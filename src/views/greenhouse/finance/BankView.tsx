@@ -27,6 +27,7 @@ import PaymentInstrumentChip from '@/components/greenhouse/PaymentInstrumentChip
 import type { InstrumentCategory } from '@/config/payment-instruments'
 import AccountDetailDrawer from '@/views/greenhouse/finance/components/AccountDetailDrawer'
 import AssignAccountDrawer from '@/views/greenhouse/finance/drawers/AssignAccountDrawer'
+import DeclareReconciliationDrawer from '@/views/greenhouse/finance/drawers/DeclareReconciliationDrawer'
 import InternalTransferDrawer from '@/views/greenhouse/finance/drawers/InternalTransferDrawer'
 
 type Coverage = {
@@ -34,6 +35,23 @@ type Coverage = {
   totalCount: number
   coveragePct: number
   unassignedCount: number
+}
+
+type ReconciliationDriftView = {
+  hasOpenDrift: boolean
+  driftAmount: number
+  driftStatus: 'open' | 'accepted' | 'reconciled' | null
+  driftAgeMinutes: number | null
+  bankClosingBalance: number | null
+  bankAvailableBalance: number | null
+  bankHoldsAmount: number | null
+  bankCreditLimit: number | null
+  pgClosingBalance: number | null
+  snapshotId: string | null
+  snapshotAt: string | null
+  sourceKind: string | null
+  sourceEvidenceRef: string | null
+  driftExplanation: string | null
 }
 
 type TreasuryAccount = {
@@ -51,6 +69,7 @@ type TreasuryAccount = {
   reconciliationStatus: string | null
   reconciliationPeriodId: string | null
   isPeriodClosed: boolean
+  drift: ReconciliationDriftView | null
 }
 
 type CreditCardSummary = {
@@ -171,6 +190,8 @@ const BankView = () => {
   const [data, setData] = useState<BankResponse | null>(null)
 
   const [transferOpen, setTransferOpen] = useState(false)
+  const [reconcileOpen, setReconcileOpen] = useState(false)
+  const [reconcilePreselect, setReconcilePreselect] = useState<string | null>(null)
   const [assignOpen, setAssignOpen] = useState(false)
   const [detailAccountId, setDetailAccountId] = useState<string | null>(null)
 
@@ -435,6 +456,19 @@ const BankView = () => {
             <CardHeader
               title='Saldos por instrumento'
               subheader={`Período ${MONTHS.find(option => option.value === month)?.label || month} ${year}. Click en una cuenta para abrir el detalle y el cierre del período.`}
+              action={
+                <Button
+                  variant='tonal'
+                  color='primary'
+                  size='small'
+                  onClick={() => {
+                    setReconcilePreselect(null)
+                    setReconcileOpen(true)
+                  }}
+                >
+                  Declarar conciliación
+                </Button>
+              }
             />
             <CardContent sx={{ pt: 0 }}>
               <TableContainer>
@@ -503,7 +537,19 @@ const BankView = () => {
                             <TableCell>{formatAmount(account.periodInflows, account.currency)}</TableCell>
                             <TableCell>{formatAmount(account.periodOutflows, account.currency)}</TableCell>
                             <TableCell sx={{ fontWeight: 700 }}>
-                              {formatAmount(account.closingBalance, account.currency)}
+                              <Stack spacing={0.5}>
+                                <Box>{formatAmount(account.closingBalance, account.currency)}</Box>
+                                {account.drift && account.drift.driftStatus !== 'reconciled' && Math.abs(account.drift.driftAmount) >= 1 && (
+                                  <CustomChip
+                                    round='true'
+                                    size='small'
+                                    variant='tonal'
+                                    color={account.drift.driftStatus === 'accepted' ? 'info' : 'warning'}
+                                    label={`${account.drift.driftStatus === 'accepted' ? 'Por conciliar' : 'Drift'} ${formatAmount(Math.abs(account.drift.driftAmount), account.currency)}`}
+                                    title={`Banco: ${formatAmount(account.drift.bankClosingBalance ?? 0, account.currency)} • Greenhouse: ${formatAmount(account.drift.pgClosingBalance ?? 0, account.currency)}${account.drift.driftExplanation ? ` • ${account.drift.driftExplanation}` : ''}`}
+                                  />
+                                )}
+                              </Stack>
                             </TableCell>
                             <TableCell>
                               <CustomChip
@@ -598,6 +644,21 @@ const BankView = () => {
         accounts={accountOptions}
         onClose={() => setTransferOpen(false)}
         onSuccess={() => void fetchData()}
+      />
+
+      <DeclareReconciliationDrawer
+        open={reconcileOpen}
+        accounts={data.accounts.map(a => ({
+          accountId: a.accountId,
+          accountName: a.accountName,
+          currency: a.currency,
+          instrumentCategory: a.instrumentCategory,
+          closingBalance: a.closingBalance,
+          creditLimit: data.creditCards.find(cc => cc.accountId === a.accountId)?.creditLimit ?? null
+        }))}
+        preselectedAccountId={reconcilePreselect}
+        onClose={() => setReconcileOpen(false)}
+        onDeclared={() => void fetchData()}
       />
 
       <AssignAccountDrawer

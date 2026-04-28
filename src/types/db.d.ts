@@ -3264,6 +3264,36 @@ export interface GreenhouseFinanceAccountOpeningTrialBalance {
   superseded_reason: string | null;
 }
 
+export interface GreenhouseFinanceAccountReconciliationSnapshots {
+  account_id: string;
+  bank_available_balance: Numeric | null;
+  bank_closing_balance: Numeric;
+  bank_credit_limit: Numeric | null;
+  /**
+   * Para credit_card: cupo_total - bank_closing - bank_available_balance. Authorizations en proceso que reducen disponible pero no deuda. NULL para otros account_kind.
+   */
+  bank_holds_amount: Numeric | null;
+  created_at: Generated<Timestamp>;
+  declared_by_user_id: string | null;
+  /**
+   * pg_closing_balance − bank_closing_balance. Para liability accounts, positivo = PG cuenta más deuda que banco (típico cuando PG ya reconoció cargos en hold). Para asset, positivo = PG tiene más caja que banco.
+   */
+  drift_amount: Numeric;
+  drift_explanation: string | null;
+  /**
+   * open: no revisado. accepted: usuario marcó drift como pendiente legítimo (holds, timing, FX) — sigue mostrando badge informativo. reconciled: drift cerrado por adición de data faltante o nuevo snapshot que cuadró exacto.
+   */
+  drift_status: string;
+  pg_closing_balance: Numeric;
+  resolved_at: Timestamp | null;
+  resolved_by_user_id: string | null;
+  resolved_reason: string | null;
+  snapshot_at: Timestamp;
+  snapshot_id: string;
+  source_evidence_ref: string | null;
+  source_kind: string;
+}
+
 export interface GreenhouseFinanceAccounts {
   account_id: string;
   /**
@@ -7171,6 +7201,7 @@ export interface DB {
   "greenhouse_finance.account_balances": GreenhouseFinanceAccountBalances;
   "greenhouse_finance.account_number_registry": GreenhouseFinanceAccountNumberRegistry;
   "greenhouse_finance.account_opening_trial_balance": GreenhouseFinanceAccountOpeningTrialBalance;
+  "greenhouse_finance.account_reconciliation_snapshots": GreenhouseFinanceAccountReconciliationSnapshots;
   "greenhouse_finance.accounts": GreenhouseFinanceAccounts;
   "greenhouse_finance.bank_statement_rows": GreenhouseFinanceBankStatementRows;
   "greenhouse_finance.client_economics": GreenhouseFinanceClientEconomics;

@@ -17,6 +17,7 @@ import {
 } from '@/lib/finance/shared'
 import { getBankFxPnlBreakdown } from '@/lib/finance/fx-pnl'
 import { getActiveOpeningTrialBalance } from '@/lib/finance/account-opening-trial-balance'
+import { getOpenDriftSummariesForAccounts } from '@/lib/finance/reconciliation/snapshots'
 import { captureWithDomain } from '@/lib/observability/capture'
 
 type QueryableClient = Pick<PoolClient, 'query'>
@@ -170,6 +171,23 @@ export type TreasuryCoverage = {
   unassignedCount: number
 }
 
+export type ReconciliationDriftSummaryView = {
+  hasOpenDrift: boolean
+  driftAmount: number
+  driftStatus: 'open' | 'accepted' | 'reconciled' | null
+  driftAgeMinutes: number | null
+  bankClosingBalance: number | null
+  bankAvailableBalance: number | null
+  bankHoldsAmount: number | null
+  bankCreditLimit: number | null
+  pgClosingBalance: number | null
+  snapshotId: string | null
+  snapshotAt: string | null
+  sourceKind: string | null
+  sourceEvidenceRef: string | null
+  driftExplanation: string | null
+}
+
 export type TreasuryBankAccountOverview = {
   accountId: string
   accountName: string
@@ -196,6 +214,8 @@ export type TreasuryBankAccountOverview = {
   reconciliationPeriodId: string | null
   creditLimit: number | null
   metadata: Record<string, unknown> | null
+  /** TASK-704: drift bank vs PG. null si nunca se declaró un snapshot. */
+  drift: ReconciliationDriftSummaryView | null
 }
 
 export type TreasuryFxBreakdown = {
@@ -1220,7 +1240,7 @@ export const getBankOverview = async ({
     client
   )
 
-  const accounts: TreasuryBankAccountOverview[] = rows.map(row => ({
+  const accountsRaw: TreasuryBankAccountOverview[] = rows.map(row => ({
     accountId: normalizeString(row.account_id),
     accountName: normalizeString(row.account_name),
     bankName: row.bank_name ? normalizeString(row.bank_name) : null,
@@ -1244,8 +1264,40 @@ export const getBankOverview = async ({
     reconciliationStatus: row.reconciliation_status ? normalizeString(row.reconciliation_status) : null,
     reconciliationPeriodId: row.reconciliation_period_id ? normalizeString(row.reconciliation_period_id) : null,
     creditLimit: row.credit_limit != null ? roundCurrency(toNumber(row.credit_limit)) : null,
-    metadata: parseMetadata(row.metadata_json)
+    metadata: parseMetadata(row.metadata_json),
+    drift: null
   }))
+
+  // TASK-704: enrich accounts con drift summary (latest snapshot per account).
+  const driftSummaries = await getOpenDriftSummariesForAccounts(accountsRaw.map(a => a.accountId))
+
+  const accounts: TreasuryBankAccountOverview[] = accountsRaw.map(account => {
+    const summary = driftSummaries[account.accountId]
+
+    if (!summary || !summary.latestSnapshot) {
+      return account
+    }
+
+    return {
+      ...account,
+      drift: {
+        hasOpenDrift: summary.hasOpenDrift,
+        driftAmount: summary.driftAmount,
+        driftStatus: summary.driftStatus,
+        driftAgeMinutes: summary.driftAgeMinutes,
+        bankClosingBalance: summary.latestSnapshot.bankClosingBalance,
+        bankAvailableBalance: summary.latestSnapshot.bankAvailableBalance,
+        bankHoldsAmount: summary.latestSnapshot.bankHoldsAmount,
+        bankCreditLimit: summary.latestSnapshot.bankCreditLimit,
+        pgClosingBalance: summary.latestSnapshot.pgClosingBalance,
+        snapshotId: summary.latestSnapshot.snapshotId,
+        snapshotAt: summary.latestSnapshot.snapshotAt,
+        sourceKind: summary.latestSnapshot.sourceKind,
+        sourceEvidenceRef: summary.latestSnapshot.sourceEvidenceRef,
+        driftExplanation: summary.latestSnapshot.driftExplanation
+      }
+    }
+  })
 
   const coverage = await getCoverage(periodStart, periodEnd, client)
 
