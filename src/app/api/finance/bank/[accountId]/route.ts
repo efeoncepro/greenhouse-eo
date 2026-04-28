@@ -37,11 +37,18 @@ export async function GET(
     const year = yearParam ? parsePositiveInteger(yearParam, 'year') : null
     const month = monthParam ? parsePositiveInteger(monthParam, 'month') : null
 
+    // TASK-705 — pure read path:
+    // - materialize: 'skip' (NO recomputar inline; lanes reactivas mantienen snapshots).
+    // - historySource: 'monthly_read_model' (lee account_balances_monthly precomputed).
+    // El response incluye freshness.isStale=true cuando el snapshot es viejo;
+    // la UI muestra banner "Actualizado hace X" sin disparar recompute síncrono.
     const detail = await getBankAccountDetail({
       accountId,
       year,
       month,
-      actorUserId: tenant.userId || null
+      actorUserId: tenant.userId || null,
+      materialize: 'skip',
+      historySource: 'monthly_read_model'
     })
 
     return NextResponse.json(detail)

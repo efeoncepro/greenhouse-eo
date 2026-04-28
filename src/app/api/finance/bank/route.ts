@@ -39,10 +39,15 @@ export async function GET(request: Request) {
     const year = parsePeriodValue(url.searchParams.get('year'), 'year')
     const month = parsePeriodValue(url.searchParams.get('month'), 'month')
 
+    // TASK-705 — read snapshot only. NO materializar inline. La materialización
+    // canónica vive en lanes reactivas (accountBalancesProjection) + cron
+    // ops-worker `ops-finance-rematerialize-balances`. Si snapshot está stale,
+    // el response incluye `freshness.isStale = true` y la UI muestra banner.
     const overview = await getBankOverview({
       year,
       month,
-      actorUserId: tenant.userId || null
+      actorUserId: tenant.userId || null,
+      materialize: 'skip'
     })
 
     return NextResponse.json(overview)

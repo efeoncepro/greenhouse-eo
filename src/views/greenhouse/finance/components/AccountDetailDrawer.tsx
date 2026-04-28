@@ -93,10 +93,18 @@ type ActiveOtb = {
   supersededTransactionsCount: number
 }
 
+type FreshnessSignal = {
+  lastMaterializedAt: string | null
+  ageSeconds: number | null
+  isStale: boolean
+  label: string | null
+}
+
 type DetailResponse = {
   account: AccountOverview
   currentBalance: AccountBalance
   activeOtb: ActiveOtb | null
+  freshness?: FreshnessSignal
   history: HistoryPoint[]
   movements: Movement[]
 }
@@ -263,6 +271,18 @@ const AccountDetailDrawer = ({ open, accountId, year, month, onClose, onSuccess 
 
         {!loading && !error && detail ? (
           <Stack spacing={4}>
+            {detail.freshness?.isStale && detail.freshness?.label ? (
+              <Alert
+                severity='info'
+                variant='outlined'
+                icon={<i className='tabler-clock' aria-hidden />}
+                role='status'
+                aria-live='polite'
+              >
+                Saldo actualizado {detail.freshness.label.toLowerCase()}. La materialización corre
+                en segundo plano; los movimientos recientes podrían demorar unos minutos en aparecer.
+              </Alert>
+            ) : null}
             <Card variant='outlined'>
               <CardContent>
                 <Stack

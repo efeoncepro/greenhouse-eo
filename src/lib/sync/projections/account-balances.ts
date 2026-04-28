@@ -3,7 +3,38 @@ import 'server-only'
 import type { ProjectionDefinition } from '../projection-registry'
 import { query } from '@/lib/db'
 import { rematerializeAccountBalancesFromDate } from '@/lib/finance/account-balances'
+import { aggregateMonthlyFromDaily } from '@/lib/finance/account-balances-monthly'
 import { normalizeString, toDateString } from '@/lib/finance/shared'
+
+/**
+ * TASK-705 Slice 3 — refresh atómico daily + monthly aggregation.
+ *
+ * Después de rematerializar el daily desde `fromDate`, agrega los meses afectados
+ * (entre `fromDate` y hoy) al read model `account_balances_monthly`. Mantiene el
+ * read model fresco automáticamente sin necesidad de cron adicional para casos
+ * comunes; el cron `ops-finance-rematerialize-balances` (5:00 CLT) cubre casos
+ * batch o backfill.
+ */
+const refreshMonthlyForRange = async (accountId: string, fromDate: string) => {
+  const start = new Date(`${fromDate}T00:00:00Z`)
+
+  if (Number.isNaN(start.getTime())) return
+
+  const today = new Date()
+  const startYM = start.getUTCFullYear() * 12 + start.getUTCMonth()
+  const endYM = today.getUTCFullYear() * 12 + today.getUTCMonth()
+
+  for (let ym = startYM; ym <= endYM; ym++) {
+    const year = Math.floor(ym / 12)
+    const month = (ym % 12) + 1
+
+    try {
+      await aggregateMonthlyFromDaily({ accountId, year, month })
+    } catch {
+      // Idempotencia: errores en un mes específico no abortan el resto.
+    }
+  }
+}
 
 const refreshAccountFromDate = async (accountId: string | null, date: string | null) => {
   if (!accountId || !date) {
@@ -14,6 +45,9 @@ const refreshAccountFromDate = async (accountId: string | null, date: string | n
     accountId,
     fromDate: date
   })
+
+  // TASK-705 — refresca también el read model mensual para los meses afectados.
+  await refreshMonthlyForRange(accountId, date)
 
   return { accountId, date }
 }

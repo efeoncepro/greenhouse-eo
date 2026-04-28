@@ -3226,6 +3226,40 @@ export interface GreenhouseFinanceAccountBalances {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseFinanceAccountBalancesMonthly {
+  account_id: string;
+  /**
+   * PK app-generated: acctbal-mo-{accountId}-{YYYY-MM}.
+   */
+  balance_id: string;
+  balance_month: number;
+  balance_year: number;
+  /**
+   * Closing del ultimo dia del mes con snapshot diario (DISTINCT ON balance_date DESC).
+   */
+  closing_balance: Generated<Numeric>;
+  closing_balance_clp: Numeric | null;
+  /**
+   * Timestamp de la ultima rematerializacion. Freshness signal: NOW() - computed_at > threshold => stale.
+   */
+  computed_at: Generated<Timestamp>;
+  created_at: Generated<Timestamp>;
+  currency: string;
+  fx_gain_loss_clp: Generated<Numeric>;
+  fx_gain_loss_realized_clp: Generated<Numeric>;
+  fx_gain_loss_translation_clp: Generated<Numeric>;
+  last_transaction_at: Timestamp | null;
+  /**
+   * Closing del primer dia del mes (DISTINCT ON balance_date ASC).
+   */
+  opening_balance: Generated<Numeric>;
+  period_inflows: Generated<Numeric>;
+  period_outflows: Generated<Numeric>;
+  space_id: string | null;
+  transaction_count: Generated<number>;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseFinanceAccountNumberRegistry {
   account_number: string;
   assigned_at: Generated<Timestamp>;
@@ -7390,6 +7424,7 @@ export interface DB {
   "greenhouse_delivery.staff_aug_placements": GreenhouseDeliveryStaffAugPlacements;
   "greenhouse_delivery.tasks": GreenhouseDeliveryTasks;
   "greenhouse_finance.account_balances": GreenhouseFinanceAccountBalances;
+  "greenhouse_finance.account_balances_monthly": GreenhouseFinanceAccountBalancesMonthly;
   "greenhouse_finance.account_number_registry": GreenhouseFinanceAccountNumberRegistry;
   "greenhouse_finance.account_opening_trial_balance": GreenhouseFinanceAccountOpeningTrialBalance;
   "greenhouse_finance.account_reconciliation_snapshots": GreenhouseFinanceAccountReconciliationSnapshots;
