@@ -783,7 +783,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-706` | `to-do` | Previred Processor UX & Bank Semantics | `docs/tasks/to-do/TASK-706-previred-processor-ux-and-bank-semantics.md` |
 | `TASK-707` | `to-do` | Previred Canonical Payment Runtime & Backfill | `docs/tasks/to-do/TASK-707-previred-canonical-payment-runtime-and-backfill.md` |
 | `TASK-708` | `to-do` | Nubox Documents-Only SoT + Reconciliation Purity Cutover | `docs/tasks/to-do/TASK-708-nubox-documents-only-and-reconciliation-sot-cutover.md` |
-| `TASK-708b` | `to-do` | Nubox Phantom Cohort Remediation (historical cleanup) | `docs/tasks/to-do/TASK-708b-nubox-phantom-cohort-remediation.md` |
+| `TASK-708b` | `complete` | Nubox Phantom Cohort Remediation (historical cleanup) | `docs/tasks/complete/TASK-708b-nubox-phantom-cohort-remediation.md` |
 | `TASK-710` | `to-do` | Tool Consumption Bridge (provider→tool→assignment→consumption→client) — MLCM Fase 2 | `docs/tasks/to-do/TASK-710-tool-consumption-bridge.md` |
 | `TASK-711` | `to-do` | Member ↔ Tool License Assignment UI — MLCM ops surface | `docs/tasks/to-do/TASK-711-member-tool-license-ui.md` |
 | `TASK-712` | `to-do` | Tool Catalog Consolidation (cost models, lifecycle, vendor FK) — MLCM Fase 2 | `docs/tasks/to-do/TASK-712-tool-catalog-consolidation.md` |

@@ -79,18 +79,18 @@ export interface CohortCEvidenceRow {
 }
 
 const COHORT_A_FILTER = `
-  payment_source = 'nubox_bank_sync'
-  AND payment_account_id IS NULL
-  AND superseded_by_payment_id IS NULL
-  AND superseded_at IS NULL
+  ip.payment_source = 'nubox_bank_sync'
+  AND ip.payment_account_id IS NULL
+  AND ip.superseded_by_payment_id IS NULL
+  AND ip.superseded_at IS NULL
 `
 
 const COHORT_B_FILTER = `
-  payment_source = 'manual'
-  AND payment_id LIKE 'exp-pay-backfill-EXP-NB-%'
-  AND payment_account_id IS NULL
-  AND superseded_by_payment_id IS NULL
-  AND superseded_at IS NULL
+  ep.payment_source = 'manual'
+  AND ep.payment_id LIKE 'exp-pay-backfill-EXP-NB-%'
+  AND ep.payment_account_id IS NULL
+  AND ep.superseded_by_payment_id IS NULL
+  AND ep.superseded_at IS NULL
 `
 
 const COHORT_C_FILTER = `

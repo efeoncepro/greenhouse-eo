@@ -1,0 +1,1389 @@
+{
+  "generatedAt": "2026-04-28T15:08:41.831Z",
+  "task": "TASK-708b",
+  "totalSignals": 86,
+  "classified": 86,
+  "counts": {
+    "repaired_with_account": 21,
+    "superseded_replaced": 0,
+    "dismissed_no_cash": 65
+  },
+  "proposals": [
+    {
+      "signalId": "signal-67506ad8-fd25-4969-900e-faaddbb83f5e",
+      "documentKind": "income",
+      "documentId": "INC-NB-26004360",
+      "paymentId": "PAY-NUBOX-inc-3968936",
+      "amount": 752730,
+      "currency": "CLP",
+      "signalDate": "2026-04-13",
+      "outcome": "repaired_with_account",
+      "reason": "TASK-708b: D5 rule rule-nubox-clp-bank-transfer-santander resuelve cuenta santander-clp con confianza alta.",
+      "resolvedAccountId": "santander-clp",
+      "evidence": {
+        "matchingRule": "rule-nubox-clp-bank-transfer-santander",
+        "matchingOutcome": "resolved"
+      }
+    },
+    {
+      "signalId": "signal-0b2734fb-a830-49ca-8c64-71bcdc80a0eb",
+      "documentKind": "expense",
+      "documentId": "EXP-NB-33287311",
+      "paymentId": "exp-pay-backfill-EXP-NB-33287311",
+      "amount": 101150,
+      "currency": "CLP",
+      "signalDate": "2026-02-27",
+      "outcome": "dismissed_no_cash",
+      "reason": "TASK-708b: pago historico Nubox sin evidencia de cash real (2026-02-27). Anulado sin reemplazo bajo runbook docs/operations/runbooks/TASK-708b-nubox-phantom-remediation.md.",
+      "resolvedAccountId": null,
+      "evidence": {
+        "matchingOutcome": "no_match",
+        "matchingRule": null
+      }
+    },
+    {
+      "signalId": "signal-7b6b6e15-295a-4ac0-a027-b6ead7e2ee17",
+      "documentKind": "expense",
+      "documentId": "EXP-NB-33271963",
+      "paymentId": "exp-pay-backfill-EXP-NB-33271963",
+      "amount": 642600,
+      "currency": "CLP",
+      "signalDate": "2026-02-26",
+      "outcome": "dismissed_no_cash",
+      "reason": "TASK-708b: pago historico Nubox sin evidencia de cash real (2026-02-26). Anulado sin reemplazo bajo runbook docs/operations/runbooks/TASK-708b-nubox-phantom-remediation.md.",
+      "resolvedAccountId": null,
+      "evidence": {
+        "matchingOutcome": "no_match",
+        "matchingRule": null
+      }
+    },
+    {
+      "signalId": "signal-4319d817-40c8-404a-adad-e72c1b1cf7ea",
+      "documentKind": "expense",
+      "documentId": "EXP-NB-31178446",
+      "paymentId": "exp-pay-backfill-EXP-NB-31178446",
+      "amount": 303450,
+      "currency": "CLP",
+      "signalDate": "2026-01-29",
+      "outcome": "dismissed_no_cash",
+      "reason": "TASK-708b: pago historico Nubox sin evidencia de cash real (2026-01-29). Anulado sin reemplazo bajo runbook docs/operations/runbooks/TASK-708b-nubox-phantom-remediation.md.",
+      "resolvedAccountId": null,
+      "evidence": {
+        "matchingOutcome": "no_match",
+        "matchingRule": null
+      }
+    },
+    {
+      "signalId": "signal-a66c8d2b-c067-4833-a9c2-78d7e91c0b1d",
+      "documentKind": "expense",
+      "documentId": "EXP-NB-29454482",
+      "paymentId": "exp-pay-backfill-EXP-NB-29454482",
+      "amount": 101150,
+      "currency": "CLP",
+      "signalDate": "2025-12-31",
+      "outcome": "dismissed_no_cash",
+      "reason": "TASK-708b: pago historico Nubox sin evidencia de cash real (2025-12-31). Anulado sin reemplazo bajo runbook docs/operations/runbooks/TASK-708b-nubox-phantom-remediation.md.",
+      "resolvedAccountId": null,
+      "evidence": {
+        "matchingOutcome": "no_match",
+        "matchingRule": null
+      }
+    },
+    {
+      "signalId": "signal-4a4353df-bfaa-4283-a8df-9a51020cec6a",
+      "documentKind": "expense",
+      "documentId": "EXP-NB-29133156",
+      "paymentId": "exp-pay-backfill-EXP-NB-29133156",
+      "amount": 8163,
+      "currency": "CLP",
+      "signalDate": "2025-12-24",
+      "outcome": "dismissed_no_cash",
+      "reason": "TASK-708b: pago historico Nubox sin evidencia de cash real (2025-12-24). Anulado sin reemplazo bajo runbook docs/operations/runbooks/TASK-708b-nubox-phantom-remediation.md.",
+      "resolvedAccountId": null,
+      "evidence": {
+        "matchingOutcome": "no_match",
+        "matchingRule": null
+      }
+    },
+    {
+      "signalId": "signal-884a8a6d-09e5-443b-bea0-b518503d241b",
+      "documentKind": "expense",
+      "documentId": "EXP-NB-29454157",
+      "paymentId": "exp-pay-backfill-EXP-NB-29454157",
+      "amount": 101150,
+      "currency": "CLP",
+      "signalDate": "2025-12-05",
+      "outcome": "dismissed_no_cash",
+      "reason": "TASK-708b: pago historico Nubox sin evidencia de cash real (2025-12-05). Anulado sin reemplazo bajo runbook docs/operations/runbooks/TASK-708b-nubox-phantom-remediation.md.",
+      "resolvedAccountId": null,
+      "evidence": {
+        "matchingOutcome": "no_match",
+        "matchingRule": null
+      }
+    },
+    {
+      "signalId": "signal-132fb25d-ed17-4f8b-bf7a-8194dda8c2e6",
+      "documentKind": "expense",
+      "documentId": "EXP-NB-27629178",
+      "paymentId": "exp-pay-backfill-EXP-NB-27629178",
+      "amount": 595000,
+      "currency": "CLP",
+      "signalDate": "2025-11-29",
+      "outcome": "dismissed_no_cash",
+      "reason": "TASK-708b: pago historico Nubox sin evidencia de cash real (2025-11-29). Anulado sin reemplazo bajo runbook docs/operations/runbooks/TASK-708b-nubox-phantom-remediation.md.",
+      "resolvedAccountId": null,
+      "evidence": {
+        "matchingOutcome": "no_match",
+        "matchingRule": null
+      }
+    },
+    {
+      "signalId": "signal-664218db-9aec-406c-92fc-7aca11c77776",
+      "documentKind": "expense",
+      "documentId": "EXP-NB-27560221",
+      "paymentId": "exp-pay-backfill-EXP-NB-27560221",
+      "amount": 101150,
+      "currency": "CLP",
+      "signalDate": "2025-11-28",
+      "outcome": "dismissed_no_cash",
+      "reason": "TASK-708b: pago historico Nubox sin evidencia de cash real (2025-11-28). Anulado sin reemplazo bajo runbook docs/operations/runbooks/TASK-708b-nubox-phantom-remediation.md.",
+      "resolvedAccountId": null,
+      "evidence": {
+        "matchingOutcome": "no_match",
+        "matchingRule": null
+      }
+    },
+    {
+      "signalId": "signal-b789059f-a4b7-4d9c-8597-760f74578b5a",
+      "documentKind": "expense",
+      "documentId": "EXP-NB-27549692",
+      "paymentId": "exp-pay-backfill-EXP-NB-27549692",
+      "amount": 187370,
+      "currency": "CLP",
+      "signalDate": "2025-11-28",
+      "outcome": "dismissed_no_cash",
+      "reason": "TASK-708b: pago historico Nubox sin evidencia de cash real (2025-11-28). Anulado sin reemplazo bajo runbook docs/operations/runbooks/TASK-708b-nubox-phantom-remediation.md.",
+      "resolvedAccountId": null,
+      "evidence": {
+        "matchingOutcome": "no_match",
+        "matchingRule": null
+      }
+    },
+    {
+      "signalId": "signal-04ba6cff-4a38-4644-8b07-06adabb743d7",
+      "documentKind": "income",
+      "documentId": "INC-NB-20582432",
+      "paymentId": "PAY-NUBOX-inc-2975109",
+      "amount": 6902000,
+      "currency": "CLP",
+      "signalDate": "2025-11-28",
+      "outcome": "repaired_with_account",
+      "reason": "TASK-708b: D5 rule rule-nubox-clp-bank-transfer-santander resuelve cuenta santander-clp con confianza alta.",
+      "resolvedAccountId": "santander-clp",
+      "evidence": {
+        "matchingRule": "rule-nubox-clp-bank-transfer-santander",
+        "matchingOutcome": "resolved"
+      }
+    },
+    {
+      "signalId": "signal-27d9dce3-7c96-4612-a796-58b42caff7df",
+      "documentKind": "expense",
+      "documentId": "EXP-NB-27549691",
+      "paymentId": "exp-pay-backfill-EXP-NB-27549691",
+      "amount": 134605,
+      "currency": "CLP",
+      "signalDate": "2025-11-28",
+      "outcome": "dismissed_no_cash",
+      "reason": "TASK-708b: pago historico Nubox sin evidencia de cash real (2025-11-28). Anulado sin reemplazo bajo runbook docs/operations/runbooks/TASK-708b-nubox-phantom-remediation.md.",
+      "resolvedAccountId": null,
+      "evidence": {
+        "matchingOutcome": "no_match",
+        "matchingRule": null
+      }
+    },
+    {
+      "signalId": "signal-c9576c0a-30ab-4e2c-aeee-8485f3a52425",
+      "documentKind": "income",
+      "documentId": "INC-NB-20482168",
+      "paymentId": "PAY-NUBOX-inc-2957300",
+      "amount": 117873,
+      "currency": "CLP",
+      "signalDate": "2025-11-27",
+      "outcome": "repaired_with_account",
+      "reason": "TASK-708b: D5 rule rule-nubox-clp-bank-transfer-santander resuelve cuenta santander-clp con confianza alta.",
+      "resolvedAccountId": "santander-clp",
+      "evidence": {
+        "matchingRule": "rule-nubox-clp-bank-transfer-santander",
+        "matchingOutcome": "resolved"
+      }
+    },
+    {
+      "signalId": "signal-128ca682-8ee1-450f-ad6f-711ebb223ae5",
+      "documentKind": "expense",
+      "documentId": "EXP-NB-27090989",
+      "paymentId": "exp-pay-backfill-EXP-NB-27090989",
+      "amount": 243096,
+      "currency": "CLP",
+      "signalDate": "2025-11-19",
+      "outcome": "dismissed_no_cash",
+      "reason": "TASK-708b: pago historico Nubox sin evidencia de cash real (2025-11-19). Anulado sin reemplazo bajo runbook docs/operations/runbooks/TASK-708b-nubox-phantom-remediation.md.",
+      "resolvedAccountId": null,
+      "evidence": {
+        "matchingOutcome": "no_match",
+        "matchingRule": null
+      }
+    },
+    {
+      "signalId": "signal-05975a95-b232-4148-ac1e-12eef00c627d",
+      "documentKind": "income",
+      "documentId": "INC-NB-20298181",
+      "paymentId": "PAY-NUBOX-inc-2853086",
+      "amount": 752730,
+      "currency": "CLP",
+      "signalDate": "2025-11-07",
+      "outcome": "repaired_with_account",
+      "reason": "TASK-708b: D5 rule rule-nubox-clp-bank-transfer-santander resuelve cuenta santander-clp con confianza alta.",
+      "resolvedAccountId": "santander-clp",
+      "evidence": {
+        "matchingRule": "rule-nubox-clp-bank-transfer-santander",
+        "matchingOutcome": "resolved"
+      }
+    },
+    {
+      "signalId": "signal-5dd96691-53a4-4767-955d-c615c6709b8c",
+      "documentKind": "income",
+      "documentId": "INC-NB-19116635",
+      "paymentId": "PAY-NUBOX-inc-2823401",
+      "amount": 6902000,
+      "currency": "CLP",
+      "signalDate": "2025-11-03",
+      "outcome": "repaired_with_account",
+      "reason": "TASK-708b: D5 rule rule-nubox-clp-bank-transfer-santander resuelve cuenta santander-clp con confianza alta.",
+      "resolvedAccountId": "santander-clp",
+      "evidence": {
+        "matchingRule": "rule-nubox-clp-bank-transfer-santander",
+        "matchingOutcome": "resolved"
+      }
+    },
+    {
+      "signalId": "signal-d6b3d94e-6f58-4f9f-b601-be60c428d190",
+      "documentKind": "income",
+      "documentId": "INC-NB-20056160",
+      "paymentId": "PAY-NUBOX-inc-2812579",
+      "amount": 1285200,
+      "currency": "CLP",
+      "signalDate": "2025-10-30",
+      "outcome": "repaired_with_account",
+      "reason": "TASK-708b: D5 rule rule-nubox-clp-bank-transfer-santander resuelve cuenta santander-clp con confianza alta.",
+      "resolvedAccountId": "santander-clp",
+      "evidence": {
+        "matchingRule": "rule-nubox-clp-bank-transfer-santander",
+        "matchingOutcome": "resolved"
+      }
+    },
+    {
+      "signalId": "signal-2ab094ca-acdd-4aea-b8cd-a149173cda13",
+      "documentKind": "expense",
+      "documentId": "EXP-NB-25702323",
+      "paymentId": "exp-pay-backfill-EXP-NB-25702323",
+      "amount": 8330,
+      "currency": "CLP",
+      "signalDate": "2025-10-29",
+      "outcome": "dismissed_no_cash",
+      "reason": "TASK-708b: pago historico Nubox sin evidencia de cash real (2025-10-29). Anulado sin reemplazo bajo runbook docs/operations/runbooks/TASK-708b-nubox-phantom-remediation.md.",
+      "resolvedAccountId": null,
+      "evidence": {
+        "matchingOutcome": "no_match",
+        "matchingRule": null
+      }
+    },
+    {
+      "signalId": "signal-a9259db3-1608-4dc2-90bb-889b008b945a",
+      "documentKind": "expense",
+      "documentId": "EXP-NB-25702231",
+      "paymentId": "exp-pay-backfill-EXP-NB-25702231",
+      "amount": 8330,
+      "currency": "CLP",
+      "signalDate": "2025-10-29",
+      "outcome": "dismissed_no_cash",
+      "reason": "TASK-708b: pago historico Nubox sin evidencia de cash real (2025-10-29). Anulado sin reemplazo bajo runbook docs/operations/runbooks/TASK-708b-nubox-phantom-remediation.md.",
+      "resolvedAccountId": null,
+      "evidence": {
+        "matchingOutcome": "no_match",
+        "matchingRule": null
+      }
+    },
+    {
+      "signalId": "signal-12b898c7-926f-42ea-8dba-1183d6833382",
+      "documentKind": "expense",
+      "documentId": "EXP-NB-25645341",
+      "paymentId": "exp-pay-backfill-EXP-NB-25645341",
+      "amount": 19348,
+      "currency": "CLP",
+      "signalDate": "2025-10-28",
+      "outcome": "dismissed_no_cash",
+      "reason": "TASK-708b: pago historico Nubox sin evidencia de cash real (2025-10-28). Anulado sin reemplazo bajo runbook docs/operations/runbooks/TASK-708b-nubox-phantom-remediation.md.",
+      "resolvedAccountId": null,
+      "evidence": {
+        "matchingOutcome": "no_match",
+        "matchingRule": null
+      }
+    },
+    {
+      "signalId": "signal-bddfb057-9b2a-41f1-85e3-651a6a4f6d82",
+      "documentKind": "expense",
+      "documentId": "EXP-NB-24654132",
+      "paymentId": "exp-pay-backfill-EXP-NB-24654132",
+      "amount": 44950,
+      "currency": "CLP",
+      "signalDate": "2025-10-10",
+      "outcome": "dismissed_no_cash",
+      "reason": "TASK-708b: pago historico Nubox sin evidencia de cash real (2025-10-10). Anulado sin reemplazo bajo runbook docs/operations/runbooks/TASK-708b-nubox-phantom-remediation.md.",
+      "resolvedAccountId": null,
+      "evidence": {
+        "matchingOutcome": "no_match",
+        "matchingRule": null
+      }
+    },
+    {
+      "signalId": "signal-3c46ddd7-a737-4584-b4b4-a2ad8a769506",
+      "documentKind": "expense",
+      "documentId": "EXP-NB-26074135",
+      "paymentId": "exp-pay-backfill-EXP-NB-26074135",
+      "amount": 18581,
+      "currency": "CLP",
+      "signalDate": "2025-10-10",
+      "outcome": "dismissed_no_cash",
+      "reason": "TASK-708b: pago historico Nubox sin evidencia de cash real (2025-10-10). Anulado sin reemplazo bajo runbook docs/operations/runbooks/TASK-708b-nubox-phantom-remediation.md.",
+      "resolvedAccountId": null,
+      "evidence": {
+        "matchingOutcome": "no_match",
+        "matchingRule": null
+      }
+    },
+    {
+      "signalId": "signal-608cacd7-8df8-4216-ad28-34177ca0b5ad",
+      "documentKind": "expense",
+      "documentId": "EXP-NB-24686121",
+      "paymentId": "exp-pay-backfill-EXP-NB-24686121",
+      "amount": 18646,
+      "currency": "CLP",
+      "signalDate": "2025-10-10",
+      "outcome": "dismissed_no_cash",
+      "reason": "TASK-708b: pago historico Nubox sin evidencia de cash real (2025-10-10). Anulado sin reemplazo bajo runbook docs/operations/runbooks/TASK-708b-nubox-phantom-remediation.md.",
+      "resolvedAccountId": null,
+      "evidence": {
+        "matchingOutcome": "no_match",
+        "matchingRule": null
+      }
+    },
+    {
+      "signalId": "signal-59efbbca-d374-4c89-968e-a232e5b7ec43",
+      "documentKind": "income",
+      "documentId": "INC-NB-17780592",
+      "paymentId": "PAY-NUBOX-inc-2678589",
+      "amount": 6902000,
+      "currency": "CLP",
+      "signalDate": "2025-10-07",
+      "outcome": "repaired_with_account",
+      "reason": "TASK-708b: D5 rule rule-nubox-clp-bank-transfer-santander resuelve cuenta santander-clp con confianza alta.",
+      "resolvedAccountId": "santander-clp",
+      "evidence": {
+        "matchingRule": "rule-nubox-clp-bank-transfer-santander",
+        "matchingOutcome": "resolved"
+      }
+    },
+    {
+      "signalId": "signal-93f90dfa-7d41-414a-a104-17c9254ca821",
+      "documentKind": "income",
+      "documentId": "INC-NB-18648363",
+      "paymentId": "PAY-NUBOX-inc-2678602",
+      "amount": 752730,
+      "currency": "CLP",
+      "signalDate": "2025-10-07",
+      "outcome": "repaired_with_account",
+      "reason": "TASK-708b: D5 rule rule-nubox-clp-bank-transfer-santander resuelve cuenta santander-clp con confianza alta.",
+      "resolvedAccountId": "santander-clp",
+      "evidence": {
+        "matchingRule": "rule-nubox-clp-bank-transfer-santander",
+        "matchingOutcome": "resolved"
+      }
+    },
+    {
+      "signalId": "signal-e04a108b-a067-4077-b979-8962a2e6639e",
+      "documentKind": "expense",
+      "documentId": "EXP-NB-24373664",
+      "paymentId": "exp-pay-backfill-EXP-NB-24373664",
+      "amount": 139833,
+      "currency": "CLP",
+      "signalDate": "2025-10-06",
+      "outcome": "dismissed_no_cash",
+      "reason": "TASK-708b: pago historico Nubox sin evidencia de cash real (2025-10-06). Anulado sin reemplazo bajo runbook docs/operations/runbooks/TASK-708b-nubox-phantom-remediation.md.",
+      "resolvedAccountId": null,
+      "evidence": {
+        "matchingOutcome": "no_match",
+        "matchingRule": null
+      }
+    },
+    {
+      "signalId": "signal-50a61b1d-8a09-4d0a-8021-6ff1c5653efb",
+      "documentKind": "expense",
+      "documentId": "EXP-NB-24422897",
+      "paymentId": "exp-pay-backfill-EXP-NB-24422897",
+      "amount": 70481,
+      "currency": "CLP",
+      "signalDate": "2025-10-06",
+      "outcome": "dismissed_no_cash",
+      "reason": "TASK-708b: pago historico Nubox sin evidencia de cash real (2025-10-06). Anulado sin reemplazo bajo runbook docs/operations/runbooks/TASK-708b-nubox-phantom-remediation.md.",
+      "resolvedAccountId": null,
+      "evidence": {
+        "matchingOutcome": "no_match",
+        "matchingRule": null
+      }
+    },
+    {
+      "signalId": "signal-2f6798db-c799-49d0-b88d-8c8b2cd045c6",
+      "documentKind": "income",
+      "documentId": "INC-NB-16506406",
+      "paymentId": "PAY-NUBOX-inc-2654318",
+      "amount": 6902000,
+      "currency": "CLP",
+      "signalDate": "2025-10-03",
+      "outcome": "repaired_with_account",
+      "reason": "TASK-708b: D5 rule rule-nubox-clp-bank-transfer-santander resuelve cuenta santander-clp con confianza alta.",
+      "resolvedAccountId": "santander-clp",
+      "evidence": {
+        "matchingRule": "rule-nubox-clp-bank-transfer-santander",
+        "matchingOutcome": "resolved"
+      }
+    },
+    {
+      "signalId": "signal-c2ba5255-aea9-4612-912b-65df0b2a0ab8",
+      "documentKind": "expense",
+      "documentId": "EXP-NB-24396868",
+      "paymentId": "exp-pay-backfill-EXP-NB-24396868",
+      "amount": 37990,
+      "currency": "CLP",
+      "signalDate": "2025-09-30",
+      "outcome": "dismissed_no_cash",
+      "reason": "TASK-708b: pago historico Nubox sin evidencia de cash real (2025-09-30). Anulado sin reemplazo bajo runbook docs/operations/runbooks/TASK-708b-nubox-phantom-remediation.md.",
+      "resolvedAccountId": null,
+      "evidence": {
+        "matchingOutcome": "no_match",
+        "matchingRule": null
+      }
+    },
+    {
+      "signalId": "signal-ff6c9696-52bb-41b6-b83f-b0d17682885d",
+      "documentKind": "income",
+      "documentId": "INC-NB-18542422",
+      "paymentId": "PAY-NUBOX-inc-2638730",
+      "amount": 252387,
+      "currency": "CLP",
+      "signalDate": "2025-09-30",
+      "outcome": "repaired_with_account",
+      "reason": "TASK-708b: D5 rule rule-nubox-clp-bank-transfer-santander resuelve cuenta santander-clp con confianza alta.",
+      "resolvedAccountId": "santander-clp",
+      "evidence": {
+        "matchingRule": "rule-nubox-clp-bank-transfer-santander",
+        "matchingOutcome": "resolved"
+      }
+    },
+    {
+      "signalId": "signal-cf23a54c-c9f0-465a-a90c-027fc39366ff",
+      "documentKind": "expense",
+      "documentId": "EXP-NB-23744059",
+      "paymentId": "exp-pay-backfill-EXP-NB-23744059",
+      "amount": 101150,
+      "currency": "CLP",
+      "signalDate": "2025-09-26",
+      "outcome": "dismissed_no_cash",
+      "reason": "TASK-708b: pago historico Nubox sin evidencia de cash real (2025-09-26). Anulado sin reemplazo bajo runbook docs/operations/runbooks/TASK-708b-nubox-phantom-remediation.md.",
+      "resolvedAccountId": null,
+      "evidence": {
+        "matchingOutcome": "no_match",
+        "matchingRule": null
+      }
+    },
+    {
+      "signalId": "signal-0bf28a5c-8531-4a8e-8671-7d0b6e5face4",
+      "documentKind": "expense",
+      "documentId": "EXP-NB-23747831",
+      "paymentId": "exp-pay-backfill-EXP-NB-23747831",
+      "amount": 8330,
+      "currency": "CLP",
+      "signalDate": "2025-09-26",
+      "outcome": "dismissed_no_cash",
+      "reason": "TASK-708b: pago historico Nubox sin evidencia de cash real (2025-09-26). Anulado sin reemplazo bajo runbook docs/operations/runbooks/TASK-708b-nubox-phantom-remediation.md.",
+      "resolvedAccountId": null,
+      "evidence": {
+        "matchingOutcome": "no_match",
+        "matchingRule": null
+      }
+    },
+    {
+      "signalId": "signal-a9d2ed07-5265-4c2a-92c9-793f86b39676",
+      "documentKind": "expense",
+      "documentId": "EXP-NB-23797554",
+      "paymentId": "exp-pay-backfill-EXP-NB-23797554",
+      "amount": 19287,
+      "currency": "CLP",
+      "signalDate": "2025-09-26",
+      "outcome": "dismissed_no_cash",
+      "reason": "TASK-708b: pago historico Nubox sin evidencia de cash real (2025-09-26). Anulado sin reemplazo bajo runbook docs/operations/runbooks/TASK-708b-nubox-phantom-remediation.md.",
+      "resolvedAccountId": null,
+      "evidence": {
+        "matchingOutcome": "no_match",
+        "matchingRule": null
+      }
+    },
+    {
+      "signalId": "signal-1a5ae3ac-da12-44af-aa7e-813deea49c6c",
+      "documentKind": "expense",
+      "documentId": "EXP-NB-23340053",
+      "paymentId": "exp-pay-backfill-EXP-NB-23340053",
+      "amount": 1325184,
+      "currency": "CLP",
+      "signalDate": "2025-09-18",
+      "outcome": "dismissed_no_cash",
+      "reason": "TASK-708b: pago historico Nubox sin evidencia de cash real (2025-09-18). Anulado sin reemplazo bajo runbook docs/operations/runbooks/TASK-708b-nubox-phantom-remediation.md.",
+      "resolvedAccountId": null,
+      "evidence": {
+        "matchingOutcome": "no_match",
+        "matchingRule": null
+      }
+    },
+    {
+      "signalId": "signal-f4822e70-722c-452c-8ed2-d8d034b39e6f",
+      "documentKind": "expense",
+      "documentId": "EXP-NB-22822648",
+      "paymentId": "exp-pay-backfill-EXP-NB-22822648",
+      "amount": 140400,
+      "currency": "CLP",
+      "signalDate": "2025-09-09",
+      "outcome": "dismissed_no_cash",
+      "reason": "TASK-708b: pago historico Nubox sin evidencia de cash real (2025-09-09). Anulado sin reemplazo bajo runbook docs/operations/runbooks/TASK-708b-nubox-phantom-remediation.md.",
+      "resolvedAccountId": null,
+      "evidence": {
+        "matchingOutcome": "no_match",
+        "matchingRule": null
+      }
+    },
+    {
+      "signalId": "signal-36f72e96-ff51-48b6-ba79-2613a2453c09",
+      "documentKind": "expense",
+      "documentId": "EXP-NB-22771628",
+      "paymentId": "exp-pay-backfill-EXP-NB-22771628",
+      "amount": 23550,
+      "currency": "CLP",
+      "signalDate": "2025-09-08",
+      "outcome": "dismissed_no_cash",
+      "reason": "TASK-708b: pago historico Nubox sin evidencia de cash real (2025-09-08). Anulado sin reemplazo bajo runbook docs/operations/runbooks/TASK-708b-nubox-phantom-remediation.md.",
+      "resolvedAccountId": null,
+      "evidence": {
+        "matchingOutcome": "no_match",
+        "matchingRule": null
+      }
+    },
+    {
+      "signalId": "signal-47068d16-ae32-46bc-8eab-b0736f3b4278",
+      "documentKind": "expense",
+      "documentId": "EXP-NB-22771827",
+      "paymentId": "exp-pay-backfill-EXP-NB-22771827",
+      "amount": 140038,
+      "currency": "CLP",
+      "signalDate": "2025-09-08",
+      "outcome": "dismissed_no_cash",
+      "reason": "TASK-708b: pago historico Nubox sin evidencia de cash real (2025-09-08). Anulado sin reemplazo bajo runbook docs/operations/runbooks/TASK-708b-nubox-phantom-remediation.md.",
+      "resolvedAccountId": null,
+      "evidence": {
+        "matchingOutcome": "no_match",
+        "matchingRule": null
+      }
+    },
+    {
+      "signalId": "signal-9560e5f3-8112-4ec1-8f52-62fea1fa1534",
+      "documentKind": "expense",
+      "documentId": "EXP-NB-22996825",
+      "paymentId": "exp-pay-backfill-EXP-NB-22996825",
+      "amount": 70319,
+      "currency": "CLP",
+      "signalDate": "2025-09-06",
+      "outcome": "dismissed_no_cash",
+      "reason": "TASK-708b: pago historico Nubox sin evidencia de cash real (2025-09-06). Anulado sin reemplazo bajo runbook docs/operations/runbooks/TASK-708b-nubox-phantom-remediation.md.",
+      "resolvedAccountId": null,
+      "evidence": {
+        "matchingOutcome": "no_match",
+        "matchingRule": null
+      }
+    },
+    {
+      "signalId": "signal-d228d89e-f1a8-480b-bdfc-f2b160e7a2f9",
+      "documentKind": "income",
+      "documentId": "INC-NB-17386672",
+      "paymentId": "PAY-NUBOX-inc-2510466",
+      "amount": 199908,
+      "currency": "CLP",
+      "signalDate": "2025-09-05",
+      "outcome": "repaired_with_account",
+      "reason": "TASK-708b: D5 rule rule-nubox-clp-bank-transfer-santander resuelve cuenta santander-clp con confianza alta.",
+      "resolvedAccountId": "santander-clp",
+      "evidence": {
+        "matchingRule": "rule-nubox-clp-bank-transfer-santander",
+        "matchingOutcome": "resolved"
+      }
+    },
+    {
+      "signalId": "signal-bc4b8f37-c18b-4e32-8382-3476fd01367b",
+      "documentKind": "income",
+      "documentId": "INC-NB-17381932",
+      "paymentId": "PAY-NUBOX-inc-2510467",
+      "amount": 364021,
+      "currency": "CLP",
+      "signalDate": "2025-09-05",
+      "outcome": "repaired_with_account",
+      "reason": "TASK-708b: D5 rule rule-nubox-clp-bank-transfer-santander resuelve cuenta santander-clp con confianza alta.",
+      "resolvedAccountId": "santander-clp",
+      "evidence": {
+        "matchingRule": "rule-nubox-clp-bank-transfer-santander",
+        "matchingOutcome": "resolved"
+      }
+    },
+    {
+      "signalId": "signal-5f559e28-d472-438d-abbd-364cf8056c1e",
+      "documentKind": "expense",
+      "documentId": "EXP-NB-22649651",
+      "paymentId": "exp-pay-backfill-EXP-NB-22649651",
+      "amount": 350000,
+      "currency": "CLP",
+      "signalDate": "2025-09-05",
+      "outcome": "dismissed_no_cash",
+      "reason": "TASK-708b: pago historico Nubox sin evidencia de cash real (2025-09-05). Anulado sin reemplazo bajo runbook docs/operations/runbooks/TASK-708b-nubox-phantom-remediation.md.",
+      "resolvedAccountId": null,
+      "evidence": {
+        "matchingOutcome": "no_match",
+        "matchingRule": null
+      }
+    },
+    {
+      "signalId": "signal-3e1256b0-7651-4815-9852-a4e0aad9c468",
+      "documentKind": "expense",
+      "documentId": "EXP-NB-22242423",
+      "paymentId": "exp-pay-backfill-EXP-NB-22242423",
+      "amount": 101150,
+      "currency": "CLP",
+      "signalDate": "2025-08-29",
+      "outcome": "dismissed_no_cash",
+      "reason": "TASK-708b: pago historico Nubox sin evidencia de cash real (2025-08-29). Anulado sin reemplazo bajo runbook docs/operations/runbooks/TASK-708b-nubox-phantom-remediation.md.",
+      "resolvedAccountId": null,
+      "evidence": {
+        "matchingOutcome": "no_match",
+        "matchingRule": null
+      }
+    },
+    {
+      "signalId": "signal-741d2ba1-e696-4d84-b83f-a596aef9aa76",
+      "documentKind": "expense",
+      "documentId": "EXP-NB-22122973",
+      "paymentId": "exp-pay-backfill-EXP-NB-22122973",
+      "amount": 19198,
+      "currency": "CLP",
+      "signalDate": "2025-08-27",
+      "outcome": "dismissed_no_cash",
+      "reason": "TASK-708b: pago historico Nubox sin evidencia de cash real (2025-08-27). Anulado sin reemplazo bajo runbook docs/operations/runbooks/TASK-708b-nubox-phantom-remediation.md.",
+      "resolvedAccountId": null,
+      "evidence": {
+        "matchingOutcome": "no_match",
+        "matchingRule": null
+      }
+    },
+    {
+      "signalId": "signal-09252ff8-4ac2-4ea7-9d7c-ebf7ae2de6ef",
+      "documentKind": "income",
+      "documentId": "INC-NB-15465011",
+      "paymentId": "PAY-NUBOX-inc-2438765",
+      "amount": 752730,
+      "currency": "CLP",
+      "signalDate": "2025-08-21",
+      "outcome": "repaired_with_account",
+      "reason": "TASK-708b: D5 rule rule-nubox-clp-bank-transfer-santander resuelve cuenta santander-clp con confianza alta.",
+      "resolvedAccountId": "santander-clp",
+      "evidence": {
+        "matchingRule": "rule-nubox-clp-bank-transfer-santander",
+        "matchingOutcome": "resolved"
+      }
+    },
+    {
+      "signalId": "signal-3a279f29-2100-44d3-be99-0797dd39f491",
+      "documentKind": "expense",
+      "documentId": "EXP-NB-21205774",
+      "paymentId": "exp-pay-backfill-EXP-NB-21205774",
+      "amount": 17311,
+      "currency": "CLP",
+      "signalDate": "2025-08-12",
+      "outcome": "dismissed_no_cash",
+      "reason": "TASK-708b: pago historico Nubox sin evidencia de cash real (2025-08-12). Anulado sin reemplazo bajo runbook docs/operations/runbooks/TASK-708b-nubox-phantom-remediation.md.",
+      "resolvedAccountId": null,
+      "evidence": {
+        "matchingOutcome": "no_match",
+        "matchingRule": null
+      }
+    },
+    {
+      "signalId": "signal-d51fd6c2-46c3-4cd7-b974-7d22776fa694",
+      "documentKind": "expense",
+      "documentId": "EXP-NB-21160973",
+      "paymentId": "exp-pay-backfill-EXP-NB-21160973",
+      "amount": 1325184,
+      "currency": "CLP",
+      "signalDate": "2025-08-12",
+      "outcome": "dismissed_no_cash",
+      "reason": "TASK-708b: pago historico Nubox sin evidencia de cash real (2025-08-12). Anulado sin reemplazo bajo runbook docs/operations/runbooks/TASK-708b-nubox-phantom-remediation.md.",
+      "resolvedAccountId": null,
+      "evidence": {
+        "matchingOutcome": "no_match",
+        "matchingRule": null
+      }
+    },
+    {
+      "signalId": "signal-0f2884fb-0a41-42f2-937f-470f08c8fe4a",
+      "documentKind": "expense",
+      "documentId": "EXP-NB-20865941",
+      "paymentId": "exp-pay-backfill-EXP-NB-20865941",
+      "amount": 69926,
+      "currency": "CLP",
+      "signalDate": "2025-08-06",
+      "outcome": "dismissed_no_cash",
+      "reason": "TASK-708b: pago historico Nubox sin evidencia de cash real (2025-08-06). Anulado sin reemplazo bajo runbook docs/operations/runbooks/TASK-708b-nubox-phantom-remediation.md.",
+      "resolvedAccountId": null,
+      "evidence": {
+        "matchingOutcome": "no_match",
+        "matchingRule": null
+      }
+    },
+    {
+      "signalId": "signal-0cf50a62-8f98-4389-a287-43f01d66ed64",
+      "documentKind": "income",
+      "documentId": "INC-NB-13463653",
+      "paymentId": "PAY-NUBOX-inc-2319775",
+      "amount": 752730,
+      "currency": "CLP",
+      "signalDate": "2025-08-03",
+      "outcome": "repaired_with_account",
+      "reason": "TASK-708b: D5 rule rule-nubox-clp-bank-transfer-santander resuelve cuenta santander-clp con confianza alta.",
+      "resolvedAccountId": "santander-clp",
+      "evidence": {
+        "matchingRule": "rule-nubox-clp-bank-transfer-santander",
+        "matchingOutcome": "resolved"
+      }
+    },
+    {
+      "signalId": "signal-1c367ce8-c8cc-4c52-9121-74fe591b4a87",
+      "documentKind": "expense",
+      "documentId": "EXP-NB-20464227",
+      "paymentId": "exp-pay-backfill-EXP-NB-20464227",
+      "amount": 221666,
+      "currency": "CLP",
+      "signalDate": "2025-08-01",
+      "outcome": "dismissed_no_cash",
+      "reason": "TASK-708b: pago historico Nubox sin evidencia de cash real (2025-08-01). Anulado sin reemplazo bajo runbook docs/operations/runbooks/TASK-708b-nubox-phantom-remediation.md.",
+      "resolvedAccountId": null,
+      "evidence": {
+        "matchingOutcome": "no_match",
+        "matchingRule": null
+      }
+    },
+    {
+      "signalId": "signal-494413f7-bab2-426c-954f-6e19f457cde2",
+      "documentKind": "expense",
+      "documentId": "EXP-NB-20464228",
+      "paymentId": "exp-pay-backfill-EXP-NB-20464228",
+      "amount": 350000,
+      "currency": "CLP",
+      "signalDate": "2025-08-01",
+      "outcome": "dismissed_no_cash",
+      "reason": "TASK-708b: pago historico Nubox sin evidencia de cash real (2025-08-01). Anulado sin reemplazo bajo runbook docs/operations/runbooks/TASK-708b-nubox-phantom-remediation.md.",
+      "resolvedAccountId": null,
+      "evidence": {
+        "matchingOutcome": "no_match",
+        "matchingRule": null
+      }
+    },
+    {
+      "signalId": "signal-2330a1d9-eedc-4beb-b7df-fde89b9da48f",
+      "documentKind": "expense",
+      "documentId": "EXP-NB-20435850",
+      "paymentId": "exp-pay-backfill-EXP-NB-20435850",
+      "amount": 19241,
+      "currency": "CLP",
+      "signalDate": "2025-07-31",
+      "outcome": "dismissed_no_cash",
+      "reason": "TASK-708b: pago historico Nubox sin evidencia de cash real (2025-07-31). Anulado sin reemplazo bajo runbook docs/operations/runbooks/TASK-708b-nubox-phantom-remediation.md.",
+      "resolvedAccountId": null,
+      "evidence": {
+        "matchingOutcome": "no_match",
+        "matchingRule": null
+      }
+    },
+    {
+      "signalId": "signal-e73b34a7-38f8-4234-afd7-7a8ec924f7cc",
+      "documentKind": "expense",
+      "documentId": "EXP-NB-18822399",
+      "paymentId": "exp-pay-backfill-EXP-NB-18822399",
+      "amount": 70097,
+      "currency": "CLP",
+      "signalDate": "2025-07-06",
+      "outcome": "dismissed_no_cash",
+      "reason": "TASK-708b: pago historico Nubox sin evidencia de cash real (2025-07-06). Anulado sin reemplazo bajo runbook docs/operations/runbooks/TASK-708b-nubox-phantom-remediation.md.",
+      "resolvedAccountId": null,
+      "evidence": {
+        "matchingOutcome": "no_match",
+        "matchingRule": null
+      }
+    },
+    {
+      "signalId": "signal-63898649-b296-4129-9693-6674bdeaa224",
+      "documentKind": "expense",
+      "documentId": "EXP-NB-18678818",
+      "paymentId": "exp-pay-backfill-EXP-NB-18678818",
+      "amount": 19202,
+      "currency": "CLP",
+      "signalDate": "2025-07-03",
+      "outcome": "dismissed_no_cash",
+      "reason": "TASK-708b: pago historico Nubox sin evidencia de cash real (2025-07-03). Anulado sin reemplazo bajo runbook docs/operations/runbooks/TASK-708b-nubox-phantom-remediation.md.",
+      "resolvedAccountId": null,
+      "evidence": {
+        "matchingOutcome": "no_match",
+        "matchingRule": null
+      }
+    },
+    {
+      "signalId": "signal-762600fb-cd92-4dfd-8b94-a0e5470e5a40",
+      "documentKind": "income",
+      "documentId": "INC-NB-11834170",
+      "paymentId": "PAY-NUBOX-inc-2138087",
+      "amount": 1006740,
+      "currency": "CLP",
+      "signalDate": "2025-06-27",
+      "outcome": "repaired_with_account",
+      "reason": "TASK-708b: D5 rule rule-nubox-clp-bank-transfer-santander resuelve cuenta santander-clp con confianza alta.",
+      "resolvedAccountId": "santander-clp",
+      "evidence": {
+        "matchingRule": "rule-nubox-clp-bank-transfer-santander",
+        "matchingOutcome": "resolved"
+      }
+    },
+    {
+      "signalId": "signal-f6c1708d-a73f-43bd-97c7-77fb12973469",
+      "documentKind": "income",
+      "documentId": "INC-NB-12034679",
+      "paymentId": "PAY-NUBOX-inc-2117230",
+      "amount": 184100,
+      "currency": "CLP",
+      "signalDate": "2025-06-25",
+      "outcome": "repaired_with_account",
+      "reason": "TASK-708b: D5 rule rule-nubox-clp-bank-transfer-santander resuelve cuenta santander-clp con confianza alta.",
+      "resolvedAccountId": "santander-clp",
+      "evidence": {
+        "matchingRule": "rule-nubox-clp-bank-transfer-santander",
+        "matchingOutcome": "resolved"
+      }
+    },
+    {
+      "signalId": "signal-0c4a96a7-0a4f-4cd6-b06a-a3c454043fad",
+      "documentKind": "income",
+      "documentId": "INC-NB-12026561",
+      "paymentId": "PAY-NUBOX-inc-2031514",
+      "amount": 368459,
+      "currency": "CLP",
+      "signalDate": "2025-06-08",
+      "outcome": "repaired_with_account",
+      "reason": "TASK-708b: D5 rule rule-nubox-clp-bank-transfer-santander resuelve cuenta santander-clp con confianza alta.",
+      "resolvedAccountId": "santander-clp",
+      "evidence": {
+        "matchingRule": "rule-nubox-clp-bank-transfer-santander",
+        "matchingOutcome": "resolved"
+      }
+    },
+    {
+      "signalId": "signal-4b7a3d81-849f-436e-a527-6265618bcba5",
+      "documentKind": "expense",
+      "documentId": "EXP-NB-14614465",
+      "paymentId": "exp-pay-backfill-EXP-NB-14614465",
+      "amount": 100338,
+      "currency": "CLP",
+      "signalDate": "2025-06-08",
+      "outcome": "dismissed_no_cash",
+      "reason": "TASK-708b: pago historico Nubox sin evidencia de cash real (2025-06-08). Anulado sin reemplazo bajo runbook docs/operations/runbooks/TASK-708b-nubox-phantom-remediation.md.",
+      "resolvedAccountId": null,
+      "evidence": {
+        "matchingOutcome": "no_match",
+        "matchingRule": null
+      }
+    },
+    {
+      "signalId": "signal-24d25fc8-45be-4014-ade4-ef35ba74afb1",
+      "documentKind": "expense",
+      "documentId": "EXP-NB-17090742",
+      "paymentId": "exp-pay-backfill-EXP-NB-17090742",
+      "amount": 19147,
+      "currency": "CLP",
+      "signalDate": "2025-06-05",
+      "outcome": "dismissed_no_cash",
+      "reason": "TASK-708b: pago historico Nubox sin evidencia de cash real (2025-06-05). Anulado sin reemplazo bajo runbook docs/operations/runbooks/TASK-708b-nubox-phantom-remediation.md.",
+      "resolvedAccountId": null,
+      "evidence": {
+        "matchingOutcome": "no_match",
+        "matchingRule": null
+      }
+    },
+    {
+      "signalId": "signal-43161a24-930e-4e63-92cc-eb5a1ac19903",
+      "documentKind": "expense",
+      "documentId": "EXP-NB-17024135",
+      "paymentId": "exp-pay-backfill-EXP-NB-17024135",
+      "amount": 152167,
+      "currency": "CLP",
+      "signalDate": "2025-06-04",
+      "outcome": "dismissed_no_cash",
+      "reason": "TASK-708b: pago historico Nubox sin evidencia de cash real (2025-06-04). Anulado sin reemplazo bajo runbook docs/operations/runbooks/TASK-708b-nubox-phantom-remediation.md.",
+      "resolvedAccountId": null,
+      "evidence": {
+        "matchingOutcome": "no_match",
+        "matchingRule": null
+      }
+    },
+    {
+      "signalId": "signal-6d5aca51-b495-45e6-af55-21a9e8cb7492",
+      "documentKind": "expense",
+      "documentId": "EXP-NB-15783293",
+      "paymentId": "exp-pay-backfill-EXP-NB-15783293",
+      "amount": 76569,
+      "currency": "CLP",
+      "signalDate": "2025-05-06",
+      "outcome": "dismissed_no_cash",
+      "reason": "TASK-708b: pago historico Nubox sin evidencia de cash real (2025-05-06). Anulado sin reemplazo bajo runbook docs/operations/runbooks/TASK-708b-nubox-phantom-remediation.md.",
+      "resolvedAccountId": null,
+      "evidence": {
+        "matchingOutcome": "no_match",
+        "matchingRule": null
+      }
+    },
+    {
+      "signalId": "signal-aa60a506-14ad-4280-86dc-81c27c13fcf4",
+      "documentKind": "income",
+      "documentId": "INC-NB-8723267",
+      "paymentId": "PAY-NUBOX-inc-1829252",
+      "amount": 1788165,
+      "currency": "CLP",
+      "signalDate": "2025-05-02",
+      "outcome": "repaired_with_account",
+      "reason": "TASK-708b: D5 rule rule-nubox-clp-bank-transfer-santander resuelve cuenta santander-clp con confianza alta.",
+      "resolvedAccountId": "santander-clp",
+      "evidence": {
+        "matchingRule": "rule-nubox-clp-bank-transfer-santander",
+        "matchingOutcome": "resolved"
+      }
+    },
+    {
+      "signalId": "signal-32ab51d0-7778-4bb3-96b7-ed91c8e1683c",
+      "documentKind": "expense",
+      "documentId": "EXP-NB-15161240",
+      "paymentId": "exp-pay-backfill-EXP-NB-15161240",
+      "amount": 37995,
+      "currency": "CLP",
+      "signalDate": "2025-04-30",
+      "outcome": "dismissed_no_cash",
+      "reason": "TASK-708b: pago historico Nubox sin evidencia de cash real (2025-04-30). Anulado sin reemplazo bajo runbook docs/operations/runbooks/TASK-708b-nubox-phantom-remediation.md.",
+      "resolvedAccountId": null,
+      "evidence": {
+        "matchingOutcome": "no_match",
+        "matchingRule": null
+      }
+    },
+    {
+      "signalId": "signal-3b47210f-089f-45d1-b24b-5287d7648a6b",
+      "documentKind": "expense",
+      "documentId": "EXP-NB-13651411",
+      "paymentId": "exp-pay-backfill-EXP-NB-13651411",
+      "amount": 37631,
+      "currency": "CLP",
+      "signalDate": "2025-04-07",
+      "outcome": "dismissed_no_cash",
+      "reason": "TASK-708b: pago historico Nubox sin evidencia de cash real (2025-04-07). Anulado sin reemplazo bajo runbook docs/operations/runbooks/TASK-708b-nubox-phantom-remediation.md.",
+      "resolvedAccountId": null,
+      "evidence": {
+        "matchingOutcome": "no_match",
+        "matchingRule": null
+      }
+    },
+    {
+      "signalId": "signal-f1280af4-c8ec-46f3-875a-daf78437895d",
+      "documentKind": "expense",
+      "documentId": "EXP-NB-13596515",
+      "paymentId": "exp-pay-backfill-EXP-NB-13596515",
+      "amount": 75647,
+      "currency": "CLP",
+      "signalDate": "2025-04-06",
+      "outcome": "dismissed_no_cash",
+      "reason": "TASK-708b: pago historico Nubox sin evidencia de cash real (2025-04-06). Anulado sin reemplazo bajo runbook docs/operations/runbooks/TASK-708b-nubox-phantom-remediation.md.",
+      "resolvedAccountId": null,
+      "evidence": {
+        "matchingOutcome": "no_match",
+        "matchingRule": null
+      }
+    },
+    {
+      "signalId": "signal-970dcfe3-fdc2-47be-8f17-997e80097cb5",
+      "documentKind": "expense",
+      "documentId": "EXP-NB-12771372",
+      "paymentId": "exp-pay-backfill-EXP-NB-12771372",
+      "amount": 81386,
+      "currency": "CLP",
+      "signalDate": "2025-03-24",
+      "outcome": "dismissed_no_cash",
+      "reason": "TASK-708b: pago historico Nubox sin evidencia de cash real (2025-03-24). Anulado sin reemplazo bajo runbook docs/operations/runbooks/TASK-708b-nubox-phantom-remediation.md.",
+      "resolvedAccountId": null,
+      "evidence": {
+        "matchingOutcome": "no_match",
+        "matchingRule": null
+      }
+    },
+    {
+      "signalId": "signal-6d447b98-9887-401d-9425-fef5e22c0d0c",
+      "documentKind": "expense",
+      "documentId": "EXP-NB-11513744",
+      "paymentId": "exp-pay-backfill-EXP-NB-11513744",
+      "amount": 69014,
+      "currency": "CLP",
+      "signalDate": "2025-03-06",
+      "outcome": "dismissed_no_cash",
+      "reason": "TASK-708b: pago historico Nubox sin evidencia de cash real (2025-03-06). Anulado sin reemplazo bajo runbook docs/operations/runbooks/TASK-708b-nubox-phantom-remediation.md.",
+      "resolvedAccountId": null,
+      "evidence": {
+        "matchingOutcome": "no_match",
+        "matchingRule": null
+      }
+    },
+    {
+      "signalId": "signal-04cb98f0-9916-4fbd-9391-5947d8c40eb0",
+      "documentKind": "income",
+      "documentId": "INC-NB-7456595",
+      "paymentId": "PAY-NUBOX-inc-1402176",
+      "amount": 1772856,
+      "currency": "CLP",
+      "signalDate": "2025-03-04",
+      "outcome": "repaired_with_account",
+      "reason": "TASK-708b: D5 rule rule-nubox-clp-bank-transfer-santander resuelve cuenta santander-clp con confianza alta.",
+      "resolvedAccountId": "santander-clp",
+      "evidence": {
+        "matchingRule": "rule-nubox-clp-bank-transfer-santander",
+        "matchingOutcome": "resolved"
+      }
+    },
+    {
+      "signalId": "signal-33972287-ab6c-48a7-864a-06c8a4ae8b0c",
+      "documentKind": "expense",
+      "documentId": "EXP-NB-9487963",
+      "paymentId": "exp-pay-backfill-EXP-NB-9487963",
+      "amount": 68512,
+      "currency": "CLP",
+      "signalDate": "2025-02-06",
+      "outcome": "dismissed_no_cash",
+      "reason": "TASK-708b: pago historico Nubox sin evidencia de cash real (2025-02-06). Anulado sin reemplazo bajo runbook docs/operations/runbooks/TASK-708b-nubox-phantom-remediation.md.",
+      "resolvedAccountId": null,
+      "evidence": {
+        "matchingOutcome": "no_match",
+        "matchingRule": null
+      }
+    },
+    {
+      "signalId": "signal-6a191193-78fe-4c58-acc1-06f2e2a38df7",
+      "documentKind": "expense",
+      "documentId": "EXP-NB-7445538",
+      "paymentId": "exp-pay-backfill-EXP-NB-7445538",
+      "amount": 68579,
+      "currency": "CLP",
+      "signalDate": "2025-01-06",
+      "outcome": "dismissed_no_cash",
+      "reason": "TASK-708b: pago historico Nubox sin evidencia de cash real (2025-01-06). Anulado sin reemplazo bajo runbook docs/operations/runbooks/TASK-708b-nubox-phantom-remediation.md.",
+      "resolvedAccountId": null,
+      "evidence": {
+        "matchingOutcome": "no_match",
+        "matchingRule": null
+      }
+    },
+    {
+      "signalId": "signal-636f1885-d001-43df-8906-1c07554f4bb4",
+      "documentKind": "expense",
+      "documentId": "EXP-NB-7381585",
+      "paymentId": "exp-pay-backfill-EXP-NB-7381585",
+      "amount": 18735,
+      "currency": "CLP",
+      "signalDate": "2025-01-02",
+      "outcome": "dismissed_no_cash",
+      "reason": "TASK-708b: pago historico Nubox sin evidencia de cash real (2025-01-02). Anulado sin reemplazo bajo runbook docs/operations/runbooks/TASK-708b-nubox-phantom-remediation.md.",
+      "resolvedAccountId": null,
+      "evidence": {
+        "matchingOutcome": "no_match",
+        "matchingRule": null
+      }
+    },
+    {
+      "signalId": "signal-f4ef880e-2b06-453d-af18-2f02cf66c949",
+      "documentKind": "expense",
+      "documentId": "EXP-NB-7070569",
+      "paymentId": "exp-pay-backfill-EXP-NB-7070569",
+      "amount": 74395,
+      "currency": "CLP",
+      "signalDate": "2024-12-26",
+      "outcome": "dismissed_no_cash",
+      "reason": "TASK-708b: pago historico Nubox sin evidencia de cash real (2024-12-26). Anulado sin reemplazo bajo runbook docs/operations/runbooks/TASK-708b-nubox-phantom-remediation.md.",
+      "resolvedAccountId": null,
+      "evidence": {
+        "matchingOutcome": "no_match",
+        "matchingRule": null
+      }
+    },
+    {
+      "signalId": "signal-c8c9cb82-7e0a-4b69-8e1e-4da160830b1f",
+      "documentKind": "expense",
+      "documentId": "EXP-NB-6185886",
+      "paymentId": "exp-pay-backfill-EXP-NB-6185886",
+      "amount": 74395,
+      "currency": "CLP",
+      "signalDate": "2024-12-24",
+      "outcome": "dismissed_no_cash",
+      "reason": "TASK-708b: pago historico Nubox sin evidencia de cash real (2024-12-24). Anulado sin reemplazo bajo runbook docs/operations/runbooks/TASK-708b-nubox-phantom-remediation.md.",
+      "resolvedAccountId": null,
+      "evidence": {
+        "matchingOutcome": "no_match",
+        "matchingRule": null
+      }
+    },
+    {
+      "signalId": "signal-1fa886ba-35b4-4651-97c6-6fbf05686361",
+      "documentKind": "expense",
+      "documentId": "EXP-NB-5864610",
+      "paymentId": "exp-pay-backfill-EXP-NB-5864610",
+      "amount": 18605,
+      "currency": "CLP",
+      "signalDate": "2024-11-29",
+      "outcome": "dismissed_no_cash",
+      "reason": "TASK-708b: pago historico Nubox sin evidencia de cash real (2024-11-29). Anulado sin reemplazo bajo runbook docs/operations/runbooks/TASK-708b-nubox-phantom-remediation.md.",
+      "resolvedAccountId": null,
+      "evidence": {
+        "matchingOutcome": "no_match",
+        "matchingRule": null
+      }
+    },
+    {
+      "signalId": "signal-87a6f385-eab2-442e-b558-1fb9fbf33e9f",
+      "documentKind": "expense",
+      "documentId": "EXP-NB-5006739",
+      "paymentId": "exp-pay-backfill-EXP-NB-5006739",
+      "amount": 18576,
+      "currency": "CLP",
+      "signalDate": "2024-11-12",
+      "outcome": "dismissed_no_cash",
+      "reason": "TASK-708b: pago historico Nubox sin evidencia de cash real (2024-11-12). Anulado sin reemplazo bajo runbook docs/operations/runbooks/TASK-708b-nubox-phantom-remediation.md.",
+      "resolvedAccountId": null,
+      "evidence": {
+        "matchingOutcome": "no_match",
+        "matchingRule": null
+      }
+    },
+    {
+      "signalId": "signal-b9670167-70f7-43c3-906c-eda2be0b9840",
+      "documentKind": "expense",
+      "documentId": "EXP-NB-4873646",
+      "paymentId": "exp-pay-backfill-EXP-NB-4873646",
+      "amount": 67781,
+      "currency": "CLP",
+      "signalDate": "2024-11-06",
+      "outcome": "dismissed_no_cash",
+      "reason": "TASK-708b: pago historico Nubox sin evidencia de cash real (2024-11-06). Anulado sin reemplazo bajo runbook docs/operations/runbooks/TASK-708b-nubox-phantom-remediation.md.",
+      "resolvedAccountId": null,
+      "evidence": {
+        "matchingOutcome": "no_match",
+        "matchingRule": null
+      }
+    },
+    {
+      "signalId": "signal-2e2df7ae-cddc-49f0-9e1b-74be8220777a",
+      "documentKind": "expense",
+      "documentId": "EXP-NB-4363005",
+      "paymentId": "exp-pay-backfill-EXP-NB-4363005",
+      "amount": 18496,
+      "currency": "CLP",
+      "signalDate": "2024-10-11",
+      "outcome": "dismissed_no_cash",
+      "reason": "TASK-708b: pago historico Nubox sin evidencia de cash real (2024-10-11). Anulado sin reemplazo bajo runbook docs/operations/runbooks/TASK-708b-nubox-phantom-remediation.md.",
+      "resolvedAccountId": null,
+      "evidence": {
+        "matchingOutcome": "no_match",
+        "matchingRule": null
+      }
+    },
+    {
+      "signalId": "signal-2c2f2843-f4f1-4962-8bd5-9bbfbdfdddb8",
+      "documentKind": "expense",
+      "documentId": "EXP-NB-4297432",
+      "paymentId": "exp-pay-backfill-EXP-NB-4297432",
+      "amount": 67676,
+      "currency": "CLP",
+      "signalDate": "2024-10-06",
+      "outcome": "dismissed_no_cash",
+      "reason": "TASK-708b: pago historico Nubox sin evidencia de cash real (2024-10-06). Anulado sin reemplazo bajo runbook docs/operations/runbooks/TASK-708b-nubox-phantom-remediation.md.",
+      "resolvedAccountId": null,
+      "evidence": {
+        "matchingOutcome": "no_match",
+        "matchingRule": null
+      }
+    },
+    {
+      "signalId": "signal-c1fe74c7-ae04-4592-bcc2-2acfcff7ae9b",
+      "documentKind": "income",
+      "documentId": "INC-NB-4672691",
+      "paymentId": "PAY-NUBOX-inc-803944",
+      "amount": 297500,
+      "currency": "CLP",
+      "signalDate": "2024-10-04",
+      "outcome": "repaired_with_account",
+      "reason": "TASK-708b: D5 rule rule-nubox-clp-bank-transfer-santander resuelve cuenta santander-clp con confianza alta.",
+      "resolvedAccountId": "santander-clp",
+      "evidence": {
+        "matchingRule": "rule-nubox-clp-bank-transfer-santander",
+        "matchingOutcome": "resolved"
+      }
+    },
+    {
+      "signalId": "signal-80228a5e-fb3b-4f33-bc9b-2304cd0fb9ff",
+      "documentKind": "expense",
+      "documentId": "EXP-NB-3867101",
+      "paymentId": "exp-pay-backfill-EXP-NB-3867101",
+      "amount": 55166,
+      "currency": "CLP",
+      "signalDate": "2024-09-06",
+      "outcome": "dismissed_no_cash",
+      "reason": "TASK-708b: pago historico Nubox sin evidencia de cash real (2024-09-06). Anulado sin reemplazo bajo runbook docs/operations/runbooks/TASK-708b-nubox-phantom-remediation.md.",
+      "resolvedAccountId": null,
+      "evidence": {
+        "matchingOutcome": "no_match",
+        "matchingRule": null
+      }
+    },
+    {
+      "signalId": "signal-2b21e502-e0c5-4b06-bf25-b16e6b42c2e4",
+      "documentKind": "expense",
+      "documentId": "EXP-NB-3864298",
+      "paymentId": "exp-pay-backfill-EXP-NB-3864298",
+      "amount": 73443,
+      "currency": "CLP",
+      "signalDate": "2024-09-06",
+      "outcome": "dismissed_no_cash",
+      "reason": "TASK-708b: pago historico Nubox sin evidencia de cash real (2024-09-06). Anulado sin reemplazo bajo runbook docs/operations/runbooks/TASK-708b-nubox-phantom-remediation.md.",
+      "resolvedAccountId": null,
+      "evidence": {
+        "matchingOutcome": "no_match",
+        "matchingRule": null
+      }
+    },
+    {
+      "signalId": "signal-5b27db71-55fa-41ba-83f8-65f53a6c40f6",
+      "documentKind": "expense",
+      "documentId": "EXP-NB-3253966",
+      "paymentId": "exp-pay-backfill-EXP-NB-3253966",
+      "amount": 67077,
+      "currency": "CLP",
+      "signalDate": "2024-08-06",
+      "outcome": "dismissed_no_cash",
+      "reason": "TASK-708b: pago historico Nubox sin evidencia de cash real (2024-08-06). Anulado sin reemplazo bajo runbook docs/operations/runbooks/TASK-708b-nubox-phantom-remediation.md.",
+      "resolvedAccountId": null,
+      "evidence": {
+        "matchingOutcome": "no_match",
+        "matchingRule": null
+      }
+    },
+    {
+      "signalId": "signal-adec0c2d-e45d-458b-bb14-36d85f86f18e",
+      "documentKind": "income",
+      "documentId": "INC-NB-4171983",
+      "paymentId": "PAY-NUBOX-inc-630934",
+      "amount": 327250,
+      "currency": "CLP",
+      "signalDate": "2024-07-05",
+      "outcome": "repaired_with_account",
+      "reason": "TASK-708b: D5 rule rule-nubox-clp-bank-transfer-santander resuelve cuenta santander-clp con confianza alta.",
+      "resolvedAccountId": "santander-clp",
+      "evidence": {
+        "matchingRule": "rule-nubox-clp-bank-transfer-santander",
+        "matchingOutcome": "resolved"
+      }
+    },
+    {
+      "signalId": "signal-4362c367-2b33-4d85-93ab-4fef9c9dd1d5",
+      "documentKind": "expense",
+      "documentId": "EXP-NB-2571053",
+      "paymentId": "exp-pay-backfill-EXP-NB-2571053",
+      "amount": 24524,
+      "currency": "CLP",
+      "signalDate": "2024-06-28",
+      "outcome": "dismissed_no_cash",
+      "reason": "TASK-708b: pago historico Nubox sin evidencia de cash real (2024-06-28). Anulado sin reemplazo bajo runbook docs/operations/runbooks/TASK-708b-nubox-phantom-remediation.md.",
+      "resolvedAccountId": null,
+      "evidence": {
+        "matchingOutcome": "no_match",
+        "matchingRule": null
+      }
+    },
+    {
+      "signalId": "signal-f857c945-a16e-4ead-b825-25e730e3fae6",
+      "documentKind": "expense",
+      "documentId": "EXP-NB-2554907",
+      "paymentId": "exp-pay-backfill-EXP-NB-2554907",
+      "amount": 66839,
+      "currency": "CLP",
+      "signalDate": "2024-06-25",
+      "outcome": "dismissed_no_cash",
+      "reason": "TASK-708b: pago historico Nubox sin evidencia de cash real (2024-06-25). Anulado sin reemplazo bajo runbook docs/operations/runbooks/TASK-708b-nubox-phantom-remediation.md.",
+      "resolvedAccountId": null,
+      "evidence": {
+        "matchingOutcome": "no_match",
+        "matchingRule": null
+      }
+    },
+    {
+      "signalId": "signal-d9082cc0-4bb2-49fd-b93c-e59f712be527",
+      "documentKind": "expense",
+      "documentId": "EXP-NB-2554911",
+      "paymentId": "exp-pay-backfill-EXP-NB-2554911",
+      "amount": 18165,
+      "currency": "CLP",
+      "signalDate": "2024-04-26",
+      "outcome": "dismissed_no_cash",
+      "reason": "TASK-708b: pago historico Nubox sin evidencia de cash real (2024-04-26). Anulado sin reemplazo bajo runbook docs/operations/runbooks/TASK-708b-nubox-phantom-remediation.md.",
+      "resolvedAccountId": null,
+      "evidence": {
+        "matchingOutcome": "no_match",
+        "matchingRule": null
+      }
+    },
+    {
+      "signalId": "signal-b52a094b-682c-40da-93cd-9fefa82667fe",
+      "documentKind": "expense",
+      "documentId": "EXP-NB-2554912",
+      "paymentId": "exp-pay-backfill-EXP-NB-2554912",
+      "amount": 107560,
+      "currency": "CLP",
+      "signalDate": "2024-04-24",
+      "outcome": "dismissed_no_cash",
+      "reason": "TASK-708b: pago historico Nubox sin evidencia de cash real (2024-04-24). Anulado sin reemplazo bajo runbook docs/operations/runbooks/TASK-708b-nubox-phantom-remediation.md.",
+      "resolvedAccountId": null,
+      "evidence": {
+        "matchingOutcome": "no_match",
+        "matchingRule": null
+      }
+    }
+  ]
+}
