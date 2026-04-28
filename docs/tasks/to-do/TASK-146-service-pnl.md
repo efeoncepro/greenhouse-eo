@@ -1,3 +1,7 @@
+## Delta 2026-04-28 — Subordinada al programa Member Loaded Cost Model
+
+Esta task **agrega la dimensión `service_id` al modelo dimensional** definido en `docs/architecture/GREENHOUSE_MEMBER_LOADED_COST_MODEL_V1.md`. Para producir Service P&L, los facts `member_loaded_cost_per_period` y `client_full_cost_per_period` deben ganar una dimensión adicional `service_id`. Bloqueo previo: requiere FK `service_id` en `payroll_member_client_allocations` (input al Fact 2 de allocations) y un mapping `expense → service_id` para tools de cliente directo. Hasta que el modelo dimensional materialice (Fase 2 del roadmap MLCM_V1 §11), Service P&L no puede ser fully-loaded.
+
 ## Delta 2026-03-30
 - `TASK-142` ya cerró el shell real de `Space 360` y el tab `Services` existe con contrato operativo sobre `getAgencySpace360()`.
 - Esta task ya no debe asumir que necesita crear primero la vista `Services`; el trabajo pendiente es agregar revenue/cost/margin por servicio encima del tab ya materializado.

@@ -1,5 +1,9 @@
 # TASK-395 — Management Accounting Planning Engine: Budgets, Drivers & Approval Governance
 
+## Delta 2026-04-28 — Subordinada al programa Member Loaded Cost Model
+
+Esta task implementa **Fase 5: Pluggable Overhead Strategies + Budget capability** del roadmap MLCM_V1 §11 (`docs/architecture/GREENHOUSE_MEMBER_LOADED_COST_MODEL_V1.md`). El budget engine se compone con el modelo dimensional Member-Loaded como **plan layer** sobre los facts actuales: `member_loaded_cost_per_period` (actual) + `member_loaded_cost_per_period_budget` (plan) — misma shape, distinta cardinalidad temporal. Las driver-based forecasts heredan los buckets canónicos del Fact 3.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

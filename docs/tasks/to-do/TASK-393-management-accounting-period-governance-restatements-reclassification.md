@@ -1,5 +1,9 @@
 # TASK-393 — Management Accounting Period Governance, Restatements & Reclassification
 
+## Delta 2026-04-28 — Subordinada al programa Member Loaded Cost Model
+
+Esta task implementa **§5 Snapshots Inmutables + §6 Period Closing Workflow** del spec canónico `docs/architecture/GREENHOUSE_MEMBER_LOADED_COST_MODEL_V1.md`. La función `closeAccountingPeriod()` y el modelo de restatement aquí descritos son la mecánica concreta para producir y reabrir los snapshots `member_loaded_cost_per_period_snapshot` y `client_full_cost_per_period_snapshot` (Fact 3/4 del modelo dimensional). Scope técnico no cambia.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

@@ -1,5 +1,9 @@
 # TASK-310 — Partner Cost Tracking + Profitability
 
+## Delta 2026-04-28 — Subordinada al programa Member Loaded Cost Model
+
+Esta task aplica el modelo Member-Loaded definido en `docs/architecture/GREENHOUSE_MEMBER_LOADED_COST_MODEL_V1.md` al **subconjunto cliente=partner**. Partner P&L se obtiene del Fact 4 `client_full_cost_per_period` filtrado por `client.is_partner=true`. No introduce nuevo modelo, solo lente sobre el modelo canónico. Pueden agregarse buckets específicos (revenue_share_clp, partner_referral_credits) como facts cost_dimension paralelos al financial costs path.
+
 ## Status
 - Lifecycle: `to-do`
 - Priority: `P2`

@@ -1,5 +1,9 @@
 # TASK-178 — Finance Budget Engine: Budget vs. Actual & Variance Analysis
 
+## Delta 2026-04-28 — Subordinada al programa Member Loaded Cost Model
+
+Esta task se solapa parcialmente con TASK-395 (planning engine). Ambas implementan **budget overlay sobre el modelo dimensional Member-Loaded** (`docs/architecture/GREENHOUSE_MEMBER_LOADED_COST_MODEL_V1.md`). El budget engine produce `member_loaded_cost_per_period_budget` y `client_full_cost_per_period_budget` con la misma cardinalidad/shape que los facts actual. Variance se computa como diff entre snapshots actual y budget. Coordinación TASK-178 ↔ TASK-395 pendiente: probable consolidación.
+
 ## Status
 
 | Campo | Valor |

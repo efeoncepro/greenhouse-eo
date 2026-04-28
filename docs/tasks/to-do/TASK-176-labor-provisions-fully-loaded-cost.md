@@ -1,3 +1,7 @@
+## Delta 2026-04-28 — Subordinada al programa Member Loaded Cost Model
+
+Esta task ahora se mapea al programa canónico definido en `docs/architecture/GREENHOUSE_MEMBER_LOADED_COST_MODEL_V1.md`. El output (provisiones laborales agregadas al fully-loaded cost) **alimenta el bucket `payroll_cost_clp` de `member_loaded_cost_per_period`** (Fact 3 del modelo dimensional, §2.3 de MLCM_V1). El scope técnico de esta task NO cambia. Sigue siendo **prerequisito hard del gate Reliable Actual Foundation** y, en el nuevo contexto, prerequisito de Fase 2 (Materializers) del roadmap MLCM_V1 §11.
+
 ## Delta 2026-04-13
 
 - TASK-392 cerrada como programa documental. Esta task queda como el **unico blocker restante** del gate `Reliable Actual Foundation` definido en `GREENHOUSE_MANAGEMENT_ACCOUNTING_ARCHITECTURE_V1.md`. Los otros 5 prerequisitos (TASK-174 locking, TASK-175 tests, TASK-179 Postgres cutover, TASK-401 continuous matching, TASK-167/192 organization scope) ya estan cerrados. Hasta que esta task cierre, el `actual` de Management Accounting sigue subestimando labor cost en ~12.5% y las capabilities downstream (`TASK-395` planning, `TASK-396` variance, `TASK-397` financial costs, `TASK-398` enterprise hardening) no pueden declararse enterprise-ready.

@@ -1,5 +1,9 @@
 # TASK-396 — Management Accounting Variance, Forecast & Executive Control Tower
 
+## Delta 2026-04-28 — Subordinada al programa Member Loaded Cost Model
+
+Esta task **lee margen y variance del Fact 4 `client_full_cost_per_period`** definido en el spec raíz `docs/architecture/GREENHOUSE_MEMBER_LOADED_COST_MODEL_V1.md`. La tower comparativa (actual vs budget vs forecast) consume los snapshots inmutables (§5) y la tabla de variance se derive de la diff entre `member_loaded_cost_per_period_actual` y `member_loaded_cost_per_period_budget`. Scope ejecutivo y forecast model se conservan.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

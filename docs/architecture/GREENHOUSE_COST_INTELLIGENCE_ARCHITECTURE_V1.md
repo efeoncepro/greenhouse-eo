@@ -1,5 +1,24 @@
 # GREENHOUSE_COST_INTELLIGENCE_ARCHITECTURE_V1.md
 
+## ⚠️ Delta 2026-04-28 — Spec recontextualizada como implementación V0
+
+A partir del 2026-04-28, **`GREENHOUSE_MEMBER_LOADED_COST_MODEL_V1.md` es la spec raíz del modelo económico Greenhouse**. Esta spec (Cost Intelligence V1) queda **recontextualizada como documentación de la implementación V0**: refleja el runtime actual (TASK-705 reglas, TASK-708 v2 VIEW, TASK-709 consolidación) que se mantiene activo durante la migración.
+
+**Lectura forward-going:**
+
+- El modelo canónico forward-going es `MEMBER_LOADED_COST_MODEL_V1` — modelo dimensional con miembro como átomo, snapshots inmutables, overhead policies pluggable.
+- Esta spec documenta lo que vive en runtime hoy. NO se borra porque sigue siendo la realidad operativa hasta completar Fase 3 del roadmap MLCM_V1 §11.
+- Cualquier capability nueva de cost intelligence debe construirse sobre el contrato de MLCM_V1, NO extender los atajos `expenses.allocated_client_id` / `expenses.direct_overhead_member_id` que esta spec describe.
+
+**Migration path desde esta implementación V0 a MLCM_V1:**
+
+- Fases 1-3 del roadmap MLCM_V1 §11 mantienen backwards compatibility — TASK-705 reglas, TASK-708 VIEW v2, TASK-709 consolidada siguen activas.
+- Después de Fase 3, los atajos `allocated_client_id` y `direct_overhead_member_id` quedan deprecados como override manual de excepción solamente. El attribution canónico fluye via `member_tool_consumption` bridge (TASK-710).
+
+**Cualquier conflicto entre esta spec y MEMBER_LOADED_COST_MODEL_V1 se resuelve a favor de MLCM_V1** (es la spec raíz forward-going).
+
+---
+
 ## Delta 2026-03-31 — Finance ledger más expresivo para consumers downstream
 - `TASK-182` + `TASK-183` dejan explícito que Cost Intelligence ya no debe inferir parte de la semántica fina de gastos desde surfaces ambiguas.
 - El ledger `greenhouse_finance.expenses` ahora expone mejor contexto operativo para consumers:

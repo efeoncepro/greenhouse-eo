@@ -1,3 +1,7 @@
+## Delta 2026-04-28 — Subordinada al programa Member Loaded Cost Model
+
+Esta task **filtra el modelo dimensional canónico por dimensión `business_unit`** (`docs/architecture/GREENHOUSE_MEMBER_LOADED_COST_MODEL_V1.md`). El P&L por BU se obtiene como rollup de `client_full_cost_per_period` agrupado por BU del cliente, complementado con la dimensión BU del Fact 1 (expenses) ya nativa en el modelo. Depende de TASK-394 (BU dimension expansion) en paralelo.
+
 ## Delta 2026-03-31
 - TASK-182 (Expense Drawer Agency Taxonomy) agrega `cost_category` granular a cada expense. El P&L por BU que esta task materializa puede desagregar costos por categoria (operational, infrastructure, tax_social) en vez de solo por expense_type generico.
 - TASK-182 + TASK-183 tambien dejan `space_id`, `source_type`, `payment_provider` y `payment_rail` en el contrato del ledger, además de nuevos tipos `bank_fee`, `gateway_fee` y `financial_cost`; esta task puede apoyarse en ese slicing en vez de depender solo de `service_line`.

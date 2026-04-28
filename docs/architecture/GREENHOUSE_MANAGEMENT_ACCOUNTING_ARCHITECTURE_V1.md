@@ -6,6 +6,34 @@
 
 ---
 
+## ⚠️ Delta 2026-04-28 — Spec parcialmente supersedida por MEMBER_LOADED_COST_MODEL_V1
+
+A partir del 2026-04-28, **`GREENHOUSE_MEMBER_LOADED_COST_MODEL_V1.md` es la spec raíz del modelo económico Greenhouse**. Esta spec (Management Accounting V1) queda **parcialmente supersedida**: conserva su scope de gobernanza enterprise, pero las decisiones canónicas del modelo de costos pasan a MLCM_V1.
+
+**Scope que pasa a `MEMBER_LOADED_COST_MODEL_V1`:**
+
+- Modelo dimensional core (Provider × Tool × Member × Client × Period × Expense) → §2 de MLCM_V1
+- Overhead distribution policies (per_fte / per_revenue / equal / no_distribution) → §4 de MLCM_V1
+- Snapshots inmutables y política temporal (anti re-cálculo retroactivo) → §5 de MLCM_V1
+- Period governance + prior period adjustments → §5 de MLCM_V1 (TASK-393 implementa)
+- Anti-patterns de cost-attribution → §10 de MLCM_V1
+
+**Scope que CONSERVA esta spec:**
+
+- BU + legal entity + intercompany scope (TASK-394 implementa)
+- Planning engine + budgets + drivers + approval governance (TASK-395 implementa)
+- Variance + forecast + executive control tower (TASK-396 implementa)
+- Financial costs integration (factoring + FX fees + treasury) (TASK-397 implementa) — agrega `cost_dimension='financial'` al modelo de MLCM_V1
+- Enterprise hardening (RBAC + observability + runbooks) (TASK-398 implementa)
+- Criterio canónico de NO abrir contabilidad legal todavía (§"Criterio para no abrir todavia contabilidad legal" más abajo)
+- Reliable Actual Foundation gate (§"Reliable Actual Foundation" más abajo) — sigue siendo el bloqueador para enterprise-readiness
+
+**Resultado:** esta spec se vuelve **el manual operacional de gobernanza** sobre el modelo de costos definido en MLCM_V1. El "qué calculamos y cómo" vive en MLCM_V1; el "quién aprueba, cuándo se cierra, cómo se audita, cómo se planifica" vive aquí.
+
+**Cualquier conflicto entre las dos specs se resuelve a favor de MEMBER_LOADED_COST_MODEL_V1** (es la spec raíz forward-going).
+
+---
+
 ## Objetivo
 
 Definir la decision arquitectonica para el siguiente modulo financiero que Greenhouse realmente necesita a partir del runtime actual del repo.

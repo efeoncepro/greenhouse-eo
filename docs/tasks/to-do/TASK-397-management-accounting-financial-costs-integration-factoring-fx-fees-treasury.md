@@ -1,5 +1,9 @@
 # TASK-397 — Management Accounting Financial Costs Integration: Factoring, FX, Fees & Treasury
 
+## Delta 2026-04-28 — Subordinada al programa Member Loaded Cost Model
+
+Esta task **agrega el `cost_dimension='financial'` al modelo dimensional** definido en `docs/architecture/GREENHOUSE_MEMBER_LOADED_COST_MODEL_V1.md` §2 (Provider × Tool × Member × Client × Period × Expense). Factoring fees, FX gain/loss, bank fees y treasury costs se modelan como facts paralelos a los operating costs, compartiendo las mismas dimensiones (period, legal_entity, client_id) pero excluidos del bucket member-loaded (no son cost-per-member). Mantiene su scope técnico completo.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

@@ -1,5 +1,9 @@
 # TASK-398 — Management Accounting Enterprise Hardening: Explainability, RBAC, Observability & Runbooks
 
+## Delta 2026-04-28 — Subordinada al programa Member Loaded Cost Model
+
+Esta task **endurece los endpoints y proyecciones del programa Member Loaded Cost Model** definido en `docs/architecture/GREENHOUSE_MEMBER_LOADED_COST_MODEL_V1.md`. RBAC (admin / finance / client read-only), explainability (trace de cada peso atribuido al expense origen via Fact 1 + Fact 2), observability (signals de coverage, drift, snapshot integrity) y runbooks aplican sobre las VIEWs y materializers definidos en MLCM_V1. Scope técnico no cambia.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

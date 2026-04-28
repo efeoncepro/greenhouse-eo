@@ -1,5 +1,9 @@
 # TASK-394 — Management Accounting Scope Expansion: BU, Legal Entity & Intercompany
 
+## Delta 2026-04-28 — Subordinada al programa Member Loaded Cost Model
+
+Esta task aporta dimensiones **business_unit** y **legal_entity** al programa canónico `docs/architecture/GREENHOUSE_MEMBER_LOADED_COST_MODEL_V1.md`. Es ortogonal al modelo dimensional (Provider × Tool × Member × Client × Period × Expense): agrega dos ejes adicionales sobre los facts ya definidos. Mantiene scope completo (intercompany, FX policy, multi-entity consolidation) pero ahora se entiende como **enrichment cross-cutting**, no como spec independiente.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

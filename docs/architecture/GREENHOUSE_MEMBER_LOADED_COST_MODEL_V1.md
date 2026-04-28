@@ -1,11 +1,29 @@
 # Greenhouse EO — Member Loaded Cost Model V1
 
+> **Status:** **SPEC RAÍZ del modelo económico Greenhouse**. Toda decisión de costos / margen / pricing / P&L referencia esta spec.
 > **Version:** 1.0
 > **Created:** 2026-04-28 by Claude (Opus 4.7) en sesión con Julio Reyes
 > **Audience:** Backend engineers, agentes que implementen cost-attribution / margin / pricing, finance/PM stakeholders que necesiten entender de dónde vienen las cifras de margen
 > **Related:** `GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`, `GREENHOUSE_COMMERCIAL_PARTY_LIFECYCLE_V1.md`, `GREENHOUSE_COMMERCIAL_COST_ATTRIBUTION_V1.md`, `GREENHOUSE_PERSON_ORGANIZATION_MODEL_V1.md`, TASK-705, TASK-708, TASK-709
-> **Supersedes:** modelo ad-hoc actual (`expenses.allocated_client_id` + `direct_overhead_member_id` + reglas TASK-705 reactivas)
-> **Status:** SPEC — no implementado. Reemplaza el approach reactivo actual con un modelo dimensional canónico.
+> **Supersedes parcialmente:**
+>   - `GREENHOUSE_MANAGEMENT_ACCOUNTING_ARCHITECTURE_V1.md` — pierde scope: snapshots inmutables (§5 aquí), overhead policies (§4 aquí), period governance (§5 aquí). Conserva: BU/legal entity scope, planning engine, variance/forecast, executive control tower, RBAC/observability.
+>   - `GREENHOUSE_COST_INTELLIGENCE_ARCHITECTURE_V1.md` — queda como documentación de la implementación V0 (TASK-705 + TASK-708 + TASK-709). El modelo canónico forward-going es éste.
+>   - Modelo ad-hoc actual (`expenses.allocated_client_id` + `direct_overhead_member_id` + reglas TASK-705 reactivas) — deprecado en Fase 3 del roadmap §11.
+> **Status implementación:** SPEC — no implementado. Reemplaza el approach reactivo actual con un modelo dimensional canónico.
+
+---
+
+## Specs subordinadas
+
+Esta spec es la **fuente única de verdad del modelo económico**. Las siguientes specs operan dentro de su contrato:
+
+| Spec subordinada | Scope que conserva | Scope que pasa a MLCM_V1 |
+|---|---|---|
+| `MANAGEMENT_ACCOUNTING_ARCHITECTURE_V1` | BU + legal entity + intercompany scope, planning engine, variance/forecast/executive control tower, RBAC/observability/runbooks, criterio de no abrir contabilidad legal | Snapshots inmutables (§5), overhead policies (§4), period governance (§5), modelo dimensional core (§2) |
+| `COST_INTELLIGENCE_ARCHITECTURE_V1` | Documentación de implementación V0 actual (TASK-705/708/709) | Modelo canónico forward-going (todo este doc) |
+| `COMMERCIAL_COST_ATTRIBUTION_V1` | Atribución comercial commercial (recipe vs reality, contractual) | Conserva sin cambios — perpendicular al modelo de costos |
+
+Cualquier nueva capability de costos / margen / pricing / P&L debe leer de los API contracts canónicos definidos en §7. NO crear endpoints paralelos.
 
 ---
 
