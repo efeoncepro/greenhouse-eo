@@ -1,8 +1,8 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.6
+> **Version:** 1.7
 > **Creado:** 2026-04-07 por Claude
-> **Ultima actualizacion:** 2026-04-27 por Codex
-> **Documentacion tecnica:** [GREENHOUSE_FINANCE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md)
+> **Ultima actualizacion:** 2026-04-28 por Claude Opus 4.7 (TASK-714 drawer semantico por instrumento)
+> **Documentacion tecnica:** [GREENHOUSE_FINANCE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md), [TASK-714](../../tasks/complete/TASK-714-banco-instrument-detail-semantic-drawer.md)
 
 # Modulos de Caja — Cobros, Pagos, Banco, Cuenta Accionista y Posicion de Caja
 
@@ -88,6 +88,31 @@ Finance separa explícitamente los **documentos comerciales** (facturas de venta
   - historial de 12 meses
   - movimientos recientes
   - cierre de periodo por cuenta
+
+### Drawer semantico por instrumento (TASK-714)
+
+El drawer de detalle adapta titulo, KPIs, chart y vocabulario de movimientos al tipo de instrumento. La logica vive en `src/lib/finance/instrument-presentation.ts` (resolver `resolveInstrumentDetailPresentation`) — single source of UI strings por perfil. Perfiles soportados:
+
+| Perfil | Casos | Header | KPIs | Movimientos |
+|---|---|---|---|---|
+| `transactional_account` | bank_account, fintech, cash, payment_platform | "Detalle de cuenta" | Saldo actual / Ingresos del periodo / Salidas del periodo | Entrada / Salida |
+| `credit_card` | tarjeta de credito corporativa | "Detalle de tarjeta" + identidad `•••• 2505 · Mastercard` | Disponible / Deuda actual (con % utilizacion) / Cupo total | Pago / abono / Cargo |
+| `shareholder_account` | cuenta corriente accionista | "Detalle de cuenta accionista" | Saldo actual (signo segun direccion) / Aportes / Reembolsos | Aporte / Reembolso |
+
+Para tarjeta de credito, el drawer muestra:
+
+- Identidad: red (Mastercard/Visa), ultimos 4 digitos, moneda.
+- Banner contextual cuando la TC no tiene cupo declarado (KPI Disponible queda en "Sin datos" sin alarmar).
+- KPI Deuda actual escala a color `error` cuando utilizacion >= 80%, `warning` cuando es menor.
+- Chart con barras "Cargos" (color warning) y "Pagos / abonos" (color success), no "Ingresos / Salidas".
+
+Reglas duras:
+
+- El drawer NO interpreta reglas contables (asset vs liability sign, clamp de consumed). Solo renderiza un perfil resuelto por el resolver.
+- El backend entrega `cardLastFour`, `cardNetwork`, `creditLimit`, `accountKind` en `TreasuryBankAccountOverview`. La UI no recalcula saldos.
+- Para agregar un nuevo perfil (ej. `payroll_processor` para Previred en TASK-706, `loan_account` para prestamos), agregar una rama en `resolveInstrumentDetailPresentation`. Cero refactor del drawer.
+
+> Detalle tecnico: `src/lib/finance/instrument-presentation.ts` (resolver + tests). Bridge a la UI en `src/views/greenhouse/finance/components/AccountDetailDrawer.tsx`. Helper `computeCreditCardSemantics` espejo de la logica del overview en `getBankOverview` — extraido para reusarlo desde el detail sin re-runs.
 
 ### Coverage de instrumentos
 

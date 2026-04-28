@@ -81,6 +81,9 @@ type AccountOverviewRow = {
   account_type: string
   credit_limit: unknown
   metadata_json: unknown
+  account_kind: string | null
+  card_last_four: string | null
+  card_network: string | null
   opening_balance: unknown
   period_inflows: unknown
   period_outflows: unknown
@@ -217,6 +220,15 @@ export type TreasuryBankAccountOverview = {
   metadata: Record<string, unknown> | null
   /** TASK-704: drift bank vs PG. null si nunca se declaró un snapshot. */
   drift: ReconciliationDriftSummaryView | null
+  /**
+   * TASK-714 — semantic identity fields surfaced for instrument-aware presenters.
+   * `accountKind` distinguishes asset (bank, fintech) from liability (credit_card,
+   * shareholder_account, future loans). card_last_four and card_network are only
+   * non-null for `instrument_category='credit_card'`.
+   */
+  accountKind: 'asset' | 'liability'
+  cardLastFour: string | null
+  cardNetwork: string | null
 }
 
 export type TreasuryFxBreakdown = {
@@ -1289,6 +1301,9 @@ export const getBankOverview = async ({
         a.account_type,
         a.credit_limit,
         a.metadata_json,
+        a.account_kind,
+        a.card_last_four,
+        a.card_network,
         COALESCE(o.opening_balance, a.opening_balance)::text AS opening_balance,
         COALESCE(s.period_inflows, '0') AS period_inflows,
         COALESCE(s.period_outflows, '0') AS period_outflows,
@@ -1341,6 +1356,9 @@ export const getBankOverview = async ({
     reconciliationPeriodId: row.reconciliation_period_id ? normalizeString(row.reconciliation_period_id) : null,
     creditLimit: row.credit_limit != null ? roundCurrency(toNumber(row.credit_limit)) : null,
     metadata: parseMetadata(row.metadata_json),
+    accountKind: row.account_kind === 'liability' ? 'liability' : 'asset',
+    cardLastFour: row.card_last_four ? normalizeString(row.card_last_four) : null,
+    cardNetwork: row.card_network ? normalizeString(row.card_network) : null,
     drift: null
   }))
 
