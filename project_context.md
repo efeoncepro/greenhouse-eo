@@ -1,3 +1,67 @@
+## Delta 2026-04-28 Greenhouse Domains And Modules Architecture V1
+
+- Nueva arquitectura canonica: `docs/architecture/GREENHOUSE_DOMAINS_MODULES_ARCHITECTURE_V1.md`.
+- Decision: Greenhouse separa **Core Platform** de **Core Domains** y **Domain Modules**.
+  - Core Platform = runtime base no instalable: auth, tenant, access, API, events, secrets, audit, object graph.
+  - Core Domains = areas nativas de negocio/operacion como `payroll`, `finance`, `cost`, `agency`, `workforce`, `commercial`, `communications`.
+  - Domain Modules = subcapacidades funcionales estables dentro de dominios, por ejemplo `finance.bank`, `finance.cash-signals`, `payroll.compliance`, `agency.public-discovery`.
+- Regla nueva: un Domain Module no es automaticamente Plugin, App, Service Module, View ni Entitlement.
+- Plugins expanden dominios/modulos; Apps enriquecen dominios/modulos/plugins conectando sistemas externos; Service Modules siguen siendo producto/capacidad comercial asignable a clientes.
+- Decisiones cerradas antes de runtime:
+  - Domain Registry primero: manifests read-only en `src/config/domains/<domainKey>.manifest.ts` cuando se implemente.
+  - Dependency graph obligatorio entre domains, modules, apps, plugins, service modules, views, entitlements, workflows y tools.
+  - Lifecycle base comun: `planned`, `available`, `active`, `paused`, `deprecated`, `archived`, `retired`.
+  - Version compatibility debe declarar Core, Domains, Modules, APIs, eventos y migraciones requeridas; no basta con versionar el paquete.
+  - Data ownership: Core Platform owns cross-cutting, Core Domain owns canonical business state, Plugins enrich/materialize/orchestrate, Apps aportan external signal/source/effect.
+  - Admin control plane debe partir read-only/readiness antes de install/uninstall interactivo.
+  - Naming canonico: `domain`, `domain.module`, `domain.plugin-package`, `appKey`, `viewCode`, `domain.capability.action`.
+- `GREENHOUSE_CORE_PLATFORM_ARCHITECTURE_V1.md`, `GREENHOUSE_APPS_ARCHITECTURE_V1.md` y `GREENHOUSE_PLUGINS_ARCHITECTURE_V1.md` fueron ajustados para referenciar esta capa.
+
+## Delta 2026-04-28 Greenhouse Core Platform Architecture V1
+
+- Nueva arquitectura canonica: `docs/architecture/GREENHOUSE_CORE_PLATFORM_ARCHITECTURE_V1.md`.
+- Decision: la definicion de **Core Platform** vive fuera de Apps y Plugins. Core es el runtime base no instalable que sostiene auth, tenant context, access governance, API Platform, grafo canonico, outbox/event spine, webhook base, secret resolution, audit/observability, notification foundation y Home shell base.
+- Regla de clasificacion oficial:
+  - si apagarlo rompe auth, tenant context, API base, events base, secret resolution, audit o grafo canonico, es **Core Platform**.
+  - si entrega una capacidad funcional Greenhouse con UI/API/data/events/jobs propios, es **Native Plugin**.
+  - si conecta un sistema externo, proveedor, canal, source, API, SaaS o dependencia infra gobernable, es **Connected App**.
+- `GREENHOUSE_PLUGINS_ARCHITECTURE_V1.md` ahora solo referencia Core y no es owner de su definicion.
+
+## Delta 2026-04-28 Greenhouse Plugins Architecture V1
+
+- Nueva arquitectura canonica: `docs/architecture/GREENHOUSE_PLUGINS_ARCHITECTURE_V1.md`.
+- Decision: Greenhouse debe modelar **Plugins** como paquetes funcionales Greenhouse instalables, versionables y gobernables, no como codigo externo dinamico ni marketplace.
+- Separacion de planos:
+  - Apps conectan dependencias externas.
+  - Plugins empaquetan capacidades funcionales Greenhouse.
+  - Tools ejecutan acciones puntuales.
+  - Workflows orquestan procesos multi-step.
+  - Service Modules describen producto/capacidad comercial.
+  - Views y Entitlements gobiernan UI y permisos.
+- Regla central: un Plugin instalado no concede permisos, no activa automaticamente views/sidebar y no reemplaza `service_modules`; debe declarar ambos planos de acceso cuando apliquen (`views` + `entitlements`).
+- La definicion de Core queda delegada a `GREENHOUSE_CORE_PLATFORM_ARCHITECTURE_V1.md`; Plugins solo define paquetes funcionales sobre Core.
+- V1 recomendado: manifests TypeScript code-versioned, runtime read-only sobre codigo/rutas actuales, sin dynamic loading ni install/uninstall interactivo hasta tener readiness y lifecycle probados.
+- Candidatos iniciales para validar el modelo: `platform.health`, `communications.manual-announcements`, `finance.external-cash-signals`, `finance.bank-read-model`, `payroll.previred`, `commercial.public-tenders`, `capabilities.creative-hub`, `home.nexa`.
+
+## Delta 2026-04-28 Greenhouse Apps Architecture V1
+
+- Nueva arquitectura canonica: `docs/architecture/GREENHOUSE_APPS_ARCHITECTURE_V1.md`.
+- Decision: Greenhouse debe evolucionar `integrations` hacia **Greenhouse Apps** gobernables, instalables, versionables y observables.
+- V1 no reemplaza runtime existente: `greenhouse_sync.integration_registry` se conserva como estado operacional legacy mientras se introduce el modelo `Manifest + Catalog + Installation + Binding + Runtime State + Readiness + Events`.
+- Regla central:
+  - `App Manifest` = contrato esperado, code-versioned y sin secretos.
+  - DB/runtime = estado instalado, health, readiness, bindings y ultima operacion.
+  - Docs = explicacion humana derivada.
+- Una App instalada no concede permisos, no activa vistas y no equivale a un `service_module`; deben mantenerse separados:
+  - Apps para dependencias externas.
+  - `service_modules` para producto/capacidad comercial.
+  - `views` para surfaces visibles.
+  - `entitlements` para acciones autorizadas.
+- Integraciones actuales se adoptan gradualmente como `legacy_active` o `discovered`:
+  - `notion`, `hubspot`, `nubox`, `frame_io` desde `integration_registry`.
+  - `teams`, `mercado_publico`, `zapsign` como runtime/helper existente pendiente de manifest/managed state.
+- Antes de crear nuevas integraciones productivas, revisar esta arquitectura y declarar manifest, scopes, secrets refs, data role, readiness, safe modes, data touched, ownership y access model cuando aplique.
+
 ## Delta 2026-04-26 Greenhouse Deep Link Platform documentada
 
 - Nueva arquitectura canonica: `docs/architecture/GREENHOUSE_DEEP_LINK_PLATFORM_V1.md`.

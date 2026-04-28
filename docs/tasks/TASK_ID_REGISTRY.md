@@ -795,5 +795,6 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-713` | `to-do` | Period Closing Workflow (snapshots inmutables + restatement) — MLCM Fase 4 | `docs/tasks/to-do/TASK-713-period-closing-workflow.md` |
 | `TASK-714` | `complete` | Banco Instrument Detail Semantic Drawer | `docs/tasks/complete/TASK-714-banco-instrument-detail-semantic-drawer.md` |
 | `TASK-714c` | `to-do` | Shareholder Reimbursable Expense Canonical Runtime (factory + UI) | `docs/tasks/to-do/TASK-714c-shareholder-reimbursable-expense-canonical-runtime.md` |
+| `TASK-714d` | `to-do` (umbrella, Slice 1+2 ✅) | Internal Transfer Pair Invariant + Global66 ledger canonicalization | `docs/tasks/to-do/TASK-714d-internal-transfer-pair-invariant.md` |
 | `TASK-715` | `to-do` | Reconciliation Test Period Archive UX | `docs/tasks/to-do/TASK-715-reconciliation-test-period-archive-ux.md` |
 | `TASK-716` | `to-do` | Manual Team Announcements | `docs/tasks/to-do/TASK-716-manual-team-announcements.md` |

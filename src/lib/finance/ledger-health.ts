@@ -82,6 +82,25 @@ export interface LedgerHealthSnapshot {
       signalId: string
     }>
   }
+  /**
+   * TASK-714d — settlement_groups con leg_type='internal_transfer' que tienen
+   * `out_count != in_count` (legs activos, sin contar superseded). Indica un
+   * grupo bilateral incompleto, típicamente con la pata `incoming` faltante.
+   *
+   * Steady state esperado: `count = 0`. Cualquier valor > 0 implica que hay
+   * settlement_groups con desbalance que distorsionan el ledger de la cuenta
+   * receptora. Resolución: usar el helper canónico
+   * `createInternalTransferSettlement` o el script de backfill TASK-714d.
+   */
+  task714d: {
+    internalTransferGroupsWithMissingPair: number
+    sampleImbalancedGroups: Array<{
+      settlementGroupId: string
+      outCount: number
+      inCount: number
+      instruments: string[]
+    }>
+  }
 }
 
 const STALE_THRESHOLD_DAYS = 2
@@ -436,6 +455,48 @@ const TASK708D_COHORT_D_COUNT_SQL = `
   ) cohort_d
 `
 
+// ─── TASK-714d — Internal transfer pair invariant ────────────────────────────
+//
+// settlement_groups con leg_type='internal_transfer' deben tener exactamente
+// 1 leg `outgoing` + 1 leg `incoming` activas (no superseded). Cuando emerge
+// un desbalance significa que el carril emisor de las legs no fue el helper
+// canónico `createInternalTransferSettlement`. Síntoma visible: la cuenta
+// receptora no muestra inflows aunque la emisora muestra outflows.
+//
+// Excluye explícitamente legs con superseded_at NOT NULL o
+// superseded_by_otb_id NOT NULL — esas son audit chains, no movimientos
+// activos.
+
+const TASK714D_INTERNAL_TRANSFER_PAIR_IMBALANCE_COUNT_SQL = `
+  SELECT COUNT(*) AS total FROM (
+    SELECT settlement_group_id
+    FROM greenhouse_finance.settlement_legs
+    WHERE leg_type = 'internal_transfer'
+      AND superseded_at IS NULL
+      AND superseded_by_otb_id IS NULL
+    GROUP BY settlement_group_id
+    HAVING SUM(CASE WHEN direction = 'outgoing' THEN 1 ELSE 0 END)
+        <> SUM(CASE WHEN direction = 'incoming' THEN 1 ELSE 0 END)
+  ) imbalanced
+`
+
+const TASK714D_INTERNAL_TRANSFER_PAIR_IMBALANCE_SAMPLE_SQL = `
+  SELECT
+    settlement_group_id,
+    SUM(CASE WHEN direction = 'outgoing' THEN 1 ELSE 0 END)::int AS out_count,
+    SUM(CASE WHEN direction = 'incoming' THEN 1 ELSE 0 END)::int AS in_count,
+    array_agg(DISTINCT instrument_id) AS instruments
+  FROM greenhouse_finance.settlement_legs
+  WHERE leg_type = 'internal_transfer'
+    AND superseded_at IS NULL
+    AND superseded_by_otb_id IS NULL
+  GROUP BY settlement_group_id
+  HAVING SUM(CASE WHEN direction = 'outgoing' THEN 1 ELSE 0 END)
+      <> SUM(CASE WHEN direction = 'incoming' THEN 1 ELSE 0 END)
+  ORDER BY settlement_group_id
+  LIMIT 20
+`
+
 const UNANCHORED_EXPENSES_SQL = `
   SELECT
     e.expense_id, e.expense_type, e.total_amount::text, e.payment_date::text
@@ -472,6 +533,8 @@ export const getFinanceLedgerHealth = async (): Promise<LedgerHealthSnapshot> =>
     reconciledUnscopedRows,
     signalsUnresolvedOverThresholdRows,
     signalsPromotedInvariantRows,
+    itxImbalanceCountRows,
+    itxImbalanceSampleRows,
     cohortDCountRows,
     cohortDSampleRows
   ] = await Promise.all([
@@ -486,6 +549,13 @@ export const getFinanceLedgerHealth = async (): Promise<LedgerHealthSnapshot> =>
     runGreenhousePostgresQuery<{ total: string }>(TASK708_RECONCILED_AGAINST_UNSCOPED_SQL).catch(() => [{ total: '0' }]),
     runGreenhousePostgresQuery<{ total: string }>(TASK708_EXTERNAL_SIGNALS_UNRESOLVED_OVER_THRESHOLD_SQL, [EXTERNAL_SIGNALS_UNRESOLVED_THRESHOLD_DAYS]).catch(() => [{ total: '0' }]),
     runGreenhousePostgresQuery<{ total: string }>(TASK708_EXTERNAL_SIGNALS_PROMOTED_INVARIANT_VIOLATION_SQL).catch(() => [{ total: '0' }]),
+    runGreenhousePostgresQuery<{ total: string }>(TASK714D_INTERNAL_TRANSFER_PAIR_IMBALANCE_COUNT_SQL).catch(() => [{ total: '0' }]),
+    runGreenhousePostgresQuery<{
+      settlement_group_id: string
+      out_count: number
+      in_count: number
+      instruments: string[]
+    }>(TASK714D_INTERNAL_TRANSFER_PAIR_IMBALANCE_SAMPLE_SQL).catch(() => []),
     runGreenhousePostgresQuery<{ total: string }>(TASK708D_COHORT_D_COUNT_SQL).catch(() => [{ total: '0' }]),
     runGreenhousePostgresQuery<{
       payment_kind: 'income' | 'expense'
@@ -569,6 +639,16 @@ export const getFinanceLedgerHealth = async (): Promise<LedgerHealthSnapshot> =>
     }))
   }
 
+  const task714d = {
+    internalTransferGroupsWithMissingPair: readCount(itxImbalanceCountRows),
+    sampleImbalancedGroups: itxImbalanceSampleRows.map(row => ({
+      settlementGroupId: row.settlement_group_id,
+      outCount: Number(row.out_count),
+      inCount: Number(row.in_count),
+      instruments: Array.isArray(row.instruments) ? row.instruments.filter(Boolean) : []
+    }))
+  }
+
   const healthy =
     settlementDrift.driftedIncomesCount === 0 &&
     phantoms.incomePhantomsCount === 0 &&
@@ -581,7 +661,10 @@ export const getFinanceLedgerHealth = async (): Promise<LedgerHealthSnapshot> =>
     task708.externalCashSignalsPromotedInvariantViolation === 0 &&
     // TASK-708d: Cohort D debe ser 0; cualquier valor mayor implica payments
     // post-cutover con cuenta inferida pero sin evidencia de cartola.
-    task708d.postCutoverPhantomsWithoutBankEvidence === 0
+    task708d.postCutoverPhantomsWithoutBankEvidence === 0 &&
+    // TASK-714d: settlement_groups internal_transfer balanceados; cualquier
+    // grupo con out_count != in_count distorsiona el ledger receptor.
+    task714d.internalTransferGroupsWithMissingPair === 0
 
   return {
     healthy,
@@ -591,6 +674,7 @@ export const getFinanceLedgerHealth = async (): Promise<LedgerHealthSnapshot> =>
     balanceFreshness: { accountsWithStaleBalances },
     unanchoredExpenses,
     task708,
-    task708d
+    task708d,
+    task714d
   }
 }
