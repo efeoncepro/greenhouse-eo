@@ -291,6 +291,21 @@ const buildSettlementLegPlan = async (
   const fundingInstrumentId = str(input.settlementConfig?.fundingInstrumentId)
   const mainInstrumentId = str(input.paymentAccountId)
 
+  // TASK-708 Slice 4 — invariante de defensa estructural: cualquier payment
+  // canónico (income_payment / expense_payment) que llega aca DEBE traer su
+  // payment_account_id resuelto. Eso ya esta garantizado por:
+  //   - el CHECK income/expense_payments_account_required_after_cutover (Slice 0)
+  //   - la firma RecordPaymentInput con AccountId branded (Slice 4 sigue)
+  // Pero defendemos aca tambien antes de construir la leg principal — el
+  // CHECK SQL settlement_legs_principal_requires_instrument lo rechazaria de
+  // todas formas, pero la guarda explicita produce error mensajes mas claros.
+  if (!mainInstrumentId) {
+    throw new FinanceValidationError(
+      `TASK-708 Slice 4: cannot build settlement plan for ${paymentType} ${input.paymentId} — paymentAccountId (instrumentId) is required for receipt/payout legs.`,
+      400
+    )
+  }
+
   const instrumentCurrencyMap = await loadInstrumentCurrencies(
     [fundingInstrumentId, mainInstrumentId].filter((value): value is string => Boolean(value)),
     input.client

@@ -1,5 +1,25 @@
 # Handoff.md
 
+## Sesion 2026-04-28 — TASK-708 Slices 1-6 Cutover + observabilidad (in-progress)
+
+- Rama: `task/TASK-708-slices-1-6` (mergeada a `develop`).
+- Slice 1 entregado (Nubox cutover): `src/lib/nubox/sync-nubox-to-postgres.ts` reemplaza las 2 reconcile* (income/expense) por una sola `recordSignalFromBankMovement` que escribe a `external_cash_signals` via `recordSignal()`. Cero `recordPayment` / `INSERT INTO expense_payments` desde el sync. Idempotencia por `UNIQUE (source_system, source_event_id)`. spaceId resuelto por inheritance de la expense linked + fallback `NUBOX_DEFAULT_SPACE_ID` (default `spc-8641519f-12a0-456f-b03a-e94522d35e3a` "Greenhouse Demo"). Output struct + sync_run notes incluyen `signalsRecorded`. Outbox event canónico `finance.external_cash_signal.recorded`.
+- Slice 2 entregado (matchability central): `src/lib/finance/reconciliation-matchability.ts` con `getPaymentMatchability()` y `getSettlementLegMatchability()` retornando discriminated union exhaustiva (`recorded`/`reconciliable`/`pending_account_resolution`/`needs_repair`). Helper booleano `isReconciliable`. 11 tests unitarios verdes que validan precedencia: superseded chain > NULL account, supersede priority sobre needs_repair, distinción legs principales (receipt/payout) vs auxiliares (funding/fx_conversion).
+- Slice 3 entregado (candidate resolver scopeado): `listReconciliationCandidatesByDateRangeFromPostgres` ahora exige `accountId` posicional. Las 3 queries de income (settlement legs + payment fallback + invoice fallback) y 3 de expense filtran `WHERE instrument_id = accountId` o `payment_account_id = accountId` + excluyen superseded chains. Invoice fallback skipea cuando hay accountId (rows sin anchor). `listReconciliationCandidatesFromPostgres` propaga `period.accountId`. `listUnmatchedStatementRowsByDateRangeFromPostgres` ahora retorna `account_id` para que `auto-match` (route + cron) agrupe por cuenta y corra el resolver una vez por cuenta — cero leakage cross-account.
+- Slice 4 entregado (settlement orchestration hardening): `buildSettlementLegPlan` agrega guard explícito que rechaza `paymentAccountId` nulo con `FinanceValidationError` antes de construir la leg principal — defensa redundante con el CHECK SQL `settlement_legs_principal_requires_instrument` pero produce error más claro. La invariante runtime+SQL forman defensa en profundidad.
+- Slice 6 entregado (lifecycle + observabilidad): `validateReconciledTransitionFromPostgres(periodId)` pierde el segundo parámetro `statementImported` (era hardcoded `true`). Ahora deriva el estado desde `reconciliation_periods.statement_row_count` + `COUNT(bank_statement_rows)` reales — lectura de estado persistido, no parámetro externo. `ledger-health.ts` extendido con 6 métricas TASK-708:
+  - `paymentsPendingAccountResolutionRuntime` (post-cutover; debe ser 0)
+  - `paymentsPendingAccountResolutionHistorical` (Cohorte A+B; baja con TASK-708b)
+  - `settlementLegsPrincipalWithoutInstrument` (4 legs hoy; baja con TASK-708b)
+  - `reconciledRowsAgainstUnscopedTarget` (cross-account o leg null; debe ser 0)
+  - `externalCashSignalsUnresolvedOverThreshold` (config via `EXTERNAL_CASH_SIGNALS_UNRESOLVED_THRESHOLD_DAYS`, default 14d)
+  - `externalCashSignalsPromotedInvariantViolation` (canary del trigger D4; debe ser 0)
+  - El flag `healthy` ahora exige `paymentsPendingAccountResolutionRuntime===0` y `externalCashSignalsPromotedInvariantViolation===0`. Histórico no cuenta para `healthy`.
+  - Endpoint admin `/api/admin/finance/ledger-health` ya servía `getFinanceLedgerHealth()`; el nuevo objeto `task708` aparece automáticamente en el payload.
+  - UI cola admin `/finance/external-signals` queda como follow-up dedicado (skill greenhouse-ux + UX writing).
+- 2 fallas pre-existentes resueltas: `get-operations-overview.test.ts` actualizado para mockear y validar el 5to metric `labor_allocation_saturation_drift` (TASK-709 no había updated tests); `member-period-attribution.test.ts` actualizado para verificar VIEW `client_labor_cost_allocation_consolidated` (TASK-709b consolidation rename).
+- Verificación: `pnpm lint` limpio, `npx tsc --noEmit` limpio, `pnpm test` **2437/2437 verde** (5 skipped pre-existentes), `pnpm build` OK. Slices 1-6 cierran TASK-708. Solo queda TASK-708b (remediación histórica) que es task hermana con runbook propio.
+
 ## Sesion 2026-04-28 — TASK-708 Slice 0 Model Hardening (in-progress)
 
 - Rama: `task/TASK-708-nubox-documents-only-and-reconciliation-sot-cutover`.

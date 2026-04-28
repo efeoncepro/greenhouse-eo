@@ -8,7 +8,7 @@
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `[optional EPIC-###]`
-- Status real: `Slice 0 (model hardening) — en ejecución 2026-04-28`
+- Status real: `Slices 0-6 entregados 2026-04-28 (TASK-708 lista para cierre tras VALIDATE final post-TASK-708b)`
 - Rank: `TBD`
 - Domain: `finance`
 - Blocked by: `none`
