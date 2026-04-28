@@ -784,9 +784,19 @@ export const materializeAccountBalance = async (
 
   const previous = await getPreviousBalanceRow(input.accountId, balanceDate, input.client)
 
+  // TASK-703b/705 hardening: when no previous balance row exists for this day,
+  // the canonical opening source is the active OTB (not the legacy
+  // accounts.opening_balance cache, which has historically been corrupted by
+  // unrelated update paths). The OTB.openingBalance is reconciled bank truth.
+  const otb = await getActiveOpeningTrialBalance(input.accountId)
+
+  const otbOpening = otb && balanceDate >= otb.genesisDate
+    ? roundCurrency(otb.openingBalance)
+    : null
+
   const openingBalance = previous
     ? roundCurrency(toNumber(previous.closing_balance))
-    : roundCurrency(toNumber(account.opening_balance))
+    : (otbOpening ?? roundCurrency(toNumber(account.opening_balance)))
 
   const movementSummary = await getDailyMovementSummary(input.accountId, balanceDate, input.client)
   const fxSummary = await getDailyFxGainLoss(input.accountId, balanceDate, input.client)
