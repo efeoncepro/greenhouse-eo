@@ -782,3 +782,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-705` | `to-do` | Banco Read Model & Snapshot Cutover | `docs/tasks/to-do/TASK-705-banco-read-model-snapshot-cutover.md` |
 | `TASK-706` | `to-do` | Previred Processor UX & Bank Semantics | `docs/tasks/to-do/TASK-706-previred-processor-ux-and-bank-semantics.md` |
 | `TASK-707` | `to-do` | Previred Canonical Payment Runtime & Backfill | `docs/tasks/to-do/TASK-707-previred-canonical-payment-runtime-and-backfill.md` |
+| `TASK-708` | `to-do` | Nubox Documents-Only SoT + Reconciliation Purity Cutover | `docs/tasks/to-do/TASK-708-nubox-documents-only-and-reconciliation-sot-cutover.md` |
