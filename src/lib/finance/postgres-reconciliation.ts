@@ -50,6 +50,10 @@ type PostgresPeriodRow = {
   provider_slug_snapshot: string | null
   provider_name_snapshot: string | null
   period_currency_snapshot: string | null
+  archived_at: string | Date | null
+  archived_by_user_id: string | null
+  archive_reason: string | null
+  archive_kind: string | null
   created_at: string | Date | null
   updated_at: string | Date | null
 }
@@ -212,6 +216,10 @@ const mapPeriod = (row: PostgresPeriodRow) => ({
   providerSlugSnapshot: str(row.provider_slug_snapshot),
   providerNameSnapshot: str(row.provider_name_snapshot),
   periodCurrencySnapshot: str(row.period_currency_snapshot),
+  archivedAt: toTimestampString(row.archived_at as string | { value?: string } | null),
+  archivedBy: str(row.archived_by_user_id),
+  archiveReason: str(row.archive_reason),
+  archiveKind: str(row.archive_kind),
   createdAt: toTimestampString(row.created_at as string | { value?: string } | null),
   updatedAt: toTimestampString(row.updated_at as string | { value?: string } | null)
 })
@@ -281,10 +289,16 @@ const buildStatementFingerprint = (
 
 export const listReconciliationPeriodsFromPostgres = async ({
   accountId,
-  status
+  status,
+  includeArchived = false
 }: {
   accountId?: string | null
   status?: string | null
+  /**
+   * TASK-715: by default the operational queue hides periods archived as test
+   * residue. Pass `true` to include them (audit/history views).
+   */
+  includeArchived?: boolean
 } = {}) => {
   await assertFinanceSlice2PostgresReady()
 
@@ -304,6 +318,10 @@ export const listReconciliationPeriodsFromPostgres = async ({
     values.push(status)
   }
 
+  if (!includeArchived) {
+    conditions.push(`archived_at IS NULL`)
+  }
+
   const where = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : ''
 
   const rows = await queryRows<PostgresPeriodRow>(`
@@ -318,6 +336,199 @@ export const listReconciliationPeriodsFromPostgres = async ({
     items: rows.map(mapPeriod),
     total: rows.length
   }
+}
+
+// ─── TASK-715: archive period as test ──────────────────────────────
+
+const ARCHIVE_KIND_TEST = 'test_period'
+const ARCHIVE_REASON_MIN_LENGTH = 8
+
+const ensureArchiveReason = (reason: string): string => {
+  const trimmed = (reason ?? '').trim()
+
+  if (trimmed.length < ARCHIVE_REASON_MIN_LENGTH) {
+    throw new FinanceValidationError(
+      `archive_reason debe tener al menos ${ARCHIVE_REASON_MIN_LENGTH} caracteres.`,
+      422,
+      { field: 'archive_reason' },
+      'ARCHIVE_REASON_TOO_SHORT'
+    )
+  }
+
+  return trimmed
+}
+
+/**
+ * TASK-715 — archives a reconciliation period as a test/experimental run.
+ *
+ * Semantically distinct from `status='reconciled'` (a real accounting closure):
+ *   - `reconciled` = period closed because bank balance matched system balance.
+ *   - `archived as test` = period was never real bank evidence (E2E test, mistake,
+ *     pre-OTB anchor residue). Hidden from operational queue, preserved for audit.
+ *
+ * Hard rules:
+ *   - reason >= 8 chars (audit-grade).
+ *   - cero DELETE: only UPDATE archive_*.
+ *   - idempotent: if already archived with same kind, no-op.
+ *   - blocked when status='closed' (formally closed accounting).
+ *   - emits outbox event `finance.reconciliation_period.archived_as_test`.
+ */
+export const archiveReconciliationPeriodAsTestInPostgres = async (input: {
+  periodId: string
+  reason: string
+  actorUserId: string
+}): Promise<{ periodId: string; alreadyArchived: boolean }> => {
+  await assertFinanceSlice2PostgresReady()
+
+  const reason = ensureArchiveReason(input.reason)
+  const actor = (input.actorUserId ?? '').trim()
+
+  if (!actor) {
+    throw new FinanceValidationError('actorUserId is required to archive a period.', 422)
+  }
+
+  return withGreenhousePostgresTransaction(async client => {
+    const periodRows = await client.query<{
+      period_id: string
+      status: string
+      archived_at: string | Date | null
+      archive_kind: string | null
+    }>(
+      `SELECT period_id, status, archived_at, archive_kind
+       FROM greenhouse_finance.reconciliation_periods
+       WHERE period_id = $1
+       FOR UPDATE`,
+      [input.periodId]
+    )
+
+    if (periodRows.rows.length === 0) {
+      throw new FinanceValidationError(`Reconciliation period ${input.periodId} not found.`, 404)
+    }
+
+    const period = periodRows.rows[0]
+
+    if (period.archived_at) {
+      // Idempotency: already archived. Confirm same kind to avoid silently
+      // re-classifying.
+      if (period.archive_kind !== ARCHIVE_KIND_TEST) {
+        throw new FinanceValidationError(
+          `Period already archived with a different kind (${period.archive_kind ?? 'unknown'}).`,
+          409
+        )
+      }
+
+      return { periodId: input.periodId, alreadyArchived: true }
+    }
+
+    if (period.status === 'closed') {
+      throw new FinanceValidationError(
+        `Cannot archive a period in status='closed'. Reopen the period first if it should never have been closed.`,
+        422
+      )
+    }
+
+    await client.query(
+      `UPDATE greenhouse_finance.reconciliation_periods
+       SET archived_at = NOW(),
+           archived_by_user_id = $2,
+           archive_reason = $3,
+           archive_kind = $4,
+           updated_at = NOW()
+       WHERE period_id = $1`,
+      [input.periodId, actor, reason, ARCHIVE_KIND_TEST]
+    )
+
+    await publishOutboxEvent(
+      {
+        aggregateType: 'finance.reconciliation_period',
+        aggregateId: input.periodId,
+        eventType: 'finance.reconciliation_period.archived_as_test',
+        payload: {
+          periodId: input.periodId,
+          archiveKind: ARCHIVE_KIND_TEST,
+          reason,
+          actorUserId: actor,
+          previousStatus: period.status
+        }
+      },
+      client
+    )
+
+    return { periodId: input.periodId, alreadyArchived: false }
+  })
+}
+
+/**
+ * TASK-715 — reactivates a previously archived period.
+ *
+ * Use case: archived by mistake, or the period turned out to represent real
+ * bank evidence after all. Clears all archive_* fields and emits a distinct
+ * audit event so the lifecycle stays traceable.
+ */
+export const unarchiveReconciliationPeriodInPostgres = async (input: {
+  periodId: string
+  actorUserId: string
+}): Promise<{ periodId: string; wasArchived: boolean }> => {
+  await assertFinanceSlice2PostgresReady()
+
+  const actor = (input.actorUserId ?? '').trim()
+
+  if (!actor) {
+    throw new FinanceValidationError('actorUserId is required to unarchive a period.', 422)
+  }
+
+  return withGreenhousePostgresTransaction(async client => {
+    const periodRows = await client.query<{
+      period_id: string
+      archived_at: string | Date | null
+      archive_kind: string | null
+      archive_reason: string | null
+    }>(
+      `SELECT period_id, archived_at, archive_kind, archive_reason
+       FROM greenhouse_finance.reconciliation_periods
+       WHERE period_id = $1
+       FOR UPDATE`,
+      [input.periodId]
+    )
+
+    if (periodRows.rows.length === 0) {
+      throw new FinanceValidationError(`Reconciliation period ${input.periodId} not found.`, 404)
+    }
+
+    const period = periodRows.rows[0]
+
+    if (!period.archived_at) {
+      return { periodId: input.periodId, wasArchived: false }
+    }
+
+    await client.query(
+      `UPDATE greenhouse_finance.reconciliation_periods
+       SET archived_at = NULL,
+           archived_by_user_id = NULL,
+           archive_reason = NULL,
+           archive_kind = NULL,
+           updated_at = NOW()
+       WHERE period_id = $1`,
+      [input.periodId]
+    )
+
+    await publishOutboxEvent(
+      {
+        aggregateType: 'finance.reconciliation_period',
+        aggregateId: input.periodId,
+        eventType: 'finance.reconciliation_period.unarchived',
+        payload: {
+          periodId: input.periodId,
+          previousArchiveKind: period.archive_kind,
+          previousArchiveReason: period.archive_reason,
+          actorUserId: actor
+        }
+      },
+      client
+    )
+
+    return { periodId: input.periodId, wasArchived: true }
+  })
 }
 
 // ─── Periods: create ────────────────────────────────────────────────

@@ -24,8 +24,9 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
   const accountId = searchParams.get('accountId')
   const status = searchParams.get('status')
+  const includeArchived = searchParams.get('includeArchived') === 'true'
 
-  const result = await listReconciliationPeriodsFromPostgres({ accountId, status })
+  const result = await listReconciliationPeriodsFromPostgres({ accountId, status, includeArchived })
 
   return NextResponse.json(result)
 }

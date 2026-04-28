@@ -60,6 +60,28 @@ export interface LedgerHealthSnapshot {
     externalCashSignalsUnresolvedOverThreshold: number
     externalCashSignalsPromotedInvariantViolation: number
   }
+  /**
+   * TASK-708d — Cohort D: post-cutover payments adoptados por D5 rule
+   * (account resolution `auto_exact_match`) sin evidencia de cartola bancaria.
+   *
+   * Steady state esperado: `count = 0`. Cualquier valor > 0 implica que la
+   * regla D5 inferio una cuenta canonica para un payment que no aparece como
+   * cash real en `bank_statement_rows`. Resolucion: usar `dismissIncomePhantom` /
+   * `dismissExpensePhantom` (TASK-708b helpers) o adjudicar como cash real
+   * importando la cartola y matcheando.
+   */
+  task708d: {
+    postCutoverPhantomsWithoutBankEvidence: number
+    samplePhantoms: Array<{
+      paymentKind: 'income' | 'expense'
+      paymentId: string
+      documentId: string
+      accountId: string
+      paymentDate: string
+      amount: number
+      signalId: string
+    }>
+  }
 }
 
 const STALE_THRESHOLD_DAYS = 2
@@ -242,6 +264,178 @@ const TASK708_EXTERNAL_SIGNALS_PROMOTED_INVARIANT_VIOLATION_SQL = `
     )
 `
 
+// ─── TASK-708d — Cohort D: post-cutover D5-adopted phantoms sin evidencia ────
+//
+// Definicion canonica: la regla D5 (`auto_exact_match` por source_system +
+// payment_method + currency) resolvio una cuenta para un payment, pero no
+// existe `bank_statement_rows` reconciliado/matcheado con ese payment ni con
+// su settlement_leg. Cuenta inferida ≠ cash probado.
+//
+// Excluye explicitamente:
+//   - Cadenas supersede en cualquier eje (TASK-702 / TASK-703b / TASK-708b).
+//   - Signals dismissed (`account_resolution_status='dismissed'` o
+//     `superseded_at NOT NULL`).
+//   - Casos con bank_statement_rows matched al payment o a sus legs.
+//   - Casos con settlement_legs reconciled (reconciliation_row_id NOT NULL).
+//
+// Salida: count agregado + sample (max 20) para ledger-health drill-down.
+
+const TASK708D_COHORT_D_SAMPLE_SQL = `
+  WITH d5_active_adoptions AS (
+    SELECT
+      'income'::text AS payment_kind,
+      s.signal_id,
+      s.document_id,
+      ip.payment_id,
+      ip.payment_account_id AS account_id,
+      ip.payment_date::text AS payment_date,
+      ip.amount::text AS amount
+    FROM greenhouse_finance.external_cash_signals s
+    JOIN greenhouse_finance.income_payments ip ON ip.payment_id = s.promoted_payment_id
+    WHERE s.promoted_payment_kind = 'income_payment'
+      AND s.resolution_method = 'auto_exact_match'
+      AND s.account_resolution_status = 'adopted'
+      AND s.superseded_at IS NULL
+      AND ip.superseded_at IS NULL
+      AND ip.superseded_by_payment_id IS NULL
+      AND ip.superseded_by_otb_id IS NULL
+      AND ip.created_at >= TIMESTAMPTZ '${TASK_708_CUTOVER_TS}'
+    UNION ALL
+    SELECT
+      'expense'::text AS payment_kind,
+      s.signal_id,
+      s.document_id,
+      ep.payment_id,
+      ep.payment_account_id AS account_id,
+      ep.payment_date::text AS payment_date,
+      ep.amount::text AS amount
+    FROM greenhouse_finance.external_cash_signals s
+    JOIN greenhouse_finance.expense_payments ep ON ep.payment_id = s.promoted_payment_id
+    WHERE s.promoted_payment_kind = 'expense_payment'
+      AND s.resolution_method = 'auto_exact_match'
+      AND s.account_resolution_status = 'adopted'
+      AND s.superseded_at IS NULL
+      AND ep.superseded_at IS NULL
+      AND ep.superseded_by_payment_id IS NULL
+      AND ep.superseded_by_otb_id IS NULL
+      AND ep.created_at >= TIMESTAMPTZ '${TASK_708_CUTOVER_TS}'
+  )
+  SELECT
+    a.payment_kind,
+    a.payment_id,
+    a.document_id,
+    a.account_id,
+    a.payment_date,
+    a.amount,
+    a.signal_id
+  FROM d5_active_adoptions a
+  WHERE NOT EXISTS (
+    -- Direct match: bank_statement_row.matched_payment_id = payment_id
+    SELECT 1 FROM greenhouse_finance.bank_statement_rows bsr
+    WHERE bsr.matched_payment_id = a.payment_id
+      AND bsr.match_status IN ('manual_matched', 'auto_matched')
+  )
+  AND NOT EXISTS (
+    -- Indirect match: bank_statement_row matched to one of the payment's legs
+    SELECT 1
+    FROM greenhouse_finance.settlement_legs sl
+    JOIN greenhouse_finance.bank_statement_rows bsr
+      ON bsr.matched_settlement_leg_id = sl.settlement_leg_id
+    WHERE sl.linked_payment_id = a.payment_id
+      AND sl.superseded_at IS NULL
+      AND sl.superseded_by_otb_id IS NULL
+      AND bsr.match_status IN ('manual_matched', 'auto_matched')
+  )
+  AND NOT EXISTS (
+    -- Settlement-side reconciled (some flows mark reconciliation_row_id directly)
+    SELECT 1 FROM greenhouse_finance.settlement_legs sl
+    WHERE sl.linked_payment_id = a.payment_id
+      AND sl.reconciliation_row_id IS NOT NULL
+      AND sl.superseded_at IS NULL
+      AND sl.superseded_by_otb_id IS NULL
+  )
+  ORDER BY a.payment_date DESC, a.payment_id
+  LIMIT 20
+`
+
+const TASK708D_COHORT_D_COUNT_SQL = `
+  SELECT COUNT(*) AS total FROM (
+    SELECT
+      'income'::text AS payment_kind,
+      s.signal_id,
+      ip.payment_id
+    FROM greenhouse_finance.external_cash_signals s
+    JOIN greenhouse_finance.income_payments ip ON ip.payment_id = s.promoted_payment_id
+    WHERE s.promoted_payment_kind = 'income_payment'
+      AND s.resolution_method = 'auto_exact_match'
+      AND s.account_resolution_status = 'adopted'
+      AND s.superseded_at IS NULL
+      AND ip.superseded_at IS NULL
+      AND ip.superseded_by_payment_id IS NULL
+      AND ip.superseded_by_otb_id IS NULL
+      AND ip.created_at >= TIMESTAMPTZ '${TASK_708_CUTOVER_TS}'
+      AND NOT EXISTS (
+        SELECT 1 FROM greenhouse_finance.bank_statement_rows bsr
+        WHERE bsr.matched_payment_id = ip.payment_id
+          AND bsr.match_status IN ('manual_matched', 'auto_matched')
+      )
+      AND NOT EXISTS (
+        SELECT 1
+        FROM greenhouse_finance.settlement_legs sl
+        JOIN greenhouse_finance.bank_statement_rows bsr
+          ON bsr.matched_settlement_leg_id = sl.settlement_leg_id
+        WHERE sl.linked_payment_id = ip.payment_id
+          AND sl.superseded_at IS NULL
+          AND sl.superseded_by_otb_id IS NULL
+          AND bsr.match_status IN ('manual_matched', 'auto_matched')
+      )
+      AND NOT EXISTS (
+        SELECT 1 FROM greenhouse_finance.settlement_legs sl
+        WHERE sl.linked_payment_id = ip.payment_id
+          AND sl.reconciliation_row_id IS NOT NULL
+          AND sl.superseded_at IS NULL
+          AND sl.superseded_by_otb_id IS NULL
+      )
+    UNION ALL
+    SELECT
+      'expense'::text AS payment_kind,
+      s.signal_id,
+      ep.payment_id
+    FROM greenhouse_finance.external_cash_signals s
+    JOIN greenhouse_finance.expense_payments ep ON ep.payment_id = s.promoted_payment_id
+    WHERE s.promoted_payment_kind = 'expense_payment'
+      AND s.resolution_method = 'auto_exact_match'
+      AND s.account_resolution_status = 'adopted'
+      AND s.superseded_at IS NULL
+      AND ep.superseded_at IS NULL
+      AND ep.superseded_by_payment_id IS NULL
+      AND ep.superseded_by_otb_id IS NULL
+      AND ep.created_at >= TIMESTAMPTZ '${TASK_708_CUTOVER_TS}'
+      AND NOT EXISTS (
+        SELECT 1 FROM greenhouse_finance.bank_statement_rows bsr
+        WHERE bsr.matched_payment_id = ep.payment_id
+          AND bsr.match_status IN ('manual_matched', 'auto_matched')
+      )
+      AND NOT EXISTS (
+        SELECT 1
+        FROM greenhouse_finance.settlement_legs sl
+        JOIN greenhouse_finance.bank_statement_rows bsr
+          ON bsr.matched_settlement_leg_id = sl.settlement_leg_id
+        WHERE sl.linked_payment_id = ep.payment_id
+          AND sl.superseded_at IS NULL
+          AND sl.superseded_by_otb_id IS NULL
+          AND bsr.match_status IN ('manual_matched', 'auto_matched')
+      )
+      AND NOT EXISTS (
+        SELECT 1 FROM greenhouse_finance.settlement_legs sl
+        WHERE sl.linked_payment_id = ep.payment_id
+          AND sl.reconciliation_row_id IS NOT NULL
+          AND sl.superseded_at IS NULL
+          AND sl.superseded_by_otb_id IS NULL
+      )
+  ) cohort_d
+`
+
 const UNANCHORED_EXPENSES_SQL = `
   SELECT
     e.expense_id, e.expense_type, e.total_amount::text, e.payment_date::text
@@ -277,7 +471,9 @@ export const getFinanceLedgerHealth = async (): Promise<LedgerHealthSnapshot> =>
     legsWithoutInstrumentRows,
     reconciledUnscopedRows,
     signalsUnresolvedOverThresholdRows,
-    signalsPromotedInvariantRows
+    signalsPromotedInvariantRows,
+    cohortDCountRows,
+    cohortDSampleRows
   ] = await Promise.all([
     runGreenhousePostgresQuery<{ income_id: string; total_amount: string; amount_paid: string; expected_settlement: string; drift: string }>(SETTLEMENT_DRIFT_SQL).catch(() => []),
     runGreenhousePostgresQuery<{ payment_id: string; income_id: string; payment_date: string; amount: string }>(PHANTOMS_INCOME_SQL).catch(() => []),
@@ -289,7 +485,17 @@ export const getFinanceLedgerHealth = async (): Promise<LedgerHealthSnapshot> =>
     runGreenhousePostgresQuery<{ total: string }>(TASK708_SETTLEMENT_LEGS_PRINCIPAL_WITHOUT_INSTRUMENT_SQL).catch(() => [{ total: '0' }]),
     runGreenhousePostgresQuery<{ total: string }>(TASK708_RECONCILED_AGAINST_UNSCOPED_SQL).catch(() => [{ total: '0' }]),
     runGreenhousePostgresQuery<{ total: string }>(TASK708_EXTERNAL_SIGNALS_UNRESOLVED_OVER_THRESHOLD_SQL, [EXTERNAL_SIGNALS_UNRESOLVED_THRESHOLD_DAYS]).catch(() => [{ total: '0' }]),
-    runGreenhousePostgresQuery<{ total: string }>(TASK708_EXTERNAL_SIGNALS_PROMOTED_INVARIANT_VIOLATION_SQL).catch(() => [{ total: '0' }])
+    runGreenhousePostgresQuery<{ total: string }>(TASK708_EXTERNAL_SIGNALS_PROMOTED_INVARIANT_VIOLATION_SQL).catch(() => [{ total: '0' }]),
+    runGreenhousePostgresQuery<{ total: string }>(TASK708D_COHORT_D_COUNT_SQL).catch(() => [{ total: '0' }]),
+    runGreenhousePostgresQuery<{
+      payment_kind: 'income' | 'expense'
+      payment_id: string
+      document_id: string
+      account_id: string
+      payment_date: string
+      amount: string
+      signal_id: string
+    }>(TASK708D_COHORT_D_SAMPLE_SQL).catch(() => [])
   ])
 
   const incomePhantoms = phantomsIncome.map(p => ({
@@ -350,6 +556,19 @@ export const getFinanceLedgerHealth = async (): Promise<LedgerHealthSnapshot> =>
     externalCashSignalsPromotedInvariantViolation: readCount(signalsPromotedInvariantRows)
   }
 
+  const task708d = {
+    postCutoverPhantomsWithoutBankEvidence: readCount(cohortDCountRows),
+    samplePhantoms: cohortDSampleRows.map(row => ({
+      paymentKind: row.payment_kind,
+      paymentId: row.payment_id,
+      documentId: row.document_id,
+      accountId: row.account_id,
+      paymentDate: row.payment_date,
+      amount: Number(row.amount),
+      signalId: row.signal_id
+    }))
+  }
+
   const healthy =
     settlementDrift.driftedIncomesCount === 0 &&
     phantoms.incomePhantomsCount === 0 &&
@@ -359,7 +578,10 @@ export const getFinanceLedgerHealth = async (): Promise<LedgerHealthSnapshot> =>
     // TASK-708 Slice 6: runtime cohort + canary deben ser 0; historico no
     // cuenta para `healthy` porque solo baja con TASK-708b cleanup.
     task708.paymentsPendingAccountResolutionRuntime === 0 &&
-    task708.externalCashSignalsPromotedInvariantViolation === 0
+    task708.externalCashSignalsPromotedInvariantViolation === 0 &&
+    // TASK-708d: Cohort D debe ser 0; cualquier valor mayor implica payments
+    // post-cutover con cuenta inferida pero sin evidencia de cartola.
+    task708d.postCutoverPhantomsWithoutBankEvidence === 0
 
   return {
     healthy,
@@ -368,6 +590,7 @@ export const getFinanceLedgerHealth = async (): Promise<LedgerHealthSnapshot> =>
     phantoms,
     balanceFreshness: { accountsWithStaleBalances },
     unanchoredExpenses,
-    task708
+    task708,
+    task708d
   }
 }

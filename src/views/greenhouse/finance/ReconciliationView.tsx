@@ -11,11 +11,21 @@ import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import CardHeader from '@mui/material/CardHeader'
+import Dialog from '@mui/material/Dialog'
+import DialogActions from '@mui/material/DialogActions'
+import DialogContent from '@mui/material/DialogContent'
+import DialogTitle from '@mui/material/DialogTitle'
 import Divider from '@mui/material/Divider'
+import FormControlLabel from '@mui/material/FormControlLabel'
 import Grid from '@mui/material/Grid'
+import IconButton from '@mui/material/IconButton'
 import MenuItem from '@mui/material/MenuItem'
 import Skeleton from '@mui/material/Skeleton'
+import Switch from '@mui/material/Switch'
+import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
+
+import { toast } from 'sonner'
 
 import { createColumnHelper, flexRender, getCoreRowModel, getPaginationRowModel, getSortedRowModel, useReactTable } from '@tanstack/react-table'
 import type { ColumnDef, SortingState } from '@tanstack/react-table'
@@ -23,6 +33,7 @@ import classnames from 'classnames'
 
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
+import OptionMenu from '@core/components/option-menu'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 import TablePaginationComponent from '@components/TablePaginationComponent'
 
@@ -49,6 +60,10 @@ interface ReconciliationPeriod {
   reconciledBy: string | null
   reconciledAt: string | null
   notes: string | null
+  archivedAt: string | null
+  archivedBy: string | null
+  archiveReason: string | null
+  archiveKind: string | null
 }
 
 interface Account {
@@ -103,6 +118,8 @@ const STATUS_CONFIG: Record<string, { label: string; color: 'success' | 'warning
   reconciled: { label: 'Conciliado', color: 'success' },
   closed: { label: 'Cerrado', color: 'secondary' }
 }
+
+const ARCHIVE_REASON_MIN_LENGTH = 8
 
 const MONTH_NAMES = ['', 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
 
@@ -174,6 +191,12 @@ const ReconciliationView = () => {
   const [periodSorting, setPeriodSorting] = useState<SortingState>([{ id: 'year', desc: true }])
   const [mvSorting, setMvSorting] = useState<SortingState>([])
 
+  // TASK-715 — archive period as test
+  const [includeArchived, setIncludeArchived] = useState(false)
+  const [archiveDialog, setArchiveDialog] = useState<{ open: boolean; period: ReconciliationPeriod | null }>({ open: false, period: null })
+  const [archiveReason, setArchiveReason] = useState('')
+  const [archiveSubmitting, setArchiveSubmitting] = useState(false)
+
   const fetchData = useCallback(async () => {
     setLoading(true)
     const errors: string[] = []
@@ -183,6 +206,7 @@ const ReconciliationView = () => {
 
       if (accountFilter) params.set('accountId', accountFilter)
       if (statusFilter) params.set('status', statusFilter)
+      if (includeArchived) params.set('includeArchived', 'true')
 
       const [periodsRes, accountsRes, incomeRes, expenseRes] = await Promise.all([
         fetch(`/api/finance/reconciliation?${params.toString()}`, { cache: 'no-store' }),
@@ -256,7 +280,7 @@ const ReconciliationView = () => {
       setFetchErrors(errors)
       setLoading(false)
     }
-  }, [accountFilter, statusFilter])
+  }, [accountFilter, statusFilter, includeArchived])
 
   useEffect(() => {
     fetchData()
@@ -267,6 +291,82 @@ const ReconciliationView = () => {
   const reconciledCount = periods.filter(p => p.status === 'reconciled').length
   const inProgressCount = periods.filter(p => p.status === 'in_progress').length
   const pendingMovementCount = pendingMovements.length
+
+  // TASK-715 — archive handlers
+  const handleOpenArchiveDialog = useCallback((period: ReconciliationPeriod) => {
+    setArchiveReason('')
+    setArchiveDialog({ open: true, period })
+  }, [])
+
+  const handleCloseArchiveDialog = useCallback(() => {
+    if (archiveSubmitting) return
+    setArchiveDialog({ open: false, period: null })
+    setArchiveReason('')
+  }, [archiveSubmitting])
+
+  const handleConfirmArchive = useCallback(async () => {
+    const period = archiveDialog.period
+
+    if (!period) return
+
+    const trimmed = archiveReason.trim()
+
+    if (trimmed.length < ARCHIVE_REASON_MIN_LENGTH) {
+      toast.error(`El motivo debe tener al menos ${ARCHIVE_REASON_MIN_LENGTH} caracteres.`)
+
+      return
+    }
+
+    setArchiveSubmitting(true)
+
+    try {
+      const response = await fetch(`/api/finance/reconciliation/${period.periodId}/archive`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reason: trimmed })
+      })
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}))
+        const errorMessage: string = typeof data?.error === 'string' ? data.error : `No se pudo archivar el período (HTTP ${response.status}).`
+
+        toast.error(errorMessage)
+
+        return
+      }
+
+      toast.success('Período archivado como prueba.')
+      setArchiveDialog({ open: false, period: null })
+      setArchiveReason('')
+      await fetchData()
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Error de red al archivar el período.')
+    } finally {
+      setArchiveSubmitting(false)
+    }
+  }, [archiveDialog, archiveReason, fetchData])
+
+  const handleUnarchive = useCallback(async (period: ReconciliationPeriod) => {
+    try {
+      const response = await fetch(`/api/finance/reconciliation/${period.periodId}/archive`, {
+        method: 'DELETE'
+      })
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}))
+        const errorMessage: string = typeof data?.error === 'string' ? data.error : `No se pudo reactivar el período (HTTP ${response.status}).`
+
+        toast.error(errorMessage)
+
+        return
+      }
+
+      toast.success('Período reactivado.')
+      await fetchData()
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Error de red al reactivar el período.')
+    }
+  }, [fetchData])
 
   // Period columns (need accounts for lookup)
   const periodColumnHelper = createColumnHelper<ReconciliationPeriod>()
@@ -290,12 +390,73 @@ const ReconciliationView = () => {
     periodColumnHelper.accessor('statementRowCount', { header: 'Filas', cell: ({ getValue }) => getValue() || 0, meta: { align: 'center' } }),
     periodColumnHelper.accessor('status', {
       header: 'Estado',
-      cell: ({ getValue }) => { const c = STATUS_CONFIG[getValue()] || STATUS_CONFIG.open;
+      cell: ({ row }) => {
+        // TASK-715: archived as test takes visual precedence over status
+        // because the period is no longer part of the operational queue.
+        if (row.original.archivedAt) {
+          return (
+            <Tooltip
+              title={row.original.archiveReason || 'Periodo archivado como prueba'}
+              placement='top'
+              arrow
+            >
+              <span>
+                <CustomChip
+                  round='true'
+                  size='small'
+                  color='secondary'
+                  variant='tonal'
+                  label='Prueba archivada'
+                  icon={<i className='tabler-archive' style={{ fontSize: 14 }} />}
+                />
+              </span>
+            </Tooltip>
+          )
+        }
 
- 
+        const c = STATUS_CONFIG[row.original.status] || STATUS_CONFIG.open
 
-return <CustomChip round='true' size='small' color={c.color} label={c.label} /> }
-    })
+        return <CustomChip round='true' size='small' color={c.color} label={c.label} />
+      }
+    }),
+    {
+      id: 'actions',
+      header: 'Acciones',
+      enableSorting: false,
+      cell: ({ row }) => {
+        // Stop event propagation so clicking the menu doesn't navigate to detail.
+        const period = row.original
+        const isClosed = period.status === 'closed'
+        const isArchived = Boolean(period.archivedAt)
+
+        return (
+          <Box onClick={e => e.stopPropagation()} sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <OptionMenu
+              iconButtonProps={{ size: 'small' }}
+              options={
+                isArchived
+                  ? [{
+                      text: 'Reactivar período',
+                      icon: 'tabler-archive-off',
+                      menuItemProps: {
+                        onClick: () => handleUnarchive(period)
+                      }
+                    }]
+                  : [{
+                      text: 'Archivar como prueba',
+                      icon: 'tabler-archive',
+                      menuItemProps: {
+                        disabled: isClosed,
+                        onClick: () => handleOpenArchiveDialog(period)
+                      }
+                    }]
+              }
+            />
+          </Box>
+        )
+      },
+      meta: { align: 'center' }
+    } as ColumnDef<ReconciliationPeriod, unknown>
   ]
 
   const periodTable = useReactTable({
@@ -485,6 +646,21 @@ return <CustomChip round='true' size='small' color={c.color} label={c.label} /> 
             <MenuItem value='reconciled'>Conciliado</MenuItem>
             <MenuItem value='closed'>Cerrado</MenuItem>
           </CustomTextField>
+          <FormControlLabel
+            control={
+              <Switch
+                size='small'
+                checked={includeArchived}
+                onChange={e => setIncludeArchived(e.target.checked)}
+              />
+            }
+            label={
+              <Typography variant='body2' color='text.secondary'>
+                Mostrar archivados
+              </Typography>
+            }
+            sx={{ ml: 'auto', mr: 0 }}
+          />
         </CardContent>
         <Divider />
         <div className='overflow-x-auto'>
@@ -578,6 +754,71 @@ return <CustomChip round='true' size='small' color={c.color} label={c.label} /> 
           fetchData()
         }}
       />
+
+      {/* TASK-715 — Archive as test dialog */}
+      <Dialog
+        open={archiveDialog.open}
+        onClose={handleCloseArchiveDialog}
+        fullWidth
+        maxWidth='sm'
+        closeAfterTransition={false}
+      >
+        <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 2, pb: 1 }}>
+          <Avatar variant='rounded' sx={{ bgcolor: 'secondary.lightOpacity', width: 40, height: 40 }}>
+            <i className='tabler-archive' style={{ fontSize: 20, color: 'var(--mui-palette-secondary-main)' }} />
+          </Avatar>
+          <Box sx={{ flex: 1 }}>
+            <Typography variant='h6' component='div'>
+              Archivar este período como prueba?
+            </Typography>
+            {archiveDialog.period && (
+              <Typography variant='caption' color='text.secondary'>
+                {MONTH_NAMES[archiveDialog.period.month]} {archiveDialog.period.year} · {accounts.find(a => a.accountId === archiveDialog.period?.accountId)?.accountName || archiveDialog.period.accountId}
+              </Typography>
+            )}
+          </Box>
+          <IconButton size='small' onClick={handleCloseArchiveDialog} disabled={archiveSubmitting} aria-label='Cerrar'>
+            <i className='tabler-x' style={{ fontSize: 18 }} />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent sx={{ pt: 2 }}>
+          <Typography variant='body2' color='text.secondary' sx={{ mb: 4 }}>
+            Esta acción no concilia el período. Lo oculta de la cola operativa pero queda en el historial para auditoría. Puedes activar “Mostrar archivados” para verlo de nuevo o reactivarlo.
+          </Typography>
+          <CustomTextField
+            fullWidth
+            multiline
+            minRows={3}
+            label='Motivo'
+            placeholder='Ej: Periodo de prueba E2E creado por error.'
+            value={archiveReason}
+            onChange={e => setArchiveReason(e.target.value)}
+            disabled={archiveSubmitting}
+            helperText={`Mínimo ${ARCHIVE_REASON_MIN_LENGTH} caracteres. Queda registrado en el audit del período.`}
+            error={archiveReason.length > 0 && archiveReason.trim().length < ARCHIVE_REASON_MIN_LENGTH}
+            inputProps={{ 'aria-label': 'Motivo del archivo' }}
+          />
+        </DialogContent>
+        <DialogActions sx={{ px: 6, pb: 5 }}>
+          <Button
+            variant='tonal'
+            color='secondary'
+            onClick={handleCloseArchiveDialog}
+            disabled={archiveSubmitting}
+          >
+            Cancelar
+          </Button>
+          <Button
+            variant='contained'
+            color='primary'
+            onClick={handleConfirmArchive}
+            disabled={archiveSubmitting || archiveReason.trim().length < ARCHIVE_REASON_MIN_LENGTH}
+            startIcon={archiveSubmitting ? null : <i className='tabler-archive' style={{ fontSize: 16 }} />}
+          >
+            {archiveSubmitting ? 'Archivando...' : 'Archivar período'}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   )
 }

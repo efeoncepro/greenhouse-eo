@@ -1,10 +1,10 @@
 # Conciliación bancaria
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-04-27 por Claude Opus 4.7 + Julio Reyes
-> **Ultima actualizacion:** 2026-04-27
-> **Documentacion tecnica:** [GREENHOUSE_FINANCE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md), [TASK-702](../../tasks/in-progress/TASK-702-bank-reconciliation-canonical-anchors-rematerialize.md)
+> **Ultima actualizacion:** 2026-04-28 por Claude Opus 4.7 (TASK-715 archive-as-test UX)
+> **Documentacion tecnica:** [GREENHOUSE_FINANCE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md), [TASK-702](../../tasks/in-progress/TASK-702-bank-reconciliation-canonical-anchors-rematerialize.md), [TASK-715](../../tasks/complete/TASK-715-reconciliation-test-period-archive-ux.md)
 
 ## Qué es
 
@@ -148,6 +148,28 @@ curl https://greenhouse.efeoncepro.com/api/admin/finance/ledger-health
 Returns 200 si healthy, 503 si hay drift. El dashboard de Reliability Control Plane consume este endpoint vía `incidentDomainTag='finance'`.
 
 > Detalle técnico: endpoint en `src/app/api/admin/finance/ledger-health/route.ts`, lib en `src/lib/finance/ledger-health.ts`. Cron diario que dispara alerts si hay drift queda como follow-up de TASK-702.
+
+## Archivar un período de prueba (TASK-715)
+
+Cuando creas un período de conciliación experimental (ej. para validar un flujo E2E o probar imports de cartola) y no quieres que aparezca en la cola operativa, **no lo concilies**. Conciliar significa que el banco cuadró con el sistema; no es lo correcto para un período que nunca fue evidencia bancaria real.
+
+En su lugar, en `/finance/reconciliation` haz click en el menú de tres puntos a la derecha del período → **"Archivar como prueba"**. Aparecerá un diálogo pidiendo:
+
+- Un motivo (mínimo 8 caracteres). Ej: "Periodo E2E manual match validation rerun".
+- Confirmación.
+
+Tras archivar:
+
+- El período desaparece de la cola por defecto (ya no aparece en KPIs ni en saldo apertura).
+- Queda registrado con `archive_kind='test_period'`, `archived_by_user_id`, `archive_reason` y `archived_at`. No se borra ningún `bank_statement_row` ni `payment` asociado.
+- Para verlo de nuevo, activa el toggle **"Mostrar archivados"** sobre la tabla.
+- Para reactivarlo (porque era real después de todo), abre el menú del período archivado → **"Reactivar período"**.
+
+> Cuándo NO archivar: cuando el período sí representa cash real pero todavía está en proceso de matching. Para esos casos, completa la conciliación normal o déjalo abierto.
+>
+> Bloqueo: no se puede archivar un período en `status='closed'` (cierre contable formal). Reabre el período primero si fue cerrado por error.
+>
+> Detalle técnico: store `archiveReconciliationPeriodAsTestInPostgres` y `unarchiveReconciliationPeriodInPostgres` en `src/lib/finance/postgres-reconciliation.ts`. Endpoint `POST /api/finance/reconciliation/[id]/archive` (archivar) y `DELETE` (reactivar). Outbox events `finance.reconciliation_period.archived_as_test` y `finance.reconciliation_period.unarchived`.
 
 ## Reglas duras — qué NO hacer
 

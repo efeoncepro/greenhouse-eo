@@ -4291,6 +4291,16 @@ export interface GreenhouseFinanceQuotes {
 
 export interface GreenhouseFinanceReconciliationPeriods {
   account_id: string;
+  /**
+   * TASK-715: archive classification. Currently only 'test_period'. Future kinds (e.g. 'duplicate', 'mistake') extend the CHECK constraint.
+   */
+  archive_kind: string | null;
+  archive_reason: string | null;
+  /**
+   * TASK-715: timestamp when period was archived (e.g. as test residue). NULL = active. Coordinated with archived_by_user_id, archive_reason, archive_kind via consistency CHECK.
+   */
+  archived_at: Timestamp | null;
+  archived_by_user_id: string | null;
   closing_balance_bank: Numeric | null;
   closing_balance_system: Numeric | null;
   created_at: Generated<Timestamp>;
