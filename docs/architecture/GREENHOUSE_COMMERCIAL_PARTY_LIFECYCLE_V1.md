@@ -9,6 +9,71 @@
 
 ---
 
+## Delta 2026-04-28 — TASK-706 HubSpot inbound webhook como tercer trigger canónico
+
+El programa Party Lifecycle ahora tiene **3 paths complementarios** para llevar una HubSpot company al lifecycle Greenhouse, todos terminando en el mismo motor canónico (`syncHubSpotCompanies` / `createPartyFromHubSpotCompany` / `instantiateClientForParty`):
+
+| Path | Trigger | Latencia típica | Cuándo se usa | Spec |
+|---|---|---|---|---|
+| **Cron inbound** | Schedule diario | ~6h-24h | Sweep de seguridad / reconciliation periódica | Fase B (TASK-536) |
+| **Adoption manual** | Click en Quote Builder | <2s | Operador necesita un candidate HubSpot que aún no está materializado | Fase C (TASK-537) |
+| **Webhook auto-sync (NUEVO)** | Event HubSpot Developer Platform | <10s | Cualquier company creada o modificada en HubSpot llega automáticamente | TASK-706 |
+
+### Por qué los 3 coexisten sin contraposición
+
+1. **Mismo upsert idempotente**: los 3 paths llaman a `createPartyFromHubSpotCompany` / `syncHubSpotCompanies` / `instantiateClientForParty`. Si el webhook trae una company antes que el cron y el operador la adopta manualmente, los 3 inserts pegan la misma row idempotente (UPSERT por `hubspot_company_id`). Cero riesgo de duplicados.
+
+2. **Roles complementarios**:
+   - **Webhook** = path por defecto en producción. Captura el 99% de eventos en tiempo real. Reemplaza la espera al cron.
+   - **Adoption manual** = fallback rápido cuando el operador necesita avanzar y el webhook aún no llegó (timeout HubSpot, race con UI), o cuando se adopta una company antigua que predates el webhook subscription.
+   - **Cron** = safety net. Sweep periódico que captura events perdidos (HubSpot retries exhausted, webhook handler bug, etc.). Esencial para confidence en la integridad del mirror.
+
+3. **Single source-of-truth helper**: ambos webhook y cron pasan por `syncHubSpotCompanies({ fullResync: false })` en `src/lib/hubspot/sync-hubspot-companies.ts`. La adoption manual usa el mismo `createPartyFromHubSpotCompany` downstream. Cualquier mejora al motor de promoción aplica a los 3 paths automáticamente.
+
+### Arquitectura del webhook (TASK-706)
+
+1. **HubSpot Developer Platform** (account `kortex-dev` 48713323, app `efeonce-data-platform` 33235280, build #22 deployed 2026-04-28). Webhook component `greenhouse-portal-webhooks`. Subscriptions activas:
+   - `object.creation` → company
+   - `object.propertyChange` → company `[lifecyclestage, name, domain, country, industry, linea_de_servicio, servicios_especificos]`
+   - `object.creation` → contact
+   - `object.propertyChange` → contact `[email, phone, firstname, lastname, lifecyclestage]`
+2. **Target URL**: `https://greenhouse.efeoncepro.com/api/webhooks/hubspot-companies` (signature method v3).
+3. **Endpoint Next.js**: ruta genérica `/api/webhooks/[endpointKey]/route.ts` → `processInboundWebhook` → handler `hubspot-companies` (`src/lib/webhooks/handlers/hubspot-companies.ts`).
+4. **Handler**:
+   - Valida firma HubSpot v3 (HMAC-SHA256 sobre `POST + uri + body + timestamp` con `HUBSPOT_APP_CLIENT_SECRET`, timing-safe, max age 5 min).
+   - Inbox dedupe por `event_id` (idempotencia).
+   - Extrae company IDs únicos (incluye `associatedObjectId` de contact events).
+   - Para cada company: `syncHubSpotCompanyById(id, { promote: true, triggeredBy: 'hubspot-webhook' })` → bridge fetch → UPSERT `greenhouse_crm.companies` + `greenhouse_crm.contacts` → `syncHubSpotCompanies()` para promover a `greenhouse_core.organizations` + `clients`.
+   - Si la response del bridge incluye `capabilities.businessLines` o `capabilities.serviceModules`, llama `syncTenantCapabilitiesFromIntegration` para persistir en tenant capabilities. Reemplaza la lógica que hacía el bridge Cloud Run en `sync_company_capabilities_from_hubspot` — ahora todo termina en Greenhouse.
+   - Failures parciales se capturan en Sentry domain=`integrations.hubspot` pero no abortan el batch. Si TODOS fallan → throw → HubSpot reintenta automáticamente.
+
+### Consecuencias para el spec
+
+- El `targetUrl` del webhook YA NO apunta al bridge Cloud Run; apunta directamente a Greenhouse Next.js. El bridge sigue activo como **read API** (`/companies/{id}`, `/companies/{id}/contacts`, etc.) usado por `syncHubSpotCompanyById` para fetchar payload normalizado de HubSpot. La separación es: **read = bridge**, **write/persist = Greenhouse**.
+- El cron `/api/cron/hubspot-companies-sync` queda activo como reconciliation diaria. NO removerlo aunque el webhook esté en producción.
+- El endpoint `POST /api/commercial/parties/adopt` queda activo como fallback inmediato. NO removerlo.
+- La regla canónica para nuevos client_ids: cuando vienen de HubSpot, prefix es `hubspot-company-{ID}`. Cuando vienen de otra fuente (Nubox, internal, etc.), usar otro prefix para evitar colisión.
+
+**⚠️ Reglas duras**:
+
+- **NO** crear endpoints paralelos para sync HubSpot. Si emerge necesidad de webhook para deals, products, etc., agregar nuevo handler bajo `src/lib/webhooks/handlers/` + nueva subscription en el mismo app HubSpot vía `hs project upload` desde `services/hubspot_greenhouse_integration/hubspot-app/`.
+- **NO** escribir directamente en `greenhouse_core.organizations/clients` desde el handler. Siempre vía `syncHubSpotCompanies` o `createPartyFromHubSpotCompany` para mantener single-path.
+- **NO** desactivar el cron `/api/cron/hubspot-companies-sync` aunque el webhook funcione. Es safety net.
+- **NO** confundir el bridge Cloud Run actual con un sync engine. Post TASK-706 el bridge es **read API only** — no recibe webhooks ni persiste a Greenhouse directamente.
+- Cuando se cambie la subscription HubSpot, hacerlo solo via `hs project upload` desde el repo monorepo. NUNCA editar manual desde la UI HubSpot — perderá sincronía con el snapshot versionado.
+
+### Tests
+
+`pnpm test src/lib/webhooks/handlers/hubspot-companies` (6 tests cubren signature reject, timestamp expiry, dedup, partial failures, all-fail retry).
+
+### Spec relacionada
+
+- `CLAUDE.md` — sección "HubSpot inbound webhook — companies + contacts auto-sync (TASK-706)"
+- `services/hubspot_greenhouse_integration/hubspot-app/hubspot-bigquery/src/app/webhooks/webhooks-hsmeta.json` — config canónica de subscriptions
+- `docs/operations/hubspot-app-manifest/` — snapshot del manifest
+
+---
+
 ## Delta 2026-04-22 — TASK-573 deal birth contract completion
 
 El comando `createDealFromQuoteContext` deja de depender de heurísticas frágiles y pasa a resolver el nacimiento del deal con un contrato más completo:
