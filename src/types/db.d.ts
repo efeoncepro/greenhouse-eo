@@ -3458,6 +3458,55 @@ export interface GreenhouseFinanceExchangeRates {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseFinanceExpenseAttributionAudit {
+  applied_allocated_client_id: string | null;
+  applied_cost_category: string | null;
+  applied_cost_is_direct: boolean | null;
+  applied_direct_overhead_kind: string | null;
+  applied_direct_overhead_member_id: string | null;
+  applied_service_line: string | null;
+  applied_tool_catalog_id: string | null;
+  audit_id: string;
+  expense_id: string;
+  notes: string | null;
+  previous_allocated_client_id: string | null;
+  previous_cost_category: string | null;
+  previous_cost_is_direct: boolean | null;
+  previous_direct_overhead_kind: string | null;
+  previous_direct_overhead_member_id: string | null;
+  previous_service_line: string | null;
+  previous_tool_catalog_id: string | null;
+  resolved_at: Generated<Timestamp>;
+  resolved_by_user_id: string | null;
+  rule_id: string | null;
+  splits_json: Json | null;
+}
+
+export interface GreenhouseFinanceExpenseAttributionRules {
+  allocation_strategy: string;
+  cost_category: string;
+  cost_is_direct: Generated<boolean>;
+  created_at: Generated<Timestamp>;
+  declared_by_user_id: string | null;
+  default_allocated_client_id: string | null;
+  default_business_line: string | null;
+  default_direct_overhead_kind: string | null;
+  default_member_ids: string[] | null;
+  default_service_line: string | null;
+  evidence_refs: Generated<Json | null>;
+  is_active: Generated<boolean>;
+  match_currency: string | null;
+  match_description_pattern: string | null;
+  match_reference_pattern: string | null;
+  match_supplier_pattern: string | null;
+  rule_description: string | null;
+  rule_id: string;
+  rule_name: string;
+  rule_priority: Generated<number>;
+  tool_catalog_id: string | null;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseFinanceExpensePayments {
   amount: Numeric;
   amount_clp: Numeric | null;
@@ -7209,6 +7258,8 @@ export interface DB {
   "greenhouse_finance.cost_allocations": GreenhouseFinanceCostAllocations;
   "greenhouse_finance.economic_indicators": GreenhouseFinanceEconomicIndicators;
   "greenhouse_finance.exchange_rates": GreenhouseFinanceExchangeRates;
+  "greenhouse_finance.expense_attribution_audit": GreenhouseFinanceExpenseAttributionAudit;
+  "greenhouse_finance.expense_attribution_rules": GreenhouseFinanceExpenseAttributionRules;
   "greenhouse_finance.expense_payments": GreenhouseFinanceExpensePayments;
   "greenhouse_finance.expenses": GreenhouseFinanceExpenses;
   "greenhouse_finance.factoring_operations": GreenhouseFinanceFactoringOperations;
