@@ -98,11 +98,16 @@ const SETTLEMENT_DRIFT_SQL = `
   LIMIT 20
 `
 
+// Excluye TODAS las cadenas de supersede (TASK-702 payment, TASK-703b OTB,
+// TASK-708b superseded_at sin replacement). Coherente con triggers TASK-708b
+// fn_sync_expense_amount_paid y fn_recompute_income_amount_paid.
 const PHANTOMS_INCOME_SQL = `
   SELECT payment_id, income_id, payment_date::text, amount::text
   FROM greenhouse_finance.income_payments
   WHERE payment_account_id IS NULL
     AND superseded_by_payment_id IS NULL
+    AND superseded_by_otb_id IS NULL
+    AND superseded_at IS NULL
     AND payment_source = 'nubox_bank_sync'
   ORDER BY payment_date DESC
   LIMIT 20
@@ -113,6 +118,8 @@ const PHANTOMS_EXPENSE_SQL = `
   FROM greenhouse_finance.expense_payments
   WHERE payment_account_id IS NULL
     AND superseded_by_payment_id IS NULL
+    AND superseded_by_otb_id IS NULL
+    AND superseded_at IS NULL
     AND payment_source IN ('nubox_sync', 'manual')
   ORDER BY payment_date DESC
   LIMIT 20

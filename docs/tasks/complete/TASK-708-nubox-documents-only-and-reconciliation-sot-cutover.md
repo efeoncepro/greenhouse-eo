@@ -2,13 +2,13 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `[optional EPIC-###]`
-- Status real: `Slices 0-6 entregados 2026-04-28 (TASK-708 lista para cierre tras VALIDATE final post-TASK-708b)`
+- Status real: `Cerrada 2026-04-28 — Slices 0-6 mergeados; TASK-708b ejecutado (apply runbook 21+65+4 phantom cleanup); CHECK settlement_legs_principal_requires_instrument VALIDATED + enforced; las 6 metricas TASK-708 en ledger-health = 0.`
 - Rank: `TBD`
 - Domain: `finance`
 - Blocked by: `none`

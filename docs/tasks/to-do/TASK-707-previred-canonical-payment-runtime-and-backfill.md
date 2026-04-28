@@ -1,5 +1,11 @@
 # TASK-707 — Previred Canonical Payment Runtime & Backfill
 
+## Delta 2026-04-28 — Coordinación verificada con TASK-708 + TASK-708b
+
+TASK-708 cerrada con coordinación explícita: los paths Previred ya validan `paymentAccountId` no-nulo en `materialize-payments-from-period.ts:155-162` (verifica existence de cuenta) y `anchored-payments.ts:35,152` (firma `paymentAccountId: string` no-nullable + `ensureAccount` validator). La invariante `payment_account_id NOT NULL after_cutover` (CHECK SQL) NO rompe Previred runtime.
+
+Si emerge una cohorte histórica de Previred phantom payments, **el patrón canónico de remediación está listo**: copiar `docs/operations/runbooks/_template-external-signal-remediation.md` y adaptar. Helpers reusables: `dismissIncomePhantom`/`dismissExpensePhantom`, `cohort-backfill`, `historical-remediation`. Migración VALIDATE idempotente (Camino E) + cascade supersede atómico documentados.
+
 ## Status
 
 - Lifecycle: `to-do`
@@ -8,7 +14,7 @@
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `[optional EPIC-###]`
-- Status real: `Diseño`
+- Status real: `Diseño — coordinación TASK-708 verificada (Previred no rompe invariante). Patrón remediación reusable disponible si emerge cohorte histórica.`
 - Rank: `TBD`
 - Domain: `finance`
 - Blocked by: `none`

@@ -2,6 +2,52 @@
 
 ## 2026-04-28
 
+### 2026-04-28 — TASK-708 + 708b cierre TOTAL: residual cleanup + plantilla reusable + arquitectura documentada
+
+Cierre absoluto del ciclo TASK-708 + TASK-708b. **Todos los pendientes resueltos**, incluyendo deuda residual edge-case y documentación arquitectónica.
+
+**Residual cleanup**:
+
+- 1 `income_payment` legacy con `payment_source='client_direct'` ($752,000 CLP, GORE-Servicio-Enero, INC-202602-001) dismissed via `dismissIncomePhantom` con razón canónica documentada ("factoring implícito por Sky Capital sin operation formal — excedente Chita confirma cobro"). Income recomputado a $2,609 (solo el excedente Chita real).
+
+**Coherencia de queries `ledger-health.ts`**:
+
+- `PHANTOMS_INCOME_SQL` y `PHANTOMS_EXPENSE_SQL` ahora incluyen `AND superseded_at IS NULL AND superseded_by_otb_id IS NULL`. Coherente con triggers TASK-708b y CHECK relajado. Cualquier query que mida "phantom activo" debe excluir las 3 chains (payment, OTB, dismissal manual).
+
+**Plantilla reusable** (`docs/operations/runbooks/_template-external-signal-remediation.md`):
+
+- Patrón canónico documentado para futuras cohortes (Previred, file imports, HubSpot, Stripe). Reutiliza `dismissIncomePhantom`/`dismissExpensePhantom`, `cohort-backfill`, `historical-remediation`. Incluye Camino E (migración VALIDATE idempotente) y cascade supersede atómico.
+
+**Documentación arquitectónica** (`docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`):
+
+- Delta 2026-04-28 con los 5 mecanismos canónicos: (1) `external_cash_signals` lane genérica, (2) reglas D5 declarativas + política D3, (3) tipo branded `AccountId`, (4) convención `superseded_at` en CHECKs/queries, (5) patrón remediación histórica. Reglas duras heredadas + archivos clave + follow-ups documentados.
+
+**Tasks vecinas**:
+
+- **TASK-705 (Banco read-model)** desbloqueada con Delta 2026-04-28 — cash ledger limpio, lista para iniciar.
+- **TASK-707 (Previred runtime)** marcada con coordinación verificada — paths Previred ya validan `paymentAccountId` no-nulo.
+- **TASK-708** movida de `in-progress/` → `complete/`. README actualizado.
+- **TASK-708b runbook** completado con sección "Lecciones aprendidas": tiempos reales por paso, decisiones canónicas, bugs corregidos durante apply, casos edge, sugerencias para futuras cohortes.
+- **TASK-708c creada** como follow-up diferido (P3, Bajo impacto): tras 30+ días con métricas en 0 (~2026-05-28), simplificar el CHECK condicional con `created_at < cutover` a CHECK universal `payment_account_id IS NOT NULL OR superseded_*`. Documentación + acceptance criteria + queries de verificación completas.
+
+**Verificación final live** (Postgres dev 2026-04-28 11:30+):
+
+- Acceptance #1 (Cohorte A residual) = **0** ✓
+- Acceptance #2 (Cohorte B residual) = **0** ✓
+- Acceptance #3 (Cohorte C residual) = **0** ✓
+- `paymentsPendingAccountResolutionRuntime = 0` ✓
+- `paymentsPendingAccountResolutionHistorical = 0` ✓ (post-dismiss residual GORE)
+- `settlementLegsPrincipalWithoutInstrument = 0` ✓
+- `reconciledRowsAgainstUnscopedTarget = 0` ✓
+- `externalCashSignalsPromotedInvariantViolation = 0` ✓ (canary D4)
+- `external_cash_signals: 21 adopted + 65 dismissed = 86 terminal states` ✓
+- 30/30 tests verde, lint limpio, tsc limpio.
+
+**Estado actual del módulo Finance**:
+
+- Las 6 métricas TASK-708 = 0 ✓ (cierre limpio TASK-708 + TASK-708b).
+- `healthy = false` queda por DOS dimensiones legítimas pre-existentes ajenas a TASK-708/708b: `settlementDrift = 3` (TASK-571) y `unanchored expenses = 36` (TASK-702). Ambas son tareas separadas con sus propios runbooks.
+
 ### 2026-04-28 — TASK-708b ejecución apply COMPLETADA: cohortes históricas Nubox limpiadas
 
 Apply runbook ejecutado contra Postgres dev. **86 phantom payments resueltos** (21 reparados + 65 descartados), 4 settlement legs limpias, CHECK constraint VALIDATED + enforced. Acceptance Criteria queries == 0.

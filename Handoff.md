@@ -1,5 +1,33 @@
 # Handoff.md
 
+## Sesion 2026-04-28 — TASK-708 + TASK-708b cierre TOTAL (incluye final cleanup)
+
+- Rama: `task/TASK-708b-final-cleanup`.
+- Cierre absoluto del ciclo TASK-708 + TASK-708b. TODOS los pendientes resueltos:
+  - **Residual `client_direct` GORE-Servicio-Enero ($752K CLP)** — dismissed via `dismissIncomePhantom` con razón canónica documentada. Income `INC-202602-001` recomputado a $2,609 (solo el excedente Chita real).
+  - **Queries pre-TASK-708 en `ledger-health`** (PHANTOMS_INCOME_SQL, PHANTOMS_EXPENSE_SQL) actualizadas para excluir `superseded_at IS NOT NULL` — alineadas con triggers TASK-708b y CHECK relajado. Coherencia total.
+  - **Plantilla reusable** `docs/operations/runbooks/_template-external-signal-remediation.md` para futuras cohortes (Previred, file imports, HubSpot, Stripe). Reutiliza helpers + migración VALIDATE idempotente (Camino E) + cascade supersede atómico.
+  - **TASK-705 (Banco read-model)** marcada como desbloqueada con Delta 2026-04-28.
+  - **TASK-707 (Previred runtime)** marcada con coordinación verificada + patrón remediación reusable disponible.
+  - **TASK-708 movida a `complete/`** (estaba aún en `in-progress/`); README actualizado.
+  - **TASK-708b runbook completado con sección "Lecciones aprendidas"**: tiempos reales por paso, decisiones canónicas (Camino E, cascade atómico, convención `superseded_at`), bugs corregidos durante apply, casos edge, sugerencias para futuras cohortes.
+  - **`docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`** actualizado con Delta 2026-04-28 documentando los 5 mecanismos canónicos (`external_cash_signals` lane, reglas D5 + política D3, AccountId branded, convención `superseded_at`, patrón remediación histórica).
+  - **TASK-708c creada** como follow-up diferido (P3, Bajo impacto): tras 30+ días con métricas en 0, simplificar el CHECK condicional con `created_at < cutover` a CHECK universal `payment_account_id IS NOT NULL OR superseded_*`.
+- Verificación final live (Postgres dev 2026-04-28):
+  - `Acceptance #1 Cohorte A residual = 0` ✓
+  - `Acceptance #2 Cohorte B residual = 0` ✓
+  - `Acceptance #3 Cohorte C residual = 0` ✓
+  - `paymentsPendingAccountResolutionRuntime = 0` ✓
+  - `paymentsPendingAccountResolutionHistorical = 0` ✓ (post-dismiss del residual GORE)
+  - `settlementLegsPrincipalWithoutInstrument = 0` ✓
+  - `reconciledRowsAgainstUnscopedTarget = 0` ✓
+  - `externalCashSignalsPromotedInvariantViolation = 0` ✓ (canary D4 verde)
+  - `external_cash_signals: 21 adopted + 65 dismissed = 86 terminal states` ✓
+- Tests: 30/30 verde en `external-cash-signals/__tests__/`. Lint limpio. tsc --noEmit limpio.
+- Estado actual del ledger:
+  - `healthy = false` por DOS dimensiones legítimas pre-existentes ajenas a TASK-708/708b: `settlementDrift = 3` (TASK-571) y `unanchored expenses = 36` (TASK-702). Ambas son tareas separadas con sus propios runbooks/follow-ups.
+  - Las 6 métricas TASK-708 = 0 confirman cierre limpio del ciclo.
+
 ## Sesion 2026-04-28 — TASK-708b ejecucion apply COMPLETADA (cerrada)
 
 - Rama: `task/TASK-708b-apply-execution`.

@@ -2,7 +2,83 @@
 
 > **Version:** 1.0
 > **Created:** 2026-03-30
-> **Last updated:** 2026-04-27
+> **Last updated:** 2026-04-28
+
+## Delta 2026-04-28 — TASK-708 + 708b: Nubox Documents-Only SoT + External Cash Signals canonical lane
+
+Cierre del cutover canonico **Nubox = documentos / Greenhouse = dinero**. Cinco mecanismos canonicos quedaron disponibles para cualquier modulo finance:
+
+### 1. `external_cash_signals` — lane generica para senales de cash externas
+
+Tabla `greenhouse_finance.external_cash_signals` (TASK-708 D1) actua como buzon write-only para cualquier `source_system` (Nubox, Previred, file imports, HubSpot, Stripe, manual_admin). Idempotencia natural via `UNIQUE (source_system, source_event_id)`. Cualquier sync externo escribe aca; nunca toca `income_payments` / `expense_payments` directo. Promocion a payment canonico solo via:
+
+- `evaluateSignalAccount` (D5 rule engine) + politica `external_signal_auto_adopt_policies` (D3) cuando una sola regla resuelve cuenta con confianza alta.
+- Adopcion manual via UI cola admin `/finance/external-signals` con capability `finance.cash.adopt-external-signal`.
+
+Modulo canonico: `src/lib/finance/external-cash-signals/`. APIs: `recordSignal`, `evaluateSignalAccount`, `adoptSignalManually`, `dismissSignal`.
+
+### 2. Reglas declarativas D5 + politica D3
+
+`account_signal_matching_rules` (datos, no codigo) + `external_signal_resolution_attempts` (audit log inmutable con `evaluator_version` pinned). Politica `external_signal_auto_adopt_policies` controla mode `review` vs `auto_adopt` por `(source_system, space_id)`. Default global conservador: `review` (firma humana cada adopcion).
+
+### 3. Tipo branded `AccountId`
+
+`src/lib/finance/types/account-id.ts` exporta `AccountId = string & { __brand }`. Cualquier API canonica de cash (`recordPayment`, `recordExpensePayment`, `orchestrateSettlement`, `listReconciliationCandidatesByAccount`) recibe `AccountId`, NO `string | null`. Falla en `tsc` si se pasa null. `parseAccountId` valida existencia en `accounts`.
+
+### 4. Conviencion `superseded_at` en CHECKs y queries de health
+
+Cualquier supersede chain (TASK-702 payment, TASK-703b OTB, TASK-708b dismissal manual) excluye filas de invariantes activas. CHECKs y queries que miden "phantom activo" deben filtrar las 3 chains:
+
+```sql
+WHERE payment_account_id IS NULL
+  AND superseded_by_payment_id IS NULL
+  AND superseded_by_otb_id IS NULL
+  AND superseded_at IS NULL
+```
+
+CHECK `settlement_legs_principal_requires_instrument` se relajo para incluir `OR superseded_at IS NOT NULL OR superseded_by_otb_id IS NOT NULL`.
+
+### 5. Patron canonico de remediacion historica (TASK-708b)
+
+Para limpiar cohortes phantom de cualquier `source_system` futuro:
+
+- **Backfill retroactivo a signals** (`cohort-backfill.ts`): exposicion en cola admin sin tocar payments originales.
+- **Classify proposal** (`historical-remediation.ts:classifyHistoricalSignal`): bank_statement_row match → `repaired_with_account`; D5 rule unique → `repaired`; sino → `dismissed_no_cash` conservador.
+- **Apply transactional** (`historical-remediation.ts:applyHistoricalRemediation`): UPDATE in-place del phantom poblando `payment_account_id` (estrategia canonica TASK-708b — convierte phantom en payment canonico LIMPIO sin perder audit).
+- **Dismiss sin replacement** (`payment-instruments/dismiss-phantom.ts`): marca `superseded_at + superseded_reason` + outbox event `finance.{income,expense}.payment_dismissed_historical`.
+- **Migracion VALIDATE idempotente self-checking (Camino E)**: `RAISE NOTICE + RETURN` si quedan residuos; `ALTER TABLE VALIDATE CONSTRAINT` solo cuando count == 0. Sin estados fragiles.
+- **Cascade supersede atomico**: una sola migracion hace DROP + CREATE CHECK + UPDATE cleanup + VALIDATE en transaccion.
+
+Plantilla reusable: `docs/operations/runbooks/_template-external-signal-remediation.md`. Runbook ejecutado: `docs/operations/runbooks/TASK-708b-nubox-phantom-remediation.md`.
+
+### Reglas duras heredadas
+
+- **Cero DELETE destructivo** sobre payments contaminados. Solo supersede chain (preserva audit).
+- **Idempotencia natural** en backfill + apply (re-run safe).
+- **Audit firmada**: `actorUserId` obligatorio, queda en `resolved_by_user_id` y outbox events.
+- **Nubox NO escribe `income_payments` / `expense_payments`**. Solo `income`, `expenses`, `external_cash_signals`. Path runtime cortado en `src/lib/nubox/sync-nubox-to-postgres.ts`.
+
+### Resultado del apply 2026-04-28
+
+86 phantom payments resueltos: 21 `repaired_with_account` (cuenta `santander-clp` resuelta via D5 rule, $39.3M CLP movido al ledger canonico) + 65 `dismissed_no_cash` ($8.8M CLP marcado como deuda historica sin cash real). 4 settlement legs phantom limpias. CHECK `settlement_legs_principal_requires_instrument` VALIDATED + enforced. Las 6 metricas TASK-708 en `ledger-health` = 0.
+
+### Archivos clave
+
+- `migrations/20260428123802881..143356496..150455638..151421785_*` (8 migraciones del ciclo)
+- `src/lib/finance/external-cash-signals/` (modulo canonico signals)
+- `src/lib/finance/payment-instruments/dismiss-phantom.ts`
+- `src/lib/finance/types/account-id.ts`
+- `src/lib/finance/ledger-health.ts` (6 metricas TASK-708 + queries actualizadas con superseded_at)
+- `scripts/finance/task708b-{inventory,backfill-signals,classify,apply}.ts`
+- `docs/operations/runbooks/TASK-708b-nubox-phantom-remediation.md` (runbook canonico)
+- `docs/operations/runbooks/_template-external-signal-remediation.md` (plantilla reusable)
+
+### Follow-ups
+
+- Activar politica `auto_adopt` para Nubox tras 50+ adopciones manuales validadas.
+- Promover `CHECK income/expense_payments_account_required_after_cutover` a `NOT NULL` puro tras 30+ dias de estabilidad post-cutover.
+- Notificacion Teams cuando `external_cash_signals_unresolved_over_threshold > 0` por mas de N dias.
+- Agregar reglas D5 adicionales (TC, USD, Global66) cuando aparezcan patrones reales.
 
 ## Delta 2026-04-27 — Payment Instrument responsible candidates
 
