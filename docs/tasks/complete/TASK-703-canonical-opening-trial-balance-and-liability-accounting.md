@@ -289,16 +289,29 @@ Adicionalmente había **datos phantom pre-OTB** en la chain: account_balances ro
 
 5. **Re-anchor TC corp**: nueva OTB al 07/04 = $268,442 reconciled (= "MONTO TOTAL FACTURADO A PAGAR" del PDF cycle close 06/04 = cupo utilizado al EOD 06/04 = SOD 07/04). Cascade superseded automáticamente: 2 settlement_legs marzo, 1 settlement_leg 06/04 (pago marzo cycle que aterrizó tarde), 3 expense_payments Deel pre-anchor. Re-materialización via `scripts/finance/rematerialize-account.ts`.
 
-**Resultado verificado**:
+**Resultado verificado** (post cartola "Ultimos movimientos_nac27_04_2026.xlsx"):
 
-- Closing balance TC corp 27/04 (PG) = **$1,125,449**
+- Closing balance TC corp 28/04 (PG) = **$1,110,897**
 - Bank reality 27/04 (OfficeBanking) = **$1,063,381**
-- **Gap residual = $62,068** (5.5%)
+- **Gap residual = $47,516** (4.3%)
+
+Math con datos cartola:
+- $268,442 (OTB anchor 07/04 = SALDO INICIAL ciclo abril per cartola)
+- + $1,308,007 (cargos abril per cartola: 14 establecimientos)
+- − $14,552 (Vercel Nota de Crédito 15/04 — captured)
+- − $451,000 (2 PAGOS 25/04: $5K + $446K — fechas corregidas)
+- = $1,110,897 ✓
 
 Sources del gap residual (tracking explícito, no hardcodeo):
 
-- **Vercel refund $14,552** pendiente de capturar como income_payment (incoming abril). Cuando se backfillee → closing baja a $1,110,897 → gap $47,516.
-- **Bank holds bancarios ~$96,246**: cupo total OfficeBanking = $1,603,754 vs cupo total PDF = $1,700,000. Diferencia $96,246 son authorizations pendientes que reducen disponible pero no deuda. Estos NO son cargos a registrar en nuestro ledger (no han sido posted) — son fluctuaciones de bank.
-- **FX rate diffs en cargos USD** (Vercel/Anthropic/OpenAI/Adobe): nuestras conversiones a CLP usan rate mid-day; banco usa rate al settlement (puede diferir 0.5-2%). Sobre $1.3M de cargos, drift de 0.5% = ~$6.5K.
+- **Bank holds (pre-autorizaciones)**: cupo total OfficeBanking = $1,063,381 deuda + $540,373 disponible = $1,603,754 vs cupo TC fijo $1,700,000. Diferencia $96,246 son authorizations pendientes que reducen disponible pero NO deuda. Estos NO son cargos a registrar — son fluctuaciones de bank.
+- **Posibles transacciones post-cartola-12:53**: la cartola xlsx se descargó 27/04 12:53. Si entre ese momento y el screenshot OfficeBanking del usuario hubo movimientos (un abono que el banco aplicó al cierre del día), explican el gap. Solución: re-descargar cartola al final del día y reaplicar el fix.
+- **Modelado de bank holds pendiente**: TASK followup → tabla `bank_holds(hold_id, account_id, hold_date, amount, expected_post_date, status, posted_payment_id, evidence_ref)`. Holds activos restan al disponible UI, no a deuda. Cuando se postea, se linkea al expense_payment correspondiente. Cierra el último gap estructural.
+
+**Acciones aplicadas en PG el 2026-04-28** (con evidence cartola xlsx):
+
+1. UPDATE 4 settlement_legs: transaction_date 27/04 → 25/04 (2 incoming en TC + 2 outgoing en CLP). Cartola dice PAGO 25/04, fechas previas en PG estaban erradas.
+2. INSERT settlement_group `stlgrp-vercel-refund-20260415` + leg `stlleg-stlgrp-vercel-refund-20260415-in` ($14,552 incoming en TC, leg_type=receipt, settlement_mode=direct).
+3. Re-materializar TC desde 07/04 → 28/04: `pnpm tsx --require ./scripts/lib/server-only-shim.cjs scripts/finance/rematerialize-account.ts santander-corp-clp`.
 
 **Patrón reusable**: el mecanismo OTB cascade-supersede es ahora canónico. Cuando aparezcan otras cuentas liability/asset que necesiten re-anclar (otro accionista, préstamos, wallets), el flujo es: (1) declarar nueva OTB con genesisDate más reciente y opening_balance authoritative del bank, (2) cascade-supersede borra account_balances pre-anchor y marca pre-OTB transactions superseded, (3) re-materializar via `pnpm tsx --require ./scripts/lib/server-only-shim.cjs scripts/finance/rematerialize-account.ts <accountId>`.
