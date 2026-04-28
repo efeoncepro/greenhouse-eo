@@ -53,12 +53,14 @@ const DECLARATIONS: OtbDeclaration[] = [
   },
   {
     accountId: 'global66-clp',
-    genesisDate: '2026-02-28',
-    openingBalance: 380,
-    declarationReason: 'Computado del cuadre febrero Global66: inflows desde Efeonce $1,911,066 - outflows colaboradores + fees $1,910,686 = $380 residual.',
+    genesisDate: '2026-04-05',
+    openingBalance: 8562,
+    declarationReason: 'Re-anchor (TASK-703b/704) al SOD 05/04 = saldo final del 04/04 = $8,562 según screenshot empresas.global66.com/wallets/2303987 con timestamp 04/abril/2026. Bank-authoritative. La OTB anterior 28/02 con $380 era estimada con data parcial pre-período (no incluía el "Otro movimiento" $668,825 del 10/03 que la cartola muestra como debit, ni ajustes menores totalizando $8,182). Re-anclando al saldo verificado evitamos arrastrar el error desde 28/02. Movements 28/02 a 04/04 ya en PG cascade-supersede automáticamente.',
     auditStatus: 'reconciled',
     evidenceRefs: [
-      { type: 'cartola', ref: 'data/bank/Global-extracto_movimientos_start=01-02-2026_end=27-04-2026.xls', period: '2026-02-02' }
+      { type: 'screenshot_global66', ref: 'data/bank/screenshots/global66-saldo-final-20260404.png', period: '2026-04-04', description: 'Saldo final a 04/abril/2026: $8,562 CLP. URL: empresas.global66.com/wallets/2303987.' },
+      { type: 'cartola_xls', ref: 'data/bank/Global-extracto_movimientos_start=01-02-2026_end=27-04-2026.xls', period: '2026-02-01..2026-04-27' },
+      { type: 'supersede_note', description: 'Reemplaza OTB obtb-global66-clp-20260228-1f51ea79 (28/02 $380) que era estimación pre-screenshot. Bank-authoritative ahora.' }
     ]
   },
   {
