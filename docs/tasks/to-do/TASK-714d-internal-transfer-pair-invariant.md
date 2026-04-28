@@ -148,7 +148,11 @@ Verificación pendiente:
 
 - Cierre de la umbrella requiere las 4 slices completas.
 - Slices 1+2 ya cerrados — quedan en este markdown como audit.
-- Slices 3+4+5 pendientes de input humano o discovery adicional.
+- Slices 3+4+5 derivadas a tasks dedicadas (2026-04-28):
+  - **Slice 3** → `TASK-717` (reclasificación payroll declarativa via intents table)
+  - **Slice 4** → `TASK-718` (TC backfill: análisis automatizado debt-reduction model + apply)
+  - **Slice 5** → `TASK-719` (OTB Global66 verificación contra cartola + detector evidence_refs)
+- La umbrella se cierra cuando las 3 derivadas estén `complete`.
 
 ## Hard rules aplicadas
 

@@ -798,3 +798,6 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-714d` | `to-do` (umbrella, Slice 1+2 ✅) | Internal Transfer Pair Invariant + Global66 ledger canonicalization | `docs/tasks/to-do/TASK-714d-internal-transfer-pair-invariant.md` |
 | `TASK-715` | `to-do` | Reconciliation Test Period Archive UX | `docs/tasks/to-do/TASK-715-reconciliation-test-period-archive-ux.md` |
 | `TASK-716` | `to-do` | Manual Team Announcements | `docs/tasks/to-do/TASK-716-manual-team-announcements.md` |
+| `TASK-717` | `to-do` | Reclasificación payroll declarativa via intents table (deriva TASK-714d Slice 3) | `docs/tasks/to-do/TASK-717-payroll-reclassification-intents.md` |
+| `TASK-718` | `to-do` | TC backfill: análisis automatizado debt-reduction model + apply (deriva TASK-714d Slice 4) | `docs/tasks/to-do/TASK-718-tc-debt-reduction-model-decision.md` |
+| `TASK-719` | `to-do` | OTB Global66 verificación contra cartola + detector de evidence_refs (deriva TASK-714d Slice 5) | `docs/tasks/to-do/TASK-719-otb-global66-verification-and-evidence-detector.md` |
