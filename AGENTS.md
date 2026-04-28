@@ -411,6 +411,27 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
 - Si el bypass secret se vuelve stale, borrar `VERCEL_AUTOMATION_BYPASS_SECRET` de `.env.local` y correr el script de nuevo — auto-refetch.
 - Fuente: `scripts/staging-request.mjs`
 
+### Teams Bot outbound smoke y mensajes manuales (2026-04-28)
+
+- Greenhouse/Nexa envía mensajes proactivos a Teams vía **Bot Framework Connector**, no vía Microsoft Graph como canal principal de delivery.
+- Secreto runtime: `greenhouse-teams-bot-client-credentials` en GCP Secret Manager, con JSON `{ "clientId": "...", "clientSecret": "...", "tenantId": "..." }`. Nunca imprimir `clientSecret`, access tokens ni payloads completos con secretos.
+- Token OAuth:
+  - endpoint `https://login.microsoftonline.com/<tenantId>/oauth2/v2.0/token`
+  - scope `https://api.botframework.com/.default`
+- Delivery canónico:
+  - Resolver primero el `chatId`/conversation id exacto (`teams_notification_channels.recipient_chat_id`, cache de conversation reference o Teams connector `_resolve_chat`).
+  - Enviar `POST {serviceUrl}/v3/conversations/{encodeURIComponent(chatId)}/activities`.
+  - Probar service URLs con failover regional: `https://smba.trafficmanager.net/teams`, `/amer`, `/emea`, `/apac`.
+- Group chats y menciones tipo `@todos`:
+  - Usar activity `type: "message"`, `textFormat: "xml"`, texto con `<at>todos</at>` y `entities: [{ type: "mention", text: "<at>todos</at>", mentioned: { id: <chatId>, name: "todos" } }]`.
+  - El transcript vía Graph puede normalizar la mención como `todos` o `[Greenhouse]: ...`; validar visualmente en Teams cuando la semántica de notificación sea crítica.
+- Chats individuales:
+  - Si el usuario indica que Greenhouse ya fue agregado al chat individual, **no crear 1:1 a ciegas con AAD Object ID**. Resolver el chat `oneOnOne` existente y publicar sobre su `chatId`.
+  - Crear conversación Bot Framework con `members: [{ id: "29:<aadObjectId>" }]` puede fallar con `403 Failed to decrypt pairwise id`; tratarlo como ruta/conversation reference incorrecta o instalación incompleta, no como prueba de que el usuario no existe.
+  - En 1:1 no hace falta mencionar al usuario; Teams notifica al participante del chat.
+- Para smoke scripts locales que importen libs server-side, usar `npx tsx --require ./scripts/lib/server-only-shim.cjs ...` para neutralizar imports `server-only`.
+- Si esto pasa a UI/producto, no implementar un textbox que postea directo a Teams. Debe converger con Notification Hub / `TASK-716`: intent/outbox, preview, aprobación si aplica, idempotencia, retries, audit, delivery status y permisos en ambos planos (`views` + `entitlements`).
+
 ### Cloud Run ops-worker (crons reactivos + materialización)
 
 - Greenhouse tiene un servicio Cloud Run dedicado (`ops-worker`) en `us-east4` que ejecuta los crons reactivos del outbox y la materialización de cost attribution.

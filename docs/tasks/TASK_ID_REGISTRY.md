@@ -792,3 +792,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-713` | `to-do` | Period Closing Workflow (snapshots inmutables + restatement) — MLCM Fase 4 | `docs/tasks/to-do/TASK-713-period-closing-workflow.md` |
 | `TASK-714` | `to-do` | Banco Instrument Detail Semantic Drawer | `docs/tasks/to-do/TASK-714-banco-instrument-detail-semantic-drawer.md` |
 | `TASK-715` | `to-do` | Reconciliation Test Period Archive UX | `docs/tasks/to-do/TASK-715-reconciliation-test-period-archive-ux.md` |
+| `TASK-716` | `to-do` | Manual Team Announcements | `docs/tasks/to-do/TASK-716-manual-team-announcements.md` |

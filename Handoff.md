@@ -1,5 +1,19 @@
 # Handoff.md
 
+## Sesion 2026-04-28 — TASK-716 Manual Team Announcements creada
+
+- A partir del smoke exitoso del Greenhouse Teams Bot en el chat `EO Team`, se creó `TASK-716` para formalizar una surface de comunicaciones manuales desde Greenhouse/Nexa.
+- Spec nueva: `docs/tasks/to-do/TASK-716-manual-team-announcements.md`.
+- La task separa explícitamente:
+  - **Manual:** redacción, destino, mención, preview, confirmación, aprobación/publicación.
+  - **Automatizado:** validaciones, secret hygiene, idempotencia, outbox/intent, dispatch Teams Bot, retries, audit, estado de entrega y observabilidad.
+- Access model declarado en ambos planos:
+  - `views`: `administracion.communications` sobre `/admin/communications`.
+  - `entitlements`: `admin.communications` con acciones `read/create/approve/manage`.
+- Se registró `TASK-716` en `docs/tasks/TASK_ID_REGISTRY.md` y `docs/tasks/README.md`; siguiente ID disponible: `TASK-717`.
+- Bloqueo intencional: `TASK-716` queda `Blocked by: TASK-690` para que no nazca como textbox directo a Teams, sino convergida con Notification Hub. Si se decide adelantarla, Plan Mode debe documentar una mini-foundation migrable a `notification_intents` / `notification_deliveries`.
+- No se tocaron runtime ni código productivo en esta sesión; solo documentación operativa de task.
+
 ## Sesion 2026-04-28 — Santander CLP follow-ups + backlog robusto
 
 - Rama: `task/santander-clp-followups`.
