@@ -25,6 +25,7 @@
  */
 
 import type { TreasuryBankAccountOverview } from '@/lib/finance/account-balances'
+import type { ProcessorComponentizationStatus, TreasuryProcessorDigest } from '@/lib/finance/processor-digest'
 import {
   INSTRUMENT_CATEGORY_ICONS,
   INSTRUMENT_CATEGORY_LABELS,
@@ -347,13 +348,158 @@ const resolveShareholderAccountProfile = (account: TreasuryBankAccountOverview):
   contextBanner: null
 })
 
+const COMPONENTIZATION_LABEL: Record<ProcessorComponentizationStatus, string> = {
+  componentized: 'Desglose completo',
+  pending_componentization: 'Desglose pendiente',
+  none: 'Sin pagos del período'
+}
+
+const COMPONENTIZATION_AVATAR_COLOR: Record<ProcessorComponentizationStatus, AvatarColor> = {
+  componentized: 'success',
+  pending_componentization: 'warning',
+  none: 'secondary'
+}
+
+const formatProcessorIdentity = (
+  account: TreasuryBankAccountOverview,
+  digest: TreasuryProcessorDigest | null
+): InstrumentIdentityField[] => {
+  const fields: InstrumentIdentityField[] = [
+    { label: 'Procesador', value: account.accountName }
+  ]
+
+  if (digest && digest.payerAccounts.length > 0) {
+    const primaryPayer = digest.payerAccounts[0]
+
+    fields.push({
+      label: digest.payerAccounts.length === 1 ? 'Cuenta pagadora' : 'Cuentas pagadoras',
+      value: digest.payerAccounts.length === 1
+        ? primaryPayer.accountName
+        : `${primaryPayer.accountName} +${digest.payerAccounts.length - 1}`
+    })
+  }
+
+  fields.push({ label: 'Moneda', value: account.currency })
+
+  return fields
+}
+
+/**
+ * TASK-706 — `payroll_processor` accounts surface processor activity, NOT a
+ * bank ledger. The KPI row leads with operational primitives (payments
+ * processed, amount processed, componentization status) and the drawer body
+ * renders a list of processed payments instead of bank-style movements.
+ *
+ * The cash always remains visible in the real payer account (santander-clp
+ * for Previred); this profile narrates the processor side without
+ * duplicating cash.
+ */
+const resolveProcessorTransitProfile = (
+  account: TreasuryBankAccountOverview,
+  digest: TreasuryProcessorDigest | null
+): InstrumentDetailProfile => {
+  const status: ProcessorComponentizationStatus = digest?.componentizationStatus ?? 'none'
+  const paymentCount = digest?.paymentCount ?? 0
+  const processedAmount = digest?.processedAmount ?? 0
+  const primaryPayer = digest?.payerAccounts[0] ?? null
+
+  const banner: InstrumentDetailProfile['contextBanner'] = (() => {
+    if (status === 'none') {
+      return {
+        tone: 'info',
+        text: `${account.accountName} no es una cuenta bancaria con saldo propio. Es un procesador operacional: el cash siempre vive en la cuenta pagadora real. No se detectaron pagos en el período consultado.`
+      }
+    }
+
+    if (status === 'pending_componentization') {
+      return {
+        tone: 'warning',
+        text: `Hay pagos detectados desde ${primaryPayer?.accountName ?? 'la cuenta pagadora'}, pero el desglose previsional aún no está completo. El monto total ya está reflejado en caja; solo falta la componentización por cotizante / institución.`
+      }
+    }
+
+    // componentized — confirmar visualmente que el cash sí salió del banco
+    return {
+      tone: 'info',
+      text: `Pagos del período componentizados. El cash salió desde ${primaryPayer?.accountName ?? 'la cuenta pagadora'}; este procesador solo refleja la actividad operativa.`
+    }
+  })()
+
+  return {
+    profileKey: 'processor_transit',
+    drawerTitle: `Procesador ${account.accountName}`,
+    drawerSubtitle: 'Pagos previsionales procesados, cuenta pagadora real y estado de desglose. No tiene saldo propio.',
+    identityFields: formatProcessorIdentity(account, digest),
+    kpis: [
+      {
+        key: 'paymentCount',
+        title: 'Pagos del período',
+        value: paymentCount,
+        subtitle: paymentCount === 0
+          ? 'Sin pagos detectados'
+          : paymentCount === 1
+            ? 'Pago detectado'
+            : `${paymentCount} pagos detectados`,
+        avatarIcon: 'tabler-receipt-2',
+        avatarColor: paymentCount > 0 ? 'primary' : 'secondary'
+      },
+      {
+        key: 'processedAmount',
+        title: 'Monto procesado',
+        value: processedAmount,
+        subtitle: primaryPayer
+          ? `Cash desde ${primaryPayer.accountName}`
+          : 'Sin cuenta pagadora detectada',
+        avatarIcon: 'tabler-cash-banknote',
+        avatarColor: 'info'
+      },
+      {
+        key: 'componentizationStatus',
+        title: 'Estado del desglose',
+        // Use null so the drawer renders the status label string from `subtitle`
+        // and the avatar tone, instead of formatting a number.
+        value: null,
+        subtitle: COMPONENTIZATION_LABEL[status],
+        avatarIcon: status === 'componentized'
+          ? 'tabler-check'
+          : status === 'pending_componentization'
+            ? 'tabler-progress-alert'
+            : 'tabler-circle-dashed',
+        avatarColor: COMPONENTIZATION_AVATAR_COLOR[status]
+      }
+    ],
+    chart: {
+      title: 'Procesamiento de los últimos 12 meses',
+      subtitle: 'Pagos detectados por mes (no es saldo bancario)',
+      inflowLabel: 'Pagos procesados',
+      inflowColor: SUCCESS_HEX,
+      outflowLabel: 'Sin uso',
+      outflowColor: WARNING_HEX
+    },
+    movements: {
+      sectionTitle: 'Pagos del procesador',
+      sectionSubtitle: 'Cada fila es un pago detectado en una cuenta pagadora real.',
+      directionLabels: { incoming: 'Procesado', outgoing: 'Procesado' },
+      emptyLabel: status === 'none'
+        ? `No hay pagos de ${account.accountName} en el período consultado.`
+        : 'No hay pagos detectados todavía. Cuando llegue la cartola, este timeline se enriquece automáticamente.',
+      amountHeader: 'Monto procesado'
+    },
+    contextBanner: banner
+  }
+}
+
 /**
  * Public entry point. Returns the profile that the drawer should render for
  * the given account. Falls back to `transactional_account` for unknown
  * categories so the UI never breaks on a new instrument type.
+ *
+ * `digest` is optional and only consumed for the `processor_transit` profile.
+ * Other profiles ignore it.
  */
 export const resolveInstrumentDetailPresentation = (
-  account: TreasuryBankAccountOverview
+  account: TreasuryBankAccountOverview,
+  digest?: TreasuryProcessorDigest | null
 ): InstrumentDetailProfile => {
   const category = account.instrumentCategory
 
@@ -365,9 +511,12 @@ export const resolveInstrumentDetailPresentation = (
     return resolveShareholderAccountProfile(account)
   }
 
+  if (category === 'payroll_processor') {
+    return resolveProcessorTransitProfile(account, digest ?? null)
+  }
+
   // Default: transactional gramatica (bank_account, fintech, cash, payment_platform)
-  // Future profiles (payroll_processor in TASK-706, loan_account, wallets) plug
-  // here via additional branches.
+  // Future profiles (loan_account, wallets) plug here via additional branches.
   return resolveTransactionalAccountProfile(account)
 }
 

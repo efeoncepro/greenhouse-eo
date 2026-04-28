@@ -100,6 +100,42 @@ type Movement = {
   providerReference: string | null
   providerStatus: string | null
   isReconciled: boolean
+  /** TASK-706 — populated when this movement is the cash leg of a processor payment. */
+  processorContext?: {
+    processorAccountId: string
+    processorAccountName: string
+    label: string
+    tone: 'info' | 'warning'
+  } | null
+}
+
+type ProcessorPaymentRow = {
+  paymentId: string
+  expenseId: string
+  paymentDate: string | null
+  amount: number
+  currency: string
+  payerAccountId: string | null
+  payerAccountName: string | null
+  reference: string | null
+  institution: string | null
+  payrollPeriodId: string | null
+  periodYear: number | null
+  periodMonth: number | null
+  isReconciled: boolean
+}
+
+type ProcessorDigest = {
+  accountId: string
+  accountName: string
+  periodStart: string
+  periodEnd: string
+  paymentCount: number
+  processedAmount: number
+  processedAmountClp: number
+  payerAccounts: Array<{ accountId: string; accountName: string; amount: number }>
+  componentizationStatus: 'componentized' | 'pending_componentization' | 'none'
+  payments: ProcessorPaymentRow[]
 }
 
 type ActiveOtb = {
@@ -125,6 +161,8 @@ type DetailResponse = {
   freshness?: FreshnessSignal
   history: HistoryPoint[]
   movements: Movement[]
+  /** TASK-706 — populated when account.instrumentCategory === 'payroll_processor'. */
+  processor?: ProcessorDigest | null
 }
 
 type Props = {
@@ -298,7 +336,41 @@ const AccountDetailDrawer = ({ open, accountId, year, month, onClose, onSuccess 
       cardNetwork: account.cardNetwork ?? null
     }
 
-    return resolveInstrumentDetailPresentation(bridged)
+    // TASK-706 — bridge the processor digest from `detail.processor` (canonical
+    // shape) into the resolver type. The resolver only reads these fields; the
+    // shapes are intentionally aligned to keep the bridge a no-op cast.
+    const digestForResolver = detail.processor
+      ? {
+          accountId: detail.processor.accountId,
+          accountName: detail.processor.accountName,
+          periodStart: detail.processor.periodStart,
+          periodEnd: detail.processor.periodEnd,
+          paymentCount: detail.processor.paymentCount,
+          processedAmount: detail.processor.processedAmount,
+          processedAmountClp: detail.processor.processedAmountClp,
+          payerAccounts: detail.processor.payerAccounts,
+          componentizationStatus: detail.processor.componentizationStatus,
+          payments: detail.processor.payments.map(p => ({
+            paymentId: p.paymentId,
+            expenseId: p.expenseId,
+            paymentDate: p.paymentDate,
+            amount: p.amount,
+            amountClp: null as number | null,
+            currency: p.currency,
+            payerAccountId: p.payerAccountId,
+            payerAccountName: p.payerAccountName,
+            reference: p.reference,
+            expenseType: null as string | null,
+            institution: p.institution,
+            payrollPeriodId: p.payrollPeriodId,
+            periodYear: p.periodYear,
+            periodMonth: p.periodMonth,
+            isReconciled: p.isReconciled
+          }))
+        }
+      : null
+
+    return resolveInstrumentDetailPresentation(bridged, digestForResolver)
   }, [detail])
 
   return (
@@ -415,123 +487,228 @@ const AccountDetailDrawer = ({ open, accountId, year, month, onClose, onSuccess 
 
             {profile ? (
               <Grid container spacing={4}>
-                {profile.kpis.map(kpi => (
-                  <Grid key={kpi.key} size={{ xs: 12, md: 4 }}>
-                    <HorizontalWithSubtitle
-                      title={kpi.title}
-                      stats={kpi.value !== null ? formatAmount(kpi.value, detail.account.currency) : 'Sin datos'}
-                      subtitle={kpi.subtitle}
-                      avatarIcon={kpi.avatarIcon}
-                      avatarColor={kpi.avatarColor}
-                    />
-                  </Grid>
-                ))}
+                {profile.kpis.map(kpi => {
+                  // TASK-706 — `paymentCount` is an integer (no currency).
+                  // KPIs with value=null but a meaningful subtitle (e.g.
+                  // componentization status) render the subtitle as the stat.
+                  const stats = (() => {
+                    if (kpi.value === null) {
+                      return kpi.key === 'componentizationStatus' ? kpi.subtitle : 'Sin datos'
+                    }
+
+                    if (kpi.key === 'paymentCount') {
+                      return new Intl.NumberFormat('es-CL').format(kpi.value)
+                    }
+
+                    return formatAmount(kpi.value, detail.account.currency)
+                  })()
+
+                  // For componentizationStatus the value travels in `stats`;
+                  // suppress duplicate subtitle to keep the card tight.
+                  const subtitle = kpi.key === 'componentizationStatus' && kpi.value === null
+                    ? 'Estado del desglose previsional'
+                    : kpi.subtitle
+
+                  return (
+                    <Grid key={kpi.key} size={{ xs: 12, md: 4 }}>
+                      <HorizontalWithSubtitle
+                        title={kpi.title}
+                        stats={stats}
+                        subtitle={subtitle}
+                        avatarIcon={kpi.avatarIcon}
+                        avatarColor={kpi.avatarColor}
+                      />
+                    </Grid>
+                  )
+                })}
               </Grid>
             ) : null}
 
-            <Card>
-              <CardHeader
-                title={profile?.chart.title ?? 'Últimos 12 meses'}
-                subheader={profile?.chart.subtitle ?? ''}
-              />
-              <CardContent>
-                <AppRecharts>
-                  <ResponsiveContainer width='100%' height={260}>
-                    <BarChart data={chartData}>
-                      <CartesianGrid strokeDasharray='3 3' />
-                      <XAxis dataKey='label' />
-                      <YAxis />
-                      <Tooltip />
-                      <Bar
-                        dataKey='inflows'
-                        name={profile?.chart.inflowLabel ?? 'Ingresos'}
-                        fill={profile?.chart.inflowColor ?? '#3DBA5D'}
-                        radius={[4, 4, 0, 0]}
-                      />
-                      <Bar
-                        dataKey='outflows'
-                        name={profile?.chart.outflowLabel ?? 'Salidas'}
-                        fill={profile?.chart.outflowColor ?? '#FF4D49'}
-                        radius={[4, 4, 0, 0]}
-                      />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </AppRecharts>
-              </CardContent>
-            </Card>
+            {/* Bank-style chart hidden for processor profiles — they have no
+                bank ledger to chart and the bar series would all be zero with
+                misleading labels. */}
+            {profile?.profileKey !== 'processor_transit' ? (
+              <Card>
+                <CardHeader
+                  title={profile?.chart.title ?? 'Últimos 12 meses'}
+                  subheader={profile?.chart.subtitle ?? ''}
+                />
+                <CardContent>
+                  <AppRecharts>
+                    <ResponsiveContainer width='100%' height={260}>
+                      <BarChart data={chartData}>
+                        <CartesianGrid strokeDasharray='3 3' />
+                        <XAxis dataKey='label' />
+                        <YAxis />
+                        <Tooltip />
+                        <Bar
+                          dataKey='inflows'
+                          name={profile?.chart.inflowLabel ?? 'Ingresos'}
+                          fill={profile?.chart.inflowColor ?? '#3DBA5D'}
+                          radius={[4, 4, 0, 0]}
+                        />
+                        <Bar
+                          dataKey='outflows'
+                          name={profile?.chart.outflowLabel ?? 'Salidas'}
+                          fill={profile?.chart.outflowColor ?? '#FF4D49'}
+                          radius={[4, 4, 0, 0]}
+                        />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </AppRecharts>
+                </CardContent>
+              </Card>
+            ) : null}
 
-            <Card>
-              <CardHeader
-                title={profile?.movements.sectionTitle ?? 'Movimientos recientes'}
-                subheader={profile?.movements.sectionSubtitle ?? ''}
-              />
-              <CardContent sx={{ pt: 0 }}>
-                {detail.movements.length === 0 ? (
-                  detail.activeOtb && detail.activeOtb.supersededTransactionsCount > 0 ? (
-                    <Alert severity='info'>
-                      <Typography variant='body2' sx={{ fontWeight: 600, mb: 0.5 }}>
-                        Cuenta anclada al {formatDate(detail.activeOtb.genesisDate)} con saldo {formatAmount(detail.activeOtb.openingBalance, detail.account.currency)} ({detail.activeOtb.auditStatus})
-                      </Typography>
-                      <Typography variant='caption' display='block'>
-                        {detail.activeOtb.supersededTransactionsCount} movimientos previos al ancla quedan en audit (encapsulados en el saldo opening). En el período consultado no hay movimientos posteriores al ancla todavía.
-                      </Typography>
+            {profile?.profileKey === 'processor_transit' && detail.processor ? (
+              <Card>
+                <CardHeader
+                  title={profile.movements.sectionTitle}
+                  subheader={profile.movements.sectionSubtitle}
+                />
+                <CardContent sx={{ pt: 0 }}>
+                  {detail.processor.payments.length === 0 ? (
+                    <Alert severity='info' role='status' aria-live='polite'>
+                      {profile.movements.emptyLabel}
                     </Alert>
                   ) : (
-                    <Alert severity='info'>
-                      {profile?.movements.emptyLabel ?? 'Esta cuenta no tiene movimientos en el período consultado.'}
-                    </Alert>
-                  )
-                ) : (
-                  <TableContainer>
-                    <Table size='small'>
-                      <TableHead>
-                        <TableRow>
-                          <TableCell>Fecha</TableCell>
-                          <TableCell>Tipo</TableCell>
-                          <TableCell>{profile?.movements.amountHeader ?? 'Monto'}</TableCell>
-                          <TableCell>Referencia</TableCell>
-                          <TableCell>Conciliación</TableCell>
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {detail.movements.map(movement => {
-                          const directionLabel = movement.direction === 'incoming'
-                            ? (profile?.movements.directionLabels.incoming ?? 'Entrada')
-                            : (profile?.movements.directionLabels.outgoing ?? 'Salida')
+                    <TableContainer>
+                      <Table size='small'>
+                        <TableHead>
+                          <TableRow>
+                            <TableCell>Fecha</TableCell>
+                            <TableCell>Cuenta pagadora</TableCell>
+                            <TableCell>{profile.movements.amountHeader}</TableCell>
+                            <TableCell>Período</TableCell>
+                            <TableCell>Estado</TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {detail.processor.payments.map(payment => {
+                            const periodLabel = payment.periodYear && payment.periodMonth
+                              ? `${String(payment.periodMonth).padStart(2, '0')}/${payment.periodYear}`
+                              : '—'
 
-                          return (
-                            <TableRow key={movement.movementId}>
-                              <TableCell>{formatDate(movement.transactionDate)}</TableCell>
-                              <TableCell>
-                                <Stack spacing={0.5}>
-                                  <Typography variant='body2' sx={{ fontWeight: 500 }}>
-                                    {directionLabel}
-                                  </Typography>
-                                  <Typography variant='caption' color='text.secondary'>
-                                    {movement.movementType} · {movement.movementSource}
-                                  </Typography>
-                                </Stack>
-                              </TableCell>
-                              <TableCell>{formatAmount(movement.amount, movement.currency)}</TableCell>
-                              <TableCell>{movement.providerReference || '—'}</TableCell>
-                              <TableCell>
-                                <CustomChip
-                                  round='true'
-                                  size='small'
-                                  variant='tonal'
-                                  color={movement.isReconciled ? 'success' : 'warning'}
-                                  label={movement.isReconciled ? 'Conciliado' : 'Por conciliar'}
-                                />
-                              </TableCell>
-                            </TableRow>
-                          )
-                        })}
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                )}
-              </CardContent>
-            </Card>
+                            return (
+                              <TableRow key={payment.paymentId}>
+                                <TableCell>{formatDate(payment.paymentDate)}</TableCell>
+                                <TableCell>
+                                  <Stack spacing={0.5}>
+                                    <Typography variant='body2' sx={{ fontWeight: 500 }}>
+                                      {payment.payerAccountName || payment.payerAccountId || 'Sin cuenta pagadora'}
+                                    </Typography>
+                                    {payment.institution ? (
+                                      <Typography variant='caption' color='text.secondary'>
+                                        {payment.institution}
+                                      </Typography>
+                                    ) : null}
+                                  </Stack>
+                                </TableCell>
+                                <TableCell>{formatAmount(payment.amount, payment.currency)}</TableCell>
+                                <TableCell>{periodLabel}</TableCell>
+                                <TableCell>
+                                  <CustomChip
+                                    round='true'
+                                    size='small'
+                                    variant='tonal'
+                                    color={payment.isReconciled ? 'success' : 'warning'}
+                                    label={payment.isReconciled ? 'Componentizado' : 'Desglose pendiente'}
+                                  />
+                                </TableCell>
+                              </TableRow>
+                            )
+                          })}
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+                  )}
+                </CardContent>
+              </Card>
+            ) : (
+              <Card>
+                <CardHeader
+                  title={profile?.movements.sectionTitle ?? 'Movimientos recientes'}
+                  subheader={profile?.movements.sectionSubtitle ?? ''}
+                />
+                <CardContent sx={{ pt: 0 }}>
+                  {detail.movements.length === 0 ? (
+                    detail.activeOtb && detail.activeOtb.supersededTransactionsCount > 0 ? (
+                      <Alert severity='info'>
+                        <Typography variant='body2' sx={{ fontWeight: 600, mb: 0.5 }}>
+                          Cuenta anclada al {formatDate(detail.activeOtb.genesisDate)} con saldo {formatAmount(detail.activeOtb.openingBalance, detail.account.currency)} ({detail.activeOtb.auditStatus})
+                        </Typography>
+                        <Typography variant='caption' display='block'>
+                          {detail.activeOtb.supersededTransactionsCount} movimientos previos al ancla quedan en audit (encapsulados en el saldo opening). En el período consultado no hay movimientos posteriores al ancla todavía.
+                        </Typography>
+                      </Alert>
+                    ) : (
+                      <Alert severity='info'>
+                        {profile?.movements.emptyLabel ?? 'Esta cuenta no tiene movimientos en el período consultado.'}
+                      </Alert>
+                    )
+                  ) : (
+                    <TableContainer>
+                      <Table size='small'>
+                        <TableHead>
+                          <TableRow>
+                            <TableCell>Fecha</TableCell>
+                            <TableCell>Tipo</TableCell>
+                            <TableCell>{profile?.movements.amountHeader ?? 'Monto'}</TableCell>
+                            <TableCell>Referencia</TableCell>
+                            <TableCell>Conciliación</TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {detail.movements.map(movement => {
+                            const directionLabel = movement.direction === 'incoming'
+                              ? (profile?.movements.directionLabels.incoming ?? 'Entrada')
+                              : (profile?.movements.directionLabels.outgoing ?? 'Salida')
+
+                            return (
+                              <TableRow key={movement.movementId}>
+                                <TableCell>{formatDate(movement.transactionDate)}</TableCell>
+                                <TableCell>
+                                  <Stack spacing={0.5}>
+                                    <Stack direction='row' spacing={1} alignItems='center'>
+                                      <Typography variant='body2' sx={{ fontWeight: 500 }}>
+                                        {directionLabel}
+                                      </Typography>
+                                      {movement.processorContext ? (
+                                        <CustomChip
+                                          round='true'
+                                          size='small'
+                                          variant='tonal'
+                                          color={movement.processorContext.tone === 'warning' ? 'warning' : 'info'}
+                                          label={`${movement.processorContext.processorAccountName} · ${movement.processorContext.label}`}
+                                        />
+                                      ) : null}
+                                    </Stack>
+                                    <Typography variant='caption' color='text.secondary'>
+                                      {movement.movementType} · {movement.movementSource}
+                                    </Typography>
+                                  </Stack>
+                                </TableCell>
+                                <TableCell>{formatAmount(movement.amount, movement.currency)}</TableCell>
+                                <TableCell>{movement.providerReference || '—'}</TableCell>
+                                <TableCell>
+                                  <CustomChip
+                                    round='true'
+                                    size='small'
+                                    variant='tonal'
+                                    color={movement.isReconciled ? 'success' : 'warning'}
+                                    label={movement.isReconciled ? 'Conciliado' : 'Por conciliar'}
+                                  />
+                                </TableCell>
+                              </TableRow>
+                            )
+                          })}
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+                  )}
+                </CardContent>
+              </Card>
+            )}
           </Stack>
         ) : null}
       </Box>
