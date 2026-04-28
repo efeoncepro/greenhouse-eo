@@ -4085,6 +4085,20 @@ export interface GreenhouseFinanceIncomeSettlementReconciliation {
   withholding_amount: Numeric | null;
 }
 
+export interface GreenhouseFinanceInstrumentCategoryKpiRules {
+  account_kind: string;
+  contributes_to_cash: boolean;
+  contributes_to_consolidated_clp: boolean;
+  contributes_to_net_worth: boolean;
+  created_at: Generated<Timestamp>;
+  display_group: string;
+  display_label: string;
+  instrument_category: string;
+  net_worth_sign: number;
+  rationale: string;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseFinanceInstrumentCategoryProviderRules {
   counterparty_kind: string | null;
   counterparty_label: string | null;
@@ -7460,6 +7474,7 @@ export interface DB {
   "greenhouse_finance.income_line_items": GreenhouseFinanceIncomeLineItems;
   "greenhouse_finance.income_payments": GreenhouseFinanceIncomePayments;
   "greenhouse_finance.income_settlement_reconciliation": GreenhouseFinanceIncomeSettlementReconciliation;
+  "greenhouse_finance.instrument_category_kpi_rules": GreenhouseFinanceInstrumentCategoryKpiRules;
   "greenhouse_finance.instrument_category_provider_rules": GreenhouseFinanceInstrumentCategoryProviderRules;
   "greenhouse_finance.internal_account_type_catalog": GreenhouseFinanceInternalAccountTypeCatalog;
   "greenhouse_finance.loan_accounts": GreenhouseFinanceLoanAccounts;

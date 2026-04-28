@@ -101,6 +101,23 @@ export interface LedgerHealthSnapshot {
       instruments: string[]
     }>
   }
+  /**
+   * TASK-720 — Active accounts with `instrument_category` not present in
+   * `instrument_category_kpi_rules`. Steady state expected: `count = 0`.
+   * Cualquier valor > 0 implica que `getBankOverview` va a fail-fast con
+   * `MissingKpiRuleError` cuando una cuenta de esa categoría sea consultada.
+   * Resolución: `INSERT INTO greenhouse_finance.instrument_category_kpi_rules`
+   * con la regla apropiada antes de activar cuentas en esa categoría.
+   */
+  task720: {
+    instrumentCategoriesWithoutKpiRule: number
+    sampleAccountsWithoutRule: Array<{
+      accountId: string
+      accountName: string
+      instrumentCategory: string
+      currency: string
+    }>
+  }
 }
 
 const STALE_THRESHOLD_DAYS = 2
@@ -497,6 +514,42 @@ const TASK714D_INTERNAL_TRANSFER_PAIR_IMBALANCE_SAMPLE_SQL = `
   LIMIT 20
 `
 
+// TASK-720 — accounts activas con instrument_category sin rule en
+// `instrument_category_kpi_rules`. Steady state esperado: 0. Si > 0,
+// `getBankOverview` fail-fast con MissingKpiRuleError cuando una cuenta de
+// esa categoría sea consultada. Catch graceful (`.catch(() => [])`) cubre el
+// caso donde la tabla no existe (pre-migration TASK-720).
+
+const TASK720_ACCOUNTS_WITHOUT_KPI_RULE_COUNT_SQL = `
+  SELECT COUNT(*)::text AS total
+  FROM greenhouse_finance.accounts a
+  WHERE a.is_active = TRUE
+    AND a.instrument_category IS NOT NULL
+    AND NOT EXISTS (
+      SELECT 1
+      FROM greenhouse_finance.instrument_category_kpi_rules r
+      WHERE r.instrument_category = a.instrument_category
+    )
+`
+
+const TASK720_ACCOUNTS_WITHOUT_KPI_RULE_SAMPLE_SQL = `
+  SELECT
+    a.account_id,
+    a.account_name,
+    a.instrument_category,
+    a.currency
+  FROM greenhouse_finance.accounts a
+  WHERE a.is_active = TRUE
+    AND a.instrument_category IS NOT NULL
+    AND NOT EXISTS (
+      SELECT 1
+      FROM greenhouse_finance.instrument_category_kpi_rules r
+      WHERE r.instrument_category = a.instrument_category
+    )
+  ORDER BY a.account_name
+  LIMIT 20
+`
+
 const UNANCHORED_EXPENSES_SQL = `
   SELECT
     e.expense_id, e.expense_type, e.total_amount::text, e.payment_date::text
@@ -536,7 +589,9 @@ export const getFinanceLedgerHealth = async (): Promise<LedgerHealthSnapshot> =>
     itxImbalanceCountRows,
     itxImbalanceSampleRows,
     cohortDCountRows,
-    cohortDSampleRows
+    cohortDSampleRows,
+    task720CountRows,
+    task720SampleRows
   ] = await Promise.all([
     runGreenhousePostgresQuery<{ income_id: string; total_amount: string; amount_paid: string; expected_settlement: string; drift: string }>(SETTLEMENT_DRIFT_SQL).catch(() => []),
     runGreenhousePostgresQuery<{ payment_id: string; income_id: string; payment_date: string; amount: string }>(PHANTOMS_INCOME_SQL).catch(() => []),
@@ -565,7 +620,14 @@ export const getFinanceLedgerHealth = async (): Promise<LedgerHealthSnapshot> =>
       payment_date: string
       amount: string
       signal_id: string
-    }>(TASK708D_COHORT_D_SAMPLE_SQL).catch(() => [])
+    }>(TASK708D_COHORT_D_SAMPLE_SQL).catch(() => []),
+    runGreenhousePostgresQuery<{ total: string }>(TASK720_ACCOUNTS_WITHOUT_KPI_RULE_COUNT_SQL).catch(() => [{ total: '0' }]),
+    runGreenhousePostgresQuery<{
+      account_id: string
+      account_name: string
+      instrument_category: string
+      currency: string
+    }>(TASK720_ACCOUNTS_WITHOUT_KPI_RULE_SAMPLE_SQL).catch(() => [])
   ])
 
   const incomePhantoms = phantomsIncome.map(p => ({
@@ -649,6 +711,16 @@ export const getFinanceLedgerHealth = async (): Promise<LedgerHealthSnapshot> =>
     }))
   }
 
+  const task720 = {
+    instrumentCategoriesWithoutKpiRule: readCount(task720CountRows),
+    sampleAccountsWithoutRule: task720SampleRows.map(row => ({
+      accountId: row.account_id,
+      accountName: row.account_name,
+      instrumentCategory: row.instrument_category,
+      currency: row.currency
+    }))
+  }
+
   const healthy =
     settlementDrift.driftedIncomesCount === 0 &&
     phantoms.incomePhantomsCount === 0 &&
@@ -664,7 +736,10 @@ export const getFinanceLedgerHealth = async (): Promise<LedgerHealthSnapshot> =>
     task708d.postCutoverPhantomsWithoutBankEvidence === 0 &&
     // TASK-714d: settlement_groups internal_transfer balanceados; cualquier
     // grupo con out_count != in_count distorsiona el ledger receptor.
-    task714d.internalTransferGroupsWithMissingPair === 0
+    task714d.internalTransferGroupsWithMissingPair === 0 &&
+    // TASK-720: cuentas activas con instrument_category sin rule causan
+    // fail-fast en getBankOverview (MissingKpiRuleError).
+    task720.instrumentCategoriesWithoutKpiRule === 0
 
   return {
     healthy,
@@ -675,6 +750,7 @@ export const getFinanceLedgerHealth = async (): Promise<LedgerHealthSnapshot> =>
     unanchoredExpenses,
     task708,
     task708d,
-    task714d
+    task714d,
+    task720
   }
 }

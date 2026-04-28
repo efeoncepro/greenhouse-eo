@@ -128,6 +128,14 @@ type BankResponse = {
     fxGainLossClp: number
     fxGainLoss: FxGainLossBreakdown
     coverage: Coverage
+    /** TASK-720 — breakdown declarativo cash / credit / platform_internal. Aditivo. */
+    breakdown?: {
+      cash: number
+      credit: number
+      platformInternal: number
+    }
+    /** TASK-720 — net worth (asset − liability) en CLP equivalente. */
+    netWorthClp?: number
   }
   accounts: TreasuryAccount[]
   creditCards: CreditCardSummary[]
@@ -385,9 +393,10 @@ const BankView = () => {
           <HorizontalWithSubtitle
             title='Saldo CLP'
             stats={formatAmount(data.kpis.totalClp, 'CLP')}
-            subtitle='Suma de instrumentos en pesos'
+            subtitle='Cash disponible en cuentas operativas CLP'
             avatarIcon='tabler-currency-dollar'
             avatarColor='primary'
+            titleTooltip='Suma sólo cuentas operativas (banco, fintech, plataforma de pagos). Excluye tarjetas de crédito (deuda) y cuentas internas (CCA, wallets) — se muestran abajo.'
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, lg: 4 }}>
@@ -472,6 +481,32 @@ const BankView = () => {
             )
           })()}
         </Grid>
+
+        {data.kpis.breakdown && data.kpis.breakdown.credit > 0 ? (
+          <Grid size={{ xs: 12, sm: 6, lg: 4 }}>
+            <HorizontalWithSubtitle
+              title='Crédito utilizado'
+              stats={formatAmount(data.kpis.breakdown.credit, 'CLP')}
+              subtitle='Deuda activa en tarjetas y líneas externas'
+              avatarIcon='tabler-credit-card'
+              avatarColor='error'
+              titleTooltip='Suma del saldo adeudado en cuentas liability externas (tarjetas de crédito, factoring). NO se incluye en Saldo CLP porque es deuda, no cash disponible.'
+            />
+          </Grid>
+        ) : null}
+
+        {data.kpis.breakdown && data.kpis.breakdown.platformInternal > 0 ? (
+          <Grid size={{ xs: 12, sm: 6, lg: 4 }}>
+            <HorizontalWithSubtitle
+              title='Cuentas internas'
+              stats={formatAmount(data.kpis.breakdown.platformInternal, 'CLP')}
+              subtitle='CCAs, wallets y procesadores de tránsito'
+              avatarIcon='tabler-circles-relation'
+              avatarColor='secondary'
+              titleTooltip='Suma de ledgers internos (cuentas corrientes accionistas, wallets de colaboradores, procesadores de nómina). NO se incluye en Saldo CLP — son posiciones internas, no cash operativo.'
+            />
+          </Grid>
+        ) : null}
 
         <Grid size={{ xs: 12 }}>
           <Card>

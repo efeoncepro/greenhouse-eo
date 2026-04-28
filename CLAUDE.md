@@ -404,6 +404,11 @@ AGENT_AUTH_SECRET=<secret> node scripts/playwright-auth-setup.mjs
 - Para chats individuales ya instalados por usuario, **no crear 1:1 a ciegas con AAD Object ID**. Resolver el `oneOnOne` existente y postear ahí. El intento `members: [{ id: "29:<aadObjectId>" }]` puede fallar con `403 Failed to decrypt pairwise id` aunque el usuario exista.
 - En 1:1 no hace falta mencionar al destinatario; Teams notifica el chat. Para smoke scripts locales con imports server-side, usar `npx tsx --require ./scripts/lib/server-only-shim.cjs ...`.
 - Producto/UI: cualquier canal manual debe converger con Notification Hub / `TASK-716` (intent/outbox, preview, aprobación, idempotencia, retries, audit, delivery status y permisos `views` + `entitlements`), no con un textbox que postea directo a Teams.
+- Chats verificados:
+  - `EO Team`: `19:1e085e8a02d24cc7a0244490e5d00fb0@thread.v2`.
+  - `Sky - Efeonce | Shared`: `19:bf42622ef7b44d139cd4659e8aa22e81@thread.v2`.
+  - Mention real de Valentina Hoyos: `text = "<at>Valentina Hoyos</at>"`, `mentioned.id = "29:f60d5730-1aab-45ec-a435-45ffe8be6f54"`.
+- Referencia de tono: el 2026-04-28 Nexa se presentó en `Sky - Efeonce | Shared` como AI Agent de Efeonce y anunció a Valentina Hoyos como `Content Lead` del Piloto Sky de mayo. Activity id: `1777411344948`. Mantener copy cálido, claro, con emojis moderados y enfoque de coordinación útil.
 
 ### Cloud Run ops-worker (crons reactivos + materialización)
 
@@ -721,6 +726,23 @@ Toda cuenta operativa (banco, tarjeta, fintech, CCA, wallet futura) declara un p
   3. INSERT row en `instrument_category_provider_rules` con la regla
   4. Agregar entrada en `getCategoryProviderRule` (mirror TS)
   El form admin se adapta solo. Cero refactor de UI.
+
+### Finance — Bank KPI aggregation policy-driven (TASK-720)
+
+Los KPIs del módulo Banco (`Saldo CLP`, `Saldo USD`, `Equivalente CLP`) se computan a partir de la tabla declarativa `greenhouse_finance.instrument_category_kpi_rules`. Cada `instrument_category` (bank_account, fintech, payment_platform, payroll_processor, credit_card, shareholder_account + reservadas employee_wallet, intercompany_loan, factoring_advance, escrow_account) declara cómo contribuye a cada KPI: `contributes_to_cash`, `contributes_to_consolidated_clp`, `contributes_to_net_worth`, `net_worth_sign` (+1 asset / -1 liability), `display_group` (cash / credit / platform_internal).
+
+**Helper canónico**: `aggregateBankKpis(accounts, rules)` en `src/lib/finance/instrument-kpi-rules.ts`. Es la única fuente de los KPIs en `getBankOverview`. Si una cuenta tiene `instrument_category` sin rule → `MissingKpiRuleError` (fail-fast).
+
+**Detector**: `task720.instrumentCategoriesWithoutKpiRule` en `getFinanceLedgerHealth`. Steady state = 0. Si > 0, agregar fila al catálogo antes de activar cuentas en esa categoría.
+
+**FK enforcement**: `accounts.instrument_category` → `instrument_category_kpi_rules.instrument_category`. Cualquier INSERT con categoría unknown falla con FK violation.
+
+**Reglas duras**:
+
+- **NUNCA** sumar `closingBalance` de cuentas Banco inline para computar KPIs. Toda agregación pasa por `aggregateBankKpis`.
+- **NUNCA** activar una cuenta con `instrument_category` que no tenga fila en `instrument_category_kpi_rules`. Agregar la rule primero (1 INSERT con `display_label`, `display_group`, `rationale`).
+- **NUNCA** mezclar asset + liability sin signo en cálculos de Banco. La sign convention TASK-703 está embebida en `net_worth_sign`.
+- Cuando emerja una categoría nueva (wallets, loans, factoring), seed la rule + el detector ledger-health pasa solo. Cero refactor de agregador.
 
 ### Finance — OTB cascade-supersede (TASK-703b)
 

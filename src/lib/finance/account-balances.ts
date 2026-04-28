@@ -16,6 +16,7 @@ import {
   type FinanceCurrency
 } from '@/lib/finance/shared'
 import { getBankFxPnlBreakdown } from '@/lib/finance/fx-pnl'
+import { aggregateBankKpis, loadKpiRules } from '@/lib/finance/instrument-kpi-rules'
 import { buildFreshnessSignal } from '@/lib/finance/bank-freshness'
 import { getActiveOpeningTrialBalance } from '@/lib/finance/account-opening-trial-balance'
 import { getOpenDriftSummariesForAccounts } from '@/lib/finance/reconciliation/snapshots'
@@ -276,6 +277,17 @@ export type TreasuryBankOverview = {
     /** Canonical FX breakdown — sourced from VIEW greenhouse_finance.fx_pnl_breakdown via src/lib/finance/fx-pnl.ts. */
     fxGainLoss: TreasuryFxBreakdown
     coverage: TreasuryCoverage
+    /**
+     * TASK-720 — breakdown declarativo por display_group (cash / credit / platform_internal)
+     * basado en `instrument_category_kpi_rules`. Aditivo y backward-compat.
+     */
+    breakdown: {
+      cash: number
+      credit: number
+      platformInternal: number
+    }
+    /** TASK-720 — net worth (asset − liability) en CLP equivalente. */
+    netWorthClp: number
   }
   accounts: TreasuryBankAccountOverview[]
   creditCards: Array<{
@@ -1424,21 +1436,17 @@ export const getBankOverview = async ({
     client
   })
 
-  const totalClp = roundCurrency(
-    accounts
-      .filter(account => account.currency === 'CLP')
-      .reduce((sum, account) => sum + account.closingBalance, 0)
-  )
+  // TASK-720 — KPI aggregation policy-driven via `instrument_category_kpi_rules`.
+  // Reemplaza la suma indiscriminada (asset + liability) que infla "Saldo CLP" en
+  // $1.3M (TC + CCA). Cada categoría declara qué contribuye a cash / consolidated /
+  // net worth. Cuentas sin rule fail-fast con MissingKpiRuleError; el detector
+  // `task720.instrumentCategoriesWithoutKpiRule` previene el fallo en runtime.
+  const kpiRules = await loadKpiRules()
+  const kpiAggregation = aggregateBankKpis(accounts, kpiRules)
 
-  const totalUsd = roundCurrency(
-    accounts
-      .filter(account => account.currency === 'USD')
-      .reduce((sum, account) => sum + account.closingBalance, 0)
-  )
-
-  const consolidatedClp = roundCurrency(
-    accounts.reduce((sum, account) => sum + (account.closingBalanceClp ?? 0), 0)
-  )
+  const totalClp = kpiAggregation.totalCashByCurrency.CLP ?? 0
+  const totalUsd = kpiAggregation.totalCashByCurrency.USD ?? 0
+  const consolidatedClp = kpiAggregation.consolidatedCashClp
 
   // Canonical FX P&L breakdown — single source of truth (TASK-699).
   // Reads from VIEW greenhouse_finance.fx_pnl_breakdown via the helper, so
@@ -1515,7 +1523,9 @@ export const getBankOverview = async ({
       activeAccounts: accounts.length,
       fxGainLossClp,
       fxGainLoss,
-      coverage
+      coverage,
+      breakdown: kpiAggregation.byGroup,
+      netWorthClp: kpiAggregation.netWorthClp
     },
     accounts,
     creditCards,
