@@ -78,6 +78,16 @@ interface ClientRow {
   loadedCostClp: number
   headcountFte: number
   memberCount: number
+  /** TASK-708: expense_direct_client (cargos directos a este cliente) */
+  expenseDirectClientClp?: number
+  /** TASK-708: expense_direct_member_via_fte (cargos a miembros prorrateados aquí) */
+  expenseDirectMemberViaFteClp?: number
+}
+
+interface CostAttributionV2Coverage {
+  hasLaborData: boolean
+  hasDirectClientData: boolean
+  hasDirectMemberViaFteData: boolean
 }
 
 interface ExplainMember {
@@ -247,6 +257,7 @@ const CostAllocationsView = () => {
   const [healthData, setHealthData] = useState<CommercialCostAttributionHealthSummary | null>(null)
   const [prevHealthData, setPrevHealthData] = useState<CommercialCostAttributionHealthSummary | null>(null)
   const [clientRows, setClientRows] = useState<ClientRow[]>([])
+  const [v2Coverage, setV2Coverage] = useState<CostAttributionV2Coverage | null>(null)
   const [attributionLoading, setAttributionLoading] = useState(false)
   const [expandedClientId, setExpandedClientId] = useState<string | null>(null)
   const [clientExplainCache, setClientExplainCache] = useState<Record<string, CommercialCostAttributionClientExplain | null>>({})
@@ -283,9 +294,10 @@ const CostAllocationsView = () => {
       const prevMonth = month === 1 ? 12 : month - 1
       const prevYear = month === 1 ? year - 1 : year
 
-      const [healthRes, clientsRes, prevHealthRes] = await Promise.all([
+      const [healthRes, clientsRes, v2Res, prevHealthRes] = await Promise.all([
         fetch(`/api/cost-intelligence/commercial-cost-attribution/health?year=${year}&month=${month}`),
         fetch(`/api/cost-intelligence/commercial-cost-attribution/by-client?year=${year}&month=${month}`),
+        fetch(`/api/cost-intelligence/commercial-cost-attribution/by-client-v2?year=${year}&month=${month}`),
         fetch(`/api/cost-intelligence/commercial-cost-attribution/health?year=${prevYear}&month=${prevMonth}`)
       ])
 
@@ -299,10 +311,66 @@ const CostAllocationsView = () => {
         setPrevHealthData(null)
       }
 
-      if (clientsRes.ok) {
-        const data = await clientsRes.json()
+      // V1 (labor allocation source-of-truth) — merged with V2 (TASK-708)
+      // for completeness. V2 brings expense_direct_client +
+      // expense_direct_member_via_fte dimensions ignored by V1.
+      const v1Clients: ClientRow[] = clientsRes.ok ? (await clientsRes.json()).clients || [] : []
 
-        setClientRows(data.clients || [])
+      if (v2Res.ok) {
+        const v2Data = await v2Res.json() as {
+          clients: Array<{
+            clientId: string
+            clientName: string
+            totalClp: number
+            byDimension: { labor: number; expenseDirectClient: number; expenseDirectMemberViaFte: number }
+          }>
+          coverage: CostAttributionV2Coverage
+        }
+
+        setV2Coverage(v2Data.coverage)
+
+        // Merge: enrich V1 rows with V2 expense dimensions (matching by clientId)
+        // and add V2-only clients that V1 didn't see (e.g. clients with only
+        // expense_direct attribution but no labor allocation yet).
+        const merged = new Map<string, ClientRow>()
+
+        for (const v1 of v1Clients) {
+          merged.set(v1.clientId, { ...v1 })
+        }
+
+        for (const v2 of v2Data.clients) {
+          const existing = merged.get(v2.clientId)
+          const directExpenses = v2.byDimension.expenseDirectClient + v2.byDimension.expenseDirectMemberViaFte
+
+          if (existing) {
+            existing.expenseDirectClientClp = v2.byDimension.expenseDirectClient
+            existing.expenseDirectMemberViaFteClp = v2.byDimension.expenseDirectMemberViaFte
+            existing.loadedCostClp = (existing.loadedCostClp || 0) + directExpenses
+
+            // Prefer canonical name from v2 (greenhouse_core.clients) when available
+            if (v2.clientName && v2.clientName !== v2.clientId) {
+              existing.clientName = v2.clientName
+            }
+          } else {
+            merged.set(v2.clientId, {
+              clientId: v2.clientId,
+              organizationId: '',
+              clientName: v2.clientName || v2.clientId,
+              laborCostClp: v2.byDimension.labor,
+              overheadCostClp: 0,
+              loadedCostClp: v2.totalClp,
+              headcountFte: 0,
+              memberCount: 0,
+              expenseDirectClientClp: v2.byDimension.expenseDirectClient,
+              expenseDirectMemberViaFteClp: v2.byDimension.expenseDirectMemberViaFte
+            })
+          }
+        }
+
+        setClientRows(Array.from(merged.values()).sort((a, b) => b.loadedCostClp - a.loadedCostClp))
+      } else {
+        setClientRows(v1Clients)
+        setV2Coverage(null)
       }
     } catch {
       // Non-blocking
@@ -724,7 +792,7 @@ const CostAllocationsView = () => {
                   <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                     <HorizontalWithSubtitle
                       title='Clientes'
-                      stats={String(healthData?.clientCount ?? clientRows.length)}
+                      stats={String(Math.max(healthData?.clientCount ?? 0, clientRows.length))}
                       avatarIcon='tabler-building-store'
                       avatarColor='primary'
                       trend={clientsDelta?.direction}
@@ -789,6 +857,24 @@ const CostAllocationsView = () => {
                             : ''}
                         </Alert>
                       )}
+                    </Grid>
+                  )}
+
+                  {/* TASK-708: V2 coverage transparency — honest degradation */}
+                  {v2Coverage && (!v2Coverage.hasLaborData || !v2Coverage.hasDirectClientData || !v2Coverage.hasDirectMemberViaFteData) && (
+                    <Grid size={{ xs: 12 }}>
+                      <Alert severity='info' variant='outlined' icon={<i className='tabler-info-circle' />}>
+                        <Typography variant='body2' sx={{ fontWeight: 600, mb: 0.5 }}>
+                          Cobertura por dimensión de costo (V2):
+                        </Typography>
+                        <Typography variant='caption' display='block' component='div'>
+                          • <strong>Labor allocation</strong> (staffing × payroll): {v2Coverage.hasLaborData ? '✓ disponible' : '⚠ pendiente — cierre del período no materializó client_labor_cost_allocation'}
+                          <br />
+                          • <strong>Gastos directos a cliente</strong> (Metricool→Motogas, etc.): {v2Coverage.hasDirectClientData ? '✓ atribuido' : '— sin gastos directos a cliente este período'}
+                          <br />
+                          • <strong>Gastos directos a miembro vía staffing</strong> (Adobe team, payroll): {v2Coverage.hasDirectMemberViaFteData ? '✓ prorrateado' : '— sin gastos a miembros con staffing activo este período'}
+                        </Typography>
+                      </Alert>
                     </Grid>
                   )}
 

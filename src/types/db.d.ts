@@ -5271,6 +5271,16 @@ export interface GreenhouseServingCommercialCostAttribution {
   source_of_truth: string;
 }
 
+export interface GreenhouseServingCommercialCostAttributionV2 {
+  amount_clp: Numeric | null;
+  client_id: string | null;
+  cost_dimension: string | null;
+  fte_contribution: Numeric | null;
+  member_id: string | null;
+  period_month: number | null;
+  period_year: number | null;
+}
+
 export interface GreenhouseServingContractMrrArrSnapshots {
   arr_clp: Generated<Numeric | null>;
   business_line_code: string | null;
@@ -7333,6 +7343,7 @@ export interface DB {
   "greenhouse_serving.client_capability_360": GreenhouseServingClientCapability360;
   "greenhouse_serving.client_labor_cost_allocation": GreenhouseServingClientLaborCostAllocation;
   "greenhouse_serving.commercial_cost_attribution": GreenhouseServingCommercialCostAttribution;
+  "greenhouse_serving.commercial_cost_attribution_v2": GreenhouseServingCommercialCostAttributionV2;
   "greenhouse_serving.contract_mrr_arr_snapshots": GreenhouseServingContractMrrArrSnapshots;
   "greenhouse_serving.contract_profitability_snapshots": GreenhouseServingContractProfitabilitySnapshots;
   "greenhouse_serving.deal_pipeline_snapshots": GreenhouseServingDealPipelineSnapshots;
