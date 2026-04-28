@@ -32,6 +32,31 @@ Esta umbrella tiene 4 slices, 2 ya ejecutados al 2026-04-28.
 - ✅ **Invariante de seguridad respetado**: closing Santander CLP 28/04 = $4,172,563 SIN cambios. Closing Global66 28/04 = $8,562 SIN cambios (DIFF = 0).
 - ✅ Re-detector post-apply: pasamos de 8 imbalanced → 3 (solo TC pendiente).
 - ✅ Global66 ahora muestra inflows correctos (e.g. 04/04: $1,865,465 entrantes desde Santander, $1,865,465 salientes a Daniela/Andrés/FX fees, neto $0).
+- ✅ **Post-flight read model refresh** (2026-04-28): después del backfill las daily `account_balances` quedaron correctas pero `account_balances_monthly` (read model TASK-705 que consume el drawer chart) seguía con el snapshot pre-backfill — el chart quedaba vacío. Refresco aplicado via `refreshMonthlyBatch` para 2026-03 y 2026-04. Estado post-refresh: 2026-04 closing=$8,562 (preservado), in=$1,865,465 = out=$1,865,465 (cuadrado). El drawer chart ahora pinta correctamente.
+
+#### Hygiene rule reusable
+
+Cualquier script de backfill que toque settlement_legs / income_payments / expense_payments y luego llame `rematerializeAccountBalancesFromDate` debe **también** refrescar `account_balances_monthly` para los meses tocados. La rematerialize daily NO dispara el read model mensual — eso requiere `refreshMonthlyBatch(items)` explícito o esperar a la lane reactiva del worker.
+
+Patrón canónico post-backfill:
+
+```ts
+import { refreshMonthlyBatch } from '@/lib/finance/account-balances-monthly'
+
+// Después de rematerializeAccountBalancesFromDate, calcular meses tocados
+const monthsTouched = new Set<string>() // 'YYYY-MM' keys
+for (const o of orphans) monthsTouched.add(o.transaction_date.slice(0, 7))
+
+const items = Array.from(monthsTouched).map(key => ({
+  accountId: targetAccount,
+  year: Number(key.slice(0, 4)),
+  month: Number(key.slice(5, 7))
+}))
+
+await refreshMonthlyBatch(items)
+```
+
+**Followup pendiente** (no bloquea): el path `historySource='recompute'` en `getAccountDetailOverview` (`src/lib/finance/account-balances.ts:1641`) usa `DISTINCT ON (date_trunc('month', balance_date))` que retorna sólo el último día del mes — pierde los `period_inflows`/`period_outflows` del resto del mes. Bug pre-existente sin impacto hoy (drawer usa `monthly_read_model`). Se debe reemplazar por `SUM(period_inflows)` agrupado cuando se aborde. Tracking: deferido a Slice 5.
 
 ### Slice 3 — Reclasificación payroll Global66 ⏳ PENDIENTE
 
