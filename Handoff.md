@@ -1,5 +1,22 @@
 # Handoff.md
 
+## Sesion 2026-04-28 — Santander CLP follow-ups + backlog robusto
+
+- Rama: `task/santander-clp-followups`.
+- Se formalizaron los follow-ups recomendados por el handoff de Claude sin mezclar scopes:
+  - `TASK-708d` — detector Cohorte D para phantoms post-cutover auto-adoptados por D5 sin evidencia de cartola bancaria (`docs/tasks/to-do/TASK-708d-post-cutover-phantom-cohort-detector.md`).
+  - `TASK-715` — UX "Archivar como prueba" en `/finance/reconciliation`, separado de `TASK-714` porque pertenece a conciliacion, no al drawer Banco (`docs/tasks/to-do/TASK-715-reconciliation-test-period-archive-ux.md`).
+  - `TASK-708c` se preservo con su significado original: promover CHECK a universal tras 30+ dias de estabilidad. No reutilizarlo para Cohorte D.
+- `docs/tasks/TASK_ID_REGISTRY.md` corregido: `TASK-708` estaba registrado como `to-do` aunque ya vive en `complete/`; ahora apunta a `docs/tasks/complete/...`. `docs/tasks/README.md` sincronizado y siguiente ID disponible queda `TASK-716`.
+- Data fix live aplicado contra Postgres dev para COM.MANTENCION Santander CLP:
+  - Script versionado: `scripts/finance/fix-santander-maintenance-date.ts`.
+  - Dry-run confirmo target exacto `exp-pay-c15f6f51-bfa2-4cdb-9c22-df3e656e1bf5` por $19.495 CLP.
+  - Al aplicar, se descubrio que ya existia el payment canonico de cartola `exp-pay-d50e82ad-6556-40cb-97e2-3773df1bb279` (`payment_source='bank_statement'`, referencia `sclp-20260327-com-19495`, fecha 2026-03-27). La ruta robusta fue marcar el payment manual/Nubox como audit-only (`superseded_at`) y cascade-supersede sus 2 settlement legs, no dejar dos cash payments activos.
+  - Rematerializacion `santander-clp` ejecutada desde seed 2026-02-28 hasta 2026-04-28; monthly read model refrescado (2 meses, 0 errores).
+  - Resultado final: `account_balances` Santander CLP al 2026-04-28 = $4.172.563, drift vs bank target = $0.
+- Nota operativa: `bank_statement_rows.row_id='sclp-20260327-com-19495'` no esta importado como row en Postgres, pero el payment canonico de cartola si existe como `expense_payments.reference='sclp-20260327-com-19495'`. `TASK-708d` debe considerar este tipo de evidencia por payment/settlement, no solo existencia literal de `bank_statement_rows`.
+- Verificacion ejecutada en esta sesion: dry-run + apply del script, post-check de payment/settlement legs, rematerializacion diaria + mensual. Pendiente antes del merge: `pnpm lint`, `pnpm tsc --noEmit`, `git diff --check`.
+
 ## Sesion 2026-04-28 — TASK-705 Banco Read Model & Snapshot Cutover (cerrada)
 
 - Rama: `task/TASK-705-banco-read-model-snapshot-cutover`.

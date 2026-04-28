@@ -2,6 +2,21 @@
 
 ## 2026-04-28
 
+### 2026-04-28 — Santander CLP residual COM.MANTENCION y follow-ups Finance
+
+Se cerro el residual de Santander CLP por COM.MANTENCION ($19.495 CLP) con un script operativo versionado:
+
+- `scripts/finance/fix-santander-maintenance-date.ts` valida el payment exacto, evidencia de cartola/versioned manifest, duplicado canonico y rematerializa snapshots.
+- Se detecto que ya existia el payment canonico de cartola `exp-pay-d50e82ad-6556-40cb-97e2-3773df1bb279` (`payment_source='bank_statement'`, referencia `sclp-20260327-com-19495`, fecha 2026-03-27).
+- El payment manual/Nubox duplicado `exp-pay-c15f6f51-bfa2-4cdb-9c22-df3e656e1bf5` quedo audit-only via `superseded_at`, con cascade a sus 2 `settlement_legs`.
+- `santander-clp` se rematerializo desde 2026-02-28 hasta 2026-04-28; `account_balances_monthly` refresco marzo y abril. Resultado final: closing Greenhouse $4.172.563 = target banco $4.172.563, drift $0.
+
+Backlog sincronizado:
+
+- Nueva `TASK-708d` para detector Cohorte D de phantoms post-cutover auto-adoptados por D5 sin evidencia bancaria.
+- Nueva `TASK-715` para "Archivar como prueba" en `/finance/reconciliation`.
+- `TASK-708` corregida en el registry como `complete`; siguiente ID disponible `TASK-716`.
+
 ### 2026-04-28 — TASK-705 Banco Read Model & Snapshot Cutover (cerrada)
 
 `/finance/bank` y `/finance/bank/[accountId]` pasan a leer exclusivamente snapshots persistidos. La materialización pesada queda fuera del request path. Latencia esperada: ~5s+ → sub-200ms para el chart histórico del drawer.

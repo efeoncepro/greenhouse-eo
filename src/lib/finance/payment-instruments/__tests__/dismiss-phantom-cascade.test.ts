@@ -12,16 +12,20 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 type FakeClient = { query: ReturnType<typeof vi.fn> }
+
 const mockClientQuery = vi.fn()
+
 const mockWithTransaction = vi.fn<(fn: (client: FakeClient) => Promise<unknown>) => Promise<unknown>>(
   async fn => fn({ query: mockClientQuery })
 )
+
 interface OutboxEventInput {
   aggregateType: string
   aggregateId: string
   eventType: string
   payload: Record<string, unknown>
 }
+
 const mockPublishOutboxEvent = vi.fn<(event: OutboxEventInput, client?: unknown) => Promise<void>>(
   async () => undefined
 )
