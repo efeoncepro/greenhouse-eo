@@ -98,22 +98,34 @@ export const declareOpeningTrialBalance = async (
     const currency = acct.rows[0].currency
     const openingBalanceClp = input.openingBalanceClp ?? (currency === 'CLP' ? input.openingBalance : input.openingBalance)
 
-    // Idempotency: if there's already an active OTB for this (account_id, genesis_date)
-    // with the same opening_balance + reason, skip. Otherwise supersede the existing one.
-    const existing = await client.query<{ obtb_id: string; opening_balance: string }>(
-      `SELECT obtb_id, opening_balance::text
+    // Find the currently active OTB for this account (regardless of date).
+    // Canonical rule: an account has AT MOST one active OTB. Declaring a new
+    // one supersedes the prior — idempotent if same (account, genesisDate,
+    // openingBalance), supersede-cascade otherwise.
+    const existing = await client.query<{ obtb_id: string; genesis_date: Date | string; opening_balance: string }>(
+      `SELECT obtb_id, genesis_date, opening_balance::text
        FROM greenhouse_finance.account_opening_trial_balance
        WHERE account_id = $1
-         AND genesis_date = $2::date
-         AND superseded_by IS NULL`,
-      [input.accountId, input.genesisDate]
+         AND superseded_by IS NULL
+       ORDER BY genesis_date DESC, created_at DESC
+       LIMIT 1`,
+      [input.accountId]
     )
+
+    let priorActiveObtbId: string | null = null
 
     if (existing.rows.length > 0) {
       const existingBalance = Number(existing.rows[0].opening_balance)
 
-      if (Math.abs(existingBalance - input.openingBalance) < 0.01) {
-        // Same value, idempotent return
+      const existingGenesis = typeof existing.rows[0].genesis_date === 'string'
+        ? existing.rows[0].genesis_date
+        : new Date(existing.rows[0].genesis_date).toISOString().slice(0, 10)
+
+      const sameDate = existingGenesis === input.genesisDate
+      const sameBalance = Math.abs(existingBalance - input.openingBalance) < 0.01
+
+      if (sameDate && sameBalance) {
+        // Identical declaration — idempotent return
         const r = await client.query<OtbRowDb>(
           `SELECT * FROM greenhouse_finance.account_opening_trial_balance WHERE obtb_id = $1`,
           [existing.rows[0].obtb_id]
@@ -122,15 +134,10 @@ export const declareOpeningTrialBalance = async (
         return mapOtbRow(r.rows[0])
       }
 
-      // Different value — supersede the old one
-      await client.query(
-        `UPDATE greenhouse_finance.account_opening_trial_balance SET
-           superseded_by = $1,
-           superseded_at = NOW(),
-           superseded_reason = $2
-         WHERE obtb_id = $3`,
-        [obtbId, `Revised: ${reason}`, existing.rows[0].obtb_id]
-      )
+      // Mark the prior OTB to be superseded by the NEW one. We can't UPDATE
+      // it yet because the FK requires the new obtb_id to exist first; the
+      // supersede happens after the INSERT below.
+      priorActiveObtbId = existing.rows[0].obtb_id
     }
 
     const r = await client.query<OtbRowDb>(
@@ -154,6 +161,19 @@ export const declareOpeningTrialBalance = async (
       ]
     )
 
+    // Now that the new OTB row exists, point the prior active OTB at it.
+    // Order matters: FK requires the target (superseded_by) to exist first.
+    if (priorActiveObtbId) {
+      await client.query(
+        `UPDATE greenhouse_finance.account_opening_trial_balance SET
+           superseded_by = $1,
+           superseded_at = NOW(),
+           superseded_reason = $2
+         WHERE obtb_id = $3`,
+        [obtbId, `Revised: ${reason}`, priorActiveObtbId]
+      )
+    }
+
     // Sync accounts.opening_balance + opening_balance_date as a cache
     await client.query(
       `UPDATE greenhouse_finance.accounts SET
@@ -163,6 +183,27 @@ export const declareOpeningTrialBalance = async (
        WHERE account_id = $3`,
       [input.openingBalance, input.genesisDate, input.accountId]
     )
+
+    // TASK-703b: cascade-supersede pre-anchor transactions and prune
+    // derived account_balances rows. Atomic SQL function so we don't have
+    // to round-trip three UPDATEs from TS.
+    const cascade = await client.query<{
+      superseded_settlement_legs: number
+      superseded_income_payments: number
+      superseded_expense_payments: number
+      pruned_balance_rows: number
+    }>(
+      `SELECT *
+       FROM greenhouse_finance.cascade_supersede_pre_otb_transactions($1, $2, $3::date, $4)`,
+      [input.accountId, obtbId, input.genesisDate, `Pre-OTB anchor: ${reason}`]
+    )
+
+    const cascadeCounts = cascade.rows[0] ?? {
+      superseded_settlement_legs: 0,
+      superseded_income_payments: 0,
+      superseded_expense_payments: 0,
+      pruned_balance_rows: 0
+    }
 
     await publishOutboxEvent(
       {
@@ -176,7 +217,13 @@ export const declareOpeningTrialBalance = async (
           openingBalance: input.openingBalance,
           openingBalanceClp,
           auditStatus,
-          declarationReason: reason
+          declarationReason: reason,
+          cascadeCounts: {
+            supersededSettlementLegs: Number(cascadeCounts.superseded_settlement_legs),
+            supersededIncomePayments: Number(cascadeCounts.superseded_income_payments),
+            supersededExpensePayments: Number(cascadeCounts.superseded_expense_payments),
+            prunedBalanceRows: Number(cascadeCounts.pruned_balance_rows)
+          }
         }
       },
       client

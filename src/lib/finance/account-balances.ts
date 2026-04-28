@@ -16,6 +16,7 @@ import {
   type FinanceCurrency
 } from '@/lib/finance/shared'
 import { getBankFxPnlBreakdown } from '@/lib/finance/fx-pnl'
+import { getActiveOpeningTrialBalance } from '@/lib/finance/account-opening-trial-balance'
 import { captureWithDomain } from '@/lib/observability/capture'
 
 type QueryableClient = Pick<PoolClient, 'query'>
@@ -529,6 +530,7 @@ const getDailyMovementSummary = async (
         FROM greenhouse_finance.settlement_legs sl
         WHERE sl.instrument_id = $1
           AND sl.transaction_date = $2::date
+          AND sl.superseded_by_otb_id IS NULL
       ),
       fallback_income_payments AS (
         SELECT
@@ -538,12 +540,15 @@ const getDailyMovementSummary = async (
         FROM greenhouse_finance.income_payments ip
         WHERE ip.payment_account_id = $1
           AND ip.payment_date = $2::date
+          AND ip.superseded_by_payment_id IS NULL
+          AND ip.superseded_by_otb_id IS NULL
           AND NOT EXISTS (
             SELECT 1
             FROM greenhouse_finance.settlement_legs sl
             WHERE sl.linked_payment_type = 'income_payment'
               AND sl.linked_payment_id = ip.payment_id
               AND sl.instrument_id = $1
+              AND sl.superseded_by_otb_id IS NULL
           )
       ),
       fallback_expense_payments AS (
@@ -554,12 +559,15 @@ const getDailyMovementSummary = async (
         FROM greenhouse_finance.expense_payments ep
         WHERE ep.payment_account_id = $1
           AND ep.payment_date = $2::date
+          AND ep.superseded_by_payment_id IS NULL
+          AND ep.superseded_by_otb_id IS NULL
           AND NOT EXISTS (
             SELECT 1
             FROM greenhouse_finance.settlement_legs sl
             WHERE sl.linked_payment_type = 'expense_payment'
               AND sl.linked_payment_id = ep.payment_id
               AND sl.instrument_id = $1
+              AND sl.superseded_by_otb_id IS NULL
           )
       ),
       movements AS (
@@ -603,12 +611,16 @@ const getDailyFxGainLoss = async (
         WHERE ip.payment_account_id = $1
           AND ip.payment_date = $2::date
           AND ip.fx_gain_loss_clp IS NOT NULL
+          AND ip.superseded_by_payment_id IS NULL
+          AND ip.superseded_by_otb_id IS NULL
         UNION ALL
         SELECT ep.fx_gain_loss_clp
         FROM greenhouse_finance.expense_payments ep
         WHERE ep.payment_account_id = $1
           AND ep.payment_date = $2::date
           AND ep.fx_gain_loss_clp IS NOT NULL
+          AND ep.superseded_by_payment_id IS NULL
+          AND ep.superseded_by_otb_id IS NULL
       ) fx
     `,
     [accountId, balanceDate],
@@ -630,16 +642,21 @@ const getEarliestMovementDate = async (
         FROM greenhouse_finance.settlement_legs sl
         WHERE sl.instrument_id = $1
           AND sl.transaction_date IS NOT NULL
+          AND sl.superseded_by_otb_id IS NULL
         UNION ALL
         SELECT ip.payment_date AS movement_date
         FROM greenhouse_finance.income_payments ip
         WHERE ip.payment_account_id = $1
           AND ip.payment_date IS NOT NULL
+          AND ip.superseded_by_payment_id IS NULL
+          AND ip.superseded_by_otb_id IS NULL
         UNION ALL
         SELECT ep.payment_date AS movement_date
         FROM greenhouse_finance.expense_payments ep
         WHERE ep.payment_account_id = $1
           AND ep.payment_date IS NOT NULL
+          AND ep.superseded_by_payment_id IS NULL
+          AND ep.superseded_by_otb_id IS NULL
       ) movement_dates
     `,
     [accountId],
@@ -669,17 +686,30 @@ const resolveMaterializationStartDate = async (
   targetStartDate: string,
   client?: QueryableClient
 ) => {
+  // TASK-703b: an active OTB declares the canonical anchor. The materializer
+  // must NEVER walk earlier than the OTB's genesis_date. Pre-anchor data is
+  // either superseded (cascade-supersede) or out of scope by definition.
+  const otb = await getActiveOpeningTrialBalance(accountId)
+  const otbGenesisDate = otb?.genesisDate ?? null
+
+  const clampToOtb = (date: string): string => {
+    if (!otbGenesisDate) return date
+
+    return date < otbGenesisDate ? otbGenesisDate : date
+  }
+
   const previous = await getPreviousBalanceRow(accountId, targetStartDate, client)
 
   if (previous) {
-    return targetStartDate
+    return clampToOtb(targetStartDate)
   }
 
   const account = await getAccountRow(accountId, client)
   const openingBalanceDate = toDateString(account.opening_balance_date)
   const earliestMovementDate = await getEarliestMovementDate(accountId, client)
+  const candidate = minDate(openingBalanceDate, earliestMovementDate, targetStartDate) || targetStartDate
 
-  return minDate(openingBalanceDate, earliestMovementDate, targetStartDate) || targetStartDate
+  return clampToOtb(candidate)
 }
 
 const getCoverage = async (
@@ -1267,7 +1297,16 @@ export const getBankOverview = async ({
       const metadataCreditLimit = toNumber(account.metadata?.creditLimit ?? account.metadata?.credit_limit ?? null)
       const creditLimit = account.creditLimit ?? (metadataCreditLimit > 0 ? metadataCreditLimit : null)
 
-      const consumed = roundCurrency(account.periodOutflows)
+      // TASK-703b: "consumed" is the BANK's "cupo utilizado" / "deuda activa".
+      // For a liability account (credit_card), closingBalance is the running
+      // cumulative debt (cargos minus pagos minus credit applied).
+      // periodOutflows would only show charges of the SELECTED month, missing
+      // unpaid balance from prior cycles — that's a UI bug for revolving credit.
+      // Negative closingBalance means client has credit/sobrepago with the bank;
+      // we clamp at 0 because "consumed > 0 ⟹ deuda" semantically (bank UI does
+      // the same — never shows "deuda negativa", instead shows credit elsewhere).
+      const runningBalance = roundCurrency(account.closingBalance)
+      const consumed = Math.max(0, runningBalance)
 
       return {
         accountId: account.accountId,
@@ -1422,6 +1461,7 @@ export const getBankAccountDetail = async ({
         FROM greenhouse_finance.settlement_legs sl
         WHERE sl.instrument_id = $1
           AND sl.transaction_date BETWEEN $2::date AND $3::date
+          AND sl.superseded_by_otb_id IS NULL
       ),
       fallback_income AS (
         SELECT
@@ -1444,12 +1484,15 @@ export const getBankAccountDetail = async ({
         FROM greenhouse_finance.income_payments ip
         WHERE ip.payment_account_id = $1
           AND ip.payment_date BETWEEN $2::date AND $3::date
+          AND ip.superseded_by_payment_id IS NULL
+          AND ip.superseded_by_otb_id IS NULL
           AND NOT EXISTS (
             SELECT 1
             FROM greenhouse_finance.settlement_legs sl
             WHERE sl.linked_payment_type = 'income_payment'
               AND sl.linked_payment_id = ip.payment_id
               AND sl.instrument_id = $1
+              AND sl.superseded_by_otb_id IS NULL
           )
       ),
       fallback_expense AS (
@@ -1473,12 +1516,15 @@ export const getBankAccountDetail = async ({
         FROM greenhouse_finance.expense_payments ep
         WHERE ep.payment_account_id = $1
           AND ep.payment_date BETWEEN $2::date AND $3::date
+          AND ep.superseded_by_payment_id IS NULL
+          AND ep.superseded_by_otb_id IS NULL
           AND NOT EXISTS (
             SELECT 1
             FROM greenhouse_finance.settlement_legs sl
             WHERE sl.linked_payment_type = 'expense_payment'
               AND sl.linked_payment_id = ep.payment_id
               AND sl.instrument_id = $1
+              AND sl.superseded_by_otb_id IS NULL
           )
       )
       SELECT *

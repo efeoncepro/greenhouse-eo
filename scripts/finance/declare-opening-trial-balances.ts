@@ -63,12 +63,13 @@ const DECLARATIONS: OtbDeclaration[] = [
   },
   {
     accountId: 'santander-corp-clp',
-    genesisDate: '2026-03-06',
-    openingBalance: 802905,
-    declarationReason: 'Saldo adeudado final período anterior (06/02-06/03) según estado de cuenta TC Santander Corp PDF marzo. Convención liability: balance positivo = deuda con Mastercard.',
+    genesisDate: '2026-04-07',
+    openingBalance: 268442,
+    declarationReason: 'Re-anchor (TASK-703b) al SOD 07/04 = EOD cierre ciclo marzo 06/04/2026. Cupo utilizado al cierre 06/04 = $268,442 (= "MONTO TOTAL FACTURADO A PAGAR" en PDF página 1). Convención canónica Greenhouse: OTB.genesisDate representa balance al INICIO del día genesis (i.e., EOD del día anterior). Por eso anclamos en 07/04 con el cierre ciclo 06/04. El cascade-supersede automáticamente marca como superseded: (a) settlement_legs 06/03 y 12/03 (pagos marzo), (b) expense_payment 05/03 Deel REC-2026-3, (c) expense_payments 05/04 Deel REC-2026-5 y REC-2026-6 (charges marzo cycle pero dated en abril en PG), (d) settlement_leg 06/04 incoming $696,198 (pago marzo 04/04 que aterrizó al banco el 06/04). Estos están todos encapsulados en el $268,442 del PDF. Convención liability: balance positivo = cupo utilizado = "Deuda" en OfficeBanking. La OTB anterior 06/03 con +$802,905 era incorrecta (interpretó la magnitud del crédito a favor del cliente como deuda).',
     auditStatus: 'reconciled',
     evidenceRefs: [
-      { type: 'cartola_tc', ref: 'data/bank/EstadoCuentaTC-XXXXXXXXXXXX2505-20260427.pdf', period: '2026-02-06..2026-03-06' }
+      { type: 'cartola_tc', ref: 'data/bank/EstadoCuentaTC-XXXXXXXXXXXX2505-20260427.pdf', period: '2026-03-06..2026-04-06', description: 'Cupo total $1,700,000 — Cupo utilizado $268,442 — Cupo disponible $1,431,558 al cierre 06/04/2026 (EOD = SOD 07/04).' },
+      { type: 'supersede_note', description: 'Reemplaza OTB obtb-santander-corp-clp-20260306-770dfd33 (06/03 $802,905) y OTB intermedia 06/04 (si existió) que eran anchors mal interpretados.' }
     ]
   },
   {

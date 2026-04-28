@@ -3453,6 +3453,10 @@ export interface GreenhouseFinanceExpensePayments {
   space_id: string | null;
   superseded_at: Timestamp | null;
   /**
+   * Anti-DELETE: marca un expense_payment como superseded por una OTB anchor. Coexiste con superseded_by_payment_id (TASK-702). Materializer filtra por AMBAS columnas.
+   */
+  superseded_by_otb_id: string | null;
+  /**
    * Idem income_payments. Trigger fn_sync_expense_amount_paid excluye filas con esta columna no-null del SUM(amount).
    */
   superseded_by_payment_id: string | null;
@@ -3843,6 +3847,10 @@ export interface GreenhouseFinanceIncomePayments {
   space_id: string | null;
   superseded_at: Timestamp | null;
   /**
+   * Anti-DELETE: marca un income_payment como superseded por una OTB anchor. Coexiste con superseded_by_payment_id (TASK-702). Materializer filtra por AMBAS columnas.
+   */
+  superseded_by_otb_id: string | null;
+  /**
    * Anti double-counting: cuando un phantom Nubox sin payment_account_id co-existe con el payment canónico (ej. factoring_proceeds), se marca aquí en vez de eliminarlo. Audit preservado.
    */
   superseded_by_payment_id: string | null;
@@ -4179,6 +4187,12 @@ export interface GreenhouseFinanceSettlementLegs {
   settlement_group_id: string;
   settlement_leg_id: string;
   space_id: string | null;
+  superseded_at: Timestamp | null;
+  /**
+   * Anti-DELETE: marca un settlement_leg como superseded por una OTB anchor. La OTB.opening_balance ya encapsula el efecto neto de este leg, por lo que el materializer lo excluye del chain. Audit-preserved.
+   */
+  superseded_by_otb_id: string | null;
+  superseded_reason: string | null;
   transaction_date: Timestamp | null;
   updated_at: Generated<Timestamp>;
 }

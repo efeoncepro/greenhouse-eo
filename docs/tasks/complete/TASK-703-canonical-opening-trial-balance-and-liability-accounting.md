@@ -259,3 +259,46 @@ CLI invocations o helper script que declara OTB para los 7 instrumentos:
 ## Open Questions
 
 - Si Julio aporta data del histórico *1879 pre-28/02 + transferencias pre-19/02, podemos llevar OTB CCA a `audit_status='reconciled'`. Sin esa data queda 'estimated'.
+
+## Delta 2026-04-28 — TASK-703b OTB cascade-supersede
+
+Cuando se intentó cuadrar abril contra OfficeBanking del banco, el OTB original al 06/03 = $802,905 estaba semánticamente **invertido**: el PDF de marzo dice "SALDO ADEUDADO FINAL PERÍODO ANTERIOR -$802,905" — la magnitud es la misma pero el signo indica **crédito a favor del cliente** (sobrepago), no deuda. Convención liability del Greenhouse: balance positivo = deuda con banco; negativo = sobrepago. Anchoring positivo era incorrecto.
+
+Adicionalmente había **datos phantom pre-OTB** en la chain: account_balances rows desde 2025-05-01 (un materialize antiguo nunca podado), expense_payments y settlement_legs en marzo que llenaban opening con valores erráticos.
+
+**Solución canónica robusta** (no parche):
+
+1. **Migración `20260428000125705_task-703b-otb-cascade-supersede.sql`**:
+   - Columnas `superseded_by_otb_id` en `settlement_legs`, `income_payments`, `expense_payments` con FK a `account_opening_trial_balance(obtb_id)`. Misma forma que `superseded_by_payment_id` (TASK-702) pero con semántica diferente: el supersede payment-chain es intra-document; el supersede OTB es anchor-driven (data antes del anchor canónico está fuera del scope del chain corriente).
+   - SQL function `cascade_supersede_pre_otb_transactions(account_id, otb_id, genesis_date, reason)` atómica que: (a) UPDATE settlement_legs/income_payments/expense_payments con `transaction_date < genesis_date` marcándolas `superseded_by_otb_id = otb_id`, (b) DELETE account_balances con `balance_date < genesis_date` (proyecciones derivadas, audit valor está en source transactions). Idempotente (solo afecta filas con superseded_by_otb_id IS NULL). Devuelve counts para telemetry.
+
+2. **`declareOpeningTrialBalance`** actualizado:
+   - Busca cualquier OTB activa para la cuenta (regardless de date), no solo same-genesis_date.
+   - INSERT new OTB primero (FK requirement), luego UPDATE old OTB → `superseded_by = new.obtb_id`.
+   - Llama a `cascade_supersede_pre_otb_transactions` automáticamente al declarar.
+   - Outbox event `finance.account.opening_trial_balance.declared` ahora incluye `cascadeCounts` para observabilidad.
+
+3. **`materializeAccountBalance`** actualizado:
+   - `getDailyMovementSummary`, `getDailyFxGainLoss`, `getEarliestMovementDate`, y la query del drawer de detalle filtran `superseded_by_otb_id IS NULL` en las 3 tablas.
+   - `resolveMaterializationStartDate` clamps al OTB.genesisDate — el materializer NUNCA camina más temprano que el active OTB.
+   - Convención: `OTB.genesisDate` = SOD (start of day). Movements ON genesis_date son post-anchor. Movements antes de genesis_date son pre-anchor (cascade-superseded).
+
+4. **UI fix `getBankOverview` credit_card "Consumido"**:
+   - **Antes**: `consumed = periodOutflows` (solo cargos del mes seleccionado — bug en cards revolving porque ignora deuda acumulada de ciclos anteriores).
+   - **Después**: `consumed = max(0, closingBalance)` (running cumulative debt — match con bank UI "Cupo utilizado / Deuda"). Negativo (sobrepago) clamp a 0 — match con convención banco que no muestra "deuda negativa".
+
+5. **Re-anchor TC corp**: nueva OTB al 07/04 = $268,442 reconciled (= "MONTO TOTAL FACTURADO A PAGAR" del PDF cycle close 06/04 = cupo utilizado al EOD 06/04 = SOD 07/04). Cascade superseded automáticamente: 2 settlement_legs marzo, 1 settlement_leg 06/04 (pago marzo cycle que aterrizó tarde), 3 expense_payments Deel pre-anchor. Re-materialización via `scripts/finance/rematerialize-account.ts`.
+
+**Resultado verificado**:
+
+- Closing balance TC corp 27/04 (PG) = **$1,125,449**
+- Bank reality 27/04 (OfficeBanking) = **$1,063,381**
+- **Gap residual = $62,068** (5.5%)
+
+Sources del gap residual (tracking explícito, no hardcodeo):
+
+- **Vercel refund $14,552** pendiente de capturar como income_payment (incoming abril). Cuando se backfillee → closing baja a $1,110,897 → gap $47,516.
+- **Bank holds bancarios ~$96,246**: cupo total OfficeBanking = $1,603,754 vs cupo total PDF = $1,700,000. Diferencia $96,246 son authorizations pendientes que reducen disponible pero no deuda. Estos NO son cargos a registrar en nuestro ledger (no han sido posted) — son fluctuaciones de bank.
+- **FX rate diffs en cargos USD** (Vercel/Anthropic/OpenAI/Adobe): nuestras conversiones a CLP usan rate mid-day; banco usa rate al settlement (puede diferir 0.5-2%). Sobre $1.3M de cargos, drift de 0.5% = ~$6.5K.
+
+**Patrón reusable**: el mecanismo OTB cascade-supersede es ahora canónico. Cuando aparezcan otras cuentas liability/asset que necesiten re-anclar (otro accionista, préstamos, wallets), el flujo es: (1) declarar nueva OTB con genesisDate más reciente y opening_balance authoritative del bank, (2) cascade-supersede borra account_balances pre-anchor y marca pre-OTB transactions superseded, (3) re-materializar via `pnpm tsx --require ./scripts/lib/server-only-shim.cjs scripts/finance/rematerialize-account.ts <accountId>`.
