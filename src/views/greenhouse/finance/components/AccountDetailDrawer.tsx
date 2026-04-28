@@ -38,22 +38,40 @@ import {
   YAxis
 } from '@/libs/Recharts'
 import type { InstrumentCategory } from '@/config/payment-instruments'
+import {
+  resolveInstrumentDetailPresentation,
+  type InstrumentDetailProfile
+} from '@/lib/finance/instrument-presentation'
+import type { TreasuryBankAccountOverview } from '@/lib/finance/account-balances'
 
-type AccountOverview = {
-  accountId: string
-  accountName: string
-  bankName: string | null
-  currency: string
-  instrumentCategory: string | null
-  providerSlug: string | null
-  openingBalance: number
-  periodInflows: number
-  periodOutflows: number
-  closingBalance: number
-  discrepancy: number
-  reconciliationStatus: string | null
-  reconciliationPeriodId: string | null
-  isPeriodClosed: boolean
+// TASK-714 — drawer consumes the canonical TreasuryBankAccountOverview shape
+// directly (extended with cardLastFour/cardNetwork/accountKind by the API).
+// Optional fields are typed loose because the read-model cutover (TASK-705)
+// still streams payloads in flight.
+type AccountOverview = Pick<
+  TreasuryBankAccountOverview,
+  | 'accountId'
+  | 'accountName'
+  | 'bankName'
+  | 'currency'
+  | 'instrumentCategory'
+  | 'providerSlug'
+  | 'openingBalance'
+  | 'periodInflows'
+  | 'periodOutflows'
+  | 'closingBalance'
+  | 'discrepancy'
+  | 'reconciliationStatus'
+  | 'reconciliationPeriodId'
+  | 'isPeriodClosed'
+  | 'creditLimit'
+  | 'metadata'
+> & {
+  // Always present after TASK-714 contract extension; defaulted defensively
+  // until the read-model cutover lands.
+  accountKind?: 'asset' | 'liability'
+  cardLastFour?: string | null
+  cardNetwork?: string | null
 }
 
 type AccountBalance = {
@@ -237,6 +255,52 @@ const AccountDetailDrawer = ({ open, accountId, year, month, onClose, onSuccess 
     outflows: point.periodOutflows
   })) || []
 
+  // TASK-714 — derive presentation profile from the account semantic identity.
+  // The drawer renders strictly from the profile; it does not interpret
+  // accounting rules per category. Fallback profile guards against the brief
+  // window where `detail` is null (initial load or error state).
+  const profile: InstrumentDetailProfile | null = useMemo(() => {
+    if (!detail?.account) return null
+
+    // Bridge: cast the drawer's narrow AccountOverview to the canonical type
+    // expected by the resolver. All fields the resolver reads are guaranteed
+    // by the TASK-714 contract extension; the rest defaults safely.
+    const account = detail.account as AccountOverview
+
+    const bridged: TreasuryBankAccountOverview = {
+      accountId: account.accountId,
+      accountName: account.accountName,
+      bankName: account.bankName,
+      currency: account.currency,
+      instrumentCategory: account.instrumentCategory,
+      providerSlug: account.providerSlug,
+      accountType: 'unknown',
+      openingBalance: account.openingBalance,
+      periodInflows: account.periodInflows,
+      periodOutflows: account.periodOutflows,
+      closingBalance: detail.currentBalance.closingBalance,
+      closingBalanceClp: null,
+      fxRateUsed: null,
+      fxGainLossClp: 0,
+      fxGainLossRealizedClp: 0,
+      fxGainLossTranslationClp: 0,
+      transactionCount: 0,
+      lastTransactionAt: null,
+      isPeriodClosed: account.isPeriodClosed,
+      discrepancy: account.discrepancy,
+      reconciliationStatus: account.reconciliationStatus,
+      reconciliationPeriodId: account.reconciliationPeriodId,
+      creditLimit: account.creditLimit ?? null,
+      metadata: account.metadata ?? null,
+      drift: null,
+      accountKind: account.accountKind ?? 'asset',
+      cardLastFour: account.cardLastFour ?? null,
+      cardNetwork: account.cardNetwork ?? null
+    }
+
+    return resolveInstrumentDetailPresentation(bridged)
+  }, [detail])
+
   return (
     <Drawer
       anchor='right'
@@ -246,12 +310,12 @@ const AccountDetailDrawer = ({ open, accountId, year, month, onClose, onSuccess 
     >
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 4 }}>
         <Box>
-          <Typography variant='h6'>Detalle de cuenta</Typography>
+          <Typography variant='h6'>{profile?.drawerTitle ?? 'Detalle del instrumento'}</Typography>
           <Typography variant='body2' color='text.secondary'>
-            Balance, movimiento reciente y cierre del período sobre el ledger real de tesorería.
+            {profile?.drawerSubtitle ?? 'Cargando...'}
           </Typography>
         </Box>
-        <IconButton size='small' onClick={onClose}>
+        <IconButton size='small' onClick={onClose} aria-label='Cerrar detalle'>
           <i className='tabler-x' />
         </IconButton>
       </Box>
@@ -283,6 +347,17 @@ const AccountDetailDrawer = ({ open, accountId, year, month, onClose, onSuccess 
                 en segundo plano; los movimientos recientes podrían demorar unos minutos en aparecer.
               </Alert>
             ) : null}
+            {profile?.contextBanner ? (
+              <Alert
+                severity={profile.contextBanner.tone === 'warning' ? 'warning' : 'info'}
+                variant='outlined'
+                role='status'
+                aria-live='polite'
+              >
+                {profile.contextBanner.text}
+              </Alert>
+            ) : null}
+
             <Card variant='outlined'>
               <CardContent>
                 <Stack
@@ -294,9 +369,23 @@ const AccountDetailDrawer = ({ open, accountId, year, month, onClose, onSuccess 
                   <Stack spacing={2}>
                     <PaymentInstrumentChip
                       providerSlug={detail.account.providerSlug}
-                      instrumentName={`${detail.account.accountName} · ${detail.account.currency}`}
+                      instrumentName={detail.account.accountName}
                       instrumentCategory={(detail.account.instrumentCategory || 'bank_account') as InstrumentCategory}
                     />
+                    {profile && profile.identityFields.length > 0 ? (
+                      <Stack direction='row' spacing={3} useFlexGap flexWrap='wrap'>
+                        {profile.identityFields.map(field => (
+                          <Box key={field.label} sx={{ display: 'flex', flexDirection: 'column' }}>
+                            <Typography variant='caption' color='text.secondary' sx={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                              {field.label}
+                            </Typography>
+                            <Typography variant='body2' sx={{ fontWeight: 600, fontFamily: field.label === 'Tarjeta' ? 'monospace' : undefined }}>
+                              {field.value}
+                            </Typography>
+                          </Box>
+                        ))}
+                      </Stack>
+                    ) : null}
                     <Stack direction='row' spacing={2} useFlexGap flexWrap='wrap'>
                       <CustomChip
                         round='true'
@@ -324,40 +413,26 @@ const AccountDetailDrawer = ({ open, accountId, year, month, onClose, onSuccess 
               </CardContent>
             </Card>
 
-            <Grid container spacing={4}>
-              <Grid size={{ xs: 12, md: 4 }}>
-                <HorizontalWithSubtitle
-                  title='Saldo actual'
-                  stats={formatAmount(detail.currentBalance.closingBalance, detail.account.currency)}
-                  subtitle='Snapshot al cierre del período consultado'
-                  avatarIcon='tabler-building-bank'
-                  avatarColor='primary'
-                />
+            {profile ? (
+              <Grid container spacing={4}>
+                {profile.kpis.map(kpi => (
+                  <Grid key={kpi.key} size={{ xs: 12, md: 4 }}>
+                    <HorizontalWithSubtitle
+                      title={kpi.title}
+                      stats={kpi.value !== null ? formatAmount(kpi.value, detail.account.currency) : 'Sin datos'}
+                      subtitle={kpi.subtitle}
+                      avatarIcon={kpi.avatarIcon}
+                      avatarColor={kpi.avatarColor}
+                    />
+                  </Grid>
+                ))}
               </Grid>
-              <Grid size={{ xs: 12, md: 4 }}>
-                <HorizontalWithSubtitle
-                  title='Ingresos período'
-                  stats={formatAmount(detail.currentBalance.periodInflows, detail.account.currency)}
-                  subtitle='Entradas registradas en la cuenta'
-                  avatarIcon='tabler-arrow-down-left'
-                  avatarColor='success'
-                />
-              </Grid>
-              <Grid size={{ xs: 12, md: 4 }}>
-                <HorizontalWithSubtitle
-                  title='Salidas período'
-                  stats={formatAmount(detail.currentBalance.periodOutflows, detail.account.currency)}
-                  subtitle='Pagos, fees o transferencias desde este instrumento'
-                  avatarIcon='tabler-arrow-up-right'
-                  avatarColor='error'
-                />
-              </Grid>
-            </Grid>
+            ) : null}
 
             <Card>
               <CardHeader
-                title='Últimos 12 meses'
-                subheader='Ingresos y salidas materializados por cuenta'
+                title={profile?.chart.title ?? 'Últimos 12 meses'}
+                subheader={profile?.chart.subtitle ?? ''}
               />
               <CardContent>
                 <AppRecharts>
@@ -367,8 +442,18 @@ const AccountDetailDrawer = ({ open, accountId, year, month, onClose, onSuccess 
                       <XAxis dataKey='label' />
                       <YAxis />
                       <Tooltip />
-                      <Bar dataKey='inflows' name='Ingresos' fill='#3DBA5D' radius={[4, 4, 0, 0]} />
-                      <Bar dataKey='outflows' name='Salidas' fill='#FF4D49' radius={[4, 4, 0, 0]} />
+                      <Bar
+                        dataKey='inflows'
+                        name={profile?.chart.inflowLabel ?? 'Ingresos'}
+                        fill={profile?.chart.inflowColor ?? '#3DBA5D'}
+                        radius={[4, 4, 0, 0]}
+                      />
+                      <Bar
+                        dataKey='outflows'
+                        name={profile?.chart.outflowLabel ?? 'Salidas'}
+                        fill={profile?.chart.outflowColor ?? '#FF4D49'}
+                        radius={[4, 4, 0, 0]}
+                      />
                     </BarChart>
                   </ResponsiveContainer>
                 </AppRecharts>
@@ -377,8 +462,8 @@ const AccountDetailDrawer = ({ open, accountId, year, month, onClose, onSuccess 
 
             <Card>
               <CardHeader
-                title='Movimientos recientes'
-                subheader='Timeline operativo leído desde settlement legs y fallback de payment ledger'
+                title={profile?.movements.sectionTitle ?? 'Movimientos recientes'}
+                subheader={profile?.movements.sectionSubtitle ?? ''}
               />
               <CardContent sx={{ pt: 0 }}>
                 {detail.movements.length === 0 ? (
@@ -393,7 +478,7 @@ const AccountDetailDrawer = ({ open, accountId, year, month, onClose, onSuccess 
                     </Alert>
                   ) : (
                     <Alert severity='info'>
-                      Esta cuenta no tiene movimientos en el período consultado.
+                      {profile?.movements.emptyLabel ?? 'Esta cuenta no tiene movimientos en el período consultado.'}
                     </Alert>
                   )
                 ) : (
@@ -403,38 +488,44 @@ const AccountDetailDrawer = ({ open, accountId, year, month, onClose, onSuccess 
                         <TableRow>
                           <TableCell>Fecha</TableCell>
                           <TableCell>Tipo</TableCell>
-                          <TableCell>Monto</TableCell>
+                          <TableCell>{profile?.movements.amountHeader ?? 'Monto'}</TableCell>
                           <TableCell>Referencia</TableCell>
                           <TableCell>Conciliación</TableCell>
                         </TableRow>
                       </TableHead>
                       <TableBody>
-                        {detail.movements.map(movement => (
-                          <TableRow key={movement.movementId}>
-                            <TableCell>{formatDate(movement.transactionDate)}</TableCell>
-                            <TableCell>
-                              <Stack spacing={0.5}>
-                                <Typography variant='body2' sx={{ fontWeight: 500 }}>
-                                  {movement.movementType}
-                                </Typography>
-                                <Typography variant='caption' color='text.secondary'>
-                                  {movement.direction === 'incoming' ? 'Entrada' : 'Salida'} · {movement.movementSource}
-                                </Typography>
-                              </Stack>
-                            </TableCell>
-                            <TableCell>{formatAmount(movement.amount, movement.currency)}</TableCell>
-                            <TableCell>{movement.providerReference || '—'}</TableCell>
-                            <TableCell>
-                              <CustomChip
-                                round='true'
-                                size='small'
-                                variant='tonal'
-                                color={movement.isReconciled ? 'success' : 'warning'}
-                                label={movement.isReconciled ? 'Conciliado' : 'Por conciliar'}
-                              />
-                            </TableCell>
-                          </TableRow>
-                        ))}
+                        {detail.movements.map(movement => {
+                          const directionLabel = movement.direction === 'incoming'
+                            ? (profile?.movements.directionLabels.incoming ?? 'Entrada')
+                            : (profile?.movements.directionLabels.outgoing ?? 'Salida')
+
+                          return (
+                            <TableRow key={movement.movementId}>
+                              <TableCell>{formatDate(movement.transactionDate)}</TableCell>
+                              <TableCell>
+                                <Stack spacing={0.5}>
+                                  <Typography variant='body2' sx={{ fontWeight: 500 }}>
+                                    {directionLabel}
+                                  </Typography>
+                                  <Typography variant='caption' color='text.secondary'>
+                                    {movement.movementType} · {movement.movementSource}
+                                  </Typography>
+                                </Stack>
+                              </TableCell>
+                              <TableCell>{formatAmount(movement.amount, movement.currency)}</TableCell>
+                              <TableCell>{movement.providerReference || '—'}</TableCell>
+                              <TableCell>
+                                <CustomChip
+                                  round='true'
+                                  size='small'
+                                  variant='tonal'
+                                  color={movement.isReconciled ? 'success' : 'warning'}
+                                  label={movement.isReconciled ? 'Conciliado' : 'Por conciliar'}
+                                />
+                              </TableCell>
+                            </TableRow>
+                          )
+                        })}
                       </TableBody>
                     </Table>
                   </TableContainer>
