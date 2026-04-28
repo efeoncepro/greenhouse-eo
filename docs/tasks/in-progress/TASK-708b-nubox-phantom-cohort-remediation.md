@@ -2,13 +2,13 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto` (deuda histórica con plata real adentro; bloquea `CHECK VALIDATE` final de TASK-708)
 - Effort: `Medio-Alto`
 - Type: `remediation`
 - Epic: `[optional EPIC-###]`
-- Status real: `Diseno`
+- Status real: `Helpers + scripts + runbook entregados 2026-04-28; pendiente de ejecución apply en Postgres dev/prod`
 - Rank: `TBD`
 - Domain: `finance`
 - Blocked by: `TASK-708` (necesita las invariantes activas para no reintroducir contaminación durante la remediación)

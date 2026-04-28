@@ -27,3 +27,25 @@ export { adoptSignalManually } from './adopt-signal'
 export type { AdoptSignalManuallyResult } from './adopt-signal'
 export { dismissSignal } from './dismiss-signal'
 export type { DismissSignalResult } from './dismiss-signal'
+export {
+  listCohortAEvidence,
+  listCohortBEvidence,
+  listCohortCEvidence,
+  backfillCohortAToSignals,
+  backfillCohortBToSignals
+} from './cohort-backfill'
+export type {
+  CohortAEvidenceRow,
+  CohortBEvidenceRow,
+  CohortCEvidenceRow,
+  BackfillResult
+} from './cohort-backfill'
+export {
+  classifyHistoricalSignal,
+  applyHistoricalRemediation,
+  verifyCohortCResolution
+} from './historical-remediation'
+export type {
+  RemediationOutcome,
+  ClassificationProposal
+} from './historical-remediation'

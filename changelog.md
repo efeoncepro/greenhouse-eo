@@ -2,6 +2,47 @@
 
 ## 2026-04-28
 
+### 2026-04-28 — TASK-708b helpers + scripts + runbook canónico (in-progress)
+
+Entregable: framework completo de remediación histórica para cohortes Nubox phantom. Listo para ejecutar el apply runbook contra Postgres dev/prod.
+
+**Modelo de datos extendido**:
+
+- Migración `20260428143356496_task-708b-extend-amount-paid-triggers-include-superseded-at` (creada, no aplicada — vive como Paso 0 del runbook): extiende `fn_sync_expense_amount_paid` y `fn_recompute_income_amount_paid` para excluir filas con `superseded_at IS NOT NULL` (independiente de `superseded_by_payment_id`/`superseded_by_otb_id`). Habilita el outcome `dismissed_no_cash` sin replacement.
+- Migración `20260428143357179_task-708b-validate-settlement-legs-principal-requires-instrument` (creada, no aplicada — vive como Paso 5 final del runbook): aplica `VALIDATE CONSTRAINT settlement_legs_principal_requires_instrument`. Tiene guard `DO $$ ... RAISE EXCEPTION` que falla si quedan violations residuales.
+
+**Helpers nuevos** `src/lib/finance/`:
+
+- `payment-instruments/dismiss-phantom.ts`: `dismissIncomePhantom` y `dismissExpensePhantom`. Marcan phantom con `superseded_at + superseded_reason` SIN replacement. Idempotente, emiten outbox events `finance.{income,expense}.payment_dismissed_historical`. Razón obligatoria 8+ chars.
+- `external-cash-signals/cohort-backfill.ts`: `listCohortAEvidence` / `listCohortBEvidence` / `listCohortCEvidence` (read-only inventory) + `backfillCohortAToSignals` / `backfillCohortBToSignals` (idempotente vía `UNIQUE (source_system, source_event_id)`). Resuelve `space_id` desde `income.organization_id → spaces` con fallback al space "Greenhouse Demo".
+- `external-cash-signals/historical-remediation.ts`: `classifyHistoricalSignal` (read-only proposal — bank_statement_row match → `repaired_with_account`; D5 rule única → `repaired_with_account`; sino → `dismissed_no_cash` conservador) + `applyHistoricalRemediation` (transactional, idempotente — UPDATE in-place phantom + reanchor leg para repaired/superseded; dismissPhantomPayment para dismissed; UPDATE signal a estado terminal con `resolved_by_user_id`) + `verifyCohortCResolution` (post-apply check de Cohorte C clean).
+
+**Estrategia canónica para `repaired_with_account`**: UPDATE in-place del phantom poblando `payment_account_id` (en lugar de "reemplazar phantom con payment limpio nuevo"). Convierte el phantom en payment canónico LIMPIO sin perder audit ni reanchor del bank_statement_row. Coherente con el caso $6.9M PAY-NUBOX-inc-3699924.
+
+**4 CLI scripts** registrados en `package.json` con flags `--dry-run` / `--apply` / `--chunk-size N` / `--filter-cohort A|B`:
+
+- `pnpm finance:task708b-inventory [--out path]` — read-only evidence JSON
+- `pnpm finance:task708b-backfill-signals [--apply] [--cohort A|B]`
+- `pnpm finance:task708b-classify [--out path]` — read-only proposals
+- `pnpm finance:task708b-apply --report path --actor user [--apply] [--chunk-size N]`
+
+**Runbook canónico** `docs/operations/runbooks/TASK-708b-nubox-phantom-remediation.md` con: pre-flight checklist, 6 pasos numerados (migración 1 → inventory → backfill → classify → apply → migración 2 VALIDATE), rollback procedures, caso especial $6.9M documentado, sección lecciones aprendidas, generalización a futuras cohortes (Previred / file imports / HubSpot / Stripe).
+
+**Tests**: 30/30 verde en `src/lib/finance/external-cash-signals/__tests__/`. Nuevos: 4 tests para `classifyHistoricalSignal` (bank_row match, D5 fallback, dismissed default, ambiguous = conservative), 4 para `applyHistoricalRemediation` (income dismiss, idempotent already-dismissed, missing account guard, unknown documentKind), 5 para `cohort-backfill` (dry-run no-op, fresh creation, idempotency, fallback space, error handling per-row).
+
+**Validación live datos** (Postgres `efeonce-group:us-east4:greenhouse-pg-dev`, 2026-04-28):
+
+- Cohorte A: 23 income_payments, total $32,183,823 CLP, rango 2024-07-05 a 2026-04-13.
+- Cohorte B: 65 expense_payments, total $8,835,024 CLP, rango 2024-04-24 a 2026-02-27 (más antigua que el spec).
+- Cohorte C: 4 settlement_legs (3 receipt + 1 funding). El caso $6.9M ya tiene `bank_statement_row` reconciliada → outcome auto `repaired_with_account` con `santander-clp`. **Open Question del spec resuelta sin pedir cartola adicional.**
+
+**Pendiente** (requiere autorización humana antes de tocar Postgres):
+
+- Paso 0: aplicar migración 1.
+- Pasos 1-4: inventory → backfill --apply → classify → apply --apply.
+- Paso 5: aplicar migración 2 (VALIDATE).
+- Paso 6: verificar Acceptance queries == 0 y `ledger-health.task708.paymentsPendingAccountResolutionHistorical === 0`.
+
 ### 2026-04-28 — TASK-708 followups: UI cola admin + seed reglas Nubox + RCP integration
 
 Cierre del trabajo de TASK-708 antes de pasar a TASK-708b. Cuatro followups que dejan la plataforma operativa para la remediación histórica.

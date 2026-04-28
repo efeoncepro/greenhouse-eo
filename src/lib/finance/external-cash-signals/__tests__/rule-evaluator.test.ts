@@ -3,7 +3,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 const mockRunGreenhousePostgresQuery = vi.fn()
 
 vi.mock('@/lib/postgres/client', () => ({
-  runGreenhousePostgresQuery: (...args: unknown[]) => mockRunGreenhousePostgresQuery(...args)
+  runGreenhousePostgresQuery: (...args: unknown[]) => mockRunGreenhousePostgresQuery(...args),
+  withGreenhousePostgresTransaction: vi.fn()
 }))
 
 import { EVALUATOR_VERSION, evaluateSignalAccount } from '@/lib/finance/external-cash-signals'
