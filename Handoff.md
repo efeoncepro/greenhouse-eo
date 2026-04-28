@@ -1,5 +1,41 @@
 # Handoff.md
 
+## Sesion 2026-04-28 — Greenhouse Domains And Modules Architecture V1 creada
+
+- Se creó `docs/architecture/GREENHOUSE_DOMAINS_MODULES_ARCHITECTURE_V1.md` para documentar Core Domains y Domain Modules como capa separada de Core Platform, Apps, Plugins y Service Modules.
+- Decisión: Payroll, Finance, Cost, Agency y dominios similares son dominios nativos Greenhouse; sus módulos internos no deben modelarse automáticamente como Plugins.
+- Regla clave: un Domain Module organiza una subcapacidad funcional estable; un Plugin la expande; una App la enriquece con dependencia externa; un Service Module sigue siendo producto/capacidad comercial asignable a clientes.
+- Se resolvieron y documentaron los contratos faltantes antes de proponer runtime: Domain Registry read-only primero, dependency graph obligatorio, lifecycle común, version compatibility, data ownership, readiness envelope, admin control plane read-only inicial y naming discipline.
+- `GREENHOUSE_APPS_ARCHITECTURE_V1.md` ahora exige `consumerDomains`/`consumerModules` y compatibilidad contra Core/Domains/Modules; `GREENHOUSE_PLUGINS_ARCHITECTURE_V1.md` exige `extendedDomains`/`extendedModules` y validación del dependency graph.
+- Se actualizaron referencias en `docs/README.md`, `project_context.md`, `GREENHOUSE_CORE_PLATFORM_ARCHITECTURE_V1.md`, `GREENHOUSE_APPS_ARCHITECTURE_V1.md` y `GREENHOUSE_PLUGINS_ARCHITECTURE_V1.md`.
+- No se tocó runtime ni código productivo.
+
+## Sesion 2026-04-28 — Greenhouse Core Platform Architecture V1 creada
+
+- Se creó `docs/architecture/GREENHOUSE_CORE_PLATFORM_ARCHITECTURE_V1.md` para mover la definición de Core fuera del documento de Plugins.
+- Core Platform queda definido como runtime base no instalable/no desinstalable: auth, tenant context, access governance, API Platform runtime, canonical object graph, outbox/event spine, webhook base, secret resolution, audit/observability, platform health base, notification foundation y Home shell base.
+- La regla de clasificación Core vs Native Plugin vs Connected App ahora vive en ese documento; `GREENHOUSE_PLUGINS_ARCHITECTURE_V1.md` fue ajustado para referenciar Core sin apropiarse de su definición.
+- `docs/README.md` y `project_context.md` actualizados. No se tocó runtime ni código productivo.
+
+## Sesion 2026-04-28 — Greenhouse Plugins Architecture V1 creada
+
+- Se creó `docs/architecture/GREENHOUSE_PLUGINS_ARCHITECTURE_V1.md` como contrato canónico para modelar Plugins como paquetes funcionales Greenhouse instalables, versionables y gobernables.
+- La spec separa explícitamente Apps, Plugins, Tools, Workflows, Service Modules, Views, Entitlements y Route Groups.
+- Decisión V1: Plugins son manifests code-versioned sobre código existente; no dynamic loading, no marketplace y no install/uninstall interactivo hasta tener readiness/lifecycle probados.
+- Regla clave documentada: instalar Plugin no concede permisos ni activa vistas automáticamente; todo plugin con UI/acciones debe declarar `views` y `entitlements` cuando apliquen.
+- Se agregó criterio explícito para clasificar piezas como **Core Platform**, **Native Plugin** o **Connected App**, con ejemplos concretos (Nubox, Teams, Mercado Público, Previred, Creative Hub, HubSpot, Home Nexa, API Platform y Platform Health).
+- Candidatos iniciales documentados: `platform.health`, `notifications.teams-delivery`, `communications.manual-announcements`, `finance.external-cash-signals`, `finance.bank-read-model`, `payroll.previred`, `commercial.public-tenders`, `capabilities.creative-hub`, `capabilities.crm-command-center`, `home.nexa`.
+- `docs/README.md` y `project_context.md` actualizados. No se tocó runtime ni código productivo.
+
+## Sesion 2026-04-28 — Greenhouse Apps Architecture V1 creada
+
+- Se creó `docs/architecture/GREENHOUSE_APPS_ARCHITECTURE_V1.md` como contrato canónico para evolucionar `integrations` hacia **Greenhouse Apps** instalables, versionables, gobernables y observables.
+- La spec define `App Manifest`, `App Catalog`, `App Installation`, `App Binding`, `App Credential Reference`, runtime state, readiness, lifecycle, uninstall semantics, versioning, API Platform alignment, safe modes, data ownership, security, relation con tools/agentes y adopción gradual de integraciones existentes.
+- Decisión V1: no reemplazar `greenhouse_sync.integration_registry`; usarlo como runtime state legacy mientras Apps introduce manifests code-versioned y adopción progresiva (`legacy_active` / `discovered` → `managed_active`).
+- Regla clave documentada: una App instalada no activa permisos, views ni service modules. Apps, `service_modules`, `views`, `entitlements`, `routeGroups` y startup policy quedan como planos separados.
+- `docs/README.md` y `project_context.md` actualizados para registrar la arquitectura.
+- No se tocó runtime ni código productivo. Validación documental: pendiente solo revisar diff/typos si se quiere pulir copy.
+
 ## Sesion 2026-04-28 — TASK-716 Manual Team Announcements creada
 
 - A partir del smoke exitoso del Greenhouse Teams Bot en el chat `EO Team`, se creó `TASK-716` para formalizar una surface de comunicaciones manuales desde Greenhouse/Nexa.
