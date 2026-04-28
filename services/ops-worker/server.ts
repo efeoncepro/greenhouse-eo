@@ -896,6 +896,68 @@ const handleFinanceRematerializeBalances = async (req: IncomingMessage, res: Ser
         })
 
         results.push({ accountId: r.accountId, days: r.daysMaterialized, closing: r.finalClosingBalance })
+
+        // TASK-705 — refresh monthly read model para todos los meses tocados.
+        // Idempotente; cada (accountId, year, month) resulta en UPSERT atomico.
+        const startD = new Date(`${seedDate}T00:00:00Z`)
+        const endD = new Date(`${endDate}T00:00:00Z`)
+        const startYM = startD.getUTCFullYear() * 12 + startD.getUTCMonth()
+        const endYM = endD.getUTCFullYear() * 12 + endD.getUTCMonth()
+
+        for (let ym = startYM; ym <= endYM; ym++) {
+          const year = Math.floor(ym / 12)
+          const month = (ym % 12) + 1
+
+          try {
+            const probe = await runGreenhousePostgresQuery<{ ok: number } & Record<string, unknown>>(
+              `SELECT 1 AS ok FROM greenhouse_finance.account_balances WHERE account_id = $1
+                 AND EXTRACT(YEAR FROM balance_date)::int = $2
+                 AND EXTRACT(MONTH FROM balance_date)::int = $3 LIMIT 1`,
+              [acct.account_id, year, month]
+            )
+
+            if (probe.length > 0) {
+              await runGreenhousePostgresQuery(
+                `INSERT INTO greenhouse_finance.account_balances_monthly (
+                   balance_id, account_id, space_id, balance_year, balance_month, currency,
+                   opening_balance, closing_balance, closing_balance_clp,
+                   period_inflows, period_outflows,
+                   fx_gain_loss_clp, fx_gain_loss_realized_clp, fx_gain_loss_translation_clp,
+                   transaction_count, last_transaction_at, computed_at
+                 )
+                 WITH buckets AS (
+                   SELECT * FROM greenhouse_finance.account_balances
+                   WHERE account_id = $1
+                     AND EXTRACT(YEAR FROM balance_date)::int = $2
+                     AND EXTRACT(MONTH FROM balance_date)::int = $3
+                 ),
+                 o AS (SELECT opening_balance FROM buckets ORDER BY balance_date ASC LIMIT 1),
+                 c AS (SELECT space_id, currency, closing_balance, closing_balance_clp FROM buckets ORDER BY balance_date DESC LIMIT 1),
+                 s AS (SELECT SUM(period_inflows)::numeric AS pi, SUM(period_outflows)::numeric AS po,
+                              SUM(fx_gain_loss_clp)::numeric AS fxa, SUM(fx_gain_loss_realized_clp)::numeric AS fxr,
+                              SUM(fx_gain_loss_translation_clp)::numeric AS fxt, SUM(transaction_count)::int AS tc,
+                              MAX(last_transaction_at) AS lta FROM buckets)
+                 SELECT $4, $1, c.space_id, $2, $3, c.currency, o.opening_balance, c.closing_balance,
+                        c.closing_balance_clp, s.pi, s.po, s.fxa, s.fxr, s.fxt, s.tc, s.lta, NOW()
+                 FROM c, o, s
+                 ON CONFLICT (account_id, balance_year, balance_month) DO UPDATE
+                 SET space_id = EXCLUDED.space_id, currency = EXCLUDED.currency,
+                     opening_balance = EXCLUDED.opening_balance, closing_balance = EXCLUDED.closing_balance,
+                     closing_balance_clp = EXCLUDED.closing_balance_clp,
+                     period_inflows = EXCLUDED.period_inflows, period_outflows = EXCLUDED.period_outflows,
+                     fx_gain_loss_clp = EXCLUDED.fx_gain_loss_clp,
+                     fx_gain_loss_realized_clp = EXCLUDED.fx_gain_loss_realized_clp,
+                     fx_gain_loss_translation_clp = EXCLUDED.fx_gain_loss_translation_clp,
+                     transaction_count = EXCLUDED.transaction_count,
+                     last_transaction_at = EXCLUDED.last_transaction_at,
+                     computed_at = NOW()`,
+                [acct.account_id, year, month, `acctbal-mo-${acct.account_id}-${year}-${String(month).padStart(2, '0')}`]
+              )
+            }
+          } catch {
+            // Mes-failure no aborta el resto; idempotente.
+          }
+        }
       } catch (err) {
         const message = err instanceof Error ? err.message : String(err)
 

@@ -16,6 +16,7 @@ import {
   type FinanceCurrency
 } from '@/lib/finance/shared'
 import { getBankFxPnlBreakdown } from '@/lib/finance/fx-pnl'
+import { buildFreshnessSignal } from '@/lib/finance/bank-freshness'
 import { getActiveOpeningTrialBalance } from '@/lib/finance/account-opening-trial-balance'
 import { getOpenDriftSummariesForAccounts } from '@/lib/finance/reconciliation/snapshots'
 import { captureWithDomain } from '@/lib/observability/capture'
@@ -233,6 +234,17 @@ export type TreasuryFxBreakdown = {
   isDegraded: boolean
 }
 
+export type TreasuryFreshness = {
+  /** Maximum computed_at across the snapshots feeding this response (ISO timestamp). null = sin snapshots. */
+  lastMaterializedAt: string | null
+  /** Seconds since lastMaterializedAt at request time. null = sin snapshots. */
+  ageSeconds: number | null
+  /** TASK-705 — declarado stale si ageSeconds excede el threshold operativo (default 3600s = 1h). */
+  isStale: boolean
+  /** Optional human label (e.g., "Hace 5 minutos"). UI puede preferirlo a calcular desde lastMaterializedAt. */
+  label: string | null
+}
+
 export type TreasuryBankOverview = {
   period: {
     year: number
@@ -263,6 +275,8 @@ export type TreasuryBankOverview = {
     available: number | null
   }>
   unassignedPayments: TreasuryUnassignedPayment[]
+  /** TASK-705 — freshness signal del snapshot canónico. */
+  freshness?: TreasuryFreshness
 }
 
 export type TreasuryUnassignedPayment = {
@@ -291,6 +305,8 @@ export type TreasuryBankAccountDetail = {
     declarationReason: string
     supersededTransactionsCount: number
   } | null
+  /** TASK-705 — freshness signal por cuenta. */
+  freshness?: TreasuryFreshness
   history: Array<{
     month: string
     closingBalance: number
@@ -1138,12 +1154,21 @@ export const getBankOverview = async ({
   year,
   month,
   actorUserId,
-  client
+  client,
+  materialize = 'force'
 }: {
   year?: number | null
   month?: number | null
   actorUserId?: string | null
   client?: QueryableClient
+  /**
+   * TASK-705 — controla si el reader fuerza materialización inline o solo lee snapshots.
+   * - `'force'` (default, backward-compat): rematerializa antes de leer (uso pre-705).
+   * - `'skip'`: lee snapshots existentes sin materializar (uso canónico web post-705).
+   * La materialización canónica vive en lanes reactivas (accountBalancesProjection)
+   * + ops-worker cron (`ops-finance-rematerialize-balances`).
+   */
+  materialize?: 'force' | 'skip'
 }): Promise<TreasuryBankOverview> => {
   const now = new Date()
   const resolvedYear = year ?? now.getUTCFullYear()
@@ -1162,12 +1187,14 @@ export const getBankOverview = async ({
     periodStart
   ) || periodStart
 
-  await materializeAccountBalancesForPeriod({
-    startDate: periodStart,
-    endDate: periodEnd,
-    actorUserId,
-    client
-  })
+  if (materialize === 'force') {
+    await materializeAccountBalancesForPeriod({
+      startDate: periodStart,
+      endDate: periodEnd,
+      actorUserId,
+      client
+    })
+  }
 
   const rows = await queryRows<AccountOverviewRow>(
     `
@@ -1384,6 +1411,19 @@ export const getBankOverview = async ({
       }
     })
 
+  // TASK-705 — freshness signal: max(computed_at) across active accounts.
+  const freshnessRows = await queryRows<{ last_materialized_at: string | null } & Record<string, unknown>>(
+    `
+      SELECT MAX(computed_at)::text AS last_materialized_at
+      FROM greenhouse_finance.account_balances
+      WHERE balance_date BETWEEN $1::date AND $2::date
+    `,
+    [periodStart, periodEnd],
+    client
+  )
+
+  const freshness = buildFreshnessSignal(freshnessRows[0]?.last_materialized_at ?? null)
+
   return {
     period: {
       year: resolvedYear,
@@ -1403,7 +1443,8 @@ export const getBankOverview = async ({
     },
     accounts,
     creditCards,
-    unassignedPayments
+    unassignedPayments,
+    freshness
   }
 }
 
@@ -1412,15 +1453,32 @@ export const getBankAccountDetail = async ({
   year,
   month,
   actorUserId,
-  client
+  client,
+  materialize = 'force',
+  historySource = 'recompute'
 }: {
   accountId: string
   year?: number | null
   month?: number | null
   actorUserId?: string | null
   client?: QueryableClient
+  /**
+   * TASK-705 — control de materialización inline (idem getBankOverview).
+   * - `'force'` (default, backward-compat): rematerializa antes de leer (uso pre-705).
+   * - `'skip'`: lee snapshots existentes sin materializar (uso canónico web post-705).
+   */
+  materialize?: 'force' | 'skip'
+  /**
+   * TASK-705 Slice 2 — fuente del histórico de 12 meses.
+   * - `'recompute'` (default, backward-compat): query `DISTINCT ON (date_trunc('month', balance_date))`
+   *   sobre `account_balances` daily (5+ segundos).
+   * - `'monthly_read_model'`: lee directamente `account_balances_monthly` (sub-100ms).
+   *   Recomendado para web; el read model se mantiene fresco vía proyección reactiva
+   *   o cron `ops-finance-rematerialize-balances`.
+   */
+  historySource?: 'recompute' | 'monthly_read_model'
 }): Promise<TreasuryBankAccountDetail> => {
-  const overview = await getBankOverview({ year, month, actorUserId, client })
+  const overview = await getBankOverview({ year, month, actorUserId, client, materialize })
   const account = overview.accounts.find(item => item.accountId === accountId)
 
   if (!account) {
@@ -1466,42 +1524,72 @@ export const getBankAccountDetail = async ({
 
   const historyStart = subtractMonths(overview.period.startDate, 11)
 
-  await materializeAccountBalancesForPeriod({
-    accountIds: [accountId],
-    startDate: historyStart,
-    endDate: overview.period.endDate,
-    actorUserId,
-    client
-  })
+  if (materialize === 'force') {
+    await materializeAccountBalancesForPeriod({
+      accountIds: [accountId],
+      startDate: historyStart,
+      endDate: overview.period.endDate,
+      actorUserId,
+      client
+    })
+  }
 
-  const historyRows = await queryRows<MonthlyHistoryRow>(
-    `
-      WITH monthly_last_rows AS (
-        SELECT DISTINCT ON (date_trunc('month', balance_date))
-          date_trunc('month', balance_date)::date AS balance_month,
-          closing_balance,
-          closing_balance_clp,
-          period_inflows,
-          period_outflows,
-          fx_gain_loss_clp
-        FROM greenhouse_finance.account_balances
-        WHERE account_id = $1
-          AND balance_date BETWEEN $2::date AND $3::date
-        ORDER BY date_trunc('month', balance_date), balance_date DESC
+  // TASK-705 — la query daily DISTINCT ON cuesta ~5s+ por apertura del drawer.
+  // El read model mensual `account_balances_monthly` (TASK-705 Slice 2) precomputa
+  // los mismos campos y se refresca reactivamente. Switch via historySource.
+  const historyRows = historySource === 'monthly_read_model'
+    ? await queryRows<MonthlyHistoryRow>(
+        `
+          SELECT
+            make_date(balance_year, balance_month, 1)::date AS balance_month,
+            closing_balance::text AS closing_balance,
+            closing_balance_clp::text AS closing_balance_clp,
+            period_inflows::text AS period_inflows,
+            period_outflows::text AS period_outflows,
+            fx_gain_loss_clp::text AS fx_gain_loss_clp
+          FROM greenhouse_finance.account_balances_monthly
+          WHERE account_id = $1
+            AND (balance_year * 100 + balance_month) BETWEEN
+                ($2 * 100 + $3) AND ($4 * 100 + $5)
+          ORDER BY balance_year ASC, balance_month ASC
+        `,
+        [
+          accountId,
+          Number(historyStart.slice(0, 4)),
+          Number(historyStart.slice(5, 7)),
+          Number(overview.period.endDate.slice(0, 4)),
+          Number(overview.period.endDate.slice(5, 7))
+        ],
+        client
       )
-      SELECT
-        balance_month,
-        closing_balance,
-        closing_balance_clp,
-        period_inflows,
-        period_outflows,
-        fx_gain_loss_clp
-      FROM monthly_last_rows
-      ORDER BY balance_month ASC
-    `,
-    [accountId, historyStart, overview.period.endDate],
-    client
-  )
+    : await queryRows<MonthlyHistoryRow>(
+        `
+          WITH monthly_last_rows AS (
+            SELECT DISTINCT ON (date_trunc('month', balance_date))
+              date_trunc('month', balance_date)::date AS balance_month,
+              closing_balance,
+              closing_balance_clp,
+              period_inflows,
+              period_outflows,
+              fx_gain_loss_clp
+            FROM greenhouse_finance.account_balances
+            WHERE account_id = $1
+              AND balance_date BETWEEN $2::date AND $3::date
+            ORDER BY date_trunc('month', balance_date), balance_date DESC
+          )
+          SELECT
+            balance_month,
+            closing_balance,
+            closing_balance_clp,
+            period_inflows,
+            period_outflows,
+            fx_gain_loss_clp
+          FROM monthly_last_rows
+          ORDER BY balance_month ASC
+        `,
+        [accountId, historyStart, overview.period.endDate],
+        client
+      )
 
   const movementRows = await queryRows<AccountDetailMovementRow>(
     `
@@ -1631,10 +1719,16 @@ export const getBankAccountDetail = async ({
     }
   }
 
+  // TASK-705 — freshness signal por cuenta. computed_at del último snapshot daily.
+  const computedAtRaw = currentBalance.computed_at
+  const computedAtStr = computedAtRaw instanceof Date ? computedAtRaw.toISOString() : (computedAtRaw ?? null)
+  const accountFreshness = buildFreshnessSignal(computedAtStr)
+
   return {
     account,
     currentBalance: mapAccountBalanceRow(currentBalance),
     activeOtb,
+    freshness: accountFreshness,
     history: historyRows.map(row => ({
       month: toDateString(row.balance_month) || '',
       closingBalance: roundCurrency(toNumber(row.closing_balance)),

@@ -6,13 +6,13 @@ TASK-708 (Nubox cutover) y TASK-708b (remediación histórica) cerraron 2026-04-
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `[optional EPIC-###]`
-- Status real: `Diseño — desbloqueada por TASK-708 + TASK-708b (2026-04-28). Cash ledger limpio, lista para iniciar.`
+- Status real: `Cerrada 2026-04-28 — read-model account_balances_monthly + composite indexes + reader split (materialize='skip' / historySource='monthly_read_model') + freshness signal en API + UI banner en BankView y Drawer + projection reactiva extendida + ops-worker monthly aggregation. Web endpoints leen snapshots, NO materializan inline.`
 - Rank: `TBD`
 - Domain: `finance`
 - Blocked by: `none`

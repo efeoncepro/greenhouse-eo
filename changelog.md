@@ -2,6 +2,52 @@
 
 ## 2026-04-28
 
+### 2026-04-28 — TASK-705 Banco Read Model & Snapshot Cutover (cerrada)
+
+`/finance/bank` y `/finance/bank/[accountId]` pasan a leer exclusivamente snapshots persistidos. La materialización pesada queda fuera del request path. Latencia esperada: ~5s+ → sub-200ms para el chart histórico del drawer.
+
+**Migrations** (3, todas en `20260428162810184` … `20260428162811516`):
+
+- `account_balances_monthly` — read model canónico mensual con UNIQUE `(account_id, balance_year, balance_month)`, columnas FX TASK-699, FK a accounts/spaces, 3 indexes hot-path + trigger updated_at.
+- Composite partial indexes en `income_payments`, `expense_payments`, `settlement_legs` filtrando superseded chains. Cubre el patrón `WHERE payment_account_id = X AND payment_date BETWEEN Y AND Z ORDER BY payment_date DESC`.
+- Backfill atómico desde aggregation de `account_balances` daily (idempotente vía UNIQUE + ON CONFLICT).
+
+**Helpers nuevos**:
+
+- `src/lib/finance/account-balances-monthly.ts` — `aggregateMonthlyFromDaily`, `listMonthlyHistoryForAccount`, `refreshMonthlyBatch`. Source of truth sigue siendo daily; monthly es proyección derivada.
+- `src/lib/finance/bank-freshness.ts` — `buildFreshnessSignal` con threshold operativo configurable vía `BANK_FRESHNESS_STALE_THRESHOLD_SECONDS` (default 1h).
+
+**Refactor `account-balances.ts`**:
+
+- `getBankOverview` y `getBankAccountDetail` aceptan `materialize: 'force' | 'skip'` (default `'force'` para backward-compat con cron y ops-worker).
+- `getBankAccountDetail` acepta `historySource: 'recompute' | 'monthly_read_model'` — el path canónico web usa `'monthly_read_model'` (sub-100ms).
+- Tipo `TreasuryFreshness` agregado al overview y al detail; el response incluye `freshness.lastMaterializedAt + ageSeconds + isStale + label`.
+
+**API routes web**:
+
+- `src/app/api/finance/bank/route.ts` y `[accountId]/route.ts` ahora pasan `materialize: 'skip'` y `historySource: 'monthly_read_model'`. Cero recompute inline.
+
+**Lane reactiva extendida**:
+
+- `src/lib/sync/projections/account-balances.ts` — después de cada `rematerializeAccountBalancesFromDate`, encadena `aggregateMonthlyFromDaily` para todos los meses entre `fromDate` y hoy. Idempotente por mes; errores en un mes no abortan el resto.
+
+**Ops-worker extendido**:
+
+- `services/ops-worker/server.ts` `POST /finance/rematerialize-balances` — tras rematerializar daily, refresca monthly read model para todos los meses tocados. UPSERT atómico inline. Cron `ops-finance-rematerialize-balances` (5:00 CLT) mantiene el read model fresco diariamente.
+
+**UI freshness**:
+
+- Banner `Alert severity='info'` con `role='status'` y `aria-live='polite'` en `BankView.tsx` y `AccountDetailDrawer.tsx`. Aparece solo cuando `freshness.isStale=true`. Copy en Spanish; nunca dispara recompute síncrono.
+
+**Verificación**:
+
+- `pnpm lint` limpio, `pnpm tsc --noEmit` limpio, `pnpm test` **2453/2453 verde**, `pnpm build` OK.
+
+**Tasks vecinas desbloqueadas**:
+
+- TASK-714 (Banco Drawer Semántico): puede reusar el read-model contract sin trabajo doble.
+- TASK-706 (Previred UX): lee snapshots ya canónicos sin tocar materialization.
+
 ### 2026-04-28 — TASK-708 + 708b cierre TOTAL: residual cleanup + plantilla reusable + arquitectura documentada
 
 Cierre absoluto del ciclo TASK-708 + TASK-708b. **Todos los pendientes resueltos**, incluyendo deuda residual edge-case y documentación arquitectónica.

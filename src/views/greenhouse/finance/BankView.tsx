@@ -105,6 +105,13 @@ type FxGainLossBreakdown = {
   isDegraded: boolean
 }
 
+type FreshnessSignal = {
+  lastMaterializedAt: string | null
+  ageSeconds: number | null
+  isStale: boolean
+  label: string | null
+}
+
 type BankResponse = {
   period: {
     year: number
@@ -125,6 +132,7 @@ type BankResponse = {
   accounts: TreasuryAccount[]
   creditCards: CreditCardSummary[]
   unassignedPayments: UnassignedPayment[]
+  freshness?: FreshnessSignal
 }
 
 const MONTHS = [
@@ -285,6 +293,20 @@ const BankView = () => {
   return (
     <>
       <Grid container spacing={6}>
+        {data.freshness?.isStale && data.freshness?.label ? (
+          <Grid size={{ xs: 12 }}>
+            <Alert
+              severity='info'
+              variant='outlined'
+              icon={<i className='tabler-clock' aria-hidden />}
+              role='status'
+              aria-live='polite'
+            >
+              Datos actualizados {data.freshness.label.toLowerCase()}. La materialización corre en
+              segundo plano; abrir cuentas o cambiar de período no debería sentirse lento.
+            </Alert>
+          </Grid>
+        ) : null}
         <Grid size={{ xs: 12 }}>
           <Card>
             <CardContent>
