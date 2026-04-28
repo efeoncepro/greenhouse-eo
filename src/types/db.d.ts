@@ -5248,6 +5248,29 @@ export interface GreenhouseServingClientLaborCostAllocation {
   total_fte: Numeric | null;
 }
 
+export interface GreenhouseServingClientLaborCostAllocationConsolidated {
+  allocated_labor_clp: Numeric | null;
+  allocated_labor_source: Numeric | null;
+  allocated_net_clp: Numeric | null;
+  allocated_net_source: Numeric | null;
+  client_id: string | null;
+  client_name: string | null;
+  exchange_rate_to_clp: Numeric | null;
+  fte_contribution: Numeric | null;
+  gross_total_source: Numeric | null;
+  member_id: string | null;
+  member_name: string | null;
+  net_total_source: Numeric | null;
+  payroll_currency: string | null;
+  period_month: number | null;
+  period_year: number | null;
+  /**
+   * Cuántos payroll_entries underlying se consolidaron en este row. Si > 1, significa que el período tuvo múltiples nóminas posteadas (e.g. nómina mes anterior + mes corriente). Útil para drift detection.
+   */
+  source_payroll_entry_count: Int8 | null;
+  total_fte: Numeric | null;
+}
+
 export interface GreenhouseServingCommercialCostAttribution {
   allocation_ratio: Generated<Numeric>;
   base_labor_cost_target: Generated<Numeric>;
@@ -5674,6 +5697,17 @@ export interface GreenhouseServingIncome360 {
   total_factoring_fee: Numeric | null;
   total_factoring_nominal: Numeric | null;
   updated_at: Timestamp | null;
+}
+
+export interface GreenhouseServingLaborAllocationSaturationDrift {
+  client_count: Int8 | null;
+  client_ids: string[] | null;
+  client_names: string[] | null;
+  member_id: string | null;
+  member_name: string | null;
+  period_month: number | null;
+  period_year: number | null;
+  sum_fte: Numeric | null;
 }
 
 export interface GreenhouseServingMember360 {
@@ -7342,6 +7376,7 @@ export interface DB {
   "greenhouse_serving.client_360": GreenhouseServingClient360;
   "greenhouse_serving.client_capability_360": GreenhouseServingClientCapability360;
   "greenhouse_serving.client_labor_cost_allocation": GreenhouseServingClientLaborCostAllocation;
+  "greenhouse_serving.client_labor_cost_allocation_consolidated": GreenhouseServingClientLaborCostAllocationConsolidated;
   "greenhouse_serving.commercial_cost_attribution": GreenhouseServingCommercialCostAttribution;
   "greenhouse_serving.commercial_cost_attribution_v2": GreenhouseServingCommercialCostAttributionV2;
   "greenhouse_serving.contract_mrr_arr_snapshots": GreenhouseServingContractMrrArrSnapshots;
@@ -7359,6 +7394,7 @@ export interface DB {
   "greenhouse_serving.ico_member_metrics": GreenhouseServingIcoMemberMetrics;
   "greenhouse_serving.ico_organization_metrics": GreenhouseServingIcoOrganizationMetrics;
   "greenhouse_serving.income_360": GreenhouseServingIncome360;
+  "greenhouse_serving.labor_allocation_saturation_drift": GreenhouseServingLaborAllocationSaturationDrift;
   "greenhouse_serving.member_360": GreenhouseServingMember360;
   "greenhouse_serving.member_capacity_economics": GreenhouseServingMemberCapacityEconomics;
   "greenhouse_serving.member_leave_360": GreenhouseServingMemberLeave360;

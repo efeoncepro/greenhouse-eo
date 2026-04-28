@@ -268,7 +268,8 @@ const buildFinanceDataQualitySummary = (metrics: OperationsSubsystemMetric[]) =>
  */
 const PLATFORM_INTEGRITY_METRIC_KEYS = new Set<string>([
   'payment_ledger_integrity',
-  'direct_cost_without_client'
+  'direct_cost_without_client',
+  'labor_allocation_saturation_drift'
 ])
 
 const isPlatformIntegrityMetric = (key: string): boolean =>
@@ -290,7 +291,7 @@ export const buildFinanceDataQualitySubsystem = async (): Promise<OperationsSubs
       }
     }
 
-    const [divergentPayments, overdueCount, allocationRows] = await Promise.all([
+    const [divergentPayments, overdueCount, allocationRows, saturationDriftRows] = await Promise.all([
       // Ledger integrity goes through the canonical reconciliation helper.
       // DO NOT inline a `SUM(income_payments)` query here — that ignores
       // factoring fees and withholdings and produces false drift.
@@ -312,11 +313,19 @@ export const buildFinanceDataQualitySubsystem = async (): Promise<OperationsSubs
          FROM greenhouse_finance.expenses e
          WHERE COALESCE(e.is_annulled, FALSE) = FALSE
            AND e.expense_type NOT IN ('tax', 'social_security')`
-      ).catch(() => [{ direct_without_client: '0', shared_unallocated: '0' }])
+      ).catch(() => [{ direct_without_client: '0', shared_unallocated: '0' }]),
+      // TASK-709: detecta over-saturation (member dedica >100% a clientes en
+      // un período = imposible). Si retorna rows, indica bug en
+      // client_team_assignments upstream (overlapping assignments mal
+      // partitionados por date range).
+      runGreenhousePostgresQuery<{ cnt: string }>(
+        `SELECT COUNT(*)::text AS cnt FROM greenhouse_serving.labor_allocation_saturation_drift`
+      ).catch(() => [{ cnt: '0' }])
     ])
 
     const directCostWithoutClient = Number(allocationRows[0]?.direct_without_client ?? 0)
     const sharedOverheadUnallocated = Number(allocationRows[0]?.shared_unallocated ?? 0)
+    const laborSaturationDrift = Number(saturationDriftRows[0]?.cnt ?? 0)
 
     const metrics: OperationsSubsystemMetric[] = [
       {
@@ -347,6 +356,16 @@ export const buildFinanceDataQualitySubsystem = async (): Promise<OperationsSubs
         label: 'Overhead compartido no asignado',
         value: sharedOverheadUnallocated,
         status: 'info'
+      },
+      {
+        // TASK-709: invariante BD que detecta over-saturation en labor
+        // allocation. Cuando > 0 = bug en client_team_assignments upstream
+        // (assignments overlapping para mismo miembro/período sin date
+        // partitioning). Platform integrity issue real, no operacional.
+        key: 'labor_allocation_saturation_drift',
+        label: 'Drift de capacidad laboral (FTE > 100%)',
+        value: laborSaturationDrift,
+        status: laborSaturationDrift === 0 ? 'ok' : 'warning'
       }
     ]
 

@@ -214,7 +214,7 @@ export const computeCommercialCostAttributionForPeriod = async (
         cla.total_fte,
         cla.fte_contribution,
         cla.allocated_labor_clp
-      FROM greenhouse_serving.client_labor_cost_allocation cla
+      FROM greenhouse_serving.client_labor_cost_allocation_consolidated cla
       LEFT JOIN client_bridge cb
         ON cb.client_id = cla.client_id
       WHERE cla.period_year = $1
@@ -223,7 +223,7 @@ export const computeCommercialCostAttributionForPeriod = async (
       `,
       [year, month]
     ).catch((error: unknown) => {
-      console.error(`[commercial-cost-attribution] client_labor_cost_allocation query failed for ${year}-${String(month).padStart(2, '0')}:`, error instanceof Error ? error.message : error)
+      console.error(`[commercial-cost-attribution] client_labor_cost_allocation_consolidated query failed for ${year}-${String(month).padStart(2, '0')}:`, error instanceof Error ? error.message : error)
 
       return [] as LaborAllocationRow[]
     })
@@ -448,10 +448,10 @@ export const materializeAllAvailablePeriods = async (
 ): Promise<{ periods: number; totalAllocations: number; durationMs: number }> => {
   const startMs = Date.now()
 
-  // Discover all periods with labor allocation data
+  // Discover all periods with labor allocation data (TASK-709: usa consolidada)
   const periodRows = await runGreenhousePostgresQuery<{ period_year: number; period_month: number }>(
     `SELECT DISTINCT period_year, period_month
-     FROM greenhouse_serving.client_labor_cost_allocation
+     FROM greenhouse_serving.client_labor_cost_allocation_consolidated
      ORDER BY period_year, period_month`
   )
 
