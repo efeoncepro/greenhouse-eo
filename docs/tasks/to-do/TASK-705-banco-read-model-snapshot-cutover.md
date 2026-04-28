@@ -1,5 +1,9 @@
 # TASK-705 — Banco Read Model & Snapshot Cutover
 
+## Delta 2026-04-28 — Desbloqueada por cierre TASK-708 + TASK-708b
+
+TASK-708 (Nubox cutover) y TASK-708b (remediación histórica) cerraron 2026-04-28. La base de cash ahora está limpia: cero phantom payments runtime, cero settlement legs sin instrument, CHECKs validated + enforced. **Banco ya puede leer cash canónico sin riesgo de contaminación**. El read model que construye TASK-705 hereda un ledger correcto desde día uno.
+
 ## Status
 
 - Lifecycle: `to-do`
@@ -8,7 +12,7 @@
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `[optional EPIC-###]`
-- Status real: `Diseño`
+- Status real: `Diseño — desbloqueada por TASK-708 + TASK-708b (2026-04-28). Cash ledger limpio, lista para iniciar.`
 - Rank: `TBD`
 - Domain: `finance`
 - Blocked by: `none`

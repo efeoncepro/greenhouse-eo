@@ -330,9 +330,63 @@ Tras completar todos los pasos:
 
 ---
 
-## Lecciones aprendidas (post-apply)
+## Lecciones aprendidas (apply 2026-04-28)
 
-> Sección a completar al cierre. Incluir: tiempos reales por paso, decisiones manuales tomadas, ediciones al classification JSON, casos edge encontrados, sugerencias para futuras cohortes (Previred, file imports, HubSpot, Stripe).
+### Tiempos reales por paso
+
+| Paso | Tiempo | Notas |
+|---|---|---|
+| Paso 0 (migración 1) | 30s | Fácil; aplicación directa con `pnpm migrate:up` |
+| Paso 1 (inventario) | 5s | Output JSON 86KB en `docs/operations/runbooks/` |
+| Paso 2 (backfill --apply) | 12s | 86 signals creadas idempotente |
+| Paso 3 (classify) | 30s | 86 propuestas evaluadas; D5 rule resuelve 21 a `santander-clp`, 65 → dismissed |
+| Paso 4 (apply) | 90s | 21 income repaired + 65 expense dismissed; 2 cascade legs descubiertas residuales |
+| Paso 5 (migración 2 + 3) | 20s | VALIDATE skip + atomic cleanup migration |
+| Paso 6 (verificación) | 10s | Acceptance queries == 0 |
+| **Total** | **~4 minutos** de ejecución pura | + ~30 minutos de iteración debugging |
+
+### Decisiones canónicas tomadas durante la ejecución (extender a futuras cohortes)
+
+1. **Camino E — Migración VALIDATE idempotente self-checking**: cuando una migración VALIDATE necesita correr "después" de un cleanup, NO pongas un `RAISE EXCEPTION` que bloquee `pnpm migrate:up`. Pon un `RAISE NOTICE + RETURN` que haga skip silencioso si hay residuos, y ejecuta el `VALIDATE CONSTRAINT` solo cuando count == 0. Esto permite que la migración esté en el repo desde día uno, registrada en `pgmigrations`, y se aplique automáticamente cuando la base esté lista. Sin estados frágiles, sin archivos en `/tmp/`, sin renames de timestamps.
+
+2. **Cascade supersede atómico en una sola migración**: cuando descubras casos edge durante el apply (e.g., legs cuyos linked payments ya estaban superseded por chains previas), NO los resuelvas con scripts ad-hoc fuera de migración. Crea una nueva migración que haga DROP + CREATE CHECK + UPDATE cleanup + VALIDATE en una transacción única. Si el VALIDATE final falla, todo el cleanup hace rollback (RAII transaccional).
+
+3. **Convención `superseded_at IS NOT NULL` extiende a CHECKs y queries**: cualquier supersede chain (TASK-702 payment, TASK-703b OTB, TASK-708b dismissal manual) excluye filas de invariantes activas. El CHECK `settlement_legs_principal_requires_instrument` se relajó para `OR superseded_at IS NOT NULL OR superseded_by_otb_id IS NOT NULL`. Las queries de health (`PHANTOMS_INCOME_SQL`, `PHANTOMS_EXPENSE_SQL`, `TASK708_*_SQL`) se actualizaron para incluir `AND superseded_at IS NULL`. Patrón canónico: cualquier query que mida "phantom activo" debe excluir las 3 chains.
+
+### Bugs corregidos durante el apply (mergeados en commits subsiguientes)
+
+1. **`expense_payments` no tiene columna `updated_at`**: la tabla solo tiene `created_at` y `recorded_at`. `dismissExpensePhantom` y `historical-remediation.ts` referenciaban `updated_at = NOW()` en sus UPDATE statements, fallando con `column does not exist`. Removido. Lección: SIEMPRE verificar el schema real (no asumir paridad con `expenses` u otras tablas).
+
+2. **Referencias ambiguas `payment_account_id` en SQL con JOINs**: `cohort-backfill.ts` tenía filtros sin alias. PostgreSQL los rechaza con `column reference is ambiguous`. Prefijado con alias `ip.` / `ep.`. Lección: en queries con JOIN, prefijar TODAS las columnas con alias explícito.
+
+3. **2 settlement legs residuales post-apply**: 2 receipt legs (`stlleg-PAY-NUBOX-inc-3699924` y `stlleg-PAY-NUBOX-inc-3968935`) cuyos linked income_payments ya estaban superseded por chain previa (factoring proceeds + replacement) NO fueron supersedeed automáticamente. El UPDATE manual fallaba con CHECK violation porque el constraint no permitía UPDATE de filas existentes en violation. Solución canónica: extender el CHECK para excluir filas superseded (alineado con la regla "supersede = histórico audit-only") y hacer cascade supersede atómico en migración.
+
+### Casos edge encontrados
+
+1. **Caso $6.9M PAY-NUBOX-inc-3699924 resuelto sin pedir cartola adicional**: la spec original lo marcó como Open Question bloqueante esperando cartola del cliente/banco. La realidad: la cartola YA EXISTÍA en `bank_statement_rows` (`santander-clp_2026_03_3bf2f840e20a`), reconciliada contra la phantom leg. El classify automático lo detectó, propuso `repaired_with_account` con `santander-clp`, y el apply lo resolvió in-place sin intervención manual. Lección: antes de bloquear un caso esperando evidencia externa, **buscar en `bank_statement_rows` si la evidencia ya está en el sistema**.
+
+2. **Cohorte A reportó 21 (no 23) al inventory**: 2 phantoms originales fueron superseded por trabajo paralelo entre la documentación de la spec y la ejecución del apply. El inventory script siempre reporta la realidad actual; los counts del spec son snapshot temporal y pueden divergir. **El inventario manda; la spec es referencia documentación**.
+
+3. **Income legacy `client_direct` ($752K GORE) fuera de scope TASK-708b**: durante la verificación final emergió 1 phantom adicional con `payment_source='client_direct'` (NO Nubox), creado pre-cutover. El runbook NO lo cubre, pero el helper `dismissIncomePhantom` es agnóstico de payment_source. Lo dismisseamos con razón documentada como follow-up cleanup. Lección: **el helper `dismissPhantomPayment` es reusable para cualquier phantom de cualquier source_system**, no solo Nubox.
+
+### Sugerencias para futuras cohortes (Previred / file imports / HubSpot / Stripe)
+
+1. **Antes de empezar el apply**: verificar el `payment_source` del CHECK constraints en `income_payments` / `expense_payments`. Si la cohorte requiere un nuevo `payment_source`, agregar al CHECK primero (migración aditiva) y después backfill.
+
+2. **Antes de classify**: agregar reglas D5 seed para el nuevo `source_system` en `account_signal_matching_rules`. Sin reglas, el classify cae siempre a `dismissed_no_cash`. Política recomendada: arrancar la política `external_signal_auto_adopt_policies` en `mode='review'` los primeros 50 casos antes de promover a `auto_adopt`.
+
+3. **Patrón reusable** documentado en plantilla `docs/operations/runbooks/_template-external-signal-remediation.md`: copiar este runbook, sustituir `nubox` → `<nuevo>`, `Cohorte A/B/C` → cohortes específicas del nuevo source, mantener los 6 pasos numerados y la migración VALIDATE idempotente.
+
+4. **El cascade-supersede de legs es probable**: cualquier cohorte con factoring/replacement chains pre-existentes va a tener este caso edge. Anticipar la migración cleanup atómico en el plan.
+
+### Resultado final
+
+- 86 phantom payments resueltos: 21 reparados ($39.3M CLP movido al ledger canónico) + 65 descartados ($8.8M CLP marcado como deuda histórica sin cash real).
+- 4 settlement legs phantom limpias (3 reparadas in-place + 2 cascade-supersede).
+- 1 income legacy `client_direct` adicional ($752K) dismissed como follow-up.
+- CHECK `settlement_legs_principal_requires_instrument` VALIDATED + enforced retroactivo + futuro.
+- Las 6 métricas TASK-708 en `ledger-health` = 0.
+- Patrón canónico documentado y testeado para emerging cohorts.
 
 ---
 
