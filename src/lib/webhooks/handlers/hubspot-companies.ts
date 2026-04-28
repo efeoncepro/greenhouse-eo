@@ -3,6 +3,7 @@ import { createHmac, timingSafeEqual } from 'node:crypto'
 import { registerInboundHandler } from '@/lib/webhooks/inbound'
 import { resolveSecret } from '@/lib/webhooks/signing'
 import { syncHubSpotCompanyById } from '@/lib/hubspot/sync-company-by-id'
+import { syncTenantCapabilitiesFromIntegration } from '@/lib/integrations/greenhouse-integration'
 import { captureWithDomain } from '@/lib/observability/capture'
 
 /**
@@ -144,7 +145,38 @@ registerInboundHandler('hubspot-companies', async (inboxEvent, rawBody, parsedPa
 
   for (const id of companyIds) {
     try {
-      await syncHubSpotCompanyById(id, { promote: true, triggeredBy: 'hubspot-webhook' })
+      const result = await syncHubSpotCompanyById(id, { promote: true, triggeredBy: 'hubspot-webhook' })
+
+      // Persist capability codes (business_lines + service_modules) into the
+      // canonical tenant capabilities table — replicates the work that the
+      // Cloud Run bridge used to do for property changes on `linea_de_servicio`
+      // and `servicios_especificos`. Now everything terminates in Greenhouse.
+      if (result.capabilities.businessLines.length > 0 || result.capabilities.serviceModules.length > 0) {
+        try {
+          await syncTenantCapabilitiesFromIntegration({
+            selector: {
+              clientId: null,
+              publicId: null,
+              sourceSystem: 'hubspot_crm',
+              sourceObjectType: 'company',
+              sourceObjectId: id
+            },
+            sourceSystem: 'hubspot_crm',
+            sourceObjectType: 'company',
+            sourceObjectId: id,
+            confidence: 'high',
+            businessLines: result.capabilities.businessLines,
+            serviceModules: result.capabilities.serviceModules
+          })
+        } catch (err) {
+          captureWithDomain(err, 'integrations.hubspot', {
+            level: 'warning',
+            tags: { source: 'hubspot-companies-webhook', step: 'capability-sync' },
+            extra: { hubspotCompanyId: id }
+          })
+        }
+      }
+
       results.push({ id, ok: true })
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err)

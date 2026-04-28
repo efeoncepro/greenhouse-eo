@@ -7,7 +7,8 @@ const syncMock = vi.fn(async () => ({
   companyRecordId: 'crm-company-test',
   companyUpserted: true,
   contactsUpserted: 1,
-  promotedSummary: null
+  promotedSummary: null,
+  capabilities: { businessLines: [], serviceModules: [] }
 }))
 
 const captureMock = vi.fn()
@@ -18,6 +19,10 @@ vi.mock('@/lib/hubspot/sync-company-by-id', () => ({
 
 vi.mock('@/lib/observability/capture', () => ({
   captureWithDomain: captureMock
+}))
+
+vi.mock('@/lib/integrations/greenhouse-integration', () => ({
+  syncTenantCapabilitiesFromIntegration: vi.fn(async () => null)
 }))
 
 vi.mock('@/lib/webhooks/signing', () => ({
@@ -152,7 +157,8 @@ describe('hubspot-companies webhook handler', () => {
       companyRecordId: 'crm-company-other',
       companyUpserted: true,
       contactsUpserted: 0,
-      promotedSummary: null
+      promotedSummary: null,
+      capabilities: { businessLines: [], serviceModules: [] }
     })
 
     const events = [

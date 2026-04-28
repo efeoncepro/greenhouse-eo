@@ -37,6 +37,10 @@ interface BridgeCompanyProfile {
   owner: {
     hubspotOwnerId: string | null
   }
+  capabilities?: {
+    businessLines?: string[]
+    serviceModules?: string[]
+  }
   [key: string]: unknown
 }
 
@@ -66,6 +70,10 @@ export interface SyncCompanyByIdResult {
     promoted: number
     clientsInstantiated: number
   } | null
+  capabilities: {
+    businessLines: string[]
+    serviceModules: string[]
+  }
 }
 
 const fetchFromBridge = async <T>(path: string): Promise<T> => {
@@ -268,10 +276,15 @@ export const syncHubSpotCompanyById = async (
   let companyRecordId = ''
   let contactsCount = 0
   let promotedSummary: SyncCompanyByIdResult['promotedSummary'] = null
+  let businessLines: string[] = []
+  let serviceModules: string[] = []
 
   try {
     // 1. Fetch company profile from bridge
     const profile = await fetchFromBridge<BridgeCompanyProfile>(`/companies/${trimmed}`)
+
+    businessLines = Array.isArray(profile.capabilities?.businessLines) ? profile.capabilities!.businessLines : []
+    serviceModules = Array.isArray(profile.capabilities?.serviceModules) ? profile.capabilities!.serviceModules : []
 
     // 2. Fetch contacts from bridge
     let contacts: BridgeContactProfile[] = []
@@ -332,6 +345,7 @@ export const syncHubSpotCompanyById = async (
     companyRecordId,
     companyUpserted: true,
     contactsUpserted: contactsCount,
-    promotedSummary
+    promotedSummary,
+    capabilities: { businessLines, serviceModules }
   }
 }
