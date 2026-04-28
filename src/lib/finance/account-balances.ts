@@ -567,6 +567,13 @@ const getDailyMovementSummary = async (
 ) => {
   const rows = await queryRows<DailyMovementRow>(
     `
+      -- Three-axis supersede filter (TASK-702 / TASK-703b / TASK-708b):
+      -- a payment or settlement_leg is "active" only when ALL three are NULL:
+      --   * superseded_by_payment_id (payment-chain replacement)
+      --   * superseded_at            (TASK-708b dismiss-no-cash, leg cascade)
+      --   * superseded_by_otb_id     (anchor-chain replacement)
+      -- Filtering on only one axis (historical bug) miscounts dismissed phantoms
+      -- and inflates account_balances.
       WITH settlement_movements AS (
         SELECT
           sl.direction,
@@ -575,6 +582,7 @@ const getDailyMovementSummary = async (
         FROM greenhouse_finance.settlement_legs sl
         WHERE sl.instrument_id = $1
           AND sl.transaction_date = $2::date
+          AND sl.superseded_at IS NULL
           AND sl.superseded_by_otb_id IS NULL
       ),
       fallback_income_payments AS (
@@ -586,12 +594,15 @@ const getDailyMovementSummary = async (
         WHERE ip.payment_account_id = $1
           AND ip.payment_date = $2::date
           AND ip.superseded_by_payment_id IS NULL
+          AND ip.superseded_at IS NULL
+          AND ip.superseded_by_otb_id IS NULL
           AND NOT EXISTS (
             SELECT 1
             FROM greenhouse_finance.settlement_legs sl
             WHERE sl.linked_payment_type = 'income_payment'
               AND sl.linked_payment_id = ip.payment_id
               AND sl.instrument_id = $1
+              AND sl.superseded_at IS NULL
               AND sl.superseded_by_otb_id IS NULL
           )
       ),
@@ -604,12 +615,15 @@ const getDailyMovementSummary = async (
         WHERE ep.payment_account_id = $1
           AND ep.payment_date = $2::date
           AND ep.superseded_by_payment_id IS NULL
+          AND ep.superseded_at IS NULL
+          AND ep.superseded_by_otb_id IS NULL
           AND NOT EXISTS (
             SELECT 1
             FROM greenhouse_finance.settlement_legs sl
             WHERE sl.linked_payment_type = 'expense_payment'
               AND sl.linked_payment_id = ep.payment_id
               AND sl.instrument_id = $1
+              AND sl.superseded_at IS NULL
               AND sl.superseded_by_otb_id IS NULL
           )
       ),
@@ -646,6 +660,8 @@ const getDailyFxGainLoss = async (
 ) => {
   const rows = await queryRows<DailyFxRow>(
     `
+      -- Three-axis supersede filter: payments are "active" only when all three
+      -- supersede pointers are NULL. See settlement_movements CTE comment above.
       SELECT
         COALESCE(SUM(fx_gain_loss_clp), 0)::text AS fx_gain_loss_clp
       FROM (
@@ -655,6 +671,8 @@ const getDailyFxGainLoss = async (
           AND ip.payment_date = $2::date
           AND ip.fx_gain_loss_clp IS NOT NULL
           AND ip.superseded_by_payment_id IS NULL
+          AND ip.superseded_at IS NULL
+          AND ip.superseded_by_otb_id IS NULL
         UNION ALL
         SELECT ep.fx_gain_loss_clp
         FROM greenhouse_finance.expense_payments ep
@@ -662,6 +680,8 @@ const getDailyFxGainLoss = async (
           AND ep.payment_date = $2::date
           AND ep.fx_gain_loss_clp IS NOT NULL
           AND ep.superseded_by_payment_id IS NULL
+          AND ep.superseded_at IS NULL
+          AND ep.superseded_by_otb_id IS NULL
       ) fx
     `,
     [accountId, balanceDate],
@@ -677,12 +697,14 @@ const getEarliestMovementDate = async (
 ) => {
   const rows = await queryRows<{ earliest_date: string | Date | null }>(
     `
+      -- Three-axis supersede filter: see settlement_movements CTE comment above.
       SELECT MIN(movement_date) AS earliest_date
       FROM (
         SELECT sl.transaction_date AS movement_date
         FROM greenhouse_finance.settlement_legs sl
         WHERE sl.instrument_id = $1
           AND sl.transaction_date IS NOT NULL
+          AND sl.superseded_at IS NULL
           AND sl.superseded_by_otb_id IS NULL
         UNION ALL
         SELECT ip.payment_date AS movement_date
@@ -690,12 +712,16 @@ const getEarliestMovementDate = async (
         WHERE ip.payment_account_id = $1
           AND ip.payment_date IS NOT NULL
           AND ip.superseded_by_payment_id IS NULL
+          AND ip.superseded_at IS NULL
+          AND ip.superseded_by_otb_id IS NULL
         UNION ALL
         SELECT ep.payment_date AS movement_date
         FROM greenhouse_finance.expense_payments ep
         WHERE ep.payment_account_id = $1
           AND ep.payment_date IS NOT NULL
           AND ep.superseded_by_payment_id IS NULL
+          AND ep.superseded_at IS NULL
+          AND ep.superseded_by_otb_id IS NULL
       ) movement_dates
     `,
     [accountId],
@@ -810,9 +836,19 @@ export const materializeAccountBalance = async (
     ? roundCurrency(otb.openingBalance)
     : null
 
-  const openingBalance = previous
-    ? roundCurrency(toNumber(previous.closing_balance))
-    : (otbOpening ?? roundCurrency(toNumber(account.opening_balance)))
+  // Hardening: on the OTB.genesis_date itself, the OTB anchor is authoritative
+  // and MUST override any pre-OTB account_balances row found by getPreviousBalanceRow.
+  // Pre-OTB rows are stale legacy projections (e.g. residue of test reconciliation
+  // periods declared before the OTB existed); the cascade-supersede only
+  // touches transactions, not derived account_balances rows. Without this clamp,
+  // a stale 02-27 closing would propagate forward as 02-28 opening, defeating the OTB.
+  const isAnchorDay = otb !== null && balanceDate === otb.genesisDate
+
+  const openingBalance = isAnchorDay && otbOpening !== null
+    ? otbOpening
+    : previous
+      ? roundCurrency(toNumber(previous.closing_balance))
+      : (otbOpening ?? roundCurrency(toNumber(account.opening_balance)))
 
   const movementSummary = await getDailyMovementSummary(input.accountId, balanceDate, input.client)
   const fxSummary = await getDailyFxGainLoss(input.accountId, balanceDate, input.client)
@@ -1614,6 +1650,7 @@ export const getBankAccountDetail = async ({
         FROM greenhouse_finance.settlement_legs sl
         WHERE sl.instrument_id = $1
           AND sl.transaction_date BETWEEN $2::date AND $3::date
+          AND sl.superseded_at IS NULL
           AND sl.superseded_by_otb_id IS NULL
       ),
       fallback_income AS (
@@ -1638,12 +1675,15 @@ export const getBankAccountDetail = async ({
         WHERE ip.payment_account_id = $1
           AND ip.payment_date BETWEEN $2::date AND $3::date
           AND ip.superseded_by_payment_id IS NULL
+          AND ip.superseded_at IS NULL
+          AND ip.superseded_by_otb_id IS NULL
           AND NOT EXISTS (
             SELECT 1
             FROM greenhouse_finance.settlement_legs sl
             WHERE sl.linked_payment_type = 'income_payment'
               AND sl.linked_payment_id = ip.payment_id
               AND sl.instrument_id = $1
+              AND sl.superseded_at IS NULL
               AND sl.superseded_by_otb_id IS NULL
           )
       ),
@@ -1669,12 +1709,15 @@ export const getBankAccountDetail = async ({
         WHERE ep.payment_account_id = $1
           AND ep.payment_date BETWEEN $2::date AND $3::date
           AND ep.superseded_by_payment_id IS NULL
+          AND ep.superseded_at IS NULL
+          AND ep.superseded_by_otb_id IS NULL
           AND NOT EXISTS (
             SELECT 1
             FROM greenhouse_finance.settlement_legs sl
             WHERE sl.linked_payment_type = 'expense_payment'
               AND sl.linked_payment_id = ep.payment_id
               AND sl.instrument_id = $1
+              AND sl.superseded_at IS NULL
               AND sl.superseded_by_otb_id IS NULL
           )
       )

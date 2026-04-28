@@ -74,19 +74,40 @@ export const dismissIncomePhantom = async (
     }
 
     const phantom = phantomRow.rows[0]
+    const alreadyDismissed = Boolean(phantom.superseded_at)
 
-    // Idempotency: ya superseded por cualquier mecanismo
-    if (phantom.superseded_at) {
-      return { incomeId: phantom.income_id, alreadyDismissed: true, recomputed: -1 }
+    // If the payment is already superseded but linked settlement_legs are NOT,
+    // still run the cascade (backfill scenario). Otherwise the idempotent
+    // re-call is a true no-op.
+    if (!alreadyDismissed) {
+      await client.query(
+        `UPDATE greenhouse_finance.income_payments SET
+           superseded_at = NOW(),
+           superseded_reason = $1
+         WHERE payment_id = $2`,
+        [reason, input.phantomPaymentId]
+      )
     }
 
-    await client.query(
-      `UPDATE greenhouse_finance.income_payments SET
+    // Cascade-supersede linked settlement_legs. The materializer prefers
+    // settlement_legs over fallback income_payments; without this cascade the
+    // phantom inflow would still be counted by account_balances despite the
+    // payment being superseded.
+    const cascadedLegs = await client.query<{ settlement_leg_id: string }>(
+      `UPDATE greenhouse_finance.settlement_legs SET
          superseded_at = NOW(),
          superseded_reason = $1
-       WHERE payment_id = $2`,
+       WHERE linked_payment_type = 'income_payment'
+         AND linked_payment_id = $2
+         AND superseded_at IS NULL
+       RETURNING settlement_leg_id`,
       [reason, input.phantomPaymentId]
     )
+
+    if (alreadyDismissed && cascadedLegs.rows.length === 0) {
+      // True no-op: payment already dismissed and no orphan legs to cascade.
+      return { incomeId: phantom.income_id, alreadyDismissed: true, recomputed: -1 }
+    }
 
     const recomputed = await client.query<{ result: string }>(
       `SELECT greenhouse_finance.fn_recompute_income_amount_paid($1) AS result`,
@@ -101,6 +122,7 @@ export const dismissIncomePhantom = async (
         payload: {
           incomeId: phantom.income_id,
           phantomPaymentId: input.phantomPaymentId,
+          cascadedSettlementLegIds: cascadedLegs.rows.map(row => row.settlement_leg_id),
           reason,
           actorUserId: input.actorUserId ?? null
         }
@@ -143,18 +165,33 @@ export const dismissExpensePhantom = async (
     }
 
     const phantom = phantomRow.rows[0]
+    const alreadyDismissed = Boolean(phantom.superseded_at)
 
-    if (phantom.superseded_at) {
-      return { expenseId: phantom.expense_id, alreadyDismissed: true }
+    if (!alreadyDismissed) {
+      await client.query(
+        `UPDATE greenhouse_finance.expense_payments SET
+           superseded_at = NOW(),
+           superseded_reason = $1
+         WHERE payment_id = $2`,
+        [reason, input.phantomPaymentId]
+      )
     }
 
-    await client.query(
-      `UPDATE greenhouse_finance.expense_payments SET
+    // Cascade-supersede linked settlement_legs (same reasoning as income side).
+    const cascadedLegs = await client.query<{ settlement_leg_id: string }>(
+      `UPDATE greenhouse_finance.settlement_legs SET
          superseded_at = NOW(),
          superseded_reason = $1
-       WHERE payment_id = $2`,
+       WHERE linked_payment_type = 'expense_payment'
+         AND linked_payment_id = $2
+         AND superseded_at IS NULL
+       RETURNING settlement_leg_id`,
       [reason, input.phantomPaymentId]
     )
+
+    if (alreadyDismissed && cascadedLegs.rows.length === 0) {
+      return { expenseId: phantom.expense_id, alreadyDismissed: true }
+    }
 
     await publishOutboxEvent(
       {
@@ -164,6 +201,7 @@ export const dismissExpensePhantom = async (
         payload: {
           expenseId: phantom.expense_id,
           phantomPaymentId: input.phantomPaymentId,
+          cascadedSettlementLegIds: cascadedLegs.rows.map(row => row.settlement_leg_id),
           reason,
           actorUserId: input.actorUserId ?? null
         }
