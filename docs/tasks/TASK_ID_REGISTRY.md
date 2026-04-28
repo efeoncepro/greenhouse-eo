@@ -793,6 +793,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-711` | `to-do` | Member ↔ Tool License Assignment UI — MLCM ops surface | `docs/tasks/to-do/TASK-711-member-tool-license-ui.md` |
 | `TASK-712` | `to-do` | Tool Catalog Consolidation (cost models, lifecycle, vendor FK) — MLCM Fase 2 | `docs/tasks/to-do/TASK-712-tool-catalog-consolidation.md` |
 | `TASK-713` | `to-do` | Period Closing Workflow (snapshots inmutables + restatement) — MLCM Fase 4 | `docs/tasks/to-do/TASK-713-period-closing-workflow.md` |
-| `TASK-714` | `to-do` | Banco Instrument Detail Semantic Drawer | `docs/tasks/to-do/TASK-714-banco-instrument-detail-semantic-drawer.md` |
+| `TASK-714` | `complete` | Banco Instrument Detail Semantic Drawer | `docs/tasks/complete/TASK-714-banco-instrument-detail-semantic-drawer.md` |
+| `TASK-714c` | `to-do` | Shareholder Reimbursable Expense Canonical Runtime (factory + UI) | `docs/tasks/to-do/TASK-714c-shareholder-reimbursable-expense-canonical-runtime.md` |
 | `TASK-715` | `to-do` | Reconciliation Test Period Archive UX | `docs/tasks/to-do/TASK-715-reconciliation-test-period-archive-ux.md` |
 | `TASK-716` | `to-do` | Manual Team Announcements | `docs/tasks/to-do/TASK-716-manual-team-announcements.md` |
