@@ -248,18 +248,81 @@ describe('resolveInstrumentDetailPresentation', () => {
     expect(componentizationKpi?.avatarColor).toBe('success')
   })
 
-  it('returns shareholder_account profile with accionista vocabulary', () => {
-    const profile = resolveInstrumentDetailPresentation({
+  describe('shareholder_account (CCA) — TASK-714b sign + label semantics', () => {
+    const ccaAccount = {
       ...baseAccount,
-      instrumentCategory: 'shareholder_account',
-      accountKind: 'liability',
+      instrumentCategory: 'shareholder_account' as unknown as null,
+      accountKind: 'liability' as const,
       accountName: 'CCA Julio Reyes'
+    }
+
+    it('uses canonical accionista vocabulary aligned with liability sign', () => {
+      const profile = resolveInstrumentDetailPresentation(ccaAccount)
+
+      expect(profile.profileKey).toBe('shareholder_account')
+      expect(profile.drawerTitle).toContain('accionista')
+
+      // incoming al CCA = REDUCE deuda con accionista = "Reembolso al accionista".
+      // outgoing del CCA = AUMENTA deuda con accionista = "Aporte del accionista".
+      expect(profile.movements.directionLabels.incoming).toBe('Reembolso al accionista')
+      expect(profile.movements.directionLabels.outgoing).toBe('Aporte del accionista')
     })
 
-    expect(profile.profileKey).toBe('shareholder_account')
-    expect(profile.drawerTitle).toContain('accionista')
-    expect(profile.movements.directionLabels.incoming).toBe('Aporte')
-    expect(profile.movements.directionLabels.outgoing).toBe('Reembolso')
+    it('KPI titles map periodOutflows → Aportes y periodInflows → Reembolsos', () => {
+      const profile = resolveInstrumentDetailPresentation({
+        ...ccaAccount,
+        periodInflows: 1949078,
+        periodOutflows: 1015252
+      })
+
+      const aportesKpi = profile.kpis.find(k => k.title === 'Aportes del accionista')
+      const reembolsosKpi = profile.kpis.find(k => k.title === 'Reembolsos al accionista')
+
+      expect(aportesKpi).toBeDefined()
+      expect(aportesKpi?.value).toBe(1015252)
+      expect(reembolsosKpi).toBeDefined()
+      expect(reembolsosKpi?.value).toBe(1949078)
+    })
+
+    it('saldo > 0 (empresa debe) → magnitude + warning + label "Empresa debe al accionista"', () => {
+      const profile = resolveInstrumentDetailPresentation({
+        ...ccaAccount,
+        closingBalance: 250000
+      })
+
+      const saldoKpi = profile.kpis.find(k => k.key === 'closingBalance')
+
+      expect(saldoKpi?.value).toBe(250000)
+      expect(saldoKpi?.subtitle).toBe('Empresa debe al accionista')
+      expect(saldoKpi?.avatarColor).toBe('warning')
+    })
+
+    it('saldo < 0 (accionista debe) → magnitude positive + info + label "Accionista debe a la empresa"', () => {
+      const profile = resolveInstrumentDetailPresentation({
+        ...ccaAccount,
+        closingBalance: -933825.57
+      })
+
+      const saldoKpi = profile.kpis.find(k => k.key === 'closingBalance')
+
+      // The drawer renders the magnitude; the direction lives in the subtitle.
+      expect(saldoKpi?.value).toBeCloseTo(933825.57, 2)
+      expect(saldoKpi?.subtitle).toBe('Accionista debe a la empresa')
+      expect(saldoKpi?.avatarColor).toBe('info')
+    })
+
+    it('saldo = 0 → success + label "Cuenta saldada"', () => {
+      const profile = resolveInstrumentDetailPresentation({
+        ...ccaAccount,
+        closingBalance: 0
+      })
+
+      const saldoKpi = profile.kpis.find(k => k.key === 'closingBalance')
+
+      expect(saldoKpi?.value).toBe(0)
+      expect(saldoKpi?.subtitle).toBe('Cuenta saldada')
+      expect(saldoKpi?.avatarColor).toBe('success')
+    })
   })
 
   it('falls back to transactional for unknown category', () => {

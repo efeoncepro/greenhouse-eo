@@ -296,57 +296,109 @@ const resolveCreditCardProfile = (account: TreasuryBankAccountOverview): Instrum
   }
 }
 
-const resolveShareholderAccountProfile = (account: TreasuryBankAccountOverview): InstrumentDetailProfile => ({
-  profileKey: 'shareholder_account',
-  drawerTitle: 'Detalle de cuenta accionista',
-  drawerSubtitle: 'Saldo, aportes y reembolsos sobre la cuenta corriente del accionista.',
-  identityFields: [
-    { label: 'Cuenta', value: account.accountName },
-    { label: 'Moneda', value: account.currency }
-  ],
-  kpis: [
-    {
-      key: 'closingBalance',
-      title: 'Saldo actual',
-      value: account.closingBalance,
-      subtitle: 'Posición al cierre del período (positivo = empresa debe)',
-      avatarIcon: 'tabler-user-dollar',
-      avatarColor: account.closingBalance >= 0 ? 'warning' : 'success'
+/**
+ * TASK-714b — Sign + label canónico para shareholder_account (CCA).
+ *
+ * Convención liability (TASK-703 sign inversion ya aplicada en
+ * `materializeAccountBalance`):
+ *   - `incoming` (settlement leg ENTRA al CCA) → REDUCE closing_balance.
+ *     Ejemplo: la empresa transfiere desde Santander al CCA Julio Reyes.
+ *     Semánticamente: la empresa devolvió plata al accionista (pago de deuda)
+ *     o adelantó plata que el accionista deberá rendir.
+ *     Label correcto: "Reembolso al accionista" / "Pago al accionista".
+ *
+ *   - `outgoing` (settlement leg SALE del CCA) → AUMENTA closing_balance.
+ *     Ejemplo: un expense_payment con `payment_account_id=CCA` paga un
+ *     proveedor desde la cuenta del accionista.
+ *     Semánticamente: la empresa usó plata del accionista para pagar el
+ *     gasto, generando deuda (la empresa le debe al accionista lo que usó).
+ *     Label correcto: "Aporte del accionista" / "Cargo a CCA".
+ *
+ * KPI saldo:
+ *   - closing > 0 → empresa debe al accionista (deuda pendiente).
+ *   - closing < 0 → accionista debe a la empresa (sobrepago / saldo a favor).
+ *   - closing = 0 → cuenta saldada.
+ *
+ * Pre-fix (bug TASK-714 introduced 2026-04-28): los labels estaban
+ * invertidos — `incoming` se mostraba como "Aporte" y `outgoing` como
+ * "Reembolso", lo opuesto del efecto contable real. Confirmado en vivo
+ * con CCA Julio Reyes 2026-04: closing -$933,826 (accionista debe) con
+ * inflows de $1,949,078 que el UI mostraba como "Aportes" cuando
+ * realmente eran reembolsos al accionista (transferencias Santander → CCA).
+ */
+const resolveShareholderAccountProfile = (account: TreasuryBankAccountOverview): InstrumentDetailProfile => {
+  const closing = account.closingBalance
+  const empresaDebe = closing > 0
+  const accionistaDebe = closing < 0
+
+  const saldoLabel = empresaDebe
+    ? 'Empresa debe al accionista'
+    : accionistaDebe
+      ? 'Accionista debe a la empresa'
+      : 'Cuenta saldada'
+
+  // Magnitud absoluta para que el operador lea "$933,826 — Accionista debe a
+  // la empresa" en lugar de un negativo ambiguo. El KPI banner narra la
+  // dirección.
+  const saldoMagnitude = Math.abs(closing)
+
+  return {
+    profileKey: 'shareholder_account',
+    drawerTitle: 'Detalle de cuenta accionista',
+    drawerSubtitle: 'Posición bilateral entre empresa y accionista. Aportes, reembolsos y ajustes.',
+    identityFields: [
+      { label: 'Cuenta', value: account.accountName },
+      { label: 'Moneda', value: account.currency }
+    ],
+    kpis: [
+      {
+        key: 'closingBalance',
+        title: 'Saldo actual',
+        value: saldoMagnitude,
+        subtitle: saldoLabel,
+        avatarIcon: 'tabler-user-dollar',
+        // empresa debe → warning (la empresa tiene una obligación pendiente).
+        // accionista debe → info (cuenta a favor de la empresa).
+        // saldada → success.
+        avatarColor: empresaDebe ? 'warning' : accionistaDebe ? 'info' : 'success'
+      },
+      {
+        key: 'periodOutflows',
+        title: 'Aportes del accionista',
+        value: account.periodOutflows,
+        subtitle: 'Movimientos que aumentan deuda con el accionista',
+        avatarIcon: 'tabler-arrow-down-left',
+        avatarColor: 'info'
+      },
+      {
+        key: 'periodInflows',
+        title: 'Reembolsos al accionista',
+        value: account.periodInflows,
+        subtitle: 'Movimientos que reducen deuda con el accionista',
+        avatarIcon: 'tabler-arrow-up-right',
+        avatarColor: 'secondary'
+      }
+    ],
+    chart: {
+      title: 'Últimos 12 meses',
+      subtitle: 'Aportes del accionista (+) vs reembolsos al accionista (−)',
+      inflowLabel: 'Reembolsos al accionista',
+      inflowColor: PRIMARY_HEX,
+      outflowLabel: 'Aportes del accionista',
+      outflowColor: SUCCESS_HEX
     },
-    {
-      key: 'periodInflows',
-      title: 'Aportes del período',
-      value: account.periodInflows,
-      subtitle: 'Movimientos que aumentan saldo accionista',
-      avatarIcon: 'tabler-arrow-down-left',
-      avatarColor: 'info'
+    movements: {
+      sectionTitle: 'Movimientos del accionista',
+      sectionSubtitle: 'Aportes, reembolsos y ajustes sobre la cuenta corriente bilateral',
+      // incoming al CCA = la empresa devolvió plata = reembolso al accionista.
+      // outgoing del CCA = se usó plata del accionista = aporte del accionista.
+      directionLabels: { incoming: 'Reembolso al accionista', outgoing: 'Aporte del accionista' },
+      emptyLabel: 'Sin movimientos del accionista en el período consultado.',
+      amountHeader: 'Monto'
     },
-    {
-      key: 'periodOutflows',
-      title: 'Reembolsos del período',
-      value: account.periodOutflows,
-      subtitle: 'Movimientos que reducen saldo accionista',
-      avatarIcon: 'tabler-arrow-up-right',
-      avatarColor: 'secondary'
-    }
-  ],
-  chart: {
-    title: 'Últimos 12 meses',
-    subtitle: 'Aportes y reembolsos materializados',
-    inflowLabel: 'Aportes',
-    inflowColor: SUCCESS_HEX,
-    outflowLabel: 'Reembolsos',
-    outflowColor: PRIMARY_HEX
-  },
-  movements: {
-    sectionTitle: 'Movimientos del accionista',
-    sectionSubtitle: 'Aportes, reembolsos y ajustes sobre la cuenta',
-    directionLabels: { incoming: 'Aporte', outgoing: 'Reembolso' },
-    emptyLabel: 'Sin movimientos del accionista en el período consultado.',
-    amountHeader: 'Monto'
-  },
-  contextBanner: null
-})
+    contextBanner: null
+  }
+}
 
 const COMPONENTIZATION_LABEL: Record<ProcessorComponentizationStatus, string> = {
   componentized: 'Desglose completo',
