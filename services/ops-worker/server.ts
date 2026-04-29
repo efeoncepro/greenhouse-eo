@@ -892,7 +892,8 @@ const handleFinanceRematerializeBalances = async (req: IncomingMessage, res: Ser
           accountId: acct.account_id,
           seedDate,
           openingBalance: opening,
-          endDate
+          endDate,
+          seedMode: 'explicit'
         })
 
         results.push({ accountId: r.accountId, days: r.daysMaterialized, closing: r.finalClosingBalance })

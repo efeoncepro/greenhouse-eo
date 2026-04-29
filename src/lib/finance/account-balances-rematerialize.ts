@@ -41,6 +41,15 @@ export interface RematerializeAccountInput {
   seedDate: string  // YYYY-MM-DD
   openingBalance: number
   endDate?: string  // YYYY-MM-DD; default today
+  /**
+   * `active_otb` rebuilds from the current opening trial balance when present.
+   * Use it for full account replays and audited re-anchors.
+   *
+   * `explicit` respects the caller-provided seed exactly. Use it for rolling
+   * jobs that seed from an already-materialized closing row; otherwise a daily
+   * cron can accidentally widen a 7-day refresh into a full OTB replay.
+   */
+  seedMode?: 'active_otb' | 'explicit'
 }
 
 export interface RematerializeAccountResult {
@@ -143,9 +152,15 @@ const insertSeedRow = async (
 export const rematerializeAccountBalanceRange = async (
   input: RematerializeAccountInput
 ): Promise<RematerializeAccountResult> => {
-  // Prefer OTB declaration over the input seed if available — OTB is the
-  // canonical opening source per TASK-703.
-  const otb = await getActiveOpeningTrialBalance(input.accountId)
+  const seedMode = input.seedMode ?? 'active_otb'
+
+  // Full replays prefer OTB declaration over the input seed — OTB is the
+  // canonical opening source per TASK-703. Rolling/incremental jobs must
+  // preserve their explicit seed so they do not rewrite historical periods.
+  const otb = seedMode === 'active_otb'
+    ? await getActiveOpeningTrialBalance(input.accountId)
+    : null
+
   const seedDate = otb?.genesisDate ?? input.seedDate
   const openingBalance = otb?.openingBalance ?? input.openingBalance
   const endDate = input.endDate ?? ymd(new Date())
@@ -176,17 +191,20 @@ export const rematerializeAccountBalanceRange = async (
 
     await insertSeedRow(client, input.accountId, seedDate, openingBalance)
 
-    // Update accounts.opening_balance + opening_balance_date as a cache so
-    // future snapshots have an anchor when no previous snapshot exists. The
-    // OTB remains the source of truth (TASK-703).
-    await client.query(
-      `UPDATE greenhouse_finance.accounts SET
-         opening_balance = $1,
-         opening_balance_date = $2::date,
-         updated_at = NOW()
-       WHERE account_id = $3`,
-      [openingBalance, seedDate, input.accountId]
-    )
+    if (seedMode === 'active_otb') {
+      // Update accounts.opening_balance + opening_balance_date as a cache so
+      // future snapshots have an anchor when no previous snapshot exists. The
+      // OTB remains the source of truth (TASK-703). Rolling jobs intentionally
+      // do not mutate this cache.
+      await client.query(
+        `UPDATE greenhouse_finance.accounts SET
+           opening_balance = $1,
+           opening_balance_date = $2::date,
+           updated_at = NOW()
+         WHERE account_id = $3`,
+        [openingBalance, seedDate, input.accountId]
+      )
+    }
 
     let daysMaterialized = 0
     let cursor = addDays(toUtcDate(seedDate), 1)

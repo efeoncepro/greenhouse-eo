@@ -76,7 +76,10 @@ export async function POST(request: Request) {
       throw new FinanceValidationError('month must be between 1 and 12.')
     }
 
-    const openingBalance = toNumber(body.openingBalance)
+    const openingBalance = body.openingBalance == null || body.openingBalance === ''
+      ? null
+      : toNumber(body.openingBalance)
+
     const periodId = `${accountId}_${year}_${String(month).padStart(2, '0')}`
     const notes = body.notes ? normalizeString(body.notes) : null
 

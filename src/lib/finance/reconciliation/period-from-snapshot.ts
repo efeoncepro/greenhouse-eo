@@ -3,6 +3,7 @@ import 'server-only'
 import type { PoolClient } from 'pg'
 
 import { withGreenhousePostgresTransaction, runGreenhousePostgresQuery } from '@/lib/postgres/client'
+import { resolveCanonicalReconciliationOpeningBalance } from '@/lib/finance/postgres-reconciliation'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 
 import { buildDeterministicPeriodId } from './full-context'
@@ -34,9 +35,10 @@ export interface CreatePeriodFromSnapshotInput {
   actorUserId: string | null
   /**
    * Optional opening balance override. If null/undefined and the period doesn't
-   * exist yet, the helper uses the snapshot's `pg_closing_balance` as opening
-   * (consistent with the audit trail: "the period opens at what PG had at the
-   * snapshot moment"). For an existing period, opening_balance is NOT modified.
+   * exist yet, the helper uses the canonical account_balances closing from the
+   * day before the period starts. Snapshot `pg_closing_balance` is drift audit
+   * evidence, not an accounting opening source. For an existing period,
+   * opening_balance is NOT modified.
    */
   openingBalance?: number | null
   /** Optional notes for the period creation. */
@@ -154,7 +156,12 @@ export const createOrLinkPeriodFromSnapshot = async (
 
       const opening = input.openingBalance != null
         ? input.openingBalance
-        : Number(snapshot.pg_closing_balance)
+        : await resolveCanonicalReconciliationOpeningBalance({
+            accountId: snapshot.account_id,
+            year,
+            month,
+            client
+          })
 
       await client.query(
         `INSERT INTO greenhouse_finance.reconciliation_periods (

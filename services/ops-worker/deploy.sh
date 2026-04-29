@@ -456,6 +456,9 @@ echo "  -> ops-product-catalog-reconcile-v2: 0 6 * * 1 (weekly Mon 06:00 Santiag
 # Cloud Run is the canonical home for finance crons:
 #   - Vercel cron timeout 800s vs Cloud Run 60min — rematerialize loops 7 days
 #     × N accounts which is fine here, tight on Vercel.
+#   - Rolling balance rematerialization MUST seed from the last persisted
+#     closing row (`seedMode=explicit` in code), not from historical OTB, so the
+#     daily job cannot rewrite bank history while refreshing the trailing range.
 #   - Cloud Scheduler retry exponencial nativo + co-located con Cloud SQL.
 #   - Reliability signal via captureMessageWithDomain('finance') feeds the
 #     incident lane of the dashboard, no extra Sentry project required.

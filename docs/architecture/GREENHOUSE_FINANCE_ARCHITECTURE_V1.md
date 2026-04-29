@@ -852,6 +852,7 @@ Implicación para el backlog:
   - `ReconciliationDetailView` muestra snapshots de instrumento/proveedor/moneda del período
   - permite `Marcar conciliado` y `Cerrar período` usando `PUT /api/finance/reconciliation/[id]`
   - la acción queda bloqueada hasta tener extracto importado, diferencia en cero y sin rows pendientes
+  - los snapshots (`account_reconciliation_snapshots.pg_closing_balance`) son evidencia de drift al instante declarado, no fuente de apertura contable; la apertura de un periodo nuevo viene del `account_balances` canonico del dia anterior al inicio del periodo, salvo override explicito y auditado
 
 ## Delta 2026-04-08 — Bank & Treasury module completed (TASK-283)
 
@@ -862,6 +863,10 @@ Implicación para el backlog:
   - UNIQUE `(account_id, balance_date)` para materialización idempotente
 - **Materialización reactiva de tesorería**
   - helper `materializeAccountBalance()` y readers en `src/lib/finance/account-balances.ts`
+  - `rematerializeAccountBalanceRange()` distingue dos modos de seed:
+    - `active_otb`: replay auditado desde la OTB activa; uso para re-anchors/backfills historicos controlados
+    - `explicit`: replay incremental desde un cierre ya materializado; uso obligatorio para crons rolling como `ops-finance-rematerialize-balances`
+  - los crons rolling no deben reemplazar su seed explicito por OTB ni mutar `accounts.opening_balance`; esto evita que una corrida diaria de 7 dias reescriba historia bancaria completa
   - projection `accountBalancesProjection` escucha:
     - `finance.income_payment.recorded`
     - `finance.expense_payment.recorded`

@@ -285,6 +285,62 @@ const buildStatementFingerprint = (
     ].join('||'))
     .digest('hex')
 
+const ymd = (date: Date): string => {
+  const year = date.getUTCFullYear()
+  const month = String(date.getUTCMonth() + 1).padStart(2, '0')
+  const day = String(date.getUTCDate()).padStart(2, '0')
+
+  return `${year}-${month}-${day}`
+}
+
+export const resolveCanonicalReconciliationOpeningBalance = async ({
+  accountId,
+  year,
+  month,
+  client
+}: {
+  accountId: string
+  year: number
+  month: number
+  client?: QueryableClient
+}): Promise<number> => {
+  if (!Number.isInteger(year) || !Number.isInteger(month) || month < 1 || month > 12) {
+    throw new FinanceValidationError('year/month must describe a valid reconciliation period.')
+  }
+
+  const periodStart = new Date(Date.UTC(year, month - 1, 1))
+  const previousDay = new Date(periodStart)
+
+  previousDay.setUTCDate(previousDay.getUTCDate() - 1)
+
+  const previousDayYmd = ymd(previousDay)
+
+  const rows = await queryRows<{ closing_balance: string }>(
+    `
+      SELECT ab.closing_balance::text
+      FROM greenhouse_finance.account_balances ab
+      JOIN greenhouse_finance.accounts a
+        ON a.account_id = ab.account_id
+       AND a.space_id = ab.space_id
+      WHERE ab.account_id = $1
+        AND ab.balance_date = $2::date
+        AND a.is_active = TRUE
+      LIMIT 1
+    `,
+    [accountId, previousDayYmd],
+    client
+  )
+
+  if (!rows[0]) {
+    throw new FinanceValidationError(
+      `No canonical balance exists for ${accountId} on ${previousDayYmd}. Rematerialize account_balances before creating the reconciliation period.`,
+      409
+    )
+  }
+
+  return roundCurrency(toNumber(rows[0].closing_balance))
+}
+
 // ─── Periods: list ──────────────────────────────────────────────────
 
 export const listReconciliationPeriodsFromPostgres = async ({
@@ -545,7 +601,7 @@ export const createReconciliationPeriodInPostgres = async ({
   accountId: string
   year: number
   month: number
-  openingBalance: number
+  openingBalance?: number | null
   notes: string | null
 }) => {
   await assertFinanceSlice2PostgresReady()
@@ -583,6 +639,10 @@ export const createReconciliationPeriodInPostgres = async ({
 
   const account = accountRows[0]
 
+  const canonicalOpeningBalance = openingBalance == null
+    ? await resolveCanonicalReconciliationOpeningBalance({ accountId, year, month })
+    : roundCurrency(openingBalance)
+
   await queryRows(
     `
       INSERT INTO greenhouse_finance.reconciliation_periods (
@@ -597,7 +657,7 @@ export const createReconciliationPeriodInPostgres = async ({
       accountId,
       year,
       month,
-      openingBalance,
+      canonicalOpeningBalance,
       notes,
       str(account.instrument_category),
       str(account.provider_slug),
