@@ -7,11 +7,9 @@ import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import CardHeader from '@mui/material/CardHeader'
-import Chip from '@mui/material/Chip'
 import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
 import Skeleton from '@mui/material/Skeleton'
-import Stack from '@mui/material/Stack'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
@@ -47,16 +45,9 @@ interface AccountRow {
   bankName: string
   currency: string
   openingBalance: number
-  closingBalance: number
-  closingBalanceClp: number | null
-  periodInflows: number
-  periodOutflows: number
   isActive: boolean
   instrumentCategory: string | null
   providerSlug: string | null
-  accountKind: 'asset' | 'liability'
-  reconciliationStatus: string | null
-  driftAmount: number | null
 }
 
 interface ReceivableSummary {
@@ -75,46 +66,15 @@ interface MonthlySeriesPoint {
   cashInClp: number
   cashOutClp: number
   netFlowClp: number
-  source: 'monthly_read_model' | 'legacy_safe_fallback'
-  isDegraded: boolean
-}
-
-interface CashPositionKpis {
-  cashAvailableClp: number
-  creditUsedClp: number
-  platformInternalClp: number
-  receivableClp: number
-  payableClp: number
-  netPositionClp: number
-  activeAccounts: number
-}
-
-interface FxGainLossBreakdown {
-  totalClp: number
-  realizedClp: number
-  translationClp: number
-  internalTransferClp: number
-  hasExposure: boolean
-  isDegraded: boolean
-}
-
-interface FreshnessSignal {
-  lastMaterializedAt: string | null
-  ageSeconds: number | null
-  isStale: boolean
-  label: string | null
 }
 
 interface CashPositionData {
-  kpis: CashPositionKpis
   accounts: AccountRow[]
   receivable: ReceivableSummary
   payable: PayableSummary
-  fxGainLoss: FxGainLossBreakdown
   fxGainLossClp: number
   netPosition: number
   monthlySeries: MonthlySeriesPoint[]
-  freshness: FreshnessSignal
 }
 
 // ---------------------------------------------------------------------------
@@ -259,13 +219,8 @@ const CashPositionView = () => {
     label: `${MONTH_SHORT[point.month]} ${String(point.year).slice(2)}`,
     cashIn: point.cashInClp,
     cashOut: point.cashOutClp,
-    netFlow: point.netFlowClp,
-    source: point.source,
-    isDegraded: point.isDegraded
+    netFlow: point.netFlowClp
   }))
-
-  const hasMonthlyFallback = data.monthlySeries.some(point => point.isDegraded)
-  const hasOpenDrift = data.accounts.some(account => account.driftAmount !== null && Math.abs(account.driftAmount) > 0)
 
   // ---------------------------------------------------------------------------
   // Render
@@ -273,47 +228,21 @@ const CashPositionView = () => {
 
   return (
     <Grid container spacing={6}>
-      {(data.freshness.isStale || hasMonthlyFallback || data.fxGainLoss.isDegraded) && (
-        <Grid size={{ xs: 12 }}>
-          <Alert
-            severity={data.freshness.isStale || data.fxGainLoss.isDegraded ? 'warning' : 'info'}
-            action={
-              <Stack direction='row' spacing={2}>
-                <Button color='inherit' size='small' href='/finance/bank'>
-                  Ver Banco
-                </Button>
-                {hasOpenDrift && (
-                  <Button color='inherit' size='small' href='/finance/reconciliation'>
-                    Revisar conciliación
-                  </Button>
-                )}
-              </Stack>
-            }
-          >
-            {data.freshness.isStale
-              ? `Los saldos vienen del último snapshot disponible (${data.freshness.label || 'sin fecha disponible'}).`
-              : hasMonthlyFallback
-                ? 'Algunos meses usan fallback seguro porque el read model mensual todavía no tiene snapshots completos.'
-                : 'El resultado cambiario está degradado porque falta una tasa para cerrar el periodo.'}
-          </Alert>
-        </Grid>
-      )}
-
       {/* KPI Row */}
       <Grid size={{ xs: 12, sm: 6, md: 2.4 }}>
         <HorizontalWithSubtitle
-          title='Caja disponible'
-          stats={formatCLP(data.kpis.cashAvailableClp)}
+          title='Posicion neta'
+          stats={formatCLP(data.netPosition)}
           avatarIcon='tabler-wallet'
-          avatarColor={data.kpis.cashAvailableClp >= 0 ? 'success' : 'error'}
-          subtitle='Saldo materializado en Banco'
+          avatarColor={data.netPosition >= 0 ? 'success' : 'error'}
+          subtitle='Caja disponible estimada'
         />
       </Grid>
 
       <Grid size={{ xs: 12, sm: 6, md: 2.4 }}>
         <HorizontalWithSubtitle
           title='Por cobrar'
-          stats={formatCLP(data.kpis.receivableClp)}
+          stats={formatCLP(data.receivable.totalClp)}
           avatarIcon='tabler-arrow-down-right'
           avatarColor='info'
           subtitle={`${data.receivable.pendingInvoices} facturas pendientes`}
@@ -323,7 +252,7 @@ const CashPositionView = () => {
       <Grid size={{ xs: 12, sm: 6, md: 2.4 }}>
         <HorizontalWithSubtitle
           title='Por pagar'
-          stats={formatCLP(data.kpis.payableClp)}
+          stats={formatCLP(data.payable.totalClp)}
           avatarIcon='tabler-arrow-up-right'
           avatarColor='warning'
           subtitle={`${data.payable.pendingExpenses} compromisos pendientes`}
@@ -332,50 +261,28 @@ const CashPositionView = () => {
 
       <Grid size={{ xs: 12, sm: 6, md: 2.4 }}>
         <HorizontalWithSubtitle
-          title='Crédito utilizado'
-          stats={formatCLP(data.kpis.creditUsedClp)}
-          subtitle='Deuda activa en instrumentos'
-          avatarIcon='tabler-credit-card'
-          avatarColor={data.kpis.creditUsedClp > 0 ? 'warning' : 'success'}
-        />
-      </Grid>
-
-      <Grid size={{ xs: 12, sm: 6, md: 2.4 }}>
-        <HorizontalWithSubtitle
-          title='Posición neta'
-          stats={formatCLP(data.kpis.netPositionClp)}
-          avatarIcon='tabler-scale'
-          avatarColor={data.kpis.netPositionClp >= 0 ? 'success' : 'error'}
-          subtitle='Caja + CxC - CxP - crédito'
-        />
-      </Grid>
-
-      <Grid size={{ xs: 12, sm: 6, md: 2.4 }}>
-        <HorizontalWithSubtitle
           title='Resultado cambiario'
-          stats={formatCLP(data.fxGainLoss.totalClp)}
-          subtitle={
-            data.fxGainLoss.hasExposure
-              ? `${formatCLP(data.fxGainLoss.realizedClp)} realizado`
-              : 'Sin exposición FX activa'
-          }
+          stats={formatCLP(data.fxGainLossClp)}
+          subtitle={data.fxGainLossClp >= 0 ? 'Ganancia cambiaria' : 'Perdida cambiaria'}
           avatarIcon='tabler-arrows-exchange'
-          avatarColor={data.fxGainLoss.isDegraded ? 'warning' : data.fxGainLoss.totalClp >= 0 ? 'success' : 'error'}
+          avatarColor={data.fxGainLossClp >= 0 ? 'success' : 'error'}
+        />
+      </Grid>
+
+      <Grid size={{ xs: 12, sm: 6, md: 2.4 }}>
+        <HorizontalWithSubtitle
+          title='Cuentas activas'
+          stats={String(data.accounts.filter(a => a.isActive).length)}
+          avatarIcon='tabler-building-bank'
+          avatarColor='primary'
+          subtitle='Cuentas bancarias operativas'
         />
       </Grid>
 
       {/* Cash flow chart */}
       <Grid size={{ xs: 12 }}>
         <Card>
-          <CardHeader
-            title='Flujo de caja disponible — 12 meses'
-            subheader='Entradas y salidas desde el ledger materializado; los meses sin snapshot usan fallback seguro.'
-            action={
-              <Button variant='outlined' size='small' href='/finance/bank'>
-                Ver detalle en Banco
-              </Button>
-            }
-          />
+          <CardHeader title='Flujo de caja — 12 meses' />
           <Divider />
           <CardContent>
             {chartData.length === 0 ? (
@@ -406,14 +313,6 @@ const CashPositionView = () => {
                 </ResponsiveContainer>
               </AppRecharts>
             )}
-            {hasMonthlyFallback && (
-              <Stack direction='row' spacing={2} flexWrap='wrap' mt={3}>
-                <Chip size='small' color='warning' variant='tonal' label='Fallback seguro en algunos meses' />
-                <Typography variant='caption' color='text.secondary'>
-                  El fallback usa `amount_clp` de pagos y excluye pagos superseded; no rematerializa Banco.
-                </Typography>
-              </Stack>
-            )}
           </CardContent>
         </Card>
       </Grid>
@@ -421,10 +320,7 @@ const CashPositionView = () => {
       {/* Accounts table */}
       <Grid size={{ xs: 12 }}>
         <Card>
-          <CardHeader
-            title='Cuentas e instrumentos'
-            subheader='Saldos vigentes desde Banco, con categoría financiera y estado de conciliación.'
-          />
+          <CardHeader title='Cuentas bancarias' />
           <Divider />
           <CardContent>
             {data.accounts.length === 0 ? (
@@ -439,9 +335,7 @@ const CashPositionView = () => {
                       <TableCell>Cuenta</TableCell>
                       <TableCell>Banco</TableCell>
                       <TableCell>Moneda</TableCell>
-                      <TableCell>Categoría</TableCell>
-                      <TableCell align='right'>Saldo vigente</TableCell>
-                      <TableCell>Conciliación</TableCell>
+                      <TableCell align='right'>Saldo apertura</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -457,34 +351,14 @@ const CashPositionView = () => {
                         </TableCell>
                         <TableCell>{account.bankName}</TableCell>
                         <TableCell>{account.currency}</TableCell>
-                        <TableCell>
-                          <Chip
-                            size='small'
-                            variant='tonal'
-                            color={account.accountKind === 'liability' ? 'warning' : 'success'}
-                            label={account.accountKind === 'liability' ? 'Deuda / crédito' : 'Caja'}
-                          />
-                        </TableCell>
                         <TableCell align='right'>
                           {account.currency === 'CLP'
-                            ? formatCLP(account.closingBalance)
+                            ? formatCLP(account.openingBalance)
                             : new Intl.NumberFormat('es-CL', {
                                 style: 'currency',
                                 currency: account.currency,
                                 maximumFractionDigits: 2
-                              }).format(account.closingBalance)}
-                        </TableCell>
-                        <TableCell>
-                          <Stack spacing={0.5}>
-                            <Typography variant='body2'>
-                              {account.reconciliationStatus || 'Sin periodo abierto'}
-                            </Typography>
-                            {account.driftAmount !== null && (
-                              <Typography variant='caption' color='warning.main'>
-                                Drift {formatCLP(account.driftAmount)}
-                              </Typography>
-                            )}
-                          </Stack>
+                              }).format(account.openingBalance)}
                         </TableCell>
                       </TableRow>
                     ))}

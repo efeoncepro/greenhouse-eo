@@ -4,17 +4,6 @@
 > **Created:** 2026-03-30
 > **Last updated:** 2026-04-29
 
-## Delta 2026-04-29 — TASK-724 Cash Position ledger-first sin tocar Banco
-
-`/finance/cash-position` pasa a ser un resumen ejecutivo sobre contratos canonicos existentes de Banco:
-
-- Runtime nuevo: `src/lib/finance/cash-position/overview.ts`.
-- API: `GET /api/finance/cash-position` mantiene campos legacy (`receivable`, `payable`, `fxGainLossClp`, `netPosition`) y agrega payload versionado con `kpis`, `fxGainLoss`, `freshness`, `accounts` enriquecidas y `monthlySeries.source`.
-- Fuente de saldos, categorias, FX y freshness: `getBankOverview({ materialize: 'skip' })` / `account_balances` / `fx_pnl_breakdown` / reglas `instrument_category_kpi_rules`.
-- Fuente de serie mensual: `account_balances_monthly` cuando existe snapshot mensual. Si un mes falta, se marca `source='legacy_safe_fallback'` y `isDegraded=true`.
-- Fallback legacy seguro: usa `COALESCE(payment.amount_clp, payment.amount * COALESCE(payment.exchange_rate_at_payment, document.exchange_rate_to_clp, 1))` y excluye pagos superseded. Esto corrige pagos CLP sobre documentos USD sin reabrir calculos de Banco.
-- Guardrail explicito: TASK-724 no modifica `src/lib/finance/account-balances.ts`, materializadores, reglas KPI ni saldos de Banco. Banco permanece como contrato read-only ya cuadrado.
-
 ## Delta 2026-04-29 — TASK-723 AI-assisted reconciliation intelligence
 
 Conciliacion bancaria incorpora una capa AI **consultiva** sobre el workbench existente. El contrato es deliberadamente conservador para proteger saldos ya cuadrados:

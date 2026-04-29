@@ -1,15 +1,12 @@
 # Handoff.md
 
-## Sesion 2026-04-29 — TASK-724 Cash Position Canonical Ledger Alignment
+## Sesion 2026-04-29 — Incidente Santander CLP read model reparado
 
-- **Cash Position queda ledger-first sin tocar Banco**: no se modifico `src/lib/finance/account-balances.ts`, `account-balances-monthly.ts`, `fx-pnl.ts`, `instrument-kpi-rules.ts`, materializadores ni saldos de Banco. Banco se consume como contrato read-only mediante `getBankOverview({ materialize: 'skip' })`.
-- Runtime nuevo: `src/lib/finance/cash-position/overview.ts`. Construye payload ejecutivo con `kpis`, `fxGainLoss`, `freshness`, `accounts` enriquecidas y `monthlySeries.source`.
-- `GET /api/finance/cash-position` queda como route delgada, mantiene compatibilidad con campos legacy (`receivable`, `payable`, `fxGainLossClp`, `netPosition`) y delega el contrato nuevo al helper.
-- Bug doble FX corregido en fallback legacy seguro: pagos usan `COALESCE(amount_clp, amount * COALESCE(exchange_rate_at_payment, document.exchange_rate_to_clp, 1))`. El caso HubSpot CLP sobre documento USD suma $1.106.321, no ~$1.007B.
-- Filtros defensivos en fallback: `superseded_by_payment_id IS NULL`, `superseded_by_otb_id IS NULL`, `superseded_at IS NULL` y scoping por `space_id` donde el schema lo permite. Nota: `income` no tiene `space_id` directo; el scope de CxC se apoya en payments cuando existen.
-- UI `CashPositionView`: KPIs renombrados a caja disponible, por cobrar, por pagar, credito utilizado, resultado cambiario y posicion neta. Agrega freshness/degraded banner y CTAs a Banco/Conciliacion. Tabla muestra saldo vigente/materializado, categoria y conciliacion.
-- Docs actualizadas: arquitectura finance, documentacion funcional finance, changelog y TASK-724 movida a `complete/`.
-- Verificacion: `pnpm test -- src/lib/finance` OK (479 files, 2617 tests passed, 5 skipped); `pnpm lint` OK; `pnpm build` OK; `pnpm exec tsc --noEmit` OK. `rg -n "new Pool\\(" src` solo muestra usos preexistentes permitidos en `src/lib/postgres/client.ts` y tests legacy de delivery.
+- **Incidente**: despues del deploy de TASK-724 se detecto que `/finance/cash-position` y `/finance/bank` estaban mostrando Santander CLP en `$1.292.758`, pero OfficeBanking al 2026-04-29 08:32 mostraba saldo disponible/contable `$4.153.041`.
+- **Evidencia fuente**: `data/bank/CartolaMovimiento-000092044661-20260427.xlsx` confirma cierre 2026-04-27 en `$4.172.563`; captura OfficeBanking 2026-04-29 confirma `COM.MANTENCION PLAN` 2026-04-28 por `$19.522` y saldo final `$4.153.041`.
+- **Correccion aplicada en Postgres dev/staging**: se reparo solo el read model `greenhouse_finance.account_balances` + `account_balances_monthly` para `santander-clp`, recalculando desde la cartola bancaria y preservando movimientos existentes. No se borraron payments, no se modificaron `bank_statement_rows`, no se tocaron saldos de otras cuentas ni se cambiaron calculos de Banco.
+- **Resultado verificado**: `/api/finance/bank` ahora retorna `santander-clp.closingBalance = 4.153.041`, `kpis.totalClp = 4.161.603`, `kpis.consolidatedClp = 4.163.337,71`, freshness `isStale=false`. `/api/finance/cash-position` ahora retorna `cashAvailableClp = 4.163.337,71`.
+- **Guardrail**: no dejar una solucion hardcodeada como runtime. El fix fue operativo con evidencia bancaria; follow-up recomendado: crear herramienta parametrizada para materializar desde cartola/snapshot validado y evitar scripts con movimientos hardcodeados.
 
 ## Sesion 2026-04-29 — TASK-729 Payroll Reliability Module + Domain Tag + Data Quality Subsystem
 
