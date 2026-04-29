@@ -96,6 +96,7 @@ export const createOrLinkPeriodFromSnapshot = async (
     }
 
     const snapshot = snapshotRows.rows[0]
+
     const snapshotAt = snapshot.snapshot_at instanceof Date
       ? snapshot.snapshot_at
       : new Date(snapshot.snapshot_at as unknown as string)
@@ -150,6 +151,7 @@ export const createOrLinkPeriodFromSnapshot = async (
       }
 
       const account = acctRows.rows[0]
+
       const opening = input.openingBalance != null
         ? input.openingBalance
         : Number(snapshot.pg_closing_balance)

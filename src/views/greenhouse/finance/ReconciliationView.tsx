@@ -11,6 +11,7 @@ import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import CardHeader from '@mui/material/CardHeader'
+import Stack from '@mui/material/Stack'
 import Dialog from '@mui/material/Dialog'
 import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
@@ -31,6 +32,7 @@ import { createColumnHelper, flexRender, getCoreRowModel, getPaginationRowModel,
 import type { ColumnDef, SortingState } from '@tanstack/react-table'
 import classnames from 'classnames'
 
+import CustomAvatar from '@core/components/mui/Avatar'
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 import OptionMenu from '@core/components/option-menu'
@@ -183,6 +185,21 @@ const ReconciliationView = () => {
   const [periods, setPeriods] = useState<ReconciliationPeriod[]>([])
   const [accounts, setAccounts] = useState<Account[]>([])
   const [pendingMovements, setPendingMovements] = useState<PendingMovement[]>([])
+
+  // TASK-722 — orphan snapshots: declarados en Banco sin period linked.
+  const [orphanSnapshots, setOrphanSnapshots] = useState<Array<{
+    snapshotId: string
+    accountId: string
+    accountName: string
+    currency: string
+    snapshotAt: string
+    driftStatus: 'open' | 'accepted' | 'reconciled'
+    driftAmount: number
+    bankClosingBalance: number
+    evidenceAssetId: string | null
+  }>>([])
+
+  const [openingFromSnapshot, setOpeningFromSnapshot] = useState<string | null>(null)
   const [accountFilter, setAccountFilter] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
   const [fetchErrors, setFetchErrors] = useState<string[]>([])
@@ -208,6 +225,14 @@ const ReconciliationView = () => {
       if (statusFilter) params.set('status', statusFilter)
       if (includeArchived) params.set('includeArchived', 'true')
 
+      // TASK-722 — request orphan snapshots for current month (siempre).
+      const now = new Date()
+      const currentYear = now.getFullYear()
+      const currentMonth = now.getMonth() + 1
+
+      params.set('year', String(currentYear))
+      params.set('month', String(currentMonth))
+
       const [periodsRes, accountsRes, incomeRes, expenseRes] = await Promise.all([
         fetch(`/api/finance/reconciliation?${params.toString()}`, { cache: 'no-store' }),
         fetch('/api/finance/accounts', { cache: 'no-store' }),
@@ -219,6 +244,7 @@ const ReconciliationView = () => {
         const data = await periodsRes.json()
 
         setPeriods(data.items ?? [])
+        setOrphanSnapshots(Array.isArray(data.orphanSnapshots) ? data.orphanSnapshots : [])
       } else {
         errors.push(`Períodos: ${periodsRes.status}`)
       }
@@ -345,6 +371,42 @@ const ReconciliationView = () => {
       setArchiveSubmitting(false)
     }
   }, [archiveDialog, archiveReason, fetchData])
+
+  // TASK-722 — abrir/crear periodo desde snapshot declarado en Banco
+  const handleOpenFromSnapshot = useCallback(async (snapshotId: string) => {
+    setOpeningFromSnapshot(snapshotId)
+
+    try {
+      const response = await fetch('/api/finance/reconciliation/from-snapshot', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ snapshotId })
+      })
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}))
+
+        const errorMessage: string = typeof data?.error === 'string'
+          ? data.error
+          : `No se pudo abrir el período desde el snapshot (HTTP ${response.status}).`
+
+        toast.error(errorMessage)
+
+        return
+      }
+
+      const result = await response.json()
+
+      toast.success(result.created ? 'Período creado desde snapshot.' : 'Período abierto en el workbench.')
+
+      // Navigate to the period workbench.
+      window.location.href = result.periodUrl
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Error de red al abrir el período.')
+    } finally {
+      setOpeningFromSnapshot(null)
+    }
+  }, [])
 
   const handleUnarchive = useCallback(async (period: ReconciliationPeriod) => {
     try {
@@ -553,6 +615,79 @@ const ReconciliationView = () => {
         <Alert severity='info'>
           Ya existen movimientos de caja por conciliar, pero aún no hay períodos abiertos. Crea un período para el mes y cuenta correspondiente para empezar el matching bancario.
         </Alert>
+      )}
+
+      {orphanSnapshots.length > 0 && (
+        <Card elevation={0} sx={{ border: theme => `1px solid ${theme.palette.divider}`, borderLeft: '4px solid', borderLeftColor: 'warning.main' }}>
+          <CardHeader
+            avatar={<CustomAvatar variant='rounded' skin='light' color='warning'><i className='tabler-file-import' /></CustomAvatar>}
+            title='Snapshots bancarios sin período abierto'
+            subheader={`${orphanSnapshots.length} cuenta${orphanSnapshots.length === 1 ? '' : 's'} con snapshot declarado en Banco esperando workbench. Abre el período para importar la cartola y resolver el matching.`}
+          />
+          <CardContent sx={{ pt: 0 }}>
+            <Stack spacing={1.5}>
+              {orphanSnapshots.map(snap => (
+                <Box
+                  key={snap.snapshotId}
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: 2,
+                    flexWrap: 'wrap',
+                    p: 2,
+                    border: theme => `1px solid ${theme.palette.divider}`,
+                    borderRadius: 1
+                  }}
+                >
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flex: 1, minWidth: 240 }}>
+                    <CustomAvatar variant='rounded' skin='light' color='info' sx={{ width: 36, height: 36 }}>
+                      <i className='tabler-building-bank' />
+                    </CustomAvatar>
+                    <Box>
+                      <Typography variant='body2' fontWeight={600}>
+                        {snap.accountName}{' '}
+                        <Typography component='span' variant='caption' color='text.secondary'>
+                          ({snap.currency})
+                        </Typography>
+                      </Typography>
+                      <Typography variant='caption' color='text.secondary' sx={{ display: 'block' }}>
+                        Snapshot: {new Date(snap.snapshotAt).toLocaleString('es-CL', { dateStyle: 'medium', timeStyle: 'short' })}
+                        {' · '}
+                        Banco: {formatCLP(snap.bankClosingBalance)}
+                        {' · '}
+                        <CustomChip
+                          size='small'
+                          round='true'
+                          color={snap.driftStatus === 'reconciled' ? 'success' : snap.driftStatus === 'accepted' ? 'info' : 'warning'}
+                          label={snap.driftStatus === 'reconciled' ? 'Cuadrado' : snap.driftStatus === 'accepted' ? `Drift aceptado ${formatCLP(Math.abs(snap.driftAmount))}` : `Drift abierto ${formatCLP(Math.abs(snap.driftAmount))}`}
+                          sx={{ height: 18 }}
+                        />
+                        {snap.evidenceAssetId && (
+                          <>
+                            {' · '}
+                            <i className='tabler-paperclip' style={{ fontSize: 14, verticalAlign: 'middle' }} />
+                            {' Con evidencia'}
+                          </>
+                        )}
+                      </Typography>
+                    </Box>
+                  </Box>
+                  <Button
+                    variant='contained'
+                    size='small'
+                    color='warning'
+                    startIcon={<i className='tabler-arrow-right' />}
+                    onClick={() => handleOpenFromSnapshot(snap.snapshotId)}
+                    disabled={openingFromSnapshot === snap.snapshotId}
+                  >
+                    {openingFromSnapshot === snap.snapshotId ? 'Abriendo…' : 'Abrir workbench'}
+                  </Button>
+                </Box>
+              ))}
+            </Stack>
+          </CardContent>
+        </Card>
       )}
 
       {/* KPIs */}

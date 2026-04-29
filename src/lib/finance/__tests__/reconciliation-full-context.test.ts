@@ -98,12 +98,6 @@ const PERIOD_ROW_WITH_STATEMENT = {
   statement_row_count: 10
 }
 
-const PERIOD_ROW_ARCHIVED = {
-  ...PERIOD_ROW_OPEN,
-  archived_at: '2026-04-29T00:00:00Z',
-  archive_kind: 'test_period'
-}
-
 const COUNTS_ALL_MATCHED = {
   total: '10', matched: '10', suggested: '0', excluded: '0', unmatched: '0'
 }

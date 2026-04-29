@@ -21,6 +21,7 @@ import TableCell from '@mui/material/TableCell'
 import TableContainer from '@mui/material/TableContainer'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
+import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 
 import CustomChip from '@core/components/mui/Chip'
@@ -63,8 +64,38 @@ interface StatementRow {
   matchStatus: string
   matchedType: string | null
   matchedId: string | null
+  matchedPaymentId?: string | null
+  matchedSettlementLegId?: string | null
   matchConfidence: number | null
   notes: string | null
+}
+
+// TASK-722 — bridge contract from /api/finance/reconciliation/[id]
+interface BridgeContext {
+  account: { accountId: string; accountName: string; currency: string; instrumentCategory: string | null; accountKind: 'asset' | 'liability' }
+  period: { periodId: string; status: string; statementImported: boolean; statementRowCount: number; difference: number | null } | null
+  latestSnapshot: {
+    snapshotId: string
+    snapshotAt: string
+    bankClosingBalance: number
+    pgClosingBalance: number
+    driftAmount: number
+    driftStatus: 'open' | 'accepted' | 'reconciled'
+    driftExplanation: string | null
+    sourceKind: string
+    sourceEvidenceRef: string | null
+    evidenceAssetId: string | null
+  } | null
+  evidenceAsset: {
+    assetId: string
+    filename: string
+    mimeType: string
+    sizeBytes: number
+    downloadUrl: string
+  } | null
+  statementRows: { total: number; matched: number; suggested: number; excluded: number; unmatched: number }
+  difference: number | null
+  nextAction: 'declare_snapshot' | 'create_period' | 'import_statement' | 'resolve_matches' | 'mark_reconciled' | 'close_period' | 'closed' | 'archived'
 }
 
 // ---------------------------------------------------------------------------
@@ -122,6 +153,8 @@ const ReconciliationDetailView = () => {
   const [loading, setLoading] = useState(true)
   const [period, setPeriod] = useState<ReconciliationPeriod | null>(null)
   const [statementRows, setStatementRows] = useState<StatementRow[]>([])
+  // TASK-722 — bridge context: snapshot + evidence + drift + nextAction
+  const [bridge, setBridge] = useState<BridgeContext | null>(null)
   const [autoMatchLoading, setAutoMatchLoading] = useState(false)
   const [statusUpdateLoading, setStatusUpdateLoading] = useState<'reconciled' | 'closed' | null>(null)
   const [selectedRow, setSelectedRow] = useState<StatementRow | null>(null)
@@ -145,6 +178,7 @@ const ReconciliationDetailView = () => {
 
         setPeriod(data.period ?? null)
         setStatementRows(data.statements ?? [])
+        setBridge(data.bridge ?? null)
       } else {
         setSnackbar({ open: true, message: 'No pudimos cargar el periodo de conciliacion.', severity: 'error' })
       }
@@ -290,6 +324,19 @@ const ReconciliationDetailView = () => {
   const pendingStatementRows = statementRows.filter(row => row.matchStatus === 'unmatched' || row.matchStatus === 'suggested').length
   const canMarkReconciled = period.statementImported && Math.abs(period.difference) <= 0.01 && pendingStatementRows === 0
 
+  // TASK-722 — explicación clara del blocker para "Marcar conciliado".
+  const markReconciledBlockReason = (() => {
+    if (canMarkReconciled) return null
+
+    const reasons: string[] = []
+
+    if (!period.statementImported) reasons.push('falta importar el extracto bancario')
+    if (pendingStatementRows > 0) reasons.push(`${pendingStatementRows} fila${pendingStatementRows === 1 ? '' : 's'} pendiente${pendingStatementRows === 1 ? '' : 's'} de match`)
+    if (Math.abs(period.difference) > 0.01) reasons.push(`la diferencia es ${formatCLP(period.difference)}, debe ser $0`)
+
+    return reasons.length === 0 ? null : `Bloqueado: ${reasons.join(' · ')}.`
+  })()
+
   // ---------------------------------------------------------------------------
   // Render
   // ---------------------------------------------------------------------------
@@ -330,16 +377,19 @@ const ReconciliationDetailView = () => {
             {autoMatchLoading ? 'Procesando...' : 'Auto-match'}
           </Button>
           {period.status !== 'closed' && period.status !== 'reconciled' && (
-            <Button
-              variant='contained'
-              color='success'
-              startIcon={<i className='tabler-checks' />}
-              onClick={() => handlePeriodStatusUpdate('reconciled')}
-              disabled={!canMarkReconciled || statusUpdateLoading !== null}
-              title={!canMarkReconciled ? 'Necesitas extracto importado, diferencia en cero y sin filas pendientes.' : undefined}
-            >
-              {statusUpdateLoading === 'reconciled' ? 'Marcando...' : 'Marcar conciliado'}
-            </Button>
+            <Tooltip title={markReconciledBlockReason ?? 'Marcar el período como conciliado'} arrow>
+              <span>
+                <Button
+                  variant='contained'
+                  color='success'
+                  startIcon={<i className='tabler-checks' />}
+                  onClick={() => handlePeriodStatusUpdate('reconciled')}
+                  disabled={!canMarkReconciled || statusUpdateLoading !== null}
+                >
+                  {statusUpdateLoading === 'reconciled' ? 'Marcando...' : 'Marcar conciliado'}
+                </Button>
+              </span>
+            </Tooltip>
           )}
           {period.status === 'reconciled' && (
             <Button
@@ -354,6 +404,100 @@ const ReconciliationDetailView = () => {
           )}
         </Box>
       </Box>
+
+      {markReconciledBlockReason && period.status === 'in_progress' && (
+        <Alert severity='info' icon={<i className='tabler-info-circle' />}>
+          <Typography variant='body2'>
+            <strong>Para marcar este período como conciliado:</strong> {markReconciledBlockReason.replace('Bloqueado: ', '')}
+          </Typography>
+        </Alert>
+      )}
+
+      {/* TASK-722 — Estado bancario panel: snapshot + evidencia + drift */}
+      {bridge?.latestSnapshot && (
+        <Card elevation={0} sx={{ border: theme => `1px solid ${theme.palette.divider}`, borderLeft: '4px solid', borderLeftColor: bridge.latestSnapshot.driftStatus === 'reconciled' ? 'success.main' : bridge.latestSnapshot.driftStatus === 'accepted' ? 'info.main' : 'warning.main' }}>
+          <CardHeader
+            avatar={<Avatar variant='rounded' sx={{ bgcolor: 'info.lightOpacity' }}><i className='tabler-building-bank' style={{ color: 'inherit' }} /></Avatar>}
+            title='Estado bancario'
+            subheader={`Snapshot declarado el ${new Date(bridge.latestSnapshot.snapshotAt).toLocaleString('es-CL', { dateStyle: 'medium', timeStyle: 'short' })} · Fuente: ${bridge.latestSnapshot.sourceKind.replace(/_/g, ' ')}`}
+            action={
+              <CustomChip
+                round='true'
+                size='small'
+                color={bridge.latestSnapshot.driftStatus === 'reconciled' ? 'success' : bridge.latestSnapshot.driftStatus === 'accepted' ? 'info' : 'warning'}
+                label={bridge.latestSnapshot.driftStatus === 'reconciled' ? 'Cuadrado' : bridge.latestSnapshot.driftStatus === 'accepted' ? 'Drift aceptado' : 'Drift abierto'}
+              />
+            }
+          />
+          <Divider />
+          <Box sx={{ p: 4, display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(3, 1fr)' }, gap: 4 }}>
+            <Box>
+              <Typography variant='caption' color='text.secondary' sx={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                Saldo banco (snapshot)
+              </Typography>
+              <Typography variant='h6' sx={{ fontVariantNumeric: 'tabular-nums' }}>
+                {formatCLP(bridge.latestSnapshot.bankClosingBalance)}
+              </Typography>
+            </Box>
+            <Box>
+              <Typography variant='caption' color='text.secondary' sx={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                Saldo Greenhouse
+              </Typography>
+              <Typography variant='h6' sx={{ fontVariantNumeric: 'tabular-nums' }}>
+                {formatCLP(bridge.latestSnapshot.pgClosingBalance)}
+              </Typography>
+            </Box>
+            <Box>
+              <Typography variant='caption' color='text.secondary' sx={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                Drift
+              </Typography>
+              <Typography variant='h6' sx={{ fontVariantNumeric: 'tabular-nums', color: Math.abs(bridge.latestSnapshot.driftAmount) < 0.01 ? 'success.main' : 'warning.main' }}>
+                {formatCLP(bridge.latestSnapshot.driftAmount)}
+              </Typography>
+            </Box>
+          </Box>
+          {bridge.latestSnapshot.driftExplanation && (
+            <Box sx={{ px: 4, pb: 3 }}>
+              <Typography variant='caption' color='text.secondary'>
+                Explicación: {bridge.latestSnapshot.driftExplanation}
+              </Typography>
+            </Box>
+          )}
+          {bridge.evidenceAsset && (
+            <Box sx={{ px: 4, pb: 4, display: 'flex', alignItems: 'center', gap: 2 }}>
+              <i className='tabler-paperclip' style={{ fontSize: 18 }} />
+              <Typography variant='body2'>
+                Evidencia adjunta: <strong>{bridge.evidenceAsset.filename}</strong>
+              </Typography>
+              <Button
+                component='a'
+                href={bridge.evidenceAsset.downloadUrl}
+                target='_blank'
+                rel='noreferrer'
+                size='small'
+                variant='outlined'
+                startIcon={<i className='tabler-eye' />}
+              >
+                Ver cartola
+              </Button>
+            </Box>
+          )}
+          {!bridge.evidenceAsset && bridge.latestSnapshot.evidenceAssetId && (
+            <Box sx={{ px: 4, pb: 4 }}>
+              <Alert severity='warning' icon={<i className='tabler-link-off' />}>
+                La evidencia de este snapshot tiene una referencia rota. Re-sube la cartola desde Banco para restaurar la auditoría.
+              </Alert>
+            </Box>
+          )}
+          {!bridge.evidenceAsset && !bridge.latestSnapshot.evidenceAssetId && bridge.latestSnapshot.sourceEvidenceRef && (
+            <Box sx={{ px: 4, pb: 4 }}>
+              <Typography variant='caption' color='text.secondary'>
+                Evidencia legacy (texto libre, pre TASK-721): {bridge.latestSnapshot.sourceEvidenceRef}
+              </Typography>
+            </Box>
+          )}
+        </Card>
+      )}
 
       {/* KPIs */}
       <Grid container spacing={6}>
@@ -533,9 +677,41 @@ const ReconciliationDetailView = () => {
                       </TableCell>
                       <TableCell>
                         {row.matchedId ? (
-                          <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
-                            {row.matchedId}
-                          </Typography>
+                          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                            <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
+                              {row.matchedId}
+                            </Typography>
+                            {/* TASK-722 — distinguir match canónico (settlement_leg, TASK-708) vs legacy (solo payment_id) */}
+                            {row.matchedSettlementLegId ? (
+                              <Tooltip title='Match canónico vía settlement leg (TASK-708): vinculado al ledger contable.' arrow>
+                                <span>
+                                  <CustomChip
+                                    round='true'
+                                    size='small'
+                                    color='success'
+                                    variant='outlined'
+                                    label='Canónico'
+                                    icon={<i className='tabler-link' style={{ fontSize: 12 }} />}
+                                    sx={{ height: 18, fontSize: '0.65rem' }}
+                                  />
+                                </span>
+                              </Tooltip>
+                            ) : row.matchedPaymentId ? (
+                              <Tooltip title='Match legacy: solo payment_id, no vinculado a un settlement_leg. Pendiente upgrade al canal canónico TASK-708.' arrow>
+                                <span>
+                                  <CustomChip
+                                    round='true'
+                                    size='small'
+                                    color='warning'
+                                    variant='outlined'
+                                    label='Legacy'
+                                    icon={<i className='tabler-clock-pause' style={{ fontSize: 12 }} />}
+                                    sx={{ height: 18, fontSize: '0.65rem' }}
+                                  />
+                                </span>
+                              </Tooltip>
+                            ) : null}
+                          </Box>
                         ) : (
                           <Typography variant='body2' color='text.secondary'>
                             —
