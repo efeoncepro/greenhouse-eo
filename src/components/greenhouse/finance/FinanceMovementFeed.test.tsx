@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest'
 import { renderWithTheme } from '@/test/render'
 
 import FinanceMovementFeed from './FinanceMovementFeed'
+import { FINANCE_MOVEMENT_PROVIDER_CATALOG } from './finance-movement-provider-catalog'
 import type { FinanceMovementFeedItem } from './finance-movement-feed.types'
 
 const items: FinanceMovementFeedItem[] = [
@@ -37,10 +38,17 @@ const items: FinanceMovementFeedItem[] = [
 
 describe('FinanceMovementFeed', () => {
   it('renders movement titles, statuses and amounts', () => {
-    const { getByText } = renderWithTheme(<FinanceMovementFeed items={items} showRunningBalance />)
+    const { getByLabelText, getByText } = renderWithTheme(
+      <FinanceMovementFeed
+        items={[{ ...items[0], providerId: 'hubspot' }, items[1] as FinanceMovementFeedItem]}
+        providerCatalog={FINANCE_MOVEMENT_PROVIDER_CATALOG}
+        showRunningBalance
+      />
+    )
 
     expect(getByText('HubSpot — Marketing Hub Starter + Sales Hub Pro + Service Hub Pro')).toBeInTheDocument()
-    expect(getByText('Pendiente')).toBeInTheDocument()
+    expect(getByLabelText('HubSpot')).toBeInTheDocument()
+    expect(getByText('Pago pendiente')).toBeInTheDocument()
     expect(getByText('Conciliado')).toBeInTheDocument()
     expect(getByText('-$187.350')).toBeInTheDocument()
     expect(getByText((_, element) => element?.textContent === 'Saldo: $4.537.844')).toBeInTheDocument()

@@ -2,6 +2,12 @@
 
 ## 2026-04-29
 
+### 2026-04-29 — Finance movement feed visual fidelity
+
+- Finance / Conciliacion: el feed de movimientos pendientes ahora infiere proveedores SaaS conocidos desde el texto operativo y usa un catalogo visual local para HubSpot, Envato, GitHub, Google, Adobe y Notion sin depender de logos no auditados.
+- Los egresos dejan de usar iconografia azul de accion/navegacion y pasan a tonos warning/neutros; los labels pendientes ahora distinguen `Pago pendiente` y `Cobro pendiente`.
+- La correccion sigue siendo visual/read-only: no toca queries, saldos, matching, materializaciones ni datos persistidos.
+
 ### 2026-04-29 — Finance movement feed foundation
 
 - Finance / Conciliacion: TASK-726 reemplazo la mini-tabla de "Movimientos de caja por conciliar" por `FinanceMovementFeed`, una primitive reusable con wrapping seguro, estados accesibles y virtualizacion encapsulada con `@tanstack/react-virtual`.

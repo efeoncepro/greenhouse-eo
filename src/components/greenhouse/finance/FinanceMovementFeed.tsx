@@ -19,8 +19,8 @@ import EmptyState from '@/components/greenhouse/EmptyState'
 import type { FinanceMovementFeedItem, FinanceMovementFeedProps, FinanceMovementVisual } from './finance-movement-feed.types'
 import {
   FINANCE_MOVEMENT_STATUS_COLORS,
-  FINANCE_MOVEMENT_STATUS_LABELS,
   formatFinanceMovementAmount,
+  getFinanceMovementStatusLabel,
   groupFinanceMovementItems,
   resolveFinanceMovementVisual
 } from './finance-movement-feed.utils'
@@ -39,11 +39,12 @@ const movementColor = (visual: FinanceMovementVisual) => visual.color ?? 'second
 
 const MovementVisual = ({ visual, compact }: { visual: FinanceMovementVisual; compact: boolean }) => {
   const color = movementColor(visual)
+  const hasCustomTone = Boolean(visual.tone)
 
   return (
     <CustomAvatar
       variant='rounded'
-      skin='light'
+      skin={hasCustomTone ? undefined : 'light'}
       color={color}
       sx={{
         flex: '0 0 auto',
@@ -51,14 +52,17 @@ const MovementVisual = ({ visual, compact }: { visual: FinanceMovementVisual; co
         height: compact ? 38 : 48,
         borderRadius: '50%',
         fontWeight: 600,
-        textTransform: 'uppercase'
+        textTransform: 'none',
+        bgcolor: visual.tone?.bg,
+        color: visual.tone?.text,
+        border: visual.tone?.border ? `1px solid ${visual.tone.border}` : undefined
       }}
       aria-label={visual.label}
     >
       {visual.kind === 'provider_logo' && visual.logoUrl ? (
         <img src={visual.logoUrl} alt='' style={{ maxWidth: '70%', maxHeight: '70%', objectFit: 'contain' }} />
       ) : visual.kind === 'initials' ? (
-        <Typography component='span' variant='caption' sx={{ fontWeight: 700, color: 'inherit' }}>
+        <Typography component='span' variant='caption' sx={{ fontWeight: 700, color: 'inherit', letterSpacing: 0 }}>
           {visual.initials}
         </Typography>
       ) : (
@@ -140,7 +144,7 @@ const MovementRow = ({
   const amount = formatFinanceMovementAmount(item.amount, item.currency)
   const runningBalance = item.runningBalance == null ? null : formatFinanceMovementAmount(item.runningBalance, item.currency)
   const statusColor = item.status ? FINANCE_MOVEMENT_STATUS_COLORS[item.status] : undefined
-  const statusLabel = item.status ? FINANCE_MOVEMENT_STATUS_LABELS[item.status] : null
+  const statusLabel = getFinanceMovementStatusLabel(item)
   const confidenceLabel = item.confidence == null ? null : `${Math.round(item.confidence * 100)}%`
 
   const handleSelect = () => {
@@ -160,7 +164,7 @@ const MovementRow = ({
           bgcolor: 'action.hover'
         },
         '&:focus-within': {
-          boxShadow: theme => `inset 3px 0 0 ${theme.palette.primary.main}`
+          boxShadow: theme => `inset 0 0 0 1px ${alpha(theme.palette.primary.main, 0.18)}`
         }
       }}
     >
@@ -193,7 +197,7 @@ const MovementRow = ({
             variant='body2'
             sx={{
               color: theme => theme.palette.customColors?.midnight ?? 'text.primary',
-              fontWeight: 600,
+              fontWeight: 500,
               lineHeight: 1.4,
               overflowWrap: 'anywhere'
             }}
@@ -233,7 +237,7 @@ const MovementRow = ({
             variant='body2'
             sx={{
               fontWeight: 600,
-              color: item.direction === 'in' ? 'success.main' : 'text.primary',
+              color: item.direction === 'in' ? 'success.main' : theme => theme.palette.customColors?.midnight ?? 'text.primary',
               whiteSpace: 'nowrap',
               fontVariantNumeric: 'tabular-nums'
             }}

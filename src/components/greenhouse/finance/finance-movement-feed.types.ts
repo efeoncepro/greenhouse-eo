@@ -26,6 +26,12 @@ export type FinanceMovementVisual = {
   logoUrl?: string | null
   logoStatus?: FinanceMovementLogoStatus
   color?: 'primary' | 'success' | 'warning' | 'error' | 'info' | 'secondary'
+  tone?: {
+    source: string
+    bg: string
+    text: string
+    border?: string
+  }
 }
 
 export type FinanceMovementProviderIdentity = {
@@ -33,6 +39,8 @@ export type FinanceMovementProviderIdentity = {
   providerName?: string | null
   iconUrl?: string | null
   logoStatus?: FinanceMovementLogoStatus
+  initials?: string | null
+  tone?: FinanceMovementVisual['tone']
 }
 
 export type FinanceMovementDetail = {

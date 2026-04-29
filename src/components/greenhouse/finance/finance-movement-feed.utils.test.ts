@@ -2,7 +2,12 @@ import { describe, expect, it } from 'vitest'
 
 import type { FinanceMovementFeedItem } from './finance-movement-feed.types'
 import {
+  FINANCE_MOVEMENT_PROVIDER_CATALOG,
+  inferFinanceMovementProviderId
+} from './finance-movement-provider-catalog'
+import {
   formatFinanceMovementAmount,
+  getFinanceMovementStatusLabel,
   groupFinanceMovementItems,
   resolveFinanceMovementVisual
 } from './finance-movement-feed.utils'
@@ -70,5 +75,33 @@ describe('finance-movement-feed utils', () => {
 
     expect(fallback.kind).toBe('initials')
     expect(fallback.initials).toBe('EN')
+  })
+
+  it('infers known SaaS providers from operational movement text', () => {
+    expect(inferFinanceMovementProviderId({ title: 'HubSpot — Marketing Hub Starter + Sales Hub Pro' })).toBe('hubspot')
+    expect(inferFinanceMovementProviderId({ title: 'Envato Elements (compra TC corp)' })).toBe('envato')
+    expect(inferFinanceMovementProviderId({ title: 'Google Play / Workspace charges' })).toBe('google')
+  })
+
+  it('keeps cash-out visuals in the warning family instead of primary blue', () => {
+    const visual = resolveFinanceMovementVisual(baseItem)
+
+    expect(visual.kind).toBe('semantic_icon')
+    expect(visual.color).toBe('warning')
+  })
+
+  it('uses branded local provider tones when a known provider is resolved', () => {
+    const visual = resolveFinanceMovementVisual(
+      { ...baseItem, providerId: 'hubspot' },
+      { providerCatalog: FINANCE_MOVEMENT_PROVIDER_CATALOG }
+    )
+
+    expect(visual.kind).toBe('provider_logo')
+    expect(visual.tone?.text).toBeTruthy()
+  })
+
+  it('uses direction-specific pending labels', () => {
+    expect(getFinanceMovementStatusLabel(baseItem)).toBe('Pago pendiente')
+    expect(getFinanceMovementStatusLabel({ ...baseItem, direction: 'in', sourceType: 'cash_in' })).toBe('Cobro pendiente')
   })
 })

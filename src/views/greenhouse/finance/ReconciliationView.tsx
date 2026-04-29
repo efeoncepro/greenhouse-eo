@@ -38,7 +38,7 @@ import CustomTextField from '@core/components/mui/TextField'
 import OptionMenu from '@core/components/option-menu'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 import TablePaginationComponent from '@components/TablePaginationComponent'
-import { FinanceMovementFeed } from '@/components/greenhouse/finance'
+import { FINANCE_MOVEMENT_PROVIDER_CATALOG, FinanceMovementFeed, inferFinanceMovementProviderId } from '@/components/greenhouse/finance'
 import type { FinanceMovementFeedItem } from '@/components/greenhouse/finance'
 
 import tableStyles from '@core/styles/table.module.css'
@@ -503,6 +503,11 @@ const ReconciliationView = () => {
         status: 'pending',
         sourceType: item.type === 'cobro' ? 'cash_in' : 'cash_out',
         sourceId: item.id,
+        providerId: inferFinanceMovementProviderId({
+          title: item.description,
+          counterparty: item.partyName,
+          instrumentName: item.instrumentName
+        }),
         details: [
           { label: 'Tipo', value: item.type === 'cobro' ? 'Cobro' : 'Pago' },
           { label: 'ID origen', value: item.id },
@@ -819,6 +824,7 @@ const ReconciliationView = () => {
           density='comfortable'
           showRunningBalance={false}
           virtualizeThreshold={80}
+          providerCatalog={FINANCE_MOVEMENT_PROVIDER_CATALOG}
           emptyTitle='Sin movimientos de caja pendientes'
           emptyDescription='No hay cobros ni pagos esperando match bancario en este momento.'
         />

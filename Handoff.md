@@ -1,5 +1,12 @@
 # Handoff.md
 
+## Sesion 2026-04-29 — Finance movement feed visual fidelity fix
+
+- Se corrigio la fidelidad visual del feed en `/finance/reconciliation` respecto del mockup aprobado: egresos ya no usan tono azul primario, labels pendientes distinguen `Pago pendiente` / `Cobro pendiente`, y el foco visual deja de parecer seleccion activa.
+- Se agrego `finance-movement-provider-catalog.ts` como catalogo visual local/auditable para SaaS conocidos (HubSpot, Envato, GitHub, Google, Adobe, Notion). La vista infiere provider desde texto operativo como fallback de presentacion; no cambia DB ni source of truth financiero.
+- Guardrail de logos: solo se usan SVG locales cuando estan marcados `verified`; en el resto se usan iniciales con tono de marca controlado. No se muestran logos externos no auditados.
+- Verificacion: `pnpm test src/components/greenhouse/finance` OK; `pnpm exec eslint src/components/greenhouse/finance src/views/greenhouse/finance/ReconciliationView.tsx` OK; `pnpm exec tsc --noEmit` OK; `pnpm lint` OK; `pnpm build` OK.
+
 ## Sesion 2026-04-29 — TASK-726 Finance Movement Feed Foundation completada
 
 - Se creo `FinanceMovementFeed` en `src/components/greenhouse/finance/` como primitive reusable para movimientos financieros con agrupacion por fecha, wrapping seguro, estados loading/error/empty, detalles expandibles y virtualizacion encapsulada via `@tanstack/react-virtual`.

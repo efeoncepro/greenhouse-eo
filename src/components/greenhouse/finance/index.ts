@@ -11,9 +11,14 @@ export type {
   FinanceMovementVisual
 } from './finance-movement-feed.types'
 export {
+  FINANCE_MOVEMENT_PROVIDER_CATALOG,
+  inferFinanceMovementProviderId
+} from './finance-movement-provider-catalog'
+export {
   FINANCE_MOVEMENT_STATUS_COLORS,
   FINANCE_MOVEMENT_STATUS_LABELS,
   formatFinanceMovementAmount,
+  getFinanceMovementStatusLabel,
   getFinanceMovementDayKey,
   getFinanceMovementDayLabel,
   groupFinanceMovementItems,

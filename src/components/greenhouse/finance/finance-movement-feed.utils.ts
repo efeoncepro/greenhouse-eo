@@ -13,6 +13,19 @@ export const FINANCE_MOVEMENT_STATUS_LABELS: Record<FinanceMovementStatus, strin
   review: 'Revisar'
 }
 
+export const getFinanceMovementStatusLabel = (item: FinanceMovementFeedItem): string | null => {
+  if (!item.status) return null
+
+  if (item.status === 'pending') {
+    if (item.direction === 'in' || item.sourceType === 'cash_in') return 'Cobro pendiente'
+    if (item.direction === 'out' || item.sourceType === 'cash_out') return 'Pago pendiente'
+  }
+
+  if (item.status === 'suggested') return 'Sugerido AI'
+
+  return FINANCE_MOVEMENT_STATUS_LABELS[item.status]
+}
+
 export const FINANCE_MOVEMENT_STATUS_COLORS: Record<FinanceMovementStatus, 'primary' | 'success' | 'warning' | 'error' | 'info' | 'secondary'> = {
   pending: 'warning',
   suggested: 'info',
@@ -93,17 +106,19 @@ const resolveCatalogVisual = (
       label,
       logoUrl: identity.iconUrl,
       logoStatus,
-      initials: getInitials(label),
-      color: 'primary'
+      initials: identity.initials ?? getInitials(label),
+      color: 'primary',
+      tone: identity.tone
     }
   }
 
   return {
     kind: 'initials',
     label,
-    initials: getInitials(label),
+    initials: identity.initials ?? getInitials(label),
     logoStatus,
-    color: 'primary'
+    color: 'primary',
+    tone: identity.tone
   }
 }
 
@@ -142,7 +157,7 @@ export const resolveFinanceMovementVisual = (
       kind: 'semantic_icon',
       label: 'Egreso',
       icon: item.sourceType === 'tooling_provider' ? 'tabler-tools' : 'tabler-arrow-up-right',
-      color: item.sourceType === 'tooling_provider' ? 'warning' : 'primary'
+      color: 'warning'
     }
   }
 
