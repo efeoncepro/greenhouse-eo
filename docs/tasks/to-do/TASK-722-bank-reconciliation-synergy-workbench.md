@@ -153,6 +153,7 @@ Reglas obligatorias:
 - Definir estrategia persistente para relacionar snapshot con periodo:
   - preferido: columnas aditivas nullable `reconciliation_period_id` y, si aplica, `statement_import_batch_id` en `account_reconciliation_snapshots`.
   - alternativa permitida solo si la migracion se posterga: helper deterministico por `account_id + snapshot_at month` con warning de deuda.
+- **Garantía de idempotencia** — verificar si existe `UNIQUE (account_id, year, month)` en `reconciliation_periods`. Hoy la PK es solo `period_id` (text); el formato deterministico `accountId_year_month` (e.g. `santander-clp_2026_03`) protege a nivel aplicacional, no a nivel DB. Agregar migración aditiva `ALTER TABLE ... ADD CONSTRAINT IF NOT EXISTS uniq_recon_periods_account_year_month UNIQUE (account_id, year, month)` con pre-flight que aborte si hay duplicados existentes. Sin esto, dos requests concurrentes de `createPeriodFromSnapshot` pueden crear duplicados con `period_id` diferente.
 
 ### Slice 2 — Period creation from Bank snapshot
 
@@ -188,6 +189,7 @@ Reglas obligatorias:
 - Si no hay extracto importado pero hay evidencia asset compatible, mostrar CTA "Importar desde evidencia" cuando el parser lo soporte; si no, "Importar extracto" normal con contexto.
 - Mantener los CTAs actuales: importar extracto, auto-match, marcar conciliado, cerrar periodo.
 - Agregar estado bloqueante claro cuando `Marcar conciliado` esta disabled: falta extracto, quedan filas pendientes o diferencia no es cero.
+- **Surface canonical match channel** — en la tabla de filas del extracto, mostrar `matched_settlement_leg_id` (canal canónico TASK-708) además de `match_status`/`matched_payment_id`. Cuando `matched_settlement_leg_id` esté poblado, el match es vía settlement leg (vinculación canónica con el ledger); cuando esté null pero `matched_payment_id` no, es un match legacy/payment-only que requiere upgrade. La UI debe distinguir ambos casos con chip diferenciado y tooltip ("Match canónico vía settlement leg" vs "Match legacy via payment_id — pendiente upgrade a settlement leg").
 
 ### Slice 5 — UX, accessibility and microinteractions
 
@@ -264,15 +266,30 @@ type BankReconciliationBridge = {
 
 ### Access model
 
-- `routeGroups`: seguir usando `finance` para `/finance/*`.
-- `views` / `authorizedViews`: la task reutiliza las surfaces existentes `/finance/bank` y `/finance/reconciliation`; si se declaran view codes finos, usar `finance.bank` y `finance.reconciliation.list/detail` o el naming vigente del catálogo.
-- `entitlements`: usar/crear capabilities finas si no existen:
-  - `finance.reconciliation.read@tenant`
-  - `finance.reconciliation.match@space`
-  - `finance.reconciliation.import@space`
-  - `finance.reconciliation.declare_snapshot@space`
-  - `finance.reconciliation.close@space`
-- La instalacion/visibilidad de views no concede automaticamente matching ni cierre.
+#### Estado verificado del motor de entitlements (2026-04-29)
+
+- El motor de entitlements **ya existe** y está cerrado por `TASK-403` (complete). Vive en `src/lib/entitlements/runtime.ts` con helpers `can()`, `canSeeModule()`, `getTenantEntitlements()`.
+- El catálogo canónico es runtime-only en `src/config/entitlements-catalog.ts` (no hay tabla DB `entitlement_capabilities` — el TS catalog **es** la fuente de verdad).
+- Capabilities `finance.*` ya seedeadas (9): `finance.workspace`, `finance.status`, `finance.payment_instruments.{read,update,deactivate,manage_defaults,reveal_sensitive}`, `finance.cash.{adopt,dismiss}-external-signal`.
+- Forma de cada capability: `{ module, capability, action, scope }` — **NO** existe la sintaxis postfija `capability@scope`. `scope` es campo separado del catálogo.
+
+#### Plan de access model dentro del scope de esta task
+
+- Mantener `requireFinanceTenantContext` (route group `finance` o `efeonce_admin`) como guard transversal en `/api/finance/reconciliation/*` y `/api/finance/reconciliation/[id]/*`. NO eliminarlo.
+- Agregar **5 capabilities nuevas** al catálogo en `src/config/entitlements-catalog.ts` (file edit, sin migration):
+  - `finance.reconciliation.read` — `{ action: 'read', scope: 'tenant' }`
+  - `finance.reconciliation.match` — `{ action: 'write', scope: 'space' }`
+  - `finance.reconciliation.import` — `{ action: 'write', scope: 'space' }`
+  - `finance.reconciliation.declare_snapshot` — `{ action: 'write', scope: 'space' }`
+  - `finance.reconciliation.close` — `{ action: 'write', scope: 'space' }`
+- Extender `getTenantEntitlements()` (mismo helper de TASK-403) para que conceda esas 5 según role + routeGroup actual:
+  - `efeonce_admin` o `finance_admin` → todas
+  - `finance_operator` o `routeGroup=finance` → `read` + `match` + `import` + `declare_snapshot`
+  - `close` solo a `efeonce_admin` y `finance_admin` (acción transaccional de cierre).
+- En los endpoints de mutación (auto-match, match manual, import, exclude, accept, reconcile, archive), agregar guard granular adicional `can({ subject, capability, action, scope })` además del `requireFinanceTenantContext` general.
+- En `BankView` y `ReconciliationView`/`ReconciliationDetailView`, gatear CTAs sensibles (`Importar extracto`, `Marcar conciliado`, `Cerrar período`) con `can()` para evitar que aparezcan disabled cuando la persona no debe verlos.
+- `views` / `authorizedViews`: la task reutiliza las surfaces existentes `/finance/bank` y `/finance/reconciliation`; no se introduce un view code nuevo en V1.
+- La instalación/visibilidad de views no concede automáticamente matching ni cierre — el guard `can()` cubre esa separación.
 
 ### UX review inputs
 
@@ -341,3 +358,10 @@ Hallazgos usados para esta task:
 ## Delta 2026-04-28
 
 - Task creada tras revisar UI/codigo de Banco y Conciliacion, staging requests reales, Playwright autenticado con usuario agente y las skills `greenhouse-ux-content-accessibility` + `greenhouse-microinteractions-auditor`.
+
+## Delta 2026-04-29
+
+- **Access model corregido contra realidad del codebase**. El motor de entitlements ya existe (TASK-403, complete) en `src/lib/entitlements/runtime.ts` con helpers `can()`/`canSeeModule()`/`getTenantEntitlements()`. El catálogo es runtime-only en `src/config/entitlements-catalog.ts` (no hay tabla DB). Las 5 capabilities `finance.reconciliation.*` se agregan dentro del scope de esta task — son ~50 líneas en 2 archivos, no requieren task separada ni esperar otro entregable. Sintaxis canónica: `{ module, capability, action, scope }` (campos separados, no postfijo `@scope`).
+- **Slice 1 reforzado** con garantía DB de idempotencia: agregar `UNIQUE (account_id, year, month)` en `reconciliation_periods` con migración aditiva. Sin eso, dos requests concurrentes de "create period from snapshot" pueden generar duplicados con period_id distintos.
+- **Slice 4 ampliado** para mostrar `matched_settlement_leg_id` (canal canónico TASK-708) además de `match_status` y `matched_payment_id`. UI debe distinguir match canónico (vía settlement leg) vs legacy (solo payment_id, pendiente upgrade).
+- Referencia incorrecta a "TASK-690 entrega entitlements" eliminada — TASK-690 es Notification Hub (otro dominio).
