@@ -1,5 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { ROLE_CODES } from '@/config/role-codes'
+
 const mockRequireFinanceTenantContext = vi.fn()
 const mockCreateFinanceAccountInPostgres = vi.fn()
 const mockUpsertFinanceExchangeRateInPostgres = vi.fn()
@@ -97,7 +99,14 @@ describe('Finance BigQuery write cutover guards', () => {
     process.env.FINANCE_BIGQUERY_WRITE_ENABLED = 'false'
 
     mockRequireFinanceTenantContext.mockResolvedValue({
-      tenant: { tenantType: 'efeonce_internal', routeGroups: ['internal'], userId: 'user-1' },
+      tenant: {
+        tenantType: 'efeonce_internal',
+        routeGroups: ['internal', 'finance'],
+        roleCodes: [ROLE_CODES.FINANCE_ADMIN],
+        primaryRoleCode: ROLE_CODES.FINANCE_ADMIN,
+        authorizedViews: [],
+        userId: 'user-1'
+      },
       errorResponse: null
     })
 

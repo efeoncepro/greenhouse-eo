@@ -5,6 +5,22 @@ import { resolvePortalHomePolicy } from '@/lib/tenant/resolve-portal-home-path'
 
 const UNIQUE_SEPARATOR = '::'
 
+const normalizeStringArray = (value: unknown): string[] =>
+  Array.isArray(value)
+    ? value.filter((entry): entry is string => typeof entry === 'string' && entry.trim().length > 0)
+    : []
+
+const normalizeSubject = (subject: TenantEntitlementSubject): TenantEntitlementSubject => ({
+  ...subject,
+  roleCodes: normalizeStringArray(subject.roleCodes),
+  routeGroups: normalizeStringArray(subject.routeGroups),
+  authorizedViews: normalizeStringArray(subject.authorizedViews),
+  projectScopes: normalizeStringArray(subject.projectScopes),
+  campaignScopes: normalizeStringArray(subject.campaignScopes),
+  businessLines: normalizeStringArray(subject.businessLines),
+  serviceModules: normalizeStringArray(subject.serviceModules)
+})
+
 const hasRole = (subject: TenantEntitlementSubject, roleCode: string) => subject.roleCodes.includes(roleCode)
 const hasRouteGroup = (subject: TenantEntitlementSubject, routeGroup: string) => subject.routeGroups.includes(routeGroup)
 const hasAuthorizedView = (subject: TenantEntitlementSubject, viewCode: string) => subject.authorizedViews.includes(viewCode)
@@ -64,7 +80,8 @@ const inferAudience = (subject: TenantEntitlementSubject): HomeAudienceKey => {
   return 'internal'
 }
 
-export const getTenantEntitlements = (subject: TenantEntitlementSubject): TenantEntitlements => {
+export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): TenantEntitlements => {
+  const subject = normalizeSubject(rawSubject)
   const entries = new Map<string, TenantEntitlement>()
 
   addEntitlement(entries, {

@@ -114,4 +114,15 @@ describe('getTenantEntitlements', () => {
     expect(can(entitlements, 'client_portal.workspace', 'launch', 'space')).toBe(true)
     expect(canSeeModule(entitlements, 'client_portal')).toBe(true)
   })
+
+  it('fails closed instead of throwing when a legacy caller omits optional access arrays', () => {
+    const subject = {
+      userId: 'legacy-user',
+      tenantType: 'efeonce_internal',
+      primaryRoleCode: ROLE_CODES.COLLABORATOR
+    } as TenantEntitlementSubject
+
+    expect(can(subject, 'finance.reconciliation.declare_snapshot', 'create', 'space')).toBe(false)
+    expect(can(subject, 'home.view', 'read', 'own')).toBe(true)
+  })
 })
