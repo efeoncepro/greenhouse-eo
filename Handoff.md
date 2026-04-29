@@ -1,5 +1,11 @@
 # Handoff.md
 
+## Sesion 2026-04-29 — Manual de Uso agregado
+
+- Se creo `docs/manual-de-uso/` como nueva capa documental para guias practicas de uso del portal por dominio.
+- `AGENTS.md` y `CLAUDE.md` ahora instruyen a agentes a crear/actualizar manuales tras implementar capacidades visibles que requieran pasos, permisos, cuidados o troubleshooting.
+- Primer manual creado: `docs/manual-de-uso/finance/sugerencias-asistidas-conciliacion.md`, cubriendo la feature TASK-723 de sugerencias asistidas de conciliacion.
+
 ## Sesion 2026-04-29 — TASK-723 AI-Assisted Reconciliation Intelligence completada
 
 - TASK-723 se movio a `docs/tasks/complete/` tras implementacion y validacion.

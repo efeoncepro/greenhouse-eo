@@ -66,6 +66,11 @@ Indice maestro de la documentacion no operativa del repo.
 - [Sistema de Observabilidad de Tests](documentation/plataforma/sistema-observabilidad-de-tests.md)
 - [Sister Platform Bindings](documentation/plataforma/sister-platform-bindings.md)
 
+### Manual de uso
+
+- [Manual de Uso](manual-de-uso/README.md)
+- [Sugerencias asistidas de conciliacion](manual-de-uso/finance/sugerencias-asistidas-conciliacion.md)
+
 ### API
 
 - [GREENHOUSE_API_REFERENCE_V1.md](api/GREENHOUSE_API_REFERENCE_V1.md)

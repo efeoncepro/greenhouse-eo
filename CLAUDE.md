@@ -81,6 +81,7 @@ Regla: módulos de dominio extienden estos objetos, no crean identidades paralel
 - `docs/issues/README.md` — pipeline de incidentes operativos `ISSUE-###`
 - `docs/architecture/` — specs de arquitectura canónicas (30+ documentos)
 - `docs/documentation/` — documentación funcional de la plataforma en lenguaje simple, organizada por dominio (identity, finance, hr, etc.). Cada documento enlaza a su spec técnica en `docs/architecture/`
+- `docs/manual-de-uso/` — manuales prácticos por dominio para usar capacidades concretas del portal paso a paso, con permisos, cuidados y troubleshooting
 - `docs/operations/` — modelos operativos (documentación, GitHub Project, data model, repo ecosystem)
 - Fuente canónica para higiene y rotación segura de secretos:
   - `docs/operations/GREENHOUSE_CLOUD_GOVERNANCE_OPERATING_MODEL_V1.md`
@@ -269,6 +270,44 @@ Contenido:
 
 - `docs/architecture/` → contratos técnicos para agentes y desarrolladores (schemas, APIs, decisiones de diseño)
 - `docs/documentation/` → explicaciones funcionales para entender cómo funciona la plataforma (roles, flujos, reglas de negocio)
+
+## User Manual Protocol
+
+Los manuales de uso viven en `docs/manual-de-uso/` y explican cómo operar una capacidad concreta del portal paso a paso. Su índice es `docs/manual-de-uso/README.md`.
+
+### Cuándo crear o actualizar
+
+- **Al completar una implementación visible** que agregue una feature, botón, panel, workflow o módulo que el usuario debe aprender a operar, revisar `docs/manual-de-uso/`.
+- Si ya existe un manual para esa capacidad, actualizarlo.
+- Si no existe y el flujo tiene pasos, permisos, estados, riesgos operativos o troubleshooting, crear uno.
+- Si la feature solo cambia reglas internas sin cambio visible, normalmente basta con `docs/documentation/` o `docs/architecture/`.
+
+### Estructura
+
+```
+docs/manual-de-uso/
+  README.md
+  finance/
+  identity/
+  admin-center/
+  hr/
+  agency/
+  plataforma/
+```
+
+### Formato mínimo
+
+Cada manual debe incluir:
+
+- para qué sirve
+- antes de empezar
+- paso a paso
+- qué significan los estados o señales
+- qué no hacer
+- problemas comunes
+- referencias técnicas
+
+Regla: escribir para el operador del portal, no para el implementador. El manual debe permitir usar la feature sin leer código.
 
 ### Heurística de acceso para agentes
 

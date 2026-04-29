@@ -5482,6 +5482,16 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Las APIs `/api/finance/reconciliation/[id]/intelligence*` solo listan/generan/revisan sugerencias. No aplican matches, no escriben `account_balances`, no rematerializan saldos y no cierran periodos.
 - El CTA de UI abre el dialog existente de conciliacion con candidato preseleccionado; el usuario sigue confirmando el match con el flujo humano normal.
 - Cualquier extension futura debe mantener el filtro por `space_id` y `account_id`, preferir `settlement_legs` canonicas y tratar payment-only legacy como baja confianza.
+
+## Delta 2026-04-29 — Manual de Uso como capa documental
+
+- Se agrega `docs/manual-de-uso/` como capa separada para guias practicas de uso del portal por dominio.
+- Diferencia canonica:
+  - `docs/architecture/` = contratos tecnicos.
+  - `docs/documentation/` = explicacion funcional y reglas de negocio.
+  - `docs/manual-de-uso/` = pasos concretos para usar una capacidad, permisos, cuidados y troubleshooting.
+- `AGENTS.md` y `CLAUDE.md` ahora exigen revisar/crear manuales tras implementar capacidades visibles que el usuario deba operar.
+- Primer manual: `docs/manual-de-uso/finance/sugerencias-asistidas-conciliacion.md`.
 ## Delta 2026-04-21 TASK-548 cierra el loop operativo de Product Catalog Sync
 
 - Greenhouse ya tiene detección nocturna de drift para `product_catalog` frente a HubSpot Products.

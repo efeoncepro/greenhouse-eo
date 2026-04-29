@@ -7466,6 +7466,7 @@ Validations: tsc 0 errors, lint 0 errors, 427 files / 2225 tests pass / 5 skippe
 
 - Finance / Conciliacion: TASK-723 agregó inteligencia asistida consultiva para el workbench. Las sugerencias se guardan con audit trail por `space_id`, prompt/model hashes y revisión humana; no aplican matches, no re-materializan saldos y no cierran períodos.
 - Finance / Reconciliation safety: el resolver de candidatos ahora mantiene el scope por `account_id` también para expense payments/settlement legs, evitando sugerencias cruzadas entre instrumentos.
+- Documentacion / Manual de Uso: se agregó `docs/manual-de-uso/` como capa práctica por dominio para explicar cómo operar features visibles, y se documentó la obligación en `AGENTS.md` y `CLAUDE.md`.
 
 ## 2026-04-26
 
