@@ -5,6 +5,7 @@
 ### 2026-04-29 — TASK-728 Finance Movement Feed Decision Polish
 
 - Finance / Conciliacion: la cola de movimientos por conciliar queda como superficie operativa principal, con resumen visible, subtotales por día, microinteracciones de fila y orden visual antes de la tabla de períodos. Cambio UI/read-only; no modifica saldos, matching ni materializaciones.
+- Documentacion: `FinanceMovementFeed` queda registrado como primitive reusable en `docs/documentation/finance/finance-movement-feed.md`, con API publica, reglas de catalogos visuales, virtualizacion, guardrails read-only y checklist para reutilizarlo sin duplicar tablas ni hardcodear logos.
 
 ### 2026-04-29 — TASK-727 Internal role × view matrix + Supervisor scope en JWT
 

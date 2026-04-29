@@ -1,10 +1,10 @@
 # Conciliación bancaria
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.4
+> **Version:** 1.5
 > **Creado:** 2026-04-27 por Claude Opus 4.7 + Julio Reyes
-> **Ultima actualizacion:** 2026-04-29 por Codex (TASK-726 Finance Movement Feed Foundation)
-> **Documentacion tecnica:** [GREENHOUSE_FINANCE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md), [TASK-702](../../tasks/in-progress/TASK-702-bank-reconciliation-canonical-anchors-rematerialize.md), [TASK-715](../../tasks/complete/TASK-715-reconciliation-test-period-archive-ux.md), [TASK-720](../../tasks/complete/TASK-720-instrument-category-kpi-rules.md), [TASK-721](../../tasks/complete/TASK-721-finance-evidence-canonical-uploader.md), [TASK-722](../../tasks/complete/TASK-722-bank-reconciliation-synergy-workbench.md), [TASK-723](../../tasks/complete/TASK-723-ai-assisted-reconciliation-intelligence.md), [TASK-726](../../tasks/complete/TASK-726-finance-movement-feed-foundation.md)
+> **Ultima actualizacion:** 2026-04-29 por Codex (TASK-728 Finance Movement Feed Decision Polish)
+> **Documentacion tecnica:** [GREENHOUSE_FINANCE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md), [Finance Movement Feed](finance-movement-feed.md), [TASK-702](../../tasks/in-progress/TASK-702-bank-reconciliation-canonical-anchors-rematerialize.md), [TASK-715](../../tasks/complete/TASK-715-reconciliation-test-period-archive-ux.md), [TASK-720](../../tasks/complete/TASK-720-instrument-category-kpi-rules.md), [TASK-721](../../tasks/complete/TASK-721-finance-evidence-canonical-uploader.md), [TASK-722](../../tasks/complete/TASK-722-bank-reconciliation-synergy-workbench.md), [TASK-723](../../tasks/complete/TASK-723-ai-assisted-reconciliation-intelligence.md), [TASK-726](../../tasks/complete/TASK-726-finance-movement-feed-foundation.md), [TASK-728](../../tasks/complete/TASK-728-finance-movement-feed-decision-polish.md)
 
 ## Qué es
 
@@ -48,6 +48,8 @@ En `/finance/reconciliation`, la sección **Movimientos de caja por conciliar** 
 Este feed es **solo visual/read-only**. No calcula saldos, no aplica matches, no modifica `account_balances`, no crea payments y no rematerializa balances. Si en una pantalla se muestra saldo posterior (`runningBalance`), ese saldo debe venir de un read model o snapshot del dominio financiero; el componente nunca lo deriva inline.
 
 Para listas grandes, la primitive soporta virtualización encapsulada con `@tanstack/react-virtual`. La vista no debe importar el virtualizer directamente: solo pasa items al componente compartido.
+
+Contrato reutilizable: [Finance Movement Feed](finance-movement-feed.md) define la API publica del componente, reglas de catalogos visuales, guardrails read-only y checklist para usarlo en otros modulos financieros sin duplicar patrones.
 
 ## Cómo se ancla cada movimiento
 

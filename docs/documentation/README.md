@@ -46,6 +46,7 @@ Documentacion oficial de la plataforma Greenhouse. Cada documento describe como 
 - [HES — Recepción y validación de servicio](finance/hes-recepcion-y-validacion.md) — hoja de entrada de servicio como respaldo recibido del cliente, estados visibles y herencia documental desde la OC
 - [PDF de Cotización — Documento Enterprise](finance/pdf-cotizacion-enterprise.md) — PDF rediseñado nivel enterprise con 8 secciones modulares (5 always + 3 conditional), branding Efeonce + sub-brand identification, fonts DM Sans + Poppins, QR signed para verificación de autenticidad y endpoint público que valida contra DB. Adaptativo: 2-3 páginas para quotes chicas / 6-7 páginas para enterprise. Shipped en TASK-629.
 - [Modulos de Caja — Cobros, Pagos, Banco, Cuenta Accionista y Posicion de Caja](finance/modulos-caja-cobros-pagos.md) — cobros (cash in), pagos (cash out), tesoreria por instrumento, cuenta corriente accionista y diferencia devengado vs caja
+- [Finance Movement Feed](finance/finance-movement-feed.md) — primitive reusable para mostrar movimientos financieros con identidad visual, instrumento, estado, subtotales y virtualizacion sin mezclar UI con calculos de saldo
 
 ### HR y Nomina
 

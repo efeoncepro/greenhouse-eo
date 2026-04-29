@@ -70,6 +70,7 @@ Indice maestro de la documentacion no operativa del repo.
 
 - [Manual de Uso](manual-de-uso/README.md)
 - [Sugerencias asistidas de conciliacion](manual-de-uso/finance/sugerencias-asistidas-conciliacion.md)
+- [Finance Movement Feed](documentation/finance/finance-movement-feed.md)
 
 ### API
 

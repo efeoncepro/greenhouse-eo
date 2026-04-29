@@ -1,12 +1,12 @@
 # Sugerencias asistidas de conciliacion
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-04-29 por Codex
-> **Ultima actualizacion:** 2026-04-29 por Codex (TASK-726 Finance Movement Feed Foundation)
+> **Ultima actualizacion:** 2026-04-29 por Codex (TASK-728 Finance Movement Feed Decision Polish)
 > **Modulo:** Finanzas / Conciliacion bancaria
 > **Ruta en portal:** `/finance/reconciliation/[id]`
-> **Documentacion relacionada:** [Conciliacion bancaria](../../documentation/finance/conciliacion-bancaria.md), [TASK-723](../../tasks/complete/TASK-723-ai-assisted-reconciliation-intelligence.md), [TASK-726](../../tasks/complete/TASK-726-finance-movement-feed-foundation.md), [Arquitectura Finance](../../architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md)
+> **Documentacion relacionada:** [Conciliacion bancaria](../../documentation/finance/conciliacion-bancaria.md), [Finance Movement Feed](../../documentation/finance/finance-movement-feed.md), [TASK-723](../../tasks/complete/TASK-723-ai-assisted-reconciliation-intelligence.md), [TASK-726](../../tasks/complete/TASK-726-finance-movement-feed-foundation.md), [TASK-728](../../tasks/complete/TASK-728-finance-movement-feed-decision-polish.md), [Arquitectura Finance](../../architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md)
 
 ## Para que sirve
 
@@ -40,6 +40,8 @@ Cada movimiento muestra:
 - ID y trazabilidad en detalle expandible.
 
 Esta vista no cambia saldos ni concilia por si sola. Es una forma de lectura. El match real sigue ocurriendo en el workbench/dialog de conciliacion.
+
+El componente reutilizable que soporta esta vista esta documentado en [Finance Movement Feed](../../documentation/finance/finance-movement-feed.md). Si otra pantalla financiera necesita mostrar movimientos de forma secuencial, debe reutilizar esa primitive antes de crear una tabla o lista nueva.
 
 ## Paso a paso
 
