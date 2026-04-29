@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
+import type { CSSProperties } from 'react'
 
 import { useRouter } from 'next/navigation'
 
@@ -150,7 +151,20 @@ const formatDate = (date: string | null): string => {
 
 const mvColumnHelper = createColumnHelper<PendingMovement>()
 
- 
+const pendingMovementColumnStyles: Record<string, CSSProperties> = {
+  type: { width: 104, minWidth: 104, verticalAlign: 'top' },
+  description: { width: '52%', minWidth: 0, verticalAlign: 'top' },
+  partyName: { width: '18%', minWidth: 0, verticalAlign: 'top' },
+  date: { width: 116, minWidth: 116, verticalAlign: 'top' },
+  amount: { width: 144, minWidth: 144, verticalAlign: 'top' }
+}
+
+const getPendingMovementColumnStyle = (columnId: string, align?: string): CSSProperties => ({
+  whiteSpace: 'normal',
+  textAlign: align === 'right' ? 'right' : 'left',
+  ...pendingMovementColumnStyles[columnId]
+})
+
 const mvColumns: ColumnDef<PendingMovement, any>[] = [
   mvColumnHelper.accessor('type', {
     header: 'Tipo',
@@ -159,22 +173,45 @@ const mvColumns: ColumnDef<PendingMovement, any>[] = [
   mvColumnHelper.accessor('description', {
     header: 'Descripción',
     cell: ({ row }) => (
-      <>
-        <Typography variant='body2' fontWeight={500}>{row.original.description}</Typography>
-        <Typography variant='caption' color='text.secondary'>{row.original.id}</Typography>
+      <Box sx={{ display: 'flex', minWidth: 0, maxWidth: '100%', flexDirection: 'column', gap: 0.5 }}>
+        <Typography
+          variant='body2'
+          fontWeight={500}
+          sx={{ whiteSpace: 'normal', overflowWrap: 'anywhere', wordBreak: 'break-word', lineHeight: 1.45 }}
+        >
+          {row.original.description}
+        </Typography>
+        <Typography
+          variant='caption'
+          color='text.secondary'
+          sx={{ display: 'block', whiteSpace: 'normal', overflowWrap: 'anywhere', wordBreak: 'break-all', lineHeight: 1.35 }}
+        >
+          {row.original.id}
+        </Typography>
         {row.original.instrumentName && (
-          <Typography variant='caption' color='text.secondary' display='block'>
+          <Typography
+            variant='caption'
+            color='text.secondary'
+            sx={{ display: 'block', whiteSpace: 'normal', overflowWrap: 'anywhere', wordBreak: 'break-word', lineHeight: 1.35 }}
+          >
             {row.original.instrumentName}
           </Typography>
         )}
-      </>
+      </Box>
     )
   }),
-  mvColumnHelper.accessor('partyName', { header: 'Contraparte', cell: ({ getValue }) => <Typography variant='body2'>{getValue() || '—'}</Typography> }),
-  mvColumnHelper.accessor('date', { header: 'Fecha', cell: ({ getValue }) => <Typography variant='body2'>{formatDate(getValue())}</Typography> }),
+  mvColumnHelper.accessor('partyName', {
+    header: 'Contraparte',
+    cell: ({ getValue }) => (
+      <Typography variant='body2' sx={{ whiteSpace: 'normal', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
+        {getValue() || '—'}
+      </Typography>
+    )
+  }),
+  mvColumnHelper.accessor('date', { header: 'Fecha', cell: ({ getValue }) => <Typography variant='body2' sx={{ whiteSpace: 'nowrap' }}>{formatDate(getValue())}</Typography> }),
   mvColumnHelper.accessor('amount', {
     header: 'Monto',
-    cell: ({ getValue }) => <Typography variant='body2' fontWeight={600} color={getValue() >= 0 ? 'success.main' : 'error.main'}>{formatCLP(getValue())}</Typography>,
+    cell: ({ getValue }) => <Typography variant='body2' fontWeight={600} color={getValue() >= 0 ? 'success.main' : 'error.main'} sx={{ whiteSpace: 'nowrap', fontVariantNumeric: 'tabular-nums' }}>{formatCLP(getValue())}</Typography>,
     meta: { align: 'right' }
   })
 ]
@@ -841,17 +878,21 @@ const ReconciliationView = () => {
           }
         />
         <Divider />
-        <div className='overflow-x-auto'>
-          <table className={tableStyles.table}>
+        <Box sx={{ maxWidth: '100%', overflowX: 'hidden' }}>
+          <table className={tableStyles.table} style={{ tableLayout: 'fixed', width: '100%', whiteSpace: 'normal' }}>
             <thead>
               {mvTable.getHeaderGroups().map(hg => (
                 <tr key={hg.id}>
-                  {hg.headers.map(header => (
-                    <th key={header.id} onClick={header.column.getToggleSortingHandler()} className={classnames({ 'cursor-pointer select-none': header.column.getCanSort() })} style={{ textAlign: (header.column.columnDef.meta as { align?: string } | undefined)?.align === 'right' ? 'right' : 'left' }}>
-                      {flexRender(header.column.columnDef.header, header.getContext())}
-                      {{ asc: ' ↑', desc: ' ↓' }[header.column.getIsSorted() as string] ?? null}
-                    </th>
-                  ))}
+                  {hg.headers.map(header => {
+                    const align = (header.column.columnDef.meta as { align?: string } | undefined)?.align
+
+                    return (
+                      <th key={header.id} onClick={header.column.getToggleSortingHandler()} className={classnames({ 'cursor-pointer select-none': header.column.getCanSort() })} style={getPendingMovementColumnStyle(header.column.id, align)}>
+                        {flexRender(header.column.columnDef.header, header.getContext())}
+                        {{ asc: ' ↑', desc: ' ↓' }[header.column.getIsSorted() as string] ?? null}
+                      </th>
+                    )
+                  })}
                 </tr>
               ))}
             </thead>
@@ -860,16 +901,20 @@ const ReconciliationView = () => {
                 <tr><td colSpan={mvColumns.length} style={{ textAlign: 'center', padding: '3rem' }}><Typography variant='body2' color='text.secondary'>No hay movimientos de caja pendientes por conciliar.</Typography></td></tr>
               ) : mvTable.getRowModel().rows.map(row => (
                 <tr key={row.id}>
-                  {row.getVisibleCells().map(cell => (
-                    <td key={cell.id} style={{ textAlign: (cell.column.columnDef.meta as { align?: string } | undefined)?.align === 'right' ? 'right' : 'left' }}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </td>
-                  ))}
+                  {row.getVisibleCells().map(cell => {
+                    const align = (cell.column.columnDef.meta as { align?: string } | undefined)?.align
+
+                    return (
+                      <td key={cell.id} style={getPendingMovementColumnStyle(cell.column.id, align)}>
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </td>
+                    )
+                  })}
                 </tr>
               ))}
             </tbody>
           </table>
-        </div>
+        </Box>
       </Card>
 
       <CreateReconciliationPeriodDrawer

@@ -1,5 +1,11 @@
 # Handoff.md
 
+## Sesion 2026-04-29 — Reconciliation pending movements adaptive table
+
+- Se ajusto la tabla "Movimientos de caja por conciliar" en `/finance/reconciliation` para no generar scroll horizontal por descripciones largas.
+- La solucion es visual/read-only: `table-layout: fixed`, columnas estables y wrapping explicito en descripcion, IDs e instrumentos. No altera datos en DB, saldos, matching ni materializaciones.
+- Validacion: `pnpm exec eslint src/views/greenhouse/finance/ReconciliationView.tsx` OK; `pnpm lint` OK; `pnpm build` OK.
+
 ## Sesion 2026-04-29 — Manual de Uso agregado
 
 - Se creo `docs/manual-de-uso/` como nueva capa documental para guias practicas de uso del portal por dominio.

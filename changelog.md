@@ -1,5 +1,13 @@
 # changelog.md
 
+## 2026-04-29
+
+### 2026-04-29 — Reconciliation pending movements adaptive table
+
+- `/finance/reconciliation` ahora muestra los movimientos de caja pendientes con layout fijo y wrapping controlado en descripciones largas, IDs e instrumentos.
+- Se elimina el scroll horizontal interno de esa tabla sin truncar ni modificar los datos persistidos.
+- El cambio es solo visual/read-only: no toca saldos, matches, materializaciones ni queries financieras.
+
 ## 2026-04-28
 
 ### 2026-04-28 — Santander CLP residual COM.MANTENCION y follow-ups Finance
