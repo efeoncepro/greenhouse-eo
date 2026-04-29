@@ -26,6 +26,7 @@ import {
 import { resolvePortalHomePath } from '@/lib/tenant/resolve-portal-home-path'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
+import { resolveSupervisorAccessSummaryFromMinimalContext } from '@/lib/reporting-hierarchy/access'
 
 const getMicrosoftProfileIdentity = ({
   profile,
@@ -557,6 +558,22 @@ const createAuthOptions = (): NextAuthOptions => {
         routeGroups: Array.isArray(token.routeGroups) ? token.routeGroups : []
       })
 
+      // TASK-727 — Resolve supervisor scope summary una vez por sesión y persistir en JWT.
+      // Si la fila ya existe (refresh) y tenemos memberId, solo recomputamos cuando es la
+      // primera materialización (ie, viene un user nuevo o cambió member/tenantType).
+      const shouldResolveSupervisorAccess =
+        Boolean(user) ||
+        Boolean(account) ||
+        token.supervisorAccess === undefined
+
+      if (shouldResolveSupervisorAccess) {
+        token.supervisorAccess = await resolveSupervisorAccessSummaryFromMinimalContext({
+          userId: typeof token.userId === 'string' ? token.userId : null,
+          tenantType: typeof token.tenantType === 'string' ? token.tenantType : null,
+          memberId: typeof token.memberId === 'string' ? token.memberId : null
+        })
+      }
+
       return token
     },
     async session({ session, token }) {
@@ -606,6 +623,9 @@ const createAuthOptions = (): NextAuthOptions => {
         // Collaborator identity
         session.user.memberId = typeof token.memberId === 'string' ? token.memberId : undefined
         session.user.identityProfileId = typeof token.identityProfileId === 'string' ? token.identityProfileId : undefined
+
+        // TASK-727 — Supervisor scope summary
+        session.user.supervisorAccess = token.supervisorAccess ?? null
       }
 
       return session

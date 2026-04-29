@@ -6,6 +6,7 @@ import { getNextAuthSecret } from '@/lib/auth-secrets'
 import { getTenantAccessRecordForAgent } from '@/lib/tenant/access'
 import { resolvePortalHomePath } from '@/lib/tenant/resolve-portal-home-path'
 import { ROLE_CODES } from '@/config/role-codes'
+import { resolveSupervisorAccessSummaryFromMinimalContext } from '@/lib/reporting-hierarchy/access'
 
 /**
  * In-process agent session minter.
@@ -114,7 +115,13 @@ export const signAgentSessionInProcess = async (
     organizationId: tenant.organizationId ?? undefined,
     organizationName: tenant.organizationName ?? undefined,
     memberId: tenant.memberId ?? undefined,
-    identityProfileId: tenant.identityProfileId ?? undefined
+    identityProfileId: tenant.identityProfileId ?? undefined,
+    // TASK-727 — Supervisor scope summary para agentes (Daniela vía agent-auth ve aprobaciones)
+    supervisorAccess: await resolveSupervisorAccessSummaryFromMinimalContext({
+      userId: tenant.userId,
+      tenantType: tenant.tenantType,
+      memberId: tenant.memberId
+    })
   }
 
   const nextAuthSecret = getNextAuthSecret()

@@ -85,8 +85,18 @@ const missingRelation = (error: unknown) => {
 }
 
 import { ROLE_CODES, isRoleCode } from '@/config/role-codes'
+import { captureMessageWithDomain } from '@/lib/observability/capture'
 
-const roleCanAccessViewFallback = (
+/**
+ * Heurística de fallback usada cuando `role_view_assignments` no tiene una fila explícita
+ * para `(role, view)`. Post TASK-727 (seed completo de los 12 roles internos + 3 cliente),
+ * esta función NO debería invocarse con `granted = true` en steady-state — si lo hace, hay
+ * un rol o vista nuevos sin seed correspondiente.
+ *
+ * La telemetría emite WARNING via `captureMessageWithDomain('identity', ...)` para que
+ * Reliability Control Plane pueda detectarlo como signal `role_view_fallback_invocations`.
+ */
+const computeRoleCanAccessViewFallback = (
   role: {
     roleCode: string
     isAdmin: boolean
@@ -94,7 +104,7 @@ const roleCanAccessViewFallback = (
     routeGroups: string[]
   },
   view: GovernanceViewRegistryEntry
-) => {
+): boolean => {
   if (role.routeGroups.includes(view.routeGroup)) {
     return true
   }
@@ -112,6 +122,38 @@ const roleCanAccessViewFallback = (
   }
 
   return false
+}
+
+const FALLBACK_TELEMETRY_ENABLED =
+  process.env.NODE_ENV !== 'test' && process.env.GREENHOUSE_DISABLE_VIEW_FALLBACK_TELEMETRY !== 'true'
+
+const roleCanAccessViewFallback = (
+  role: {
+    roleCode: string
+    isAdmin: boolean
+    isInternal: boolean
+    routeGroups: string[]
+  },
+  view: GovernanceViewRegistryEntry
+): boolean => {
+  const granted = computeRoleCanAccessViewFallback(role, view)
+
+  if (granted && FALLBACK_TELEMETRY_ENABLED) {
+    // Steady-state esperado post-TASK-727: 0 invocaciones con granted=true. Si emite,
+    // hay un rol o vista sin seed en `role_view_assignments` — gap de gobernanza.
+    captureMessageWithDomain('role_view_fallback_used', 'identity', {
+      level: 'warning',
+      tags: {
+        roleCode: role.roleCode,
+        viewCode: view.viewCode,
+        routeGroup: view.routeGroup,
+        reason: 'missing_role_view_assignment'
+      },
+      fingerprint: ['role_view_fallback', role.roleCode, view.viewCode]
+    })
+  }
+
+  return granted
 }
 
 import { deriveRouteGroupsForSingleRole } from '@/lib/tenant/role-route-mapping'

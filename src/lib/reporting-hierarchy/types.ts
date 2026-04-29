@@ -53,6 +53,35 @@ export interface SupervisorScopeRecord {
   canAccessSupervisorLeave: boolean
 }
 
+/**
+ * JWT-safe summary of supervisor authority. Subset de SupervisorScopeRecord pensado para
+ * viajar en cookies/JWT sin inflar tamaño: NO incluye visibleMemberIds ni delegatedSupervisorIds
+ * (arrays variables que se resuelven on-demand server-side via getSupervisorScopeForTenant).
+ *
+ * El menú lateral y cualquier surface "para supervisores" consume estos flags.
+ */
+export interface SupervisorAccessSummary {
+  memberId: string | null
+  directReportCount: number
+  delegatedSupervisorCount: number
+  hasDirectReports: boolean
+  hasDelegatedAuthority: boolean
+  canAccessSupervisorPeople: boolean
+  canAccessSupervisorLeave: boolean
+}
+
+export const toSupervisorAccessSummary = (
+  scope: SupervisorScopeRecord
+): SupervisorAccessSummary => ({
+  memberId: scope.memberId,
+  directReportCount: scope.directReportCount,
+  delegatedSupervisorCount: scope.delegatedSupervisorIds.length,
+  hasDirectReports: scope.hasDirectReports,
+  hasDelegatedAuthority: scope.hasDelegatedAuthority,
+  canAccessSupervisorPeople: scope.canAccessSupervisorPeople,
+  canAccessSupervisorLeave: scope.canAccessSupervisorLeave
+})
+
 export interface UpsertReportingLineInput {
   memberId: string
   supervisorMemberId: string | null

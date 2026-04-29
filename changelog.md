@@ -2,6 +2,17 @@
 
 ## 2026-04-29
 
+### 2026-04-29 — TASK-727 Internal role × view matrix + Supervisor scope en JWT
+
+- Cierre de fugas de autorizacion detectadas con Daniela Ferreira (rol `efeonce_operations`):
+  - YA NO ve "Economia de la agencia" (gestion.economia, gestion.staff_augmentation): denials explicitos en `role_view_assignments`.
+  - YA NO ve nomina cross-team (equipo.nomina, equipo.nomina_proyectada): denials explicitos. Sigue viendo su propia liquidacion (mi_ficha.mi_nomina).
+  - YA VE `/hr/approvals` y `/hr/team` en menu lateral aunque su `default_portal_home_path` sea `/home`: el menu ahora consume `session.user.supervisorAccess.canAccessSupervisorLeave` (derivado de `reporting_lines`) en vez de heuristica por whitelist de `dashboardHref`.
+- Migration `20260429100204419` replica el patron TASK-285 a los 12 roles internos (234 grants + 10 denials explicitos). 248 entradas en audit log.
+- `SupervisorAccessSummary` (JWT-safe summary) inyectado en JWT callback de `auth.ts` + `sign-agent-session-in-process.ts`. Tipo expuesto en `next-auth.d.ts` (User/Session/JWT) y `TenantContext`.
+- Telemetria warning a Sentry (`domain=identity`, `role_view_fallback_used`) en cada invocacion del fallback heuristico `roleCanAccessViewFallback`. Steady state esperado = 0 invocaciones.
+- 35/35 tests nuevos verdes (`internal-role-visibility.test.ts`, `supervisor-access-summary.test.ts`). `efeonce_admin` retiene full visibility (Julio Reyes no afectado). Doc funcional `docs/documentation/identity/sistema-identidad-roles-acceso.md` v1.4 actualizada.
+
 ### 2026-04-29 — Finance movement feed instrument logos
 
 - Finance / Conciliacion: el chip de instrumento ahora reutiliza `PaymentInstrumentChip` y el catalogo canonico de proveedores de pago para mostrar logos bancarios verificados cuando existe `paymentProviderSlug`.

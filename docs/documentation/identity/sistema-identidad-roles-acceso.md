@@ -1,9 +1,9 @@
 # Sistema de Identidad, Roles y Acceso
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.3
+> **Version:** 1.4
 > **Creado:** 2026-04-05 por Claude (TASK-248)
-> **Ultima actualizacion:** 2026-04-17 por Codex (TASK-404 — gobernanza de entitlements en Admin Center)
+> **Ultima actualizacion:** 2026-04-29 por Claude (TASK-727 — matriz role × view canonica para internos + supervisor scope en JWT)
 > **Documentacion tecnica:** [GREENHOUSE_IDENTITY_ACCESS_V2.md](../../architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md), [GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md](../../architecture/GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md), [GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md)
 
 ---
@@ -117,6 +117,48 @@ Cada vista individual del portal (53 en total) esta registrada en un catalogo. S
 > **Detalle tecnico:** Los datos de perfil fluyen desde Microsoft Graph → `client_users` + `identity_profiles` → VIEW `person_360` → `toPersonProfileSummary()`. El avatar se almacena en GCS y se sirve via `/api/media/users/{id}/avatar`. El cron de Entra sync corre diariamente a las 8:00 UTC (`src/app/api/cron/entra-profile-sync/route.ts`). Spec: [GREENHOUSE_IDENTITY_ACCESS_V2.md](../../architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md).
 
 > **Detalle tecnico:** El catalogo de vistas esta en [`src/lib/admin/view-access-catalog.ts`](../../src/lib/admin/view-access-catalog.ts). La matriz completa rol-route groups esta en [GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md §1.5](../../architecture/GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md). El fallback de perfil usa `toPersonProfileSummaryFromSession()` en [`src/lib/person-360/get-person-profile.ts`](../../src/lib/person-360/get-person-profile.ts).
+
+---
+
+## Que ve cada rol interno (matriz canonica TASK-727)
+
+Desde TASK-727 la matriz "rol x vista" para los 12 roles internos vive **en la base de datos** (`greenhouse_core.role_view_assignments`), no en heuristica de codigo. Cada fila tiene `granted: true` (visible) o `granted: false` (denial explicito, registrado en audit log). Esto cierra fugas como "el rol Operaciones veia la Economia de la agencia" y deja la matriz auditable y editable desde Admin Center.
+
+| Rol                           | Que vistas tiene                                                                                  |
+| ----------------------------- | ------------------------------------------------------------------------------------------------- |
+| **Superadministrador**        | Todas las vistas                                                                                  |
+| **Operaciones**               | Gestion operativa + organigrama + personas + Mi Ficha. SIN Economia, Staff Augmentation ni nomina cross-team |
+| **Lider de Cuenta**           | Cuentas + organizaciones + delivery + campanas + Mi Ficha. SIN Economia ni nomina cross-team      |
+| **Colaborador / Empleado**    | Solo "Mi Ficha" (perfil, mi nomina, mis permisos, mis asignaciones)                               |
+| **Nomina**                    | Equipo (personas, nomina, permisos, jerarquia, organigrama, departamentos, asistencia) + Mi Ficha |
+| **Gestion HR**                | Todo "Equipo" (incluye objetivos y evaluaciones) + Mi Ficha                                       |
+| **Analista de Finanzas**      | Todas las "Finanzas" + Economia + Mi Ficha (read-only via capabilities)                           |
+| **Administrador de Finanzas** | Analista + Staff Augmentation + Instrumentos de pago                                              |
+| **Gerente de Finanzas**       | Administrador de Finanzas + Delivery + Capacidad (cross-context forecasting)                      |
+| **People Viewer**             | Solo Personas + Organigrama                                                                       |
+| **AI Tooling Admin**          | Solo Herramientas IA + Mi Perfil/Inicio/Organizacion                                              |
+
+**Distincion critica de nomina**: cualquier colaborador interno ve **su propia liquidacion** (`mi_ficha.mi_nomina` → `/my/payroll`). La vista cross-team de nomina (`equipo.nomina` y `equipo.nomina_proyectada`) es sensible y solo la ven HR (`hr_payroll`, `hr_manager`) y Superadministrador.
+
+> **Detalle tecnico:** Seed canonico en [migrations/20260429100204419_task-727-seed-internal-role-view-assignments.sql](../../../migrations/20260429100204419_task-727-seed-internal-role-view-assignments.sql). Tests de regresion en [`src/lib/admin/internal-role-visibility.test.ts`](../../../src/lib/admin/internal-role-visibility.test.ts). El fallback heuristico ([`roleCanAccessViewFallback`](../../../src/lib/admin/view-access-store.ts)) emite warning a Sentry (domain `identity`) cuando se invoca — steady-state esperado = 0.
+
+---
+
+## Supervisores: aprobar permisos del equipo
+
+Si un colaborador tiene **direct reports** en `reporting_lines` (o tiene autoridad delegada via `operational_responsibilities`), el sistema lo reconoce automaticamente como supervisor — **sin necesidad de un rol explicito de "supervisor"**.
+
+Que pasa cuando entras como supervisor:
+
+| Surface                       | Lo que hace                                                                                            |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------ |
+| **Aprobar permisos** (`/hr/approvals`) | Lista de solicitudes pendientes de tu subarbol. Aprobar / rechazar con comentario.            |
+| **Mi equipo** (`/hr/team`)             | Roster de tus reports directos + delegados, con saldos de permisos y estado.                  |
+| **Organigrama parcial**                | Vista del subarbol bajo tu autoridad (solo si tienes `canAccessSupervisorPeople = true`).      |
+
+Antes de TASK-727, este surface se mostraba solo a usuarios cuyo `default_portal_home_path` apuntaba a `/hr` o `/hr/approvals` — una heuristica fragil. Desde TASK-727, el flag `supervisorAccess` se inyecta en el JWT/session derivado de la jerarquia real, y el menu lateral lo consume directo. Cualquier supervisor con reports activos ve el surface, independiente de su pagina de inicio.
+
+> **Detalle tecnico:** Resolver canonico [`getSupervisorScopeForTenant`](../../../src/lib/reporting-hierarchy/access.ts) → wrapper JWT-friendly [`resolveSupervisorAccessSummaryFromMinimalContext`](../../../src/lib/reporting-hierarchy/access.ts) → inyeccion en [`auth.ts`](../../../src/lib/auth.ts) JWT/session callbacks. Tipo [`SupervisorAccessSummary`](../../../src/lib/reporting-hierarchy/types.ts). Menu cleanup en [`VerticalMenu.tsx`](../../../src/components/layout/vertical/VerticalMenu.tsx).
 
 ---
 

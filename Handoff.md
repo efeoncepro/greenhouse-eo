@@ -1,5 +1,21 @@
 # Handoff.md
 
+## Sesion 2026-04-29 — TASK-727 Internal role × view matrix + Supervisor scope en JWT
+
+- **Bug fix detectado con Daniela Ferreira (Creative Lead, role `efeonce_operations`):** veia "Economia de la agencia" (gestion.economia) que es financiero, y NO veia `/hr/approvals` aunque tiene 3 direct reports en `reporting_lines`.
+- **Causa raiz**: 12 roles internos tenian `role_view_assignments` vacio → caian al fallback heuristico `roleCanAccessViewFallback` que concedia todas las views `routeGroup='internal'` a cualquier rol con route_group_scope `['internal']`. Adicionalmente, el menu lateral decidia `/hr/approvals` por whitelist de `default_portal_home_path` (heuristica fragil).
+- **Solucion aplicada**:
+  - Migration `20260429100204419_task-727-seed-internal-role-view-assignments.sql` — replica del patron TASK-285 para los 12 roles internos: 234 grants + 10 denials explicitos (`efeonce_operations` × `gestion.economia`, `gestion.staff_augmentation`, `equipo.nomina`, `equipo.nomina_proyectada`; mismos para `efeonce_account`).
+  - `SupervisorAccessSummary` (subset JWT-safe de `SupervisorScopeRecord`, sin arrays) inyectado en JWT/session callback de `auth.ts` + agent-session minter, derivado de `getSupervisorScopeForTenant` que ya consulta `reporting_lines` + `operational_responsibilities`.
+  - `VerticalMenu.tsx` ahora consume `session.user.supervisorAccess.canAccessSupervisorLeave` en vez de `dashboardHref` whitelist. Cualquier supervisor con reports activos ve `/hr/approvals` y `/hr/team`, independiente de su pagina de inicio.
+  - Telemetria warning a Sentry (`domain=identity`, message `role_view_fallback_used`) en cada invocacion del fallback heuristico — steady state esperado = 0 invocaciones post-seed.
+  - `equipo.nomina` y `equipo.nomina_proyectada` denegados explicitos para roles operativos (cross-team payroll es sensible). Daniela ve **su propia** `mi_ficha.mi_nomina`, no la del equipo.
+- **Cobertura post-seed**: 15 roles con `role_view_assignments` (3 cliente desde TASK-285 + 12 internos desde TASK-727). 248 entradas en `view_access_log`.
+- **Out of scope** (declarados en spec): limpieza de los 87 page guards con fallback boolean inline (no afecta correctness post-seed; opcional follow-up TASK-727b). Migracion a entitlements capability-based (TASK-404 no aplicada en dev). Refresh on-demand del JWT cuando cambian reporting_lines (acepta lag hasta proximo login).
+- **Daniela post-fix**: ve `/hr/approvals` (lista pendientes de Andres, Melkin, Valentina) + `/hr/team` (roster del subarbol) en menu lateral, NO ve `/agency/economics` ni `/hr/payroll/projected`. `efeonce_admin` (Julio) sigue viendo todo.
+- **3 viewCodes en VIEW_REGISTRY (codigo) NO estan en `view_registry` (DB)**: `administracion.commercial_parties`, `administracion.product_sync_conflicts`, `administracion.product_catalog`. Se omitieron del seed para no violar FK; `efeonce_admin` los ve via fallback `is_admin=true`. Follow-up: insertar las 3 filas en `view_registry` cuando otra task lo requiera.
+- **Verificacion**: 35/35 tests nuevos pasan (`internal-role-visibility.test.ts` + `supervisor-access-summary.test.ts`). 85/85 tests existentes en admin/auth/tenant/reporting-hierarchy verdes. `pnpm lint` OK. `npx tsc --noEmit` OK. Migration aplicada en dev con types regenerados.
+
 ## Sesion 2026-04-29 — Finance movement feed instrument logos
 
 - Se conecto el chip de instrumento del feed de conciliacion con `PaymentInstrumentChip` y el catalogo canonico de `payment-instruments`.

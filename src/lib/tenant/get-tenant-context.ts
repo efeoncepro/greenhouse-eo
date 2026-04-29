@@ -3,6 +3,7 @@ import 'server-only'
 import { getServerAuthSession } from '@/lib/auth'
 import { getCachedBusinessLineSummaries } from '@/lib/business-line/metadata'
 import type { BusinessLineMetadataSummary } from '@/types/business-line'
+import type { SupervisorAccessSummary } from '@/lib/reporting-hierarchy/types'
 
 export interface TenantContext {
   userId: string
@@ -35,6 +36,9 @@ export interface TenantContext {
   // Collaborator identity
   memberId?: string
   identityProfileId?: string
+
+  // Supervisor scope (TASK-727): JWT-safe summary of supervisor authority for menu/UI gating.
+  supervisorAccess?: SupervisorAccessSummary | null
 }
 
 export const getTenantContext = async (): Promise<TenantContext | null> => {
@@ -79,6 +83,9 @@ export const getTenantContext = async (): Promise<TenantContext | null> => {
 
     // Collaborator identity
     ...(session.user.memberId ? { memberId: session.user.memberId } : {}),
-    ...(session.user.identityProfileId ? { identityProfileId: session.user.identityProfileId } : {})
+    ...(session.user.identityProfileId ? { identityProfileId: session.user.identityProfileId } : {}),
+
+    // Supervisor scope (TASK-727): pasamos el summary tal como viene del JWT.
+    supervisorAccess: session.user.supervisorAccess ?? null
   }
 }

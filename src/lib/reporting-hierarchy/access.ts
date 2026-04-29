@@ -3,7 +3,11 @@ import 'server-only'
 import { query } from '@/lib/db'
 import type { TenantContext } from '@/lib/tenant/get-tenant-context'
 import { listReportingSubtree } from '@/lib/reporting-hierarchy/readers'
-import type { SupervisorScopeRecord } from '@/lib/reporting-hierarchy/types'
+import {
+  toSupervisorAccessSummary,
+  type SupervisorAccessSummary,
+  type SupervisorScopeRecord
+} from '@/lib/reporting-hierarchy/types'
 
 type TenantMemberRow = {
   member_id: string
@@ -164,4 +168,43 @@ export const canViewMemberInSupervisorScope = async ({
   const scope = await getSupervisorScopeForTenant(tenant)
 
   return scope.visibleMemberIds.includes(memberId)
+}
+
+/**
+ * TASK-727 — JWT-friendly resolver. Acepta el shape mínimo (userId/tenantType/memberId) que
+ * está disponible en el JWT callback de NextAuth, sin requerir un TenantContext completo.
+ *
+ * Devuelve null para tenants no-internal, sesiones sin memberId resuelto, o cualquier error
+ * (failsoft: el menú simplemente no muestra surfaces de supervisor — degradación honesta).
+ */
+export const resolveSupervisorAccessSummaryFromMinimalContext = async (input: {
+  userId?: string | null
+  tenantType?: string | null
+  memberId?: string | null
+}): Promise<SupervisorAccessSummary | null> => {
+  if (input.tenantType !== 'efeonce_internal') {
+    return null
+  }
+
+  if (!input.userId && !input.memberId) {
+    return null
+  }
+
+  try {
+    const partialTenant = {
+      userId: input.userId ?? '',
+      tenantType: 'efeonce_internal' as const,
+      memberId: input.memberId ?? undefined
+    } as Pick<TenantContext, 'userId' | 'tenantType' | 'memberId'>
+
+    const scope = await getSupervisorScopeForTenant(partialTenant as TenantContext)
+
+    if (!scope.memberId) {
+      return null
+    }
+
+    return toSupervisorAccessSummary(scope)
+  } catch {
+    return null
+  }
 }

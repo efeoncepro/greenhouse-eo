@@ -74,19 +74,24 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
 
   const dashboardHref = session?.user?.portalHomePath || '/home'
 
-  const hasSupervisorWorkspaceLanding =
-    isInternalUser &&
-    Boolean(session?.user?.memberId) &&
-    ['/hr', '/hr/team', '/hr/approvals'].includes(dashboardHref)
+  // TASK-727 — Supervisor scope canonical (derivado de reporting_lines/operational_responsibilities,
+  // inyectado en el JWT por auth.ts). Reemplaza la heurística previa basada en `dashboardHref`.
+  const supervisorAccess = session?.user?.supervisorAccess ?? null
+
+  const canSupervise =
+    Boolean(session?.user?.memberId) && supervisorAccess?.canAccessSupervisorLeave === true
+
+  const canSuperviseOrgChart =
+    Boolean(session?.user?.memberId) && supervisorAccess?.canAccessSupervisorPeople === true
 
   const canSeePeople =
     isPeopleRouteGroup ||
-    hasSupervisorWorkspaceLanding ||
+    canSupervise ||
     roleCodes.includes(ROLE_CODES.EFEONCE_ADMIN) ||
     roleCodes.includes(ROLE_CODES.EFEONCE_OPERATIONS) ||
     roleCodes.includes(ROLE_CODES.HR_PAYROLL)
 
-  const canSeeSupervisorOrgChart = hasSupervisorWorkspaceLanding || authorizedViews.includes('equipo.organigrama')
+  const canSeeSupervisorOrgChart = canSuperviseOrgChart || authorizedViews.includes('equipo.organigrama')
 
   const capabilityModules = resolveCapabilityModules({
     businessLines: session?.user?.businessLines || [],
@@ -180,7 +185,10 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
     // ── PERSONAS Y HR (section: 1 flat + 3 collapsibles, conditional) ──
     const hasHrAccess = isHrUser || isAdminUser
 
-    const canSeeHrTeamWorkspace = Boolean(session?.user?.memberId) && (hasHrAccess || hasSupervisorWorkspaceLanding)
+    // TASK-727 — `canSeeHrTeamWorkspace` ahora consume `supervisorAccess` canónico desde el JWT
+    // en vez de heurística por `dashboardHref` whitelist. Cualquier supervisor con direct reports
+    // o delegated authority ve aprobaciones/equipo, independiente de su portalHomePath.
+    const canSeeHrTeamWorkspace = Boolean(session?.user?.memberId) && (hasHrAccess || canSupervise)
 
     const hrItems: VerticalMenuDataType[] = hasHrAccess
       ? [

@@ -1,5 +1,7 @@
 import type { DefaultSession } from 'next-auth'
 
+import type { SupervisorAccessSummary } from '@/lib/reporting-hierarchy/types'
+
 declare module 'next-auth' {
   interface User {
     userId: string
@@ -33,6 +35,9 @@ declare module 'next-auth' {
     // Collaborator identity
     memberId?: string
     identityProfileId?: string
+
+    // Supervisor scope (TASK-727): JWT-safe summary of supervisor authority for menu/UI gating.
+    supervisorAccess?: SupervisorAccessSummary | null
   }
 
   interface Session {
@@ -69,6 +74,9 @@ declare module 'next-auth' {
       // Collaborator identity
       memberId?: string
       identityProfileId?: string
+
+      // Supervisor scope (TASK-727): JWT-safe summary of supervisor authority for menu/UI gating.
+      supervisorAccess?: SupervisorAccessSummary | null
     } & DefaultSession['user']
   }
 }
@@ -108,5 +116,8 @@ declare module 'next-auth/jwt' {
     // Collaborator identity
     memberId?: string
     identityProfileId?: string
+
+    // Supervisor scope (TASK-727): JWT-safe summary of supervisor authority for menu/UI gating.
+    supervisorAccess?: SupervisorAccessSummary | null
   }
 }
