@@ -55,6 +55,7 @@ export type FinanceMovementFeedItem = {
   description?: string | null
   counterparty?: string | null
   instrumentName?: string | null
+  instrumentCategory?: string | null
   amount: number
   currency: string
   direction: FinanceMovementDirection

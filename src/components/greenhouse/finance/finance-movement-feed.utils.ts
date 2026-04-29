@@ -26,6 +26,18 @@ export const getFinanceMovementStatusLabel = (item: FinanceMovementFeedItem): st
   return FINANCE_MOVEMENT_STATUS_LABELS[item.status]
 }
 
+export const getFinanceMovementInstrumentIcon = (item: Pick<FinanceMovementFeedItem, 'instrumentName' | 'instrumentCategory' | 'paymentProviderSlug'>): string => {
+  const value = [item.instrumentCategory, item.instrumentName, item.paymentProviderSlug].filter(Boolean).join(' ').toLowerCase()
+
+  if (value.includes('credit') || value.includes('card') || value.includes('tc') || value.includes('tarjeta')) return 'tabler-credit-card'
+  if (value.includes('shareholder') || value.includes('accionista') || value.includes('cca')) return 'tabler-user-dollar'
+  if (value.includes('wallet') || value.includes('billetera')) return 'tabler-wallet'
+  if (value.includes('factoring')) return 'tabler-receipt-refund'
+  if (value.includes('bank') || value.includes('banco') || value.includes('santander') || value.includes('cuenta')) return 'tabler-building-bank'
+
+  return 'tabler-building-bank'
+}
+
 export const FINANCE_MOVEMENT_STATUS_COLORS: Record<FinanceMovementStatus, 'primary' | 'success' | 'warning' | 'error' | 'info' | 'secondary'> = {
   pending: 'warning',
   suggested: 'info',

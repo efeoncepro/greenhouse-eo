@@ -20,6 +20,7 @@ import type { FinanceMovementFeedItem, FinanceMovementFeedProps, FinanceMovement
 import {
   FINANCE_MOVEMENT_STATUS_COLORS,
   formatFinanceMovementAmount,
+  getFinanceMovementInstrumentIcon,
   getFinanceMovementStatusLabel,
   groupFinanceMovementItems,
   resolveFinanceMovementVisual
@@ -126,6 +127,41 @@ const MovementDetails = ({ item }: { item: FinanceMovementFeedItem }) => {
   )
 }
 
+const MovementInstrumentPill = ({ item }: { item: FinanceMovementFeedItem }) => {
+  if (!item.instrumentName) return null
+
+  const icon = getFinanceMovementInstrumentIcon(item)
+
+  return (
+    <Box
+      component='span'
+      aria-label={`Instrumento: ${item.instrumentName}`}
+      sx={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 1,
+        minHeight: 24,
+        maxWidth: '100%',
+        px: 2,
+        py: 0.35,
+        borderRadius: 999,
+        border: theme => `1px solid ${alpha(theme.palette.info.main, 0.18)}`,
+        bgcolor: theme => alpha(theme.palette.info.main, 0.08),
+        color: theme => theme.palette.customColors?.midnight ?? theme.palette.info.dark,
+        fontSize: '0.72rem',
+        fontWeight: 600,
+        lineHeight: 1.2,
+        overflowWrap: 'anywhere'
+      }}
+    >
+      <i className={icon} aria-hidden='true' style={{ fontSize: 14, flex: '0 0 auto' }} />
+      <Box component='span' sx={{ minWidth: 0, overflowWrap: 'anywhere' }}>
+        {item.instrumentName}
+      </Box>
+    </Box>
+  )
+}
+
 const MovementRow = ({
   item,
   compact,
@@ -216,11 +252,7 @@ const MovementRow = ({
                 sx={{ height: 22, fontSize: '0.7rem', fontWeight: 600 }}
               />
             )}
-            {item.instrumentName && (
-              <Typography variant='caption' sx={{ color: 'text.secondary', overflowWrap: 'anywhere' }}>
-                {item.instrumentName}
-              </Typography>
-            )}
+            <MovementInstrumentPill item={item} />
             {item.counterparty && (
               <Typography variant='caption' sx={{ color: 'text.secondary', overflowWrap: 'anywhere' }}>
                 {item.counterparty}

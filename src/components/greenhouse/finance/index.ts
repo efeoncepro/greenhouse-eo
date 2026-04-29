@@ -18,6 +18,7 @@ export {
   FINANCE_MOVEMENT_STATUS_COLORS,
   FINANCE_MOVEMENT_STATUS_LABELS,
   formatFinanceMovementAmount,
+  getFinanceMovementInstrumentIcon,
   getFinanceMovementStatusLabel,
   getFinanceMovementDayKey,
   getFinanceMovementDayLabel,

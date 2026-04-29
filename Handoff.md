@@ -1,5 +1,12 @@
 # Handoff.md
 
+## Sesion 2026-04-29 — Finance movement feed instrument signal
+
+- Se elevo el instrumento financiero del feed de conciliacion a señal visible principal: `FinanceMovementFeed` ahora muestra `instrumentName` como chip con icono (`bank`, `credit card`, `CCA`, `wallet`, `factoring`) en vez de texto plano secundario.
+- `/finance/reconciliation` propaga `paymentInstrumentCategory` y `paymentProviderSlug` desde cash-in/cash-out al feed, reutilizando datos ya disponibles. No hay nuevas queries ni escrituras DB.
+- Guardrail: el cambio sigue siendo UI/read-only; no calcula running balances, no modifica matching, no toca materializaciones ni saldos.
+- Verificacion: `pnpm test src/components/greenhouse/finance` OK; `pnpm exec eslint src/components/greenhouse/finance src/views/greenhouse/finance/ReconciliationView.tsx` OK; `pnpm exec tsc --noEmit` OK; `pnpm lint` OK; `pnpm build` OK.
+
 ## Sesion 2026-04-29 — Finance movement feed visual fidelity fix
 
 - Se corrigio la fidelidad visual del feed en `/finance/reconciliation` respecto del mockup aprobado: egresos ya no usan tono azul primario, labels pendientes distinguen `Pago pendiente` / `Cobro pendiente`, y el foco visual deja de parecer seleccion activa.

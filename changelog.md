@@ -2,6 +2,11 @@
 
 ## 2026-04-29
 
+### 2026-04-29 — Finance movement feed instrument signal
+
+- Finance / Conciliacion: el feed de movimientos pendientes ahora trata el instrumento financiero como señal principal, no como metadata secundaria. Se muestra como chip con icono para cuenta bancaria, tarjeta, CCA, wallet o rail cuando el dato viene de cash-in/cash-out.
+- El cambio mantiene la separacion de responsabilidades: solo reusa `paymentAccountName`, `paymentInstrumentCategory` y `paymentProviderSlug` ya presentes en los endpoints; no calcula saldos ni modifica conciliacion.
+
 ### 2026-04-29 — Finance movement feed visual fidelity
 
 - Finance / Conciliacion: el feed de movimientos pendientes ahora infiere proveedores SaaS conocidos desde el texto operativo y usa un catalogo visual local para HubSpot, Envato, GitHub, Google, Adobe y Notion sin depender de logos no auditados.

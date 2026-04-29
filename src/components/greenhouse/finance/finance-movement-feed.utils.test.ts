@@ -7,6 +7,7 @@ import {
 } from './finance-movement-provider-catalog'
 import {
   formatFinanceMovementAmount,
+  getFinanceMovementInstrumentIcon,
   getFinanceMovementStatusLabel,
   groupFinanceMovementItems,
   resolveFinanceMovementVisual
@@ -103,5 +104,11 @@ describe('finance-movement-feed utils', () => {
   it('uses direction-specific pending labels', () => {
     expect(getFinanceMovementStatusLabel(baseItem)).toBe('Pago pendiente')
     expect(getFinanceMovementStatusLabel({ ...baseItem, direction: 'in', sourceType: 'cash_in' })).toBe('Cobro pendiente')
+  })
+
+  it('resolves semantic icons for financial instruments', () => {
+    expect(getFinanceMovementInstrumentIcon({ instrumentName: 'Santander Corp.', instrumentCategory: null, paymentProviderSlug: null })).toBe('tabler-building-bank')
+    expect(getFinanceMovementInstrumentIcon({ instrumentName: 'Tarjeta corporativa', instrumentCategory: 'credit_card', paymentProviderSlug: null })).toBe('tabler-credit-card')
+    expect(getFinanceMovementInstrumentIcon({ instrumentName: 'CCA Julio Reyes', instrumentCategory: null, paymentProviderSlug: null })).toBe('tabler-user-dollar')
   })
 })

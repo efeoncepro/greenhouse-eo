@@ -48,6 +48,7 @@ describe('FinanceMovementFeed', () => {
 
     expect(getByText('HubSpot — Marketing Hub Starter + Sales Hub Pro + Service Hub Pro')).toBeInTheDocument()
     expect(getByLabelText('HubSpot')).toBeInTheDocument()
+    expect(getByLabelText('Instrumento: Santander Corp.')).toBeInTheDocument()
     expect(getByText('Pago pendiente')).toBeInTheDocument()
     expect(getByText('Conciliado')).toBeInTheDocument()
     expect(getByText('-$187.350')).toBeInTheDocument()

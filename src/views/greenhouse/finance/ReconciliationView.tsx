@@ -110,6 +110,8 @@ interface PendingMovement {
   date: string | null
   amount: number
   instrumentName: string | null
+  instrumentCategory: string | null
+  paymentProviderSlug: string | null
 }
 
 // ---------------------------------------------------------------------------
@@ -230,7 +232,9 @@ const ReconciliationView = () => {
             partyName: item.clientName || null,
             date: item.paymentDate,
             amount: item.amount,
-            instrumentName: item.paymentAccountName || item.paymentProviderSlug || item.paymentInstrumentCategory || null
+            instrumentName: item.paymentAccountName || item.paymentProviderSlug || item.paymentInstrumentCategory || null,
+            instrumentCategory: item.paymentInstrumentCategory,
+            paymentProviderSlug: item.paymentProviderSlug
           }))
 
         const expenses: PendingMovement[] = (expenseData.items ?? [])
@@ -241,7 +245,9 @@ const ReconciliationView = () => {
             partyName: item.supplierName || item.memberName || null,
             date: item.paymentDate,
             amount: -item.amount,
-            instrumentName: item.paymentAccountName || item.paymentProviderSlug || item.paymentInstrumentCategory || null
+            instrumentName: item.paymentAccountName || item.paymentProviderSlug || item.paymentInstrumentCategory || null,
+            instrumentCategory: item.paymentInstrumentCategory,
+            paymentProviderSlug: item.paymentProviderSlug
           }))
 
         setPendingMovements(
@@ -497,12 +503,14 @@ const ReconciliationView = () => {
         title: item.description,
         counterparty: item.partyName,
         instrumentName: item.instrumentName,
+        instrumentCategory: item.instrumentCategory,
         amount: item.amount,
         currency: 'CLP',
         direction: item.type === 'cobro' ? 'in' : 'out',
         status: 'pending',
         sourceType: item.type === 'cobro' ? 'cash_in' : 'cash_out',
         sourceId: item.id,
+        paymentProviderSlug: item.paymentProviderSlug,
         providerId: inferFinanceMovementProviderId({
           title: item.description,
           counterparty: item.partyName,
