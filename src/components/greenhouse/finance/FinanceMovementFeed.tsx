@@ -15,6 +15,8 @@ import { useVirtualizer } from '@tanstack/react-virtual'
 import CustomAvatar from '@core/components/mui/Avatar'
 import CustomChip from '@core/components/mui/Chip'
 import EmptyState from '@/components/greenhouse/EmptyState'
+import PaymentInstrumentChip from '@/components/greenhouse/PaymentInstrumentChip'
+import { INSTRUMENT_CATEGORIES, type InstrumentCategory } from '@/config/payment-instruments'
 
 import type { FinanceMovementFeedItem, FinanceMovementFeedProps, FinanceMovementVisual } from './finance-movement-feed.types'
 import {
@@ -127,8 +129,54 @@ const MovementDetails = ({ item }: { item: FinanceMovementFeedItem }) => {
   )
 }
 
+const resolveInstrumentCategory = (value: string | null | undefined): InstrumentCategory | undefined =>
+  value && (INSTRUMENT_CATEGORIES as readonly string[]).includes(value) ? (value as InstrumentCategory) : undefined
+
 const MovementInstrumentPill = ({ item }: { item: FinanceMovementFeedItem }) => {
   if (!item.instrumentName) return null
+
+  const instrumentCategory = resolveInstrumentCategory(item.instrumentCategory)
+
+  if (item.paymentProviderSlug) {
+    return (
+      <Box
+        component='span'
+        aria-label={`Instrumento: ${item.instrumentName}`}
+        sx={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          minHeight: 26,
+          maxWidth: '100%',
+          px: 1.5,
+          py: 0.35,
+          borderRadius: 999,
+          border: theme => `1px solid ${alpha(theme.palette.divider, 0.88)}`,
+          bgcolor: 'background.paper',
+          overflow: 'hidden',
+          '& > .MuiBox-root': {
+            minWidth: 0,
+            maxWidth: '100%'
+          },
+          '& .MuiTypography-root': {
+            minWidth: 0,
+            maxWidth: '100%',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            fontSize: '0.72rem',
+            fontWeight: 600,
+            color: theme => theme.palette.customColors?.midnight ?? theme.palette.text.primary
+          }
+        }}
+      >
+        <PaymentInstrumentChip
+          providerSlug={item.paymentProviderSlug}
+          instrumentName={item.instrumentName}
+          instrumentCategory={instrumentCategory}
+          size='sm'
+        />
+      </Box>
+    )
+  }
 
   const icon = getFinanceMovementInstrumentIcon(item)
 

@@ -2,6 +2,12 @@
 
 ## 2026-04-29
 
+### 2026-04-29 — Finance movement feed instrument logos
+
+- Finance / Conciliacion: el chip de instrumento ahora reutiliza `PaymentInstrumentChip` y el catalogo canonico de proveedores de pago para mostrar logos bancarios verificados cuando existe `paymentProviderSlug`.
+- La solucion evita hardcoding por banco: Santander, BCI, Falabella y futuros proveedores se resuelven desde el manifest/catalogo compartido, con fallback por categoria/icono si el dato no viene completo.
+- El cambio es visual/read-only: no toca queries, saldos, matching, materializaciones ni datos persistidos.
+
 ### 2026-04-29 — Finance movement feed instrument signal
 
 - Finance / Conciliacion: el feed de movimientos pendientes ahora trata el instrumento financiero como señal principal, no como metadata secundaria. Se muestra como chip con icono para cuenta bancaria, tarjeta, CCA, wallet o rail cuando el dato viene de cash-in/cash-out.

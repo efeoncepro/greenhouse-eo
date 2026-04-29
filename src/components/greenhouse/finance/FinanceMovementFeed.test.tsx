@@ -20,6 +20,8 @@ const items: FinanceMovementFeedItem[] = [
     sourceType: 'cash_out',
     sourceId: 'exp-pay-1',
     instrumentName: 'Santander Corp.',
+    instrumentCategory: 'bank_account',
+    paymentProviderSlug: 'santander',
     details: [{ label: 'Origen', value: 'Cash-out' }]
   },
   {
@@ -49,6 +51,7 @@ describe('FinanceMovementFeed', () => {
     expect(getByText('HubSpot — Marketing Hub Starter + Sales Hub Pro + Service Hub Pro')).toBeInTheDocument()
     expect(getByLabelText('HubSpot')).toBeInTheDocument()
     expect(getByLabelText('Instrumento: Santander Corp.')).toBeInTheDocument()
+    expect(getByLabelText('Instrumento: Santander Corp.').querySelector('img[alt="Santander"]')).toBeInTheDocument()
     expect(getByText('Pago pendiente')).toBeInTheDocument()
     expect(getByText('Conciliado')).toBeInTheDocument()
     expect(getByText('-$187.350')).toBeInTheDocument()

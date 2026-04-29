@@ -1,5 +1,12 @@
 # Handoff.md
 
+## Sesion 2026-04-29 — Finance movement feed instrument logos
+
+- Se conecto el chip de instrumento del feed de conciliacion con `PaymentInstrumentChip` y el catalogo canonico de `payment-instruments`.
+- Los instrumentos bancarios ahora usan `paymentProviderSlug` para mostrar el logo verificado existente (por ejemplo Santander/BCI/Falabella) y degradan al fallback por categoria/icono cuando el proveedor no existe o no viene en los datos.
+- Guardrail: no se agrego mapping hardcodeado por banco ni assets nuevos; se reutiliza el manifest/catalogo ya protegido por `pnpm catalog:check`. Cambio UI/read-only, sin tocar saldos, matching, queries ni materializaciones.
+- Verificacion: `pnpm test src/components/greenhouse/finance` OK; `pnpm exec eslint src/components/greenhouse/finance src/views/greenhouse/finance/ReconciliationView.tsx` OK; `pnpm lint` OK; `pnpm build` OK.
+
 ## Sesion 2026-04-29 — Finance movement feed instrument signal
 
 - Se elevo el instrumento financiero del feed de conciliacion a señal visible principal: `FinanceMovementFeed` ahora muestra `instrumentName` como chip con icono (`bank`, `credit card`, `CCA`, `wallet`, `factoring`) en vez de texto plano secundario.
