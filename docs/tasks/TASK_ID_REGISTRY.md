@@ -809,3 +809,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-725` | `to-do` | Finance Fiscal Scope & Legal Entity Foundation | `docs/tasks/to-do/TASK-725-finance-fiscal-scope-legal-entity-foundation.md` |
 | `TASK-726` | `complete` | Finance Movement Feed Foundation | `docs/tasks/complete/TASK-726-finance-movement-feed-foundation.md` |
 | `TASK-727` | `complete` | Internal Role × View Matrix Seed + Supervisor Scope en JWT | `docs/tasks/complete/TASK-727-internal-role-view-seed-and-supervisor-jwt.md` |
+| `TASK-728` | `complete` | Finance Movement Feed Decision Polish | `docs/tasks/complete/TASK-728-finance-movement-feed-decision-polish.md` |

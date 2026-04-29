@@ -2,6 +2,10 @@
 
 ## 2026-04-29
 
+### 2026-04-29 — TASK-728 Finance Movement Feed Decision Polish
+
+- Finance / Conciliacion: la cola de movimientos por conciliar queda como superficie operativa principal, con resumen visible, subtotales por día, microinteracciones de fila y orden visual antes de la tabla de períodos. Cambio UI/read-only; no modifica saldos, matching ni materializaciones.
+
 ### 2026-04-29 — TASK-727 Internal role × view matrix + Supervisor scope en JWT
 
 - Cierre de fugas de autorizacion detectadas con Daniela Ferreira (rol `efeonce_operations`):

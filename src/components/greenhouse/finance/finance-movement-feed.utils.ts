@@ -182,13 +182,15 @@ export const resolveFinanceMovementVisual = (
 }
 
 export const groupFinanceMovementItems = (items: FinanceMovementFeedItem[]) => {
-  const groups = new Map<string, { label: string; items: FinanceMovementFeedItem[] }>()
+  const groups = new Map<string, { label: string; items: FinanceMovementFeedItem[]; amount: number; currency: string }>()
 
   items.forEach(item => {
     const key = getFinanceMovementDayKey(item.date)
-    const current = groups.get(key) ?? { label: getFinanceMovementDayLabel(item.date), items: [] }
+    const current = groups.get(key) ?? { label: getFinanceMovementDayLabel(item.date), items: [], amount: 0, currency: item.currency }
 
     current.items.push(item)
+    current.amount += item.amount
+    current.currency = current.currency || item.currency
     groups.set(key, current)
   })
 

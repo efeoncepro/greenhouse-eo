@@ -4,6 +4,8 @@ export type {
   FinanceMovementFeedDensity,
   FinanceMovementFeedItem,
   FinanceMovementFeedProps,
+  FinanceMovementFeedSummaryItem,
+  FinanceMovementFeedSummaryTone,
   FinanceMovementLogoStatus,
   FinanceMovementProviderIdentity,
   FinanceMovementSourceType,
