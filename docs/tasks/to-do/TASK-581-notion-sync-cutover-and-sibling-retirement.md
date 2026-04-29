@@ -271,6 +271,26 @@ gcloud scheduler jobs list --location=us-central1 | grep notion-hubspot
 - Decommissionar hsproject.json v2025.2 del sibling si se quiere (no bloquea porque ya está retired; coordinar con TASK-575).
 - Post-mortem del EPIC-005 post 30 días: ¿la estrategia híbrida cumplió reliability targets? ¿Se puede eliminar reconciliation polling?
 
+## Delta 2026-04-29
+
+Decision operativa tomada antes del cutover formal: el sibling **`cesargrowth11/notion-hubspot-sync`** (`https://github.com/cesargrowth11/notion-hubspot-sync`) queda congelado como runtime legacy porque la implementacion actual no se considera suficientemente robusta. La absorcion se hara despues sobre Greenhouse como orquestador canonico; no se implementara una nueva ronda de fixes dentro del sibling.
+
+Estado runtime verificado el 2026-04-29: se pausaron exclusivamente los Cloud Scheduler jobs de ese repo en `efeonce-group/us-central1`:
+
+- `notion-hubspot-reverse-poll` — `PAUSED`
+- `hubspot-notion-deal-poll` — `PAUSED`
+- `notion-hubspot-reverse-poll-staging` — `PAUSED`
+- `hubspot-notion-deal-poll-staging` — `PAUSED`
+
+No se pausaron schedulers de `notion-bigquery`, `hubspot-bigquery`, `ops-worker`, Greenhouse ni otros servicios.
+
+Implicacion para esta task:
+
+- Slice 4 ya no debe asumir que el sibling sigue corriendo hasta T+5; el estado base puede ser "schedulers ya pausados desde 2026-04-29".
+- El parity check debe usar logs/BigQuery/historial previo del sibling o una reactivacion manual temporal y controlada, nunca un resume permanente.
+- El rollback command `gcloud scheduler jobs resume ...` debe tratarse como accion excepcional aprobada por el owner, porque reactivar el sibling tambien reactiva el comportamiento legacy que se decidio congelar.
+- Actualizar el runbook de cutover para distinguir claramente entre "pre-freeze 2026-04-29" y "cutover/retirement definitivo".
+
 ## Open Questions
 
 - Ventana exacta del cutover (día y hora). Decisión operativa al momento de agendar.

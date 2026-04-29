@@ -277,6 +277,19 @@ La policy de EPIC-005 dice "state-machine por deal stage + LWW fallback". La tab
 - Cache in-memory + invalidation via outbox event cuando mappings cambian.
 - Export/import de mappings para migrations entre environments.
 
+## Delta 2026-04-29
+
+Decision operativa: el sibling fuente de los mappings legacy es **`cesargrowth11/notion-hubspot-sync`** (`https://github.com/cesargrowth11/notion-hubspot-sync`). No confundir con `cesargrowth11/notion-bigquery` ni `cesargrowth11/hubspot-bigquery`.
+
+Estado runtime desde 2026-04-29: la ejecucion automatica del sibling quedo pausada en Cloud Scheduler porque el flujo actual no se considera suficientemente robusto y sera absorbido luego por Greenhouse como orquestador. Jobs pausados en `efeonce-group/us-central1`:
+
+- `notion-hubspot-reverse-poll`
+- `hubspot-notion-deal-poll`
+- `notion-hubspot-reverse-poll-staging`
+- `hubspot-notion-deal-poll-staging`
+
+Implicacion para esta task: extraer los mappings desde el repo sibling solo como seed legacy congelada. No reactivar schedulers, no optimizar los diccionarios en Python, no crear nuevos hardcodes. El output canonico debe vivir en Postgres/Greenhouse y ser gobernable por Greenhouse.
+
 ## Open Questions
 
 - ¿`identity_profile_source_links` tiene check constraint o enum actual que rechaza `'notion'`? Verificar en Slice 1.

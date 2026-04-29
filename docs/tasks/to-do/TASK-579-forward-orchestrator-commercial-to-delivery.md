@@ -260,6 +260,18 @@ async function projectDealToNotion(dealId: string, changedFields: string[]) {
 - Contacts independientes (Notion contact page separado en Contacts DB, no solo field del task).
 - Batch projections para cuando un deal trigger múltiples cambios en una ventana corta (collapse 3 eventos → 1 write).
 
+## Delta 2026-04-29
+
+Decision operativa: el sibling que esta task reemplaza es **`cesargrowth11/notion-hubspot-sync`** (`https://github.com/cesargrowth11/notion-hubspot-sync`), especificamente el forward worker en `hubspot-notion-sync/`. No confundir con `cesargrowth11/notion-bigquery` ni `cesargrowth11/hubspot-bigquery`.
+
+Estado runtime desde 2026-04-29: la ejecucion automatica del sibling quedo pausada en Cloud Scheduler para que no siga escribiendo Notion/HubSpot mientras se prepara la absorcion. Jobs pausados en `efeonce-group/us-central1`:
+
+- `hubspot-notion-deal-poll`
+- `hubspot-notion-deal-poll-staging`
+- Tambien quedaron pausados los reverse jobs del mismo repo: `notion-hubspot-reverse-poll` y `notion-hubspot-reverse-poll-staging`.
+
+Implicacion para esta task: el parity check debe comparar contra ultimo estado/log historico del sibling, no contra una ejecucion viva reactivada. Greenhouse debe asumir ownership via outbox + ops-worker + Notion Write Bridge; no se debe "arreglar" el polling Python como camino principal.
+
 ## Open Questions
 
 - ¿La Companies DB de Notion existe al momento de ejecutar esta task? Dependencia con TASK-580 Discovery.

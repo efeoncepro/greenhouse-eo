@@ -239,6 +239,19 @@ Códigos: `NOTION_AUTH` (401), `NOTION_NOT_FOUND` (404), `NOTION_RATE_LIMIT` (42
 - Métricas Prometheus-style de rate-limit consumption para alertar antes de throttling.
 - Circuit breaker si Notion API cae sostenidamente (hoy retry + fail hard).
 
+## Delta 2026-04-29
+
+Decision operativa: el sibling que se va a absorber es **`cesargrowth11/notion-hubspot-sync`** (`https://github.com/cesargrowth11/notion-hubspot-sync`). No confundir con `cesargrowth11/notion-bigquery` (ingestion read-only Notion -> BigQuery) ni con `cesargrowth11/hubspot-bigquery` (HubSpot -> BigQuery + app HubSpot Developer Platform).
+
+Estado runtime desde 2026-04-29: la ejecucion automatica del sibling `notion-hubspot-sync` quedo pausada en Cloud Scheduler para evitar que siga escribiendo mientras se prepara la absorcion hacia Greenhouse como orquestador. Jobs pausados en `efeonce-group/us-central1`:
+
+- `notion-hubspot-reverse-poll`
+- `hubspot-notion-deal-poll`
+- `notion-hubspot-reverse-poll-staging`
+- `hubspot-notion-deal-poll-staging`
+
+Implicacion para esta task: el Write Bridge debe implementarse como capability nueva de Greenhouse y no como parche sobre el sibling pausado. El repo sibling queda como referencia legacy de contratos y payloads, no como runtime a optimizar ni reactivar durante esta fase.
+
 ## Open Questions
 
 - Rename del servicio a `commercial_delivery_bridge`: decide Discovery Slice 2 con evidencia de grep.

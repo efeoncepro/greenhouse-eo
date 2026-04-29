@@ -305,6 +305,18 @@ def validate_notion_webhook(body_bytes, signature_header, signing_secret):
 - Admin UI para ver watermark + últimas reconciliations.
 - Contacts as standalone entity (no solo field del task en forward).
 
+## Delta 2026-04-29
+
+Decision operativa: el sibling que esta task reemplaza es **`cesargrowth11/notion-hubspot-sync`** (`https://github.com/cesargrowth11/notion-hubspot-sync`), especificamente el reverse worker top-level `main.py`. No confundir con `cesargrowth11/notion-bigquery` ni `cesargrowth11/hubspot-bigquery`.
+
+Estado runtime desde 2026-04-29: la ejecucion automatica del sibling quedo pausada en Cloud Scheduler para evitar mas writes desde el sistema legacy mientras se disena la absorcion Greenhouse-first. Jobs pausados en `efeonce-group/us-central1`:
+
+- `notion-hubspot-reverse-poll`
+- `notion-hubspot-reverse-poll-staging`
+- Tambien quedaron pausados los forward jobs del mismo repo: `hubspot-notion-deal-poll` y `hubspot-notion-deal-poll-staging`.
+
+Implicacion para esta task: usar el reverse sync Python solo como referencia de comportamiento legacy y casos borde. La nueva solucion debe canonicalizar en Greenhouse, emitir eventos `delivery.*`, respetar back-pressure y proyectar a HubSpot via bridge existente; no reactivar ni extender el polling legacy como solucion final.
+
 ## Open Questions
 
 - Notion webhooks: ¿qué versión de API? ¿Qué evento types exactos? Verificar en Slice 1 Discovery.
