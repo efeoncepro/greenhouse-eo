@@ -76,6 +76,10 @@ export async function POST(request: Request) {
       throw new FinanceValidationError(`driftStatus must be one of: ${VALID_DRIFT_STATUSES.join(', ')}`)
     }
 
+    const evidenceAssetId = typeof body.evidenceAssetId === 'string' && body.evidenceAssetId.trim().length > 0
+      ? body.evidenceAssetId.trim()
+      : null
+
     const result = await declareReconciliationSnapshot({
       accountId,
       snapshotAt,
@@ -87,6 +91,7 @@ export async function POST(request: Request) {
       driftExplanation: body.driftExplanation || null,
       sourceKind,
       sourceEvidenceRef: body.sourceEvidenceRef || null,
+      evidenceAssetId,
       declaredByUserId: tenant.userId || null
     })
 

@@ -6,6 +6,7 @@ export type GreenhouseAssetRetentionClass =
   | 'public_media'
   | 'hr_leave'
   | 'finance_purchase_order'
+  | 'finance_reconciliation_evidence'
   | 'payroll_receipt'
   | 'payroll_export'
   | 'document_vault'
@@ -30,6 +31,8 @@ export type GreenhouseAssetContext =
   | 'evidence_draft'
   | 'evidence'
   | 'quote_pdf'
+  | 'finance_reconciliation_evidence_draft'
+  | 'finance_reconciliation_evidence'
 
 export interface GreenhouseAssetRecord {
   assetId: string
@@ -53,6 +56,8 @@ export interface GreenhouseAssetRecord {
   uploadSource: 'user' | 'system'
   downloadCount: number
   metadata: Record<string, unknown>
+  /** TASK-721 — SHA-256 hex del binario para dedup idempotente. */
+  contentHash: string | null
   createdAt: string | null
   uploadedAt: string | null
   attachedAt: string | null
@@ -67,7 +72,12 @@ export interface PrivateAssetUploadResponse {
 
 export type DraftUploadContext = Extract<
   GreenhouseAssetContext,
-  'leave_request_draft' | 'purchase_order_draft' | 'master_agreement_draft' | 'certification_draft' | 'evidence_draft'
+  | 'leave_request_draft'
+  | 'purchase_order_draft'
+  | 'master_agreement_draft'
+  | 'certification_draft'
+  | 'evidence_draft'
+  | 'finance_reconciliation_evidence_draft'
 >
 
 export interface UploadPrivateAssetInput {

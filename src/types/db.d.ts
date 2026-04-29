@@ -1639,6 +1639,10 @@ export interface GreenhouseCoreAssets {
   attached_at: Timestamp | null;
   attached_by_user_id: string | null;
   bucket_name: string;
+  /**
+   * TASK-721 — SHA-256 hex del contenido binario. Usado para dedup idempotente: createPrivatePendingAsset busca existing asset con mismo hash antes de subir. Nullable para assets legacy pre-TASK-721.
+   */
+  content_hash: string | null;
   created_at: Generated<Timestamp>;
   deleted_at: Timestamp | null;
   deleted_by_user_id: string | null;
@@ -3318,6 +3322,10 @@ export interface GreenhouseFinanceAccountReconciliationSnapshots {
    * open: no revisado. accepted: usuario marcó drift como pendiente legítimo (holds, timing, FX) — sigue mostrando badge informativo. reconciled: drift cerrado por adición de data faltante o nuevo snapshot que cuadró exacto.
    */
   drift_status: string;
+  /**
+   * TASK-721 — FK a greenhouse_core.assets. Reemplaza el text-input libre source_evidence_ref para flujos nuevos. ON DELETE SET NULL para que borrado del asset no rompa el snapshot, pero el detector task721.reconciliationSnapshotsWithBrokenEvidence flag-eará el caso.
+   */
+  evidence_asset_id: string | null;
   pg_closing_balance: Numeric;
   resolved_at: Timestamp | null;
   resolved_by_user_id: string | null;

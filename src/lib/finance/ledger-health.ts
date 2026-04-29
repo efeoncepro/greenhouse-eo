@@ -118,6 +118,24 @@ export interface LedgerHealthSnapshot {
       currency: string
     }>
   }
+  /**
+   * TASK-721 — Reconciliation snapshots with `evidence_asset_id` apuntando a
+   * un asset que no existe o está marcado como `deleted`. Steady state
+   * esperado: `count = 0`. Cualquier valor > 0 implica que un snapshot tiene
+   * referencia rota a su evidencia — la auditoría futura no podrá reproducir.
+   * Resolución: re-subir la cartola via el drawer de conciliación, o limpiar
+   * el FK si la evidencia fue retirada intencionalmente.
+   */
+  task721: {
+    reconciliationSnapshotsWithBrokenEvidence: number
+    sampleBrokenSnapshots: Array<{
+      snapshotId: string
+      accountId: string
+      snapshotAt: string
+      evidenceAssetId: string
+      assetStatus: string | null
+    }>
+  }
 }
 
 const STALE_THRESHOLD_DAYS = 2
@@ -550,6 +568,38 @@ const TASK720_ACCOUNTS_WITHOUT_KPI_RULE_SAMPLE_SQL = `
   LIMIT 20
 `
 
+// TASK-721 — reconciliation snapshots con evidence_asset_id roto.
+// Roto = asset_id no existe O asset.status='deleted'. Con ON DELETE SET NULL
+// el FK natural cubre el primer caso (la columna queda null cuando se borra
+// el asset), pero el test directo cubre cualquier inconsistencia.
+
+const TASK721_BROKEN_EVIDENCE_COUNT_SQL = `
+  SELECT COUNT(*)::text AS total
+  FROM greenhouse_finance.account_reconciliation_snapshots s
+  WHERE s.evidence_asset_id IS NOT NULL
+    AND NOT EXISTS (
+      SELECT 1
+      FROM greenhouse_core.assets a
+      WHERE a.asset_id = s.evidence_asset_id
+        AND a.status <> 'deleted'
+    )
+`
+
+const TASK721_BROKEN_EVIDENCE_SAMPLE_SQL = `
+  SELECT
+    s.snapshot_id,
+    s.account_id,
+    s.snapshot_at::text AS snapshot_at,
+    s.evidence_asset_id,
+    a.status AS asset_status
+  FROM greenhouse_finance.account_reconciliation_snapshots s
+  LEFT JOIN greenhouse_core.assets a ON a.asset_id = s.evidence_asset_id
+  WHERE s.evidence_asset_id IS NOT NULL
+    AND (a.asset_id IS NULL OR a.status = 'deleted')
+  ORDER BY s.snapshot_at DESC
+  LIMIT 20
+`
+
 const UNANCHORED_EXPENSES_SQL = `
   SELECT
     e.expense_id, e.expense_type, e.total_amount::text, e.payment_date::text
@@ -591,7 +641,9 @@ export const getFinanceLedgerHealth = async (): Promise<LedgerHealthSnapshot> =>
     cohortDCountRows,
     cohortDSampleRows,
     task720CountRows,
-    task720SampleRows
+    task720SampleRows,
+    task721CountRows,
+    task721SampleRows
   ] = await Promise.all([
     runGreenhousePostgresQuery<{ income_id: string; total_amount: string; amount_paid: string; expected_settlement: string; drift: string }>(SETTLEMENT_DRIFT_SQL).catch(() => []),
     runGreenhousePostgresQuery<{ payment_id: string; income_id: string; payment_date: string; amount: string }>(PHANTOMS_INCOME_SQL).catch(() => []),
@@ -627,7 +679,15 @@ export const getFinanceLedgerHealth = async (): Promise<LedgerHealthSnapshot> =>
       account_name: string
       instrument_category: string
       currency: string
-    }>(TASK720_ACCOUNTS_WITHOUT_KPI_RULE_SAMPLE_SQL).catch(() => [])
+    }>(TASK720_ACCOUNTS_WITHOUT_KPI_RULE_SAMPLE_SQL).catch(() => []),
+    runGreenhousePostgresQuery<{ total: string }>(TASK721_BROKEN_EVIDENCE_COUNT_SQL).catch(() => [{ total: '0' }]),
+    runGreenhousePostgresQuery<{
+      snapshot_id: string
+      account_id: string
+      snapshot_at: string
+      evidence_asset_id: string
+      asset_status: string | null
+    }>(TASK721_BROKEN_EVIDENCE_SAMPLE_SQL).catch(() => [])
   ])
 
   const incomePhantoms = phantomsIncome.map(p => ({
@@ -721,6 +781,17 @@ export const getFinanceLedgerHealth = async (): Promise<LedgerHealthSnapshot> =>
     }))
   }
 
+  const task721 = {
+    reconciliationSnapshotsWithBrokenEvidence: readCount(task721CountRows),
+    sampleBrokenSnapshots: task721SampleRows.map(row => ({
+      snapshotId: row.snapshot_id,
+      accountId: row.account_id,
+      snapshotAt: row.snapshot_at,
+      evidenceAssetId: row.evidence_asset_id,
+      assetStatus: row.asset_status
+    }))
+  }
+
   const healthy =
     settlementDrift.driftedIncomesCount === 0 &&
     phantoms.incomePhantomsCount === 0 &&
@@ -739,7 +810,9 @@ export const getFinanceLedgerHealth = async (): Promise<LedgerHealthSnapshot> =>
     task714d.internalTransferGroupsWithMissingPair === 0 &&
     // TASK-720: cuentas activas con instrument_category sin rule causan
     // fail-fast en getBankOverview (MissingKpiRuleError).
-    task720.instrumentCategoriesWithoutKpiRule === 0
+    task720.instrumentCategoriesWithoutKpiRule === 0 &&
+    // TASK-721: snapshots con evidence_asset_id roto degradan auditoría.
+    task721.reconciliationSnapshotsWithBrokenEvidence === 0
 
   return {
     healthy,
@@ -751,6 +824,7 @@ export const getFinanceLedgerHealth = async (): Promise<LedgerHealthSnapshot> =>
     task708,
     task708d,
     task714d,
-    task720
+    task720,
+    task721
   }
 }
