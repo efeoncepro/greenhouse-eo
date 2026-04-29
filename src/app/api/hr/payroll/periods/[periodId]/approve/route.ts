@@ -22,11 +22,15 @@ export async function POST(_: Request, { params }: { params: Promise<{ periodId:
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
+  let resolvedPeriodId: string | null = null
+
   try {
     await ensurePayrollInfrastructure()
     const projectId = getProjectId()
 
     const { periodId } = await params
+
+    resolvedPeriodId = periodId
     const period = await getPayrollPeriod(periodId)
 
     if (!period) {
@@ -91,6 +95,10 @@ export async function POST(_: Request, { params }: { params: Promise<{ periodId:
 
     return NextResponse.json(updated)
   } catch (error) {
-    return toPayrollErrorResponse(error, 'Unable to approve payroll period.')
+    return toPayrollErrorResponse(error, 'Unable to approve payroll period.', {
+      stage: 'approve',
+      periodId: resolvedPeriodId,
+      actorUserId: tenant.userId
+    })
   }
 }

@@ -14,9 +14,13 @@ export async function POST(_: Request, { params }: { params: Promise<{ periodId:
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
+  let resolvedPeriodId: string | null = null
+
   try {
     const session = await getServerAuthSession()
     const { periodId } = await params
+
+    resolvedPeriodId = periodId
 
     const result = await calculatePayroll({
       periodId,
@@ -25,6 +29,10 @@ export async function POST(_: Request, { params }: { params: Promise<{ periodId:
 
     return NextResponse.json(result)
   } catch (error) {
-    return toPayrollErrorResponse(error, 'Unable to calculate payroll.')
+    return toPayrollErrorResponse(error, 'Unable to calculate payroll.', {
+      stage: 'calculate',
+      periodId: resolvedPeriodId,
+      actorUserId: tenant.userId
+    })
   }
 }

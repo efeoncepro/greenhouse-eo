@@ -1,5 +1,24 @@
 # Handoff.md
 
+## Sesion 2026-04-29 — TASK-729 Payroll Reliability Module + Domain Tag + Data Quality Subsystem
+
+- **Cierre del hueco de observability detectado en auditoría pre-cierre nómina abril 2026**: payroll estaba absorbido bajo `delivery` en el Reliability Control Plane, sin `incidentDomainTag` propio, sin `captureWithDomain` calls (5 `console.error` directos sin domain tag), y sin subsystem en `/admin/ops-health`. Cuando algo se rompía en payroll, ops veía un incident anónimo en `delivery` sin filtrar por módulo.
+- **100% aditivo, NO toca el motor de cálculo**: state machine, `buildPayrollEntry`, outbox events, lifecycle de períodos, `getPayrollPeriodReadiness`, reliquidation TASK-410 y crons existentes quedan intactos.
+- **Cambios entregados**:
+  - Tipos: `'payroll'` agregado a `ReliabilityModuleKey` + `'hr'` a `ReliabilityModuleDomain` ([src/types/reliability.ts](src/types/reliability.ts)).
+  - Domain tag: `'payroll'` agregado a `CaptureDomain` enum ([src/lib/observability/capture.ts](src/lib/observability/capture.ts)).
+  - Registry: payroll registrado en `STATIC_RELIABILITY_REGISTRY` con `incidentDomainTag='payroll'`, 4 routes, 2 APIs, 6 dependencies, 1 smoke test, `expectedSignalKinds: ['subsystem', 'incident', 'test_lane']` ([src/lib/reliability/registry.ts](src/lib/reliability/registry.ts)).
+  - Mapping: `'Payroll Data Quality' → 'payroll'` en `SUBSYSTEM_MODULE_MAP` ([src/lib/reliability/signals.ts](src/lib/reliability/signals.ts)).
+  - Incident routing: keyword `payroll`/`compensation`/`previred`/`nomina`/`liquidacion` enrutan al módulo payroll con priority 28 (debajo de finance pero arriba de notion/teams/delivery) ([src/lib/reliability/incident-mapping.ts](src/lib/reliability/incident-mapping.ts)).
+  - 4 detectores read-only en `src/lib/payroll/data-quality/`: `stuck_draft_periods`, `compensation_version_overlaps`, `previred_sync_freshness`, `projection_queue_failures`. Cada uno fail-soft (retorna `info` en error, nunca throw).
+  - Composer `buildPayrollDataQualitySubsystem()` en [src/lib/operations/get-operations-overview.ts](src/lib/operations/get-operations-overview.ts) con kill switch `GREENHOUSE_DISABLE_PAYROLL_DETECTORS=true`.
+  - Helper canónico `toPayrollErrorResponse(error, fallbackMessage, extra?)` actualizado para usar `captureWithDomain(err, 'payroll', { extra })` — instrumenta automáticamente todos los handlers payroll que lo usan.
+  - 3 handlers críticos (`calculate`, `approve`, `close`) pasan `extra: { stage, periodId, actorUserId }` para enriquecer el contexto Sentry.
+  - 5 `console.error` directos reemplazados por `captureWithDomain` en `get-compensation.ts`, `postgres-store.ts`, `projected/route.ts`, `api-response.ts`. Steady state = 0.
+- **Verificación**: 24 tests nuevos (`detectors.test.ts` + `api-response.test.ts`) verdes. 323 tests existentes en payroll/reliability/operations/observability sin regresión. `pnpm lint` OK. `pnpm build` OK. `npx tsc --noEmit` OK.
+- **Doc**: sección 27 "Observability & Reliability" agregada a `GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md` con boundaries explícitos y patrón "cómo agregar un detector nuevo".
+- **Próximo paso pre-cierre nómina**: TASK-731 (Pre-Close Validator endpoint) y TASK-730 (E2E Smoke Lane). Ambas dependen de este registry+subsystem ya en place.
+
 ## Sesion 2026-04-29 — TASK-728 Finance Movement Feed Decision Polish
 
 - Se completo TASK-728 en worktree aislado `greenhouse-eo-task-728` para no interferir con TASK-727/Claude en el checkout principal.

@@ -236,6 +236,40 @@ export const STATIC_RELIABILITY_REGISTRY: ReliabilityModuleDefinition[] = [
     ],
     expectedSignalKinds: ['runtime', 'incident'],
     incidentDomainTag: 'home'
+  },
+  {
+    moduleKey: 'payroll',
+    label: 'Payroll',
+    description:
+      'Motor de cálculo de nómina, cierre mensual, reliquidación post-export, integración PREVIRED Chile y proyección de nómina. Crítico para el ciclo de pago mensual del equipo.',
+    domain: 'hr',
+    routes: [
+      { path: '/hr/payroll', label: 'Nómina' },
+      { path: '/hr/payroll/projected', label: 'Nómina proyectada' }
+    ],
+    apis: [
+      { path: '/api/hr/payroll/periods', label: 'Períodos de nómina' },
+      { path: '/api/hr/payroll/projected', label: 'Nómina proyectada (read)' }
+    ],
+    dependencies: [
+      'greenhouse_payroll schema',
+      'cloud.postgres',
+      'greenhouse_sync.source_sync_runs (previred)',
+      'greenhouse_sync.projection_refresh_queue (projected_payroll, leave_payroll_recalculation)',
+      'PREVIRED Chile sync',
+      'operational-calendar (feriados Chile)'
+    ],
+    smokeTests: [
+      'tests/e2e/smoke/hr-payroll.spec.ts'
+    ],
+    filesOwned: [
+      'src/lib/payroll/**',
+      'src/views/greenhouse/hr/payroll/**',
+      'src/app/api/hr/payroll/**',
+      'src/app/(dashboard)/hr/payroll/**'
+    ],
+    expectedSignalKinds: ['subsystem', 'incident', 'test_lane'],
+    incidentDomainTag: 'payroll'
   }
 ]
 

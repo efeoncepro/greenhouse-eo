@@ -15,8 +15,12 @@ export async function POST(_: Request, { params }: { params: Promise<{ periodId:
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
+  let resolvedPeriodId: string | null = null
+
   try {
     const { periodId } = await params
+
+    resolvedPeriodId = periodId
     const currentPeriod = await getPayrollPeriod(periodId)
     const { period, exportedNow } = await closePayrollPeriod(periodId)
 
@@ -28,6 +32,10 @@ export async function POST(_: Request, { params }: { params: Promise<{ periodId:
       notificationDispatch
     })
   } catch (error) {
-    return toPayrollErrorResponse(error, 'Unable to close payroll period.')
+    return toPayrollErrorResponse(error, 'Unable to close payroll period.', {
+      stage: 'close',
+      periodId: resolvedPeriodId,
+      actorUserId: tenant.userId
+    })
   }
 }

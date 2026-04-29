@@ -9,6 +9,7 @@ import type {
   UpdateCompensationVersionInput
 } from '@/types/payroll'
 
+import { captureWithDomain } from '@/lib/observability/capture'
 import { ensurePayrollInfrastructure } from '@/lib/payroll/schema'
 import { listPayrollCompensationMembers } from '@/lib/payroll/get-payroll-members'
 import {
@@ -439,7 +440,10 @@ export const getCompensationOverview = async (): Promise<PayrollCompensationOver
   const compensations = compensationsResult.status === 'fulfilled' ? compensationsResult.value : []
 
   if (compensationsResult.status === 'rejected') {
-    console.error('Unable to load current payroll compensations.', compensationsResult.reason)
+    captureWithDomain(compensationsResult.reason, 'payroll', {
+      level: 'error',
+      extra: { stage: 'load_current_compensations' }
+    })
   }
 
   let members =
@@ -448,7 +452,10 @@ export const getCompensationOverview = async (): Promise<PayrollCompensationOver
       : await listFallbackPayrollMembers()
 
   if (membersResult.status === 'rejected') {
-    console.error('Unable to load payroll compensation members.', membersResult.reason)
+    captureWithDomain(membersResult.reason, 'payroll', {
+      level: 'error',
+      extra: { stage: 'load_compensation_members' }
+    })
   }
 
   members = mergeCurrentCompensationIntoMembers({ members, compensations })

@@ -44,6 +44,7 @@ export type CaptureDomain =
   | 'agency'
   | 'observability'
   | 'home'
+  | 'payroll'
 
 export interface CaptureOptions {
   /** Free-form structured context. Ends up in Sentry's `Additional Data`. */

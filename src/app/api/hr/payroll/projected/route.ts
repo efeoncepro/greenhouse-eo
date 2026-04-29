@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 
 import type { ProjectionMode } from '@/types/payroll'
 
+import { captureWithDomain } from '@/lib/observability/capture'
 import { requireHrTenantContext } from '@/lib/tenant/authorization'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { resolveExchangeRateToClp } from '@/lib/finance/shared'
@@ -190,7 +191,10 @@ export async function GET(request: Request) {
       { headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0' } }
     )
   } catch (error) {
-    console.error('GET /api/hr/payroll/projected failed:', error)
+    captureWithDomain(error, 'payroll', {
+      level: 'error',
+      extra: { stage: 'projected_payroll_read' }
+    })
 
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Unknown error' },

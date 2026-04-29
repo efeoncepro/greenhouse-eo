@@ -59,7 +59,10 @@ const SUBSYSTEM_MODULE_MAP: Record<string, ReliabilityModuleKey> = {
   'Finance Data Quality': 'finance',
 
   // Teams notifications & bot (TASK-669 + TASK-671)
-  'Teams Notifications': 'integrations.teams'
+  'Teams Notifications': 'integrations.teams',
+
+  // Payroll (TASK-729) — domain HR, módulo first-class en Reliability Control Plane
+  'Payroll Data Quality': 'payroll'
 }
 
 const subsystemSlug = (name: string) =>

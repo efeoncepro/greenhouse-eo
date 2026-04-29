@@ -19,6 +19,7 @@ export type ReliabilityModuleKey =
   | 'cloud'
   | 'delivery'
   | 'home'
+  | 'payroll'
 
 export type ReliabilityModuleDomain =
   | 'platform'
@@ -26,6 +27,7 @@ export type ReliabilityModuleDomain =
   | 'finance'
   | 'delivery'
   | 'home'
+  | 'hr'
 
 export type ReliabilitySignalKind =
   | 'runtime'

@@ -43,7 +43,6 @@ const MODULE_TITLE_HINTS: Record<ReliabilityModuleKey, string[]> = {
     'quotation',
     'expense',
     'income',
-    'payroll',
     'pricing-engine',
     'nubox',
     'reconciliation'
@@ -52,7 +51,18 @@ const MODULE_TITLE_HINTS: Record<ReliabilityModuleKey, string[]> = {
   'integrations.teams': ['teams_notification', 'teams-bot', 'bot framework', 'graph chat', 'graph channel'],
   cloud: ['cloud sql', 'bigquery', 'sentry', 'vercel cron', 'cloud run', 'gcp'],
   delivery: ['ico-engine', 'ico_engine', 'sprint', 'delivery_tasks', 'reactive worker', 'agency operations'],
-  home: ['home block', 'home snapshot', 'home pulse', 'home today', 'home insights', 'home recents']
+  home: ['home block', 'home snapshot', 'home pulse', 'home today', 'home insights', 'home recents'],
+  // TASK-729: hints para incidents de payroll. La keyword `payroll` se mueve a
+  // este módulo (antes vivía bajo `finance` por proximidad de dominio); con el
+  // domain tag canónico `domain=payroll` el fallback por keyword solo se usa
+  // cuando llega un incident sin tag (Sentry legacy).
+  payroll: [
+    'payroll',
+    'compensation',
+    'previred',
+    'nomina',
+    'liquidacion'
+  ]
 }
 
 /**
@@ -62,6 +72,10 @@ const MODULE_TITLE_HINTS: Record<ReliabilityModuleKey, string[]> = {
  */
 const MODULE_PRIORITY: Record<ReliabilityModuleKey, number> = {
   finance: 30,
+  // Payroll prioridad alta: matchea por dominio específico (nómina, previred);
+  // cuando un incident toca payroll y finance, payroll gana porque es el módulo
+  // operacional dueño del flujo. Si emerge ambigüedad, ajustar > 30.
+  payroll: 28,
   'integrations.notion': 25,
   'integrations.teams': 22,
   delivery: 20,

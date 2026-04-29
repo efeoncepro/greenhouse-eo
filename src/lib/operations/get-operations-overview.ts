@@ -12,6 +12,14 @@ import { readAiLlmOperationsSnapshot } from '@/lib/ico-engine/ai/llm-enrichment-
 import { getNotionDeliveryDataQualityOverview } from '@/lib/integrations/notion-delivery-data-quality'
 import { countIncomesWithSettlementDrift } from '@/lib/finance/income-settlement'
 import { getFinanceLedgerHealth } from '@/lib/finance/ledger-health'
+import {
+  detectStuckDraftPeriods,
+  detectCompensationVersionOverlaps,
+  detectPreviredSyncFreshness,
+  detectProjectionQueueFailures,
+  isPayrollPlatformMetric,
+  type PayrollDataQualityMetric
+} from '@/lib/payroll/data-quality'
 import { readReactiveBacklogOverview, type ReactiveBacklogOverview } from '@/lib/operations/reactive-backlog'
 import { getLastReactiveRun } from '@/lib/sync/reactive-run-tracker'
 import {
@@ -478,6 +486,98 @@ export const buildFinanceDataQualitySubsystem = async (): Promise<OperationsSubs
   }
 }
 
+/**
+ * TASK-729 — Payroll Data Quality subsystem composer.
+ *
+ * Agrega los 4 detectores de payroll en paralelo. Cada detector es read-only,
+ * fail-soft (retorna `info` en error). El subsystem escala a `degraded` solo
+ * si hay platform integrity metrics con severity warning/error — métricas
+ * operacionales (PREVIRED freshness) no escalan, surface info-only.
+ *
+ * Kill switch: `GREENHOUSE_DISABLE_PAYROLL_DETECTORS=true` retorna estado
+ * `not_configured` sin ejecutar queries — útil para diagnóstico o cuando
+ * el subsystem genera ruido y se necesita silenciar sin redeploy.
+ *
+ * Spec: docs/tasks/to-do/TASK-729-payroll-reliability-module.md
+ */
+export const buildPayrollDataQualitySubsystem = async (): Promise<OperationsSubsystem> => {
+  if (process.env.GREENHOUSE_DISABLE_PAYROLL_DETECTORS === 'true') {
+    return {
+      name: 'Payroll Data Quality',
+      status: 'not_configured',
+      processed: 0,
+      failed: 0,
+      lastRun: null,
+      summary: 'Detectores de payroll deshabilitados via GREENHOUSE_DISABLE_PAYROLL_DETECTORS.',
+      metrics: []
+    }
+  }
+
+  try {
+    const hasPayrollTables = await tableExists('greenhouse_payroll', 'payroll_periods')
+
+    if (!hasPayrollTables) {
+      return {
+        name: 'Payroll Data Quality',
+        status: 'not_configured',
+        processed: 0,
+        failed: 0,
+        lastRun: null,
+        summary: null,
+        metrics: []
+      }
+    }
+
+    const [stuck, overlaps, previred, queue] = await Promise.all([
+      detectStuckDraftPeriods(),
+      detectCompensationVersionOverlaps(),
+      detectPreviredSyncFreshness(),
+      detectProjectionQueueFailures()
+    ])
+
+    const metrics: PayrollDataQualityMetric[] = [stuck, overlaps, previred, queue]
+
+    const platformIssueMetrics = metrics.filter(
+      metric => (metric.status === 'warning' || metric.status === 'error') && isPayrollPlatformMetric(metric.key)
+    )
+
+    const status: OperationsHealthStatus = platformIssueMetrics.length > 0 ? 'degraded' : 'healthy'
+    const platformMetricsCount = metrics.filter(metric => isPayrollPlatformMetric(metric.key)).length
+
+    return {
+      name: 'Payroll Data Quality',
+      status,
+      processed: platformMetricsCount,
+      failed: platformIssueMetrics.length,
+      lastRun: new Date().toISOString(),
+      summary: buildPayrollDataQualitySummary(metrics),
+      metrics
+    }
+  } catch {
+    return {
+      name: 'Payroll Data Quality',
+      status: 'idle',
+      processed: 0,
+      failed: 0,
+      lastRun: null,
+      summary: 'No se pudo construir el resumen de data quality de payroll.',
+      metrics: []
+    }
+  }
+}
+
+const buildPayrollDataQualitySummary = (metrics: PayrollDataQualityMetric[]): string => {
+  const issues = metrics
+    .filter(m => isPayrollPlatformMetric(m.key) && (m.status === 'warning' || m.status === 'error'))
+    .map(m => `${m.label}: ${m.value}`)
+
+  if (issues.length === 0) {
+    return 'Sin gaps de plataforma. Los detectores no encontraron stuck periods, compensaciones solapadas ni proyecciones fallidas.'
+  }
+
+  return `${issues.length} alerta${issues.length === 1 ? '' : 's'} activa${issues.length === 1 ? '' : 's'}: ${issues.join(' · ')}.`
+}
+
 const buildNotionDeliveryDataQualitySubsystem = (
   overview: IntegrationDataQualityOverview | null
 ): OperationsSubsystem => {
@@ -932,6 +1032,7 @@ export const getOperationsOverview = async (): Promise<OperationsOverview> => {
       lastRun: icoAiSignalsLastSync
     },
     await buildFinanceDataQualitySubsystem(),
+    await buildPayrollDataQualitySubsystem(),
     buildNotionDeliveryDataQualitySubsystem(notionDeliveryDataQuality)
   ]
 

@@ -22,6 +22,7 @@ import {
   resolveScheduleRequired
 } from '@/types/hr-contracts'
 
+import { captureWithDomain } from '@/lib/observability/capture'
 import {
   isGreenhousePostgresConfigured,
   runGreenhousePostgresQuery,
@@ -2487,13 +2488,19 @@ export const pgGetCompensationOverview = async (): Promise<PayrollCompensationOv
   const compensations = compensationsResult.status === 'fulfilled' ? compensationsResult.value : []
 
   if (compensationsResult.status === 'rejected') {
-    console.error('Unable to load current payroll compensations from Postgres.', compensationsResult.reason)
+    captureWithDomain(compensationsResult.reason, 'payroll', {
+      level: 'error',
+      extra: { stage: 'pg_load_current_compensations' }
+    })
   }
 
   let members = membersResult.status === 'fulfilled' ? membersResult.value : []
 
   if (membersResult.status === 'rejected') {
-    console.error('Unable to load payroll compensation members from Postgres.', membersResult.reason)
+    captureWithDomain(membersResult.reason, 'payroll', {
+      level: 'error',
+      extra: { stage: 'pg_load_compensation_members' }
+    })
   }
 
   // Merge current compensation into members

@@ -2,6 +2,18 @@
 
 ## 2026-04-29
 
+### 2026-04-29 — TASK-729 Payroll Reliability Module + Domain Tag + Data Quality Subsystem
+
+- Payroll registrado como módulo first-class en el Reliability Control Plane (`STATIC_RELIABILITY_REGISTRY`) con `incidentDomainTag='payroll'`. Antes estaba absorbido bajo `delivery`.
+- `'payroll'` agregado a `CaptureDomain` enum. `toPayrollErrorResponse` (helper canónico de API routes) ahora envía a Sentry con `tags.domain='payroll'` cuando el error no es PayrollValidationError. Los 3 handlers críticos (calculate/approve/close) pasan `extra: { stage, periodId, actorUserId }` para context enriquecido.
+- 5 `console.error` directos reemplazados por `captureWithDomain(err, 'payroll', { extra })` en `get-compensation.ts`, `postgres-store.ts`, `projected/route.ts`, `api-response.ts`. Steady state = 0 console.error directos en payroll.
+- Subsystem "Payroll Data Quality" en Operations Overview (`/admin/ops-health`) con 4 detectores read-only: `stuck_draft_periods`, `compensation_version_overlaps`, `previred_sync_freshness`, `projection_queue_failures`. 3 son platform integrity (escalan a `degraded`), 1 es operacional (info).
+- Cada detector es fail-soft: retorna `info` con valor neutro si la query falla. Nunca rompe el dashboard.
+- Kill switch: `GREENHOUSE_DISABLE_PAYROLL_DETECTORS=true` desactiva el subsystem sin redeploy.
+- Incident routing por keyword: `payroll`/`compensation`/`previred`/`nomina`/`liquidacion` enrutan a módulo payroll para incidents Sentry sin domain tag (legacy).
+- 100% aditivo: NO toca el motor de cálculo, state machine, outbox events, lifecycle de períodos, ni `getPayrollPeriodReadiness`. Cero regresión sobre las 323 tests existentes.
+- Doc canónica `GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md` actualizada con sección 27 "Observability & Reliability".
+
 ### 2026-04-29 — TASK-728 Finance Movement Feed Decision Polish
 
 - Finance / Conciliacion: la cola de movimientos por conciliar queda como superficie operativa principal, con resumen visible, subtotales por día, microinteracciones de fila y orden visual antes de la tabla de períodos. Cambio UI/read-only; no modifica saldos, matching ni materializaciones.

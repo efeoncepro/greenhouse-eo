@@ -1531,3 +1531,51 @@ Archivo: `src/lib/payroll/current-payroll-period.ts`
 3. **Solo `efeonce_admin` puede reabrir** — no hay delegation a roles intermedios.
 4. **Ordering soft en reactive consumer** — si dos instancias de ops-worker toman `entry.superseded` y `entry.created` del mismo aggregate, pueden procesarse out-of-order. La idempotencia lo atrapa, pero no es FIFO estricto. Documentado en `docs/architecture/GREENHOUSE_REACTIVE_PIPELINE_SCALABILITY_V1.md`.
 5. **Latencia del delta a finanzas** — depende de la cadencia del scheduler (2-5 min). Documentado en el mismo doc de scalability.
+
+## 27. Observability & Reliability (TASK-729)
+
+Payroll es un módulo first-class del Reliability Control Plane (`STATIC_RELIABILITY_REGISTRY`) con `incidentDomainTag = 'payroll'`. Todos los errores no-validation que pasen por `toPayrollErrorResponse` (helper canónico de los API routes) emiten a Sentry con `tags.domain = 'payroll'`, lo que permite filtrar incidents por módulo en Cloud & Integrations y producir el `incident` signal del módulo Payroll.
+
+### 27.1 Domain tag canónico
+
+- `CaptureDomain` enum incluye `'payroll'` ([src/lib/observability/capture.ts](../../src/lib/observability/capture.ts)).
+- Todos los `console.error` directos en `src/lib/payroll/**` y `src/app/api/hr/payroll/**` fueron reemplazados por `captureWithDomain(err, 'payroll', { extra: { stage, periodId, actorUserId } })`.
+- `toPayrollErrorResponse(error, fallbackMessage, extra?)` en [src/lib/payroll/api-response.ts](../../src/lib/payroll/api-response.ts) es el helper canónico — instrumentar nuevos endpoints solo requiere usarlo y pasar `extra` con context.
+- **Steady state**: cero `console.error` directos en payroll. Si emerge uno nuevo, falla el grep de regresión y debe migrarse al helper.
+
+### 27.2 Subsystem "Payroll Data Quality"
+
+[`buildPayrollDataQualitySubsystem`](../../src/lib/operations/get-operations-overview.ts) entrega 4 detectores read-only que viven en [src/lib/payroll/data-quality/](../../src/lib/payroll/data-quality/):
+
+| Métrica | Tipo | Severidad | Acción |
+|---|---|---|---|
+| `stuck_draft_periods` | platform integrity | warning si 1, error si > 1 | período `draft` con `updated_at > 48h` y mes operativo ya transcurrido |
+| `compensation_version_overlaps` | platform integrity | error si > 0 | versions activas con date ranges solapados — bloquea cálculo correcto |
+| `previred_sync_freshness` | operacional (info) | nunca escala | horas desde último `source_sync_runs` exitoso de `previred` |
+| `projection_queue_failures` | platform integrity | warning si 1-5, error si > 5 | entries `failed`/`dead` (no archived) en `projection_refresh_queue` para projections de payroll |
+
+- Las 3 métricas `platform integrity` escalan el subsystem a `degraded` cuando emiten warning/error. La operacional (PREVIRED freshness) es informativa.
+- Cada detector es **fail-soft**: si la query falla (schema legacy, connection issue), retorna `info` con valor neutro. Nunca throw.
+- El subsystem se enchufa al Reliability Control Plane vía `SUBSYSTEM_MODULE_MAP` en [src/lib/reliability/signals.ts](../../src/lib/reliability/signals.ts) — `'Payroll Data Quality' → 'payroll'`.
+
+### 27.3 Kill switch
+
+`GREENHOUSE_DISABLE_PAYROLL_DETECTORS=true` desactiva el subsystem retornando `not_configured` sin ejecutar queries. Útil para diagnóstico, mantenimiento, o si el subsystem genera ruido y se necesita silenciar sin redeploy. **Esta variable no afecta el motor de cálculo** — solo la observabilidad.
+
+### 27.4 Boundaries explícitos (qué NO hace este módulo)
+
+- **No reemplaza `getPayrollPeriodReadiness`**. Ese helper es el gate canónico de aprobación server-side y sigue siendo source of truth para bloqueantes pre-approval. Los detectores son visibilidad continua, no enforcement.
+- **No mide duración de cálculo ni emite histograms**. Fuera de scope V1 — follow-up TASK derivada si se necesita.
+- **No emite alertas a Teams automáticamente**. La conexión con notifications queda para TASK-731 (pre-close validator).
+- **No persiste resultados de detectores**. Cada llamada a Operations Overview re-corre las queries. Si la cardinalidad lo justifica, agregar caching (TTL 30s in-process, patrón ya usado en Platform Health).
+
+### 27.5 Cómo detectar un gap nuevo de payroll
+
+Cuando emerja un gap operativo no cubierto:
+
+1. Crear nuevo helper en `src/lib/payroll/data-quality/<gap-name>.ts` con shape `() => Promise<PayrollDataQualityMetric>`.
+2. Decidir si es platform integrity (escala) u operacional (info). Agregar la key a `PAYROLL_PLATFORM_METRIC_KEYS` o `PAYROLL_OPERATIONAL_METRIC_KEYS` en `data-quality/types.ts`.
+3. Agregar al `Promise.all` en `buildPayrollDataQualitySubsystem` y al `metrics` array.
+4. Test vitest con happy path + edge case + fail-soft.
+
+No requiere migration. No requiere cambio de UI (Ops Health renderiza automáticamente cualquier métrica nueva del subsystem).
