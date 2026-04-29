@@ -1,10 +1,10 @@
 # Conciliación bancaria
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-04-27 por Claude Opus 4.7 + Julio Reyes
-> **Ultima actualizacion:** 2026-04-29 por Claude Opus 4.7 (TASK-720 KPI rules + TASK-721 evidence uploader + TASK-722 Bank↔Reconciliation synergy)
-> **Documentacion tecnica:** [GREENHOUSE_FINANCE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md), [TASK-702](../../tasks/in-progress/TASK-702-bank-reconciliation-canonical-anchors-rematerialize.md), [TASK-715](../../tasks/complete/TASK-715-reconciliation-test-period-archive-ux.md), [TASK-720](../../tasks/complete/TASK-720-instrument-category-kpi-rules.md), [TASK-721](../../tasks/complete/TASK-721-finance-evidence-canonical-uploader.md), [TASK-722](../../tasks/complete/TASK-722-bank-reconciliation-synergy-workbench.md)
+> **Ultima actualizacion:** 2026-04-29 por Codex (TASK-723 AI-assisted reconciliation intelligence)
+> **Documentacion tecnica:** [GREENHOUSE_FINANCE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md), [TASK-702](../../tasks/in-progress/TASK-702-bank-reconciliation-canonical-anchors-rematerialize.md), [TASK-715](../../tasks/complete/TASK-715-reconciliation-test-period-archive-ux.md), [TASK-720](../../tasks/complete/TASK-720-instrument-category-kpi-rules.md), [TASK-721](../../tasks/complete/TASK-721-finance-evidence-canonical-uploader.md), [TASK-722](../../tasks/complete/TASK-722-bank-reconciliation-synergy-workbench.md), [TASK-723](../../tasks/complete/TASK-723-ai-assisted-reconciliation-intelligence.md)
 
 ## Qué es
 
@@ -177,6 +177,15 @@ Tras archivar:
 2. **Nunca eliminar un phantom Nubox por DELETE manual.** Usar `supersedeIncomePhantom()` o `supersedeExpensePhantom()` con audit reason mínimo de 8 caracteres.
 3. **Nunca tocar `account_balances` por UPDATE manual.** Re-correr `pnpm finance:rematerialize-balances` que es idempotente.
 4. **Nunca duplicar un settlement_group.** Las factories usan IDs deterministas para que re-runs no creen duplicados.
+5. **Nunca tratar una sugerencia asistida como conciliación aplicada.** TASK-723 solo propone candidatos auditables; el match real sigue requiriendo confirmación humana en el dialog de conciliación.
+
+## Sugerencias asistidas (TASK-723)
+
+El detalle de un período puede mostrar **Sugerencias asistidas** para filas sin resolver. Greenhouse combina reglas determinísticas con un modelo AI protegido por sanitización, hashes de auditoría y kill switch (`FINANCE_RECONCILIATION_AI_ENABLED`).
+
+Estas sugerencias no cambian saldos, no cierran períodos y no crean movimientos. Sirven para abrir el dialog de match con un candidato preseleccionado, revisar la evidencia y confirmar manualmente si corresponde. Si una sugerencia apunta a un target legacy payment-only, la UI lo marca como revisión sensible y reduce la confianza.
+
+Cada sugerencia queda registrada con `space_id`, `period_id`, `account_id`, versión de prompt/modelo, factores de evidencia, estado de revisión y simulación del impacto esperado. La simulación es informativa; el saldo oficial solo cambia por los comandos canónicos de conciliación y la materialización contable existente.
 
 ## Cómo agregar un nuevo tipo de movimiento bancario
 

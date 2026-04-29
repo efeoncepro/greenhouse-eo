@@ -13,6 +13,7 @@ import CardHeader from '@mui/material/CardHeader'
 import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
 import IconButton from '@mui/material/IconButton'
+import LinearProgress from '@mui/material/LinearProgress'
 import Skeleton from '@mui/material/Skeleton'
 import Snackbar from '@mui/material/Snackbar'
 import Table from '@mui/material/Table'
@@ -70,6 +71,28 @@ interface StatementRow {
   notes: string | null
 }
 
+interface IntelligenceSuggestion {
+  suggestionId: string
+  suggestionType: string
+  status: string
+  confidence: number
+  proposedAction: {
+    action: string
+    targetIds: string[]
+    payload: {
+      rowId?: string
+      candidateId?: string
+      matchedSettlementLegId?: string | null
+      matchedPaymentId?: string | null
+      targetQuality?: string
+    }
+  }
+  evidenceFactors: Array<{ factor: string; weight: number; observed: string }>
+  rationale: string
+  simulation: { currentDifference: number | null; projectedDifference: number | null; affectedRows: string[] } | null
+  modelId: string
+}
+
 // TASK-722 — bridge contract from /api/finance/reconciliation/[id]
 interface BridgeContext {
   account: { accountId: string; accountName: string; currency: string; instrumentCategory: string | null; accountKind: 'asset' | 'liability' }
@@ -117,6 +140,15 @@ const MATCH_STATUS_CONFIG: Record<string, { label: string; color: 'success' | 'w
   excluded: { label: 'Excluido', color: 'error' }
 }
 
+const SUGGESTION_TYPE_LABELS: Record<string, string> = {
+  match: 'Match sugerido',
+  group_match: 'Grupo sugerido',
+  drift_explanation: 'Explicación de drift',
+  import_mapping: 'Normalización',
+  closure_review: 'Pre-cierre',
+  anomaly: 'Anomalía'
+}
+
 const MONTH_NAMES = ['', 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
 
 const INSTRUMENT_CATEGORY_LABELS: Record<string, string> = {
@@ -141,6 +173,13 @@ const formatDate = (dateStr: string): string => {
   return `${day}/${month}/${year}`
 }
 
+const confidenceTone = (confidence: number): { label: string; color: 'success' | 'warning' | 'secondary' } => {
+  if (confidence >= 0.85) return { label: 'Alta confianza', color: 'success' }
+  if (confidence >= 0.6) return { label: 'Confianza media', color: 'warning' }
+
+  return { label: 'Baja confianza', color: 'secondary' }
+}
+
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
@@ -155,9 +194,14 @@ const ReconciliationDetailView = () => {
   const [statementRows, setStatementRows] = useState<StatementRow[]>([])
   // TASK-722 — bridge context: snapshot + evidence + drift + nextAction
   const [bridge, setBridge] = useState<BridgeContext | null>(null)
+  const [aiEnabled, setAiEnabled] = useState(false)
+  const [aiLoading, setAiLoading] = useState(false)
+  const [aiGenerating, setAiGenerating] = useState(false)
+  const [aiSuggestions, setAiSuggestions] = useState<IntelligenceSuggestion[]>([])
   const [autoMatchLoading, setAutoMatchLoading] = useState(false)
   const [statusUpdateLoading, setStatusUpdateLoading] = useState<'reconciled' | 'closed' | null>(null)
   const [selectedRow, setSelectedRow] = useState<StatementRow | null>(null)
+  const [suggestedCandidateId, setSuggestedCandidateId] = useState<string | null>(null)
   const [matchDialogOpen, setMatchDialogOpen] = useState(false)
   const [importDrawerOpen, setImportDrawerOpen] = useState(false)
 
@@ -189,11 +233,31 @@ const ReconciliationDetailView = () => {
     }
   }, [id])
 
+  const fetchSuggestions = useCallback(async () => {
+    if (!id) return
+
+    setAiLoading(true)
+
+    try {
+      const res = await fetch(`/api/finance/reconciliation/${id}/intelligence`, { cache: 'no-store' })
+
+      if (res.ok) {
+        const data = await res.json()
+
+        setAiEnabled(Boolean(data.enabled))
+        setAiSuggestions(Array.isArray(data.suggestions) ? data.suggestions : [])
+      }
+    } finally {
+      setAiLoading(false)
+    }
+  }, [id])
+
   useEffect(() => {
     if (id) {
       fetchData()
+      fetchSuggestions()
     }
-  }, [id, fetchData])
+  }, [id, fetchData, fetchSuggestions])
 
   const handleAutoMatch = async () => {
     setAutoMatchLoading(true)
@@ -233,6 +297,7 @@ const ReconciliationDetailView = () => {
   }
 
   const handleRowClick = (row: StatementRow) => {
+    setSuggestedCandidateId(null)
     setSelectedRow(row)
     setMatchDialogOpen(true)
   }
@@ -245,6 +310,82 @@ const ReconciliationDetailView = () => {
     })
 
     fetchData()
+    fetchSuggestions()
+  }
+
+  const handleGenerateSuggestions = async () => {
+    setAiGenerating(true)
+
+    try {
+      const res = await fetch(`/api/finance/reconciliation/${id}/intelligence`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mode: 'statement_rows' })
+      })
+
+      const data = await res.json().catch(() => ({}))
+
+      if (res.ok) {
+        setAiEnabled(Boolean(data.enabled))
+        setAiSuggestions(Array.isArray(data.suggestions) ? data.suggestions : [])
+        setSnackbar({
+          open: true,
+          message: data.skippedReason || `Sugerencias actualizadas: ${data.generated ?? 0} nuevas o refrescadas.`,
+          severity: data.skippedReason ? 'info' : 'success'
+        })
+      } else {
+        setSnackbar({ open: true, message: data.error || 'No pudimos generar sugerencias.', severity: 'error' })
+      }
+    } catch {
+      setSnackbar({ open: true, message: 'Error de conexión al generar sugerencias.', severity: 'error' })
+    } finally {
+      setAiGenerating(false)
+    }
+  }
+
+  const handleReviewSuggestion = async (suggestion: IntelligenceSuggestion, decision: 'accepted' | 'rejected') => {
+    try {
+      const res = await fetch(`/api/finance/reconciliation/${id}/intelligence/${suggestion.suggestionId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          decision,
+          ...(decision === 'rejected' && { rejectionReason: 'Descartada desde el workbench.' })
+        })
+      })
+
+      if (res.ok) {
+        await fetchSuggestions()
+        setSnackbar({
+          open: true,
+          message: decision === 'accepted'
+            ? 'Sugerencia marcada como revisada. Confirma el match en el dialog para aplicarlo.'
+            : 'Sugerencia descartada.',
+          severity: 'success'
+        })
+      } else {
+        const data = await res.json().catch(() => ({}))
+
+        setSnackbar({ open: true, message: data.error || 'No pudimos revisar la sugerencia.', severity: 'error' })
+      }
+    } catch {
+      setSnackbar({ open: true, message: 'Error de conexión al revisar la sugerencia.', severity: 'error' })
+    }
+  }
+
+  const handleOpenSuggestion = (suggestion: IntelligenceSuggestion) => {
+    const rowId = suggestion.proposedAction.payload.rowId
+    const row = rowId ? statementRows.find(item => item.rowId === rowId) : null
+
+    if (!row) {
+      setSnackbar({ open: true, message: 'La fila sugerida ya no está disponible en este periodo.', severity: 'info' })
+
+      return
+    }
+
+    setSuggestedCandidateId(suggestion.proposedAction.payload.candidateId ?? null)
+    setSelectedRow(row)
+    setMatchDialogOpen(true)
   }
 
   const handlePeriodStatusUpdate = async (nextStatus: 'reconciled' | 'closed') => {
@@ -323,6 +464,17 @@ const ReconciliationDetailView = () => {
   const statusConf = STATUS_CONFIG[period.status] || STATUS_CONFIG.open
   const pendingStatementRows = statementRows.filter(row => row.matchStatus === 'unmatched' || row.matchStatus === 'suggested').length
   const canMarkReconciled = period.statementImported && Math.abs(period.difference) <= 0.01 && pendingStatementRows === 0
+  const proposedSuggestions = aiSuggestions.filter(suggestion => suggestion.status === 'proposed' || suggestion.status === 'draft')
+
+  const suggestionsByRow = proposedSuggestions.reduce<Record<string, IntelligenceSuggestion[]>>((acc, suggestion) => {
+    const rowId = suggestion.proposedAction.payload.rowId
+
+    if (!rowId) return acc
+
+    acc[rowId] = [...(acc[rowId] ?? []), suggestion]
+
+    return acc
+  }, {})
 
   // TASK-722 — explicación clara del blocker para "Marcar conciliado".
   const markReconciledBlockReason = (() => {
@@ -575,6 +727,114 @@ const ReconciliationDetailView = () => {
         </Alert>
       )}
 
+      <Card
+        component='aside'
+        aria-label='Sugerencias de conciliación'
+        elevation={0}
+        sx={{ border: t => `1px solid ${t.palette.divider}` }}
+      >
+        {(aiLoading || aiGenerating) && <LinearProgress />}
+        <CardHeader
+          avatar={
+            <Avatar variant='rounded' sx={{ bgcolor: 'primary.lightOpacity' }}>
+              <i className='tabler-sparkles' style={{ fontSize: 22, color: 'var(--mui-palette-primary-main)' }} />
+            </Avatar>
+          }
+          title='Sugerencias asistidas'
+          subheader='Greenhouse propone casos para revisar; no aplica matches ni cambia saldos.'
+          action={
+            <Button
+              size='small'
+              variant='contained'
+              startIcon={<i className='tabler-wand' />}
+              onClick={handleGenerateSuggestions}
+              disabled={aiGenerating || period.status === 'closed'}
+            >
+              {aiGenerating ? 'Generando...' : 'Generar sugerencias'}
+            </Button>
+          }
+        />
+        <Divider />
+        <Box sx={{ p: 4, display: 'flex', flexDirection: 'column', gap: 3 }} role='status' aria-live='polite'>
+          {!aiEnabled && (
+            <Alert severity='info' icon={<i className='tabler-shield-lock' />}>
+              La inteligencia de conciliación está apagada por configuración. El workbench sigue funcionando con reglas determinísticas y revisión manual.
+            </Alert>
+          )}
+
+          {aiEnabled && proposedSuggestions.length === 0 && (
+            <Alert severity='success' icon={<i className='tabler-circle-check' />}>
+              No hay sugerencias pendientes para este periodo. Puedes generar una revisión cuando haya filas sin resolver.
+            </Alert>
+          )}
+
+          {proposedSuggestions.map(suggestion => {
+            const tone = confidenceTone(suggestion.confidence)
+            const targetQuality = suggestion.proposedAction.payload.targetQuality
+
+            return (
+              <Box
+                key={suggestion.suggestionId}
+                sx={{ border: t => `1px solid ${t.palette.divider}`, borderRadius: 1, p: 3, display: 'flex', flexDirection: 'column', gap: 2 }}
+              >
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 2, flexWrap: 'wrap' }}>
+                  <CustomChip
+                    round='true'
+                    size='small'
+                    color='info'
+                    label={SUGGESTION_TYPE_LABELS[suggestion.suggestionType] || 'Sugerencia'}
+                  />
+                  <CustomChip
+                    round='true'
+                    size='small'
+                    color={tone.color}
+                    variant='outlined'
+                    label={`${tone.label} · ${Math.round(suggestion.confidence * 100)}%`}
+                  />
+                </Box>
+                <Typography variant='body2'>{suggestion.rationale}</Typography>
+                {targetQuality === 'legacy_payment_only' && (
+                  <Alert severity='warning' icon={<i className='tabler-clock-pause' />}>
+                    Este target es legacy payment-only. Revísalo antes de confirmar.
+                  </Alert>
+                )}
+                {suggestion.simulation && suggestion.simulation.currentDifference !== null && suggestion.simulation.projectedDifference !== null && (
+                  <Typography variant='caption' color='text.secondary'>
+                    Simulación: diferencia actual {formatCLP(suggestion.simulation.currentDifference)} → {formatCLP(suggestion.simulation.projectedDifference)}
+                  </Typography>
+                )}
+                <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+                  <Button
+                    size='small'
+                    variant='outlined'
+                    startIcon={<i className='tabler-list-search' />}
+                    onClick={() => handleOpenSuggestion(suggestion)}
+                  >
+                    Revisar match
+                  </Button>
+                  <Button
+                    size='small'
+                    color='success'
+                    variant='tonal'
+                    onClick={() => handleReviewSuggestion(suggestion, 'accepted')}
+                  >
+                    Marcar revisada
+                  </Button>
+                  <Button
+                    size='small'
+                    color='secondary'
+                    variant='text'
+                    onClick={() => handleReviewSuggestion(suggestion, 'rejected')}
+                  >
+                    Descartar
+                  </Button>
+                </Box>
+              </Box>
+            )
+          })}
+        </Box>
+      </Card>
+
       {/* Statement Rows Table */}
       <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
         <CardHeader
@@ -614,6 +874,7 @@ const ReconciliationDetailView = () => {
                 statementRows.map(row => {
                   const matchConf = MATCH_STATUS_CONFIG[row.matchStatus] || MATCH_STATUS_CONFIG.unmatched
                   const isNegative = row.amount < 0
+                  const rowSuggestions = suggestionsByRow[row.rowId] ?? []
 
                   return (
                     <TableRow
@@ -656,12 +917,29 @@ const ReconciliationDetailView = () => {
                         </Typography>
                       </TableCell>
                       <TableCell>
-                        <CustomChip
-                          round='true'
-                          size='small'
-                          color={matchConf.color}
-                          label={matchConf.label}
-                        />
+                        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 1 }}>
+                          <CustomChip
+                            round='true'
+                            size='small'
+                            color={matchConf.color}
+                            label={matchConf.label}
+                          />
+                          {rowSuggestions.length > 0 && (
+                            <Tooltip title='Sugerencia asistida disponible; requiere revisión humana.' arrow>
+                              <span>
+                                <CustomChip
+                                  round='true'
+                                  size='small'
+                                  color='info'
+                                  variant='outlined'
+                                  icon={<i className='tabler-sparkles' style={{ fontSize: 12 }} />}
+                                  label='Sugerencia'
+                                  sx={{ height: 18, fontSize: '0.65rem' }}
+                                />
+                              </span>
+                            </Tooltip>
+                          )}
+                        </Box>
                       </TableCell>
                       <TableCell>
                         {row.matchedType ? (
@@ -744,7 +1022,11 @@ const ReconciliationDetailView = () => {
         open={matchDialogOpen}
         periodId={id}
         row={selectedRow}
-        onClose={() => setMatchDialogOpen(false)}
+        initialCandidateId={suggestedCandidateId}
+        onClose={() => {
+          setMatchDialogOpen(false)
+          setSuggestedCandidateId(null)
+        }}
         onActionComplete={handleMatchActionComplete}
       />
 

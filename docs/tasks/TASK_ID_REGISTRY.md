@@ -804,6 +804,6 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-720` | `complete` | Instrument Category KPI Rules + policy-driven Bank aggregation | `docs/tasks/complete/TASK-720-instrument-category-kpi-rules.md` |
 | `TASK-721` | `complete` | Finance evidence canonical uploader (reconciliation + OTB) | `docs/tasks/complete/TASK-721-finance-evidence-canonical-uploader.md` |
 | `TASK-722` | `complete` | Bank Reconciliation Synergy Workbench | `docs/tasks/complete/TASK-722-bank-reconciliation-synergy-workbench.md` |
-| `TASK-723` | `to-do` | AI-Assisted Reconciliation Intelligence | `docs/tasks/to-do/TASK-723-ai-assisted-reconciliation-intelligence.md` |
+| `TASK-723` | `complete` | AI-Assisted Reconciliation Intelligence | `docs/tasks/complete/TASK-723-ai-assisted-reconciliation-intelligence.md` |
 | `TASK-724` | `to-do` | Cash Position Canonical Ledger Alignment | `docs/tasks/to-do/TASK-724-cash-position-canonical-ledger-alignment.md` |
 | `TASK-725` | `to-do` | Finance Fiscal Scope & Legal Entity Foundation | `docs/tasks/to-do/TASK-725-finance-fiscal-scope-legal-entity-foundation.md` |

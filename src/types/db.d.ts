@@ -4315,6 +4315,50 @@ export interface GreenhouseFinanceQuotes {
   updated_at: Generated<Timestamp | null>;
 }
 
+export interface GreenhouseFinanceReconciliationAiSuggestions {
+  accepted_at: Timestamp | null;
+  accepted_by_user_id: string | null;
+  account_id: string;
+  candidate_payment_ids: Generated<string[]>;
+  /**
+   * Targets canonicos preferidos post TASK-708/TASK-722. candidate_payment_ids queda solo para fallback legacy payment-only.
+   */
+  candidate_settlement_leg_ids: Generated<string[]>;
+  confidence: Generated<Numeric>;
+  created_at: Generated<Timestamp>;
+  evidence_factors_json: Generated<Json>;
+  failure_reason: string | null;
+  generated_at: Generated<Timestamp>;
+  input_hash: string;
+  latency_ms: number | null;
+  model_id: string;
+  output_json: Generated<Json>;
+  period_id: string;
+  prompt_hash: string;
+  prompt_version: string;
+  /**
+   * JSON validado por runtime con action, targetIds y payload. Nunca ejecuta writes automaticos.
+   */
+  proposed_action_json: Generated<Json>;
+  rationale: Generated<string>;
+  rejected_at: Timestamp | null;
+  rejected_by_user_id: string | null;
+  rejection_reason: string | null;
+  simulation_json: Json | null;
+  /**
+   * Tenant scope denormalizado desde reconciliation_periods/accounts. Todas las queries runtime deben filtrar por este campo o derivarlo desde el periodo.
+   */
+  space_id: string;
+  statement_row_ids: Generated<string[]>;
+  status: Generated<string>;
+  suggestion_id: string;
+  suggestion_type: string;
+  superseded_at: Timestamp | null;
+  tokens_in: number | null;
+  tokens_out: number | null;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseFinanceReconciliationPeriods {
   account_id: string;
   /**
@@ -7497,6 +7541,7 @@ export interface DB {
   "greenhouse_finance.purchase_orders": GreenhouseFinancePurchaseOrders;
   "greenhouse_finance.quote_line_items": GreenhouseFinanceQuoteLineItems;
   "greenhouse_finance.quotes": GreenhouseFinanceQuotes;
+  "greenhouse_finance.reconciliation_ai_suggestions": GreenhouseFinanceReconciliationAiSuggestions;
   "greenhouse_finance.reconciliation_periods": GreenhouseFinanceReconciliationPeriods;
   "greenhouse_finance.service_entry_sheets": GreenhouseFinanceServiceEntrySheets;
   "greenhouse_finance.settlement_groups": GreenhouseFinanceSettlementGroups;

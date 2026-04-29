@@ -2,7 +2,27 @@
 
 > **Version:** 1.0
 > **Created:** 2026-03-30
-> **Last updated:** 2026-04-28
+> **Last updated:** 2026-04-29
+
+## Delta 2026-04-29 — TASK-723 AI-assisted reconciliation intelligence
+
+Conciliacion bancaria incorpora una capa AI **consultiva** sobre el workbench existente. El contrato es deliberadamente conservador para proteger saldos ya cuadrados:
+
+- Tabla nueva: `greenhouse_finance.reconciliation_ai_suggestions`, siempre con `space_id`, `period_id` y `account_id`.
+- Runtime: `src/lib/finance/reconciliation-intelligence/*`.
+- APIs:
+  - `GET /api/finance/reconciliation/[id]/intelligence`
+  - `POST /api/finance/reconciliation/[id]/intelligence`
+  - `POST /api/finance/reconciliation/[id]/intelligence/[suggestionId]`
+- Kill switch: `FINANCE_RECONCILIATION_AI_ENABLED=false` por default.
+- Access:
+  - `finance.reconciliation.ai_suggestions.read` (`read`, `space`)
+  - `finance.reconciliation.ai_suggestions.generate` (`create`, `space`)
+  - `finance.reconciliation.ai_suggestions.review` (`update`, `space`)
+
+La capa no escribe `bank_statement_rows` como matched, no crea `income_payments` / `expense_payments`, no toca `account_balances`, no re-materializa saldos y no cierra periodos. Solo persiste sugerencias auditables con `prompt_version`, `model_id`, hashes de input/prompt, evidencia estructurada y simulacion. Aplicar un match sigue pasando por el dialog humano y los endpoints existentes de conciliacion.
+
+El prepass rules-first reutiliza `scoreAutoMatches`; los targets preferidos son `settlement_legs` canónicos post TASK-708/TASK-722. Los candidatos legacy payment-only quedan permitidos solo como fallback de baja confianza y marcados en `evidence_factors_json`. Antes de exponer candidatos al modelo, el resolver filtra por `account_id` para evitar sugerencias cruzadas entre instrumentos.
 
 ## Delta 2026-04-28 — TASK-708 + 708b: Nubox Documents-Only SoT + External Cash Signals canonical lane
 
@@ -1849,4 +1869,3 @@ State machine `nextAction` deriva la siguiente acción operativa sin persistirse
 |---|---|---|
 | `task720.instrumentCategoriesWithoutKpiRule` | accounts vs instrument_category_kpi_rules | 0 |
 | `task721.reconciliationSnapshotsWithBrokenEvidence` | snapshots con FK rota | 0 |
-

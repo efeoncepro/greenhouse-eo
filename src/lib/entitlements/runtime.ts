@@ -343,6 +343,30 @@ export const getTenantEntitlements = (subject: TenantEntitlementSubject): Tenant
       scope: 'space',
       source
     })
+
+    addEntitlement(entries, {
+      module: 'finance',
+      capability: 'finance.reconciliation.ai_suggestions.read',
+      action: 'read',
+      scope: 'space',
+      source
+    })
+
+    addEntitlement(entries, {
+      module: 'finance',
+      capability: 'finance.reconciliation.ai_suggestions.generate',
+      action: 'create',
+      scope: 'space',
+      source
+    })
+
+    addEntitlement(entries, {
+      module: 'finance',
+      capability: 'finance.reconciliation.ai_suggestions.review',
+      action: 'update',
+      scope: 'space',
+      source
+    })
   }
 
   // TASK-722 — Cierre de periodo (close): solo finance_admin o efeonce_admin.

@@ -191,6 +191,27 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     defaultScope: 'space'
   },
   {
+    // TASK-723 — Read AI-assisted reconciliation suggestions.
+    key: 'finance.reconciliation.ai_suggestions.read',
+    module: 'finance',
+    actions: ['read'] as const,
+    defaultScope: 'space'
+  },
+  {
+    // TASK-723 — Generate/refresh advisory suggestions. Does not grant match writes.
+    key: 'finance.reconciliation.ai_suggestions.generate',
+    module: 'finance',
+    actions: ['create'] as const,
+    defaultScope: 'space'
+  },
+  {
+    // TASK-723 — Accept/reject advisory suggestions. Does not apply matches.
+    key: 'finance.reconciliation.ai_suggestions.review',
+    module: 'finance',
+    actions: ['update'] as const,
+    defaultScope: 'space'
+  },
+  {
     key: 'admin.workspace',
     module: 'admin',
     actions: ['read', 'manage', 'launch'] as const,

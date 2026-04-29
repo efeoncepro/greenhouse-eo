@@ -1,5 +1,15 @@
 # Handoff.md
 
+## Sesion 2026-04-29 — TASK-723 AI-Assisted Reconciliation Intelligence completada
+
+- TASK-723 se movio a `docs/tasks/complete/` tras implementacion y validacion.
+- Discovery completo antes de codigo: TASK-722 ya esta cerrada; la spec original estaba desactualizada en `Blocked by`, path de docs, ausencia de `space_id` en la tabla de sugerencias y equivalencia indebida entre targets payment-only y settlement-leg.
+- Riesgo detectado antes de implementar: `listReconciliationCandidatesByDateRangeFromPostgres` declara account-scoping completo, pero el SQL real de expense candidates no filtra todo por `accountId`; TASK-723 debe corregir/encapsular eso antes de alimentar AI.
+- Implementacion completada: migration `20260429014513285_task-723-reconciliation-ai-suggestions.sql`, runtime `src/lib/finance/reconciliation-intelligence/*`, APIs `/api/finance/reconciliation/[id]/intelligence*`, entitlements `finance.reconciliation.ai_suggestions.*`, panel consultivo en `ReconciliationDetailView` y preseleccion de candidato en el dialog existente.
+- Guardrail de saldos: la capa es advisory-only detras de `FINANCE_RECONCILIATION_AI_ENABLED=false` por default; no aplica matches, no escribe `account_balances`, no re-materializa saldos y no cierra periodos. El fix de candidatos restringe expense candidates por `accountId` antes de exponerlos a UI/AI.
+- Verificacion: `pnpm migrate:up` aplicado via `pnpm pg:connect:migrate` y regenero `src/types/db.d.ts`; `pnpm test src/lib/finance/reconciliation-intelligence/sanitize.test.ts src/lib/finance/reconciliation-intelligence/validation.test.ts` OK; `pnpm lint` OK; `pnpm build` OK.
+- Nota de checklist: `rg -n "new Pool\\(" src` sigue mostrando usos preexistentes en `src/lib/delivery/task-display.test.ts`; TASK-723 no agrego ningun `new Pool()`.
+
 ## Sesion 2026-04-28 — Greenhouse Domains And Modules Architecture V1 creada
 
 - Se creó `docs/architecture/GREENHOUSE_DOMAINS_MODULES_ARCHITECTURE_V1.md` para documentar Core Domains y Domain Modules como capa separada de Core Platform, Apps, Plugins y Service Modules.

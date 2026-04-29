@@ -1444,7 +1444,13 @@ export const listReconciliationCandidatesByDateRangeFromPostgres = async ({
         JOIN greenhouse_finance.expenses e ON e.expense_id = ep.expense_id
         LEFT JOIN greenhouse_finance.accounts a ON a.account_id = sl.instrument_id
         WHERE sl.linked_payment_type = 'expense_payment'
+          AND sl.instrument_id = $5
           AND sl.is_reconciled = FALSE
+          AND sl.superseded_at IS NULL
+          AND sl.superseded_by_otb_id IS NULL
+          AND ep.payment_account_id = $5
+          AND ep.superseded_by_payment_id IS NULL
+          AND ep.superseded_by_otb_id IS NULL
           AND sl.transaction_date BETWEEN $1::date AND $2::date
           AND (
             $3 = ''
@@ -1461,7 +1467,7 @@ export const listReconciliationCandidatesByDateRangeFromPostgres = async ({
         ORDER BY sl.transaction_date DESC NULLS LAST, sl.amount DESC
         LIMIT $4
       `,
-      [startDate, endDate, searchPattern, candidateRowLimit]
+      [startDate, endDate, searchPattern, candidateRowLimit, accountId]
     )
 
     for (const row of expenseSettlementRows) {
@@ -1501,6 +1507,9 @@ export const listReconciliationCandidatesByDateRangeFromPostgres = async ({
         FROM greenhouse_finance.expense_payments ep
         JOIN greenhouse_finance.expenses e ON e.expense_id = ep.expense_id
         WHERE ep.is_reconciled = FALSE
+          AND ep.payment_account_id = $5
+          AND ep.superseded_by_payment_id IS NULL
+          AND ep.superseded_by_otb_id IS NULL
           AND ep.payment_date BETWEEN $1::date AND $2::date
           AND NOT EXISTS (
             SELECT 1
@@ -1520,7 +1529,7 @@ export const listReconciliationCandidatesByDateRangeFromPostgres = async ({
         ORDER BY ep.payment_date DESC NULLS LAST, ep.amount DESC
         LIMIT $4
       `,
-      [startDate, endDate, searchPattern, candidateRowLimit]
+      [startDate, endDate, searchPattern, candidateRowLimit, accountId]
     )
 
     for (const row of expensePaymentRows) {
@@ -1549,7 +1558,12 @@ export const listReconciliationCandidatesByDateRangeFromPostgres = async ({
       })
     }
 
-    const expenseFallbackRows = await queryRows<ExpenseInvoiceFallbackRow>(
+    // TASK-708/TASK-723 — skip invoice-level fallback when accountId is scoped.
+    // These records have no canonical account anchor, so they must not enter a
+    // per-account reconciliation or AI suggestion pool.
+    const expenseFallbackRows: ExpenseInvoiceFallbackRow[] = accountId
+      ? []
+      : await queryRows<ExpenseInvoiceFallbackRow>(
       `
         SELECT
           e.expense_id, e.total_amount, e.amount_paid, e.currency,

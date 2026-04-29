@@ -8,16 +8,16 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `optional`
-- Status real: `Diseno`
+- Status real: `Implementada y validada el 2026-04-29`
 - Rank: `TBD`
 - Domain: `finance`
-- Blocked by: `TASK-722`
+- Blocked by: `none` (`TASK-722` cerrada el 2026-04-29)
 - Branch: `task/TASK-723-ai-assisted-reconciliation-intelligence`
 - Legacy ID: `none`
 - GitHub Issue: `optional`
@@ -28,7 +28,7 @@ Agregar una capa AI asistiva para conciliacion bancaria que proponga matches, ag
 
 ## Why This Task Exists
 
-`TASK-722` conecta Banco y Conciliacion como flujo operativo. Una vez exista esa columna vertebral, aparecen casos donde reglas exactas no alcanzan:
+`TASK-722` ya conecta Banco y Conciliacion como flujo operativo. Sobre esa columna vertebral aparecen casos donde reglas exactas no alcanzan:
 
 - descripciones bancarias pobres o variables (`TRASPASO TERCEROS`, `COMPRA INTL`, `ABONO`, marcas abreviadas).
 - cargos de tarjeta en hold que explican drift, pero no deben cerrarse como banco posted.
@@ -79,7 +79,7 @@ Reglas obligatorias:
 
 ## Normative Docs
 
-- `docs/tasks/to-do/TASK-722-bank-reconciliation-synergy-workbench.md`
+- `docs/tasks/complete/TASK-722-bank-reconciliation-synergy-workbench.md`
 - `docs/tasks/complete/TASK-721-finance-evidence-canonical-uploader.md`
 - `docs/tasks/complete/TASK-708-nubox-documents-only-and-reconciliation-sot-cutover.md`
 - `docs/tasks/complete/TASK-715-reconciliation-test-period-archive-ux.md`
@@ -89,7 +89,7 @@ Reglas obligatorias:
 
 ### Depends on
 
-- `TASK-722` para bridge Banco -> Conciliacion y estado combinado por cuenta/periodo.
+- `TASK-722` para bridge Banco -> Conciliacion y estado combinado por cuenta/periodo. Estado real: `complete`.
 - `TASK-721` para evidencia canonica (`evidence_asset_id`) usable como metadata de contexto.
 - `greenhouse_finance.reconciliation_periods`
 - `greenhouse_finance.bank_statement_rows`
@@ -136,6 +136,9 @@ Reglas obligatorias:
 - No hay simulacion de impacto sobre drift antes de aplicar matches.
 - No hay memoria operativa para aprender de aceptaciones/rechazos.
 - No hay sanitizacion especifica para descripciones bancarias, referencias, RUTs, IDs bancarios o evidencia metadata.
+- La tabla propuesta originalmente no declaraba `space_id`; la implementacion debe persistirlo denormalizado desde `reconciliation_periods` / `accounts` para aislamiento tenant y queries operativas.
+- El canal canonico post TASK-708/TASK-722 es `matched_settlement_leg_id`; los `candidate_payment_ids` se mantienen solo como fallback legacy y deben bajar confianza o quedar marcados como `legacy_payment_only`.
+- `listReconciliationCandidatesByDateRangeFromPostgres` debe corregirse/filtrarse antes de alimentar AI: el comentario dice que expense candidates filtran por `accountId`, pero el SQL actual de expense settlement/payment/fallback no lo hace completamente.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -155,6 +158,7 @@ Reglas obligatorias:
 - Crear tabla `greenhouse_finance.reconciliation_ai_suggestions`.
 - Campos minimos:
   - `suggestion_id`
+  - `space_id`
   - `period_id`
   - `account_id`
   - `suggestion_type`
@@ -182,6 +186,7 @@ Reglas obligatorias:
   - `rejection_reason`
 - Estados: `draft`, `proposed`, `accepted`, `rejected`, `expired`, `superseded`, `failed`.
 - Tipos: `match`, `group_match`, `drift_explanation`, `import_mapping`, `closure_review`, `anomaly`.
+- `candidate_settlement_leg_ids` es el target preferido. `candidate_payment_ids` solo existe para compatibilidad legacy y debe quedar explicitado en `evidence_factors_json`.
 
 ### Slice 2 — Deterministic pre-pass
 
@@ -198,6 +203,8 @@ Reglas obligatorias:
   - FX timing
   - transferencias internas incompletas
 - Si una regla deterministica alcanza confianza alta, generar sugerencia sin LLM y marcar `model_id='rules-only'`.
+- Antes de usar candidatos existentes, validar que cada target pertenece al `account_id` y `space_id` del periodo. No confiar solo en IDs enviados por UI o devueltos por LLM.
+- Corregir o envolver el candidate resolver para que expense settlement/payment/fallback queden account-scoped; mientras eso no ocurra, AI no puede persistir sugerencias basadas en esos fallbacks.
 
 ### Slice 3 — Prompt builder + sanitization
 
@@ -326,9 +333,9 @@ Orden canonico:
 - `routeGroups`: `finance`.
 - `views`: no crea vista nueva en V1; aparece dentro de `/finance/reconciliation` y `/finance/reconciliation/[id]`.
 - `entitlements`:
-  - `finance.reconciliation.ai_suggestions.read@space`
-  - `finance.reconciliation.ai_suggestions.generate@space`
-  - `finance.reconciliation.ai_suggestions.review@space`
+  - `finance.reconciliation.ai_suggestions.read` — `{ action: 'read', scope: 'space' }`
+  - `finance.reconciliation.ai_suggestions.generate` — `{ action: 'create', scope: 'space' }`
+  - `finance.reconciliation.ai_suggestions.review` — `{ action: 'update', scope: 'space' }`
 - La capacidad de generar AI no implica permiso para aplicar match ni cerrar periodo.
 
 ### Safety and privacy
@@ -346,16 +353,18 @@ Orden canonico:
 
 ## Acceptance Criteria
 
-- [ ] Existe tabla `greenhouse_finance.reconciliation_ai_suggestions` con lifecycle auditado.
-- [ ] Pre-pass deterministico genera sugerencias `rules-only` sin LLM cuando corresponde.
-- [ ] Prompt builder produce JSON estable y validado por schema runtime.
-- [ ] Sanitizacion cubre RUT, emails, UUIDs largos, numeros de cuenta/tarjeta y referencias sensibles.
-- [ ] API permite generar, listar, aceptar y rechazar sugerencias.
-- [ ] UI muestra sugerencias no conversacionales en el workbench de conciliacion.
-- [ ] Aceptar una sugerencia no aplica writes automaticos fuera del flujo humano existente.
-- [ ] Kill switch `FINANCE_RECONCILIATION_AI_ENABLED` desactiva todo sin romper Conciliacion.
-- [ ] Sugerencias guardan `modelId`, `promptVersion`, `promptHash`, `inputHash`, tokens y latencia.
-- [ ] Se documenta access model en ambos planos: views + entitlements.
+- [x] Existe tabla `greenhouse_finance.reconciliation_ai_suggestions` con lifecycle auditado.
+- [x] La tabla persiste `space_id`, `period_id` y `account_id`; todas las queries filtran por tenant/scope derivado del periodo.
+- [x] El candidate resolver usado por AI valida `account_id`/`space_id` y no usa expense fallbacks cross-account.
+- [x] Pre-pass deterministico genera sugerencias `rules-only` sin LLM cuando corresponde.
+- [x] Prompt builder produce JSON estable y validado por schema runtime.
+- [x] Sanitizacion cubre RUT, emails, UUIDs largos, numeros de cuenta/tarjeta y referencias sensibles.
+- [x] API permite generar, listar, aceptar y rechazar sugerencias.
+- [x] UI muestra sugerencias no conversacionales en el workbench de conciliacion.
+- [x] Aceptar una sugerencia no aplica writes automaticos fuera del flujo humano existente.
+- [x] Kill switch `FINANCE_RECONCILIATION_AI_ENABLED` desactiva todo sin romper Conciliacion.
+- [x] Sugerencias guardan `modelId`, `promptVersion`, `promptHash`, `inputHash`, tokens y latencia.
+- [x] Se documenta access model en ambos planos: views + entitlements.
 
 ## Verification
 
@@ -373,13 +382,13 @@ Orden canonico:
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre `TASK-722`, `TASK-721`, `TASK-708` y la capa `src/lib/finance/ai/*`
-- [ ] variables de entorno nuevas quedaron documentadas en `project_context.md` y `.env.example` si aplican
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [x] se ejecuto chequeo de impacto cruzado sobre `TASK-722`, `TASK-721`, `TASK-708` y la capa `src/lib/finance/ai/*`
+- [x] variables de entorno nuevas quedaron documentadas en `project_context.md` y `.env.example` si aplican
 
 ## Follow-ups
 
@@ -391,3 +400,9 @@ Orden canonico:
 ## Delta 2026-04-28
 
 - Task creada como follow-up de `TASK-722` para modelar AI no conversacional en conciliacion: suggestions estructuradas, rules-first, human-in-the-loop, audit trail y fallback deterministico.
+
+## Delta 2026-04-29
+
+- Implementada capa `reconciliation-intelligence` advisory-only con migration, types, APIs, entitlements, UI no conversacional, sanitizacion y tests.
+- Se corrigio el resolver de expense candidates para filtrar por `account_id` y excluir fallbacks sin anchor cuando el periodo esta scoped.
+- Validado con `pnpm pg:doctor`, `pnpm migrate:up`, tests unitarios del modulo, `pnpm lint` y `pnpm build`.

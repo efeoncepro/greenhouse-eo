@@ -71,6 +71,7 @@ type Props = {
   open: boolean
   periodId: string
   row: StatementRow | null
+  initialCandidateId?: string | null
   onClose: () => void
   onActionComplete: () => void
 }
@@ -102,7 +103,7 @@ const MATCH_STATUS_CONFIG: Record<string, { label: string; color: 'success' | 'w
 // Component
 // ---------------------------------------------------------------------------
 
-const ReconciliationMatchDialog = ({ open, periodId, row, onClose, onActionComplete }: Props) => {
+const ReconciliationMatchDialog = ({ open, periodId, row, initialCandidateId = null, onClose, onActionComplete }: Props) => {
   const [candidates, setCandidates] = useState<Candidate[]>([])
   const [loadingCandidates, setLoadingCandidates] = useState(false)
   const [selectedCandidateId, setSelectedCandidateId] = useState<string | null>(null)
@@ -123,7 +124,7 @@ const ReconciliationMatchDialog = ({ open, periodId, row, onClose, onActionCompl
   useEffect(() => {
     if (open && row) {
       setError(null)
-      setSelectedCandidateId(null)
+      setSelectedCandidateId(initialCandidateId)
       setSearch('')
       setExcludeNotes('')
 
@@ -134,7 +135,7 @@ const ReconciliationMatchDialog = ({ open, periodId, row, onClose, onActionCompl
         setMode('match')
       }
     }
-  }, [open, row, isConfirmedMatch])
+  }, [open, row, isConfirmedMatch, initialCandidateId])
 
   // Fetch candidates when in match mode
   const fetchCandidates = useCallback(async () => {

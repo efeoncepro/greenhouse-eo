@@ -5474,6 +5474,14 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - El repo puede estar siendo editado por varios agentes y personas en paralelo.
 - `Handoff.md` es la fuente de continuidad entre turnos.
 - `AGENTS.md` define las reglas del repositorio y prevalece como guia operativa local.
+
+## Delta 2026-04-29 — TASK-723 reconciliation intelligence advisory-only
+
+- Conciliacion bancaria ahora tiene una capa AI consultiva detras de `FINANCE_RECONCILIATION_AI_ENABLED` (default `false` en `.env.example`).
+- El storage canonico es `greenhouse_finance.reconciliation_ai_suggestions` y siempre persiste `space_id`, `period_id` y `account_id`.
+- Las APIs `/api/finance/reconciliation/[id]/intelligence*` solo listan/generan/revisan sugerencias. No aplican matches, no escriben `account_balances`, no rematerializan saldos y no cierran periodos.
+- El CTA de UI abre el dialog existente de conciliacion con candidato preseleccionado; el usuario sigue confirmando el match con el flujo humano normal.
+- Cualquier extension futura debe mantener el filtro por `space_id` y `account_id`, preferir `settlement_legs` canonicas y tratar payment-only legacy como baja confianza.
 ## Delta 2026-04-21 TASK-548 cierra el loop operativo de Product Catalog Sync
 
 - Greenhouse ya tiene detección nocturna de drift para `product_catalog` frente a HubSpot Products.

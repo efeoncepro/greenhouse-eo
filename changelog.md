@@ -7462,6 +7462,11 @@ Validations: tsc 0 errors, lint 0 errors, 427 files / 2225 tests pass / 5 skippe
 
 # Changelog
 
+## 2026-04-29
+
+- Finance / Conciliacion: TASK-723 agregó inteligencia asistida consultiva para el workbench. Las sugerencias se guardan con audit trail por `space_id`, prompt/model hashes y revisión humana; no aplican matches, no re-materializan saldos y no cierran períodos.
+- Finance / Reconciliation safety: el resolver de candidatos ahora mantiene el scope por `account_id` también para expense payments/settlement legs, evitando sugerencias cruzadas entre instrumentos.
+
 ## 2026-04-26
 
 - API Platform: `/developers/api` ahora es el portal publico developer-facing de la plataforma. La pagina deja de presentar `integrations/v1` como historia principal y documenta lanes `ecosystem`, `app`, event control plane y legacy.

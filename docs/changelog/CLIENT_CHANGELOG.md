@@ -42,6 +42,21 @@ No reemplaza `changelog.md` del repo, que sigue siendo el registro interno técn
 
 ---
 
+## 2026.04-beta.29
+
+**Canal:** Beta
+**Fecha:** 2026-04-29
+**Disponible para:** internal
+**Módulos:** Finanzas / Conciliación bancaria
+
+### Novedades
+
+- El workbench de conciliación puede mostrar sugerencias asistidas para revisar posibles matches sin aplicar cambios automáticamente.
+
+### Notas
+
+- Las sugerencias requieren revisión humana y no cambian saldos, cierres ni movimientos por sí solas.
+
 ## 2026.04-beta.27
 
 **Canal:** Beta
