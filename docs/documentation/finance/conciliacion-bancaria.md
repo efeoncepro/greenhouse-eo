@@ -1,10 +1,10 @@
 # Conciliación bancaria
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.3
+> **Version:** 1.4
 > **Creado:** 2026-04-27 por Claude Opus 4.7 + Julio Reyes
-> **Ultima actualizacion:** 2026-04-29 por Codex (TASK-723 AI-assisted reconciliation intelligence)
-> **Documentacion tecnica:** [GREENHOUSE_FINANCE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md), [TASK-702](../../tasks/in-progress/TASK-702-bank-reconciliation-canonical-anchors-rematerialize.md), [TASK-715](../../tasks/complete/TASK-715-reconciliation-test-period-archive-ux.md), [TASK-720](../../tasks/complete/TASK-720-instrument-category-kpi-rules.md), [TASK-721](../../tasks/complete/TASK-721-finance-evidence-canonical-uploader.md), [TASK-722](../../tasks/complete/TASK-722-bank-reconciliation-synergy-workbench.md), [TASK-723](../../tasks/complete/TASK-723-ai-assisted-reconciliation-intelligence.md)
+> **Ultima actualizacion:** 2026-04-29 por Codex (TASK-726 Finance Movement Feed Foundation)
+> **Documentacion tecnica:** [GREENHOUSE_FINANCE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md), [TASK-702](../../tasks/in-progress/TASK-702-bank-reconciliation-canonical-anchors-rematerialize.md), [TASK-715](../../tasks/complete/TASK-715-reconciliation-test-period-archive-ux.md), [TASK-720](../../tasks/complete/TASK-720-instrument-category-kpi-rules.md), [TASK-721](../../tasks/complete/TASK-721-finance-evidence-canonical-uploader.md), [TASK-722](../../tasks/complete/TASK-722-bank-reconciliation-synergy-workbench.md), [TASK-723](../../tasks/complete/TASK-723-ai-assisted-reconciliation-intelligence.md), [TASK-726](../../tasks/complete/TASK-726-finance-movement-feed-foundation.md)
 
 ## Qué es
 
@@ -33,6 +33,21 @@ Cada fila de la cartola del banco cae en una de 4 categorías:
 | **D — Sobra** | Greenhouse tiene un payment que NO está en banco | No tocar la fila bancaria. Investigar si fue payment a otra cuenta o test |
 
 > Detalle técnico: la matriz de clasificación se ejecuta en `scripts/finance/conciliate-march-april-2026.ts` para el período de marzo+abril 2026. El árbol de decisión está en el helper `preflight-bank-row.ts` (futuro: integración a la UI `/finance/reconciliation`).
+
+## Cómo se muestran los movimientos pendientes
+
+En `/finance/reconciliation`, la sección **Movimientos de caja por conciliar** usa un feed financiero operativo. Cada movimiento se muestra como una unidad legible con:
+
+- tipo visual de movimiento (ingreso, egreso o proveedor cuando exista identidad confiable);
+- descripción completa con wrapping seguro;
+- estado explícito, por ejemplo `Pendiente`;
+- instrumento o contraparte cuando venga del dato fuente;
+- monto alineado para lectura rápida;
+- trazabilidad expandible con ID origen y metadata.
+
+Este feed es **solo visual/read-only**. No calcula saldos, no aplica matches, no modifica `account_balances`, no crea payments y no rematerializa balances. Si en una pantalla se muestra saldo posterior (`runningBalance`), ese saldo debe venir de un read model o snapshot del dominio financiero; el componente nunca lo deriva inline.
+
+Para listas grandes, la primitive soporta virtualización encapsulada con `@tanstack/react-virtual`. La vista no debe importar el virtualizer directamente: solo pasa items al componente compartido.
 
 ## Cómo se ancla cada movimiento
 

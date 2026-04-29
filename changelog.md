@@ -2,6 +2,12 @@
 
 ## 2026-04-29
 
+### 2026-04-29 — Finance movement feed foundation
+
+- Finance / Conciliacion: TASK-726 reemplazo la mini-tabla de "Movimientos de caja por conciliar" por `FinanceMovementFeed`, una primitive reusable con wrapping seguro, estados accesibles y virtualizacion encapsulada con `@tanstack/react-virtual`.
+- El feed muestra identidad visual con catalogos existentes cuando el logo esta verificado y degrada a iniciales/iconos semanticos cuando no lo esta, evitando publicar isotipos incorrectos.
+- El cambio es read-only: no modifica queries financieras, saldos, matching, materializaciones ni datos persistidos.
+
 ### 2026-04-29 — Reconciliation pending movements adaptive table
 
 - `/finance/reconciliation` ahora muestra los movimientos de caja pendientes con layout fijo y wrapping controlado en descripciones largas, IDs e instrumentos.

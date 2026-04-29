@@ -1,7 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
-import type { CSSProperties } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { useRouter } from 'next/navigation'
 
@@ -39,6 +38,8 @@ import CustomTextField from '@core/components/mui/TextField'
 import OptionMenu from '@core/components/option-menu'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 import TablePaginationComponent from '@components/TablePaginationComponent'
+import { FinanceMovementFeed } from '@/components/greenhouse/finance'
+import type { FinanceMovementFeedItem } from '@/components/greenhouse/finance'
 
 import tableStyles from '@core/styles/table.module.css'
 import CreateReconciliationPeriodDrawer from '@views/greenhouse/finance/drawers/CreateReconciliationPeriodDrawer'
@@ -133,88 +134,9 @@ const MONTH_NAMES = ['', 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 
 const formatCLP = (amount: number): string =>
   new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(amount)
 
-const formatDate = (date: string | null): string => {
-  if (!date) {
-    return '—'
-  }
-
-  const [year, month, day] = date.split('-')
-
-  return `${day}/${month}/${year}`
-}
-
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
-
-// ── Pending movements columns (static — no closures needed) ──
-
-const mvColumnHelper = createColumnHelper<PendingMovement>()
-
-const pendingMovementColumnStyles: Record<string, CSSProperties> = {
-  type: { width: 104, minWidth: 104, verticalAlign: 'top' },
-  description: { width: '52%', minWidth: 0, verticalAlign: 'top' },
-  partyName: { width: '18%', minWidth: 0, verticalAlign: 'top' },
-  date: { width: 116, minWidth: 116, verticalAlign: 'top' },
-  amount: { width: 144, minWidth: 144, verticalAlign: 'top' }
-}
-
-const getPendingMovementColumnStyle = (columnId: string, align?: string): CSSProperties => ({
-  whiteSpace: 'normal',
-  textAlign: align === 'right' ? 'right' : 'left',
-  ...pendingMovementColumnStyles[columnId]
-})
-
-const mvColumns: ColumnDef<PendingMovement, any>[] = [
-  mvColumnHelper.accessor('type', {
-    header: 'Tipo',
-    cell: ({ getValue }) => <CustomChip round='true' size='small' color={getValue() === 'cobro' ? 'success' : 'warning'} label={getValue() === 'cobro' ? 'Cobro' : 'Pago'} />
-  }),
-  mvColumnHelper.accessor('description', {
-    header: 'Descripción',
-    cell: ({ row }) => (
-      <Box sx={{ display: 'flex', minWidth: 0, maxWidth: '100%', flexDirection: 'column', gap: 0.5 }}>
-        <Typography
-          variant='body2'
-          fontWeight={500}
-          sx={{ whiteSpace: 'normal', overflowWrap: 'anywhere', wordBreak: 'break-word', lineHeight: 1.45 }}
-        >
-          {row.original.description}
-        </Typography>
-        <Typography
-          variant='caption'
-          color='text.secondary'
-          sx={{ display: 'block', whiteSpace: 'normal', overflowWrap: 'anywhere', wordBreak: 'break-all', lineHeight: 1.35 }}
-        >
-          {row.original.id}
-        </Typography>
-        {row.original.instrumentName && (
-          <Typography
-            variant='caption'
-            color='text.secondary'
-            sx={{ display: 'block', whiteSpace: 'normal', overflowWrap: 'anywhere', wordBreak: 'break-word', lineHeight: 1.35 }}
-          >
-            {row.original.instrumentName}
-          </Typography>
-        )}
-      </Box>
-    )
-  }),
-  mvColumnHelper.accessor('partyName', {
-    header: 'Contraparte',
-    cell: ({ getValue }) => (
-      <Typography variant='body2' sx={{ whiteSpace: 'normal', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
-        {getValue() || '—'}
-      </Typography>
-    )
-  }),
-  mvColumnHelper.accessor('date', { header: 'Fecha', cell: ({ getValue }) => <Typography variant='body2' sx={{ whiteSpace: 'nowrap' }}>{formatDate(getValue())}</Typography> }),
-  mvColumnHelper.accessor('amount', {
-    header: 'Monto',
-    cell: ({ getValue }) => <Typography variant='body2' fontWeight={600} color={getValue() >= 0 ? 'success.main' : 'error.main'} sx={{ whiteSpace: 'nowrap', fontVariantNumeric: 'tabular-nums' }}>{formatCLP(getValue())}</Typography>,
-    meta: { align: 'right' }
-  })
-]
 
 const ReconciliationView = () => {
   const router = useRouter()
@@ -243,7 +165,6 @@ const ReconciliationView = () => {
   const [createDrawerOpen, setCreateDrawerOpen] = useState(false)
   const [accountDrawerOpen, setAccountDrawerOpen] = useState(false)
   const [periodSorting, setPeriodSorting] = useState<SortingState>([{ id: 'year', desc: true }])
-  const [mvSorting, setMvSorting] = useState<SortingState>([])
 
   // TASK-715 — archive period as test
   const [includeArchived, setIncludeArchived] = useState(false)
@@ -568,14 +489,28 @@ const ReconciliationView = () => {
     getPaginationRowModel: getPaginationRowModel()
   })
 
-  const mvTable = useReactTable({
-    data: pendingMovements,
-    columns: mvColumns,
-    state: { sorting: mvSorting },
-    onSortingChange: setMvSorting,
-    getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel()
-  })
+  const pendingMovementFeedItems = useMemo<FinanceMovementFeedItem[]>(
+    () =>
+      pendingMovements.map(item => ({
+        id: item.id,
+        date: item.date,
+        title: item.description,
+        counterparty: item.partyName,
+        instrumentName: item.instrumentName,
+        amount: item.amount,
+        currency: 'CLP',
+        direction: item.type === 'cobro' ? 'in' : 'out',
+        status: 'pending',
+        sourceType: item.type === 'cobro' ? 'cash_in' : 'cash_out',
+        sourceId: item.id,
+        details: [
+          { label: 'Tipo', value: item.type === 'cobro' ? 'Cobro' : 'Pago' },
+          { label: 'ID origen', value: item.id },
+          { label: 'Instrumento', value: item.instrumentName || '—' }
+        ]
+      })),
+    [pendingMovements]
+  )
 
   const totalDifference = periods
     .filter(p => p.status !== 'reconciled')
@@ -878,43 +813,15 @@ const ReconciliationView = () => {
           }
         />
         <Divider />
-        <Box sx={{ maxWidth: '100%', overflowX: 'hidden' }}>
-          <table className={tableStyles.table} style={{ tableLayout: 'fixed', width: '100%', whiteSpace: 'normal' }}>
-            <thead>
-              {mvTable.getHeaderGroups().map(hg => (
-                <tr key={hg.id}>
-                  {hg.headers.map(header => {
-                    const align = (header.column.columnDef.meta as { align?: string } | undefined)?.align
-
-                    return (
-                      <th key={header.id} onClick={header.column.getToggleSortingHandler()} className={classnames({ 'cursor-pointer select-none': header.column.getCanSort() })} style={getPendingMovementColumnStyle(header.column.id, align)}>
-                        {flexRender(header.column.columnDef.header, header.getContext())}
-                        {{ asc: ' ↑', desc: ' ↓' }[header.column.getIsSorted() as string] ?? null}
-                      </th>
-                    )
-                  })}
-                </tr>
-              ))}
-            </thead>
-            <tbody>
-              {mvTable.getRowModel().rows.length === 0 ? (
-                <tr><td colSpan={mvColumns.length} style={{ textAlign: 'center', padding: '3rem' }}><Typography variant='body2' color='text.secondary'>No hay movimientos de caja pendientes por conciliar.</Typography></td></tr>
-              ) : mvTable.getRowModel().rows.map(row => (
-                <tr key={row.id}>
-                  {row.getVisibleCells().map(cell => {
-                    const align = (cell.column.columnDef.meta as { align?: string } | undefined)?.align
-
-                    return (
-                      <td key={cell.id} style={getPendingMovementColumnStyle(cell.column.id, align)}>
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                      </td>
-                    )
-                  })}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </Box>
+        <FinanceMovementFeed
+          embedded
+          items={pendingMovementFeedItems}
+          density='comfortable'
+          showRunningBalance={false}
+          virtualizeThreshold={80}
+          emptyTitle='Sin movimientos de caja pendientes'
+          emptyDescription='No hay cobros ni pagos esperando match bancario en este momento.'
+        />
       </Card>
 
       <CreateReconciliationPeriodDrawer

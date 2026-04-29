@@ -1,5 +1,13 @@
 # Handoff.md
 
+## Sesion 2026-04-29 — TASK-726 Finance Movement Feed Foundation completada
+
+- Se creo `FinanceMovementFeed` en `src/components/greenhouse/finance/` como primitive reusable para movimientos financieros con agrupacion por fecha, wrapping seguro, estados loading/error/empty, detalles expandibles y virtualizacion encapsulada via `@tanstack/react-virtual`.
+- `/finance/reconciliation` ahora usa el feed para "Movimientos de caja por conciliar" sin cambiar fetches, queries, saldos, matching, materializaciones ni acciones financieras.
+- Guardrail visual: logos del catalogo solo se muestran cuando llegan marcados como verificados; si no, el feed degrada a iniciales o iconos semanticos para no mostrar marcas incorrectas.
+- Documentacion actualizada: `docs/documentation/finance/conciliacion-bancaria.md`, `docs/manual-de-uso/finance/sugerencias-asistidas-conciliacion.md`, `docs/tasks/complete/TASK-726-finance-movement-feed-foundation.md`.
+- Verificacion: `pnpm test src/components/greenhouse/finance` OK; `pnpm exec eslint src/components/greenhouse/finance src/views/greenhouse/finance/ReconciliationView.tsx` OK; `pnpm exec tsc --noEmit` OK; `pnpm lint` OK; `pnpm build` OK.
+
 ## Sesion 2026-04-29 — Reconciliation pending movements adaptive table
 
 - Se ajusto la tabla "Movimientos de caja por conciliar" en `/finance/reconciliation` para no generar scroll horizontal por descripciones largas.

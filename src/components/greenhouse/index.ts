@@ -43,6 +43,14 @@ export { default as ProjectTeamSection } from './ProjectTeamSection'
 export { default as SprintTeamVelocitySection } from './SprintTeamVelocitySection'
 export { default as BusinessLineBadge } from './BusinessLineBadge'
 export { default as BusinessLineMetadataCard } from './BusinessLineMetadataCard'
+export { FinanceMovementFeed } from './finance'
+export type {
+  FinanceMovementFeedItem,
+  FinanceMovementFeedProps,
+  FinanceMovementProviderIdentity,
+  FinanceMovementStatus,
+  FinanceMovementVisual
+} from './finance'
 
 // Intentionally excluded from the shared barrel: react-pdf eagerly loads pdfjs
 // and touches browser-only globals during SSR. Import it directly where needed.

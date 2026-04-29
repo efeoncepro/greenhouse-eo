@@ -1,12 +1,12 @@
 # Sugerencias asistidas de conciliacion
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-04-29 por Codex
-> **Ultima actualizacion:** 2026-04-29 por Codex
+> **Ultima actualizacion:** 2026-04-29 por Codex (TASK-726 Finance Movement Feed Foundation)
 > **Modulo:** Finanzas / Conciliacion bancaria
 > **Ruta en portal:** `/finance/reconciliation/[id]`
-> **Documentacion relacionada:** [Conciliacion bancaria](../../documentation/finance/conciliacion-bancaria.md), [TASK-723](../../tasks/complete/TASK-723-ai-assisted-reconciliation-intelligence.md), [Arquitectura Finance](../../architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md)
+> **Documentacion relacionada:** [Conciliacion bancaria](../../documentation/finance/conciliacion-bancaria.md), [TASK-723](../../tasks/complete/TASK-723-ai-assisted-reconciliation-intelligence.md), [TASK-726](../../tasks/complete/TASK-726-finance-movement-feed-foundation.md), [Arquitectura Finance](../../architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md)
 
 ## Para que sirve
 
@@ -26,6 +26,20 @@ Necesitas:
 - Que la inteligencia asistida este habilitada por configuracion: `FINANCE_RECONCILIATION_AI_ENABLED=true`.
 
 Si el flag esta apagado, veras el panel, pero Greenhouse no llamara al modelo AI para generar nuevas sugerencias.
+
+## Vista de movimientos pendientes
+
+La pantalla principal de conciliacion muestra los movimientos de caja pendientes como un feed financiero. Esta vista sirve para recorrer pagos y cobros rapidamente sin que descripciones largas generen scroll horizontal.
+
+Cada movimiento muestra:
+
+- descripcion principal;
+- estado operativo;
+- cuenta o instrumento cuando existe;
+- monto;
+- ID y trazabilidad en detalle expandible.
+
+Esta vista no cambia saldos ni concilia por si sola. Es una forma de lectura. El match real sigue ocurriendo en el workbench/dialog de conciliacion.
 
 ## Paso a paso
 
