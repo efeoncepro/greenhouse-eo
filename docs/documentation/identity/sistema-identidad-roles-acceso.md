@@ -1,9 +1,9 @@
 # Sistema de Identidad, Roles y Acceso
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.4
+> **Version:** 1.5
 > **Creado:** 2026-04-05 por Claude (TASK-248)
-> **Ultima actualizacion:** 2026-04-29 por Claude (TASK-727 — matriz role × view canonica para internos + supervisor scope en JWT)
+> **Ultima actualizacion:** 2026-04-29 por Claude (TASK-727 — caso canonico Creative Lead supervisora con menu detallado y matriz de capacidades)
 > **Documentacion tecnica:** [GREENHOUSE_IDENTITY_ACCESS_V2.md](../../architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md), [GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md](../../architecture/GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md), [GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md)
 
 ---
@@ -159,6 +159,121 @@ Que pasa cuando entras como supervisor:
 Antes de TASK-727, este surface se mostraba solo a usuarios cuyo `default_portal_home_path` apuntaba a `/hr` o `/hr/approvals` — una heuristica fragil. Desde TASK-727, el flag `supervisorAccess` se inyecta en el JWT/session derivado de la jerarquia real, y el menu lateral lo consume directo. Cualquier supervisor con reports activos ve el surface, independiente de su pagina de inicio.
 
 > **Detalle tecnico:** Resolver canonico [`getSupervisorScopeForTenant`](../../../src/lib/reporting-hierarchy/access.ts) → wrapper JWT-friendly [`resolveSupervisorAccessSummaryFromMinimalContext`](../../../src/lib/reporting-hierarchy/access.ts) → inyeccion en [`auth.ts`](../../../src/lib/auth.ts) JWT/session callbacks. Tipo [`SupervisorAccessSummary`](../../../src/lib/reporting-hierarchy/types.ts). Menu cleanup en [`VerticalMenu.tsx`](../../../src/components/layout/vertical/VerticalMenu.tsx).
+
+---
+
+## Caso canonico: Creative Lead supervisora (Daniela Ferreira)
+
+Esta seccion documenta con precision lo que ve y puede hacer una **Creative Lead** post-TASK-727. Sirve como referencia concreta para tasks futuras que toquen visibilidad o aprobaciones para roles similares (Account Lead, Strategy Lead, etc.).
+
+### Perfil
+
+| Campo            | Valor                                                                 |
+| ---------------- | --------------------------------------------------------------------- |
+| Roles activos    | `efeonce_operations` + `collaborator`                                 |
+| Route groups     | `internal` + `my`                                                     |
+| Direct reports   | 3 (Andres Carlosama, Melkin Hernandez, Valentina Hoyos)               |
+| Tenant type      | `efeonce_internal`                                                    |
+| Supervisor scope | `canAccessSupervisorLeave = true`, `canAccessSupervisorPeople = true` |
+
+### Menu completo que ve
+
+#### Home
+
+- Inicio (`/home`) — Nexa y operacion de hoy
+
+#### Seccion "Gestion"
+
+- Agencia (`/agency`) — workspace operativo institucional
+- Spaces (`/agency/spaces`) — clientes activos, postura cross-space
+- ❌ Economia — **bloqueada** (denial explicito `gestion.economia`)
+- Equipo y talento (collapsible)
+  - Equipo de agencia (`/agency/team`)
+  - Talent Discovery (`/agency/talent-discovery`)
+  - ❌ Staff Augmentation — **bloqueada** (denial explicito)
+- Operaciones (collapsible)
+  - Delivery (`/agency/delivery`)
+  - Campanas (`/agency/campaigns`)
+  - Organizaciones (`/agency/organizations`)
+  - Servicios (`/agency/services`)
+  - Operaciones (`/agency/operations`)
+  - Capacidad (`/agency/capacity`)
+
+#### Seccion "Personas y HR" (modo supervisor — sin route_group `hr`)
+
+- Personas (`/people`) — directorio interno
+- Mi equipo (`/hr/team`) — roster de los 3 reports
+- Aprobar permisos (`/hr/approvals`) — solicitudes pendientes del subarbol
+- Organigrama parcial (`/hr/org-chart`) — solo su subarbol
+
+#### Seccion "Mi ficha"
+
+- Mis Asignaciones (`/my/assignments`) — clientes, FTE, capacidad
+- Mi Desempeno (`/my/performance`) — ICO, OTD, metricas
+- Mi Delivery (`/my/delivery`) — tareas, proyectos, CRM
+- Mi Perfil (`/my/profile`)
+- Mi Nomina (`/my/payroll`) — su liquidacion personal (NO la del equipo)
+- Mis Permisos (`/my/leave`) — saldos y solicitudes propias
+- Mi Organizacion (`/my/organization`) — directorio, colegas
+- Mis Objetivos (`/my/goals`)
+- Mis Evaluaciones (`/my/evaluations`)
+
+### Que NO ve (denegado o sin grant)
+
+- Economia de la agencia (P&L global)
+- Staff Augmentation (economics por placement)
+- Nomina cross-team / Nomina proyectada (vistas HR sensibles)
+- Finanzas (ingresos, egresos, conciliacion, banco, intelligence, etc.)
+- Admin Center
+- Permisos cross-team de toda la empresa
+- Departamentos / Jerarquia / Asistencia globales
+- Herramientas IA
+
+### Que puede hacer con certeza
+
+#### Como supervisora
+
+- Aprobar o rechazar solicitudes de permisos de Andres, Melkin, Valentina (con comentario)
+- Ver el roster de su equipo: nombre, cargo, saldos de permisos, ausencias proximas
+- Ver el organigrama parcial del subarbol bajo su autoridad
+- Ver el Person 360 completo de cada uno de sus reports
+
+#### Como operadora (efeonce_operations)
+
+- Ver workspace de la agencia y postura operativa
+- Ver Spaces (clientes activos) y entrar a cada uno
+- Ver delivery cross-tenant (estado de proyectos, tareas, sprints, riesgos)
+- Ver capacidad operativa (dedicacion, FTE asignado, gaps)
+- Ver campanas activas cross-space
+- Ver operaciones (queue, postura del platform interno)
+- Ver organizaciones, servicios contratados, equipo de agencia
+- Ver el directorio de Personas y Person 360 de cualquier interno
+- Read-only sobre datos comerciales/financieros — su rol no escribe en finanzas/quotes/contratos
+
+#### Como colaboradora (collaborator)
+
+- Solicitar permisos propios y ver historial
+- Ver y editar su perfil (foto, datos personales, contacto)
+- Ver su nomina personal (liquidaciones historicas)
+- Ver sus asignaciones a clientes (FTE, capacidad consumida)
+- Ver su desempeno personal (ICO, OTD, metricas)
+- Ver su delivery personal (tareas asignadas, proyectos)
+- Ver su organizacion (directorio, colegas)
+- Crear/actualizar sus objetivos del ciclo activo
+- Responder evaluaciones asignadas
+
+#### Lo que NO puede hacer
+
+- Ver P&L de la agencia, margenes, ranking de rentabilidad por Space
+- Ver economics de placements de Staff Augmentation
+- Ver nomina del equipo (cross-team payroll) ni nomina proyectada
+- Aprobar permisos de personas que NO son sus reports directos
+- Cambiar roles, capabilities ni asignaciones de otras personas
+- Acceder a finanzas, instrumentos de pago, conciliacion, banco
+- Acceder a Admin Center
+- Modificar el organigrama, jerarquia formal o departamentos
+
+> **Importante para refresh de sesion:** Cuando se aplican cambios al `role_view_assignments` o cambian las `reporting_lines` de una persona, su sesion existente sigue mostrando lo anterior hasta el proximo login. El JWT se materializa una vez al iniciar sesion y carga `authorizedViews` + `supervisorAccess` en ese momento. Para que un cambio sea visible inmediatamente, el usuario debe hacer logout/login. Esto es comportamiento esperado y aceptado por la spec V1 — un follow-up futuro puede agregar refresh on-demand via outbox listener.
 
 ---
 
