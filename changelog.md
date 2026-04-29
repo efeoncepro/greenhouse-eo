@@ -2,6 +2,13 @@
 
 ## 2026-04-29
 
+### 2026-04-29 — TASK-724 Cash Position ledger-first
+
+- `/finance/cash-position` ahora consume saldos, FX, categorias y freshness desde contratos canonicos existentes de Banco, sin modificar calculos ni materializadores de Banco.
+- La serie mensual usa `account_balances_monthly` cuando hay snapshot; los meses incompletos quedan marcados como fallback seguro y usan `amount_clp` para evitar doble conversion FX en pagos CLP asociados a documentos USD.
+- La UI aclara la semantica: `Caja disponible`, `Por cobrar`, `Por pagar`, `Credito utilizado`, `Resultado cambiario` y `Posicion neta`. Ya no presenta `por cobrar - por pagar` como caja disponible.
+- Se agregan estados honestos de freshness/degradacion con links a Banco y Conciliacion para revisar detalle operacional.
+
 ### 2026-04-29 — TASK-729 Payroll Reliability Module + Domain Tag + Data Quality Subsystem
 
 - Payroll registrado como módulo first-class en el Reliability Control Plane (`STATIC_RELIABILITY_REGISTRY`) con `incidentDomainTag='payroll'`. Antes estaba absorbido bajo `delivery`.
