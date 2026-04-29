@@ -727,6 +727,26 @@ Toda cuenta operativa (banco, tarjeta, fintech, CCA, wallet futura) declara un p
   4. Agregar entrada en `getCategoryProviderRule` (mirror TS)
   El form admin se adapta solo. Cero refactor de UI.
 
+### Finance — Evidence canonical uploader (TASK-721)
+
+Toda evidencia que respalde un snapshot de conciliación (cartola, screenshot OfficeBanking, statement PDF) o futura declaración de OTB / loan / factoring **debe** subirse via el uploader canónico de assets, NO declararse como text-input libre.
+
+**Flow canónico**:
+1. UI usa `<GreenhouseFileUploader contextType='finance_reconciliation_evidence_draft'>`. PDF/JPG/PNG/WEBP, max 10MB.
+2. POST `/api/assets/private` calcula SHA-256, dedup por `content_hash` (mismo hash + mismo context → reuse asset existente, sin duplicar bucket object).
+3. `createPrivatePendingAsset` sube a bucket `greenhouse-private-assets-{env}` con prefijo `finance-reconciliation-evidence/{assetId}/...` y persiste fila en `greenhouse_core.assets` con `retention_class='finance_reconciliation_evidence'`.
+4. UI envía `evidenceAssetId` al endpoint `/api/finance/reconciliation/snapshots`.
+5. `declareReconciliationSnapshot` en una sola transacción: insert snapshot con `evidence_asset_id` FK + `attachAssetToAggregate` (status pending → attached, owner_aggregate_id = snapshotId, owner_aggregate_type = 'finance_reconciliation_evidence').
+
+**Reglas duras**:
+
+- **NUNCA** aceptar `source_evidence_ref` como text libre en flujos nuevos. La columna existe solo para audit histórico pre-TASK-721.
+- **NUNCA** subir directo al bucket público `greenhouse-public-media` para finance evidence. Bucket privado por seguridad (IAM restringida).
+- **NUNCA** persistir `evidence_asset_id` apuntando a un asset que no existe — el FK con `ON DELETE SET NULL` cubre el delete, pero el detector `task721.reconciliationSnapshotsWithBrokenEvidence` flag-ea cualquier inconsistencia.
+- **Permisos**: solo route group `finance` o `efeonce_admin` puede subir `finance_reconciliation_evidence_draft`. NO se acepta member-only.
+- **Dedup**: `findAssetByContentHash` reusa asset existente si SHA-256 + context coinciden y status='pending'. Idempotente — el operador puede re-subir el mismo PDF y NO se duplica.
+- **Reusable**: cuando emerjan loans / factoring / OTB declarations / period closings, agregar nuevos contexts (`finance_loan_evidence_draft`, etc.) al type union + dictionaries en `greenhouse-assets.ts`. El uploader, dedup y detector son transversales.
+
 ### Finance — Bank KPI aggregation policy-driven (TASK-720)
 
 Los KPIs del módulo Banco (`Saldo CLP`, `Saldo USD`, `Equivalente CLP`) se computan a partir de la tabla declarativa `greenhouse_finance.instrument_category_kpi_rules`. Cada `instrument_category` (bank_account, fintech, payment_platform, payroll_processor, credit_card, shareholder_account + reservadas employee_wallet, intercompany_loan, factoring_advance, escrow_account) declara cómo contribuye a cada KPI: `contributes_to_cash`, `contributes_to_consolidated_clp`, `contributes_to_net_worth`, `net_worth_sign` (+1 asset / -1 liability), `display_group` (cash / credit / platform_internal).

@@ -8,14 +8,14 @@ import { ROLE_CODES } from '@/config/role-codes'
 
 export const dynamic = 'force-dynamic'
 
-const isDraftContext = (value: string): value is Extract<GreenhouseAssetContext, 'leave_request_draft' | 'purchase_order_draft' | 'master_agreement_draft' | 'certification_draft' | 'evidence_draft'> =>
-  value === 'leave_request_draft' || value === 'purchase_order_draft' || value === 'master_agreement_draft' || value === 'certification_draft' || value === 'evidence_draft'
+const isDraftContext = (value: string): value is Extract<GreenhouseAssetContext, 'leave_request_draft' | 'purchase_order_draft' | 'master_agreement_draft' | 'certification_draft' | 'evidence_draft' | 'finance_reconciliation_evidence_draft'> =>
+  value === 'leave_request_draft' || value === 'purchase_order_draft' || value === 'master_agreement_draft' || value === 'certification_draft' || value === 'evidence_draft' || value === 'finance_reconciliation_evidence_draft'
 
 const canUploadForContext = ({
   contextType,
   tenant
 }: {
-  contextType: Extract<GreenhouseAssetContext, 'leave_request_draft' | 'purchase_order_draft' | 'master_agreement_draft' | 'certification_draft' | 'evidence_draft'>
+  contextType: Extract<GreenhouseAssetContext, 'leave_request_draft' | 'purchase_order_draft' | 'master_agreement_draft' | 'certification_draft' | 'evidence_draft' | 'finance_reconciliation_evidence_draft'>
   tenant: Awaited<ReturnType<typeof requireTenantContext>>['tenant']
 }) => {
   if (!tenant) {
@@ -28,6 +28,12 @@ const canUploadForContext = ({
 
   if (contextType === 'certification_draft' || contextType === 'evidence_draft') {
     return Boolean(tenant.memberId) || hasRouteGroup(tenant, 'hr') || hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)
+  }
+
+  // TASK-721 — finance_reconciliation_evidence_draft: solo finance route group
+  // o efeonce_admin. NO se acepta member-only — es un flujo operativo.
+  if (contextType === 'finance_reconciliation_evidence_draft') {
+    return hasRouteGroup(tenant, 'finance') || hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)
   }
 
   return hasRouteGroup(tenant, 'finance') || hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)

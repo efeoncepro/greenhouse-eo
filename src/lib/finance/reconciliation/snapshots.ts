@@ -3,6 +3,7 @@ import { randomUUID } from 'node:crypto'
 import type { PoolClient } from 'pg'
 
 import { runGreenhousePostgresQuery, withGreenhousePostgresTransaction } from '@/lib/postgres/client'
+import { attachAssetToAggregate, getAssetById } from '@/lib/storage/greenhouse-assets'
 
 /**
  * TASK-704 — Account Reconciliation Snapshots.
@@ -37,6 +38,13 @@ export interface DeclareReconciliationSnapshotInput {
   driftExplanation?: string | null
   sourceKind: ReconciliationSourceKind
   sourceEvidenceRef?: string | null
+  /**
+   * TASK-721 — FK a greenhouse_core.assets. Si presente, la transacción
+   * atómicamente attache-a el asset al snapshot (status pending → attached,
+   * owner_aggregate_id = snapshotId, owner_aggregate_type =
+   * finance_reconciliation_evidence). Reemplaza sourceEvidenceRef text-libre.
+   */
+  evidenceAssetId?: string | null
   declaredByUserId?: string | null
 }
 
@@ -54,6 +62,8 @@ export interface ReconciliationSnapshotRecord {
   driftExplanation: string | null
   sourceKind: ReconciliationSourceKind
   sourceEvidenceRef: string | null
+  /** TASK-721 — FK a greenhouse_core.assets, null para snapshots legacy o sin evidence. */
+  evidenceAssetId: string | null
   declaredByUserId: string | null
   createdAt: string
   resolvedAt: string | null
@@ -83,6 +93,7 @@ interface SnapshotRowDb extends Record<string, unknown> {
   drift_explanation: string | null
   source_kind: ReconciliationSourceKind
   source_evidence_ref: string | null
+  evidence_asset_id: string | null
   declared_by_user_id: string | null
   created_at: Date | string
   resolved_at: Date | string | null
@@ -110,6 +121,7 @@ const mapRow = (row: SnapshotRowDb): ReconciliationSnapshotRecord => ({
   driftExplanation: row.drift_explanation,
   sourceKind: row.source_kind,
   sourceEvidenceRef: row.source_evidence_ref,
+  evidenceAssetId: row.evidence_asset_id,
   declaredByUserId: row.declared_by_user_id,
   createdAt: toIso(row.created_at),
   resolvedAt: toIsoOrNull(row.resolved_at),
@@ -124,6 +136,26 @@ export const declareReconciliationSnapshot = async (
   input: DeclareReconciliationSnapshotInput
 ): Promise<ReconciliationSnapshotRecord> => {
   const reason = (input.driftExplanation ?? '').trim() || null
+  const evidenceAssetId = input.evidenceAssetId?.trim() || null
+
+  // TASK-721 — Pre-flight: si trae evidenceAssetId, validar que el asset existe
+  // y está en estado pending (todavía no attached a otro aggregate). Esto evita
+  // attach race conditions y deja el error fuera de la transacción crítica.
+  if (evidenceAssetId) {
+    const asset = await getAssetById(evidenceAssetId)
+
+    if (!asset) {
+      throw new Error(`Evidence asset ${evidenceAssetId} not found`)
+    }
+
+    if (asset.status === 'deleted') {
+      throw new Error(`Evidence asset ${evidenceAssetId} is deleted and cannot be attached`)
+    }
+
+    if (asset.ownerAggregateType !== 'finance_reconciliation_evidence_draft' && asset.ownerAggregateType !== 'finance_reconciliation_evidence') {
+      throw new Error(`Evidence asset ${evidenceAssetId} has wrong context: ${asset.ownerAggregateType}`)
+    }
+  }
 
   return withGreenhousePostgresTransaction(async (client: PoolClient) => {
     // 1. Verify account exists.
@@ -161,21 +193,39 @@ export const declareReconciliationSnapshot = async (
          snapshot_id, account_id, snapshot_at,
          bank_closing_balance, bank_available_balance, bank_holds_amount, bank_credit_limit,
          pg_closing_balance, drift_amount, drift_status, drift_explanation,
-         source_kind, source_evidence_ref, declared_by_user_id, created_at
+         source_kind, source_evidence_ref, evidence_asset_id, declared_by_user_id, created_at
        ) VALUES (
          $1, $2, $3::timestamptz,
          $4, $5, $6, $7,
          $8, $9, $10, $11,
-         $12, $13, $14, NOW()
+         $12, $13, $14, $15, NOW()
        )
        RETURNING *`,
       [
         snapshotId, input.accountId, input.snapshotAt,
         input.bankClosingBalance, input.bankAvailableBalance ?? null, input.bankHoldsAmount ?? null, input.bankCreditLimit ?? null,
         pgClosing, drift, driftStatus, reason,
-        input.sourceKind, input.sourceEvidenceRef ?? null, input.declaredByUserId ?? null
+        input.sourceKind, input.sourceEvidenceRef ?? null, evidenceAssetId, input.declaredByUserId ?? null
       ]
     )
+
+    // TASK-721 — Si traemos evidence asset, attach atómicamente al snapshot.
+    // Compartimos la transacción para que rollback de cualquier paso revierta
+    // el attach + insert juntos.
+    if (evidenceAssetId) {
+      await attachAssetToAggregate({
+        assetId: evidenceAssetId,
+        ownerAggregateType: 'finance_reconciliation_evidence',
+        ownerAggregateId: snapshotId,
+        actorUserId: input.declaredByUserId ?? 'system',
+        client,
+        metadata: {
+          accountId: input.accountId,
+          snapshotAt: input.snapshotAt,
+          sourceKind: input.sourceKind
+        }
+      })
+    }
 
     return mapRow(r.rows[0])
   })

@@ -1,6 +1,6 @@
 import 'server-only'
 
-import { randomUUID } from 'node:crypto'
+import { createHash, randomUUID } from 'node:crypto'
 
 import type { PoolClient } from 'pg'
 
@@ -41,6 +41,7 @@ type AssetRow = {
   upload_source: string
   download_count: number | string | null
   metadata_json: Record<string, unknown> | null
+  content_hash: string | null
   created_at: string | null
   uploaded_at: string | null
   attached_at: string | null
@@ -51,12 +52,13 @@ type AssetRow = {
 const PRIVATE_USER_ALLOWED_MIME_TYPES = new Set(['application/pdf', 'image/jpeg', 'image/png', 'image/webp'])
 const SYSTEM_ALLOWED_MIME_TYPES = new Set([...PRIVATE_USER_ALLOWED_MIME_TYPES, 'text/csv', 'text/csv; charset=utf-8'])
 
-const MAX_PRIVATE_UPLOAD_BYTES_BY_CONTEXT: Record<Extract<GreenhouseAssetContext, 'leave_request_draft' | 'purchase_order_draft' | 'master_agreement_draft' | 'certification_draft' | 'evidence_draft'>, number> = {
+const MAX_PRIVATE_UPLOAD_BYTES_BY_CONTEXT: Record<Extract<GreenhouseAssetContext, 'leave_request_draft' | 'purchase_order_draft' | 'master_agreement_draft' | 'certification_draft' | 'evidence_draft' | 'finance_reconciliation_evidence_draft'>, number> = {
   leave_request_draft: 10 * 1024 * 1024,
   purchase_order_draft: 10 * 1024 * 1024,
   master_agreement_draft: 25 * 1024 * 1024,
   certification_draft: 10 * 1024 * 1024,
-  evidence_draft: 10 * 1024 * 1024
+  evidence_draft: 10 * 1024 * 1024,
+  finance_reconciliation_evidence_draft: 10 * 1024 * 1024
 }
 
 const CONTEXT_RETENTION_CLASS: Record<GreenhouseAssetContext, GreenhouseAssetRetentionClass> = {
@@ -73,7 +75,9 @@ const CONTEXT_RETENTION_CLASS: Record<GreenhouseAssetContext, GreenhouseAssetRet
   certification: 'hr_certification',
   evidence_draft: 'hr_evidence',
   evidence: 'hr_evidence',
-  quote_pdf: 'document_vault'
+  quote_pdf: 'document_vault',
+  finance_reconciliation_evidence_draft: 'finance_reconciliation_evidence',
+  finance_reconciliation_evidence: 'finance_reconciliation_evidence'
 }
 
 const CONTEXT_PREFIX: Record<GreenhouseAssetContext, string> = {
@@ -90,7 +94,9 @@ const CONTEXT_PREFIX: Record<GreenhouseAssetContext, string> = {
   certification: 'certifications',
   evidence_draft: 'evidence',
   evidence: 'evidence',
-  quote_pdf: 'quotation-pdfs'
+  quote_pdf: 'quotation-pdfs',
+  finance_reconciliation_evidence_draft: 'finance-reconciliation-evidence',
+  finance_reconciliation_evidence: 'finance-reconciliation-evidence'
 }
 
 const toNumber = (value: number | string | null | undefined) => {
@@ -252,6 +258,7 @@ const mapAssetRow = (row: AssetRow): GreenhouseAssetRecord => ({
   uploadSource: row.upload_source === 'system' ? 'system' : 'user',
   downloadCount: toNumber(row.download_count),
   metadata: normalizeRecord(row.metadata_json),
+  contentHash: normalizeNullableString(row.content_hash),
   createdAt: normalizeNullableString(row.created_at),
   uploadedAt: normalizeNullableString(row.uploaded_at),
   attachedAt: normalizeNullableString(row.attached_at),
@@ -264,7 +271,7 @@ const assertPrivateAssetUpload = ({
   contentType,
   sizeBytes
 }: {
-  contextType: Extract<GreenhouseAssetContext, 'leave_request_draft' | 'purchase_order_draft' | 'master_agreement_draft' | 'certification_draft' | 'evidence_draft'>
+  contextType: Extract<GreenhouseAssetContext, 'leave_request_draft' | 'purchase_order_draft' | 'master_agreement_draft' | 'certification_draft' | 'evidence_draft' | 'finance_reconciliation_evidence_draft'>
   contentType: string
   sizeBytes: number
 }) => {
@@ -318,6 +325,42 @@ const buildMetadataJson = ({
   ...(extra || {})
 })
 
+/**
+ * TASK-721 — Compute SHA-256 hex of file bytes for content-based dedup.
+ */
+const computeContentHash = (bytes: ArrayBuffer | Uint8Array | Buffer): string => {
+  const buffer = bytes instanceof ArrayBuffer ? Buffer.from(bytes) : Buffer.from(bytes as Uint8Array)
+
+  return createHash('sha256').update(buffer).digest('hex')
+}
+
+/**
+ * TASK-721 — Find a non-deleted asset with the same SHA-256 content hash.
+ * Used by `createPrivatePendingAsset` for idempotent dedup: same file → reuse
+ * existing asset row + bucket object instead of duplicating.
+ */
+export const findAssetByContentHash = async (
+  contentHash: string,
+  client?: QueryableClient
+): Promise<GreenhouseAssetRecord | null> => {
+  if (!contentHash) return null
+
+  const rows = await queryAssetRows<AssetRow>(
+    `
+      SELECT *
+      FROM greenhouse_core.assets
+      WHERE content_hash = $1
+        AND status <> 'deleted'
+      ORDER BY created_at DESC
+      LIMIT 1
+    `,
+    [contentHash],
+    client
+  )
+
+  return rows[0] ? mapAssetRow(rows[0]) : null
+}
+
 export const createPrivatePendingAsset = async ({
   contextType,
   uploadedByUserId,
@@ -329,7 +372,7 @@ export const createPrivatePendingAsset = async ({
   ownerMemberId,
   metadata
 }: {
-  contextType: Extract<GreenhouseAssetContext, 'leave_request_draft' | 'purchase_order_draft' | 'master_agreement_draft' | 'certification_draft' | 'evidence_draft'>
+  contextType: Extract<GreenhouseAssetContext, 'leave_request_draft' | 'purchase_order_draft' | 'master_agreement_draft' | 'certification_draft' | 'evidence_draft' | 'finance_reconciliation_evidence_draft'>
   uploadedByUserId: string
   fileName: string
   contentType: string
@@ -352,6 +395,26 @@ export const createPrivatePendingAsset = async ({
     contentType,
     sizeBytes
   })
+
+  // TASK-721 — content-hash dedup: same SHA-256 → reuse existing pending asset.
+  const contentHash = computeContentHash(bytes)
+  const existing = await findAssetByContentHash(contentHash)
+
+  if (existing && existing.status === 'pending' && existing.ownerAggregateType === contextType) {
+    // Identical pending upload by hash + same context → reuse to avoid duplicate
+    // bucket object + DB row. Audit is preserved (original `uploaded_at`).
+    await writeAssetAccessLog({
+      assetId: existing.assetId,
+      action: 'upload',
+      actorUserId: uploadedByUserId,
+      metadata: {
+        deduplicatedFromContentHash: contentHash,
+        reusedExistingAsset: true
+      }
+    })
+
+    return existing
+  }
 
   const assetId = buildAssetId()
   const publicId = buildAssetPublicId()
@@ -392,12 +455,13 @@ export const createPrivatePendingAsset = async ({
         uploaded_by_user_id,
         upload_source,
         metadata_json,
+        content_hash,
         created_at,
         uploaded_at
       )
       VALUES (
         $1, $2, 'private', 'pending', $3, $4, $5, $6, $7, $8, $9, NULL,
-        $10, $11, $12, $13, 'user', $14::jsonb, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+        $10, $11, $12, $13, 'user', $14::jsonb, $15, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
       )
       RETURNING *
     `,
@@ -415,7 +479,8 @@ export const createPrivatePendingAsset = async ({
       ownershipScope.ownerSpaceId,
       ownershipScope.ownerMemberId,
       uploadedByUserId,
-      JSON.stringify(buildMetadataJson({ originalFileName: fileName, extra: metadata }))
+      JSON.stringify(buildMetadataJson({ originalFileName: fileName, extra: metadata })),
+      contentHash
     ]
   )
 
@@ -464,7 +529,7 @@ export const attachAssetToAggregate = async ({
   client
 }: {
   assetId: string
-  ownerAggregateType: Exclude<GreenhouseAssetContext, 'leave_request_draft' | 'purchase_order_draft' | 'certification_draft' | 'evidence_draft'>
+  ownerAggregateType: Exclude<GreenhouseAssetContext, 'leave_request_draft' | 'purchase_order_draft' | 'master_agreement_draft' | 'certification_draft' | 'evidence_draft' | 'finance_reconciliation_evidence_draft'>
   ownerAggregateId: string
   actorUserId: string
   ownerClientId?: string | null

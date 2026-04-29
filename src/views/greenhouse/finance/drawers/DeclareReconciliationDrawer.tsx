@@ -12,6 +12,7 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
 import CustomTextField from '@core/components/mui/TextField'
+import GreenhouseFileUploader, { type UploadedFileValue } from '@/components/greenhouse/GreenhouseFileUploader'
 
 interface AccountOption {
   accountId: string
@@ -65,7 +66,7 @@ const DeclareReconciliationDrawer = ({
   const [bankAvailableBalance, setBankAvailableBalance] = useState('')
   const [bankCreditLimit, setBankCreditLimit] = useState('')
   const [sourceKind, setSourceKind] = useState('officebanking_screenshot')
-  const [sourceEvidenceRef, setSourceEvidenceRef] = useState('')
+  const [evidenceFile, setEvidenceFile] = useState<UploadedFileValue | null>(null)
   const [driftExplanation, setDriftExplanation] = useState('')
   const [driftStatus, setDriftStatus] = useState<'open' | 'accepted'>('accepted')
   const [submitting, setSubmitting] = useState(false)
@@ -80,7 +81,7 @@ const DeclareReconciliationDrawer = ({
       setBankAvailableBalance('')
       setBankCreditLimit('')
       setSourceKind('officebanking_screenshot')
-      setSourceEvidenceRef('')
+      setEvidenceFile(null)
       setDriftExplanation('')
       setDriftStatus('accepted')
       setError(null)
@@ -145,7 +146,7 @@ const DeclareReconciliationDrawer = ({
           bankCreditLimit: bankCreditLimit ? Number(bankCreditLimit) : undefined,
           bankHoldsAmount: computedHolds,
           sourceKind,
-          sourceEvidenceRef: sourceEvidenceRef.trim() || undefined,
+          evidenceAssetId: evidenceFile?.assetId,
           driftExplanation: driftExplanation.trim() || undefined,
           driftStatus
         })
@@ -263,12 +264,20 @@ const DeclareReconciliationDrawer = ({
             ))}
           </CustomTextField>
 
-          <CustomTextField
-            fullWidth
-            label='Evidencia (path / URL)'
-            value={sourceEvidenceRef}
-            onChange={e => setSourceEvidenceRef(e.target.value)}
-            placeholder='data/bank/screenshot-20260427.png'
+          <GreenhouseFileUploader
+            contextType='finance_reconciliation_evidence_draft'
+            value={evidenceFile}
+            onChange={setEvidenceFile}
+            title='Evidencia (cartola, screenshot o PDF)'
+            helperText='Sube el respaldo bancario que valida el saldo declarado. El archivo queda en el storage privado de Greenhouse con hash, audit y URL accesible para auditoría futura.'
+            emptyTitle='Arrastra la cartola aquí'
+            emptyDescription='PDF, JPG, PNG o WEBP — máximo 10 MB.'
+            browseCta='Subir cartola'
+            replaceCta='Reemplazar archivo'
+            uploadingCta='Subiendo cartola…'
+            removeCta='Quitar cartola'
+            disabled={submitting}
+            metadataLabel={`recon-${accountId}-${snapshotAt.slice(0, 10)}`}
           />
 
           {driftPreview != null && Math.abs(driftPreview) >= 1 && (
