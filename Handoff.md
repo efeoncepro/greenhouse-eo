@@ -36,6 +36,12 @@
 - `docs/README.md` y `project_context.md` actualizados para registrar la arquitectura.
 - No se tocó runtime ni código productivo. Validación documental: pendiente solo revisar diff/typos si se quiere pulir copy.
 
+## Sesion 2026-04-28 — Teams Bot knowledge actualizado
+
+- Se documentó en `AGENTS.md` y `CLAUDE.md` el chat grupal `Sky - Efeonce | Shared` para futuros envíos de Nexa: `19:bf42622ef7b44d139cd4659e8aa22e81@thread.v2`.
+- También quedó documentado el patrón de mención real a Valentina Hoyos (`29:f60d5730-1aab-45ec-a435-45ffe8be6f54`) y el primer anuncio client-facing de Nexa en ese canal (`activity id 1777411344948`).
+- Regla de tono: anuncios client-facing desde Nexa deben sonar cálidos, claros, con emojis moderados y foco operativo; no como boletines rígidos ni mensajes genéricos.
+
 ## Sesion 2026-04-28 — TASK-716 Manual Team Announcements creada
 
 - A partir del smoke exitoso del Greenhouse Teams Bot en el chat `EO Team`, se creó `TASK-716` para formalizar una surface de comunicaciones manuales desde Greenhouse/Nexa.

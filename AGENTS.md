@@ -431,6 +431,11 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
   - En 1:1 no hace falta mencionar al usuario; Teams notifica al participante del chat.
 - Para smoke scripts locales que importen libs server-side, usar `npx tsx --require ./scripts/lib/server-only-shim.cjs ...` para neutralizar imports `server-only`.
 - Si esto pasa a UI/producto, no implementar un textbox que postea directo a Teams. Debe converger con Notification Hub / `TASK-716`: intent/outbox, preview, aprobación si aplica, idempotencia, retries, audit, delivery status y permisos en ambos planos (`views` + `entitlements`).
+- Chats operativos ya verificados:
+  - `EO Team` group chat: `19:1e085e8a02d24cc7a0244490e5d00fb0@thread.v2`.
+  - `Sky - Efeonce | Shared` group chat: `19:bf42622ef7b44d139cd4659e8aa22e81@thread.v2`.
+  - Para mencionar a Valentina Hoyos en Teams, usar entity `mentioned.id = "29:f60d5730-1aab-45ec-a435-45ffe8be6f54"` y `text = "<at>Valentina Hoyos</at>"`.
+- El primer anuncio client-facing en `Sky - Efeonce | Shared` fue enviado el 2026-04-28 como Nexa presentándose como AI Agent de Efeonce y comunicando a Valentina Hoyos como `Content Lead` del Piloto Sky de mayo. Activity id: `1777411344948`. Usar ese tono como referencia: amable, claro, con emojis moderados, sin sonar a boletín rígido.
 
 ### Cloud Run ops-worker (crons reactivos + materialización)
 
