@@ -1695,3 +1695,158 @@ Tests TASK-599 explícitos:
 - N señales adicionales por suite fallida cuando hay errores.
 
 El boundary TASK-599 en `RELIABILITY_INTEGRATION_BOUNDARIES` quedó en status `ready`. Cuando no hay reporte local (runtime portal sin acceso a artifacts CI), degrada a `awaiting_data` con notas explícitas — nunca enmascara regresiones como "todo bien".
+
+## Delta 2026-04-29 — TASK-720 / TASK-721 / TASK-722: Bank ↔ Reconciliation canonical synergy
+
+Tres tasks ejecutadas end-to-end en una sola sesión que cierran el ciclo operativo Banco ↔ Conciliación con disciplina estructural. Cero regresiones (552/552 tests).
+
+### TASK-720 — Bank KPI aggregation policy-driven
+
+**Problema**: el KPI "Saldo CLP" sumaba todas las cuentas CLP sin distinguir asset vs liability — credit_card y shareholder_account aparecían como cash, inflando el total en $1.3M (sobre $4.18M real).
+
+**Solución estructural**: tabla declarativa `greenhouse_finance.instrument_category_kpi_rules` que dicta cómo cada `instrument_category` contribuye a cada KPI (cash / consolidated_clp / net_worth) con `net_worth_sign` (+1 asset, −1 liability) y `display_group` (cash / credit / platform_internal).
+
+```sql
+CREATE TABLE greenhouse_finance.instrument_category_kpi_rules (
+  instrument_category TEXT PRIMARY KEY,
+  account_kind TEXT NOT NULL CHECK (account_kind IN ('asset', 'liability')),
+  contributes_to_cash BOOLEAN NOT NULL,
+  contributes_to_consolidated_clp BOOLEAN NOT NULL,
+  contributes_to_net_worth BOOLEAN NOT NULL,
+  net_worth_sign SMALLINT NOT NULL CHECK (net_worth_sign IN (-1, 1)),
+  display_label TEXT NOT NULL,
+  display_group TEXT NOT NULL CHECK (display_group IN ('cash', 'credit', 'platform_internal')),
+  rationale TEXT NOT NULL
+);
+```
+
+10 categorías seedeadas (6 activas + 4 reservadas: `employee_wallet`, `intercompany_loan`, `factoring_advance`, `escrow_account`).
+
+**Helper canónico**: `aggregateBankKpis(accounts, rules)` en `src/lib/finance/instrument-kpi-rules.ts`. Pure function; throw `MissingKpiRuleError` si una cuenta tiene categoría sin rule (fail-fast).
+
+**Detector**: `task720.instrumentCategoriesWithoutKpiRule` en ledger-health. Steady state = 0.
+
+**FK constraint** (Slice 5): `accounts.instrument_category → instrument_category_kpi_rules.instrument_category`. Cualquier INSERT con categoría unknown falla con FK violation. Anti-reincidencia.
+
+**Reusabilidad**: cuando emerjan wallets / loans / factoring / escrow → 1 INSERT al catálogo + cero refactor de agregador o UI.
+
+### TASK-721 — Finance evidence canonical uploader
+
+**Problema**: el drawer "Declarar conciliación" pedía evidencia como text input libre con path/URL. Operador podía declarar referencias a archivos inexistentes — auditoría futura no podía reproducir snapshots.
+
+**Solución**: reuso completo de la infraestructura `greenhouse_core.assets`:
+
+- Nuevos asset contexts `finance_reconciliation_evidence_draft` + `finance_reconciliation_evidence`
+- Retention class `finance_reconciliation_evidence`
+- Bucket privado `greenhouse-private-assets-{env}` (existente)
+- Columna `assets.content_hash` (SHA-256) para dedup idempotente
+- Columna `account_reconciliation_snapshots.evidence_asset_id` FK con `ON DELETE SET NULL`
+
+**Atomic transaction** en `declareReconciliationSnapshot`:
+1. Pre-flight: validar asset existe + status correcto + context correcto
+2. INSERT snapshot con `evidence_asset_id` FK
+3. `attachAssetToAggregate(assetId, 'finance_reconciliation_evidence', snapshotId)` en misma tx — status pending → attached, owner_aggregate_id = snapshotId
+
+**Dedup por content_hash**: `findAssetByContentHash(hash)` reusa asset existente si SHA-256 + context coinciden y status='pending'. Same PDF re-subido → cero duplicados en bucket.
+
+**Detector**: `task721.reconciliationSnapshotsWithBrokenEvidence` flag rows con `evidence_asset_id` apuntando a asset deleted/missing.
+
+**UI**: `<GreenhouseFileUploader contextType='finance_reconciliation_evidence_draft'>` reemplaza text input. Drag & drop, preview, max 10MB, accepta PDF/JPG/PNG/WEBP.
+
+**Reusabilidad**: cuando emerjan loans / factoring / OTB declarations / period closings → agregar context al type union + dictionaries en `greenhouse-assets.ts`. Uploader, dedup, audit, outbox son transversales.
+
+### TASK-722 — Bank Reconciliation Synergy Workbench
+
+**Problema**: `/finance/bank` y `/finance/reconciliation` eran páginas paralelas que no se hablaban. Snapshot declarado en Banco no aparecía en el workbench. Period creado en workbench no veía evidencia.
+
+**Solución estructural**: bridge contract canónico + period-from-snapshot atomic + capabilities granulares.
+
+#### Schema
+
+```sql
+-- DB-level idempotency (antes era solo aplicacional via period_id deterministic)
+ALTER TABLE greenhouse_finance.reconciliation_periods
+  ADD CONSTRAINT uniq_recon_periods_account_year_month UNIQUE (account_id, year, month);
+
+-- Bridge column
+ALTER TABLE greenhouse_finance.account_reconciliation_snapshots
+  ADD COLUMN reconciliation_period_id TEXT
+  REFERENCES greenhouse_finance.reconciliation_periods(period_id) ON DELETE SET NULL;
+```
+
+#### Bridge helper canónico
+
+`getReconciliationFullContext({periodId | accountId+year+month})` en `src/lib/finance/reconciliation/full-context.ts` retorna:
+
+```ts
+{
+  account: { accountId, accountName, currency, instrumentCategory, accountKind },
+  period: { periodId, year, month, status, ... } | null,
+  latestSnapshot: { snapshotId, driftStatus, driftAmount, evidenceAssetId, ... } | null,
+  evidenceAsset: { assetId, filename, downloadUrl, ... } | null,
+  statementRows: { total, matched, suggested, excluded, unmatched },
+  difference: number | null,
+  nextAction: 'declare_snapshot' | 'create_period' | 'import_statement'
+            | 'resolve_matches' | 'mark_reconciled' | 'close_period'
+            | 'closed' | 'archived'
+}
+```
+
+State machine `nextAction` deriva la siguiente acción operativa sin persistirse — si la lógica cambia se actualiza en TS sin migration.
+
+`listOrphanSnapshotsForPeriod(year, month)` retorna snapshots sin period linked (alimenta empty state UI).
+
+#### Period-from-snapshot atomic
+
+`createOrLinkPeriodFromSnapshot({snapshotId, actorUserId, openingBalance?, notes?})` en `src/lib/finance/reconciliation/period-from-snapshot.ts`:
+
+1. `FOR UPDATE` lock en snapshot
+2. Si ya tiene `reconciliation_period_id` → return idempotente (`alreadyLinked: true`)
+3. Build deterministic `period_id = accountId_year_MM`
+4. Check existing period por `(account_id, year, month)` con `FOR UPDATE`
+5. Si no existe: INSERT period con `opening_balance = snapshot.pg_closing_balance` (audit-consistent)
+6. UPDATE `snapshot.reconciliation_period_id = period_id` en misma tx
+7. Outbox event `finance.reconciliation_period.created_from_snapshot`
+
+**Race-safe**: la UNIQUE constraint detecta concurrencia; si dos requests con mismo snapshotId concurren, uno gana la tx, el otro hace short-circuit por `alreadyLinked`.
+
+#### Capabilities (TASK-403 motor existente)
+
+5 capabilities `finance.reconciliation.*` agregadas al catalog (`src/config/entitlements-catalog.ts`):
+
+| Capability | Action | Scope | Quién |
+|---|---|---|---|
+| `finance.reconciliation.read` | read | tenant | finance / FINANCE_ADMIN / EFEONCE_ADMIN |
+| `finance.reconciliation.match` | create+update | space | mismo set |
+| `finance.reconciliation.import` | create | space | mismo set |
+| `finance.reconciliation.declare_snapshot` | create+update | space | mismo set |
+| `finance.reconciliation.close` | close | space | **solo FINANCE_ADMIN / EFEONCE_ADMIN** |
+
+`can()` guards en 11 endpoints de mutación. `requireFinanceTenantContext` se mantiene como guard transversal.
+
+#### Surface UI
+
+- **ReconciliationView**: empty state accionable con orphan snapshots cuando hay snapshots sin period — botón "Abrir workbench" → POST `/from-snapshot` → navega
+- **ReconciliationDetailView**: panel "Estado bancario" superior (snapshot + drift + evidence con link a cartola) + chip diferenciado en filas (`Canónico` vs `Legacy` según matched_settlement_leg_id) + tooltip blocker explícito en "Marcar conciliado"
+- **BankView**: CTA inline "Abrir workbench" en cuentas con `reconciliationPeriodId` (no muta — solo navega)
+
+#### Outbox events nuevos
+
+- `finance.reconciliation_period.created_from_snapshot` — emitido al crear o re-link periodo desde snapshot
+
+### Reglas duras transversales (TASK-720 / 721 / 722)
+
+- **NUNCA** sumar KPIs de Banco inline. Toda agregación pasa por `aggregateBankKpis`.
+- **NUNCA** declarar evidencia como text libre. Toda evidence va por `GreenhouseFileUploader` → asset canónico.
+- **NUNCA** crear periodo concurrent sin pasar por helper canónico. La UNIQUE constraint detecta race.
+- **NUNCA** mezclar match canónico (settlement_leg, TASK-708) y legacy (payment_id) sin distinción visual.
+- **Banco es read-only sobre el modelo de conciliación**. Toda mutación va por endpoints del workbench.
+- Cuando emerja una nueva categoría / context / surface, reusar los catálogos existentes — no refactor.
+
+### Detectors agregados
+
+| Detector | Fuente | Steady state |
+|---|---|---|
+| `task720.instrumentCategoriesWithoutKpiRule` | accounts vs instrument_category_kpi_rules | 0 |
+| `task721.reconciliationSnapshotsWithBrokenEvidence` | snapshots con FK rota | 0 |
+

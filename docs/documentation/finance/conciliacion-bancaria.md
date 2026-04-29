@@ -1,10 +1,10 @@
 # Conciliación bancaria
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-04-27 por Claude Opus 4.7 + Julio Reyes
-> **Ultima actualizacion:** 2026-04-28 por Claude Opus 4.7 (TASK-715 archive-as-test UX)
-> **Documentacion tecnica:** [GREENHOUSE_FINANCE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md), [TASK-702](../../tasks/in-progress/TASK-702-bank-reconciliation-canonical-anchors-rematerialize.md), [TASK-715](../../tasks/complete/TASK-715-reconciliation-test-period-archive-ux.md)
+> **Ultima actualizacion:** 2026-04-29 por Claude Opus 4.7 (TASK-720 KPI rules + TASK-721 evidence uploader + TASK-722 Bank↔Reconciliation synergy)
+> **Documentacion tecnica:** [GREENHOUSE_FINANCE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md), [TASK-702](../../tasks/in-progress/TASK-702-bank-reconciliation-canonical-anchors-rematerialize.md), [TASK-715](../../tasks/complete/TASK-715-reconciliation-test-period-archive-ux.md), [TASK-720](../../tasks/complete/TASK-720-instrument-category-kpi-rules.md), [TASK-721](../../tasks/complete/TASK-721-finance-evidence-canonical-uploader.md), [TASK-722](../../tasks/complete/TASK-722-bank-reconciliation-synergy-workbench.md)
 
 ## Qué es
 
@@ -188,3 +188,101 @@ Si aparece un patrón nuevo (ej. crédito factoring de un proveedor distinto, re
 4. Documentar el caso especial aquí.
 
 > Detalle técnico: `src/lib/finance/payment-instruments/anchored-payments.ts` tiene 12 factories canónicas. Para extender, copiar el patrón existente.
+
+## Sinergia Banco ↔ Conciliación (2026-04-29)
+
+Tres mejoras estructurales que convierten Banco y Conciliación en un solo flujo operativo:
+
+### 1. Saldo CLP del módulo Banco ahora dice la verdad (TASK-720)
+
+**Antes**: el KPI "Saldo CLP" en `/finance/bank` sumaba todas las cuentas en pesos sin distinguir si eran cash real o deuda. Una tarjeta de crédito con $1.1M de deuda aparecía como si fuera $1.1M de cash. Lo mismo para la cuenta corriente del accionista.
+
+**Ahora**: el sistema sabe qué tipo de cuenta es cada una y cómo contribuye a cada KPI. El "Saldo CLP" muestra solo cash disponible (banco + fintech + plataforma de pagos). La deuda aparece en su propio card "Crédito utilizado". Las cuentas internas (CCA, wallets) aparecen en su propio card "Cuentas internas". Ningún número miente sobre lo que es.
+
+> Detalle técnico: `aggregateBankKpis` en `src/lib/finance/instrument-kpi-rules.ts` consume la tabla declarativa `instrument_category_kpi_rules`. Cada categoría (`bank_account`, `fintech`, `credit_card`, `shareholder_account`, etc.) declara qué KPIs alimenta y con qué signo.
+
+### 2. La cartola sube a un storage real (TASK-721)
+
+**Antes**: el drawer "Declarar conciliación" pedía la evidencia (cartola/screenshot) como un texto libre. El operador podía escribir `data/bank/foo.pdf` y nadie verificaba que el archivo existiera. Auditoría futura no podía reproducir.
+
+**Ahora**: el drawer tiene un uploader de archivos real. El operador arrastra el PDF/screenshot, se sube al bucket privado de Greenhouse con dedup por hash (mismo PDF re-subido = no se duplica), queda enlazado al snapshot atómicamente. La cartola es accesible por URL firmada para todo el equipo, no solo para quien la subió.
+
+Acepta PDF, JPG, PNG, WEBP. Máximo 10MB. La evidencia queda como assets canónicos en `greenhouse_core.assets` con audit trail completo.
+
+> Detalle técnico: contexto `finance_reconciliation_evidence_draft` y `finance_reconciliation_evidence` en el sistema canónico de assets. Reusa toda la infraestructura existente (HR leave, purchase orders, certifications). Detector ledger-health flag rows con evidencia rota.
+
+### 3. Bridge Banco ↔ Conciliación: un solo flujo end-to-end (TASK-722)
+
+**Antes**: declarabas un snapshot en Banco con su evidencia, pero después tenías que ir a Conciliación, recordarte qué cuenta era, recordarte qué mes, crear el período manualmente, recapturar todo. El snapshot vivía aislado en Banco; el período vivía aislado en Conciliación. Si querías importar la cartola del banco, eso era un tercer paso desconectado.
+
+**Ahora**: el flujo es continuo.
+
+#### Camino 1 — desde Banco al workbench
+
+1. En `/finance/bank`, el operador ve cada cuenta con su drift (banco vs Greenhouse).
+2. Click "Declarar conciliación" → drawer con uploader real (TASK-721).
+3. Snapshot queda registrado, evidencia adjunta atómicamente.
+4. En la fila de la cuenta aparece el chip "Por conciliar $X" si hay drift.
+5. Click "Abrir workbench" → navega directo al período de Conciliación. Si el período no existe, se crea desde el snapshot sin recapturar saldo.
+
+#### Camino 2 — desde Conciliación
+
+1. En `/finance/reconciliation`, si hay snapshots declarados sin período abierto, aparece un card amarillo accionable:
+   ```
+   🟠 Snapshots bancarios sin período abierto
+       Santander (CLP) — Drift abierto $77,892 — Con evidencia
+       [Abrir workbench →]
+   ```
+2. Click "Abrir workbench" → crea el período desde el snapshot, navega al workbench.
+
+#### En el workbench (`/finance/reconciliation/[periodId]`)
+
+Hay un panel nuevo arriba: **"Estado bancario"**.
+
+| Saldo banco (snapshot) | Saldo Greenhouse | Drift |
+|---|---|---|
+| $4,172,563 | $4,172,563 | $0 |
+
+Si hay evidencia adjunta, aparece el botón "Ver cartola" que descarga el PDF firmado.
+
+Si el drift es distinto de cero, se ve la explicación que el operador escribió.
+
+#### En la tabla de filas del extracto
+
+Cada fila ahora distingue claramente cómo está matcheada:
+- **Canónico** (verde, ícono link): match vinculado al settlement_leg del ledger contable. Es el formato canónico actual.
+- **Legacy** (naranja, ícono pause): match solo por payment_id, sin settlement_leg. Pendiente upgrade al canal canónico.
+
+Esto permite al operador y al auditor saber qué matches están "completos" y cuáles necesitan revisión.
+
+#### Cuándo "Marcar conciliado" está bloqueado
+
+El botón muestra una explicación clara cuando no se puede marcar el período como conciliado:
+
+> Bloqueado: falta importar el extracto bancario · 2 filas pendientes de match · la diferencia es $1,500, debe ser $0
+
+Antes el botón solo aparecía deshabilitado sin explicación.
+
+### Permisos por acción
+
+Hay 5 niveles de permiso en Conciliación, con reglas claras:
+
+| Acción | Quién puede |
+|---|---|
+| Ver el listado y los detalles | Cualquier persona con acceso al módulo Finance |
+| Match/unmatch/exclude/auto-match | Operadores Finance + admins |
+| Importar extractos | Operadores Finance + admins |
+| Declarar snapshots / crear períodos | Operadores Finance + admins |
+| **Cerrar período (acción terminal)** | **Solo finance_admin / efeonce_admin** |
+
+Cerrar un período es una acción terminal — escala a admin. El resto del flujo operativo lo puede ejecutar el equipo Finance.
+
+### Garantías estructurales
+
+- **Sin duplicados**: la base de datos impide a nivel de constraint dos períodos con misma cuenta + año + mes.
+- **Atomic**: si falla un paso del proceso "crear período desde snapshot", todo se reverte.
+- **Audit completo**: cada acción genera evento de outbox, y cada cartola tiene hash + timestamp + uploader.
+- **Race-safe**: si dos operadores hacen click "Abrir workbench" sobre el mismo snapshot al mismo tiempo, el sistema lo detecta — uno gana, el otro recibe "ya está abierto".
+- **Idempotente**: re-llamar "Abrir workbench" sobre un snapshot ya linkeado no crea nada nuevo, solo navega.
+
+> Detalle técnico: helper `getReconciliationFullContext` en `src/lib/finance/reconciliation/full-context.ts`. State machine `nextAction` (declare_snapshot → create_period → import_statement → resolve_matches → mark_reconciled → close_period → closed → archived). Helper atomic `createOrLinkPeriodFromSnapshot` en `src/lib/finance/reconciliation/period-from-snapshot.ts`. UNIQUE constraint en `(account_id, year, month)` aplicada en migración TASK-722.
