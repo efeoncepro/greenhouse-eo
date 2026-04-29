@@ -727,6 +727,37 @@ Toda cuenta operativa (banco, tarjeta, fintech, CCA, wallet futura) declara un p
   4. Agregar entrada en `getCategoryProviderRule` (mirror TS)
   El form admin se adapta solo. Cero refactor de UI.
 
+### Finance — Bank ↔ Reconciliation synergy (TASK-722)
+
+`/finance/bank` y `/finance/reconciliation` son ahora un solo flujo operativo. Banco es el tablero (cuentas + saldos + snapshots + drift + evidencia); Conciliación es el workbench transaccional (importar extractos, matching, cierre de periodo).
+
+**Bridge contract** (read-only): `getReconciliationFullContext({periodId | accountId+year+month})` en `src/lib/finance/reconciliation/full-context.ts` retorna `{ account, period?, latestSnapshot?, evidenceAsset?, statementRows, difference, nextAction }` con state machine `nextAction: declare_snapshot → create_period → import_statement → resolve_matches → mark_reconciled → close_period → closed → archived`.
+
+**Period creation desde snapshot** (atomic): `createOrLinkPeriodFromSnapshot({snapshotId, actorUserId})` en `src/lib/finance/reconciliation/period-from-snapshot.ts`. Idempotente (re-llamar devuelve `alreadyLinked=true`), atomic (insert period + UPDATE snapshot.reconciliation_period_id en misma tx), race-safe (UNIQUE (account_id, year, month) constraint).
+
+**API**:
+- `POST /api/finance/reconciliation/from-snapshot` — gated por `finance.reconciliation.declare_snapshot`
+- `GET /api/finance/reconciliation?year=&month=` retorna `orphanSnapshots[]` adicional cuando se piden
+- `GET /api/finance/reconciliation/[id]` retorna campo `bridge` con full context
+
+**Capabilities** (TASK-403 motor, no DB tabla):
+- `finance.reconciliation.read` — finance route_group / FINANCE_ADMIN / EFEONCE_ADMIN
+- `finance.reconciliation.match` — mismo set
+- `finance.reconciliation.import` — mismo set
+- `finance.reconciliation.declare_snapshot` — mismo set
+- `finance.reconciliation.close` — solo FINANCE_ADMIN / EFEONCE_ADMIN (acción terminal)
+
+Guards `can()` agregados a 11 endpoints de mutación. `requireFinanceTenantContext` se mantiene como guard transversal.
+
+**Reglas duras**:
+
+- **NUNCA** sumar reconciliation logic inline en views. Toda composición pasa por `getReconciliationFullContext`.
+- **NUNCA** crear periodo concurrent sin pasar por `createOrLinkPeriodFromSnapshot` o `createReconciliationPeriodInPostgres`. Ambas usan idempotency: la UNIQUE (account_id, year, month) constraint detecta race conditions a nivel DB.
+- **NUNCA** mostrar match status sin distinguir `matched_settlement_leg_id` (canal canónico TASK-708) vs `matched_payment_id` (legacy). UI usa chip diferenciado "Canónico" vs "Legacy".
+- **NUNCA** disable "Marcar conciliado" sin explicación clara en tooltip + alert. Operador debe saber qué falta.
+- Banco es read-only sobre el modelo de conciliación; toda mutación va por endpoints del workbench. El botón "Abrir workbench" en BankView no muta — solo navega.
+- Cuando emerja una nueva surface (e.g. cierre de período Q4 dashboard), reusa el bridge. Cero composición ad-hoc.
+
 ### Finance — Evidence canonical uploader (TASK-721)
 
 Toda evidencia que respalde un snapshot de conciliación (cartola, screenshot OfficeBanking, statement PDF) o futura declaración de OTB / loan / factoring **debe** subirse via el uploader canónico de assets, NO declararse como text-input libre.
