@@ -169,14 +169,17 @@ Reglas obligatorias:
 - Corregir el calculo legacy de `monthlySeries` para usar `amount_clp` cuando exista:
   - `COALESCE(ip.amount_clp, ip.amount * COALESCE(ip.exchange_rate_at_payment, i.exchange_rate_to_clp, 1))`
   - `COALESCE(ep.amount_clp, ep.amount * COALESCE(ep.exchange_rate_at_payment, e.exchange_rate_to_clp, 1))`
-- Excluir pagos `superseded_at IS NOT NULL` y cadenas audit-only del flujo.
+- Excluir pagos superseded usando el filtro canonico TASK-703b: `superseded_by_payment_id IS NULL AND superseded_by_otb_id IS NULL` (las dos columnas estan coordinadas — payment-chain + anchor-chain). NO usar `superseded_at IS NOT NULL` solo: es solo el timestamp, el contrato canonico son los FKs.
+- Aplicar el mismo fix de doble FX en las queries de `receivable` y `payable` (lineas 67 y 77 del route): hoy `total_amount_clp - amount_paid * COALESCE(exchange_rate_to_clp, 1)` subestima el balance pendiente cuando `amount_paid` esta en CLP sobre un documento USD. Es el mismo anti-pattern que `monthlySeries` y debe caer en el mismo hotfix, no esperar a Slice 2.
 - Agregar test de regresion con pago CLP sobre documento USD que debe sumar `$1.106.321`, no `$1.007.363.090`.
+- Agregar test de regresion adicional con pago superseded (`superseded_by_payment_id IS NOT NULL`) que NO debe contar en flujo ni en `amount_paid` para receivable/payable.
 - Mantener el contrato JSON actual para no romper la UI mientras se construye el alineamiento canonico.
 
 ### Slice 2 — Canonical cash position service
 
 - Extraer `src/lib/finance/cash-position/overview.ts` o helper equivalente.
 - Leer saldos, inflows/outflows y freshness desde `getBankOverview()` o desde los mismos helpers/read models que usa Banco.
+- **Decision a tomar en plan mode**: si el helper consume `settlement_legs` (canal canonico forward TASK-708) o se queda en `income_payments` / `expense_payments` por compatibilidad temporal. Default sugerido: legs cuando exista cobertura completa para el periodo y fallback a payments con flag `source: 'legacy_payments_fallback'` cuando no. Cualquier otra surface de finance que migre despues va a esperar la misma decision — documentarla en el delta de arquitectura.
 - Definir payload versionado para `CashPositionOverview` con:
   - `cashAvailableClp`
   - `creditUsedClp`
@@ -351,7 +354,8 @@ Resultado esperado:
 - [ ] La serie mensual usa `account_balances_monthly` / `account_balances` cuando existe read model canonico.
 - [ ] Si el read model esta stale o incompleto, la API/UI exponen freshness/degraded state.
 - [ ] La vista mantiene links/drill-down hacia Banco y Conciliacion para detalle operacional.
-- [ ] Tests cubren doble conversion FX, pagos superseded y fallback seguro.
+- [ ] Tests cubren doble conversion FX en `monthlySeries` Y en `receivable`/`payable`, pagos superseded (filtro canonico TASK-703b) y fallback seguro.
+- [ ] El filtro de superseded usa `superseded_by_payment_id IS NULL AND superseded_by_otb_id IS NULL`, no `superseded_at IS NOT NULL`.
 
 ## Verification
 
