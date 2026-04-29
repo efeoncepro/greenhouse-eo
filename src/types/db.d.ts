@@ -3327,6 +3327,10 @@ export interface GreenhouseFinanceAccountReconciliationSnapshots {
    */
   evidence_asset_id: string | null;
   pg_closing_balance: Numeric;
+  /**
+   * TASK-722 — FK al periodo canónico de conciliación. Linkea un snapshot declarado en Banco con el periodo del workbench que lo procesa. ON DELETE SET NULL preserva el snapshot si el periodo se elimina (borrado no permitido hoy, defensivo). NULL para snapshots sin periodo procesado todavía.
+   */
+  reconciliation_period_id: string | null;
   resolved_at: Timestamp | null;
   resolved_by_user_id: string | null;
   resolved_reason: string | null;

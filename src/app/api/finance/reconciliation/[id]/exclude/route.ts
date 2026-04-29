@@ -6,6 +6,7 @@ import {
   clearReconciliationLinkInPostgres,
   excludeStatementRowInPostgres
 } from '@/lib/finance/postgres-reconciliation'
+import { can } from '@/lib/entitlements/runtime'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 import {
   FinanceValidationError,
@@ -20,6 +21,11 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  // TASK-722 — granular guard.
+  if (!can(tenant, 'finance.reconciliation.match', 'update', 'space')) {
+    return NextResponse.json({ error: 'No tienes permiso para excluir filas de extracto.' }, { status: 403 })
   }
 
   try {

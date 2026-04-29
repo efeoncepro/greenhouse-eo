@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 
+import { can } from '@/lib/entitlements/runtime'
 import { acceptDrift } from '@/lib/finance/reconciliation/snapshots'
 import { FinanceValidationError, assertNonEmptyString } from '@/lib/finance/shared'
 import { requireBankTreasuryTenantContext } from '@/lib/tenant/authorization'
@@ -14,6 +15,11 @@ export async function POST(
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  // TASK-722 — granular guard: aceptar drift es declarar conciliación.
+  if (!can(tenant, 'finance.reconciliation.declare_snapshot', 'update', 'space')) {
+    return NextResponse.json({ error: 'No tienes permiso para aceptar drift de snapshots.' }, { status: 403 })
   }
 
   try {

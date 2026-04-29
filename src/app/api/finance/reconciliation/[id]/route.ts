@@ -6,7 +6,9 @@ import {
   updateReconciliationPeriodInPostgres,
   validateReconciledTransitionFromPostgres
 } from '@/lib/finance/postgres-reconciliation'
+import { getReconciliationFullContext } from '@/lib/finance/reconciliation/full-context'
 import { FinanceValidationError, normalizeString, toNumber } from '@/lib/finance/shared'
+import { can } from '@/lib/entitlements/runtime'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 
@@ -20,13 +22,22 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
   }
 
   const { id: periodId } = await params
-  const detail = await getReconciliationPeriodDetailFromPostgres(periodId)
+
+  // TASK-722 — bridge: include full context (snapshot + evidence + drift) en la
+  // misma respuesta para que el detail view no tenga que componer manualmente.
+  const [detail, bridge] = await Promise.all([
+    getReconciliationPeriodDetailFromPostgres(periodId),
+    getReconciliationFullContext({ periodId }).catch(() => null)
+  ])
 
   if (!detail) {
     return NextResponse.json({ error: 'Reconciliation period not found' }, { status: 404 })
   }
 
-  return NextResponse.json(detail)
+  return NextResponse.json({
+    ...detail,
+    bridge
+  })
 }
 
 export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -89,6 +100,16 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
 
     if (updates.status === 'closed' && previousStatus !== 'reconciled') {
       throw new FinanceValidationError('A reconciliation period can only be closed after it is reconciled.', 409)
+    }
+
+    // TASK-722 — granular guards: close requiere finance.reconciliation.close
+    // (solo finance_admin / efeonce_admin), match requiere finance.reconciliation.match.
+    if (updates.status === 'closed' && !can(tenant, 'finance.reconciliation.close', 'close', 'space')) {
+      return NextResponse.json({ error: 'No tienes permiso para cerrar periodos de conciliación.' }, { status: 403 })
+    }
+
+    if (updates.status === 'reconciled' && !can(tenant, 'finance.reconciliation.match', 'update', 'space')) {
+      return NextResponse.json({ error: 'No tienes permiso para marcar periodos como conciliados.' }, { status: 403 })
     }
 
     if (updates.status === 'reconciled') {

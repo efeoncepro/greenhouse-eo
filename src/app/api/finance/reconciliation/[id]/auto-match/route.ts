@@ -12,6 +12,7 @@ import {
   setReconciliationLinkInPostgres,
   updateStatementRowMatchInPostgres
 } from '@/lib/finance/postgres-reconciliation'
+import { can } from '@/lib/entitlements/runtime'
 import { FinanceValidationError } from '@/lib/finance/shared'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 
@@ -26,6 +27,11 @@ export async function POST(_request: Request, { params }: { params: Promise<{ id
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  // TASK-722 — granular guard.
+  if (!can(tenant, 'finance.reconciliation.match', 'create', 'space')) {
+    return NextResponse.json({ error: 'No tienes permiso para ejecutar auto-match.' }, { status: 403 })
   }
 
   try {

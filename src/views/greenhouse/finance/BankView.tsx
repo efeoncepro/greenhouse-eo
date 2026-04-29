@@ -633,6 +633,22 @@ const BankView = () => {
                                   color={account.isPeriodClosed ? 'success' : 'secondary'}
                                   label={account.isPeriodClosed ? 'Cerrado' : 'Abierto'}
                                 />
+                                {/* TASK-722 — Direct link al workbench si el periodo existe.
+                                    Click stop propagation para no abrir también el drawer detail. */}
+                                {account.reconciliationPeriodId && (
+                                  <Button
+                                    size='small'
+                                    variant='text'
+                                    startIcon={<i className='tabler-arrow-right' style={{ fontSize: 14 }} />}
+                                    onClick={e => {
+                                      e.stopPropagation()
+                                      window.location.href = `/finance/reconciliation/${encodeURIComponent(account.reconciliationPeriodId!)}`
+                                    }}
+                                    sx={{ minWidth: 0, px: 1, py: 0.25, fontSize: '0.7rem', justifyContent: 'flex-start' }}
+                                  >
+                                    Abrir workbench
+                                  </Button>
+                                )}
                               </Stack>
                             </TableCell>
                             <TableCell>{formatDate(data.period.endDate)}</TableCell>

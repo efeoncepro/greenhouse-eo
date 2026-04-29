@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 
 import { withTransaction } from '@/lib/db'
+import { can } from '@/lib/entitlements/runtime'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 import {
   assertReconciliationPeriodIsMutableFromPostgres,
@@ -23,6 +24,11 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  // TASK-722 — granular guard: match es mutación operativa.
+  if (!can(tenant, 'finance.reconciliation.match', 'create', 'space')) {
+    return NextResponse.json({ error: 'No tienes permiso para conciliar movimientos.' }, { status: 403 })
   }
 
   try {

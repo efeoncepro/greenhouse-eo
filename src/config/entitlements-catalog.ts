@@ -154,6 +154,43 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     defaultScope: 'space'
   },
   {
+    // TASK-722 — Read access to reconciliation workbench (list + detail).
+    key: 'finance.reconciliation.read',
+    module: 'finance',
+    actions: ['read'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    // TASK-722 — Match/unmatch/exclude statement rows + auto-match.
+    key: 'finance.reconciliation.match',
+    module: 'finance',
+    actions: ['create', 'update'] as const,
+    defaultScope: 'space'
+  },
+  {
+    // TASK-722 — Import bank statements into a reconciliation period.
+    key: 'finance.reconciliation.import',
+    module: 'finance',
+    actions: ['create'] as const,
+    defaultScope: 'space'
+  },
+  {
+    // TASK-722 — Declare a bank↔Greenhouse snapshot from /finance/bank.
+    // Also gates accept/reconcile of drift snapshots.
+    key: 'finance.reconciliation.declare_snapshot',
+    module: 'finance',
+    actions: ['create', 'update'] as const,
+    defaultScope: 'space'
+  },
+  {
+    // TASK-722 — Close a reconciled period (terminal state).
+    // Restricted: solo finance_admin / efeonce_admin.
+    key: 'finance.reconciliation.close',
+    module: 'finance',
+    actions: ['close'] as const,
+    defaultScope: 'space'
+  },
+  {
     key: 'admin.workspace',
     module: 'admin',
     actions: ['read', 'manage', 'launch'] as const,
