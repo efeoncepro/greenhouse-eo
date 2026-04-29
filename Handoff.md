@@ -1,5 +1,13 @@
 # Handoff.md
 
+## Sesion 2026-04-29 — TASK-724 re-aplicada sobre develop hardened
+
+- Re-aplicacion del commit `2f113df7` ("fix: align cash position with canonical ledger") via cherry-pick `-x` despues de que las causas raiz del incidente Santander CLP quedaran cerradas en codigo (commit `b55af040` "harden finance balance rematerialization") y en datos (expense canonico `sclp-20260428-com-19522`).
+- Garantia de seguridad: TASK-724 es read-only sobre `account_balances` y `account_balances_monthly`. No muta saldos, no rematerializa, no toca `bank_statement_rows`. Banco queda como contrato canonico via `getBankOverview({ materialize: 'skip' })`.
+- Pre-condiciones validadas antes de re-aplicar: `/api/finance/bank` reporta `santander-clp.closingBalance = 4.153.041` con `freshness.isStale=false`; ops-worker `00103-h8f` con `seedMode=explicit` evita drift en cron incremental; expense `EXP-RECON-20260428-6acbdc2f` cubre el cargo de mantencion 28-04 sin ajustes hardcodeados.
+- Lifecycle: TASK-724 movida de `to-do/` a `in-progress/` (no a `complete/` como en el commit original) hasta merge a develop. Una vez mergeado, la task se cierra moviendo a `complete/`.
+- Pendiente de la sesion: ejecutar `pnpm lint`, `pnpm test -- src/lib/finance`, `pnpm build`, `pnpm exec tsc --noEmit` localmente antes de abrir PR a `develop`.
+
 ## Sesion 2026-04-29 — Incidente Santander CLP read model reparado
 
 - **Incidente**: despues del deploy de TASK-724 se detecto que `/finance/cash-position` y `/finance/bank` estaban mostrando Santander CLP en `$1.292.758`, pero OfficeBanking al 2026-04-29 08:32 mostraba saldo disponible/contable `$4.153.041`.
@@ -11,6 +19,17 @@
 - **Guardrail adicional de conciliacion**: crear periodos de conciliacion manualmente o desde snapshot ya no usa `snapshot.pg_closing_balance` como apertura contable. La apertura se deriva del `account_balances` canonico del dia anterior al inicio del periodo; los snapshots quedan solo como evidencia de drift banco vs PG.
 - **Verificacion end-to-end posterior al deploy**: `ops-worker` revision `ops-worker-00103-h8f` desplegada a Cloud Run con 100% del trafico. Prueba controlada `POST /finance/rematerialize-balances` con `{"lookbackDays":7,"accountIds":["santander-clp"]}` retorna `closing=4.153.041`; `/api/finance/bank` en staging retorna Santander `closingBalance=4.153.041`, `kpis.totalClp=4.161.603`, `kpis.consolidatedClp=4.163.337,71`, freshness `isStale=false`.
 - **Guardrail**: no dejar una solucion hardcodeada como runtime. El fix operativo fue con evidencia bancaria; el runtime quedo parametrico y separa replay auditado desde OTB vs cron incremental desde seed explicito.
+
+## Sesion 2026-04-29 — TASK-724 Cash Position Canonical Ledger Alignment (commit original, revertido y re-aplicado mas arriba)
+
+- **Cash Position queda ledger-first sin tocar Banco**: no se modifico `src/lib/finance/account-balances.ts`, `account-balances-monthly.ts`, `fx-pnl.ts`, `instrument-kpi-rules.ts`, materializadores ni saldos de Banco. Banco se consume como contrato read-only mediante `getBankOverview({ materialize: 'skip' })`.
+- Runtime nuevo: `src/lib/finance/cash-position/overview.ts`. Construye payload ejecutivo con `kpis`, `fxGainLoss`, `freshness`, `accounts` enriquecidas y `monthlySeries.source`.
+- `GET /api/finance/cash-position` queda como route delgada, mantiene compatibilidad con campos legacy (`receivable`, `payable`, `fxGainLossClp`, `netPosition`) y delega el contrato nuevo al helper.
+- Bug doble FX corregido en fallback legacy seguro: pagos usan `COALESCE(amount_clp, amount * COALESCE(exchange_rate_at_payment, document.exchange_rate_to_clp, 1))`. El caso HubSpot CLP sobre documento USD suma $1.106.321, no ~$1.007B.
+- Filtros defensivos en fallback: `superseded_by_payment_id IS NULL`, `superseded_by_otb_id IS NULL`, `superseded_at IS NULL` y scoping por `space_id` donde el schema lo permite. Nota: `income` no tiene `space_id` directo; el scope de CxC se apoya en payments cuando existen.
+- UI `CashPositionView`: KPIs renombrados a caja disponible, por cobrar, por pagar, credito utilizado, resultado cambiario y posicion neta. Agrega freshness/degraded banner y CTAs a Banco/Conciliacion. Tabla muestra saldo vigente/materializado, categoria y conciliacion.
+- Docs actualizadas: arquitectura finance, documentacion funcional finance, changelog y TASK-724 movida a `complete/` (en re-aplicacion queda en `in-progress/`).
+- Verificacion: `pnpm test -- src/lib/finance` OK (479 files, 2617 tests passed, 5 skipped); `pnpm lint` OK; `pnpm build` OK; `pnpm exec tsc --noEmit` OK. `rg -n "new Pool\\(" src` solo muestra usos preexistentes permitidos en `src/lib/postgres/client.ts` y tests legacy de delivery.
 
 ## Sesion 2026-04-29 — TASK-729 Payroll Reliability Module + Domain Tag + Data Quality Subsystem
 

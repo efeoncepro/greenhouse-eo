@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.8
+> **Version:** 1.9
 > **Creado:** 2026-04-07 por Claude
-> **Ultima actualizacion:** 2026-04-28 por Claude Opus 4.7 (TASK-706 perfil processor_transit + Previred)
+> **Ultima actualizacion:** 2026-04-29 por Codex (TASK-724 Cash Position ledger-first)
 > **Documentacion tecnica:** [GREENHOUSE_FINANCE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md), [TASK-714](../../tasks/complete/TASK-714-banco-instrument-detail-semantic-drawer.md), [TASK-706](../../tasks/complete/TASK-706-previred-processor-ux-and-bank-semantics.md)
 
 # Modulos de Caja — Cobros, Pagos, Banco, Cuenta Accionista y Posicion de Caja
@@ -18,7 +18,7 @@ Finance separa explícitamente los **documentos comerciales** (facturas de venta
 | **Pagos** | `/finance/cash-out` | Dinero efectivamente pagado |
 | **Banco** | `/finance/bank` | Tesoreria por instrumento: saldo, coverage, discrepancia y cierre |
 | **Cuenta accionista** | `/finance/shareholder-account` | Saldo bilateral entre empresa y accionistas |
-| **Posicion de caja** | `/finance/cash-position` | Saldo real: cobrado menos pagado |
+| **Posicion de caja** | `/finance/cash-position` | Resumen ejecutivo de caja desde Banco, CxC, CxP y FX |
 
 ## Cobros (Cash In)
 
@@ -44,13 +44,18 @@ Finance separa explícitamente los **documentos comerciales** (facturas de venta
 
 ## Posicion de Caja
 
-- Vista de resumen que responde: "cuanto dinero tenemos realmente"
+- Vista de resumen ejecutivo que responde: "cuanta caja disponible tenemos, que compromisos afectan la posicion y que tan fresco esta el ledger"
 - Muestra:
-  - **Posicion neta**: cobros menos pagos del periodo
+  - **Caja disponible**: saldo materializado por Banco en instrumentos que contribuyen a caja
   - **Por cobrar**: facturas emitidas pendientes de cobro
   - **Por pagar**: compromisos pendientes de pago
-  - **Grafico 12 meses**: cobros vs pagos vs flujo neto mensual
-  - **Cuentas bancarias**: listado de cuentas activas con saldo de apertura
+  - **Credito utilizado**: deuda activa en instrumentos tipo tarjeta o liability
+  - **Resultado cambiario**: breakdown canonico desde `fx_pnl_breakdown`
+  - **Posicion neta**: caja disponible + por cobrar - por pagar - credito utilizado
+  - **Grafico 12 meses**: entradas/salidas desde `account_balances_monthly`; si un mes no tiene snapshot, usa fallback seguro con `amount_clp` y lo marca como degradado
+  - **Cuentas e instrumentos**: listado de cuentas activas con saldo vigente, categoria y estado de conciliacion
+- No recalcula saldos de Banco ni dispara materializacion en el request interactivo.
+- Si Banco esta stale, si falta read model mensual o si FX esta degradado, la vista muestra un aviso y linkea al detalle operacional en `/finance/bank` o `/finance/reconciliation`.
 
 ## Banco (Treasury)
 
@@ -176,7 +181,8 @@ Reglas duras:
 - El documento (`Ventas` / `Compras`) es la fuente comercial y tributaria
 - El ledger (`income_payments` / `expense_payments`) es la fuente canonica de caja real
 - Si un documento aparece como pagado o cobrado, debe existir al menos un evento en el ledger correspondiente
-- Los modulos `Cobros`, `Pagos`, `Posicion de caja`, las proyecciones reactivas y los calculos de costos deben leer caja desde ese ledger, no desde un flag embebido en el documento
+- Los modulos `Cobros`, `Pagos`, las proyecciones reactivas y los calculos de costos deben leer caja desde ese ledger, no desde un flag embebido en el documento
+- `Posicion de caja` debe leer saldos, FX, freshness y flujo mensual desde los snapshots/read models de Banco cuando existan; el fallback a payments queda limitado a huecos de read model y debe usar `amount_clp` para evitar doble conversion FX
 
 ## Remediacion historica
 

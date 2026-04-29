@@ -805,7 +805,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-721` | `complete` | Finance evidence canonical uploader (reconciliation + OTB) | `docs/tasks/complete/TASK-721-finance-evidence-canonical-uploader.md` |
 | `TASK-722` | `complete` | Bank Reconciliation Synergy Workbench | `docs/tasks/complete/TASK-722-bank-reconciliation-synergy-workbench.md` |
 | `TASK-723` | `complete` | AI-Assisted Reconciliation Intelligence | `docs/tasks/complete/TASK-723-ai-assisted-reconciliation-intelligence.md` |
-| `TASK-724` | `to-do` | Cash Position Canonical Ledger Alignment | `docs/tasks/to-do/TASK-724-cash-position-canonical-ledger-alignment.md` |
+| `TASK-724` | `in-progress` | Cash Position Canonical Ledger Alignment | `docs/tasks/in-progress/TASK-724-cash-position-canonical-ledger-alignment.md` |
 | `TASK-725` | `to-do` | Finance Fiscal Scope & Legal Entity Foundation | `docs/tasks/to-do/TASK-725-finance-fiscal-scope-legal-entity-foundation.md` |
 | `TASK-726` | `complete` | Finance Movement Feed Foundation | `docs/tasks/complete/TASK-726-finance-movement-feed-foundation.md` |
 | `TASK-727` | `complete` | Internal Role × View Matrix Seed + Supervisor Scope en JWT | `docs/tasks/complete/TASK-727-internal-role-view-seed-and-supervisor-jwt.md` |
