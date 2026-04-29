@@ -42,12 +42,26 @@ describe('FinanceMovementFeed', () => {
   it('renders movement titles, statuses and amounts', () => {
     const { getByLabelText, getByText } = renderWithTheme(
       <FinanceMovementFeed
+        title='Movimientos financieros'
         items={[{ ...items[0], providerId: 'hubspot' }, items[1] as FinanceMovementFeedItem]}
         providerCatalog={FINANCE_MOVEMENT_PROVIDER_CATALOG}
+        summaryItems={[
+          {
+            id: 'pending',
+            label: 'Cola visible',
+            value: '2 movimientos',
+            helper: 'Cobros y pagos sin match',
+            icon: 'tabler-list-search',
+            tone: 'warning'
+          }
+        ]}
+        lastUpdatedLabel='Actualizado 10:32'
         showRunningBalance
       />
     )
 
+    expect(getByText('Cola visible')).toBeInTheDocument()
+    expect(getByText('Actualizado 10:32')).toBeInTheDocument()
     expect(getByText('HubSpot — Marketing Hub Starter + Sales Hub Pro + Service Hub Pro')).toBeInTheDocument()
     expect(getByLabelText('HubSpot')).toBeInTheDocument()
     expect(getByLabelText('Instrumento: Santander Corp.')).toBeInTheDocument()

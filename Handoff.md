@@ -1,5 +1,15 @@
 # Handoff.md
 
+## Sesion 2026-04-29 — TASK-728 Finance Movement Feed Decision Polish
+
+- Se completo TASK-728 en worktree aislado `greenhouse-eo-task-728` para no interferir con TASK-727/Claude en el checkout principal.
+- `/finance/reconciliation` ahora muestra la cola de movimientos por conciliar antes de la tabla de periodos, con summary strip, subtotales por dia, conteos visibles y microinteracciones de fila mas claras.
+- `FinanceMovementFeed` queda mas reusable: soporta `summaryItems`, `lastUpdatedLabel`, `showDayTotals`, headers por dia con subtotal y affordances accesibles para abrir/expandir movimientos.
+- Se corrigio un warning funcional preexistente de TanStack Table: el sorting inicial apuntaba a columna `year`, pero la tabla expone `period`; ahora el accessor tiene `id: 'period'`.
+- Guardrail: cambio UI/read-only. No se tocaron saldos, matching, queries financieras, materializaciones, migraciones ni writes.
+- Verificacion: `pnpm test src/components/greenhouse/finance` OK; `pnpm exec eslint src/components/greenhouse/finance src/views/greenhouse/finance/ReconciliationView.tsx` OK; `pnpm exec tsc --noEmit` OK; `pnpm lint` OK; `pnpm build` OK.
+- QA visual con usuario agente dedicado en `/finance/reconciliation`: desktop y mobile sin overflow horizontal ni errores de consola. Capturas locales: `/tmp/task-728-reconciliation-desktop-final.png` y `/tmp/task-728-reconciliation-mobile-feed-v2.png`.
+
 ## Sesion 2026-04-29 — TASK-727 Internal role × view matrix + Supervisor scope en JWT
 
 - **Bug fix detectado con Daniela Ferreira (Creative Lead, role `efeonce_operations`):** veia "Economia de la agencia" (gestion.economia) que es financiero, y NO veia `/hr/approvals` aunque tiene 3 direct reports en `reporting_lines`.

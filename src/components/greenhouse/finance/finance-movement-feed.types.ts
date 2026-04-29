@@ -48,6 +48,17 @@ export type FinanceMovementDetail = {
   value: ReactNode
 }
 
+export type FinanceMovementFeedSummaryTone = 'primary' | 'success' | 'warning' | 'error' | 'info' | 'secondary'
+
+export type FinanceMovementFeedSummaryItem = {
+  id: string
+  label: string
+  value: ReactNode
+  helper?: ReactNode
+  icon?: string
+  tone?: FinanceMovementFeedSummaryTone
+}
+
 export type FinanceMovementFeedItem = {
   id: string
   date: string | null
@@ -85,6 +96,9 @@ export type FinanceMovementFeedProps = {
   emptyTitle?: string
   emptyDescription?: string
   showRunningBalance?: boolean
+  summaryItems?: FinanceMovementFeedSummaryItem[]
+  lastUpdatedLabel?: string | null
+  showDayTotals?: boolean
   virtualized?: boolean
   virtualizeThreshold?: number
   estimateItemSize?: number

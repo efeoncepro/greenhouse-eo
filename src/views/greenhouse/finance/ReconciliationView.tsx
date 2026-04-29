@@ -39,7 +39,7 @@ import OptionMenu from '@core/components/option-menu'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 import TablePaginationComponent from '@components/TablePaginationComponent'
 import { FINANCE_MOVEMENT_PROVIDER_CATALOG, FinanceMovementFeed, inferFinanceMovementProviderId } from '@/components/greenhouse/finance'
-import type { FinanceMovementFeedItem } from '@/components/greenhouse/finance'
+import type { FinanceMovementFeedItem, FinanceMovementFeedSummaryItem } from '@/components/greenhouse/finance'
 
 import tableStyles from '@core/styles/table.module.css'
 import CreateReconciliationPeriodDrawer from '@views/greenhouse/finance/drawers/CreateReconciliationPeriodDrawer'
@@ -164,9 +164,10 @@ const ReconciliationView = () => {
   const [accountFilter, setAccountFilter] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
   const [fetchErrors, setFetchErrors] = useState<string[]>([])
+  const [lastRefreshedAt, setLastRefreshedAt] = useState<Date | null>(null)
   const [createDrawerOpen, setCreateDrawerOpen] = useState(false)
   const [accountDrawerOpen, setAccountDrawerOpen] = useState(false)
-  const [periodSorting, setPeriodSorting] = useState<SortingState>([{ id: 'year', desc: true }])
+  const [periodSorting, setPeriodSorting] = useState<SortingState>([{ id: 'period', desc: true }])
 
   // TASK-715 — archive period as test
   const [includeArchived, setIncludeArchived] = useState(false)
@@ -268,6 +269,7 @@ const ReconciliationView = () => {
       errors.push(error instanceof Error ? error.message : 'No pudimos cargar la conciliación.')
     } finally {
       setFetchErrors(errors)
+      setLastRefreshedAt(new Date())
       setLoading(false)
     }
   }, [accountFilter, statusFilter, includeArchived])
@@ -399,7 +401,15 @@ const ReconciliationView = () => {
 
    
   const periodColumns: ColumnDef<ReconciliationPeriod, any>[] = [
-    periodColumnHelper.accessor('month', { header: 'Período', cell: ({ row }) => <Typography variant='body2' fontWeight={600}>{MONTH_NAMES[row.original.month]} {row.original.year}</Typography> }),
+    periodColumnHelper.accessor(row => row.year * 100 + row.month, {
+      id: 'period',
+      header: 'Período',
+      cell: ({ row }) => (
+        <Typography variant='body2' fontWeight={600}>
+          {MONTH_NAMES[row.original.month]} {row.original.year}
+        </Typography>
+      )
+    }),
     periodColumnHelper.accessor('accountId', { header: 'Cuenta', cell: ({ getValue }) => <Typography variant='body2'>{accounts.find(a => a.accountId === getValue())?.accountName || getValue()}</Typography> }),
     periodColumnHelper.accessor('openingBalance', { header: 'Saldo apertura', cell: ({ getValue }) => <Typography variant='body2'>{formatCLP(getValue())}</Typography>, meta: { align: 'right' } }),
     periodColumnHelper.accessor('closingBalanceBank', { header: 'Saldo banco', cell: ({ getValue }) => <Typography variant='body2'>{getValue() ? formatCLP(getValue()) : '—'}</Typography>, meta: { align: 'right' } }),
@@ -524,6 +534,58 @@ const ReconciliationView = () => {
       })),
     [pendingMovements]
   )
+
+  const pendingMovementSummaryItems = useMemo<FinanceMovementFeedSummaryItem[]>(() => {
+    const cashOutAmount = pendingMovements
+      .filter(item => item.type === 'pago')
+      .reduce((sum, item) => sum + Math.abs(item.amount), 0)
+
+    const cashInAmount = pendingMovements
+      .filter(item => item.type === 'cobro')
+      .reduce((sum, item) => sum + Math.abs(item.amount), 0)
+
+    const instrumentCount = new Set(pendingMovements.map(item => item.instrumentName).filter(Boolean)).size
+    const missingInstrumentCount = pendingMovements.filter(item => !item.instrumentName).length
+
+    return [
+      {
+        id: 'pending-count',
+        label: 'Cola visible',
+        value: pendingMovementCount === 1 ? '1 movimiento' : `${pendingMovementCount} movimientos`,
+        helper: 'Cobros y pagos sin match',
+        icon: 'tabler-list-search',
+        tone: pendingMovementCount > 0 ? 'warning' : 'success'
+      },
+      {
+        id: 'cash-out',
+        label: 'Pagos en lista',
+        value: formatCLP(cashOutAmount),
+        helper: 'Solo lista visible',
+        icon: 'tabler-arrow-up-right',
+        tone: cashOutAmount > 0 ? 'warning' : 'secondary'
+      },
+      {
+        id: 'cash-in',
+        label: 'Cobros en lista',
+        value: formatCLP(cashInAmount),
+        helper: 'Solo lista visible',
+        icon: 'tabler-arrow-down-left',
+        tone: cashInAmount > 0 ? 'success' : 'secondary'
+      },
+      {
+        id: 'instruments',
+        label: 'Instrumentos',
+        value: `${instrumentCount} reconocidos`,
+        helper: missingInstrumentCount > 0 ? `${missingInstrumentCount} sin instrumento` : 'Catálogo canónico',
+        icon: 'tabler-credit-card',
+        tone: missingInstrumentCount > 0 ? 'info' : 'primary'
+      }
+    ]
+  }, [pendingMovementCount, pendingMovements])
+
+  const lastRefreshedLabel = lastRefreshedAt
+    ? `Actualizado ${lastRefreshedAt.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' })}`
+    : null
 
   const totalDifference = periods
     .filter(p => p.status !== 'reconciled')
@@ -729,6 +791,61 @@ const ReconciliationView = () => {
         </Grid>
       )}
 
+      <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}`, overflow: 'hidden' }}>
+        <Box
+          sx={{
+            px: 4,
+            py: 3,
+            display: 'grid',
+            gridTemplateColumns: { xs: 'auto minmax(0, 1fr)', md: 'auto minmax(0, 1fr) auto' },
+            gap: 2,
+            alignItems: 'center'
+          }}
+        >
+          <Box sx={{ gridRow: { xs: '1 / 2', md: 'auto' } }}>
+            <Avatar variant='rounded' sx={{ bgcolor: 'warning.lightOpacity' }}>
+              <i className='tabler-list-search' style={{ fontSize: 22, color: 'var(--mui-palette-warning-main)' }} />
+            </Avatar>
+          </Box>
+          <Box sx={{ minWidth: 0 }}>
+            <Typography variant='subtitle1' sx={{ fontWeight: 600, color: theme => theme.palette.customColors?.midnight ?? 'text.primary' }}>
+              Movimientos de caja por conciliar
+            </Typography>
+            <Typography variant='body2' sx={{ color: 'text.secondary', mt: 0.25, maxWidth: 820 }}>
+              {pendingMovementCount > 0
+                ? 'Cola operativa de cobros y pagos esperando match bancario. Los totales son solo de esta lista visible.'
+                : 'Sin cobros ni pagos esperando match bancario.'}
+            </Typography>
+          </Box>
+          {lastRefreshedLabel && (
+            <Typography
+              variant='caption'
+              sx={{
+                color: 'text.disabled',
+                gridColumn: { xs: '2 / 3', md: 'auto' },
+                justifySelf: { xs: 'start', md: 'end' },
+                whiteSpace: 'nowrap'
+              }}
+            >
+              {lastRefreshedLabel}
+            </Typography>
+          )}
+        </Box>
+        <Divider />
+        <FinanceMovementFeed
+          embedded
+          items={pendingMovementFeedItems}
+          density='comfortable'
+          showRunningBalance={false}
+          summaryItems={pendingMovementSummaryItems}
+          showDayTotals
+          virtualizeThreshold={80}
+          providerCatalog={FINANCE_MOVEMENT_PROVIDER_CATALOG}
+          emptyTitle='Sin movimientos de caja pendientes'
+          emptyDescription='No hay cobros ni pagos esperando match bancario en este momento.'
+        />
+      </Card>
+
       {/* Table */}
       <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
         <CardHeader
@@ -813,29 +930,6 @@ const ReconciliationView = () => {
           </table>
         </div>
         <TablePaginationComponent table={periodTable as ReturnType<typeof useReactTable>} />
-      </Card>
-
-      <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
-        <CardHeader
-          title='Movimientos de caja por conciliar'
-          subheader={pendingMovementCount > 0 ? `${pendingMovementCount} movimientos de caja sin match bancario` : 'Sin movimientos de caja pendientes'}
-          avatar={
-            <Avatar variant='rounded' sx={{ bgcolor: 'warning.lightOpacity' }}>
-              <i className='tabler-list-search' style={{ fontSize: 22, color: 'var(--mui-palette-warning-main)' }} />
-            </Avatar>
-          }
-        />
-        <Divider />
-        <FinanceMovementFeed
-          embedded
-          items={pendingMovementFeedItems}
-          density='comfortable'
-          showRunningBalance={false}
-          virtualizeThreshold={80}
-          providerCatalog={FINANCE_MOVEMENT_PROVIDER_CATALOG}
-          emptyTitle='Sin movimientos de caja pendientes'
-          emptyDescription='No hay cobros ni pagos esperando match bancario en este momento.'
-        />
       </Card>
 
       <CreateReconciliationPeriodDrawer

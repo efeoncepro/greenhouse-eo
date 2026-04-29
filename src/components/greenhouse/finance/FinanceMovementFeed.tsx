@@ -8,6 +8,7 @@ import Collapse from '@mui/material/Collapse'
 import IconButton from '@mui/material/IconButton'
 import Skeleton from '@mui/material/Skeleton'
 import Stack from '@mui/material/Stack'
+import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 import { alpha } from '@mui/material/styles'
 import { useVirtualizer } from '@tanstack/react-virtual'
@@ -18,7 +19,12 @@ import EmptyState from '@/components/greenhouse/EmptyState'
 import PaymentInstrumentChip from '@/components/greenhouse/PaymentInstrumentChip'
 import { INSTRUMENT_CATEGORIES, type InstrumentCategory } from '@/config/payment-instruments'
 
-import type { FinanceMovementFeedItem, FinanceMovementFeedProps, FinanceMovementVisual } from './finance-movement-feed.types'
+import type {
+  FinanceMovementFeedItem,
+  FinanceMovementFeedProps,
+  FinanceMovementFeedSummaryItem,
+  FinanceMovementVisual
+} from './finance-movement-feed.types'
 import {
   FINANCE_MOVEMENT_STATUS_COLORS,
   formatFinanceMovementAmount,
@@ -29,12 +35,19 @@ import {
 } from './finance-movement-feed.utils'
 
 type FeedEntry =
-  | { type: 'day'; key: string; label: string; count: number }
+  | { type: 'day'; key: string; label: string; count: number; amount: number; currency: string }
   | { type: 'item'; key: string; item: FinanceMovementFeedItem }
 
 const buildFeedEntries = (items: FinanceMovementFeedItem[]): FeedEntry[] =>
   groupFinanceMovementItems(items).flatMap(group => [
-    { type: 'day' as const, key: group.key, label: group.label, count: group.items.length },
+    {
+      type: 'day' as const,
+      key: group.key,
+      label: group.label,
+      count: group.items.length,
+      amount: group.amount,
+      currency: group.currency
+    },
     ...group.items.map(item => ({ type: 'item' as const, key: item.id, item }))
   ])
 
@@ -75,16 +88,101 @@ const MovementVisual = ({ visual, compact }: { visual: FinanceMovementVisual; co
   )
 }
 
-const DayHeader = ({ label, count }: { label: string; count: number }) => (
+const SummaryStrip = ({ items }: { items: FinanceMovementFeedSummaryItem[] }) => {
+  if (!items.length) return null
+
+  return (
+    <Box
+      sx={{
+        px: 4,
+        py: 2.5,
+        borderBottom: theme => `1px solid ${theme.palette.divider}`,
+        bgcolor: theme => alpha(theme.palette.primary.main, 0.018),
+        display: 'grid',
+        gridTemplateColumns: {
+          xs: '1fr',
+          sm: 'repeat(2, minmax(0, 1fr))',
+          lg: `repeat(${Math.min(items.length, 4)}, minmax(0, 1fr))`
+        },
+        gap: 2
+      }}
+    >
+      {items.map(item => (
+        <Box
+          key={item.id}
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 2,
+            minWidth: 0,
+            px: 2,
+            py: 1.5,
+            borderRadius: 1.5,
+            border: theme => `1px solid ${alpha(theme.palette[item.tone ?? 'primary'].main, 0.14)}`,
+            bgcolor: theme => alpha(theme.palette[item.tone ?? 'primary'].main, 0.055)
+          }}
+        >
+          {item.icon && (
+            <Box
+              component='span'
+              aria-hidden='true'
+              sx={{
+                width: 28,
+                height: 28,
+                borderRadius: '50%',
+                flex: '0 0 auto',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: theme => theme.palette[item.tone ?? 'primary'].main,
+                bgcolor: theme => alpha(theme.palette[item.tone ?? 'primary'].main, 0.1)
+              }}
+            >
+              <i className={item.icon} style={{ fontSize: 16 }} />
+            </Box>
+          )}
+          <Box sx={{ minWidth: 0 }}>
+            <Typography variant='caption' sx={{ color: 'text.secondary', display: 'block', lineHeight: 1.2 }}>
+              {item.label}
+            </Typography>
+            <Typography variant='body2' sx={{ color: 'text.primary', fontWeight: 600, lineHeight: 1.25, overflowWrap: 'anywhere' }}>
+              {item.value}
+            </Typography>
+            {item.helper && (
+              <Typography variant='caption' sx={{ color: 'text.disabled', display: 'block', mt: 0.25, overflowWrap: 'anywhere' }}>
+                {item.helper}
+              </Typography>
+            )}
+          </Box>
+        </Box>
+      ))}
+    </Box>
+  )
+}
+
+const DayHeader = ({
+  label,
+  count,
+  amount,
+  currency,
+  showDayTotals
+}: {
+  label: string
+  count: number
+  amount: number
+  currency: string
+  showDayTotals: boolean
+}) => (
   <Box
     sx={{
       px: 4,
       pt: 3,
       pb: 1.5,
       bgcolor: 'background.paper',
-      display: 'flex',
-      justifyContent: 'space-between',
+      display: 'grid',
+      gridTemplateColumns: { xs: '1fr', sm: 'minmax(0, 1fr) auto' },
       gap: 2,
+      alignItems: 'center',
       position: 'sticky',
       top: 0,
       zIndex: 1
@@ -93,9 +191,23 @@ const DayHeader = ({ label, count }: { label: string; count: number }) => (
     <Typography variant='caption' sx={{ color: 'text.secondary', fontWeight: 600 }}>
       {label}
     </Typography>
-    <Typography variant='caption' sx={{ color: 'text.disabled' }}>
-      {count === 1 ? '1 movimiento' : `${count} movimientos`}
-    </Typography>
+    <Stack direction='row' spacing={1.5} useFlexGap sx={{ justifyContent: { xs: 'flex-start', sm: 'flex-end' }, flexWrap: 'wrap' }}>
+      <Typography variant='caption' sx={{ color: 'text.disabled' }}>
+        {count === 1 ? '1 movimiento' : `${count} movimientos`}
+      </Typography>
+      {showDayTotals && (
+        <Typography
+          variant='caption'
+          sx={{
+            color: amount > 0 ? 'success.main' : theme => theme.palette.customColors?.midnight ?? theme.palette.text.primary,
+            fontWeight: 600,
+            fontVariantNumeric: 'tabular-nums'
+          }}
+        >
+          {formatFinanceMovementAmount(amount, currency)}
+        </Typography>
+      )}
+    </Stack>
   </Box>
 )
 
@@ -230,6 +342,8 @@ const MovementRow = ({
   const statusColor = item.status ? FINANCE_MOVEMENT_STATUS_COLORS[item.status] : undefined
   const statusLabel = getFinanceMovementStatusLabel(item)
   const confidenceLabel = item.confidence == null ? null : `${Math.round(item.confidence * 100)}%`
+  const titleId = `finance-movement-title-${item.id}`
+  const metaId = `finance-movement-meta-${item.id}`
 
   const handleSelect = () => {
     if (item.disabled) return
@@ -243,12 +357,13 @@ const MovementRow = ({
         py: compact ? 2 : 3,
         borderTop: theme => `1px solid ${theme.palette.divider}`,
         bgcolor: expanded ? 'action.hover' : 'background.paper',
-        transition: theme => theme.transitions.create(['background-color', 'box-shadow'], { duration: theme.transitions.duration.shortest }),
+        transition: theme => theme.transitions.create(['background-color', 'box-shadow', 'border-color'], { duration: theme.transitions.duration.shortest }),
         '&:hover': {
-          bgcolor: 'action.hover'
+          bgcolor: theme => alpha(theme.palette.primary.main, 0.025),
+          boxShadow: theme => `inset 3px 0 0 ${alpha(theme.palette.primary.main, 0.25)}`
         },
         '&:focus-within': {
-          boxShadow: theme => `inset 0 0 0 1px ${alpha(theme.palette.primary.main, 0.18)}`
+          boxShadow: theme => `inset 3px 0 0 ${alpha(theme.palette.primary.main, 0.5)}, inset 0 0 0 1px ${alpha(theme.palette.primary.main, 0.16)}`
         }
       }}
     >
@@ -256,12 +371,14 @@ const MovementRow = ({
         component={onItemSelect ? ButtonBase : 'div'}
         onClick={onItemSelect ? handleSelect : undefined}
         disabled={item.disabled}
+        aria-labelledby={titleId}
+        aria-describedby={metaId}
         sx={{
           width: '100%',
           display: 'grid',
           gridTemplateColumns: {
             xs: `${compact ? 38 : 44}px minmax(0, 1fr)`,
-            md: `${compact ? 40 : 52}px minmax(0, 1fr) minmax(128px, ${compact ? 164 : 192}px) ${hasDetails ? '32px' : '0px'}`
+            md: `${compact ? 40 : 52}px minmax(0, 1fr) minmax(132px, ${compact ? 164 : 192}px) 32px`
           },
           gap: compact ? 2 : 3,
           alignItems: 'center',
@@ -279,6 +396,7 @@ const MovementRow = ({
         <Box sx={{ minWidth: 0 }}>
           <Typography
             variant='body2'
+            id={titleId}
             sx={{
               color: theme => theme.palette.customColors?.midnight ?? 'text.primary',
               fontWeight: 500,
@@ -289,7 +407,7 @@ const MovementRow = ({
             {item.title}
           </Typography>
 
-          <Stack direction='row' spacing={1} useFlexGap sx={{ mt: 1, flexWrap: 'wrap', alignItems: 'center' }}>
+          <Stack id={metaId} direction='row' spacing={1} useFlexGap sx={{ mt: 1, flexWrap: 'wrap', alignItems: 'center' }}>
             {statusLabel && statusColor && (
               <CustomChip
                 round='true'
@@ -331,24 +449,30 @@ const MovementRow = ({
           )}
         </Box>
 
-        {hasDetails && (
+        <Tooltip title={hasDetails ? (expanded ? 'Ocultar trazabilidad' : 'Ver trazabilidad') : 'Abrir movimiento'} placement='left' arrow>
           <IconButton
             size='small'
-            aria-label={expanded ? 'Ocultar trazabilidad' : 'Ver trazabilidad'}
+            aria-label={hasDetails ? (expanded ? 'Ocultar trazabilidad' : 'Ver trazabilidad') : 'Abrir movimiento'}
             aria-expanded={expanded}
             onClick={event => {
               event.stopPropagation()
-              setExpanded(current => !current)
+              if (hasDetails) setExpanded(current => !current)
+              else handleSelect()
             }}
             sx={{
               display: { xs: 'none', md: 'inline-flex' },
+              color: 'text.disabled',
+              '&:hover': {
+                color: 'primary.main',
+                bgcolor: theme => alpha(theme.palette.primary.main, 0.08)
+              },
               transform: expanded ? 'rotate(90deg)' : 'rotate(0deg)',
               transition: theme => theme.transitions.create('transform', { duration: theme.transitions.duration.shortest })
             }}
           >
             <i className='tabler-chevron-right' />
           </IconButton>
-        )}
+        </Tooltip>
       </Box>
 
       {hasDetails && (
@@ -387,6 +511,9 @@ const FinanceMovementFeed = ({
   emptyTitle = 'Sin movimientos',
   emptyDescription = 'No hay movimientos financieros para mostrar en este momento.',
   showRunningBalance = true,
+  summaryItems = [],
+  lastUpdatedLabel = null,
+  showDayTotals = true,
   virtualized,
   virtualizeThreshold = 80,
   estimateItemSize = 88,
@@ -410,7 +537,17 @@ const FinanceMovementFeed = ({
   })
 
   const renderEntry = (entry: FeedEntry) => {
-    if (entry.type === 'day') return <DayHeader label={entry.label} count={entry.count} />
+    if (entry.type === 'day') {
+      return (
+        <DayHeader
+          label={entry.label}
+          count={entry.count}
+          amount={entry.amount}
+          currency={entry.currency}
+          showDayTotals={showDayTotals}
+        />
+      )
+    }
 
     const visual = resolveFinanceMovementVisual(entry.item, { providerCatalog, paymentProviderCatalog })
 
@@ -437,19 +574,28 @@ const FinanceMovementFeed = ({
       }}
     >
       {(title || subtitle) && (
-        <Box sx={{ px: 4, py: 3, borderBottom: theme => `1px solid ${theme.palette.divider}` }}>
-          {title && (
-            <Typography variant='subtitle1' sx={{ fontWeight: 600 }}>
-              {title}
-            </Typography>
-          )}
-          {subtitle && (
-            <Typography variant='body2' sx={{ color: 'text.secondary', mt: 0.5 }}>
-              {subtitle}
+        <Box sx={{ px: 4, py: 3, borderBottom: theme => `1px solid ${theme.palette.divider}`, display: 'flex', justifyContent: 'space-between', gap: 2, flexWrap: 'wrap' }}>
+          <Box sx={{ minWidth: 0 }}>
+            {title && (
+              <Typography variant='subtitle1' sx={{ fontWeight: 600 }}>
+                {title}
+              </Typography>
+            )}
+            {subtitle && (
+              <Typography variant='body2' sx={{ color: 'text.secondary', mt: 0.5 }}>
+                {subtitle}
+              </Typography>
+            )}
+          </Box>
+          {lastUpdatedLabel && (
+            <Typography variant='caption' sx={{ color: 'text.disabled', alignSelf: 'center' }}>
+              {lastUpdatedLabel}
             </Typography>
           )}
         </Box>
       )}
+
+      <SummaryStrip items={summaryItems} />
 
       {error ? (
         <EmptyState icon='tabler-alert-circle' title='No pudimos cargar los movimientos' description={error} minHeight={220} />
