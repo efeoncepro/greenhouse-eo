@@ -810,3 +810,6 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-726` | `complete` | Finance Movement Feed Foundation | `docs/tasks/complete/TASK-726-finance-movement-feed-foundation.md` |
 | `TASK-727` | `complete` | Internal Role × View Matrix Seed + Supervisor Scope en JWT | `docs/tasks/complete/TASK-727-internal-role-view-seed-and-supervisor-jwt.md` |
 | `TASK-728` | `complete` | Finance Movement Feed Decision Polish | `docs/tasks/complete/TASK-728-finance-movement-feed-decision-polish.md` |
+| `TASK-729` | `to-do` | Payroll Reliability Module + Domain Tag + Data Quality Subsystem | `docs/tasks/to-do/TASK-729-payroll-reliability-module.md` |
+| `TASK-730` | `to-do` | Payroll E2E Smoke Lane (calculate → approve → close) | `docs/tasks/to-do/TASK-730-payroll-e2e-smoke-lane.md` |
+| `TASK-731` | `to-do` | Payroll Pre-Close Validator + Pre-Flight Endpoint | `docs/tasks/to-do/TASK-731-payroll-pre-close-validator.md` |
