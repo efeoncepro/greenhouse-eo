@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 
+import { can } from '@/lib/entitlements/runtime'
 import { reconcileSnapshot } from '@/lib/finance/reconciliation/snapshots'
 import { FinanceValidationError, assertNonEmptyString } from '@/lib/finance/shared'
 import { requireBankTreasuryTenantContext } from '@/lib/tenant/authorization'
@@ -14,6 +15,11 @@ export async function POST(
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  // TASK-722 — granular guard: marcar snapshot como reconciled es match.
+  if (!can(tenant, 'finance.reconciliation.match', 'update', 'space')) {
+    return NextResponse.json({ error: 'No tienes permiso para marcar snapshots como conciliados.' }, { status: 403 })
   }
 
   try {

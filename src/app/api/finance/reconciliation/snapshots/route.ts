@@ -7,6 +7,7 @@ import {
   type DriftStatus
 } from '@/lib/finance/reconciliation/snapshots'
 import { FinanceValidationError, assertNonEmptyString, toNumber } from '@/lib/finance/shared'
+import { can } from '@/lib/entitlements/runtime'
 import { requireBankTreasuryTenantContext } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
@@ -57,6 +58,11 @@ export async function POST(request: Request) {
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  // TASK-722 — granular guard: declarar snapshot.
+  if (!can(tenant, 'finance.reconciliation.declare_snapshot', 'create', 'space')) {
+    return NextResponse.json({ error: 'No tienes permiso para declarar snapshots de conciliación.' }, { status: 403 })
   }
 
   try {

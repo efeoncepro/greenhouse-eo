@@ -1,10 +1,12 @@
 import { NextResponse } from 'next/server'
 
+import { can } from '@/lib/entitlements/runtime'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 import {
   listReconciliationPeriodsFromPostgres,
   createReconciliationPeriodInPostgres
 } from '@/lib/finance/postgres-reconciliation'
+import { listOrphanSnapshotsForPeriod } from '@/lib/finance/reconciliation/full-context'
 import {
   assertNonEmptyString,
   normalizeString,
@@ -26,9 +28,26 @@ export async function GET(request: Request) {
   const status = searchParams.get('status')
   const includeArchived = searchParams.get('includeArchived') === 'true'
 
-  const result = await listReconciliationPeriodsFromPostgres({ accountId, status, includeArchived })
+  // TASK-722 — opcional: include orphan snapshots when (year, month) supplied.
+  // Permite a la UI mostrar "snapshots declarados sin periodo" cuando el queue
+  // de periodos del mes está vacío.
+  const yearParam = searchParams.get('year')
+  const monthParam = searchParams.get('month')
+  const yearNum = yearParam ? Number(yearParam) : null
+  const monthNum = monthParam ? Number(monthParam) : null
+  const wantsOrphans = Number.isInteger(yearNum) && Number.isInteger(monthNum) && monthNum! >= 1 && monthNum! <= 12
 
-  return NextResponse.json(result)
+  const [result, orphanSnapshots] = await Promise.all([
+    listReconciliationPeriodsFromPostgres({ accountId, status, includeArchived }),
+    wantsOrphans
+      ? listOrphanSnapshotsForPeriod(yearNum as number, monthNum as number).catch(() => [])
+      : Promise.resolve([])
+  ])
+
+  return NextResponse.json({
+    ...result,
+    orphanSnapshots
+  })
 }
 
 export async function POST(request: Request) {
@@ -36,6 +55,11 @@ export async function POST(request: Request) {
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  // TASK-722 — granular guard: crear period es declarar conciliación.
+  if (!can(tenant, 'finance.reconciliation.declare_snapshot', 'create', 'space')) {
+    return NextResponse.json({ error: 'No tienes permiso para crear periodos de conciliación.' }, { status: 403 })
   }
 
   try {

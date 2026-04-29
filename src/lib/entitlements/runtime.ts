@@ -284,6 +284,80 @@ export const getTenantEntitlements = (subject: TenantEntitlementSubject): Tenant
     })
   }
 
+  // TASK-722 — Reconciliation workbench capabilities.
+  // Read access: cualquier route_group=finance, finance_admin o efeonce_admin
+  // pueden listar y abrir el workbench.
+  if (
+    hasRouteGroup(subject, 'finance') ||
+    hasRole(subject, ROLE_CODES.FINANCE_ADMIN) ||
+    hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)
+  ) {
+    const source: TenantEntitlementSource = hasRouteGroup(subject, 'finance') ? 'route_group' : 'role'
+
+    addEntitlement(entries, {
+      module: 'finance',
+      capability: 'finance.reconciliation.read',
+      action: 'read',
+      scope: 'tenant',
+      source
+    })
+
+    // Mutaciones operativas (match/import/declare_snapshot): finance route_group
+    // o finance_admin / efeonce_admin pueden ejecutarlas.
+    addEntitlement(entries, {
+      module: 'finance',
+      capability: 'finance.reconciliation.match',
+      action: 'create',
+      scope: 'space',
+      source
+    })
+
+    addEntitlement(entries, {
+      module: 'finance',
+      capability: 'finance.reconciliation.match',
+      action: 'update',
+      scope: 'space',
+      source
+    })
+
+    addEntitlement(entries, {
+      module: 'finance',
+      capability: 'finance.reconciliation.import',
+      action: 'create',
+      scope: 'space',
+      source
+    })
+
+    addEntitlement(entries, {
+      module: 'finance',
+      capability: 'finance.reconciliation.declare_snapshot',
+      action: 'create',
+      scope: 'space',
+      source
+    })
+
+    addEntitlement(entries, {
+      module: 'finance',
+      capability: 'finance.reconciliation.declare_snapshot',
+      action: 'update',
+      scope: 'space',
+      source
+    })
+  }
+
+  // TASK-722 — Cierre de periodo (close): solo finance_admin o efeonce_admin.
+  // Es la acción terminal del workbook; route_group=finance solo (sin admin role)
+  // puede ejecutar match/import/declare_snapshot pero NO close.
+  if (hasRole(subject, ROLE_CODES.FINANCE_ADMIN) || hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
+    addEntitlement(entries, {
+      module: 'finance',
+      capability: 'finance.reconciliation.close',
+      action: 'close',
+      scope: 'space',
+      source: 'role'
+    })
+  }
+
   if (hasRouteGroup(subject, 'admin') || hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
     addEntitlement(entries, {
       module: 'admin',
