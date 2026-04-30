@@ -867,8 +867,8 @@ Implicación para el backlog:
     - `active_otb`: replay auditado desde la OTB activa; uso para re-anchors/backfills historicos controlados
     - `explicit`: replay incremental desde un cierre ya materializado; uso obligatorio para crons rolling como `ops-finance-rematerialize-balances`
   - los crons rolling no deben reemplazar su seed explicito por OTB ni mutar `accounts.opening_balance`; esto evita que una corrida diaria de 7 dias reescriba historia bancaria completa
-  - antes de confirmar una rematerializacion, `account-balance-evidence-guard` compara los cierres recien materializados contra snapshots bancarios `reconciled`; si hay drift fuera de tolerancia, aborta la transaccion antes de escribir saldos dañados
-  - snapshots `open` / `accepted` siguen siendo evidencia operativa pero no hard-blockean el materializador; el bloqueo solo aplica a verdad bancaria reconciliada
+  - antes de confirmar una rematerializacion, `account-balance-evidence-guard` compara los cierres recien materializados contra snapshots protegidos `reconciled` o `accepted`; si hay drift fuera de tolerancia, aborta la transaccion antes de escribir saldos dañados
+  - snapshots `reconciled` representan verdad bancaria/proveedor externo; snapshots `accepted` representan checkpoints operativos aceptados desde saldos ya cuadrados. Ambos bloquean drift futuro sin hardcodear montos en runtime; snapshots `open` siguen siendo evidencia pendiente y no bloquean el materializador
   - projection `accountBalancesProjection` escucha:
     - `finance.income_payment.recorded`
     - `finance.expense_payment.recorded`

@@ -56,6 +56,31 @@ describe('validateAccountBalanceWriteAgainstEvidence', () => {
     })
   })
 
+  it('also protects accepted operator checkpoints from drift', async () => {
+    const client = buildClient([
+      {
+        snapshot_id: 'checkpoint-santander-usd-20260429',
+        account_id: 'santander-usd-usd',
+        drift_status: 'accepted',
+        balance_date: '2026-04-29',
+        bank_closing_balance: '1.94',
+        materialized_closing_balance: '0.00'
+      }
+    ])
+
+    await expect(
+      validateAccountBalanceWriteAgainstEvidence({
+        client,
+        accountId: 'santander-usd-usd',
+        startDate: '2026-04-22',
+        endDate: '2026-04-29'
+      })
+    ).rejects.toMatchObject({
+      code: 'FINANCE_ACCOUNT_BALANCE_EVIDENCE_DRIFT',
+      accountId: 'santander-usd-usd'
+    })
+  })
+
   it('can run in warn-only mode without blocking the caller', async () => {
     const client = buildClient([
       {

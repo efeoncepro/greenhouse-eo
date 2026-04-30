@@ -27,6 +27,7 @@ export interface AccountBalanceEvidenceGuardResult {
 interface EvidenceComparisonRow {
   snapshot_id: string
   account_id: string
+  drift_status: string
   balance_date: string
   bank_closing_balance: string
   materialized_closing_balance: string | null
@@ -45,7 +46,7 @@ export class AccountBalanceEvidenceGuardError extends Error {
 
     super(
       `Blocked account balance rematerialization for ${accountId}: ` +
-        `${violations.length} reconciled bank snapshot(s) would drift. ${sample}`
+        `${violations.length} protected balance evidence snapshot(s) would drift. ${sample}`
     )
 
     this.name = 'AccountBalanceEvidenceGuardError'
@@ -79,10 +80,11 @@ export const validateAccountBalanceWriteAgainstEvidence = async ({
 
   const result = await client.query<EvidenceComparisonRow>(
     `
-      WITH latest_reconciled_evidence AS (
+      WITH latest_protected_evidence AS (
         SELECT DISTINCT ON ((s.snapshot_at::date))
           s.snapshot_id,
           s.account_id,
+          s.drift_status,
           s.snapshot_at::date::text AS balance_date,
           s.bank_closing_balance::text AS bank_closing_balance
         FROM greenhouse_finance.account_reconciliation_snapshots s
@@ -90,17 +92,18 @@ export const validateAccountBalanceWriteAgainstEvidence = async ({
           ON a.account_id = s.account_id
         WHERE s.account_id = $1
           AND a.is_active = TRUE
-          AND s.drift_status = 'reconciled'
+          AND s.drift_status IN ('accepted', 'reconciled')
           AND s.snapshot_at::date BETWEEN $2::date AND $3::date
         ORDER BY (s.snapshot_at::date), s.snapshot_at DESC, s.created_at DESC
       )
       SELECT
         e.snapshot_id,
         e.account_id,
+        e.drift_status,
         e.balance_date,
         e.bank_closing_balance,
         ab.closing_balance::text AS materialized_closing_balance
-      FROM latest_reconciled_evidence e
+      FROM latest_protected_evidence e
       LEFT JOIN greenhouse_finance.account_balances ab
         ON ab.account_id = e.account_id
        AND ab.balance_date = e.balance_date::date
