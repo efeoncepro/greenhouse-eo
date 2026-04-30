@@ -1,6 +1,7 @@
 import 'server-only'
 
 import { getBigQueryClient } from '@/lib/bigquery'
+import { getSantiagoDateParts } from '@/lib/calendar/business-time'
 import {
   buildMetricSelectSQL,
   buildDeliveryPeriodSourceSql,
@@ -30,21 +31,6 @@ export interface AiSignalMaterializationResult {
 }
 
 const AI_MODEL_VERSION = 'ico-ai-core-v1.0.0'
-
-const getCurrentSantiagoDate = () => {
-  const parts = new Intl.DateTimeFormat('en-CA', {
-    timeZone: 'America/Santiago',
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit'
-  }).formatToParts(new Date())
-
-  return {
-    year: Number(parts.find(part => part.type === 'year')?.value ?? '0'),
-    month: Number(parts.find(part => part.type === 'month')?.value ?? '0'),
-    day: Number(parts.find(part => part.type === 'day')?.value ?? '1')
-  }
-}
 
 const serializeSignalPayload = (payloadJson: Record<string, unknown>) => JSON.stringify(payloadJson)
 
@@ -389,6 +375,11 @@ export const materializeAiSignals = async (
   }
 
   const generatedAt = new Date().toISOString()
+  const generatedPeriod = getSantiagoDateParts(generatedAt)
+
+  if (!generatedPeriod) {
+    throw new Error(`ICO AI materialization produced invalid generatedAt timestamp: ${generatedAt}`)
+  }
 
   const historyBySpace = await readHistoricalSnapshots(
     projectId,
@@ -436,9 +427,8 @@ export const materializeAiSignals = async (
   )
 
   const predictionLogsWritten = await replacePredictionLogs(projectId, predictionLogs)
-  const currentPeriod = getCurrentSantiagoDate()
 
-  await hydratePredictionActuals(projectId, currentPeriod.year, currentPeriod.month)
+  await hydratePredictionActuals(projectId, generatedPeriod.year, generatedPeriod.month)
 
   return {
     aiSignalsWritten,

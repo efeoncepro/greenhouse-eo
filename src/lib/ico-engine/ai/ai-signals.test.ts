@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { detectAiAnomalies } from '@/lib/ico-engine/ai/anomaly-detector'
 import { evaluateAiEligibility } from '@/lib/ico-engine/ai/eligibility'
@@ -52,6 +52,10 @@ const buildSnapshot = ({
 })
 
 describe('AI ICO signals', () => {
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
   it('marks a space as AI eligible when rolling completed tasks clears the threshold', () => {
     const result = evaluateAiEligibility([
       buildSnapshot({ periodYear: 2026, periodMonth: 4, otdPct: 90, completedTasks: 16 }),
@@ -105,6 +109,9 @@ describe('AI ICO signals', () => {
   })
 
   it('projects end-of-month OTD only for the active Santiago period', () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date('2026-04-30T23:00:00.000Z'))
+
     const currentSnapshot = buildSnapshot({
       periodYear: 2026,
       periodMonth: 4,
@@ -142,5 +149,39 @@ describe('AI ICO signals', () => {
     expect(result.predictionSignals[0].predictedValue).toBeLessThan(72)
     expect(result.predictionSignals[0].confidence).toBeGreaterThan(0)
     expect(result.predictionLogs[0].metricName).toBe('otd_pct')
+  })
+
+  it('skips prediction when generatedAt falls outside the snapshot month even if host clock matches', () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date('2026-04-04T12:00:00.000Z'))
+
+    const currentSnapshot = buildSnapshot({
+      periodYear: 2026,
+      periodMonth: 4,
+      otdPct: 72,
+      completedTasks: 18,
+      onTimeCount: 13,
+      lateDropCount: 3,
+      overdueCount: 2
+    })
+
+    const historyRows = [
+      buildSnapshot({ periodYear: 2025, periodMonth: 10, otdPct: 80 }),
+      buildSnapshot({ periodYear: 2025, periodMonth: 11, otdPct: 79 }),
+      buildSnapshot({ periodYear: 2025, periodMonth: 12, otdPct: 78 }),
+      buildSnapshot({ periodYear: 2026, periodMonth: 1, otdPct: 77 }),
+      buildSnapshot({ periodYear: 2026, periodMonth: 2, otdPct: 76 }),
+      buildSnapshot({ periodYear: 2026, periodMonth: 3, otdPct: 75 })
+    ]
+
+    const result = buildAiPredictions({
+      currentSnapshots: [currentSnapshot],
+      historyBySpace: new Map([[currentSnapshot.space_id, historyRows]]),
+      generatedAt: '2026-05-04T12:00:00.000Z',
+      modelVersion: 'ico-ai-core-v1'
+    })
+
+    expect(result.predictionSignals).toHaveLength(0)
+    expect(result.predictionLogs).toHaveLength(0)
   })
 })

@@ -1,5 +1,7 @@
 import 'server-only'
 
+import { getMonthProgressRatio } from '@/lib/calendar/business-time'
+
 import { buildMetricValuesFromRow } from '../read-metrics'
 import { toNullableNumber, toNumber } from '../shared'
 
@@ -26,23 +28,6 @@ const SUPPORTED_PREDICTION_METRICS: SupportedPredictionMetric[] = [
   { metricName: 'ftr_pct', rowMetricId: 'ftr_pct', direction: 'lower_is_worse', clamp: [0, 100] }
 ]
 
-const DAY_FORMATTER = new Intl.DateTimeFormat('en-CA', {
-  timeZone: 'America/Santiago',
-  year: 'numeric',
-  month: '2-digit',
-  day: '2-digit'
-})
-
-const getSantiagoDateParts = () => {
-  const parts = DAY_FORMATTER.formatToParts(new Date())
-
-  return {
-    year: Number(parts.find(part => part.type === 'year')?.value ?? '0'),
-    month: Number(parts.find(part => part.type === 'month')?.value ?? '0'),
-    day: Number(parts.find(part => part.type === 'day')?.value ?? '1')
-  }
-}
-
 const clampValue = (value: number, clamp?: [number, number]) => {
   if (!clamp) return value
 
@@ -62,18 +47,6 @@ const computeSlope = (values: number[]) => {
   if (denominator === 0) return 0
 
   return numerator / denominator
-}
-
-const getProgressRatio = (periodYear: number, periodMonth: number) => {
-  const today = getSantiagoDateParts()
-
-  if (today.year !== periodYear || today.month !== periodMonth) {
-    return null
-  }
-
-  const totalDaysInMonth = new Date(Date.UTC(periodYear, periodMonth, 0)).getUTCDate()
-
-  return Math.min(1, Math.max(0.05, today.day / totalDaysInMonth))
 }
 
 const getRowPeriodKey = (row: AiMetricSnapshotRow) => toNumber(row.period_year) * 100 + toNumber(row.period_month)
@@ -98,7 +71,12 @@ export const buildAiPredictions = ({
   for (const snapshot of currentSnapshots) {
     const periodYear = toNumber(snapshot.period_year)
     const periodMonth = toNumber(snapshot.period_month)
-    const progressRatio = getProgressRatio(periodYear, periodMonth)
+
+    const progressRatio = getMonthProgressRatio({
+      periodYear,
+      periodMonth,
+      at: generatedAt
+    })
 
     if (progressRatio === null) {
       continue
