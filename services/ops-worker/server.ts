@@ -884,7 +884,10 @@ const handleFinanceRematerializeBalances = async (req: IncomingMessage, res: Ser
       }>(
         `SELECT
            s.snapshot_at::date::text AS balance_date,
-           s.bank_closing_balance::text AS closing_balance,
+           CASE
+             WHEN s.drift_status = 'accepted' THEN s.pg_closing_balance
+             ELSE s.bank_closing_balance
+           END::text AS closing_balance,
            s.snapshot_id,
            s.drift_status
          FROM greenhouse_finance.account_reconciliation_snapshots s

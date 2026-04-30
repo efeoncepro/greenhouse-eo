@@ -30,6 +30,7 @@ interface EvidenceComparisonRow {
   drift_status: string
   balance_date: string
   bank_closing_balance: string
+  pg_closing_balance: string
   materialized_closing_balance: string | null
 }
 
@@ -86,7 +87,8 @@ export const validateAccountBalanceWriteAgainstEvidence = async ({
           s.account_id,
           s.drift_status,
           s.snapshot_at::date::text AS balance_date,
-          s.bank_closing_balance::text AS bank_closing_balance
+          s.bank_closing_balance::text AS bank_closing_balance,
+          s.pg_closing_balance::text AS pg_closing_balance
         FROM greenhouse_finance.account_reconciliation_snapshots s
         JOIN greenhouse_finance.accounts a
           ON a.account_id = s.account_id
@@ -102,6 +104,7 @@ export const validateAccountBalanceWriteAgainstEvidence = async ({
         e.drift_status,
         e.balance_date,
         e.bank_closing_balance,
+        e.pg_closing_balance,
         ab.closing_balance::text AS materialized_closing_balance
       FROM latest_protected_evidence e
       LEFT JOIN greenhouse_finance.account_balances ab
@@ -115,13 +118,17 @@ export const validateAccountBalanceWriteAgainstEvidence = async ({
   const violations = result.rows.flatMap(row => {
     const bankClosingBalance = roundCurrency(toNumber(row.bank_closing_balance))
 
+    const expectedClosingBalance = roundCurrency(
+      toNumber(row.drift_status === 'accepted' ? row.pg_closing_balance : row.bank_closing_balance)
+    )
+
     const materializedClosingBalance = row.materialized_closing_balance == null
       ? null
       : roundCurrency(toNumber(row.materialized_closing_balance))
 
     const driftAmount = materializedClosingBalance == null
-      ? bankClosingBalance
-      : roundCurrency(materializedClosingBalance - bankClosingBalance)
+      ? expectedClosingBalance
+      : roundCurrency(materializedClosingBalance - expectedClosingBalance)
 
     if (Math.abs(driftAmount) <= tolerance) {
       return []

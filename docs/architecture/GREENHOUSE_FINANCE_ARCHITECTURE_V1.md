@@ -869,7 +869,7 @@ Implicación para el backlog:
   - los crons rolling no deben reemplazar su seed explicito por OTB ni mutar `accounts.opening_balance`; esto evita que una corrida diaria de 7 dias reescriba historia bancaria completa
   - si existe un snapshot protegido `reconciled`/`accepted` dentro del lookback, el cron rolling lo usa como seed efectivo y preserva la fila diaria de ese checkpoint; solo reconstruye fechas posteriores para no pisar saldos ya cuadrados
   - antes de confirmar una rematerializacion, `account-balance-evidence-guard` compara los cierres recien materializados contra snapshots protegidos `reconciled` o `accepted`; si hay drift fuera de tolerancia, aborta la transaccion antes de escribir saldos dañados
-  - snapshots `reconciled` representan verdad bancaria/proveedor externo; snapshots `accepted` representan checkpoints operativos aceptados desde saldos ya cuadrados. Ambos bloquean drift futuro sin hardcodear montos en runtime; snapshots `open` siguen siendo evidencia pendiente y no bloquean el materializador
+  - snapshots `reconciled` representan verdad bancaria/proveedor externo y bloquean contra `bank_closing_balance`; snapshots `accepted` representan checkpoints operativos aceptados y bloquean contra `pg_closing_balance`, preservando cualquier drift banco-vs-PG visible como pendiente/aceptado. Ambos bloquean drift futuro sin hardcodear montos en runtime; snapshots `open` siguen siendo evidencia pendiente y no bloquean el materializador
   - projection `accountBalancesProjection` escucha:
     - `finance.income_payment.recorded`
     - `finance.expense_payment.recorded`

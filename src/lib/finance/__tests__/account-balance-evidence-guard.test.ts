@@ -63,7 +63,8 @@ describe('validateAccountBalanceWriteAgainstEvidence', () => {
         account_id: 'santander-usd-usd',
         drift_status: 'accepted',
         balance_date: '2026-04-29',
-        bank_closing_balance: '1.94',
+        bank_closing_balance: '100.00',
+        pg_closing_balance: '1.94',
         materialized_closing_balance: '0.00'
       }
     ])
