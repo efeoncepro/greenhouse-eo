@@ -821,3 +821,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-737` | `to-do` | `notion-bq-sync` Hardening Contract & Absorption Readiness | `docs/tasks/to-do/TASK-737-notion-bq-sync-hardening-contract-and-absorption-readiness.md` |
 | `TASK-738` | `to-do` | Portal Notion SDK Migration | `docs/tasks/to-do/TASK-738-portal-notion-sdk-migration.md` |
 | `TASK-739` | `to-do` | Notion API Modernization Readiness | `docs/tasks/to-do/TASK-739-notion-api-modernization-readiness.md` |
+| `TASK-740` | `to-do` | Critical Metrics Change Safety Harness | `docs/tasks/to-do/TASK-740-critical-metrics-change-safety-harness.md` |

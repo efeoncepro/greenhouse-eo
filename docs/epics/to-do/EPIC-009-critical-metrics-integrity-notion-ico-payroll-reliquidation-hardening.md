@@ -55,6 +55,7 @@ Eso vuelve este programa más amplio que una sola task: mezcla payroll safety, f
 
 ## Child Tasks
 
+- `TASK-740` — safety harness previo: invariantes, golden datasets, replay, contract tests y rollout/rollback
 - `TASK-732` — payroll safety gate + KPI provenance durable para cálculo oficial y re-liquidación
 - `TASK-733` — true freeze de snapshots ICO + reproducibilidad histórica para payroll/reliquidación
 - `TASK-734` — hardening de materialización ICO: concurrencia, atomicidad, idempotencia y aislamiento AI
@@ -98,3 +99,7 @@ Eso vuelve este programa más amplio que una sola task: mezcla payroll safety, f
 ## Delta 2026-04-30
 
 Epic creado después de contrastar tres auditorías cross-domain con verificación adicional en codebase y Cloud SQL. La decisión rectora queda explícita: primero integridad crítica de métricas y reliquidación; después SDK y modernización de API Notion.
+
+## Delta 2026-04-30 — Wave 0
+
+Se agrega `TASK-740` como prerrequisito operativo del epic. Antes de tocar `TASK-732/733/734`, Greenhouse debe contar con un safety harness explícito: invariantes, golden datasets, replay procedure, contract checks y rollout/rollback plan.
