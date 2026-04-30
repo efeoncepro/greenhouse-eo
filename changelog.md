@@ -2,6 +2,11 @@
 
 ## 2026-04-30
 
+- Se revalidó en Cloud SQL el supuesto de reliquidación payroll: `payroll_period_reopen_audit` existe y hay entries `version > 1`, confirmando que `ICO -> Payroll -> Reliquidación` ya es un carril crítico vivo y no solo un diseño.
+- Se actualizó [docs/audits/ico/ICO_ENGINE_AUDIT_2026-04-30.md](docs/audits/ico/ICO_ENGINE_AUDIT_2026-04-30.md) con delta de verificación codebase + database, incluyendo el gap actual de provenance KPI en `payroll_entries` (solo `kpi_data_source` materializado).
+- Se creó [EPIC-009](docs/epics/to-do/EPIC-009-critical-metrics-integrity-notion-ico-payroll-reliquidation-hardening.md) para coordinar el blindaje del carril crítico `Notion -> notion_ops -> conformed -> ICO -> Payroll -> Reliquidación`.
+- Se agregaron las tasks [TASK-732](docs/tasks/to-do/TASK-732-payroll-ico-safety-gate-and-kpi-provenance.md) a [TASK-739](docs/tasks/to-do/TASK-739-notion-api-modernization-readiness.md), ordenando la ejecución en tres ondas: payroll/ICO integrity first, hardening del pipeline Notion después, SDK/API modernization al final.
+
 ### 2026-04-30 — Notion pipeline audit documentation lane
 
 - Se crea la nueva categoria documental `docs/audits/` para versionar auditorias tecnicas y operativas fuera de `tasks/`.

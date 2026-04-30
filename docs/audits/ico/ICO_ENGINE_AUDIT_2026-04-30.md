@@ -218,6 +218,52 @@ Severity: Medium-High
 
 Se encontraron dos problemas distintos:
 
+## Delta 2026-04-30 — Verificación adicional codebase + database
+
+Después de la auditoría inicial se revalidó el supuesto de que **Payroll ya tiene re-liquidación activa** y de que eso cambia la criticidad del puente `ICO -> Payroll`.
+
+Confirmado en codebase:
+
+- existe foundation explícita de reapertura y re-liquidación en:
+  - `src/lib/payroll/reopen-period.ts`
+  - `src/lib/payroll/supersede-entry.ts`
+  - `src/views/greenhouse/payroll/ReopenPeriodDialog.tsx`
+  - `src/views/greenhouse/payroll/ReliquidationBadge.tsx`
+  - `src/views/greenhouse/payroll/EntryVersionHistoryDrawer.tsx`
+- la lógica actual no pisa la v1 in-place: al recalcular en período `reopened`, supersede la entry previa y crea versión nueva vinculada por `reopen_audit_id`
+- ya existe backlog y lineage específico de re-liquidación:
+  - `TASK-409`
+  - `TASK-410`
+  - `TASK-411`
+  - `TASK-412`
+  - `TASK-414`
+
+Confirmado en database, tras renovar `gcloud auth` + `ADC` y volver a correr `pnpm pg:doctor`:
+
+- Cloud SQL runtime accesible como `greenhouse_app` sobre `efeonce-group:us-east4:greenhouse-pg-dev`
+- existe `greenhouse_payroll.payroll_period_reopen_audit`
+- existe al menos **1 reopen audit real**
+- existen al menos **4 payroll entries con `version > 1`**
+- el período `2026-03` aparece como caso real de reapertura histórica
+
+Hallazgo adicional importante de schema vivo:
+
+- en `greenhouse_payroll.payroll_entries` hoy solo está materializado `kpi_data_source`
+- **no** aparecen todavía columnas ricas de provenance como:
+  - `kpi_source_mode`
+  - `kpi_confidence`
+  - `kpi_suppression_reason`
+  - `kpi_snapshot_month`
+
+Conclusión reforzada:
+
+- la re-liquidación **sí afecta directamente** esta conversación
+- el mayor riesgo no es todavía el SDK de Notion
+- la prioridad correcta sigue siendo:
+  1. safety gate `ICO -> payroll`
+  2. freeze/reproducibilidad histórica para payroll + re-liquidación
+  3. hardening del engine y del pipeline Notion upstream
+
 - fallback con join inválido `member_id = space_id`
 - cálculo ejecutivo con `average of averages` sobre spaces, no ponderado por task volume
 

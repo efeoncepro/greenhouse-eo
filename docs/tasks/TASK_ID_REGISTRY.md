@@ -813,3 +813,11 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-729` | `complete` | Payroll Reliability Module + Domain Tag + Data Quality Subsystem | `docs/tasks/complete/TASK-729-payroll-reliability-module.md` |
 | `TASK-730` | `to-do` | Payroll E2E Smoke Lane (calculate → approve → close) | `docs/tasks/to-do/TASK-730-payroll-e2e-smoke-lane.md` |
 | `TASK-731` | `to-do` | Payroll Pre-Close Validator + Pre-Flight Endpoint | `docs/tasks/to-do/TASK-731-payroll-pre-close-validator.md` |
+| `TASK-732` | `to-do` | Payroll ICO Safety Gate + KPI Provenance for Liquidación y Reliquidación | `docs/tasks/to-do/TASK-732-payroll-ico-safety-gate-and-kpi-provenance.md` |
+| `TASK-733` | `to-do` | ICO Locked Snapshot Immutability + Reliquidación Reproducibility | `docs/tasks/to-do/TASK-733-ico-locked-snapshot-immutability-and-reliquidation-reproducibility.md` |
+| `TASK-734` | `to-do` | ICO Materialization Concurrency, Idempotency & AI Isolation Hardening | `docs/tasks/to-do/TASK-734-ico-materialization-concurrency-idempotency-and-ai-isolation.md` |
+| `TASK-735` | `to-do` | ICO Consumer Boundary & Scoped Read Surface Convergence | `docs/tasks/to-do/TASK-735-ico-consumer-boundary-and-scoped-read-surface-convergence.md` |
+| `TASK-736` | `to-do` | Greenhouse Consumption Hardening for `notion-bq-sync` | `docs/tasks/to-do/TASK-736-greenhouse-notion-bq-sync-consumption-hardening.md` |
+| `TASK-737` | `to-do` | `notion-bq-sync` Hardening Contract & Absorption Readiness | `docs/tasks/to-do/TASK-737-notion-bq-sync-hardening-contract-and-absorption-readiness.md` |
+| `TASK-738` | `to-do` | Portal Notion SDK Migration | `docs/tasks/to-do/TASK-738-portal-notion-sdk-migration.md` |
+| `TASK-739` | `to-do` | Notion API Modernization Readiness | `docs/tasks/to-do/TASK-739-notion-api-modernization-readiness.md` |

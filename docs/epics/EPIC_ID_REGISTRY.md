@@ -22,7 +22,8 @@ Registro canónico de asignación de IDs `EPIC-###` para evitar colisiones y ren
 | `EPIC-006` | `to-do` | `docs/epics/to-do/EPIC-006-ico-signals-operational-memory-platform.md` |
 | `EPIC-007` | `to-do` | `docs/epics/to-do/EPIC-007-reliability-control-plane.md` |
 | `EPIC-008` | `to-do` | `docs/epics/to-do/EPIC-008-organization-workspace-convergence-facet-entitlements.md` |
+| `EPIC-009` | `to-do` | `docs/epics/to-do/EPIC-009-critical-metrics-integrity-notion-ico-payroll-reliquidation-hardening.md` |
 
 ## Siguiente ID disponible
 
-- `EPIC-009`
+- `EPIC-010`
