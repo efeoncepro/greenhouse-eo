@@ -1,5 +1,22 @@
 # Handoff.md
 
+## Sesion 2026-04-30 — Fix robusto para predicciones ICO dependientes del reloj del runner
+
+- **Incidente**: el `CI` de `main` para el commit `fd2dd75e` quedó rojo en el run `25154300079` por `src/lib/ico-engine/ai/ai-signals.test.ts`, caso `projects end-of-month OTD only for the active Santiago period`.
+- **Causa raíz real**: `buildAiPredictions()` calculaba el `progressRatio` con `new Date()` en timezone `America/Santiago`, ignorando el `generatedAt` que ya recibe como input. El mismo snapshot histórico podía producir predicciones distintas según el día real del runner.
+- **Riesgo de producto**: no era solo un test frágil. El contrato de replay/reproducibilidad del carril `ICO` quedaba acoplado al reloj del host, exactamente el tipo de drift que `TASK-740` debe blindar para `ICO -> Payroll -> Reliquidación`.
+- **Fix aplicado**:
+  - helper reusable nuevo `src/lib/calendar/business-time.ts` con `getDatePartsInTimeZone`, `getSantiagoDateParts` y `getMonthProgressRatio`
+  - `src/lib/ico-engine/ai/predictor.ts` ahora deriva el `progressRatio` desde `generatedAt`, no desde `new Date()`
+  - `src/lib/ico-engine/ai/materialize-ai-signals.ts` reutiliza el mismo contexto temporal explícito para `hydratePredictionActuals()`, evitando que una corrida use dos “ahoras” distintos
+  - `src/lib/ico-engine/ai/ai-signals.test.ts` quedó endurecido con reloj falso (`vi.useFakeTimers`) para fijar la regresión: prueba que manda `generatedAt`, no el clock del runner
+- **Validación local**:
+  - `pnpm vitest run src/lib/ico-engine/ai/ai-signals.test.ts --reporter=verbose` OK
+  - `pnpm exec eslint src/lib/calendar/business-time.ts src/lib/ico-engine/ai/predictor.ts src/lib/ico-engine/ai/materialize-ai-signals.ts src/lib/ico-engine/ai/ai-signals.test.ts` OK
+  - `pnpm exec tsc --noEmit` OK
+  - `pnpm test` OK (`479` files, `2620` tests verdes, `5` skipped)
+- **Nota operativa**: `pnpm build` dentro de la worktree aislada falla por limitación de Turbopack con `node_modules` symlinkado fuera del filesystem root de la worktree, no por el fix (`Symlink node_modules is invalid`). La build de release debe revalidarse en un checkout con `node_modules` nativo antes de empujar a `develop/main`.
+
 ## Sesion 2026-04-29 — Incidente Santander CLP read model reparado
 
 - **Incidente**: despues del deploy de TASK-724 se detecto que `/finance/cash-position` y `/finance/bank` estaban mostrando Santander CLP en `$1.292.758`, pero OfficeBanking al 2026-04-29 08:32 mostraba saldo disponible/contable `$4.153.041`.

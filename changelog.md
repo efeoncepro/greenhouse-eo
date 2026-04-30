@@ -2,6 +2,9 @@
 
 ## 2026-04-30
 
+- ICO Engine AI predictions ahora derivan el progreso del mes desde `generatedAt` en timezone `America/Santiago`, no desde el reloj implícito del runner. Esto vuelve reproducibles las predicciones end-of-month y evita drift entre replays, materializaciones y CI.
+- Se agregó `src/lib/calendar/business-time.ts` como helper reusable para contexto temporal de negocio, y la materialización AI de ICO ahora reutiliza el mismo contexto temporal explícito tanto para construir predicciones como para hidratar actuals del período vigente.
+
 - Se revalidó en Cloud SQL el supuesto de reliquidación payroll: `payroll_period_reopen_audit` existe y hay entries `version > 1`, confirmando que `ICO -> Payroll -> Reliquidación` ya es un carril crítico vivo y no solo un diseño.
 - Se actualizó [docs/audits/ico/ICO_ENGINE_AUDIT_2026-04-30.md](docs/audits/ico/ICO_ENGINE_AUDIT_2026-04-30.md) con delta de verificación codebase + database, incluyendo el gap actual de provenance KPI en `payroll_entries` (solo `kpi_data_source` materializado).
 - Se creó [EPIC-009](docs/epics/to-do/EPIC-009-critical-metrics-integrity-notion-ico-payroll-reliquidation-hardening.md) para coordinar el blindaje del carril crítico `Notion -> notion_ops -> conformed -> ICO -> Payroll -> Reliquidación`.
