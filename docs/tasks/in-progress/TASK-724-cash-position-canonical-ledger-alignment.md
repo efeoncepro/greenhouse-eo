@@ -8,13 +8,13 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `optional`
-- Status real: `Diseno`
+- Status real: `Re-aplicada 2026-04-29 sobre develop hardened (commit b55af040 cerro causas raiz del incidente Santander CLP). Implementacion via cherry-pick del commit 2f113df7. En PR validation pendiente de merge a develop.`
 - Rank: `TBD`
 - Domain: `finance`
 - Blocked by: `none`
@@ -393,6 +393,25 @@ Task creada tras investigar staging + DB + codebase sin cambios runtime:
 - Consulta directa a Postgres mostro que el total legacy-safe usando `ep.amount_clp` es `11124408.67`.
 - El principal outlier fue `exp-pay-sha-46679051-7ba82530` / `EXP-SHA-46679051` HubSpot: pago CLP de `$1.106.321` sobre gasto USD, inflado por doble FX a `$1.007.363.090`.
 - `/api/finance/bank?year=2026&month=4` mostro saldos instrument-aware sanos y muy distintos, confirmando divergencia arquitectonica.
+
+## Delta 2026-04-29b — Audit correction before implementation
+
+Discovery de implementacion confirmo dos correcciones obligatorias antes de tocar runtime:
+
+- **Banco queda fuera de cambios de calculo.** `cash-position` puede consumir `getBankOverview({ materialize: 'skip' })`, `account_balances_monthly`, `fx_pnl_breakdown` y freshness existentes, pero no debe modificar `src/lib/finance/account-balances.ts`, materializadores, reglas KPI ni saldos de Banco. Banco ya esta cuadrado y se trata como contrato read-only para esta task.
+- `superseded_by_otb_id` existe en `income_payments` / `expense_payments`, pero el contrato vigente posterior a TASK-703b corrige que OTB cascade sea principalmente ledger-only (`settlement_legs` + pruning de `account_balances`). En payments, el filtro `superseded_by_otb_id IS NULL` se mantiene solo como defensa/compatibilidad legacy junto con `superseded_by_payment_id IS NULL` y `superseded_at IS NULL`; no se debe disenar nueva logica asumiendo que OTB supersede payments como path normal.
+- `docs/architecture/schema-snapshot-baseline.sql` esta stale para esta zona de finance ledger. Para TASK-724, la referencia efectiva de runtime es `src/types/db.d.ts` + migraciones recientes (`TASK-699`, `TASK-705`, `TASK-708`).
+
+## Delta 2026-04-29c — Implementation closed
+
+Implementacion cerrada sin tocar Banco:
+
+- Nuevo helper `src/lib/finance/cash-position/overview.ts` arma el payload de Posicion de caja desde `getBankOverview({ materialize: 'skip' })`, `account_balances_monthly` y fallback legacy seguro.
+- `GET /api/finance/cash-position` queda como route delgada y mantiene campos legacy de compatibilidad.
+- `CashPositionView` muestra semantica nueva: caja disponible, por cobrar, por pagar, credito utilizado, resultado cambiario y posicion neta.
+- El grafico mensual lee read model cuando existe y marca `legacy_safe_fallback` cuando falta snapshot mensual.
+- Tests nuevos cubren pago CLP sobre documento USD, fallback de tipo de cambio, ventana rolling y filtros superseded/space en fallback.
+- Verificacion: `pnpm test -- src/lib/finance`, `pnpm lint`, `pnpm build`, `pnpm exec tsc --noEmit`.
 
 ## Open Questions
 
