@@ -630,7 +630,7 @@ Refs: TASK-696, branch `task/TASK-696-smart-home-v2-enterprise` (4 commits).
 
 ### 2026-04-26 — Greenhouse Deep Link Platform architecture
 
-Nueva spec canonica `docs/architecture/GREENHOUSE_DEEP_LINK_PLATFORM_V1.md`: formaliza deep links como referencias semanticas access-aware, con resolver central objetivo para web, email, Teams, mobile, public share, API y MCP. El contrato exige declarar `viewCode` y `requiredCapabilities` cuando apliquen, evitando seguir repartiendo strings de URL en menus, notificaciones, emails, search y cards. Implementacion registrada como `TASK-694` en `docs/tasks/to-do/TASK-694-deep-link-platform-foundation.md`.
+Nueva spec canonica `docs/architecture/GREENHOUSE_DEEP_LINK_PLATFORM_V1.md`: formaliza deep links como referencias semanticas access-aware, con resolver central objetivo para web, email, Teams, mobile, public share, API y MCP. El contrato exige declarar `viewCode` y `requiredCapabilities` cuando apliquen, evitando seguir repartiendo strings de URL en menus, notificaciones, emails, search y cards. Implementacion registrada como `TASK-694` en `docs/tasks/complete/TASK-694-deep-link-platform-foundation.md`.
 
 ### 2026-04-26 — TASK-690 Notification Hub Architecture Contract + sinergia con TASK-671
 

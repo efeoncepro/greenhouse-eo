@@ -20,6 +20,7 @@ Documentacion oficial de la plataforma Greenhouse. Cada documento describe como 
 
 - [API Platform Ecosystem](plataforma/api-platform-ecosystem.md) — nueva lane ecosystem-facing de APIs machine-to-machine: cómo funciona hoy, qué expone, cómo convive con `/api/integrations/v1/*` y cuál es el camino correcto de hardening sin romper consumers actuales
 - [Platform Health API](plataforma/platform-health-api.md) — contrato `platform-health.v1` para preflight programático de agentes (MCP, Teams bot, CI): estado global, safe modes determinísticos, fuentes consultadas, recomendaciones accionables, redacción agresiva de secretos
+- [Deep Link Platform](plataforma/deep-link-platform.md) — capa compartida para resolver referencias semánticas a links canónicos, URLs absolutas por ambiente, fallback y metadata de acceso sin repartir strings de ruta por todo el portal
 - [Capa de Contexto Estructurado](plataforma/capa-contexto-estructurado.md) — memoria estructurada sidecar para payloads normalizados, auditoría, replay operativo y trabajo asistido por agentes sin reemplazar la verdad relacional
 - [Mi Perfil](plataforma/mi-perfil.md) — vista personal del colaborador: datos de identidad, equipos, proyectos, colegas y actividad reciente
 - [Sister Platform Bindings](plataforma/sister-platform-bindings.md) — enlace formal entre scopes externos de apps hermanas y scopes internos de Greenhouse

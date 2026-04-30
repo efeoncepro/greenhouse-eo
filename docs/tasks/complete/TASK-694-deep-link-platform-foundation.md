@@ -8,13 +8,13 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `none`
-- Status real: `Diseno`
+- Status real: `Implementado en develop — 2026-04-30`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none`
@@ -98,7 +98,7 @@ Reglas obligatorias:
 - `src/app/api/admin/teams/test/route.ts`
 - `src/lib/webhooks/consumers/notification-mapping.ts` (solo si se elige como proof consumer)
 - `docs/architecture/GREENHOUSE_DEEP_LINK_PLATFORM_V1.md` (delta menor si el runtime cambia el contrato)
-- `docs/tasks/to-do/TASK-694-deep-link-platform-foundation.md`
+- `docs/tasks/complete/TASK-694-deep-link-platform-foundation.md`
 - `Handoff.md`
 - `changelog.md`
 

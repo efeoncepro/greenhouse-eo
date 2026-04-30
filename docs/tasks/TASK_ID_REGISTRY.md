@@ -769,7 +769,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-691` | `to-do` | Notification Hub Shadow Mode | `docs/tasks/to-do/TASK-691-notification-hub-shadow-mode.md` |
 | `TASK-692` | `to-do` | Notification Hub Cutover | `docs/tasks/to-do/TASK-692-notification-hub-cutover.md` |
 | `TASK-693` | `to-do` | Notification Hub Bidireccional + UI Preferences + Mentions | `docs/tasks/to-do/TASK-693-notification-hub-bidirectional-ui.md` |
-| `TASK-694` | `to-do` | Deep Link Platform Foundation | `docs/tasks/to-do/TASK-694-deep-link-platform-foundation.md` |
+| `TASK-694` | `complete` | Deep Link Platform Foundation | `docs/tasks/complete/TASK-694-deep-link-platform-foundation.md` |
 | `TASK-695` | `to-do` | Nexa Insights via Notification Hub (Teams + In-App + Email) | `docs/tasks/to-do/TASK-695-nexa-insights-teams-delivery.md` |
 | `TASK-696` | `in-progress` | Smart Home v2 (Enterprise-grade redesign — registry + contract + observability + 7 blocks) | `docs/tasks/in-progress/TASK-696-smart-home-v2-enterprise.md` |
 | `TASK-697` | `complete` | Payment Instrument Admin Workspace Enterprise | `docs/tasks/complete/TASK-697-payment-instrument-admin-workspace-enterprise.md` |
