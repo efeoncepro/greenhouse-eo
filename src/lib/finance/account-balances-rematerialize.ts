@@ -56,6 +56,12 @@ export interface RematerializeAccountInput {
    */
   seedMode?: 'active_otb' | 'explicit'
   /**
+   * Rolling jobs can resume from an already materialized protected checkpoint.
+   * When true and the seed row exists, the seed day is not deleted/reinserted;
+   * only later days are rebuilt from that closing balance.
+   */
+  preserveSeedRow?: boolean
+  /**
    * Protects reconciled bank truth. By default, rematerialization aborts before
    * commit when a reconciled bank snapshot would drift from the newly
    * materialized closing balance.
@@ -161,6 +167,22 @@ const insertSeedRow = async (
   )
 }
 
+const getExistingSeedClosing = async (
+  client: PoolClient,
+  accountId: string,
+  seedDate: string
+): Promise<number | null> => {
+  const result = await client.query<{ closing_balance: string }>(
+    `SELECT closing_balance::text
+     FROM greenhouse_finance.account_balances
+     WHERE account_id = $1
+       AND balance_date = $2::date`,
+    [accountId, seedDate]
+  )
+
+  return result.rows.length > 0 ? Number(result.rows[0].closing_balance) : null
+}
+
 export const rematerializeAccountBalanceRange = async (
   input: RematerializeAccountInput
 ): Promise<RematerializeAccountResult> => {
@@ -191,17 +213,31 @@ export const rematerializeAccountBalanceRange = async (
       )
     }
 
-    // Delete only non-closed snapshots in the range; insert seed
+    const existingSeedClosing = input.preserveSeedRow
+      ? await getExistingSeedClosing(client, input.accountId, seedDate)
+      : null
+
+    if (input.preserveSeedRow && existingSeedClosing != null && Math.abs(existingSeedClosing - openingBalance) > 0.01) {
+      throw new Error(
+        `Protected seed row for ${input.accountId} on ${seedDate} closes at ${existingSeedClosing}, ` +
+          `but requested opening is ${openingBalance}. Refusing to rematerialize across a mismatched checkpoint.`
+      )
+    }
+
+    // Delete only non-closed snapshots in the range. If the caller resumes from
+    // a protected seed row, preserve that row and rebuild only future dates.
     await client.query(
       `DELETE FROM greenhouse_finance.account_balances
        WHERE account_id = $1
-         AND balance_date >= $2::date
+         AND balance_date ${input.preserveSeedRow && existingSeedClosing != null ? '>' : '>='} $2::date
          AND balance_date <= $3::date
          AND is_period_closed = FALSE`,
       [input.accountId, seedDate, endDate]
     )
 
-    await insertSeedRow(client, input.accountId, seedDate, openingBalance)
+    if (!input.preserveSeedRow || existingSeedClosing == null) {
+      await insertSeedRow(client, input.accountId, seedDate, openingBalance)
+    }
 
     if (seedMode === 'active_otb') {
       // Update accounts.opening_balance + opening_balance_date as a cache so

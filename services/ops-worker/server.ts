@@ -876,31 +876,62 @@ const handleFinanceRematerializeBalances = async (req: IncomingMessage, res: Ser
     const results: Array<{ accountId: string; days: number; closing: number }> = []
 
     for (const acct of accounts) {
-      // Use the previous day's closing as the seed for this rematerialize
-      const seedRow = await runGreenhousePostgresQuery<{ closing_balance: string }>(
-        `SELECT closing_balance::text
-         FROM greenhouse_finance.account_balances
-         WHERE account_id = $1 AND balance_date <= $2::date
-         ORDER BY balance_date DESC LIMIT 1`,
-        [acct.account_id, seedDate]
+      const protectedSeed = await runGreenhousePostgresQuery<{
+        balance_date: string
+        closing_balance: string
+        snapshot_id: string
+        drift_status: string
+      }>(
+        `SELECT
+           s.snapshot_at::date::text AS balance_date,
+           s.bank_closing_balance::text AS closing_balance,
+           s.snapshot_id,
+           s.drift_status
+         FROM greenhouse_finance.account_reconciliation_snapshots s
+         WHERE s.account_id = $1
+           AND s.drift_status IN ('accepted', 'reconciled')
+           AND s.snapshot_at::date BETWEEN $2::date AND $3::date
+         ORDER BY s.snapshot_at DESC, s.created_at DESC
+         LIMIT 1`,
+        [acct.account_id, seedDate, endDate]
       )
 
-      const opening = seedRow.length > 0 ? Number(seedRow[0].closing_balance) : Number(acct.opening_balance ?? 0)
+      let effectiveSeedDate = seedDate
+      let opening: number
+      let preserveSeedRow = false
+
+      if (protectedSeed.length > 0) {
+        effectiveSeedDate = protectedSeed[0].balance_date
+        opening = Number(protectedSeed[0].closing_balance)
+        preserveSeedRow = true
+      } else {
+        // Use the previous day's closing as the seed for this rematerialize.
+        const seedRow = await runGreenhousePostgresQuery<{ closing_balance: string }>(
+          `SELECT closing_balance::text
+           FROM greenhouse_finance.account_balances
+           WHERE account_id = $1 AND balance_date <= $2::date
+           ORDER BY balance_date DESC LIMIT 1`,
+          [acct.account_id, seedDate]
+        )
+
+        opening = seedRow.length > 0 ? Number(seedRow[0].closing_balance) : Number(acct.opening_balance ?? 0)
+      }
 
       try {
         const r = await rematerializeAccountBalanceRange({
           accountId: acct.account_id,
-          seedDate,
+          seedDate: effectiveSeedDate,
           openingBalance: opening,
           endDate,
-          seedMode: 'explicit'
+          seedMode: 'explicit',
+          preserveSeedRow
         })
 
         results.push({ accountId: r.accountId, days: r.daysMaterialized, closing: r.finalClosingBalance })
 
         // TASK-705 — refresh monthly read model para todos los meses tocados.
         // Idempotente; cada (accountId, year, month) resulta en UPSERT atomico.
-        const startD = new Date(`${seedDate}T00:00:00Z`)
+        const startD = new Date(`${r.seedDate}T00:00:00Z`)
         const endD = new Date(`${endDate}T00:00:00Z`)
         const startYM = startD.getUTCFullYear() * 12 + startD.getUTCMonth()
         const endYM = endD.getUTCFullYear() * 12 + endD.getUTCMonth()
