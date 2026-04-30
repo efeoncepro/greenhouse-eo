@@ -3,6 +3,11 @@ import type { PoolClient } from 'pg'
 import { runGreenhousePostgresQuery, withGreenhousePostgresTransaction } from '@/lib/postgres/client'
 
 import { materializeAccountBalance } from './account-balances'
+import {
+  validateAccountBalanceWriteAgainstEvidence,
+  type AccountBalanceEvidenceGuardOptions,
+  type AccountBalanceEvidenceGuardResult
+} from './account-balance-evidence-guard'
 import { getActiveOpeningTrialBalance } from './account-opening-trial-balance'
 
 /**
@@ -50,6 +55,12 @@ export interface RematerializeAccountInput {
    * cron can accidentally widen a 7-day refresh into a full OTB replay.
    */
   seedMode?: 'active_otb' | 'explicit'
+  /**
+   * Protects reconciled bank truth. By default, rematerialization aborts before
+   * commit when a reconciled bank snapshot would drift from the newly
+   * materialized closing balance.
+   */
+  evidenceGuard?: AccountBalanceEvidenceGuardOptions
 }
 
 export interface RematerializeAccountResult {
@@ -60,6 +71,7 @@ export interface RematerializeAccountResult {
   finalClosingBalance: number
   daysMaterialized: number
   closedDaysSkipped: number
+  evidenceGuard: AccountBalanceEvidenceGuardResult
 }
 
 const ymd = (d: Date): string => {
@@ -223,6 +235,14 @@ export const rematerializeAccountBalanceRange = async (
 
     const finalClosingBalance = lastResult ? Number(lastResult.closingBalance) : openingBalance
 
+    const evidenceGuard = await validateAccountBalanceWriteAgainstEvidence({
+      client,
+      accountId: input.accountId,
+      startDate: seedDate,
+      endDate,
+      options: input.evidenceGuard
+    })
+
     return {
       accountId: input.accountId,
       seedDate,
@@ -230,7 +250,8 @@ export const rematerializeAccountBalanceRange = async (
       openingBalance,
       finalClosingBalance,
       daysMaterialized,
-      closedDaysSkipped: closedDays.length
+      closedDaysSkipped: closedDays.length,
+      evidenceGuard
     }
   })
 }
