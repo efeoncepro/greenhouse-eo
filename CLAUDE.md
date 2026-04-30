@@ -82,6 +82,7 @@ Regla: módulos de dominio extienden estos objetos, no crean identidades paralel
 - `docs/architecture/` — specs de arquitectura canónicas (30+ documentos)
 - `docs/documentation/` — documentación funcional de la plataforma en lenguaje simple, organizada por dominio (identity, finance, hr, etc.). Cada documento enlaza a su spec técnica en `docs/architecture/`
 - `docs/manual-de-uso/` — manuales prácticos por dominio para usar capacidades concretas del portal paso a paso, con permisos, cuidados y troubleshooting
+- `docs/audits/` — auditorías técnicas y operativas reutilizables. Úsalas frecuentemente cuando trabajes una zona auditada, pero antes de confiar en ellas verifica si sus hallazgos siguen vigentes o si el sistema requiere una auditoría nueva/refresh.
 - `docs/operations/` — modelos operativos (documentación, GitHub Project, data model, repo ecosystem)
 - Fuente canónica para higiene y rotación segura de secretos:
   - `docs/operations/GREENHOUSE_CLOUD_GOVERNANCE_OPERATING_MODEL_V1.md`

@@ -106,6 +106,16 @@ Indice maestro de la documentacion no operativa del repo.
 - [RESEARCH-006-delivery-task-member-attribution.md](research/RESEARCH-006-delivery-task-member-attribution.md)
 - [RESEARCH-007-commercial-public-tenders-module.md](research/RESEARCH-007-commercial-public-tenders-module.md)
 
+### Audits
+
+- [Audits Index](audits/README.md)
+- Regla de uso: las auditorias deben consumirse frecuentemente cuando el trabajo toque esa zona, pero siempre revalidando si sus hallazgos siguen vigentes o si hace falta una auditoria nueva/refresh.
+- [ICO Audits](audits/ico/README.md)
+- [ICO_ENGINE_AUDIT_2026-04-30.md](audits/ico/ICO_ENGINE_AUDIT_2026-04-30.md)
+- [Notion Audits](audits/notion/README.md)
+- [NOTION_BQ_SYNC_AUDIT_2026-04-30.md](audits/notion/notion-bq-sync/NOTION_BQ_SYNC_AUDIT_2026-04-30.md)
+- [GREENHOUSE_CONSUMPTION_AUDIT_2026-04-30.md](audits/notion/notion-bq-sync/GREENHOUSE_CONSUMPTION_AUDIT_2026-04-30.md)
+
 ### Operations
 
 - [Issue Tracker](issues/README.md)

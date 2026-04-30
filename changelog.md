@@ -1,5 +1,17 @@
 # changelog.md
 
+## 2026-04-30
+
+### 2026-04-30 — Notion pipeline audit documentation lane
+
+- Se crea la nueva categoria documental `docs/audits/` para versionar auditorias tecnicas y operativas fuera de `tasks/`.
+- Primer slice publicado: `docs/audits/notion/notion-bq-sync/NOTION_BQ_SYNC_AUDIT_2026-04-30.md`.
+- Segundo slice publicado: `docs/audits/notion/notion-bq-sync/GREENHOUSE_CONSUMPTION_AUDIT_2026-04-30.md`, enfocado en como `greenhouse-eo` consume el pipeline en admin, governance, observabilidad y el carril hacia `ICO`.
+- Se agrega la categoria `ICO` dentro de `docs/audits/` con `docs/audits/ico/ICO_ENGINE_AUDIT_2026-04-30.md`, que audita materialización, consumers, blast radius y el puente crítico `ICO -> Payroll`.
+- `AGENTS.md`, `CLAUDE.md`, `project_context.md`, `docs/README.md`, `docs/audits/README.md` y `docs/operations/DOCUMENTATION_OPERATING_MODEL_V1.md` ahora formalizan `docs/audits/` como categoría canónica y dejan explícito que toda auditoría debe revalidarse antes de asumirse vigente.
+- La auditoria consolida riesgos de seguridad, consistencia multi-tenant, deuda legacy Notion, posture operativa y acople critico con `greenhouse-eo` / `ICO`.
+- `docs/README.md` ahora enlaza explicitamente la nueva categoria `Audits`.
+
 ## 2026-04-29
 
 ### 2026-04-29 — TASK-729 Payroll Reliability Module + Domain Tag + Data Quality Subsystem

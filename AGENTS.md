@@ -13,6 +13,8 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
 - Convencion documental vigente:
   - `README.md`, `AGENTS.md`, `CONTRIBUTING.md`, `project_context.md`, `Handoff.md`, `Handoff.archive.md` y `changelog.md` quedan en raiz.
   - specs, tasks, roadmap y guias especializadas viven bajo `docs/`.
+  - `docs/audits/` vive bajo `docs/` como categoria formal para auditorias tecnicas y operativas versionadas. El indice vigente es `docs/audits/README.md`.
+  - las auditorias deben consumirse como input operativo frecuente cuando un cambio toca el sistema auditado, pero nunca asumirse vigentes a ciegas: antes de apoyarse en una auditoria hay que verificar si el runtime, el codigo o la arquitectura siguen reflejando lo que documento, o si hace falta abrir una auditoria nueva/refresh.
   - `docs/epics/` se ordena operativamente en `in-progress/`, `to-do/` y `complete/`; el indice vigente es `docs/epics/README.md`.
   - los epics nuevos deben usar ID estable `EPIC-###` y `docs/epics/EPIC_TEMPLATE.md`; sirven para programas cross-domain o multi-task y no reemplazan la ejecucion por tasks.
   - `docs/mini-tasks/` se ordena operativamente en `in-progress/`, `to-do/` y `complete/`; el indice vigente es `docs/mini-tasks/README.md`.
@@ -37,6 +39,7 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
 - Usar `Handoff.archive.md` solo si hace falta rastrear contexto historico; no como primera lectura operativa.
 - Leer la especificacion externa `../Greenhouse_Portal_Spec_v1.md` cuando el cambio afecte producto, autenticacion, data, rutas principales o arquitectura.
 - Si el trabajo requiere specs o briefs, buscarlos primero en `docs/README.md` y luego en la categoria correspondiente dentro de `docs/`.
+- Si existe una auditoria relevante en `docs/audits/` para la zona que vas a tocar, leerla temprano y usarla como contexto operativo; antes de confiar en sus conclusiones, validar si sus hallazgos siguen vigentes en el codebase/runtime actual.
 - Si el trabajo nace de una task del sistema (`TASK-###` nueva o `CODEX_TASK_*` legacy), revisar obligatoriamente la arquitectura antes de implementar:
   - minimo: `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md` y `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
   - ademas: toda arquitectura especializada que aplique al task, por ejemplo identidad, finance, service modules o multitenancy
@@ -131,6 +134,7 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
 - Actualizar `project_context.md` cuando cambie arquitectura, stack, rutas clave, decisiones o restricciones.
 - Actualizar `docs/documentation/` cuando cambie comportamiento funcional de un modulo. Cada dominio tiene su subcarpeta (identity, finance, hr, etc.). Si un documento del dominio afectado existe, actualizarlo. Si no existe y el cambio es significativo, crearlo. El indice vive en `docs/documentation/README.md`.
 - Actualizar `docs/manual-de-uso/` cuando una capacidad visible requiera instrucciones de uso practico. Cada dominio tiene su subcarpeta (finance, identity, hr, etc.). Si existe un manual de la capacidad, actualizarlo; si no existe y el flujo tiene pasos, permisos, estados, riesgos o troubleshooting, crearlo. El indice vive en `docs/manual-de-uso/README.md`.
+- Actualizar `docs/audits/` cuando se produzca una auditoria tecnica/operativa reusable, especialmente si descubre riesgos sistemicos, contratos frágiles o decisiones de priorizacion cross-domain. Las auditorias no reemplazan arquitectura ni tasks: documentan el estado observado en una fecha.
 - No usar estos documentos como dumping ground. Deben quedar legibles.
 - Usar `docs/operations/DOCUMENTATION_OPERATING_MODEL_V1.md` para evitar duplicacion: una fuente canonica por tema y deltas breves en el resto.
 - La politica canonica de release channels y changelog client-facing vive en `docs/operations/RELEASE_CHANNELS_OPERATING_MODEL_V1.md`.
@@ -139,6 +143,7 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
   - `docs/architecture/` — contratos tecnicos para agentes y desarrolladores (schemas, APIs, decisiones de diseno)
   - `docs/documentation/` — explicaciones funcionales en lenguaje simple (roles, flujos, reglas de negocio). Cada documento enlaza a su spec tecnica
   - `docs/manual-de-uso/` — guias operativas paso a paso para usuarios del portal (como usar, permisos, cuidados, troubleshooting)
+  - `docs/audits/` — auditorias tecnicas y operativas reutilizables, fechadas y acotadas por scope. Se consumen frecuentemente como contexto para decisiones, pero siempre deben revalidarse contra el estado actual antes de tratarlas como vigentes.
   - `docs/operations/` — modelos operativos del repo y del equipo (documentacion, GitHub Project, release channels)
 - Las skills locales tambien tienen contrato documental:
   - `AGENTS.md` y `CLAUDE.md` dejan la regla operativa corta

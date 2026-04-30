@@ -1,3 +1,18 @@
+## Delta 2026-04-30 Audits Folder Now Has Canonical Operating Status
+
+- `docs/audits/` ya es una categoria documental formal del repo.
+- Su propósito es versionar auditorias tecnicas y operativas reutilizables sobre sistemas, pipelines, contracts y runtime slices.
+- Regla operativa nueva:
+  - las auditorias deben consumirse frecuentemente como contexto cuando un trabajo toca la zona auditada
+  - ninguna auditoria debe tratarse como vigente a ciegas
+  - antes de apoyarse en una auditoria, hay que verificar si el codebase, el runtime y la arquitectura actual siguen reflejando sus hallazgos
+  - si el sistema cambio de forma material o la auditoria ya no es suficientemente confiable, debe abrirse una auditoria nueva o un refresh versionado
+- Fuentes canonicas de esta convención:
+  - `AGENTS.md`
+  - `CLAUDE.md`
+  - `docs/audits/README.md`
+  - `docs/operations/DOCUMENTATION_OPERATING_MODEL_V1.md`
+
 ## Delta 2026-04-28 Greenhouse Domains And Modules Architecture V1
 
 - Nueva arquitectura canonica: `docs/architecture/GREENHOUSE_DOMAINS_MODULES_ARCHITECTURE_V1.md`.

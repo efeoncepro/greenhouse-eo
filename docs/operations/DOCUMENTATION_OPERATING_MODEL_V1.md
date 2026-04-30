@@ -23,6 +23,7 @@ Cada cambio debe documentarse, pero no cada documento debe repetir la historia c
 - La taxonomia vigente es:
   - `docs/architecture/`
   - `docs/api/`
+  - `docs/audits/`
   - `docs/changelog/`
   - `docs/epics/`
   - `docs/mini-tasks/`
@@ -65,6 +66,19 @@ Cada cambio debe documentarse, pero no cada documento debe repetir la historia c
   - `docs/ui/SKY_TENANT_EXECUTIVE_SLICE_V1.md`
 - Deben contener contrato y decisiones de su dominio, no repetir contexto general del repo.
 
+### 5.1. Auditorias tecnicas y operativas
+- `docs/audits/`
+- Aqui viven auditorias reutilizables, fechadas y versionadas sobre sistemas, pipelines, contracts o runtime slices.
+- Una auditoria captura el estado observado en una fecha y debe incluir scope, conclusiones y riesgos.
+- Regla de consumo:
+  - deben usarse frecuentemente como contexto cuando el trabajo toque la zona auditada
+  - no deben asumirse vigentes a ciegas
+  - antes de apoyarse en una auditoria, verificar si el runtime, el codebase y la arquitectura siguen reflejando sus hallazgos
+  - si la auditoria ya no representa con seguridad el estado actual, abrir una auditoria nueva o un refresh versionado
+- Regla de compresion:
+  - la auditoria no reemplaza arquitectura, tasks, issues ni runbooks
+  - documenta el estado observado y puede servir para priorizar o abrir tasks/issues derivados
+
 ### 6. Changelog curado
 - `docs/changelog/CLIENT_CHANGELOG.md`
 - Aqui vive el changelog client-facing del producto.
@@ -88,6 +102,7 @@ Cuando un cambio toque varios documentos:
 
 ### README
 - una linea de estado si cambia stack, enfoque o referencia principal
+- si cambia la taxonomia documental o aparece una auditoria relevante nueva, enlazarla desde `docs/README.md`
 
 ### project_context
 - que tecnologia o libreria se activo
@@ -117,6 +132,19 @@ La documentacion debe:
 - evitar explicar el mismo cambio con redacciones distintas en 4 archivos
 
 Si un documento ya tiene suficiente contexto y otro solo necesita continuidad, enlazar o mencionar, no reescribir.
+
+## Regla para auditorias
+
+- Las auditorias deben ser:
+  - fechadas
+  - acotadas por scope
+  - reutilizables por otros agentes
+  - explicitas sobre si describen codigo, runtime, docs o todos los planos
+- Una auditoria sirve como input operativo frecuente, pero no como verdad permanente.
+- Si un agente va a usar una auditoria para justificar una decision importante, debe revalidar al menos:
+  - que los archivos o contratos citados sigan existiendo
+  - que no haya una decision arquitectonica posterior que la contradiga
+  - que el runtime no haya cambiado de forma material desde la fecha de la auditoria
 
 ## Regla para hygiene de secretos
 
