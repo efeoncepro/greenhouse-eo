@@ -94,6 +94,90 @@ export const createGreenhouseMcpServer = (
     async args => handlers.getIntegrationReadiness(args)
   )
 
+  server.registerTool(
+    'get_platform_health',
+    {
+      title: 'Get Platform Health',
+      description:
+        'Read the ecosystem-facing platform health snapshot for the configured scope, including overall status, safe modes, degraded sources and recommended checks.',
+      inputSchema: {},
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async () => handlers.getPlatformHealth()
+  )
+
+  server.registerTool(
+    'list_event_types',
+    {
+      title: 'List Event Types',
+      description: 'List event types exposed by the ecosystem-facing webhook control plane.',
+      inputSchema: {
+        search: z.string().trim().min(1).optional(),
+        namespace: z.string().trim().min(1).optional(),
+        aggregateType: z.string().trim().min(1).optional()
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.listEventTypes(args)
+  )
+
+  server.registerTool(
+    'list_webhook_subscriptions',
+    {
+      title: 'List Webhook Subscriptions',
+      description: 'List webhook subscriptions owned by the configured consumer and binding scope.',
+      inputSchema: {
+        page: z.number().int().positive().optional(),
+        pageSize: z.number().int().positive().max(100).optional(),
+        active: z.boolean().optional()
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.listWebhookSubscriptions(args)
+  )
+
+  server.registerTool(
+    'get_webhook_subscription',
+    {
+      title: 'Get Webhook Subscription',
+      description: 'Load one webhook subscription detail by subscription ID within the configured scope.',
+      inputSchema: {
+        id: z.string().trim().min(1)
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.getWebhookSubscription(args)
+  )
+
+  server.registerTool(
+    'list_webhook_deliveries',
+    {
+      title: 'List Webhook Deliveries',
+      description: 'List webhook deliveries owned by the configured consumer and binding scope.',
+      inputSchema: {
+        page: z.number().int().positive().optional(),
+        pageSize: z.number().int().positive().max(100).optional(),
+        status: z.string().trim().min(1).optional(),
+        eventType: z.string().trim().min(1).optional()
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.listWebhookDeliveries(args)
+  )
+
+  server.registerTool(
+    'get_webhook_delivery',
+    {
+      title: 'Get Webhook Delivery',
+      description: 'Load one webhook delivery detail by delivery ID within the configured scope.',
+      inputSchema: {
+        id: z.string().trim().min(1)
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.getWebhookDelivery(args)
+  )
+
   return server
 }
 

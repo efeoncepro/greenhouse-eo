@@ -1,9 +1,9 @@
 # API Platform Ecosystem
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-04-25 por Codex (TASK-616 follow-up)
-> **Ultima actualizacion:** 2026-04-30 por Codex (TASK-647 MCP read-only runtime V1)
+> **Ultima actualizacion:** 2026-04-30 por Codex (TASK-647 read-only follow-ups: health + event plane reads)
 > **Documentacion tecnica:** [GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md)
 
 ---
@@ -61,13 +61,22 @@ Hoy ese MCP base ya existe como runtime local en:
 - `scripts/run-greenhouse-mcp.ts`
 - `pnpm mcp:greenhouse`
 
-La V1 expone cinco tools read-only:
+La base inicial expone cinco tools read-only:
 
 - `get_context`
 - `list_organizations`
 - `get_organization`
 - `list_capabilities`
 - `get_integration_readiness`
+
+Y hoy ya suma extensiones read-only downstream sobre el mismo cliente:
+
+- `get_platform_health`
+- `list_event_types`
+- `list_webhook_subscriptions`
+- `get_webhook_subscription`
+- `list_webhook_deliveries`
+- `get_webhook_delivery`
 
 ## Como funciona hoy
 
@@ -90,7 +99,7 @@ Ademas, ya existe una extension downstream inmediata:
 
 - `GET /api/platform/ecosystem/health`
 
-`health` ya esta disponible como contrato ecosystem-facing, pero no necesita inflar la surface minima del MCP read-only V1. Puede agregarse como tool hermana (`get_platform_health`) sobre el mismo cliente downstream cuando convenga.
+`health` ya esta disponible como contrato ecosystem-facing y hoy ya puede exponerse por MCP como `get_platform_health` sobre el mismo cliente downstream.
 
 También expone el plano de control de eventos:
 
@@ -102,6 +111,16 @@ También expone el plano de control de eventos:
 - `GET /api/platform/ecosystem/webhook-deliveries`
 - `GET /api/platform/ecosystem/webhook-deliveries/:id`
 - `POST /api/platform/ecosystem/webhook-deliveries/:id/retry`
+
+El MCP actual solo consume la parte read-only de ese plano de control:
+
+- `list_event_types`
+- `list_webhook_subscriptions`
+- `get_webhook_subscription`
+- `list_webhook_deliveries`
+- `get_webhook_delivery`
+
+Los commands (`create`, `update`, `retry`) siguen fuera del scope MCP actual hasta cerrar una historia más fuerte de write safety e idempotencia.
 
 Todos funcionan con el mismo patrón:
 

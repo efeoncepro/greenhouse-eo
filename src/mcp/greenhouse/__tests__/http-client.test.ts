@@ -9,7 +9,8 @@ const config: GreenhouseMcpConfig = {
   consumerToken: 'secret-token',
   externalScopeType: 'organization',
   externalScopeId: 'org_123',
-  apiVersion: '2026-04-25'
+  apiVersion: '2026-04-25',
+  requestTimeoutMs: 15000
 }
 
 describe('GreenhouseApiPlatformClient', () => {
@@ -84,5 +85,70 @@ describe('GreenhouseApiPlatformClient', () => {
       requestId: 'req-403',
       apiVersion: '2026-04-25'
     } satisfies Partial<GreenhouseMcpApiError>)
+  })
+
+  it('calls platform health and event control plane routes through the same scoped client', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            requestId: 'req-health',
+            servedAt: '2026-04-30T12:00:00.000Z',
+            version: '2026-04-25',
+            data: {
+              contractVersion: 'platform-health.v1',
+              overallStatus: 'healthy'
+            },
+            meta: {}
+          }),
+          {
+            status: 200,
+            headers: { 'content-type': 'application/json' }
+          }
+        )
+      )
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            requestId: 'req-events',
+            servedAt: '2026-04-30T12:00:00.000Z',
+            version: '2026-04-25',
+            data: { count: 1, items: [{ code: 'delivery.updated' }] },
+            meta: {}
+          }),
+          {
+            status: 200,
+            headers: { 'content-type': 'application/json' }
+          }
+        )
+      )
+
+    const client = new GreenhouseApiPlatformClient(config, fetchMock)
+
+    await client.getPlatformHealth()
+    await client.listEventTypes({ namespace: 'delivery' })
+
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      1,
+      'https://greenhouse.example.com/api/platform/ecosystem/health?externalScopeType=organization&externalScopeId=org_123',
+      expect.objectContaining({
+        method: 'GET',
+        headers: expect.objectContaining({
+          authorization: 'Bearer secret-token',
+          'x-greenhouse-api-version': '2026-04-25'
+        }),
+        signal: expect.any(AbortSignal)
+      })
+    )
+
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      2,
+      'https://greenhouse.example.com/api/platform/ecosystem/event-types?externalScopeType=organization&externalScopeId=org_123&namespace=delivery',
+      expect.objectContaining({
+        method: 'GET',
+        signal: expect.any(AbortSignal)
+      })
+    )
   })
 })

@@ -9,6 +9,12 @@ const mockListEcosystemOrganizations = vi.fn()
 const mockGetEcosystemOrganizationDetail = vi.fn()
 const mockListEcosystemCapabilities = vi.fn()
 const mockGetEcosystemIntegrationReadiness = vi.fn()
+const mockGetEcosystemPlatformHealth = vi.fn()
+const mockListEventTypes = vi.fn()
+const mockListWebhookSubscriptions = vi.fn()
+const mockGetWebhookSubscription = vi.fn()
+const mockListWebhookDeliveries = vi.fn()
+const mockGetWebhookDelivery = vi.fn()
 
 vi.mock('@/lib/api-platform/core/ecosystem-auth', () => ({
   runEcosystemReadRoute: (...args: unknown[]) => mockRunEcosystemReadRoute(...args)
@@ -27,10 +33,28 @@ vi.mock('@/lib/api-platform/resources/integration-readiness', () => ({
   getEcosystemIntegrationReadiness: (...args: unknown[]) => mockGetEcosystemIntegrationReadiness(...args)
 }))
 
+vi.mock('@/lib/api-platform/resources/platform-health', () => ({
+  getEcosystemPlatformHealth: (...args: unknown[]) => mockGetEcosystemPlatformHealth(...args)
+}))
+
+vi.mock('@/lib/api-platform/resources/events', () => ({
+  listEventTypes: (...args: unknown[]) => mockListEventTypes(...args),
+  listWebhookSubscriptions: (...args: unknown[]) => mockListWebhookSubscriptions(...args),
+  getWebhookSubscription: (...args: unknown[]) => mockGetWebhookSubscription(...args),
+  listWebhookDeliveries: (...args: unknown[]) => mockListWebhookDeliveries(...args),
+  getWebhookDelivery: (...args: unknown[]) => mockGetWebhookDelivery(...args)
+}))
+
 const organizationsRoute = await import('./organizations/route')
 const organizationDetailRoute = await import('./organizations/[id]/route')
 const capabilitiesRoute = await import('./capabilities/route')
 const readinessRoute = await import('./integration-readiness/route')
+const healthRoute = await import('./health/route')
+const eventTypesRoute = await import('./event-types/route')
+const webhookSubscriptionsRoute = await import('./webhook-subscriptions/route')
+const webhookSubscriptionDetailRoute = await import('./webhook-subscriptions/[id]/route')
+const webhookDeliveriesRoute = await import('./webhook-deliveries/route')
+const webhookDeliveryDetailRoute = await import('./webhook-deliveries/[id]/route')
 
 describe('api platform ecosystem route contracts', () => {
   beforeEach(() => {
@@ -102,5 +126,59 @@ describe('api platform ecosystem route contracts', () => {
 
     expect(mockListEcosystemCapabilities).toHaveBeenCalledTimes(1)
     expect(mockGetEcosystemIntegrationReadiness).toHaveBeenCalledTimes(1)
+  })
+
+  it('routes platform health through the ecosystem harness and health adapter', async () => {
+    mockGetEcosystemPlatformHealth.mockResolvedValue({
+      data: { contractVersion: 'platform-health.v1', overallStatus: 'healthy' }
+    })
+
+    const response = await healthRoute.GET(new Request('https://example.com/api/platform/ecosystem/health'))
+    const body = await response.json()
+
+    expect(body.routeKey).toBe('platform.ecosystem.health')
+    expect(mockGetEcosystemPlatformHealth).toHaveBeenCalledWith(expect.any(Request))
+  })
+
+  it('routes event control plane reads through shared adapters', async () => {
+    mockListEventTypes.mockResolvedValue({ count: 1, items: [{ code: 'delivery.updated' }] })
+    mockListWebhookSubscriptions.mockResolvedValue({
+      page: 1,
+      pageSize: 25,
+      total: 1,
+      count: 1,
+      items: [{ subscriptionId: 'sub-1' }]
+    })
+    mockGetWebhookSubscription.mockResolvedValue({ subscriptionId: 'sub-1' })
+    mockListWebhookDeliveries.mockResolvedValue({
+      page: 1,
+      pageSize: 25,
+      total: 1,
+      count: 1,
+      items: [{ deliveryId: 'del-1' }]
+    })
+    mockGetWebhookDelivery.mockResolvedValue({ deliveryId: 'del-1' })
+
+    await eventTypesRoute.GET(new Request('https://example.com/api/platform/ecosystem/event-types'))
+    await webhookSubscriptionsRoute.GET(new Request('https://example.com/api/platform/ecosystem/webhook-subscriptions'))
+    await webhookSubscriptionDetailRoute.GET(new Request('https://example.com/api/platform/ecosystem/webhook-subscriptions/sub-1'), {
+      params: Promise.resolve({ id: 'sub-1' })
+    })
+    await webhookDeliveriesRoute.GET(new Request('https://example.com/api/platform/ecosystem/webhook-deliveries'))
+    await webhookDeliveryDetailRoute.GET(new Request('https://example.com/api/platform/ecosystem/webhook-deliveries/del-1'), {
+      params: Promise.resolve({ id: 'del-1' })
+    })
+
+    expect(mockListEventTypes).toHaveBeenCalledTimes(1)
+    expect(mockListWebhookSubscriptions).toHaveBeenCalledTimes(1)
+    expect(mockGetWebhookSubscription).toHaveBeenCalledWith({
+      context: expect.any(Object),
+      subscriptionId: 'sub-1'
+    })
+    expect(mockListWebhookDeliveries).toHaveBeenCalledTimes(1)
+    expect(mockGetWebhookDelivery).toHaveBeenCalledWith({
+      context: expect.any(Object),
+      deliveryId: 'del-1'
+    })
   })
 })

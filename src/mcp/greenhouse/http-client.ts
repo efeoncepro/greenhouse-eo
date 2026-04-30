@@ -105,6 +105,47 @@ export class GreenhouseApiPlatformClient {
     })
   }
 
+  async getPlatformHealth() {
+    return this.request('/api/platform/ecosystem/health')
+  }
+
+  async listEventTypes(input: {
+    search?: string
+    namespace?: string
+    aggregateType?: string
+  }) {
+    return this.request('/api/platform/ecosystem/event-types', input)
+  }
+
+  async listWebhookSubscriptions(input: {
+    page?: number
+    pageSize?: number
+    active?: boolean
+  }) {
+    return this.request('/api/platform/ecosystem/webhook-subscriptions', input)
+  }
+
+  async getWebhookSubscription(input: { id: string }) {
+    const encodedId = encodeURIComponent(input.id)
+
+    return this.request(`/api/platform/ecosystem/webhook-subscriptions/${encodedId}`)
+  }
+
+  async listWebhookDeliveries(input: {
+    page?: number
+    pageSize?: number
+    status?: string
+    eventType?: string
+  }) {
+    return this.request('/api/platform/ecosystem/webhook-deliveries', input)
+  }
+
+  async getWebhookDelivery(input: { id: string }) {
+    const encodedId = encodeURIComponent(input.id)
+
+    return this.request(`/api/platform/ecosystem/webhook-deliveries/${encodedId}`)
+  }
+
   private async request<TData>(
     path: string,
     query: QueryParams = {}
@@ -117,14 +158,36 @@ export class GreenhouseApiPlatformClient {
       ...query
     })
 
-    const response = await this.fetchImpl(url.toString(), {
-      method: 'GET',
-      headers: {
-        accept: 'application/json',
-        authorization: `Bearer ${this.config.consumerToken}`,
-        'x-greenhouse-api-version': this.config.apiVersion
+    const controller = new AbortController()
+    const timeout = setTimeout(() => controller.abort(), this.config.requestTimeoutMs)
+
+    let response: Response
+
+    try {
+      response = await this.fetchImpl(url.toString(), {
+        method: 'GET',
+        headers: {
+          accept: 'application/json',
+          authorization: `Bearer ${this.config.consumerToken}`,
+          'x-greenhouse-api-version': this.config.apiVersion
+        },
+        signal: controller.signal
+      })
+    } catch (error) {
+      if (error instanceof Error && error.name === 'AbortError') {
+        throw new GreenhouseMcpApiError(
+          `Greenhouse API request timed out after ${this.config.requestTimeoutMs}ms.`,
+          {
+            status: 504,
+            code: 'upstream_timeout'
+          }
+        )
       }
-    })
+
+      throw error
+    } finally {
+      clearTimeout(timeout)
+    }
 
     const payload = await tryParseJson(response)
 

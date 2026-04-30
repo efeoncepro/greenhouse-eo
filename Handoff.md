@@ -1,5 +1,29 @@
 # Handoff.md
 
+## Sesion 2026-04-30 — TASK-647 follow-ups read-only cerrados
+
+- Se extendió el MCP read-only sin abrir writes ni auth nueva.
+- Nuevas tools expuestas en `src/mcp/greenhouse/server.ts`:
+  - `get_platform_health`
+  - `list_event_types`
+  - `list_webhook_subscriptions`
+  - `get_webhook_subscription`
+  - `list_webhook_deliveries`
+  - `get_webhook_delivery`
+- Hardening nuevo del runtime:
+  - `GREENHOUSE_MCP_REQUEST_TIMEOUT_MS` opcional en config/env (default `15000`)
+  - timeout vía `AbortController` en el client HTTP
+  - validación runtime del contrato `platform-health.v1` antes de aceptar `get_platform_health` como success
+- Contract tests extendidos:
+  - `src/app/api/platform/ecosystem/route-contract.test.ts` ahora cubre `health`, `event-types`, `webhook-subscriptions` y `webhook-deliveries`
+- Validación ejecutada:
+  - `pnpm vitest run src/mcp/greenhouse/__tests__/config.test.ts src/mcp/greenhouse/__tests__/http-client.test.ts src/mcp/greenhouse/__tests__/tools.test.ts src/app/api/platform/ecosystem/route-contract.test.ts` OK
+  - `pnpm exec tsc --noEmit --pretty false` OK
+- Límite explícito:
+  - no se abren commands MCP de event control plane
+  - no se mezcla `TASK-659` (OAuth/hosted auth)
+  - no se mezcla `TASK-648` (ICO API Platform surface)
+
 ## Sesion 2026-04-30 — TASK-647 MCP read-only adapter V1 cerrado
 
 - `TASK-647` quedó implementada y verificada end-to-end.
@@ -37,7 +61,7 @@
   - `pnpm build` OK
   - smoke MCP local contra mock downstream: OK (`get_context` registrado y callable via stdio)
 - Decision explícita de scope:
-  - `get_platform_health` no entra en V1 mínima; queda como follow-up inmediato sobre el mismo cliente downstream
+  - `get_platform_health` y el event control plane read-only ya quedaron cubiertos después como follow-up cerrado
 
 ## Sesion 2026-04-30 — TASK-647 MCP read-only local registration + documentation lane
 

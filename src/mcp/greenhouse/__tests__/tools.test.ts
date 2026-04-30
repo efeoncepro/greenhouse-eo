@@ -22,7 +22,13 @@ describe('createGreenhouseMcpHandlers', () => {
       listOrganizations: vi.fn(),
       getOrganization: vi.fn(),
       listCapabilities: vi.fn(),
-      getIntegrationReadiness: vi.fn()
+      getIntegrationReadiness: vi.fn(),
+      getPlatformHealth: vi.fn(),
+      listEventTypes: vi.fn(),
+      listWebhookSubscriptions: vi.fn(),
+      getWebhookSubscription: vi.fn(),
+      listWebhookDeliveries: vi.fn(),
+      getWebhookDelivery: vi.fn()
     })
 
     const result = await handlers.getContext()
@@ -57,11 +63,52 @@ describe('createGreenhouseMcpHandlers', () => {
           apiVersion: '2026-04-25',
           details: null
         })
-      )
+      ),
+      getPlatformHealth: vi.fn().mockResolvedValue({
+        ok: true,
+        requestId: 'req-health',
+        apiVersion: '2026-04-25',
+        status: 200,
+        data: {
+          contractVersion: 'platform-health.v1',
+          generatedAt: '2026-04-30T12:00:00.000Z',
+          environment: 'staging',
+          overallStatus: 'degraded',
+          confidence: 'high',
+          safeModes: {
+            readSafe: true,
+            writeSafe: false,
+            deploySafe: false,
+            backfillSafe: false,
+            notifySafe: true,
+            agentAutomationSafe: false
+          },
+          modules: [],
+          blockingIssues: [],
+          warnings: [],
+          recommendedChecks: [],
+          degradedSources: []
+        },
+        meta: {}
+      }),
+      listEventTypes: vi.fn().mockResolvedValue({
+        ok: true,
+        requestId: 'req-events',
+        apiVersion: '2026-04-25',
+        status: 200,
+        data: { count: 1, items: [{ code: 'delivery.updated' }] },
+        meta: {}
+      }),
+      listWebhookSubscriptions: vi.fn(),
+      getWebhookSubscription: vi.fn(),
+      listWebhookDeliveries: vi.fn(),
+      getWebhookDelivery: vi.fn()
     })
 
     const forbiddenResult = await handlers.getOrganization({ id: 'org-1' })
     const authResult = await handlers.getIntegrationReadiness({})
+    const healthResult = await handlers.getPlatformHealth()
+    const eventsResult = await handlers.listEventTypes({ namespace: 'delivery' })
 
     expect(forbiddenResult.isError).toBe(true)
     expect(forbiddenResult.structuredContent).toMatchObject({
@@ -77,6 +124,23 @@ describe('createGreenhouseMcpHandlers', () => {
       requestId: 'req-401',
       status: 401,
       error: { code: 'invalid_token' }
+    })
+
+    expect(healthResult.isError).toBe(false)
+    expect(healthResult.structuredContent).toMatchObject({
+      ok: true,
+      requestId: 'req-health',
+      data: {
+        contractVersion: 'platform-health.v1',
+        overallStatus: 'degraded'
+      }
+    })
+
+    expect(eventsResult.isError).toBe(false)
+    expect(eventsResult.structuredContent).toMatchObject({
+      ok: true,
+      requestId: 'req-events',
+      data: { count: 1 }
     })
   })
 })

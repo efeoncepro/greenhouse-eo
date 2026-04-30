@@ -2,6 +2,13 @@
 
 ## 2026-04-30
 
+- `TASK-647` cierra sus follow-ups read-only desbloqueados:
+  - el MCP ahora expone `get_platform_health` sobre `GET /api/platform/ecosystem/health`
+  - también expone lectura del event control plane: `list_event_types`, `list_webhook_subscriptions`, `get_webhook_subscription`, `list_webhook_deliveries`, `get_webhook_delivery`
+  - el client MCP gana timeout configurable (`GREENHOUSE_MCP_REQUEST_TIMEOUT_MS`, default `15000`) y valida runtime el contrato `platform-health.v1` antes de responder `ok`
+  - `route-contract.test.ts` de ecosystem ahora cubre `health` y las rutas read-only del control plane
+  - los commands MCP sobre subscriptions/deliveries siguen fuera de scope; no se abren writes en este corte
+
 - `TASK-647` cierra el primer MCP server oficial read-only de Greenhouse:
   - runtime nuevo en `src/mcp/greenhouse/**` + `scripts/run-greenhouse-mcp.ts`
   - script local `pnpm mcp:greenhouse`

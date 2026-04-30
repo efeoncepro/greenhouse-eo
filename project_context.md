@@ -139,6 +139,22 @@
 - `.vscode/mcp.json` puede registrar el server local sin embutir secrets, usando `inputs` interactivos.
 - `get_platform_health` queda explícitamente fuera del corte mínimo, pero el runtime ya quedó diseñado para agregar esa tool sobre el mismo cliente downstream sin romper la V1.
 
+## Delta 2026-04-30 TASK-647 cierra follow-ups read-only desbloqueados
+
+- El MCP read-only ya expone extensiones downstream seguras sobre el mismo cliente HTTP:
+  - `get_platform_health`
+  - `list_event_types`
+  - `list_webhook_subscriptions`
+  - `get_webhook_subscription`
+  - `list_webhook_deliveries`
+  - `get_webhook_delivery`
+- Guardrails nuevos del client MCP:
+  - timeout configurable `GREENHOUSE_MCP_REQUEST_TIMEOUT_MS` (default `15000`)
+  - validación runtime del payload `platform-health.v1` antes de devolver `ok`
+- Regla preservada:
+  - event control plane por MCP sigue siendo solo lectura
+  - `create/update subscription`, `retry delivery`, OAuth hosted (`TASK-659`) e ICO ecosystem surface (`TASK-648`) siguen como workstreams separados
+
 ## Delta 2026-04-26 Greenhouse Deep Link Platform documentada
 
 - Nueva arquitectura canonica: `docs/architecture/GREENHOUSE_DEEP_LINK_PLATFORM_V1.md`.
