@@ -1,3 +1,22 @@
+## Delta 2026-04-30 Manual Teams Announcement Helper
+
+- Greenhouse ya tiene un helper canónico para anuncios manuales vía Greenhouse TeamBot.
+- Artefactos principales:
+  - `src/config/manual-teams-announcements.ts` — registry code-versioned de destinos manuales permitidos
+  - `src/lib/communications/manual-teams-announcements.ts` — preview, validación, fingerprint y envío auditable
+  - `scripts/send-manual-teams-announcement.ts` — CLI operativa
+  - `docs/operations/manual-teams-announcements.md` — runbook
+- Comando canónico:
+  - `pnpm teams:announce`
+- Guardrails operativos:
+  - usar `--dry-run` para preview
+  - usar `--yes` para envío real
+  - body desde `--body-file` con párrafos separados por línea en blanco
+  - CTA `https` obligatorio
+  - destinos manuales salen del registry en código, no de texto libre
+- Regla de reutilización:
+  - ante solicitudes futuras de enviar mensajes por Greenhouse/TeamBot, preferir este helper antes de improvisar scripts temporales o usar el conector personal de Teams
+
 ## Delta 2026-04-30 Audits Folder Now Has Canonical Operating Status
 
 - `docs/audits/` ya es una categoria documental formal del repo.

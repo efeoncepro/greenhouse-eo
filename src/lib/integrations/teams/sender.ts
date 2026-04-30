@@ -5,6 +5,7 @@ import { randomUUID } from 'crypto'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { resolveSecretByRef } from '@/lib/secrets/secret-manager'
 
+import { writeTeamsSendRunOutcome, writeTeamsSendRunStart } from './send-run-log'
 import { sendViaBotFramework } from './bot-framework/sender'
 import type {
   TeamsAdaptiveCard,
@@ -35,63 +36,6 @@ const buildLogicAppPayload = (card: TeamsAdaptiveCard) => ({
 })
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
-
-const writeSendRunStart = async ({
-  runId,
-  channel,
-  syncMode,
-  triggeredBy,
-  correlationId,
-  sourceObjectId
-}: {
-  runId: string
-  channel: TeamsChannelRecord
-  syncMode: TeamsSendOptions['syncMode']
-  triggeredBy: string
-  correlationId?: string
-  sourceObjectId?: string
-}) => {
-  const baseNote = `channel=${channel.channel_code}; kind=${channel.channel_kind}`
-  const correlationNote = correlationId ? `correlation=${correlationId}; ` : ''
-  const sourceNote = sourceObjectId ? `source_object_id=${sourceObjectId}; ` : ''
-
-  await runGreenhousePostgresQuery(
-    `INSERT INTO greenhouse_sync.source_sync_runs (
-      sync_run_id, source_system, source_object_type, sync_mode,
-      status, records_read, records_written_raw, triggered_by, notes, started_at
-    )
-    VALUES ($1, 'teams_notification', 'teams_channel', $2, 'running', 0, 0, $3, $4, CURRENT_TIMESTAMP)
-    ON CONFLICT (sync_run_id) DO NOTHING`,
-    [
-      runId,
-      syncMode || 'reactive',
-      triggeredBy,
-      `${correlationNote}${sourceNote}${baseNote}`.slice(0, 2000)
-    ]
-  )
-}
-
-const writeSendRunOutcome = async ({
-  runId,
-  status,
-  notes,
-  recordsWritten
-}: {
-  runId: string
-  status: 'succeeded' | 'failed'
-  notes: string
-  recordsWritten: number
-}) => {
-  await runGreenhousePostgresQuery(
-    `UPDATE greenhouse_sync.source_sync_runs
-     SET status = $2,
-         records_written_raw = $3,
-         notes = $4,
-         finished_at = CURRENT_TIMESTAMP
-     WHERE sync_run_id = $1`,
-    [runId, status, recordsWritten, notes.slice(0, 2000)]
-  )
-}
 
 type TeamsChannelRow = Omit<TeamsChannelRecord, 'recipient_kind' | 'recipient_routing_rule_json'> & {
   recipient_kind: string | null
@@ -293,7 +237,7 @@ export const postTeamsCard = async (
     }
   }
 
-  await writeSendRunStart({
+  await writeTeamsSendRunStart({
     runId,
     channel,
     syncMode: options.syncMode || 'reactive',
@@ -310,7 +254,7 @@ export const postTeamsCard = async (
       const webhookUrl = await resolveSecretByRef(channel.secret_ref)
 
       if (!webhookUrl) {
-        await writeSendRunOutcome({
+        await writeTeamsSendRunOutcome({
           runId,
           status: 'failed',
           notes: `missing_secret: secret_ref=${channel.secret_ref}`,
@@ -335,7 +279,7 @@ export const postTeamsCard = async (
       const botResult = await sendViaBotFramework({ channel, card, options })
 
       if (!botResult.ok) {
-        await writeSendRunOutcome({
+          await writeTeamsSendRunOutcome({
           runId,
           status: 'failed',
           notes: `${botResult.reason}: ${botResult.detail}; transport=bot_framework; surface=${channel.recipient_kind}`,
@@ -357,7 +301,7 @@ export const postTeamsCard = async (
       surface = botResult.surface
     } else {
       // graph_rsc reserved for future Resource-Specific Consent flow
-      await writeSendRunOutcome({
+      await writeTeamsSendRunOutcome({
         runId,
         status: 'failed',
         notes: `unsupported_channel_kind: ${channel.channel_kind}`,
@@ -379,7 +323,7 @@ export const postTeamsCard = async (
       ? `transport=bot_framework; surface=${surface}`
       : `transport=logic_app`
 
-    await writeSendRunOutcome({
+    await writeTeamsSendRunOutcome({
       runId,
       status: 'succeeded',
       notes: `sent via ${channel.channel_kind}; ${transportTag}; attempts=${attempts}`,
@@ -395,7 +339,7 @@ export const postTeamsCard = async (
     }
   } catch (error) {
     if (error instanceof TeamsCardTooLargeError) {
-      await writeSendRunOutcome({
+      await writeTeamsSendRunOutcome({
         runId,
         status: 'failed',
         notes: `card_too_large: ${error.bytes} bytes (limit ${error.limit})`,
@@ -414,7 +358,7 @@ export const postTeamsCard = async (
     }
 
     if (error instanceof TeamsTransportError) {
-      await writeSendRunOutcome({
+      await writeTeamsSendRunOutcome({
         runId,
         status: 'failed',
         notes: `http_error: status=${error.status ?? 'unknown'}; ${error.message}`,
@@ -434,7 +378,7 @@ export const postTeamsCard = async (
 
     const detail = error instanceof Error ? error.message : String(error)
 
-    await writeSendRunOutcome({
+    await writeTeamsSendRunOutcome({
       runId,
       status: 'failed',
       notes: `transport_error: ${detail}`,

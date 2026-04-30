@@ -109,6 +109,7 @@
     "seed:kortex-pilot": "tsx scripts/seed-kortex-sister-platform-pilot.ts",
     "seed:service-catalog": "tsx scripts/seed-service-catalog.ts",
     "staging:request": "node scripts/staging-request.mjs",
+    "teams:announce": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/send-manual-teams-announcement.ts",
     "email:dev": "email dev --dir src/emails --port 3001",
     "postinstall": "npm run build:icons",
     "clean": "node scripts/clean-paths.mjs .next-local .next",

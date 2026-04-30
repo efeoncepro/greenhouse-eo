@@ -439,6 +439,13 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
   - En 1:1 no hace falta mencionar al usuario; Teams notifica al participante del chat.
 - Para smoke scripts locales que importen libs server-side, usar `npx tsx --require ./scripts/lib/server-only-shim.cjs ...` para neutralizar imports `server-only`.
 - Si esto pasa a UI/producto, no implementar un textbox que postea directo a Teams. Debe converger con Notification Hub / `TASK-716`: intent/outbox, preview, aprobación si aplica, idempotencia, retries, audit, delivery status y permisos en ambos planos (`views` + `entitlements`).
+- **Helper canónico ya disponible para anuncios manuales**:
+  - comando: `pnpm teams:announce`
+  - runbook: `docs/operations/manual-teams-announcements.md`
+  - runtime: `src/lib/communications/manual-teams-announcements.ts`
+  - destinos permitidos code-versioned: `src/config/manual-teams-announcements.ts`
+  - reglas: usar `--dry-run` para preview, `--yes` para envío real, `--body-file` con párrafos separados por línea en blanco, CTA `https` obligatorio
+  - para futuras solicitudes de "envía este mensaje por Greenhouse TeamBot", preferir este helper antes de improvisar scripts ad hoc o usar el conector personal de Teams
 - Chats operativos ya verificados:
   - `EO Team` group chat: `19:1e085e8a02d24cc7a0244490e5d00fb0@thread.v2`.
   - `Sky - Efeonce | Shared` group chat: `19:bf42622ef7b44d139cd4659e8aa22e81@thread.v2`.

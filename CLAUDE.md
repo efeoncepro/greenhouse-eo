@@ -444,6 +444,13 @@ AGENT_AUTH_SECRET=<secret> node scripts/playwright-auth-setup.mjs
 - Para chats individuales ya instalados por usuario, **no crear 1:1 a ciegas con AAD Object ID**. Resolver el `oneOnOne` existente y postear ahí. El intento `members: [{ id: "29:<aadObjectId>" }]` puede fallar con `403 Failed to decrypt pairwise id` aunque el usuario exista.
 - En 1:1 no hace falta mencionar al destinatario; Teams notifica el chat. Para smoke scripts locales con imports server-side, usar `npx tsx --require ./scripts/lib/server-only-shim.cjs ...`.
 - Producto/UI: cualquier canal manual debe converger con Notification Hub / `TASK-716` (intent/outbox, preview, aprobación, idempotencia, retries, audit, delivery status y permisos `views` + `entitlements`), no con un textbox que postea directo a Teams.
+- **Helper canónico ya existe para anuncios manuales vía TeamBot**:
+  - comando: `pnpm teams:announce`
+  - runbook: `docs/operations/manual-teams-announcements.md`
+  - runtime: `src/lib/communications/manual-teams-announcements.ts`
+  - destinos registrados: `src/config/manual-teams-announcements.ts`
+  - guardrails: `--dry-run` primero, `--yes` para enviar, `--body-file` con párrafos separados por línea en blanco, CTA `https` obligatorio
+  - para futuras peticiones del tipo "envía este mensaje por Greenhouse/TeamBot", reutilizar este helper antes de crear scripts temporales o usar el conector personal de Teams
 - Chats verificados:
   - `EO Team`: `19:1e085e8a02d24cc7a0244490e5d00fb0@thread.v2`.
   - `Sky - Efeonce | Shared`: `19:bf42622ef7b44d139cd4659e8aa22e81@thread.v2`.

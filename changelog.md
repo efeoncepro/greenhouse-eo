@@ -7606,3 +7606,15 @@ Validations: tsc 0 errors, lint 0 errors, 427 files / 2225 tests pass / 5 skippe
 - Product Catalog Sync: completed the Greenhouse-first identity cutover for HubSpot products. The materializer now promotes legacy `hubspot_imported` survivors in place when `legacy_sku = product_code`, the outbound bridge now does `bind-first` before `create`, and `hubspot_product_id` is guarded by a unique partial index.
 - Added `pnpm product-catalog:materialize-and-sync` as the operational command to rematerialize the canonical catalog from Greenhouse sources and then sync/bind survivors into HubSpot without importing HubSpot-only products back into Greenhouse.
 - Executed the live cutover: HubSpot moved from `36` legacy products with `0` `gh_*` markers to `74` active products with `74` `gh_*` markers, and local `product_catalog` was cleaned from `36` `hubspot_imported` rows down to `0`.
+### 2026-04-30 — Manual Teams Announcement helper canonico para Greenhouse TeamBot
+
+Se agrego un helper reusable para anuncios manuales del TeamBot Greenhouse, pensado para evitar futuros envios ad hoc desde scripts temporales o conectores personales. El flujo ahora tiene destino registrado en codigo (`eo-team`), validacion estructural del mensaje, `dry-run`, confirmacion explicita con `--yes`, card builder consistente y audit trail en `source_sync_runs`.
+
+Artefactos nuevos:
+- `src/config/manual-teams-announcements.ts`
+- `src/lib/communications/manual-teams-announcements.ts`
+- `scripts/send-manual-teams-announcement.ts`
+- `docs/operations/manual-teams-announcements.md`
+
+Comando operativo:
+- `pnpm teams:announce`

@@ -1,5 +1,24 @@
 # Handoff.md
 
+## Sesion 2026-04-30 — Helper canónico para anuncios manuales por Greenhouse TeamBot
+
+- Se creó una base reusable para futuros anuncios manuales a Teams sin depender del conector personal del operador.
+- Runtime nuevo:
+  - `src/config/manual-teams-announcements.ts` registra destinos manuales permitidos. Primer destino: `eo-team` → chat grupal `EO Team`.
+  - `src/lib/communications/manual-teams-announcements.ts` construye preview, valida payload, genera fingerprint estable y envía via `sendViaBotFramework` con audit trail en `greenhouse_sync.source_sync_runs`.
+  - `src/lib/integrations/teams/send-run-log.ts` centraliza el write de `source_sync_runs` y ahora también lo reutiliza `src/lib/integrations/teams/sender.ts`.
+  - `scripts/send-manual-teams-announcement.ts` expone la CLI `pnpm teams:announce` con `--dry-run` y gate `--yes`.
+- Runbook operativo nuevo: `docs/operations/manual-teams-announcements.md`.
+- Guardrails:
+  - destinos manuales salen de registry code-versioned, no de texto libre
+  - CTA obligatorio `https`
+  - body por archivo con párrafos separados por línea en blanco
+  - fingerprint sha256 corto para trazabilidad humana
+  - envío real requiere `--yes`
+- Scope intencional:
+  - esto NO implementa aún la surface completa de `TASK-716`
+  - sí deja una herramienta segura y escalable para usos operativos puntuales mientras esa task sigue bloqueada por `TASK-690`
+
 ## Sesion 2026-04-30 — Fix robusto para predicciones ICO dependientes del reloj del runner
 
 - **Incidente**: el `CI` de `main` para el commit `fd2dd75e` quedó rojo en el run `25154300079` por `src/lib/ico-engine/ai/ai-signals.test.ts`, caso `projects end-of-month OTD only for the active Santiago period`.
