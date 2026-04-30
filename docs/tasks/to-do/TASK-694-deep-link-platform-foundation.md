@@ -116,7 +116,7 @@ Reglas obligatorias:
 ### Gap
 
 - No existe `src/lib/navigation/deep-links/**`.
-- No hay helper unico de base URL para ambiente/preview/staging/production.
+- No hay helper unico de base URL para ambiente/preview/staging/production; hoy existen builders ad hoc repartidos en Teams, webhooks, reliability, emails y `quote-share`.
 - No hay contrato semantico para decir "quote edit", "leave review" o "ops health" sin acoplarse a una ruta string.
 - No hay metadata unificada para resolver ambos planos de acceso: `views` visibles y `entitlements` finos.
 - No hay tests que protejan drift entre rutas, `VIEW_REGISTRY`, notificaciones, Teams y API Platform.
@@ -148,14 +148,14 @@ Reglas obligatorias:
 - Crear `registry.ts`, `resolver.ts` y `definitions/*`.
 - Implementar `resolveGreenhouseDeepLink(reference, context?)`.
 - Registrar definitions iniciales:
-  - `home` -> `portalHomePath` cuando exista, fallback `/home`
+  - `home` -> `portalHomePath` cuando exista, fallback `/home`; para surface interna tratar `viewCode` como derivado de startup policy/Home entitlements y no asumir un `viewCode` único ya materializado
   - `ops_health` -> `/admin/ops-health`
   - `person` -> `/people/:personId`
   - `quote` -> `/finance/quotes/:quoteId` y `edit` -> `/finance/quotes/:quoteId/edit`
   - `income` -> `/finance/income/:incomeId`
   - `expense` -> `/finance/expenses/:expenseId`
   - `leave_request` -> `/hr/leave?requestId=:requestId`
-  - `payroll_period` -> `/hr/payroll?periodId=:periodId`
+  - `payroll_period` -> `/hr/payroll/periods/:periodId`
   - `public_quote_share` -> `/public/quote/:quotationId/:versionNumber/:token` o el builder vigente si ya existe input suficiente
 - Hacer que errores de referencia invalida degraden a `status='invalid_reference'` con fallback seguro, no throw en consumers de notificacion.
 
@@ -170,6 +170,11 @@ Reglas obligatorias:
   - `leave_request`: `equipo.permisos`
   - `payroll_period`: `equipo.nomina`
 - Declarar capabilities finas como metadata no bloqueante cuando el repo ya tenga entitlement claro; si no existe, dejar `requiredCapabilities: []` y documentar el gap.
+- Reutilizar bindings/capabilities ya comprobados en discovery cuando existan:
+  - `ops_health` -> `platform.health.read`
+  - `person` -> `people.directory`
+  - `leave_request` -> `hr.leave` y `hr.leave_balance` segun action
+  - `quote`, `income`, `expense`, `payroll_period` quedan inicialmente view-first salvo que discovery posterior demuestre capability fina estable
 - Agregar test que compare definitions con `VIEW_REGISTRY` para las surfaces con `viewCode`.
 
 ### Slice 4 — Low-Risk Consumer Proof
@@ -241,14 +246,14 @@ Definitions iniciales sugeridas:
 
 | Kind | Actions | Path | View plane | Entitlement plane |
 | --- | --- | --- | --- | --- |
-| `home` | `view` | `portalHomePath` o `/home` | segun destination | no bloqueante |
+| `home` | `view` | `portalHomePath` o `/home` | surface interna sin `viewCode` único materializado; `cliente.pulse` aplica para la lens cliente | `home.*` / startup policy segun destination |
 | `ops_health` | `view` | `/admin/ops-health` | `administracion.ops_health` | `platform.health.read` si aplica |
-| `person` | `view` | `/people/:personId` | `equipo.personas` si existe; verificar en discovery | sensibilidad person-level; no inventar write |
+| `person` | `view` | `/people/:personId` | `equipo.personas` | `people.directory` para lectura/launch |
 | `quote` | `view`, `edit` | `/finance/quotes/:quoteId`, `/finance/quotes/:quoteId/edit` | `finanzas.cotizaciones` | usar metadata comercial/finance existente si existe |
 | `income` | `view` | `/finance/income/:incomeId` | `finanzas.ingresos` | usar metadata finance existente si existe |
 | `expense` | `view` | `/finance/expenses/:expenseId` | `finanzas.egresos` | usar metadata finance existente si existe |
 | `leave_request` | `view`, `review` | `/hr/leave?requestId=:requestId` | `equipo.permisos` | `hr.leave` si aplica |
-| `payroll_period` | `view` | `/hr/payroll?periodId=:periodId` | `equipo.nomina` | sensibilidad payroll; no exponer preview por defecto |
+| `payroll_period` | `view` | `/hr/payroll/periods/:periodId` | `equipo.nomina` | sensibilidad payroll; no exponer preview por defecto |
 | `public_quote_share` | `open` | quote share builder vigente | public share | token/revocation owns access |
 
 <!-- ═══════════════════════════════════════════════════════════

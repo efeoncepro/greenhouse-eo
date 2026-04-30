@@ -1,3 +1,24 @@
+## Delta 2026-04-30 TASK-694 aterriza Deep Link Platform Foundation
+
+- Ya existe foundation runtime compartida en `src/lib/navigation/deep-links/**`.
+- El runtime nuevo resuelve referencias semánticas a `href`, `absoluteUrl`, `canonicalPath`, fallback y metadata de acceso reutilizando:
+  - `VIEW_REGISTRY`
+  - `VIEW_ENTITLEMENT_BINDINGS`
+  - `portalHomePath`
+  - builders públicos existentes cuando aplica
+- Definitions iniciales activas:
+  - `home`, `ops_health`, `person`, `quote`, `income`, `expense`, `leave_request`, `payroll_period`, `public_quote_share`
+- Regla de adopción nueva:
+  - consumers nuevos o de bajo riesgo que hoy armen URLs internas manualmente deben preferir `resolveGreenhouseDeepLink()`
+  - el output legacy `actionUrl` puede seguir existiendo como string derivado mientras Notification Hub, Home, API Platform app y Teams terminan su convergencia
+- Alineaciones cerradas:
+  - `payroll_period` canónico = `/hr/payroll/periods/:periodId`
+  - `person` canónico = `/people/:memberId`
+  - `home` interno sigue siendo startup-policy-first; no existe un `viewCode` único materializado para toda la surface
+- Primeros consumers migrados:
+  - `src/app/api/admin/teams/test/route.ts`
+  - `src/lib/webhooks/consumers/notification-mapping.ts` (solo casos `person`, `income`, `expense`)
+
 ## Delta 2026-04-30 Manual Teams Announcement Helper
 
 - Greenhouse ya tiene un helper canónico para anuncios manuales vía Greenhouse TeamBot.

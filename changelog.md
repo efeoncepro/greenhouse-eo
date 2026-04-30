@@ -2,6 +2,14 @@
 
 ## 2026-04-30
 
+- `TASK-694` aterriza la primera foundation runtime de Deep Links en `src/lib/navigation/deep-links/**`: referencias semánticas ahora pueden resolverse a `href`, `absoluteUrl`, `canonicalPath`, fallback y metadata de acceso reutilizando `VIEW_REGISTRY`, `portalHomePath` y access metadata existente.
+- El contrato inicial cubre `home`, `ops_health`, `person`, `quote`, `income`, `expense`, `leave_request`, `payroll_period` y `public_quote_share`.
+- `payroll_period` queda alineado con la realidad del portal en `/hr/payroll/periods/:periodId`.
+- Se migraron dos consumers de bajo riesgo sin romper `actionUrl` legacy:
+  - `src/app/api/admin/teams/test/route.ts` ahora genera el CTA de Teams via resolver canónico.
+  - `src/lib/webhooks/consumers/notification-mapping.ts` ya resuelve selectivamente `person`, `income` y `expense` desde el registry nuevo.
+- Se agregaron tests unitarios para precedence de base URL, encoding/fallback y drift guard contra `VIEW_REGISTRY`.
+
 - ICO Engine AI predictions ahora derivan el progreso del mes desde `generatedAt` en timezone `America/Santiago`, no desde el reloj implícito del runner. Esto vuelve reproducibles las predicciones end-of-month y evita drift entre replays, materializaciones y CI.
 - Se agregó `src/lib/calendar/business-time.ts` como helper reusable para contexto temporal de negocio, y la materialización AI de ICO ahora reutiliza el mismo contexto temporal explícito tanto para construir predicciones como para hidratar actuals del período vigente.
 

@@ -5,14 +5,17 @@ import {
   listActiveTeamsChannels,
   postTeamsCard
 } from '@/lib/integrations/teams'
+import { resolveGreenhouseDeepLink } from '@/lib/navigation/deep-links'
 import { requireAdminTenantContext } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
 
-const PORTAL_ORIGIN = process.env.NEXTAUTH_URL?.replace(/\/$/, '') || 'https://greenhouse.efeoncepro.com'
-
 const buildTestCard = (channelCode: string, actor: string) =>
   buildOpsAlertCard({
+    actionUrl: resolveGreenhouseDeepLink(
+      { kind: 'ops_health', audience: 'teams' },
+      { env: process.env }
+    ).absoluteUrl,
     title: 'Prueba de canal Teams',
     message: `Mensaje de prueba enviado por ${actor} desde Greenhouse para validar el canal '${channelCode}'.`,
     severity: 'info',
@@ -20,7 +23,6 @@ const buildTestCard = (channelCode: string, actor: string) =>
     occurredAt: new Date(),
     environment: process.env.VERCEL_ENV || process.env.NODE_ENV || 'unknown',
     facts: [{ title: 'Canal', value: channelCode }],
-    actionUrl: `${PORTAL_ORIGIN}/admin/ops-health`,
     actionLabel: 'Ver Ops Health'
   })
 

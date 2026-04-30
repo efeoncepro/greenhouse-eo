@@ -1,5 +1,6 @@
 import 'server-only'
 
+import { resolveGreenhouseDeepLink, type GreenhouseDeepLinkKind } from '@/lib/navigation/deep-links'
 import type { WebhookEnvelope } from '@/lib/webhooks/types'
 import { getFinanceAdminRecipients, getHrAdminRecipients, getMemberRecipient, getPayrollPeriodRecipients, getUserRecipient, type RecipientResolutionResult } from './notification-recipients'
 
@@ -38,6 +39,18 @@ const toPeriodLabel = (envelope: WebhookEnvelope) => {
 
 const getMemberId = (envelope: WebhookEnvelope) =>
   typeof envelope.data.memberId === 'string' && envelope.data.memberId.trim() ? envelope.data.memberId : null
+
+const getStringData = (envelope: WebhookEnvelope, key: string) => {
+  const value = envelope.data[key]
+
+  return typeof value === 'string' && value.trim() ? value.trim() : null
+}
+
+const resolveLegacyActionUrl = (kind: GreenhouseDeepLinkKind, id?: string | null) =>
+  resolveGreenhouseDeepLink({
+    kind,
+    ...(id ? { id } : {})
+  }).href
 
 const baseMetadata = (envelope: WebhookEnvelope): NotificationDispatchMetadata => ({
   eventId: envelope.eventId,
@@ -120,11 +133,7 @@ export const NOTIFICATION_MAPPINGS: NotificationMapping[] = [
 
       return `Nuevo colaborador: ${displayName}`
     },
-    actionUrl: envelope => {
-      const memberId = getMemberId(envelope)
-
-      return memberId ? `/people/${memberId}` : '/people'
-    },
+    actionUrl: envelope => resolveLegacyActionUrl('person', getMemberId(envelope)),
     resolveRecipients: getHrAdminRecipients,
     metadata: baseMetadata
   },
@@ -146,11 +155,7 @@ export const NOTIFICATION_MAPPINGS: NotificationMapping[] = [
 
       return incomeId ? `Factura: ${incomeId}` : 'Pago registrado en el sistema.'
     },
-    actionUrl: envelope => {
-      const incomeId = typeof envelope.data.incomeId === 'string' ? envelope.data.incomeId : null
-
-      return incomeId ? `/finance/income/${incomeId}` : '/finance/income'
-    },
+    actionUrl: envelope => resolveLegacyActionUrl('income', getStringData(envelope, 'incomeId')),
     resolveRecipients: getFinanceAdminRecipients,
     metadata: baseMetadata
   },
@@ -171,11 +176,7 @@ export const NOTIFICATION_MAPPINGS: NotificationMapping[] = [
 
       return amount ? `Monto: ${amount}` : 'Gasto registrado en el sistema.'
     },
-    actionUrl: envelope => {
-      const expenseId = typeof envelope.data.expenseId === 'string' ? envelope.data.expenseId : null
-
-      return expenseId ? `/finance/expenses/${expenseId}` : '/finance/expenses'
-    },
+    actionUrl: envelope => resolveLegacyActionUrl('expense', getStringData(envelope, 'expenseId')),
     resolveRecipients: getFinanceAdminRecipients,
     metadata: baseMetadata
   },
@@ -211,11 +212,7 @@ export const NOTIFICATION_MAPPINGS: NotificationMapping[] = [
 
       return amount ? `Monto: ${amount}` : null
     },
-    actionUrl: envelope => {
-      const incomeId = typeof envelope.data.incomeId === 'string' ? envelope.data.incomeId : null
-
-      return incomeId ? `/finance/income/${incomeId}` : '/finance/income'
-    },
+    actionUrl: envelope => resolveLegacyActionUrl('income', getStringData(envelope, 'incomeId')),
     resolveRecipients: getFinanceAdminRecipients,
     metadata: baseMetadata
   },
@@ -354,11 +351,7 @@ export const NOTIFICATION_MAPPINGS: NotificationMapping[] = [
         ? `El documento ${folio} fue reclamado ante el SII. Requiere revisión.`
         : 'Un documento fue reclamado ante el SII. Requiere revisión.'
     },
-    actionUrl: envelope => {
-      const expenseId = typeof envelope.data.expenseId === 'string' ? envelope.data.expenseId : null
-
-      return expenseId ? `/finance/expenses/${expenseId}` : '/finance/expenses'
-    },
+    actionUrl: envelope => resolveLegacyActionUrl('expense', getStringData(envelope, 'expenseId')),
     resolveRecipients: getFinanceAdminRecipients,
     metadata: baseMetadata
   },
@@ -373,11 +366,7 @@ export const NOTIFICATION_MAPPINGS: NotificationMapping[] = [
       return folio ? `Divergencia de cobro: Factura #${folio}` : 'Divergencia de cobro detectada'
     },
     body: () => 'Nubox marca como cobrada pero Greenhouse tiene pago pendiente.',
-    actionUrl: envelope => {
-      const incomeId = typeof envelope.data.incomeId === 'string' ? envelope.data.incomeId : null
-
-      return incomeId ? `/finance/income/${incomeId}` : '/finance/income'
-    },
+    actionUrl: envelope => resolveLegacyActionUrl('income', getStringData(envelope, 'incomeId')),
     resolveRecipients: getFinanceAdminRecipients,
     metadata: baseMetadata
   },

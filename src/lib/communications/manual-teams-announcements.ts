@@ -120,12 +120,16 @@ const buildCard = ({
       size: 'Large',
       wrap: true
     },
-    ...paragraphs.map((paragraph, index) => ({
-      type: 'TextBlock' as const,
-      text: paragraph,
-      wrap: true,
-      spacing: index === 0 ? 'Medium' : 'Small'
-    }))
+    ...paragraphs.map((paragraph, index) => {
+      const spacing: 'Medium' | 'Small' = index === 0 ? 'Medium' : 'Small'
+
+      return {
+        type: 'TextBlock' as const,
+        text: paragraph,
+        wrap: true,
+        spacing
+      }
+    })
   ],
   actions: [
     {

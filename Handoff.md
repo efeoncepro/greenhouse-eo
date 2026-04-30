@@ -1,5 +1,38 @@
 # Handoff.md
 
+## Sesion 2026-04-30 — TASK-694 Deep Link Platform Foundation (slice runtime inicial)
+
+- Se implementó la foundation compartida `src/lib/navigation/deep-links/**` con:
+  - `types.ts`, `base-url.ts`, `access.ts`, `registry.ts`, `resolver.ts`, `definitions/*`, `index.ts`
+  - tests nuevos en `src/lib/navigation/deep-links/__tests__/`
+- Definitions activas en este corte:
+  - `home`, `ops_health`, `person`, `quote`, `income`, `expense`, `leave_request`, `payroll_period`, `public_quote_share`
+- Decisiones cerradas durante discovery + implementation:
+  - `payroll_period` resuelve a `/hr/payroll/periods/:periodId`
+  - `home` interno sigue siendo startup-policy-first y no fuerza `viewCode` único
+  - `quote`, `income`, `expense`, `payroll_period` quedan inicialmente `view-first`
+  - `ops_health`, `person`, `leave_request` ya declaran metadata de entitlements cuando el repo sí tiene capability estable
+- Consumers migrados sin romper shape legacy:
+  - `src/app/api/admin/teams/test/route.ts` ahora usa `resolveGreenhouseDeepLink(...).absoluteUrl` para `ops_health`
+  - `src/lib/webhooks/consumers/notification-mapping.ts` migra selectivamente `member.created`, `finance.income_payment.recorded`, `finance.income.created`, `finance.expense.created`, `finance.sii_claim.detected`, `finance.balance_divergence.detected` a deep links, preservando `actionUrl` relativo
+- Docs actualizados:
+  - `docs/architecture/GREENHOUSE_DEEP_LINK_PLATFORM_V1.md`
+  - `project_context.md`
+  - `docs/tasks/to-do/TASK-694-deep-link-platform-foundation.md`
+  - `changelog.md`
+- Validación ejecutada:
+  - `pnpm vitest run src/lib/navigation/deep-links/__tests__/base-url.test.ts src/lib/navigation/deep-links/__tests__/resolver.test.ts src/lib/webhooks/consumers/notification-mapping.test.ts` OK
+  - `pnpm exec eslint src/lib/navigation/deep-links src/lib/webhooks/consumers/notification-mapping.ts src/lib/webhooks/consumers/notification-mapping.test.ts src/app/api/admin/teams/test/route.ts` OK
+  - `pnpm exec tsc --noEmit` OK
+  - `pnpm lint` OK
+  - `pnpm build` OK
+- Build-health fix incluido en el cierre:
+  - `src/lib/communications/manual-teams-announcements.ts` ajusta el tipado literal de `spacing` en Adaptive Cards; no cambia comportamiento, solo elimina el type error que impedía `tsc`/`build`
+- Follow-ups claros:
+  - converger más consumers (`src/lib/sync/projections/notifications.ts`, Home loaders, Teams notify projection)
+  - evaluar si `public_quote_share` debe reutilizar builder público existente o mantener path canónico inline como hoy
+  - cuando madure Notification Hub, reemplazar generación manual de `actionUrl` por referencias semánticas en más carriles
+
 ## Sesion 2026-04-30 — Helper canónico para anuncios manuales por Greenhouse TeamBot
 
 - Se creó una base reusable para futuros anuncios manuales a Teams sin depender del conector personal del operador.
