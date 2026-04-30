@@ -2,6 +2,15 @@
 
 ## 2026-04-30
 
+- `TASK-647` cierra el primer MCP server oficial read-only de Greenhouse:
+  - runtime nuevo en `src/mcp/greenhouse/**` + `scripts/run-greenhouse-mcp.ts`
+  - script local `pnpm mcp:greenhouse`
+  - tools V1: `get_context`, `list_organizations`, `get_organization`, `list_capabilities`, `get_integration_readiness`
+  - downstream exclusivo de `api/platform/ecosystem/*`, sin SQL directo ni writes
+  - preserva `requestId`, `apiVersion`, `status` y errores machine-readable del carril ecosystem
+  - `.vscode/mcp.json` registra el server local sin embutir secrets, con inputs para `GREENHOUSE_MCP_API_BASE_URL`, `GREENHOUSE_MCP_CONSUMER_TOKEN`, `GREENHOUSE_MCP_EXTERNAL_SCOPE_TYPE` y `GREENHOUSE_MCP_EXTERNAL_SCOPE_ID`
+  - `docs/documentation/plataforma/api-platform-ecosystem.md` y `project_context.md` quedan sincronizados con el runtime operativo
+
 - `TASK-694` aterriza la primera foundation runtime de Deep Links en `src/lib/navigation/deep-links/**`: referencias semánticas ahora pueden resolverse a `href`, `absoluteUrl`, `canonicalPath`, fallback y metadata de acceso reutilizando `VIEW_REGISTRY`, `portalHomePath` y access metadata existente.
 - El contrato inicial cubre `home`, `ops_health`, `person`, `quote`, `income`, `expense`, `leave_request`, `payroll_period` y `public_quote_share`.
 - `payroll_period` queda alineado con la realidad del portal en `/hr/payroll/periods/:periodId`.

@@ -1,9 +1,9 @@
 # API Platform Ecosystem
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.2
 > **Creado:** 2026-04-25 por Codex (TASK-616 follow-up)
-> **Ultima actualizacion:** 2026-04-25 por Codex (TASK-616 follow-up)
+> **Ultima actualizacion:** 2026-04-30 por Codex (TASK-647 MCP read-only runtime V1)
 > **Documentacion tecnica:** [GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md)
 
 ---
@@ -43,6 +43,32 @@ Sirve para tres cosas:
 
 No es una API pública abierta. Hoy es una lane controlada, autenticada y binding-aware.
 
+## Relacion con MCP
+
+Esta lane es la base oficial del primer MCP server de Greenhouse.
+
+La regla importante para `TASK-647` y sus follow-ups es:
+
+- el MCP oficial va downstream de `api/platform/ecosystem/*`
+- la V1 inicial es `read-only`
+- no debe leer SQL directo
+- no debe saltarse auth, scope, request logging ni rate limits del carril ecosystem
+- cualquier write futuro por MCP queda bloqueado hasta que exista command policy e idempotencia transversal
+
+Hoy ese MCP base ya existe como runtime local en:
+
+- `src/mcp/greenhouse/*`
+- `scripts/run-greenhouse-mcp.ts`
+- `pnpm mcp:greenhouse`
+
+La V1 expone cinco tools read-only:
+
+- `get_context`
+- `list_organizations`
+- `get_organization`
+- `list_capabilities`
+- `get_integration_readiness`
+
 ## Como funciona hoy
 
 Hoy la foundation nueva ya existe en el runtime:
@@ -59,6 +85,12 @@ La lane inicial expone estos endpoints de lectura:
 - `GET /api/platform/ecosystem/organizations/:id`
 - `GET /api/platform/ecosystem/capabilities`
 - `GET /api/platform/ecosystem/integration-readiness`
+
+Ademas, ya existe una extension downstream inmediata:
+
+- `GET /api/platform/ecosystem/health`
+
+`health` ya esta disponible como contrato ecosystem-facing, pero no necesita inflar la surface minima del MCP read-only V1. Puede agregarse como tool hermana (`get_platform_health`) sobre el mismo cliente downstream cuando convenga.
 
 También expone el plano de control de eventos:
 
@@ -192,7 +224,7 @@ No significa:
 
 La idea de esta surface es mostrar qué capacidades tiene activas el tenant o cliente dentro del scope resuelto.
 
-###+ Integration Readiness
+### Integration Readiness
 
 `/integration-readiness` expresa health y readiness de integraciones y bindings.
 
@@ -203,6 +235,22 @@ Hoy esta surface responde preguntas como:
 - la integración existe en el registry
 - está pausada o bloqueada
 - su health operativo está sano o degradado
+
+### Health
+
+`/health` ya existe como surface ecosystem-facing de platform health.
+
+Su uso correcto en este momento es:
+
+- health operativo de la plataforma
+- diagnostico downstream para agentes y consolas
+- extension inmediata del MCP read-only, no requisito de la surface minima base
+
+No debe confundirse con:
+
+- readiness de una integración particular
+- writes de control plane
+- bypass de observabilidad interna
 
 ## Como resuelve seguridad y tenancy
 
@@ -309,7 +357,7 @@ Todavía no hace estas cosas:
 - writes ecosystem-facing amplios de dominio
 - idempotencia runtime de commands
 - generacion automatica de OpenAPI desde schemas runtime
-- MCP downstream
+- MCP write-safe o surfaces MCP más amplias que el slice read-only V1
 - una API pública abierta
 - migración total de todos los recursos legacy al carril nuevo
 
@@ -352,7 +400,37 @@ En términos concretos, lo siguiente debería ser:
 ### 4. Eventing y downstream
 
 - webhooks o delivery contracts donde tenga sentido
-- MCP encima de esta lane, no directo sobre rutas legacy o readers ad hoc
+- MCP read-only encima de esta lane, no directo sobre rutas legacy o readers ad hoc
+- extension corta con `platform health` sobre el mismo cliente downstream antes de abrir writes o tools más libres
+
+## Registro local MCP read-only V1
+
+Para desarrollo local, el repo ya puede registrar un server MCP Greenhouse apuntando al entrypoint esperado `pnpm mcp:greenhouse`.
+
+La configuracion local esperada usa estas env vars:
+
+- `GREENHOUSE_MCP_API_BASE_URL`
+- `GREENHOUSE_MCP_CONSUMER_TOKEN`
+- `GREENHOUSE_MCP_EXTERNAL_SCOPE_TYPE`
+- `GREENHOUSE_MCP_EXTERNAL_SCOPE_ID`
+
+Reglas operativas:
+
+- no versionar secrets ni tokens en `.vscode/mcp.json`
+- usar `input/prompt` o env inyectado por el operador local
+- tratar `GREENHOUSE_MCP_CONSUMER_TOKEN` como secreto
+- no inventar consumers nuevos a ciegas solo para probar el MCP
+- si el target es `staging` o `preview`, respetar el flujo operativo de bypass SSO ya documentado para requests programaticos
+
+La V1 read-only esperada del MCP debe exponer un set chico de tools:
+
+- `get_context`
+- `list_organizations`
+- `get_organization`
+- `list_capabilities`
+- `get_integration_readiness`
+
+`get_platform_health` queda reconocido como extension downstream inmediata porque el endpoint ya existe hoy, pero no necesita crecer junto con la surface minima inicial.
 
 ## Como robustecerla sin romper nada
 

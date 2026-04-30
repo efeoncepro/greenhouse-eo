@@ -1,5 +1,67 @@
 # Handoff.md
 
+## Sesion 2026-04-30 — TASK-647 MCP read-only adapter V1 cerrado
+
+- `TASK-647` quedó implementada y verificada end-to-end.
+- Runtime nuevo:
+  - `src/mcp/greenhouse/config.ts`
+  - `src/mcp/greenhouse/http-client.ts`
+  - `src/mcp/greenhouse/tools.ts`
+  - `src/mcp/greenhouse/server.ts`
+  - `src/mcp/greenhouse/index.ts`
+  - `scripts/run-greenhouse-mcp.ts`
+- Dependencias/entrypoint:
+  - `@modelcontextprotocol/sdk` ahora es dependencia directa
+  - `package.json` expone `pnpm mcp:greenhouse`
+  - `.env.example` declara `GREENHOUSE_MCP_API_BASE_URL`, `GREENHOUSE_MCP_CONSUMER_TOKEN`, `GREENHOUSE_MCP_EXTERNAL_SCOPE_TYPE`, `GREENHOUSE_MCP_EXTERNAL_SCOPE_ID` y `GREENHOUSE_MCP_API_VERSION`
+- Tools V1 activas:
+  - `get_context`
+  - `list_organizations`
+  - `get_organization`
+  - `list_capabilities`
+  - `get_integration_readiness`
+- Guardrails preservados:
+  - read-only
+  - sin SQL directo
+  - sin writes
+  - scope fijo por `externalScopeType` + `externalScopeId`
+  - preserva `requestId`, `apiVersion`, `status` y errores machine-readable del carril ecosystem
+- Registro local:
+  - `.vscode/mcp.json` registra `greenhouse/greenhouse-mcp-readonly` con `pnpm mcp:greenhouse`
+  - no embebe secrets; usa `inputs` interactivos
+- Tests/verificacion ejecutados:
+  - `pnpm vitest run src/mcp/greenhouse/__tests__/config.test.ts src/mcp/greenhouse/__tests__/http-client.test.ts src/mcp/greenhouse/__tests__/tools.test.ts` OK
+  - `pnpm exec eslint src/mcp/greenhouse scripts/run-greenhouse-mcp.ts` OK
+  - `pnpm exec tsc --noEmit --pretty false` OK
+  - `pnpm lint` OK
+  - `pnpm build` OK
+  - smoke MCP local contra mock downstream: OK (`get_context` registrado y callable via stdio)
+- Decision explícita de scope:
+  - `get_platform_health` no entra en V1 mínima; queda como follow-up inmediato sobre el mismo cliente downstream
+
+## Sesion 2026-04-30 — TASK-647 MCP read-only local registration + documentation lane
+
+- Subtarea paralela enfocada solo en registro local/documentacion, sin tocar `src/**` ni `package.json`.
+- `.vscode/mcp.json` ahora registra un server local `greenhouse/greenhouse-mcp-readonly` apuntando al entrypoint esperado `pnpm mcp:greenhouse`.
+- El registro no embebe secrets:
+  - `GREENHOUSE_MCP_API_BASE_URL`
+  - `GREENHOUSE_MCP_CONSUMER_TOKEN`
+  - `GREENHOUSE_MCP_EXTERNAL_SCOPE_TYPE`
+  - `GREENHOUSE_MCP_EXTERNAL_SCOPE_ID`
+  - todos quedan resueltos via `inputs` de VS Code MCP; el token va marcado como `password`.
+- `docs/documentation/plataforma/api-platform-ecosystem.md` ahora deja explicito:
+  - que el MCP oficial va downstream de `api/platform/ecosystem/*`
+  - que la V1 es estrictamente `read-only`
+  - que `platform health` ya existe como extension downstream inmediata y no obliga a inflar la surface minima base
+  - que el registro local no debe crear consumers nuevos ni saltarse el flujo de bypass SSO cuando el target es `staging` o `preview`
+- `changelog.md` actualizado para registrar esta lane documental/operativa.
+- Validacion ejecutada:
+  - `node -e "JSON.parse(require('fs').readFileSync('.vscode/mcp.json','utf8')); console.log('ok')"` OK
+  - revision manual de consistencia contra `docs/tasks/complete/TASK-647-greenhouse-mcp-read-only-adapter-v1.md`
+- Limite explicito de esta subtarea:
+  - no documenta secrets reales ni crea consumers
+  - el runtime MCP y las variables operativas quedaron cubiertos despues en la sesion de cierre de `TASK-647`
+
 ## Sesion 2026-04-30 — TASK-694 Deep Link Platform Foundation (slice runtime inicial)
 
 - Se implementó la foundation compartida `src/lib/navigation/deep-links/**` con:

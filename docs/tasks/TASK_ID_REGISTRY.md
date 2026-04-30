@@ -722,7 +722,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-644` | `to-do` | Page entrance + skeleton crossfade | `docs/tasks/to-do/TASK-644-page-entrance-skeleton-crossfade.md` |
 | `TASK-645` | `to-do` | KPI counter animations (rolling numbers) | `docs/tasks/to-do/TASK-645-kpi-counter-animations.md` |
 | `TASK-646` | `to-do` | Scroll-triggered chart entrance + list stagger | `docs/tasks/to-do/TASK-646-scroll-triggered-chart-entrance-stagger.md` |
-| `TASK-647` | `to-do` | Greenhouse MCP Read-Only Adapter V1 | `docs/tasks/to-do/TASK-647-greenhouse-mcp-read-only-adapter-v1.md` |
+| `TASK-647` | `complete` | Greenhouse MCP Read-Only Adapter V1 | `docs/tasks/complete/TASK-647-greenhouse-mcp-read-only-adapter-v1.md` |
 | `TASK-648` | `to-do` | API Platform ICO Read Surface V1 | `docs/tasks/to-do/TASK-648-api-platform-ico-read-surface-v1.md` |
 | `TASK-649` | `complete` | API Platform Completion Program | `docs/tasks/complete/TASK-649-api-platform-completion-program.md` |
 | `TASK-650` | `to-do` | API Platform Domain Read Surfaces Program | `docs/tasks/to-do/TASK-650-api-platform-domain-read-surfaces-program.md` |

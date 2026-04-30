@@ -75,7 +75,7 @@ Reglas obligatorias:
 - `docs/tasks/complete/TASK-616-api-platform-foundation-ecosystem-read-surface-v1.md`
 - `docs/tasks/complete/TASK-617-api-platform-v1-1-convergence-program.md`
 - `docs/tasks/complete/TASK-617.1-api-platform-rest-hardening.md`
-- `docs/tasks/to-do/TASK-647-greenhouse-mcp-read-only-adapter-v1.md`
+- `docs/tasks/complete/TASK-647-greenhouse-mcp-read-only-adapter-v1.md`
 - `docs/api/GREENHOUSE_API_PLATFORM_V1.md`
 - `docs/api/GREENHOUSE_API_PLATFORM_V1.openapi.yaml`
 - `docs/documentation/delivery/motor-ico-metricas-operativas.md`

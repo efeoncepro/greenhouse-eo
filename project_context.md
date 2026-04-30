@@ -117,6 +117,28 @@
   - `teams`, `mercado_publico`, `zapsign` como runtime/helper existente pendiente de manifest/managed state.
 - Antes de crear nuevas integraciones productivas, revisar esta arquitectura y declarar manifest, scopes, secrets refs, data role, readiness, safe modes, data touched, ownership y access model cuando aplique.
 
+## Delta 2026-04-30 TASK-647 cierra MCP read-only adapter V1
+
+- Greenhouse ya tiene un runtime MCP local read-only downstream de `api/platform/ecosystem/*` en `src/mcp/greenhouse/**`.
+- El server expone por stdio cinco tools base:
+  - `get_context`
+  - `list_organizations`
+  - `get_organization`
+  - `list_capabilities`
+  - `get_integration_readiness`
+- Regla de arquitectura preservada: el MCP no lee SQL directo, no hace writes y no duplica auth, scope, request logging ni rate limits; todo baja al carril ecosystem existente.
+- Entry point operativo local:
+  - `pnpm mcp:greenhouse`
+  - `scripts/run-greenhouse-mcp.ts`
+- Variables de entorno nuevas para operación local/controlada:
+  - `GREENHOUSE_MCP_API_BASE_URL`
+  - `GREENHOUSE_MCP_CONSUMER_TOKEN`
+  - `GREENHOUSE_MCP_EXTERNAL_SCOPE_TYPE`
+  - `GREENHOUSE_MCP_EXTERNAL_SCOPE_ID`
+  - `GREENHOUSE_MCP_API_VERSION` (opcional; default `2026-04-25`)
+- `.vscode/mcp.json` puede registrar el server local sin embutir secrets, usando `inputs` interactivos.
+- `get_platform_health` queda explícitamente fuera del corte mínimo, pero el runtime ya quedó diseñado para agregar esa tool sobre el mismo cliente downstream sin romper la V1.
+
 ## Delta 2026-04-26 Greenhouse Deep Link Platform documentada
 
 - Nueva arquitectura canonica: `docs/architecture/GREENHOUSE_DEEP_LINK_PLATFORM_V1.md`.

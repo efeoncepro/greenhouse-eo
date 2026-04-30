@@ -8,13 +8,13 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `[optional EPIC-###]`
-- Status real: `Diseno`
+- Status real: `Implementado, verificado, documentado y empujado a develop`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none`
@@ -24,7 +24,7 @@
 
 ## Summary
 
-Construir el primer MCP server oficial de Greenhouse como adapter read-only downstream de `api/platform/ecosystem/*`. El corte expone tools mínimas para contexto, organizaciones, capabilities e integration readiness, sin acceso SQL directo ni writes.
+Construir el primer MCP server oficial de Greenhouse como adapter read-only downstream de `api/platform/ecosystem/*`. El corte expone tools mínimas para contexto, organizaciones, capabilities e integration readiness, sin acceso SQL directo ni writes. `platform health` ya existe downstream y debe quedar explicitado como follow-up inmediato o como extensión opcional si el slice cabe sin inflar la surface base.
 
 ## Why This Task Exists
 
@@ -85,6 +85,7 @@ Reglas obligatorias:
 - `src/app/api/platform/ecosystem/organizations/[id]/route.ts`
 - `src/app/api/platform/ecosystem/capabilities/route.ts`
 - `src/app/api/platform/ecosystem/integration-readiness/route.ts`
+- `src/app/api/platform/ecosystem/health/route.ts`
 - `src/lib/api-platform/core/**`
 - `src/lib/api-platform/resources/**`
 - `greenhouse_core.sister_platform_consumers`
@@ -105,7 +106,7 @@ Reglas obligatorias:
 - `package.json`
 - `pnpm-lock.yaml`
 - `.vscode/mcp.json` si se registra un server local para desarrollo
-- `docs/tasks/to-do/TASK-647-greenhouse-mcp-read-only-adapter-v1.md`
+- `docs/tasks/complete/TASK-647-greenhouse-mcp-read-only-adapter-v1.md`
 - `docs/documentation/plataforma/api-platform-ecosystem.md`
 - `Handoff.md`
 - `changelog.md`
@@ -115,7 +116,9 @@ Reglas obligatorias:
 ### Already exists
 
 - `api/platform/ecosystem/*` ya expone lecturas binding-aware para `context`, `organizations`, `capabilities` e `integration-readiness`.
+- `api/platform/ecosystem/health` ya existe como contrato ecosystem-facing para agentes/MCP, aunque no sea obligatorio incluirlo en este corte mínimo.
 - `api/platform/ecosystem/*` ya tiene versioning, response envelope, request IDs, rate-limit headers y paginación uniforme donde aplica.
+- `src/lib/api-platform/core/ecosystem-auth.ts` ya implementa auth por consumer, binding resolution, scope enforcement, request logging y rate limits para este carril.
 - `docs/architecture/GREENHOUSE_MCP_ARCHITECTURE_V1.md` define el MCP como server oficial downstream, read-first y sin bypass de la API Platform.
 - `.vscode/mcp.json` ya existe para servidores MCP externos de desarrollo, pero no registra todavía un server Greenhouse local.
 - `@modelcontextprotocol/sdk` aparece en lockfiles por dependencias transitorias, pero no está declarado como dependencia directa en `package.json`.
@@ -172,12 +175,14 @@ Reglas obligatorias:
   - `get_integration_readiness`
 - Mantener inputs pequeños y explícitos; no aceptar texto libre para resolver tenancy.
 - Normalizar errores de la API Platform a errores MCP machine-readable sin ocultar `code`, `status` ni `requestId` cuando existan.
+- `get_platform_health` no es obligatoria en este corte mínimo, pero el runtime debe quedar diseñado para agregarla encima del mismo cliente downstream sin romper la V1.
 
 ### Slice 4 — Local developer registration
 
 - Agregar un script local si hace falta, por ejemplo `pnpm mcp:greenhouse`.
 - Registrar el server en `.vscode/mcp.json` solo si puede hacerse sin secrets embebidos.
 - Documentar cómo inyectar env vars localmente sin crear un consumer nuevo a ciegas.
+- Si el smoke usa `staging` o `preview`, respetar el bypass SSO y el flujo operativo ya documentado; no asumir que `GREENHOUSE_MCP_API_BASE_URL` + consumer token bastan por sí solos.
 
 ### Slice 5 — Tests and docs
 
@@ -210,6 +215,8 @@ MCP client
 
 El MCP no debe importar stores de dominio ni ejecutar queries. Si un resource falta en `api/platform/ecosystem/*`, se abre una task de API Platform antes de exponerlo por MCP.
 
+La implementación debe reutilizar el carril ecosystem existente (`runEcosystemReadRoute`, resources y response envelope) como contrato downstream. No duplicar auth, rate limit, binding resolution ni request logging dentro del runtime MCP.
+
 El output de cada tool debe preservar al menos:
 
 - `requestId`
@@ -219,6 +226,11 @@ El output de cada tool debe preservar al menos:
 - `warnings` o `errors` cuando correspondan
 
 Para `list_organizations`, mantener paginación explícita compatible con el contrato actual (`page`, `pageSize`) y no esconder dumps grandes detrás de una tool sin límites.
+
+Nota de contrato real observada en discovery:
+
+- `organizations/:id` devuelve `403 forbidden` cuando el identificador existe pero cae fuera del scope resuelto; no degradar ese caso a `404`.
+- `integration-readiness` hoy pasa por el harness ecosystem pero su payload es global al registry y no binding-specific; si eso se endurece después, debe hacerse primero en API Platform.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 4 — VERIFICATION & CLOSING

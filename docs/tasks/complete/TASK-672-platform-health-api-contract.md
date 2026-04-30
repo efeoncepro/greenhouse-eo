@@ -82,7 +82,7 @@ Reglas obligatorias:
 
 - `docs/tasks/complete/TASK-616-api-platform-foundation-ecosystem-read-surface-v1.md`
 - `docs/tasks/complete/TASK-617-api-platform-v1-1-convergence-program.md`
-- `docs/tasks/to-do/TASK-647-greenhouse-mcp-read-only-adapter-v1.md`
+- `docs/tasks/complete/TASK-647-greenhouse-mcp-read-only-adapter-v1.md`
 - `docs/tasks/to-do/TASK-653-api-platform-ops-reliability-read-surface.md`
 - `docs/tasks/to-do/TASK-657-api-platform-degraded-modes-dependency-health.md`
 - `docs/tasks/to-do/TASK-658-api-platform-resource-authorization-bridge.md`
