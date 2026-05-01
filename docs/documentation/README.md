@@ -7,6 +7,7 @@ Documentacion oficial de la plataforma Greenhouse. Cada documento describe como 
 ### Identidad y acceso
 
 - [Sistema de Identidad, Roles y Acceso](identity/sistema-identidad-roles-acceso.md) — roles, permisos, supervisoria, responsabilidades operativas, candados de seguridad
+- [Sistema de Autenticación Resiliente](identity/sistema-auth-resiliente.md) — 7 capas defensivas que protegen el flujo de login (secret hygiene, readiness contract, observability, schema integrity, magic-link self-recovery, smoke lane sintética, rotation playbook). Postmortem de ISSUE-061 y guía de diagnóstico
 
 ### Admin Center
 
