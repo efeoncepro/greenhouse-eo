@@ -3,7 +3,9 @@
 // TASK-749 — Tab "Pago" en Person 360.
 // Fuente PRIMARIA del Beneficiary Payment Profile del miembro. CRUD completo
 // (crear, editar, aprobar, cancelar, revelar sensible) — todo via el componente
-// reutilizable <PaymentProfilesPanel> en modo embedded.
+// reutilizable <PaymentProfilesPanel> en modo embedded (cards expandidos).
+//
+// Spec: docs/mockups/payment-profiles-dual-mockup.html (Surface 1).
 
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
