@@ -100,6 +100,20 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     defaultScope: 'tenant'
   },
   {
+    // TASK-745 — crear / revertir adjustments de payroll por entry
+    key: 'hr.payroll_adjustments',
+    module: 'hr',
+    actions: ['create', 'update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    // TASK-745 — aprobar adjustments en estado pending_approval (maker-checker)
+    key: 'hr.payroll_adjustments_approval',
+    module: 'hr',
+    actions: ['approve'] as const,
+    defaultScope: 'tenant'
+  },
+  {
     key: 'finance.workspace',
     module: 'finance',
     actions: ['read', 'launch'] as const,

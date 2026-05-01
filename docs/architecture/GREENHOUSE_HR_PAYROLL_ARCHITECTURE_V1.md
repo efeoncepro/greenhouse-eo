@@ -1,5 +1,29 @@
 # GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md
 
+## Delta 2026-05-01 — TASK-745: Payroll Adjustments Foundation V1
+
+Se introduce el modelo canonico **event-sourced** para ajustar el pago de un entry en una nomina puntual: tabla `greenhouse_payroll.payroll_adjustments` con 5 kinds (`exclude`, `gross_factor`, `gross_factor_per_component`, `fixed_deduction`, `manual_override`), composables ortogonalmente.
+
+- **Inmutabilidad**: una vez `status='active'`, no se mutan columnas. Cambios crean rows nuevos en chain `superseded_by`.
+- **Maker-checker**: env `PAYROLL_ADJUSTMENTS_REQUIRE_APPROVAL` controla si los ajustes nacen `pending_approval` o `active`. Capability `hr.payroll_adjustments_approval` aprueba.
+- **Compliance Chile dependiente**: trigger DB `assert_chile_dependent_adjustment_compliance` rechaza `exclude` o `factor=0` para entries con `pay_regime='chile'` + contrato `indefinido|plazo_fijo` salvo motivos legales (`leave_unpaid`, `unauthorized_absence`, `termination_pending`).
+- **Computacion**: `src/lib/payroll/adjustments/compute-net.ts` aplica adjustments en orden canonico: `exclude` (corto) → `gross_factor` (multiplicativo) → recompute SII honorarios + previsional Chile sobre bruto efectivo → `fixed_deduction` resta del neto → `manual_override` gana sobre todo. Pure, idempotente, 19 tests.
+- **Wire en calculate-payroll**: `applyAdjustmentsToEntry` corre post-bruto-natural y pre-persistencia. Override `grossTotal`, `netTotal`, `siiRetentionAmount`, `chileTotalDeductions`. Primera calc no tiene adjustments (entry_id no existe); recalcs subsecuentes los aplican.
+- **Reliquidacion (TASK-409)**: en `supersedePayrollEntryOnRecalculate` case A (primera supersession), `cloneActiveAdjustmentsToV2` clona los adjustments del v1 al v2 con `source_kind='reliquidation_clone'` para preservar la intencion del operador.
+- **Outbox**: 3 events nuevos `payroll.adjustment.{created,approved,reverted}` con `aggregate_type='payroll_adjustment'`, payload incluye `kind`, `payloadSnapshot`, `sourceKind`, `sourceRef`. Finance projection consume para recompute de gasto de personal.
+- **API**: `POST/GET /api/hr/payroll/entries/[entryId]/adjustments`, `POST .../[adjustmentId]/approve|revert`. Permisos: `hr.payroll_adjustments` (crear/revertir), `hr.payroll_adjustments_approval` (aprobar).
+- **UI**: `PayrollEntryAdjustDialog` (3 modos radio + descuento adicional + dropdown motivo + nota + preview neto en vivo) y `PayrollAdjustmentHistoryDrawer` (historial activo + revertido + superseded por entry, con acciones approve/revert).
+
+**Reglas duras**:
+
+- **NUNCA** computar neto fuera de `computePayrollEntryNet` cuando hay adjustments — perder la lectura del trigger compliance, del audit chain o del outbox event.
+- **NUNCA** mutar `payroll_adjustments` rows con `status='active'`. Reverter via `status='reverted'` + nuevo row.
+- **NUNCA** crear adjustments en periodo `exported` salvo via reopen flow + `cloneActiveAdjustmentsToV2`.
+- **NUNCA** loggear `payload` raw del adjustment en logs externos: puede contener datos del colaborador + motivos sensibles.
+- Cuando emerja TASK-746 (schedules + Finance ledger), los adjustments con `source_kind='recurring_schedule'` se materializan via cron sobre la misma tabla.
+
+Spec funcional: `docs/documentation/hr/ajustes-de-pago-en-nomina.md`. Manual operativo: `docs/manual-de-uso/hr/ajustar-pago-de-nomina.md`. Task: `docs/tasks/in-progress/TASK-745-payroll-adjustments-foundation.md`.
+
 ## Delta 2026-05-01 — TASK-744: hard boundary de regímenes Payroll
 
 Payroll ahora materializa `contract_type_snapshot` en `greenhouse_payroll.payroll_entries` para que la entry calculada preserve el régimen usado en el cálculo y la base de datos pueda proteger nuevas escrituras incompatibles.

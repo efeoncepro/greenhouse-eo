@@ -29,6 +29,8 @@ import { getPayrollPeriod } from '@/lib/payroll/get-payroll-periods'
 import { canRecalculatePayrollPeriod, isPayrollPeriodReopened } from '@/lib/payroll/period-lifecycle'
 import { upsertPayrollEntry } from '@/lib/payroll/persist-entry'
 import { supersedePayrollEntryOnRecalculate } from '@/lib/payroll/supersede-entry'
+import { applyAdjustmentsToEntry } from '@/lib/payroll/adjustments/apply-to-entry'
+import { cloneActiveAdjustmentsToV2 } from '@/lib/payroll/adjustments/apply-adjustment'
 import { ensurePayrollInfrastructure } from '@/lib/payroll/schema'
 import { PayrollValidationError, getPeriodRangeFromId, runPayrollQuery, toNumber } from '@/lib/payroll/shared'
 import {
@@ -612,6 +614,13 @@ export const calculatePayroll = async ({
       }
     }
 
+    // TASK-745 — apply active payroll_adjustments before persisting. On the
+    // first calculation no adjustments exist (entry_id has no row yet), so
+    // this is a no-op. On subsequent recalculations after the operator
+    // applied adjustments via API, the active adjustments override the
+    // gross/SII/deductions/net of the entry deterministically.
+    entry = await applyAdjustmentsToEntry(entry)
+
     // TASK-410/411 — when the period is reopened, each entry mutation must
     // go through the supersede path so that v1 stays immutable, v2 is
     // created/updated in place, and `payroll_entry.reliquidated` is emitted
@@ -619,11 +628,35 @@ export const calculatePayroll = async ({
     // v1 in place, break the versioning invariant, and silently skip the
     // delta publication.
     if (isPayrollPostgresEnabled() && isPayrollPeriodReopened(period.status)) {
+      const v1EntryIdForClone = entry.entryId
+
       try {
-        await supersedePayrollEntryOnRecalculate({
+        const supersedeResult = await supersedePayrollEntryOnRecalculate({
           updatedEntry: entry,
           actorUserId: actorIdentifier ?? 'system'
         })
+
+        // TASK-745 — on first supersession (case A) the v2 row gets a fresh
+        // entry_id; clone any active adjustments from the v1 row over to v2
+        // so the operator's intent (exclude / factor / fixed_deduction)
+        // survives the reopen. Idempotent: if v2 already had cloned rows
+        // from a prior recalc, the active partial unique index prevents
+        // duplicates and the clone helper logs and skips.
+        if (
+          supersedeResult.entryId !== v1EntryIdForClone &&
+          supersedeResult.version >= 2
+        ) {
+          await cloneActiveAdjustmentsToV2({
+            v1EntryId: v1EntryIdForClone,
+            v2EntryId: supersedeResult.entryId,
+            triggeredBy: actorIdentifier ?? 'system'
+          }).catch(error => {
+            console.warn(
+              `[calculate-payroll] cloneActiveAdjustmentsToV2 failed for ${v1EntryIdForClone} → ${supersedeResult.entryId}:`,
+              error instanceof Error ? error.message : String(error)
+            )
+          })
+        }
       } catch (error) {
         // If no active row exists yet for (period, member) the supersede
         // flow can't compute a delta — this happens when calculate adds a

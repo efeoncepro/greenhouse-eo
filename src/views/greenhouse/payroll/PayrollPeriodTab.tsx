@@ -848,6 +848,7 @@ const PayrollPeriodTab = ({
               period={period}
               periodStatus={period.status}
               onEntryUpdate={handleEntryUpdate}
+              onAdjustmentChanged={onRefresh}
             />
           )}
 

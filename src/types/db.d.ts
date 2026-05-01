@@ -5139,6 +5139,38 @@ export interface GreenhousePayrollCompensationVersions {
   version_id: string;
 }
 
+export interface GreenhousePayrollPayrollAdjustments {
+  adjustment_id: string;
+  approved_at: Timestamp | null;
+  approved_by: string | null;
+  created_at: Generated<Timestamp>;
+  effective_at: Generated<Timestamp>;
+  /**
+   * exclude=skip from calc; gross_factor=multiply natural gross by payload.factor; gross_factor_per_component=per-line factor map; fixed_deduction=subtract payload.amount from net; manual_override=force payload.netClp final.
+   */
+  kind: string;
+  member_id: string;
+  payload: Generated<Json>;
+  payroll_entry_id: string;
+  period_id: string;
+  reason_code: string;
+  reason_note: string;
+  requested_at: Generated<Timestamp>;
+  requested_by: string;
+  reverted_at: Timestamp | null;
+  reverted_by: string | null;
+  reverted_reason: string | null;
+  /**
+   * manual=human; recurring_schedule=auto from TASK-746 schedule; finance_event=triggered by finance projection; reliquidation_clone=cloned from v1 entry on reopen.
+   */
+  source_kind: Generated<string>;
+  source_ref: string | null;
+  status: Generated<string>;
+  superseded_by: string | null;
+  updated_at: Generated<Timestamp>;
+  version: Generated<number>;
+}
+
 export interface GreenhousePayrollPayrollBonusConfig {
   config_id: string;
   created_at: Generated<Timestamp>;
@@ -7626,6 +7658,7 @@ export interface DB {
   "greenhouse_payroll.chile_previred_indicators": GreenhousePayrollChilePreviredIndicators;
   "greenhouse_payroll.chile_tax_brackets": GreenhousePayrollChileTaxBrackets;
   "greenhouse_payroll.compensation_versions": GreenhousePayrollCompensationVersions;
+  "greenhouse_payroll.payroll_adjustments": GreenhousePayrollPayrollAdjustments;
   "greenhouse_payroll.payroll_bonus_config": GreenhousePayrollPayrollBonusConfig;
   "greenhouse_payroll.payroll_entries": GreenhousePayrollPayrollEntries;
   "greenhouse_payroll.payroll_export_packages": GreenhousePayrollPayrollExportPackages;

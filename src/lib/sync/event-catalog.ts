@@ -40,6 +40,7 @@ export const AGGREGATE_TYPES = {
   // Payroll
   payrollPeriod: 'payroll_period',
   payrollEntry: 'payroll_entry',
+  payrollAdjustment: 'payroll_adjustment',
   compensationVersion: 'compensation_version',
   projectedPayroll: 'projected_payroll',
   payrollPrevisionalSnapshot: 'payroll_previsional_snapshot',
@@ -301,6 +302,9 @@ export const EVENT_TYPES = {
   payrollPeriodExported: 'payroll_period.exported',
   payrollEntryUpserted: 'payroll_entry.upserted',
   payrollEntryReliquidated: 'payroll_entry.reliquidated',
+  payrollAdjustmentCreated: 'payroll.adjustment.created',
+  payrollAdjustmentApproved: 'payroll.adjustment.approved',
+  payrollAdjustmentReverted: 'payroll.adjustment.reverted',
   leaveRequestCreated: 'leave_request.created',
   leaveRequestEscalatedToHr: 'leave_request.escalated_to_hr',
   leaveRequestApproved: 'leave_request.approved',

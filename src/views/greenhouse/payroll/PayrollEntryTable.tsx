@@ -4,6 +4,8 @@ import { Fragment, useState } from 'react'
 
 import Link from 'next/link'
 
+import { useSession } from 'next-auth/react'
+
 import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
@@ -30,8 +32,11 @@ import { canEditPayrollEntries } from '@/lib/payroll/period-lifecycle'
 import { getInitials } from '@/utils/getInitials'
 import { DataTableShell } from '@/components/greenhouse/data-table'
 import { InlineNumericEditor } from '@/components/greenhouse/primitives'
+import { ROLE_CODES } from '@/config/role-codes'
 import ChileDeductionBreakdown from './ChileDeductionBreakdown'
 import EntryVersionHistoryDrawer from './EntryVersionHistoryDrawer'
+import PayrollAdjustmentHistoryDrawer from './PayrollAdjustmentHistoryDrawer'
+import PayrollEntryAdjustDialog from './PayrollEntryAdjustDialog'
 import PayrollEntryExplainDialog from './PayrollEntryExplainDialog'
 import PayrollReceiptDialog from './PayrollReceiptDialog'
 import ReliquidationBadge from './ReliquidationBadge'
@@ -42,13 +47,19 @@ type Props = {
   period: PayrollPeriod
   periodStatus: PeriodStatus
   onEntryUpdate: (entryId: string, field: string, value: number | string | boolean | null) => void
+  onAdjustmentChanged?: () => void
 }
 
-const PayrollEntryTable = ({ entries, period, periodStatus, onEntryUpdate }: Props) => {
+const PayrollEntryTable = ({ entries, period, periodStatus, onEntryUpdate, onAdjustmentChanged }: Props) => {
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const [receiptEntry, setReceiptEntry] = useState<PayrollEntry | null>(null)
   const [explainEntry, setExplainEntry] = useState<PayrollEntry | null>(null)
   const [historyEntry, setHistoryEntry] = useState<PayrollEntry | null>(null)
+  const [adjustEntry, setAdjustEntry] = useState<PayrollEntry | null>(null)
+  const [adjustHistoryEntry, setAdjustHistoryEntry] = useState<PayrollEntry | null>(null)
+
+  const { data: session } = useSession()
+  const canApproveAdjustments = (session?.user?.roleCodes ?? []).includes(ROLE_CODES.EFEONCE_ADMIN)
 
   const isEditable = canEditPayrollEntries(periodStatus)
 
@@ -312,6 +323,27 @@ const PayrollEntryTable = ({ entries, period, periodStatus, onEntryUpdate }: Pro
                       <Tooltip title='Detalle de cálculo'>
                         <IconButton size='small' onClick={() => setExplainEntry(entry)} aria-label={`Ver detalle de cálculo de ${entry.memberName}`}>
                           <i className='tabler-search' />
+                        </IconButton>
+                      </Tooltip>
+                      {isEditable && (
+                        <Tooltip title='Ajustar pago (excluir, porcentaje o descuento)'>
+                          <IconButton
+                            size='small'
+                            color='warning'
+                            onClick={() => setAdjustEntry(entry)}
+                            aria-label={`Ajustar pago de ${entry.memberName}`}
+                          >
+                            <i className='tabler-adjustments-dollar' />
+                          </IconButton>
+                        </Tooltip>
+                      )}
+                      <Tooltip title='Ver ajustes aplicados'>
+                        <IconButton
+                          size='small'
+                          onClick={() => setAdjustHistoryEntry(entry)}
+                          aria-label={`Ver ajustes de ${entry.memberName}`}
+                        >
+                          <i className='tabler-list-details' />
                         </IconButton>
                       </Tooltip>
                       {(periodStatus === 'approved' || periodStatus === 'exported') && (
@@ -631,6 +663,21 @@ const PayrollEntryTable = ({ entries, period, periodStatus, onEntryUpdate }: Pro
       onClose={() => setHistoryEntry(null)}
       entryId={historyEntry?.entryId ?? null}
       memberName={historyEntry?.memberName ?? null}
+    />
+    <PayrollEntryAdjustDialog
+      open={!!adjustEntry}
+      onClose={() => setAdjustEntry(null)}
+      entry={adjustEntry}
+      onSubmitted={() => {
+        if (onAdjustmentChanged) onAdjustmentChanged()
+      }}
+    />
+    <PayrollAdjustmentHistoryDrawer
+      open={!!adjustHistoryEntry}
+      onClose={() => setAdjustHistoryEntry(null)}
+      entryId={adjustHistoryEntry?.entryId ?? null}
+      memberName={adjustHistoryEntry?.memberName ?? null}
+      canApprove={canApproveAdjustments}
     />
     </>
   )
