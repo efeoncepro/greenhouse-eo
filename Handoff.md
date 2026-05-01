@@ -1,5 +1,29 @@
 # Handoff.md
 
+## Sesion 2026-05-01 — TASK-742 Auth Resilience 7-Layer Architecture
+
+- **Trigger**: incidente 2026-04-30 — Daniela Ferreira (y todo internal user) no podía entrar vía Microsoft SSO; URL devolvía `?error=Callback`. Su `last_login_at` fue 2026-04-13. Algo cambió post-2026-04-13 que rompió el callback de Azure AD; sin observabilidad estructurada, NextAuth swallow-eó el error real. Auditoría forense de los 3 secrets críticos en GCP confirmó payloads sanos (v2/latest sin contaminación; v1 tenía comillas envolventes pero fue rotada el 2026-04-05/04-09). El bug está fuera de Greenhouse (Azure App registration / tenant config), pero el sistema no tenía mecanismos para detectarlo automáticamente ni dar al usuario un camino de recuperación.
+- **Solución**: 7 capas defensivas, branch `feature/TASK-742-auth-resilience-7-layers`.
+  - **Capa 1 — Secret hygiene**: `src/lib/secrets/format-validators.ts` con reglas por secret crítico (NEXTAUTH_SECRET, AZURE_AD_CLIENT_*, GOOGLE_CLIENT_*, NEXTAUTH_URL, CRON_SECRET, AGENT_AUTH_SECRET); `resolveSecret` rechaza payloads malformados y emite Sentry warning cuando un secret cae a `process.env` en prod.
+  - **Capa 2 — Readiness contract**: `src/lib/auth/readiness.ts` corre OIDC discovery + JWT sign+verify roundtrip; `/api/auth/health` expone status por provider; UI Login lee y oculta/deshabilita botones SSO degradados con warning accionable en vez del opaco `error=Callback`.
+  - **Capa 3 — Observability**: `greenhouse_serving.auth_attempts` append-only (PII redacted), `recordAuthAttempt` en cada signIn/jwt/authorize callback, `captureWithDomain(err, 'identity')` con stage + reason_code estable. La próxima falla emite la causa exacta en Sentry domain=identity.
+  - **Capa 4 — Schema integrity**: CHECK constraint `client_users_auth_mode_invariant` que prohíbe estados imposibles (`auth_mode='both'` con `password_hash=NULL`). Backfill normalizó 6 rows internas de `both` → `microsoft_sso`; Daniela Ferreira ahora `auth_mode='microsoft_sso'`. Estados transicionales (`sso_pending`, `password_reset_pending`, `invited`) preservados.
+  - **Capa 5 — Magic-link**: `/auth/magic-link` request + consume endpoints. Token 32 bytes urlsafe, bcrypt-hashed, single-use, 15min TTL, anti-enumeration response. UI surface debajo del formulario credentials. Email template 'magic_link' (priority=critical) en es/en. Cubre el caso "sin password + SSO roto" — exactamente el modo de falla del incidente original.
+  - **Capa 6 — Smoke lane**: handler `POST /smoke/identity-auth-providers` en ops-worker (Cloud Run) + Cloud Scheduler `*/5 * * * *`. 4 probes (portal /api/auth/health + Microsoft OIDC discovery + in-process readiness + JWT roundtrip). Persiste `greenhouse_sync.smoke_lane_runs` con `lane_key='identity.auth.providers'`. Falla → Sentry domain=identity rojo.
+  - **Capa 7 — Rotation playbook**: `pnpm secrets:audit` (8 secrets críticos, hygiene score, source detection) y `pnpm secrets:rotate <id>` con verify-before-cutover (validate format → printf %s canonical add → trigger redeploy → poll health → solo entonces disable previous). Nunca deja prod en estado unverified.
+- **Migrations aplicadas en dev**: 3 migrations (auth_attempts, auth_mode CHECK + normalize, auth_magic_links). 6 internal users normalizados a `microsoft_sso` incluyendo Daniela. Distribución post: 1 both, 1 credentials, 6 microsoft_sso, 29 password_reset_pending, 3 sso_pending.
+- **GitHub Actions**: `.github/workflows/ops-worker-deploy.yml` extendido — paths `src/lib/auth/**`, `src/lib/auth-secrets.ts`, `src/lib/secrets/**` ahora disparan auto-redeploy del ops-worker.
+- **Verification**:
+  - `pnpm test src/lib/secrets src/lib/auth`: 43/43 green
+  - `npx tsc --noEmit`: 0 errors
+  - `pnpm pg:connect:migrate`: 3 migrations OK + types regenerados
+  - `pnpm exec eslint <touched files>`: 0 errors
+- **Pendiente para destrabar el incidente original SSO**:
+  1. Investigar Azure App Registration `3626642f-0451-4eb2-8c29-d2211ab3176c` — verificar redirect URIs registradas, tenant config (multi-tenant vs single-tenant), client_secret expiration. Sin eso, MS SSO seguirá rebotando.
+  2. Una vez deployadas las 7 capas a producción, el próximo intento fallido emite el error exacto en Sentry/auth_attempts.
+  3. Mientras se destraba MS SSO, los users internos pueden usar el magic-link para entrar.
+- **Spec canónica**: `docs/tasks/in-progress/TASK-742-auth-resilience-7-layers.md` (mover a `complete/` post-merge prod).
+
 ## Sesion 2026-04-30 — Payroll Chile tax table auto-resolution hardening
 
 - Se cerró la brecha UX/runtime donde el operador veía un campo ambiguo de tabla tributaria Chile y parecía obligado a conocer manualmente una versión tipo `gael-YYYY-MM`.
