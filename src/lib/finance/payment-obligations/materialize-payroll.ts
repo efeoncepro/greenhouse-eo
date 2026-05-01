@@ -3,11 +3,10 @@ import 'server-only'
 import { query } from '@/lib/db'
 import type {
   PaymentObligationBeneficiaryType,
-  PaymentObligationCurrency,
-  PaymentObligationKind
+  PaymentObligationCurrency
 } from '@/types/payment-obligations'
 
-import { createPaymentObligation } from './create-obligation'
+import { reconcilePaymentObligation } from './reconcile-obligation'
 
 interface PayrollEntryRow extends Record<string, unknown> {
   entry_id: string
@@ -22,6 +21,15 @@ interface PayrollEntryRow extends Record<string, unknown> {
   net_total: number | string
   gross_total: number | string
   sii_retention_amount: number | string | null
+  // Cotizaciones empleado (descontadas del bruto, van a Previred)
+  chile_afp_amount: number | string | null
+  chile_health_amount: number | string | null
+  chile_unemployment_amount: number | string | null
+  chile_apv_amount: number | string | null
+  // Aportes empleador (van a Previred sobre bruto del empleado)
+  chile_employer_cesantia_amount: number | string | null
+  chile_employer_mutual_amount: number | string | null
+  chile_employer_sis_amount: number | string | null
   chile_employer_total_cost: number | string | null
   member_space_id: string | null
 }
@@ -112,6 +120,13 @@ export async function materializePayrollObligationsForExportedPeriod(args: {
         e.net_total,
         e.gross_total,
         e.sii_retention_amount,
+        e.chile_afp_amount,
+        e.chile_health_amount,
+        e.chile_unemployment_amount,
+        e.chile_apv_amount,
+        e.chile_employer_cesantia_amount,
+        e.chile_employer_mutual_amount,
+        e.chile_employer_sis_amount,
         e.chile_employer_total_cost,
         NULL::text AS member_space_id
        FROM greenhouse_payroll.payroll_entries AS e
@@ -147,11 +162,14 @@ export async function materializePayrollObligationsForExportedPeriod(args: {
     const beneficiaryType: PaymentObligationBeneficiaryType = 'member'
     const isDeel = entry.payroll_via === 'deel'
 
-    // 1) employee_net_pay
-    const obligationKind: PaymentObligationKind = isDeel ? 'provider_payroll' : 'employee_net_pay'
-
-    if (netTotal > 0 || isDeel) {
-      const created = await createPaymentObligation({
+    // 1) employee_net_pay — SIEMPRE el monto neto real que Greenhouse paga al
+    // colaborador, sin importar el rail (interno o vía Deel). El rail queda
+    // codificado en `metadata.payrollVia` + (cuando aplique) en
+    // `metadata.processorSlug='deel'`. Greenhouse SI tiene visibilidad del
+    // amount: aunque el dinero vaya a través de Deel como processor, la
+    // obligación es contra el colaborador por su net real.
+    if (netTotal > 0) {
+      const created = await reconcilePaymentObligation({
         spaceId: memberSpaceId,
         sourceKind: 'payroll',
         sourceRef: entry.period_id,
@@ -159,10 +177,8 @@ export async function materializePayrollObligationsForExportedPeriod(args: {
         beneficiaryType,
         beneficiaryId: entry.member_id,
         beneficiaryName: entry.display_name,
-        obligationKind,
-        // En Deel V1 dejamos amount=0 placeholder + metadata referencia, ya que
-        // Greenhouse no es owner del pago final.
-        amount: isDeel ? 0 : netTotal,
+        obligationKind: 'employee_net_pay',
+        amount: netTotal,
         currency,
         dueDate: periodEnd,
         metadata: {
@@ -171,20 +187,26 @@ export async function materializePayrollObligationsForExportedPeriod(args: {
           payRegime: entry.pay_regime ?? null,
           payrollVia: entry.payroll_via ?? null,
           deelContractId: entry.deel_contract_id ?? null,
-          referenceNet: isDeel ? netTotal : null,
+          processorSlug: isDeel ? 'deel' : null,
           grossTotal: toNumber(entry.gross_total)
         }
       })
 
-      if (isDeel) {
-        if (created.created) result.providerPayrollCreated += 1
-      } else {
-        if (created.created) result.employeeNetPayCreated += 1
-        else result.employeeNetPaySkipped += 1
-      }
+      if (created.action === 'created') result.employeeNetPayCreated += 1
+      else if (created.action === 'superseded') {
+        result.employeeNetPayCreated += 1
+        result.notes.push(
+          `obligation reconciled (member=${entry.member_id}): amount drift ${created.previousAmount} → ${netTotal} ${currency}`
+        )
+      } else result.employeeNetPaySkipped += 1
     }
 
     // 2) employee_withheld_component (SII retention para honorarios)
+    // Nota: idempotency key incluye beneficiary_id='cl_sii'. Una sola
+    // obligation SII por (period, beneficiary), por lo que multiples
+    // honorarios consolidan via sourceRef='period_id' + beneficiary_id.
+    // Por ahora cada uno crea su propia obligation con sourceRef
+    // unico = entry_id para evitar conflicto.
     const siiRetention = toNumber(entry.sii_retention_amount)
 
     if (
@@ -192,10 +214,10 @@ export async function materializePayrollObligationsForExportedPeriod(args: {
       entry.contract_type_snapshot === 'honorarios' &&
       siiRetention > 0
     ) {
-      const sii = await createPaymentObligation({
+      const sii = await reconcilePaymentObligation({
         spaceId: memberSpaceId,
         sourceKind: 'payroll',
-        sourceRef: entry.period_id,
+        sourceRef: `${entry.period_id}:sii:${entry.entry_id}`,
         periodId: entry.period_id,
         beneficiaryType: 'tax_authority',
         beneficiaryId: 'cl_sii',
@@ -212,20 +234,57 @@ export async function materializePayrollObligationsForExportedPeriod(args: {
         }
       })
 
-      if (sii.created) result.employeeWithheldCreated += 1
+      if (sii.action === 'created') result.employeeWithheldCreated += 1
+      else if (sii.action === 'superseded') {
+        result.employeeWithheldCreated += 1
+        result.notes.push(
+          `SII obligation reconciled (member=${entry.member_id}): ${sii.previousAmount} → ${siiRetention} CLP`
+        )
+      }
     }
   }
 
   // 3) employer_social_security consolidado (Previred)
-  const employerTotal = entries.reduce(
-    (sum, e) => sum + toNumber(e.chile_employer_total_cost),
-    0
-  )
+  //
+  // Previred es el processor canonico chileno que recibe:
+  //   - Aportes empleador (AFC empleador, Mutual, SIS) sobre el bruto
+  //   - Cotizaciones empleado descontadas del bruto (AFP, Salud, AFC empleado)
+  //   - APV opcional voluntario del empleado
+  //
+  // El monto debe ser la suma TOTAL de cotizaciones previsionales que
+  // Greenhouse paga a Previred — NO solo la parte empleador.
+  // El SII (impuesto unico, retencion honorarios) NO va a Previred.
+  const previredTotal = entries.reduce((sum, e) => {
+    const employee =
+      toNumber(e.chile_afp_amount) +
+      toNumber(e.chile_health_amount) +
+      toNumber(e.chile_unemployment_amount) +
+      toNumber(e.chile_apv_amount)
 
-  if (employerTotal > 0) {
+    const employer =
+      toNumber(e.chile_employer_cesantia_amount) +
+      toNumber(e.chile_employer_mutual_amount) +
+      toNumber(e.chile_employer_sis_amount)
+
+    return sum + employee + employer
+  }, 0)
+
+  // Breakdown para audit + drift detection
+  const previredBreakdown = entries.map(e => ({
+    memberId: e.member_id,
+    afpEmployee: toNumber(e.chile_afp_amount),
+    healthEmployee: toNumber(e.chile_health_amount),
+    unemploymentEmployee: toNumber(e.chile_unemployment_amount),
+    apvEmployee: toNumber(e.chile_apv_amount),
+    cesantiaEmployer: toNumber(e.chile_employer_cesantia_amount),
+    mutualEmployer: toNumber(e.chile_employer_mutual_amount),
+    sisEmployer: toNumber(e.chile_employer_sis_amount)
+  }))
+
+  if (previredTotal > 0) {
     const previred = await findPreviredSupplier()
 
-    const created = await createPaymentObligation({
+    const created = await reconcilePaymentObligation({
       spaceId: null,
       sourceKind: 'payroll',
       sourceRef: periodId,
@@ -234,22 +293,39 @@ export async function materializePayrollObligationsForExportedPeriod(args: {
       beneficiaryId: previred?.supplier_id ?? 'cl_previred',
       beneficiaryName: previred?.legal_name ?? previred?.trade_name ?? 'Previred',
       obligationKind: 'employer_social_security',
-      amount: employerTotal,
+      amount: previredTotal,
       currency: 'CLP',
       dueDate: periodEnd,
       metadata: {
         consolidatedFromEntries: entries.length,
-        sourcePeriod: periodId
+        sourcePeriod: periodId,
+        breakdown: previredBreakdown,
+        coveragePolicy: {
+          includesEmployeeAfp: true,
+          includesEmployeeHealth: true,
+          includesEmployeeUnemployment: true,
+          includesEmployeeApv: true,
+          includesEmployerCesantia: true,
+          includesEmployerMutual: true,
+          includesEmployerSis: true,
+          excludesSiiTax: true,
+          excludesHonorariosRetention: true
+        }
       }
     })
 
-    if (created.created) {
+    if (created.action === 'created') {
       result.employerSocialSecurityCreated = true
+    } else if (created.action === 'superseded') {
+      result.employerSocialSecurityCreated = true
+      result.notes.push(
+        `Previred obligation reconciled: ${created.previousAmount} → ${previredTotal} CLP (incluye empleado + empleador completo)`
+      )
     } else {
       result.employerSocialSecuritySkipped = true
     }
   } else {
-    result.notes.push('No hay chile_employer_total_cost > 0 — no se materializa employer_social_security')
+    result.notes.push('No hay cotizaciones previsionales > 0 — no se materializa employer_social_security')
   }
 
   return result
