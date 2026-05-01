@@ -1,5 +1,23 @@
 # Handoff.md
 
+## Sesion 2026-05-01 (tarde) — pivot Inter → Geist sobre la foundation TASK-566
+
+- **Trigger**: tras shippear Inter en staging (commit `5c4d84aa`, deploy preview `greenhouse-96gktkj39`), el usuario validó visualmente y comparó vía mockup A/B (`docs/mockups/typography-inter-vs-geist-mockup.html`). Veredicto: **Inter se siente plana / poco moderna**, Geist tiene la personalidad AI-native que necesita el portal Globe.
+- **Decisión**: pivot a **Geist Sans** como product UI base, manteniendo Poppins en `h1-h4`. Geist Mono **NO** se introduce — `monoId/monoAmount` siguen sobre Geist Sans + `tabular-nums`. Sigue siendo sistema de dos familias.
+- **Calibración de pesos**: idéntica al contrato post-TASK-566 (Poppins 600/700/800 en h1-h4, Geist 400 body / 500 helpers / 600 h5/h6/button/overline/monoId / 700 monoAmount / 800 kpiValue). No se preventiva down-shift; se valida en staging real y solo se recalibra surface puntual si emerge oppressive.
+- **Resultado código** (sobre los mismos 3 archivos owned por TASK-566, sin reabrir la task):
+  - `src/app/layout.tsx`: import `Inter` → `Geist`. Variable CSS `--font-inter` → `--font-geist`. Mismos pesos (400/500/600/700/800), mismo `display:'swap'`, mismo fallback array.
+  - `src/components/theme/mergedTheme.ts`: `typography.fontFamily` base ahora `var(--font-geist), 'Geist', …`. Pesos por variant inalterados.
+  - `docs/architecture/GREENHOUSE_DESIGN_TOKENS_V1.md` §3 actualizada + bump a **v1.2**: tabla `3.1`, scale `3.2`, prohibiciones `3.4`, foundation files `3.5`. Versioning row 1.2 documenta el pivot. Anti-pattern catalog y "Por qué Geist" reescritos.
+- **Documentos hijos del epic realineados a Geist en este turno**:
+  - `EPIC-004` — bloque Delta `2026-05-01 (tarde)` agregado.
+  - `TASK-566` (closed) — bloque Delta `2026-05-01 (tarde)` agregado al inicio.
+  - `TASK-567` — bloque Delta agregado: ESLint rule debe bloquear también `var(--font-inter)` y `'Inter'` literal en código nuevo.
+  - `TASK-568` — bloque Delta agregado: emails y PDFs convergen a `Poppins + Geist`. Asset PDF `Geist-{Regular,Medium,SemiBold,Bold,ExtraBold}.ttf` (npm `geist`, SIL OFL 1.1).
+  - `TASK-569` — bloque Delta agregado: Figma + skills cleanup apuntan a Geist; `.claude/skills/modern-ui/SKILL.md` debe quitar la regla legacy "no Inter".
+- **Verificación**: `pnpm lint` ✓. Deploy a staging en curso. Validación visual queda como follow-up del usuario en `/home`, `/finance/quotes/new`, `/hr/payroll`, `/admin` (light/dark + mobile + zoom 125-150%).
+- **Riesgo abierto**: una vez verificado en staging, si alguna surface puntual se siente oppressive (predecibles: dock total $38M+, monoAmount en payroll, button contained sobre fondo saturado), commit chico de recalibración variant-por-variant. Sin recalibración preventiva — eso anularía el motivo del pivot.
+
 ## Sesion 2026-05-01 — TASK-566 cerrada (foundation Inter + Poppins implementada)
 
 - **Trigger**: usuario pidió implementar TASK-566 (foundation tipográfica del EPIC-004) sobre la spec ya realineada a Inter.

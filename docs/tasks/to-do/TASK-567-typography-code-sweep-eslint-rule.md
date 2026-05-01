@@ -1,5 +1,15 @@
 # TASK-567 — Typography Code Sweep + ESLint Governance Rule
 
+## Delta 2026-05-01 (tarde) — pivot a Geist
+
+Tras cerrar TASK-566 con Inter y validar visualmente, el usuario decidió pivotar a **Geist Sans** como product UI base (mismo contrato `Poppins display + sans product` ahora con Geist en vez de Inter). El sweep que esta task ejecuta debe leer "Geist" donde el cuerpo abajo dice "Inter":
+
+- Toda referencia a "foundation Inter" se interpreta como "foundation Geist"
+- Las prohibiciones ESLint contra `var(--font-dm-sans)` y `'DM Sans'` siguen vigentes
+- Se agrega prohibición ESLint contra `var(--font-inter)` y `'Inter'` literal en código nuevo (sin retroceder a Inter en el barrido)
+- Geist Mono **NO** se introduce; `monoId/monoAmount` siguen sobre Geist Sans + `tabular-nums`
+- Pesos canónicos por variant son los del bump 1.2 de `GREENHOUSE_DESIGN_TOKENS_V1.md`
+
 ## Status
 
 - Lifecycle: `to-do`

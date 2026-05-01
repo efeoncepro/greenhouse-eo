@@ -29,28 +29,28 @@ Violations visible in code review or agent output are a **hard block**, not a ni
 
 ## 3. Typography
 
-> **Política canónica vigente** (TASK-566 / EPIC-004, 2026-05-01): el sistema tipográfico de Greenhouse opera con **dos familias activas y solo dos**: `Poppins` para display controlado (`h1-h4`) y `Inter` para todo el producto base (body, forms, tablas, controles, chips, labels, KPIs, IDs y montos). `DM Sans` quedó retirada como baseline. `fontFamily: 'monospace'` está prohibido globalmente — los montos y los IDs usan Inter con `font-variant-numeric: tabular-nums`. Los variants `monoId` y `monoAmount` siguen siendo la API semántica para IDs y montos, pero NO licencian una tercera familia monospace.
+> **Política canónica vigente** (TASK-566 / EPIC-004, 2026-05-01 — pivot a Geist tarde del mismo día): el sistema tipográfico de Greenhouse opera con **dos familias activas y solo dos**: `Poppins` para display controlado (`h1-h4`) y `Geist Sans` para todo el producto base (body, forms, tablas, controles, chips, labels, KPIs, IDs y montos). `DM Sans` e `Inter` quedaron retiradas como baseline. `fontFamily: 'monospace'` está prohibido globalmente — los montos y los IDs usan Geist con `font-variant-numeric: tabular-nums`. Los variants `monoId` y `monoAmount` siguen siendo la API semántica para IDs y montos, pero NO licencian una tercera familia monospace (en particular **Geist Mono NO se introduce**).
 
 ### 3.1 Font families
 
 | Role | Family | CSS Variable | Pesos cargados | When to use |
 |---|---|---|---|---|
 | Display | **Poppins** | `var(--font-poppins)` | 600, 700, 800 | EXCLUSIVO para `h1-h4` y momentos display realmente intencionales. Prohibido en `h5`, `h6`, `body*`, `button`, `overline`, `kpiValue`, `mono*`, chips, tablas, inputs |
-| Product UI base | **Inter** | `var(--font-inter)` | 400, 500, 600, 700, 800 | TODO el resto del producto: body, forms, controles, tablas, chips, labels, KPIs, IDs, montos. Es el `typography.fontFamily` default del theme — no debe hardcodearse inline |
-| Numbers / IDs | **Inter** + `font-variant-numeric: tabular-nums` | `var(--font-inter)` | mismos pesos que Inter | Toda columna numérica, total, KPI, ID y monto. **PROHIBIDO `font-family: monospace`** |
+| Product UI base | **Geist Sans** | `var(--font-geist)` | 400, 500, 600, 700, 800 | TODO el resto del producto: body, forms, controles, tablas, chips, labels, KPIs, IDs, montos. Es el `typography.fontFamily` default del theme — no debe hardcodearse inline |
+| Numbers / IDs | **Geist** + `font-variant-numeric: tabular-nums` | `var(--font-geist)` | mismos pesos que Geist | Toda columna numérica, total, KPI, ID y monto. **PROHIBIDO `font-family: monospace`** y **PROHIBIDO Geist Mono** |
 
 **Stack fallback explícito** (para periodos de carga de fuente, fallos de red o entornos sin Google Fonts):
 
-- Inter:  `var(--font-inter), 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif`
+- Geist:  `var(--font-geist), 'Geist', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif`
 - Poppins: `var(--font-poppins), 'Poppins', system-ui, -apple-system, sans-serif`
 
 El stack vive textualmente en `src/app/layout.tsx` (param `fallback` de `next/font/google`) y en `src/components/theme/mergedTheme.ts` (`typography.fontFamily`). Cuando se modifique uno hay que reflejarlo en los tres puntos: layout, theme y este documento.
 
 **Por qué dos familias y no tres**: monospace (Menlo, Courier, Consolas) lee como "código / herramienta de dev / legacy" en UIs enterprise modernas. Ramp, Mercury, Pilot, Stripe Dashboard, Linear y Vercel usan sans-serif con `tabular-nums` para alinear columnas. Monospace pertenece a editores de código y consolas SQL, no al quote builder de un CFO.
 
-**Por qué Inter y no DM Sans / Geist**: Inter tiene métricas tabulares de fábrica, soporta toda la gama de pesos requerida por el producto (400-800), tiene cobertura latina completa para clientes Globe (Sky, ANAM, etc.) y es la baseline de facto del enterprise UI moderno (Stripe, GitHub, Vercel). DM Sans quedó como deuda de la primera fundación del portal. Geist se evaluó en draft y se descartó: deja una tercera familia técnica (Geist Mono) implícita y exige más assets locales para PDFs/email sin ganancia visible.
+**Por qué Geist (y no DM Sans, ni Inter como baseline final)**: Geist Sans (Vercel + Basement Studio, 2024) tiene la misma base técnica que Inter (variable wght axis, métricas tabulares, cobertura latina completa) pero rinde con más personalidad: peso óptico más confiado al mismo numeric weight, tracking ligeramente más tight, y la apariencia "AI-native / modern enterprise" que distingue al portal. DM Sans quedó como deuda de la primera fundación. Inter shippeó como foundation TASK-566 (commit `5c4d84aa`) y validación visual + comparativa A/B (`docs/mockups/typography-inter-vs-geist-mockup.html`) confirmó que Inter se sentía "plana / poco moderna" para el client portal Globe — el pivot a Geist se aplicó la misma tarde. **Geist Mono NO se introduce**: `monoId` y `monoAmount` siguen sobre Geist Sans + `tabular-nums`, manteniendo la regla dura de máximo 2 familias activas. PDF y email convergen al mismo contrato vía TASK-568 (registro local de `Geist-{Regular,Medium,SemiBold,Bold,ExtraBold}.ttf`).
 
-**Regla dura**: máximo 2 familias activas en una surface. Una página que combine Inter body + Poppins hero + monospace amounts = 3 familias = fail.
+**Regla dura**: máximo 2 familias activas en una surface. Una página que combine Geist body + Poppins hero + monospace amounts = 3 familias = fail.
 
 ### 3.2 Type scale
 
@@ -62,18 +62,18 @@ Base root font: `13.125px` (0.82rem, non-standard per Vuexy template). All other
 | h2 | **Poppins** | 1.5 | 24 (override) | 700 | 1.25 | — | Marketing section header |
 | h3 | **Poppins** | 1.25 | 20 (override) | 600 | 1.3 | — | Page identity (rare) |
 | h4 | **Poppins** | 1 | 16 (override) | 600 | 1.4 | — | **Page title in product UI** |
-| h5 | Inter | 1.125 | 18 | 600 | 1.556 | — | **Section title inside card/accordion** |
-| h6 | Inter | 0.9375 | 15 | 600 | 1.467 | — | Inline bold label (prefer subtitle1) |
-| subtitle1 | Inter | 0.9375 | 15 | 400 | 1.467 | — | **Card subheader, list item primary** |
-| subtitle2 | Inter | 0.8125 | 13 | 400 | 1.538 | — | Card subheader secondary |
-| body1 | Inter | 1 | 16 (override) | 400 | 1.5 | — | **Primary body text** |
-| body2 | Inter | 0.875 | 14 (override) | 400 | 1.5 | — | **Dense text, table cells, chip labels, helpers** |
-| button | Inter | 0.9375 | 15 | 600 | 1.467 | — | Theme override — do not touch |
-| caption | Inter | 0.8125 | 13 | 400 | 1.4 | 0.4px | **Metadata, validity, timestamps, "sugerido"** |
-| overline | Inter | 0.75 | 12 | 600 | 1.167 | 1px | **Section labels over content (SUBTOTAL, TOTAL, STATUS)** |
-| monoId | Inter + `tabular-nums` | 0.875 | 14 | 600 | 1.54 | 0.01em | IDs alfanuméricos canónicos (`EO-XXX-XXXX`, SKU, account number) |
-| monoAmount | Inter + `tabular-nums` | 0.8125 | 13 | 700 | 1.54 | — | Montos en tablas y celdas densas (`$4.823.681`) |
-| kpiValue | Inter + `tabular-nums` | 1.75 | 28 | 800 | 1.05 | — | Stat principal de KPI cards y dashboards |
+| h5 | Geist | 1.125 | 18 | 600 | 1.556 | — | **Section title inside card/accordion** |
+| h6 | Geist | 0.9375 | 15 | 600 | 1.467 | — | Inline bold label (prefer subtitle1) |
+| subtitle1 | Geist | 0.9375 | 15 | 400 | 1.467 | — | **Card subheader, list item primary** |
+| subtitle2 | Geist | 0.8125 | 13 | 400 | 1.538 | — | Card subheader secondary |
+| body1 | Geist | 1 | 16 (override) | 400 | 1.5 | — | **Primary body text** |
+| body2 | Geist | 0.875 | 14 (override) | 400 | 1.5 | — | **Dense text, table cells, chip labels, helpers** |
+| button | Geist | 0.9375 | 15 | 600 | 1.467 | — | Theme override — do not touch |
+| caption | Geist | 0.8125 | 13 | 400 | 1.4 | 0.4px | **Metadata, validity, timestamps, "sugerido"** |
+| overline | Geist | 0.75 | 12 | 600 | 1.167 | 1px | **Section labels over content (SUBTOTAL, TOTAL, STATUS)** |
+| monoId | Geist + `tabular-nums` | 0.875 | 14 | 600 | 1.54 | 0.01em | IDs alfanuméricos canónicos (`EO-XXX-XXXX`, SKU, account number) |
+| monoAmount | Geist + `tabular-nums` | 0.8125 | 13 | 700 | 1.54 | — | Montos en tablas y celdas densas (`$4.823.681`) |
+| kpiValue | Geist + `tabular-nums` | 1.75 | 28 | 800 | 1.05 | — | Stat principal de KPI cards y dashboards |
 
 > **Nota**: las celdas marcadas "(override)" son tamaños declarados en `mergedTheme.ts` que sobreescriben el coreTheme. El resto hereda de `src/@core/theme/typography.ts` y la regla dura es no tocar `@core/theme/*`.
 
@@ -97,8 +97,10 @@ Base root font: `13.125px` (0.82rem, non-standard per Vuexy template). All other
 
 ### 3.4 Prohibitions
 
-- **NEVER** uses `fontFamily: 'monospace'` (literal o vía stacks tipo `'Menlo, Consolas, monospace'`). Para alinear cifras usar `fontVariantNumeric: 'tabular-nums'` sobre Inter.
-- **NEVER** declare `fontFamily` inline en componentes nuevos. Inter es default implícito; Poppins se aplica solo por las variants `h1-h4` ya tipadas en el theme.
+- **NEVER** uses `fontFamily: 'monospace'` (literal o vía stacks tipo `'Menlo, Consolas, monospace'`). Para alinear cifras usar `fontVariantNumeric: 'tabular-nums'` sobre Geist.
+- **NEVER** declare `fontFamily` inline en componentes nuevos. Geist es default implícito; Poppins se aplica solo por las variants `h1-h4` ya tipadas en el theme.
+- **NEVER** introduce Geist Mono ni ninguna familia mono separada — los variants `monoId` y `monoAmount` resuelven el caso sobre Geist Sans + tabular-nums.
+- **NEVER** mantener referencias activas a `var(--font-inter)` o `'Inter'` literal en código nuevo. Las residuales se barren en `TASK-567`.
 - **NEVER** mantener referencias activas a `var(--font-dm-sans)` o a `'DM Sans'` en código nuevo. Las residuales en `src/components/greenhouse/*`, `src/views/**/styles.module.css`, `src/app/global-error.tsx` y `src/lib/finance/pdf/**` se barren en `TASK-567` (sweep + ESLint rule) y `TASK-568` (emails + PDFs).
 - **NEVER** introduce una tercera familia (Geist Mono, IBM Plex Mono, JetBrains Mono, etc.) para montos, IDs o code samples. `monoId` / `monoAmount` resuelven ambos casos sin agregar fuente.
 - **NEVER** set `fontSize` inline. Use variants.
@@ -110,7 +112,7 @@ Base root font: `13.125px` (0.82rem, non-standard per Vuexy template). All other
 | Concern | File |
 |---|---|
 | Font loading + CSS variables + fallback stack | `src/app/layout.tsx` |
-| Theme override (Inter base, Poppins h1-h4, mono variants Inter+tabular-nums) | `src/components/theme/mergedTheme.ts` |
+| Theme override (Geist base, Poppins h1-h4, mono variants Geist+tabular-nums) | `src/components/theme/mergedTheme.ts` |
 | Variant type declarations (`monoId`, `monoAmount`, `kpiValue`) | `src/components/theme/types.ts` |
 | Coretheme fallback chain (NOT to be edited per regla dura) | `src/@core/theme/typography.ts` |
 
@@ -392,7 +394,7 @@ These are anti-patterns detected in the Greenhouse codebase, with the correct pa
 
 | Anti-pattern | Why it's wrong | Correct pattern | Detected where |
 |---|---|---|---|
-| `fontFamily: 'monospace'` on numbers | Reads as "dev tool / legacy / technical" | `fontVariantNumeric: 'tabular-nums'` on Inter (or use `monoId` / `monoAmount` variants) | Finance Intelligence, Agency dashboards, pre-TASK-488 Quote Builder |
+| `fontFamily: 'monospace'` on numbers | Reads as "dev tool / legacy / technical" | `fontVariantNumeric: 'tabular-nums'` on Geist (or use `monoId` / `monoAmount` variants) | Finance Intelligence, Agency dashboards, pre-TASK-488 Quote Builder |
 | `Popover > Select` | 3 clicks to select | `CustomAutocomplete` | Pre-TASK-488 ContextChip |
 | `primary + success + info` in parallel empty-state CTAs | Color carnival, misuse of semantic palette | 1 `primary` + N `tonal secondary` | Pre-TASK-488 QuoteLineItemsEditor empty state |
 | `sx={{ borderRadius: 2.5 }}` (20px) | Off-scale, creates inconsistency | `theme.shape.customBorderRadius.lg` (8px) or `9999` for pills | Pre-TASK-488 ContextChip |
@@ -437,7 +439,8 @@ Inventoried by TASK-488 subagent 2026-04-19. Top 15 files to copy/adapt (never f
 | Version | Date | Author | Summary |
 |---|---|---|---|
 | 1.0 | 2026-04-19 | Claude + TASK-488 | Initial canonical tokens extracted from `src/@core/theme/*` + Vuexy template + TASK-487 gaps analysis. |
-| 1.1 | 2026-05-01 | Claude + TASK-566 / EPIC-004 | §3 reescrita: política canónica `Poppins display + Inter base`. DM Sans retirada como baseline. `monoId` / `monoAmount` / `kpiValue` migrados a Inter + `tabular-nums` (sin monospace). Stack fallback explícito para Inter y Poppins documentado y referenciado a `layout.tsx` + `mergedTheme.ts`. Anti-pattern row de monospace actualizado para apuntar a Inter / variants `mono*`. |
+| 1.1 | 2026-05-01 (mañana) | Claude + TASK-566 / EPIC-004 | §3 reescrita: política canónica `Poppins display + Inter base`. DM Sans retirada como baseline. `monoId` / `monoAmount` / `kpiValue` migrados a Inter + `tabular-nums` (sin monospace). Stack fallback explícito para Inter y Poppins documentado y referenciado a `layout.tsx` + `mergedTheme.ts`. Anti-pattern row de monospace actualizado para apuntar a Inter / variants `mono*`. |
+| 1.2 | 2026-05-01 (tarde) | Claude + TASK-566 / EPIC-004 (Delta pivot) | Pivot Inter → **Geist Sans** tras validación visual del usuario en staging (Inter "se siente plana"). Mismos pesos por variant (Poppins 600/700/800 en h1-h4, Geist 400 body, 500 helpers, 600 h5/h6/button/overline/monoId, 700 monoAmount, 800 kpiValue). Stack fallback rotado a `var(--font-geist), 'Geist', system-ui, …`. Prohibición explícita de Geist Mono y de `var(--font-inter)`/`'Inter'` literal en código nuevo. Mockup de referencia visual: `docs/mockups/typography-inter-vs-geist-mockup.html`. |
 
 ## 16. Related docs
 

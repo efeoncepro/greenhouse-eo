@@ -1,5 +1,16 @@
 # TASK-569 — Typography Visual Regression + Figma Alignment + Skills/Docs Cleanup
 
+## Delta 2026-05-01 (tarde) — pivot a Geist
+
+Tras cerrar TASK-566 con Inter y validar visualmente, el usuario decidió pivotar a **Geist Sans** como product UI base. Esta task ahora valida y propaga el contrato `Poppins + Geist`, no `Poppins + Inter`. Cambios concretos sobre el cuerpo:
+
+- Donde dice "Inter" como destino canónico, leer "Geist Sans"
+- `.claude/skills/modern-ui/SKILL.md` debe quitar la regla "no Inter" (ya invalidada por TASK-566) y agregar nota de baseline `Poppins + Geist`
+- Figma debe alinearse a `Poppins + Geist`, no `Poppins + Inter`
+- El grep de cleanup ahora barre `'DM Sans'`, `var(--font-dm-sans)`, `var(--font-inter)`, `'Inter'` literal y referencias a `Geist Mono`
+- Visual regression valida que NO hay regresiones de first fold, wraps o clipping al pasar el theme a Geist (mismos casos de uso pero contra Geist en /home, /finance/quotes/new, /hr/payroll, /admin)
+- Mockup de referencia de la decisión visual: `docs/mockups/typography-inter-vs-geist-mockup.html`
+
 ## Status
 
 - Lifecycle: `to-do`

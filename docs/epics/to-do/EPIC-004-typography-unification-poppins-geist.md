@@ -1,4 +1,4 @@
-# EPIC-004 — Typography Unification: Poppins Display + Inter Product UI
+# EPIC-004 — Typography Unification: Poppins Display + Geist Product UI
 
 ## Status
 
@@ -14,15 +14,15 @@
 
 ## Summary
 
-Unificar el sistema tipográfico de Greenhouse EO a **Poppins** como display controlado (`h1-h4`) + **Inter** como tipografía base del producto (body, forms, tablas, controles, chips, labels, KPIs, metadata). Eliminar **DM Sans** del portal. Eliminar el uso literal de `fontFamily: 'monospace'` y conservar `monoId` / `monoAmount` como variants semánticos respaldados por **Inter + tabular nums**, no por una tercera familia técnica.
+Unificar el sistema tipográfico de Greenhouse EO a **Poppins** como display controlado (`h1-h4`) + **Geist** como tipografía base del producto (body, forms, tablas, controles, chips, labels, KPIs, metadata). Eliminar **DM Sans** del portal. Eliminar el uso literal de `fontFamily: 'monospace'` y conservar `monoId` / `monoAmount` como variants semánticos respaldados por **Geist + tabular nums**, no por una tercera familia técnica.
 
 ## Why This Epic Exists
 
-El programa original quedó redactado sobre una migración a `Geist`, pero el repo hoy sigue usando `DM Sans` y la decisión de producto cambió a **Inter**. Eso obliga a corregir no solo el destino de la migración, sino también los fundamentos del epic:
+El programa original quedó redactado sobre una migración a `Geist`, pero el repo hoy sigue usando `DM Sans` y la decisión de producto cambió a **Geist**. Eso obliga a corregir no solo el destino de la migración, sino también los fundamentos del epic:
 
 1. `GREENHOUSE_DESIGN_TOKENS_V1.md` declara una política que el theme actual no cumple: Poppins está restringida en teoría, pero `mergedTheme.ts` la aplica a `h1-h6`, `button`, `overline` y `kpiValue`.
 2. El portal mantiene `fontFamily: 'monospace'` en `monoId` / `monoAmount` y en componentes sueltos, contradiciendo el propio contrato de tokens.
-3. La migración a `Inter` deja un sistema más simple y gobernable que el draft `Geist`:
+3. La migración a `Geist` deja un sistema más simple y gobernable que el draft `Geist`:
    - evita una tercera familia adicional para IDs/montos
    - conserva mejor el principio operativo de “máximo dos familias activas por surface”
    - facilita consistencia entre portal, email, PDF, Figma y skills
@@ -31,10 +31,10 @@ El programa original quedó redactado sobre una migración a `Geist`, pero el re
 ## Outcome
 
 - Poppins aparece exclusivamente en `h1-h4` y momentos display realmente intencionales.
-- Inter reemplaza a DM Sans como base del producto autenticado.
-- `monoId` y `monoAmount` sobreviven como variants semánticos, pero usando Inter con `fontVariantNumeric: 'tabular-nums'` y ajustes de tracking/peso, no una familia monospace separada.
+- Geist reemplaza a DM Sans como base del producto autenticado.
+- `monoId` y `monoAmount` sobreviven como variants semánticos, pero usando Geist con `fontVariantNumeric: 'tabular-nums'` y ajustes de tracking/peso, no una familia monospace separada.
 - `fontFamily: 'monospace'` queda prohibido en theme, componentes, emails y PDFs.
-- Emails y PDFs convergen a la misma dupla `Inter + Poppins`.
+- Emails y PDFs convergen a la misma dupla `Geist + Poppins`.
 - Skills, docs y librería de diseño dejan de empujar `DM Sans` o el draft `Geist`.
 
 ## Architecture Alignment
@@ -47,14 +47,14 @@ El programa original quedó redactado sobre una migración a `Geist`, pero el re
 Reglas transversales:
 
 - Poppins solo en `h1-h4`, salvo excepciones explícitas y documentadas.
-- Inter es el default implícito del producto; no debería hardcodearse inline.
+- Geist es el default implícito del producto; no debería hardcodearse inline.
 - `monoId` / `monoAmount` siguen siendo la API canónica para IDs y montos, pero sin depender de monospace.
 - `src/@core/theme/*` no se toca; el override vive en `src/components/theme/mergedTheme.ts`.
 - Todo cambio tipográfico visible debe validarse en light y dark mode, desktop y mobile, y con zoom alto en al menos una surface densa.
 
 ## Child Tasks
 
-- `TASK-566` — foundation del cambio: `layout.tsx`, `mergedTheme.ts`, tokens doc y decisión base Inter.
+- `TASK-566` — foundation del cambio: `layout.tsx`, `mergedTheme.ts`, tokens doc y decisión base Geist.
 - `TASK-567` — sweep de overrides hardcodeados + regla ESLint para prevenir drift futuro.
 - `TASK-568` — surfaces de delivery: emails, PDFs y assets tipográficos hoy existentes en el repo.
 - `TASK-569` — validación final: regresión visual, Figma, skills, docs y cierre del programa.
@@ -65,24 +65,24 @@ Reglas transversales:
 - `src/app/layout.tsx` hoy carga `DM Sans + Poppins`.
 - `src/components/theme/mergedTheme.ts` hoy usa `DM Sans`, Poppins excesiva y variants `mono*` con monospace.
 - `src/lib/finance/pdf/register-fonts.ts` y `src/lib/finance/pdf/tokens.ts` ya existen y deben reutilizarse, no reemplazarse por un helper inventado en paralelo.
-- `.claude/skills/modern-ui/SKILL.md` hoy fija explícitamente “no Inter”; debe corregirse en `TASK-569`.
+- `.claude/skills/modern-ui/SKILL.md` hoy fija explícitamente “no Geist”; debe corregirse en `TASK-569`.
 
 ## Exit Criteria
 
-- [ ] `src/app/layout.tsx` carga `Inter + Poppins` y elimina `DM Sans`
-- [ ] `src/components/theme/mergedTheme.ts` usa Inter como base y restringe Poppins a `h1-h4`
+- [ ] `src/app/layout.tsx` carga `Geist + Poppins` y elimina `DM Sans`
+- [ ] `src/components/theme/mergedTheme.ts` usa Geist como base y restringe Poppins a `h1-h4`
 - [ ] `monoId` / `monoAmount` ya no usan `fontFamily: 'monospace'`
-- [ ] `GREENHOUSE_DESIGN_TOKENS_V1.md §3` refleja la política `Poppins + Inter`
+- [ ] `GREENHOUSE_DESIGN_TOKENS_V1.md §3` refleja la política `Poppins + Geist`
 - [ ] `src/emails/**` y `src/lib/finance/pdf/**` convergen a la nueva política
 - [ ] La rule ESLint bloquea hardcodes nuevos de `fontFamily` y el uso literal de monospace
 - [ ] Figma, skills y docs dejan de mencionar `DM Sans` como baseline y dejan de empujar `Geist` como destino
-- [ ] El programa deja documentado fallback/rollback operativo si algún runtime no puede absorber `Inter` o si los assets PDF faltan
+- [ ] El programa deja documentado fallback/rollback operativo si algún runtime no puede absorber `Geist` o si los assets PDF faltan
 - [ ] El programa deja trazabilidad de procedencia/licencia de los assets de fuente locales que se agreguen
 
 ## Non-goals
 
 - No eliminar Poppins por completo.
-- No introducir una tercera familia nueva para “mono” salvo que discovery pruebe que Inter no cubre el caso.
+- No introducir una tercera familia nueva para “mono” salvo que discovery pruebe que Geist no cubre el caso.
 - No rediseñar componentes o cambiar spacing/color/radius fuera de lo necesario para absorber el cambio tipográfico.
 - No tocar branding de logos, isotipos o piezas externas fuera del portal, email y PDF.
 
@@ -90,14 +90,23 @@ Reglas transversales:
 
 | Riesgo | Mitigación |
 |---|---|
-| Wrap/overflow distinto entre Inter y DM Sans | `TASK-569` con Playwright + sweep manual |
+| Wrap/overflow distinto entre Geist y DM Sans | `TASK-569` con Playwright + sweep manual |
 | Drift entre portal y PDF/email | `TASK-568` usa los artefactos reales ya presentes (`register-fonts.ts`, `tokens.ts`, `src/emails/**`) |
-| Futuros agentes siguen empujando DM Sans o “no Inter” | `TASK-569` actualiza skills y docs operativas |
+| Futuros agentes siguen empujando DM Sans o “no Geist” | `TASK-569` actualiza skills y docs operativas |
 | `monoId` / `monoAmount` pierden legibilidad al dejar monospace | validar con tabular nums, peso y spacing antes de introducir otra familia |
-| `Inter` genera CLS/FOUT perceptible en primeras cargas | validar `display: 'swap'`, revisar first fold y documentar fallback stack |
+| `Geist` genera CLS/FOUT perceptible en primeras cargas | validar `display: 'swap'`, revisar first fold y documentar fallback stack |
 | Assets PDF nuevos entran sin trazabilidad o con pesos innecesarios | `TASK-568` documenta provenance, formatos y set mínimo usado |
 
-## Delta 2026-05-01
+## Delta 2026-05-01 (mañana) — primer realineamiento
 
 - El epic fue realineado desde el draft `Geist` hacia `Inter` por decisión explícita del usuario.
 - Se corrigió el contrato para trabajar con los artefactos reales del repo y preservar un sistema de dos familias (`Poppins + Inter`) salvo hallazgo técnico fuerte en discovery.
+
+## Delta 2026-05-01 (tarde) — pivot a Geist tras validación visual
+
+- TASK-566 se cerró con Inter shippeado a staging (commit `5c4d84aa`, deploy preview Vercel `greenhouse-96gktkj39`).
+- El usuario realizó validación visual en staging real + comparativa A/B (`docs/mockups/typography-inter-vs-geist-mockup.html`) y encontró que **Inter se siente plana / poco moderna** vs Geist, que aporta más personalidad y vibe AI-native.
+- Decisión irreversible: el epic vuelve a apuntar a **Geist Sans** como product UI base. Geist Mono **NO se introduce** — `monoId` / `monoAmount` siguen sobre Geist Sans + `tabular-nums`. Sigue siendo un sistema de dos familias: `Poppins display + Geist product UI`.
+- El cambio se aplica encima de la foundation TASK-566 (la arquitectura del contrato es portable; cambiar Inter→Geist es swap de variable CSS + del `next/font/google` import, mismos pesos por variant que validó el mockup).
+- **Pesos por variant**: se mantienen idénticos al contrato post-TASK-566 (Poppins 600/700/800 en h1-h4, Geist 400 body, 500 helpers, 600 h5/h6/button/overline/monoId, 700 monoAmount, 800 kpiValue). No se preventiva un down-shift "para compensar" la mayor densidad óptica de Geist — se valida en staging real y se recalibra solo si una surface puntual emerge oppressive.
+- Los hijos `TASK-566`, `TASK-567`, `TASK-568`, `TASK-569` se realinean a Geist en este mismo turno.

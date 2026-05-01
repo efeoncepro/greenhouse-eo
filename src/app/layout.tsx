@@ -1,4 +1,4 @@
-import { Inter, Poppins } from 'next/font/google'
+import { Geist, Poppins } from 'next/font/google'
 
 import type { Metadata } from 'next'
 
@@ -23,14 +23,14 @@ import '@assets/iconify-icons/generated-icons.css'
 import '@flaticon/flaticon-uicons/css/brands/all.css'
 import '@flaticon/flaticon-uicons/css/regular/rounded.css'
 
-// Typography foundation — TASK-566 / EPIC-004
-// Inter = product UI base (body, controls, tables, KPIs, IDs, amounts via tabular-nums)
+// Typography foundation — TASK-566 / EPIC-004 (Delta 2026-05-01 tarde: pivot a Geist)
+// Geist Sans = product UI base (body, controls, tables, KPIs, IDs, amounts via tabular-nums)
 // Poppins = display only, restricted to h1-h4 in mergedTheme.ts
-// Source of truth: docs/architecture/GREENHOUSE_DESIGN_TOKENS_V1.md §3
-const inter = Inter({
+// Source of truth: docs/architecture/GREENHOUSE_DESIGN_TOKENS_V1.md §3 (v1.2)
+const geist = Geist({
   subsets: ['latin'],
   weight: ['400', '500', '600', '700', '800'],
-  variable: '--font-inter',
+  variable: '--font-geist',
   display: 'swap',
   fallback: ['system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif']
 })
@@ -65,7 +65,7 @@ const RootLayout = async (props: ChildrenType) => {
 
   return (
     <html id='__next' lang='en' dir={direction} suppressHydrationWarning>
-      <body className={`${inter.variable} ${poppins.variable} flex is-full min-bs-full flex-auto flex-col`}>
+      <body className={`${geist.variable} ${poppins.variable} flex is-full min-bs-full flex-auto flex-col`}>
         <InitColorSchemeScript attribute='data' defaultMode={systemMode} />
         {children}
       </body>

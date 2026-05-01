@@ -1,5 +1,16 @@
 # TASK-568 — Typography in Delivery Surfaces: Email Stack + PDF Font Registration
 
+## Delta 2026-05-01 (tarde) — pivot a Geist
+
+Tras cerrar TASK-566 con Inter y validar visualmente, el usuario decidió pivotar a **Geist Sans** como product UI base. Esta task pasa a converger emails y PDFs al contrato `Poppins + Geist`, no `Poppins + Inter`. Cambios concretos sobre el cuerpo:
+
+- Donde dice "Inter" como destino, leer "Geist Sans"
+- `src/assets/fonts/**` debe incorporar el set local de Geist (`Geist-Regular.ttf`, `Geist-Medium.ttf`, `Geist-SemiBold.ttf`, `Geist-Bold.ttf`, `Geist-ExtraBold.ttf`). Asset disponible en npm `geist` (SIL OFL 1.1) y en el repo `vercel/geist-font`
+- `register-fonts.ts` registra cada peso como su propia familia (`'Geist'` 400, `'Geist Medium'` 500, `'Geist SemiBold'` 600, `'Geist Bold'` 700, `'Geist ExtraBold'` 800) siguiendo el patrón actual de DM Sans
+- `tokens.ts` reemplaza `body: 'DM Sans'` por `body: 'Geist'`, etc.
+- Emails: `src/emails/constants.ts` cambia el fallback stack a `'Geist', -apple-system, BlinkMacSystemFont, sans-serif` y la URL Google Fonts importada queda `family=Geist:wght@400;500;600;700;800`
+- Geist Mono **NO** se introduce; mono variants quedan sobre Geist Sans + `tabular-nums`
+
 ## Status
 
 - Lifecycle: `to-do`

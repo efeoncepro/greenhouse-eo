@@ -129,13 +129,13 @@ const mergedTheme = (settings: Settings, mode: SystemMode, direction: Theme['dir
       }
     },
     typography: {
-      // Typography foundation — TASK-566 / EPIC-004
-      // Inter = product UI base (body, forms, tables, controls, KPIs, IDs, amounts).
+      // Typography foundation — TASK-566 / EPIC-004 (Delta 2026-05-01 tarde: pivot a Geist)
+      // Geist Sans = product UI base (body, forms, tables, controls, KPIs, IDs, amounts).
       // Poppins = display only, restricted to h1-h4.
-      // monoId / monoAmount stay as semantic variants but use Inter + tabular-nums
-      // (no monospace family). Source of truth: docs/architecture/GREENHOUSE_DESIGN_TOKENS_V1.md §3.
+      // monoId / monoAmount stay as semantic variants but use Geist + tabular-nums
+      // (NO monospace family, NO Geist Mono). Source of truth: docs/architecture/GREENHOUSE_DESIGN_TOKENS_V1.md §3 (v1.2).
       fontFamily:
-        "var(--font-inter), 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
+        "var(--font-geist), 'Geist', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
       h1: {
         fontFamily: "var(--font-poppins), 'Poppins', system-ui, -apple-system, sans-serif",
         fontWeight: 800,

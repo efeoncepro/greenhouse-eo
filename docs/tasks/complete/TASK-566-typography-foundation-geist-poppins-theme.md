@@ -1,5 +1,9 @@
 # TASK-566 — Typography Foundation: Inter + Poppins Theme Realignment
 
+## Delta 2026-05-01 (tarde) — pivot a Geist tras validación visual
+
+Esta task se cerró ese mismo día con Inter shippeado a staging (commit `5c4d84aa`, deploy preview Vercel `greenhouse-96gktkj39`). El usuario validó visualmente + comparó vía mockup A/B (`docs/mockups/typography-inter-vs-geist-mockup.html`) y concluyó que **Inter se siente plana / poco moderna** vs Geist. Decisión irreversible: pivot a **Geist Sans** como product UI base manteniendo `Poppins` en `h1-h4` (sigue siendo sistema de dos familias). Se ejecuta como follow-up del cierre formal de TASK-566 sobre los mismos 3 archivos owned, sin reabrir la task. Tracking del pivot en EPIC-004 Delta `2026-05-01 (tarde)` y commit que sigue a `5c4d84aa`.
+
 ## Status
 
 - Lifecycle: `complete`
