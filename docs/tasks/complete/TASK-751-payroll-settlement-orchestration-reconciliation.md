@@ -2,12 +2,12 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
 - Type: `implementation`
-- Status real: `Diseno`
+- Status real: `V1 entregado 2026-05-01 — wireup order.paid → expense_payment + payroll downstream status reader`
 - Rank: `TBD`
 - Domain: `finance`
 - Blocked by: `TASK-748`, `TASK-749`, `TASK-750`

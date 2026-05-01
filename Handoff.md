@@ -1,5 +1,26 @@
 # Handoff.md
 
+## Sesion 2026-05-01 — TASK-751 Payroll Settlement Orchestration V1 (cierra programa Payment Orders)
+
+- **Trigger**: usuario pidio implementar TASK-751 end-to-end. Es el wireup que cierra el programa Payment Orders (TASK-748 + TASK-749 + TASK-750 + TASK-751).
+- **Entregado** (auto-mode):
+  - Migration `20260501163149826` aditiva: link bidireccional `expense_payments.payment_order_line_id ↔ payment_order_lines.expense_payment_id` con partial unique index para idempotency atomica.
+  - Helper `recordPaymentForOrder({orderId})` en `src/lib/finance/payment-orders/record-payment-from-order.ts`: itera lines, resuelve expenseId desde `(payroll_period_id, member_id)`, llama recordExpensePayment con `paymentOrderLineId`. V1 procesa solo `employee_net_pay`.
+  - `recordExpensePayment` extendido con `paymentOrderLineId?: string | null` opcional + back-fill del link reverse en la misma tx.
+  - Reader `getPayrollPaymentStatusForPeriod(periodId)` deriva 10 estados downstream (no_obligation / awaiting_order / order_pending_approval / order_approved / order_scheduled / order_submitted / order_paid_unreconciled / reconciled / closed / blocked_no_profile). NO escribe en payroll_entries.
+  - Projection consumer `recordExpensePaymentFromOrderProjection` escuchando `finance.payment_order.paid` (agregado a REACTIVE_EVENT_TYPES), maxRetries 2.
+  - API `GET /api/admin/finance/payment-orders/payroll-status?periodId=X`.
+  - UI: `<PayrollPaymentStatusCard>` con 4 KPIs + Alert drift en PayrollPeriodTab + columna "Estado pago" en PayrollEntryTable + seccion "Origen Payroll" en OrderDetailDrawer.
+  - Tests: 12 verdes (3 row-mapper TASK-750 + 7 resolver TASK-749 + 2 contract TASK-751).
+  - Docs: Delta TASK-751 en spec arquitectura + funcional + manual operador.
+- **Validacion**: lint clean, tsc clean, migrations aplicadas en staging.
+- **Decisiones**:
+  - Read-only para Payroll — el reader no muta entries. Payroll sigue siendo motor canonico sin contaminar.
+  - Cada line con su propia tx (recordExpensePayment ya es atomic). Partial unique index previene duplicados en retry.
+  - V1 enfoque employee_net_pay; otros kinds (employer_social_security consolidado, processor_fee, fx_component) en path legacy operator hasta que emerja caso real.
+  - Reliquidacion de obligations queda en TASK-755 V2; payrollReliquidationDeltaProjection (TASK-411) ya cubre el delta de expenses.
+- **Programa Payment Orders cerrado V1**: TASK-748 + TASK-749 + TASK-750 + TASK-751 entregadas. Backlog V2 declarado en TASK-752/753/754/755.
+
 ## Sesion 2026-05-01 — TASK-749 Beneficiary Payment Profiles V1 con modelo dual-surface
 
 - **Trigger**: usuario pidio implementar TASK-749 end-to-end despues de aprobar el mockup `payment-profiles-dual-mockup.html`. Decision arquitectonica clave: NO ubicar perfiles de personas en una surface aislada (`/finance/payment-profiles`) sino en un **modelo dual-surface** con un solo componente reutilizable montado en 3 lugares.

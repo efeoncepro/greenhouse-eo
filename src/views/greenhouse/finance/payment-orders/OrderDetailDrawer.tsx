@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 
+import Link from 'next/link'
+
 import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
@@ -226,6 +228,30 @@ const OrderDetailDrawer = ({ order, loading, onClose, onActionComplete }: OrderD
               </Typography>
               <Typography variant='body2'>{order.cancelledReason}</Typography>
             </Alert>
+          ) : null}
+
+          {/* TASK-751 — payroll origin link when order was generated from a payroll period. */}
+          {order.periodId ? (
+            <Stack spacing={1.5}>
+              <Typography variant='subtitle2'>Origen Payroll</Typography>
+              <Stack direction='row' spacing={2} alignItems='center' flexWrap='wrap' useFlexGap>
+                <Chip
+                  size='small'
+                  variant='outlined'
+                  icon={<i className='tabler-receipt-2' aria-hidden='true' />}
+                  label={`Periodo: ${order.periodId}`}
+                />
+                <Button
+                  component={Link}
+                  href={`/hr/payroll?periodId=${encodeURIComponent(order.periodId)}`}
+                  size='small'
+                  variant='outlined'
+                  startIcon={<i className='tabler-external-link' aria-hidden='true' />}
+                >
+                  Ver en Payroll
+                </Button>
+              </Stack>
+            </Stack>
           ) : null}
 
           {/* Lines */}

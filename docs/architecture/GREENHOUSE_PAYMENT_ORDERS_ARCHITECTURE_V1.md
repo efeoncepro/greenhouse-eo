@@ -1,5 +1,56 @@
 # Greenhouse Payment Orders Architecture V1
 
+## Delta 2026-05-01 — TASK-751: Payroll Settlement Orchestration + Reconciliation Wireup (V1)
+
+Cierra el ciclo end-to-end: cuando una `payment_order` (TASK-750) pasa a
+`state='paid'`, un projection consumer reactive crea automaticamente
+`expense_payment` + `settlement_leg` por cada line payroll, dejando el
+flujo listo para ser conciliado por TASK-722.
+
+### Schema (aditivo, migration 20260501163149826)
+
+- `expense_payments.payment_order_line_id` (TEXT, nullable, FK ON DELETE SET NULL): link al line que dispara el pago. NULL para pagos legacy.
+- `payment_order_lines.expense_payment_id` (TEXT, nullable, FK ON DELETE SET NULL): link reverse para queries fast.
+- Partial unique index sobre `expense_payments.payment_order_line_id WHERE payment_order_line_id IS NOT NULL AND superseded_by_payment_id IS NULL AND superseded_by_otb_id IS NULL`: idempotency atomica — un unico expense_payment vivo por line.
+
+### Helpers TS
+
+- `recordPaymentForOrder({orderId})` en `src/lib/finance/payment-orders/record-payment-from-order.ts`: itera lines de una order paid, resuelve expense_id desde `(payroll_period_id, member_id)`, llama `recordExpensePayment` con `paymentOrderLineId`. V1 procesa solo `source_kind='payroll' AND obligation_kind='employee_net_pay'`. Otros kinds quedan `skipped` con reason claro.
+- `getPayrollPaymentStatusForPeriod(periodId)` en `src/lib/finance/payment-orders/payroll-status-reader.ts`: read-only compose entre payroll_entries + payment_obligations + payment_order_lines + payment_orders + expense_payments. Deriva 10 estados downstream sin escribir.
+- `recordExpensePayment` extendido con `paymentOrderLineId?: string | null` opcional.
+
+### Projection consumer reactive
+
+`recordExpensePaymentFromOrderProjection` registrado en projection-registry. Trigger event `finance.payment_order.paid` (agregado a `REACTIVE_EVENT_TYPES`). maxRetries: 2.
+
+### State machine downstream (10 estados read-only)
+
+`no_obligation` / `awaiting_order` / `order_pending_approval` / `order_approved` / `order_scheduled` / `order_submitted` / `order_paid_unreconciled` / `reconciled` / `closed` / `blocked_no_profile`.
+
+### API
+
+`GET /api/admin/finance/payment-orders/payroll-status?periodId=X` retorna `PayrollPeriodDownstreamSummary` con KPIs + byEntry. Auth `requireFinanceTenantContext`.
+
+### UI
+
+- `<PayrollPaymentStatusCard periodId>` con 4 KPIs (Obligaciones, Ordenes pagadas, Conciliadas, Bloqueadas) + Alert con drift cuando `totalBlocked>0` linkeando a `/finance/payment-profiles`.
+- Mount en `PayrollPeriodTab` despues de KPIs principales.
+- Columna "Estado pago" en `PayrollEntryTable` con chip por entry. Fetch compartido con la card.
+- Seccion "Origen Payroll" en `OrderDetailDrawer` cuando `order.periodId` presente, con link a `/hr/payroll?periodId=X`.
+
+### Reglas duras
+
+- **Read-only para Payroll**: el reader NO muta `payroll_entries`. El calculo no se toca.
+- **Idempotency**: partial unique index + check `expense_payment_id` previo previenen duplicados.
+- **V1 enfoque**: solo `employee_net_pay`. Otros kinds (employer_social_security consolidado, processor_fee, fx_component) quedan en path legacy del operator.
+- **Reliquidacion**: `payrollReliquidationDeltaProjection` (TASK-411) ya crea expense delta; equivalente para obligations queda en TASK-755 V2.
+
+### Coexistencia
+
+- `payroll-expense-reactive.ts` (TASK-411) sigue creando expenses pendientes. **No se reemplaza.**
+- `recordExpensePayment` (TASK-693) sigue siendo unico path para payments + legs. **No se duplica.**
+- TASK-722 Reconciliation: cruza expense_payments contra bank_statement_rows como antes. `payment_order_line_id` nuevo es audit, no afecta matching.
+
 ## Delta 2026-05-01 — TASK-749: Beneficiary Payment Profiles + Routing Resolver (V1)
 
 Cierra la pieza "por qué rail pagar a este beneficiario" con un modelo

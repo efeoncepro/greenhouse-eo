@@ -3644,6 +3644,10 @@ export interface GreenhouseFinanceExpensePayments {
   payment_date: Timestamp;
   payment_id: string;
   payment_method: string | null;
+  /**
+   * TASK-751 - Link al payment_order_line que disparo este expense_payment. NULL para pagos legacy registrados directamente sin pasar por order. Partial unique: solo 1 expense_payment vivo por line (excluyendo superseded).
+   */
+  payment_order_line_id: string | null;
   payment_source: Generated<string>;
   reconciled_at: Timestamp | null;
   reconciled_by_user_id: string | null;
@@ -4292,6 +4296,10 @@ export interface GreenhouseFinancePaymentOrderLines {
   beneficiary_type: string;
   created_at: Generated<Timestamp>;
   currency: string;
+  /**
+   * TASK-751 - Link reverse al expense_payment generado al ejecutar la order. Permite queries fast desde la order al ledger sin join via metadata. ON DELETE SET NULL: cancelar la line no borra el payment.
+   */
+  expense_payment_id: string | null;
   failure_reason: string | null;
   /**
    * TRUE cuando amount < obligation.amount. La diff queda como residual.

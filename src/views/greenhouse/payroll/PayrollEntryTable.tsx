@@ -28,6 +28,10 @@ import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 
 import type { PayrollEntry, PayrollPeriod, PeriodStatus } from '@/types/payroll'
+import type {
+  PayrollEntryDownstreamState,
+  PayrollEntryDownstreamStatus
+} from '@/lib/finance/payment-orders/payroll-status-reader'
 import { canEditPayrollEntries } from '@/lib/payroll/period-lifecycle'
 import { getInitials } from '@/utils/getInitials'
 import { DataTableShell } from '@/components/greenhouse/data-table'
@@ -48,9 +52,32 @@ type Props = {
   periodStatus: PeriodStatus
   onEntryUpdate: (entryId: string, field: string, value: number | string | boolean | null) => void
   onAdjustmentChanged?: () => void
+  /**
+   * TASK-751 — downstream payment status per entry (shared fetch from
+   * PayrollPeriodTab to avoid duplicate calls). When null, the "Estado pago"
+   * column renders an em-dash for every row.
+   */
+  paymentStatusByEntry?: PayrollEntryDownstreamStatus[] | null
 }
 
-const PayrollEntryTable = ({ entries, period, periodStatus, onEntryUpdate, onAdjustmentChanged }: Props) => {
+// TASK-751 — chip presentation for the downstream payment state of each entry.
+// Pinta la columna "Estado pago" al final de la tabla.
+type ChipColor = 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning'
+
+const PAYMENT_STATE_CHIP: Record<PayrollEntryDownstreamState, { label: string; color: ChipColor; variant: 'tonal' | 'outlined' }> = {
+  no_obligation: { label: '—', color: 'default', variant: 'outlined' },
+  awaiting_order: { label: 'Por programar', color: 'warning', variant: 'tonal' },
+  order_pending_approval: { label: 'Pendiente aprobacion', color: 'warning', variant: 'tonal' },
+  order_approved: { label: 'En proceso', color: 'info', variant: 'tonal' },
+  order_scheduled: { label: 'En proceso', color: 'info', variant: 'tonal' },
+  order_submitted: { label: 'En proceso', color: 'info', variant: 'tonal' },
+  order_paid_unreconciled: { label: 'Pagado · sin conciliar', color: 'primary', variant: 'tonal' },
+  reconciled: { label: 'Conciliado', color: 'success', variant: 'tonal' },
+  closed: { label: 'Conciliado', color: 'success', variant: 'tonal' },
+  blocked_no_profile: { label: 'Bloqueado: sin perfil', color: 'error', variant: 'tonal' }
+}
+
+const PayrollEntryTable = ({ entries, period, periodStatus, onEntryUpdate, onAdjustmentChanged, paymentStatusByEntry }: Props) => {
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const [receiptEntry, setReceiptEntry] = useState<PayrollEntry | null>(null)
   const [explainEntry, setExplainEntry] = useState<PayrollEntry | null>(null)
@@ -62,6 +89,11 @@ const PayrollEntryTable = ({ entries, period, periodStatus, onEntryUpdate, onAdj
   const canApproveAdjustments = (session?.user?.roleCodes ?? []).includes(ROLE_CODES.EFEONCE_ADMIN)
 
   const isEditable = canEditPayrollEntries(periodStatus)
+
+  // TASK-751 — Map<entryId, PayrollEntryDownstreamStatus> for O(1) lookup per row.
+  const paymentStatusMap = new Map<string, PayrollEntryDownstreamStatus>(
+    (paymentStatusByEntry ?? []).map(status => [status.entryId, status])
+  )
 
   const toggleExpand = (entryId: string) => {
     setExpandedId(prev => (prev === entryId ? null : entryId))
@@ -90,6 +122,8 @@ const PayrollEntryTable = ({ entries, period, periodStatus, onEntryUpdate, onAdj
             <TableCell align='right'>Bruto</TableCell>
             <TableCell align='right'>Descuentos</TableCell>
             <TableCell align='right' sx={{ fontWeight: 700 }}>Neto</TableCell>
+            {/* TASK-751 — downstream payment state (read-only chip per entry). */}
+            <TableCell align='center'>Estado pago</TableCell>
             <TableCell sx={{ width: 40 }} />
           </TableRow>
         </TableHead>
@@ -317,6 +351,42 @@ const PayrollEntryTable = ({ entries, period, periodStatus, onEntryUpdate, onAdj
                     )}
                   </TableCell>
 
+                  {/* Estado pago (TASK-751) */}
+                  <TableCell align='center'>
+                    {(() => {
+                      const status = paymentStatusMap.get(entry.entryId)
+
+                      if (!status || status.state === 'no_obligation') {
+                        return (
+                          <Typography variant='body2' color='text.disabled'>
+                            —
+                          </Typography>
+                        )
+                      }
+
+                      const chipMeta = PAYMENT_STATE_CHIP[status.state]
+
+                      const tooltipText = status.blockReason
+                        ? `${chipMeta.label} · ${status.blockReason}`
+                        : chipMeta.label
+
+                      return (
+                        <Tooltip title={tooltipText}>
+                          <span>
+                            <CustomChip
+                              round='true'
+                              size='small'
+                              variant={chipMeta.variant}
+                              color={chipMeta.color === 'default' ? 'secondary' : chipMeta.color}
+                              label={chipMeta.label}
+                              sx={{ height: 22, fontSize: '0.7rem' }}
+                            />
+                          </span>
+                        </Tooltip>
+                      )
+                    })()}
+                  </TableCell>
+
                   {/* Receipt */}
                   <TableCell>
                     <Stack direction='row' spacing={0.5}>
@@ -360,7 +430,8 @@ const PayrollEntryTable = ({ entries, period, periodStatus, onEntryUpdate, onAdj
                 {/* Expanded detail row */}
                 {canExpand && (
                   <TableRow>
-                    <TableCell colSpan={13} sx={{ py: 0, px: 0 }}>
+                    {/* TASK-751 — colSpan bumped to 14 after adding the "Estado pago" column. */}
+                    <TableCell colSpan={14} sx={{ py: 0, px: 0 }}>
                       <Collapse in={isExpanded} timeout='auto' unmountOnExit>
                         <Box sx={{ p: 2 }}>
                           <Stack spacing={3}>

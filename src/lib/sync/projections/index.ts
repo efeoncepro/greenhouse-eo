@@ -25,6 +25,7 @@ import { providerToolingProjection } from './provider-tooling'
 import { staffAugPlacementProjection } from './staff-augmentation'
 import { financeExpenseReactiveIntakeProjection } from './finance-expense-reactive-intake'
 import { paymentObligationsFromPayrollProjection } from './payment-obligations-from-payroll'
+import { recordExpensePaymentFromOrderProjection } from './record-expense-payment-from-order'
 import { payrollReliquidationDeltaProjection } from './payroll-reliquidation-delta'
 import { agencyPerformanceReportProjection } from './agency-performance-report'
 import { icoAiSignalsProjection } from './ico-ai-signals'
@@ -78,6 +79,7 @@ export const ensureProjectionsRegistered = () => {
   registerProjection(providerToolingProjection)
   registerProjection(financeExpenseReactiveIntakeProjection)
   registerProjection(paymentObligationsFromPayrollProjection)
+  registerProjection(recordExpensePaymentFromOrderProjection)
   registerProjection(payrollReliquidationDeltaProjection)
   registerProjection(accountBalancesProjection)
   registerProjection(staffAugPlacementProjection)

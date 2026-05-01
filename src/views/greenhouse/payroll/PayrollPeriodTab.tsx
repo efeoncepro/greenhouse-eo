@@ -30,11 +30,13 @@ import { HorizontalWithSubtitle } from '@/components/card-statistics'
 import { ROLE_CODES } from '@/config/role-codes'
 import { buildPayrollTaxTableVersion } from '@/lib/payroll/tax-table-version-format'
 import type { PayrollCompensationMember, PayrollEntry, PayrollPeriod, PayrollPeriodReadiness } from '@/types/payroll'
+import type { PayrollPeriodDownstreamSummary } from '@/lib/finance/payment-orders/payroll-status-reader'
 import {
   canEditPayrollPeriodMetadata,
   doesPayrollPeriodUpdateRequireReset
 } from '@/lib/payroll/period-lifecycle'
 import PayrollEntryTable from './PayrollEntryTable'
+import PayrollPaymentStatusCard from './PayrollPaymentStatusCard'
 import ReopenPeriodDialog from './ReopenPeriodDialog'
 import { buildPayrollCurrencySummary, formatCurrency, formatPeriodLabel, formatTimestamp, periodStatusConfig } from './helpers'
 
@@ -85,6 +87,9 @@ const PayrollPeriodTab = ({
   const [readiness, setReadiness] = useState<PayrollPeriodReadiness | null>(null)
   const [readinessError, setReadinessError] = useState<string | null>(null)
   const [readinessLoading, setReadinessLoading] = useState(false)
+  const [paymentStatus, setPaymentStatus] = useState<PayrollPeriodDownstreamSummary | null>(null)
+  const [paymentStatusLoading, setPaymentStatusLoading] = useState(false)
+  const [paymentStatusError, setPaymentStatusError] = useState<string | null>(null)
   const periodId = period?.periodId ?? null
   const visibleAttendanceNotes = readiness?.attendanceDiagnostics.notes.filter(note => !GOVERNANCE_ATTENDANCE_NOTES.has(note)) ?? []
 
@@ -129,6 +134,55 @@ const PayrollPeriodTab = ({
     }
 
     void loadReadiness()
+
+    return () => {
+      active = false
+    }
+  }, [periodId, period?.status, entries.length])
+
+  // TASK-751 — fetch downstream payment status for the period (single fetch shared
+  // between PayrollPaymentStatusCard and PayrollEntryTable's "Estado pago" column).
+  useEffect(() => {
+    if (!periodId) {
+      setPaymentStatus(null)
+      setPaymentStatusError(null)
+
+      return
+    }
+
+    let active = true
+
+    const loadPaymentStatus = async () => {
+      setPaymentStatusLoading(true)
+      setPaymentStatusError(null)
+
+      try {
+        const res = await fetch(`/api/admin/finance/payment-orders/payroll-status?periodId=${encodeURIComponent(periodId)}`)
+
+        if (!res.ok) {
+          const data = await res.json().catch(() => null)
+
+          throw new Error(data?.error || 'No pudimos cargar el estado downstream del periodo.')
+        }
+
+        const data = (await res.json()) as PayrollPeriodDownstreamSummary
+
+        if (active) {
+          setPaymentStatus(data)
+        }
+      } catch (loadError) {
+        if (active) {
+          setPaymentStatus(null)
+          setPaymentStatusError(loadError instanceof Error ? loadError.message : 'No pudimos cargar el estado downstream del periodo.')
+        }
+      } finally {
+        if (active) {
+          setPaymentStatusLoading(false)
+        }
+      }
+    }
+
+    void loadPaymentStatus()
 
     return () => {
       active = false
@@ -492,6 +546,16 @@ const PayrollPeriodTab = ({
         </Alert>
       )}
 
+      {/* TASK-751 — downstream payment status (obligations, paid orders, reconciled, blocked). */}
+      <Box sx={{ mb: 4 }}>
+        <PayrollPaymentStatusCard
+          periodId={period.periodId}
+          summary={paymentStatus}
+          loading={paymentStatusLoading}
+          error={paymentStatusError}
+        />
+      </Box>
+
       <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
         <CardHeader
           avatar={
@@ -849,6 +913,7 @@ const PayrollPeriodTab = ({
               periodStatus={period.status}
               onEntryUpdate={handleEntryUpdate}
               onAdjustmentChanged={onRefresh}
+              paymentStatusByEntry={paymentStatus?.byEntry ?? null}
             />
           )}
 

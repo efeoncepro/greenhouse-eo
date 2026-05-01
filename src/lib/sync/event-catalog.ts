@@ -647,6 +647,8 @@ export const REACTIVE_EVENT_TYPES = [
   EVENT_TYPES.payrollPeriodExported,
   EVENT_TYPES.payrollEntryUpserted,
   EVENT_TYPES.payrollEntryReliquidated,
+  // TASK-751: order.paid dispara recordExpensePaymentFromOrderProjection
+  EVENT_TYPES.financePaymentOrderPaid,
   EVENT_TYPES.leaveRequestCreated,
   EVENT_TYPES.leaveRequestEscalatedToHr,
   EVENT_TYPES.leaveRequestApproved,
