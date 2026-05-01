@@ -1,5 +1,39 @@
 # Handoff.md
 
+## Sesion 2026-05-01 — Payroll PREVIRED sync schema drift fixed end-to-end
+
+- **Trigger**: al intentar destrabar abril 2026 desde staging, `/api/cron/sync-previred?start=2026-04&end=2026-05` falló con `column "worker_rate" of relation "chile_afp_rates" does not exist`, y por rebote `ImpUnico` no obtuvo `UTM` válida. Además, la verificación Chromium/Playwright con el usuario agente debía quedar explícitamente probada sobre el deployment real.
+- **Hallazgos confirmados**:
+  - `greenhouse_payroll.chile_afp_rates` en Cloud SQL guarda solo `total_rate`; no tiene `worker_rate` ni `employer_rate`.
+  - El drift entró cuando `src/lib/payroll/previred-sync.ts` empezó a intentar escribir `worker_rate` en la tabla canónica reducida. `git log -S"worker_rate" -- src/lib/payroll/previred-sync.ts` apunta a `1aa6a037`.
+  - El `INSERT` de AFP además tenía otro bug latente: la lista de columnas/values estaba desalineada para `is_active`.
+  - Los fallbacks legacy de `chile-previsional-helpers.ts` también estaban rotos: consultaban `previred_*` como si tuvieran `period_year/period_month`, cuando en realidad usan `indicator_date`.
+  - Playwright sí quedó probado contra staging real con `agent@greenhouse.efeonce.org`: `pnpm test:e2e:setup` generó `storageState` válido y `pnpm exec playwright test tests/e2e/smoke/hr-payroll.spec.ts --project=chromium` pasó `2/2`. Navegación Chromium adicional confirmó `/hr/payroll` `200`, `Abril 2026` visible y sin el falso `0 colaboradores`.
+- **Solución implementada**:
+  - `src/lib/payroll/previred-sync.ts` alinea el write de `greenhouse_payroll.chile_afp_rates` con el schema desplegado: persiste `total_rate`, `source` e `is_active` sin referenciar columnas inexistentes.
+  - `src/lib/payroll/chile-previsional-helpers.ts` repara los fallbacks legacy:
+    - `previred_period_indicators` ahora se lee por `indicator_date` y aliases reales (`imm_value`, `afp_top_unf`, `unemployment_top_unf`)
+    - `previred_afp_rates` ahora se lee por `indicator_date`, preservando `worker_rate` cuando el snapshot legacy existe
+  - Tests nuevos de compatibilidad de schema:
+    - `src/lib/payroll/previred-sync.schema-compatibility.test.ts`
+    - `src/lib/payroll/chile-previsional-helpers.schema-compatibility.test.ts`
+- **Validación ejecutada**:
+  - `pnpm test:e2e:setup` contra `https://greenhouse-eo-env-staging-efeonce-7670142f.vercel.app` OK
+  - `pnpm exec playwright test tests/e2e/smoke/hr-payroll.spec.ts --project=chromium` OK
+  - screenshot/runtime check con Chromium headless:
+    - `/hr/payroll` `200`
+    - `Abril 2026` visible
+    - ya no aparece `0 colaboradores`
+    - readiness UI muestra `6 colaborador(es) entrarían al cálculo; 1 quedarían fuera por compensación; 0 requieren KPI ICO; 0 requieren asistencia/licencias`
+  - `pnpm vitest run src/lib/payroll/previred-sync.schema-compatibility.test.ts src/lib/payroll/chile-previsional-helpers.schema-compatibility.test.ts src/lib/payroll/previred-sync.test.ts src/lib/payroll/chile-previsional-helpers.test.ts` OK
+  - `pnpm exec eslint src/lib/payroll/previred-sync.ts src/lib/payroll/chile-previsional-helpers.ts src/lib/payroll/previred-sync.schema-compatibility.test.ts src/lib/payroll/chile-previsional-helpers.schema-compatibility.test.ts` OK
+  - `pnpm exec tsc --noEmit --pretty false` OK
+- **Pendiente operativo después del push**:
+  1. Deployar el fix a `develop`.
+  2. Re-ejecutar `GET /api/cron/sync-previred?start=2026-04&end=2026-05` en staging.
+  3. Confirmar que desaparece `missing_tax_table_version` en `2026-04`.
+  4. Ejecutar `POST /api/hr/payroll/periods/2026-04/calculate` y verificar entries materializadas.
+
 ## Sesion 2026-05-01 — Payroll readiness aligned with real calculation contract
 
 - **Trigger**: incidente operativo en `/hr/payroll` sobre abril 2026. El período ya podía crearse de nuevo, pero la UI seguía mostrando `0 colaboradores`, readiness mezclaba reglas que no aplicaban (`KPI ICO` y asistencia para cohortes sin impacto en pago), `missingCompensationMemberIds` salía como `[null]`, y PREVIRED/ImpUnico de abril no se estaba sincronizando automáticamente.

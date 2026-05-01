@@ -557,6 +557,10 @@ const upsertAfpRates = async (
   client: PoolClient,
   rows: ChileAfpRateSnapshot[]
 ) => {
+  // The canonical payroll foundation persists the monthly AFP total rate by
+  // period/name. `workerRate` is still parsed from Gael because downstream
+  // split resolution may consume richer sources, but `chile_afp_rates` itself
+  // only stores `total_rate` in the deployed schema.
   for (const row of rows) {
     await queryRow(
       client,
@@ -566,7 +570,6 @@ const upsertAfpRates = async (
           period_year,
           period_month,
           afp_name,
-          worker_rate,
           total_rate,
           source,
           is_active,
@@ -586,7 +589,6 @@ const upsertAfpRates = async (
           row.periodYear,
           row.periodMonth,
           row.afpName,
-          row.workerRate,
           row.totalRate,
           row.source,
           row.isActive

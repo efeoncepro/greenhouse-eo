@@ -1149,6 +1149,10 @@ Regla:
   - `greenhouse_payroll.chile_previred_indicators`
   - `greenhouse_payroll.chile_afp_rates`
   - `greenhouse_payroll.chile_tax_brackets`
+- Contrato actual de `greenhouse_payroll.chile_afp_rates`:
+  - guarda `total_rate` por `period_year + period_month + afp_name`
+  - no persiste `worker_rate` ni `employer_rate` en la tabla canónica desplegada
+  - cuando existe un snapshot legacy `greenhouse_payroll.previred_afp_rates`, Payroll puede reutilizarlo como fallback técnico para recuperar el split histórico `worker_rate/total_rate`
 - El cron `GET /api/cron/sync-previred` y el backfill `pnpm backfill:chile-previsional` son los mecanismos operativos para mantener la base previsional viva.
 - `ImpUnico` se convierte a UTM usando la UTM del mismo período para preservar el contrato de `greenhouse_payroll.chile_tax_brackets`.
 

@@ -2,6 +2,14 @@
 
 ## 2026-05-01
 
+- Payroll Chile PREVIRED sync queda endurecido contra drift de schema:
+  - `src/lib/payroll/previred-sync.ts` ya no intenta escribir `worker_rate` en `greenhouse_payroll.chile_afp_rates`; la tabla canónica desplegada solo persiste `total_rate`.
+  - `src/lib/payroll/chile-previsional-helpers.ts` repara los fallbacks legacy sobre `previred_period_indicators` y `previred_afp_rates` usando `indicator_date` y aliases reales del schema histórico.
+  - Nuevos tests de compatibilidad de schema blindan ambos carriles:
+    - `src/lib/payroll/previred-sync.schema-compatibility.test.ts`
+    - `src/lib/payroll/chile-previsional-helpers.schema-compatibility.test.ts`
+  - El smoke E2E de Chromium con `agent@greenhouse.efeonce.org` vuelve a pasar en staging para `/hr/payroll` y `/my/payroll`, y la UI de payroll ya no muestra el falso `0 colaboradores` en el borrador de abril 2026.
+
 - `TASK-742` Auth Resilience 7-Layer Architecture entregada en branch `feature/TASK-742-auth-resilience-7-layers`. Cierra 6 fallas estructurales del sistema de autenticación expuestas por el incidente del 2026-04-30 (Microsoft SSO rebotando con `?error=Callback` opaco para todo internal user).
   - **Capa 1 — Secret hygiene**: `validateSecretFormat` con reglas por secret crítico; `resolveSecret` rechaza payloads malformados (whitespace, comillas, charset, length). Sentry warning cuando un secret cae a env en prod.
   - **Capa 2 — Readiness contract**: `/api/auth/health` expone status por provider via OIDC discovery + JWT sign+verify roundtrip. UI Login esconde botones SSO degradados con warning accionable.

@@ -1,5 +1,13 @@
 ## Delta 2026-05-01 Payroll readiness y roster borrador ya siguen el contrato real de calculo
 
+- `sync-previred` ya no asume columnas inexistentes en `greenhouse_payroll.chile_afp_rates`: la tabla canónica desplegada persiste `total_rate` por AFP/período, mientras el split legacy (`worker_rate`) queda acotado a snapshots `previred_*`.
+- Los fallbacks legacy de payroll Chile vuelven a ser operativos:
+  - `previred_period_indicators` se lee por `indicator_date` y aliases reales del schema histórico
+  - `previred_afp_rates` se lee por `indicator_date` preservando `worker_rate` cuando existe
+- La verificación E2E canónica con el usuario agente quedó reprobadamente viva en staging:
+  - `pnpm test:e2e:setup` genera `.auth/storageState.json`
+  - `pnpm exec playwright test tests/e2e/smoke/hr-payroll.spec.ts --project=chromium` pasa contra `greenhouse-eo-env-staging-efeonce-7670142f.vercel.app`
+
 - `Payroll` ahora separa explícitamente dos conceptos que antes se mezclaban en UI/runtime:
   - `colaboradores elegibles para cálculo`
   - `entries ya materializadas`
