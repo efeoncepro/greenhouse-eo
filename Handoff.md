@@ -1,5 +1,20 @@
 # Handoff.md
 
+## Sesion 2026-05-01 — EPIC-004 y TASK-566/567/568/569 realineadas de Geist a Inter
+
+- **Trigger**: usuario pidió revisar a profundidad el programa tipográfico 566-569 y confirmó que no quiere migrar a `Geist`, sino a `Inter`.
+- **Resultado documental**:
+  - `docs/epics/to-do/EPIC-004-typography-unification-poppins-geist.md` fue reescrita para reflejar `Poppins + Inter`.
+  - `docs/tasks/to-do/TASK-566-typography-foundation-geist-poppins-theme.md` quedó realineada a `Inter` como base y sin tercera familia mono por defecto.
+  - `docs/tasks/to-do/TASK-567-typography-code-sweep-eslint-rule.md` fue simplificada y reenfocada al contrato nuevo.
+  - `docs/tasks/to-do/TASK-568-typography-email-pdf-font-registration.md` ahora parte del runtime real del repo (`src/lib/finance/pdf/register-fonts.ts`, `tokens.ts`, assets locales) en vez de asumir helpers/URLs de `Geist`.
+  - `docs/tasks/to-do/TASK-569-typography-visual-regression-figma-docs.md` se corrigió para apuntar a las skills reales del repo (`modern-ui`, `greenhouse-ui-review`, `greenhouse-email`, etc.) y limpiar el drift documental “no Inter”.
+- **Decisión de diseño**:
+  - baseline objetivo del programa = `Poppins` para display controlado + `Inter` para product UI.
+  - `monoId` y `monoAmount` se preservan como variants semánticos, pero el contrato preferido pasa a ser `Inter + tabular-nums`, no `Geist Mono` ni `monospace`.
+- **Riesgo abierto**:
+  - el repo todavía tiene muchas referencias legacy a `DM Sans` fuera del epic/tareas; no se limpiaron en este slice porque el pedido era ajustar el programa, no reescribir toda la documentación histórica.
+
 ## Sesion 2026-05-01 — TASK-763 creada desde mockup aprobado de Lifecycle UI
 
 - **Trigger**: usuario aprobó el mockup `docs/mockups/onboarding-module-mockup.html` y pidió aterrizarlo en una task/UI spec de implementación.
