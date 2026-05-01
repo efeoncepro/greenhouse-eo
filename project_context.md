@@ -1,3 +1,13 @@
+## Delta 2026-05-01 Claude skill invocable para auditoria de Payroll
+
+- Claude ahora tiene la skill local invocable `greenhouse-payroll-auditor`.
+- Vive en `.claude/skills/greenhouse-payroll-auditor/SKILL.md`, siguiendo la convencion oficial vigente de Claude Skills.
+- Reutiliza el mismo criterio operativo de la skill Codex:
+  - legislacion y formulas Chile en `references/chile-payroll-law.md`
+  - runtime Greenhouse Payroll en `references/greenhouse-payroll-runtime.md`
+  - trabajadores remotos/internacionales, Deel/EOR/contractor y KPI ICO en `references/international-remote-payroll.md`
+- Nota de convencion: `AGENTS.md` y `CLAUDE.md` ya no indican que las skills nuevas deban nacer como `skill.md` minuscula; ese patron queda como compatibilidad legacy.
+
 ## Delta 2026-05-01 TASK-741 cierra MCP Remote Gateway V1
 
 - Greenhouse ya expone el MCP read-only por HTTP remoto privado en `GET/POST/DELETE /api/mcp/greenhouse`.

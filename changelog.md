@@ -2,6 +2,8 @@
 
 ## 2026-05-01
 
+- Se agrega la skill local invocable de Claude `greenhouse-payroll-auditor` en `.claude/skills/greenhouse-payroll-auditor/SKILL.md`, con referencias para legislacion/calculo Chile, runtime Payroll Greenhouse e internacionales/Deel. Tambien se alinean `AGENTS.md` y `CLAUDE.md` con la convencion oficial vigente de Claude Skills (`SKILL.md`) dejando `skill.md` como legacy.
+
 - **TASK-741 — Greenhouse MCP Remote Gateway V1**. Se agrega gateway MCP remoto privado en `GET/POST/DELETE /api/mcp/greenhouse` usando el transporte oficial Streamable HTTP del SDK MCP. El gateway reutiliza el mismo runtime read-only de `pnpm mcp:greenhouse`, se protege con `GREENHOUSE_MCP_REMOTE_GATEWAY_TOKEN`, limita payloads con `GREENHOUSE_MCP_REMOTE_MAX_BODY_BYTES` y mantiene `TASK-659` como dueño separado de OAuth/hosted auth multiusuario.
 
 - **TASK-744 — Payroll Chile Compliance Remediation & International Guardrails**. Se corrige el motor de Payroll para separar regimenes Chile dependiente, honorarios e internacional/Deel: retencion honorarios 2026 queda en 15,25%, Seguro de Cesantia separa trabajador/empleador (`plazo_fijo` trabajador 0% / empleador 3%), el calculo Chile aplica topes AFP/salud/SIS/mutual y cesantia cuando existen topes PREVIRED, honorarios falla cerrado si intenta pasar por helper dependiente, y readiness bloquea entries calculadas con regimenes incompatibles. Se agrega `contract_type_snapshot` a `greenhouse_payroll.payroll_entries` con constraints `NOT VALID` para nuevas escrituras y tests Payroll quedan verdes.

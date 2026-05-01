@@ -91,7 +91,7 @@ Regla: módulos de dominio extienden estos objetos, no crean identidades paralel
 - Fuente canónica para trabajo multi-agente (Claude + Codex en paralelo):
   - `docs/operations/MULTI_AGENT_WORKTREE_OPERATING_MODEL_V1.md` — incluye higiene de worktrees, `rebase --onto`, `force-push-with-lease`, CI como gate compartido, squash merge policy, background watcher pattern para auto-merge sin branch protection
 - Convenciones de skills locales:
-  - Claude: `.claude/skills/<skill-name>/skill.md` (minuscula)
+  - Claude: `.claude/skills/<skill-name>/SKILL.md` (convencion oficial vigente; existen skills legacy en `skill.md` minuscula)
   - Codex: `.codex/skills/<skill-name>/SKILL.md` (mayuscula)
 
 ### Architecture Docs (los más críticos)

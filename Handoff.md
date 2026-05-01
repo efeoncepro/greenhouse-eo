@@ -1,5 +1,25 @@
 # Handoff.md
 
+## Sesion 2026-05-01 — Claude skill invocable Greenhouse Payroll Auditor
+
+- **Trigger**: el usuario pidio que la skill de Payroll tambien estuviera disponible para Claude y pudiera invocarse.
+- **Resultado**:
+  - Se creo `.claude/skills/greenhouse-payroll-auditor/SKILL.md` con frontmatter oficial minimo (`name`, `description`).
+  - Invocacion manual esperada en Claude Code: `/greenhouse-payroll-auditor [scope]`.
+  - Se agregaron referencias propias para Claude:
+    - `.claude/skills/greenhouse-payroll-auditor/references/chile-payroll-law.md`
+    - `.claude/skills/greenhouse-payroll-auditor/references/greenhouse-payroll-runtime.md`
+    - `.claude/skills/greenhouse-payroll-auditor/references/international-remote-payroll.md`
+  - La skill cubre la misma postura robusta de auditoria: clasificacion laboral antes de calcular, KPI ICO obligatorio cuando afecta bonos, no calcular metricas inline, no aplicar deducciones Chile a Deel/internacionales por defecto, y fail-closed para datos legales/fuente faltantes.
+- **Convencion ajustada**:
+  - `AGENTS.md` ahora refleja la convencion oficial vigente `.claude/skills/<skill-name>/SKILL.md` y deja `skill.md` como legacy.
+  - `CLAUDE.md` ahora refleja la convencion oficial vigente `.claude/skills/<skill-name>/SKILL.md`.
+  - Las skills Claude existentes en `skill.md` minuscula quedan documentadas como legacy/compatibilidad, no como patron para skills nuevas.
+- **Validacion**:
+  - Se verifico contra docs oficiales de Claude/Agent Skills: el entrypoint correcto es `SKILL.md` en mayuscula.
+  - Estructura de frontmatter y archivos verificada localmente.
+  - `git diff --check` OK.
+
 ## Sesion 2026-05-01 — TASK-741 Greenhouse MCP Remote Gateway V1
 
 - **Trigger**: el usuario pidio verificar si quedaba algo pendiente de `TASK-741`; la auditoria encontro que la task seguia en `to-do` y no existia `src/app/api/mcp/greenhouse/route.ts` ni transporte remoto.

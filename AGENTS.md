@@ -82,7 +82,8 @@ Estos CLIs estan autenticados localmente. Cuando una task toca su dominio, **usa
 - Si el cambio es UI, UX o seleccion de componentes, usar como criterio operativo los skills locales vigentes (`greenhouse-agent`, `greenhouse-portal-ui-implementer`, `greenhouse-ui-orchestrator` o `greenhouse-vuexy-ui-expert`) y revisar `full-version` junto con la documentacion oficial de Vuexy antes de inventar componentes nuevos.
 - Si el cambio crea o modifica skills locales para agentes:
   - skills de Codex viven en `.codex/skills/<skill-name>/SKILL.md`
-  - skills de Claude viven en `.claude/skills/<skill-name>/skill.md` (minuscula — convencion oficial de Claude Code)
+  - skills de Claude viven en `.claude/skills/<skill-name>/SKILL.md` (mayuscula — convencion oficial vigente de Claude/Agent Skills)
+  - los archivos Claude legacy en `.claude/skills/*/skill.md` se preservan solo como compatibilidad historica; no usarlos como patron para skills nuevas
   - antes de crear una skill nueva, revisar primero ejemplos locales existentes en `.codex/skills/*` o `.claude/skills/*`
 - Si el cambio afecta como funciona un modulo desde la perspectiva del usuario, verificar si existe documentacion funcional en `docs/documentation/` para el dominio afectado y actualizarla.
 - Si el cambio agrega o modifica una capacidad visible que el usuario debe saber operar paso a paso, actualizar o crear un manual en `docs/manual-de-uso/` con la categoria del dominio correspondiente. Los manuales no reemplazan arquitectura ni documentacion funcional: explican como usar la feature, que permisos requiere, que no hacer y como resolver problemas comunes.
