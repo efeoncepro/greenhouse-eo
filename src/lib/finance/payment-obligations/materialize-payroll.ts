@@ -7,6 +7,7 @@ import type {
 } from '@/types/payment-obligations'
 
 import { reconcilePaymentObligation } from './reconcile-obligation'
+import { calculatePreviredEntryBreakdown, calculatePreviredTotal } from './calculate-previred-total'
 
 interface PayrollEntryRow extends Record<string, unknown> {
   entry_id: string
@@ -254,32 +255,27 @@ export async function materializePayrollObligationsForExportedPeriod(args: {
   // El monto debe ser la suma TOTAL de cotizaciones previsionales que
   // Greenhouse paga a Previred — NO solo la parte empleador.
   // El SII (impuesto unico, retencion honorarios) NO va a Previred.
-  const previredTotal = entries.reduce((sum, e) => {
-    const employee =
-      toNumber(e.chile_afp_amount) +
-      toNumber(e.chile_health_amount) +
-      toNumber(e.chile_unemployment_amount) +
-      toNumber(e.chile_apv_amount)
+  // Helper canonico (extraido para pure-testability anti-regresion).
+  // Cualquier cambio a la formula Previred DEBE ir en
+  // src/lib/finance/payment-obligations/calculate-previred-total.ts +
+  // actualizar su test unit. El materializer solo orquesta el INSERT.
+  const previredTotal = calculatePreviredTotal(entries)
 
-    const employer =
-      toNumber(e.chile_employer_cesantia_amount) +
-      toNumber(e.chile_employer_mutual_amount) +
-      toNumber(e.chile_employer_sis_amount)
+  // Breakdown per-member para audit + drift detection
+  const previredBreakdown = entries.map(e => {
+    const breakdown = calculatePreviredEntryBreakdown(e)
 
-    return sum + employee + employer
-  }, 0)
-
-  // Breakdown para audit + drift detection
-  const previredBreakdown = entries.map(e => ({
-    memberId: e.member_id,
-    afpEmployee: toNumber(e.chile_afp_amount),
-    healthEmployee: toNumber(e.chile_health_amount),
-    unemploymentEmployee: toNumber(e.chile_unemployment_amount),
-    apvEmployee: toNumber(e.chile_apv_amount),
-    cesantiaEmployer: toNumber(e.chile_employer_cesantia_amount),
-    mutualEmployer: toNumber(e.chile_employer_mutual_amount),
-    sisEmployer: toNumber(e.chile_employer_sis_amount)
-  }))
+    return {
+      memberId: e.member_id,
+      afpEmployee: breakdown.afpEmployee,
+      healthEmployee: breakdown.healthEmployee,
+      unemploymentEmployee: breakdown.unemploymentEmployee,
+      apvEmployee: breakdown.apvEmployee,
+      cesantiaEmployer: breakdown.cesantiaEmployer,
+      mutualEmployer: breakdown.mutualEmployer,
+      sisEmployer: breakdown.sisEmployer
+    }
+  })
 
   if (previredTotal > 0) {
     const previred = await findPreviredSupplier()
