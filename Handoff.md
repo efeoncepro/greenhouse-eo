@@ -1,5 +1,39 @@
 # Handoff.md
 
+## Sesion 2026-05-01 — Payroll readiness aligned with real calculation contract
+
+- **Trigger**: incidente operativo en `/hr/payroll` sobre abril 2026. El período ya podía crearse de nuevo, pero la UI seguía mostrando `0 colaboradores`, readiness mezclaba reglas que no aplicaban (`KPI ICO` y asistencia para cohortes sin impacto en pago), `missingCompensationMemberIds` salía como `[null]`, y PREVIRED/ImpUnico de abril no se estaba sincronizando automáticamente.
+- **Hallazgos confirmados**:
+  - El `0 colaboradores` era discrepancia de contrato: la UI mostraba `entries.length`, no el roster elegible del borrador.
+  - El warning de `KPI ICO` en staging golpeaba a `humberly-henriquez` y `luis-reyes`, ambos `honorarios` Chile con `bonusOtdMax=0` y `bonusRpaMax=0`; no eran KPI-requeridos para cálculo real.
+  - El warning de asistencia golpeaba también cohortes donde el propio motor no prorratea (`honorarios`, `Deel`, `scheduleRequired=false`).
+  - El blocker Chile de abril 2026 era real: faltaba `gael-2026-04` en `greenhouse_payroll.chile_tax_brackets`; el cron `/api/cron/sync-previred` existía en código pero no estaba programado en `vercel.json`.
+- **Solución implementada**:
+  - Nueva capa canónica `src/lib/payroll/compensation-requirements.ts` con reglas para:
+    - `requiresPayrollKpi`
+    - `requiresPayrollAttendanceSignal`
+    - `requiresPayrollChileTaxTable`
+  - `payroll-readiness.ts` ahora:
+    - pide KPI solo a miembros KPI-dependientes
+    - pide asistencia solo a miembros cuyo pago depende de asistencia
+    - eleva esos faltantes a blockers reales cuando sí afectan cálculo
+  - `calculate-payroll.ts` ahora falla antes de persistir entries si falta KPI o asistencia en cohortes obligatorias.
+  - `postgres-store.ts` deja de devolver `memberId = null` cuando falta compensación; ahora el warning apunta al miembro real.
+  - `PayrollDashboard.tsx` y `PayrollPeriodTab.tsx` ahora muestran roster elegible en borrador y dejan de vender `entries=0` como si no hubiera personas.
+  - `vercel.json` programa `/api/cron/sync-previred`.
+  - `previred-sync.ts` ahora registra `source_sync_runs`; `previred-sync-freshness.ts` corrige `completed_at -> COALESCE(finished_at, started_at)`.
+- **Validación ejecutada**:
+  - `pnpm exec eslint <slice payroll/ui>` OK
+  - `pnpm vitest run src/lib/payroll/compensation-requirements.test.ts src/lib/payroll/payroll-readiness.test.ts src/lib/payroll/data-quality/previred-sync-freshness.test.ts src/lib/payroll/fetch-kpis-for-period.test.ts src/lib/payroll/fetch-attendance-for-period.test.ts src/lib/payroll/postgres-store.test.ts` OK
+  - `pnpm vitest run src/lib/payroll/project-payroll.test.ts` OK
+  - `pnpm exec tsc --noEmit --pretty false` OK
+  - `pnpm build` compiló OK; `Next.js` intentó agregar includes efímeros `.next-local/build-*` a `tsconfig.json`, pero ese ruido se revirtió y no debe commitearse.
+- **Pendiente operativo después del push**:
+  1. Deployar a `develop`.
+  2. Ejecutar `sync-previred` para `2026-04` y `2026-05` en staging con bypass + `CRON_SECRET`.
+  3. Reprobar `/api/hr/payroll/periods/2026-04/readiness` y `POST /api/hr/payroll/periods/2026-04/calculate`.
+  4. Verificar con Chromium/Playwright autenticado que el roster borrador y el cálculo ya reflejen el estado real.
+
 ## Sesion 2026-05-01 — TASK-742 Auth Resilience 7-Layer Architecture
 
 - **Trigger**: incidente 2026-04-30 — Daniela Ferreira (y todo internal user) no podía entrar vía Microsoft SSO; URL devolvía `?error=Callback`. Su `last_login_at` fue 2026-04-13. Algo cambió post-2026-04-13 que rompió el callback de Azure AD; sin observabilidad estructurada, NextAuth swallow-eó el error real. Auditoría forense de los 3 secrets críticos en GCP confirmó payloads sanos (v2/latest sin contaminación; v1 tenía comillas envolventes pero fue rotada el 2026-04-05/04-09). El bug está fuera de Greenhouse (Azure App registration / tenant config), pero el sistema no tenía mecanismos para detectarlo automáticamente ni dar al usuario un camino de recuperación.

@@ -3,7 +3,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
 > **Version:** 1.0
 > **Creado:** 2026-04-30 por Codex
-> **Ultima actualizacion:** 2026-04-30 por Codex
+> **Ultima actualizacion:** 2026-05-01 por Codex
 > **Documentacion tecnica:** [GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md)
 
 ---
@@ -100,6 +100,52 @@ Ahora:
 - el backend intenta resolver la tabla automaticamente
 - el sistema avisa con claridad si falta sincronizacion antes del calculo
 - el override manual queda confinado a edicion avanzada del periodo
+
+---
+
+## Elegibilidad, readiness y entries materializadas
+
+Un punto importante del modulo es que **elegibilidad de calculo** y **entries ya generadas** no son la misma cosa.
+
+- Un periodo en `borrador` puede tener colaboradores elegibles aunque todavia no existan `payroll_entries`.
+- El readiness calcula ese roster elegible usando compensaciones vigentes del mes.
+- Las `entries` aparecen solo despues de ejecutar `Calcular`.
+
+Por eso, ver un periodo en borrador con roster elegible no significa que la nomina ya exista; significa que Greenhouse ya sabe a quien incluir cuando el periodo quede listo para calcular.
+
+---
+
+## Cuando KPI ICO realmente bloquea
+
+Greenhouse ya no trata los KPI faltantes como una alerta generica para todos.
+
+Ahora los KPI ICO solo son obligatorios cuando:
+
+- la compensacion del colaborador usa bono variable real (`OTD` o `RpA`)
+- y ese bono forma parte del calculo de nomina del periodo
+
+Esto evita falsos positivos en casos como:
+
+- honorarios sin bono KPI
+- compensaciones sin exposicion a `OTD` ni `RpA`
+
+Si falta KPI para un colaborador que **si depende** de bono variable, el periodo queda bloqueado antes del calculo oficial.
+
+---
+
+## Cuando asistencia o licencias realmente bloquean
+
+Las senales de asistencia/licencias tampoco se revisan ya como si aplicaran a todos por igual.
+
+Solo se consideran requeridas cuando la asistencia puede cambiar el monto calculado de la nomina, por ejemplo en colaboraciones internas donde:
+
+- no es `honorarios`
+- no se procesa via `Deel`
+- y la compensacion requiere control de asistencia
+
+Esto evita marcar como faltantes casos donde el propio motor no prorratea por asistencia.
+
+Si la asistencia o licencias son requeridas para el calculo y no existe senal confiable del periodo, Greenhouse bloquea el calculo oficial en vez de asumir una nomina optimista.
 
 ---
 

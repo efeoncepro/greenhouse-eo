@@ -1,10 +1,12 @@
+import { randomUUID } from 'node:crypto'
+
 import type { PoolClient, QueryResultRow } from 'pg'
 
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 import { assertPayrollPostgresReady } from '@/lib/payroll/postgres-store'
 import { normalizeString } from '@/lib/payroll/shared'
-import { withGreenhousePostgresTransaction } from '@/lib/postgres/client'
+import { runGreenhousePostgresQuery, withGreenhousePostgresTransaction } from '@/lib/postgres/client'
 
 type GaelPreviredPayload = {
   PreviredID?: number | string
@@ -132,6 +134,8 @@ export type ChilePrevisionalSyncResult = {
   outboxEventId?: string
 }
 
+type PreviredSyncRunStatus = 'running' | 'succeeded' | 'failed' | 'partial'
+
 const GAEL_BASE_URL = 'https://api.gael.cloud/general/public'
 const SOURCE_LABEL = 'gael_api'
 
@@ -139,6 +143,9 @@ const normalizePeriodKey = (year: number, month: number) => `${String(month).pad
 const buildPreviredUrl = (year: number, month: number) => `${GAEL_BASE_URL}/previred/${normalizePeriodKey(year, month)}`
 const buildImpUnicoUrl = (year: number, month: number) => `${GAEL_BASE_URL}/impunico/${normalizePeriodKey(year, month)}`
 const buildTaxTableVersion = (year: number, month: number) => `gael-${year}-${String(month).padStart(2, '0')}`
+
+const buildPreviredSyncRunId = (year: number, month: number) =>
+  `previred-${year}-${String(month).padStart(2, '0')}-${randomUUID()}`
 
 const parseGaelNumber = (value: unknown) => {
   if (typeof value === 'number') {
@@ -206,6 +213,73 @@ const fetchGaelJson = async <T>(url: string) => {
   }
 
   return response.json() as Promise<T>
+}
+
+const writePreviredSyncRunStart = async ({
+  runId,
+  periodYear,
+  periodMonth
+}: {
+  runId: string
+  periodYear: number
+  periodMonth: number
+}) => {
+  try {
+    await runGreenhousePostgresQuery(
+      `INSERT INTO greenhouse_sync.source_sync_runs (
+        sync_run_id, source_system, source_object_type, sync_mode,
+        status, records_read, records_written_raw, triggered_by, notes, started_at
+      )
+      VALUES ($1, 'previred', 'chile_previsional_period', 'cron', 'running', 0, 0, 'cron:sync-previred', $2, CURRENT_TIMESTAMP)
+      ON CONFLICT (sync_run_id) DO NOTHING`,
+      [runId, `period=${periodYear}-${String(periodMonth).padStart(2, '0')}`]
+    )
+  } catch (error) {
+    console.warn('[sync-previred] failed to write start run log', error)
+  }
+}
+
+const writePreviredSyncRunOutcome = async ({
+  runId,
+  status,
+  periodYear,
+  periodMonth,
+  previred,
+  impunico
+}: {
+  runId: string
+  status: PreviredSyncRunStatus
+  periodYear: number
+  periodMonth: number
+  previred: SyncPartStatus
+  impunico: SyncPartStatus
+}) => {
+  const recordsWritten = (previred.rows ?? 0) + (impunico.rows ?? 0)
+
+  const notes = [
+    `period=${periodYear}-${String(periodMonth).padStart(2, '0')}`,
+    `previred=${previred.status}${typeof previred.rows === 'number' ? `:${previred.rows}` : ''}`,
+    `impunico=${impunico.status}${typeof impunico.rows === 'number' ? `:${impunico.rows}` : ''}`,
+    previred.message ? `previred_message=${previred.message}` : null,
+    impunico.message ? `impunico_message=${impunico.message}` : null
+  ]
+    .filter(Boolean)
+    .join('; ')
+    .slice(0, 2000)
+
+  try {
+    await runGreenhousePostgresQuery(
+      `UPDATE greenhouse_sync.source_sync_runs
+       SET status = $2,
+           records_written_raw = $3,
+           notes = $4,
+           finished_at = CURRENT_TIMESTAMP
+       WHERE sync_run_id = $1`,
+      [runId, status, recordsWritten, notes]
+    )
+  } catch (error) {
+    console.warn('[sync-previred] failed to write outcome run log', error)
+  }
 }
 
 export const parsePreviredPayload = (payload: GaelPreviredPayload): ChilePreviredPeriodSnapshot => {
@@ -617,11 +691,14 @@ export const syncChilePrevisionalPeriod = async ({
   periodMonth: number
 }): Promise<ChilePrevisionalSyncResult> => {
   const start = Date.now()
+  const runId = buildPreviredSyncRunId(periodYear, periodMonth)
 
   let previred: SyncPartStatus = { status: 'error', message: 'Not started' }
   let impunico: SyncPartStatus = { status: 'error', message: 'Not started' }
   let outboxEventId: string | undefined
   let utmValue: number | undefined
+
+  await writePreviredSyncRunStart({ runId, periodYear, periodMonth })
 
   try {
 
@@ -653,6 +730,22 @@ export const syncChilePrevisionalPeriod = async ({
       message: error instanceof Error ? error.message : 'Unknown error'
     }
   }
+
+  const status: PreviredSyncRunStatus =
+    previred.status === 'ok' && impunico.status === 'ok'
+      ? 'succeeded'
+      : previred.status === 'ok' || impunico.status === 'ok'
+        ? 'partial'
+        : 'failed'
+
+  await writePreviredSyncRunOutcome({
+    runId,
+    status,
+    periodYear,
+    periodMonth,
+    previred,
+    impunico
+  })
 
   return {
     periodYear,

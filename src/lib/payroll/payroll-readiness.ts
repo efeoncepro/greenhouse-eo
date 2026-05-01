@@ -8,6 +8,11 @@ import type {
 
 import { getLastBusinessDayOfMonth, getOperationalDateKey } from '@/lib/calendar/operational-calendar'
 import { getHistoricalEconomicIndicatorForPeriod } from '@/lib/finance/economic-indicators'
+import {
+  requiresPayrollAttendanceSignal,
+  requiresPayrollChileTaxTable,
+  requiresPayrollKpi
+} from '@/lib/payroll/compensation-requirements'
 import { fetchAttendanceForPayrollPeriod } from '@/lib/payroll/fetch-attendance-for-period'
 import { fetchKpisForPeriod } from '@/lib/payroll/fetch-kpis-for-period'
 import { getApplicableCompensationVersionsForPeriod } from '@/lib/payroll/get-compensation'
@@ -33,9 +38,6 @@ const hasAttendanceSignal = (attendance: AttendanceSnapshot | null | undefined) 
     attendance.daysOnUnpaidLeave > 0
   )
 }
-
-const isChileLaborCompensation = (row: ApplicableCompensation) =>
-  row.payRegime === 'chile' && row.contractType !== 'honorarios'
 
 export const buildPayrollPeriodReadiness = ({
   period,
@@ -65,7 +67,7 @@ export const buildPayrollPeriodReadiness = ({
     row => row.payRegime === 'chile' && row.healthSystem === 'isapre' && (row.healthPlanUf || 0) > 0
   )
 
-  const includesChilePayroll = includedCompensations.some(isChileLaborCompensation)
+  const includesChilePayroll = includedCompensations.some(requiresPayrollChileTaxTable)
 
   const blockingIssues: PayrollReadinessIssue[] = []
   const warnings: PayrollReadinessIssue[] = []
@@ -122,19 +124,21 @@ export const buildPayrollPeriodReadiness = ({
   }
 
   if (missingKpiMemberIds.length > 0) {
-    warnings.push({
+    blockingIssues.push({
       code: 'missing_kpi',
-      severity: 'warning',
-      message: `${missingKpiMemberIds.length} colaborador(es) no tienen KPI ICO disponibles para este período.`,
+      severity: 'blocking',
+      message:
+        `${missingKpiMemberIds.length} colaborador(es) con bonificación variable requieren KPI ICO antes de calcular este período.`,
       memberIds: missingKpiMemberIds
     })
   }
 
   if (missingAttendanceMemberIds.length > 0) {
-    warnings.push({
+    blockingIssues.push({
       code: 'missing_attendance_signal',
-      severity: 'warning',
-      message: `${missingAttendanceMemberIds.length} colaborador(es) no muestran señales de asistencia/licencias en el período.`,
+      severity: 'blocking',
+      message:
+        `${missingAttendanceMemberIds.length} colaborador(es) requieren señales de asistencia o licencias antes de calcular este período.`,
       memberIds: missingAttendanceMemberIds
     })
   }
@@ -198,7 +202,7 @@ export const getPayrollPeriodReadiness = async (periodId: string): Promise<Payro
 
   const compensationRows = await getApplicableCompensationVersionsForPeriod(range.periodStart, range.periodEnd)
   const includedCompensations = compensationRows.filter(row => row.hasCompensationVersion)
-  const includesChilePayroll = includedCompensations.some(isChileLaborCompensation)
+  const includesChilePayroll = includedCompensations.some(requiresPayrollChileTaxTable)
 
   const resolvedTaxTableVersion = includesChilePayroll
     ? await resolvePayrollTaxTableVersion({
@@ -219,22 +223,26 @@ export const getPayrollPeriodReadiness = async (periodId: string): Promise<Payro
         )?.value ?? null)
       : null
 
-  const includedMemberIds = compensationRows.filter(row => row.hasCompensationVersion).map(row => row.memberId)
+  const kpiRequiredMemberIds = includedCompensations.filter(requiresPayrollKpi).map(row => row.memberId)
+
+  const attendanceRequiredMemberIds = includedCompensations
+    .filter(requiresPayrollAttendanceSignal)
+    .map(row => row.memberId)
 
   const [kpiData, attendanceResult] = await Promise.all([
     fetchKpisForPeriod({
-      memberIds: includedMemberIds,
+      memberIds: kpiRequiredMemberIds,
       periodYear: range.year,
       periodMonth: range.month
     }),
-    fetchAttendanceForPayrollPeriod(includedMemberIds, range.periodStart, range.periodEnd)
+    fetchAttendanceForPayrollPeriod(attendanceRequiredMemberIds, range.periodStart, range.periodEnd)
   ])
 
   const attendanceData = attendanceResult.snapshots
 
-  const missingKpiMemberIds = includedMemberIds.filter(memberId => !kpiData.snapshots.has(memberId))
+  const missingKpiMemberIds = kpiRequiredMemberIds.filter(memberId => !kpiData.snapshots.has(memberId))
 
-  const missingAttendanceMemberIds = includedMemberIds.filter(
+  const missingAttendanceMemberIds = attendanceRequiredMemberIds.filter(
     memberId => !hasAttendanceSignal(attendanceData.get(memberId))
   )
 

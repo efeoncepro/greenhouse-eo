@@ -24,7 +24,7 @@ import type { PayrollDataQualityMetric } from './types'
 export const detectPreviredSyncFreshness = async (): Promise<PayrollDataQualityMetric> => {
   try {
     const rows = await runGreenhousePostgresQuery<{ hours_since: string | null }>(
-      `SELECT EXTRACT(EPOCH FROM (NOW() - MAX(completed_at))) / 3600 AS hours_since
+      `SELECT EXTRACT(EPOCH FROM (NOW() - MAX(COALESCE(finished_at, started_at)))) / 3600 AS hours_since
        FROM greenhouse_sync.source_sync_runs
        WHERE source_system = 'previred'
          AND status = 'succeeded'`

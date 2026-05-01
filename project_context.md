@@ -1,3 +1,22 @@
+## Delta 2026-05-01 Payroll readiness y roster borrador ya siguen el contrato real de calculo
+
+- `Payroll` ahora separa explícitamente dos conceptos que antes se mezclaban en UI/runtime:
+  - `colaboradores elegibles para cálculo`
+  - `entries ya materializadas`
+- En períodos `draft`, la UI puede mostrar roster elegible sin que existan todavía `payroll_entries`; esto evita el falso `0 colaboradores` cuando el borrador aún no se calculó.
+- Se agregó la capa canónica `src/lib/payroll/compensation-requirements.ts` para decidir por compensación:
+  - cuándo `KPI ICO` es realmente obligatorio
+  - cuándo asistencia/licencias puede cambiar el monto pagado
+  - cuándo Chile requiere tabla tributaria
+- Regla nueva del cálculo oficial:
+  - si falta `KPI ICO` para un colaborador con bono variable real, el cálculo bloquea antes de persistir entries
+  - si falta asistencia/licencias para un colaborador cuyo pago depende de asistencia, el cálculo bloquea antes de persistir entries
+  - `honorarios`, `Deel` y compensaciones sin exposición KPI dejan de contaminar readiness con falsos positivos
+- Operación nueva:
+  - `sync-previred` queda programado en `vercel.json`
+  - cada corrida registra `greenhouse_sync.source_sync_runs`
+  - el detector `previred_sync_freshness` vuelve a leer frescura real desde `finished_at`
+
 ## Delta 2026-04-30 TASK-694 aterriza Deep Link Platform Foundation
 
 - Ya existe foundation runtime compartida en `src/lib/navigation/deep-links/**`.

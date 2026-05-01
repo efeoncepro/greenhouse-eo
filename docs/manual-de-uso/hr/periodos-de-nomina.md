@@ -3,7 +3,7 @@
 > **Tipo de documento:** Manual de uso
 > **Version:** 1.0
 > **Creado:** 2026-04-30 por Codex
-> **Ultima actualizacion:** 2026-04-30 por Codex
+> **Ultima actualizacion:** 2026-05-01 por Codex
 > **Modulo:** HR / Nomina
 > **Ruta en portal:** `/hr/payroll`
 > **Documentacion relacionada:** [GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md), [Periodos de nomina](../../documentation/hr/periodos-de-nomina.md)
@@ -71,6 +71,16 @@ Si no tienes una instruccion clara, dejalo vacio para que Greenhouse resuelva la
 - `Aprobado`: el periodo fue revisado y aprobado para cierre.
 - `Exportado`: el periodo ya fue cerrado/exportado.
 
+### Importante sobre `Borrador`
+
+Un periodo en borrador puede mostrar colaboradores elegibles aunque todavia no tenga entries.
+
+Eso significa:
+
+- el roster del periodo ya fue resuelto
+- pero la nomina oficial aun no se materializa
+- las entries apareceran solo despues de `Calcular`
+
 ## Problemas comunes
 
 ### Pude crear el periodo, pero no calcular
@@ -82,6 +92,36 @@ Que hacer:
 1. Confirma que el mes del periodo sea correcto.
 2. Revisa si el sistema muestra alerta de tabla tributaria faltante.
 3. Pide sincronizar la base previsional/tributaria del mes antes de recalcular.
+
+### Veo colaboradores elegibles, pero aun no aparece la tabla de nomina
+
+Eso es esperado si el periodo sigue en `Borrador`.
+
+Que significa:
+
+- Greenhouse ya sabe quienes entrarian al calculo
+- todavia no existen entries materializadas
+- primero debes resolver blockers del readiness y luego usar `Calcular`
+
+### El readiness dice que faltan KPI ICO
+
+Ese blocker solo aplica si el colaborador depende de bono variable real en ese periodo.
+
+Que hacer:
+
+1. Revisa si la compensacion del colaborador usa `OTD` o `RpA`.
+2. Si si usa bono KPI, valida que el colaborador tenga metricas ICO para ese mes.
+3. Si no usa bono KPI, no deberia quedar bloqueado por esta causa; reportalo como inconsistencia del readiness.
+
+### El readiness dice que faltan senales de asistencia/licencias
+
+Ese blocker solo aplica cuando la asistencia puede cambiar el monto pagado en ese periodo.
+
+Que hacer:
+
+1. Confirma si el colaborador realmente requiere control de asistencia en nomina.
+2. Si si lo requiere, valida que exista senal de asistencia o licencia para el mes.
+3. Si el colaborador es `honorarios` o se procesa via `Deel`, ese bloqueo no deberia aplicar.
 
 ### Veo un valor esperado como `gael-2026-04` y no se si debo escribirlo
 

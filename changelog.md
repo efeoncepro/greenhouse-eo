@@ -4971,6 +4971,16 @@ Validations: tsc 0 errors, lint 0 errors, 427 files / 2225 tests pass / 5 skippe
 - Si no existe una tabla tributaria sincronizada para ese mes, el período igual puede crearse como borrador, pero el sistema bloquea el cálculo con un mensaje explícito en vez de fallar de forma ambigua o degradar el impuesto a `0`.
 - `reverse-quote` también valida que exista una tabla tributaria Chile sincronizada para el mes antes de cotizar remuneración inversa.
 
+### Payroll readiness now matches the real calculation contract
+
+- `Payroll` ya no mezcla “entries materializadas” con “colaboradores elegibles”: un período en `Borrador` puede mostrar roster elegible antes de generar `payroll_entries`, y la UI lo refleja sin caer en el falso `0 colaboradores`.
+- Se agregó un helper canónico `src/lib/payroll/compensation-requirements.ts` para decidir, por compensación, cuándo realmente se requieren `KPI ICO`, cuándo la asistencia/licencias afecta pago y cuándo Chile necesita tabla tributaria.
+- `readiness` ahora bloquea solo por `KPI ICO` faltante cuando la compensación sí depende de bono variable (`OTD`/`RpA`), y solo por asistencia/licencias faltantes cuando esa señal realmente puede cambiar el monto calculado.
+- Se eliminaron falsos positivos operativos en casos como `honorarios`, `Deel` o compensaciones sin exposición a bono KPI.
+- El cálculo oficial ahora falla antes de persistir entries si falta `KPI ICO` o asistencia en colaboradores donde esas fuentes sí son obligatorias para el cálculo.
+- El read-model de compensaciones deja de devolver `missingCompensationMemberIds = [null]`; ahora expone el `memberId` real del colaborador fuera de cálculo.
+- `sync-previred` queda programado en `vercel.json`, y cada corrida registra `source_sync_runs` para que el detector `previred_sync_freshness` vuelva a tener observabilidad real sobre `finished_at`.
+
 ### Economic indicators migration + historical backfill
 
 - Ejecutada la migration `scripts/migrations/add-economic-indicators.sql` para materializar `greenhouse_finance.economic_indicators`.

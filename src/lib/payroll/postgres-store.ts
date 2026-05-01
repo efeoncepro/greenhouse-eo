@@ -826,7 +826,7 @@ export const pgGetApplicableCompensationVersionsForPeriod = async (periodStart: 
     `
       SELECT DISTINCT ON (m.member_id)
         cv.version_id,
-        cv.member_id,
+        m.member_id,
         m.display_name,
         m.primary_email,
         m.avatar_url,

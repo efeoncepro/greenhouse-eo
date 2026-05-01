@@ -15,6 +15,11 @@ import { DEFAULT_BONUS_PRORATION_CONFIG, normalizeBonusProrationConfig } from '@
 import { calculateOtdBonus, calculateRpaBonus } from '@/lib/payroll/bonus-proration'
 import { calculateHonorariosTotals } from '@/lib/payroll/calculate-honorarios'
 import { calculatePayrollTotals } from '@/lib/payroll/calculate-chile-deductions'
+import {
+  requiresPayrollAttendanceSignal,
+  requiresPayrollChileTaxTable,
+  requiresPayrollKpi
+} from '@/lib/payroll/compensation-requirements'
 import { computeChileTax } from '@/lib/payroll/compute-chile-tax'
 import { fetchAttendanceForPayrollPeriod } from '@/lib/payroll/fetch-attendance-for-period'
 import { fetchKpisForPeriod } from '@/lib/payroll/fetch-kpis-for-period'
@@ -104,6 +109,19 @@ type AttendanceSnapshot = {
 }
 
 const roundCurrency = (value: number) => Math.round(value * 100) / 100
+
+const hasAttendanceSignal = (attendance: AttendanceSnapshot | null | undefined) => {
+  if (!attendance) {
+    return false
+  }
+
+  return (
+    attendance.daysPresent > 0 ||
+    attendance.daysAbsent > 0 ||
+    attendance.daysOnLeave > 0 ||
+    attendance.daysOnUnpaidLeave > 0
+  )
+}
 
 const resolvePayrollPeriodIndicators = async ({
   periodId,
@@ -433,9 +451,9 @@ export const calculatePayroll = async ({
     row => row.payRegime === 'chile' && row.healthSystem === 'isapre' && (row.healthPlanUf || 0) > 0
   )
 
-  const includesChilePayroll = compensationRows.some(
-    row => row.payRegime === 'chile' && row.contractType !== 'honorarios'
-  )
+  const includesChilePayroll = compensationRows.some(requiresPayrollChileTaxTable)
+  const kpiRequiredMemberIds = compensationRows.filter(requiresPayrollKpi).map(row => row.memberId)
+  const attendanceRequiredMemberIds = compensationRows.filter(requiresPayrollAttendanceSignal).map(row => row.memberId)
 
   const resolvedTaxTableVersion = includesChilePayroll
     ? await resolvePayrollTaxTableVersion({
@@ -471,16 +489,14 @@ export const calculatePayroll = async ({
     )
   }
 
-  const memberIds = compensationRows.map(row => row.memberId)
-
   const [bonusConfig, kpiData, attendanceResult] = await Promise.all([
     getBonusConfigForDate(range.periodEnd),
     fetchKpisForPeriod({
-      memberIds,
+      memberIds: kpiRequiredMemberIds,
       periodYear: range.year,
       periodMonth: range.month
     }),
-    fetchAttendanceForPayrollPeriod(memberIds, range.periodStart, attendanceCutDate)
+    fetchAttendanceForPayrollPeriod(attendanceRequiredMemberIds, range.periodStart, attendanceCutDate)
   ])
 
   if (attendanceResult.leaveDataDegraded) {
@@ -492,15 +508,32 @@ export const calculatePayroll = async ({
 
   const attendanceData = attendanceResult.snapshots
 
+  const missingKpiMemberIds = kpiRequiredMemberIds.filter(memberId => !kpiData.snapshots.has(memberId))
+
+  const missingAttendanceMemberIds = attendanceRequiredMemberIds.filter(
+    memberId => !hasAttendanceSignal(attendanceData.get(memberId))
+  )
+
+  if (missingKpiMemberIds.length > 0) {
+    throw new PayrollValidationError(
+      'This payroll period requires ICO KPI data for every collaborator with variable bonuses before payroll can be calculated.',
+      400,
+      { memberIds: missingKpiMemberIds }
+    )
+  }
+
+  if (missingAttendanceMemberIds.length > 0) {
+    throw new PayrollValidationError(
+      'This payroll period requires attendance or leave signals for every collaborator whose pay depends on attendance before payroll can be calculated.',
+      400,
+      { memberIds: missingAttendanceMemberIds }
+    )
+  }
+
   const entries: PayrollEntry[] = []
-  const missingKpiMemberIds: string[] = []
 
   for (const compensation of compensationRows) {
     const kpi = kpiData.snapshots.get(compensation.memberId) || null
-
-    if (!kpi) {
-      missingKpiMemberIds.push(compensation.memberId)
-    }
 
     const attendance = attendanceData.get(compensation.memberId) ?? null
 

@@ -30,7 +30,13 @@ import {
   type ActivePayrollPeriodEntry
 } from '@/lib/payroll/current-payroll-period'
 import { buildPayrollTaxTableVersion } from '@/lib/payroll/tax-table-version-format'
-import type { CompensationVersion, PayrollCompensationMember, PayrollEntry, PayrollPeriod } from '@/types/payroll'
+import type {
+  CompensationVersion,
+  PayrollCompensationMember,
+  PayrollEntry,
+  PayrollPeriod,
+  PayrollPeriodReadiness
+} from '@/types/payroll'
 import PayrollCompensationTab from './PayrollCompensationTab'
 import PayrollHistoryTab from './PayrollHistoryTab'
 import PayrollPeriodTab from './PayrollPeriodTab'
@@ -46,6 +52,7 @@ const PayrollDashboard = () => {
   const [activePeriod, setActivePeriod] = useState<PayrollPeriod | null>(null)
   const [activePayrollEntries, setActivePayrollEntries] = useState<ActivePayrollPeriodEntry[]>([])
   const [activeEntries, setActiveEntries] = useState<PayrollEntry[]>([])
+  const [kpiReadiness, setKpiReadiness] = useState<PayrollPeriodReadiness | null>(null)
 
   const [currencyEquivalents, setCurrencyEquivalents] = useState<{
     clpEquivalent: { grossClp: number; netClp: number; fxRate: number } | null
@@ -223,6 +230,81 @@ const PayrollDashboard = () => {
     [periods]
   )
 
+  // Stats — show active period, or last period as fallback for KPI context
+  const lastPeriod = periods.length > 0
+    ? periods.reduce((latest, p) => (p.periodId > latest.periodId ? p : latest), periods[0])
+    : null
+
+  const kpiPeriod = activePeriod ?? lastPeriod
+  const kpiEntries = activeEntries
+  const isKpiFallback = !activePeriod && lastPeriod !== null
+  const statusConfig = kpiPeriod ? periodStatusConfig[kpiPeriod.status] : null
+  const needsCompensationSetup = compensations.length === 0
+  const hasActivePayrollMembers = compensationMembers.length > 0
+  const grossSummary = buildPayrollCurrencySummary(kpiEntries, entry => entry.grossTotal)
+  const netSummary = buildPayrollCurrencySummary(kpiEntries, entry => entry.netTotal)
+  const kpiPeriodId = kpiPeriod?.periodId ?? null
+  const kpiPeriodStatus = kpiPeriod?.status ?? null
+
+  const collaboratorCount =
+    kpiPeriod?.status === 'draft' ? kpiReadiness?.includedMemberIds.length ?? 0 : kpiEntries.length
+
+  const collaboratorTitle = kpiPeriod?.status === 'draft' ? 'Elegibles' : 'Colaboradores'
+
+  const collaboratorSubtitle =
+    kpiPeriod?.status === 'draft'
+      ? 'Entrarían al cálculo en este período'
+      : isKpiFallback
+        ? `Último: ${kpiPeriod ? formatPeriodLabel(kpiPeriod.year, kpiPeriod.month) : '—'}`
+        : 'Con nómina en este período'
+
+  // TASK-409 — multi-period awareness. When more than one period is active
+  // (e.g. Marzo reopened + Abril draft), surface a secondary entries list
+  // so the operator can jump between them without the "Historial" tab. The
+  // primary period (index 0) is already rendered in the main area.
+  const secondaryActivePeriods = activePayrollEntries.slice(1)
+
+  const selectedPeriod = selectedPeriodId ? periods.find(period => period.periodId === selectedPeriodId) ?? null : null
+  const displayedPeriod = selectedPeriod ?? activePeriod
+  const displayedEntries = selectedPeriod?.periodId === activePeriod?.periodId ? activeEntries : selectedEntries
+  const isHistoricalSelection = Boolean(displayedPeriod && activePeriod && displayedPeriod.periodId !== activePeriod.periodId)
+
+  useEffect(() => {
+    if (!kpiPeriodId || kpiPeriodStatus !== 'draft') {
+      setKpiReadiness(null)
+
+      return
+    }
+
+    let active = true
+
+    const loadReadiness = async () => {
+      try {
+        const res = await fetch(`/api/hr/payroll/periods/${kpiPeriodId}/readiness`)
+
+        if (!res.ok) {
+          throw new Error('No se pudo cargar el roster elegible del período.')
+        }
+
+        const data = (await res.json()) as PayrollPeriodReadiness
+
+        if (active) {
+          setKpiReadiness(data)
+        }
+      } catch {
+        if (active) {
+          setKpiReadiness(null)
+        }
+      }
+    }
+
+    void loadReadiness()
+
+    return () => {
+      active = false
+    }
+  }, [kpiPeriodId, kpiPeriodStatus])
+
   if (loading) {
     return (
       <Stack spacing={6}>
@@ -238,31 +320,6 @@ const PayrollDashboard = () => {
       </Stack>
     )
   }
-
-  // Stats — show active period, or last period as fallback for KPI context
-  const lastPeriod = periods.length > 0
-    ? periods.reduce((latest, p) => (p.periodId > latest.periodId ? p : latest), periods[0])
-    : null
-
-  const kpiPeriod = activePeriod ?? lastPeriod
-  const kpiEntries = activeEntries
-  const isKpiFallback = !activePeriod && lastPeriod !== null
-  const statusConfig = kpiPeriod ? periodStatusConfig[kpiPeriod.status] : null
-  const needsCompensationSetup = compensations.length === 0
-  const hasActivePayrollMembers = compensationMembers.length > 0
-  const grossSummary = buildPayrollCurrencySummary(kpiEntries, entry => entry.grossTotal)
-  const netSummary = buildPayrollCurrencySummary(kpiEntries, entry => entry.netTotal)
-
-  // TASK-409 — multi-period awareness. When more than one period is active
-  // (e.g. Marzo reopened + Abril draft), surface a secondary entries list
-  // so the operator can jump between them without the "Historial" tab. The
-  // primary period (index 0) is already rendered in the main area.
-  const secondaryActivePeriods = activePayrollEntries.slice(1)
-
-  const selectedPeriod = selectedPeriodId ? periods.find(period => period.periodId === selectedPeriodId) ?? null : null
-  const displayedPeriod = selectedPeriod ?? activePeriod
-  const displayedEntries = selectedPeriod?.periodId === activePeriod?.periodId ? activeEntries : selectedEntries
-  const isHistoricalSelection = Boolean(displayedPeriod && activePeriod && displayedPeriod.periodId !== activePeriod.periodId)
 
   return (
     <>
@@ -358,11 +415,11 @@ const PayrollDashboard = () => {
           </Grid>
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <HorizontalWithSubtitle
-              title='Colaboradores'
-              stats={String(kpiEntries.length)}
+              title={collaboratorTitle}
+              stats={String(collaboratorCount)}
               avatarIcon='tabler-users'
               avatarColor='info'
-              subtitle={isKpiFallback ? `Último: ${kpiPeriod ? formatPeriodLabel(kpiPeriod.year, kpiPeriod.month) : '—'}` : 'Con nómina en este período'}
+              subtitle={collaboratorSubtitle}
             />
           </Grid>
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
@@ -437,6 +494,7 @@ const PayrollDashboard = () => {
               onRefresh={handleRefresh}
               onCreatePeriod={openNewPeriodDialog}
               createPeriodLabel={createPeriodLabel}
+              members={compensationMembers}
               isHistoricalSelection={isHistoricalSelection}
               currencyEquivalents={!isHistoricalSelection ? currencyEquivalents : undefined}
             />
