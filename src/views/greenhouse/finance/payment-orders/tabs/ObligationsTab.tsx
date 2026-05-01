@@ -529,6 +529,7 @@ const ObligationsTab = ({
                         skin='light'
                         color={beneficiaryAvatarColor(o.beneficiaryType)}
                         size={32}
+                        src={o.beneficiaryAvatarUrl ?? undefined}
                         sx={{ fontSize: 12, fontWeight: 600 }}
                       >
                         {initialsForBeneficiary(o)}

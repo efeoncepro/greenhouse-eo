@@ -58,6 +58,7 @@ export interface PaymentObligation {
   beneficiaryType: PaymentObligationBeneficiaryType
   beneficiaryId: string
   beneficiaryName: string | null
+  beneficiaryAvatarUrl: string | null
   obligationKind: PaymentObligationKind
   amount: number
   currency: PaymentObligationCurrency

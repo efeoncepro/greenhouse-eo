@@ -24,6 +24,10 @@ export async function GET(request: Request) {
   const limit = Number(searchParams.get('limit') ?? '100')
   const offset = Number(searchParams.get('offset') ?? '0')
 
+  // Default: hide cancelled/superseded obligations from the operational view.
+  // Override with ?includeCancelled=true if explicitly needed (e.g. audit/history).
+  const includeCancelled = searchParams.get('includeCancelled') === 'true'
+
   try {
     const { items, total } = await listPaymentObligations({
       periodId,
@@ -32,6 +36,7 @@ export async function GET(request: Request) {
       obligationKind,
       status: status ?? undefined,
       sourceKind,
+      excludeCancelled: !includeCancelled,
       limit: Number.isFinite(limit) ? limit : 100,
       offset: Number.isFinite(offset) ? offset : 0
     })

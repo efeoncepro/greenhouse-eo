@@ -219,6 +219,7 @@ const ObligationDetailDrawer = ({ obligationId, onClose }: ObligationDetailDrawe
                 skin='light'
                 color={beneficiaryAvatarColor(detail.obligation.beneficiaryType)}
                 size={48}
+                src={detail.obligation.beneficiaryAvatarUrl ?? undefined}
                 sx={{ fontSize: 16, fontWeight: 600 }}
               >
                 {initialsForBeneficiary(detail.obligation.beneficiaryName, detail.obligation.beneficiaryId, detail.obligation.beneficiaryType)}

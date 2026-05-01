@@ -16,6 +16,7 @@ export interface ObligationRow extends Record<string, unknown> {
   beneficiary_type: string
   beneficiary_id: string
   beneficiary_name: string | null
+  beneficiary_avatar_url?: string | null
   obligation_kind: string
   amount: number | string
   currency: string
@@ -56,6 +57,7 @@ export const mapObligationRow = (row: ObligationRow): PaymentObligation => ({
   beneficiaryType: row.beneficiary_type as PaymentObligationBeneficiaryType,
   beneficiaryId: row.beneficiary_id,
   beneficiaryName: row.beneficiary_name,
+  beneficiaryAvatarUrl: row.beneficiary_avatar_url ?? null,
   obligationKind: row.obligation_kind as PaymentObligationKind,
   amount: toNumber(row.amount),
   currency: row.currency as PaymentObligationCurrency,
