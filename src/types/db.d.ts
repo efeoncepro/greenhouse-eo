@@ -4186,6 +4186,33 @@ export interface GreenhouseFinancePaymentInstrumentAdminAuditLog {
   space_id: string | null;
 }
 
+export interface GreenhouseFinancePaymentObligations {
+  amount: Numeric;
+  beneficiary_id: string;
+  beneficiary_name: string | null;
+  beneficiary_type: string;
+  cancelled_reason: string | null;
+  created_at: Generated<Timestamp>;
+  currency: string;
+  due_date: Timestamp | null;
+  metadata_json: Generated<Json>;
+  obligation_id: string;
+  /**
+   * employee_net_pay = neto al colaborador; employer_social_security = aporte previsional consolidado; employee_withheld_component = retencion entregada al estado (SII); provider_payroll = placeholder Deel/EOR; processor_fee = costo plataforma de pago; fx_component = costo cambiario; manual = entrada manual.
+   */
+  obligation_kind: string;
+  period_id: string | null;
+  /**
+   * payroll = generado desde payroll_period.exported; supplier_invoice = factura proveedor; tax_obligation = SII u otra autoridad; manual = entrada humana; reliquidation_delta = TASK-409 reliquidacion v2 vs v1.
+   */
+  source_kind: string;
+  source_ref: string;
+  space_id: string | null;
+  status: Generated<string>;
+  superseded_by: string | null;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseFinancePaymentProviderCatalog {
   /**
    * Subset of greenhouse_finance instrument categories this provider can serve. Used by admin UI to filter the provider dropdown by current category. Extend (don't branch) when a new wallet category ships.
@@ -7612,6 +7639,7 @@ export interface DB {
   "greenhouse_finance.loan_accounts": GreenhouseFinanceLoanAccounts;
   "greenhouse_finance.nubox_emission_log": GreenhouseFinanceNuboxEmissionLog;
   "greenhouse_finance.payment_instrument_admin_audit_log": GreenhouseFinancePaymentInstrumentAdminAuditLog;
+  "greenhouse_finance.payment_obligations": GreenhouseFinancePaymentObligations;
   "greenhouse_finance.payment_provider_catalog": GreenhouseFinancePaymentProviderCatalog;
   "greenhouse_finance.products": GreenhouseFinanceProducts;
   "greenhouse_finance.purchase_orders": GreenhouseFinancePurchaseOrders;

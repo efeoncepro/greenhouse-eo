@@ -2,6 +2,27 @@
 
 Catalogo canonico de eventos del sistema de outbox de Greenhouse. Cada evento se registra en `greenhouse_sync.outbox_events` y se publica a BigQuery via el consumer `outbox-publish`.
 
+## Delta 2026-05-01 — TASK-748: Payment Obligations
+
+Aggregate type nuevo: `payment_obligation`.
+
+Eventos:
+
+- `finance.payment_obligation.generated` — emitido por `createPaymentObligation` cuando se materializa una obligation desde una source (payroll, supplier_invoice, manual). Payload: `{ obligationId, sourceKind, sourceRef, periodId, beneficiaryType, beneficiaryId, obligationKind, amount, currency, status, spaceId }`.
+- `finance.payment_obligation.superseded` — emitido por `supersedePaymentObligation` cuando una obligation viva (no pagada) es reemplazada por otra. Payload: `{ obligationId, supersededBy, reason, originalAmount, replacementAmount, deltaAmount, currency, beneficiaryId, obligationKind }`.
+
+Consumers futuros:
+
+- TASK-750 payment_orders consume `.generated` para construir ordenes.
+- TASK-751 reconciliation consume `.superseded` para mantener delta auditable.
+- Reliability AI Observer (TASK-638) puede correlacionar drift entre obligations y expenses.
+
+Reglas:
+
+- Eventos publicados DENTRO de la transaccion del INSERT/UPDATE para idempotencia.
+- `aggregate_id` = `obligation_id`.
+- Schema version implicita V1; no se necesita `schemaVersion: 2` (eventos entity-scoped, no period-scoped).
+
 ## Delta 2026-04-21
 
 - `TASK-533` agrega el aggregate type `vat_position` y el evento `finance.vat_position.period_materialized`.

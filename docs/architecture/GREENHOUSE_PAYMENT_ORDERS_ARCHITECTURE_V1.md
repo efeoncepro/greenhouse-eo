@@ -1,5 +1,72 @@
 # Greenhouse Payment Orders Architecture V1
 
+## Delta 2026-05-01 — TASK-748: Payment Obligations Foundation
+
+Se introduce la primera capa canonica del programa Payment Orders: la tabla
+`greenhouse_finance.payment_obligations` que componentiza obligaciones financieras
+generadas por sources upstream (payroll, supplier_invoice, tax_obligation, manual,
+reliquidation_delta) sin reemplazar el ledger `expenses`.
+
+Schema canonico (migration `20260501140545647_task-748-payment-obligations.sql`):
+
+- PK `obligation_id` TEXT.
+- `source_kind` ∈ payroll | supplier_invoice | tax_obligation | manual | reliquidation_delta.
+- `obligation_kind` ∈ employee_net_pay | employer_social_security | employee_withheld_component | provider_payroll | processor_fee | fx_component | manual.
+- `beneficiary_type` ∈ member | supplier | tax_authority | processor | other.
+- `status` ∈ generated | scheduled | partially_paid | paid | reconciled | closed | cancelled | superseded.
+- `currency` ∈ CLP | USD; `amount` NUMERIC(14,2) >= 0.
+- `space_id` NULLABLE en V1 hasta que emerja resolver canonico member→space.
+
+Idempotency partial unique: `(source_kind, source_ref, obligation_kind, beneficiary_id, COALESCE(period_id,'__no_period__')) WHERE status NOT IN ('superseded','cancelled')`. Re-export del mismo periodo no duplica obligations.
+
+Inmutabilidad: rows con `paid|partially_paid|reconciled|closed` no pueden ser supersedidas; el caller emite un nuevo row tipo `reliquidation_delta` independiente.
+
+### Materializer Payroll (`materializePayrollObligationsForExportedPeriod`)
+
+Corre como projection consumer de `payroll_period.exported`. Por cada `payroll_entry` activo:
+
+| Caso | obligation_kind | amount | beneficiary | currency |
+|---|---|---|---|---|
+| Chile dependiente / international internal | `employee_net_pay` | `net_total` | member | entry.currency |
+| Honorarios + sii_retention > 0 | `employee_withheld_component` | `sii_retention_amount` | tax_authority `cl_sii` | CLP |
+| `payroll_via='deel'` | `provider_payroll` | 0 placeholder + metadata.referenceNet | member | entry.currency |
+
+Y al final del periodo:
+
+| Caso | obligation_kind | amount | beneficiary |
+|---|---|---|---|
+| Σ chile_employer_total_cost > 0 | `employer_social_security` | total CLP | supplier Previred si existe, sino `cl_previred` |
+
+### Coexistencia con expenses (NO reemplazo)
+
+`finance_expense_reactive_intake` (TASK-411) sigue corriendo. Ambas projections consumen `payroll_period.exported`:
+
+- `expenses` mantiene devengo P&L + su state machine `payment_status` (legacy).
+- `payment_obligations` introduce la capa explicita "que se debe pagar" con state machine de pago propia.
+- `getPaymentObligationsDrift(periodId)` compara conteos para detectar gaps de cobertura.
+
+### Outbox events emitidos
+
+- `finance.payment_obligation.generated` (aggregate_type=`payment_obligation`) — consumers futuros: TASK-750 payment_orders, TASK-751 reconciliation, reliability AI Observer.
+- `finance.payment_obligation.superseded` — audit chain + delta reporting.
+
+Cada evento se publica DENTRO de la misma transaccion del INSERT/UPDATE via `publishOutboxEvent(client)`.
+
+### Reglas duras
+
+- **NUNCA** modificar `calculate-payroll.ts` ni `payroll_entries.net_total` desde el modulo de obligations.
+- **NUNCA** supersedir una obligation con status `paid|partially_paid|reconciled|closed`. Emitir nueva con `source_kind='reliquidation_delta'`.
+- **NUNCA** emitir `payment_obligation.generated` fuera de transaction; el outbox event acompaña al INSERT en la misma tx.
+- **NUNCA** crear obligations sin idempotency key canonica.
+- **NUNCA** materializar obligations Chile-dependientes para `payroll_via='deel'` (TASK-744 boundary). Placeholder es `provider_payroll` con amount=0.
+- Cuando emerja resolver de `member.space_id`, popular obligations via UPDATE batch — campo NULLABLE para permitirlo.
+
+Files owned: `src/lib/finance/payment-obligations/`, `src/lib/sync/projections/payment-obligations-from-payroll.ts`, `src/types/payment-obligations.ts`.
+Endpoints: `GET /api/admin/finance/payment-obligations`, `GET /api/admin/finance/payment-obligations/drift?periodId=YYYY-MM`.
+Tests: 5/5 row-mapper passing. Materializer + projection covered por smoke con re-export real.
+
+Spec consumer: TASK-750 (payment_orders) lee de aqui.
+
 ## Objetivo
 
 Definir el contrato canónico para **Órdenes de Pago** en Greenhouse: una capa de Tesorería dentro de Finance que convierte obligaciones financieras en pagos ejecutables, auditables y conciliables, sin mover la responsabilidad de cálculo hacia Payroll ni hacia otros módulos originadores.
