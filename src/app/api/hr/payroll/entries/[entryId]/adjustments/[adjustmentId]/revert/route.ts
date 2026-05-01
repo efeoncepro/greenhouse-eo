@@ -5,6 +5,7 @@ import {
   PayrollAdjustmentValidationError,
   revertAdjustment
 } from '@/lib/payroll/adjustments/apply-adjustment'
+import { recalculatePayrollEntry } from '@/lib/payroll/recalculate-entry'
 import { requireHrTenantContext } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
@@ -18,7 +19,7 @@ export async function POST(
   if (!tenant) return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   try {
-    const { adjustmentId } = await params
+    const { entryId, adjustmentId } = await params
     const session = await getServerAuthSession()
     const userId = session?.user?.id ?? tenant.userId
 
@@ -38,7 +39,25 @@ export async function POST(
       revertedReason
     })
 
-    return NextResponse.json({ adjustment, reverted: true })
+    // TASK-745c — auto-recalc tras revert: el adjustment dejo de aplicar,
+    // el entry vuelve al estado natural sin ese descuento/factor.
+    let recalculated = false
+
+    try {
+      await recalculatePayrollEntry({
+        entryId,
+        input: {},
+        actorIdentifier: userId
+      })
+      recalculated = true
+    } catch (recalcError) {
+      console.warn(
+        `[adjustments revert] auto-recalc failed for entry ${entryId}:`,
+        recalcError instanceof Error ? recalcError.message : recalcError
+      )
+    }
+
+    return NextResponse.json({ adjustment, reverted: true, recalculated })
   } catch (error) {
     if (error instanceof PayrollAdjustmentValidationError) {
       return NextResponse.json({ error: error.message }, { status: error.statusCode })

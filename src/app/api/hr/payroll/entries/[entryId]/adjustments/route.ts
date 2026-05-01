@@ -12,6 +12,7 @@ import {
   ADJUSTMENT_REASON_CODES,
   isAdjustmentReasonCode
 } from '@/lib/payroll/adjustments/reason-codes'
+import { recalculatePayrollEntry } from '@/lib/payroll/recalculate-entry'
 import { requireHrTenantContext } from '@/lib/tenant/authorization'
 import type { AdjustmentKind } from '@/types/payroll-adjustments'
 
@@ -155,7 +156,31 @@ export async function POST(
       sourceKind: 'manual'
     })
 
-    return NextResponse.json({ adjustment, eventId, created: true }, { status: 201 })
+    // TASK-745c — auto-recalculate del entry para reflejar el adjustment en
+    // grossTotal/netTotal/SII/deducciones inmediatamente. Si el adjustment
+    // nacio active, el recalc lo aplica; si nacio pending_approval, el
+    // entry no cambia hasta que approveAdjustment dispare otro recalc.
+    let recalculated = false
+
+    if (adjustment.status === 'active') {
+      try {
+        await recalculatePayrollEntry({
+          entryId,
+          input: {},
+          actorIdentifier: userId
+        })
+        recalculated = true
+      } catch (recalcError) {
+        // No fallamos la creacion: el adjustment ya quedo persistido y el
+        // operador puede recalcular manual desde el header del periodo.
+        console.warn(
+          `[adjustments POST] auto-recalc failed for entry ${entryId}:`,
+          recalcError instanceof Error ? recalcError.message : recalcError
+        )
+      }
+    }
+
+    return NextResponse.json({ adjustment, eventId, created: true, recalculated }, { status: 201 })
   } catch (error) {
     if (error instanceof PayrollAdjustmentValidationError) {
       return NextResponse.json({ error: error.message }, { status: error.statusCode })

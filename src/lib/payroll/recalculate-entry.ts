@@ -18,6 +18,7 @@ import {
   isPayrollPeriodReopened,
   shouldReopenApprovedPayrollPeriod
 } from '@/lib/payroll/period-lifecycle'
+import { applyAdjustmentsToEntry } from '@/lib/payroll/adjustments/apply-to-entry'
 import { upsertPayrollEntry } from '@/lib/payroll/persist-entry'
 import { ensurePayrollInfrastructure } from '@/lib/payroll/schema'
 import { PayrollValidationError, getPeriodRangeFromId, runPayrollQuery, toNumber } from '@/lib/payroll/shared'
@@ -487,6 +488,13 @@ export const recalculatePayrollEntry = async ({
     adjustedMovilizacionAmount: entry.adjustedMovilizacionAmount ?? compensation.movilizacionAmount
   }
 
+  // TASK-745 — apply active payroll_adjustments before persisting. The
+  // recalculated entry has natural totals; this step overrides grossTotal,
+  // netTotal, siiRetentionAmount and chileTotalDeductions according to active
+  // adjustments. Idempotent: if no adjustments exist, the entry is returned
+  // unchanged.
+  const updatedEntryWithAdjustments = await applyAdjustmentsToEntry(updatedEntry)
+
   // TASK-410 — when the period is in `reopened` state we must never mutate
   // the v1 entry in place. The supersede path creates (or updates) the v2
   // row inside a transaction and emits `payroll_entry.reliquidated` for the
@@ -500,7 +508,7 @@ export const recalculatePayrollEntry = async ({
     }
 
     const superseded = await supersedePayrollEntryOnRecalculate({
-      updatedEntry,
+      updatedEntry: updatedEntryWithAdjustments,
       actorUserId: actorIdentifier ?? 'system'
     })
 
@@ -513,7 +521,7 @@ export const recalculatePayrollEntry = async ({
     return persisted
   }
 
-  await upsertPayrollEntry(updatedEntry)
+  await upsertPayrollEntry(updatedEntryWithAdjustments)
 
   const persisted = await getPayrollEntryById(entryId)
 
