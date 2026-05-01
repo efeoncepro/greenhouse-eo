@@ -838,3 +838,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-754` | `to-do` | Payment Profiles V3 Hardening (Vault externo + Micro-deposit verification) | `docs/tasks/to-do/TASK-754-payment-profiles-vault-and-verification.md` |
 | `TASK-755` | `to-do` | Payment Profiles Ops Advanced (Bulk approve + Diff viewer + Splits + Threshold routing) | `docs/tasks/to-do/TASK-755-payment-profiles-ops-advanced.md` |
 | `TASK-756` | `to-do` | Auto-generación de Payment Orders desde Payroll exportado (puente operativo faltante) | `docs/tasks/to-do/TASK-756-payroll-orders-auto-generation.md` |
+| `TASK-757` | `to-do` | Payment Processor Execution Sync + Global66 Webhook Adapter V1 | `docs/tasks/to-do/TASK-757-payment-processor-execution-sync-global66-webhook.md` |

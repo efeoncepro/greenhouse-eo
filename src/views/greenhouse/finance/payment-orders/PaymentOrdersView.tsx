@@ -18,17 +18,18 @@ import EmptyState from '@/components/greenhouse/EmptyState'
 import type { PaymentOrdersKpis } from '@/lib/finance/payment-orders/get-kpis'
 import type { PaymentObligation } from '@/types/payment-obligations'
 import type { PaymentOrder, PaymentOrderWithLines } from '@/types/payment-orders'
-import type { PaymentCalendarItem } from '@/lib/finance/payment-calendar/list-calendar-items'
 
 import PaymentOrdersKpiRow from './PaymentOrdersKpiRow'
+import PaymentOrdersHealthGrid from './PaymentOrdersHealthGrid'
 import ObligationsTab from './tabs/ObligationsTab'
 import OrdersTab from './tabs/OrdersTab'
-import CalendarTab from './tabs/CalendarTab'
+import ReconciliationTab from './tabs/ReconciliationTab'
 import EventsTab from './tabs/EventsTab'
+import ObligationDetailDrawer from './ObligationDetailDrawer'
 import OrderDetailDrawer from './OrderDetailDrawer'
 import CreateOrderDialog from './CreateOrderDialog'
 
-type TabKey = 'obligations' | 'orders' | 'calendar' | 'events'
+type TabKey = 'obligations' | 'orders' | 'reconciliation' | 'events'
 
 const PaymentOrdersView = () => {
   const [tab, setTab] = useState<TabKey>('obligations')
@@ -43,12 +44,11 @@ const PaymentOrdersView = () => {
   const [orders, setOrders] = useState<PaymentOrder[]>([])
   const [ordersLoading, setOrdersLoading] = useState(false)
 
-  const [calendar, setCalendar] = useState<PaymentCalendarItem[]>([])
-  const [calendarLoading, setCalendarLoading] = useState(false)
-
   const [createDialogOpen, setCreateDialogOpen] = useState(false)
   const [drawerOrder, setDrawerOrder] = useState<PaymentOrderWithLines | null>(null)
   const [drawerLoading, setDrawerLoading] = useState(false)
+
+  const [openObligationId, setOpenObligationId] = useState<string | null>(null)
 
   // ── Loaders ─────────────────────────────────────────────────
 
@@ -98,27 +98,9 @@ const PaymentOrdersView = () => {
       setOrders(json.items ?? [])
     } catch (e) {
       console.error(e)
-      toast.error('No fue posible cargar las ordenes')
+      toast.error('No fue posible cargar las órdenes')
     } finally {
       setOrdersLoading(false)
-    }
-  }, [])
-
-  const loadCalendar = useCallback(async () => {
-    setCalendarLoading(true)
-
-    try {
-      const r = await fetch('/api/admin/finance/payment-calendar')
-
-      if (!r.ok) throw new Error('calendar_failed')
-      const json = await r.json()
-
-      setCalendar(json.items ?? [])
-    } catch (e) {
-      console.error(e)
-      toast.error('No fue posible cargar el calendario')
-    } finally {
-      setCalendarLoading(false)
     }
   }, [])
 
@@ -126,14 +108,13 @@ const PaymentOrdersView = () => {
     void loadKpis()
     void loadObligations()
     void loadOrders()
-    void loadCalendar()
-  }, [loadKpis, loadObligations, loadOrders, loadCalendar])
+  }, [loadKpis, loadObligations, loadOrders])
 
   // ── Actions ─────────────────────────────────────────────────
 
   const handleOpenCreate = useCallback(() => {
     if (selectedObligationIds.size === 0) {
-      toast.info('Selecciona al menos una obligacion')
+      toast.info('Selecciona al menos una obligación')
 
       return
     }
@@ -146,9 +127,9 @@ const PaymentOrdersView = () => {
       setCreateDialogOpen(false)
       setSelectedObligationIds(new Set())
       toast.success(`Orden ${order.title} creada`)
-      await Promise.all([loadKpis(), loadObligations(), loadOrders(), loadCalendar()])
+      await Promise.all([loadKpis(), loadObligations(), loadOrders()])
     },
-    [loadKpis, loadObligations, loadOrders, loadCalendar]
+    [loadKpis, loadObligations, loadOrders]
   )
 
   const handleOpenOrder = useCallback(async (orderId: string) => {
@@ -172,12 +153,12 @@ const PaymentOrdersView = () => {
   }, [])
 
   const handleOrderActionComplete = useCallback(async () => {
-    await Promise.all([loadKpis(), loadObligations(), loadOrders(), loadCalendar()])
+    await Promise.all([loadKpis(), loadObligations(), loadOrders()])
 
     if (drawerOrder?.orderId) {
       await handleOpenOrder(drawerOrder.orderId)
     }
-  }, [loadKpis, loadObligations, loadOrders, loadCalendar, drawerOrder, handleOpenOrder])
+  }, [loadKpis, loadObligations, loadOrders, drawerOrder, handleOpenOrder])
 
   // ── Selection helpers ──────────────────────────────────────
 
@@ -216,11 +197,12 @@ const PaymentOrdersView = () => {
               <Typography variant='overline' color='text.secondary' letterSpacing='0.06em'>
                 Finanzas · Pagos
               </Typography>
-              <Typography variant='h4'>Ordenes de pago</Typography>
+              <Typography variant='h4'>Órdenes de pago</Typography>
               <Typography variant='body2' color='text.secondary' sx={{ maxWidth: 720 }}>
-                Convierte obligaciones financieras en ordenes auditables con maker-checker, programacion
-                y trazabilidad de envio. Las obligaciones provienen automaticamente de nomina exportada,
-                facturas de proveedores y obligaciones tributarias.
+                Tesorería convierte obligaciones en pagos ejecutables, sin tocar el cálculo de Payroll. Las
+                obligaciones provienen automáticamente de nómina exportada, facturas de proveedores y
+                obligaciones tributarias. Esta vista permite planificarlas, agruparlas en órdenes,
+                aprobarlas y liberarlas a procesador con trazabilidad maker-checker.
               </Typography>
             </Stack>
             <Button
@@ -237,6 +219,9 @@ const PaymentOrdersView = () => {
 
       <PaymentOrdersKpiRow kpis={kpis} loading={kpisLoading} />
 
+      {/* Health grid: bridge stats + drift per period (mockup spec §"DRIFT HEALTH") */}
+      <PaymentOrdersHealthGrid />
+
       {/* Tabs */}
       <Card elevation={0} sx={theme => ({ border: `1px solid ${theme.palette.divider}` })}>
         <CardHeader
@@ -246,32 +231,33 @@ const PaymentOrdersView = () => {
               onChange={(_, v) => setTab(v as TabKey)}
               variant='scrollable'
               scrollButtons='auto'
-              aria-label='Pestanas de Ordenes de pago'
+              aria-label='Pestañas de Órdenes de pago'
             >
               <Tab value='obligations' label={`Obligaciones (${obligationsAvailableForOrder.length})`} />
-              <Tab value='orders' label={`Ordenes (${orders.length})`} />
-              <Tab value='calendar' label={`Calendario (${calendar.length})`} />
-              <Tab value='events' label='Eventos' />
+              <Tab value='orders' label={`Órdenes de pago (${orders.length})`} />
+              <Tab value='reconciliation' label='Conciliación' />
+              <Tab value='events' label='Eventos del outbox' />
             </Tabs>
           }
           sx={{ pb: 0 }}
         />
         <CardContent>
           {tab === 'obligations' ? (
-            obligationsAvailableForOrder.length === 0 && !obligationsLoading ? (
+            obligations.length === 0 && !obligationsLoading ? (
               <EmptyState
                 icon='tabler-clipboard-off'
                 title='Sin obligaciones por programar'
-                description='Las obligaciones de nomina se generan al exportar un periodo. Las facturas de proveedores y obligaciones tributarias se materializaran en proximas iteraciones.'
+                description='Las obligaciones de nómina se generan al exportar un periodo. Las facturas de proveedores y obligaciones tributarias se materializarán en próximas iteraciones.'
               />
             ) : (
               <ObligationsTab
-                obligations={obligationsAvailableForOrder}
+                obligations={obligations}
                 loading={obligationsLoading}
                 selectedIds={selectedObligationIds}
                 onToggle={toggleObligation}
                 onClearSelection={clearSelection}
                 onCreateOrder={handleOpenCreate}
+                onOpenObligation={setOpenObligationId}
               />
             )
           ) : null}
@@ -280,8 +266,8 @@ const PaymentOrdersView = () => {
             orders.length === 0 && !ordersLoading ? (
               <EmptyState
                 icon='tabler-stack-2'
-                title='Aun no hay ordenes de pago'
-                description='Selecciona obligaciones desde la pestana Obligaciones y crea tu primera orden.'
+                title='Aún no hay órdenes de pago'
+                description='Selecciona obligaciones desde la pestaña Obligaciones y crea tu primera orden.'
                 action={
                   <Button variant='outlined' onClick={() => setTab('obligations')}>
                     Ir a obligaciones
@@ -293,17 +279,7 @@ const PaymentOrdersView = () => {
             )
           ) : null}
 
-          {tab === 'calendar' ? (
-            calendar.length === 0 && !calendarLoading ? (
-              <EmptyState
-                icon='tabler-calendar'
-                title='Calendario vacio'
-                description='Cuando haya obligaciones u ordenes con fechas declaradas se mostraran aqui agrupadas por estado y vencimiento.'
-              />
-            ) : (
-              <CalendarTab items={calendar} loading={calendarLoading} onOpenOrder={handleOpenOrder} />
-            )
-          ) : null}
+          {tab === 'reconciliation' ? <ReconciliationTab /> : null}
 
           {tab === 'events' ? <EventsTab /> : null}
         </CardContent>
@@ -323,10 +299,15 @@ const PaymentOrdersView = () => {
         onActionComplete={handleOrderActionComplete}
       />
 
+      <ObligationDetailDrawer
+        obligationId={openObligationId}
+        onClose={() => setOpenObligationId(null)}
+      />
+
       <Alert severity='info' icon={<i className='tabler-info-circle' />} sx={{ alignSelf: 'flex-start' }}>
         Esta vista lee desde <code>greenhouse_finance.payment_obligations</code> y{' '}
-        <code>greenhouse_finance.payment_orders</code>. Cada accion publica un evento en{' '}
-        <code>greenhouse_sync.outbox_events</code> para auditoria y proyecciones reactivas.
+        <code>greenhouse_finance.payment_orders</code>. Cada acción publica un evento en{' '}
+        <code>greenhouse_sync.outbox_events</code> para auditoría y proyecciones reactivas.
       </Alert>
     </Stack>
   )

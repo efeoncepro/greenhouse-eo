@@ -1,5 +1,17 @@
 # Handoff.md
 
+## Sesion 2026-05-01 — TASK-757 creada para execution sync de processors
+
+- **Trigger**: usuario pidio aterrizar robustez/escalabilidad para Payment Orders y crear la task follow-up del webhook de Global66.
+- **Resultado documental**:
+  - Nueva task `docs/tasks/to-do/TASK-757-payment-processor-execution-sync-global66-webhook.md`.
+  - Registro sincronizado en `docs/tasks/TASK_ID_REGISTRY.md`.
+  - Índice sincronizado en `docs/tasks/README.md` y siguiente ID libre actualizado a `TASK-758`.
+- **Decision de diseño**:
+  - `TASK-757` nace como architecture/provider-neutral core con `Global66` como primer adapter, no como integración hardcoded del dominio.
+  - Reutiliza `POST /api/webhooks/[endpointKey]` + `greenhouse_sync.webhook_inbox_events`; no abre un carril webhook paralelo.
+  - Queda separado de `TASK-756`: auto-generación de orders es upstream; execution sync por processor es downstream.
+
 ## Sesion 2026-05-01 — TASK-751 Payroll Settlement Orchestration V1 (cierra programa Payment Orders)
 
 - **Trigger**: usuario pidio implementar TASK-751 end-to-end. Es el wireup que cierra el programa Payment Orders (TASK-748 + TASK-749 + TASK-750 + TASK-751).
