@@ -4,6 +4,7 @@ import {
   getAfpRateForCode,
   getImmForPeriod,
   getSisRate,
+  getChileUnemploymentRatesForPeriod,
   getTopeAfpForPeriod,
   getTopeCesantiaForPeriod,
   getUnemploymentRateForPeriod,
@@ -22,7 +23,15 @@ describe('chile provisional helpers', () => {
   it('returns canonical unemployment and SIS defaults when no postgres snapshot is available', async () => {
     await expect(getSisRate('2026-03-31')).resolves.toBe(0)
     await expect(getUnemploymentRateForPeriod('2026-03-31', 'indefinido')).resolves.toBeCloseTo(0.006, 3)
-    await expect(getUnemploymentRateForPeriod('2026-03-31', 'plazo_fijo')).resolves.toBeCloseTo(0.03, 3)
+    await expect(getUnemploymentRateForPeriod('2026-03-31', 'plazo_fijo')).resolves.toBe(0)
+    await expect(getChileUnemploymentRatesForPeriod('2026-03-31', 'indefinido')).resolves.toEqual({
+      workerRate: 0.006,
+      employerRate: 0.024
+    })
+    await expect(getChileUnemploymentRatesForPeriod('2026-03-31', 'plazo_fijo')).resolves.toEqual({
+      workerRate: 0,
+      employerRate: 0.03
+    })
   })
 
   it('returns canonical topes for AFP and cesantía', async () => {
@@ -43,15 +52,16 @@ describe('chile provisional helpers', () => {
     await expect(
       resolveChileEmployerCostAmounts({
         payRegime: 'chile',
-        contractType: 'indefinido',
+        contractType: 'plazo_fijo',
         imponibleBase: 100000,
+        cesantiaBase: 50000,
         periodDate: '2026-03-31'
       })
     ).resolves.toEqual({
       sisAmount: 0,
-      cesantiaAmount: 2400,
+      cesantiaAmount: 1500,
       mutualAmount: 930,
-      totalCost: 3330
+      totalCost: 2430
     })
   })
 })

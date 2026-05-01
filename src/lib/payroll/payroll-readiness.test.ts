@@ -244,6 +244,25 @@ describe('buildPayrollPeriodReadiness', () => {
     expect(readiness.blockingIssues.map(issue => issue.code)).toEqual(['leave_data_unavailable'])
   })
 
+  it('blocks approval/export when calculated entries mix incompatible payroll regimes', () => {
+    const readiness = buildPayrollPeriodReadiness({
+      period: {
+        ...period,
+        status: 'calculated'
+      },
+      compensationRows: [compensatedMember],
+      missingKpiMemberIds: [],
+      missingAttendanceMemberIds: [],
+      attendanceDiagnostics,
+      regimeMismatchMemberIds: ['member-1']
+    })
+
+    expect(readiness.ready).toBe(false)
+    expect(readiness.approval.ready).toBe(false)
+    expect(readiness.blockingIssues.map(issue => issue.code)).toEqual(['payroll_regime_mismatch'])
+    expect(readiness.blockingIssues[0]?.memberIds).toEqual(['member-1'])
+  })
+
   it('marks draft periods as overdue once the calculation deadline passed', () => {
     const readiness = buildPayrollPeriodReadiness({
       period,

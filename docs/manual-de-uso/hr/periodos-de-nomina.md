@@ -123,6 +123,22 @@ Que hacer:
 2. Si si lo requiere, valida que exista senal de asistencia o licencia para el mes.
 3. Si el colaborador es `honorarios` o se procesa via `Deel`, ese bloqueo no deberia aplicar.
 
+### El readiness dice que hay regimenes incompatibles
+
+Ese blocker significa que ya existe una liquidacion calculada con campos que no corresponden al regimen del colaborador.
+
+Ejemplos:
+
+- `honorarios` con AFP, salud, cesantia o Impuesto Unico.
+- `Deel` o internacional con retencion SII o deducciones Chile.
+
+Que hacer:
+
+1. No apruebes ni exportes el periodo.
+2. Si el periodo no esta exportado, usa `Calcular` para regenerar las entries con el motor corregido.
+3. Si el periodo ya esta exportado, usa reapertura/reliquidacion formal y deja trazabilidad del motivo.
+4. Si afecta a Melkin, Daniela o Andres, confirma que sigan como internacionales/Deel y que solo usen KPI ICO para bonos variables.
+
 ### Veo un valor esperado como `gael-2026-04` y no se si debo escribirlo
 
 No. Ese valor es informativo. En el flujo normal no debes escribirlo manualmente.

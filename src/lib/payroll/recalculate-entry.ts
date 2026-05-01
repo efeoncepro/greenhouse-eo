@@ -6,7 +6,9 @@ import { getBigQueryProjectId } from '@/lib/bigquery'
 import { getHistoricalEconomicIndicatorForPeriod } from '@/lib/finance/economic-indicators'
 import { DEFAULT_BONUS_PRORATION_CONFIG, normalizeBonusProrationConfig } from '@/lib/payroll/bonus-config'
 import { calculateOtdBonus, calculateRpaBonus } from '@/lib/payroll/bonus-proration'
+import { calculateHonorariosTotals } from '@/lib/payroll/calculate-honorarios'
 import { calculatePayrollTotals } from '@/lib/payroll/calculate-chile-deductions'
+import { requiresPayrollChileTaxTable } from '@/lib/payroll/compensation-requirements'
 import { computeChileTax } from '@/lib/payroll/compute-chile-tax'
 import { getCompensationVersionById } from '@/lib/payroll/get-compensation'
 import { getPayrollEntryById } from '@/lib/payroll/get-payroll-entries'
@@ -282,7 +284,9 @@ export const recalculatePayrollEntry = async ({
         periodDate: periodEnd
       }))?.value ?? null
 
-  const resolvedTaxTableVersion = compensation.payRegime === 'chile'
+  const requiresChileTaxTable = requiresPayrollChileTaxTable(compensation)
+
+  const resolvedTaxTableVersion = requiresChileTaxTable
     ? await resolvePayrollTaxTableVersion({
         year: period.year,
         month: period.month,
@@ -298,14 +302,14 @@ export const recalculatePayrollEntry = async ({
       }))?.value ?? null
     : null
 
-  if (compensation.payRegime === 'chile' && !resolvedTaxTableVersion) {
+  if (requiresChileTaxTable && !resolvedTaxTableVersion) {
     throw new PayrollValidationError(
       'This payroll period requires a synchronized Chile tax table for the selected month before Chile payroll can be recalculated.',
       400
     )
   }
 
-  if (compensation.payRegime === 'chile' && resolvedTaxTableVersion && typeof resolvedUtmValue !== 'number') {
+  if (requiresChileTaxTable && resolvedTaxTableVersion && typeof resolvedUtmValue !== 'number') {
     throw new PayrollValidationError('This payroll period requires a historical UTM value to recalculate Chile payroll taxes.', 400)
   }
 
@@ -329,34 +333,36 @@ export const recalculatePayrollEntry = async ({
   const effectiveMovilizacionAmount = entry.adjustedMovilizacionAmount ?? compensation.movilizacionAmount ?? 0
   const effectiveFixedBonusAmount = entry.adjustedFixedBonusAmount ?? compensation.fixedBonusAmount
 
-  const provisionalTotals = await calculatePayrollTotals({
-    payRegime: compensation.payRegime,
-    baseSalary: effectiveBaseSalary,
-    remoteAllowance: effectiveRemoteAllowance,
-    colacionAmount: effectiveColacionAmount,
-    movilizacionAmount: effectiveMovilizacionAmount,
-    fixedBonusAmount: effectiveFixedBonusAmount,
-    bonusOtdAmount: nextBonusOtdAmount,
-    bonusRpaAmount: nextBonusRpaAmount,
-    bonusOtherAmount: nextBonusOtherAmount,
-    afpName: compensation.afpName,
-    afpRate: compensation.afpRate,
-    afpCotizacionRate: compensation.afpCotizacionRate,
-    afpComisionRate: compensation.afpComisionRate,
-    healthSystem: compensation.healthSystem,
-    healthPlanUf: compensation.healthPlanUf,
-    unemploymentRate: compensation.unemploymentRate,
-    contractType: compensation.contractType,
-    hasApv: compensation.hasApv,
-    apvAmount: compensation.apvAmount,
-    ufValue: resolvedUfValue,
-    taxAmount: 0,
-    periodDate: periodEnd
-  })
+  const provisionalTotals = compensation.contractType === 'honorarios'
+    ? null
+    : await calculatePayrollTotals({
+        payRegime: compensation.payrollVia === 'deel' ? 'international' : compensation.payRegime,
+        baseSalary: effectiveBaseSalary,
+        remoteAllowance: effectiveRemoteAllowance,
+        colacionAmount: effectiveColacionAmount,
+        movilizacionAmount: effectiveMovilizacionAmount,
+        fixedBonusAmount: effectiveFixedBonusAmount,
+        bonusOtdAmount: nextBonusOtdAmount,
+        bonusRpaAmount: nextBonusRpaAmount,
+        bonusOtherAmount: nextBonusOtherAmount,
+        afpName: compensation.afpName,
+        afpRate: compensation.afpRate,
+        afpCotizacionRate: compensation.afpCotizacionRate,
+        afpComisionRate: compensation.afpComisionRate,
+        healthSystem: compensation.healthSystem,
+        healthPlanUf: compensation.healthPlanUf,
+        unemploymentRate: compensation.unemploymentRate,
+        contractType: compensation.contractType,
+        hasApv: compensation.hasApv,
+        apvAmount: compensation.apvAmount,
+        ufValue: resolvedUfValue,
+        taxAmount: 0,
+        periodDate: periodEnd
+      })
 
-  const autoTaxAmount = compensation.payRegime === 'chile' && resolvedTaxTableVersion
+  const autoTaxAmount = requiresChileTaxTable && resolvedTaxTableVersion
     ? (await computeChileTax({
-        taxableBaseClp: provisionalTotals.chileTaxableBase ?? 0,
+        taxableBaseClp: provisionalTotals?.chileTaxableBase ?? 0,
         taxTableVersion: resolvedTaxTableVersion,
         utmValue: resolvedUtmValue
       })).taxAmountClp
@@ -364,30 +370,69 @@ export const recalculatePayrollEntry = async ({
 
   const nextTaxAmount = input.chileTaxAmount ?? autoTaxAmount
 
-  const totals = await calculatePayrollTotals({
-    payRegime: compensation.payRegime,
-    baseSalary: effectiveBaseSalary,
-    remoteAllowance: effectiveRemoteAllowance,
-    colacionAmount: effectiveColacionAmount,
-    movilizacionAmount: effectiveMovilizacionAmount,
-    fixedBonusAmount: effectiveFixedBonusAmount,
-    bonusOtdAmount: nextBonusOtdAmount,
-    bonusRpaAmount: nextBonusRpaAmount,
-    bonusOtherAmount: nextBonusOtherAmount,
-    afpName: compensation.afpName,
-    afpRate: compensation.afpRate,
-    afpCotizacionRate: compensation.afpCotizacionRate,
-    afpComisionRate: compensation.afpComisionRate,
-    healthSystem: compensation.healthSystem,
-    healthPlanUf: compensation.healthPlanUf,
-    unemploymentRate: compensation.unemploymentRate,
-    contractType: compensation.contractType,
-    hasApv: compensation.hasApv,
-    apvAmount: compensation.apvAmount,
-    ufValue: resolvedUfValue,
-    taxAmount: nextTaxAmount,
-    periodDate: periodEnd
-  })
+  const honorariosTotals = compensation.contractType === 'honorarios'
+    ? calculateHonorariosTotals({
+        periodDate: periodEnd,
+        baseSalary: effectiveBaseSalary,
+        fixedBonusAmount: effectiveFixedBonusAmount,
+        bonusOtdAmount: nextBonusOtdAmount,
+        bonusRpaAmount: nextBonusRpaAmount,
+        bonusOtherAmount: nextBonusOtherAmount
+      })
+    : null
+
+  const totals = honorariosTotals
+    ? {
+        grossTotal: honorariosTotals.grossTotal,
+        netTotalCalculated: honorariosTotals.netTotalCalculated,
+        chileAfpName: null,
+        chileAfpRate: null,
+        chileAfpAmount: null,
+        chileAfpCotizacionAmount: null,
+        chileAfpComisionAmount: null,
+        chileGratificacionLegalAmount: null,
+        chileColacionAmount: null,
+        chileMovilizacionAmount: null,
+        chileHealthSystem: null,
+        chileHealthAmount: null,
+        chileHealthObligatoriaAmount: null,
+        chileHealthVoluntariaAmount: null,
+        chileEmployerSisAmount: null,
+        chileEmployerCesantiaAmount: null,
+        chileEmployerMutualAmount: null,
+        chileEmployerTotalCost: null,
+        chileUnemploymentRate: null,
+        chileUnemploymentAmount: null,
+        chileTaxableBase: honorariosTotals.grossTotal,
+        chileTaxAmount: null,
+        chileApvAmount: null,
+        chileUfValue: null,
+        chileTotalDeductions: honorariosTotals.siiRetentionAmount
+      }
+    : await calculatePayrollTotals({
+        payRegime: compensation.payrollVia === 'deel' ? 'international' : compensation.payRegime,
+        baseSalary: effectiveBaseSalary,
+        remoteAllowance: effectiveRemoteAllowance,
+        colacionAmount: effectiveColacionAmount,
+        movilizacionAmount: effectiveMovilizacionAmount,
+        fixedBonusAmount: effectiveFixedBonusAmount,
+        bonusOtdAmount: nextBonusOtdAmount,
+        bonusRpaAmount: nextBonusRpaAmount,
+        bonusOtherAmount: nextBonusOtherAmount,
+        afpName: compensation.afpName,
+        afpRate: compensation.afpRate,
+        afpCotizacionRate: compensation.afpCotizacionRate,
+        afpComisionRate: compensation.afpComisionRate,
+        healthSystem: compensation.healthSystem,
+        healthPlanUf: compensation.healthPlanUf,
+        unemploymentRate: compensation.unemploymentRate,
+        contractType: compensation.contractType,
+        hasApv: compensation.hasApv,
+        apvAmount: compensation.apvAmount,
+        ufValue: resolvedUfValue,
+        taxAmount: nextTaxAmount,
+        periodDate: periodEnd
+      })
 
   const nextManualOverride = input.manualOverride ?? entry.manualOverride
   const nextNetTotalOverride = nextManualOverride ? input.netTotal ?? entry.netTotalOverride ?? entry.netTotal : null
@@ -427,6 +472,8 @@ export const recalculatePayrollEntry = async ({
     chileUnemploymentAmount: totals.chileUnemploymentAmount,
     chileTaxableBase: totals.chileTaxableBase,
     chileTaxAmount: totals.chileTaxAmount,
+    siiRetentionRate: honorariosTotals?.siiRetentionRate ?? null,
+    siiRetentionAmount: honorariosTotals?.siiRetentionAmount ?? null,
     chileApvAmount: totals.chileApvAmount,
     chileUfValue: totals.chileUfValue,
     chileTotalDeductions: totals.chileTotalDeductions,
@@ -435,6 +482,7 @@ export const recalculatePayrollEntry = async ({
     netTotal: nextNetTotal,
     manualOverride: nextManualOverride,
     manualOverrideNote: input.manualOverrideNote !== undefined ? input.manualOverrideNote : entry.manualOverrideNote,
+    contractTypeSnapshot: compensation.contractType,
     adjustedColacionAmount: entry.adjustedColacionAmount ?? compensation.colacionAmount,
     adjustedMovilizacionAmount: entry.adjustedMovilizacionAmount ?? compensation.movilizacionAmount
   }

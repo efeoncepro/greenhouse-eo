@@ -1,3 +1,21 @@
+## Delta 2026-05-01 Skill local invocable para auditoria de Payroll Efeonce
+
+- Nueva skill local Codex invocable como `$greenhouse-payroll-auditor`.
+- Vive en `.codex/skills/greenhouse-payroll-auditor/` y fue validada con `skill-creator`.
+- Proposito:
+  - auditar, revisar y proponer fixes robustos para Payroll Efeonce/Greenhouse
+  - cubrir trabajadores dependientes Chile, honorarios, Deel/EOR/contractor internacional, KPI ICO, asistencia/licencias, PREVIRED/ImpUnico, impuestos, deducciones, costos empleador, readiness y exports
+- La skill usa disclosure progresivo:
+  - `SKILL.md` liviano para el workflow operativo
+  - `references/chile-payroll-law.md` para reglas/fuentes oficiales Chile
+  - `references/greenhouse-payroll-runtime.md` para formulas, paths y watchlist del runtime actual
+  - `references/international-remote-payroll.md` para regimenes remotos/internacionales y limites de Deel/EOR
+- Watchlist operacional incorporado:
+  - verificar retencion SII honorarios 2026 contra fuente oficial antes de liquidar
+  - revisar split trabajador/empleador de Seguro de Cesantia por tipo de contrato
+  - verificar aplicacion de topes AFP/salud/cesantia/SIS/mutual en sueldos altos
+  - no omitir KPI ICO para trabajadores internacionales con bonos OTD/RPA
+
 ## Delta 2026-05-01 Payroll readiness y roster borrador ya siguen el contrato real de calculo
 
 - `sync-previred` ya no asume columnas inexistentes en `greenhouse_payroll.chile_afp_rates`: la tabla canónica desplegada persiste `total_rate` por AFP/período, mientras el split legacy (`worker_rate`) queda acotado a snapshots `previred_*`.

@@ -1,5 +1,20 @@
 # GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md
 
+## Delta 2026-05-01 — TASK-744: hard boundary de regímenes Payroll
+
+Payroll ahora materializa `contract_type_snapshot` en `greenhouse_payroll.payroll_entries` para que la entry calculada preserve el régimen usado en el cálculo y la base de datos pueda proteger nuevas escrituras incompatibles.
+
+Reglas canónicas:
+
+- `honorarios` usa retención SII del año de emisión. Para 2026 la tasa oficial es `15,25%`.
+- `honorarios` no puede materializar AFP, salud, Seguro de Cesantía, SIS, mutual, APV ni IUSC de trabajador dependiente. Si una ruta intenta recalcularlo como Chile dependiente, el helper falla cerrado.
+- `payRegime = international` o `payrollVia = deel` no puede materializar retención SII ni campos estatutarios Chile. Greenhouse registra el snapshot operativo y los bonos KPI, pero Deel/proveedor sigue siendo owner de payroll legal.
+- Seguro de Cesantía separa tasa trabajador y empleador: `indefinido` trabajador `0,6%` / empleador `2,4%`; `plazo_fijo` trabajador `0%` / empleador `3%`.
+- Las bases previsionales Chile dependiente separan `imponibleBase`, base AFP/salud/SIS/mutual con tope AFP, y base cesantía con tope cesantía cuando los topes PREVIRED existen para el período.
+- Readiness bloquea aprobación/export si detecta entries ya calculadas que mezclan regímenes incompatibles. En períodos no exportados, la salida operativa es recalcular limpio; en períodos exportados, usar reapertura/reliquidación formal.
+
+Guardrail operativo vigente: Melkin Hernández, Daniela Ferreira y Andrés Carlosama son internacionales/Deel. No se les aplica payroll estatutario Chile, pero siguen requiriendo KPI ICO cuando su compensación tiene bono OTD/RpA.
+
 ## Delta 2026-04-18 — TASK-468: Payroll contract_type sigue aislado; commercial resuelve por bridge externo
 
 - `greenhouse_payroll.compensation_versions.contract_type` mantiene su semántica actual como snapshot factual de compensación; no recibe FK ni rewrite desde el programa comercial de pricing.

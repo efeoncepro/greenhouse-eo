@@ -5189,6 +5189,7 @@ export interface GreenhousePayrollPayrollEntries {
   chile_unemployment_rate: Numeric | null;
   colacion_amount: Generated<Numeric>;
   compensation_version_id: string;
+  contract_type_snapshot: string | null;
   created_at: Generated<Timestamp>;
   currency: string;
   days_absent: number | null;

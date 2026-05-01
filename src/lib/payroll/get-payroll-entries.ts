@@ -122,6 +122,7 @@ const normalizePayrollEntry = (row: PayrollEntryRow): PayrollEntry => ({
   memberAvatarUrl: normalizeNullableString(row.avatar_url),
   compensationVersionId: String(row.compensation_version_id || ''),
   payRegime: row.pay_regime === 'international' ? 'international' : 'chile',
+  contractTypeSnapshot: null,
   payrollVia: row.payroll_via === 'deel' ? 'deel' : 'internal',
   currency: row.currency === 'USD' ? 'USD' : 'CLP',
   baseSalary: toNumber(row.base_salary),

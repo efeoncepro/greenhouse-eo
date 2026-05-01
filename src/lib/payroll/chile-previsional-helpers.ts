@@ -107,11 +107,13 @@ export const resolveChileEmployerCostAmounts = async ({
   payRegime,
   contractType,
   imponibleBase,
+  cesantiaBase,
   periodDate
 }: {
   payRegime: 'chile' | 'intl'
   contractType: 'indefinido' | 'plazo_fijo'
   imponibleBase: number
+  cesantiaBase?: number
   periodDate: string
 }): Promise<ChileEmployerCostAmounts | null> => {
   if (payRegime !== 'chile') {
@@ -120,12 +122,13 @@ export const resolveChileEmployerCostAmounts = async ({
 
   const roundCurrency = (value: number) => Math.round(value * 100) / 100
   const safeBase = Math.max(0, imponibleBase)
+  const safeCesantiaBase = Math.max(0, cesantiaBase ?? imponibleBase)
   const sisRate = await getSisRate(periodDate)
-  const cesantiaRate = contractType === 'plazo_fijo' ? 0 : 0.024
+  const { employerRate: cesantiaRate } = await getChileUnemploymentRatesForPeriod(periodDate, contractType)
   const mutualRate = 0.0093
 
   const sisAmount = roundCurrency(safeBase * sisRate)
-  const cesantiaAmount = roundCurrency(safeBase * cesantiaRate)
+  const cesantiaAmount = roundCurrency(safeCesantiaBase * cesantiaRate)
   const mutualAmount = roundCurrency(safeBase * mutualRate)
 
   return {
@@ -450,7 +453,17 @@ export const getAfpRateForCode = async (afpCode: string, periodDate: string) => 
 export const getUnemploymentRateForPeriod = async (
   _periodDate: string,
   contractType: 'indefinido' | 'plazo_fijo'
-) => (contractType === 'plazo_fijo' ? 0.03 : 0.006)
+) => (contractType === 'plazo_fijo' ? 0 : 0.006)
+
+export const getChileUnemploymentRatesForPeriod = async (
+  periodDate: string,
+  contractType: 'indefinido' | 'plazo_fijo'
+) => {
+  const workerRate = await getUnemploymentRateForPeriod(periodDate, contractType)
+  const employerRate = contractType === 'plazo_fijo' ? 0.03 : 0.024
+
+  return { workerRate, employerRate }
+}
 
 export const resolveChileAfpRateForCompensation = async ({
   year,

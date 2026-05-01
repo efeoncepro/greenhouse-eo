@@ -198,6 +198,7 @@ export interface PayrollEntry {
   memberAvatarUrl: string | null
   compensationVersionId: string
   payRegime: PayRegime
+  contractTypeSnapshot?: ContractType | null
   payrollVia?: PayrollVia
   currency: PayrollCurrency
   baseSalary: number
@@ -332,6 +333,7 @@ export type PayrollReadinessIssueCode =
   | 'missing_uf_value'
   | 'missing_utm_value'
   | 'missing_tax_table_version'
+  | 'payroll_regime_mismatch'
   | 'period_not_calculated'
   | 'leave_data_unavailable'
 

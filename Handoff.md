@@ -1,5 +1,27 @@
 # Handoff.md
 
+## Sesion 2026-05-01 — TASK-744 Payroll Chile compliance remediation
+
+- **Trigger**: el usuario pidio implementar `TASK-744` para resolver end-to-end los hallazgos de Payroll sin parches, preservando a Melkin, Daniela y Andres como internacionales/Deel.
+- **Trabajo realizado**:
+  - Fases de descubrimiento/auditoria/mapa/plan ejecutadas con subagentes read-only.
+  - Spec corregida y movida a `docs/tasks/in-progress/TASK-744-payroll-chile-compliance-remediation.md` manteniendo branch `develop`.
+  - Migracion `20260501095540489_task-744-payroll-regime-boundaries.sql` aplicada via `pnpm pg:connect:migrate`; `src/types/db.d.ts` regenerado.
+  - `greenhouse_payroll.payroll_entries` ahora tiene `contract_type_snapshot` y constraints `NOT VALID` para nuevas escrituras incompatibles de honorarios/internacional.
+  - Retencion SII honorarios 2026 corregida a `0.1525`; 2027 a `0.16`.
+  - Seguro de Cesantia separado: trabajador `plazo_fijo = 0`, empleador `plazo_fijo = 0.03`.
+  - Calculo Chile dependiente aplica topes AFP/salud/SIS/mutual y cesantia cuando PREVIRED expone topes UF.
+  - `calculate-payroll` y `recalculate-entry` ya no pasan honorarios por segunda pasada de IUSC Chile dependiente.
+  - Readiness bloquea aprobacion/export si detecta entries calculadas con regimenes incompatibles.
+- **Validacion local**:
+  - `pnpm vitest run src/lib/payroll` OK: 38 files / 243 tests.
+  - `pnpm exec tsc --noEmit --pretty false` OK.
+  - `pnpm exec eslint src/lib/payroll src/types/payroll.ts src/types/hr-contracts.ts` OK.
+- **Pendiente antes de cerrar**:
+  - `pnpm build` y `pnpm lint` globales.
+  - Recalcular abril 2026 en staging post-deploy y verificar entries de Humberly, Luis, Valentina, Melkin, Daniela y Andres.
+  - Cerrar task/mover a complete solo despues de staging verification.
+
 ## Sesion 2026-05-01 — TASK-743 Operational Data Table Density Contract
 
 - **Trigger**: usuario reporto scroll horizontal en `/hr/payroll` cuando el periodo esta en `calculated`/`reopened` (BonusInput inline + slider + min/max hinchaba dos columnas). En vez de parche, levantamos contrato canonico para todas las tablas operativas con celdas editables o > 8 columnas.

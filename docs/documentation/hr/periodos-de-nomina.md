@@ -131,6 +131,8 @@ Esto evita falsos positivos en casos como:
 
 Si falta KPI para un colaborador que **si depende** de bono variable, el periodo queda bloqueado antes del calculo oficial.
 
+Los colaboradores internacionales/Deel tambien pueden requerir KPI ICO si tienen bono `OTD` o `RpA`. Ese KPI solo alimenta el bono operativo registrado en Greenhouse; no convierte la entry en payroll estatutario Chile.
+
 ---
 
 ## Cuando asistencia o licencias realmente bloquean
@@ -146,6 +148,22 @@ Solo se consideran requeridas cuando la asistencia puede cambiar el monto calcul
 Esto evita marcar como faltantes casos donde el propio motor no prorratea por asistencia.
 
 Si la asistencia o licencias son requeridas para el calculo y no existe senal confiable del periodo, Greenhouse bloquea el calculo oficial en vez de asumir una nomina optimista.
+
+---
+
+## Fronteras de regimen Payroll
+
+Greenhouse separa tres familias de calculo:
+
+- `Chile dependiente`: aplica AFP, salud, Seguro de Cesantia, SIS, mutual, APV e Impuesto Unico cuando corresponde.
+- `Honorarios`: aplica retencion SII del anio de emision y no aplica descuentos de trabajador dependiente.
+- `Internacional/Deel`: registra compensacion y bonos operativos, pero no aplica payroll estatutario Chile.
+
+Desde `TASK-744`, cada entry guarda un `contract_type_snapshot` para auditar que el calculo no cambie de regimen despues de materializarse.
+
+Si el readiness detecta que una entry ya calculada mezcla regimenes incompatibles, bloquea aprobacion/export y pide recalcular. Esto evita aprobar una nomina que combine, por ejemplo, retencion SII de honorarios con AFP/salud/cesantia de trabajador dependiente.
+
+Melkin Hernandez, Daniela Ferreira y Andres Carlosama deben mantenerse como internacionales/Deel. Si tienen bono variable, siguen requiriendo KPI ICO, pero no deben recibir deducciones Chile.
 
 ---
 

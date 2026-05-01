@@ -14,3 +14,4 @@ Indice de auditorias tecnicas y operativas versionadas dentro de `docs/`.
 
 - [ICO](ico/README.md)
 - [Notion](notion/README.md)
+- [Payroll](payroll/README.md)

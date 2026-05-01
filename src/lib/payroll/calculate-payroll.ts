@@ -331,6 +331,7 @@ export const buildPayrollEntry = async ({
     memberAvatarUrl: compensation.memberAvatarUrl,
     compensationVersionId: compensation.versionId,
     payRegime: compensation.payRegime,
+    contractTypeSnapshot: compensation.contractType,
     payrollVia: compensation.payrollVia,
     currency: compensation.currency,
     baseSalary: compensation.baseSalary,
@@ -547,7 +548,7 @@ export const calculatePayroll = async ({
       attendance
     })
 
-    if (compensation.payRegime === 'chile' && resolvedTaxTableVersion) {
+    if (requiresPayrollChileTaxTable(compensation) && resolvedTaxTableVersion) {
       const taxResult = await computeChileTax({
         taxableBaseClp: entry.chileTaxableBase ?? 0,
         taxTableVersion: resolvedTaxTableVersion,
