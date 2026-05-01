@@ -833,3 +833,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-749` | `to-do` | Beneficiary Payment Profiles + Routing Policies | `docs/tasks/to-do/TASK-749-beneficiary-payment-profiles-routing.md` |
 | `TASK-750` | `to-do` | Payment Orders, Batches, Payment Calendar + Maker-Checker Runtime | `docs/tasks/to-do/TASK-750-payment-orders-batches-maker-checker.md` |
 | `TASK-751` | `to-do` | Payroll Settlement Orchestration + Reconciliation Integration | `docs/tasks/to-do/TASK-751-payroll-settlement-orchestration-reconciliation.md` |
+| `TASK-752` | `to-do` | Payment Profiles V2 Foundation (Suppliers + Tax authorities + Autocomplete + Scheduled rotation) | `docs/tasks/to-do/TASK-752-payment-profiles-v2-foundation.md` |
+| `TASK-753` | `to-do` | Payment Profiles Self-Service (Mi cuenta de pago + Notificaciones) | `docs/tasks/to-do/TASK-753-payment-profiles-self-service.md` |
+| `TASK-754` | `to-do` | Payment Profiles V3 Hardening (Vault externo + Micro-deposit verification) | `docs/tasks/to-do/TASK-754-payment-profiles-vault-and-verification.md` |
+| `TASK-755` | `to-do` | Payment Profiles Ops Advanced (Bulk approve + Diff viewer + Splits + Threshold routing) | `docs/tasks/to-do/TASK-755-payment-profiles-ops-advanced.md` |
