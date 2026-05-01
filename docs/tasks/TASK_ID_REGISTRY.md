@@ -826,3 +826,5 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-742` | `complete` | Auth Resilience 7-Layer Architecture | `docs/tasks/complete/TASK-742-auth-resilience-7-layers.md` |
 | `TASK-743` | `complete` | Operational Data Table Density Contract (DataTableShell + InlineNumericEditor + lint+visual gates + 14 legacy tables migrated) | `docs/tasks/complete/TASK-743-operational-data-table-density-contract.md` |
 | `TASK-744` | `complete` | Payroll Chile Compliance Remediation & International Guardrails | `docs/tasks/complete/TASK-744-payroll-chile-compliance-remediation.md` |
+| `TASK-745` | `to-do` | Payroll Adjustments Foundation V1 (exclude / gross_factor / fixed_deduction event-sourced) | `docs/tasks/to-do/TASK-745-payroll-adjustments-foundation.md` |
+| `TASK-746` | `to-do` | Adjustment Schedules + Finance Ledger Integration (loans, advances, cron materialization) | `docs/tasks/to-do/TASK-746-adjustment-schedules-finance-ledger.md` |
