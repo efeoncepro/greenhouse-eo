@@ -25,13 +25,15 @@ import Tab from '@mui/material/Tab'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
-import TableContainer from '@mui/material/TableContainer'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
 
+
 import TabContext from '@mui/lab/TabContext'
 import TabPanel from '@mui/lab/TabPanel'
+
+import { DataTableShell } from '@/components/greenhouse/data-table'
 
 import CustomChip from '@core/components/mui/Chip'
 import CustomTabList from '@core/components/mui/TabList'
@@ -524,7 +526,7 @@ const HrEvalsView = () => {
             <Typography color='text.secondary'>Sin asignaciones para este ciclo.</Typography>
           </CardContent>
         ) : (
-          <TableContainer>
+          <DataTableShell identifier='hr-evals-assignments' ariaLabel='Asignaciones de evaluacion'>
             <Table size='small'>
               <TableHead>
                 <TableRow>
@@ -574,7 +576,7 @@ const HrEvalsView = () => {
                 ))}
               </TableBody>
             </Table>
-          </TableContainer>
+          </DataTableShell>
         )}
       </Card>
     )
@@ -616,7 +618,7 @@ const HrEvalsView = () => {
             <Typography color='text.secondary'>Sin resultados disponibles.</Typography>
           </CardContent>
         ) : (
-          <TableContainer>
+          <DataTableShell identifier='hr-evals-results' ariaLabel='Resultados de evaluacion'>
             <Table size='small'>
               <TableHead>
                 <TableRow>
@@ -686,7 +688,7 @@ const HrEvalsView = () => {
                 ))}
               </TableBody>
             </Table>
-          </TableContainer>
+          </DataTableShell>
         )}
       </Card>
     )

@@ -19,12 +19,14 @@ import Stack from '@mui/material/Stack'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
-import TableContainer from '@mui/material/TableContainer'
+
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
 
 import classnames from 'classnames'
+
+import { DataTableShell } from '@/components/greenhouse/data-table'
 
 import CustomAvatar from '@core/components/mui/Avatar'
 
@@ -402,7 +404,7 @@ const TalentOpsDashboardView = () => {
                 />
               </Box>
             ) : (
-              <TableContainer>
+              <DataTableShell identifier='talent-ops-actions' ariaLabel={LABELS.sectionActions}>
                 <Table className={tableStyles.table} size='small'>
                   <TableHead>
                     <TableRow>
@@ -464,7 +466,7 @@ const TalentOpsDashboardView = () => {
                     ))}
                   </TableBody>
                 </Table>
-              </TableContainer>
+              </DataTableShell>
             )}
           </CardContent>
         </Card>
@@ -484,7 +486,7 @@ const TalentOpsDashboardView = () => {
           />
           <Divider />
           <CardContent sx={{ p: 0 }}>
-            <TableContainer>
+            <DataTableShell identifier='talent-ops-completeness' ariaLabel={LABELS.sectionCompleteness}>
               <Table className={tableStyles.table} size='small'>
                 <TableHead>
                   <TableRow>
@@ -553,7 +555,7 @@ const TalentOpsDashboardView = () => {
                   ))}
                 </TableBody>
               </Table>
-            </TableContainer>
+            </DataTableShell>
           </CardContent>
         </Card>
       </Grid>
@@ -575,7 +577,7 @@ const TalentOpsDashboardView = () => {
               {/* Left: Skill gaps table */}
               <Grid size={{ xs: 12, md: 7 }}>
                 <Typography variant='subtitle2' sx={{ mb: 2 }}>Gaps de skills</Typography>
-                <TableContainer>
+                <DataTableShell identifier='talent-ops-skill-gaps' ariaLabel='Gaps de skills'>
                   <Table className={tableStyles.table} size='small'>
                     <TableHead>
                       <TableRow>
@@ -621,7 +623,7 @@ const TalentOpsDashboardView = () => {
                       )}
                     </TableBody>
                   </Table>
-                </TableContainer>
+                </DataTableShell>
               </Grid>
 
               {/* Right: Summary stats */}

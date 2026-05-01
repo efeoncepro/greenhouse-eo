@@ -1,5 +1,72 @@
 # Handoff.md
 
+## Sesion 2026-05-01 — TASK-743 Operational Data Table Density Contract
+
+- **Trigger**: usuario reporto scroll horizontal en `/hr/payroll` cuando el periodo esta en `calculated`/`reopened` (BonusInput inline + slider + min/max hinchaba dos columnas). En vez de parche, levantamos contrato canonico para todas las tablas operativas con celdas editables o > 8 columnas.
+- **Entregables**:
+  - Spec: `docs/architecture/GREENHOUSE_OPERATIONAL_TABLE_PLATFORM_V1.md`
+  - Doc funcional: `docs/documentation/plataforma/tablas-operativas.md`
+  - Density tokens: `src/components/greenhouse/data-table/density.ts` (compact/comfortable/expanded)
+  - Hook + provider: `src/components/greenhouse/data-table/useTableDensity.tsx` (cookie `gh-table-density`)
+  - Wrapper canonico: `src/components/greenhouse/data-table/DataTableShell.tsx` (container query auto-degrade, sticky-first column, gradient fade, ResizeObserver)
+  - Primitiva editable canonica: `src/components/greenhouse/primitives/InlineNumericEditor.tsx` (reemplaza `BonusInput`, slider en popover-on-focus para `comfortable`)
+  - Lint rule: `eslint-plugins/greenhouse/rules/no-raw-table-without-shell.mjs` (registrada en `eslint.config.mjs`)
+  - Visual regression: `tests/e2e/smoke/payroll-table-density.spec.ts`
+  - Reglas duras agregadas a `CLAUDE.md` y `AGENTS.md`
+- **Migracion masiva (15 tablas)**: PayrollEntryTable + 14 vistas legacy: EntitlementsGovernanceTab (×4), TalentOpsDashboardView (×3), ProductCatalogDetailView (×1), BankView (×2), CashInListView (×1), FinancePeriodClosureDashboardView (×2), QuotesListView (×1), PipelineBoardUnified (×1), QuoteCreateDrawer (×1), QuoteLineItemsEditor (×2), HrLeaveView (×3), HrEvalsView (×2), MemberPayrollHistory (×2), PayrollCompensationTab (×1). `BonusInput.tsx` queda como re-export deprecated que delega en `InlineNumericEditor`.
+- **Verificacion**: `pnpm lint` clean, `npx tsc --noEmit` clean, `pnpm build` exitoso. `pnpm test` muestra 5 fails pre-existentes en `src/lib/payroll/project-payroll.test.ts` por cambios uncommitted en `calculate-chile-deductions.ts` que NO pertenecen a esta task (otro agente trabajando en TASK-026/-744 hris contract canonicalization).
+- **Como evolucionar**: agregar nueva tabla operativa = envolver con `<DataTableShell>` + lint rule la fuerza. Para customizar densidad por surface: prop `density="..."` o cookie. Migrar otra primitiva editable inline = construir analogo a `InlineNumericEditor` que lea `useTableDensity()`.
+
+## Sesion 2026-05-01 — Skill invocable Greenhouse Payroll Auditor
+
+- **Trigger**: el usuario pidio investigar a profundidad legislacion laboral chilena, calculos de nomina y regimenes remotos/internacionales para crear una skill capaz de auditar, proponer y revisar Payroll Efeonce en Greenhouse.
+- **Resultado**:
+  - Nueva skill local invocable como `$greenhouse-payroll-auditor`.
+  - Archivos:
+    - `.codex/skills/greenhouse-payroll-auditor/SKILL.md`
+    - `.codex/skills/greenhouse-payroll-auditor/agents/openai.yaml`
+    - `.codex/skills/greenhouse-payroll-auditor/references/chile-payroll-law.md`
+    - `.codex/skills/greenhouse-payroll-auditor/references/greenhouse-payroll-runtime.md`
+    - `.codex/skills/greenhouse-payroll-auditor/references/international-remote-payroll.md`
+  - La skill documenta workflow de auditoria, clasificacion de regimen laboral, formulas Chile, honorarios, Deel/EOR/contractor internacional, KPI ICO y readiness.
+  - Incluye watchlist de riesgos reales observados en runtime: retencion honorarios 2026, split de cesantia por contrato, topes legales previsionales y KPI ICO para internacionales con bonos.
+- **Validacion ejecutada**:
+  - `python3 /Users/jreye/.codex/skills/.system/skill-creator/scripts/quick_validate.py .codex/skills/greenhouse-payroll-auditor` OK.
+- **Pendiente**:
+  - No se cambio runtime de Payroll en este slice; la skill deja explicitamente los gaps como material de auditoria/proximo fix.
+
+## Sesion 2026-05-01 — Auditoria Payroll compliance documentada
+
+- **Trigger**: el usuario pidio documentar en el espacio de auditorias la auditoria read-only hecha con `$greenhouse-payroll-auditor`.
+- **Artefactos**:
+  - `docs/audits/payroll/PAYROLL_COMPLIANCE_AUDIT_2026-05-01.md`
+  - `docs/audits/payroll/README.md`
+  - `docs/audits/README.md` actualizado con categoria Payroll
+- **Hallazgos documentados**:
+  - retencion honorarios 2026 desactualizada contra SII
+  - seguro de cesantia `plazo_fijo` con split trabajador/empleador incorrecto
+  - entries staging de honorarios mezclando retencion SII con deducciones dependientes
+  - falta de aplicacion clara de topes imponibles en formula visible
+  - gratificacion legal sobre `baseSalary` en vez de remuneracion elegible documentada
+  - incoherencias de clasificacion contractual a revisar
+  - KPI ICO internacional preservado como positive control
+- **Validacion**:
+  - Solo documentacion; no se cambio runtime ni datos.
+
+## Sesion 2026-05-01 — TASK-744 creada para remediar hallazgos Payroll
+
+- **Trigger**: el usuario pidio crear una task para corregir los hallazgos de la auditoria Payroll y aclaró que Melkin, Daniela y Andrés son internacionales.
+- **Resultado**:
+  - Nueva task `TASK-744 — Payroll Chile Compliance Remediation & International Guardrails`.
+  - Archivo: `docs/tasks/to-do/TASK-744-payroll-chile-compliance-remediation.md`.
+  - Registrada en `docs/tasks/TASK_ID_REGISTRY.md` y `docs/tasks/README.md`.
+- **Guardrail explícito incorporado**:
+  - Melkin Hernández, Daniela Ferreira y Andrés Carlosama son internacionales/Deel.
+  - La remediación no debe aplicarles AFP, salud, cesantía, SIS, mutual, IUSC ni retención honorarios Chile.
+  - Sí debe preservar KPI ICO para bonos variables internacionales.
+- **Validacion**:
+  - Solo documentación/task planning; no se cambio runtime ni datos.
+
 ## Sesion 2026-05-01 — Payroll PREVIRED sync schema drift fixed end-to-end
 
 - **Trigger**: al intentar destrabar abril 2026 desde staging, `/api/cron/sync-previred?start=2026-04&end=2026-05` falló con `column "worker_rate" of relation "chile_afp_rates" does not exist`, y por rebote `ImpUnico` no obtuvo `UTM` válida. Además, la verificación Chromium/Playwright con el usuario agente debía quedar explícitamente probada sobre el deployment real.

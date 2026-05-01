@@ -2,6 +2,12 @@
 
 ## 2026-05-01
 
+- **TASK-743 — Operational Data Table Density Contract**. Se introduce contrato canonico de plataforma para tablas operativas: density tokens (`compact`/`comfortable`/`expanded`), `<DataTableShell>` (container queries + auto-degrade + sticky-first column + scroll fade), `<InlineNumericEditor>` (reemplaza `BonusInput`, slider en popover-on-focus), lint rule `greenhouse/no-raw-table-without-shell` y visual regression Playwright. PayrollEntryTable + 14 vistas legacy migradas. Resuelve overflow horizontal contra `compactContentWidth: 1440` de manera robusta y escalable. Spec en `docs/architecture/GREENHOUSE_OPERATIONAL_TABLE_PLATFORM_V1.md`, doc funcional en `docs/documentation/plataforma/tablas-operativas.md`. Reglas duras agregadas a `CLAUDE.md` y `AGENTS.md`.
+
+- Se documenta la auditoria read-only de Payroll en `docs/audits/payroll/PAYROLL_COMPLIANCE_AUDIT_2026-05-01.md`, con hallazgos criticos sobre honorarios 2026, cesantia por tipo de contrato, topes imponibles, gratificacion legal, coherencia contractual y preservacion de KPI ICO para internacionales.
+
+- Se crea la skill local invocable `$greenhouse-payroll-auditor` para auditar Payroll Efeonce/Greenhouse con contexto de legislacion laboral chilena, formulas de nomina, honorarios, Deel/EOR/contractor internacional, KPI ICO, asistencia/licencias, PREVIRED/ImpUnico y watchlist del runtime actual.
+
 - Payroll Chile PREVIRED sync queda endurecido contra drift de schema:
   - `src/lib/payroll/previred-sync.ts` ya no intenta escribir `worker_rate` en `greenhouse_payroll.chile_afp_rates`; la tabla canónica desplegada solo persiste `total_rate`.
   - `src/lib/payroll/chile-previsional-helpers.ts` repara los fallbacks legacy sobre `previred_period_indicators` y `previred_afp_rates` usando `indicator_date` y aliases reales del schema histórico.

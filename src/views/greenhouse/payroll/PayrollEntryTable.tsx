@@ -17,7 +17,6 @@ import Switch from '@mui/material/Switch'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
-import TableContainer from '@mui/material/TableContainer'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Tooltip from '@mui/material/Tooltip'
@@ -29,7 +28,8 @@ import CustomTextField from '@core/components/mui/TextField'
 import type { PayrollEntry, PayrollPeriod, PeriodStatus } from '@/types/payroll'
 import { canEditPayrollEntries } from '@/lib/payroll/period-lifecycle'
 import { getInitials } from '@/utils/getInitials'
-import BonusInput from './BonusInput'
+import { DataTableShell } from '@/components/greenhouse/data-table'
+import { InlineNumericEditor } from '@/components/greenhouse/primitives'
 import ChileDeductionBreakdown from './ChileDeductionBreakdown'
 import EntryVersionHistoryDrawer from './EntryVersionHistoryDrawer'
 import PayrollEntryExplainDialog from './PayrollEntryExplainDialog'
@@ -58,7 +58,11 @@ const PayrollEntryTable = ({ entries, period, periodStatus, onEntryUpdate }: Pro
 
   return (
     <>
-      <TableContainer>
+      <DataTableShell
+        identifier='payroll-entries'
+        ariaLabel='Tabla de nomina mensual'
+        stickyFirstColumn
+      >
       <Table size='small'>
         <TableHead>
           <TableRow>
@@ -199,13 +203,13 @@ const PayrollEntryTable = ({ entries, period, periodStatus, onEntryUpdate }: Pro
                   {/* Bono OTD */}
                   <TableCell align='right'>
                     {isEditable ? (
-                      <BonusInput
+                      <InlineNumericEditor
                         value={entry.bonusOtdAmount}
                         min={entry.bonusOtdMin}
                         max={entry.bonusOtdMax}
                         currency={entry.currency}
                         qualifies={entry.kpiOtdQualifies}
-                        label='OTD'
+                        label='Bono OTD'
                         onChange={v => onEntryUpdate(entry.entryId, 'bonusOtdAmount', v)}
                       />
                     ) : (
@@ -226,13 +230,13 @@ const PayrollEntryTable = ({ entries, period, periodStatus, onEntryUpdate }: Pro
                   {/* Bono RpA */}
                   <TableCell align='right'>
                     {isEditable ? (
-                      <BonusInput
+                      <InlineNumericEditor
                         value={entry.bonusRpaAmount}
                         min={entry.bonusRpaMin}
                         max={entry.bonusRpaMax}
                         currency={entry.currency}
                         qualifies={entry.kpiRpaQualifies}
-                        label='RpA'
+                        label='Bono RpA'
                         onChange={v => onEntryUpdate(entry.entryId, 'bonusRpaAmount', v)}
                       />
                     ) : (
@@ -608,7 +612,7 @@ const PayrollEntryTable = ({ entries, period, periodStatus, onEntryUpdate }: Pro
           })}
         </TableBody>
       </Table>
-    </TableContainer>
+      </DataTableShell>
 
     <PayrollReceiptDialog
       open={!!receiptEntry}

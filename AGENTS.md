@@ -756,6 +756,26 @@ Contrato versionado `platform-health.v1`. Permite a agentes (MCP, Teams bot, CI,
   - Recharts: 7/10 sin inversión adicional; gana solo si construimos `GhChart` premium (no priorizado).
 - TASK-518 (migración masiva a Recharts) **descartada** — pierde impacto visual. Ver Delta 2026-04-26 en `docs/tasks/to-do/TASK-518-apexcharts-deprecation.md`.
 
+### Tablas operativas — Density Contract canonical (TASK-743, 2026-05-01)
+
+Toda tabla operativa con celdas editables inline o > 8 columnas vive bajo un contrato declarativo de densidad para no desbordar el `compactContentWidth: 1440`.
+
+- **3 densidades canonicas**: `compact` (row 32px, editor 110px, sin slider inline), `comfortable` (row 44px, editor 130px, slider en popover-on-focus), `expanded` (row 56px, editor 160px, slider inline + min/max captions).
+- **Resolucion de densidad** (precedencia): prop explicita > cookie `gh-table-density` > container query auto-degrade (< 1280px degrada un nivel) > default tema (`comfortable`).
+- **Wrapper canonico**: `<DataTableShell>` envuelve TODA tabla operativa. Establece `container-type: inline-size`, observa el ancho real, computa densidad efectiva, expone `<DataTableShell.Sticky>` para columna sticky-first y agrega gradient fade en el borde derecho cuando hay scroll restante.
+- **Primitive editable canonica**: `<InlineNumericEditor>` reemplaza inputs+sliders dispersos. Acepta `value`, `min`, `max`, `step`, `currency`, `qualifies`, `disabled`, `label`, `onChange`. Adapta render a la densidad efectiva.
+- **Ubicacion**: `src/components/greenhouse/data-table/{density,useTableDensity,DataTableShell}.tsx` y `src/components/greenhouse/primitives/InlineNumericEditor.tsx`.
+- **Spec canonica**: `docs/architecture/GREENHOUSE_OPERATIONAL_TABLE_PLATFORM_V1.md`.
+- **Doc funcional**: `docs/documentation/plataforma/tablas-operativas.md`.
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** crear una `<Table>` MUI con > 8 columnas o con `<input>`/`<TextField>`/`<Slider>` en `<TableBody>` sin envolverla en `<DataTableShell>`. Lint rule `greenhouse/no-raw-table-without-shell` bloquea el commit.
+- **NUNCA** hardcodear `minWidth` en una primitiva editable — debe leer densidad via `useTableDensity()`.
+- **NUNCA** mover `compactContentWidth` a `wide` para resolver overflow de una tabla. Resolver siempre con el contrato (densidad + sticky + scroll fade).
+- **NUNCA** duplicar `BonusInput` u otra primitiva legacy. Migrar consumers a `<InlineNumericEditor>`. `BonusInput.tsx` queda como re-export deprecado hasta que el ultimo consumer migre.
+- **NUNCA** desactivar el visual regression test de `/hr/payroll` para forzar un merge. Si falla por overflow, la solucion es respetar el contrato, no bypass.
+
 ## Task Lifecycle Protocol
 
 ### Regla general

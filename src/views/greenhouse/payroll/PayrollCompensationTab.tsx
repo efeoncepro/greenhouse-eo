@@ -22,10 +22,11 @@ import Stack from '@mui/material/Stack'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
-import TableContainer from '@mui/material/TableContainer'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
+
+import { DataTableShell } from '@/components/greenhouse/data-table'
 
 import CustomChip from '@core/components/mui/Chip'
 
@@ -131,7 +132,7 @@ const PayrollCompensationTab = ({ compensations, eligibleMembers, members, onRef
               Todos los colaboradores activos ya tienen compensación vigente. Haz clic en una fila para crear una nueva versión.
             </Typography>
           )}
-          <TableContainer>
+          <DataTableShell identifier='payroll-compensation-versions' ariaLabel='Versiones de compensacion del equipo'>
             <Table size='small'>
               <TableHead>
                 <TableRow>
@@ -254,7 +255,7 @@ const PayrollCompensationTab = ({ compensations, eligibleMembers, members, onRef
                 )}
               </TableBody>
             </Table>
-          </TableContainer>
+          </DataTableShell>
         </CardContent>
       </Card>
 

@@ -20,6 +20,8 @@ import nextCoreWebVitals from 'eslint-config-next/core-web-vitals'
 import tseslint from 'typescript-eslint'
 import prettierConfig from 'eslint-config-prettier'
 
+import greenhousePlugin from './eslint-plugins/greenhouse/index.mjs'
+
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 
@@ -230,6 +232,23 @@ export default [
       '@typescript-eslint/no-var-requires': 'off'
     }
   },
+
+  /*
+    TASK-743 — Operational data table density contract gate.
+    Aplica solo a archivos que pueden contener tablas operativas: src/views,
+    src/components, src/app. La regla solo dispara cuando el archivo importa
+    Table desde @mui/material, asi que el override es barato y limpio.
+  */
+  {
+    files: ['src/views/**/*.tsx', 'src/components/**/*.tsx', 'src/app/**/*.tsx'],
+    plugins: {
+      greenhouse: greenhousePlugin
+    },
+    rules: {
+      'greenhouse/no-raw-table-without-shell': 'error'
+    }
+  },
+
 
   /*
     Prettier compat — DEBE ir al final. Apaga reglas que conflictuan con

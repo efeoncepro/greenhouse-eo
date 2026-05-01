@@ -13,6 +13,22 @@
 
 Greenhouse EO es un portal Next.js 16 App Router con MUI 7.x envuelto por el starter-kit Vuexy. Este documento es la referencia canónica de la plataforma UI: stack, librerías disponibles, patrones de componentes, convenciones de estado, y reglas de adopción.
 
+## Delta 2026-05-01 — Operational Data Table Density Contract (TASK-743)
+
+Toda tabla operativa con celdas editables inline o > 8 columnas vive bajo el contrato de densidad canonico. Resuelve el overflow horizontal contra `compactContentWidth: 1440` de manera declarativa, robusta y escalable.
+
+- **Spec canonica**: [`GREENHOUSE_OPERATIONAL_TABLE_PLATFORM_V1.md`](./GREENHOUSE_OPERATIONAL_TABLE_PLATFORM_V1.md).
+- **Doc funcional**: `docs/documentation/plataforma/tablas-operativas.md`.
+- **Primitivas**:
+  - `src/components/greenhouse/data-table/density.ts` — tokens de las 3 densidades (`compact` / `comfortable` / `expanded`).
+  - `src/components/greenhouse/data-table/useTableDensity.tsx` — hook + provider que resuelve densidad efectiva.
+  - `src/components/greenhouse/data-table/DataTableShell.tsx` — wrapper canonico con container queries, sticky-first column, scroll fade.
+  - `src/components/greenhouse/primitives/InlineNumericEditor.tsx` — primitiva editable canonica (reemplaza `BonusInput`).
+- **Lint gate**: `greenhouse/no-raw-table-without-shell`.
+- **Visual regression**: `e2e/visual/payroll-table-density.spec.ts`.
+
+Reglas duras estan en `CLAUDE.md` y `AGENTS.md` (seccion "Operational Data Table Density Contract").
+
 ## Delta 2026-04-26b — ESLint 9 flat config (TASK-514)
 
 Migramos `eslint 8.57.1` (legacy `.eslintrc.js`) a **`eslint 9.39.4` con flat config (`eslint.config.mjs`)**. ESLint 8 entró en maintenance mode en 2024; flat config es el default desde 2024 y todos los plugins modernos convergieron a él (`typescript-eslint 8.59`, `eslint-plugin-import 2.32`, `eslint-config-next 16`, `eslint-config-prettier 10`).

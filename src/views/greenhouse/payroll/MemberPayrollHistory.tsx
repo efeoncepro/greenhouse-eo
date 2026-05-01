@@ -19,13 +19,15 @@ import Stack from '@mui/material/Stack'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
-import TableContainer from '@mui/material/TableContainer'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
 import { useTheme } from '@mui/material/styles'
 
 import type { ApexOptions } from 'apexcharts'
+
+import { DataTableShell } from '@/components/greenhouse/data-table'
+
 
 import CustomChip from '@core/components/mui/Chip'
 
@@ -267,7 +269,7 @@ const MemberPayrollHistory = ({ memberId }: Props) => {
           />
           <Divider />
           <CardContent>
-            <TableContainer>
+            <DataTableShell identifier='member-payroll-history' ariaLabel='Historico de nominas del colaborador'>
               <Table size='small'>
                 <TableHead>
                   <TableRow>
@@ -340,7 +342,7 @@ const MemberPayrollHistory = ({ memberId }: Props) => {
                   ))}
                 </TableBody>
               </Table>
-            </TableContainer>
+            </DataTableShell>
           </CardContent>
         </Card>
       )}
@@ -376,7 +378,7 @@ const MemberPayrollHistory = ({ memberId }: Props) => {
           />
           <Divider />
           <CardContent>
-            <TableContainer>
+            <DataTableShell identifier='member-compensation-versions' ariaLabel='Versiones de compensacion del colaborador'>
               <Table size='small'>
                 <TableHead>
                   <TableRow>
@@ -421,7 +423,7 @@ const MemberPayrollHistory = ({ memberId }: Props) => {
                   ))}
                 </TableBody>
               </Table>
-            </TableContainer>
+            </DataTableShell>
           </CardContent>
         </Card>
       )}

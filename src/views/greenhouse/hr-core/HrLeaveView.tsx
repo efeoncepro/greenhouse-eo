@@ -25,16 +25,18 @@ import Tab from '@mui/material/Tab'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
-import TableContainer from '@mui/material/TableContainer'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
 import { useTheme } from '@mui/material/styles'
 
+
 import TabContext from '@mui/lab/TabContext'
 import TabPanel from '@mui/lab/TabPanel'
 
 import type { ApexOptions } from 'apexcharts'
+
+import { DataTableShell } from '@/components/greenhouse/data-table'
 
 import CustomChip from '@core/components/mui/Chip'
 import CustomTabList from '@core/components/mui/TabList'
@@ -937,7 +939,7 @@ const HrLeaveView = () => {
                 />
               </Stack>
 
-              <TableContainer>
+              <DataTableShell identifier='hr-leave-list' ariaLabel='Listado de licencias y ausencias'>
                 <Table size='small'>
                   <TableHead>
                     <TableRow>
@@ -1044,7 +1046,7 @@ const HrLeaveView = () => {
                     )}
                   </TableBody>
                 </Table>
-              </TableContainer>
+              </DataTableShell>
             </CardContent>
           </Card>
         </TabPanel>
@@ -1168,7 +1170,7 @@ const HrLeaveView = () => {
                     Vacaciones Chile puede mostrarse como acumulación proporcional durante el primer ciclo laboral e incluir arrastre del período anterior.
                   </Alert>
                 )}
-                <TableContainer>
+                <DataTableShell identifier='hr-leave-balance' ariaLabel='Saldos personales de licencias'>
                   <Table size='small'>
                     <TableHead>
                       <TableRow>
@@ -1240,7 +1242,7 @@ const HrLeaveView = () => {
                       )}
                     </TableBody>
                   </Table>
-                </TableContainer>
+                </DataTableShell>
               </CardContent>
             </Card>
           </Stack>
@@ -1329,7 +1331,7 @@ const HrLeaveView = () => {
                     </CustomTextField>
                   </Stack>
 
-                  <TableContainer>
+                  <DataTableShell identifier='hr-leave-supervisor-balances' ariaLabel='Saldos del equipo (vista supervisor)'>
                     <Table size='small'>
                       <TableHead>
                         <TableRow>
@@ -1426,7 +1428,7 @@ const HrLeaveView = () => {
                         )}
                       </TableBody>
                     </Table>
-                  </TableContainer>
+                  </DataTableShell>
                 </CardContent>
               </Card>
             </Stack>

@@ -25,6 +25,7 @@ import Typography from '@mui/material/Typography'
 import { useListAnimation } from '@/hooks/useListAnimation'
 import useQuotesList from '@/hooks/useQuotesList'
 import useViewTransitionRouter from '@/hooks/useViewTransitionRouter'
+import { DataTableShell } from '@/components/greenhouse/data-table'
 
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
@@ -213,7 +214,7 @@ const QuotesListView = () => {
             </Typography>
           </Box>
         ) : (
-          <Box sx={{ overflowX: 'auto' }}>
+          <DataTableShell identifier='finance-quotes-list' ariaLabel='Listado de cotizaciones'>
             <Table size='small'>
               <TableHead>
                 <TableRow>
@@ -297,7 +298,7 @@ const QuotesListView = () => {
                 })}
               </TableBody>
             </Table>
-          </Box>
+          </DataTableShell>
         )}
       </Card>
     </Stack>

@@ -30,6 +30,9 @@ import { alpha, useTheme } from '@mui/material/styles'
 
 import { toast } from 'sonner'
 
+import { DataTableShell } from '@/components/greenhouse/data-table'
+
+
 import CustomAvatar from '@core/components/mui/Avatar'
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
@@ -569,6 +572,7 @@ const FinancePeriodClosureDashboardView = ({ canManageClosure, canReopen }: Prop
               minHeight={260}
             />
           ) : (
+            <DataTableShell identifier='finance-period-closure-list' ariaLabel='Periodos de cierre financiero'>
             <TableContainer component={Paper} variant='outlined'>
               <Table>
                 <TableHead>
@@ -780,6 +784,7 @@ const FinancePeriodClosureDashboardView = ({ canManageClosure, canReopen }: Prop
                                       ))}
                                     </Box>
 
+                                    <DataTableShell identifier='finance-period-closure-snapshots' ariaLabel='Snapshots de clientes en el periodo'>
                                     <TableContainer component={Paper} variant='outlined'>
                                       <Table size='small'>
                                         <TableHead>
@@ -852,6 +857,7 @@ const FinancePeriodClosureDashboardView = ({ canManageClosure, canReopen }: Prop
                                         </TableBody>
                                       </Table>
                                     </TableContainer>
+                                    </DataTableShell>
 
                                     {period.audit.reopenedReason ? (
                                       <Alert severity='warning' variant='outlined'>
@@ -871,6 +877,7 @@ const FinancePeriodClosureDashboardView = ({ canManageClosure, canReopen }: Prop
                 </TableBody>
               </Table>
             </TableContainer>
+            </DataTableShell>
           )}
         </Stack>
       </ExecutiveCardShell>
