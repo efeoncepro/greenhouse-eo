@@ -1,0 +1,1579 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Greenhouse Onboarding Module — Mockup V1</title>
+    <style>
+      :root {
+        --gh-ink: #08243f;
+        --gh-ocean: #0d5cab;
+        --gh-sky: #00a7c4;
+        --gh-mint: #1f8f6a;
+        --gh-lime: #75be3b;
+        --gh-amber: #d88a17;
+        --gh-coral: #d2475f;
+        --gh-violet: #5c4ee5;
+
+        --gh-bg: #f5f7fb;
+        --gh-surface: rgba(255, 255, 255, 0.92);
+        --gh-surface-strong: #ffffff;
+        --gh-border: rgba(14, 36, 63, 0.1);
+        --gh-border-strong: rgba(14, 36, 63, 0.18);
+        --gh-text-soft: #5f7185;
+        --gh-text-faint: #8da0b3;
+        --gh-shadow-sm: 0 10px 20px rgba(8, 36, 63, 0.05);
+        --gh-shadow-md: 0 22px 44px rgba(8, 36, 63, 0.09);
+        --gh-shadow-lg: 0 30px 80px rgba(8, 36, 63, 0.13);
+        --gh-radius: 18px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        color: var(--gh-ink);
+        background:
+          radial-gradient(circle at top left, rgba(92, 78, 229, 0.12), transparent 30rem),
+          radial-gradient(circle at top right, rgba(0, 167, 196, 0.08), transparent 26rem),
+          linear-gradient(180deg, #fbfcfe 0%, var(--gh-bg) 44%, #eef3f8 100%);
+        font-family: "DM Sans", "Poppins", Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .page {
+        max-width: 1480px;
+        margin: 0 auto;
+        padding: 28px 28px 64px;
+      }
+
+      .topbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        padding: 14px 18px;
+        border: 1px solid var(--gh-border);
+        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(18px);
+        box-shadow: var(--gh-shadow-sm);
+        position: sticky;
+        top: 14px;
+        z-index: 10;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+
+      .brand-badge {
+        width: 42px;
+        height: 42px;
+        border-radius: 14px;
+        display: grid;
+        place-items: center;
+        color: white;
+        font-weight: 800;
+        background: linear-gradient(135deg, var(--gh-violet), var(--gh-ocean));
+        box-shadow: inset 0 1px 0 rgba(255,255,255,.25);
+      }
+
+      .brand-copy strong {
+        display: block;
+        font-size: 14px;
+      }
+
+      .brand-copy span {
+        color: var(--gh-text-soft);
+        font-size: 12px;
+      }
+
+      .nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .nav a {
+        padding: 9px 14px;
+        border-radius: 999px;
+        color: var(--gh-text-soft);
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.01em;
+        transition: transform 160ms ease, background-color 160ms ease, color 160ms ease, box-shadow 160ms ease;
+      }
+
+      .nav a:hover,
+      .nav a:focus-visible {
+        background: rgba(92, 78, 229, 0.09);
+        color: var(--gh-violet);
+        transform: translateY(-1px);
+        box-shadow: var(--gh-shadow-sm);
+        outline: none;
+      }
+
+      .hero {
+        margin-top: 24px;
+        display: grid;
+        grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+        gap: 24px;
+      }
+
+      .glass,
+      .panel {
+        border: 1px solid var(--gh-border);
+        border-radius: 24px;
+        background: var(--gh-surface);
+        backdrop-filter: blur(16px);
+        box-shadow: var(--gh-shadow-md);
+      }
+
+      .hero-copy {
+        padding: 30px;
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 14px;
+        padding: 7px 12px;
+        border-radius: 999px;
+        background: rgba(92, 78, 229, 0.08);
+        color: var(--gh-violet);
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+
+      h1 {
+        margin: 0 0 14px;
+        font-size: clamp(34px, 5vw, 54px);
+        line-height: 0.98;
+        letter-spacing: -0.04em;
+      }
+
+      .lead {
+        margin: 0;
+        max-width: 64ch;
+        color: var(--gh-text-soft);
+        font-size: 15px;
+        line-height: 1.65;
+      }
+
+      .lead strong {
+        color: var(--gh-ink);
+      }
+
+      .hero-highlights {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 18px;
+      }
+
+      .token {
+        padding: 8px 12px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .token.blue { background: rgba(13, 92, 171, 0.1); color: var(--gh-ocean); }
+      .token.green { background: rgba(31, 143, 106, 0.1); color: var(--gh-mint); }
+      .token.amber { background: rgba(216, 138, 23, 0.12); color: #9b6210; }
+      .token.violet { background: rgba(92, 78, 229, 0.1); color: var(--gh-violet); }
+      .token.sky { background: rgba(0, 167, 196, 0.1); color: #007e95; }
+
+      .hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 24px;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 16px;
+        border-radius: 12px;
+        border: 1px solid transparent;
+        font-size: 14px;
+        font-weight: 800;
+        letter-spacing: 0.01em;
+        cursor: pointer;
+        transition: transform 160ms ease, box-shadow 160ms ease, background-color 160ms ease, border-color 160ms ease;
+      }
+
+      .btn:hover,
+      .btn:focus-visible {
+        transform: translateY(-1px);
+        box-shadow: var(--gh-shadow-sm);
+        outline: none;
+      }
+
+      .btn.primary {
+        background: linear-gradient(135deg, var(--gh-violet), var(--gh-ocean));
+        color: white;
+      }
+
+      .btn.ghost {
+        background: white;
+        border-color: var(--gh-border-strong);
+        color: var(--gh-ink);
+      }
+
+      .hero-aside {
+        padding: 22px;
+        display: grid;
+        gap: 16px;
+      }
+
+      .mini-metric {
+        padding: 16px;
+        border: 1px solid var(--gh-border);
+        border-radius: 18px;
+        background: rgba(255,255,255,0.88);
+        transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+      }
+
+      .mini-metric:hover {
+        transform: translateY(-2px);
+        border-color: rgba(92, 78, 229, 0.24);
+        box-shadow: var(--gh-shadow-sm);
+      }
+
+      .mini-metric small {
+        color: var(--gh-text-soft);
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .06em;
+      }
+
+      .mini-metric strong {
+        display: block;
+        margin-top: 8px;
+        font-size: 28px;
+        letter-spacing: -0.03em;
+      }
+
+      .mini-metric p {
+        margin: 10px 0 0;
+        color: var(--gh-text-soft);
+        font-size: 13px;
+        line-height: 1.5;
+      }
+
+      .section {
+        margin-top: 28px;
+      }
+
+      .section-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: end;
+        gap: 16px;
+        margin-bottom: 18px;
+      }
+
+      .section-head h2 {
+        margin: 0;
+        font-size: 26px;
+        letter-spacing: -0.03em;
+      }
+
+      .section-head p {
+        margin: 8px 0 0;
+        max-width: 72ch;
+        color: var(--gh-text-soft);
+        font-size: 14px;
+        line-height: 1.55;
+      }
+
+      .hint {
+        padding: 10px 12px;
+        border-radius: 12px;
+        background: rgba(13, 92, 171, 0.08);
+        color: var(--gh-ocean);
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .workspace {
+        display: grid;
+        grid-template-columns: 280px minmax(0, 1fr);
+        gap: 20px;
+      }
+
+      .sidebar {
+        padding: 18px;
+        display: grid;
+        gap: 14px;
+        align-content: start;
+      }
+
+      .sidebar-title {
+        font-size: 13px;
+        color: var(--gh-text-soft);
+        font-weight: 800;
+        letter-spacing: .06em;
+        text-transform: uppercase;
+      }
+
+      .rail-link {
+        display: grid;
+        gap: 4px;
+        padding: 14px 14px;
+        border-radius: 16px;
+        border: 1px solid transparent;
+        transition: transform 150ms ease, background-color 150ms ease, border-color 150ms ease;
+      }
+
+      .rail-link:hover,
+      .rail-link:focus-visible {
+        transform: translateX(2px);
+        background: rgba(92, 78, 229, 0.06);
+        border-color: rgba(92, 78, 229, 0.16);
+        outline: none;
+      }
+
+      .rail-link.active {
+        background: linear-gradient(135deg, rgba(92, 78, 229, 0.1), rgba(13, 92, 171, 0.08));
+        border-color: rgba(92, 78, 229, 0.2);
+      }
+
+      .rail-link strong {
+        font-size: 15px;
+      }
+
+      .rail-link span {
+        color: var(--gh-text-soft);
+        font-size: 12px;
+        line-height: 1.4;
+      }
+
+      .content-stack {
+        display: grid;
+        gap: 18px;
+      }
+
+      .command-bar {
+        padding: 18px;
+        display: flex;
+        justify-content: space-between;
+        gap: 14px;
+        align-items: center;
+      }
+
+      .command-title h3 {
+        margin: 0;
+        font-size: 22px;
+        letter-spacing: -0.03em;
+      }
+
+      .command-title p {
+        margin: 7px 0 0;
+        color: var(--gh-text-soft);
+        font-size: 14px;
+      }
+
+      .command-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+      .stat {
+        padding: 18px;
+        border-radius: 18px;
+        border: 1px solid var(--gh-border);
+        background: var(--gh-surface-strong);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .stat::before {
+        content: "";
+        position: absolute;
+        inset: 0 auto auto 0;
+        width: 100%;
+        height: 4px;
+        background: var(--gh-violet);
+      }
+
+      .stat.green::before { background: var(--gh-lime); }
+      .stat.sky::before { background: var(--gh-sky); }
+      .stat.amber::before { background: var(--gh-amber); }
+      .stat.red::before { background: var(--gh-coral); }
+
+      .stat small {
+        color: var(--gh-text-soft);
+        text-transform: uppercase;
+        letter-spacing: .06em;
+        font-size: 11px;
+        font-weight: 800;
+      }
+
+      .stat strong {
+        display: block;
+        margin-top: 10px;
+        font-size: 30px;
+        letter-spacing: -0.04em;
+      }
+
+      .stat span {
+        display: block;
+        margin-top: 8px;
+        color: var(--gh-text-soft);
+        font-size: 13px;
+        line-height: 1.4;
+      }
+
+      .split {
+        display: grid;
+        grid-template-columns: 1.18fr 0.82fr;
+        gap: 18px;
+      }
+
+      .roster-card,
+      .queue-card,
+      .templates-card,
+      .my-card,
+      .detail-card {
+        padding: 18px;
+      }
+
+      .card-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        gap: 12px;
+        margin-bottom: 14px;
+      }
+
+      .card-head h4 {
+        margin: 0;
+        font-size: 18px;
+        letter-spacing: -0.02em;
+      }
+
+      .card-head p {
+        margin: 6px 0 0;
+        color: var(--gh-text-soft);
+        font-size: 13px;
+        line-height: 1.45;
+      }
+
+      .segmented {
+        display: inline-flex;
+        gap: 8px;
+        padding: 6px;
+        border: 1px solid var(--gh-border);
+        border-radius: 999px;
+        background: rgba(255,255,255,.82);
+      }
+
+      .segmented button {
+        border: 0;
+        background: transparent;
+        border-radius: 999px;
+        padding: 8px 12px;
+        color: var(--gh-text-soft);
+        font-size: 12px;
+        font-weight: 800;
+        cursor: pointer;
+        transition: background-color 140ms ease, color 140ms ease;
+      }
+
+      .segmented button.active {
+        background: rgba(92, 78, 229, 0.11);
+        color: var(--gh-violet);
+      }
+
+      .instance-list,
+      .template-list,
+      .my-list {
+        display: grid;
+        gap: 12px;
+      }
+
+      .instance {
+        display: grid;
+        grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.9fr) minmax(180px, 0.8fr) 84px;
+        gap: 14px;
+        align-items: center;
+        padding: 14px;
+        border: 1px solid var(--gh-border);
+        border-radius: 16px;
+        background: white;
+        transition: transform 150ms ease, box-shadow 150ms ease, border-color 150ms ease;
+      }
+
+      .instance:hover,
+      .instance:focus-within {
+        transform: translateY(-2px);
+        box-shadow: var(--gh-shadow-sm);
+        border-color: rgba(13, 92, 171, 0.25);
+      }
+
+      .identity {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .avatar {
+        width: 42px;
+        height: 42px;
+        border-radius: 14px;
+        display: grid;
+        place-items: center;
+        font-size: 13px;
+        font-weight: 900;
+        color: white;
+        background: linear-gradient(135deg, var(--gh-ocean), var(--gh-sky));
+      }
+
+      .identity strong {
+        display: block;
+        font-size: 15px;
+      }
+
+      .identity span {
+        display: block;
+        margin-top: 4px;
+        color: var(--gh-text-soft);
+        font-size: 12px;
+      }
+
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.02em;
+      }
+
+      .chip.violet { background: rgba(92, 78, 229, 0.1); color: var(--gh-violet); }
+      .chip.blue { background: rgba(13, 92, 171, 0.1); color: var(--gh-ocean); }
+      .chip.green { background: rgba(31, 143, 106, 0.1); color: var(--gh-mint); }
+      .chip.amber { background: rgba(216, 138, 23, 0.12); color: #9b6210; }
+      .chip.red { background: rgba(210, 71, 95, 0.12); color: var(--gh-coral); }
+      .chip.gray { background: rgba(95, 113, 133, 0.1); color: var(--gh-text-soft); }
+
+      .progress-shell {
+        display: grid;
+        gap: 8px;
+      }
+
+      .progress-meta {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        font-size: 12px;
+        color: var(--gh-text-soft);
+        font-weight: 700;
+      }
+
+      .bar {
+        position: relative;
+        height: 10px;
+        border-radius: 999px;
+        background: rgba(8, 36, 63, 0.08);
+        overflow: hidden;
+      }
+
+      .bar > span {
+        display: block;
+        height: 100%;
+        border-radius: inherit;
+        background: linear-gradient(90deg, var(--gh-violet), var(--gh-sky));
+      }
+
+      .bar.green > span {
+        background: linear-gradient(90deg, var(--gh-lime), var(--gh-mint));
+      }
+
+      .queue-list {
+        display: grid;
+        gap: 10px;
+      }
+
+      .queue-item {
+        padding: 14px;
+        border-radius: 16px;
+        border: 1px solid var(--gh-border);
+        background: white;
+      }
+
+      .queue-item strong {
+        display: block;
+        font-size: 14px;
+      }
+
+      .queue-item p {
+        margin: 8px 0 0;
+        color: var(--gh-text-soft);
+        font-size: 13px;
+        line-height: 1.5;
+      }
+
+      .warning {
+        padding: 14px 16px;
+        border-radius: 16px;
+        border: 1px solid rgba(216, 138, 23, 0.25);
+        background: rgba(255, 244, 225, 0.86);
+        color: #7d5209;
+      }
+
+      .warning strong {
+        display: block;
+        font-size: 14px;
+      }
+
+      .warning span {
+        display: block;
+        margin-top: 6px;
+        font-size: 13px;
+        line-height: 1.55;
+      }
+
+      .template-canvas {
+        display: grid;
+        grid-template-columns: 320px minmax(0, 1fr);
+        gap: 18px;
+      }
+
+      .template-list .template {
+        padding: 14px;
+        border-radius: 16px;
+        border: 1px solid var(--gh-border);
+        background: white;
+        transition: transform 150ms ease, box-shadow 150ms ease;
+      }
+
+      .template-list .template:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--gh-shadow-sm);
+      }
+
+      .template strong {
+        display: block;
+        font-size: 15px;
+      }
+
+      .template p {
+        margin: 8px 0 0;
+        color: var(--gh-text-soft);
+        font-size: 13px;
+        line-height: 1.45;
+      }
+
+      .editor {
+        padding: 18px;
+        border-radius: 20px;
+        border: 1px solid var(--gh-border);
+        background: linear-gradient(180deg, rgba(255,255,255,.98), rgba(245,247,251,.95));
+      }
+
+      .editor-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+        margin-bottom: 16px;
+      }
+
+      .field {
+        padding: 14px;
+        border: 1px solid var(--gh-border);
+        border-radius: 16px;
+        background: white;
+      }
+
+      .field label {
+        display: block;
+        color: var(--gh-text-soft);
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: .06em;
+        text-transform: uppercase;
+      }
+
+      .field strong {
+        display: block;
+        margin-top: 10px;
+        font-size: 14px;
+      }
+
+      .steps {
+        display: grid;
+        gap: 10px;
+      }
+
+      .step {
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr) auto auto;
+        gap: 12px;
+        align-items: center;
+        padding: 14px;
+        border-radius: 16px;
+        border: 1px solid var(--gh-border);
+        background: rgba(255,255,255,0.92);
+        transition: transform 140ms ease, border-color 140ms ease;
+      }
+
+      .step:hover {
+        transform: translateX(2px);
+        border-color: rgba(92, 78, 229, 0.25);
+      }
+
+      .drag {
+        width: 34px;
+        height: 34px;
+        border-radius: 12px;
+        border: 1px dashed var(--gh-border-strong);
+        display: grid;
+        place-items: center;
+        color: var(--gh-text-faint);
+        font-weight: 900;
+      }
+
+      .step strong {
+        display: block;
+        font-size: 14px;
+      }
+
+      .step span {
+        display: block;
+        margin-top: 5px;
+        color: var(--gh-text-soft);
+        font-size: 12px;
+      }
+
+      .my-layout {
+        display: grid;
+        grid-template-columns: 1.02fr 0.98fr;
+        gap: 18px;
+      }
+
+      .my-hero {
+        padding: 22px;
+        background:
+          radial-gradient(circle at top right, rgba(117, 190, 59, 0.16), transparent 16rem),
+          linear-gradient(160deg, rgba(92, 78, 229, 0.08), rgba(0, 167, 196, 0.05));
+      }
+
+      .progress-ring {
+        display: grid;
+        place-items: center;
+        width: 122px;
+        height: 122px;
+        border-radius: 999px;
+        background:
+          radial-gradient(circle closest-side, white 79%, transparent 80% 100%),
+          conic-gradient(var(--gh-violet) 0 62%, rgba(8,36,63,.09) 62% 100%);
+        margin-bottom: 16px;
+      }
+
+      .progress-ring strong {
+        font-size: 24px;
+        letter-spacing: -0.04em;
+      }
+
+      .progress-ring span {
+        display: block;
+        text-align: center;
+        color: var(--gh-text-soft);
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .task-row {
+        display: flex;
+        align-items: start;
+        gap: 12px;
+        padding: 14px;
+        border-radius: 16px;
+        border: 1px solid var(--gh-border);
+        background: white;
+        transition: background-color 140ms ease, box-shadow 140ms ease;
+      }
+
+      .task-row:hover {
+        background: rgba(92, 78, 229, 0.03);
+        box-shadow: var(--gh-shadow-sm);
+      }
+
+      .check {
+        width: 22px;
+        height: 22px;
+        margin-top: 2px;
+        border-radius: 8px;
+        border: 2px solid rgba(92, 78, 229, 0.35);
+        display: grid;
+        place-items: center;
+        color: var(--gh-violet);
+        font-size: 12px;
+        font-weight: 900;
+      }
+
+      .task-row strong {
+        display: block;
+        font-size: 14px;
+      }
+
+      .task-row p {
+        margin: 6px 0 0;
+        color: var(--gh-text-soft);
+        font-size: 12px;
+        line-height: 1.45;
+      }
+
+      .people-card {
+        padding: 18px;
+      }
+
+      .mini-person {
+        display: grid;
+        gap: 14px;
+        padding: 16px;
+        border-radius: 18px;
+        border: 1px solid var(--gh-border);
+        background: white;
+      }
+
+      .mini-person header {
+        display: flex;
+        justify-content: space-between;
+        gap: 14px;
+        align-items: start;
+      }
+
+      .mini-person header strong {
+        display: block;
+        font-size: 15px;
+      }
+
+      .mini-person header span {
+        display: block;
+        margin-top: 4px;
+        color: var(--gh-text-soft);
+        font-size: 12px;
+      }
+
+      .footnote {
+        margin-top: 24px;
+        padding: 18px 20px;
+        border-radius: 18px;
+        border: 1px dashed rgba(92, 78, 229, 0.22);
+        background: rgba(255,255,255,0.72);
+        color: var(--gh-text-soft);
+        font-size: 13px;
+        line-height: 1.6;
+      }
+
+      @media (max-width: 1180px) {
+        .hero,
+        .workspace,
+        .split,
+        .template-canvas,
+        .my-layout {
+          grid-template-columns: 1fr;
+        }
+
+        .stats-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .instance {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 760px) {
+        .page {
+          padding: 18px 16px 48px;
+        }
+
+        .topbar,
+        .command-bar,
+        .section-head {
+          flex-direction: column;
+          align-items: stretch;
+        }
+
+        .stats-grid,
+        .editor-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .hero-copy {
+          padding: 24px;
+        }
+
+        h1 {
+          font-size: 34px;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        html {
+          scroll-behavior: auto;
+        }
+
+        *,
+        *::before,
+        *::after {
+          animation: none !important;
+          transition: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-badge">GH</div>
+          <div class="brand-copy">
+            <strong>Lifecycle HR Mockup</strong>
+            <span>Greenhouse HR module · review-first before implementation</span>
+          </div>
+        </div>
+        <nav class="nav" aria-label="Secciones del mockup">
+          <a href="#overview">Overview HR</a>
+          <a href="#offboarding-lane">Offboarding</a>
+          <a href="#templates">Plantillas</a>
+          <a href="#my-onboarding">Mi Onboarding</a>
+          <a href="#person-card">People 360</a>
+        </nav>
+      </header>
+
+      <section class="hero">
+        <div class="glass hero-copy">
+          <div class="eyebrow">UI orchestrator + UX + microinteractions</div>
+          <h1>Un onboarding que se entiende en 10 segundos y se opera sin fricción.</h1>
+          <p class="lead">
+            El diseño propone dos carriles visibles: <strong>Onboarding</strong> para altas y <strong>Offboarding</strong> para salidas,
+            con una surface dominante para <strong>HR operar cohortes, vencimientos, payroll lane, handoff y ownership</strong>.
+            La lectura dominante no es “la lista de tareas”, sino el <strong>estado del proceso, el riesgo actual y la próxima acción</strong>.
+          </p>
+          <div class="hero-highlights">
+            <span class="token violet">List-detail en HR</span>
+            <span class="token sky">My onboarding self-service</span>
+            <span class="token amber">Offboarding con lane de salida</span>
+            <span class="token green">States: empty · warning · overdue</span>
+            <span class="token blue">Copy operacional honesta</span>
+            <span class="token blue">Microinteracciones discretas</span>
+          </div>
+          <div class="hero-actions">
+            <a class="btn primary" href="#overview">Ver dashboard HR</a>
+            <a class="btn ghost" href="#my-onboarding">Ver experiencia colaborador</a>
+          </div>
+        </div>
+        <aside class="glass hero-aside" aria-label="Resumen de decisión de diseño">
+          <div class="mini-metric">
+            <small>Signal dominante</small>
+            <strong>Cohortes + salida crítica</strong>
+            <p>La primera pantalla prioriza cohortes activas, tareas vencidas y también casos de salida con riesgo de payroll, acceso o handoff pendiente.</p>
+          </div>
+          <div class="mini-metric">
+            <small>Patrón principal</small>
+            <strong>Summary + roster + case lane</strong>
+            <p>La vista admin combina KPI strip, roster operativo, cola de bloqueos y un carril explícito para offboarding.</p>
+          </div>
+          <div class="mini-metric">
+            <small>Guardrail crítico</small>
+            <strong>No implicar completitud</strong>
+            <p>Cuando faltan documentos, asignaciones o datos bancarios, la UI lo nombra como estado parcial y empuja la acción siguiente.</p>
+          </div>
+        </aside>
+      </section>
+
+      <section id="overview" class="section">
+        <div class="section-head">
+          <div>
+            <h2>1. HR & Admin Overview</h2>
+            <p>Surface de operación diaria para HR. Pensada como centro de control de cohortes, overdue items, ownership y activación de nuevas instancias. El primer fold responde: cuántos ingresos están vivos, dónde se está atascando el proceso y quién necesita intervención hoy.</p>
+          </div>
+          <div class="hint">Primary pattern: governance + roster + queue</div>
+        </div>
+
+        <div class="workspace">
+          <aside class="glass sidebar" aria-label="Navegación lateral del módulo">
+            <div class="sidebar-title">Módulo HR Lifecycle</div>
+            <a class="rail-link active" href="#overview">
+              <strong>Instancias activas</strong>
+              <span>Roster con progreso, overdue y responsables por etapa.</span>
+            </a>
+            <a class="rail-link" href="#templates">
+              <strong>Plantillas</strong>
+              <span>Diseño y versionado de onboarding, contractor y offboarding.</span>
+            </a>
+            <a class="rail-link" href="#my-onboarding">
+              <strong>Mi Onboarding</strong>
+              <span>Experiencia self-service del colaborador con tareas accionables.</span>
+            </a>
+            <a class="rail-link" href="#person-card">
+              <strong>People 360</strong>
+              <span>Card compacta de progreso para no sacar a RRHH de la ficha de la persona.</span>
+            </a>
+            <a class="rail-link" href="#offboarding-lane">
+              <strong>Offboarding cases</strong>
+              <span>Salida laboral, accesos, handoff, payroll final y documentos de término.</span>
+            </a>
+          </aside>
+
+          <div class="content-stack">
+            <div class="glass command-bar">
+              <div class="command-title">
+                <h3>Onboarding & Offboarding</h3>
+                <p>14 instancias abiertas · 3 requieren acción hoy · 1 tiene bloqueo crítico por documentos faltantes.</p>
+              </div>
+              <div class="command-actions">
+                <button class="btn ghost">Filtrar cohortes</button>
+                <button class="btn ghost">Exportar estado</button>
+                <button class="btn primary">Crear instancia manual</button>
+              </div>
+            </div>
+
+            <div class="stats-grid">
+              <div class="glass stat">
+                <small>Instancias activas</small>
+                <strong>14</strong>
+                <span>10 onboarding · 4 offboarding, con lectura consolidada por owner.</span>
+              </div>
+              <div class="glass stat green">
+                <small>En tiempo</small>
+                <strong>78%</strong>
+                <span>11 instancias vienen dentro de su ventana y no requieren escalación.</span>
+              </div>
+              <div class="glass stat amber">
+                <small>Items vencidos</small>
+                <strong>9</strong>
+                <span>3 son de IT y 4 de supervisor; el módulo destaca el owner, no solo el estado.</span>
+              </div>
+              <div class="glass stat red">
+                <small>Bloqueos críticos</small>
+                <strong>1</strong>
+                <span>Un alta no puede pasar a “operativa” porque faltan documentos de identidad.</span>
+              </div>
+            </div>
+
+            <div class="split">
+              <div class="glass roster-card">
+                <div class="card-head">
+                  <div>
+                    <h4>Roster operativo de instancias</h4>
+                    <p>List-detail con contexto suficiente para decidir sin entrar a cada caso.</p>
+                  </div>
+                  <div class="segmented" aria-label="Filtro de vistas">
+                    <button class="active">Activas</button>
+                    <button>Overdue</button>
+                    <button>Completadas</button>
+                  </div>
+                </div>
+
+                <div class="instance-list">
+                  <article class="instance" tabindex="0">
+                    <div class="identity">
+                      <div class="avatar">VR</div>
+                      <div>
+                        <strong>Valentina Reyes</strong>
+                        <span>Onboarding · indefinido · inicia el 3 mayo</span>
+                      </div>
+                    </div>
+                    <div class="chips">
+                      <span class="chip violet">Equipo Efeonce</span>
+                      <span class="chip green">En tiempo</span>
+                    </div>
+                    <div class="progress-shell">
+                      <div class="progress-meta"><span>9 de 13 tareas</span><span>69%</span></div>
+                      <div class="bar"><span style="width:69%"></span></div>
+                    </div>
+                    <div class="chips">
+                      <span class="chip blue">Abrir</span>
+                    </div>
+                  </article>
+
+                  <article class="instance" tabindex="0">
+                    <div class="identity">
+                      <div class="avatar" style="background:linear-gradient(135deg, var(--gh-lime), var(--gh-mint));">LP</div>
+                      <div>
+                        <strong>Luis Pizarro</strong>
+                        <span>Onboarding · contractor · proyecto Nexa</span>
+                      </div>
+                    </div>
+                    <div class="chips">
+                      <span class="chip blue">Contractor</span>
+                      <span class="chip amber">2 vencidas</span>
+                    </div>
+                    <div class="progress-shell">
+                      <div class="progress-meta"><span>4 de 6 tareas</span><span>67%</span></div>
+                      <div class="bar green"><span style="width:67%"></span></div>
+                    </div>
+                    <div class="chips">
+                      <span class="chip gray">Escalar</span>
+                    </div>
+                  </article>
+
+                  <article class="instance" tabindex="0">
+                    <div class="identity">
+                      <div class="avatar" style="background:linear-gradient(135deg, var(--gh-coral), #f06b7e);">CH</div>
+                      <div>
+                        <strong>Camila Herrera</strong>
+                        <span>Offboarding · renuncia efectiva 15 mayo</span>
+                      </div>
+                    </div>
+                    <div class="chips">
+                      <span class="chip red">Bloqueada</span>
+                      <span class="chip amber">Finiquito pendiente</span>
+                    </div>
+                    <div class="progress-shell">
+                      <div class="progress-meta"><span>5 de 9 tareas</span><span>56%</span></div>
+                      <div class="bar"><span style="width:56%"></span></div>
+                    </div>
+                    <div class="chips">
+                      <span class="chip violet">Resolver</span>
+                    </div>
+                  </article>
+                </div>
+              </div>
+
+              <div class="glass queue-card">
+                <div class="card-head">
+                  <div>
+                    <h4>Queue de bloqueos y próximos pasos</h4>
+                    <p>La microinteracción importante aquí no es animar: es explicar el impacto y la recuperación.</p>
+                  </div>
+                </div>
+
+                <div class="queue-list">
+                  <div class="warning" role="status" aria-live="polite">
+                    <strong>Valentina aún no puede pasar a “lista para operar”.</strong>
+                    <span>Faltan documentos de identidad y la tarea sigue en estado colaborador pendiente. La UI muestra el owner y la dependencia real, no solo un badge rojo.</span>
+                  </div>
+
+                  <article class="queue-item">
+                    <strong>2 licencias de Figma siguen sin asignarse</strong>
+                    <p>Owner: IT · plantillas “Equipo Efeonce” y “Contractor”. CTA sugerida: abrir backlog de accesos y confirmar disponibilidad.</p>
+                  </article>
+
+                  <article class="queue-item">
+                    <strong>Camila Herrera tiene offboarding en progreso con lane payroll abierto</strong>
+                    <p>La surface conecta checklist, accesos, handoff y settlement final en vez de tratar el egreso como simple baja de usuario.</p>
+                  </article>
+
+                  <article class="queue-item">
+                    <strong>Plantilla contractor tiene 3 ítems opcionales nunca usados</strong>
+                    <p>Señal de diseño: revisar fricción de template, no solo contar completados. CTA: editar plantilla.</p>
+                  </article>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="offboarding-lane" class="section">
+        <div class="section-head">
+          <div>
+            <h2>1B. Offboarding lane visible</h2>
+            <p>Aquí el módulo deja de parecer “solo onboarding”. Esta iteración separa explícitamente los casos de salida con una lectura dominante propia: causal, fecha efectiva, accesos, transferencia operativa y lane payroll/documental.</p>
+          </div>
+          <div class="hint">Primary pattern: case pipeline + risk detail</div>
+        </div>
+
+        <div class="split">
+          <div class="glass roster-card">
+            <div class="card-head">
+              <div>
+                <h4>Pipeline de offboarding</h4>
+                <p>Cada caso se presenta como una relación de salida, no como simple “usuario a desactivar”. El caso muestra causal, fecha efectiva y el carril que sigue abierto.</p>
+              </div>
+              <div class="segmented" aria-label="Filtro de casos de salida">
+                <button class="active">Activos</button>
+                <button>Bloqueados</button>
+                <button>Ejecutados</button>
+              </div>
+            </div>
+
+            <div class="instance-list">
+              <article class="instance" tabindex="0">
+                <div class="identity">
+                  <div class="avatar" style="background:linear-gradient(135deg, var(--gh-coral), #ef7b8e);">CH</div>
+                  <div>
+                    <strong>Camila Herrera</strong>
+                    <span>Renuncia · último día 15 mayo · contrato indefinido</span>
+                  </div>
+                </div>
+                <div class="chips">
+                  <span class="chip red">Payroll lane abierto</span>
+                  <span class="chip amber">Transferencia pendiente</span>
+                </div>
+                <div class="progress-shell">
+                  <div class="progress-meta"><span>5 de 9 tareas</span><span>56%</span></div>
+                  <div class="bar"><span style="width:56%"></span></div>
+                </div>
+                <div class="chips">
+                  <span class="chip violet">Abrir caso</span>
+                </div>
+              </article>
+
+              <article class="instance" tabindex="0">
+                <div class="identity">
+                  <div class="avatar" style="background:linear-gradient(135deg, #ad4bff, #e86ef6);">MS</div>
+                  <div>
+                    <strong>Matías Soto</strong>
+                    <span>Fin de plazo fijo · último día 31 mayo · payroll interno</span>
+                  </div>
+                </div>
+                <div class="chips">
+                  <span class="chip amber">Docs de término pendientes</span>
+                  <span class="chip blue">Accesos programados</span>
+                </div>
+                <div class="progress-shell">
+                  <div class="progress-meta"><span>6 de 8 tareas</span><span>75%</span></div>
+                  <div class="bar green"><span style="width:75%"></span></div>
+                </div>
+                <div class="chips">
+                  <span class="chip gray">Revisar</span>
+                </div>
+              </article>
+            </div>
+          </div>
+
+          <div class="glass detail-card">
+            <div class="card-head">
+              <div>
+                <h4>Case detail · Camila Herrera</h4>
+                <p>La surface muestra la separación de carriles: identidad, acceso, transferencia y payroll final. Eso prepara bien una futura capacidad de finiquito sin mentir que ya existe toda la automatización.</p>
+              </div>
+            </div>
+
+            <div class="stats-grid" style="grid-template-columns: repeat(2, minmax(0, 1fr)); margin-bottom: 14px;">
+              <div class="glass stat red">
+                <small>Estado del caso</small>
+                <strong>Blocked</strong>
+                <span>El egreso no puede ejecutarse completo mientras siga pendiente el carril de payroll final.</span>
+              </div>
+              <div class="glass stat amber">
+                <small>Fecha efectiva</small>
+                <strong>15 mayo</strong>
+                <span>Último día laboral confirmado, con handoff comercial aún abierto.</span>
+              </div>
+            </div>
+
+            <div class="queue-list">
+              <article class="queue-item">
+                <strong>1. Identity & access</strong>
+                <p>Microsoft 365 programado para desactivación el mismo día. Notion y Figma siguen activos hasta cierre de transferencia.</p>
+              </article>
+              <article class="queue-item">
+                <strong>2. Operational handoff</strong>
+                <p>Quedan 2 proyectos con owner por reasignar. La UI lo trata como blocker real y lo deja visible antes del botón “Ejecutar salida”.</p>
+              </article>
+              <article class="queue-item">
+                <strong>3. Payroll / término</strong>
+                <p>Hay un carril pendiente para documentos de término y settlement final. La interfaz no asume “finiquito emitido”; lo nombra como lane abierto.</p>
+              </article>
+              <div class="warning" role="status">
+                <strong>Estado parcial honesto para Offboarding</strong>
+                <span>La salida puede estar avanzada en accesos, pero no debe verse como cerrada si siguen pendientes transferencia o payroll final.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="templates" class="section">
+        <div class="section-head">
+          <div>
+            <h2>2. Editor de plantillas</h2>
+            <p>El editor evita la sensación de “formulario infinito”. Se comporta como un canvas con catálogo lateral y un detalle dominante para que RRHH entienda el flujo de onboarding/offboarding como una secuencia operacional real.</p>
+          </div>
+          <div class="hint">Primary pattern: list-detail editor</div>
+        </div>
+
+        <div class="glass templates-card">
+          <div class="template-canvas">
+            <div class="template-list">
+              <article class="template">
+                <strong>Onboarding — Equipo Efeonce</strong>
+                <p>13 pasos · laboral · incluye documentos, cuentas, accesos y check-in 30 días.</p>
+                <div class="chips" style="margin-top:10px">
+                  <span class="chip violet">Default</span>
+                  <span class="chip green">Activa</span>
+                </div>
+              </article>
+              <article class="template">
+                <strong>Onboarding — Contractor</strong>
+                <p>6 pasos · rápido · foco en accesos, NDA y contexto de proyecto.</p>
+                <div class="chips" style="margin-top:10px">
+                  <span class="chip blue">Contractor</span>
+                </div>
+              </article>
+              <article class="template">
+                <strong>Offboarding — Estándar</strong>
+                <p>9 pasos · acceso, transferencia, documentos de término y cierre Greenhouse.</p>
+                <div class="chips" style="margin-top:10px">
+                  <span class="chip red">Offboarding</span>
+                </div>
+              </article>
+            </div>
+
+            <div class="editor">
+              <div class="card-head">
+                <div>
+                  <h4>Template editor · Onboarding — Equipo Efeonce</h4>
+                  <p>Los bloques de arriba resumen el contrato; la lista de abajo es la secuencia operativa editable con prioridad visual para due offset, owner y obligatoriedad.</p>
+                </div>
+                <div class="command-actions">
+                  <button class="btn ghost">Duplicar plantilla</button>
+                  <button class="btn primary">Guardar cambios</button>
+                </div>
+              </div>
+
+              <div class="editor-grid">
+                <div class="field">
+                  <label>Aplica a</label>
+                  <strong>indefinido · plazo fijo · EOR</strong>
+                </div>
+                <div class="field">
+                  <label>Auto-creación</label>
+                  <strong>Al cambiar member.status a active</strong>
+                </div>
+                <div class="field">
+                  <label>Estado</label>
+                  <strong>Activa · versión 3</strong>
+                </div>
+              </div>
+
+              <div class="steps">
+                <article class="step">
+                  <div class="drag">⋮⋮</div>
+                  <div>
+                    <strong>Crear perfil en Greenhouse</strong>
+                    <span>RRHH · Día 0 · obligatorio · abre el carril operativo</span>
+                  </div>
+                  <span class="chip blue">HR</span>
+                  <span class="chip green">Required</span>
+                </article>
+
+                <article class="step">
+                  <div class="drag">⋮⋮</div>
+                  <div>
+                    <strong>Firmar contrato de trabajo</strong>
+                    <span>RRHH · Día 0 · puede conectarse después a Document Vault / firma</span>
+                  </div>
+                  <span class="chip blue">HR</span>
+                  <span class="chip green">Required</span>
+                </article>
+
+                <article class="step">
+                  <div class="drag">⋮⋮</div>
+                  <div>
+                    <strong>Registrar datos bancarios y previsión</strong>
+                    <span>RRHH · Día 0 · la helper text debería prevenir errores de payroll temprano</span>
+                  </div>
+                  <span class="chip violet">Payroll lane</span>
+                  <span class="chip green">Required</span>
+                </article>
+
+                <article class="step">
+                  <div class="drag">⋮⋮</div>
+                  <div>
+                    <strong>Configurar acceso a Notion workspace</strong>
+                    <span>IT · Día 1 · depende de Microsoft 365 y licencia base</span>
+                  </div>
+                  <span class="chip gray">Dependent</span>
+                  <span class="chip amber">Conditional</span>
+                </article>
+
+                <article class="step">
+                  <div class="drag">⋮⋮</div>
+                  <div>
+                    <strong>Check-in de primera quincena</strong>
+                    <span>Supervisor · Día 15 · ejemplo de paso con feedback más narrativo que operativo</span>
+                  </div>
+                  <span class="chip blue">Supervisor</span>
+                  <span class="chip gray">Milestone</span>
+                </article>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="my-onboarding" class="section">
+        <div class="section-head">
+          <div>
+            <h2>3. Mi Onboarding</h2>
+            <p>Experiencia self-service para el colaborador. La primera vista muestra progreso, tareas accionables y contexto suficiente para no depender de un mail perdido. El tono es claro, no corporativo-vacío.</p>
+          </div>
+          <div class="hint">Primary pattern: progress + task feed</div>
+        </div>
+
+        <div class="my-layout">
+          <div class="glass my-card my-hero">
+            <div class="progress-ring" aria-hidden="true">
+              <div>
+                <strong>62%</strong>
+                <span>Completado</span>
+              </div>
+            </div>
+            <div class="card-head" style="margin-bottom: 10px;">
+              <div>
+                <h4>Tu onboarding en Efeonce</h4>
+                <p>Te faltan 5 tareas. Hoy puedes avanzar con perfil profesional y documentos de identidad.</p>
+              </div>
+              <span class="chip violet">Empieza el 3 mayo</span>
+            </div>
+
+            <div class="my-list">
+              <article class="task-row">
+                <div class="check"></div>
+                <div>
+                  <strong>Completar perfil profesional</strong>
+                  <p>Necesitamos skills, herramientas y experiencia para activar tu perfil interno. Vence hoy 18:00.</p>
+                </div>
+                <span class="chip amber">Pendiente</span>
+              </article>
+
+              <article class="task-row">
+                <div class="check"></div>
+                <div>
+                  <strong>Subir documentos de identidad</strong>
+                  <p>Sin este paso RRHH no puede cerrar tu alta operativa. Acepta PDF o imagen legible.</p>
+                </div>
+                <span class="chip red">Bloquea alta</span>
+              </article>
+
+              <article class="task-row">
+                <div class="check">✓</div>
+                <div>
+                  <strong>Firmar contrato de trabajo</strong>
+                  <p>Documento validado y recibido. No necesitas hacer nada más en este paso.</p>
+                </div>
+                <span class="chip green">Completada</span>
+              </article>
+            </div>
+          </div>
+
+          <div class="glass detail-card">
+            <div class="card-head">
+              <div>
+                <h4>Estado general del proceso</h4>
+                <p>No todo depende de ti. Esta lista hace visible qué sigue en RRHH, IT y tu supervisor.</p>
+              </div>
+            </div>
+
+            <div class="my-list">
+              <article class="task-row">
+                <div class="check">✓</div>
+                <div>
+                  <strong>Crear cuenta Microsoft 365</strong>
+                  <p>IT la completó ayer a las 16:42.</p>
+                </div>
+              </article>
+
+              <article class="task-row">
+                <div class="check">✓</div>
+                <div>
+                  <strong>Asignar licencias de herramientas</strong>
+                  <p>Figma y Notion listas. Slack aún no aplica en esta plantilla.</p>
+                </div>
+              </article>
+
+              <article class="task-row">
+                <div class="check"></div>
+                <div>
+                  <strong>Asignarte a proyectos iniciales</strong>
+                  <p>Responsable: supervisor. Esta tarea se desbloquea después de tu briefing de bienvenida.</p>
+                </div>
+                <span class="chip gray">Supervisor</span>
+              </article>
+
+              <div class="warning" role="status">
+                <strong>Estado parcial honesto</strong>
+                <span>Tu acceso base ya está listo, pero todavía no apareces como “operativa” porque faltan documentos. La UI no dice “todo listo” antes de tiempo.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="person-card" class="section">
+        <div class="section-head">
+          <div>
+            <h2>4. Card compacta en People 360</h2>
+            <p>Resumen de onboarding/offboarding dentro de la ficha de la persona para no forzar cambio de contexto. Pensada como card de actividad con link al caso completo.</p>
+          </div>
+          <div class="hint">Primary pattern: compact status card</div>
+        </div>
+
+        <div class="glass people-card">
+          <div class="mini-person">
+            <header>
+              <div>
+                <strong>Onboarding activo · Valentina Reyes</strong>
+                <span>Plantilla “Equipo Efeonce” · Ingreso efectivo 3 mayo · Owner principal RRHH</span>
+              </div>
+              <span class="chip green">9/13 completadas</span>
+            </header>
+
+            <div class="progress-shell">
+              <div class="progress-meta">
+                <span>Faltan 2 tareas colaborador · 2 supervisor</span>
+                <span>69%</span>
+              </div>
+              <div class="bar"><span style="width:69%"></span></div>
+            </div>
+
+            <div class="chips">
+              <span class="chip amber">1 overdue</span>
+              <span class="chip red">Documento identidad pendiente</span>
+              <span class="chip blue">Abrir instancia completa</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="footnote">
+        <strong>Notas de diseño.</strong> Este mockup sigue la baseline moderna del repo: first fold dominante, menos igualdad visual, copy operacional, estados explícitos y microinteracciones discretas. La motion propuesta es mínima: hover, focus, elevación ligera y transiciones cortas; no depende de animación para comunicar significado y respeta `prefers-reduced-motion`.
+      </div>
+    </div>
+  </body>
+</html>

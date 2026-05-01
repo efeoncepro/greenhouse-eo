@@ -1,5 +1,19 @@
 # Handoff.md
 
+## Sesion 2026-05-01 — TASK-763 creada desde mockup aprobado de Lifecycle UI
+
+- **Trigger**: usuario aprobó el mockup `docs/mockups/onboarding-module-mockup.html` y pidió aterrizarlo en una task/UI spec de implementación.
+- **Resultado documental**:
+  - Nueva task `docs/tasks/to-do/TASK-763-lifecycle-onboarding-offboarding-ui-mockup-adoption.md`.
+  - Registro sincronizado en `docs/tasks/TASK_ID_REGISTRY.md`.
+  - Índice sincronizado en `docs/tasks/README.md` y siguiente ID libre actualizado a `TASK-764`.
+- **Decision de diseño**:
+  - La implementación UI se modela como shell `Lifecycle / Onboarding & Offboarding`, no como otra pantalla aislada de onboarding.
+  - La task cuelga de dos foundations distintas:
+    - `TASK-030` para el runtime checklist onboarding/offboarding legacy
+    - `TASK-760` para que el carril offboarding visible no se apoye en semántica falsa
+  - El mockup aprobado queda como fuente visual canónica, pero la implementación no debe copiar HTML literal ni implicar que el motor de finiquitos ya existe.
+
 ## Sesion 2026-05-01 — EPIC-010 + TASK-760/761/762 creadas para Offboarding y Finiquitos
 
 - **Trigger**: usuario consultó si Greenhouse podía construir finiquitos y si dependía de implementar Onboarding primero.

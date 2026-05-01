@@ -13,8 +13,11 @@ export interface ListObligationsFilters {
   status?: PaymentObligationStatus | 'all'
   sourceKind?: string
   spaceId?: string
-  /** Si true, excluye obligations en status='cancelled' o 'superseded' (default false). */
+  /** Si true, excluye obligations en status='cancelled' (default false). */
   excludeCancelled?: boolean
+  /** Si true, excluye obligations en status='superseded' (default false). Las superseded
+   *  son audit chain — usualmente se MUESTRAN con badge "Reemplazada", no se ocultan. */
+  excludeSuperseded?: boolean
   limit?: number
   offset?: number
 }
@@ -62,7 +65,11 @@ export async function listPaymentObligations(
   }
 
   if (filters.excludeCancelled) {
-    conditions.push(`o.status NOT IN ('cancelled', 'superseded')`)
+    conditions.push(`o.status <> 'cancelled'`)
+  }
+
+  if (filters.excludeSuperseded) {
+    conditions.push(`o.status <> 'superseded'`)
   }
 
   const whereClause = conditions.join(' AND ')

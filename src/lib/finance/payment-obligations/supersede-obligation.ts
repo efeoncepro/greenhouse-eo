@@ -70,22 +70,48 @@ export async function supersedePaymentObligation(
       )
     }
 
-    // Crea la nueva (mismo idempotency key con el de la original generara
-    // duplicate-detection — el caller debe pasar new* values nuevos o
-    // un sourceRef distinto si la idempotency aplica).
+    // CRITICAL ORDERING (TASK-759 V2 fix):
+    // 1) Marcar la original como superseded PRIMERO (sin superseded_by todavia).
+    // 2) Insertar la replacement DESPUES — el idempotency check en
+    //    createPaymentObligation filtra status IN (superseded, cancelled),
+    //    asi que NO matcheara la original ya marcada.
+    // 3) UPDATE final de superseded_by con el id real de la replacement.
+    //
+    // Si invertimos el orden (createPaymentObligation primero), la
+    // idempotency check matchea la original viva y retorna `created:false`
+    // con el SAME id → UPDATE termina haciendo self-supersede
+    // (`superseded_by = original_id`) y la nueva row NUNCA se inserta.
+    // Sintoma: row "fantasma" superseded apuntando a si misma + monto correcto
+    // jamas materializado. Bug observado en period 2026-04 Previred.
+
+    await client.query(
+      `UPDATE greenhouse_finance.payment_obligations
+          SET status = 'superseded',
+              cancelled_reason = $2,
+              updated_at = now()
+        WHERE obligation_id = $1`,
+      [input.originalObligationId, input.reason.trim()]
+    )
+
     const replacementResult = await createPaymentObligation(input.newObligation, client)
     const replacement = replacementResult.obligation
 
-    // Marca original superseded apuntando a la nueva
+    // Sanity: la idempotency check NO debe haber matchedo el original
+    // (acabamos de marcarlo superseded). Si pasa, es bug grave del helper.
+    if (replacement.obligationId === input.originalObligationId) {
+      throw new PaymentObligationValidationError(
+        `supersedePaymentObligation: replacement collapsed to original id ${input.originalObligationId}. Idempotency check did not honor superseded filter.`,
+        500
+      )
+    }
+
     const updatedOriginal = await client.query<ObligationRow>(
       `UPDATE greenhouse_finance.payment_obligations
-          SET status = 'superseded',
-              superseded_by = $2,
-              cancelled_reason = $3,
+          SET superseded_by = $2,
               updated_at = now()
         WHERE obligation_id = $1
         RETURNING *`,
-      [input.originalObligationId, replacement.obligationId, input.reason.trim()]
+      [input.originalObligationId, replacement.obligationId]
     )
 
     const original = mapObligationRow(updatedOriginal.rows[0])

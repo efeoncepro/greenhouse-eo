@@ -849,3 +849,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-760` | `to-do` | Workforce Offboarding Runtime Foundation | `docs/tasks/to-do/TASK-760-workforce-offboarding-runtime-foundation.md` |
 | `TASK-761` | `to-do` | Payroll Final Settlement / Finiquito Engine Chile | `docs/tasks/to-do/TASK-761-payroll-final-settlement-finiquito-engine-chile.md` |
 | `TASK-762` | `to-do` | Finiquito Document Generation + Approval Flow | `docs/tasks/to-do/TASK-762-finiquito-document-generation-approval-flow.md` |
+| `TASK-763` | `to-do` | Lifecycle Onboarding & Offboarding UI Mockup Adoption | `docs/tasks/to-do/TASK-763-lifecycle-onboarding-offboarding-ui-mockup-adoption.md` |
