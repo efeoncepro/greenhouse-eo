@@ -2,6 +2,8 @@
 
 ## 2026-05-01
 
+- Se documenta la arquitectura canónica `Payment Orders` como módulo de Tesorería dentro de Finance en `docs/architecture/GREENHOUSE_PAYMENT_ORDERS_ARCHITECTURE_V1.md`. La decisión evita mover pagos a Payroll: Payroll calcula/exporta obligaciones; Finance/Tesorería crea órdenes, calendario de pagos, registra pagos, settlement y conciliación. Se abre el programa `TASK-747` con child tasks `TASK-748` a `TASK-751` para obligations, beneficiary profiles/routing, orders/batches/calendar maker-checker y payroll settlement orchestration.
+
 - Se agrega la skill local invocable de Claude `greenhouse-payroll-auditor` en `.claude/skills/greenhouse-payroll-auditor/SKILL.md`, con referencias para legislacion/calculo Chile, runtime Payroll Greenhouse e internacionales/Deel. Tambien se alinean `AGENTS.md` y `CLAUDE.md` con la convencion oficial vigente de Claude Skills (`SKILL.md`) dejando `skill.md` como legacy.
 
 - **TASK-741 — Greenhouse MCP Remote Gateway V1**. Se agrega gateway MCP remoto privado en `GET/POST/DELETE /api/mcp/greenhouse` usando el transporte oficial Streamable HTTP del SDK MCP. El gateway reutiliza el mismo runtime read-only de `pnpm mcp:greenhouse`, se protege con `GREENHOUSE_MCP_REMOTE_GATEWAY_TOKEN`, limita payloads con `GREENHOUSE_MCP_REMOTE_MAX_BODY_BYTES` y mantiene `TASK-659` como dueño separado de OAuth/hosted auth multiusuario.

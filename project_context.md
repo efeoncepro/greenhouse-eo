@@ -1,3 +1,19 @@
+## Delta 2026-05-01 Payment Orders como modulo de Tesoreria/Finance
+
+- Se definio arquitectura nueva para `Payment Orders` en `docs/architecture/GREENHOUSE_PAYMENT_ORDERS_ARCHITECTURE_V1.md`.
+- Decision canonica:
+  - `Payroll` calcula y exporta obligaciones.
+  - `Finance/Tesoreria` crea ordenes de pago, resuelve instrumentos, registra pagos, modela settlement legs y concilia.
+  - `payroll_period.exported` no significa `paid`.
+- El modulo pertenece a `greenhouse_finance`, no a `greenhouse_payroll`, porque debe servir tambien para proveedores, impuestos, anticipos, prestamos, reembolsos y cuenta corriente accionista.
+- Se abrio programa de implementacion por tasks:
+  - `TASK-747` umbrella Payment Orders Program
+  - `TASK-748` Payment Obligations Foundation
+  - `TASK-749` Beneficiary Payment Profiles + Routing Policies
+  - `TASK-750` Payment Orders, Batches, Payment Calendar + Maker-Checker Runtime
+  - `TASK-751` Payroll Settlement Orchestration + Reconciliation Integration
+- Regla de rollout: primero obligaciones read-only/idempotentes, luego perfiles/routing, luego ordenes/batches/calendario, y finalmente integracion Payroll->settlement->conciliacion.
+
 ## Delta 2026-05-01 Claude skill invocable para auditoria de Payroll
 
 - Claude ahora tiene la skill local invocable `greenhouse-payroll-auditor`.

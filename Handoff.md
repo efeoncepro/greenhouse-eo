@@ -1,5 +1,30 @@
 # Handoff.md
 
+## Sesion 2026-05-01 — Arquitectura Payment Orders + tasks 747-751
+
+- **Trigger**: el usuario pidio modelar de forma robusta/escalable el gap donde Payroll exporta nomina pero el pago real puede ocurrir despues y por multiples plataformas/instrumentos por colaborador.
+- **Decision arquitectonica**:
+  - El modulo se llama conceptualmente `Payment Orders` / `Ordenes de Pago`.
+  - Pertenece a `Finance/Tesoreria`, no a `Payroll`.
+  - Payroll calcula y exporta obligaciones; Finance/Tesoreria planifica, aprueba, paga, modela settlement y concilia.
+  - `payroll_period.exported` crea obligaciones `generated`; no implica `paid`.
+- **Documentacion creada/actualizada**:
+  - `docs/architecture/GREENHOUSE_PAYMENT_ORDERS_ARCHITECTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`
+  - `project_context.md`
+  - `changelog.md`
+- **Backlog creado**:
+  - `TASK-747` umbrella Payment Orders Program
+  - `TASK-748` Payment Obligations Foundation
+  - `TASK-749` Beneficiary Payment Profiles + Routing Policies
+  - `TASK-750` Payment Orders, Batches, Payment Calendar + Maker-Checker Runtime
+  - `TASK-751` Payroll Settlement Orchestration + Reconciliation Integration
+- **Razon de split**:
+  - Una sola task seria demasiado riesgosa porque mezcla schema, perfiles sensibles, maker-checker, batches, settlement, conciliacion y Payroll UI.
+  - El rollout seguro es incremental: obligations -> routing -> orders/calendar -> payroll orchestration.
+- **Validacion**:
+  - Solo documentacion/task planning; no se cambio runtime.
+
 ## Sesion 2026-05-01 — Claude skill invocable Greenhouse Payroll Auditor
 
 - **Trigger**: el usuario pidio que la skill de Payroll tambien estuviera disponible para Claude y pudiera invocarse.

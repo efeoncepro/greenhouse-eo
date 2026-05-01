@@ -828,3 +828,8 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-744` | `complete` | Payroll Chile Compliance Remediation & International Guardrails | `docs/tasks/complete/TASK-744-payroll-chile-compliance-remediation.md` |
 | `TASK-745` | `to-do` | Payroll Adjustments Foundation V1 (exclude / gross_factor / fixed_deduction event-sourced) | `docs/tasks/to-do/TASK-745-payroll-adjustments-foundation.md` |
 | `TASK-746` | `to-do` | Adjustment Schedules + Finance Ledger Integration (loans, advances, cron materialization) | `docs/tasks/to-do/TASK-746-adjustment-schedules-finance-ledger.md` |
+| `TASK-747` | `to-do` | Payment Orders Program | `docs/tasks/to-do/TASK-747-payment-orders-program.md` |
+| `TASK-748` | `to-do` | Payment Obligations Foundation | `docs/tasks/to-do/TASK-748-payment-obligations-foundation.md` |
+| `TASK-749` | `to-do` | Beneficiary Payment Profiles + Routing Policies | `docs/tasks/to-do/TASK-749-beneficiary-payment-profiles-routing.md` |
+| `TASK-750` | `to-do` | Payment Orders, Batches, Payment Calendar + Maker-Checker Runtime | `docs/tasks/to-do/TASK-750-payment-orders-batches-maker-checker.md` |
+| `TASK-751` | `to-do` | Payroll Settlement Orchestration + Reconciliation Integration | `docs/tasks/to-do/TASK-751-payroll-settlement-orchestration-reconciliation.md` |

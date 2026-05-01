@@ -4,6 +4,21 @@
 > **Created:** 2026-03-30
 > **Last updated:** 2026-04-29
 
+## Delta 2026-05-01 — Payment Orders como capa canónica de Tesorería
+
+Se define `Payment Orders` como subdominio de Finance/Tesorería para separar obligaciones, órdenes de pago, pagos reales, settlement y conciliación.
+
+Fuente canónica: `docs/architecture/GREENHOUSE_PAYMENT_ORDERS_ARCHITECTURE_V1.md`.
+
+Reglas principales:
+
+- `Payroll` calcula y exporta obligaciones; no decide ni registra pagos reales.
+- `Finance/Tesorería` crea órdenes de pago, resuelve instrumentos, registra payments, modela settlement legs y concilia.
+- Una nómina exportada genera obligaciones `generated`; no implica `paid`.
+- Colaboradores distintos pueden pagarse por instrumentos distintos mediante `beneficiary_payment_profiles` versionados y políticas de routing.
+- Previred, Deel, Global66 y otros processors se modelan como processors/plataformas operativas; el cash vive en la cuenta pagadora real o en settlement legs explícitos.
+- Reliquidaciones no reescriben pagos conciliados: generan deltas compensatorios.
+
 ## Delta 2026-04-29 — TASK-723 AI-assisted reconciliation intelligence
 
 Conciliacion bancaria incorpora una capa AI **consultiva** sobre el workbench existente. El contrato es deliberadamente conservador para proteger saldos ya cuadrados:
