@@ -6,8 +6,17 @@ const opts = await connector.getOptions({ instanceConnectionName: process.env.GR
 const pool = new pg.Pool({ ...opts, user: process.env.GREENHOUSE_POSTGRES_OPS_USER || 'greenhouse_ops', password: process.env.GREENHOUSE_POSTGRES_OPS_PASSWORD, database: process.env.GREENHOUSE_POSTGRES_DATABASE, max: 1 })
 
 try {
-  const obs = await pool.query(`SELECT obligation_id, period_id, source_kind, beneficiary_type, beneficiary_id, beneficiary_name, obligation_kind, amount, currency, status, due_date, space_id FROM greenhouse_finance.payment_obligations ORDER BY created_at DESC`)
+  const queue = await pool.query(`SELECT status, retry_count, error_message, updated_at FROM greenhouse_sync.projection_refresh_queue WHERE projection_name='payment_obligations_from_payroll' AND entity_id='2026-04' ORDER BY updated_at DESC LIMIT 3`)
 
-  console.log('All obligations:')
-  obs.rows.forEach(r => console.log('  ' + r.obligation_id?.slice(0,20) + '… kind=' + r.obligation_kind + ' status=' + r.status + ' amount=' + r.amount + ' ' + r.currency + ' beneficiary=' + r.beneficiary_id + ' period=' + r.period_id + ' space=' + (r.space_id || 'NULL')))
+  console.log('Queue:')
+  queue.rows.forEach(r => console.log('  ', r.status, 'retries=' + r.retry_count, 'updated=' + r.updated_at?.toISOString?.(), 'error=' + (r.error_message || '-').slice(0, 150)))
+
+  const obs = await pool.query(`SELECT obligation_id, beneficiary_id, beneficiary_name, obligation_kind, amount, currency, status, superseded_by, created_at FROM greenhouse_finance.payment_obligations WHERE period_id='2026-04' ORDER BY created_at DESC`)
+
+  console.log('\nObligations period 2026-04 (' + obs.rowCount + ' total):')
+  obs.rows.forEach(r => {
+    const sup = r.superseded_by ? ' →' + r.superseded_by.slice(0, 16) : ''
+
+    console.log('  [' + r.status.padEnd(11) + '] ' + (r.beneficiary_name || '').padEnd(38) + ' ' + r.obligation_kind.padEnd(28) + String(r.amount).padStart(12) + ' ' + r.currency + sup)
+  })
 } finally { await pool.end(); await connector.close() }
