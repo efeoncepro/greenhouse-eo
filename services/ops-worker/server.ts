@@ -1239,6 +1239,65 @@ const handleIdentityAuthSmoke = async (req: IncomingMessage, res: ServerResponse
     }
   }
 
+  // Probe 2b — Azure /authorize endpoint with the real client_id.
+  //
+  // This is the smoking-gun probe: it catches the exact failure mode of the
+  // 2026-04-30 incident (signInAudience flipped from multi-tenant to single-
+  // tenant). When the App is correctly multi-tenant, /common/oauth2/v2.0/authorize
+  // returns HTTP 200 with the "Sign in to your account" page (Azure renders the
+  // login UI). When the App is single-tenant accessed via /common/, Azure
+  // responds with HTTP 200 but the body contains AADSTS50194 / AADSTS9002313
+  // and a different page title.
+  //
+  // Detects 4 distinct failure modes without browser automation:
+  //   - App deleted / client_id wrong  → AADSTS700016
+  //   - Multi-tenant misconfiguration  → AADSTS50194 / AADSTS9002313
+  //   - Redirect URI not registered    → AADSTS50011
+  //   - Tenant-restricted              → AADSTS500011
+  {
+    const t = Date.now()
+    const clientId = (process.env.AZURE_AD_CLIENT_ID || '').trim()
+    const redirect = `${portalUrl}/api/auth/callback/azure-ad`
+
+    const url =
+      `https://login.microsoftonline.com/common/oauth2/v2.0/authorize` +
+      `?client_id=${encodeURIComponent(clientId)}` +
+      `&response_type=code` +
+      `&redirect_uri=${encodeURIComponent(redirect)}` +
+      `&scope=openid` +
+      `&response_mode=query` +
+      `&state=ops-worker-smoke`
+
+    if (!clientId) {
+      probes.push({ name: 'azure_authorize_endpoint', passed: false, durationMs: 0, reason: 'AZURE_AD_CLIENT_ID unset' })
+    } else {
+      try {
+        const response = await fetchWithTimeout(url, { method: 'GET' }, 5_000)
+        const text = await response.text().catch(() => '')
+        const aadstsMatch = text.match(/AADSTS\d+/)
+        const passed = response.ok && !aadstsMatch && /sign in to your account/i.test(text)
+
+        probes.push({
+          name: 'azure_authorize_endpoint',
+          passed,
+          durationMs: Date.now() - t,
+          reason: passed
+            ? undefined
+            : aadstsMatch
+              ? `Azure rejected authorize: ${aadstsMatch[0]}`
+              : `unexpected response (HTTP ${response.status})`
+        })
+      } catch (error) {
+        probes.push({
+          name: 'azure_authorize_endpoint',
+          passed: false,
+          durationMs: Date.now() - t,
+          reason: error instanceof Error ? error.message : 'unknown_error'
+        })
+      }
+    }
+  }
+
   // Probe 3 — in-process readiness snapshot (uses ops-worker's own secrets)
   {
     const t = Date.now()

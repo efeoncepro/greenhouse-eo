@@ -88,6 +88,7 @@
     "sync:smoke-lane": "tsx scripts/publish-smoke-lane-run.ts",
     "secrets:audit": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/secrets/audit.ts",
     "secrets:rotate": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/secrets/rotate.ts",
+    "auth:audit-azure-app": "tsx scripts/auth/audit-azure-app.ts",
     "setup:bigquery:outbox": "tsx scripts/setup-bigquery-outbox.ts",
     "setup:bigquery:outbox-marts": "tsx scripts/setup-bigquery-outbox-marts.ts",
     "setup:bigquery:source-sync": "tsx scripts/setup-bigquery-source-sync.ts",

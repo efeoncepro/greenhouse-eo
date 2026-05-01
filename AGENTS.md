@@ -32,6 +32,18 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
 
 ## Reglas Operativas
 
+### 0. Tooling disponible (CLIs autenticadas)
+
+Estos CLIs estan autenticados localmente. Cuando una task toca su dominio, **usalos directamente** en vez de pedirle al usuario que lo haga manualmente desde portal/web UI. Esto aplica especialmente para diagnostico y fix de incidentes runtime cuya causa raiz vive fuera del codigo.
+
+- **Azure CLI (`az`)**: autenticado contra el tenant Microsoft de Efeonce `a80bf6c1-7c45-4d70-b043-51389622a0e4`. Sirve para gestionar Azure AD App Registrations (redirect URIs, client secrets, tenant config), Bot Service, Logic Apps, Resource Groups. Comandos canonicos: `az ad app show --id <client-id>`, `az ad app update`, `az ad app credential reset`, `az ad sp show`. Subscription ID: `e1cfff3e-8c21-4170-8b28-ad083b741266`.
+- **Google Cloud CLI (`gcloud`)**: autenticado como `julio.reyes@efeonce.org` con ADC. Project canonico `efeonce-group`. Sirve para Secret Manager, Cloud Run, Cloud SQL, Cloud Scheduler, BigQuery, Cloud Build, Workload Identity Federation.
+- **GitHub CLI (`gh`)**: autenticado contra `efeoncepro/greenhouse-eo`. Sirve para issues, PRs, workflow runs, releases.
+- **Vercel CLI (`vercel`)**: autenticado contra el team `efeonce-7670142f`. Sirve para env vars, deployments, project config.
+- **PostgreSQL CLI (`psql`)** via `pnpm pg:connect`: levanta proxy Cloud SQL + conexion auto, sin credenciales manuales.
+
+**Regla operativa**: si diagnosticas que la causa raiz de un incidente vive en una de estas plataformas, ejecuta el fix con el CLI con guardrails y verificacion. Documentar pasos manuales para que el usuario los haga es **antipatron** salvo que la accion sea destructiva (eliminar app registration, drop database, force-push), en cuyo caso confirma con el usuario primero.
+
 ### 1. Antes de cambiar codigo
 
 - Leer `project_context.md`.
