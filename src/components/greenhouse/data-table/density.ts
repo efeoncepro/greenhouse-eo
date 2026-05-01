@@ -16,27 +16,27 @@ export interface DensityTokens {
 export const DENSITY_TOKENS: Record<TableDensity, DensityTokens> = {
   compact: {
     rowHeight: 32,
-    cellPaddingX: 6,
+    cellPaddingX: 4,
+    cellPaddingY: 4,
+    inlineEditorMinWidth: 84,
+    showSliderInline: false,
+    showMinMaxCaption: false,
+    fontSize: '0.75rem'
+  },
+  comfortable: {
+    rowHeight: 40,
+    cellPaddingX: 8,
     cellPaddingY: 8,
     inlineEditorMinWidth: 110,
     showSliderInline: false,
     showMinMaxCaption: false,
     fontSize: '0.8125rem'
   },
-  comfortable: {
-    rowHeight: 44,
-    cellPaddingX: 10,
-    cellPaddingY: 12,
-    inlineEditorMinWidth: 130,
-    showSliderInline: false,
-    showMinMaxCaption: false,
-    fontSize: '0.875rem'
-  },
   expanded: {
     rowHeight: 56,
     cellPaddingX: 12,
-    cellPaddingY: 16,
-    inlineEditorMinWidth: 160,
+    cellPaddingY: 12,
+    inlineEditorMinWidth: 150,
     showSliderInline: true,
     showMinMaxCaption: true,
     fontSize: '0.875rem'
@@ -46,8 +46,8 @@ export const DENSITY_TOKENS: Record<TableDensity, DensityTokens> = {
 export const DEFAULT_TABLE_DENSITY: TableDensity = 'comfortable'
 
 export const DENSITY_DEGRADE_BREAKPOINTS = {
-  expandedToComfortable: 1280,
-  comfortableToCompact: 960
+  expandedToComfortable: 1400,
+  comfortableToCompact: 1200
 } as const
 
 export const TABLE_DENSITY_COOKIE = 'gh-table-density'

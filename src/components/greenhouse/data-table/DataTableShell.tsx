@@ -111,6 +111,30 @@ const DataTableShell = ({
   )
 
   const stickyEnabled = stickyFirstColumn && scrollState.overflow
+  const { tokens } = resolution
+
+  // Density token CSS injection — applied to ALL TableCell descendants so the
+  // shell governs the actual visual density, not each table individually.
+  const densityCellSx = {
+    '& .MuiTableCell-root': {
+      paddingLeft: `${tokens.cellPaddingX}px`,
+      paddingRight: `${tokens.cellPaddingX}px`,
+      paddingTop: `${tokens.cellPaddingY}px`,
+      paddingBottom: `${tokens.cellPaddingY}px`,
+      fontSize: tokens.fontSize
+    },
+    '& .MuiTableCell-sizeSmall': {
+      paddingLeft: `${tokens.cellPaddingX}px`,
+      paddingRight: `${tokens.cellPaddingX}px`,
+      paddingTop: `${tokens.cellPaddingY}px`,
+      paddingBottom: `${tokens.cellPaddingY}px`
+    },
+    '& .MuiTable-root': {
+      // Allow the table to size to the available width and let cells shrink.
+      width: '100%',
+      minWidth: 'auto'
+    }
+  }
 
   return (
     <TableDensityProvider value={contextValue}>
@@ -138,8 +162,10 @@ const DataTableShell = ({
           tabIndex={scrollState.overflow ? 0 : -1}
           sx={{
             width: '100%',
+            maxWidth: '100%',
             overflowX: 'auto',
             overflowY: 'visible',
+            ...densityCellSx,
             // sticky-first: enabled via CSS only when overflow is real, to avoid
             // visual seam when not needed.
             ...(stickyEnabled

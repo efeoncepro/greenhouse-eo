@@ -170,10 +170,14 @@ const InlineNumericEditor = ({
       }}
       sx={{
         width: tokens.inlineEditorMinWidth,
+        '& .MuiInputBase-root': {
+          fontSize: tokens.fontSize
+        },
         '& input': {
           fontFamily: 'monospace',
           textAlign: 'right',
-          fontSize: tokens.fontSize
+          fontSize: tokens.fontSize,
+          padding: density === 'compact' ? '4px 6px' : undefined
         }
       }}
     />
