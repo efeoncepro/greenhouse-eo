@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { useRouter } from 'next/navigation'
 
@@ -67,8 +67,57 @@ const LoginV2 = ({
   const [error, setError] = useState('')
   const [ssoLoading, setSsoLoading] = useState<'microsoft' | 'google' | null>(null)
   const [isTransitioning, setIsTransitioning] = useState(false)
+  const [providerReadiness, setProviderReadiness] = useState<{
+    microsoft: 'ready' | 'degraded' | 'unconfigured' | 'unknown'
+    google: 'ready' | 'degraded' | 'unconfigured' | 'unknown'
+    microsoftReason?: string
+    googleReason?: string
+  }>({
+    microsoft: 'unknown',
+    google: 'unknown'
+  })
 
   const router = useRouter()
+
+  // TASK-742 Capa 2 — Live provider readiness probe (cached 30s server-side).
+  // Hides/disables provider buttons when their underlying secret/discovery
+  // probe failed, so a user never gets the opaque `error=Callback` redirect.
+  useEffect(() => {
+    let cancelled = false
+
+    const fetchHealth = async () => {
+      try {
+        const response = await fetch('/api/auth/health', { cache: 'no-store' })
+
+        if (!response.ok || cancelled) return
+
+        const snap = await response.json()
+        const azure = snap.providers?.find((p: { provider: string }) => p.provider === 'azure-ad')
+        const google = snap.providers?.find((p: { provider: string }) => p.provider === 'google')
+
+        if (cancelled) return
+
+        setProviderReadiness({
+          microsoft: azure?.status ?? 'unknown',
+          google: google?.status ?? 'unknown',
+          microsoftReason: azure?.reason,
+          googleReason: google?.reason
+        })
+      } catch {
+        // Health endpoint failure is non-blocking — buttons fall back to env
+        // flags. Capa 3 captures the upstream failure separately.
+      }
+    }
+
+    fetchHealth()
+
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  const isMicrosoftDegraded = providerReadiness.microsoft === 'degraded'
+  const isGoogleDegraded = providerReadiness.google === 'degraded'
 
   const {
     register,
@@ -279,7 +328,7 @@ const LoginV2 = ({
                   variant='contained'
                   size='large'
                   onClick={handleMicrosoftSignIn}
-                  disabled={!hasMicrosoftAuth || isAnyLoading}
+                  disabled={!hasMicrosoftAuth || isMicrosoftDegraded || isAnyLoading}
                   startIcon={
                     ssoLoading === 'microsoft' ? (
                       <CircularProgress size={20} color='inherit' />
@@ -310,6 +359,11 @@ const LoginV2 = ({
                 </Button>
                 {!hasMicrosoftAuth ? (
                   <Alert severity='info'>{GH_MESSAGES.login_microsoft_unavailable}</Alert>
+                ) : isMicrosoftDegraded ? (
+                  <Alert severity='warning'>
+                    Microsoft SSO temporalmente no disponible. Usa email y contraseña, o pide un acceso
+                    por link mágico abajo.
+                  </Alert>
                 ) : null}
 
                 {/* Google SSO — secondary */}
@@ -318,7 +372,7 @@ const LoginV2 = ({
                   variant='outlined'
                   size='large'
                   onClick={handleGoogleSignIn}
-                  disabled={!hasGoogleAuth || isAnyLoading}
+                  disabled={!hasGoogleAuth || isGoogleDegraded || isAnyLoading}
                   startIcon={
                     ssoLoading === 'google' ? (
                       <CircularProgress size={20} color='inherit' />
@@ -349,6 +403,10 @@ const LoginV2 = ({
                 </Button>
                 {!hasGoogleAuth ? (
                   <Alert severity='info'>{GH_MESSAGES.login_google_unavailable}</Alert>
+                ) : isGoogleDegraded ? (
+                  <Alert severity='warning'>
+                    Google SSO temporalmente no disponible. Usa email y contraseña, o pide un link mágico.
+                  </Alert>
                 ) : null}
 
                 {/* Separator */}

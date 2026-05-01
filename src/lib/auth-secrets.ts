@@ -1,5 +1,6 @@
 import 'server-only'
 
+import { getAuthReadinessSnapshot, type AuthReadinessSnapshot } from '@/lib/auth/readiness'
 import { resolveSecret } from '@/lib/secrets/secret-manager'
 
 export const authSecrets = await (async () => {
@@ -21,6 +22,17 @@ export const authSecrets = await (async () => {
     googleClient: googleClientSecret
   }
 })()
+
+/**
+ * TASK-742 Capa 2 — Compute the readiness snapshot using the same secrets
+ * the providers use. Cached 30s in `getAuthReadinessSnapshot`.
+ */
+export const getCurrentAuthReadiness = (): Promise<AuthReadinessSnapshot> =>
+  getAuthReadinessSnapshot({
+    azureAdClientSecret: authSecrets.azureAdClient.value,
+    googleClientSecret: authSecrets.googleClient.value,
+    nextAuthSecret: authSecrets.nextAuth.value
+  })
 
 export const getNextAuthSecret = () => {
   const secret = authSecrets.nextAuth.value?.trim()

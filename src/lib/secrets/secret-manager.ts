@@ -1,6 +1,12 @@
 import { SecretManagerServiceClient } from '@google-cloud/secret-manager'
 
 import { createGoogleAuth, getGoogleProjectId } from '@/lib/google-credentials'
+import {
+  isKnownSecretFormat,
+  summarizeFormatViolation,
+  validateSecretFormat,
+  type SecretFormatViolation
+} from '@/lib/secrets/format-validators'
 
 export type SecretResolutionSource = 'secret_manager' | 'env' | 'unconfigured'
 
@@ -10,6 +16,8 @@ export interface SecretResolution {
   envVarName: string
   secretRefEnvVarName: string
   secretRef: string | null
+  /** TASK-742 — populated when the payload was rejected by format validation. */
+  formatViolations?: SecretFormatViolation[]
 }
 
 type SecretResolutionOptions = {
@@ -273,6 +281,45 @@ export const resolveSecret = async ({
       source: 'env',
       value: envValue
     }
+  }
+
+  // TASK-742 Capa 1 — Reject malformed payloads before they reach runtime.
+  // Format validators only fire for known critical secrets (NEXTAUTH_SECRET,
+  // AZURE_AD_CLIENT_SECRET, etc.). Unknown secrets get a basic hygiene check
+  // only (no length/charset enforcement, see format-validators.ts).
+  if (resolution.value && isKnownSecretFormat(envVarName)) {
+    const formatResult = validateSecretFormat(envVarName, resolution.value)
+
+    if (!formatResult.ok) {
+      console.warn(
+        `[secrets] Format validation failed for ${envVarName}; rejecting payload without exposing value.`,
+        summarizeFormatViolation(envVarName, formatResult)
+      )
+
+      resolution = {
+        ...resolution,
+        source: 'unconfigured',
+        value: null,
+        formatViolations: formatResult.violations
+      }
+    }
+  }
+
+  // TASK-742 Capa 1 — Telemetry: emit a domain=identity warning when a critical
+  // secret silently falls back to env (signals SECRET_REF is broken in prod).
+  if (
+    resolution.source === 'env' &&
+    isKnownSecretFormat(envVarName) &&
+    process.env.NODE_ENV === 'production'
+  ) {
+    console.warn(
+      `[secrets] Critical secret ${envVarName} resolved from process.env in production (SECRET_REF unavailable). Investigate Secret Manager.`,
+      {
+        envVarName,
+        secretRefEnvVarName: resolvedSecretRefEnvVarName,
+        secretRefConfigured: Boolean(secretRef)
+      }
+    )
   }
 
   cache.set(cacheKey, {

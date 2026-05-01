@@ -823,3 +823,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-739` | `to-do` | Notion API Modernization Readiness | `docs/tasks/to-do/TASK-739-notion-api-modernization-readiness.md` |
 | `TASK-740` | `to-do` | Critical Metrics Change Safety Harness | `docs/tasks/to-do/TASK-740-critical-metrics-change-safety-harness.md` |
 | `TASK-741` | `to-do` | Greenhouse MCP Remote Gateway V1 | `docs/tasks/to-do/TASK-741-greenhouse-mcp-remote-gateway-v1.md` |
+| `TASK-742` | `in-progress` | Auth Resilience 7-Layer Architecture | `docs/tasks/in-progress/TASK-742-auth-resilience-7-layers.md` |
