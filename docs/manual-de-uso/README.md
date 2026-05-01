@@ -33,7 +33,7 @@ _Pendiente._
 
 ### Plataforma
 
-_Pendiente._
+- [MCP Greenhouse Read-Only](plataforma/mcp-greenhouse-read-only.md) — cómo levantar el MCP local, qué variables necesita, qué tools read-only existen hoy, qué límites de scope respeta y qué follow-ups siguen fuera de alcance.
 
 ## Plantilla recomendada
 
