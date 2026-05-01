@@ -1,5 +1,24 @@
 # Handoff.md
 
+## Sesion 2026-05-01 — EPIC-010 + TASK-760/761/762 creadas para Offboarding y Finiquitos
+
+- **Trigger**: usuario consultó si Greenhouse podía construir finiquitos y si dependía de implementar Onboarding primero.
+- **Resultado documental**:
+  - Nuevo epic `docs/epics/to-do/EPIC-010-workforce-offboarding-finiquito-foundation.md`.
+  - Nuevas tasks:
+    - `docs/tasks/to-do/TASK-760-workforce-offboarding-runtime-foundation.md`
+    - `docs/tasks/to-do/TASK-761-payroll-final-settlement-finiquito-engine-chile.md`
+    - `docs/tasks/to-do/TASK-762-finiquito-document-generation-approval-flow.md`
+  - Índices/registros sincronizados:
+    - `docs/epics/README.md`
+    - `docs/epics/EPIC_ID_REGISTRY.md`
+    - `docs/tasks/README.md`
+    - `docs/tasks/TASK_ID_REGISTRY.md`
+- **Decision de diseño**:
+  - Finiquitos **sí** se pueden construir, pero no deben arrancar desde Onboarding.
+  - El prerequisito correcto es una foundation de `OffboardingCase` canónico (`TASK-760`), seguida por un engine de settlement final/finiquito (`TASK-761`) y luego el documento/workflow de emisión (`TASK-762`).
+  - La arquitectura vigente de Offboarding declara explícitamente que V1 aún no incluye motor exhaustivo de finiquitos; estas tareas aterrizan ese gap como programa formal.
+
 ## Sesion 2026-05-01 — TASK-758 creada para hardening de recibos honorarios sin tocar cálculo
 
 - **Trigger**: usuario reportó incoherencia en PDF/recibo de Luis Reyes (`honorarios`) donde la retención/impuesto no se refleja correctamente en la surface, pero aclaró explícitamente que el cálculo actual de Payroll no debe tocarse.
