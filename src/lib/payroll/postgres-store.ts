@@ -32,6 +32,7 @@ import {
   PayrollValidationError,
   assertPayrollDateString,
   buildPeriodId,
+  getPayrollPeriodEndDate,
   normalizeBoolean,
   normalizeNullableString,
   normalizeString,
@@ -102,9 +103,6 @@ type PgCompensationRow = {
   created_at: string | Date | null
 }
 
-const buildPayrollPeriodIndicatorDate = (year: number, month: number) =>
-  `${year}-${String(month).padStart(2, '0')}-31`
-
 const resolvePayrollPeriodUfValue = async ({
   year,
   month,
@@ -120,7 +118,7 @@ const resolvePayrollPeriodUfValue = async ({
 
   const snapshot = await getHistoricalEconomicIndicatorForPeriod({
     indicatorCode: 'UF',
-    periodDate: buildPayrollPeriodIndicatorDate(year, month)
+    periodDate: getPayrollPeriodEndDate(year, month)
   })
 
   return snapshot?.value ?? null

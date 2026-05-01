@@ -8,6 +8,7 @@ import {
   buildPayrollQueryTypes,
   PayrollValidationError,
   buildPeriodId,
+  getPayrollPeriodEndDate,
   normalizeNullableString,
   runPayrollQuery,
   toNullableNumber,
@@ -57,9 +58,6 @@ type PayrollPeriodRow = {
 
 const getProjectId = () => getBigQueryProjectId()
 
-const buildPayrollPeriodIndicatorDate = (year: number, month: number) =>
-  `${year}-${String(month).padStart(2, '0')}-31`
-
 const resolvePayrollPeriodUfValue = async ({
   year,
   month,
@@ -75,7 +73,7 @@ const resolvePayrollPeriodUfValue = async ({
 
   const snapshot = await getHistoricalEconomicIndicatorForPeriod({
     indicatorCode: 'UF',
-    periodDate: buildPayrollPeriodIndicatorDate(year, month)
+    periodDate: getPayrollPeriodEndDate(year, month)
   })
 
   return snapshot?.value ?? null

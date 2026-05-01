@@ -207,6 +207,26 @@ export const getTableColumns = async (dataset: string, tableName: string) => {
 
 export const buildPeriodId = (year: number, month: number) => `${year}-${String(month).padStart(2, '0')}`
 
+export const getPayrollPeriodRange = (year: number, month: number) => {
+  if (!Number.isInteger(year) || !Number.isInteger(month) || month < 1 || month > 12) {
+    throw new PayrollValidationError('Invalid period id components.')
+  }
+
+  const start = new Date(Date.UTC(year, month - 1, 1))
+  const endExclusive = new Date(Date.UTC(year, month, 1))
+  const end = new Date(Date.UTC(year, month, 0))
+
+  return {
+    year,
+    month,
+    periodStart: start.toISOString().slice(0, 10),
+    periodEnd: end.toISOString().slice(0, 10),
+    periodEndExclusive: endExclusive.toISOString().slice(0, 10)
+  }
+}
+
+export const getPayrollPeriodEndDate = (year: number, month: number) => getPayrollPeriodRange(year, month).periodEnd
+
 export const getPeriodRangeFromId = (periodId: string) => {
   const match = /^(\d{4})-(\d{2})$/.exec(periodId)
 
@@ -217,21 +237,9 @@ export const getPeriodRangeFromId = (periodId: string) => {
   const year = Number(match[1])
   const month = Number(match[2])
 
-  if (!Number.isInteger(year) || !Number.isInteger(month) || month < 1 || month > 12) {
-    throw new PayrollValidationError('Invalid period id components.')
-  }
-
-  const start = new Date(Date.UTC(year, month - 1, 1))
-  const endExclusive = new Date(Date.UTC(year, month, 1))
-  const end = new Date(Date.UTC(year, month, 0))
-
   return {
     periodId,
-    year,
-    month,
-    periodStart: start.toISOString().slice(0, 10),
-    periodEnd: end.toISOString().slice(0, 10),
-    periodEndExclusive: endExclusive.toISOString().slice(0, 10)
+    ...getPayrollPeriodRange(year, month)
   }
 }
 

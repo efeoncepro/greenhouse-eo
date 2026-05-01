@@ -36,6 +36,10 @@ describe('pgUpdatePayrollPeriod', () => {
         return PAYROLL_REQUIRED_TABLES.map(qualified_name => ({ qualified_name }))
       }
 
+      if (text.includes("to_regclass('greenhouse_payroll.chile_tax_brackets')")) {
+        return [{ exists: true }]
+      }
+
       if (text.includes('SELECT * FROM greenhouse_payroll.payroll_periods')) {
         return [
           {
@@ -98,7 +102,7 @@ describe('pgUpdatePayrollPeriod', () => {
     expect(updated.periodId).toBe('2026-02')
     expect(updated.month).toBe(2)
     expect(updated.status).toBe('draft')
-    expect(mockRunGreenhousePostgresQuery).toHaveBeenCalledTimes(3)
+    expect(mockRunGreenhousePostgresQuery).toHaveBeenCalledTimes(4)
     expect(mockClientQuery).toHaveBeenCalledTimes(5)
 
     const selectUpdatedPeriodCall = mockClientQuery.mock.calls.find(call =>
@@ -112,6 +116,10 @@ describe('pgUpdatePayrollPeriod', () => {
     mockRunGreenhousePostgresQuery.mockImplementation(async (text: string) => {
       if (text.includes('FROM pg_tables')) {
         return PAYROLL_REQUIRED_TABLES.map(qualified_name => ({ qualified_name }))
+      }
+
+      if (text.includes("to_regclass('greenhouse_payroll.chile_tax_brackets')")) {
+        return [{ exists: true }]
       }
 
       if (text.includes('SELECT * FROM greenhouse_payroll.payroll_periods')) {
