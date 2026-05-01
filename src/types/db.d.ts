@@ -5401,6 +5401,49 @@ export interface GreenhouseServingAgencyPerformanceReports {
   trend_stable_band_pp: Numeric | null;
 }
 
+export interface GreenhouseServingAuthAttempts {
+  attempt_id: string;
+  attempted_at: Generated<Timestamp>;
+  /**
+   * First 2 characters of local part + domain. Example: ja***@efeoncepro.com
+   */
+  email_redacted: string | null;
+  ip_hashed: string | null;
+  /**
+   * First 4 + ellipsis + last 4 characters of the Azure AD object ID. Never the raw OID.
+   */
+  microsoft_oid_redacted: string | null;
+  microsoft_tenant_id: string | null;
+  outcome: string;
+  provider: string;
+  /**
+   * Stable enum: success, invalid_password, tenant_not_found, account_disabled, account_inactive, account_status_invalid, oid_mismatch, email_alias_mismatch, callback_exception, pg_lookup_failed, bigquery_fallback_failed, magic_link_expired, magic_link_used, magic_link_invalid, unknown
+   */
+  reason_code: string;
+  reason_redacted: string | null;
+  request_id: string | null;
+  stage: string;
+  user_agent_hash: string | null;
+  user_id_resolved: string | null;
+}
+
+export interface GreenhouseServingAuthMagicLinks {
+  expires_at: Timestamp;
+  requested_at: Generated<Timestamp>;
+  /**
+   * sha256(ip)[:32] for IP-level rate limiting and audit. Never the raw IP.
+   */
+  requested_ip_hashed: string | null;
+  /**
+   * bcrypt hash of the raw URL-safe random 32-byte token. Cost factor 10. Never the raw token.
+   */
+  token_hash_bcrypt: string;
+  token_id: string;
+  used_at: Timestamp | null;
+  used_ip_hashed: string | null;
+  user_id: string;
+}
+
 export interface GreenhouseServingClient360 {
   active: boolean | null;
   active_module_codes: string[] | null;
@@ -7592,6 +7635,8 @@ export interface DB {
   "greenhouse_payroll.previred_period_indicators": GreenhousePayrollPreviredPeriodIndicators;
   "greenhouse_payroll.projected_payroll_promotions": GreenhousePayrollProjectedPayrollPromotions;
   "greenhouse_serving.agency_performance_reports": GreenhouseServingAgencyPerformanceReports;
+  "greenhouse_serving.auth_attempts": GreenhouseServingAuthAttempts;
+  "greenhouse_serving.auth_magic_links": GreenhouseServingAuthMagicLinks;
   "greenhouse_serving.client_360": GreenhouseServingClient360;
   "greenhouse_serving.client_capability_360": GreenhouseServingClientCapability360;
   "greenhouse_serving.client_labor_cost_allocation": GreenhouseServingClientLaborCostAllocation;
