@@ -224,6 +224,14 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
     routeGroup: 'finance'
   },
   {
+    viewCode: 'finanzas.ordenes_pago',
+    section: 'finanzas',
+    label: 'Órdenes de pago',
+    description: 'Convierte obligaciones en órdenes auditables con maker-checker, programación y trazabilidad.',
+    routePath: '/finance/payment-orders',
+    routeGroup: 'finance'
+  },
+  {
     viewCode: 'finanzas.banco',
     section: 'finanzas',
     label: 'Banco',

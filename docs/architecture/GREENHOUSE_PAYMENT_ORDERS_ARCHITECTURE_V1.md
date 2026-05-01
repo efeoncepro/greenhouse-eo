@@ -1,5 +1,102 @@
 # Greenhouse Payment Orders Architecture V1
 
+## Delta 2026-05-01 — TASK-750: Payment Orders + Lines + Artifacts (runtime V1)
+
+Cierra la capa runtime entre `payment_obligations` y el pago real. Tres tablas
+nuevas, helpers core, API admin, UI con tabs (Obligaciones / Órdenes / Calendario
+/ Eventos) y entrada de menú dedicada.
+
+### Schema
+
+- `greenhouse_finance.payment_orders` — orden auditada con `state` machine de 10
+  estados (`draft` → `pending_approval` → `approved` → `scheduled` → `submitted`
+  → `paid` → `settled` → `closed`; ramas `failed` / `cancelled`).
+- `greenhouse_finance.payment_order_lines` — vincula 1:1 a obligations.
+  Idempotency partial unique index sobre `obligation_id WHERE state NOT IN
+  ('cancelled','failed')` lockea una obligation a UNA orden viva a la vez.
+- `greenhouse_finance.payment_order_artifacts` — batch CSV / receipt / proof
+  con `content_hash` SHA-256 + `download_log_json` para audit completo.
+
+### Reglas duras
+
+- **Maker-checker**: `approved_by != created_by` cuando `require_approval=TRUE`.
+  Triple defensa: trigger DB + helper TS + UI bloquea botón.
+- **Currency uniforme**: V1 no soporta orders con monedas mixtas. Crear una
+  orden por moneda (CLP separada de USD).
+- **Cancelar libera locks**: cancelar order marca lines como `cancelled` y
+  restituye obligations a `generated` (las suelta para nueva orden).
+- **Order aprobada inmuta**: cambios crean nueva order + cancel de la anterior
+  via `superseded_by`. No se mutan amounts ni beneficiarios in-place.
+- **Cascade en mark-paid**: marca solo obligations cuyas lines TODAS quedaron
+  pagadas (soporte futuro a partial payments multi-line).
+
+### Helpers TS canónicos
+
+- `createPaymentOrderFromObligations(input)` — locking transaccional + outbox.
+- `approvePaymentOrder(input)` — maker-checker + outbox.
+- `schedulePaymentOrder({ orderId, scheduledFor })` — fecha calendario.
+- `submitPaymentOrder({ orderId, externalReference? })` — marca enviada.
+- `markPaymentOrderPaid({ orderId, paidAt?, externalReference? })` — cierra
+  ciclo runtime (la conciliación bancaria sigue siendo TASK-722).
+- `cancelPaymentOrder({ orderId, reason })` — libera locks.
+
+### Payment Calendar reader
+
+- `listPaymentCalendarItems(filters)` compone obligations + orders con un
+  `calendar_state` derivado en SQL (overdue, ready_to_schedule, scheduled,
+  submission_due, awaiting_confirmation, awaiting_reconciliation, closed).
+- Solo lectura; no recalcula montos. Filtros por space/period/currency/date
+  range/calendar_state/item_kind.
+
+### API admin
+
+- `GET /api/admin/finance/payment-orders` — listar con filtros + paginación.
+- `POST /api/admin/finance/payment-orders` — crear orden desde obligationIds.
+- `GET /api/admin/finance/payment-orders/:id` — detalle con lines + artifacts.
+- `POST /api/admin/finance/payment-orders/:id/{approve,cancel,schedule,submit,mark-paid}` — actions.
+- `GET /api/admin/finance/payment-orders/kpis` — KPIs del header.
+- `GET /api/admin/finance/payment-calendar` — calendar reader.
+
+### Permisos / View Registry
+
+- View code: `finanzas.ordenes_pago` (route_path `/finance/payment-orders`).
+- Roles seed: `efeonce_admin`, `finance_admin`, `finance_manager`,
+  `finance_analyst` (migration `20260501145618269`).
+- Guard de página: `hasRouteGroup('finance')` || `EFEONCE_ADMIN`.
+- Guard de API: `requireFinanceTenantContext`.
+
+### Eventos outbox emitidos
+
+- `finance.payment_order.created`
+- `finance.payment_order.approved`
+- `finance.payment_order.scheduled`
+- `finance.payment_order.submitted`
+- `finance.payment_order.paid`
+- `finance.payment_order.cancelled`
+- `finance.payment_order_artifact.generated` (V2)
+- `finance.payment_order_artifact.downloaded` (V2)
+
+### Coexistencia con expenses + reconciliation
+
+- `expense_payments` (TASK-722) sigue siendo la fuente de verdad del cash flow
+  efectivo. `mark-paid` NO crea automáticamente `expense_payments` en V1 — eso
+  queda en TASK-751 cuando se integre con el motor de reconciliation.
+- `payment_orders` es la capa runtime de planificación + aprobación + envío.
+- `payment_obligations` (TASK-748) es la capa de obligación componentizada.
+
+### UI canónica
+
+- Page: `/finance/payment-orders` (`src/app/(dashboard)/finance/payment-orders/page.tsx`).
+- View: `src/views/greenhouse/finance/payment-orders/PaymentOrdersView.tsx`.
+- 4 tabs: Obligaciones (selección bulk + create), Órdenes (tabla con drawer detail),
+  Calendario, Eventos (catálogo).
+- DataTableShell + EmptyState + sonner toasts. Bulk action bar con
+  `role='status' aria-live='polite'`.
+- Detail drawer: lineas + acciones contextuales por estado + audit timeline.
+
+Spec consumers downstream: TASK-751 (reconciliation runtime — wireup `expense_payments`
+desde order paid), TASK-752 (artifacts batch CSV generator).
+
 ## Delta 2026-05-01 — TASK-748: Payment Obligations Foundation
 
 Se introduce la primera capa canonica del programa Payment Orders: la tabla

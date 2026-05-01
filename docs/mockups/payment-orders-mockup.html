@@ -1,0 +1,1257 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Greenhouse Payment Orders — Mockup V1</title>
+    <style>
+      :root {
+        --gh-midnight: #022a4e;
+        --gh-blue: #0375db;
+        --gh-purple: #7367f0;
+        --gh-green: #6ec207;
+        --gh-leaf: #4caf6e;
+        --gh-cyan: #00bad1;
+        --gh-orange: #ff6500;
+        --gh-red: #bb1954;
+        --gh-gray: #808390;
+
+        --gh-bg: #f8f7fa;
+        --gh-surface: #ffffff;
+        --gh-soft-blue: #eaf3fc;
+        --gh-soft-purple: #efeefe;
+        --gh-soft-green: #edf7f0;
+        --gh-soft-cyan: #e6f7fa;
+        --gh-soft-orange: #fff2ea;
+        --gh-soft-red: #f9ecf1;
+        --gh-soft-gray: #f1f2f4;
+
+        --gh-border: #e5e7eb;
+        --gh-border-strong: #d0d5dd;
+        --gh-text-muted: #667085;
+        --gh-text-faint: #98a2b3;
+        --gh-shadow-sm: 0 2px 8px rgb(2 42 78 / 0.04);
+        --gh-shadow: 0 18px 42px rgb(2 42 78 / 0.08);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        color: var(--gh-midnight);
+        background:
+          radial-gradient(circle at top left, rgb(115 103 240 / 0.08), transparent 38rem),
+          linear-gradient(180deg, #ffffff 0%, var(--gh-bg) 42%);
+        font-family: "DM Sans", "Poppins", Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        font-feature-settings: "tnum";
+      }
+
+      .page {
+        max-width: 1440px;
+        margin: 0 auto;
+        padding: 32px;
+      }
+
+      /* ───── Hero & decisión ───── */
+
+      .hero {
+        display: grid;
+        grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+        gap: 24px;
+        margin-bottom: 24px;
+      }
+
+      .panel {
+        border: 1px solid var(--gh-border);
+        border-radius: 16px;
+        background: var(--gh-surface);
+        box-shadow: var(--gh-shadow-sm);
+      }
+
+      .hero-copy {
+        padding: 28px;
+        border: 1px solid var(--gh-border);
+        border-radius: 18px;
+        background: rgb(255 255 255 / 0.92);
+        box-shadow: var(--gh-shadow);
+      }
+
+      .eyebrow {
+        margin: 0 0 10px;
+        color: var(--gh-purple);
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      h1 {
+        margin: 0 0 12px;
+        font-size: 28px;
+        line-height: 1.15;
+        letter-spacing: -0.01em;
+      }
+
+      .lead {
+        margin: 0 0 16px;
+        color: var(--gh-text-muted);
+        font-size: 14px;
+        line-height: 1.55;
+      }
+
+      .lead strong {
+        color: var(--gh-midnight);
+      }
+
+      .pill-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 12px;
+      }
+
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+      }
+
+      .pill-blue { background: var(--gh-soft-blue); color: var(--gh-blue); }
+      .pill-purple { background: var(--gh-soft-purple); color: var(--gh-purple); }
+      .pill-green { background: var(--gh-soft-green); color: #1b7a4e; }
+      .pill-orange { background: var(--gh-soft-orange); color: #b34504; }
+      .pill-red { background: var(--gh-soft-red); color: var(--gh-red); }
+      .pill-cyan { background: var(--gh-soft-cyan); color: #007a8a; }
+      .pill-gray { background: var(--gh-soft-gray); color: #4b5563; }
+
+      .decision-card {
+        padding: 24px;
+        border: 1px dashed var(--gh-purple);
+        border-radius: 18px;
+        background: rgb(115 103 240 / 0.04);
+      }
+
+      .decision-card h2 {
+        margin: 0 0 12px;
+        font-size: 16px;
+        color: var(--gh-purple);
+      }
+
+      .decision-card ul {
+        margin: 0;
+        padding-left: 18px;
+        color: var(--gh-midnight);
+        font-size: 13px;
+        line-height: 1.6;
+      }
+
+      .decision-card li + li {
+        margin-top: 4px;
+      }
+
+      .decision-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 16px;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 14px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: 0.01em;
+        cursor: pointer;
+        transition: transform 150ms ease-out, box-shadow 150ms ease-out, background 150ms ease-out;
+        border: 1px solid transparent;
+      }
+
+      .btn:hover { transform: translateY(-1px); box-shadow: var(--gh-shadow-sm); }
+      .btn:focus-visible { outline: 2px solid var(--gh-purple); outline-offset: 2px; }
+
+      .btn-primary { background: var(--gh-purple); color: white; }
+      .btn-tonal { background: var(--gh-soft-purple); color: var(--gh-purple); }
+      .btn-outline { background: white; color: var(--gh-midnight); border-color: var(--gh-border-strong); }
+      .btn-ghost { background: transparent; color: var(--gh-text-muted); }
+      .btn-danger { background: var(--gh-red); color: white; }
+      .btn-success { background: #1b7a4e; color: white; }
+
+      /* ───── KPI row ───── */
+
+      .kpi-row {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 16px;
+        margin-bottom: 24px;
+      }
+
+      .kpi-card {
+        padding: 18px;
+        border: 1px solid var(--gh-border);
+        border-radius: 14px;
+        background: var(--gh-surface);
+        box-shadow: var(--gh-shadow-sm);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .kpi-card::before {
+        content: "";
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 3px;
+        background: var(--gh-purple);
+      }
+      .kpi-card.green::before { background: var(--gh-green); }
+      .kpi-card.orange::before { background: var(--gh-orange); }
+      .kpi-card.cyan::before { background: var(--gh-cyan); }
+      .kpi-card.red::before { background: var(--gh-red); }
+
+      .kpi-label {
+        margin: 0 0 6px;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--gh-text-muted);
+      }
+
+      .kpi-value {
+        font-size: 26px;
+        font-weight: 600;
+        font-feature-settings: "tnum";
+        letter-spacing: -0.01em;
+      }
+
+      .kpi-sub {
+        margin-top: 6px;
+        font-size: 12px;
+        color: var(--gh-text-muted);
+      }
+
+      .kpi-trend-up { color: #1b7a4e; }
+      .kpi-trend-down { color: var(--gh-red); }
+      .kpi-trend-flat { color: var(--gh-text-muted); }
+
+      /* ───── Tabs ───── */
+
+      .tabs {
+        display: flex;
+        gap: 4px;
+        margin-bottom: 16px;
+        border-bottom: 1px solid var(--gh-border);
+      }
+
+      .tab {
+        padding: 10px 14px;
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--gh-text-muted);
+        background: transparent;
+        border: none;
+        border-bottom: 2px solid transparent;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .tab.active {
+        color: var(--gh-purple);
+        border-bottom-color: var(--gh-purple);
+        font-weight: 600;
+      }
+
+      .tab .badge {
+        background: var(--gh-soft-purple);
+        color: var(--gh-purple);
+        font-size: 10px;
+        padding: 2px 6px;
+        border-radius: 999px;
+        font-weight: 700;
+      }
+
+      .tab.active .badge { background: var(--gh-purple); color: white; }
+
+      /* ───── Filters ───── */
+
+      .filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+        margin-bottom: 16px;
+      }
+
+      .filter-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 6px 12px;
+        border: 1px solid var(--gh-border);
+        background: white;
+        color: var(--gh-midnight);
+        border-radius: 999px;
+        font-size: 12px;
+        cursor: pointer;
+      }
+
+      .filter-chip.active {
+        background: var(--gh-soft-purple);
+        border-color: var(--gh-purple);
+        color: var(--gh-purple);
+      }
+
+      .filter-search {
+        flex: 1;
+        min-width: 240px;
+        padding: 8px 12px;
+        border: 1px solid var(--gh-border);
+        border-radius: 8px;
+        font-size: 13px;
+      }
+
+      /* ───── Table ───── */
+
+      .table-card {
+        border: 1px solid var(--gh-border);
+        border-radius: 14px;
+        background: var(--gh-surface);
+        overflow: hidden;
+      }
+
+      .table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+      }
+
+      .table thead {
+        background: #fafafa;
+        border-bottom: 1px solid var(--gh-border);
+      }
+
+      .table th {
+        text-align: left;
+        padding: 10px 12px;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--gh-text-muted);
+        font-weight: 600;
+      }
+
+      .table th.right, .table td.right { text-align: right; }
+      .table th.center, .table td.center { text-align: center; }
+
+      .table td {
+        padding: 12px;
+        vertical-align: middle;
+        border-bottom: 1px solid #f3f4f6;
+      }
+
+      .table tr:last-child td { border-bottom: none; }
+
+      .table tr:hover td {
+        background: #fafbfc;
+      }
+
+      .table tr.selected td {
+        background: var(--gh-soft-purple);
+      }
+
+      .row-checkbox {
+        accent-color: var(--gh-purple);
+      }
+
+      .beneficiary-cell {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: var(--gh-soft-purple);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--gh-purple);
+        flex-shrink: 0;
+      }
+
+      .avatar.supplier { background: var(--gh-soft-blue); color: var(--gh-blue); }
+      .avatar.tax { background: var(--gh-soft-orange); color: #b34504; }
+
+      .beneficiary-meta {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+
+      .beneficiary-name { font-weight: 500; }
+      .beneficiary-id {
+        font-size: 11px;
+        color: var(--gh-text-faint);
+        font-feature-settings: "tnum";
+      }
+
+      .amount {
+        font-feature-settings: "tnum";
+        font-weight: 500;
+      }
+
+      .currency {
+        font-size: 10px;
+        color: var(--gh-text-muted);
+        margin-left: 4px;
+      }
+
+      .status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 3px 9px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 600;
+      }
+
+      .status-generated { background: var(--gh-soft-purple); color: var(--gh-purple); }
+      .status-scheduled { background: var(--gh-soft-cyan); color: #007a8a; }
+      .status-paid { background: var(--gh-soft-green); color: #1b7a4e; }
+      .status-reconciled { background: #e7f1ff; color: #0958d9; }
+      .status-partially { background: var(--gh-soft-orange); color: #b34504; }
+      .status-cancelled { background: var(--gh-soft-gray); color: #4b5563; }
+      .status-superseded { background: #fef3c7; color: #b45309; }
+
+      .row-actions {
+        display: flex;
+        gap: 4px;
+        justify-content: flex-end;
+      }
+
+      .icon-btn {
+        width: 30px;
+        height: 30px;
+        border-radius: 6px;
+        background: transparent;
+        border: 1px solid transparent;
+        color: var(--gh-text-muted);
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 150ms ease-out, color 150ms ease-out;
+      }
+
+      .icon-btn:hover {
+        background: var(--gh-soft-purple);
+        color: var(--gh-purple);
+      }
+
+      .icon-btn:focus-visible {
+        outline: 2px solid var(--gh-purple);
+        outline-offset: 1px;
+      }
+
+      /* ───── Bulk action bar ───── */
+
+      .bulk-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 12px 16px;
+        background: var(--gh-purple);
+        color: white;
+        border-radius: 12px;
+        margin-bottom: 16px;
+        box-shadow: var(--gh-shadow);
+      }
+
+      .bulk-bar-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 13px;
+      }
+
+      .bulk-bar-count {
+        background: rgb(255 255 255 / 0.18);
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-weight: 600;
+      }
+
+      .bulk-bar-actions {
+        display: flex;
+        gap: 8px;
+      }
+
+      .bulk-bar .btn-primary {
+        background: white;
+        color: var(--gh-purple);
+      }
+
+      .bulk-bar .btn-ghost {
+        color: rgb(255 255 255 / 0.85);
+      }
+
+      /* ───── Drawer ───── */
+
+      .drawer {
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: 480px;
+        background: var(--gh-surface);
+        box-shadow: -8px 0 32px rgb(2 42 78 / 0.12);
+        border-left: 1px solid var(--gh-border);
+        z-index: 50;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .drawer-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 20px 24px;
+        border-bottom: 1px solid var(--gh-border);
+      }
+
+      .drawer-header h3 {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 600;
+      }
+
+      .drawer-meta {
+        font-size: 11px;
+        color: var(--gh-text-muted);
+        margin-top: 2px;
+        font-feature-settings: "tnum";
+      }
+
+      .drawer-body {
+        padding: 20px 24px;
+        overflow-y: auto;
+        flex: 1;
+      }
+
+      .section-title {
+        margin: 0 0 12px;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--gh-text-muted);
+        font-weight: 600;
+      }
+
+      .section + .section { margin-top: 24px; }
+
+      .data-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px 16px;
+      }
+
+      .data-grid .label {
+        font-size: 11px;
+        color: var(--gh-text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+      }
+
+      .data-grid .value {
+        font-size: 13px;
+        font-weight: 500;
+        margin-top: 2px;
+        font-feature-settings: "tnum";
+      }
+
+      .timeline {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .timeline-item {
+        display: flex;
+        gap: 12px;
+        padding-bottom: 12px;
+        border-bottom: 1px dashed #f3f4f6;
+      }
+
+      .timeline-item:last-child { border-bottom: none; }
+
+      .timeline-dot {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: var(--gh-soft-purple);
+        color: var(--gh-purple);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        flex-shrink: 0;
+      }
+
+      .timeline-dot.green { background: var(--gh-soft-green); color: #1b7a4e; }
+      .timeline-dot.cyan { background: var(--gh-soft-cyan); color: #007a8a; }
+      .timeline-dot.orange { background: var(--gh-soft-orange); color: #b34504; }
+
+      .timeline-text {
+        flex: 1;
+      }
+
+      .timeline-title {
+        font-size: 13px;
+        font-weight: 500;
+      }
+
+      .timeline-time {
+        font-size: 11px;
+        color: var(--gh-text-faint);
+        font-feature-settings: "tnum";
+      }
+
+      .drawer-footer {
+        padding: 16px 24px;
+        border-top: 1px solid var(--gh-border);
+        display: flex;
+        gap: 8px;
+        justify-content: flex-end;
+        background: #fafafa;
+      }
+
+      /* ───── Empty / loading ───── */
+
+      .empty-card {
+        padding: 40px 24px;
+        text-align: center;
+        color: var(--gh-text-muted);
+      }
+
+      .empty-card .icon {
+        font-size: 36px;
+        margin-bottom: 12px;
+        opacity: 0.6;
+      }
+
+      .skeleton-row td {
+        padding: 14px 12px;
+      }
+
+      .skeleton {
+        height: 12px;
+        background: linear-gradient(90deg, #f3f4f6, #e5e7eb, #f3f4f6);
+        background-size: 200% 100%;
+        animation: shimmer 1.6s linear infinite;
+        border-radius: 4px;
+      }
+
+      @keyframes shimmer {
+        0% { background-position: 200% 0; }
+        100% { background-position: -200% 0; }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .skeleton { animation: none; }
+        * { transition: none !important; animation-duration: 0.001ms !important; }
+      }
+
+      /* ───── Drift health card ───── */
+
+      .health-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin-bottom: 24px;
+      }
+
+      .health-card {
+        padding: 20px;
+        border: 1px solid var(--gh-border);
+        border-radius: 14px;
+        background: var(--gh-surface);
+        box-shadow: var(--gh-shadow-sm);
+      }
+
+      .health-card.warn {
+        border-left: 4px solid var(--gh-orange);
+        background: linear-gradient(180deg, var(--gh-soft-orange) 0%, white 24px);
+      }
+
+      .health-card.ok {
+        border-left: 4px solid var(--gh-green);
+        background: linear-gradient(180deg, var(--gh-soft-green) 0%, white 24px);
+      }
+
+      .health-title {
+        margin: 0 0 4px;
+        font-size: 14px;
+        font-weight: 600;
+      }
+
+      .health-sub {
+        margin: 0 0 12px;
+        font-size: 12px;
+        color: var(--gh-text-muted);
+      }
+
+      .health-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 6px 0;
+        font-size: 13px;
+      }
+
+      .health-row + .health-row {
+        border-top: 1px dashed #f3f4f6;
+      }
+
+      /* ───── Footnote ───── */
+
+      .notes {
+        margin-top: 32px;
+        padding: 24px;
+        border: 1px solid var(--gh-border);
+        border-radius: 14px;
+        background: rgb(255 255 255 / 0.65);
+        font-size: 12px;
+        color: var(--gh-text-muted);
+        line-height: 1.6;
+      }
+
+      .notes strong { color: var(--gh-midnight); }
+      .notes code {
+        background: var(--gh-soft-gray);
+        padding: 1px 6px;
+        border-radius: 4px;
+        font-size: 11px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page" role="main">
+
+      <!-- ─── HERO ─── -->
+      <section class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">Mockup · Payment Orders V1 · Pendiente aprobación</p>
+          <h1>Tesorería convierte obligaciones en pagos ejecutables, sin tocar el cálculo de Payroll.</h1>
+          <p class="lead">
+            <strong>Payment Obligations</strong> (TASK-748) ya está activa: cada periodo exportado materializa qué se debe pagar, a quién, en qué moneda y por qué motivo.
+            Esta vista es la propuesta para que Tesorería <strong>las planifique, agrupe en órdenes, apruebe y libere a procesador</strong>.
+            Espacios siguen viendo P&amp;L por <code>expenses</code>; obligations es la fuente de verdad de pago.
+          </p>
+          <div class="pill-row" aria-label="Estados de obligación">
+            <span class="pill pill-purple"><span aria-hidden="true">●</span> Generada</span>
+            <span class="pill pill-cyan"><span aria-hidden="true">●</span> Programada</span>
+            <span class="pill pill-orange"><span aria-hidden="true">●</span> Parcial</span>
+            <span class="pill pill-green"><span aria-hidden="true">●</span> Pagada</span>
+            <span class="pill pill-blue"><span aria-hidden="true">●</span> Conciliada</span>
+            <span class="pill pill-gray"><span aria-hidden="true">●</span> Anulada</span>
+          </div>
+        </div>
+
+        <aside class="decision-card" aria-labelledby="decisiones">
+          <h2 id="decisiones">Decisiones pendientes</h2>
+          <ul>
+            <li>¿Maker-checker requerido para órdenes &gt; CLP 5.000.000 o universal?</li>
+            <li>Comisiones de procesador (Banco Santander, Global66, Deel) ¿se materializan como obligation <code>processor_fee</code> o se imputan en settlement?</li>
+            <li>Vista por colaborador para "ver mis pagos pendientes" en <em>Mi Greenhouse</em>: ¿incluida en V1 o follow-up?</li>
+            <li>FX para órdenes USD: locking del tipo de cambio al momento de programar vs al momento de pagar.</li>
+          </ul>
+          <div class="decision-actions">
+            <button class="btn btn-primary" type="button">Aprobar mockup</button>
+            <button class="btn btn-tonal" type="button">Pedir ajustes</button>
+            <button class="btn btn-outline" type="button">Comparar con Stripe / Linear</button>
+          </div>
+        </aside>
+      </section>
+
+      <!-- ─── KPI ROW ─── -->
+      <section class="kpi-row" aria-label="Indicadores Treasury">
+        <article class="kpi-card" aria-label="Por programar: 23 obligaciones, $24,5M CLP">
+          <p class="kpi-label">Por programar</p>
+          <p class="kpi-value">23 <span style="font-size: 14px; color: var(--gh-text-muted); font-weight: 400;">obligaciones</span></p>
+          <p class="kpi-sub kpi-trend-flat">$ 24.532.180 CLP equiv.</p>
+        </article>
+        <article class="kpi-card cyan" aria-label="Programadas para esta semana: 18 obligaciones">
+          <p class="kpi-label">Esta semana</p>
+          <p class="kpi-value">18</p>
+          <p class="kpi-sub kpi-trend-flat">Vencen entre lun 04 y vie 08 may</p>
+        </article>
+        <article class="kpi-card orange" aria-label="Vencidas: 2 obligaciones, requieren atención">
+          <p class="kpi-label">Vencidas</p>
+          <p class="kpi-value">2</p>
+          <p class="kpi-sub kpi-trend-down">2 días en atraso · Acción inmediata</p>
+        </article>
+        <article class="kpi-card green" aria-label="Pagadas en el último periodo: 41 obligaciones, $58,2M CLP">
+          <p class="kpi-label">Pagadas (abr 2026)</p>
+          <p class="kpi-value">41</p>
+          <p class="kpi-sub kpi-trend-up">$ 58.214.022 CLP equiv. · 100% conciliadas</p>
+        </article>
+      </section>
+
+      <!-- ─── DRIFT HEALTH ─── -->
+      <section class="health-grid" aria-label="Salud de obligaciones vs expenses">
+        <article class="health-card ok">
+          <p class="health-title">Bridge Payroll → Obligations</p>
+          <p class="health-sub">Última materialización: <strong>1 may 2026, 13:02 CLT</strong> · periodo 2026-04</p>
+          <div class="health-row"><span>Entries activos</span><strong>6</strong></div>
+          <div class="health-row"><span>Net pay obligations</span><strong>5</strong></div>
+          <div class="health-row"><span>SII honorarios</span><strong>2</strong></div>
+          <div class="health-row"><span>Provider Deel placeholder</span><strong>3</strong></div>
+          <div class="health-row"><span>Employer SS Previred</span><strong>1</strong></div>
+        </article>
+        <article class="health-card ok">
+          <p class="health-title">Drift obligations vs expenses</p>
+          <p class="health-sub">Comparación per periodo · Cero diferencia tolerada</p>
+          <div class="health-row"><span>Periodo 2026-04</span><span class="pill pill-green">Sin drift</span></div>
+          <div class="health-row"><span>Periodo 2026-03</span><span class="pill pill-green">Sin drift</span></div>
+          <div class="health-row"><span>Periodo 2026-02</span><span class="pill pill-orange">2 obligations sin expense</span></div>
+          <div class="health-row"><span>Periodo 2026-01</span><span class="pill pill-green">Sin drift</span></div>
+        </article>
+      </section>
+
+      <!-- ─── TABS ─── -->
+      <nav class="tabs" role="tablist" aria-label="Vistas de Treasury">
+        <button class="tab active" role="tab" aria-selected="true" aria-controls="panel-obligations">
+          Obligaciones <span class="badge">23</span>
+        </button>
+        <button class="tab" role="tab" aria-selected="false">Órdenes de pago <span class="badge">7</span></button>
+        <button class="tab" role="tab" aria-selected="false">Conciliación</button>
+        <button class="tab" role="tab" aria-selected="false">Eventos del outbox</button>
+      </nav>
+
+      <!-- ─── BULK BAR ─── -->
+      <div class="bulk-bar" role="status" aria-live="polite">
+        <div class="bulk-bar-left">
+          <span class="bulk-bar-count">3 seleccionadas</span>
+          <span>$ 1.610 USD · todas con beneficiario USD · listo para 1 sola orden</span>
+        </div>
+        <div class="bulk-bar-actions">
+          <button class="btn btn-ghost" type="button">Limpiar selección</button>
+          <button class="btn btn-outline" type="button">Programar para...</button>
+          <button class="btn btn-primary" type="button">Crear orden de pago →</button>
+        </div>
+      </div>
+
+      <!-- ─── FILTERS ─── -->
+      <div class="filters" role="toolbar" aria-label="Filtros de obligaciones">
+        <input class="filter-search" type="search" placeholder="Buscar por beneficiario, motivo o ID…" aria-label="Buscar obligaciones" />
+        <button class="filter-chip active" type="button" aria-pressed="true">Todas (23)</button>
+        <button class="filter-chip" type="button" aria-pressed="false">Por programar (23)</button>
+        <button class="filter-chip" type="button" aria-pressed="false">Vencidas (2)</button>
+        <button class="filter-chip" type="button" aria-pressed="false">Solo USD</button>
+        <button class="filter-chip" type="button" aria-pressed="false">Periodo: 2026-04</button>
+        <button class="filter-chip" type="button" aria-pressed="false">Source: Payroll</button>
+        <button class="btn btn-ghost" type="button" style="margin-left: auto;">Limpiar filtros</button>
+      </div>
+
+      <!-- ─── TABLE ─── -->
+      <section class="table-card" id="panel-obligations" role="tabpanel" aria-label="Lista de obligaciones de pago">
+        <table class="table" aria-label="Obligaciones de pago" aria-rowcount="23">
+          <thead>
+            <tr>
+              <th style="width: 28px;"><input type="checkbox" class="row-checkbox" aria-label="Seleccionar todas las visibles" /></th>
+              <th>Beneficiario</th>
+              <th>Tipo de obligación</th>
+              <th>Periodo</th>
+              <th>Vence</th>
+              <th class="right">Monto</th>
+              <th class="center">Estado</th>
+              <th class="right">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Row 1 — selected, USD, employee_net_pay -->
+            <tr class="selected">
+              <td><input type="checkbox" class="row-checkbox" checked aria-label="Seleccionar Andrés Carlosama" /></td>
+              <td>
+                <div class="beneficiary-cell">
+                  <span class="avatar" aria-hidden="true">AC</span>
+                  <div class="beneficiary-meta">
+                    <span class="beneficiary-name">Andrés Carlosama</span>
+                    <span class="beneficiary-id">member · Deel</span>
+                  </div>
+                </div>
+              </td>
+              <td><span class="pill pill-purple">Pago neto</span></td>
+              <td>2026-04</td>
+              <td>30 abr 2026</td>
+              <td class="right amount">913,74<span class="currency">USD</span></td>
+              <td class="center"><span class="status-pill status-generated">● Generada</span></td>
+              <td class="right">
+                <div class="row-actions">
+                  <button class="icon-btn" type="button" title="Ver detalle" aria-label="Ver detalle de obligación de Andrés Carlosama">i</button>
+                  <button class="icon-btn" type="button" title="Programar" aria-label="Programar pago">⏱</button>
+                  <button class="icon-btn" type="button" title="Más" aria-label="Más acciones">⋯</button>
+                </div>
+              </td>
+            </tr>
+
+            <!-- Row 2 — selected, USD, provider_payroll Deel -->
+            <tr class="selected">
+              <td><input type="checkbox" class="row-checkbox" checked /></td>
+              <td>
+                <div class="beneficiary-cell">
+                  <span class="avatar" aria-hidden="true">DF</span>
+                  <div class="beneficiary-meta">
+                    <span class="beneficiary-name">Daniela Ferreira</span>
+                    <span class="beneficiary-id">member · Deel · placeholder</span>
+                  </div>
+                </div>
+              </td>
+              <td><span class="pill pill-blue">Provider Deel</span></td>
+              <td>2026-04</td>
+              <td>30 abr 2026</td>
+              <td class="right amount">0,00<span class="currency">USD</span> <span class="pill pill-gray" style="margin-left: 6px;">ref. 1.250 USD</span></td>
+              <td class="center"><span class="status-pill status-generated">● Generada</span></td>
+              <td class="right">
+                <div class="row-actions">
+                  <button class="icon-btn" type="button">i</button>
+                  <button class="icon-btn" type="button">⋯</button>
+                </div>
+              </td>
+            </tr>
+
+            <!-- Row 3 — selected, USD, employee_net_pay (Melkin con descuento aplicado) -->
+            <tr class="selected">
+              <td><input type="checkbox" class="row-checkbox" checked /></td>
+              <td>
+                <div class="beneficiary-cell">
+                  <span class="avatar" aria-hidden="true">MH</span>
+                  <div class="beneficiary-meta">
+                    <span class="beneficiary-name">Melkin Hernández</span>
+                    <span class="beneficiary-id">member · Deel</span>
+                  </div>
+                </div>
+              </td>
+              <td><span class="pill pill-purple">Pago neto</span> <span class="pill pill-orange" style="margin-left: 4px;">Ajuste 95 USD</span></td>
+              <td>2026-04</td>
+              <td>30 abr 2026</td>
+              <td class="right amount">758,75<span class="currency">USD</span></td>
+              <td class="center"><span class="status-pill status-generated">● Generada</span></td>
+              <td class="right">
+                <div class="row-actions">
+                  <button class="icon-btn" type="button">i</button>
+                  <button class="icon-btn" type="button">⏱</button>
+                  <button class="icon-btn" type="button">⋯</button>
+                </div>
+              </td>
+            </tr>
+
+            <!-- Row 4 — CLP honorarios neto -->
+            <tr>
+              <td><input type="checkbox" class="row-checkbox" /></td>
+              <td>
+                <div class="beneficiary-cell">
+                  <span class="avatar" aria-hidden="true">VH</span>
+                  <div class="beneficiary-meta">
+                    <span class="beneficiary-name">Valentina Hoyos</span>
+                    <span class="beneficiary-id">member · Honorarios</span>
+                  </div>
+                </div>
+              </td>
+              <td><span class="pill pill-purple">Pago neto</span></td>
+              <td>2026-04</td>
+              <td>30 abr 2026</td>
+              <td class="right amount">832.944<span class="currency">CLP</span></td>
+              <td class="center"><span class="status-pill status-generated">● Generada</span></td>
+              <td class="right">
+                <div class="row-actions">
+                  <button class="icon-btn" type="button">i</button>
+                  <button class="icon-btn" type="button">⏱</button>
+                  <button class="icon-btn" type="button">⋯</button>
+                </div>
+              </td>
+            </tr>
+
+            <!-- Row 5 — SII honorarios -->
+            <tr>
+              <td><input type="checkbox" class="row-checkbox" /></td>
+              <td>
+                <div class="beneficiary-cell">
+                  <span class="avatar tax" aria-hidden="true">SII</span>
+                  <div class="beneficiary-meta">
+                    <span class="beneficiary-name">Servicio de Impuestos Internos</span>
+                    <span class="beneficiary-id">tax_authority · cl_sii</span>
+                  </div>
+                </div>
+              </td>
+              <td><span class="pill pill-orange">Retención SII honorarios</span></td>
+              <td>2026-04</td>
+              <td>12 may 2026 <span style="color:var(--gh-red); font-size:10px; margin-left:4px;">en 11 días</span></td>
+              <td class="right amount">237.757<span class="currency">CLP</span></td>
+              <td class="center"><span class="status-pill status-generated">● Generada</span></td>
+              <td class="right">
+                <div class="row-actions">
+                  <button class="icon-btn" type="button">i</button>
+                  <button class="icon-btn" type="button">⏱</button>
+                  <button class="icon-btn" type="button">⋯</button>
+                </div>
+              </td>
+            </tr>
+
+            <!-- Row 6 — Previred consolidado -->
+            <tr>
+              <td><input type="checkbox" class="row-checkbox" /></td>
+              <td>
+                <div class="beneficiary-cell">
+                  <span class="avatar supplier" aria-hidden="true">PV</span>
+                  <div class="beneficiary-meta">
+                    <span class="beneficiary-name">Previred</span>
+                    <span class="beneficiary-id">supplier · sup-previred-001</span>
+                  </div>
+                </div>
+              </td>
+              <td><span class="pill pill-cyan">Cargas previsionales</span></td>
+              <td>2026-04</td>
+              <td>10 may 2026</td>
+              <td class="right amount">412.085<span class="currency">CLP</span></td>
+              <td class="center"><span class="status-pill status-scheduled">● Programada</span></td>
+              <td class="right">
+                <div class="row-actions">
+                  <button class="icon-btn" type="button">i</button>
+                  <button class="icon-btn" type="button">⋯</button>
+                </div>
+              </td>
+            </tr>
+
+            <!-- Row 7 — Vencida -->
+            <tr>
+              <td><input type="checkbox" class="row-checkbox" /></td>
+              <td>
+                <div class="beneficiary-cell">
+                  <span class="avatar supplier" aria-hidden="true">SF</span>
+                  <div class="beneficiary-meta">
+                    <span class="beneficiary-name">Software Factory SpA</span>
+                    <span class="beneficiary-id">supplier · sup-sw-014</span>
+                  </div>
+                </div>
+              </td>
+              <td><span class="pill pill-gray">Manual</span></td>
+              <td>2026-03</td>
+              <td><span style="color: var(--gh-red); font-weight: 500;">29 abr 2026 · 2 días vencida</span></td>
+              <td class="right amount">1.180.000<span class="currency">CLP</span></td>
+              <td class="center"><span class="status-pill status-partially">● Parcial</span></td>
+              <td class="right">
+                <div class="row-actions">
+                  <button class="icon-btn" type="button">i</button>
+                  <button class="icon-btn" type="button">⏱</button>
+                  <button class="icon-btn" type="button">⋯</button>
+                </div>
+              </td>
+            </tr>
+
+            <!-- Row 8 — Reconciled -->
+            <tr>
+              <td><input type="checkbox" class="row-checkbox" disabled aria-disabled="true" /></td>
+              <td>
+                <div class="beneficiary-cell">
+                  <span class="avatar" aria-hidden="true">LR</span>
+                  <div class="beneficiary-meta">
+                    <span class="beneficiary-name">Luis Reyes</span>
+                    <span class="beneficiary-id">member · Honorarios</span>
+                  </div>
+                </div>
+              </td>
+              <td><span class="pill pill-purple">Pago neto</span></td>
+              <td>2026-04</td>
+              <td>30 abr 2026</td>
+              <td class="right amount">424.250<span class="currency">CLP</span></td>
+              <td class="center"><span class="status-pill status-reconciled">● Conciliada</span></td>
+              <td class="right">
+                <div class="row-actions">
+                  <button class="icon-btn" type="button">i</button>
+                  <button class="icon-btn" type="button">⋯</button>
+                </div>
+              </td>
+            </tr>
+
+            <!-- Skeleton rows: estado de carga -->
+            <tr class="skeleton-row" aria-hidden="true">
+              <td><div class="skeleton" style="width: 18px;"></div></td>
+              <td><div class="skeleton" style="width: 70%;"></div></td>
+              <td><div class="skeleton" style="width: 60%;"></div></td>
+              <td><div class="skeleton" style="width: 40%;"></div></td>
+              <td><div class="skeleton" style="width: 50%;"></div></td>
+              <td class="right"><div class="skeleton" style="width: 60%; margin-left: auto;"></div></td>
+              <td class="center"><div class="skeleton" style="width: 60%; margin: 0 auto;"></div></td>
+              <td class="right"><div class="skeleton" style="width: 30%; margin-left: auto;"></div></td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- ─── DRAWER (mostrado abierto sobre el contenido) ─── -->
+      <aside class="drawer" aria-label="Detalle de obligación seleccionada">
+        <header class="drawer-header">
+          <div>
+            <h3>Detalle de obligación</h3>
+            <p class="drawer-meta">pob-f32925ea-52cd-44cc-a33b-16424b3f7f27</p>
+          </div>
+          <button class="icon-btn" type="button" aria-label="Cerrar detalle">✕</button>
+        </header>
+        <div class="drawer-body">
+
+          <div class="section">
+            <p class="section-title">Resumen</p>
+            <div class="data-grid">
+              <div>
+                <p class="label">Beneficiario</p>
+                <p class="value">Melkin Hernández</p>
+              </div>
+              <div>
+                <p class="label">Monto</p>
+                <p class="value">USD 758,75</p>
+              </div>
+              <div>
+                <p class="label">Tipo</p>
+                <p class="value">Pago neto · Deel</p>
+              </div>
+              <div>
+                <p class="label">Periodo</p>
+                <p class="value">2026-04 · Vence 30 abr</p>
+              </div>
+              <div>
+                <p class="label">Source</p>
+                <p class="value">payroll · 2026-04_melkin-hernandez</p>
+              </div>
+              <div>
+                <p class="label">Estado</p>
+                <p class="value"><span class="status-pill status-generated">● Generada</span></p>
+              </div>
+            </div>
+          </div>
+
+          <div class="section">
+            <p class="section-title">Componentes del pago</p>
+            <table class="table" style="border: 1px solid var(--gh-border); border-radius: 8px;">
+              <tbody>
+                <tr>
+                  <td>Bruto natural</td>
+                  <td class="right amount">913,74 USD</td>
+                </tr>
+                <tr>
+                  <td>Bruto efectivo (factor 100%)</td>
+                  <td class="right amount">913,74 USD</td>
+                </tr>
+                <tr>
+                  <td>Descuento adicional <span style="color:var(--gh-text-muted); font-size:11px;">· Devolución de anticipo</span></td>
+                  <td class="right amount" style="color: var(--gh-red);">− 95,00 USD</td>
+                </tr>
+                <tr style="background: var(--gh-soft-purple);">
+                  <td><strong>Neto a pagar</strong></td>
+                  <td class="right amount"><strong>758,75 USD</strong></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="section">
+            <p class="section-title">Auditoría</p>
+            <ul class="timeline">
+              <li class="timeline-item">
+                <span class="timeline-dot" aria-hidden="true">✓</span>
+                <div class="timeline-text">
+                  <p class="timeline-title">Generada desde Payroll</p>
+                  <p class="timeline-time">1 may 2026, 13:02 · system · payroll_period.exported</p>
+                </div>
+              </li>
+              <li class="timeline-item">
+                <span class="timeline-dot orange" aria-hidden="true">⚠</span>
+                <div class="timeline-text">
+                  <p class="timeline-title">Ajuste de pago aplicado en Payroll</p>
+                  <p class="timeline-time">1 may 2026, 13:02 · julio.reyes — fixed_deduction 95 USD · &ldquo;Devolución anticipo de marzo&rdquo;</p>
+                </div>
+              </li>
+              <li class="timeline-item">
+                <span class="timeline-dot green" aria-hidden="true">⊙</span>
+                <div class="timeline-text">
+                  <p class="timeline-title">Outbox event publicado</p>
+                  <p class="timeline-time">1 may 2026, 13:02 · finance.payment_obligation.generated</p>
+                </div>
+              </li>
+            </ul>
+          </div>
+
+          <div class="section">
+            <p class="section-title">Próxima acción</p>
+            <p style="font-size: 13px; color: var(--gh-text-muted); margin: 0 0 12px;">
+              Esta obligación va a una orden de pago Deel. Selecciona instrumento y fecha de programación.
+            </p>
+            <div style="display: flex; flex-direction: column; gap: 8px; font-size: 13px;">
+              <label style="display: block;">
+                <span style="display: block; font-size: 11px; color: var(--gh-text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px;">Procesador recomendado</span>
+                <select style="width: 100%; padding: 8px 12px; border: 1px solid var(--gh-border); border-radius: 8px; font: inherit;">
+                  <option>Deel · USD payout (auto-detectado por payroll_via=deel)</option>
+                </select>
+              </label>
+              <label style="display: block;">
+                <span style="display: block; font-size: 11px; color: var(--gh-text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px;">Fecha de programación</span>
+                <input type="date" value="2026-05-04" style="width: 100%; padding: 8px 12px; border: 1px solid var(--gh-border); border-radius: 8px; font: inherit;" />
+              </label>
+            </div>
+          </div>
+        </div>
+        <footer class="drawer-footer">
+          <button class="btn btn-ghost" type="button">Cancelar</button>
+          <button class="btn btn-tonal" type="button">Programar para luego</button>
+          <button class="btn btn-primary" type="button">Crear orden y enviar a Deel →</button>
+        </footer>
+      </aside>
+
+      <!-- ─── NOTAS DE IMPLEMENTACIÓN ─── -->
+      <aside class="notes" aria-label="Notas de implementación">
+        <p><strong>Notas de implementación canónicas (V1)</strong></p>
+        <p>
+          <strong>Stack:</strong> MUI 7.x sobre Vuexy starter. Tabs con <code>CustomTabList</code>. Bulk bar usa <code>role="status"</code> + <code>aria-live="polite"</code> para anunciar selección. Drawer es <code>MUI Drawer</code> anchor right 480px. Tabla migra a <code>DataTableShell</code> (TASK-743) con InlineNumericEditor solo si emerge edición inline.
+        </p>
+        <p>
+          <strong>Densidad operativa:</strong> rows 44px (comfortable), Avatar 32px, status pill 22px alto, monospace solo en montos via <code>fontVariantNumeric: 'tabular-nums'</code> sobre DM Sans. Sin <code>monospace</code> hardcoded (TASK-488).
+        </p>
+        <p>
+          <strong>Empty states:</strong> usar <code>EmptyState</code> con <code>animatedIcon</code> Lottie cuando es first-use ("aún no hay obligaciones generadas"). Para "sin resultados" del search, estado calmo sin animación. Errores siempre estáticos.
+        </p>
+        <p>
+          <strong>Loading:</strong> <code>Skeleton</code> rows mientras drena el periodo. <code>LinearProgress</code> en header de la card cuando se está re-fetching tras crear orden. Spinner local en botón "Crear orden" durante POST. Toast <code>react-toastify</code> via Providers — nunca un container nuevo.
+        </p>
+        <p>
+          <strong>Reduced motion:</strong> shimmer skeleton se desactiva con <code>prefers-reduced-motion: reduce</code>. Bulk bar entra con <code>AnimatePresence</code> + slide-up 200ms ease-out, gated por <code>useReducedMotion</code> de <code>@/hooks/useReducedMotion</code>.
+        </p>
+        <p>
+          <strong>Accesibilidad:</strong> tabla con <code>aria-rowcount</code> + headers semánticos; bulk bar es <code>role="status"</code>; chips de estado siempre combinan icono + texto (nunca solo color); focus ring 2px <code>--gh-purple</code> con offset 2; touch targets ≥ 24×24 px en row actions, 30×30 en mockup.
+        </p>
+        <p>
+          <strong>Permisos sugeridos:</strong> <code>finance.payment_obligations.read</code> (ya cubierto por <code>finance.workspace</code>), <code>finance.payment_orders.create</code> nuevo (TASK-750), <code>finance.payment_orders.approve</code> con maker-checker (TASK-750).
+        </p>
+        <p>
+          <strong>Out of scope V1 (este mockup):</strong> ejecución real contra procesador (Banco/Deel/Global66), conciliación bancaria, vista colaborador en Mi Greenhouse, FX locking, exportes PDF de orden de pago. Cada uno saldrá como TASK derivada.
+        </p>
+      </aside>
+    </div>
+  </body>
+</html>

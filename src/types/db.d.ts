@@ -4213,6 +4213,84 @@ export interface GreenhouseFinancePaymentObligations {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseFinancePaymentOrderArtifacts {
+  artifact_id: string;
+  artifact_kind: string;
+  asset_id: string | null;
+  byte_size: Int8 | null;
+  content_hash: string | null;
+  content_hash_algorithm: Generated<string>;
+  download_log_json: Generated<Json>;
+  file_name: string | null;
+  generated_at: Generated<Timestamp>;
+  generated_by: string | null;
+  metadata_json: Generated<Json>;
+  mime_type: string | null;
+  order_id: string;
+}
+
+export interface GreenhouseFinancePaymentOrderLines {
+  amount: Numeric;
+  beneficiary_id: string;
+  beneficiary_name: string | null;
+  beneficiary_type: string;
+  created_at: Generated<Timestamp>;
+  currency: string;
+  failure_reason: string | null;
+  /**
+   * TRUE cuando amount < obligation.amount. La diff queda como residual.
+   */
+  is_partial: Generated<boolean>;
+  line_id: string;
+  metadata_json: Generated<Json>;
+  obligation_id: string;
+  obligation_kind: string;
+  order_id: string;
+  state: Generated<string>;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseFinancePaymentOrders {
+  approved_at: Timestamp | null;
+  approved_by: string | null;
+  /**
+   * payroll = nomina periodo; supplier = facturas proveedor; tax = SII/Previred; mixed = combinada; manual = ad-hoc.
+   */
+  batch_kind: string;
+  cancelled_at: Timestamp | null;
+  cancelled_by: string | null;
+  cancelled_reason: string | null;
+  created_at: Generated<Timestamp>;
+  created_by: string;
+  currency: string;
+  description: string | null;
+  due_date: Timestamp | null;
+  external_reference: string | null;
+  external_status: string | null;
+  failure_reason: string | null;
+  fx_locked_at: Timestamp | null;
+  fx_rate_snapshot: Numeric | null;
+  metadata_json: Generated<Json>;
+  order_id: string;
+  paid_at: Timestamp | null;
+  payment_method: string | null;
+  period_id: string | null;
+  processor_slug: string | null;
+  require_approval: Generated<boolean>;
+  scheduled_for: Timestamp | null;
+  source_account_id: string | null;
+  space_id: string | null;
+  /**
+   * draft = creando; pending_approval = espera maker-checker; approved = aprobada inmutable; scheduled = lista en calendario; submitted = enviada a banco/processor; paid = ejecutada; settled = conciliada; closed = cerrada audit; failed = error submission; cancelled = revertida.
+   */
+  state: Generated<string>;
+  submitted_at: Timestamp | null;
+  superseded_by: string | null;
+  title: string;
+  total_amount: Numeric;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseFinancePaymentProviderCatalog {
   /**
    * Subset of greenhouse_finance instrument categories this provider can serve. Used by admin UI to filter the provider dropdown by current category. Extend (don't branch) when a new wallet category ships.
@@ -7640,6 +7718,9 @@ export interface DB {
   "greenhouse_finance.nubox_emission_log": GreenhouseFinanceNuboxEmissionLog;
   "greenhouse_finance.payment_instrument_admin_audit_log": GreenhouseFinancePaymentInstrumentAdminAuditLog;
   "greenhouse_finance.payment_obligations": GreenhouseFinancePaymentObligations;
+  "greenhouse_finance.payment_order_artifacts": GreenhouseFinancePaymentOrderArtifacts;
+  "greenhouse_finance.payment_order_lines": GreenhouseFinancePaymentOrderLines;
+  "greenhouse_finance.payment_orders": GreenhouseFinancePaymentOrders;
   "greenhouse_finance.payment_provider_catalog": GreenhouseFinancePaymentProviderCatalog;
   "greenhouse_finance.products": GreenhouseFinanceProducts;
   "greenhouse_finance.purchase_orders": GreenhouseFinancePurchaseOrders;

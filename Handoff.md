@@ -1,5 +1,23 @@
 # Handoff.md
 
+## Sesion 2026-05-01 — TASK-750 Payment Orders V1 entregado end-to-end
+
+- **Trigger**: usuario aprobo el mockup `/docs/mockups/payment-orders-mockup.html` y pidio implementar end-to-end.
+- **Entregado** (auto-mode, FASES 1-7):
+  - Schema migration `20260501143749876` con 3 tablas (`payment_orders`, `payment_order_lines`, `payment_order_artifacts`) + trigger maker-checker DB + idempotency unique index sobre `obligation_id WHERE state NOT IN cancelled/failed`.
+  - Helpers core en `src/lib/finance/payment-orders/`: `createPaymentOrderFromObligations`, `approvePaymentOrder`, `schedulePaymentOrder`, `submitPaymentOrder`, `markPaymentOrderPaid`, `cancelPaymentOrder`, listers, row-mapper, errors, get-kpis.
+  - Payment Calendar reader en `src/lib/finance/payment-calendar/list-calendar-items.ts` componiendo obligations + orders con `calendar_state` derivado en SQL.
+  - API admin completa en `/api/admin/finance/payment-orders/**` + `/api/admin/finance/payment-calendar`.
+  - UI: `/finance/payment-orders` page + `PaymentOrdersView` con 4 tabs (Obligaciones / Órdenes / Calendario / Eventos), KPI row, drawer detalle con state-aware actions, CreateOrderDialog con currency-mixed guard, DataTableShell + EmptyState + sonner toasts.
+  - Permisos + view registry: nuevo viewCode `finanzas.ordenes_pago` con grants para `efeonce_admin`, `finance_admin`, `finance_manager`, `finance_analyst` (migration `20260501145618269`); entrada en menú Tesoreria.
+  - 11 nuevos outbox events: `finance.payment_order.{created,approved,scheduled,submitted,paid,settled,closed,failed,cancelled}` + 2 artifact events.
+  - Docs: Delta TASK-750 en spec canónica, doc funcional en `docs/documentation/finance/ordenes-de-pago.md`, manual operador en `docs/manual-de-uso/finance/ordenes-de-pago.md`.
+  - Tests: 8 tests verdes (3 row-mapper, 5 obligaciones).
+- **Validacion**: lint clean, tsc clean, vitest payment-orders/payment-obligations verde, migrations aplicadas en staging via `pg:connect:migrate`.
+- **Coexistencia**: NO reemplaza `expenses` ni `expense_payments`. Mark-paid cierra el ciclo runtime de la order pero no crea automaticamente expense_payment — eso queda en TASK-751.
+- **Tasks afectadas**: TASK-750 movida a `complete/`, registrada en `docs/tasks/README.md`.
+- **Pendiente downstream**: TASK-751 (settlement + reconciliation wiring), TASK-752 (artifact CSV generator), TASK-749 (beneficiary payment profiles).
+
 ## Sesion 2026-05-01 — Arquitectura Payment Orders + tasks 747-751
 
 - **Trigger**: el usuario pidio modelar de forma robusta/escalable el gap donde Payroll exporta nomina pero el pago real puede ocurrir despues y por multiples plataformas/instrumentos por colaborador.

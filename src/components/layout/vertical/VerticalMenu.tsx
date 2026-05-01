@@ -331,12 +331,14 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
             children: [
               { label: nl(GH_FINANCE_NAV.cashIn), href: '/finance/cash-in' },
               { label: nl(GH_FINANCE_NAV.cashOut), href: '/finance/cash-out' },
+              { label: nl(GH_FINANCE_NAV.paymentOrders), href: '/finance/payment-orders' },
               { label: nl(GH_FINANCE_NAV.bank), href: '/finance/bank' },
               { label: nl(GH_FINANCE_NAV.shareholderAccount), href: '/finance/shareholder-account' },
               { label: nl(GH_FINANCE_NAV.cashPosition), href: '/finance/cash-position' }
             ].filter(item => {
               if (item.href === '/finance/cash-in') return canSeeView('finanzas.ingresos', true)
               if (item.href === '/finance/cash-out') return canSeeView('finanzas.egresos', true)
+              if (item.href === '/finance/payment-orders') return canSeeView('finanzas.ordenes_pago', true)
               if (item.href === '/finance/bank') return canSeeView('finanzas.banco', canSeeBankTreasury)
               if (item.href === '/finance/shareholder-account') return canSeeView('finanzas.cuenta_corriente_accionista', canSeeBankTreasury)
               if (item.href === '/finance/cash-position') return canSeeView('finanzas.resumen', true)
