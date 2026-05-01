@@ -1,5 +1,17 @@
 # Handoff.md
 
+## Sesion 2026-05-01 — TASK-758 creada para hardening de recibos honorarios sin tocar cálculo
+
+- **Trigger**: usuario reportó incoherencia en PDF/recibo de Luis Reyes (`honorarios`) donde la retención/impuesto no se refleja correctamente en la surface, pero aclaró explícitamente que el cálculo actual de Payroll no debe tocarse.
+- **Resultado documental**:
+  - Nueva task `docs/tasks/to-do/TASK-758-payroll-honorarios-receipt-render-contract-hardening.md`.
+  - Registro sincronizado en `docs/tasks/TASK_ID_REGISTRY.md`.
+  - Índice sincronizado en `docs/tasks/README.md` y siguiente ID libre actualizado a `TASK-759`.
+- **Decision de diseño**:
+  - El problema se modela como bug de **proyección/render de recibos**, no del motor de cálculo Payroll.
+  - La task se ancla en `TASK-077` (foundation receipts) + `TASK-744` (hard boundary honorarios) y prohíbe explícitamente tocar `calculate-payroll.ts`, `calculate-honorarios.ts` o `recalculate-entry.ts`.
+  - El fix esperado converge `PayrollReceiptCard` + PDF a un helper compartido de breakdown visual para `honorarios`, reutilizando como referencia el criterio ya presente en `PayrollEntryTable` y `ProjectedPayrollView`.
+
 ## Sesion 2026-05-01 — TASK-757 creada para execution sync de processors
 
 - **Trigger**: usuario pidio aterrizar robustez/escalabilidad para Payment Orders y crear la task follow-up del webhook de Global66.
