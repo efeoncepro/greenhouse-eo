@@ -2185,11 +2185,15 @@ export const createFinanceExpenseInPostgres = async ({
           $34, $35::date, $36::date,
           $37, $38, $39,
           $40, $41, $42, $43,
-          FALSE,
           $44, $45, $46,
-          $47::date, $48, $49, $50, $51,
-          $52, $53, $54, $55, $56,
-          $57, $58,
+          $47, $48, $49,
+          $50, $51, $52, $53,
+          FALSE,
+          $54, $55, $56,
+          $57, $58, $59,
+          $60::date, $61, $62, $63, $64,
+          $65, $66, $67, $68, $69,
+          $70, $71,
           CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
         )
         RETURNING *
