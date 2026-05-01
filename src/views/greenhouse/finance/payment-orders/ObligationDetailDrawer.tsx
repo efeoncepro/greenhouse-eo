@@ -264,6 +264,94 @@ const ObligationDetailDrawer = ({ obligationId, onClose }: ObligationDetailDrawe
             </Box>
           </Stack>
 
+          {/* ── PAYSLIP DELIVERY (TASK-759) ──────────────────── */}
+          {detail.payslipDelivery ? (
+            <>
+              <Divider />
+              <Stack spacing={1.5}>
+                <Typography
+                  variant='caption'
+                  color='text.secondary'
+                  sx={{ textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 600 }}
+                >
+                  Recibo de nómina
+                </Typography>
+                <Box
+                  sx={theme => ({
+                    p: 2,
+                    borderRadius: 1.5,
+                    border: `1px solid ${theme.palette.divider}`,
+                    backgroundColor: detail.payslipDelivery!.status === 'email_sent'
+                      ? `${theme.palette.success.main}0A`
+                      : detail.payslipDelivery!.status === 'email_failed'
+                        ? `${theme.palette.error.main}0A`
+                        : 'transparent'
+                  })}
+                >
+                  <Stack direction='row' spacing={2} alignItems='center'>
+                    <CustomAvatar
+                      skin='light'
+                      color={
+                        detail.payslipDelivery.status === 'email_sent' ? 'success'
+                          : detail.payslipDelivery.status === 'email_failed' ? 'error'
+                            : 'secondary'
+                      }
+                      size={32}
+                      sx={{ fontSize: 14 }}
+                    >
+                      <i className={
+                        detail.payslipDelivery.status === 'email_sent'
+                          ? 'tabler-mail-check'
+                          : detail.payslipDelivery.status === 'email_failed'
+                            ? 'tabler-mail-x'
+                            : 'tabler-mail'
+                      } aria-hidden='true' />
+                    </CustomAvatar>
+                    <Stack spacing={0.25} sx={{ flex: 1, minWidth: 0 }}>
+                      {detail.payslipDelivery.status === 'email_sent' ? (
+                        <>
+                          <Typography variant='body2' fontWeight={500}>
+                            Enviado a {detail.payslipDelivery.emailRecipient}
+                          </Typography>
+                          <Typography variant='caption' color='text.secondary'>
+                            {formatDateTime(detail.payslipDelivery.emailSentAt)}
+                            {detail.payslipDelivery.deliveryTrigger
+                              ? ` · trigger: ${detail.payslipDelivery.deliveryTrigger === 'period_exported' ? 'al exportar período' : detail.payslipDelivery.deliveryTrigger === 'payment_paid' ? 'al pagar la orden' : 'reenvío manual'}`
+                              : ''}
+                          </Typography>
+                        </>
+                      ) : detail.payslipDelivery.status === 'email_failed' ? (
+                        <>
+                          <Typography variant='body2' fontWeight={500} color='error.main'>
+                            Envío fallido
+                          </Typography>
+                          {detail.payslipDelivery.errorMessage ? (
+                            <Typography variant='caption' color='text.disabled'>
+                              {detail.payslipDelivery.errorMessage.slice(0, 120)}
+                            </Typography>
+                          ) : null}
+                        </>
+                      ) : detail.payslipDelivery.status === 'generated' ? (
+                        <>
+                          <Typography variant='body2' fontWeight={500}>
+                            PDF generado, esperando envío
+                          </Typography>
+                          <Typography variant='caption' color='text.secondary'>
+                            El email se enviará cuando se marque la orden como pagada
+                          </Typography>
+                        </>
+                      ) : (
+                        <Typography variant='body2' fontWeight={500} color='error.main'>
+                          Generación fallida
+                        </Typography>
+                      )}
+                    </Stack>
+                  </Stack>
+                </Box>
+              </Stack>
+            </>
+          ) : null}
+
           <Divider />
 
           {/* ── COMPONENTES DEL PAGO ──────────────────────────── */}

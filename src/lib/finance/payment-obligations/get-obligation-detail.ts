@@ -26,12 +26,24 @@ export interface ObligationOrderLink {
   paidAt: string | null
 }
 
+export interface ObligationPayslipDelivery {
+  receiptId: string
+  status: 'generated' | 'generation_failed' | 'email_sent' | 'email_failed'
+  deliveryTrigger: 'period_exported' | 'payment_paid' | 'manual_resend' | null
+  emailRecipient: string | null
+  emailSentAt: string | null
+  emailDeliveryId: string | null
+  paymentOrderLineId: string | null
+  errorMessage: string | null
+}
+
 export interface PaymentObligationDetail {
   obligation: PaymentObligation
   audit: ObligationAuditEvent[]
   orderLinks: ObligationOrderLink[]
   components: Array<{ label: string; description: string | null; amount: number; currency: string; sign: 'positive' | 'negative' }>
   netAmount: { amount: number; currency: string }
+  payslipDelivery: ObligationPayslipDelivery | null
 }
 
 interface AuditRow extends Record<string, unknown> {
@@ -268,11 +280,75 @@ export async function getPaymentObligationDetail(
     paidAt: r.paid_at
   }))
 
+  // ── TASK-759: Payslip delivery status (when this obligation is employee_net_pay) ──
+  let payslipDelivery: ObligationPayslipDelivery | null = null
+
+  if (obligation.obligationKind === 'employee_net_pay' && obligation.sourceKind === 'payroll') {
+    const meta = obligation.metadataJson ?? {}
+    const payrollEntryId = typeof meta.payrollEntryId === 'string' ? meta.payrollEntryId : null
+
+    if (payrollEntryId) {
+      const receiptRows = await query<{
+        receipt_id: string
+        status: string
+        delivery_trigger: string | null
+        email_recipient: string | null
+        email_sent_at: string | null
+        email_delivery_id: string | null
+        email_error: string | null
+        generation_error: string | null
+        payment_order_line_id: string | null
+      }>(
+        `SELECT receipt_id, status, delivery_trigger, email_recipient,
+                email_sent_at::text AS email_sent_at, email_delivery_id, email_error, generation_error,
+                payment_order_line_id
+           FROM greenhouse_payroll.payroll_receipts
+          WHERE entry_id = $1
+          ORDER BY created_at DESC
+          LIMIT 1`,
+        [payrollEntryId]
+      )
+
+      const receipt = receiptRows[0]
+
+      if (receipt) {
+        const status = (
+          receipt.status === 'generated' ||
+          receipt.status === 'generation_failed' ||
+          receipt.status === 'email_sent' ||
+          receipt.status === 'email_failed'
+            ? receipt.status
+            : 'generated'
+        ) as ObligationPayslipDelivery['status']
+
+        const deliveryTrigger = (
+          receipt.delivery_trigger === 'period_exported' ||
+          receipt.delivery_trigger === 'payment_paid' ||
+          receipt.delivery_trigger === 'manual_resend'
+            ? receipt.delivery_trigger
+            : null
+        ) as ObligationPayslipDelivery['deliveryTrigger']
+
+        payslipDelivery = {
+          receiptId: receipt.receipt_id,
+          status,
+          deliveryTrigger,
+          emailRecipient: receipt.email_recipient,
+          emailSentAt: receipt.email_sent_at,
+          emailDeliveryId: receipt.email_delivery_id,
+          paymentOrderLineId: receipt.payment_order_line_id,
+          errorMessage: receipt.email_error ?? receipt.generation_error
+        }
+      }
+    }
+  }
+
   return {
     obligation,
     audit,
     orderLinks,
     components: buildComponents(obligation),
-    netAmount: { amount: obligation.amount, currency: obligation.currency }
+    netAmount: { amount: obligation.amount, currency: obligation.currency },
+    payslipDelivery
   }
 }
