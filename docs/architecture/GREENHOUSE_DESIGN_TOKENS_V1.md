@@ -56,24 +56,26 @@ El stack vive textualmente en `src/app/layout.tsx` (param `fallback` de `next/fo
 
 Base root font: `13.125px` (0.82rem, non-standard per Vuexy template). All other sizes are relative.
 
-| Variant | Family | Size (rem) | Size (px) | Weight | Line height | Letter spacing | Canonical usage |
+| Variant | Family | Size (rem) | Size (px) | Weight | Line height (token) | Letter spacing | Canonical usage |
 |---|---|---|---|---|---|---|---|
-| h1 | **Poppins** | 2 | 32 (override) | 800 | 1.2 | — | Marketing hero only |
-| h2 | **Poppins** | 1.5 | 24 (override) | 700 | 1.25 | — | Marketing section header |
-| h3 | **Poppins** | 1.25 | 20 (override) | 600 | 1.3 | — | Page identity (rare) |
-| h4 | **Poppins** | 1 | 16 (override) | 600 | 1.4 | — | **Page title in product UI** |
-| h5 | Geist | 1.125 | 18 | 600 | 1.556 | — | **Section title inside card/accordion** |
-| h6 | Geist | 0.9375 | 15 | 600 | 1.467 | — | Inline bold label (prefer subtitle1) |
-| subtitle1 | Geist | 0.9375 | 15 | 400 | 1.467 | — | **Card subheader, list item primary** |
-| subtitle2 | Geist | 0.8125 | 13 | 400 | 1.538 | — | Card subheader secondary |
-| body1 | Geist | 1 | 16 (override) | 400 | 1.5 | — | **Primary body text** |
-| body2 | Geist | 0.875 | 14 (override) | 400 | 1.5 | — | **Dense text, table cells, chip labels, helpers** |
-| button | Geist | 0.9375 | 15 | 600 | 1.467 | — | Theme override — do not touch |
-| caption | Geist | 0.8125 | 13 | 400 | 1.4 | 0.4px | **Metadata, validity, timestamps, "sugerido"** |
-| overline | Geist | 0.75 | 12 | 600 | 1.167 | 1px | **Section labels over content (SUBTOTAL, TOTAL, STATUS)** |
-| monoId | Geist + `tabular-nums` | 0.875 | 14 | 600 | 1.54 | 0.01em | IDs alfanuméricos canónicos (`EO-XXX-XXXX`, SKU, account number) |
-| monoAmount | Geist + `tabular-nums` | 0.8125 | 13 | 700 | 1.54 | — | Montos en tablas y celdas densas (`$4.823.681`) |
-| kpiValue | Geist + `tabular-nums` | 1.75 | 28 | 800 | 1.05 | — | Stat principal de KPI cards y dashboards |
+| h1 | **Poppins** | 2 | 32 (override) | 800 | `heading` (1.25) | — | Marketing hero only |
+| h2 | **Poppins** | 1.5 | 24 (override) | 700 | `heading` (1.25) | — | Marketing section header |
+| h3 | **Poppins** | 1.25 | 20 (override) | 600 | `heading` (1.25) | — | Page identity (rare) |
+| h4 | **Poppins** | 1 | 16 (override) | 600 | `pageTitle` (1.4) | — | **Page title in product UI** |
+| h5 | Geist | 1.125 | 18 | 600 | `body` (1.5) | — | **Section title inside card/accordion** |
+| h6 | Geist | 0.9375 | 15 | 600 | `body` (1.5) | — | Inline bold label (prefer subtitle1) |
+| subtitle1 | Geist | 0.9375 | 15 | 400 | `body` (1.5) | — | **Card subheader, list item primary** |
+| subtitle2 | Geist | 0.8125 | 13 | 400 | 1.538 (coretheme inherit) | — | Card subheader secondary |
+| body1 | Geist | 1 | 16 (override) | 400 | `body` (1.5) | — | **Primary body text** |
+| body2 | Geist | 0.875 | 14 (override) | 400 | `body` (1.5) | — | **Dense text, table cells, chip labels, helpers** |
+| button | Geist | 0.9375 | 15 | 600 | 1.467 (coretheme inherit) | — | Theme override — do not touch |
+| caption | Geist | 0.8125 | 13 | 400 | `metadata` (1.45) | 0.4px | **Metadata, validity, timestamps, "sugerido"** |
+| overline | Geist | 0.75 | 12 | 600 | 1.167 (coretheme inherit) | 1px | **Section labels over content (SUBTOTAL, TOTAL, STATUS)** — uppercase tight intentional |
+| monoId | Geist + `tabular-nums` | 0.875 | 14 | 600 | `numericDense` (1.54) | 0.01em | IDs alfanuméricos canónicos (`EO-XXX-XXXX`, SKU, account number) |
+| monoAmount | Geist + `tabular-nums` | 0.8125 | 13 | 700 | `numericDense` (1.54) | — | Montos en tablas y celdas densas (`$4.823.681`) |
+| kpiValue | Geist + `tabular-nums` | 1.75 | 28 | 800 | `display` (1.05) | — | Stat principal de KPI cards y dashboards |
+
+> **Sobre line-height tokens**: la columna `Line height (token)` referencia el namespace canónico definido en §3.6. Variants marcadas `coretheme inherit` heredan del Vuexy core (`src/@core/theme/typography.ts`, no editable por regla dura) sin override Greenhouse — son intencionales. Toda la calibración Greenhouse vive en los tokens, NO en magic numbers inline.
 
 > **Nota**: las celdas marcadas "(override)" son tamaños declarados en `mergedTheme.ts` que sobreescriben el coreTheme. El resto hereda de `src/@core/theme/typography.ts` y la regla dura es no tocar `@core/theme/*`.
 
@@ -113,8 +115,41 @@ Base root font: `13.125px` (0.82rem, non-standard per Vuexy template). All other
 |---|---|
 | Font loading + CSS variables + fallback stack | `src/app/layout.tsx` |
 | Theme override (Geist base, Poppins h1-h4, mono variants Geist+tabular-nums) | `src/components/theme/mergedTheme.ts` |
-| Variant type declarations (`monoId`, `monoAmount`, `kpiValue`) | `src/components/theme/types.ts` |
+| Variant type declarations (`monoId`, `monoAmount`, `kpiValue`) + `theme.lineHeights` augmentation | `src/components/theme/types.ts` |
+| Line-height token namespace (canonical scale) | `src/components/theme/typography-tokens.ts` |
 | Coretheme fallback chain (NOT to be edited per regla dura) | `src/@core/theme/typography.ts` |
+
+### 3.6 Line-height token namespace (v1.3+)
+
+Los `line-height` ratios viven en un namespace tokenizado canónico, **no como magic numbers inline en el theme**. Cada variant del theme y todo consumer externo (cuando emerja) referencia tokens semánticos. Una calibración futura toca un solo lugar (`typography-tokens.ts`) y se propaga a todas las variants que consuman ese token.
+
+| Token | Valor | Razón / aplicación |
+|---|---|---|
+| `display` | 1.05 | Display moments donde la compresión es señal intencional. Aplica a `kpiValue`. Usar también para totales hero, dashboard stats grandes, dock totals |
+| `heading` | 1.25 | Display headings (Poppins). Tight feel. Aplica a `h1`, `h2`, `h3` (marketing/identity) |
+| `pageTitle` | 1.4 | Page title en product UI. Aplica a `h4`. Más relajado que `heading` porque convive con body inmediatamente debajo |
+| `metadata` | 1.45 | Captions, timestamps, validity, helper text. Aplica a `caption`. Levemente más tight que `body` para compensar el font-size más chico (13px vs 15-16px de body) |
+| `body` | 1.5 | Product UI baseline. Aplica a `body1`, `body2`, `h5`, `h6`, `subtitle1`. **Piso WCAG 1.4.12** (text-spacing override): no bajar de 1.5 en variants de párrafo. Convergente con Linear / Stripe Dashboard / Vercel app sobre Geist |
+| `numericDense` | 1.54 | Numeric runs requiring column breathing. Aplica a `monoId`, `monoAmount`. La leve apertura sobre `body` ayuda a que las cifras en columnas tabulares no se peguen verticalmente |
+
+**Acceso runtime**: cualquier componente puede leer estos tokens vía `theme.lineHeights.<token>`:
+
+```tsx
+import { useTheme } from '@mui/material/styles'
+
+const Component = () => {
+  const theme = useTheme()
+  return <Box sx={{ lineHeight: theme.lineHeights.body }}>...</Box>
+}
+```
+
+**Reglas duras** (auditables por `greenhouse-ui-review`):
+
+- **NEVER** declarar `lineHeight` con un número literal en una variant nueva del theme. Siempre referenciar `lineHeights.<token>`.
+- **NEVER** declarar `lineHeight` inline en componentes de aplicación si una variant ya cubre el caso — usar la variant.
+- Cuando un componente legítimamente necesite un line-height fuera de variants (caso raro), referenciar `theme.lineHeights.<token>`, no un número.
+- Para extender la escala: agregar token nuevo a `typography-tokens.ts` con docstring que justifique el caso, type-augment en `types.ts`, documentar fila acá. **No** introducir tokens redundantes (e.g. `tightish: 1.22` cuando `heading: 1.25` cubre el rango).
+- Las variants del coretheme Vuexy (`src/@core/theme/typography.ts`) NO se editan (regla dura del repo). Cuando una variant Greenhouse-relevante hereda del coretheme con un valor que se siente cramped, el override va en `mergedTheme.ts` apuntando a un token de §3.6.
 
 ## 4. Spacing
 
@@ -441,6 +476,7 @@ Inventoried by TASK-488 subagent 2026-04-19. Top 15 files to copy/adapt (never f
 | 1.0 | 2026-04-19 | Claude + TASK-488 | Initial canonical tokens extracted from `src/@core/theme/*` + Vuexy template + TASK-487 gaps analysis. |
 | 1.1 | 2026-05-01 (mañana) | Claude + TASK-566 / EPIC-004 | §3 reescrita: política canónica `Poppins display + Inter base`. DM Sans retirada como baseline. `monoId` / `monoAmount` / `kpiValue` migrados a Inter + `tabular-nums` (sin monospace). Stack fallback explícito para Inter y Poppins documentado y referenciado a `layout.tsx` + `mergedTheme.ts`. Anti-pattern row de monospace actualizado para apuntar a Inter / variants `mono*`. |
 | 1.2 | 2026-05-01 (tarde) | Claude + TASK-566 / EPIC-004 (Delta pivot) | Pivot Inter → **Geist Sans** tras validación visual del usuario en staging (Inter "se siente plana"). Mismos pesos por variant (Poppins 600/700/800 en h1-h4, Geist 400 body, 500 helpers, 600 h5/h6/button/overline/monoId, 700 monoAmount, 800 kpiValue). Stack fallback rotado a `var(--font-geist), 'Geist', system-ui, …`. Prohibición explícita de Geist Mono y de `var(--font-inter)`/`'Inter'` literal en código nuevo. Mockup de referencia visual: `docs/mockups/typography-inter-vs-geist-mockup.html`. |
+| 1.3 | 2026-05-01 (tarde) | Claude + TASK-566 / EPIC-004 (line-height namespace + calibración Geist) | **Cambio arquitectónico**: introducción del namespace canónico de line-height tokens (§3.6), accesible vía `theme.lineHeights.<token>`. Implementación: `src/components/theme/typography-tokens.ts` (tokens canónicos `display` 1.05, `heading` 1.25, `pageTitle` 1.4, `metadata` 1.45, `body` 1.5, `numericDense` 1.54), type augmentation en `types.ts`, theme expone `lineHeights` para uso runtime. **Toda variant del theme que necesite line-height referencia un token**, cero magic numbers en `mergedTheme.ts`. Calibración Geist absorbida por los tokens: `h5/h6/subtitle1` ahora consumen `body` (= 1.5, antes coretheme 1.467/1.556 leía cramped); `caption` consume `metadata` (= 1.45, antes 1.4); `h1/h2/h3` colapsan a `heading` (= 1.25, antes 1.2/1.25/1.3 graduación cosmética sin valor). Body1/body2 siguen en 1.5 (piso WCAG 1.4.12). `button`, `overline`, `subtitle2` heredan del coretheme sin override (intencional). Razón del trigger: Geist tiene x-height ligeramente más bajo que Inter/DM Sans, lo cual hace que ratios `<1.5` se sientan cramped al root 13.125px de Vuexy. Convergente con Linear / Stripe Dashboard / Vercel app que corren subtitle/h6 a 1.5 sobre Geist. **Solución robusta + escalable**: futuras calibraciones de line-height tocan 1 archivo, no N variants. |
 
 ## 16. Related docs
 

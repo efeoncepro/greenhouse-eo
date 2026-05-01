@@ -17,8 +17,14 @@ import type { SystemMode } from '@core/types'
 // Core Theme Imports
 import coreTheme from '@core/theme'
 
+// Greenhouse typography tokens (v1.3+) — line-height namespace canónico
+import { lineHeights } from './typography-tokens'
+
 const mergedTheme = (settings: Settings, mode: SystemMode, direction: Theme['direction']) => {
   const userTheme: ThemeOptions = {
+    // Expose line-height tokens al theme — accesible vía `theme.lineHeights.<token>`
+    // desde useTheme() / styled() / sx={}. Source of truth: typography-tokens.ts.
+    lineHeights,
     colorSchemes: {
       light: {
         palette: {
@@ -129,54 +135,61 @@ const mergedTheme = (settings: Settings, mode: SystemMode, direction: Theme['dir
       }
     },
     typography: {
-      // Typography foundation — TASK-566 / EPIC-004 (Delta 2026-05-01 tarde: pivot a Geist)
+      // Typography foundation — TASK-566 / EPIC-004 (Delta 2026-05-01 tarde: pivot a Geist + namespace v1.3)
       // Geist Sans = product UI base (body, forms, tables, controls, KPIs, IDs, amounts).
       // Poppins = display only, restricted to h1-h4.
       // monoId / monoAmount stay as semantic variants but use Geist + tabular-nums
-      // (NO monospace family, NO Geist Mono). Source of truth: docs/architecture/GREENHOUSE_DESIGN_TOKENS_V1.md §3 (v1.2).
+      // (NO monospace family, NO Geist Mono).
+      // line-heights consumen `lineHeights` tokens — cero magic numbers.
+      // Source of truth: docs/architecture/GREENHOUSE_DESIGN_TOKENS_V1.md §3 (v1.3).
       fontFamily:
         "var(--font-geist), 'Geist', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
       h1: {
         fontFamily: "var(--font-poppins), 'Poppins', system-ui, -apple-system, sans-serif",
         fontWeight: 800,
         fontSize: '2rem',
-        lineHeight: 1.2
+        lineHeight: lineHeights.heading
       },
       h2: {
         fontFamily: "var(--font-poppins), 'Poppins', system-ui, -apple-system, sans-serif",
         fontWeight: 700,
         fontSize: '1.5rem',
-        lineHeight: 1.25
+        lineHeight: lineHeights.heading
       },
       h3: {
         fontFamily: "var(--font-poppins), 'Poppins', system-ui, -apple-system, sans-serif",
         fontWeight: 600,
         fontSize: '1.25rem',
-        lineHeight: 1.3
+        lineHeight: lineHeights.heading
       },
       h4: {
         fontFamily: "var(--font-poppins), 'Poppins', system-ui, -apple-system, sans-serif",
         fontWeight: 600,
         fontSize: '1rem',
-        lineHeight: 1.4
+        lineHeight: lineHeights.pageTitle
       },
       h5: {
-        fontWeight: 600
+        fontWeight: 600,
+        lineHeight: lineHeights.body
       },
       h6: {
-        fontWeight: 600
+        fontWeight: 600,
+        lineHeight: lineHeights.body
+      },
+      subtitle1: {
+        lineHeight: lineHeights.body
       },
       body1: {
         fontSize: '1rem',
-        lineHeight: 1.5
+        lineHeight: lineHeights.body
       },
       body2: {
         fontSize: '0.875rem',
-        lineHeight: 1.5
+        lineHeight: lineHeights.body
       },
       caption: {
         fontSize: '0.8125rem',
-        lineHeight: 1.4
+        lineHeight: lineHeights.metadata
       },
       button: {
         fontWeight: 600,
@@ -190,20 +203,20 @@ const mergedTheme = (settings: Settings, mode: SystemMode, direction: Theme['dir
       monoId: {
         fontWeight: 600,
         fontSize: '0.875rem',
-        lineHeight: 1.54,
+        lineHeight: lineHeights.numericDense,
         letterSpacing: '0.01em',
         fontVariantNumeric: 'tabular-nums'
       },
       monoAmount: {
         fontWeight: 700,
         fontSize: '0.8125rem',
-        lineHeight: 1.54,
+        lineHeight: lineHeights.numericDense,
         fontVariantNumeric: 'tabular-nums'
       },
       kpiValue: {
         fontWeight: 800,
         fontSize: '1.75rem',
-        lineHeight: 1.05,
+        lineHeight: lineHeights.display,
         fontVariantNumeric: 'tabular-nums'
       }
     }

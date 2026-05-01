@@ -1,5 +1,46 @@
 # Handoff.md
 
+## Sesion 2026-05-01 (noche) — DESIGN.md + CLI oficial integrada
+
+- **Trigger**: usuario pidió adoptar el formato abierto `DESIGN.md` de Google Labs en todo el repo y además instalar la CLI global.
+- **Resultado**:
+  - nuevo archivo raíz `DESIGN.md` como contrato visual compacto para agentes
+  - baseline declarada: `Poppins + Geist`, con tokens de color, tipografía, spacing, radius y componentes alineados al runtime real
+  - `package.json` incorpora scripts:
+    - `pnpm design:lint`
+    - `pnpm design:diff`
+    - `pnpm design:export:tailwind`
+  - `README.md`, `docs/README.md`, `AGENTS.md`, `CLAUDE.md`, `project_context.md` y `changelog.md` quedan actualizados para que futuros agentes lean `DESIGN.md` de forma explícita
+- **CLI oficial**:
+  - dependencia local agregada: `@google/design.md`
+  - instalación global pedida por usuario pendiente de verificación al cierre del turno
+  - binario esperado: `design.md`
+- **Validación esperada en este turno**:
+  - `pnpm design:lint`
+  - smoke del binario global: `design.md lint DESIGN.md`
+- **Riesgo abierto**:
+  - el paquete `@google/design.md@0.1.1` emite warnings de peer deps no bloqueantes en este workspace; si el CLI cambia contrato en versiones futuras, conviene fijar/reevaluar antes de meterlo a CI dura.
+
+## Sesion 2026-05-01 (tarde, post-pivot) — line-height token namespace canónico (tokens v1.3)
+
+- **Trigger**: tras shippear Geist (commit `91859c13`, deploy `greenhouse-eiu021wol`), el usuario reportó que el portal "se ve muy junto" y pidió explícitamente solución **robusta, resiliente, escalable** — no parche de 3 inline overrides.
+- **Diagnóstico** (con skills `modern-ui` + `greenhouse-ux` cargadas en sesión): Geist tiene x-height ligeramente más bajo que Inter/DM Sans, lo cual con el root font 13.125px de Vuexy hace que ratios `<1.5` (subtitle1/h6/caption heredados del coretheme) se sientan cramped en transición a body 1.5. Pero la causa estructural era **mayor**: el theme tenía magic numbers de line-height inline en cada variant, sin tokens semánticos compartidos — calibrar implicaba tocar N lugares por concepto.
+- **Solución arquitectónica (no patch)**:
+  1. Nuevo archivo canónico `src/components/theme/typography-tokens.ts` declara namespace `lineHeights = { display, heading, pageTitle, metadata, body, numericDense }` con docstrings que justifican cada token y nombres semánticos (no magic numbers, no nombres opacos).
+  2. `src/components/theme/types.ts` hace type augmentation `Theme['lineHeights']` para que el namespace sea accesible via `theme.lineHeights.<token>` en runtime desde cualquier componente (sx, styled, useTheme).
+  3. `src/components/theme/mergedTheme.ts` consume tokens en TODAS las variants — cero magic numbers en typography. `h1-h3 → heading`, `h4 → pageTitle`, `h5/h6/subtitle1/body1/body2 → body`, `caption → metadata`, `monoId/monoAmount → numericDense`, `kpiValue → display`. `button`, `overline`, `subtitle2` heredan del coretheme sin override (intencional, NO se inventan tokens redundantes).
+  4. `theme.lineHeights` queda expuesto al runtime — futuro componente puede leer `theme.lineHeights.body` cuando necesite line-height fuera de variants.
+  5. `GREENHOUSE_DESIGN_TOKENS_V1.md` §3.2 actualizada (columna ahora muestra token name + valor), nueva §3.6 documenta el namespace canónico con reglas duras, foundation files §3.5 incluye el archivo nuevo, bump a **v1.3** con versioning row que documenta el cambio arquitectónico.
+- **Resultado para la queja del usuario**: las 3 variants que causaban "se ve muy junto" (h6/subtitle1/caption) absorbieron la calibración vía token (h6 y subtitle1 ahora apuntan a `body=1.5`, caption apunta a `metadata=1.45`). Misma calibración que un patch hubiera entregado, pero ahora cualquier futura recalibración toca **1 archivo**, no N.
+- **Convergencia con producto enterprise moderno**: Linear / Stripe Dashboard / Vercel app (Geist-based) corren subtitle/h6 a 1.5 — la calibración Greenhouse converge a la baseline industria. Tokens nombrados (display/heading/body/etc) son el patrón Tailwind/Material 3 — no se inventa nomenclatura nueva.
+- **Reglas duras agregadas (§3.6 doc canónico, auditables por `greenhouse-ui-review`)**:
+  - NEVER declarar `lineHeight` con número literal en variants nuevas — referenciar token.
+  - NEVER `lineHeight` inline en componentes si una variant ya cubre el caso.
+  - Cuando un componente legítimamente necesite line-height fuera de variants, leer `theme.lineHeights.<token>`, no número.
+  - Para extender la escala: agregar token a `typography-tokens.ts` con docstring + type augment + documentar fila en §3.6.
+- **Verificación**: pendiente lint + build + deploy + validación visual del usuario.
+- **Riesgo abierto**: si en staging real alguna surface puntual sigue sintiéndose tight, **NO** se vuelve al patch — se evalúa si la causa es el token mal calibrado (entonces ajusta el valor en `typography-tokens.ts`, propaga a todas las variants que lo usan) o si la surface necesita un token nuevo legítimo (entonces se agrega al namespace siguiendo §3.6).
+
 ## Sesion 2026-05-01 (tarde) — pivot Inter → Geist sobre la foundation TASK-566
 
 - **Trigger**: tras shippear Inter en staging (commit `5c4d84aa`, deploy preview `greenhouse-96gktkj39`), el usuario validó visualmente y comparó vía mockup A/B (`docs/mockups/typography-inter-vs-geist-mockup.html`). Veredicto: **Inter se siente plana / poco moderna**, Geist tiene la personalidad AI-native que necesita el portal Globe.

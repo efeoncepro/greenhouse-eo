@@ -74,6 +74,19 @@ declare module '@mui/material/styles' {
       lightShadow: string
       darkShadow: string
     }
+    /**
+     * Line-height tokens canónicos (v1.3+). Source of truth:
+     * `docs/architecture/GREENHOUSE_DESIGN_TOKENS_V1.md` §3.6.
+     * Implementación: `src/components/theme/typography-tokens.ts`.
+     */
+    lineHeights: {
+      display: number
+      heading: number
+      pageTitle: number
+      metadata: number
+      body: number
+      numericDense: number
+    }
   }
   interface ThemeOptions {
     shape?: {
@@ -129,6 +142,14 @@ declare module '@mui/material/styles' {
       lightShadow?: string
       darkShadow?: string
     }
+    lineHeights?: Partial<{
+      display: number
+      heading: number
+      pageTitle: number
+      metadata: number
+      body: number
+      numericDense: number
+    }>
   }
 
   // Custom Typography Variants
