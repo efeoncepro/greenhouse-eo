@@ -8,13 +8,13 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `optional`
-- Status real: `Implementacion`
+- Status real: `Cerrada 2026-05-01`
 - Rank: `TBD`
 - Domain: `hr`
 - Blocked by: `none`
@@ -275,37 +275,47 @@ El agente debe confirmar por qué staging produjo entries honorarios con deducci
 
 ## Acceptance Criteria
 
-- [ ] `getSiiRetentionRate(2026)` o su reemplazo retorna `0.1525` y queda cubierto por tests.
-- [ ] Seguro de Cesantía calcula trabajador/empleador correctamente para `indefinido` y `plazo_fijo`.
-- [ ] Cálculo Chile dependiente aplica topes imponibles por base separada cuando corresponde.
-- [ ] `contractType = honorarios` nunca materializa deducciones dependientes en `PayrollEntry`.
-- [ ] Melkin Hernández, Daniela Ferreira y Andrés Carlosama permanecen internacionales/Deel en staging y no reciben deducciones Chile.
-- [ ] Internacionales con bonos OTD/RPA siguen bloqueados si falta KPI ICO y calculan bono desde `kpiDataSource = ico` cuando existe.
-- [ ] Abril 2026 en staging se recalcula/reliquida con entries coherentes antes de aprobación/export.
-- [ ] Readiness/preflight detecta blockers legales relevantes y no devuelve `ready: true` si una entry calculada combina regímenes incompatibles.
-- [ ] Docs de arquitectura/documentación/manual quedan actualizados si cambian reglas visibles.
+- [x] `getSiiRetentionRate(2026)` o su reemplazo retorna `0.1525` y queda cubierto por tests.
+- [x] Seguro de Cesantía calcula trabajador/empleador correctamente para `indefinido` y `plazo_fijo`.
+- [x] Cálculo Chile dependiente aplica topes imponibles por base separada cuando corresponde.
+- [x] `contractType = honorarios` nunca materializa deducciones dependientes en `PayrollEntry`.
+- [x] Melkin Hernández, Daniela Ferreira y Andrés Carlosama permanecen internacionales/Deel en staging y no reciben deducciones Chile.
+- [x] Internacionales con bonos OTD/RPA siguen bloqueados si falta KPI ICO y calculan bono desde `kpiDataSource = ico` cuando existe.
+- [x] Abril 2026 en staging se recalcula/reliquida con entries coherentes antes de aprobación/export.
+- [x] Readiness/preflight detecta blockers legales relevantes y no devuelve `ready: true` si una entry calculada combina regímenes incompatibles.
+- [x] Docs de arquitectura/documentación/manual quedan actualizados si cambian reglas visibles.
 
 ## Verification
 
-- `pnpm vitest run src/lib/payroll`
-- `pnpm exec eslint src/lib/payroll src/types/payroll.ts src/types/hr-contracts.ts`
-- `pnpm exec tsc --noEmit --pretty false`
-- `pnpm build`
-- `pnpm staging:request /api/hr/payroll/periods/2026-04/readiness --pretty`
-- `pnpm staging:request /api/hr/payroll/periods/2026-04/entries --pretty`
-- `pnpm test:e2e:setup`
-- `pnpm exec playwright test tests/e2e/smoke/hr-payroll.spec.ts --project=chromium`
+- `pnpm vitest run src/lib/payroll` — OK, 38 files / 243 tests.
+- `pnpm exec eslint src/lib/payroll src/types/payroll.ts src/types/hr-contracts.ts` — OK.
+- `pnpm exec tsc --noEmit --pretty false` — OK.
+- `pnpm build` — OK.
+- `pnpm lint` — OK.
+- `pnpm test:coverage` — OK, 495 files / 2706 tests passed / 5 skipped.
+- `rg -n "new Pool\\(" src -g "*.{ts,tsx}"` — no new `Pool`; only canonical `src/lib/postgres/client.ts` plus pre-existing tests.
+- `pnpm pg:doctor` — OK, runtime role healthy via CLI-safe doctor.
+- `pnpm pg:connect:migrate` — OK, no migrations pending; regenerated `src/types/db.d.ts` with no diff.
+- Vercel status for commit `418d3c9a` — success, deployment completed.
+- `pnpm staging:request POST /api/hr/payroll/periods/2026-04/calculate '{}' --pretty` — OK, recalculated staging April 2026 at `2026-05-01T10:22:26.440Z`.
+- `pnpm staging:request /api/hr/payroll/periods/2026-04/readiness --pretty` — OK, `ready: true`, no blockers, one expected warning for `julio-reyes` without compensation.
+- `pnpm staging:request /api/hr/payroll/periods/2026-04/entries --pretty` — OK:
+  - Humberly Henriquez: `contractTypeSnapshot=honorarios`, `siiRetentionRate=0.1525`, no Chile dependent deductions.
+  - Luis Reyes: `contractTypeSnapshot=honorarios`, `siiRetentionRate=0.1525`, no Chile dependent deductions.
+  - Valentina Hoyos: `contractTypeSnapshot=indefinido`, Chile dependent calculation with statutory deductions.
+  - Melkin Hernandez, Daniela Ferreira, Andres Carlosama: `payRegime=international`, `payrollVia=deel`, `kpiDataSource=ico`, no Chile dependent deductions.
+- `pnpm test:e2e:setup` / Playwright manual browser were not rerun in this closure slice because the GitHub Chromium smoke suite for `418d3c9a` completed successfully and staging API verification exercised the exact April 2026 Payroll state.
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
-- [ ] `docs/audits/payroll/PAYROLL_COMPLIANCE_AUDIT_2026-05-01.md` quedo referenciado con el estado post-fix o se creó refresh de auditoría
-- [ ] Se documentó explícitamente si abril 2026 requiere reliquidación, recalculo o reapertura formal
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] `docs/audits/payroll/PAYROLL_COMPLIANCE_AUDIT_2026-05-01.md` quedo referenciado con el estado post-fix o se creó refresh de auditoría
+- [x] Se documentó explícitamente si abril 2026 requiere reliquidación, recalculo o reapertura formal
 
 ## Follow-ups
 
@@ -317,4 +327,4 @@ El agente debe confirmar por qué staging produjo entries honorarios con deducci
 
 - ¿La gratificación legal de Efeonce debe considerar solo sueldo base por acuerdo contractual explícito o remuneración mensual imponible elegible completa?
 - ¿Se debe modelar `obra/faena` como `contractType` separado para Seguro de Cesantía?
-- ¿Qué flujo operativo se usará para corregir abril 2026 si aún no está exportado: recalculo simple, reapertura controlada o reliquidación formal?
+- Resuelta para abril 2026: como el período estaba `calculated` y no `exported`, se aplicó recalculo controlado en staging. Si el período llega a `exported` en otro entorno, corresponde reapertura/reliquidación formal, no mutación silenciosa.

@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 const mockRunGreenhousePostgresQuery = vi.fn()
 const mockGetSpaceFinanceMetrics = vi.fn()
@@ -62,6 +62,8 @@ import { getAgencySpace360 } from './space-360'
 
 describe('getAgencySpace360', () => {
   beforeEach(() => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date('2026-04-15T12:00:00.000Z'))
     vi.clearAllMocks()
 
     mockGetSpaceFinanceMetrics.mockResolvedValue([])
@@ -99,6 +101,10 @@ describe('getAgencySpace360', () => {
       memberSkillsByMember: {},
       services: []
     })
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
   })
 
   it('returns null when the client/space cannot be resolved', async () => {

@@ -8,12 +8,12 @@
 - Criticality: critica
 - Business sensitivity: alta
 - Runtime checked: staging via `pnpm staging:request`
-- Mutation policy: no se ejecuto calculo, aprobacion, export, migracion ni escritura de datos
-- Remediation status: `TASK-744` implementa correcciones de motor, constraints DB `NOT VALID`, readiness blocker y tests. Pendiente validacion staging post-deploy y recalculo de abril 2026.
+- Mutation policy: auditoria original read-only; cierre posterior de `TASK-744` recalculo abril 2026 en staging antes de aprobacion/export.
+- Remediation status: `TASK-744` cerrada 2026-05-01. Motor corregido, constraints DB `NOT VALID`, readiness blocker y tests aplicados; abril 2026 recalculado en staging a `2026-05-01T10:22:26.440Z` con entries coherentes por regimen.
 
 ## Executive Summary
 
-La auditoria concluye que **Payroll Chile no debe aprobarse ni exportarse como legalmente confiable hasta corregir formulas estructurales**.
+La auditoria concluyo originalmente que **Payroll Chile no debia aprobarse ni exportarse como legalmente confiable hasta corregir formulas estructurales**. Esa remediacion quedo aplicada por `TASK-744` y validada en staging para abril 2026 antes de aprobacion/export.
 
 El problema no es solo un bug puntual de UI. Hay drift entre:
 

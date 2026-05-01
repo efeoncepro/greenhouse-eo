@@ -5,7 +5,7 @@
 - **Trigger**: el usuario pidio implementar `TASK-744` para resolver end-to-end los hallazgos de Payroll sin parches, preservando a Melkin, Daniela y Andres como internacionales/Deel.
 - **Trabajo realizado**:
   - Fases de descubrimiento/auditoria/mapa/plan ejecutadas con subagentes read-only.
-  - Spec corregida y movida a `docs/tasks/in-progress/TASK-744-payroll-chile-compliance-remediation.md` manteniendo branch `develop`.
+  - Spec corregida, ejecutada y cerrada en `docs/tasks/complete/TASK-744-payroll-chile-compliance-remediation.md` manteniendo branch `develop`.
   - Migracion `20260501095540489_task-744-payroll-regime-boundaries.sql` aplicada via `pnpm pg:connect:migrate`; `src/types/db.d.ts` regenerado.
   - `greenhouse_payroll.payroll_entries` ahora tiene `contract_type_snapshot` y constraints `NOT VALID` para nuevas escrituras incompatibles de honorarios/internacional.
   - Retencion SII honorarios 2026 corregida a `0.1525`; 2027 a `0.16`.
@@ -17,10 +17,18 @@
   - `pnpm vitest run src/lib/payroll` OK: 38 files / 243 tests.
   - `pnpm exec tsc --noEmit --pretty false` OK.
   - `pnpm exec eslint src/lib/payroll src/types/payroll.ts src/types/hr-contracts.ts` OK.
-- **Pendiente antes de cerrar**:
-  - `pnpm build` y `pnpm lint` globales.
-  - Recalcular abril 2026 en staging post-deploy y verificar entries de Humberly, Luis, Valentina, Melkin, Daniela y Andres.
-  - Cerrar task/mover a complete solo despues de staging verification.
+- **Validacion global y staging**:
+  - `pnpm build` OK.
+  - `pnpm lint` OK.
+  - `pnpm test:coverage` OK: 495 files / 2706 tests passed / 5 skipped.
+  - `pnpm pg:doctor` OK despues de desacoplar el doctor CLI del pool runtime Next/server-only.
+  - `pnpm pg:connect:migrate` OK: no migrations pending; `src/types/db.d.ts` regenerado sin diff.
+  - Vercel deployment de `418d3c9a` completado.
+  - `pnpm staging:request POST /api/hr/payroll/periods/2026-04/calculate '{}' --pretty` OK; abril 2026 recalculado en staging a `2026-05-01T10:22:26.440Z`.
+  - `pnpm staging:request /api/hr/payroll/periods/2026-04/readiness --pretty` OK: sin blockers; warning esperado por `julio-reyes` sin compensacion.
+  - Entries verificadas: Humberly/Luis honorarios con retencion SII 15,25% y sin deducciones dependientes; Valentina Chile dependiente; Melkin/Daniela/Andres international/Deel con KPI ICO y sin deducciones Chile.
+- **Estado**: TASK-744 cerrada; no quedan migraciones pendientes para esta task. Follow-ups estructurales quedan explicitamente en `TASK-730`, `TASK-731` y `TASK-732`.
+- **CI fix colateral**: `src/lib/agency/space-360.test.ts` ahora fija reloj de prueba en abril 2026 para evitar drift mensual (`expected month 4`, runtime month 5 el 2026-05-01) que rompio el coverage de GitHub.
 
 ## Sesion 2026-05-01 — TASK-743 Operational Data Table Density Contract
 

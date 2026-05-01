@@ -1,3 +1,14 @@
+## Delta 2026-05-01 TASK-744 Payroll compliance cerrada en staging
+
+- `TASK-744` quedo cerrada en `docs/tasks/complete/TASK-744-payroll-chile-compliance-remediation.md` sobre `develop`.
+- Abril 2026 fue recalculado en staging despues del deploy `418d3c9a` antes de aprobacion/export:
+  - Humberly Henriquez y Luis Reyes: `contractTypeSnapshot=honorarios`, retencion SII `0.1525`, sin deducciones dependientes Chile.
+  - Valentina Hoyos: `contractTypeSnapshot=indefinido`, calculo Chile dependiente con deducciones estatutarias.
+  - Melkin Hernandez, Daniela Ferreira y Andres Carlosama: `payRegime=international`, `payrollVia=deel`, `kpiDataSource=ico`, sin deducciones Chile.
+- `pnpm pg:connect:migrate` confirma que no quedan migraciones pendientes para esta task y regenera `src/types/db.d.ts` sin diff.
+- `pnpm pg:doctor` vuelve a correr desde CLI sin arrastrar imports `server-only`; el doctor usa un cliente Postgres directo con perfil de herramientas y mantiene soporte para Cloud SQL Connector/Secret Manager.
+- El coverage de CI ya no depende del mes calendario real en `space-360.test.ts`; se fija el reloj en abril 2026 para el caso que valida el período de insights Nexa.
+
 ## Delta 2026-05-01 Skill local invocable para auditoria de Payroll Efeonce
 
 - Nueva skill local Codex invocable como `$greenhouse-payroll-auditor`.
