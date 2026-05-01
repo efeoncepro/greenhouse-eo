@@ -1,11 +1,11 @@
 # MCP Greenhouse Read-Only
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-04-30 por Codex
-> **Ultima actualizacion:** 2026-04-30 por Codex
+> **Ultima actualizacion:** 2026-05-01 por Codex
 > **Modulo:** plataforma / MCP
-> **Ruta en portal:** `N/A` (server local stdio)
+> **Ruta en portal:** `N/A` (server MCP local `stdio` o remoto HTTP)
 > **Documentacion relacionada:** [API Platform Ecosystem](../../documentation/plataforma/api-platform-ecosystem.md), [Platform Health API](../../documentation/plataforma/platform-health-api.md), [GREENHOUSE_MCP_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_MCP_ARCHITECTURE_V1.md)
 
 ## Para que sirve
@@ -24,6 +24,15 @@ Hoy sirve para:
 - consultar platform health
 - leer el event control plane en modo consulta
 
+## Modalidades disponibles
+
+Greenhouse expone el mismo MCP read-only de dos formas:
+
+- Local `stdio`: para clientes que pueden levantar un proceso local, usando `pnpm mcp:greenhouse`.
+- Remoto HTTP: para clientes que necesitan una URL estable, usando `POST /api/mcp/greenhouse`.
+
+Ambas modalidades comparten las mismas tools y el mismo cliente downstream. La diferencia es solo el transporte y el envelope de acceso.
+
 ## Antes de empezar
 
 Necesitas estas variables de entorno:
@@ -37,15 +46,21 @@ Opcionales:
 
 - `GREENHOUSE_MCP_API_VERSION`
 - `GREENHOUSE_MCP_REQUEST_TIMEOUT_MS`
+- `GREENHOUSE_MCP_REMOTE_GATEWAY_TOKEN`
+- `GREENHOUSE_MCP_REMOTE_MAX_BODY_BYTES`
 
 Reglas importantes:
 
 - el token debe ser de un `consumer` ecosystem válido
 - el scope lo define `externalScopeType + externalScopeId`
 - si apuntas a `staging` o `preview`, no asumas que basta con la URL; debes respetar el flujo operativo ya documentado para entornos protegidos
-- este MCP es local y stdio: no es una URL pública ni un servicio hosted
+- el modo local usa `stdio`
+- el modo remoto HTTP V1 es privado/service-to-service, no público ni self-service
+- el modo remoto no reemplaza `TASK-659`: OAuth hosted/multiusuario sigue fuera de este corte
 
 ## Como levantarlo
+
+### Modo local `stdio`
 
 El entrypoint canónico es:
 
@@ -54,6 +69,33 @@ pnpm mcp:greenhouse
 ```
 
 Si usas el registro local del repo, `.vscode/mcp.json` ya define el server `greenhouse/greenhouse-mcp-readonly` y te pedirá los inputs necesarios sin embutir secretos en el archivo.
+
+### Modo remoto HTTP
+
+El endpoint remoto canónico es:
+
+```text
+POST /api/mcp/greenhouse
+GET /api/mcp/greenhouse
+DELETE /api/mcp/greenhouse
+```
+
+Para conectarte desde un cliente MCP compatible con Streamable HTTP, usa la URL completa del ambiente y agrega:
+
+```text
+Authorization: Bearer <GREENHOUSE_MCP_REMOTE_GATEWAY_TOKEN>
+```
+
+El gateway remoto está deshabilitado si `GREENHOUSE_MCP_REMOTE_GATEWAY_TOKEN` no existe. En ese caso responde como no configurado en vez de abrir una surface anónima.
+
+El modo remoto V1 es stateless. Eso significa:
+
+- no guarda sesiones MCP en memoria entre requests
+- no mantiene estado por usuario
+- no implementa OAuth, refresh tokens ni revocación multiusuario
+- cada request vuelve a usar el runtime MCP compartido y el scope server-side configurado
+
+Este diseño es intencional para V1: permite publicar una URL operable sin confundirla con hosted auth multiusuario.
 
 ## Que puede hacer hoy
 
@@ -169,6 +211,13 @@ Eso significa:
 - si el recurso existe pero cae fuera del scope, fallará
 - si el token no es válido, fallará
 
+En modo remoto hay dos credenciales separadas:
+
+- `GREENHOUSE_MCP_REMOTE_GATEWAY_TOKEN`: protege el gateway HTTP frente al cliente MCP remoto.
+- `GREENHOUSE_MCP_CONSUMER_TOKEN`: se usa server-side para llamar la API Platform Ecosystem.
+
+No mezcles ambas. El gateway token no reemplaza al consumer token, y el consumer token no debe exponerse como secreto de usuario final.
+
 ## Problemas comunes
 
 ### El server no levanta
@@ -178,6 +227,14 @@ Revisa:
 - que existan las variables `GREENHOUSE_MCP_*`
 - que `GREENHOUSE_MCP_API_BASE_URL` no termine con errores de path o protocolo
 - que `GREENHOUSE_MCP_CONSUMER_TOKEN` no esté vacío
+
+### El endpoint remoto responde que no está configurado
+
+Revisa:
+
+- que `GREENHOUSE_MCP_REMOTE_GATEWAY_TOKEN` exista en el ambiente
+- que el cliente envíe `Authorization: Bearer <token>`
+- que no estés intentando usar el custom domain de staging sin el bypass operacional de Vercel cuando aplique
 
 ### El request falla por timeout
 
@@ -224,10 +281,12 @@ Acción recomendada:
 - no asumir que una tool de lectura autoriza luego un write manual
 - no mezclar este MCP con scripts SQL ad hoc para “completar” acceso
 - no usarlo como bypass de API Platform
+- no publicar el gateway remoto como API anónima ni como OAuth multiusuario improvisado
 
 ## Referencias tecnicas
 
 - Runtime MCP: [src/mcp/greenhouse](../../../src/mcp/greenhouse)
 - Entry point: [scripts/run-greenhouse-mcp.ts](../../../scripts/run-greenhouse-mcp.ts)
+- Gateway remoto: [src/app/api/mcp/greenhouse/route.ts](../../../src/app/api/mcp/greenhouse/route.ts)
 - Lane ecosystem: [docs/documentation/plataforma/api-platform-ecosystem.md](../../documentation/plataforma/api-platform-ecosystem.md)
 - Platform health: [docs/documentation/plataforma/platform-health-api.md](../../documentation/plataforma/platform-health-api.md)

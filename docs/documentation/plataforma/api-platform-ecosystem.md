@@ -1,9 +1,9 @@
 # API Platform Ecosystem
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.3
+> **Version:** 1.4
 > **Creado:** 2026-04-25 por Codex (TASK-616 follow-up)
-> **Ultima actualizacion:** 2026-04-30 por Codex (TASK-647 read-only follow-ups: health + event plane reads)
+> **Ultima actualizacion:** 2026-05-01 por Codex (TASK-741 remote MCP gateway)
 > **Documentacion tecnica:** [GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md)
 
 ---
@@ -60,6 +60,13 @@ Hoy ese MCP base ya existe como runtime local en:
 - `src/mcp/greenhouse/*`
 - `scripts/run-greenhouse-mcp.ts`
 - `pnpm mcp:greenhouse`
+
+Desde `TASK-741`, el mismo runtime también existe como gateway remoto privado en:
+
+- `src/app/api/mcp/greenhouse/route.ts`
+- `GET/POST/DELETE /api/mcp/greenhouse`
+
+El gateway remoto usa el transporte MCP oficial Streamable HTTP, no una ruta JSON ad hoc. Reutiliza el mismo server y las mismas tools que el modo local `stdio`.
 
 La base inicial expone cinco tools read-only:
 
@@ -121,6 +128,14 @@ El MCP actual solo consume la parte read-only de ese plano de control:
 - `get_webhook_delivery`
 
 Los commands (`create`, `update`, `retry`) siguen fuera del scope MCP actual hasta cerrar una historia más fuerte de write safety e idempotencia.
+
+El gateway remoto V1 tampoco cambia el modelo de auth hosted:
+
+- es privado y service-to-service
+- requiere `GREENHOUSE_MCP_REMOTE_GATEWAY_TOKEN` para entrar al endpoint
+- usa el consumer/scope `GREENHOUSE_MCP_*` del servidor para bajar a `api/platform/ecosystem/*`
+- no representa usuarios finales
+- no implementa OAuth multiusuario, refresh tokens ni revocación; eso sigue en `TASK-659`
 
 Todos funcionan con el mismo patrón:
 

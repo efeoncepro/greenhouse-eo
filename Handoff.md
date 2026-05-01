@@ -1,5 +1,34 @@
 # Handoff.md
 
+## Sesion 2026-05-01 — TASK-741 Greenhouse MCP Remote Gateway V1
+
+- **Trigger**: el usuario pidio verificar si quedaba algo pendiente de `TASK-741`; la auditoria encontro que la task seguia en `to-do` y no existia `src/app/api/mcp/greenhouse/route.ts` ni transporte remoto.
+- **Solucion implementada**:
+  - `src/mcp/greenhouse/remote.ts` agrega el adapter remoto oficial sobre `WebStandardStreamableHTTPServerTransport`.
+  - `src/app/api/mcp/greenhouse/route.ts` expone `GET/POST/DELETE /api/mcp/greenhouse` con `runtime='nodejs'` y `dynamic='force-dynamic'`.
+  - El gateway remoto V1 es privado/service-to-service, stateless y protegido por `GREENHOUSE_MCP_REMOTE_GATEWAY_TOKEN`.
+  - El gateway reutiliza `createGreenhouseMcpServer()`; no duplica tools, no lee SQL y sigue downstream de `api/platform/ecosystem/*`.
+  - Se agregó budget defensivo `GREENHOUSE_MCP_REMOTE_MAX_BODY_BYTES` para acotar payloads.
+- **Documentacion actualizada**:
+  - `docs/architecture/GREENHOUSE_MCP_ARCHITECTURE_V1.md`
+  - `docs/documentation/plataforma/api-platform-ecosystem.md`
+  - `docs/manual-de-uso/plataforma/mcp-greenhouse-read-only.md`
+  - `docs/tasks/complete/TASK-741-greenhouse-mcp-remote-gateway-v1.md`
+  - `docs/tasks/README.md`
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+  - `.env.example`, `project_context.md`, `changelog.md`
+- **Validacion ejecutada**:
+  - `pnpm vitest run src/mcp/greenhouse/__tests__ src/app/api/mcp/greenhouse/route.test.ts` OK.
+  - `pnpm exec tsc --noEmit --pretty false` OK.
+  - `pnpm exec eslint src/mcp/greenhouse src/app/api/mcp/greenhouse` OK.
+  - `pnpm lint` OK.
+  - `pnpm build` OK; mantiene warnings locales existentes de critical secrets resueltos desde `process.env` por falta de `*_SECRET_REF`.
+  - `pnpm pg:connect:migrate` OK: no migrations pending; `src/types/db.d.ts` regenerado sin diff.
+  - `git diff --check` OK.
+  - `rg -n "new Pool\\(" src scripts -g "*.{ts,tsx}"` solo muestra el cliente canónico y tests legacy existentes.
+- **Follow-up intencional**:
+  - `TASK-659` sigue abierta para OAuth/hosted auth multiusuario; no fue absorbida por este gateway privado.
+
 ## Sesion 2026-05-01 — TASK-744 Payroll Chile compliance remediation
 
 - **Trigger**: el usuario pidio implementar `TASK-744` para resolver end-to-end los hallazgos de Payroll sin parches, preservando a Melkin, Daniela y Andres como internacionales/Deel.

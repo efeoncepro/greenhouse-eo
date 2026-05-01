@@ -2,6 +2,8 @@
 
 ## 2026-05-01
 
+- **TASK-741 — Greenhouse MCP Remote Gateway V1**. Se agrega gateway MCP remoto privado en `GET/POST/DELETE /api/mcp/greenhouse` usando el transporte oficial Streamable HTTP del SDK MCP. El gateway reutiliza el mismo runtime read-only de `pnpm mcp:greenhouse`, se protege con `GREENHOUSE_MCP_REMOTE_GATEWAY_TOKEN`, limita payloads con `GREENHOUSE_MCP_REMOTE_MAX_BODY_BYTES` y mantiene `TASK-659` como dueño separado de OAuth/hosted auth multiusuario.
+
 - **TASK-744 — Payroll Chile Compliance Remediation & International Guardrails**. Se corrige el motor de Payroll para separar regimenes Chile dependiente, honorarios e internacional/Deel: retencion honorarios 2026 queda en 15,25%, Seguro de Cesantia separa trabajador/empleador (`plazo_fijo` trabajador 0% / empleador 3%), el calculo Chile aplica topes AFP/salud/SIS/mutual y cesantia cuando existen topes PREVIRED, honorarios falla cerrado si intenta pasar por helper dependiente, y readiness bloquea entries calculadas con regimenes incompatibles. Se agrega `contract_type_snapshot` a `greenhouse_payroll.payroll_entries` con constraints `NOT VALID` para nuevas escrituras y tests Payroll quedan verdes.
 
 - **TASK-744 cierre operativo**. El deploy de `418d3c9a` quedo completo en Vercel y abril 2026 se recalculo en staging antes de aprobacion/export: Humberly y Luis quedan como honorarios con retencion SII `0.1525` y sin deducciones dependientes; Valentina mantiene calculo Chile dependiente; Melkin, Daniela y Andres permanecen internacionales/Deel con KPI ICO y sin deducciones Chile. `pnpm pg:connect:migrate` confirma que no quedan migraciones pendientes.

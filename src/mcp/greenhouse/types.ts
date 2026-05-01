@@ -2,6 +2,7 @@ import type { SisterPlatformExternalScopeType } from '@/lib/sister-platforms/typ
 
 export const DEFAULT_GREENHOUSE_MCP_API_VERSION = '2026-04-25'
 export const DEFAULT_GREENHOUSE_MCP_REQUEST_TIMEOUT_MS = 15_000
+export const DEFAULT_GREENHOUSE_MCP_REMOTE_MAX_BODY_BYTES = 1_000_000
 
 export type GreenhouseMcpConfig = {
   apiBaseUrl: string
@@ -10,6 +11,11 @@ export type GreenhouseMcpConfig = {
   externalScopeId: string
   apiVersion: string
   requestTimeoutMs: number
+}
+
+export type GreenhouseMcpRemoteGatewayConfig = {
+  gatewayToken: string
+  maxBodyBytes: number
 }
 
 export type GreenhouseApiSuccessEnvelope<T> = {

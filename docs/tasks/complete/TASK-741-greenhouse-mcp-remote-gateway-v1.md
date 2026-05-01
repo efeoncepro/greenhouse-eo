@@ -8,17 +8,17 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `[optional EPIC-###]`
-- Status real: `Diseno`
+- Status real: `Cerrada 2026-05-01`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none`
-- Branch: `task/TASK-741-greenhouse-mcp-remote-gateway-v1`
+- Branch: `develop`
 - Legacy ID: `TASK-647 remote transport follow-up`
 - GitHub Issue: `—`
 
@@ -239,13 +239,13 @@ Discovery debe confirmar el shape final exigido por el SDK que ya vive en `@mode
 
 ## Acceptance Criteria
 
-- [ ] Existe un gateway MCP remoto HTTP en el repo con URL y transporte oficiales.
-- [ ] El runtime remoto reutiliza las mismas tools read-only y el mismo cliente downstream de `TASK-647`.
-- [ ] `pnpm mcp:greenhouse` sigue funcionando como MCP local `stdio`.
-- [ ] El gateway remoto V1 documenta explícitamente su modelo privado/service-to-service y su límite respecto de `TASK-659`.
-- [ ] No se introduce SQL directo ni bypass de `api/platform/ecosystem/*`.
-- [ ] Tests focalizados cubren route handler, transporte y paridad básica entre `stdio` y HTTP.
-- [ ] Arquitectura, documentación funcional y manual de uso quedan sincronizados con el nuevo modo remoto.
+- [x] Existe un gateway MCP remoto HTTP en el repo con URL y transporte oficiales.
+- [x] El runtime remoto reutiliza las mismas tools read-only y el mismo cliente downstream de `TASK-647`.
+- [x] `pnpm mcp:greenhouse` sigue funcionando como MCP local `stdio`.
+- [x] El gateway remoto V1 documenta explícitamente su modelo privado/service-to-service y su límite respecto de `TASK-659`.
+- [x] No se introduce SQL directo ni bypass de `api/platform/ecosystem/*`.
+- [x] Tests focalizados cubren route handler, transporte y paridad básica entre `stdio` y HTTP.
+- [x] Arquitectura, documentación funcional y manual de uso quedan sincronizados con el nuevo modo remoto.
 
 ## Verification
 
@@ -257,13 +257,13 @@ Discovery debe confirmar el shape final exigido por el SDK que ya vive en `@mode
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
-- [ ] `TASK-659` no fue absorbida accidentalmente ni dejada inconsistente
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] `TASK-659` no fue absorbida accidentalmente ni dejada inconsistente
 
 ## Follow-ups
 
@@ -274,3 +274,14 @@ Discovery debe confirmar el shape final exigido por el SDK que ya vive en `@mode
 ## Delta 2026-04-30
 
 Task creada para separar formalmente el transporte remoto HTTP del MCP de Greenhouse del trabajo de auth hosted/multiusuario ya asignado a `TASK-659`.
+
+## Completion Notes — 2026-05-01
+
+- Se creó `src/mcp/greenhouse/remote.ts` como adapter remoto oficial sobre `WebStandardStreamableHTTPServerTransport`.
+- Se expuso `src/app/api/mcp/greenhouse/route.ts` como endpoint `GET/POST/DELETE /api/mcp/greenhouse` en runtime `nodejs` y `force-dynamic`.
+- El modo V1 remoto es `stateless`, privado y service-to-service: requiere `Authorization: Bearer <GREENHOUSE_MCP_REMOTE_GATEWAY_TOKEN>` y delega downstream con el consumer/scope `GREENHOUSE_MCP_*` configurado en servidor.
+- El gateway reutiliza `createGreenhouseMcpServer()` y por lo tanto comparte el mismo mapping de tools read-only con `pnpm mcp:greenhouse`.
+- Se agregó budget de body remoto configurable con `GREENHOUSE_MCP_REMOTE_MAX_BODY_BYTES` para evitar payloads MCP no acotados.
+- Tests focalizados:
+  - `src/mcp/greenhouse/__tests__/remote.test.ts`
+  - `src/app/api/mcp/greenhouse/route.test.ts`

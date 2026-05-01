@@ -822,7 +822,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-738` | `to-do` | Portal Notion SDK Migration | `docs/tasks/to-do/TASK-738-portal-notion-sdk-migration.md` |
 | `TASK-739` | `to-do` | Notion API Modernization Readiness | `docs/tasks/to-do/TASK-739-notion-api-modernization-readiness.md` |
 | `TASK-740` | `to-do` | Critical Metrics Change Safety Harness | `docs/tasks/to-do/TASK-740-critical-metrics-change-safety-harness.md` |
-| `TASK-741` | `to-do` | Greenhouse MCP Remote Gateway V1 | `docs/tasks/to-do/TASK-741-greenhouse-mcp-remote-gateway-v1.md` |
+| `TASK-741` | `complete` | Greenhouse MCP Remote Gateway V1 | `docs/tasks/complete/TASK-741-greenhouse-mcp-remote-gateway-v1.md` |
 | `TASK-742` | `complete` | Auth Resilience 7-Layer Architecture | `docs/tasks/complete/TASK-742-auth-resilience-7-layers.md` |
 | `TASK-743` | `complete` | Operational Data Table Density Contract (DataTableShell + InlineNumericEditor + lint+visual gates + 14 legacy tables migrated) | `docs/tasks/complete/TASK-743-operational-data-table-density-contract.md` |
-| `TASK-744` | `to-do` | Payroll Chile Compliance Remediation & International Guardrails | `docs/tasks/to-do/TASK-744-payroll-chile-compliance-remediation.md` |
+| `TASK-744` | `complete` | Payroll Chile Compliance Remediation & International Guardrails | `docs/tasks/complete/TASK-744-payroll-chile-compliance-remediation.md` |

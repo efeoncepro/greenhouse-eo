@@ -1,3 +1,18 @@
+## Delta 2026-05-01 TASK-741 cierra MCP Remote Gateway V1
+
+- Greenhouse ya expone el MCP read-only por HTTP remoto privado en `GET/POST/DELETE /api/mcp/greenhouse`.
+- El gateway remoto vive en:
+  - `src/mcp/greenhouse/remote.ts`
+  - `src/app/api/mcp/greenhouse/route.ts`
+- Transporte oficial: `WebStandardStreamableHTTPServerTransport` de `@modelcontextprotocol/sdk`.
+- Modo V1: `stateless` + `enableJsonResponse`, pensado para App Router/Vercel sin guardar sesiones MCP en memoria.
+- Auth V1: `Authorization: Bearer <GREENHOUSE_MCP_REMOTE_GATEWAY_TOKEN>`.
+- Downstream preservado: el gateway reutiliza `createGreenhouseMcpServer()` y por lo tanto usa el mismo mapping read-only que `pnpm mcp:greenhouse`, bajando solo a `api/platform/ecosystem/*` con `GREENHOUSE_MCP_*`.
+- Variables nuevas:
+  - `GREENHOUSE_MCP_REMOTE_GATEWAY_TOKEN` — habilita/protege el gateway remoto HTTP.
+  - `GREENHOUSE_MCP_REMOTE_MAX_BODY_BYTES` — budget opcional de request body; default `1000000`.
+- `TASK-659` sigue siendo la dueña de OAuth/hosted auth multiusuario; `TASK-741` no introduce OAuth, refresh tokens ni user-delegated scopes.
+
 ## Delta 2026-05-01 TASK-744 Payroll compliance cerrada en staging
 
 - `TASK-744` quedo cerrada en `docs/tasks/complete/TASK-744-payroll-chile-compliance-remediation.md` sobre `develop`.
