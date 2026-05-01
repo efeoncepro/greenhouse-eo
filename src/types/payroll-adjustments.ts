@@ -18,7 +18,12 @@ export type AdjustmentSourceKind =
   | 'finance_event'
   | 'reliquidation_clone'
 
-// Discriminated union por kind.
+// Discriminated union por kind. Para los kinds con monto absoluto
+// (fixed_deduction y manual_override) el payload incluye `currency` para ser
+// self-describing y coherente con `payroll_entries.currency`. El trigger de
+// DB `assert_adjustment_payload_currency_coherent` valida la igualdad.
+export type AdjustmentPayloadCurrency = 'CLP' | 'USD'
+
 export type AdjustmentPayload =
   | { kind: 'exclude' }
   | { kind: 'gross_factor'; factor: number }
@@ -27,8 +32,8 @@ export type AdjustmentPayload =
       // map columna lógica → factor (e.g. { base: 0.5, bonusOtd: 1, bonusRpa: 1 })
       components: Record<string, number>
     }
-  | { kind: 'fixed_deduction'; amount: number }
-  | { kind: 'manual_override'; netClp: number }
+  | { kind: 'fixed_deduction'; amount: number; currency: AdjustmentPayloadCurrency }
+  | { kind: 'manual_override'; netAmount: number; currency: AdjustmentPayloadCurrency }
 
 export interface PayrollAdjustment {
   adjustmentId: string

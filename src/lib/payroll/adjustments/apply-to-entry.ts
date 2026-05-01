@@ -12,6 +12,7 @@ const buildSnapshot = (
 ): PayrollEntryComputeSnapshot => ({
   payRegime: entry.payRegime as 'chile' | 'international',
   contractTypeSnapshot: entry.contractTypeSnapshot ?? null,
+  currency: entry.currency,
   naturalGrossClp: entry.grossTotal,
   components: {
     base: entry.adjustedBaseSalary ?? entry.baseSalary,

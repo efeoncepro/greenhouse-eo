@@ -38,6 +38,7 @@ const adj = (over: Partial<PayrollAdjustment>): PayrollAdjustment => ({
 const honorariosSnap = (gross: number, rate = 0.135): PayrollEntryComputeSnapshot => ({
   payRegime: 'chile',
   contractTypeSnapshot: 'honorarios',
+  currency: 'CLP',
   naturalGrossClp: gross,
   components: { base: gross },
   siiRetentionRate: rate
@@ -46,6 +47,7 @@ const honorariosSnap = (gross: number, rate = 0.135): PayrollEntryComputeSnapsho
 const chileDepSnap = (gross: number, deductions: number): PayrollEntryComputeSnapshot => ({
   payRegime: 'chile',
   contractTypeSnapshot: 'indefinido',
+  currency: 'CLP',
   naturalGrossClp: gross,
   components: { base: gross },
   siiRetentionRate: null,
@@ -55,6 +57,7 @@ const chileDepSnap = (gross: number, deductions: number): PayrollEntryComputeSna
 const intlSnap = (gross: number): PayrollEntryComputeSnapshot => ({
   payRegime: 'international',
   contractTypeSnapshot: 'contractor',
+  currency: 'USD',
   naturalGrossClp: gross,
   components: { base: gross },
   siiRetentionRate: null
@@ -119,7 +122,7 @@ describe('computePayrollEntryNet', () => {
 
   it('6. fixed_deduction (anticipo) reduce neto sin tocar bruto', () => {
     const r = computePayrollEntryNet(honorariosSnap(500_000), [
-      adj({ kind: 'fixed_deduction', payload: { amount: 100_000 }, reasonCode: 'advance_payback' })
+      adj({ kind: 'fixed_deduction', payload: { amount: 100_000, currency: 'CLP' }, reasonCode: 'advance_payback' })
     ])
 
     expect(r.effectiveGrossClp).toBe(500_000)
@@ -130,8 +133,8 @@ describe('computePayrollEntryNet', () => {
 
   it('7. multiple fixed_deductions se suman', () => {
     const r = computePayrollEntryNet(honorariosSnap(500_000), [
-      adj({ kind: 'fixed_deduction', payload: { amount: 50_000 }, reasonCode: 'advance_payback' }),
-      adj({ kind: 'fixed_deduction', payload: { amount: 30_000 }, reasonCode: 'agreed_discount' })
+      adj({ kind: 'fixed_deduction', payload: { amount: 50_000, currency: 'CLP' }, reasonCode: 'advance_payback' }),
+      adj({ kind: 'fixed_deduction', payload: { amount: 30_000, currency: 'CLP' }, reasonCode: 'agreed_discount' })
     ])
 
     expect(r.fixedDeductionClp).toBe(80_000)
@@ -141,7 +144,7 @@ describe('computePayrollEntryNet', () => {
   it('8. factor + fixed_deduction componen ortogonalmente', () => {
     const r = computePayrollEntryNet(honorariosSnap(500_000), [
       adj({ kind: 'gross_factor', payload: { factor: 0.7 } }),
-      adj({ kind: 'fixed_deduction', payload: { amount: 100_000 } })
+      adj({ kind: 'fixed_deduction', payload: { amount: 100_000, currency: 'CLP' } })
     ])
 
     // bruto efectivo 350_000, sii 47_250, neto 350_000-47_250-100_000 = 202_750
@@ -154,8 +157,8 @@ describe('computePayrollEntryNet', () => {
   it('9. manual_override gana sobre todo', () => {
     const r = computePayrollEntryNet(honorariosSnap(500_000), [
       adj({ kind: 'gross_factor', payload: { factor: 0.5 } }),
-      adj({ kind: 'fixed_deduction', payload: { amount: 100_000 } }),
-      adj({ kind: 'manual_override', payload: { netClp: 999_999 } })
+      adj({ kind: 'fixed_deduction', payload: { amount: 100_000, currency: 'CLP' } }),
+      adj({ kind: 'manual_override', payload: { netAmount: 999_999, currency: 'CLP' } })
     ])
 
     expect(r.overrideApplied).toBe(true)
@@ -191,8 +194,8 @@ describe('computePayrollEntryNet', () => {
   it('12. ignore inactive adjustments (pending_approval, reverted, superseded)', () => {
     const r = computePayrollEntryNet(honorariosSnap(500_000), [
       adj({ kind: 'gross_factor', payload: { factor: 0.5 }, status: 'reverted' }),
-      adj({ kind: 'fixed_deduction', payload: { amount: 100_000 }, status: 'pending_approval' }),
-      adj({ kind: 'manual_override', payload: { netClp: 1 }, status: 'superseded' })
+      adj({ kind: 'fixed_deduction', payload: { amount: 100_000, currency: 'CLP' }, status: 'pending_approval' }),
+      adj({ kind: 'manual_override', payload: { netAmount: 1, currency: 'CLP' }, status: 'superseded' })
     ])
 
     // ningun adj activo => natural
@@ -204,7 +207,7 @@ describe('computePayrollEntryNet', () => {
   it('13. idempotente — mismo input, mismo output', () => {
     const adjs = [
       adj({ kind: 'gross_factor', payload: { factor: 0.6 } }),
-      adj({ kind: 'fixed_deduction', payload: { amount: 50_000 } })
+      adj({ kind: 'fixed_deduction', payload: { amount: 50_000, currency: 'CLP' } })
     ]
 
     const a = computePayrollEntryNet(honorariosSnap(500_000), adjs)
@@ -216,7 +219,7 @@ describe('computePayrollEntryNet', () => {
   it('14. exclude tiene prioridad sobre cualquier otro adjustment activo', () => {
     const r = computePayrollEntryNet(honorariosSnap(500_000), [
       adj({ kind: 'gross_factor', payload: { factor: 0.7 } }),
-      adj({ kind: 'fixed_deduction', payload: { amount: 30_000 } }),
+      adj({ kind: 'fixed_deduction', payload: { amount: 30_000, currency: 'CLP' } }),
       adj({ kind: 'exclude', payload: {}, reasonCode: 'no_activity' })
     ])
 
@@ -228,6 +231,7 @@ describe('computePayrollEntryNet', () => {
     const snap: PayrollEntryComputeSnapshot = {
       payRegime: 'international',
       contractTypeSnapshot: 'contractor',
+      currency: 'USD',
       naturalGrossClp: 1_000_000,
       components: { base: 700_000, bonusOtd: 200_000, bonusRpa: 100_000 },
       siiRetentionRate: null
@@ -254,7 +258,7 @@ describe('computePayrollEntryNet', () => {
 
   it('17. fixed_deduction mayor al bruto puede dejar neto negativo (caller decide)', () => {
     const r = computePayrollEntryNet(honorariosSnap(100_000), [
-      adj({ kind: 'fixed_deduction', payload: { amount: 200_000 } })
+      adj({ kind: 'fixed_deduction', payload: { amount: 200_000, currency: 'CLP' } })
     ])
 
     // Por diseño no clamp; el caller (UI/blockers) deciden si permite negative.
@@ -262,7 +266,7 @@ describe('computePayrollEntryNet', () => {
   })
 
   it('18. order independiente (orden de input no cambia resultado)', () => {
-    const a1 = adj({ kind: 'fixed_deduction', payload: { amount: 30_000 } })
+    const a1 = adj({ kind: 'fixed_deduction', payload: { amount: 30_000, currency: 'CLP' } })
     const a2 = adj({ kind: 'gross_factor', payload: { factor: 0.7 } })
 
     const r1 = computePayrollEntryNet(honorariosSnap(500_000), [a1, a2])
@@ -274,10 +278,65 @@ describe('computePayrollEntryNet', () => {
 
   it('19. appliedAdjustmentIds list refleja exactamente los activos contribuyendo', () => {
     const a1 = adj({ kind: 'gross_factor', payload: { factor: 0.5 } })
-    const a2 = adj({ kind: 'fixed_deduction', payload: { amount: 50_000 } })
+    const a2 = adj({ kind: 'fixed_deduction', payload: { amount: 50_000, currency: 'CLP' } })
     const a3 = adj({ kind: 'gross_factor', payload: { factor: 0.8 }, status: 'reverted' })
     const r = computePayrollEntryNet(honorariosSnap(500_000), [a1, a2, a3])
 
     expect(r.appliedAdjustmentIds).toEqual([a1.adjustmentId, a2.adjustmentId])
+  })
+
+  // ── TASK-745b — currency self-describing ──────────────────────────
+
+  it('20. fixed_deduction USD aplica a entry USD sin tocar SII (no honorarios)', () => {
+    const r = computePayrollEntryNet(intlSnap(2_000), [
+      adj({
+        kind: 'fixed_deduction',
+        payload: { amount: 95, currency: 'USD' },
+        reasonCode: 'agreed_discount'
+      })
+    ])
+
+    expect(r.fixedDeductionClp).toBe(95)
+    expect(r.netClp).toBe(2_000 - 95)
+    expect(r.siiRetentionClp).toBe(0)
+    expect(r.chileDeductionsClp).toBe(0)
+  })
+
+  it('21. fixed_deduction con currency mismatch lanza AdjustmentCurrencyMismatchError', () => {
+    expect(() =>
+      computePayrollEntryNet(intlSnap(2_000), [
+        adj({
+          kind: 'fixed_deduction',
+          payload: { amount: 95, currency: 'CLP' },
+          reasonCode: 'agreed_discount'
+        })
+      ])
+    ).toThrow(/AdjustmentCurrencyMismatch|payload.currency=CLP/)
+  })
+
+  it('22. manual_override USD: usa netAmount + currency coherente', () => {
+    const r = computePayrollEntryNet(intlSnap(2_000), [
+      adj({
+        kind: 'manual_override',
+        payload: { netAmount: 1_500, currency: 'USD' },
+        reasonCode: 'agreed_discount'
+      })
+    ])
+
+    expect(r.overrideApplied).toBe(true)
+    expect(r.netClp).toBe(1_500)
+  })
+
+  it('23. manual_override legacy `netClp` sigue funcionando back-compat para CLP', () => {
+    const r = computePayrollEntryNet(honorariosSnap(500_000), [
+      adj({
+        kind: 'manual_override',
+        payload: { netClp: 250_000, currency: 'CLP' },
+        reasonCode: 'correction_prior_period'
+      })
+    ])
+
+    expect(r.overrideApplied).toBe(true)
+    expect(r.netClp).toBe(250_000)
   })
 })

@@ -30,11 +30,12 @@ interface EntrySnapshotRow extends Record<string, unknown> {
   period_id: string
   pay_regime: string
   contract_type_snapshot: string | null
+  currency: string
 }
 
 const fetchEntrySnapshot = async (entryId: string): Promise<EntrySnapshotRow | null> => {
   const rows = await query<EntrySnapshotRow>(
-    `SELECT member_id, period_id, pay_regime, contract_type_snapshot
+    `SELECT member_id, period_id, pay_regime, contract_type_snapshot, currency
        FROM greenhouse_payroll.payroll_entries
       WHERE entry_id = $1
       LIMIT 1`,
@@ -106,7 +107,7 @@ export async function POST(
       )
     }
 
-    const payload = (body.payload && typeof body.payload === 'object' ? body.payload : {}) as Record<
+    const rawPayload = (body.payload && typeof body.payload === 'object' ? body.payload : {}) as Record<
       string,
       unknown
     >
@@ -116,6 +117,18 @@ export async function POST(
     if (!entrySnap) {
       return NextResponse.json({ error: 'Entry no encontrada' }, { status: 404 })
     }
+
+    // Inyectar currency desde entry para kinds con monto absoluto. Si el client
+    // no mando currency, asumimos la del entry (defensive). Si mando una
+    // distinta, dejamos que el trigger DB la rechace para honrar la fuente
+    // canonica (entry.currency).
+    const payload: Record<string, unknown> =
+      kind === 'fixed_deduction' || kind === 'manual_override'
+        ? {
+            ...rawPayload,
+            currency: (rawPayload as { currency?: string }).currency ?? entrySnap.currency
+          }
+        : rawPayload
 
     // Compliance Chile dependiente: chequeo en TS antes de hit DB para mejor mensaje UX.
     const complianceError = checkChileDependentCompliance({

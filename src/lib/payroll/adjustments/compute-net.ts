@@ -18,10 +18,17 @@ import type {
 } from '@/types/payroll-adjustments'
 
 // Snapshot minimo del entry necesario para el calculo.
-// Trabajamos con CLP-equivalentes; los entries USD ya vienen pre-convertidos a CLP en su propio campo.
+// `naturalGrossClp` es un nombre historico — en realidad representa el bruto
+// compuesto en la moneda del entry (CLP o USD). El compute-net es agnostico
+// de moneda: opera enteramente sobre la moneda del entry. SII / previsional
+// Chile solo aplican si la moneda + regimen lo justifican (honorarios CLP,
+// chile dependiente CLP).
 export interface PayrollEntryComputeSnapshot {
   payRegime: 'chile' | 'international'
   contractTypeSnapshot: string | null
+  // Moneda del entry. Los adjustments fixed_deduction y manual_override deben
+  // declarar la misma moneda en su payload.
+  currency: 'CLP' | 'USD'
   // Bruto natural compuesto (base + remoto + bonos + ajustes por asistencia, antes de adjustments).
   naturalGrossClp: number
   // Componentes individuales (para gross_factor_per_component).
@@ -39,6 +46,15 @@ export interface PayrollEntryComputeSnapshot {
   // Retorna 0 si no aplica (international, honorarios). Inyectada por el caller para
   // mantener compute-net puro y agnostico de calculate-chile-deductions.
   recomputeChileDeductionsClp?: (effectiveGrossClp: number) => number
+}
+
+export class AdjustmentCurrencyMismatchError extends Error {
+  constructor(public readonly adjustmentId: string, expected: string, got: string, kind: string) {
+    super(
+      `Adjustment ${adjustmentId} (kind=${kind}) tiene payload.currency=${got} pero el entry exige ${expected}`
+    )
+    this.name = 'AdjustmentCurrencyMismatchError'
+  }
 }
 
 const isAdjustmentActive = (status: AdjustmentStatus): boolean => status === 'active'
@@ -161,11 +177,24 @@ export function computePayrollEntryNet(
     ? round2(Math.max(0, snapshot.recomputeChileDeductionsClp(effectiveGrossClp)))
     : 0
 
-  // 5) Apply fixed_deduction(s) — sum
+  // 5) Apply fixed_deduction(s) — sum. Cada fixed_deduction debe declarar
+  // currency coherente con snapshot.currency (validacion DB-level + safety
+  // net en compute time).
   let fixedDeductionClp = 0
 
   for (const a of active) {
     if (a.kind !== 'fixed_deduction') continue
+    const payloadCurrency = (a.payload as { currency?: string }).currency
+
+    if (payloadCurrency && payloadCurrency !== snapshot.currency) {
+      throw new AdjustmentCurrencyMismatchError(
+        a.adjustmentId,
+        snapshot.currency,
+        payloadCurrency,
+        a.kind
+      )
+    }
+
     const amt = Number((a.payload as { amount?: number }).amount)
 
     if (Number.isFinite(amt) && amt > 0) {
@@ -180,14 +209,30 @@ export function computePayrollEntryNet(
     effectiveGrossClp - siiRetentionClp - chileDeductionsClp - fixedDeductionClp
   )
 
-  // 6) manual_override gana sobre todo
+  // 6) manual_override gana sobre todo. Usa payload.netAmount (en
+  // entry.currency); soporta legacy `netClp` para back-compat de pre-745b.
   const overrideAdj = active.find(a => a.kind === 'manual_override')
 
   let netClp = netBeforeOverride
   let overrideApplied = false
 
   if (overrideAdj) {
-    const v = Number((overrideAdj.payload as { netClp?: number }).netClp)
+    const overridePayload = overrideAdj.payload as {
+      netAmount?: number
+      netClp?: number
+      currency?: string
+    }
+
+    if (overridePayload.currency && overridePayload.currency !== snapshot.currency) {
+      throw new AdjustmentCurrencyMismatchError(
+        overrideAdj.adjustmentId,
+        snapshot.currency,
+        overridePayload.currency,
+        overrideAdj.kind
+      )
+    }
+
+    const v = Number(overridePayload.netAmount ?? overridePayload.netClp)
 
     if (Number.isFinite(v)) {
       netClp = round2(v)

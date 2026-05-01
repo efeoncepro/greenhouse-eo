@@ -102,6 +102,7 @@ const PayrollEntryAdjustDialog = ({ open, onClose, entry, onSubmitted }: Props) 
     return {
       payRegime: entry.payRegime as 'chile' | 'international',
       contractTypeSnapshot: entry.contractTypeSnapshot ?? null,
+      currency: entry.currency,
       naturalGrossClp: entry.grossTotal,
       components: {
         base: entry.adjustedBaseSalary ?? entry.baseSalary,
@@ -132,12 +133,17 @@ const PayrollEntryAdjustDialog = ({ open, onClose, entry, onSubmitted }: Props) 
 
     const extra = Number(extraDeduction)
 
-    if (Number.isFinite(extra) && extra > 0 && mode !== 'exclude') {
-      adjs.push(buildAdjustmentForPreview('fixed_deduction', { amount: extra }))
+    if (Number.isFinite(extra) && extra > 0 && mode !== 'exclude' && entry) {
+      adjs.push(
+        buildAdjustmentForPreview('fixed_deduction', {
+          amount: extra,
+          currency: entry.currency
+        })
+      )
     }
 
     return adjs
-  }, [mode, percentage, extraDeduction])
+  }, [mode, percentage, extraDeduction, entry])
 
   const computation = useMemo(() => {
     if (!previewSnapshot) return null
@@ -219,7 +225,7 @@ const PayrollEntryAdjustDialog = ({ open, onClose, entry, onSubmitted }: Props) 
       const extra = Number(extraDeduction)
 
       if (Number.isFinite(extra) && extra > 0 && mode !== 'exclude') {
-        await submitOne('fixed_deduction', { amount: extra })
+        await submitOne('fixed_deduction', { amount: extra, currency: entry.currency })
       }
 
       onSubmitted()
@@ -278,13 +284,13 @@ const PayrollEntryAdjustDialog = ({ open, onClose, entry, onSubmitted }: Props) 
           )}
 
           <CustomTextField
-            label='Descuento adicional (CLP)'
+            label={`Descuento adicional (${entry.currency})`}
             type='number'
             value={extraDeduction}
             disabled={mode === 'exclude'}
             onChange={e => setExtraDeduction(e.target.value)}
-            helperText='Ej: anticipo a recuperar, prestamo en cuotas. Aplica al neto.'
-            inputProps={{ min: 0, step: 1000 }}
+            helperText={`Ej: anticipo a recuperar, prestamo en cuotas. Se descuenta del neto en ${entry.currency} (la moneda del colaborador).`}
+            inputProps={{ min: 0, step: entry.currency === 'CLP' ? 1000 : 10 }}
             fullWidth
           />
 
@@ -350,7 +356,7 @@ const PayrollEntryAdjustDialog = ({ open, onClose, entry, onSubmitted }: Props) 
                 {computation.fixedDeductionClp > 0 && (
                   <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                     <span>Descuento adicional:</span>
-                    <span>− {formatCurrency(computation.fixedDeductionClp, 'CLP')}</span>
+                    <span>− {formatCurrency(computation.fixedDeductionClp, entry.currency)}</span>
                   </Box>
                 )}
                 <Divider />

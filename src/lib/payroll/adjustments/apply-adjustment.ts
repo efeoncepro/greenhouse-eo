@@ -119,14 +119,35 @@ const validateInputSync = (input: CreateAdjustmentInput): void => {
         )
       }
 
+      const currency = (input.payload as { currency?: string }).currency
+
+      if (currency !== 'CLP' && currency !== 'USD') {
+        throw new PayrollAdjustmentValidationError(
+          `fixed_deduction.currency requerido (CLP|USD); recibido ${currency}`
+        )
+      }
+
       break
     }
 
     case 'manual_override': {
-      const v = Number((input.payload as { netClp?: number }).netClp)
+      const v = Number(
+        (input.payload as { netAmount?: number; netClp?: number }).netAmount ??
+          (input.payload as { netClp?: number }).netClp
+      )
 
       if (!Number.isFinite(v)) {
-        throw new PayrollAdjustmentValidationError('manual_override.netClp debe ser numero')
+        throw new PayrollAdjustmentValidationError(
+          'manual_override.netAmount debe ser numero'
+        )
+      }
+
+      const currency = (input.payload as { currency?: string }).currency
+
+      if (currency !== 'CLP' && currency !== 'USD') {
+        throw new PayrollAdjustmentValidationError(
+          `manual_override.currency requerido (CLP|USD); recibido ${currency}`
+        )
       }
 
       break
