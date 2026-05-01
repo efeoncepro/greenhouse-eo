@@ -1,5 +1,114 @@
 # Greenhouse Payment Orders Architecture V1
 
+## Delta 2026-05-01 — TASK-749: Beneficiary Payment Profiles + Routing Resolver (V1)
+
+Cierra la pieza "por qué rail pagar a este beneficiario" con un modelo
+**dual-surface**: un componente UI reutilizable montado en 3 lugares con la
+misma fuente de verdad backend.
+
+### Schema
+
+- `greenhouse_finance.beneficiary_payment_profiles` — perfil versionado
+  (status: `draft`, `pending_approval`, `active`, `superseded`, `cancelled`)
+  con maker-checker triple defensa (DB trigger + helper TS + UI). Idempotency
+  partial unique index sobre `(space, beneficiary_type, beneficiary_id, currency) WHERE status='active'`.
+- `greenhouse_finance.beneficiary_payment_profile_audit_log` — append-only
+  con actions `created/updated/approved/superseded/cancelled/revealed_sensitive`,
+  IP/UA, motivo, diff JSON.
+
+### Helpers TS canónicos
+
+- `createPaymentProfile(input)` — crea en `pending_approval` (default).
+- `approvePaymentProfile(input)` — transiciona a `active`. Si existe otro
+  `active` para la misma key, lo supersede atomicamente en la misma tx.
+- `cancelPaymentProfile(input)` — solo desde estados no-terminales.
+- `revealPaymentProfileSensitive(input)` — devuelve `accountNumberFull` +
+  `vaultRef` + audit + outbox. Capability `finance.payment_profiles.reveal_sensitive`
+  obligatorio + motivo (5+ chars) + IP/UA capturados.
+- `getActivePaymentProfile({...})` — lookup canónico por (space, beneficiary, currency).
+- `getPaymentProfileDriftForActiveObligations()` — beneficiarios con obligaciones
+  vivas sin perfil activo (bloquea Payment Orders).
+- `getPaymentProfileQueueSummary()` — snapshot consolidado: counts + pending
+  list + drift rows. Una sola llamada para la surface ops.
+
+### Routing resolver
+
+`resolvePaymentRoute(obligation, context)` en `src/lib/finance/payment-routing/`:
+
+- **Cascada**: validar beneficiary_type ∈ {member, shareholder} → buscar
+  `active` → si no, buscar `pending_approval` → si no, `profile_missing`.
+- **Outcomes**: `resolved`, `profile_missing`, `profile_pending_approval`,
+  `unsupported_currency`, `unsupported_beneficiary_type`.
+- **Output**: `{providerSlug, paymentMethod, paymentInstrumentId, profileId, reason, resolvedAt}`.
+- **Wireup en `createPaymentOrderFromObligations`**: cuando el caller no
+  entrega `processorSlug/paymentMethod`, el resolver corre solo para
+  `beneficiary_type='member'` y guarda snapshot por line en
+  `payment_orders.metadata_json.routing_snapshots`. El primer `resolved`
+  gana como header de la order.
+
+### Modelo UI dual-surface
+
+- **Componente reutilizable**: `<PaymentProfilesPanel>` en
+  `src/views/greenhouse/finance/payment-profiles/PaymentProfilesPanel.tsx`.
+  Recibe `constrainedBeneficiary?: {type, id, name?, countryCode?}` para
+  pre-llenar el dialog y filtrar la tabla.
+- **Mount 1 — Person 360 (fuente primaria de personas)**: tab "Pago" en
+  `src/views/greenhouse/people/tabs/PersonPaymentTab.tsx`. Permiso
+  `canViewPaymentProfile` (efeonce_admin / finance_admin / finance_analyst).
+- **Mount 2 — Shareholder 360 (fuente primaria de accionistas)**: sección en
+  `ShareholderAccountDetailDrawer.tsx` cuando hay `profileId` (identity_profile).
+- **Mount 3 — Surface ops** (`/finance/payment-profiles`): NO duplica CRUD.
+  Cubre 3 jobs cross-cutting: cola de aprobación, drift card de
+  obligaciones bloqueadas, tabla universal read-only con deep links a los 360.
+
+### API admin
+
+- `GET /api/admin/finance/payment-profiles` — list con filtros.
+- `POST /api/admin/finance/payment-profiles` — create.
+- `GET /api/admin/finance/payment-profiles/:id` — detalle (masked).
+- `POST /api/admin/finance/payment-profiles/:id/{approve,cancel,reveal-sensitive}` — actions.
+- `GET /api/admin/finance/payment-profiles/:id/audit` — log.
+- `GET /api/admin/finance/payment-profiles/queue` — counts + pending + drift (snapshot ops).
+- `POST /api/admin/finance/payment-routing/preview` — resuelve sin escribir.
+
+### Permisos / Capabilities
+
+4 nuevas en `entitlements-catalog.ts`:
+- `finance.payment_profiles.read`
+- `finance.payment_profiles.create` (create + update)
+- `finance.payment_profiles.approve` (update)
+- `finance.payment_profiles.reveal_sensitive` (read; gateado por motivo + audit)
+
+View code `finanzas.perfiles_pago` seedado para 4 roles finanzas
+(migration `20260501151806364`).
+
+### Eventos outbox emitidos
+
+- `finance.beneficiary_payment_profile.created`
+- `finance.beneficiary_payment_profile.updated`
+- `finance.beneficiary_payment_profile.approved`
+- `finance.beneficiary_payment_profile.superseded`
+- `finance.beneficiary_payment_profile.cancelled`
+- `finance.beneficiary_payment_profile.revealed_sensitive`
+
+### Reglas duras
+
+- **Datos sensibles enmascarados por default**: `account_number_full` y
+  `vault_ref` solo se devuelven via `reveal-sensitive` con capability + motivo + audit.
+- **Maker-checker triple defensa**: trigger DB + helper TS + UI bloquea botón
+  cuando `created_by == approver`.
+- **Idempotency**: partial unique index garantiza solo 1 `active` por (space,
+  beneficiary_type, beneficiary_id, currency). Aprobar nuevo automaticamente
+  supersede el anterior atómicamente.
+- **V1 enfoque**: `beneficiary_type ∈ {member, shareholder}`. Otros tipos
+  (supplier, tax_authority, processor) se aceptan en CHECK constraint para
+  forward compat pero no son creables via helper en V1.
+- **Country fallback**: profile.country → member.location_country → identity_profile → 'CL' default.
+- **vault_ref como contrato futuro**: V1 placeholder; cuando emerja vault
+  externo, `account_number_full` puede ser NULL y la fuente canónica es el vault.
+
+Spec consumer downstream: TASK-750 ya integrado vía resolver wireup.
+
 ## Delta 2026-05-01 — TASK-750: Payment Orders + Lines + Artifacts (runtime V1)
 
 Cierra la capa runtime entre `payment_obligations` y el pago real. Tres tablas

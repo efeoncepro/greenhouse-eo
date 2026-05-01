@@ -5,6 +5,7 @@ import { randomUUID } from 'node:crypto'
 import type { PoolClient } from 'pg'
 
 import { withTransaction } from '@/lib/db'
+import { resolvePaymentRoute } from '@/lib/finance/payment-routing/resolve-route'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 import type {
   PaymentOrder,
@@ -240,6 +241,58 @@ export async function createPaymentOrderFromObligations(
       input.periodId ??
       (distinctPeriods.size === 1 ? ([...distinctPeriods][0] as string) : null)
 
+    // 6.5 TASK-749: Resolver routing por line desde el perfil activo del
+    // beneficiary cuando el caller no provee processorSlug/paymentMethod.
+    // El snapshot queda en metadata.routing_snapshots (audit + debugging).
+    // Si el caller YA entrega esos campos, ganan: el resolver no se invoca.
+    //
+    // V1: solo resolvemos para beneficiary_type='member'. Otros tipos
+    // (tax_authority, processor, other) requieren routing manual del operator.
+    // 'shareholder' no genera obligations en V1 (CCAs son manual entries).
+    const routingSnapshots: Array<Record<string, unknown>> = []
+    let resolvedProcessorSlug = input.processorSlug ?? null
+    let resolvedPaymentMethod: PaymentOrderPaymentMethod | null = input.paymentMethod ?? null
+
+    if (!input.processorSlug && !input.paymentMethod) {
+      const memberRows = result.rows.filter(r => r.beneficiary_type === 'member')
+
+      for (const row of memberRows) {
+        try {
+          const route = await resolvePaymentRoute({
+            spaceId: row.space_id,
+            beneficiaryType: 'member',
+            beneficiaryId: row.beneficiary_id,
+            currency: row.currency as 'CLP' | 'USD',
+            obligationKind: row.obligation_kind as 'employee_net_pay'
+          })
+
+          routingSnapshots.push({
+            obligationId: row.obligation_id,
+            outcome: route.outcome,
+            providerSlug: route.providerSlug,
+            paymentMethod: route.paymentMethod,
+            paymentInstrumentId: route.paymentInstrumentId,
+            profileId: route.profileId,
+            reason: route.reason,
+            resolvedAt: route.resolvedAt
+          })
+
+          if (route.outcome === 'resolved' && !resolvedProcessorSlug) {
+            resolvedProcessorSlug = route.providerSlug
+            resolvedPaymentMethod = route.paymentMethod
+          }
+        } catch (e) {
+          // Resolver falla = degradar a "unresolved", no bloquea el create.
+          // El caller puede setear processorSlug manualmente despues.
+          routingSnapshots.push({
+            obligationId: row.obligation_id,
+            outcome: 'resolver_error',
+            error: e instanceof Error ? e.message : String(e)
+          })
+        }
+      }
+    }
+
     // 7. INSERT order
     const orderId = buildOrderId()
     const requireApproval = input.requireApproval !== false
@@ -268,8 +321,8 @@ export async function createPaymentOrderFromObligations(
         periodId,
         input.title.trim(),
         input.description ?? null,
-        input.processorSlug ?? null,
-        input.paymentMethod ?? null,
+        resolvedProcessorSlug,
+        resolvedPaymentMethod,
         input.sourceAccountId ?? null,
         totalAmount,
         currency,
@@ -280,7 +333,10 @@ export async function createPaymentOrderFromObligations(
         input.createdBy,
         requireApproval ? null : input.createdBy,
         requireApproval ? null : new Date().toISOString(),
-        JSON.stringify(input.metadata ?? {})
+        JSON.stringify({
+          ...(input.metadata ?? {}),
+          ...(routingSnapshots.length > 0 ? { routing_snapshots: routingSnapshots } : {})
+        })
       ]
     )
 

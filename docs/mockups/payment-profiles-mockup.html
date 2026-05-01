@@ -1,0 +1,907 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Perfiles de pago — Mockup TASK-749</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #f4f5fa;
+    --surface: #ffffff;
+    --border: #dbdade;
+    --text: #2f2b3d;
+    --text-secondary: #6f6b7d;
+    --primary: #7367f0;
+    --primary-tonal: rgba(115,103,240,0.16);
+    --success: #6ec207;
+    --success-tonal: rgba(110,194,7,0.16);
+    --warning: #ff6500;
+    --warning-tonal: rgba(255,101,0,0.16);
+    --error: #bb1954;
+    --error-tonal: rgba(187,25,84,0.16);
+    --info: #00bad1;
+    --info-tonal: rgba(0,186,209,0.16);
+    --secondary: #808390;
+    --secondary-tonal: rgba(128,131,144,0.16);
+    --hover: rgba(47,43,61,0.04);
+    --shadow: 0 2px 6px rgba(47,43,61,0.06);
+    --radius: 10px;
+    --radius-lg: 14px;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.45;
+  }
+  .layout { max-width: 1440px; margin: 0 auto; padding: 32px 32px 96px; }
+  .stack { display: flex; flex-direction: column; gap: 24px; }
+  .row { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+  .row-between { display: flex; gap: 16px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+  }
+  .eyebrow {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-secondary);
+    font-weight: 600;
+  }
+  h1 { font-size: 24px; margin: 0; font-weight: 600; }
+  h2 { font-size: 18px; margin: 0; font-weight: 600; }
+  h3 { font-size: 15px; margin: 0; font-weight: 600; }
+  .lead { color: var(--text-secondary); font-size: 14px; max-width: 720px; line-height: 1.55; }
+
+  /* Buttons */
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 14px; min-height: 38px;
+    border-radius: 8px; border: 1px solid transparent;
+    font-family: inherit; font-size: 13px; font-weight: 500;
+    cursor: pointer; text-decoration: none;
+    transition: background 120ms;
+  }
+  .btn-primary { background: var(--primary); color: white; }
+  .btn-primary:hover { filter: brightness(1.08); }
+  .btn-outlined { background: transparent; color: var(--text); border-color: var(--border); }
+  .btn-outlined:hover { background: var(--hover); }
+  .btn-error { background: transparent; color: var(--error); border-color: var(--error); }
+  .btn-error:hover { background: var(--error-tonal); }
+  .btn-success { background: var(--success); color: white; }
+  .btn-success:hover { filter: brightness(1.08); }
+  .btn-sm { padding: 5px 10px; min-height: 30px; font-size: 12px; }
+  .icon-btn { width: 32px; height: 32px; padding: 0; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; background: transparent; border: 1px solid transparent; cursor: pointer; }
+  .icon-btn:hover { background: var(--hover); }
+
+  /* Chips */
+  .chip {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 10px;
+    border-radius: 999px; font-size: 12px; font-weight: 500;
+    background: var(--secondary-tonal); color: var(--text);
+    line-height: 1.6;
+  }
+  .chip-tonal-warning { background: var(--warning-tonal); color: var(--warning); }
+  .chip-tonal-success { background: var(--success-tonal); color: var(--success); }
+  .chip-tonal-error { background: var(--error-tonal); color: var(--error); }
+  .chip-tonal-info { background: var(--info-tonal); color: var(--info); }
+  .chip-tonal-primary { background: var(--primary-tonal); color: var(--primary); }
+  .chip-outlined {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+  }
+
+  /* Filters bar */
+  .filters {
+    display: grid; grid-template-columns: repeat(4, 1fr) auto;
+    gap: 12px; align-items: end;
+  }
+  @media (max-width: 1080px) {
+    .filters { grid-template-columns: repeat(2, 1fr); }
+  }
+  .field { display: flex; flex-direction: column; gap: 4px; }
+  .field label { font-size: 12px; color: var(--text-secondary); font-weight: 500; }
+  .field input,
+  .field select,
+  .field textarea {
+    width: 100%;
+    padding: 8px 10px;
+    border-radius: 6px; border: 1px solid var(--border);
+    background: var(--surface);
+    font-family: inherit; font-size: 13px;
+    color: var(--text);
+    min-height: 38px;
+  }
+  .field input:focus,
+  .field select:focus,
+  .field textarea:focus {
+    outline: 2px solid var(--primary); outline-offset: 1px;
+    border-color: var(--primary);
+  }
+  .field .caption { font-size: 11px; color: var(--text-secondary); }
+
+  /* KPI summary row (informational) */
+  .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  @media (max-width: 880px) { .kpi-grid { grid-template-columns: repeat(2, 1fr); } }
+  .kpi {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .kpi-icon {
+    width: 42px; height: 42px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; flex-shrink: 0;
+  }
+  .kpi-stack { display: flex; flex-direction: column; gap: 2px; }
+  .kpi-label { color: var(--text-secondary); font-size: 13px; }
+  .kpi-value { font-size: 24px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .kpi-sub { font-size: 12px; color: var(--text-secondary); }
+
+  /* Table */
+  .table-wrap { overflow: auto; }
+  table {
+    width: 100%; border-collapse: collapse;
+    font-size: 13px;
+  }
+  thead th {
+    text-align: left;
+    padding: 10px 12px;
+    font-size: 12px;
+    color: var(--text-secondary);
+    font-weight: 500;
+    border-bottom: 1px solid var(--border);
+    background: rgba(47,43,61,0.02);
+    position: sticky; top: 0;
+  }
+  tbody td {
+    padding: 12px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+  tbody tr {
+    cursor: pointer;
+    transition: background 80ms;
+  }
+  tbody tr:hover { background: var(--hover); }
+  tbody tr.selected { background: rgba(115,103,240,0.05); }
+  .td-stack { display: flex; flex-direction: column; gap: 1px; }
+  .td-secondary { color: var(--text-secondary); font-size: 12px; }
+  .td-mono { font-family: ui-monospace, 'SF Mono', monospace; font-size: 12px; color: var(--text-secondary); }
+  .td-amount { font-variant-numeric: tabular-nums; font-weight: 500; text-align: right; }
+
+  /* Empty state preview */
+  .empty {
+    border: 1px dashed rgba(47,43,61,0.22);
+    background: rgba(47,43,61,0.04);
+    border-radius: 14px;
+    padding: 32px;
+    text-align: center;
+    display: flex; flex-direction: column; align-items: center; gap: 12px;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+  .empty-icon {
+    width: 56px; height: 56px; border-radius: 50%;
+    background: rgba(47,43,61,0.08); color: var(--text-secondary);
+    display: flex; align-items: center; justify-content: center; font-size: 26px;
+  }
+
+  /* Drawer */
+  .drawer-shell {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+  .drawer-header {
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .drawer-body { padding: 24px; display: flex; flex-direction: column; gap: 20px; }
+  .drawer-section {
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .drawer-section h3 { font-size: 13px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.06em; }
+  .meta-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .meta-item { display: flex; flex-direction: column; gap: 2px; }
+  .meta-item .lbl { font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.04em; }
+  .meta-item .val { font-size: 14px; }
+
+  /* Alert / banner */
+  .alert {
+    border-radius: 8px;
+    padding: 12px 16px;
+    border-left: 4px solid;
+    font-size: 13px;
+    display: flex; gap: 10px; align-items: flex-start;
+  }
+  .alert-info { background: var(--info-tonal); border-color: var(--info); color: var(--text); }
+  .alert-warning { background: var(--warning-tonal); border-color: var(--warning); color: var(--text); }
+  .alert-error { background: var(--error-tonal); border-color: var(--error); color: var(--text); }
+  .alert-success { background: var(--success-tonal); border-color: var(--success); color: var(--text); }
+
+  /* Reveal sensitive box */
+  .sensitive-box {
+    border: 1px solid var(--warning);
+    background: rgba(255,101,0,0.06);
+    border-radius: 8px;
+    padding: 12px 14px;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .sensitive-value {
+    font-family: ui-monospace, 'SF Mono', monospace;
+    font-size: 14px; font-weight: 600;
+    letter-spacing: 0.08em;
+  }
+  .reveal-row { display: flex; gap: 8px; align-items: center; }
+
+  /* Audit timeline */
+  .timeline { display: flex; flex-direction: column; gap: 12px; }
+  .timeline-item { display: flex; gap: 12px; align-items: flex-start; }
+  .timeline-dot {
+    width: 32px; height: 32px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; flex-shrink: 0;
+  }
+  .timeline-stack { display: flex; flex-direction: column; gap: 1px; flex: 1; }
+  .timeline-label { font-weight: 500; font-size: 13px; }
+  .timeline-meta { font-size: 12px; color: var(--text-secondary); }
+
+  /* Two-column shell for the mockup */
+  .two-col {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 480px;
+    gap: 24px;
+    align-items: start;
+  }
+  @media (max-width: 1180px) { .two-col { grid-template-columns: 1fr; } }
+
+  .pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--primary-tonal); color: var(--primary);
+    padding: 4px 10px; border-radius: 999px;
+    font-size: 12px; font-weight: 500;
+  }
+
+  .decision-card {
+    background: rgba(115,103,240,0.06);
+    border: 1px solid var(--primary);
+    border-radius: var(--radius);
+    padding: 16px;
+    display: flex; flex-direction: column; gap: 8px;
+    max-width: 720px;
+  }
+  .decision-card ul { margin: 0; padding-left: 18px; }
+  .decision-card li { margin-bottom: 4px; }
+
+  /* dialog preview */
+  .dialog-preview {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    max-width: 540px;
+  }
+  .dialog-header { padding: 16px 24px; border-bottom: 1px solid var(--border); }
+  .dialog-body { padding: 20px 24px; display: flex; flex-direction: column; gap: 14px; max-height: 60vh; overflow: auto; }
+  .dialog-footer {
+    padding: 12px 24px;
+    border-top: 1px solid var(--border);
+    display: flex; gap: 8px; justify-content: flex-end;
+  }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  /* mocked icons (unicode + Tabler-like name in a span) */
+  .ico { width: 18px; height: 18px; display: inline-block; vertical-align: middle; }
+  .switch {
+    position: relative; width: 36px; height: 20px;
+    background: var(--border); border-radius: 999px;
+    flex-shrink: 0;
+  }
+  .switch.on { background: var(--primary); }
+  .switch::after {
+    content: ''; position: absolute; top: 2px; left: 2px;
+    width: 16px; height: 16px; border-radius: 50%;
+    background: white;
+    transition: left 120ms;
+  }
+  .switch.on::after { left: 18px; }
+  .switch-row { display: flex; align-items: flex-start; gap: 12px; }
+  .switch-stack { display: flex; flex-direction: column; gap: 2px; }
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- HERO -->
+  <div class="card stack">
+    <div class="row-between">
+      <div class="stack" style="gap:6px;">
+        <span class="eyebrow">Mockup · Perfiles de pago V1 · Pendiente aprobación</span>
+        <h1>Perfiles de pago por beneficiario</h1>
+        <div class="lead">
+          Define cómo pagar a cada colaborador o accionista (banco local, Deel, Wise, Global66) con
+          maker-checker y datos sensibles enmascarados por defecto. Una sola vez se decide la ruta;
+          después <strong>Órdenes de pago</strong> la aplica automáticamente al programar pagos.
+        </div>
+      </div>
+      <button class="btn btn-primary">+ Crear perfil</button>
+    </div>
+
+    <div class="decision-card">
+      <strong>Cómo se conecta este módulo</strong>
+      <ul>
+        <li><strong>Obligaciones (TASK-748)</strong> → genera "qué se debe pagar"</li>
+        <li><strong>Perfiles de pago (este módulo)</strong> → resuelve "por qué rail pagar al beneficiario"</li>
+        <li><strong>Órdenes de pago (TASK-750)</strong> → toma el perfil activo y arma la orden con provider + método ya resueltos</li>
+      </ul>
+      <div class="lead" style="font-size:13px;">
+        El resolver lee el perfil <strong>active</strong> por (espacio, beneficiario, moneda) y
+        congela un snapshot en la orden. Si no hay perfil activo, la orden bloquea hasta que alguien lo cree.
+      </div>
+    </div>
+  </div>
+
+  <!-- KPI summary -->
+  <div class="kpi-grid" style="margin-top:24px;" role="status" aria-live="polite">
+    <div class="kpi">
+      <div class="kpi-icon" style="background:var(--success-tonal); color:var(--success);">✓</div>
+      <div class="kpi-stack">
+        <div class="kpi-label">Activos</div>
+        <div class="kpi-value">12</div>
+        <div class="kpi-sub">listos para usar en órdenes</div>
+      </div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-icon" style="background:var(--warning-tonal); color:var(--warning);">⌛</div>
+      <div class="kpi-stack">
+        <div class="kpi-label">Pendientes de aprobación</div>
+        <div class="kpi-value">3</div>
+        <div class="kpi-sub">esperando checker</div>
+      </div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-icon" style="background:var(--info-tonal); color:var(--info);">↻</div>
+      <div class="kpi-stack">
+        <div class="kpi-label">Reemplazados (superseded)</div>
+        <div class="kpi-value">7</div>
+        <div class="kpi-sub">historial preservado</div>
+      </div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-icon" style="background:var(--error-tonal); color:var(--error);">!</div>
+      <div class="kpi-stack">
+        <div class="kpi-label">Sin perfil (drift)</div>
+        <div class="kpi-value">2</div>
+        <div class="kpi-sub">colaboradores con obligaciones bloqueadas</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FILTERS + TABLE -->
+  <div class="card stack" style="margin-top:24px;">
+    <div class="row-between">
+      <h2>Perfiles registrados</h2>
+      <div class="row" style="gap:8px;">
+        <button class="btn btn-outlined btn-sm">⤓ Exportar CSV</button>
+      </div>
+    </div>
+
+    <div class="filters">
+      <div class="field">
+        <label>Estado</label>
+        <select>
+          <option>Todos</option>
+          <option>Pendiente aprobación</option>
+          <option selected>Activo</option>
+          <option>Reemplazado</option>
+          <option>Cancelado</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Tipo de beneficiario</label>
+        <select>
+          <option selected>Todos</option>
+          <option>Colaborador</option>
+          <option>Accionista</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Moneda</label>
+        <select>
+          <option selected>Todas</option>
+          <option>CLP</option>
+          <option>USD</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Buscar</label>
+        <input type="search" placeholder="Nombre o ID del beneficiario" />
+      </div>
+      <button class="btn btn-outlined">Limpiar</button>
+    </div>
+
+    <div class="table-wrap" data-table-shell="payment-profiles">
+      <table aria-label="Tabla de perfiles de pago">
+        <thead>
+          <tr>
+            <th>Beneficiario</th>
+            <th>Tipo</th>
+            <th>Moneda</th>
+            <th>Provider</th>
+            <th>Método</th>
+            <th>Cuenta</th>
+            <th>Estado</th>
+            <th>Maker → Checker</th>
+            <th>Vigente desde</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="selected">
+            <td>
+              <div class="td-stack">
+                <strong>Andrés Rodríguez</strong>
+                <span class="td-mono">mem-andres-001</span>
+              </div>
+            </td>
+            <td><span class="chip chip-outlined">Colaborador</span></td>
+            <td>USD</td>
+            <td><span class="chip chip-tonal-info">Global66</span></td>
+            <td>global66</td>
+            <td><span class="td-mono">•••• 4521</span></td>
+            <td><span class="chip chip-tonal-success">Activo</span></td>
+            <td>
+              <div class="td-stack">
+                <span>julio.reyes@</span>
+                <span class="td-secondary">→ daniela.f@</span>
+              </div>
+            </td>
+            <td><span class="td-secondary">15 abr 2026</span></td>
+          </tr>
+
+          <tr>
+            <td>
+              <div class="td-stack">
+                <strong>Daniela Ferreira</strong>
+                <span class="td-mono">mem-daniela-002</span>
+              </div>
+            </td>
+            <td><span class="chip chip-outlined">Colaborador</span></td>
+            <td>USD</td>
+            <td><span class="chip chip-tonal-info">Wise</span></td>
+            <td>wise</td>
+            <td><span class="td-mono">•••• 8821</span></td>
+            <td><span class="chip chip-tonal-success">Activo</span></td>
+            <td>
+              <div class="td-stack">
+                <span>cesar.l@</span>
+                <span class="td-secondary">→ julio.reyes@</span>
+              </div>
+            </td>
+            <td><span class="td-secondary">02 mar 2026</span></td>
+          </tr>
+
+          <tr>
+            <td>
+              <div class="td-stack">
+                <strong>Melkin Rodríguez</strong>
+                <span class="td-mono">mem-melkin-003</span>
+              </div>
+            </td>
+            <td><span class="chip chip-outlined">Colaborador</span></td>
+            <td>USD</td>
+            <td><span class="chip chip-tonal-info">Wise</span></td>
+            <td>wise</td>
+            <td><span class="td-mono">•••• 0094</span></td>
+            <td><span class="chip chip-tonal-warning">Pendiente aprobación</span></td>
+            <td>
+              <div class="td-stack">
+                <span>julio.reyes@</span>
+                <span class="td-secondary">→ —</span>
+              </div>
+            </td>
+            <td><span class="td-secondary">—</span></td>
+          </tr>
+
+          <tr>
+            <td>
+              <div class="td-stack">
+                <strong>Valentina Hoyos</strong>
+                <span class="td-mono">mem-valentina-004</span>
+              </div>
+            </td>
+            <td><span class="chip chip-outlined">Colaborador</span></td>
+            <td>CLP</td>
+            <td><span class="chip chip-tonal-info">BCI</span></td>
+            <td>bank_transfer</td>
+            <td><span class="td-mono">•••• 2110</span></td>
+            <td><span class="chip chip-tonal-success">Activo</span></td>
+            <td>
+              <div class="td-stack">
+                <span>julio.reyes@</span>
+                <span class="td-secondary">→ daniela.f@</span>
+              </div>
+            </td>
+            <td><span class="td-secondary">01 ene 2026</span></td>
+          </tr>
+
+          <tr>
+            <td>
+              <div class="td-stack">
+                <strong>Luis Fernández</strong>
+                <span class="td-mono">mem-luis-005</span>
+              </div>
+            </td>
+            <td><span class="chip chip-outlined">Colaborador</span></td>
+            <td>CLP</td>
+            <td><span class="chip chip-tonal-info">Banco Chile</span></td>
+            <td>bank_transfer</td>
+            <td><span class="td-mono">•••• 9203</span></td>
+            <td><span class="chip chip-tonal-success">Activo</span></td>
+            <td>
+              <div class="td-stack">
+                <span>cesar.l@</span>
+                <span class="td-secondary">→ julio.reyes@</span>
+              </div>
+            </td>
+            <td><span class="td-secondary">10 feb 2026</span></td>
+          </tr>
+
+          <tr>
+            <td>
+              <div class="td-stack">
+                <strong>Julio Reyes (CCA)</strong>
+                <span class="td-mono">id-julio-001</span>
+              </div>
+            </td>
+            <td><span class="chip chip-outlined">Accionista</span></td>
+            <td>CLP</td>
+            <td><span class="chip chip-tonal-primary">Greenhouse</span></td>
+            <td>manual_cash</td>
+            <td><span class="td-mono">•••• 0001</span></td>
+            <td><span class="chip chip-tonal-success">Activo</span></td>
+            <td>
+              <div class="td-stack">
+                <span>cesar.l@</span>
+                <span class="td-secondary">→ daniela.f@</span>
+              </div>
+            </td>
+            <td><span class="td-secondary">28 ene 2026</span></td>
+          </tr>
+
+          <tr>
+            <td>
+              <div class="td-stack">
+                <strong>Humberly Mojica</strong>
+                <span class="td-mono">mem-humberly-006</span>
+              </div>
+            </td>
+            <td><span class="chip chip-outlined">Colaborador</span></td>
+            <td>CLP</td>
+            <td><span class="chip chip-tonal-info">Santander</span></td>
+            <td>bank_transfer</td>
+            <td><span class="td-mono">•••• 7702</span></td>
+            <td><span class="chip">Reemplazado</span></td>
+            <td>
+              <div class="td-stack">
+                <span>julio.reyes@</span>
+                <span class="td-secondary">→ cesar.l@</span>
+              </div>
+            </td>
+            <td><span class="td-secondary">15 dic 2025 → 14 abr 2026</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="row" style="gap:6px; padding-top:8px; border-top:1px solid var(--border); justify-content:flex-end;">
+      <span class="td-secondary">7 perfiles · 1–7 de 7</span>
+    </div>
+  </div>
+
+  <!-- TWO-COL: Drawer detail + Create dialog preview -->
+  <h2 style="margin-top:32px; margin-bottom:8px;">Surfaces</h2>
+  <div class="lead" style="margin-bottom:16px;">Click en una fila abre el drawer (derecha). El botón "Crear perfil" abre el dialog inline (abajo).</div>
+
+  <div class="two-col">
+    <!-- DIALOG -->
+    <div class="dialog-preview">
+      <div class="dialog-header">
+        <h2>Crear perfil de pago</h2>
+      </div>
+      <div class="dialog-body">
+        <div class="alert alert-info">
+          <span>ℹ️</span>
+          <div>
+            El perfil entra como <strong>Pendiente aprobación</strong>. Otro usuario distinto al creador
+            debe aprobarlo (maker-checker).
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="field">
+            <label>Tipo de beneficiario</label>
+            <select>
+              <option selected>Colaborador</option>
+              <option>Accionista</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Moneda</label>
+            <select>
+              <option selected>USD</option>
+              <option>CLP</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>ID del beneficiario *</label>
+          <input value="mem-andres-001" />
+          <span class="caption">ID del miembro o identity_profile</span>
+        </div>
+
+        <div class="field">
+          <label>Nombre (display)</label>
+          <input value="Andrés Rodríguez" />
+        </div>
+
+        <div class="form-row">
+          <div class="field">
+            <label>País</label>
+            <input value="CO" maxlength="2" placeholder="CL" />
+          </div>
+          <div class="field">
+            <label>Provider</label>
+            <select>
+              <option>BCI</option>
+              <option>Banco de Chile</option>
+              <option>Santander</option>
+              <option>Wise</option>
+              <option selected>Global66</option>
+              <option>Deel</option>
+              <option>PayPal</option>
+              <option>Mercado Pago</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Método de pago</label>
+          <select>
+            <option>bank_transfer</option>
+            <option>wire</option>
+            <option>wise</option>
+            <option selected>global66</option>
+            <option>paypal</option>
+            <option>deel</option>
+            <option>manual_cash</option>
+            <option>check</option>
+            <option>sii_pec</option>
+            <option>other</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Titular de la cuenta</label>
+          <input value="Andres Rodriguez" />
+        </div>
+
+        <div class="field">
+          <label>Número de cuenta *</label>
+          <input value="0014725831924521" type="password" />
+          <span class="caption">Se enmascara al guardar. Solo se revela con permiso explícito y queda en audit log.</span>
+        </div>
+
+        <div class="form-row">
+          <div class="field">
+            <label>Banco / Plataforma</label>
+            <input value="Global66" />
+          </div>
+          <div class="field">
+            <label>Routing / SWIFT (opcional)</label>
+            <input placeholder="ABACUS-99887" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Notas internas</label>
+          <textarea rows="2" placeholder="Cualquier contexto operativo (ej. 'pago semanal preferente'…)"></textarea>
+        </div>
+
+        <div class="switch-row">
+          <div class="switch on" aria-hidden="true"></div>
+          <div class="switch-stack">
+            <strong style="font-size:13px;">Requiere aprobación (maker-checker)</strong>
+            <span class="caption">Recomendado: déjalo activo. El creador no puede aprobar su propio perfil.</span>
+          </div>
+        </div>
+      </div>
+      <div class="dialog-footer">
+        <button class="btn btn-outlined">Cancelar</button>
+        <button class="btn btn-primary">Crear perfil</button>
+      </div>
+    </div>
+
+    <!-- DRAWER -->
+    <div class="drawer-shell">
+      <div class="drawer-header">
+        <div>
+          <h2>Detalle del perfil</h2>
+          <span class="td-mono">bpp-95f1a2c8-4e2d-4f3b-9e7a-9c1d4d7d8b2a</span>
+        </div>
+        <button class="icon-btn" aria-label="Cerrar drawer">✕</button>
+      </div>
+      <div class="drawer-body">
+        <!-- Identity -->
+        <div class="drawer-section">
+          <h3>Beneficiario</h3>
+          <div class="row" style="gap:8px;">
+            <span class="chip chip-outlined">Colaborador</span>
+            <span class="chip chip-tonal-success">Activo</span>
+            <span class="chip chip-tonal-info">USD</span>
+            <span class="chip chip-outlined">CO</span>
+          </div>
+          <div style="margin-top:6px; font-size:18px; font-weight:600;">Andrés Rodríguez</div>
+          <span class="td-mono">mem-andres-001</span>
+        </div>
+
+        <!-- Routing -->
+        <div class="drawer-section">
+          <h3>Ruta de pago</h3>
+          <div class="meta-grid">
+            <div class="meta-item">
+              <span class="lbl">Provider</span>
+              <span class="val"><span class="chip chip-tonal-info">Global66</span></span>
+            </div>
+            <div class="meta-item">
+              <span class="lbl">Método</span>
+              <span class="val">global66</span>
+            </div>
+            <div class="meta-item">
+              <span class="lbl">País</span>
+              <span class="val">CO</span>
+            </div>
+            <div class="meta-item">
+              <span class="lbl">Instrumento vinculado</span>
+              <span class="val td-secondary">— ninguno</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sensitive account data -->
+        <div class="drawer-section">
+          <h3>Cuenta destino</h3>
+          <div class="meta-item">
+            <span class="lbl">Titular</span>
+            <span class="val">Andres Rodriguez</span>
+          </div>
+          <div class="meta-item">
+            <span class="lbl">Plataforma</span>
+            <span class="val">Global66</span>
+          </div>
+
+          <div class="sensitive-box">
+            <div class="reveal-row">
+              <span class="lbl" style="font-size:11px;">Número de cuenta</span>
+            </div>
+            <div class="sensitive-value">•••• 4521</div>
+            <div class="reveal-row">
+              <button class="btn btn-outlined btn-sm" aria-label="Revelar número completo">
+                👁 Revelar número completo
+              </button>
+              <span class="caption" style="font-size:11px; color:var(--text-secondary);">Solo con permiso · queda en audit log con motivo</span>
+            </div>
+          </div>
+
+          <!-- Hidden: full reveal alert (preview state) -->
+          <div class="alert alert-warning" style="margin-top:6px;" role="status" aria-live="polite">
+            <span>⚠️</span>
+            <div>
+              <strong>Datos sensibles revelados.</strong> Esta acción quedó registrada en el audit log con
+              motivo <em>"Verificación pre-pago marzo 2026"</em>. El número completo se ocultará automáticamente en 60s.
+            </div>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="drawer-section">
+          <h3>Acciones</h3>
+          <div class="row" style="gap:8px;">
+            <button class="btn btn-outlined" disabled style="opacity:0.4; cursor:not-allowed;">Aprobar</button>
+            <button class="btn btn-outlined">Editar (crea nueva versión)</button>
+            <button class="btn btn-error">Cancelar perfil</button>
+          </div>
+          <span class="caption">"Aprobar" solo aparece para perfiles en estado <em>Pendiente aprobación</em> y solo si tu usuario es distinto al creador.</span>
+        </div>
+
+        <!-- Audit timeline -->
+        <div class="drawer-section">
+          <h3>Historial de auditoría</h3>
+          <div class="timeline">
+            <div class="timeline-item">
+              <div class="timeline-dot" style="background:var(--warning-tonal); color:var(--warning);">👁</div>
+              <div class="timeline-stack">
+                <div class="timeline-label">Datos sensibles revelados</div>
+                <div class="timeline-meta">julio.reyes@efeonce.org · 1 may 2026 11:42 · "Verificación pre-pago marzo 2026"</div>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-dot" style="background:var(--success-tonal); color:var(--success);">✓</div>
+              <div class="timeline-stack">
+                <div class="timeline-label">Perfil aprobado</div>
+                <div class="timeline-meta">daniela.f@efeonce.org · 15 abr 2026 09:14</div>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-dot" style="background:var(--info-tonal); color:var(--info);">↻</div>
+              <div class="timeline-stack">
+                <div class="timeline-label">Reemplaza perfil bpp-3a8c…</div>
+                <div class="timeline-meta">El perfil anterior queda <em>superseded</em> automáticamente</div>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-dot" style="background:var(--primary-tonal); color:var(--primary);">+</div>
+              <div class="timeline-stack">
+                <div class="timeline-label">Perfil creado</div>
+                <div class="timeline-meta">julio.reyes@efeonce.org · 14 abr 2026 17:05</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- EMPTY STATE preview -->
+  <h2 style="margin-top:48px;">Estado vacío (zero state)</h2>
+  <div class="lead" style="margin-bottom:16px;">Cuando no hay perfiles registrados aún o el filtro no devuelve resultados.</div>
+  <div class="empty">
+    <div class="empty-icon">🪪</div>
+    <h3>Aún no hay perfiles de pago</h3>
+    <div class="td-secondary">Crea uno para definir cómo pagar a un colaborador o accionista. Los perfiles activos se aplican automáticamente a las órdenes de pago futuras.</div>
+    <button class="btn btn-primary">+ Crear primer perfil</button>
+  </div>
+
+  <!-- Implementation notes -->
+  <h2 style="margin-top:48px;">Notas de implementación</h2>
+  <div class="card stack">
+    <div class="row" style="gap:8px;">
+      <span class="pill">DataTableShell</span>
+      <span class="pill">EmptyState</span>
+      <span class="pill">CustomTextField</span>
+      <span class="pill">sonner toast</span>
+      <span class="pill">Tabler icons</span>
+      <span class="pill">DM Sans</span>
+    </div>
+    <ul style="margin:0; padding-left:20px; color:var(--text-secondary);">
+      <li><strong>Maker-checker triple defensa:</strong> trigger DB + helper TS + UI bloquea botón "Aprobar" si user == creador.</li>
+      <li><strong>Reveal sensitive:</strong> capability <code>finance.payment_profiles.reveal_sensitive</code> + motivo (5+ chars) + audit log con IP/UA + outbox event.</li>
+      <li><strong>Versionado:</strong> editar un perfil activo crea nuevo perfil; al aprobarlo, el viejo queda <em>superseded</em> en la misma transacción (atomic).</li>
+      <li><strong>Idempotency:</strong> partial unique index sobre (space, beneficiary_type, beneficiary_id, currency) <em>WHERE status='active'</em>.</li>
+      <li><strong>A11y:</strong> focus rings 2px, contraste 4.5:1, touch targets ≥44px, <code>role='status' aria-live='polite'</code> en zonas que cambian (alert de reveal, empty results).</li>
+      <li><strong>Permissions seed:</strong> view code <code>finanzas.perfiles_pago</code> grant para 4 roles finanzas en migration 20260501151806364.</li>
+    </ul>
+  </div>
+
+</div>
+</body>
+</html>

@@ -155,6 +155,31 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     actions: ['read'] as const,
     defaultScope: 'tenant'
   },
+  // ── Beneficiary Payment Profiles (TASK-749) ───────────────────────
+  {
+    key: 'finance.payment_profiles.read',
+    module: 'finance',
+    actions: ['read'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'finance.payment_profiles.create',
+    module: 'finance',
+    actions: ['create', 'update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'finance.payment_profiles.approve',
+    module: 'finance',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'finance.payment_profiles.reveal_sensitive',
+    module: 'finance',
+    actions: ['read'] as const,
+    defaultScope: 'tenant'
+  },
   {
     key: 'finance.cash.adopt-external-signal',
     module: 'finance',

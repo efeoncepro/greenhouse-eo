@@ -74,6 +74,7 @@ export const GH_FINANCE_NAV = {
   suppliers: { label: 'Proveedores', subtitle: 'Directorio de proveedores' },
   reconciliation: { label: 'Conciliación', subtitle: 'Conciliación bancaria' },
   paymentOrders: { label: 'Órdenes de pago', subtitle: 'Obligaciones, ordenes y calendario de pagos' },
+  paymentProfiles: { label: 'Perfiles de pago', subtitle: 'Cola de aprobación y drift cross-entity' },
   intelligence: { label: 'Economía', subtitle: 'Cierre de período y P&L operativo' },
   quotes: { label: 'Cotizaciones', subtitle: 'Cotizaciones de Nubox y HubSpot en un solo lugar' },
   contracts: { label: 'Contratos', subtitle: 'SOWs, renovaciones y ejecución comercial activa' },

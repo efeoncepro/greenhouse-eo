@@ -3434,6 +3434,62 @@ export interface GreenhouseFinanceBankStatementRows {
   value_date: Timestamp | null;
 }
 
+export interface GreenhouseFinanceBeneficiaryPaymentProfileAuditLog {
+  action: string;
+  actor_email: string | null;
+  actor_user_id: string;
+  audit_id: string;
+  created_at: Generated<Timestamp>;
+  diff_json: Generated<Json>;
+  ip_address: string | null;
+  profile_id: string;
+  reason: string | null;
+  user_agent: string | null;
+}
+
+export interface GreenhouseFinanceBeneficiaryPaymentProfiles {
+  account_holder_name: string | null;
+  /**
+   * Numero de cuenta completo. SOLO se devuelve si caller tiene capability finance.payment_profiles.reveal_sensitive. Default queries devuelven solo account_number_masked.
+   */
+  account_number_full: string | null;
+  account_number_masked: string | null;
+  active_from: Timestamp | null;
+  active_to: Timestamp | null;
+  approved_at: Timestamp | null;
+  approved_by: string | null;
+  bank_name: string | null;
+  beneficiary_id: string;
+  beneficiary_name: string | null;
+  beneficiary_type: string;
+  cancelled_at: Timestamp | null;
+  cancelled_by: string | null;
+  cancelled_reason: string | null;
+  country_code: string | null;
+  created_at: Generated<Timestamp>;
+  created_by: string;
+  currency: string;
+  metadata_json: Generated<Json>;
+  notes: string | null;
+  payment_instrument_id: string | null;
+  payment_method: string | null;
+  profile_id: string;
+  provider_slug: string | null;
+  require_approval: Generated<boolean>;
+  routing_reference: string | null;
+  space_id: string | null;
+  /**
+   * draft = borrador editable; pending_approval = esperando maker-checker; active = vigente (1 sola por space/beneficiary/currency); superseded = reemplazada via superseded_by; cancelled = anulada con motivo.
+   */
+  status: Generated<string>;
+  superseded_by: string | null;
+  updated_at: Generated<Timestamp>;
+  /**
+   * Referencia opaca a vault externo (TASK-749 V1 placeholder). Cuando este presente, la fuente canonica es el vault y account_number_full puede ser NULL.
+   */
+  vault_ref: string | null;
+}
+
 export interface GreenhouseFinanceClientEconomics {
   client_id: string;
   client_name: string;
@@ -7692,6 +7748,8 @@ export interface DB {
   "greenhouse_finance.account_signal_matching_rules": GreenhouseFinanceAccountSignalMatchingRules;
   "greenhouse_finance.accounts": GreenhouseFinanceAccounts;
   "greenhouse_finance.bank_statement_rows": GreenhouseFinanceBankStatementRows;
+  "greenhouse_finance.beneficiary_payment_profile_audit_log": GreenhouseFinanceBeneficiaryPaymentProfileAuditLog;
+  "greenhouse_finance.beneficiary_payment_profiles": GreenhouseFinanceBeneficiaryPaymentProfiles;
   "greenhouse_finance.client_economics": GreenhouseFinanceClientEconomics;
   "greenhouse_finance.client_profiles": GreenhouseFinanceClientProfiles;
   "greenhouse_finance.cost_allocations": GreenhouseFinanceCostAllocations;

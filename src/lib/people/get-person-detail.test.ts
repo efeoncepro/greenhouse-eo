@@ -118,7 +118,8 @@ const minimalAccess: PersonAccess = {
   canViewHrProfile: false,
   canViewAiTools: false,
   canViewIdentityContext: false,
-  canViewAccessContext: false
+  canViewAccessContext: false,
+  canViewPaymentProfile: false
 }
 
 const makePgMemberRow = (overrides: Record<string, unknown> = {}) => ({

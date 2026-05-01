@@ -1,0 +1,710 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Perfiles de pago — modelo dual surface · TASK-749 V1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #f4f5fa; --surface: #fff; --border: #dbdade;
+    --text: #2f2b3d; --text-secondary: #6f6b7d;
+    --primary: #7367f0; --primary-tonal: rgba(115,103,240,.16);
+    --success: #6ec207; --success-tonal: rgba(110,194,7,.16);
+    --warning: #ff6500; --warning-tonal: rgba(255,101,0,.16);
+    --error: #bb1954; --error-tonal: rgba(187,25,84,.16);
+    --info: #00bad1; --info-tonal: rgba(0,186,209,.16);
+    --hover: rgba(47,43,61,.04);
+    --radius: 10px; --radius-lg: 14px;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: 'DM Sans', system-ui, sans-serif;
+    background: var(--bg); color: var(--text);
+    font-size: 14px; line-height: 1.45;
+  }
+  .layout { max-width: 1440px; margin: 0 auto; padding: 32px 32px 96px; }
+
+  /* Hero */
+  .hero {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 28px;
+    margin-bottom: 28px;
+  }
+  .eyebrow {
+    font-size: 11px; text-transform: uppercase; letter-spacing: .08em;
+    color: var(--text-secondary); font-weight: 600;
+  }
+  h1 { font-size: 26px; margin: 6px 0 8px; font-weight: 600; }
+  h2 { font-size: 18px; margin: 0; font-weight: 600; }
+  h3 { font-size: 14px; margin: 0; font-weight: 600; }
+  .lead { color: var(--text-secondary); max-width: 820px; line-height: 1.55; }
+
+  .surface-toggle {
+    display: flex; gap: 8px; margin-top: 18px; flex-wrap: wrap;
+  }
+  .toggle-pill {
+    padding: 8px 14px; border-radius: 999px;
+    background: var(--surface); border: 1px solid var(--border);
+    font-size: 13px; cursor: pointer; transition: all 120ms;
+    text-decoration: none; color: var(--text);
+  }
+  .toggle-pill.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+  .toggle-pill:not(.active):hover { background: var(--hover); }
+
+  .arch-card {
+    background: rgba(115,103,240,.05);
+    border: 1px solid var(--primary);
+    border-radius: var(--radius);
+    padding: 16px 18px; margin-top: 18px;
+  }
+  .arch-card strong { color: var(--primary); }
+  .arch-row {
+    display: flex; gap: 14px; flex-wrap: wrap; align-items: center;
+    font-size: 13px; margin-top: 8px;
+  }
+  .arch-step {
+    display: inline-flex; gap: 6px; align-items: center;
+    background: #fff; border: 1px solid var(--border);
+    padding: 6px 12px; border-radius: 999px;
+  }
+  .arch-arrow { color: var(--text-secondary); }
+
+  /* Section */
+  .section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    margin-bottom: 32px;
+    overflow: hidden;
+  }
+  .section-tag {
+    display: inline-block; padding: 4px 10px; border-radius: 999px;
+    background: var(--primary-tonal); color: var(--primary);
+    font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em;
+  }
+  .section-header {
+    padding: 18px 24px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+  }
+  .section-body { padding: 24px; }
+
+  /* Person 360 simulation */
+  .person-shell {
+    border: 1px solid var(--border); border-radius: var(--radius);
+    background: var(--surface);
+  }
+  .person-header {
+    padding: 16px 20px; border-bottom: 1px solid var(--border);
+    display: flex; gap: 14px; align-items: center;
+  }
+  .avatar {
+    width: 48px; height: 48px; border-radius: 50%;
+    background: linear-gradient(135deg, #7367f0, #00bad1);
+    color: #fff; display: flex; align-items: center; justify-content: center;
+    font-weight: 600; font-size: 18px;
+  }
+  .person-name { font-weight: 600; font-size: 16px; }
+  .person-meta { font-size: 12px; color: var(--text-secondary); }
+  .person-tabs {
+    display: flex; gap: 0; border-bottom: 1px solid var(--border);
+    padding: 0 20px;
+  }
+  .person-tab {
+    padding: 12px 16px; font-size: 13px; cursor: pointer;
+    border-bottom: 2px solid transparent;
+    color: var(--text-secondary);
+  }
+  .person-tab.active { color: var(--primary); border-bottom-color: var(--primary); font-weight: 500; }
+  .person-tab:hover:not(.active) { color: var(--text); }
+  .person-content { padding: 20px; }
+
+  /* Profile card (in tab) */
+  .profile-card {
+    border: 1px solid var(--border); border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .profile-card-header {
+    padding: 14px 16px; background: rgba(47,43,61,.02);
+    border-bottom: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;
+  }
+  .profile-card-body {
+    padding: 16px; display: grid; grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  @media (max-width: 720px) { .profile-card-body { grid-template-columns: 1fr; } }
+  .profile-card-actions {
+    padding: 12px 16px; border-top: 1px solid var(--border);
+    background: rgba(47,43,61,.02);
+    display: flex; gap: 8px; flex-wrap: wrap; align-items: center; justify-content: space-between;
+  }
+  .meta-item .lbl {
+    font-size: 11px; color: var(--text-secondary);
+    text-transform: uppercase; letter-spacing: .04em;
+  }
+  .meta-item .val { font-size: 14px; }
+
+  /* Buttons */
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 7px 14px; min-height: 36px;
+    border-radius: 8px; border: 1px solid transparent;
+    font-family: inherit; font-size: 13px; font-weight: 500;
+    cursor: pointer; text-decoration: none; transition: background 120ms;
+  }
+  .btn-primary { background: var(--primary); color: #fff; }
+  .btn-primary:hover { filter: brightness(1.08); }
+  .btn-outlined { background: transparent; color: var(--text); border-color: var(--border); }
+  .btn-outlined:hover { background: var(--hover); }
+  .btn-error { background: transparent; color: var(--error); border-color: var(--error); }
+  .btn-success { background: var(--success); color: #fff; }
+  .btn-sm { padding: 5px 10px; min-height: 30px; font-size: 12px; }
+
+  /* Chips */
+  .chip {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 10px; border-radius: 999px;
+    font-size: 12px; font-weight: 500; line-height: 1.6;
+    background: rgba(128,131,144,.16);
+  }
+  .chip-success { background: var(--success-tonal); color: var(--success); }
+  .chip-warning { background: var(--warning-tonal); color: var(--warning); }
+  .chip-error { background: var(--error-tonal); color: var(--error); }
+  .chip-info { background: var(--info-tonal); color: var(--info); }
+  .chip-primary { background: var(--primary-tonal); color: var(--primary); }
+  .chip-outlined {
+    background: transparent; border: 1px solid var(--border);
+    color: var(--text-secondary);
+  }
+
+  /* Table */
+  .table-wrap { overflow: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead th {
+    text-align: left; padding: 10px 12px;
+    font-size: 12px; color: var(--text-secondary); font-weight: 500;
+    border-bottom: 1px solid var(--border);
+    background: rgba(47,43,61,.02);
+  }
+  tbody td { padding: 12px; border-bottom: 1px solid var(--border); }
+  tbody tr { cursor: pointer; transition: background 80ms; }
+  tbody tr:hover { background: var(--hover); }
+  .td-mono { font-family: ui-monospace, 'SF Mono', monospace; font-size: 12px; color: var(--text-secondary); }
+  .td-stack { display: flex; flex-direction: column; gap: 1px; }
+  .td-secondary { color: var(--text-secondary); font-size: 12px; }
+
+  /* Alert */
+  .alert {
+    border-radius: 8px; padding: 12px 16px;
+    border-left: 4px solid; font-size: 13px;
+    display: flex; gap: 10px; align-items: flex-start;
+    margin-bottom: 16px;
+  }
+  .alert-warning { background: var(--warning-tonal); border-color: var(--warning); }
+  .alert-info { background: var(--info-tonal); border-color: var(--info); }
+  .alert-error { background: var(--error-tonal); border-color: var(--error); }
+
+  /* Drift card */
+  .ops-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 880px) { .ops-grid { grid-template-columns: 1fr; } }
+  .drift-card {
+    border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 18px;
+  }
+  .drift-card.danger { border-color: var(--error); background: rgba(187,25,84,.04); }
+  .drift-card.queue { border-color: var(--warning); background: rgba(255,101,0,.04); }
+
+  /* Sensitive box */
+  .sensitive {
+    background: rgba(255,101,0,.06);
+    border: 1px solid var(--warning);
+    border-radius: 6px;
+    padding: 10px 12px; margin-top: 6px;
+    font-size: 13px; display: flex; gap: 8px; align-items: center; justify-content: space-between;
+  }
+  .sensitive code {
+    font-family: ui-monospace, 'SF Mono', monospace;
+    letter-spacing: .08em; font-weight: 600;
+  }
+
+  /* Audit timeline */
+  .timeline {
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .tl-item { display: flex; gap: 10px; align-items: flex-start; }
+  .tl-dot {
+    width: 28px; height: 28px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; flex-shrink: 0;
+  }
+  .tl-stack { display: flex; flex-direction: column; gap: 1px; flex: 1; }
+  .tl-label { font-size: 13px; font-weight: 500; }
+  .tl-meta { font-size: 12px; color: var(--text-secondary); }
+
+  /* Person 360 sidebar simulation (KPI strip) */
+  .kpi-strip {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+    padding: 16px 20px; border-bottom: 1px solid var(--border);
+    background: rgba(47,43,61,.015);
+  }
+  @media (max-width: 880px) { .kpi-strip { grid-template-columns: repeat(2, 1fr); } }
+  .kpi-mini { display: flex; flex-direction: column; gap: 1px; }
+  .kpi-mini .lbl { font-size: 11px; color: var(--text-secondary); }
+  .kpi-mini .val { font-size: 18px; font-weight: 600; font-variant-numeric: tabular-nums; }
+
+  .small-help {
+    font-size: 12px; color: var(--text-secondary); margin-top: 4px;
+  }
+
+  .badge-count {
+    background: var(--error); color: #fff;
+    padding: 2px 7px; border-radius: 999px; font-size: 11px; font-weight: 600;
+    min-width: 20px; display: inline-flex; align-items: center; justify-content: center;
+  }
+
+  .breadcrumb {
+    font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;
+  }
+  .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+  .breadcrumb a:hover { color: var(--text); }
+
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- HERO -->
+  <div class="hero">
+    <span class="eyebrow">Mockup · Modelo dual-surface · TASK-749 V1 · Pendiente aprobación</span>
+    <h1>Perfiles de pago — donde viven y por qué</h1>
+    <div class="lead">
+      Los perfiles de pago de <strong>personas</strong> viven dentro de su Person 360. Los de <strong>accionistas</strong>
+      viven dentro de Shareholder 360. La surface centralizada en Finance solo existe para operaciones
+      cross-entity: cola de aprobación, drift cuando faltan perfiles para obligaciones vivas, y audit
+      cross-cutting. <strong>Una sola pieza de UI reutilizable, tres mounts naturales.</strong>
+    </div>
+
+    <div class="arch-card">
+      <strong>Modelo dual-surface (consistente con Stripe / GitHub / Linear)</strong>
+      <div class="arch-row">
+        <span class="arch-step">📁 Backend único (CRUD agnóstico)</span>
+        <span class="arch-arrow">→</span>
+        <span class="arch-step">🧩 &lt;PaymentProfilesPanel&gt; reutilizable</span>
+        <span class="arch-arrow">→</span>
+        <span class="arch-step">👤 Person 360 (tab Pago)</span>
+        <span class="arch-step">💰 Shareholder 360</span>
+        <span class="arch-step">⚙️ Finance Ops queue</span>
+      </div>
+    </div>
+
+    <div class="surface-toggle" role="tablist" aria-label="Surfaces a previsualizar">
+      <a class="toggle-pill active" href="#person">👤 Person 360 — Tab Pago</a>
+      <a class="toggle-pill" href="#shareholder">💰 Shareholder 360 — Sección Pago</a>
+      <a class="toggle-pill" href="#ops">⚙️ Finance Ops — Cola y drift</a>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────────────────────────────────── -->
+  <!-- SURFACE 1: Person 360 — Tab Pago (FUENTE PRIMARIA)         -->
+  <!-- ────────────────────────────────────────────────────────── -->
+  <div class="section" id="person">
+    <div class="section-header">
+      <div>
+        <span class="section-tag">Surface 1 · primaria</span>
+        <h2 style="margin-top:8px;">Person 360 — Tab "Pago"</h2>
+        <div class="lead" style="margin-top:6px;">
+          Donde un manager o admin <strong>crea, edita, aprueba o cancela</strong> el perfil de un
+          colaborador. Es la fuente de verdad. Acciones contextuales al beneficiario; reveal sensible con motivo y audit.
+        </div>
+      </div>
+    </div>
+    <div class="section-body" style="background: rgba(47,43,61,.025);">
+      <div class="person-shell">
+        <div class="person-header">
+          <div class="avatar">AR</div>
+          <div>
+            <div class="person-name">Andrés Rodríguez</div>
+            <div class="person-meta">mem-andres-001 · Colaborador · Internacional · USD</div>
+          </div>
+          <div style="margin-left:auto; display: flex; gap: 8px;">
+            <span class="chip chip-info">Active</span>
+            <span class="chip chip-outlined">Colombia</span>
+          </div>
+        </div>
+
+        <div class="kpi-strip">
+          <div class="kpi-mini"><span class="lbl">Compensación mensual</span><span class="val">USD 4.900</span></div>
+          <div class="kpi-mini"><span class="lbl">Próxima nómina</span><span class="val">15 may</span></div>
+          <div class="kpi-mini"><span class="lbl">ICO score</span><span class="val">82</span></div>
+          <div class="kpi-mini"><span class="lbl">Perfiles de pago activos</span><span class="val">1</span></div>
+        </div>
+
+        <div class="person-tabs" role="tablist">
+          <span class="person-tab" role="tab">Resumen</span>
+          <span class="person-tab" role="tab">Compensación</span>
+          <span class="person-tab" role="tab">Capacidad</span>
+          <span class="person-tab" role="tab">ICO</span>
+          <span class="person-tab active" role="tab" aria-selected="true">Pago</span>
+          <span class="person-tab" role="tab">Permisos</span>
+          <span class="person-tab" role="tab">Documentos</span>
+        </div>
+
+        <div class="person-content">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; flex-wrap: wrap; gap: 12px;">
+            <div>
+              <h3>Perfiles de pago</h3>
+              <div class="small-help">
+                Define el rail por el que se pagan las obligaciones de Andrés. Cada moneda tiene su propio perfil
+                con maker-checker.
+              </div>
+            </div>
+            <button class="btn btn-primary">+ Agregar perfil</button>
+          </div>
+
+          <!-- ACTIVE PROFILE -->
+          <div class="profile-card" style="margin-bottom: 16px;">
+            <div class="profile-card-header">
+              <div style="display: flex; gap: 8px; align-items: center;">
+                <h3>Perfil USD · Activo</h3>
+                <span class="chip chip-success">✓ Activo</span>
+                <span class="chip chip-outlined">Vigente desde 15 abr 2026</span>
+              </div>
+              <div class="td-mono">bpp-95f1a2c8</div>
+            </div>
+            <div class="profile-card-body">
+              <div class="meta-item"><span class="lbl">Provider</span><span class="val"><span class="chip chip-info">Global66</span></span></div>
+              <div class="meta-item"><span class="lbl">Método</span><span class="val">global66</span></div>
+              <div class="meta-item"><span class="lbl">Titular</span><span class="val">Andres Rodriguez</span></div>
+              <div class="meta-item"><span class="lbl">País</span><span class="val">CO</span></div>
+              <div class="meta-item" style="grid-column: 1 / -1;">
+                <span class="lbl">Cuenta destino</span>
+                <div class="sensitive">
+                  <code>•••• 4521</code>
+                  <button class="btn btn-outlined btn-sm" aria-label="Revelar número completo">👁 Revelar (con motivo)</button>
+                </div>
+                <span class="small-help">Reveal queda en audit log con IP, timestamp y motivo. Auto-oculta a los 60s.</span>
+              </div>
+              <div class="meta-item"><span class="lbl">Maker</span><span class="val">julio.reyes@</span></div>
+              <div class="meta-item"><span class="lbl">Checker</span><span class="val">daniela.f@</span></div>
+            </div>
+            <div class="profile-card-actions">
+              <span class="td-secondary">Cualquier cambio crea una nueva versión y supersede esta automáticamente al aprobarse.</span>
+              <div style="display: flex; gap: 8px;">
+                <button class="btn btn-outlined btn-sm">Editar (nueva versión)</button>
+                <button class="btn btn-error btn-sm">Cancelar perfil</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- AUDIT TIMELINE -->
+          <div class="profile-card">
+            <div class="profile-card-header">
+              <h3>Historial de auditoría · USD</h3>
+              <a href="#" class="td-secondary" style="font-size: 12px;">Ver todo el log →</a>
+            </div>
+            <div class="profile-card-body" style="grid-template-columns: 1fr;">
+              <div class="timeline">
+                <div class="tl-item">
+                  <div class="tl-dot" style="background: var(--warning-tonal); color: var(--warning);">👁</div>
+                  <div class="tl-stack">
+                    <div class="tl-label">Datos sensibles revelados</div>
+                    <div class="tl-meta">julio.reyes@ · 1 may 2026 11:42 · "Verificación pre-pago marzo 2026"</div>
+                  </div>
+                </div>
+                <div class="tl-item">
+                  <div class="tl-dot" style="background: var(--success-tonal); color: var(--success);">✓</div>
+                  <div class="tl-stack">
+                    <div class="tl-label">Perfil aprobado</div>
+                    <div class="tl-meta">daniela.f@ · 15 abr 2026 09:14 — supersede bpp-3a8c… (anterior Wise)</div>
+                  </div>
+                </div>
+                <div class="tl-item">
+                  <div class="tl-dot" style="background: var(--primary-tonal); color: var(--primary);">+</div>
+                  <div class="tl-stack">
+                    <div class="tl-label">Perfil creado · USD vía Global66</div>
+                    <div class="tl-meta">julio.reyes@ · 14 abr 2026 17:05</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- HINT FOR MISSING CURRENCIES -->
+          <div class="alert alert-info" style="margin-top: 16px;">
+            💡 Andrés solo recibe pagos en USD hoy. Si necesitas crear un perfil CLP (ej. bonus en Chile),
+            usa "Agregar perfil" arriba.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────────────────────────────────── -->
+  <!-- SURFACE 2: Shareholder 360 — Sección Pago                   -->
+  <!-- ────────────────────────────────────────────────────────── -->
+  <div class="section" id="shareholder">
+    <div class="section-header">
+      <div>
+        <span class="section-tag">Surface 2 · primaria</span>
+        <h2 style="margin-top:8px;">Shareholder 360 — Sección "Perfil de pago"</h2>
+        <div class="lead" style="margin-top:6px;">
+          Misma pieza, otro contenedor. La sección se monta en la página de Cuenta Corriente Accionista.
+          Crear/aprobar/cancelar tienen exactamente el mismo flujo que en Person 360.
+        </div>
+      </div>
+    </div>
+    <div class="section-body" style="background: rgba(47,43,61,.025);">
+      <div class="person-shell">
+        <div class="person-header">
+          <div class="avatar" style="background: linear-gradient(135deg, #ff6500, #bb1954);">JR</div>
+          <div>
+            <div class="person-name">Julio Reyes — CCA · Greenhouse</div>
+            <div class="person-meta">id-julio-001 · Accionista · Cuenta interna •••• 0001</div>
+          </div>
+          <div style="margin-left:auto; display: flex; gap: 8px;">
+            <span class="chip chip-success">Activa</span>
+            <span class="chip chip-primary">Greenhouse · platform_operator</span>
+          </div>
+        </div>
+
+        <div class="person-content" style="padding: 20px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
+            <h3>Perfil de pago</h3>
+            <button class="btn btn-outlined btn-sm">Editar perfil</button>
+          </div>
+
+          <div class="profile-card">
+            <div class="profile-card-header">
+              <div style="display: flex; gap: 8px; align-items: center;">
+                <span class="chip chip-success">✓ Activo</span>
+                <span class="chip chip-outlined">CLP</span>
+              </div>
+              <div class="td-mono">bpp-7a31cd9b</div>
+            </div>
+            <div class="profile-card-body">
+              <div class="meta-item"><span class="lbl">Provider</span><span class="val"><span class="chip chip-primary">Greenhouse</span></span></div>
+              <div class="meta-item"><span class="lbl">Método</span><span class="val">manual_cash</span></div>
+              <div class="meta-item"><span class="lbl">Cuenta interna</span><span class="val td-mono">01-90-7-0001</span></div>
+              <div class="meta-item"><span class="lbl">Maker → Checker</span><span class="val">cesar.l@ → daniela.f@</span></div>
+            </div>
+            <div class="profile-card-actions">
+              <span class="td-secondary">CCA usa el ledger interno de Greenhouse. No hay datos sensibles externos.</span>
+              <a href="#" class="td-secondary" style="font-size: 12px;">Ver historial →</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────────────────────────────────── -->
+  <!-- SURFACE 3: Finance Ops — Cola + drift                       -->
+  <!-- ────────────────────────────────────────────────────────── -->
+  <div class="section" id="ops">
+    <div class="section-header">
+      <div>
+        <span class="section-tag">Surface 3 · ops cross-entity</span>
+        <h2 style="margin-top:8px;">Finance · Pagos · Perfiles (vista ops)</h2>
+        <div class="lead" style="margin-top:6px;">
+          Esta surface NO duplica el CRUD. Sirve solo para 3 jobs cross-cutting: <strong>aprobar pendientes en cola</strong>,
+          <strong>detectar drift</strong> (obligaciones bloqueadas por falta de perfil), y <strong>auditar el universo</strong> de perfiles.
+          Click en una fila → te lleva a Person 360 / Shareholder 360 con el tab abierto.
+        </div>
+      </div>
+    </div>
+    <div class="section-body">
+
+      <div class="breadcrumb">
+        Finanzas → Tesorería → Perfiles de pago
+      </div>
+
+      <!-- TOP: Queue + Drift -->
+      <div class="ops-grid" style="margin-bottom: 24px;">
+        <div class="drift-card queue">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <div>
+              <span class="section-tag" style="background: var(--warning-tonal); color: var(--warning);">Cola de aprobación</span>
+              <h3 style="margin-top: 6px;">3 perfiles esperando checker</h3>
+            </div>
+            <button class="btn btn-primary">Aprobar siguiente →</button>
+          </div>
+          <div class="lead" style="font-size: 13px; margin-bottom: 12px;">
+            Estos perfiles fueron creados pero no han sido aprobados. Recordá: el creador no puede aprobar el suyo (maker-checker).
+          </div>
+          <ul style="margin: 0; padding-left: 18px; font-size: 13px;">
+            <li>Melkin Rodríguez · USD via Wise · creado por <em>julio.reyes@</em> hace 2h</li>
+            <li>Carolina Pérez · CLP via Banco Chile · creado por <em>cesar.l@</em> hace 1d</li>
+            <li>Roberto Sosa · USD via PayPal · creado por <em>julio.reyes@</em> hace 3d</li>
+          </ul>
+        </div>
+
+        <div class="drift-card danger">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <div>
+              <span class="section-tag" style="background: var(--error-tonal); color: var(--error);">Drift detectado</span>
+              <h3 style="margin-top: 6px;">2 colaboradores con obligaciones bloqueadas</h3>
+            </div>
+            <button class="btn btn-error btn-sm">Ver detalle</button>
+          </div>
+          <div class="lead" style="font-size: 13px; margin-bottom: 12px;">
+            Estas personas tienen obligaciones de pago activas pero <strong>no tienen perfil registrado</strong>. Las órdenes
+            de pago no se pueden generar hasta crear el perfil.
+          </div>
+          <ul style="margin: 0; padding-left: 18px; font-size: 13px;">
+            <li>Juan Pérez · 2 obligaciones USD pendientes · <a href="#" style="color: var(--primary);">Crear perfil →</a></li>
+            <li>María Soto · 1 obligación CLP pendiente · <a href="#" style="color: var(--primary);">Crear perfil →</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- READ-ONLY TABLE -->
+      <div style="margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
+        <h3>Universo de perfiles</h3>
+        <div style="display: flex; gap: 8px;">
+          <select style="padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border); font-size: 13px;">
+            <option>Todos los estados</option><option>Pendiente</option><option selected>Activo</option><option>Reemplazado</option><option>Cancelado</option>
+          </select>
+          <input placeholder="Buscar persona…" style="padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border); font-size: 13px;" />
+        </div>
+      </div>
+
+      <div class="alert alert-info">
+        ℹ️ Esta vista es <strong>read-only</strong>. Para crear o editar un perfil, abrí la persona o el accionista correspondiente.
+        Click en cualquier fila te lleva al lugar correcto.
+      </div>
+
+      <div class="table-wrap">
+        <table aria-label="Universo de perfiles de pago">
+          <thead>
+            <tr>
+              <th>Beneficiario</th>
+              <th>Tipo</th>
+              <th>Moneda</th>
+              <th>Provider · Método</th>
+              <th>Cuenta</th>
+              <th>Estado</th>
+              <th>Maker → Checker</th>
+              <th>Vigente desde</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <div class="td-stack">
+                  <strong>Andrés Rodríguez</strong>
+                  <span class="td-mono">→ /people/mem-andres-001?tab=payment</span>
+                </div>
+              </td>
+              <td><span class="chip chip-outlined">Colaborador</span></td>
+              <td>USD</td>
+              <td>Global66 · global66</td>
+              <td><span class="td-mono">•••• 4521</span></td>
+              <td><span class="chip chip-success">Activo</span></td>
+              <td>julio.reyes@ → daniela.f@</td>
+              <td>15 abr 2026</td>
+            </tr>
+            <tr>
+              <td>
+                <div class="td-stack">
+                  <strong>Melkin Rodríguez</strong>
+                  <span class="td-mono">→ /people/mem-melkin-003?tab=payment</span>
+                </div>
+              </td>
+              <td><span class="chip chip-outlined">Colaborador</span></td>
+              <td>USD</td>
+              <td>Wise · wise</td>
+              <td><span class="td-mono">•••• 0094</span></td>
+              <td><span class="chip chip-warning">Pendiente</span></td>
+              <td>julio.reyes@ → —</td>
+              <td>—</td>
+            </tr>
+            <tr>
+              <td>
+                <div class="td-stack">
+                  <strong>Valentina Hoyos</strong>
+                  <span class="td-mono">→ /people/mem-valentina-004?tab=payment</span>
+                </div>
+              </td>
+              <td><span class="chip chip-outlined">Colaborador</span></td>
+              <td>CLP</td>
+              <td>BCI · bank_transfer</td>
+              <td><span class="td-mono">•••• 2110</span></td>
+              <td><span class="chip chip-success">Activo</span></td>
+              <td>julio.reyes@ → daniela.f@</td>
+              <td>1 ene 2026</td>
+            </tr>
+            <tr>
+              <td>
+                <div class="td-stack">
+                  <strong>Julio Reyes (CCA)</strong>
+                  <span class="td-mono">→ /finance/shareholder-account/id-julio-001</span>
+                </div>
+              </td>
+              <td><span class="chip chip-outlined">Accionista</span></td>
+              <td>CLP</td>
+              <td>Greenhouse · manual_cash</td>
+              <td><span class="td-mono">•••• 0001</span></td>
+              <td><span class="chip chip-success">Activo</span></td>
+              <td>cesar.l@ → daniela.f@</td>
+              <td>28 ene 2026</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- IMPLEMENTATION NOTES -->
+  <div class="section">
+    <div class="section-header">
+      <h2>Cómo se construye sin parche</h2>
+    </div>
+    <div class="section-body">
+      <div class="ops-grid">
+        <div>
+          <h3 style="margin-bottom: 8px;">Pieza reutilizable</h3>
+          <ul style="font-size: 13px; line-height: 1.7;">
+            <li><strong>&lt;PaymentProfilesPanel&gt;</strong> — el componente real con CRUD. Recibe <code>beneficiaryType</code> + <code>beneficiaryId</code>.</li>
+            <li>Modo <code>embedded</code>: sin header propio, sin filtros (lo provee el host: Person 360 o Shareholder 360).</li>
+            <li>Modo <code>standalone</code>: dialog flotante o página dedicada (en V2 si hace falta).</li>
+          </ul>
+        </div>
+        <div>
+          <h3 style="margin-bottom: 8px;">Surface ops sin duplicación</h3>
+          <ul style="font-size: 13px; line-height: 1.7;">
+            <li><strong>Cola</strong>: GET /api/admin/finance/payment-profiles?status=pending_approval</li>
+            <li><strong>Drift</strong>: nuevo helper <code>getPaymentProfileDriftForActiveObligations()</code> + endpoint /queue</li>
+            <li><strong>Tabla universal</strong>: solo lectura. Click → deep link al 360 correcto.</li>
+            <li><strong>Sin botón "Crear"</strong>: la creación es contextual al beneficiario.</li>
+          </ul>
+        </div>
+        <div>
+          <h3 style="margin-bottom: 8px;">Resiliencia</h3>
+          <ul style="font-size: 13px; line-height: 1.7;">
+            <li>Si el panel falla, Person 360 sigue funcionando (Error Boundary).</li>
+            <li>Si user no tiene capability <code>finance.payment_profiles.read</code>, el tab "Pago" no se muestra.</li>
+            <li>El backend ya devuelve enmascarado por default; revelar requiere capability + motivo + audit.</li>
+          </ul>
+        </div>
+        <div>
+          <h3 style="margin-bottom: 8px;">Escalabilidad</h3>
+          <ul style="font-size: 13px; line-height: 1.7;">
+            <li>Agregar provider nuevo = INSERT en <code>payment_provider_catalog</code>. Cero código UI.</li>
+            <li>Agregar nuevo beneficiary type (V2 supplier) = montar &lt;PaymentProfilesPanel&gt; en su 360. Cero refactor.</li>
+            <li>Eventos outbox listos para Notification Hub (TASK-716) y reactive projections.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

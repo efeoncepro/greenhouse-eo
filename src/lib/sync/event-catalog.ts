@@ -45,6 +45,7 @@ export const AGGREGATE_TYPES = {
   paymentOrder: 'payment_order',
   paymentOrderLine: 'payment_order_line',
   paymentOrderArtifact: 'payment_order_artifact',
+  beneficiaryPaymentProfile: 'beneficiary_payment_profile',
   compensationVersion: 'compensation_version',
   projectedPayroll: 'projected_payroll',
   payrollPrevisionalSnapshot: 'payroll_previsional_snapshot',
@@ -326,6 +327,14 @@ export const EVENT_TYPES = {
   financePaymentOrderCancelled: 'finance.payment_order.cancelled',
   financePaymentOrderArtifactGenerated: 'finance.payment_order_artifact.generated',
   financePaymentOrderArtifactDownloaded: 'finance.payment_order_artifact.downloaded',
+
+  // Beneficiary Payment Profiles (TASK-749)
+  financeBeneficiaryPaymentProfileCreated: 'finance.beneficiary_payment_profile.created',
+  financeBeneficiaryPaymentProfileUpdated: 'finance.beneficiary_payment_profile.updated',
+  financeBeneficiaryPaymentProfileApproved: 'finance.beneficiary_payment_profile.approved',
+  financeBeneficiaryPaymentProfileSuperseded: 'finance.beneficiary_payment_profile.superseded',
+  financeBeneficiaryPaymentProfileCancelled: 'finance.beneficiary_payment_profile.cancelled',
+  financeBeneficiaryPaymentProfileRevealedSensitive: 'finance.beneficiary_payment_profile.revealed_sensitive',
   leaveRequestCreated: 'leave_request.created',
   leaveRequestEscalatedToHr: 'leave_request.escalated_to_hr',
   leaveRequestApproved: 'leave_request.approved',

@@ -31,6 +31,7 @@ import CustomTextField from '@core/components/mui/TextField'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 import TablePaginationComponent from '@components/TablePaginationComponent'
 import AnimatedCounter from '@/components/greenhouse/AnimatedCounter'
+import PaymentProfilesPanel from '@views/greenhouse/finance/payment-profiles/PaymentProfilesPanel'
 
 import type { ShareholderAccountBalance, ShareholderAccountMovement, ShareholderAccountSummary } from './types'
 import {
@@ -477,6 +478,21 @@ const ShareholderAccountDetailDrawer = ({
                 </Stack>
               </CardContent>
             </Card>
+
+            {/* TASK-749: Perfil de pago del accionista (fuente primaria) */}
+            {selectedAccount.profileId ? (
+              <Card>
+                <CardContent>
+                  <PaymentProfilesPanel
+                    constrainedBeneficiary={{
+                      beneficiaryType: 'shareholder',
+                      beneficiaryId: selectedAccount.profileId,
+                      beneficiaryName: selectedAccount.shareholderName
+                    }}
+                  />
+                </CardContent>
+              </Card>
+            ) : null}
 
             <Card>
               <CardContent>

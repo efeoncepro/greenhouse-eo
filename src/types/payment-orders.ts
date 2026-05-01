@@ -32,6 +32,7 @@ export const PAYMENT_ORDER_PAYMENT_METHODS = [
   'paypal',
   'wise',
   'deel',
+  'global66',
   'manual_cash',
   'check',
   'sii_pec',

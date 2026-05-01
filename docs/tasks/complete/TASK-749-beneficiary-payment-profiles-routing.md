@@ -2,12 +2,12 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
-- Status real: `Diseno`
+- Status real: `V1 entregado 2026-05-01 con modelo dual-surface (Person 360 + Shareholder 360 + Finance Ops)`
 - Rank: `TBD`
 - Domain: `finance`
 - Blocked by: `TASK-748`

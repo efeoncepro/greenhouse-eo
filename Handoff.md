@@ -1,5 +1,27 @@
 # Handoff.md
 
+## Sesion 2026-05-01 — TASK-749 Beneficiary Payment Profiles V1 con modelo dual-surface
+
+- **Trigger**: usuario pidio implementar TASK-749 end-to-end despues de aprobar el mockup `payment-profiles-dual-mockup.html`. Decision arquitectonica clave: NO ubicar perfiles de personas en una surface aislada (`/finance/payment-profiles`) sino en un **modelo dual-surface** con un solo componente reutilizable montado en 3 lugares.
+- **Entregado** (auto-mode):
+  - 4 migrations: schema `beneficiary_payment_profiles` + `beneficiary_payment_profile_audit_log` con maker-checker trigger e idempotency partial unique index, seed Global66 al provider catalog, seed view code `finanzas.perfiles_pago` + grants, migration aditiva `global66` al payment_method enum de orders.
+  - Helpers core en `src/lib/finance/beneficiary-payment-profiles/`: errors, mask, row-mapper, audit, create-profile, approve-profile, cancel-profile, list-profiles, reveal-sensitive, access, drift-detector, queue-summary.
+  - Routing resolver `src/lib/finance/payment-routing/resolve-route.ts` con cascade (resolved/profile_missing/profile_pending_approval/unsupported_currency/unsupported_beneficiary_type) + 7 tests verdes.
+  - 4 capabilities nuevas (read/create/approve/reveal_sensitive) + 6 outbox events.
+  - API admin completa: CRUD + approve + cancel + reveal-sensitive + audit + queue + routing-preview.
+  - **UI dual-surface**:
+    - Componente reutilizable `<PaymentProfilesPanel>` en `src/views/greenhouse/finance/payment-profiles/PaymentProfilesPanel.tsx` con prop `constrainedBeneficiary` para pre-llenar dialog y filtrar tabla.
+    - **Mount 1 — Person 360**: tab "Pago" en `src/views/greenhouse/people/tabs/PersonPaymentTab.tsx`, registrado en `helpers.ts` TAB_CONFIG + TAB_PERMISSIONS, gateado por `canViewPaymentProfile` (efeonce_admin / finance_admin / finance_analyst).
+    - **Mount 2 — Shareholder 360**: seccion en `ShareholderAccountDetailDrawer.tsx` cuando hay `profileId` (identity_profile).
+    - **Mount 3 — Surface ops**: `PaymentProfilesView` rediseñada como queue + drift card + tabla universal read-only con deep links a 360s. SIN CTA crear (creacion vive en cada 360).
+  - Wireup del resolver en `payment-orders/create-from-obligations.ts`: solo se invoca para `beneficiary_type='member'` (V1, ya que shareholder/tax_authority/processor no generan obligations en V1). Snapshot por line en `metadata_json.routing_snapshots`.
+  - Docs: Delta TASK-749 en spec arquitectura + funcional (`docs/documentation/finance/perfiles-de-pago-beneficiarios.md`) + manual operador (`docs/manual-de-uso/finance/perfiles-de-pago-beneficiarios.md`).
+  - Tests: 10 verdes (3 row-mapper TASK-750 + 7 resolver TASK-749).
+- **Validacion**: lint clean, tsc clean (toda la base), migrations aplicadas en staging via `pnpm pg:connect:migrate`.
+- **Aprendizaje**: se considero inicialmente una surface aislada en `/finance/payment-profiles` como fuente primaria. Usuario corrigio: "Los profiles de personas no deberian vivir en Person 360?". Auditando Stripe/GitHub/Linear se confirmo el patron dual-surface (fuente primaria en la entidad + queue ops cross-cutting). Refactor: `<PaymentProfilesPanel>` reutilizable evita duplicacion. Surface ops perdio el CTA crear y se enfoca en jobs cross-cutting (queue + drift). Click en filas → deep link a 360.
+- **Tasks afectadas**: TASK-749 movida a `complete/`, registrada en `docs/tasks/README.md`.
+- **Pendiente downstream**: TASK-751 (settlement orchestration + reconciliation), TASK-752 (artifact CSV generator). El resolver V1 no maneja shareholder en obligations (no aplica hoy); si V2 introduce dividend obligations, agregar al filter del wireup.
+
 ## Sesion 2026-05-01 — TASK-750 Payment Orders V1 entregado end-to-end
 
 - **Trigger**: usuario aprobo el mockup `/docs/mockups/payment-orders-mockup.html` y pidio implementar end-to-end.
