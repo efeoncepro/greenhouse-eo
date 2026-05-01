@@ -1,4 +1,4 @@
-import { DM_Sans, Poppins } from 'next/font/google'
+import { Inter, Poppins } from 'next/font/google'
 
 import type { Metadata } from 'next'
 
@@ -23,16 +23,24 @@ import '@assets/iconify-icons/generated-icons.css'
 import '@flaticon/flaticon-uicons/css/brands/all.css'
 import '@flaticon/flaticon-uicons/css/regular/rounded.css'
 
-const dmSans = DM_Sans({
+// Typography foundation — TASK-566 / EPIC-004
+// Inter = product UI base (body, controls, tables, KPIs, IDs, amounts via tabular-nums)
+// Poppins = display only, restricted to h1-h4 in mergedTheme.ts
+// Source of truth: docs/architecture/GREENHOUSE_DESIGN_TOKENS_V1.md §3
+const inter = Inter({
   subsets: ['latin'],
-  weight: ['400', '500', '600'],
-  variable: '--font-dm-sans'
+  weight: ['400', '500', '600', '700', '800'],
+  variable: '--font-inter',
+  display: 'swap',
+  fallback: ['system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif']
 })
 
 const poppins = Poppins({
   subsets: ['latin'],
   weight: ['600', '700', '800'],
-  variable: '--font-poppins'
+  variable: '--font-poppins',
+  display: 'swap',
+  fallback: ['system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif']
 })
 
 export const metadata: Metadata = {
@@ -57,7 +65,7 @@ const RootLayout = async (props: ChildrenType) => {
 
   return (
     <html id='__next' lang='en' dir={direction} suppressHydrationWarning>
-      <body className={`${dmSans.variable} ${poppins.variable} flex is-full min-bs-full flex-auto flex-col`}>
+      <body className={`${inter.variable} ${poppins.variable} flex is-full min-bs-full flex-auto flex-col`}>
         <InitColorSchemeScript attribute='data' defaultMode={systemMode} />
         {children}
       </body>

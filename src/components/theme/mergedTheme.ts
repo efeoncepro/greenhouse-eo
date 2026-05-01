@@ -129,37 +129,41 @@ const mergedTheme = (settings: Settings, mode: SystemMode, direction: Theme['dir
       }
     },
     typography: {
-      fontFamily: "var(--font-dm-sans), 'DM Sans', system-ui, -apple-system, sans-serif",
+      // Typography foundation — TASK-566 / EPIC-004
+      // Inter = product UI base (body, forms, tables, controls, KPIs, IDs, amounts).
+      // Poppins = display only, restricted to h1-h4.
+      // monoId / monoAmount stay as semantic variants but use Inter + tabular-nums
+      // (no monospace family). Source of truth: docs/architecture/GREENHOUSE_DESIGN_TOKENS_V1.md §3.
+      fontFamily:
+        "var(--font-inter), 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
       h1: {
-        fontFamily: "var(--font-poppins), 'Poppins', system-ui, sans-serif",
+        fontFamily: "var(--font-poppins), 'Poppins', system-ui, -apple-system, sans-serif",
         fontWeight: 800,
         fontSize: '2rem',
         lineHeight: 1.2
       },
       h2: {
-        fontFamily: "var(--font-poppins), 'Poppins', system-ui, sans-serif",
+        fontFamily: "var(--font-poppins), 'Poppins', system-ui, -apple-system, sans-serif",
         fontWeight: 700,
         fontSize: '1.5rem',
         lineHeight: 1.25
       },
       h3: {
-        fontFamily: "var(--font-poppins), 'Poppins', system-ui, sans-serif",
+        fontFamily: "var(--font-poppins), 'Poppins', system-ui, -apple-system, sans-serif",
         fontWeight: 600,
         fontSize: '1.25rem',
         lineHeight: 1.3
       },
       h4: {
-        fontFamily: "var(--font-poppins), 'Poppins', system-ui, sans-serif",
+        fontFamily: "var(--font-poppins), 'Poppins', system-ui, -apple-system, sans-serif",
         fontWeight: 600,
         fontSize: '1rem',
         lineHeight: 1.4
       },
       h5: {
-        fontFamily: "var(--font-poppins), 'Poppins', system-ui, sans-serif",
         fontWeight: 600
       },
       h6: {
-        fontFamily: "var(--font-poppins), 'Poppins', system-ui, sans-serif",
         fontWeight: 600
       },
       body1: {
@@ -172,37 +176,35 @@ const mergedTheme = (settings: Settings, mode: SystemMode, direction: Theme['dir
       },
       caption: {
         fontSize: '0.8125rem',
-        lineHeight: 1.4,
-        color: '#667085'
+        lineHeight: 1.4
       },
       button: {
-        fontFamily: "var(--font-poppins), 'Poppins', system-ui, sans-serif",
         fontWeight: 600,
         textTransform: 'none'
       },
       overline: {
-        fontFamily: "var(--font-poppins), 'Poppins', system-ui, sans-serif",
         fontWeight: 600,
         letterSpacing: '1px',
         fontSize: '0.75rem'
       },
       monoId: {
-        fontFamily: 'monospace',
         fontWeight: 600,
         fontSize: '0.875rem',
-        lineHeight: 1.54
+        lineHeight: 1.54,
+        letterSpacing: '0.01em',
+        fontVariantNumeric: 'tabular-nums'
       },
       monoAmount: {
-        fontFamily: 'monospace',
         fontWeight: 700,
         fontSize: '0.8125rem',
-        lineHeight: 1.54
+        lineHeight: 1.54,
+        fontVariantNumeric: 'tabular-nums'
       },
       kpiValue: {
-        fontFamily: "var(--font-poppins), 'Poppins', system-ui, sans-serif",
         fontWeight: 800,
         fontSize: '1.75rem',
-        lineHeight: 1.05
+        lineHeight: 1.05,
+        fontVariantNumeric: 'tabular-nums'
       }
     }
   }

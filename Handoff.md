@@ -1,5 +1,24 @@
 # Handoff.md
 
+## Sesion 2026-05-01 — TASK-566 cerrada (foundation Inter + Poppins implementada)
+
+- **Trigger**: usuario pidió implementar TASK-566 (foundation tipográfica del EPIC-004) sobre la spec ya realineada a Inter.
+- **Resultado código**:
+  - `src/app/layout.tsx`: `DM_Sans` reemplazado por `Inter` (pesos 400/500/600/700/800). `Poppins` se mantiene (600/700/800). Ambos con `display:'swap'` y `fallback` arrays explícitos para mitigar FOUT/CLS. Variables CSS: `--font-inter` y `--font-poppins`.
+  - `src/components/theme/mergedTheme.ts`: `typography.fontFamily` base → Inter. Poppins removida de `h5/h6/button/overline/kpiValue`, queda solo en `h1-h4`. `monoId/monoAmount/kpiValue` ya no usan `monospace` ni Poppins; usan Inter implícito + `fontVariantNumeric:'tabular-nums'`. `caption.color` hardcodeado eliminado.
+  - `docs/architecture/GREENHOUSE_DESIGN_TOKENS_V1.md` §3 reescrita end-to-end (bump 1.1): política `Poppins display + Inter base`, stack fallback explícito, tabla de scale con familia por variant, prohibiciones nuevas, sección 3.5 con foundation files.
+  - Cleanup colateral: 4 errores de lint pre-existentes en `scripts/verify-humberly-fix.mjs` (whitespace) resueltos para que `pnpm lint` quede limpio.
+- **Out of scope confirmado** (siguen abiertas):
+  - `TASK-567` — sweep de `fontFamily` hardcodeada + ESLint rule.
+  - `TASK-568` — emails + PDFs (`src/emails/constants.ts`, `src/lib/finance/pdf/{tokens,register-fonts}.ts` y secciones).
+  - `TASK-569` — visual regression + Figma + skills cleanup.
+  - Residuales activas no tocadas: `GreenhouseFunnelCard.tsx`, `public-quote/styles.module.css`, `global-error.tsx`, `ai/image-generator.ts`. `src/@core/theme/typography.ts` queda intacto (regla dura).
+- **Verificación**:
+  - `pnpm lint` ✓
+  - `pnpm build` ejecutado (route map renderizado en CI local)
+  - revisión visual manual queda como follow-up del usuario en `/home`, `/finance/quotes/new`, `/hr/payroll`, `/admin` (light/dark + mobile + zoom 125-150%)
+- **Riesgo abierto**: hasta que TASK-567 cierre el sweep, las pocas surfaces que aún hardcodean `var(--font-dm-sans)` (componente Funnel, public-quote stylesheet, global-error) caerán al fallback `sans-serif` del propio inline declaration. El portal autenticado al 99% pasa por el theme, así que el impacto visible es mínimo.
+
 ## Sesion 2026-05-01 — EPIC-004 y TASK-566/567/568/569 realineadas de Geist a Inter
 
 - **Trigger**: usuario pidió revisar a profundidad el programa tipográfico 566-569 y confirmó que no quiere migrar a `Geist`, sino a `Inter`.

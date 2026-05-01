@@ -2,7 +2,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio` (~1 día)
@@ -123,14 +123,14 @@ Reglas duras:
 
 ## Acceptance Criteria
 
-- [ ] `src/app/layout.tsx` importa `Inter` y `Poppins`, no `DM_Sans`
-- [ ] `src/components/theme/mergedTheme.ts` usa Inter como base
-- [ ] `h1-h4` usan Poppins y `h5-h6/button/overline/kpiValue` ya no fuerzan Poppins
-- [ ] `monoId` / `monoAmount` no usan `fontFamily: 'monospace'`
-- [ ] `docs/architecture/GREENHOUSE_DESIGN_TOKENS_V1.md` deja de declarar DM Sans como default
-- [ ] La política canónica documenta `Poppins + Inter`
-- [ ] El stack fallback para Inter/Poppins queda explícito en layout/theme y documentado en tokens
-- [ ] No aparecen regresiones obvias de first fold o clipping en dark mode / mobile básico durante la validación manual
+- [x] `src/app/layout.tsx` importa `Inter` y `Poppins`, no `DM_Sans`
+- [x] `src/components/theme/mergedTheme.ts` usa Inter como base
+- [x] `h1-h4` usan Poppins y `h5-h6/button/overline/kpiValue` ya no fuerzan Poppins
+- [x] `monoId` / `monoAmount` no usan `fontFamily: 'monospace'`
+- [x] `docs/architecture/GREENHOUSE_DESIGN_TOKENS_V1.md` deja de declarar DM Sans como default
+- [x] La política canónica documenta `Poppins + Inter`
+- [x] El stack fallback para Inter/Poppins queda explícito en layout/theme y documentado en tokens
+- [ ] No aparecen regresiones obvias de first fold o clipping en dark mode / mobile básico durante la validación manual — pendiente revisión visual del usuario
 
 ## Verification
 
@@ -142,3 +142,23 @@ Reglas duras:
 ## Open Questions
 
 - ¿`kpiValue` debe heredar Inter puro o mantener un tratamiento especial de peso/tracking? La task asume Inter para reducir familias activas; validar visualmente.
+
+## Resolution log
+
+- **2026-05-01** — Implementación cerrada. Cambios:
+  - `src/app/layout.tsx`: `DM_Sans → Inter`. Pesos `400/500/600/700/800` para Inter, `600/700/800` para Poppins. `display: 'swap'` y `fallback` arrays explícitos en ambas familias. CSS variables: `--font-inter` y `--font-poppins`.
+  - `src/components/theme/mergedTheme.ts`:
+    - `typography.fontFamily` base → `var(--font-inter), 'Inter', system-ui, …`
+    - Poppins removida de `h5`, `h6`, `button`, `overline`, `kpiValue` (heredan Inter)
+    - `monoId` / `monoAmount` ya no declaran `fontFamily`; agregan `fontVariantNumeric: 'tabular-nums'` y `monoId` agrega `letterSpacing: 0.01em`
+    - `kpiValue` agrega `fontVariantNumeric: 'tabular-nums'` (mantiene weight 800 / size 1.75rem)
+    - `caption.color` hardcodeado eliminado (cae al default `text.secondary` cuando se aplique vía `<Typography color='text.secondary'>`)
+  - `docs/architecture/GREENHOUSE_DESIGN_TOKENS_V1.md` §3 reescrita end-to-end:
+    - tabla `3.1 Font families` actualizada (Poppins display / Inter base / sin DM Sans / sin monospace)
+    - stack fallback explícito documentado y referenciado a `layout.tsx` + `mergedTheme.ts`
+    - `3.2 Type scale` ahora declara la familia por variant (incluyendo `monoId/monoAmount/kpiValue`)
+    - `3.4 Prohibitions` ampliadas con prohibición de `var(--font-dm-sans)` activo en código nuevo y de tercera familia (Geist Mono / IBM Plex Mono / etc.)
+    - nueva sección `3.5 Foundation files` que enumera la fuente de verdad
+    - bump versión a `1.1` con summary
+- **Out of scope confirmado**: residuales `DM Sans` en `src/components/greenhouse/GreenhouseFunnelCard.tsx`, `src/views/greenhouse/finance/public-quote/styles.module.css`, `src/app/global-error.tsx`, `src/lib/finance/pdf/**`, `src/emails/constants.ts`, `src/lib/ai/image-generator.ts`, `src/@core/theme/typography.ts` (regla dura). Sweep + ESLint rule en TASK-567; emails y PDFs en TASK-568; visual regression + Figma + skills en TASK-569.
+- **Verificación**: `pnpm lint` limpio (resolví 4 errores stylistic preexistentes en `scripts/verify-humberly-fix.mjs` aprovechando el sweep). `pnpm build` ejecutado en CI local. La revisión visual queda pendiente en manos del usuario sobre `/home`, `/finance/quotes/new`, `/hr/payroll`, `/admin` (light/dark + mobile + zoom 125-150%).
