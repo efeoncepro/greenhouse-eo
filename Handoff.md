@@ -1,5 +1,25 @@
 # Handoff.md
 
+## Sesion 2026-04-30 — Payroll Chile tax table auto-resolution hardening
+
+- Se cerró la brecha UX/runtime donde el operador veía un campo ambiguo de tabla tributaria Chile y parecía obligado a conocer manualmente una versión tipo `gael-YYYY-MM`.
+- Cambios principales:
+  - nuevo formatter puro `src/lib/payroll/tax-table-version-format.ts`
+  - nuevo resolver `src/lib/payroll/tax-table-version.ts` que busca `greenhouse_payroll.chile_tax_brackets` por mes imputable, prefiere la versión canónica `gael-YYYY-MM` y puede reutilizar una única versión disponible del mes como fallback seguro
+  - `create/update payroll period` en `get-payroll-periods.ts` y `postgres-store.ts` ahora autocompletan `taxTableVersion` cuando es posible y rechazan overrides manuales inexistentes para el mes
+  - `readiness`, `calculate`, `recalculate` y `reverse-quote` ya no dependen ciegamente del valor persistido; intentan resolver la tabla del mes y bloquean con mensaje explícito si falta sincronización
+  - `compute-chile-tax.ts` deja de tragar silenciosamente errores Postgres al consultar brackets tributarios
+  - UI de `PayrollDashboard` cambia de input editable a referencia informativa `Versión tributaria Chile esperada`; `PayrollPeriodTab` mantiene override manual pero lo declara como avanzado y opcional
+- Validación ejecutada:
+  - `pnpm vitest run src/lib/payroll/tax-table-version.test.ts src/lib/payroll/payroll-readiness.test.ts src/lib/payroll/postgres-store.test.ts` OK
+  - `pnpm exec tsc --noEmit --pretty false` OK
+  - `pnpm exec eslint src/lib/payroll src/app/api/hr/payroll/compensation/reverse-quote/route.ts src/views/greenhouse/payroll/PayrollDashboard.tsx src/views/greenhouse/payroll/PayrollPeriodTab.tsx` OK
+  - `pnpm build` OK
+- Documentación actualizada:
+  - `docs/documentation/hr/periodos-de-nomina.md`
+  - `docs/manual-de-uso/hr/periodos-de-nomina.md`
+  - índices `docs/documentation/README.md` y `docs/manual-de-uso/README.md`
+
 ## Sesion 2026-04-30 — TASK-647 follow-ups read-only cerrados
 
 - Se extendió el MCP read-only sin abrir writes ni auth nueva.

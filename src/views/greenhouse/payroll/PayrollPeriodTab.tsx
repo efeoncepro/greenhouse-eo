@@ -28,6 +28,7 @@ import CustomTextField from '@core/components/mui/TextField'
 import { ConfirmDialog } from '@/components/dialogs'
 import { HorizontalWithSubtitle } from '@/components/card-statistics'
 import { ROLE_CODES } from '@/config/role-codes'
+import { buildPayrollTaxTableVersion } from '@/lib/payroll/tax-table-version-format'
 import type { PayrollEntry, PayrollPeriod, PayrollPeriodReadiness } from '@/types/payroll'
 import {
   canEditPayrollPeriodMetadata,
@@ -355,6 +356,11 @@ const PayrollPeriodTab = ({ period, entries, onRefresh, onCreatePeriod, createPe
   const canEditPeriod = canEditPayrollPeriodMetadata(period.status)
   const nextYearPreview = editYear === '' ? period.year : editYear
   const nextMonthPreview = editMonth === '' ? period.month : editMonth
+
+  const expectedTaxTableVersion = buildPayrollTaxTableVersion(
+    typeof nextYearPreview === 'number' ? nextYearPreview : period.year,
+    typeof nextMonthPreview === 'number' ? nextMonthPreview : period.month
+  )
 
   const resetWarning =
     canEditPeriod && doesPayrollPeriodUpdateRequireReset({
@@ -902,7 +908,8 @@ const PayrollPeriodTab = ({ period, entries, onRefresh, onCreatePeriod, createPe
               label='Versión tabla impositiva'
               value={editTaxTable}
               onChange={e => setEditTaxTable(e.target.value)}
-              helperText='Identificador de la tabla SII aplicable'
+              placeholder={expectedTaxTableVersion}
+              helperText='Déjala vacía para que Greenhouse intente resolver automáticamente la tabla tributaria sincronizada del mes. Usa un override solo si necesitas una versión distinta.'
             />
             <CustomTextField
               fullWidth

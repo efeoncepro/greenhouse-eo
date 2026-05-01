@@ -31,25 +31,37 @@ describe('pgUpdatePayrollPeriod', () => {
   })
 
   it('reads the corrected period inside the same transaction before commit', async () => {
-    mockRunGreenhousePostgresQuery
-      .mockResolvedValueOnce(PAYROLL_REQUIRED_TABLES.map(qualified_name => ({ qualified_name })))
-      .mockResolvedValueOnce([
-        {
-          period_id: '2026-03',
-          year: 2026,
-          month: 3,
-          status: 'approved',
-          calculated_at: '2026-03-05T12:00:00.000Z',
-          calculated_by_user_id: 'user-1',
-          approved_at: '2026-03-06T12:00:00.000Z',
-          approved_by_user_id: 'user-2',
-          exported_at: null,
-          uf_value: 39990,
-          tax_table_version: 'SII-2026-03',
-          notes: 'Periodo creado como marzo',
-          created_at: '2026-03-01T12:00:00.000Z'
-        }
-      ])
+    mockRunGreenhousePostgresQuery.mockImplementation(async (text: string) => {
+      if (text.includes('FROM pg_tables')) {
+        return PAYROLL_REQUIRED_TABLES.map(qualified_name => ({ qualified_name }))
+      }
+
+      if (text.includes('SELECT * FROM greenhouse_payroll.payroll_periods')) {
+        return [
+          {
+            period_id: '2026-03',
+            year: 2026,
+            month: 3,
+            status: 'approved',
+            calculated_at: '2026-03-05T12:00:00.000Z',
+            calculated_by_user_id: 'user-1',
+            approved_at: '2026-03-06T12:00:00.000Z',
+            approved_by_user_id: 'user-2',
+            exported_at: null,
+            uf_value: 39990,
+            tax_table_version: 'SII-2026-03',
+            notes: 'Periodo creado como marzo',
+            created_at: '2026-03-01T12:00:00.000Z'
+          }
+        ]
+      }
+
+      if (text.includes('SELECT DISTINCT tax_table_version')) {
+        return [{ tax_table_version: 'gael-2026-02' }]
+      }
+
+      return []
+    })
 
     mockClientQuery
       .mockResolvedValueOnce({ rows: [] })
@@ -68,7 +80,7 @@ describe('pgUpdatePayrollPeriod', () => {
             approved_by_user_id: null,
             exported_at: null,
             uf_value: 39990,
-            tax_table_version: 'SII-2026-02',
+            tax_table_version: 'gael-2026-02',
             notes: 'Nomina imputable febrero 2026',
             created_at: '2026-03-01T12:00:00.000Z'
           }
@@ -79,14 +91,14 @@ describe('pgUpdatePayrollPeriod', () => {
       year: 2026,
       month: 2,
       ufValue: 39990,
-      taxTableVersion: 'SII-2026-02',
+      taxTableVersion: 'gael-2026-02',
       notes: 'Nomina imputable febrero 2026'
     })
 
     expect(updated.periodId).toBe('2026-02')
     expect(updated.month).toBe(2)
     expect(updated.status).toBe('draft')
-    expect(mockRunGreenhousePostgresQuery).toHaveBeenCalledTimes(2)
+    expect(mockRunGreenhousePostgresQuery).toHaveBeenCalledTimes(3)
     expect(mockClientQuery).toHaveBeenCalledTimes(5)
 
     const selectUpdatedPeriodCall = mockClientQuery.mock.calls.find(call =>
@@ -97,25 +109,37 @@ describe('pgUpdatePayrollPeriod', () => {
   })
 
   it('resets an approved period back to draft when metadata changes require a recalculation', async () => {
-    mockRunGreenhousePostgresQuery
-      .mockResolvedValueOnce(PAYROLL_REQUIRED_TABLES.map(qualified_name => ({ qualified_name })))
-      .mockResolvedValueOnce([
-        {
-          period_id: '2026-03',
-          year: 2026,
-          month: 3,
-          status: 'approved',
-          calculated_at: '2026-03-05T12:00:00.000Z',
-          calculated_by_user_id: 'user-1',
-          approved_at: '2026-03-06T12:00:00.000Z',
-          approved_by_user_id: 'user-2',
-          exported_at: null,
-          uf_value: 39990,
-          tax_table_version: 'SII-2026-03',
-          notes: 'Periodo aprobado',
-          created_at: '2026-03-01T12:00:00.000Z'
-        }
-      ])
+    mockRunGreenhousePostgresQuery.mockImplementation(async (text: string) => {
+      if (text.includes('FROM pg_tables')) {
+        return PAYROLL_REQUIRED_TABLES.map(qualified_name => ({ qualified_name }))
+      }
+
+      if (text.includes('SELECT * FROM greenhouse_payroll.payroll_periods')) {
+        return [
+          {
+            period_id: '2026-03',
+            year: 2026,
+            month: 3,
+            status: 'approved',
+            calculated_at: '2026-03-05T12:00:00.000Z',
+            calculated_by_user_id: 'user-1',
+            approved_at: '2026-03-06T12:00:00.000Z',
+            approved_by_user_id: 'user-2',
+            exported_at: null,
+            uf_value: 39990,
+            tax_table_version: 'SII-2026-03',
+            notes: 'Periodo aprobado',
+            created_at: '2026-03-01T12:00:00.000Z'
+          }
+        ]
+      }
+
+      if (text.includes('SELECT DISTINCT tax_table_version')) {
+        return [{ tax_table_version: 'gael-2026-03' }]
+      }
+
+      return []
+    })
 
     mockClientQuery
       .mockResolvedValueOnce({ rows: [], rowCount: 1 })
@@ -132,7 +156,7 @@ describe('pgUpdatePayrollPeriod', () => {
             approved_by_user_id: null,
             exported_at: null,
             uf_value: 40000,
-            tax_table_version: 'SII-2026-04',
+            tax_table_version: 'gael-2026-03',
             notes: 'Periodo ajustado',
             created_at: '2026-03-01T12:00:00.000Z'
           }
@@ -151,7 +175,7 @@ describe('pgUpdatePayrollPeriod', () => {
             approved_by_user_id: null,
             exported_at: null,
             uf_value: 40000,
-            tax_table_version: 'SII-2026-04',
+            tax_table_version: 'gael-2026-03',
             notes: 'Periodo ajustado',
             created_at: '2026-03-01T12:00:00.000Z'
           }
@@ -170,7 +194,7 @@ describe('pgUpdatePayrollPeriod', () => {
             approved_by_user_id: null,
             exported_at: null,
             uf_value: 40000,
-            tax_table_version: 'SII-2026-04',
+            tax_table_version: 'gael-2026-03',
             notes: 'Periodo ajustado',
             created_at: '2026-03-01T12:00:00.000Z'
           }
@@ -181,7 +205,7 @@ describe('pgUpdatePayrollPeriod', () => {
       year: 2026,
       month: 3,
       ufValue: 40000,
-      taxTableVersion: 'SII-2026-04',
+      taxTableVersion: 'gael-2026-03',
       notes: 'Periodo ajustado'
     })
 

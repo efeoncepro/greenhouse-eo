@@ -25,7 +25,7 @@ _Pendiente._
 
 ### HR y Nomina
 
-_Pendiente._
+- [Periodos de nomina](hr/periodos-de-nomina.md) — como crear, editar y calcular periodos sin adivinar la version tributaria Chile; cuando Greenhouse la resuelve solo y cuando un override manual si aplica.
 
 ### Agencia y Operaciones
 

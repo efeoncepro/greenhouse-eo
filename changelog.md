@@ -4949,6 +4949,14 @@ Validations: tsc 0 errors, lint 0 errors, 427 files / 2225 tests pass / 5 skippe
 - La creación de período de nómina ahora también puede capturar `taxTableVersion`, mientras la `UF` sigue autohidratándose.
 - Hallazgo funcional documentado: el módulo sí calcula con salario base, conectividad y bonos variables (`OTD`, `RpA`, `bonusOtherAmount`) y descuenta ausencias/licencias no pagadas, pero todavía no modela un catálogo genérico de bonos fijos recurrentes aparte de `remoteAllowance`.
 
+### Payroll tax table auto-resolution hardening
+
+- La creación de períodos de nómina ya no depende de que el operador conozca manualmente una `taxTableVersion` interna para Chile.
+- Greenhouse ahora intenta resolver automáticamente la tabla tributaria sincronizada del mes imputable al crear, editar, revisar readiness, calcular y recalcular nómina.
+- La UI dejó de sugerir el placeholder legacy `SII-*`; ahora muestra la versión esperada como referencia informativa y deja el override manual solo como camino avanzado.
+- Si no existe una tabla tributaria sincronizada para ese mes, el período igual puede crearse como borrador, pero el sistema bloquea el cálculo con un mensaje explícito en vez de fallar de forma ambigua o degradar el impuesto a `0`.
+- `reverse-quote` también valida que exista una tabla tributaria Chile sincronizada para el mes antes de cotizar remuneración inversa.
+
 ### Economic indicators migration + historical backfill
 
 - Ejecutada la migration `scripts/migrations/add-economic-indicators.sql` para materializar `greenhouse_finance.economic_indicators`.

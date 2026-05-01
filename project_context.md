@@ -3621,6 +3621,18 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - si ese cambio altera la base de cálculo (`year`, `month`, `ufValue` o `taxTableVersion`), el período vuelve a `draft` y sus `payroll_entries` se eliminan para obligar un recálculo limpio
   - no se permite “renombrar” un período exportado ni moverlo encima de un `periodId` ya existente
 
+## Delta 2026-04-30 Payroll tax table auto-resolution — operador no debe adivinar `gael-YYYY-MM`
+
+- Se cerró una brecha de UX/robustez en `Payroll`: el modal de creación pedía implícitamente una `taxTableVersion` Chile que el operador no tenía por qué conocer y todavía mostraba un placeholder legacy `SII-*`.
+- Regla operativa derivada:
+  - la `taxTableVersion` canonica para Chile sigue siendo `gael-YYYY-MM`
+  - pero el operador no debe memorizarla ni escribirla manualmente en el flujo normal
+- Comportamiento derivado:
+  - al crear o editar un período, Greenhouse intenta resolver automáticamente la tabla tributaria sincronizada del mes imputable
+  - si existe una única versión sincronizada para ese mes, puede reutilizarla aunque no coincida exactamente con el nombre canónico esperado
+  - si no existe tabla tributaria sincronizada para el mes, el período puede quedar en `draft`, pero `readiness`, `calculate`, `recalculate` y `reverse quote` bloquean con mensaje explícito antes de producir cálculo Chile inválido
+  - el override manual de `taxTableVersion` sigue existiendo solo como camino avanzado y se valida contra versiones realmente disponibles del mes
+
 ## Delta 2026-03-21 Payroll KPI source cutover — ICO becomes the monthly source of truth
 
 - Se confirmó una brecha entre la intención funcional de `Payroll` y su runtime real:

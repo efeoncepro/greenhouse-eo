@@ -13,6 +13,7 @@ import { fetchKpisForPeriod } from '@/lib/payroll/fetch-kpis-for-period'
 import { getApplicableCompensationVersionsForPeriod } from '@/lib/payroll/get-compensation'
 import { getPayrollPeriod } from '@/lib/payroll/get-payroll-periods'
 import { PayrollValidationError, getPeriodRangeFromId } from '@/lib/payroll/shared'
+import { resolvePayrollTaxTableVersion } from '@/lib/payroll/tax-table-version'
 
 type ApplicableCompensation = Awaited<ReturnType<typeof getApplicableCompensationVersionsForPeriod>>[number]
 type AttendanceSnapshot =
@@ -199,8 +200,17 @@ export const getPayrollPeriodReadiness = async (periodId: string): Promise<Payro
   const includedCompensations = compensationRows.filter(row => row.hasCompensationVersion)
   const includesChilePayroll = includedCompensations.some(isChileLaborCompensation)
 
+  const resolvedTaxTableVersion = includesChilePayroll
+    ? await resolvePayrollTaxTableVersion({
+        year: period.year,
+        month: period.month,
+        requestedVersion: period.taxTableVersion,
+        allowMonthFallbackForRequestedVersion: true
+      })
+    : null
+
   const resolvedUtmValue =
-    includesChilePayroll && period.taxTableVersion
+    includesChilePayroll && resolvedTaxTableVersion
       ? ((
           await getHistoricalEconomicIndicatorForPeriod({
             indicatorCode: 'UTM',
@@ -229,11 +239,14 @@ export const getPayrollPeriodReadiness = async (periodId: string): Promise<Payro
   )
 
   return buildPayrollPeriodReadiness({
-    period: resolvedUfValue == null ? period : { ...period, ufValue: resolvedUfValue },
+    period:
+      resolvedUfValue == null && resolvedTaxTableVersion === period.taxTableVersion
+        ? period
+        : { ...period, ufValue: resolvedUfValue ?? period.ufValue, taxTableVersion: resolvedTaxTableVersion },
     compensationRows,
     missingKpiMemberIds,
     missingAttendanceMemberIds,
     attendanceDiagnostics: attendanceResult.diagnostics,
-    missingUtmValue: includesChilePayroll && period.taxTableVersion != null && typeof resolvedUtmValue !== 'number'
+    missingUtmValue: includesChilePayroll && resolvedTaxTableVersion != null && typeof resolvedUtmValue !== 'number'
   })
 }

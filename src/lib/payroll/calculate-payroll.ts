@@ -32,6 +32,7 @@ import {
   pgGetActiveBonusConfig,
   pgSetPeriodCalculated
 } from '@/lib/payroll/postgres-store'
+import { resolvePayrollTaxTableVersion } from '@/lib/payroll/tax-table-version'
 import { contractAllowsRemoteAllowance } from '@/types/hr-contracts'
 
 type BonusConfigRow = {
@@ -436,10 +437,19 @@ export const calculatePayroll = async ({
     row => row.payRegime === 'chile' && row.contractType !== 'honorarios'
   )
 
+  const resolvedTaxTableVersion = includesChilePayroll
+    ? await resolvePayrollTaxTableVersion({
+        year: period.year,
+        month: period.month,
+        requestedVersion: period.taxTableVersion,
+        allowMonthFallbackForRequestedVersion: true
+      })
+    : null
+
   const indicatorValues = await resolvePayrollPeriodIndicators({
     periodId,
     periodUfValue: period.ufValue,
-    taxTableVersion: period.taxTableVersion,
+    taxTableVersion: resolvedTaxTableVersion,
     indicatorPeriodDate: projectionContext?.asOfDate ?? null
   })
 
@@ -447,14 +457,14 @@ export const calculatePayroll = async ({
     throw new PayrollValidationError('This payroll period requires ufValue to calculate Isapre deductions.', 400)
   }
 
-  if (includesChilePayroll && !period.taxTableVersion) {
+  if (includesChilePayroll && !resolvedTaxTableVersion) {
     throw new PayrollValidationError(
-      'This payroll period requires taxTableVersion to calculate Chile payroll taxes.',
+      'This payroll period requires a synchronized Chile tax table for the selected month before Chile payroll can be calculated.',
       400
     )
   }
 
-  if (includesChilePayroll && period.taxTableVersion && typeof indicatorValues.utmValue !== 'number') {
+  if (includesChilePayroll && resolvedTaxTableVersion && typeof indicatorValues.utmValue !== 'number') {
     throw new PayrollValidationError(
       'This payroll period requires a historical UTM value to calculate Chile payroll taxes.',
       400
@@ -504,10 +514,10 @@ export const calculatePayroll = async ({
       attendance
     })
 
-    if (compensation.payRegime === 'chile' && period.taxTableVersion) {
+    if (compensation.payRegime === 'chile' && resolvedTaxTableVersion) {
       const taxResult = await computeChileTax({
         taxableBaseClp: entry.chileTaxableBase ?? 0,
-        taxTableVersion: period.taxTableVersion,
+        taxTableVersion: resolvedTaxTableVersion,
         utmValue: indicatorValues.utmValue
       })
 

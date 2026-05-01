@@ -52,6 +52,8 @@ import {
 } from '@/lib/payroll/period-lifecycle'
 import { getHistoricalEconomicIndicatorForPeriod } from '@/lib/finance/economic-indicators'
 import { resolveChileAfpSplitRates } from '@/lib/payroll/chile-previsional-helpers'
+import { buildPayrollTaxTableVersion } from '@/lib/payroll/tax-table-version-format'
+import { resolvePayrollTaxTableVersion } from '@/lib/payroll/tax-table-version'
 
 
 // ---------------------------------------------------------------------------
@@ -1417,8 +1419,22 @@ export const pgCreatePayrollPeriod = async (input: CreatePayrollPeriodInput) => 
     ufValue: input.ufValue
   })
 
+  const normalizedTaxTableVersion = normalizeNullableString(input.taxTableVersion)
+
+  const resolvedTaxTableVersion = await resolvePayrollTaxTableVersion({
+    year: input.year,
+    month: input.month,
+    requestedVersion: normalizedTaxTableVersion
+  })
+
   if (existing) {
     throw new PayrollValidationError('Payroll period already exists.', 409)
+  }
+
+  if (normalizedTaxTableVersion && !resolvedTaxTableVersion) {
+    throw new PayrollValidationError(
+      `taxTableVersion is not available for ${input.year}-${String(input.month).padStart(2, '0')}. Leave it empty to auto-resolve or sync Chile tax tables first.`
+    )
   }
 
   return withGreenhousePostgresTransaction(async (client) => {
@@ -1432,7 +1448,7 @@ export const pgCreatePayrollPeriod = async (input: CreatePayrollPeriodInput) => 
       [
         periodId, input.year, input.month,
         resolvedUfValue,
-        normalizeNullableString(input.taxTableVersion),
+        resolvedTaxTableVersion,
         normalizeNullableString(input.notes)
       ]
     )
@@ -1471,8 +1487,37 @@ export const pgUpdatePayrollPeriod = async (periodId: string, input: UpdatePayro
     ufValue: input.ufValue === undefined ? current.ufValue : input.ufValue
   })
 
+  const nextPeriodId = buildPeriodId(nextYear, nextMonth)
+  const identityChanged = nextPeriodId !== current.periodId
+  const currentCanonicalTaxTableVersion = buildPayrollTaxTableVersion(current.year, current.month)
+
+  const shouldAutoMigrateTaxTable =
+    input.taxTableVersion === undefined &&
+    identityChanged &&
+    (current.taxTableVersion == null || current.taxTableVersion === currentCanonicalTaxTableVersion)
+
+  const requestedTaxTableVersion = normalizeNullableString(input.taxTableVersion)
+
   const nextTaxTableVersion =
-    input.taxTableVersion === undefined ? current.taxTableVersion : normalizeNullableString(input.taxTableVersion)
+    input.taxTableVersion !== undefined
+      ? await resolvePayrollTaxTableVersion({
+          year: nextYear,
+          month: nextMonth,
+          requestedVersion: requestedTaxTableVersion
+        })
+      : shouldAutoMigrateTaxTable
+        ? await resolvePayrollTaxTableVersion({
+            year: nextYear,
+            month: nextMonth,
+            requestedVersion: null
+          })
+        : current.taxTableVersion
+
+  if (requestedTaxTableVersion && !nextTaxTableVersion) {
+    throw new PayrollValidationError(
+      `taxTableVersion is not available for ${nextYear}-${String(nextMonth).padStart(2, '0')}. Leave it empty to auto-resolve or sync Chile tax tables first.`
+    )
+  }
 
   const nextNotes = input.notes === undefined ? current.notes : normalizeNullableString(input.notes)
 
@@ -1487,9 +1532,6 @@ export const pgUpdatePayrollPeriod = async (periodId: string, input: UpdatePayro
   if (nextUfValue !== undefined && nextUfValue !== null && (!Number.isFinite(nextUfValue) || nextUfValue < 0)) {
     throw new PayrollValidationError('ufValue must be a non-negative number when provided.')
   }
-
-  const nextPeriodId = buildPeriodId(nextYear, nextMonth)
-  const identityChanged = nextPeriodId !== current.periodId
 
     const requiresReset = doesPayrollPeriodUpdateRequireReset({
       currentYear: current.year,

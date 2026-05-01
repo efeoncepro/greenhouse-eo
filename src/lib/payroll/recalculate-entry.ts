@@ -21,6 +21,7 @@ import { ensurePayrollInfrastructure } from '@/lib/payroll/schema'
 import { PayrollValidationError, getPeriodRangeFromId, runPayrollQuery, toNumber } from '@/lib/payroll/shared'
 import { isPayrollPostgresEnabled, pgGetActiveBonusConfig, pgSetPeriodCalculated } from '@/lib/payroll/postgres-store'
 import { supersedePayrollEntryOnRecalculate } from '@/lib/payroll/supersede-entry'
+import { resolvePayrollTaxTableVersion } from '@/lib/payroll/tax-table-version'
 
 type BonusConfigRow = {
   otd_threshold: number | string | null
@@ -281,18 +282,30 @@ export const recalculatePayrollEntry = async ({
         periodDate: periodEnd
       }))?.value ?? null
 
-  const resolvedUtmValue = period.taxTableVersion
+  const resolvedTaxTableVersion = compensation.payRegime === 'chile'
+    ? await resolvePayrollTaxTableVersion({
+        year: period.year,
+        month: period.month,
+        requestedVersion: period.taxTableVersion,
+        allowMonthFallbackForRequestedVersion: true
+      })
+    : null
+
+  const resolvedUtmValue = resolvedTaxTableVersion
     ? (await getHistoricalEconomicIndicatorForPeriod({
         indicatorCode: 'UTM',
         periodDate: periodEnd
       }))?.value ?? null
     : null
 
-  if (compensation.payRegime === 'chile' && !period.taxTableVersion) {
-    throw new PayrollValidationError('This payroll period requires taxTableVersion to recalculate Chile payroll taxes.', 400)
+  if (compensation.payRegime === 'chile' && !resolvedTaxTableVersion) {
+    throw new PayrollValidationError(
+      'This payroll period requires a synchronized Chile tax table for the selected month before Chile payroll can be recalculated.',
+      400
+    )
   }
 
-  if (compensation.payRegime === 'chile' && period.taxTableVersion && typeof resolvedUtmValue !== 'number') {
+  if (compensation.payRegime === 'chile' && resolvedTaxTableVersion && typeof resolvedUtmValue !== 'number') {
     throw new PayrollValidationError('This payroll period requires a historical UTM value to recalculate Chile payroll taxes.', 400)
   }
 
@@ -341,10 +354,10 @@ export const recalculatePayrollEntry = async ({
     periodDate: periodEnd
   })
 
-  const autoTaxAmount = compensation.payRegime === 'chile' && period.taxTableVersion
+  const autoTaxAmount = compensation.payRegime === 'chile' && resolvedTaxTableVersion
     ? (await computeChileTax({
         taxableBaseClp: provisionalTotals.chileTaxableBase ?? 0,
-        taxTableVersion: period.taxTableVersion,
+        taxTableVersion: resolvedTaxTableVersion,
         utmValue: resolvedUtmValue
       })).taxAmountClp
     : 0

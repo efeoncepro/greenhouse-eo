@@ -29,6 +29,7 @@ import {
   getNextPayrollPeriodSuggestion,
   type ActivePayrollPeriodEntry
 } from '@/lib/payroll/current-payroll-period'
+import { buildPayrollTaxTableVersion } from '@/lib/payroll/tax-table-version-format'
 import type { CompensationVersion, PayrollCompensationMember, PayrollEntry, PayrollPeriod } from '@/types/payroll'
 import PayrollCompensationTab from './PayrollCompensationTab'
 import PayrollHistoryTab from './PayrollHistoryTab'
@@ -64,7 +65,7 @@ const PayrollDashboard = () => {
   const [newPeriodOpen, setNewPeriodOpen] = useState(false)
   const [newYear, setNewYear] = useState(new Date().getFullYear())
   const [newMonth, setNewMonth] = useState(new Date().getMonth() + 1)
-  const [newTaxTableVersion, setNewTaxTableVersion] = useState('')
+  const expectedTaxTableVersion = buildPayrollTaxTableVersion(newYear, newMonth)
 
   const createPeriodSuggestion = getNextPayrollPeriodSuggestion(periods)
   const createPeriodLabel = formatPeriodLabel(createPeriodSuggestion.year, createPeriodSuggestion.month)
@@ -186,8 +187,7 @@ const PayrollDashboard = () => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         year: newYear,
-        month: newMonth,
-        taxTableVersion: newTaxTableVersion || null
+        month: newMonth
       })
     })
 
@@ -199,10 +199,9 @@ const PayrollDashboard = () => {
       return
     }
 
-    setNewTaxTableVersion('')
     setNewPeriodOpen(false)
     handleRefresh()
-  }, [newYear, newMonth, newTaxTableVersion, handleRefresh])
+  }, [newYear, newMonth, handleRefresh])
 
   const handleSelectHistoryPeriod = useCallback(
     async (periodId: string) => {
@@ -503,14 +502,17 @@ const PayrollDashboard = () => {
             <CustomTextField
               fullWidth
               size='small'
-              label='Tabla impuesto Chile'
-              placeholder='SII-2026-03'
-              value={newTaxTableVersion}
-              onChange={e => setNewTaxTableVersion(e.target.value)}
-              helperText='Requerida si el período incluye colaboradores Chile.'
+              label='Versión tributaria Chile esperada'
+              value={expectedTaxTableVersion}
+              slotProps={{
+                input: {
+                  readOnly: true
+                }
+              }}
+              helperText='Greenhouse intenta resolverla automáticamente al crear el período si ya existe una tabla tributaria sincronizada para ese mes.'
             />
             <Alert severity='info'>
-              La UF del período se sincroniza automáticamente según el mes imputable. Si el período incluye Chile, define también la tabla tributaria antes de calcular. El salario base, AFP, salud y bonos se configuran en Compensaciones.
+              La UF del período se sincroniza automáticamente según el mes imputable. Si este período incluye Chile, Greenhouse usará la tabla tributaria sincronizada del mes cuando esté disponible. Si aún falta sincronización, podrás crear el borrador igual y el sistema te avisará antes de calcular.
             </Alert>
           </Stack>
         </DialogContent>
@@ -519,7 +521,6 @@ const PayrollDashboard = () => {
             variant='tonal'
             color='secondary'
             onClick={() => {
-              setNewTaxTableVersion('')
               setNewPeriodOpen(false)
             }}
           >
