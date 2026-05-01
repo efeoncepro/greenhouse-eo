@@ -30,6 +30,7 @@ const OIDC_DISCOVERY_TIMEOUT_MS = 5_000
 
 const MICROSOFT_OIDC_DISCOVERY_URL =
   'https://login.microsoftonline.com/common/v2.0/.well-known/openid-configuration'
+
 const GOOGLE_OIDC_DISCOVERY_URL = 'https://accounts.google.com/.well-known/openid-configuration'
 
 export type AuthProviderReadinessStatus = 'ready' | 'degraded' | 'unconfigured'
@@ -106,6 +107,7 @@ const probeOidcDiscovery = async (
 export const probeNextAuthSecretRoundTrip = async (secret: string): Promise<boolean> => {
   try {
     const key = new TextEncoder().encode(secret)
+
     const token = await new SignJWT({ probe: true })
       .setProtectedHeader({ alg: 'HS256' })
       .setIssuedAt()
@@ -132,7 +134,7 @@ const READINESS_CACHE_TTL_MS = 30_000
 
 declare global {
 
-  // eslint-disable-next-line no-var
+   
   var __greenhouseAuthReadinessCache:
     | { snapshot: AuthReadinessSnapshot; expiresAt: number }
     | undefined

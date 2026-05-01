@@ -55,8 +55,11 @@ describe('resolveSecret', () => {
   })
 
   it('sanitizes quoted secret payloads returned by Secret Manager', async () => {
+    // Uses an unknown-format secret name so Capa 1 format validators (TASK-742)
+    // don't reject the short test payload. NEXTAUTH_SECRET-specific tests live
+    // in format-validators.test.ts.
     vi.stubEnv('GCP_PROJECT', 'efeonce-group')
-    vi.stubEnv('NEXTAUTH_SECRET_SECRET_REF', 'greenhouse-nextauth-secret-staging')
+    vi.stubEnv('SOME_OPAQUE_SECRET_SECRET_REF', 'some-opaque-secret-name')
     accessSecretVersion.mockResolvedValue([
       {
         payload: {
@@ -68,7 +71,7 @@ describe('resolveSecret', () => {
     const { resolveSecret } = await import('@/lib/secrets/secret-manager')
 
     const resolution = await resolveSecret({
-      envVarName: 'NEXTAUTH_SECRET'
+      envVarName: 'SOME_OPAQUE_SECRET'
     })
 
     expect(resolution.source).toBe('secret_manager')

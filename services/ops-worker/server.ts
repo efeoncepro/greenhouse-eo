@@ -54,6 +54,9 @@ import { runQuotationLifecycleSweep } from '@/lib/commercial-intelligence/renewa
 import { sendEmail } from '@/lib/email/delivery'
 import { buildWeeklyDigest, resolveWeeklyDigestRecipients, WEEKLY_DIGEST_DEFAULT_LIMIT } from '@/lib/nexa/digest'
 
+import { getCurrentAuthReadiness } from '@/lib/auth-secrets'
+import { probeNextAuthSecretRoundTrip } from '@/lib/auth/readiness'
+
 import { getReactiveQueueDepth, InvalidDomainError } from './reactive-queue-depth'
 import { runProductCatalogDriftDetectJob } from './product-catalog-drift-detect'
 import { runProductCatalogReconcileV2Job } from './product-catalog-reconcile-v2'
@@ -1141,6 +1144,198 @@ const handleNotionConformedSync = async (req: IncomingMessage, res: ServerRespon
   }
 }
 
+// ─── /smoke/identity-auth-providers ──────────────────────────────────────────
+//
+// TASK-742 Capa 6 — Synthetic monitor for the auth provider stack.
+// Persists a row in greenhouse_sync.smoke_lane_runs with lane_key
+// 'identity.auth.providers'. Reliability dashboard consumes this to roll up
+// SSO health into the Identity subsystem. Must run from outside Vercel to
+// avoid measuring the same runtime that may be itself broken.
+//
+// Probes (each with 5s timeout):
+//   - GET https://greenhouse.efeoncepro.com/api/auth/health → expect status='ready'
+//   - HEAD Microsoft OIDC discovery endpoint → expect 200
+//   - In-process JWT sign+verify roundtrip with NEXTAUTH_SECRET
+//
+// Exit codes via JSON response:
+//   200 + status='passed'  → all probes succeeded
+//   200 + status='failed'  → at least one probe failed (smoke registered, alerts fire)
+//   502                     → smoke run itself failed (PG insert, etc.)
+const handleIdentityAuthSmoke = async (req: IncomingMessage, res: ServerResponse) => {
+  if (req.method !== 'POST') {
+    json(res, 405, { error: 'Method not allowed' })
+
+    return
+  }
+
+  const portalUrl = (process.env.GREENHOUSE_PORTAL_BASE_URL || 'https://greenhouse.efeoncepro.com').replace(/\/$/u, '')
+  const microsoftOidcUrl = 'https://login.microsoftonline.com/common/v2.0/.well-known/openid-configuration'
+  const startedAt = new Date()
+
+  type ProbeResult = { name: string; passed: boolean; durationMs: number; reason?: string }
+  const probes: ProbeResult[] = []
+
+  const fetchWithTimeout = async (url: string, init: RequestInit, ms: number) => {
+    const controller = new AbortController()
+    const timer = setTimeout(() => controller.abort(), ms)
+
+    try {
+      return await fetch(url, { ...init, signal: controller.signal, redirect: 'manual' })
+    } finally {
+      clearTimeout(timer)
+    }
+  }
+
+  // Probe 1 — portal /api/auth/health
+  {
+    const t = Date.now()
+
+    try {
+      const response = await fetchWithTimeout(`${portalUrl}/api/auth/health`, { method: 'GET' }, 5_000)
+
+      if (!response.ok) {
+        probes.push({ name: 'portal_auth_health', passed: false, durationMs: Date.now() - t, reason: `HTTP ${response.status}` })
+      } else {
+        const body = (await response.json().catch(() => null)) as { overallStatus?: string } | null
+        const overallStatus = body?.overallStatus
+
+        probes.push({
+          name: 'portal_auth_health',
+          passed: overallStatus === 'ready',
+          durationMs: Date.now() - t,
+          reason: overallStatus !== 'ready' ? `overallStatus=${overallStatus ?? 'missing'}` : undefined
+        })
+      }
+    } catch (error) {
+      probes.push({
+        name: 'portal_auth_health',
+        passed: false,
+        durationMs: Date.now() - t,
+        reason: error instanceof Error ? error.message : 'unknown_error'
+      })
+    }
+  }
+
+  // Probe 2 — Microsoft OIDC discovery
+  {
+    const t = Date.now()
+
+    try {
+      const response = await fetchWithTimeout(microsoftOidcUrl, { method: 'GET' }, 5_000)
+
+      probes.push({
+        name: 'microsoft_oidc_discovery',
+        passed: response.ok,
+        durationMs: Date.now() - t,
+        reason: response.ok ? undefined : `HTTP ${response.status}`
+      })
+    } catch (error) {
+      probes.push({
+        name: 'microsoft_oidc_discovery',
+        passed: false,
+        durationMs: Date.now() - t,
+        reason: error instanceof Error ? error.message : 'unknown_error'
+      })
+    }
+  }
+
+  // Probe 3 — in-process readiness snapshot (uses ops-worker's own secrets)
+  {
+    const t = Date.now()
+
+    try {
+      const snap = await getCurrentAuthReadiness()
+
+      probes.push({
+        name: 'in_process_readiness',
+        passed: snap.overallStatus === 'ready',
+        durationMs: Date.now() - t,
+        reason: snap.overallStatus !== 'ready' ? `overallStatus=${snap.overallStatus}` : undefined
+      })
+    } catch (error) {
+      probes.push({
+        name: 'in_process_readiness',
+        passed: false,
+        durationMs: Date.now() - t,
+        reason: error instanceof Error ? error.message : 'unknown_error'
+      })
+    }
+  }
+
+  // Probe 4 — JWT sign+verify roundtrip with NEXTAUTH_SECRET
+  {
+    const t = Date.now()
+    const secret = process.env.NEXTAUTH_SECRET?.trim() || null
+
+    if (!secret) {
+      probes.push({ name: 'jwt_self_test', passed: false, durationMs: Date.now() - t, reason: 'NEXTAUTH_SECRET unset' })
+    } else {
+      const ok = await probeNextAuthSecretRoundTrip(secret)
+
+      probes.push({
+        name: 'jwt_self_test',
+        passed: ok,
+        durationMs: Date.now() - t,
+        reason: ok ? undefined : 'sign+verify roundtrip failed'
+      })
+    }
+  }
+
+  const finishedAt = new Date()
+  const allPassed = probes.every(p => p.passed)
+  const status: 'passed' | 'failed' = allPassed ? 'passed' : 'failed'
+  const totalTests = probes.length
+  const passedTests = probes.filter(p => p.passed).length
+  const failedTests = totalTests - passedTests
+
+  const smokeRunId = `smoke-identity-auth-${Date.now().toString(36)}`
+  const commitSha = (process.env.K_REVISION || process.env.GIT_COMMIT || 'unknown').slice(0, 40)
+  const branch = process.env.K_SERVICE || 'ops-worker'
+
+  try {
+    await runGreenhousePostgresQuery(
+      `INSERT INTO greenhouse_sync.smoke_lane_runs (
+         smoke_lane_run_id, lane_key, commit_sha, branch, workflow_run_url,
+         status, started_at, finished_at, duration_ms,
+         total_tests, passed_tests, failed_tests, skipped_tests, summary_json
+       )
+       VALUES ($1, $2, $3, $4, $5, $6, $7::timestamptz, $8::timestamptz, $9,
+               $10, $11, $12, $13, $14::jsonb)`,
+      [
+        smokeRunId,
+        'identity.auth.providers',
+        commitSha,
+        branch,
+        null,
+        status,
+        startedAt.toISOString(),
+        finishedAt.toISOString(),
+        finishedAt.getTime() - startedAt.getTime(),
+        totalTests,
+        passedTests,
+        failedTests,
+        0,
+        JSON.stringify({ probes })
+      ]
+    )
+
+    if (status === 'failed') {
+      captureMessageWithDomain(
+        `identity.auth.providers smoke failed: ${probes.filter(p => !p.passed).map(p => p.name).join(', ')}`,
+        'identity',
+        { level: 'error', extra: { probes } }
+      )
+    }
+
+    json(res, 200, { smokeRunId, status, totalTests, passedTests, failedTests, probes })
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'unknown_error'
+
+    console.error('[ops-worker] /smoke/identity-auth-providers failed to persist:', message)
+    json(res, 502, { error: message, probes })
+  }
+}
+
 // ─── Router ─────────────────────────────────────────────────────────────────
 
 const server = createServer(async (req, res) => {
@@ -1235,6 +1430,12 @@ const server = createServer(async (req, res) => {
 
     if (method === 'POST' && path === '/notion-conformed/sync') {
       await handleNotionConformedSync(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/smoke/identity-auth-providers') {
+      await handleIdentityAuthSmoke(req, res)
 
       return
     }

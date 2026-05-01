@@ -5,6 +5,7 @@ import LeaveRequestDecisionEmail from '@/emails/LeaveRequestDecisionEmail'
 import LeaveRequestPendingReviewEmail from '@/emails/LeaveRequestPendingReviewEmail'
 import LeaveRequestSubmittedEmail from '@/emails/LeaveRequestSubmittedEmail'
 import LeaveReviewConfirmationEmail from '@/emails/LeaveReviewConfirmationEmail'
+import MagicLinkEmail from '@/emails/MagicLinkEmail'
 import NotificationEmail from '@/emails/NotificationEmail'
 import PasswordResetEmail from '@/emails/PasswordResetEmail'
 import PayrollExportReadyEmail, { type CurrencyBreakdown } from '@/emails/PayrollExportReadyEmail'
@@ -248,6 +249,32 @@ registerTemplate('password_reset', (context: {
     text: locale === 'en'
       ? ['Reset your Greenhouse password.', '', `Link: ${context.resetUrl}`].join('\n')
       : ['Restablece tu contrase\u00f1a en Greenhouse.', '', `Enlace: ${context.resetUrl}`].join('\n')
+  }
+})
+
+// TASK-742 Capa 5 \u2014 Magic-link self-recovery
+registerTemplate('magic_link', (context: {
+  magicLinkUrl: string
+  userName?: string
+  locale?: 'es' | 'en'
+  expiresInMinutes?: number
+}) => {
+  const locale = context.locale || 'es'
+  const minutes = context.expiresInMinutes ?? 15
+
+  return {
+    subject: locale === 'en'
+      ? `Sign in to Greenhouse \u2014 link valid ${minutes} min`
+      : `Acceso a Greenhouse \u2014 enlace v\u00e1lido ${minutes} min`,
+    react: MagicLinkEmail({
+      magicLinkUrl: context.magicLinkUrl,
+      userName: context.userName,
+      locale,
+      expiresInMinutes: minutes
+    }),
+    text: locale === 'en'
+      ? [`Sign in to Greenhouse. Valid ${minutes} minutes.`, '', `Link: ${context.magicLinkUrl}`].join('\n')
+      : [`Entra a Greenhouse. V\u00e1lido por ${minutes} minutos.`, '', `Enlace: ${context.magicLinkUrl}`].join('\n')
   }
 })
 

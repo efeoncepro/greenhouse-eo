@@ -26,11 +26,13 @@ describe('Auth readiness contract — TASK-742 Capa 2', () => {
   describe('probeNextAuthSecretRoundTrip', () => {
     it('returns true when secret can sign + verify a JWT', async () => {
       const result = await probeNextAuthSecretRoundTrip('a'.repeat(64))
+
       expect(result).toBe(true)
     })
 
     it('returns false on empty secret', async () => {
       const result = await probeNextAuthSecretRoundTrip('')
+
       expect(result).toBe(false)
     })
   })
@@ -46,6 +48,7 @@ describe('Auth readiness contract — TASK-742 Capa 2', () => {
       })
 
       const azure = snap.providers.find(p => p.provider === 'azure-ad')
+
       expect(azure?.status).toBe('ready')
       expect(snap.nextAuthSecretReady).toBe(true)
     })
@@ -60,6 +63,7 @@ describe('Auth readiness contract — TASK-742 Capa 2', () => {
       })
 
       const azure = snap.providers.find(p => p.provider === 'azure-ad')
+
       expect(azure?.status).toBe('degraded')
       expect(azure?.failingStage).toBe('oidc_discovery_failed')
     })
@@ -74,6 +78,7 @@ describe('Auth readiness contract — TASK-742 Capa 2', () => {
       })
 
       const azure = snap.providers.find(p => p.provider === 'azure-ad')
+
       expect(azure?.status).toBe('unconfigured')
       expect(azure?.failingStage).toBe('unconfigured')
     })
@@ -89,6 +94,7 @@ describe('Auth readiness contract — TASK-742 Capa 2', () => {
       })
 
       const azure = snap.providers.find(p => p.provider === 'azure-ad')
+
       expect(azure?.status).toBe('degraded')
       expect(azure?.failingStage).toBe('secret_format_invalid')
     })
@@ -103,6 +109,7 @@ describe('Auth readiness contract — TASK-742 Capa 2', () => {
       })
 
       const cred = snap.providers.find(p => p.provider === 'credentials')
+
       expect(cred?.status).toBe('degraded')
       expect(cred?.failingStage).toBe('jwt_self_test_failed')
       expect(snap.nextAuthSecretReady).toBe(false)
@@ -124,6 +131,7 @@ describe('Auth readiness contract — TASK-742 Capa 2', () => {
   describe('getAuthReadinessSnapshot caching', () => {
     it('reuses cached snapshot within TTL', async () => {
       const fetchMock = vi.fn(async () => new Response('{}', { status: 200 }))
+
       global.fetch = fetchMock as unknown as typeof fetch
 
       const first = await getAuthReadinessSnapshot({
