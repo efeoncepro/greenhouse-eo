@@ -27,6 +27,11 @@ on:
       - 'src/lib/finance/payroll-expense-reactive.ts'
       - 'src/lib/finance/apply-payroll-reliquidation-delta.ts'
       - 'src/lib/email/**'
+      # TASK-742 — ops-worker hosts the auth-providers smoke lane and consumes
+      # the readiness/secrets stack, so changes here must trigger a redeploy.
+      - 'src/lib/auth/**'
+      - 'src/lib/auth-secrets.ts'
+      - 'src/lib/secrets/**'
   workflow_dispatch:
     inputs:
       environment:

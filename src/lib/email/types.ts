@@ -6,6 +6,7 @@ export type EmailType =
   | 'password_reset'
   | 'invitation'
   | 'verify_email'
+  | 'magic_link'
   | 'payroll_export'
   | 'payroll_receipt'
   | 'payroll_liquidacion_v2'
@@ -28,6 +29,7 @@ export type EmailPriority = 'critical' | 'transactional' | 'broadcast'
  */
 export const EMAIL_PRIORITY_MAP: Record<string, EmailPriority> = {
   password_reset:               'critical',
+  magic_link:                   'critical',
   verify_email:                 'critical',
   invitation:                   'transactional',
   leave_request_decision:       'transactional',

@@ -1,5 +1,19 @@
 # changelog.md
 
+## 2026-05-01
+
+- `TASK-742` Auth Resilience 7-Layer Architecture entregada en branch `feature/TASK-742-auth-resilience-7-layers`. Cierra 6 fallas estructurales del sistema de autenticación expuestas por el incidente del 2026-04-30 (Microsoft SSO rebotando con `?error=Callback` opaco para todo internal user).
+  - **Capa 1 — Secret hygiene**: `validateSecretFormat` con reglas por secret crítico; `resolveSecret` rechaza payloads malformados (whitespace, comillas, charset, length). Sentry warning cuando un secret cae a env en prod.
+  - **Capa 2 — Readiness contract**: `/api/auth/health` expone status por provider via OIDC discovery + JWT sign+verify roundtrip. UI Login esconde botones SSO degradados con warning accionable.
+  - **Capa 3 — SSO observability**: `greenhouse_serving.auth_attempts` append-only ledger (PII redacted: sha256 IP/UA, 2-char email prefix, OID prefix+suffix). `recordAuthAttempt` instrumenta cada signIn/jwt/authorize callback con stage + reason_code estable. `captureWithDomain(err, 'identity')` reemplaza el swallow de NextAuth.
+  - **Capa 4 — Schema integrity**: CHECK constraint `client_users_auth_mode_invariant` prohíbe estados imposibles (`auth_mode='both'` con `password_hash=NULL`). 6 internal users normalizados a `microsoft_sso`, incluyendo Daniela Ferreira que estaba en estado inconsistente.
+  - **Capa 5 — Magic-link self-recovery**: endpoints `/api/auth/magic-link/{request,consume}` + página `/auth/magic-link`. Token 32 bytes urlsafe bcrypt-hashed, single-use, 15min TTL, anti-enumeration. Email template `magic_link` priority=critical en es/en. Cubre el modo de falla "sin password + SSO roto".
+  - **Capa 6 — Smoke lane sintética**: `POST /smoke/identity-auth-providers` en ops-worker (Cloud Run) con Cloud Scheduler `*/5 * * * *`. 4 probes (portal /api/auth/health, Microsoft OIDC discovery, in-process readiness, JWT roundtrip). Persiste `greenhouse_sync.smoke_lane_runs` con `lane_key='identity.auth.providers'`.
+  - **Capa 7 — Secret rotation playbook**: `pnpm secrets:audit` reporta hygiene de 8 secrets críticos. `pnpm secrets:rotate <id>` con verify-before-cutover (format validate → printf %s canonical add → trigger redeploy → poll health → solo entonces disable previous; abort y revert si health falla).
+  - 3 migrations aplicadas en dev: `auth_attempts`, `auth_mode CHECK + normalize`, `auth_magic_links`.
+  - `.github/workflows/ops-worker-deploy.yml` extendido para auto-redeployar el ops-worker en cambios a `src/lib/auth/**`, `src/lib/auth-secrets.ts`, `src/lib/secrets/**`.
+  - 43/43 tests verdes, 0 tsc errors, 0 lint errors.
+
 ## 2026-04-30
 
 - `TASK-647` cierra sus follow-ups read-only desbloqueados:

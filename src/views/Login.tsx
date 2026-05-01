@@ -67,6 +67,7 @@ const LoginV2 = ({
   const [error, setError] = useState('')
   const [ssoLoading, setSsoLoading] = useState<'microsoft' | 'google' | null>(null)
   const [isTransitioning, setIsTransitioning] = useState(false)
+
   const [providerReadiness, setProviderReadiness] = useState<{
     microsoft: 'ready' | 'degraded' | 'unconfigured' | 'unknown'
     google: 'ready' | 'degraded' | 'unconfigured' | 'unknown'
@@ -488,6 +489,19 @@ const LoginV2 = ({
                     </LoadingButton>
                   </Stack>
                 </form>
+
+                {/* TASK-742 Capa 5 — Magic-link self-recovery */}
+                <Box sx={{ textAlign: 'center', mt: 0.5 }}>
+                  <Link
+                    href='/auth/magic-link'
+                    style={{ textDecoration: 'none', ...(isAnyLoading ? { pointerEvents: 'none', opacity: 0.5 } : {}) }}
+                    tabIndex={isAnyLoading ? -1 : undefined}
+                  >
+                    <Typography variant='caption' sx={{ color: 'text.secondary' }}>
+                      ¿No puedes entrar? Recibe un link mágico por correo
+                    </Typography>
+                  </Link>
+                </Box>
 
                 {/* Access note */}
                 <Typography

@@ -507,6 +507,18 @@ upsert_scheduler_job \
   '{"executionSource":"scheduled_primary"}'
 echo "  -> ops-notion-conformed-sync: 20 7 * * * (Notion daily BQ + PG sync, replaces Vercel /api/cron/sync-conformed)"
 
+# TASK-742 Capa 6 — Identity auth providers smoke lane.
+# Hits the portal /api/auth/health, Microsoft OIDC discovery, and runs an
+# in-process JWT roundtrip every 5 minutes. Persists smoke_lane_runs row that
+# the Reliability subsystem 'Identity Auth Providers' rolls up. Fires Sentry
+# domain=identity when any probe fails.
+upsert_scheduler_job \
+  "ops-identity-auth-smoke" \
+  "*/5 * * * *" \
+  "/smoke/identity-auth-providers" \
+  '{"triggeredBy":"cloud_scheduler"}'
+echo "  -> ops-identity-auth-smoke: */5 * * * * (TASK-742 — auth providers synthetic monitor)"
+
 echo ""
 echo "=== Deployment complete ==="
 echo ""
