@@ -33,6 +33,7 @@ El draft anterior asumía `Geist` y proponía helpers nuevos, pero el repo ya ti
 - `DM Sans` desaparece de `src/emails/**` y `src/lib/finance/pdf/**`
 - No se introduce una fuente mono separada salvo hallazgo técnico fuerte
 - Los assets nuevos quedan trazables, mínimos y reproducibles para runtime serverless
+- En emails, `Poppins` se conserva para headings display; `Inter` queda como base para body, metadata y lectura larga
 
 ## Architecture Alignment
 
@@ -62,6 +63,7 @@ El draft anterior asumía `Geist` y proponía helpers nuevos, pero el repo ya ti
 - mantener Poppins solo para headings display cuando aplique
 - remover menciones directas a DM Sans
 - validar fallback razonable en clientes que ignoren custom fonts
+- evitar llevar `Poppins` a párrafos largos, tablas o bloques densos de lectura operativa
 
 ### Slice 2 — PDF font registration
 
@@ -110,6 +112,7 @@ El draft anterior asumía `Geist` y proponía helpers nuevos, pero el repo ya ti
 - [ ] no aparece una tercera familia nueva salvo justificación documentada
 - [ ] La procedencia/licencia o fuente operativa de los archivos `Inter` queda documentada en la task o doc relacionada
 - [ ] Existe fallback claro si una familia PDF no registra: no rompe render y queda detectable en validación manual
+- [ ] Los emails usan `Poppins` en headings display y `Inter` en body/metadata; no quedan párrafos largos o tablas operativas renderizados en `Poppins`
 
 ## Verification
 
