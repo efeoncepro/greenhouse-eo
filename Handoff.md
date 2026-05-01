@@ -14,6 +14,7 @@
   - `monoId` y `monoAmount` se preservan como variants semánticos, pero el contrato preferido pasa a ser `Inter + tabular-nums`, no `Geist Mono` ni `monospace`.
 - **Riesgo abierto**:
   - el repo todavía tiene muchas referencias legacy a `DM Sans` fuera del epic/tareas; no se limpiaron en este slice porque el pedido era ajustar el programa, no reescribir toda la documentación histórica.
+  - follow-up documental agregado en una segunda pasada: el programa ahora exige validación light/dark, mobile, zoom alto, fallback stacks explícitos, trazabilidad/licencia de assets `Inter` para PDF y criterio de cleanup histórico para no borrar referencias legacy a ciegas.
 
 ## Sesion 2026-05-01 — TASK-763 creada desde mockup aprobado de Lifecycle UI
 

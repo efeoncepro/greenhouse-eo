@@ -78,11 +78,13 @@ La rule debe bloquear:
 
 - `fontFamily` hardcodeada en `sx`, `styled`, `StyleSheet.create` o patrones equivalentes dentro de UI productiva
 - `fontFamily: 'monospace'`
+- referencias directas a `DM Sans` o `Geist` en product UI una vez landed `TASK-566`
 
 Excepciones:
 
 - comentarios explícitos con `eslint-disable-next-line`
 - casos de marketing o branding realmente documentados
+- cualquier excepción debe dejar justificación legible, no solo el disable
 
 ### Slice 4 — Reclasificar TASK-021
 
@@ -100,6 +102,8 @@ Excepciones:
 - [ ] grep de `fontFamily: 'monospace'` en `src/**` da 0
 - [ ] `pnpm lint` falla si alguien agrega `fontFamily: 'monospace'`
 - [ ] `TASK-021` queda referenciada como supersedida parcialmente por `TASK-567`
+- [ ] La rule deja mensajes de error accionables que indiquen usar variants/tokens en vez de solo fallar genéricamente
+- [ ] La task documenta al menos un ejemplo de excepción válida y uno inválido
 
 ## Verification
 

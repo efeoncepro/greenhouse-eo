@@ -34,6 +34,7 @@ Además, las tasks draft anteriores mencionaban skills que no existen exactament
 - Figma alineada a `Poppins + Inter`
 - skills reales del repo alineadas al nuevo contrato
 - docs operativas sin instrucciones contradictorias
+- cierre documental suficiente para que un agente nuevo no reabra el baseline viejo por error
 
 ## Architecture Alignment
 
@@ -70,6 +71,7 @@ Además, las tasks draft anteriores mencionaban skills que no existen exactament
   - títulos siguen siendo escaneables en primer fold
   - tablas y KPIs no pierden legibilidad
   - zoom alto / wraps densos no rompen CTA ni metadata crítica
+- incluir al menos una validación de dark mode y una de viewport estrecho en las surfaces más densas
 
 ### Slice 2 — Figma
 
@@ -91,6 +93,7 @@ Actualizar el inventario real del repo:
 - remover menciones normativas a `DM Sans` como baseline
 - remover instrucciones que sigan diciendo “no migrar a Inter”
 - limpiar referencias al draft `Geist` que ya no apliquen
+- dejar explícito qué referencias legacy pueden sobrevivir solo como contexto histórico
 
 ## Out of Scope
 
@@ -106,6 +109,8 @@ Actualizar el inventario real del repo:
 - [ ] `.claude/skills/greenhouse-ui-review/SKILL.md` audita con el baseline nuevo
 - [ ] `.claude/skills/greenhouse-email/skill.md` deja de modelar `EMAIL_FONTS.body` sobre DM Sans
 - [ ] grep de `DM Sans` y del draft normativo `no Inter` queda limpio en skills/docs activas del programa
+- [ ] La validación visual incluye al menos un caso en dark mode, uno en mobile/viewport estrecho y uno con zoom alto sobre surface densa
+- [ ] La task deja cerrado qué menciones legacy pueden seguir existiendo por valor histórico para evitar “grep cleanup” destructivo
 
 ## Verification
 

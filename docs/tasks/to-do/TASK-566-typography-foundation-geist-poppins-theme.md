@@ -47,6 +47,7 @@ Reglas duras:
 - Poppins solo en `h1-h4`
 - `fontFamily: 'monospace'` prohibido globalmente
 - `monoId` y `monoAmount` siguen existiendo como API semántica
+- La foundation debe conservar fallback stacks explícitos para cuando `Inter` o `Poppins` no carguen
 
 ## Files Owned
 
@@ -71,6 +72,7 @@ Reglas duras:
 - Mantener `Poppins`
 - Usar variables CSS claras, por ejemplo `--font-inter` y `--font-poppins`
 - Agregar `display: 'swap'`
+- Declarar fallback stack explícito y consistente con MUI/system fonts para limitar FOUT/CLS
 
 ### Slice 2 — Theme realignment
 
@@ -83,6 +85,7 @@ Reglas duras:
   - agregan `fontVariantNumeric: 'tabular-nums'`
   - usan peso/spacing que mantenga legibilidad para IDs y montos
 - `caption` deja de hardcodear color
+- revisar si `kpiValue` necesita `fontVariantNumeric: 'tabular-nums'` además del cambio de familia
 
 ### Slice 3 — Token doc rewrite
 
@@ -105,6 +108,18 @@ Reglas duras:
 - No introducir `Geist Mono` ni otra tercera familia en esta foundation.
 - Si durante la implementación se detecta que Inter no cubre suficientemente montos/IDs con `tabular-nums`, eso se documenta como hallazgo; no se cambia el contrato sin actualizar el epic.
 - El objetivo es simplificar el sistema, no solo reemplazar una sans por otra.
+- Si aparece regresión severa de wrap o pérdida de jerarquía en first fold, la corrección preferida es ajustar variants/tokens, no reintroducir familias inline.
+
+## Robustness Additions
+
+- Validar en light y dark mode al menos:
+  - `/home`
+  - `/finance/quotes/new`
+  - `/hr/payroll`
+  - `/admin`
+- Validar en viewport desktop y mobile compacto.
+- Revisar una surface densa al 125%-150% de zoom para detectar wraps tempranos en tabs, chips y toolbars.
+- Dejar documentado el stack fallback final en la task y en tokens, no solo en código.
 
 ## Acceptance Criteria
 
@@ -114,12 +129,15 @@ Reglas duras:
 - [ ] `monoId` / `monoAmount` no usan `fontFamily: 'monospace'`
 - [ ] `docs/architecture/GREENHOUSE_DESIGN_TOKENS_V1.md` deja de declarar DM Sans como default
 - [ ] La política canónica documenta `Poppins + Inter`
+- [ ] El stack fallback para Inter/Poppins queda explícito en layout/theme y documentado en tokens
+- [ ] No aparecen regresiones obvias de first fold o clipping en dark mode / mobile básico durante la validación manual
 
 ## Verification
 
 - `pnpm lint`
 - `pnpm build`
 - revisión manual en Home, Quotes, Admin, Payroll
+- revisión visual rápida en light/dark y desktop/mobile
 
 ## Open Questions
 

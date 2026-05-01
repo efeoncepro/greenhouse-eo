@@ -50,6 +50,7 @@ Reglas transversales:
 - Inter es el default implícito del producto; no debería hardcodearse inline.
 - `monoId` / `monoAmount` siguen siendo la API canónica para IDs y montos, pero sin depender de monospace.
 - `src/@core/theme/*` no se toca; el override vive en `src/components/theme/mergedTheme.ts`.
+- Todo cambio tipográfico visible debe validarse en light y dark mode, desktop y mobile, y con zoom alto en al menos una surface densa.
 
 ## Child Tasks
 
@@ -75,6 +76,8 @@ Reglas transversales:
 - [ ] `src/emails/**` y `src/lib/finance/pdf/**` convergen a la nueva política
 - [ ] La rule ESLint bloquea hardcodes nuevos de `fontFamily` y el uso literal de monospace
 - [ ] Figma, skills y docs dejan de mencionar `DM Sans` como baseline y dejan de empujar `Geist` como destino
+- [ ] El programa deja documentado fallback/rollback operativo si algún runtime no puede absorber `Inter` o si los assets PDF faltan
+- [ ] El programa deja trazabilidad de procedencia/licencia de los assets de fuente locales que se agreguen
 
 ## Non-goals
 
@@ -91,6 +94,8 @@ Reglas transversales:
 | Drift entre portal y PDF/email | `TASK-568` usa los artefactos reales ya presentes (`register-fonts.ts`, `tokens.ts`, `src/emails/**`) |
 | Futuros agentes siguen empujando DM Sans o “no Inter” | `TASK-569` actualiza skills y docs operativas |
 | `monoId` / `monoAmount` pierden legibilidad al dejar monospace | validar con tabular nums, peso y spacing antes de introducir otra familia |
+| `Inter` genera CLS/FOUT perceptible en primeras cargas | validar `display: 'swap'`, revisar first fold y documentar fallback stack |
+| Assets PDF nuevos entran sin trazabilidad o con pesos innecesarios | `TASK-568` documenta provenance, formatos y set mínimo usado |
 
 ## Delta 2026-05-01
 

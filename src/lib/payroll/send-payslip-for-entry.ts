@@ -18,6 +18,7 @@ import { downloadGreenhouseMediaAsset, uploadGreenhouseStorageObject } from '@/l
 import { getGreenhousePrivateAssetsBucket, upsertSystemGeneratedAsset } from '@/lib/storage/greenhouse-assets'
 import {
   buildPayslipDeliveryId,
+  hasActivePayslipDelivery,
   recordPayslipDelivery,
   type PayslipDeliveryKind
 } from '@/lib/payroll/payslip-deliveries-store'
@@ -82,11 +83,33 @@ export async function sendPayslipForEntry(
     return { status: 'failed_generation', receiptId: null, resendId: null, error: `period ${entry.periodId} not found` }
   }
 
-  // 2. Idempotency check — si ya hay receipt email_sent para esta entry, skip.
+  // 2. Idempotency check — granular por DELIVERY KIND (TASK-759 V2 fix).
+  //
+  // ANTES: chequeaba payroll_receipts.status='email_sent' (flag GLOBAL por receipt).
+  //   Bug: si legacy_export envió un mail al exportar el período, el flag quedaba
+  //   en email_sent para siempre. Cuando Tesorería marcaba la orden pagada y la
+  //   projection nueva 'on_payment_paid' intentaba enviar, hacía skip silencioso.
+  //   Resultado: colaborador NO recibía el mail "tu pago se ejecutó" porque el
+  //   flag del legacy export bloqueaba.
+  //
+  // AHORA: chequea payslip_deliveries por (entry_id, delivery_kind) específica.
+  //   Cada kind (period_exported / payment_paid / payment_committed / etc.) es
+  //   independiente. Un colaborador puede recibir 1 'period_exported' + 1
+  //   'payment_paid' (no son duplicados, son comunicaciones distintas en el
+  //   lifecycle del pago). 'manual_resend' siempre se envía (no es idempotent).
   const existing = await getPayrollReceiptByEntryId(input.entryId)
 
-  if (existing?.status === 'email_sent' && existing.emailSentAt) {
-    return { status: 'skipped_already_sent', receiptId: existing.receiptId, resendId: null, error: null }
+  const deliveryKindForCheck: PayslipDeliveryKind =
+    input.trigger === 'period_exported' ? 'period_exported'
+    : input.trigger === 'payment_paid' ? 'payment_paid'
+    : 'manual_resend'
+
+  if (deliveryKindForCheck !== 'manual_resend') {
+    const activeDelivery = await hasActivePayslipDelivery(input.entryId, deliveryKindForCheck)
+
+    if (activeDelivery) {
+      return { status: 'skipped_already_sent', receiptId: existing?.receiptId ?? null, resendId: null, error: null }
+    }
   }
 
   // 3. Sin email → skip (no failure).

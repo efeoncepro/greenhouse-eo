@@ -32,6 +32,7 @@ El draft anterior asumía `Geist` y proponía helpers nuevos, pero el repo ya ti
 - PDFs registran pesos locales de Inter y Poppins
 - `DM Sans` desaparece de `src/emails/**` y `src/lib/finance/pdf/**`
 - No se introduce una fuente mono separada salvo hallazgo técnico fuerte
+- Los assets nuevos quedan trazables, mínimos y reproducibles para runtime serverless
 
 ## Architecture Alignment
 
@@ -60,6 +61,7 @@ El draft anterior asumía `Geist` y proponía helpers nuevos, pero el repo ya ti
 - actualizar stacks a Inter para body/metadata
 - mantener Poppins solo para headings display cuando aplique
 - remover menciones directas a DM Sans
+- validar fallback razonable en clientes que ignoren custom fonts
 
 ### Slice 2 — PDF font registration
 
@@ -72,6 +74,7 @@ El draft anterior asumía `Geist` y proponía helpers nuevos, pero el repo ya ti
 - incorporar los archivos locales de `Inter` necesarios para PDF en `src/assets/fonts/**`
 - dejar trazable la procedencia/formato de esos assets para no depender de URLs remotas volátiles
 - mantener el set mínimo de pesos realmente usados por `src/lib/finance/pdf/tokens.ts`
+- documentar naming convention de archivos para que futuros cambios no reintroduzcan assets ambiguos
 
 ### Slice 4 — PDF tokens
 
@@ -89,6 +92,7 @@ El draft anterior asumía `Geist` y proponía helpers nuevos, pero el repo ya ti
 - verificar qué archivos reales existen en `src/assets/fonts/**`
 - documentar explícitamente el set nuevo de Inter que se agregó o, si ya quedó resuelto por otra task, el set efectivo reutilizado
 - no depender de URLs remotas si ya existe una estrategia local
+- dejar nota explícita si algún runtime PDF sigue dependiendo de fallback Helvetica por error controlado
 
 ## Out of Scope
 
@@ -104,12 +108,16 @@ El draft anterior asumía `Geist` y proponía helpers nuevos, pero el repo ya ti
 - [ ] emails dejan de referenciar DM Sans
 - [ ] PDFs y emails convergen a `Poppins + Inter`
 - [ ] no aparece una tercera familia nueva salvo justificación documentada
+- [ ] La procedencia/licencia o fuente operativa de los archivos `Inter` queda documentada en la task o doc relacionada
+- [ ] Existe fallback claro si una familia PDF no registra: no rompe render y queda detectable en validación manual
 
 ## Verification
 
 - preview de emails
 - render manual de quote PDF / payroll PDF
 - `pnpm build`
+- revisar al menos un email en Gmail/Outlook o equivalente con fallback realista
+- abrir un PDF generado y verificar que headings/body/montos no colapsan a pesos erráticos
 
 ## Open Questions
 
