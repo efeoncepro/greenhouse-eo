@@ -23,6 +23,27 @@ import Typography from '@mui/material/Typography'
 import CustomChip from '@core/components/mui/Chip'
 import { downloadPayrollReceiptPdf } from '@/lib/payroll/download-payroll-receipt'
 
+interface PayslipDeliveryEvent {
+  deliveryKind: string
+  status: string
+  sentAt: string | null
+  failedAt: string | null
+  errorMessage: string | null
+  emailProviderId: string | null
+  superseded: boolean
+  createdAt: string
+}
+
+interface PaymentOrderInfo {
+  orderId: string
+  title: string | null
+  state: string | null
+  processorSlug: string | null
+  scheduledFor: string | null
+  paidAt: string | null
+  externalReference: string | null
+}
+
 interface PayrollEntry {
   entryId: string
   periodId: string
@@ -32,6 +53,17 @@ interface PayrollEntry {
   grossTotal: number
   netTotal: number
   status: string
+  // TASK-759e — payment lifecycle metadata (optional, may be undefined for legacy entries)
+  paymentStatus?: string
+  paymentOrder?: PaymentOrderInfo | null
+  payslipDelivery?: {
+    deliveryKind: string
+    status: string
+    sentAt: string | null
+    emailProviderId: string | null
+    emailRecipient: string | null
+  } | null
+  payslipDeliveryTimeline?: PayslipDeliveryEvent[]
 }
 
 interface PayrollData {
@@ -47,6 +79,31 @@ const MONTHS = ['', 'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep
 
 const fmt = (amount: number, currency: string) =>
   new Intl.NumberFormat('es-CL', { style: 'currency', currency: currency === 'USD' ? 'USD' : 'CLP', maximumFractionDigits: 0 }).format(amount)
+
+const PROCESSOR_LABELS: Record<string, string> = {
+  deel: 'Deel',
+  bank_internal: 'Banco',
+  global66: 'Global66',
+  wise: 'Wise',
+  paypal: 'PayPal',
+  manual_cash: 'Manual',
+  sii_pec: 'SII PEC'
+}
+
+const PAYMENT_STATUS_META: Record<string, { label: string; color: 'primary' | 'info' | 'warning' | 'success' | 'error' | 'secondary' }> = {
+  awaiting_order: { label: 'Por programar', color: 'warning' },
+  order_pending: { label: 'En aprobación', color: 'warning' },
+  order_approved: { label: 'Programado', color: 'info' },
+  order_paid: { label: 'Pagado', color: 'success' },
+  cancelled: { label: 'Cancelado', color: 'error' }
+}
+
+const formatPaymentDate = (iso: string | null): string => {
+  if (!iso) return '—'
+  const d = new Date(iso)
+
+  return d.toLocaleDateString('es-CL', { day: '2-digit', month: 'short', year: 'numeric' })
+}
 
 const MyPayrollView = () => {
   const [data, setData] = useState<PayrollData | null>(null)
@@ -174,32 +231,59 @@ const MyPayrollView = () => {
                     <TableCell>Período</TableCell>
                     <TableCell align='right'>Bruto</TableCell>
                     <TableCell align='right'>Neto</TableCell>
-                    <TableCell align='center'>Estado</TableCell>
+                    <TableCell align='center'>Estado pago</TableCell>
+                    <TableCell align='center'>Procesador</TableCell>
+                    <TableCell align='center'>Fecha pago</TableCell>
                     <TableCell align='center'>Recibo</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {entries.map(e => (
-                    <TableRow key={e.entryId} hover>
-                      <TableCell><Typography variant='body2' fontWeight={600}>{MONTHS[e.month]} {e.year}</Typography></TableCell>
-                      <TableCell align='right'>{fmt(e.grossTotal, e.currency)}</TableCell>
-                      <TableCell align='right'><Typography fontWeight={600}>{fmt(e.netTotal, e.currency)}</Typography></TableCell>
-                      <TableCell align='center'>
-                        <CustomChip round='true' size='small' variant='tonal' color={e.status === 'exported' ? 'success' : e.status === 'approved' ? 'primary' : 'secondary'} label={e.status === 'exported' ? 'Exportada' : e.status === 'approved' ? 'Aprobada' : e.status} />
-                      </TableCell>
-                      <TableCell align='center'>
-                        <Button
-                          size='small'
-                          variant='tonal'
-                          startIcon={<i className='tabler-file-download' />}
-                          onClick={() => { void handleDownloadReceipt(e) }}
-                          aria-label={`Descargar recibo PDF de ${MONTHS[e.month]} ${e.year}`}
-                        >
-                          PDF
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                  {entries.map(e => {
+                    const paymentStatusKey = e.paymentStatus ?? 'awaiting_order'
+                    const statusMeta = PAYMENT_STATUS_META[paymentStatusKey] ?? { label: 'Por programar', color: 'warning' as const }
+
+                    const processorLabel = e.paymentOrder?.processorSlug
+                      ? (PROCESSOR_LABELS[e.paymentOrder.processorSlug] ?? e.paymentOrder.processorSlug)
+                      : null
+
+                    const dateLabel = e.paymentOrder?.paidAt
+                      ? `Pagado ${formatPaymentDate(e.paymentOrder.paidAt)}`
+                      : e.paymentOrder?.scheduledFor
+                        ? `Programado ${formatPaymentDate(e.paymentOrder.scheduledFor)}`
+                        : '—'
+
+                    return (
+                      <TableRow key={e.entryId} hover>
+                        <TableCell><Typography variant='body2' fontWeight={600}>{MONTHS[e.month]} {e.year}</Typography></TableCell>
+                        <TableCell align='right'>{fmt(e.grossTotal, e.currency)}</TableCell>
+                        <TableCell align='right'><Typography fontWeight={600}>{fmt(e.netTotal, e.currency)}</Typography></TableCell>
+                        <TableCell align='center'>
+                          <CustomChip round='true' size='small' variant='tonal' color={statusMeta.color} label={statusMeta.label} />
+                        </TableCell>
+                        <TableCell align='center'>
+                          {processorLabel ? (
+                            <CustomChip round='true' size='small' variant='outlined' label={processorLabel} />
+                          ) : (
+                            <Typography variant='caption' color='text.disabled'>—</Typography>
+                          )}
+                        </TableCell>
+                        <TableCell align='center'>
+                          <Typography variant='caption' color='text.secondary'>{dateLabel}</Typography>
+                        </TableCell>
+                        <TableCell align='center'>
+                          <Button
+                            size='small'
+                            variant='tonal'
+                            startIcon={<i className='tabler-file-download' />}
+                            onClick={() => { void handleDownloadReceipt(e) }}
+                            aria-label={`Descargar recibo PDF de ${MONTHS[e.month]} ${e.year}`}
+                          >
+                            PDF
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    )
+                  })}
                 </TableBody>
               </Table>
             </TableContainer>

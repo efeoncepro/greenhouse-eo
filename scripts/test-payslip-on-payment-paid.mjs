@@ -21,7 +21,6 @@ const pool = new pg.Pool({
 })
 
 const ORDER_ID = 'por-66563173-bdda-4591-b9ef-f798ecc98b95'
-const ENTRY_ID_PATTERN = '%luis-reyes%' // entry of Luis for period 2026-04
 
 async function inspect() {
   const order = await pool.query(`SELECT order_id, state, paid_at FROM greenhouse_finance.payment_orders WHERE order_id = $1`, [ORDER_ID])
@@ -64,6 +63,7 @@ async function markPaid() {
   console.log('Marking Luis order as paid via DB transaction + outbox event publish (simulates POST /mark-paid)...')
 
   const client = await pool.connect()
+
   try {
     await client.query('BEGIN')
 
@@ -73,6 +73,7 @@ async function markPaid() {
 
     // Publish outbox event matching mark-paid.ts shape
     const eventId = `outbox-test-task759-${Date.now()}`
+
     await client.query(
       `INSERT INTO greenhouse_sync.outbox_events (event_id, aggregate_type, aggregate_id, event_type, payload_json, status, occurred_at)
        VALUES ($1, 'payment_order', $2, 'finance.payment_order.paid', $3::jsonb, 'pending', NOW())`,

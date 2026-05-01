@@ -16,6 +16,18 @@ import {
 import { sendEmail } from '@/lib/email/delivery'
 import { downloadGreenhouseMediaAsset, uploadGreenhouseStorageObject } from '@/lib/storage/greenhouse-media'
 import { getGreenhousePrivateAssetsBucket, upsertSystemGeneratedAsset } from '@/lib/storage/greenhouse-assets'
+import {
+  buildPayslipDeliveryId,
+  recordPayslipDelivery,
+  type PayslipDeliveryKind
+} from '@/lib/payroll/payslip-deliveries-store'
+
+const triggerToDeliveryKind = (trigger: PayrollReceiptDeliveryTrigger): PayslipDeliveryKind => {
+  if (trigger === 'period_exported') return 'period_exported'
+  if (trigger === 'payment_paid') return 'payment_paid'
+
+  return 'manual_resend'
+}
 
 /**
  * TASK-759 — Helper canónico per-entry para envío del recibo de nómina.
@@ -255,8 +267,30 @@ export async function sendPayslipForEntry(
       paymentOrderLineId: input.paymentOrderLineId ?? null
     })
 
+    // TASK-759 V2: registrar delivery failed en el ledger
+    const deliveryKind = triggerToDeliveryKind(input.trigger)
+
+    await recordPayslipDelivery({
+      deliveryId: buildPayslipDeliveryId(input.entryId, deliveryKind, sourceEventId),
+      receiptId,
+      entryId: input.entryId,
+      memberId: entry.memberId,
+      periodId: entry.periodId,
+      deliveryKind,
+      paymentOrderLineId: input.paymentOrderLineId ?? null,
+      sourceEventId,
+      triggeredByUserId: input.actorEmail ?? null,
+      status: 'failed',
+      emailRecipient: entry.memberEmail,
+      errorMessage: errorMsg,
+      failedAt: new Date().toISOString()
+    })
+
     return { status: 'failed_email', receiptId, resendId: null, error: errorMsg }
   }
+
+  const deliveryKind = triggerToDeliveryKind(input.trigger)
+  const deliveryId = buildPayslipDeliveryId(input.entryId, deliveryKind, sourceEventId)
 
   if (sendResult?.status === 'sent') {
     await savePayrollReceipt({
@@ -269,17 +303,53 @@ export async function sendPayslipForEntry(
       paymentOrderLineId: input.paymentOrderLineId ?? null
     })
 
+    // TASK-759 V2: registrar delivery sent en el ledger
+    await recordPayslipDelivery({
+      deliveryId,
+      receiptId,
+      entryId: input.entryId,
+      memberId: entry.memberId,
+      periodId: entry.periodId,
+      deliveryKind,
+      paymentOrderLineId: input.paymentOrderLineId ?? null,
+      sourceEventId,
+      triggeredByUserId: input.actorEmail ?? null,
+      status: 'sent',
+      emailRecipient: entry.memberEmail,
+      emailProviderId: sendResult.resendId,
+      templateVersion: RECEIPT_TEMPLATE_VERSION,
+      sentAt: new Date().toISOString()
+    })
+
     return { status: 'sent', receiptId, resendId: sendResult.resendId, error: null }
   }
 
   // sendResult exists but not sent (e.g. queued, failed locally).
+  const errorMsg = sendResult?.error || 'Email delivery skipped.'
+
   await savePayrollReceipt({
     ...baseReceipt,
     status: 'email_failed',
-    emailError: sendResult?.error || 'Email delivery skipped.',
+    emailError: errorMsg,
     deliveryTrigger: input.trigger,
     paymentOrderLineId: input.paymentOrderLineId ?? null
   })
 
-  return { status: 'failed_email', receiptId, resendId: null, error: sendResult?.error || 'Email delivery skipped.' }
+  await recordPayslipDelivery({
+    deliveryId,
+    receiptId,
+    entryId: input.entryId,
+    memberId: entry.memberId,
+    periodId: entry.periodId,
+    deliveryKind,
+    paymentOrderLineId: input.paymentOrderLineId ?? null,
+    sourceEventId,
+    triggeredByUserId: input.actorEmail ?? null,
+    status: 'failed',
+    emailRecipient: entry.memberEmail,
+    errorMessage: errorMsg,
+    failedAt: new Date().toISOString()
+  })
+
+  return { status: 'failed_email', receiptId, resendId: null, error: errorMsg }
 }

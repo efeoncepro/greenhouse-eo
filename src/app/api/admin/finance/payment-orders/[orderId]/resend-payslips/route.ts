@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server'
 import { query } from '@/lib/db'
 import { sendPayslipForEntry } from '@/lib/payroll/send-payslip-for-entry'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
+import { can } from '@/lib/entitlements/runtime'
 
 export const dynamic = 'force-dynamic'
 
@@ -35,6 +36,14 @@ export async function POST(
   const { tenant, errorResponse } = await requireFinanceTenantContext()
 
   if (!tenant) return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  // TASK-759d — Capability gate fina (en addición a finance route_group).
+  if (!can(tenant, 'finance.payslip.resend', 'update', 'tenant')) {
+    return NextResponse.json(
+      { error: 'No tienes permisos para reenviar recibos. Requiere finance.payslip.resend.' },
+      { status: 403 }
+    )
+  }
 
   const { orderId } = await params
 

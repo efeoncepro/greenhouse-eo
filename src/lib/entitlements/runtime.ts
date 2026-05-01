@@ -362,6 +362,17 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       scope: 'tenant',
       source: 'role'
     })
+
+    // TASK-759 V2 (759d) — Payslip resend capability. Solo finance_admin/efeonce_admin.
+    // El analyst NO puede reenviar (read-only). Cubre el endpoint /resend-payslips
+    // y el botón "Reenviar manualmente" en drawers.
+    addEntitlement(entries, {
+      module: 'finance',
+      capability: 'finance.payslip.resend',
+      action: 'update',
+      scope: 'tenant',
+      source: 'role'
+    })
   }
 
   // TASK-722 — Reconciliation workbench capabilities.

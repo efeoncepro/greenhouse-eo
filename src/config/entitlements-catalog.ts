@@ -180,6 +180,16 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     actions: ['read'] as const,
     defaultScope: 'tenant'
   },
+
+  // ── Payslip delivery resend (TASK-759 V2 / 759d) ───────────────────
+  // Permite a finance ops re-disparar el envío del recibo a un colaborador,
+  // típicamente cuando el path automático falla. force=true bypasses idempotency.
+  {
+    key: 'finance.payslip.resend',
+    module: 'finance',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
   {
     key: 'finance.cash.adopt-external-signal',
     module: 'finance',

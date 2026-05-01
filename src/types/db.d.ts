@@ -5532,6 +5532,38 @@ export interface GreenhousePayrollPayrollReceipts {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhousePayrollPayslipDeliveries {
+  created_at: Generated<Timestamp>;
+  delivery_id: string;
+  /**
+   * Tipo de comunicación: period_exported (legacy), payment_committed (759b), payment_paid (759 V1), payment_cancelled (759c), payment_revised (759c future), manual_resend.
+   */
+  delivery_kind: string;
+  email_provider_id: string | null;
+  email_recipient: string | null;
+  email_subject: string | null;
+  entry_id: string;
+  error_message: string | null;
+  failed_at: Timestamp | null;
+  member_id: string;
+  metadata_json: Generated<Json>;
+  payment_order_id: string | null;
+  payment_order_line_id: string | null;
+  period_id: string;
+  receipt_id: string;
+  scheduled_for: Timestamp | null;
+  sent_at: Timestamp | null;
+  source_event_id: string | null;
+  status: string;
+  /**
+   * Si esta delivery fue reemplazada por un revised/cancelled posterior, FK a la nueva. NULL = activa. Audit chain preservado.
+   */
+  superseded_by: string | null;
+  template_version: string | null;
+  triggered_by_user_id: string | null;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhousePayrollPreviredAfpRates {
   afp_code: string;
   afp_name: string;
@@ -7848,6 +7880,7 @@ export interface DB {
   "greenhouse_payroll.payroll_period_reopen_audit": GreenhousePayrollPayrollPeriodReopenAudit;
   "greenhouse_payroll.payroll_periods": GreenhousePayrollPayrollPeriods;
   "greenhouse_payroll.payroll_receipts": GreenhousePayrollPayrollReceipts;
+  "greenhouse_payroll.payslip_deliveries": GreenhousePayrollPayslipDeliveries;
   "greenhouse_payroll.previred_afp_rates": GreenhousePayrollPreviredAfpRates;
   "greenhouse_payroll.previred_period_indicators": GreenhousePayrollPreviredPeriodIndicators;
   "greenhouse_payroll.projected_payroll_promotions": GreenhousePayrollProjectedPayrollPromotions;

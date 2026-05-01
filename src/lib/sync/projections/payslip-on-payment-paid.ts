@@ -4,6 +4,7 @@ import type { ProjectionDefinition } from '../projection-registry'
 import { query } from '@/lib/db'
 import { sendPayslipForEntry } from '@/lib/payroll/send-payslip-for-entry'
 import { getPaymentDeliveryMode } from '@/lib/payroll/payslip-delivery-mode'
+import { captureWithDomain } from '@/lib/observability/capture'
 
 interface OrderLineRow extends Record<string, unknown> {
   line_id: string
@@ -114,6 +115,10 @@ export const payslipOnPaymentPaidProjection: ProjectionDefinition = {
       } catch (e) {
         failed += 1
         errors.push(`entry ${entryId}: ${e instanceof Error ? e.message : String(e)}`)
+        captureWithDomain(e, 'payroll', {
+          tags: { feature: 'payslip_lifecycle', kind: 'payment_paid' },
+          extra: { entryId, orderId, lineId: line.line_id }
+        })
       }
     }
 

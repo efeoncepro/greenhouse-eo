@@ -17,6 +17,8 @@ import { projectedPayrollProjection } from './projected-payroll'
 import { leavePayrollRecalculationProjection } from './leave-payroll-recalculation'
 import { payrollReceiptsProjection } from './payroll-receipts'
 import { payslipOnPaymentPaidProjection } from './payslip-on-payment-paid'
+import { payslipOnPaymentApprovedProjection } from './payslip-on-payment-approved'
+import { payslipOnPaymentCancelledProjection } from './payslip-on-payment-cancelled'
 import { payrollExportReadyProjection } from './payroll-export-ready'
 import { periodClosureStatusProjection } from './period-closure-status'
 import { commercialCostAttributionProjection } from './commercial-cost-attribution'
@@ -76,6 +78,8 @@ export const ensureProjectionsRegistered = () => {
   registerProjection(leavePayrollRecalculationProjection)
   registerProjection(payrollReceiptsProjection)
   registerProjection(payslipOnPaymentPaidProjection)
+  registerProjection(payslipOnPaymentApprovedProjection)
+  registerProjection(payslipOnPaymentCancelledProjection)
   registerProjection(payrollExportReadyProjection)
   registerProjection(periodClosureStatusProjection)
   registerProjection(providerToolingProjection)
