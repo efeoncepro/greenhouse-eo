@@ -60,7 +60,7 @@ describe('pgUpdatePayrollPeriod', () => {
         ]
       }
 
-      if (text.includes('SELECT DISTINCT tax_table_version')) {
+      if (text.includes('FROM greenhouse_payroll.chile_tax_brackets')) {
         return [{ tax_table_version: 'gael-2026-02' }]
       }
 
@@ -142,7 +142,7 @@ describe('pgUpdatePayrollPeriod', () => {
         ]
       }
 
-      if (text.includes('SELECT DISTINCT tax_table_version')) {
+      if (text.includes('FROM greenhouse_payroll.chile_tax_brackets')) {
         return [{ tax_table_version: 'gael-2026-03' }]
       }
 

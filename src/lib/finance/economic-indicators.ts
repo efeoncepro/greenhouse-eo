@@ -95,6 +95,7 @@ export const shouldIgnoreEconomicIndicatorsBigQueryError = (error: unknown) => {
     /not found: table/i.test(message)
     || /dataset .* was not found/i.test(message)
     || message.includes('fin_economic_indicators')
+    || message.includes('Missing GCP_PROJECT or GOOGLE_CLOUD_PROJECT environment variable')
   )
 }
 
@@ -300,6 +301,31 @@ const upsertStoredEconomicIndicator = async (item: EconomicIndicatorSnapshot) =>
   return item
 }
 
+const resolveMindicadorIndicatorAtOrBefore = async ({
+  indicatorCode,
+  requestedDate
+}: {
+  indicatorCode: EconomicIndicatorCode
+  requestedDate: string
+}) => {
+  const definition = DEFINITIONS[indicatorCode]
+
+  if (definition.provider !== 'mindicador') {
+    return null
+  }
+
+  const requestedYear = Number(requestedDate.slice(0, 4))
+  const fallbackFromDate = `${requestedYear - 1}-01-01`
+
+  const snapshots = await fetchMindicadorIndicatorRange({
+    indicatorCode,
+    fromDate: fallbackFromDate,
+    toDate: requestedDate
+  })
+
+  return snapshots.at(-1) ?? null
+}
+
 export const upsertEconomicIndicators = async (items: EconomicIndicatorSnapshot[]) => {
   const persisted: EconomicIndicatorSnapshot[] = []
 
@@ -317,7 +343,6 @@ const getStoredEconomicIndicatorAtOrBeforeFromBigQuery = async ({
   indicatorCode: EconomicIndicatorCode
   requestedDate: string
 }) => {
-  const projectId = getFinanceProjectId()
   let rows: Array<{
     indicator_id: string
     indicator_code: string
@@ -329,6 +354,8 @@ const getStoredEconomicIndicatorAtOrBeforeFromBigQuery = async ({
   }>
 
   try {
+    const projectId = getFinanceProjectId()
+
     rows = await runFinanceQuery<{
       indicator_id: string
       indicator_code: string
@@ -451,7 +478,13 @@ export const getEconomicIndicatorAtOrBefore = async ({
     }
   }
 
-  return getStoredEconomicIndicatorAtOrBeforeFromBigQuery({ indicatorCode, requestedDate })
+  const bigQueryStored = await getStoredEconomicIndicatorAtOrBeforeFromBigQuery({ indicatorCode, requestedDate })
+
+  if (bigQueryStored) {
+    return bigQueryStored
+  }
+
+  return resolveMindicadorIndicatorAtOrBefore({ indicatorCode, requestedDate })
 }
 
 export const getLatestEconomicIndicator = async (indicatorCode: EconomicIndicatorCode) => {

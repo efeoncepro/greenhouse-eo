@@ -61,12 +61,18 @@ export const listPayrollTaxTableVersionsForMonth = async ({
 
   const rows = await runGreenhousePostgresQuery<TaxTableVersionRow>(
     `
-      SELECT DISTINCT tax_table_version
-      FROM greenhouse_payroll.chile_tax_brackets
-      WHERE effective_from >= $1::date
-        AND effective_from < $2::date
+      SELECT tax_table_version
+      FROM (
+        SELECT
+          tax_table_version,
+          CASE WHEN tax_table_version = $3 THEN 0 ELSE 1 END AS sort_priority
+        FROM greenhouse_payroll.chile_tax_brackets
+        WHERE effective_from >= $1::date
+          AND effective_from < $2::date
+        GROUP BY tax_table_version
+      ) AS available_versions
       ORDER BY
-        CASE WHEN tax_table_version = $3 THEN 0 ELSE 1 END,
+        sort_priority ASC,
         tax_table_version ASC
     `,
     [periodStart, nextPeriodStart, canonicalVersion]
