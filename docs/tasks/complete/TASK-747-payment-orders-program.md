@@ -2,12 +2,12 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
 - Type: `umbrella`
-- Status real: `Diseno`
+- Status real: `Programa V1 cerrado 2026-05-01 — TASK-748 + TASK-749 + TASK-750 + TASK-751 entregadas. Backlog V2 declarado en TASK-752/753/754/755.`
 - Rank: `TBD`
 - Domain: `finance`
 - Blocked by: `none`

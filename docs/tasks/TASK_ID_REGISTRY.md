@@ -828,11 +828,11 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-744` | `complete` | Payroll Chile Compliance Remediation & International Guardrails | `docs/tasks/complete/TASK-744-payroll-chile-compliance-remediation.md` |
 | `TASK-745` | `to-do` | Payroll Adjustments Foundation V1 (exclude / gross_factor / fixed_deduction event-sourced) | `docs/tasks/to-do/TASK-745-payroll-adjustments-foundation.md` |
 | `TASK-746` | `to-do` | Adjustment Schedules + Finance Ledger Integration (loans, advances, cron materialization) | `docs/tasks/to-do/TASK-746-adjustment-schedules-finance-ledger.md` |
-| `TASK-747` | `to-do` | Payment Orders Program | `docs/tasks/to-do/TASK-747-payment-orders-program.md` |
-| `TASK-748` | `to-do` | Payment Obligations Foundation | `docs/tasks/to-do/TASK-748-payment-obligations-foundation.md` |
-| `TASK-749` | `to-do` | Beneficiary Payment Profiles + Routing Policies | `docs/tasks/to-do/TASK-749-beneficiary-payment-profiles-routing.md` |
-| `TASK-750` | `to-do` | Payment Orders, Batches, Payment Calendar + Maker-Checker Runtime | `docs/tasks/to-do/TASK-750-payment-orders-batches-maker-checker.md` |
-| `TASK-751` | `to-do` | Payroll Settlement Orchestration + Reconciliation Integration | `docs/tasks/to-do/TASK-751-payroll-settlement-orchestration-reconciliation.md` |
+| `TASK-747` | `complete` | Payment Orders Program (umbrella, V1 cerrado) | `docs/tasks/complete/TASK-747-payment-orders-program.md` |
+| `TASK-748` | `complete` | Payment Obligations Foundation V1 | `docs/tasks/complete/TASK-748-payment-obligations-foundation.md` |
+| `TASK-749` | `complete` | Beneficiary Payment Profiles + Routing Policies V1 (dual-surface) | `docs/tasks/complete/TASK-749-beneficiary-payment-profiles-routing.md` |
+| `TASK-750` | `complete` | Payment Orders, Batches, Payment Calendar + Maker-Checker Runtime V1 | `docs/tasks/complete/TASK-750-payment-orders-batches-maker-checker.md` |
+| `TASK-751` | `complete` | Payroll Settlement Orchestration + Reconciliation Integration V1 | `docs/tasks/complete/TASK-751-payroll-settlement-orchestration-reconciliation.md` |
 | `TASK-752` | `to-do` | Payment Profiles V2 Foundation (Suppliers + Tax authorities + Autocomplete + Scheduled rotation) | `docs/tasks/to-do/TASK-752-payment-profiles-v2-foundation.md` |
 | `TASK-753` | `to-do` | Payment Profiles Self-Service (Mi cuenta de pago + Notificaciones) | `docs/tasks/to-do/TASK-753-payment-profiles-self-service.md` |
 | `TASK-754` | `to-do` | Payment Profiles V3 Hardening (Vault externo + Micro-deposit verification) | `docs/tasks/to-do/TASK-754-payment-profiles-vault-and-verification.md` |
