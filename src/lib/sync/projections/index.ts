@@ -16,6 +16,7 @@ import { operatingEntityMembershipProjection } from './operating-entity-membersh
 import { projectedPayrollProjection } from './projected-payroll'
 import { leavePayrollRecalculationProjection } from './leave-payroll-recalculation'
 import { payrollReceiptsProjection } from './payroll-receipts'
+import { payslipOnPaymentPaidProjection } from './payslip-on-payment-paid'
 import { payrollExportReadyProjection } from './payroll-export-ready'
 import { periodClosureStatusProjection } from './period-closure-status'
 import { commercialCostAttributionProjection } from './commercial-cost-attribution'
@@ -74,6 +75,7 @@ export const ensureProjectionsRegistered = () => {
   registerProjection(projectedPayrollProjection)
   registerProjection(leavePayrollRecalculationProjection)
   registerProjection(payrollReceiptsProjection)
+  registerProjection(payslipOnPaymentPaidProjection)
   registerProjection(payrollExportReadyProjection)
   registerProjection(periodClosureStatusProjection)
   registerProjection(providerToolingProjection)

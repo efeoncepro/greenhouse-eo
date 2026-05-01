@@ -840,3 +840,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-756` | `to-do` | Auto-generación de Payment Orders desde Payroll exportado (puente operativo faltante) | `docs/tasks/to-do/TASK-756-payroll-orders-auto-generation.md` |
 | `TASK-757` | `to-do` | Payment Processor Execution Sync + Global66 Webhook Adapter V1 | `docs/tasks/to-do/TASK-757-payment-processor-execution-sync-global66-webhook.md` |
 | `TASK-758` | `to-do` | Payroll Honorarios Receipt Render Contract Hardening | `docs/tasks/to-do/TASK-758-payroll-honorarios-receipt-render-contract-hardening.md` |
+| `TASK-759` | `in-progress` | Payslip Delivery On Payment Paid (split lifecycle) | `docs/tasks/in-progress/TASK-759-payslip-delivery-on-payment-paid.md` |

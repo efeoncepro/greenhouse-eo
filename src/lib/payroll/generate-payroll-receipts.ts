@@ -263,6 +263,8 @@ export const generatePayrollReceiptsForPeriod = async (
           emailDeliveryId: null,
           emailError: null,
           templateVersion: null,
+          deliveryTrigger: null,
+          paymentOrderLineId: null,
           createdAt: null,
           updatedAt: null
         }
@@ -284,7 +286,8 @@ export const generatePayrollReceiptsForPeriod = async (
           emailSentAt: new Date().toISOString(),
           emailDeliveryId: sendResult.resendId,
           generatedBy: input.actorEmail ?? null,
-          templateVersion: RECEIPT_TEMPLATE_VERSION
+          templateVersion: RECEIPT_TEMPLATE_VERSION,
+          deliveryTrigger: 'period_exported'
         })
 
         emailed++

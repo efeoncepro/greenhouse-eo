@@ -5499,6 +5499,10 @@ export interface GreenhousePayrollPayrollPeriods {
 export interface GreenhousePayrollPayrollReceipts {
   asset_id: string | null;
   created_at: Generated<Timestamp>;
+  /**
+   * TASK-759 — which lifecycle event triggered the email send. NULL = PDF generated but not yet emailed.
+   */
+  delivery_trigger: string | null;
   email_delivery_id: string | null;
   email_error: string | null;
   email_recipient: string | null;
@@ -5510,6 +5514,10 @@ export interface GreenhousePayrollPayrollReceipts {
   generation_error: string | null;
   member_id: string;
   pay_regime: string;
+  /**
+   * TASK-759 — when delivery_trigger = payment_paid, links to the payment_order_line that triggered the send. NULL otherwise.
+   */
+  payment_order_line_id: string | null;
   period_id: string;
   receipt_id: string;
   revision: Generated<number>;
