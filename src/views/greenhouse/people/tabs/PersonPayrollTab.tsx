@@ -13,16 +13,21 @@ import CardContent from '@mui/material/CardContent'
 import CardHeader from '@mui/material/CardHeader'
 import CircularProgress from '@mui/material/CircularProgress'
 import Grid from '@mui/material/Grid'
+import Stack from '@mui/material/Stack'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
 import TableContainer from '@mui/material/TableContainer'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
+import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 import { useTheme } from '@mui/material/styles'
 
 import type { ApexOptions } from 'apexcharts'
+
+import CustomChip from '@core/components/mui/Chip'
+
 
 import type { PayrollEntry } from '@/types/payroll'
 import { downloadPayrollReceiptPdf } from '@/lib/payroll/download-payroll-receipt'
@@ -178,12 +183,37 @@ const PersonPayrollTab = ({ entries: initialEntries, memberId }: Props) => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {sorted.map(entry => (
+                  {sorted.map(entry => {
+                    // TASK-745d — derivado del entry: si net != netCalculated o
+                    // hay manualOverride explicito, es senal de adjustments
+                    // activos. Conservador: solo muestra el chip; el detalle
+                    // exacto vive en el PDF / dialog Ajustar pago.
+                    const hasAdjustment =
+                      entry.manualOverride ||
+                      (entry.netTotalCalculated != null &&
+                        Math.abs((entry.netTotalCalculated ?? 0) - entry.netTotal) > 0.01)
+
+                    return (
                     <TableRow key={entry.entryId} hover>
                       <TableCell>
-                        <Typography variant='body2' fontWeight={500}>
-                          {formatPeriodIdLabel(entry.periodId)}
-                        </Typography>
+                        <Stack direction='row' spacing={1} alignItems='center'>
+                          <Typography variant='body2' fontWeight={500}>
+                            {formatPeriodIdLabel(entry.periodId)}
+                          </Typography>
+                          {hasAdjustment && (
+                            <Tooltip title='Este período tiene ajustes de pago aplicados. Ver recibo para detalle.'>
+                              <Box>
+                                <CustomChip
+                                  round='true'
+                                  size='small'
+                                  color='warning'
+                                  label='Ajustado'
+                                  sx={{ height: 18, fontSize: '0.65rem' }}
+                                />
+                              </Box>
+                            </Tooltip>
+                          )}
+                        </Stack>
                       </TableCell>
                       <TableCell align='right'>
                         <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
@@ -222,7 +252,8 @@ const PersonPayrollTab = ({ entries: initialEntries, memberId }: Props) => {
                         </Button>
                       </TableCell>
                     </TableRow>
-                  ))}
+                    )
+                  })}
                 </TableBody>
               </Table>
             </TableContainer>

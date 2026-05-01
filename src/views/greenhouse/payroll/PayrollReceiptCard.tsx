@@ -1,5 +1,6 @@
 'use client'
 
+import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
@@ -12,6 +13,7 @@ import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
 
 import type { PayrollEntry, PayrollPeriod } from '@/types/payroll'
+import type { EntryAdjustmentBreakdown } from '@/lib/payroll/adjustments/breakdown'
 import { GH_COLORS } from '@/config/greenhouse-nomenclature'
 import { formatCurrency, formatFactor, formatPercent } from './helpers'
 
@@ -25,6 +27,9 @@ type Props = {
   entry: PayrollEntry
   period: PayrollPeriod
   employerInfo?: EmployerInfo
+  // TASK-745d — opcional para back-compat. Cuando se pasa, el preview
+  // refleja exactamente lo que ira al PDF.
+  adjustmentsBreakdown?: EntryAdjustmentBreakdown
 }
 
 type PayrollEntryWithAllowances = PayrollEntry & {
@@ -49,7 +54,7 @@ const ReceiptRow = ({ label, value, bold }: { label: string; value: string; bold
   </TableRow>
 )
 
-const PayrollReceiptCard = ({ entry, period, employerInfo }: Props) => {
+const PayrollReceiptCard = ({ entry, period, employerInfo, adjustmentsBreakdown }: Props) => {
   const monthName = MONTH_NAMES[period.month - 1] ?? String(period.month)
   const currency = entry.currency
   const isChile = entry.payRegime === 'chile'
@@ -242,6 +247,65 @@ const PayrollReceiptCard = ({ entry, period, employerInfo }: Props) => {
               </TableBody>
             </Table>
           </>
+        )}
+
+        {/* TASK-745d — Adjustments visibility */}
+        {adjustmentsBreakdown?.excluded && (
+          <Alert severity='error' variant='outlined' sx={{ mb: 2 }}>
+            <Typography variant='body2' fontWeight={700}>
+              Excluido de esta nómina — {adjustmentsBreakdown.excluded.reasonLabel}
+            </Typography>
+            <Typography variant='caption' color='text.secondary' sx={{ display: 'block' }}>
+              {adjustmentsBreakdown.excluded.reasonNote}
+            </Typography>
+          </Alert>
+        )}
+
+        {adjustmentsBreakdown && adjustmentsBreakdown.factorApplied !== 1 && !adjustmentsBreakdown.excluded && (
+          <Alert severity='warning' variant='outlined' sx={{ mb: 2 }}>
+            <Typography variant='body2'>
+              Bruto efectivo aplicado: {(adjustmentsBreakdown.factorApplied * 100).toFixed(0)}% del bruto natural
+            </Typography>
+          </Alert>
+        )}
+
+        {adjustmentsBreakdown && adjustmentsBreakdown.fixedDeductions.length > 0 && (
+          <>
+            <Typography variant='subtitle2' sx={{ mb: 1 }}>Descuentos pactados</Typography>
+            <Table size='small' sx={{ mb: 2 }}>
+              <TableBody>
+                {adjustmentsBreakdown.fixedDeductions.map(fd => (
+                  <TableRow key={fd.adjustmentId}>
+                    <TableCell sx={{ py: 0.75 }}>
+                      <Typography variant='body2'>{fd.reasonLabel}</Typography>
+                      <Typography variant='caption' color='text.secondary' sx={{ display: 'block' }}>
+                        {fd.reasonNote}
+                      </Typography>
+                    </TableCell>
+                    <TableCell align='right' sx={{ py: 0.75, fontFamily: 'monospace' }}>
+                      − {formatCurrency(fd.amount, fd.currency as 'CLP' | 'USD')}
+                    </TableCell>
+                  </TableRow>
+                ))}
+                <ReceiptRow
+                  label='Total descuentos pactados'
+                  value={`− ${formatCurrency(adjustmentsBreakdown.totalFixedDeductionAmount, currency)}`}
+                  bold
+                />
+              </TableBody>
+            </Table>
+          </>
+        )}
+
+        {adjustmentsBreakdown?.manualOverride && (
+          <Alert severity='info' variant='outlined' sx={{ mb: 2 }}>
+            <Typography variant='body2' fontWeight={700}>
+              Override manual de neto — {adjustmentsBreakdown.manualOverride.reasonLabel}
+            </Typography>
+            <Typography variant='caption' color='text.secondary' sx={{ display: 'block' }}>
+              {adjustmentsBreakdown.manualOverride.reasonNote}
+            </Typography>
+          </Alert>
         )}
 
         {/* Net total */}

@@ -5,6 +5,12 @@ import ExcelJS from 'exceljs'
 import type { PayrollEntry, PayrollPeriod } from '@/types/payroll'
 
 import { getPayrollEntries } from '@/lib/payroll/get-payroll-entries'
+import { getActiveAdjustmentsForPeriod } from '@/lib/payroll/adjustments/apply-adjustment'
+import {
+  getEntryAdjustmentBreakdown,
+  type EntryAdjustmentBreakdown
+} from '@/lib/payroll/adjustments/breakdown'
+import type { PayrollAdjustment } from '@/types/payroll-adjustments'
 import { getPayrollPeriod } from '@/lib/payroll/get-payroll-periods'
 import { PayrollValidationError } from '@/lib/payroll/shared'
 
@@ -122,7 +128,8 @@ const buildResumenSheet = (
 
 const buildDetalleSheet = (
   workbook: ExcelJS.Workbook,
-  entries: PayrollEntry[]
+  entries: PayrollEntry[],
+  breakdownsByEntry: Map<string, EntryAdjustmentBreakdown>
 ) => {
   const sheet = workbook.addWorksheet('Detalle')
 
@@ -155,7 +162,13 @@ const buildDetalleSheet = (
     'Neto calculado',
     'Neto override',
     'Neto a pagar',
-    'Override manual'
+    'Override manual',
+    // TASK-745d — adjustments visibility en exports
+    'Excluido',
+    'Factor aplicado',
+    'Descuento adicional',
+    'Motivo descuento',
+    'Override neto'
   ]
 
   sheet.columns = headers.map((header, i) => ({
@@ -193,6 +206,18 @@ const buildDetalleSheet = (
       entryWithAllowances.movilizacionAmount ??
       0
 
+    const breakdown = breakdownsByEntry.get(entry.entryId)
+
+    const reasonNotes = breakdown
+      ? [
+          ...breakdown.fixedDeductions.map(fd => `${fd.reasonLabel}: ${fd.reasonNote}`),
+          breakdown.excluded ? `Excluido: ${breakdown.excluded.reasonNote}` : null,
+          breakdown.manualOverride ? `Override: ${breakdown.manualOverride.reasonNote}` : null
+        ]
+          .filter(Boolean)
+          .join(' | ')
+      : ''
+
     const row = sheet.addRow([
       entry.memberName,
       entry.memberEmail,
@@ -222,11 +247,17 @@ const buildDetalleSheet = (
       entry.netTotalCalculated ?? entry.netTotal,
       entry.netTotalOverride,
       entry.netTotal,
-      entry.manualOverride ? 'Sí' : 'No'
+      entry.manualOverride ? 'Sí' : 'No',
+      // TASK-745d — adjustments visibility
+      breakdown?.excluded ? 'Sí' : 'No',
+      breakdown?.factorApplied ?? 1,
+      breakdown?.totalFixedDeductionAmount ?? 0,
+      reasonNotes,
+      breakdown?.manualOverride ? breakdown.manualOverride.netAmount : null
     ])
 
     // Apply currency format to numeric cells excluding text/date style columns.
-    for (const col of [5, 6, 7, 8, 9, 10, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28]) {
+    for (const col of [5, 6, 7, 8, 9, 10, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 32, 34]) {
       const cell = row.getCell(col)
 
       if (typeof cell.value === 'number') {
@@ -240,10 +271,19 @@ const buildDetalleSheet = (
         cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF1F8E9' } }
       })
     }
+
+    // TASK-745d — Highlight rows with active adjustments
+    if (breakdown && breakdown.hasActiveAdjustments) {
+      const highlightColor = breakdown.excluded ? 'FFFFE0E0' : 'FFFFF4D6'
+
+      row.eachCell(cell => {
+        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: highlightColor } }
+      })
+    }
   }
 
-  // Auto-filter
-  sheet.autoFilter = { from: 'A1', to: `AC${entries.length + 1}` }
+  // Auto-filter (extiende a las nuevas columnas)
+  sheet.autoFilter = { from: 'A1', to: `AH${entries.length + 1}` }
 
   return sheet
 }
@@ -338,13 +378,31 @@ export const generatePayrollExcel = async (periodId: string): Promise<Buffer> =>
 
   const entries = await getPayrollEntries(periodId)
 
+  // TASK-745d — load adjustments del periodo y agruparlos por entry para que
+  // buildDetalleSheet los pueda renderizar sin N hits a DB.
+  const allAdjustments = await getActiveAdjustmentsForPeriod(periodId)
+  const adjustmentsByEntry = new Map<string, PayrollAdjustment[]>()
+
+  for (const adj of allAdjustments) {
+    const list = adjustmentsByEntry.get(adj.payrollEntryId) ?? []
+
+    list.push(adj)
+    adjustmentsByEntry.set(adj.payrollEntryId, list)
+  }
+
+  const breakdownsByEntry = new Map<string, EntryAdjustmentBreakdown>()
+
+  for (const [entryId, adjs] of adjustmentsByEntry) {
+    breakdownsByEntry.set(entryId, getEntryAdjustmentBreakdown(adjs))
+  }
+
   const workbook = new ExcelJS.Workbook()
 
   workbook.creator = 'Greenhouse EO'
   workbook.created = new Date()
 
   buildResumenSheet(workbook, period, entries)
-  buildDetalleSheet(workbook, entries)
+  buildDetalleSheet(workbook, entries, breakdownsByEntry)
   buildAsistenciaSheet(workbook, entries)
 
   const buffer = await workbook.xlsx.writeBuffer()
