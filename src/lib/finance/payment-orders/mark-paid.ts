@@ -8,6 +8,7 @@ import type { PaymentOrder } from '@/types/payment-orders'
 
 import { PaymentOrderConflictError, PaymentOrderValidationError } from './errors'
 import { mapOrderRow, type OrderRow } from './row-mapper'
+import { assertSourceAccountForPaid } from './transitions'
 
 export interface MarkPaymentOrderPaidInput {
   orderId: string
@@ -54,9 +55,15 @@ export async function markPaymentOrderPaid(
     if (row.state !== 'submitted') {
       throw new PaymentOrderConflictError(
         `Solo se puede marcar como pagada desde 'submitted'. Estado actual: ${row.state}`,
-        'invalid_state'
+        'invalid_state_transition'
       )
     }
+
+    // TASK-765 Slice 1: hard-gate source_account_id antes del UPDATE.
+    // El CHECK constraint en DB es la red de seguridad estatica; este
+    // throw produce el error tipado con codigo `source_account_required`
+    // que el UI mapea a banner es-CL legible para el operator.
+    assertSourceAccountForPaid(input.orderId, row.source_account_id, 'paid')
 
     const updated = await c.query<OrderRow>(
       `UPDATE greenhouse_finance.payment_orders
