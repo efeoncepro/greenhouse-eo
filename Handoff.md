@@ -1,5 +1,17 @@
 # Handoff.md
 
+## Sesion 2026-05-02 — TASK-765 tomada (Payment Order ↔ Bank Settlement Resilience)
+
+- **Lifecycle**: `in-progress` (movida de `to-do/` a `in-progress/`)
+- **Branch**: `task/TASK-765-payment-order-bank-settlement-resilience`
+- **Trigger**: incidente 2026-05-01 detectado por usuario. Dos `payment_orders` (Luis Reyes $148,312.50 + Humberly Henriquez $254,250.00) quedaron en `state='paid'` sin afectar el banco. Investigación reveló cadena de 3 fallas estructurales: (F1) `source_account_id=NULL` permitido en aprobación, (F2) materializador `finance_expense_reactive_intake` dead-letter con "INSERT has more target columns than expressions" → 0 filas en `expenses` para 2026-04, (F3) proyector `record_expense_payment_from_order` skipea silencioso (`recorded=0 skipped=1`) sin error_class.
+- **Cuenta origen para recovery**: Santander CLP (confirmado por usuario).
+- **Decisiones de arquitectura tomadas**:
+  - Path atómico (slice 5) será **canónico**; el proyector reactivo queda como **safety net read-only** (idempotencia preservada por unique index en `expense_payments.payment_order_line_id`).
+  - Capabilities `finance.payroll.rematerialize` y `finance.payment_orders.recover` serán **nuevas y granulares** (least privilege, audit fino).
+- **Próximo step**: Discovery en paralelo (finance / payroll / reactive / reliability / UI) → plan.md → STOP checkpoint humano (P0 + Effort Alto).
+- **Blast radius**: producción tiene los 2 zombie y el materializador dead-letter de 2026-04. Fix llegará a `develop` → `main` por staged rollout.
+
 ## Sesion 2026-05-02 — TASK-265 cerrada (Copy Contract + Foundation + ESLint Gate)
 
 - **Lifecycle**: complete (movido de `to-do/` a `complete/`)

@@ -851,3 +851,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-762` | `to-do` | Finiquito Document Generation + Approval Flow | `docs/tasks/to-do/TASK-762-finiquito-document-generation-approval-flow.md` |
 | `TASK-763` | `to-do` | Lifecycle Onboarding & Offboarding UI Mockup Adoption | `docs/tasks/to-do/TASK-763-lifecycle-onboarding-offboarding-ui-mockup-adoption.md` |
 | `TASK-764` | `to-do` | DESIGN.md Contract Hardening (CI gate + spec sync + token hygiene + agent injection) | `docs/tasks/to-do/TASK-764-design-md-contract-hardening.md` |
+| `TASK-765` | `to-do` | Payment Order ↔ Bank Settlement Resilience (atomic mark-paid + materialize-or-throw + reliability signals + state machine hardening + recovery del incidente 2026-05-01) | `docs/tasks/to-do/TASK-765-payment-order-bank-settlement-resilience.md` |
