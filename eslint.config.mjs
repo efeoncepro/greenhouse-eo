@@ -238,6 +238,17 @@ export default [
     Aplica solo a archivos que pueden contener tablas operativas: src/views,
     src/components, src/app. La regla solo dispara cuando el archivo importa
     Table desde @mui/material, asi que el override es barato y limpio.
+
+    TASK-567 — Typography contract gate (fontFamily literals).
+    Aplica al mismo scope. Excluimos:
+      - src/components/theme/**          (theme source-of-truth)
+      - src/@core/theme/**               (Vuexy theme primitive)
+      - src/app/global-error.tsx         (corre antes del theme MUI)
+      - src/emails/**                    (emails con webfont fallback propio)
+      - src/lib/finance/pdf/**           (react-pdf no usa MUI variants)
+    Modo inicial 'warn' (TASK-567 Slice 3a). Sweep automatizado limpia el
+    inventario inicial; despues se promueve a 'error' (Slice 3b) para que
+    cualquier regresion bloquee CI.
   */
   {
     files: ['src/views/**/*.tsx', 'src/components/**/*.tsx', 'src/app/**/*.tsx'],
@@ -245,7 +256,20 @@ export default [
       greenhouse: greenhousePlugin
     },
     rules: {
-      'greenhouse/no-raw-table-without-shell': 'error'
+      'greenhouse/no-raw-table-without-shell': 'error',
+      'greenhouse/no-hardcoded-fontfamily': 'warn'
+    }
+  },
+  {
+    files: [
+      'src/components/theme/**',
+      'src/@core/theme/**',
+      'src/app/global-error.tsx',
+      'src/emails/**',
+      'src/lib/finance/pdf/**'
+    ],
+    rules: {
+      'greenhouse/no-hardcoded-fontfamily': 'off'
     }
   },
 
