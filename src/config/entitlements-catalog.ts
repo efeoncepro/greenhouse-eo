@@ -203,6 +203,19 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     actions: ['update'] as const,
     defaultScope: 'tenant'
   },
+  // TASK-765 Slice 8 — Recovery de payment_orders zombie.
+  // Permite a FINANCE_ADMIN / EFEONCE_ADMIN reparar ordenes que quedaron
+  // `state='paid'` sin downstream completo: asignar `source_account_id`,
+  // re-disparar el outbox event para que el proyector reactivo (safety
+  // net) cree expense_payment + settlement_leg, y rematerializar
+  // account_balances de la cuenta origen. Audit log append-only registra
+  // la transicion con reason='recovery_TASK-765'.
+  {
+    key: 'finance.payment_orders.recover',
+    module: 'finance',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
   {
     key: 'finance.cash.adopt-external-signal',
     module: 'finance',
