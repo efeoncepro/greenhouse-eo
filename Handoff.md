@@ -1,5 +1,74 @@
 # Handoff.md
 
+## Sesion 2026-05-02 — TASK-265 cerrada (Copy Contract + Foundation + ESLint Gate)
+
+- **Lifecycle**: complete (movido de `to-do/` a `complete/`)
+- **Slices entregados**: 1 (audit), 2 (foundation `src/lib/copy/`), 4 (Kortex doc), 5a (ESLint rule), 5b (skill hardening), 5c (CLAUDE.md mention dura). Slice 5d (hook) deferido — la rule ESLint cubre el flanco mecánico sin necesidad de hook redundante.
+- **Foundation creada**:
+  - `src/lib/copy/types.ts` — Locale, MicrocopyDictionary, 9 namespaces (actions, states, loading, empty, months, aria, errors, feedback, time)
+  - `src/lib/copy/dictionaries/es-CL/` — 9 archivos por namespace + composer index.ts. Default canónico
+  - `src/lib/copy/dictionaries/en-US/index.ts` — stub re-exporta es-CL para paridad type-safe (TASK-266 lo traduce)
+  - `src/lib/copy/index.ts` — API pública `getMicrocopy(locale?)` + tipos exportados
+  - **NO requiere `'server-only'`** — usable client-side y server-side (data estática serializable)
+- **ESLint rule canónica**: `eslint-plugins/greenhouse/rules/no-untokenized-copy.mjs` activa en modo `warn`. Detecta:
+  - aria-label literal en JSXAttribute (caso dominante)
+  - Status maps inline con `{ label: 'Pendiente'/'Activo'/etc }`
+  - Loading strings (`'Cargando...'`/`'Guardando...'`)
+  - Empty states (`'Sin datos'`/`'Sin resultados'`)
+  - Cobertura secundaria de label/placeholder/helperText/title/subtitle dentro de JSXAttribute o styled()
+  - Excludes: theme files, global-error, public/**, emails/**, finance/pdf/**
+- **Skill `greenhouse-ux-writing` hardenizada** en `~/.claude/skills/greenhouse-ux-writing/skill.md`:
+  - Description reescrita con `MANDATORY` + triggers explícitos (labels, placeholders, tooltips, drawer titles, snackbar, alert, empty state, error message, status, loading, aria-label, KPI, microcopy en español)
+  - `type: gate` agregado al frontmatter (paralelo a `greenhouse-ui-review`)
+  - Sección "Mandatory reading" apuntando a `src/lib/copy/`, `src/config/greenhouse-nomenclature.ts`, `GREENHOUSE_UI_PLATFORM_V1.md`
+  - Decision tree para nuevos strings + sección de enforcement mecánico apuntando a la rule
+- **CLAUDE.md** Conventions ampliado:
+  - Sección "Microcopy / UI copy — regla canónica (TASK-265)" con regla dura "ANTES de escribir cualquier string visible al usuario, invocar `greenhouse-ux-writing`"
+  - Decision tree inline + cross-link a `src/lib/copy/` y `greenhouse-nomenclature.ts`
+- **GREENHOUSE_UI_PLATFORM_V1.md** Delta 2026-05-02 con Copy System Contract completo (5 KB de spec):
+  - Las dos capas canónicas
+  - API pública con ejemplos
+  - Decision tree por tipo
+  - Reglas duras
+  - Coordinación con TASK-266 (i18n) y Kortex (Slice 4)
+
+### Snapshot baseline para TASK-407/408 (lint warnings emitidos por la rule)
+
+`pnpm lint` al cierre TASK-265: **318 warnings totales** distribuidos por pattern:
+
+| Pattern | Count | Asignado a |
+|---|---|---|
+| aria-label literal | **202** | TASK-407 (shared shell) — caso dominante |
+| Status maps inline (`{ label: 'Pendiente' }`) | **59** | TASK-407 (componentes) |
+| Loading strings | **0** | (cubierto por sweep ya iniciado o false-negatives — verificar en TASK-407) |
+| Empty states | **23** | TASK-407 |
+| Secondary props (label/placeholder/etc) | **34** | TASK-407 + TASK-408 según surface |
+
+Total real escaneable post-rule: 318. Más bajo que la estimación pre-implementación de ~630 porque la rule excluye scopes legítimos (theme, global-error, public, emails, PDFs) que sí estaban en el conteo bruto del audit.
+
+**Promote a `error` mode**: cierre TASK-408 ejecuta `eslint.config.mjs` change `'warn'` → `'error'` en la rule + verifica `pnpm lint` clean (0 errors).
+
+### Verification ejecutada
+
+- `pnpm lint`: 0 errors / 318 warnings (la rule emite warnings; gate activo no bloquea CI)
+- `pnpm tsc --noEmit`: 0 errors
+- `src/lib/copy/` carga client + server (no `'server-only'` constraint)
+
+### Sinergia con tasks colindantes
+
+- **TASK-407 desbloqueada**: foundation existe, baseline 318 warnings registrado, sweep target claro (aria-label primero por dominancia 64%)
+- **TASK-408 desbloqueada**: foundation lista, su Closing Protocol promueve la rule a `error`
+- **TASK-266 epic desbloqueado**: foundation locale-aware desde día uno, TASK-428 puede arrancar ADR de librería sabiendo que la API ya está estable
+- **TASK-264** (theme/branding): contrato verbal y theme convergen como hermanos según declarado en spec
+
+### Open questions resueltas
+
+- ¿`greenhouse-nomenclature.ts` principal o evolucionar? → **recortarlo, no ampliarlo** (alineado con spec; product nomenclature only)
+- ¿estructura dictionary-ready? → **namespace-by-domain con archivos TS separados** (mismo patrón Vuexy `dictionaries/`); index.ts compositor por locale
+- ¿locale param día uno? → **SÍ** (`Locale = 'es-CL' | 'en-US'`); en-US es stub semilla
+- ¿adapter dictionary-like aunque es-only? → **SÍ** (justificado por footprint LATAM; TASK-266 no reescribe API)
+- ¿Kortex adapter ejecutable? → **conceptual** documentado en GREENHOUSE_UI_PLATFORM_V1.md Delta 2026-05-02 sección Kortex
+
 ## Sesion 2026-05-02 — Microcopy governance integrada a TASK-265 (no se creó task duplicada)
 
 - **Pregunta operativa**: agentes AI tienden a hardcodear copy en JSX ignorando la skill `greenhouse-ux-writing`. Causa raíz: skill es opt-in, no hay enforcement mecánico.

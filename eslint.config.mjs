@@ -257,7 +257,15 @@ export default [
     },
     rules: {
       'greenhouse/no-raw-table-without-shell': 'error',
-      'greenhouse/no-hardcoded-fontfamily': 'error'
+      'greenhouse/no-hardcoded-fontfamily': 'error',
+      // TASK-265 Slice 5a — microcopy contract gate.
+      // Modo inicial 'warn' (gate establecido, no bloquea CI mientras
+      // TASK-407 + TASK-408 ejecutan sweep). Cierre TASK-408 promueve
+      // a 'error'. Detecta aria-label literales (caso dominante: 405
+      // instancias), status maps inline (100), loading strings (94),
+      // empty states (31) + cobertura secundaria de label/placeholder/
+      // helperText/title/subtitle.
+      'greenhouse/no-untokenized-copy': 'warn'
     }
   },
   {
@@ -270,7 +278,8 @@ export default [
       'src/lib/finance/pdf/**'
     ],
     rules: {
-      'greenhouse/no-hardcoded-fontfamily': 'off'
+      'greenhouse/no-hardcoded-fontfamily': 'off',
+      'greenhouse/no-untokenized-copy': 'off'
     }
   },
 

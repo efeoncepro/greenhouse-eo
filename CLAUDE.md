@@ -330,7 +330,23 @@ Regla: no diseñar una task o arquitectura nueva describiendo solo `views` si ta
 - Vistas por módulo: `src/views/greenhouse/*`
 - Lógica de dominio: `src/lib/*` (organizada por módulo: `payroll/`, `finance/`, `people/`, `agency/`, `sync/`, etc.)
 - Tipos por dominio: `src/types/*`
-- Nomenclatura centralizada: `src/config/greenhouse-nomenclature.ts`
+- **Nomenclatura de producto + navegación**: `src/config/greenhouse-nomenclature.ts` (Pulse, Spaces, Ciclos, etc.)
+- **Microcopy funcional shared (locale-aware)**: `src/lib/copy/` (TASK-265). API: `import { getMicrocopy } from '@/lib/copy'`. Namespaces: `actions` (CTAs), `states` (Activo/Pendiente), `loading` (Cargando…/Guardando…), `empty` (Sin datos/Sin resultados), `months`, `aria`, `errors`, `feedback`, `time`. NO duplicar texto que ya existe en `greenhouse-nomenclature.ts`.
+
+### Microcopy / UI copy — regla canónica (TASK-265)
+
+**ANTES de escribir cualquier string visible al usuario** (label, placeholder, helperText, title, alert, snackbar, empty state, error message, status label, loading text, aria-label, tooltip, KPI title), invocar la skill `greenhouse-ux-writing` para validar tono (es-CL tuteo) y revisar si la string ya existe en alguna de estas dos capas:
+
+1. `src/lib/copy/` — microcopy funcional shared (CTAs, estados, loading, empty, etc.)
+2. `src/config/greenhouse-nomenclature.ts` — product nomenclature + navegación + labels institucionales
+
+**Enforcement mecánico**: ESLint rule `greenhouse/no-untokenized-copy` (modo `warn` durante TASK-265 + sweeps TASK-407/408; promueve a `error` al cierre TASK-408). Detecta aria-labels literales, status maps inline, loading strings, empty states, y secondary props (label/placeholder/etc) en JSX. Excluidos: theme files, global-error, public/**, emails/**, finance/pdf/**.
+
+**Decision tree**:
+
+- ¿Es product nomenclature (Pulse, Spaces, Ciclos, Mi Greenhouse) o navegación? → `greenhouse-nomenclature.ts`
+- ¿Es microcopy funcional reusada en >3 surfaces (CTAs, estados, loading, empty, aria)? → `src/lib/copy/dictionaries/es-CL/<namespace>.ts`
+- ¿Es copy de dominio específico? → vive cerca del dominio pero pasa por skill `greenhouse-ux-writing` para validar tono
 
 ### API Routes
 

@@ -13,6 +13,160 @@
 
 Greenhouse EO es un portal Next.js 16 App Router con MUI 7.x envuelto por el starter-kit Vuexy. Este documento es la referencia canónica de la plataforma UI: stack, librerías disponibles, patrones de componentes, convenciones de estado, y reglas de adopción.
 
+## Delta 2026-05-02 — Copy System Contract (TASK-265)
+
+Toda string visible al usuario en Greenhouse EO vive en una de **dos capas canónicas**, separadas por propósito y locale-aware desde día uno. Cualquier hardcode en JSX es drift y será bloqueado por la rule ESLint `greenhouse/no-untokenized-copy` (modo `error` post cierre TASK-408).
+
+### Las dos capas
+
+| Capa | Path | Propósito | Locale-aware |
+|---|---|---|---|
+| **Product nomenclature** | `src/config/greenhouse-nomenclature.ts` | Lenguaje propio del producto: Pulse, Spaces, Ciclos, Mi Greenhouse, Torre de control. Navegación. Labels institucionales del shell. | No (es-CL only por design) |
+| **Functional shared microcopy** | `src/lib/copy/` (TASK-265) | CTAs base, estados operativos, loading/processing, empty states, meses, aria-labels, errores genéricos, feedback toasts, tiempo relativo. | Sí (`es-CL` default, `en-US` stub para TASK-266) |
+
+### API pública del módulo de microcopy
+
+```ts
+import { getMicrocopy } from '@/lib/copy'
+
+const t = getMicrocopy() // default 'es-CL'
+
+// CTAs
+<Button>{t.actions.save}</Button>           // 'Guardar'
+<Button variant='outlined'>{t.actions.cancel}</Button>  // 'Cancelar'
+
+// Estados
+<Chip label={t.states.pending} />           // 'Pendiente'
+<Chip label={t.states.approved} />          // 'Aprobado'
+
+// Loading
+{isLoading && <Typography>{t.loading.saving}</Typography>}  // 'Guardando...'
+
+// Empty states
+<EmptyState
+  title={t.empty.firstUseTitle}             // 'Aún no hay nada por aquí'
+  hint={t.empty.firstUseHint}               // 'Empieza creando tu primer registro'
+/>
+
+// aria-labels
+<IconButton aria-label={t.aria.closeDialog}>  {/* 'Cerrar diálogo' */}
+  <i className='ri-close-line' />
+</IconButton>
+
+// Meses
+const monthLabel = t.months.short[monthIndex] // 'Ene' .. 'Dic'
+const fullMonth = t.months.long[monthIndex]   // 'Enero' .. 'Diciembre'
+
+// Tiempo relativo (functions)
+<span>{t.time.minutesAgo(5)}</span>          // 'Hace 5 minutos'
+<span>{t.time.minutesAgo(1)}</span>          // 'Hace 1 minuto'
+```
+
+### Decision tree (donde escribir copy nuevo)
+
+```
+¿Es product nomenclature (Pulse, Spaces, Ciclos, Mi Greenhouse, Torre de control)?
+  → src/config/greenhouse-nomenclature.ts
+
+¿Es navegación, label institucional del shell, o categoría de notificación?
+  → src/config/greenhouse-nomenclature.ts (TASK-408 migra notification-categories ahí)
+
+¿Es microcopy funcional reusada en >3 surfaces (CTAs, estados, loading, empty, aria)?
+  → src/lib/copy/dictionaries/es-CL/<namespace>.ts
+  → Si namespace no existe, agregalo a types.ts + dictionaries/es-CL/index.ts
+
+¿Es copy de dominio específico (e.g., un empty state propio de payroll)?
+  → Cerca del dominio (helper o componente) pero PASA por skill greenhouse-ux-writing para validar tono.
+```
+
+### Casos por tipo
+
+**1. Product nomenclature** — `greenhouse-nomenclature.ts`
+
+```ts
+import { GH_NAVIGATION, GH_NEXA, GH_PRICING } from '@/config/greenhouse-nomenclature'
+
+<MenuItem>{GH_NAVIGATION.spaces}</MenuItem>
+```
+
+**2. Shared microcopy** — `src/lib/copy/`
+
+```tsx
+import { getMicrocopy } from '@/lib/copy'
+
+const t = getMicrocopy()
+
+<TextField label='Nombre del proyecto' />  // ❌ drift — disparará la rule
+<TextField label={t.actions.save} />        // ❌ drift semántico — el label NO es 'Guardar' acá
+<TextField label={GH_NAVIGATION.projectName} />  // ✅ si es nomenclature
+<TextField label='Nombre del proyecto' />  // ✅ válido si es domain-specific Y pasa por skill greenhouse-ux-writing
+```
+
+**3. Domain-specific copy** — cerca del dominio
+
+```ts
+// src/lib/payroll/copy.ts (ejemplo)
+import type { ChileEmployeeKind } from './types'
+
+export const PAYROLL_DOMAIN_COPY: Record<ChileEmployeeKind, string> = {
+  dependent: 'Trabajador dependiente',
+  honorarios: 'Boleta a honorarios',
+  international: 'Colaborador internacional'
+}
+```
+
+Esto es válido pero requiere review por skill `greenhouse-ux-writing` para tono.
+
+### Reglas duras
+
+- **NUNCA** duplicar texto entre `greenhouse-nomenclature.ts` y `src/lib/copy/`. Si una string es nomenclatura, vive solo en nomenclature; si es microcopy funcional, vive solo en copy.
+- **NUNCA** importar `src/lib/copy/` con `import 'server-only'`. La capa debe ser usable client-side también.
+- **NUNCA** agregar namespaces nuevos a `src/lib/copy/` sin que >3 surfaces los reusen.
+- **NUNCA** escribir copy nuevo sin invocar la skill `greenhouse-ux-writing` para validar tono es-CL.
+- **SIEMPRE** mantener paridad de claves entre todos los locales (`es-CL`, `en-US`). Cuando TASK-266 active i18n real, esa paridad permite traducción sin tocar consumers.
+
+### Enforcement mecánico
+
+ESLint rule `greenhouse/no-untokenized-copy` (TASK-265 Slice 5a) detecta:
+
+| Pattern | Mensaje accionable |
+|---|---|
+| `aria-label='X'` literal | Use `getMicrocopy().aria.<key>` |
+| `{ label: 'Pendiente' }` en status maps | Use `getMicrocopy().states.<key>` |
+| `'Cargando...'` / `'Guardando...'` literales | Use `getMicrocopy().loading.<key>` |
+| `'Sin datos'` / `'Sin resultados'` literales | Use `getMicrocopy().empty.<key>` |
+| `label`/`placeholder`/`helperText`/`title`/`subtitle` literales en JSX | Use `getMicrocopy()` o `greenhouse-nomenclature.ts` |
+
+Excluidos por scope: `src/components/theme/**`, `src/@core/**`, `src/app/global-error.tsx`, `src/app/public/**`, `src/emails/**`, `src/lib/finance/pdf/**`, tests.
+
+Modo: `warn` durante TASK-265 + sweeps TASK-407/408. Promueve a `error` al cierre TASK-408.
+
+### Coordinación con i18n (TASK-266)
+
+`src/lib/copy/` está locale-aware desde día uno (`Locale = 'es-CL' | 'en-US'`). Cuando TASK-266 / TASK-430 active i18n real:
+
+1. Traducir las claves en `src/lib/copy/dictionaries/en-US/<namespace>.ts` (hoy re-exporta es-CL como semilla)
+2. Conectar `getMicrocopy(locale)` a la fuente de locale (sesión user, persistencia tenant per TASK-431)
+3. La API pública NO cambia → consumers no reescriben nada
+
+### Coordinación con Kortex (Slice 4 — exploratorio)
+
+La separación capas (product nomenclature vs functional microcopy) habilita extracción futura del copy institucional reusable a un paquete compartible con Kortex sin arrastrar lenguaje de producto Greenhouse:
+
+- **Reusable para Kortex** (cuando confirme consumo): `src/lib/copy/` (microcopy funcional shared) + capa institucional de `greenhouse-nomenclature.ts` (login, brand neutral, common actions, categorías genéricas).
+- **NO reusable**: metáforas de producto Greenhouse, navegación específica, labels de módulos exclusivos (Pulse, Spaces, Ciclos, Mi Greenhouse, Torre de control).
+
+Esta task (TASK-265) NO crea adapter ejecutable para Kortex; solo deja la separación conceptual y el namespace de microcopy listo para extracción cuando Kortex confirme roadmap de consumo.
+
+### Foundation (TASK-265 entregables)
+
+- `src/lib/copy/types.ts` — tipos canónicos (Locale, MicrocopyDictionary, namespaces)
+- `src/lib/copy/dictionaries/es-CL/` — dictionary completo es-CL (9 namespaces seed)
+- `src/lib/copy/dictionaries/en-US/` — stub (re-exporta es-CL hasta TASK-266)
+- `src/lib/copy/index.ts` — API pública (`getMicrocopy`)
+- `eslint-plugins/greenhouse/rules/no-untokenized-copy.mjs` — gate ESLint
+- `~/.claude/skills/greenhouse-ux-writing/skill.md` — skill governance (tono, anti-patterns, decision tree)
+
 ## Delta 2026-05-01 — Operational Data Table Density Contract (TASK-743)
 
 Toda tabla operativa con celdas editables inline o > 8 columnas vive bajo el contrato de densidad canonico. Resuelve el overflow horizontal contra `compactContentWidth: 1440` de manera declarativa, robusta y escalable.

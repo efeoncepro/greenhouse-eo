@@ -55,12 +55,12 @@ Acceptance criteria + entregables del Slice 5 incorporados abajo. Slices 1-4 sin
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `design`
-- Status real: `Diseno`
+- Status real: `Cerrada 2026-05-02`
 - Rank: `TBD`
 - Domain: `content`
 - Blocked by: `none`
