@@ -4,7 +4,9 @@ import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 import { markPaymentOrderPaid } from '@/lib/finance/payment-orders/mark-paid'
 import {
   PaymentOrderConflictError,
+  PaymentOrderExpenseUnresolvedError,
   PaymentOrderMissingSourceAccountError,
+  PaymentOrderSettlementBlockedError,
   PaymentOrderValidationError
 } from '@/lib/finance/payment-orders/errors'
 
@@ -32,10 +34,15 @@ export async function POST(
 
     return NextResponse.json({ order: result.order, eventId: result.eventId })
   } catch (error) {
-    // TASK-765 Slice 1: el hard-gate source_account_id genera
-    // PaymentOrderMissingSourceAccountError (422 + code='source_account_required').
+    // TASK-765: errores tipados del path atomico (slice 5).
+    // - source_account_required (slice 1): 422
+    // - settlement_blocked (slice 4/5): 422 con reason estructurada
+    // - expense_unresolved (slice 4): 422
+    // - conflict / validation: 409 / 400
     if (
       error instanceof PaymentOrderMissingSourceAccountError ||
+      error instanceof PaymentOrderSettlementBlockedError ||
+      error instanceof PaymentOrderExpenseUnresolvedError ||
       error instanceof PaymentOrderValidationError ||
       error instanceof PaymentOrderConflictError
     ) {

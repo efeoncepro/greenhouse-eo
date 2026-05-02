@@ -173,17 +173,28 @@ const PAYMENT_COLUMNS = `
  *
  * Publishes outbox event: finance.expense_payment.recorded
  */
-export async function recordExpensePayment(input: RecordExpensePaymentInput): Promise<{
+// TASK-765 Slice 5: el path canonico atomico (mark-paid-atomic) necesita
+// invocar recordExpensePayment dentro de la misma tx que el UPDATE de
+// payment_orders.state='paid'. Para soportarlo sin abrir tx anidada,
+// recordExpensePayment acepta `client?: PoolClient` opcional. Cuando se
+// pasa, el body corre directo en esa tx; cuando se omite, mantiene el
+// comportamiento legacy de abrir su propia withGreenhousePostgresTransaction.
+//
+// Idempotencia preservada: el partial unique index sobre
+// expense_payments.payment_order_line_id sigue protegiendo retries y
+// concurrency races.
+const runRecordExpensePayment = async (
+  client: PoolClient,
+  input: RecordExpensePaymentInput,
+  paymentId: string,
+  paymentSource: ExpensePaymentSource
+): Promise<{
   payment: ExpensePaymentRecord
   expenseId: string
   paymentStatus: string
   amountPaid: number
   amountPending: number
-}> {
-  const paymentId = input.paymentId || `exp-pay-${randomUUID()}`
-  const paymentSource = input.paymentSource || 'manual'
-
-  return withGreenhousePostgresTransaction(async (client: PoolClient) => {
+}> => {
     // Lock the expense row to prevent concurrent payment races
     const expenseRows = await queryRows<{
       expense_id: string
@@ -367,7 +378,36 @@ export async function recordExpensePayment(input: RecordExpensePaymentInput): Pr
       amountPaid: newAmountPaid,
       amountPending: roundCurrency(totalAmount - newAmountPaid)
     }
-  })
+  }
+
+/**
+ * Public entry point. Cuando se invoca sin `client`, abre su propia tx
+ * (path legacy). Cuando se invoca con `client`, el body corre dentro de
+ * la tx del caller — usado por mark-paid-atomic (slice 5) para garantizar
+ * que payment_order.state='paid' commitea ATOMICAMENTE con expense_payment
+ * + settlement_leg + outbox events. Si cualquier step falla, ROLLBACK
+ * completo: la order vuelve al estado anterior, sin zombie.
+ */
+export async function recordExpensePayment(
+  input: RecordExpensePaymentInput,
+  client?: PoolClient
+): Promise<{
+  payment: ExpensePaymentRecord
+  expenseId: string
+  paymentStatus: string
+  amountPaid: number
+  amountPending: number
+}> {
+  const paymentId = input.paymentId || `exp-pay-${randomUUID()}`
+  const paymentSource = input.paymentSource || 'manual'
+
+  if (client) {
+    return runRecordExpensePayment(client, input, paymentId, paymentSource)
+  }
+
+  return withGreenhousePostgresTransaction(c =>
+    runRecordExpensePayment(c, input, paymentId, paymentSource)
+  )
 }
 
 // ─── getPaymentsForExpense ──────────────────────────────────────────
