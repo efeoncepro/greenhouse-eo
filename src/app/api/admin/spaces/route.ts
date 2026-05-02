@@ -2,6 +2,7 @@ import { randomUUID } from 'crypto'
 
 import { NextResponse } from 'next/server'
 
+import { getEffectiveNotionFreshnessForSpaces } from '@/lib/integrations/notion-sync-freshness'
 import { requireAdminTenantContext } from '@/lib/tenant/authorization'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
@@ -191,6 +192,12 @@ export async function GET() {
       ORDER BY s.created_at DESC`
     )
 
+    const notionSpaceIds = rows
+      .filter(row => Boolean(row.has_notion_mapping) && row.space_id)
+      .map(row => String(row.space_id))
+
+    const effectiveFreshness = await getEffectiveNotionFreshnessForSpaces(notionSpaceIds)
+
     const spaces = rows.map(r => ({
       spaceId: String(r.space_id),
       spaceName: String(r.space_name || ''),
@@ -203,7 +210,7 @@ export async function GET() {
       status: String(r.status || 'active'),
       hasNotionMapping: Boolean(r.has_notion_mapping),
       syncEnabled: r.sync_enabled != null ? Boolean(r.sync_enabled) : null,
-      lastSyncedAt: r.last_synced_at ? String(r.last_synced_at) : null,
+      lastSyncedAt: effectiveFreshness.get(String(r.space_id)) ?? (r.last_synced_at ? String(r.last_synced_at) : null),
       createdAt: r.created_at ? String(r.created_at) : null
     }))
 

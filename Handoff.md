@@ -1,5 +1,30 @@
 # Handoff.md
 
+## Sesion 2026-05-02 — Notion freshness drift (BigQuery vs PostgreSQL) mitigado en portal
+
+- **Trigger**: investigacion del usuario por `RpA Global = 3` en `/agency` derivo en un hallazgo mas grave: mayo 2026 **si** tiene datos Notion en BigQuery, pero `greenhouse_core.space_notion_sources.last_synced_at` seguia `NULL` en PostgreSQL mientras `efeonce-group.greenhouse.space_notion_sources.last_synced_at` se actualizaba todos los dias.
+- **Evidencia directa**:
+  - BigQuery `ico_engine.v_tasks_enriched` para mayo 2026: Efeonce tiene 39 tasks, 39 completadas, 1 sola con `rpa_value > 0`, `avg_positive_rpa = 3.0`. El `3` de Agency sale de esa muestra minima, no de un cierre vacio.
+  - BigQuery raw `notion_ops.{tareas,proyectos,sprints}` fresco el `2026-05-02` para Efeonce y Sky.
+  - PostgreSQL `greenhouse_core.space_notion_sources`: ambos spaces activos con `sync_enabled = true`, DB ids correctos y `last_synced_at = null`.
+  - BigQuery `greenhouse.space_notion_sources`: ambos spaces con `last_synced_at` actualizado (`2026-05-02 07:03:34` / `07:05:57`).
+  - `INFORMATION_SCHEMA.JOBS_BY_PROJECT` confirma que el writer diario vive fuera del portal y ejecuta `UPDATE greenhouse.space_notion_sources SET last_synced_at = CURRENT_TIMESTAMP()` como `183008134038-compute@developer.gserviceaccount.com`.
+- **Resultado código**:
+  - nuevo helper [`src/lib/integrations/notion-sync-freshness.ts`](/Users/jreye/Documents/greenhouse-eo/src/lib/integrations/notion-sync-freshness.ts) para:
+    - leer freshness desde BigQuery
+    - devolver freshness efectiva por space con fallback PG -> BQ
+    - reconciliar `last_synced_at` de BQ hacia PostgreSQL
+  - [`src/lib/sync/sync-bq-conformed-to-postgres.ts`](/Users/jreye/Documents/greenhouse-eo/src/lib/sync/sync-bq-conformed-to-postgres.ts) ahora, ademas del drain `BQ conformed -> greenhouse_delivery.*`, reconcilia `space_notion_sources.last_synced_at` hacia PostgreSQL en la misma corrida idempotente.
+  - readers endurecidos con fallback a BigQuery:
+    - [`src/app/api/admin/tenants/[id]/notion-status/route.ts`](/Users/jreye/Documents/greenhouse-eo/src/app/api/admin/tenants/%5Bid%5D/notion-status/route.ts)
+    - [`src/app/api/admin/spaces/route.ts`](/Users/jreye/Documents/greenhouse-eo/src/app/api/admin/spaces/route.ts)
+    - [`src/lib/operations/get-operations-overview.ts`](/Users/jreye/Documents/greenhouse-eo/src/lib/operations/get-operations-overview.ts)
+- **Validacion**:
+  - `pnpm exec eslint src/lib/integrations/notion-sync-freshness.ts src/lib/sync/sync-bq-conformed-to-postgres.ts 'src/app/api/admin/tenants/[id]/notion-status/route.ts' src/app/api/admin/spaces/route.ts src/lib/operations/get-operations-overview.ts` ✓
+- **Riesgo / deuda abierta**:
+  - el writer primario sigue viviendo fuera de este repo (`notion-bq-sync` / compute service account). El portal ya puede **reconciliar** y **dejar de mentir** en sus readers, pero la solucion mas canonica sigue siendo agregar tambien la escritura espejo a PostgreSQL en ese servicio upstream.
+  - no se corrige aun la inconsistencia secundaria de trust metadata en `/api/agency/spaces` (`rpaAvg` presente con `rpaMetric = no_completed_tasks`).
+
 ## Sesion 2026-05-01 (noche) — DESIGN.md + CLI oficial integrada
 
 - **Trigger**: usuario pidió adoptar el formato abierto `DESIGN.md` de Google Labs en todo el repo y además instalar la CLI global.

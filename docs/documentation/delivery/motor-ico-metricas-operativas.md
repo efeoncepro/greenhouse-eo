@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
 > **Version:** 1.0
 > **Creado:** 2026-04-05 por Claude (agente)
-> **Ultima actualizacion:** 2026-04-16 por Codex
+> **Ultima actualizacion:** 2026-05-02 por Codex
 > **Documentacion tecnica:** [Greenhouse ICO Engine v1](../../architecture/Greenhouse_ICO_Engine_v1.md), [Contrato Metricas ICO v1](../../architecture/Contrato_Metricas_ICO_v1.md)
 
 # Motor ICO — Metricas Operativas
@@ -44,6 +44,18 @@ Notion (tareas)
 
 > Detalle tecnico: el sync pipeline es un servicio Cloud Run (`notion-bq-sync`). La materializacion corre desde otro Cloud Run (`ico-batch-worker`). Ambos estan documentados en [Cloud Infrastructure v1](../../architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md).
 
+### Nota importante sobre "ultimo sync"
+
+Desde `2026-05-02`, Greenhouse trata la frescura de Notion con una regla mas estricta:
+
+- el pipeline upstream actualiza freshness en BigQuery
+- el portal reconcilia esa frescura de vuelta a PostgreSQL
+- si PostgreSQL viene atrasado o nulo, las surfaces operativas pueden usar BigQuery como fallback para no mostrar falsos "nunca sincronizado"
+
+Esto evita un caso real donde Notion estaba fresco en mayo, pero algunas pantallas internas leian `NULL` en PostgreSQL y daban la impresion equivocada de que el pipeline no habia corrido.
+
+> Detalle tecnico: ver [GREENHOUSE_NOTION_DELIVERY_SYNC_V1](../../architecture/GREENHOUSE_NOTION_DELIVERY_SYNC_V1.md).
+
 ---
 
 ## Donde se guardan las metricas
@@ -57,6 +69,23 @@ Las metricas se calculan una vez al dia y se guardan en tres capas, de mas rapid
 | **Calculo en vivo** | Consulta directa a `v_tasks_enriched` | ~8s | Ultimo recurso si nada esta materializado |
 
 El sistema intenta la capa mas rapida primero y cae a la siguiente si esta vacia.
+
+### Importante: periodo cerrado vs periodo en curso
+
+No todas las pantallas leen siempre un snapshot cerrado. Algunas surfaces de Agency pueden leer `ICO` live sobre `v_tasks_enriched` para el **mes en curso**. En esos casos puede pasar algo metodologicamente valido pero operativamente fragil:
+
+- si solo 1 tarea completada tiene `rpa_value > 0`
+- y ese valor es `3`
+- entonces el RpA live del periodo puede verse como `3.0`
+
+Eso **no** significa que Notion este vacio ni que el engine este roto. Significa que la muestra del periodo en curso es pequena y todavia no estabiliza el promedio.
+
+Regla practica:
+
+- **snapshot materializado / periodo cerrado** = lectura mas estable para reporting
+- **live period / mes en curso** = lectura util para operacion diaria, pero mas sensible a muestras pequenas
+
+> Caso real validado el 2026-05-02: Efeonce tenia 39 tareas de mayo, 39 completadas, pero solo 1 con `rpa_value > 0`, por eso `avg_positive_rpa = 3.0`.
 
 ### Como se llena Postgres
 

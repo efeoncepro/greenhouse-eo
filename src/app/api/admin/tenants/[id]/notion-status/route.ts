@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 
+import { getEffectiveNotionFreshnessForSpaces } from '@/lib/integrations/notion-sync-freshness'
 import { requireAdminTenantContext } from '@/lib/tenant/authorization'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
@@ -56,6 +57,8 @@ export async function GET(
   )
 
   const mapping = mappings.length > 0 ? mappings[0] : null
+  const effectiveFreshness = await getEffectiveNotionFreshnessForSpaces([spaceId])
+  const lastSyncedAt = effectiveFreshness.get(spaceId) ?? null
 
   return NextResponse.json({
     space: {
@@ -77,7 +80,7 @@ export async function GET(
       },
       syncEnabled: Boolean(mapping.sync_enabled),
       syncFrequency: String(mapping.sync_frequency || 'daily'),
-      lastSyncedAt: mapping.last_synced_at ? String(mapping.last_synced_at) : null,
+      lastSyncedAt,
       createdAt: mapping.created_at ? String(mapping.created_at) : null,
       updatedAt: mapping.updated_at ? String(mapping.updated_at) : null,
       createdBy: mapping.created_by ? String(mapping.created_by) : null

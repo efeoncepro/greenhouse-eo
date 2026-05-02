@@ -1,6 +1,21 @@
 # changelog.md
 
+## 2026-05-02
+
+- Se documenta el protocolo de mantenimiento de `DESIGN.md` como contrato vivo: el archivo debe actualizarse cuando cambie el runtime visual real, validarse con `pnpm design:lint` y sincronizar la documentación extensa (`docs/architecture/GREENHOUSE_DESIGN_TOKENS_V1.md`) cuando el cambio sea estructural.
+
+- Notion sync operational freshness queda endurecida contra drift entre BigQuery y PostgreSQL:
+  - nuevo helper `src/lib/integrations/notion-sync-freshness.ts` centraliza lectura de `last_synced_at` desde `greenhouse.space_notion_sources`, fallback efectivo por `space_id` y reconciliacion `BQ -> greenhouse_core.space_notion_sources`.
+  - `src/lib/sync/sync-bq-conformed-to-postgres.ts` ahora no solo drena `greenhouse_conformed.delivery_* -> greenhouse_delivery.*`; tambien refleja `space_notion_sources.last_synced_at` desde BigQuery hacia PostgreSQL en la misma corrida diaria/idempotente.
+  - readers operativos que antes mentian con `NULL` en PG ahora usan freshness efectiva con fallback a BigQuery:
+    - `GET /api/admin/spaces`
+    - `GET /api/admin/tenants/[id]/notion-status`
+    - `src/lib/operations/get-operations-overview.ts`
+  - Impacto: el portal deja de mostrar "nunca sincronizado" cuando el upstream `notion-bq-sync` ya actualizo BigQuery, y el binding canonico en PostgreSQL se va autocurando en el siguiente `BQ -> PG drain`.
+
 ## 2026-05-01
+
+- Se adopta `DESIGN.md` en la raiz del repo como contrato visual portable para agentes y tooling UI. El archivo condensa el baseline real `Poppins + Geist`, tokens de color/spacing/radius/componentes y reglas de uso alineadas al theme activo. Tambien se integra el CLI oficial `@google/design.md` al repo con scripts `pnpm design:lint`, `pnpm design:diff` y `pnpm design:export:tailwind`.
 
 - Se documenta la arquitectura canónica `Payment Orders` como módulo de Tesorería dentro de Finance en `docs/architecture/GREENHOUSE_PAYMENT_ORDERS_ARCHITECTURE_V1.md`. La decisión evita mover pagos a Payroll: Payroll calcula/exporta obligaciones; Finance/Tesorería crea órdenes, calendario de pagos, registra pagos, settlement y conciliación. Se abre el programa `TASK-747` con child tasks `TASK-748` a `TASK-751` para obligations, beneficiary profiles/routing, orders/batches/calendar maker-checker y payroll settlement orchestration.
 
