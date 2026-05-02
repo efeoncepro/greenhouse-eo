@@ -2,10 +2,172 @@
 
 > Spec canónica del `Reliability Control Plane` de Greenhouse EO. Define el registry por módulo, el modelo unificado de señales, el contrato de evidencia y cómo `Admin Center`, `Ops Health` y `Cloud & Integrations` consumen la lectura consolidada sin duplicar fuentes.
 >
-> Versión: `1.2`
+> Versión: `1.3`
 > Estado: `vigente`
 > Creada: `2026-04-25` por TASK-600
-> Última actualización: `2026-04-25` por TASK-638 (AI Observer enrichment via Gemini Flash + ops-worker host)
+> Última actualización: `2026-05-02` por TASK-765 (3 signals nuevos para el path payment_order ↔ bank settlement)
+
+---
+
+## Delta 2026-05-02 — TASK-765 module `finance.payment_orders` (3 signals nuevos)
+
+Cierra el incidente 2026-05-01 (payment_orders zombie sin impacto en banco). Agrega 3 signals al subsystem `Finance Data Quality` para detectar el path payment_order → expense_payment → settlement_leg → account_balances cuando se rompe.
+
+### Module entry
+
+```ts
+{
+  moduleKey: 'finance.payment_orders',
+  label: 'Payment Orders → Bank Settlement',
+  description: 'Path canónico payroll → expenses → payment_orders → expense_payments → settlement_legs → account_balances',
+  domain: 'finance',
+  subsystemId: 'finance_data_quality',
+  incidentDomainTag: 'finance',
+  expectedSignalKinds: ['drift', 'dead_letter', 'lag', 'incident'],
+  filesOwned: [
+    'src/lib/finance/payment-orders/**',
+    'src/lib/finance/payroll-expense-reactive.ts',
+    'src/lib/sync/projections/record-expense-payment-from-order.ts',
+    'src/lib/sync/projections/finance-expense-reactive-intake.ts',
+    'src/app/api/admin/finance/payroll-expense-rematerialize/**',
+    'src/app/api/admin/finance/payment-orders/[orderId]/recover/**'
+  ]
+}
+```
+
+Rolea al subsystem existente `Finance Data Quality` — no crea nuevo subsystem. La severidad agregada del módulo se computa con la regla canónica: peor severidad concreta entre los 4 signals esperados.
+
+### Signal 1 — `finance.payment_orders.paid_without_expense_payment`
+
+| Campo | Valor |
+| --- | --- |
+| Kind | `drift` |
+| Severidad cuando count > 0 | `error` |
+| Steady state | `0` |
+| Source | `getPaidOrdersWithoutExpensePaymentSignal` |
+| Reader | [`src/lib/reliability/queries/payment-orders-paid-without-expense-payment.ts`](../../src/lib/reliability/queries/payment-orders-paid-without-expense-payment.ts) |
+
+Query canónica:
+
+```sql
+SELECT COUNT(*)::int AS n
+FROM greenhouse_finance.payment_orders po
+WHERE po.state = 'paid'
+  AND po.paid_at < NOW() - INTERVAL '15 minutes'
+  AND NOT EXISTS (
+    SELECT 1 FROM greenhouse_finance.payment_order_lines pol
+     WHERE pol.order_id = po.order_id
+       AND pol.expense_payment_id IS NOT NULL
+  )
+  AND NOT EXISTS (
+    SELECT 1 FROM greenhouse_sync.outbox_events oe
+     WHERE oe.aggregate_id = po.order_id
+       AND oe.event_type = 'finance.payment_order.settlement_blocked'
+       AND oe.occurred_at > NOW() - INTERVAL '7 days'
+  );
+```
+
+**Qué representa**: orders en `state='paid'` hace > 15 minutos cuya line(s) NO tienen `expense_payment_id` y que NO han emitido un evento `settlement_blocked` reciente (últimos 7 días). Es la divergencia exacta del incidente 2026-05-01: la order quedó "Pagada" en UI sin impacto en `account_balances` y nadie alertó.
+
+**Bajo qué condiciones se prende**:
+
+- Path no-atómico falla post-Slice 5 (recovery legacy o bug futuro en `markPaymentOrderPaidAtomic`).
+- Proyector reactivo `record_expense_payment_from_order` skipea silenciosamente (no debería ocurrir post-Slice 4 — es safety net del safety net).
+- Una migración o seed manual setea `state='paid'` directo en DB bypass del trigger.
+
+**Por qué excluye orders con `settlement_blocked` reciente**: ese caso ya está señalado por `payment_orders_dead_letter` + el banner del DetailDrawer. Doble-conteo crearía ruido.
+
+### Signal 2 — `finance.payment_orders.dead_letter`
+
+| Campo | Valor |
+| --- | --- |
+| Kind | `dead_letter` |
+| Severidad cuando count > 0 | `error` |
+| Steady state | `0` |
+| Source | `getPaymentOrdersDeadLetterSignal` |
+| Reader | [`src/lib/reliability/queries/payment-orders-dead-letter.ts`](../../src/lib/reliability/queries/payment-orders-dead-letter.ts) |
+
+Query canónica:
+
+```sql
+SELECT COUNT(*)::int AS n
+FROM greenhouse_sync.outbox_reactive_log
+WHERE handler = ANY(ARRAY[
+    'record_expense_payment_from_order:finance.payment_order.paid',
+    'finance_expense_reactive_intake:payroll_period.exported'
+  ])
+  AND result = 'dead-letter'
+  AND acknowledged_at IS NULL
+  AND recovered_at IS NULL;
+```
+
+**Qué representa**: dead-letters NO acknowledged y NO recovered en los 2 handlers críticos del path:
+
+- `record_expense_payment_from_order:finance.payment_order.paid` — proyección que materializa expense_payments + settlement_legs cuando una order pasa a `paid`.
+- `finance_expense_reactive_intake:payroll_period.exported` — proyección que materializa expenses desde payroll exportado (root cause del incidente 2026-05-01).
+
+Alineado con el partial index `outbox_reactive_log_active_dead_letters_idx` (TASK 2026-04-26).
+
+**Bajo qué condiciones se prende**:
+
+- Resolver throw post-Slice 4 con `expense_unresolved`, `out_of_scope_v1`, `cutover_violation` o `materializer_dead_letter`.
+- Materializer payroll falla con error no recuperable (drift de columnas, FK violation).
+- Reactor agotó retries (`maxRetries=1` para `finance_expense_reactive_intake`, `maxRetries=2` para `record_expense_payment_from_order`).
+
+**Cómo se apaga**: operador hace `acknowledged_at` (issue conocido sin fix) o `recovered_at` (post-fix vía `/api/admin/finance/payroll-expense-rematerialize` o `/api/admin/finance/payment-orders/[orderId]/recover`).
+
+### Signal 3 — `finance.payroll_expense.materialization_lag`
+
+| Campo | Valor |
+| --- | --- |
+| Kind | `lag` |
+| Severidad cuando count > 0 | `warning` (no error) |
+| Steady state | `0` |
+| Source | `getPayrollExpenseMaterializationLagSignal` |
+| Reader | [`src/lib/reliability/queries/payroll-expense-materialization-lag.ts`](../../src/lib/reliability/queries/payroll-expense-materialization-lag.ts) |
+
+Query canónica:
+
+```sql
+SELECT COUNT(*)::int AS n
+FROM greenhouse_payroll.payroll_periods pp
+WHERE pp.status = 'exported'
+  AND pp.exported_at < NOW() - INTERVAL '1 hour'
+  AND NOT EXISTS (
+    SELECT 1 FROM greenhouse_finance.expenses e
+     WHERE e.payroll_period_id = pp.period_id
+       AND e.expense_type = 'payroll'
+       AND e.source_type = 'payroll_generated'
+  );
+```
+
+**Qué representa**: períodos payroll exportados hace > 1 hora que aún no tienen filas en `greenhouse_finance.expenses` con `expense_type='payroll' AND source_type='payroll_generated'`. Captura precisamente la falla upstream del incidente 2026-05-01: el reactor falló, el período quedó sin expenses, y las payment_orders downstream se aprobaron y cerraron como zombie sobre vacío.
+
+**Bajo qué condiciones se prende**:
+
+- Reactor `finance_expense_reactive_intake` en dead-letter (signal 2 también prende).
+- Outbox `payroll_period.exported` no se publicó (bug en payroll export path).
+- Cloud Run `ops-worker` caído (signal cloud también prende).
+
+**Severidad warning, no error**: el path es asincrónico — un período recién exportado puede tardar minutos en materializar. Solo después de 1h el lag se vuelve sospechoso. Si signal 2 (dead_letter) prende junto, el operador sabe que es bug, no propagación normal.
+
+### Por qué los 3 signals juntos
+
+Los 3 cubren capas distintas del mismo path:
+
+- **Lag (signal 3)** detecta el problema **upstream** — el período payroll no llegó a `expenses` aún.
+- **Dead-letter (signal 2)** detecta el problema **a mitad de pipeline** — el reactor agotó retries.
+- **Drift (signal 1)** detecta el problema **downstream** — la order ya está `paid` pero el ledger no refleja el movimiento.
+
+Si los 3 = 0, el path está sano. Si 1 prende y los otros no, es señal de un bug específico en esa capa. Si los 3 prenden simultáneos, el path está roto end-to-end (caso del incidente 2026-05-01).
+
+### Wiring en `RELIABILITY_REGISTRY`
+
+Registrados en [`src/lib/reliability/registry.ts`](../../src/lib/reliability/registry.ts) bajo el moduleKey `finance.payment_orders`. Composición vía `buildReliabilityOverview()` en [`src/lib/reliability/get-reliability-overview.ts`](../../src/lib/reliability/get-reliability-overview.ts) — los 3 signals aparecen automáticamente en el snapshot consumido por `/api/admin/reliability`, Admin Center, Ops Health y AI Observer (TASK-638).
+
+### Spec canónica
+
+[`docs/tasks/complete/TASK-765-payment-order-bank-settlement-resilience.md`](../tasks/complete/TASK-765-payment-order-bank-settlement-resilience.md) Slice 7. Contrato del path atómico documentado en [`GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`](./GREENHOUSE_FINANCE_ARCHITECTURE_V1.md) Delta 2026-05-02.
 
 ---
 

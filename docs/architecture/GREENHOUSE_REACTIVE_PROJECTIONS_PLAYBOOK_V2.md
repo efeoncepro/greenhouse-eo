@@ -260,6 +260,104 @@ Todo el ciclo V2 — deteccion, diseno, implementacion, rollout y validacion —
 
 Resultado final: `/api/internal/projections` reporta `health = true`, 14/14 projections en `circuit: closed`, backlog 0, audit-only sweep integrado al recovery cron.
 
+## Patrón canónico: resolver loud (TASK-765 Slice 4)
+
+V2 ya cierra el silent-skip a nivel de **consumer** (un evento sin scope queda marcado `no-op:no-scope` en `outbox_reactive_log`). Pero hay una segunda variante de silent-skip que ocurre **dentro del `refresh()`** de una proyección: el resolver encuentra precondiciones rotas, no ejecuta el efecto deseado y retorna sin throw. La proyección termina `coalesced:recorded=0 skipped=1`, el reactive worker la marca `completed`, y el problema queda invisible.
+
+Esa fue exactamente la falla que dejó 2 `payment_orders` zombie el 2026-05-01 (incidente origen de TASK-765). El proyector `record_expense_payment_from_order` ejecutó 3 veces para 2 orders, cada vez devolviendo `result=coalesced:recorded=0 skipped=1` porque el resolver no encontró `expenses` para `(period=2026-04, member_id)`. La refresh_queue marcó `completed`, no `failed`. Cero alerta, cero dead-letter, cero rollback de `state=paid`.
+
+### Anti-patrón "skip silencioso" dentro de refresh
+
+```text
+# MAL — el resolver encuentra precondición rota y skipea sin throw
+
+const refresh = async (scope, payload) => {
+  const expense = await findExpense(scope.entityId)
+  if (!expense) {
+    return null              // ← refresh_queue queda completed, nadie alerta
+  }
+  await recordPayment(expense)
+  return 'recorded'
+}
+```
+
+El consumer V2 trata el `return null` como éxito (mapea a `result='no-op:...'`), no como falla. La precondición rota nunca llega al circuit breaker, ni al dead-letter, ni a Sentry, ni al reliability signal.
+
+### Pattern correcto
+
+3 obligaciones cuando un resolver detecta precondición rota:
+
+1. **Throw tipado** con `error_class` estable (no genérico). Define una jerarquía de error en el módulo de la proyección con códigos parseable por reliability/UI.
+2. **Outbox event `*_blocked`** con `reason` estructurada **antes** del throw — para que UI banner, AI Observer y notification policies puedan reaccionar sin esperar a que un humano lea el dead-letter.
+3. **`captureWithDomain(err, '<domain>', { tags: { source } })`** **antes** de re-throw — para que el subsystem correspondiente vea el incidente en Sentry tagged por `domain` (TASK-742 pattern).
+
+```text
+# BIEN — resolver loud con throw tipado + outbox + captureWithDomain
+
+const refresh = async (scope, payload) => {
+  let expense
+  try {
+    expense = await findExpense(scope.entityId)
+
+    if (!expense) {
+      // Intento de auto-recovery sincrono (idempotente)
+      await materializeUpstream(scope.entityId)
+      expense = await findExpense(scope.entityId)
+    }
+
+    if (!expense) {
+      // Precondición sigue rota → outbox + throw tipado
+      await publishOutboxEvent({
+        eventType: 'finance.payment_order.settlement_blocked',
+        payload: {
+          eventVersion: 'v1',
+          reason: 'expense_unresolved',
+          detail: '...',
+          affectedLineIds: [...]
+        }
+      })
+      throw new PaymentOrderExpenseUnresolvedError(...)
+    }
+
+    await recordPayment(expense)
+    return 'recorded'
+  } catch (err) {
+    captureWithDomain(err, 'finance', {
+      tags: { source: 'payment_order_settlement', orderId: scope.entityId }
+    })
+    throw err   // ← reactive worker rutea a failed/dead-letter
+  }
+}
+```
+
+### Cómo lo rutea el reactive worker
+
+Cuando el throw escapa de `refresh()`:
+
+1. `markRefreshFailed(queueId, error)` setea `result='failed'` y captura `last_error`.
+2. Per-event retry tracking: `retries++` en `outbox_reactive_log`. Si `retries >= maxRetries`, `result='dead-letter'`.
+3. Circuit breaker recibe `recordCircuitFailure(name, error)` — abre el circuito si la rate de failures cruza el umbral.
+4. El subsystem `Finance Data Quality` (vía `RELIABILITY_REGISTRY` con `incidentDomainTag='finance'`) ve el incidente Sentry tagged por domain y lo agrega al rollup.
+5. El reliability signal `finance.payment_orders.dead_letter` cuenta la fila dead-letter no acknowledged y prende `severity='error'` en `/admin/operations`.
+
+### Ejemplos canónicos en el repo
+
+- [`src/lib/finance/payment-orders/record-payment-from-order.ts`](../../src/lib/finance/payment-orders/record-payment-from-order.ts) — resolver con 3 paths que throw + outbox `settlement_blocked`:
+  - `expense_not_found` después de invocar materializer sincrono → `PaymentOrderExpenseUnresolvedError`.
+  - `out_of_scope_v1` (lines no-payroll) → `PaymentOrderSettlementBlockedError` con `reason='out_of_scope_v1'`.
+  - `recordExpensePayment` falla (CHECK violation, etc.) → throw envuelto con `cause` original preservado.
+- [`src/lib/sync/projections/finance-expense-reactive-intake.ts`](../../src/lib/sync/projections/finance-expense-reactive-intake.ts) — `try/catch` minimal alrededor de `materializePayrollExpensesForExportedPeriod` con `captureWithDomain(err, 'finance', { source: 'payroll_expense_materialization' })` antes de re-throw. Garantiza que cualquier error del materializer (drift de columnas, FK violation) llegue a Sentry tagged correctamente y al refresh_queue como `failed` con `error_class='application'`.
+
+### Cuándo NO aplicar este pattern
+
+El `return null` honesto sigue siendo válido cuando representa un no-op real, no una precondición rota:
+
+- `extractScope` devolvió `null` y el consumer V2 ya lo manejó como `no-op:no-scope` (ese path está cubierto y no necesita throw).
+- La proyección detecta `already_linked` (idempotencia: la fila ya existe). Caso típico de re-run.
+- El payload trae un `entityType` que esta proyección no maneja (genuinamente fuera de scope, no precondición rota).
+
+La regla de oro: **si el operador esperaba que algo cambie y no cambió, throw**. Si genuinamente no había nada que hacer, `return null`.
+
 ## Referencias
 
 - **TASK canonica:** [TASK-379 — Reactive Projections Enterprise Hardening](../tasks/in-progress/TASK-379-reactive-projections-enterprise-hardening.md)

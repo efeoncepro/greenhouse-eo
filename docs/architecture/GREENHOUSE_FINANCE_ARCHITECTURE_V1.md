@@ -2,7 +2,161 @@
 
 > **Version:** 1.0
 > **Created:** 2026-03-30
-> **Last updated:** 2026-04-29
+> **Last updated:** 2026-05-02
+
+## Delta 2026-05-02 — TASK-765 Payment Order Bank Settlement (atomic contract)
+
+Cierra el incidente 2026-05-01 (2 `payment_orders` quedaron `state='paid'` sin afectar Santander CLP). Convierte el path `payment_order.paid → bank impact` en atómico, observable y resiliente end-to-end. Subordina la sección "Payment Orders como capa canónica" del Delta 2026-05-01: el contrato de transición a `paid` ya no depende del outbox para crear ledger downstream.
+
+### Flow canónico
+
+```text
+payroll_period.exported
+  → finance_expense_reactive_intake (materializa expenses)
+    → payment_obligations.generated  (TASK-748)
+      → payment_orders.draft → pending_approval → approved → submitted  (TASK-750)
+        → markPaymentOrderPaidAtomic  (TASK-765 Slice 5):
+          1. SELECT FOR UPDATE order
+          2. assertSourceAccountForPaid  (Slice 1 hard-gate, defense in depth)
+          3. UPDATE state='paid' (anti-zombie trigger valida)
+          4. recordPaymentOrderStateTransition (audit log append-only)
+          5. Per line: recordExpensePayment(input, client) → expense_payment + settlement_leg
+          6. publishOutboxEvent('finance.payment_order.paid')
+          7. ROLLBACK completo si CUALQUIER step falla
+        → account_balances rematerializado
+        → BANCO REBAJADO
+```
+
+Una sola transacción `withTransaction(client => ...)`. Idempotencia preservada por el partial unique index sobre `expense_payments.payment_order_line_id`.
+
+### Path atómico — por qué importa
+
+Antes de TASK-765, los pasos 5 y 6 vivían detrás del outbox + proyección reactiva (`record_expense_payment_from_order`). Si la proyección skipeaba silenciosamente (resolver `expense_not_found`, `out_of_scope_v1`) o fallaba, la order quedaba `paid` con `expense_payment_id` NULL en sus lines, sin impacto en `account_balances`. El operador veía "Pagada" en UI, el banco intacto, cero alerta.
+
+`markPaymentOrderPaidAtomic` ([`src/lib/finance/payment-orders/mark-paid-atomic.ts:163-380`](../../src/lib/finance/payment-orders/mark-paid-atomic.ts)) corre los 7 steps en una sola tx. Si cualquier line falla `recordExpensePayment` (CHECK violation, materializer drift, supersede chain inconsistente), ROLLBACK completo — la order vuelve al estado anterior y nunca queda zombie.
+
+### Proyector reactivo como safety net read-only
+
+`record_expense_payment_from_order` ([`src/lib/sync/projections/record-expense-payment-from-order.ts`](../../src/lib/sync/projections/record-expense-payment-from-order.ts)) **sigue activo post-Slice 5** pero ahora cumple el rol de safety net:
+
+- Toda order que ya pasó por `markPaymentOrderPaidAtomic` tiene sus lines con `expense_payment_id` poblado. El proyector hace SELECT, detecta `already_linked`, devuelve `skipped[].reason='already_linked'`. No hay double-write.
+- La idempotencia natural está garantizada por el partial unique index sobre `expense_payments.payment_order_line_id`. Si el proyector intenta INSERT por carrera con la tx atómica, PG rechaza por unique violation y el reactive worker lo rutea a retry.
+- El proyector solo crea downstream nuevo cuando una `payment_order` llegó a `paid` por un path NO-atómico (legacy pre-TASK-765, recovery del incidente vía `/api/admin/finance/payment-orders/[orderId]/recover`).
+
+### Hard-gate triple sobre `source_account_id`
+
+Defense in depth de 4 capas:
+
+1. **CHECK constraint DB** `payment_orders_source_account_required_when_paid`: rechaza UPDATE/INSERT con `state='paid' AND source_account_id IS NULL`.
+2. **TS guard** `assertSourceAccountForPaid(orderId, sourceAccountId, targetState)` en [`src/lib/finance/payment-orders/transitions.ts`](../../src/lib/finance/payment-orders/transitions.ts) — invocado tanto en `markPaymentOrderPaid` como en `markPaymentOrderPaidAtomic` antes del UPDATE.
+3. **UI** `PaymentOrderApprovalForm.tsx` exige `sourceAccountId` Select required antes de submit con tooltip explicativo.
+4. **Trigger PG anti-zombie** `payment_orders_anti_zombie_trigger` BEFORE INSERT/UPDATE — segunda capa DB que también valida `paid_at IS NOT NULL` cuando `state='paid'`.
+
+Cualquier camino futuro que mute `payment_orders` (TASK-756 auto-generación, TASK-707 Previred runtime, etc.) hereda automáticamente las 4 capas — no hay que recordarlas en cada caller.
+
+### State machine canónica + matrix de transiciones
+
+Estados válidos: `draft`, `pending_approval`, `approved`, `submitted`, `paid`, `settled`, `closed`, `cancelled`, `failed`.
+
+Transiciones permitidas (mirror exacto del trigger PG y del helper TS `assertValidPaymentOrderStateTransition`):
+
+| Desde | A |
+| --- | --- |
+| `draft` | `pending_approval`, `cancelled` |
+| `pending_approval` | `approved`, `cancelled` |
+| `approved` | `submitted`, `paid`, `cancelled` |
+| `submitted` | `paid`, `failed`, `cancelled` |
+| `paid` | `settled`, `cancelled` |
+| `settled` | `closed` |
+| `failed` | `approved`, `cancelled` |
+
+Cualquier otra transición (e.g. `paid → submitted`, `cancelled → approved`, `closed → *`) es rechazada por el trigger PG con `RAISE EXCEPTION 'payment_orders_invalid_state_transition: ...'`.
+
+### Audit log append-only `payment_order_state_transitions`
+
+Tabla nueva ([`migrations/...task-765-payment-order-state-transitions-audit.sql`](../../migrations/)):
+
+- PK `transition_id` (`EO-POT-{uuid8}`).
+- FK a `payment_orders(order_id) ON DELETE CASCADE`.
+- Columnas: `from_state`, `to_state`, `actor_user_id`, `reason`, `metadata_json JSONB`, `occurred_at`.
+- Índices `(order_id, occurred_at)` y partial `(to_state, occurred_at) WHERE to_state IN ('paid','settled','closed','cancelled','failed')`.
+- Triggers `payment_order_state_transitions_no_update_trigger` + `payment_order_state_transitions_no_delete_trigger` BEFORE UPDATE/DELETE → `RAISE EXCEPTION`. Append-only enforced a nivel DB.
+
+Helper canónico: `recordPaymentOrderStateTransition({orderId, fromState, toState, actorUserId, reason, metadata}, client?)` en [`src/lib/finance/payment-orders/state-transitions-audit.ts`](../../src/lib/finance/payment-orders/state-transitions-audit.ts). Aceptar `client?` permite que `markPaymentOrderPaidAtomic` insert el row dentro de la misma tx que el UPDATE.
+
+Para correcciones (corner case de un actor humano), insertar nueva fila con `metadata_json.correction_of=<transition_id>`. Nunca UPDATE/DELETE.
+
+### Reliability signals nuevos
+
+3 signals registrados en `RELIABILITY_REGISTRY` bajo el módulo `finance.payment_orders` (rolea al subsystem `Finance Data Quality`). Steady state = 0.
+
+| Signal | Kind | Severidad | Steady |
+| --- | --- | --- | --- |
+| `finance.payment_orders.paid_without_expense_payment` | `drift` | `error` | 0 |
+| `finance.payment_orders.dead_letter` | `dead_letter` | `error` | 0 |
+| `finance.payroll_expense.materialization_lag` | `lag` | `warning` | 0 |
+
+Detalle, queries SQL y rollup en [`GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1.md`](./GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1.md) Delta 2026-05-02.
+
+### Outbox events nuevos
+
+#### `finance.payment_order.settlement_blocked` (v1)
+
+Emitido cuando el resolver del proyector detecta una precondición rota (Slice 4). Reasons canónicos:
+
+```ts
+type FinancePaymentOrderSettlementBlockedV1 = {
+  eventVersion: 'v1'
+  orderId: string
+  state: 'paid'
+  reason:
+    | 'expense_unresolved'        // resolver no encontró expenses tras materialize sincrono
+    | 'account_missing'            // source_account_id NULL
+    | 'cutover_violation'          // CHECK expense_payments_account_required_after_cutover
+    | 'materializer_dead_letter'   // upstream payroll materializer en dead-letter
+    | 'out_of_scope_v1'            // V1 no cubre este obligation_kind (e.g. employer_social_security)
+  detail: string
+  affectedLineIds: string[]
+  blockedAt: ISODateString
+}
+```
+
+Consumers: UI banner en `PaymentOrderDetailDrawer.tsx`, AI Observer, futuras notification policies (TASK-716).
+
+#### `finance.payroll_expenses.rematerialized` (v1, audit-only)
+
+Emitido por `POST /api/admin/finance/payroll-expense-rematerialize` para auditar reruns manuales del materializer.
+
+Ambos registrados en [`GREENHOUSE_EVENT_CATALOG_V1.md`](./GREENHOUSE_EVENT_CATALOG_V1.md) Delta 2026-05-02.
+
+### Endpoints admin nuevos
+
+#### `POST /api/admin/finance/payroll-expense-rematerialize`
+
+Gated por capability `finance.payroll.rematerialize` (FINANCE_ADMIN + EFEONCE_ADMIN). Body `{periodId, year, month, dryRun?}`. Idempotente. Devuelve `{ payrollCreated, payrollSkipped, socialSecurityCreated, socialSecuritySkipped, errors[] }`.
+
+#### `POST /api/admin/finance/payment-orders/[orderId]/recover`
+
+Gated por capability `finance.payment_orders.recover` (FINANCE_ADMIN + EFEONCE_ADMIN). Body `{sourceAccountId, paidAt?}`. Recovery atómico para órdenes paid-zombie:
+
+1. Materializa `expenses` para `(period_id, member_id)` si faltan.
+2. UPDATE `source_account_id` y `paid_at`.
+3. Insert audit log con `reason='recovery_TASK-765'`.
+4. Re-publica outbox `finance.payment_order.paid` con `eventVersion='v1.replay'`.
+5. Espera al proyector (poll cada 5s, max 30s).
+
+Usado el 2026-05-02 para recuperar las 2 órdenes del incidente (Luis Reyes + Humberly Henriquez, $402,562.50 CLP combinado contra Santander CLP).
+
+### Reglas duras (heredadas en CLAUDE.md)
+
+- **NUNCA** marcar `state='paid'` con `source_account_id IS NULL`. Hard-gate triple bloquea en 4 capas.
+- **NUNCA** dejar `state='paid'` sin downstream completo. El path atómico `markPaymentOrderPaidAtomic` corre TODO en una sola tx; ROLLBACK total si algo falla.
+- **NUNCA** skipear silencioso desde el resolver. Throw + outbox `settlement_blocked` con reason estructurada (Slice 4).
+- **NUNCA** modificar el INSERT de `expenses`/`income`/`income_payments`/`expense_payments` sin verificar paridad column-count. Test `expense-insert-column-parity.test.ts` valida 14 sites canónicos en CI.
+- **NUNCA** transicionar fuera del matrix canónico. Trigger PG + helper TS enforce.
+- **NUNCA** modificar `payment_order_state_transitions` (audit log). Append-only enforced por trigger PG.
+
+Spec canónica: [`docs/tasks/complete/TASK-765-payment-order-bank-settlement-resilience.md`](../tasks/complete/TASK-765-payment-order-bank-settlement-resilience.md).
 
 ## Delta 2026-05-01 — Payment Orders como capa canónica de Tesorería
 
