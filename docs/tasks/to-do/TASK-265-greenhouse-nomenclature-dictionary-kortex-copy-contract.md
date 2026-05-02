@@ -1,5 +1,21 @@
 # TASK-265 — Greenhouse Nomenclature, Dictionary & Kortex Copy Contract
 
+## Delta 2026-05-02 — Slice 5 agregado: gate operativo (ESLint + skill hardening)
+
+Triggered por observación operativa: agentes AI tienden a hardcodear copy en JSX ignorando la skill `greenhouse-ux-writing`. La causa raíz es que la skill es **opt-in** y no hay enforcement mecánico.
+
+**Decisión arquitectónica**: el gate operativo se integra a TASK-265 (no en task separada) porque debe apuntar a la foundation dictionary-ready desde día uno — lo opuesto introduce drift entre contrato y enforcement.
+
+**Patrón heredado de TASK-567** (gate antes que sweep):
+
+- TASK-265 (esta task) + Slice 5 nuevo → entrega foundation + gate en modo `warn`
+- TASK-407 + TASK-408 → sweep migra hardcodes a la capa canónica
+- Cierre de TASK-408 → promote del gate a modo `error` (CI bloquea regresiones)
+
+**Co-extiende sin duplicar**: la skill `greenhouse-ux-writing` ya existe; la rule la complementa con enforcement mecánico. La rule no reemplaza la skill — fuerza que se invoque cuando el agente intenta escribir copy fuera del registry.
+
+Acceptance criteria + entregables del Slice 5 incorporados abajo. Slices 1-4 sin cambios.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -128,6 +144,14 @@ Reglas obligatorias:
 - `src/emails/PayrollReceiptEmail.tsx`
 - `docs/architecture/GREENHOUSE_UI_PLATFORM_V1.md`
 - `docs/tasks/to-do/TASK-265-greenhouse-nomenclature-dictionary-kortex-copy-contract.md`
+- **Slice 5 ownership**:
+  - `eslint-plugins/greenhouse/rules/no-untokenized-copy.mjs` (nuevo)
+  - `eslint-plugins/greenhouse/index.mjs` (registro de la rule)
+  - `eslint.config.mjs` (aplicación de la rule + scope excludes)
+  - `.claude/skills/greenhouse-ux-writing/SKILL.md` (hardening de description + triggers)
+  - `.claude/skills/greenhouse-ui-review/SKILL.md` (checklist row microcopy)
+  - `CLAUDE.md` (mención dura en Conventions)
+  - `.claude/settings.json` (hook PostToolUse opcional)
 
 ## Current Repo State
 
@@ -201,6 +225,64 @@ Esta task (TASK-265) entrega **únicamente**:
 
 No migra código de superficies — eso lo hacen las derivadas, con criterio de aceptación medible por superficie.
 
+### Slice 5 — Gate operativo: ESLint rule + skill hardening + checklist
+
+Este Slice cierra el flanco operativo (agentes ignoran `greenhouse-ux-writing`) que motivó el bump del 2026-05-02. Hereda el patrón gate-antes-que-sweep de TASK-567 (typography contract). Sin esto, las child tasks `TASK-407` y `TASK-408` migrarían superficies pero los agentes seguirían introduciendo hardcodes nuevos en paralelo — el sweep nunca alcanza al influjo.
+
+**Componentes del Slice**:
+
+#### 5a. ESLint rule local `greenhouse/no-untokenized-copy`
+
+- Archivo: `eslint-plugins/greenhouse/rules/no-untokenized-copy.mjs`
+- Patrón heredado de `no-hardcoded-fontfamily` y `no-raw-table-without-shell` (AST vanilla, `.mjs`, mensajes accionables)
+- **Detecta** strings literales en props específicos de UI primitives Greenhouse:
+  - `label`, `placeholder`, `helperText` (TextField, Select, Autocomplete)
+  - `title`, `subtitle` (CardHeader, Drawer header)
+  - `message`, `description` (Alert, Snackbar, EmptyState)
+  - `tooltip`, `aria-label` cuando son strings literales
+- **Permite** valores que vengan de:
+  - `greenhouse-nomenclature.ts` (capa product nomenclature recortada)
+  - capa dictionary-ready inicializada en Slice 2 (path final decidido en Slice 2)
+  - `// eslint-disable-next-line greenhouse/no-untokenized-copy` con justificación inline
+- **Excluidos por scope** (en `eslint.config.mjs`):
+  - `src/components/theme/**`, `src/@core/**` (theme files)
+  - `src/app/global-error.tsx` (pre-theme)
+  - `src/app/public/**` (páginas públicas pre-shell)
+  - `src/emails/**` (cubierto por TASK-408)
+  - `src/lib/finance/pdf/**` (react-pdf con su propio sistema)
+  - `**/*.test.*` (tests)
+- **Modo inicial**: `warn` durante TASK-265 + TASK-407/408 (no bloquea CI mientras migra el sweep)
+- **Modo final**: `error` post cierre TASK-408 (CI bloquea regresiones)
+
+#### 5b. Hardening de skill `greenhouse-ux-writing`
+
+- Reforzar `description` con triggers explícitos: "labels", "tooltips", "empty states", "error messages", "snackbar", "drawer titles", "form helpers", "copy en español", "microcopy"
+- Agregar mención dura en `CLAUDE.md` Conventions: "Antes de escribir cualquier string visible al usuario en JSX (label, placeholder, title, alert, snackbar, empty state, error message), invocar `greenhouse-ux-writing` para validar tono + revisar si existe en `greenhouse-nomenclature.ts` o en la capa dictionary-ready"
+- Cross-link explícito skill ↔ `greenhouse-nomenclature.ts` ↔ foundation dictionary-ready (Slice 2)
+
+#### 5c. Checklist row en `greenhouse-ui-review`
+
+Agregar un punto al pre-commit checklist de la skill `greenhouse-ui-review`:
+
+> "**Microcopy**: ¿algún string visible al usuario quedó hardcoded en JSX? Si sí, ¿está justificado con `eslint-disable` o debe migrar a `greenhouse-nomenclature.ts` / capa dictionary-ready? Invocar `greenhouse-ux-writing` para validar tono."
+
+Backstop si la rule (5a) tiene false negatives o si el agente bypassea.
+
+#### 5d. Hook PostToolUse opcional (defense-in-depth)
+
+`.claude/settings.json` hook que detecta edits en archivos `src/views/**`, `src/components/**` y emite recordatorio: "Recordá que strings de UI deben venir de `greenhouse-nomenclature.ts` o de la capa dictionary-ready, no hardcoded. La skill `greenhouse-ux-writing` valida el tono."
+
+Es defensa secundaria — la rule (5a) hace el trabajo principal.
+
+#### Coordinación con TASK-407/408
+
+- TASK-265 cierra con rule en `warn` → CI no bloquea, pero developers/agentes ven warnings al lintar
+- TASK-407 ejecuta sweep shared shell (arrays meses, CTAs base, empty/error/loading) → warnings bajan
+- TASK-408 ejecuta sweep notifications + emails → warnings bajan
+- **Cierre TASK-408** promueve la rule a `error`. CI bloquea cualquier regresión
+
+Mismo flujo verificado y exitoso en TASK-567 (warn → 311 warnings → sweep → 0 → error).
+
 ### Slice 4 — Kortex copy adapter (exploratorio, no bloqueante)
 
 Este slice es **exploratorio/documental**, no entregable de código. No hay consumer Kortex ejecutándose que valide el contrato; forzar un adapter completo en esta lane genera over-engineering contra un target hipotético.
@@ -268,6 +350,22 @@ La regla objetivo es esta:
 - [ ] `greenhouse-nomenclature.ts` decremented: removidas las categorías que no son product nomenclature ni navegación (si aplica sin romper runtime; si no, queda el plan de deprecation).
 - [ ] Documento en `docs/architecture/GREENHOUSE_UI_PLATFORM_V1.md` con el contrato canónico y ejemplos de código para los 3 casos (product nomenclature / shared microcopy / local domain copy).
 
+### Entregables Slice 5 (gate operativo)
+
+- [ ] `eslint-plugins/greenhouse/rules/no-untokenized-copy.mjs` creada siguiendo patrón AST vanilla de `no-hardcoded-fontfamily` (TASK-567).
+- [ ] Rule registrada en `eslint-plugins/greenhouse/index.mjs` y aplicada en `eslint.config.mjs` con scope `src/views/**`, `src/components/**`, `src/app/**` y excludes documentados.
+- [ ] Rule activa en modo `warn` al cierre de TASK-265.
+- [ ] Skill `greenhouse-ux-writing`: description reforzada con triggers explícitos; bidirectional cross-link con nomenclature.ts y dictionary-ready foundation.
+- [ ] `CLAUDE.md` Conventions: mención dura "antes de escribir cualquier string visible, invocar `greenhouse-ux-writing`".
+- [ ] Skill `greenhouse-ui-review`: checklist row "Microcopy" agregado.
+- [ ] (Opcional) Hook PostToolUse en `.claude/settings.json` que recuerde la regla al editar archivos UI.
+- [ ] Test smoke con `RuleTester` para los patterns dominantes (label/placeholder/title con literal vs token reference) — opcional pero recomendado para evitar regresión de la rule misma.
+
+### Coordinación con TASK-407 / TASK-408 (promote a error mode)
+
+- [ ] TASK-407 + TASK-408 documentadas con la dependencia: cuando TASK-408 cierre, su Closing Protocol debe incluir "promover `greenhouse/no-untokenized-copy` a `error` en `eslint.config.mjs` y verificar `pnpm lint` clean".
+- [ ] Snapshot inicial de warnings emitidos por la rule registrado en `Handoff.md` al cierre de TASK-265. Las child tasks (407/408) usan ese baseline para medir progreso del sweep.
+
 ### Medibles — diferidos a child tasks
 
 Los hard numbers de reducción de hardcodes viven en las derivadas:
@@ -286,8 +384,11 @@ Los hard numbers de reducción de hardcodes viven en las derivadas:
 ## Closing Protocol
 
 - [ ] Actualizar `docs/architecture/GREENHOUSE_UI_PLATFORM_V1.md` con la regla canónica de copy system.
-- [ ] Ejecutar chequeo de impacto cruzado sobre tasks que referencian `greenhouse-nomenclature.ts`, en especial `TASK-116` y `TASK-264`.
+- [ ] Ejecutar chequeo de impacto cruzado sobre tasks que referencian `greenhouse-nomenclature.ts`, en especial `TASK-116`, `TASK-264`, `TASK-407`, `TASK-408`.
 - [ ] Dejar explícito en `Handoff.md` qué parte del contrato verbal queda reusable para Kortex.
+- [ ] Documentar en `Handoff.md` el snapshot inicial de warnings emitidos por `greenhouse/no-untokenized-copy` (baseline para TASK-407/408).
+- [ ] Verificar que `pnpm lint` corre la rule y emite warnings (no errors) al cierre de TASK-265 — gate establecido pero no bloqueante hasta cierre TASK-408.
+- [ ] Actualizar TASK-407 y TASK-408 con la dependencia "Closing Protocol promueve `no-untokenized-copy` a error mode + verifica lint clean".
 
 ## Follow-ups
 

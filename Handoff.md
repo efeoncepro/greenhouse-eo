@@ -1,5 +1,20 @@
 # Handoff.md
 
+## Sesion 2026-05-02 — Microcopy governance integrada a TASK-265 (no se creó task duplicada)
+
+- **Pregunta operativa**: agentes AI tienden a hardcodear copy en JSX ignorando la skill `greenhouse-ux-writing`. Causa raíz: skill es opt-in, no hay enforcement mecánico.
+- **Inventario antes de proponer task nueva** (mismo principio que aplicamos en design-tokens audit antes de redactar ADR): el programa de microcopy governance YA EXISTE — TASK-265 (contract + foundation) + TASK-407 (sweep shared shell) + TASK-408 (sweep notifications/emails) + epic TASK-266 (i18n umbrella) + TASK-428/429/430/431 (i18n hijos).
+- **Decisión arquitectónica**: NO crear TASK-771. Integrar el gate operativo (ESLint rule + skill hardening + checklist + hook) como **Slice 5 de TASK-265**. Razón: cuando TASK-265 cierre con la foundation dictionary-ready inicializada, el gate debe apuntar a esa foundation desde día uno. Crear el gate en task separada introduce drift entre contrato y enforcement.
+- **Patrón heredado de TASK-567** (gate antes que sweep):
+  - TASK-265 Slice 5 → gate en modo `warn` (no bloquea CI mientras migra)
+  - TASK-407 + TASK-408 → sweep migra hardcodes a la capa canónica
+  - Cierre TASK-408 → promote del gate a `error` mode (CI bloquea regresiones)
+- **Cambios aplicados**:
+  - TASK-265 con Slice 5 nuevo (5a rule, 5b skill hardening, 5c checklist `greenhouse-ui-review`, 5d hook PostToolUse opcional)
+  - TASK-407 Closing Protocol: verifica warning count baja respecto al baseline. Resuelta su Open Question sobre ESLint rule.
+  - TASK-408 Closing Protocol: promueve la rule a error mode al cierre.
+- **Skill `greenhouse-ux-writing` queda como source-of-truth de tono/wording**; la rule la complementa con enforcement mecánico, no la reemplaza.
+
 ## Sesion 2026-05-02 — TASK-567 cerrada (typography sweep + ESLint governance)
 
 - **Contexto**: tras commit de `DESIGN.md` (commit `f8fc7200`) y creación de TASK-764 (DESIGN.md hardening), el usuario pidió ejecutar TASK-567 con principio "lo más robusto, seguro, resiliente y escalable". Decisión arquitectónica: invertir el orden de la spec — gate antes que sweep — para que cualquier limpieza quede auto-protegida desde CI antes de hacerse.

@@ -133,8 +133,9 @@ Reglas obligatorias:
 ## Closing Protocol
 
 - [ ] Actualizar `Handoff.md` con resumen de migración y superficies afectadas.
-- [ ] Ejecutar chequeo de impacto cruzado sobre `TASK-116` y `TASK-266`.
+- [ ] Ejecutar chequeo de impacto cruzado sobre `TASK-116`, `TASK-266` y `TASK-408`.
+- [ ] Verificar que el contador de warnings de `greenhouse/no-untokenized-copy` (rule introducida por TASK-265 Slice 5) bajó respecto al baseline registrado al cierre de TASK-265. Si quedan 0 warnings en el scope cubierto por esta task (shared shell + componentes), documentar; si no, registrar el delta y dejar el resto a TASK-408.
 
 ## Open Questions
 
-- ¿Conviene agregar un ESLint rule que alerte sobre hardcodes de CTAs base, o basta con la disciplina de code review?
+- ~~¿Conviene agregar un ESLint rule que alerte sobre hardcodes de CTAs base, o basta con la disciplina de code review?~~ — **Resuelto 2026-05-02 vía TASK-265 Slice 5**: la rule `greenhouse/no-untokenized-copy` fue agregada al programa de TASK-265 (gate antes que sweep, mismo patrón TASK-567). Esta task ejecuta el sweep contra ese baseline.
