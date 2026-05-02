@@ -1,5 +1,37 @@
 # TASK-265 — Greenhouse Nomenclature, Dictionary & Kortex Copy Contract
 
+## Delta 2026-05-02 (tarde) — recalibración de baseline pre-ejecución
+
+Verificación full del codebase reveló drift material vs los números de la spec original (2026-04-06). Recalibración aplicada para que el agente que tome la task no parta de premisas obsoletas:
+
+**Baseline actualizado**:
+
+- `greenhouse-nomenclature.ts`: **2,733 líneas** (la spec decía 1,592 → +71% por shipping orgánico de TASK-469/487 y otras lanes que agregaron a `GH_PRICING`, `GH_NEXA`, etc.)
+- Importers: **139 archivos** (la spec decía ~94 → +48%)
+- Month arrays duplicados: **26 archivos** (la spec decía 8+ → 3.25× peor)
+- `@formatjs/intl-localematcher@0.6.2` ya está en `package.json` deps (preview de TASK-428, no usado todavía en `src/`)
+
+**Supuesto invalidado**:
+
+- La spec dice "Emails (`src/emails/*.tsx`) casi no consumen `greenhouse-nomenclature.ts`; solo `LeaveRequestPendingReviewEmail.tsx` trae un patrón manual bilingüe ad-hoc". **Realidad: 0 emails importan nomenclature**. El patrón bilingüe ad-hoc que la spec describe no existe (quizá nunca shipeó, o fue removido). TASK-408 hereda gap completo: 18 archivos email totales, ninguno conectado al canon.
+
+**Recalibración del Slice 5 (ESLint rule scope)**:
+
+Audit del codebase mostró que `label=`, `placeholder=`, `helperText=`, `title=` en TextField/Drawer/Dialog **ya están mayormente token-referenced** vía `GH_MESSAGES` (alta adopción). Apuntar la rule a esos patrones cubre poca superficie real. Los gaps reales son distintos:
+
+| Pattern | Hardcoded count | Por qué importa |
+|---|---|---|
+| `aria-label` literal en JSX | **405** | El caso dominante; accesibilidad + tokenización ausentes |
+| Status maps inline (`{ pending: { label: 'Pendiente' } }`) | **100** | `'Activo'`/`'Pendiente'`/`'Inactivo'`/`'Aprobado'`/`'Rechazado'` distribuidos en views |
+| Loading strings (`'Guardando...'`/`'Cargando...'`/`'Procesando...'`) | **94** | Drawers, dialogs, formularios |
+| Empty states (`'Sin datos'`/`'Sin resultados'`) | **31** | Top: FinanceDashboardView (7), HomeView (4) |
+
+**Total ~630 strings residuales** distribuidos así, no en los `label=` originalmente apuntados.
+
+**Reescope del Slice 5a**: la rule `greenhouse/no-untokenized-copy` debe priorizar — en este orden de impacto — `aria-label`, status maps, loading strings, empty states. Los `label`/`placeholder`/`helperText`/`title` siguen siendo cubiertos pero como cobertura secundaria.
+
+**Sin blockers de producto adicionales**: el ADR de paleta (TASK-368) ya está cerrado; la skill `greenhouse-ux-writing` ya define tono/voice. La task es ejecutable directo cuando se tome — partiendo del baseline correcto.
+
 ## Delta 2026-05-02 — Slice 5 agregado: gate operativo (ESLint + skill hardening)
 
 Triggered por observación operativa: agentes AI tienden a hardcodear copy en JSX ignorando la skill `greenhouse-ux-writing`. La causa raíz es que la skill es **opt-in** y no hay enforcement mecánico.
