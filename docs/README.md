@@ -7,6 +7,7 @@ Indice maestro de la documentacion no operativa del repo.
 1. Volver a la raiz para contexto operativo inmediato:
    - [README.md](../README.md)
    - [AGENTS.md](../AGENTS.md)
+   - [DESIGN.md](../DESIGN.md)
    - [project_context.md](../project_context.md)
    - [Handoff.md](../Handoff.md)
 2. Entrar a la categoria de documentacion que corresponda al trabajo.

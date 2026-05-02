@@ -75,6 +75,7 @@ Regla: módulos de dominio extienden estos objetos, no crean identidades paralel
 ## Key Docs
 
 - `AGENTS.md` — reglas operativas completas, branching, deploy, coordinación, PostgreSQL access
+- `DESIGN.md` — contrato visual compacto para agentes; leerlo cuando el cambio toque UI, UX, tipografía, color, spacing o selección de componentes
 - `project_context.md` — arquitectura, stack, decisiones, restricciones (documento vivo con deltas)
 - `Handoff.md` — trabajo en curso, riesgos, próximos pasos
 - `docs/tasks/README.md` — pipeline de tareas `TASK-###` y legacy `CODEX_TASK_*`

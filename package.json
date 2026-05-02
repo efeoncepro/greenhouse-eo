@@ -8,6 +8,9 @@
     "dev": "next dev --turbopack",
     "prebuild": "pnpm build:icons && pnpm catalog:check",
     "build": "node scripts/run-next-build.mjs",
+    "design:lint": "design.md lint DESIGN.md",
+    "design:diff": "design.md diff DESIGN.md DESIGN.prev.md",
+    "design:export:tailwind": "design.md export --format tailwind DESIGN.md",
     "start": "node scripts/run-next-start.mjs",
     "prelint": "pnpm build:icons",
     "lint": "eslint .",
@@ -223,6 +226,7 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.5",
     "@eslint/js": "9.39.4",
+    "@google/design.md": "^0.1.1",
     "@iconify-json/logos": "^1.2.10",
     "@iconify/json": "2.2.408",
     "@iconify/tools": "4.1.4",

@@ -163,6 +163,29 @@ El portal no busca reemplazar Notion ni HubSpot. Su rol es exponer lectura ejecu
 - PNPM
 - Vercel como plataforma de deploy
 
+## Contrato visual para agentes
+
+El repo ahora versiona `DESIGN.md` en la raiz como contrato de diseño legible por agentes. Resume el baseline visual real de Greenhouse sobre el runtime actual:
+
+- `Poppins` para display controlado
+- `Geist` para product UI base
+- tokens de color, spacing, radius y componentes alineados al theme activo
+
+CLI oficial integrada localmente:
+
+```bash
+pnpm design:lint
+pnpm design:diff
+pnpm design:export:tailwind
+```
+
+Instalacion global opcional:
+
+```bash
+npm install -g @google/design.md
+design.md lint DESIGN.md
+```
+
 ## Fuentes de datos y contratos
 
 El portal opera con dos capas de datos complementarias:

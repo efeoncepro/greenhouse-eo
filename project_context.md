@@ -1,3 +1,23 @@
+## Delta 2026-05-01 DESIGN.md adoption for agent-facing UI contract
+
+- El repo ahora versiona `DESIGN.md` en la raiz como contrato visual legible por agentes.
+- `DESIGN.md` no reemplaza `docs/architecture/GREENHOUSE_DESIGN_TOKENS_V1.md`: la arquitectura/token doc sigue siendo la fuente canónica extensa; `DESIGN.md` funciona como capa portátil y compacta para herramientas y agentes que leen contexto de repo.
+- La baseline declarada en `DESIGN.md` queda alineada al runtime actual:
+  - `Poppins` para display controlado
+  - `Geist Sans` para body, tablas, formularios, labels, KPIs, IDs y montos
+  - máximo 2 familias activas por surface
+  - `DM Sans`, `Inter` y familias monospace quedan fuera del baseline
+- El CLI oficial `@google/design.md` queda integrado localmente via `package.json`:
+  - `pnpm design:lint`
+  - `pnpm design:diff`
+  - `pnpm design:export:tailwind`
+- Regla operativa nueva para trabajo UI: además de `AGENTS.md`, `CLAUDE.md`, `full-version`, Vuexy docs y arquitectura relevante, los agentes deben leer `DESIGN.md` antes de generar o refactorizar UI visible.
+- Convencion de mantenimiento:
+  - `DESIGN.md` evoluciona cada vez que cambia el contrato visual real del producto
+  - primero cambia/decide runtime, luego se sincroniza `DESIGN.md`, luego se corre `pnpm design:lint`
+  - si el cambio es estructural, tambien se sincroniza `docs/architecture/GREENHOUSE_DESIGN_TOKENS_V1.md`
+  - `DESIGN.md` no debe contener estado especulativo o futuro no aprobado
+
 ## Delta 2026-05-01 Payment Orders como modulo de Tesoreria/Finance
 
 - Se definio arquitectura nueva para `Payment Orders` en `docs/architecture/GREENHOUSE_PAYMENT_ORDERS_ARCHITECTURE_V1.md`.

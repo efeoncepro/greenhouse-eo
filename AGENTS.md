@@ -79,7 +79,7 @@ Estos CLIs estan autenticados localmente. Cuando una task toca su dominio, **usa
   - revisar `docs/architecture/GREENHOUSE_POSTGRES_CANONICAL_360_V1.md`
   - correr `pnpm pg:doctor` antes de asumir que el acceso esta sano
 - Si una task del sistema contradice la arquitectura vigente, no implementarla tal cual; corregir primero la task o documentar la nueva decision arquitectonica.
-- Si el cambio es UI, UX o seleccion de componentes, usar como criterio operativo los skills locales vigentes (`greenhouse-agent`, `greenhouse-portal-ui-implementer`, `greenhouse-ui-orchestrator` o `greenhouse-vuexy-ui-expert`) y revisar `full-version` junto con la documentacion oficial de Vuexy antes de inventar componentes nuevos.
+- Si el cambio es UI, UX o seleccion de componentes, usar como criterio operativo los skills locales vigentes (`greenhouse-agent`, `greenhouse-portal-ui-implementer`, `greenhouse-ui-orchestrator` o `greenhouse-vuexy-ui-expert`), revisar `full-version` junto con la documentacion oficial de Vuexy antes de inventar componentes nuevos y leer `DESIGN.md` en raiz como contrato visual legible por agentes.
 - Si el cambio crea o modifica skills locales para agentes:
   - skills de Codex viven en `.codex/skills/<skill-name>/SKILL.md`
   - skills de Claude viven en `.claude/skills/<skill-name>/SKILL.md` (mayuscula — convencion oficial vigente de Claude/Agent Skills)
