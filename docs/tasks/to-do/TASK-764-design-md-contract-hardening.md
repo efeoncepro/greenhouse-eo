@@ -1,5 +1,28 @@
 # TASK-764 — DESIGN.md Contract Hardening (CI gate + spec sync + token hygiene + agent injection)
 
+## Delta 2026-05-02 — Audit de Design Tokens completado
+
+Antes de implementar la task, se ejecutó audit transversal de Design Tokens documentado en [docs/audits/design-tokens/DESIGN_TOKENS_AUDIT_2026-05-02.md](../../audits/design-tokens/DESIGN_TOKENS_AUDIT_2026-05-02.md). El audit detectó **14 drift items** entre `DESIGN.md` (raíz), `GREENHOUSE_DESIGN_TOKENS_V1.md` y runtime real:
+
+- 🔴 **3 críticos** — conflicto de paleta primaria/secundaria/info entre los tres planos. Requiere ADR de decisión de producto antes de continuar (bloqueante).
+- 🟡 **5 medios** — version header V1 desactualizado, 14 customColors no documentados, component contracts cuantitativos faltan en V1, 16 paleta tokens DESIGN.md ausentes en V1 (= los 16 warnings actuales del linter), color drift en charts.
+- 🟢 **6 bajos** — variants semánticos sub-utilizados (TASK-021 follow-up), fontWeight hardcoded 140+ instances, naming snake-case ↔ camelCase, cross-ref asimétrico, info color ausente en DESIGN.md, DM Sans residual en zonas excluidas legítimamente.
+
+**Plan de resolución** (5 fases, ~2.5 días bloqueantes + 1-3 días opcionales):
+
+1. **Fase 1** — Decisión paleta (ADR) → bloquea todo. Recomendación: runtime es source-of-truth, V1 actualiza valores.
+2. **Fase 2** — Reconciliación V1 docs (header bump 1.4, customColors §8.3, component contracts §4.2, info en DESIGN.md).
+3. **Fase 3** — Cierre design:lint warnings (16 → 0) referenciando tokens en component contracts. Activar strict mode.
+4. **Fase 4** — Cross-ref V1 ↔ DESIGN.md + actualizar nota TASK-567 en V1 §3.2.
+5. **Fase 5** — Deuda de adopción → vive en TASK-021 (variants + fontWeight) y TASK-770 nueva (charts + customColors orphans).
+
+Los Slices originales 1-6 de la task se mantienen pero con scope concreto:
+
+- Slice 1 (CI gate) sigue igual.
+- **Slice 2** (sync DESIGN.md ↔ V1) ahora cubre drift items #1-9, #13-14 con el plan de Fases 1-2-4.
+- **Slice 3** (resolver 16 warnings) ahora se mapea 1:1 con drift item #7 (los 16 tokens DESIGN.md ausentes en V1).
+- Slices 4-6 sin cambios.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
