@@ -4355,6 +4355,17 @@ export interface GreenhouseFinancePaymentOrders {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseFinancePaymentOrderStateTransitions {
+  actor_user_id: string | null;
+  from_state: string;
+  metadata_json: Generated<Json>;
+  occurred_at: Generated<Timestamp>;
+  order_id: string;
+  reason: string | null;
+  to_state: string;
+  transition_id: string;
+}
+
 export interface GreenhouseFinancePaymentProviderCatalog {
   /**
    * Subset of greenhouse_finance instrument categories this provider can serve. Used by admin UI to filter the provider dropdown by current category. Extend (don't branch) when a new wallet category ships.
@@ -7826,6 +7837,7 @@ export interface DB {
   "greenhouse_finance.payment_obligations": GreenhouseFinancePaymentObligations;
   "greenhouse_finance.payment_order_artifacts": GreenhouseFinancePaymentOrderArtifacts;
   "greenhouse_finance.payment_order_lines": GreenhouseFinancePaymentOrderLines;
+  "greenhouse_finance.payment_order_state_transitions": GreenhouseFinancePaymentOrderStateTransitions;
   "greenhouse_finance.payment_orders": GreenhouseFinancePaymentOrders;
   "greenhouse_finance.payment_provider_catalog": GreenhouseFinancePaymentProviderCatalog;
   "greenhouse_finance.products": GreenhouseFinanceProducts;

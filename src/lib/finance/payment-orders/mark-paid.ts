@@ -8,6 +8,7 @@ import type { PaymentOrder } from '@/types/payment-orders'
 
 import { PaymentOrderConflictError, PaymentOrderValidationError } from './errors'
 import { mapOrderRow, type OrderRow } from './row-mapper'
+import { recordPaymentOrderStateTransition } from './state-transitions-audit'
 import { assertSourceAccountForPaid } from './transitions'
 
 export interface MarkPaymentOrderPaidInput {
@@ -103,6 +104,25 @@ export async function markPaymentOrderPaid(
     }
 
     const order = mapOrderRow(updated.rows[0])
+
+    // TASK-765 Slice 6: audit log append-only de la transicion. Va dentro
+    // de la misma tx que el UPDATE — si commitea, ambos commitean; si falla,
+    // ambos rollback. Garantia: nunca queda paid en payment_orders sin
+    // su contraparte en payment_order_state_transitions.
+    await recordPaymentOrderStateTransition(
+      {
+        orderId: order.orderId,
+        fromState: 'submitted',
+        toState: 'paid',
+        actorUserId: input.paidBy,
+        reason: 'mark_paid',
+        metadata: {
+          externalReference: input.externalReference ?? null,
+          sourceAccountId: order.sourceAccountId ?? null
+        }
+      },
+      c
+    )
 
     const eventId = await publishOutboxEvent(
       {
