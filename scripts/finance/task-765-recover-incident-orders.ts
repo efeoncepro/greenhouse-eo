@@ -35,7 +35,7 @@ const SOURCE_ACCOUNT_ID = 'santander-clp' // confirmado por usuario
 const ACTOR_USER_ID = 'system:recovery_TASK-765'
 const REASON = 'recovery_TASK-765_incident_2026-05-01'
 
-interface OrderRow {
+interface OrderRow extends Record<string, unknown> {
   order_id: string
   state: string
   payment_method: string | null
@@ -46,7 +46,7 @@ interface OrderRow {
   currency: string
 }
 
-interface LineRow {
+interface LineRow extends Record<string, unknown> {
   line_id: string
   obligation_id: string
   amount: number | string
