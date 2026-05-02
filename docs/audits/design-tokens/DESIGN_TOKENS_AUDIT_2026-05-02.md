@@ -1,11 +1,25 @@
 # Greenhouse Design Tokens — Auditoría 2026-05-02
 
 > **Tipo de documento:** Auditoría técnica
-> **Versión:** 1.0
+> **Versión:** 1.1
 > **Fecha:** 2026-05-02
 > **Ejecutado por:** Claude Opus 4.7 (1M context) en sesión sobre TASK-567
 > **Scope:** Tres dimensiones — V1 spec ↔ runtime, DESIGN.md ↔ V1 spec, consumo real en codebase
 > **Trigger:** Preparación de TASK-764 (DESIGN.md Contract Hardening). Antes de implementar el CI gate, sync con spec V1 y resolución de los 16 warnings de `pnpm design:lint`, se requería inventario concreto del drift actual.
+
+## Update v1.1 — 2026-05-02 (tarde)
+
+Verificación post-audit reveló que **el ADR de paleta canónica YA existe**: `docs/architecture/GREENHOUSE_THEME_TOKEN_CONTRACT_V1.md` (TASK-368, 2026-04-11). Esa spec §1.4 dice textualmente: "mergedTheme es la fuente de verdad porque es lo que el usuario ve". Esto **es la Opción A** ya formalizada hace 3 semanas.
+
+Implicaciones:
+
+- **Drift #1, #2, #3, #14 NO requieren decisión nueva** — la decisión está tomada. Solo hay que sincronizar `GREENHOUSE_DESIGN_TOKENS_V1.md` con `GREENHOUSE_THEME_TOKEN_CONTRACT_V1.md`.
+- **`info.main = #0375DB`** (Core Blue) es decisión consciente documentada en THEME_TOKEN_CONTRACT §1.4: "mergedTheme overridea info a coreBlue; GH_COLORS coincide con el override, no con la base". No es leftover Vuexy.
+- **`primaryColorConfig.ts`** soporta multi-tenant via 7 paletas Efeonce predefinidas (Core Blue default + Royal/Azure/Midnight/Lime/Sunset/Crimson) y acepta hex arbitrario vía `settings.primaryColor`. Multi-tenant ya operativo.
+- **`secondary.main = #023C70`** (navy) en runtime corresponde a `efeonce-azure.main` del catálogo Efeonce — coherente con la paleta institucional, no es drift accidental.
+- **Fase 1 del plan** colapsa de "1-2 días ADR" a "0.25 días sync de specs".
+
+Acción: las Fases 2-4 originales se reordenan; el plan total baja de ~2.5 días a ~1 día humano para el flanco bloqueante.
 
 ---
 

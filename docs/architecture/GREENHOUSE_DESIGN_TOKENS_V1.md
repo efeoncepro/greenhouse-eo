@@ -1,9 +1,30 @@
 # Greenhouse EO — Design Tokens V1
 
-> **Version:** 1.0
+> **Version:** 1.4
 > **Created:** 2026-04-19 (TASK-488)
+> **Last updated:** 2026-05-02 (audit reconciliation, TASK-764 prep)
 > **Audience:** Frontend engineers, UI/UX architects, AI agents (Claude + Codex), designers extending the system
 > **Source of truth status:** CANONICAL. Any component, view, or pattern that drifts from this document is incorrect and must be corrected or the doc updated with explicit rationale.
+> **Runtime authority:** `src/components/theme/mergedTheme.ts` — when this doc and runtime disagree on a hex value, **runtime wins** and this doc updates. Decision formalized in [`GREENHOUSE_THEME_TOKEN_CONTRACT_V1.md`](GREENHOUSE_THEME_TOKEN_CONTRACT_V1.md) §1.4.
+> **Agent-facing contract:** [`DESIGN.md`](../../DESIGN.md) (root) — compact `@google/design.md` v0.1.0 format derivative of this spec.
+
+## Delta 2026-05-02 — Audit reconciliation (v1.4)
+
+Ejecutado audit transversal documentado en [`docs/audits/design-tokens/DESIGN_TOKENS_AUDIT_2026-05-02.md`](../audits/design-tokens/DESIGN_TOKENS_AUDIT_2026-05-02.md). Reconciliaciones aplicadas en este bump:
+
+- **Color drift cerrado** (drift items #1-3, #14): valores de `secondary.main` y `info.main` actualizados a runtime real (`#023C70` navy y `#0375DB` Core Blue respectivamente). Decisión heredada de `GREENHOUSE_THEME_TOKEN_CONTRACT_V1.md` §1.4 (runtime es source-of-truth).
+- **`primary.main` runtime-driven**: declarado explícitamente como delegado a `settings.primaryColor` con default `#0375DB` (Core Blue). Catálogo Efeonce de 7 paletas en `src/configs/primaryColorConfig.ts` (efeonce-core, efeonce-royal, efeonce-azure, efeonce-midnight, efeonce-lime, efeonce-sunset, efeonce-crimson).
+- **`palette.customColors.*` documentado** (drift item #5): nueva sección §8.3 lista los 14 tokens semánticos Greenhouse con valor + uso esperado + adopción real medida (audit 2026-05-02). 7 con adopción confirmada (midnight 52 usos, lightAlloy 41 usos, etc.). 7 con 0 usos marcados como orphan candidates → cleanup en TASK-770.
+- **Component padding contracts** (drift item #6): nueva §4.2 con paddings/heights cuantitativos (button 12px, card 24px, input height 40px, status-chip 8px). Match con DESIGN.md y runtime.
+- **TASK-567 scope-out documentado** (drift item #9): §3.4 actualizado — DM Sans residual en `src/app/global-error.tsx`, `src/emails/constants.ts`, `src/@core/theme/typography.ts` son excepciones legítimas (pre-theme/email/Vuexy primitive), no drift.
+- **Cross-reference DESIGN.md ↔ V1** (drift item #8): §16 actualizado.
+- **Mapping bilateral naming** (drift item #13): nueva tabla §15 mapea `numeric-id ↔ monoId`, `numeric-amount ↔ monoAmount`, `kpi-value ↔ kpiValue`, `headline-display ↔ h1`, `headline-lg ↔ h2`, `headline-md ↔ h3`, `page-title ↔ h4`, `section-title ↔ h5`, `label-md ↔ h6`, `body-lg ↔ body1`, `body-md ↔ body2`, `body-sm ↔ caption`.
+
+Drift items remanentes (no resueltos en este bump, vinculados a otras tasks):
+
+- #7 (16 paleta tokens DESIGN.md ausentes en V1) → TASK-764 Slice 3 (resolver warnings de `pnpm design:lint`)
+- #10, #11 (variants sub-utilizados, fontWeight 140+) → TASK-021 (deuda de adopción)
+- #12 (color drift en charts) → TASK-770 nueva
 
 ---
 
@@ -102,8 +123,13 @@ Base root font: `13.125px` (0.82rem, non-standard per Vuexy template). All other
 - **NEVER** uses `fontFamily: 'monospace'` (literal o vía stacks tipo `'Menlo, Consolas, monospace'`). Para alinear cifras usar `fontVariantNumeric: 'tabular-nums'` sobre Geist.
 - **NEVER** declare `fontFamily` inline en componentes nuevos. Geist es default implícito; Poppins se aplica solo por las variants `h1-h4` ya tipadas en el theme.
 - **NEVER** introduce Geist Mono ni ninguna familia mono separada — los variants `monoId` y `monoAmount` resuelven el caso sobre Geist Sans + tabular-nums.
-- **NEVER** mantener referencias activas a `var(--font-inter)` o `'Inter'` literal en código nuevo. Las residuales se barren en `TASK-567`.
-- **NEVER** mantener referencias activas a `var(--font-dm-sans)` o a `'DM Sans'` en código nuevo. Las residuales en `src/components/greenhouse/*`, `src/views/**/styles.module.css`, `src/app/global-error.tsx` y `src/lib/finance/pdf/**` se barren en `TASK-567` (sweep + ESLint rule) y `TASK-568` (emails + PDFs).
+- **NEVER** mantener referencias activas a `var(--font-inter)` o `'Inter'` literal en código nuevo. TASK-567 cerró el sweep en UI productiva (2026-05-02): 0 referencias a Inter en `src/views/**`, `src/components/**`, `src/app/**`. La regla ESLint `greenhouse/no-hardcoded-fontfamily` (modo `error`) bloquea regresiones desde CI.
+- **NEVER** mantener referencias activas a `var(--font-dm-sans)` o a `'DM Sans'` en código nuevo. TASK-567 cerró el sweep. Quedan **excepciones legítimas documentadas** (NO drift):
+  - `src/app/global-error.tsx` — corre antes que el theme MUI cargue, necesita literal CSS
+  - `src/emails/constants.ts` — emails con webfont fallback fuera del shell MUI
+  - `src/@core/theme/typography.ts` — Vuexy primitive read-only por regla dura
+  - `src/lib/finance/pdf/**` — react-pdf con su propio sistema de fonts
+  Estas zonas están excluidas del scope de la rule ESLint en `eslint.config.mjs`. Cualquier nuevo archivo fuera de esas zonas que introduzca DM Sans falla CI.
 - **NEVER** introduce una tercera familia (Geist Mono, IBM Plex Mono, JetBrains Mono, etc.) para montos, IDs o code samples. `monoId` / `monoAmount` resuelven ambos casos sin agregar fuente.
 - **NEVER** set `fontSize` inline. Use variants.
 - **NEVER** exceed 2 font families in a single surface (regla operativa modern-ui).
@@ -192,6 +218,20 @@ With base root 16px: `spacing(n) = 4n px`.
 - Do not use raw px in `sx={{ padding: '16px' }}`. Use `sx={{ p: 4 }}` → spacing(4) → 16px.
 - Do not create custom spacing values (e.g., `sx={{ p: 2.75 }}` → 11px). Stick to the scale.
 - Exception: button padding comes from MUI theme overrides (already defined). Do not re-set padding on Button.
+
+### 4.4 Component padding contracts (quantitative)
+
+These cuantitative contracts mirror DESIGN.md root and reflect runtime theme overrides. **Do not redefine inline** — use the component primitives, the theme applies these automatically.
+
+| Component | Padding | Height | Border radius | Source |
+|---|---|---|---|---|
+| `button-primary` / `button-secondary` | 12px | — | `md` (6px) | MUI Button override + DESIGN.md |
+| `card-default` | 24px | — | `md` (6px) | `MuiCardContent` override |
+| `card-floating` | 24px | — | `lg` (8px) | Drawers, dialogs, sticky docks |
+| `input-default` | 12px | 40px | `md` (6px) | `CustomTextField` primitive |
+| `status-chip` | 8px | — | `md` (6px) | `MuiChip` override |
+
+**Why explicit**: agents and contributors reading this spec previously had to grep `mergedTheme.ts` styleOverrides to discover button/input padding. Now declared canonically here for fast lookup. Runtime remains source-of-truth — if mergedTheme drifts from this table, update this table to match.
 
 ## 5. Border radius
 
@@ -285,20 +325,66 @@ MUI 24-step shadow scale in `src/@core/theme/shadows.ts`. Per-color custom shado
 
 ## 8. Color system
 
-Defined in `src/@core/theme/colorSchemes.ts`. Six semantic colors + neutral.
+Three layers compose the effective palette (see `GREENHOUSE_THEME_TOKEN_CONTRACT_V1.md` §1.1):
 
-### 8.1 Palette
+1. **Vuexy base** in `src/@core/theme/colorSchemes.ts` (lowest priority, ~60 tokens including opacities)
+2. **Greenhouse overrides + customColors** in `src/components/theme/mergedTheme.ts` (brand identity)
+3. **Runtime override** via `CustomThemeProvider` consuming `settings.primaryColor` from `src/configs/primaryColorConfig.ts` (per-tenant accent)
+
+**Runtime is source-of-truth**: when this doc and `mergedTheme.ts` disagree on a hex, runtime wins (TASK-368 contract).
+
+### 8.1 Palette (effective runtime values)
 
 | Token | Hex | Brand meaning | Usage |
 |---|---|---|---|
-| `primary.main` | `#7367F0` (Vuexy purple) | Brand identity | CTAs, active state, filled chips, links |
-| `secondary.main` | `#808390` (gray) | Neutral | Tonal secondary CTAs, metadata, disabled |
-| `success.main` | `#6ec207` (neon lime) | Healthy / optimal | KPI óptimo, margin healthy, task complete |
-| `warning.main` | `#ff6500` (sunset orange) | Attention | Margin warning, expiring soon, approaching limit |
-| `error.main` | `#bb1954` (crimson magenta) | Critical / blocked | Validation fail, margin critical, quote expired |
-| `info.main` | `#00BAD1` (cyan) | Informational | Neutral info, template applied, non-critical state |
+| `primary.main` | runtime-driven, default `#0375DB` (Core Blue) | Brand identity | CTAs, active state, filled chips, links |
+| `secondary.main` | `#023C70` (Efeonce azure / deep navy) | Structural | Navigation depth, emphasis blocks, structural CTAs |
+| `success.main` | `#6EC207` (neon lime) | Healthy / optimal | KPI óptimo, margin healthy, task complete |
+| `warning.main` | `#FF6500` (sunset orange) | Attention | Margin warning, expiring soon, approaching limit |
+| `error.main` | `#BB1954` (crimson magenta) | Critical / blocked | Validation fail, margin critical, quote expired |
+| `info.main` | `#0375DB` (Core Blue) | Informational | Neutral info, template applied, non-critical state |
+
+**`primary.main` runtime selection**: the active primary is whatever `settings.primaryColor` resolves to. Default for un-configured tenants is the first entry of `primaryColorConfig.ts`: `efeonce-core` (`#0375DB`). Per-tenant brands (Globe clients, etc.) can override via the customizer or persisted settings.
+
+**Approved Efeonce primary palette** (catalog in `src/configs/primaryColorConfig.ts`):
+
+| Name | Light | Main | Dark | When to use |
+|---|---|---|---|---|
+| `efeonce-core` | `#3691E3` | `#0375DB` | `#024C8F` | Default (Greenhouse / Efeonce internal) |
+| `efeonce-royal` | `#0375DB` | `#024C8F` | `#023C70` | Branded tenant (deeper accent) |
+| `efeonce-azure` | `#024C8F` | `#023C70` | `#022A4E` | Matches `secondary.main` — avoid as primary unless intentional |
+| `efeonce-midnight` | `#023C70` | `#022A4E` | `#011A32` | High-contrast structural moments |
+| `efeonce-lime` | `#8FD139` | `#6EC207` | `#589C05` | Greenhouse positive accent (rare) |
+| `efeonce-sunset` | `#FF8533` | `#FF6500` | `#CC5100` | Warm accent (rare) |
+| `efeonce-crimson` | `#CC4477` | `#BB1954` | `#99133D` | Critical accent (rare) |
 
 Each color ships with opacities: `lighterOpacity` (8%), `lightOpacity` (16%), `mainOpacity` (24%), `darkOpacity` (32%), `darkerOpacity` (38%).
+
+### 8.1.bis customColors namespace (Greenhouse semantic layer)
+
+`mergedTheme.ts` extends `palette` with a `customColors` namespace (14 tokens) that names brand moments not covered by MUI semantic colors. These are **canonical for Greenhouse** but not part of MUI standard palette.
+
+**Adopted (audit 2026-05-02 — usage count in `src/views/**`, `src/components/**`, `src/app/**`):**
+
+| Token | Hex | Use |
+|---|---|---|
+| `customColors.midnight` | `#022A4E` | Deep navy backgrounds, structural emphasis (52 uses) |
+| `customColors.lightAlloy` | `#DBDBDB` | Subtle borders, dividers (41 uses) |
+| `customColors.coreBlue` | `#0375DB` | Brand accents (mirror of `info.main`) |
+| `customColors.deepAzure` | `#023C70` | Mirror of `secondary.main` for contexts where brand naming reads better |
+| `customColors.royalBlue` | `#024C8F` | Mid-stop in the blue ramp |
+| `customColors.neonLime` | `#6EC207` | Mirror of `success.main` for chart/brand contexts |
+| `customColors.sunsetOrange` | `#FF6500` | Mirror of `warning.main` |
+| `customColors.crimson` | `#BB1954` | Mirror of `error.main` |
+| `customColors.bodyText` | tied to `text.primary` | Body text in non-MUI primitives |
+| `customColors.secondaryText` | tied to `text.secondary` | Helpers in non-MUI primitives |
+| `customColors.claimGray` | `#848484` | Disabled / muted text in non-MUI primitives |
+
+**Orphan candidates (0 uses at audit 2026-05-02 — cleanup in TASK-770):**
+
+`customColors.bodyBg`, `customColors.chatBg`, `customColors.greyLightBg`, `customColors.inputBorder`, `customColors.tableHeaderBg`, `customColors.tooltipText`, `customColors.trackBg`.
+
+When adding a new brand moment, check this namespace first; only add a new token if no existing one fits and the new value is reused ≥3 times.
 
 ### 8.2 Usage rules (HARD RULES — violation = fail)
 
@@ -477,16 +563,65 @@ Inventoried by TASK-488 subagent 2026-04-19. Top 15 files to copy/adapt (never f
 | 1.1 | 2026-05-01 (mañana) | Claude + TASK-566 / EPIC-004 | §3 reescrita: política canónica `Poppins display + Inter base`. DM Sans retirada como baseline. `monoId` / `monoAmount` / `kpiValue` migrados a Inter + `tabular-nums` (sin monospace). Stack fallback explícito para Inter y Poppins documentado y referenciado a `layout.tsx` + `mergedTheme.ts`. Anti-pattern row de monospace actualizado para apuntar a Inter / variants `mono*`. |
 | 1.2 | 2026-05-01 (tarde) | Claude + TASK-566 / EPIC-004 (Delta pivot) | Pivot Inter → **Geist Sans** tras validación visual del usuario en staging (Inter "se siente plana"). Mismos pesos por variant (Poppins 600/700/800 en h1-h4, Geist 400 body, 500 helpers, 600 h5/h6/button/overline/monoId, 700 monoAmount, 800 kpiValue). Stack fallback rotado a `var(--font-geist), 'Geist', system-ui, …`. Prohibición explícita de Geist Mono y de `var(--font-inter)`/`'Inter'` literal en código nuevo. Mockup de referencia visual: `docs/mockups/typography-inter-vs-geist-mockup.html`. |
 | 1.3 | 2026-05-01 (tarde) | Claude + TASK-566 / EPIC-004 (line-height namespace + calibración Geist) | **Cambio arquitectónico**: introducción del namespace canónico de line-height tokens (§3.6), accesible vía `theme.lineHeights.<token>`. Implementación: `src/components/theme/typography-tokens.ts` (tokens canónicos `display` 1.05, `heading` 1.25, `pageTitle` 1.4, `metadata` 1.45, `body` 1.5, `numericDense` 1.54), type augmentation en `types.ts`, theme expone `lineHeights` para uso runtime. **Toda variant del theme que necesite line-height referencia un token**, cero magic numbers en `mergedTheme.ts`. Calibración Geist absorbida por los tokens: `h5/h6/subtitle1` ahora consumen `body` (= 1.5, antes coretheme 1.467/1.556 leía cramped); `caption` consume `metadata` (= 1.45, antes 1.4); `h1/h2/h3` colapsan a `heading` (= 1.25, antes 1.2/1.25/1.3 graduación cosmética sin valor). Body1/body2 siguen en 1.5 (piso WCAG 1.4.12). `button`, `overline`, `subtitle2` heredan del coretheme sin override (intencional). Razón del trigger: Geist tiene x-height ligeramente más bajo que Inter/DM Sans, lo cual hace que ratios `<1.5` se sientan cramped al root 13.125px de Vuexy. Convergente con Linear / Stripe Dashboard / Vercel app que corren subtitle/h6 a 1.5 sobre Geist. **Solución robusta + escalable**: futuras calibraciones de line-height tocan 1 archivo, no N variants. |
+| 1.4 | 2026-05-02 | Claude + TASK-764 audit reconciliation | Audit transversal cerró drift items críticos vs runtime real (`mergedTheme.ts`). §8.1 actualizado: `secondary.main = #023C70` (efeonce-azure), `info.main = #0375DB` (Core Blue) reflejan runtime real, no Vuexy default. `primary.main` declarado como runtime-driven con catálogo Efeonce de 7 paletas (default `efeonce-core` Core Blue). Nueva §8.1.bis documenta `customColors` namespace (14 tokens, 7 con adopción confirmada, 7 orphan candidates → TASK-770 cleanup). Nueva §4.4 con 6 component padding contracts cuantitativos (button 12px, card 24px, input 40px, status-chip 8px). §3.4 actualizado: TASK-567 cerró sweep en UI productiva; DM Sans residual en global-error/emails/@core/PDFs documentado como excepciones legítimas (NO drift). Nueva §15.1 mapping bilateral DESIGN.md ↔ V1 (snake-case ↔ camelCase). §16 cross-ref simétrica con DESIGN.md y THEME_TOKEN_CONTRACT_V1. **Decisión runtime-as-source-of-truth heredada de THEME_TOKEN_CONTRACT_V1 §1.4** (TASK-368, 2026-04-11) — no requirió ADR nuevo. |
+
+### 15.1 Naming map — DESIGN.md ↔ V1 / runtime
+
+DESIGN.md (raíz, formato `@google/design.md`) usa nombres semánticos snake-case. V1 + runtime usan API JS camelCase (MUI variant names + custom variants). Mapping bilateral canónico:
+
+| DESIGN.md (semantic) | V1 / runtime (API) | Notas |
+|---|---|---|
+| `headline-display` | `h1` | Poppins display, 2rem |
+| `headline-lg` | `h2` | Poppins display, 1.5rem |
+| `headline-md` | `h3` | Poppins display, 1.25rem |
+| `page-title` | `h4` | Poppins display, 1rem |
+| `section-title` | `h5` | Geist, 1.125rem |
+| `label-md` | `h6` | Geist, 0.9375rem |
+| `body-lg` | `body1` | Geist, 1rem |
+| `body-md` | `body2` | Geist, 0.875rem |
+| `body-sm` | `caption` | Geist, 0.8125rem, metadata line-height |
+| `overline` | `overline` | identico |
+| `numeric-id` | `monoId` | Geist + tabular-nums, 0.875rem, 600 |
+| `numeric-amount` | `monoAmount` | Geist + tabular-nums, 0.8125rem, 700 |
+| `kpi-value` | `kpiValue` | Geist + tabular-nums, 1.75rem, 800 |
+
+Cuando un agente lee DESIGN.md y necesita el variant runtime, consulta esta tabla. Cuando el inverso: V1 → DESIGN.md, mismo mapping.
 
 ## 16. Related docs
 
-- `docs/architecture/GREENHOUSE_UI_PLATFORM_V1.md` — UI platform stack and component inventory
-- `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md` — master architecture
-- `src/@core/theme/` — live implementation
-- `src/config/greenhouse-nomenclature.ts` — copy canonical
+**Authoritative siblings**:
+
+- [`GREENHOUSE_THEME_TOKEN_CONTRACT_V1.md`](GREENHOUSE_THEME_TOKEN_CONTRACT_V1.md) — TASK-368 ADR. Establece runtime como source-of-truth en §1.4. Esta spec V1 hereda esa decisión.
+- [`DESIGN.md`](../../DESIGN.md) (root) — agent-facing compact contract en formato Google Labs `@google/design.md` v0.1.0. Derivative de esta spec V1 (extendida) — cuando este doc cambia estructuralmente, DESIGN.md también.
+
+**Architecture context**:
+
+- [`GREENHOUSE_UI_PLATFORM_V1.md`](GREENHOUSE_UI_PLATFORM_V1.md) — UI platform stack and component inventory
+- [`GREENHOUSE_ARCHITECTURE_V1.md`](GREENHOUSE_ARCHITECTURE_V1.md) — master architecture
+
+**Runtime authority**:
+
+- `src/components/theme/mergedTheme.ts` — Greenhouse overrides + customColors (canonical for hex values)
+- `src/components/theme/typography-tokens.ts` — line-height token namespace (v1.3+)
+- `src/components/theme/types.ts` — TypeScript augmentation for variants + lineHeights
+- `src/configs/primaryColorConfig.ts` — Efeonce primary palette catalog (7 colors)
+- `src/app/layout.tsx` — font loading via `next/font/google`
+- `src/@core/theme/` — Vuexy base (lowest priority, read-only by hard rule)
+
+**Audits**:
+
+- [`docs/audits/design-tokens/DESIGN_TOKENS_AUDIT_2026-05-02.md`](../audits/design-tokens/DESIGN_TOKENS_AUDIT_2026-05-02.md) — first transversal audit; informed v1.4 reconciliation
+
+**Agent skills (consume + enforce this doc)**:
+
 - `.claude/skills/modern-ui/SKILL.md` — local overlay with Greenhouse pinned decisions
 - `.claude/skills/greenhouse-ui-review/SKILL.md` — pre-commit design-time gates
 - `~/.claude/skills/greenhouse-ux/skill.md` — UX architect skill (user-level)
+
+**Adjacent code-side enforcement**:
+
+- `eslint-plugins/greenhouse/rules/no-hardcoded-fontfamily.mjs` (TASK-567) — bloquea `fontFamily` literal en UI productiva
+- `eslint-plugins/greenhouse/rules/no-raw-table-without-shell.mjs` (TASK-743) — operational data table density gate
 
 ---
 
