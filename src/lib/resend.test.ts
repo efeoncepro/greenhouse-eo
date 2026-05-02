@@ -37,10 +37,14 @@ describe('resend config', () => {
 
     const resendModule = await import('@/lib/resend')
 
-    expect(resolveSecret).toHaveBeenNthCalledWith(1, {
+    // Post-TASK-765 refactor: la resolucion ya no es top-level await.
+    // Esperar a que el cache este caliente antes de leer sync getters.
+    await resendModule.ensureResendSecretsResolved()
+
+    expect(resolveSecret).toHaveBeenCalledWith({
       envVarName: 'RESEND_API_KEY'
     })
-    expect(resolveSecret).toHaveBeenNthCalledWith(2, {
+    expect(resolveSecret).toHaveBeenCalledWith({
       envVarName: 'RESEND_WEBHOOK_SIGNING_SECRET'
     })
     expect(resendModule.getResendApiKey()).toBe('resend-secret-key')
@@ -72,6 +76,8 @@ describe('resend config', () => {
       })
 
     const resendModule = await import('@/lib/resend')
+
+    await resendModule.ensureResendSecretsResolved()
 
     expect(resendModule.getEmailFromAddress()).toBe('Efeonce Greenhouse <greenhouse@efeoncepro.com>')
     expect(resendModule.getResendApiKey()).toBeNull()

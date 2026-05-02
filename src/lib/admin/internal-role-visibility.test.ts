@@ -47,7 +47,7 @@ const TASK_727_GRANTS: Record<string, string[]> = {
     'equipo.jerarquia', 'equipo.organigrama', 'equipo.departamentos', 'equipo.asistencia',
     'equipo.objetivos', 'equipo.evaluaciones',
     'finanzas.resumen', 'finanzas.ingresos', 'finanzas.egresos', 'finanzas.conciliacion',
-    'finanzas.ordenes_pago', 'finanzas.perfiles_pago',
+    'finanzas.ordenes_pago',
     'finanzas.banco', 'finanzas.cuenta_corriente_accionista', 'finanzas.clientes',
     'finanzas.proveedores', 'finanzas.inteligencia', 'finanzas.asignaciones_costos',
     'finanzas.cotizaciones', 'finanzas.ordenes_compra', 'finanzas.hes',
@@ -142,8 +142,8 @@ describe('TASK-727: Internal role × view matrix', () => {
     expect(MI_FICHA_VIEW_CODES).toHaveLength(10)
   })
 
-  it('finanzas has 13 views', () => {
-    expect(FINANZAS_VIEW_CODES).toHaveLength(13)
+  it('finanzas has 14 views', () => {
+    expect(FINANZAS_VIEW_CODES).toHaveLength(14)
   })
 
   it('equipo has 10 views (incluye nomina_proyectada)', () => {

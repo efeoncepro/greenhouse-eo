@@ -43,6 +43,10 @@ describe('auth-secrets', () => {
 
     const authSecretsModule = await import('@/lib/auth-secrets')
 
+    // Post-TASK-765 refactor: la resolucion ya no es top-level await.
+    // Esperar a que el cache este caliente antes de leer sync getters.
+    await authSecretsModule.ensureAuthSecretsResolved()
+
     expect(authSecretsModule.getNextAuthSecret()).toBe('nextauth-secret')
     expect(authSecretsModule.getAzureAdClientSecret()).toBe('azure-client-secret')
     expect(authSecretsModule.getGoogleClientSecret()).toBe('google-client-secret')
@@ -76,6 +80,8 @@ describe('auth-secrets', () => {
       })
 
     const authSecretsModule = await import('@/lib/auth-secrets')
+
+    await authSecretsModule.ensureAuthSecretsResolved()
 
     expect(authSecretsModule.hasMicrosoftAuthProvider()).toBe(false)
   })

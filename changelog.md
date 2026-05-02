@@ -2,6 +2,22 @@
 
 ## 2026-05-02
 
+- **TASK-765 cerrada** — Payment Order ↔ Bank Settlement Resilience + Recovery del incidente 2026-05-01. Resuelve la cadena de 3 fallas estructurales que dejaron 2 `payment_orders` (Luis Reyes $148,312.50 + Humberly Henriquez $254,250.00) en `state='paid'` sin afectar Santander CLP. 8 slices entregados:
+  - **Slice 1** — Hard-gate `source_account_id` triple: CHECK constraint DB (NOT VALID, prefiltro estados terminales) + `assertSourceAccountForPaid` TS guard + UI banner warning + picker dialog en OrderDetailDrawer + tooltip explicativo en "Marcar pagada" disabled.
+  - **Slice 2** — Universal column-parity test (`expense-insert-column-parity.test.ts`) que valida 14 INSERT sites canónicos (4 tablas wide finance). Detectó y fixeó bug latente real en `createFinanceIncomeInPostgres` (45 cols vs 44 expressions) que habría reproducido el mismo error PG del incidente.
+  - **Slice 3** — Endpoint admin `POST /api/admin/finance/payroll-expense-rematerialize` (capability `finance.payroll.rematerialize`) idempotente con dryRun + outbox event `finance.payroll_expenses.rematerialized` audit-only.
+  - **Slice 4** — Resolver loud: `record-payment-from-order.ts` ahora throw + outbox `finance.payment_order.settlement_blocked` (5 reasons tipadas) en lugar de skip silencioso. `captureWithDomain(err, 'finance')` en proyecciones para dead-letter routing correcto.
+  - **Slice 5** — Atomicidad transaccional `markPaymentOrderPaidAtomic`: state=paid + audit log + per-line `recordExpensePayment(client)` + settlement_legs + outbox events DENTRO de una sola tx. Si rollback ocurre, la order vuelve a `submitted` — nunca queda zombie. Refactor `recordExpensePayment` con `client?` opcional. Proyector reactivo queda como safety net read-only.
+  - **Slice 6** — State machine hardening: tabla `payment_order_state_transitions` append-only (trigger anti-update/delete) + trigger `payment_orders_anti_zombie_trigger` valida 3 invariantes (paid_at NOT NULL + source_account_id NOT NULL + transition matrix canónica). Backfill defensivo para órdenes legacy.
+  - **Slice 7** — 3 reliability signals nuevos en `RELIABILITY_REGISTRY` (`paid_orders_without_expense_payment`, `payment_orders_dead_letter`, `payroll_expense_materialization_lag`) + UI banner reason-aware en OrderDetailDrawer con CTA "Recuperar orden".
+  - **Slice 8** — Endpoint admin `POST /api/admin/finance/payment-orders/[orderId]/recover` (capability `finance.payment_orders.recover`) + ejecución de recovery contra producción. Verificado: 2 expense_payments + 2 settlement_legs creados, banco reflejado ($402,562.50 outflow, closing $3,750,478.50 al 2026-05-02), reliability signals todos en 0.
+  - **Bonus fixes incluidos:**
+    - 4 tests preexistentes rotos resueltos (PayrollPaymentStatusCard null-safe, internal-role-visibility cardinality, people permissions tabs, creative-velocity-review post-quality-gate).
+    - **Bug shim/auth-secrets post-TASK-742 regression resuelto**: refactor `auth-secrets.ts` + `resend.ts` para eliminar top-level await que rompía tsx CLI scripts. Lazy memoized resolver pattern preserva sync API (`getNextAuthSecret`, etc) con fast-path env-first; `ensureAuthSecretsResolved()` para callers async. `pnpm finance:rematerialize-balances` y todos los demás scripts del repo ya corren correctamente.
+  - **CLAUDE.md** sección "Finance — Payment order ↔ bank settlement invariants (TASK-765)" agregada con flow diagram end-to-end + reglas duras + helpers canónicos.
+  - **GREENHOUSE_EVENT_CATALOG_V1.md** Delta 2026-05-02 con shape v1 versionado de los 2 eventos nuevos.
+  - 4 migrations nuevas, 3 helpers TS canónicos, 9 test files nuevos (83/83 verdes en scope TASK-765), 1 endpoint admin recovery + 1 endpoint admin rematerialize, 2 capabilities granulares nuevas.
+
 - **TASK-265 cerrada** — Greenhouse Nomenclature, Dictionary & Kortex Copy Contract. Entrega:
   - **Foundation locale-aware** en `src/lib/copy/` con 9 namespaces canónicos (`actions`, `states`, `loading`, `empty`, `months`, `aria`, `errors`, `feedback`, `time`). API pública: `import { getMicrocopy } from '@/lib/copy'`. Server + client compatible (no `'server-only'`).
   - **es-CL dictionary completo** seed (default canónico) + **en-US stub** que re-exporta es-CL para paridad type-safe (TASK-266 lo traduce sin tocar consumers).

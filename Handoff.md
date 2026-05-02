@@ -1,5 +1,44 @@
 # Handoff.md
 
+## Sesion 2026-05-02 — TASK-765 cerrada (Payment Order ↔ Bank Settlement Resilience + Recovery del incidente 2026-05-01)
+
+- **Lifecycle:** `complete` (movida de `in-progress/` a `complete/`)
+- **Branch:** `task/TASK-765-payment-order-bank-settlement-resilience`
+- **Slices entregados:** 1, 2, 3, 4, 5, 6, 7, 8 — todos los 8 del plan original.
+- **Recovery del incidente 2026-05-01 ejecutado contra producción:**
+  - Luis Reyes — Nomina 2026-04 (`por-66563173`): expense_payment + settlement_leg + audit log + outbox replay → $148,312.50 CLP outflow Santander CLP.
+  - Humberly Henriquez — Nomina 2026-04 (`por-596043bd`): idem → $254,250.00 CLP outflow.
+  - Total reflejado en banco: **$402,562.50 CLP**. Closing balance Santander CLP al 2026-05-02: $3,750,478.50.
+- **Reliability signals POST-recovery (verificado vía SQL):**
+  - `paid_orders_without_expense_payment`: n=0 (era 2)
+  - `payment_orders_dead_letter`: n=0 (era 1, acknowledged + recovered)
+  - `payroll_expense_materialization_lag`: n=0
+- **Bonus fixes incluidos:**
+  - 4 tests preexistentes rotos resueltos (PayrollPaymentStatusCard null-safe, internal-role-visibility count drift, people permissions tabs cardinality, creative-velocity-review evidenceMode/attributionClass post quality-gate tightening).
+  - Bug shim/auth-secrets post-TASK-742 regression resuelto: refactor `auth-secrets.ts` + `resend.ts` para eliminar top-level await que rompía tsx CLI scripts. `pnpm finance:rematerialize-balances` y todos los demás scripts del repo ya corren correctamente.
+- **Verificación final:**
+  - `pnpm tsc --noEmit`: 0 errors.
+  - `pnpm build`: verde.
+  - `pnpm test`: 514/514 test files, 2861/2866 tests passed (5 skipped, 0 failed).
+  - `pnpm lint`: 0 errors, 318 warnings (todas preexistentes — TASK-265 mode `warn`).
+  - `pnpm pg:doctor`: healthy.
+- **Outbox events nuevos en catálogo:** `finance.payment_order.settlement_blocked` (v1, 5 reasons) + `finance.payroll_expenses.rematerialized` (v1).
+- **Capabilities granulares nuevas:** `finance.payroll.rematerialize` + `finance.payment_orders.recover` (FINANCE_ADMIN + EFEONCE_ADMIN).
+- **CLAUDE.md actualizado:** sección "Finance — Payment order ↔ bank settlement invariants (TASK-765)" con diagram end-to-end, reglas duras, helpers canónicos.
+- **Próximo step:** merge a `develop`. Production rollout staged. Account_balances rematerialization manual ya ejecutada en dev — en prod, el cron worker la actualiza naturalmente al deploy + rerun.
+
+## Sesion 2026-05-02 — TASK-765 tomada (Payment Order ↔ Bank Settlement Resilience)
+
+- **Lifecycle**: `in-progress` (movida de `to-do/` a `in-progress/`)
+- **Branch**: `task/TASK-765-payment-order-bank-settlement-resilience`
+- **Trigger**: incidente 2026-05-01 detectado por usuario. Dos `payment_orders` (Luis Reyes $148,312.50 + Humberly Henriquez $254,250.00) quedaron en `state='paid'` sin afectar el banco. Investigación reveló cadena de 3 fallas estructurales: (F1) `source_account_id=NULL` permitido en aprobación, (F2) materializador `finance_expense_reactive_intake` dead-letter con "INSERT has more target columns than expressions" → 0 filas en `expenses` para 2026-04, (F3) proyector `record_expense_payment_from_order` skipea silencioso (`recorded=0 skipped=1`) sin error_class.
+- **Cuenta origen para recovery**: Santander CLP (confirmado por usuario).
+- **Decisiones de arquitectura tomadas**:
+  - Path atómico (slice 5) será **canónico**; el proyector reactivo queda como **safety net read-only** (idempotencia preservada por unique index en `expense_payments.payment_order_line_id`).
+  - Capabilities `finance.payroll.rematerialize` y `finance.payment_orders.recover` serán **nuevas y granulares** (least privilege, audit fino).
+- **Próximo step**: Discovery en paralelo (finance / payroll / reactive / reliability / UI) → plan.md → STOP checkpoint humano (P0 + Effort Alto).
+- **Blast radius**: producción tiene los 2 zombie y el materializador dead-letter de 2026-04. Fix llegará a `develop` → `main` por staged rollout.
+
 ## Sesion 2026-05-02 — TASK-265 cerrada (Copy Contract + Foundation + ESLint Gate)
 
 - **Lifecycle**: complete (movido de `to-do/` a `complete/`)

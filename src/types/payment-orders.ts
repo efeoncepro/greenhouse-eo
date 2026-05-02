@@ -138,7 +138,35 @@ export interface PaymentOrderArtifact {
   metadataJson: Record<string, unknown>
 }
 
+/**
+ * TASK-765 Slice 7 — settlement_blocked outbox events surface for the
+ * OrderDetailDrawer banner. The reader pulls the last 5 events of type
+ * `finance.payment_order.settlement_blocked` for this aggregate (last 7
+ * days). Slice 4 will start emitting these events from the loud resolver;
+ * slice 8 consumes them to drive the recovery CTA.
+ */
+export type PaymentOrderBlockedReason =
+  | 'expense_unresolved'
+  | 'account_missing'
+  | 'cutover_violation'
+  | 'materializer_dead_letter'
+  | 'out_of_scope_v1'
+
+export interface PaymentOrderBlockedEvent {
+  reason: PaymentOrderBlockedReason | string
+  detail: string
+  blockedAt: string
+}
+
 export interface PaymentOrderWithLines extends PaymentOrder {
   lines: PaymentOrderLine[]
   artifacts: PaymentOrderArtifact[]
+
+  /**
+   * Últimos 5 eventos `finance.payment_order.settlement_blocked` de los últimos
+   * 7 días para esta orden, ordenados más reciente primero. Vacío en steady
+   * state. El drawer pinta un Alert rojo con CTA "Recuperar orden" cuando
+   * length > 0.
+   */
+  recentBlockedEvents: PaymentOrderBlockedEvent[]
 }

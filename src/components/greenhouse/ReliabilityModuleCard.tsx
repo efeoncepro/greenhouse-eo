@@ -71,7 +71,11 @@ const SIGNAL_KIND_LABEL: Record<ReliabilitySignalKind, string> = {
   subsystem: 'Subsistema',
   test_lane: 'Test lane',
   billing: 'Billing',
-  ai_summary: 'AI summary'
+  ai_summary: 'AI summary',
+  // TASK-765 Slice 7
+  drift: 'Drift',
+  dead_letter: 'Dead-letter',
+  lag: 'Lag'
 }
 
 const VISIBLE_SIGNALS = 3

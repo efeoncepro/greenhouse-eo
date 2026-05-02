@@ -5,6 +5,7 @@ import type {
   PaymentOrder,
   PaymentOrderArtifact,
   PaymentOrderBatchKind,
+  PaymentOrderBlockedEvent,
   PaymentOrderLine,
   PaymentOrderState,
   PaymentOrderWithLines
@@ -138,7 +139,7 @@ export async function getPaymentOrderWithLines(
 
   if (!order) return null
 
-  const [lineRows, artifactRows] = await Promise.all([
+  const [lineRows, artifactRows, blockedRows] = await Promise.all([
     query<OrderLineRow>(
       `SELECT * FROM greenhouse_finance.payment_order_lines
         WHERE order_id = $1
@@ -150,11 +151,39 @@ export async function getPaymentOrderWithLines(
         WHERE order_id = $1
         ORDER BY generated_at DESC`,
       [orderId]
-    )
+    ),
+    // TASK-765 Slice 7 — last 5 settlement_blocked outbox events (last 7 days)
+    // for this aggregate. Drives the red banner + "Recuperar orden" CTA in
+    // OrderDetailDrawer. Events are emitted by slice 4 (resolver loud).
+    query<{ payload: Record<string, unknown>; occurred_at: string }>(
+      `SELECT payload, occurred_at
+         FROM greenhouse_sync.outbox_events
+        WHERE aggregate_id = $1
+          AND event_type = 'finance.payment_order.settlement_blocked'
+          AND occurred_at > NOW() - INTERVAL '7 days'
+        ORDER BY occurred_at DESC
+        LIMIT 5`,
+      [orderId]
+    ).catch(() => [])
   ])
 
   const lines: PaymentOrderLine[] = lineRows.map(mapOrderLineRow)
   const artifacts: PaymentOrderArtifact[] = artifactRows.map(mapOrderArtifactRow)
 
-  return { ...order, lines, artifacts }
+  const recentBlockedEvents: PaymentOrderBlockedEvent[] = blockedRows.map(row => {
+    const payload = row.payload ?? {}
+    const reason = typeof payload.reason === 'string' ? payload.reason : 'unknown'
+    const detail = typeof payload.detail === 'string' ? payload.detail : ''
+
+    const blockedAt =
+      typeof payload.blockedAt === 'string'
+        ? payload.blockedAt
+        : typeof row.occurred_at === 'string'
+          ? row.occurred_at
+          : new Date().toISOString()
+
+    return { reason, detail, blockedAt }
+  })
+
+  return { ...order, lines, artifacts, recentBlockedEvents }
 }

@@ -1,18 +1,25 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import Link from 'next/link'
 
 import Alert from '@mui/material/Alert'
+import AlertTitle from '@mui/material/AlertTitle'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Chip from '@mui/material/Chip'
+import Dialog from '@mui/material/Dialog'
+import DialogActions from '@mui/material/DialogActions'
+import DialogContent from '@mui/material/DialogContent'
+import DialogTitle from '@mui/material/DialogTitle'
 import Divider from '@mui/material/Divider'
 import Drawer from '@mui/material/Drawer'
 import IconButton from '@mui/material/IconButton'
 import LinearProgress from '@mui/material/LinearProgress'
+import MenuItem from '@mui/material/MenuItem'
 import Stack from '@mui/material/Stack'
+import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 
 import Table from '@mui/material/Table'
@@ -23,8 +30,67 @@ import TableRow from '@mui/material/TableRow'
 
 import { toast } from 'sonner'
 
+import CustomTextField from '@core/components/mui/TextField'
+
 import { DataTableShell } from '@/components/greenhouse/data-table'
-import type { PaymentOrderState, PaymentOrderWithLines } from '@/types/payment-orders'
+import type {
+  PaymentOrderBlockedReason,
+  PaymentOrderState,
+  PaymentOrderWithLines
+} from '@/types/payment-orders'
+
+// TASK-765 Slice 1: estados pre-paid donde el operator todavia puede asignar
+// la cuenta origen. Refleja PATCHABLE_STATES del API route.
+const SOURCE_ACCOUNT_PATCHABLE_STATES: ReadonlySet<PaymentOrderState> = new Set([
+  'draft',
+  'pending_approval',
+  'approved',
+  'scheduled',
+  'submitted'
+])
+
+// TASK-765 Slice 7: copy del banner settlement_blocked. Cada `reason` viene
+// del payload del outbox event `finance.payment_order.settlement_blocked`
+// (slice 4). Validado con greenhouse-ux-writing — tono es-CL tuteo, [What]
+// + [How to fix] cuando la accion del operador puede ayudar.
+const BLOCKED_REASON_BODY: Record<PaymentOrderBlockedReason, string> = {
+  expense_unresolved:
+    'No se encontró el expense de payroll para este período/miembro. Verifica que la nómina del período esté exportada y materializada.',
+  account_missing: 'Falta la cuenta bancaria origen.',
+  cutover_violation: 'Falla de constraint financiero — contacta al admin.',
+  materializer_dead_letter:
+    'Materializador de payroll en dead-letter para este período.',
+  out_of_scope_v1: 'Tipo de obligación aún no soportado por el path automático.'
+}
+
+const formatBlockedAt = (iso: string) => {
+  try {
+    return new Date(iso).toLocaleString('es-CL', {
+      day: '2-digit',
+      month: 'short',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
+  } catch {
+    return iso
+  }
+}
+
+const resolveBlockedBody = (reason: string, detail: string) => {
+  if (reason in BLOCKED_REASON_BODY) {
+    return BLOCKED_REASON_BODY[reason as PaymentOrderBlockedReason]
+  }
+
+  return detail ? `Settlement bloqueado: ${detail}` : 'Settlement bloqueado.'
+}
+
+interface BankAccountOption {
+  accountId: string
+  accountName: string
+  bankName: string
+  currency: string
+  isActive: boolean
+}
 
 interface OrderDetailDrawerProps {
   order: PaymentOrderWithLines | null
@@ -74,6 +140,172 @@ const formatDate = (d: string | null) => {
 
 const OrderDetailDrawer = ({ order, loading, onClose, onActionComplete }: OrderDetailDrawerProps) => {
   const [actionInFlight, setActionInFlight] = useState(false)
+  const [pickerOpen, setPickerOpen] = useState(false)
+  const [accounts, setAccounts] = useState<BankAccountOption[]>([])
+  const [accountsLoading, setAccountsLoading] = useState(false)
+  const [selectedAccountId, setSelectedAccountId] = useState('')
+
+  // TASK-765 Slice 1: reglas de gating para hard-gate UX.
+  // - canAssignSourceAccount: estado mutable y operator puede usar el picker.
+  // - sourceAccountMissingForFlow: estado pre-paid sin cuenta -> banner warning.
+  // - markPaidBlockedReason: tooltip cuando "Marcar pagada" esta disabled.
+  const canAssignSourceAccount = useMemo(() => {
+    if (!order) return false
+
+    return SOURCE_ACCOUNT_PATCHABLE_STATES.has(order.state)
+  }, [order])
+
+  const sourceAccountMissingForFlow = useMemo(() => {
+    if (!order) return false
+
+    return canAssignSourceAccount && !order.sourceAccountId
+  }, [order, canAssignSourceAccount])
+
+  const markPaidBlockedReason = useMemo(() => {
+    if (!order) return null
+
+    if (order.state === 'submitted' && !order.sourceAccountId) {
+      return 'Asigna primero la cuenta bancaria origen para poder marcar la orden como pagada.'
+    }
+
+    return null
+  }, [order])
+
+  // Fetch accounts solo cuando se abre el picker — evita carga innecesaria.
+  useEffect(() => {
+    if (!pickerOpen) return
+    let cancelled = false
+
+    setAccountsLoading(true)
+    fetch('/api/finance/accounts?isActive=true')
+      .then(r => r.json())
+      .then(data => {
+        if (cancelled) return
+        const items: BankAccountOption[] = Array.isArray(data?.items) ? data.items : []
+
+        // Filtrar por moneda de la orden + activas (defensa adicional al server-side).
+        const filtered = items.filter(
+          a => a.isActive && (!order || a.currency === order.currency)
+        )
+
+        setAccounts(filtered)
+
+        // Pre-seleccionar la cuenta actual si existe.
+        if (order?.sourceAccountId) {
+          setSelectedAccountId(order.sourceAccountId)
+        } else if (filtered.length === 1) {
+          setSelectedAccountId(filtered[0].accountId)
+        } else {
+          setSelectedAccountId('')
+        }
+      })
+      .catch(() => {
+        if (!cancelled) toast.error('No fue posible cargar las cuentas. Intenta de nuevo.')
+      })
+      .finally(() => {
+        if (!cancelled) setAccountsLoading(false)
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [pickerOpen, order])
+
+  // TASK-765 Slice 7: derivado de banner settlement_blocked. La orden tiene
+  // banner cuando hay events recientes (last 7 days, last 5 published por
+  // slice 4). El CTA "Recuperar orden" se habilita cuando state='paid' (el
+  // único estado donde el endpoint slice 8 puede operar — la presencia del
+  // banner implica que el ledger downstream está incompleto).
+  const recentBlockedEvents = order?.recentBlockedEvents ?? []
+  const hasBlockedBanner = recentBlockedEvents.length > 0
+  const latestBlockedEvent = hasBlockedBanner ? recentBlockedEvents[0] : null
+
+  const recoveryEnabled = order?.state === 'paid'
+
+  const sourceAccountInfo = useMemo(() => {
+    if (!order?.sourceAccountId) return null
+
+    const match = accounts.find(a => a.accountId === order.sourceAccountId)
+
+    if (match) return `${match.accountName} · ${match.bankName} (${match.currency})`
+
+    return order.sourceAccountId
+  }, [order, accounts])
+
+  const handleAssignSourceAccount = async () => {
+    if (!order || !selectedAccountId) return
+    setActionInFlight(true)
+
+    try {
+      const r = await fetch(`/api/admin/finance/payment-orders/${order.orderId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sourceAccountId: selectedAccountId })
+      })
+
+      const json = await r.json()
+
+      if (!r.ok) {
+        toast.error(json.error ?? 'No fue posible asignar la cuenta origen. Intenta de nuevo.')
+
+        return
+      }
+
+      toast.success('Cuenta origen actualizada.')
+      setPickerOpen(false)
+      await onActionComplete()
+    } catch (e) {
+      console.error(e)
+      toast.error('No fue posible asignar la cuenta origen. Intenta de nuevo.')
+    } finally {
+      setActionInFlight(false)
+    }
+  }
+
+  // TASK-765 Slice 7: handler del CTA "Recuperar orden". Llama al endpoint
+  // de recovery (slice 8). Si el endpoint aún no está deployado (404) o falla
+  // (5xx), surfacea un toast claro para que el operador escale.
+  const handleRecover = async () => {
+    if (!order) return
+
+    if (!order.sourceAccountId) {
+      toast.error('Asigna primero la cuenta bancaria origen para recuperar la orden.')
+
+      return
+    }
+
+    setActionInFlight(true)
+
+    try {
+      const r = await fetch(`/api/admin/finance/payment-orders/${order.orderId}/recover`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sourceAccountId: order.sourceAccountId })
+      })
+
+      if (r.status === 404) {
+        toast.error('Endpoint de recuperación no disponible aún. Contacta al admin.')
+
+        return
+      }
+
+      const json = await r.json().catch(() => ({}))
+
+      if (!r.ok) {
+        toast.error(json.error ?? 'No fue posible recuperar la orden.')
+
+        return
+      }
+
+      toast.success('Orden recuperada. Verifica el banco.')
+      await onActionComplete()
+    } catch (e) {
+      console.error(e)
+      toast.error('Error de red al recuperar la orden.')
+    } finally {
+      setActionInFlight(false)
+    }
+  }
 
   const callAction = async (path: string, body?: Record<string, unknown>) => {
     if (!order) return
@@ -298,6 +530,85 @@ const OrderDetailDrawer = ({ order, loading, onClose, onActionComplete }: OrderD
             </DataTableShell>
           </Stack>
 
+          {/* TASK-765 Slice 7: banner settlement_blocked. Renderiza cuando
+              hay events recientes (last 7 days) en outbox para esta orden.
+              CTA "Recuperar orden" llama al endpoint slice 8. */}
+          {hasBlockedBanner && latestBlockedEvent ? (
+            <Alert
+              severity='error'
+              icon={<i className='tabler-alert-octagon' aria-hidden='true' />}
+              action={
+                recoveryEnabled ? (
+                  <Button
+                    size='small'
+                    color='inherit'
+                    variant='outlined'
+                    onClick={handleRecover}
+                    disabled={actionInFlight}
+                  >
+                    Recuperar orden
+                  </Button>
+                ) : undefined
+              }
+            >
+              <AlertTitle>Settlement bloqueado</AlertTitle>
+              <Typography variant='body2' sx={{ mb: 1 }}>
+                {resolveBlockedBody(latestBlockedEvent.reason, latestBlockedEvent.detail)}
+              </Typography>
+              <Typography variant='caption' color='text.secondary'>
+                Detectado el {formatBlockedAt(latestBlockedEvent.blockedAt)}
+                {recentBlockedEvents.length > 1
+                  ? ` · ${recentBlockedEvents.length} eventos en los últimos 7 días`
+                  : null}
+              </Typography>
+            </Alert>
+          ) : null}
+
+          {/* TASK-765 Slice 1: Cuenta bancaria origen — hard-gate visible.
+              Banner warning cuando falta + picker para asignarla. */}
+          <Stack spacing={2}>
+            <Typography variant='subtitle2'>Cuenta bancaria origen</Typography>
+            <Stack direction='row' spacing={2} alignItems='center' flexWrap='wrap' useFlexGap>
+              {order.sourceAccountId ? (
+                <Chip
+                  size='small'
+                  variant='tonal'
+                  color='success'
+                  icon={<i className='tabler-building-bank' aria-hidden='true' />}
+                  label={sourceAccountInfo ?? order.sourceAccountId}
+                />
+              ) : (
+                <Chip
+                  size='small'
+                  variant='tonal'
+                  color='warning'
+                  icon={<i className='tabler-alert-triangle' aria-hidden='true' />}
+                  label='Sin asignar'
+                />
+              )}
+              {canAssignSourceAccount ? (
+                <Button
+                  size='small'
+                  variant='outlined'
+                  startIcon={<i className='tabler-edit' aria-hidden='true' />}
+                  onClick={() => setPickerOpen(true)}
+                  disabled={actionInFlight}
+                >
+                  {order.sourceAccountId ? 'Cambiar cuenta' : 'Asignar cuenta origen'}
+                </Button>
+              ) : null}
+            </Stack>
+            {sourceAccountMissingForFlow ? (
+              <Alert severity='warning' icon={<i className='tabler-alert-triangle' aria-hidden='true' />}>
+                <AlertTitle>Falta la cuenta bancaria origen</AlertTitle>
+                <Typography variant='body2'>
+                  Esta orden no puede marcarse como pagada hasta que asignes desde qué cuenta sale el
+                  dinero. Sin esto, el banco no rebaja saldo y la conciliación queda incompleta.
+                </Typography>
+              </Alert>
+            ) : null}
+          </Stack>
+
           {/* Actions */}
           <Stack spacing={2}>
             <Typography variant='subtitle2'>Acciones</Typography>
@@ -318,9 +629,18 @@ const OrderDetailDrawer = ({ order, loading, onClose, onActionComplete }: OrderD
                 </Button>
               ) : null}
               {order.state === 'submitted' ? (
-                <Button variant='contained' color='success' onClick={handleMarkPaid} disabled={actionInFlight}>
-                  Marcar pagada
-                </Button>
+                <Tooltip title={markPaidBlockedReason ?? ''} disableHoverListener={!markPaidBlockedReason}>
+                  <span>
+                    <Button
+                      variant='contained'
+                      color='success'
+                      onClick={handleMarkPaid}
+                      disabled={actionInFlight || Boolean(markPaidBlockedReason)}
+                    >
+                      Marcar pagada
+                    </Button>
+                  </span>
+                </Tooltip>
               ) : null}
               {['draft', 'pending_approval', 'approved', 'scheduled'].includes(order.state) ? (
                 <Button variant='outlined' color='error' onClick={handleCancel} disabled={actionInFlight}>
@@ -351,6 +671,56 @@ const OrderDetailDrawer = ({ order, loading, onClose, onActionComplete }: OrderD
           </Stack>
         </Stack>
       )}
+
+      {/* TASK-765 Slice 1: picker dialog para asignar cuenta origen */}
+      <Dialog open={pickerOpen} onClose={() => setPickerOpen(false)} maxWidth='xs' fullWidth>
+        <DialogTitle>Asignar cuenta bancaria origen</DialogTitle>
+        <DialogContent dividers>
+          <Stack spacing={3}>
+            <Typography variant='body2' color='text.secondary'>
+              La cuenta desde donde se transfiere el pago. Solo cuentas activas en la moneda de la
+              orden.
+            </Typography>
+            <CustomTextField
+              select
+              label='Cuenta'
+              value={selectedAccountId}
+              onChange={e => setSelectedAccountId(e.target.value)}
+              fullWidth
+              disabled={accountsLoading}
+              helperText={
+                accountsLoading
+                  ? 'Cargando cuentas…'
+                  : accounts.length === 0
+                    ? `No hay cuentas activas en ${order?.currency ?? 'la moneda solicitada'}.`
+                    : null
+              }
+              SelectProps={{ displayEmpty: true }}
+            >
+              <MenuItem value='' disabled>
+                Selecciona una cuenta
+              </MenuItem>
+              {accounts.map(account => (
+                <MenuItem key={account.accountId} value={account.accountId}>
+                  {account.accountName} · {account.bankName} ({account.currency})
+                </MenuItem>
+              ))}
+            </CustomTextField>
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setPickerOpen(false)} disabled={actionInFlight}>
+            Cancelar
+          </Button>
+          <Button
+            variant='contained'
+            onClick={handleAssignSourceAccount}
+            disabled={actionInFlight || !selectedAccountId || accountsLoading}
+          >
+            {actionInFlight ? 'Asignando…' : 'Asignar cuenta'}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Drawer>
   )
 }
