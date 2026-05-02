@@ -33,7 +33,11 @@ import { toast } from 'sonner'
 import CustomTextField from '@core/components/mui/TextField'
 
 import { DataTableShell } from '@/components/greenhouse/data-table'
-import type { PaymentOrderState, PaymentOrderWithLines } from '@/types/payment-orders'
+import type {
+  PaymentOrderBlockedReason,
+  PaymentOrderState,
+  PaymentOrderWithLines
+} from '@/types/payment-orders'
 
 // TASK-765 Slice 1: estados pre-paid donde el operator todavia puede asignar
 // la cuenta origen. Refleja PATCHABLE_STATES del API route.
@@ -44,6 +48,41 @@ const SOURCE_ACCOUNT_PATCHABLE_STATES: ReadonlySet<PaymentOrderState> = new Set(
   'scheduled',
   'submitted'
 ])
+
+// TASK-765 Slice 7: copy del banner settlement_blocked. Cada `reason` viene
+// del payload del outbox event `finance.payment_order.settlement_blocked`
+// (slice 4). Validado con greenhouse-ux-writing — tono es-CL tuteo, [What]
+// + [How to fix] cuando la accion del operador puede ayudar.
+const BLOCKED_REASON_BODY: Record<PaymentOrderBlockedReason, string> = {
+  expense_unresolved:
+    'No se encontró el expense de payroll para este período/miembro. Verifica que la nómina del período esté exportada y materializada.',
+  account_missing: 'Falta la cuenta bancaria origen.',
+  cutover_violation: 'Falla de constraint financiero — contacta al admin.',
+  materializer_dead_letter:
+    'Materializador de payroll en dead-letter para este período.',
+  out_of_scope_v1: 'Tipo de obligación aún no soportado por el path automático.'
+}
+
+const formatBlockedAt = (iso: string) => {
+  try {
+    return new Date(iso).toLocaleString('es-CL', {
+      day: '2-digit',
+      month: 'short',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
+  } catch {
+    return iso
+  }
+}
+
+const resolveBlockedBody = (reason: string, detail: string) => {
+  if (reason in BLOCKED_REASON_BODY) {
+    return BLOCKED_REASON_BODY[reason as PaymentOrderBlockedReason]
+  }
+
+  return detail ? `Settlement bloqueado: ${detail}` : 'Settlement bloqueado.'
+}
 
 interface BankAccountOption {
   accountId: string
@@ -172,6 +211,17 @@ const OrderDetailDrawer = ({ order, loading, onClose, onActionComplete }: OrderD
     }
   }, [pickerOpen, order])
 
+  // TASK-765 Slice 7: derivado de banner settlement_blocked. La orden tiene
+  // banner cuando hay events recientes (last 7 days, last 5 published por
+  // slice 4). El CTA "Recuperar orden" se habilita cuando state='paid' (el
+  // único estado donde el endpoint slice 8 puede operar — la presencia del
+  // banner implica que el ledger downstream está incompleto).
+  const recentBlockedEvents = order?.recentBlockedEvents ?? []
+  const hasBlockedBanner = recentBlockedEvents.length > 0
+  const latestBlockedEvent = hasBlockedBanner ? recentBlockedEvents[0] : null
+
+  const recoveryEnabled = order?.state === 'paid'
+
   const sourceAccountInfo = useMemo(() => {
     if (!order?.sourceAccountId) return null
 
@@ -207,6 +257,51 @@ const OrderDetailDrawer = ({ order, loading, onClose, onActionComplete }: OrderD
     } catch (e) {
       console.error(e)
       toast.error('No fue posible asignar la cuenta origen. Intenta de nuevo.')
+    } finally {
+      setActionInFlight(false)
+    }
+  }
+
+  // TASK-765 Slice 7: handler del CTA "Recuperar orden". Llama al endpoint
+  // de recovery (slice 8). Si el endpoint aún no está deployado (404) o falla
+  // (5xx), surfacea un toast claro para que el operador escale.
+  const handleRecover = async () => {
+    if (!order) return
+
+    if (!order.sourceAccountId) {
+      toast.error('Asigna primero la cuenta bancaria origen para recuperar la orden.')
+
+      return
+    }
+
+    setActionInFlight(true)
+
+    try {
+      const r = await fetch(`/api/admin/finance/payment-orders/${order.orderId}/recover`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sourceAccountId: order.sourceAccountId })
+      })
+
+      if (r.status === 404) {
+        toast.error('Endpoint de recuperación no disponible aún. Contacta al admin.')
+
+        return
+      }
+
+      const json = await r.json().catch(() => ({}))
+
+      if (!r.ok) {
+        toast.error(json.error ?? 'No fue posible recuperar la orden.')
+
+        return
+      }
+
+      toast.success('Orden recuperada. Verifica el banco.')
+      await onActionComplete()
+    } catch (e) {
+      console.error(e)
+      toast.error('Error de red al recuperar la orden.')
     } finally {
       setActionInFlight(false)
     }
@@ -434,6 +529,40 @@ const OrderDetailDrawer = ({ order, loading, onClose, onActionComplete }: OrderD
               </Table>
             </DataTableShell>
           </Stack>
+
+          {/* TASK-765 Slice 7: banner settlement_blocked. Renderiza cuando
+              hay events recientes (last 7 days) en outbox para esta orden.
+              CTA "Recuperar orden" llama al endpoint slice 8. */}
+          {hasBlockedBanner && latestBlockedEvent ? (
+            <Alert
+              severity='error'
+              icon={<i className='tabler-alert-octagon' aria-hidden='true' />}
+              action={
+                recoveryEnabled ? (
+                  <Button
+                    size='small'
+                    color='inherit'
+                    variant='outlined'
+                    onClick={handleRecover}
+                    disabled={actionInFlight}
+                  >
+                    Recuperar orden
+                  </Button>
+                ) : undefined
+              }
+            >
+              <AlertTitle>Settlement bloqueado</AlertTitle>
+              <Typography variant='body2' sx={{ mb: 1 }}>
+                {resolveBlockedBody(latestBlockedEvent.reason, latestBlockedEvent.detail)}
+              </Typography>
+              <Typography variant='caption' color='text.secondary'>
+                Detectado el {formatBlockedAt(latestBlockedEvent.blockedAt)}
+                {recentBlockedEvents.length > 1
+                  ? ` · ${recentBlockedEvents.length} eventos en los últimos 7 días`
+                  : null}
+              </Typography>
+            </Alert>
+          ) : null}
 
           {/* TASK-765 Slice 1: Cuenta bancaria origen — hard-gate visible.
               Banner warning cuando falta + picker para asignarla. */}

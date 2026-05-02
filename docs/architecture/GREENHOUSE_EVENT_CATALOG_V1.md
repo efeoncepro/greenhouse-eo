@@ -2,6 +2,83 @@
 
 Catalogo canonico de eventos del sistema de outbox de Greenhouse. Cada evento se registra en `greenhouse_sync.outbox_events` y se publica a BigQuery via el consumer `outbox-publish`.
 
+## Delta 2026-05-02 — TASK-765: Payment Order Bank Settlement Resilience
+
+Dos nuevos eventos canónicos del dominio finance para hacer observable y auditable la cadena `payment_order.paid → bank impact`. Los emiten distintos slices de TASK-765, pero ambos se documentan aquí porque comparten el mismo aggregate domain (`finance` / `payroll_expense`) y serán consumidos por la misma capa de Reliability + AI Observer.
+
+### `finance.payment_order.settlement_blocked`
+
+Aggregate type: `payment_order`.
+
+Publisher (a partir de slice 4): `src/lib/finance/payment-orders/record-payment-from-order.ts` (proyección reactiva `record_expense_payment_from_order` cuando un step en la cadena `expense ↔ expense_payment ↔ settlement_leg ↔ account_balances` falla).
+
+Schema v1:
+
+```ts
+type FinancePaymentOrderSettlementBlockedV1 = {
+  eventVersion: 'v1'
+  orderId: string
+  state: 'paid'
+  reason:
+    | 'expense_unresolved'        // resolver no encontró expenses para (period_id, member_id)
+    | 'account_missing'           // source_account_id NULL al transicionar
+    | 'cutover_violation'         // CHECK expense_payments_account_required_after_cutover rechazó el INSERT
+    | 'materializer_dead_letter'  // upstream payroll materializer en dead-letter
+    | 'out_of_scope_v1'           // V1 del proyector no cubre este obligation_kind (e.g. employer_social_security)
+  detail: string                  // mensaje human-readable, sanitizable
+  affectedLineIds: string[]       // payment_order_lines afectadas
+  retryableAfter?: string         // ISO timestamp, sugiere re-disparo
+  blockedAt: string               // ISO timestamp del bloqueo
+}
+```
+
+Consumers:
+
+- **UI banner** en `PaymentOrderDetailDrawer.tsx` (slice 7) — alert rojo si la order tiene un evento reciente sin resolver, con CTA `Recuperar orden`.
+- **Reliability AI Observer** (TASK-638) — correlaciona con dead-letter del proyector y signal `paid_orders_without_expense_payment` (slice 5/7).
+- **Reliability signal `payment_orders_dead_letter`** (slice 7) — query directa al outbox + `outbox_reactive_log`.
+
+Reglas:
+
+- `aggregate_id` = `orderId`.
+- Publicado **dentro de la misma transacción** que el throw del proyector cuando es posible; si no, en un commit separado pero antes de re-disparar refresh queue.
+- Steady state esperado: 0 events en ventana de 24h en producción saludable.
+
+### `finance.payroll_expenses.rematerialized`
+
+Aggregate type: `payroll_expense`.
+
+Publisher: `src/app/api/admin/finance/payroll-expense-rematerialize/route.ts` (endpoint admin de slice 3, gated por `finance.payroll.rematerialize`).
+
+Schema v1:
+
+```ts
+type FinancePayrollExpensesRematerializedV1 = {
+  eventVersion: 'v1'
+  periodId: string                 // greenhouse_payroll.payroll_periods.period_id
+  year: number                     // 2000-2100
+  month: number                    // 1-12
+  dryRun: boolean                  // true = preview (no INSERTs)
+  payrollCreated: number           // filas `expenses` creadas (expense_type='payroll')
+  payrollSkipped: number           // filas existentes (idempotencia)
+  socialSecurityCreated: boolean   // true si se creó la fila Previred consolidada
+  socialSecuritySkipped: boolean   // inverse
+  actorUserId: string              // tenant.userId del admin
+  rematerializedAt: string         // ISO timestamp del trigger
+}
+```
+
+Consumers:
+
+- **Audit log** — el evento es la fuente de verdad de cuándo y quién re-disparó la materialización (los `expenses` insertados también tienen `source_type='payroll_generated'`, pero NO carry actor — el outbox sí).
+- **Reliability AI Observer** — útil para correlacionar la curación del signal `payroll_expense_materialization_lag` (slice 7) con la acción humana que la cerró.
+
+Reglas:
+
+- `aggregate_id` = `periodId`.
+- El evento es **fire-and-forget**: si el publish falla, la materialización no se rollbackea (el endpoint loggea via `captureWithDomain` y devuelve 200 con `eventId: undefined`).
+- DryRun emite el evento igual con `dryRun: true` para que el audit log capture intentos de operador (operativamente útil aunque no muten).
+
 ## Delta 2026-05-01 — TASK-748: Payment Obligations
 
 Aggregate type nuevo: `payment_obligation`.

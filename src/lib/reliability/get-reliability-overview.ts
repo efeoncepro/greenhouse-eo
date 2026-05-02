@@ -26,6 +26,9 @@ import type { SyntheticRouteSnapshot } from '@/types/reliability-synthetic'
 
 import { buildAiSummarySignals } from './ai/build-ai-summary-signals'
 import { getLatestAiObservationsByScope, type AiObservation } from './ai/reader'
+import { getPaymentOrdersDeadLetterSignal } from './queries/payment-orders-dead-letter'
+import { getPaidOrdersWithoutExpensePaymentSignal } from './queries/payment-orders-paid-without-expense-payment'
+import { getPayrollExpenseMaterializationLagSignal } from './queries/payroll-expense-materialization-lag'
 import { RELIABILITY_REGISTRY } from './registry'
 import { getReliabilityRegistry } from './registry-store'
 import {
@@ -41,6 +44,7 @@ import {
   buildNotionDataQualitySignals,
   buildNotionFreshnessSignal,
   buildObservabilityPostureSignal,
+  buildPaymentOrderSettlementSignals,
   buildSentryIncidentSignals,
   buildSubsystemSignals,
   buildSyntheticModuleSignals,
@@ -241,6 +245,14 @@ interface ReliabilityOverviewSources {
    * don't accidentally hammer the Sentry API.
    */
   domainIncidents?: Record<string, CloudSentryIncidentsSnapshot> | null
+
+  /**
+   * TASK-765 Slice 7 — payment_order ↔ bank settlement signals. 3 readers
+   * que cuentan drift / dead_letter / lag para el path payroll → expense →
+   * payment_order. Cada reader degrada honestamente (kind=unknown) si la
+   * query falla. El composer los inyecta en `allSignals` con resto del array.
+   */
+  paymentOrderSettlement?: ReliabilitySignal[] | null
 }
 
 export const buildReliabilityOverview = (
@@ -270,7 +282,11 @@ export const buildReliabilityOverview = (
     // Closes the `expectedSignalKinds: ['incident']` gap for finance,
     // delivery, integrations.notion (cloud already had a global signal).
     ...(sources.domainIncidents ? buildDomainIncidentSignals(sources.domainIncidents) : []),
-    ...(sources.aiObservations ? buildAiSummarySignals(sources.aiObservations.byModule) : [])
+    ...(sources.aiObservations ? buildAiSummarySignals(sources.aiObservations.byModule) : []),
+    // TASK-765 Slice 7 — payment_order ↔ bank settlement signals (drift /
+    // dead_letter / lag). Inyectadas pre-fetched desde getReliabilityOverview
+    // para mantener buildReliabilityOverview sincrónico.
+    ...(sources.paymentOrderSettlement ?? [])
   ]
 
   const signalsByModule = new Map<string, ReliabilitySignal[]>()
@@ -420,6 +436,18 @@ export const getReliabilityOverview = async (
     ? preloadedSources.domainIncidents
     : await hydrateDomainIncidents(modules ?? RELIABILITY_REGISTRY)
 
+  // TASK-765 Slice 7 — payment_order ↔ bank settlement signals (drift /
+  // dead_letter / lag). Cada reader degrada honestamente (severity=unknown)
+  // si su query falla — un solo signal roto NO envenena el overview entero.
+  const paymentOrderSettlement =
+    preloadedSources.paymentOrderSettlement !== undefined
+      ? preloadedSources.paymentOrderSettlement
+      : await buildPaymentOrderSettlementSignals({
+          paidWithoutExpensePayment: getPaidOrdersWithoutExpensePaymentSignal,
+          deadLetter: getPaymentOrdersDeadLetterSignal,
+          materializationLag: getPayrollExpenseMaterializationLagSignal
+        }).catch(() => null)
+
   return buildReliabilityOverview(operations, {
     billing,
     notionOperational,
@@ -427,7 +455,8 @@ export const getReliabilityOverview = async (
     financeSmokeLane,
     modules,
     aiObservations,
-    domainIncidents
+    domainIncidents,
+    paymentOrderSettlement
   })
 }
 

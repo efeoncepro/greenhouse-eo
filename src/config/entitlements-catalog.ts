@@ -190,6 +190,19 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     actions: ['update'] as const,
     defaultScope: 'tenant'
   },
+
+  // ── Payroll → Expense rematerialization (TASK-765 slice 3) ────────
+  // Permite a FINANCE_ADMIN / EFEONCE_ADMIN re-disparar la materialización
+  // de `expenses` (payroll + social_security) para un período payroll cuando
+  // la proyección reactiva `finance_expense_reactive_intake` quedó dead-letter
+  // o falló silenciosamente. Idempotente: el materializador skipea filas
+  // existentes por (payroll_period_id, member_id, expense_type, source_type).
+  {
+    key: 'finance.payroll.rematerialize',
+    module: 'finance',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
   {
     key: 'finance.cash.adopt-external-signal',
     module: 'finance',

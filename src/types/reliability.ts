@@ -48,6 +48,30 @@ export type ReliabilitySignalKind =
    */
   | 'ai_summary'
 
+  /**
+   * TASK-765 — Payment Order ↔ Bank Settlement Resilience.
+   *
+   * Tres categorías nuevas que cubren modos de falla distintos del path
+   * `payment_order.paid → expense_payment → settlement_leg → account_balance`
+   * y son reusables por cualquier futuro module que necesite el mismo
+   * vocabulario:
+   *
+   * - `drift`: divergencia detectable entre dos sources of truth que deberían
+   *   coincidir (e.g. orders en `state='paid'` sin `expense_payment` asociado
+   *   tras 15min, ledger entries que no cuadran con bank statements).
+   *
+   * - `dead_letter`: handlers reactivos que llegaron al límite de retries y
+   *   están en `outbox_reactive_log.result='dead-letter'` sin acknowledge ni
+   *   recovery — requiere intervención humana antes de poder progresar.
+   *
+   * - `lag`: latencia anormal en pipelines async donde el upstream completó
+   *   pero el downstream aún no materializa (e.g. payroll period exportado
+   *   hace > 1h sin filas en `expenses`).
+   */
+  | 'drift'
+  | 'dead_letter'
+  | 'lag'
+
 export type ReliabilitySeverity =
   | 'ok'
   | 'warning'

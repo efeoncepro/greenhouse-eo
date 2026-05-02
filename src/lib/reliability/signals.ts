@@ -956,5 +956,35 @@ export const SIGNAL_KIND_LABELS: Record<ReliabilitySignalKind, string> = {
   subsystem: 'Subsistema',
   test_lane: 'Test lane',
   billing: 'Billing',
-  ai_summary: 'AI summary'
+  ai_summary: 'AI summary',
+  // TASK-765 Slice 7
+  drift: 'Drift',
+  dead_letter: 'Dead-letter',
+  lag: 'Lag'
+}
+
+/**
+ * TASK-765 Slice 7 — Payment Order ↔ Bank Settlement signals.
+ *
+ * Wraps the 3 readers in `src/lib/reliability/queries/` so the composer can
+ * inject them into `buildReliabilityOverview`. Each reader handles its own
+ * try/catch and returns a degraded signal (kind=unknown) instead of throwing
+ * — so a failure in one DB query never poisons the whole overview.
+ *
+ * Lives behind `Promise.all` to avoid sequential N+1 latency on /admin/operations.
+ */
+export const buildPaymentOrderSettlementSignals = async (
+  readers: {
+    paidWithoutExpensePayment: () => Promise<ReliabilitySignal>
+    deadLetter: () => Promise<ReliabilitySignal>
+    materializationLag: () => Promise<ReliabilitySignal>
+  }
+): Promise<ReliabilitySignal[]> => {
+  const [paid, dead, lag] = await Promise.all([
+    readers.paidWithoutExpensePayment(),
+    readers.deadLetter(),
+    readers.materializationLag()
+  ])
+
+  return [paid, dead, lag]
 }

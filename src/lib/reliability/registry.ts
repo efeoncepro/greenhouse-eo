@@ -58,7 +58,11 @@ export const STATIC_RELIABILITY_REGISTRY: ReliabilityModuleDefinition[] = [
       'src/components/greenhouse/pricing/**',
       'src/components/greenhouse/quote-builder/**'
     ],
-    expectedSignalKinds: ['subsystem', 'incident', 'test_lane'],
+    // TASK-765 Slice 7 — drift / dead_letter / lag signals para el path
+    // payment_order ↔ bank settlement (3 readers en
+    // src/lib/reliability/queries/). Quedan rolleados al subsystem `Finance
+    // Data Quality` vía buildReliabilityOverview, que ya rutea por moduleKey.
+    expectedSignalKinds: ['subsystem', 'incident', 'test_lane', 'drift', 'dead_letter', 'lag'],
     incidentDomainTag: 'finance'
   },
   {
