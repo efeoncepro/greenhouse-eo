@@ -95,7 +95,9 @@ const PayrollPaymentStatusCard = ({ periodId, summary: externalSummary, loading:
     }
   }, [periodId, isControlled, externalSummary, externalLoading, externalError])
 
-  const blockedEntries = summary?.byEntry.filter(entry => entry.state === 'blocked_no_profile') ?? []
+  // Defensa contra summary mal-formado: byEntry puede ser undefined si la
+  // respuesta del API quedo a medio camino (e.g. degradado, version incompatible).
+  const blockedEntries = summary?.byEntry?.filter(entry => entry.state === 'blocked_no_profile') ?? []
   const blockedColor: 'warning' | 'secondary' = (summary?.totalBlocked ?? 0) > 0 ? 'warning' : 'secondary'
 
   return (

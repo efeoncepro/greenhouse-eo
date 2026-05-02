@@ -12,6 +12,7 @@ describe('people access matrix', () => {
       'activity',
       'memberships',
       'economy',
+      'payment',
       'ai-tools'
     ])
     expect(access.canViewMemberships).toBe(true)
