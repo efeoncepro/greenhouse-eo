@@ -767,24 +767,24 @@ function FinanceImpactCard({ memberId }: { memberId: string }) {
                 <Typography variant='overline' color='text.secondary'>Costo mensual</Typography>
                 <Stack direction='row' justifyContent='space-between'>
                   <Typography variant='body2'>Salario base</Typography>
-                  <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>{formatCLP(data.cost.baseSalaryClp)}</Typography>
+                  <Typography variant='body2'>{formatCLP(data.cost.baseSalaryClp)}</Typography>
                 </Stack>
                 <Stack direction='row' justifyContent='space-between'>
                   <Typography variant='body2'>Costo laboral</Typography>
-                  <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>{formatCLP(data.cost.laborCostTarget)}</Typography>
+                  <Typography variant='body2'>{formatCLP(data.cost.laborCostTarget)}</Typography>
                 </Stack>
                 <Stack direction='row' justifyContent='space-between'>
                   <Typography variant='body2'>Overhead directo</Typography>
-                  <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>{formatCLP(data.cost.directOverheadClp)}</Typography>
+                  <Typography variant='body2'>{formatCLP(data.cost.directOverheadClp)}</Typography>
                 </Stack>
                 <Stack direction='row' justifyContent='space-between'>
                   <Typography variant='body2'>Overhead compartido</Typography>
-                  <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>{formatCLP(data.cost.sharedOverheadClp)}</Typography>
+                  <Typography variant='body2'>{formatCLP(data.cost.sharedOverheadClp)}</Typography>
                 </Stack>
                 <Divider />
                 <Stack direction='row' justifyContent='space-between'>
                   <Typography variant='body2' sx={{ fontWeight: 600 }}>Costo total loaded</Typography>
-                  <Typography variant='body2' sx={{ fontWeight: 600, fontFamily: 'monospace' }}>{formatCLP(data.cost.loadedCostTarget)}</Typography>
+                  <Typography variant='body2' sx={{ fontWeight: 600 }}>{formatCLP(data.cost.loadedCostTarget)}</Typography>
                 </Stack>
               </Stack>
             </Grid>
@@ -794,13 +794,13 @@ function FinanceImpactCard({ memberId }: { memberId: string }) {
                 {data.assignments.items.slice(0, 5).map((a, i) => (
                   <Stack key={i} direction='row' justifyContent='space-between'>
                     <Typography variant='body2'>{a.clientName ?? 'Sin nombre'} ({Math.round(a.fteWeight * 100)}%)</Typography>
-                    <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>{formatCLP(a.revenueClp)}</Typography>
+                    <Typography variant='body2'>{formatCLP(a.revenueClp)}</Typography>
                   </Stack>
                 ))}
                 <Divider />
                 <Stack direction='row' justifyContent='space-between'>
                   <Typography variant='body2' sx={{ fontWeight: 600 }}>Total atribuido</Typography>
-                  <Typography variant='body2' sx={{ fontWeight: 600, fontFamily: 'monospace' }}>{formatCLP(data.assignments.totalRevenueAttributed)}</Typography>
+                  <Typography variant='body2' sx={{ fontWeight: 600 }}>{formatCLP(data.assignments.totalRevenueAttributed)}</Typography>
                 </Stack>
               </Stack>
             </Grid>

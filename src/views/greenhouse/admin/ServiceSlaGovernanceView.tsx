@@ -484,7 +484,7 @@ return
                               <Typography variant='caption' color='text.secondary'>
                                 {service.lineaDeServicio} · {service.servicioEspecifico}
                               </Typography>
-                              <Typography variant='caption' sx={{ fontFamily: 'monospace' }} color='text.secondary'>
+                              <Typography variant='caption' color='text.secondary'>
                                 {service.publicId ?? service.serviceId}
                               </Typography>
                             </Stack>
@@ -620,7 +620,7 @@ return
                                 <Typography variant='caption' color='text.secondary'>
                                   {item.definition.indicatorFormula}
                                 </Typography>
-                                <Typography variant='caption' color='text.secondary' sx={{ fontFamily: 'monospace' }}>
+                                <Typography variant='caption' color='text.secondary'>
                                   {item.definition.measurementSource}
                                 </Typography>
                               </Stack>

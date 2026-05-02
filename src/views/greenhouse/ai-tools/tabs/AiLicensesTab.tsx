@@ -187,9 +187,7 @@ const AiLicensesTab = ({ licenses, tools, meta, onRefresh }: Props) => {
       columnHelper.accessor('accountEmail', {
         header: 'Email cuenta',
         cell: ({ getValue }) => (
-          <Typography sx={{ fontFamily: getValue() ? 'monospace' : undefined, fontSize: getValue() ? '0.8rem' : undefined }}>
-            {getValue() ?? '—'}
-          </Typography>
+          <Typography variant={getValue() ? 'monoId' : 'body2'}>{getValue() ?? '—'}</Typography>
         )
       }),
       columnHelper.accessor('licenseStatus', {

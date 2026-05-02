@@ -398,7 +398,7 @@ const AuditDiffViewer = ({ action, changeSummary }: AuditDiffViewerProps) => {
                     </Typography>
                     <Typography
                       variant='body2'
-                      sx={{ fontFamily: 'monospace', fontSize: '0.8rem', wordBreak: 'break-all' }}
+                      sx={{ fontSize: '0.8rem', wordBreak: 'break-all' }}
                     >
                       {formatValue(previous)}
                     </Typography>
@@ -423,7 +423,7 @@ const AuditDiffViewer = ({ action, changeSummary }: AuditDiffViewerProps) => {
                     </Typography>
                     <Typography
                       variant='body2'
-                      sx={{ fontFamily: 'monospace', fontSize: '0.8rem', wordBreak: 'break-all' }}
+                      sx={{ fontSize: '0.8rem', wordBreak: 'break-all' }}
                     >
                       {formatValue(next)}
                     </Typography>
@@ -452,7 +452,7 @@ const AuditDiffViewer = ({ action, changeSummary }: AuditDiffViewerProps) => {
               <Typography variant='caption' sx={{ fontWeight: 600, display: 'inline-block', minWidth: 160 }}>
                 {key}:
               </Typography>{' '}
-              <Typography variant='caption' sx={{ fontFamily: 'monospace' }}>
+              <Typography variant='caption'>
                 {formatValue(value)}
               </Typography>
             </Box>
@@ -467,7 +467,7 @@ const AuditDiffViewer = ({ action, changeSummary }: AuditDiffViewerProps) => {
               <Typography variant='caption' sx={{ fontWeight: 600, display: 'inline-block', minWidth: 160 }}>
                 {key}:
               </Typography>{' '}
-              <Typography variant='caption' sx={{ fontFamily: 'monospace' }}>
+              <Typography variant='caption'>
                 {formatValue(value)}
               </Typography>
             </Box>
@@ -500,7 +500,7 @@ const AuditDiffViewer = ({ action, changeSummary }: AuditDiffViewerProps) => {
                     <Typography variant='caption' color='text.secondary' sx={{ display: 'inline-block', minWidth: 160 }}>
                       {key}:
                     </Typography>{' '}
-                    <Typography variant='caption' color='text.secondary' sx={{ fontFamily: 'monospace' }}>
+                    <Typography variant='caption' color='text.secondary'>
                       {formatValue(value)}
                     </Typography>
                   </Box>
@@ -520,7 +520,7 @@ const AuditDiffViewer = ({ action, changeSummary }: AuditDiffViewerProps) => {
                 <Typography variant='caption' sx={{ fontWeight: 600 }}>
                   {key}:
                 </Typography>{' '}
-                <Typography variant='caption' sx={{ fontFamily: 'monospace' }} color='text.secondary'>
+                <Typography variant='caption' color='text.secondary'>
                   {formatValue(value)}
                 </Typography>
               </Box>

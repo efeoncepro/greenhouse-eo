@@ -677,13 +677,13 @@ const ServiceDetailView = ({ serviceId }: Props) => {
                   {detail.notionProjectId && (
                     <Grid size={{ xs: 12 }}>
                       <Typography variant='caption' color='text.secondary' sx={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>Notion Project ID</Typography>
-                      <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>{detail.notionProjectId}</Typography>
+                      <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>{detail.notionProjectId}</Typography>
                     </Grid>
                   )}
                   {detail.createdBy && (
                     <Grid size={{ xs: 12, sm: 6 }}>
                       <Typography variant='caption' color='text.secondary' sx={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>Creado por</Typography>
-                      <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>{detail.createdBy}</Typography>
+                      <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>{detail.createdBy}</Typography>
                     </Grid>
                   )}
                 </Grid>
@@ -852,7 +852,7 @@ const ServiceDetailView = ({ serviceId }: Props) => {
                                   <Typography variant='caption' color='text.secondary'>
                                     {item.definition.indicatorFormula}
                                   </Typography>
-                                  <Typography variant='caption' color='text.secondary' sx={{ fontFamily: 'monospace' }}>
+                                  <Typography variant='caption' color='text.secondary'>
                                     {item.definition.measurementSource}
                                   </Typography>
                                 </Stack>
@@ -967,7 +967,7 @@ const ServiceDetailView = ({ serviceId }: Props) => {
                 <Grid container spacing={4}>
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <Typography variant='caption' color='text.secondary' sx={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>HubSpot Service ID</Typography>
-                    <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>{detail.hubspotServiceId ?? '—'}</Typography>
+                    <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>{detail.hubspotServiceId ?? '—'}</Typography>
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <Typography variant='caption' color='text.secondary' sx={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>Sync Status</Typography>
@@ -980,13 +980,13 @@ const ServiceDetailView = ({ serviceId }: Props) => {
                   {detail.hubspotCompanyId && (
                     <Grid size={{ xs: 12, sm: 6 }}>
                       <Typography variant='caption' color='text.secondary' sx={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>HubSpot Company ID</Typography>
-                      <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>{detail.hubspotCompanyId}</Typography>
+                      <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>{detail.hubspotCompanyId}</Typography>
                     </Grid>
                   )}
                   {detail.hubspotDealId && (
                     <Grid size={{ xs: 12, sm: 6 }}>
                       <Typography variant='caption' color='text.secondary' sx={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>HubSpot Deal ID</Typography>
-                      <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>{detail.hubspotDealId}</Typography>
+                      <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>{detail.hubspotDealId}</Typography>
                     </Grid>
                   )}
                 </Grid>
@@ -1144,7 +1144,7 @@ const InfoRow = ({ label, value, mono }: { label: string; value: string | null; 
     <Typography
       variant='body2'
       fontWeight={500}
-      sx={mono ? { fontFamily: 'monospace', fontSize: '0.8rem' } : undefined}
+      sx={mono ? { fontSize: '0.8rem' } : undefined}
     >
       {value ?? '—'}
     </Typography>

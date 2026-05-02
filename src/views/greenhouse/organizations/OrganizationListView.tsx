@@ -105,7 +105,7 @@ const orgColumns: ColumnDef<OrganizationListItem, any>[] = [
   }),
   columnHelper.accessor('publicId', {
     header: 'ID',
-    cell: ({ getValue }) => <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>{getValue()}</Typography>
+    cell: ({ getValue }) => <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>{getValue()}</Typography>
   }),
   columnHelper.accessor('country', {
     header: 'País',

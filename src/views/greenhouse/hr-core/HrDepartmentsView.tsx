@@ -350,7 +350,7 @@ const HrDepartmentsView = ({ isAdmin }: Props) => {
                       </Typography>
                     </TableCell>
                     <TableCell align='center'>
-                      <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>{dept.sortOrder}</Typography>
+                      <Typography variant='body2'>{dept.sortOrder}</Typography>
                     </TableCell>
                     <TableCell align='center'>
                       <CustomChip

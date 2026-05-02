@@ -409,7 +409,7 @@ return theme.palette.secondary.main
                           <Box sx={{ mb: 2 }}>
                             <Stack direction='row' justifyContent='space-between' sx={{ mb: 0.5 }}>
                               <Typography variant='caption' color='text.secondary'>Consumo mensual</Typography>
-                              <Typography variant='caption' sx={{ fontFamily: 'monospace' }}>
+                              <Typography variant='caption'>
                                 {wallet.monthlyConsumed} / {wallet.monthlyLimit}
                               </Typography>
                             </Stack>
@@ -612,7 +612,7 @@ return theme.palette.secondary.main
                   </CustomAvatar>
                   <Box>
                     <Typography variant='subtitle2'>{editWallet.toolName}</Typography>
-                    <Typography variant='caption' color='text.secondary' sx={{ fontFamily: 'monospace', fontSize: '0.75rem' }}>
+                    <Typography variant='caption' color='text.secondary' sx={{ fontSize: '0.75rem' }}>
                       {editWallet.walletId}
                     </Typography>
                   </Box>

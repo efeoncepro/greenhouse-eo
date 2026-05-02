@@ -240,7 +240,7 @@ const EditOverheadDrawer = ({ open, overheadId, onClose, onSuccess }: Props) => 
         <Box>
           <Typography variant='h6'>Editar overhead</Typography>
           {loadedSku ? (
-            <Typography variant='caption' sx={{ fontFamily: 'monospace', color: 'text.secondary' }}>
+            <Typography variant='caption' sx={{ color: 'text.secondary' }}>
               SKU {loadedSku}
             </Typography>
           ) : null}

@@ -138,7 +138,7 @@ const PurchaseOrdersListView = () => {
       header: 'OC #',
       cell: ({ row }) => (
         <Box>
-          <Typography variant='body2' fontWeight={600} sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
+          <Typography variant='body2' fontWeight={600} sx={{ fontSize: '0.8rem' }}>
             {row.original.poNumber}
           </Typography>
           {row.original.description && (
@@ -267,7 +267,7 @@ const PurchaseOrdersListView = () => {
     return (
       <Stack spacing={6}>
         <Box>
-          <Typography variant='h4' sx={{ fontFamily: 'Poppins, sans-serif', fontWeight: 600, mb: 1 }}>Órdenes de compra</Typography>
+          <Typography variant='h4' sx={{ fontWeight: 600, mb: 1 }}>Órdenes de compra</Typography>
           <Typography variant='body2' color='text.secondary'>OC de clientes, saldos y consumo</Typography>
         </Box>
         <Grid container spacing={6}>{[0, 1, 2, 3].map(i => <Grid size={{ xs: 12, sm: 6, md: 3 }} key={i}><Skeleton variant='rounded' height={120} /></Grid>)}</Grid>
@@ -280,7 +280,7 @@ const PurchaseOrdersListView = () => {
     <Stack spacing={6}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 2 }}>
         <Box>
-          <Typography variant='h4' sx={{ fontFamily: 'Poppins, sans-serif', fontWeight: 600, mb: 1 }}>Órdenes de compra</Typography>
+          <Typography variant='h4' sx={{ fontWeight: 600, mb: 1 }}>Órdenes de compra</Typography>
           <Typography variant='body2' color='text.secondary'>OC de clientes, saldos y consumo</Typography>
         </Box>
         <Button variant='contained' color='primary' startIcon={<i className='tabler-plus' />} onClick={() => setDrawerOpen(true)}>

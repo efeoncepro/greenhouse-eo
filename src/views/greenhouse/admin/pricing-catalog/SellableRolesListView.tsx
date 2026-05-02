@@ -129,7 +129,7 @@ const buildColumns = (
   columnHelper.accessor('roleSku', {
     header: 'SKU',
     cell: ({ getValue }) => (
-      <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
+      <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>
         {getValue() || '—'}
       </Typography>
     )

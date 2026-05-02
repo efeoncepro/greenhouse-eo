@@ -72,7 +72,7 @@ const BusinessLineEditDialog = ({ open, metadata, onClose, onSaved }: Props) => 
     <Dialog open={open} onClose={onClose} maxWidth='sm' fullWidth>
       <DialogTitle sx={{ pb: 1 }}>
         Editar {metadata.label}
-        <span style={{ fontFamily: 'monospace', fontSize: 12, marginLeft: 8, opacity: 0.5 }}>{metadata.moduleCode}</span>
+        <span style={{ fontSize: 12, marginLeft: 8, opacity: 0.5 }}>{metadata.moduleCode}</span>
       </DialogTitle>
       <DialogContent>
         <Stack spacing={3} sx={{ pt: 1 }}>

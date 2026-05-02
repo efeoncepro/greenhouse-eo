@@ -36,6 +36,9 @@
 // Theme contract: docs/architecture/GREENHOUSE_DESIGN_TOKENS_V1.md §3
 // Visual contract: DESIGN.md (raiz)
 
+// CSS-wide values that pass through (browsers resolve them; not a banned family).
+const ALLOWLIST_VALUES = new Set(['inherit', 'initial', 'unset', 'revert', 'revert-layer', ''])
+
 const MONOSPACE_NEEDLES = ['monospace', 'menlo', 'consolas', 'courier', 'sf mono', 'ui-monospace']
 const BANNED_INTER = ['inter', '--font-inter']
 const BANNED_DM_SANS = ['dm sans', '--font-dm-sans']
@@ -94,58 +97,26 @@ const isFontFamilyKey = property => {
 }
 
 const isInsideRelevantContext = property => {
-  // Walk up the AST to determine if the Property is inside an sx/style JSX
-  // attribute, a styled(...) call, or a makeStyles/createStyles call. We scope
-  // the rule to those contexts so theme override files (mergedTheme,
-  // typography.ts) and unrelated object literals (test fixtures, payload
-  // builders) do not trigger.
-  let current = property.parent
+  // The rule's scope is already constrained by the files glob in
+  // eslint.config.mjs (src/views, src/components, src/app). Within that scope,
+  // any Property with key fontFamily and a literal banned value is suspect.
+  // We allow ALL contexts — JSXAttribute (sx/style), styled(...) calls,
+  // makeStyles/createStyles, AND nested patterns like
+  //   InputProps={{ sx: { fontFamily: 'monospace' } }}
+  //   slotProps={{ root: { sx: { fontFamily: 'monospace' } } }}
+  //   ECharts/ApexCharts config objects passed as props.
+  //
+  // The previous implementation walked the ancestor chain looking for sx/style
+  // JSXAttributes, which missed nested `sx` keys inside other JSX props
+  // (e.g. MUI TextField InputProps.sx). The simpler rule — "no banned literals
+  // in any object literal in product UI code" — is more robust and matches
+  // the contract intent: tokens or variants only, never raw font strings.
+  //
+  // Files that legitimately need raw fontFamily (theme source, emails, PDFs,
+  // global-error pre-theme) are excluded via files glob in eslint.config.mjs.
+  void property
 
-  while (current) {
-    if (current.type === 'JSXAttribute') {
-      const name = current.name && current.name.name
-
-      return name === 'sx' || name === 'style'
-    }
-
-    if (current.type === 'CallExpression') {
-      const callee = current.callee
-
-      if (!callee) return false
-
-      // styled('h1')({ fontFamily }) o styled(Box)({ fontFamily })
-      if (callee.type === 'Identifier' && callee.name === 'styled') return true
-
-      // styled.h1({ fontFamily })
-      if (
-        callee.type === 'MemberExpression' &&
-        callee.object &&
-        callee.object.type === 'Identifier' &&
-        callee.object.name === 'styled'
-      ) {
-        return true
-      }
-
-      // styled('h1')(...) — when styled('h1') itself returns a function and
-      // we are evaluating its invocation argument
-      if (
-        callee.type === 'CallExpression' &&
-        callee.callee &&
-        callee.callee.type === 'Identifier' &&
-        callee.callee.name === 'styled'
-      ) {
-        return true
-      }
-
-      if (callee.type === 'Identifier' && (callee.name === 'makeStyles' || callee.name === 'createStyles')) {
-        return true
-      }
-    }
-
-    current = current.parent
-  }
-
-  return false
+  return true
 }
 
 export default {
@@ -175,21 +146,67 @@ export default {
     }
   },
   create(context) {
+    const checkLiteralValue = (valueNode, reportNode) => {
+      const extracted = extractStringValue(valueNode)
+
+      if (!extracted) return
+      if (ALLOWLIST_VALUES.has(lower(extracted.value).trim())) return
+
+      const messageId = classifyLiteral(extracted.value)
+
+      context.report({
+        node: reportNode || valueNode,
+        messageId
+      })
+    }
+
+    // Recursively descend into Conditional/Logical/JSXExpressionContainer values
+    // so patterns like `fontFamily: cond ? 'monospace' : undefined` and
+    // `fontFamily={cond ? 'monospace' : undefined}` still fire.
+    const checkValueExpression = (valueNode, reportNode) => {
+      if (!valueNode) return
+
+      if (valueNode.type === 'JSXExpressionContainer') {
+        checkValueExpression(valueNode.expression, reportNode)
+
+        return
+      }
+
+      if (valueNode.type === 'ConditionalExpression') {
+        checkValueExpression(valueNode.consequent, reportNode)
+        checkValueExpression(valueNode.alternate, reportNode)
+
+        return
+      }
+
+      if (valueNode.type === 'LogicalExpression') {
+        checkValueExpression(valueNode.left, reportNode)
+        checkValueExpression(valueNode.right, reportNode)
+
+        return
+      }
+
+      checkLiteralValue(valueNode, reportNode || valueNode)
+    }
+
     return {
+      // Object literal property: { fontFamily: '...' } in sx/style/styled/etc.
       Property(node) {
         if (!isFontFamilyKey(node)) return
         if (!isInsideRelevantContext(node)) return
 
-        const extracted = extractStringValue(node.value)
+        checkValueExpression(node.value, node.value)
+      },
 
-        if (!extracted) return
+      // JSX attribute shortcut: <Typography fontFamily='monospace'>
+      // MUI Typography exposes fontFamily as a top-level prop equivalent to
+      // sx.fontFamily, so the same contract applies.
+      JSXAttribute(node) {
+        const name = node.name && node.name.name
 
-        const messageId = classifyLiteral(extracted.value)
+        if (name !== 'fontFamily') return
 
-        context.report({
-          node: node.value,
-          messageId
-        })
+        checkValueExpression(node.value, node.value)
       }
     }
   }

@@ -66,6 +66,11 @@ const proseSx = {
     px: 0.75,
     py: 0.25,
     borderRadius: 0.75,
+
+    // Excepcion justificada (TASK-567): el tag <code> dentro de markdown
+    // rendering del thread de Nexa muestra source code literal, no IDs ni
+    // montos. Es el caso de excepcion documentado en la spec.
+    // eslint-disable-next-line greenhouse/no-hardcoded-fontfamily
     fontFamily: 'monospace',
     border: '1px solid',
     borderColor: 'divider'

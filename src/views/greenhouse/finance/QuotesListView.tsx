@@ -248,7 +248,6 @@ const QuotesListView = () => {
                         <Typography
                           variant='body2'
                           sx={{
-                            fontFamily: 'monospace',
                             fontSize: '0.8rem',
                             viewTransitionName: `quote-identity-${q.quoteId}`
                           }}
@@ -271,7 +270,7 @@ const QuotesListView = () => {
                         <Typography variant='body2' color='text.secondary'>{formatDate(q.dueDate)}</Typography>
                       </TableCell>
                       <TableCell align='right'>
-                        <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>{formatCLP(q.totalAmountClp)}</Typography>
+                        <Typography variant='body2'>{formatCLP(q.totalAmountClp)}</Typography>
                       </TableCell>
                       <TableCell>
                         {q.currentVersion && q.currentVersion > 1 ? (

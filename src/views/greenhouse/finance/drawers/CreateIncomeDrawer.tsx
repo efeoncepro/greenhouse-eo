@@ -392,7 +392,7 @@ const CreateIncomeDrawer = ({ open, onClose, onSuccess }: Props) => {
           disabled
           InputProps={{
             readOnly: true,
-            sx: { fontFamily: 'monospace', fontSize: '0.85rem', bgcolor: 'action.hover' }
+            sx: { fontSize: '0.85rem', bgcolor: 'action.hover' }
           }}
         />
         <CustomTextField

@@ -1,5 +1,17 @@
 # Handoff.md
 
+## Sesion 2026-05-02 — TASK-567 cerrada (typography sweep + ESLint governance)
+
+- **Contexto**: tras commit de `DESIGN.md` (commit `f8fc7200`) y creación de TASK-764 (DESIGN.md hardening), el usuario pidió ejecutar TASK-567 con principio "lo más robusto, seguro, resiliente y escalable". Decisión arquitectónica: invertir el orden de la spec — gate antes que sweep — para que cualquier limpieza quede auto-protegida desde CI antes de hacerse.
+- **Slice 3a — gate establecido en `warn`**: rule local `greenhouse/no-hardcoded-fontfamily` en `eslint-plugins/greenhouse/rules/no-hardcoded-fontfamily.mjs` siguiendo patrón de `no-raw-table-without-shell` (TASK-743). AST vanilla, scope universal sobre `Property` con key `fontFamily` y value literal/template puro. Allowlist para CSS-wide values. 7 messageIds accionables por familia detectada. Snapshot inicial: 311 warnings, 0 errors.
+- **Slice 2 — sweep automatizado conservador**: 2 codemods regex (`/tmp/codemod-fontfamily.mjs` y `pass2`) eliminaron 300 occurrences (262 + 38) en 135 archivos. Pass 1: `'monospace'` literal en `sx`/`style`. Pass 2: `'Poppins'`, `'Poppins, sans-serif'`, `'Inter'`, `'DM Sans'`, composite mono stacks. Codemods quedan como artifacts en `/tmp` (no commiteados — son de uso único).
+- **Slice 2c — 9 casos especiales manuales**: ternarios `mono ? { fontFamily: 'monospace' } : undefined` migrados a `variant={mono ? 'monoId' : 'body2'}` en `PersonProfileTab` (×2). 6× `InputProps.sx` anidado en CreateHesDrawer/CreatePurchaseOrderDrawer/CreateIncomeDrawer/EditProfileDrawer eliminada la fontFamily preservando fontSize/bgcolor. NexaThread `<code>` markdown con `eslint-disable-next-line` justificado (excepción válida de spec — código fuente literal, no IDs/amounts).
+- **Slice 3b — rule en `error`**: subida de severidad bloquea CI desde ahora ante cualquier regresión. Excluidos por scope: `src/components/theme/**`, `src/@core/theme/**`, `src/app/global-error.tsx`, `src/app/public/**`, `src/emails/**`, `src/lib/finance/pdf/**`.
+- **Slice 4 — TASK-021 reclasificada**: nota delta agregada al inicio de `docs/tasks/to-do/TASK-021-typography-variant-adoption.md`. Sigue vigente para `fontWeight` migration y adopción opt-in de variants semánticos donde aplique.
+- **Verification**: `pnpm lint` 0/0, `npx tsc --noEmit` 0 errors. Delta neto -38 LOC (335 inserciones, 373 deleciones).
+- **Sinergia con TASK-764 (DESIGN.md hardening)**: TASK-567 cierra el flanco "typography drift en código" del contrato visual. TASK-764 añade el flanco "design tokens drift en DESIGN.md" (CI gate `design:lint`). Ambas convergen en "tokens declarados, runtime alineado, lint que bloquea drift".
+- **Follow-ups**: `fontWeight` hardcodeado y adopción opt-in de `monoId/monoAmount` quedan en TASK-021. Tests con `RuleTester` para rules locales pendientes (no hay infra hoy).
+
 ## Sesion 2026-05-02 — Notion freshness drift (BigQuery vs PostgreSQL) mitigado en portal
 
 - **Trigger**: investigacion del usuario por `RpA Global = 3` en `/agency` derivo en un hallazgo mas grave: mayo 2026 **si** tiene datos Notion en BigQuery, pero `greenhouse_core.space_notion_sources.last_synced_at` seguia `NULL` en PostgreSQL mientras `efeonce-group.greenhouse.space_notion_sources.last_synced_at` se actualizaba todos los dias.

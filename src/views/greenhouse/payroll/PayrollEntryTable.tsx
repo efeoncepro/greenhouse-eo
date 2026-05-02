@@ -205,7 +205,7 @@ const PayrollEntryTable = ({ entries, period, periodStatus, onEntryUpdate, onAdj
                     {entry.workingDaysInPeriod != null ? (
                       <Tooltip title={`Presentes: ${entry.daysPresent ?? 0} | Ausentes: ${entry.daysAbsent ?? 0} | Licencia: ${entry.daysOnLeave ?? 0}`}>
                         <span>
-                          <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
+                          <Typography variant='body2'>
                             {formatAttendanceRatio(entry.daysPresent, entry.workingDaysInPeriod)}
                           </Typography>
                           {(entry.daysAbsent ?? 0) > 0 && (
@@ -224,7 +224,7 @@ const PayrollEntryTable = ({ entries, period, periodStatus, onEntryUpdate, onAdj
                       ? `Original: ${formatCurrency(entry.baseSalary, entry.currency)} | Ajustado por inasistencia`
                       : ''
                     }>
-                      <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
+                      <Typography variant='body2'>
                         {formatCurrency(entry.adjustedBaseSalary ?? entry.baseSalary, entry.currency)}
                       </Typography>
                     </Tooltip>
@@ -258,7 +258,7 @@ const PayrollEntryTable = ({ entries, period, periodStatus, onEntryUpdate, onAdj
                         onChange={v => onEntryUpdate(entry.entryId, 'bonusOtdAmount', v)}
                       />
                     ) : (
-                      <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
+                      <Typography variant='body2'>
                         {formatCurrency(entry.bonusOtdAmount, entry.currency)}
                       </Typography>
                     )}
@@ -285,7 +285,7 @@ const PayrollEntryTable = ({ entries, period, periodStatus, onEntryUpdate, onAdj
                         onChange={v => onEntryUpdate(entry.entryId, 'bonusRpaAmount', v)}
                       />
                     ) : (
-                      <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
+                      <Typography variant='body2'>
                         {formatCurrency(entry.bonusRpaAmount, entry.currency)}
                       </Typography>
                     )}
@@ -297,7 +297,7 @@ const PayrollEntryTable = ({ entries, period, periodStatus, onEntryUpdate, onAdj
                       ? `Original: ${formatCurrency(entry.remoteAllowance, entry.currency)} | Ajustado por inasistencia`
                       : ''
                     }>
-                      <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
+                      <Typography variant='body2'>
                         {formatCurrency(entry.adjustedRemoteAllowance ?? entry.remoteAllowance, entry.currency)}
                       </Typography>
                     </Tooltip>
@@ -308,7 +308,7 @@ const PayrollEntryTable = ({ entries, period, periodStatus, onEntryUpdate, onAdj
                       ? `Original: ${formatCurrency(entry.fixedBonusAmount, entry.currency)} | Ajustado por inasistencia`
                       : entry.fixedBonusLabel || ''
                     }>
-                      <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
+                      <Typography variant='body2'>
                         {formatCurrency(entry.adjustedFixedBonusAmount ?? entry.fixedBonusAmount, entry.currency)}
                       </Typography>
                     </Tooltip>
@@ -316,7 +316,7 @@ const PayrollEntryTable = ({ entries, period, periodStatus, onEntryUpdate, onAdj
 
                   {/* Bruto */}
                   <TableCell align='right'>
-                    <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
+                    <Typography variant='body2'>
                       {formatCurrency(entry.grossTotal, entry.currency)}
                     </Typography>
                   </TableCell>
@@ -327,7 +327,7 @@ const PayrollEntryTable = ({ entries, period, periodStatus, onEntryUpdate, onAdj
                       <Typography
                         variant='body2'
                         color='error.main'
-                        sx={{ fontFamily: 'monospace', cursor: 'pointer' }}
+                        sx={{ cursor: 'pointer' }}
                         onClick={() => toggleExpand(entry.entryId)}
                       >
                         - {formatCurrency(isHonorarios ? entry.siiRetentionAmount : entry.chileTotalDeductions, 'CLP')}
@@ -339,7 +339,7 @@ const PayrollEntryTable = ({ entries, period, periodStatus, onEntryUpdate, onAdj
 
                   {/* Neto */}
                   <TableCell align='right'>
-                    <Typography variant='subtitle2' sx={{ fontFamily: 'monospace', fontWeight: 700 }}>
+                    <Typography variant='subtitle2' sx={{ fontWeight: 700 }}>
                       {formatCurrency(entry.netTotal, entry.currency)}
                     </Typography>
                     {entry.manualOverride && (
@@ -534,7 +534,7 @@ const PayrollEntryTable = ({ entries, period, periodStatus, onEntryUpdate, onAdj
                                     Greenhouse registra el monto y calcula los bonos KPI desde OTD y RpA; Deel sigue gestionando compliance y pago final.
                                   </Typography>
                                   {entry.deelContractId && (
-                                    <Typography variant='caption' sx={{ display: 'block', mt: 1.5, fontFamily: 'monospace' }}>
+                                    <Typography variant='caption' sx={{ display: 'block', mt: 1.5 }}>
                                       Contrato: {entry.deelContractId}
                                     </Typography>
                                   )}

@@ -143,7 +143,7 @@ const InlineNumericEditor = ({
       <Typography
         variant='body2'
         color='text.disabled'
-        sx={{ fontFamily: 'monospace', fontSize: tokens.fontSize }}
+        sx={{ fontSize: tokens.fontSize }}
       >
         {formatter(0, currency)}
       </Typography>
@@ -174,7 +174,6 @@ const InlineNumericEditor = ({
           fontSize: tokens.fontSize
         },
         '& input': {
-          fontFamily: 'monospace',
           textAlign: 'right',
           fontSize: tokens.fontSize,
           padding: density === 'compact' ? '4px 6px' : undefined

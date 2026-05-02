@@ -509,19 +509,18 @@ const MrrArrDashboardView = () => {
                       <Typography variant='body2' color='text.secondary'>{row.staffingModel}</Typography>
                     </TableCell>
                     <TableCell align='right'>
-                      <Typography variant='body2' sx={{ fontFamily: 'monospace', fontWeight: 500 }}>
+                      <Typography variant='body2' sx={{ fontWeight: 500 }}>
                         {formatCLP(row.mrrClp)}
                       </Typography>
                     </TableCell>
                     <TableCell align='right'>
-                      <Typography variant='body2' sx={{ fontFamily: 'monospace' }} color='text.secondary'>
+                      <Typography variant='body2' color='text.secondary'>
                         {formatCLP(row.arrClp)}
                       </Typography>
                     </TableCell>
                     <TableCell align='right'>
                       <Typography
                         variant='body2'
-                        sx={{ fontFamily: 'monospace' }}
                         color={row.mrrDeltaClp > 0 ? 'success.main' : row.mrrDeltaClp < 0 ? 'error.main' : 'text.secondary'}
                       >
                         {row.mrrDeltaClp > 0 ? '+' : ''}{formatCLP(row.mrrDeltaClp)}
@@ -577,7 +576,7 @@ const BreakdownCard = ({ title, data, loading, limit }: BreakdownCardProps) => {
                 <Typography variant='body2'>
                   {key} <Typography component='span' variant='caption' color='text.secondary'>({value.count})</Typography>
                 </Typography>
-                <Typography variant='body2' sx={{ fontFamily: 'monospace', fontWeight: 500 }}>
+                <Typography variant='body2' sx={{ fontWeight: 500 }}>
                   {formatCLP(value.mrrClp)}
                 </Typography>
               </Stack>

@@ -322,17 +322,17 @@ const ProductCatalogView = () => {
                         )}
                       </TableCell>
                       <TableCell>
-                        <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
+                        <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>
                           {p.sku ?? '—'}
                         </Typography>
                       </TableCell>
                       <TableCell align='right'>
-                        <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
+                        <Typography variant='body2'>
                           {p.unitPrice !== null ? formatCLP(p.unitPrice) : '—'}
                         </Typography>
                       </TableCell>
                       <TableCell align='right'>
-                        <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
+                        <Typography variant='body2'>
                           {p.costOfGoodsSold !== null ? formatCLP(p.costOfGoodsSold) : '—'}
                         </Typography>
                       </TableCell>

@@ -275,7 +275,6 @@ const PaymentProfileCard = ({ profile, onActionComplete }: PaymentProfileCardPro
             <Typography
               variant='caption'
               sx={{
-                fontFamily: 'ui-monospace, SF Mono, monospace',
                 fontSize: '0.7rem',
                 color: 'text.secondary'
               }}
@@ -397,7 +396,6 @@ const PaymentProfileCard = ({ profile, onActionComplete }: PaymentProfileCardPro
               <Typography
                 variant='subtitle2'
                 sx={{
-                  fontFamily: 'ui-monospace, SF Mono, monospace',
                   letterSpacing: '0.08em'
                 }}
               >

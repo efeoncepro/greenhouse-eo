@@ -328,7 +328,7 @@ const PayrollEntryAdjustDialog = ({ open, onClose, entry, onSubmitted }: Props) 
           {isExpandedMode && computation && (
             <>
               <Divider />
-              <Stack spacing={1} sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
+              <Stack spacing={1} sx={{ fontSize: '0.8rem' }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                   <span>Bruto natural:</span>
                   <span>{formatCurrency(naturalGross, entry.currency)}</span>

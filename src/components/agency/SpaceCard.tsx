@@ -112,7 +112,7 @@ const SpaceCard = ({ space, financeMetrics }: Props) => {
         <Box sx={{ flex: 1, minWidth: 0 }}>
           <Stack direction='row' spacing={0.75} alignItems='center' flexWrap='wrap' useFlexGap>
             <Typography
-              sx={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: '0.95rem', color: theme.palette.customColors.midnight }}
+              sx={{ fontWeight: 600, fontSize: '0.95rem', color: theme.palette.customColors.midnight }}
               noWrap
             >
               {space.clientName}
@@ -177,7 +177,7 @@ const SpaceCard = ({ space, financeMetrics }: Props) => {
               sx={{ height: 6, borderRadius: 3, bgcolor: alpha(rpa.muiColor, 0.12) }}
             />
           </Box>
-          <Typography sx={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: '0.85rem', color: rpa.muiColor, minWidth: 30, textAlign: 'right' }}>
+          <Typography sx={{ fontWeight: 600, fontSize: '0.85rem', color: rpa.muiColor, minWidth: 30, textAlign: 'right' }}>
             {space.rpaAvg !== null ? space.rpaAvg.toFixed(1) : '—'}
           </Typography>
         </Stack>
@@ -193,7 +193,7 @@ const SpaceCard = ({ space, financeMetrics }: Props) => {
               sx={{ height: 6, borderRadius: 3, bgcolor: alpha(otd.muiColor, 0.12) }}
             />
           </Box>
-          <Typography sx={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: '0.85rem', color: otd.muiColor, minWidth: 30, textAlign: 'right' }}>
+          <Typography sx={{ fontWeight: 600, fontSize: '0.85rem', color: otd.muiColor, minWidth: 30, textAlign: 'right' }}>
             {space.otdPct !== null ? `${Math.round(space.otdPct)}%` : '—'}
           </Typography>
         </Stack>

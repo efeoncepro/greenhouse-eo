@@ -914,7 +914,6 @@ const AdminCenterView = ({
                           size='small'
                           label={route}
                           variant='outlined'
-                          sx={{ fontFamily: 'monospace' }}
                         />
                       ))}
                     </Stack>

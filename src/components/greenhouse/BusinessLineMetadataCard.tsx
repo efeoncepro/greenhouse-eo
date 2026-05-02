@@ -89,7 +89,7 @@ const BusinessLineMetadataCard = ({ metadata, onClick }: Props) => {
 
         {/* Footer: module_code + icon */}
         <Stack direction='row' justifyContent='space-between' alignItems='center'>
-          <Typography variant='caption' color='text.disabled' fontFamily='monospace'>
+          <Typography variant='monoId' color='text.disabled'>
             {metadata.moduleCode}
           </Typography>
           {metadata.iconName && (

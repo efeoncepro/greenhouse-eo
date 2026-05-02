@@ -88,7 +88,7 @@ const TenantServiceModulesTable = ({ capabilities }: TenantServiceModulesTablePr
       columnHelper.accessor('publicModuleId', {
         header: GH_INTERNAL_MESSAGES.admin_tenant_service_modules_header_code,
         cell: ({ row }) => (
-          <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>{row.original.publicModuleId}</Typography>
+          <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>{row.original.publicModuleId}</Typography>
         )
       }),
       columnHelper.accessor('familyLabel', {

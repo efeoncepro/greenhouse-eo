@@ -1009,7 +1009,7 @@ const EditSellableRoleDrawer = ({ open, roleId, onClose, onSuccess }: EditSellab
         <Box>
           <Typography variant='h6'>Editar rol vendible</Typography>
           {role && (
-            <Typography variant='caption' color='text.secondary' sx={{ fontFamily: 'monospace' }}>
+            <Typography variant='caption' color='text.secondary'>
               {role.roleSku} · {role.roleLabelEs}
             </Typography>
           )}
@@ -1340,7 +1340,6 @@ const EditSellableRoleDrawer = ({ open, roleId, onClose, onSuccess }: EditSellab
                             <Typography
                               variant='caption'
                               color='text.secondary'
-                              sx={{ fontFamily: 'monospace' }}
                             >
                               {row.employmentTypeCode}
                               {row.countryCode ? ` · ${row.countryCode}` : ''}
@@ -1858,8 +1857,7 @@ const EditSellableRoleDrawer = ({ open, roleId, onClose, onSuccess }: EditSellab
                                                   display: 'block',
                                                   overflow: 'hidden',
                                                   textOverflow: 'ellipsis',
-                                                  whiteSpace: 'nowrap',
-                                                  fontFamily: 'monospace'
+                                                  whiteSpace: 'nowrap'
                                                 }
                                               }}
                                             />

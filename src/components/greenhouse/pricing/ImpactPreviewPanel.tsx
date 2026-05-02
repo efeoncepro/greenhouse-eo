@@ -296,7 +296,7 @@ const ImpactPreviewPanel = ({
                   </Typography>
                   <Stack spacing={0.5}>
                     {result.affectedQuotes.sample.map(quote => (
-                      <Typography key={quote.quotationId} variant='caption' sx={{ fontFamily: 'monospace' }}>
+                      <Typography key={quote.quotationId} variant='caption'>
                         {quote.quotationNumber} · {quote.clientName ?? '—'} ·{' '}
                         {formatClp(quote.totalAmountClp)} · {quote.status}
                       </Typography>

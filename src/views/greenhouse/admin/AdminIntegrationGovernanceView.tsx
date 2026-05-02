@@ -380,7 +380,7 @@ const AdminIntegrationGovernanceView = ({
                           <Typography variant='body2' sx={{ fontWeight: 600, textTransform: 'capitalize' }}>
                             {binding.sisterPlatformKey}
                           </Typography>
-                          <Typography variant='caption' color='text.secondary' sx={{ fontFamily: 'monospace' }}>
+                          <Typography variant='caption' color='text.secondary'>
                             {binding.publicId}
                           </Typography>
                         </Stack>
@@ -476,7 +476,7 @@ const AdminIntegrationGovernanceView = ({
                     </Typography>
                   </TableCell>
                   <TableCell>
-                    <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8125rem' }}>
+                    <Typography variant='body2' sx={{ fontSize: '0.8125rem' }}>
                       {entry.syncCadence ?? '\u2014'}
                     </Typography>
                   </TableCell>
@@ -676,7 +676,7 @@ const AdminIntegrationGovernanceView = ({
                           <Typography variant='body2' sx={{ fontWeight: 600 }}>
                             {space.spaceName ?? space.spaceId}
                           </Typography>
-                          <Typography variant='caption' color='text.secondary' sx={{ fontFamily: 'monospace' }}>
+                          <Typography variant='caption' color='text.secondary'>
                             {space.spaceId}
                           </Typography>
                         </Stack>
@@ -787,7 +787,7 @@ const AdminIntegrationGovernanceView = ({
                           <Typography variant='body2' sx={{ fontWeight: 600 }}>
                             {space.spaceName ?? space.spaceId}
                           </Typography>
-                          <Typography variant='caption' color='text.secondary' sx={{ fontFamily: 'monospace' }}>
+                          <Typography variant='caption' color='text.secondary'>
                             {space.spaceId}
                           </Typography>
                         </Stack>
@@ -877,7 +877,7 @@ const AdminIntegrationGovernanceView = ({
                           {notionRecentRuns.slice(0, 6).map(run => (
                             <TableRow key={run.dataQualityRunId} hover>
                               <TableCell>
-                                <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8125rem' }}>
+                                <Typography variant='body2' sx={{ fontSize: '0.8125rem' }}>
                                   {run.spaceId}
                                 </Typography>
                               </TableCell>
@@ -935,7 +935,7 @@ const AdminIntegrationGovernanceView = ({
                       )}
                     </Stack>
                     {entry.syncEndpoint ? (
-                      <Typography variant='caption' color='text.secondary' sx={{ fontFamily: 'monospace' }}>
+                      <Typography variant='caption' color='text.secondary'>
                         {entry.syncEndpoint}
                       </Typography>
                     ) : (

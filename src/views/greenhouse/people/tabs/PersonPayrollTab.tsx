@@ -216,27 +216,27 @@ const PersonPayrollTab = ({ entries: initialEntries, memberId }: Props) => {
                         </Stack>
                       </TableCell>
                       <TableCell align='right'>
-                        <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
+                        <Typography variant='body2'>
                           {formatCurrency(entry.baseSalary, currency)}
                         </Typography>
                       </TableCell>
                       <TableCell align='right'>
-                        <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
+                        <Typography variant='body2'>
                           {formatCurrency(entry.bonusOtdAmount + entry.bonusRpaAmount + entry.bonusOtherAmount, currency)}
                         </Typography>
                       </TableCell>
                       <TableCell align='right'>
-                        <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
+                        <Typography variant='body2'>
                           {formatCurrency(entry.grossTotal, currency)}
                         </Typography>
                       </TableCell>
                       <TableCell align='right'>
-                        <Typography variant='body2' color='error.main' sx={{ fontFamily: 'monospace' }}>
+                        <Typography variant='body2' color='error.main'>
                           {entry.chileTotalDeductions ? `- ${formatCurrency(entry.chileTotalDeductions, 'CLP')}` : '—'}
                         </Typography>
                       </TableCell>
                       <TableCell align='right'>
-                        <Typography variant='subtitle2' sx={{ fontFamily: 'monospace', fontWeight: 700 }}>
+                        <Typography variant='subtitle2' sx={{ fontWeight: 700 }}>
                           {formatCurrency(entry.netTotal, currency)}
                         </Typography>
                       </TableCell>

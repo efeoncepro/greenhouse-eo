@@ -283,7 +283,7 @@ const EffectiveViewsSection = ({
                         >
                           <Box sx={{ minWidth: 0 }}>
                             <Typography variant='body2'>{view.label}</Typography>
-                            <Typography variant='caption' color='text.disabled' sx={{ fontFamily: 'monospace' }}>
+                            <Typography variant='caption' color='text.disabled'>
                               {view.viewCode}
                             </Typography>
                           </Box>
@@ -353,7 +353,7 @@ const EffectiveEntitlementsSection = ({
                 <TableRow key={`${row.capability}:${row.action}:${row.scope}`}>
                   <TableCell>{toTitleCase(row.module.replace('_', ' '))}</TableCell>
                   <TableCell>
-                    <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
+                    <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>
                       {row.capability}
                     </Typography>
                   </TableCell>
@@ -514,7 +514,7 @@ const OverridesSection = ({
                   {overrides.map(override => (
                     <TableRow key={override.overrideId}>
                       <TableCell>
-                        <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
+                        <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>
                           {override.capability}
                         </Typography>
                       </TableCell>

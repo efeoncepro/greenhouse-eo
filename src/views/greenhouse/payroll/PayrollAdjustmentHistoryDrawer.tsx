@@ -230,7 +230,7 @@ const PayrollAdjustmentHistoryDrawer = ({
                     {KIND_LABELS[a.kind] ?? a.kind}
                   </Typography>
                   {formatPayloadSummary(a.kind, a.payload) && (
-                    <Typography variant='body2' color='text.secondary' sx={{ fontFamily: 'monospace' }}>
+                    <Typography variant='body2' color='text.secondary'>
                       {formatPayloadSummary(a.kind, a.payload)}
                     </Typography>
                   )}

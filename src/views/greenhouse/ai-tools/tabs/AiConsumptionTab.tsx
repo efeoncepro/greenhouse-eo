@@ -189,7 +189,7 @@ const AiConsumptionTab = ({ meta }: Props) => {
 
           return (
             <Typography
-              sx={{ fontFamily: 'monospace', fontWeight: 600, color: isDebit ? 'error.main' : 'success.main' }}
+              sx={{ fontWeight: 600, color: isDebit ? 'error.main' : 'success.main' }}
             >
               {isDebit ? '-' : '+'}{row.original.creditAmount}
             </Typography>
@@ -199,7 +199,7 @@ const AiConsumptionTab = ({ meta }: Props) => {
       columnHelper.accessor('balanceAfter', {
         header: 'Balance',
         cell: ({ getValue }) => (
-          <Typography sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
+          <Typography sx={{ fontSize: '0.8rem' }}>
             {getValue()}
           </Typography>
         )
@@ -229,7 +229,7 @@ const AiConsumptionTab = ({ meta }: Props) => {
         id: 'cost',
         header: 'Costo',
         cell: ({ row }) => (
-          <Typography sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
+          <Typography sx={{ fontSize: '0.8rem' }}>
             {formatCost(row.original.totalCost, row.original.costCurrency)}
           </Typography>
         )

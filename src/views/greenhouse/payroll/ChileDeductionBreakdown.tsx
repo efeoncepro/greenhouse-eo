@@ -36,7 +36,6 @@ const LineItem = ({ label, amount, isDeduction = false, isBold = false }: LineIt
     <Typography
       variant='body2'
       fontWeight={isBold ? 600 : 400}
-      sx={{ fontFamily: 'monospace' }}
       color={isDeduction ? 'error.main' : isBold ? 'success.main' : 'text.primary'}
     >
       {isDeduction && amount ? '- ' : isBold ? '' : ''}
@@ -110,7 +109,7 @@ const ChileDeductionBreakdown = ({ entry }: Props) => {
       {entry.remoteAllowance > 0 && (
         <Stack direction='row' justifyContent='space-between' sx={{ py: 0.25 }}>
           <Typography variant='body2'>Asig. teletrabajo</Typography>
-          <Typography variant='body2' sx={{ fontFamily: 'monospace' }} color='success.main'>
+          <Typography variant='body2' color='success.main'>
             + {formatCurrency(effectiveRemoteAllowance, 'CLP')}
           </Typography>
         </Stack>
@@ -118,7 +117,7 @@ const ChileDeductionBreakdown = ({ entry }: Props) => {
       {colacion > 0 && (
         <Stack direction='row' justifyContent='space-between' sx={{ py: 0.25 }}>
           <Typography variant='body2'>Colación</Typography>
-          <Typography variant='body2' sx={{ fontFamily: 'monospace' }} color='success.main'>
+          <Typography variant='body2' color='success.main'>
             + {formatCurrency(colacion, 'CLP')}
           </Typography>
         </Stack>
@@ -126,7 +125,7 @@ const ChileDeductionBreakdown = ({ entry }: Props) => {
       {movilizacion > 0 && (
         <Stack direction='row' justifyContent='space-between' sx={{ py: 0.25 }}>
           <Typography variant='body2'>Movilización</Typography>
-          <Typography variant='body2' sx={{ fontFamily: 'monospace' }} color='success.main'>
+          <Typography variant='body2' color='success.main'>
             + {formatCurrency(movilizacion, 'CLP')}
           </Typography>
         </Stack>
@@ -136,7 +135,7 @@ const ChileDeductionBreakdown = ({ entry }: Props) => {
           <Typography variant='body2'>
             {entry.fixedBonusLabel ? `Bono fijo (${entry.fixedBonusLabel})` : 'Bono fijo'}
           </Typography>
-          <Typography variant='body2' sx={{ fontFamily: 'monospace' }} color='success.main'>
+          <Typography variant='body2' color='success.main'>
             + {formatCurrency(entry.adjustedFixedBonusAmount ?? entry.fixedBonusAmount, 'CLP')}
           </Typography>
         </Stack>

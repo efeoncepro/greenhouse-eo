@@ -216,7 +216,7 @@ const EmailDeliveryHistoryTab = () => {
     columnHelper.accessor('attemptNumber', {
       header: 'Int.',
       cell: ({ getValue }) => (
-        <Typography variant='body2' sx={getValue() > 1 ? { fontFamily: 'monospace', fontSize: '0.8rem' } : {}}>
+        <Typography variant='body2' sx={getValue() > 1 ? { fontSize: '0.8rem' } : {}}>
           {getValue()}
         </Typography>
       ),

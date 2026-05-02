@@ -211,7 +211,7 @@ const ClientDrillDown = ({
             {data.members.map(m => (
               <TableRow key={m.memberId}>
                 <TableCell>
-                  <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.75rem' }}>
+                  <Typography variant='body2' sx={{ fontSize: '0.75rem' }}>
                     {m.memberId}
                   </Typography>
                 </TableCell>
@@ -578,7 +578,7 @@ const CostAllocationsView = () => {
    
   const allocColumns: ColumnDef<Allocation, any>[] = [
     allocColumnHelper.accessor('clientName', { header: 'Cliente', cell: ({ getValue }) => <Typography variant='body2' fontWeight={600}>{getValue()}</Typography> }),
-    allocColumnHelper.accessor('expenseId', { header: 'Expense ID', cell: ({ getValue }) => <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.75rem' }}>{getValue().slice(0, 12)}...</Typography> }),
+    allocColumnHelper.accessor('expenseId', { header: 'Expense ID', cell: ({ getValue }) => <Typography variant='body2' sx={{ fontSize: '0.75rem' }}>{getValue().slice(0, 12)}...</Typography> }),
     allocColumnHelper.accessor('allocationMethod', { header: 'Metodo', cell: ({ getValue }) => <CustomChip round='true' size='small' variant='tonal' color='info' label={METHOD_LABELS[getValue()] || getValue()} />, meta: { align: 'center' } }),
     allocColumnHelper.accessor('allocationPercent', { header: '%', cell: ({ getValue }) => `${(getValue() * 100).toFixed(1)}%`, meta: { align: 'right' } }),
     allocColumnHelper.accessor('allocatedAmountClp', { header: 'Monto CLP', cell: ({ getValue }) => formatClpShort(getValue()), meta: { align: 'right' } }),

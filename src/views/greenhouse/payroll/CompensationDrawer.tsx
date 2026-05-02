@@ -642,7 +642,7 @@ const Row = ({ label, amount, bold, negative, primary, muted }: {
     <Typography variant='body2' color={muted ? 'text.disabled' : 'text.secondary'} fontWeight={bold ? 600 : 400} fontSize={13}>
       {label}
     </Typography>
-    <Typography fontFamily='monospace' fontSize={13} fontWeight={bold ? 700 : 500} color={primary ? 'primary.main' : negative ? 'error.main' : muted ? 'text.disabled' : 'text.primary'}>
+    <Typography variant='monoAmount' fontWeight={bold ? 700 : 500} color={primary ? 'primary.main' : negative ? 'error.main' : muted ? 'text.disabled' : 'text.primary'}>
       {negative && amount != null && amount > 0 ? `−${fmt(amount)}` : fmt(amount)}
     </Typography>
   </Stack>

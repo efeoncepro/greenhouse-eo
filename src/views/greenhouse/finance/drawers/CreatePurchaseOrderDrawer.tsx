@@ -347,7 +347,7 @@ const CreatePurchaseOrderDrawer = ({ open, onClose, onSuccess }: Props) => {
             <CustomTextField
               fullWidth size='small' label='N° de OC' required
               value={poNumber} onChange={e => setPoNumber(e.target.value)}
-              InputProps={{ sx: { fontFamily: 'monospace', fontSize: '0.85rem' } }}
+              InputProps={{ sx: { fontSize: '0.85rem' } }}
             />
           </Grid>
           <Grid size={{ xs: 12, sm: 6 }}>

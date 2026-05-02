@@ -394,7 +394,7 @@ const ExternalSignalsView = ({ initial }: Props) => {
                         <TableCell>
                           {row.matchedRuleId ? (
                             <Tooltip title={`Outcome: ${row.resolutionOutcome ?? 'n/a'}`}>
-                              <Typography variant='caption' sx={{ fontFamily: 'monospace', fontSize: '0.75rem' }}>
+                              <Typography variant='caption' sx={{ fontSize: '0.75rem' }}>
                                 {row.matchedRuleId}
                               </Typography>
                             </Tooltip>

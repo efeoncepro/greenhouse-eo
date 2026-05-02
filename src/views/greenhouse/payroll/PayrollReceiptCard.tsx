@@ -50,7 +50,7 @@ const MONTH_NAMES = [
 const ReceiptRow = ({ label, value, bold }: { label: string; value: string; bold?: boolean }) => (
   <TableRow sx={bold ? { bgcolor: 'action.hover' } : undefined}>
     <TableCell sx={{ py: 0.75, fontWeight: bold ? 700 : 400 }}>{label}</TableCell>
-    <TableCell align='right' sx={{ py: 0.75, fontFamily: 'monospace', fontWeight: bold ? 700 : 400 }}>{value}</TableCell>
+    <TableCell align='right' sx={{ py: 0.75, fontWeight: bold ? 700 : 400 }}>{value}</TableCell>
   </TableRow>
 )
 
@@ -282,7 +282,7 @@ const PayrollReceiptCard = ({ entry, period, employerInfo, adjustmentsBreakdown 
                         {fd.reasonNote}
                       </Typography>
                     </TableCell>
-                    <TableCell align='right' sx={{ py: 0.75, fontFamily: 'monospace' }}>
+                    <TableCell align='right' sx={{ py: 0.75 }}>
                       − {formatCurrency(fd.amount, fd.currency as 'CLP' | 'USD')}
                     </TableCell>
                   </TableRow>
@@ -323,7 +323,7 @@ const PayrollReceiptCard = ({ entry, period, employerInfo, adjustmentsBreakdown 
           }}
         >
           <Typography variant='subtitle1' fontWeight={700} color='inherit'>Líquido a pagar</Typography>
-          <Typography variant='h6' fontWeight={700} sx={{ fontFamily: 'monospace' }} color='inherit'>
+          <Typography variant='h6' fontWeight={700} color='inherit'>
             {formatCurrency(entry.netTotal, currency)}
           </Typography>
         </Box>

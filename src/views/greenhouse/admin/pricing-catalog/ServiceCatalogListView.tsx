@@ -103,7 +103,7 @@ const buildColumns = (
   columnHelper.accessor('serviceSku', {
     header: COPY.columns.sku,
     cell: ({ getValue }) => (
-      <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
+      <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>
         {getValue() || '—'}
       </Typography>
     )
@@ -199,7 +199,7 @@ const buildColumns = (
       if (!value) return <Typography variant='body2' color='text.secondary'>—</Typography>
 
       return (
-        <Typography variant='caption' sx={{ fontFamily: 'monospace', fontSize: '0.75rem' }}>
+        <Typography variant='caption' sx={{ fontSize: '0.75rem' }}>
           {value}
         </Typography>
       )

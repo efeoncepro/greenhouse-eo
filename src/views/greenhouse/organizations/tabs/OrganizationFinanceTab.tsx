@@ -255,16 +255,16 @@ const OrganizationFinanceTab = ({ detail }: Props) => {
                           <Typography variant='body2' fontWeight={600}>{c.clientName}</Typography>
                         </TableCell>
                         <TableCell align='right'>
-                          <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>{formatCLP(c.totalRevenueClp)}</Typography>
+                          <Typography variant='body2'>{formatCLP(c.totalRevenueClp)}</Typography>
                         </TableCell>
                         <TableCell align='right'>
-                          <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>{formatCLP(c.laborCostClp)}</Typography>
+                          <Typography variant='body2'>{formatCLP(c.laborCostClp)}</Typography>
                         </TableCell>
                         <TableCell align='right'>
-                          <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>{formatCLP(c.directCostsClp)}</Typography>
+                          <Typography variant='body2'>{formatCLP(c.directCostsClp)}</Typography>
                         </TableCell>
                         <TableCell align='right'>
-                          <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>{formatCLP(c.indirectCostsClp)}</Typography>
+                          <Typography variant='body2'>{formatCLP(c.indirectCostsClp)}</Typography>
                         </TableCell>
                         <TableCell align='center'>
                           <CustomChip

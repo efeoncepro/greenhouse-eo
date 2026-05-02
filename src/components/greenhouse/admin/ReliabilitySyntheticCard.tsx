@@ -181,7 +181,7 @@ const ReliabilitySyntheticCard = ({ snapshots, sweep }: Props) => {
                               {snapshot.moduleKey}
                             </Typography>
                           </Stack>
-                          <Typography variant='body2' sx={{ fontFamily: 'monospace' }} noWrap>
+                          <Typography variant='body2' noWrap>
                             {snapshot.routePath}
                           </Typography>
                           {snapshot.lastProbe.errorMessage && (

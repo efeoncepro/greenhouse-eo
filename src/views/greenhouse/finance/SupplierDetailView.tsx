@@ -304,7 +304,7 @@ const SupplierDetailView = () => {
 
         <Box sx={{ flex: 1 }}>
           <Stack direction='row' alignItems='center' spacing={1.5} flexWrap='wrap'>
-            <Typography variant='h4' sx={{ fontFamily: 'Poppins, sans-serif', fontWeight: 600 }}>
+            <Typography variant='h4' sx={{ fontWeight: 600 }}>
               {supplier.legalName}
             </Typography>
             <CustomChip label={categoryLabel} size='small' round='true' variant='tonal' color='primary' />

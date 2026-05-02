@@ -875,7 +875,7 @@ const ProjectedPayrollView = () => {
 const LineItem = ({ label, value, color, bold }: { label: string; value: string; color?: string; bold?: boolean }) => (
   <Stack direction='row' justifyContent='space-between' alignItems='center' sx={{ py: 0.25 }}>
     <Typography variant='body2' color='text.secondary'>{label}</Typography>
-    <Typography variant='body2' sx={{ fontFamily: 'monospace', fontWeight: bold ? 600 : 400 }} color={color || 'text.primary'}>{value}</Typography>
+    <Typography variant='body2' sx={{ fontWeight: bold ? 600 : 400 }} color={color || 'text.primary'}>{value}</Typography>
   </Stack>
 )
 

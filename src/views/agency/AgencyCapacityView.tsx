@@ -20,7 +20,7 @@ const AgencyCapacityView = ({ capacity }: Props) => (
       elevation={0}
       sx={{ p: 3, border: theme => `1px solid ${theme.palette.customColors.lightAlloy}`, borderRadius: 3, bgcolor: 'background.paper' }}
     >
-      <Typography variant='h5' sx={{ fontFamily: 'Poppins', fontWeight: 700, color: theme => theme.palette.customColors.midnight, mb: 0.5 }}>
+      <Typography variant='h5' sx={{ fontWeight: 700, color: theme => theme.palette.customColors.midnight, mb: 0.5 }}>
         {GH_AGENCY.capacity_title}
       </Typography>
       <Typography variant='body2' sx={{ color: 'text.secondary' }}>

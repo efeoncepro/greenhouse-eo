@@ -451,7 +451,7 @@ const AccountDetailDrawer = ({ open, accountId, year, month, onClose, onSuccess 
                             <Typography variant='caption' color='text.secondary' sx={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                               {field.label}
                             </Typography>
-                            <Typography variant='body2' sx={{ fontWeight: 600, fontFamily: field.label === 'Tarjeta' ? 'monospace' : undefined }}>
+                            <Typography variant={field.label === 'Tarjeta' ? 'monoId' : 'body2'} sx={{ fontWeight: 600 }}>
                               {field.value}
                             </Typography>
                           </Box>

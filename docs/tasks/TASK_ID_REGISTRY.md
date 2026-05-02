@@ -620,7 +620,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-564` | `to-do` | Quote Builder: Gate Deal Creation + Link-to-HubSpot-Company Fallback | `docs/tasks/to-do/TASK-564-quote-builder-deal-creation-hubspot-link-gating.md` |
 | `TASK-565` | `to-do` | Quote Builder Context Strip Modernization (Prominence Tiers + Blocking-Empty Semantics + Progress Counter) | `docs/tasks/to-do/TASK-565-quote-builder-context-strip-modernization.md` |
 | `TASK-566` | `to-do` | Typography Foundation: Inter + Poppins Theme Realignment (EPIC-004 child 1/4) | `docs/tasks/to-do/TASK-566-typography-foundation-geist-poppins-theme.md` |
-| `TASK-567` | `to-do` | Typography Code Sweep + ESLint Governance Rule (EPIC-004 child 2/4) | `docs/tasks/to-do/TASK-567-typography-code-sweep-eslint-rule.md` |
+| `TASK-567` | `complete` | Typography Code Sweep + ESLint Governance Rule (EPIC-004 child 2/4) | `docs/tasks/complete/TASK-567-typography-code-sweep-eslint-rule.md` |
 | `TASK-568` | `to-do` | Typography in Delivery Surfaces: Email Stack + PDF Font Registration (EPIC-004 child 3/4) | `docs/tasks/to-do/TASK-568-typography-email-pdf-font-registration.md` |
 | `TASK-569` | `to-do` | Typography Visual Regression + Figma Alignment + Skills/Docs Cleanup (EPIC-004 child 4/4) | `docs/tasks/to-do/TASK-569-typography-visual-regression-figma-docs.md` |
 | `TASK-570` | `complete` | Move "Crear deal nuevo" CTA into Deal Chip Popover Footer | `docs/tasks/complete/TASK-570-create-deal-cta-in-popover-footer.md` |

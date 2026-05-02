@@ -256,7 +256,7 @@ const CashOutListView = () => {
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 2 }}>
           <Box>
-            <Typography variant='h4' sx={{ fontFamily: 'Poppins, sans-serif', fontWeight: 600, mb: 1 }}>
+            <Typography variant='h4' sx={{ fontWeight: 600, mb: 1 }}>
               Pagos
             </Typography>
             <Typography variant='body2' color='text.secondary'>
@@ -285,7 +285,7 @@ const CashOutListView = () => {
       {/* Header */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 2 }}>
         <Box>
-          <Typography variant='h4' sx={{ fontFamily: 'Poppins, sans-serif', fontWeight: 600, mb: 1 }}>
+          <Typography variant='h4' sx={{ fontWeight: 600, mb: 1 }}>
             Pagos
           </Typography>
           <Typography variant='body2' color='text.secondary'>
@@ -452,7 +452,7 @@ const CashOutListView = () => {
                         )}
                       </TableCell>
                       <TableCell>
-                        <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
+                        <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>
                           {item.reference || '\u2014'}
                         </Typography>
                       </TableCell>

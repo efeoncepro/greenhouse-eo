@@ -235,7 +235,7 @@ const EntryVersionHistoryDrawer = ({ open, onClose, entryId, memberName }: Props
                           <Typography variant='caption' color='text.secondary' sx={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                             Bruto
                           </Typography>
-                          <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
+                          <Typography variant='body2'>
                             {formatMoney(version.grossTotal, currency)}
                           </Typography>
                           {previous && grossDelta !== 0 && (
@@ -251,7 +251,7 @@ const EntryVersionHistoryDrawer = ({ open, onClose, entryId, memberName }: Props
                           <Typography variant='caption' color='text.secondary' sx={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                             Neto
                           </Typography>
-                          <Typography variant='body2' sx={{ fontFamily: 'monospace', fontWeight: 600 }}>
+                          <Typography variant='body2' sx={{ fontWeight: 600 }}>
                             {formatMoney(version.netTotal, currency)}
                           </Typography>
                           {previous && netDelta !== 0 && (
@@ -277,7 +277,7 @@ const EntryVersionHistoryDrawer = ({ open, onClose, entryId, memberName }: Props
                           </Typography>
                         )}
                         {version.reopenAuditId && (
-                          <Typography variant='caption' color='text.secondary' sx={{ fontFamily: 'monospace', fontSize: '0.7rem' }}>
+                          <Typography variant='caption' color='text.secondary' sx={{ fontSize: '0.7rem' }}>
                             Audit: {version.reopenAuditId}
                           </Typography>
                         )}

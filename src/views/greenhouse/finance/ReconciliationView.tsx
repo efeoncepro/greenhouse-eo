@@ -599,7 +599,7 @@ const ReconciliationView = () => {
     return (
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
         <Box>
-          <Typography variant='h4' sx={{ fontFamily: 'Poppins, sans-serif', fontWeight: 600, mb: 1 }}>
+          <Typography variant='h4' sx={{ fontWeight: 600, mb: 1 }}>
             Conciliación
           </Typography>
           <Typography variant='body2' color='text.secondary'>
@@ -627,7 +627,7 @@ const ReconciliationView = () => {
       {/* Header */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 2 }}>
         <Box>
-          <Typography variant='h4' sx={{ fontFamily: 'Poppins, sans-serif', fontWeight: 600, mb: 1 }}>
+          <Typography variant='h4' sx={{ fontWeight: 600, mb: 1 }}>
             Conciliación
           </Typography>
           <Typography variant='body2' color='text.secondary'>

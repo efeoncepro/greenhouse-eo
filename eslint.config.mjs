@@ -257,7 +257,7 @@ export default [
     },
     rules: {
       'greenhouse/no-raw-table-without-shell': 'error',
-      'greenhouse/no-hardcoded-fontfamily': 'warn'
+      'greenhouse/no-hardcoded-fontfamily': 'error'
     }
   },
   {
@@ -265,6 +265,7 @@ export default [
       'src/components/theme/**',
       'src/@core/theme/**',
       'src/app/global-error.tsx',
+      'src/app/public/**',
       'src/emails/**',
       'src/lib/finance/pdf/**'
     ],

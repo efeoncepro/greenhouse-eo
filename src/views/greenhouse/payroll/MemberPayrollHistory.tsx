@@ -293,27 +293,27 @@ const MemberPayrollHistory = ({ memberId }: Props) => {
                         </Typography>
                       </TableCell>
                       <TableCell align='center'>
-                        <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
+                        <Typography variant='body2'>
                           {formatAttendanceRatio(entry.daysPresent, entry.workingDaysInPeriod)}
                         </Typography>
                       </TableCell>
                       <TableCell align='right'>
-                        <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
+                        <Typography variant='body2'>
                           {formatCurrency(entry.adjustedBaseSalary ?? entry.baseSalary, entry.currency)}
                         </Typography>
                       </TableCell>
                       <TableCell align='center'>
-                        <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
+                        <Typography variant='body2'>
                           {formatFactor(entry.bonusOtdProrationFactor)}
                         </Typography>
                       </TableCell>
                       <TableCell align='center'>
-                        <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
+                        <Typography variant='body2'>
                           {formatFactor(entry.bonusRpaProrationFactor)}
                         </Typography>
                       </TableCell>
                       <TableCell align='right'>
-                        <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
+                        <Typography variant='body2'>
                           {formatCurrency(
                             (entry.adjustedFixedBonusAmount ?? entry.fixedBonusAmount)
                               + entry.bonusOtdAmount
@@ -324,17 +324,17 @@ const MemberPayrollHistory = ({ memberId }: Props) => {
                         </Typography>
                       </TableCell>
                       <TableCell align='right'>
-                        <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
+                        <Typography variant='body2'>
                           {formatCurrency(entry.grossTotal, entry.currency)}
                         </Typography>
                       </TableCell>
                       <TableCell align='right'>
-                        <Typography variant='body2' color='error.main' sx={{ fontFamily: 'monospace' }}>
+                        <Typography variant='body2' color='error.main'>
                           {entry.chileTotalDeductions ? `- ${formatCurrency(entry.chileTotalDeductions, 'CLP')}` : '—'}
                         </Typography>
                       </TableCell>
                       <TableCell align='right'>
-                        <Typography variant='subtitle2' sx={{ fontFamily: 'monospace', fontWeight: 700 }}>
+                        <Typography variant='subtitle2' sx={{ fontWeight: 700 }}>
                           {formatCurrency(entry.netTotal, entry.currency)}
                         </Typography>
                       </TableCell>
@@ -402,7 +402,7 @@ const MemberPayrollHistory = ({ memberId }: Props) => {
                         />
                       </TableCell>
                       <TableCell align='right'>
-                        <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
+                        <Typography variant='body2'>
                           {formatCurrency(cv.baseSalary, cv.currency)}
                         </Typography>
                       </TableCell>

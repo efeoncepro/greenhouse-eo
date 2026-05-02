@@ -177,18 +177,18 @@ const PayrollCompensationTab = ({ compensations, eligibleMembers, members, onRef
                       />
                     </TableCell>
                     <TableCell align='right'>
-                      <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
+                      <Typography variant='body2'>
                         {formatCurrency(comp.baseSalary, comp.currency)}
                       </Typography>
                     </TableCell>
                     <TableCell align='right'>
-                      <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
+                      <Typography variant='body2'>
                         {formatCurrency(comp.remoteAllowance, comp.currency)}
                       </Typography>
                     </TableCell>
                     <TableCell align='right'>
                       <Stack alignItems='flex-end' spacing={0.25}>
-                        <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
+                        <Typography variant='body2'>
                           {formatCurrency(comp.fixedBonusAmount, comp.currency)}
                         </Typography>
                         {comp.fixedBonusLabel && (
@@ -199,12 +199,12 @@ const PayrollCompensationTab = ({ compensations, eligibleMembers, members, onRef
                       </Stack>
                     </TableCell>
                     <TableCell align='right'>
-                      <Typography variant='body2' color='text.secondary' sx={{ fontFamily: 'monospace' }}>
+                      <Typography variant='body2' color='text.secondary'>
                         {formatCurrency(comp.bonusOtdMax, comp.currency)}
                       </Typography>
                     </TableCell>
                     <TableCell align='right'>
-                      <Typography variant='body2' color='text.secondary' sx={{ fontFamily: 'monospace' }}>
+                      <Typography variant='body2' color='text.secondary'>
                         {formatCurrency(comp.bonusRpaMax, comp.currency)}
                       </Typography>
                     </TableCell>

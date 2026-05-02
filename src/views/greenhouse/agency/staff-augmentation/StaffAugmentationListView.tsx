@@ -117,7 +117,7 @@ const columns: ColumnDef<PlacementListItem, any>[] = [
         >
           {row.original.memberName || 'Sin miembro'}
         </Typography>
-        <Typography variant='caption' sx={{ fontFamily: 'monospace' }} color='text.secondary'>
+        <Typography variant='caption' color='text.secondary'>
           {row.original.publicId || row.original.placementId}
         </Typography>
       </Box>
