@@ -214,10 +214,11 @@ Reglas obligatorias:
 
 ### Slice 1 — VIEW canónica + helpers TS + tests de paridad
 
+- **Schema confirmado pre-execution (Q1 resuelta):** `income_payments` tiene `amount_clp` (numeric(14,2)), `exchange_rate_at_payment`, `fx_gain_loss_clp`, 3-axis supersede — schema idéntico a `expense_payments`. Cero migración estructural extra; las 2 VIEWS son el mismo template.
 - Migration `task-766-expense-payments-normalized-view`:
   - `CREATE VIEW greenhouse_finance.expense_payments_normalized AS SELECT ep.payment_id, ep.expense_id, ep.payment_date, ep.amount AS payment_amount_native, ep.currency AS payment_currency, ep.payment_account_id, ep.is_reconciled, ep.payment_order_line_id, ep.created_at, ep.exchange_rate_at_payment, ep.fx_gain_loss_clp, COALESCE(ep.amount_clp, CASE WHEN ep.currency = 'CLP' THEN ep.amount ELSE NULL END) AS payment_amount_clp, (ep.currency != 'CLP' AND ep.amount_clp IS NULL) AS has_clp_drift FROM greenhouse_finance.expense_payments ep WHERE ep.superseded_by_payment_id IS NULL AND ep.superseded_by_otb_id IS NULL AND ep.superseded_at IS NULL;`
   - Comentario SQL `COMMENT ON VIEW ... IS 'TASK-766 canonical reader. NEVER compute payment CLP via ep.amount * exchange_rate_to_clp. amount_clp is the FX-resolved canonical value at payment date.'`
-- Migration `task-766-income-payments-normalized-view` análoga.
+- Migration `task-766-income-payments-normalized-view` análoga (mismo template, columna `income_id` en lugar de `expense_id`).
 - `src/lib/finance/expense-payments-reader.ts`:
   - `sumExpensePaymentsClpForPeriod({fromDate, toDate, expenseType?, supplierId?, isReconciled?})` → `{totalClp, totalPayments, supplierClp, payrollClp, fiscalClp, driftCount}`. Lee desde la VIEW + JOIN a `expenses`.
   - `listExpensePaymentsNormalized({...filters, page, pageSize})` → array de payments con `payment_amount_clp` canónico.
@@ -241,10 +242,11 @@ Reglas obligatorias:
   - Mark drift: `UPDATE greenhouse_finance.expense_payments SET requires_fx_repair = TRUE WHERE currency != 'CLP' AND amount_clp IS NULL;` (los payments USD/EUR/etc sin amount_clp poblado).
   - Idem para `income_payments`.
   - Index parcial: `CREATE INDEX expense_payments_requires_fx_repair_idx ON greenhouse_finance.expense_payments (requires_fx_repair, payment_date) WHERE requires_fx_repair = TRUE;`.
-- Migration `task-766-payments-clp-amount-required-after-cutover`:
+- Migration `task-766-payments-clp-amount-required-after-cutover` (Q2 resuelta):
+  - Cutover_date canónica: `2026-05-03 00:00:00+00` (post-merge TASK-766, fixed).
   - `ALTER TABLE greenhouse_finance.expense_payments ADD CONSTRAINT expense_payments_clp_amount_required_after_cutover CHECK (currency = 'CLP' OR amount_clp IS NOT NULL OR superseded_by_payment_id IS NOT NULL OR superseded_by_otb_id IS NOT NULL OR created_at < '2026-05-03 00:00:00+00'::timestamp with time zone) NOT VALID;`
   - Idem para `income_payments`.
-  - `VALIDATE CONSTRAINT` solo si el count de drift es 0 (sino dejar `NOT VALID` con TODO).
+  - **`VALIDATE CONSTRAINT` ejecutado en la misma migration** SOLO si `requires_fx_repair` count == 0 post-backfill. Si > 0 (caso esperado: ningún registro non-CLP sin amount_clp en el dataset actual según el SQL del incidente), el `VALIDATE` se difiere a una migration final dentro del slice 5 (post-repair endpoint), donde el count está pinned a 0 con audit log. Atomic: la migration que cierra el constraint es la última operación del recovery.
 - `src/lib/reliability/queries/expense-payments-clp-drift.ts`:
   ```sql
   SELECT COUNT(*)::int AS n
@@ -269,7 +271,7 @@ Reglas obligatorias:
     - `ip.amount * COALESCE(i.exchange_rate_to_clp` (income variant)
     - `ep.amount * exchange_rate_at_payment` cuando NO viene de la VIEW (la VIEW también lo expone, pero usa `ep.amount_clp`).
   - Excepciones explícitas: archivos en `src/lib/finance/expense-payments-reader.ts`, `income-payments-reader.ts`, las VIEWS migrations, `payment-orders/mark-paid-atomic.ts`, `expense-payment-ledger.ts` (estos populate amount_clp, no lo leen).
-  - Mode `error` desde el primer commit (a diferencia de `no-untokenized-copy` que entró en `warn`).
+  - **Mode `error` desde el primer commit del slice 3 (Q4 resuelta)**: el patrón es contractualmente prohibido. Slice 3 entrega lint rule + migración del cash-out atómicamente — el commit que activa la rule es el mismo que migra el primer callsite. Slice 4 audita el resto del portal antes de mergear; si la rule rompe build en otros files, ESE es el output esperado (los lista exhaustivamente para migración en slice 4). Cero tolerancia a legacy en este patrón — distinto a TASK-265 (`no-untokenized-copy` en `warn`) porque allá había 318 warnings legacy aceptables; aquí cualquier hit es un risk de KPIs inflados en producción.
   - Mensaje del error: cita la regla dura + path al helper canónico + link a TASK-766.
 - Test ESLint para la rule (`no-untokenized-fx-math.test.mjs`).
 - Refactor `src/app/api/finance/cash-out/route.ts`:
@@ -307,12 +309,13 @@ Reglas obligatorias:
 - `src/lib/finance/repair-payments-clp-amount.ts`:
   - `repairExpensePaymentsClpAmount({paymentIds?, batchSize?})` — itera filas con `requires_fx_repair=TRUE`, invoca `resolveExchangeRateToClp({currency, requestedRate: null, asOfDate: payment_date})` con date histórico, escribe `amount_clp` + `exchange_rate_at_payment` + flips `requires_fx_repair=FALSE`. Atomic per row, idempotente.
   - `repairIncomePaymentsClpAmount` análogo.
-- `src/app/api/admin/finance/payments-clp-repair/route.ts`:
-  - `POST /api/admin/finance/payments-clp-repair` (capability `finance.payments.repair_clp` nueva en entitlements-catalog).
+- `src/app/api/admin/finance/payments-clp-repair/route.ts` (Q3 + Q7 resueltas — Vercel route, capability nueva granular):
+  - `POST /api/admin/finance/payments-clp-repair` (capability `finance.payments.repair_clp` nueva en entitlements-catalog, reservada FINANCE_ADMIN + EFEONCE_ADMIN; least-privilege canónico).
   - Body: `{ kind: 'expense' | 'income', paymentIds?: string[], dryRun?: boolean, batchSize?: number }`.
   - Devuelve audit del repair: count repaired, count skipped (con razón), errors.
   - Wrap con `captureWithDomain('finance', { tags: { source: 'payments_clp_repair' } })`.
   - Outbox event `finance.payments.clp_repaired` (v1, audit-only).
+  - **Vive en Vercel route (NO ops-worker)**: `resolveExchangeRateToClp` ya tiene caching + fallback chain; cero infra nueva.
 - Tests Vitest para el endpoint + el helper.
 - **Documentación:**
   - CLAUDE.md sección "Finance — CLP currency reader invariants (TASK-766)" con diagram + reglas duras + helpers canónicos + link a la VIEW + lint rule + reliability signal.
@@ -516,7 +519,22 @@ Post slice 3 (cash-out migrado al helper):
 
 ## Open Questions
 
-- ¿`income_payments` también tiene la columna `amount_clp`? La task asume que sí (mismo pattern TASK-708). **Confirmar en Discovery** y, si no, agregar migración aditiva análoga al setup de `expense_payments.amount_clp`.
-- ¿Qué cutover_date se usa en el CHECK constraint? Default propuesto: `2026-05-03 00:00:00+00` (post-merge TASK-766). **Confirmar con usuario** si hay deadline operacional distinto.
-- ¿La capability `finance.payments.repair_clp` es nueva o reusa una existente (e.g. `finance.payroll.rematerialize` de TASK-765)? Default propuesto: nueva granular (least privilege). **Confirmar.**
-- ¿Bloqueamos la rule `no-untokenized-fx-math` en mode `error` desde el primer commit (forzando migración inmediata de callsites en slice 4 antes de poder mergear), o `warn` durante el slice 4 y `error` al cierre? Default propuesto: `error` desde el primer commit (no hay legacy code que tolerar; el patrón es contractualmente prohibido). **Confirmar.**
+**Resueltas pre-execution con la opción más robusta:**
+
+- **Q1 — `income_payments.amount_clp`?** ✅ Confirmado vía SQL `\d greenhouse_finance.income_payments` — la columna existe (`numeric(14,2)`), junto con `exchange_rate_at_payment`, `fx_gain_loss_clp` y los 4 campos de 3-axis supersede. Schema idéntico a `expense_payments`. Cero migración estructural extra: las 2 VIEWS y los 2 helpers se construyen con el mismo template.
+
+- **Q2 — Cutover_date del CHECK constraint?** ✅ `2026-05-03 00:00:00+00 America/Santiago` (post-merge TASK-766). Justificación: cualquier payment INSERTed pre-cutover queda fuera del enforcement (compatible con backfill defensivo del slice 2); cualquier INSERT post-cutover non-CLP sin `amount_clp` poblado falla a nivel DB. **`VALIDATE CONSTRAINT` se ejecuta DENTRO de la misma migration del slice 2 SOLO si `requires_fx_repair` count == 0 post-backfill** (caso esperado en producción según el escaneo del incidente). Si > 0, el `VALIDATE` se difiere a una migration posterior dentro del mismo slice (post-repair endpoint del slice 5), y la migration de validation queda pinned con el count real. Atomic: la migration que cierra el constraint es la última operación del recovery. Mismo patrón que `expense_payments_account_required_after_cutover` (TASK-708/728) usado en producción sin issues.
+
+- **Q3 — Capability `finance.payments.repair_clp`?** ✅ Nueva granular. Reservada `FINANCE_ADMIN + EFEONCE_ADMIN`. Justificación: principio de least-privilege canónico del repo (TASK-742, TASK-765). El repair es operacionalmente análogo a `finance.payroll.rematerialize` pero opera sobre un universo distinto (FX rates históricos vs payroll expenses); compartir la capability acopla dimensiones ortogonales. La granularidad permite audit fino por `audit_events` y eventual delegación parcial (e.g. un futuro `finance.data_quality_specialist` rol con solo capabilities de repair, no de mark-paid).
+
+- **Q4 — Lint rule mode `error` o `warn`?** ✅ **`error` desde el primer commit del slice 3.** Justificación: el patrón es contractualmente prohibido (no hay un caso legítimo donde `SUM(ep.amount × *_rate)` sea correcto post-VIEW); cualquier callsite legacy ES un bug latente equivalente al del incidente. Slice 3 entrega lint rule + migración del cash-out atómicamente — el commit que activa la rule es el mismo que migra el primer callsite. Slice 4 audita el resto del portal antes de mergear; si la rule rompe build en otros files, ese ES el output esperado (los lista exhaustivamente para migración en slice 4). Cero tolerancia a legacy en este patrón — distinto a TASK-265 (`no-untokenized-copy` en `warn`) porque allá había 318 warnings legacy aceptables; aquí cualquier hit es un risk de KPIs inflados en producción.
+
+**Bonus — decisiones de arquitectura adicionales tomadas pre-execution:**
+
+- **Q5 — Naming de la columna VIEW: `payment_amount_clp` vs `amount_clp`?** ✅ `payment_amount_clp` (full-qualified). Justificación: `amount_clp` raw colide con la columna persistida `expense_payments.amount_clp`; el prefix `payment_` deja explícito que es la versión post-COALESCE canónica de la VIEW (no la columna raw). Análogo: `payment_amount_native` para el original sin convertir, `payment_currency` para distinguir de `expense.currency`.
+
+- **Q6 — VIEW filtra supersede o expone todas las filas?** ✅ Filtra supersede (excluye `superseded_by_payment_id IS NOT NULL OR superseded_by_otb_id IS NOT NULL OR superseded_at IS NOT NULL`). Justificación: ningún consumer canónico de KPIs CLP debería ver versiones superseded; mismo pattern que `fx_pnl_breakdown` (TASK-699) y `income_settlement_reconciliation` (TASK-571). Auditoría/diagnóstico de filas superseded usa la tabla raw, no la VIEW.
+
+- **Q7 — Repair endpoint reusa secrets/Cloud Run o lo invoca via Vercel route?** ✅ Vercel route (`src/app/api/admin/finance/payments-clp-repair`). Justificación: el repair invoca `resolveExchangeRateToClp` que ya tiene caching + fallback chain; no hay razón para crossear a ops-worker (que sí necesitan crons reactivos). Cero infra nueva.
+
+- **Q8 — ¿Backfill 1:1 (CLP→CLP) bloquea el deploy si el `UPDATE` masivo lockea la tabla?** ✅ Backfill batched + idempotente. La migration ejecuta el UPDATE en lotes via `WITH RECURSIVE` o `LIMIT/OFFSET`-style con commits intermedios (mismo pattern de TASK-708b backfill). Para producción, `expense_payments` tiene ~hundreds-to-thousands de rows CLP→CLP; el lock sería micro. Pero la práctica defensiva es batched, no row-table-lock.
