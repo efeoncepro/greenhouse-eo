@@ -227,6 +227,83 @@ describe('TASK-768 resolveExpenseEconomicCategory', () => {
     expect(result.matchedRule).toBe('KNOWN_REGULATOR_REGEX')
   })
 
+  it('Rule 3.5: DIRECT_MEMBER + human name without member match (Daniela España caso real)', async () => {
+    // Colaboradora sin RUT chileno, sin email, sin registro en members.
+    // El cost_category='direct_member' + beneficiary humano es signal canónica.
+    lookupMemberByDisplayNameMock.mockResolvedValueOnce(null)
+
+    const result = await resolveExpenseEconomicCategory({
+      beneficiaryName: 'Daniela Alejandra Ferreira Toro',
+      costCategory: 'direct_member',
+      rawDescription: 'Envío a Daniela Alejandra Ferreira Toro (España) — Nómina Marzo'
+    })
+
+    expect(result.category).toBe('labor_cost_external')
+    expect(result.confidence).toBe('medium')
+    expect(result.matchedRule).toBe('DIRECT_MEMBER_COST_CATEGORY_HUMAN_NAME')
+  })
+
+  it('Rule 3.5: DIRECT_MEMBER + human name CON member match (Andrés Colombia si registrado)', async () => {
+    lookupMemberByDisplayNameMock.mockResolvedValueOnce({
+      memberId: 'member-andres',
+      identityProfileId: 'profile-andres',
+      displayName: 'Andrés Carlosama Termal',
+      employmentType: 'international',
+      primaryEmail: 'andres@efeonce.org',
+      active: true,
+      payrollVia: 'global66',
+      deelContractId: null
+    })
+
+    const result = await resolveExpenseEconomicCategory({
+      beneficiaryName: 'Andrés Carlosama Termal',
+      costCategory: 'direct_member',
+      rawDescription: 'Envío a Andrés (Colombia) — Pago Nómina Marzo'
+    })
+
+    expect(result.category).toBe('labor_cost_external')
+    expect(result.confidence).toBe('high')
+    expect(result.matchedRule).toBe('DIRECT_MEMBER_COST_CATEGORY_WITH_MEMBER_MATCH')
+  })
+
+  it('Rule 3.5: DIRECT_MEMBER NO matchea con corporate beneficiary (Adobe, etc.)', async () => {
+    // Beneficiary es brand corporativa → NO matchea looksLikeHumanName → cae a regla siguiente
+    const result = await resolveExpenseEconomicCategory({
+      beneficiaryName: 'Adobe',
+      costCategory: 'direct_member',
+      accountingType: 'supplier'
+    })
+
+    // Debe caer a ACCOUNTING_TYPE_AMBIGUOUS_FALLBACK, NO a DIRECT_MEMBER
+    expect(result.matchedRule).not.toBe('DIRECT_MEMBER_COST_CATEGORY_HUMAN_NAME')
+    expect(result.matchedRule).toBe('ACCOUNTING_TYPE_AMBIGUOUS_FALLBACK')
+  })
+
+  it('Rule 3.6: FX fee con cost_category=direct_member + description menciona nómina', async () => {
+    const result = await resolveExpenseEconomicCategory({
+      beneficiaryName: null,
+      costCategory: 'direct_member',
+      rawDescription: 'Costo tipo de cambio (Andrés Colombia nómina marzo)'
+    })
+
+    expect(result.category).toBe('labor_cost_external')
+    expect(result.confidence).toBe('medium')
+    expect(result.matchedRule).toBe('FX_FEE_COST_OF_PAYROLL')
+  })
+
+  it('Rule 3.6: bank_fee NO de payroll (mantención cuenta) → NO matchea FX fee rule', async () => {
+    const result = await resolveExpenseEconomicCategory({
+      beneficiaryName: null,
+      costCategory: 'overhead',
+      rawDescription: 'COM.MANTENCION PLAN',
+      accountingType: 'bank_fee'
+    })
+
+    // Cae a ACCOUNTING_TYPE_AMBIGUOUS_FALLBACK con bank_fee_real
+    expect(result.matchedRule).not.toBe('FX_FEE_COST_OF_PAYROLL')
+    expect(result.category).toBe('bank_fee_real')
+  })
+
   it('Rule 4: name fuzzy match (single result)', async () => {
     lookupMemberByDisplayNameMock.mockResolvedValueOnce(internalMember)
 

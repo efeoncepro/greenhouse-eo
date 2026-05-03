@@ -71,6 +71,61 @@ export interface ResolveIncomeResult {
 }
 
 /**
+ * Patrones de "naturaleza corporativa" en el beneficiary_name.
+ * Si matchea alguno de estos sufijos/keywords → es entidad corporativa, NO persona natural.
+ *
+ * Cobertura intencional:
+ *   - Sufijos legales chilenos: SpA, Ltda, S.A., S. de R.L., E.I.R.L.
+ *   - Sufijos legales internacionales: Inc., Corp., LLC, Ltd, GmbH, BV, AG, AB, Pty
+ *   - Vendors corporativos populares (Adobe, Vercel, Notion, Anthropic, etc. — vienen como
+ *     `supplier_name` sin sufijo legal)
+ *   - Strings genéricos de transferencia/costo/comisión que indican que el beneficiary
+ *     no es una persona específica
+ */
+const CORPORATE_BENEFICIARY_REGEX =
+  /\b(SpA|Ltda\.?|S\.A\.?|S\.\s*de\s*R\.L\.?|E\.I\.R\.L\.?|Inc\.?|Corp\.?|LLC|Ltd\.?|GmbH|B\.?V\.?|AG|AB|Pty|Company|Co\.?|Group|Holdings?|Subscriptions?|Hosting|Cloud|API|Plan|Suite|Workspace|Pago\s+(Cuota|Crédito)|Comisión|FX\s+fee|Costo\s+tipo\s+de\s+cambio)\b/i
+
+const KNOWN_CORPORATE_BRANDS_REGEX =
+  /\b(Adobe|Vercel|Notion|Anthropic|OpenAI|GitHub|Google|Microsoft|Amazon|AWS|Stripe|Twilio|Slack|Zoom|HubSpot|Shopify|Linear|Figma|Atlassian|Datadog|Sentry|Cloudflare|Mastercard|Visa|MercadoPago|PayPal|Wise|Beeconta|Nubox|Toku|Metricool|ElevenLabs|Claude\.ai|Envato|Spotify|Netflix|Dropbox|Apple)\b/i
+
+/**
+ * Detecta si un beneficiary_name corresponde a una persona natural (no entidad corporativa).
+ *
+ * Heurística:
+ *   - Tiene 2+ palabras (firstName lastName mínimo)
+ *   - NO matchea sufijos corporativos
+ *   - NO matchea brands corporativas conocidas
+ *   - NO contiene solo dígitos / símbolos (descarta refs de transacción)
+ *
+ * Ejemplos:
+ *   "Daniela Alejandra Ferreira Toro"        → true (persona natural)
+ *   "Andrés Carlosama Termal"                → true
+ *   "Adobe"                                  → false (corporate brand)
+ *   "Beeconta SpA"                           → false (sufijo legal)
+ *   "Deel Inc."                              → false (sufijo legal)
+ *   "Costo tipo de cambio (Andrés Colombia)" → false (descripción genérica de FX fee)
+ */
+export const looksLikeHumanName = (name: string | null | undefined): boolean => {
+  if (!name) return false
+
+  const trimmed = name.trim()
+
+  if (trimmed.length < 5) return false
+
+  // Descarta strings que son claramente descripciones genéricas
+  if (CORPORATE_BENEFICIARY_REGEX.test(trimmed)) return false
+  if (KNOWN_CORPORATE_BRANDS_REGEX.test(trimmed)) return false
+
+  // Debe tener 2+ palabras (firstName lastName mínimo)
+  const wordCount = trimmed
+    .split(/\s+/)
+    .filter(w => /^[\p{L}'-]{2,}$/u.test(w))
+    .length
+
+  return wordCount >= 2
+}
+
+/**
  * Mapping employment_type → economic_category cuando hay member match.
  */
 const memberToExpenseCategory = (
@@ -202,6 +257,82 @@ export const resolveExpenseEconomicCategory = async (
         confidence: 'high',
         matchedRule: 'IDENTITY_MATCH_BY_EMAIL',
         evidence: { ...evidence, reason, member_id: member.memberId, email: emailFromName }
+      }
+    }
+  }
+
+  // Rule 3.5 — DIRECT_MEMBER_COST_CATEGORY (TASK-768 followup)
+  //
+  // Cubre el caso de colaboradores internacionales SIN RUT chileno (Daniela
+  // España, Andrés Colombia) cuyos pagos vienen via Global66/transferencia
+  // directa con `cost_category='direct_member'`. Esa columna es signal
+  // canónica que identifica que el costo es atribuible a una persona; cuando
+  // el beneficiary tiene patrón de nombre humano + cost_category='direct_member',
+  // es seguro decir labor_cost_external (no son colaboradores Chile internos
+  // porque ya hubieran matched Rule 2 RUT).
+  //
+  // FX fees con cost_category='direct_member' (tipo cambio asociado a una
+  // remesa internacional de nómina) también se capturan como labor_cost_external
+  // — son cost-of-payroll, no overhead bancario genérico.
+  if (
+    input.costCategory === 'direct_member' &&
+    looksLikeHumanName(beneficiaryName)
+  ) {
+    // Intentar elevar confidence buscando member match por nombre fuzzy
+    const member = await lookupMemberByDisplayName(beneficiaryName)
+
+    if (member) {
+      const { category, reason } = memberToExpenseCategory(member)
+
+      return {
+        category,
+        confidence: 'high',
+        matchedRule: 'DIRECT_MEMBER_COST_CATEGORY_WITH_MEMBER_MATCH',
+        evidence: {
+          ...evidence,
+          reason,
+          member_id: member.memberId,
+          matched_name: member.displayName,
+          cost_category_hint: 'direct_member'
+        }
+      }
+    }
+
+    // No matchea members, pero cost_category='direct_member' + nombre humano
+    // es signal suficiente para clasificar como labor externo (no Chile interno).
+    return {
+      category: 'labor_cost_external',
+      confidence: 'medium',
+      matchedRule: 'DIRECT_MEMBER_COST_CATEGORY_HUMAN_NAME',
+      evidence: {
+        ...evidence,
+        beneficiary_name: beneficiaryName,
+        cost_category_hint: 'direct_member',
+        reason: 'cost_category=direct_member + human-name pattern → labor_cost_external (collaborator without member registration)'
+      }
+    }
+  }
+
+  // Rule 3.6 — FX fee asociado a payment internacional
+  //
+  // Caso: FX fees Global66 que tienen cost_category='direct_member' pero
+  // beneficiary_name puede ser null o "Costo tipo de cambio (Andrés Colombia
+  // nómina marzo)". Si la description menciona explícitamente nómina/payroll
+  // + payment_provider_slug es fintech internacional → cost-of-payroll.
+  if (
+    input.costCategory === 'direct_member' &&
+    input.rawDescription &&
+    /(?:tipo\s+de\s+cambio|fx\s+fee|comisi[oó]n\s+(?:envio|env[ií]o|transfer|wire))/i.test(input.rawDescription) &&
+    /n[oó]mina|payroll|sueldo|salario|colaborador/i.test(input.rawDescription)
+  ) {
+    return {
+      category: 'labor_cost_external',
+      confidence: 'medium',
+      matchedRule: 'FX_FEE_COST_OF_PAYROLL',
+      evidence: {
+        ...evidence,
+        raw_description: input.rawDescription,
+        reason: 'FX fee con cost_category=direct_member y description mencionando nómina/payroll → cost-of-payroll (no overhead bancario)'
       }
     }
   }

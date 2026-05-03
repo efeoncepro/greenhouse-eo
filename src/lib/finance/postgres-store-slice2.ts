@@ -22,6 +22,10 @@ import {
 import { parsePersistedIncomeTaxSnapshot } from '@/lib/finance/income-tax-snapshot'
 import { parsePersistedExpenseTaxSnapshot } from '@/lib/finance/expense-tax-snapshot'
 import { resolveAutoAllocation, type AutoAllocationInput } from '@/lib/finance/auto-allocation-rules'
+import {
+  resolveAndPersistExpenseEconomicCategory,
+  resolveAndPersistIncomeEconomicCategory
+} from '@/lib/finance/economic-category/writer-integration'
 import { ensureOrganizationForClient } from '@/lib/account-360/organization-identity'
 import type { ChileTaxSnapshot } from '@/lib/tax/chile'
 
@@ -1415,6 +1419,20 @@ export const createFinanceIncomeInPostgres = async ({
   await assertFinanceSlice2PostgresReady()
 
   const run = async (client: PoolClient) => {
+    // TASK-768 — resolver canónico income en write-time.
+    const incomeEconomicCategoryResolution = await resolveAndPersistIncomeEconomicCategory({
+      incomeId,
+      resolverInput: {
+        payerName: clientName ?? null,
+        payerClientProfileId: clientProfileId,
+        rawDescription: description,
+        accountingType: incomeType,
+        amount: totalAmount,
+        currency
+      },
+      client
+    })
+
     const rows = await queryRows<PostgresIncomeRow>(
       `
         INSERT INTO greenhouse_finance.income (
@@ -1429,7 +1447,7 @@ export const createFinanceIncomeInPostgres = async ({
           po_number, hes_number, service_line, income_type,
           is_reconciled,
           partner_id, partner_name, partner_share_percent, partner_share_amount, net_after_partner,
-          notes, created_by_user_id,
+          notes, created_by_user_id, economic_category,
           created_at, updated_at
         )
         VALUES (
@@ -1444,7 +1462,7 @@ export const createFinanceIncomeInPostgres = async ({
           $31, $32, $33, $34,
           FALSE,
           $35, $36, $37, $38, $39,
-          $40, $41,
+          $40, $41, $42,
           CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
         )
         RETURNING *
@@ -1460,7 +1478,7 @@ export const createFinanceIncomeInPostgres = async ({
         quotationId, contractId, sourceHesId, purchaseOrderId, hesId,
         poNumber, hesNumber, serviceLine, incomeType,
         partnerId, partnerName, partnerSharePercent, partnerShareAmount, netAfterPartner,
-        notes, actorUserId
+        notes, actorUserId, incomeEconomicCategoryResolution.category
       ],
       client
     )
@@ -2150,6 +2168,27 @@ export const createFinanceExpenseInPostgres = async ({
   await assertFinanceSlice2PostgresReady()
 
   const run = async (client: PoolClient) => {
+    // TASK-768 — resolver canónico invocado en write-time.
+    // Sinergia con TASK-765 path canónico: el resolver tiene acceso a
+    // member_id, supplier_id, cost_category, raw description — datos que
+    // el trigger transparente NO puede usar. Resultado: confidence=high
+    // para casos identity-resolved, no fallback genérico.
+    const economicCategoryResolution = await resolveAndPersistExpenseEconomicCategory({
+      expenseId,
+      resolverInput: {
+        beneficiaryName: supplierName ?? memberName ?? null,
+        beneficiaryMemberId: memberId,
+        beneficiarySupplierId: supplierId,
+        rawDescription: description,
+        sourceKind: sourceType,
+        accountingType: expenseType,
+        costCategory: costCategory ?? null,
+        amount: totalAmount,
+        currency
+      },
+      client
+    })
+
     const rows = await queryRows<PostgresExpenseRow>(
       `
         INSERT INTO greenhouse_finance.expenses (
@@ -2171,7 +2210,7 @@ export const createFinanceExpenseInPostgres = async ({
           direct_overhead_scope, direct_overhead_kind, direct_overhead_member_id,
           receipt_date, purchase_type, vat_unrecoverable_amount, vat_fixed_assets_amount, vat_common_use_amount,
           dte_type_code, dte_folio, exempt_amount, other_taxes_amount, withholding_amount,
-          notes, created_by_user_id,
+          notes, created_by_user_id, economic_category,
           created_at, updated_at
         )
         VALUES (
@@ -2193,7 +2232,7 @@ export const createFinanceExpenseInPostgres = async ({
           $57, $58, $59,
           $60::date, $61, $62, $63, $64,
           $65, $66, $67, $68, $69,
-          $70, $71,
+          $70, $71, $72,
           CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
         )
         RETURNING *
@@ -2216,7 +2255,7 @@ export const createFinanceExpenseInPostgres = async ({
         directOverheadScope, directOverheadKind, directOverheadMemberId,
         receiptDate, purchaseType, vatUnrecoverableAmount, vatFixedAssetsAmount, vatCommonUseAmount,
         dteTypeCode, dteFolio, exemptAmount, otherTaxesAmount, withholdingAmount,
-        notes, actorUserId
+        notes, actorUserId, economicCategoryResolution.category
       ],
       client
     )
