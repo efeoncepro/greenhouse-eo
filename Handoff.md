@@ -1,5 +1,32 @@
 # Handoff.md
 
+## Sesion 2026-05-03 — TASK-777 creada (Canonical Expense Distribution & Shared Cost Pools)
+
+- **Lifecycle:** `to-do`
+- **Branch al cierre:** `develop`
+- **Trigger:** investigación manual del usuario en `/finance/intelligence` mostró que `SKY` y `ANAM` estaban absorbiendo overhead inflado por una mezcla de lanes incompatibles:
+  - `provider payroll` / pagos `Deel` terminando en `direct_overhead_target` o shared pool
+  - `Previred` y otros pagos regulatorios entrando al shared pool genérico
+  - `bank fees`, factoring y otros financial costs mezclados con overhead operativo
+- **Decisión documental:** se crea `docs/tasks/to-do/TASK-777-canonical-expense-distribution-and-shared-cost-pools.md` como la task faltante entre `TASK-768`, `TASK-176`, `TASK-397`, `TASK-710` y `TASK-713`.
+- **Tesis canónica:** `economic_category` ya existe y es necesaria, pero no basta. Falta el segundo paso explícito `expense -> distribution lane` para separar:
+  - `member_direct_labor`
+  - `member_direct_tool`
+  - `client_direct_non_labor`
+  - `shared_operational_overhead`
+  - `shared_financial_cost`
+  - `regulatory_payment`
+  - `provider_payroll`
+  - `treasury_transit`
+  - `unallocated`
+- **Recomendación operativa al usuario (no implementada):**
+  - **Abril 2026:** no conviene tratarlo como cierre canónico confiable "tal cual". Si negocio necesita congelarlo, hacerlo solo como snapshot provisional/reopenable o con nota explícita de restatement pendiente.
+  - **Mayo 2026:** debería ser el primer mes que cierre bien solo si `TASK-777` (o un slice mínimo equivalente) deja gate de cierre para impedir contaminación de pools shared.
+- **Docs sincronizados:**
+  - `docs/tasks/to-do/TASK-777-canonical-expense-distribution-and-shared-cost-pools.md`
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+  - `docs/tasks/README.md`
+
 ## Sesion 2026-05-03 — TASK-774 cerrada (Account Balance CLP-Native Reader Contract)
 
 - **Lifecycle:** `complete` (movida a `complete/`, README sync, signal vivo en staging real).

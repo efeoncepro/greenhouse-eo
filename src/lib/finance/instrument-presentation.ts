@@ -81,6 +81,28 @@ export interface InstrumentIdentityField {
   value: string
 }
 
+/**
+ * TASK-776 — Modos temporales canonicos del drawer de cuenta.
+ *
+ * Todo drawer/dashboard de finance que muestre agregaciones temporales DEBE
+ * declarar su modo via este enum. Cada modo tiene semantica clara:
+ *
+ *   - `snapshot`: rolling window (default 30 dias) — caso de uso "que pasa hoy".
+ *     KPIs + chart 12m + lista ultimos N dias. NO requiere year+month.
+ *   - `period`: un mes calendario especifico — caso de uso "estoy cerrando Mayo".
+ *     Filtra movimientos al year+month exacto. KPIs muestran cierre del periodo.
+ *   - `audit`: historico completo desde anchor OTB — caso de uso "auditoria".
+ *     Movimientos desde genesis_date del active OTB. Sin filtro mes/window.
+ */
+export type TemporalMode = 'snapshot' | 'period' | 'audit'
+
+export interface TemporalDefaults {
+  /** Modo a usar cuando el caller no override (drawer abre por primera vez). */
+  mode: TemporalMode
+  /** Solo aplica si mode='snapshot'. Default 30. */
+  windowDays?: number
+}
+
 export interface InstrumentDetailProfile {
   profileKey: InstrumentProfileKey
   /** Drawer title, e.g. "Detalle de cuenta" / "Detalle de tarjeta". */
@@ -95,6 +117,11 @@ export interface InstrumentDetailProfile {
   movements: InstrumentMovementVocabulary
   /** Optional banner shown above the KPI row, e.g. for liability instruments. */
   contextBanner: { tone: 'info' | 'warning'; text: string } | null
+  /**
+   * TASK-776 — Default temporal mode + window for this instrument category.
+   * If not declared, drawer falls back to mode='period' (legacy behavior).
+   */
+  temporalDefaults?: TemporalDefaults
 }
 
 const SUCCESS_HEX = '#3DBA5D'
@@ -224,7 +251,10 @@ const resolveTransactionalAccountProfile = (account: TreasuryBankAccountOverview
       emptyLabel: 'Esta cuenta no tiene movimientos en el período consultado.',
       amountHeader: 'Monto'
     },
-    contextBanner: null
+    contextBanner: null,
+    // TASK-776 — bank_account: caso de uso "que paso recientemente". Default
+    // snapshot rolling 30 dias. Cierre mensual via mode='period' explicito.
+    temporalDefaults: { mode: 'snapshot', windowDays: 30 }
   }
 }
 
@@ -292,7 +322,10 @@ const resolveCreditCardProfile = (account: TreasuryBankAccountOverview): Instrum
     },
     contextBanner: semantics.creditLimit === null
       ? { tone: 'info', text: 'Esta tarjeta no tiene cupo declarado en sistema. Las métricas de disponible quedan ocultas hasta que se registre el límite.' }
-      : null
+      : null,
+    // TASK-776 — credit_card: caso de uso "que pase con la TC esta semana".
+    // Default snapshot rolling 30 dias. Cierre del ciclo TC via mode='period'.
+    temporalDefaults: { mode: 'snapshot', windowDays: 30 }
   }
 }
 
@@ -396,7 +429,11 @@ const resolveShareholderAccountProfile = (account: TreasuryBankAccountOverview):
       emptyLabel: 'Sin movimientos del accionista en el período consultado.',
       amountHeader: 'Monto'
     },
-    contextBanner: null
+    contextBanner: null,
+    // TASK-776 — shareholder_account (CCA): caso de uso "auditoria historica
+    // completa del accionista". Default audit (desde anchor OTB) — todos los
+    // aportes/reembolsos visibles sin filtrar por mes.
+    temporalDefaults: { mode: 'audit' }
   }
 }
 
@@ -537,7 +574,10 @@ const resolveProcessorTransitProfile = (
         : 'No hay pagos detectados todavía. Cuando llegue la cartola, este timeline se enriquece automáticamente.',
       amountHeader: 'Monto procesado'
     },
-    contextBanner: banner
+    contextBanner: banner,
+    // TASK-776 — processor_transit (Deel/Stripe/etc): caso de uso "cierre
+    // mensual de comisiones procesador". Default period (mes seleccionado).
+    temporalDefaults: { mode: 'period' }
   }
 }
 

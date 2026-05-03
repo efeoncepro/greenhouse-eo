@@ -5,9 +5,13 @@ import {
   getBankAccountDetail
 } from '@/lib/finance/account-balances'
 import { FinanceValidationError } from '@/lib/finance/shared'
+import type { TemporalMode } from '@/lib/finance/instrument-presentation'
+import { resolveTemporalWindow } from '@/lib/finance/temporal-window'
 import { requireBankTreasuryTenantContext } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
+
+const VALID_TEMPORAL_MODES: readonly TemporalMode[] = ['snapshot', 'period', 'audit']
 
 const parsePositiveInteger = (value: unknown, fieldName: string) => {
   const parsed = Number(value)
@@ -17,6 +21,18 @@ const parsePositiveInteger = (value: unknown, fieldName: string) => {
   }
 
   return parsed
+}
+
+const parseTemporalMode = (value: string | null): TemporalMode | null => {
+  if (!value) return null
+
+  if ((VALID_TEMPORAL_MODES as readonly string[]).includes(value)) {
+    return value as TemporalMode
+  }
+
+  throw new FinanceValidationError(
+    `mode must be one of: ${VALID_TEMPORAL_MODES.join(', ')}. Received: ${value}`
+  )
 }
 
 export async function GET(
@@ -37,6 +53,36 @@ export async function GET(
     const year = yearParam ? parsePositiveInteger(yearParam, 'year') : null
     const month = monthParam ? parsePositiveInteger(monthParam, 'month') : null
 
+    // TASK-776 — temporal mode contract canonico.
+    // - Si caller envia ?mode=snapshot|period|audit → resuelve ventana via helper.
+    // - Si NO envia mode pero envia year+month → backward compat (mode='period').
+    // - Si NO envia ninguno → caller (drawer) hereda el default declarativo
+    //   del profile via instrument-presentation.ts; este endpoint NO asume.
+    const modeParam = parseTemporalMode(url.searchParams.get('mode'))
+    const windowDaysParam = url.searchParams.get('windowDays')
+    const windowDays = windowDaysParam ? parsePositiveInteger(windowDaysParam, 'windowDays') : undefined
+    const anchorDateParam = url.searchParams.get('anchorDate')
+    const anchorDate = anchorDateParam && /^\d{4}-\d{2}-\d{2}$/.test(anchorDateParam) ? anchorDateParam : null
+
+    let movementsWindow: { fromDate: string; toDate: string; mode: TemporalMode; label: string } | undefined
+
+    if (modeParam) {
+      const resolved = resolveTemporalWindow({
+        mode: modeParam,
+        year: year ?? undefined,
+        month: month ?? undefined,
+        anchorDate,
+        windowDays
+      })
+
+      movementsWindow = {
+        fromDate: resolved.fromDate,
+        toDate: resolved.toDate,
+        mode: resolved.modeResolved,
+        label: resolved.label
+      }
+    }
+
     // TASK-705 — pure read path:
     // - materialize: 'skip' (NO recomputar inline; lanes reactivas mantienen snapshots).
     // - historySource: 'monthly_read_model' (lee account_balances_monthly precomputed).
@@ -48,10 +94,23 @@ export async function GET(
       month,
       actorUserId: tenant.userId || null,
       materialize: 'skip',
-      historySource: 'monthly_read_model'
+      historySource: 'monthly_read_model',
+      movementsWindow
     })
 
-    return NextResponse.json(detail)
+    // TASK-776 — echo back de la ventana usada (para chip header del drawer).
+    // Si caller no envió mode, refleja el period del overview (legacy behavior).
+    const responseWithWindow = {
+      ...detail,
+      movementsWindow: movementsWindow ?? {
+        fromDate: detail.currentBalance.balanceDate, // approximate fallback
+        toDate: detail.currentBalance.balanceDate,
+        mode: 'period' as TemporalMode,
+        label: 'Período actual'
+      }
+    }
+
+    return NextResponse.json(responseWithWindow)
   } catch (error) {
     if (error instanceof FinanceValidationError) {
       return NextResponse.json({ error: error.message }, { status: error.statusCode })

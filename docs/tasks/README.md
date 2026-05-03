@@ -22,7 +22,7 @@ Primer bloque operativo asignado:
 
 - `TASK-001` a `TASK-052` asignados (backlog activo, briefs historicos, specs de apoyo)
 - `TASK-053` a `TASK-056` asignados
-- siguiente ID disponible: `TASK-776`
+- siguiente ID disponible: `TASK-778`
 - `TASK-726` ✅ — Finance Movement Feed Foundation. Implementa la primitive reusable aprobada en `docs/mockups/finance-movement-feed-mockup.html`: feed financiero adaptable, virtualizacion encapsulada con `@tanstack/react-virtual`, resolver visual sobre catalogos existentes y primera integracion read-only en `/finance/reconciliation`. Spec: `complete/TASK-726-finance-movement-feed-foundation.md`.
 - **Programa Member Loaded Cost Model** 🆕 (2026-04-28) — Spec raíz `docs/architecture/GREENHOUSE_MEMBER_LOADED_COST_MODEL_V1.md` reorganizada como autoridad del modelo económico Greenhouse. Tasks subordinadas:
   - **MLCM Fase 2 (Materializers)**: `TASK-710` Tool Consumption Bridge, `TASK-712` Tool Catalog Consolidation, `TASK-176` Labor Provisions (input al `payroll_cost_clp`)
@@ -30,6 +30,7 @@ Primer bloque operativo asignado:
   - **MLCM Fase 4 (Period Governance)**: `TASK-713` Period Closing Workflow, `TASK-393` Period Governance & Restatements (scope amplio)
   - **MLCM Fase 5 (Planning)**: `TASK-395` Planning Engine + Budgets, `TASK-178` Finance Budget Engine (consolidación pendiente con TASK-395)
   - **Lectores cross-cutting**: `TASK-396` Variance & Forecast (lee Fact 4), `TASK-394` BU/Legal Entity (dimensión transversal), `TASK-397` Financial Costs (cost_dimension nuevo), `TASK-398` Enterprise Hardening (RBAC + observability)
+  - **Follow-up crítico de distribución económica**: `TASK-777` Canonical Expense Distribution & Shared Cost Pools — formaliza el resolver `expense -> distribution lane` y evita que payroll/regulatorio/financial terminen inflando `overhead_clp` en `member_capacity_economics` / `operational_pl`
   - **Lentes específicos**: `TASK-146` Service P&L (agrega `service_id` dim), `TASK-177` Operational P&L by BU, `TASK-310` Partner P&L
   - **Specs subordinadas**: `GREENHOUSE_MANAGEMENT_ACCOUNTING_ARCHITECTURE_V1.md` (parcialmente supersedida — conserva BU/legal entity, criterio NO contabilidad legal, gate Reliable Actual Foundation), `GREENHOUSE_COST_INTELLIGENCE_ARCHITECTURE_V1.md` (recontextualizada como V0 / implementación TASK-705/708/709)
 - `EPIC-008` 🆕 — Organization Workspace Convergence & Facet Entitlements. Programa cross-domain para converger `Organizaciones` y `Clientes` hacia una experiencia canónica basada en `organization`, manteniendo las rutas actuales como entrypoints y moviendo la decisión de facets/tabs/acciones a entitlements finos + proyección de workspace. Reutiliza la foundation ya existente de `Account 360`, `facet-authorization`, `TASK-181` y `TASK-191` en vez de crear otra línea paralela. Child tasks iniciales: `TASK-611`, `TASK-612`, `TASK-613`. Spec: `docs/epics/to-do/EPIC-008-organization-workspace-convergence-facet-entitlements.md`.

@@ -379,6 +379,19 @@ export type TreasuryBankAccountDetail = {
    * ledger.
    */
   processor?: TreasuryProcessorDigest | null
+  /**
+   * TASK-776 — Echo back de la ventana temporal usada para `movements`,
+   * para que el drawer renderice el chip header ("Últimos 30 días" / "Mayo
+   * 2026" / "Desde 07/04/2026") sin recomputar la lógica en cliente.
+   * Backward compat: si caller no pasó movementsWindow, este campo refleja
+   * el period del overview (mode='period' implícito).
+   */
+  movementsWindow?: {
+    fromDate: string
+    toDate: string
+    mode: 'snapshot' | 'period' | 'audit'
+    label: string
+  }
 }
 
 export type TreasuryPaymentAssignment = {
@@ -1554,7 +1567,8 @@ export const getBankAccountDetail = async ({
   actorUserId,
   client,
   materialize = 'force',
-  historySource = 'recompute'
+  historySource = 'recompute',
+  movementsWindow
 }: {
   accountId: string
   year?: number | null
@@ -1576,6 +1590,15 @@ export const getBankAccountDetail = async ({
    *   o cron `ops-finance-rematerialize-balances`.
    */
   historySource?: 'recompute' | 'monthly_read_model'
+  /**
+   * TASK-776 — Override de la ventana temporal usada para filtrar la lista
+   * de movements. Cuando no se pasa, default = `period` resuelto desde
+   * `year+month` (backward-compat). Cuando se pasa, los movements se
+   * filtran por `fromDate..toDate` independiente del period del overview.
+   *
+   * Resolución canónica via `resolveTemporalWindow` en src/lib/finance/temporal-window.ts.
+   */
+  movementsWindow?: { fromDate: string; toDate: string } | null
 }): Promise<TreasuryBankAccountDetail> => {
   const overview = await getBankOverview({ year, month, actorUserId, client, materialize })
   const account = overview.accounts.find(item => item.accountId === accountId)
@@ -1795,7 +1818,13 @@ export const getBankAccountDetail = async ({
       ORDER BY transaction_date DESC NULLS LAST, movement_id DESC
       LIMIT 50
     `,
-    [accountId, overview.period.startDate, overview.period.endDate],
+    // TASK-776 — usa movementsWindow override si se proveyó (modo snapshot/audit
+    // del drawer); fallback al period del overview (modo period legacy).
+    [
+      accountId,
+      movementsWindow?.fromDate ?? overview.period.startDate,
+      movementsWindow?.toDate ?? overview.period.endDate
+    ],
     client
   )
 
