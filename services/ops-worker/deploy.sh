@@ -495,6 +495,100 @@ upsert_scheduler_job \
   '{}'
 echo "  -> ops-nubox-quotes-hot-sync: */15 * * * * (Nubox quotes hot path, TASK-775)"
 
+# ─── TASK-775 Slice 7 mass migration (12 crons) ─────────────────────────────
+#
+# Migración bulk de los crons restantes del Vercel cron lane: webhook-dispatch,
+# email-delivery-retry, entra-*, hubspot-*, sync-conformed-recovery, recon-auto-match.
+#
+# Razón unificada: todos son async-critical (alimentan o consumen pipelines downstream
+# que QA y staging necesitan probar). Vercel custom env NO ejecuta crons → flow
+# downstream se rompe silenciosamente. Cloud Scheduler corre por proyecto GCP, igual
+# en cualquier env.
+
+upsert_scheduler_job \
+  "ops-webhook-dispatch" \
+  "*/2 * * * *" \
+  "/webhook-dispatch" \
+  '{}'
+echo "  -> ops-webhook-dispatch: */2 * * * * (outbound webhooks, TASK-775)"
+
+upsert_scheduler_job \
+  "ops-email-delivery-retry" \
+  "*/5 * * * *" \
+  "/email-delivery-retry" \
+  '{}'
+echo "  -> ops-email-delivery-retry: */5 * * * * (failed email retry, TASK-775)"
+
+upsert_scheduler_job \
+  "ops-entra-profile-sync" \
+  "0 8 * * *" \
+  "/entra/profile-sync" \
+  '{}'
+echo "  -> ops-entra-profile-sync: 0 8 * * * (Entra users + manager sync, TASK-775)"
+
+upsert_scheduler_job \
+  "ops-entra-webhook-renew" \
+  "0 6 */2 * *" \
+  "/entra/webhook-renew" \
+  '{}'
+echo "  -> ops-entra-webhook-renew: 0 6 */2 * * (Entra webhook subscription renew, TASK-775)"
+
+upsert_scheduler_job \
+  "ops-hubspot-quotes-sync" \
+  "0 */6 * * *" \
+  "/hubspot/quotes-sync" \
+  '{}'
+echo "  -> ops-hubspot-quotes-sync: 0 */6 * * * (HubSpot quotes sync, TASK-775)"
+
+upsert_scheduler_job \
+  "ops-hubspot-company-lifecycle-sync" \
+  "0 */6 * * *" \
+  "/hubspot/company-lifecycle-sync" \
+  '{}'
+echo "  -> ops-hubspot-company-lifecycle-sync: 0 */6 * * * (HubSpot lifecycle sync, TASK-775)"
+
+upsert_scheduler_job \
+  "ops-hubspot-companies-sync" \
+  "*/10 * * * *" \
+  "/hubspot/companies-sync" \
+  '{}'
+echo "  -> ops-hubspot-companies-sync: */10 * * * * (HubSpot companies incremental, TASK-775)"
+
+upsert_scheduler_job \
+  "ops-hubspot-companies-sync-full" \
+  "0 3 * * *" \
+  "/hubspot/companies-sync" \
+  '{"fullResync":true}'
+echo "  -> ops-hubspot-companies-sync-full: 0 3 * * * (HubSpot companies daily full resync, TASK-775)"
+
+upsert_scheduler_job \
+  "ops-hubspot-deals-sync" \
+  "0 */4 * * *" \
+  "/hubspot/deals-sync" \
+  '{}'
+echo "  -> ops-hubspot-deals-sync: 0 */4 * * * (HubSpot deals sync, TASK-775)"
+
+upsert_scheduler_job \
+  "ops-hubspot-products-sync" \
+  "0 8 * * *" \
+  "/hubspot/products-sync" \
+  '{}'
+echo "  -> ops-hubspot-products-sync: 0 8 * * * (HubSpot products sync, TASK-775)"
+
+upsert_scheduler_job \
+  "ops-notion-conformed-recovery" \
+  "*/30 * * * *" \
+  "/notion-conformed/recovery" \
+  '{}'
+echo "  -> ops-notion-conformed-recovery: */30 * * * * (Notion sync recovery retries, TASK-775)"
+
+upsert_scheduler_job \
+  "ops-reconciliation-auto-match" \
+  "45 7 * * *" \
+  "/reconciliation/auto-match" \
+  '{}'
+echo "  -> ops-reconciliation-auto-match: 45 7 * * * (continuous bank statement auto-match, TASK-775)"
+
 # Global projection recovery — unchanged lane.
 upsert_scheduler_job \
   "ops-reactive-recover" \

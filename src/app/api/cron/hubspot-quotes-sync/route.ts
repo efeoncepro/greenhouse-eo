@@ -1,55 +1,25 @@
 import { NextResponse } from 'next/server'
 
+import { runHubspotQuotesSync } from '@/lib/cron-orchestrators'
 import { requireCronAuth } from '@/lib/cron/require-cron-auth'
-import { checkIntegrationReadiness } from '@/lib/integrations/readiness'
 
-import { syncAllHubSpotQuotes } from '@/lib/hubspot/sync-hubspot-quotes'
-
+/**
+ * TASK-775 Slice 7 — Vercel cron fallback manual.
+ * Path scheduler canónico: Cloud Scheduler ops-hubspot-quotes-sync → ops-worker.
+ * Lógica en src/lib/cron-orchestrators/index.ts (runHubspotQuotesSync).
+ */
 export const dynamic = 'force-dynamic'
 
 export async function GET(request: Request) {
   const { authorized, errorResponse } = requireCronAuth(request)
 
-  if (!authorized) {
-    return errorResponse
-  }
-
-  // ── Readiness gate: check HubSpot integration status ──
-  try {
-    const readiness = await checkIntegrationReadiness('hubspot')
-
-    if (!readiness.ready) {
-      console.log(`[hubspot-quotes-sync] Skipped: HubSpot upstream not ready — ${readiness.reason}`)
-
-      return NextResponse.json({ skipped: true, reason: readiness.reason })
-    }
-  } catch (error) {
-    console.warn('[hubspot-quotes-sync] Readiness check failed, proceeding anyway:', error)
-  }
+  if (!authorized) return errorResponse
 
   try {
-    const startMs = Date.now()
-    const { organizations, results } = await syncAllHubSpotQuotes()
+    const result = await runHubspotQuotesSync()
 
-    const totalCreated = results.reduce((s, r) => s + r.created, 0)
-    const totalUpdated = results.reduce((s, r) => s + r.updated, 0)
-    const totalErrors = results.reduce((s, r) => s + r.errors.length, 0)
-
-    console.log(
-      `[hubspot-quotes-sync] ${organizations} orgs, ${totalCreated} created, ${totalUpdated} updated, ${totalErrors} errors, ${Date.now() - startMs}ms`
-    )
-
-    return NextResponse.json({
-      organizations,
-      totalCreated,
-      totalUpdated,
-      totalErrors,
-      durationMs: Date.now() - startMs,
-      details: results.filter(r => r.created > 0 || r.updated > 0 || r.errors.length > 0)
-    })
+    return NextResponse.json(result)
   } catch (error) {
-    console.error('[hubspot-quotes-sync] Cron failed:', error)
-
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }

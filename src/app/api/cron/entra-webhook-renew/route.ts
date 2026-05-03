@@ -1,8 +1,13 @@
 import { NextResponse } from 'next/server'
 
+import { runEntraWebhookRenew } from '@/lib/cron-orchestrators'
 import { requireCronAuth } from '@/lib/cron/require-cron-auth'
-import { createOrRenewSubscription } from '@/lib/entra/webhook-subscription'
 
+/**
+ * TASK-775 Slice 7 — Vercel cron fallback manual.
+ * Path scheduler canónico: Cloud Scheduler ops-entra-webhook-renew → ops-worker.
+ * Lógica en src/lib/cron-orchestrators/index.ts (runEntraWebhookRenew).
+ */
 export const dynamic = 'force-dynamic'
 export const maxDuration = 30
 
@@ -11,29 +16,13 @@ export async function GET(request: Request) {
 
   if (!authorized) return errorResponse
 
-  const startMs = Date.now()
-
   try {
-    const result = await createOrRenewSubscription()
-    const durationMs = Date.now() - startMs
+    const result = await runEntraWebhookRenew()
 
-    console.log(
-      `[entra-webhook-renew] ${result.action} subscription=${result.subscription.id} expires=${result.subscription.expirationDateTime} duration=${durationMs}ms`
-    )
-
-    return NextResponse.json({
-      action: result.action,
-      subscriptionId: result.subscription.id,
-      expirationDateTime: result.subscription.expirationDateTime,
-      durationMs
-    })
+    return NextResponse.json(result)
   } catch (error) {
-    const durationMs = Date.now() - startMs
-
-    console.error('[entra-webhook-renew] Failed:', error)
-
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Unknown error', durationMs },
+      { error: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     )
   }

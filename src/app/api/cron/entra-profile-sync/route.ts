@@ -1,10 +1,13 @@
 import { NextResponse } from 'next/server'
 
+import { runEntraProfileSync } from '@/lib/cron-orchestrators'
 import { requireCronAuth } from '@/lib/cron/require-cron-auth'
-import { fetchEntraUsersWithManagers } from '@/lib/entra/graph-client'
-import { syncEntraProfiles } from '@/lib/entra/profile-sync'
-import { runEntraHierarchyGovernanceScan } from '@/lib/reporting-hierarchy/governance'
 
+/**
+ * TASK-775 Slice 7 — Vercel cron fallback manual.
+ * Path scheduler canónico: Cloud Scheduler ops-entra-profile-sync → ops-worker.
+ * Lógica en src/lib/cron-orchestrators/index.ts (runEntraProfileSync).
+ */
 export const dynamic = 'force-dynamic'
 export const maxDuration = 300
 
@@ -13,35 +16,13 @@ export async function GET(request: Request) {
 
   if (!authorized) return errorResponse
 
-  const startMs = Date.now()
-
   try {
-    const entraUsers = await fetchEntraUsersWithManagers()
+    const result = await runEntraProfileSync()
 
-    console.log(`[entra-profile-sync] Fetched ${entraUsers.length} users from Entra`)
-
-    const result = await syncEntraProfiles(entraUsers)
-
-    const hierarchyGovernance = await runEntraHierarchyGovernanceScan({
-      triggeredBy: 'cron:entra-profile-sync',
-      syncMode: 'poll',
-      entraUsers
-    })
-
-    const durationMs = Date.now() - startMs
-
-    console.log(
-      `[entra-profile-sync] done processed=${result.processed} users_updated=${result.usersUpdated} profiles_created=${result.profilesCreated} profiles_linked=${result.profilesLinked} profiles_updated=${result.profilesUpdated} members_updated=${result.membersUpdated} avatars_synced=${result.avatarsSynced} skipped=${result.skipped} errors=${result.errors.length} duration=${durationMs}ms`
-    )
-
-    return NextResponse.json({ ...result, hierarchyGovernance, durationMs })
+    return NextResponse.json(result)
   } catch (error) {
-    const durationMs = Date.now() - startMs
-
-    console.error('[entra-profile-sync] Cron failed:', error)
-
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Unknown error', durationMs },
+      { error: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     )
   }

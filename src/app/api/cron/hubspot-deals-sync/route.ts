@@ -1,36 +1,28 @@
 import { NextResponse } from 'next/server'
 
+import { runHubspotDealsSync } from '@/lib/cron-orchestrators'
 import { requireCronAuth } from '@/lib/cron/require-cron-auth'
-import { syncHubSpotDeals } from '@/lib/hubspot/sync-hubspot-deals'
 
+/**
+ * TASK-775 Slice 7 — Vercel cron fallback manual.
+ * Path scheduler canónico: Cloud Scheduler ops-hubspot-deals-sync → ops-worker.
+ * Lógica en src/lib/cron-orchestrators/index.ts (runHubspotDealsSync).
+ */
 export const dynamic = 'force-dynamic'
 
 export async function GET(request: Request) {
   const { authorized, errorResponse } = requireCronAuth(request)
 
-  if (!authorized) {
-    return errorResponse
-  }
+  if (!authorized) return errorResponse
 
   const url = new URL(request.url)
   const includeClosed = url.searchParams.get('includeClosed') !== 'false'
 
   try {
-    const startMs = Date.now()
-    const summary = await syncHubSpotDeals({ includeClosed })
+    const result = await runHubspotDealsSync({ includeClosed })
 
-    console.log(
-      `[hubspot-deals-sync] source=${summary.totalSourceDeals} created=${summary.created} updated=${summary.updated} skipped=${summary.skipped} errors=${summary.errors.length} durationMs=${Date.now() - startMs}`
-    )
-
-    return NextResponse.json({
-      ...summary,
-      durationMs: Date.now() - startMs,
-      details: summary.results.filter(result => result.action !== 'skipped' || result.error)
-    })
+    return NextResponse.json(result)
   } catch (error) {
-    console.error('[hubspot-deals-sync] Cron failed:', error)
-
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }

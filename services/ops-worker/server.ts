@@ -25,6 +25,17 @@
  *   POST /nubox/balance-sync           → Nubox balances → PG + divergence outbox (TASK-775, replaces Vercel /api/cron/nubox-balance-sync)
  *   POST /nubox/sync                   → 3-fase raw→conformed→postgres (TASK-775, replaces Vercel /api/cron/nubox-sync)
  *   POST /nubox/quotes-hot-sync        → Quotes hot path period-scoped (TASK-775, replaces Vercel /api/cron/nubox-quotes-hot-sync)
+ *   POST /webhook-dispatch             → Outbound webhooks dispatcher (TASK-775, replaces Vercel /api/cron/webhook-dispatch)
+ *   POST /email-delivery-retry         → Failed email retry (TASK-775, replaces Vercel /api/cron/email-delivery-retry)
+ *   POST /entra/profile-sync           → Entra users + manager sync (TASK-775, replaces Vercel /api/cron/entra-profile-sync)
+ *   POST /entra/webhook-renew          → Entra webhook subscription renew (TASK-775, replaces Vercel /api/cron/entra-webhook-renew)
+ *   POST /hubspot/quotes-sync          → HubSpot quotes sync (TASK-775, replaces Vercel /api/cron/hubspot-quotes-sync)
+ *   POST /hubspot/company-lifecycle-sync → HubSpot lifecycle sync (TASK-775)
+ *   POST /hubspot/companies-sync       → HubSpot companies sync (TASK-775)
+ *   POST /hubspot/deals-sync           → HubSpot deals sync (TASK-775)
+ *   POST /hubspot/products-sync        → HubSpot products sync (TASK-775)
+ *   POST /notion-conformed/recovery    → Notion conformed retry due runs (TASK-775, replaces Vercel /api/cron/sync-conformed-recovery)
+ *   POST /reconciliation/auto-match    → Continuous bank statement auto-match (TASK-775, replaces Vercel /api/cron/reconciliation-auto-match)
  *
  * Auth: Cloud Run IAM (--no-allow-unauthenticated) + optional CRON_SECRET header
  * Runtime: Node.js 22 via esbuild bundle (handles TypeScript + @/ path aliases)
@@ -65,6 +76,19 @@ import {
   runNuboxQuotesHotSync,
   runNuboxSyncOrchestration
 } from '@/lib/nubox/sync-nubox-orchestrator'
+import {
+  runEmailDeliveryRetry,
+  runEntraProfileSync,
+  runEntraWebhookRenew,
+  runHubspotCompaniesSync,
+  runHubspotCompanyLifecycleSync,
+  runHubspotDealsSync,
+  runHubspotProductsSync,
+  runHubspotQuotesSync,
+  runNotionConformedRecovery,
+  runReconciliationAutoMatch,
+  runWebhookDispatch
+} from '@/lib/cron-orchestrators'
 import { buildWeeklyDigest, resolveWeeklyDigestRecipients, WEEKLY_DIGEST_DEFAULT_LIMIT } from '@/lib/nexa/digest'
 
 import { getCurrentAuthReadiness } from '@/lib/auth-secrets'
@@ -1267,6 +1291,95 @@ const handleNuboxQuotesHotSync = wrapCronHandler({
   }
 })
 
+// ─── /webhook-dispatch ──────────────────────────────────────────────────────
+//
+// TASK-775 Slice 7 — Webhook outbound dispatcher migrado de Vercel a Cloud Run.
+const handleWebhookDispatch = wrapCronHandler({
+  name: 'webhook-dispatch',
+  domain: 'sync',
+  run: async (): Promise<Record<string, unknown>> => runWebhookDispatch()
+})
+
+// ─── /email-delivery-retry ──────────────────────────────────────────────────
+//
+// TASK-775 Slice 7 — Email delivery retry migrado de Vercel a Cloud Run.
+const handleEmailDeliveryRetry = wrapCronHandler({
+  name: 'email-delivery-retry',
+  domain: 'sync',
+  run: async (): Promise<Record<string, unknown>> => runEmailDeliveryRetry()
+})
+
+// ─── /entra/* ───────────────────────────────────────────────────────────────
+//
+// TASK-775 Slice 7 — Entra crons migrados a Cloud Run.
+const handleEntraProfileSync = wrapCronHandler({
+  name: 'entra-profile-sync',
+  domain: 'identity',
+  run: async (): Promise<Record<string, unknown>> => runEntraProfileSync()
+})
+
+const handleEntraWebhookRenew = wrapCronHandler({
+  name: 'entra-webhook-renew',
+  domain: 'identity',
+  run: async (): Promise<Record<string, unknown>> => runEntraWebhookRenew()
+})
+
+// ─── /hubspot/* ─────────────────────────────────────────────────────────────
+//
+// TASK-775 Slice 7 — Lane HubSpot completo migrado a Cloud Run.
+const handleHubspotQuotesSync = wrapCronHandler({
+  name: 'hubspot-quotes-sync',
+  domain: 'integrations.hubspot',
+  run: async (): Promise<Record<string, unknown>> => runHubspotQuotesSync()
+})
+
+const handleHubspotCompanyLifecycleSync = wrapCronHandler({
+  name: 'hubspot-company-lifecycle-sync',
+  domain: 'integrations.hubspot',
+  run: async (): Promise<Record<string, unknown>> => runHubspotCompanyLifecycleSync()
+})
+
+const handleHubspotCompaniesSync = wrapCronHandler({
+  name: 'hubspot-companies-sync',
+  domain: 'integrations.hubspot',
+  run: async (body): Promise<Record<string, unknown>> => runHubspotCompaniesSync({
+    dryRun: typeof body.dryRun === 'boolean' ? body.dryRun : false,
+    fullResync: typeof body.fullResync === 'boolean' ? body.fullResync : false
+  })
+})
+
+const handleHubspotDealsSync = wrapCronHandler({
+  name: 'hubspot-deals-sync',
+  domain: 'integrations.hubspot',
+  run: async (body): Promise<Record<string, unknown>> => runHubspotDealsSync({
+    includeClosed: typeof body.includeClosed === 'boolean' ? body.includeClosed : true
+  })
+})
+
+const handleHubspotProductsSync = wrapCronHandler({
+  name: 'hubspot-products-sync',
+  domain: 'integrations.hubspot',
+  run: async (): Promise<Record<string, unknown>> => runHubspotProductsSync()
+})
+
+// ─── /notion-conformed/recovery ─────────────────────────────────────────────
+//
+// TASK-775 Slice 7 — Notion conformed recovery migrado a Cloud Run.
+const handleNotionConformedRecovery = wrapCronHandler({
+  name: 'notion-conformed-recovery',
+  domain: 'integrations.notion',
+  run: async (): Promise<Record<string, unknown>> => runNotionConformedRecovery()
+})
+
+// ─── /reconciliation/auto-match ─────────────────────────────────────────────
+//
+// TASK-775 Slice 7 — Reconciliation auto-match migrado a Cloud Run.
+const handleReconciliationAutoMatch = wrapCronHandler({
+  name: 'reconciliation-auto-match',
+  domain: 'finance',
+  run: async (): Promise<Record<string, unknown>> => runReconciliationAutoMatch()
+})
+
 const handleNotionConformedSync = async (req: IncomingMessage, res: ServerResponse) => {
   const body = await readBody(req)
   const rawSource = typeof body.executionSource === 'string' ? body.executionSource.trim() : 'scheduled_primary'
@@ -1701,6 +1814,72 @@ const server = createServer(async (req, res) => {
 
     if (method === 'POST' && path === '/nubox/quotes-hot-sync') {
       await handleNuboxQuotesHotSync(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/webhook-dispatch') {
+      await handleWebhookDispatch(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/email-delivery-retry') {
+      await handleEmailDeliveryRetry(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/entra/profile-sync') {
+      await handleEntraProfileSync(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/entra/webhook-renew') {
+      await handleEntraWebhookRenew(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/hubspot/quotes-sync') {
+      await handleHubspotQuotesSync(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/hubspot/company-lifecycle-sync') {
+      await handleHubspotCompanyLifecycleSync(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/hubspot/companies-sync') {
+      await handleHubspotCompaniesSync(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/hubspot/deals-sync') {
+      await handleHubspotDealsSync(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/hubspot/products-sync') {
+      await handleHubspotProductsSync(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/notion-conformed/recovery') {
+      await handleNotionConformedRecovery(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/reconciliation/auto-match') {
+      await handleReconciliationAutoMatch(req, res)
 
       return
     }

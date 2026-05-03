@@ -9,10 +9,6 @@
       "schedule": "15 8 * * *"
     },
     {
-      "path": "/api/cron/sync-conformed-recovery",
-      "schedule": "*/30 * * * *"
-    },
-    {
       "path": "/api/cron/reliability-synthetic",
       "schedule": "*/30 * * * *"
     },
@@ -29,52 +25,8 @@
       "schedule": "30 10 * * *"
     },
     {
-      "path": "/api/cron/reconciliation-auto-match",
-      "schedule": "45 7 * * *"
-    },
-    {
-      "path": "/api/cron/webhook-dispatch",
-      "schedule": "*/2 * * * *"
-    },
-    {
-      "path": "/api/cron/email-delivery-retry",
-      "schedule": "*/5 * * * *"
-    },
-    {
       "path": "/api/cron/email-data-retention",
       "schedule": "0 3 * * 0"
-    },
-    {
-      "path": "/api/cron/entra-profile-sync",
-      "schedule": "0 8 * * *"
-    },
-    {
-      "path": "/api/cron/entra-webhook-renew",
-      "schedule": "0 6 */2 * *"
-    },
-    {
-      "path": "/api/cron/hubspot-quotes-sync",
-      "schedule": "0 */6 * * *"
-    },
-    {
-      "path": "/api/cron/hubspot-company-lifecycle-sync",
-      "schedule": "0 */6 * * *"
-    },
-    {
-      "path": "/api/cron/hubspot-companies-sync",
-      "schedule": "*/10 * * * *"
-    },
-    {
-      "path": "/api/cron/hubspot-companies-sync?full=true",
-      "schedule": "0 3 * * *"
-    },
-    {
-      "path": "/api/cron/hubspot-deals-sync",
-      "schedule": "0 */4 * * *"
-    },
-    {
-      "path": "/api/cron/hubspot-products-sync",
-      "schedule": "0 8 * * *"
     },
     {
       "path": "/api/cron/fx-sync-latam?window=morning",

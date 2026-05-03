@@ -1,9 +1,13 @@
 import { NextResponse } from 'next/server'
 
+import { runHubspotCompaniesSync } from '@/lib/cron-orchestrators'
 import { requireCronAuth } from '@/lib/cron/require-cron-auth'
-import { checkIntegrationReadiness } from '@/lib/integrations/readiness'
-import { syncHubSpotCompanies } from '@/lib/hubspot/sync-hubspot-companies'
 
+/**
+ * TASK-775 Slice 7 — Vercel cron fallback manual.
+ * Path scheduler canónico: Cloud Scheduler ops-hubspot-companies-sync → ops-worker.
+ * Lógica en src/lib/cron-orchestrators/index.ts (runHubspotCompaniesSync).
+ */
 export const dynamic = 'force-dynamic'
 
 const isTruthy = (value: string | null): boolean =>
@@ -12,38 +16,17 @@ const isTruthy = (value: string | null): boolean =>
 export async function GET(request: Request) {
   const { authorized, errorResponse } = requireCronAuth(request)
 
-  if (!authorized) {
-    return errorResponse
-  }
-
-  try {
-    const readiness = await checkIntegrationReadiness('hubspot')
-
-    if (!readiness.ready) {
-      return NextResponse.json({
-        skipped: true,
-        reason: readiness.reason
-      })
-    }
-  } catch (error) {
-    console.warn('[hubspot-companies-sync] Readiness check failed, proceeding anyway:', error)
-  }
+  if (!authorized) return errorResponse
 
   const url = new URL(request.url)
   const dryRun = isTruthy(url.searchParams.get('dry'))
   const fullResync = isTruthy(url.searchParams.get('full'))
 
   try {
-    const startMs = Date.now()
-    const summary = await syncHubSpotCompanies({ dryRun, fullResync })
+    const result = await runHubspotCompaniesSync({ dryRun, fullResync })
 
-    return NextResponse.json({
-      ...summary,
-      durationMs: Date.now() - startMs
-    })
+    return NextResponse.json(result)
   } catch (error) {
-    console.error('[hubspot-companies-sync] Cron failed:', error)
-
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }

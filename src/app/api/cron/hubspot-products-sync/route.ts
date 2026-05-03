@@ -1,47 +1,25 @@
 import { NextResponse } from 'next/server'
 
+import { runHubspotProductsSync } from '@/lib/cron-orchestrators'
 import { requireCronAuth } from '@/lib/cron/require-cron-auth'
-import { checkIntegrationReadiness } from '@/lib/integrations/readiness'
 
-import { syncHubSpotProductCatalog } from '@/lib/hubspot/sync-hubspot-products'
-
+/**
+ * TASK-775 Slice 7 — Vercel cron fallback manual.
+ * Path scheduler canónico: Cloud Scheduler ops-hubspot-products-sync → ops-worker.
+ * Lógica en src/lib/cron-orchestrators/index.ts (runHubspotProductsSync).
+ */
 export const dynamic = 'force-dynamic'
 
 export async function GET(request: Request) {
   const { authorized, errorResponse } = requireCronAuth(request)
 
-  if (!authorized) {
-    return errorResponse
-  }
-
-  // ── Readiness gate: check HubSpot integration status ──
-  try {
-    const readiness = await checkIntegrationReadiness('hubspot')
-
-    if (!readiness.ready) {
-      console.log(`[hubspot-products-sync] Skipped: HubSpot upstream not ready — ${readiness.reason}`)
-
-      return NextResponse.json({ skipped: true, reason: readiness.reason })
-    }
-  } catch (error) {
-    console.warn('[hubspot-products-sync] Readiness check failed, proceeding anyway:', error)
-  }
+  if (!authorized) return errorResponse
 
   try {
-    const startMs = Date.now()
-    const result = await syncHubSpotProductCatalog()
+    const result = await runHubspotProductsSync()
 
-    console.log(
-      `[hubspot-products-sync] ${result.created} created, ${result.updated} updated, ${result.skipped} skipped, ${result.errors.length} errors, ${Date.now() - startMs}ms`
-    )
-
-    return NextResponse.json({
-      ...result,
-      durationMs: Date.now() - startMs
-    })
+    return NextResponse.json(result)
   } catch (error) {
-    console.error('[hubspot-products-sync] Cron failed:', error)
-
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }

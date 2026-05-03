@@ -1,54 +1,27 @@
 import { NextResponse } from 'next/server'
 
-import { alertCronFailure } from '@/lib/alerts/slack-notify'
+import { runNotionConformedRecovery } from '@/lib/cron-orchestrators'
 import { requireCronAuth } from '@/lib/cron/require-cron-auth'
-import {
-  listDueNotionSyncRecoveryRuns,
-  runNotionSyncOrchestration
-} from '@/lib/integrations/notion-sync-orchestration'
 
+/**
+ * TASK-775 Slice 7 — Vercel cron fallback manual.
+ * Path scheduler canónico: Cloud Scheduler ops-notion-conformed-recovery → ops-worker.
+ * Lógica en src/lib/cron-orchestrators/index.ts (runNotionConformedRecovery).
+ */
 export const dynamic = 'force-dynamic'
 export const maxDuration = 120
 
 export async function GET(request: Request) {
   const { authorized, errorResponse } = requireCronAuth(request)
 
-  if (!authorized) {
-    return errorResponse
-  }
+  if (!authorized) return errorResponse
 
   try {
-    const dueRetries = await listDueNotionSyncRecoveryRuns()
+    const result = await runNotionConformedRecovery()
 
-    if (dueRetries.length === 0) {
-      return NextResponse.json({
-        processed: 0,
-        message: 'No due Notion conformed retries',
-        dueRetries: []
-      })
-    }
-
-    const result = await runNotionSyncOrchestration({
-      executionSource: 'scheduled_retry'
-    })
-
-    if (result.dataQualityMonitor?.executed === false) {
-      await alertCronFailure(
-        'notion-delivery-data-quality-post-sync-retry',
-        result.dataQualityMonitor.error ?? 'Unknown post-sync retry data quality error',
-        { syncRunId: result.syncRunId ?? 'unknown' }
-      ).catch(() => {})
-    }
-
-    return NextResponse.json({
-      ...result,
-      dueRetries
-    })
+    return NextResponse.json(result)
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error'
-
-    console.error('[sync-conformed-recovery] Retry failed:', error)
-    await alertCronFailure('sync-conformed-recovery', error)
 
     return NextResponse.json({ error: message }, { status: 502 })
   }
