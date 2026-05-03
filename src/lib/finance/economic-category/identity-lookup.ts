@@ -96,12 +96,13 @@ export const lookupMemberByRut = async (rut: string): Promise<ResolvedMember | n
             m.primary_email, m.active, m.payroll_via, m.deel_contract_id
        FROM greenhouse_core.organizations o
        JOIN greenhouse_core.person_legal_entity_relationships pler
-         ON pler.organization_id = o.organization_id
+         ON pler.legal_entity_organization_id = o.organization_id
        JOIN greenhouse_core.members m
          ON m.identity_profile_id = pler.profile_id
       WHERE o.tax_id = $1
         AND COALESCE(o.tax_id_type, '') IN ('cl_rut_natural', 'cl_rut_persona_natural', 'cl_rut')
         AND m.active = TRUE
+        AND COALESCE(pler.status, 'active') = 'active'
       LIMIT 1`,
     [normalized]
   )
