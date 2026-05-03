@@ -27,6 +27,10 @@ import type { SyntheticRouteSnapshot } from '@/types/reliability-synthetic'
 import { buildAiSummarySignals } from './ai/build-ai-summary-signals'
 import { getLatestAiObservationsByScope, type AiObservation } from './ai/reader'
 import { getAccountBalancesFxDriftSignal } from './queries/account-balances-fx-drift'
+import {
+  getExpenseDistributionSharedPoolContaminationSignal,
+  getExpenseDistributionUnresolvedSignal
+} from './queries/expense-distribution'
 import { getExpensePaymentsClpDriftSignal } from './queries/expense-payments-clp-drift'
 import { getIncomePaymentsClpDriftSignal } from './queries/income-payments-clp-drift'
 import { getPaymentOrdersDeadLetterSignal } from './queries/payment-orders-dead-letter'
@@ -52,6 +56,7 @@ import {
   buildNotionFreshnessSignal,
   buildObservabilityPostureSignal,
   buildFinanceClpDriftSignals,
+  buildExpenseDistributionSignals,
   buildPaymentOrderSettlementSignals,
   buildSentryIncidentSignals,
   buildSubsystemSignals,
@@ -311,6 +316,14 @@ interface ReliabilityOverviewSources {
    * Bug Figma EXP-202604-008 (2026-05-03).
    */
   accountBalancesFxDrift?: ReliabilitySignal | null
+
+  /**
+   * TASK-777 Slice 3 — Expense distribution management-accounting gates.
+   * Protege P&L/overhead: cuenta expenses sin lane canónico y filas que el
+   * pool legacy tomaría como overhead aunque son payroll provider, regulatorio
+   * o costos financieros. Steady state = 0 antes de cerrar períodos.
+   */
+  expenseDistribution?: ReliabilitySignal[] | null
 }
 
 export const buildReliabilityOverview = (
@@ -354,7 +367,9 @@ export const buildReliabilityOverview = (
     // TASK-775 Slice 5 — Vercel ↔ Cloud Scheduler drift (async-critical crons).
     ...(sources.cronStagingDrift ? [sources.cronStagingDrift] : []),
     // TASK-774 Slice 4 — Account balances FX drift (closing_balance vs recompute).
-    ...(sources.accountBalancesFxDrift ? [sources.accountBalancesFxDrift] : [])
+    ...(sources.accountBalancesFxDrift ? [sources.accountBalancesFxDrift] : []),
+    // TASK-777 Slice 3 — Expense distribution gates.
+    ...(sources.expenseDistribution ?? [])
   ]
 
   const signalsByModule = new Map<string, ReliabilitySignal[]>()
@@ -565,6 +580,14 @@ export const getReliabilityOverview = async (
       ? preloadedSources.accountBalancesFxDrift
       : await getAccountBalancesFxDriftSignal().catch(() => null)
 
+  const expenseDistribution =
+    preloadedSources.expenseDistribution !== undefined
+      ? preloadedSources.expenseDistribution
+      : await buildExpenseDistributionSignals({
+          unresolved: getExpenseDistributionUnresolvedSignal,
+          sharedPoolContamination: getExpenseDistributionSharedPoolContaminationSignal
+        }).catch(() => null)
+
   return buildReliabilityOverview(operations, {
     billing,
     notionOperational,
@@ -578,7 +601,8 @@ export const getReliabilityOverview = async (
     providerBqSyncDeadLetter,
     outboxHealth,
     cronStagingDrift,
-    accountBalancesFxDrift
+    accountBalancesFxDrift,
+    expenseDistribution
   })
 }
 
