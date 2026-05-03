@@ -1,5 +1,52 @@
 # Handoff.md
 
+## Sesion 2026-05-03 — EPIC-012 Finance Five-Capabilities Operating System
+
+- **Trigger:** usuario acepto la recomendacion de ordenar Finance en 5 capacidades: `Treasury & Payments`, `Accounting Semantics`, `Management Accounting`, `Close Governance`, `Planning & Control Tower`.
+- **Artefacto creado:** `docs/epics/to-do/EPIC-012-finance-five-capabilities-operating-system.md`.
+- **Registros sincronizados:** `docs/epics/EPIC_ID_REGISTRY.md` y `docs/epics/README.md`; siguiente ID disponible queda `EPIC-013`.
+- **Task vinculada:** `TASK-777` ahora declara `Epic: EPIC-012`.
+- **Secuencia recomendada:** Wave 1 `TASK-777`; Wave 2 `TASK-713/TASK-393`; Wave 3 `TASK-397`, `TASK-176`, `TASK-710/711/712`, `TASK-707*`, `TASK-756/757`; Wave 4 metric registry + planning/forecast/control tower.
+
+## Sesion 2026-05-03 — Finance domain end-to-end audit
+
+- **Skill usada:** `greenhouse-finance-accounting-operator` en modo `audit`.
+- **Artefacto creado:** `docs/audits/finance/FINANCE_DOMAIN_AUDIT_2026-05-03.md` + `docs/audits/finance/README.md`; indice `docs/audits/README.md` sincronizado.
+- **Runtime verificado read-only:** `pnpm pg:doctor` OK + SQL contra Cloud SQL dev/staging via Cloud SQL Connector.
+- **Conclusion ejecutiva:** Finance transaccional/pagos esta bastante sano tras TASK-766/774/765; Management Accounting / Cost Attribution / Close Governance no esta listo para cierre canonico de abril 2026.
+- **Signals vivos revisados:** account balance FX drift `0`; expense/income payment CLP drift `0`; payment orders zombie `0`; payment orders dead-letter `0`.
+- **Hallazgos criticos:**
+  - `overhead_clp` abril 2026 mezcla provider payroll, Previred/regulatorio, factoring/bank fees y shared SaaS en el mismo pool.
+  - abril 2026 aparece `ready=100%` con `reconciliation_status=not_required`, aunque reconciliation periods de abril siguen `open` y `operational_pl.period_closed=false`.
+  - `operational_pl` sigue consumiendo atajos V0 (`allocated_client_id`, `cost_allocations`) mientras el modelo raiz MLCM_V1 exige lanes/facts canonicas.
+- **Recomendacion:** abril solo provisional/restatement-needed; mayo no debe cerrarse sin gates de `TASK-777` + close governance `TASK-713/TASK-393`.
+
+## Sesion 2026-05-03 — Codex skill `greenhouse-finance-accounting-operator`
+
+- **Scope:** capacidad nueva solo para Codex. No se deja version Claude en este turno para no chocar con el trabajo separado que el usuario pidio a Claude.
+- **Paths activos:**
+  - `.codex/skills/greenhouse-finance-accounting-operator/SKILL.md`
+  - `.codex/skills/greenhouse-finance-accounting-operator/references/greenhouse-finance-runtime-map.md`
+  - `.codex/skills/greenhouse-finance-accounting-operator/references/accounting-finance-playbook.md`
+  - `/Users/jreye/.codex/skills/greenhouse-finance-accounting-operator/SKILL.md`
+- **Enfoque canónico:** la skill ya no queda repo-centrica. Combina arquitectura Greenhouse con benchmarks externos:
+  - `IFRS Conceptual Framework`, `IAS 1`, `IAS 7`, `IFRS 7`, `IFRS 15`, `IFRS 16`
+  - `COSO`
+  - `AICPA/CIMA Global Management Accounting Principles`
+  - `AFP` para treasury/payments controls
+- **Objetivo operativo:** que Codex pueda auditar, diagnosticar, recomendar y ejecutar trabajo financiero-contable con criterio de management accounting, fiscal/tax, treasury, cashflow, payments, P&L, close governance y controls/auditability.
+- **Upgrade posterior:** la skill ahora incluye runbooks ejecutables en `.codex/skills/greenhouse-finance-accounting-operator/references/finance-operations-runbooks.md` para:
+  - overhead/cost allocation audit
+  - client P&L review
+  - expense/payment classification
+  - cash/balance reconciliation
+  - cashflow/liquidity review
+  - month close
+  - reopen/restatement
+  - payment controls review
+  - budget vs actual vs forecast review
+- **Cambio de alcance registrado:** se eliminaron las skills Claude que se habian alcanzado a crear para evitar conflicto con la version separada que el usuario pidio a Claude.
+
 ## Sesion 2026-05-03 — TASK-777 creada (Canonical Expense Distribution & Shared Cost Pools)
 
 - **Lifecycle:** `to-do`

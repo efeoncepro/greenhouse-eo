@@ -13,7 +13,7 @@
 - Impact: `Muy alto`
 - Effort: `Alto`
 - Type: `implementation`
-- Epic: `[optional EPIC-###]`
+- Epic: `EPIC-012`
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `finance`

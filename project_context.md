@@ -11,6 +11,29 @@
 - Para verificar higiene de contexto sin modificar archivos, usar `pnpm docs:context-check`. El check es no destructivo por defecto y existe para avisar drift, no para borrar memoria.
 - Preview/Staging/Production vigentes deben seguir lo declarado en `AGENTS.md` y `RELEASE_CHANNELS_OPERATING_MODEL_V1.md`; si un delta antiguo de Vercel contradice esos contratos, tratarlo como historia y revalidar con Vercel CLI/runtime.
 
+## Delta 2026-05-03 Codex finance/accounting operator skill
+
+- Codex ahora tiene una skill local y una global llamadas `greenhouse-finance-accounting-operator`.
+- Paths canonicos:
+  - repo local: `.codex/skills/greenhouse-finance-accounting-operator/SKILL.md`
+  - global usuario: `/Users/jreye/.codex/skills/greenhouse-finance-accounting-operator/SKILL.md`
+- La skill no se apoya solo en el runtime Greenhouse. Tambien obliga a contrastar decisiones con marcos externos y mejores practicas de mercado:
+  - `IFRS Conceptual Framework`
+  - `IAS 1`
+  - `IAS 7`
+  - `IFRS 7`
+  - `IFRS 15`
+  - `IFRS 16`
+  - `COSO`
+  - `AICPA/CIMA Global Management Accounting Principles`
+  - `AFP` para treasury y payments controls
+- Uso esperado:
+  - auditoria de P&L, overhead, cashflow, payments, reconciliacion, tax/fiscal treatment, period close y cost attribution
+  - diseño de fixes y recomendaciones guiadas por contabilidad financiera, cost accounting, treasury y controles, no solo por conveniencia del schema actual
+- Regla operativa nueva:
+  - si el runtime del repo discrepa de mejores practicas contables/financieras, el agente debe explicitar el drift y no normalizarlo silenciosamente como si fuera correcto por existir en codigo
+  - la skill ahora incluye modos operativos y runbooks para `audit`, `recommend`, `execute`, `close_governance` y `reconcile`; no debe usarse solo como checklist teórico
+
 ## Delta 2026-05-03 Postgres TLS recovery cubre raw pg + Kysely
 
 - Sentry production `JAVASCRIPT-NEXTJS-2N` reportó `ssl/tls alert bad certificate` en `POST /api/webhooks/hubspot-companies`, pero la investigación mostró que el patrón también golpeaba crons, SCIM y sync: no era un bug de HubSpot ni del webhook.
