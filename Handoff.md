@@ -1,5 +1,15 @@
 # Handoff.md
 
+## Sesion 2026-05-03 — TASK-771 tomada (Finance Supplier Write Decoupling + BQ Projection vía Outbox)
+
+- **Lifecycle:** `in-progress` (movida de `to-do/` a `in-progress/`).
+- **Branch:** `develop` (instrucción explícita del usuario — no crear branch dedicado).
+- **Ownership check:** `gh pr list --search "TASK-771"` vacío; `git branch -a | grep 771` sin branches previas.
+- **Origen:** auditoría 2026-05-03 sobre incidente "Error al crear proveedor" en `dev-greenhouse.efeoncepro.com/finance/expenses` drawer "Nuevo proveedor". Diagnóstico: `syncProviderFromFinanceSupplier` ([src/lib/providers/canonical.ts:72](src/lib/providers/canonical.ts#L72)) ejecuta MERGE/UPDATE BQ + DDL inline en el POST handler sin try/catch ni guard; cualquier falla BQ devuelve 500 aunque PG ya commiteó. 3 suppliers afectados ya en PG (`figma-inc` 2026-05-03, `microsoft-inc` 2026-03-15, `notion-inc` 2026-03-15).
+- **Decisión arquitectónica:** rechazo del fix mínimo (try/catch + log) por insuficiente. Solución canónica = outbox-driven projection: el evento `provider.upserted` ya se emite dentro de la tx PG ([src/lib/providers/postgres.ts:166](src/lib/providers/postgres.ts#L166)) pero sin consumer; se construye el consumer reactivo en `ops-worker` con dead-letter + retry exponencial, se elimina el sync inline y se agrega reliability signal `finance.providers.bq_sync_drift`.
+- **Plan:** 5 slices canónicos (hotfix → consumer reactivo → limpieza → reliability → backfill).
+- **Open Questions a resolver pre-FASE 1:** (a) ¿hay consumers vivos de `greenhouse.providers` BQ?; (b) umbral aged-pending para reliability signal; (c) causa raíz del fail BQ en staging (ADC/schema/permisos).
+
 ## Sesion 2026-05-03 — TASK-769 implementada (Cloud Cost Intelligence + AI FinOps Copilot)
 
 - **Lifecycle:** `complete` (movida a `complete/` y README/registry sincronizados).

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 import { syncProviderFromFinanceSupplier } from '@/lib/providers/canonical'
+import { captureWithDomain } from '@/lib/observability/capture'
 import { resolveCanonicalProviderId } from '@/lib/providers/postgres'
 import { getLatestProviderToolingSnapshot } from '@/lib/providers/provider-tooling-snapshots'
 import { listPreferredToolProviderCostBasisByProvider } from '@/lib/commercial-cost-basis/tool-provider-cost-basis-reader'
@@ -342,14 +343,22 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
       }
 
 
-      await syncProviderFromFinanceSupplier({
-        supplierId,
-        providerId: updatedSupplier.providerId,
-        legalName: updatedSupplier.legalName,
-        tradeName: updatedSupplier.tradeName,
-        website: updatedSupplier.website,
-        isActive: updatedSupplier.isActive
-      })
+      // TASK-771 Slice 1 — sync BQ no debe bloquear el response: PG ya commiteó el UPDATE.
+      try {
+        await syncProviderFromFinanceSupplier({
+          supplierId,
+          providerId: updatedSupplier.providerId,
+          legalName: updatedSupplier.legalName,
+          tradeName: updatedSupplier.tradeName,
+          website: updatedSupplier.website,
+          isActive: updatedSupplier.isActive
+        })
+      } catch (syncError) {
+        captureWithDomain(syncError, 'finance', {
+          tags: { source: 'sync_provider_bq_legacy', stage: 'post_supplier_update_pg' },
+          extra: { supplierId, providerId: updatedSupplier.providerId }
+        })
+      }
 
       return NextResponse.json({
         supplierId,
@@ -507,14 +516,22 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
       `, { supplierId })
 
       if (updatedSupplier) {
-        await syncProviderFromFinanceSupplier({
-          supplierId,
-          providerId: updatedSupplier.provider_id ? normalizeString(updatedSupplier.provider_id) : null,
-          legalName: normalizeString(updatedSupplier.legal_name),
-          tradeName: updatedSupplier.trade_name ? normalizeString(updatedSupplier.trade_name) : null,
-          website: updatedSupplier.website ? normalizeString(updatedSupplier.website) : null,
-          isActive: normalizeBoolean(updatedSupplier.is_active)
-        })
+        // TASK-771 Slice 1 — sync BQ no debe bloquear el response (BQ-fallback path).
+        try {
+          await syncProviderFromFinanceSupplier({
+            supplierId,
+            providerId: updatedSupplier.provider_id ? normalizeString(updatedSupplier.provider_id) : null,
+            legalName: normalizeString(updatedSupplier.legal_name),
+            tradeName: updatedSupplier.trade_name ? normalizeString(updatedSupplier.trade_name) : null,
+            website: updatedSupplier.website ? normalizeString(updatedSupplier.website) : null,
+            isActive: normalizeBoolean(updatedSupplier.is_active)
+          })
+        } catch (syncError) {
+          captureWithDomain(syncError, 'finance', {
+            tags: { source: 'sync_provider_bq_legacy', stage: 'post_supplier_update_bq_fallback' },
+            extra: { supplierId }
+          })
+        }
       }
 
       return NextResponse.json({
