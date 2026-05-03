@@ -2,7 +2,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P0`
 - Impact: `Crítico` (KPIs banco/treasury inflados/deflados por mix moneda)
 - Effort: `Medio (4-6h)`

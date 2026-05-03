@@ -620,10 +620,29 @@ const getDailyMovementSummary = async (
       --   * superseded_by_otb_id     (anchor-chain replacement)
       -- Filtering on only one axis (historical bug) miscounts dismissed phantoms
       -- and inflates account_balances.
+      --
+      -- TASK-774 — CLP-equivalent contract canonico:
+      -- Para cuentas CLP que reciben pagos en moneda extranjera (caso CCA
+      -- TASK-714c, payments Deel/Adobe/Figma USD pagados desde TC CLP), el
+      -- balance se computa con payment_amount_clp (FX-resolved) en lugar
+      -- de amount (currency original). El COALESCE chain es el mismo de
+      -- las VIEWs canonicas TASK-766 (expense_payments_normalized,
+      -- income_payments_normalized):
+      --   COALESCE(amount_clp, CASE WHEN currency=CLP THEN amount END)
+      -- Para settlement_legs aplicamos COALESCE inline (settlement_legs ya
+      -- tiene columna amount_clp opcional desde migration 20260408103211338);
+      -- para ep/ip leemos directo de las VIEWs canonicas TASK-766 que ya
+      -- exponen payment_amount_clp con el mismo COALESCE + filtro 3-axis
+      -- supersede inline. Bug pre-fix: ep.amount sumaba USD nativo en cuenta
+      -- CLP -> balance Santander Corp +92.9 en lugar de +83,773.5 (Figma
+      -- EXP-202604-008, 2026-05-03).
       WITH settlement_movements AS (
         SELECT
           sl.direction,
-          sl.amount,
+          COALESCE(
+            sl.amount_clp,
+            CASE WHEN sl.currency = 'CLP' THEN sl.amount END
+          ) AS amount,
           sl.transaction_date::timestamptz AS occurred_at
         FROM greenhouse_finance.settlement_legs sl
         WHERE sl.instrument_id = $1
@@ -634,19 +653,16 @@ const getDailyMovementSummary = async (
       fallback_income_payments AS (
         SELECT
           'incoming'::text AS direction,
-          ip.amount,
-          ip.payment_date::timestamptz AS occurred_at
-        FROM greenhouse_finance.income_payments ip
-        WHERE ip.payment_account_id = $1
-          AND ip.payment_date = $2::date
-          AND ip.superseded_by_payment_id IS NULL
-          AND ip.superseded_at IS NULL
-          AND ip.superseded_by_otb_id IS NULL
+          ipn.payment_amount_clp AS amount,
+          ipn.payment_date::timestamptz AS occurred_at
+        FROM greenhouse_finance.income_payments_normalized ipn
+        WHERE ipn.payment_account_id = $1
+          AND ipn.payment_date = $2::date
           AND NOT EXISTS (
             SELECT 1
             FROM greenhouse_finance.settlement_legs sl
             WHERE sl.linked_payment_type = 'income_payment'
-              AND sl.linked_payment_id = ip.payment_id
+              AND sl.linked_payment_id = ipn.payment_id
               AND sl.instrument_id = $1
               AND sl.superseded_at IS NULL
               AND sl.superseded_by_otb_id IS NULL
@@ -655,19 +671,16 @@ const getDailyMovementSummary = async (
       fallback_expense_payments AS (
         SELECT
           'outgoing'::text AS direction,
-          ep.amount,
-          ep.payment_date::timestamptz AS occurred_at
-        FROM greenhouse_finance.expense_payments ep
-        WHERE ep.payment_account_id = $1
-          AND ep.payment_date = $2::date
-          AND ep.superseded_by_payment_id IS NULL
-          AND ep.superseded_at IS NULL
-          AND ep.superseded_by_otb_id IS NULL
+          epn.payment_amount_clp AS amount,
+          epn.payment_date::timestamptz AS occurred_at
+        FROM greenhouse_finance.expense_payments_normalized epn
+        WHERE epn.payment_account_id = $1
+          AND epn.payment_date = $2::date
           AND NOT EXISTS (
             SELECT 1
             FROM greenhouse_finance.settlement_legs sl
             WHERE sl.linked_payment_type = 'expense_payment'
-              AND sl.linked_payment_id = ep.payment_id
+              AND sl.linked_payment_id = epn.payment_id
               AND sl.instrument_id = $1
               AND sl.superseded_at IS NULL
               AND sl.superseded_by_otb_id IS NULL
