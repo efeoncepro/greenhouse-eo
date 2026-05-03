@@ -21,6 +21,7 @@
  *   POST /cloud-cost-ai-watch          → Cloud cost FinOps AI + deterministic alert sweep (TASK-769)
  *   POST /notion-conformed/sync        → Notion BQ raw → conformed → PG cycle (replaces Vercel /api/cron/sync-conformed)
  *   POST /outbox/publish-batch         → Outbox PG → BQ raw publisher with state machine (TASK-773, replaces Vercel /api/cron/outbox-publish)
+ *   POST /email-deliverability-monitor → Bounce/complaint rate monitor (TASK-775, replaces Vercel /api/cron/email-deliverability-monitor)
  *
  * Auth: Cloud Run IAM (--no-allow-unauthenticated) + optional CRON_SECRET header
  * Runtime: Node.js 22 via esbuild bundle (handles TypeScript + @/ path aliases)
@@ -55,6 +56,7 @@ import { captureMessageWithDomain } from '@/lib/observability/capture'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { runQuotationLifecycleSweep } from '@/lib/commercial-intelligence/renewal-lifecycle'
 import { sendEmail } from '@/lib/email/delivery'
+import { runEmailDeliverabilityMonitor } from '@/lib/email/deliverability-monitor'
 import { buildWeeklyDigest, resolveWeeklyDigestRecipients, WEEKLY_DIGEST_DEFAULT_LIMIT } from '@/lib/nexa/digest'
 
 import { getCurrentAuthReadiness } from '@/lib/auth-secrets'
@@ -63,6 +65,7 @@ import { probeNextAuthSecretRoundTrip } from '@/lib/auth/readiness'
 import { getReactiveQueueDepth, InvalidDomainError } from './reactive-queue-depth'
 import { runProductCatalogDriftDetectJob } from './product-catalog-drift-detect'
 import { runProductCatalogReconcileV2Job } from './product-catalog-reconcile-v2'
+import { wrapCronHandler } from './cron-handler-wrapper'
 
 // ─── Config ─────────────────────────────────────────────────────────────────
 
@@ -1188,6 +1191,28 @@ const handleOutboxPublishBatch = async (req: IncomingMessage, res: ServerRespons
   }
 }
 
+// ─── /email-deliverability-monitor ──────────────────────────────────────────
+//
+// TASK-775 Slice 2 — Email deliverability monitor migrado de Vercel cron a
+// ops-worker. Computa bounce rate y complaint rate de los últimos 7 días, emite
+// outbox events `email.deliverability.alert` si excede thresholds Gmail.
+//
+// Razón de migración: Vercel custom env (staging) NO ejecuta crons — el monitor
+// nunca disparaba alerts en staging, y el equipo perdía visibilidad de drift
+// durante QA. Cloud Scheduler corre por proyecto GCP, igual en cualquier env.
+//
+// Inaugura el helper canónico `wrapCronHandler` (TASK-775 Slice 1) — centraliza
+// runId, audit log, captureWithDomain('sync'), redact errors, 502 sanitizado.
+const handleEmailDeliverabilityMonitor = wrapCronHandler({
+  name: 'email-deliverability-monitor',
+  domain: 'sync',
+  run: async (): Promise<Record<string, unknown>> => {
+    const result = await runEmailDeliverabilityMonitor()
+
+    return { ...result }
+  }
+})
+
 const handleNotionConformedSync = async (req: IncomingMessage, res: ServerResponse) => {
   const body = await readBody(req)
   const rawSource = typeof body.executionSource === 'string' ? body.executionSource.trim() : 'scheduled_primary'
@@ -1598,6 +1623,12 @@ const server = createServer(async (req, res) => {
 
     if (method === 'POST' && path === '/outbox/publish-batch') {
       await handleOutboxPublishBatch(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/email-deliverability-monitor') {
+      await handleEmailDeliverabilityMonitor(req, res)
 
       return
     }

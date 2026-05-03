@@ -49,10 +49,6 @@
       "schedule": "*/5 * * * *"
     },
     {
-      "path": "/api/cron/email-deliverability-monitor",
-      "schedule": "0 */6 * * *"
-    },
-    {
       "path": "/api/cron/email-data-retention",
       "schedule": "0 3 * * 0"
     },

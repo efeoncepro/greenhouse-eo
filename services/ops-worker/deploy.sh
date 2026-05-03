@@ -446,6 +446,23 @@ upsert_scheduler_job \
   '{"batchSize":500,"maxRetries":5}'
 echo "  -> ops-outbox-publish: */2 * * * * (outbox PG → BQ raw publisher, TASK-773)"
 
+# Email deliverability monitor — TASK-775 Slice 2.
+#
+# Cron 0 */6 * * * America/Santiago: 4 runs/día. Cómputa bounce/complaint rate
+# de los últimos 7 días sobre `greenhouse_notifications.email_deliveries` y
+# emite outbox events `email.deliverability.alert` si excede thresholds Gmail
+# (2% bounces, 0.1% complaints).
+#
+# Razón Cloud Scheduler: el cron Vercel original NUNCA disparaba alerts en
+# staging porque Vercel custom env no ejecuta crons. Cloud Scheduler corre por
+# proyecto GCP, igual en staging y prod.
+upsert_scheduler_job \
+  "ops-email-deliverability-monitor" \
+  "0 */6 * * *" \
+  "/email-deliverability-monitor" \
+  '{}'
+echo "  -> ops-email-deliverability-monitor: 0 */6 * * * (bounce/complaint monitor, TASK-775)"
+
 # Global projection recovery — unchanged lane.
 upsert_scheduler_job \
   "ops-reactive-recover" \
