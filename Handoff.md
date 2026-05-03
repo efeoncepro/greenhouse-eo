@@ -1,5 +1,14 @@
 # Handoff.md
 
+## Sesion 2026-05-03 — TASK-769 tomada (Cloud Cost Intelligence + AI FinOps Copilot)
+
+- **Lifecycle:** `in-progress` (movida de `to-do/` a `in-progress/`)
+- **Branch:** `task/TASK-769-cloud-cost-intelligence-ai-finops-copilot`
+- **Ownership check:** `gh pr list --search "TASK-769"` sin PRs; `git branch -a | grep TASK-769` sin branches previas antes de crear esta rama.
+- **Discovery inicial:** BigQuery real ya tiene `billing_export.gcp_billing_export_v1_013340_4C7071_668441` y `billing_export.gcp_billing_export_resource_v1_013340_4C7071_668441`; `pnpm pg:doctor` saludable.
+- **Decisiones preliminares a validar en Audit/Plan:** V2 debe extender `src/lib/cloud/gcp-billing.ts` sin romper V1, usar `resource_v1` para drill-down acotado, mantener detección determinística antes de IA, y preferir Teams como canal primario Greenhouse-first con Slack como fallback/compatibilidad `TASK-103`.
+- **Checkpoint:** P1 + Effort Alto => humano después de Plan Mode antes de escribir código funcional.
+
 ## Sesion 2026-05-03 — TASK-768 cerrada (Finance Expense Economic Category Dimension + ISSUE-065 resolved)
 
 - **Lifecycle:** `complete` (movida a `complete/`)
