@@ -4,6 +4,8 @@ const mockRunGreenhousePostgresQuery = vi.fn()
 const mockAssertCampaignSchemaReady = vi.fn()
 
 vi.mock('@/lib/postgres/client', () => ({
+  onGreenhousePostgresReset: () => () => {},
+  isGreenhousePostgresRetryableConnectionError: () => false,
   runGreenhousePostgresQuery: (...args: unknown[]) => mockRunGreenhousePostgresQuery(...args)
 }))
 

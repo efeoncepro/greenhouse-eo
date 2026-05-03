@@ -30,6 +30,8 @@ vi.mock('@/lib/commercial/hubspot-contact-resolution', () => ({
 }))
 
 vi.mock('@/lib/postgres/client', () => ({
+  onGreenhousePostgresReset: () => () => {},
+  isGreenhousePostgresRetryableConnectionError: () => false,
   runGreenhousePostgresQuery: (...args: unknown[]) => runGreenhousePostgresQueryMock(...args),
   withGreenhousePostgresTransaction: (...args: unknown[]) =>
     withGreenhousePostgresTransactionMock(...args)

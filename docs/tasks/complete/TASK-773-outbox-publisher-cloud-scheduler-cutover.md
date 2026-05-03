@@ -6,13 +6,13 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P0`
 - Impact: `Crítico`
 - Effort: `Medio (3-4h)`
 - Type: `infrastructure-platform`
 - Epic: `none`
-- Status real: `Implementación`
+- Status real: `Cerrada 2026-05-03 — 7 slices entregados, deploy ops-worker SUCCESS, Cloud Scheduler ENABLED, drain manual verificado, account_balance Santander Corp rematerializado, E2E Playwright + Chromium 3/3 verde contra staging real`
 - Rank: `TBD`
 - Domain: `platform / finance / sync`
 - Blocked by: `none`

@@ -32,6 +32,8 @@ const mockPublishOutboxEvent = vi.fn<(event: OutboxEventInput, client?: unknown)
 )
 
 vi.mock('@/lib/postgres/client', () => ({
+  onGreenhousePostgresReset: () => () => {},
+  isGreenhousePostgresRetryableConnectionError: () => false,
   runGreenhousePostgresQuery: (sql: string, values?: unknown[]) => mockRunQuery(sql, values),
   withGreenhousePostgresTransaction: (fn: (client: unknown) => Promise<unknown>) => mockWithTransaction(fn)
 }))

@@ -7,6 +7,8 @@ const mockResolveAutoAllocation = vi.fn()
 const mockEnsureOrganizationForClient = vi.fn()
 
 vi.mock('@/lib/postgres/client', () => ({
+  onGreenhousePostgresReset: () => () => {},
+  isGreenhousePostgresRetryableConnectionError: () => false,
   runGreenhousePostgresQuery: (...args: unknown[]) => mockRunGreenhousePostgresQuery(...args),
   withGreenhousePostgresTransaction: (...args: unknown[]) => mockWithGreenhousePostgresTransaction(...args),
   isGreenhousePostgresConfigured: () => mockIsGreenhousePostgresConfigured()

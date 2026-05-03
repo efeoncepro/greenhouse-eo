@@ -1,5 +1,18 @@
 # Handoff.md
 
+## Sesion 2026-05-03 — TASK-773 cerrada (Outbox Publisher Cloud Scheduler Cutover + Reliability + E2E Pre-Merge Gate)
+
+- **Lifecycle:** `complete` (movida a `complete/`, README/registry sincronizados).
+- **Branch:** `develop` (commits directos, instrucción explícita).
+- **Origen:** incidente runtime detectado tras TASK-772 (pago Figma no rebajaba TC Santander Corp). Diagnóstico: el cron Vercel `outbox-publish` solo corre en deploys de Production → staging dejaba TODOS los outbox events en `status='pending'` invisible.
+- **Absorbe TASK-262** (P1 Migrar outbox-publish a ops-worker) — superset estricto.
+- **7 slices entregados**: state machine canónica + helper refactor (SELECT FOR UPDATE SKIP LOCKED) + Cloud Scheduler `*/2 min` + 2 reliability signals + cutover Vercel + E2E gate + docs.
+- **Resolución cross-task contamination**: 16 tests preexistentes fallaban por mocks sin `onGreenhousePostgresReset` (agregada por TLS hardening). Script ad-hoc agregó las 2 funciones nuevas a 99 mocks. Resultado: 0 fails.
+- **Refactor tests flaky TASK-772**: `fireEvent.mouseDown` → `waitFor(role='listbox')` para MUI Select. 4/4 verde estable.
+- **Verde global**: 539 files / 3046 tests / build 22.2s / lint 0 errors. Playwright + Chromium + agent auth contra staging real → 3/3 verde.
+- **Bug latente detectado** → TASK-774 derivada (P0 Crítico): `materializeAccountBalance` no usa VIEW canónica TASK-766 → balance crece +USD nativo en vez de +CLP equivalente. Spec completa con plan canónico.
+- **Lecciones canonizadas en CLAUDE.md**: Vercel cron solo corren en Production; state machine explícita > status opaco; reliability signal por infra crítica nueva; E2E gate pre-merge para finance write paths.
+
 ## Sesion 2026-05-03 — Postgres TLS bad certificate runtime hardening
 
 - **Trigger:** Sentry production `JAVASCRIPT-NEXTJS-2N` (`POST /api/webhooks/hubspot-companies`) reportó `ssl/tls alert bad certificate` desde `src/lib/postgres/client.ts`.

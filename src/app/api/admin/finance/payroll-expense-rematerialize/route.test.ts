@@ -20,6 +20,8 @@ vi.mock('@/lib/finance/payroll-expense-reactive', () => ({
 }))
 
 vi.mock('@/lib/postgres/client', () => ({
+  onGreenhousePostgresReset: () => () => {},
+  isGreenhousePostgresRetryableConnectionError: () => false,
   runGreenhousePostgresQuery: (...args: unknown[]) => mockRunPg(...args)
 }))
 

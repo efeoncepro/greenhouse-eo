@@ -20,6 +20,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 const mockRunQuery = vi.fn()
 const mockClientQuery = vi.fn()
+
 const mockWithTransaction = vi.fn(async (cb: (client: { query: typeof mockClientQuery }) => Promise<unknown>) =>
   cb({ query: mockClientQuery })
 )
@@ -30,11 +31,14 @@ const mockBqDataset = vi.fn(() => ({ table: mockBqTable }))
 const mockGetBigQueryClient = vi.fn(() => ({ dataset: mockBqDataset }))
 
 const mockCaptureWithDomain = vi.fn()
+
 const mockRedactErrorForResponse = vi.fn((err: unknown) =>
   err instanceof Error ? err.message : String(err)
 )
 
 vi.mock('@/lib/postgres/client', () => ({
+  onGreenhousePostgresReset: () => () => {},
+  isGreenhousePostgresRetryableConnectionError: () => false,
   runGreenhousePostgresQuery: (...args: unknown[]) => mockRunQuery(...args),
   withGreenhousePostgresTransaction: (cb: (client: unknown) => Promise<unknown>) => mockWithTransaction(cb)
 }))

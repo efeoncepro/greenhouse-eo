@@ -1150,9 +1150,11 @@ const handleFinanceLedgerHealthCheck = async (_req: IncomingMessage, res: Server
 // Defaults: batchSize=100, maxRetries=OUTBOX_MAX_PUBLISH_ATTEMPTS (5).
 const handleOutboxPublishBatch = async (req: IncomingMessage, res: ServerResponse) => {
   const body = await readBody(req)
+
   const batchSize = typeof body.batchSize === 'number' && body.batchSize > 0
     ? Math.min(1000, Math.floor(body.batchSize))
     : 100
+
   const maxRetries = typeof body.maxRetries === 'number' && body.maxRetries > 0
     ? Math.floor(body.maxRetries)
     : OUTBOX_MAX_PUBLISH_ATTEMPTS

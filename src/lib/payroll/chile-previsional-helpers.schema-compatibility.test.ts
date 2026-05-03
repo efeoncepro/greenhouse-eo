@@ -12,6 +12,8 @@ const mockGetHistoricalEconomicIndicatorForPeriod = vi.fn(async (_input?: unknow
 })
 
 vi.mock('@/lib/postgres/client', () => ({
+  onGreenhousePostgresReset: () => () => {},
+  isGreenhousePostgresRetryableConnectionError: () => false,
   runGreenhousePostgresQuery: (sql: string, params?: unknown[]) =>
     mockRunGreenhousePostgresQuery(sql, params)
 }))

@@ -25,6 +25,8 @@ vi.mock('@/lib/finance/expense-payments-reader', () => ({
 }))
 
 vi.mock('@/lib/postgres/client', () => ({
+  onGreenhousePostgresReset: () => () => {},
+  isGreenhousePostgresRetryableConnectionError: () => false,
   runGreenhousePostgresQuery: (...args: unknown[]) => runQueryMock(...args)
 }))
 

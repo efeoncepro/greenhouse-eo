@@ -6,6 +6,8 @@ const { runGreenhousePostgresQuery, syncCanonicalFinanceQuote } = vi.hoisted(() 
 }))
 
 vi.mock('@/lib/postgres/client', () => ({
+  onGreenhousePostgresReset: () => () => {},
+  isGreenhousePostgresRetryableConnectionError: () => false,
   runGreenhousePostgresQuery,
   withGreenhousePostgresTransaction: vi.fn()
 }))

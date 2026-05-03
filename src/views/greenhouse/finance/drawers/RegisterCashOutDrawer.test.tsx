@@ -90,16 +90,25 @@ const setupFetch = (expenses: unknown[]) => {
 }
 
 const openSupplierSelect = async () => {
-  // MUI TextField select renderiza un input invisible + un combobox button.
-  // Esperamos que el fetch termine antes de abrir el menú.
+  // MUI TextField select renderiza un input invisible + un combobox button
+  // que vive en un Portal. fireEvent.mouseDown es sincrono y a veces NO dispara
+  // el state internal de MUI Select (flakey en CI). Patrón más robusto:
+  // (a) esperar al combobox role no disabled, (b) fireEvent.mouseDown,
+  // (c) waitFor hasta que role='listbox' aparece (signal canónico de menú abierto).
   await waitFor(() => {
-    expect(screen.getByLabelText(/Proveedor/i)).not.toHaveAttribute('disabled')
+    const combobox = screen.getByRole('combobox', { name: /Proveedor/i })
+
+    expect(combobox).not.toHaveAttribute('aria-disabled', 'true')
   })
 
-  const supplierSelect = screen.getByLabelText(/Proveedor/i)
+  const supplierSelect = screen.getByRole('combobox', { name: /Proveedor/i })
 
-  // Click + arrow down dispara el menu
   fireEvent.mouseDown(supplierSelect)
+
+  // Wait until MUI mounts the listbox (señal canónica de menú abierto).
+  await waitFor(() => {
+    expect(screen.getByRole('listbox', { name: /Proveedor/i })).toBeInTheDocument()
+  })
 }
 
 beforeEach(() => {

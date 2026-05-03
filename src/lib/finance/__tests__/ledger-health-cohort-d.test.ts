@@ -12,6 +12,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 const mockRunQuery = vi.fn<(sql: string, params?: unknown[]) => Promise<unknown[]>>()
 
 vi.mock('@/lib/postgres/client', () => ({
+  onGreenhousePostgresReset: () => () => {},
+  isGreenhousePostgresRetryableConnectionError: () => false,
   runGreenhousePostgresQuery: (sql: string, params?: unknown[]) => mockRunQuery(sql, params)
 }))
 

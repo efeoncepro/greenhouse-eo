@@ -22,6 +22,8 @@ const requireFinanceMock = vi.fn()
 const isPostgresEnabledMock = vi.fn()
 
 vi.mock('@/lib/postgres/client', () => ({
+  onGreenhousePostgresReset: () => () => {},
+  isGreenhousePostgresRetryableConnectionError: () => false,
   runGreenhousePostgresQuery: (...args: unknown[]) => runQueryMock(...args)
 }))
 

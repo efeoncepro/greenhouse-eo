@@ -7,6 +7,8 @@ vi.mock('server-only', () => ({}))
 const mockQuery = vi.fn()
 
 vi.mock('@/lib/postgres/client', () => ({
+  onGreenhousePostgresReset: () => () => {},
+  isGreenhousePostgresRetryableConnectionError: () => false,
   runGreenhousePostgresQuery: (...args: unknown[]) => mockQuery(...args)
 }))
 

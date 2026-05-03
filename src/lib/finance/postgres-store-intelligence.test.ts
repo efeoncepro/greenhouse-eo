@@ -5,6 +5,8 @@ const mockAssertFinanceSlice2PostgresReady = vi.fn()
 const mockReadCommercialCostAttributionByClientForPeriod = vi.fn()
 
 vi.mock('@/lib/postgres/client', () => ({
+  onGreenhousePostgresReset: () => () => {},
+  isGreenhousePostgresRetryableConnectionError: () => false,
   runGreenhousePostgresQuery: (...args: unknown[]) => mockRunGreenhousePostgresQuery(...args),
   withGreenhousePostgresTransaction: vi.fn()
 }))

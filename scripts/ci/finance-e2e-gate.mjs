@@ -65,6 +65,7 @@ const main = () => {
 
   // 1) Files changed
   let changedFiles
+
   try {
     changedFiles = exec(`git diff --name-only ${mergeBase}...HEAD`).split('\n').filter(Boolean)
   } catch (err) {
@@ -100,6 +101,7 @@ const main = () => {
   const e2eTestsChanged = changedFiles.filter((f) => FINANCE_E2E_PATTERN.test(f))
 
   let commitMessages = ''
+
   try {
     commitMessages = exec(`git log ${mergeBase}..HEAD --format=%B`)
   } catch {

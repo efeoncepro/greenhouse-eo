@@ -29,6 +29,8 @@ vi.mock('@/lib/sync/publish-event', () => ({
 }))
 
 vi.mock('@/lib/postgres/client', () => ({
+  onGreenhousePostgresReset: () => () => {},
+  isGreenhousePostgresRetryableConnectionError: () => false,
   runGreenhousePostgresQuery: vi.fn(),
   withGreenhousePostgresTransaction: (callback: (client: { query: typeof mockClientQuery }) => Promise<unknown>) =>
     mockWithGreenhousePostgresTransaction(callback)
