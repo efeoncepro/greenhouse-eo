@@ -68,6 +68,7 @@ Documentacion oficial de la plataforma Greenhouse. Cada documento describe como 
 - [Ops Worker — Crons Reactivos en Cloud Run](operations/ops-worker-reactive-crons.md) — servicio Cloud Run que procesa eventos reactivos del outbox, corridas scheduladas, ESM/CJS shim pattern, monitoreo en Ops Health
 - [Commercial Cost Worker](operations/commercial-cost-worker.md) — worker Cloud Run dedicado para la base de costos comercial, su ledger de corridas por periodo/scope y la separacion respecto de `ops-worker`
 - [Postura Cloud GCP](operations/postura-cloud-gcp.md) — estado auditado de Cloud Run, Secret Manager, Cloud SQL, PostgreSQL y BigQuery; qué está sano, qué sigue riesgoso y cómo leer la topología compartida actual
+- [Cloud Cost Intelligence y Copiloto FinOps](operations/cloud-cost-intelligence-finops.md) — lectura funcional del modulo TASK-769: costos GCP, proyeccion, drivers deterministas, alertas tempranas y capa AI para priorizar optimizaciones
 - [Acceso Programatico a Staging](operations/acceso-programatico-staging.md) — como agentes y CI acceden a Staging, bypass de SSO, comando `staging:request`, troubleshooting
 
 ### Delivery
