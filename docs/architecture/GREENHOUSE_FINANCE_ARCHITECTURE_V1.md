@@ -2183,3 +2183,49 @@ Toda agregación SUM se hace sobre el alias resultante del subselect (`SUM(amoun
 | Detector | Fuente | Steady state |
 |---|---|---|
 | `finance.account_balances.fx_drift` | recompute desde VIEWs vs persisted | 0 |
+
+## Delta 2026-05-03 — TASK-776: Account Detail Drawer Temporal Modes Contract
+
+### Bug class cerrada
+
+`AccountDetailDrawer` (`/finance/bank` → drawer al click en cuenta) mezclaba 4 surfaces con 4 ventanas temporales independientes y sin contract declarado: KPIs (acumulado snapshot), chart (rolling 12 meses), lista de movimientos (período mes seleccionado), banner OTB (pre-anchor preserved). Caso real 2026-05-03: balance Santander Corp $1.225.047 correcto post-fix TASK-774 pero lista "Movimientos" vacía porque filtraba Mayo 2026 mientras el cargo Figma fue 29/04. Operador veía "balance bajó pero no veo el cargo" → confusión + ticket.
+
+### Contract canónico (extiende instrument-presentation)
+
+- `TemporalMode = 'snapshot' | 'period' | 'audit'` enum cerrado declarado en `instrument-presentation.ts`.
+- `TemporalDefaults = { mode; windowDays? }` agregado a `InstrumentDetailProfile`.
+- Helper `resolveTemporalWindow({mode, year?, month?, anchorDate?, windowDays?, today?})` en `src/lib/finance/temporal-window.ts` retorna `{fromDate, toDate, modeResolved, label, spanDays}`.
+- Degradación honesta: input incompleto → cae a snapshot, NO throw silente.
+
+### Defaults declarativos por categoría
+
+| Categoría | Default mode | Caso de uso |
+|---|---|---|
+| `bank_account` | snapshot 30d | "qué pasa hoy" |
+| `credit_card` | snapshot 30d | "qué cargué esta semana" |
+| `fintech` | snapshot 30d | "qué pasa hoy" |
+| `shareholder_account` (CCA) | audit | auditoría completa desde anchor |
+| `processor_transit` (Deel/Stripe/etc.) | period | cierre mensual comisiones |
+
+### API canónico
+
+Endpoint `/api/finance/bank/[accountId]`:
+
+- Query params: `?mode=snapshot|period|audit&windowDays=30&year=2026&month=5&anchorDate=2026-04-07` (todos opcionales).
+- Backward compat 100%: `year+month` sin `mode` → behavior legacy intacto (`mode='period'` implícito).
+- Response incluye `movementsWindow: {fromDate, toDate, mode, label}`.
+
+### Drawer UI
+
+- Selector inline `ToggleButtonGroup` (Reciente | Período | Histórico) con tooltips MUI.
+- Chip header: "Mostrando: Últimos 30 días" / "Mayo 2026" / "Desde 07/04/2026".
+- Banner OTB condicional: SOLO en `mode='audit'` o `'period'` pre-anchor. En `'snapshot'` sin movimientos, hint para cambiar a Histórico.
+- `useEffect` resetea `temporalMode` cuando cambia `accountId`.
+
+### Reglas duras agregadas
+
+- **NUNCA** calcular `fromDate`/`toDate` inline en drawer/dashboard de finance. Toda resolución pasa por `resolveTemporalWindow`.
+- **NUNCA** mezclar modos en surfaces del mismo render.
+- **NUNCA** crear drawer/dashboard nuevo de finance sin declarar `temporalDefaults` en su `InstrumentDetailProfile`.
+- **NUNCA** hardcodear el `mode` en componente UI. Default viene del profile.
+- Nuevos modos (e.g. `quarter`, `ytd`) → agregar al enum + extender helper. NO branchear en consumers.

@@ -4,7 +4,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete` (deployed 2026-05-03)
 - Priority: `P1`
 - Impact: `Medio` (UX deuda arquitectónica + clase de bugs "ventana temporal incoherente")
 - Effort: `Medio (4-5h)`
