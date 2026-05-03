@@ -1,5 +1,45 @@
 # Handoff.md
 
+## Sesion 2026-05-03 — TASK-772 cerrada (Finance Expense Supplier Hydration & Cash-Out Selection Integrity)
+
+- **Lifecycle:** `complete` (movida a `complete/`, README/registry sincronizados).
+- **Branch:** `develop` (commits directos, mismo flujo TASK-771 por instrucción explícita).
+- **Slices entregados:**
+  - **Slice 1 — Reader contract canónico** (`src/lib/finance/postgres-store-slice2.ts`): extiende `FinanceExpenseRecord` con 7 campos derivados (`supplierDisplayName`, `sortDate`, `amountPaid`, `amountPaidClp`, `amountPaidIsHomogeneous`, `pendingAmount`, `pendingAmountClp`). 4 SELECTs canónicos (list/get/UPDATE/INSERT) ahora hacen LEFT JOIN suppliers + LEFT JOIN LATERAL aggregate desde VIEW canónica TASK-766 `expense_payments_normalized`. UPDATE/INSERT envuelven el RETURNING en CTE para que el outbox event payload tenga el contract completo desde la misma tx.
+  - **Slice 2 — ExpensesListView** (`src/views/greenhouse/finance/ExpensesListView.tsx`): columna proveedor lee `supplierDisplayName ?? supplierName ?? '—'`. Sort default cambiado de `paymentDate` → `sortDate` (= server-side COALESCE doc/payment/created).
+  - **Slice 3 — RegisterCashOutDrawer** (`.../drawers/RegisterCashOutDrawer.tsx`): grouping por `supplierKey` estable (supplierId || displayName || legacyName || `__unassigned__`). Display de monto pendiente respeta moneda original (`USD 92,90`) + helper text agrega equivalente CLP separado (`Equivalente CLP: $83.774`). NUNCA recompute pendingAmount desde `totalAmountClp - amountPaid` (anti-patrón TASK-766).
+  - **Slice 4 — Writer snapshot hydration** (`src/app/api/finance/expenses/route.ts`): POST resuelve `supplier_name` desde tabla `suppliers` cuando viene `supplierId` sin name explícito. FinanceValidationError 400 si supplierId no existe (nunca crear FK rota). Defense-in-depth con Slice 1 reader fallback.
+  - **Slice 5 — Tests regresión** (`.../drawers/RegisterCashOutDrawer.test.tsx`): 4 tests cubren caso Figma EXP-202604-008 (agrupado bajo "Figma" no "Sin proveedor"), orphan sin supplierId (sí "Sin proveedor"), grupos distintos, fallback graceful a supplierName legacy. Pattern `fireEvent.mouseDown` para abrir MUI Select portal.
+- **Decisiones arquitectónicas (Open Questions resueltas pre-FASE 1):**
+  - (Q1) Snapshot vs reader fallback → **AMBOS** (defense-in-depth canónico).
+  - (Q2) Moneda de pago → **monto documento principal + CLP secundario explícito**.
+  - (Q3) `amountPaid` con mix de monedas → **null + flag `amountPaidIsHomogeneous=false`**, consumer cae a `pendingAmountClp` con disclaimer "(equiv. CLP)". NUNCA inventar conversiones FX (regla TASK-766).
+  - (Q4) Sort canónico → **`COALESCE(document_date, payment_date, created_at)`** server-side.
+  - (Q5) Backfill defensivo `supplier_name` legacy → **NO**. Reader fallback resuelve display sin migration. Writer snapshot evita futuros nulos. Migration UPDATE puede ocurrir más tarde si se quiere consistency en exports históricos.
+- **Caso de prueba real (Figma EXP-202604-008)** — verificado contra PG live:
+  - Pre-fix: supplierName=null, drawer agrupa "Sin proveedor", display USD 83.773,50 (CLP con label USD)
+  - Post-fix: supplierDisplayName="Figma", agrupado bajo "Figma (1 documento)", display "USD 92,90" + helper "Equivalente CLP: $83.774"
+- **Sinergia con ecosistema:**
+  - Reusa VIEW canónica TASK-766 `expense_payments_normalized` (no recomputa CLP via FX inline).
+  - Patrón LEFT JOIN suppliers + LATERAL aggregate replicable a `income` reader (futura TASK derivada).
+  - Lint rule `greenhouse/no-untokenized-fx-math` (TASK-766) sigue protegiendo el path.
+  - Defense-in-depth (writer snapshot + reader fallback) alineado con TASK-768 trigger + COALESCE pattern.
+- **Tests verde**: 536 test files / 3029 tests / 5 skipped (preexistentes). Build clean 22.3s. tsc clean. lint 0 errors / 318 warnings preexistentes (TASK-265 backlog ajeno).
+- **Anti-patterns grep**: 0 `new Pool` en src/ fuera de `src/lib/postgres/client.ts`. 0 `getServerAuthSession()` directo en layouts/pages.
+- **Activación post-deploy**: el push a `develop` triggea Vercel preview/staging build automático. Vercel deploy < 5 min. Verificable via `dev-greenhouse.efeoncepro.com/finance/cash-out` con drawer open + supplier Figma seleccionable.
+- **Riesgos/follow-ups**:
+  - BQ-fallback path en `route.ts:610+` (cuando PG está caído) NO hidrata snapshot ni emite supplierDisplayName — degraded mode legítimo. Reader UI usa fallback `?? supplierName`.
+  - El `fix(finance): TASK-771 followup` commit corrigió 2 padding-line errors preexistentes en `scripts/finance/backfill-provider-bq-sync.ts` que bloqueaban `pnpm lint` con 0-error gate.
+  - Patrón replicable a `/api/finance/income` para casos análogos con `client_name` snapshot — task derivada potencial.
+
+## Sesion 2026-05-03 — Postgres TLS bad certificate runtime hardening
+
+- **Trigger:** Sentry production `JAVASCRIPT-NEXTJS-2N` (`POST /api/webhooks/hubspot-companies`) reportó `ssl/tls alert bad certificate` desde `src/lib/postgres/client.ts`.
+- **Diagnóstico:** no es bug del webhook ni de HubSpot. Vercel logs mostraron el mismo patrón en webhooks, crons, SCIM y sync; causa probable: Cloud SQL Connector/pool en runtime Vercel warm con certificado TLS efímero o conexión stale.
+- **Fix aplicado:** `src/lib/postgres/client.ts` ahora expone detección retryable + listeners de reset; `src/lib/db.ts` invalida Kysely cuando se resetea Postgres y usa un pool adapter dinámico que reintenta `connect()` una vez ante errores TLS retryable.
+- **Guardrail:** `withGreenhousePostgresTransaction` solo reintenta el arranque de transacción (`connect`/`BEGIN`), no callbacks ya ejecutados ni `COMMIT`, para evitar duplicar writes.
+- **Docs:** `project_context.md` y `docs/architecture/GREENHOUSE_POSTGRES_ACCESS_MODEL_V1.md` documentan el contrato para futuros agentes.
+
 ## Sesion 2026-05-03 — TASK-772 tomada (Finance Expense Supplier Hydration & Cash-Out Selection Integrity)
 
 - **Lifecycle:** `in-progress` (movida de `to-do/` a `in-progress/`).
