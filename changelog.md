@@ -2,6 +2,12 @@
 
 ## 2026-05-03
 
+- **TASK-771 cerrada** — Finance Supplier Write Decoupling + BQ Projection vía Outbox. Recovery del incidente "Error al crear proveedor" silencioso (drawer `/finance/expenses` devolvía 500 aunque el supplier ya estaba creado en PG).
+  - **Crear/editar proveedores ya no falla por BigQuery**: POST/PUT `/api/finance/suppliers` responde 201/200 cuando PG commitea, independiente del estado de BQ. Antes: cualquier falla BQ (permisos, schema, dataset missing) propagaba como 500. Ahora: el endpoint reporta el estado real PG y la proyección BQ corre async via consumer reactivo.
+  - **Nueva projection canónica `provider_bq_sync`** consumiendo outbox event `provider.upserted` (emitido en la tx PG por `upsertProviderFromFinanceSupplierInPostgres`). Re-lee supplier de PG (single source of truth) → MERGE BQ idempotente. maxRetries=3, dead-letter automático. Drena cada 5 min vía Cloud Scheduler `ops-reactive-finance` (sin job nuevo).
+  - **Nuevo reliability signal `finance.providers.bq_sync_drift`** visible en `/admin/operations`. Steady state esperado=0; >0 indica drift PG↔BQ activo (AI Tooling y consumers BQ verán datos stale). Subsystem rollup `Finance Data Quality`.
+  - **Backfill script `scripts/finance/backfill-provider-bq-sync.ts`** para recovery one-shot manual (3 suppliers afectados pre-fix: figma-inc, microsoft-inc, notion-inc). Auto-drain post-deploy en el próximo ciclo del scheduler.
+  - **Patrón canónico documentado**: prohibido escribir DDL/MERGE BigQuery inline en route handlers post-cutover PG-first. La regla canónica es PG primary + outbox + projection async (reactive playbook).
 - **TASK-769 cerrada** — Cloud Cost Intelligence + AI FinOps Copilot. Convierte Billing Export V1 en una capacidad FinOps Greenhouse-first:
   - Reader V2 backwards-compatible en `getGcpBillingOverview()`: detecta tabla estándar + `resource_v1`, agrega `costByResource`, `topDrivers`, `forecast` y última observación AI opcional.
   - Validación BigQuery real: dataset `billing_export` poblado con `gcp_billing_export_v1_013340_4C7071_668441` y `gcp_billing_export_resource_v1_013340_4C7071_668441`; 30 días = CLP 114.379,91; forecast rolling mensual = CLP 121.840,58; driver principal Cloud SQL `greenhouse-pg-dev`.

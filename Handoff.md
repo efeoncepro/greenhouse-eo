@@ -1,14 +1,27 @@
 # Handoff.md
 
-## Sesion 2026-05-03 — TASK-771 tomada (Finance Supplier Write Decoupling + BQ Projection vía Outbox)
+## Sesion 2026-05-03 — TASK-771 cerrada (Finance Supplier Write Decoupling + BQ Projection vía Outbox)
 
-- **Lifecycle:** `in-progress` (movida de `to-do/` a `in-progress/`).
-- **Branch:** `develop` (instrucción explícita del usuario — no crear branch dedicado).
-- **Ownership check:** `gh pr list --search "TASK-771"` vacío; `git branch -a | grep 771` sin branches previas.
-- **Origen:** auditoría 2026-05-03 sobre incidente "Error al crear proveedor" en `dev-greenhouse.efeoncepro.com/finance/expenses` drawer "Nuevo proveedor". Diagnóstico: `syncProviderFromFinanceSupplier` ([src/lib/providers/canonical.ts:72](src/lib/providers/canonical.ts#L72)) ejecuta MERGE/UPDATE BQ + DDL inline en el POST handler sin try/catch ni guard; cualquier falla BQ devuelve 500 aunque PG ya commiteó. 3 suppliers afectados ya en PG (`figma-inc` 2026-05-03, `microsoft-inc` 2026-03-15, `notion-inc` 2026-03-15).
-- **Decisión arquitectónica:** rechazo del fix mínimo (try/catch + log) por insuficiente. Solución canónica = outbox-driven projection: el evento `provider.upserted` ya se emite dentro de la tx PG ([src/lib/providers/postgres.ts:166](src/lib/providers/postgres.ts#L166)) pero sin consumer; se construye el consumer reactivo en `ops-worker` con dead-letter + retry exponencial, se elimina el sync inline y se agrega reliability signal `finance.providers.bq_sync_drift`.
-- **Plan:** 5 slices canónicos (hotfix → consumer reactivo → limpieza → reliability → backfill).
-- **Open Questions a resolver pre-FASE 1:** (a) ¿hay consumers vivos de `greenhouse.providers` BQ?; (b) umbral aged-pending para reliability signal; (c) causa raíz del fail BQ en staging (ADC/schema/permisos).
+- **Lifecycle:** `complete` (movida a `complete/`, README/registry sincronizados).
+- **Branch:** `develop` (commits directos, no branch dedicado por instrucción explícita).
+- **Slices entregados:**
+  - **Slice 1 — Hotfix**: try/catch + `captureWithDomain` en POST `/api/finance/suppliers` y PUT `/api/finance/suppliers/[id]` (3 callsites). Endpoints responden 201/200 cuando PG commitea, independiente de fallas BQ. Regression test del incidente 2026-05-03 verde.
+  - **Slice 2 — Projection canónica**: `src/lib/sync/projections/provider-bq-sync.ts` registrada en el dispatcher reactivo (`projections/index.ts`). Subscribe a `provider.upserted`, re-lee supplier desde PG (single source of truth, evita drift por payloads stale), maxRetries=3 → dead-letter. 8 tests cubren contract, scope, fresh data, supplier deleted skip, PG/BQ throws.
+  - **Slice 3 — Limpieza**: eliminada llamada inline `syncProviderFromFinanceSupplier` del POST y PUT (PG path). Mantenida en BQ-fallback path con try/catch (degraded mode legítimo cuando PG está caído). Tests actualizados.
+  - **Slice 4 — Reliability signal**: `finance.providers.bq_sync_drift` (`src/lib/reliability/queries/provider-bq-sync-dead-letter.ts`) wired en `get-reliability-overview.ts`. Cuenta entries `provider_bq_sync:provider.upserted` en dead-letter sin ack. Subsystem rollup `Finance Data Quality`. 4 tests (steady=0, error count>0, handler param canónico, degraded honestly).
+  - **Slice 5 — Backfill script**: `scripts/finance/backfill-provider-bq-sync.ts` para recovery one-shot manual. Idempotente. Dry-run validó los 3 suppliers (figma-inc, microsoft-inc, notion-inc) resuelven provider correctamente. NO se corrió LIVE: el ops-worker auto-drena post-deploy via `ops-reactive-finance` cada 5 min.
+- **Decisiones arquitectónicas (Open Questions resueltas pre-FASE 1):**
+  - (a) ¿Consumers vivos de `greenhouse.providers` BQ? **SÍ**: 4 LEFT JOINs en `src/lib/ai-tools/service.ts` (catalog, licenses, wallet, admin metadata) + 3 fallback BQ reads en finance. Decisión: **mantener el sync, refactorizado como projection reactiva** — no eliminar sin reemplazo.
+  - (b) Umbral aged-pending para signal: **N/A**. Decisión mejor: usar `outbox_reactive_log.result='dead-letter'` (alineado TASK-765 pattern), sin ventana arbitraria. Más preciso, sin false positives.
+  - (c) Causa raíz inmediata del fail BQ en staging: **no bloqueante**. La projection tiene retry+dead-letter; cualquier failure persistente quedará visible vía `finance.providers.bq_sync_drift`. Diagnosis específica BQ se hace post-cutover sobre dead-letter entries reales.
+- **Sinergia con ecosistema**: el dispatcher reactivo canónico ya existente (`src/lib/sync/reactive-consumer.ts`) y el Cloud Scheduler `ops-reactive-finance` cubren el caso sin job nuevo. El registry de signals `RELIABILITY_REGISTRY` (TASK-635) ya declara `expectedSignalKinds` incluyendo `dead_letter` para el módulo `finance` (TASK-765 Slice 7), no requiere extension. Patrón reusable: futuras projections finance se enchufan a `provider.upserted` / `expense.*` / `income.*` sin tocar el composer.
+- **Tests verde**: 535 test files / 3025 tests / 5 skipped. Build `pnpm build` clean en 36.5s. `npx tsc --noEmit` clean. `pnpm lint` 0 errors / 318 warnings preexistentes (TASK-265 backlog ajeno).
+- **Anti-patterns grep**: 0 `new Pool` en src/ fuera de `src/lib/postgres/client.ts` (solo test legacy preexistente). 0 `getServerAuthSession()` directo en layouts/pages.
+- **Activación post-deploy**: el push a `develop` triggera `ops-worker-deploy.yml` (paths incluye `src/lib/sync/**`). Una vez redeployado el worker, el primer ciclo `ops-reactive-finance` (≤5 min) drena automáticamente los 3 supplier events huérfanos y los proyecta a BQ. Verificable vía `/admin/operations` (signal en steady=0 después del drenaje).
+- **Riesgos/follow-ups**:
+  - El fail BQ original en staging puede persistir (causa raíz no diagnosticada). Si emerge en `finance.providers.bq_sync_drift > 0` post-deploy, el signal lo hará visible y se podrá investigar con evidencia real desde dead-letter entries.
+  - Test obsoleto en `bigquery-write-cutover.test.ts:60-62` (mock de `syncProviderFromFinanceSupplier`) sigue compatible — no rompe nada porque el mock solo se invoca en path de validación de cutover, no testea el sync inline.
+  - TASK-772 fue creada en paralelo por otro flujo (Finance Expense Supplier Hydration & Cash-Out Selection Integrity, caso Figma EXP-202604-008) — NO toca este path; ambas son ortogonales.
 
 ## Sesion 2026-05-03 — TASK-769 implementada (Cloud Cost Intelligence + AI FinOps Copilot)
 
