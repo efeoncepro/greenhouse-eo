@@ -1,5 +1,28 @@
 # Handoff.md
 
+## Sesion 2026-05-03 — TASK-769 creada (Cloud Cost Intelligence + AI FinOps Copilot)
+
+- **Lifecycle:** `to-do`
+- **Workspace branch al cierre de la sesión:** `develop`
+- **Trigger:** usuario pidió formalizar una task para convertir la observabilidad base de `Billing Export` en una capacidad Greenhouse-first con drill-down, alertas tempranas y capa AI que interprete el gasto y recomiende dónde atacar primero.
+- **Decisión de diseño:**
+  - NO reabrir `TASK-586`: esa lane sigue siendo V1 de observabilidad base.
+  - NO delegar detección a la IA: la task exige separación explícita entre facts determinísticos, signals/thresholds auditables y narrativa AI grounded.
+  - Reusar el patrón `TASK-638` (`ops-worker`, kill-switch, sanitización, JSON estricto, dedupe) en vez de inventar otro runner AI paralelo.
+- **Artefactos creados/actualizados:**
+  - `docs/tasks/to-do/TASK-769-cloud-cost-intelligence-ai-finops-copilot.md`
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+  - `docs/tasks/README.md`
+- **Scope anclado al runtime real:**
+  - Billing V2 sobre `src/lib/cloud/gcp-billing.ts` + `src/types/billing-export.ts`
+  - surfaces en `AdminIntegrationGovernanceView` / `GcpBillingCard`
+  - signals en `src/lib/reliability/signals.ts` + `get-reliability-overview.ts`
+  - capa AI y scheduling en `src/lib/reliability/ai/*` + `services/ops-worker/server.ts`
+- **Open questions dejadas dentro de la task:**
+  - tabla AI nueva vs extender `greenhouse_ai.reliability_ai_observations` con `scope`
+  - `Teams` vs `Slack` como canal primario V1
+  - cuánto complementar `Billing Export` con Cloud Monitoring para señales más tempranas
+
 ## Sesion 2026-05-03 — TASK-766 cerrada (Finance CLP-Currency Reader Contract Resilience + Resolución del incidente 2026-05-02)
 
 - **Lifecycle:** `complete` (movida de `in-progress/` a `complete/`)
