@@ -1,5 +1,14 @@
 # Handoff.md
 
+## Sesion 2026-05-03 — TASK-772 tomada (Finance Expense Supplier Hydration & Cash-Out Selection Integrity)
+
+- **Lifecycle:** `in-progress` (movida de `to-do/` a `in-progress/`).
+- **Branch:** `develop` (instrucción explícita — no crear branch dedicado, mismo flujo TASK-771).
+- **Ownership check:** `gh pr list --search "TASK-772"` vacío; `git branch -a | grep 772` sin branches previas.
+- **Desbloqueo:** TASK-771 cerrada minutos antes desbloquea el `Blocked by` declarado en spec — ahora puedo tocar consumers de suppliers en expenses/cash-out sin conflicto.
+- **Origen:** evidencia del incidente Figma (`EXP-202604-008`): supplier `figma-inc` existe en PG con `tradeName=Figma`, expense lo referencia con `supplierId=figma-inc` pero `supplier_name=null`. UI `/finance/cash-out` agrupa por `supplierName || 'Sin proveedor'` ocultándolo. Drawer pago calcula `pendingAmount` con `totalAmountClp` mientras conserva `currency=USD` → puede mostrar `USD 83.773,50` en lugar de `USD 92.90`. Sort de Compras client-side por `paymentDate` puede ocultar obligaciones recientes.
+- **Diferencia con TASK-771:** TASK-771 atacó write path supplier → BigQuery (proyección reactiva). TASK-772 ataca read/display path expenses (hidratar `supplierDisplayName`, separar moneda original vs CLP, sort canónico). Ortogonales — ambas necesarias.
+
 ## Sesion 2026-05-03 — TASK-771 cerrada (Finance Supplier Write Decoupling + BQ Projection vía Outbox)
 
 - **Lifecycle:** `complete` (movida a `complete/`, README/registry sincronizados).
