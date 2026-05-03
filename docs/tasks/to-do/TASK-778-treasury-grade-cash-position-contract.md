@@ -11,7 +11,7 @@
 - Type: `architecture` + `data-integrity` + `ux`
 - Status real: `Diseño — auditoría finance-skill completada 2026-05-03`
 - Domain: `finance / treasury`
-- Blocked by: `none` (data subyacente OK post TASK-766/774; falta presentación + features)
+- Blocked by: `TASK-779` (Treasury Hub Spec Canonization + Visual Regression Foundation — sin esto NO se puede validar paridad mockup-implementación)
 - Branch: `develop` (instrucción explícita Greenhouse)
 - Origen: auditoría `/finance/cash-position` 2026-05-03 vía skill `greenhouse-finance-accounting-operator` aplicando IAS 7, COSO, treasury best practices (Mercury / Brex / Stripe Treasury / Kyriba benchmarks)
 
