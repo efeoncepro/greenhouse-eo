@@ -1,5 +1,15 @@
 # Handoff.md
 
+## Sesion 2026-05-03 — TASK-768 tomada (Finance Expense Economic Category Dimension)
+
+- **Lifecycle:** `in-progress` (movida de `to-do/` a `in-progress/`)
+- **Branch:** `task/TASK-768-finance-expense-economic-category-dimension`
+- **Trigger:** descubrimiento 2026-05-03 post-cutover TASK-766. KPI Nómina cash-out abril 2026 = $1.030.082 cuando costos labor reales del periodo ~$4M. Causa raíz arquitectónica: `expense_type` mezcla dimensiones contable/SII y analítica/operativa. Bank reconciler defaultea a `supplier` cuando crea expenses desde transacciones bancarias.
+- **Decisión arquitectónica clave (resuelta pre-execution)**: NO lente read-time (descartada: no ataca causa raíz, blast radius cruza P&L/ICO/Member Loaded Cost/Budget/Cost Attribution, source of truth dividida, auditabilidad pobre). SÍ split de dimensión write-time: nueva columna `economic_category` persistida + resolver canónico + backfill + CHECK NOT NULL + hint engine + reclassification UI + reliability signals + lint rule + migración exhaustiva.
+- **9 slices canon-pattern** replicando TASK-571/699/708/728/721/742/766.
+- **Próximo step:** Resolver 7 Open Questions con opción más robusta + Discovery en paralelo (subagentes Explore para canonical writers, bank reconciler, reliability registry, analytics consumers) → Audit → Connection map → Plan + STOP humano (P0).
+- **Blast radius:** producción tiene KPIs Nómina/Proveedores sesgados visibles. Post-fix: KPI Nómina sube a ~$4M, Proveedores baja en proporción, Total Pagado se mantiene en $11.5M (saldos bancarios intactos).
+
 ## Sesion 2026-05-03 — TASK-769 creada (Cloud Cost Intelligence + AI FinOps Copilot)
 
 - **Lifecycle:** `to-do`
