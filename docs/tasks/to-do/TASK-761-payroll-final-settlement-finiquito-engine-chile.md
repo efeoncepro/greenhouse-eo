@@ -24,6 +24,10 @@
 
 Construye el motor canónico de cálculo de cierre laboral/finiquito para Chile, empezando por el caso de `resignation` en trabajadores dependientes. El motor debe consumir un `OffboardingCase` ya aprobado, resolver haberes y descuentos finales del trabajador saliente, y producir un settlement auditable separado de la nómina mensual normal.
 
+## Delta 2026-05-03 — Dependencia fuerte de fechas canónicas de offboarding
+
+La revisión del runtime People/HR confirmó que hoy solo existen `hireDate` y `contractEndDate`. Para este motor, `contractEndDate` no es suficiente ni seguro como fecha de término laboral. El cálculo debe depender de un `OffboardingCase` aprobado con `effective_date` y `last_working_day`; `member.active = false` tampoco es señal válida de término laboral.
+
 ## Why This Task Exists
 
 Greenhouse ya calcula nómina mensual, pero un finiquito no es simplemente “otra liquidación del mes”. Requiere una capa específica para:
@@ -60,6 +64,9 @@ Reglas obligatorias:
 - Partir por `resignation` en Chile dependiente; otras causales/regímenes como extensiones.
 - Toda fórmula debe ser auditable y explicable.
 - El engine debe fallar cerrado si faltan datos críticos del caso o snapshot contractual.
+- No calcular desde `contractEndDate` directamente; ese campo puede quedar como evidencia/snapshot contractual, no como source of truth del término.
+- No calcular desde `member.active = false` ni desde la acción administrativa `deactivateMember`.
+- Requerir `offboarding_case_id`, `effective_date`, `last_working_day`, causal y snapshot contractual antes de calcular.
 
 ## Normative Docs
 
@@ -104,6 +111,7 @@ Reglas obligatorias:
 - No existe runtime específico de finiquito.
 - No existe cálculo final separado del payroll mensual.
 - No existe aggregate/documento auditable de settlement final.
+- No existe todavía source of truth runtime de fecha efectiva de salida; queda bloqueado por `TASK-760`.
 
 ## Scope
 
@@ -112,6 +120,7 @@ Reglas obligatorias:
 - Crear schema base para `final_settlements`
 - Link obligatorio a `offboarding_case_id`
 - Snapshot contractual + inputs legales mínimos
+- Persistir snapshots de `effective_date`, `last_working_day`, causal y `contract_end_date_snapshot` para auditoría
 
 ### Slice 2 — Chile resignation engine
 
@@ -124,6 +133,7 @@ Reglas obligatorias:
 - Validar datos mínimos del caso
 - Falla cerrada ante inputs faltantes
 - Estados del settlement: draft, calculated, reviewed, approved, issued, cancelled
+- Testear explícitamente que `contractEndDate` sin `OffboardingCase` aprobado no habilita cálculo
 
 ## Out of Scope
 
@@ -138,6 +148,7 @@ Reglas obligatorias:
 - [ ] Se puede calcular un caso V1 de renuncia Chile dependiente desde un offboarding case.
 - [ ] El resultado queda auditable y explicable.
 - [ ] No se contamina el motor de payroll mensual con lógica ad hoc de finiquito.
+- [ ] El motor falla cerrado si solo existe `contractEndDate`, `member.active = false` o una desactivación administrativa sin caso aprobado.
 
 ## Verification
 

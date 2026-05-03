@@ -76,8 +76,10 @@ Regla: módulos de dominio extienden estos objetos, no crean identidades paralel
 
 - `AGENTS.md` — reglas operativas completas, branching, deploy, coordinación, PostgreSQL access
 - `DESIGN.md` — contrato visual compacto para agentes; leerlo cuando el cambio toque UI, UX, tipografía, color, spacing o selección de componentes
-- `project_context.md` — arquitectura, stack, decisiones, restricciones (documento vivo con deltas)
-- `Handoff.md` — trabajo en curso, riesgos, próximos pasos
+- `project_context.md` — estado vigente del repo, stack, decisiones y restricciones; leer primero su sección "Estado vigente para agentes"
+- `Handoff.md` — cabina de mando activa: trabajo en curso, riesgos y próximos pasos
+- `Handoff.archive.md` — caja negra histórica; usar para auditoría de resoluciones sin tratar entradas antiguas como contrato vigente
+- `docs/operations/CONTEXT_HANDOFF_OPERATING_MODEL_V1.md` — regla canónica para navegar `project_context.md`, `Handoff.md` y `Handoff.archive.md` sin perder auditoría ni inflar el handoff activo
 - `docs/tasks/README.md` — pipeline de tareas `TASK-###` y legacy `CODEX_TASK_*`
 - `docs/issues/README.md` — pipeline de incidentes operativos `ISSUE-###`
 - `docs/architecture/` — specs de arquitectura canónicas (30+ documentos)

@@ -4,7 +4,7 @@
 
 Definir un prompt operativo canónico para que Codex ejecute `TASK-###` dentro de `greenhouse-eo` con alta fidelidad al repo real, bajo drift, buen uso de skills, coordinación segura con subagentes y cierre documental consistente.
 
-Este documento **no reemplaza** `AGENTS.md`, `project_context.md`, `Handoff.md` ni `docs/tasks/TASK_PROCESS.md`. Los comprime en una forma reutilizable para sesiones de ejecución.
+Este documento **no reemplaza** `AGENTS.md`, `project_context.md`, `Handoff.md`, `Handoff.archive.md`, `docs/operations/CONTEXT_HANDOFF_OPERATING_MODEL_V1.md` ni `docs/tasks/TASK_PROCESS.md`. Los comprime en una forma reutilizable para sesiones de ejecución.
 
 ## Cuándo usarlo
 
@@ -118,6 +118,7 @@ Lee siempre:
 - `AGENTS.md`
 - `project_context.md`
 - `Handoff.md`
+- `docs/operations/CONTEXT_HANDOFF_OPERATING_MODEL_V1.md`
 - `DESIGN.md`
 - `docs/tasks/TASK_PROCESS.md`
 - la spec completa de la task

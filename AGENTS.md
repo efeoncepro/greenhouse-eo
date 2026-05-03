@@ -36,6 +36,7 @@ Este bloque es el resumen obligatorio antes de ejecutar cualquier cambio. Las se
 
 - Primero orientarse: leer `project_context.md`, `Handoff.md`, la task/spec aplicable y la arquitectura del dominio antes de escribir.
 - Protocolo TASK-###: usar `docs/tasks/TASK_PROCESS.md` como proceso canonico y `docs/operations/CODEX_EXECUTION_PROMPT_V1.md` como prompt operativo robusto para ejecucion con Codex.
+- Contexto y auditoria: `docs/operations/CONTEXT_HANDOFF_OPERATING_MODEL_V1.md` gobierna como usar `project_context.md`, `Handoff.md` y `Handoff.archive.md` sin perder memoria historica.
 - Source of truth: si task/spec, arquitectura y runtime real discrepan, prevalecen arquitectura vigente + codigo/schema/runtime verificados. Corregir la spec antes de implementar si el drift cambia contrato o bloquea.
 - Proporcionalidad: discovery breve para cambios locales; protocolo completo para cambios cross-domain, auth, billing, finance, data, cloud, migraciones, observabilidad o UI visible.
 - Reutilizar antes de crear: buscar helpers, readers, components, routes, signals, capabilities y docs existentes antes de introducir piezas nuevas.
@@ -67,6 +68,7 @@ Estos CLIs estan autenticados localmente. Cuando una task toca su dominio, **usa
 - Leer `project_context.md`.
 - Leer `Handoff.md` para ver trabajo en curso, riesgos y proximos pasos.
 - Usar `Handoff.archive.md` solo si hace falta rastrear contexto historico; no como primera lectura operativa.
+- Para continuidad entre agentes, auditoria historica y compresion segura del handoff, aplicar `docs/operations/CONTEXT_HANDOFF_OPERATING_MODEL_V1.md`. No borrar historia auditable; moverla o enlazarla cuando corresponda.
 - Leer `DESIGN.md` cuando el cambio toque cualquier surface visible o decision visual del portal.
 - Leer la especificacion externa `../Greenhouse_Portal_Spec_v1.md` cuando el cambio afecte producto, autenticacion, data, rutas principales o arquitectura.
 - Si el trabajo requiere specs o briefs, buscarlos primero en `docs/README.md` y luego en la categoria correspondiente dentro de `docs/`.

@@ -44,6 +44,7 @@ Cada cambio debe documentarse, pero no cada documento debe repetir la historia c
 - `project_context.md`
 - Aqui vive el estado actual del repo, stack, rutas, librerias activas, deploy y restricciones.
 - Debe responder: que existe hoy, que se usa hoy, que sigue pendiente hoy.
+- La especializacion canonica para `project_context.md` + `Handoff.md` + `Handoff.archive.md` vive en `docs/operations/CONTEXT_HANDOFF_OPERATING_MODEL_V1.md`.
 
 ### 3. Continuidad de turno
 - `Handoff.md`
@@ -54,6 +55,7 @@ Cada cambio debe documentarse, pero no cada documento debe repetir la historia c
   - riesgos o pendientes
 - Formato corto. No duplicar arquitectura.
 - Si hace falta conservar historia detallada, moverla a `Handoff.archive.md` y dejar en `Handoff.md` solo el estado activo.
+- No borrar historia auditable para reducir tamano: preservar en `Handoff.archive.md`, task complete, issue resuelto o doc canonica, y dejar puntero corto cuando siga siendo relevante.
 
 ### 4. Registro de cambios
 - `changelog.md`

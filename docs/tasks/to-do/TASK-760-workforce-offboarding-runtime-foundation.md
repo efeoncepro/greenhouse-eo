@@ -24,6 +24,18 @@
 
 Implementa la foundation runtime del agregado canónico `WorkRelationshipOffboardingCase` para que Greenhouse pueda modelar una salida laboral o contractual como un caso formal y no como suma de checklists, flags sueltos o desactivaciones de acceso. Esta task es el prerrequisito funcional para cualquier motor serio de finiquitos.
 
+## Delta 2026-05-03 — People runtime gap verificado en codebase
+
+Revisión directa del repo confirmó que la ficha/persona hoy no tiene una fecha canónica de término laboral:
+
+- `src/types/hr-core.ts` expone `hireDate` y `contractEndDate`, pero no `terminationDate`, `effectiveExitDate` ni `lastWorkingDay`.
+- `src/lib/hr-core/service.ts` persiste `hireDate`/`contractEndDate`; no existe lifecycle de salida laboral.
+- `src/lib/hr-core/leave-domain.ts` calcula vacaciones desde `hireDate`, pero no recibe una fecha canónica de salida para cierre proporcional.
+- `src/lib/team-admin/mutate-team.ts` tiene `deactivateMember`, que solo baja `greenhouse_core.members.active = false` y cierra asignaciones con `CURRENT_DATE`; eso es desactivación administrativa, no offboarding laboral.
+- No existe runtime/migración bajo `src/lib/workforce/offboarding/**` ni tablas de caso `offboarding_case`.
+
+Decisión: `contractEndDate` queda como dato contractual o señal de revisión, no como término laboral efectivo. La fuente de verdad de salida debe ser el agregado `WorkRelationshipOffboardingCase` con `effective_date` y `last_working_day`.
+
 ## Why This Task Exists
 
 Hoy Greenhouse sabe:
@@ -65,6 +77,9 @@ Reglas obligatorias:
 
 - Offboarding no puede modelarse como “desactivar usuario”.
 - El agregado vive sobre una relación de trabajo, no solo sobre una persona.
+- No agregar un `terminationDate` plano a `greenhouse_core.members` ni a `HrMemberProfile` como source of truth de salida; People debe leer el estado desde el caso canónico o un read-model derivado.
+- `contract_end_date` / `contractEndDate` puede abrir una revisión o sugerir un caso, pero no ejecuta offboarding ni habilita finiquito por sí solo.
+- `member.active = false` es efecto downstream de un caso ejecutado, o fallback administrativo explícito, nunca la fuente de verdad laboral.
 - No hard delete de histórico.
 - `SCIM` puede abrir o actualizar casos, pero no saltarse el agregado.
 - La task debe distinguir claramente `views`/surface visible y `entitlements`/acciones autorizadas.
@@ -113,13 +128,21 @@ Reglas obligatorias:
 - No existe state machine formal ejecutable.
 - No hay lane canónica de payroll final.
 - No hay cola/surface propia de casos de offboarding.
+- No existe fecha de término laboral real en People/HR profile; solo existen `hireDate` y `contractEndDate`.
+- No existe card/read-model en People 360 que distinga `fecha de ingreso`, `fin de contrato`, `salida programada`, `último día trabajado` y `estado de offboarding`.
+- La acción actual `Desactivar` puede confundirse con offboarding si no se rodea de guardrails.
 
 ## Scope
 
 ### Slice 1 — Aggregate schema
 
 - Tabla base `work_relationship_offboarding_cases`
-- Campos mínimos: relationship, causal, fecha efectiva, last working day, source, status, lane, notes
+- Campos mínimos: relationship, causal, `effective_date`, `last_working_day`, source, status, lane, notes
+- Snapshot contractual mínimo: `contract_end_date_snapshot`, tipo de relación, régimen/país y empleador legal si aplica
+- Guardrail: `effective_date` requerido antes de `approved`, `scheduled` o `executed`.
+- Guardrail: `last_working_day` requerido antes de `scheduled` o `executed`.
+- Guardrail: `last_working_day` no debe quedar después de `effective_date` salvo excepción explícita y auditada.
+- Guardrail: `contract_end_date_snapshot` no reemplaza `effective_date`.
 - Índices, status model y audit trail
 
 ### Slice 2 — Lane resolution + state model
@@ -131,8 +154,11 @@ Reglas obligatorias:
 ### Slice 3 — Trigger sources
 
 - Crear caso manual desde HR
+- Abrir `needs_review` desde `contractEndDate` próximo/vencido cuando aplique, sin ejecutar offboarding automáticamente
 - Abrir `needs_review` desde señales SCIM/Admin cuando aplique
 - Enlazar checklist legacy como consumer o child object
+- Hacer que cualquier flujo administrativo de `deactivateMember` que afecte una relación laboral derive al caso de offboarding cuando corresponda.
+- Si `deactivateMember` se usa como excepción, registrar explícitamente que fue desactivación administrativa/identity-only y no salida laboral.
 
 ### Slice 4 — Surfaces + access model
 
@@ -145,6 +171,18 @@ Reglas obligatorias:
   - `offboarding_case.execute`
   - `offboarding_case.cancel`
 
+### Slice 5 — People 360 lifecycle integration
+
+- Agregar read-model/helper para que People 360 muestre fecha de ingreso (`hireDate`), fin de contrato si existe (`contractEndDate`), salida programada (`effective_date`), último día trabajado (`last_working_day`) y estado del caso de offboarding.
+- CTA autorizado `Iniciar offboarding` desde la ficha/persona cuando no haya caso activo.
+- Evitar que `Desactivar` sea la acción primaria de salida laboral.
+
+### Slice 6 — Legacy deactivation guardrail
+
+- Mantener `deactivateMember` como operación de acceso/administración de bajo nivel.
+- Agregar warning, audit trail o wrapper de dominio para impedir que se use silenciosamente como offboarding laboral.
+- Un caso `executed` puede llamar downstream a revocación de acceso/desactivación, pero no al revés.
+
 ## Out of Scope
 
 - No calcular aún finiquitos.
@@ -156,6 +194,9 @@ Reglas obligatorias:
 
 - [ ] Existe agregado canónico `OffboardingCase` con estado y lane formal.
 - [ ] Se puede abrir y operar un caso de renuncia manualmente desde HR.
+- [ ] People/HR distingue fecha de ingreso, fin de contrato, salida efectiva y último día trabajado.
+- [ ] `contractEndDate` no se usa como fuente de verdad de término laboral ni como input directo de finiquito.
+- [ ] `deactivateMember` no representa silenciosamente un término laboral; queda guardrail o derivación a offboarding.
 - [ ] Existe hook explícito para lane de payroll final sin calcular todavía el finiquito.
 - [ ] La task no depende de implementar Onboarding.
 
@@ -165,6 +206,8 @@ Reglas obligatorias:
 - `pnpm exec tsc --noEmit --pretty false`
 - `pnpm test`
 - Validación manual de crear y mover un caso de offboarding en preview/local
+- Test unitario/read-model que pruebe `contractEndDate` vs `effective_date` como conceptos distintos
+- Grep/revisión: no introducir `terminationDate` plano como owner canónico fuera del agregado/read-model derivado
 
 ## Closing Protocol
 
