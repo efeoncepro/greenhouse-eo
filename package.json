@@ -53,6 +53,7 @@
     "finance:task708b-backfill-signals": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/finance/task708b-backfill-signals.ts",
     "finance:task708b-classify": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/finance/task708b-classify.ts",
     "finance:task708b-apply": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/finance/task708b-apply.ts",
+    "finance:materialize-expense-distribution": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/finance/materialize-expense-distribution.ts",
     "backfill:hubspot-contact-names": "tsx scripts/backfill-hubspot-contact-names.ts",
     "hubspot:properties": "tsx scripts/ensure-hubspot-custom-properties.ts",
     "hubspot:company-properties": "tsx scripts/create-hubspot-company-custom-properties.ts",
