@@ -33,6 +33,8 @@
 // Spec: docs/tasks/in-progress/TASK-766-finance-clp-currency-reader-contract.md
 
 const PATTERNS = [
+  // ─── TASK-766 — multiplicación inline con exchange_rate_to_clp ─────────────
+  //
   // expense_payments anti-pattern: ep.amount * COALESCE(e.exchange_rate_to_clp, ...)
   {
     regex: /\bep\.amount\s*\*\s*COALESCE\s*\(\s*[a-z_.]*exchange_rate_to_clp/i,
@@ -52,6 +54,27 @@ const PATTERNS = [
   {
     regex: /\bip\.amount\s*\*\s*[a-z_.]*exchange_rate_to_clp\b/i,
     label: 'ip.amount × exchange_rate_to_clp'
+  },
+
+  // ─── TASK-774 — agregación SUM(ep.amount/ip.amount/sl.amount) sin _clp ───
+  //
+  // SUM(ep.amount) en SQL embebido sin pasar por VIEW canónica → asume que
+  // el currency del payment es CLP. En cuentas CLP que reciben pagos USD
+  // (caso CCA TASK-714c, payments Deel/Adobe/Figma USD pagados desde TC CLP)
+  // el balance se infla/deflaciona porque suma USD nativo en columna CLP.
+  // Bug Figma EXP-202604-008 (2026-05-03): +$92.9 USD vs +$83,773.5 CLP esperado.
+  // Mismo COALESCE chain TASK-766 aplica a settlement_legs.amount_clp.
+  {
+    regex: /\bSUM\s*\(\s*ep\.amount\s*\)/i,
+    label: 'SUM(ep.amount) — usar payment_amount_clp via expense_payments_normalized'
+  },
+  {
+    regex: /\bSUM\s*\(\s*ip\.amount\s*\)/i,
+    label: 'SUM(ip.amount) — usar payment_amount_clp via income_payments_normalized'
+  },
+  {
+    regex: /\bSUM\s*\(\s*sl\.amount\s*\)/i,
+    label: 'SUM(sl.amount) — usar COALESCE(sl.amount_clp, CASE WHEN currency=CLP THEN amount END)'
   }
 ]
 

@@ -41,6 +41,19 @@ const validCases = [
   {
     code: '`UPDATE greenhouse_finance.expense_payments SET amount_clp = $1 WHERE payment_id = $2`',
     name: 'mutator setting amount_clp (recordExpensePayment pattern)'
+  },
+  // ─── TASK-774 valid cases ────────────────────────────────────────────────
+  {
+    code: '`SELECT SUM(amount) FROM movements WHERE direction = $1`',
+    name: 'TASK-774: SUM(amount) over subselect alias (account-balances pattern)'
+  },
+  {
+    code: '`SELECT COALESCE(sl.amount_clp, CASE WHEN sl.currency = ${l_clp} THEN sl.amount END) AS amount FROM greenhouse_finance.settlement_legs sl`',
+    name: 'TASK-774: settlement_legs COALESCE inline (account-balances canonical)'
+  },
+  {
+    code: '`SELECT epn.payment_amount_clp FROM greenhouse_finance.expense_payments_normalized epn`',
+    name: 'TASK-774: read VIEW canonical with epn alias'
   }
 ]
 
@@ -73,6 +86,22 @@ const invalidCases = [
       'const SQL = "SELECT SUM(ep.amount * COALESCE(e.exchange_rate_to_clp, 1)) FROM greenhouse_finance.expense_payments ep JOIN greenhouse_finance.expenses e ON e.expense_id = ep.expense_id"',
     errors: 1,
     name: 'plain string literal (>30 chars) con anti-pattern'
+  },
+  // ─── TASK-774 invalid cases ──────────────────────────────────────────────
+  {
+    code: '`SELECT SUM(ep.amount) FROM greenhouse_finance.expense_payments ep WHERE payment_account_id = $1`',
+    errors: 1,
+    name: 'TASK-774: SUM(ep.amount) directo sin VIEW canonical'
+  },
+  {
+    code: '`SELECT SUM(ip.amount) FROM greenhouse_finance.income_payments ip WHERE payment_account_id = $1`',
+    errors: 1,
+    name: 'TASK-774: SUM(ip.amount) directo sin VIEW canonical'
+  },
+  {
+    code: '`SELECT SUM(sl.amount) FROM greenhouse_finance.settlement_legs sl WHERE instrument_id = $1`',
+    errors: 1,
+    name: 'TASK-774: SUM(sl.amount) sin COALESCE amount_clp'
   }
 ]
 
@@ -81,7 +110,7 @@ ruleTester.run('greenhouse/no-untokenized-fx-math', rule, {
   invalid: invalidCases.map(c => ({
     ...c,
     errors: Array.from({ length: c.errors }, () => ({
-      message: /anti-patrón TASK-766/u
+      message: /anti-patr/u
     }))
   }))
 })
