@@ -430,6 +430,22 @@ upsert_scheduler_job \
   '{"domain":"cost_intelligence","batchSize":500}'
 echo "  -> ops-reactive-cost-intelligence: */10 * * * * (cost_intelligence domain)"
 
+# ─── Outbox publisher (TASK-773) ─────────────────────────────────────────────
+# Migración desde Vercel cron /api/cron/outbox-publish (que solo corre en
+# producción) a Cloud Scheduler (que corre por proyecto GCP, igual en staging
+# y prod). Cierra clase de bugs invisibles donde flujos write-then-projection
+# de Finance funcionan en producción pero quedan colgados en staging.
+#
+# Cron */2 min: más frecuente que el original */5 para mejor SLA. Costo
+# negligible (< 1s CPU por run cuando no hay events). State machine:
+# pending → publishing → published/failed/dead_letter (max 5 retries).
+upsert_scheduler_job \
+  "ops-outbox-publish" \
+  "*/2 * * * *" \
+  "/outbox/publish-batch" \
+  '{"batchSize":500,"maxRetries":5}'
+echo "  -> ops-outbox-publish: */2 * * * * (outbox PG → BQ raw publisher, TASK-773)"
+
 # Global projection recovery — unchanged lane.
 upsert_scheduler_job \
   "ops-reactive-recover" \
