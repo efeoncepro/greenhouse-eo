@@ -891,6 +891,101 @@ Toda lectura de `greenhouse_finance.expenses` que vaya a UI o exports **debe** c
 
 **Spec canónica**: `docs/tasks/complete/TASK-772-finance-expense-supplier-hydration-cash-out-selection.md`. Patrón replicable a `income`, `payment_orders` y futuros agregados que mezclen identidad referenciada + amounts en moneda mixta.
 
+### Outbox publisher canónico — Cloud Scheduler, no Vercel (TASK-773)
+
+El **outbox publisher** mueve eventos de `greenhouse_sync.outbox_events` (Postgres) a `greenhouse_raw.postgres_outbox_events` (BigQuery) y los marca como `status='published'`. El **reactive consumer** (que materializa projections downstream — account_balance, provider_bq_sync, etc.) filtra `WHERE status='published'`. Si el publisher está caído o un batch persiste fallando, NINGUNA projection corre, NINGUN account_balance se rematerializa, NINGUN downstream side effect ocurre.
+
+**El publisher canónico vive en Cloud Scheduler + ops-worker, NO en Vercel cron**:
+
+- `Cloud Scheduler ops-outbox-publish` (cron `*/2 min`) → `POST /outbox/publish-batch` en ops-worker.
+- Helper canónico: `publishPendingOutboxEvents` ([src/lib/sync/outbox-consumer.ts](../src/lib/sync/outbox-consumer.ts)) con state machine atómica.
+- Endpoint: `services/ops-worker/server.ts:handleOutboxPublishBatch`.
+
+**Por qué Cloud Scheduler y no Vercel cron**: Vercel solo ejecuta crons en deploys de **Production**. Staging custom environment **no los corre**. Eso significa que **cualquier flow async que dependa del outbox queda invisible en staging** (root cause del incidente Figma 2026-05-03 cuando el pago no rebajaba TC). Cloud Scheduler corre por proyecto GCP, igual en staging y prod, sin distinción.
+
+**State machine canónica**:
+
+```text
+                 ┌──────────────┐
+                 │   pending    │  (writer INSERT default)
+                 └──────┬───────┘
+                        │ SELECT FOR UPDATE SKIP LOCKED
+                        ▼
+                 ┌──────────────┐
+                 │  publishing  │  (worker tomó el lock)
+                 └──┬───────┬───┘
+            BQ OK   │       │   BQ FAIL
+                    ▼       ▼
+            ┌───────────┐  ┌─────────┐
+            │ published │  │ failed  │  (retries++)
+            └───────────┘  └────┬────┘
+                                │ retries >= OUTBOX_MAX_PUBLISH_ATTEMPTS (5)
+                                ▼
+                          ┌─────────────┐
+                          │ dead_letter │  (humano interviene)
+                          └─────────────┘
+```
+
+**Reliability signals canónicos** (visibles en `/admin/operations`):
+
+- `sync.outbox.unpublished_lag` — events `pending`/`failed` con edad > 10 min. Steady=0. Si > 0, publisher caído o falla persistente.
+- `sync.outbox.dead_letter` — events agotaron retries. Steady=0. Cualquier > 0 requiere humano: replay manual o investigación root cause.
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** agregar nuevos crons de outbox/event-bus/projection-refresh a `vercel.json`. Solo se permiten crons Vercel para tareas que pueden correr únicamente en producción (e.g. backfill nocturno, scheduled report). Los crons del path async crítico van a `services/ops-worker/deploy.sh`.
+- **NUNCA** modificar la state machine sin actualizar la CHECK constraint `outbox_events_status_check` + comentario en CLAUDE.md.
+- **NUNCA** filtrar eventos por `WHERE status='pending'` en consumers downstream. El reactive consumer canónico filtra `'published'`. Si necesitas un consumer que toque pending (e.g. UI de troubleshooting), declara explícitamente el contract.
+- **NUNCA** catch + swallow errores del helper `publishPendingOutboxEvents`. La state machine atómica se basa en que la tx PG complete o aborte limpio.
+
+**Spec canónica**: `docs/tasks/complete/TASK-773-outbox-publisher-cloud-scheduler-cutover.md`. Patrón replicable: cuando emerja otro Vercel cron infrastructure-critical (TASK-258 sync-conformed pipeline, TASK-259 entra-profile-sync), seguir el mismo template (helper canónico → endpoint ops-worker → Cloud Scheduler job → reliability signal).
+
+### Finance write-path E2E gate (TASK-773 Slice 6)
+
+Cualquier task que toque handlers `POST/PUT/PATCH/DELETE` en `src/app/api/finance/**/route.ts` **debe verificar el flow end-to-end downstream**, no solo el contract API. Bug class detectada 2026-05-03: el endpoint Figma respondía 200 OK pero el TC Santander no rebajaba — porque el contract API funcionaba pero el side effect downstream (outbox → BQ → reactive → account_balance) calló silencioso.
+
+**Gate**: `pnpm finance:e2e-gate` (warn) o `pnpm finance:e2e-gate --strict` (error).
+
+**Evidencia válida** (cualquiera):
+
+1. Algún commit del branch tiene `[downstream-verified: <flow-name>]` en el message body.
+2. Algún archivo `tests/e2e/smoke/finance-*.spec.ts` fue creado o modificado en el branch.
+3. El cambio NO modifica handlers POST/PUT/PATCH/DELETE (typo, comments, formatting). El gate detecta esto y skipea.
+
+**Flujos críticos canónicos** (verificar end-to-end ANTES de cerrar):
+
+| Flow | Action | Downstream verification |
+|---|---|---|
+| Crear supplier | POST `/api/finance/suppliers` | Aparece en `/admin/payment-instruments` directory + NO 500 |
+| Crear expense | POST `/api/finance/expenses` | Aparece en `/finance/expenses` con sortDate correcto + supplierDisplayName |
+| Registrar pago | POST `/api/finance/expenses/[id]/payments` | expense.status=paid + **account_balance refleja cargo** + cash-out drawer ya no muestra el doc |
+| Anular payment | DELETE `/api/finance/expenses/[id]/payments/[paymentId]` | balance vuelve atrás |
+| Conciliar período | POST `/api/finance/reconciliation/[periodId]/match` | Reconciliación completa + signals reliability OK |
+
+**Verificación recomendada con Playwright + Chromium + agent auth**:
+
+```bash
+# Setup once (genera .auth/storageState.json)
+AGENT_AUTH_SECRET=<secret> node scripts/playwright-auth-setup.mjs
+
+# E2E del flow específico (browser real con sesión NextAuth válida)
+pnpm playwright test tests/e2e/smoke/finance-cash-out.spec.ts --project=chromium
+```
+
+**⚠️ Regla**: cuando cierres una task que toque write paths finance, agregá `[downstream-verified: <flow>]` al último commit y describí qué verificaste. Patrón:
+
+```text
+feat(finance): TASK-XXX Slice 5 — registro pago atómico
+
+[downstream-verified: cash-out-payment]
+- POST /api/finance/expenses/[id]/payments → 201 OK
+- account_balances rematerializa < 5 min via /admin/operations
+- /finance/bank muestra cargo en TC Santander
+- /finance/cash-out drawer ya no muestra el documento
+```
+
+**Spec canónica**: `docs/tasks/complete/TASK-773-outbox-publisher-cloud-scheduler-cutover.md` (Slice 6).
+
 ### Database — Migration markers (anti pre-up-marker bug)
 
 Toda migration `.sql` en `migrations/` DEBE comenzar con el marker `-- Up Migration` exacto. `node-pg-migrate` parsea el archivo buscando ese marker para identificar la sección Up; si falta, la sección queda vacía y la migración se registra como aplicada en `pgmigrations` SIN ejecutar el SQL real (silent failure detectado en TASK-768 Slice 1).

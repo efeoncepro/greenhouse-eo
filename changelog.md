@@ -2,6 +2,17 @@
 
 ## 2026-05-03
 
+- **TASK-773 entregada** — Outbox Publisher Cloud Scheduler Cutover + Reliability + E2E Pre-Merge Gate. Cierra clase entera de bugs invisibles donde flujos write-then-projection de Finance funcionan en producción pero quedan colgados en staging.
+  - **Outbox publisher migrado a Cloud Scheduler + ops-worker**: el cron `/outbox/publish-batch` corre por proyecto GCP cada 2 min, igual en staging y producción. Antes vivía en Vercel cron `*/5 min` que **solo corre en deploys de Production** — staging custom environment no los ejecuta. Por eso el pago de Figma 2026-05-03 no rebajaba TC Santander.
+  - **State machine canónica explícita**: `pending → publishing → published/failed/dead_letter`. CHECK constraint atomic + index parcial para fetch eficiente del worker. SELECT FOR UPDATE SKIP LOCKED para concurrencia segura. Max 5 retries antes de dead-letter (humano interviene).
+  - **2 reliability signals nuevos** visibles en `/admin/operations`:
+    - `sync.outbox.unpublished_lag` — events sin publicar > 10 min
+    - `sync.outbox.dead_letter` — events que agotaron retries
+    Steady=0 ambos. Si > 0, dashboard pinta error y el operador ve qué break en el event bus sin necesidad de chequeo manual.
+  - **E2E pre-merge gate**: `pnpm finance:e2e-gate` detecta cuando un PR modifica handlers POST/PUT/PATCH/DELETE en `src/app/api/finance/**/route.ts` sin evidencia de verificación downstream. Mode warn por default; promueve a strict tras 1 sprint de adopción.
+  - **Patrón canónico documentado** en CLAUDE.md: nuevos crons infrastructure-critical van a `services/ops-worker/deploy.sh` + Cloud Scheduler. Vercel cron solo para tareas que SOLO corren en producción.
+  - **Absorbe TASK-262** (P1 Migrar outbox-publish a ops-worker). TASK-773 es superset estricto — agrega state machine + reliability + lint gate.
+  - **Auto-resuelve incidentes downstream**: TASK-771 backfill (figma-inc, microsoft-inc, notion-inc en BQ providers) y TASK-772 payment Figma (TC Santander rebaja en account_balance) drenan automáticamente al primer ciclo del nuevo Cloud Scheduler post-deploy.
 - **TASK-772 cerrada** — Finance Expense Supplier Hydration & Cash-Out Selection Integrity. Cierra la cadena visual del incidente Figma EXP-202604-008.
   - **`/finance/expenses` muestra el proveedor real**: aunque `expenses.supplier_name` sea NULL en datos legacy, el reader hidrata `supplierDisplayName` via LEFT JOIN canónico a `greenhouse_finance.suppliers`. Figma deja de mostrarse como "—".
   - **`/finance/cash-out` agrupa por proveedor estable**: el dropdown agrupa por `supplierKey` (= supplierId || displayName || legacyName), no por `supplierName || 'Sin proveedor'`. Documentos con supplierId válido pero supplierName=NULL ya NO se ocultan bajo "Sin proveedor".
