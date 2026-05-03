@@ -29,7 +29,7 @@ _Pendiente._
 
 ### Agencia y Operaciones
 
-_Pendiente._
+- [Monitorear Costos Cloud con FinOps](operations/monitorear-costos-cloud-finops.md) — como revisar gasto GCP, interpretar proyecciones y drivers, usar alertas tempranas y ejecutar diagnosticos seguros sin depender solo de la consola de Google Cloud.
 
 ### Plataforma
 
