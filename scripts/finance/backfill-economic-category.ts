@@ -164,64 +164,9 @@ const toResolveIncomeInput = (row: IncomeCandidateRow): ResolveIncomeInput => ({
   currency: row.currency ?? null
 })
 
-const writeAuditLog = async (params: {
-  batchId: string
-  targetKind: 'expense' | 'income'
-  targetId: string
-  category: string
-  matchedRule: string
-  confidence: string
-  evidence: Record<string, unknown>
-}): Promise<void> => {
-  await query(
-    `INSERT INTO greenhouse_finance.economic_category_resolution_log
-       (log_id, target_kind, target_id, resolved_category, matched_rule,
-        confidence, evidence_json, resolved_by, batch_id)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
-    [
-      `ecr-${randomUUID()}`,
-      params.targetKind,
-      params.targetId,
-      params.category,
-      params.matchedRule,
-      params.confidence,
-      JSON.stringify(params.evidence),
-      'backfill-script',
-      params.batchId
-    ]
-  )
-}
-
-const enqueueManualReview = async (params: {
-  targetKind: 'expense' | 'income'
-  targetId: string
-  candidateCategory: string
-  candidateConfidence: string
-  candidateRule: string
-  candidateEvidence: Record<string, unknown>
-}): Promise<void> => {
-  await query(
-    `INSERT INTO greenhouse_finance.economic_category_manual_queue
-       (queue_id, target_kind, target_id, candidate_category,
-        candidate_confidence, candidate_rule, candidate_evidence)
-     VALUES ($1, $2, $3, $4, $5, $6, $7)
-     ON CONFLICT (target_kind, target_id) DO UPDATE SET
-       candidate_category = EXCLUDED.candidate_category,
-       candidate_confidence = EXCLUDED.candidate_confidence,
-       candidate_rule = EXCLUDED.candidate_rule,
-       candidate_evidence = EXCLUDED.candidate_evidence,
-       updated_at = NOW()`,
-    [
-      `ecq-${randomUUID()}`,
-      params.targetKind,
-      params.targetId,
-      params.candidateCategory,
-      params.candidateConfidence,
-      params.candidateRule,
-      JSON.stringify(params.candidateEvidence)
-    ]
-  )
-}
+// Helpers writeAuditLog / enqueueManualReview se inlinean dentro de las
+// transacciones per-row de processExpenses / processIncome (ver abajo)
+// para garantizar atomicidad UPDATE + INSERT log + manual queue.
 
 const processExpenses = async (options: CliOptions): Promise<BackfillSummary> => {
   const summary = newSummary()
@@ -428,10 +373,13 @@ const printSummary = (label: string, summary: BackfillSummary): void => {
   console.log(`Enqueued manual:   ${summary.enqueuedManual}`)
   console.log(`Errors:            ${summary.errors.length}`)
   console.log(`By confidence:`)
+
   for (const [conf, count] of Object.entries(summary.byConfidence)) {
     console.log(`  ${conf.padEnd(20)} ${count}`)
   }
+
   console.log(`By category:`)
+
   for (const [cat, count] of Object.entries(summary.byCategory).sort()) {
     console.log(`  ${cat.padEnd(35)} ${count}`)
   }

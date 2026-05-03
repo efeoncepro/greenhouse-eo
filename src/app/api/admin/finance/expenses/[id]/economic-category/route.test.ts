@@ -170,6 +170,7 @@ describe('PATCH /api/admin/finance/expenses/[id]/economic-category', () => {
       buildRequest({ economicCategory: 'tax', reason: 'audit reason explanation' }),
       { params: Promise.resolve(params) }
     )
+
     const body = await res.json()
 
     expect(res.status).toBe(200)

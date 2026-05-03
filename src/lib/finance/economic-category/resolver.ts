@@ -103,9 +103,11 @@ const accountingTypeAmbiguousFallback = (
   accountingType: string | null | undefined
 ): ExpenseEconomicCategory | null => {
   if (!accountingType) return null
+
   if (accountingType === 'supplier' || accountingType === 'miscellaneous') {
     return 'vendor_cost_saas'
   }
+
   if (accountingType === 'bank_fee') return 'bank_fee_real'
 
   return null

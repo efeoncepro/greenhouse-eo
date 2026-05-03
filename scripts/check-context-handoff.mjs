@@ -39,6 +39,7 @@ const agents = read('AGENTS.md')
 const claude = read('CLAUDE.md')
 const codexPrompt = read('docs/operations/CODEX_EXECUTION_PROMPT_V1.md')
 const documentationModel = read('docs/operations/DOCUMENTATION_OPERATING_MODEL_V1.md')
+
 read('docs/operations/CONTEXT_HANDOFF_OPERATING_MODEL_V1.md')
 
 const handoffLines = handoff.split(/\r?\n/).length

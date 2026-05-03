@@ -98,6 +98,7 @@ export async function PATCH(
 
     const newCategory = validateCategory(body.economicCategory)
     const reason = validateReason(body.reason)
+
     const bulkContext =
       typeof body.bulkContext === 'string' && body.bulkContext.trim().length > 0
         ? body.bulkContext.trim()

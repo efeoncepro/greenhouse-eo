@@ -278,7 +278,8 @@ describe('TASK-768 resolveExpenseEconomicCategory', () => {
   it('regex extracts RUT con DV K minúscula y normaliza a mayúscula', async () => {
     lookupMemberByRutMock.mockImplementation(async (rut: string) => {
       if (rut === '20.557.199-K') return internalMember
-      return null
+      
+return null
     })
 
     const result = await resolveExpenseEconomicCategory({

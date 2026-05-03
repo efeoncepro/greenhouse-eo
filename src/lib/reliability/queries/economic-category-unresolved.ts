@@ -43,6 +43,7 @@ const buildSignal = async (
          FROM greenhouse_finance.${table}
         WHERE economic_category IS NULL`
     )
+
     const count = Number(rows[0]?.n ?? 0)
 
     return {
