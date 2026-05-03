@@ -179,13 +179,15 @@ describe('GET /api/finance/suppliers', () => {
   })
 })
 
-// ── TASK-771 Slice 1 — POST supplier debe responder 201 cuando PG commitea, ─
-// ── independiente de fallas BQ. Antes del fix, una excepción de              ─
-// ── syncProviderFromFinanceSupplier (BQ MERGE/UPDATE/DDL) se propagaba como  ─
-// ── 500 aunque el supplier ya estuviera persistido en Postgres (incidente    ─
-// ── 2026-05-03 — figma-inc, microsoft-inc, notion-inc).                      ─
+// ── TASK-771 — POST supplier debe responder 201 cuando PG commitea.           ─
+// ── Slice 1 envolvió el sync BQ inline en try/catch (hotfix).                 ─
+// ── Slice 3 lo eliminó por completo: la proyección a BQ corre async vía       ─
+// ── consumer reactivo `provider_bq_sync` consumiendo el outbox event          ─
+// ── `provider.upserted` emitido en la tx PG.                                  ─
+// ── Estos tests garantizan el contract nuevo: response NO depende de BQ y la  ─
+// ── llamada inline a `syncProviderFromFinanceSupplier` quedó eliminada.       ─
 
-describe('POST /api/finance/suppliers — TASK-771 hotfix BQ-decoupling', () => {
+describe('POST /api/finance/suppliers — TASK-771 BQ-decoupling', () => {
   beforeEach(() => {
     vi.clearAllMocks()
 
@@ -216,50 +218,39 @@ describe('POST /api/finance/suppliers — TASK-771 hotfix BQ-decoupling', () => 
       })
     })
 
-  it('returns 201 when PG commits and BQ sync succeeds', async () => {
-    mockSyncProviderFromFinanceSupplier.mockResolvedValue({ providerId: 'figma', providerName: 'Figma' })
-
+  it('returns 201 with PG-derived providerId without invoking inline BQ sync', async () => {
     const response = await POST(buildRequest())
     const body = await response.json()
 
     expect(response.status).toBe(201)
     expect(body).toMatchObject({ supplierId: 'figma-inc', providerId: 'figma', created: true })
     expect(mockSeedFinanceSupplierInPostgres).toHaveBeenCalledTimes(1)
-    expect(mockSyncProviderFromFinanceSupplier).toHaveBeenCalledTimes(1)
+
+    // TASK-771 Slice 3 — el sync BQ ya NO corre inline. La proyección reactiva
+    // `provider_bq_sync` consume el outbox event provider.upserted async.
+    expect(mockSyncProviderFromFinanceSupplier).not.toHaveBeenCalled()
     expect(mockCaptureWithDomain).not.toHaveBeenCalled()
   })
 
-  it('returns 201 with PG-derived providerId when BQ sync throws (regression test for incident 2026-05-03)', async () => {
-    const bqError = new Error('BigQuery: dataset not found in project efeonce-group')
-
-    mockSyncProviderFromFinanceSupplier.mockRejectedValue(bqError)
+  it('still returns 201 if BQ infrastructure is unreachable (regression for incident 2026-05-03)', async () => {
+    // Aunque mockeáramos sync para throw, la llamada ya no existe en el route.
+    // El failure BQ ahora vive en el reactive consumer, no en el request path.
+    mockSyncProviderFromFinanceSupplier.mockRejectedValue(new Error('BigQuery dataset missing'))
 
     const response = await POST(buildRequest())
     const body = await response.json()
 
-    // PG ya commiteó → endpoint NO debe propagar la falla BQ.
     expect(response.status).toBe(201)
     expect(body).toMatchObject({
       supplierId: 'figma-inc',
-      providerId: 'figma', // derivado del slugify(tradeName) en PG path
+      providerId: 'figma',
       created: true
     })
-    expect(mockSeedFinanceSupplierInPostgres).toHaveBeenCalledTimes(1)
-    expect(mockSyncProviderFromFinanceSupplier).toHaveBeenCalledTimes(1)
-
-    // El failure BQ debe quedar registrado en Sentry con domain=finance.
-    expect(mockCaptureWithDomain).toHaveBeenCalledTimes(1)
-    expect(mockCaptureWithDomain).toHaveBeenCalledWith(
-      bqError,
-      'finance',
-      expect.objectContaining({
-        tags: expect.objectContaining({ source: 'sync_provider_bq_legacy' }),
-        extra: expect.objectContaining({ supplierId: 'figma-inc', providerId: 'figma' })
-      })
-    )
+    expect(mockSyncProviderFromFinanceSupplier).not.toHaveBeenCalled()
+    expect(mockCaptureWithDomain).not.toHaveBeenCalled()
   })
 
-  it('returns 400 when PG seed throws a FinanceValidationError (path no afectado por el hotfix)', async () => {
+  it('returns 400 when PG seed throws a FinanceValidationError', async () => {
     const validationError = new Error('Invalid category: foo.')
 
     validationError.name = 'FinanceValidationError'

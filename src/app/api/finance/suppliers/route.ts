@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server'
 
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
-import { syncProviderFromFinanceSupplier } from '@/lib/providers/canonical'
-import { captureWithDomain } from '@/lib/observability/capture'
 import { assertFinanceBigQueryReadiness, ensureFinanceInfrastructure } from '@/lib/finance/schema'
 import { ensureOrganizationForSupplier } from '@/lib/account-360/organization-identity'
 import { ensureOrganizationContactMembership } from '@/lib/account-360/organization-store'
@@ -351,32 +349,18 @@ export async function POST(request: Request) {
       })
     }
 
-    // TASK-771 Slice 1 — sync BQ no debe bloquear el response: PG ya commiteó.
-    // Slice 2 mueve esta proyección a un consumer reactivo del outbox event
-    // `provider.upserted` (emitido dentro de la tx PG). Acá protegemos al cliente
-    // de cualquier failure BQ (DDL, MERGE, ADC, schema drift) que antes devolvía
-    // 500 aunque el supplier ya estuviera creado en PG (incidente 2026-05-03).
-    let syncResult: Awaited<ReturnType<typeof syncProviderFromFinanceSupplier>> = null
-
-    try {
-      syncResult = await syncProviderFromFinanceSupplier({
-        supplierId,
-        providerId: normalizedProviderId || null,
-        legalName,
-        tradeName: body.tradeName ? normalizeString(body.tradeName) : null,
-        website: body.website ? normalizeString(body.website) : null,
-        isActive: true
-      })
-    } catch (syncError) {
-      captureWithDomain(syncError, 'finance', {
-        tags: { source: 'sync_provider_bq_legacy', stage: 'post_supplier_create' },
-        extra: { supplierId, providerId: normalizedProviderId }
-      })
-    }
-
+    // TASK-771 Slice 3 — Sync a BigQuery (`greenhouse.providers` MERGE +
+    // `greenhouse.fin_suppliers.provider_id` UPDATE) ya NO corre inline.
+    // El outbox event `provider.upserted` se emite dentro de la tx PG en
+    // `upsertProviderFromFinanceSupplierInPostgres` y el consumer reactivo
+    // canónico `provider_bq_sync` (src/lib/sync/projections/provider-bq-sync.ts)
+    // lo proyecta a BQ vía Cloud Scheduler `ops-reactive-finance` cada 5 min.
+    // Eventually consistent, fail-safe (retry+dead-letter), single source of
+    // truth = PG. Slice 1 dejó esto envuelto en try/catch como hotfix; Slice 3
+    // lo elimina por completo.
     return NextResponse.json({
       supplierId,
-      providerId: syncResult?.providerId ?? normalizedProviderId ?? null,
+      providerId: normalizedProviderId || null,
       created: true
     }, { status: 201 })
   } catch (error) {

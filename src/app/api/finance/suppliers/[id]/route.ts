@@ -343,23 +343,9 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
       }
 
 
-      // TASK-771 Slice 1 — sync BQ no debe bloquear el response: PG ya commiteó el UPDATE.
-      try {
-        await syncProviderFromFinanceSupplier({
-          supplierId,
-          providerId: updatedSupplier.providerId,
-          legalName: updatedSupplier.legalName,
-          tradeName: updatedSupplier.tradeName,
-          website: updatedSupplier.website,
-          isActive: updatedSupplier.isActive
-        })
-      } catch (syncError) {
-        captureWithDomain(syncError, 'finance', {
-          tags: { source: 'sync_provider_bq_legacy', stage: 'post_supplier_update_pg' },
-          extra: { supplierId, providerId: updatedSupplier.providerId }
-        })
-      }
-
+      // TASK-771 Slice 3 — Sync a BigQuery se proyecta vía consumer reactivo
+      // `provider_bq_sync` desde el outbox event `provider.upserted` emitido en
+      // la tx PG. Ver src/lib/sync/projections/provider-bq-sync.ts.
       return NextResponse.json({
         supplierId,
         providerId: updatedSupplier.providerId,
