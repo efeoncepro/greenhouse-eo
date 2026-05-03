@@ -2,6 +2,14 @@
 
 ## 2026-05-03
 
+- **TASK-774 entregada** — Account Balance CLP-Native Reader Contract (TASK-766 pattern aplicado a `materializeAccountBalance`). Cierra clase de bugs donde balances de cuentas CLP se rebajan en currency original (USD nativo) en lugar de CLP equivalente. Bug Figma EXP-202604-008 (2026-05-03): TC Santander Corp +$92.9 USD vs +$83,773.5 CLP esperado.
+  - **`materializeAccountBalance` consume VIEWs canónicas TASK-766** (`expense_payments_normalized`, `income_payments_normalized`) + COALESCE inline para `settlement_legs.amount_clp`. Sin schema change. Backwards compat total. 3 fuentes refactorizadas (no 2 — settlement_legs también afectada).
+  - **Lint rule extendida** `greenhouse/no-untokenized-fx-math` modo `error` desde commit-1 con 3 patrones nuevos: `SUM(ep.amount)`, `SUM(ip.amount)`, `SUM(sl.amount)`. Bloquea cualquier futuro callsite que reintroduzca el anti-patrón.
+  - **Reliability signal nuevo** `finance.account_balances.fx_drift` (kind=drift, severity=error si count>0, steady=0, ventana 90 días, tolerancia $1 CLP). Recompute closing_balance esperado desde VIEWs canónicas y compara contra persisted. Detecta cualquier divergencia futura sin requerir bug report manual.
+  - **Backfill script** `scripts/finance/backfill-account-balances-fx-fix.ts` (idempotente, dry-run, anchor OTB canónico TASK-703). Para histórico > 7 días; el cron diario `ops-finance-rematerialize-balances` cubre los últimos 7 automáticamente.
+  - **Defensa en profundidad** triple: lint rule (build-time) + reliability signal (runtime) + override block explícito en `eslint.config.mjs` (solo readers canónicos exentos).
+  - **Patrón canonizado en CLAUDE.md + arch doc + doc funcional**: cualquier futuro materializer (treasury_position, cashflow_summary, account_balances_monthly_v2, etc.) DEBE pasar por las VIEWs canónicas TASK-766. Documentación: `docs/documentation/finance/saldos-de-cuenta-fx-consistencia.md`.
+  - **Verificación staging real**: signal vivo detectando 2 drifts post-deploy (esperado — auto-corrige vía cron diario sin intervención manual).
 - **TASK-775 Slices 1-7 entregados** — Vercel Cron Async-Critical Migration Platform. Cierra la clase entera de bugs "cron Vercel-only que rompe staging" detectada parcialmente por TASK-773. Absorbe TASK-258 + TASK-259.
   - **3 categorías canónicas obligatorias**: `async_critical` (Cloud Scheduler + ops-worker), `prod_only` (Vercel ok), `tooling` (Vercel ok). Spec: `docs/architecture/GREENHOUSE_VERCEL_CRON_CLASSIFICATION_V1.md`. Decision tree obligatorio para cualquier cron nuevo.
   - **Helper canónico `wrapCronHandler`** (`services/ops-worker/cron-handler-wrapper.ts`): centraliza body parse + runId estable + audit log + `captureWithDomain` + `redactErrorForResponse` + 502 sanitizado. Inaugurado en Slice 2, reusado por 14 endpoints nuevos.

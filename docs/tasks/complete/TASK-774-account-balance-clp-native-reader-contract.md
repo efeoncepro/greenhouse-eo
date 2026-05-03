@@ -1,8 +1,24 @@
 # TASK-774 — Account Balance CLP-Native Reader Contract (TASK-766 pattern aplicado a materializeAccountBalance)
 
+## Delta 2026-05-03 — 6 slices entregados
+
+- **Slice 1 (Audit)**: discovery completo via 2 subagentes Explore en paralelo. Bug confirmado en `getDailyMovementSummary` (helper interno de `materializeAccountBalance`) lineas 609-700: sumaba directo `ip.amount`, `ep.amount`, `sl.amount` sin distinguir currency vs `amount_clp`. 3 fuentes afectadas (no 2 como spec original asumia — settlement_legs tambien tiene `amount_clp` opcional).
+- **Slice 2 (Refactor canonico)**: `getDailyMovementSummary` reemplazado para consumir VIEWs canonicas TASK-766 (`expense_payments_normalized`, `income_payments_normalized`) y COALESCE inline para settlement_legs. Sin schema change. Backwards compat total. Verificacion: tsc clean, 831/831 finance+reliability tests passing.
+- **Slice 3 (Lint rule extendida)**: `no-untokenized-fx-math` + 3 patrones nuevos (`SUM(ep.amount)`, `SUM(ip.amount)`, `SUM(sl.amount)`) modo `error` desde commit-1. RuleTester tests cubren 3 valid + 3 invalid casos.
+- **Slice 4 (Reliability signal)**: `finance.account_balances.fx_drift` (kind=drift, steady=0, ventana 90 dias, tolerancia $1 CLP). Reader compara `closing_balance` persistido vs recompute desde VIEWs + COALESCE settlement_legs. 5 tests passing. Wire-up al composer get-reliability-overview.
+- **Slice 5 (Backfill script)**: `scripts/finance/backfill-account-balances-fx-fix.ts` (CLI args, dry-run, idempotente via `rematerializeAccountBalanceRange` con seedMode='active_otb'). Cron diario `ops-finance-rematerialize-balances` cubre auto los ultimos 7 dias.
+- **Slice 6 (Docs + verificación E2E)**: CLAUDE.md sección extendida "Finance — Account balances FX consistency (TASK-774, extiende TASK-766)" con 4 reglas duras nuevas + Delta en arch doc `GREENHOUSE_FINANCE_ARCHITECTURE_V1` + doc funcional `docs/documentation/finance/account-balances-fx-consistency.md` + E2E smoke spec.
+
+**Decisiones arquitectónicas resueltas pre-execution (Open Questions)**:
+
+- **Q1 (¿hay otros account_balances afectados?)** → Resolución: signal dinámico `finance.account_balances.fx_drift` con ventana 90 dias. Steady=0 post-backfill.
+- **Q2 (outbox event `account_balance.refixed`?)** → Resolución: NO crear. Reactive consumer ya escucha `account_balance.materialized` (genérico).
+- **Q3 emergente (settlement_legs VIEW vs COALESCE inline?)** → Resolución: COALESCE inline. 1 callsite, YAGNI.
+
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete` (deployed 2026-05-03)
+- Lifecycle (legacy): `in-progress`
 - Priority: `P0`
 - Impact: `Crítico` (KPIs banco/treasury inflados/deflados por mix moneda)
 - Effort: `Medio (4-6h)`

@@ -2129,3 +2129,57 @@ State machine `nextAction` deriva la siguiente acción operativa sin persistirse
 |---|---|---|
 | `task720.instrumentCategoriesWithoutKpiRule` | accounts vs instrument_category_kpi_rules | 0 |
 | `task721.reconciliationSnapshotsWithBrokenEvidence` | snapshots con FK rota | 0 |
+
+## Delta 2026-05-03 — TASK-774: Account balances FX consistency (extiende TASK-766)
+
+### Bug class cerrada
+
+`materializeAccountBalance` (`src/lib/finance/account-balances.ts`) sumaba directo `payment.amount` (currency original) sin pasar por VIEW canónica TASK-766 que ya resuelve `payment_amount_clp` (FX-resolved). Cuando un payment está en moneda extranjera y la cuenta destino es CLP (caso CCA TASK-714c, payments Deel/Adobe/Figma USD pagados desde TC CLP), el balance se infla/deflaciona porque suma USD nativo en columna CLP. Bug Figma EXP-202604-008 (2026-05-03): balance Santander Corp +$92.9 USD en lugar de +$83,773.5 CLP equivalente.
+
+### Read API canónico (extiende TASK-766)
+
+`getDailyMovementSummary` (helper privado del materializer) consume:
+
+- **`income_payments`** → VIEW `greenhouse_finance.income_payments_normalized` exponiendo `payment_amount_clp` (TASK-766).
+- **`expense_payments`** → VIEW `greenhouse_finance.expense_payments_normalized` exponiendo `payment_amount_clp` (TASK-766).
+- **`settlement_legs`** → COALESCE inline `COALESCE(sl.amount_clp, CASE WHEN sl.currency = 'CLP' THEN sl.amount END)`. Settlement_legs no tiene VIEW propia (1 callsite, YAGNI; promover a VIEW si emerge segundo callsite).
+
+Toda agregación SUM se hace sobre el alias resultante del subselect (`SUM(amount)`), NO sobre `SUM(ep.amount)` / `SUM(ip.amount)` / `SUM(sl.amount)` directo.
+
+### Reliability signal nuevo
+
+`finance.account_balances.fx_drift` (kind=`drift`, severity=`error` si count>0, steady=0):
+
+- Reader: `src/lib/reliability/queries/account-balances-fx-drift.ts`.
+- Recompute expected delta desde VIEWs canónicas + COALESCE settlement_legs y compara contra persisted (`period_inflows - period_outflows`).
+- Tolerancia $1 CLP (anti FP-noise; bug Figma fue $83,680 — un orden de magnitud > threshold).
+- Ventana 90 días.
+- Subsystem rollup: `Finance Data Quality`.
+
+### Lint rule extendida (TASK-774 sobre TASK-766)
+
+`eslint-plugins/greenhouse/rules/no-untokenized-fx-math.mjs` modo `error` desde commit-1. Patrones nuevos:
+
+| Pattern detectado | Fix canónico |
+|---|---|
+| `SUM(ep.amount)` | `SUM(payment_amount_clp)` via `expense_payments_normalized` |
+| `SUM(ip.amount)` | `SUM(payment_amount_clp)` via `income_payments_normalized` |
+| `SUM(sl.amount)` | `SUM(COALESCE(sl.amount_clp, CASE WHEN currency='CLP' THEN amount END))` |
+
+### Backfill defensivo
+
+- Cron diario `ops-finance-rematerialize-balances` (Cloud Scheduler) rematerializa últimos 7 días automáticamente — el fix se propaga sin script para casos recientes.
+- Para histórico > 7 días: `pnpm tsx --require ./scripts/lib/server-only-shim.cjs scripts/finance/backfill-account-balances-fx-fix.ts --account-id=<id> --from-date=<YYYY-MM-DD>` (idempotente, dry-run mode, anchor OTB canónico TASK-703).
+
+### Reglas duras (sumadas a TASK-766)
+
+- **NUNCA** leer `expense_payments` / `income_payments` directo en `account-balances.ts` ni en cualquier materializer downstream. Use VIEWs canónicas TASK-766.
+- **NUNCA** sumar `settlement_legs.amount` sin COALESCE con `amount_clp`. Settlement_legs tiene columna `amount_clp` opcional desde migration `20260408103211338`.
+- **NUNCA** crear materializer nuevo (e.g. `account_balances_monthly`, `treasury_position`, `cashflow_summary`) sin pasar por estas VIEWs. Si emerge necesidad de nueva VIEW (ej. `treasury_movements_normalized`), aplicar el mismo patrón TASK-766 (CTE COALESCE + filtro 3-axis supersede inline + `payment_amount_clp` column).
+- Cuando emerja un nuevo callsite que necesite CLP-equivalent, agregar a la VIEW canónica un campo nuevo (e.g. `payment_amount_clp_excluding_fx_gain`) — NO recompute inline.
+
+### Detectors agregados (TASK-774)
+
+| Detector | Fuente | Steady state |
+|---|---|---|
+| `finance.account_balances.fx_drift` | recompute desde VIEWs vs persisted | 0 |

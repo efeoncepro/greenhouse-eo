@@ -1,5 +1,25 @@
 # Handoff.md
 
+## Sesion 2026-05-03 — TASK-774 cerrada (Account Balance CLP-Native Reader Contract)
+
+- **Lifecycle:** `complete` (movida a `complete/`, README sync, signal vivo en staging real).
+- **Branch:** `develop` (instrucción explícita, mismo flujo TASK-771/772/773/775).
+- **Origen:** bug latente detectado tras cierre TASK-773 (pago Figma EXP-202604-008): balance Santander Corp +$92.9 USD en lugar de +$83,773.5 CLP equivalente. `materializeAccountBalance` sumaba directo `payment.amount` sin pasar por VIEW canónica TASK-766.
+- **6 slices entregados:**
+  - Slice 1: Audit con 2 subagentes Explore en paralelo. Bug confirmado en `getDailyMovementSummary` — 3 fuentes afectadas (no 2): `ip.amount`, `ep.amount`, `sl.amount` directo. Settlement_legs también tiene `amount_clp` opcional desde 20260408103211338.
+  - Slice 2: Refactor canónico — VIEWs `expense_payments_normalized` + `income_payments_normalized` para ep/ip, COALESCE inline para `settlement_legs`. Sin schema change. Backwards compat total. 831/831 finance+reliability tests verde.
+  - Slice 3: Lint rule extendida con 3 patrones nuevos modo `error` desde commit-1. RuleTester 3 valid + 3 invalid casos.
+  - Slice 4: Reliability signal `finance.account_balances.fx_drift` (kind=drift, steady=0, ventana 90 días, tolerancia $1 CLP) + 5 tests + wire-up composer.
+  - Slice 5: Backfill script `scripts/finance/backfill-account-balances-fx-fix.ts` (idempotente, dry-run, anchor OTB TASK-703). Cron diario `ops-finance-rematerialize-balances` cubre auto últimos 7 días.
+  - Slice 6: CLAUDE.md sección "Finance — Account balances FX consistency" (4 reglas duras) + Delta arch doc `GREENHOUSE_FINANCE_ARCHITECTURE_V1` con tabla de patterns + detector + doc funcional `docs/documentation/finance/saldos-de-cuenta-fx-consistencia.md` + E2E smoke spec.
+- **Decisiones pre-execution (Open Questions resueltas):**
+  - Q1 (signal vs hardcode histórico) → signal dinámico steady=0.
+  - Q2 (outbox event `account_balance.refixed`) → NO crear (duplica `account_balance.materialized`).
+  - Q3 emergente (settlement_legs VIEW vs COALESCE inline) → COALESCE inline (1 callsite, YAGNI).
+- **Verificación staging real:** signal vivo detectando 2 drifts post-deploy en `dev-greenhouse.efeoncepro.com`. Comportamiento esperado: cron diario `ops-finance-rematerialize-balances` (3 AM Santiago) los rematerializa en próxima ventana sin requerir backfill manual (Figma 2026-05-03 está en ventana de 7 días).
+- **Verde global:** 3056/3056 tests + reliability 108/108 + lint 0 errors + tsc clean.
+- **Lecciones canonizadas en CLAUDE.md + arch doc + doc funcional:** patrón TASK-766 ahora aplica a TODOS los materializers (no solo cash-out). Cualquier futuro materializer (treasury_position, cashflow_summary, etc.) DEBE pasar por VIEWs canónicas. Lint rule + reliability signal son defensa en profundidad.
+
 ## Sesion 2026-05-03 — TASK-775 Slices 1-7 cerrados (Vercel Cron Async-Critical Migration Platform)
 
 - **Lifecycle:** Slices 1-7 deployed en `develop`, Slice 8 (verificación E2E + cierre) en curso.
