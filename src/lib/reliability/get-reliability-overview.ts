@@ -31,6 +31,7 @@ import { getIncomePaymentsClpDriftSignal } from './queries/income-payments-clp-d
 import { getPaymentOrdersDeadLetterSignal } from './queries/payment-orders-dead-letter'
 import { getPaidOrdersWithoutExpensePaymentSignal } from './queries/payment-orders-paid-without-expense-payment'
 import { getPayrollExpenseMaterializationLagSignal } from './queries/payroll-expense-materialization-lag'
+import { getProviderBqSyncDeadLetterSignal } from './queries/provider-bq-sync-dead-letter'
 import { RELIABILITY_REGISTRY } from './registry'
 import { getReliabilityRegistry } from './registry-store'
 import {
@@ -267,6 +268,16 @@ interface ReliabilityOverviewSources {
    * `POST /api/admin/finance/payments-clp-repair` (slice 5).
    */
   financeClpDrift?: ReliabilitySignal[] | null
+
+  /**
+   * TASK-771 Slice 4 — Provider BQ sync dead-letter signal. Cuenta entries en
+   * outbox_reactive_log para handler `provider_bq_sync:provider.upserted` que
+   * llegaron a dead-letter (la projection canónica que sincroniza
+   * greenhouse_core.providers PG → greenhouse.providers BQ). Steady state
+   * esperado = 0; >0 indica drift PG↔BQ activo (AI Tooling y consumers BQ
+   * verán datos stale hasta resolver). Mismo patrón que paymentOrderSettlement.
+   */
+  providerBqSyncDeadLetter?: ReliabilitySignal[] | null
 }
 
 export const buildReliabilityOverview = (
@@ -302,7 +313,9 @@ export const buildReliabilityOverview = (
     // para mantener buildReliabilityOverview sincrónico.
     ...(sources.paymentOrderSettlement ?? []),
     // TASK-766 Slice 2 — Finance CLP currency drift signals (expense + income).
-    ...(sources.financeClpDrift ?? [])
+    ...(sources.financeClpDrift ?? []),
+    // TASK-771 Slice 4 — Provider BQ sync dead-letter signal (drift PG↔BQ).
+    ...(sources.providerBqSyncDeadLetter ?? [])
   ]
 
   const signalsByModule = new Map<string, ReliabilitySignal[]>()
@@ -473,6 +486,18 @@ export const getReliabilityOverview = async (
           incomePayments: getIncomePaymentsClpDriftSignal
         }).catch(() => null)
 
+  // TASK-771 Slice 4 — Provider BQ sync dead-letter signal (drift PG↔BQ).
+  // Single signal pero envuelto en array para shape consistency con
+  // paymentOrderSettlement / financeClpDrift. Degrada honestamente si la
+  // query falla (severity=unknown) — un solo signal roto NO envenena el
+  // overview entero.
+  const providerBqSyncDeadLetter =
+    preloadedSources.providerBqSyncDeadLetter !== undefined
+      ? preloadedSources.providerBqSyncDeadLetter
+      : await getProviderBqSyncDeadLetterSignal()
+          .then(signal => [signal])
+          .catch(() => null)
+
   return buildReliabilityOverview(operations, {
     billing,
     notionOperational,
@@ -482,7 +507,8 @@ export const getReliabilityOverview = async (
     aiObservations,
     domainIncidents,
     paymentOrderSettlement,
-    financeClpDrift
+    financeClpDrift,
+    providerBqSyncDeadLetter
   })
 }
 
