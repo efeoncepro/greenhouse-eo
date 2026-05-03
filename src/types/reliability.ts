@@ -20,6 +20,7 @@ export type ReliabilityModuleKey =
   | 'delivery'
   | 'home'
   | 'payroll'
+  | 'sync' // TASK-773 — outbox publisher + reactive consumer + projection refreshes
 
 export type ReliabilityModuleDomain =
   | 'platform'
@@ -28,6 +29,7 @@ export type ReliabilityModuleDomain =
   | 'delivery'
   | 'home'
   | 'hr'
+  | 'sync' // TASK-773
 
 export type ReliabilitySignalKind =
   | 'runtime'

@@ -32,6 +32,8 @@ import { getPaymentOrdersDeadLetterSignal } from './queries/payment-orders-dead-
 import { getPaidOrdersWithoutExpensePaymentSignal } from './queries/payment-orders-paid-without-expense-payment'
 import { getPayrollExpenseMaterializationLagSignal } from './queries/payroll-expense-materialization-lag'
 import { getProviderBqSyncDeadLetterSignal } from './queries/provider-bq-sync-dead-letter'
+import { getOutboxUnpublishedLagSignal } from './queries/outbox-unpublished-lag'
+import { getOutboxDeadLetterSignal } from './queries/outbox-dead-letter'
 import { RELIABILITY_REGISTRY } from './registry'
 import { getReliabilityRegistry } from './registry-store'
 import {
@@ -278,6 +280,16 @@ interface ReliabilityOverviewSources {
    * verán datos stale hasta resolver). Mismo patrón que paymentOrderSettlement.
    */
   providerBqSyncDeadLetter?: ReliabilitySignal[] | null
+
+  /**
+   * TASK-773 Slice 4 — Outbox publisher health. 2 readers:
+   *   - sync.outbox.unpublished_lag (events pending/failed > 10 min)
+   *   - sync.outbox.dead_letter (events agotaron retries, requieren humano)
+   * Steady state = 0 ambos. Si > 0, el event bus está roto y NINGUNA projection
+   * corre — toda actualización async finance queda colgada (root cause del
+   * incidente Figma 2026-05-03 cuando Vercel cron no corría en staging).
+   */
+  outboxHealth?: ReliabilitySignal[] | null
 }
 
 export const buildReliabilityOverview = (
@@ -315,7 +327,9 @@ export const buildReliabilityOverview = (
     // TASK-766 Slice 2 — Finance CLP currency drift signals (expense + income).
     ...(sources.financeClpDrift ?? []),
     // TASK-771 Slice 4 — Provider BQ sync dead-letter signal (drift PG↔BQ).
-    ...(sources.providerBqSyncDeadLetter ?? [])
+    ...(sources.providerBqSyncDeadLetter ?? []),
+    // TASK-773 Slice 4 — Outbox publisher health (lag + dead_letter).
+    ...(sources.outboxHealth ?? [])
   ]
 
   const signalsByModule = new Map<string, ReliabilitySignal[]>()
@@ -498,6 +512,19 @@ export const getReliabilityOverview = async (
           .then(signal => [signal])
           .catch(() => null)
 
+  // TASK-773 Slice 4 — Outbox publisher health (lag + dead_letter).
+  // 2 readers en paralelo. Cada uno degrada honestamente si su query falla.
+  // Critical signal: si el publisher está caído, NINGUNA projection corre.
+  const outboxHealth =
+    preloadedSources.outboxHealth !== undefined
+      ? preloadedSources.outboxHealth
+      : await Promise.all([
+          getOutboxUnpublishedLagSignal().catch(() => null),
+          getOutboxDeadLetterSignal().catch(() => null)
+        ])
+          .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
+          .catch(() => null)
+
   return buildReliabilityOverview(operations, {
     billing,
     notionOperational,
@@ -508,7 +535,8 @@ export const getReliabilityOverview = async (
     domainIncidents,
     paymentOrderSettlement,
     financeClpDrift,
-    providerBqSyncDeadLetter
+    providerBqSyncDeadLetter,
+    outboxHealth
   })
 }
 

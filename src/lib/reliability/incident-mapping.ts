@@ -62,6 +62,15 @@ const MODULE_TITLE_HINTS: Record<ReliabilityModuleKey, string[]> = {
     'previred',
     'nomina',
     'liquidacion'
+  ],
+  // TASK-773 — sync infrastructure (outbox publisher + reactive consumer +
+  // projection refresh). Keywords específicos del event bus.
+  sync: [
+    'outbox',
+    'reactive',
+    'projection refresh',
+    'projection_refresh_queue',
+    'event bus'
   ]
 }
 
@@ -80,6 +89,11 @@ const MODULE_PRIORITY: Record<ReliabilityModuleKey, number> = {
   'integrations.teams': 22,
   delivery: 20,
   home: 15,
+  // TASK-773 — sync infraestructure: prioridad media-baja. Si un incident
+  // matchea ambos `outbox` y `finance`, finance gana (el outbox es el medium,
+  // el finance es el dueño del side effect operacional). Sync solo gana
+  // cuando el incident es puramente del event bus.
+  sync: 10,
   cloud: 1
 }
 
