@@ -312,6 +312,16 @@ const resolveKnownEconomicCategory = (
     })
   }
 
+  if (category === 'other' && FINANCIAL_PROVIDER_PATTERN.test(searchableText)) {
+    return buildDraft({
+      expense,
+      lane: 'shared_financial_cost',
+      matchedRule: 'OTHER_FINANCIAL_TEXT_MATCH',
+      evidence: { financial_text_matched: true },
+      riskFlags: ['economic_category_other_financial_text']
+    })
+  }
+
   return buildDraft({
     expense,
     lane: 'unallocated',

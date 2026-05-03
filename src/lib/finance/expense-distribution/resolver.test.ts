@@ -128,4 +128,18 @@ describe('resolveExpenseDistribution', () => {
     expect(result.resolutionStatus).toBe('manual_required')
     expect(result.riskFlags).toContain('missing_or_unknown_economic_category')
   })
+
+  it('keeps factoring rows with weak economic_category out of operational overhead', () => {
+    const result = resolveExpenseDistribution(
+      baseExpense({
+        economicCategory: 'other',
+        supplierName: 'Xepelin',
+        description: 'Interés factoring Nº test-e2e-2 — Xepelin'
+      })
+    )
+
+    expect(result.distributionLane).toBe('shared_financial_cost')
+    expect(result.evidence.matched_rule).toBe('OTHER_FINANCIAL_TEXT_MATCH')
+    expect(result.riskFlags).toContain('economic_category_other_financial_text')
+  })
 })

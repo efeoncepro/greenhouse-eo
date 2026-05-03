@@ -11,10 +11,21 @@ export const EXPENSE_DISTRIBUTION_SHARED_POOL_CONTAMINATION_SIGNAL_ID =
   'finance.expense_distribution.shared_pool_contamination'
 
 const UNRESOLVED_SQL = `
+  WITH period_window AS (
+    SELECT
+      EXTRACT(YEAR FROM d)::int AS period_year,
+      EXTRACT(MONTH FROM d)::int AS period_month
+    FROM (
+      VALUES (DATE_TRUNC('month', NOW())::date),
+             ((DATE_TRUNC('month', NOW()) - INTERVAL '1 month')::date)
+    ) AS v(d)
+  )
   SELECT COUNT(*)::int AS n
   FROM greenhouse_finance.expenses e
+  JOIN period_window pw
+    ON pw.period_year = COALESCE(e.period_year, EXTRACT(YEAR FROM COALESCE(e.payment_date, e.document_date, e.receipt_date))::int)
+   AND pw.period_month = COALESCE(e.period_month, EXTRACT(MONTH FROM COALESCE(e.payment_date, e.document_date, e.receipt_date))::int)
   WHERE COALESCE(e.is_annulled, FALSE) = FALSE
-    AND e.created_at > NOW() - INTERVAL '120 days'
     AND NOT EXISTS (
       SELECT 1
       FROM greenhouse_finance.expense_distribution_resolution edr
@@ -27,13 +38,11 @@ const UNRESOLVED_SQL = `
 
 const SHARED_POOL_CONTAMINATION_SQL = `
   SELECT COUNT(*)::int AS n
-  FROM greenhouse_finance.expenses e
-  WHERE COALESCE(e.is_annulled, FALSE) = FALSE
-    AND e.created_at > NOW() - INTERVAL '120 days'
-    AND e.allocated_client_id IS NULL
-    AND COALESCE(e.cost_is_direct, FALSE) = FALSE
-    AND COALESCE(e.cost_category, 'operational') IN ('operational', 'infrastructure', 'tax_social', 'overhead')
-    AND COALESCE(e.economic_category, 'other') IN (
+  FROM greenhouse_finance.expense_distribution_resolution edr
+  WHERE edr.superseded_at IS NULL
+    AND edr.resolution_status = 'resolved'
+    AND edr.distribution_lane = 'shared_operational_overhead'
+    AND COALESCE(edr.economic_category, 'other') IN (
       'labor_cost_external',
       'regulatory_payment',
       'tax',

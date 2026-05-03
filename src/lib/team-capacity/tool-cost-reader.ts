@@ -131,6 +131,11 @@ export const readMemberDirectToolCosts = async (
         WHERE direct_overhead_member_id = $1
           AND direct_overhead_scope = 'member_direct'
           AND direct_overhead_kind NOT IN ('tool_license', 'tool_usage')
+          AND COALESCE(economic_category, 'other') IN (
+            'vendor_cost_saas',
+            'vendor_cost_professional_services',
+            'overhead'
+          )
           AND COALESCE(document_date, payment_date) >= $2::date
           AND COALESCE(document_date, payment_date) <= $3::date
       `,
