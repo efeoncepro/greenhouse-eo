@@ -3558,6 +3558,36 @@ export interface GreenhouseFinanceCostAllocations {
   updated_at: Generated<Timestamp | null>;
 }
 
+export interface GreenhouseFinanceEconomicCategoryManualQueue {
+  candidate_category: string | null;
+  candidate_confidence: string | null;
+  candidate_evidence: Generated<Json | null>;
+  candidate_rule: string | null;
+  created_at: Generated<Timestamp>;
+  queue_id: string;
+  resolution_note: string | null;
+  resolved_at: Timestamp | null;
+  resolved_by: string | null;
+  status: Generated<string>;
+  target_id: string;
+  target_kind: string;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseFinanceEconomicCategoryResolutionLog {
+  batch_id: string | null;
+  confidence: string;
+  created_at: Generated<Timestamp>;
+  evidence_json: Generated<Json>;
+  log_id: string;
+  matched_rule: string;
+  resolved_at: Generated<Timestamp>;
+  resolved_by: string;
+  resolved_category: string;
+  target_id: string;
+  target_kind: string;
+}
+
 export interface GreenhouseFinanceEconomicIndicators {
   created_at: Generated<Timestamp>;
   frequency: string | null;
@@ -7883,6 +7913,8 @@ export interface DB {
   "greenhouse_finance.client_economics": GreenhouseFinanceClientEconomics;
   "greenhouse_finance.client_profiles": GreenhouseFinanceClientProfiles;
   "greenhouse_finance.cost_allocations": GreenhouseFinanceCostAllocations;
+  "greenhouse_finance.economic_category_manual_queue": GreenhouseFinanceEconomicCategoryManualQueue;
+  "greenhouse_finance.economic_category_resolution_log": GreenhouseFinanceEconomicCategoryResolutionLog;
   "greenhouse_finance.economic_indicators": GreenhouseFinanceEconomicIndicators;
   "greenhouse_finance.exchange_rates": GreenhouseFinanceExchangeRates;
   "greenhouse_finance.expense_attribution_audit": GreenhouseFinanceExpenseAttributionAudit;

@@ -20,6 +20,17 @@ const CHILEAN_RUT_REGEX = /\b\d{1,2}\.\d{3}\.\d{3}-[0-9kK]\b/g
  * bank statement: "Transf.Internet a 27.836.817-3").
  *
  * Retorna array vacío si no encuentra. Normaliza a uppercase (DV K → K).
+ *
+ * IMPORTANTE: RUT es identificador chileno. Colaboradores y proveedores
+ * NO chilenos (Daniela España, Andrés Colombia, Melkin Nicaragua, vendors
+ * SaaS internacionales) NO tendrán match aquí. Esos casos se resuelven via:
+ *   - Rule 4 (lookupMemberByDisplayName) si están registrados en members
+ *     con employment_type='international' o 'contractor' o 'deel_managed'.
+ *   - Rule 5 (lookupKnownPayrollVendor regex) cuando el pago va via Deel,
+ *     Remote, Velocity Global, Global66, etc.
+ *   - Rule 9 (ambiguous fallback → manual queue) si nada matchea.
+ *
+ * Esto NO es bug — es feature. La taxonomía de identidad es local-aware.
  */
 export const extractRutsFromText = (text: string | null | undefined): string[] => {
   if (!text) return []
