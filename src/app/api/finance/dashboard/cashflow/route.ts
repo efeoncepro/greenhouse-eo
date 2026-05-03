@@ -29,11 +29,17 @@ async function getPostgresCashflow(monthKeys: string[]) {
     runGreenhousePostgresQuery<{ invoice_date: string | null; total_amount_clp: string | number }>(
       `SELECT invoice_date::text, total_amount_clp FROM greenhouse_finance.income`
     ),
-    runGreenhousePostgresQuery<{ payment_date: string | null; amount: string | number; currency: string; exchange_rate_to_clp: string | number | null }>(
-      `SELECT ip.payment_date::text, ip.amount, ip.currency,
-              COALESCE(i.exchange_rate_to_clp, 1) AS exchange_rate_to_clp
-       FROM greenhouse_finance.income_payments ip
-       JOIN greenhouse_finance.income i ON i.income_id = ip.income_id`
+    // TASK-766 Slice 4b — canonical CLP reader.
+    // Antes: SELECT ip.amount + JOIN income.exchange_rate_to_clp → multiplicación TS-level
+    // (toNumber(r.amount) * rate) que infla cuando ip.currency ≠ income.currency
+    // (caso CCA TASK-714c: $1.1M CLP × rate USD = $1B fantasma).
+    // Ahora: SELECT payment_amount_clp directo desde la VIEW canónica
+    // (income_payments_normalized) que aplica el COALESCE canónico
+    // (amount_clp persistido > CLP-trivial > NULL+drift_flag) y filtra
+    // 3-axis supersede automáticamente. Cero math casero TS-side.
+    runGreenhousePostgresQuery<{ payment_date: string | null; payment_amount_clp: string | number | null }>(
+      `SELECT payment_date::text, payment_amount_clp
+       FROM greenhouse_finance.income_payments_normalized`
     ),
     runGreenhousePostgresQuery<{ doc_date: string | null; total_amount_clp: string | number }>(
       `SELECT COALESCE(document_date, payment_date)::text AS doc_date, total_amount_clp
@@ -55,12 +61,15 @@ async function getPostgresCashflow(monthKeys: string[]) {
 
   const cashIncomeSeries = aggregateMonthlyEntries(
     pgPayments
-      .map(r => {
-        const rate = toNumber(r.exchange_rate_to_clp) || 1
-        const amountClp = r.currency === 'CLP' ? roundCurrency(toNumber(r.amount)) : roundCurrency(toNumber(r.amount) * rate)
-
-        return { period: getMonthKey(r.payment_date?.slice(0, 10) ?? null), amountClp }
-      })
+      // TASK-766 — payment_amount_clp ya viene en CLP canónico desde la VIEW;
+      // NULL = drift (non-CLP sin amount_clp persistido) → se excluye del SUM
+      // (mismo criterio que sumIncomePaymentsClpForPeriod). El reliability
+      // signal income_payments_clp_drift cuenta esos casos.
+      .filter(r => r.payment_amount_clp !== null)
+      .map(r => ({
+        period: getMonthKey(r.payment_date?.slice(0, 10) ?? null),
+        amountClp: roundCurrency(toNumber(r.payment_amount_clp))
+      }))
       .filter((e): e is { period: string; amountClp: number } => Boolean(e.period)),
     monthKeys
   )

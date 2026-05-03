@@ -82,6 +82,12 @@ export async function GET() {
     ),
 
     // Query 4 — 12-month cash flow series (real cash, not accrual)
+    // TASK-766 — canonical CLP reader. Reemplaza el anti-patron
+    // `SUM(ip.amount * COALESCE(i.exchange_rate_to_clp, 1))` y
+    // `SUM(ep.amount * COALESCE(e.exchange_rate_to_clp, 1))` por SELECT
+    // directo a las VIEWs canonicas income_payments_normalized y
+    // expense_payments_normalized, que exponen `payment_amount_clp` resuelto
+    // via COALESCE canonica + filtran 3-axis supersede automaticamente.
     runGreenhousePostgresQuery<CashFlowRow>(
       `WITH months AS (
          SELECT generate_series(
@@ -92,20 +98,18 @@ export async function GET() {
        ),
        cash_in AS (
          SELECT
-           date_trunc('month', ip.payment_date)::date AS month_start,
-           COALESCE(SUM(ip.amount * COALESCE(i.exchange_rate_to_clp, 1)), 0) AS total_clp
-         FROM greenhouse_finance.income_payments ip
-         INNER JOIN greenhouse_finance.income i ON i.income_id = ip.income_id
-         WHERE ip.payment_date >= date_trunc('month', CURRENT_DATE - INTERVAL '11 months')
+           date_trunc('month', ipn.payment_date)::date AS month_start,
+           COALESCE(SUM(ipn.payment_amount_clp), 0) AS total_clp
+         FROM greenhouse_finance.income_payments_normalized ipn
+         WHERE ipn.payment_date >= date_trunc('month', CURRENT_DATE - INTERVAL '11 months')
          GROUP BY 1
        ),
        cash_out AS (
          SELECT
-           date_trunc('month', ep.payment_date)::date AS month_start,
-           COALESCE(SUM(ep.amount * COALESCE(e.exchange_rate_to_clp, 1)), 0) AS total_clp
-         FROM greenhouse_finance.expense_payments ep
-         INNER JOIN greenhouse_finance.expenses e ON e.expense_id = ep.expense_id
-         WHERE ep.payment_date >= date_trunc('month', CURRENT_DATE - INTERVAL '11 months')
+           date_trunc('month', epn.payment_date)::date AS month_start,
+           COALESCE(SUM(epn.payment_amount_clp), 0) AS total_clp
+         FROM greenhouse_finance.expense_payments_normalized epn
+         WHERE epn.payment_date >= date_trunc('month', CURRENT_DATE - INTERVAL '11 months')
          GROUP BY 1
        )
        SELECT

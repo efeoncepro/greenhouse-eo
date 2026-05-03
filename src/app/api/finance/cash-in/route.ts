@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 
+import { sumIncomePaymentsClpForPeriod } from '@/lib/finance/income-payments-reader'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import {
@@ -47,7 +48,17 @@ export async function GET(request: Request) {
     const offset = (page - 1) * pageSize
 
     // --- Build dynamic WHERE clause ------------------------------------------
-    const conditions: string[] = []
+    // TASK-766: detail/count queries siguen leyendo de income_payments raw (la
+    // VIEW expone solo subset de columnas + JOIN; estos queries necesitan campos
+    // del income/client_profile/account). Pero filtramos 3-axis supersede
+    // explicitamente para que data list + count + summary tengan paridad
+    // (la VIEW lo filtra automaticamente; aqui replicamos la condicion).
+    const conditions: string[] = [
+      'ip.superseded_by_payment_id IS NULL',
+      'ip.superseded_by_otb_id IS NULL',
+      'ip.superseded_at IS NULL'
+    ]
+
     const params: unknown[] = []
     let paramIndex = 0
 
@@ -75,7 +86,7 @@ export async function GET(request: Request) {
       params.push(isReconciledParam === 'true')
     }
 
-    const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : ''
+    const whereClause = `WHERE ${conditions.join(' AND ')}`
 
     // --- Data query -----------------------------------------------------------
     const limitParam = paramIndex + 1
@@ -120,26 +131,94 @@ export async function GET(request: Request) {
       ${whereClause}
     `
 
-    // --- Summary KPI query ----------------------------------------------------
-    const summaryQuery = `
-      SELECT
-        COALESCE(SUM(ip.amount * COALESCE(i.exchange_rate_to_clp, 1)), 0) AS total_collected_clp,
-        COUNT(*) AS total_payments,
-        COUNT(*) FILTER (WHERE NOT ip.is_reconciled) AS unreconciled_count
-      FROM greenhouse_finance.income_payments ip
-      INNER JOIN greenhouse_finance.income i ON i.income_id = ip.income_id
-      ${whereClause}
-    `
+    // --- Summary KPIs (TASK-766 — canonical CLP reader) ----------------------
+    // Reemplaza el anti-patron `SUM(ip.amount * COALESCE(i.exchange_rate_to_clp, 1))`.
+    //
+    // Caso comun (sin clientId): delega al helper canonico
+    //   `sumIncomePaymentsClpForPeriod` que lee de VIEW income_payments_normalized.
+    // Caso con clientId: SELECT directo a la VIEW con INNER JOIN a income
+    //   (helper no expone filtro por client_id), preservando payment_amount_clp
+    //   canonico + 3-axis supersede automatico de la VIEW.
+    //
+    // En ambos paths la fuente de verdad es VIEW income_payments_normalized
+    // con `payment_amount_clp` resuelto via COALESCE canonica. Ver
+    // src/lib/finance/income-payments-reader.ts para reglas duras.
+    const summaryPromise = clientId
+      ? (async () => {
+          const summaryConditions: string[] = []
+          const summaryParams: unknown[] = []
+          let idx = 0
 
-    // --- Execute all three queries in parallel --------------------------------
-    const [dataRows, countRows, summaryRows] = await Promise.all([
+          if (fromDate) {
+            idx++
+            summaryConditions.push(`ipn.payment_date >= $${idx}`)
+            summaryParams.push(fromDate)
+          }
+
+          if (toDate) {
+            idx++
+            summaryConditions.push(`ipn.payment_date <= $${idx}`)
+            summaryParams.push(toDate)
+          }
+
+          idx++
+          summaryConditions.push(`i.client_id = $${idx}`)
+          summaryParams.push(clientId)
+
+          if (isReconciledParam === 'true' || isReconciledParam === 'false') {
+            idx++
+            summaryConditions.push(`ipn.is_reconciled = $${idx}`)
+            summaryParams.push(isReconciledParam === 'true')
+          }
+
+          const summaryWhere = summaryConditions.length > 0 ? `WHERE ${summaryConditions.join(' AND ')}` : ''
+
+          const summaryRows = await runGreenhousePostgresQuery<{
+            total_collected_clp: string | number | null
+            total_payments: string | number | null
+            unreconciled_count: string | number | null
+            drift_count: string | number | null
+          }>(
+            `
+            SELECT
+              COALESCE(SUM(ipn.payment_amount_clp), 0) AS total_collected_clp,
+              COUNT(*) AS total_payments,
+              COUNT(*) FILTER (WHERE NOT ipn.is_reconciled) AS unreconciled_count,
+              COUNT(*) FILTER (WHERE ipn.has_clp_drift) AS drift_count
+            FROM greenhouse_finance.income_payments_normalized ipn
+            INNER JOIN greenhouse_finance.income i ON i.income_id = ipn.income_id
+            ${summaryWhere}
+            `,
+            summaryParams
+          )
+
+          const row = summaryRows[0] ?? {}
+
+          return {
+            totalClp: roundCurrency(toNumber(row.total_collected_clp)),
+            totalPayments: toNumber(row.total_payments),
+            unreconciledCount: toNumber(row.unreconciled_count),
+            driftCount: toNumber(row.drift_count)
+          }
+        })()
+      : sumIncomePaymentsClpForPeriod({
+          fromDate: fromDate ?? '0001-01-01',
+          toDate: toDate ?? '9999-12-31',
+          isReconciled:
+            isReconciledParam === 'true'
+              ? true
+              : isReconciledParam === 'false'
+                ? false
+                : undefined
+        })
+
+    const [dataRows, countRows, summary] = await Promise.all([
       runGreenhousePostgresQuery<Record<string, unknown>>(dataQuery, [...params, pageSize, offset]),
       runGreenhousePostgresQuery<Record<string, unknown>>(countQuery, params),
-      runGreenhousePostgresQuery<Record<string, unknown>>(summaryQuery, params)
+      summaryPromise
     ])
 
     const total = toNumber(countRows[0]?.total ?? 0)
-    const summaryRow = summaryRows[0] ?? {}
 
     // --- Normalize rows to camelCase ------------------------------------------
     const items = dataRows.map(row => ({
@@ -171,9 +250,13 @@ export async function GET(request: Request) {
       page,
       pageSize,
       summary: {
-        totalCollectedClp: roundCurrency(toNumber(summaryRow.total_collected_clp)),
-        totalPayments: toNumber(summaryRow.total_payments),
-        unreconciledCount: toNumber(summaryRow.unreconciled_count)
+        totalCollectedClp: summary.totalClp,
+        totalPayments: summary.totalPayments,
+        unreconciledCount: summary.unreconciledCount,
+        // TASK-766 — drift count expuesto al UI para que un valor > 0 sea
+        // visible (preludio del banner reliability + reparable via
+        // POST /api/admin/finance/payments-clp-repair).
+        driftCount: summary.driftCount
       }
     })
   } catch (error) {

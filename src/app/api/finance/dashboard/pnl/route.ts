@@ -37,6 +37,15 @@ export async function GET(request: Request) {
   // Run all six queries in parallel
   const [incomeRows, collectedRows, expenseRows, payrollRows, linkedPayrollRows, rateRows] = await Promise.all([
     // Income for the period (accrual: by invoice_date)
+    // TODO(TASK-766 follow-up): partner_share_amount es atributo del income document,
+    // no del payment — fuera del alcance de TASK-766 (que cubre payments). Cuando
+    // un income es non-CLP con partner_share_amount, el calculo
+    // `partner_share_amount * COALESCE(exchange_rate_to_clp, 1)` puede inflar/perder
+    // dependiendo de si el rate del documento sigue valido. La fix definitiva es
+    // persistir `partner_share_amount_clp` en greenhouse_finance.income (mismo
+    // patron que `total_amount_clp` ya persistido). Hoy Efeonce factura 100% CLP
+    // por lo que el bug es latente. Cualquier multimoneda futura debe abrir
+    // task derivada antes de ser desplegada.
     runGreenhousePostgresQuery<PnlRow>(
       `SELECT
          COALESCE(SUM(COALESCE(effective_cost_amount_clp, total_amount_clp)), 0) AS total_clp,
@@ -51,14 +60,17 @@ export async function GET(request: Request) {
     ),
 
     // Collected revenue in the period (cash: by payment_date in income_payments)
+    // TASK-766 — canonical CLP reader. Reemplaza el anti-patron
+    // `SUM(ROUND(ip.amount * COALESCE(i.exchange_rate_to_clp, 1), 2))` por
+    // SELECT directo a la VIEW income_payments_normalized que expone
+    // `payment_amount_clp` canonico (COALESCE chain) y filtra 3-axis supersede.
     runGreenhousePostgresQuery<PnlRow>(
       `SELECT
-         COALESCE(SUM(ROUND(ip.amount * COALESCE(i.exchange_rate_to_clp, 1), 2)), 0) AS collected_clp,
+         COALESCE(SUM(ipn.payment_amount_clp), 0) AS collected_clp,
          COUNT(*) AS payment_count
-       FROM greenhouse_finance.income_payments ip
-       INNER JOIN greenhouse_finance.income i ON i.income_id = ip.income_id
-       WHERE ip.payment_date >= $1::date AND ip.payment_date <= $2::date
-         AND ip.amount > 0`,
+       FROM greenhouse_finance.income_payments_normalized ipn
+       WHERE ipn.payment_date >= $1::date AND ipn.payment_date <= $2::date
+         AND ipn.payment_amount_native > 0`,
       [periodStart, periodEnd]
     ),
 
