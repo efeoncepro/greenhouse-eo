@@ -8,13 +8,13 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P0`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `—`
-- Status real: `Implementación`
+- Status real: `Cerrada 2026-05-03 — 5 slices entregados, 3029 tests verde, build limpio, lint 0 errors`
 - Rank: `TBD`
 - Domain: `finance`
 - Blocked by: `none` (TASK-771 cerrada 2026-05-03, scope desbloqueado)
