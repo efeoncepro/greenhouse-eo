@@ -1,9 +1,16 @@
 # Categoría económica de pagos
 
 > **Tipo de documento:** Documentación funcional (lenguaje simple)
-> **Versión:** 1.0
+> **Versión:** 1.1
 > **Creado:** 2026-05-03 por TASK-768
-> **Documentación técnica:** [`GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`](../../architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md) Delta 2026-05-03
+> **Última actualización:** 2026-05-03 por TASK-768 (capacidades expandidas — modelo dimensional, clasificador automático, diccionario extensible, defensa-en-profundidad, downstream unblocking)
+> **Documentación técnica:** [`GREENHOUSE_FINANCE_ECONOMIC_CATEGORY_DIMENSION_V1.md`](../../architecture/GREENHOUSE_FINANCE_ECONOMIC_CATEGORY_DIMENSION_V1.md) (spec canónica V1 dedicada)
+
+## Qué es esto en simple
+
+TASK-768 NO fue solo arreglar un número en un dashboard. Fue **agregarle al portal una capacidad nueva**: la habilidad de leer cada pago de Greenhouse desde **dos perspectivas independientes** al mismo tiempo, sin que se contaminen entre sí.
+
+Eso suena abstracto, pero tiene impacto concreto en 8 dimensiones operativas (ver sección final). Lo más visible (KPI Nómina correcto) es solo la punta del iceberg.
 
 ## Para qué sirve
 
@@ -133,6 +140,97 @@ Greenhouse mantiene dos tablas de "diccionarios" para que el resolver auto-clasi
 - KPI Proveedores baja en proporción.
 - ICO, costos por persona, presupuestos, allocations a clientes — todos quedan correctos automáticamente porque leen `economic_category` post-Slice 8.
 - Botón "Reclasificar" disponible en `/finance/expenses` para corregir mis-clasificaciones (UI dialog futura; mientras tanto, vía endpoint admin).
+
+## Las 8 capacidades nuevas que TASK-768 le dio a Greenhouse
+
+No fue un fix puntual. Fue infraestructura permanente. Cada una de estas capacidades es independiente y se puede aprovechar por separado:
+
+### 1. Modelo dimensional separado fiscal vs analítico
+
+Cada pago vive en **dos lentes independientes** simultáneamente:
+- **Fiscal** (`expense_type`): para SII, IVA, contadora, F29.
+- **Analítico** (`economic_category`): para KPIs, ICO, P&L gerencial, dashboards.
+
+Antes había una sola columna mezclando ambas semánticas. Ahora son ortogonales.
+
+### 2. Clasificador automático con 10 reglas
+
+El portal aprendió a clasificar pagos solo. Cada nuevo pago pasa por:
+
+- **Trigger PG** (default seguro): mapeo simple de `expense_type` → `economic_category`. Cubre ~80% de los casos sin tocar 12 writers existentes.
+- **Resolver canónico** (cuando se invoca explícitamente): 10 reglas first-match-wins (member_id explícito → RUT lookup → email → name fuzzy → vendor regex → regulator regex → supplier partner → accounting_type transparent map → ambiguous fallback → manual_required).
+
+Cada decisión queda **registrada con evidencia auditable**. Si confidence baja → manual queue para resolver humano.
+
+### 3. Diccionario extensible (lookup tables)
+
+Dos tablas seedeadas que son la inteligencia del clasificador:
+
+- **`known_regulators`** — 17 entidades chilenas: Previred, SII, AFPs, Mutual CChC, Isapres, FONASA, TGR, Dirección del Trabajo.
+- **`known_payroll_vendors`** — 8 procesadores internacionales: Deel, Remote, Velocity Global, Oyster, Globalization Partners, Papaya Global, Multiplier, Rippling Global.
+
+**Cuando emerge un nuevo proveedor:** INSERT row → clasificador empieza a reconocerlo automáticamente. Cero código nuevo. Ver manual de uso para flow exacto.
+
+### 4. Programas downstream desbloqueados
+
+TASK-768 era **prerequisite literal** para 4 programas grandes que estaban esperando:
+
+| Programa | Qué hace | Por qué necesitaba TASK-768 |
+|---|---|---|
+| **TASK-178 Budget Engine** | Comparar presupuesto vs real | Variance analysis apples-to-apples |
+| **TASK-710-713 Member Loaded Cost** | Costo cargado por colaborador (Provider × Tool × Member × Client × Period × Expense) | Distinguir labor cost interno/externo de tool cost de overhead |
+| **TASK-080+ ICO Engine** | Cost-per-FTE, métricas operativas | El denominador "costo Nómina" estaba sub-counted |
+| **TASK-705/706 Cost Attribution** | Asignar costos a clientes para margen real | Allocations con dimensión correcta |
+
+**Sin TASK-768 ninguno podía iniciar.** Ahora pueden.
+
+### 5. Defensa-en-profundidad de 5 capas
+
+Anti-regresión arquitectónica:
+
+| Capa | Qué evita |
+|---|---|
+| Trigger PG `populate_default` | Que un nuevo pago entre con la columna vacía |
+| CHECK `canonical_values` (VALIDATED) | Que alguien escriba un valor inventado o legacy |
+| CHECK `required_after_cutover` (NOT VALID hasta cleanup) | Que post-cutover quede una fila INSERTed sin clasificar |
+| Lint rule mode `error` | Que un dev nuevo escriba `WHERE expense_type='supplier'` para análisis y reintroduzca el bug |
+| Reliability signals (steady=0) | Que si algo bypassea las capas anteriores, AI Observer alerte antes que el operador note |
+
+### 6. Herramientas operativas para Finance
+
+Ahora hay:
+- **Endpoints admin** para reclassify single + bulk con audit log + outbox event.
+- **Capability granular least-privilege** — delegable a roles específicos sin dar acceso a todo Finance.
+- **Manual queue** visible con candidatos pendientes (auto-priorizados por confidence baja).
+- **Audit log append-only** con trail de quién reclasificó qué y por qué (reason mínimo 10 chars obligatorio).
+- **Backfill script** reusable para futuros remediation runs (idempotente, --dry-run, --batch-size).
+
+### 7. Bug de toolchain documentado para todo el repo
+
+Durante Slice 1 se descubrió que `node-pg-migrate` puede silently registrar una migration como aplicada SIN ejecutar el SQL si falta el marker `-- Up Migration` exacto. **Bug latente que podría afectar cualquier task del repo.** Documentado en CLAUDE.md sección "Database — Migration markers" con reglas duras (verificar siempre el DDL post-migrate-up, etc).
+
+Esto **protege todo el repo a futuro**, no solo Finance.
+
+### 8. Incidente cerrado con trail forense
+
+**ISSUE-065** documentado en `docs/issues/resolved/`:
+- Síntoma exacto + pagos afectados verificados (Daniela España, Andrés Colombia, Valentina, Humberly, Previred, FX fees Global66).
+- Causa raíz: dimension conflate.
+- Solución: TASK-768 9 slices.
+- Lecciones operativas (incluye el bug `-- Up Migration` marker).
+
+Trail permanente para auditoría futura y onboarding de equipo.
+
+---
+
+## Cómo medir el valor de TASK-768
+
+| Eje | Hoy | Próximas semanas | Próximos meses | Permanente |
+|---|---|---|---|---|
+| **Visible** | KPI Nómina correcto en cash-out (~$4M vs $1M sub-counted) | TASK-178 + TASK-710 pueden iniciar | Cada nuevo dashboard parte con dimensión correcta + lint rule lo enforcea | Modelo dimensional rico → análisis antes imposibles (cost-per-FTE limpio, allocations correctas, presupuesto vs real apples-to-apples) |
+| **Operativo** | Endpoint reclassify disponible | Manual queue cleanup operador | UI dialog dedicada (follow-up TASK derivada) | Diccionario extensible vivo (agregar entidad nueva = 1 INSERT) |
+| **Arquitectónico** | 5 capas de defensa activas | TASK-178 Budget arranca | TASK-710-713 Member Loaded Cost arranca | Resolver canónico reusable para futuras dimensiones similares |
+| **Forense** | ISSUE-065 documentado y resuelto | — | — | Audit log inmutable de toda reclassify (queries SQL forensics permanentes) |
 
 > **Detalle técnico:**
 >

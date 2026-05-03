@@ -127,11 +127,133 @@ Backfill inicial detectó muchas filas low-confidence (típicamente Nubox import
 
 Verifica que el endpoint que muestra el KPI ya consume `byEconomicCategory` (TASK-768 Slice 8). Si está leyendo el shape legacy `payrollClp/supplierClp/fiscalClp` (que mapea desde economic_category con un cast), espera el próximo build/deploy. El backend ya está consistente.
 
+## Otros flows operativos disponibles
+
+Además de reclasificar pagos individuales, TASK-768 entregó 4 flows operativos adicionales que el equipo Finance puede usar:
+
+### Agregar un regulador chileno nuevo al diccionario
+
+Cuando emerja una entidad regulatoria nueva (ISL, Suseso, una nueva Isapre/AFP) que el clasificador NO reconoce automáticamente:
+
+```sql
+INSERT INTO greenhouse_finance.known_regulators
+  (regulator_id, display_name, match_regex, jurisdiction)
+VALUES
+  ('reg-cl-isl', 'Instituto de Seguridad Laboral', E'(?i)\\misl\\M|instituto\\s+seguridad\\s+laboral', 'CL');
+```
+
+Reglas duras del regex:
+- Usar `E'...'` (escape strings) para que `\\m` y `\\M` se interpreten como POSIX word boundaries.
+- Usar `(?i)` flag para case-insensitive.
+- Match contra `description` raw + `beneficiary_name`.
+- Probar antes contra una transacción real:
+  ```sql
+  SELECT 'PAGO EN LINEA ISL' ~* '(?i)\\misl\\M|instituto\\s+seguridad\\s+laboral';
+  -- expected: t (true)
+  ```
+
+Una vez insertado, el resolver lo reconoce automáticamente desde la próxima ejecución (sin reinicio del portal).
+
+### Agregar un payroll vendor internacional nuevo
+
+Cuando aparezca un vendor de payroll global nuevo (ej. Atlas, Justworks, Boundless):
+
+```sql
+INSERT INTO greenhouse_finance.known_payroll_vendors
+  (vendor_id, display_name, match_regex, vendor_type)
+VALUES
+  ('vendor-atlas', 'Atlas HXM', E'(?i)\\matlas\\M\\s+(hxm|payroll)', 'international_payroll_processor');
+```
+
+Mismas reglas de regex que reguladores.
+
+### Correr el backfill manualmente (remediation)
+
+Si emerge una situación donde varias filas necesitan re-clasificarse (ej. nuevo regulador agregado al diccionario y queremos retro-clasificar histórico):
+
+```bash
+# Dry-run primero — NO escribe nada
+pnpm tsx --require ./scripts/lib/server-only-shim.cjs \
+  scripts/finance/backfill-economic-category.ts \
+  --dry-run --limit=50
+
+# Confirmar resultado, luego correr real
+pnpm tsx --require ./scripts/lib/server-only-shim.cjs \
+  scripts/finance/backfill-economic-category.ts \
+  --batch-size=200
+
+# Limitar a solo expenses o solo income
+pnpm tsx ... --kind=expense --limit=500
+```
+
+El script es idempotente: solo procesa filas con `economic_category IS NULL`. Re-ejecutarlo no toca filas ya resueltas.
+
+**Importante**: requiere Cloud SQL Proxy corriendo + `.env.local` con credenciales PG. Si emerge necesidad de correr en producción, coordinar con un dev senior.
+
+### Ver el estado del manual queue
+
+```sql
+-- Total pending por tipo
+SELECT target_kind, status, COUNT(*)::int AS n
+FROM greenhouse_finance.economic_category_manual_queue
+GROUP BY target_kind, status
+ORDER BY target_kind, status;
+
+-- Ver candidatos pending de expense con context
+SELECT q.target_id, q.candidate_category, q.candidate_confidence, q.candidate_rule,
+       e.description, e.supplier_name, e.member_name, e.total_amount, e.currency
+FROM greenhouse_finance.economic_category_manual_queue q
+JOIN greenhouse_finance.expenses e ON e.expense_id = q.target_id
+WHERE q.target_kind = 'expense' AND q.status = 'pending'
+ORDER BY q.created_at ASC
+LIMIT 20;
+```
+
+Resolver vía endpoint admin (o UI dialog cuando se entregue) marca el row como `status='resolved'` automáticamente.
+
+### Verificar reliability signals
+
+```sql
+-- Count actual de filas no clasificadas
+SELECT 'expenses' AS table_name, COUNT(*)::int AS unresolved
+FROM greenhouse_finance.expenses WHERE economic_category IS NULL
+UNION ALL
+SELECT 'income', COUNT(*)::int
+FROM greenhouse_finance.income WHERE economic_category IS NULL;
+```
+
+O via endpoint `/api/admin/operations` (Reliability dashboard) → subsystem `Finance Data Quality` → signals `finance.expenses.economic_category_unresolved` + `finance.income.economic_category_unresolved`.
+
+**Steady state esperado**:
+- Pre-cleanup manual queue: count > 0 (esperado, son filas pendientes de operador).
+- Post-cleanup + VALIDATE atomic: count = 0 (cualquier > 0 después indica bypass o bug).
+
+### Auditar reclassifies históricas
+
+```sql
+-- Quién reclasificó qué en los últimos 7 días
+SELECT log_id, target_kind, target_id, resolved_category, matched_rule,
+       confidence, resolved_by, resolved_at,
+       evidence_json -> 'previous_category' AS previous,
+       evidence_json -> 'reason' AS reason
+FROM greenhouse_finance.economic_category_resolution_log
+WHERE matched_rule = 'manual_reclassify'
+  AND resolved_at > NOW() - INTERVAL '7 days'
+ORDER BY resolved_at DESC;
+
+-- Filtrar por bulk context
+SELECT * FROM greenhouse_finance.economic_category_resolution_log
+WHERE batch_id = 'fix-abril-2026-payroll-misclassification';
+```
+
+Tabla append-only — trigger PG rechaza UPDATE/DELETE. Si necesitas corregir un audit row, INSERT nueva fila con `evidence_json.correction_of=<original_log_id>`.
+
 ## Referencias técnicas
 
 - [Documentación funcional: Categoría económica de pagos](../../documentation/finance/categoria-economica-de-pagos.md)
-- [Spec arquitectónica: GREENHOUSE_FINANCE_ARCHITECTURE_V1.md Delta 2026-05-03](../../architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md)
+- **Spec canónica V1 dedicada**: [`GREENHOUSE_FINANCE_ECONOMIC_CATEGORY_DIMENSION_V1.md`](../../architecture/GREENHOUSE_FINANCE_ECONOMIC_CATEGORY_DIMENSION_V1.md) — modelo dimensional, clasificador, defensa-en-profundidad, contrato downstream
 - [Spec de tarea: TASK-768](../../tasks/complete/TASK-768-finance-expense-economic-category-dimension.md)
+- [Incidente cerrado: ISSUE-065](../../issues/resolved/ISSUE-065-kpi-nomina-mis-classification-by-expense-type-conflate.md)
 - [Resolver canónico TS](../../../src/lib/finance/economic-category/resolver.ts)
 - [Endpoint expenses](../../../src/app/api/admin/finance/expenses/[id]/economic-category/route.ts)
 - [Endpoint income](../../../src/app/api/admin/finance/income/[id]/economic-category/route.ts)
