@@ -2,7 +2,47 @@
 
 > **Version:** 1.0
 > **Created:** 2026-03-30
-> **Last updated:** 2026-05-03
+> **Last updated:** 2026-05-03 (TASK-768)
+
+## Delta 2026-05-03 — TASK-768 Economic Category Dimension (analytical separation)
+
+Cierra ISSUE-065 (KPI Nómina sub-counted ~$3M abril 2026 por mis-clasificación). Separa la dimensión analítica/operativa de la fiscal/contable que estaban conflate en `expense_type` / `income_type`. Subordina el shape del helper `sumExpensePaymentsClpForPeriod` (TASK-766): ahora retorna `byEconomicCategory` breakdown además de los campos legacy.
+
+**Causa raíz**: `expense_type` (legacy `accounting_type` alias) sirve a dos masters semánticos contradictorios:
+- **Fiscal/SII**: lo que es la expense desde la perspectiva tributaria (factura proveedor, recibo, impuesto). Lo lee VAT engine, IVA ledger, SII reports, chile-tax (TASK-529-533).
+- **Analítico/operativo**: lo que es la expense desde la perspectiva del modelo económico Greenhouse (gasto labor interno, externo, vendor SaaS, regulatorio, etc.). Lo lee P&L gerencial, ICO, KPIs cash-out, cost attribution, member loaded cost (TASK-710-713), budget engine (TASK-178).
+
+A veces coinciden, frecuentemente NO. Ejemplo crítico: pago a Deel Inc. → fiscalmente es proveedor (Deel emite factura a Greenhouse) pero económicamente es nómina (Deel paga a Melkin como costo labor para Greenhouse). El bank reconciler defaulteaba `expense_type='supplier'` cuando ingestaba transacciones bancarias sin metadata para inferir naturaleza payroll → ~$3M abril 2026 (Daniela España, Andrés Colombia, Valentina, Humberly, Previred) caían en bucket equivocado.
+
+**Resolución arquitectónica** (NO lente read-time):
+
+1. **Schema separation**: nueva columna `economic_category TEXT` aditiva en `expenses` + `income`. CHECK `canonical_values` enforces enum (11 valores expense, 8 income). CHECK `required_after_cutover` NOT VALID (cutover 2026-05-03 11:00 UTC; VALIDATE post-cleanup manual queue).
+2. **Lookup tables canónicas** (`greenhouse_finance.known_regulators` + `known_payroll_vendors`): regex match seedeado declarativamente (17 reguladores chilenos, 8 international payroll processors). Extender = INSERT row, cero código.
+3. **Resolver canónico TS** (`src/lib/finance/economic-category/resolver.ts`): 10 reglas first-match-wins (member_id explicit → RUT lookup → email → name fuzzy → vendor regex → regulator regex → supplier partner → accounting_type transparent map → ambiguous fallback → manual_required). Returns `{category, confidence, matchedRule, evidence}`.
+4. **Trigger BEFORE INSERT** (`populate_economic_category_default_trigger`): cero invasivo a 12 canonical writers. Transparent map de `expense_type` → default razonable. NO sobrescribe valores explícitos.
+5. **Backfill defensivo** + audit log append-only (`economic_category_resolution_log`, trigger anti-update/delete TASK-765 pattern) + manual queue (`economic_category_manual_queue`).
+6. **Reclassification endpoints**: `PATCH /api/admin/finance/expenses/[id]/economic-category` + mirror income, capability granular least-privilege (`finance.expenses.reclassify_economic_category`), atomic UPDATE + audit + outbox event `finance.expense.economic_category_changed` v1.
+7. **VIEWs extendidas**: `expense_payments_normalized` + `income_payments_normalized` exponen ambas dimensiones via JOIN. Helpers `sumExpensePaymentsClpForPeriod` retornan `byEconomicCategory` (11 keys) + legacy `supplierClp/payrollClp/fiscalClp` preservados (backwards-compat TASK-766).
+8. **Reliability signals**: `finance.expenses.economic_category_unresolved` + mirror income (drift, error si count>0, steady=0 post-cleanup). Subsystem `finance_data_quality`.
+9. **Lint rule** `greenhouse/no-untokenized-expense-type-for-analytics` mode `error`. Override block exime SII/VAT/operacional/resolver. Tolerancia cero forward.
+
+**Política consumer (regla dura)**: ningún consumer analítico de Greenhouse puede filtrar/agrupar por `expense_type` o `income_type` para análisis económico. El lint rule lo enforcea, no es convención. Para SII/VAT/IVA, usar `expense_type` (legacy `accounting_type`) sigue siendo legítimo y necesario.
+
+**Cero impacto operacional**:
+- Saldos bancarios cuadran (cash flow ortogonal a la dimensión bucket).
+- P&L tributario / SII reports siguen usando `expense_type` (preservado intacto).
+- Total Pagado canónico se mantiene; solo cambia distribución entre buckets.
+- TASK-766 CLP reader 23 tests verdes (backwards-compat preservada).
+
+**Bloqueantes downstream desbloqueados**:
+- TASK-178 (Budget Engine) puede iniciar — variance analysis canónica.
+- TASK-710-713 (Member Loaded Cost program) puede iniciar — modelo dimensional consume `economic_category`.
+- TASK-080+ (ICO Engine) puede beneficiarse via cost-per-FTE canónico.
+- TASK-705/706 (Cost Attribution) — allocations con dimensión correcta.
+
+**Tests**: 108 totales TASK-768 verdes — 11 types, 26 resolver, 7 identity-lookup, 5 lookup-tables, 14 endpoints, 11 lint rule RuleTester, 23 TASK-766 preservados, 11 ad-hoc.
+
+**Spec canónica**: `docs/tasks/complete/TASK-768-finance-expense-economic-category-dimension.md`. Patrones reusados: TASK-571/699/721 (canonical reader + helper + lint), TASK-708/728/766 (CHECK NOT VALID + VALIDATE + cutover), TASK-742/765/766 (capabilities granulares + audit + outbox).
 
 ## Delta 2026-05-03 — TASK-766 CLP currency reader contract (KPI integrity)
 
