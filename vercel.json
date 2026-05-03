@@ -9,15 +9,11 @@
       "schedule": "15 8 * * *"
     },
     {
-      "path": "/api/cron/reliability-synthetic",
+      "path": "/api/cron/sync-conformed-recovery",
       "schedule": "*/30 * * * *"
     },
     {
-      "path": "/api/cron/sync-conformed",
-      "schedule": "20 7 * * *"
-    },
-    {
-      "path": "/api/cron/sync-conformed-recovery",
+      "path": "/api/cron/reliability-synthetic",
       "schedule": "*/30 * * * *"
     },
     {
@@ -95,10 +91,6 @@
     {
       "path": "/api/cron/hubspot-products-sync",
       "schedule": "0 8 * * *"
-    },
-    {
-      "path": "/api/cron/quotation-lifecycle",
-      "schedule": "0 10 * * *"
     },
     {
       "path": "/api/cron/fx-sync-latam?window=morning",
