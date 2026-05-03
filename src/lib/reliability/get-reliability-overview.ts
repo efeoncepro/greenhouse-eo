@@ -26,6 +26,7 @@ import type { SyntheticRouteSnapshot } from '@/types/reliability-synthetic'
 
 import { buildAiSummarySignals } from './ai/build-ai-summary-signals'
 import { getLatestAiObservationsByScope, type AiObservation } from './ai/reader'
+import { getAccountBalancesFxDriftSignal } from './queries/account-balances-fx-drift'
 import { getExpensePaymentsClpDriftSignal } from './queries/expense-payments-clp-drift'
 import { getIncomePaymentsClpDriftSignal } from './queries/income-payments-clp-drift'
 import { getPaymentOrdersDeadLetterSignal } from './queries/payment-orders-dead-letter'
@@ -300,6 +301,16 @@ interface ReliabilityOverviewSources {
    * que motivó TASK-773 y TASK-775.
    */
   cronStagingDrift?: ReliabilitySignal | null
+
+  /**
+   * TASK-774 Slice 4 — Account balances FX drift signal:
+   *   - finance.account_balances.fx_drift (closing_balance vs recompute desde
+   *     VIEWs canónicas TASK-766)
+   * Steady state = 0. Si > 0, materializer corrió antes del fix TASK-774
+   * o emerge nuevo callsite con anti-patrón SUM(payment.amount) sin _clp.
+   * Bug Figma EXP-202604-008 (2026-05-03).
+   */
+  accountBalancesFxDrift?: ReliabilitySignal | null
 }
 
 export const buildReliabilityOverview = (
@@ -341,7 +352,9 @@ export const buildReliabilityOverview = (
     // TASK-773 Slice 4 — Outbox publisher health (lag + dead_letter).
     ...(sources.outboxHealth ?? []),
     // TASK-775 Slice 5 — Vercel ↔ Cloud Scheduler drift (async-critical crons).
-    ...(sources.cronStagingDrift ? [sources.cronStagingDrift] : [])
+    ...(sources.cronStagingDrift ? [sources.cronStagingDrift] : []),
+    // TASK-774 Slice 4 — Account balances FX drift (closing_balance vs recompute).
+    ...(sources.accountBalancesFxDrift ? [sources.accountBalancesFxDrift] : [])
   ]
 
   const signalsByModule = new Map<string, ReliabilitySignal[]>()
@@ -545,6 +558,13 @@ export const getReliabilityOverview = async (
       ? preloadedSources.cronStagingDrift
       : await getCronStagingDriftSignal().catch(() => null)
 
+  // TASK-774 Slice 4 — Account balances FX drift (closing_balance vs recompute
+  // desde VIEWs canonicas TASK-766). Steady=0. Degrada honestamente a `unknown`.
+  const accountBalancesFxDrift =
+    preloadedSources.accountBalancesFxDrift !== undefined
+      ? preloadedSources.accountBalancesFxDrift
+      : await getAccountBalancesFxDriftSignal().catch(() => null)
+
   return buildReliabilityOverview(operations, {
     billing,
     notionOperational,
@@ -557,7 +577,8 @@ export const getReliabilityOverview = async (
     financeClpDrift,
     providerBqSyncDeadLetter,
     outboxHealth,
-    cronStagingDrift
+    cronStagingDrift,
+    accountBalancesFxDrift
   })
 }
 
