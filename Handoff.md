@@ -1,5 +1,38 @@
 # Handoff.md
 
+## Sesion 2026-05-03 — TASK-766 cerrada (Finance CLP-Currency Reader Contract Resilience + Resolución del incidente 2026-05-02)
+
+- **Lifecycle:** `complete` (movida de `in-progress/` a `complete/`)
+- **Branch:** `task/TASK-766-finance-clp-currency-reader-contract`
+- **Slices entregados:** 1, 2, 3, 4a, 4b, 5 — todos los 5 del plan original (slice 4 ejecutado en paralelo a/b).
+- **Cierre del incidente 2026-05-02:**
+  - KPI `/finance/cash-out` "Total pagado" abril 2026: **$1.017.803.262 (broken) → $11.546.493 (canonical)**, diff atribuible a un único payment HubSpot CCA (`exp-pay-sha-46679051-7ba82530`) que el anti-patrón inflaba 88×.
+  - Backfill: 23 income_payments con `currency='CLP' AND amount_clp IS NULL` poblados (1:1 idempotente).
+  - CHECK constraint `payments_amount_clp_required_after_cutover` VALIDATED atomic en la misma migration (drift count = 0 post-backfill, caso esperado).
+- **Reliability signals POST-cutover (verificado vía SQL):**
+  - `finance.expense_payments.clp_drift`: n=0 (steady)
+  - `finance.income_payments.clp_drift`: n=0 (steady, post-backfill)
+- **Componentes canónicos nuevos:**
+  - VIEW `greenhouse_finance.expense_payments_normalized` + mirror `income_payments_normalized` con `payment_amount_clp` (COALESCE chain canonical) + filtro 3-axis supersede inline.
+  - Helpers TS `src/lib/finance/expense-payments-reader.ts` + `income-payments-reader.ts` (single source of truth para todo cómputo CLP de payments).
+  - Lint rule `eslint-plugins/greenhouse/rules/no-untokenized-fx-math.mjs` modo `error` desde commit-1 (4 patrones detected, override block exime los 2 readers canónicos).
+  - Repair admin endpoint `POST /api/admin/finance/payments-clp-repair` (capability granular `finance.payments.repair_clp`, FINANCE_ADMIN + EFEONCE_ADMIN, least-privilege) con outbox audit `finance.payments.clp_repaired` v1.
+  - 8 endpoints migrados al helper canónico (cash-out, cash-in, cash-position, dashboard/{pnl,summary,cashflow}, expenses/summary, income/summary). Bonus 4 callsites con leak de supersede fixed automáticamente.
+- **Verificación final:**
+  - `pnpm tsc --noEmit`: 0 errors.
+  - `pnpm build`: verde (18.1s).
+  - `pnpm test`: 527/527 test files, 2940/2945 tests passed (5 skipped, 0 failed).
+  - `pnpm lint`: 0 errors, 318 warnings (todas preexistentes — TASK-265 mode `warn`).
+- **Outbox events nuevos en catálogo:** `finance.payments.clp_repaired` v1 (TASK-766) — fire-and-forget, dryRun emite igual con `dryRun: true`, truncating skipped/errors a 50 entries en payload.
+- **Docs canónicos updated:**
+  - CLAUDE.md: sección "Finance — CLP currency reader invariants (TASK-766)" con reglas duras + decision tree + 7 invariantes mecánicos.
+  - `GREENHOUSE_FX_CURRENCY_PLATFORM_V1.md`: Delta 2026-05-03.
+  - `GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`: Delta 2026-05-03.
+  - `GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1.md`: Delta 2026-05-03 (V1.4).
+  - `GREENHOUSE_EVENT_CATALOG_V1.md`: Delta 2026-05-03.
+- **ISSUE-064 creado:** `docs/issues/resolved/ISSUE-064-cash-out-kpi-inflated-clp-currency-anti-pattern.md` documenta el incidente del 2026-05-02 + resolución vía TASK-766. Mismo patrón que ISSUE-063 ↔ TASK-765.
+- **Próximo step:** merge a `develop`. Production rollout staged. CHECK constraint cutover ya pasó (2026-05-03), helpers canónicos seguros para deploy.
+
 ## Sesion 2026-05-02 — TASK-766 tomada (Finance CLP-Currency Reader Contract Resilience)
 
 - **Lifecycle:** `in-progress` (movida de `to-do/` a `in-progress/`)

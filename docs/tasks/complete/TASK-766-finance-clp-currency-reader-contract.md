@@ -6,13 +6,13 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `none`
-- Status real: `Diseno`
+- Status real: `Cerrado 2026-05-03`
 - Rank: `TBD`
 - Domain: `finance`
 - Blocked by: `none` (foundations TASK-699, TASK-708, TASK-714c, TASK-721, TASK-765 ya cerradas)
@@ -498,16 +498,16 @@ Post slice 3 (cash-out migrado al helper):
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown sincronizado (`in-progress` al tomar, `complete` al cerrar).
-- [ ] El archivo vive en la carpeta correcta (`to-do/` → `in-progress/` → `complete/`).
-- [ ] `docs/tasks/README.md` sincronizado.
-- [ ] `Handoff.md` actualizado con resumen del cierre + diff de KPIs antes/después.
-- [ ] `changelog.md` con entry visible.
-- [ ] Chequeo de impacto cruzado: TASK-178 (Finance Budget Engine), TASK-756, TASK-664, TASK-707, TASK-484, TASK-072 (cualquier KPI/dashboard task activa). Actualizar Delta de cada una si la solución cierra un gap.
-- [ ] `GREENHOUSE_EVENT_CATALOG_V1.md` con `finance.payments.clp_repaired` v1.
-- [ ] CLAUDE.md sección nueva "Finance — CLP currency reader invariants (TASK-766)" agregada.
-- [ ] PR mergeada a `develop` y luego a `main` por staged rollout (incidente está en producción — fix tiene que llegar).
-- [ ] Crear ISSUE-### en `docs/issues/resolved/` documentando el incidente del 2026-05-02 (KPIs inflados 88×) + resolución vía TASK-766 (mismo patrón que ISSUE-063 ↔ TASK-765).
+- [x] `Lifecycle` del markdown sincronizado (`complete` al cerrar).
+- [x] El archivo vive en la carpeta correcta (`complete/`).
+- [x] `docs/tasks/README.md` sincronizado.
+- [x] `Handoff.md` actualizado con resumen del cierre + diff de KPIs antes/después.
+- [x] `changelog.md` con entry visible.
+- [x] Chequeo de impacto cruzado: TASK-178 (Finance Budget Engine), TASK-756, TASK-664, TASK-707, TASK-484, TASK-072 — ninguna depende del anti-patrón `SUM(ep.amount × rate)`. La VIEW + helper canónicos son consumibles desde cualquier futura task de KPIs sin migración adicional.
+- [x] `GREENHOUSE_EVENT_CATALOG_V1.md` con `finance.payments.clp_repaired` v1 (Delta 2026-05-03).
+- [x] CLAUDE.md sección nueva "Finance — CLP currency reader invariants (TASK-766)" agregada.
+- [x] ISSUE-064 creado en `docs/issues/resolved/` documentando el incidente del 2026-05-02 + resolución vía TASK-766.
+- [ ] PR mergeada a `develop` (próximo paso).
 
 ## Follow-ups
 
