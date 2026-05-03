@@ -13,7 +13,7 @@ import { test, expect, gotoAuthenticated } from '../fixtures/auth'
  */
 test.describe('platform.cron.staging_drift — TASK-775', () => {
   test('reliability overview reports cron staging drift signal at count=0', async ({ page }) => {
-    const response = await gotoAuthenticated(page, '/api/admin/reliability/overview')
+    const response = await gotoAuthenticated(page, '/api/admin/reliability')
 
     expect(response?.status(), 'overview status').toBeLessThan(400)
 
