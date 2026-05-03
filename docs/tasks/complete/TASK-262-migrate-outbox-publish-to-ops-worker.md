@@ -2,15 +2,27 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete` (absorbida en TASK-773 el 2026-05-03)
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Bajo`
 - Type: `implementation`
-- Status real: `Diseno`
+- Status real: `Absorbida en TASK-773 — Outbox Publisher Cloud Scheduler Cutover + Reliability + E2E Pre-Merge Gate`
 - Domain: `infrastructure`, `event-bus`
 - Blocked by: `none`
-- Branch: `task/TASK-262-outbox-publish-ops-worker`
+- Branch: `develop` (vía TASK-773)
+
+## Absorción (2026-05-03)
+
+Esta task fue absorbida íntegramente en **TASK-773** (`docs/tasks/in-progress/TASK-773-outbox-publisher-cloud-scheduler-cutover.md`). TASK-773 es un superset estricto:
+
+- ✅ TASK-262 Slice 1 (Endpoint + scheduler) → cubierto por TASK-773 Slice 2 (helper canónico extendido + endpoint `POST /outbox/publish-batch`) y Slice 3 (Cloud Scheduler `ops-outbox-publish` cron `*/2 min`, más frecuente que el original `*/5` para mejor SLA).
+- ✅ TASK-262 Slice 2 (Verificación) → cubierto por TASK-773 Slice 5 (cutover zero-downtime con doble publisher 24h + backfill drenaje).
+- ➕ TASK-773 agrega adicionalmente: state machine canónica `pending → publishing → published/failed/dead_letter` (Slice 1 migration), 2 reliability signals `sync.outbox.unpublished_lag` + `sync.outbox.dead_letter` (Slice 4), lint rule custom `finance-route-requires-e2e-evidence` + protocol E2E pre-merge (Slice 6), invariantes en CLAUDE.md (Slice 7).
+
+**Por qué se absorbió**: el incidente runtime detectado 2026-05-03 (TASK-772 followup — pago de Figma no rebajaba TC en staging) reveló que el bug raíz NO es solo "outbox-publish está en Vercel" sino "el patrón Vercel cron deja invisible toda una clase de bugs en staging + no hay reliability signal que lo detecte". TASK-773 ataca esa raíz arquitectónica completa.
+
+Para detalle de implementación, lifecycle final y verificación, ver `docs/tasks/complete/TASK-773-outbox-publisher-cloud-scheduler-cutover.md` cuando cierre.
 
 ## Summary
 

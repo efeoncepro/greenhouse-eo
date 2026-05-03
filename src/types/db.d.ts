@@ -7458,11 +7458,27 @@ export interface GreenhouseSyncNotionSyncOrchestrationRuns {
 export interface GreenhouseSyncOutboxEvents {
   aggregate_id: string;
   aggregate_type: string;
+  /**
+   * TASK-773 — timestamp del dead-letter routing. NULL excepto cuando status=dead_letter.
+   */
+  dead_letter_at: Timestamp | null;
   event_id: string;
   event_type: string;
+  /**
+   * TASK-773 — ultimo error sanitizado del intento de publish (BQ insert error). Usar redactErrorForResponse antes de persistir.
+   */
+  last_publish_error: string | null;
   occurred_at: Generated<Timestamp>;
   payload_json: Generated<Json>;
   published_at: Timestamp | null;
+  /**
+   * TASK-773 — contador de intentos de publish a BQ raw. Incrementa en cada failed; >= 5 dispara dead_letter.
+   */
+  published_attempts: Generated<number>;
+  /**
+   * TASK-773 — timestamp del SELECT FOR UPDATE del worker. NULL excepto cuando status=publishing.
+   */
+  publishing_started_at: Timestamp | null;
   status: Generated<string>;
 }
 

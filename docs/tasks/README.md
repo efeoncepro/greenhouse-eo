@@ -22,7 +22,7 @@ Primer bloque operativo asignado:
 
 - `TASK-001` a `TASK-052` asignados (backlog activo, briefs historicos, specs de apoyo)
 - `TASK-053` a `TASK-056` asignados
-- siguiente ID disponible: `TASK-773`
+- siguiente ID disponible: `TASK-774`
 - `TASK-726` ✅ — Finance Movement Feed Foundation. Implementa la primitive reusable aprobada en `docs/mockups/finance-movement-feed-mockup.html`: feed financiero adaptable, virtualizacion encapsulada con `@tanstack/react-virtual`, resolver visual sobre catalogos existentes y primera integracion read-only en `/finance/reconciliation`. Spec: `complete/TASK-726-finance-movement-feed-foundation.md`.
 - **Programa Member Loaded Cost Model** 🆕 (2026-04-28) — Spec raíz `docs/architecture/GREENHOUSE_MEMBER_LOADED_COST_MODEL_V1.md` reorganizada como autoridad del modelo económico Greenhouse. Tasks subordinadas:
   - **MLCM Fase 2 (Materializers)**: `TASK-710` Tool Consumption Bridge, `TASK-712` Tool Catalog Consolidation, `TASK-176` Labor Provisions (input al `payroll_cost_clp`)
