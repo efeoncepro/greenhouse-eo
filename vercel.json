@@ -29,14 +29,6 @@
       "schedule": "30 10 * * *"
     },
     {
-      "path": "/api/cron/nubox-sync",
-      "schedule": "30 7 * * *"
-    },
-    {
-      "path": "/api/cron/nubox-quotes-hot-sync",
-      "schedule": "*/15 * * * *"
-    },
-    {
       "path": "/api/cron/reconciliation-auto-match",
       "schedule": "45 7 * * *"
     },
@@ -51,10 +43,6 @@
     {
       "path": "/api/cron/email-data-retention",
       "schedule": "0 3 * * 0"
-    },
-    {
-      "path": "/api/cron/nubox-balance-sync",
-      "schedule": "0 */4 * * *"
     },
     {
       "path": "/api/cron/entra-profile-sync",

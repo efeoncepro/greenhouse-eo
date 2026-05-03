@@ -22,6 +22,9 @@
  *   POST /notion-conformed/sync        → Notion BQ raw → conformed → PG cycle (replaces Vercel /api/cron/sync-conformed)
  *   POST /outbox/publish-batch         → Outbox PG → BQ raw publisher with state machine (TASK-773, replaces Vercel /api/cron/outbox-publish)
  *   POST /email-deliverability-monitor → Bounce/complaint rate monitor (TASK-775, replaces Vercel /api/cron/email-deliverability-monitor)
+ *   POST /nubox/balance-sync           → Nubox balances → PG + divergence outbox (TASK-775, replaces Vercel /api/cron/nubox-balance-sync)
+ *   POST /nubox/sync                   → 3-fase raw→conformed→postgres (TASK-775, replaces Vercel /api/cron/nubox-sync)
+ *   POST /nubox/quotes-hot-sync        → Quotes hot path period-scoped (TASK-775, replaces Vercel /api/cron/nubox-quotes-hot-sync)
  *
  * Auth: Cloud Run IAM (--no-allow-unauthenticated) + optional CRON_SECRET header
  * Runtime: Node.js 22 via esbuild bundle (handles TypeScript + @/ path aliases)
@@ -57,6 +60,11 @@ import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { runQuotationLifecycleSweep } from '@/lib/commercial-intelligence/renewal-lifecycle'
 import { sendEmail } from '@/lib/email/delivery'
 import { runEmailDeliverabilityMonitor } from '@/lib/email/deliverability-monitor'
+import { runNuboxBalanceSync } from '@/lib/nubox/sync-nubox-balances'
+import {
+  runNuboxQuotesHotSync,
+  runNuboxSyncOrchestration
+} from '@/lib/nubox/sync-nubox-orchestrator'
 import { buildWeeklyDigest, resolveWeeklyDigestRecipients, WEEKLY_DIGEST_DEFAULT_LIMIT } from '@/lib/nexa/digest'
 
 import { getCurrentAuthReadiness } from '@/lib/auth-secrets'
@@ -1213,6 +1221,52 @@ const handleEmailDeliverabilityMonitor = wrapCronHandler({
   }
 })
 
+// ─── /nubox/* ───────────────────────────────────────────────────────────────
+//
+// TASK-775 Slice 3 — Nubox sync crons migrados de Vercel a Cloud Scheduler.
+// Razón: Vercel custom env (staging) NO ejecuta crons → balances Nubox quedaban
+// stale en staging para QA, divergencias nunca emitían outbox events. Cloud
+// Scheduler corre por proyecto GCP, igual en cualquier env.
+//
+// 3 endpoints:
+//   POST /nubox/balance-sync     → balances PG income/expenses + outbox divergence
+//   POST /nubox/sync             → 3-fase raw → conformed → postgres
+//   POST /nubox/quotes-hot-sync  → quotes hot path (period-scoped quotes)
+
+const handleNuboxBalanceSync = wrapCronHandler({
+  name: 'nubox-balance-sync',
+  domain: 'sync',
+  run: async (): Promise<Record<string, unknown>> => {
+    const result = await runNuboxBalanceSync()
+
+    return { ...result }
+  }
+})
+
+const handleNuboxSync = wrapCronHandler({
+  name: 'nubox-sync',
+  domain: 'sync',
+  run: async (): Promise<Record<string, unknown>> => {
+    const result = await runNuboxSyncOrchestration()
+
+    return { ...result }
+  }
+})
+
+const handleNuboxQuotesHotSync = wrapCronHandler({
+  name: 'nubox-quotes-hot-sync',
+  domain: 'sync',
+  run: async (body): Promise<Record<string, unknown>> => {
+    const periods = Array.isArray(body.periods)
+      ? body.periods.filter((p): p is string => typeof p === 'string')
+      : undefined
+
+    const result = await runNuboxQuotesHotSync({ periods })
+
+    return { ...result }
+  }
+})
+
 const handleNotionConformedSync = async (req: IncomingMessage, res: ServerResponse) => {
   const body = await readBody(req)
   const rawSource = typeof body.executionSource === 'string' ? body.executionSource.trim() : 'scheduled_primary'
@@ -1629,6 +1683,24 @@ const server = createServer(async (req, res) => {
 
     if (method === 'POST' && path === '/email-deliverability-monitor') {
       await handleEmailDeliverabilityMonitor(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/nubox/balance-sync') {
+      await handleNuboxBalanceSync(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/nubox/sync') {
+      await handleNuboxSync(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/nubox/quotes-hot-sync') {
+      await handleNuboxQuotesHotSync(req, res)
 
       return
     }

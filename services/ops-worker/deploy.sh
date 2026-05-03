@@ -463,6 +463,38 @@ upsert_scheduler_job \
   '{}'
 echo "  -> ops-email-deliverability-monitor: 0 */6 * * * (bounce/complaint monitor, TASK-775)"
 
+# Nubox sync crons — TASK-775 Slice 3.
+#
+# 3 jobs migrados del Vercel cron lane:
+#   - ops-nubox-balance-sync (cada 4h): rebajá balance_nubox en PG income/expenses
+#     desde BQ conformed, emite outbox events de divergence. Lightweight.
+#   - ops-nubox-sync (07:30 daily): 3-fase Nubox API → BQ raw → conformed → PG.
+#     Heavy — corre en horario de baja demanda.
+#   - ops-nubox-quotes-hot-sync (cada 15min): quotes hot path para periods activos.
+#
+# Razón Cloud Scheduler: balances Nubox en staging quedaban stale para QA porque
+# Vercel custom env no ejecuta crons. Cloud Scheduler corre por proyecto GCP.
+upsert_scheduler_job \
+  "ops-nubox-balance-sync" \
+  "0 */4 * * *" \
+  "/nubox/balance-sync" \
+  '{}'
+echo "  -> ops-nubox-balance-sync: 0 */4 * * * (Nubox balances → PG + divergence outbox, TASK-775)"
+
+upsert_scheduler_job \
+  "ops-nubox-sync" \
+  "30 7 * * *" \
+  "/nubox/sync" \
+  '{}'
+echo "  -> ops-nubox-sync: 30 7 * * * (3-fase Nubox API → BQ raw → conformed → PG, TASK-775)"
+
+upsert_scheduler_job \
+  "ops-nubox-quotes-hot-sync" \
+  "*/15 * * * *" \
+  "/nubox/quotes-hot-sync" \
+  '{}'
+echo "  -> ops-nubox-quotes-hot-sync: */15 * * * * (Nubox quotes hot path, TASK-775)"
+
 # Global projection recovery — unchanged lane.
 upsert_scheduler_job \
   "ops-reactive-recover" \
