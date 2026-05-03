@@ -18,6 +18,7 @@
  *   POST /batch-email-send             → Send a transactional email via the Greenhouse delivery pipeline
  *   POST /nexa/weekly-digest           → Send the weekly Nexa executive digest via email
  *   POST /reliability-ai-watch         → Reliability AI Observer (TASK-638): Gemini watcher over RCP overview
+ *   POST /cloud-cost-ai-watch          → Cloud cost FinOps AI + deterministic alert sweep (TASK-769)
  *   POST /notion-conformed/sync        → Notion BQ raw → conformed → PG cycle (replaces Vercel /api/cron/sync-conformed)
  *
  * Auth: Cloud Run IAM (--no-allow-unauthenticated) + optional CRON_SECRET header
@@ -844,6 +845,52 @@ const handleReliabilityAiWatch = async (req: IncomingMessage, res: ServerRespons
 }
 
 /**
+ * POST /cloud-cost-ai-watch
+ * TASK-769 — deterministic GCP Billing Export alert sweep + optional AI FinOps copilot.
+ *
+ * The deterministic sweep always runs first and is the only source of alert
+ * severity. The AI copilot is opt-in (`CLOUD_COST_AI_COPILOT_ENABLED=true`) and
+ * degrades to a skipped summary when disabled, unconfigured or deduped.
+ */
+const handleCloudCostAiWatch = async (req: IncomingMessage, res: ServerResponse) => {
+  const body = await readBody(req)
+
+  const triggeredBy = (typeof body.triggeredBy === 'string' ? body.triggeredBy : 'cloud_scheduler') as
+    | 'cron'
+    | 'manual'
+    | 'cloud_scheduler'
+
+  const force = body.force === true
+  const dryRun = body.dryRun === true
+
+  console.log(`[ops-worker] POST /cloud-cost-ai-watch — triggeredBy=${triggeredBy} force=${force} dryRun=${dryRun}`)
+
+  try {
+    const [{ runCloudCostAlertSweep }, { runCloudCostAiCopilot }] = await Promise.all([
+      import('@/lib/cloud/gcp-billing-alerts'),
+      import('@/lib/cloud/finops-ai/runner')
+    ])
+
+    const alertSummary = await runCloudCostAlertSweep({ dryRun })
+    const aiResult = await runCloudCostAiCopilot({ triggeredBy, force })
+
+    console.log(
+      `[ops-worker] /cloud-cost-ai-watch done — alerts=${alertSummary.alertsDispatched}/${alertSummary.alertsEligible} aiPersisted=${aiResult.summary.observationsPersisted} aiSkipped=${aiResult.summary.skippedReason ?? 'none'}`
+    )
+
+    json(res, 200, {
+      alertSummary,
+      aiSummary: aiResult.summary
+    })
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error'
+
+    console.error('[ops-worker] /cloud-cost-ai-watch failed:', message)
+    json(res, 502, { error: message })
+  }
+}
+
+/**
  * POST /finance/rematerialize-balances (TASK-702 Slice 7).
  *
  * Re-materializes account_balances daily snapshots for the trailing 7 days
@@ -1501,6 +1548,12 @@ const server = createServer(async (req, res) => {
 
     if (method === 'POST' && path === '/reliability-ai-watch') {
       await handleReliabilityAiWatch(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/cloud-cost-ai-watch') {
+      await handleCloudCostAiWatch(req, res)
 
       return
     }

@@ -11,6 +11,7 @@ Standalone HTTP service that runs reactive projection consumers and projection-r
 | POST   | `/reactive/process-domain` | Process domain-scoped events (default: delivery) | `api/cron/outbox-react-delivery` |
 | POST   | `/reactive/recover`        | Recover orphaned projection queue items          | `api/cron/projection-recovery`   |
 | POST   | `/reliability-ai-watch`    | Reliability AI Observer (TASK-638, Gemini)       | — (no Vercel equivalent)         |
+| POST   | `/cloud-cost-ai-watch`     | Cloud Cost Intelligence alerts + FinOps AI (TASK-769) | — (no Vercel equivalent)    |
 
 ## Request Bodies
 
@@ -28,6 +29,9 @@ All endpoints accept optional JSON body:
 
 // /reliability-ai-watch
 { "triggeredBy": "cloud_scheduler" }   // optional: cron | manual | cloud_scheduler
+
+// /cloud-cost-ai-watch
+{ "triggeredBy": "cloud_scheduler", "dryRun": true }
 ```
 
 ### Reliability AI Observer (TASK-638)
@@ -66,6 +70,21 @@ gcloud run services update ops-worker \
   --remove-env-vars=RELIABILITY_AI_OBSERVER_ENABLED
 ```
 
+### Cloud Cost Intelligence (TASK-769)
+
+`POST /cloud-cost-ai-watch` runs the Billing Export FinOps lane:
+
+1. Loads `getGcpBillingOverview({ days: 30, forceRefresh: true })`.
+2. Evaluates deterministic drivers (`forecast_risk`, `share_of_total`,
+   `service_spike`, `resource_driver`).
+3. Dispatches Teams alert first and Slack fallback only when a new fingerprint
+   crosses warning/error and cooldown allows it.
+4. Runs the AI copilot only when `CLOUD_COST_AI_COPILOT_ENABLED=true`.
+5. Returns both `alertSummary` and `aiSummary` with counts and `skippedReason`.
+
+Use `dryRun=true` for smoke checks; it does not query the dispatch table, send
+notifications or persist fingerprints.
+
 ## Cloud Scheduler Jobs
 
 | Job Name                        | Schedule         | Endpoint                   |
@@ -74,6 +93,7 @@ gcloud run services update ops-worker \
 | `ops-reactive-process-delivery` | `2-59/5 * * * *` | `/reactive/process-domain` |
 | `ops-reactive-recover`          | `*/15 * * * *`   | `/reactive/recover`        |
 | `ops-reliability-ai-watch`      | `0 */1 * * *`    | `/reliability-ai-watch`    |
+| `ops-cloud-cost-ai-watch`       | `15 */6 * * *`   | `/cloud-cost-ai-watch`     |
 
 ## Run Tracking
 

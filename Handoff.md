@@ -1,5 +1,42 @@
 # Handoff.md
 
+## Sesion 2026-05-03 — TASK-769 implementada (Cloud Cost Intelligence + AI FinOps Copilot)
+
+- **Lifecycle:** `complete` (movida a `complete/` y README/registry sincronizados).
+- **Branch:** `task/TASK-769-cloud-cost-intelligence-ai-finops-copilot`
+- **Slices entregados:**
+  - Billing Export V2 backwards-compatible: `costByResource`, `topDrivers`, `forecast`, `aiCopilot` opcional.
+  - UI Cloud & Integrations: forecast mensual, alertas tempranas, recursos/SKUs principales y resumen AI si existe.
+  - Reliability Control Plane: `cloud.expectedSignalKinds` incluye `billing`; drivers no-OK se proyectan como `cloud.billing.driver.*`.
+  - Copiloto FinOps AI: opt-in por `CLOUD_COST_AI_COPILOT_ENABLED=true`, JSON estricto, dedupe por fingerprint, persistencia en `greenhouse_ai.cloud_cost_ai_observations`.
+  - Alert sweep: `runCloudCostAlertSweep({ dryRun })`, Teams primero, Slack fallback, cooldown por fingerprint en `greenhouse_ai.cloud_cost_alert_dispatches`.
+  - ops-worker endpoint: `POST /cloud-cost-ai-watch` corre alertas determinísticas primero y AI después.
+- **Migración aplicada:** `20260503115518831_task-769-cloud-cost-ai-observations.sql`; `src/types/db.d.ts` regenerado por `pnpm migrate:up`.
+- **Datos vivos verificados:** BigQuery `efeonce-group.billing_export` tiene tabla estándar y resource-level pobladas. 30 días = CLP 114.379,91; forecast rolling mensual = CLP 121.840,58; driver principal `resource_driver.cloud_sql.greenhouse_pg_dev` severity `error` por Cloud SQL `greenhouse-pg-dev`.
+- **Validación ejecutada:**
+  - `pnpm pg:doctor`: OK.
+  - `pnpm migrate:up`: OK, migration aplicada y tipos regenerados.
+  - BigQuery reader real con `npx tsx --require ./scripts/lib/server-only-shim.cjs`: OK.
+  - Alert sweep dry-run: 5 drivers evaluados/elegibles, 0 despachos por `dryRun=true`.
+  - AI runner disabled skip: OK, costo cero con `CLOUD_COST_AI_COPILOT_ENABLED=false`.
+  - `pnpm tsc --noEmit`: OK.
+  - `pnpm lint`: 0 errors / 318 warnings legacy TASK-265.
+  - `pnpm build`: OK.
+  - `pnpm test`: 533 files / 3003 tests passed (5 skipped).
+- **Riesgos/follow-ups:**
+  - Activar AI requiere setear `CLOUD_COST_AI_COPILOT_ENABLED=true` en ops-worker + confirmar Vertex AI/WIF en runtime.
+  - Alertas reales requieren canal Teams `ops-alerts` o `CLOUD_COST_ALERT_TEAMS_CHANNEL_CODE`; si falta, caerá a Slack.
+  - Forecast GCP Console reporta CLP 135k; nuestro forecast determinístico rolling 7 días da CLP 121,8k. Diferencia esperada por método propietario de GCP; se documenta como triangulación, no como bug.
+
+## Sesion 2026-05-03 — TASK-769 tomada (Cloud Cost Intelligence + AI FinOps Copilot)
+
+- **Lifecycle:** `in-progress` (movida de `to-do/` a `in-progress/`)
+- **Branch:** `task/TASK-769-cloud-cost-intelligence-ai-finops-copilot`
+- **Ownership check:** `gh pr list --search "TASK-769"` sin PRs; `git branch -a | grep TASK-769` sin branches previas antes de crear esta rama.
+- **Discovery inicial:** BigQuery real ya tiene `billing_export.gcp_billing_export_v1_013340_4C7071_668441` y `billing_export.gcp_billing_export_resource_v1_013340_4C7071_668441`; `pnpm pg:doctor` saludable.
+- **Decisiones preliminares a validar en Audit/Plan:** V2 debe extender `src/lib/cloud/gcp-billing.ts` sin romper V1, usar `resource_v1` para drill-down acotado, mantener detección determinística antes de IA, y preferir Teams como canal primario Greenhouse-first con Slack como fallback/compatibilidad `TASK-103`.
+- **Checkpoint:** P1 + Effort Alto => humano después de Plan Mode antes de escribir código funcional.
+
 ## Sesion 2026-05-03 — TASK-768 cerrada (Finance Expense Economic Category Dimension + ISSUE-065 resolved)
 
 - **Lifecycle:** `complete` (movida a `complete/`)

@@ -8,13 +8,13 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `[optional EPIC-###]`
-- Status real: `Diseno`
+- Status real: `Implementado`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none`
@@ -267,12 +267,12 @@ La persistencia puede seguir el patrón de `greenhouse_ai.reliability_ai_observa
 
 ## Acceptance Criteria
 
-- [ ] `Admin Center` muestra costo cloud con breakdown por servicio y por recurso usando datos reales de Billing Export materializado
-- [ ] existe al menos una señal determinística por spike de costo cloud que pueda escalar a `warning/error` con evidencia concreta
-- [ ] la capa AI produce resumen grounded con drivers, causas probables y acciones recomendadas sin modificar severidades determinísticas
-- [ ] cuando la IA está desactivada o falla, la experiencia degrada honestamente y las alertas determinísticas siguen funcionando
-- [ ] el canal operativo seleccionado (`Teams` o `Slack`) recibe alertas tempranas cuando un servicio cruza threshold relevante
-- [ ] la documentación deja explícito qué vive en GCP Console (budgets) y qué vive dentro de Greenhouse (control plane + AI + alert routing)
+- [x] `Admin Center` muestra costo cloud con breakdown por servicio y por recurso usando datos reales de Billing Export materializado
+- [x] existe al menos una señal determinística por spike de costo cloud que pueda escalar a `warning/error` con evidencia concreta
+- [x] la capa AI produce resumen grounded con drivers, causas probables y acciones recomendadas sin modificar severidades determinísticas
+- [x] cuando la IA está desactivada o falla, la experiencia degrada honestamente y las alertas determinísticas siguen funcionando
+- [x] el canal operativo seleccionado (`Teams` o `Slack`) recibe alertas tempranas cuando un servicio cruza threshold relevante
+- [x] la documentación deja explícito qué vive en GCP Console (budgets) y qué vive dentro de Greenhouse (control plane + AI + alert routing)
 
 ## Verification
 
@@ -285,14 +285,14 @@ La persistencia puede seguir el patrón de `greenhouse_ai.reliability_ai_observa
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
-- [ ] `docs/architecture/GREENHOUSE_BILLING_EXPORT_OBSERVABILITY_V1.md` quedo actualizado a V2 o superseded explícitamente
-- [ ] `docs/architecture/GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1.md` quedo actualizado con los nuevos signals/AI contracts cloud-cost
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] `docs/architecture/GREENHOUSE_BILLING_EXPORT_OBSERVABILITY_V1.md` quedo actualizado a V2 o superseded explícitamente
+- [x] `docs/architecture/GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1.md` quedo actualizado con los nuevos signals/AI contracts cloud-cost
 
 ## Follow-ups
 
@@ -306,6 +306,15 @@ Task creada a partir del hallazgo operativo posterior a la materialización real
 
 ## Open Questions
 
-- ¿conviene persistir las observaciones AI en tabla nueva (`cloud_cost_ai_observations`) o extender el patrón de `reliability_ai_observations` con `scope` nuevo?
-- ¿el canal primario de alerta para V1 será `Teams`, `Slack` o ambos?
-- ¿la proyección mensual V1 debe apoyarse solo en `Billing Export` o enriquecerse además con Cloud Monitoring para señales más tempranas en servicios de alta variabilidad?
+- **Resuelta:** persistencia en tabla nueva `greenhouse_ai.cloud_cost_ai_observations`, porque el scope FinOps no debe deformar `reliability_ai_observations`.
+- **Resuelta:** Teams es canal primario Greenhouse-first; Slack queda como fallback/compatibilidad.
+- **Resuelta:** V1 usa solo `Billing Export` + `resource_v1` para detección y severidad; Cloud Monitoring queda follow-up de enriquecimiento, no source of truth.
+
+## Implementation Closure 2026-05-03
+
+- Reader real contra `efeonce-group.billing_export`: OK, tablas estándar + resource-level pobladas.
+- 30 días observados: CLP 114.379,91.
+- Forecast rolling mensual: CLP 121.840,58.
+- Driver principal: Cloud SQL `greenhouse-pg-dev`, severity `error`.
+- Migración aplicada: `20260503115518831_task-769-cloud-cost-ai-observations.sql`.
+- Validación: `pnpm pg:doctor`, `pnpm migrate:up`, BigQuery smoke real, alert sweep `dryRun`, AI disabled skip, `pnpm tsc --noEmit`, `pnpm build`, `pnpm test`, `pnpm lint`.

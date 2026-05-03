@@ -26,7 +26,11 @@ export async function GET(request: Request) {
   const days = parseDays(searchParams.get('days'))
   const forceRefresh = searchParams.get('refresh') === 'true'
 
-  const overview = await getGcpBillingOverview({ days, forceRefresh })
+  const overview = await getGcpBillingOverview({
+    days,
+    forceRefresh,
+    includeAiCopilot: searchParams.get('ai') === 'true'
+  })
 
   return NextResponse.json(overview)
 }

@@ -5,6 +5,7 @@ import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import Chip from '@mui/material/Chip'
 import Divider from '@mui/material/Divider'
+import Alert from '@mui/material/Alert'
 import LinearProgress from '@mui/material/LinearProgress'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
@@ -52,6 +53,23 @@ const formatDate = (iso: string | null): string => {
 
 const formatShare = (share: number): string => `${share.toFixed(1).replace(/\.0$/, '')}%`
 
+const formatPercentDelta = (value: number | null | undefined): string => {
+  if (value === null || value === undefined || !Number.isFinite(value)) return 'sin baseline'
+
+  return `${value > 0 ? '+' : ''}${Math.round(value)}%`
+}
+
+const toReadableList = (items: unknown[] | undefined): string[] =>
+  (items ?? [])
+    .map(item => {
+      if (typeof item === 'string') return item
+      if (item && typeof item === 'object') return JSON.stringify(item)
+
+      return ''
+    })
+    .filter(Boolean)
+    .slice(0, 3)
+
 const SpotlightRow = ({
   label,
   cost,
@@ -86,6 +104,8 @@ const GcpBillingCard = ({ overview }: Props) => {
   const isConfigured = overview.availability === 'configured'
 
   const topServices = overview.costByService.slice(0, 5)
+  const topDrivers = overview.topDrivers?.slice(0, 3) ?? []
+  const topResources = overview.costByResource?.slice(0, 5) ?? []
 
   return (
     <ExecutiveCardShell
@@ -177,6 +197,108 @@ const GcpBillingCard = ({ overview }: Props) => {
 
           <Divider />
 
+          {overview.forecast && (
+            <Card variant='outlined'>
+              <CardContent sx={{ p: 2.5 }}>
+                <Stack
+                  direction={{ xs: 'column', md: 'row' }}
+                  spacing={2}
+                  justifyContent='space-between'
+                >
+                  <Stack spacing={0.5}>
+                    <Typography variant='overline' color='text.secondary'>
+                      Proyección mensual
+                    </Typography>
+                    <Typography variant='h6' sx={{ fontVariantNumeric: 'tabular-nums' }}>
+                      {formatCurrency(overview.forecast.monthEndCost, overview.currency)}
+                    </Typography>
+                    <Typography variant='caption' color='text.secondary'>
+                      Promedio diario {formatCurrency(
+                        overview.forecast.averageDailyCost,
+                        overview.currency
+                      )} · {overview.forecast.observedCompleteDays} días completos · confianza{' '}
+                      {overview.forecast.confidence}
+                    </Typography>
+                  </Stack>
+                  <Chip
+                    size='small'
+                    color={overview.forecast.confidence === 'high' ? 'success' : 'warning'}
+                    label={
+                      overview.forecast.method === 'current_month_daily_average'
+                        ? 'Mes actual'
+                        : 'Rolling period'
+                    }
+                    sx={{ alignSelf: { xs: 'flex-start', md: 'center' } }}
+                  />
+                </Stack>
+              </CardContent>
+            </Card>
+          )}
+
+          {topDrivers.length > 0 && (
+            <Stack spacing={1.5}>
+              <Typography variant='overline' color='text.secondary'>
+                Alertas tempranas
+              </Typography>
+              {topDrivers.map(driver => (
+                <Alert
+                  key={driver.driverId}
+                  severity={driver.severity === 'error' ? 'error' : 'warning'}
+                  variant='outlined'
+                >
+                  <Stack spacing={0.5}>
+                    <Typography variant='body2' sx={{ fontWeight: 600 }}>
+                      {driver.summary}
+                    </Typography>
+                    <Typography variant='caption' color='text.secondary'>
+                      {driver.resourceName ? `${driver.resourceName} · ` : ''}
+                      {driver.evidence.map(item => `${item.label}: ${item.value}`).join(' · ')}
+                    </Typography>
+                  </Stack>
+                </Alert>
+              ))}
+            </Stack>
+          )}
+
+          {overview.aiCopilot && (
+            <Card variant='outlined'>
+              <CardContent sx={{ p: 2.5 }}>
+                <Stack spacing={1.25}>
+                  <Stack direction='row' spacing={1} alignItems='center' flexWrap='wrap' useFlexGap>
+                    <Typography variant='overline' color='text.secondary'>
+                      Copiloto FinOps AI
+                    </Typography>
+                    <Chip
+                      size='small'
+                      color={
+                        overview.aiCopilot.severity === 'error'
+                          ? 'error'
+                          : overview.aiCopilot.severity === 'warning'
+                            ? 'warning'
+                            : 'success'
+                      }
+                      label={`Confianza ${overview.aiCopilot.confidence}`}
+                    />
+                  </Stack>
+                  <Typography variant='body2'>{overview.aiCopilot.executiveSummary}</Typography>
+                  {toReadableList(overview.aiCopilot.attackPriority).length > 0 && (
+                    <Stack spacing={0.5}>
+                      {toReadableList(overview.aiCopilot.attackPriority).map(item => (
+                        <Typography key={item} variant='caption' color='text.secondary'>
+                          - {item}
+                        </Typography>
+                      ))}
+                    </Stack>
+                  )}
+                  <Typography variant='caption' color='text.secondary'>
+                    Observado: {formatDate(overview.aiCopilot.observedAt)} · modelo{' '}
+                    {overview.aiCopilot.model}
+                  </Typography>
+                </Stack>
+              </CardContent>
+            </Card>
+          )}
+
           <Stack spacing={1.5}>
             <Typography variant='overline' color='text.secondary'>
               Top servicios
@@ -187,16 +309,60 @@ const GcpBillingCard = ({ overview }: Props) => {
               </Typography>
             ) : (
               topServices.map(service => (
-                <SpotlightRow
-                  key={service.serviceId || service.serviceDescription}
-                  label={service.serviceDescription}
-                  cost={service.cost}
-                  share={overview.totalCost > 0 ? (service.cost / overview.totalCost) * 100 : 0}
-                  currency={overview.currency}
-                />
+                <Stack key={service.serviceId || service.serviceDescription} spacing={0.5}>
+                  <SpotlightRow
+                    label={service.serviceDescription}
+                    cost={service.cost}
+                    share={
+                      service.share ??
+                      (overview.totalCost > 0 ? (service.cost / overview.totalCost) * 100 : 0)
+                    }
+                    currency={overview.currency}
+                  />
+                  {service.deltaPercent !== undefined && (
+                    <Typography variant='caption' color='text.secondary'>
+                      {service.serviceDescription}: reciente{' '}
+                      {formatCurrency(service.recentDailyCost ?? 0, overview.currency)} diario vs
+                      baseline {formatCurrency(service.baselineDailyCost ?? 0, overview.currency)} (
+                      {formatPercentDelta(service.deltaPercent)})
+                    </Typography>
+                  )}
+                </Stack>
               ))
             )}
           </Stack>
+
+          {topResources.length > 0 && (
+            <Box>
+              <Divider sx={{ mb: 2 }} />
+              <Stack spacing={1.25}>
+                <Typography variant='overline' color='text.secondary'>
+                  Recursos que explican el gasto
+                </Typography>
+                {topResources.map(resource => (
+                  <Stack
+                    key={`${resource.serviceDescription}-${resource.skuDescription}-${resource.resourceName}`}
+                    spacing={0.25}
+                  >
+                    <Stack direction='row' justifyContent='space-between' gap={2}>
+                      <Typography variant='body2' sx={{ fontWeight: 600 }}>
+                        {resource.resourceName}
+                      </Typography>
+                      <Typography
+                        variant='body2'
+                        sx={{ fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}
+                      >
+                        {formatCurrency(resource.cost, overview.currency)}
+                      </Typography>
+                    </Stack>
+                    <Typography variant='caption' color='text.secondary'>
+                      {resource.serviceDescription} · {resource.skuDescription} · {formatShare(resource.share)}
+                    </Typography>
+                  </Stack>
+                ))}
+              </Stack>
+            </Box>
+          )}
 
           {overview.spotlights.notionBqSync && (
             <Box>

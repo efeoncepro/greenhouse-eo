@@ -16,6 +16,9 @@ describe('auth-secrets', () => {
   })
 
   it('enables Microsoft SSO when client id and secret resolve successfully', async () => {
+    vi.stubEnv('NEXTAUTH_SECRET', '')
+    vi.stubEnv('AZURE_AD_CLIENT_SECRET', '')
+    vi.stubEnv('GOOGLE_CLIENT_SECRET', '')
     vi.stubEnv('AZURE_AD_CLIENT_ID', 'azure-client-id')
     vi.stubEnv('GOOGLE_CLIENT_ID', 'google-client-id')
     resolveSecret
@@ -55,6 +58,9 @@ describe('auth-secrets', () => {
   })
 
   it('disables Microsoft SSO when the secret is unconfigured', async () => {
+    vi.stubEnv('NEXTAUTH_SECRET', '')
+    vi.stubEnv('AZURE_AD_CLIENT_SECRET', '')
+    vi.stubEnv('GOOGLE_CLIENT_SECRET', '')
     vi.stubEnv('AZURE_AD_CLIENT_ID', 'azure-client-id')
     resolveSecret
       .mockResolvedValueOnce({

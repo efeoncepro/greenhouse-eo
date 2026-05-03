@@ -27,6 +27,35 @@ export type Numeric = ColumnType<string, number | string, number | string>;
 
 export type Timestamp = ColumnType<Date, Date | string, Date | string>;
 
+export interface GreenhouseAiCloudCostAiObservations {
+  attack_priority: Generated<Json>;
+  confidence: string;
+  created_at: Generated<Timestamp>;
+  executive_summary: string;
+  fingerprint: string;
+  missing_telemetry: Generated<string[]>;
+  model: string;
+  observation_id: string;
+  observed_at: Timestamp;
+  output_tokens: number | null;
+  probable_causes: Generated<Json>;
+  prompt_tokens: number | null;
+  recommended_actions: Generated<Json>;
+  severity: string;
+  sweep_run_id: string;
+  top_cost_drivers: Generated<Json>;
+}
+
+export interface GreenhouseAiCloudCostAlertDispatches {
+  channels: Generated<string[]>;
+  created_at: Generated<Timestamp>;
+  dispatched_at: Generated<Timestamp>;
+  driver_ids: Generated<string[]>;
+  fingerprint: string;
+  severity: string;
+  summary: string;
+}
+
 export interface GreenhouseAiCreditLedger {
   asset_description: string | null;
   balance_after: number;
@@ -7752,6 +7781,8 @@ export interface Pgmigrations {
 }
 
 export interface DB {
+  "greenhouse_ai.cloud_cost_ai_observations": GreenhouseAiCloudCostAiObservations;
+  "greenhouse_ai.cloud_cost_alert_dispatches": GreenhouseAiCloudCostAlertDispatches;
   "greenhouse_ai.credit_ledger": GreenhouseAiCreditLedger;
   "greenhouse_ai.credit_wallets": GreenhouseAiCreditWallets;
   "greenhouse_ai.member_tool_licenses": GreenhouseAiMemberToolLicenses;
