@@ -29,6 +29,7 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
 2. Evitar romper la base de Vuexy mientras se adapta a Greenhouse.
 3. Dejar handoff claro para el siguiente agente.
 4. No mezclar refactors grandes con cambios funcionales pequenos.
+5. Preferir soluciones seguras, robustas, resilientes y escalables por sobre parches locales. La regla canonica vive en `docs/operations/SOLUTION_QUALITY_OPERATING_MODEL_V1.md`.
 
 ## Contrato rapido para agentes
 
@@ -38,6 +39,7 @@ Este bloque es el resumen obligatorio antes de ejecutar cualquier cambio. Las se
 - Protocolo TASK-###: usar `docs/tasks/TASK_PROCESS.md` como proceso canonico y `docs/operations/CODEX_EXECUTION_PROMPT_V1.md` como prompt operativo robusto para ejecucion con Codex.
 - Contexto y auditoria: `docs/operations/CONTEXT_HANDOFF_OPERATING_MODEL_V1.md` gobierna como usar `project_context.md`, `Handoff.md` y `Handoff.archive.md` sin perder memoria historica.
 - Source of truth: si task/spec, arquitectura y runtime real discrepan, prevalecen arquitectura vigente + codigo/schema/runtime verificados. Corregir la spec antes de implementar si el drift cambia contrato o bloquea.
+- Calidad de solucion: no entregar parches fragiles si el problema pide causa raiz. Aplicar `docs/operations/SOLUTION_QUALITY_OPERATING_MODEL_V1.md`; cualquier workaround debe ser temporal, reversible, documentado y con owner/retirada.
 - Proporcionalidad: discovery breve para cambios locales; protocolo completo para cambios cross-domain, auth, billing, finance, data, cloud, migraciones, observabilidad o UI visible.
 - Reutilizar antes de crear: buscar helpers, readers, components, routes, signals, capabilities y docs existentes antes de introducir piezas nuevas.
 - Aislamiento multi-agente: no cambiar la rama de un checkout donde otra persona/agente trabaja; usar `git worktree` y documentar coordinacion en `Handoff.md`.
@@ -84,6 +86,11 @@ Estos CLIs estan autenticados localmente. Cuando una task toca su dominio, **usa
   - tasks pequenas/locales pueden hacer discovery, audit y plan de forma breve
   - tasks cross-domain, shared runtime, migraciones, access model, observabilidad o UI visible deben aplicar el protocolo completo con mayor rigor
   - cambios sensibles en finance, payroll, auth, billing, cloud, data o produccion deben tratarse como de alto rigor aunque el diff parezca pequeno
+- **Regla anti-parche**:
+  - por defecto, resolver causa raiz y reforzar el contrato canonico, no solo apagar el sintoma local
+  - si el fix correcto vive en una primitive compartida, schema, worker, env, secret, docs o arquitectura, actuar ahi en vez de parchear el caller visible
+  - un workaround solo es aceptable como mitigacion temporal: reversible, documentado, con owner, condicion de retiro y task/issue asociada cuando aplique
+  - fuente canonica: `docs/operations/SOLUTION_QUALITY_OPERATING_MODEL_V1.md`
 - Si el trabajo toca permisos, navegacion, Home, menu, guards, surfaces por rol o diseño de nuevas capacidades:
   - revisar `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md`
   - revisar `docs/architecture/GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md`

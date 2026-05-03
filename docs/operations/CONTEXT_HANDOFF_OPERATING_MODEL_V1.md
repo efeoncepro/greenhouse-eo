@@ -19,6 +19,7 @@ No se borra historia para ordenar. Se mueve al archivo correcto, se indexa y se 
 | Que paso historicamente en una sesion | `Handoff.archive.md` | commit, PR, task, issue |
 | Como se resolvio un incidente | `docs/issues/resolved/ISSUE-###*.md` + task complete | `Handoff.archive.md` |
 | Como se implemento una capability | `docs/tasks/complete/TASK-###*.md` | docs de arquitectura/documentation/manual |
+| Que criterio de calidad evita parches fragiles | `docs/operations/SOLUTION_QUALITY_OPERATING_MODEL_V1.md` | `AGENTS.md` / `CLAUDE.md` regla corta |
 | Cual es el contrato tecnico estable | `docs/architecture/*` | `project_context.md` delta corto |
 
 ## Contrato De `Handoff.md`
@@ -114,6 +115,7 @@ Debe revisar como minimo:
 - `CLAUDE.md` debe declarar la misma regla para Claude Code.
 - `docs/operations/CODEX_EXECUTION_PROMPT_V1.md` debe incluir este modelo en lectura obligatoria.
 - `docs/operations/DOCUMENTATION_OPERATING_MODEL_V1.md` debe enlazar este modelo como especializacion de continuidad.
+- `docs/operations/SOLUTION_QUALITY_OPERATING_MODEL_V1.md` debe quedar enlazado desde los puntos de entrada cuando cambie el criterio transversal de no-parches.
 
 Si un agente no conoce este modelo, el repo debe volver a ensenarselo desde esos puntos de entrada.
 

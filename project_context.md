@@ -1,6 +1,7 @@
 ## Estado vigente para agentes
 
 - `AGENTS.md` y `CLAUDE.md` son los puntos de entrada operativos para agentes; ambos deben mantenerse alineados cuando cambie un contrato transversal.
+- `docs/operations/SOLUTION_QUALITY_OPERATING_MODEL_V1.md` es el contrato transversal anti-parche: Greenhouse espera soluciones seguras, robustas, resilientes y escalables por defecto; workarounds solo temporales, reversibles y documentados.
 - `docs/operations/CONTEXT_HANDOFF_OPERATING_MODEL_V1.md` gobierna la convivencia entre `project_context.md`, `Handoff.md` y `Handoff.archive.md`: no se pierde auditoria, se separa estado activo de historia.
 - `project_context.md` debe leerse como estado vigente + deltas historicos. Si un delta antiguo contradice esta cabecera, `AGENTS.md`, arquitectura vigente o runtime real, prevalece el contrato vigente y debe documentarse el drift.
 - `Handoff.md` sigue siendo util para construir: contiene contexto operacional rico. No debe recortarse ni archivarse agresivamente sin preservar texto completo y dejar referencias.

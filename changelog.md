@@ -7812,3 +7812,6 @@ Artefactos nuevos:
 
 Comando operativo:
 - `pnpm teams:announce`
+# 2026-05-03
+
+- Docs operativos: se formalizo `SOLUTION_QUALITY_OPERATING_MODEL_V1` como contrato transversal anti-parche para agentes, enlazado desde `AGENTS.md`, `CLAUDE.md`, `TASK_PROCESS`, prompt Codex y modelos operativos.

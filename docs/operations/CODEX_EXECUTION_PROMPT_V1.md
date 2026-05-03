@@ -4,7 +4,7 @@
 
 Definir un prompt operativo canónico para que Codex ejecute `TASK-###` dentro de `greenhouse-eo` con alta fidelidad al repo real, bajo drift, buen uso de skills, coordinación segura con subagentes y cierre documental consistente.
 
-Este documento **no reemplaza** `AGENTS.md`, `project_context.md`, `Handoff.md`, `Handoff.archive.md`, `docs/operations/CONTEXT_HANDOFF_OPERATING_MODEL_V1.md` ni `docs/tasks/TASK_PROCESS.md`. Los comprime en una forma reutilizable para sesiones de ejecución.
+Este documento **no reemplaza** `AGENTS.md`, `project_context.md`, `Handoff.md`, `Handoff.archive.md`, `docs/operations/CONTEXT_HANDOFF_OPERATING_MODEL_V1.md`, `docs/operations/SOLUTION_QUALITY_OPERATING_MODEL_V1.md` ni `docs/tasks/TASK_PROCESS.md`. Los comprime en una forma reutilizable para sesiones de ejecución.
 
 ## Cuándo usarlo
 
@@ -25,6 +25,8 @@ En esos casos, usar este prompt de forma proporcional y breve.
 Vas a implementar la task **[TASK-###]** ubicada en `docs/tasks/{to-do,in-progress}/TASK-###-*.md` dentro del repo `greenhouse-eo`.
 
 Tu objetivo es ejecutar la task de forma **canónica, reusable, segura, resiliente y alineada con el estado real del repo**. No basta con “hacer que funcione”: debes respetar arquitectura, runtime, documentación viva, contratos existentes y blast radius del ecosistema Greenhouse.
+
+Greenhouse no quiere parches fragiles por defecto. Debes aplicar `docs/operations/SOLUTION_QUALITY_OPERATING_MODEL_V1.md`: corrige causa raiz, reutiliza primitives canonicas, agrega defensa/regresion cuando aplique y documenta cualquier workaround como temporal, reversible y con condicion de retiro.
 
 No asumas que la spec está perfecta. Primero debes contrastarla contra:
 - el código real
@@ -78,22 +80,23 @@ PRINCIPIOS OPERATIVOS
 -------------------------------------------------------------------------------
 
 1. Reutiliza antes de crear.
-2. No implementes sobre supuestos no verificados.
-3. Si la spec está desactualizada:
+2. Corrige causa raiz antes que sintomas locales; no entregues workarounds permanentes.
+3. No implementes sobre supuestos no verificados.
+4. Si la spec está desactualizada:
    - si el drift es bloqueante o cambia contrato, corrígela primero
    - si no es bloqueante, documéntalo en Audit y sigue
-4. Si el cambio toca acceso, documenta explícitamente qué vive en:
+5. Si el cambio toca acceso, documenta explícitamente qué vive en:
    - `routeGroups`
    - `views` / `authorizedViews` / `view_code`
    - `entitlements`
    - `startup policy`
-5. Si el cambio toca UI visible, respeta `DESIGN.md`.
-6. Si el cambio toca backend/data/runtime, usa primitives canónicas del repo; no inventes paths paralelos.
-7. Si existe una auditoría relevante en `docs/audits/`, úsala como input, pero revalídala.
-8. Usa skills reales del entorno cuando el trabajo lo justifique.
-9. Usa subagentes solo cuando haya trabajo independiente, no bloqueante y con ownership claro.
-10. No mezcles refactor grande con fix funcional chico sin necesidad real.
-11. No reviertas cambios ajenos del worktree.
+6. Si el cambio toca UI visible, respeta `DESIGN.md`.
+7. Si el cambio toca backend/data/runtime, usa primitives canónicas del repo; no inventes paths paralelos.
+8. Si existe una auditoría relevante en `docs/audits/`, úsala como input, pero revalídala.
+9. Usa skills reales del entorno cuando el trabajo lo justifique.
+10. Usa subagentes solo cuando haya trabajo independiente, no bloqueante y con ownership claro.
+11. No mezcles refactor grande con fix funcional chico sin necesidad real.
+12. No reviertas cambios ajenos del worktree.
 
 -------------------------------------------------------------------------------
 PROPORCIONALIDAD

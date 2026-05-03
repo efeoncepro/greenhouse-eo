@@ -8,6 +8,8 @@
 
 Formalizar una lane liviana para cambios pequeños que no deben ejecutarse "al vuelo", pero que tampoco justifican una `TASK-###` completa ni describen una falla reactiva como `ISSUE-###`.
 
+Aunque sea liviana, una mini-task no autoriza parches fragiles. Si durante discovery aparece causa raiz compartida, contrato roto o necesidad de resiliencia/seguridad/escalabilidad, aplicar `docs/operations/SOLUTION_QUALITY_OPERATING_MODEL_V1.md` y promover a `TASK-###`.
+
 ## Canonical Locations
 
 - Tracker: `docs/mini-tasks/README.md`
@@ -88,6 +90,7 @@ Promover `MINI-###` a `TASK-###` si durante discovery o ejecución ocurre cualqu
 - se necesita nueva API, schema o contrato reusable
 - el blast radius deja de ser claramente bajo
 - la verificación deja de ser local y requiere rollout coordinado
+- el cambio local seria solo un parche sobre una causa raiz compartida
 
 Al promover:
 

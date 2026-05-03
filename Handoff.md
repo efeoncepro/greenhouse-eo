@@ -1,5 +1,12 @@
 # Handoff.md
 
+## Sesion 2026-05-03 — Solution Quality Operating Model canonizado
+
+- **Trigger:** el usuario pidio convertir la preferencia recurrente "no parches; soluciones seguras, robustas, resilientes y escalables" en regla permanente para Codex, Claude y docs operativos.
+- **Fuente canonica nueva:** `docs/operations/SOLUTION_QUALITY_OPERATING_MODEL_V1.md`.
+- **Puntos de entrada sincronizados:** `AGENTS.md`, `CLAUDE.md`, `project_context.md`, `docs/tasks/TASK_PROCESS.md`, `docs/operations/CODEX_EXECUTION_PROMPT_V1.md`, `DOCUMENTATION_OPERATING_MODEL`, `ISSUE_OPERATING_MODEL`, `MINI_TASK_OPERATING_MODEL`, `EPIC_OPERATING_MODEL`, `CONTEXT_HANDOFF_OPERATING_MODEL` y `docs/README.md`.
+- **Contrato:** causa raiz + primitive canonica por defecto; workaround solo temporal, reversible, documentado, con owner, condicion de retiro y task/issue cuando aplique.
+
 ## Sesion 2026-05-03 — TASK-773 cerrada (Outbox Publisher Cloud Scheduler Cutover + Reliability + E2E Pre-Merge Gate)
 
 - **Lifecycle:** `complete` (movida a `complete/`, README/registry sincronizados).

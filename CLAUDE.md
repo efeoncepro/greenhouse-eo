@@ -59,6 +59,13 @@ Regla: módulos de dominio extienden estos objetos, no crean identidades paralel
 - **Migrations:** `pnpm migrate:up`, `pnpm migrate:down`, `pnpm migrate:create <nombre>`, `pnpm migrate:status`
 - **DB types:** `pnpm db:generate-types` (regenerar después de cada migración)
 
+### Solution Quality Contract
+
+- Greenhouse espera soluciones seguras, robustas, resilientes y escalables por defecto; no parches locales salvo mitigacion temporal explicita.
+- Antes de implementar, validar si el problema es sintoma local o causa compartida y preferir la primitive canonica del dominio.
+- Todo workaround debe quedar documentado como temporal, reversible, con owner, condicion de retiro y task/issue asociada cuando aplique.
+- Fuente canonica: `docs/operations/SOLUTION_QUALITY_OPERATING_MODEL_V1.md`.
+
 ### Secret Manager Hygiene
 
 - Secretos consumidos por `*_SECRET_REF` deben publicarse como scalar crudo: sin comillas envolventes, sin `\n`/`\r` literal y sin whitespace residual.
@@ -93,6 +100,8 @@ Regla: módulos de dominio extienden estos objetos, no crean identidades paralel
   - `docs/architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md`
 - Fuente canónica para trabajo multi-agente (Claude + Codex en paralelo):
   - `docs/operations/MULTI_AGENT_WORKTREE_OPERATING_MODEL_V1.md` — incluye higiene de worktrees, `rebase --onto`, `force-push-with-lease`, CI como gate compartido, squash merge policy, background watcher pattern para auto-merge sin branch protection
+- Fuente canonica para calidad de solucion:
+  - `docs/operations/SOLUTION_QUALITY_OPERATING_MODEL_V1.md` — regla anti-parche: causa raiz, primitives canonicas, resiliencia, seguridad, escalabilidad y workaround solo temporal/documentado
 - Convenciones de skills locales:
   - Claude: `.claude/skills/<skill-name>/SKILL.md` (convencion oficial vigente; existen skills legacy en `skill.md` minuscula)
   - Codex: `.codex/skills/<skill-name>/SKILL.md` (mayuscula)
