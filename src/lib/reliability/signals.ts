@@ -988,3 +988,26 @@ export const buildPaymentOrderSettlementSignals = async (
 
   return [paid, dead, lag]
 }
+
+/**
+ * TASK-766 Slice 2 — Finance CLP currency drift signals.
+ *
+ * Wraps los 2 readers de drift CLP (expense_payments + income_payments) en
+ * un Promise.all para evitar latencia secuencial. Cada reader degrada
+ * honestamente (severity=unknown) si su query falla.
+ *
+ * Mismo pattern que `buildPaymentOrderSettlementSignals` (TASK-765 Slice 7).
+ */
+export const buildFinanceClpDriftSignals = async (
+  readers: {
+    expensePayments: () => Promise<ReliabilitySignal>
+    incomePayments: () => Promise<ReliabilitySignal>
+  }
+): Promise<ReliabilitySignal[]> => {
+  const [expense, income] = await Promise.all([
+    readers.expensePayments(),
+    readers.incomePayments()
+  ])
+
+  return [expense, income]
+}

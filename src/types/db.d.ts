@@ -3655,6 +3655,7 @@ export interface GreenhouseFinanceExpensePayments {
   recorded_at: Generated<Timestamp | null>;
   recorded_by_user_id: string | null;
   reference: string | null;
+  requires_fx_repair: Generated<boolean>;
   settlement_group_id: string | null;
   space_id: string | null;
   superseded_at: Timestamp | null;
@@ -4147,6 +4148,7 @@ export interface GreenhouseFinanceIncomePayments {
   recorded_at: Generated<Timestamp | null>;
   recorded_by_user_id: string | null;
   reference: string | null;
+  requires_fx_repair: Generated<boolean>;
   settlement_group_id: string | null;
   space_id: string | null;
   superseded_at: Timestamp | null;

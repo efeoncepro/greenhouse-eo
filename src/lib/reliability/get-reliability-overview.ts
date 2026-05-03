@@ -26,6 +26,8 @@ import type { SyntheticRouteSnapshot } from '@/types/reliability-synthetic'
 
 import { buildAiSummarySignals } from './ai/build-ai-summary-signals'
 import { getLatestAiObservationsByScope, type AiObservation } from './ai/reader'
+import { getExpensePaymentsClpDriftSignal } from './queries/expense-payments-clp-drift'
+import { getIncomePaymentsClpDriftSignal } from './queries/income-payments-clp-drift'
 import { getPaymentOrdersDeadLetterSignal } from './queries/payment-orders-dead-letter'
 import { getPaidOrdersWithoutExpensePaymentSignal } from './queries/payment-orders-paid-without-expense-payment'
 import { getPayrollExpenseMaterializationLagSignal } from './queries/payroll-expense-materialization-lag'
@@ -44,6 +46,7 @@ import {
   buildNotionDataQualitySignals,
   buildNotionFreshnessSignal,
   buildObservabilityPostureSignal,
+  buildFinanceClpDriftSignals,
   buildPaymentOrderSettlementSignals,
   buildSentryIncidentSignals,
   buildSubsystemSignals,
@@ -253,6 +256,17 @@ interface ReliabilityOverviewSources {
    * query falla. El composer los inyecta en `allSignals` con resto del array.
    */
   paymentOrderSettlement?: ReliabilitySignal[] | null
+
+  /**
+   * TASK-766 Slice 2 — Finance CLP currency drift signals. 2 readers que
+   * cuentan expense_payments / income_payments con currency!='CLP' y
+   * amount_clp IS NULL (drift detectado por la VIEW *_normalized via flag
+   * has_clp_drift). Cada reader degrada honestamente (kind=unknown) si la
+   * query falla. Steady state esperado = 0; cualquier valor > 0 indica una
+   * fila legacy pendiente del repair endpoint
+   * `POST /api/admin/finance/payments-clp-repair` (slice 5).
+   */
+  financeClpDrift?: ReliabilitySignal[] | null
 }
 
 export const buildReliabilityOverview = (
@@ -286,7 +300,9 @@ export const buildReliabilityOverview = (
     // TASK-765 Slice 7 — payment_order ↔ bank settlement signals (drift /
     // dead_letter / lag). Inyectadas pre-fetched desde getReliabilityOverview
     // para mantener buildReliabilityOverview sincrónico.
-    ...(sources.paymentOrderSettlement ?? [])
+    ...(sources.paymentOrderSettlement ?? []),
+    // TASK-766 Slice 2 — Finance CLP currency drift signals (expense + income).
+    ...(sources.financeClpDrift ?? [])
   ]
 
   const signalsByModule = new Map<string, ReliabilitySignal[]>()
@@ -448,6 +464,15 @@ export const getReliabilityOverview = async (
           materializationLag: getPayrollExpenseMaterializationLagSignal
         }).catch(() => null)
 
+  // TASK-766 Slice 2 — Finance CLP currency drift signals (expense + income).
+  const financeClpDrift =
+    preloadedSources.financeClpDrift !== undefined
+      ? preloadedSources.financeClpDrift
+      : await buildFinanceClpDriftSignals({
+          expensePayments: getExpensePaymentsClpDriftSignal,
+          incomePayments: getIncomePaymentsClpDriftSignal
+        }).catch(() => null)
+
   return buildReliabilityOverview(operations, {
     billing,
     notionOperational,
@@ -456,7 +481,8 @@ export const getReliabilityOverview = async (
     modules,
     aiObservations,
     domainIncidents,
-    paymentOrderSettlement
+    paymentOrderSettlement,
+    financeClpDrift
   })
 }
 
