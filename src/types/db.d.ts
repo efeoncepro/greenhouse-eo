@@ -3669,6 +3669,27 @@ export interface GreenhouseFinanceExpensePayments {
   superseded_reason: string | null;
 }
 
+export interface GreenhouseFinanceExpensePaymentsNormalized {
+  created_at: Timestamp | null;
+  exchange_rate_at_payment: Numeric | null;
+  expense_id: string | null;
+  fx_gain_loss_clp: Numeric | null;
+  has_clp_drift: boolean | null;
+  is_reconciled: boolean | null;
+  payment_account_id: string | null;
+  payment_amount_clp: Numeric | null;
+  payment_amount_native: Numeric | null;
+  payment_currency: string | null;
+  payment_date: Timestamp | null;
+  payment_id: string | null;
+  payment_method: string | null;
+  payment_order_line_id: string | null;
+  payment_source: string | null;
+  recorded_at: Timestamp | null;
+  recorded_by_user_id: string | null;
+  reference: string | null;
+}
+
 export interface GreenhouseFinanceExpenses {
   /**
    * FK to greenhouse_core.client_profiles when expense is directly allocated
@@ -4138,6 +4159,26 @@ export interface GreenhouseFinanceIncomePayments {
    */
   superseded_by_payment_id: string | null;
   superseded_reason: string | null;
+}
+
+export interface GreenhouseFinanceIncomePaymentsNormalized {
+  created_at: Timestamp | null;
+  exchange_rate_at_payment: Numeric | null;
+  fx_gain_loss_clp: Numeric | null;
+  has_clp_drift: boolean | null;
+  income_id: string | null;
+  is_reconciled: boolean | null;
+  payment_account_id: string | null;
+  payment_amount_clp: Numeric | null;
+  payment_amount_native: Numeric | null;
+  payment_currency: string | null;
+  payment_date: Timestamp | null;
+  payment_id: string | null;
+  payment_method: string | null;
+  payment_source: string | null;
+  recorded_at: Timestamp | null;
+  recorded_by_user_id: string | null;
+  reference: string | null;
 }
 
 export interface GreenhouseFinanceIncomeSettlementReconciliation {
@@ -7817,6 +7858,7 @@ export interface DB {
   "greenhouse_finance.expense_attribution_audit": GreenhouseFinanceExpenseAttributionAudit;
   "greenhouse_finance.expense_attribution_rules": GreenhouseFinanceExpenseAttributionRules;
   "greenhouse_finance.expense_payments": GreenhouseFinanceExpensePayments;
+  "greenhouse_finance.expense_payments_normalized": GreenhouseFinanceExpensePaymentsNormalized;
   "greenhouse_finance.expenses": GreenhouseFinanceExpenses;
   "greenhouse_finance.external_cash_signals": GreenhouseFinanceExternalCashSignals;
   "greenhouse_finance.external_signal_auto_adopt_policies": GreenhouseFinanceExternalSignalAutoAdoptPolicies;
@@ -7827,6 +7869,7 @@ export interface DB {
   "greenhouse_finance.income": GreenhouseFinanceIncome;
   "greenhouse_finance.income_line_items": GreenhouseFinanceIncomeLineItems;
   "greenhouse_finance.income_payments": GreenhouseFinanceIncomePayments;
+  "greenhouse_finance.income_payments_normalized": GreenhouseFinanceIncomePaymentsNormalized;
   "greenhouse_finance.income_settlement_reconciliation": GreenhouseFinanceIncomeSettlementReconciliation;
   "greenhouse_finance.instrument_category_kpi_rules": GreenhouseFinanceInstrumentCategoryKpiRules;
   "greenhouse_finance.instrument_category_provider_rules": GreenhouseFinanceInstrumentCategoryProviderRules;
