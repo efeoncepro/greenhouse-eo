@@ -1,10 +1,12 @@
 /**
  * TASK-775 Slice 1 — tests del cron handler wrapper canónico.
  */
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { IncomingMessage, ServerResponse } from 'node:http'
 
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 const mockCaptureWithDomain = vi.fn()
+
 const mockRedactErrorForResponse = vi.fn((err: unknown) =>
   err instanceof Error ? err.message : String(err)
 )
@@ -98,6 +100,7 @@ describe('wrapCronHandler — TASK-775 canonical helper', () => {
 
   it('returns 502 + emits Sentry when run() throws', async () => {
     const error = new Error('something broke')
+
     const handler = wrapCronHandler({
       name: 'fail-cron',
       domain: 'integrations.hubspot',
@@ -151,6 +154,7 @@ describe('wrapCronHandler — TASK-775 canonical helper', () => {
 
   it('passes parsed body to run()', async () => {
     let received: Record<string, unknown> = {}
+
     const handler = wrapCronHandler({
       name: 'body-cron',
       domain: 'sync',

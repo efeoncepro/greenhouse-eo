@@ -70,6 +70,15 @@ jobs:
       - name: Lint
         run: pnpm lint
 
+      - name: Vercel cron async-critical gate (TASK-775)
+        # Bloquea PRs que agreguen entries `async-critical` a vercel.json sin
+        # equivalente Cloud Scheduler. Vercel custom environments NO ejecutan
+        # crons en staging — el bug class que cierra es: cron crítico añadido a
+        # Vercel pero invisible en staging, side effect calla.
+        # Run en modo `--warn` durante migración TASK-775 (Slices 2/3/7 lo bajan
+        # a 0); promueve a strict (sin --warn) después de cierre.
+        run: pnpm vercel-cron-gate --warn
+
       - name: Test inventory
         run: pnpm test:inventory
 

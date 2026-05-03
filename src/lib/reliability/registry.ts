@@ -308,7 +308,7 @@ export const STATIC_RELIABILITY_REGISTRY: ReliabilityModuleDefinition[] = [
       'src/lib/sync/**',
       'services/ops-worker/**'
     ],
-    expectedSignalKinds: ['subsystem', 'lag', 'dead_letter', 'incident'],
+    expectedSignalKinds: ['subsystem', 'lag', 'dead_letter', 'incident', 'drift'],
     incidentDomainTag: 'sync'
   }
 ]

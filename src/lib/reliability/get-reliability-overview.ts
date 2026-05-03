@@ -34,6 +34,7 @@ import { getPayrollExpenseMaterializationLagSignal } from './queries/payroll-exp
 import { getProviderBqSyncDeadLetterSignal } from './queries/provider-bq-sync-dead-letter'
 import { getOutboxUnpublishedLagSignal } from './queries/outbox-unpublished-lag'
 import { getOutboxDeadLetterSignal } from './queries/outbox-dead-letter'
+import { getCronStagingDriftSignal } from './queries/cron-staging-drift'
 import { RELIABILITY_REGISTRY } from './registry'
 import { getReliabilityRegistry } from './registry-store'
 import {
@@ -290,6 +291,15 @@ interface ReliabilityOverviewSources {
    * incidente Figma 2026-05-03 cuando Vercel cron no corría en staging).
    */
   outboxHealth?: ReliabilitySignal[] | null
+
+  /**
+   * TASK-775 Slice 5 — Cron staging drift signal:
+   *   - platform.cron.staging_drift (Vercel async-critical sin Cloud Scheduler)
+   * Steady state = 0. Si > 0, hay crons que no corren en staging (Vercel
+   * custom environments NO ejecutan crons). Detecta la clase de bugs invisibles
+   * que motivó TASK-773 y TASK-775.
+   */
+  cronStagingDrift?: ReliabilitySignal | null
 }
 
 export const buildReliabilityOverview = (
@@ -329,7 +339,9 @@ export const buildReliabilityOverview = (
     // TASK-771 Slice 4 — Provider BQ sync dead-letter signal (drift PG↔BQ).
     ...(sources.providerBqSyncDeadLetter ?? []),
     // TASK-773 Slice 4 — Outbox publisher health (lag + dead_letter).
-    ...(sources.outboxHealth ?? [])
+    ...(sources.outboxHealth ?? []),
+    // TASK-775 Slice 5 — Vercel ↔ Cloud Scheduler drift (async-critical crons).
+    ...(sources.cronStagingDrift ? [sources.cronStagingDrift] : [])
   ]
 
   const signalsByModule = new Map<string, ReliabilitySignal[]>()
@@ -525,6 +537,14 @@ export const getReliabilityOverview = async (
           .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
           .catch(() => null)
 
+  // TASK-775 Slice 5 — Cron staging drift (Vercel async-critical sin Cloud
+  // Scheduler equivalent). Lee vercel.json + snapshot canónico de Cloud
+  // Scheduler jobs. Degrada honestamente a `unknown` si vercel.json falla.
+  const cronStagingDrift =
+    preloadedSources.cronStagingDrift !== undefined
+      ? preloadedSources.cronStagingDrift
+      : await getCronStagingDriftSignal().catch(() => null)
+
   return buildReliabilityOverview(operations, {
     billing,
     notionOperational,
@@ -536,7 +556,8 @@ export const getReliabilityOverview = async (
     paymentOrderSettlement,
     financeClpDrift,
     providerBqSyncDeadLetter,
-    outboxHealth
+    outboxHealth,
+    cronStagingDrift
   })
 }
 
