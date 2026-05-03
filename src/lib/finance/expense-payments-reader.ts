@@ -231,9 +231,6 @@ export const sumExpensePaymentsClpForPeriod = async (
         COALESCE(SUM(ep.payment_amount_clp), 0)::text                                      AS total_clp,
         COUNT(*)::text                                                                     AS total_payments,
         COUNT(*) FILTER (WHERE NOT ep.is_reconciled)::text                                 AS unreconciled_count,
-        COALESCE(SUM(ep.payment_amount_clp) FILTER (WHERE e.expense_type = 'supplier'), 0)::text AS supplier_clp,
-        COALESCE(SUM(ep.payment_amount_clp) FILTER (WHERE e.expense_type = 'payroll'), 0)::text  AS payroll_clp,
-        COALESCE(SUM(ep.payment_amount_clp) FILTER (WHERE e.expense_type IN ('tax', 'social_security')), 0)::text AS fiscal_clp,
         COUNT(*) FILTER (WHERE ep.has_clp_drift)::text                                     AS drift_count,
         COALESCE(SUM(ep.payment_amount_clp) FILTER (WHERE e.economic_category = 'labor_cost_internal'), 0)::text AS ec_labor_cost_internal,
         COALESCE(SUM(ep.payment_amount_clp) FILTER (WHERE e.economic_category = 'labor_cost_external'), 0)::text AS ec_labor_cost_external,
@@ -258,26 +255,50 @@ export const sumExpensePaymentsClpForPeriod = async (
 
   const row = rows[0]
 
+  // TASK-768 followup — campos legacy ahora se computan DESDE economic_category.
+  // Mapping canónico documentado:
+  //   payrollClp  = labor_cost_internal + labor_cost_external (cost of labor económico)
+  //   fiscalClp   = tax + regulatory_payment (cargas fiscales + previsionales)
+  //   supplierClp = vendor_cost_saas + vendor_cost_professional_services + overhead
+  //                 (cost of services/tools, NO incluye labor ni regulatorio ni FX fees reales)
+  //
+  // Razón del cambio (vs lectura desde expense_type): ~$3M de payments labor
+  // caían en bucket fiscal-supplier porque el bank reconciler defaulteaba a
+  // expense_type='supplier'. Ahora payrollClp refleja la realidad económica.
+  // Cero migración de consumers downstream — todos los que ya leen el helper
+  // heredan la dimensión correcta automáticamente.
+  const ecLaborInternal = round(toNumber(row?.ec_labor_cost_internal))
+  const ecLaborExternal = round(toNumber(row?.ec_labor_cost_external))
+  const ecVendorSaas = round(toNumber(row?.ec_vendor_cost_saas))
+  const ecVendorProfServices = round(toNumber(row?.ec_vendor_cost_professional_services))
+  const ecRegulatory = round(toNumber(row?.ec_regulatory_payment))
+  const ecTax = round(toNumber(row?.ec_tax))
+  const ecFinancialCost = round(toNumber(row?.ec_financial_cost))
+  const ecBankFeeReal = round(toNumber(row?.ec_bank_fee_real))
+  const ecOverhead = round(toNumber(row?.ec_overhead))
+  const ecFinancialSettlement = round(toNumber(row?.ec_financial_settlement))
+  const ecOther = round(toNumber(row?.ec_other))
+
   return {
     totalClp: round(toNumber(row?.total_clp)),
     totalPayments: toNumber(row?.total_payments),
     unreconciledCount: toNumber(row?.unreconciled_count),
-    supplierClp: round(toNumber(row?.supplier_clp)),
-    payrollClp: round(toNumber(row?.payroll_clp)),
-    fiscalClp: round(toNumber(row?.fiscal_clp)),
+    supplierClp: round(ecVendorSaas + ecVendorProfServices + ecOverhead),
+    payrollClp: round(ecLaborInternal + ecLaborExternal),
+    fiscalClp: round(ecTax + ecRegulatory),
     driftCount: toNumber(row?.drift_count),
     byEconomicCategory: {
-      labor_cost_internal: round(toNumber(row?.ec_labor_cost_internal)),
-      labor_cost_external: round(toNumber(row?.ec_labor_cost_external)),
-      vendor_cost_saas: round(toNumber(row?.ec_vendor_cost_saas)),
-      vendor_cost_professional_services: round(toNumber(row?.ec_vendor_cost_professional_services)),
-      regulatory_payment: round(toNumber(row?.ec_regulatory_payment)),
-      tax: round(toNumber(row?.ec_tax)),
-      financial_cost: round(toNumber(row?.ec_financial_cost)),
-      bank_fee_real: round(toNumber(row?.ec_bank_fee_real)),
-      overhead: round(toNumber(row?.ec_overhead)),
-      financial_settlement: round(toNumber(row?.ec_financial_settlement)),
-      other: round(toNumber(row?.ec_other))
+      labor_cost_internal: ecLaborInternal,
+      labor_cost_external: ecLaborExternal,
+      vendor_cost_saas: ecVendorSaas,
+      vendor_cost_professional_services: ecVendorProfServices,
+      regulatory_payment: ecRegulatory,
+      tax: ecTax,
+      financial_cost: ecFinancialCost,
+      bank_fee_real: ecBankFeeReal,
+      overhead: ecOverhead,
+      financial_settlement: ecFinancialSettlement,
+      other: ecOther
     },
     economicCategoryUnresolvedCount: toNumber(row?.ec_unresolved_count)
   }

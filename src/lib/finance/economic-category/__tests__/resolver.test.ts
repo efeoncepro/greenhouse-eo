@@ -196,7 +196,10 @@ describe('TASK-768 resolveExpenseEconomicCategory', () => {
     expect(result.matchedRule).toBe('KNOWN_REGULATOR_REGEX')
   })
 
-  it('Rule 6: SII match (caso real PAGO EN LINEA S.I.I.)', async () => {
+  it('Rule 6: SII match (caso real PAGO EN LINEA S.I.I.) → tax (no regulatory_payment)', async () => {
+    // SII semánticamente es pago directo de impuestos (tax), NO cotización
+    // previsional (regulatory_payment). El resolver prioriza tax cuando
+    // regulator_id='reg-cl-sii'. Followup TASK-768.
     lookupKnownRegulatorMock.mockResolvedValueOnce({
       regulatorId: 'reg-cl-sii',
       displayName: 'Servicio de Impuestos Internos'
@@ -204,6 +207,20 @@ describe('TASK-768 resolveExpenseEconomicCategory', () => {
 
     const result = await resolveExpenseEconomicCategory({
       rawDescription: 'PAGO EN LINEA S.I.I.'
+    })
+
+    expect(result.category).toBe('tax')
+    expect(result.matchedRule).toBe('KNOWN_REGULATOR_REGEX_SII_TAX')
+  })
+
+  it('Rule 6: Previred match (NO es SII) → regulatory_payment', async () => {
+    lookupKnownRegulatorMock.mockResolvedValueOnce({
+      regulatorId: 'reg-cl-previred',
+      displayName: 'Previred'
+    })
+
+    const result = await resolveExpenseEconomicCategory({
+      rawDescription: 'PAGO EN LINEA PREVIRED'
     })
 
     expect(result.category).toBe('regulatory_payment')
