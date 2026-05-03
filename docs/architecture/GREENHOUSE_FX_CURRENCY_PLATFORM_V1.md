@@ -413,6 +413,26 @@ The pricing engine v2 test stubs the `resolvePricingOutputFxReadiness` dep so th
 
 ## 11. Deltas
 
+### Delta 2026-05-03 — CLP currency reader contract (TASK-766)
+
+**Trigger**: incidente 2026-05-02 en `/finance/cash-out`. KPI "Total pagado" mostraba **$1.017.803.262** vs el valor canónico **$11.546.493** (88× inflado). Causa raíz: anti-patrón sistémico `SUM(ep.amount × COALESCE(e.exchange_rate_to_clp, 1))` en SQL embebido. Cuando un expense USD se paga en CLP nativo (caso CCA shareholder reimbursable TASK-714c — payment HubSpot CCA $1.106.321 CLP), multiplicar el monto CLP por el rate USD del documento original infla los KPIs en mil millones por payment.
+
+**Resolución arquitectónica** (no fix puntual):
+
+- **VIEW canónica** `greenhouse_finance.expense_payments_normalized` (+ mirror `income_payments_normalized`). Expone `payment_amount_clp` con COALESCE chain: `amount_clp` first → CLP-trivial fallback (`WHEN currency='CLP' THEN amount`) → `NULL` con `has_clp_drift=TRUE`. Aplica filtro 3-axis supersede inline (`superseded_by_payment_id IS NULL AND superseded_by_otb_id IS NULL AND superseded_at IS NULL`). Replica el patrón TASK-571 (income_settlement_reconciliation) y TASK-699 (fx_pnl_breakdown).
+- **Helper TS canónico** `src/lib/finance/expense-payments-reader.ts` + `income-payments-reader.ts`. Exports: `sumExpensePaymentsClpForPeriod`, `sumIncomePaymentsClpForPeriod`, `listExpensePaymentsNormalized`, `listIncomePaymentsNormalized`, `getExpensePaymentsClpDriftCount`, `getIncomePaymentsClpDriftCount`. Mismo shape que `getBankFxPnlBreakdown` (TASK-699): single source of truth, validates filters, returns canonical struct.
+- **Backfill defensivo** (Slice 2 migration `20260503015255538`): UPDATE idempotente `amount_clp = amount WHERE currency='CLP' AND amount_clp IS NULL` (caso seguro único). 23 income_payments backfilled. Para non-CLP sin amount_clp: marca `requires_fx_repair = TRUE`. CHECK constraint `payments_amount_clp_required_after_cutover` (NOT VALID + VALIDATE atomic, cutover 2026-05-03, mirror TASK-708/728): rechaza INSERT/UPDATE post-cutover sin `amount_clp` para non-CLP.
+- **Reliability signals canónicos** `finance.expense_payments.clp_drift` + `finance.income_payments.clp_drift` (kind=drift, severity=error si count>0, steady=0). Subsystem rollup en `Finance Data Quality`. AI Observer captura cualquier reaparición.
+- **Lint rule mecánica** `greenhouse/no-untokenized-fx-math` modo `error` desde commit-1. Detecta 4 patrones (expense + income, con/sin COALESCE) — `ep.amount * exchange_rate_to_clp`, `ep.amount * COALESCE(e.exchange_rate_to_clp, 1)`, idem `ip.amount`. Override block exime los 2 readers canónicos. Bloquea cualquier futuro callsite del anti-patrón.
+- **Repair admin endpoint** `POST /api/admin/finance/payments-clp-repair` (capability granular `finance.payments.repair_clp` — FINANCE_ADMIN + EFEONCE_ADMIN, least-privilege). Resuelve rate histórico al `payment_date` desde `greenhouse_finance.exchange_rates` (rate vigente al pago, NO el actual). Per-row atomic. Idempotente. Outbox audit `finance.payments.clp_repaired` v1. Soporta `dryRun=true`.
+- **Migración exhaustiva**: 8 endpoints migrados al helper canónico (cash-out, cash-in, cash-position, dashboard/pnl, dashboard/summary, dashboard/cashflow, expenses/summary, income/summary). Bonus: 4 callsites tenían leak de supersede pre-migración, fixed automáticamente.
+
+**Tests**: 79 totales verdes — 22 readers (Slice 1), 8 reliability signals (Slice 2), 4 cash-out anti-regresión + 10 RuleTester lint cases (Slice 3), 23 endpoint regression (Slice 4), 12 repair helper + endpoint (Slice 5). Anti-regresión hard: tests assertan `totalClp < 20_000_000` para impedir que los $1B fantasma vuelvan jamás.
+
+**Spec canónica**: `docs/tasks/complete/TASK-766-finance-clp-currency-reader-contract.md`. Patrones reusados: TASK-571 (VIEW + helper), TASK-699 (consumer contract for derived columns), TASK-708/728 (CHECK NOT VALID + VALIDATE atomic), TASK-721 (canonical helper enforcement con lint).
+
+**Política consumer (regla dura)**: ningún módulo puede recomputar saldos CLP de payments fuera de la VIEW + helper canónicos. La policy `consumer_obligations.must_use_resolver_or_fail_fast` (sección 5) se extiende a esta categoría — cualquier callsite que sume `payment.amount × rate` está prohibido por lint, no por convención.
+
 ### Delta 2026-04-19 — Provider adapter platform (TASK-484)
 
 - Wired 9 provider adapters under `src/lib/finance/fx/providers/` covering USD↔CLP (Mindicador + OpenER), USD↔MXN (Banxico SIE primary, Frankfurter/Fawaz fallback), USD↔COP (Socrata TRM primary, Fawaz fallback), USD↔PEN (apis.net.pe SUNAT primary, BCRP historical, Fawaz fallback), and CLP↔CLF (`clf_from_indicators` reading UF from `economic_indicators`).

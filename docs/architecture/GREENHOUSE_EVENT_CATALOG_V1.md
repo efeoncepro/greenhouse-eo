@@ -2,6 +2,48 @@
 
 Catalogo canonico de eventos del sistema de outbox de Greenhouse. Cada evento se registra en `greenhouse_sync.outbox_events` y se publica a BigQuery via el consumer `outbox-publish`.
 
+## Delta 2026-05-03 — TASK-766: CLP currency reader contract
+
+Un nuevo evento canónico del dominio finance para hacer auditable el path de reparación de payments con drift CLP (`currency != 'CLP' AND amount_clp IS NULL`). Lo emite el endpoint admin de slice 5 y lo consume el AI Observer + audit log.
+
+### `finance.payments.clp_repaired`
+
+Aggregate type: `finance_payments_clp_repair`.
+
+Publisher: `src/app/api/admin/finance/payments-clp-repair/route.ts` (endpoint admin POST gated por capability granular `finance.payments.repair_clp`, FINANCE_ADMIN + EFEONCE_ADMIN).
+
+Schema v1:
+
+```ts
+type FinancePaymentsClpRepairedV1 = {
+  eventVersion: 'v1'
+  kind: 'expense_payments' | 'income_payments'
+  dryRun: boolean
+  candidatesScanned: number
+  repaired: number
+  skippedCount: number
+  errorsCount: number
+  skipped: Array<{ paymentId: string; reason: string }> // truncado a 50 para evitar payload bloat
+  errors: Array<{ paymentId: string; message: string }> // idem
+  actorUserId: string
+  repairedAt: string // ISO timestamp del trigger
+}
+```
+
+Consumers:
+
+- **Audit log** — fuente de verdad de cuándo y quién disparó un repair (los UPDATEs `amount_clp` no carry actor; el outbox sí).
+- **Reliability AI Observer** — correlaciona la curación del signal `finance.expense_payments.clp_drift` / `finance.income_payments.clp_drift` con la acción humana que la cerró.
+- **Reliability dashboard** — útil para ver "drift detectado → repair ejecutado → drift volvió a 0" como un cycle visible.
+
+Reglas:
+
+- `aggregate_id` = `${kind}-${Date.now()}` (sintético; no hay un single-entity natural ya que el repair afecta una batch).
+- El evento es **fire-and-forget**: si el publish falla, el repair no se rollbackea (los UPDATEs ya commitearon). El endpoint loggea via `captureWithDomain(err, 'finance', { tags: { source: 'payments_clp_repair_audit_publish' } })` y devuelve 200 con `eventId: null`.
+- DryRun emite el evento igual con `dryRun: true` para que el audit log capture intentos de operador.
+- Las arrays `skipped` / `errors` se truncan a 50 entries en el payload outbox; los counts (`skippedCount`, `errorsCount`) preservan la magnitud real. La response HTTP del endpoint sí incluye las arrays completas (no se truncan client-side).
+- Steady state esperado: 0 events en ventana de 24h en producción saludable post-cutover (CHECK constraint `payments_amount_clp_required_after_cutover` impide nuevos drift).
+
 ## Delta 2026-05-02 — TASK-765: Payment Order Bank Settlement Resilience
 
 Dos nuevos eventos canónicos del dominio finance para hacer observable y auditable la cadena `payment_order.paid → bank impact`. Los emiten distintos slices de TASK-765, pero ambos se documentan aquí porque comparten el mismo aggregate domain (`finance` / `payroll_expense`) y serán consumidos por la misma capa de Reliability + AI Observer.
