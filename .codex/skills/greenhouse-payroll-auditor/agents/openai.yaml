@@ -1,0 +1,7 @@
+interface:
+  display_name: "Greenhouse Payroll Auditor"
+  short_description: "Audit Efeonce payroll, Chile law, and remote regimes."
+  default_prompt: "Use $greenhouse-payroll-auditor to audit this Greenhouse payroll period, identify blockers, and propose robust fixes."
+
+policy:
+  allow_implicit_invocation: true

@@ -28,12 +28,15 @@ import CustomTextField from '@core/components/mui/TextField'
 import { ConfirmDialog } from '@/components/dialogs'
 import { HorizontalWithSubtitle } from '@/components/card-statistics'
 import { ROLE_CODES } from '@/config/role-codes'
-import type { PayrollEntry, PayrollPeriod, PayrollPeriodReadiness } from '@/types/payroll'
+import { buildPayrollTaxTableVersion } from '@/lib/payroll/tax-table-version-format'
+import type { PayrollCompensationMember, PayrollEntry, PayrollPeriod, PayrollPeriodReadiness } from '@/types/payroll'
+import type { PayrollPeriodDownstreamSummary } from '@/lib/finance/payment-orders/payroll-status-reader'
 import {
   canEditPayrollPeriodMetadata,
   doesPayrollPeriodUpdateRequireReset
 } from '@/lib/payroll/period-lifecycle'
 import PayrollEntryTable from './PayrollEntryTable'
+import PayrollPaymentStatusCard from './PayrollPaymentStatusCard'
 import ReopenPeriodDialog from './ReopenPeriodDialog'
 import { buildPayrollCurrencySummary, formatCurrency, formatPeriodLabel, formatTimestamp, periodStatusConfig } from './helpers'
 
@@ -43,6 +46,7 @@ type Props = {
   onRefresh: () => void
   onCreatePeriod: () => void
   createPeriodLabel: string
+  members?: PayrollCompensationMember[]
   isHistoricalSelection?: boolean
   currencyEquivalents?: {
     clpEquivalent: { grossClp: number; netClp: number; fxRate: number } | null
@@ -55,7 +59,16 @@ const GOVERNANCE_ATTENDANCE_NOTES = new Set([
   'La integración futura objetivo para asistencia es Microsoft Teams.'
 ])
 
-const PayrollPeriodTab = ({ period, entries, onRefresh, onCreatePeriod, createPeriodLabel, isHistoricalSelection, currencyEquivalents }: Props) => {
+const PayrollPeriodTab = ({
+  period,
+  entries,
+  onRefresh,
+  onCreatePeriod,
+  createPeriodLabel,
+  members = [],
+  isHistoricalSelection,
+  currencyEquivalents
+}: Props) => {
   const { data: session } = useSession()
   const isEfeonceAdmin = session?.user?.roleCodes?.includes(ROLE_CODES.EFEONCE_ADMIN) ?? false
 
@@ -74,6 +87,9 @@ const PayrollPeriodTab = ({ period, entries, onRefresh, onCreatePeriod, createPe
   const [readiness, setReadiness] = useState<PayrollPeriodReadiness | null>(null)
   const [readinessError, setReadinessError] = useState<string | null>(null)
   const [readinessLoading, setReadinessLoading] = useState(false)
+  const [paymentStatus, setPaymentStatus] = useState<PayrollPeriodDownstreamSummary | null>(null)
+  const [paymentStatusLoading, setPaymentStatusLoading] = useState(false)
+  const [paymentStatusError, setPaymentStatusError] = useState<string | null>(null)
   const periodId = period?.periodId ?? null
   const visibleAttendanceNotes = readiness?.attendanceDiagnostics.notes.filter(note => !GOVERNANCE_ATTENDANCE_NOTES.has(note)) ?? []
 
@@ -118,6 +134,55 @@ const PayrollPeriodTab = ({ period, entries, onRefresh, onCreatePeriod, createPe
     }
 
     void loadReadiness()
+
+    return () => {
+      active = false
+    }
+  }, [periodId, period?.status, entries.length])
+
+  // TASK-751 — fetch downstream payment status for the period (single fetch shared
+  // between PayrollPaymentStatusCard and PayrollEntryTable's "Estado pago" column).
+  useEffect(() => {
+    if (!periodId) {
+      setPaymentStatus(null)
+      setPaymentStatusError(null)
+
+      return
+    }
+
+    let active = true
+
+    const loadPaymentStatus = async () => {
+      setPaymentStatusLoading(true)
+      setPaymentStatusError(null)
+
+      try {
+        const res = await fetch(`/api/admin/finance/payment-orders/payroll-status?periodId=${encodeURIComponent(periodId)}`)
+
+        if (!res.ok) {
+          const data = await res.json().catch(() => null)
+
+          throw new Error(data?.error || 'No pudimos cargar el estado downstream del periodo.')
+        }
+
+        const data = (await res.json()) as PayrollPeriodDownstreamSummary
+
+        if (active) {
+          setPaymentStatus(data)
+        }
+      } catch (loadError) {
+        if (active) {
+          setPaymentStatus(null)
+          setPaymentStatusError(loadError instanceof Error ? loadError.message : 'No pudimos cargar el estado downstream del periodo.')
+        }
+      } finally {
+        if (active) {
+          setPaymentStatusLoading(false)
+        }
+      }
+    }
+
+    void loadPaymentStatus()
 
     return () => {
       active = false
@@ -356,6 +421,11 @@ const PayrollPeriodTab = ({ period, entries, onRefresh, onCreatePeriod, createPe
   const nextYearPreview = editYear === '' ? period.year : editYear
   const nextMonthPreview = editMonth === '' ? period.month : editMonth
 
+  const expectedTaxTableVersion = buildPayrollTaxTableVersion(
+    typeof nextYearPreview === 'number' ? nextYearPreview : period.year,
+    typeof nextMonthPreview === 'number' ? nextMonthPreview : period.month
+  )
+
   const resetWarning =
     canEditPeriod && doesPayrollPeriodUpdateRequireReset({
       currentYear: period.year,
@@ -371,8 +441,25 @@ const PayrollPeriodTab = ({ period, entries, onRefresh, onCreatePeriod, createPe
   const grossSummary = buildPayrollCurrencySummary(entries, entry => entry.grossTotal)
   const netSummary = buildPayrollCurrencySummary(entries, entry => entry.netTotal)
   const deductionsSummary = buildPayrollCurrencySummary(entries, entry => entry.chileTotalDeductions ?? 0)
+  const membersById = new Map(members.map(member => [member.memberId, member]))
 
   const calculationDeadline = readiness?.calculation.deadline ?? null
+
+  const draftEligibleMembers =
+    entries.length === 0 && readiness
+      ? readiness.includedMemberIds
+          .map(memberId => membersById.get(memberId))
+          .filter((member): member is PayrollCompensationMember => Boolean(member))
+      : []
+
+  const displayedCollaboratorCount = entries.length > 0 ? entries.length : readiness?.includedMemberIds.length ?? 0
+
+  const displayedCollaboratorLabel =
+    entries.length > 0
+      ? `${entries.length} colaborador${entries.length !== 1 ? 'es' : ''}`
+      : period.status === 'draft'
+        ? `${displayedCollaboratorCount} elegible${displayedCollaboratorCount !== 1 ? 's' : ''} para cálculo`
+        : `${displayedCollaboratorCount} colaborador${displayedCollaboratorCount !== 1 ? 'es' : ''}`
 
   const calculationOperationalLabel = calculationDeadline
     ? calculationDeadline.calculatedOnTime === true
@@ -459,6 +546,16 @@ const PayrollPeriodTab = ({ period, entries, onRefresh, onCreatePeriod, createPe
         </Alert>
       )}
 
+      {/* TASK-751 — downstream payment status (obligations, paid orders, reconciled, blocked). */}
+      <Box sx={{ mb: 4 }}>
+        <PayrollPaymentStatusCard
+          periodId={period.periodId}
+          summary={paymentStatus}
+          loading={paymentStatusLoading}
+          error={paymentStatusError}
+        />
+      </Box>
+
       <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
         <CardHeader
           avatar={
@@ -482,7 +579,7 @@ const PayrollPeriodTab = ({ period, entries, onRefresh, onCreatePeriod, createPe
           }
           subheader={
             <Typography variant='body2' color='text.secondary'>
-              {entries.length} colaborador{entries.length !== 1 ? 'es' : ''}
+              {displayedCollaboratorLabel}
             </Typography>
           }
           action={
@@ -763,11 +860,11 @@ const PayrollPeriodTab = ({ period, entries, onRefresh, onCreatePeriod, createPe
                   {' '}
                   {readiness.missingKpiMemberIds.length}
                   {' '}
-                  no tienen KPI ICO;
+                  requieren KPI ICO;
                   {' '}
                   {readiness.missingAttendanceMemberIds.length}
                   {' '}
-                  no muestran señales de asistencia/licencias.
+                  requieren asistencia/licencias.
                 </Alert>
               )}
             </Stack>
@@ -775,11 +872,31 @@ const PayrollPeriodTab = ({ period, entries, onRefresh, onCreatePeriod, createPe
 
           {entries.length === 0 && period.status === 'draft' ? (
             <Box sx={{ py: 6, textAlign: 'center' }}>
-              <Stack alignItems='center' spacing={1}>
+              <Stack alignItems='center' spacing={2}>
                 <i className='tabler-calculator' style={{ fontSize: 40, color: 'var(--mui-palette-text-disabled)' }} />
-                <Typography color='text.secondary'>
-                  Período en borrador. Revisa el readiness y luego presiona &quot;Calcular&quot; para generar la nómina.
+                <Typography variant='h6'>Borrador listo para preparar</Typography>
+                <Typography color='text.secondary' sx={{ maxWidth: 680 }}>
+                  Este período todavía no tiene entries materializadas. Revisa los blockers y, cuando el readiness quede listo,
+                  presiona &quot;Calcular&quot; para generar la nómina oficial.
                 </Typography>
+                {draftEligibleMembers.length > 0 && (
+                  <Stack spacing={1.5} sx={{ width: '100%', maxWidth: 720 }}>
+                    <Typography variant='body2' color='text.secondary'>
+                      Colaboradores elegibles para este período
+                    </Typography>
+                    <Stack direction='row' spacing={1} useFlexGap flexWrap='wrap' justifyContent='center'>
+                      {draftEligibleMembers.map(member => (
+                        <CustomChip
+                          key={member.memberId}
+                          round='true'
+                          size='small'
+                          label={member.memberName}
+                          color='primary'
+                        />
+                      ))}
+                    </Stack>
+                  </Stack>
+                )}
               </Stack>
             </Box>
           ) : entries.length === 0 ? (
@@ -795,6 +912,8 @@ const PayrollPeriodTab = ({ period, entries, onRefresh, onCreatePeriod, createPe
               period={period}
               periodStatus={period.status}
               onEntryUpdate={handleEntryUpdate}
+              onAdjustmentChanged={onRefresh}
+              paymentStatusByEntry={paymentStatus?.byEntry ?? null}
             />
           )}
 
@@ -902,7 +1021,8 @@ const PayrollPeriodTab = ({ period, entries, onRefresh, onCreatePeriod, createPe
               label='Versión tabla impositiva'
               value={editTaxTable}
               onChange={e => setEditTaxTable(e.target.value)}
-              helperText='Identificador de la tabla SII aplicable'
+              placeholder={expectedTaxTableVersion}
+              helperText='Déjala vacía para que Greenhouse intente resolver automáticamente la tabla tributaria sincronizada del mes. Usa un override solo si necesitas una versión distinta.'
             />
             <CustomTextField
               fullWidth

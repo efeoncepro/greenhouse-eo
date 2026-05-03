@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Greenhouse · Inter vs Geist · Mockup comparativo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #7367F0;
+    --secondary: #023C70;
+    --success: #6EC207;
+    --warning: #FF6500;
+    --error: #BB1954;
+    --info: #0375DB;
+    --bg-page: #F8F9FA;
+    --bg-paper: #FFFFFF;
+    --bg-table-stripe: #FAFBFC;
+    --text-primary: #1A1A2E;
+    --text-secondary: #667085;
+    --text-disabled: #848484;
+    --border: #E5E7EB;
+    --border-strong: #DBDBDB;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { font-size: 13.125px; }
+  body {
+    background: var(--bg-page);
+    color: var(--text-primary);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Toolbar fija arriba */
+  .toolbar {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--secondary);
+    color: white;
+    padding: 12px 24px;
+    display: flex; align-items: center; gap: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  }
+  .toolbar h1 {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700; font-size: 18px;
+    letter-spacing: -0.01em;
+  }
+  .toolbar .meta {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px; opacity: 0.8;
+  }
+  .toolbar .controls { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+  .toolbar button {
+    background: rgba(255,255,255,0.12);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.2);
+    padding: 6px 14px; border-radius: 6px;
+    cursor: pointer;
+    font-family: inherit; font-size: 12px; font-weight: 500;
+    transition: all 0.15s;
+  }
+  .toolbar button:hover { background: rgba(255,255,255,0.22); }
+  .toolbar button.active { background: white; color: var(--secondary); font-weight: 600; }
+
+  /* Comparador */
+  .compare-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    min-height: calc(100vh - 60px);
+  }
+  .compare-grid.single { grid-template-columns: 1fr; }
+  .compare-grid > section {
+    padding: 24px;
+    border-right: 1px solid var(--border);
+    overflow-x: hidden;
+  }
+  .compare-grid > section:last-child { border-right: none; }
+
+  /* Familia tipográfica por columna */
+  .col-inter { font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif; }
+  .col-geist { font-family: 'Geist', system-ui, -apple-system, BlinkMacSystemFont, sans-serif; }
+
+  /* Headings — siempre Poppins (regla del contrato) */
+  h1, h2, h3, h4 {
+    font-family: 'Poppins', sans-serif;
+    color: var(--text-primary);
+    letter-spacing: -0.01em;
+  }
+  h1 { font-weight: 800; font-size: 32px; line-height: 1.2; }
+  h2 { font-weight: 700; font-size: 24px; line-height: 1.25; }
+  h3 { font-weight: 600; font-size: 20px; line-height: 1.3; }
+  h4 { font-weight: 600; font-size: 16px; line-height: 1.4; }
+
+  /* Subtitles + body usan la familia de la columna */
+  .col-label {
+    display: inline-block;
+    background: var(--primary); color: white;
+    padding: 4px 10px; border-radius: 999px;
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 0.5px; text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  .col-geist .col-label { background: #000; }
+
+  /* Surface card */
+  .surface {
+    background: var(--bg-paper);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 24px;
+    margin-bottom: 24px;
+  }
+  .surface-title { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+  .surface-eyebrow {
+    font-size: 11px; font-weight: 600;
+    letter-spacing: 0.8px; text-transform: uppercase;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+  }
+  .surface-helper {
+    font-size: 13px; color: var(--text-secondary);
+    margin-bottom: 16px;
+  }
+
+  /* KPI cards */
+  .kpi-row {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin: 16px 0 24px;
+  }
+  .kpi {
+    background: var(--bg-paper);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 16px;
+  }
+  .kpi-label {
+    font-size: 11px; font-weight: 600;
+    letter-spacing: 0.8px; text-transform: uppercase;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+  }
+  .kpi-value {
+    font-size: 28px; font-weight: 800; line-height: 1.05;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+    margin-bottom: 4px;
+  }
+  .kpi-trend { font-size: 12px; font-variant-numeric: tabular-nums; }
+  .kpi-trend.up { color: var(--success); }
+  .kpi-trend.down { color: var(--error); }
+
+  /* Tabla densa */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 8px;
+    font-size: 13px;
+  }
+  thead th {
+    text-align: left;
+    font-size: 11px; font-weight: 600;
+    letter-spacing: 0.5px; text-transform: uppercase;
+    color: var(--text-secondary);
+    padding: 10px 8px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-table-stripe);
+  }
+  thead th.num { text-align: right; }
+  tbody td {
+    padding: 10px 8px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+  tbody td.num {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+    font-size: 13px;
+  }
+  tbody td.id {
+    font-weight: 600; font-size: 14px;
+    letter-spacing: 0.01em;
+    font-variant-numeric: tabular-nums;
+    color: var(--secondary);
+  }
+  tbody tr:hover { background: var(--bg-table-stripe); }
+
+  /* Chips */
+  .chip {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 10px; border-radius: 999px;
+    font-size: 12px; font-weight: 600;
+    letter-spacing: 0.1px;
+  }
+  .chip.primary { background: rgba(115,103,240,0.16); color: var(--primary); }
+  .chip.success { background: rgba(110,194,7,0.16); color: #4d8c00; }
+  .chip.warning { background: rgba(255,101,0,0.18); color: #c54c00; }
+  .chip.error   { background: rgba(187,25,84,0.16); color: var(--error); }
+  .chip.info    { background: rgba(3,117,219,0.14); color: var(--info); }
+  .chip-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+
+  /* Form */
+  .form-row { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+  .form-row label {
+    font-size: 12px; font-weight: 500;
+    color: var(--text-secondary);
+  }
+  .form-row input, .form-row select {
+    padding: 9px 12px;
+    border: 1px solid var(--border-strong);
+    border-radius: 6px;
+    background: var(--bg-paper);
+    font-family: inherit; font-size: 14px;
+    color: var(--text-primary);
+  }
+  .form-row input:focus, .form-row select:focus {
+    outline: none; border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(115,103,240,0.16);
+  }
+  .helper { font-size: 12px; color: var(--text-secondary); }
+
+  /* Buttons */
+  .btn-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 16px; }
+  .btn {
+    padding: 8px 16px; border-radius: 6px;
+    font-size: 14px; font-weight: 600;
+    cursor: pointer; border: 1px solid transparent;
+    font-family: inherit;
+    letter-spacing: 0.1px;
+    transition: all 0.15s;
+  }
+  .btn.primary { background: var(--primary); color: white; }
+  .btn.primary:hover { background: #5e54d4; }
+  .btn.tonal { background: rgba(115,103,240,0.16); color: var(--primary); }
+  .btn.outline { background: transparent; color: var(--text-primary); border-color: var(--border-strong); }
+
+  /* Quote summary dock */
+  .dock {
+    background: var(--secondary);
+    color: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 8px 24px rgba(2,60,112,0.32);
+  }
+  .dock-eyebrow {
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 1px; text-transform: uppercase;
+    opacity: 0.7; margin-bottom: 6px;
+  }
+  .dock-line {
+    display: flex; justify-content: space-between; align-items: baseline;
+    padding: 6px 0;
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+  }
+  .dock-line .label { opacity: 0.85; }
+  .dock-line .num { font-weight: 700; }
+  .dock-divider { height: 1px; background: rgba(255,255,255,0.16); margin: 8px 0; }
+  .dock-total {
+    font-size: 24px; font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    margin-top: 4px;
+    letter-spacing: -0.01em;
+  }
+
+  /* Empty state */
+  .empty {
+    text-align: center; padding: 32px 16px;
+    color: var(--text-secondary);
+  }
+  .empty-icon {
+    width: 48px; height: 48px;
+    margin: 0 auto 12px;
+    background: rgba(115,103,240,0.12);
+    border-radius: 50%;
+    display: grid; place-items: center;
+    color: var(--primary);
+    font-size: 24px;
+  }
+  .empty h4 { color: var(--text-primary); margin-bottom: 6px; }
+  .empty p { font-size: 13px; max-width: 300px; margin: 0 auto 14px; }
+
+  /* Caption */
+  .caption {
+    font-size: 13px; color: var(--text-secondary);
+    letter-spacing: 0.4px;
+  }
+  .meta-row { display: flex; gap: 16px; flex-wrap: wrap; font-size: 12px; color: var(--text-secondary); }
+
+  /* Density samples */
+  .density-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-top: 14px;
+  }
+  .density-card {
+    background: var(--bg-paper);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 14px;
+  }
+  .density-num {
+    font-size: 36px; font-weight: 800;
+    line-height: 1; margin-bottom: 4px;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+  }
+  .density-label {
+    font-size: 11px; font-weight: 600;
+    letter-spacing: 0.8px; text-transform: uppercase;
+    color: var(--text-secondary);
+  }
+
+  /* Pangrama / muestra de pesos */
+  .weights {
+    display: grid; gap: 4px;
+    margin-top: 8px;
+  }
+  .weight {
+    font-size: 18px; padding: 4px 0;
+    border-bottom: 1px dashed var(--border);
+  }
+  .weight .tag {
+    display: inline-block; width: 60px;
+    font-size: 11px; color: var(--text-secondary);
+    font-weight: 500;
+  }
+  .weight .sample-400 { font-weight: 400; }
+  .weight .sample-500 { font-weight: 500; }
+  .weight .sample-600 { font-weight: 600; }
+  .weight .sample-700 { font-weight: 700; }
+  .weight .sample-800 { font-weight: 800; }
+
+  /* Notes/disclaimer footer */
+  footer {
+    background: var(--bg-paper);
+    border-top: 2px solid var(--border);
+    padding: 24px;
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+  footer h2 { font-size: 16px; color: var(--text-primary); margin-bottom: 8px; }
+  footer ul { padding-left: 18px; }
+  footer li { margin-bottom: 4px; }
+
+  /* Single-column toggle support */
+  body.geist-only .col-inter { display: none; }
+  body.inter-only .col-geist { display: none; }
+  body.geist-only .compare-grid,
+  body.inter-only .compare-grid { grid-template-columns: 1fr; }
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <h1>Greenhouse · Tipografía A/B</h1>
+  <span class="meta">Inter vs Geist · mismo Poppins en h1-h4 · TASK-566 / EPIC-004</span>
+  <div class="controls">
+    <button id="btn-side" class="active" onclick="setMode('side')">Lado a lado</button>
+    <button id="btn-inter" onclick="setMode('inter-only')">Solo Inter</button>
+    <button id="btn-geist" onclick="setMode('geist-only')">Solo Geist</button>
+  </div>
+</div>
+
+<div class="compare-grid">
+
+  <!-- ============ INTER ============ -->
+  <section class="col-inter">
+    <span class="col-label">Inter (actual)</span>
+
+    <!-- 1. Page header -->
+    <div class="surface">
+      <h4>Cotización Sky Airline · Q2 2026</h4>
+      <p class="surface-helper">Borrador editable. Última actualización hace 4 minutos por Valentina Hoyos.</p>
+      <div class="meta-row">
+        <span>Cotización <strong>EO-COT-1042</strong></span>
+        <span>·</span>
+        <span>Versión 3</span>
+        <span>·</span>
+        <span>Vigente hasta 22 jun 2026</span>
+      </div>
+    </div>
+
+    <!-- 2. KPI row -->
+    <div class="kpi-row">
+      <div class="kpi">
+        <div class="kpi-label">MRR</div>
+        <div class="kpi-value">$ 24.523.118</div>
+        <div class="kpi-trend up">+12,4% vs mes anterior</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">DSO</div>
+        <div class="kpi-value">42 días</div>
+        <div class="kpi-trend down">+3 días vs trimestre</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Margen efectivo</div>
+        <div class="kpi-value">38,2%</div>
+        <div class="kpi-trend up">+1,8 pp vs target</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Cash runway</div>
+        <div class="kpi-value">9,7 meses</div>
+        <div class="kpi-trend up">Saludable</div>
+      </div>
+    </div>
+
+    <!-- 3. Tabla densa -->
+    <div class="surface">
+      <div class="surface-eyebrow">Líneas de cotización</div>
+      <h4>Ítems vendibles</h4>
+      <p class="surface-helper">Tabla densa estilo Finance/Payroll. Columnas con tabular-nums.</p>
+      <table>
+        <thead>
+          <tr>
+            <th>SKU</th>
+            <th>Descripción</th>
+            <th>Espacio</th>
+            <th class="num">Cant.</th>
+            <th class="num">Precio</th>
+            <th class="num">Subtotal</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="id">EO-SKU-0142</td>
+            <td>Performance Marketing — Q2</td>
+            <td>Sky Airline</td>
+            <td class="num">3</td>
+            <td class="num">$ 4.500.000</td>
+            <td class="num">$ 13.500.000</td>
+            <td><span class="chip success">Aprobada</span></td>
+          </tr>
+          <tr>
+            <td class="id">EO-SKU-0089</td>
+            <td>Branding — refresh visual</td>
+            <td>Sky Airline</td>
+            <td class="num">1</td>
+            <td class="num">$ 8.200.000</td>
+            <td class="num">$ 8.200.000</td>
+            <td><span class="chip warning">En revisión</span></td>
+          </tr>
+          <tr>
+            <td class="id">EO-SKU-0317</td>
+            <td>Development — landing migration</td>
+            <td>Sky Airline</td>
+            <td class="num">120</td>
+            <td class="num">$ 65.000</td>
+            <td class="num">$ 7.800.000</td>
+            <td><span class="chip info">Borrador</span></td>
+          </tr>
+          <tr>
+            <td class="id">EO-SKU-0028</td>
+            <td>Estrategia — workshop trimestral</td>
+            <td>Sky Airline</td>
+            <td class="num">1</td>
+            <td class="num">$ 1.400.000</td>
+            <td class="num">$ 1.400.000</td>
+            <td><span class="chip primary">Lista</span></td>
+          </tr>
+          <tr>
+            <td class="id">EO-SKU-1100</td>
+            <td>Dirección de cuentas — overhead</td>
+            <td>Sky Airline</td>
+            <td class="num">3</td>
+            <td class="num">$ 950.000</td>
+            <td class="num">$ 2.850.000</td>
+            <td><span class="chip error">Bloqueada</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 4. Form + chips -->
+    <div class="surface">
+      <h4>Datos del cliente</h4>
+      <p class="surface-helper">Form típico de Quote Builder con inputs MUI-style.</p>
+      <div class="form-row">
+        <label>Organización</label>
+        <input type="text" value="Sky Airline S.A." />
+        <span class="helper">Vinculada a <strong>HubSpot Company 12894</strong></span>
+      </div>
+      <div class="form-row">
+        <label>Contacto principal</label>
+        <input type="text" value="dianesty.santander@skyairline.com" />
+      </div>
+      <div class="form-row">
+        <label>Forma de pago</label>
+        <input type="text" value="Transferencia · 30 días" />
+      </div>
+      <div class="chip-row">
+        <span class="chip primary">Cliente activo</span>
+        <span class="chip success">Pago al día</span>
+        <span class="chip info">Renueva en 14 días</span>
+        <span class="chip warning">Atención: margen bajo</span>
+        <span class="chip error">Crédito vencido</span>
+      </div>
+      <div class="btn-row">
+        <button class="btn primary">Guardar y emitir</button>
+        <button class="btn tonal">Guardar borrador</button>
+        <button class="btn outline">Cancelar</button>
+      </div>
+    </div>
+
+    <!-- 5. Density samples (números grandes) -->
+    <div class="surface">
+      <div class="surface-eyebrow">KPI hero — números grandes</div>
+      <h4>Cómo se siente Inter en cifras de dashboard</h4>
+      <div class="density-grid">
+        <div class="density-card">
+          <div class="density-num">$24,5M</div>
+          <div class="density-label">ARR proyectado</div>
+        </div>
+        <div class="density-card">
+          <div class="density-num">94,2%</div>
+          <div class="density-label">OTD trimestre</div>
+        </div>
+        <div class="density-card">
+          <div class="density-num">1.847</div>
+          <div class="density-label">Tareas activas</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. Quote dock -->
+    <div class="dock">
+      <div class="dock-eyebrow">Resumen cotización</div>
+      <div class="dock-line"><span class="label">Subtotal neto</span><span class="num">$ 33.750.000</span></div>
+      <div class="dock-line"><span class="label">Descuento (4%)</span><span class="num">−$ 1.350.000</span></div>
+      <div class="dock-line"><span class="label">IVA 19%</span><span class="num">$ 6.156.000</span></div>
+      <div class="dock-divider"></div>
+      <div class="dock-line"><span class="label">Total a facturar</span></div>
+      <div class="dock-total">$ 38.556.000</div>
+    </div>
+
+    <!-- 7. Empty state -->
+    <div class="surface">
+      <div class="empty">
+        <div class="empty-icon">📊</div>
+        <h4>Sin movimientos en este período</h4>
+        <p>No hay cargos ni ingresos registrados en la cuenta para abril 2026. Importa una cartola para empezar.</p>
+        <button class="btn primary">Importar cartola</button>
+      </div>
+    </div>
+
+    <!-- 8. Pangrama + pesos -->
+    <div class="surface">
+      <div class="surface-eyebrow">Muestra de pesos · Inter</div>
+      <h4>The quick brown fox jumps over the lazy dog · 0123456789</h4>
+      <div class="weights">
+        <div class="weight"><span class="tag">400</span><span class="sample-400">El veloz murciélago hindú comía feliz cardillo · $ 1.250.000</span></div>
+        <div class="weight"><span class="tag">500</span><span class="sample-500">El veloz murciélago hindú comía feliz cardillo · $ 1.250.000</span></div>
+        <div class="weight"><span class="tag">600</span><span class="sample-600">El veloz murciélago hindú comía feliz cardillo · $ 1.250.000</span></div>
+        <div class="weight"><span class="tag">700</span><span class="sample-700">El veloz murciélago hindú comía feliz cardillo · $ 1.250.000</span></div>
+        <div class="weight"><span class="tag">800</span><span class="sample-800">El veloz murciélago hindú comía feliz cardillo · $ 1.250.000</span></div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ============ GEIST ============ -->
+  <section class="col-geist">
+    <span class="col-label">Geist (alternativa)</span>
+
+    <!-- 1. Page header -->
+    <div class="surface">
+      <h4>Cotización Sky Airline · Q2 2026</h4>
+      <p class="surface-helper">Borrador editable. Última actualización hace 4 minutos por Valentina Hoyos.</p>
+      <div class="meta-row">
+        <span>Cotización <strong>EO-COT-1042</strong></span>
+        <span>·</span>
+        <span>Versión 3</span>
+        <span>·</span>
+        <span>Vigente hasta 22 jun 2026</span>
+      </div>
+    </div>
+
+    <!-- 2. KPI row -->
+    <div class="kpi-row">
+      <div class="kpi">
+        <div class="kpi-label">MRR</div>
+        <div class="kpi-value">$ 24.523.118</div>
+        <div class="kpi-trend up">+12,4% vs mes anterior</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">DSO</div>
+        <div class="kpi-value">42 días</div>
+        <div class="kpi-trend down">+3 días vs trimestre</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Margen efectivo</div>
+        <div class="kpi-value">38,2%</div>
+        <div class="kpi-trend up">+1,8 pp vs target</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Cash runway</div>
+        <div class="kpi-value">9,7 meses</div>
+        <div class="kpi-trend up">Saludable</div>
+      </div>
+    </div>
+
+    <!-- 3. Tabla densa -->
+    <div class="surface">
+      <div class="surface-eyebrow">Líneas de cotización</div>
+      <h4>Ítems vendibles</h4>
+      <p class="surface-helper">Tabla densa estilo Finance/Payroll. Columnas con tabular-nums.</p>
+      <table>
+        <thead>
+          <tr>
+            <th>SKU</th>
+            <th>Descripción</th>
+            <th>Espacio</th>
+            <th class="num">Cant.</th>
+            <th class="num">Precio</th>
+            <th class="num">Subtotal</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="id">EO-SKU-0142</td>
+            <td>Performance Marketing — Q2</td>
+            <td>Sky Airline</td>
+            <td class="num">3</td>
+            <td class="num">$ 4.500.000</td>
+            <td class="num">$ 13.500.000</td>
+            <td><span class="chip success">Aprobada</span></td>
+          </tr>
+          <tr>
+            <td class="id">EO-SKU-0089</td>
+            <td>Branding — refresh visual</td>
+            <td>Sky Airline</td>
+            <td class="num">1</td>
+            <td class="num">$ 8.200.000</td>
+            <td class="num">$ 8.200.000</td>
+            <td><span class="chip warning">En revisión</span></td>
+          </tr>
+          <tr>
+            <td class="id">EO-SKU-0317</td>
+            <td>Development — landing migration</td>
+            <td>Sky Airline</td>
+            <td class="num">120</td>
+            <td class="num">$ 65.000</td>
+            <td class="num">$ 7.800.000</td>
+            <td><span class="chip info">Borrador</span></td>
+          </tr>
+          <tr>
+            <td class="id">EO-SKU-0028</td>
+            <td>Estrategia — workshop trimestral</td>
+            <td>Sky Airline</td>
+            <td class="num">1</td>
+            <td class="num">$ 1.400.000</td>
+            <td class="num">$ 1.400.000</td>
+            <td><span class="chip primary">Lista</span></td>
+          </tr>
+          <tr>
+            <td class="id">EO-SKU-1100</td>
+            <td>Dirección de cuentas — overhead</td>
+            <td>Sky Airline</td>
+            <td class="num">3</td>
+            <td class="num">$ 950.000</td>
+            <td class="num">$ 2.850.000</td>
+            <td><span class="chip error">Bloqueada</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 4. Form + chips -->
+    <div class="surface">
+      <h4>Datos del cliente</h4>
+      <p class="surface-helper">Form típico de Quote Builder con inputs MUI-style.</p>
+      <div class="form-row">
+        <label>Organización</label>
+        <input type="text" value="Sky Airline S.A." style="font-family: 'Geist', sans-serif;" />
+        <span class="helper">Vinculada a <strong>HubSpot Company 12894</strong></span>
+      </div>
+      <div class="form-row">
+        <label>Contacto principal</label>
+        <input type="text" value="dianesty.santander@skyairline.com" style="font-family: 'Geist', sans-serif;" />
+      </div>
+      <div class="form-row">
+        <label>Forma de pago</label>
+        <input type="text" value="Transferencia · 30 días" style="font-family: 'Geist', sans-serif;" />
+      </div>
+      <div class="chip-row">
+        <span class="chip primary">Cliente activo</span>
+        <span class="chip success">Pago al día</span>
+        <span class="chip info">Renueva en 14 días</span>
+        <span class="chip warning">Atención: margen bajo</span>
+        <span class="chip error">Crédito vencido</span>
+      </div>
+      <div class="btn-row">
+        <button class="btn primary" style="font-family: 'Geist', sans-serif;">Guardar y emitir</button>
+        <button class="btn tonal" style="font-family: 'Geist', sans-serif;">Guardar borrador</button>
+        <button class="btn outline" style="font-family: 'Geist', sans-serif;">Cancelar</button>
+      </div>
+    </div>
+
+    <!-- 5. Density samples -->
+    <div class="surface">
+      <div class="surface-eyebrow">KPI hero — números grandes</div>
+      <h4>Cómo se siente Geist en cifras de dashboard</h4>
+      <div class="density-grid">
+        <div class="density-card">
+          <div class="density-num">$24,5M</div>
+          <div class="density-label">ARR proyectado</div>
+        </div>
+        <div class="density-card">
+          <div class="density-num">94,2%</div>
+          <div class="density-label">OTD trimestre</div>
+        </div>
+        <div class="density-card">
+          <div class="density-num">1.847</div>
+          <div class="density-label">Tareas activas</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. Quote dock -->
+    <div class="dock">
+      <div class="dock-eyebrow">Resumen cotización</div>
+      <div class="dock-line"><span class="label">Subtotal neto</span><span class="num">$ 33.750.000</span></div>
+      <div class="dock-line"><span class="label">Descuento (4%)</span><span class="num">−$ 1.350.000</span></div>
+      <div class="dock-line"><span class="label">IVA 19%</span><span class="num">$ 6.156.000</span></div>
+      <div class="dock-divider"></div>
+      <div class="dock-line"><span class="label">Total a facturar</span></div>
+      <div class="dock-total">$ 38.556.000</div>
+    </div>
+
+    <!-- 7. Empty state -->
+    <div class="surface">
+      <div class="empty">
+        <div class="empty-icon">📊</div>
+        <h4>Sin movimientos en este período</h4>
+        <p>No hay cargos ni ingresos registrados en la cuenta para abril 2026. Importa una cartola para empezar.</p>
+        <button class="btn primary" style="font-family: 'Geist', sans-serif;">Importar cartola</button>
+      </div>
+    </div>
+
+    <!-- 8. Pangrama + pesos -->
+    <div class="surface">
+      <div class="surface-eyebrow">Muestra de pesos · Geist</div>
+      <h4>The quick brown fox jumps over the lazy dog · 0123456789</h4>
+      <div class="weights">
+        <div class="weight"><span class="tag">400</span><span class="sample-400">El veloz murciélago hindú comía feliz cardillo · $ 1.250.000</span></div>
+        <div class="weight"><span class="tag">500</span><span class="sample-500">El veloz murciélago hindú comía feliz cardillo · $ 1.250.000</span></div>
+        <div class="weight"><span class="tag">600</span><span class="sample-600">El veloz murciélago hindú comía feliz cardillo · $ 1.250.000</span></div>
+        <div class="weight"><span class="tag">700</span><span class="sample-700">El veloz murciélago hindú comía feliz cardillo · $ 1.250.000</span></div>
+        <div class="weight"><span class="tag">800</span><span class="sample-800">El veloz murciélago hindú comía feliz cardillo · $ 1.250.000</span></div>
+      </div>
+    </div>
+
+  </section>
+</div>
+
+<footer class="col-inter">
+  <h2>Cómo leer este mockup</h2>
+  <ul>
+    <li><strong>Headings (h1-h4)</strong> usan Poppins en ambas columnas — esa parte del contrato no cambia.</li>
+    <li>Toda la diferencia visual es entre body / form / table / chips / KPIs / dock / empty state.</li>
+    <li>Inter es la baseline implementada hoy (commit <code>5c4d84aa</code>, deploy preview <code>greenhouse-96gktkj39</code>).</li>
+    <li>Geist se carga desde Google Fonts (<code>Geist</code>) directamente — no requiere registro local en este mockup.</li>
+    <li>Compará en particular: tablas densas (cómo se ve la columna ID y la columna monto), KPI hero (28-36px), pangrama de pesos (400-800), inputs y chips. Esos son los lugares donde la diferencia de personalidad se nota.</li>
+    <li>Si Geist gana: el switch en código es mecánico — reemplazar <code>Inter</code> por <code>Geist</code> en <code>layout.tsx</code> y en <code>mergedTheme.ts</code> (mismo patrón <code>--font-*</code>), regenerar PDFs/emails con la nueva familia, actualizar §3 del doc de tokens. ~1 día de trabajo.</li>
+  </ul>
+</footer>
+
+<script>
+  function setMode(mode) {
+    document.body.classList.remove('inter-only', 'geist-only');
+    if (mode === 'inter-only') document.body.classList.add('inter-only');
+    if (mode === 'geist-only') document.body.classList.add('geist-only');
+    ['side','inter','geist'].forEach(k => {
+      const btn = document.getElementById('btn-' + k);
+      if (!btn) return;
+      const active = (mode === 'side' && k === 'side') || (mode === 'inter-only' && k === 'inter') || (mode === 'geist-only' && k === 'geist');
+      btn.classList.toggle('active', active);
+    });
+  }
+</script>
+
+</body>
+</html>

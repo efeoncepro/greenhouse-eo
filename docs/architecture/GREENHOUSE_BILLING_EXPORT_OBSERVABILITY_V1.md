@@ -164,3 +164,24 @@ Estos valores son conservadores — se ajustan con datos reales una vez Billing 
 - UI: [`src/components/greenhouse/admin/NotionSyncOperationalCard.tsx`](../../src/components/greenhouse/admin/NotionSyncOperationalCard.tsx)
 - View entrypoint: [`src/views/greenhouse/admin/AdminIntegrationGovernanceView.tsx`](../../src/views/greenhouse/admin/AdminIntegrationGovernanceView.tsx)
 - View incident: [`src/views/greenhouse/admin/AdminOpsHealthView.tsx`](../../src/views/greenhouse/admin/AdminOpsHealthView.tsx)
+
+## Delta 2026-05-03 — TASK-769 Cloud Cost Intelligence V2
+
+TASK-769 convierte la lectura V1 de Billing Export en inteligencia FinOps operable:
+
+- El reader `getGcpBillingOverview()` detecta también `gcp_billing_export_resource_v1*` y expone `costByResource`, `topDrivers` y `forecast` sin romper consumidores V1.
+- El forecast mensual es determinístico: usa promedio del mes cuando hay al menos 7 días completos; si no, usa ventana rolling reciente para evitar subestimar al inicio de mes.
+- Los drivers tempranos se calculan antes de la IA: `forecast_risk`, `share_of_total`, `service_spike` y `resource_driver`.
+- `GcpBillingCard` en Cloud & Integrations muestra proyección, alertas tempranas, recursos/SKUs principales y última observación del Copiloto FinOps AI cuando existe.
+- `GET /api/admin/cloud/gcp-billing?ai=true` incluye la última observación AI de forma opcional; el default mantiene la respuesta determinística y cacheable.
+- `src/lib/cloud/gcp-billing-alerts.ts` ejecuta un sweep explícito con fingerprint + cooldown y canales Teams primero, Slack fallback. Nunca se despacha desde render UI ni desde GET.
+- `src/lib/cloud/finops-ai/runner.ts` ejecuta el Copiloto FinOps AI solo con `CLOUD_COST_AI_COPILOT_ENABLED=true`, JSON estricto, fingerprint dedupe y persistencia en `greenhouse_ai.cloud_cost_ai_observations`.
+- `POST /cloud-cost-ai-watch` en ops-worker corre primero alertas determinísticas y luego AI opt-in. Soporta `dryRun=true` para validar sin notificaciones ni persistencia de fingerprints.
+
+Validación real del 2026-05-03 contra `efeonce-group.billing_export`:
+
+- Tabla estándar: `gcp_billing_export_v1_013340_4C7071_668441`.
+- Tabla resource-level: `gcp_billing_export_resource_v1_013340_4C7071_668441`.
+- 30 días observados: CLP 114.379,91.
+- Forecast mensual rolling: CLP 121.840,58 con confianza high.
+- Driver principal: Cloud SQL `greenhouse-pg-dev` vCPU/RAM; `resource_driver.cloud_sql.greenhouse_pg_dev` severity `error`.

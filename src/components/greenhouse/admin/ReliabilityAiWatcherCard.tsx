@@ -137,7 +137,7 @@ return (
               />
               <Chip size='small' variant='outlined' label={formatAge(observation.observedAt)} />
             </Stack>
-            <Typography variant='caption' color='text.secondary' sx={{ fontFamily: 'monospace' }}>
+            <Typography variant='caption' color='text.secondary'>
               sweep {observation.sweepRunId}
             </Typography>
           </Stack>

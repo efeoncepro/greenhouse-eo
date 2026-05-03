@@ -1,9 +1,9 @@
 # Greenhouse MCP Architecture V1
 
 > **Tipo de documento:** Spec de arquitectura
-> **Version:** 1.0
+> **Version:** 1.2
 > **Creado:** 2026-04-25
-> **Ultima actualizacion:** 2026-04-25
+> **Ultima actualizacion:** 2026-05-01
 > **Scope:** MCP server oficial de Greenhouse para agentes y LLMs
 > **Docs relacionados:** `GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md`, `GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md`, `GREENHOUSE_SISTER_PLATFORMS_INTEGRATION_CONTRACT_V1.md`, `GREENHOUSE_SISTER_PLATFORM_BINDINGS_RUNTIME_V1.md`, `GREENHOUSE_OPS_REGISTRY_ARCHITECTURE_V1.md`, `TASK-040`, `TASK-616`
 
@@ -192,6 +192,12 @@ Montado sobre:
 - `GET /api/platform/ecosystem/organizations/:id`
 - `GET /api/platform/ecosystem/capabilities`
 - `GET /api/platform/ecosystem/integration-readiness`
+- `GET /api/platform/ecosystem/health`
+- `GET /api/platform/ecosystem/event-types`
+- `GET /api/platform/ecosystem/webhook-subscriptions`
+- `GET /api/platform/ecosystem/webhook-subscriptions/:id`
+- `GET /api/platform/ecosystem/webhook-deliveries`
+- `GET /api/platform/ecosystem/webhook-deliveries/:id`
 
 ### 8.2 Resources iniciales
 
@@ -199,6 +205,8 @@ Montado sobre:
 - `organization`
 - `capabilities`
 - `integration-readiness`
+- `platform-health`
+- `event-control-plane` (read-only)
 
 ### 8.3 Tools iniciales
 
@@ -207,8 +215,19 @@ Montado sobre:
 - `get_organization`
 - `list_capabilities`
 - `get_integration_readiness`
+- `get_platform_health`
+- `list_event_types`
+- `list_webhook_subscriptions`
+- `get_webhook_subscription`
+- `list_webhook_deliveries`
+- `get_webhook_delivery`
 
 Estos nombres son ilustrativos; el contrato final puede refinarse.
+
+Regla vigente del runtime:
+
+- `health` y event control plane pueden exponerse por MCP mientras se mantengan read-only.
+- `create/update subscription` y `retry delivery` no entran al mismo corte solo por existir en HTTP; necesitan una historia explícita de write safety, idempotencia y auditoría para MCP.
 
 ---
 
@@ -620,3 +639,21 @@ La separación correcta queda así:
 - `skills` = behavior layer
 
 Esto deja base para que agentes externos o internos puedan manipular Greenhouse con tools reales y además con workflow, guardrails y nomenclatura correctos.
+
+## 21. Delta 2026-05-01 — Remote Gateway V1 privado
+
+`TASK-741` agrega el gateway remoto oficial para el MCP read-only de Greenhouse:
+
+- URL canónica: `GET/POST/DELETE /api/mcp/greenhouse`
+- transporte oficial: `WebStandardStreamableHTTPServerTransport` del SDK MCP
+- modo V1: `stateless` y `enableJsonResponse`, apto para App Router/Vercel sin estado de sesión en memoria
+- auth V1: privado service-to-service con `Authorization: Bearer <GREENHOUSE_MCP_REMOTE_GATEWAY_TOKEN>`
+- downstream: el gateway usa el consumer/scope server-side `GREENHOUSE_MCP_*` y sigue llamando solo `api/platform/ecosystem/*`
+
+Reglas nuevas:
+
+- el gateway remoto no redefine tools ni schemas; reutiliza `createGreenhouseMcpServer()`
+- `pnpm mcp:greenhouse` sigue siendo el transporte local `stdio`
+- `TASK-659` sigue siendo la dueña de OAuth, hosted auth multiusuario, refresh/revocation y user-delegated scopes
+- si falta `GREENHOUSE_MCP_REMOTE_GATEWAY_TOKEN`, el endpoint remoto queda deshabilitado
+- el body máximo del gateway remoto se controla con `GREENHOUSE_MCP_REMOTE_MAX_BODY_BYTES` para evitar payloads no acotados

@@ -45,13 +45,13 @@ const cliColumns: ColumnDef<ClientProfile, any>[] = [
     cell: ({ row }) => (
       <Box>
         <Typography variant='body2' fontWeight={600}>{row.original.legalName || row.original.clientProfileId}</Typography>
-        <Typography variant='caption' color='text.secondary' sx={{ fontFamily: 'monospace', fontSize: '0.75rem' }}>{row.original.hubspotCompanyId}</Typography>
+        <Typography variant='caption' color='text.secondary' sx={{ fontSize: '0.75rem' }}>{row.original.hubspotCompanyId}</Typography>
       </Box>
     )
   }),
   cliColumnHelper.accessor('taxId', {
     header: 'RUT',
-    cell: ({ getValue }) => <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>{getValue() || '—'}</Typography>
+    cell: ({ getValue }) => <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>{getValue() || '—'}</Typography>
   }),
   cliColumnHelper.accessor('paymentTermsDays', {
     header: 'Plazo',
@@ -174,7 +174,7 @@ const ClientsListView = () => {
     return (
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
         <Box>
-          <Typography variant='h4' sx={{ fontFamily: 'Poppins, sans-serif', fontWeight: 600, mb: 1 }}>
+          <Typography variant='h4' sx={{ fontWeight: 600, mb: 1 }}>
             Clientes
           </Typography>
           <Typography variant='body2' color='text.secondary'>
@@ -202,7 +202,7 @@ const ClientsListView = () => {
       {/* Header */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 2 }}>
         <Box>
-          <Typography variant='h4' sx={{ fontFamily: 'Poppins, sans-serif', fontWeight: 600, mb: 1 }}>
+          <Typography variant='h4' sx={{ fontWeight: 600, mb: 1 }}>
             Clientes
           </Typography>
           <Typography variant='body2' color='text.secondary'>

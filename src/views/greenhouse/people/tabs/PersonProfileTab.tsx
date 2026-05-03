@@ -96,7 +96,7 @@ const FieldGrid = ({ fields }: { fields: FieldEntry[] }) => {
           >
             {label}
           </Typography>
-          <Typography variant='body2' fontWeight={600} sx={mono ? { fontFamily: 'monospace' } : undefined}>
+          <Typography variant={mono ? 'monoId' : 'body2'} fontWeight={600}>
             {value}
           </Typography>
         </Grid>
@@ -331,9 +331,8 @@ const PersonProfileTab = ({ detail }: Props) => {
                           {label}
                         </Typography>
                         <Typography
-                          variant='body2'
+                          variant={mono ? 'monoId' : 'body2'}
                           fontWeight={600}
-                          sx={mono ? { fontFamily: 'monospace' } : undefined}
                           color={label === 'Ultimo acceso' && lastLogin?.muted ? 'text.disabled' : 'text.primary'}
                         >
                           {value}

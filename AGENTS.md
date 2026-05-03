@@ -29,20 +29,68 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
 2. Evitar romper la base de Vuexy mientras se adapta a Greenhouse.
 3. Dejar handoff claro para el siguiente agente.
 4. No mezclar refactors grandes con cambios funcionales pequenos.
+5. Preferir soluciones seguras, robustas, resilientes y escalables por sobre parches locales. La regla canonica vive en `docs/operations/SOLUTION_QUALITY_OPERATING_MODEL_V1.md`.
+
+## Contrato rapido para agentes
+
+Este bloque es el resumen obligatorio antes de ejecutar cualquier cambio. Las secciones posteriores son la fuente detallada y no se deben ignorar cuando el dominio aplique.
+
+- Primero orientarse: leer `project_context.md`, `Handoff.md`, la task/spec aplicable y la arquitectura del dominio antes de escribir.
+- Protocolo TASK-###: usar `docs/tasks/TASK_PROCESS.md` como proceso canonico y `docs/operations/CODEX_EXECUTION_PROMPT_V1.md` como prompt operativo robusto para ejecucion con Codex.
+- Contexto y auditoria: `docs/operations/CONTEXT_HANDOFF_OPERATING_MODEL_V1.md` gobierna como usar `project_context.md`, `Handoff.md` y `Handoff.archive.md` sin perder memoria historica.
+- Source of truth: si task/spec, arquitectura y runtime real discrepan, prevalecen arquitectura vigente + codigo/schema/runtime verificados. Corregir la spec antes de implementar si el drift cambia contrato o bloquea.
+- Calidad de solucion: no entregar parches fragiles si el problema pide causa raiz. Aplicar `docs/operations/SOLUTION_QUALITY_OPERATING_MODEL_V1.md`; cualquier workaround debe ser temporal, reversible, documentado y con owner/retirada.
+- Proporcionalidad: discovery breve para cambios locales; protocolo completo para cambios cross-domain, auth, billing, finance, data, cloud, migraciones, observabilidad o UI visible.
+- Reutilizar antes de crear: buscar helpers, readers, components, routes, signals, capabilities y docs existentes antes de introducir piezas nuevas.
+- Aislamiento multi-agente: no cambiar la rama de un checkout donde otra persona/agente trabaja; usar `git worktree` y documentar coordinacion en `Handoff.md`.
+- Skills y subagentes: usar skills cuando el dominio matchee y subagentes solo para trabajo paralelo independiente con ownership claro. No delegar el bloqueo inmediato del hilo principal.
+- Seguridad runtime: no improvisar credenciales, pools, env vars, access paths, bypasses, raw errors ni acciones destructivas. Usar los CLIs autenticados con guardrails.
+- Verificacion y cierre: validar con build/lint/test/manual segun aplique, documentar lo no validado, sincronizar docs/task lifecycle y no declarar cerrado algo que siga incompleto.
 
 ## Reglas Operativas
+
+### 0. Tooling disponible (CLIs autenticadas)
+
+Estos CLIs estan autenticados localmente. Cuando una task toca su dominio, **usalos directamente** en vez de pedirle al usuario que lo haga manualmente desde portal/web UI. Esto aplica especialmente para diagnostico y fix de incidentes runtime cuya causa raiz vive fuera del codigo.
+
+- **Azure CLI (`az`)**: autenticado contra el tenant Microsoft de Efeonce `a80bf6c1-7c45-4d70-b043-51389622a0e4`. Sirve para gestionar Azure AD App Registrations (redirect URIs, client secrets, tenant config), Bot Service, Logic Apps, Resource Groups. Comandos canonicos: `az ad app show --id <client-id>`, `az ad app update`, `az ad app credential reset`, `az ad sp show`. Subscription ID: `e1cfff3e-8c21-4170-8b28-ad083b741266`.
+- **Google Cloud CLI (`gcloud`)**: autenticado como `julio.reyes@efeonce.org` con ADC. Project canonico `efeonce-group`. Sirve para Secret Manager, Cloud Run, Cloud SQL, Cloud Scheduler, BigQuery, Cloud Build, Workload Identity Federation.
+  - **Regla operativa obligatoria**: cuando un agente necesite acceso interactivo local a GCP, debe lanzar **siempre ambos** flujos y no asumir que uno reemplaza al otro:
+    - `gcloud auth login`
+    - `gcloud auth application-default login`
+  - Motivo: `gcloud` CLI y ADC pueden quedar desalineados; si solo se autentica uno, pueden fallar `bq`, `psql` via Cloud SQL tooling, Secret Manager o scripts del repo de forma parcial y confusa.
+- **GitHub CLI (`gh`)**: autenticado contra `efeoncepro/greenhouse-eo`. Sirve para issues, PRs, workflow runs, releases.
+- **Vercel CLI (`vercel`)**: autenticado contra el team `efeonce-7670142f`. Sirve para env vars, deployments, project config.
+- **PostgreSQL CLI (`psql`)** via `pnpm pg:connect`: levanta proxy Cloud SQL + conexion auto, sin credenciales manuales.
+
+**Regla operativa**: si diagnosticas que la causa raiz de un incidente vive en una de estas plataformas, ejecuta el fix con el CLI con guardrails y verificacion. Documentar pasos manuales para que el usuario los haga es **antipatron** salvo que la accion sea destructiva (eliminar app registration, drop database, force-push), en cuyo caso confirma con el usuario primero.
 
 ### 1. Antes de cambiar codigo
 
 - Leer `project_context.md`.
 - Leer `Handoff.md` para ver trabajo en curso, riesgos y proximos pasos.
 - Usar `Handoff.archive.md` solo si hace falta rastrear contexto historico; no como primera lectura operativa.
+- Para continuidad entre agentes, auditoria historica y compresion segura del handoff, aplicar `docs/operations/CONTEXT_HANDOFF_OPERATING_MODEL_V1.md`. No borrar historia auditable; moverla o enlazarla cuando corresponda.
+- Leer `DESIGN.md` cuando el cambio toque cualquier surface visible o decision visual del portal.
 - Leer la especificacion externa `../Greenhouse_Portal_Spec_v1.md` cuando el cambio afecte producto, autenticacion, data, rutas principales o arquitectura.
 - Si el trabajo requiere specs o briefs, buscarlos primero en `docs/README.md` y luego en la categoria correspondiente dentro de `docs/`.
 - Si existe una auditoria relevante en `docs/audits/` para la zona que vas a tocar, leerla temprano y usarla como contexto operativo; antes de confiar en sus conclusiones, validar si sus hallazgos siguen vigentes en el codebase/runtime actual.
 - Si el trabajo nace de una task del sistema (`TASK-###` nueva o `CODEX_TASK_*` legacy), revisar obligatoriamente la arquitectura antes de implementar:
   - minimo: `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md` y `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
   - ademas: toda arquitectura especializada que aplique al task, por ejemplo identidad, finance, service modules o multitenancy
+- **Source of truth canonico**:
+  - si hay conflicto entre la task, la arquitectura vigente y el runtime/codigo/schema real, prevalece arquitectura + runtime real
+  - si la spec/task esta desactualizada y el drift cambia contrato o bloquea implementacion, corregir primero la task/spec antes de escribir codigo
+  - si el drift no bloquea, documentarlo explicitamente en el handoff/plan y seguir con la implementacion alineada al estado real del repo
+- **Regla de proporcionalidad**:
+  - tasks pequenas/locales pueden hacer discovery, audit y plan de forma breve
+  - tasks cross-domain, shared runtime, migraciones, access model, observabilidad o UI visible deben aplicar el protocolo completo con mayor rigor
+  - cambios sensibles en finance, payroll, auth, billing, cloud, data o produccion deben tratarse como de alto rigor aunque el diff parezca pequeno
+- **Regla anti-parche**:
+  - por defecto, resolver causa raiz y reforzar el contrato canonico, no solo apagar el sintoma local
+  - si el fix correcto vive en una primitive compartida, schema, worker, env, secret, docs o arquitectura, actuar ahi en vez de parchear el caller visible
+  - un workaround solo es aceptable como mitigacion temporal: reversible, documentado, con owner, condicion de retiro y task/issue asociada cuando aplique
+  - fuente canonica: `docs/operations/SOLUTION_QUALITY_OPERATING_MODEL_V1.md`
 - Si el trabajo toca permisos, navegacion, Home, menu, guards, surfaces por rol o diseño de nuevas capacidades:
   - revisar `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md`
   - revisar `docs/architecture/GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md`
@@ -67,10 +115,19 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
   - revisar `docs/architecture/GREENHOUSE_POSTGRES_CANONICAL_360_V1.md`
   - correr `pnpm pg:doctor` antes de asumir que el acceso esta sano
 - Si una task del sistema contradice la arquitectura vigente, no implementarla tal cual; corregir primero la task o documentar la nueva decision arquitectonica.
-- Si el cambio es UI, UX o seleccion de componentes, usar como criterio operativo los skills locales vigentes (`greenhouse-agent`, `greenhouse-portal-ui-implementer`, `greenhouse-ui-orchestrator` o `greenhouse-vuexy-ui-expert`) y revisar `full-version` junto con la documentacion oficial de Vuexy antes de inventar componentes nuevos.
+- Si el cambio es UI, UX o seleccion de componentes, usar como criterio operativo los skills locales vigentes (`greenhouse-agent`, `greenhouse-portal-ui-implementer`, `greenhouse-ui-orchestrator` o `greenhouse-vuexy-ui-expert`), revisar `full-version` junto con la documentacion oficial de Vuexy antes de inventar componentes nuevos y leer `DESIGN.md` en raiz como contrato visual legible por agentes.
+- **Regla de reutilizacion**:
+  - reutilizar helpers, readers, components, routes, signals y primitives existentes antes de crear nuevos
+  - no inventar access paths paralelos si ya existe un path canonico del repo para ese dominio
+- **Skills y subagentes**:
+  - cuando el trabajo matchee un skill disponible del entorno, usarlo antes de escribir en ese dominio
+  - usar el conjunto minimo de skills que cubra el trabajo; no cargarlos por reflejo
+  - usar subagentes solo cuando haya trabajo independiente, no bloqueante y con ownership claro de archivos o preguntas
+  - no delegar a subagentes el paso critico inmediato del que depende la siguiente accion local
 - Si el cambio crea o modifica skills locales para agentes:
   - skills de Codex viven en `.codex/skills/<skill-name>/SKILL.md`
-  - skills de Claude viven en `.claude/skills/<skill-name>/skill.md` (minuscula — convencion oficial de Claude Code)
+  - skills de Claude viven en `.claude/skills/<skill-name>/SKILL.md` (mayuscula — convencion oficial vigente de Claude/Agent Skills)
+  - los archivos Claude legacy en `.claude/skills/*/skill.md` se preservan solo como compatibilidad historica; no usarlos como patron para skills nuevas
   - antes de crear una skill nueva, revisar primero ejemplos locales existentes en `.codex/skills/*` o `.claude/skills/*`
 - Si el cambio afecta como funciona un modulo desde la perspectiva del usuario, verificar si existe documentacion funcional en `docs/documentation/` para el dominio afectado y actualizarla.
 - Si el cambio agrega o modifica una capacidad visible que el usuario debe saber operar paso a paso, actualizar o crear un manual en `docs/manual-de-uso/` con la categoria del dominio correspondiente. Los manuales no reemplazan arquitectura ni documentacion funcional: explican como usar la feature, que permisos requiere, que no hacer y como resolver problemas comunes.
@@ -119,6 +176,9 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
   - El helper canonico de render para UI es `src/test/render.tsx`.
   - Priorizar tests unitarios en logica de dominio (`src/lib/**`) y componentes UI compartidos antes de sumar suites mas pesadas.
 - Si no se pudo validar, registrar exactamente que no se valido y por que en `Handoff.md`.
+- **Regla de cierre**:
+  - no declarar una task/cambio como cerrado sin dejar explicito que cambio, que se reutilizo, que se valido, que no se pudo validar, riesgos/follow-ups y que docs se actualizaron
+  - si la implementacion termino pero el `Lifecycle`, la carpeta de la task y la documentacion viva no quedaron sincronizados, el trabajo no debe presentarse como realmente cerrado
 
 ### 6. Regla de despliegue
 
@@ -439,6 +499,13 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
   - En 1:1 no hace falta mencionar al usuario; Teams notifica al participante del chat.
 - Para smoke scripts locales que importen libs server-side, usar `npx tsx --require ./scripts/lib/server-only-shim.cjs ...` para neutralizar imports `server-only`.
 - Si esto pasa a UI/producto, no implementar un textbox que postea directo a Teams. Debe converger con Notification Hub / `TASK-716`: intent/outbox, preview, aprobación si aplica, idempotencia, retries, audit, delivery status y permisos en ambos planos (`views` + `entitlements`).
+- **Helper canónico ya disponible para anuncios manuales**:
+  - comando: `pnpm teams:announce`
+  - runbook: `docs/operations/manual-teams-announcements.md`
+  - runtime: `src/lib/communications/manual-teams-announcements.ts`
+  - destinos permitidos code-versioned: `src/config/manual-teams-announcements.ts`
+  - reglas: usar `--dry-run` para preview, `--yes` para envío real, `--body-file` con párrafos separados por línea en blanco, CTA `https` obligatorio
+  - para futuras solicitudes de "envía este mensaje por Greenhouse TeamBot", preferir este helper antes de improvisar scripts ad hoc o usar el conector personal de Teams
 - Chats operativos ya verificados:
   - `EO Team` group chat: `19:1e085e8a02d24cc7a0244490e5d00fb0@thread.v2`.
   - `Sky - Efeonce | Shared` group chat: `19:bf42622ef7b44d139cd4659e8aa22e81@thread.v2`.
@@ -459,6 +526,44 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
 - Run tracking: `source_sync_runs` con `source_system='reactive_worker'`, visible en Admin > Ops Health.
 - Fuente canónica: `docs/architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md` §4.9 y §5.
 - Documentación funcional: `docs/documentation/operations/ops-worker-reactive-crons.md`
+
+### Vercel cron classification + migration platform (TASK-775)
+
+Toda decisión "dónde vive un cron" pasa por las **3 categorías canónicas** de `docs/architecture/GREENHOUSE_VERCEL_CRON_CLASSIFICATION_V1.md`:
+
+- **`async_critical`** — alimenta o consume pipeline async (outbox, projection, sync downstream) que QA/staging necesita. **Hosting canónico: Cloud Scheduler + ops-worker. NO Vercel cron.** Vercel custom env (staging) NO ejecuta crons → si vive en Vercel, queda invisible en QA y la próxima regresión "cron prod-only que rompe staging" es cuestión de tiempo.
+- **`prod_only`** — side effects que solo importan en producción real (compliance, GDPR cleanup, FX externos públicos). Hosting Vercel cron OK.
+- **`tooling`** — utilitarios para developers/QA/monitoreo. Hosting Vercel cron OK.
+
+**Patrón de migración canónico** (cron nuevo o migración):
+
+1. Lógica pura en `src/lib/<dominio>/<orchestrator>.ts` o `src/lib/cron-orchestrators/index.ts` — reusable desde Vercel route + Cloud Run.
+2. Endpoint Cloud Run en `services/ops-worker/server.ts` via helper canónico `wrapCronHandler({ name, domain, run })` — centraliza `runId`, `captureWithDomain`, `redactErrorForResponse`, audit log, 502 sanitizado.
+3. Cloud Scheduler job en `services/ops-worker/deploy.sh` con `upsert_scheduler_job` (idempotente).
+4. Si era cron Vercel scheduled, eliminar entry de `vercel.json` (la route queda como fallback manual via curl + `CRON_SECRET`).
+5. Sincronizar snapshot `CLOUD_SCHEDULER_JOBS_FOR_VERCEL_CRONS` en **dos** lugares:
+   - `src/lib/reliability/queries/cron-staging-drift.ts` (reader runtime)
+   - `scripts/ci/vercel-cron-async-critical-gate.mjs` (CI gate)
+
+**Defensas anti-regresión**:
+
+- **Reliability signal `platform.cron.staging_drift`** (subsystem `Event Bus & Sync Infrastructure`): kind=`drift`, severity=`error` si count>0, steady=0. Lee `vercel.json`, matchea contra `ASYNC_CRITICAL_PATH_PATTERNS` (`outbox*`, `sync-*`, `*-publish`, `webhook-*`, `hubspot-*`, `entra-*`, `nubox-*`, `*-monitor`, `email-delivery-retry`, `reconciliation-auto-match`), verifica equivalente Cloud Scheduler, honra `KNOWN_NON_ASYNC_CRITICAL_PATHS` (`sync-previred` = prod_only legítimo) y override `// platform-cron-allowed: <reason>` adyacente al path en vercel.json.
+- **CI gate `pnpm vercel-cron-gate`** (`.github/workflows/ci.yml` después de Lint, modo `--warn` durante TASK-775; promueve a strict tras estabilización). Falla CI si detecta async-critical sin equivalent.
+
+**⚠️ Reglas duras** (cualquier agente que toque crons las respeta):
+
+- **NUNCA** agregar a `vercel.json` un path que matchea pattern async-critical sin Cloud Scheduler equivalent. CI gate bloquea, reliability signal alerta. Si emerge un caso legítimo prod_only/tooling cuyo path matchea pattern, agregarlo a `KNOWN_NON_ASYNC_CRITICAL_PATHS` (en AMBOS readers) o usar override comment.
+- **NUNCA** crear handler Cloud Run sin pasar por `wrapCronHandler`. Sin él, perdés runId estable, audit log consistente, captureWithDomain canónico, sanitización de error y 502 contract uniforme.
+- **NUNCA** duplicar lógica de cron entre route Vercel y server.ts del ops-worker. Toda lógica vive en `src/lib/<...>/orchestrator.ts` y ambos endpoints la importan. Single source of truth.
+- **NUNCA** sincronizar `CLOUD_SCHEDULER_JOBS_FOR_VERCEL_CRONS` en uno solo de los dos lugares (reader + gate). Drift entre ambos = falsos positivos en CI o falsos negativos en runtime dashboard.
+- **NUNCA** modificar pattern array en uno solo de los dos lugares. Si emerge un nuevo pattern async-critical, agregarlo en AMBOS con comentario justificando la categoría.
+- Cuando se cree un cron nuevo, **categorizarlo PRIMERO** según las 3 categorías canónicas, luego elegir hosting. NO al revés.
+
+**Spec canónica**: `docs/architecture/GREENHOUSE_VERCEL_CRON_CLASSIFICATION_V1.md` (categorías + decision tree + inventario completo).
+**Helper canónico**: `services/ops-worker/cron-handler-wrapper.ts` (`wrapCronHandler`).
+**Reader runtime**: `src/lib/reliability/queries/cron-staging-drift.ts`.
+**CI gate**: `scripts/ci/vercel-cron-async-critical-gate.mjs`.
+**Orchestrators canónicos**: `src/lib/cron-orchestrators/index.ts` (11 orchestrators puros) + `src/lib/email/deliverability-monitor.ts` + `src/lib/nubox/sync-nubox-orchestrator.ts` + `src/lib/nubox/sync-nubox-balances.ts`.
 
 ### Reliability dashboard hygiene — orphan archive, channel readiness, smoke lane bus, domain incidents (2026-04-26)
 
@@ -736,6 +841,26 @@ Contrato versionado `platform-health.v1`. Permite a agentes (MCP, Teams bot, CI,
   - Apex: visual 8/10, ya cubre el portal, no urge migrar.
   - Recharts: 7/10 sin inversión adicional; gana solo si construimos `GhChart` premium (no priorizado).
 - TASK-518 (migración masiva a Recharts) **descartada** — pierde impacto visual. Ver Delta 2026-04-26 en `docs/tasks/to-do/TASK-518-apexcharts-deprecation.md`.
+
+### Tablas operativas — Density Contract canonical (TASK-743, 2026-05-01)
+
+Toda tabla operativa con celdas editables inline o > 8 columnas vive bajo un contrato declarativo de densidad para no desbordar el `compactContentWidth: 1440`.
+
+- **3 densidades canonicas**: `compact` (row 32px, editor 110px, sin slider inline), `comfortable` (row 44px, editor 130px, slider en popover-on-focus), `expanded` (row 56px, editor 160px, slider inline + min/max captions).
+- **Resolucion de densidad** (precedencia): prop explicita > cookie `gh-table-density` > container query auto-degrade (< 1280px degrada un nivel) > default tema (`comfortable`).
+- **Wrapper canonico**: `<DataTableShell>` envuelve TODA tabla operativa. Establece `container-type: inline-size`, observa el ancho real, computa densidad efectiva, expone `<DataTableShell.Sticky>` para columna sticky-first y agrega gradient fade en el borde derecho cuando hay scroll restante.
+- **Primitive editable canonica**: `<InlineNumericEditor>` reemplaza inputs+sliders dispersos. Acepta `value`, `min`, `max`, `step`, `currency`, `qualifies`, `disabled`, `label`, `onChange`. Adapta render a la densidad efectiva.
+- **Ubicacion**: `src/components/greenhouse/data-table/{density,useTableDensity,DataTableShell}.tsx` y `src/components/greenhouse/primitives/InlineNumericEditor.tsx`.
+- **Spec canonica**: `docs/architecture/GREENHOUSE_OPERATIONAL_TABLE_PLATFORM_V1.md`.
+- **Doc funcional**: `docs/documentation/plataforma/tablas-operativas.md`.
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** crear una `<Table>` MUI con > 8 columnas o con `<input>`/`<TextField>`/`<Slider>` en `<TableBody>` sin envolverla en `<DataTableShell>`. Lint rule `greenhouse/no-raw-table-without-shell` bloquea el commit.
+- **NUNCA** hardcodear `minWidth` en una primitiva editable — debe leer densidad via `useTableDensity()`.
+- **NUNCA** mover `compactContentWidth` a `wide` para resolver overflow de una tabla. Resolver siempre con el contrato (densidad + sticky + scroll fade).
+- **NUNCA** duplicar `BonusInput` u otra primitiva legacy. Migrar consumers a `<InlineNumericEditor>`. `BonusInput.tsx` queda como re-export deprecado hasta que el ultimo consumer migre.
+- **NUNCA** desactivar el visual regression test de `/hr/payroll` para forzar un merge. Si falla por overflow, la solucion es respetar el contrato, no bypass.
 
 ## Task Lifecycle Protocol
 

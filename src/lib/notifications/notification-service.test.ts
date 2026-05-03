@@ -7,6 +7,8 @@ const mockSendEmail = vi.fn()
 const mockResolveNotificationRecipients = vi.fn()
 
 vi.mock('@/lib/postgres/client', () => ({
+  onGreenhousePostgresReset: () => () => {},
+  isGreenhousePostgresRetryableConnectionError: () => false,
   runGreenhousePostgresQuery: (...args: unknown[]) => mockRunGreenhousePostgresQuery(...args)
 }))
 

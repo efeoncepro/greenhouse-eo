@@ -630,13 +630,63 @@ export const buildGcpBillingSignals = (overview: GcpBillingOverview): Reliabilit
     kind: 'billing',
     source: 'getGcpBillingOverview',
     label: `GCP cost (${overview.period.days} días)`,
-    severity: 'ok',
-    summary: `Total ${formatCurrency(overview.totalCost, overview.currency)} · top servicio: ${
+    severity: (overview.topDrivers ?? []).some(driver => driver.severity === 'error')
+      ? 'error'
+      : (overview.topDrivers ?? []).some(driver => driver.severity === 'warning')
+        ? 'warning'
+        : 'ok',
+    summary: `Total ${formatCurrency(overview.totalCost, overview.currency)} · forecast ${
+      overview.forecast ? formatCurrency(overview.forecast.monthEndCost, overview.currency) : 'n/d'
+    } · top servicio: ${
       overview.costByService[0]?.serviceDescription ?? 'n/d'
     }.`,
     observedAt: overview.generatedAt,
-    evidence: baseEvidence
+    evidence: [
+      ...baseEvidence,
+      ...(overview.forecast
+        ? [
+            {
+              kind: 'metric' as const,
+              label: 'Forecast mensual',
+              value: formatCurrency(overview.forecast.monthEndCost, overview.currency)
+            }
+          ]
+        : [])
+    ]
   })
+
+  for (const driver of overview.topDrivers ?? []) {
+    if (driver.severity === 'ok') continue
+
+    signals.push({
+      signalId: `cloud.billing.driver.${driver.driverId}`,
+      moduleKey: 'cloud',
+      kind: 'billing',
+      source: 'getGcpBillingOverview',
+      label: `Cost driver: ${driver.serviceDescription}`,
+      severity: driver.severity,
+      summary: driver.summary,
+      observedAt: overview.generatedAt,
+      evidence: [
+        ...baseEvidence,
+        {
+          kind: 'metric',
+          label: 'Threshold',
+          value: driver.threshold
+        },
+        {
+          kind: 'metric',
+          label: 'Share',
+          value: `${driver.share}%`
+        },
+        ...driver.evidence.map(item => ({
+          kind: 'metric' as const,
+          label: item.label,
+          value: item.value
+        }))
+      ]
+    })
+  }
 
   const notion = overview.spotlights.notionBqSync
 
@@ -956,5 +1006,96 @@ export const SIGNAL_KIND_LABELS: Record<ReliabilitySignalKind, string> = {
   subsystem: 'Subsistema',
   test_lane: 'Test lane',
   billing: 'Billing',
-  ai_summary: 'AI summary'
+  ai_summary: 'AI summary',
+  // TASK-765 Slice 7
+  drift: 'Drift',
+  dead_letter: 'Dead-letter',
+  lag: 'Lag'
+}
+
+/**
+ * TASK-765 Slice 7 — Payment Order ↔ Bank Settlement signals.
+ *
+ * Wraps the 3 readers in `src/lib/reliability/queries/` so the composer can
+ * inject them into `buildReliabilityOverview`. Each reader handles its own
+ * try/catch and returns a degraded signal (kind=unknown) instead of throwing
+ * — so a failure in one DB query never poisons the whole overview.
+ *
+ * Lives behind `Promise.all` to avoid sequential N+1 latency on /admin/operations.
+ */
+export const buildPaymentOrderSettlementSignals = async (
+  readers: {
+    paidWithoutExpensePayment: () => Promise<ReliabilitySignal>
+    deadLetter: () => Promise<ReliabilitySignal>
+    materializationLag: () => Promise<ReliabilitySignal>
+  }
+): Promise<ReliabilitySignal[]> => {
+  const [paid, dead, lag] = await Promise.all([
+    readers.paidWithoutExpensePayment(),
+    readers.deadLetter(),
+    readers.materializationLag()
+  ])
+
+  return [paid, dead, lag]
+}
+
+/**
+ * TASK-766 Slice 2 — Finance CLP currency drift signals.
+ *
+ * Wraps los 2 readers de drift CLP (expense_payments + income_payments) en
+ * un Promise.all para evitar latencia secuencial. Cada reader degrada
+ * honestamente (severity=unknown) si su query falla.
+ *
+ * Mismo pattern que `buildPaymentOrderSettlementSignals` (TASK-765 Slice 7).
+ */
+export const buildFinanceClpDriftSignals = async (
+  readers: {
+    expensePayments: () => Promise<ReliabilitySignal>
+    incomePayments: () => Promise<ReliabilitySignal>
+  }
+): Promise<ReliabilitySignal[]> => {
+  const [expense, income] = await Promise.all([
+    readers.expensePayments(),
+    readers.incomePayments()
+  ])
+
+  return [expense, income]
+}
+
+/**
+ * TASK-768 Slice 7 — builder canonico de signals "economic_category_unresolved"
+ * para expenses + income. Mismo patron que buildFinanceClpDriftSignals.
+ * Subsystem rollup: finance_data_quality.
+ */
+export const buildFinanceEconomicCategoryUnresolvedSignals = async (
+  readers: {
+    expenses: () => Promise<ReliabilitySignal>
+    income: () => Promise<ReliabilitySignal>
+  }
+): Promise<ReliabilitySignal[]> => {
+  const [expenses, income] = await Promise.all([readers.expenses(), readers.income()])
+
+  return [expenses, income]
+}
+
+/**
+ * TASK-777 — Expense distribution signals.
+ *
+ * Deterministic gates for the management-accounting distribution layer:
+ * unresolved canonical distributions and legacy shared-pool contamination.
+ * These signals protect P&L consumers before we cut them over from legacy
+ * `expenses.cost_category` heuristics to `expense_distribution_resolution`.
+ */
+export const buildExpenseDistributionSignals = async (
+  readers: {
+    unresolved: () => Promise<ReliabilitySignal>
+    sharedPoolContamination: () => Promise<ReliabilitySignal>
+  }
+): Promise<ReliabilitySignal[]> => {
+  const [unresolved, contamination] = await Promise.all([
+    readers.unresolved(),
+    readers.sharedPoolContamination()
+  ])
+
+  return [unresolved, contamination]
 }

@@ -99,7 +99,7 @@ const AgencyIcoEngineView = ({ data, onComputeLive, computingLive }: Props) => {
       >
         <Stack direction='row' alignItems='center' justifyContent='space-between' flexWrap='wrap' useFlexGap gap={1}>
           <div>
-            <Typography variant='h5' sx={{ fontFamily: 'Poppins', fontWeight: 700, color: theme.palette.customColors.midnight, mb: 0.5 }}>
+            <Typography variant='h5' sx={{ fontWeight: 700, color: theme.palette.customColors.midnight, mb: 0.5 }}>
               {GH_AGENCY.ico_title}
             </Typography>
             <Typography variant='body2' sx={{ color: theme.palette.text.secondary }}>
@@ -302,7 +302,7 @@ const AgencyIcoEngineView = ({ data, onComputeLive, computingLive }: Props) => {
                                   <Typography variant='overline' sx={{ color: theme.palette.text.secondary }}>
                                     Top Performer del período
                                   </Typography>
-                                  <Typography variant='h6' sx={{ fontFamily: 'Poppins', fontWeight: 700, color: theme.palette.customColors.midnight }}>
+                                  <Typography variant='h6' sx={{ fontWeight: 700, color: theme.palette.customColors.midnight }}>
                                     {data.report.topPerformer?.memberName ?? 'Sin ranking elegible'}
                                   </Typography>
                                   <Typography variant='body2' sx={{ color: theme.palette.text.secondary }}>

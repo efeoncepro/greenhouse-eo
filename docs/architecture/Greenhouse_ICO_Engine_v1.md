@@ -1,5 +1,33 @@
 # EFEONCE GREENHOUSE™ — ICO Engine
 
+## Delta 2026-05-02 — Agency `RpA Global = 3` traced to live-May sample, not missing Notion data
+
+Investigacion ejecutada sobre staging el `2026-05-02`:
+
+- BigQuery `ico_engine.v_tasks_enriched` para mayo 2026 devolvio:
+  - `Efeonce`: `task_rows = 39`, `completed_rows = 39`, `positive_rpa_rows = 1`, `avg_positive_rpa = 3.0`
+  - `Sky`: `task_rows = 2`, `completed_rows = 2`, `positive_rpa_rows = 0`
+- Conclusión: el `RpA Global = 3` que mostraba `/agency` **no** salia de ausencia de datos Notion. Salía de una muestra minima del periodo en curso: solo una tarea de Efeonce aportaba `rpa_value > 0`, y ese valor era `3`.
+
+### Resolucion metodologica
+
+Este episodio deja una regla de consumo importante para ICO/Agency:
+
+1. **`v_tasks_enriched` live del mes en curso puede producir valores metodologicamente correctos pero operativamente fragiles** si la muestra es minima.
+2. **La frescura de Notion y la validez de RpA no son el mismo problema**:
+   - la frescura upstream venia sana en BigQuery raw/conformed
+   - el valor `3` provenia del criterio canonico de RpA (`AVG(rpa_value > 0)` sobre completadas)
+3. **Un reader que mezcle live-month KPI con metadata stale/nula de sync induce diagnosticos falsos** ("mayo vacio", "Notion no corrio").
+
+### Implicacion para consumers ICO
+
+- Consumers que quieran leer salud del upstream Notion deben apoyarse en `notion_ops.*._synced_at`, `greenhouse.space_notion_sources.last_synced_at` o el helper canónico `src/lib/integrations/notion-sync-freshness.ts`.
+- Consumers que quieran leer KPI ICO live deben distinguir explicitamente:
+  - `periodo en curso / muestra degradada`
+  - `periodo cerrado / snapshot materializado`
+
+El fix del `2026-05-02` resuelve el **drift de freshness metadata** entre BigQuery y PostgreSQL. No cambia la formula de RpA ni maquilla el valor `3`; evita que la lectura operativa confunda "pipeline muerto" con "muestra live pequeña".
+
 ## Delta 2026-04-24 — TASK-598 introduce Narrative Presentation Layer (read-time canonical resolution)
 
 Contexto: las narrativas LLM se persisten en `greenhouse_serving.ico_ai_signal_enrichment_history` con mentions `@[label](type:id)` donde el `label` queda **congelado al momento de generación**. Si un proyecto se llamaba `Sin nombre` el lunes pasado y hoy se llama `TEASER TS - Chile (S)` (escenario real post-TASK-588), el enrichment sigue diciendo `Sin nombre` para siempre. Además el materialize ICO hace `DELETE+INSERT` diario sobre `ico_ai_signals` mientras la proyección a PG hace UPSERT por `signal_id` sin limpiar → enrichments quedan huérfanos en `_history`.

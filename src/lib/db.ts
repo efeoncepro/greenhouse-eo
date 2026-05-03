@@ -9,12 +9,15 @@
 // ============================================================
 
 import { Kysely, PostgresDialect } from 'kysely'
+import type { Pool, PoolClient } from 'pg'
 
 import {
   getGreenhousePostgresPool,
   runGreenhousePostgresQuery,
   withGreenhousePostgresTransaction,
-  closeGreenhousePostgres
+  closeGreenhousePostgres,
+  isGreenhousePostgresRetryableConnectionError,
+  onGreenhousePostgresReset
 } from '@/lib/postgres/client'
 
 import type { DB } from '@/types/db'
@@ -38,11 +41,42 @@ export const withTransaction = withGreenhousePostgresTransaction
 let _db: Kysely<DB> | null = null
 let _dbPromise: Promise<Kysely<DB>> | null = null
 
-const buildKysely = async (): Promise<Kysely<DB>> => {
-  const pool = await getGreenhousePostgresPool()
+const resetKyselyInstance = () => {
+  _db = null
+  _dbPromise = null
+}
 
+onGreenhousePostgresReset(resetKyselyInstance)
+
+const connectKyselyClient = async (attempt = 0): Promise<PoolClient> => {
+  try {
+    const pool = await getGreenhousePostgresPool()
+
+    return await pool.connect()
+  } catch (error) {
+    if (attempt > 0 || !isGreenhousePostgresRetryableConnectionError(error)) {
+      throw error
+    }
+
+    console.warn('Retrying Greenhouse Kysely connection after retryable Postgres failure.', error)
+    await closeGreenhousePostgres({ source: 'retryable_error', error }).catch(() => undefined)
+
+    return connectKyselyClient(attempt + 1)
+  }
+}
+
+const createKyselyPoolAdapter = (): Pick<Pool, 'connect' | 'end'> => ({
+  connect: () => connectKyselyClient(),
+  end: async () => {
+    await closeGreenhousePostgres()
+  }
+}) as Pick<Pool, 'connect' | 'end'>
+
+const buildKysely = async (): Promise<Kysely<DB>> => {
   return new Kysely<DB>({
-    dialect: new PostgresDialect({ pool })
+    dialect: new PostgresDialect({
+      pool: createKyselyPoolAdapter() as Pool
+    })
   })
 }
 

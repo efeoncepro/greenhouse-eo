@@ -533,7 +533,7 @@ const CreateHesDrawer = ({ open, onClose, onSuccess, editHes = null }: Props) =>
             <CustomTextField
               fullWidth size='small' label='N° de HES' required disabled={isReadOnly}
               value={hesNumber} onChange={e => setHesNumber(e.target.value)}
-              InputProps={{ sx: { fontFamily: 'monospace', fontSize: '0.85rem' } }}
+              InputProps={{ sx: { fontSize: '0.85rem' } }}
             />
           </Grid>
           <Grid size={{ xs: 12, sm: 6 }}>

@@ -22,6 +22,7 @@ import PersonProfileTab from './tabs/PersonProfileTab'
 import PersonActivityTab from './tabs/PersonActivityTab'
 import PersonMembershipsTab from './tabs/PersonMembershipsTab'
 import PersonEconomyTab from './tabs/PersonEconomyTab'
+import PersonPaymentTab from './tabs/PersonPaymentTab'
 import PersonAiToolsTab from './tabs/PersonAiToolsTab'
 
 type Props = {
@@ -160,6 +161,10 @@ const PersonTabs = ({ detail, isAdmin, membershipReloadKey, onNewMembership, onE
               {activeTab === 'economy' && (
                 <PersonEconomyTab detail={detail} onEditCompensation={onEditCompensation} />
               )}
+            </TabPanel>
+
+            <TabPanel value='payment' className='p-0'>
+              {activeTab === 'payment' && <PersonPaymentTab detail={detail} />}
             </TabPanel>
 
             <TabPanel value='ai-tools' className='p-0'>

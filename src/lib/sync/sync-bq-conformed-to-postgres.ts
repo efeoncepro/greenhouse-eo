@@ -3,6 +3,7 @@ import 'server-only'
 import { randomUUID } from 'node:crypto'
 
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
+import { reconcileNotionFreshnessToPostgres } from '@/lib/integrations/notion-sync-freshness'
 
 import {
   projectNotionDeliveryToPostgres,
@@ -194,6 +195,8 @@ export interface SyncBqConformedToPostgresResult {
   pgProjectsMarkedDeleted: number
   pgSprintsMarkedDeleted: number
   pgTasksMarkedDeleted: number
+  notionFreshnessCandidates: number
+  notionFreshnessUpdated: number
   durationMs: number
 }
 
@@ -328,6 +331,11 @@ export const syncBqConformedToPostgres = async ({
     replaceMissingForSpaces
   })
 
+  // Keep operational metadata aligned with the binding source of truth.
+  // The upstream notion-bq-sync service updates BigQuery freshness directly,
+  // so we mirror those timestamps back into PostgreSQL here.
+  const freshnessResult = await reconcileNotionFreshnessToPostgres(targetSpaceIds)
+
   return {
     syncRunId,
     bqProjectsRead: bqProjects.length,
@@ -339,6 +347,8 @@ export const syncBqConformedToPostgres = async ({
     pgProjectsMarkedDeleted: pgResult.projectsMarkedDeleted,
     pgSprintsMarkedDeleted: pgResult.sprintsMarkedDeleted,
     pgTasksMarkedDeleted: pgResult.tasksMarkedDeleted,
+    notionFreshnessCandidates: freshnessResult.candidateSpaces,
+    notionFreshnessUpdated: freshnessResult.updatedSpaces,
     durationMs: Date.now() - startedAt
   }
 }

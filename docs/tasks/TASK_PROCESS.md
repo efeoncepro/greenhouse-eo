@@ -39,6 +39,18 @@ Para la plantilla copiable, ver [`TASK_TEMPLATE.md`](TASK_TEMPLATE.md).
 
 El campo `Type` en Zone 0 determina que zonas y pasos aplican. Cuando hay duda, usar `implementation`.
 
+## Calidad de solucion obligatoria
+
+Toda task debe ejecutarse bajo `docs/operations/SOLUTION_QUALITY_OPERATING_MODEL_V1.md`.
+
+Reglas:
+
+- Resolver causa raiz antes que sintomas locales.
+- Reutilizar primitives canonicas antes de crear rutas/helpers/readers/components nuevos.
+- Si un workaround temporal es inevitable, documentar motivo, owner, condicion de retiro, verificacion y task/issue asociada.
+- En dominios sensibles (`finance`, `payroll`, `auth`, `billing`, `cloud`, `data`, `production`, sync, migraciones, observabilidad), tratar la task como alto rigor aunque el diff sea pequeno.
+- Al cerrar, dejar evidencia de por que la solucion no es un parche fragil.
+
 ---
 
 ## Zonas de carga progresiva
@@ -161,6 +173,7 @@ El agente DEBE hacer estas acciones antes de producir un plan:
 - Discrepancias entre la task y el repo real
 - Dependencias satisfechas vs. bloqueantes
 - Cualquier contradiccion detectada entre la task y la arquitectura
+- **Solution quality assessment** — causa raiz identificada, primitive canonica a reutilizar/crear y por que no se hara un parche local
 - **Access model resolution** — si el cambio toca acceso, dejar explicito si impacta `views`, `entitlements`, `startup policy`, `routeGroups` o una combinacion
 - **Skills identificadas** — cuales se usaran y para que slice
 - **Subagent decision** — secuencial o fork, y justificacion

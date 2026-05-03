@@ -1,10 +1,16 @@
 import { NextResponse } from 'next/server'
 
-import { alertCronFailure } from '@/lib/alerts/slack-notify'
 import { requireCronAuth } from '@/lib/cron/require-cron-auth'
-import { checkIntegrationReadiness } from '@/lib/integrations/readiness'
-import { syncNuboxQuotesHot } from '@/lib/nubox/sync-nubox-quotes-hot'
+import { runNuboxQuotesHotSync } from '@/lib/nubox/sync-nubox-orchestrator'
 
+/**
+ * TASK-775 Slice 3 — Vercel cron fallback manual.
+ *
+ * El path scheduler canónico es Cloud Scheduler `ops-nubox-quotes-hot-sync` →
+ * ops-worker `POST /nubox/quotes-hot-sync`. NO está scheduleado en vercel.json.
+ *
+ * Lógica en `src/lib/nubox/sync-nubox-orchestrator.ts`.
+ */
 export const dynamic = 'force-dynamic'
 export const maxDuration = 60
 
@@ -25,29 +31,10 @@ export async function GET(request: Request) {
   }
 
   try {
-    const readiness = await checkIntegrationReadiness('nubox')
-
-    if (!readiness.ready) {
-      console.log(`[nubox-quotes-hot-sync] Skipped: Nubox upstream not ready — ${readiness.reason}`)
-
-      return NextResponse.json({ skipped: true, reason: readiness.reason })
-    }
-  } catch (error) {
-    console.warn('[nubox-quotes-hot-sync] Readiness check failed, proceeding anyway:', error)
-  }
-
-  try {
-    const result = await syncNuboxQuotesHot({ periods: parsePeriods(request) })
-
-    console.log(
-      `[nubox-quotes-hot-sync] sales=${result.salesFetched} quoteSales=${result.quoteSalesFetched} created=${result.quotesCreated} updated=${result.quotesUpdated} skipped=${result.quotesSkipped} durationMs=${result.durationMs}`
-    )
+    const result = await runNuboxQuotesHotSync({ periods: parsePeriods(request) })
 
     return NextResponse.json(result)
   } catch (error) {
-    console.error('[nubox-quotes-hot-sync] Cron failed:', error)
-    await alertCronFailure('nubox-quotes-hot-sync', error)
-
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }

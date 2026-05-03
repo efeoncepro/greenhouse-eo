@@ -1,5 +1,10 @@
 import process from 'node:process'
 
+import { Connector, IpAddressTypes } from '@google-cloud/cloud-sql-connector'
+import { SecretManagerServiceClient } from '@google-cloud/secret-manager'
+import { Client } from 'pg'
+
+import { createGoogleAuth, getGoogleProjectId } from '@/lib/google-credentials'
 import { applyGreenhousePostgresProfile, loadGreenhouseToolEnv, type PostgresProfile } from './lib/load-greenhouse-tool-env'
 
 const parseProfile = (): PostgresProfile => {
@@ -13,15 +18,153 @@ const parseProfile = (): PostgresProfile => {
   throw new Error(`Unsupported Postgres profile "${value}". Use runtime, migrator, admin or ops.`)
 }
 
+const toIpType = (value: string | undefined) => {
+  switch ((value || '').trim().toUpperCase()) {
+    case 'PRIVATE':
+      return IpAddressTypes.PRIVATE
+    case 'PSC':
+      return IpAddressTypes.PSC
+    default:
+      return IpAddressTypes.PUBLIC
+  }
+}
+
+const normalizeNumber = (value: string | undefined, fallback: number) => {
+  const parsed = Number(value?.trim() || fallback)
+
+  return Number.isFinite(parsed) ? parsed : fallback
+}
+
+const normalizeBoolean = (value: string | undefined) => value?.trim().toLowerCase() === 'true'
+
+const normalizeSecretValue = (value: string | undefined) => {
+  const trimmed = value?.trim()
+
+  if (!trimmed) {
+    return null
+  }
+
+  const withoutQuotes = trimmed.replace(/^['"]+|['"]+$/g, '').trim()
+  const withoutLiteralLineEndings = withoutQuotes.replace(/(?:\\r|\\n)+$/g, '').trim()
+
+  return withoutLiteralLineEndings ? withoutLiteralLineEndings : null
+}
+
+const normalizeSecretRefValue = (value: string | undefined) => {
+  if (!value) {
+    return null
+  }
+
+  const sanitized = value.replace(/\\r/g, '').replace(/\\n/g, '').trim()
+
+  return sanitized ? sanitized : null
+}
+
+const normalizeSecretRef = (ref: string) => {
+  const trimmed = ref.trim()
+
+  if (trimmed.includes('/versions/')) {
+    return trimmed
+  }
+
+  if (trimmed.startsWith('projects/')) {
+    return `${trimmed}/versions/latest`
+  }
+
+  return `projects/${getGoogleProjectId()}/secrets/${trimmed}/versions/latest`
+}
+
+const resolvePassword = async () => {
+  const envPassword = normalizeSecretValue(process.env.GREENHOUSE_POSTGRES_PASSWORD)
+
+  if (envPassword) {
+    return { value: envPassword, source: 'env' as const, secretRef: null as string | null }
+  }
+
+  const secretRef = normalizeSecretRefValue(process.env.GREENHOUSE_POSTGRES_PASSWORD_SECRET_REF)
+
+  if (!secretRef) {
+    return { value: null, source: 'unconfigured' as const, secretRef: null as string | null }
+  }
+
+  const normalizedSecretRef = normalizeSecretRef(secretRef)
+
+  const client = new SecretManagerServiceClient({
+    auth: createGoogleAuth({
+      scopes: ['https://www.googleapis.com/auth/cloud-platform']
+    })
+  })
+
+  const [version] = await client.accessSecretVersion({
+    name: normalizedSecretRef
+  })
+
+  return {
+    value: normalizeSecretValue(version.payload?.data?.toString('utf8')),
+    source: 'secret_manager' as const,
+    secretRef: normalizedSecretRef
+  }
+}
+
+const createDoctorClient = async () => {
+  const passwordResolution = await resolvePassword()
+  const database = process.env.GREENHOUSE_POSTGRES_DATABASE?.trim()
+  const user = process.env.GREENHOUSE_POSTGRES_USER?.trim()
+
+  if (!database || !user || !passwordResolution.value) {
+    throw new Error('Greenhouse Postgres doctor is not configured. Missing database, user or password.')
+  }
+
+  const baseOptions = {
+    user,
+    password: passwordResolution.value,
+    database,
+    connectionTimeoutMillis: 15_000
+  }
+
+  const instanceConnectionName = process.env.GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME?.trim()
+
+  if (instanceConnectionName) {
+    const connector = new Connector({
+      auth: createGoogleAuth({
+        scopes: ['https://www.googleapis.com/auth/sqlservice.admin']
+      })
+    })
+
+    const connectorOptions = await connector.getOptions({
+      instanceConnectionName,
+      ipType: toIpType(process.env.GREENHOUSE_POSTGRES_IP_TYPE)
+    })
+
+    const client = new Client({
+      ...baseOptions,
+      ...connectorOptions
+    })
+
+    return { client, closeConnector: () => connector.close(), passwordSource: passwordResolution.source }
+  }
+
+  const client = new Client({
+    ...baseOptions,
+    host: process.env.GREENHOUSE_POSTGRES_HOST?.trim() || undefined,
+    port: normalizeNumber(process.env.GREENHOUSE_POSTGRES_PORT, 5432),
+    ssl: normalizeBoolean(process.env.GREENHOUSE_POSTGRES_SSL) ? { rejectUnauthorized: false } : undefined
+  })
+
+  return { client, closeConnector: async () => undefined, passwordSource: passwordResolution.source }
+}
+
 const main = async () => {
   loadGreenhouseToolEnv()
 
   const profile = parseProfile()
   const applied = applyGreenhousePostgresProfile(profile)
-  const { closeGreenhousePostgres, runGreenhousePostgresQuery } = await import('@/lib/postgres/client')
+  const { client, closeConnector, passwordSource } = await createDoctorClient()
+
+  await client.connect()
 
   try {
-    const [identity] = await runGreenhousePostgresQuery<{
+    const identityResult = await client.query<{
       current_user: string
       session_user: string
       runtime_role_exists: boolean
@@ -46,7 +189,9 @@ const main = async () => {
       `
     )
 
-    const schemata = await runGreenhousePostgresQuery<{
+    const [identity] = identityResult.rows
+
+    const schemataResult = await client.query<{
       schema_name: string
       schema_owner: string
       can_usage: boolean
@@ -77,7 +222,9 @@ const main = async () => {
       `
     )
 
-    const roleMemberships = await runGreenhousePostgresQuery<{
+    const schemata = schemataResult.rows
+
+    const roleMembershipsResult = await client.query<{
       role_name: string
       role_exists: boolean
       is_member: boolean
@@ -101,8 +248,10 @@ const main = async () => {
       `
     )
 
+    const roleMemberships = roleMembershipsResult.rows
+
     // ── Superadmin health check ──
-    const superadminCheck = await runGreenhousePostgresQuery<{
+    const superadminCheckResult = await client.query<{
       active_superadmin_count: string
       superadmin_users: string | null
     }>(
@@ -118,6 +267,8 @@ const main = async () => {
       `
     )
 
+    const superadminCheck = superadminCheckResult.rows
+
     const superadminCount = Number(superadminCheck[0]?.active_superadmin_count ?? 0)
 
     console.log(
@@ -128,7 +279,8 @@ const main = async () => {
             user: applied.user,
             database: applied.database,
             instanceConnectionName: applied.instanceConnectionName || null,
-            host: applied.host
+            host: applied.host,
+            passwordSource
           },
           identity,
           roleMemberships,
@@ -145,7 +297,8 @@ const main = async () => {
       )
     )
   } finally {
-    await closeGreenhousePostgres()
+    await client.end()
+    await closeConnector()
   }
 }
 

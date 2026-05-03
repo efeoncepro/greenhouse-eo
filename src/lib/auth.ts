@@ -4,6 +4,7 @@ import CredentialsProvider from 'next-auth/providers/credentials'
 import GoogleProvider from 'next-auth/providers/google'
 
 import { ROLE_CODES } from '@/config/role-codes'
+import { recordAuthAttempt } from '@/lib/auth/attempt-tracker'
 import {
   getAzureAdClientSecret,
   getGoogleClientSecret,
@@ -11,6 +12,7 @@ import {
   hasGoogleAuthProvider,
   hasMicrosoftAuthProvider
 } from '@/lib/auth-secrets'
+import { captureWithDomain } from '@/lib/observability/capture'
 import {
   getTenantAccessRecordByAllowedEmailDomain,
   getTenantAccessRecordByEmail,
@@ -221,6 +223,14 @@ const createAuthOptions = (): NextAuthOptions => {
           if (!tenant) {
             console.warn('Credentials auth rejected: tenant user not found.', { email: normalizedEmail })
 
+            await recordAuthAttempt({
+              provider: 'credentials',
+              stage: 'authorize',
+              outcome: 'rejected',
+              reasonCode: 'tenant_not_found',
+              email: normalizedEmail
+            })
+
             return null
           }
 
@@ -242,6 +252,19 @@ const createAuthOptions = (): NextAuthOptions => {
               payload: { email: normalizedEmail, provider: 'credentials', reason: 'invalid_password' }
             }).catch(() => {})
 
+            await recordAuthAttempt({
+              provider: 'credentials',
+              stage: 'authorize',
+              outcome: 'rejected',
+              reasonCode: !tenant.active
+                ? 'account_disabled'
+                : tenant.status !== 'active'
+                  ? 'account_status_invalid'
+                  : 'invalid_password',
+              userIdResolved: tenant.userId,
+              email: normalizedEmail
+            })
+
             return null
           }
 
@@ -250,6 +273,15 @@ const createAuthOptions = (): NextAuthOptions => {
           } catch (error) {
             console.warn('Unable to update tenant last_login_at after successful auth.', error)
           }
+
+          await recordAuthAttempt({
+            provider: 'credentials',
+            stage: 'authorize',
+            outcome: 'success',
+            reasonCode: 'success',
+            userIdResolved: tenant.userId,
+            email: normalizedEmail
+          })
 
           return {
             id: tenant.userId,
@@ -297,107 +329,218 @@ const createAuthOptions = (): NextAuthOptions => {
       }
 
       if (account?.provider === 'azure-ad') {
-        const { normalizedEmail, oid, tenantId, displayName, givenName, familyName } = getMicrosoftProfileIdentity({
-          profile: (profile as Record<string, unknown> | null | undefined) || null,
-          user
-        })
+        try {
+          const { normalizedEmail, oid, tenantId, displayName, givenName, familyName } = getMicrosoftProfileIdentity({
+            profile: (profile as Record<string, unknown> | null | undefined) || null,
+            user
+          })
 
-        if (!normalizedEmail || !oid) {
-          return '/auth/access-denied'
-        }
+          if (!normalizedEmail || !oid) {
+            await recordAuthAttempt({
+              provider: 'azure-ad',
+              stage: 'signin_callback',
+              outcome: 'rejected',
+              reasonCode: 'unknown',
+              reasonDetail: 'missing_email_or_oid',
+              email: normalizedEmail,
+              microsoftOid: oid,
+              microsoftTenantId: tenantId
+            })
 
-        let tenant = await getTenantAccessRecordByMicrosoftOid(oid)
+            return '/auth/access-denied'
+          }
 
-        if (!tenant) {
-          tenant = await getTenantAccessRecordByEmail(normalizedEmail)
-        }
+          let tenant = await getTenantAccessRecordByMicrosoftOid(oid)
 
-        if (!tenant) {
-          tenant = await getTenantAccessRecordByInternalMicrosoftAlias({
+          if (!tenant) {
+            tenant = await getTenantAccessRecordByEmail(normalizedEmail)
+          }
+
+          if (!tenant) {
+            tenant = await getTenantAccessRecordByInternalMicrosoftAlias({
+              email: normalizedEmail,
+              displayName,
+              givenName,
+              familyName
+            })
+          }
+
+          if (!tenant) {
+            await recordAuthAttempt({
+              provider: 'azure-ad',
+              stage: 'lookup',
+              outcome: 'rejected',
+              reasonCode: 'tenant_not_found',
+              email: normalizedEmail,
+              microsoftOid: oid,
+              microsoftTenantId: tenantId
+            })
+
+            return getRejectedTenantMatchRedirect({
+              provider: 'Microsoft',
+              normalizedEmail
+            })
+          }
+
+          if (!isEligibleForExternalSSOSignIn(tenant)) {
+            await recordAuthAttempt({
+              provider: 'azure-ad',
+              stage: 'signin_callback',
+              outcome: 'rejected',
+              reasonCode: tenant.active ? 'account_status_invalid' : 'account_disabled',
+              userIdResolved: tenant.userId,
+              email: normalizedEmail,
+              microsoftOid: oid,
+              microsoftTenantId: tenantId
+            })
+
+            return '/auth/access-denied'
+          }
+
+          if (tenant.microsoftOid !== oid || tenant.microsoftEmail !== normalizedEmail || tenant.microsoftTenantId !== tenantId) {
+            await linkMicrosoftIdentity({
+              tenant,
+              oid,
+              tenantId,
+              microsoftEmail: normalizedEmail
+            })
+          }
+
+          await updateTenantLastLogin(tenant, 'microsoft_sso')
+
+          await recordAuthAttempt({
+            provider: 'azure-ad',
+            stage: 'signin_callback',
+            outcome: 'success',
+            reasonCode: 'success',
+            userIdResolved: tenant.userId,
             email: normalizedEmail,
-            displayName,
-            givenName,
-            familyName
+            microsoftOid: oid,
+            microsoftTenantId: tenantId
           })
-        }
 
-        if (!tenant) {
-          return getRejectedTenantMatchRedirect({
-            provider: 'Microsoft',
-            normalizedEmail
+          return true
+        } catch (error) {
+          captureWithDomain(error, 'identity', {
+            extra: { provider: 'azure-ad', stage: 'signin_callback' }
           })
-        }
 
-        if (!isEligibleForExternalSSOSignIn(tenant)) {
-          return '/auth/access-denied'
-        }
-
-        if (tenant.microsoftOid !== oid || tenant.microsoftEmail !== normalizedEmail || tenant.microsoftTenantId !== tenantId) {
-          await linkMicrosoftIdentity({
-            tenant,
-            oid,
-            tenantId,
-            microsoftEmail: normalizedEmail
+          await recordAuthAttempt({
+            provider: 'azure-ad',
+            stage: 'signin_callback',
+            outcome: 'failure',
+            reasonCode: 'callback_exception',
+            reasonDetail: error instanceof Error ? error.message : 'unknown_error'
           })
+
+          throw error
         }
-
-        await updateTenantLastLogin(tenant, 'microsoft_sso')
-
-        return true
       }
 
       if (account?.provider === 'google') {
-        const { normalizedEmail, sub, displayName, givenName, familyName } = getGoogleProfileIdentity({
-          profile: (profile as Record<string, unknown> | null | undefined) || null,
-          user
-        })
-
-        if (!normalizedEmail || !sub) {
-          return '/auth/access-denied'
-        }
-
-        let tenant = await getTenantAccessRecordByGoogleSub(sub)
-
-        if (!tenant) {
-          tenant = await getTenantAccessRecordByEmail(normalizedEmail)
-        }
-
-        if (!tenant) {
-          tenant = await getTenantAccessRecordByInternalMicrosoftAlias({
-            email: normalizedEmail,
-            displayName,
-            givenName,
-            familyName
+        try {
+          const { normalizedEmail, sub, displayName, givenName, familyName } = getGoogleProfileIdentity({
+            profile: (profile as Record<string, unknown> | null | undefined) || null,
+            user
           })
-        }
 
-        if (!tenant) {
-          return getRejectedTenantMatchRedirect({
-            provider: 'Google',
-            normalizedEmail
+          if (!normalizedEmail || !sub) {
+            await recordAuthAttempt({
+              provider: 'google',
+              stage: 'signin_callback',
+              outcome: 'rejected',
+              reasonCode: 'unknown',
+              reasonDetail: 'missing_email_or_sub',
+              email: normalizedEmail
+            })
+
+            return '/auth/access-denied'
+          }
+
+          let tenant = await getTenantAccessRecordByGoogleSub(sub)
+
+          if (!tenant) {
+            tenant = await getTenantAccessRecordByEmail(normalizedEmail)
+          }
+
+          if (!tenant) {
+            tenant = await getTenantAccessRecordByInternalMicrosoftAlias({
+              email: normalizedEmail,
+              displayName,
+              givenName,
+              familyName
+            })
+          }
+
+          if (!tenant) {
+            await recordAuthAttempt({
+              provider: 'google',
+              stage: 'lookup',
+              outcome: 'rejected',
+              reasonCode: 'tenant_not_found',
+              email: normalizedEmail
+            })
+
+            return getRejectedTenantMatchRedirect({
+              provider: 'Google',
+              normalizedEmail
+            })
+          }
+
+          if (!isEligibleForExternalSSOSignIn(tenant)) {
+            await recordAuthAttempt({
+              provider: 'google',
+              stage: 'signin_callback',
+              outcome: 'rejected',
+              reasonCode: tenant.active ? 'account_status_invalid' : 'account_disabled',
+              userIdResolved: tenant.userId,
+              email: normalizedEmail
+            })
+
+            return '/auth/access-denied'
+          }
+
+          if (tenant.googleSub !== sub || tenant.googleEmail !== normalizedEmail) {
+            await linkGoogleIdentity({
+              tenant,
+              sub,
+              googleEmail: normalizedEmail
+            })
+          }
+
+          await updateTenantLastLogin(tenant, 'google_sso')
+
+          await recordAuthAttempt({
+            provider: 'google',
+            stage: 'signin_callback',
+            outcome: 'success',
+            reasonCode: 'success',
+            userIdResolved: tenant.userId,
+            email: normalizedEmail
           })
-        }
 
-        if (!isEligibleForExternalSSOSignIn(tenant)) {
-          return '/auth/access-denied'
-        }
-
-        if (tenant.googleSub !== sub || tenant.googleEmail !== normalizedEmail) {
-          await linkGoogleIdentity({
-            tenant,
-            sub,
-            googleEmail: normalizedEmail
+          return true
+        } catch (error) {
+          captureWithDomain(error, 'identity', {
+            extra: { provider: 'google', stage: 'signin_callback' }
           })
+
+          await recordAuthAttempt({
+            provider: 'google',
+            stage: 'signin_callback',
+            outcome: 'failure',
+            reasonCode: 'callback_exception',
+            reasonDetail: error instanceof Error ? error.message : 'unknown_error'
+          })
+
+          throw error
         }
-
-        await updateTenantLastLogin(tenant, 'google_sso')
-
-        return true
       }
 
       return false
     },
     async jwt({ token, user, account, profile }) {
+      try {
       if (user) {
         token.sub = user.id
         token.userId = user.userId
@@ -575,6 +718,34 @@ const createAuthOptions = (): NextAuthOptions => {
       }
 
       return token
+      } catch (error) {
+        // TASK-742 Capa 3 — JWT callback errors are the primary cause of opaque
+        // `error=Callback` redirects. Capture with full context so the failing
+        // stage is observable and the operator can fix the upstream cause.
+        captureWithDomain(error, 'identity', {
+          extra: {
+            stage: 'jwt_callback',
+            provider: account?.provider ?? token.provider ?? 'unknown',
+            userId: typeof token.userId === 'string' ? token.userId : null
+          }
+        })
+
+        await recordAuthAttempt({
+          provider:
+            account?.provider === 'azure-ad'
+              ? 'azure-ad'
+              : account?.provider === 'google'
+                ? 'google'
+                : 'credentials',
+          stage: 'jwt_callback',
+          outcome: 'failure',
+          reasonCode: 'callback_exception',
+          userIdResolved: typeof token.userId === 'string' ? token.userId : null,
+          reasonDetail: error instanceof Error ? error.message : 'unknown_error'
+        })
+
+        throw error
+      }
     },
     async session({ session, token }) {
       if (session.user) {

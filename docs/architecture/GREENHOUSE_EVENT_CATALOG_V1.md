@@ -2,6 +2,190 @@
 
 Catalogo canonico de eventos del sistema de outbox de Greenhouse. Cada evento se registra en `greenhouse_sync.outbox_events` y se publica a BigQuery via el consumer `outbox-publish`.
 
+## Delta 2026-05-03 — TASK-768: Economic Category Dimension audit events
+
+Dos eventos canonicos del dominio finance para hacer auditable las reclasificaciones manuales de `economic_category` (dimension analitica nueva, separada de `expense_type`/`income_type` fiscales). Los emite el endpoint admin de reclassify (Slice 6) y los consume el AI Observer + audit log.
+
+### `finance.expense.economic_category_changed`
+
+Aggregate type: `finance_expense`.
+
+Publisher: `src/app/api/admin/finance/expenses/[id]/economic-category/route.ts` (PATCH gated por capability granular `finance.expenses.reclassify_economic_category`, FINANCE_ADMIN + EFEONCE_ADMIN).
+
+Schema v1:
+
+```ts
+type FinanceExpenseEconomicCategoryChangedV1 = {
+  eventVersion: 'v1'
+  expenseId: string
+  previousCategory: ExpenseEconomicCategory | null  // null si era pre-backfill
+  newCategory: ExpenseEconomicCategory               // 11 valores enum canonicos
+  reason: string                                     // min 10 chars (audit trail)
+  bulkContext: string | null                         // si fue bulk reclassify
+  confidence: 'manual'                               // siempre manual via UI
+  matchedRule: 'manual_reclassify'                   // siempre, vs auto rules
+  actorUserId: string
+  changedAt: string                                  // ISO timestamp
+}
+```
+
+### `finance.income.economic_category_changed`
+
+Mirror para income. Aggregate type: `finance_income`. Schema mirror con `incomeId` + `IncomeEconomicCategory` (8 valores).
+
+Consumers (ambos):
+
+- **Audit log** — fuente de verdad de cuándo y quién reclasifico una fila (los UPDATEs `economic_category` no carry actor; el outbox sí + tabla append-only `economic_category_resolution_log`).
+- **Reliability AI Observer** — correlaciona la curación del signal `finance.expenses.economic_category_unresolved` con la acción humana que la cerró.
+- **Reliability dashboard** — útil para ver "manual queue → reclassify ejecutado → queue vacía" como cycle visible.
+
+Reglas:
+
+- `aggregate_id` = `expenseId` / `incomeId`.
+- Fire-and-forget: si el publish falla, el reclassify no se rollbackea. El endpoint loguea via `captureWithDomain('finance')` y devuelve 200 con `eventId: null`.
+- Idempotente: misma categoria no publica evento.
+- Steady state esperado: 0 events en ventana de 24h post-cleanup del manual queue inicial. Spikes se esperan durante onboarding o cuando emerge un nuevo proveedor que requiere clasificacion manual.
+
+## Delta 2026-05-03 — TASK-766: CLP currency reader contract
+
+Un nuevo evento canónico del dominio finance para hacer auditable el path de reparación de payments con drift CLP (`currency != 'CLP' AND amount_clp IS NULL`). Lo emite el endpoint admin de slice 5 y lo consume el AI Observer + audit log.
+
+### `finance.payments.clp_repaired`
+
+Aggregate type: `finance_payments_clp_repair`.
+
+Publisher: `src/app/api/admin/finance/payments-clp-repair/route.ts` (endpoint admin POST gated por capability granular `finance.payments.repair_clp`, FINANCE_ADMIN + EFEONCE_ADMIN).
+
+Schema v1:
+
+```ts
+type FinancePaymentsClpRepairedV1 = {
+  eventVersion: 'v1'
+  kind: 'expense_payments' | 'income_payments'
+  dryRun: boolean
+  candidatesScanned: number
+  repaired: number
+  skippedCount: number
+  errorsCount: number
+  skipped: Array<{ paymentId: string; reason: string }> // truncado a 50 para evitar payload bloat
+  errors: Array<{ paymentId: string; message: string }> // idem
+  actorUserId: string
+  repairedAt: string // ISO timestamp del trigger
+}
+```
+
+Consumers:
+
+- **Audit log** — fuente de verdad de cuándo y quién disparó un repair (los UPDATEs `amount_clp` no carry actor; el outbox sí).
+- **Reliability AI Observer** — correlaciona la curación del signal `finance.expense_payments.clp_drift` / `finance.income_payments.clp_drift` con la acción humana que la cerró.
+- **Reliability dashboard** — útil para ver "drift detectado → repair ejecutado → drift volvió a 0" como un cycle visible.
+
+Reglas:
+
+- `aggregate_id` = `${kind}-${Date.now()}` (sintético; no hay un single-entity natural ya que el repair afecta una batch).
+- El evento es **fire-and-forget**: si el publish falla, el repair no se rollbackea (los UPDATEs ya commitearon). El endpoint loggea via `captureWithDomain(err, 'finance', { tags: { source: 'payments_clp_repair_audit_publish' } })` y devuelve 200 con `eventId: null`.
+- DryRun emite el evento igual con `dryRun: true` para que el audit log capture intentos de operador.
+- Las arrays `skipped` / `errors` se truncan a 50 entries en el payload outbox; los counts (`skippedCount`, `errorsCount`) preservan la magnitud real. La response HTTP del endpoint sí incluye las arrays completas (no se truncan client-side).
+- Steady state esperado: 0 events en ventana de 24h en producción saludable post-cutover (CHECK constraint `payments_amount_clp_required_after_cutover` impide nuevos drift).
+
+## Delta 2026-05-02 — TASK-765: Payment Order Bank Settlement Resilience
+
+Dos nuevos eventos canónicos del dominio finance para hacer observable y auditable la cadena `payment_order.paid → bank impact`. Los emiten distintos slices de TASK-765, pero ambos se documentan aquí porque comparten el mismo aggregate domain (`finance` / `payroll_expense`) y serán consumidos por la misma capa de Reliability + AI Observer.
+
+### `finance.payment_order.settlement_blocked`
+
+Aggregate type: `payment_order`.
+
+Publisher (a partir de slice 4): `src/lib/finance/payment-orders/record-payment-from-order.ts` (proyección reactiva `record_expense_payment_from_order` cuando un step en la cadena `expense ↔ expense_payment ↔ settlement_leg ↔ account_balances` falla).
+
+Schema v1:
+
+```ts
+type FinancePaymentOrderSettlementBlockedV1 = {
+  eventVersion: 'v1'
+  orderId: string
+  state: 'paid'
+  reason:
+    | 'expense_unresolved'        // resolver no encontró expenses para (period_id, member_id)
+    | 'account_missing'           // source_account_id NULL al transicionar
+    | 'cutover_violation'         // CHECK expense_payments_account_required_after_cutover rechazó el INSERT
+    | 'materializer_dead_letter'  // upstream payroll materializer en dead-letter
+    | 'out_of_scope_v1'           // V1 del proyector no cubre este obligation_kind (e.g. employer_social_security)
+  detail: string                  // mensaje human-readable, sanitizable
+  affectedLineIds: string[]       // payment_order_lines afectadas
+  retryableAfter?: string         // ISO timestamp, sugiere re-disparo
+  blockedAt: string               // ISO timestamp del bloqueo
+}
+```
+
+Consumers:
+
+- **UI banner** en `PaymentOrderDetailDrawer.tsx` (slice 7) — alert rojo si la order tiene un evento reciente sin resolver, con CTA `Recuperar orden`.
+- **Reliability AI Observer** (TASK-638) — correlaciona con dead-letter del proyector y signal `paid_orders_without_expense_payment` (slice 5/7).
+- **Reliability signal `payment_orders_dead_letter`** (slice 7) — query directa al outbox + `outbox_reactive_log`.
+
+Reglas:
+
+- `aggregate_id` = `orderId`.
+- Publicado **dentro de la misma transacción** que el throw del proyector cuando es posible; si no, en un commit separado pero antes de re-disparar refresh queue.
+- Steady state esperado: 0 events en ventana de 24h en producción saludable.
+
+### `finance.payroll_expenses.rematerialized`
+
+Aggregate type: `payroll_expense`.
+
+Publisher: `src/app/api/admin/finance/payroll-expense-rematerialize/route.ts` (endpoint admin de slice 3, gated por `finance.payroll.rematerialize`).
+
+Schema v1:
+
+```ts
+type FinancePayrollExpensesRematerializedV1 = {
+  eventVersion: 'v1'
+  periodId: string                 // greenhouse_payroll.payroll_periods.period_id
+  year: number                     // 2000-2100
+  month: number                    // 1-12
+  dryRun: boolean                  // true = preview (no INSERTs)
+  payrollCreated: number           // filas `expenses` creadas (expense_type='payroll')
+  payrollSkipped: number           // filas existentes (idempotencia)
+  socialSecurityCreated: boolean   // true si se creó la fila Previred consolidada
+  socialSecuritySkipped: boolean   // inverse
+  actorUserId: string              // tenant.userId del admin
+  rematerializedAt: string         // ISO timestamp del trigger
+}
+```
+
+Consumers:
+
+- **Audit log** — el evento es la fuente de verdad de cuándo y quién re-disparó la materialización (los `expenses` insertados también tienen `source_type='payroll_generated'`, pero NO carry actor — el outbox sí).
+- **Reliability AI Observer** — útil para correlacionar la curación del signal `payroll_expense_materialization_lag` (slice 7) con la acción humana que la cerró.
+
+Reglas:
+
+- `aggregate_id` = `periodId`.
+- El evento es **fire-and-forget**: si el publish falla, la materialización no se rollbackea (el endpoint loggea via `captureWithDomain` y devuelve 200 con `eventId: undefined`).
+- DryRun emite el evento igual con `dryRun: true` para que el audit log capture intentos de operador (operativamente útil aunque no muten).
+
+## Delta 2026-05-01 — TASK-748: Payment Obligations
+
+Aggregate type nuevo: `payment_obligation`.
+
+Eventos:
+
+- `finance.payment_obligation.generated` — emitido por `createPaymentObligation` cuando se materializa una obligation desde una source (payroll, supplier_invoice, manual). Payload: `{ obligationId, sourceKind, sourceRef, periodId, beneficiaryType, beneficiaryId, obligationKind, amount, currency, status, spaceId }`.
+- `finance.payment_obligation.superseded` — emitido por `supersedePaymentObligation` cuando una obligation viva (no pagada) es reemplazada por otra. Payload: `{ obligationId, supersededBy, reason, originalAmount, replacementAmount, deltaAmount, currency, beneficiaryId, obligationKind }`.
+
+Consumers futuros:
+
+- TASK-750 payment_orders consume `.generated` para construir ordenes.
+- TASK-751 reconciliation consume `.superseded` para mantener delta auditable.
+- Reliability AI Observer (TASK-638) puede correlacionar drift entre obligations y expenses.
+
+Reglas:
+
+- Eventos publicados DENTRO de la transaccion del INSERT/UPDATE para idempotencia.
+- `aggregate_id` = `obligation_id`.
+- Schema version implicita V1; no se necesita `schemaVersion: 2` (eventos entity-scoped, no period-scoped).
+
 ## Delta 2026-04-21
 
 - `TASK-533` agrega el aggregate type `vat_position` y el evento `finance.vat_position.period_materialized`.

@@ -42,6 +42,14 @@ export interface RecordExpensePaymentInput {
   actorUserId?: string | null
   exchangeRateOverride?: number | null
   settlementConfig?: SettlementConfigurationInput | null
+  /**
+   * TASK-751 — link al payment_order_line que dispara este pago. Cuando
+   * se entrega, queda persistido en `expense_payments.payment_order_line_id`
+   * y se hace back-fill de `payment_order_lines.expense_payment_id`. La
+   * idempotency partial unique index garantiza un unico expense_payment
+   * vivo por line.
+   */
+  paymentOrderLineId?: string | null
 }
 
 export interface ExpensePaymentRecord {
@@ -165,17 +173,28 @@ const PAYMENT_COLUMNS = `
  *
  * Publishes outbox event: finance.expense_payment.recorded
  */
-export async function recordExpensePayment(input: RecordExpensePaymentInput): Promise<{
+// TASK-765 Slice 5: el path canonico atomico (mark-paid-atomic) necesita
+// invocar recordExpensePayment dentro de la misma tx que el UPDATE de
+// payment_orders.state='paid'. Para soportarlo sin abrir tx anidada,
+// recordExpensePayment acepta `client?: PoolClient` opcional. Cuando se
+// pasa, el body corre directo en esa tx; cuando se omite, mantiene el
+// comportamiento legacy de abrir su propia withGreenhousePostgresTransaction.
+//
+// Idempotencia preservada: el partial unique index sobre
+// expense_payments.payment_order_line_id sigue protegiendo retries y
+// concurrency races.
+const runRecordExpensePayment = async (
+  client: PoolClient,
+  input: RecordExpensePaymentInput,
+  paymentId: string,
+  paymentSource: ExpensePaymentSource
+): Promise<{
   payment: ExpensePaymentRecord
   expenseId: string
   paymentStatus: string
   amountPaid: number
   amountPending: number
-}> {
-  const paymentId = input.paymentId || `exp-pay-${randomUUID()}`
-  const paymentSource = input.paymentSource || 'manual'
-
-  return withGreenhousePostgresTransaction(async (client: PoolClient) => {
+}> => {
     // Lock the expense row to prevent concurrent payment races
     const expenseRows = await queryRows<{
       expense_id: string
@@ -256,9 +275,10 @@ export async function recordExpensePayment(input: RecordExpensePaymentInput): Pr
         payment_id, expense_id, payment_date, amount, currency, reference,
         payment_method, payment_account_id, payment_source, notes,
         recorded_by_user_id, recorded_at, is_reconciled, created_at,
-        exchange_rate_at_payment, amount_clp, fx_gain_loss_clp
+        exchange_rate_at_payment, amount_clp, fx_gain_loss_clp,
+        payment_order_line_id
       )
-      VALUES ($1, $2, $3::date, $4, $5, $6, $7, $8, $9, $10, $11, CURRENT_TIMESTAMP, FALSE, CURRENT_TIMESTAMP, $12, $13, $14)
+      VALUES ($1, $2, $3::date, $4, $5, $6, $7, $8, $9, $10, $11, CURRENT_TIMESTAMP, FALSE, CURRENT_TIMESTAMP, $12, $13, $14, $15)
       RETURNING ${PAYMENT_COLUMNS}`,
       [
         paymentId,
@@ -274,10 +294,23 @@ export async function recordExpensePayment(input: RecordExpensePaymentInput): Pr
         input.actorUserId || null,
         exchangeRateAtPayment,
         amountClp,
-        fxGainLossClp
+        fxGainLossClp,
+        input.paymentOrderLineId || null
       ],
       client
     )
+
+    // TASK-751: back-fill el link reverse en payment_order_lines.expense_payment_id
+    // (idempotente — solo afecta una row por line gracias al partial unique index).
+    if (input.paymentOrderLineId) {
+      await queryRows(
+        `UPDATE greenhouse_finance.payment_order_lines
+            SET expense_payment_id = $1, updated_at = now()
+          WHERE line_id = $2 AND expense_payment_id IS NULL`,
+        [paymentId, input.paymentOrderLineId],
+        client
+      )
+    }
 
     const payment = mapPaymentRow(paymentRows[0])
 
@@ -345,7 +378,36 @@ export async function recordExpensePayment(input: RecordExpensePaymentInput): Pr
       amountPaid: newAmountPaid,
       amountPending: roundCurrency(totalAmount - newAmountPaid)
     }
-  })
+  }
+
+/**
+ * Public entry point. Cuando se invoca sin `client`, abre su propia tx
+ * (path legacy). Cuando se invoca con `client`, el body corre dentro de
+ * la tx del caller — usado por mark-paid-atomic (slice 5) para garantizar
+ * que payment_order.state='paid' commitea ATOMICAMENTE con expense_payment
+ * + settlement_leg + outbox events. Si cualquier step falla, ROLLBACK
+ * completo: la order vuelve al estado anterior, sin zombie.
+ */
+export async function recordExpensePayment(
+  input: RecordExpensePaymentInput,
+  client?: PoolClient
+): Promise<{
+  payment: ExpensePaymentRecord
+  expenseId: string
+  paymentStatus: string
+  amountPaid: number
+  amountPending: number
+}> {
+  const paymentId = input.paymentId || `exp-pay-${randomUUID()}`
+  const paymentSource = input.paymentSource || 'manual'
+
+  if (client) {
+    return runRecordExpensePayment(client, input, paymentId, paymentSource)
+  }
+
+  return withGreenhousePostgresTransaction(c =>
+    runRecordExpensePayment(c, input, paymentId, paymentSource)
+  )
 }
 
 // ─── getPaymentsForExpense ──────────────────────────────────────────

@@ -370,12 +370,11 @@ describe('GET /api/finance/suppliers/[id]', () => {
         providerId: 'local-studio'
       })
     )
-    expect(mockSyncProviderFromFinanceSupplier).toHaveBeenCalledWith(
-      expect.objectContaining({
-        supplierId: 'supplier-2',
-        providerId: 'local-studio'
-      })
-    )
+    // TASK-771 Slice 3 — el sync BQ ya NO se invoca inline desde PUT.
+    // La proyección a BigQuery corre async vía consumer reactivo
+    // `provider_bq_sync` consumiendo el outbox event `provider.upserted`
+    // emitido en la tx PG (upsertProviderFromFinanceSupplierInPostgres).
+    expect(mockSyncProviderFromFinanceSupplier).not.toHaveBeenCalled()
 
     const body = await response.json()
 

@@ -54,7 +54,7 @@ type Props = {
 const DetailRow = ({ label, value }: { label: string; value: string }) => (
   <Box sx={{ display: 'flex', justifyContent: 'space-between', py: 0.5 }}>
     <Typography variant='body2' color='text.secondary'>{label}</Typography>
-    <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>{value}</Typography>
+    <Typography variant='body2'>{value}</Typography>
   </Box>
 )
 
@@ -296,27 +296,27 @@ const PersonEconomyTab = ({ detail, onEditCompensation }: Props) => {
                                 </Typography>
                               </TableCell>
                               <TableCell align='right'>
-                                <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
+                                <Typography variant='body2'>
                                   {formatCurrency(entry.baseSalary, payrollCurrency)}
                                 </Typography>
                               </TableCell>
                               <TableCell align='right'>
-                                <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
+                                <Typography variant='body2'>
                                   {formatCurrency(entry.bonusOtdAmount + entry.bonusRpaAmount + entry.bonusOtherAmount, payrollCurrency)}
                                 </Typography>
                               </TableCell>
                               <TableCell align='right'>
-                                <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
+                                <Typography variant='body2'>
                                   {formatCurrency(entry.grossTotal, payrollCurrency)}
                                 </Typography>
                               </TableCell>
                               <TableCell align='right'>
-                                <Typography variant='body2' color='error.main' sx={{ fontFamily: 'monospace' }}>
+                                <Typography variant='body2' color='error.main'>
                                   {entry.chileTotalDeductions ? `- ${formatCurrency(entry.chileTotalDeductions, 'CLP')}` : '\u2014'}
                                 </Typography>
                               </TableCell>
                               <TableCell align='right'>
-                                <Typography variant='subtitle2' sx={{ fontFamily: 'monospace', fontWeight: 700 }}>
+                                <Typography variant='subtitle2' sx={{ fontWeight: 700 }}>
                                   {formatCurrency(entry.netTotal, payrollCurrency)}
                                 </Typography>
                               </TableCell>

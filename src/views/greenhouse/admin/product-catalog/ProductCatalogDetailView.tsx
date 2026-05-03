@@ -24,6 +24,8 @@ import TableRow from '@mui/material/TableRow'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 
+import { DataTableShell } from '@/components/greenhouse/data-table'
+
 import type { ProductCatalogDetailData } from './detail-data'
 
 // ─────────────────────────────────────────────────────────────
@@ -473,6 +475,7 @@ return
               Ingresa un precio para marcarlo como autoritativo (`source=gh_admin`). Los otros se
               derivan automáticamente via FX. Deja en blanco las monedas que no vas a fijar.
             </Typography>
+            <DataTableShell identifier='product-catalog-prices' ariaLabel='Precios autoritativos del producto'>
             <Table size='small'>
               <TableHead>
                 <TableRow>
@@ -523,6 +526,7 @@ return
                 })}
               </TableBody>
             </Table>
+            </DataTableShell>
             <Stack direction='row' spacing={2} sx={{ mt: 2 }}>
               <Button variant='contained' onClick={handleSavePrices} disabled={isPending}>
                 Guardar precios

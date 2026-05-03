@@ -110,7 +110,7 @@ const columns: ColumnDef<OrganizationPerson, any>[] = [
   colHelper.accessor('assignedFte', {
     header: 'FTE',
     cell: ({ getValue }) => (
-      <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
+      <Typography variant='body2'>
         {typeof getValue() === 'number' ? formatFte(getValue()) : '—'}
       </Typography>
     ),

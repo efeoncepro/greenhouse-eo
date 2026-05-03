@@ -17,6 +17,8 @@ const mocks = vi.hoisted(() => ({
 }))
 
 vi.mock('@/lib/postgres/client', () => ({
+  onGreenhousePostgresReset: () => () => {},
+  isGreenhousePostgresRetryableConnectionError: () => false,
   runGreenhousePostgresQuery: (...args: unknown[]) =>
     mocks.runGreenhousePostgresQuery(...args)
 }))

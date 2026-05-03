@@ -22,6 +22,10 @@ import {
 import { parsePersistedIncomeTaxSnapshot } from '@/lib/finance/income-tax-snapshot'
 import { parsePersistedExpenseTaxSnapshot } from '@/lib/finance/expense-tax-snapshot'
 import { resolveAutoAllocation, type AutoAllocationInput } from '@/lib/finance/auto-allocation-rules'
+import {
+  resolveAndPersistExpenseEconomicCategory,
+  resolveAndPersistIncomeEconomicCategory
+} from '@/lib/finance/economic-category/writer-integration'
 import { ensureOrganizationForClient } from '@/lib/account-360/organization-identity'
 import type { ChileTaxSnapshot } from '@/lib/tax/chile'
 
@@ -204,6 +208,15 @@ type PostgresExpenseRow = {
   exempt_amount: unknown
   other_taxes_amount: unknown
   withholding_amount: unknown
+
+  // TASK-772 — derived fields from LEFT JOIN suppliers + LATERAL aggregate
+  // expense_payments_normalized. Always present in PG SELECT (NULL if no
+  // supplier match or no payments exist for the expense).
+  supplier_display_name: string | null
+  sort_date: string | Date | null
+  amount_paid_clp_sum: unknown
+  amount_paid_native_homogeneous: unknown
+  payments_currency_homogeneous: string | null
 }
 
 type PostgresIncomePaymentRow = {
@@ -407,6 +420,68 @@ export type FinanceExpenseRecord = {
   exemptAmount: number | null
   otherTaxesAmount: number | null
   withholdingAmount: number | null
+
+  // ─── TASK-772 display + amount contract ─────────────────────────────
+  // Resolved server-side. UI consumes directly without recomputing
+  // identity or financial semantics.
+
+  /**
+   * Display canónico del proveedor:
+   *   1. expenses.supplier_name (snapshot legacy/auditable)
+   *   2. suppliers.trade_name (display comercial)
+   *   3. suppliers.legal_name (razón social)
+   *   4. null
+   * Resuelto via LEFT JOIN greenhouse_finance.suppliers en el reader.
+   */
+  supplierDisplayName: string | null
+
+  /**
+   * Fecha canónica de display/sort de la obligación:
+   * COALESCE(document_date, payment_date, created_at::date).
+   * Una obligación se identifica primero por su emisión (documento),
+   * luego por cuándo se va a pagar, y como último recurso por creación.
+   */
+  sortDate: string | null
+
+  /**
+   * Monto pagado canónico en CLP (SUM desde expense_payments_normalized,
+   * VIEW canónica TASK-766). Siempre confiable sin importar la mix de
+   * monedas en los payments. 0 si no hay payments registrados.
+   */
+  amountPaidClp: number
+
+  /**
+   * Monto pagado en moneda original del documento. Best-effort:
+   *   - currency='CLP' → igual a amountPaidClp
+   *   - currency != 'CLP' + todos los payments en misma moneda que expense
+   *     → SUM(payment_amount_native)
+   *   - currency != 'CLP' + payments con monedas mixtas (ej. expense USD
+   *     pagado parte CLP via CCA) → null + amountPaidIsHomogeneous=false
+   * Para el último caso, consumers deben preferir amountPaidClp y mostrar
+   * un disclaimer de mix de monedas.
+   */
+  amountPaid: number | null
+
+  /**
+   * true cuando todos los payments del expense usan la misma currency
+   * que el expense (o no hay payments). false cuando hay mix de monedas.
+   * Permite a consumers decidir si mostrar amountPaid en moneda original
+   * o caer a amountPaidClp.
+   */
+  amountPaidIsHomogeneous: boolean
+
+  /**
+   * Saldo pendiente CLP: total_amount_clp - amount_paid_clp. Siempre
+   * computable. ≥0 (clamped a 0 si hubo overpayment, raro pero posible).
+   */
+  pendingAmountClp: number
+
+  /**
+   * Saldo pendiente en moneda original. Solo cuando amountPaid es resoluble
+   * (ver amountPaidIsHomogeneous). null cuando hay mix de monedas; en ese
+   * caso usar pendingAmountClp con disclaimer.
+   */
+  pendingAmount: number | null
 }
 
 export type CostAllocationRecord = {
@@ -567,7 +642,47 @@ const mapIncome = (row: PostgresIncomeRow): FinanceIncomeRecord => {
   }
 }
 
-const mapExpense =(row: PostgresExpenseRow): FinanceExpenseRecord => ({
+const mapExpense = (row: PostgresExpenseRow): FinanceExpenseRecord => {
+  // ─── TASK-772 derived fields ───────────────────────────────────────
+  const totalAmount = toNumber(row.total_amount)
+  const totalAmountClp = toNumber(row.total_amount_clp)
+  const amountPaidClp = toNumber(row.amount_paid_clp_sum) // 0 if no payments
+  const currency = normalizeString(row.currency)
+
+  // amountPaid en moneda original (best-effort, ver doc en FinanceExpenseRecord).
+  // No introducimos matemática FX ad hoc — respeta TASK-766 contract.
+  let amountPaid: number | null
+  let amountPaidIsHomogeneous: boolean
+
+  const homogeneousNative = toNullableNumber(row.amount_paid_native_homogeneous)
+  const paymentsCurrency = row.payments_currency_homogeneous
+
+  if (amountPaidClp === 0) {
+    // No hay payments → ambos resoluciones son trivialmente 0 y "homogéneas".
+    amountPaid = 0
+    amountPaidIsHomogeneous = true
+  } else if (currency === 'CLP') {
+    // CLP nativo: 1:1 trivial.
+    amountPaid = amountPaidClp
+    amountPaidIsHomogeneous = true
+  } else if (homogeneousNative !== null && paymentsCurrency === currency) {
+    // Todos los payments comparten currency con el expense → suma confiable.
+    amountPaid = homogeneousNative
+    amountPaidIsHomogeneous = true
+  } else {
+    // Mix de monedas (ej. expense USD parcialmente pagado en CLP via CCA).
+    // No inventamos conversión FX. Consumer debe usar amountPaidClp.
+    amountPaid = null
+    amountPaidIsHomogeneous = false
+  }
+
+  const pendingAmountClp = roundCurrency(Math.max(0, totalAmountClp - amountPaidClp))
+
+  const pendingAmount = amountPaid === null
+    ? null
+    : roundCurrency(Math.max(0, totalAmount - amountPaid))
+
+  return ({
   expenseId: normalizeString(row.expense_id),
   clientId: str(row.client_id),
   spaceId: str(row.space_id),
@@ -653,8 +768,18 @@ const mapExpense =(row: PostgresExpenseRow): FinanceExpenseRecord => ({
   dteFolio: str(row.dte_folio),
   exemptAmount: toNullableNumber(row.exempt_amount),
   otherTaxesAmount: toNullableNumber(row.other_taxes_amount),
-  withholdingAmount: toNullableNumber(row.withholding_amount)
+  withholdingAmount: toNullableNumber(row.withholding_amount),
+
+  // ─── TASK-772 — display + amount contract derived fields ───────────
+  supplierDisplayName: str(row.supplier_display_name),
+  sortDate: toDateString(row.sort_date as string | { value?: string } | null),
+  amountPaidClp,
+  amountPaid,
+  amountPaidIsHomogeneous,
+  pendingAmountClp,
+  pendingAmount
 })
+}
 
 const mapIncomePayment =(row: PostgresIncomePaymentRow): FinanceIncomePaymentRecord => ({
   paymentId: normalizeString(row.payment_id),
@@ -1415,6 +1540,20 @@ export const createFinanceIncomeInPostgres = async ({
   await assertFinanceSlice2PostgresReady()
 
   const run = async (client: PoolClient) => {
+    // TASK-768 — resolver canónico income en write-time.
+    const incomeEconomicCategoryResolution = await resolveAndPersistIncomeEconomicCategory({
+      incomeId,
+      resolverInput: {
+        payerName: clientName ?? null,
+        payerClientProfileId: clientProfileId,
+        rawDescription: description,
+        accountingType: incomeType,
+        amount: totalAmount,
+        currency
+      },
+      client
+    })
+
     const rows = await queryRows<PostgresIncomeRow>(
       `
         INSERT INTO greenhouse_finance.income (
@@ -1429,22 +1568,22 @@ export const createFinanceIncomeInPostgres = async ({
           po_number, hes_number, service_line, income_type,
           is_reconciled,
           partner_id, partner_name, partner_share_percent, partner_share_amount, net_after_partner,
-          notes, created_by_user_id,
+          notes, created_by_user_id, economic_category,
           created_at, updated_at
         )
         VALUES (
           $1, $2, $3, $4, $5, $6,
           $7, $8, $9::date, $10::date, $11,
-          $12, $13, $14,
-          $15, $16, $17, $18::jsonb, $19, $20::timestamptz,
-          $21,
-          $22, $23,
-          $24, 0,
-          $25, $26, $27, $28, $29,
-          $30, $31, $32, $33,
+          $12, $13, $14, $15,
+          $16, $17, $18, $19::jsonb, $20, $21::timestamptz,
+          $22,
+          $23, $24,
+          $25, 0,
+          $26, $27, $28, $29, $30,
+          $31, $32, $33, $34,
           FALSE,
-          $34, $35, $36, $37, $38,
-          $39, $40,
+          $35, $36, $37, $38, $39,
+          $40, $41, $42,
           CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
         )
         RETURNING *
@@ -1460,7 +1599,7 @@ export const createFinanceIncomeInPostgres = async ({
         quotationId, contractId, sourceHesId, purchaseOrderId, hesId,
         poNumber, hesNumber, serviceLine, incomeType,
         partnerId, partnerName, partnerSharePercent, partnerShareAmount, netAfterPartner,
-        notes, actorUserId
+        notes, actorUserId, incomeEconomicCategoryResolution.category
       ],
       client
     )
@@ -1686,12 +1825,43 @@ export const updateFinanceExpenseInPostgres = async (
   values.push(expenseId)
 
   return withGreenhousePostgresTransaction(async client => {
+    // TASK-772 — usamos CTE para que el RETURNING incluya los derived
+    // fields (supplierDisplayName, sortDate, amountPaidClp/...) en la
+    // misma tx que el UPDATE. Sino el outbox event payload tendría
+    // campos derivados null/0 hasta que un read posterior los rehidrate.
     const rows = await queryRows<PostgresExpenseRow>(
       `
-        UPDATE greenhouse_finance.expenses
-        SET ${setClauses.join(', ')}
-        WHERE expense_id = $${paramIdx}
-        RETURNING *
+        WITH updated AS (
+          UPDATE greenhouse_finance.expenses
+          SET ${setClauses.join(', ')}
+          WHERE expense_id = $${paramIdx}
+          RETURNING *
+        )
+        SELECT
+          e.*,
+          COALESCE(NULLIF(TRIM(e.supplier_name), ''), s.trade_name, s.legal_name) AS supplier_display_name,
+          COALESCE(e.document_date, e.payment_date, e.created_at::date) AS sort_date,
+          COALESCE(ep_agg.amount_paid_clp_sum, 0) AS amount_paid_clp_sum,
+          ep_agg.amount_paid_native_homogeneous,
+          ep_agg.payments_currency_homogeneous
+        FROM updated e
+        LEFT JOIN greenhouse_finance.suppliers s ON s.supplier_id = e.supplier_id
+        LEFT JOIN LATERAL (
+          SELECT
+            SUM(epn.payment_amount_clp) AS amount_paid_clp_sum,
+            CASE
+              WHEN BOOL_AND(epn.payment_currency = e.currency)
+                THEN SUM(epn.payment_amount_native)
+              ELSE NULL
+            END AS amount_paid_native_homogeneous,
+            CASE
+              WHEN BOOL_AND(epn.payment_currency = e.currency)
+                THEN MIN(epn.payment_currency)
+              ELSE NULL
+            END AS payments_currency_homogeneous
+          FROM greenhouse_finance.expense_payments_normalized epn
+          WHERE epn.expense_id = e.expense_id
+        ) ep_agg ON TRUE
       `,
       values,
       client
@@ -1867,30 +2037,32 @@ export const listFinanceExpensesFromPostgres = async ({
     values.push(value)
   }
 
-  if (expenseType) push('expense_type = $?', expenseType)
+  // Filtros se aplican sobre alias `e` (TASK-772 — el SELECT ahora
+  // hace LEFT JOIN suppliers + LATERAL aggregate payments_normalized).
+  if (expenseType) push('e.expense_type = $?', expenseType)
 
   if (status) {
     const statuses = status.split(',').map(s => s.trim()).filter(Boolean)
 
     if (statuses.length === 1) {
-      push('payment_status = $?', statuses[0])
+      push('e.payment_status = $?', statuses[0])
     } else if (statuses.length > 1) {
-      push(`payment_status = ANY($?::text[])`, statuses)
+      push(`e.payment_status = ANY($?::text[])`, statuses)
     }
   }
 
-  if (clientId) push('client_id = $?', clientId)
-  if (spaceId) push('space_id = $?', spaceId)
-  if (memberId) push('member_id = $?', memberId)
-  if (supplierId) push('supplier_id = $?', supplierId)
-  if (serviceLine) push('service_line = $?', serviceLine)
-  if (fromDate) push('COALESCE(document_date, payment_date) >= $?::date', fromDate)
-  if (toDate) push('COALESCE(document_date, payment_date) <= $?::date', toDate)
+  if (clientId) push('e.client_id = $?', clientId)
+  if (spaceId) push('e.space_id = $?', spaceId)
+  if (memberId) push('e.member_id = $?', memberId)
+  if (supplierId) push('e.supplier_id = $?', supplierId)
+  if (serviceLine) push('e.service_line = $?', serviceLine)
+  if (fromDate) push('COALESCE(e.document_date, e.payment_date) >= $?::date', fromDate)
+  if (toDate) push('COALESCE(e.document_date, e.payment_date) <= $?::date', toDate)
 
   const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : ''
 
   const countRows = await runGreenhousePostgresQuery<{ total: string }>(
-    `SELECT COUNT(*) AS total FROM greenhouse_finance.expenses ${whereClause}`,
+    `SELECT COUNT(*) AS total FROM greenhouse_finance.expenses e ${whereClause}`,
     values
   )
 
@@ -1907,33 +2079,61 @@ export const listFinanceExpensesFromPostgres = async ({
   const rows = await runGreenhousePostgresQuery<PostgresExpenseRow>(
     `
       SELECT
-        expense_id, client_id, space_id, expense_type, source_type, description, currency,
-        subtotal, tax_rate, tax_amount, tax_code, tax_recoverability, tax_rate_snapshot, tax_amount_snapshot,
-        tax_snapshot_json, is_tax_exempt, tax_snapshot_frozen_at,
-        recoverable_tax_amount, recoverable_tax_amount_clp, non_recoverable_tax_amount, non_recoverable_tax_amount_clp,
-        effective_cost_amount, effective_cost_amount_clp, total_amount,
-        exchange_rate_to_clp, total_amount_clp,
-        payment_date, payment_status, payment_method, payment_provider, payment_rail, payment_account_id, payment_reference,
-        document_number, document_date, due_date,
-        supplier_id, supplier_name, supplier_invoice_number,
-        payroll_period_id, payroll_entry_id, member_id, member_name,
-        social_security_type, social_security_institution, social_security_period,
-        tax_type, tax_period, tax_form_number,
-        miscellaneous_category, service_line, is_recurring, recurrence_frequency,
-        is_reconciled, reconciliation_id, linked_income_id,
-        cost_category, cost_is_direct, allocated_client_id,
-        direct_overhead_scope, direct_overhead_kind, direct_overhead_member_id,
-        notes, created_by_user_id,
-        created_at, updated_at,
-        nubox_purchase_id, nubox_document_status, nubox_supplier_rut,
-        nubox_supplier_name, nubox_origin, nubox_last_synced_at,
-        is_annulled, sii_document_status, receipt_date, purchase_type,
-        vat_unrecoverable_amount, vat_fixed_assets_amount, vat_common_use_amount,
-        nubox_pdf_url, balance_nubox, dte_type_code, dte_folio,
-        exempt_amount, other_taxes_amount, withholding_amount
-      FROM greenhouse_finance.expenses
+        e.expense_id, e.client_id, e.space_id, e.expense_type, e.source_type, e.description, e.currency,
+        e.subtotal, e.tax_rate, e.tax_amount, e.tax_code, e.tax_recoverability, e.tax_rate_snapshot, e.tax_amount_snapshot,
+        e.tax_snapshot_json, e.is_tax_exempt, e.tax_snapshot_frozen_at,
+        e.recoverable_tax_amount, e.recoverable_tax_amount_clp, e.non_recoverable_tax_amount, e.non_recoverable_tax_amount_clp,
+        e.effective_cost_amount, e.effective_cost_amount_clp, e.total_amount,
+        e.exchange_rate_to_clp, e.total_amount_clp,
+        e.payment_date, e.payment_status, e.payment_method, e.payment_provider, e.payment_rail, e.payment_account_id, e.payment_reference,
+        e.document_number, e.document_date, e.due_date,
+        e.supplier_id, e.supplier_name, e.supplier_invoice_number,
+        e.payroll_period_id, e.payroll_entry_id, e.member_id, e.member_name,
+        e.social_security_type, e.social_security_institution, e.social_security_period,
+        e.tax_type, e.tax_period, e.tax_form_number,
+        e.miscellaneous_category, e.service_line, e.is_recurring, e.recurrence_frequency,
+        e.is_reconciled, e.reconciliation_id, e.linked_income_id,
+        e.cost_category, e.cost_is_direct, e.allocated_client_id,
+        e.direct_overhead_scope, e.direct_overhead_kind, e.direct_overhead_member_id,
+        e.notes, e.created_by_user_id,
+        e.created_at, e.updated_at,
+        e.nubox_purchase_id, e.nubox_document_status, e.nubox_supplier_rut,
+        e.nubox_supplier_name, e.nubox_origin, e.nubox_last_synced_at,
+        e.is_annulled, e.sii_document_status, e.receipt_date, e.purchase_type,
+        e.vat_unrecoverable_amount, e.vat_fixed_assets_amount, e.vat_common_use_amount,
+        e.nubox_pdf_url, e.balance_nubox, e.dte_type_code, e.dte_folio,
+        e.exempt_amount, e.other_taxes_amount, e.withholding_amount,
+        -- TASK-772 — display canónico de proveedor con fallback a suppliers tabla
+        COALESCE(NULLIF(TRIM(e.supplier_name), ''), s.trade_name, s.legal_name) AS supplier_display_name,
+        -- TASK-772 — fecha canónica de sort/display: documento -> pago -> creación
+        COALESCE(e.document_date, e.payment_date, e.created_at::date) AS sort_date,
+        -- TASK-772 — payments aggregate desde VIEW canónica TASK-766 (CLP-safe).
+        -- amount_paid_native_homogeneous solo emite SUM si todos los payments
+        -- comparten currency con el expense; sino NULL → mapper devuelve
+        -- amountPaid=null + amountPaidIsHomogeneous=false (consumer fallback a CLP).
+        COALESCE(ep_agg.amount_paid_clp_sum, 0) AS amount_paid_clp_sum,
+        ep_agg.amount_paid_native_homogeneous,
+        ep_agg.payments_currency_homogeneous
+      FROM greenhouse_finance.expenses e
+      LEFT JOIN greenhouse_finance.suppliers s ON s.supplier_id = e.supplier_id
+      LEFT JOIN LATERAL (
+        SELECT
+          SUM(epn.payment_amount_clp) AS amount_paid_clp_sum,
+          CASE
+            WHEN BOOL_AND(epn.payment_currency = e.currency)
+              THEN SUM(epn.payment_amount_native)
+            ELSE NULL
+          END AS amount_paid_native_homogeneous,
+          CASE
+            WHEN BOOL_AND(epn.payment_currency = e.currency)
+              THEN MIN(epn.payment_currency)
+            ELSE NULL
+          END AS payments_currency_homogeneous
+        FROM greenhouse_finance.expense_payments_normalized epn
+        WHERE epn.expense_id = e.expense_id
+      ) ep_agg ON TRUE
       ${whereClause}
-      ORDER BY COALESCE(document_date, payment_date, created_at::date) DESC
+      ORDER BY COALESCE(e.document_date, e.payment_date, e.created_at::date) DESC
       LIMIT $${limitIdx} OFFSET $${offsetIdx}
     `,
     values
@@ -1950,32 +2150,55 @@ export const getFinanceExpenseFromPostgres = async (expenseId: string) => {
   const rows = await runGreenhousePostgresQuery<PostgresExpenseRow>(
     `
       SELECT
-        expense_id, client_id, space_id, expense_type, source_type, description, currency,
-        subtotal, tax_rate, tax_amount, tax_code, tax_recoverability, tax_rate_snapshot, tax_amount_snapshot,
-        tax_snapshot_json, is_tax_exempt, tax_snapshot_frozen_at,
-        recoverable_tax_amount, recoverable_tax_amount_clp, non_recoverable_tax_amount, non_recoverable_tax_amount_clp,
-        effective_cost_amount, effective_cost_amount_clp, total_amount,
-        exchange_rate_to_clp, total_amount_clp,
-        payment_date, payment_status, payment_method, payment_provider, payment_rail, payment_account_id, payment_reference,
-        document_number, document_date, due_date,
-        supplier_id, supplier_name, supplier_invoice_number,
-        payroll_period_id, payroll_entry_id, member_id, member_name,
-        social_security_type, social_security_institution, social_security_period,
-        tax_type, tax_period, tax_form_number,
-        miscellaneous_category, service_line, is_recurring, recurrence_frequency,
-        is_reconciled, reconciliation_id, linked_income_id,
-        cost_category, cost_is_direct, allocated_client_id,
-        direct_overhead_scope, direct_overhead_kind, direct_overhead_member_id,
-        notes, created_by_user_id,
-        created_at, updated_at,
-        nubox_purchase_id, nubox_document_status, nubox_supplier_rut,
-        nubox_supplier_name, nubox_origin, nubox_last_synced_at,
-        is_annulled, sii_document_status, receipt_date, purchase_type,
-        vat_unrecoverable_amount, vat_fixed_assets_amount, vat_common_use_amount,
-        nubox_pdf_url, balance_nubox, dte_type_code, dte_folio,
-        exempt_amount, other_taxes_amount, withholding_amount
-      FROM greenhouse_finance.expenses
-      WHERE expense_id = $1
+        e.expense_id, e.client_id, e.space_id, e.expense_type, e.source_type, e.description, e.currency,
+        e.subtotal, e.tax_rate, e.tax_amount, e.tax_code, e.tax_recoverability, e.tax_rate_snapshot, e.tax_amount_snapshot,
+        e.tax_snapshot_json, e.is_tax_exempt, e.tax_snapshot_frozen_at,
+        e.recoverable_tax_amount, e.recoverable_tax_amount_clp, e.non_recoverable_tax_amount, e.non_recoverable_tax_amount_clp,
+        e.effective_cost_amount, e.effective_cost_amount_clp, e.total_amount,
+        e.exchange_rate_to_clp, e.total_amount_clp,
+        e.payment_date, e.payment_status, e.payment_method, e.payment_provider, e.payment_rail, e.payment_account_id, e.payment_reference,
+        e.document_number, e.document_date, e.due_date,
+        e.supplier_id, e.supplier_name, e.supplier_invoice_number,
+        e.payroll_period_id, e.payroll_entry_id, e.member_id, e.member_name,
+        e.social_security_type, e.social_security_institution, e.social_security_period,
+        e.tax_type, e.tax_period, e.tax_form_number,
+        e.miscellaneous_category, e.service_line, e.is_recurring, e.recurrence_frequency,
+        e.is_reconciled, e.reconciliation_id, e.linked_income_id,
+        e.cost_category, e.cost_is_direct, e.allocated_client_id,
+        e.direct_overhead_scope, e.direct_overhead_kind, e.direct_overhead_member_id,
+        e.notes, e.created_by_user_id,
+        e.created_at, e.updated_at,
+        e.nubox_purchase_id, e.nubox_document_status, e.nubox_supplier_rut,
+        e.nubox_supplier_name, e.nubox_origin, e.nubox_last_synced_at,
+        e.is_annulled, e.sii_document_status, e.receipt_date, e.purchase_type,
+        e.vat_unrecoverable_amount, e.vat_fixed_assets_amount, e.vat_common_use_amount,
+        e.nubox_pdf_url, e.balance_nubox, e.dte_type_code, e.dte_folio,
+        e.exempt_amount, e.other_taxes_amount, e.withholding_amount,
+        -- TASK-772 — display canónico de proveedor con fallback a suppliers tabla
+        COALESCE(NULLIF(TRIM(e.supplier_name), ''), s.trade_name, s.legal_name) AS supplier_display_name,
+        COALESCE(e.document_date, e.payment_date, e.created_at::date) AS sort_date,
+        COALESCE(ep_agg.amount_paid_clp_sum, 0) AS amount_paid_clp_sum,
+        ep_agg.amount_paid_native_homogeneous,
+        ep_agg.payments_currency_homogeneous
+      FROM greenhouse_finance.expenses e
+      LEFT JOIN greenhouse_finance.suppliers s ON s.supplier_id = e.supplier_id
+      LEFT JOIN LATERAL (
+        SELECT
+          SUM(epn.payment_amount_clp) AS amount_paid_clp_sum,
+          CASE
+            WHEN BOOL_AND(epn.payment_currency = e.currency)
+              THEN SUM(epn.payment_amount_native)
+            ELSE NULL
+          END AS amount_paid_native_homogeneous,
+          CASE
+            WHEN BOOL_AND(epn.payment_currency = e.currency)
+              THEN MIN(epn.payment_currency)
+            ELSE NULL
+          END AS payments_currency_homogeneous
+        FROM greenhouse_finance.expense_payments_normalized epn
+        WHERE epn.expense_id = e.expense_id
+      ) ep_agg ON TRUE
+      WHERE e.expense_id = $1
       LIMIT 1
     `,
     [expenseId]
@@ -2150,49 +2373,103 @@ export const createFinanceExpenseInPostgres = async ({
   await assertFinanceSlice2PostgresReady()
 
   const run = async (client: PoolClient) => {
+    // TASK-768 — resolver canónico invocado en write-time.
+    // Sinergia con TASK-765 path canónico: el resolver tiene acceso a
+    // member_id, supplier_id, cost_category, raw description — datos que
+    // el trigger transparente NO puede usar. Resultado: confidence=high
+    // para casos identity-resolved, no fallback genérico.
+    const economicCategoryResolution = await resolveAndPersistExpenseEconomicCategory({
+      expenseId,
+      resolverInput: {
+        beneficiaryName: supplierName ?? memberName ?? null,
+        beneficiaryMemberId: memberId,
+        beneficiarySupplierId: supplierId,
+        rawDescription: description,
+        sourceKind: sourceType,
+        accountingType: expenseType,
+        costCategory: costCategory ?? null,
+        amount: totalAmount,
+        currency
+      },
+      client
+    })
+
     const rows = await queryRows<PostgresExpenseRow>(
       `
-        INSERT INTO greenhouse_finance.expenses (
-          expense_id, client_id, space_id, expense_type, source_type, description, currency,
-          subtotal, tax_rate, tax_amount, tax_code, tax_recoverability, tax_rate_snapshot, tax_amount_snapshot,
-          tax_snapshot_json, is_tax_exempt, tax_snapshot_frozen_at,
-          recoverable_tax_amount, recoverable_tax_amount_clp, non_recoverable_tax_amount, non_recoverable_tax_amount_clp,
-          effective_cost_amount, effective_cost_amount_clp, total_amount,
-          exchange_rate_to_clp, total_amount_clp,
-          payment_date, payment_status, payment_method, payment_provider, payment_rail, payment_account_id, payment_reference,
-          document_number, document_date, due_date,
-          supplier_id, supplier_name, supplier_invoice_number,
-          payroll_period_id, payroll_entry_id, member_id, member_name,
-          social_security_type, social_security_institution, social_security_period,
-          tax_type, tax_period, tax_form_number,
-          miscellaneous_category, service_line, is_recurring, recurrence_frequency,
-          is_reconciled,
-          cost_category, cost_is_direct, allocated_client_id,
-          direct_overhead_scope, direct_overhead_kind, direct_overhead_member_id,
-          receipt_date, purchase_type, vat_unrecoverable_amount, vat_fixed_assets_amount, vat_common_use_amount,
-          dte_type_code, dte_folio, exempt_amount, other_taxes_amount, withholding_amount,
-          notes, created_by_user_id,
-          created_at, updated_at
+        WITH inserted AS (
+          INSERT INTO greenhouse_finance.expenses (
+            expense_id, client_id, space_id, expense_type, source_type, description, currency,
+            subtotal, tax_rate, tax_amount, tax_code, tax_recoverability, tax_rate_snapshot, tax_amount_snapshot,
+            tax_snapshot_json, is_tax_exempt, tax_snapshot_frozen_at,
+            recoverable_tax_amount, recoverable_tax_amount_clp, non_recoverable_tax_amount, non_recoverable_tax_amount_clp,
+            effective_cost_amount, effective_cost_amount_clp, total_amount,
+            exchange_rate_to_clp, total_amount_clp,
+            payment_date, payment_status, payment_method, payment_provider, payment_rail, payment_account_id, payment_reference,
+            document_number, document_date, due_date,
+            supplier_id, supplier_name, supplier_invoice_number,
+            payroll_period_id, payroll_entry_id, member_id, member_name,
+            social_security_type, social_security_institution, social_security_period,
+            tax_type, tax_period, tax_form_number,
+            miscellaneous_category, service_line, is_recurring, recurrence_frequency,
+            is_reconciled,
+            cost_category, cost_is_direct, allocated_client_id,
+            direct_overhead_scope, direct_overhead_kind, direct_overhead_member_id,
+            receipt_date, purchase_type, vat_unrecoverable_amount, vat_fixed_assets_amount, vat_common_use_amount,
+            dte_type_code, dte_folio, exempt_amount, other_taxes_amount, withholding_amount,
+            notes, created_by_user_id, economic_category,
+            created_at, updated_at
+          )
+          VALUES (
+            $1, $2, $3, $4, $5, $6, $7,
+            $8, $9, $10, $11, $12, $13, $14,
+            $15::jsonb, $16, $17::timestamptz,
+            $18, $19, $20, $21,
+            $22, $23, $24,
+            $25, $26,
+            $27::date, $28, $29, $30, $31, $32, $33,
+            $34, $35::date, $36::date,
+            $37, $38, $39,
+            $40, $41, $42, $43,
+            $44, $45, $46,
+            $47, $48, $49,
+            $50, $51, $52, $53,
+            FALSE,
+            $54, $55, $56,
+            $57, $58, $59,
+            $60::date, $61, $62, $63, $64,
+            $65, $66, $67, $68, $69,
+            $70, $71, $72,
+            CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+          )
+          RETURNING *
         )
-        VALUES (
-          $1, $2, $3, $4, $5, $6, $7,
-          $8, $9, $10, $11, $12, $13, $14,
-          $15::jsonb, $16, $17::timestamptz,
-          $18, $19, $20, $21,
-          $22, $23, $24,
-          $25, $26,
-          $27::date, $28, $29, $30, $31, $32, $33,
-          $34, $35::date, $36::date,
-          $37, $38, $39,
-          $40, $41, $42, $43,
-          FALSE,
-          $44, $45, $46,
-          $47::date, $48, $49, $50, $51,
-          $52, $53, $54, $55, $56,
-          $57, $58,
-          CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
-        )
-        RETURNING *
+        SELECT
+          e.*,
+          -- TASK-772 — derive supplierDisplayName + sortDate + payment aggregates
+          -- en la misma tx para que el outbox event payload tenga el contract completo.
+          COALESCE(NULLIF(TRIM(e.supplier_name), ''), s.trade_name, s.legal_name) AS supplier_display_name,
+          COALESCE(e.document_date, e.payment_date, e.created_at::date) AS sort_date,
+          COALESCE(ep_agg.amount_paid_clp_sum, 0) AS amount_paid_clp_sum,
+          ep_agg.amount_paid_native_homogeneous,
+          ep_agg.payments_currency_homogeneous
+        FROM inserted e
+        LEFT JOIN greenhouse_finance.suppliers s ON s.supplier_id = e.supplier_id
+        LEFT JOIN LATERAL (
+          SELECT
+            SUM(epn.payment_amount_clp) AS amount_paid_clp_sum,
+            CASE
+              WHEN BOOL_AND(epn.payment_currency = e.currency)
+                THEN SUM(epn.payment_amount_native)
+              ELSE NULL
+            END AS amount_paid_native_homogeneous,
+            CASE
+              WHEN BOOL_AND(epn.payment_currency = e.currency)
+                THEN MIN(epn.payment_currency)
+              ELSE NULL
+            END AS payments_currency_homogeneous
+          FROM greenhouse_finance.expense_payments_normalized epn
+          WHERE epn.expense_id = e.expense_id
+        ) ep_agg ON TRUE
       `,
       [
         expenseId, clientId, spaceId, expenseType, sourceType, description, currency,
@@ -2212,7 +2489,7 @@ export const createFinanceExpenseInPostgres = async ({
         directOverheadScope, directOverheadKind, directOverheadMemberId,
         receiptDate, purchaseType, vatUnrecoverableAmount, vatFixedAssetsAmount, vatCommonUseAmount,
         dteTypeCode, dteFolio, exemptAmount, otherTaxesAmount, withholdingAmount,
-        notes, actorUserId
+        notes, actorUserId, economicCategoryResolution.category
       ],
       client
     )

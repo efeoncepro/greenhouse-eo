@@ -209,11 +209,11 @@ const PlacementDetailView = ({ placementId }: Props) => {
             <Box sx={{ width: '100%', display: 'grid', gap: 2 }}>
               <Box>
                 <Typography variant='caption' color='text.secondary'>Placement ID</Typography>
-                <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>{detail.publicId || detail.placementId}</Typography>
+                <Typography variant='body2'>{detail.publicId || detail.placementId}</Typography>
               </Box>
               <Box>
                 <Typography variant='caption' color='text.secondary'>Assignment base</Typography>
-                <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>{detail.assignmentId}</Typography>
+                <Typography variant='body2'>{detail.assignmentId}</Typography>
               </Box>
               <Box>
                 <Typography variant='caption' color='text.secondary'>Provider</Typography>

@@ -82,7 +82,7 @@ Reglas obligatorias:
 - `docs/tasks/complete/TASK-617.2-api-platform-first-party-app-surface-foundation.md`
 - `docs/tasks/complete/TASK-617.3-api-platform-event-control-plane.md`
 - `docs/tasks/complete/TASK-617.4-developer-api-documentation-portal.md`
-- `docs/tasks/to-do/TASK-647-greenhouse-mcp-read-only-adapter-v1.md`
+- `docs/tasks/complete/TASK-647-greenhouse-mcp-read-only-adapter-v1.md`
 - `docs/tasks/to-do/TASK-648-api-platform-ico-read-surface-v1.md`
 - `docs/api/GREENHOUSE_API_PLATFORM_V1.md`
 - `docs/api/GREENHOUSE_API_PLATFORM_V1.openapi.yaml`

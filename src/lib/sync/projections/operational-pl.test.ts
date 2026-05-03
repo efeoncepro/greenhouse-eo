@@ -10,6 +10,8 @@ vi.mock('@/lib/cost-intelligence/compute-operational-pl', () => ({
 // TASK-379: Do NOT mock publish-event. Let the real publisher reach the outbox
 // so we can assert schemaVersion + period envelope. Only postgres is stubbed.
 vi.mock('@/lib/postgres/client', () => ({
+  onGreenhousePostgresReset: () => () => {},
+  isGreenhousePostgresRetryableConnectionError: () => false,
   runGreenhousePostgresQuery: (...args: unknown[]) => mockRunGreenhousePostgresQuery(...args)
 }))
 

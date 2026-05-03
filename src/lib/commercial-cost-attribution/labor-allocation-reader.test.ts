@@ -1,6 +1,8 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest'
 
 vi.mock('@/lib/postgres/client', () => ({
+  onGreenhousePostgresReset: () => () => {},
+  isGreenhousePostgresRetryableConnectionError: () => false,
   runGreenhousePostgresQuery: vi.fn()
 }))
 

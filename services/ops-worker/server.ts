@@ -18,7 +18,25 @@
  *   POST /batch-email-send             → Send a transactional email via the Greenhouse delivery pipeline
  *   POST /nexa/weekly-digest           → Send the weekly Nexa executive digest via email
  *   POST /reliability-ai-watch         → Reliability AI Observer (TASK-638): Gemini watcher over RCP overview
+ *   POST /cloud-cost-ai-watch          → Cloud cost FinOps AI + deterministic alert sweep (TASK-769)
  *   POST /notion-conformed/sync        → Notion BQ raw → conformed → PG cycle (replaces Vercel /api/cron/sync-conformed)
+ *   POST /outbox/publish-batch         → Outbox PG → BQ raw publisher with state machine (TASK-773, replaces Vercel /api/cron/outbox-publish)
+ *   POST /email-deliverability-monitor → Bounce/complaint rate monitor (TASK-775, replaces Vercel /api/cron/email-deliverability-monitor)
+ *   POST /nubox/balance-sync           → Nubox balances → PG + divergence outbox (TASK-775, replaces Vercel /api/cron/nubox-balance-sync)
+ *   POST /nubox/sync                   → 3-fase raw→conformed→postgres (TASK-775, replaces Vercel /api/cron/nubox-sync)
+ *   POST /nubox/quotes-hot-sync        → Quotes hot path period-scoped (TASK-775, replaces Vercel /api/cron/nubox-quotes-hot-sync)
+ *   POST /webhook-dispatch             → Outbound webhooks dispatcher (TASK-775, replaces Vercel /api/cron/webhook-dispatch)
+ *   POST /email-delivery-retry         → Failed email retry (TASK-775, replaces Vercel /api/cron/email-delivery-retry)
+ *   POST /entra/profile-sync           → Entra users + manager sync (TASK-775, replaces Vercel /api/cron/entra-profile-sync)
+ *   POST /entra/webhook-renew          → Entra webhook subscription renew (TASK-775, replaces Vercel /api/cron/entra-webhook-renew)
+ *   POST /hubspot/quotes-sync          → HubSpot quotes sync (TASK-775, replaces Vercel /api/cron/hubspot-quotes-sync)
+ *   POST /hubspot/company-lifecycle-sync → HubSpot lifecycle sync (TASK-775)
+ *   POST /hubspot/companies-sync       → HubSpot companies sync (TASK-775)
+ *   POST /hubspot/deals-sync           → HubSpot deals sync (TASK-775)
+ *   POST /hubspot/products-sync        → HubSpot products sync (TASK-775)
+ *   POST /notion-conformed/recovery    → Notion conformed retry due runs (TASK-775, replaces Vercel /api/cron/sync-conformed-recovery)
+ *   POST /reconciliation/auto-match    → Continuous bank statement auto-match (TASK-775, replaces Vercel /api/cron/reconciliation-auto-match)
+ *   POST /ico/member-sync              → ICO member metrics BQ → PG (TASK-775, replaces Vercel /api/cron/ico-member-sync)
  *
  * Auth: Cloud Run IAM (--no-allow-unauthenticated) + optional CRON_SECRET header
  * Runtime: Node.js 22 via esbuild bundle (handles TypeScript + @/ path aliases)
@@ -27,6 +45,7 @@
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http'
 
 import { processReactiveEvents, ensureReactiveSchema, sweepAuditOnlyEvents } from '@/lib/sync/reactive-consumer'
+import { publishPendingOutboxEvents, OUTBOX_MAX_PUBLISH_ATTEMPTS } from '@/lib/sync/outbox-consumer'
 import { claimOrphanedRefreshItems, markRefreshCompleted, markRefreshFailed } from '@/lib/sync/refresh-queue'
 import { classifyReactiveError } from '@/lib/sync/reactive-error-classification'
 import { getRegisteredProjections } from '@/lib/sync/projection-registry'
@@ -52,11 +71,35 @@ import { captureMessageWithDomain } from '@/lib/observability/capture'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { runQuotationLifecycleSweep } from '@/lib/commercial-intelligence/renewal-lifecycle'
 import { sendEmail } from '@/lib/email/delivery'
+import { runEmailDeliverabilityMonitor } from '@/lib/email/deliverability-monitor'
+import { runNuboxBalanceSync } from '@/lib/nubox/sync-nubox-balances'
+import {
+  runNuboxQuotesHotSync,
+  runNuboxSyncOrchestration
+} from '@/lib/nubox/sync-nubox-orchestrator'
+import {
+  runEmailDeliveryRetry,
+  runEntraProfileSync,
+  runEntraWebhookRenew,
+  runHubspotCompaniesSync,
+  runHubspotCompanyLifecycleSync,
+  runHubspotDealsSync,
+  runHubspotProductsSync,
+  runHubspotQuotesSync,
+  runIcoMemberSync,
+  runNotionConformedRecovery,
+  runReconciliationAutoMatch,
+  runWebhookDispatch
+} from '@/lib/cron-orchestrators'
 import { buildWeeklyDigest, resolveWeeklyDigestRecipients, WEEKLY_DIGEST_DEFAULT_LIMIT } from '@/lib/nexa/digest'
+
+import { getCurrentAuthReadiness } from '@/lib/auth-secrets'
+import { probeNextAuthSecretRoundTrip } from '@/lib/auth/readiness'
 
 import { getReactiveQueueDepth, InvalidDomainError } from './reactive-queue-depth'
 import { runProductCatalogDriftDetectJob } from './product-catalog-drift-detect'
 import { runProductCatalogReconcileV2Job } from './product-catalog-reconcile-v2'
+import { wrapCronHandler } from './cron-handler-wrapper'
 
 // ─── Config ─────────────────────────────────────────────────────────────────
 
@@ -841,6 +884,52 @@ const handleReliabilityAiWatch = async (req: IncomingMessage, res: ServerRespons
 }
 
 /**
+ * POST /cloud-cost-ai-watch
+ * TASK-769 — deterministic GCP Billing Export alert sweep + optional AI FinOps copilot.
+ *
+ * The deterministic sweep always runs first and is the only source of alert
+ * severity. The AI copilot is opt-in (`CLOUD_COST_AI_COPILOT_ENABLED=true`) and
+ * degrades to a skipped summary when disabled, unconfigured or deduped.
+ */
+const handleCloudCostAiWatch = async (req: IncomingMessage, res: ServerResponse) => {
+  const body = await readBody(req)
+
+  const triggeredBy = (typeof body.triggeredBy === 'string' ? body.triggeredBy : 'cloud_scheduler') as
+    | 'cron'
+    | 'manual'
+    | 'cloud_scheduler'
+
+  const force = body.force === true
+  const dryRun = body.dryRun === true
+
+  console.log(`[ops-worker] POST /cloud-cost-ai-watch — triggeredBy=${triggeredBy} force=${force} dryRun=${dryRun}`)
+
+  try {
+    const [{ runCloudCostAlertSweep }, { runCloudCostAiCopilot }] = await Promise.all([
+      import('@/lib/cloud/gcp-billing-alerts'),
+      import('@/lib/cloud/finops-ai/runner')
+    ])
+
+    const alertSummary = await runCloudCostAlertSweep({ dryRun })
+    const aiResult = await runCloudCostAiCopilot({ triggeredBy, force })
+
+    console.log(
+      `[ops-worker] /cloud-cost-ai-watch done — alerts=${alertSummary.alertsDispatched}/${alertSummary.alertsEligible} aiPersisted=${aiResult.summary.observationsPersisted} aiSkipped=${aiResult.summary.skippedReason ?? 'none'}`
+    )
+
+    json(res, 200, {
+      alertSummary,
+      aiSummary: aiResult.summary
+    })
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error'
+
+    console.error('[ops-worker] /cloud-cost-ai-watch failed:', message)
+    json(res, 502, { error: message })
+  }
+}
+
+/**
  * POST /finance/rematerialize-balances (TASK-702 Slice 7).
  *
  * Re-materializes account_balances daily snapshots for the trailing 7 days
@@ -1082,6 +1171,228 @@ const handleFinanceLedgerHealthCheck = async (_req: IncomingMessage, res: Server
  * Body (optional): `{ "executionSource": "scheduled_primary" | "scheduled_retry" | "manual_admin" }`
  *   - default `scheduled_primary` (full daily run)
  */
+// ─── /outbox/publish-batch ──────────────────────────────────────────────────
+//
+// TASK-773 Slice 2 — Outbox publisher migrado de Vercel cron a ops-worker.
+// Movía outbox events de greenhouse_sync.outbox_events (Postgres) a
+// greenhouse_raw.postgres_outbox_events (BigQuery) y marcaba publish status
+// con state machine canónica (pending → publishing → published/failed/dead_letter).
+//
+// El reactive consumer (/reactive/process-domain) filtra por status='published'
+// — sin este publisher, todos los outbox events quedan invisibles. Por eso
+// migra de Vercel (que solo corre crons en producción) a Cloud Scheduler
+// (que corre por proyecto GCP, igual en staging y prod).
+//
+// Body opcional: {batchSize?: number, maxRetries?: number}
+// Defaults: batchSize=100, maxRetries=OUTBOX_MAX_PUBLISH_ATTEMPTS (5).
+const handleOutboxPublishBatch = async (req: IncomingMessage, res: ServerResponse) => {
+  const body = await readBody(req)
+
+  const batchSize = typeof body.batchSize === 'number' && body.batchSize > 0
+    ? Math.min(1000, Math.floor(body.batchSize))
+    : 100
+
+  const maxRetries = typeof body.maxRetries === 'number' && body.maxRetries > 0
+    ? Math.floor(body.maxRetries)
+    : OUTBOX_MAX_PUBLISH_ATTEMPTS
+
+  console.log(`[ops-worker] POST /outbox/publish-batch — batchSize=${batchSize} maxRetries=${maxRetries}`)
+
+  try {
+    const result = await publishPendingOutboxEvents({ batchSize, maxRetries })
+
+    console.log(
+      `[ops-worker] /outbox/publish-batch done — runId=${result.runId} ` +
+      `read=${result.eventsRead} published=${result.eventsPublished} ` +
+      `failed=${result.eventsFailed} deadLetter=${result.eventsDeadLetter} ` +
+      `${result.durationMs}ms`
+    )
+
+    json(res, 200, {
+      ok: true,
+      runId: result.runId,
+      eventsRead: result.eventsRead,
+      eventsPublished: result.eventsPublished,
+      eventsFailed: result.eventsFailed,
+      eventsDeadLetter: result.eventsDeadLetter,
+      durationMs: result.durationMs
+    })
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown outbox publish error'
+
+    console.error('[ops-worker] /outbox/publish-batch failed:', message)
+    json(res, 502, { error: message })
+  }
+}
+
+// ─── /email-deliverability-monitor ──────────────────────────────────────────
+//
+// TASK-775 Slice 2 — Email deliverability monitor migrado de Vercel cron a
+// ops-worker. Computa bounce rate y complaint rate de los últimos 7 días, emite
+// outbox events `email.deliverability.alert` si excede thresholds Gmail.
+//
+// Razón de migración: Vercel custom env (staging) NO ejecuta crons — el monitor
+// nunca disparaba alerts en staging, y el equipo perdía visibilidad de drift
+// durante QA. Cloud Scheduler corre por proyecto GCP, igual en cualquier env.
+//
+// Inaugura el helper canónico `wrapCronHandler` (TASK-775 Slice 1) — centraliza
+// runId, audit log, captureWithDomain('sync'), redact errors, 502 sanitizado.
+const handleEmailDeliverabilityMonitor = wrapCronHandler({
+  name: 'email-deliverability-monitor',
+  domain: 'sync',
+  run: async (): Promise<Record<string, unknown>> => {
+    const result = await runEmailDeliverabilityMonitor()
+
+    return { ...result }
+  }
+})
+
+// ─── /nubox/* ───────────────────────────────────────────────────────────────
+//
+// TASK-775 Slice 3 — Nubox sync crons migrados de Vercel a Cloud Scheduler.
+// Razón: Vercel custom env (staging) NO ejecuta crons → balances Nubox quedaban
+// stale en staging para QA, divergencias nunca emitían outbox events. Cloud
+// Scheduler corre por proyecto GCP, igual en cualquier env.
+//
+// 3 endpoints:
+//   POST /nubox/balance-sync     → balances PG income/expenses + outbox divergence
+//   POST /nubox/sync             → 3-fase raw → conformed → postgres
+//   POST /nubox/quotes-hot-sync  → quotes hot path (period-scoped quotes)
+
+const handleNuboxBalanceSync = wrapCronHandler({
+  name: 'nubox-balance-sync',
+  domain: 'sync',
+  run: async (): Promise<Record<string, unknown>> => {
+    const result = await runNuboxBalanceSync()
+
+    return { ...result }
+  }
+})
+
+const handleNuboxSync = wrapCronHandler({
+  name: 'nubox-sync',
+  domain: 'sync',
+  run: async (): Promise<Record<string, unknown>> => {
+    const result = await runNuboxSyncOrchestration()
+
+    return { ...result }
+  }
+})
+
+const handleNuboxQuotesHotSync = wrapCronHandler({
+  name: 'nubox-quotes-hot-sync',
+  domain: 'sync',
+  run: async (body): Promise<Record<string, unknown>> => {
+    const periods = Array.isArray(body.periods)
+      ? body.periods.filter((p): p is string => typeof p === 'string')
+      : undefined
+
+    const result = await runNuboxQuotesHotSync({ periods })
+
+    return { ...result }
+  }
+})
+
+// ─── /webhook-dispatch ──────────────────────────────────────────────────────
+//
+// TASK-775 Slice 7 — Webhook outbound dispatcher migrado de Vercel a Cloud Run.
+const handleWebhookDispatch = wrapCronHandler({
+  name: 'webhook-dispatch',
+  domain: 'sync',
+  run: async (): Promise<Record<string, unknown>> => runWebhookDispatch()
+})
+
+// ─── /email-delivery-retry ──────────────────────────────────────────────────
+//
+// TASK-775 Slice 7 — Email delivery retry migrado de Vercel a Cloud Run.
+const handleEmailDeliveryRetry = wrapCronHandler({
+  name: 'email-delivery-retry',
+  domain: 'sync',
+  run: async (): Promise<Record<string, unknown>> => runEmailDeliveryRetry()
+})
+
+// ─── /entra/* ───────────────────────────────────────────────────────────────
+//
+// TASK-775 Slice 7 — Entra crons migrados a Cloud Run.
+const handleEntraProfileSync = wrapCronHandler({
+  name: 'entra-profile-sync',
+  domain: 'identity',
+  run: async (): Promise<Record<string, unknown>> => runEntraProfileSync()
+})
+
+const handleEntraWebhookRenew = wrapCronHandler({
+  name: 'entra-webhook-renew',
+  domain: 'identity',
+  run: async (): Promise<Record<string, unknown>> => runEntraWebhookRenew()
+})
+
+// ─── /hubspot/* ─────────────────────────────────────────────────────────────
+//
+// TASK-775 Slice 7 — Lane HubSpot completo migrado a Cloud Run.
+const handleHubspotQuotesSync = wrapCronHandler({
+  name: 'hubspot-quotes-sync',
+  domain: 'integrations.hubspot',
+  run: async (): Promise<Record<string, unknown>> => runHubspotQuotesSync()
+})
+
+const handleHubspotCompanyLifecycleSync = wrapCronHandler({
+  name: 'hubspot-company-lifecycle-sync',
+  domain: 'integrations.hubspot',
+  run: async (): Promise<Record<string, unknown>> => runHubspotCompanyLifecycleSync()
+})
+
+const handleHubspotCompaniesSync = wrapCronHandler({
+  name: 'hubspot-companies-sync',
+  domain: 'integrations.hubspot',
+  run: async (body): Promise<Record<string, unknown>> => runHubspotCompaniesSync({
+    dryRun: typeof body.dryRun === 'boolean' ? body.dryRun : false,
+    fullResync: typeof body.fullResync === 'boolean' ? body.fullResync : false
+  })
+})
+
+const handleHubspotDealsSync = wrapCronHandler({
+  name: 'hubspot-deals-sync',
+  domain: 'integrations.hubspot',
+  run: async (body): Promise<Record<string, unknown>> => runHubspotDealsSync({
+    includeClosed: typeof body.includeClosed === 'boolean' ? body.includeClosed : true
+  })
+})
+
+const handleHubspotProductsSync = wrapCronHandler({
+  name: 'hubspot-products-sync',
+  domain: 'integrations.hubspot',
+  run: async (): Promise<Record<string, unknown>> => runHubspotProductsSync()
+})
+
+// ─── /notion-conformed/recovery ─────────────────────────────────────────────
+//
+// TASK-775 Slice 7 — Notion conformed recovery migrado a Cloud Run.
+const handleNotionConformedRecovery = wrapCronHandler({
+  name: 'notion-conformed-recovery',
+  domain: 'integrations.notion',
+  run: async (): Promise<Record<string, unknown>> => runNotionConformedRecovery()
+})
+
+// ─── /reconciliation/auto-match ─────────────────────────────────────────────
+//
+// TASK-775 Slice 7 — Reconciliation auto-match migrado a Cloud Run.
+const handleReconciliationAutoMatch = wrapCronHandler({
+  name: 'reconciliation-auto-match',
+  domain: 'finance',
+  run: async (): Promise<Record<string, unknown>> => runReconciliationAutoMatch()
+})
+
+// ─── /ico/member-sync ───────────────────────────────────────────────────────
+//
+// TASK-775 Slice 9 — ICO member sync migrado a Cloud Run. Async-critical:
+// alimenta `/people/[id]/ico` que QA usa en staging para validar métricas
+// individuales. Si queda stale en staging, QA cree que el motor está roto.
+const handleIcoMemberSync = wrapCronHandler({
+  name: 'ico-member-sync',
+  domain: 'delivery',
+  run: async (): Promise<Record<string, unknown>> => runIcoMemberSync()
+})
+
 const handleNotionConformedSync = async (req: IncomingMessage, res: ServerResponse) => {
   const body = await readBody(req)
   const rawSource = typeof body.executionSource === 'string' ? body.executionSource.trim() : 'scheduled_primary'
@@ -1138,6 +1449,257 @@ const handleNotionConformedSync = async (req: IncomingMessage, res: ServerRespon
 
     console.error('[ops-worker] /notion-conformed/sync failed:', message)
     json(res, 502, { error: message })
+  }
+}
+
+// ─── /smoke/identity-auth-providers ──────────────────────────────────────────
+//
+// TASK-742 Capa 6 — Synthetic monitor for the auth provider stack.
+// Persists a row in greenhouse_sync.smoke_lane_runs with lane_key
+// 'identity.auth.providers'. Reliability dashboard consumes this to roll up
+// SSO health into the Identity subsystem. Must run from outside Vercel to
+// avoid measuring the same runtime that may be itself broken.
+//
+// Probes (each with 5s timeout):
+//   - GET https://greenhouse.efeoncepro.com/api/auth/health → expect status='ready'
+//   - HEAD Microsoft OIDC discovery endpoint → expect 200
+//   - In-process JWT sign+verify roundtrip with NEXTAUTH_SECRET
+//
+// Exit codes via JSON response:
+//   200 + status='passed'  → all probes succeeded
+//   200 + status='failed'  → at least one probe failed (smoke registered, alerts fire)
+//   502                     → smoke run itself failed (PG insert, etc.)
+const handleIdentityAuthSmoke = async (req: IncomingMessage, res: ServerResponse) => {
+  if (req.method !== 'POST') {
+    json(res, 405, { error: 'Method not allowed' })
+
+    return
+  }
+
+  const portalUrl = (process.env.GREENHOUSE_PORTAL_BASE_URL || 'https://greenhouse.efeoncepro.com').replace(/\/$/u, '')
+  const microsoftOidcUrl = 'https://login.microsoftonline.com/common/v2.0/.well-known/openid-configuration'
+  const startedAt = new Date()
+
+  type ProbeResult = { name: string; passed: boolean; durationMs: number; reason?: string }
+  const probes: ProbeResult[] = []
+
+  const fetchWithTimeout = async (url: string, init: RequestInit, ms: number) => {
+    const controller = new AbortController()
+    const timer = setTimeout(() => controller.abort(), ms)
+
+    try {
+      return await fetch(url, { ...init, signal: controller.signal, redirect: 'manual' })
+    } finally {
+      clearTimeout(timer)
+    }
+  }
+
+  // Probe 1 — portal /api/auth/health
+  {
+    const t = Date.now()
+
+    try {
+      const response = await fetchWithTimeout(`${portalUrl}/api/auth/health`, { method: 'GET' }, 5_000)
+
+      if (!response.ok) {
+        probes.push({ name: 'portal_auth_health', passed: false, durationMs: Date.now() - t, reason: `HTTP ${response.status}` })
+      } else {
+        const body = (await response.json().catch(() => null)) as { overallStatus?: string } | null
+        const overallStatus = body?.overallStatus
+
+        probes.push({
+          name: 'portal_auth_health',
+          passed: overallStatus === 'ready',
+          durationMs: Date.now() - t,
+          reason: overallStatus !== 'ready' ? `overallStatus=${overallStatus ?? 'missing'}` : undefined
+        })
+      }
+    } catch (error) {
+      probes.push({
+        name: 'portal_auth_health',
+        passed: false,
+        durationMs: Date.now() - t,
+        reason: error instanceof Error ? error.message : 'unknown_error'
+      })
+    }
+  }
+
+  // Probe 2 — Microsoft OIDC discovery
+  {
+    const t = Date.now()
+
+    try {
+      const response = await fetchWithTimeout(microsoftOidcUrl, { method: 'GET' }, 5_000)
+
+      probes.push({
+        name: 'microsoft_oidc_discovery',
+        passed: response.ok,
+        durationMs: Date.now() - t,
+        reason: response.ok ? undefined : `HTTP ${response.status}`
+      })
+    } catch (error) {
+      probes.push({
+        name: 'microsoft_oidc_discovery',
+        passed: false,
+        durationMs: Date.now() - t,
+        reason: error instanceof Error ? error.message : 'unknown_error'
+      })
+    }
+  }
+
+  // Probe 2b — Azure /authorize endpoint with the real client_id.
+  //
+  // This is the smoking-gun probe: it catches the exact failure mode of the
+  // 2026-04-30 incident (signInAudience flipped from multi-tenant to single-
+  // tenant). When the App is correctly multi-tenant, /common/oauth2/v2.0/authorize
+  // returns HTTP 200 with the "Sign in to your account" page (Azure renders the
+  // login UI). When the App is single-tenant accessed via /common/, Azure
+  // responds with HTTP 200 but the body contains AADSTS50194 / AADSTS9002313
+  // and a different page title.
+  //
+  // Detects 4 distinct failure modes without browser automation:
+  //   - App deleted / client_id wrong  → AADSTS700016
+  //   - Multi-tenant misconfiguration  → AADSTS50194 / AADSTS9002313
+  //   - Redirect URI not registered    → AADSTS50011
+  //   - Tenant-restricted              → AADSTS500011
+  {
+    const t = Date.now()
+    const clientId = (process.env.AZURE_AD_CLIENT_ID || '').trim()
+    const redirect = `${portalUrl}/api/auth/callback/azure-ad`
+
+    const url =
+      `https://login.microsoftonline.com/common/oauth2/v2.0/authorize` +
+      `?client_id=${encodeURIComponent(clientId)}` +
+      `&response_type=code` +
+      `&redirect_uri=${encodeURIComponent(redirect)}` +
+      `&scope=openid` +
+      `&response_mode=query` +
+      `&state=ops-worker-smoke`
+
+    if (!clientId) {
+      probes.push({ name: 'azure_authorize_endpoint', passed: false, durationMs: 0, reason: 'AZURE_AD_CLIENT_ID unset' })
+    } else {
+      try {
+        const response = await fetchWithTimeout(url, { method: 'GET' }, 5_000)
+        const text = await response.text().catch(() => '')
+        const aadstsMatch = text.match(/AADSTS\d+/)
+        const passed = response.ok && !aadstsMatch && /sign in to your account/i.test(text)
+
+        probes.push({
+          name: 'azure_authorize_endpoint',
+          passed,
+          durationMs: Date.now() - t,
+          reason: passed
+            ? undefined
+            : aadstsMatch
+              ? `Azure rejected authorize: ${aadstsMatch[0]}`
+              : `unexpected response (HTTP ${response.status})`
+        })
+      } catch (error) {
+        probes.push({
+          name: 'azure_authorize_endpoint',
+          passed: false,
+          durationMs: Date.now() - t,
+          reason: error instanceof Error ? error.message : 'unknown_error'
+        })
+      }
+    }
+  }
+
+  // Probe 3 — in-process readiness snapshot (uses ops-worker's own secrets)
+  {
+    const t = Date.now()
+
+    try {
+      const snap = await getCurrentAuthReadiness()
+
+      probes.push({
+        name: 'in_process_readiness',
+        passed: snap.overallStatus === 'ready',
+        durationMs: Date.now() - t,
+        reason: snap.overallStatus !== 'ready' ? `overallStatus=${snap.overallStatus}` : undefined
+      })
+    } catch (error) {
+      probes.push({
+        name: 'in_process_readiness',
+        passed: false,
+        durationMs: Date.now() - t,
+        reason: error instanceof Error ? error.message : 'unknown_error'
+      })
+    }
+  }
+
+  // Probe 4 — JWT sign+verify roundtrip with NEXTAUTH_SECRET
+  {
+    const t = Date.now()
+    const secret = process.env.NEXTAUTH_SECRET?.trim() || null
+
+    if (!secret) {
+      probes.push({ name: 'jwt_self_test', passed: false, durationMs: Date.now() - t, reason: 'NEXTAUTH_SECRET unset' })
+    } else {
+      const ok = await probeNextAuthSecretRoundTrip(secret)
+
+      probes.push({
+        name: 'jwt_self_test',
+        passed: ok,
+        durationMs: Date.now() - t,
+        reason: ok ? undefined : 'sign+verify roundtrip failed'
+      })
+    }
+  }
+
+  const finishedAt = new Date()
+  const allPassed = probes.every(p => p.passed)
+  const status: 'passed' | 'failed' = allPassed ? 'passed' : 'failed'
+  const totalTests = probes.length
+  const passedTests = probes.filter(p => p.passed).length
+  const failedTests = totalTests - passedTests
+
+  const smokeRunId = `smoke-identity-auth-${Date.now().toString(36)}`
+  const commitSha = (process.env.K_REVISION || process.env.GIT_COMMIT || 'unknown').slice(0, 40)
+  const branch = process.env.K_SERVICE || 'ops-worker'
+
+  try {
+    await runGreenhousePostgresQuery(
+      `INSERT INTO greenhouse_sync.smoke_lane_runs (
+         smoke_lane_run_id, lane_key, commit_sha, branch, workflow_run_url,
+         status, started_at, finished_at, duration_ms,
+         total_tests, passed_tests, failed_tests, skipped_tests, summary_json
+       )
+       VALUES ($1, $2, $3, $4, $5, $6, $7::timestamptz, $8::timestamptz, $9,
+               $10, $11, $12, $13, $14::jsonb)`,
+      [
+        smokeRunId,
+        'identity.auth.providers',
+        commitSha,
+        branch,
+        null,
+        status,
+        startedAt.toISOString(),
+        finishedAt.toISOString(),
+        finishedAt.getTime() - startedAt.getTime(),
+        totalTests,
+        passedTests,
+        failedTests,
+        0,
+        JSON.stringify({ probes })
+      ]
+    )
+
+    if (status === 'failed') {
+      captureMessageWithDomain(
+        `identity.auth.providers smoke failed: ${probes.filter(p => !p.passed).map(p => p.name).join(', ')}`,
+        'identity',
+        { level: 'error', extra: { probes } }
+      )
+    }
+
+    json(res, 200, { smokeRunId, status, totalTests, passedTests, failedTests, probes })
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'unknown_error'
+
+    console.error('[ops-worker] /smoke/identity-auth-providers failed to persist:', message)
+    json(res, 502, { error: message, probes })
   }
 }
 
@@ -1239,8 +1801,122 @@ const server = createServer(async (req, res) => {
       return
     }
 
+    if (method === 'POST' && path === '/outbox/publish-batch') {
+      await handleOutboxPublishBatch(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/email-deliverability-monitor') {
+      await handleEmailDeliverabilityMonitor(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/nubox/balance-sync') {
+      await handleNuboxBalanceSync(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/nubox/sync') {
+      await handleNuboxSync(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/nubox/quotes-hot-sync') {
+      await handleNuboxQuotesHotSync(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/webhook-dispatch') {
+      await handleWebhookDispatch(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/email-delivery-retry') {
+      await handleEmailDeliveryRetry(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/entra/profile-sync') {
+      await handleEntraProfileSync(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/entra/webhook-renew') {
+      await handleEntraWebhookRenew(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/hubspot/quotes-sync') {
+      await handleHubspotQuotesSync(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/hubspot/company-lifecycle-sync') {
+      await handleHubspotCompanyLifecycleSync(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/hubspot/companies-sync') {
+      await handleHubspotCompaniesSync(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/hubspot/deals-sync') {
+      await handleHubspotDealsSync(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/hubspot/products-sync') {
+      await handleHubspotProductsSync(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/notion-conformed/recovery') {
+      await handleNotionConformedRecovery(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/reconciliation/auto-match') {
+      await handleReconciliationAutoMatch(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/ico/member-sync') {
+      await handleIcoMemberSync(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/smoke/identity-auth-providers') {
+      await handleIdentityAuthSmoke(req, res)
+
+      return
+    }
+
     if (method === 'POST' && path === '/reliability-ai-watch') {
       await handleReliabilityAiWatch(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/cloud-cost-ai-watch') {
+      await handleCloudCostAiWatch(req, res)
 
       return
     }

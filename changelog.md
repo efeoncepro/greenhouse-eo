@@ -1,6 +1,203 @@
 # changelog.md
 
+## 2026-05-03
+
+- **TASK-777 completada** — Canonical Expense Distribution & Shared Cost Pools. Se agrega fact canónico `expense_distribution_resolution` + policy/suggestions, resolver determinístico `expense -> distribution_lane`, CLI de materialización, signals, close gate en `checkPeriodReadiness` e IA advisory-only con kill-switch `FINANCE_DISTRIBUTION_AI_ENABLED`. Abril 2026 fue rematerializado: SKY overhead baja a `$2.278.629,39`, ANAM queda en `$759.543,13`, readiness distribución `100` y Deel/provider payroll deja de entrar como direct overhead de SKY. Cash/bancos/conciliación/payment orders no fueron mutados; drift CLP verificado `0`.
+- **TASK-774 entregada** — Account Balance CLP-Native Reader Contract (TASK-766 pattern aplicado a `materializeAccountBalance`). Cierra clase de bugs donde balances de cuentas CLP se rebajan en currency original (USD nativo) en lugar de CLP equivalente. Bug Figma EXP-202604-008 (2026-05-03): TC Santander Corp +$92.9 USD vs +$83,773.5 CLP esperado.
+  - **`materializeAccountBalance` consume VIEWs canónicas TASK-766** (`expense_payments_normalized`, `income_payments_normalized`) + COALESCE inline para `settlement_legs.amount_clp`. Sin schema change. Backwards compat total. 3 fuentes refactorizadas (no 2 — settlement_legs también afectada).
+  - **Lint rule extendida** `greenhouse/no-untokenized-fx-math` modo `error` desde commit-1 con 3 patrones nuevos: `SUM(ep.amount)`, `SUM(ip.amount)`, `SUM(sl.amount)`. Bloquea cualquier futuro callsite que reintroduzca el anti-patrón.
+  - **Reliability signal nuevo** `finance.account_balances.fx_drift` (kind=drift, severity=error si count>0, steady=0, ventana 90 días, tolerancia $1 CLP). Recompute closing_balance esperado desde VIEWs canónicas y compara contra persisted. Detecta cualquier divergencia futura sin requerir bug report manual.
+  - **Backfill script** `scripts/finance/backfill-account-balances-fx-fix.ts` (idempotente, dry-run, anchor OTB canónico TASK-703). Para histórico > 7 días; el cron diario `ops-finance-rematerialize-balances` cubre los últimos 7 automáticamente.
+  - **Defensa en profundidad** triple: lint rule (build-time) + reliability signal (runtime) + override block explícito en `eslint.config.mjs` (solo readers canónicos exentos).
+  - **Patrón canonizado en CLAUDE.md + arch doc + doc funcional**: cualquier futuro materializer (treasury_position, cashflow_summary, account_balances_monthly_v2, etc.) DEBE pasar por las VIEWs canónicas TASK-766. Documentación: `docs/documentation/finance/saldos-de-cuenta-fx-consistencia.md`.
+  - **Verificación staging real**: signal vivo detectando 2 drifts post-deploy (esperado — auto-corrige vía cron diario sin intervención manual).
+- **TASK-775 Slices 1-7 entregados** — Vercel Cron Async-Critical Migration Platform. Cierra la clase entera de bugs "cron Vercel-only que rompe staging" detectada parcialmente por TASK-773. Absorbe TASK-258 + TASK-259.
+  - **3 categorías canónicas obligatorias**: `async_critical` (Cloud Scheduler + ops-worker), `prod_only` (Vercel ok), `tooling` (Vercel ok). Spec: `docs/architecture/GREENHOUSE_VERCEL_CRON_CLASSIFICATION_V1.md`. Decision tree obligatorio para cualquier cron nuevo.
+  - **Helper canónico `wrapCronHandler`** (`services/ops-worker/cron-handler-wrapper.ts`): centraliza body parse + runId estable + audit log + `captureWithDomain` + `redactErrorForResponse` + 502 sanitizado. Inaugurado en Slice 2, reusado por 14 endpoints nuevos.
+  - **16 nuevos Cloud Scheduler jobs** en `services/ops-worker/deploy.sh` (idempotente). Crons migrados: `email-deliverability-monitor`, `nubox-{balance-sync,sync,quotes-hot-sync}`, `webhook-dispatch`, `email-delivery-retry`, `entra-{profile-sync,webhook-renew}`, `hubspot-{quotes,company-lifecycle,companies,companies-full,deals,products}-sync`, `notion-conformed-recovery`, `reconciliation-auto-match`.
+  - **Single source of truth**: lógica pura en `src/lib/<dominio>/orchestrator.ts` o `src/lib/cron-orchestrators/index.ts`. Routes Vercel quedan como fallback manual via curl + `CRON_SECRET`. Cero duplicación de SQL/HTTP/iteration logic.
+  - **vercel.json: 26 → 10 entries**. Solo prod_only + tooling restantes.
+  - **Defensa anti-regresión doble**:
+    - **Reliability signal `platform.cron.staging_drift`** (`Event Bus & Sync Infrastructure`): kind=drift, severity=error si count>0, steady=0. Lee `vercel.json`, matchea pattern async-critical, verifica equivalente Cloud Scheduler. Honra `KNOWN_NON_ASYNC_CRITICAL_PATHS` y override comments.
+    - **CI gate `pnpm vercel-cron-gate`** en `.github/workflows/ci.yml` (modo `--warn` durante migración, promueve a strict tras estabilización).
+  - **Drift count: 0** — todos los crons async-critical alineados con Cloud Scheduler. Steady state alcanzado.
+  - **Reglas duras canonizadas en CLAUDE.md + AGENTS.md** sección "Vercel cron classification + migration platform (TASK-775)": 6 invariantes anti-regresión + sincronización snapshot dual (reader runtime + CI gate).
+  - **Cobertura**: 3056/3056 tests passing, type-check + lint + build limpios. Slice 8 (verificación E2E + cierre) en curso.
+- **TASK-773 entregada** — Outbox Publisher Cloud Scheduler Cutover + Reliability + E2E Pre-Merge Gate. Cierra clase entera de bugs invisibles donde flujos write-then-projection de Finance funcionan en producción pero quedan colgados en staging.
+  - **Outbox publisher migrado a Cloud Scheduler + ops-worker**: el cron `/outbox/publish-batch` corre por proyecto GCP cada 2 min, igual en staging y producción. Antes vivía en Vercel cron `*/5 min` que **solo corre en deploys de Production** — staging custom environment no los ejecuta. Por eso el pago de Figma 2026-05-03 no rebajaba TC Santander.
+  - **State machine canónica explícita**: `pending → publishing → published/failed/dead_letter`. CHECK constraint atomic + index parcial para fetch eficiente del worker. SELECT FOR UPDATE SKIP LOCKED para concurrencia segura. Max 5 retries antes de dead-letter (humano interviene).
+  - **2 reliability signals nuevos** visibles en `/admin/operations`:
+    - `sync.outbox.unpublished_lag` — events sin publicar > 10 min
+    - `sync.outbox.dead_letter` — events que agotaron retries
+    Steady=0 ambos. Si > 0, dashboard pinta error y el operador ve qué break en el event bus sin necesidad de chequeo manual.
+  - **E2E pre-merge gate**: `pnpm finance:e2e-gate` detecta cuando un PR modifica handlers POST/PUT/PATCH/DELETE en `src/app/api/finance/**/route.ts` sin evidencia de verificación downstream. Mode warn por default; promueve a strict tras 1 sprint de adopción.
+  - **Patrón canónico documentado** en CLAUDE.md: nuevos crons infrastructure-critical van a `services/ops-worker/deploy.sh` + Cloud Scheduler. Vercel cron solo para tareas que SOLO corren en producción.
+  - **Absorbe TASK-262** (P1 Migrar outbox-publish a ops-worker). TASK-773 es superset estricto — agrega state machine + reliability + lint gate.
+  - **Auto-resuelve incidentes downstream**: TASK-771 backfill (figma-inc, microsoft-inc, notion-inc en BQ providers) y TASK-772 payment Figma (TC Santander rebaja en account_balance) drenan automáticamente al primer ciclo del nuevo Cloud Scheduler post-deploy.
+- **TASK-772 cerrada** — Finance Expense Supplier Hydration & Cash-Out Selection Integrity. Cierra la cadena visual del incidente Figma EXP-202604-008.
+  - **`/finance/expenses` muestra el proveedor real**: aunque `expenses.supplier_name` sea NULL en datos legacy, el reader hidrata `supplierDisplayName` via LEFT JOIN canónico a `greenhouse_finance.suppliers`. Figma deja de mostrarse como "—".
+  - **`/finance/cash-out` agrupa por proveedor estable**: el dropdown agrupa por `supplierKey` (= supplierId || displayName || legacyName), no por `supplierName || 'Sin proveedor'`. Documentos con supplierId válido pero supplierName=NULL ya NO se ocultan bajo "Sin proveedor".
+  - **Display de moneda separa documento vs equivalente CLP**: para obligaciones USD el drawer ahora muestra `USD 92,90` en el monto + helper text `Equivalente CLP: $83.774`. Antes mezclaba CLP value con currency USD mostrando `USD 83.773,50` (bug crítico para tesorería).
+  - **Sort canónico server-side**: `/finance/expenses` ordena por `sortDate = COALESCE(document_date, payment_date, created_at)` en lugar de `paymentDate` client-side. Obligaciones recién creadas sin paymentDate ya no quedan al final.
+  - **POST `/api/finance/expenses` hidrata snapshot**: cuando el cliente envía `supplierId` sin `supplierName`, resuelve desde la tabla suppliers y persiste el snapshot. FinanceValidationError 400 si el supplier no existe (nunca crear FK rota). Defense-in-depth con el reader fallback.
+  - **Contract canónico expense extendido**: 7 nuevos campos (`supplierDisplayName`, `sortDate`, `amountPaid`, `amountPaidClp`, `amountPaidIsHomogeneous`, `pendingAmount`, `pendingAmountClp`) resueltos server-side desde la VIEW canónica TASK-766 `expense_payments_normalized`. Consumers consumen sin recomputar semántica financiera.
+  - **CTE en INSERT/UPDATE**: el `RETURNING *` de `createFinanceExpenseInPostgres` y `updateFinanceExpenseInPostgres` envuelve los joins en CTE para que el outbox event payload tenga el contract completo desde la misma tx (no requiere re-fetch downstream).
+- **TASK-771 cerrada** — Finance Supplier Write Decoupling + BQ Projection vía Outbox. Recovery del incidente "Error al crear proveedor" silencioso (drawer `/finance/expenses` devolvía 500 aunque el supplier ya estaba creado en PG).
+  - **Crear/editar proveedores ya no falla por BigQuery**: POST/PUT `/api/finance/suppliers` responde 201/200 cuando PG commitea, independiente del estado de BQ. Antes: cualquier falla BQ (permisos, schema, dataset missing) propagaba como 500. Ahora: el endpoint reporta el estado real PG y la proyección BQ corre async via consumer reactivo.
+  - **Nueva projection canónica `provider_bq_sync`** consumiendo outbox event `provider.upserted` (emitido en la tx PG por `upsertProviderFromFinanceSupplierInPostgres`). Re-lee supplier de PG (single source of truth) → MERGE BQ idempotente. maxRetries=3, dead-letter automático. Drena cada 5 min vía Cloud Scheduler `ops-reactive-finance` (sin job nuevo).
+  - **Nuevo reliability signal `finance.providers.bq_sync_drift`** visible en `/admin/operations`. Steady state esperado=0; >0 indica drift PG↔BQ activo (AI Tooling y consumers BQ verán datos stale). Subsystem rollup `Finance Data Quality`.
+  - **Backfill script `scripts/finance/backfill-provider-bq-sync.ts`** para recovery one-shot manual (3 suppliers afectados pre-fix: figma-inc, microsoft-inc, notion-inc). Auto-drain post-deploy en el próximo ciclo del scheduler.
+  - **Patrón canónico documentado**: prohibido escribir DDL/MERGE BigQuery inline en route handlers post-cutover PG-first. La regla canónica es PG primary + outbox + projection async (reactive playbook).
+- **TASK-769 cerrada** — Cloud Cost Intelligence + AI FinOps Copilot. Convierte Billing Export V1 en una capacidad FinOps Greenhouse-first:
+  - Reader V2 backwards-compatible en `getGcpBillingOverview()`: detecta tabla estándar + `resource_v1`, agrega `costByResource`, `topDrivers`, `forecast` y última observación AI opcional.
+  - Validación BigQuery real: dataset `billing_export` poblado con `gcp_billing_export_v1_013340_4C7071_668441` y `gcp_billing_export_resource_v1_013340_4C7071_668441`; 30 días = CLP 114.379,91; forecast rolling mensual = CLP 121.840,58; driver principal Cloud SQL `greenhouse-pg-dev`.
+  - Alertas tempranas determinísticas: `forecast_risk`, `share_of_total`, `service_spike`, `resource_driver`; RCP proyecta drivers no-OK como señales `cloud.billing.driver.*` y `cloud` ahora espera `billing`.
+  - Copiloto FinOps AI opt-in: `CLOUD_COST_AI_COPILOT_ENABLED=true`, JSON estricto, fingerprint dedupe, persistencia en `greenhouse_ai.cloud_cost_ai_observations`; no define severidad ni dispara alertas.
+  - Alert sweep hosteado en ops-worker `POST /cloud-cost-ai-watch`: Teams primero, Slack fallback, cooldown por fingerprint y `dryRun=true` seguro para validación sin notificaciones ni persistencia.
+  - UI Cloud & Integrations: forecast, alertas tempranas, recursos/SKUs principales y último resumen AI cuando exista.
+  - 1 migration nueva aplicada + `src/types/db.d.ts` regenerado. Verificación: `pnpm pg:doctor`, `pnpm migrate:up`, BigQuery reader real, alert dry-run, AI disabled skip, `pnpm tsc --noEmit`, `pnpm build`, `pnpm test` 533 files / 3003 tests passed (5 skipped), `pnpm lint` 0 errors / 318 warnings legacy TASK-265.
+
+- **TASK-768 cerrada** — Finance Expense Economic Category Dimension + Resolución de ISSUE-065 (KPI Nómina cash-out abril 2026 sub-counted en ~$3M por mis-clasificación `expense_type` conflate). Separa la dimensión analítica/operativa de la fiscal/SII que estaban mezcladas en una sola columna. Causa raíz: bank reconciler defaulteaba `expense_type='supplier'` en transacciones bancarias sin metadata, sesgando KPIs Nómina/Proveedores cuando un payment económicamente-payroll caía en bucket fiscal-supplier. 9 slices canon-pattern:
+  - **Slice 1**: schema `economic_category TEXT` aditiva en `expenses` + `income` (NULLABLE inicial), 11 valores expense canónicos (`labor_cost_internal/external`, `vendor_cost_saas/professional_services`, `regulatory_payment`, `tax`, `financial_cost`, `bank_fee_real`, `overhead`, `financial_settlement`, `other`), 8 income, 2 lookup tables seedeadas (17 reguladores chilenos: Previred, SII, AFPs, Mutual, Isapres, FONASA, TGR, Dirección del Trabajo + 8 international payroll vendors: Deel, Remote, Velocity Global, Oyster, Globalization Partners, Papaya Global, Multiplier, Rippling Global), partial indexes para reliability signal performance, types TS canónicos + type guards. 11 tests vitest.
+  - **Slice 2**: helpers identity lookup (`extractRutsFromText` + `lookupMemberByRut/Email/DisplayName` + `lookupSupplierByRut` + `lookupKnownRegulator/PayrollVendor`), resolver canónico TS con 10 reglas first-match-wins (member_id explicit → RUT → email → name → vendor regex → regulator regex → supplier partner → accounting_type transparent map → ambiguous fallback → manual_required), barrel index. 26 resolver tests + 7 identity-lookup + 5 lookup-tables = 49 tests acumulados.
+  - **Slice 3**: backfill defensivo Node script `scripts/finance/backfill-economic-category.ts` con `--dry-run` + `--batch-size` + `--limit`, audit log append-only `economic_category_resolution_log` (trigger anti-update/delete TASK-765 pattern), manual queue `economic_category_manual_queue` para confidence low/manual_required. Backfill verificado: 22 `labor_cost_external`, 13 `labor_cost_internal`, 7 `regulatory_payment`, 2 `financial_cost`, 54 `service_revenue` resueltos automáticamente; 161 expenses + 19 income en manual queue (Nubox imports sin metadata).
+  - **Slice 5** (re-orden vs spec, antes que CHECK): trigger PG `populate_economic_category_default` BEFORE INSERT para expenses + income — cero invasivo a 12 canonical writers existentes (`createFinanceExpenseInPostgres`, `payroll-expense-reactive`, `factoring`, `nubox sync`, `anchored-payments`, etc.). Transparent map de `expense_type`/`income_type` → default razonable. NO sobrescribe valores explícitos.
+  - **Slice 4** (re-orden post-trigger): CHECK constraints `expenses_economic_category_required_after_cutover` + mirror income (NOT VALID, cutover 2026-05-03 11:00 UTC; VALIDATE diferido post-resolución manual queue) + `expenses_economic_category_canonical_values` + mirror income (VALIDATED atomic — solo enum-style values aceptados).
+  - **Slice 6**: 2 capabilities granulares nuevas (`finance.expenses.reclassify_economic_category` + `finance.income.reclassify_economic_category`, FINANCE_ADMIN + EFEONCE_ADMIN, least-privilege). Endpoints `PATCH /api/admin/finance/{expenses,income}/[id]/economic-category` con auth + capability + validation (reason min 10 chars) + atomic UPDATE + audit log + manual queue resolved + outbox events `finance.{expense,income}.economic_category_changed` v1 fire-and-forget. 14 endpoint tests (9 expense + 5 income).
+  - **Slice 7**: `CREATE OR REPLACE VIEW expense_payments_normalized` + mirror income agregando JOIN a `expenses.economic_category` (backwards-compat preservada — TASK-766 23 tests verdes). Helpers `sumExpensePaymentsClpForPeriod` + mirror income retornan shape extendido con `byEconomicCategory` breakdown (11 keys expense / 8 keys income) + `economicCategoryUnresolvedCount` + campos legacy `supplierClp/payrollClp/fiscalClp` preservados. 2 reliability signals nuevos `finance.expenses.economic_category_unresolved` + mirror income (drift, severity=error si count>0, steady=0 post-cleanup, subsystem `finance_data_quality`). Builder canónico `buildFinanceEconomicCategoryUnresolvedSignals`.
+  - **Slice 8**: lint rule custom `eslint-plugins/greenhouse/rules/no-untokenized-expense-type-for-analytics.mjs` mode `error` desde commit-1. Detecta 6 anti-patrones (filter, GROUP BY, FILTER WHERE para expense_type + income_type). Override block exime SII/VAT/operacional/resolver/cash-out filter operativo/account-balances label/processor-digest/payroll-expense-materialization-lag signal. 11 RuleTester tests. Plugin v1.4.0. cash-out endpoint expone `summary.byEconomicCategory` + `economicCategoryUnresolvedCount` para que UI migre.
+  - **Slice 9**: CLAUDE.md sección nueva "Finance — Economic Category Dimension Invariants (TASK-768)" con decision tree + API canónico + defensa-en-profundidad + reglas duras. Bonus sección nueva "Database — Migration markers (anti pre-up-marker bug)" documentando el bug `-- Up Migration` marker descubierto en Slice 1 (silent failure cuando se sobreescribe archivo). 3 architecture docs deltas (FINANCE V1.0+TASK-768, RELIABILITY V1.5, EVENT_CATALOG). ISSUE-065 documentado y resuelto. Doc funcional `docs/documentation/finance/categoria-economica-de-pagos.md` + manual de uso `docs/manual-de-uso/finance/reclasificar-pagos-categoria-economica.md`.
+  - **Verificación end-to-end**: `pnpm tsc --noEmit` 0 errors, `pnpm build` clean, `pnpm test` **533 files / 3003 tests verdes** (5 skipped, +63 vs TASK-766 baseline 2940), `pnpm lint` 0 errors / 318 warnings (preexistentes TASK-265).
+  - **Cero impacto operacional**: saldos bancarios cuadran (cash flow ortogonal a la dimensión bucket), P&L tributario / SII reports siguen usando `expense_type` (preservado intacto), Total Pagado se mantiene; solo cambia distribución entre buckets.
+  - **Bloqueantes downstream desbloqueados**: TASK-178 (Budget Engine — variance analysis canónica), TASK-710-713 (Member Loaded Cost program — modelo dimensional consume `economic_category`), beneficio indirecto TASK-080+ (ICO Engine — cost-per-FTE canónico), TASK-705/706 (Cost Attribution — allocations con dimensión correcta).
+  - **KPI canónico esperado post-deploy production**: `/finance/cash-out` Nómina abril 2026 ≈ $4M (vs $1.03M pre-fix). Total Pagado se mantiene en $11.143.931.
+  - 5 migrations + 4 archivos canónicos nuevos en `src/lib/finance/economic-category/` + 2 endpoints PATCH + 1 lint rule custom + 1 trigger PG + 1 backfill script + 2 reliability queries + 5 docs canónicos updated.
+
+- **TASK-766 cerrada** — Finance CLP-Currency Reader Contract Resilience + Resolución del incidente 2026-05-02 (KPIs `/finance/cash-out` inflados 88×). Resuelve el anti-patrón sistémico `SUM(ep.amount × COALESCE(e.exchange_rate_to_clp, 1))` aplicado a payments con `currency != document.currency` (caso CCA TASK-714c — HubSpot CCA $1.106.321 CLP × rate USD 910.55 = $1B fantasma). 5 slices entregados:
+  - **Slice 1** — VIEW canónica `greenhouse_finance.expense_payments_normalized` (mirror `income_payments_normalized`) con `payment_amount_clp` (COALESCE chain canonical: `amount_clp` first → CLP-trivial fallback → `NULL` con `has_clp_drift=TRUE`) + filtro 3-axis supersede inline. Helpers TS canónicos `src/lib/finance/expense-payments-reader.ts` + `income-payments-reader.ts` con API mínima (`sumXxxForPeriod`, `listXxxNormalized`, `getXxxClpDriftCount`). Single source of truth para todo cómputo CLP de payments. Mismo patrón TASK-571/699/721. 22 tests verdes.
+  - **Slice 2** — Backfill defensivo: 23 income_payments con `currency='CLP' AND amount_clp IS NULL` poblados (1:1 idempotente) + columna `requires_fx_repair BOOLEAN` para drift residual + CHECK constraint `payments_amount_clp_required_after_cutover` (NOT VALID + VALIDATE atomic, mirror TASK-708/728, cutover 2026-05-03). Drift count post-backfill = 0 ⇒ VALIDATE pasó atomic en la misma migration. 2 reliability signals nuevos (`finance.expense_payments.clp_drift` + `finance.income_payments.clp_drift`, kind=drift, severity=error si count>0, steady=0, subsystem `Finance Data Quality`). 8 tests verdes.
+  - **Slice 3** — Lint rule custom `eslint-plugins/greenhouse/rules/no-untokenized-fx-math.mjs` modo `error` desde commit-1. Detecta 4 patrones (expense + income, con/sin COALESCE) — `ep.amount * exchange_rate_to_clp`, `ep.amount * COALESCE(e.exchange_rate_to_clp, 1)`, idem `ip.amount`. Override block exime los 2 readers canónicos. Migración de `/api/finance/cash-out` al helper canónico atómicamente con la activación de la rule. Anti-regresión hard: tests assertan `totalPaidClp < $20M` para impedir que los $1B fantasma vuelvan jamás. 4 cash-out tests + 10 RuleTester cases verdes.
+  - **Slice 4a + 4b** — Migración exhaustiva en paralelo de 7 endpoints adicionales al helper canónico: `/api/finance/cash-in`, `/api/finance/cash-position`, `/api/finance/dashboard/{pnl,summary,cashflow}`, `/api/finance/expenses/summary`, `/api/finance/income/summary`. **Bonus 4 callsites con leak de supersede pre-migración fixed automáticamente** como side effect de migrar a la VIEW (que ya filtra 3-axis supersede inline). Decisión OUT-OF-SCOPE: `partner_share_amount × rate` queda fuera (income document level, no payment level). 23 endpoint tests verdes.
+  - **Slice 5** — Repair admin endpoint `POST /api/admin/finance/payments-clp-repair` (capability granular `finance.payments.repair_clp` — FINANCE_ADMIN + EFEONCE_ADMIN, least-privilege). Body: `{kind, paymentIds?, fromDate?, toDate?, batchSize?, dryRun?}`. Resuelve rate histórico al `payment_date` desde `greenhouse_finance.exchange_rates` (rate vigente al pago, NO el actual). Per-row atomic. Idempotente. Soporta `dryRun=true`. Outbox audit `finance.payments.clp_repaired` v1 fire-and-forget (truncating `skipped`/`errors` arrays a 50 entries en payload). 22 tests verdes (10 helper + 12 endpoint, cubriendo idempotencia, dryRun, drift detection, rate lookup miss, atomicidad, validation gates, capability check, audit truncation).
+  - **Docs canónicos updated:** CLAUDE.md sección nueva "Finance — CLP currency reader invariants (TASK-766)" con reglas duras + decision tree + 7 invariantes mecánicos. `GREENHOUSE_FX_CURRENCY_PLATFORM_V1.md` Delta 2026-05-03. `GREENHOUSE_FINANCE_ARCHITECTURE_V1.md` Delta 2026-05-03. `GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1.md` Delta 2026-05-03 (V1.4). `GREENHOUSE_EVENT_CATALOG_V1.md` Delta 2026-05-03 con shape v1 de `finance.payments.clp_repaired`.
+  - **Verificación final:** `pnpm tsc --noEmit` 0 errors, `pnpm build` verde (18.1s), `pnpm test` 527 files / 2940 tests verdes (5 skipped, 0 failed), `pnpm lint` 0 errors / 318 warnings (todas preexistentes — TASK-265 mode `warn`).
+  - **KPI canónico post-fix verificado:** `/finance/cash-out` "Total pagado" abril 2026 = **$11.546.493** (real) vs **$1.017.803.262** (broken pre-fix). Reliability signals POST-cutover: `finance.expense_payments.clp_drift` n=0, `finance.income_payments.clp_drift` n=0.
+  - **ISSUE-064 creado y resuelto:** `docs/issues/resolved/ISSUE-064-cash-out-kpi-inflated-clp-currency-anti-pattern.md` documenta el incidente del 2026-05-02 + resolución. Mismo patrón que ISSUE-063 ↔ TASK-765.
+  - 4 migrations nuevas, 4 archivos canónicos nuevos (2 VIEWs, 2 helpers TS, 1 repair endpoint, 1 lint rule), 79 tests TASK-766 acumulados verdes, 8 endpoints migrados (4 con bonus fix), 1 capability granular nueva (`finance.payments.repair_clp`), 1 outbox event canónico nuevo (`finance.payments.clp_repaired` v1).
+
+## 2026-05-02
+
+- **TASK-765 cerrada** — Payment Order ↔ Bank Settlement Resilience + Recovery del incidente 2026-05-01. Resuelve la cadena de 3 fallas estructurales que dejaron 2 `payment_orders` (Luis Reyes $148,312.50 + Humberly Henriquez $254,250.00) en `state='paid'` sin afectar Santander CLP. 8 slices entregados:
+  - **Slice 1** — Hard-gate `source_account_id` triple: CHECK constraint DB (NOT VALID, prefiltro estados terminales) + `assertSourceAccountForPaid` TS guard + UI banner warning + picker dialog en OrderDetailDrawer + tooltip explicativo en "Marcar pagada" disabled.
+  - **Slice 2** — Universal column-parity test (`expense-insert-column-parity.test.ts`) que valida 14 INSERT sites canónicos (4 tablas wide finance). Detectó y fixeó bug latente real en `createFinanceIncomeInPostgres` (45 cols vs 44 expressions) que habría reproducido el mismo error PG del incidente.
+  - **Slice 3** — Endpoint admin `POST /api/admin/finance/payroll-expense-rematerialize` (capability `finance.payroll.rematerialize`) idempotente con dryRun + outbox event `finance.payroll_expenses.rematerialized` audit-only.
+  - **Slice 4** — Resolver loud: `record-payment-from-order.ts` ahora throw + outbox `finance.payment_order.settlement_blocked` (5 reasons tipadas) en lugar de skip silencioso. `captureWithDomain(err, 'finance')` en proyecciones para dead-letter routing correcto.
+  - **Slice 5** — Atomicidad transaccional `markPaymentOrderPaidAtomic`: state=paid + audit log + per-line `recordExpensePayment(client)` + settlement_legs + outbox events DENTRO de una sola tx. Si rollback ocurre, la order vuelve a `submitted` — nunca queda zombie. Refactor `recordExpensePayment` con `client?` opcional. Proyector reactivo queda como safety net read-only.
+  - **Slice 6** — State machine hardening: tabla `payment_order_state_transitions` append-only (trigger anti-update/delete) + trigger `payment_orders_anti_zombie_trigger` valida 3 invariantes (paid_at NOT NULL + source_account_id NOT NULL + transition matrix canónica). Backfill defensivo para órdenes legacy.
+  - **Slice 7** — 3 reliability signals nuevos en `RELIABILITY_REGISTRY` (`paid_orders_without_expense_payment`, `payment_orders_dead_letter`, `payroll_expense_materialization_lag`) + UI banner reason-aware en OrderDetailDrawer con CTA "Recuperar orden".
+  - **Slice 8** — Endpoint admin `POST /api/admin/finance/payment-orders/[orderId]/recover` (capability `finance.payment_orders.recover`) + ejecución de recovery contra producción. Verificado: 2 expense_payments + 2 settlement_legs creados, banco reflejado ($402,562.50 outflow, closing $3,750,478.50 al 2026-05-02), reliability signals todos en 0.
+  - **Bonus fixes incluidos:**
+    - 4 tests preexistentes rotos resueltos (PayrollPaymentStatusCard null-safe, internal-role-visibility cardinality, people permissions tabs, creative-velocity-review post-quality-gate).
+    - **Bug shim/auth-secrets post-TASK-742 regression resuelto**: refactor `auth-secrets.ts` + `resend.ts` para eliminar top-level await que rompía tsx CLI scripts. Lazy memoized resolver pattern preserva sync API (`getNextAuthSecret`, etc) con fast-path env-first; `ensureAuthSecretsResolved()` para callers async. `pnpm finance:rematerialize-balances` y todos los demás scripts del repo ya corren correctamente.
+  - **CLAUDE.md** sección "Finance — Payment order ↔ bank settlement invariants (TASK-765)" agregada con flow diagram end-to-end + reglas duras + helpers canónicos.
+  - **GREENHOUSE_EVENT_CATALOG_V1.md** Delta 2026-05-02 con shape v1 versionado de los 2 eventos nuevos.
+  - 4 migrations nuevas, 3 helpers TS canónicos, 9 test files nuevos (83/83 verdes en scope TASK-765), 1 endpoint admin recovery + 1 endpoint admin rematerialize, 2 capabilities granulares nuevas.
+
+- **TASK-265 cerrada** — Greenhouse Nomenclature, Dictionary & Kortex Copy Contract. Entrega:
+  - **Foundation locale-aware** en `src/lib/copy/` con 9 namespaces canónicos (`actions`, `states`, `loading`, `empty`, `months`, `aria`, `errors`, `feedback`, `time`). API pública: `import { getMicrocopy } from '@/lib/copy'`. Server + client compatible (no `'server-only'`).
+  - **es-CL dictionary completo** seed (default canónico) + **en-US stub** que re-exporta es-CL para paridad type-safe (TASK-266 lo traduce sin tocar consumers).
+  - **ESLint rule `greenhouse/no-untokenized-copy`** activa en modo `warn`. Detecta aria-label literales (caso dominante 405 detectado pre-rule), status maps inline (`{ label: 'Pendiente' }`), loading strings (`'Cargando...'`), empty states (`'Sin datos'`) + cobertura secundaria de label/placeholder/helperText/title/subtitle en JSX. Excludes: theme, global-error, public, emails, finance/pdf, tests. **Snapshot baseline al cierre: 318 warnings** (202 aria-label, 59 status maps, 23 empty states, 34 secondary).
+  - **Skill `greenhouse-ux-writing` hardenizada** en `~/.claude/skills/greenhouse-ux-writing/skill.md`: description con `MANDATORY` + triggers explícitos + `type: gate` frontmatter + sección "Mandatory reading" + decision tree + cross-link bidireccional con `src/lib/copy/` y nomenclature.
+  - **CLAUDE.md** Conventions ampliado con regla canónica "ANTES de escribir cualquier string visible, invocar `greenhouse-ux-writing`" + decision tree inline.
+  - **GREENHOUSE_UI_PLATFORM_V1.md** Delta 2026-05-02 con Copy System Contract completo: las dos capas, API pública, decision tree, reglas duras, coordinación con TASK-266 (i18n) y Kortex (Slice 4 documental).
+  - **Coordinación cross-task**: TASK-407 + TASK-408 desbloqueadas; cierre TASK-408 promueve la rule a `error` mode.
+  - **Sin migración de superficies** en esta task (split-off explícito en TASK-407/408). Foundation lista para recibir migraciones.
+  - **TASK-266 epic desbloqueado**: foundation locale-aware desde día uno permite que TASK-428 (ADR i18n library) arranque sin reescribir API.
+
+- TASK-265 actualizada con Slice 5 nuevo — gate operativo de microcopy governance (ESLint rule `greenhouse/no-untokenized-copy` + hardening de skill `greenhouse-ux-writing` + checklist en `greenhouse-ui-review` + hook PostToolUse opcional). Decisión arquitectónica: integrar el gate a TASK-265 en lugar de crear task separada (TASK-771 descartada) porque debe apuntar a la foundation dictionary-ready desde día uno; task separada introduce drift entre contrato y enforcement. Patrón heredado de TASK-567: gate en `warn` durante TASK-265 + TASK-407/408 (sweep), promote a `error` al cierre de TASK-408. TASK-407 Closing Protocol verifica reducción del baseline; TASK-408 Closing Protocol ejecuta el promote. La skill `greenhouse-ux-writing` queda como source-of-truth de tono; la rule la complementa con enforcement mecánico.
+
+- TASK-567 cerrada — Typography Code Sweep + ESLint Governance Rule. Activa la regla local `greenhouse/no-hardcoded-fontfamily` en modo `error` que bloquea cualquier `fontFamily` literal hardcodeada (`'monospace'`, `'Poppins'`, `'Inter'`, `'DM Sans'`, `'Geist Mono'`, composite mono stacks, `var(--font-*)`) en `src/views/**`, `src/components/**`, `src/app/**`. Mensajes accionables por familia con 7 messageIds distintos apuntando a variants `monoId`/`monoAmount`/`kpiValue`/`h1-h4`. Allowlist para CSS-wide values (`inherit`/`initial`/`unset`/`revert`/`revert-layer`). Excluidos por scope: theme files, global-error pre-theme, páginas públicas sin shell, emails, PDF generation. Sweep automatizado limpió 300 occurrences en 135 archivos vía codemod conservador en 2 pases + 9 casos especiales manuales (ternarios, InputProps.sx anidados, `<code>` markdown con eslint-disable justificado). Delta -38 LOC. Gate antes que sweep para que el contrato visual quede auto-protegido contra regresiones desde CI. TASK-021 reclasificada con nota delta — sigue cubriendo `fontWeight` y adopción opt-in de variants semánticos.
+
+- Se documenta el protocolo de mantenimiento de `DESIGN.md` como contrato vivo: el archivo debe actualizarse cuando cambie el runtime visual real, validarse con `pnpm design:lint` y sincronizar la documentación extensa (`docs/architecture/GREENHOUSE_DESIGN_TOKENS_V1.md`) cuando el cambio sea estructural.
+
+- Notion sync operational freshness queda endurecida contra drift entre BigQuery y PostgreSQL:
+  - nuevo helper `src/lib/integrations/notion-sync-freshness.ts` centraliza lectura de `last_synced_at` desde `greenhouse.space_notion_sources`, fallback efectivo por `space_id` y reconciliacion `BQ -> greenhouse_core.space_notion_sources`.
+  - `src/lib/sync/sync-bq-conformed-to-postgres.ts` ahora no solo drena `greenhouse_conformed.delivery_* -> greenhouse_delivery.*`; tambien refleja `space_notion_sources.last_synced_at` desde BigQuery hacia PostgreSQL en la misma corrida diaria/idempotente.
+  - readers operativos que antes mentian con `NULL` en PG ahora usan freshness efectiva con fallback a BigQuery:
+    - `GET /api/admin/spaces`
+    - `GET /api/admin/tenants/[id]/notion-status`
+    - `src/lib/operations/get-operations-overview.ts`
+  - Impacto: el portal deja de mostrar "nunca sincronizado" cuando el upstream `notion-bq-sync` ya actualizo BigQuery, y el binding canonico en PostgreSQL se va autocurando en el siguiente `BQ -> PG drain`.
+
+## 2026-05-01
+
+- Se adopta `DESIGN.md` en la raiz del repo como contrato visual portable para agentes y tooling UI. El archivo condensa el baseline real `Poppins + Geist`, tokens de color/spacing/radius/componentes y reglas de uso alineadas al theme activo. Tambien se integra el CLI oficial `@google/design.md` al repo con scripts `pnpm design:lint`, `pnpm design:diff` y `pnpm design:export:tailwind`.
+
+- Se documenta la arquitectura canónica `Payment Orders` como módulo de Tesorería dentro de Finance en `docs/architecture/GREENHOUSE_PAYMENT_ORDERS_ARCHITECTURE_V1.md`. La decisión evita mover pagos a Payroll: Payroll calcula/exporta obligaciones; Finance/Tesorería crea órdenes, calendario de pagos, registra pagos, settlement y conciliación. Se abre el programa `TASK-747` con child tasks `TASK-748` a `TASK-751` para obligations, beneficiary profiles/routing, orders/batches/calendar maker-checker y payroll settlement orchestration.
+
+- Se agrega la skill local invocable de Claude `greenhouse-payroll-auditor` en `.claude/skills/greenhouse-payroll-auditor/SKILL.md`, con referencias para legislacion/calculo Chile, runtime Payroll Greenhouse e internacionales/Deel. Tambien se alinean `AGENTS.md` y `CLAUDE.md` con la convencion oficial vigente de Claude Skills (`SKILL.md`) dejando `skill.md` como legacy.
+
+- **TASK-741 — Greenhouse MCP Remote Gateway V1**. Se agrega gateway MCP remoto privado en `GET/POST/DELETE /api/mcp/greenhouse` usando el transporte oficial Streamable HTTP del SDK MCP. El gateway reutiliza el mismo runtime read-only de `pnpm mcp:greenhouse`, se protege con `GREENHOUSE_MCP_REMOTE_GATEWAY_TOKEN`, limita payloads con `GREENHOUSE_MCP_REMOTE_MAX_BODY_BYTES` y mantiene `TASK-659` como dueño separado de OAuth/hosted auth multiusuario.
+
+- **TASK-744 — Payroll Chile Compliance Remediation & International Guardrails**. Se corrige el motor de Payroll para separar regimenes Chile dependiente, honorarios e internacional/Deel: retencion honorarios 2026 queda en 15,25%, Seguro de Cesantia separa trabajador/empleador (`plazo_fijo` trabajador 0% / empleador 3%), el calculo Chile aplica topes AFP/salud/SIS/mutual y cesantia cuando existen topes PREVIRED, honorarios falla cerrado si intenta pasar por helper dependiente, y readiness bloquea entries calculadas con regimenes incompatibles. Se agrega `contract_type_snapshot` a `greenhouse_payroll.payroll_entries` con constraints `NOT VALID` para nuevas escrituras y tests Payroll quedan verdes.
+
+- **TASK-744 cierre operativo**. El deploy de `418d3c9a` quedo completo en Vercel y abril 2026 se recalculo en staging antes de aprobacion/export: Humberly y Luis quedan como honorarios con retencion SII `0.1525` y sin deducciones dependientes; Valentina mantiene calculo Chile dependiente; Melkin, Daniela y Andres permanecen internacionales/Deel con KPI ICO y sin deducciones Chile. `pnpm pg:connect:migrate` confirma que no quedan migraciones pendientes.
+
+- `pnpm pg:doctor` vuelve a ser ejecutable desde CLI: deja de importar el pool runtime Next/server-only y usa conexión Postgres directa con el mismo perfil de herramientas, manteniendo soporte para Cloud SQL Connector y Secret Manager.
+
+- Se estabiliza `src/lib/agency/space-360.test.ts` con reloj fijo de prueba para que el coverage de CI no dependa del mes calendario real.
+
+- **TASK-743 — Operational Data Table Density Contract**. Se introduce contrato canonico de plataforma para tablas operativas: density tokens (`compact`/`comfortable`/`expanded`), `<DataTableShell>` (container queries + auto-degrade + sticky-first column + scroll fade), `<InlineNumericEditor>` (reemplaza `BonusInput`, slider en popover-on-focus), lint rule `greenhouse/no-raw-table-without-shell` y visual regression Playwright. PayrollEntryTable + 14 vistas legacy migradas. Resuelve overflow horizontal contra `compactContentWidth: 1440` de manera robusta y escalable. Spec en `docs/architecture/GREENHOUSE_OPERATIONAL_TABLE_PLATFORM_V1.md`, doc funcional en `docs/documentation/plataforma/tablas-operativas.md`. Reglas duras agregadas a `CLAUDE.md` y `AGENTS.md`.
+
+- Se documenta la auditoria read-only de Payroll en `docs/audits/payroll/PAYROLL_COMPLIANCE_AUDIT_2026-05-01.md`, con hallazgos criticos sobre honorarios 2026, cesantia por tipo de contrato, topes imponibles, gratificacion legal, coherencia contractual y preservacion de KPI ICO para internacionales.
+
+- Se crea la skill local invocable `$greenhouse-payroll-auditor` para auditar Payroll Efeonce/Greenhouse con contexto de legislacion laboral chilena, formulas de nomina, honorarios, Deel/EOR/contractor internacional, KPI ICO, asistencia/licencias, PREVIRED/ImpUnico y watchlist del runtime actual.
+
+- Payroll Chile PREVIRED sync queda endurecido contra drift de schema:
+  - `src/lib/payroll/previred-sync.ts` ya no intenta escribir `worker_rate` en `greenhouse_payroll.chile_afp_rates`; la tabla canónica desplegada solo persiste `total_rate`.
+  - `src/lib/payroll/chile-previsional-helpers.ts` repara los fallbacks legacy sobre `previred_period_indicators` y `previred_afp_rates` usando `indicator_date` y aliases reales del schema histórico.
+  - Nuevos tests de compatibilidad de schema blindan ambos carriles:
+    - `src/lib/payroll/previred-sync.schema-compatibility.test.ts`
+    - `src/lib/payroll/chile-previsional-helpers.schema-compatibility.test.ts`
+  - El smoke E2E de Chromium con `agent@greenhouse.efeonce.org` vuelve a pasar en staging para `/hr/payroll` y `/my/payroll`, y la UI de payroll ya no muestra el falso `0 colaboradores` en el borrador de abril 2026.
+
+- `TASK-742` Auth Resilience 7-Layer Architecture entregada en branch `feature/TASK-742-auth-resilience-7-layers`. Cierra 6 fallas estructurales del sistema de autenticación expuestas por el incidente del 2026-04-30 (Microsoft SSO rebotando con `?error=Callback` opaco para todo internal user).
+  - **Capa 1 — Secret hygiene**: `validateSecretFormat` con reglas por secret crítico; `resolveSecret` rechaza payloads malformados (whitespace, comillas, charset, length). Sentry warning cuando un secret cae a env en prod.
+  - **Capa 2 — Readiness contract**: `/api/auth/health` expone status por provider via OIDC discovery + JWT sign+verify roundtrip. UI Login esconde botones SSO degradados con warning accionable.
+  - **Capa 3 — SSO observability**: `greenhouse_serving.auth_attempts` append-only ledger (PII redacted: sha256 IP/UA, 2-char email prefix, OID prefix+suffix). `recordAuthAttempt` instrumenta cada signIn/jwt/authorize callback con stage + reason_code estable. `captureWithDomain(err, 'identity')` reemplaza el swallow de NextAuth.
+  - **Capa 4 — Schema integrity**: CHECK constraint `client_users_auth_mode_invariant` prohíbe estados imposibles (`auth_mode='both'` con `password_hash=NULL`). 6 internal users normalizados a `microsoft_sso`, incluyendo Daniela Ferreira que estaba en estado inconsistente.
+  - **Capa 5 — Magic-link self-recovery**: endpoints `/api/auth/magic-link/{request,consume}` + página `/auth/magic-link`. Token 32 bytes urlsafe bcrypt-hashed, single-use, 15min TTL, anti-enumeration. Email template `magic_link` priority=critical en es/en. Cubre el modo de falla "sin password + SSO roto".
+  - **Capa 6 — Smoke lane sintética**: `POST /smoke/identity-auth-providers` en ops-worker (Cloud Run) con Cloud Scheduler `*/5 * * * *`. 4 probes (portal /api/auth/health, Microsoft OIDC discovery, in-process readiness, JWT roundtrip). Persiste `greenhouse_sync.smoke_lane_runs` con `lane_key='identity.auth.providers'`.
+  - **Capa 7 — Secret rotation playbook**: `pnpm secrets:audit` reporta hygiene de 8 secrets críticos. `pnpm secrets:rotate <id>` con verify-before-cutover (format validate → printf %s canonical add → trigger redeploy → poll health → solo entonces disable previous; abort y revert si health falla).
+  - 3 migrations aplicadas en dev: `auth_attempts`, `auth_mode CHECK + normalize`, `auth_magic_links`.
+  - `.github/workflows/ops-worker-deploy.yml` extendido para auto-redeployar el ops-worker en cambios a `src/lib/auth/**`, `src/lib/auth-secrets.ts`, `src/lib/secrets/**`.
+  - 43/43 tests verdes, 0 tsc errors, 0 lint errors.
+
 ## 2026-04-30
+
+- `TASK-647` cierra sus follow-ups read-only desbloqueados:
+  - el MCP ahora expone `get_platform_health` sobre `GET /api/platform/ecosystem/health`
+  - también expone lectura del event control plane: `list_event_types`, `list_webhook_subscriptions`, `get_webhook_subscription`, `list_webhook_deliveries`, `get_webhook_delivery`
+  - el client MCP gana timeout configurable (`GREENHOUSE_MCP_REQUEST_TIMEOUT_MS`, default `15000`) y valida runtime el contrato `platform-health.v1` antes de responder `ok`
+  - `route-contract.test.ts` de ecosystem ahora cubre `health` y las rutas read-only del control plane
+  - los commands MCP sobre subscriptions/deliveries siguen fuera de scope; no se abren writes en este corte
+
+- `TASK-647` cierra el primer MCP server oficial read-only de Greenhouse:
+  - runtime nuevo en `src/mcp/greenhouse/**` + `scripts/run-greenhouse-mcp.ts`
+  - script local `pnpm mcp:greenhouse`
+  - tools V1: `get_context`, `list_organizations`, `get_organization`, `list_capabilities`, `get_integration_readiness`
+  - downstream exclusivo de `api/platform/ecosystem/*`, sin SQL directo ni writes
+  - preserva `requestId`, `apiVersion`, `status` y errores machine-readable del carril ecosystem
+  - `.vscode/mcp.json` registra el server local sin embutir secrets, con inputs para `GREENHOUSE_MCP_API_BASE_URL`, `GREENHOUSE_MCP_CONSUMER_TOKEN`, `GREENHOUSE_MCP_EXTERNAL_SCOPE_TYPE` y `GREENHOUSE_MCP_EXTERNAL_SCOPE_ID`
+  - `docs/documentation/plataforma/api-platform-ecosystem.md` y `project_context.md` quedan sincronizados con el runtime operativo
+
+- `TASK-694` aterriza la primera foundation runtime de Deep Links en `src/lib/navigation/deep-links/**`: referencias semánticas ahora pueden resolverse a `href`, `absoluteUrl`, `canonicalPath`, fallback y metadata de acceso reutilizando `VIEW_REGISTRY`, `portalHomePath` y access metadata existente.
+- El contrato inicial cubre `home`, `ops_health`, `person`, `quote`, `income`, `expense`, `leave_request`, `payroll_period` y `public_quote_share`.
+- `payroll_period` queda alineado con la realidad del portal en `/hr/payroll/periods/:periodId`.
+- Se migraron dos consumers de bajo riesgo sin romper `actionUrl` legacy:
+  - `src/app/api/admin/teams/test/route.ts` ahora genera el CTA de Teams via resolver canónico.
+  - `src/lib/webhooks/consumers/notification-mapping.ts` ya resuelve selectivamente `person`, `income` y `expense` desde el registry nuevo.
+- Se agregaron tests unitarios para precedence de base URL, encoding/fallback y drift guard contra `VIEW_REGISTRY`.
 
 - ICO Engine AI predictions ahora derivan el progreso del mes desde `generatedAt` en timezone `America/Santiago`, no desde el reloj implícito del runner. Esto vuelve reproducibles las predicciones end-of-month y evita drift entre replays, materializaciones y CI.
 - Se agregó `src/lib/calendar/business-time.ts` como helper reusable para contexto temporal de negocio, y la materialización AI de ICO ahora reutiliza el mismo contexto temporal explícito tanto para construir predicciones como para hidratar actuals del período vigente.
@@ -622,7 +819,7 @@ Refs: TASK-696, branch `task/TASK-696-smart-home-v2-enterprise` (4 commits).
 
 ### 2026-04-26 — Greenhouse Deep Link Platform architecture
 
-Nueva spec canonica `docs/architecture/GREENHOUSE_DEEP_LINK_PLATFORM_V1.md`: formaliza deep links como referencias semanticas access-aware, con resolver central objetivo para web, email, Teams, mobile, public share, API y MCP. El contrato exige declarar `viewCode` y `requiredCapabilities` cuando apliquen, evitando seguir repartiendo strings de URL en menus, notificaciones, emails, search y cards. Implementacion registrada como `TASK-694` en `docs/tasks/to-do/TASK-694-deep-link-platform-foundation.md`.
+Nueva spec canonica `docs/architecture/GREENHOUSE_DEEP_LINK_PLATFORM_V1.md`: formaliza deep links como referencias semanticas access-aware, con resolver central objetivo para web, email, Teams, mobile, public share, API y MCP. El contrato exige declarar `viewCode` y `requiredCapabilities` cuando apliquen, evitando seguir repartiendo strings de URL en menus, notificaciones, emails, search y cards. Implementacion registrada como `TASK-694` en `docs/tasks/complete/TASK-694-deep-link-platform-foundation.md`.
 
 ### 2026-04-26 — TASK-690 Notification Hub Architecture Contract + sinergia con TASK-671
 
@@ -4925,6 +5122,24 @@ Validations: tsc 0 errors, lint 0 errors, 427 files / 2225 tests pass / 5 skippe
 - La creación de período de nómina ahora también puede capturar `taxTableVersion`, mientras la `UF` sigue autohidratándose.
 - Hallazgo funcional documentado: el módulo sí calcula con salario base, conectividad y bonos variables (`OTD`, `RpA`, `bonusOtherAmount`) y descuenta ausencias/licencias no pagadas, pero todavía no modela un catálogo genérico de bonos fijos recurrentes aparte de `remoteAllowance`.
 
+### Payroll tax table auto-resolution hardening
+
+- La creación de períodos de nómina ya no depende de que el operador conozca manualmente una `taxTableVersion` interna para Chile.
+- Greenhouse ahora intenta resolver automáticamente la tabla tributaria sincronizada del mes imputable al crear, editar, revisar readiness, calcular y recalcular nómina.
+- La UI dejó de sugerir el placeholder legacy `SII-*`; ahora muestra la versión esperada como referencia informativa y deja el override manual solo como camino avanzado.
+- Si no existe una tabla tributaria sincronizada para ese mes, el período igual puede crearse como borrador, pero el sistema bloquea el cálculo con un mensaje explícito en vez de fallar de forma ambigua o degradar el impuesto a `0`.
+- `reverse-quote` también valida que exista una tabla tributaria Chile sincronizada para el mes antes de cotizar remuneración inversa.
+
+### Payroll readiness now matches the real calculation contract
+
+- `Payroll` ya no mezcla “entries materializadas” con “colaboradores elegibles”: un período en `Borrador` puede mostrar roster elegible antes de generar `payroll_entries`, y la UI lo refleja sin caer en el falso `0 colaboradores`.
+- Se agregó un helper canónico `src/lib/payroll/compensation-requirements.ts` para decidir, por compensación, cuándo realmente se requieren `KPI ICO`, cuándo la asistencia/licencias afecta pago y cuándo Chile necesita tabla tributaria.
+- `readiness` ahora bloquea solo por `KPI ICO` faltante cuando la compensación sí depende de bono variable (`OTD`/`RpA`), y solo por asistencia/licencias faltantes cuando esa señal realmente puede cambiar el monto calculado.
+- Se eliminaron falsos positivos operativos en casos como `honorarios`, `Deel` o compensaciones sin exposición a bono KPI.
+- El cálculo oficial ahora falla antes de persistir entries si falta `KPI ICO` o asistencia en colaboradores donde esas fuentes sí son obligatorias para el cálculo.
+- El read-model de compensaciones deja de devolver `missingCompensationMemberIds = [null]`; ahora expone el `memberId` real del colaborador fuera de cálculo.
+- `sync-previred` queda programado en `vercel.json`, y cada corrida registra `source_sync_runs` para que el detector `previred_sync_freshness` vuelva a tener observabilidad real sobre `finished_at`.
+
 ### Economic indicators migration + historical backfill
 
 - Ejecutada la migration `scripts/migrations/add-economic-indicators.sql` para materializar `greenhouse_finance.economic_indicators`.
@@ -7606,3 +7821,18 @@ Validations: tsc 0 errors, lint 0 errors, 427 files / 2225 tests pass / 5 skippe
 - Product Catalog Sync: completed the Greenhouse-first identity cutover for HubSpot products. The materializer now promotes legacy `hubspot_imported` survivors in place when `legacy_sku = product_code`, the outbound bridge now does `bind-first` before `create`, and `hubspot_product_id` is guarded by a unique partial index.
 - Added `pnpm product-catalog:materialize-and-sync` as the operational command to rematerialize the canonical catalog from Greenhouse sources and then sync/bind survivors into HubSpot without importing HubSpot-only products back into Greenhouse.
 - Executed the live cutover: HubSpot moved from `36` legacy products with `0` `gh_*` markers to `74` active products with `74` `gh_*` markers, and local `product_catalog` was cleaned from `36` `hubspot_imported` rows down to `0`.
+### 2026-04-30 — Manual Teams Announcement helper canonico para Greenhouse TeamBot
+
+Se agrego un helper reusable para anuncios manuales del TeamBot Greenhouse, pensado para evitar futuros envios ad hoc desde scripts temporales o conectores personales. El flujo ahora tiene destino registrado en codigo (`eo-team`), validacion estructural del mensaje, `dry-run`, confirmacion explicita con `--yes`, card builder consistente y audit trail en `source_sync_runs`.
+
+Artefactos nuevos:
+- `src/config/manual-teams-announcements.ts`
+- `src/lib/communications/manual-teams-announcements.ts`
+- `scripts/send-manual-teams-announcement.ts`
+- `docs/operations/manual-teams-announcements.md`
+
+Comando operativo:
+- `pnpm teams:announce`
+# 2026-05-03
+
+- Docs operativos: se formalizo `SOLUTION_QUALITY_OPERATING_MODEL_V1` como contrato transversal anti-parche para agentes, enlazado desde `AGENTS.md`, `CLAUDE.md`, `TASK_PROCESS`, prompt Codex y modelos operativos.

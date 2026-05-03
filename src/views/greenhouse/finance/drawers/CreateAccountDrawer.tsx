@@ -261,7 +261,7 @@ const CreateAccountDrawer = ({ open, onClose, onSuccess }: Props) => {
               onChange={e => setAccountId(e.target.value)}
               required
               helperText='Se genera automaticamente. Puedes editarlo.'
-              sx={{ '& input': { fontFamily: 'monospace', fontSize: '0.85rem' } }}
+              sx={{ '& input': { fontSize: '0.85rem' } }}
             />
           </Grid>
 

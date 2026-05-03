@@ -496,7 +496,6 @@ const AuditLogTimelineView = ({ canRevert = false }: AuditLogTimelineViewProps) 
                             <Typography
                               variant='caption'
                               sx={{
-                                fontFamily: 'monospace',
                                 fontSize: '0.75rem',
                                 color: 'text.secondary'
                               }}

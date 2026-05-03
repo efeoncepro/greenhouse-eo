@@ -623,7 +623,7 @@ const FinanceDashboardView = () => {
     return (
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
         <Box>
-          <Typography variant='h4' sx={{ fontFamily: 'Poppins, sans-serif', fontWeight: 600, mb: 1 }}>
+          <Typography variant='h4' sx={{ fontWeight: 600, mb: 1 }}>
             Finanzas
           </Typography>
           <Typography variant='body2' color='text.secondary'>
@@ -657,7 +657,7 @@ const FinanceDashboardView = () => {
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
       {/* Page header */}
       <Box>
-        <Typography variant='h4' sx={{ fontFamily: 'Poppins, sans-serif', fontWeight: 600, mb: 1 }}>
+        <Typography variant='h4' sx={{ fontWeight: 600, mb: 1 }}>
           Finanzas
         </Typography>
         <Typography variant='body2' color='text.secondary'>
@@ -1069,25 +1069,25 @@ const FinanceDashboardView = () => {
                     <Divider />
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                       <Typography variant='body2' color='text.secondary'>Total bruto</Typography>
-                      <Typography variant='body1' sx={{ fontFamily: 'monospace', fontWeight: 600 }}>
+                      <Typography variant='body1' sx={{ fontWeight: 600 }}>
                         {formatCLP(pnl.payroll.totalGross)}
                       </Typography>
                     </Box>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                       <Typography variant='body2' color='text.secondary'>Total líquido</Typography>
-                      <Typography variant='body1' sx={{ fontFamily: 'monospace', fontWeight: 600 }}>
+                      <Typography variant='body1' sx={{ fontWeight: 600 }}>
                         {formatCLP(pnl.payroll.totalNet)}
                       </Typography>
                     </Box>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                       <Typography variant='body2' color='text.secondary'>Descuentos legales</Typography>
-                      <Typography variant='body1' sx={{ fontFamily: 'monospace' }}>
+                      <Typography variant='body1'>
                         {formatCLP(pnl.payroll.totalDeductions)}
                       </Typography>
                     </Box>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                       <Typography variant='body2' color='text.secondary'>Bonos</Typography>
-                      <Typography variant='body1' sx={{ fontFamily: 'monospace' }}>
+                      <Typography variant='body1'>
                         {formatCLP(pnl.payroll.totalBonuses)}
                       </Typography>
                     </Box>
@@ -1278,7 +1278,7 @@ const movementColumns: any[] = [
     cell: ({ getValue, row }) => (
       <Box>
         <Typography variant='body2' fontWeight={500}>{getValue()}</Typography>
-        <Typography variant='caption' color='text.secondary' sx={{ fontFamily: 'monospace', fontSize: '0.7rem' }}>{row.original.id}</Typography>
+        <Typography variant='caption' color='text.secondary' sx={{ fontSize: '0.7rem' }}>{row.original.id}</Typography>
       </Box>
     ),
     meta: { minWidth: 300 }

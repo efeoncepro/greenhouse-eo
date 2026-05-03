@@ -56,6 +56,8 @@ export const TAB_PERMISSIONS: Record<PersonTab, string[]> = {
   activity: [ROLE_CODES.EFEONCE_ADMIN, ROLE_CODES.EFEONCE_OPERATIONS],
   memberships: [ROLE_CODES.EFEONCE_ADMIN, ROLE_CODES.EFEONCE_OPERATIONS],
   economy: [ROLE_CODES.EFEONCE_ADMIN, ROLE_CODES.HR_PAYROLL, ROLE_CODES.FINANCE_ADMIN],
+  // TASK-749: tab "Pago" — fuente primaria del Beneficiary Payment Profile del miembro.
+  payment: [ROLE_CODES.EFEONCE_ADMIN, ROLE_CODES.FINANCE_ADMIN, ROLE_CODES.FINANCE_ANALYST],
   'ai-tools': [ROLE_CODES.EFEONCE_ADMIN, ROLE_CODES.EFEONCE_OPERATIONS]
 }
 
@@ -64,6 +66,7 @@ export const TAB_CONFIG: Array<{ value: PersonTab; label: string; icon: string }
   { value: 'activity', label: 'Actividad', icon: 'tabler-chart-dots' },
   { value: 'memberships', label: 'Organizaciones', icon: 'tabler-building' },
   { value: 'economy', label: 'Economia', icon: 'tabler-wallet' },
+  { value: 'payment', label: 'Pago', icon: 'tabler-id-badge' },
   { value: 'ai-tools', label: 'Herramientas', icon: 'tabler-wand' }
 ]
 

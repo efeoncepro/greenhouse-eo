@@ -286,7 +286,7 @@ const PersonFinanceTab = ({ memberId }: Props) => {
                         </Box>
                       </TableCell>
                       <TableCell align='right'>
-                        <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
+                        <Typography variant='body2'>
                           {formatCLP(row.attributedCostClp)}
                         </Typography>
                       </TableCell>
@@ -347,12 +347,12 @@ const PersonFinanceTab = ({ memberId }: Props) => {
                         </Typography>
                       </TableCell>
                       <TableCell align='right'>
-                        <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
+                        <Typography variant='body2'>
                           {formatCLP(entry.grossTotal)}
                         </Typography>
                       </TableCell>
                       <TableCell align='right'>
-                        <Typography variant='subtitle2' sx={{ fontFamily: 'monospace', fontWeight: 700 }}>
+                        <Typography variant='subtitle2' sx={{ fontWeight: 700 }}>
                           {formatCLP(entry.netTotal)}
                         </Typography>
                       </TableCell>

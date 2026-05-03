@@ -1,0 +1,667 @@
+# Greenhouse Payment Orders Architecture V1
+
+## Delta 2026-05-01 — TASK-751: Payroll Settlement Orchestration + Reconciliation Wireup (V1)
+
+Cierra el ciclo end-to-end: cuando una `payment_order` (TASK-750) pasa a
+`state='paid'`, un projection consumer reactive crea automaticamente
+`expense_payment` + `settlement_leg` por cada line payroll, dejando el
+flujo listo para ser conciliado por TASK-722.
+
+### Schema (aditivo, migration 20260501163149826)
+
+- `expense_payments.payment_order_line_id` (TEXT, nullable, FK ON DELETE SET NULL): link al line que dispara el pago. NULL para pagos legacy.
+- `payment_order_lines.expense_payment_id` (TEXT, nullable, FK ON DELETE SET NULL): link reverse para queries fast.
+- Partial unique index sobre `expense_payments.payment_order_line_id WHERE payment_order_line_id IS NOT NULL AND superseded_by_payment_id IS NULL AND superseded_by_otb_id IS NULL`: idempotency atomica — un unico expense_payment vivo por line.
+
+### Helpers TS
+
+- `recordPaymentForOrder({orderId})` en `src/lib/finance/payment-orders/record-payment-from-order.ts`: itera lines de una order paid, resuelve expense_id desde `(payroll_period_id, member_id)`, llama `recordExpensePayment` con `paymentOrderLineId`. V1 procesa solo `source_kind='payroll' AND obligation_kind='employee_net_pay'`. Otros kinds quedan `skipped` con reason claro.
+- `getPayrollPaymentStatusForPeriod(periodId)` en `src/lib/finance/payment-orders/payroll-status-reader.ts`: read-only compose entre payroll_entries + payment_obligations + payment_order_lines + payment_orders + expense_payments. Deriva 10 estados downstream sin escribir.
+- `recordExpensePayment` extendido con `paymentOrderLineId?: string | null` opcional.
+
+### Projection consumer reactive
+
+`recordExpensePaymentFromOrderProjection` registrado en projection-registry. Trigger event `finance.payment_order.paid` (agregado a `REACTIVE_EVENT_TYPES`). maxRetries: 2.
+
+### State machine downstream (10 estados read-only)
+
+`no_obligation` / `awaiting_order` / `order_pending_approval` / `order_approved` / `order_scheduled` / `order_submitted` / `order_paid_unreconciled` / `reconciled` / `closed` / `blocked_no_profile`.
+
+### API
+
+`GET /api/admin/finance/payment-orders/payroll-status?periodId=X` retorna `PayrollPeriodDownstreamSummary` con KPIs + byEntry. Auth `requireFinanceTenantContext`.
+
+### UI
+
+- `<PayrollPaymentStatusCard periodId>` con 4 KPIs (Obligaciones, Ordenes pagadas, Conciliadas, Bloqueadas) + Alert con drift cuando `totalBlocked>0` linkeando a `/finance/payment-profiles`.
+- Mount en `PayrollPeriodTab` despues de KPIs principales.
+- Columna "Estado pago" en `PayrollEntryTable` con chip por entry. Fetch compartido con la card.
+- Seccion "Origen Payroll" en `OrderDetailDrawer` cuando `order.periodId` presente, con link a `/hr/payroll?periodId=X`.
+
+### Reglas duras
+
+- **Read-only para Payroll**: el reader NO muta `payroll_entries`. El calculo no se toca.
+- **Idempotency**: partial unique index + check `expense_payment_id` previo previenen duplicados.
+- **V1 enfoque**: solo `employee_net_pay`. Otros kinds (employer_social_security consolidado, processor_fee, fx_component) quedan en path legacy del operator.
+- **Reliquidacion**: `payrollReliquidationDeltaProjection` (TASK-411) ya crea expense delta; equivalente para obligations queda en TASK-755 V2.
+
+### Coexistencia
+
+- `payroll-expense-reactive.ts` (TASK-411) sigue creando expenses pendientes. **No se reemplaza.**
+- `recordExpensePayment` (TASK-693) sigue siendo unico path para payments + legs. **No se duplica.**
+- TASK-722 Reconciliation: cruza expense_payments contra bank_statement_rows como antes. `payment_order_line_id` nuevo es audit, no afecta matching.
+
+## Delta 2026-05-01 — TASK-749: Beneficiary Payment Profiles + Routing Resolver (V1)
+
+Cierra la pieza "por qué rail pagar a este beneficiario" con un modelo
+**dual-surface**: un componente UI reutilizable montado en 3 lugares con la
+misma fuente de verdad backend.
+
+### Schema
+
+- `greenhouse_finance.beneficiary_payment_profiles` — perfil versionado
+  (status: `draft`, `pending_approval`, `active`, `superseded`, `cancelled`)
+  con maker-checker triple defensa (DB trigger + helper TS + UI). Idempotency
+  partial unique index sobre `(space, beneficiary_type, beneficiary_id, currency) WHERE status='active'`.
+- `greenhouse_finance.beneficiary_payment_profile_audit_log` — append-only
+  con actions `created/updated/approved/superseded/cancelled/revealed_sensitive`,
+  IP/UA, motivo, diff JSON.
+
+### Helpers TS canónicos
+
+- `createPaymentProfile(input)` — crea en `pending_approval` (default).
+- `approvePaymentProfile(input)` — transiciona a `active`. Si existe otro
+  `active` para la misma key, lo supersede atomicamente en la misma tx.
+- `cancelPaymentProfile(input)` — solo desde estados no-terminales.
+- `revealPaymentProfileSensitive(input)` — devuelve `accountNumberFull` +
+  `vaultRef` + audit + outbox. Capability `finance.payment_profiles.reveal_sensitive`
+  obligatorio + motivo (5+ chars) + IP/UA capturados.
+- `getActivePaymentProfile({...})` — lookup canónico por (space, beneficiary, currency).
+- `getPaymentProfileDriftForActiveObligations()` — beneficiarios con obligaciones
+  vivas sin perfil activo (bloquea Payment Orders).
+- `getPaymentProfileQueueSummary()` — snapshot consolidado: counts + pending
+  list + drift rows. Una sola llamada para la surface ops.
+
+### Routing resolver
+
+`resolvePaymentRoute(obligation, context)` en `src/lib/finance/payment-routing/`:
+
+- **Cascada**: validar beneficiary_type ∈ {member, shareholder} → buscar
+  `active` → si no, buscar `pending_approval` → si no, `profile_missing`.
+- **Outcomes**: `resolved`, `profile_missing`, `profile_pending_approval`,
+  `unsupported_currency`, `unsupported_beneficiary_type`.
+- **Output**: `{providerSlug, paymentMethod, paymentInstrumentId, profileId, reason, resolvedAt}`.
+- **Wireup en `createPaymentOrderFromObligations`**: cuando el caller no
+  entrega `processorSlug/paymentMethod`, el resolver corre solo para
+  `beneficiary_type='member'` y guarda snapshot por line en
+  `payment_orders.metadata_json.routing_snapshots`. El primer `resolved`
+  gana como header de la order.
+
+### Modelo UI dual-surface
+
+- **Componente reutilizable**: `<PaymentProfilesPanel>` en
+  `src/views/greenhouse/finance/payment-profiles/PaymentProfilesPanel.tsx`.
+  Recibe `constrainedBeneficiary?: {type, id, name?, countryCode?}` para
+  pre-llenar el dialog y filtrar la tabla.
+- **Mount 1 — Person 360 (fuente primaria de personas)**: tab "Pago" en
+  `src/views/greenhouse/people/tabs/PersonPaymentTab.tsx`. Permiso
+  `canViewPaymentProfile` (efeonce_admin / finance_admin / finance_analyst).
+- **Mount 2 — Shareholder 360 (fuente primaria de accionistas)**: sección en
+  `ShareholderAccountDetailDrawer.tsx` cuando hay `profileId` (identity_profile).
+- **Mount 3 — Surface ops** (`/finance/payment-profiles`): NO duplica CRUD.
+  Cubre 3 jobs cross-cutting: cola de aprobación, drift card de
+  obligaciones bloqueadas, tabla universal read-only con deep links a los 360.
+
+### API admin
+
+- `GET /api/admin/finance/payment-profiles` — list con filtros.
+- `POST /api/admin/finance/payment-profiles` — create.
+- `GET /api/admin/finance/payment-profiles/:id` — detalle (masked).
+- `POST /api/admin/finance/payment-profiles/:id/{approve,cancel,reveal-sensitive}` — actions.
+- `GET /api/admin/finance/payment-profiles/:id/audit` — log.
+- `GET /api/admin/finance/payment-profiles/queue` — counts + pending + drift (snapshot ops).
+- `POST /api/admin/finance/payment-routing/preview` — resuelve sin escribir.
+
+### Permisos / Capabilities
+
+4 nuevas en `entitlements-catalog.ts`:
+- `finance.payment_profiles.read`
+- `finance.payment_profiles.create` (create + update)
+- `finance.payment_profiles.approve` (update)
+- `finance.payment_profiles.reveal_sensitive` (read; gateado por motivo + audit)
+
+View code `finanzas.perfiles_pago` seedado para 4 roles finanzas
+(migration `20260501151806364`).
+
+### Eventos outbox emitidos
+
+- `finance.beneficiary_payment_profile.created`
+- `finance.beneficiary_payment_profile.updated`
+- `finance.beneficiary_payment_profile.approved`
+- `finance.beneficiary_payment_profile.superseded`
+- `finance.beneficiary_payment_profile.cancelled`
+- `finance.beneficiary_payment_profile.revealed_sensitive`
+
+### Reglas duras
+
+- **Datos sensibles enmascarados por default**: `account_number_full` y
+  `vault_ref` solo se devuelven via `reveal-sensitive` con capability + motivo + audit.
+- **Maker-checker triple defensa**: trigger DB + helper TS + UI bloquea botón
+  cuando `created_by == approver`.
+- **Idempotency**: partial unique index garantiza solo 1 `active` por (space,
+  beneficiary_type, beneficiary_id, currency). Aprobar nuevo automaticamente
+  supersede el anterior atómicamente.
+- **V1 enfoque**: `beneficiary_type ∈ {member, shareholder}`. Otros tipos
+  (supplier, tax_authority, processor) se aceptan en CHECK constraint para
+  forward compat pero no son creables via helper en V1.
+- **Country fallback**: profile.country → member.location_country → identity_profile → 'CL' default.
+- **vault_ref como contrato futuro**: V1 placeholder; cuando emerja vault
+  externo, `account_number_full` puede ser NULL y la fuente canónica es el vault.
+
+Spec consumer downstream: TASK-750 ya integrado vía resolver wireup.
+
+## Delta 2026-05-01 — TASK-750: Payment Orders + Lines + Artifacts (runtime V1)
+
+Cierra la capa runtime entre `payment_obligations` y el pago real. Tres tablas
+nuevas, helpers core, API admin, UI con tabs (Obligaciones / Órdenes / Calendario
+/ Eventos) y entrada de menú dedicada.
+
+### Schema
+
+- `greenhouse_finance.payment_orders` — orden auditada con `state` machine de 10
+  estados (`draft` → `pending_approval` → `approved` → `scheduled` → `submitted`
+  → `paid` → `settled` → `closed`; ramas `failed` / `cancelled`).
+- `greenhouse_finance.payment_order_lines` — vincula 1:1 a obligations.
+  Idempotency partial unique index sobre `obligation_id WHERE state NOT IN
+  ('cancelled','failed')` lockea una obligation a UNA orden viva a la vez.
+- `greenhouse_finance.payment_order_artifacts` — batch CSV / receipt / proof
+  con `content_hash` SHA-256 + `download_log_json` para audit completo.
+
+### Reglas duras
+
+- **Maker-checker**: `approved_by != created_by` cuando `require_approval=TRUE`.
+  Triple defensa: trigger DB + helper TS + UI bloquea botón.
+- **Currency uniforme**: V1 no soporta orders con monedas mixtas. Crear una
+  orden por moneda (CLP separada de USD).
+- **Cancelar libera locks**: cancelar order marca lines como `cancelled` y
+  restituye obligations a `generated` (las suelta para nueva orden).
+- **Order aprobada inmuta**: cambios crean nueva order + cancel de la anterior
+  via `superseded_by`. No se mutan amounts ni beneficiarios in-place.
+- **Cascade en mark-paid**: marca solo obligations cuyas lines TODAS quedaron
+  pagadas (soporte futuro a partial payments multi-line).
+
+### Helpers TS canónicos
+
+- `createPaymentOrderFromObligations(input)` — locking transaccional + outbox.
+- `approvePaymentOrder(input)` — maker-checker + outbox.
+- `schedulePaymentOrder({ orderId, scheduledFor })` — fecha calendario.
+- `submitPaymentOrder({ orderId, externalReference? })` — marca enviada.
+- `markPaymentOrderPaid({ orderId, paidAt?, externalReference? })` — cierra
+  ciclo runtime (la conciliación bancaria sigue siendo TASK-722).
+- `cancelPaymentOrder({ orderId, reason })` — libera locks.
+
+### Payment Calendar reader
+
+- `listPaymentCalendarItems(filters)` compone obligations + orders con un
+  `calendar_state` derivado en SQL (overdue, ready_to_schedule, scheduled,
+  submission_due, awaiting_confirmation, awaiting_reconciliation, closed).
+- Solo lectura; no recalcula montos. Filtros por space/period/currency/date
+  range/calendar_state/item_kind.
+
+### API admin
+
+- `GET /api/admin/finance/payment-orders` — listar con filtros + paginación.
+- `POST /api/admin/finance/payment-orders` — crear orden desde obligationIds.
+- `GET /api/admin/finance/payment-orders/:id` — detalle con lines + artifacts.
+- `POST /api/admin/finance/payment-orders/:id/{approve,cancel,schedule,submit,mark-paid}` — actions.
+- `GET /api/admin/finance/payment-orders/kpis` — KPIs del header.
+- `GET /api/admin/finance/payment-calendar` — calendar reader.
+
+### Permisos / View Registry
+
+- View code: `finanzas.ordenes_pago` (route_path `/finance/payment-orders`).
+- Roles seed: `efeonce_admin`, `finance_admin`, `finance_manager`,
+  `finance_analyst` (migration `20260501145618269`).
+- Guard de página: `hasRouteGroup('finance')` || `EFEONCE_ADMIN`.
+- Guard de API: `requireFinanceTenantContext`.
+
+### Eventos outbox emitidos
+
+- `finance.payment_order.created`
+- `finance.payment_order.approved`
+- `finance.payment_order.scheduled`
+- `finance.payment_order.submitted`
+- `finance.payment_order.paid`
+- `finance.payment_order.cancelled`
+- `finance.payment_order_artifact.generated` (V2)
+- `finance.payment_order_artifact.downloaded` (V2)
+
+### Coexistencia con expenses + reconciliation
+
+- `expense_payments` (TASK-722) sigue siendo la fuente de verdad del cash flow
+  efectivo. `mark-paid` NO crea automáticamente `expense_payments` en V1 — eso
+  queda en TASK-751 cuando se integre con el motor de reconciliation.
+- `payment_orders` es la capa runtime de planificación + aprobación + envío.
+- `payment_obligations` (TASK-748) es la capa de obligación componentizada.
+
+### UI canónica
+
+- Page: `/finance/payment-orders` (`src/app/(dashboard)/finance/payment-orders/page.tsx`).
+- View: `src/views/greenhouse/finance/payment-orders/PaymentOrdersView.tsx`.
+- 4 tabs: Obligaciones (selección bulk + create), Órdenes (tabla con drawer detail),
+  Calendario, Eventos (catálogo).
+- DataTableShell + EmptyState + sonner toasts. Bulk action bar con
+  `role='status' aria-live='polite'`.
+- Detail drawer: lineas + acciones contextuales por estado + audit timeline.
+
+Spec consumers downstream: TASK-751 (reconciliation runtime — wireup `expense_payments`
+desde order paid), TASK-752 (artifacts batch CSV generator).
+
+## Delta 2026-05-01 — TASK-748: Payment Obligations Foundation
+
+Se introduce la primera capa canonica del programa Payment Orders: la tabla
+`greenhouse_finance.payment_obligations` que componentiza obligaciones financieras
+generadas por sources upstream (payroll, supplier_invoice, tax_obligation, manual,
+reliquidation_delta) sin reemplazar el ledger `expenses`.
+
+Schema canonico (migration `20260501140545647_task-748-payment-obligations.sql`):
+
+- PK `obligation_id` TEXT.
+- `source_kind` ∈ payroll | supplier_invoice | tax_obligation | manual | reliquidation_delta.
+- `obligation_kind` ∈ employee_net_pay | employer_social_security | employee_withheld_component | provider_payroll | processor_fee | fx_component | manual.
+- `beneficiary_type` ∈ member | supplier | tax_authority | processor | other.
+- `status` ∈ generated | scheduled | partially_paid | paid | reconciled | closed | cancelled | superseded.
+- `currency` ∈ CLP | USD; `amount` NUMERIC(14,2) >= 0.
+- `space_id` NULLABLE en V1 hasta que emerja resolver canonico member→space.
+
+Idempotency partial unique: `(source_kind, source_ref, obligation_kind, beneficiary_id, COALESCE(period_id,'__no_period__')) WHERE status NOT IN ('superseded','cancelled')`. Re-export del mismo periodo no duplica obligations.
+
+Inmutabilidad: rows con `paid|partially_paid|reconciled|closed` no pueden ser supersedidas; el caller emite un nuevo row tipo `reliquidation_delta` independiente.
+
+### Materializer Payroll (`materializePayrollObligationsForExportedPeriod`)
+
+Corre como projection consumer de `payroll_period.exported`. Por cada `payroll_entry` activo:
+
+| Caso | obligation_kind | amount | beneficiary | currency |
+|---|---|---|---|---|
+| Chile dependiente / international internal | `employee_net_pay` | `net_total` | member | entry.currency |
+| Honorarios + sii_retention > 0 | `employee_withheld_component` | `sii_retention_amount` | tax_authority `cl_sii` | CLP |
+| `payroll_via='deel'` | `provider_payroll` | 0 placeholder + metadata.referenceNet | member | entry.currency |
+
+Y al final del periodo:
+
+| Caso | obligation_kind | amount | beneficiary |
+|---|---|---|---|
+| Σ chile_employer_total_cost > 0 | `employer_social_security` | total CLP | supplier Previred si existe, sino `cl_previred` |
+
+### Coexistencia con expenses (NO reemplazo)
+
+`finance_expense_reactive_intake` (TASK-411) sigue corriendo. Ambas projections consumen `payroll_period.exported`:
+
+- `expenses` mantiene devengo P&L + su state machine `payment_status` (legacy).
+- `payment_obligations` introduce la capa explicita "que se debe pagar" con state machine de pago propia.
+- `getPaymentObligationsDrift(periodId)` compara conteos para detectar gaps de cobertura.
+
+### Outbox events emitidos
+
+- `finance.payment_obligation.generated` (aggregate_type=`payment_obligation`) — consumers futuros: TASK-750 payment_orders, TASK-751 reconciliation, reliability AI Observer.
+- `finance.payment_obligation.superseded` — audit chain + delta reporting.
+
+Cada evento se publica DENTRO de la misma transaccion del INSERT/UPDATE via `publishOutboxEvent(client)`.
+
+### Reglas duras
+
+- **NUNCA** modificar `calculate-payroll.ts` ni `payroll_entries.net_total` desde el modulo de obligations.
+- **NUNCA** supersedir una obligation con status `paid|partially_paid|reconciled|closed`. Emitir nueva con `source_kind='reliquidation_delta'`.
+- **NUNCA** emitir `payment_obligation.generated` fuera de transaction; el outbox event acompaña al INSERT en la misma tx.
+- **NUNCA** crear obligations sin idempotency key canonica.
+- **NUNCA** materializar obligations Chile-dependientes para `payroll_via='deel'` (TASK-744 boundary). Placeholder es `provider_payroll` con amount=0.
+- Cuando emerja resolver de `member.space_id`, popular obligations via UPDATE batch — campo NULLABLE para permitirlo.
+
+Files owned: `src/lib/finance/payment-obligations/`, `src/lib/sync/projections/payment-obligations-from-payroll.ts`, `src/types/payment-obligations.ts`.
+Endpoints: `GET /api/admin/finance/payment-obligations`, `GET /api/admin/finance/payment-obligations/drift?periodId=YYYY-MM`.
+Tests: 5/5 row-mapper passing. Materializer + projection covered por smoke con re-export real.
+
+Spec consumer: TASK-750 (payment_orders) lee de aqui.
+
+## Objetivo
+
+Definir el contrato canónico para **Órdenes de Pago** en Greenhouse: una capa de Tesorería dentro de Finance que convierte obligaciones financieras en pagos ejecutables, auditables y conciliables, sin mover la responsabilidad de cálculo hacia Payroll ni hacia otros módulos originadores.
+
+Regla madre:
+
+```text
+Payroll calcula y exporta obligaciones.
+Finance/Tesorería planifica, aprueba, paga, liquida y concilia.
+```
+
+El módulo nace por una brecha real: una nómina exportada no significa que esté pagada, y una nómina puede requerir múltiples salidas de caja por distintos instrumentos, plataformas y processors.
+
+## Placement
+
+`Payment Orders` pertenece a `greenhouse_finance`, específicamente al subdominio operativo de **Tesorería / Cash Operations**.
+
+No pertenece a `greenhouse_payroll` porque:
+
+- Payroll debe seguir siendo owner del cálculo, snapshots, recibos y lifecycle `draft -> calculated -> approved -> exported`.
+- La selección de cuenta pagadora, plataforma, batch, evidencia bancaria, settlement y conciliación son responsabilidades de Finance/Tesorería.
+- El mismo patrón debe servir también para proveedores, impuestos, anticipos, préstamos, reembolsos y cuenta corriente accionista.
+
+## Problema Actual
+
+Hoy `payroll_period.exported` dispara `finance_expense_reactive_intake` y materializa:
+
+- un `expense_type='payroll'` por colaborador usando `payroll_entries.net_total`;
+- un `expense_type='social_security'` consolidado para Previred usando `chile_employer_total_cost`.
+
+Esos expenses quedan `payment_status='pending'`, lo cual es correcto como obligación, pero el sistema no modela explícitamente:
+
+- qué componente de la nómina se debe pagar;
+- qué beneficiario real recibirá el dinero;
+- qué instrumento o plataforma paga;
+- si el pago fue aprobado, programado, enviado, liquidado o conciliado;
+- si el pago requiere funding, FX, payout, fee o processor;
+- si un colaborador internacional se paga por Deel, Global66, Wise, banco local u otro rail.
+
+## Modelo Canónico
+
+El modelo separa cuatro capas:
+
+```text
+Source Domain
+  -> Payment Obligation
+  -> Payment Order / Payment Batch
+  -> Expense Payment + Settlement Legs
+  -> Bank / Processor Reconciliation
+```
+
+### 1. Source Domain
+
+El módulo originador calcula o registra una obligación económica.
+
+Ejemplos:
+
+- `Payroll`: neto de colaborador, cargas sociales, honorarios, Deel/provider.
+- `Finance Expenses`: proveedor, impuesto, servicio, reembolso.
+- `HR`: anticipo o préstamo aprobado.
+- `Shareholder Current Account`: retiro, devolución o gasto reembolsable.
+
+### 2. Payment Obligation
+
+Representa **qué se debe pagar y por qué**.
+
+Ejemplos de obligaciones Payroll:
+
+- `employee_net_pay`: neto a pagar al colaborador.
+- `employer_social_security`: obligaciones empleador vía Previred.
+- `employee_withheld_component`: montos retenidos al colaborador y pagaderos a terceros cuando el modelo lo abra.
+- `provider_payroll`: obligación hacia Deel/EOR/payroll provider.
+- `processor_fee`: comisión de plataforma o banco.
+- `fx_component`: diferencia o costo cambiario derivado.
+
+La obligación no significa pago. Puede estar pendiente, programada, parcial, pagada, reconciliada o cerrada.
+
+### 3. Payment Order / Payment Batch
+
+Representa **cómo se va a pagar** una o más obligaciones.
+
+Una orden puede ser:
+
+- individual: un colaborador, un proveedor, un impuesto;
+- agrupada: batch de nómina CLP local;
+- por processor: Previred, Deel, Global66;
+- multi-leg: funding + FX + payout + fee.
+
+Una orden puede contener múltiples líneas (`payment_order_lines`) y cada línea referencia una obligación.
+
+### 4. Expense Payment + Settlement Legs
+
+Representa **qué salida de caja ocurrió**.
+
+`expense_payments` sigue siendo el ledger canónico de pagos de gastos. `settlement_groups` y `settlement_legs` modelan la ejecución operativa real:
+
+- `funding`: banco -> plataforma;
+- `fx_conversion`: cambio de moneda;
+- `payout`: plataforma -> beneficiario;
+- `fee`: comisión;
+- `internal_transfer`: cuenta propia -> cuenta propia.
+
+La conciliación bancaria o de processor ocurre contra payments/legs, no contra Payroll directamente.
+
+## Estados
+
+### Payment Obligation
+
+```text
+generated -> scheduled -> partially_paid -> paid -> reconciled -> closed
+                         \-> cancelled
+                         \-> superseded
+```
+
+Semántica:
+
+- `generated`: obligación creada desde un source.
+- `scheduled`: asignada a una orden de pago.
+- `partially_paid`: pagos reales no cubren el total.
+- `paid`: pagos reales cubren el total.
+- `reconciled`: los pagos/legs están conciliados contra banco o processor.
+- `closed`: Finance cerró el caso operativo.
+- `cancelled`: obligación anulada antes de pago real.
+- `superseded`: reemplazada por delta/reliquidación.
+
+### Payment Order
+
+```text
+draft -> pending_approval -> approved -> scheduled -> submitted -> settled -> closed
+                              \-> failed
+                              \-> cancelled
+```
+
+Semántica:
+
+- `draft`: orden generada o editada.
+- `pending_approval`: espera maker-checker.
+- `approved`: lista para programar/enviar.
+- `scheduled`: tiene fecha e instrumento confirmado.
+- `submitted`: instrucción enviada a banco/proveedor.
+- `settled`: proveedor/banco confirma ejecución.
+- `closed`: todos los payments/legs están reconciliados o aceptados.
+- `failed`: banco/proveedor rechazó o no pudo ejecutar.
+- `cancelled`: anulada antes de ejecución.
+
+## Beneficiary Payment Profiles
+
+El beneficiario de un pago no debe inferirse solo desde `member_id`.
+
+`beneficiary_payment_profiles` debe ser una entidad versionada y auditable que resuelva:
+
+- beneficiario: `member`, `supplier`, `tax_authority`, `processor`, `shareholder`, `manual`;
+- moneda esperada;
+- país/jurisdicción;
+- proveedor/rail preferido (`santander`, `global66`, `deel`, `wise`, `previred`, etc.);
+- instrumento pagador recomendado;
+- datos de payout enmascarados o referenciados a vault;
+- vigencia (`active_from`, `active_to`);
+- estado de aprobación;
+- snapshot usado por cada orden.
+
+Casos Payroll:
+
+- Chile dependiente CLP: transferencia bancaria local al colaborador + Previred separado.
+- Honorarios CLP: pago neto al prestador, retenciones modeladas como obligación separada cuando corresponda.
+- Internacional/Deel: obligación hacia Deel/provider o payout internacional según `payroll_via`.
+- Internacional directo: rail definido por perfil (Global66, Wise, banco, etc.) con FX y fee explícitos.
+
+## Routing Policy
+
+El sistema no debe hardcodear reglas como "internacional = Global66".
+
+Debe existir un resolver policy-driven:
+
+```text
+source_kind
++ beneficiary_type
++ pay_regime
++ payroll_via
++ currency
++ country
++ active beneficiary profile
++ amount/risk policy
+= recommended payment route
+```
+
+La policy puede retornar:
+
+- pago directo desde banco;
+- processor operacional;
+- provider payroll;
+- settlement multi-leg;
+- bloqueo por perfil faltante;
+- requerimiento de aprobación adicional.
+
+## Seguridad
+
+Reglas obligatorias:
+
+- No guardar cuentas bancarias completas en texto plano si puede evitarse.
+- Mostrar identificadores enmascarados por defecto.
+- Revelar datos sensibles solo con permiso, motivo y expiración.
+- Cambios de beneficiary profile requieren maker-checker.
+- Órdenes sobre umbral de monto requieren doble aprobación.
+- Cada descarga de archivo de pago queda auditada.
+- Cada envío/reintento a banco/proveedor usa idempotency key.
+
+## Idempotencia
+
+Dedupe keys recomendadas:
+
+- Payment obligation: `(source_kind, source_ref, obligation_kind, beneficiary_id, period_id)`.
+- Payment order line: `(order_id, obligation_id)`.
+- Payment submission: `(order_id, submission_attempt)`.
+- Provider response: `(provider_slug, provider_reference)`.
+- Bank statement row: fingerprint existente del reconciliation runtime.
+
+Nunca se debe duplicar una obligación o pago por retry de outbox, cron, webhook o exportación.
+
+## Reliquidación y Restatements
+
+Reglas:
+
+- Si una obligación aún no está pagada, puede ser superseded por la nueva obligación calculada.
+- Si ya está pagada, una reliquidación crea obligación delta compensatoria.
+- Si ya está reconciliada/cerrada, nunca se reescribe historia: se crea ajuste en el período actual o delta formal.
+- `Payroll` no muta payments ni settlement legs; emite el delta y Finance decide la operación compensatoria.
+
+## Relación Con Finance Actual
+
+`greenhouse_finance.expenses` sigue representando devengo/gasto operativo.
+
+`expense_payments` sigue representando pagos reales.
+
+`payment_orders` introduce la capa faltante entre ambos:
+
+```text
+expense/payment_obligation pendiente
+  -> payment_order aprobada
+  -> expense_payment registrado
+  -> settlement_legs conciliados
+```
+
+## Payment Calendar
+
+Debe existir un **Calendario de Pagos** como vista operativa de Tesorería.
+
+No reemplaza el calendario operativo de Payroll ni el calendario de cierre financiero. Es una agenda de ejecución de caja:
+
+```text
+payment_obligations.due_date
+  -> payment_orders.scheduled_date
+  -> payment_submissions.submitted_at
+  -> expense_payments.payment_date
+  -> settlement_legs.settled_at / reconciled_at
+```
+
+Debe permitir responder:
+
+- qué obligaciones vencen esta semana;
+- qué órdenes están aprobadas pero no enviadas;
+- qué pagos fueron enviados pero no liquidados;
+- qué pagos están pagados pero no conciliados;
+- qué processors tienen actividad pendiente (Previred, Deel, Global66, etc.);
+- qué pagos son críticos por payroll, impuesto, proveedor o vencimiento legal.
+
+Estados calendarizables:
+
+- `due`: obligación con vencimiento próximo.
+- `ready_to_schedule`: obligación sin orden.
+- `scheduled`: orden aprobada con fecha.
+- `submission_due`: orden debe enviarse hoy o antes de una hora límite.
+- `awaiting_confirmation`: orden enviada sin confirmación de banco/proveedor.
+- `awaiting_reconciliation`: pago registrado sin conciliación.
+- `overdue`: obligación u orden fuera de SLA.
+- `closed`: pago conciliado/cerrado.
+
+Reglas:
+
+- El calendario muestra obligaciones y órdenes, no recalcula montos.
+- Cada item conserva source link: Payroll period/entry, expense, tax, loan, supplier, processor.
+- Cambiar una fecha de pago en el calendario debe pasar por la misma autorización de la orden.
+- Calendario debe soportar cortes por `space_id`, moneda, cuenta/instrumento, processor, beneficiary y source domain.
+- En Payroll, el calendario solo se ve como estado downstream; Payroll no agenda pagos directamente.
+
+## Relación Con Processors
+
+Previred, Deel, Global66, Wise u otros processors no son necesariamente cuentas bancarias con saldo propio.
+
+Reglas:
+
+- El cash vive en la cuenta pagadora real o en el ledger de plataforma si el producto lo modela explícitamente.
+- Un processor puede tener vista operativa de actividad sin inflar saldo.
+- El processor no debe recibir `payment_account_id` si no es cuenta pagadora real.
+- Funding, payout, FX y fee deben modelarse como settlement legs separados cuando aplique.
+
+## Superficies
+
+Módulo visible recomendado:
+
+- Finance > Pagos / Órdenes de Pago.
+- Finance > Calendario de Pagos.
+- Finance > Banco muestra settlement legs y conciliación.
+- Payroll muestra estado downstream resumido: obligaciones generadas, órdenes pendientes, pagado/reconciliado.
+- Person 360 muestra payout profile, préstamos/anticipos y pagos relacionados según permisos.
+
+## Eventos
+
+Eventos nuevos esperados:
+
+- `finance.payment_obligation.generated`
+- `finance.payment_obligation.superseded`
+- `finance.payment_order.created`
+- `finance.payment_order.approved`
+- `finance.payment_order.submitted`
+- `finance.payment_order.failed`
+- `finance.payment_order.settled`
+- `finance.payment_order.cancelled`
+- `finance.payment_order.closed`
+- `finance.beneficiary_payment_profile.created`
+- `finance.beneficiary_payment_profile.approved`
+- `finance.beneficiary_payment_profile.superseded`
+
+## Implementación Recomendada
+
+No implementar como una sola task gigante.
+
+Programa recomendado:
+
+- `TASK-747`: umbrella Payment Orders Program.
+- `TASK-748`: Payment Obligations Foundation.
+- `TASK-749`: Beneficiary Payment Profiles + Routing Policies.
+- `TASK-750`: Payment Orders, Batches, Payment Calendar + Maker-Checker Runtime.
+- `TASK-751`: Payroll Settlement Orchestration + Reconciliation Integration.
+
+Esta separación permite entregar valor incremental sin romper Payroll:
+
+1. Primero se materializan obligaciones read-only y se comparan contra expenses actuales.
+2. Luego se resuelve cómo pagar por beneficiario.
+3. Después se generan órdenes y batches aprobables.
+4. Finalmente Payroll usa el flow completo para pagos reales, settlement y conciliación.

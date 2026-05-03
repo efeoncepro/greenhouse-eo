@@ -1022,13 +1022,13 @@ const QuoteDetailView = () => {
                 {quote.dteFolio && (
                   <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                     <Typography variant='caption' color='text.secondary'>Folio DTE</Typography>
-                    <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>{quote.dteFolio}</Typography>
+                    <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>{quote.dteFolio}</Typography>
                   </Grid>
                 )}
                 {quote.hubspotDealId && (
                   <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                     <Typography variant='caption' color='text.secondary'>Deal HubSpot</Typography>
-                    <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>{quote.hubspotDealId}</Typography>
+                    <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>{quote.hubspotDealId}</Typography>
                   </Grid>
                 )}
                 {quote.notes && (
@@ -1085,7 +1085,7 @@ const QuoteDetailView = () => {
                               <Box>
                                 <Typography variant='body2' sx={{ fontWeight: 500 }}>{li.product.name}</Typography>
                                 {li.product.sku && (
-                                  <Typography variant='caption' color='text.secondary' sx={{ fontFamily: 'monospace', fontSize: '0.7rem' }}>
+                                  <Typography variant='caption' color='text.secondary' sx={{ fontSize: '0.7rem' }}>
                                     {li.product.sku}
                                   </Typography>
                                 )}
@@ -1106,7 +1106,7 @@ const QuoteDetailView = () => {
                             <Typography variant='body2'>{li.quantity}</Typography>
                           </TableCell>
                           <TableCell align='right'>
-                            <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>{formatCLP(li.unitPrice)}</Typography>
+                            <Typography variant='body2'>{formatCLP(li.unitPrice)}</Typography>
                           </TableCell>
                           <TableCell align='right'>
                             {(li.discountPercent && li.discountPercent > 0) ? (
@@ -1116,7 +1116,7 @@ const QuoteDetailView = () => {
                             )}
                           </TableCell>
                           <TableCell align='right'>
-                            <Typography variant='body2' sx={{ fontFamily: 'monospace', fontWeight: 500 }}>
+                            <Typography variant='body2' sx={{ fontWeight: 500 }}>
                               {li.totalAmount !== null ? formatCLP(li.totalAmount) : formatCLP(li.quantity * li.unitPrice)}
                             </Typography>
                           </TableCell>
@@ -1133,7 +1133,7 @@ const QuoteDetailView = () => {
                     {quote.subtotal !== null && (
                       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
                         <Typography variant='body2' color='text.secondary'>Subtotal</Typography>
-                        <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>{formatCLP(quote.subtotal)}</Typography>
+                        <Typography variant='body2'>{formatCLP(quote.subtotal)}</Typography>
                       </Box>
                     )}
                     {quote.taxAmount !== null && (
@@ -1141,13 +1141,13 @@ const QuoteDetailView = () => {
                         <Typography variant='body2' color='text.secondary'>
                           IVA{quote.taxRate ? ` (${Math.round(quote.taxRate * 100)}%)` : ''}
                         </Typography>
-                        <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>{formatCLP(quote.taxAmount)}</Typography>
+                        <Typography variant='body2'>{formatCLP(quote.taxAmount)}</Typography>
                       </Box>
                     )}
                     <Divider sx={{ my: 1 }} />
                     <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                       <Typography variant='subtitle2'>Total</Typography>
-                      <Typography variant='subtitle2' sx={{ fontFamily: 'monospace' }}>{formatCLP(quote.totalAmountClp)}</Typography>
+                      <Typography variant='subtitle2'>{formatCLP(quote.totalAmountClp)}</Typography>
                     </Box>
                   </Box>
                 </Box>

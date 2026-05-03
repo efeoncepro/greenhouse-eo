@@ -42,7 +42,7 @@ import {
   parsePersistedExpenseTaxSnapshot,
   serializeExpenseTaxSnapshot
 } from '@/lib/finance/expense-tax-snapshot'
-import { shouldFallbackFromFinancePostgres } from '@/lib/finance/postgres-store'
+import { getFinanceSupplierFromPostgres, shouldFallbackFromFinancePostgres } from '@/lib/finance/postgres-store'
 import { isFinanceBigQueryWriteEnabled } from '@/lib/finance/bigquery-write-flag'
 import { withIdempotency } from '@/lib/finance/idempotency'
 
@@ -431,6 +431,35 @@ export async function POST(request: Request) {
 
     let generatedExpenseId = normalizeString(body.expenseId)
 
+    // ── TASK-772 Slice 4 — Supplier snapshot hydration ─────────────────
+    // Cuando el cliente envía `supplierId` sin `supplierName`, resolvemos el
+    // display canónico desde la tabla `suppliers` y lo persistimos como
+    // snapshot. Esto evita que registros nuevos nazcan con `supplier_name=null`
+    // (root cause del incidente Figma EXP-202604-008).
+    //
+    // Defense-in-depth con Slice 1: el reader hidrata el display via LEFT JOIN
+    // para datos legacy. Este snapshot evita el JOIN para datos nuevos y
+    // protege auditoría/exports cuando el supplier cambie de nombre downstream.
+    //
+    // Si supplierId no existe en la tabla → 400 con error claro (nunca crear
+    // expense con FK rota).
+    const supplierIdInput = body.supplierId ? normalizeString(body.supplierId) : null
+    const supplierNameProvided = body.supplierName ? normalizeString(body.supplierName) : null
+    let supplierNameResolved = supplierNameProvided
+
+    if (supplierIdInput && !supplierNameResolved) {
+      const supplier = await getFinanceSupplierFromPostgres(supplierIdInput)
+
+      if (!supplier) {
+        throw new FinanceValidationError(
+          `Proveedor con id "${supplierIdInput}" no existe en el directorio.`,
+          400
+        )
+      }
+
+      supplierNameResolved = supplier.tradeName ?? supplier.legalName ?? null
+    }
+
     // ── Postgres-first path ──
     try {
       if (!generatedExpenseId) {
@@ -479,8 +508,8 @@ export async function POST(request: Request) {
         documentNumber: body.documentNumber ? normalizeString(body.documentNumber) : null,
         documentDate: body.documentDate ? normalizeString(body.documentDate) : null,
         dueDate: body.dueDate ? normalizeString(body.dueDate) : null,
-        supplierId: body.supplierId ? normalizeString(body.supplierId) : null,
-        supplierName: body.supplierName ? normalizeString(body.supplierName) : null,
+        supplierId: supplierIdInput,
+        supplierName: supplierNameResolved, // TASK-772 — snapshot hidratado
         supplierInvoiceNumber: body.supplierInvoiceNumber ? normalizeString(body.supplierInvoiceNumber) : null,
         payrollPeriodId: normalizeString(body.payrollPeriodId) || resolvedMember.payrollPeriodId,
         payrollEntryId: resolvedMember.payrollEntryId,
@@ -636,8 +665,8 @@ export async function POST(request: Request) {
         documentNumber: body.documentNumber ? normalizeString(body.documentNumber) : null,
         documentDate: body.documentDate ? normalizeString(body.documentDate) : null,
         dueDate: body.dueDate ? normalizeString(body.dueDate) : null,
-        supplierId: body.supplierId ? normalizeString(body.supplierId) : null,
-        supplierName: body.supplierName ? normalizeString(body.supplierName) : null,
+        supplierId: supplierIdInput,
+        supplierName: supplierNameResolved, // TASK-772 — snapshot hidratado
         supplierInvoiceNumber: body.supplierInvoiceNumber ? normalizeString(body.supplierInvoiceNumber) : null,
         payrollPeriodId: normalizeString(body.payrollPeriodId) || resolvedMember.payrollPeriodId,
         payrollEntryId: resolvedMember.payrollEntryId,

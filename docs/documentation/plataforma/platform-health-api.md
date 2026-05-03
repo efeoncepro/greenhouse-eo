@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
 > **Version:** 1.0
 > **Creado:** 2026-04-26 por Claude (implementacion TASK-672)
-> **Ultima actualizacion:** 2026-04-26
+> **Ultima actualizacion:** 2026-04-30
 > **Documentacion tecnica:** [GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md), [GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1.md](../../architecture/GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1.md)
 
 # Platform Health API — Preflight programatico de la plataforma
@@ -177,7 +177,7 @@ Recomendacion de uso para agentes MCP y Teams bot:
 
 ## Tareas relacionadas
 
-- TASK-647 — MCP read-only adapter expone tool `get_platform_health` que envuelve este contrato.
+- TASK-647 — MCP read-only adapter ya expone la tool `get_platform_health` que envuelve este contrato.
 - TASK-657 — degraded modes / dependency health usa el mismo wrapper `withSourceTimeout` para sus probes.
 - TASK-658 — resource authorization bridge habilitara `platform.health.detail` en la ruta ecosystem.
 - TASK-660 — promueve este contrato a `stable` en la OpenAPI publica.

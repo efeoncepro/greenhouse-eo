@@ -242,7 +242,6 @@ const PersonAiToolsTab = ({ memberId }: Props) => {
                             <Typography
                               variant='body2'
                               sx={{
-                                fontFamily: 'monospace',
                                 fontWeight: 600,
                                 color: isDebit ? 'error.main' : 'success.main'
                               }}

@@ -178,7 +178,7 @@ export default function GreenhouseApiPlatformPage() {
                   <Divider />
                   <Stack spacing={1}>
                     {lane.routes.map(route => (
-                      <Typography key={route} variant='body2' sx={{ fontFamily: 'monospace' }}>
+                      <Typography key={route} variant='body2'>
                         {route}
                       </Typography>
                     ))}

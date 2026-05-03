@@ -201,7 +201,7 @@ const PersonMembershipsTab = ({ memberId, assignments, isAdmin, reloadKey, onAdd
                         </TableCell>
                         <TableCell align='right'>
                           {assignment ? (
-                            <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
+                            <Typography variant='body2'>
                               {formatFte(assignment.fteAllocation)}
                             </Typography>
                           ) : (

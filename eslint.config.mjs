@@ -20,6 +20,8 @@ import nextCoreWebVitals from 'eslint-config-next/core-web-vitals'
 import tseslint from 'typescript-eslint'
 import prettierConfig from 'eslint-config-prettier'
 
+import greenhousePlugin from './eslint-plugins/greenhouse/index.mjs'
+
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 
@@ -230,6 +232,135 @@ export default [
       '@typescript-eslint/no-var-requires': 'off'
     }
   },
+
+  /*
+    TASK-743 — Operational data table density contract gate.
+    Aplica solo a archivos que pueden contener tablas operativas: src/views,
+    src/components, src/app. La regla solo dispara cuando el archivo importa
+    Table desde @mui/material, asi que el override es barato y limpio.
+
+    TASK-567 — Typography contract gate (fontFamily literals).
+    Aplica al mismo scope. Excluimos:
+      - src/components/theme/**          (theme source-of-truth)
+      - src/@core/theme/**               (Vuexy theme primitive)
+      - src/app/global-error.tsx         (corre antes del theme MUI)
+      - src/emails/**                    (emails con webfont fallback propio)
+      - src/lib/finance/pdf/**           (react-pdf no usa MUI variants)
+    Modo inicial 'warn' (TASK-567 Slice 3a). Sweep automatizado limpia el
+    inventario inicial; despues se promueve a 'error' (Slice 3b) para que
+    cualquier regresion bloquee CI.
+  */
+  {
+    files: ['src/views/**/*.tsx', 'src/components/**/*.tsx', 'src/app/**/*.tsx'],
+    plugins: {
+      greenhouse: greenhousePlugin
+    },
+    rules: {
+      'greenhouse/no-raw-table-without-shell': 'error',
+      'greenhouse/no-hardcoded-fontfamily': 'error',
+      // TASK-265 Slice 5a — microcopy contract gate.
+      // Modo inicial 'warn' (gate establecido, no bloquea CI mientras
+      // TASK-407 + TASK-408 ejecutan sweep). Cierre TASK-408 promueve
+      // a 'error'. Detecta aria-label literales (caso dominante: 405
+      // instancias), status maps inline (100), loading strings (94),
+      // empty states (31) + cobertura secundaria de label/placeholder/
+      // helperText/title/subtitle.
+      'greenhouse/no-untokenized-copy': 'warn'
+    }
+  },
+
+  /*
+    TASK-766 Slice 3 — Finance CLP currency reader gate.
+    Aplica a TODO el codigo del portal (incluye API routes .ts y libs).
+    Mode 'error' desde el primer commit: cero tolerancia a legacy (cualquier
+    hit es risk de KPIs inflados en produccion). Slice 3 migra cash-out;
+    Slice 4 audita el resto del portal antes de mergear. Las excepciones
+    explicitas (helpers/readers canonicos, tests del rule) viven en el
+    bloque de override de abajo.
+  */
+  {
+    files: ['src/**/*.ts', 'src/**/*.tsx'],
+    plugins: {
+      greenhouse: greenhousePlugin
+    },
+    rules: {
+      'greenhouse/no-untokenized-fx-math': 'error',
+      'greenhouse/no-untokenized-expense-type-for-analytics': 'error'
+    }
+  },
+  {
+    files: [
+      'src/components/theme/**',
+      'src/@core/theme/**',
+      'src/app/global-error.tsx',
+      'src/app/public/**',
+      'src/emails/**',
+      'src/lib/finance/pdf/**'
+    ],
+    rules: {
+      'greenhouse/no-hardcoded-fontfamily': 'off',
+      'greenhouse/no-untokenized-copy': 'off'
+    }
+  },
+
+  // TASK-766 Slice 3 — la lint rule no-untokenized-fx-math se desactiva
+  // SOLO en los helpers/readers canónicos donde el patrón aparece como
+  // referencia en docstrings y assertion strings de tests (NO en SQL real).
+  // El patrón está prohibido en cualquier otro file del portal.
+  {
+    files: [
+      'src/lib/finance/expense-payments-reader.ts',
+      'src/lib/finance/income-payments-reader.ts',
+      'src/lib/finance/__tests__/expense-payments-reader.test.ts',
+      'src/lib/finance/__tests__/income-payments-reader.test.ts',
+      'eslint-plugins/greenhouse/rules/no-untokenized-fx-math.mjs',
+      'eslint-plugins/greenhouse/rules/__tests__/no-untokenized-fx-math.test.mjs'
+    ],
+    rules: {
+      'greenhouse/no-untokenized-fx-math': 'off'
+    }
+  },
+
+  // TASK-768 Slice 8 — la lint rule no-untokenized-expense-type-for-analytics
+  // se desactiva para usos legitimos:
+  //  * SII / IVA / VAT / chile-tax engine (taxonomia fiscal por contrato)
+  //  * Resolver canonico + tests + backfill (necesitan leer expense_type
+  //    como hint del transparent map)
+  //  * Readers que exponen ambas dimensiones simultaneamente
+  //  * cash-out filter operativo (UI permite filter por taxonomia fiscal;
+  //    el KPI rollup analitico ya migra a byEconomicCategory en Slice 7)
+  //  * account-balances label fiscal (label "Cotizacion Previred" para UX
+  //    bancaria, no analytical KPI)
+  //  * processor-digest payroll digest (operacional, no analytical)
+  //  * payroll-expense-materialization-lag signal (materializacion proxy,
+  //    no analytical bucket — TASK-765 ownership preservado)
+  {
+    files: [
+      'src/lib/finance/expense-payments-reader.ts',
+      'src/lib/finance/income-payments-reader.ts',
+      'src/lib/finance/__tests__/expense-payments-reader.test.ts',
+      'src/lib/finance/__tests__/income-payments-reader.test.ts',
+      'src/lib/finance/economic-category/**',
+      'scripts/finance/backfill-economic-category.ts',
+      'src/lib/tax/**',
+      'src/lib/finance/expense-tax-snapshot.ts',
+      'src/lib/finance/income-tax-snapshot.ts',
+      'src/lib/finance/expense-taxonomy.ts',
+      'src/lib/finance/vat-ledger.ts',
+      'src/lib/finance/account-balances.ts',
+      'src/lib/finance/processor-digest.ts',
+      'src/lib/reliability/queries/payroll-expense-materialization-lag.ts',
+      'src/app/api/finance/cash-out/route.ts',
+      'src/app/api/admin/finance/expenses/[id]/economic-category/**',
+      'src/app/api/admin/finance/income/[id]/economic-category/**',
+      'eslint-plugins/greenhouse/rules/no-untokenized-expense-type-for-analytics.mjs',
+      'eslint-plugins/greenhouse/rules/__tests__/no-untokenized-expense-type-for-analytics.test.mjs'
+    ],
+    rules: {
+      'greenhouse/no-untokenized-expense-type-for-analytics': 'off'
+    }
+  },
+
 
   /*
     Prettier compat — DEBE ir al final. Apaga reglas que conflictuan con

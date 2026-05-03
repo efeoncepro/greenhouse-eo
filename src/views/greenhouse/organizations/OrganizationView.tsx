@@ -201,7 +201,7 @@ const OrganizationView = ({ organizationId }: Props) => {
                   <Typography variant='body2' color='text.secondary'>{detail.industry}</Typography>
                 )}
                 {(detail.legalName || detail.taxId) && (
-                  <Typography variant='caption' color='text.secondary' sx={{ fontFamily: 'monospace', fontSize: '0.75rem' }}>
+                  <Typography variant='caption' color='text.secondary' sx={{ fontSize: '0.75rem' }}>
                     {detail.legalName}{detail.taxId ? ` · ${detail.taxIdType ? `${detail.taxIdType}: ` : ''}${detail.taxId}` : ''}
                   </Typography>
                 )}

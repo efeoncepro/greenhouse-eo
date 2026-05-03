@@ -82,7 +82,7 @@ const columns: ColumnDef<CampaignItem, any>[] = [
     cell: ({ row }) => (
       <>
         <Typography variant='body2' fontWeight={600}>{row.original.displayName}</Typography>
-        <Typography variant='caption' sx={{ fontFamily: 'monospace', fontSize: '0.7rem' }} color='text.disabled'>{row.original.eoId}</Typography>
+        <Typography variant='caption' sx={{ fontSize: '0.7rem' }} color='text.disabled'>{row.original.eoId}</Typography>
       </>
     )
   }),

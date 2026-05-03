@@ -64,7 +64,7 @@ export default function DashboardError({ error, reset }: { error: Error & { dige
           </Box>
 
           {error.digest && (
-            <Typography variant='caption' color='text.disabled' sx={{ fontFamily: 'monospace' }}>
+            <Typography variant='caption' color='text.disabled'>
               Ref: {error.digest}
             </Typography>
           )}

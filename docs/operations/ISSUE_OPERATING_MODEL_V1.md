@@ -16,6 +16,8 @@ Issues are not small tasks with another name.
 An issue may be solved directly without a task when the fix is localized and low-ambiguity.
 An issue should spawn one or more tasks when the remediation needs broader hardening, migrations, refactors, or coordinated rollout.
 
+All remediations follow `docs/operations/SOLUTION_QUALITY_OPERATING_MODEL_V1.md`: fix root cause when feasible, avoid permanent workarounds, and document any temporary mitigation with owner and retirement condition.
+
 ## Canonical Locations
 
 - Tracker: `docs/issues/README.md`
@@ -72,6 +74,7 @@ Rules:
 - promote only high-confidence findings to formal issue status
 - if the first diagnosis is wrong, update the issue instead of leaving stale assumptions in place
 - if the remediation path needs planning beyond a localized fix, create a linked `TASK-###`
+- if the only available fix is a workaround, mark it explicitly as temporary and create/link the canonical remediation task when needed
 
 ### 3. Resolve
 
@@ -118,6 +121,7 @@ Before marking an issue resolved, confirm:
 - the bug was reproduced or validated with high confidence
 - the code fix addresses the root cause, not only the symptom
 - the affected module has at least one focused verification step executed
+- any workaround has owner, retirement condition and linked follow-up
 - the issue file was moved to `resolved/`
 - the tracker in `docs/issues/README.md` was updated
 - handoff/changelog/context docs were updated when relevant

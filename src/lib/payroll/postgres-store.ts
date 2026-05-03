@@ -32,6 +32,7 @@ import {
   PayrollValidationError,
   assertPayrollDateString,
   buildPeriodId,
+  getPayrollPeriodEndDate,
   normalizeBoolean,
   normalizeNullableString,
   normalizeString,
@@ -52,6 +53,8 @@ import {
 } from '@/lib/payroll/period-lifecycle'
 import { getHistoricalEconomicIndicatorForPeriod } from '@/lib/finance/economic-indicators'
 import { resolveChileAfpSplitRates } from '@/lib/payroll/chile-previsional-helpers'
+import { buildPayrollTaxTableVersion } from '@/lib/payroll/tax-table-version-format'
+import { resolvePayrollTaxTableVersion } from '@/lib/payroll/tax-table-version'
 
 
 // ---------------------------------------------------------------------------
@@ -100,9 +103,6 @@ type PgCompensationRow = {
   created_at: string | Date | null
 }
 
-const buildPayrollPeriodIndicatorDate = (year: number, month: number) =>
-  `${year}-${String(month).padStart(2, '0')}-31`
-
 const resolvePayrollPeriodUfValue = async ({
   year,
   month,
@@ -118,7 +118,7 @@ const resolvePayrollPeriodUfValue = async ({
 
   const snapshot = await getHistoricalEconomicIndicatorForPeriod({
     indicatorCode: 'UF',
-    periodDate: buildPayrollPeriodIndicatorDate(year, month)
+    periodDate: getPayrollPeriodEndDate(year, month)
   })
 
   return snapshot?.value ?? null
@@ -149,6 +149,7 @@ type PgEntryRow = {
   avatar_url: string | null
   compensation_version_id: string
   pay_regime: string
+  contract_type_snapshot: string | null
   payroll_via: string | null
   deel_contract_id: string | null
   currency: string
@@ -519,6 +520,7 @@ const mapEntry = (row: PgEntryRow): PayrollEntry => ({
   memberAvatarUrl: normalizeNullableString(row.avatar_url),
   compensationVersionId: row.compensation_version_id,
   payRegime: row.pay_regime === 'international' ? 'international' : 'chile',
+  contractTypeSnapshot: row.contract_type_snapshot ? normalizeContractType(row.contract_type_snapshot) : null,
   payrollVia: row.payroll_via === 'deel' ? 'deel' : 'internal',
   currency: row.currency === 'USD' ? 'USD' : 'CLP',
   baseSalary: toNumber(row.base_salary),
@@ -826,7 +828,7 @@ export const pgGetApplicableCompensationVersionsForPeriod = async (periodStart: 
     `
       SELECT DISTINCT ON (m.member_id)
         cv.version_id,
-        cv.member_id,
+        m.member_id,
         m.display_name,
         m.primary_email,
         m.avatar_url,
@@ -1101,7 +1103,7 @@ export const pgCreateCompensationVersion = async ({
         resolvedAfpSplitRates?.cotizacionRate ?? null,
         resolvedAfpSplitRates?.comisionRate ?? null,
         input.healthSystem ?? null, input.healthPlanUf ?? null,
-        input.unemploymentRate ?? (memberContract.contractType === 'plazo_fijo' ? 0.03 : 0.006),
+        input.unemploymentRate ?? (memberContract.contractType === 'plazo_fijo' ? 0 : 0.006),
         memberContract.contractType, Boolean(input.hasApv), Number(input.apvAmount ?? 0),
         effectiveFrom, nextEffectiveTo, isCurrent,
         input.changeReason.trim(), input.desiredNetClp ?? null, actorUserId
@@ -1320,7 +1322,7 @@ export const pgUpdateCompensationVersion = async ({
         resolvedAfpSplitRates?.comisionRate ?? null,
         input.healthSystem ?? null,
         input.healthPlanUf ?? null,
-        input.unemploymentRate ?? (memberContract.contractType === 'plazo_fijo' ? 0.03 : 0.006),
+        input.unemploymentRate ?? (memberContract.contractType === 'plazo_fijo' ? 0 : 0.006),
         memberContract.contractType,
         Boolean(input.hasApv),
         Number(input.apvAmount ?? 0),
@@ -1417,8 +1419,22 @@ export const pgCreatePayrollPeriod = async (input: CreatePayrollPeriodInput) => 
     ufValue: input.ufValue
   })
 
+  const normalizedTaxTableVersion = normalizeNullableString(input.taxTableVersion)
+
+  const resolvedTaxTableVersion = await resolvePayrollTaxTableVersion({
+    year: input.year,
+    month: input.month,
+    requestedVersion: normalizedTaxTableVersion
+  })
+
   if (existing) {
     throw new PayrollValidationError('Payroll period already exists.', 409)
+  }
+
+  if (normalizedTaxTableVersion && !resolvedTaxTableVersion) {
+    throw new PayrollValidationError(
+      `taxTableVersion is not available for ${input.year}-${String(input.month).padStart(2, '0')}. Leave it empty to auto-resolve or sync Chile tax tables first.`
+    )
   }
 
   return withGreenhousePostgresTransaction(async (client) => {
@@ -1432,7 +1448,7 @@ export const pgCreatePayrollPeriod = async (input: CreatePayrollPeriodInput) => 
       [
         periodId, input.year, input.month,
         resolvedUfValue,
-        normalizeNullableString(input.taxTableVersion),
+        resolvedTaxTableVersion,
         normalizeNullableString(input.notes)
       ]
     )
@@ -1471,8 +1487,37 @@ export const pgUpdatePayrollPeriod = async (periodId: string, input: UpdatePayro
     ufValue: input.ufValue === undefined ? current.ufValue : input.ufValue
   })
 
+  const nextPeriodId = buildPeriodId(nextYear, nextMonth)
+  const identityChanged = nextPeriodId !== current.periodId
+  const currentCanonicalTaxTableVersion = buildPayrollTaxTableVersion(current.year, current.month)
+
+  const shouldAutoMigrateTaxTable =
+    input.taxTableVersion === undefined &&
+    identityChanged &&
+    (current.taxTableVersion == null || current.taxTableVersion === currentCanonicalTaxTableVersion)
+
+  const requestedTaxTableVersion = normalizeNullableString(input.taxTableVersion)
+
   const nextTaxTableVersion =
-    input.taxTableVersion === undefined ? current.taxTableVersion : normalizeNullableString(input.taxTableVersion)
+    input.taxTableVersion !== undefined
+      ? await resolvePayrollTaxTableVersion({
+          year: nextYear,
+          month: nextMonth,
+          requestedVersion: requestedTaxTableVersion
+        })
+      : shouldAutoMigrateTaxTable
+        ? await resolvePayrollTaxTableVersion({
+            year: nextYear,
+            month: nextMonth,
+            requestedVersion: null
+          })
+        : current.taxTableVersion
+
+  if (requestedTaxTableVersion && !nextTaxTableVersion) {
+    throw new PayrollValidationError(
+      `taxTableVersion is not available for ${nextYear}-${String(nextMonth).padStart(2, '0')}. Leave it empty to auto-resolve or sync Chile tax tables first.`
+    )
+  }
 
   const nextNotes = input.notes === undefined ? current.notes : normalizeNullableString(input.notes)
 
@@ -1487,9 +1532,6 @@ export const pgUpdatePayrollPeriod = async (periodId: string, input: UpdatePayro
   if (nextUfValue !== undefined && nextUfValue !== null && (!Number.isFinite(nextUfValue) || nextUfValue < 0)) {
     throw new PayrollValidationError('ufValue must be a non-negative number when provided.')
   }
-
-  const nextPeriodId = buildPeriodId(nextYear, nextMonth)
-  const identityChanged = nextPeriodId !== current.periodId
 
     const requiresReset = doesPayrollPeriodUpdateRequireReset({
       currentYear: current.year,
@@ -1822,6 +1864,7 @@ const ENTRY_BASE_SELECT = `
     m.avatar_url,
     e.compensation_version_id,
     e.pay_regime,
+    e.contract_type_snapshot,
     e.payroll_via,
     e.deel_contract_id,
     e.currency,
@@ -2083,7 +2126,7 @@ export const pgUpsertPayrollEntry = async (
       `
         INSERT INTO greenhouse_payroll.payroll_entries (
           entry_id, period_id, member_id, compensation_version_id,
-          pay_regime, payroll_via, deel_contract_id, currency, base_salary, remote_allowance, colacion_amount, movilizacion_amount, fixed_bonus_label, fixed_bonus_amount,
+          pay_regime, contract_type_snapshot, payroll_via, deel_contract_id, currency, base_salary, remote_allowance, colacion_amount, movilizacion_amount, fixed_bonus_label, fixed_bonus_amount,
           member_display_name,
           kpi_otd_percent, kpi_rpa_avg, kpi_otd_qualifies, kpi_rpa_qualifies,
           kpi_tasks_completed, kpi_data_source,
@@ -2106,7 +2149,7 @@ export const pgUpsertPayrollEntry = async (
         )
         VALUES (
           $1, $2, $3, $4,
-          $5, $6, $7, $8, $9, $10, $11, $12, $13, $14,
+          $5, COALESCE($69, (SELECT contract_type FROM greenhouse_payroll.compensation_versions WHERE version_id = $4)), $6, $7, $8, $9, $10, $11, $12, $13, $14,
           $15,
           $16, $17, $18, $19,
           $20, $21,
@@ -2130,6 +2173,7 @@ export const pgUpsertPayrollEntry = async (
           member_id = EXCLUDED.member_id,
           compensation_version_id = EXCLUDED.compensation_version_id,
           pay_regime = EXCLUDED.pay_regime,
+          contract_type_snapshot = EXCLUDED.contract_type_snapshot,
           payroll_via = EXCLUDED.payroll_via,
           deel_contract_id = EXCLUDED.deel_contract_id,
           currency = EXCLUDED.currency,
@@ -2215,7 +2259,8 @@ export const pgUpsertPayrollEntry = async (
         entry.workingDaysInPeriod, entry.daysPresent, entry.daysAbsent,
         entry.daysOnLeave, entry.daysOnUnpaidLeave,
         entry.adjustedBaseSalary, entry.adjustedRemoteAllowance, entry.adjustedColacionAmount,
-        entry.adjustedMovilizacionAmount, entry.adjustedFixedBonusAmount
+        entry.adjustedMovilizacionAmount, entry.adjustedFixedBonusAmount,
+        entry.contractTypeSnapshot ?? null
       ]
     )
 

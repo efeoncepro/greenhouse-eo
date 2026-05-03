@@ -58,7 +58,11 @@ export const STATIC_RELIABILITY_REGISTRY: ReliabilityModuleDefinition[] = [
       'src/components/greenhouse/pricing/**',
       'src/components/greenhouse/quote-builder/**'
     ],
-    expectedSignalKinds: ['subsystem', 'incident', 'test_lane'],
+    // TASK-765 Slice 7 — drift / dead_letter / lag signals para el path
+    // payment_order ↔ bank settlement (3 readers en
+    // src/lib/reliability/queries/). Quedan rolleados al subsystem `Finance
+    // Data Quality` vía buildReliabilityOverview, que ya rutea por moduleKey.
+    expectedSignalKinds: ['subsystem', 'incident', 'test_lane', 'drift', 'dead_letter', 'lag'],
     incidentDomainTag: 'finance'
   },
   {
@@ -134,7 +138,7 @@ export const STATIC_RELIABILITY_REGISTRY: ReliabilityModuleDefinition[] = [
       'src/app/(dashboard)/admin/**',
       'src/views/greenhouse/admin/**'
     ],
-    expectedSignalKinds: ['runtime', 'posture', 'incident', 'cost_guard'],
+    expectedSignalKinds: ['runtime', 'posture', 'incident', 'cost_guard', 'billing'],
     incidentDomainTag: 'cloud'
   },
   {
@@ -270,6 +274,42 @@ export const STATIC_RELIABILITY_REGISTRY: ReliabilityModuleDefinition[] = [
     ],
     expectedSignalKinds: ['subsystem', 'incident', 'test_lane'],
     incidentDomainTag: 'payroll'
+  },
+  {
+    // TASK-773 — Outbox publisher + reactive consumer infrastructure.
+    // El event bus es fundamento del sistema reactivo (provider.upserted,
+    // expense_payment.recorded, payroll_period.exported, etc.). Si el
+    // publisher (PG → BQ raw) está caído o un batch dead-letterea, NINGUNA
+    // projection corre — toda actualización async finance queda colgada.
+    // Reliability dashboard ahora detecta:
+    //   - sync.outbox.unpublished_lag (events 'pending'/'failed' con edad > 10 min)
+    //   - sync.outbox.dead_letter (events que agotaron retries — requieren humano)
+    moduleKey: 'sync',
+    label: 'Event Bus & Sync Infrastructure',
+    description:
+      'Outbox publisher (PG → BQ raw) + reactive consumer + projection refreshes. Backbone async de Greenhouse: si está caído, nada async progresa.',
+    domain: 'sync',
+    routes: [
+      { path: '/admin/operations', label: 'Ops Health' }
+    ],
+    apis: [
+      { path: '/api/admin/reliability/overview', label: 'Reliability overview' }
+    ],
+    dependencies: [
+      'greenhouse_sync.outbox_events',
+      'greenhouse_sync.outbox_reactive_log',
+      'greenhouse_sync.source_sync_runs',
+      'greenhouse_raw.postgres_outbox_events (BigQuery)',
+      'ops-worker Cloud Run (POST /outbox/publish-batch, /reactive/process-domain)',
+      'Cloud Scheduler ops-outbox-publish (*/2 min) + ops-reactive-* (*/5 min)'
+    ],
+    smokeTests: [],
+    filesOwned: [
+      'src/lib/sync/**',
+      'services/ops-worker/**'
+    ],
+    expectedSignalKinds: ['subsystem', 'lag', 'dead_letter', 'incident', 'drift'],
+    incidentDomainTag: 'sync'
   }
 ]
 

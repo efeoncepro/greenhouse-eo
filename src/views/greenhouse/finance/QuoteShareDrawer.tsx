@@ -444,7 +444,6 @@ return
                     component='code'
                     sx={{
                       flex: 1,
-                      fontFamily: 'ui-monospace, SFMono-Regular, monospace',
                       fontSize: 13,
                       color: 'primary.main',
                       bgcolor: 'background.default',

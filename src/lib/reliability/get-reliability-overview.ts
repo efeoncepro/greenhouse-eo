@@ -26,6 +26,20 @@ import type { SyntheticRouteSnapshot } from '@/types/reliability-synthetic'
 
 import { buildAiSummarySignals } from './ai/build-ai-summary-signals'
 import { getLatestAiObservationsByScope, type AiObservation } from './ai/reader'
+import { getAccountBalancesFxDriftSignal } from './queries/account-balances-fx-drift'
+import {
+  getExpenseDistributionSharedPoolContaminationSignal,
+  getExpenseDistributionUnresolvedSignal
+} from './queries/expense-distribution'
+import { getExpensePaymentsClpDriftSignal } from './queries/expense-payments-clp-drift'
+import { getIncomePaymentsClpDriftSignal } from './queries/income-payments-clp-drift'
+import { getPaymentOrdersDeadLetterSignal } from './queries/payment-orders-dead-letter'
+import { getPaidOrdersWithoutExpensePaymentSignal } from './queries/payment-orders-paid-without-expense-payment'
+import { getPayrollExpenseMaterializationLagSignal } from './queries/payroll-expense-materialization-lag'
+import { getProviderBqSyncDeadLetterSignal } from './queries/provider-bq-sync-dead-letter'
+import { getOutboxUnpublishedLagSignal } from './queries/outbox-unpublished-lag'
+import { getOutboxDeadLetterSignal } from './queries/outbox-dead-letter'
+import { getCronStagingDriftSignal } from './queries/cron-staging-drift'
 import { RELIABILITY_REGISTRY } from './registry'
 import { getReliabilityRegistry } from './registry-store'
 import {
@@ -41,6 +55,9 @@ import {
   buildNotionDataQualitySignals,
   buildNotionFreshnessSignal,
   buildObservabilityPostureSignal,
+  buildFinanceClpDriftSignals,
+  buildExpenseDistributionSignals,
+  buildPaymentOrderSettlementSignals,
   buildSentryIncidentSignals,
   buildSubsystemSignals,
   buildSyntheticModuleSignals,
@@ -241,6 +258,72 @@ interface ReliabilityOverviewSources {
    * don't accidentally hammer the Sentry API.
    */
   domainIncidents?: Record<string, CloudSentryIncidentsSnapshot> | null
+
+  /**
+   * TASK-765 Slice 7 — payment_order ↔ bank settlement signals. 3 readers
+   * que cuentan drift / dead_letter / lag para el path payroll → expense →
+   * payment_order. Cada reader degrada honestamente (kind=unknown) si la
+   * query falla. El composer los inyecta en `allSignals` con resto del array.
+   */
+  paymentOrderSettlement?: ReliabilitySignal[] | null
+
+  /**
+   * TASK-766 Slice 2 — Finance CLP currency drift signals. 2 readers que
+   * cuentan expense_payments / income_payments con currency!='CLP' y
+   * amount_clp IS NULL (drift detectado por la VIEW *_normalized via flag
+   * has_clp_drift). Cada reader degrada honestamente (kind=unknown) si la
+   * query falla. Steady state esperado = 0; cualquier valor > 0 indica una
+   * fila legacy pendiente del repair endpoint
+   * `POST /api/admin/finance/payments-clp-repair` (slice 5).
+   */
+  financeClpDrift?: ReliabilitySignal[] | null
+
+  /**
+   * TASK-771 Slice 4 — Provider BQ sync dead-letter signal. Cuenta entries en
+   * outbox_reactive_log para handler `provider_bq_sync:provider.upserted` que
+   * llegaron a dead-letter (la projection canónica que sincroniza
+   * greenhouse_core.providers PG → greenhouse.providers BQ). Steady state
+   * esperado = 0; >0 indica drift PG↔BQ activo (AI Tooling y consumers BQ
+   * verán datos stale hasta resolver). Mismo patrón que paymentOrderSettlement.
+   */
+  providerBqSyncDeadLetter?: ReliabilitySignal[] | null
+
+  /**
+   * TASK-773 Slice 4 — Outbox publisher health. 2 readers:
+   *   - sync.outbox.unpublished_lag (events pending/failed > 10 min)
+   *   - sync.outbox.dead_letter (events agotaron retries, requieren humano)
+   * Steady state = 0 ambos. Si > 0, el event bus está roto y NINGUNA projection
+   * corre — toda actualización async finance queda colgada (root cause del
+   * incidente Figma 2026-05-03 cuando Vercel cron no corría en staging).
+   */
+  outboxHealth?: ReliabilitySignal[] | null
+
+  /**
+   * TASK-775 Slice 5 — Cron staging drift signal:
+   *   - platform.cron.staging_drift (Vercel async-critical sin Cloud Scheduler)
+   * Steady state = 0. Si > 0, hay crons que no corren en staging (Vercel
+   * custom environments NO ejecutan crons). Detecta la clase de bugs invisibles
+   * que motivó TASK-773 y TASK-775.
+   */
+  cronStagingDrift?: ReliabilitySignal | null
+
+  /**
+   * TASK-774 Slice 4 — Account balances FX drift signal:
+   *   - finance.account_balances.fx_drift (closing_balance vs recompute desde
+   *     VIEWs canónicas TASK-766)
+   * Steady state = 0. Si > 0, materializer corrió antes del fix TASK-774
+   * o emerge nuevo callsite con anti-patrón SUM(payment.amount) sin _clp.
+   * Bug Figma EXP-202604-008 (2026-05-03).
+   */
+  accountBalancesFxDrift?: ReliabilitySignal | null
+
+  /**
+   * TASK-777 Slice 3 — Expense distribution management-accounting gates.
+   * Protege P&L/overhead: cuenta expenses sin lane canónico y filas que el
+   * pool legacy tomaría como overhead aunque son payroll provider, regulatorio
+   * o costos financieros. Steady state = 0 antes de cerrar períodos.
+   */
+  expenseDistribution?: ReliabilitySignal[] | null
 }
 
 export const buildReliabilityOverview = (
@@ -270,7 +353,23 @@ export const buildReliabilityOverview = (
     // Closes the `expectedSignalKinds: ['incident']` gap for finance,
     // delivery, integrations.notion (cloud already had a global signal).
     ...(sources.domainIncidents ? buildDomainIncidentSignals(sources.domainIncidents) : []),
-    ...(sources.aiObservations ? buildAiSummarySignals(sources.aiObservations.byModule) : [])
+    ...(sources.aiObservations ? buildAiSummarySignals(sources.aiObservations.byModule) : []),
+    // TASK-765 Slice 7 — payment_order ↔ bank settlement signals (drift /
+    // dead_letter / lag). Inyectadas pre-fetched desde getReliabilityOverview
+    // para mantener buildReliabilityOverview sincrónico.
+    ...(sources.paymentOrderSettlement ?? []),
+    // TASK-766 Slice 2 — Finance CLP currency drift signals (expense + income).
+    ...(sources.financeClpDrift ?? []),
+    // TASK-771 Slice 4 — Provider BQ sync dead-letter signal (drift PG↔BQ).
+    ...(sources.providerBqSyncDeadLetter ?? []),
+    // TASK-773 Slice 4 — Outbox publisher health (lag + dead_letter).
+    ...(sources.outboxHealth ?? []),
+    // TASK-775 Slice 5 — Vercel ↔ Cloud Scheduler drift (async-critical crons).
+    ...(sources.cronStagingDrift ? [sources.cronStagingDrift] : []),
+    // TASK-774 Slice 4 — Account balances FX drift (closing_balance vs recompute).
+    ...(sources.accountBalancesFxDrift ? [sources.accountBalancesFxDrift] : []),
+    // TASK-777 Slice 3 — Expense distribution gates.
+    ...(sources.expenseDistribution ?? [])
   ]
 
   const signalsByModule = new Map<string, ReliabilitySignal[]>()
@@ -420,6 +519,75 @@ export const getReliabilityOverview = async (
     ? preloadedSources.domainIncidents
     : await hydrateDomainIncidents(modules ?? RELIABILITY_REGISTRY)
 
+  // TASK-765 Slice 7 — payment_order ↔ bank settlement signals (drift /
+  // dead_letter / lag). Cada reader degrada honestamente (severity=unknown)
+  // si su query falla — un solo signal roto NO envenena el overview entero.
+  const paymentOrderSettlement =
+    preloadedSources.paymentOrderSettlement !== undefined
+      ? preloadedSources.paymentOrderSettlement
+      : await buildPaymentOrderSettlementSignals({
+          paidWithoutExpensePayment: getPaidOrdersWithoutExpensePaymentSignal,
+          deadLetter: getPaymentOrdersDeadLetterSignal,
+          materializationLag: getPayrollExpenseMaterializationLagSignal
+        }).catch(() => null)
+
+  // TASK-766 Slice 2 — Finance CLP currency drift signals (expense + income).
+  const financeClpDrift =
+    preloadedSources.financeClpDrift !== undefined
+      ? preloadedSources.financeClpDrift
+      : await buildFinanceClpDriftSignals({
+          expensePayments: getExpensePaymentsClpDriftSignal,
+          incomePayments: getIncomePaymentsClpDriftSignal
+        }).catch(() => null)
+
+  // TASK-771 Slice 4 — Provider BQ sync dead-letter signal (drift PG↔BQ).
+  // Single signal pero envuelto en array para shape consistency con
+  // paymentOrderSettlement / financeClpDrift. Degrada honestamente si la
+  // query falla (severity=unknown) — un solo signal roto NO envenena el
+  // overview entero.
+  const providerBqSyncDeadLetter =
+    preloadedSources.providerBqSyncDeadLetter !== undefined
+      ? preloadedSources.providerBqSyncDeadLetter
+      : await getProviderBqSyncDeadLetterSignal()
+          .then(signal => [signal])
+          .catch(() => null)
+
+  // TASK-773 Slice 4 — Outbox publisher health (lag + dead_letter).
+  // 2 readers en paralelo. Cada uno degrada honestamente si su query falla.
+  // Critical signal: si el publisher está caído, NINGUNA projection corre.
+  const outboxHealth =
+    preloadedSources.outboxHealth !== undefined
+      ? preloadedSources.outboxHealth
+      : await Promise.all([
+          getOutboxUnpublishedLagSignal().catch(() => null),
+          getOutboxDeadLetterSignal().catch(() => null)
+        ])
+          .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
+          .catch(() => null)
+
+  // TASK-775 Slice 5 — Cron staging drift (Vercel async-critical sin Cloud
+  // Scheduler equivalent). Lee vercel.json + snapshot canónico de Cloud
+  // Scheduler jobs. Degrada honestamente a `unknown` si vercel.json falla.
+  const cronStagingDrift =
+    preloadedSources.cronStagingDrift !== undefined
+      ? preloadedSources.cronStagingDrift
+      : await getCronStagingDriftSignal().catch(() => null)
+
+  // TASK-774 Slice 4 — Account balances FX drift (closing_balance vs recompute
+  // desde VIEWs canonicas TASK-766). Steady=0. Degrada honestamente a `unknown`.
+  const accountBalancesFxDrift =
+    preloadedSources.accountBalancesFxDrift !== undefined
+      ? preloadedSources.accountBalancesFxDrift
+      : await getAccountBalancesFxDriftSignal().catch(() => null)
+
+  const expenseDistribution =
+    preloadedSources.expenseDistribution !== undefined
+      ? preloadedSources.expenseDistribution
+      : await buildExpenseDistributionSignals({
+          unresolved: getExpenseDistributionUnresolvedSignal,
+          sharedPoolContamination: getExpenseDistributionSharedPoolContaminationSignal
+        }).catch(() => null)
+
   return buildReliabilityOverview(operations, {
     billing,
     notionOperational,
@@ -427,7 +595,14 @@ export const getReliabilityOverview = async (
     financeSmokeLane,
     modules,
     aiObservations,
-    domainIncidents
+    domainIncidents,
+    paymentOrderSettlement,
+    financeClpDrift,
+    providerBqSyncDeadLetter,
+    outboxHealth,
+    cronStagingDrift,
+    accountBalancesFxDrift,
+    expenseDistribution
   })
 }
 

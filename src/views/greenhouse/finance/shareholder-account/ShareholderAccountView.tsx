@@ -201,12 +201,7 @@ const ShareholderAccountView = () => {
                 {row.original.accountName}
               </Typography>
               {row.original.accountNumber ? (
-                <Typography
-                  variant='caption'
-                  color='text.secondary'
-                  fontFamily='var(--mui-typography-monospace, monospace)'
-                  noWrap
-                >
+                <Typography variant='monoId' color='text.secondary' noWrap>
                   {row.original.accountNumber}
                 </Typography>
               ) : null}

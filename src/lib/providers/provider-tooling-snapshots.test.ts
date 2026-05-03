@@ -8,6 +8,8 @@ const mockWithGreenhousePostgresTransaction = vi.fn(async (callback: (client: { 
 )
 
 vi.mock('@/lib/postgres/client', () => ({
+  onGreenhousePostgresReset: () => () => {},
+  isGreenhousePostgresRetryableConnectionError: () => false,
   runGreenhousePostgresQuery: (...args: unknown[]) => mockRunGreenhousePostgresQuery(...args),
   withGreenhousePostgresTransaction: (callback: (client: { query: typeof mockClientQuery }) => Promise<unknown>) =>
     mockWithGreenhousePostgresTransaction(callback)

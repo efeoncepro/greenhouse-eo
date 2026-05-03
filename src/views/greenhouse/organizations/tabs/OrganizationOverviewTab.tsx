@@ -304,7 +304,7 @@ const OrganizationOverviewTab = ({ detail }: Props) => {
                         </Typography>
                       </TableCell>
                       <TableCell>
-                        <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
+                        <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>
                           {space.publicId}
                         </Typography>
                       </TableCell>
@@ -322,7 +322,7 @@ const OrganizationOverviewTab = ({ detail }: Props) => {
                       </TableCell>
                       <TableCell>
                         {space.clientId ? (
-                          <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
+                          <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>
                             {space.clientId}
                           </Typography>
                         ) : (

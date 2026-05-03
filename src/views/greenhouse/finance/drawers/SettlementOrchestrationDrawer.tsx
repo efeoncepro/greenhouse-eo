@@ -391,7 +391,7 @@ const SettlementOrchestrationDrawer = ({ open, paymentType, paymentId, onClose, 
                 <Grid container spacing={3}>
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <Typography variant='caption' color='text.secondary'>Settlement group</Typography>
-                    <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
+                    <Typography variant='body2'>
                       {detail.settlementGroup.settlementGroupId}
                     </Typography>
                   </Grid>

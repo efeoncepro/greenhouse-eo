@@ -4,6 +4,8 @@ import { Fragment, useState } from 'react'
 
 import Link from 'next/link'
 
+import { useSession } from 'next-auth/react'
+
 import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
@@ -17,7 +19,6 @@ import Switch from '@mui/material/Switch'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
-import TableContainer from '@mui/material/TableContainer'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Tooltip from '@mui/material/Tooltip'
@@ -27,11 +28,19 @@ import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 
 import type { PayrollEntry, PayrollPeriod, PeriodStatus } from '@/types/payroll'
+import type {
+  PayrollEntryDownstreamState,
+  PayrollEntryDownstreamStatus
+} from '@/lib/finance/payment-orders/payroll-status-reader'
 import { canEditPayrollEntries } from '@/lib/payroll/period-lifecycle'
 import { getInitials } from '@/utils/getInitials'
-import BonusInput from './BonusInput'
+import { DataTableShell } from '@/components/greenhouse/data-table'
+import { InlineNumericEditor } from '@/components/greenhouse/primitives'
+import { ROLE_CODES } from '@/config/role-codes'
 import ChileDeductionBreakdown from './ChileDeductionBreakdown'
 import EntryVersionHistoryDrawer from './EntryVersionHistoryDrawer'
+import PayrollAdjustmentHistoryDrawer from './PayrollAdjustmentHistoryDrawer'
+import PayrollEntryAdjustDialog from './PayrollEntryAdjustDialog'
 import PayrollEntryExplainDialog from './PayrollEntryExplainDialog'
 import PayrollReceiptDialog from './PayrollReceiptDialog'
 import ReliquidationBadge from './ReliquidationBadge'
@@ -42,15 +51,49 @@ type Props = {
   period: PayrollPeriod
   periodStatus: PeriodStatus
   onEntryUpdate: (entryId: string, field: string, value: number | string | boolean | null) => void
+  onAdjustmentChanged?: () => void
+  /**
+   * TASK-751 — downstream payment status per entry (shared fetch from
+   * PayrollPeriodTab to avoid duplicate calls). When null, the "Estado pago"
+   * column renders an em-dash for every row.
+   */
+  paymentStatusByEntry?: PayrollEntryDownstreamStatus[] | null
 }
 
-const PayrollEntryTable = ({ entries, period, periodStatus, onEntryUpdate }: Props) => {
+// TASK-751 — chip presentation for the downstream payment state of each entry.
+// Pinta la columna "Estado pago" al final de la tabla.
+type ChipColor = 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning'
+
+const PAYMENT_STATE_CHIP: Record<PayrollEntryDownstreamState, { label: string; color: ChipColor; variant: 'tonal' | 'outlined' }> = {
+  no_obligation: { label: '—', color: 'default', variant: 'outlined' },
+  awaiting_order: { label: 'Por programar', color: 'warning', variant: 'tonal' },
+  order_pending_approval: { label: 'Pendiente aprobacion', color: 'warning', variant: 'tonal' },
+  order_approved: { label: 'En proceso', color: 'info', variant: 'tonal' },
+  order_scheduled: { label: 'En proceso', color: 'info', variant: 'tonal' },
+  order_submitted: { label: 'En proceso', color: 'info', variant: 'tonal' },
+  order_paid_unreconciled: { label: 'Pagado · sin conciliar', color: 'primary', variant: 'tonal' },
+  reconciled: { label: 'Conciliado', color: 'success', variant: 'tonal' },
+  closed: { label: 'Conciliado', color: 'success', variant: 'tonal' },
+  blocked_no_profile: { label: 'Bloqueado: sin perfil', color: 'error', variant: 'tonal' }
+}
+
+const PayrollEntryTable = ({ entries, period, periodStatus, onEntryUpdate, onAdjustmentChanged, paymentStatusByEntry }: Props) => {
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const [receiptEntry, setReceiptEntry] = useState<PayrollEntry | null>(null)
   const [explainEntry, setExplainEntry] = useState<PayrollEntry | null>(null)
   const [historyEntry, setHistoryEntry] = useState<PayrollEntry | null>(null)
+  const [adjustEntry, setAdjustEntry] = useState<PayrollEntry | null>(null)
+  const [adjustHistoryEntry, setAdjustHistoryEntry] = useState<PayrollEntry | null>(null)
+
+  const { data: session } = useSession()
+  const canApproveAdjustments = (session?.user?.roleCodes ?? []).includes(ROLE_CODES.EFEONCE_ADMIN)
 
   const isEditable = canEditPayrollEntries(periodStatus)
+
+  // TASK-751 — Map<entryId, PayrollEntryDownstreamStatus> for O(1) lookup per row.
+  const paymentStatusMap = new Map<string, PayrollEntryDownstreamStatus>(
+    (paymentStatusByEntry ?? []).map(status => [status.entryId, status])
+  )
 
   const toggleExpand = (entryId: string) => {
     setExpandedId(prev => (prev === entryId ? null : entryId))
@@ -58,7 +101,11 @@ const PayrollEntryTable = ({ entries, period, periodStatus, onEntryUpdate }: Pro
 
   return (
     <>
-      <TableContainer>
+      <DataTableShell
+        identifier='payroll-entries'
+        ariaLabel='Tabla de nomina mensual'
+        stickyFirstColumn
+      >
       <Table size='small'>
         <TableHead>
           <TableRow>
@@ -75,6 +122,8 @@ const PayrollEntryTable = ({ entries, period, periodStatus, onEntryUpdate }: Pro
             <TableCell align='right'>Bruto</TableCell>
             <TableCell align='right'>Descuentos</TableCell>
             <TableCell align='right' sx={{ fontWeight: 700 }}>Neto</TableCell>
+            {/* TASK-751 — downstream payment state (read-only chip per entry). */}
+            <TableCell align='center'>Estado pago</TableCell>
             <TableCell sx={{ width: 40 }} />
           </TableRow>
         </TableHead>
@@ -156,7 +205,7 @@ const PayrollEntryTable = ({ entries, period, periodStatus, onEntryUpdate }: Pro
                     {entry.workingDaysInPeriod != null ? (
                       <Tooltip title={`Presentes: ${entry.daysPresent ?? 0} | Ausentes: ${entry.daysAbsent ?? 0} | Licencia: ${entry.daysOnLeave ?? 0}`}>
                         <span>
-                          <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
+                          <Typography variant='body2'>
                             {formatAttendanceRatio(entry.daysPresent, entry.workingDaysInPeriod)}
                           </Typography>
                           {(entry.daysAbsent ?? 0) > 0 && (
@@ -175,7 +224,7 @@ const PayrollEntryTable = ({ entries, period, periodStatus, onEntryUpdate }: Pro
                       ? `Original: ${formatCurrency(entry.baseSalary, entry.currency)} | Ajustado por inasistencia`
                       : ''
                     }>
-                      <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
+                      <Typography variant='body2'>
                         {formatCurrency(entry.adjustedBaseSalary ?? entry.baseSalary, entry.currency)}
                       </Typography>
                     </Tooltip>
@@ -199,17 +248,17 @@ const PayrollEntryTable = ({ entries, period, periodStatus, onEntryUpdate }: Pro
                   {/* Bono OTD */}
                   <TableCell align='right'>
                     {isEditable ? (
-                      <BonusInput
+                      <InlineNumericEditor
                         value={entry.bonusOtdAmount}
                         min={entry.bonusOtdMin}
                         max={entry.bonusOtdMax}
                         currency={entry.currency}
                         qualifies={entry.kpiOtdQualifies}
-                        label='OTD'
+                        label='Bono OTD'
                         onChange={v => onEntryUpdate(entry.entryId, 'bonusOtdAmount', v)}
                       />
                     ) : (
-                      <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
+                      <Typography variant='body2'>
                         {formatCurrency(entry.bonusOtdAmount, entry.currency)}
                       </Typography>
                     )}
@@ -226,17 +275,17 @@ const PayrollEntryTable = ({ entries, period, periodStatus, onEntryUpdate }: Pro
                   {/* Bono RpA */}
                   <TableCell align='right'>
                     {isEditable ? (
-                      <BonusInput
+                      <InlineNumericEditor
                         value={entry.bonusRpaAmount}
                         min={entry.bonusRpaMin}
                         max={entry.bonusRpaMax}
                         currency={entry.currency}
                         qualifies={entry.kpiRpaQualifies}
-                        label='RpA'
+                        label='Bono RpA'
                         onChange={v => onEntryUpdate(entry.entryId, 'bonusRpaAmount', v)}
                       />
                     ) : (
-                      <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
+                      <Typography variant='body2'>
                         {formatCurrency(entry.bonusRpaAmount, entry.currency)}
                       </Typography>
                     )}
@@ -248,7 +297,7 @@ const PayrollEntryTable = ({ entries, period, periodStatus, onEntryUpdate }: Pro
                       ? `Original: ${formatCurrency(entry.remoteAllowance, entry.currency)} | Ajustado por inasistencia`
                       : ''
                     }>
-                      <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
+                      <Typography variant='body2'>
                         {formatCurrency(entry.adjustedRemoteAllowance ?? entry.remoteAllowance, entry.currency)}
                       </Typography>
                     </Tooltip>
@@ -259,7 +308,7 @@ const PayrollEntryTable = ({ entries, period, periodStatus, onEntryUpdate }: Pro
                       ? `Original: ${formatCurrency(entry.fixedBonusAmount, entry.currency)} | Ajustado por inasistencia`
                       : entry.fixedBonusLabel || ''
                     }>
-                      <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
+                      <Typography variant='body2'>
                         {formatCurrency(entry.adjustedFixedBonusAmount ?? entry.fixedBonusAmount, entry.currency)}
                       </Typography>
                     </Tooltip>
@@ -267,7 +316,7 @@ const PayrollEntryTable = ({ entries, period, periodStatus, onEntryUpdate }: Pro
 
                   {/* Bruto */}
                   <TableCell align='right'>
-                    <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
+                    <Typography variant='body2'>
                       {formatCurrency(entry.grossTotal, entry.currency)}
                     </Typography>
                   </TableCell>
@@ -278,7 +327,7 @@ const PayrollEntryTable = ({ entries, period, periodStatus, onEntryUpdate }: Pro
                       <Typography
                         variant='body2'
                         color='error.main'
-                        sx={{ fontFamily: 'monospace', cursor: 'pointer' }}
+                        sx={{ cursor: 'pointer' }}
                         onClick={() => toggleExpand(entry.entryId)}
                       >
                         - {formatCurrency(isHonorarios ? entry.siiRetentionAmount : entry.chileTotalDeductions, 'CLP')}
@@ -290,7 +339,7 @@ const PayrollEntryTable = ({ entries, period, periodStatus, onEntryUpdate }: Pro
 
                   {/* Neto */}
                   <TableCell align='right'>
-                    <Typography variant='subtitle2' sx={{ fontFamily: 'monospace', fontWeight: 700 }}>
+                    <Typography variant='subtitle2' sx={{ fontWeight: 700 }}>
                       {formatCurrency(entry.netTotal, entry.currency)}
                     </Typography>
                     {entry.manualOverride && (
@@ -302,12 +351,69 @@ const PayrollEntryTable = ({ entries, period, periodStatus, onEntryUpdate }: Pro
                     )}
                   </TableCell>
 
+                  {/* Estado pago (TASK-751) */}
+                  <TableCell align='center'>
+                    {(() => {
+                      const status = paymentStatusMap.get(entry.entryId)
+
+                      if (!status || status.state === 'no_obligation') {
+                        return (
+                          <Typography variant='body2' color='text.disabled'>
+                            —
+                          </Typography>
+                        )
+                      }
+
+                      const chipMeta = PAYMENT_STATE_CHIP[status.state]
+
+                      const tooltipText = status.blockReason
+                        ? `${chipMeta.label} · ${status.blockReason}`
+                        : chipMeta.label
+
+                      return (
+                        <Tooltip title={tooltipText}>
+                          <span>
+                            <CustomChip
+                              round='true'
+                              size='small'
+                              variant={chipMeta.variant}
+                              color={chipMeta.color === 'default' ? 'secondary' : chipMeta.color}
+                              label={chipMeta.label}
+                              sx={{ height: 22, fontSize: '0.7rem' }}
+                            />
+                          </span>
+                        </Tooltip>
+                      )
+                    })()}
+                  </TableCell>
+
                   {/* Receipt */}
                   <TableCell>
                     <Stack direction='row' spacing={0.5}>
                       <Tooltip title='Detalle de cálculo'>
                         <IconButton size='small' onClick={() => setExplainEntry(entry)} aria-label={`Ver detalle de cálculo de ${entry.memberName}`}>
                           <i className='tabler-search' />
+                        </IconButton>
+                      </Tooltip>
+                      {isEditable && (
+                        <Tooltip title='Ajustar pago (excluir, porcentaje o descuento)'>
+                          <IconButton
+                            size='small'
+                            color='warning'
+                            onClick={() => setAdjustEntry(entry)}
+                            aria-label={`Ajustar pago de ${entry.memberName}`}
+                          >
+                            <i className='tabler-adjustments-dollar' />
+                          </IconButton>
+                        </Tooltip>
+                      )}
+                      <Tooltip title='Ver ajustes aplicados'>
+                        <IconButton
+                          size='small'
+                          onClick={() => setAdjustHistoryEntry(entry)}
+                          aria-label={`Ver ajustes de ${entry.memberName}`}
+                        >
+                          <i className='tabler-list-details' />
                         </IconButton>
                       </Tooltip>
                       {(periodStatus === 'approved' || periodStatus === 'exported') && (
@@ -324,7 +430,8 @@ const PayrollEntryTable = ({ entries, period, periodStatus, onEntryUpdate }: Pro
                 {/* Expanded detail row */}
                 {canExpand && (
                   <TableRow>
-                    <TableCell colSpan={13} sx={{ py: 0, px: 0 }}>
+                    {/* TASK-751 — colSpan bumped to 14 after adding the "Estado pago" column. */}
+                    <TableCell colSpan={14} sx={{ py: 0, px: 0 }}>
                       <Collapse in={isExpanded} timeout='auto' unmountOnExit>
                         <Box sx={{ p: 2 }}>
                           <Stack spacing={3}>
@@ -427,7 +534,7 @@ const PayrollEntryTable = ({ entries, period, periodStatus, onEntryUpdate }: Pro
                                     Greenhouse registra el monto y calcula los bonos KPI desde OTD y RpA; Deel sigue gestionando compliance y pago final.
                                   </Typography>
                                   {entry.deelContractId && (
-                                    <Typography variant='caption' sx={{ display: 'block', mt: 1.5, fontFamily: 'monospace' }}>
+                                    <Typography variant='caption' sx={{ display: 'block', mt: 1.5 }}>
                                       Contrato: {entry.deelContractId}
                                     </Typography>
                                   )}
@@ -608,7 +715,7 @@ const PayrollEntryTable = ({ entries, period, periodStatus, onEntryUpdate }: Pro
           })}
         </TableBody>
       </Table>
-    </TableContainer>
+      </DataTableShell>
 
     <PayrollReceiptDialog
       open={!!receiptEntry}
@@ -627,6 +734,21 @@ const PayrollEntryTable = ({ entries, period, periodStatus, onEntryUpdate }: Pro
       onClose={() => setHistoryEntry(null)}
       entryId={historyEntry?.entryId ?? null}
       memberName={historyEntry?.memberName ?? null}
+    />
+    <PayrollEntryAdjustDialog
+      open={!!adjustEntry}
+      onClose={() => setAdjustEntry(null)}
+      entry={adjustEntry}
+      onSubmitted={() => {
+        if (onAdjustmentChanged) onAdjustmentChanged()
+      }}
+    />
+    <PayrollAdjustmentHistoryDrawer
+      open={!!adjustHistoryEntry}
+      onClose={() => setAdjustHistoryEntry(null)}
+      entryId={adjustHistoryEntry?.entryId ?? null}
+      memberName={adjustHistoryEntry?.memberName ?? null}
+      canApprove={canApproveAdjustments}
     />
     </>
   )

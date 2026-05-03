@@ -150,7 +150,7 @@ const ProfitabilityTab = ({
               return (
                 <TableRow key={`${row.quotationId}-${row.periodYear}-${row.periodMonth}`} hover>
                   <TableCell>
-                    <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
+                    <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>
                       {row.quotationId}
                     </Typography>
                   </TableCell>
@@ -160,17 +160,17 @@ const ProfitabilityTab = ({
                     </Typography>
                   </TableCell>
                   <TableCell align='right'>
-                    <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
+                    <Typography variant='body2'>
                       {formatCLP(row.quotedTotalClp)}
                     </Typography>
                   </TableCell>
                   <TableCell align='right'>
-                    <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
+                    <Typography variant='body2'>
                       {formatCLP(row.invoicedTotalClp)}
                     </Typography>
                   </TableCell>
                   <TableCell align='right'>
-                    <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
+                    <Typography variant='body2'>
                       {formatCLP(row.attributedCostClp)}
                     </Typography>
                   </TableCell>
@@ -245,12 +245,12 @@ const RenewalsTab = ({
                 {renewals.map(item => (
                   <TableRow key={item.quotationId} hover>
                     <TableCell>
-                      <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
+                      <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>
                         {item.quotationId}
                       </Typography>
                     </TableCell>
                     <TableCell align='right'>
-                      <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>{formatCLP(item.totalAmountClp)}</Typography>
+                      <Typography variant='body2'>{formatCLP(item.totalAmountClp)}</Typography>
                     </TableCell>
                     <TableCell>{formatDate(item.expiryDate)}</TableCell>
                     <TableCell>
@@ -305,12 +305,12 @@ const RenewalsTab = ({
                 {expired.map(item => (
                   <TableRow key={item.quotationId} hover>
                     <TableCell>
-                      <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
+                      <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>
                         {item.quotationId}
                       </Typography>
                     </TableCell>
                     <TableCell align='right'>
-                      <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>{formatCLP(item.totalAmountClp)}</Typography>
+                      <Typography variant='body2'>{formatCLP(item.totalAmountClp)}</Typography>
                     </TableCell>
                     <TableCell>{formatDate(item.expiryDate)}</TableCell>
                     <TableCell>

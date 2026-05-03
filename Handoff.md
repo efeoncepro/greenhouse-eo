@@ -1,5 +1,1182 @@
 # Handoff.md
 
+## Sesion 2026-05-03 — TASK-777 completada end-to-end
+
+- **Branch:** `task/TASK-777-canonical-expense-distribution`.
+- **Skill usada:** `greenhouse-finance-accounting-operator` + `greenhouse-agent`.
+- **Entregado:** migración `expense_distribution_policy`, `expense_distribution_resolution`, `expense_distribution_ai_suggestions`; resolver determinístico `expense -> distribution_lane`; materializador por período; signals `finance.expense_distribution.{unresolved,shared_pool_contamination}`; cutover de shared overhead en `member_capacity_economics`; filtro anti-contaminación en `tool-cost-reader`; close gate en `checkPeriodReadiness`; IA advisory-only + cola/API admin de sugerencias.
+- **Runtime aplicado:** `pnpm pg:connect:migrate` OK + tipos DB regenerados; `pnpm run finance:materialize-expense-distribution -- --period 202604` OK; `202605` OK sin filas.
+- **Abril rematerializado:** member capacity 7 members, commercial attribution 4 allocations, operational P&L 7 snapshots.
+- **Resultado P&L abril:** SKY overhead queda `$2.278.629,39`, ANAM overhead `$759.543,13`; SKY margen bruto queda `$1.902.318,83` (`27,56%`). Se elimina fuga legacy donde Deel/provider payroll sumaba `$1.840.249,24` como direct overhead de SKY.
+- **Close gate runtime:** abril 2026 `isReady=true`, readiness `100`, distribution `complete`, active resolutions `50`, unresolved `0`, contamination `0`; mayo distribución `complete` con 0 filas pero `isReady=false` por ingresos/egresos/FX ausentes.
+- **Signals live:** distribution unresolved `0`, shared pool contamination `0`, expense/income CLP drift `0`.
+- **Validacion:** `pnpm build` OK en la rama actual; focused Vitest, `pnpm tsc --noEmit`, `pnpm lint` y `pnpm pg:doctor` ya habian pasado en esta sesion.
+- **No-breakage:** no se mutaron account balances, settlement legs, payment ledgers, payment orders ni conciliación; solo se usaron como superficies protegidas/baseline.
+- **Lifecycle:** TASK-777 movida a `complete`; docs/tasks registry y documentación funcional/arquitectura sincronizadas.
+
+## Sesion 2026-05-03 — EPIC-012 Finance Five-Capabilities Operating System
+
+- **Trigger:** usuario acepto la recomendacion de ordenar Finance en 5 capacidades: `Treasury & Payments`, `Accounting Semantics`, `Management Accounting`, `Close Governance`, `Planning & Control Tower`.
+- **Artefacto creado:** `docs/epics/to-do/EPIC-012-finance-five-capabilities-operating-system.md`.
+- **Registros sincronizados:** `docs/epics/EPIC_ID_REGISTRY.md` y `docs/epics/README.md`; siguiente ID disponible queda `EPIC-013`.
+- **Task vinculada:** `TASK-777` ahora declara `Epic: EPIC-012`.
+- **Actualización IA:** `TASK-777` y `EPIC-012` incorporan IA como copiloto de distribución contable para casos ambiguos. Regla dura: IA sugiere con evidencia/confidence/prompt hash y kill-switch; no escribe P&L, no cierra períodos, no modifica snapshots y no materializa reglas sin aprobación humana/audit trail.
+- **Actualización no-breakage:** `TASK-777` queda blindada para no romper tesorería/caja: account balances, normalized payment readers, Payment Orders, settlement legs y conciliación son superficies protegidas. La task puede leerlas como evidencia, pero no mutarlas ni recomputar saldos CLP; exige baseline before/after de drift, paid-without-bank-impact, dead-letter y reconciliation status.
+- **Secuencia recomendada:** Wave 1 `TASK-777`; Wave 2 `TASK-713/TASK-393`; Wave 3 `TASK-397`, `TASK-176`, `TASK-710/711/712`, `TASK-707*`, `TASK-756/757`; Wave 4 metric registry + planning/forecast/control tower.
+
+## Sesion 2026-05-03 — Finance domain end-to-end audit
+
+- **Skill usada:** `greenhouse-finance-accounting-operator` en modo `audit`.
+- **Artefacto creado:** `docs/audits/finance/FINANCE_DOMAIN_AUDIT_2026-05-03.md` + `docs/audits/finance/README.md`; indice `docs/audits/README.md` sincronizado.
+- **Runtime verificado read-only:** `pnpm pg:doctor` OK + SQL contra Cloud SQL dev/staging via Cloud SQL Connector.
+- **Conclusion ejecutiva:** Finance transaccional/pagos esta bastante sano tras TASK-766/774/765; Management Accounting / Cost Attribution / Close Governance no esta listo para cierre canonico de abril 2026.
+- **Signals vivos revisados:** account balance FX drift `0`; expense/income payment CLP drift `0`; payment orders zombie `0`; payment orders dead-letter `0`.
+- **Hallazgos criticos:**
+  - `overhead_clp` abril 2026 mezcla provider payroll, Previred/regulatorio, factoring/bank fees y shared SaaS en el mismo pool.
+  - abril 2026 aparece `ready=100%` con `reconciliation_status=not_required`, aunque reconciliation periods de abril siguen `open` y `operational_pl.period_closed=false`.
+  - `operational_pl` sigue consumiendo atajos V0 (`allocated_client_id`, `cost_allocations`) mientras el modelo raiz MLCM_V1 exige lanes/facts canonicas.
+- **Recomendacion:** abril solo provisional/restatement-needed; mayo no debe cerrarse sin gates de `TASK-777` + close governance `TASK-713/TASK-393`.
+
+## Sesion 2026-05-03 — Codex skill `greenhouse-finance-accounting-operator`
+
+- **Scope:** capacidad nueva solo para Codex. No se deja version Claude en este turno para no chocar con el trabajo separado que el usuario pidio a Claude.
+- **Paths activos:**
+  - `.codex/skills/greenhouse-finance-accounting-operator/SKILL.md`
+  - `.codex/skills/greenhouse-finance-accounting-operator/references/greenhouse-finance-runtime-map.md`
+  - `.codex/skills/greenhouse-finance-accounting-operator/references/accounting-finance-playbook.md`
+  - `/Users/jreye/.codex/skills/greenhouse-finance-accounting-operator/SKILL.md`
+- **Enfoque canónico:** la skill ya no queda repo-centrica. Combina arquitectura Greenhouse con benchmarks externos:
+  - `IFRS Conceptual Framework`, `IAS 1`, `IAS 7`, `IFRS 7`, `IFRS 15`, `IFRS 16`
+  - `COSO`
+  - `AICPA/CIMA Global Management Accounting Principles`
+  - `AFP` para treasury/payments controls
+- **Objetivo operativo:** que Codex pueda auditar, diagnosticar, recomendar y ejecutar trabajo financiero-contable con criterio de management accounting, fiscal/tax, treasury, cashflow, payments, P&L, close governance y controls/auditability.
+- **Upgrade posterior:** la skill ahora incluye runbooks ejecutables en `.codex/skills/greenhouse-finance-accounting-operator/references/finance-operations-runbooks.md` para:
+  - overhead/cost allocation audit
+  - client P&L review
+  - expense/payment classification
+  - cash/balance reconciliation
+  - cashflow/liquidity review
+  - month close
+  - reopen/restatement
+  - payment controls review
+  - budget vs actual vs forecast review
+- **Cambio de alcance registrado:** se eliminaron las skills Claude que se habian alcanzado a crear para evitar conflicto con la version separada que el usuario pidio a Claude.
+
+## Sesion 2026-05-03 — TASK-777 creada (Canonical Expense Distribution & Shared Cost Pools)
+
+- **Lifecycle:** `to-do`
+- **Branch al cierre:** `develop`
+- **Trigger:** investigación manual del usuario en `/finance/intelligence` mostró que `SKY` y `ANAM` estaban absorbiendo overhead inflado por una mezcla de lanes incompatibles:
+  - `provider payroll` / pagos `Deel` terminando en `direct_overhead_target` o shared pool
+  - `Previred` y otros pagos regulatorios entrando al shared pool genérico
+  - `bank fees`, factoring y otros financial costs mezclados con overhead operativo
+- **Decisión documental:** se crea `docs/tasks/to-do/TASK-777-canonical-expense-distribution-and-shared-cost-pools.md` como la task faltante entre `TASK-768`, `TASK-176`, `TASK-397`, `TASK-710` y `TASK-713`.
+- **Tesis canónica:** `economic_category` ya existe y es necesaria, pero no basta. Falta el segundo paso explícito `expense -> distribution lane` para separar:
+  - `member_direct_labor`
+  - `member_direct_tool`
+  - `client_direct_non_labor`
+  - `shared_operational_overhead`
+  - `shared_financial_cost`
+  - `regulatory_payment`
+  - `provider_payroll`
+  - `treasury_transit`
+  - `unallocated`
+- **Recomendación operativa al usuario (no implementada):**
+  - **Abril 2026:** no conviene tratarlo como cierre canónico confiable "tal cual". Si negocio necesita congelarlo, hacerlo solo como snapshot provisional/reopenable o con nota explícita de restatement pendiente.
+  - **Mayo 2026:** debería ser el primer mes que cierre bien solo si `TASK-777` (o un slice mínimo equivalente) deja gate de cierre para impedir contaminación de pools shared.
+- **Docs sincronizados:**
+  - `docs/tasks/to-do/TASK-777-canonical-expense-distribution-and-shared-cost-pools.md`
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+  - `docs/tasks/README.md`
+
+## Sesion 2026-05-03 — TASK-774 cerrada (Account Balance CLP-Native Reader Contract)
+
+- **Lifecycle:** `complete` (movida a `complete/`, README sync, signal vivo en staging real).
+- **Branch:** `develop` (instrucción explícita, mismo flujo TASK-771/772/773/775).
+- **Origen:** bug latente detectado tras cierre TASK-773 (pago Figma EXP-202604-008): balance Santander Corp +$92.9 USD en lugar de +$83,773.5 CLP equivalente. `materializeAccountBalance` sumaba directo `payment.amount` sin pasar por VIEW canónica TASK-766.
+- **6 slices entregados:**
+  - Slice 1: Audit con 2 subagentes Explore en paralelo. Bug confirmado en `getDailyMovementSummary` — 3 fuentes afectadas (no 2): `ip.amount`, `ep.amount`, `sl.amount` directo. Settlement_legs también tiene `amount_clp` opcional desde 20260408103211338.
+  - Slice 2: Refactor canónico — VIEWs `expense_payments_normalized` + `income_payments_normalized` para ep/ip, COALESCE inline para `settlement_legs`. Sin schema change. Backwards compat total. 831/831 finance+reliability tests verde.
+  - Slice 3: Lint rule extendida con 3 patrones nuevos modo `error` desde commit-1. RuleTester 3 valid + 3 invalid casos.
+  - Slice 4: Reliability signal `finance.account_balances.fx_drift` (kind=drift, steady=0, ventana 90 días, tolerancia $1 CLP) + 5 tests + wire-up composer.
+  - Slice 5: Backfill script `scripts/finance/backfill-account-balances-fx-fix.ts` (idempotente, dry-run, anchor OTB TASK-703). Cron diario `ops-finance-rematerialize-balances` cubre auto últimos 7 días.
+  - Slice 6: CLAUDE.md sección "Finance — Account balances FX consistency" (4 reglas duras) + Delta arch doc `GREENHOUSE_FINANCE_ARCHITECTURE_V1` con tabla de patterns + detector + doc funcional `docs/documentation/finance/saldos-de-cuenta-fx-consistencia.md` + E2E smoke spec.
+- **Decisiones pre-execution (Open Questions resueltas):**
+  - Q1 (signal vs hardcode histórico) → signal dinámico steady=0.
+  - Q2 (outbox event `account_balance.refixed`) → NO crear (duplica `account_balance.materialized`).
+  - Q3 emergente (settlement_legs VIEW vs COALESCE inline) → COALESCE inline (1 callsite, YAGNI).
+- **Verificación staging real:** signal vivo detectando 2 drifts post-deploy en `dev-greenhouse.efeoncepro.com`. Comportamiento esperado: cron diario `ops-finance-rematerialize-balances` (3 AM Santiago) los rematerializa en próxima ventana sin requerir backfill manual (Figma 2026-05-03 está en ventana de 7 días).
+- **Verde global:** 3056/3056 tests + reliability 108/108 + lint 0 errors + tsc clean.
+- **Lecciones canonizadas en CLAUDE.md + arch doc + doc funcional:** patrón TASK-766 ahora aplica a TODOS los materializers (no solo cash-out). Cualquier futuro materializer (treasury_position, cashflow_summary, etc.) DEBE pasar por VIEWs canónicas. Lint rule + reliability signal son defensa en profundidad.
+
+## Sesion 2026-05-03 — TASK-775 Slices 1-7 cerrados (Vercel Cron Async-Critical Migration Platform)
+
+- **Lifecycle:** Slices 1-7 deployed en `develop`, Slice 8 (verificación E2E + cierre) en curso.
+- **Branch:** `develop` (instrucción explícita, mismo flujo TASK-771/772/773).
+- **Origen:** auditoría post-TASK-773 reveló 16+ crons async-critical aún en Vercel (= no corren en staging custom env). Absorbe TASK-258 + TASK-259.
+- **8 slices entregados:**
+  - Slice 1: Spec canónica `GREENHOUSE_VERCEL_CRON_CLASSIFICATION_V1.md` (3 categorías + decision tree) + helper `wrapCronHandler` con audit + sanitización + captureWithDomain canónico.
+  - Slice 2: Migración `email-deliverability-monitor` → Cloud Scheduler. Inaugura wrapCronHandler. Drift 16.
+  - Slice 3: Migración 3 nubox crons (balance-sync + sync + quotes-hot-sync) con orchestrators puros. Drift 12.
+  - Slice 4: Cleanup duplicados (sync-conformed, quotation-lifecycle).
+  - Slice 5: Reliability signal `platform.cron.staging_drift` + reader + 6 tests + wire-up overview. Steady=0.
+  - Slice 6: CI gate standalone `pnpm vercel-cron-gate` en `.github/workflows/ci.yml` (warn mode durante migración, promueve a strict tras estabilización).
+  - Slice 7: Mass migration 12 crons (webhook-dispatch, email-delivery-retry, entra-{profile,webhook}, hubspot-{quotes,company-lifecycle,companies,deals,products}, sync-conformed-recovery, reconciliation-auto-match) usando módulo único `src/lib/cron-orchestrators/index.ts`. **Drift = 0**.
+  - Slice 8 (en curso): docs CLAUDE.md + AGENTS.md + Handoff + verificación E2E con Playwright + agent auth contra staging real.
+- **Resultado canónico:**
+  - vercel.json: 26 → 10 entries (solo prod_only + tooling restantes).
+  - 16 nuevos Cloud Scheduler jobs en `services/ops-worker/deploy.sh` (idempotente).
+  - 14 nuevos endpoints Cloud Run en `services/ops-worker/server.ts` via `wrapCronHandler`.
+  - Single source of truth: lógica pura en `src/lib/<dominio>/orchestrator.ts` o `src/lib/cron-orchestrators/index.ts`.
+  - Defensa anti-regresión doble: reliability signal runtime + CI gate pre-merge.
+- **Verde global:** 3056/3056 tests passing, type-check + lint + build limpios.
+- **Lecciones canonizadas en CLAUDE.md + AGENTS.md sección "Vercel cron classification + migration platform (TASK-775)":** 3 categorías obligatorias + patrón wrapCronHandler + 6 reglas duras anti-regresión + sincronización snapshot dual.
+
+## Sesion 2026-05-03 — Solution Quality Operating Model canonizado
+
+- **Trigger:** el usuario pidio convertir la preferencia recurrente "no parches; soluciones seguras, robustas, resilientes y escalables" en regla permanente para Codex, Claude y docs operativos.
+- **Fuente canonica nueva:** `docs/operations/SOLUTION_QUALITY_OPERATING_MODEL_V1.md`.
+- **Puntos de entrada sincronizados:** `AGENTS.md`, `CLAUDE.md`, `project_context.md`, `docs/tasks/TASK_PROCESS.md`, `docs/operations/CODEX_EXECUTION_PROMPT_V1.md`, `DOCUMENTATION_OPERATING_MODEL`, `ISSUE_OPERATING_MODEL`, `MINI_TASK_OPERATING_MODEL`, `EPIC_OPERATING_MODEL`, `CONTEXT_HANDOFF_OPERATING_MODEL` y `docs/README.md`.
+- **Contrato:** causa raiz + primitive canonica por defecto; workaround solo temporal, reversible, documentado, con owner, condicion de retiro y task/issue cuando aplique.
+
+## Sesion 2026-05-03 — TASK-773 cerrada (Outbox Publisher Cloud Scheduler Cutover + Reliability + E2E Pre-Merge Gate)
+
+- **Lifecycle:** `complete` (movida a `complete/`, README/registry sincronizados).
+- **Branch:** `develop` (commits directos, instrucción explícita).
+- **Origen:** incidente runtime detectado tras TASK-772 (pago Figma no rebajaba TC Santander Corp). Diagnóstico: el cron Vercel `outbox-publish` solo corre en deploys de Production → staging dejaba TODOS los outbox events en `status='pending'` invisible.
+- **Absorbe TASK-262** (P1 Migrar outbox-publish a ops-worker) — superset estricto.
+- **7 slices entregados**: state machine canónica + helper refactor (SELECT FOR UPDATE SKIP LOCKED) + Cloud Scheduler `*/2 min` + 2 reliability signals + cutover Vercel + E2E gate + docs.
+- **Resolución cross-task contamination**: 16 tests preexistentes fallaban por mocks sin `onGreenhousePostgresReset` (agregada por TLS hardening). Script ad-hoc agregó las 2 funciones nuevas a 99 mocks. Resultado: 0 fails.
+- **Refactor tests flaky TASK-772**: `fireEvent.mouseDown` → `waitFor(role='listbox')` para MUI Select. 4/4 verde estable.
+- **Verde global**: 539 files / 3046 tests / build 22.2s / lint 0 errors. Playwright + Chromium + agent auth contra staging real → 3/3 verde.
+- **Bug latente detectado** → TASK-774 derivada (P0 Crítico): `materializeAccountBalance` no usa VIEW canónica TASK-766 → balance crece +USD nativo en vez de +CLP equivalente. Spec completa con plan canónico.
+- **Lecciones canonizadas en CLAUDE.md**: Vercel cron solo corren en Production; state machine explícita > status opaco; reliability signal por infra crítica nueva; E2E gate pre-merge para finance write paths.
+
+## Sesion 2026-05-03 — Postgres TLS bad certificate runtime hardening
+
+- **Trigger:** Sentry production `JAVASCRIPT-NEXTJS-2N` (`POST /api/webhooks/hubspot-companies`) reportó `ssl/tls alert bad certificate` desde `src/lib/postgres/client.ts`.
+- **Diagnóstico:** no es bug del webhook ni de HubSpot. Vercel logs mostraron el mismo patrón en webhooks, crons, SCIM y sync; causa probable: Cloud SQL Connector/pool en runtime Vercel warm con certificado TLS efímero o conexión stale.
+- **Fix aplicado:** `src/lib/postgres/client.ts` ahora expone detección retryable + listeners de reset; `src/lib/db.ts` invalida Kysely cuando se resetea Postgres y usa un pool adapter dinámico que reintenta `connect()` una vez ante errores TLS retryable.
+- **Guardrail:** `withGreenhousePostgresTransaction` solo reintenta el arranque de transacción (`connect`/`BEGIN`), no callbacks ya ejecutados ni `COMMIT`, para evitar duplicar writes.
+- **Validación:** `pnpm exec vitest run src/lib/db.test.ts src/lib/postgres/client.test.ts`, eslint focalizado, `npx tsc --noEmit`, `pnpm pg:doctor`, `pnpm lint` y `pnpm build` verdes. `pnpm lint` mantiene 318 warnings legacy de copy.
+
+## Sesion 2026-05-03 — TASK-772 cerrada (Finance Expense Supplier Hydration & Cash-Out Selection Integrity)
+
+- **Lifecycle:** `complete` (movida a `complete/`, README/registry sincronizados).
+- **Branch:** `develop` (commits directos, mismo flujo TASK-771 por instrucción explícita).
+- **Slices entregados:**
+  - **Slice 1 — Reader contract canónico** (`src/lib/finance/postgres-store-slice2.ts`): extiende `FinanceExpenseRecord` con 7 campos derivados (`supplierDisplayName`, `sortDate`, `amountPaid`, `amountPaidClp`, `amountPaidIsHomogeneous`, `pendingAmount`, `pendingAmountClp`). 4 SELECTs canónicos (list/get/UPDATE/INSERT) ahora hacen LEFT JOIN suppliers + LEFT JOIN LATERAL aggregate desde VIEW canónica TASK-766 `expense_payments_normalized`. UPDATE/INSERT envuelven el RETURNING en CTE para que el outbox event payload tenga el contract completo desde la misma tx.
+  - **Slice 2 — ExpensesListView** (`src/views/greenhouse/finance/ExpensesListView.tsx`): columna proveedor lee `supplierDisplayName ?? supplierName ?? '—'`. Sort default cambiado de `paymentDate` → `sortDate` (= server-side COALESCE doc/payment/created).
+  - **Slice 3 — RegisterCashOutDrawer** (`.../drawers/RegisterCashOutDrawer.tsx`): grouping por `supplierKey` estable (supplierId || displayName || legacyName || `__unassigned__`). Display de monto pendiente respeta moneda original (`USD 92,90`) + helper text agrega equivalente CLP separado (`Equivalente CLP: $83.774`). NUNCA recompute pendingAmount desde `totalAmountClp - amountPaid` (anti-patrón TASK-766).
+  - **Slice 4 — Writer snapshot hydration** (`src/app/api/finance/expenses/route.ts`): POST resuelve `supplier_name` desde tabla `suppliers` cuando viene `supplierId` sin name explícito. FinanceValidationError 400 si supplierId no existe (nunca crear FK rota). Defense-in-depth con Slice 1 reader fallback.
+  - **Slice 5 — Tests regresión** (`.../drawers/RegisterCashOutDrawer.test.tsx`): 4 tests cubren caso Figma EXP-202604-008 (agrupado bajo "Figma" no "Sin proveedor"), orphan sin supplierId (sí "Sin proveedor"), grupos distintos, fallback graceful a supplierName legacy. Pattern `fireEvent.mouseDown` para abrir MUI Select portal.
+- **Decisiones arquitectónicas (Open Questions resueltas pre-FASE 1):**
+  - (Q1) Snapshot vs reader fallback → **AMBOS** (defense-in-depth canónico).
+  - (Q2) Moneda de pago → **monto documento principal + CLP secundario explícito**.
+  - (Q3) `amountPaid` con mix de monedas → **null + flag `amountPaidIsHomogeneous=false`**, consumer cae a `pendingAmountClp` con disclaimer "(equiv. CLP)". NUNCA inventar conversiones FX (regla TASK-766).
+  - (Q4) Sort canónico → **`COALESCE(document_date, payment_date, created_at)`** server-side.
+  - (Q5) Backfill defensivo `supplier_name` legacy → **NO**. Reader fallback resuelve display sin migration. Writer snapshot evita futuros nulos. Migration UPDATE puede ocurrir más tarde si se quiere consistency en exports históricos.
+- **Caso de prueba real (Figma EXP-202604-008)** — verificado contra PG live:
+  - Pre-fix: supplierName=null, drawer agrupa "Sin proveedor", display USD 83.773,50 (CLP con label USD)
+  - Post-fix: supplierDisplayName="Figma", agrupado bajo "Figma (1 documento)", display "USD 92,90" + helper "Equivalente CLP: $83.774"
+- **Sinergia con ecosistema:**
+  - Reusa VIEW canónica TASK-766 `expense_payments_normalized` (no recomputa CLP via FX inline).
+  - Patrón LEFT JOIN suppliers + LATERAL aggregate replicable a `income` reader (futura TASK derivada).
+  - Lint rule `greenhouse/no-untokenized-fx-math` (TASK-766) sigue protegiendo el path.
+  - Defense-in-depth (writer snapshot + reader fallback) alineado con TASK-768 trigger + COALESCE pattern.
+- **Tests verde**: 536 test files / 3029 tests / 5 skipped (preexistentes). Build clean 22.3s. tsc clean. lint 0 errors / 318 warnings preexistentes (TASK-265 backlog ajeno).
+- **Anti-patterns grep**: 0 `new Pool` en src/ fuera de `src/lib/postgres/client.ts`. 0 `getServerAuthSession()` directo en layouts/pages.
+- **Activación post-deploy**: el push a `develop` triggea Vercel preview/staging build automático. Vercel deploy < 5 min. Verificable via `dev-greenhouse.efeoncepro.com/finance/cash-out` con drawer open + supplier Figma seleccionable.
+- **Riesgos/follow-ups**:
+  - BQ-fallback path en `route.ts:610+` (cuando PG está caído) NO hidrata snapshot ni emite supplierDisplayName — degraded mode legítimo. Reader UI usa fallback `?? supplierName`.
+  - El `fix(finance): TASK-771 followup` commit corrigió 2 padding-line errors preexistentes en `scripts/finance/backfill-provider-bq-sync.ts` que bloqueaban `pnpm lint` con 0-error gate.
+  - Patrón replicable a `/api/finance/income` para casos análogos con `client_name` snapshot — task derivada potencial.
+
+## Sesion 2026-05-03 — Postgres TLS bad certificate runtime hardening
+
+- **Trigger:** Sentry production `JAVASCRIPT-NEXTJS-2N` (`POST /api/webhooks/hubspot-companies`) reportó `ssl/tls alert bad certificate` desde `src/lib/postgres/client.ts`.
+- **Diagnóstico:** no es bug del webhook ni de HubSpot. Vercel logs mostraron el mismo patrón en webhooks, crons, SCIM y sync; causa probable: Cloud SQL Connector/pool en runtime Vercel warm con certificado TLS efímero o conexión stale.
+- **Fix aplicado:** `src/lib/postgres/client.ts` ahora expone detección retryable + listeners de reset; `src/lib/db.ts` invalida Kysely cuando se resetea Postgres y usa un pool adapter dinámico que reintenta `connect()` una vez ante errores TLS retryable.
+- **Guardrail:** `withGreenhousePostgresTransaction` solo reintenta el arranque de transacción (`connect`/`BEGIN`), no callbacks ya ejecutados ni `COMMIT`, para evitar duplicar writes.
+- **Docs:** `project_context.md` y `docs/architecture/GREENHOUSE_POSTGRES_ACCESS_MODEL_V1.md` documentan el contrato para futuros agentes.
+
+## Sesion 2026-05-03 — TASK-772 tomada (Finance Expense Supplier Hydration & Cash-Out Selection Integrity)
+
+- **Lifecycle:** `in-progress` (movida de `to-do/` a `in-progress/`).
+- **Branch:** `develop` (instrucción explícita — no crear branch dedicado, mismo flujo TASK-771).
+- **Ownership check:** `gh pr list --search "TASK-772"` vacío; `git branch -a | grep 772` sin branches previas.
+- **Desbloqueo:** TASK-771 cerrada minutos antes desbloquea el `Blocked by` declarado en spec — ahora puedo tocar consumers de suppliers en expenses/cash-out sin conflicto.
+- **Origen:** evidencia del incidente Figma (`EXP-202604-008`): supplier `figma-inc` existe en PG con `tradeName=Figma`, expense lo referencia con `supplierId=figma-inc` pero `supplier_name=null`. UI `/finance/cash-out` agrupa por `supplierName || 'Sin proveedor'` ocultándolo. Drawer pago calcula `pendingAmount` con `totalAmountClp` mientras conserva `currency=USD` → puede mostrar `USD 83.773,50` en lugar de `USD 92.90`. Sort de Compras client-side por `paymentDate` puede ocultar obligaciones recientes.
+- **Diferencia con TASK-771:** TASK-771 atacó write path supplier → BigQuery (proyección reactiva). TASK-772 ataca read/display path expenses (hidratar `supplierDisplayName`, separar moneda original vs CLP, sort canónico). Ortogonales — ambas necesarias.
+
+## Sesion 2026-05-03 — TASK-771 cerrada (Finance Supplier Write Decoupling + BQ Projection vía Outbox)
+
+- **Lifecycle:** `complete` (movida a `complete/`, README/registry sincronizados).
+- **Branch:** `develop` (commits directos, no branch dedicado por instrucción explícita).
+- **Slices entregados:**
+  - **Slice 1 — Hotfix**: try/catch + `captureWithDomain` en POST `/api/finance/suppliers` y PUT `/api/finance/suppliers/[id]` (3 callsites). Endpoints responden 201/200 cuando PG commitea, independiente de fallas BQ. Regression test del incidente 2026-05-03 verde.
+  - **Slice 2 — Projection canónica**: `src/lib/sync/projections/provider-bq-sync.ts` registrada en el dispatcher reactivo (`projections/index.ts`). Subscribe a `provider.upserted`, re-lee supplier desde PG (single source of truth, evita drift por payloads stale), maxRetries=3 → dead-letter. 8 tests cubren contract, scope, fresh data, supplier deleted skip, PG/BQ throws.
+  - **Slice 3 — Limpieza**: eliminada llamada inline `syncProviderFromFinanceSupplier` del POST y PUT (PG path). Mantenida en BQ-fallback path con try/catch (degraded mode legítimo cuando PG está caído). Tests actualizados.
+  - **Slice 4 — Reliability signal**: `finance.providers.bq_sync_drift` (`src/lib/reliability/queries/provider-bq-sync-dead-letter.ts`) wired en `get-reliability-overview.ts`. Cuenta entries `provider_bq_sync:provider.upserted` en dead-letter sin ack. Subsystem rollup `Finance Data Quality`. 4 tests (steady=0, error count>0, handler param canónico, degraded honestly).
+  - **Slice 5 — Backfill script**: `scripts/finance/backfill-provider-bq-sync.ts` para recovery one-shot manual. Idempotente. Dry-run validó los 3 suppliers (figma-inc, microsoft-inc, notion-inc) resuelven provider correctamente. NO se corrió LIVE: el ops-worker auto-drena post-deploy via `ops-reactive-finance` cada 5 min.
+- **Decisiones arquitectónicas (Open Questions resueltas pre-FASE 1):**
+  - (a) ¿Consumers vivos de `greenhouse.providers` BQ? **SÍ**: 4 LEFT JOINs en `src/lib/ai-tools/service.ts` (catalog, licenses, wallet, admin metadata) + 3 fallback BQ reads en finance. Decisión: **mantener el sync, refactorizado como projection reactiva** — no eliminar sin reemplazo.
+  - (b) Umbral aged-pending para signal: **N/A**. Decisión mejor: usar `outbox_reactive_log.result='dead-letter'` (alineado TASK-765 pattern), sin ventana arbitraria. Más preciso, sin false positives.
+  - (c) Causa raíz inmediata del fail BQ en staging: **no bloqueante**. La projection tiene retry+dead-letter; cualquier failure persistente quedará visible vía `finance.providers.bq_sync_drift`. Diagnosis específica BQ se hace post-cutover sobre dead-letter entries reales.
+- **Sinergia con ecosistema**: el dispatcher reactivo canónico ya existente (`src/lib/sync/reactive-consumer.ts`) y el Cloud Scheduler `ops-reactive-finance` cubren el caso sin job nuevo. El registry de signals `RELIABILITY_REGISTRY` (TASK-635) ya declara `expectedSignalKinds` incluyendo `dead_letter` para el módulo `finance` (TASK-765 Slice 7), no requiere extension. Patrón reusable: futuras projections finance se enchufan a `provider.upserted` / `expense.*` / `income.*` sin tocar el composer.
+- **Tests verde**: 535 test files / 3025 tests / 5 skipped. Build `pnpm build` clean en 36.5s. `npx tsc --noEmit` clean. `pnpm lint` 0 errors / 318 warnings preexistentes (TASK-265 backlog ajeno).
+- **Anti-patterns grep**: 0 `new Pool` en src/ fuera de `src/lib/postgres/client.ts` (solo test legacy preexistente). 0 `getServerAuthSession()` directo en layouts/pages.
+- **Activación post-deploy**: el push a `develop` triggera `ops-worker-deploy.yml` (paths incluye `src/lib/sync/**`). Una vez redeployado el worker, el primer ciclo `ops-reactive-finance` (≤5 min) drena automáticamente los 3 supplier events huérfanos y los proyecta a BQ. Verificable vía `/admin/operations` (signal en steady=0 después del drenaje).
+- **Riesgos/follow-ups**:
+  - El fail BQ original en staging puede persistir (causa raíz no diagnosticada). Si emerge en `finance.providers.bq_sync_drift > 0` post-deploy, el signal lo hará visible y se podrá investigar con evidencia real desde dead-letter entries.
+  - Test obsoleto en `bigquery-write-cutover.test.ts:60-62` (mock de `syncProviderFromFinanceSupplier`) sigue compatible — no rompe nada porque el mock solo se invoca en path de validación de cutover, no testea el sync inline.
+  - TASK-772 fue creada en paralelo por otro flujo (Finance Expense Supplier Hydration & Cash-Out Selection Integrity, caso Figma EXP-202604-008) — NO toca este path; ambas son ortogonales.
+
+## Sesion 2026-05-03 — TASK-769 implementada (Cloud Cost Intelligence + AI FinOps Copilot)
+
+- **Lifecycle:** `complete` (movida a `complete/` y README/registry sincronizados).
+- **Branch:** `task/TASK-769-cloud-cost-intelligence-ai-finops-copilot`
+- **Slices entregados:**
+  - Billing Export V2 backwards-compatible: `costByResource`, `topDrivers`, `forecast`, `aiCopilot` opcional.
+  - UI Cloud & Integrations: forecast mensual, alertas tempranas, recursos/SKUs principales y resumen AI si existe.
+  - Reliability Control Plane: `cloud.expectedSignalKinds` incluye `billing`; drivers no-OK se proyectan como `cloud.billing.driver.*`.
+  - Copiloto FinOps AI: opt-in por `CLOUD_COST_AI_COPILOT_ENABLED=true`, JSON estricto, dedupe por fingerprint, persistencia en `greenhouse_ai.cloud_cost_ai_observations`.
+  - Alert sweep: `runCloudCostAlertSweep({ dryRun })`, Teams primero, Slack fallback, cooldown por fingerprint en `greenhouse_ai.cloud_cost_alert_dispatches`.
+  - ops-worker endpoint: `POST /cloud-cost-ai-watch` corre alertas determinísticas primero y AI después.
+- **Migración aplicada:** `20260503115518831_task-769-cloud-cost-ai-observations.sql`; `src/types/db.d.ts` regenerado por `pnpm migrate:up`.
+- **Datos vivos verificados:** BigQuery `efeonce-group.billing_export` tiene tabla estándar y resource-level pobladas. 30 días = CLP 114.379,91; forecast rolling mensual = CLP 121.840,58; driver principal `resource_driver.cloud_sql.greenhouse_pg_dev` severity `error` por Cloud SQL `greenhouse-pg-dev`.
+- **Validación ejecutada:**
+  - `pnpm pg:doctor`: OK.
+  - `pnpm migrate:up`: OK, migration aplicada y tipos regenerados.
+  - BigQuery reader real con `npx tsx --require ./scripts/lib/server-only-shim.cjs`: OK.
+  - Alert sweep dry-run: 5 drivers evaluados/elegibles, 0 despachos por `dryRun=true`.
+  - AI runner disabled skip: OK, costo cero con `CLOUD_COST_AI_COPILOT_ENABLED=false`.
+  - `pnpm tsc --noEmit`: OK.
+  - `pnpm lint`: 0 errors / 318 warnings legacy TASK-265.
+  - `pnpm build`: OK.
+  - `pnpm test`: 533 files / 3003 tests passed (5 skipped).
+- **Riesgos/follow-ups:**
+  - Activar AI requiere setear `CLOUD_COST_AI_COPILOT_ENABLED=true` en ops-worker + confirmar Vertex AI/WIF en runtime.
+  - Alertas reales requieren canal Teams `ops-alerts` o `CLOUD_COST_ALERT_TEAMS_CHANNEL_CODE`; si falta, caerá a Slack.
+  - Forecast GCP Console reporta CLP 135k; nuestro forecast determinístico rolling 7 días da CLP 121,8k. Diferencia esperada por método propietario de GCP; se documenta como triangulación, no como bug.
+
+## Sesion 2026-05-03 — TASK-769 tomada (Cloud Cost Intelligence + AI FinOps Copilot)
+
+- **Lifecycle:** `in-progress` (movida de `to-do/` a `in-progress/`)
+- **Branch:** `task/TASK-769-cloud-cost-intelligence-ai-finops-copilot`
+- **Ownership check:** `gh pr list --search "TASK-769"` sin PRs; `git branch -a | grep TASK-769` sin branches previas antes de crear esta rama.
+- **Discovery inicial:** BigQuery real ya tiene `billing_export.gcp_billing_export_v1_013340_4C7071_668441` y `billing_export.gcp_billing_export_resource_v1_013340_4C7071_668441`; `pnpm pg:doctor` saludable.
+- **Decisiones preliminares a validar en Audit/Plan:** V2 debe extender `src/lib/cloud/gcp-billing.ts` sin romper V1, usar `resource_v1` para drill-down acotado, mantener detección determinística antes de IA, y preferir Teams como canal primario Greenhouse-first con Slack como fallback/compatibilidad `TASK-103`.
+- **Checkpoint:** P1 + Effort Alto => humano después de Plan Mode antes de escribir código funcional.
+
+## Sesion 2026-05-03 — TASK-768 cerrada (Finance Expense Economic Category Dimension + ISSUE-065 resolved)
+
+- **Lifecycle:** `complete` (movida a `complete/`)
+- **Branch:** `task/TASK-768-finance-expense-economic-category-dimension`
+- **9 slices entregados end-to-end**:
+  - Slice 1: Schema + columna `economic_category` aditiva + 2 lookup tables seedeadas (17 reguladores chilenos + 8 international payroll vendors) + types TS canónicos (11 expense values, 8 income values)
+  - Slice 2: Helpers identity lookup (extractRutsFromText, lookupMemberByRut/Email/Name, lookupSupplier, lookupKnown*) + resolver canónico con 10 reglas first-match-wins + 26 tests
+  - Slice 3: Backfill defensivo Node script + audit log append-only + manual queue + 49 tests acumulados
+  - Slice 5 (re-orden vs spec): Trigger PG `populate_economic_category_default` BEFORE INSERT (cero invasivo a 12 canonical writers)
+  - Slice 4 (re-orden vs spec): CHECK NOT VALID `required_after_cutover` + canonical_values VALIDATED (11 expense, 8 income enum)
+  - Slice 6: Reclassification endpoints PATCH expense + income con capabilities granulares + audit log + outbox events v1 + 14 tests
+  - Slice 7: VIEWs canónicas extendidas con JOIN economic_category + helpers `byEconomicCategory` breakdown (backwards-compat TASK-766 23 tests verdes) + 2 reliability signals nuevos + builder canónico
+  - Slice 8: Lint rule `greenhouse/no-untokenized-expense-type-for-analytics` mode `error` desde commit-1 + cash-out endpoint expone byEconomicCategory + 11 RuleTester tests
+  - Slice 9: CLAUDE.md sección nueva + 3 arch docs deltas + ISSUE-065 documentado y resuelto + doc funcional + manual de uso + GUARDRAIL anti pre-up-marker bug
+- **Verificación final**:
+  - `pnpm tsc --noEmit`: 0 errors
+  - `pnpm build`: clean
+  - `pnpm test`: **533 files / 3003 tests verdes** (5 skipped, +63 vs TASK-766 baseline 2940)
+  - `pnpm lint`: 0 errors / 318 warnings (todas preexistentes TASK-265, scope aparte)
+- **5 migrations nuevas** aplicadas a dev DB
+- **2 capabilities granulares nuevas** (`finance.expenses.reclassify_economic_category` + `finance.income.reclassify_economic_category`)
+- **2 outbox events v1 nuevos** (`finance.expense.economic_category_changed` + `finance.income.economic_category_changed`)
+- **2 reliability signals nuevos** (`finance.expenses.economic_category_unresolved` + `finance.income.economic_category_unresolved`)
+- **1 lint rule custom nueva** (mode `error` desde commit-1)
+- **Bonus arquitectónico**: nueva sección canónica en CLAUDE.md "Database — Migration markers" que documenta el bug `-- Up Migration` marker descubierto en Slice 1 (silent failure cuando se sobreescribe archivo sin preservar el marker).
+- **KPI/data diff esperado post-deploy**:
+  - KPI Nómina cash-out abril 2026: $1.030.082 (broken) → ~$4M (canónico, suma `labor_cost_internal + labor_cost_external`)
+  - KPI Proveedores baja en proporción (deja de absorber payments labor)
+  - Total Pagado canónico se mantiene en $11.143.931 (cash flow ortogonal a buckets)
+  - Reliability signals iniciales: 161 expenses + 19 income en manual queue (esperado, Nubox imports). Operador resuelve via UI Slice 6 antes de migration follow-up que hará VALIDATE atomic.
+- **ISSUE-065 documentado y resuelto**: `docs/issues/resolved/ISSUE-065-kpi-nomina-mis-classification-by-expense-type-conflate.md`
+- **Próximo step**: PR + merge a `develop` (incluye cambios documentales paralelos de Codex que se incorporan al rebase pre-merge).
+- **Bloqueantes downstream desbloqueados**: TASK-178 (Budget Engine), TASK-710-713 (Member Loaded Cost program), beneficio indirecto a TASK-080+ (ICO Engine) y TASK-705/706 (Cost Attribution).
+
+## Sesion 2026-05-03 — TASK-768 tomada (Finance Expense Economic Category Dimension)
+
+- **Lifecycle:** `in-progress` (movida de `to-do/` a `in-progress/`)
+- **Branch:** `task/TASK-768-finance-expense-economic-category-dimension`
+- **Trigger:** descubrimiento 2026-05-03 post-cutover TASK-766. KPI Nómina cash-out abril 2026 = $1.030.082 cuando costos labor reales del periodo ~$4M. Causa raíz arquitectónica: `expense_type` mezcla dimensiones contable/SII y analítica/operativa. Bank reconciler defaultea a `supplier` cuando crea expenses desde transacciones bancarias.
+- **Decisión arquitectónica clave (resuelta pre-execution)**: NO lente read-time (descartada: no ataca causa raíz, blast radius cruza P&L/ICO/Member Loaded Cost/Budget/Cost Attribution, source of truth dividida, auditabilidad pobre). SÍ split de dimensión write-time: nueva columna `economic_category` persistida + resolver canónico + backfill + CHECK NOT NULL + hint engine + reclassification UI + reliability signals + lint rule + migración exhaustiva.
+- **9 slices canon-pattern** replicando TASK-571/699/708/728/721/742/766.
+- **Próximo step:** Resolver 7 Open Questions con opción más robusta + Discovery en paralelo (subagentes Explore para canonical writers, bank reconciler, reliability registry, analytics consumers) → Audit → Connection map → Plan + STOP humano (P0).
+- **Blast radius:** producción tiene KPIs Nómina/Proveedores sesgados visibles. Post-fix: KPI Nómina sube a ~$4M, Proveedores baja en proporción, Total Pagado se mantiene en $11.5M (saldos bancarios intactos).
+
+## Sesion 2026-05-03 — TASK-769 creada (Cloud Cost Intelligence + AI FinOps Copilot)
+
+- **Lifecycle:** `to-do`
+- **Workspace branch al cierre de la sesión:** `develop`
+- **Trigger:** usuario pidió formalizar una task para convertir la observabilidad base de `Billing Export` en una capacidad Greenhouse-first con drill-down, alertas tempranas y capa AI que interprete el gasto y recomiende dónde atacar primero.
+- **Decisión de diseño:**
+  - NO reabrir `TASK-586`: esa lane sigue siendo V1 de observabilidad base.
+  - NO delegar detección a la IA: la task exige separación explícita entre facts determinísticos, signals/thresholds auditables y narrativa AI grounded.
+  - Reusar el patrón `TASK-638` (`ops-worker`, kill-switch, sanitización, JSON estricto, dedupe) en vez de inventar otro runner AI paralelo.
+- **Artefactos creados/actualizados:**
+  - `docs/tasks/to-do/TASK-769-cloud-cost-intelligence-ai-finops-copilot.md`
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+  - `docs/tasks/README.md`
+- **Scope anclado al runtime real:**
+  - Billing V2 sobre `src/lib/cloud/gcp-billing.ts` + `src/types/billing-export.ts`
+  - surfaces en `AdminIntegrationGovernanceView` / `GcpBillingCard`
+  - signals en `src/lib/reliability/signals.ts` + `get-reliability-overview.ts`
+  - capa AI y scheduling en `src/lib/reliability/ai/*` + `services/ops-worker/server.ts`
+- **Open questions dejadas dentro de la task:**
+  - tabla AI nueva vs extender `greenhouse_ai.reliability_ai_observations` con `scope`
+  - `Teams` vs `Slack` como canal primario V1
+  - cuánto complementar `Billing Export` con Cloud Monitoring para señales más tempranas
+
+## Sesion 2026-05-03 — TASK-766 cerrada (Finance CLP-Currency Reader Contract Resilience + Resolución del incidente 2026-05-02)
+
+- **Lifecycle:** `complete` (movida de `in-progress/` a `complete/`)
+- **Branch:** `task/TASK-766-finance-clp-currency-reader-contract`
+- **Slices entregados:** 1, 2, 3, 4a, 4b, 5 — todos los 5 del plan original (slice 4 ejecutado en paralelo a/b).
+- **Cierre del incidente 2026-05-02:**
+  - KPI `/finance/cash-out` "Total pagado" abril 2026: **$1.017.803.262 (broken) → $11.546.493 (canonical)**, diff atribuible a un único payment HubSpot CCA (`exp-pay-sha-46679051-7ba82530`) que el anti-patrón inflaba 88×.
+  - Backfill: 23 income_payments con `currency='CLP' AND amount_clp IS NULL` poblados (1:1 idempotente).
+  - CHECK constraint `payments_amount_clp_required_after_cutover` VALIDATED atomic en la misma migration (drift count = 0 post-backfill, caso esperado).
+- **Reliability signals POST-cutover (verificado vía SQL):**
+  - `finance.expense_payments.clp_drift`: n=0 (steady)
+  - `finance.income_payments.clp_drift`: n=0 (steady, post-backfill)
+- **Componentes canónicos nuevos:**
+  - VIEW `greenhouse_finance.expense_payments_normalized` + mirror `income_payments_normalized` con `payment_amount_clp` (COALESCE chain canonical) + filtro 3-axis supersede inline.
+  - Helpers TS `src/lib/finance/expense-payments-reader.ts` + `income-payments-reader.ts` (single source of truth para todo cómputo CLP de payments).
+  - Lint rule `eslint-plugins/greenhouse/rules/no-untokenized-fx-math.mjs` modo `error` desde commit-1 (4 patrones detected, override block exime los 2 readers canónicos).
+  - Repair admin endpoint `POST /api/admin/finance/payments-clp-repair` (capability granular `finance.payments.repair_clp`, FINANCE_ADMIN + EFEONCE_ADMIN, least-privilege) con outbox audit `finance.payments.clp_repaired` v1.
+  - 8 endpoints migrados al helper canónico (cash-out, cash-in, cash-position, dashboard/{pnl,summary,cashflow}, expenses/summary, income/summary). Bonus 4 callsites con leak de supersede fixed automáticamente.
+- **Verificación final:**
+  - `pnpm tsc --noEmit`: 0 errors.
+  - `pnpm build`: verde (18.1s).
+  - `pnpm test`: 527/527 test files, 2940/2945 tests passed (5 skipped, 0 failed).
+  - `pnpm lint`: 0 errors, 318 warnings (todas preexistentes — TASK-265 mode `warn`).
+- **Outbox events nuevos en catálogo:** `finance.payments.clp_repaired` v1 (TASK-766) — fire-and-forget, dryRun emite igual con `dryRun: true`, truncating skipped/errors a 50 entries en payload.
+- **Docs canónicos updated:**
+  - CLAUDE.md: sección "Finance — CLP currency reader invariants (TASK-766)" con reglas duras + decision tree + 7 invariantes mecánicos.
+  - `GREENHOUSE_FX_CURRENCY_PLATFORM_V1.md`: Delta 2026-05-03.
+  - `GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`: Delta 2026-05-03.
+  - `GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1.md`: Delta 2026-05-03 (V1.4).
+  - `GREENHOUSE_EVENT_CATALOG_V1.md`: Delta 2026-05-03.
+- **ISSUE-064 creado:** `docs/issues/resolved/ISSUE-064-cash-out-kpi-inflated-clp-currency-anti-pattern.md` documenta el incidente del 2026-05-02 + resolución vía TASK-766. Mismo patrón que ISSUE-063 ↔ TASK-765.
+- **Próximo step:** merge a `develop`. Production rollout staged. CHECK constraint cutover ya pasó (2026-05-03), helpers canónicos seguros para deploy.
+
+## Sesion 2026-05-02 — TASK-766 tomada (Finance CLP-Currency Reader Contract Resilience)
+
+- **Lifecycle:** `in-progress` (movida de `to-do/` a `in-progress/`)
+- **Branch:** `task/TASK-766-finance-clp-currency-reader-contract`
+- **Trigger:** post-merge TASK-765, usuario reportó KPIs inflados en `/finance/cash-out`. Investigación SQL confirmó bug arquitectónico: `SUM(ep.amount × COALESCE(e.exchange_rate_to_clp, 1))` infla 88× cuando un payment CLP toca un expense USD (caso CCA TASK-714c — HubSpot $1,106,321 × rate 910.55 = $1B fantasma).
+- **Decisión arquitectónica:** NO fix puntual al endpoint. Solución de raíz en 5 slices: VIEW canónica `expense_payments_normalized` + helper TS + lint rule custom + reliability signals + backfill + repair endpoint. Mismo patrón TASK-571/699/721.
+- **4 Open Questions resueltas pre-execution con opción más robusta:**
+  - Q1 — `income_payments.amount_clp` ya existe (verificado SQL): cero migración estructural extra.
+  - Q2 — Cutover `2026-05-03 00:00:00+00`, VALIDATE atomic post-backfill.
+  - Q3 — Capability `finance.payments.repair_clp` nueva granular (least-privilege).
+  - Q4 — Lint rule mode `error` desde commit 1 (cero tolerancia a legacy).
+- **Próximo step:** Discovery en paralelo (callsites del anti-patrón en portal + reliability registry + lint rule template + schema verification) → plan.md → STOP checkpoint humano (P0).
+- **Blast radius:** producción tiene KPIs inflados visibles en `/finance/cash-out`. Fix llegará a `develop` → `main` por staged rollout.
+
+## Sesion 2026-05-02 — TASK-765 cerrada (Payment Order ↔ Bank Settlement Resilience + Recovery del incidente 2026-05-01)
+
+- **Lifecycle:** `complete` (movida de `in-progress/` a `complete/`)
+- **Branch:** `task/TASK-765-payment-order-bank-settlement-resilience`
+- **Slices entregados:** 1, 2, 3, 4, 5, 6, 7, 8 — todos los 8 del plan original.
+- **Recovery del incidente 2026-05-01 ejecutado contra producción:**
+  - Luis Reyes — Nomina 2026-04 (`por-66563173`): expense_payment + settlement_leg + audit log + outbox replay → $148,312.50 CLP outflow Santander CLP.
+  - Humberly Henriquez — Nomina 2026-04 (`por-596043bd`): idem → $254,250.00 CLP outflow.
+  - Total reflejado en banco: **$402,562.50 CLP**. Closing balance Santander CLP al 2026-05-02: $3,750,478.50.
+- **Reliability signals POST-recovery (verificado vía SQL):**
+  - `paid_orders_without_expense_payment`: n=0 (era 2)
+  - `payment_orders_dead_letter`: n=0 (era 1, acknowledged + recovered)
+  - `payroll_expense_materialization_lag`: n=0
+- **Bonus fixes incluidos:**
+  - 4 tests preexistentes rotos resueltos (PayrollPaymentStatusCard null-safe, internal-role-visibility count drift, people permissions tabs cardinality, creative-velocity-review evidenceMode/attributionClass post quality-gate tightening).
+  - Bug shim/auth-secrets post-TASK-742 regression resuelto: refactor `auth-secrets.ts` + `resend.ts` para eliminar top-level await que rompía tsx CLI scripts. `pnpm finance:rematerialize-balances` y todos los demás scripts del repo ya corren correctamente.
+- **Verificación final:**
+  - `pnpm tsc --noEmit`: 0 errors.
+  - `pnpm build`: verde.
+  - `pnpm test`: 514/514 test files, 2861/2866 tests passed (5 skipped, 0 failed).
+  - `pnpm lint`: 0 errors, 318 warnings (todas preexistentes — TASK-265 mode `warn`).
+  - `pnpm pg:doctor`: healthy.
+- **Outbox events nuevos en catálogo:** `finance.payment_order.settlement_blocked` (v1, 5 reasons) + `finance.payroll_expenses.rematerialized` (v1).
+- **Capabilities granulares nuevas:** `finance.payroll.rematerialize` + `finance.payment_orders.recover` (FINANCE_ADMIN + EFEONCE_ADMIN).
+- **CLAUDE.md actualizado:** sección "Finance — Payment order ↔ bank settlement invariants (TASK-765)" con diagram end-to-end, reglas duras, helpers canónicos.
+- **Próximo step:** merge a `develop`. Production rollout staged. Account_balances rematerialization manual ya ejecutada en dev — en prod, el cron worker la actualiza naturalmente al deploy + rerun.
+
+## Sesion 2026-05-02 — TASK-765 tomada (Payment Order ↔ Bank Settlement Resilience)
+
+- **Lifecycle**: `in-progress` (movida de `to-do/` a `in-progress/`)
+- **Branch**: `task/TASK-765-payment-order-bank-settlement-resilience`
+- **Trigger**: incidente 2026-05-01 detectado por usuario. Dos `payment_orders` (Luis Reyes $148,312.50 + Humberly Henriquez $254,250.00) quedaron en `state='paid'` sin afectar el banco. Investigación reveló cadena de 3 fallas estructurales: (F1) `source_account_id=NULL` permitido en aprobación, (F2) materializador `finance_expense_reactive_intake` dead-letter con "INSERT has more target columns than expressions" → 0 filas en `expenses` para 2026-04, (F3) proyector `record_expense_payment_from_order` skipea silencioso (`recorded=0 skipped=1`) sin error_class.
+- **Cuenta origen para recovery**: Santander CLP (confirmado por usuario).
+- **Decisiones de arquitectura tomadas**:
+  - Path atómico (slice 5) será **canónico**; el proyector reactivo queda como **safety net read-only** (idempotencia preservada por unique index en `expense_payments.payment_order_line_id`).
+  - Capabilities `finance.payroll.rematerialize` y `finance.payment_orders.recover` serán **nuevas y granulares** (least privilege, audit fino).
+- **Próximo step**: Discovery en paralelo (finance / payroll / reactive / reliability / UI) → plan.md → STOP checkpoint humano (P0 + Effort Alto).
+- **Blast radius**: producción tiene los 2 zombie y el materializador dead-letter de 2026-04. Fix llegará a `develop` → `main` por staged rollout.
+
+## Sesion 2026-05-02 — TASK-265 cerrada (Copy Contract + Foundation + ESLint Gate)
+
+- **Lifecycle**: complete (movido de `to-do/` a `complete/`)
+- **Slices entregados**: 1 (audit), 2 (foundation `src/lib/copy/`), 4 (Kortex doc), 5a (ESLint rule), 5b (skill hardening), 5c (CLAUDE.md mention dura). Slice 5d (hook) deferido — la rule ESLint cubre el flanco mecánico sin necesidad de hook redundante.
+- **Foundation creada**:
+  - `src/lib/copy/types.ts` — Locale, MicrocopyDictionary, 9 namespaces (actions, states, loading, empty, months, aria, errors, feedback, time)
+  - `src/lib/copy/dictionaries/es-CL/` — 9 archivos por namespace + composer index.ts. Default canónico
+  - `src/lib/copy/dictionaries/en-US/index.ts` — stub re-exporta es-CL para paridad type-safe (TASK-266 lo traduce)
+  - `src/lib/copy/index.ts` — API pública `getMicrocopy(locale?)` + tipos exportados
+  - **NO requiere `'server-only'`** — usable client-side y server-side (data estática serializable)
+- **ESLint rule canónica**: `eslint-plugins/greenhouse/rules/no-untokenized-copy.mjs` activa en modo `warn`. Detecta:
+  - aria-label literal en JSXAttribute (caso dominante)
+  - Status maps inline con `{ label: 'Pendiente'/'Activo'/etc }`
+  - Loading strings (`'Cargando...'`/`'Guardando...'`)
+  - Empty states (`'Sin datos'`/`'Sin resultados'`)
+  - Cobertura secundaria de label/placeholder/helperText/title/subtitle dentro de JSXAttribute o styled()
+  - Excludes: theme files, global-error, public/**, emails/**, finance/pdf/**
+- **Skill `greenhouse-ux-writing` hardenizada** en `~/.claude/skills/greenhouse-ux-writing/skill.md`:
+  - Description reescrita con `MANDATORY` + triggers explícitos (labels, placeholders, tooltips, drawer titles, snackbar, alert, empty state, error message, status, loading, aria-label, KPI, microcopy en español)
+  - `type: gate` agregado al frontmatter (paralelo a `greenhouse-ui-review`)
+  - Sección "Mandatory reading" apuntando a `src/lib/copy/`, `src/config/greenhouse-nomenclature.ts`, `GREENHOUSE_UI_PLATFORM_V1.md`
+  - Decision tree para nuevos strings + sección de enforcement mecánico apuntando a la rule
+- **CLAUDE.md** Conventions ampliado:
+  - Sección "Microcopy / UI copy — regla canónica (TASK-265)" con regla dura "ANTES de escribir cualquier string visible al usuario, invocar `greenhouse-ux-writing`"
+  - Decision tree inline + cross-link a `src/lib/copy/` y `greenhouse-nomenclature.ts`
+- **GREENHOUSE_UI_PLATFORM_V1.md** Delta 2026-05-02 con Copy System Contract completo (5 KB de spec):
+  - Las dos capas canónicas
+  - API pública con ejemplos
+  - Decision tree por tipo
+  - Reglas duras
+  - Coordinación con TASK-266 (i18n) y Kortex (Slice 4)
+
+### Snapshot baseline para TASK-407/408 (lint warnings emitidos por la rule)
+
+`pnpm lint` al cierre TASK-265: **318 warnings totales** distribuidos por pattern:
+
+| Pattern | Count | Asignado a |
+|---|---|---|
+| aria-label literal | **202** | TASK-407 (shared shell) — caso dominante |
+| Status maps inline (`{ label: 'Pendiente' }`) | **59** | TASK-407 (componentes) |
+| Loading strings | **0** | (cubierto por sweep ya iniciado o false-negatives — verificar en TASK-407) |
+| Empty states | **23** | TASK-407 |
+| Secondary props (label/placeholder/etc) | **34** | TASK-407 + TASK-408 según surface |
+
+Total real escaneable post-rule: 318. Más bajo que la estimación pre-implementación de ~630 porque la rule excluye scopes legítimos (theme, global-error, public, emails, PDFs) que sí estaban en el conteo bruto del audit.
+
+**Promote a `error` mode**: cierre TASK-408 ejecuta `eslint.config.mjs` change `'warn'` → `'error'` en la rule + verifica `pnpm lint` clean (0 errors).
+
+### Verification ejecutada
+
+- `pnpm lint`: 0 errors / 318 warnings (la rule emite warnings; gate activo no bloquea CI)
+- `pnpm tsc --noEmit`: 0 errors
+- `src/lib/copy/` carga client + server (no `'server-only'` constraint)
+
+### Sinergia con tasks colindantes
+
+- **TASK-407 desbloqueada**: foundation existe, baseline 318 warnings registrado, sweep target claro (aria-label primero por dominancia 64%)
+- **TASK-408 desbloqueada**: foundation lista, su Closing Protocol promueve la rule a `error`
+- **TASK-266 epic desbloqueado**: foundation locale-aware desde día uno, TASK-428 puede arrancar ADR de librería sabiendo que la API ya está estable
+- **TASK-264** (theme/branding): contrato verbal y theme convergen como hermanos según declarado en spec
+
+### Open questions resueltas
+
+- ¿`greenhouse-nomenclature.ts` principal o evolucionar? → **recortarlo, no ampliarlo** (alineado con spec; product nomenclature only)
+- ¿estructura dictionary-ready? → **namespace-by-domain con archivos TS separados** (mismo patrón Vuexy `dictionaries/`); index.ts compositor por locale
+- ¿locale param día uno? → **SÍ** (`Locale = 'es-CL' | 'en-US'`); en-US es stub semilla
+- ¿adapter dictionary-like aunque es-only? → **SÍ** (justificado por footprint LATAM; TASK-266 no reescribe API)
+- ¿Kortex adapter ejecutable? → **conceptual** documentado en GREENHOUSE_UI_PLATFORM_V1.md Delta 2026-05-02 sección Kortex
+
+## Sesion 2026-05-02 — Microcopy governance integrada a TASK-265 (no se creó task duplicada)
+
+- **Pregunta operativa**: agentes AI tienden a hardcodear copy en JSX ignorando la skill `greenhouse-ux-writing`. Causa raíz: skill es opt-in, no hay enforcement mecánico.
+- **Inventario antes de proponer task nueva** (mismo principio que aplicamos en design-tokens audit antes de redactar ADR): el programa de microcopy governance YA EXISTE — TASK-265 (contract + foundation) + TASK-407 (sweep shared shell) + TASK-408 (sweep notifications/emails) + epic TASK-266 (i18n umbrella) + TASK-428/429/430/431 (i18n hijos).
+- **Decisión arquitectónica**: NO crear TASK-771. Integrar el gate operativo (ESLint rule + skill hardening + checklist + hook) como **Slice 5 de TASK-265**. Razón: cuando TASK-265 cierre con la foundation dictionary-ready inicializada, el gate debe apuntar a esa foundation desde día uno. Crear el gate en task separada introduce drift entre contrato y enforcement.
+- **Patrón heredado de TASK-567** (gate antes que sweep):
+  - TASK-265 Slice 5 → gate en modo `warn` (no bloquea CI mientras migra)
+  - TASK-407 + TASK-408 → sweep migra hardcodes a la capa canónica
+  - Cierre TASK-408 → promote del gate a `error` mode (CI bloquea regresiones)
+- **Cambios aplicados**:
+  - TASK-265 con Slice 5 nuevo (5a rule, 5b skill hardening, 5c checklist `greenhouse-ui-review`, 5d hook PostToolUse opcional)
+  - TASK-407 Closing Protocol: verifica warning count baja respecto al baseline. Resuelta su Open Question sobre ESLint rule.
+  - TASK-408 Closing Protocol: promueve la rule a error mode al cierre.
+- **Skill `greenhouse-ux-writing` queda como source-of-truth de tono/wording**; la rule la complementa con enforcement mecánico, no la reemplaza.
+
+## Sesion 2026-05-02 — TASK-567 cerrada (typography sweep + ESLint governance)
+
+- **Contexto**: tras commit de `DESIGN.md` (commit `f8fc7200`) y creación de TASK-764 (DESIGN.md hardening), el usuario pidió ejecutar TASK-567 con principio "lo más robusto, seguro, resiliente y escalable". Decisión arquitectónica: invertir el orden de la spec — gate antes que sweep — para que cualquier limpieza quede auto-protegida desde CI antes de hacerse.
+- **Slice 3a — gate establecido en `warn`**: rule local `greenhouse/no-hardcoded-fontfamily` en `eslint-plugins/greenhouse/rules/no-hardcoded-fontfamily.mjs` siguiendo patrón de `no-raw-table-without-shell` (TASK-743). AST vanilla, scope universal sobre `Property` con key `fontFamily` y value literal/template puro. Allowlist para CSS-wide values. 7 messageIds accionables por familia detectada. Snapshot inicial: 311 warnings, 0 errors.
+- **Slice 2 — sweep automatizado conservador**: 2 codemods regex (`/tmp/codemod-fontfamily.mjs` y `pass2`) eliminaron 300 occurrences (262 + 38) en 135 archivos. Pass 1: `'monospace'` literal en `sx`/`style`. Pass 2: `'Poppins'`, `'Poppins, sans-serif'`, `'Inter'`, `'DM Sans'`, composite mono stacks. Codemods quedan como artifacts en `/tmp` (no commiteados — son de uso único).
+- **Slice 2c — 9 casos especiales manuales**: ternarios `mono ? { fontFamily: 'monospace' } : undefined` migrados a `variant={mono ? 'monoId' : 'body2'}` en `PersonProfileTab` (×2). 6× `InputProps.sx` anidado en CreateHesDrawer/CreatePurchaseOrderDrawer/CreateIncomeDrawer/EditProfileDrawer eliminada la fontFamily preservando fontSize/bgcolor. NexaThread `<code>` markdown con `eslint-disable-next-line` justificado (excepción válida de spec — código fuente literal, no IDs/amounts).
+- **Slice 3b — rule en `error`**: subida de severidad bloquea CI desde ahora ante cualquier regresión. Excluidos por scope: `src/components/theme/**`, `src/@core/theme/**`, `src/app/global-error.tsx`, `src/app/public/**`, `src/emails/**`, `src/lib/finance/pdf/**`.
+- **Slice 4 — TASK-021 reclasificada**: nota delta agregada al inicio de `docs/tasks/to-do/TASK-021-typography-variant-adoption.md`. Sigue vigente para `fontWeight` migration y adopción opt-in de variants semánticos donde aplique.
+- **Verification**: `pnpm lint` 0/0, `npx tsc --noEmit` 0 errors. Delta neto -38 LOC (335 inserciones, 373 deleciones).
+- **Sinergia con TASK-764 (DESIGN.md hardening)**: TASK-567 cierra el flanco "typography drift en código" del contrato visual. TASK-764 añade el flanco "design tokens drift en DESIGN.md" (CI gate `design:lint`). Ambas convergen en "tokens declarados, runtime alineado, lint que bloquea drift".
+- **Follow-ups**: `fontWeight` hardcodeado y adopción opt-in de `monoId/monoAmount` quedan en TASK-021. Tests con `RuleTester` para rules locales pendientes (no hay infra hoy).
+
+## Sesion 2026-05-02 — Notion freshness drift (BigQuery vs PostgreSQL) mitigado en portal
+
+- **Trigger**: investigacion del usuario por `RpA Global = 3` en `/agency` derivo en un hallazgo mas grave: mayo 2026 **si** tiene datos Notion en BigQuery, pero `greenhouse_core.space_notion_sources.last_synced_at` seguia `NULL` en PostgreSQL mientras `efeonce-group.greenhouse.space_notion_sources.last_synced_at` se actualizaba todos los dias.
+- **Evidencia directa**:
+  - BigQuery `ico_engine.v_tasks_enriched` para mayo 2026: Efeonce tiene 39 tasks, 39 completadas, 1 sola con `rpa_value > 0`, `avg_positive_rpa = 3.0`. El `3` de Agency sale de esa muestra minima, no de un cierre vacio.
+  - BigQuery raw `notion_ops.{tareas,proyectos,sprints}` fresco el `2026-05-02` para Efeonce y Sky.
+  - PostgreSQL `greenhouse_core.space_notion_sources`: ambos spaces activos con `sync_enabled = true`, DB ids correctos y `last_synced_at = null`.
+  - BigQuery `greenhouse.space_notion_sources`: ambos spaces con `last_synced_at` actualizado (`2026-05-02 07:03:34` / `07:05:57`).
+  - `INFORMATION_SCHEMA.JOBS_BY_PROJECT` confirma que el writer diario vive fuera del portal y ejecuta `UPDATE greenhouse.space_notion_sources SET last_synced_at = CURRENT_TIMESTAMP()` como `183008134038-compute@developer.gserviceaccount.com`.
+- **Resultado código**:
+  - nuevo helper [`src/lib/integrations/notion-sync-freshness.ts`](/Users/jreye/Documents/greenhouse-eo/src/lib/integrations/notion-sync-freshness.ts) para:
+    - leer freshness desde BigQuery
+    - devolver freshness efectiva por space con fallback PG -> BQ
+    - reconciliar `last_synced_at` de BQ hacia PostgreSQL
+  - [`src/lib/sync/sync-bq-conformed-to-postgres.ts`](/Users/jreye/Documents/greenhouse-eo/src/lib/sync/sync-bq-conformed-to-postgres.ts) ahora, ademas del drain `BQ conformed -> greenhouse_delivery.*`, reconcilia `space_notion_sources.last_synced_at` hacia PostgreSQL en la misma corrida idempotente.
+  - readers endurecidos con fallback a BigQuery:
+    - [`src/app/api/admin/tenants/[id]/notion-status/route.ts`](/Users/jreye/Documents/greenhouse-eo/src/app/api/admin/tenants/%5Bid%5D/notion-status/route.ts)
+    - [`src/app/api/admin/spaces/route.ts`](/Users/jreye/Documents/greenhouse-eo/src/app/api/admin/spaces/route.ts)
+    - [`src/lib/operations/get-operations-overview.ts`](/Users/jreye/Documents/greenhouse-eo/src/lib/operations/get-operations-overview.ts)
+- **Validacion**:
+  - `pnpm exec eslint src/lib/integrations/notion-sync-freshness.ts src/lib/sync/sync-bq-conformed-to-postgres.ts 'src/app/api/admin/tenants/[id]/notion-status/route.ts' src/app/api/admin/spaces/route.ts src/lib/operations/get-operations-overview.ts` ✓
+- **Riesgo / deuda abierta**:
+  - el writer primario sigue viviendo fuera de este repo (`notion-bq-sync` / compute service account). El portal ya puede **reconciliar** y **dejar de mentir** en sus readers, pero la solucion mas canonica sigue siendo agregar tambien la escritura espejo a PostgreSQL en ese servicio upstream.
+  - no se corrige aun la inconsistencia secundaria de trust metadata en `/api/agency/spaces` (`rpaAvg` presente con `rpaMetric = no_completed_tasks`).
+
+## Sesion 2026-05-01 (noche) — DESIGN.md + CLI oficial integrada
+
+- **Trigger**: usuario pidió adoptar el formato abierto `DESIGN.md` de Google Labs en todo el repo y además instalar la CLI global.
+- **Resultado**:
+  - nuevo archivo raíz `DESIGN.md` como contrato visual compacto para agentes
+  - baseline declarada: `Poppins + Geist`, con tokens de color, tipografía, spacing, radius y componentes alineados al runtime real
+  - `package.json` incorpora scripts:
+    - `pnpm design:lint`
+    - `pnpm design:diff`
+    - `pnpm design:export:tailwind`
+  - `README.md`, `docs/README.md`, `AGENTS.md`, `CLAUDE.md`, `project_context.md` y `changelog.md` quedan actualizados para que futuros agentes lean `DESIGN.md` de forma explícita
+- **CLI oficial**:
+  - dependencia local agregada: `@google/design.md`
+  - instalación global pedida por usuario pendiente de verificación al cierre del turno
+  - binario esperado: `design.md`
+- **Validación esperada en este turno**:
+  - `pnpm design:lint`
+  - smoke del binario global: `design.md lint DESIGN.md`
+- **Riesgo abierto**:
+  - el paquete `@google/design.md@0.1.1` emite warnings de peer deps no bloqueantes en este workspace; si el CLI cambia contrato en versiones futuras, conviene fijar/reevaluar antes de meterlo a CI dura.
+
+## Sesion 2026-05-01 (tarde, post-pivot) — line-height token namespace canónico (tokens v1.3)
+
+- **Trigger**: tras shippear Geist (commit `91859c13`, deploy `greenhouse-eiu021wol`), el usuario reportó que el portal "se ve muy junto" y pidió explícitamente solución **robusta, resiliente, escalable** — no parche de 3 inline overrides.
+- **Diagnóstico** (con skills `modern-ui` + `greenhouse-ux` cargadas en sesión): Geist tiene x-height ligeramente más bajo que Inter/DM Sans, lo cual con el root font 13.125px de Vuexy hace que ratios `<1.5` (subtitle1/h6/caption heredados del coretheme) se sientan cramped en transición a body 1.5. Pero la causa estructural era **mayor**: el theme tenía magic numbers de line-height inline en cada variant, sin tokens semánticos compartidos — calibrar implicaba tocar N lugares por concepto.
+- **Solución arquitectónica (no patch)**:
+  1. Nuevo archivo canónico `src/components/theme/typography-tokens.ts` declara namespace `lineHeights = { display, heading, pageTitle, metadata, body, numericDense }` con docstrings que justifican cada token y nombres semánticos (no magic numbers, no nombres opacos).
+  2. `src/components/theme/types.ts` hace type augmentation `Theme['lineHeights']` para que el namespace sea accesible via `theme.lineHeights.<token>` en runtime desde cualquier componente (sx, styled, useTheme).
+  3. `src/components/theme/mergedTheme.ts` consume tokens en TODAS las variants — cero magic numbers en typography. `h1-h3 → heading`, `h4 → pageTitle`, `h5/h6/subtitle1/body1/body2 → body`, `caption → metadata`, `monoId/monoAmount → numericDense`, `kpiValue → display`. `button`, `overline`, `subtitle2` heredan del coretheme sin override (intencional, NO se inventan tokens redundantes).
+  4. `theme.lineHeights` queda expuesto al runtime — futuro componente puede leer `theme.lineHeights.body` cuando necesite line-height fuera de variants.
+  5. `GREENHOUSE_DESIGN_TOKENS_V1.md` §3.2 actualizada (columna ahora muestra token name + valor), nueva §3.6 documenta el namespace canónico con reglas duras, foundation files §3.5 incluye el archivo nuevo, bump a **v1.3** con versioning row que documenta el cambio arquitectónico.
+- **Resultado para la queja del usuario**: las 3 variants que causaban "se ve muy junto" (h6/subtitle1/caption) absorbieron la calibración vía token (h6 y subtitle1 ahora apuntan a `body=1.5`, caption apunta a `metadata=1.45`). Misma calibración que un patch hubiera entregado, pero ahora cualquier futura recalibración toca **1 archivo**, no N.
+- **Convergencia con producto enterprise moderno**: Linear / Stripe Dashboard / Vercel app (Geist-based) corren subtitle/h6 a 1.5 — la calibración Greenhouse converge a la baseline industria. Tokens nombrados (display/heading/body/etc) son el patrón Tailwind/Material 3 — no se inventa nomenclatura nueva.
+- **Reglas duras agregadas (§3.6 doc canónico, auditables por `greenhouse-ui-review`)**:
+  - NEVER declarar `lineHeight` con número literal en variants nuevas — referenciar token.
+  - NEVER `lineHeight` inline en componentes si una variant ya cubre el caso.
+  - Cuando un componente legítimamente necesite line-height fuera de variants, leer `theme.lineHeights.<token>`, no número.
+  - Para extender la escala: agregar token a `typography-tokens.ts` con docstring + type augment + documentar fila en §3.6.
+- **Verificación**: pendiente lint + build + deploy + validación visual del usuario.
+- **Riesgo abierto**: si en staging real alguna surface puntual sigue sintiéndose tight, **NO** se vuelve al patch — se evalúa si la causa es el token mal calibrado (entonces ajusta el valor en `typography-tokens.ts`, propaga a todas las variants que lo usan) o si la surface necesita un token nuevo legítimo (entonces se agrega al namespace siguiendo §3.6).
+
+## Sesion 2026-05-01 (tarde) — pivot Inter → Geist sobre la foundation TASK-566
+
+- **Trigger**: tras shippear Inter en staging (commit `5c4d84aa`, deploy preview `greenhouse-96gktkj39`), el usuario validó visualmente y comparó vía mockup A/B (`docs/mockups/typography-inter-vs-geist-mockup.html`). Veredicto: **Inter se siente plana / poco moderna**, Geist tiene la personalidad AI-native que necesita el portal Globe.
+- **Decisión**: pivot a **Geist Sans** como product UI base, manteniendo Poppins en `h1-h4`. Geist Mono **NO** se introduce — `monoId/monoAmount` siguen sobre Geist Sans + `tabular-nums`. Sigue siendo sistema de dos familias.
+- **Calibración de pesos**: idéntica al contrato post-TASK-566 (Poppins 600/700/800 en h1-h4, Geist 400 body / 500 helpers / 600 h5/h6/button/overline/monoId / 700 monoAmount / 800 kpiValue). No se preventiva down-shift; se valida en staging real y solo se recalibra surface puntual si emerge oppressive.
+- **Resultado código** (sobre los mismos 3 archivos owned por TASK-566, sin reabrir la task):
+  - `src/app/layout.tsx`: import `Inter` → `Geist`. Variable CSS `--font-inter` → `--font-geist`. Mismos pesos (400/500/600/700/800), mismo `display:'swap'`, mismo fallback array.
+  - `src/components/theme/mergedTheme.ts`: `typography.fontFamily` base ahora `var(--font-geist), 'Geist', …`. Pesos por variant inalterados.
+  - `docs/architecture/GREENHOUSE_DESIGN_TOKENS_V1.md` §3 actualizada + bump a **v1.2**: tabla `3.1`, scale `3.2`, prohibiciones `3.4`, foundation files `3.5`. Versioning row 1.2 documenta el pivot. Anti-pattern catalog y "Por qué Geist" reescritos.
+- **Documentos hijos del epic realineados a Geist en este turno**:
+  - `EPIC-004` — bloque Delta `2026-05-01 (tarde)` agregado.
+  - `TASK-566` (closed) — bloque Delta `2026-05-01 (tarde)` agregado al inicio.
+  - `TASK-567` — bloque Delta agregado: ESLint rule debe bloquear también `var(--font-inter)` y `'Inter'` literal en código nuevo.
+  - `TASK-568` — bloque Delta agregado: emails y PDFs convergen a `Poppins + Geist`. Asset PDF `Geist-{Regular,Medium,SemiBold,Bold,ExtraBold}.ttf` (npm `geist`, SIL OFL 1.1).
+  - `TASK-569` — bloque Delta agregado: Figma + skills cleanup apuntan a Geist; `.claude/skills/modern-ui/SKILL.md` debe quitar la regla legacy "no Inter".
+- **Verificación**: `pnpm lint` ✓. Deploy a staging en curso. Validación visual queda como follow-up del usuario en `/home`, `/finance/quotes/new`, `/hr/payroll`, `/admin` (light/dark + mobile + zoom 125-150%).
+- **Riesgo abierto**: una vez verificado en staging, si alguna surface puntual se siente oppressive (predecibles: dock total $38M+, monoAmount en payroll, button contained sobre fondo saturado), commit chico de recalibración variant-por-variant. Sin recalibración preventiva — eso anularía el motivo del pivot.
+
+## Sesion 2026-05-01 — TASK-566 cerrada (foundation Inter + Poppins implementada)
+
+- **Trigger**: usuario pidió implementar TASK-566 (foundation tipográfica del EPIC-004) sobre la spec ya realineada a Inter.
+- **Resultado código**:
+  - `src/app/layout.tsx`: `DM_Sans` reemplazado por `Inter` (pesos 400/500/600/700/800). `Poppins` se mantiene (600/700/800). Ambos con `display:'swap'` y `fallback` arrays explícitos para mitigar FOUT/CLS. Variables CSS: `--font-inter` y `--font-poppins`.
+  - `src/components/theme/mergedTheme.ts`: `typography.fontFamily` base → Inter. Poppins removida de `h5/h6/button/overline/kpiValue`, queda solo en `h1-h4`. `monoId/monoAmount/kpiValue` ya no usan `monospace` ni Poppins; usan Inter implícito + `fontVariantNumeric:'tabular-nums'`. `caption.color` hardcodeado eliminado.
+  - `docs/architecture/GREENHOUSE_DESIGN_TOKENS_V1.md` §3 reescrita end-to-end (bump 1.1): política `Poppins display + Inter base`, stack fallback explícito, tabla de scale con familia por variant, prohibiciones nuevas, sección 3.5 con foundation files.
+  - Cleanup colateral: 4 errores de lint pre-existentes en `scripts/verify-humberly-fix.mjs` (whitespace) resueltos para que `pnpm lint` quede limpio.
+- **Out of scope confirmado** (siguen abiertas):
+  - `TASK-567` — sweep de `fontFamily` hardcodeada + ESLint rule.
+  - `TASK-568` — emails + PDFs (`src/emails/constants.ts`, `src/lib/finance/pdf/{tokens,register-fonts}.ts` y secciones).
+  - `TASK-569` — visual regression + Figma + skills cleanup.
+  - Residuales activas no tocadas: `GreenhouseFunnelCard.tsx`, `public-quote/styles.module.css`, `global-error.tsx`, `ai/image-generator.ts`. `src/@core/theme/typography.ts` queda intacto (regla dura).
+- **Verificación**:
+  - `pnpm lint` ✓
+  - `pnpm build` ejecutado (route map renderizado en CI local)
+  - revisión visual manual queda como follow-up del usuario en `/home`, `/finance/quotes/new`, `/hr/payroll`, `/admin` (light/dark + mobile + zoom 125-150%)
+- **Riesgo abierto**: hasta que TASK-567 cierre el sweep, las pocas surfaces que aún hardcodean `var(--font-dm-sans)` (componente Funnel, public-quote stylesheet, global-error) caerán al fallback `sans-serif` del propio inline declaration. El portal autenticado al 99% pasa por el theme, así que el impacto visible es mínimo.
+
+## Sesion 2026-05-01 — EPIC-004 y TASK-566/567/568/569 realineadas de Geist a Inter
+
+- **Trigger**: usuario pidió revisar a profundidad el programa tipográfico 566-569 y confirmó que no quiere migrar a `Geist`, sino a `Inter`.
+- **Resultado documental**:
+  - `docs/epics/to-do/EPIC-004-typography-unification-poppins-geist.md` fue reescrita para reflejar `Poppins + Inter`.
+  - `docs/tasks/to-do/TASK-566-typography-foundation-geist-poppins-theme.md` quedó realineada a `Inter` como base y sin tercera familia mono por defecto.
+  - `docs/tasks/to-do/TASK-567-typography-code-sweep-eslint-rule.md` fue simplificada y reenfocada al contrato nuevo.
+  - `docs/tasks/to-do/TASK-568-typography-email-pdf-font-registration.md` ahora parte del runtime real del repo (`src/lib/finance/pdf/register-fonts.ts`, `tokens.ts`, assets locales) en vez de asumir helpers/URLs de `Geist`.
+  - `docs/tasks/to-do/TASK-569-typography-visual-regression-figma-docs.md` se corrigió para apuntar a las skills reales del repo (`modern-ui`, `greenhouse-ui-review`, `greenhouse-email`, etc.) y limpiar el drift documental “no Inter”.
+- **Decisión de diseño**:
+  - baseline objetivo del programa = `Poppins` para display controlado + `Inter` para product UI.
+  - `monoId` y `monoAmount` se preservan como variants semánticos, pero el contrato preferido pasa a ser `Inter + tabular-nums`, no `Geist Mono` ni `monospace`.
+- **Riesgo abierto**:
+  - el repo todavía tiene muchas referencias legacy a `DM Sans` fuera del epic/tareas; no se limpiaron en este slice porque el pedido era ajustar el programa, no reescribir toda la documentación histórica.
+  - follow-up documental agregado en una segunda pasada: el programa ahora exige validación light/dark, mobile, zoom alto, fallback stacks explícitos, trazabilidad/licencia de assets `Inter` para PDF y criterio de cleanup histórico para no borrar referencias legacy a ciegas.
+
+## Sesion 2026-05-01 — TASK-763 creada desde mockup aprobado de Lifecycle UI
+
+- **Trigger**: usuario aprobó el mockup `docs/mockups/onboarding-module-mockup.html` y pidió aterrizarlo en una task/UI spec de implementación.
+- **Resultado documental**:
+  - Nueva task `docs/tasks/to-do/TASK-763-lifecycle-onboarding-offboarding-ui-mockup-adoption.md`.
+  - Registro sincronizado en `docs/tasks/TASK_ID_REGISTRY.md`.
+  - Índice sincronizado en `docs/tasks/README.md` y siguiente ID libre actualizado a `TASK-764`.
+- **Decision de diseño**:
+  - La implementación UI se modela como shell `Lifecycle / Onboarding & Offboarding`, no como otra pantalla aislada de onboarding.
+  - La task cuelga de dos foundations distintas:
+    - `TASK-030` para el runtime checklist onboarding/offboarding legacy
+    - `TASK-760` para que el carril offboarding visible no se apoye en semántica falsa
+  - El mockup aprobado queda como fuente visual canónica, pero la implementación no debe copiar HTML literal ni implicar que el motor de finiquitos ya existe.
+
+## Sesion 2026-05-01 — EPIC-010 + TASK-760/761/762 creadas para Offboarding y Finiquitos
+
+- **Trigger**: usuario consultó si Greenhouse podía construir finiquitos y si dependía de implementar Onboarding primero.
+- **Resultado documental**:
+  - Nuevo epic `docs/epics/to-do/EPIC-010-workforce-offboarding-finiquito-foundation.md`.
+  - Nuevas tasks:
+    - `docs/tasks/to-do/TASK-760-workforce-offboarding-runtime-foundation.md`
+    - `docs/tasks/to-do/TASK-761-payroll-final-settlement-finiquito-engine-chile.md`
+    - `docs/tasks/to-do/TASK-762-finiquito-document-generation-approval-flow.md`
+  - Índices/registros sincronizados:
+    - `docs/epics/README.md`
+    - `docs/epics/EPIC_ID_REGISTRY.md`
+    - `docs/tasks/README.md`
+    - `docs/tasks/TASK_ID_REGISTRY.md`
+- **Decision de diseño**:
+  - Finiquitos **sí** se pueden construir, pero no deben arrancar desde Onboarding.
+  - El prerequisito correcto es una foundation de `OffboardingCase` canónico (`TASK-760`), seguida por un engine de settlement final/finiquito (`TASK-761`) y luego el documento/workflow de emisión (`TASK-762`).
+  - La arquitectura vigente de Offboarding declara explícitamente que V1 aún no incluye motor exhaustivo de finiquitos; estas tareas aterrizan ese gap como programa formal.
+
+## Sesion 2026-05-01 — TASK-758 creada para hardening de recibos honorarios sin tocar cálculo
+
+- **Trigger**: usuario reportó incoherencia en PDF/recibo de Luis Reyes (`honorarios`) donde la retención/impuesto no se refleja correctamente en la surface, pero aclaró explícitamente que el cálculo actual de Payroll no debe tocarse.
+- **Resultado documental**:
+  - Nueva task `docs/tasks/to-do/TASK-758-payroll-honorarios-receipt-render-contract-hardening.md`.
+  - Registro sincronizado en `docs/tasks/TASK_ID_REGISTRY.md`.
+  - Índice sincronizado en `docs/tasks/README.md` y siguiente ID libre actualizado a `TASK-759`.
+- **Decision de diseño**:
+  - El problema se modela como bug de **proyección/render de recibos**, no del motor de cálculo Payroll.
+  - La task se ancla en `TASK-077` (foundation receipts) + `TASK-744` (hard boundary honorarios) y prohíbe explícitamente tocar `calculate-payroll.ts`, `calculate-honorarios.ts` o `recalculate-entry.ts`.
+  - El fix esperado converge `PayrollReceiptCard` + PDF a un helper compartido de breakdown visual para `honorarios`, reutilizando como referencia el criterio ya presente en `PayrollEntryTable` y `ProjectedPayrollView`.
+
+## Sesion 2026-05-01 — TASK-757 creada para execution sync de processors
+
+- **Trigger**: usuario pidio aterrizar robustez/escalabilidad para Payment Orders y crear la task follow-up del webhook de Global66.
+- **Resultado documental**:
+  - Nueva task `docs/tasks/to-do/TASK-757-payment-processor-execution-sync-global66-webhook.md`.
+  - Registro sincronizado en `docs/tasks/TASK_ID_REGISTRY.md`.
+  - Índice sincronizado en `docs/tasks/README.md` y siguiente ID libre actualizado a `TASK-758`.
+- **Decision de diseño**:
+  - `TASK-757` nace como architecture/provider-neutral core con `Global66` como primer adapter, no como integración hardcoded del dominio.
+  - Reutiliza `POST /api/webhooks/[endpointKey]` + `greenhouse_sync.webhook_inbox_events`; no abre un carril webhook paralelo.
+  - Queda separado de `TASK-756`: auto-generación de orders es upstream; execution sync por processor es downstream.
+
+## Sesion 2026-05-01 — TASK-751 Payroll Settlement Orchestration V1 (cierra programa Payment Orders)
+
+- **Trigger**: usuario pidio implementar TASK-751 end-to-end. Es el wireup que cierra el programa Payment Orders (TASK-748 + TASK-749 + TASK-750 + TASK-751).
+- **Entregado** (auto-mode):
+  - Migration `20260501163149826` aditiva: link bidireccional `expense_payments.payment_order_line_id ↔ payment_order_lines.expense_payment_id` con partial unique index para idempotency atomica.
+  - Helper `recordPaymentForOrder({orderId})` en `src/lib/finance/payment-orders/record-payment-from-order.ts`: itera lines, resuelve expenseId desde `(payroll_period_id, member_id)`, llama recordExpensePayment con `paymentOrderLineId`. V1 procesa solo `employee_net_pay`.
+  - `recordExpensePayment` extendido con `paymentOrderLineId?: string | null` opcional + back-fill del link reverse en la misma tx.
+  - Reader `getPayrollPaymentStatusForPeriod(periodId)` deriva 10 estados downstream (no_obligation / awaiting_order / order_pending_approval / order_approved / order_scheduled / order_submitted / order_paid_unreconciled / reconciled / closed / blocked_no_profile). NO escribe en payroll_entries.
+  - Projection consumer `recordExpensePaymentFromOrderProjection` escuchando `finance.payment_order.paid` (agregado a REACTIVE_EVENT_TYPES), maxRetries 2.
+  - API `GET /api/admin/finance/payment-orders/payroll-status?periodId=X`.
+  - UI: `<PayrollPaymentStatusCard>` con 4 KPIs + Alert drift en PayrollPeriodTab + columna "Estado pago" en PayrollEntryTable + seccion "Origen Payroll" en OrderDetailDrawer.
+  - Tests: 12 verdes (3 row-mapper TASK-750 + 7 resolver TASK-749 + 2 contract TASK-751).
+  - Docs: Delta TASK-751 en spec arquitectura + funcional + manual operador.
+- **Validacion**: lint clean, tsc clean, migrations aplicadas en staging.
+- **Decisiones**:
+  - Read-only para Payroll — el reader no muta entries. Payroll sigue siendo motor canonico sin contaminar.
+  - Cada line con su propia tx (recordExpensePayment ya es atomic). Partial unique index previene duplicados en retry.
+  - V1 enfoque employee_net_pay; otros kinds (employer_social_security consolidado, processor_fee, fx_component) en path legacy operator hasta que emerja caso real.
+  - Reliquidacion de obligations queda en TASK-755 V2; payrollReliquidationDeltaProjection (TASK-411) ya cubre el delta de expenses.
+- **Programa Payment Orders cerrado V1**: TASK-748 + TASK-749 + TASK-750 + TASK-751 entregadas. Backlog V2 declarado en TASK-752/753/754/755.
+
+## Sesion 2026-05-01 — TASK-749 Beneficiary Payment Profiles V1 con modelo dual-surface
+
+- **Trigger**: usuario pidio implementar TASK-749 end-to-end despues de aprobar el mockup `payment-profiles-dual-mockup.html`. Decision arquitectonica clave: NO ubicar perfiles de personas en una surface aislada (`/finance/payment-profiles`) sino en un **modelo dual-surface** con un solo componente reutilizable montado en 3 lugares.
+- **Entregado** (auto-mode):
+  - 4 migrations: schema `beneficiary_payment_profiles` + `beneficiary_payment_profile_audit_log` con maker-checker trigger e idempotency partial unique index, seed Global66 al provider catalog, seed view code `finanzas.perfiles_pago` + grants, migration aditiva `global66` al payment_method enum de orders.
+  - Helpers core en `src/lib/finance/beneficiary-payment-profiles/`: errors, mask, row-mapper, audit, create-profile, approve-profile, cancel-profile, list-profiles, reveal-sensitive, access, drift-detector, queue-summary.
+  - Routing resolver `src/lib/finance/payment-routing/resolve-route.ts` con cascade (resolved/profile_missing/profile_pending_approval/unsupported_currency/unsupported_beneficiary_type) + 7 tests verdes.
+  - 4 capabilities nuevas (read/create/approve/reveal_sensitive) + 6 outbox events.
+  - API admin completa: CRUD + approve + cancel + reveal-sensitive + audit + queue + routing-preview.
+  - **UI dual-surface**:
+    - Componente reutilizable `<PaymentProfilesPanel>` en `src/views/greenhouse/finance/payment-profiles/PaymentProfilesPanel.tsx` con prop `constrainedBeneficiary` para pre-llenar dialog y filtrar tabla.
+    - **Mount 1 — Person 360**: tab "Pago" en `src/views/greenhouse/people/tabs/PersonPaymentTab.tsx`, registrado en `helpers.ts` TAB_CONFIG + TAB_PERMISSIONS, gateado por `canViewPaymentProfile` (efeonce_admin / finance_admin / finance_analyst).
+    - **Mount 2 — Shareholder 360**: seccion en `ShareholderAccountDetailDrawer.tsx` cuando hay `profileId` (identity_profile).
+    - **Mount 3 — Surface ops**: `PaymentProfilesView` rediseñada como queue + drift card + tabla universal read-only con deep links a 360s. SIN CTA crear (creacion vive en cada 360).
+  - Wireup del resolver en `payment-orders/create-from-obligations.ts`: solo se invoca para `beneficiary_type='member'` (V1, ya que shareholder/tax_authority/processor no generan obligations en V1). Snapshot por line en `metadata_json.routing_snapshots`.
+  - Docs: Delta TASK-749 en spec arquitectura + funcional (`docs/documentation/finance/perfiles-de-pago-beneficiarios.md`) + manual operador (`docs/manual-de-uso/finance/perfiles-de-pago-beneficiarios.md`).
+  - Tests: 10 verdes (3 row-mapper TASK-750 + 7 resolver TASK-749).
+- **Validacion**: lint clean, tsc clean (toda la base), migrations aplicadas en staging via `pnpm pg:connect:migrate`.
+- **Aprendizaje**: se considero inicialmente una surface aislada en `/finance/payment-profiles` como fuente primaria. Usuario corrigio: "Los profiles de personas no deberian vivir en Person 360?". Auditando Stripe/GitHub/Linear se confirmo el patron dual-surface (fuente primaria en la entidad + queue ops cross-cutting). Refactor: `<PaymentProfilesPanel>` reutilizable evita duplicacion. Surface ops perdio el CTA crear y se enfoca en jobs cross-cutting (queue + drift). Click en filas → deep link a 360.
+- **Tasks afectadas**: TASK-749 movida a `complete/`, registrada en `docs/tasks/README.md`.
+- **Pendiente downstream**: TASK-751 (settlement orchestration + reconciliation), TASK-752 (artifact CSV generator). El resolver V1 no maneja shareholder en obligations (no aplica hoy); si V2 introduce dividend obligations, agregar al filter del wireup.
+
+## Sesion 2026-05-01 — TASK-750 Payment Orders V1 entregado end-to-end
+
+- **Trigger**: usuario aprobo el mockup `/docs/mockups/payment-orders-mockup.html` y pidio implementar end-to-end.
+- **Entregado** (auto-mode, FASES 1-7):
+  - Schema migration `20260501143749876` con 3 tablas (`payment_orders`, `payment_order_lines`, `payment_order_artifacts`) + trigger maker-checker DB + idempotency unique index sobre `obligation_id WHERE state NOT IN cancelled/failed`.
+  - Helpers core en `src/lib/finance/payment-orders/`: `createPaymentOrderFromObligations`, `approvePaymentOrder`, `schedulePaymentOrder`, `submitPaymentOrder`, `markPaymentOrderPaid`, `cancelPaymentOrder`, listers, row-mapper, errors, get-kpis.
+  - Payment Calendar reader en `src/lib/finance/payment-calendar/list-calendar-items.ts` componiendo obligations + orders con `calendar_state` derivado en SQL.
+  - API admin completa en `/api/admin/finance/payment-orders/**` + `/api/admin/finance/payment-calendar`.
+  - UI: `/finance/payment-orders` page + `PaymentOrdersView` con 4 tabs (Obligaciones / Órdenes / Calendario / Eventos), KPI row, drawer detalle con state-aware actions, CreateOrderDialog con currency-mixed guard, DataTableShell + EmptyState + sonner toasts.
+  - Permisos + view registry: nuevo viewCode `finanzas.ordenes_pago` con grants para `efeonce_admin`, `finance_admin`, `finance_manager`, `finance_analyst` (migration `20260501145618269`); entrada en menú Tesoreria.
+  - 11 nuevos outbox events: `finance.payment_order.{created,approved,scheduled,submitted,paid,settled,closed,failed,cancelled}` + 2 artifact events.
+  - Docs: Delta TASK-750 en spec canónica, doc funcional en `docs/documentation/finance/ordenes-de-pago.md`, manual operador en `docs/manual-de-uso/finance/ordenes-de-pago.md`.
+  - Tests: 8 tests verdes (3 row-mapper, 5 obligaciones).
+- **Validacion**: lint clean, tsc clean, vitest payment-orders/payment-obligations verde, migrations aplicadas en staging via `pg:connect:migrate`.
+- **Coexistencia**: NO reemplaza `expenses` ni `expense_payments`. Mark-paid cierra el ciclo runtime de la order pero no crea automaticamente expense_payment — eso queda en TASK-751.
+- **Tasks afectadas**: TASK-750 movida a `complete/`, registrada en `docs/tasks/README.md`.
+- **Pendiente downstream**: TASK-751 (settlement + reconciliation wiring), TASK-752 (artifact CSV generator), TASK-749 (beneficiary payment profiles).
+
+## Sesion 2026-05-01 — Arquitectura Payment Orders + tasks 747-751
+
+- **Trigger**: el usuario pidio modelar de forma robusta/escalable el gap donde Payroll exporta nomina pero el pago real puede ocurrir despues y por multiples plataformas/instrumentos por colaborador.
+- **Decision arquitectonica**:
+  - El modulo se llama conceptualmente `Payment Orders` / `Ordenes de Pago`.
+  - Pertenece a `Finance/Tesoreria`, no a `Payroll`.
+  - Payroll calcula y exporta obligaciones; Finance/Tesoreria planifica, aprueba, paga, modela settlement y concilia.
+  - `payroll_period.exported` crea obligaciones `generated`; no implica `paid`.
+- **Documentacion creada/actualizada**:
+  - `docs/architecture/GREENHOUSE_PAYMENT_ORDERS_ARCHITECTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`
+  - `project_context.md`
+  - `changelog.md`
+- **Backlog creado**:
+  - `TASK-747` umbrella Payment Orders Program
+  - `TASK-748` Payment Obligations Foundation
+  - `TASK-749` Beneficiary Payment Profiles + Routing Policies
+  - `TASK-750` Payment Orders, Batches, Payment Calendar + Maker-Checker Runtime
+  - `TASK-751` Payroll Settlement Orchestration + Reconciliation Integration
+- **Razon de split**:
+  - Una sola task seria demasiado riesgosa porque mezcla schema, perfiles sensibles, maker-checker, batches, settlement, conciliacion y Payroll UI.
+  - El rollout seguro es incremental: obligations -> routing -> orders/calendar -> payroll orchestration.
+- **Validacion**:
+  - Solo documentacion/task planning; no se cambio runtime.
+
+## Sesion 2026-05-01 — Claude skill invocable Greenhouse Payroll Auditor
+
+- **Trigger**: el usuario pidio que la skill de Payroll tambien estuviera disponible para Claude y pudiera invocarse.
+- **Resultado**:
+  - Se creo `.claude/skills/greenhouse-payroll-auditor/SKILL.md` con frontmatter oficial minimo (`name`, `description`).
+  - Invocacion manual esperada en Claude Code: `/greenhouse-payroll-auditor [scope]`.
+  - Se agregaron referencias propias para Claude:
+    - `.claude/skills/greenhouse-payroll-auditor/references/chile-payroll-law.md`
+    - `.claude/skills/greenhouse-payroll-auditor/references/greenhouse-payroll-runtime.md`
+    - `.claude/skills/greenhouse-payroll-auditor/references/international-remote-payroll.md`
+  - La skill cubre la misma postura robusta de auditoria: clasificacion laboral antes de calcular, KPI ICO obligatorio cuando afecta bonos, no calcular metricas inline, no aplicar deducciones Chile a Deel/internacionales por defecto, y fail-closed para datos legales/fuente faltantes.
+- **Convencion ajustada**:
+  - `AGENTS.md` ahora refleja la convencion oficial vigente `.claude/skills/<skill-name>/SKILL.md` y deja `skill.md` como legacy.
+  - `CLAUDE.md` ahora refleja la convencion oficial vigente `.claude/skills/<skill-name>/SKILL.md`.
+  - Las skills Claude existentes en `skill.md` minuscula quedan documentadas como legacy/compatibilidad, no como patron para skills nuevas.
+- **Validacion**:
+  - Se verifico contra docs oficiales de Claude/Agent Skills: el entrypoint correcto es `SKILL.md` en mayuscula.
+  - Estructura de frontmatter y archivos verificada localmente.
+  - `git diff --check` OK.
+
+## Sesion 2026-05-01 — TASK-741 Greenhouse MCP Remote Gateway V1
+
+- **Trigger**: el usuario pidio verificar si quedaba algo pendiente de `TASK-741`; la auditoria encontro que la task seguia en `to-do` y no existia `src/app/api/mcp/greenhouse/route.ts` ni transporte remoto.
+- **Solucion implementada**:
+  - `src/mcp/greenhouse/remote.ts` agrega el adapter remoto oficial sobre `WebStandardStreamableHTTPServerTransport`.
+  - `src/app/api/mcp/greenhouse/route.ts` expone `GET/POST/DELETE /api/mcp/greenhouse` con `runtime='nodejs'` y `dynamic='force-dynamic'`.
+  - El gateway remoto V1 es privado/service-to-service, stateless y protegido por `GREENHOUSE_MCP_REMOTE_GATEWAY_TOKEN`.
+  - El gateway reutiliza `createGreenhouseMcpServer()`; no duplica tools, no lee SQL y sigue downstream de `api/platform/ecosystem/*`.
+  - Se agregó budget defensivo `GREENHOUSE_MCP_REMOTE_MAX_BODY_BYTES` para acotar payloads.
+- **Documentacion actualizada**:
+  - `docs/architecture/GREENHOUSE_MCP_ARCHITECTURE_V1.md`
+  - `docs/documentation/plataforma/api-platform-ecosystem.md`
+  - `docs/manual-de-uso/plataforma/mcp-greenhouse-read-only.md`
+  - `docs/tasks/complete/TASK-741-greenhouse-mcp-remote-gateway-v1.md`
+  - `docs/tasks/README.md`
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+  - `.env.example`, `project_context.md`, `changelog.md`
+- **Validacion ejecutada**:
+  - `pnpm vitest run src/mcp/greenhouse/__tests__ src/app/api/mcp/greenhouse/route.test.ts` OK.
+  - `pnpm exec tsc --noEmit --pretty false` OK.
+  - `pnpm exec eslint src/mcp/greenhouse src/app/api/mcp/greenhouse` OK.
+  - `pnpm lint` OK.
+  - `pnpm build` OK; mantiene warnings locales existentes de critical secrets resueltos desde `process.env` por falta de `*_SECRET_REF`.
+  - `pnpm pg:connect:migrate` OK: no migrations pending; `src/types/db.d.ts` regenerado sin diff.
+  - `git diff --check` OK.
+  - `rg -n "new Pool\\(" src scripts -g "*.{ts,tsx}"` solo muestra el cliente canónico y tests legacy existentes.
+- **Follow-up intencional**:
+  - `TASK-659` sigue abierta para OAuth/hosted auth multiusuario; no fue absorbida por este gateway privado.
+
+## Sesion 2026-05-01 — TASK-744 Payroll Chile compliance remediation
+
+- **Trigger**: el usuario pidio implementar `TASK-744` para resolver end-to-end los hallazgos de Payroll sin parches, preservando a Melkin, Daniela y Andres como internacionales/Deel.
+- **Trabajo realizado**:
+  - Fases de descubrimiento/auditoria/mapa/plan ejecutadas con subagentes read-only.
+  - Spec corregida, ejecutada y cerrada en `docs/tasks/complete/TASK-744-payroll-chile-compliance-remediation.md` manteniendo branch `develop`.
+  - Migracion `20260501095540489_task-744-payroll-regime-boundaries.sql` aplicada via `pnpm pg:connect:migrate`; `src/types/db.d.ts` regenerado.
+  - `greenhouse_payroll.payroll_entries` ahora tiene `contract_type_snapshot` y constraints `NOT VALID` para nuevas escrituras incompatibles de honorarios/internacional.
+  - Retencion SII honorarios 2026 corregida a `0.1525`; 2027 a `0.16`.
+  - Seguro de Cesantia separado: trabajador `plazo_fijo = 0`, empleador `plazo_fijo = 0.03`.
+  - Calculo Chile dependiente aplica topes AFP/salud/SIS/mutual y cesantia cuando PREVIRED expone topes UF.
+  - `calculate-payroll` y `recalculate-entry` ya no pasan honorarios por segunda pasada de IUSC Chile dependiente.
+  - Readiness bloquea aprobacion/export si detecta entries calculadas con regimenes incompatibles.
+- **Validacion local**:
+  - `pnpm vitest run src/lib/payroll` OK: 38 files / 243 tests.
+  - `pnpm exec tsc --noEmit --pretty false` OK.
+  - `pnpm exec eslint src/lib/payroll src/types/payroll.ts src/types/hr-contracts.ts` OK.
+- **Validacion global y staging**:
+  - `pnpm build` OK.
+  - `pnpm lint` OK.
+  - `pnpm test:coverage` OK: 495 files / 2706 tests passed / 5 skipped.
+  - `pnpm pg:doctor` OK despues de desacoplar el doctor CLI del pool runtime Next/server-only.
+  - `pnpm pg:connect:migrate` OK: no migrations pending; `src/types/db.d.ts` regenerado sin diff.
+  - Vercel deployment de `418d3c9a` completado.
+  - `pnpm staging:request POST /api/hr/payroll/periods/2026-04/calculate '{}' --pretty` OK; abril 2026 recalculado en staging a `2026-05-01T10:22:26.440Z`.
+  - `pnpm staging:request /api/hr/payroll/periods/2026-04/readiness --pretty` OK: sin blockers; warning esperado por `julio-reyes` sin compensacion.
+  - Entries verificadas: Humberly/Luis honorarios con retencion SII 15,25% y sin deducciones dependientes; Valentina Chile dependiente; Melkin/Daniela/Andres international/Deel con KPI ICO y sin deducciones Chile.
+- **Estado**: TASK-744 cerrada; no quedan migraciones pendientes para esta task. Follow-ups estructurales quedan explicitamente en `TASK-730`, `TASK-731` y `TASK-732`.
+- **CI fix colateral**: `src/lib/agency/space-360.test.ts` ahora fija reloj de prueba en abril 2026 para evitar drift mensual (`expected month 4`, runtime month 5 el 2026-05-01) que rompio el coverage de GitHub.
+
+## Sesion 2026-05-01 — TASK-743 Operational Data Table Density Contract
+
+- **Trigger**: usuario reporto scroll horizontal en `/hr/payroll` cuando el periodo esta en `calculated`/`reopened` (BonusInput inline + slider + min/max hinchaba dos columnas). En vez de parche, levantamos contrato canonico para todas las tablas operativas con celdas editables o > 8 columnas.
+- **Entregables**:
+  - Spec: `docs/architecture/GREENHOUSE_OPERATIONAL_TABLE_PLATFORM_V1.md`
+  - Doc funcional: `docs/documentation/plataforma/tablas-operativas.md`
+  - Density tokens: `src/components/greenhouse/data-table/density.ts` (compact/comfortable/expanded)
+  - Hook + provider: `src/components/greenhouse/data-table/useTableDensity.tsx` (cookie `gh-table-density`)
+  - Wrapper canonico: `src/components/greenhouse/data-table/DataTableShell.tsx` (container query auto-degrade, sticky-first column, gradient fade, ResizeObserver)
+  - Primitiva editable canonica: `src/components/greenhouse/primitives/InlineNumericEditor.tsx` (reemplaza `BonusInput`, slider en popover-on-focus para `comfortable`)
+  - Lint rule: `eslint-plugins/greenhouse/rules/no-raw-table-without-shell.mjs` (registrada en `eslint.config.mjs`)
+  - Visual regression: `tests/e2e/smoke/payroll-table-density.spec.ts`
+  - Reglas duras agregadas a `CLAUDE.md` y `AGENTS.md`
+- **Migracion masiva (15 tablas)**: PayrollEntryTable + 14 vistas legacy: EntitlementsGovernanceTab (×4), TalentOpsDashboardView (×3), ProductCatalogDetailView (×1), BankView (×2), CashInListView (×1), FinancePeriodClosureDashboardView (×2), QuotesListView (×1), PipelineBoardUnified (×1), QuoteCreateDrawer (×1), QuoteLineItemsEditor (×2), HrLeaveView (×3), HrEvalsView (×2), MemberPayrollHistory (×2), PayrollCompensationTab (×1). `BonusInput.tsx` queda como re-export deprecated que delega en `InlineNumericEditor`.
+- **Verificacion**: `pnpm lint` clean, `npx tsc --noEmit` clean, `pnpm build` exitoso. `pnpm test` muestra 5 fails pre-existentes en `src/lib/payroll/project-payroll.test.ts` por cambios uncommitted en `calculate-chile-deductions.ts` que NO pertenecen a esta task (otro agente trabajando en TASK-026/-744 hris contract canonicalization).
+- **Como evolucionar**: agregar nueva tabla operativa = envolver con `<DataTableShell>` + lint rule la fuerza. Para customizar densidad por surface: prop `density="..."` o cookie. Migrar otra primitiva editable inline = construir analogo a `InlineNumericEditor` que lea `useTableDensity()`.
+
+## Sesion 2026-05-01 — Skill invocable Greenhouse Payroll Auditor
+
+- **Trigger**: el usuario pidio investigar a profundidad legislacion laboral chilena, calculos de nomina y regimenes remotos/internacionales para crear una skill capaz de auditar, proponer y revisar Payroll Efeonce en Greenhouse.
+- **Resultado**:
+  - Nueva skill local invocable como `$greenhouse-payroll-auditor`.
+  - Archivos:
+    - `.codex/skills/greenhouse-payroll-auditor/SKILL.md`
+    - `.codex/skills/greenhouse-payroll-auditor/agents/openai.yaml`
+    - `.codex/skills/greenhouse-payroll-auditor/references/chile-payroll-law.md`
+    - `.codex/skills/greenhouse-payroll-auditor/references/greenhouse-payroll-runtime.md`
+    - `.codex/skills/greenhouse-payroll-auditor/references/international-remote-payroll.md`
+  - La skill documenta workflow de auditoria, clasificacion de regimen laboral, formulas Chile, honorarios, Deel/EOR/contractor internacional, KPI ICO y readiness.
+  - Incluye watchlist de riesgos reales observados en runtime: retencion honorarios 2026, split de cesantia por contrato, topes legales previsionales y KPI ICO para internacionales con bonos.
+- **Validacion ejecutada**:
+  - `python3 /Users/jreye/.codex/skills/.system/skill-creator/scripts/quick_validate.py .codex/skills/greenhouse-payroll-auditor` OK.
+- **Pendiente**:
+  - No se cambio runtime de Payroll en este slice; la skill deja explicitamente los gaps como material de auditoria/proximo fix.
+
+## Sesion 2026-05-01 — Auditoria Payroll compliance documentada
+
+- **Trigger**: el usuario pidio documentar en el espacio de auditorias la auditoria read-only hecha con `$greenhouse-payroll-auditor`.
+- **Artefactos**:
+  - `docs/audits/payroll/PAYROLL_COMPLIANCE_AUDIT_2026-05-01.md`
+  - `docs/audits/payroll/README.md`
+  - `docs/audits/README.md` actualizado con categoria Payroll
+- **Hallazgos documentados**:
+  - retencion honorarios 2026 desactualizada contra SII
+  - seguro de cesantia `plazo_fijo` con split trabajador/empleador incorrecto
+  - entries staging de honorarios mezclando retencion SII con deducciones dependientes
+  - falta de aplicacion clara de topes imponibles en formula visible
+  - gratificacion legal sobre `baseSalary` en vez de remuneracion elegible documentada
+  - incoherencias de clasificacion contractual a revisar
+  - KPI ICO internacional preservado como positive control
+- **Validacion**:
+  - Solo documentacion; no se cambio runtime ni datos.
+
+## Sesion 2026-05-01 — TASK-744 creada para remediar hallazgos Payroll
+
+- **Trigger**: el usuario pidio crear una task para corregir los hallazgos de la auditoria Payroll y aclaró que Melkin, Daniela y Andrés son internacionales.
+- **Resultado**:
+  - Nueva task `TASK-744 — Payroll Chile Compliance Remediation & International Guardrails`.
+  - Archivo: `docs/tasks/to-do/TASK-744-payroll-chile-compliance-remediation.md`.
+  - Registrada en `docs/tasks/TASK_ID_REGISTRY.md` y `docs/tasks/README.md`.
+- **Guardrail explícito incorporado**:
+  - Melkin Hernández, Daniela Ferreira y Andrés Carlosama son internacionales/Deel.
+  - La remediación no debe aplicarles AFP, salud, cesantía, SIS, mutual, IUSC ni retención honorarios Chile.
+  - Sí debe preservar KPI ICO para bonos variables internacionales.
+- **Validacion**:
+  - Solo documentación/task planning; no se cambio runtime ni datos.
+
+## Sesion 2026-05-01 — Payroll PREVIRED sync schema drift fixed end-to-end
+
+- **Trigger**: al intentar destrabar abril 2026 desde staging, `/api/cron/sync-previred?start=2026-04&end=2026-05` falló con `column "worker_rate" of relation "chile_afp_rates" does not exist`, y por rebote `ImpUnico` no obtuvo `UTM` válida. Además, la verificación Chromium/Playwright con el usuario agente debía quedar explícitamente probada sobre el deployment real.
+- **Hallazgos confirmados**:
+  - `greenhouse_payroll.chile_afp_rates` en Cloud SQL guarda solo `total_rate`; no tiene `worker_rate` ni `employer_rate`.
+  - El drift entró cuando `src/lib/payroll/previred-sync.ts` empezó a intentar escribir `worker_rate` en la tabla canónica reducida. `git log -S"worker_rate" -- src/lib/payroll/previred-sync.ts` apunta a `1aa6a037`.
+  - El `INSERT` de AFP además tenía otro bug latente: la lista de columnas/values estaba desalineada para `is_active`.
+  - Los fallbacks legacy de `chile-previsional-helpers.ts` también estaban rotos: consultaban `previred_*` como si tuvieran `period_year/period_month`, cuando en realidad usan `indicator_date`.
+  - Playwright sí quedó probado contra staging real con `agent@greenhouse.efeonce.org`: `pnpm test:e2e:setup` generó `storageState` válido y `pnpm exec playwright test tests/e2e/smoke/hr-payroll.spec.ts --project=chromium` pasó `2/2`. Navegación Chromium adicional confirmó `/hr/payroll` `200`, `Abril 2026` visible y sin el falso `0 colaboradores`.
+- **Solución implementada**:
+  - `src/lib/payroll/previred-sync.ts` alinea el write de `greenhouse_payroll.chile_afp_rates` con el schema desplegado: persiste `total_rate`, `source` e `is_active` sin referenciar columnas inexistentes.
+  - `src/lib/payroll/chile-previsional-helpers.ts` repara los fallbacks legacy:
+    - `previred_period_indicators` ahora se lee por `indicator_date` y aliases reales (`imm_value`, `afp_top_unf`, `unemployment_top_unf`)
+    - `previred_afp_rates` ahora se lee por `indicator_date`, preservando `worker_rate` cuando el snapshot legacy existe
+  - Tests nuevos de compatibilidad de schema:
+    - `src/lib/payroll/previred-sync.schema-compatibility.test.ts`
+    - `src/lib/payroll/chile-previsional-helpers.schema-compatibility.test.ts`
+- **Validación ejecutada**:
+  - `pnpm test:e2e:setup` contra `https://greenhouse-eo-env-staging-efeonce-7670142f.vercel.app` OK
+  - `pnpm exec playwright test tests/e2e/smoke/hr-payroll.spec.ts --project=chromium` OK
+  - screenshot/runtime check con Chromium headless:
+    - `/hr/payroll` `200`
+    - `Abril 2026` visible
+    - ya no aparece `0 colaboradores`
+    - readiness UI muestra `6 colaborador(es) entrarían al cálculo; 1 quedarían fuera por compensación; 0 requieren KPI ICO; 0 requieren asistencia/licencias`
+  - `pnpm vitest run src/lib/payroll/previred-sync.schema-compatibility.test.ts src/lib/payroll/chile-previsional-helpers.schema-compatibility.test.ts src/lib/payroll/previred-sync.test.ts src/lib/payroll/chile-previsional-helpers.test.ts` OK
+  - `pnpm exec eslint src/lib/payroll/previred-sync.ts src/lib/payroll/chile-previsional-helpers.ts src/lib/payroll/previred-sync.schema-compatibility.test.ts src/lib/payroll/chile-previsional-helpers.schema-compatibility.test.ts` OK
+  - `pnpm exec tsc --noEmit --pretty false` OK
+- **Pendiente operativo después del push**:
+  1. Deployar el fix a `develop`.
+  2. Re-ejecutar `GET /api/cron/sync-previred?start=2026-04&end=2026-05` en staging.
+  3. Confirmar que desaparece `missing_tax_table_version` en `2026-04`.
+  4. Ejecutar `POST /api/hr/payroll/periods/2026-04/calculate` y verificar entries materializadas.
+
+## Sesion 2026-05-01 — Payroll readiness aligned with real calculation contract
+
+- **Trigger**: incidente operativo en `/hr/payroll` sobre abril 2026. El período ya podía crearse de nuevo, pero la UI seguía mostrando `0 colaboradores`, readiness mezclaba reglas que no aplicaban (`KPI ICO` y asistencia para cohortes sin impacto en pago), `missingCompensationMemberIds` salía como `[null]`, y PREVIRED/ImpUnico de abril no se estaba sincronizando automáticamente.
+- **Hallazgos confirmados**:
+  - El `0 colaboradores` era discrepancia de contrato: la UI mostraba `entries.length`, no el roster elegible del borrador.
+  - El warning de `KPI ICO` en staging golpeaba a `humberly-henriquez` y `luis-reyes`, ambos `honorarios` Chile con `bonusOtdMax=0` y `bonusRpaMax=0`; no eran KPI-requeridos para cálculo real.
+  - El warning de asistencia golpeaba también cohortes donde el propio motor no prorratea (`honorarios`, `Deel`, `scheduleRequired=false`).
+  - El blocker Chile de abril 2026 era real: faltaba `gael-2026-04` en `greenhouse_payroll.chile_tax_brackets`; el cron `/api/cron/sync-previred` existía en código pero no estaba programado en `vercel.json`.
+- **Solución implementada**:
+  - Nueva capa canónica `src/lib/payroll/compensation-requirements.ts` con reglas para:
+    - `requiresPayrollKpi`
+    - `requiresPayrollAttendanceSignal`
+    - `requiresPayrollChileTaxTable`
+  - `payroll-readiness.ts` ahora:
+    - pide KPI solo a miembros KPI-dependientes
+    - pide asistencia solo a miembros cuyo pago depende de asistencia
+    - eleva esos faltantes a blockers reales cuando sí afectan cálculo
+  - `calculate-payroll.ts` ahora falla antes de persistir entries si falta KPI o asistencia en cohortes obligatorias.
+  - `postgres-store.ts` deja de devolver `memberId = null` cuando falta compensación; ahora el warning apunta al miembro real.
+  - `PayrollDashboard.tsx` y `PayrollPeriodTab.tsx` ahora muestran roster elegible en borrador y dejan de vender `entries=0` como si no hubiera personas.
+  - `vercel.json` programa `/api/cron/sync-previred`.
+  - `previred-sync.ts` ahora registra `source_sync_runs`; `previred-sync-freshness.ts` corrige `completed_at -> COALESCE(finished_at, started_at)`.
+- **Validación ejecutada**:
+  - `pnpm exec eslint <slice payroll/ui>` OK
+  - `pnpm vitest run src/lib/payroll/compensation-requirements.test.ts src/lib/payroll/payroll-readiness.test.ts src/lib/payroll/data-quality/previred-sync-freshness.test.ts src/lib/payroll/fetch-kpis-for-period.test.ts src/lib/payroll/fetch-attendance-for-period.test.ts src/lib/payroll/postgres-store.test.ts` OK
+  - `pnpm vitest run src/lib/payroll/project-payroll.test.ts` OK
+  - `pnpm exec tsc --noEmit --pretty false` OK
+  - `pnpm build` compiló OK; `Next.js` intentó agregar includes efímeros `.next-local/build-*` a `tsconfig.json`, pero ese ruido se revirtió y no debe commitearse.
+- **Pendiente operativo después del push**:
+  1. Deployar a `develop`.
+  2. Ejecutar `sync-previred` para `2026-04` y `2026-05` en staging con bypass + `CRON_SECRET`.
+  3. Reprobar `/api/hr/payroll/periods/2026-04/readiness` y `POST /api/hr/payroll/periods/2026-04/calculate`.
+  4. Verificar con Chromium/Playwright autenticado que el roster borrador y el cálculo ya reflejen el estado real.
+
+## Sesion 2026-05-01 — TASK-742 Auth Resilience 7-Layer Architecture
+
+- **Trigger**: incidente 2026-04-30 — Daniela Ferreira (y todo internal user) no podía entrar vía Microsoft SSO; URL devolvía `?error=Callback`. Su `last_login_at` fue 2026-04-13. Algo cambió post-2026-04-13 que rompió el callback de Azure AD; sin observabilidad estructurada, NextAuth swallow-eó el error real. Auditoría forense de los 3 secrets críticos en GCP confirmó payloads sanos (v2/latest sin contaminación; v1 tenía comillas envolventes pero fue rotada el 2026-04-05/04-09). El bug está fuera de Greenhouse (Azure App registration / tenant config), pero el sistema no tenía mecanismos para detectarlo automáticamente ni dar al usuario un camino de recuperación.
+- **Solución**: 7 capas defensivas, branch `feature/TASK-742-auth-resilience-7-layers`.
+  - **Capa 1 — Secret hygiene**: `src/lib/secrets/format-validators.ts` con reglas por secret crítico (NEXTAUTH_SECRET, AZURE_AD_CLIENT_*, GOOGLE_CLIENT_*, NEXTAUTH_URL, CRON_SECRET, AGENT_AUTH_SECRET); `resolveSecret` rechaza payloads malformados y emite Sentry warning cuando un secret cae a `process.env` en prod.
+  - **Capa 2 — Readiness contract**: `src/lib/auth/readiness.ts` corre OIDC discovery + JWT sign+verify roundtrip; `/api/auth/health` expone status por provider; UI Login lee y oculta/deshabilita botones SSO degradados con warning accionable en vez del opaco `error=Callback`.
+  - **Capa 3 — Observability**: `greenhouse_serving.auth_attempts` append-only (PII redacted), `recordAuthAttempt` en cada signIn/jwt/authorize callback, `captureWithDomain(err, 'identity')` con stage + reason_code estable. La próxima falla emite la causa exacta en Sentry domain=identity.
+  - **Capa 4 — Schema integrity**: CHECK constraint `client_users_auth_mode_invariant` que prohíbe estados imposibles (`auth_mode='both'` con `password_hash=NULL`). Backfill normalizó 6 rows internas de `both` → `microsoft_sso`; Daniela Ferreira ahora `auth_mode='microsoft_sso'`. Estados transicionales (`sso_pending`, `password_reset_pending`, `invited`) preservados.
+  - **Capa 5 — Magic-link**: `/auth/magic-link` request + consume endpoints. Token 32 bytes urlsafe, bcrypt-hashed, single-use, 15min TTL, anti-enumeration response. UI surface debajo del formulario credentials. Email template 'magic_link' (priority=critical) en es/en. Cubre el caso "sin password + SSO roto" — exactamente el modo de falla del incidente original.
+  - **Capa 6 — Smoke lane**: handler `POST /smoke/identity-auth-providers` en ops-worker (Cloud Run) + Cloud Scheduler `*/5 * * * *`. 4 probes (portal /api/auth/health + Microsoft OIDC discovery + in-process readiness + JWT roundtrip). Persiste `greenhouse_sync.smoke_lane_runs` con `lane_key='identity.auth.providers'`. Falla → Sentry domain=identity rojo.
+  - **Capa 7 — Rotation playbook**: `pnpm secrets:audit` (8 secrets críticos, hygiene score, source detection) y `pnpm secrets:rotate <id>` con verify-before-cutover (validate format → printf %s canonical add → trigger redeploy → poll health → solo entonces disable previous). Nunca deja prod en estado unverified.
+- **Migrations aplicadas en dev**: 3 migrations (auth_attempts, auth_mode CHECK + normalize, auth_magic_links). 6 internal users normalizados a `microsoft_sso` incluyendo Daniela. Distribución post: 1 both, 1 credentials, 6 microsoft_sso, 29 password_reset_pending, 3 sso_pending.
+- **GitHub Actions**: `.github/workflows/ops-worker-deploy.yml` extendido — paths `src/lib/auth/**`, `src/lib/auth-secrets.ts`, `src/lib/secrets/**` ahora disparan auto-redeploy del ops-worker.
+- **Verification**:
+  - `pnpm test src/lib/secrets src/lib/auth`: 43/43 green
+  - `npx tsc --noEmit`: 0 errors
+  - `pnpm pg:connect:migrate`: 3 migrations OK + types regenerados
+  - `pnpm exec eslint <touched files>`: 0 errors
+- **Pendiente para destrabar el incidente original SSO**:
+  1. Investigar Azure App Registration `3626642f-0451-4eb2-8c29-d2211ab3176c` — verificar redirect URIs registradas, tenant config (multi-tenant vs single-tenant), client_secret expiration. Sin eso, MS SSO seguirá rebotando.
+  2. Una vez deployadas las 7 capas a producción, el próximo intento fallido emite el error exacto en Sentry/auth_attempts.
+  3. Mientras se destraba MS SSO, los users internos pueden usar el magic-link para entrar.
+- **Spec canónica**: `docs/tasks/in-progress/TASK-742-auth-resilience-7-layers.md` (mover a `complete/` post-merge prod).
+
+## Sesion 2026-04-30 — Payroll Chile tax table auto-resolution hardening
+
+- Se cerró la brecha UX/runtime donde el operador veía un campo ambiguo de tabla tributaria Chile y parecía obligado a conocer manualmente una versión tipo `gael-YYYY-MM`.
+- Cambios principales:
+  - nuevo formatter puro `src/lib/payroll/tax-table-version-format.ts`
+  - nuevo resolver `src/lib/payroll/tax-table-version.ts` que busca `greenhouse_payroll.chile_tax_brackets` por mes imputable, prefiere la versión canónica `gael-YYYY-MM` y puede reutilizar una única versión disponible del mes como fallback seguro
+  - `create/update payroll period` en `get-payroll-periods.ts` y `postgres-store.ts` ahora autocompletan `taxTableVersion` cuando es posible y rechazan overrides manuales inexistentes para el mes
+  - `readiness`, `calculate`, `recalculate` y `reverse-quote` ya no dependen ciegamente del valor persistido; intentan resolver la tabla del mes y bloquean con mensaje explícito si falta sincronización
+  - `compute-chile-tax.ts` deja de tragar silenciosamente errores Postgres al consultar brackets tributarios
+  - UI de `PayrollDashboard` cambia de input editable a referencia informativa `Versión tributaria Chile esperada`; `PayrollPeriodTab` mantiene override manual pero lo declara como avanzado y opcional
+- Validación ejecutada:
+  - `pnpm vitest run src/lib/payroll/tax-table-version.test.ts src/lib/payroll/payroll-readiness.test.ts src/lib/payroll/postgres-store.test.ts` OK
+  - `pnpm exec tsc --noEmit --pretty false` OK
+  - `pnpm exec eslint src/lib/payroll src/app/api/hr/payroll/compensation/reverse-quote/route.ts src/views/greenhouse/payroll/PayrollDashboard.tsx src/views/greenhouse/payroll/PayrollPeriodTab.tsx` OK
+  - `pnpm build` OK
+- Documentación actualizada:
+  - `docs/documentation/hr/periodos-de-nomina.md`
+  - `docs/manual-de-uso/hr/periodos-de-nomina.md`
+  - índices `docs/documentation/README.md` y `docs/manual-de-uso/README.md`
+
+## Sesion 2026-04-30 — TASK-647 follow-ups read-only cerrados
+
+- Se extendió el MCP read-only sin abrir writes ni auth nueva.
+- Nuevas tools expuestas en `src/mcp/greenhouse/server.ts`:
+  - `get_platform_health`
+  - `list_event_types`
+  - `list_webhook_subscriptions`
+  - `get_webhook_subscription`
+  - `list_webhook_deliveries`
+  - `get_webhook_delivery`
+- Hardening nuevo del runtime:
+  - `GREENHOUSE_MCP_REQUEST_TIMEOUT_MS` opcional en config/env (default `15000`)
+  - timeout vía `AbortController` en el client HTTP
+  - validación runtime del contrato `platform-health.v1` antes de aceptar `get_platform_health` como success
+- Contract tests extendidos:
+  - `src/app/api/platform/ecosystem/route-contract.test.ts` ahora cubre `health`, `event-types`, `webhook-subscriptions` y `webhook-deliveries`
+- Validación ejecutada:
+  - `pnpm vitest run src/mcp/greenhouse/__tests__/config.test.ts src/mcp/greenhouse/__tests__/http-client.test.ts src/mcp/greenhouse/__tests__/tools.test.ts src/app/api/platform/ecosystem/route-contract.test.ts` OK
+  - `pnpm exec tsc --noEmit --pretty false` OK
+- Límite explícito:
+  - no se abren commands MCP de event control plane
+  - no se mezcla `TASK-659` (OAuth/hosted auth)
+  - no se mezcla `TASK-648` (ICO API Platform surface)
+
+## Sesion 2026-04-30 — TASK-647 MCP read-only adapter V1 cerrado
+
+- `TASK-647` quedó implementada y verificada end-to-end.
+- Runtime nuevo:
+  - `src/mcp/greenhouse/config.ts`
+  - `src/mcp/greenhouse/http-client.ts`
+  - `src/mcp/greenhouse/tools.ts`
+  - `src/mcp/greenhouse/server.ts`
+  - `src/mcp/greenhouse/index.ts`
+  - `scripts/run-greenhouse-mcp.ts`
+- Dependencias/entrypoint:
+  - `@modelcontextprotocol/sdk` ahora es dependencia directa
+  - `package.json` expone `pnpm mcp:greenhouse`
+  - `.env.example` declara `GREENHOUSE_MCP_API_BASE_URL`, `GREENHOUSE_MCP_CONSUMER_TOKEN`, `GREENHOUSE_MCP_EXTERNAL_SCOPE_TYPE`, `GREENHOUSE_MCP_EXTERNAL_SCOPE_ID` y `GREENHOUSE_MCP_API_VERSION`
+- Tools V1 activas:
+  - `get_context`
+  - `list_organizations`
+  - `get_organization`
+  - `list_capabilities`
+  - `get_integration_readiness`
+- Guardrails preservados:
+  - read-only
+  - sin SQL directo
+  - sin writes
+  - scope fijo por `externalScopeType` + `externalScopeId`
+  - preserva `requestId`, `apiVersion`, `status` y errores machine-readable del carril ecosystem
+- Registro local:
+  - `.vscode/mcp.json` registra `greenhouse/greenhouse-mcp-readonly` con `pnpm mcp:greenhouse`
+  - no embebe secrets; usa `inputs` interactivos
+- Tests/verificacion ejecutados:
+  - `pnpm vitest run src/mcp/greenhouse/__tests__/config.test.ts src/mcp/greenhouse/__tests__/http-client.test.ts src/mcp/greenhouse/__tests__/tools.test.ts` OK
+  - `pnpm exec eslint src/mcp/greenhouse scripts/run-greenhouse-mcp.ts` OK
+  - `pnpm exec tsc --noEmit --pretty false` OK
+  - `pnpm lint` OK
+  - `pnpm build` OK
+  - smoke MCP local contra mock downstream: OK (`get_context` registrado y callable via stdio)
+- Decision explícita de scope:
+  - `get_platform_health` y el event control plane read-only ya quedaron cubiertos después como follow-up cerrado
+
+## Sesion 2026-04-30 — TASK-647 MCP read-only local registration + documentation lane
+
+- Subtarea paralela enfocada solo en registro local/documentacion, sin tocar `src/**` ni `package.json`.
+- `.vscode/mcp.json` ahora registra un server local `greenhouse/greenhouse-mcp-readonly` apuntando al entrypoint esperado `pnpm mcp:greenhouse`.
+- El registro no embebe secrets:
+  - `GREENHOUSE_MCP_API_BASE_URL`
+  - `GREENHOUSE_MCP_CONSUMER_TOKEN`
+  - `GREENHOUSE_MCP_EXTERNAL_SCOPE_TYPE`
+  - `GREENHOUSE_MCP_EXTERNAL_SCOPE_ID`
+  - todos quedan resueltos via `inputs` de VS Code MCP; el token va marcado como `password`.
+- `docs/documentation/plataforma/api-platform-ecosystem.md` ahora deja explicito:
+  - que el MCP oficial va downstream de `api/platform/ecosystem/*`
+  - que la V1 es estrictamente `read-only`
+  - que `platform health` ya existe como extension downstream inmediata y no obliga a inflar la surface minima base
+  - que el registro local no debe crear consumers nuevos ni saltarse el flujo de bypass SSO cuando el target es `staging` o `preview`
+- `changelog.md` actualizado para registrar esta lane documental/operativa.
+- Validacion ejecutada:
+  - `node -e "JSON.parse(require('fs').readFileSync('.vscode/mcp.json','utf8')); console.log('ok')"` OK
+  - revision manual de consistencia contra `docs/tasks/complete/TASK-647-greenhouse-mcp-read-only-adapter-v1.md`
+- Limite explicito de esta subtarea:
+  - no documenta secrets reales ni crea consumers
+  - el runtime MCP y las variables operativas quedaron cubiertos despues en la sesion de cierre de `TASK-647`
+
+## Sesion 2026-04-30 — TASK-694 Deep Link Platform Foundation (slice runtime inicial)
+
+- Se implementó la foundation compartida `src/lib/navigation/deep-links/**` con:
+  - `types.ts`, `base-url.ts`, `access.ts`, `registry.ts`, `resolver.ts`, `definitions/*`, `index.ts`
+  - tests nuevos en `src/lib/navigation/deep-links/__tests__/`
+- Definitions activas en este corte:
+  - `home`, `ops_health`, `person`, `quote`, `income`, `expense`, `leave_request`, `payroll_period`, `public_quote_share`
+- Decisiones cerradas durante discovery + implementation:
+  - `payroll_period` resuelve a `/hr/payroll/periods/:periodId`
+  - `home` interno sigue siendo startup-policy-first y no fuerza `viewCode` único
+  - `quote`, `income`, `expense`, `payroll_period` quedan inicialmente `view-first`
+  - `ops_health`, `person`, `leave_request` ya declaran metadata de entitlements cuando el repo sí tiene capability estable
+- Consumers migrados sin romper shape legacy:
+  - `src/app/api/admin/teams/test/route.ts` ahora usa `resolveGreenhouseDeepLink(...).absoluteUrl` para `ops_health`
+  - `src/lib/webhooks/consumers/notification-mapping.ts` migra selectivamente `member.created`, `finance.income_payment.recorded`, `finance.income.created`, `finance.expense.created`, `finance.sii_claim.detected`, `finance.balance_divergence.detected` a deep links, preservando `actionUrl` relativo
+- Docs actualizados:
+  - `docs/architecture/GREENHOUSE_DEEP_LINK_PLATFORM_V1.md`
+  - `project_context.md`
+  - `docs/tasks/complete/TASK-694-deep-link-platform-foundation.md`
+  - `changelog.md`
+- Validación ejecutada:
+  - `pnpm vitest run src/lib/navigation/deep-links/__tests__/base-url.test.ts src/lib/navigation/deep-links/__tests__/resolver.test.ts src/lib/webhooks/consumers/notification-mapping.test.ts` OK
+  - `pnpm exec eslint src/lib/navigation/deep-links src/lib/webhooks/consumers/notification-mapping.ts src/lib/webhooks/consumers/notification-mapping.test.ts src/app/api/admin/teams/test/route.ts` OK
+  - `pnpm exec tsc --noEmit` OK
+  - `pnpm lint` OK
+  - `pnpm build` OK
+- Build-health fix incluido en el cierre:
+  - `src/lib/communications/manual-teams-announcements.ts` ajusta el tipado literal de `spacing` en Adaptive Cards; no cambia comportamiento, solo elimina el type error que impedía `tsc`/`build`
+- Follow-ups claros:
+  - converger más consumers (`src/lib/sync/projections/notifications.ts`, Home loaders, Teams notify projection)
+  - evaluar si `public_quote_share` debe reutilizar builder público existente o mantener path canónico inline como hoy
+  - cuando madure Notification Hub, reemplazar generación manual de `actionUrl` por referencias semánticas en más carriles
+
+## Sesion 2026-04-30 — Helper canónico para anuncios manuales por Greenhouse TeamBot
+
+- Se creó una base reusable para futuros anuncios manuales a Teams sin depender del conector personal del operador.
+- Runtime nuevo:
+  - `src/config/manual-teams-announcements.ts` registra destinos manuales permitidos. Primer destino: `eo-team` → chat grupal `EO Team`.
+  - `src/lib/communications/manual-teams-announcements.ts` construye preview, valida payload, genera fingerprint estable y envía via `sendViaBotFramework` con audit trail en `greenhouse_sync.source_sync_runs`.
+  - `src/lib/integrations/teams/send-run-log.ts` centraliza el write de `source_sync_runs` y ahora también lo reutiliza `src/lib/integrations/teams/sender.ts`.
+  - `scripts/send-manual-teams-announcement.ts` expone la CLI `pnpm teams:announce` con `--dry-run` y gate `--yes`.
+- Runbook operativo nuevo: `docs/operations/manual-teams-announcements.md`.
+- Guardrails:
+  - destinos manuales salen de registry code-versioned, no de texto libre
+  - CTA obligatorio `https`
+  - body por archivo con párrafos separados por línea en blanco
+  - fingerprint sha256 corto para trazabilidad humana
+  - envío real requiere `--yes`
+- Scope intencional:
+  - esto NO implementa aún la surface completa de `TASK-716`
+  - sí deja una herramienta segura y escalable para usos operativos puntuales mientras esa task sigue bloqueada por `TASK-690`
+
 ## Sesion 2026-04-30 — Fix robusto para predicciones ICO dependientes del reloj del runner
 
 - **Incidente**: el `CI` de `main` para el commit `fd2dd75e` quedó rojo en el run `25154300079` por `src/lib/ico-engine/ai/ai-signals.test.ts`, caso `projects end-of-month OTD only for the active Santiago period`.
@@ -624,7 +1801,7 @@
 - Se documento la arquitectura canonica de deep links en `docs/architecture/GREENHOUSE_DEEP_LINK_PLATFORM_V1.md`.
 - La decision queda registrada como capability shared futura: referencias semanticas (`kind/id/action/scope`) resueltas por una capa central que produce `href`, `absoluteUrl`, `label`, `viewCode`, capabilities, fallback y preview segun audiencia.
 - El doc recoge patrones de Slack, Teams, Salesforce, Atlassian, Notion, GitHub y Figma, y los aterriza al estado actual del repo: `VIEW_REGISTRY`, `portalHomePath`, `actionUrl`, search estatico, Teams cards y quote short links.
-- Se creo `TASK-694` (`docs/tasks/to-do/TASK-694-deep-link-platform-foundation.md`) para implementar la foundation runtime `src/lib/navigation/deep-links/**` sin mezclar storage, search/sidebar ni migracion completa de Notification Hub.
+- Se creo `TASK-694` (`docs/tasks/complete/TASK-694-deep-link-platform-foundation.md`) para implementar la foundation runtime `src/lib/navigation/deep-links/**` sin mezclar storage, search/sidebar ni migracion completa de Notification Hub.
 - `docs/tasks/TASK_ID_REGISTRY.md` reserva `TASK-694` y `docs/tasks/README.md` deja el siguiente ID disponible en `TASK-695`.
 - `docs/README.md`, `project_context.md` y `changelog.md` quedan enlazados/actualizados. No hubo cambios runtime.
 - Validacion: doc-only; se verifico `git status` y lectura puntual del documento.

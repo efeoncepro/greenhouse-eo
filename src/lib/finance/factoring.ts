@@ -6,6 +6,7 @@ import type { PoolClient } from 'pg'
 
 import { withGreenhousePostgresTransaction } from '@/lib/postgres/client'
 import { assertFinanceSlice2PostgresReady } from '@/lib/finance/postgres-store-slice2'
+import { resolveAndPersistExpenseEconomicCategory } from '@/lib/finance/economic-category/writer-integration'
 import { FinanceValidationError, toNumber, normalizeString, roundCurrency } from '@/lib/finance/shared'
 
 // ─── Types ──────────────────────────────────────────────────────────────────
@@ -71,6 +72,24 @@ const insertExpenseInTransaction = async (
     actorUserId: string | null
   }
 ): Promise<void> => {
+  // TASK-768 — resolver canónico: factoring fees con supplier marcado partner
+  // → financial_settlement (rule SUPPLIER_LOOKUP_PARTNER). Sin partner →
+  // ACCOUNTING_TYPE_AMBIGUOUS_FALLBACK con manual queue.
+  const resolution = await resolveAndPersistExpenseEconomicCategory({
+    expenseId,
+    resolverInput: {
+      beneficiaryName: supplierName,
+      beneficiarySupplierId: supplierId,
+      rawDescription: description,
+      sourceKind: 'factoring',
+      accountingType: expenseType,
+      costCategory: 'operational',
+      amount,
+      currency: 'CLP'
+    },
+    client: client as { query: (text: string, params?: unknown[]) => Promise<unknown> }
+  })
+
   await client.query(
     `INSERT INTO greenhouse_finance.expenses (
       expense_id, client_id, expense_type, description, currency,
@@ -87,7 +106,7 @@ const insertExpenseInTransaction = async (
       is_reconciled,
       cost_category, cost_is_direct, allocated_client_id,
       direct_overhead_scope, direct_overhead_kind, direct_overhead_member_id,
-      notes, created_by_user_id,
+      notes, created_by_user_id, economic_category,
       created_at, updated_at
     )
     VALUES (
@@ -105,13 +124,13 @@ const insertExpenseInTransaction = async (
       FALSE,
       'operational', FALSE, NULL,
       NULL, NULL, NULL,
-      NULL, $10,
+      NULL, $10, $11,
       CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
     )`,
     [
       expenseId, clientId, expenseType, description,
       amount, paymentDate, paymentReference,
-      supplierId, supplierName, actorUserId
+      supplierId, supplierName, actorUserId, resolution.category
     ]
   )
 }

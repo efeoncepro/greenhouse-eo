@@ -193,7 +193,7 @@ const CostProvenancePopover = ({
                     </Typography>
                     <Typography
                       variant='body2'
-                      sx={{ fontFamily: 'monospace', fontSize: '0.8rem', wordBreak: 'break-all' }}
+                      sx={{ fontSize: '0.8rem', wordBreak: 'break-all' }}
                     >
                       {sourceRef}
                     </Typography>

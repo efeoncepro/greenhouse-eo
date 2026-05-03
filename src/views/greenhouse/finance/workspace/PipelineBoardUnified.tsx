@@ -20,11 +20,12 @@ import Stack from '@mui/material/Stack'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
-import TableContainer from '@mui/material/TableContainer'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
+
+import { DataTableShell } from '@/components/greenhouse/data-table'
 
 import CustomChip from '@core/components/mui/Chip'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
@@ -466,7 +467,7 @@ const PipelineBoardUnified = ({
             </Alert>
           </Box>
         ) : (
-          <TableContainer>
+          <DataTableShell identifier='pipeline-commercial-board' ariaLabel={GH_PIPELINE_COMMERCIAL.subtabPipelineLabel}>
             <Table size='small' aria-label={GH_PIPELINE_COMMERCIAL.subtabPipelineLabel}>
               <TableHead>
                 <TableRow>
@@ -585,7 +586,7 @@ const PipelineBoardUnified = ({
                 })}
               </TableBody>
             </Table>
-          </TableContainer>
+          </DataTableShell>
         )}
       </Card>
     </Stack>

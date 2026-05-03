@@ -19,11 +19,13 @@ import Stack from '@mui/material/Stack'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
-import TableContainer from '@mui/material/TableContainer'
+
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
+
+import { DataTableShell } from '@/components/greenhouse/data-table'
 
 import { ExecutiveMiniStatCard } from '@/components/greenhouse'
 import type {
@@ -180,7 +182,7 @@ const EntitlementsGovernanceTab = ({ data }: Props) => {
         />
         <Divider />
         <CardContent>
-          <TableContainer>
+          <DataTableShell identifier='entitlements-capabilities' ariaLabel='Catalogo de capabilities'>
             <Table size='small'>
               <TableHead>
                 <TableRow>
@@ -195,7 +197,7 @@ const EntitlementsGovernanceTab = ({ data }: Props) => {
                 {data.capabilities.map(item => (
                   <TableRow key={item.capability}>
                     <TableCell>
-                      <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
+                      <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>
                         {item.capability}
                       </Typography>
                     </TableCell>
@@ -213,7 +215,7 @@ const EntitlementsGovernanceTab = ({ data }: Props) => {
                 ))}
               </TableBody>
             </Table>
-          </TableContainer>
+          </DataTableShell>
         </CardContent>
       </Card>
 
@@ -254,7 +256,7 @@ const EntitlementsGovernanceTab = ({ data }: Props) => {
               </Grid>
             </Grid>
 
-            <TableContainer>
+            <DataTableShell identifier='entitlements-role-defaults' ariaLabel='Defaults por rol'>
               <Table size='small' aria-label='Defaults por rol'>
                 <TableHead>
                   <TableRow>
@@ -269,7 +271,7 @@ const EntitlementsGovernanceTab = ({ data }: Props) => {
                   {capabilityRows.map(row => (
                     <TableRow key={row.key}>
                       <TableCell>
-                        <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
+                        <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>
                           {row.capability}
                         </Typography>
                       </TableCell>
@@ -293,7 +295,7 @@ const EntitlementsGovernanceTab = ({ data }: Props) => {
                   ))}
                 </TableBody>
               </Table>
-            </TableContainer>
+            </DataTableShell>
 
             <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
               <Button variant='contained' onClick={handleSaveRoleDefaults} disabled={saving || !selectedRoleCode}>
@@ -316,7 +318,7 @@ const EntitlementsGovernanceTab = ({ data }: Props) => {
         />
         <Divider />
         <CardContent>
-          <TableContainer>
+          <DataTableShell identifier='entitlements-view-mappings' ariaLabel='Mapeo de vistas a capabilities'>
             <Table size='small'>
               <TableHead>
                 <TableRow>
@@ -331,12 +333,12 @@ const EntitlementsGovernanceTab = ({ data }: Props) => {
                   <TableRow key={`${binding.viewCode}:${binding.capability}:${binding.scope}`}>
                     <TableCell>{binding.viewLabel}</TableCell>
                     <TableCell>
-                      <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
+                      <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>
                         {binding.routePath}
                       </Typography>
                     </TableCell>
                     <TableCell>
-                      <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
+                      <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>
                         {binding.capability}
                       </Typography>
                     </TableCell>
@@ -351,7 +353,7 @@ const EntitlementsGovernanceTab = ({ data }: Props) => {
                 ))}
               </TableBody>
             </Table>
-          </TableContainer>
+          </DataTableShell>
         </CardContent>
       </Card>
 
@@ -404,7 +406,7 @@ const EntitlementsGovernanceTab = ({ data }: Props) => {
         />
         <Divider />
         <CardContent>
-          <TableContainer>
+          <DataTableShell identifier='entitlements-audit-log' ariaLabel='Bitacora de cambios de entitlements'>
             <Table size='small'>
               <TableHead>
                 <TableRow>
@@ -429,7 +431,7 @@ const EntitlementsGovernanceTab = ({ data }: Props) => {
                 ))}
               </TableBody>
             </Table>
-          </TableContainer>
+          </DataTableShell>
         </CardContent>
       </Card>
     </Stack>

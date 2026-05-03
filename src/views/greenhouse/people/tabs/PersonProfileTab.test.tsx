@@ -66,6 +66,7 @@ const detail: PersonDetail = {
     canViewAiTools: false,
     canViewIdentityContext: false,
     canViewAccessContext: false,
+    canViewPaymentProfile: false,
     visibleTabs: ['profile', 'activity', 'memberships', 'economy']
   },
   summary: {

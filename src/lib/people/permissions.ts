@@ -1,7 +1,7 @@
 import { ROLE_CODES } from '@/config/role-codes'
 import type { PersonAccess, PersonTab } from '@/types/people'
 
-const personTabOrder: PersonTab[] = ['profile', 'activity', 'memberships', 'economy', 'ai-tools']
+const personTabOrder: PersonTab[] = ['profile', 'activity', 'memberships', 'economy', 'payment', 'ai-tools']
 
 export const getPersonAccess = (
   roleCodes: string[],
@@ -12,6 +12,7 @@ export const getPersonAccess = (
   const isHrPayroll = roleCodes.includes(ROLE_CODES.HR_PAYROLL)
   const isHrManager = roleCodes.includes(ROLE_CODES.HR_MANAGER)
   const isFinance = roleCodes.includes(ROLE_CODES.FINANCE_ADMIN)
+  const isFinanceAnalyst = roleCodes.includes(ROLE_CODES.FINANCE_ANALYST)
   const isPeopleViewer = roleCodes.includes(ROLE_CODES.PEOPLE_VIEWER)
   const isSupervisorScoped = options?.supervisorScoped === true
 
@@ -25,6 +26,7 @@ export const getPersonAccess = (
   const canViewAiTools = isAdmin || isOps
   const canViewIdentityContext = isAdmin || isOps || isHrPayroll || isSupervisorScoped
   const canViewAccessContext = isAdmin || isOps
+  const canViewPaymentProfile = isAdmin || isFinance || isFinanceAnalyst
 
   return {
     canViewMemberships,
@@ -37,11 +39,13 @@ export const getPersonAccess = (
     canViewAiTools,
     canViewIdentityContext,
     canViewAccessContext,
+    canViewPaymentProfile,
     visibleTabs: personTabOrder.filter(tab => {
       if (tab === 'profile') return canViewIdentityContext || canViewHrProfile
       if (tab === 'activity') return canViewActivity
       if (tab === 'memberships') return canViewMemberships
       if (tab === 'economy') return canViewCompensation || canViewPayroll || canViewFinance
+      if (tab === 'payment') return canViewPaymentProfile
       if (tab === 'ai-tools') return canViewAiTools
 
       return false

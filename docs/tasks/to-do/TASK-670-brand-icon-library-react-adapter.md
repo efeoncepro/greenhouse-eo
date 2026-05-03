@@ -60,7 +60,7 @@ Revisar y respetar:
 
 - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
 - `docs/architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md`
-- `docs/tasks/to-do/TASK-647-greenhouse-mcp-read-only-adapter-v1.md`
+- `docs/tasks/complete/TASK-647-greenhouse-mcp-read-only-adapter-v1.md`
 - `docs/tasks/to-do/TASK-660-api-platform-openapi-stable-contract.md`
 
 Reglas obligatorias:

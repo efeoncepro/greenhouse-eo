@@ -16,6 +16,9 @@ describe('auth-secrets', () => {
   })
 
   it('enables Microsoft SSO when client id and secret resolve successfully', async () => {
+    vi.stubEnv('NEXTAUTH_SECRET', '')
+    vi.stubEnv('AZURE_AD_CLIENT_SECRET', '')
+    vi.stubEnv('GOOGLE_CLIENT_SECRET', '')
     vi.stubEnv('AZURE_AD_CLIENT_ID', 'azure-client-id')
     vi.stubEnv('GOOGLE_CLIENT_ID', 'google-client-id')
     resolveSecret
@@ -43,6 +46,10 @@ describe('auth-secrets', () => {
 
     const authSecretsModule = await import('@/lib/auth-secrets')
 
+    // Post-TASK-765 refactor: la resolucion ya no es top-level await.
+    // Esperar a que el cache este caliente antes de leer sync getters.
+    await authSecretsModule.ensureAuthSecretsResolved()
+
     expect(authSecretsModule.getNextAuthSecret()).toBe('nextauth-secret')
     expect(authSecretsModule.getAzureAdClientSecret()).toBe('azure-client-secret')
     expect(authSecretsModule.getGoogleClientSecret()).toBe('google-client-secret')
@@ -51,6 +58,9 @@ describe('auth-secrets', () => {
   })
 
   it('disables Microsoft SSO when the secret is unconfigured', async () => {
+    vi.stubEnv('NEXTAUTH_SECRET', '')
+    vi.stubEnv('AZURE_AD_CLIENT_SECRET', '')
+    vi.stubEnv('GOOGLE_CLIENT_SECRET', '')
     vi.stubEnv('AZURE_AD_CLIENT_ID', 'azure-client-id')
     resolveSecret
       .mockResolvedValueOnce({
@@ -76,6 +86,8 @@ describe('auth-secrets', () => {
       })
 
     const authSecretsModule = await import('@/lib/auth-secrets')
+
+    await authSecretsModule.ensureAuthSecretsResolved()
 
     expect(authSecretsModule.hasMicrosoftAuthProvider()).toBe(false)
   })

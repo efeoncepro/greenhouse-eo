@@ -150,7 +150,6 @@ const CustomFunnelLabel = (props: {
       fill='#fff'
       fontSize={height < 30 ? 11 : 13}
       fontWeight={600}
-      fontFamily='var(--font-dm-sans), sans-serif'
       style={{ textShadow: '0 1px 3px rgba(0,0,0,0.4)' }}
     >
       {name} · {(value ?? 0).toLocaleString('es-CL')}

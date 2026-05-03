@@ -12,6 +12,7 @@ La diferencia con otras capas de documentacion:
 
 ### Finanzas
 
+- [Distribucion de costos para P&L operativo](finance/distribucion-costos-pnl.md) — como revisar, materializar y cerrar períodos sin inflar overhead de clientes con payroll, regulatorio, financiero o treasury transit.
 - [Sugerencias asistidas de conciliacion](finance/sugerencias-asistidas-conciliacion.md) — como generar, revisar, aceptar o descartar sugerencias AI sin alterar saldos automaticamente.
 - [Finance Movement Feed](../documentation/finance/finance-movement-feed.md) — contrato reusable para mostrar movimientos financieros sin duplicar tablas, hardcodes de logos ni calculos de saldo en UI.
 
@@ -25,15 +26,15 @@ _Pendiente._
 
 ### HR y Nomina
 
-_Pendiente._
+- [Periodos de nomina](hr/periodos-de-nomina.md) — como crear, editar y calcular periodos sin adivinar la version tributaria Chile; cuando Greenhouse la resuelve solo y cuando un override manual si aplica.
 
 ### Agencia y Operaciones
 
-_Pendiente._
+- [Monitorear Costos Cloud con FinOps](operations/monitorear-costos-cloud-finops.md) — como revisar gasto GCP, interpretar proyecciones y drivers, usar alertas tempranas y ejecutar diagnosticos seguros sin depender solo de la consola de Google Cloud.
 
 ### Plataforma
 
-_Pendiente._
+- [MCP Greenhouse Read-Only](plataforma/mcp-greenhouse-read-only.md) — cómo levantar el MCP local `stdio` o conectarse al gateway remoto HTTP privado, qué variables necesita, qué tools read-only existen hoy, qué límites de scope respeta y qué follow-ups siguen fuera de alcance.
 
 ## Plantilla recomendada
 

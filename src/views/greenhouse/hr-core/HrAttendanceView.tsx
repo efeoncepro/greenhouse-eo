@@ -224,7 +224,7 @@ const HrAttendanceView = () => {
                         </Typography>
                       </TableCell>
                       <TableCell align='right'>
-                        <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
+                        <Typography variant='body2'>
                           {rec.minutesPresent != null ? `${rec.minutesPresent} min` : '—'}
                         </Typography>
                       </TableCell>

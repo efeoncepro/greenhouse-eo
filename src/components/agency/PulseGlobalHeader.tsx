@@ -36,7 +36,7 @@ const PulseGlobalHeader = ({ kpis }: Props) => (
       <Box>
         <Typography
           variant='h5'
-          sx={{ fontFamily: 'Poppins', fontWeight: 700, color: theme => theme.palette.customColors.midnight, mb: 0.5 }}
+          sx={{ fontWeight: 700, color: theme => theme.palette.customColors.midnight, mb: 0.5 }}
         >
           {GH_AGENCY.pulse_title}
         </Typography>

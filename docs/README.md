@@ -7,6 +7,7 @@ Indice maestro de la documentacion no operativa del repo.
 1. Volver a la raiz para contexto operativo inmediato:
    - [README.md](../README.md)
    - [AGENTS.md](../AGENTS.md)
+   - [DESIGN.md](../DESIGN.md)
    - [project_context.md](../project_context.md)
    - [Handoff.md](../Handoff.md)
 2. Entrar a la categoria de documentacion que corresponda al trabajo.
@@ -119,15 +120,18 @@ Indice maestro de la documentacion no operativa del repo.
 ### Operations
 
 - [Issue Tracker](issues/README.md)
+- [SOLUTION_QUALITY_OPERATING_MODEL_V1.md](operations/SOLUTION_QUALITY_OPERATING_MODEL_V1.md)
 - [MULTI_AGENT_WORKTREE_OPERATING_MODEL_V1.md](operations/MULTI_AGENT_WORKTREE_OPERATING_MODEL_V1.md)
 - [Mini Task Operating Model](operations/MINI_TASK_OPERATING_MODEL_V1.md)
 - [DOCUMENTATION_OPERATING_MODEL_V1.md](operations/DOCUMENTATION_OPERATING_MODEL_V1.md)
+- [CONTEXT_HANDOFF_OPERATING_MODEL_V1.md](operations/CONTEXT_HANDOFF_OPERATING_MODEL_V1.md)
 - [ISSUE_OPERATING_MODEL_V1.md](operations/ISSUE_OPERATING_MODEL_V1.md)
 - [GREENHOUSE_CLOUD_GOVERNANCE_OPERATING_MODEL_V1.md](operations/GREENHOUSE_CLOUD_GOVERNANCE_OPERATING_MODEL_V1.md)
 - [GITHUB_PROJECT_OPERATING_MODEL_V1.md](operations/GITHUB_PROJECT_OPERATING_MODEL_V1.md)
 - [GREENHOUSE_REPO_ECOSYSTEM_V1.md](operations/GREENHOUSE_REPO_ECOSYSTEM_V1.md)
 - [GREENHOUSE_DATA_MODEL_DOCUMENT_OPERATING_MODEL_V1.md](operations/GREENHOUSE_DATA_MODEL_DOCUMENT_OPERATING_MODEL_V1.md)
 - [GREENHOUSE_PERFORMANCE_REPORT_OPERATING_MODEL_V1.md](operations/GREENHOUSE_PERFORMANCE_REPORT_OPERATING_MODEL_V1.md)
+- [CODEX_EXECUTION_PROMPT_V1.md](operations/CODEX_EXECUTION_PROMPT_V1.md)
 - [EPIC_OPERATING_MODEL_V1.md](operations/EPIC_OPERATING_MODEL_V1.md)
 - [HR_PAYROLL_BRANCH_RESCUE_RUNBOOK_V1.md](operations/HR_PAYROLL_BRANCH_RESCUE_RUNBOOK_V1.md)
 - [RELEASE_CHANNELS_OPERATING_MODEL_V1.md](operations/RELEASE_CHANNELS_OPERATING_MODEL_V1.md)

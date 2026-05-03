@@ -14,11 +14,13 @@ import Stack from '@mui/material/Stack'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
-import TableContainer from '@mui/material/TableContainer'
+
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
 import MenuItem from '@mui/material/MenuItem'
+
+import { DataTableShell } from '@/components/greenhouse/data-table'
 
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
@@ -528,7 +530,7 @@ const BankView = () => {
               }
             />
             <CardContent sx={{ pt: 0 }}>
-              <TableContainer>
+              <DataTableShell identifier='bank-instruments' ariaLabel='Instrumentos de pago bancarios'>
                 <Table>
                   <TableHead>
                     <TableRow>
@@ -658,7 +660,7 @@ const BankView = () => {
                     })}
                   </TableBody>
                 </Table>
-              </TableContainer>
+              </DataTableShell>
             </CardContent>
           </Card>
         </Grid>
@@ -675,7 +677,7 @@ const BankView = () => {
                   No hay tarjetas de crédito activas registradas en este tenant.
                 </Alert>
               ) : (
-                <TableContainer>
+                <DataTableShell identifier='bank-credit-cards' ariaLabel='Tarjetas de credito'>
                   <Table size='small'>
                     <TableHead>
                       <TableRow>
@@ -705,7 +707,7 @@ const BankView = () => {
                       ))}
                     </TableBody>
                   </Table>
-                </TableContainer>
+                </DataTableShell>
               )}
             </CardContent>
           </Card>

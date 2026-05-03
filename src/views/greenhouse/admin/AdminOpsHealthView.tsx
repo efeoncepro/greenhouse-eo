@@ -582,7 +582,7 @@ const AdminOpsHealthView = ({
                           gap={2}
                         >
                           <Stack spacing={0.25}>
-                            <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8125rem' }}>
+                            <Typography variant='body2' sx={{ fontSize: '0.8125rem' }}>
                               {run.spaceId}
                             </Typography>
                             <Typography variant='caption' color='text.secondary'>
@@ -869,7 +869,7 @@ const AdminOpsHealthView = ({
                       <Stack direction='row' justifyContent='space-between' alignItems='flex-start' gap={2}>
                         <Stack spacing={0.5} sx={{ minWidth: 0 }}>
                           <Typography variant='h6'>{incident.title}</Typography>
-                          <Typography variant='body2' color='text.secondary' sx={{ fontFamily: 'monospace' }}>
+                          <Typography variant='body2' color='text.secondary'>
                             {incident.location}
                           </Typography>
                         </Stack>
@@ -929,7 +929,7 @@ const AdminOpsHealthView = ({
                   <CardContent>
                     <Stack spacing={1.25}>
                       <Stack direction='row' justifyContent='space-between' alignItems='center' gap={2}>
-                        <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
+                        <Typography variant='body2'>
                           {event.eventType}
                         </Typography>
                         <Chip size='small' variant='outlined' label={event.status} />
@@ -962,7 +962,6 @@ const AdminOpsHealthView = ({
                           size='small'
                           variant='outlined'
                           label={eventType}
-                          sx={{ fontFamily: 'monospace' }}
                         />
                       ))
                     ) : (
@@ -1000,7 +999,6 @@ const AdminOpsHealthView = ({
                             size='small'
                             variant='outlined'
                             label={`${item.eventType} · ${item.count}`}
-                            sx={{ fontFamily: 'monospace' }}
                           />
                         ))}
                       </Stack>
@@ -1064,7 +1062,7 @@ const AdminOpsHealthView = ({
                       <Stack direction='row' justifyContent='space-between' alignItems='flex-start' gap={2}>
                         <Stack spacing={0.5}>
                           <Typography variant='h6'>{item.projectionName}</Typography>
-                          <Typography variant='body2' color='text.secondary' sx={{ fontFamily: 'monospace' }}>
+                          <Typography variant='body2' color='text.secondary'>
                             {item.entityType}:{trimId(item.entityId)}
                           </Typography>
                         </Stack>
@@ -1148,7 +1146,7 @@ const AdminOpsHealthView = ({
                       gap={2}
                       sx={{ mb: 0.5 }}
                     >
-                      <Typography variant='body2' sx={{ fontWeight: 500, fontFamily: 'monospace' }}>
+                      <Typography variant='body2' sx={{ fontWeight: 500 }}>
                         {event.title}
                       </Typography>
                       <Chip size='small' variant='tonal' color={chipColor(event.resultTone)} label={event.result} />

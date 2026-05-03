@@ -59,6 +59,13 @@ Regla: módulos de dominio extienden estos objetos, no crean identidades paralel
 - **Migrations:** `pnpm migrate:up`, `pnpm migrate:down`, `pnpm migrate:create <nombre>`, `pnpm migrate:status`
 - **DB types:** `pnpm db:generate-types` (regenerar después de cada migración)
 
+### Solution Quality Contract
+
+- Greenhouse espera soluciones seguras, robustas, resilientes y escalables por defecto; no parches locales salvo mitigacion temporal explicita.
+- Antes de implementar, validar si el problema es sintoma local o causa compartida y preferir la primitive canonica del dominio.
+- Todo workaround debe quedar documentado como temporal, reversible, con owner, condicion de retiro y task/issue asociada cuando aplique.
+- Fuente canonica: `docs/operations/SOLUTION_QUALITY_OPERATING_MODEL_V1.md`.
+
 ### Secret Manager Hygiene
 
 - Secretos consumidos por `*_SECRET_REF` deben publicarse como scalar crudo: sin comillas envolventes, sin `\n`/`\r` literal y sin whitespace residual.
@@ -75,8 +82,11 @@ Regla: módulos de dominio extienden estos objetos, no crean identidades paralel
 ## Key Docs
 
 - `AGENTS.md` — reglas operativas completas, branching, deploy, coordinación, PostgreSQL access
-- `project_context.md` — arquitectura, stack, decisiones, restricciones (documento vivo con deltas)
-- `Handoff.md` — trabajo en curso, riesgos, próximos pasos
+- `DESIGN.md` — contrato visual compacto para agentes; leerlo cuando el cambio toque UI, UX, tipografía, color, spacing o selección de componentes
+- `project_context.md` — estado vigente del repo, stack, decisiones y restricciones; leer primero su sección "Estado vigente para agentes"
+- `Handoff.md` — cabina de mando activa: trabajo en curso, riesgos y próximos pasos
+- `Handoff.archive.md` — caja negra histórica; usar para auditoría de resoluciones sin tratar entradas antiguas como contrato vigente
+- `docs/operations/CONTEXT_HANDOFF_OPERATING_MODEL_V1.md` — regla canónica para navegar `project_context.md`, `Handoff.md` y `Handoff.archive.md` sin perder auditoría ni inflar el handoff activo
 - `docs/tasks/README.md` — pipeline de tareas `TASK-###` y legacy `CODEX_TASK_*`
 - `docs/issues/README.md` — pipeline de incidentes operativos `ISSUE-###`
 - `docs/architecture/` — specs de arquitectura canónicas (30+ documentos)
@@ -90,9 +100,37 @@ Regla: módulos de dominio extienden estos objetos, no crean identidades paralel
   - `docs/architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md`
 - Fuente canónica para trabajo multi-agente (Claude + Codex en paralelo):
   - `docs/operations/MULTI_AGENT_WORKTREE_OPERATING_MODEL_V1.md` — incluye higiene de worktrees, `rebase --onto`, `force-push-with-lease`, CI como gate compartido, squash merge policy, background watcher pattern para auto-merge sin branch protection
+- Fuente canonica para calidad de solucion:
+  - `docs/operations/SOLUTION_QUALITY_OPERATING_MODEL_V1.md` — regla anti-parche: causa raiz, primitives canonicas, resiliencia, seguridad, escalabilidad y workaround solo temporal/documentado
 - Convenciones de skills locales:
-  - Claude: `.claude/skills/<skill-name>/skill.md` (minuscula)
+  - Claude: `.claude/skills/<skill-name>/SKILL.md` (convencion oficial vigente; existen skills legacy en `skill.md` minuscula)
   - Codex: `.codex/skills/<skill-name>/SKILL.md` (mayuscula)
+
+## Skill obligatoria: greenhouse-finance-accounting-operator
+
+**INVOCAR SIEMPRE** la skill `greenhouse-finance-accounting-operator` (ubicada en `.claude/skills/greenhouse-finance-accounting-operator/SKILL.md` + global `~/.claude/skills/`) ANTES de:
+
+- Tocar cualquier módulo de **finanzas** (`/finance/*`, `src/lib/finance/`, `src/app/api/finance/*`, `greenhouse_finance.*` schema): bank, cash-out, cash-in, expenses, income, suppliers, payment_orders, reconciliation, account_balances, settlement_legs, OTB declaration.
+- Tocar cualquier módulo de **costos / cost intelligence** (`src/lib/commercial-cost-attribution/`, `src/lib/finance/postgres-store-intelligence.ts`, member-period attribution, client_economics, labor allocation, CCA shareholder accounts, loaded cost models, ICO economics).
+- Tocar cualquier flujo **fiscal/tributario** (Chile SII, DTE, IVA débito/crédito, F22/F29, retenciones honorarios 14.5%, gastos rechazados Art 21, Capital Propio Tributario, ProPyme/14A regime, gratificación legal, indemnización años servicio).
+- Tocar cualquier flujo de **payments / treasury** (cashflow forecast, working capital, FX hedging, payment rails ACH/SEPA/SWIFT/PIX, factoring, invoice discounting, internal_transfers, fx_pnl_breakdown, account_balance materialization).
+- Tocar **P&L / reporting / KPIs financieros** (revenue recognition ASC 606/IFRS 15, EBITDA quality, gross margin, contribution margin, unit economics CAC/LTV, variance analysis, budget vs actual, FP&A).
+- Tocar **cierre mensual / period close / reconciliation** (trial balance, accruals, deferrals, bank rec, intercompany matching, audit trail).
+- Tocar **internal controls / audit / compliance** (COSO, SOX, segregation of duties, materiality ISA 320, fraud detection, going concern, Ley 20.393 MPD, UAF reporting, gobierno corporativo).
+- Tocar **economic_category** (TASK-768), **expense_payments_normalized** (TASK-766), **account_balances FX** (TASK-774), **OTB cascade** (TASK-703), **payment orders bank settlement** (TASK-765), **fx_pnl_breakdown** (TASK-699), **internal_account_number** (TASK-700).
+
+**Triggers léxicos** que disparan la invocación: "audit", "audita", "P&L", "EBITDA", "cashflow", "balance", "cierre", "conciliación", "IVA", "DTE", "factura", "boleta", "honorarios", "gratificación", "indemnización", "SII", "F22", "F29", "PPM", "retención", "gasto rechazado", "leasing", "depreciación", "amortización", "provisión", "deferred", "accrual", "revenue recognition", "5 pasos", "ASC 606", "IFRS 15", "IFRS 16", "IAS 7", "COSO", "SOX", "segregation of duties", "materiality", "going concern", "fraud triangle", "Benford", "ABC costing", "throughput", "standard costing", "absorption", "direct costing", "variance", "DSO", "DPO", "DIO", "CCC", "working capital", "13-week forecast", "hedge", "forward", "natural hedging", "factoring", "supply chain finance", "letter of credit", "cost-plus", "value-based", "retainer", "fixed-fee", "T&M", "loaded cost", "utilization rate", "realization rate", "CAC", "LTV", "payback", "unit economics", "ROIC", "ROE", "FCF", "CFO", "EBIT", "NOPAT", "WACC", "due diligence", "transfer pricing", "TP", "MPD", "PEP", "lavado activos", "cohecho", "auditor externo", "CPA", "Big-4", "qualified opinion", "adverse opinion", "going concern", "restatement", "impairment", "fair value", "mark-to-market", "MTM", "hedge effectiveness", "OCI", "comprehensive income".
+
+**Razón**: la skill combina IFRS / US GAAP / Chile NIIF / COSO / ISA / AICPA con runtime Greenhouse (helpers canónicos, VIEWs, reliability signals). Sin invocarla: alto riesgo de violar contratos canónicos (TASK-766/768/774/703), recomendar tratamientos contables incorrectos, perder material de framework, o no escalar a CPA/auditor cuando corresponde.
+
+**Cuándo NO invocarla**: tareas de plumbing puramente técnico sin razonamiento contable (ej. "qué endpoint usa esta vista" → `greenhouse-backend`; "ajusta este chart de Apex" → `greenhouse-ux`). Si la pregunta combina técnico + contable, invocar AMBAS.
+
+**Sinergia con otras skills**:
+
+- Si toca **payroll** (cálculo nómina, AFP/Salud/SIS, indemnizaciones runtime): combinar con `greenhouse-payroll-auditor`.
+- Si toca **HubSpot bridge** (CCA, products, deals): combinar con `hubspot-greenhouse-bridge`.
+- Si toca **PostgreSQL** queries finance: combinar con `greenhouse-postgres`.
+- Si toca **Cloud Run** ops-worker (reactive consumers finance, projection refresh): combinar con `greenhouse-cron-sync-ops`.
 
 ### Architecture Docs (los más críticos)
 
@@ -109,6 +147,7 @@ Regla: módulos de dominio extienden estos objetos, no crean identidades paralel
 - `GREENHOUSE_INTERNAL_IDENTITY_V1.md` — separación auth principal vs canonical identity
 - `GREENHOUSE_MEMBER_LOADED_COST_MODEL_V1.md` 🆕 — **SPEC RAÍZ del modelo económico Greenhouse** (2026-04-28). Modelo dimensional Provider × Tool × Member × Client × Period × Expense, full absorption costing, snapshots inmutables, overhead policies. Subordina parcialmente `GREENHOUSE_MANAGEMENT_ACCOUNTING_ARCHITECTURE_V1.md` (modelo dimensional + period governance) y recontextualiza `GREENHOUSE_COST_INTELLIGENCE_ARCHITECTURE_V1.md` como V0. Programa de tasks: `TASK-710` (Tool Consumption Bridge), `TASK-711` (Member↔Tool UI), `TASK-712` (Tool Catalog), `TASK-713` (Period Closing). Roadmap por fases en §11.
 - `GREENHOUSE_FINANCE_ARCHITECTURE_V1.md` — módulo Finance: P&L engine, dual-store, outbox, allocations
+- `GREENHOUSE_FINANCE_ECONOMIC_CATEGORY_DIMENSION_V1.md` 🆕 — **modelo dimensional analítico/operativo separado de la taxonomía fiscal** (TASK-768): `economic_category` ortogonal a `expense_type`/`income_type`, clasificador automático con 10 reglas, diccionario extensible (`known_regulators` + `known_payroll_vendors`), defensa-en-profundidad de 5 capas, herramientas operativas (reclassify endpoints + manual queue + backfill), contrato downstream con TASK-178/710-713/080+/705/706. Cierra ISSUE-065
 - `GREENHOUSE_FX_CURRENCY_PLATFORM_V1.md` — matriz canónica de monedas por dominio, FX policy, readiness contract, currency registry
 - `GREENHOUSE_UI_PLATFORM_V1.md` — stack UI, librerías disponibles, patrones de componentes
 - `GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md` — infraestructura de webhooks inbound/outbound
@@ -329,7 +368,23 @@ Regla: no diseñar una task o arquitectura nueva describiendo solo `views` si ta
 - Vistas por módulo: `src/views/greenhouse/*`
 - Lógica de dominio: `src/lib/*` (organizada por módulo: `payroll/`, `finance/`, `people/`, `agency/`, `sync/`, etc.)
 - Tipos por dominio: `src/types/*`
-- Nomenclatura centralizada: `src/config/greenhouse-nomenclature.ts`
+- **Nomenclatura de producto + navegación**: `src/config/greenhouse-nomenclature.ts` (Pulse, Spaces, Ciclos, etc.)
+- **Microcopy funcional shared (locale-aware)**: `src/lib/copy/` (TASK-265). API: `import { getMicrocopy } from '@/lib/copy'`. Namespaces: `actions` (CTAs), `states` (Activo/Pendiente), `loading` (Cargando…/Guardando…), `empty` (Sin datos/Sin resultados), `months`, `aria`, `errors`, `feedback`, `time`. NO duplicar texto que ya existe en `greenhouse-nomenclature.ts`.
+
+### Microcopy / UI copy — regla canónica (TASK-265)
+
+**ANTES de escribir cualquier string visible al usuario** (label, placeholder, helperText, title, alert, snackbar, empty state, error message, status label, loading text, aria-label, tooltip, KPI title), invocar la skill `greenhouse-ux-writing` para validar tono (es-CL tuteo) y revisar si la string ya existe en alguna de estas dos capas:
+
+1. `src/lib/copy/` — microcopy funcional shared (CTAs, estados, loading, empty, etc.)
+2. `src/config/greenhouse-nomenclature.ts` — product nomenclature + navegación + labels institucionales
+
+**Enforcement mecánico**: ESLint rule `greenhouse/no-untokenized-copy` (modo `warn` durante TASK-265 + sweeps TASK-407/408; promueve a `error` al cierre TASK-408). Detecta aria-labels literales, status maps inline, loading strings, empty states, y secondary props (label/placeholder/etc) en JSX. Excluidos: theme files, global-error, public/**, emails/**, finance/pdf/**.
+
+**Decision tree**:
+
+- ¿Es product nomenclature (Pulse, Spaces, Ciclos, Mi Greenhouse) o navegación? → `greenhouse-nomenclature.ts`
+- ¿Es microcopy funcional reusada en >3 surfaces (CTAs, estados, loading, empty, aria)? → `src/lib/copy/dictionaries/es-CL/<namespace>.ts`
+- ¿Es copy de dominio específico? → vive cerca del dominio pero pasa por skill `greenhouse-ux-writing` para validar tono
 
 ### API Routes
 
@@ -444,6 +499,13 @@ AGENT_AUTH_SECRET=<secret> node scripts/playwright-auth-setup.mjs
 - Para chats individuales ya instalados por usuario, **no crear 1:1 a ciegas con AAD Object ID**. Resolver el `oneOnOne` existente y postear ahí. El intento `members: [{ id: "29:<aadObjectId>" }]` puede fallar con `403 Failed to decrypt pairwise id` aunque el usuario exista.
 - En 1:1 no hace falta mencionar al destinatario; Teams notifica el chat. Para smoke scripts locales con imports server-side, usar `npx tsx --require ./scripts/lib/server-only-shim.cjs ...`.
 - Producto/UI: cualquier canal manual debe converger con Notification Hub / `TASK-716` (intent/outbox, preview, aprobación, idempotencia, retries, audit, delivery status y permisos `views` + `entitlements`), no con un textbox que postea directo a Teams.
+- **Helper canónico ya existe para anuncios manuales vía TeamBot**:
+  - comando: `pnpm teams:announce`
+  - runbook: `docs/operations/manual-teams-announcements.md`
+  - runtime: `src/lib/communications/manual-teams-announcements.ts`
+  - destinos registrados: `src/config/manual-teams-announcements.ts`
+  - guardrails: `--dry-run` primero, `--yes` para enviar, `--body-file` con párrafos separados por línea en blanco, CTA `https` obligatorio
+  - para futuras peticiones del tipo "envía este mensaje por Greenhouse/TeamBot", reutilizar este helper antes de crear scripts temporales o usar el conector personal de Teams
 - Chats verificados:
   - `EO Team`: `19:1e085e8a02d24cc7a0244490e5d00fb0@thread.v2`.
   - `Sky - Efeonce | Shared`: `19:bf42622ef7b44d139cd4659e8aa22e81@thread.v2`.
@@ -462,6 +524,43 @@ AGENT_AUTH_SECRET=<secret> node scripts/playwright-auth-setup.mjs
 - Las rutas API Vercel (`/api/cron/outbox-react`, etc.) son fallback manual, no scheduladas.
 - Run tracking: `source_sync_runs` con `source_system='reactive_worker'`, visible en Admin > Ops Health.
 - Fuente canónica: `docs/architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md` §4.9 y §5.
+
+### Vercel cron classification + migration platform (TASK-775)
+
+Toda decisión "dónde vive un cron" pasa por las **3 categorías canónicas** de `docs/architecture/GREENHOUSE_VERCEL_CRON_CLASSIFICATION_V1.md`:
+
+- **`async_critical`** — alimenta o consume pipeline async (outbox, projection, sync downstream) que QA/staging necesita. **Hosting canónico: Cloud Scheduler + ops-worker. NO Vercel cron.**
+- **`prod_only`** — side effects que solo importan en producción real (compliance, GDPR cleanup, FX rates externos). Hosting Vercel cron OK.
+- **`tooling`** — utilitarios para developers/QA/monitoreo (synthetic monitors, data quality probes). Hosting Vercel cron OK.
+
+**Patrón de migración canónico** (cuando crees un cron nuevo o migres uno existente):
+
+1. Lógica pura en `src/lib/<dominio>/<orchestrator>.ts` o `src/lib/cron-orchestrators/index.ts` — reusable desde Vercel route + Cloud Run.
+2. Endpoint Cloud Run en `services/ops-worker/server.ts` via helper canónico `wrapCronHandler({ name, domain, run })` — centraliza `runId`, `captureWithDomain`, `redactErrorForResponse`, audit log, 502 sanitizado.
+3. Cloud Scheduler job en `services/ops-worker/deploy.sh` con `upsert_scheduler_job` (idempotente).
+4. Si era cron Vercel scheduled, eliminar entry de `vercel.json` (la route queda como fallback manual via curl + `CRON_SECRET`).
+5. Sincronizar snapshot `CLOUD_SCHEDULER_JOBS_FOR_VERCEL_CRONS` en **dos** lugares:
+   - `src/lib/reliability/queries/cron-staging-drift.ts` (reader runtime)
+   - `scripts/ci/vercel-cron-async-critical-gate.mjs` (CI gate)
+
+**Defensas anti-regresión**:
+
+- **Reliability signal `platform.cron.staging_drift`** (subsystem `Event Bus & Sync Infrastructure`): kind=`drift`, severity=`error` si count>0, steady=0. Lee `vercel.json`, matchea contra `ASYNC_CRITICAL_PATH_PATTERNS` (`outbox*`, `sync-*`, `*-publish`, `webhook-*`, `hubspot-*`, `entra-*`, `nubox-*`, `*-monitor`, `email-delivery-retry`, `reconciliation-auto-match`), verifica equivalente Cloud Scheduler, honra `KNOWN_NON_ASYNC_CRITICAL_PATHS` (`sync-previred` = prod_only legítimo) y override `// platform-cron-allowed: <reason>` adyacente al path en vercel.json.
+- **CI gate `pnpm vercel-cron-gate`** (`.github/workflows/ci.yml` después de Lint, modo `--warn` durante TASK-775; promueve a strict tras estabilización). Falla CI si detecta async-critical sin equivalent.
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** agregar a `vercel.json` un path que matchea pattern async-critical sin Cloud Scheduler equivalent. CI gate bloquea, reliability signal alerta. Si emerge un caso legítimo prod_only/tooling cuyo path matchea pattern, agregarlo a `KNOWN_NON_ASYNC_CRITICAL_PATHS` (en AMBOS readers) o usar override comment.
+- **NUNCA** crear handler Cloud Run sin pasar por `wrapCronHandler`. Sin él, perdés runId estable, audit log consistente, captureWithDomain canónico, sanitización de error y 502 contract uniforme.
+- **NUNCA** duplicar lógica de cron entre route Vercel y server.ts del ops-worker. Toda lógica vive en `src/lib/<...>/orchestrator.ts` y ambos endpoints la importan. Single source of truth.
+- **NUNCA** sincronizar `CLOUD_SCHEDULER_JOBS_FOR_VERCEL_CRONS` en uno solo de los dos lugares (reader + gate). Drift entre ambos = falsos positivos en CI o falsos negativos en runtime dashboard.
+- **NUNCA** modificar pattern array en uno solo. Si emerge un nuevo pattern async-critical, agregarlo en AMBOS lugares con comentario justificando la categoría.
+- Cuando se cree un cron nuevo, **categorizarlo PRIMERO** según las 3 categorías canónicas, luego elegir hosting. NO al revés.
+
+**Spec canónica**: `docs/architecture/GREENHOUSE_VERCEL_CRON_CLASSIFICATION_V1.md` (categorías + decision tree + inventario).
+**Helper canónico**: `services/ops-worker/cron-handler-wrapper.ts` (`wrapCronHandler`).
+**Reader runtime**: `src/lib/reliability/queries/cron-staging-drift.ts`.
+**CI gate**: `scripts/ci/vercel-cron-async-critical-gate.mjs`.
 
 ### Reliability dashboard hygiene — orphan archive, channel readiness, smoke lane bus, domain incidents
 
@@ -717,6 +816,341 @@ El "Resultado cambiario" del Banco se compone de **3 fuentes legítimas** y debe
 - **NUNCA** loggear silenciosamente cuando `resolveExchangeRateToClp` falla. Usar `captureWithDomain(err, 'finance', { tags: { source: 'fx_pnl_translation' } })` y degradar a `translation = 0` — degradación honesta, nunca bloquear la materialización del snapshot diario.
 - Patrón canónico replicado de `income_settlement_reconciliation` (TASK-571 / TASK-699). Cuando se necesite "una columna compuesta de N mecanismos legítimos", aplicar este shape: VIEW + helper TS + comments anti re-derive + UI con estados honestos.
 
+### Finance — CLP currency reader invariants (TASK-766)
+
+Toda lectura de `expense_payments` o `income_payments` que necesite saldos en CLP **debe** ir por la VIEW canónica + helper TS. NUNCA recomputar `monto_clp = ep.amount × exchange_rate_to_clp` en SQL embebido.
+
+**Por qué**: el campo `exchange_rate_to_clp` vive en el documento original (`expenses` / `income`). Cuando un expense en USD se paga en CLP (caso CCA shareholder reimbursable TASK-714c), multiplicar el monto CLP nativo del payment por el rate USD del documento infla los KPIs en mil millones por payment. Incidente real 2026-05-02: `/finance/cash-out` mostraba $1.017.803.262 vs real $11.546.493 (88× inflado), todo por **un** payment HubSpot CCA.
+
+**Read API canónico**:
+- VIEW: `greenhouse_finance.expense_payments_normalized` y `greenhouse_finance.income_payments_normalized`. Exponen `payment_amount_clp` (COALESCE chain: `amount_clp` first → CLP-trivial fallback `WHEN currency='CLP' THEN amount` → `NULL` + `has_clp_drift=TRUE`). Aplican filtro 3-axis supersede inline.
+- Helpers TS: `src/lib/finance/expense-payments-reader.ts` y `src/lib/finance/income-payments-reader.ts`.
+  - `sumExpensePaymentsClpForPeriod({fromDate, toDate, expenseType?, supplierId?, isReconciled?})` → `{totalClp, totalPayments, unreconciledCount, supplierClp, payrollClp, fiscalClp, driftCount}`
+  - `sumIncomePaymentsClpForPeriod({fromDate, toDate, clientProfileId?, isReconciled?})` → `{totalClp, totalPayments, unreconciledCount, driftCount}`
+  - `listExpensePaymentsNormalized({...})` y `listIncomePaymentsNormalized({...})` para detalle paginado
+  - `getExpensePaymentsClpDriftCount()` y `getIncomePaymentsClpDriftCount()` para reliability signals
+
+**Backfill + drift defense (Slice 2)**:
+- `expense_payments` y `income_payments` tienen columna `requires_fx_repair BOOLEAN` que marca filas con `currency != 'CLP' AND amount_clp IS NULL`.
+- CHECK constraint `payments_amount_clp_required_after_cutover` (NOT VALID + VALIDATE atomic, mirror del patrón TASK-708/728 con cutover 2026-05-03): rechaza INSERT/UPDATE post-cutover sin `amount_clp` para non-CLP, salvo supersede activo.
+- Reliability signals canónicos: `finance.expense_payments.clp_drift` + `finance.income_payments.clp_drift` (kind=drift, severity=error si count>0, steady=0). Subsystem rollup: `Finance Data Quality`.
+
+**Lint rule mecánica (Slice 3)**:
+- `eslint-plugins/greenhouse/rules/no-untokenized-fx-math.mjs` modo `error`. Detecta SQL embedido con 4 patrones (expense + income, con/sin COALESCE) — `ep.amount * exchange_rate_to_clp`, `ep.amount * COALESCE(e.exchange_rate_to_clp, 1)`, idem `ip.amount`. Bloquea el commit.
+- Override block en `eslint.config.mjs` exime los readers canónicos (`src/lib/finance/expense-payments-reader.ts`, `src/lib/finance/income-payments-reader.ts`) — son la única fuente legítima de la VIEW.
+
+**Repair admin endpoint (Slice 5)**:
+- `POST /api/admin/finance/payments-clp-repair` (capability `finance.payments.repair_clp`, FINANCE_ADMIN + EFEONCE_ADMIN). Body: `{kind: 'expense_payments'|'income_payments', paymentIds?, fromDate?, toDate?, batchSize?, dryRun?}`. Resuelve rate histórico al `payment_date` desde `greenhouse_finance.exchange_rates` (rate vigente al pago, NO el actual) y poblá `amount_clp + exchange_rate_at_payment + requires_fx_repair=FALSE` per-row atomic. Idempotente. Outbox audit `finance.payments.clp_repaired` v1.
+
+**⚠️ Reglas duras**:
+- **NUNCA** escribir `SUM(ep.amount * exchange_rate_to_clp)`, `SUM(ep.amount * COALESCE(e.exchange_rate_to_clp, 1))` ni variantes con `ip.amount`. Lint rule `greenhouse/no-untokenized-fx-math` rompe build.
+- **NUNCA** sumar `payment.amount` directo y luego multiplicar por rate del documento en código TS — el rate del documento puede ser de issuance USD pero el payment puede ser CLP nativo. La VIEW resuelve esto correctamente.
+- **NUNCA** crear un nuevo callsite de KPIs CLP sin pasar por `sumExpensePaymentsClpForPeriod` / `sumIncomePaymentsClpForPeriod`. Si el caso de uso pide breakdown nuevo (e.g. por supplier_id), extender el helper, NO duplicar SQL.
+- **NUNCA** ignorar `driftCount` en surfaces que ya lo exponen. UI debe banner anomalies cuando `driftCount > 0` para que el operador invoque `/api/admin/finance/payments-clp-repair`.
+- **NUNCA** hacer DELETE manual de filas con `requires_fx_repair=TRUE` para "limpiar" el dashboard. Usar el endpoint de repair (idempotente, audit trail completo).
+- **NUNCA** modificar la VIEW sin actualizar también: helpers TS, tests anti-regresión KPI, lint rule (si emerge un nuevo anti-patrón), reliability signals.
+- Cuando emerja una nueva primitiva de payment (e.g. `treasury_movement`, `intercompany_transfer`), debe nacer con `amount_clp` desde el INSERT (la helper canónica `recordExpensePayment` / `recordIncomePayment` ya resuelven rate histórico al insert) y CHECK constraint anti-NULL desde el day-1.
+
+**Spec canónica**: `docs/tasks/complete/TASK-766-finance-clp-currency-reader-contract.md`. Replica los patrones de TASK-571 (settlement reconciliation), TASK-699 (FX P&L breakdown), TASK-721 (canonical helper enforcement), TASK-708/728 (CHECK NOT VALID + VALIDATE atomic).
+
+### Finance — Account balances FX consistency (TASK-774, extiende TASK-766)
+
+`materializeAccountBalance` (`src/lib/finance/account-balances.ts`) **debe** consumir las VIEWs canónicas TASK-766 (`expense_payments_normalized`, `income_payments_normalized`) + COALESCE(`settlement_legs.amount_clp`, ...) para computar `period_inflows`/`period_outflows`. NUNCA `SUM(payment.amount)` directo.
+
+**Por qué**: bug Figma EXP-202604-008 (2026-05-03). Payment USD $92.9 desde TC Santander Corp (cuenta CLP) sumaba +$92.9 nativo en lugar de +$83,773.5 CLP equivalente. Mismo anti-patrón sistémico que TASK-766 cerró para cash-out KPIs, quedó vivo en path account_balances.
+
+**Read API canónico** (extiende TASK-766):
+
+- En `getDailyMovementSummary` (helper privado del materializer):
+  - `income_payments`: lee `income_payments_normalized.payment_amount_clp` (VIEW canónica TASK-766).
+  - `expense_payments`: lee `expense_payments_normalized.payment_amount_clp` (VIEW canónica TASK-766).
+  - `settlement_legs`: COALESCE inline `COALESCE(sl.amount_clp, CASE WHEN sl.currency = 'CLP' THEN sl.amount END)`. Settlement_legs no tiene VIEW propia (1 callsite, YAGNI; promover a VIEW si emerge segundo callsite).
+- Toda agregación SUM se hace sobre el alias resultante del subselect (`SUM(amount)`), NO sobre `SUM(ep.amount)` / `SUM(ip.amount)` / `SUM(sl.amount)` directo.
+
+**Reliability signal canónico**:
+
+- `finance.account_balances.fx_drift` (kind=`drift`, severity=`error` si count>0, steady=0). Recompute expected delta desde VIEWs canónicas + COALESCE settlement_legs y compara contra persisted (`period_inflows - period_outflows`). Tolerancia $1 CLP (anti FP-noise). Ventana 90 días. Reader: `src/lib/reliability/queries/account-balances-fx-drift.ts`. Subsystem rollup: `Finance Data Quality`.
+
+**Lint rule mecánica** (extiende TASK-766):
+
+- `eslint-plugins/greenhouse/rules/no-untokenized-fx-math.mjs` modo `error`. Nuevos patrones TASK-774:
+  - `SUM(ep.amount)` → usar `payment_amount_clp` via `expense_payments_normalized`
+  - `SUM(ip.amount)` → usar `payment_amount_clp` via `income_payments_normalized`
+  - `SUM(sl.amount)` → usar `COALESCE(sl.amount_clp, CASE WHEN currency='CLP' THEN amount END)`
+
+**Backfill defensivo**:
+
+- Cron diario `ops-finance-rematerialize-balances` rematerializa últimos 7 días automáticamente — el fix se propaga sin script para casos recientes (incluye Figma 2026-05-03).
+- Para histórico > 7 días: `pnpm tsx --require ./scripts/lib/server-only-shim.cjs scripts/finance/backfill-account-balances-fx-fix.ts --account-id=<id> --from-date=<YYYY-MM-DD>` (idempotente, dry-run mode).
+
+**⚠️ Reglas duras** (sumadas a las de TASK-766):
+
+- **NUNCA** leer `expense_payments` / `income_payments` directo en `account-balances.ts` ni en cualquier materializer downstream. Use VIEWs canónicas TASK-766.
+- **NUNCA** sumar `settlement_legs.amount` sin COALESCE con `amount_clp`. Settlement_legs tiene columna `amount_clp` opcional desde migration `20260408103211338`.
+- **NUNCA** crear materializer nuevo (e.g. `account_balances_monthly`, `treasury_position`, `cashflow_summary`) sin pasar por estas VIEWs. Si emerge necesidad de nueva VIEW (ej. `treasury_movements_normalized` para una nueva primitiva), aplicar el mismo patrón TASK-766 (CTE COALESCE + filtro 3-axis supersede inline + `payment_amount_clp` column).
+- Cuando emerja un nuevo callsite que necesite CLP-equivalent, agregar a la VIEW canónica un campo nuevo (e.g. `payment_amount_clp_excluding_fx_gain`) — NO recompute inline.
+
+**Spec canónica**: `docs/tasks/complete/TASK-774-account-balance-clp-native-reader-contract.md`. Patrón aplicado al path account_balances después de TASK-766 que cubrió cash-out.
+
+### Finance — Account drawer temporal modes contract (TASK-776)
+
+Todo drawer/dashboard de finance que muestre agregaciones temporales DEBE declarar `temporalMode: 'snapshot' | 'period' | 'audit'` (declarado en `instrument-presentation.ts` per categoría) y resolver su ventana via helper canónico `resolveTemporalWindow`. NUNCA calcular `fromDate`/`toDate` inline en consumers.
+
+**Por qué**: el `AccountDetailDrawer` mezclaba 4 surfaces con 4 ventanas temporales independientes sin contract declarado (KPIs acumulados + chart 12m + lista filtrada por mes + banner OTB). Caso real 2026-05-03: balance Santander Corp $1.225.047 correcto post-fix TASK-774, pero lista "Movimientos" vacía porque filtraba Mayo 2026 mientras el cargo Figma fue 29/04. Operador veía "balance bajó pero no veo el cargo" → confusión + ticket.
+
+**Contract canónico** (`src/lib/finance/instrument-presentation.ts` + `src/lib/finance/temporal-window.ts`):
+
+- `TemporalMode = 'snapshot' | 'period' | 'audit'` enum cerrado.
+- `TemporalDefaults = { mode: TemporalMode; windowDays?: number }` declarado per profile.
+- Helper `resolveTemporalWindow({mode, year?, month?, anchorDate?, windowDays?, today?})` retorna `{fromDate, toDate, modeResolved, label, spanDays}`.
+- Degradación honesta: input incompleto (e.g. `mode='period'` sin year/month) cae a snapshot, NO throw silente.
+
+**Defaults declarativos por categoría**:
+
+- `bank_account` / `credit_card` / `fintech` → `snapshot` (windowDays=30) — caso de uso "qué pasa hoy".
+- `shareholder_account` (CCA) → `audit` — auditoría completa desde anchor.
+- `processor_transit` (Deel/Stripe/etc.) → `period` — cierre mensual comisiones.
+
+**Endpoint** `/api/finance/bank/[accountId]`:
+
+- Query params: `?mode=snapshot|period|audit&windowDays=30&year=2026&month=5&anchorDate=2026-04-07`. Todos opcionales.
+- Backward compat 100%: si solo viene `year+month` sin `mode`, comportamiento legacy intacto (`mode='period'` implícito).
+- Response incluye `movementsWindow: {fromDate, toDate, mode, label}` para chip header del drawer.
+
+**Drawer**:
+
+- Selector inline `ToggleButtonGroup` con 3 modos (Reciente | Período | Histórico) + tooltips MUI.
+- Chip header: "Mostrando: Últimos 30 días" / "Mostrando: Mayo 2026" / "Mostrando: Desde 07/04/2026".
+- Banner OTB condicional: SOLO en `mode='audit'` o `'period'` pre-anchor. En `'snapshot'` sin movimientos, hint para cambiar a Histórico.
+- `useEffect` resetea `temporalMode` cuando cambia `accountId` (nueva cuenta hereda su default declarativo via primera carga sin override).
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** calcular `fromDate`/`toDate` inline en un drawer/dashboard de finance. Toda resolución pasa por `resolveTemporalWindow`.
+- **NUNCA** mezclar modos en surfaces del mismo render (e.g. KPIs `period` + lista `snapshot` simultáneamente). Los 3 modos son atómicos por surface temporal.
+- **NUNCA** crear un drawer/dashboard nuevo de finance que muestre agregaciones temporales sin declarar `temporalDefaults` en su `InstrumentDetailProfile`. Default fallback `period` (legacy) solo cubre back-compat — explicitar siempre.
+- **NUNCA** hardcodear el `mode` en el componente UI. Default viene del profile (declarativo, extensible). Operator override via selector inline.
+- Cuando emerja un nuevo modo (`quarter`, `ytd`, `last_n_months`), agregar al enum `TemporalMode` + extender helper. NO branchear en consumers.
+
+**Spec canónica**: `docs/tasks/in-progress/TASK-776-account-detail-drawer-temporal-modes-contract.md`. Doc funcional: `docs/documentation/finance/drawer-vista-temporal.md`.
+
+### Finance — Economic Category Dimension Invariants (TASK-768)
+
+**`expense_type` y `income_type` son taxonomía FISCAL/SII** (legacy `accounting_type` alias). Para análisis económico (KPIs, ICO, P&L gerencial, Member Loaded Cost, Budget Engine, Cost Attribution) se usa la dimension separada **`economic_category`** persistida en `greenhouse_finance.expenses.economic_category` y `income.economic_category`.
+
+**Por qué**: el bank reconciler defaultea `expense_type='supplier'` cuando crea expenses desde transacciones bancarias sin metadata rica. Eso sesga KPIs Nómina/Proveedores en mil-millones cuando un payment económicamente-payroll cae en bucket fiscal-supplier (caso real abril 2026: ~$3M en pagos a Daniela España, Andrés Colombia, Valentina, Humberly, Previred clasificados como Proveedor cuando económicamente son Nómina).
+
+**Decision tree para nuevo código**:
+
+- ¿Es lectura para SII / VAT / IVA / regulatory? → usa `expense_type` / `income_type`.
+- ¿Es lectura para KPIs / dashboards / P&L gerencial / ICO / cost attribution? → usa `economic_category`.
+
+**API canónico**:
+
+- VIEW `expense_payments_normalized` y `income_payments_normalized` (TASK-766 + TASK-768 extendidas) exponen ambas dimensiones via JOIN.
+- Helpers `sumExpensePaymentsClpForPeriod` / `sumIncomePaymentsClpForPeriod` retornan `byEconomicCategory` breakdown (11 keys expense, 8 keys income) + `economicCategoryUnresolvedCount` + campos legacy preservados (backwards-compat TASK-766).
+- Resolver canónico `resolveExpenseEconomicCategory(...)` / `resolveIncomeEconomicCategory(...)` (`src/lib/finance/economic-category/resolver.ts`) — único helper que mapea inputs a categoría con rules engine declarativo.
+- Reclassification endpoints: `PATCH /api/admin/finance/expenses/[id]/economic-category` + mirror income (capability granular `finance.expenses.reclassify_economic_category` / `finance.income.reclassify_economic_category`, FINANCE_ADMIN + EFEONCE_ADMIN, audit log + outbox `finance.expense.economic_category_changed` v1).
+- Manual queue: `greenhouse_finance.economic_category_manual_queue` para filas con confidence low/manual_required pendientes de operador.
+- Audit log append-only: `economic_category_resolution_log` (trigger anti-update/delete).
+
+**Defensa-en-profundidad**:
+
+- Trigger PG `populate_expense_economic_category_default_trigger` BEFORE INSERT — poblar default desde transparent map de `expense_type` (cero invasivo a 12 canonical writers existentes).
+- Trigger mirror `populate_income_economic_category_default_trigger`.
+- CHECK constraint `expenses_economic_category_required_after_cutover` (NOT VALID; VALIDATE post-resolución manual queue).
+- CHECK constraint `expenses_economic_category_canonical_values` (VALIDATED — 11 valores enumerados; 8 income).
+- Lint rule `greenhouse/no-untokenized-expense-type-for-analytics` modo `error` — bloquea `e.expense_type =`, `GROUP BY e.expense_type`, `FILTER (WHERE i.income_type ...)` en código nuevo. Override block exime SII/VAT/operacional/resolver.
+- Reliability signals canónicos: `finance.expenses.economic_category_unresolved` + `finance.income.economic_category_unresolved` (kind=drift, severity=error si count>0, steady=0 post-cleanup, subsystem `finance_data_quality`).
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** filtres/agrupes por `expense_type` / `income_type` en consumers analíticos. Lint rule rompe build.
+- **NUNCA** modifiques `expense_type` legacy histórico — está reservado para SII/VAT y blast radius enorme.
+- **NUNCA** poblar `economic_category` con string libre — solo valores del enum canónico (CHECK constraint `canonical_values` lo bloquea).
+- **NUNCA** computes `economic_category` en read-time (lente derivada). Es columna persistida; consumers la leen directo.
+- **NUNCA** bypass del resolver canónico. Si emerge un nuevo path de payments (ej. wallets, intercompany), debe llamar `resolveExpenseEconomicCategory` / `resolveIncomeEconomicCategory` o agregar regla nueva al rules engine.
+- Cuando emerja un nuevo proveedor regulador chileno (otra Isapre, AFP nueva) o vendor de payroll internacional (Multiplier++, etc.), agregar fila a `greenhouse_finance.known_regulators` o `known_payroll_vendors` (seed declarativo) — NO código nuevo.
+
+**Spec canónica**: `docs/tasks/complete/TASK-768-finance-expense-economic-category-dimension.md`. Patrones reusados: TASK-571/699/721/708/728/766 (mismo shape: VIEW canónica + helper + reliability + lint + CHECK + trigger).
+
+### Finance — Reactive projections en lugar de sync inline a BQ (TASK-771)
+
+Post-cutover PG-first, **toda proyección a BigQuery debe correr async vía consumer reactivo del outbox**, NUNCA inline en el request handler. La regla canónica es:
+
+```text
+tx PG (write + emit outbox event)  →  outbox event        →  reactive consumer (ops-worker)
+        ↓ commitea atómico                ↓ pending             ↓ cron 5 min Cloud Scheduler
+        respond 201/200 al cliente        ↓ published           MERGE BQ idempotente
+                                                                retry+dead-letter automático
+                                                                reliability signal cubre drift
+```
+
+**Por qué**: el incidente 2026-05-03 ("Error al crear proveedor" silencioso) ocurrió porque `syncProviderFromFinanceSupplier` ([src/lib/providers/canonical.ts](../src/lib/providers/canonical.ts)) ejecutaba MERGE BQ + UPDATE BQ + DDL inline en el POST/PUT supplier handler. Cualquier falla BQ devolvía 500 al cliente aunque PG ya hubiese commiteado, dejando 3 suppliers persistidos silenciosamente sin que el operador lo supiera (figma-inc, microsoft-inc, notion-inc).
+
+**Helpers canónicos**:
+
+- **Projection registration**: `registerProjection(...)` en `src/lib/sync/projections/index.ts`. Cada projection es un `ProjectionDefinition` ([src/lib/sync/projection-registry.ts](../src/lib/sync/projection-registry.ts)) con `triggerEvents`, `extractScope`, `refresh`, `maxRetries`. El dispatcher V2 (`src/lib/sync/reactive-consumer.ts`) hace el fetch/grouping/dead-letter/circuit-breaker automáticamente.
+- **Re-leer de PG en `refresh`**: NUNCA confiar en payload del outbox event como source of truth. Usar el `entityId` del scope para re-leer la fila desde su tabla canónica (e.g. `getFinanceSupplierFromPostgres(entityId)`). Esto garantiza consistencia ante updates posteriores al evento o backfills con payloads stale.
+- **Idempotencia**: el `refresh` debe ser safe re-run. MERGE por PK natural + UPDATE filtrado con `COALESCE diff` son los patrones más comunes.
+- **Reliability signal**: cada projection crítica debe tener su signal `dead_letter` en `src/lib/reliability/queries/<projection>-dead-letter.ts` (clonar de `provider-bq-sync-dead-letter.ts` o `payment-orders-dead-letter.ts`). Wire-up en `get-reliability-overview.ts`. Steady=0; >0 indica que la projection está en dead-letter y un consumer downstream verá datos stale.
+- **Backfill script one-shot**: `scripts/finance/backfill-<projection>.ts` (clonar de `scripts/finance/backfill-provider-bq-sync.ts`) para recovery manual. Idempotente. NO se corre LIVE desde local; el ops-worker auto-drena post-deploy.
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** ejecutar `bigQuery.query({MERGE INTO ...})`, `UPDATE`, o `INSERT` BigQuery dentro de un route handler `route.ts`. La proyección va a una projection registrada.
+- **NUNCA** llamar `ensureFinanceInfrastructure()` / `ensureAiToolingInfrastructure()` desde un route handler en hot path. Bootstrap BQ vive en startup del worker o en migration explícita BigQuery.
+- **NUNCA** propagar una falla BQ como 500 cuando la primary store (PG) commiteó. Si BQ falla y la operación es síncrona inevitable, envolver en try/catch + `captureWithDomain(err, 'finance', { tags: { source: '<sync_name>', stage: '<...>' } })` y devolver el response basado en datos PG.
+- **NUNCA** usar `Sentry.captureException()` directo en code paths con dominio claro. Usar `captureWithDomain(err, '<domain>', ...)` desde `src/lib/observability/capture.ts` para que reliability dashboards roleen el incidente al subsystem correcto.
+- Cuando emerja una nueva proyección downstream (Snowflake mart, search index, AI tooling cache, etc.), debe nacer como `ProjectionDefinition` consumiendo el outbox event relevante. NUNCA acoplada al request path.
+- El BQ-fallback path en finance routes (cuando PG está caído) sí puede mantener sync inline porque ahí el outbox no es accesible — pero envuelto en try/catch para no bloquear el response degraded.
+
+**Spec canónica**: `docs/tasks/complete/TASK-771-finance-supplier-write-decoupling-bq-projection.md`. Patrón reusable end-to-end: para futuras projections finance, clonar la estructura de `provider_bq_sync` (projection + reliability signal + backfill script).
+
+### Finance — Expense display contract (TASK-772)
+
+Toda lectura de `greenhouse_finance.expenses` que vaya a UI o exports **debe** consumir el contract canónico extendido de `FinanceExpenseRecord`. Resuelve identidad del proveedor, fecha de orden y monto pendiente sin que el consumer tenga que recomputar joins ni semántica financiera.
+
+**Campos derivados canónicos** (resueltos server-side via LEFT JOIN suppliers + LEFT JOIN LATERAL aggregate desde VIEW canónica TASK-766 `expense_payments_normalized`):
+
+- **`supplierDisplayName`** — `COALESCE(NULLIF(TRIM(expenses.supplier_name), ''), suppliers.trade_name, suppliers.legal_name)`. Display canónico que tolera datos legacy con `supplier_name=NULL`.
+- **`sortDate`** — `COALESCE(document_date, payment_date, created_at::date)`. Una obligación se identifica primero por su emisión, luego por cuándo se va a pagar, finalmente por cuándo se creó.
+- **`amountPaidClp`** — `SUM(payment_amount_clp)` desde la VIEW. CLP-safe sin importar mix de monedas en payments.
+- **`amountPaid`** — moneda original del documento. Best-effort:
+  - `currency='CLP'` → igual a amountPaidClp (1:1)
+  - `currency != 'CLP'` + payments homogéneos → `SUM(payment_amount_native)`
+  - mix de monedas (caso CCA TASK-714c) → **null + `amountPaidIsHomogeneous=false`**
+- **`pendingAmountClp`** = `total_amount_clp - amountPaidClp` (clamp ≥0). Siempre confiable.
+- **`pendingAmount`** = `total_amount - amountPaid` (null cuando heterogéneo).
+
+**Defense-in-depth supplier snapshot**:
+
+- **Reader fallback** (lectura): el LEFT JOIN suppliers resuelve `supplierDisplayName` para datos legacy. Inmediato sin migration.
+- **Writer snapshot** (escritura): POST `/api/finance/expenses` resuelve `supplier_name` desde la tabla suppliers cuando viene `supplierId` sin name. FinanceValidationError 400 si supplierId no existe. Garantiza que registros nuevos no nazcan con FK válida pero `supplier_name=NULL`.
+
+**CTE en INSERT/UPDATE para outbox payload completo**:
+
+`createFinanceExpenseInPostgres` y `updateFinanceExpenseInPostgres` envuelven el `RETURNING *` en un `WITH inserted/updated AS (...)` + LEFT JOIN suppliers + LEFT JOIN LATERAL aggregate, garantizando que el outbox event payload (`finance.expense.created/updated`) tenga el contract completo desde la misma transacción. Sin esto, los consumers del outbox recibirían `supplierDisplayName=null` y `pendingAmountClp=0` aunque la fila tuviera datos correctos en lecturas posteriores.
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** lee `expenses.supplier_name` directo en consumers UI. Usar siempre `supplierDisplayName` del contract.
+- **NUNCA** recomputa `pendingAmount = totalAmountClp - amountPaid` en consumers (mezcla CLP con currency original — root cause del bug Cash-Out 2026-05-03 que mostraba `USD 83.773,50` en lugar de `USD 92,90`). Usar `pendingAmount` (moneda original) o `pendingAmountClp` (CLP) según el contexto.
+- **NUNCA** invente conversiones FX cuando `amountPaid=null` (mix de monedas heterogéneo). Caer a `amountPaidClp` con disclaimer "(equiv. CLP)" — es honesto y respeta TASK-766 contract.
+- **NUNCA** agrupe documentos en UI por `supplierName || 'Sin proveedor'`. Use `supplierKey = supplierId || supplierDisplayName || supplierName || '__unassigned__'` (estable e idempotente). El label visible es `supplierDisplayName ?? supplierName ?? 'Sin proveedor'`. "Sin proveedor" solo aplica cuando NO hay supplierId Y NO hay display name.
+- **NUNCA** sortear obligaciones client-side por `paymentDate` solo. Usar `sortDate` (server-side) o respetar el orden natural del backend.
+- **NUNCA** crear expense con `supplierId` que no existe en la tabla. El POST handler valida y devuelve 400 con error claro.
+- Cuando emerja un nuevo entity con problema análogo (ej. `income.client_name` snapshot vs `clients` tabla), replicar el patrón: extender reader con LEFT JOIN canónico + writer snapshot hydration + tests regresión.
+
+**Spec canónica**: `docs/tasks/complete/TASK-772-finance-expense-supplier-hydration-cash-out-selection.md`. Patrón replicable a `income`, `payment_orders` y futuros agregados que mezclen identidad referenciada + amounts en moneda mixta.
+
+### Outbox publisher canónico — Cloud Scheduler, no Vercel (TASK-773)
+
+El **outbox publisher** mueve eventos de `greenhouse_sync.outbox_events` (Postgres) a `greenhouse_raw.postgres_outbox_events` (BigQuery) y los marca como `status='published'`. El **reactive consumer** (que materializa projections downstream — account_balance, provider_bq_sync, etc.) filtra `WHERE status='published'`. Si el publisher está caído o un batch persiste fallando, NINGUNA projection corre, NINGUN account_balance se rematerializa, NINGUN downstream side effect ocurre.
+
+**El publisher canónico vive en Cloud Scheduler + ops-worker, NO en Vercel cron**:
+
+- `Cloud Scheduler ops-outbox-publish` (cron `*/2 min`) → `POST /outbox/publish-batch` en ops-worker.
+- Helper canónico: `publishPendingOutboxEvents` ([src/lib/sync/outbox-consumer.ts](../src/lib/sync/outbox-consumer.ts)) con state machine atómica.
+- Endpoint: `services/ops-worker/server.ts:handleOutboxPublishBatch`.
+
+**Por qué Cloud Scheduler y no Vercel cron**: Vercel solo ejecuta crons en deploys de **Production**. Staging custom environment **no los corre**. Eso significa que **cualquier flow async que dependa del outbox queda invisible en staging** (root cause del incidente Figma 2026-05-03 cuando el pago no rebajaba TC). Cloud Scheduler corre por proyecto GCP, igual en staging y prod, sin distinción.
+
+**State machine canónica**:
+
+```text
+                 ┌──────────────┐
+                 │   pending    │  (writer INSERT default)
+                 └──────┬───────┘
+                        │ SELECT FOR UPDATE SKIP LOCKED
+                        ▼
+                 ┌──────────────┐
+                 │  publishing  │  (worker tomó el lock)
+                 └──┬───────┬───┘
+            BQ OK   │       │   BQ FAIL
+                    ▼       ▼
+            ┌───────────┐  ┌─────────┐
+            │ published │  │ failed  │  (retries++)
+            └───────────┘  └────┬────┘
+                                │ retries >= OUTBOX_MAX_PUBLISH_ATTEMPTS (5)
+                                ▼
+                          ┌─────────────┐
+                          │ dead_letter │  (humano interviene)
+                          └─────────────┘
+```
+
+**Reliability signals canónicos** (visibles en `/admin/operations`):
+
+- `sync.outbox.unpublished_lag` — events `pending`/`failed` con edad > 10 min. Steady=0. Si > 0, publisher caído o falla persistente.
+- `sync.outbox.dead_letter` — events agotaron retries. Steady=0. Cualquier > 0 requiere humano: replay manual o investigación root cause.
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** agregar nuevos crons de outbox/event-bus/projection-refresh a `vercel.json`. Solo se permiten crons Vercel para tareas que pueden correr únicamente en producción (e.g. backfill nocturno, scheduled report). Los crons del path async crítico van a `services/ops-worker/deploy.sh`.
+- **NUNCA** modificar la state machine sin actualizar la CHECK constraint `outbox_events_status_check` + comentario en CLAUDE.md.
+- **NUNCA** filtrar eventos por `WHERE status='pending'` en consumers downstream. El reactive consumer canónico filtra `'published'`. Si necesitas un consumer que toque pending (e.g. UI de troubleshooting), declara explícitamente el contract.
+- **NUNCA** catch + swallow errores del helper `publishPendingOutboxEvents`. La state machine atómica se basa en que la tx PG complete o aborte limpio.
+
+**Spec canónica**: `docs/tasks/complete/TASK-773-outbox-publisher-cloud-scheduler-cutover.md`. Patrón replicable: cuando emerja otro Vercel cron infrastructure-critical (TASK-258 sync-conformed pipeline, TASK-259 entra-profile-sync), seguir el mismo template (helper canónico → endpoint ops-worker → Cloud Scheduler job → reliability signal).
+
+### Finance write-path E2E gate (TASK-773 Slice 6)
+
+Cualquier task que toque handlers `POST/PUT/PATCH/DELETE` en `src/app/api/finance/**/route.ts` **debe verificar el flow end-to-end downstream**, no solo el contract API. Bug class detectada 2026-05-03: el endpoint Figma respondía 200 OK pero el TC Santander no rebajaba — porque el contract API funcionaba pero el side effect downstream (outbox → BQ → reactive → account_balance) calló silencioso.
+
+**Gate**: `pnpm finance:e2e-gate` (warn) o `pnpm finance:e2e-gate --strict` (error).
+
+**Evidencia válida** (cualquiera):
+
+1. Algún commit del branch tiene `[downstream-verified: <flow-name>]` en el message body.
+2. Algún archivo `tests/e2e/smoke/finance-*.spec.ts` fue creado o modificado en el branch.
+3. El cambio NO modifica handlers POST/PUT/PATCH/DELETE (typo, comments, formatting). El gate detecta esto y skipea.
+
+**Flujos críticos canónicos** (verificar end-to-end ANTES de cerrar):
+
+| Flow | Action | Downstream verification |
+|---|---|---|
+| Crear supplier | POST `/api/finance/suppliers` | Aparece en `/admin/payment-instruments` directory + NO 500 |
+| Crear expense | POST `/api/finance/expenses` | Aparece en `/finance/expenses` con sortDate correcto + supplierDisplayName |
+| Registrar pago | POST `/api/finance/expenses/[id]/payments` | expense.status=paid + **account_balance refleja cargo** + cash-out drawer ya no muestra el doc |
+| Anular payment | DELETE `/api/finance/expenses/[id]/payments/[paymentId]` | balance vuelve atrás |
+| Conciliar período | POST `/api/finance/reconciliation/[periodId]/match` | Reconciliación completa + signals reliability OK |
+
+**Verificación recomendada con Playwright + Chromium + agent auth**:
+
+```bash
+# Setup once (genera .auth/storageState.json)
+AGENT_AUTH_SECRET=<secret> node scripts/playwright-auth-setup.mjs
+
+# E2E del flow específico (browser real con sesión NextAuth válida)
+pnpm playwright test tests/e2e/smoke/finance-cash-out.spec.ts --project=chromium
+```
+
+**⚠️ Regla**: cuando cierres una task que toque write paths finance, agregá `[downstream-verified: <flow>]` al último commit y describí qué verificaste. Patrón:
+
+```text
+feat(finance): TASK-XXX Slice 5 — registro pago atómico
+
+[downstream-verified: cash-out-payment]
+- POST /api/finance/expenses/[id]/payments → 201 OK
+- account_balances rematerializa < 5 min via /admin/operations
+- /finance/bank muestra cargo en TC Santander
+- /finance/cash-out drawer ya no muestra el documento
+```
+
+**Spec canónica**: `docs/tasks/complete/TASK-773-outbox-publisher-cloud-scheduler-cutover.md` (Slice 6).
+
+### Database — Migration markers (anti pre-up-marker bug)
+
+Toda migration `.sql` en `migrations/` DEBE comenzar con el marker `-- Up Migration` exacto. `node-pg-migrate` parsea el archivo buscando ese marker para identificar la sección Up; si falta, la sección queda vacía y la migración se registra como aplicada en `pgmigrations` SIN ejecutar el SQL real (silent failure detectado en TASK-768 Slice 1).
+
+**Reglas duras**:
+
+- **NUNCA** sobrescribir un archivo de migration sin preservar la línea `-- Up Migration` al inicio.
+- **NUNCA** asumir que `pnpm migrate:up` ejecutó SQL solo porque retornó "Migrations complete!" — verifica con `pnpm pg:connect:shell` o un script `node` con `pg` que los objetos esperados (tablas, columnas, constraints) existen.
+- **SIEMPRE** usa `pnpm migrate:create <slug>` para generar el archivo (incluye los markers correctos).
+- **SIEMPRE** después de `pnpm migrate:up`, valida con SELECT contra `information_schema.columns` / `pg_constraint` / `pg_indexes` que el DDL fue aplicado.
+- Si la down migration es destructiva, separar con marker `-- Down Migration` exacto. Sin él, el rollback no opera.
+
 ### Finance — Internal Account Number Allocator (TASK-700)
 
 Algoritmo canónico para asignar números de cuenta internos a CCAs hoy y wallets/loans/factoring mañana. **Toda cuenta interna que necesite identificador legible debe pasar por este allocator** — no se generan números en consumers.
@@ -743,6 +1177,53 @@ Catálogo de type codes (extender insertando filas — no requiere migrar genera
 - **NUNCA** bypass del registry escribiendo directo a `accounts.account_number` para una categoría que usa el registry. El registry es la fuente de verdad audit.
 - **NUNCA** desincronizar TS y SQL del Luhn — el test `luhn-parity` rompe build si pasa.
 - Cuando se cree el módulo de wallets, agregar fila al catalog y reusar el allocator. Cero código nuevo de generación.
+
+### Finance — Payment order ↔ bank settlement invariants (TASK-765)
+
+Toda transición de `payment_orders` a `state='paid'` debe rebajar el banco en la cuenta origen, atómicamente. El path canónico end-to-end es:
+
+```text
+payroll_period.exported
+  → finance_expense_reactive_intake (materializa expenses)
+    → payment_obligations.generated (TASK-748)
+      → payment_orders.draft → pending_approval → approved → submitted (TASK-750)
+        → markPaymentOrderPaidAtomic (TASK-765 Slice 5):
+          1. SELECT FOR UPDATE
+          2. assertSourceAccountForPaid (Slice 1 hard-gate)
+          3. UPDATE state='paid' (anti-zombie trigger Slice 6 valida)
+          4. recordPaymentOrderStateTransition (audit log Slice 6 append-only)
+          5. Per line: recordExpensePayment(input, client) → expense_payment + settlement_leg
+          6. publishOutboxEvent('finance.payment_order.paid')
+          7. ROLLBACK completo si CUALQUIER step falla
+        → account_balances rematerialization
+        → BANCO REBAJADO
+```
+
+**Reglas duras:**
+
+- **NUNCA** marcar `state='paid'` con `source_account_id IS NULL`. Hard-gate triple: CHECK constraint `payment_orders_source_account_required_when_paid` (DB) + `assertSourceAccountForPaid` (TS) + UI Tooltip + trigger `payment_orders_anti_zombie_trigger` (defense in depth).
+- **NUNCA** dejar `state='paid'` sin downstream completo. El path atómico `markPaymentOrderPaidAtomic` (`src/lib/finance/payment-orders/mark-paid-atomic.ts`) corre TODO en una sola tx. Si rollback ocurre, la order vuelve a `submitted` — nunca queda zombie. El proyector reactivo `record_expense_payment_from_order` queda como **safety net read-only** (idempotencia preservada por partial unique index).
+- **NUNCA** skipear silencioso desde el resolver. `recordPaymentForOrder` (`record-payment-from-order.ts`) ahora throw + outbox `finance.payment_order.settlement_blocked` cuando: (a) `expense_not_found` después de invocar materializer sincrono, (b) `out_of_scope_v1` (lines no-payroll), (c) `recordExpensePayment` falla.
+- **NUNCA** modificar el INSERT de `expenses` / `income` / `income_payments` / `expense_payments` sin verificar paridad column-count vs expression-count. El test `expense-insert-column-parity.test.ts` valida 14 INSERT sites canónicos en CI; cualquier drift rompe build (mismo bug que dejó dead-letter el materializer 2026-05-01).
+- **NUNCA** transicionar estados fuera del matrix canónico (`draft → pending_approval → approved → submitted → paid → settled → closed` + cancellation paths). El trigger PG `payment_orders_anti_zombie_trigger` enforce a nivel DB; el TS helper `assertValidPaymentOrderStateTransition` enforce en código.
+- **NUNCA** modificar `payment_order_state_transitions` (audit log). Es append-only enforced por trigger PG `payment_order_state_transitions_no_update/no_delete_trigger`. Para correcciones, insertar nueva fila con `metadata_json.correction_of=<transition_id>`.
+- **Reliability signals** (`/admin/operations`): `paid_orders_without_expense_payment` (drift), `payment_orders_dead_letter` (dead_letter), `payroll_expense_materialization_lag` (lag). Steady state = 0. Cualquier valor > 0 indica un breakage en el path canónico.
+- **Capabilities granulares** (least privilege): `finance.payroll.rematerialize` (admin endpoint rerun materializer) y `finance.payment_orders.recover` (recovery endpoint para órdenes zombie). Reservadas FINANCE_ADMIN + EFEONCE_ADMIN.
+
+**Helpers canónicos:**
+
+- `markPaymentOrderPaidAtomic({orderId, paidBy, paidAt?, externalReference?})` — path atómico canónico.
+- `assertSourceAccountForPaid(orderId, sourceAccountId, targetState)` — hard-gate Slice 1.
+- `recordPaymentOrderStateTransition({...}, client)` — append-only audit log writer (slice 6).
+- `recordExpensePayment(input, client?)` — extiende firma con `client?` opcional (post-Slice 5).
+- `materializePayrollExpensesForExportedPeriod({periodId, year, month})` — idempotente, invocable sincrono dentro de tx atómica.
+- `checkInsertParity(sql)` — anti-regresión universal para INSERTs SQL embebidos.
+- `POST /api/admin/finance/payroll-expense-rematerialize` — admin endpoint rerun materializer (capability `finance.payroll.rematerialize`).
+- `POST /api/admin/finance/payment-orders/[orderId]/recover` — recovery endpoint para zombies (capability `finance.payment_orders.recover`).
+
+**Outbox events nuevos:** `finance.payment_order.settlement_blocked` (v1, 5 reasons) + `finance.payroll_expenses.rematerialized` (v1, audit-only). Documentados en `docs/architecture/GREENHOUSE_EVENT_CATALOG_V1.md` Delta 2026-05-02.
+
+**Spec canónica:** `docs/tasks/complete/TASK-765-payment-order-bank-settlement-resilience.md`.
 
 ### Finance — Payment Provider Catalog + category provider rules (TASK-701)
 
@@ -921,6 +1402,77 @@ Cuando una cuenta liability/asset necesita re-anclar su Opening Trial Balance (p
   - Apex ya cubre el portal con visual decente (8/10) y no urge migrar.
   - Recharts es 7/10 visual sin inversión adicional — solo gana si construimos `GhChart` premium encima, lo cual es trabajo no priorizado.
 - Spec completa y trigger conditions: `docs/tasks/to-do/TASK-518-apexcharts-deprecation.md`.
+
+### Tooling disponible (CLIs autenticadas)
+
+Estos CLIs están autenticados localmente. Cuando una task toca su dominio, **úsalos directamente** en vez de pedirle al usuario que lo haga manualmente desde portal/web UI:
+
+- **Azure CLI (`az`)**: autenticado contra el tenant `a80bf6c1-7c45-4d70-b043-51389622a0e4` de Efeonce. Se usa para gestionar Azure AD App Registrations (redirect URIs, client secrets, tenant config), Bot Service, Logic Apps, Resource Groups, etc. Comandos canónicos: `az ad app show --id <client-id>`, `az ad app update`, `az ad app credential reset`, `az ad sp show`. Tenant ID Microsoft de Efeonce: `a80bf6c1-7c45-4d70-b043-51389622a0e4`. Subscription ID: `e1cfff3e-8c21-4170-8b28-ad083b741266`.
+- **Google Cloud CLI (`gcloud`)**: autenticado como `julio.reyes@efeonce.org` con ADC. Usar para Secret Manager, Cloud Run, Cloud SQL, Cloud Scheduler, BigQuery, Cloud Build, Workload Identity Federation. Project canónico: `efeonce-group`.
+  - **Regla operativa obligatoria**: cuando un agente necesite acceso interactivo local a GCP, debe lanzar **siempre ambos** flujos y no asumir que uno reemplaza al otro:
+    - `gcloud auth login`
+    - `gcloud auth application-default login`
+  - Motivo: `gcloud` CLI y ADC pueden quedar desalineados; si solo se autentica uno, pueden fallar `bq`, `psql` via Cloud SQL tooling, Secret Manager o scripts del repo de forma parcial y confusa.
+- **GitHub CLI (`gh`)**: autenticado contra `efeoncepro/greenhouse-eo`. Usar para issues, PRs, workflow runs, releases.
+- **Vercel CLI (`vercel`)**: autenticado contra el team `efeonce-7670142f`. Usar para env vars, deployments, project config. Token en `.env.local` o config global.
+- **PostgreSQL CLI (`psql`)** vía `pnpm pg:connect`: levanta proxy Cloud SQL + conexión auto. No requiere credenciales manuales.
+
+**Regla operativa**: cuando un agente diagnostica un incidente y la causa raíz vive en una de estas plataformas, debe **ejecutar el fix con el CLI** (con guardrails y verificación), no documentar pasos manuales. Si el fix es destructivo (eliminar app registration, drop database, force-push) sí confirma con el usuario primero.
+
+### Auth resilience invariants (TASK-742)
+
+7 capas defensivas que protegen el flujo de autenticación. Cualquier cambio que toque NextAuth, secrets de auth, o el flujo de sign-in debe respetar estos invariantes — son los que evitan que una rotación mal hecha o un cambio en Azure App registration vuelva a romper login silenciosamente como en el incidente 2026-04-30.
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** cambiar `signInAudience` de la Azure AD App Registration a `AzureADMyOrg` (single-tenant). Greenhouse es multi-tenant por arquitectura — clientes Globe (Sky, etc.) entran desde sus propios tenants Azure. El valor canónico es **`AzureADMultipleOrgs`** (work/school accounts de cualquier tenant; rechaza personal Microsoft Accounts). El callback `signIn` en `auth.ts` rechaza tenants no provisionados via lookup en `client_users` por `microsoft_oid`/`microsoft_email`/alias — la autorización fina vive en Greenhouse, no en Azure. El 2026-04-30 alguien flipeó esto a `AzureADMyOrg` y rompió SSO para todos los users. `pnpm auth:audit-azure-app` detecta drift en segundos.
+- **NUNCA** remover redirect URIs registradas en la Azure App. Las canónicas son `https://greenhouse.efeoncepro.com/api/auth/callback/azure-ad` (production) y `https://dev-greenhouse.efeoncepro.com/api/auth/callback/azure-ad` (staging). El auditor las verifica como dura.
+- **NO** llamar `Sentry.captureException(err)` en code paths de auth. Usar siempre `captureWithDomain(err, 'identity', { extra: { provider, stage } })` desde `src/lib/observability/capture.ts`. El subsystem `Identity` rolls up por `domain=identity`.
+- **NO** publicar secretos críticos sin pasar por `validateSecretFormat` (`src/lib/secrets/format-validators.ts`). Si agregas un secret crítico nuevo, agregá su rule al catálogo `FORMAT_RULES`. `resolveSecret` rechaza payloads que no pasan validation.
+- **NO** rotar un secret en producción manualmente. Usar `pnpm secrets:rotate <gcp-secret-id> --validate-as <ENV_NAME> --vercel-redeploy <project> --health-url <url>`. El playbook hace verify-before-cutover y revert automático si health falla.
+- **NUNCA** mutar el JWT/signIn callbacks de NextAuth sin envolverlos en try/catch + `recordAuthAttempt(...)`. NextAuth swallow-ea errores → opaque `?error=Callback`. El wrapping garantiza que la próxima falla emita stage + reason_code estable a `greenhouse_serving.auth_attempts` y a Sentry.
+- **NUNCA** computar SSO health en el cliente. La UI de Login lee `/api/auth/health` (contract `auth-readiness.v1`) y oculta/deshabilita botones degradados. Single source of truth.
+- **NUNCA** persistir el raw token de un magic-link. Solo `bcrypt(token)` con cost 10. TTL=15min, single-use enforced en consume time. Usar `src/lib/auth/magic-link.ts` — no inventar tokens nuevos.
+- **NUNCA** crear un `client_users` row con `auth_mode='both'` sin `password_hash`, ni `auth_mode='microsoft_sso'` sin `microsoft_oid`. La CHECK constraint `client_users_auth_mode_invariant` lo bloquea. Si necesitas estado transicional, usar `auth_mode='sso_pending'` (sin password ni SSO link, ready para link en próximo signIn).
+- **NO** depender de `process.env.NEXTAUTH_SECRET` plano en producción si existe `NEXTAUTH_SECRET_SECRET_REF`. El resolver prefiere Secret Manager. Tener ambos crea drift.
+
+**Helpers canónicos**:
+
+- `validateSecretFormat(envName, value)` — Capa 1
+- `getCurrentAuthReadiness()` desde `src/lib/auth-secrets.ts` — Capa 2
+- `recordAuthAttempt({ provider, stage, outcome, reasonCode, ... })` desde `src/lib/auth/attempt-tracker.ts` — Capa 3
+- `requestMagicLink({ email, ip })` / `consumeMagicLink({ tokenId, rawToken, ip })` — Capa 5
+- `pnpm secrets:audit` / `pnpm secrets:rotate` — Capa 7
+
+**Observability surfaces**:
+
+- `/api/auth/health` — public read-only readiness
+- `greenhouse_serving.auth_attempts` — append-only ledger (90-day retention)
+- `greenhouse_sync.smoke_lane_runs` con `lane_key='identity.auth.providers'` — synthetic monitor cada 5min via Cloud Scheduler
+- Sentry `domain=identity` — todos los errors de auth
+
+**Spec completa**: `docs/tasks/complete/TASK-742-auth-resilience-7-layers.md`.
+
+### Operational Data Table Density Contract (TASK-743)
+
+Toda tabla operativa con celdas editables inline o > 8 columnas debe vivir bajo el contrato de densidad. Resuelve el overflow horizontal contra `compactContentWidth: 1440` de manera robusta y escalable, sin parchear caso-por-caso.
+
+- **3 densidades canonicas** (`compact` / `comfortable` / `expanded`) con tokens fijos: row height, padding, editor min-width, slider visibility, font size.
+- **Resolucion**: prop > cookie `gh-table-density` > container query auto-degrade (< 1280px baja un nivel) > default `comfortable`.
+- **Wrapper canonico**: `<DataTableShell>` con `container-type: inline-size`, `ResizeObserver`, sticky-first column, scroll fade en borde derecho cuando hay overflow.
+- **Primitive editable canonica**: `<InlineNumericEditor>` (reemplaza `BonusInput`). En `compact` solo input, en `comfortable` input + slider en popover-on-focus, en `expanded` input + slider inline + min/max captions.
+- **Ubicacion**: `src/components/greenhouse/data-table/{density,useTableDensity,DataTableShell}.tsx` y `src/components/greenhouse/primitives/InlineNumericEditor.tsx`.
+- **Spec canonica**: `docs/architecture/GREENHOUSE_OPERATIONAL_TABLE_PLATFORM_V1.md`.
+- **Doc funcional**: `docs/documentation/plataforma/tablas-operativas.md`.
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** crear una `Table` MUI con > 8 columnas o con `<input>`/`<TextField>`/`<Slider>` dentro de `<TableBody>` sin envolverla en `<DataTableShell>`. Lint rule `greenhouse/no-raw-table-without-shell` bloquea el commit.
+- **NUNCA** hardcodear `minWidth` en una primitiva editable inline. Debe leer la densidad via `useTableDensity()`.
+- **NUNCA** mover `compactContentWidth: 1440` a `'wide'` global para "resolver" un overflow. Es cortoplacista y rompe consistencia con dashboards diseñados a 1440. La solucion canonica es el contrato.
+- **NUNCA** duplicar `BonusInput`. Esta marcado como deprecated re-export que delega en `<InlineNumericEditor>`. Cualquier consumer nuevo debe usar la primitiva canonica directamente.
+- **NUNCA** desactivar el visual regression test `payroll-table-density.spec.ts` para forzar un merge. Si falla por overflow, respetar el contrato; no bypass.
+- Cuando emerja una tabla operativa nueva (ProjectedPayrollView, ReconciliationWorkbench, IcoScorecard, FinanceMovementFeed), migrarla al contrato de manera oportunista. La lint rule la fuerza al primer toque significativo.
 
 ### Otras convenciones
 

@@ -134,7 +134,7 @@ const PersonIdentityTab = ({ identityContext, accessContext, eoId, hrContext, de
               <Grid container spacing={4}>
                 {/* Key-value pairs */}
                 <KeyValue label='EO-ID'>
-                  <Typography variant='body1' fontWeight={600} sx={{ fontFamily: 'monospace' }}>
+                  <Typography variant='body1' fontWeight={600}>
                     {identityContext.eoId ?? '—'}
                   </Typography>
                 </KeyValue>
@@ -282,7 +282,7 @@ const PersonIdentityTab = ({ identityContext, accessContext, eoId, hrContext, de
                 </KeyValue>
 
                 <KeyValue label='Ruta de inicio'>
-                  <Typography variant='body1' fontWeight={600} sx={{ fontFamily: 'monospace' }}>
+                  <Typography variant='body1' fontWeight={600}>
                     {accessContext.defaultPortalHomePath ?? '—'}
                   </Typography>
                 </KeyValue>

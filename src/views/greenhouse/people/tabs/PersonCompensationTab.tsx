@@ -23,7 +23,7 @@ type Props = {
 const DetailRow = ({ label, value, color }: { label: string; value: string; color?: string }) => (
   <Box sx={{ display: 'flex', justifyContent: 'space-between', py: 0.5 }}>
     <Typography variant='body2' color='text.secondary'>{label}</Typography>
-    <Typography variant='body2' sx={{ fontFamily: 'monospace', color: color ?? 'text.primary' }}>{value}</Typography>
+    <Typography variant='body2' sx={{ color: color ?? 'text.primary' }}>{value}</Typography>
   </Box>
 )
 

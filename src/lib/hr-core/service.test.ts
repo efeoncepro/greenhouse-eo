@@ -77,6 +77,8 @@ vi.mock('@/lib/postgres/client', async () => {
 })
 
 vi.mock('@/lib/sync/publish-event', () => ({
+  onGreenhousePostgresReset: () => () => {},
+  isGreenhousePostgresRetryableConnectionError: () => false,
   publishOutboxEvent: (...args: unknown[]) => publishOutboxEventMock(...args)
 }))
 

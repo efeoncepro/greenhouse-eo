@@ -128,7 +128,7 @@ const PersonLeftSidebar = ({ detail, isAdmin, onEditProfile, onDeactivate, onEdi
             <Typography variant='overline' color='text.secondary'>Identidad</Typography>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
               <i className='tabler-fingerprint' style={{ fontSize: 16, color: 'var(--mui-palette-text-secondary)' }} />
-              <Typography variant='body2' sx={{ fontFamily: 'monospace', fontWeight: 600 }}>{member.eoId}</Typography>
+              <Typography variant='body2' sx={{ fontWeight: 600 }}>{member.eoId}</Typography>
             </Box>
             {detail.linkedUserId && (
               <Button
@@ -160,7 +160,7 @@ const PersonLeftSidebar = ({ detail, isAdmin, onEditProfile, onDeactivate, onEdi
             </Box>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
               <i className='tabler-cash' style={{ fontSize: 16, color: 'var(--mui-palette-text-secondary)' }} />
-              <Typography variant='body2' sx={{ fontFamily: 'monospace', fontWeight: 600 }}>
+              <Typography variant='body2' sx={{ fontWeight: 600 }}>
                 {formatCurrency(detail.currentCompensation.baseSalary, detail.currentCompensation.currency)}
               </Typography>
             </Box>

@@ -15,6 +15,11 @@ import { DEFAULT_BONUS_PRORATION_CONFIG, normalizeBonusProrationConfig } from '@
 import { calculateOtdBonus, calculateRpaBonus } from '@/lib/payroll/bonus-proration'
 import { calculateHonorariosTotals } from '@/lib/payroll/calculate-honorarios'
 import { calculatePayrollTotals } from '@/lib/payroll/calculate-chile-deductions'
+import {
+  requiresPayrollAttendanceSignal,
+  requiresPayrollChileTaxTable,
+  requiresPayrollKpi
+} from '@/lib/payroll/compensation-requirements'
 import { computeChileTax } from '@/lib/payroll/compute-chile-tax'
 import { fetchAttendanceForPayrollPeriod } from '@/lib/payroll/fetch-attendance-for-period'
 import { fetchKpisForPeriod } from '@/lib/payroll/fetch-kpis-for-period'
@@ -24,6 +29,8 @@ import { getPayrollPeriod } from '@/lib/payroll/get-payroll-periods'
 import { canRecalculatePayrollPeriod, isPayrollPeriodReopened } from '@/lib/payroll/period-lifecycle'
 import { upsertPayrollEntry } from '@/lib/payroll/persist-entry'
 import { supersedePayrollEntryOnRecalculate } from '@/lib/payroll/supersede-entry'
+import { applyAdjustmentsToEntry } from '@/lib/payroll/adjustments/apply-to-entry'
+import { cloneActiveAdjustmentsToV2 } from '@/lib/payroll/adjustments/apply-adjustment'
 import { ensurePayrollInfrastructure } from '@/lib/payroll/schema'
 import { PayrollValidationError, getPeriodRangeFromId, runPayrollQuery, toNumber } from '@/lib/payroll/shared'
 import {
@@ -32,6 +39,7 @@ import {
   pgGetActiveBonusConfig,
   pgSetPeriodCalculated
 } from '@/lib/payroll/postgres-store'
+import { resolvePayrollTaxTableVersion } from '@/lib/payroll/tax-table-version'
 import { contractAllowsRemoteAllowance } from '@/types/hr-contracts'
 
 type BonusConfigRow = {
@@ -103,6 +111,19 @@ type AttendanceSnapshot = {
 }
 
 const roundCurrency = (value: number) => Math.round(value * 100) / 100
+
+const hasAttendanceSignal = (attendance: AttendanceSnapshot | null | undefined) => {
+  if (!attendance) {
+    return false
+  }
+
+  return (
+    attendance.daysPresent > 0 ||
+    attendance.daysAbsent > 0 ||
+    attendance.daysOnLeave > 0 ||
+    attendance.daysOnUnpaidLeave > 0
+  )
+}
 
 const resolvePayrollPeriodIndicators = async ({
   periodId,
@@ -312,6 +333,7 @@ export const buildPayrollEntry = async ({
     memberAvatarUrl: compensation.memberAvatarUrl,
     compensationVersionId: compensation.versionId,
     payRegime: compensation.payRegime,
+    contractTypeSnapshot: compensation.contractType,
     payrollVia: compensation.payrollVia,
     currency: compensation.currency,
     baseSalary: compensation.baseSalary,
@@ -432,14 +454,23 @@ export const calculatePayroll = async ({
     row => row.payRegime === 'chile' && row.healthSystem === 'isapre' && (row.healthPlanUf || 0) > 0
   )
 
-  const includesChilePayroll = compensationRows.some(
-    row => row.payRegime === 'chile' && row.contractType !== 'honorarios'
-  )
+  const includesChilePayroll = compensationRows.some(requiresPayrollChileTaxTable)
+  const kpiRequiredMemberIds = compensationRows.filter(requiresPayrollKpi).map(row => row.memberId)
+  const attendanceRequiredMemberIds = compensationRows.filter(requiresPayrollAttendanceSignal).map(row => row.memberId)
+
+  const resolvedTaxTableVersion = includesChilePayroll
+    ? await resolvePayrollTaxTableVersion({
+        year: period.year,
+        month: period.month,
+        requestedVersion: period.taxTableVersion,
+        allowMonthFallbackForRequestedVersion: true
+      })
+    : null
 
   const indicatorValues = await resolvePayrollPeriodIndicators({
     periodId,
     periodUfValue: period.ufValue,
-    taxTableVersion: period.taxTableVersion,
+    taxTableVersion: resolvedTaxTableVersion,
     indicatorPeriodDate: projectionContext?.asOfDate ?? null
   })
 
@@ -447,30 +478,28 @@ export const calculatePayroll = async ({
     throw new PayrollValidationError('This payroll period requires ufValue to calculate Isapre deductions.', 400)
   }
 
-  if (includesChilePayroll && !period.taxTableVersion) {
+  if (includesChilePayroll && !resolvedTaxTableVersion) {
     throw new PayrollValidationError(
-      'This payroll period requires taxTableVersion to calculate Chile payroll taxes.',
+      'This payroll period requires a synchronized Chile tax table for the selected month before Chile payroll can be calculated.',
       400
     )
   }
 
-  if (includesChilePayroll && period.taxTableVersion && typeof indicatorValues.utmValue !== 'number') {
+  if (includesChilePayroll && resolvedTaxTableVersion && typeof indicatorValues.utmValue !== 'number') {
     throw new PayrollValidationError(
       'This payroll period requires a historical UTM value to calculate Chile payroll taxes.',
       400
     )
   }
 
-  const memberIds = compensationRows.map(row => row.memberId)
-
   const [bonusConfig, kpiData, attendanceResult] = await Promise.all([
     getBonusConfigForDate(range.periodEnd),
     fetchKpisForPeriod({
-      memberIds,
+      memberIds: kpiRequiredMemberIds,
       periodYear: range.year,
       periodMonth: range.month
     }),
-    fetchAttendanceForPayrollPeriod(memberIds, range.periodStart, attendanceCutDate)
+    fetchAttendanceForPayrollPeriod(attendanceRequiredMemberIds, range.periodStart, attendanceCutDate)
   ])
 
   if (attendanceResult.leaveDataDegraded) {
@@ -482,15 +511,32 @@ export const calculatePayroll = async ({
 
   const attendanceData = attendanceResult.snapshots
 
+  const missingKpiMemberIds = kpiRequiredMemberIds.filter(memberId => !kpiData.snapshots.has(memberId))
+
+  const missingAttendanceMemberIds = attendanceRequiredMemberIds.filter(
+    memberId => !hasAttendanceSignal(attendanceData.get(memberId))
+  )
+
+  if (missingKpiMemberIds.length > 0) {
+    throw new PayrollValidationError(
+      'This payroll period requires ICO KPI data for every collaborator with variable bonuses before payroll can be calculated.',
+      400,
+      { memberIds: missingKpiMemberIds }
+    )
+  }
+
+  if (missingAttendanceMemberIds.length > 0) {
+    throw new PayrollValidationError(
+      'This payroll period requires attendance or leave signals for every collaborator whose pay depends on attendance before payroll can be calculated.',
+      400,
+      { memberIds: missingAttendanceMemberIds }
+    )
+  }
+
   const entries: PayrollEntry[] = []
-  const missingKpiMemberIds: string[] = []
 
   for (const compensation of compensationRows) {
     const kpi = kpiData.snapshots.get(compensation.memberId) || null
-
-    if (!kpi) {
-      missingKpiMemberIds.push(compensation.memberId)
-    }
 
     const attendance = attendanceData.get(compensation.memberId) ?? null
 
@@ -504,10 +550,10 @@ export const calculatePayroll = async ({
       attendance
     })
 
-    if (compensation.payRegime === 'chile' && period.taxTableVersion) {
+    if (requiresPayrollChileTaxTable(compensation) && resolvedTaxTableVersion) {
       const taxResult = await computeChileTax({
         taxableBaseClp: entry.chileTaxableBase ?? 0,
-        taxTableVersion: period.taxTableVersion,
+        taxTableVersion: resolvedTaxTableVersion,
         utmValue: indicatorValues.utmValue
       })
 
@@ -568,6 +614,13 @@ export const calculatePayroll = async ({
       }
     }
 
+    // TASK-745 — apply active payroll_adjustments before persisting. On the
+    // first calculation no adjustments exist (entry_id has no row yet), so
+    // this is a no-op. On subsequent recalculations after the operator
+    // applied adjustments via API, the active adjustments override the
+    // gross/SII/deductions/net of the entry deterministically.
+    entry = await applyAdjustmentsToEntry(entry)
+
     // TASK-410/411 — when the period is reopened, each entry mutation must
     // go through the supersede path so that v1 stays immutable, v2 is
     // created/updated in place, and `payroll_entry.reliquidated` is emitted
@@ -575,11 +628,35 @@ export const calculatePayroll = async ({
     // v1 in place, break the versioning invariant, and silently skip the
     // delta publication.
     if (isPayrollPostgresEnabled() && isPayrollPeriodReopened(period.status)) {
+      const v1EntryIdForClone = entry.entryId
+
       try {
-        await supersedePayrollEntryOnRecalculate({
+        const supersedeResult = await supersedePayrollEntryOnRecalculate({
           updatedEntry: entry,
           actorUserId: actorIdentifier ?? 'system'
         })
+
+        // TASK-745 — on first supersession (case A) the v2 row gets a fresh
+        // entry_id; clone any active adjustments from the v1 row over to v2
+        // so the operator's intent (exclude / factor / fixed_deduction)
+        // survives the reopen. Idempotent: if v2 already had cloned rows
+        // from a prior recalc, the active partial unique index prevents
+        // duplicates and the clone helper logs and skips.
+        if (
+          supersedeResult.entryId !== v1EntryIdForClone &&
+          supersedeResult.version >= 2
+        ) {
+          await cloneActiveAdjustmentsToV2({
+            v1EntryId: v1EntryIdForClone,
+            v2EntryId: supersedeResult.entryId,
+            triggeredBy: actorIdentifier ?? 'system'
+          }).catch(error => {
+            console.warn(
+              `[calculate-payroll] cloneActiveAdjustmentsToV2 failed for ${v1EntryIdForClone} → ${supersedeResult.entryId}:`,
+              error instanceof Error ? error.message : String(error)
+            )
+          })
+        }
       } catch (error) {
         // If no active row exists yet for (period, member) the supersede
         // flow can't compute a delta — this happens when calculate adds a

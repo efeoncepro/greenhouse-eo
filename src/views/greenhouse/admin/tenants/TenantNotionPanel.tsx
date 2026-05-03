@@ -626,7 +626,7 @@ const TenantNotionPanel = ({ clientId, clientName }: Props) => {
                   Space
                 </Typography>
                 <Typography variant='body2' fontWeight={600}>{status.space.spaceName}</Typography>
-                <Typography variant='caption' sx={{ fontFamily: 'monospace', fontSize: '0.75rem' }} color='text.disabled'>
+                <Typography variant='caption' sx={{ fontSize: '0.75rem' }} color='text.disabled'>
                   {status.space.spaceId}
                 </Typography>
               </Stack>
@@ -661,7 +661,7 @@ const TenantNotionPanel = ({ clientId, clientName }: Props) => {
                 <Typography variant='body2' color='text.secondary'>
                   {formatDatetime(mapping.createdAt)}
                 </Typography>
-                <Typography variant='caption' sx={{ fontFamily: 'monospace', fontSize: '0.75rem' }} color='text.disabled'>
+                <Typography variant='caption' sx={{ fontSize: '0.75rem' }} color='text.disabled'>
                   {mapping.sourceId}
                 </Typography>
               </Stack>
@@ -696,7 +696,7 @@ const TenantNotionPanel = ({ clientId, clientName }: Props) => {
                             </Stack>
                           </TableCell>
                           <TableCell>
-                            <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
+                            <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>
                               {dbId || '—'}
                             </Typography>
                           </TableCell>
@@ -810,7 +810,7 @@ const TenantNotionPanel = ({ clientId, clientName }: Props) => {
                                 <TableCell>
                                   <Stack spacing={0.25}>
                                     <Typography variant='body2'>{formatDatetime(run.updatedAt)}</Typography>
-                                    <Typography variant='caption' color='text.disabled' sx={{ fontFamily: 'monospace' }}>
+                                    <Typography variant='caption' color='text.disabled'>
                                       {run.orchestrationRunId}
                                     </Typography>
                                   </Stack>
@@ -928,7 +928,7 @@ const TenantNotionPanel = ({ clientId, clientName }: Props) => {
                             {latestDataQualityChecks.map(check => (
                               <TableRow key={check.dataQualityCheckId} hover>
                                 <TableCell>
-                                  <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
+                                  <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>
                                     {check.checkKey}
                                   </Typography>
                                 </TableCell>
@@ -980,7 +980,7 @@ const TenantNotionPanel = ({ clientId, clientName }: Props) => {
                                 <TableCell>
                                   <Stack spacing={0.25}>
                                     <Typography variant='body2'>{formatDatetime(run.checkedAt)}</Typography>
-                                    <Typography variant='caption' color='text.disabled' sx={{ fontFamily: 'monospace' }}>
+                                    <Typography variant='caption' color='text.disabled'>
                                       {run.dataQualityRunId}
                                     </Typography>
                                   </Stack>
@@ -1369,7 +1369,7 @@ const TenantNotionPanel = ({ clientId, clientName }: Props) => {
                           </Typography>
                         </TableCell>
                         <TableCell>
-                          <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
+                          <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>
                             {db ? formatShortDbId(db.databaseId) : '—'}
                           </Typography>
                         </TableCell>

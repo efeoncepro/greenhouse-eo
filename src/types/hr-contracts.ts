@@ -65,8 +65,8 @@ export const CONTRACT_COMPENSATION_POLICIES: Record<ContractType, ContractCompen
 export const SII_RETENTION_RATES: Record<number, number> = {
   2024: 0.1375,
   2025: 0.145,
-  2026: 0.145,
-  2027: 0.1525,
+  2026: 0.1525,
+  2027: 0.16,
   2028: 0.17
 }
 

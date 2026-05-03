@@ -1,5 +1,17 @@
 # Greenhouse PostgreSQL Access Model V1
 
+## Delta 2026-05-03 — Runtime TLS recovery covers raw pg and Kysely pools
+
+- Incidente production `JAVASCRIPT-NEXTJS-2N` en Sentry reportó `ssl/tls alert bad certificate` durante `POST /api/webhooks/hubspot-companies`.
+- Diagnóstico: la falla no era específica del webhook; el mismo patrón apareció en webhooks, crons, SCIM y sync. La causa probable es un pool/conector Cloud SQL en runtime Vercel warm con certificado TLS efímero o conexión stale.
+- Regla nueva:
+  - `src/lib/postgres/client.ts` sigue siendo el único owner de `Pool`, Connector, detección de errores retryable y reset del estado Postgres.
+  - `src/lib/db.ts` debe construir Kysely sobre un pool adapter dinámico que adquiere el pool vigente en cada `connect()` y reintenta una vez los fallos retryable de conexión.
+  - cuando `closeGreenhousePostgres()` resetea pool/connector, debe notificar a los consumers cacheados para invalidar instancias Kysely pegadas al pool viejo.
+- Guardrail:
+  - `withGreenhousePostgresTransaction()` solo reintenta fallos retryable antes de ejecutar lógica de negocio (`connect`/`BEGIN`); no reintenta callbacks ya ejecutados ni `COMMIT`.
+  - no crear `new Pool()` fuera de `src/lib/postgres/client.ts`.
+
 ## Delta 2026-04-23 — Auditoria live confirma drift de DDL en runtime
 
 - La auditoría live del `2026-04-23` confirmó que `greenhouse_app` todavía reporta `can_create=true` en:

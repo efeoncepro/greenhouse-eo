@@ -10,6 +10,8 @@ vi.mock('@/lib/staff-augmentation/snapshots', () => ({
 
 // TASK-379: assert the v2 publish helper reaches the outbox with schemaVersion.
 vi.mock('@/lib/postgres/client', () => ({
+  onGreenhousePostgresReset: () => () => {},
+  isGreenhousePostgresRetryableConnectionError: () => false,
   runGreenhousePostgresQuery: (...args: unknown[]) => mockRunGreenhousePostgresQuery(...args)
 }))
 

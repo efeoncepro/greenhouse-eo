@@ -503,7 +503,7 @@ const ReconciliationDetailView = () => {
           </IconButton>
           <Box>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <Typography variant='h4' sx={{ fontFamily: 'Poppins, sans-serif', fontWeight: 600 }}>
+              <Typography variant='h4' sx={{ fontWeight: 600 }}>
                 Conciliación {MONTH_NAMES[period.month]} {period.year}
               </Typography>
               <CustomChip
@@ -898,7 +898,7 @@ const ReconciliationDetailView = () => {
                         </Typography>
                       </TableCell>
                       <TableCell>
-                        <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
+                        <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>
                           {row.reference || '—'}
                         </Typography>
                       </TableCell>
@@ -956,7 +956,7 @@ const ReconciliationDetailView = () => {
                       <TableCell>
                         {row.matchedId ? (
                           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-                            <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
+                            <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>
                               {row.matchedId}
                             </Typography>
                             {/* TASK-722 — distinguir match canónico (settlement_leg, TASK-708) vs legacy (solo payment_id) */}

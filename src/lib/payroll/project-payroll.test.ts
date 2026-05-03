@@ -83,7 +83,7 @@ const baseCompensation = {
   memberName: 'Andres Carlosama',
   memberEmail: 'acarlosama@efeoncepro.com',
   memberAvatarUrl: null,
-  payRegime: 'chile_dependent',
+  payRegime: 'chile',
   currency: 'CLP',
   baseSalary: 800000,
   remoteAllowance: 100000,
@@ -99,7 +99,7 @@ const baseCompensation = {
   healthSystem: 'fonasa',
   healthPlanUf: 0,
   unemploymentRate: 0.006,
-  contractType: 'indefinite',
+  contractType: 'indefinido',
   hasApv: false,
   apvAmount: 0,
   effectiveFrom: '2026-01-01',
@@ -195,7 +195,9 @@ describe('projectPayrollForPeriod', () => {
       fixedBonusAmount: 0,
       bonusOtdMax: 0,
       bonusRpaMax: 0,
-      payRegime: 'contractor_usd',
+      payRegime: 'international',
+      payrollVia: 'deel',
+      contractType: 'contractor',
       gratificacionLegalMode: 'ninguna'
     }
 

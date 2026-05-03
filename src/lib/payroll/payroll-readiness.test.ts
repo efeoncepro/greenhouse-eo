@@ -92,7 +92,7 @@ describe('buildPayrollPeriodReadiness', () => {
     expect(readiness.calculation.deadline.lastBusinessDay).toBe('2026-03-31')
   })
 
-  it('adds warnings for missing compensation, KPI, and attendance signals', () => {
+  it('keeps compensation gaps as warnings and escalates missing required KPI/attendance to blockers', () => {
     const readiness = buildPayrollPeriodReadiness({
       period,
       compensationRows: [
@@ -110,13 +110,13 @@ describe('buildPayrollPeriodReadiness', () => {
       attendanceDiagnostics
     })
 
-    expect(readiness.ready).toBe(true)
-    expect(readiness.calculation.ready).toBe(true)
+    expect(readiness.ready).toBe(false)
+    expect(readiness.calculation.ready).toBe(false)
     expect(readiness.missingCompensationMemberIds).toEqual(['member-2'])
     expect(readiness.missingKpiMemberIds).toEqual(['member-1'])
     expect(readiness.missingAttendanceMemberIds).toEqual(['member-1'])
-    expect(readiness.warnings.map(issue => issue.code)).toEqual([
-      'missing_compensation',
+    expect(readiness.warnings.map(issue => issue.code)).toEqual(['missing_compensation'])
+    expect(readiness.blockingIssues.map(issue => issue.code)).toEqual([
       'missing_kpi',
       'missing_attendance_signal'
     ])
@@ -242,6 +242,25 @@ describe('buildPayrollPeriodReadiness', () => {
     expect(readiness.calculation.ready).toBe(false)
     expect(readiness.approval.ready).toBe(false)
     expect(readiness.blockingIssues.map(issue => issue.code)).toEqual(['leave_data_unavailable'])
+  })
+
+  it('blocks approval/export when calculated entries mix incompatible payroll regimes', () => {
+    const readiness = buildPayrollPeriodReadiness({
+      period: {
+        ...period,
+        status: 'calculated'
+      },
+      compensationRows: [compensatedMember],
+      missingKpiMemberIds: [],
+      missingAttendanceMemberIds: [],
+      attendanceDiagnostics,
+      regimeMismatchMemberIds: ['member-1']
+    })
+
+    expect(readiness.ready).toBe(false)
+    expect(readiness.approval.ready).toBe(false)
+    expect(readiness.blockingIssues.map(issue => issue.code)).toEqual(['payroll_regime_mismatch'])
+    expect(readiness.blockingIssues[0]?.memberIds).toEqual(['member-1'])
   })
 
   it('marks draft periods as overdue once the calculation deadline passed', () => {

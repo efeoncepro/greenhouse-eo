@@ -157,7 +157,7 @@ const ClientAiCreditsSection = () => {
                         </CustomAvatar>
                         <Typography variant='body2'>{project.projectName}</Typography>
                       </Stack>
-                      <Typography variant='body2' sx={{ fontFamily: 'monospace', fontWeight: 500 }}>
+                      <Typography variant='body2' sx={{ fontWeight: 500 }}>
                         {project.creditsConsumed.toLocaleString('es-CL')}
                       </Typography>
                     </Stack>
@@ -285,7 +285,7 @@ const WalletCard = ({ wallet, theme }: WalletCardProps) => {
           <Box sx={{ mb: 1.5 }}>
             <Stack direction='row' justifyContent='space-between' sx={{ mb: 0.5 }}>
               <Typography variant='caption' color='text.secondary'>Consumo mensual</Typography>
-              <Typography variant='caption' sx={{ fontFamily: 'monospace' }}>
+              <Typography variant='caption'>
                 {wallet.monthlyConsumed} / {wallet.monthlyLimit}
               </Typography>
             </Stack>

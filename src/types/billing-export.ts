@@ -25,11 +25,72 @@ export interface GcpServiceCost {
   serviceId: string
   serviceDescription: string
   cost: number
+  share?: number
+  baselineDailyCost?: number
+  recentDailyCost?: number
+  deltaPercent?: number | null
+  topResources?: GcpResourceCost[]
 }
 
 export interface GcpDailyCost {
   date: string
   totalCost: number
+}
+
+export interface GcpResourceCost {
+  serviceDescription: string
+  skuDescription: string
+  projectId: string | null
+  resourceName: string
+  cost: number
+  share: number
+  firstUsageDate: string | null
+  lastUsageDate: string | null
+}
+
+export type GcpCostDriverKind =
+  | 'service_spike'
+  | 'share_of_total'
+  | 'forecast_risk'
+  | 'resource_driver'
+
+export type GcpCostDriverSeverity = 'ok' | 'warning' | 'error'
+
+export interface GcpCostDriver {
+  driverId: string
+  kind: GcpCostDriverKind
+  severity: GcpCostDriverSeverity
+  serviceDescription: string
+  resourceName: string | null
+  summary: string
+  currentCost: number
+  baselineCost: number | null
+  deltaPercent: number | null
+  share: number
+  threshold: string
+  evidence: Array<{ label: string; value: string }>
+}
+
+export interface GcpBillingForecast {
+  monthStartDate: string
+  monthEndDate: string
+  observedCompleteDays: number
+  observedCost: number
+  averageDailyCost: number
+  monthEndCost: number
+  method: 'current_month_daily_average' | 'rolling_period_average' | 'unavailable'
+  confidence: 'high' | 'medium' | 'low'
+  note: string
+}
+
+export interface GcpBillingAiCopilotSnapshot {
+  severity: 'ok' | 'warning' | 'error' | 'skipped'
+  executiveSummary: string
+  recommendedActions: unknown[]
+  attackPriority: unknown[]
+  confidence: 'high' | 'medium' | 'low' | 'unknown'
+  observedAt: string
+  model: string
 }
 
 export interface GcpServiceSpotlight {
@@ -46,6 +107,10 @@ export interface GcpBillingOverview {
   currency: string
   costByDay: GcpDailyCost[]
   costByService: GcpServiceCost[]
+  costByResource?: GcpResourceCost[]
+  topDrivers?: GcpCostDriver[]
+  forecast?: GcpBillingForecast | null
+  aiCopilot?: GcpBillingAiCopilotSnapshot | null
   spotlights: {
     cloudRun: GcpServiceSpotlight | null
     bigQuery: GcpServiceSpotlight | null
@@ -60,6 +125,7 @@ export interface GcpBillingOverview {
   source: {
     dataset: string
     table: string | null
+    resourceTable?: string | null
     latestUsageDate: string | null
   }
   notes: string[]

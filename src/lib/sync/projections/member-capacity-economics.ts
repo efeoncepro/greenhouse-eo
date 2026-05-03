@@ -671,7 +671,7 @@ const loadMemberCapacityEconomicsSources = async (memberId: string, period: Peri
     `
       SELECT
         COUNT(*)::int AS expense_count,
-        COALESCE(SUM(COALESCE(effective_cost_amount_clp, total_amount_clp)), 0) AS total_shared_overhead_target,
+        COALESCE(SUM(amount_clp), 0) AS total_shared_overhead_target,
         (
           SELECT COUNT(DISTINCT a2.member_id)::int
           FROM greenhouse_core.client_team_assignments a2
@@ -682,14 +682,21 @@ const loadMemberCapacityEconomicsSources = async (memberId: string, period: Peri
             AND COALESCE(NULLIF(LOWER(TRIM(a2.client_id)), ''), '__missing__') <> ALL($3::text[])
             AND COALESCE(NULLIF(LOWER(TRIM(c2.client_name)), ''), '__missing__') <> ALL($4::text[])
         ) AS billable_member_count
-      FROM greenhouse_finance.expenses
-      WHERE allocated_client_id IS NULL
-        AND COALESCE(cost_is_direct, FALSE) = FALSE
-        AND cost_category IN ('operational', 'infrastructure', 'tax_social')
-        AND COALESCE(document_date, payment_date) >= $1::date
-        AND COALESCE(document_date, payment_date) <= $2::date
+      FROM greenhouse_finance.expense_distribution_resolution
+      WHERE period_year = $5
+        AND period_month = $6
+        AND distribution_lane = 'shared_operational_overhead'
+        AND resolution_status = 'resolved'
+        AND superseded_at IS NULL
     `,
-    [periodStart, periodEnd, INTERNAL_COMMERCIAL_CLIENT_IDS, INTERNAL_COMMERCIAL_CLIENT_NAMES]
+    [
+      periodStart,
+      periodEnd,
+      INTERNAL_COMMERCIAL_CLIENT_IDS,
+      INTERNAL_COMMERCIAL_CLIENT_NAMES,
+      period.year,
+      period.month
+    ]
   )
 
   const sharedOverheadContext = buildSharedOverheadPool(period, sharedOverheadPoolRow || null)

@@ -78,7 +78,7 @@ const TenantProjectsPanel = ({ projects }: Props) => {
                           </Stack>
                         </TableCell>
                         <TableCell>
-                          <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
+                          <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>
                             {project.projectId}
                           </Typography>
                         </TableCell>

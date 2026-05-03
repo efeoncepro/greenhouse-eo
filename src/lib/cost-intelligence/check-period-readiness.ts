@@ -45,11 +45,19 @@ type ExistingPeriodClosureRow = {
   updated_at: string | null
 }
 
+type ExpenseDistributionGateRow = {
+  total_expenses: number | string | null
+  active_resolutions: number | string | null
+  unresolved_resolutions: number | string | null
+  shared_pool_contamination: number | string | null
+}
+
 export type PeriodClosureLifecycle = 'open' | 'ready' | 'closed' | 'reopened'
 export type PayrollClosureStatus = 'pending' | 'calculated' | 'approved' | 'exported'
 export type FinanceClosureStatus = 'pending' | 'partial' | 'complete'
 export type ReconciliationClosureStatus = 'pending' | 'partial' | 'complete' | 'not_required'
 export type FxClosureStatus = 'pending' | 'locked'
+export type ExpenseDistributionClosureStatus = 'pending' | 'complete' | 'blocked'
 
 export type PeriodClosureConfig = {
   configId: string
@@ -79,11 +87,13 @@ export type PeriodClosureReadiness = {
   expenseStatus: FinanceClosureStatus
   reconciliationStatus: ReconciliationClosureStatus
   fxStatus: FxClosureStatus
+  expenseDistributionStatus: ExpenseDistributionClosureStatus
   payrollClosed: boolean
   incomeClosed: boolean
   expensesClosed: boolean
   reconciliationClosed: boolean
   fxLocked: boolean
+  expenseDistributionReady: boolean
   readinessPct: number
   isReady: boolean
   snapshotRevision: number
@@ -92,6 +102,9 @@ export type PeriodClosureReadiness = {
     incomeCount: number
     expenseCount: number
     fxCount: number
+    expenseDistributionActiveResolutions: number
+    expenseDistributionUnresolved: number
+    expenseDistributionSharedPoolContamination: number
   }
   audit: {
     closedAt: string | null
@@ -182,6 +195,24 @@ const resolveFxStatus = ({ count, required }: { count: number; required: boolean
   return count > 0 ? 'locked' : 'pending'
 }
 
+const resolveExpenseDistributionStatus = ({
+  expenseCount,
+  activeResolutions,
+  unresolved,
+  sharedPoolContamination
+}: {
+  expenseCount: number
+  activeResolutions: number
+  unresolved: number
+  sharedPoolContamination: number
+}): ExpenseDistributionClosureStatus => {
+  if (sharedPoolContamination > 0) return 'blocked'
+  if (expenseCount === 0) return 'complete'
+  if (activeResolutions < expenseCount || unresolved > 0) return 'pending'
+
+  return 'complete'
+}
+
 const deriveClosureStatus = ({
   existingStatus,
   isReady
@@ -259,7 +290,7 @@ export const checkPeriodReadiness = async ({
   const operationalMonth = getOperationalPayrollMonth(new Date(), calendarOptions)
   const lastBusinessDayOfTargetMonth = getLastBusinessDayOfMonth(year, month, calendarOptions)
 
-  const [config, existingRows, payrollRows, incomeRows, expenseRows, fxRows] = await Promise.all([
+  const [config, existingRows, payrollRows, incomeRows, expenseRows, fxRows, distributionRows] = await Promise.all([
     getPeriodClosureConfig({ year, month, client }),
     runRows<ExistingPeriodClosureRow>(
       `
@@ -326,6 +357,58 @@ export const checkPeriodReadiness = async ({
       `,
       [range.periodStart, range.periodEnd],
       client
+    ),
+    runRows<ExpenseDistributionGateRow>(
+      `
+        WITH period_expenses AS (
+          SELECT expense_id
+          FROM greenhouse_finance.expenses
+          WHERE COALESCE(period_year, EXTRACT(YEAR FROM COALESCE(payment_date, document_date, receipt_date))::int) = $1
+            AND COALESCE(period_month, EXTRACT(MONTH FROM COALESCE(payment_date, document_date, receipt_date))::int) = $2
+            AND COALESCE(is_annulled, FALSE) = FALSE
+        ),
+        active_resolutions AS (
+          SELECT
+            expense_id,
+            distribution_lane,
+            resolution_status,
+            economic_category
+          FROM greenhouse_finance.expense_distribution_resolution
+          WHERE period_year = $1
+            AND period_month = $2
+            AND superseded_at IS NULL
+        )
+        SELECT
+          (SELECT COUNT(*)::int FROM period_expenses) AS total_expenses,
+          (SELECT COUNT(*)::int FROM active_resolutions) AS active_resolutions,
+          (
+            (SELECT COUNT(*)::int FROM period_expenses pe
+             WHERE NOT EXISTS (
+               SELECT 1 FROM active_resolutions ar WHERE ar.expense_id = pe.expense_id
+             ))
+            +
+            (SELECT COUNT(*)::int FROM active_resolutions
+             WHERE resolution_status IN ('manual_required', 'blocked')
+                OR distribution_lane = 'unallocated')
+          ) AS unresolved_resolutions,
+          (
+            SELECT COUNT(*)::int
+            FROM active_resolutions
+            WHERE distribution_lane = 'shared_operational_overhead'
+              AND resolution_status = 'resolved'
+              AND COALESCE(economic_category, '') IN (
+                'labor_cost_internal',
+                'labor_cost_external',
+                'regulatory_payment',
+                'tax',
+                'financial_cost',
+                'bank_fee_real',
+                'financial_settlement'
+              )
+          ) AS shared_pool_contamination
+      `,
+      [year, month],
+      client
     )
   ])
 
@@ -334,11 +417,22 @@ export const checkPeriodReadiness = async ({
   const incomeCount = Number(incomeRows[0]?.total ?? 0)
   const expenseCount = Number(expenseRows[0]?.total ?? 0)
   const fxCount = Number(fxRows[0]?.total ?? 0)
+  const distributionGate = distributionRows[0]
+  const expenseDistributionActiveResolutions = Number(distributionGate?.active_resolutions ?? 0)
+  const expenseDistributionUnresolved = Number(distributionGate?.unresolved_resolutions ?? 0)
+  const expenseDistributionSharedPoolContamination = Number(distributionGate?.shared_pool_contamination ?? 0)
 
   const incomeStatus = resolveFinanceStatus({ count: incomeCount, required: config.requireIncomeRecorded })
   const expenseStatus = resolveFinanceStatus({ count: expenseCount, required: config.requireExpensesRecorded })
   const reconciliationStatus: ReconciliationClosureStatus = config.requireBankReconciled ? 'pending' : 'not_required'
   const fxStatus = resolveFxStatus({ count: fxCount, required: config.requireFxLocked })
+
+  const expenseDistributionStatus = resolveExpenseDistributionStatus({
+    expenseCount,
+    activeResolutions: expenseDistributionActiveResolutions,
+    unresolved: expenseDistributionUnresolved,
+    sharedPoolContamination: expenseDistributionSharedPoolContamination
+  })
 
   const payrollClosed = config.requirePayrollExported
     ? payrollStatus === 'exported'
@@ -348,11 +442,13 @@ export const checkPeriodReadiness = async ({
   const expensesClosed = expenseStatus === 'complete'
   const reconciliationClosed = reconciliationStatus === 'not_required'
   const fxLocked = fxStatus === 'locked'
+  const expenseDistributionReady = expenseDistributionStatus === 'complete'
 
   const checks = [
     config.requirePayrollExported ? payrollClosed : null,
     config.requireIncomeRecorded ? incomeClosed : null,
     config.requireExpensesRecorded ? expensesClosed : null,
+    config.requireExpensesRecorded ? expenseDistributionReady : null,
     config.requireBankReconciled ? reconciliationClosed : null,
     config.requireFxLocked ? fxLocked : null
   ].filter((value): value is boolean => value !== null)
@@ -383,11 +479,13 @@ export const checkPeriodReadiness = async ({
     expenseStatus,
     reconciliationStatus,
     fxStatus,
+    expenseDistributionStatus,
     payrollClosed,
     incomeClosed,
     expensesClosed,
     reconciliationClosed,
     fxLocked,
+    expenseDistributionReady,
     readinessPct,
     isReady,
     snapshotRevision: toInteger(existing?.snapshot_revision) ?? 1,
@@ -395,7 +493,10 @@ export const checkPeriodReadiness = async ({
     metrics: {
       incomeCount,
       expenseCount,
-      fxCount
+      fxCount,
+      expenseDistributionActiveResolutions,
+      expenseDistributionUnresolved,
+      expenseDistributionSharedPoolContamination
     },
     audit: {
       closedAt: toNullableString(existing?.closed_at),

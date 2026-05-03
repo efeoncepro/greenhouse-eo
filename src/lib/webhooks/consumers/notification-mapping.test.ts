@@ -69,4 +69,56 @@ describe('notification mappings', () => {
       }
     }))).toBe('/people/member-julio')
   })
+
+  it('keeps income-related action urls aligned with the deep-link resolver output', () => {
+    const paymentRecorded = findNotificationMapping('finance.income_payment.recorded')
+    const incomeCreated = findNotificationMapping('finance.income.created')
+    const balanceDivergence = findNotificationMapping('finance.balance_divergence.detected')
+
+    expect(paymentRecorded?.actionUrl?.(makeEnvelope({
+      eventType: 'finance.income_payment.recorded',
+      aggregateType: 'income_payment',
+      aggregateId: 'pay-1',
+      data: {
+        incomeId: 'inc-100'
+      }
+    }))).toBe('/finance/income/inc-100')
+
+    expect(incomeCreated?.actionUrl?.(makeEnvelope({
+      eventType: 'finance.income.created',
+      aggregateType: 'income',
+      aggregateId: 'inc-200',
+      data: {
+        incomeId: 'inc-200'
+      }
+    }))).toBe('/finance/income/inc-200')
+
+    expect(balanceDivergence?.actionUrl?.(makeEnvelope({
+      eventType: 'finance.balance_divergence.detected',
+      aggregateType: 'income',
+      aggregateId: 'inc-300',
+      data: {}
+    }))).toBe('/finance/income')
+  })
+
+  it('keeps expense-related action urls aligned with the deep-link resolver output', () => {
+    const expenseCreated = findNotificationMapping('finance.expense.created')
+    const siiClaim = findNotificationMapping('finance.sii_claim.detected')
+
+    expect(expenseCreated?.actionUrl?.(makeEnvelope({
+      eventType: 'finance.expense.created',
+      aggregateType: 'expense',
+      aggregateId: 'exp-100',
+      data: {
+        expenseId: 'exp-100'
+      }
+    }))).toBe('/finance/expenses/exp-100')
+
+    expect(siiClaim?.actionUrl?.(makeEnvelope({
+      eventType: 'finance.sii_claim.detected',
+      aggregateType: 'expense',
+      aggregateId: 'exp-200',
+      data: {}
+    }))).toBe('/finance/expenses')
+  })
 })

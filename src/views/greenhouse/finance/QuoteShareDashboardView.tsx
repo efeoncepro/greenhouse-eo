@@ -256,7 +256,7 @@ export const QuoteShareDashboardView = () => {
                             {item.quotationNumber} v{item.versionNumber}
                           </Typography>
                         </Link>
-                        <Typography variant='caption' color='text.secondary' sx={{ fontFamily: 'monospace' }}>
+                        <Typography variant='caption' color='text.secondary'>
                           /q/{item.shortCode}
                         </Typography>
                       </TableCell>

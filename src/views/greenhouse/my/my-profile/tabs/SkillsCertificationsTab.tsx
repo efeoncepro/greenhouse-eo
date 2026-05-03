@@ -1025,7 +1025,7 @@ function AddLanguageDialog({
             renderOption={(props, option) => (
               <li {...props} key={option.code}>
                 <Stack direction='row' spacing={1} alignItems='center'>
-                  <Typography variant='body2' color='text.secondary' sx={{ minWidth: 24, fontFamily: 'monospace' }}>
+                  <Typography variant='body2' color='text.secondary' sx={{ minWidth: 24 }}>
                     {option.code}
                   </Typography>
                   <Typography variant='body2'>{option.name}</Typography>

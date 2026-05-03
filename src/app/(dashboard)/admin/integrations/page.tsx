@@ -61,7 +61,7 @@ export default async function Page() {
       getNotionDeliveryDataQualityOverview({ limit: 12 }),
       getNotionSyncOrchestrationOverview({ limit: 12 }),
       listSisterPlatformBindings({ tenant, limit: 24 }),
-      getGcpBillingOverview().catch(error => {
+      getGcpBillingOverview({ includeAiCopilot: true }).catch(error => {
         console.warn('[admin/integrations] GCP billing overview failed:', error)
 
         return null

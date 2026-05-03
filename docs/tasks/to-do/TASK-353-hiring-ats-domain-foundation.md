@@ -11,6 +11,7 @@
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
+- Epic: `EPIC-011`
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `agency`
@@ -54,15 +55,21 @@ Revisar y respetar:
 - `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md`
 - `docs/architecture/GREENHOUSE_PERSON_COMPLETE_360_V1.md`
 - `docs/architecture/GREENHOUSE_PERSON_IDENTITY_CONSUMPTION_V1.md`
+- `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md`
 - `docs/architecture/Greenhouse_HRIS_Architecture_v1.md`
 - `docs/architecture/GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md`
 
 Reglas obligatorias:
 
 - `Person` sigue siendo la raíz humana canónica; `CandidateFacet` no crea un root paralelo
+- `CandidateFacet` se ancla a `identity_profile_id`; `member_id` es faceta operativa opcional, no llave primaria del candidato.
 - `HiringApplication` es la unidad transaccional del pipeline
 - el opening público es una proyección controlada del `HiringOpening` interno
 - esta task no crea `member`, `assignment` ni `placement`
+- La foundation debe dejar listo el contrato para que `TASK-356` pueda convertir `internal_hire` vía HRIS/People sobre el mismo `identity_profile_id`, sin duplicar persona.
+- El schema canónico V1 vive en `greenhouse_hiring`; cualquier tabla de apoyo en `greenhouse_core` debe justificarse como faceta cross-domain real.
+- Toda query interna debe filtrar por `space_id` o por scope canónico equivalente cuando la entidad sea tenant-scoped.
+- Los APIs deben sanitizar errores y no devolver `error.message` raw al cliente.
 
 ## Normative Docs
 
@@ -90,13 +97,15 @@ Reglas obligatorias:
 
 ### Files owned
 
-- `src/lib`
-- `src/app/api`
-- `src/types`
-- `src/lib/person-360`
-- `src/lib/people`
-- `src/lib/storage/greenhouse-assets.ts`
+- `migrations/<ts>_task-353-hiring-ats-domain-foundation.sql`
+- `src/lib/hiring/**`
+- `src/app/api/hiring/**`
+- `src/types/hiring.ts`
+- `src/types/db.d.ts`
+- `src/lib/person-360/**` solo para readers hiring-aware derivados
+- `src/lib/people/**` solo para readers hiring-aware derivados
 - `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md`
+- `docs/architecture/GREENHOUSE_EVENT_CATALOG_V1.md` si se documentan eventos base
 - `project_context.md`
 
 ## Current Repo State
@@ -133,7 +142,11 @@ Reglas obligatorias:
   - `HiringOpening`
   - `CandidateFacet`
   - `HiringApplication`
-- Dejar explícito el ownership de schema/servicio según el modelo final elegido en implementación
+- Crear las tablas en `greenhouse_hiring` con IDs estables, `space_id` cuando aplique, timestamps, audit fields, status enums/checks y FKs explícitas hacia `greenhouse_core.identity_profiles`.
+- Dejar `CandidateFacet` como relación persona-first: `candidate_facet_id`, `identity_profile_id`, source, readiness, availability, expected rate/band, consent/retention metadata y estado.
+- No crear tabla root `candidates` ni copiar PII fuera de `identity_profile` salvo snapshots mínimos justificados.
+- Dejar en `HiringApplication` / `HiringDecision` los campos necesarios para downstream: `identity_profile_id`, `candidate_facet_id`, selected destination, tentative start date, expected legal entity/context y prerequisites snapshot si aplica.
+- No persistir payroll truth definitiva en Hiring; compensation/rate/budget quedan como propuesta/snapshot hasta confirmación downstream.
 
 ### Slice 2 — Services + API baseline
 
@@ -142,12 +155,29 @@ Reglas obligatorias:
   - crear/listar/actualizar `HiringOpening`
   - reconciliar `CandidateFacet` sobre `Person`
   - crear/listar `HiringApplication`
+- Implementar validación de payload, tenant isolation, capability gates y sanitización de errores.
+- Separar endpoints internos de endpoints públicos; esta task solo deja contratos internos/base, no abre apply público.
 
 ### Slice 3 — Public opening publication contract
 
 - Materializar la proyección pública del opening
 - Soportar `visibility` y `publicationStatus`
 - Definir el payload público mínimo que consumirá la landing de careers
+- Persistir o derivar un payload público allowlist-only: nunca publicar owners internos, score, economics, budget/rate internos, notas, risk ni cliente confidencial.
+
+### Slice 4 — Access + capability baseline
+
+- Declarar views mínimas esperadas aunque la UI viva en `TASK-355`.
+- Declarar capabilities V1:
+  - `hiring.demand.read`
+  - `hiring.demand.write`
+  - `hiring.opening.read`
+  - `hiring.opening.write`
+  - `hiring.opening.publish`
+  - `hiring.application.read`
+  - `hiring.application.write`
+  - `hiring.application.decide`
+- Registrar el delta en catálogo de entitlements/capabilities si el repo lo requiere durante implementación.
 
 ## Out of Scope
 
@@ -165,6 +195,7 @@ El slice debe dejar explícitos:
 - source normalization incluyendo `public_careers`
 - frontera entre datos internos del opening y payload público derivado
 - payload mínimo de `HiringApplication` para que `TASK-354` y `TASK-355` no dependan de mocks
+- payload mínimo de selección para que `TASK-356` pueda crear `HiringHandoff` y HRIS/People pueda revisar creación/promoción de `member`
 
 Si el schema final no existe hoy en el repo, la task debe:
 
@@ -181,6 +212,10 @@ Si el schema final no existe hoy en el repo, la task debe:
 - [ ] Existen aggregates y service/API baseline para `TalentDemand`, `HiringOpening`, `CandidateFacet` y `HiringApplication`
 - [ ] La publicación pública del opening queda resuelta como proyección derivada del opening interno
 - [ ] La reconciliación de candidate facet reutiliza `Person` como raíz canónica
+- [ ] No existe root paralelo `candidate`; la faceta referencia `identity_profile_id`
+- [ ] Las APIs internas filtran por tenant/scope y no exponen errores raw
+- [ ] El ownership de archivos queda acotado a `src/lib/hiring/**`, `src/app/api/hiring/**`, migración, types y docs explícitos
+- [ ] La foundation conserva IDs/persona y snapshots mínimos suficientes para handoff `internal_hire` sin crear `member`
 
 ## Verification
 
@@ -200,6 +235,8 @@ Si el schema final no existe hoy en el repo, la task debe:
 - `TASK-355`
 - `TASK-356`
 
-## Open Questions
+## Resolved Open Questions
 
-- si la primera iteración del schema vive completamente en un dominio nuevo o si requiere apoyo temporal de una tabla/faceta en `greenhouse_core`
+- La primera iteración vive en schema nuevo `greenhouse_hiring`. Solo referencia `greenhouse_core.identity_profiles` como raíz humana y facetas existentes cuando corresponda.
+- No se crea `greenhouse_core.candidates` ni se modela `candidate` como root. Si implementación descubre que falta una faceta core reusable, debe documentarse como delta arquitectónico y no improvisarse dentro de Hiring.
+- El publication contract queda en Hiring y se consume como allowlist pública por `TASK-354`; no se crea otro modelo público paralelo.

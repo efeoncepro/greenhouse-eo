@@ -301,6 +301,80 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     })
   }
 
+  // TASK-749 — Beneficiary Payment Profiles capabilities.
+  // Read: cualquiera con route_group=finance o role finance_admin/finance_analyst/efeonce_admin.
+  // Create/Update + Approve: route_group finance o roles finance_admin/efeonce_admin.
+  // Reveal sensitive: solo efeonce_admin/finance_admin (mismo gate que payment_instruments).
+  if (
+    hasRouteGroup(subject, 'finance') ||
+    hasRole(subject, ROLE_CODES.FINANCE_ADMIN) ||
+    hasRole(subject, ROLE_CODES.FINANCE_ANALYST) ||
+    hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)
+  ) {
+    const source: TenantEntitlementSource = hasRouteGroup(subject, 'finance') ? 'route_group' : 'role'
+
+    addEntitlement(entries, {
+      module: 'finance',
+      capability: 'finance.payment_profiles.read',
+      action: 'read',
+      scope: 'tenant',
+      source
+    })
+  }
+
+  if (
+    hasRouteGroup(subject, 'finance') ||
+    hasRole(subject, ROLE_CODES.FINANCE_ADMIN) ||
+    hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)
+  ) {
+    const source: TenantEntitlementSource = hasRouteGroup(subject, 'finance') ? 'route_group' : 'role'
+
+    addEntitlement(entries, {
+      module: 'finance',
+      capability: 'finance.payment_profiles.create',
+      action: 'create',
+      scope: 'tenant',
+      source
+    })
+
+    addEntitlement(entries, {
+      module: 'finance',
+      capability: 'finance.payment_profiles.create',
+      action: 'update',
+      scope: 'tenant',
+      source
+    })
+
+    addEntitlement(entries, {
+      module: 'finance',
+      capability: 'finance.payment_profiles.approve',
+      action: 'update',
+      scope: 'tenant',
+      source
+    })
+  }
+
+  if (hasRole(subject, ROLE_CODES.FINANCE_ADMIN) || hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
+    addEntitlement(entries, {
+      module: 'finance',
+      capability: 'finance.payment_profiles.reveal_sensitive',
+      action: 'read',
+      scope: 'tenant',
+      source: 'role'
+    })
+
+    // TASK-759 V2 (759d) — Payslip resend capability. Solo finance_admin/efeonce_admin.
+    // El analyst NO puede reenviar (read-only). Cubre el endpoint /resend-payslips
+    // y el botón "Reenviar manualmente" en drawers.
+    addEntitlement(entries, {
+      module: 'finance',
+      capability: 'finance.payslip.resend',
+      action: 'update',
+      scope: 'tenant',
+      source: 'role'
+    })
+  }
+
   // TASK-722 — Reconciliation workbench capabilities.
   // Read access: cualquier route_group=finance, finance_admin o efeonce_admin
   // pueden listar y abrir el workbench.
@@ -382,6 +456,30 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       capability: 'finance.reconciliation.ai_suggestions.review',
       action: 'update',
       scope: 'space',
+      source
+    })
+
+    addEntitlement(entries, {
+      module: 'finance',
+      capability: 'finance.expense_distribution.ai_suggestions.read',
+      action: 'read',
+      scope: 'tenant',
+      source
+    })
+
+    addEntitlement(entries, {
+      module: 'finance',
+      capability: 'finance.expense_distribution.ai_suggestions.generate',
+      action: 'create',
+      scope: 'tenant',
+      source
+    })
+
+    addEntitlement(entries, {
+      module: 'finance',
+      capability: 'finance.expense_distribution.ai_suggestions.review',
+      action: 'update',
+      scope: 'tenant',
       source
     })
   }

@@ -9,6 +9,8 @@ const mockPublishOutboxEvent = vi.fn()
 const mockRequireTenantContext = vi.fn()
 
 vi.mock('@/lib/postgres/client', () => ({
+  onGreenhousePostgresReset: () => () => {},
+  isGreenhousePostgresRetryableConnectionError: () => false,
   runGreenhousePostgresQuery: (...args: unknown[]) => mockRunGreenhousePostgresQuery(...args)
 }))
 

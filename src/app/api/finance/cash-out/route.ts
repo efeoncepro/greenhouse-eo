@@ -1,14 +1,14 @@
 import { NextResponse } from 'next/server'
 
-import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
-import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
+import { sumExpensePaymentsClpForPeriod } from '@/lib/finance/expense-payments-reader'
 import {
   toNumber,
   toDateString,
   toTimestampString,
-  normalizeString,
-  roundCurrency
+  normalizeString
 } from '@/lib/finance/shared'
+import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
+import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
 
@@ -20,6 +20,7 @@ interface PaymentRow {
   expense_id: string
   payment_date: unknown
   amount: unknown
+  amount_clp: unknown
   currency: string
   reference: string | null
   payment_method: string | null
@@ -41,43 +42,56 @@ interface PaymentRow {
   payment_instrument_category: string | null
 }
 
-interface SummaryRow {
-  [key: string]: unknown
-  total_paid_clp: unknown
-  total_payments: unknown
-  unreconciled_count: unknown
-  supplier_total_clp: unknown
-  payroll_total_clp: unknown
-  fiscal_total_clp: unknown
-}
-
 // ── Normalizer ──────────────────────────────────────────────────────
+//
+// TASK-774 Slice 7 — exponer SIEMPRE `amountClp` (CLP-equivalente FX-resolved)
+// y `amount` (currency original) lado a lado. Consumers UI deben preferir
+// `amountClp` para mostrar saldo CLP; usar `amount + currency` solo cuando
+// el contexto necesita la moneda original (ej. visualización del documento).
+// La cola de conciliación usa `amountClp` para mostrar el monto que
+// efectivamente impactara el saldo de la cuenta.
 
-const normalizePayment = (row: PaymentRow) => ({
-  paymentId: normalizeString(row.payment_id),
-  expenseId: normalizeString(row.expense_id),
-  paymentDate: toDateString(row.payment_date as string | { value?: string } | null),
-  amount: toNumber(row.amount),
-  currency: normalizeString(row.currency),
-  reference: row.reference ? normalizeString(row.reference) : null,
-  paymentMethod: row.payment_method ? normalizeString(row.payment_method) : null,
-  paymentSource: row.payment_source ? normalizeString(row.payment_source) : null,
-  isReconciled: Boolean(row.is_reconciled),
-  createdAt: toTimestampString(row.created_at as string | { value?: string } | null),
-  expenseDescription: normalizeString(row.expense_description),
-  expenseType: normalizeString(row.expense_type),
-  expenseTotal: toNumber(row.expense_total),
-  supplierId: row.supplier_id ? normalizeString(row.supplier_id) : null,
-  supplierName: row.supplier_name ? normalizeString(row.supplier_name) : null,
-  costCategory: row.cost_category ? normalizeString(row.cost_category) : null,
-  documentNumber: row.document_number ? normalizeString(row.document_number) : null,
-  memberName: row.member_name ? normalizeString(row.member_name) : null,
-  exchangeRateToClp: toNumber(row.exchange_rate_to_clp),
-  paymentAccountId: row.payment_account_id ? normalizeString(row.payment_account_id) : null,
-  paymentAccountName: row.payment_account_name ? normalizeString(row.payment_account_name) : null,
-  paymentProviderSlug: row.payment_provider_slug ? normalizeString(row.payment_provider_slug) : null,
-  paymentInstrumentCategory: row.payment_instrument_category ? normalizeString(row.payment_instrument_category) : null
-})
+const normalizePayment = (row: PaymentRow) => {
+  const amountNative = toNumber(row.amount)
+  const currency = normalizeString(row.currency)
+  const amountClpRaw = toNumber(row.amount_clp)
+
+  // Fallback canónico TASK-766: si amount_clp es NULL pero currency es CLP,
+  // usa amount nativo (que ya está en CLP). Si NULL y non-CLP, marca drift.
+  const amountClp = amountClpRaw > 0
+    ? amountClpRaw
+    : (currency === 'CLP' ? amountNative : 0)
+
+  const hasClpDrift = currency !== 'CLP' && amountClpRaw === 0
+
+  return {
+    paymentId: normalizeString(row.payment_id),
+    expenseId: normalizeString(row.expense_id),
+    paymentDate: toDateString(row.payment_date as string | { value?: string } | null),
+    amount: amountNative,
+    amountClp,
+    hasClpDrift,
+    currency,
+    reference: row.reference ? normalizeString(row.reference) : null,
+    paymentMethod: row.payment_method ? normalizeString(row.payment_method) : null,
+    paymentSource: row.payment_source ? normalizeString(row.payment_source) : null,
+    isReconciled: Boolean(row.is_reconciled),
+    createdAt: toTimestampString(row.created_at as string | { value?: string } | null),
+    expenseDescription: normalizeString(row.expense_description),
+    expenseType: normalizeString(row.expense_type),
+    expenseTotal: toNumber(row.expense_total),
+    supplierId: row.supplier_id ? normalizeString(row.supplier_id) : null,
+    supplierName: row.supplier_name ? normalizeString(row.supplier_name) : null,
+    costCategory: row.cost_category ? normalizeString(row.cost_category) : null,
+    documentNumber: row.document_number ? normalizeString(row.document_number) : null,
+    memberName: row.member_name ? normalizeString(row.member_name) : null,
+    exchangeRateToClp: toNumber(row.exchange_rate_to_clp),
+    paymentAccountId: row.payment_account_id ? normalizeString(row.payment_account_id) : null,
+    paymentAccountName: row.payment_account_name ? normalizeString(row.payment_account_name) : null,
+    paymentProviderSlug: row.payment_provider_slug ? normalizeString(row.payment_provider_slug) : null,
+    paymentInstrumentCategory: row.payment_instrument_category ? normalizeString(row.payment_instrument_category) : null
+  }
+}
 
 // ── GET handler ─────────────────────────────────────────────────────
 
@@ -156,6 +170,7 @@ export async function GET(request: Request) {
         ep.expense_id,
         ep.payment_date,
         ep.amount,
+        ep.amount_clp,
         ep.currency,
         ep.reference,
         ep.payment_method,
@@ -185,27 +200,19 @@ export async function GET(request: Request) {
       params
     )
 
-    // ── Summary KPIs ────────────────────────────────────────────────
-    // Re-use only the filter params (not LIMIT/OFFSET)
-    const filterParams = params.slice(0, paramIndex - 2)
-
-    const summaryResult = await runGreenhousePostgresQuery<SummaryRow>(
-      `
-      SELECT
-        COALESCE(SUM(ep.amount * COALESCE(e.exchange_rate_to_clp, 1)), 0) AS total_paid_clp,
-        COUNT(*) AS total_payments,
-        COUNT(*) FILTER (WHERE NOT ep.is_reconciled) AS unreconciled_count,
-        COALESCE(SUM(ep.amount * COALESCE(e.exchange_rate_to_clp, 1)) FILTER (WHERE e.expense_type = 'supplier'), 0) AS supplier_total_clp,
-        COALESCE(SUM(ep.amount * COALESCE(e.exchange_rate_to_clp, 1)) FILTER (WHERE e.expense_type = 'payroll'), 0) AS payroll_total_clp,
-        COALESCE(SUM(ep.amount * COALESCE(e.exchange_rate_to_clp, 1)) FILTER (WHERE e.expense_type IN ('tax', 'social_security')), 0) AS fiscal_total_clp
-      FROM greenhouse_finance.expense_payments ep
-      INNER JOIN greenhouse_finance.expenses e ON e.expense_id = ep.expense_id
-      ${whereClause}
-      `,
-      filterParams
-    )
-
-    const s = summaryResult[0]
+    // ── Summary KPIs (TASK-766 — canonical CLP reader) ──────────────
+    // Reemplaza el anti-patrón `SUM(ep.amount * COALESCE(e.exchange_rate_to_clp, 1))`
+    // por el helper canónico que lee de la VIEW expense_payments_normalized
+    // con `payment_amount_clp` correctamente resuelto. Ver
+    // src/lib/finance/expense-payments-reader.ts para reglas duras + rationale.
+    const summary = await sumExpensePaymentsClpForPeriod({
+      fromDate: fromDate ?? '0001-01-01',
+      toDate: toDate ?? '9999-12-31',
+      expenseType: expenseType ?? undefined,
+      supplierId: supplierId ?? undefined,
+      isReconciled:
+        isReconciledParam === null ? undefined : isReconciledParam === 'true'
+    })
 
     return NextResponse.json({
       items: rows.map(normalizePayment),
@@ -213,12 +220,23 @@ export async function GET(request: Request) {
       page,
       pageSize,
       summary: {
-        totalPaidClp: roundCurrency(toNumber(s?.total_paid_clp)),
-        totalPayments: toNumber(s?.total_payments),
-        unreconciledCount: toNumber(s?.unreconciled_count),
-        supplierTotalClp: roundCurrency(toNumber(s?.supplier_total_clp)),
-        payrollTotalClp: roundCurrency(toNumber(s?.payroll_total_clp)),
-        fiscalTotalClp: roundCurrency(toNumber(s?.fiscal_total_clp))
+        totalPaidClp: summary.totalClp,
+        totalPayments: summary.totalPayments,
+        unreconciledCount: summary.unreconciledCount,
+        // Legacy buckets (TASK-766 — preserved for backwards-compat).
+        supplierTotalClp: summary.supplierClp,
+        payrollTotalClp: summary.payrollClp,
+        fiscalTotalClp: summary.fiscalClp,
+        // TASK-766 — drift count expuesto al UI para que un valor > 0 sea
+        // visible (preludio del banner reliability + reparable via
+        // POST /api/admin/finance/payments-clp-repair).
+        driftCount: summary.driftCount,
+        // TASK-768 — breakdown analitico canonico por economic_category.
+        // UI debe migrar a leer estos campos para mostrar Nomina/Proveedores/Fiscal
+        // correctamente clasificados (resuelve mis-clasificacion ~$3M abril 2026).
+        // Total Nomina canonico = labor_cost_internal + labor_cost_external.
+        byEconomicCategory: summary.byEconomicCategory,
+        economicCategoryUnresolvedCount: summary.economicCategoryUnresolvedCount
       }
     })
   } catch (error) {

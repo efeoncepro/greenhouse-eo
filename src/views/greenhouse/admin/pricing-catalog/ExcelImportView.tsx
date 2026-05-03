@@ -527,10 +527,10 @@ const ExcelImportView = () => {
                                 label={ACTION_LABEL[diff.action]}
                               />
                             </TableCell>
-                            <TableCell sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
+                            <TableCell sx={{ fontSize: '0.8rem' }}>
                               {diff.entityId ?? '—'}
                             </TableCell>
-                            <TableCell sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
+                            <TableCell sx={{ fontSize: '0.8rem' }}>
                               {diff.entitySku ?? '—'}
                             </TableCell>
                             <TableCell>

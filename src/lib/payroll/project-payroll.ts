@@ -11,6 +11,7 @@ import type {
 import { getHistoricalEconomicIndicatorForPeriod } from '@/lib/finance/economic-indicators'
 import { DEFAULT_BONUS_PRORATION_CONFIG, normalizeBonusProrationConfig } from '@/lib/payroll/bonus-config'
 import { buildPayrollEntry } from '@/lib/payroll/calculate-payroll'
+import { requiresPayrollAttendanceSignal, requiresPayrollKpi } from '@/lib/payroll/compensation-requirements'
 import {
   type AttendanceResult,
   countWeekdays,
@@ -165,14 +166,18 @@ export const projectPayrollForPeriod = async ({
     }
   }
 
-  const memberIds = compensations.map(c => (typeof c.memberId === 'string' ? c.memberId.trim() : '')).filter(Boolean)
+  const kpiRequiredMemberIds = compensations.filter(requiresPayrollKpi).map(compensation => compensation.memberId)
+
+  const attendanceRequiredMemberIds = compensations
+    .filter(requiresPayrollAttendanceSignal)
+    .map(compensation => compensation.memberId)
 
   // 2. Fetch inputs in parallel
   const [kpiMap, attendanceResult, bonusConfig, ufIndicator] = await Promise.all([
-    fetchKpisForPeriod({ memberIds, periodYear: year, periodMonth: month })
+    fetchKpisForPeriod({ memberIds: kpiRequiredMemberIds, periodYear: year, periodMonth: month })
       .then(r => r.snapshots)
       .catch(() => new Map<string, PayrollKpiSnapshot>()),
-    fetchAttendanceForAllMembers(memberIds, periodStart, attendanceCutDate).catch(
+    fetchAttendanceForAllMembers(attendanceRequiredMemberIds, periodStart, attendanceCutDate).catch(
       (): AttendanceResult => ({ snapshots: new Map(), leaveDataDegraded: true })
     ),
     getBonusConfig(periodEnd),

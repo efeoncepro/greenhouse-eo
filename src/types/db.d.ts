@@ -27,6 +27,35 @@ export type Numeric = ColumnType<string, number | string, number | string>;
 
 export type Timestamp = ColumnType<Date, Date | string, Date | string>;
 
+export interface GreenhouseAiCloudCostAiObservations {
+  attack_priority: Generated<Json>;
+  confidence: string;
+  created_at: Generated<Timestamp>;
+  executive_summary: string;
+  fingerprint: string;
+  missing_telemetry: Generated<string[]>;
+  model: string;
+  observation_id: string;
+  observed_at: Timestamp;
+  output_tokens: number | null;
+  probable_causes: Generated<Json>;
+  prompt_tokens: number | null;
+  recommended_actions: Generated<Json>;
+  severity: string;
+  sweep_run_id: string;
+  top_cost_drivers: Generated<Json>;
+}
+
+export interface GreenhouseAiCloudCostAlertDispatches {
+  channels: Generated<string[]>;
+  created_at: Generated<Timestamp>;
+  dispatched_at: Generated<Timestamp>;
+  driver_ids: Generated<string[]>;
+  fingerprint: string;
+  severity: string;
+  summary: string;
+}
+
 export interface GreenhouseAiCreditLedger {
   asset_description: string | null;
   balance_after: number;
@@ -3434,6 +3463,62 @@ export interface GreenhouseFinanceBankStatementRows {
   value_date: Timestamp | null;
 }
 
+export interface GreenhouseFinanceBeneficiaryPaymentProfileAuditLog {
+  action: string;
+  actor_email: string | null;
+  actor_user_id: string;
+  audit_id: string;
+  created_at: Generated<Timestamp>;
+  diff_json: Generated<Json>;
+  ip_address: string | null;
+  profile_id: string;
+  reason: string | null;
+  user_agent: string | null;
+}
+
+export interface GreenhouseFinanceBeneficiaryPaymentProfiles {
+  account_holder_name: string | null;
+  /**
+   * Numero de cuenta completo. SOLO se devuelve si caller tiene capability finance.payment_profiles.reveal_sensitive. Default queries devuelven solo account_number_masked.
+   */
+  account_number_full: string | null;
+  account_number_masked: string | null;
+  active_from: Timestamp | null;
+  active_to: Timestamp | null;
+  approved_at: Timestamp | null;
+  approved_by: string | null;
+  bank_name: string | null;
+  beneficiary_id: string;
+  beneficiary_name: string | null;
+  beneficiary_type: string;
+  cancelled_at: Timestamp | null;
+  cancelled_by: string | null;
+  cancelled_reason: string | null;
+  country_code: string | null;
+  created_at: Generated<Timestamp>;
+  created_by: string;
+  currency: string;
+  metadata_json: Generated<Json>;
+  notes: string | null;
+  payment_instrument_id: string | null;
+  payment_method: string | null;
+  profile_id: string;
+  provider_slug: string | null;
+  require_approval: Generated<boolean>;
+  routing_reference: string | null;
+  space_id: string | null;
+  /**
+   * draft = borrador editable; pending_approval = esperando maker-checker; active = vigente (1 sola por space/beneficiary/currency); superseded = reemplazada via superseded_by; cancelled = anulada con motivo.
+   */
+  status: Generated<string>;
+  superseded_by: string | null;
+  updated_at: Generated<Timestamp>;
+  /**
+   * Referencia opaca a vault externo (TASK-749 V1 placeholder). Cuando este presente, la fuente canonica es el vault y account_number_full puede ser NULL.
+   */
+  vault_ref: string | null;
+}
+
 export interface GreenhouseFinanceClientEconomics {
   client_id: string;
   client_name: string;
@@ -3500,6 +3585,36 @@ export interface GreenhouseFinanceCostAllocations {
   period_year: number;
   space_id: string | null;
   updated_at: Generated<Timestamp | null>;
+}
+
+export interface GreenhouseFinanceEconomicCategoryManualQueue {
+  candidate_category: string | null;
+  candidate_confidence: string | null;
+  candidate_evidence: Generated<Json | null>;
+  candidate_rule: string | null;
+  created_at: Generated<Timestamp>;
+  queue_id: string;
+  resolution_note: string | null;
+  resolved_at: Timestamp | null;
+  resolved_by: string | null;
+  status: Generated<string>;
+  target_id: string;
+  target_kind: string;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseFinanceEconomicCategoryResolutionLog {
+  batch_id: string | null;
+  confidence: string;
+  created_at: Generated<Timestamp>;
+  evidence_json: Generated<Json>;
+  log_id: string;
+  matched_rule: string;
+  resolved_at: Generated<Timestamp>;
+  resolved_by: string;
+  resolved_category: string;
+  target_id: string;
+  target_kind: string;
 }
 
 export interface GreenhouseFinanceEconomicIndicators {
@@ -3574,6 +3689,82 @@ export interface GreenhouseFinanceExpenseAttributionRules {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseFinanceExpenseDistributionAiSuggestions {
+  applied_resolution_id: string | null;
+  confidence: string;
+  created_at: Generated<Timestamp>;
+  evidence_json: Generated<Json>;
+  expense_id: string;
+  input_hash: string;
+  model_id: string;
+  period_month: number;
+  period_year: number;
+  prompt_hash: string;
+  rationale: string;
+  reviewed_at: Timestamp | null;
+  reviewed_by_user_id: string | null;
+  status: Generated<string>;
+  suggested_client_id: string | null;
+  suggested_distribution_lane: string;
+  suggested_member_id: string | null;
+  suggestion_id: string;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseFinanceExpenseDistributionPolicy {
+  created_at: Generated<Timestamp>;
+  declared_at: Generated<Timestamp>;
+  declared_by_user_id: string | null;
+  evidence_json: Generated<Json>;
+  financial_cost_method: Generated<string>;
+  operational_overhead_method: Generated<string>;
+  period_month: number;
+  period_year: number;
+  policy_id: string;
+  policy_version: string;
+  regulatory_payment_method: Generated<string>;
+  status: Generated<string>;
+  superseded_by_policy_id: string | null;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseFinanceExpenseDistributionResolution {
+  amount_clp: Numeric;
+  basis_amount_clp: Numeric | null;
+  client_id: string | null;
+  confidence: Generated<string>;
+  created_at: Generated<Timestamp>;
+  /**
+   * member_direct_labor/tool, client_direct_non_labor, shared_operational_overhead, shared_financial_cost, regulatory_payment, provider_payroll, treasury_transit o unallocated. Solo shared_operational_overhead entra al pool operacional por defecto.
+   */
+  distribution_lane: string;
+  economic_category: string | null;
+  evidence_json: Generated<Json>;
+  expense_id: string;
+  legacy_cost_category: string | null;
+  member_id: string | null;
+  organization_id: string | null;
+  payment_obligation_id: string | null;
+  payment_order_id: string | null;
+  payment_order_line_id: string | null;
+  payroll_entry_id: string | null;
+  payroll_period_id: string | null;
+  period_month: number;
+  period_year: number;
+  policy_id: string | null;
+  resolution_id: string;
+  resolution_status: Generated<string>;
+  resolved_at: Generated<Timestamp>;
+  resolved_by_user_id: string | null;
+  risk_flags: Generated<string[]>;
+  source: string;
+  superseded_at: Timestamp | null;
+  superseded_by_resolution_id: string | null;
+  supplier_id: string | null;
+  tool_catalog_id: string | null;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseFinanceExpensePayments {
   amount: Numeric;
   amount_clp: Numeric | null;
@@ -3588,6 +3779,10 @@ export interface GreenhouseFinanceExpensePayments {
   payment_date: Timestamp;
   payment_id: string;
   payment_method: string | null;
+  /**
+   * TASK-751 - Link al payment_order_line que disparo este expense_payment. NULL para pagos legacy registrados directamente sin pasar por order. Partial unique: solo 1 expense_payment vivo por line (excluyendo superseded).
+   */
+  payment_order_line_id: string | null;
   payment_source: Generated<string>;
   reconciled_at: Timestamp | null;
   reconciled_by_user_id: string | null;
@@ -3595,6 +3790,7 @@ export interface GreenhouseFinanceExpensePayments {
   recorded_at: Generated<Timestamp | null>;
   recorded_by_user_id: string | null;
   reference: string | null;
+  requires_fx_repair: Generated<boolean>;
   settlement_group_id: string | null;
   space_id: string | null;
   superseded_at: Timestamp | null;
@@ -3607,6 +3803,29 @@ export interface GreenhouseFinanceExpensePayments {
    */
   superseded_by_payment_id: string | null;
   superseded_reason: string | null;
+}
+
+export interface GreenhouseFinanceExpensePaymentsNormalized {
+  created_at: Timestamp | null;
+  economic_category: string | null;
+  exchange_rate_at_payment: Numeric | null;
+  expense_id: string | null;
+  expense_type: string | null;
+  fx_gain_loss_clp: Numeric | null;
+  has_clp_drift: boolean | null;
+  is_reconciled: boolean | null;
+  payment_account_id: string | null;
+  payment_amount_clp: Numeric | null;
+  payment_amount_native: Numeric | null;
+  payment_currency: string | null;
+  payment_date: Timestamp | null;
+  payment_id: string | null;
+  payment_method: string | null;
+  payment_order_line_id: string | null;
+  payment_source: string | null;
+  recorded_at: Timestamp | null;
+  recorded_by_user_id: string | null;
+  reference: string | null;
 }
 
 export interface GreenhouseFinanceExpenses {
@@ -3640,6 +3859,10 @@ export interface GreenhouseFinanceExpenses {
   dte_folio: string | null;
   dte_type_code: string | null;
   due_date: Timestamp | null;
+  /**
+   * TASK-768: dimension analitica/operativa. Valores canonicos: labor_cost_internal | labor_cost_external | vendor_cost_saas | vendor_cost_professional_services | regulatory_payment | tax | financial_cost | bank_fee_real | overhead | financial_settlement | other. NULLABLE pre-cutover; CHECK NOT NULL post-cutover (Slice 4). Distinta de expense_type (taxonomia fiscal/SII).
+   */
+  economic_category: string | null;
   /**
    * Canonical operational cost in document currency: subtotal + non_recoverable_tax_amount.
    */
@@ -3908,6 +4131,10 @@ export interface GreenhouseFinanceIncome {
   dte_type_code: string | null;
   dte_type_name: string | null;
   due_date: Timestamp | null;
+  /**
+   * TASK-768: dimension analitica/operativa. Valores canonicos: service_revenue | client_reimbursement | factoring_proceeds | partner_payout_offset | internal_transfer_in | tax_refund | financial_income | other. NULLABLE pre-cutover; CHECK NOT NULL post-cutover (Slice 4).
+   */
+  economic_category: string | null;
   exchange_rate_to_clp: Numeric | null;
   exempt_amount: Numeric | null;
   hes_id: string | null;
@@ -4066,6 +4293,7 @@ export interface GreenhouseFinanceIncomePayments {
   recorded_at: Generated<Timestamp | null>;
   recorded_by_user_id: string | null;
   reference: string | null;
+  requires_fx_repair: Generated<boolean>;
   settlement_group_id: string | null;
   space_id: string | null;
   superseded_at: Timestamp | null;
@@ -4078,6 +4306,28 @@ export interface GreenhouseFinanceIncomePayments {
    */
   superseded_by_payment_id: string | null;
   superseded_reason: string | null;
+}
+
+export interface GreenhouseFinanceIncomePaymentsNormalized {
+  created_at: Timestamp | null;
+  economic_category: string | null;
+  exchange_rate_at_payment: Numeric | null;
+  fx_gain_loss_clp: Numeric | null;
+  has_clp_drift: boolean | null;
+  income_id: string | null;
+  income_type: string | null;
+  is_reconciled: boolean | null;
+  payment_account_id: string | null;
+  payment_amount_clp: Numeric | null;
+  payment_amount_native: Numeric | null;
+  payment_currency: string | null;
+  payment_date: Timestamp | null;
+  payment_id: string | null;
+  payment_method: string | null;
+  payment_source: string | null;
+  recorded_at: Timestamp | null;
+  recorded_by_user_id: string | null;
+  reference: string | null;
 }
 
 export interface GreenhouseFinanceIncomeSettlementReconciliation {
@@ -4134,6 +4384,26 @@ export interface GreenhouseFinanceInternalAccountTypeCatalog {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseFinanceKnownPayrollVendors {
+  active: Generated<boolean>;
+  created_at: Generated<Timestamp>;
+  display_name: string;
+  match_regex: string;
+  updated_at: Generated<Timestamp>;
+  vendor_id: string;
+  vendor_type: Generated<string>;
+}
+
+export interface GreenhouseFinanceKnownRegulators {
+  active: Generated<boolean>;
+  created_at: Generated<Timestamp>;
+  display_name: string;
+  jurisdiction: Generated<string>;
+  match_regex: string;
+  regulator_id: string;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseFinanceLoanAccounts {
   created_at: Generated<Timestamp>;
   currency: Generated<string>;
@@ -4184,6 +4454,126 @@ export interface GreenhouseFinancePaymentInstrumentAdminAuditLog {
   reason: string | null;
   request_id: string | null;
   space_id: string | null;
+}
+
+export interface GreenhouseFinancePaymentObligations {
+  amount: Numeric;
+  beneficiary_id: string;
+  beneficiary_name: string | null;
+  beneficiary_type: string;
+  cancelled_reason: string | null;
+  created_at: Generated<Timestamp>;
+  currency: string;
+  due_date: Timestamp | null;
+  metadata_json: Generated<Json>;
+  obligation_id: string;
+  /**
+   * employee_net_pay = neto al colaborador; employer_social_security = aporte previsional consolidado; employee_withheld_component = retencion entregada al estado (SII); provider_payroll = placeholder Deel/EOR; processor_fee = costo plataforma de pago; fx_component = costo cambiario; manual = entrada manual.
+   */
+  obligation_kind: string;
+  period_id: string | null;
+  /**
+   * payroll = generado desde payroll_period.exported; supplier_invoice = factura proveedor; tax_obligation = SII u otra autoridad; manual = entrada humana; reliquidation_delta = TASK-409 reliquidacion v2 vs v1.
+   */
+  source_kind: string;
+  source_ref: string;
+  space_id: string | null;
+  status: Generated<string>;
+  superseded_by: string | null;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseFinancePaymentOrderArtifacts {
+  artifact_id: string;
+  artifact_kind: string;
+  asset_id: string | null;
+  byte_size: Int8 | null;
+  content_hash: string | null;
+  content_hash_algorithm: Generated<string>;
+  download_log_json: Generated<Json>;
+  file_name: string | null;
+  generated_at: Generated<Timestamp>;
+  generated_by: string | null;
+  metadata_json: Generated<Json>;
+  mime_type: string | null;
+  order_id: string;
+}
+
+export interface GreenhouseFinancePaymentOrderLines {
+  amount: Numeric;
+  beneficiary_id: string;
+  beneficiary_name: string | null;
+  beneficiary_type: string;
+  created_at: Generated<Timestamp>;
+  currency: string;
+  /**
+   * TASK-751 - Link reverse al expense_payment generado al ejecutar la order. Permite queries fast desde la order al ledger sin join via metadata. ON DELETE SET NULL: cancelar la line no borra el payment.
+   */
+  expense_payment_id: string | null;
+  failure_reason: string | null;
+  /**
+   * TRUE cuando amount < obligation.amount. La diff queda como residual.
+   */
+  is_partial: Generated<boolean>;
+  line_id: string;
+  metadata_json: Generated<Json>;
+  obligation_id: string;
+  obligation_kind: string;
+  order_id: string;
+  state: Generated<string>;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseFinancePaymentOrders {
+  approved_at: Timestamp | null;
+  approved_by: string | null;
+  /**
+   * payroll = nomina periodo; supplier = facturas proveedor; tax = SII/Previred; mixed = combinada; manual = ad-hoc.
+   */
+  batch_kind: string;
+  cancelled_at: Timestamp | null;
+  cancelled_by: string | null;
+  cancelled_reason: string | null;
+  created_at: Generated<Timestamp>;
+  created_by: string;
+  currency: string;
+  description: string | null;
+  due_date: Timestamp | null;
+  external_reference: string | null;
+  external_status: string | null;
+  failure_reason: string | null;
+  fx_locked_at: Timestamp | null;
+  fx_rate_snapshot: Numeric | null;
+  metadata_json: Generated<Json>;
+  order_id: string;
+  paid_at: Timestamp | null;
+  payment_method: string | null;
+  period_id: string | null;
+  processor_slug: string | null;
+  require_approval: Generated<boolean>;
+  scheduled_for: Timestamp | null;
+  source_account_id: string | null;
+  space_id: string | null;
+  /**
+   * draft = creando; pending_approval = espera maker-checker; approved = aprobada inmutable; scheduled = lista en calendario; submitted = enviada a banco/processor; paid = ejecutada; settled = conciliada; closed = cerrada audit; failed = error submission; cancelled = revertida.
+   */
+  state: Generated<string>;
+  submitted_at: Timestamp | null;
+  superseded_by: string | null;
+  title: string;
+  total_amount: Numeric;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseFinancePaymentOrderStateTransitions {
+  actor_user_id: string | null;
+  from_state: string;
+  metadata_json: Generated<Json>;
+  occurred_at: Generated<Timestamp>;
+  order_id: string;
+  reason: string | null;
+  to_state: string;
+  transition_id: string;
 }
 
 export interface GreenhouseFinancePaymentProviderCatalog {
@@ -5139,6 +5529,38 @@ export interface GreenhousePayrollCompensationVersions {
   version_id: string;
 }
 
+export interface GreenhousePayrollPayrollAdjustments {
+  adjustment_id: string;
+  approved_at: Timestamp | null;
+  approved_by: string | null;
+  created_at: Generated<Timestamp>;
+  effective_at: Generated<Timestamp>;
+  /**
+   * exclude=skip from calc; gross_factor=multiply natural gross by payload.factor; gross_factor_per_component=per-line factor map; fixed_deduction=subtract payload.amount from net; manual_override=force payload.netClp final.
+   */
+  kind: string;
+  member_id: string;
+  payload: Generated<Json>;
+  payroll_entry_id: string;
+  period_id: string;
+  reason_code: string;
+  reason_note: string;
+  requested_at: Generated<Timestamp>;
+  requested_by: string;
+  reverted_at: Timestamp | null;
+  reverted_by: string | null;
+  reverted_reason: string | null;
+  /**
+   * manual=human; recurring_schedule=auto from TASK-746 schedule; finance_event=triggered by finance projection; reliquidation_clone=cloned from v1 entry on reopen.
+   */
+  source_kind: Generated<string>;
+  source_ref: string | null;
+  status: Generated<string>;
+  superseded_by: string | null;
+  updated_at: Generated<Timestamp>;
+  version: Generated<number>;
+}
+
 export interface GreenhousePayrollPayrollBonusConfig {
   config_id: string;
   created_at: Generated<Timestamp>;
@@ -5189,6 +5611,7 @@ export interface GreenhousePayrollPayrollEntries {
   chile_unemployment_rate: Numeric | null;
   colacion_amount: Generated<Numeric>;
   compensation_version_id: string;
+  contract_type_snapshot: string | null;
   created_at: Generated<Timestamp>;
   currency: string;
   days_absent: number | null;
@@ -5297,6 +5720,10 @@ export interface GreenhousePayrollPayrollPeriods {
 export interface GreenhousePayrollPayrollReceipts {
   asset_id: string | null;
   created_at: Generated<Timestamp>;
+  /**
+   * TASK-759 — which lifecycle event triggered the email send. NULL = PDF generated but not yet emailed.
+   */
+  delivery_trigger: string | null;
   email_delivery_id: string | null;
   email_error: string | null;
   email_recipient: string | null;
@@ -5308,6 +5735,10 @@ export interface GreenhousePayrollPayrollReceipts {
   generation_error: string | null;
   member_id: string;
   pay_regime: string;
+  /**
+   * TASK-759 — when delivery_trigger = payment_paid, links to the payment_order_line that triggered the send. NULL otherwise.
+   */
+  payment_order_line_id: string | null;
   period_id: string;
   receipt_id: string;
   revision: Generated<number>;
@@ -5319,6 +5750,38 @@ export interface GreenhousePayrollPayrollReceipts {
    * PDF template version that generated this receipt. NULL = pre-versioning (stale). Compared against RECEIPT_TEMPLATE_VERSION at serve time; mismatch triggers lazy regeneration.
    */
   template_version: string | null;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhousePayrollPayslipDeliveries {
+  created_at: Generated<Timestamp>;
+  delivery_id: string;
+  /**
+   * Tipo de comunicación: period_exported (legacy), payment_committed (759b), payment_paid (759 V1), payment_cancelled (759c), payment_revised (759c future), manual_resend.
+   */
+  delivery_kind: string;
+  email_provider_id: string | null;
+  email_recipient: string | null;
+  email_subject: string | null;
+  entry_id: string;
+  error_message: string | null;
+  failed_at: Timestamp | null;
+  member_id: string;
+  metadata_json: Generated<Json>;
+  payment_order_id: string | null;
+  payment_order_line_id: string | null;
+  period_id: string;
+  receipt_id: string;
+  scheduled_for: Timestamp | null;
+  sent_at: Timestamp | null;
+  source_event_id: string | null;
+  status: string;
+  /**
+   * Si esta delivery fue reemplazada por un revised/cancelled posterior, FK a la nueva. NULL = activa. Audit chain preservado.
+   */
+  superseded_by: string | null;
+  template_version: string | null;
+  triggered_by_user_id: string | null;
   updated_at: Generated<Timestamp>;
 }
 
@@ -5399,6 +5862,49 @@ export interface GreenhouseServingAgencyPerformanceReports {
   top_performer_throughput_count: number | null;
   total_tasks: number | null;
   trend_stable_band_pp: Numeric | null;
+}
+
+export interface GreenhouseServingAuthAttempts {
+  attempt_id: string;
+  attempted_at: Generated<Timestamp>;
+  /**
+   * First 2 characters of local part + domain. Example: ja***@efeoncepro.com
+   */
+  email_redacted: string | null;
+  ip_hashed: string | null;
+  /**
+   * First 4 + ellipsis + last 4 characters of the Azure AD object ID. Never the raw OID.
+   */
+  microsoft_oid_redacted: string | null;
+  microsoft_tenant_id: string | null;
+  outcome: string;
+  provider: string;
+  /**
+   * Stable enum: success, invalid_password, tenant_not_found, account_disabled, account_inactive, account_status_invalid, oid_mismatch, email_alias_mismatch, callback_exception, pg_lookup_failed, bigquery_fallback_failed, magic_link_expired, magic_link_used, magic_link_invalid, unknown
+   */
+  reason_code: string;
+  reason_redacted: string | null;
+  request_id: string | null;
+  stage: string;
+  user_agent_hash: string | null;
+  user_id_resolved: string | null;
+}
+
+export interface GreenhouseServingAuthMagicLinks {
+  expires_at: Timestamp;
+  requested_at: Generated<Timestamp>;
+  /**
+   * sha256(ip)[:32] for IP-level rate limiting and audit. Never the raw IP.
+   */
+  requested_ip_hashed: string | null;
+  /**
+   * bcrypt hash of the raw URL-safe random 32-byte token. Cost factor 10. Never the raw token.
+   */
+  token_hash_bcrypt: string;
+  token_id: string;
+  used_at: Timestamp | null;
+  used_ip_hashed: string | null;
+  user_id: string;
 }
 
 export interface GreenhouseServingClient360 {
@@ -7028,11 +7534,27 @@ export interface GreenhouseSyncNotionSyncOrchestrationRuns {
 export interface GreenhouseSyncOutboxEvents {
   aggregate_id: string;
   aggregate_type: string;
+  /**
+   * TASK-773 — timestamp del dead-letter routing. NULL excepto cuando status=dead_letter.
+   */
+  dead_letter_at: Timestamp | null;
   event_id: string;
   event_type: string;
+  /**
+   * TASK-773 — ultimo error sanitizado del intento de publish (BQ insert error). Usar redactErrorForResponse antes de persistir.
+   */
+  last_publish_error: string | null;
   occurred_at: Generated<Timestamp>;
   payload_json: Generated<Json>;
   published_at: Timestamp | null;
+  /**
+   * TASK-773 — contador de intentos de publish a BQ raw. Incrementa en cada failed; >= 5 dispara dead_letter.
+   */
+  published_attempts: Generated<number>;
+  /**
+   * TASK-773 — timestamp del SELECT FOR UPDATE del worker. NULL excepto cuando status=publishing.
+   */
+  publishing_started_at: Timestamp | null;
   status: Generated<string>;
 }
 
@@ -7351,6 +7873,8 @@ export interface Pgmigrations {
 }
 
 export interface DB {
+  "greenhouse_ai.cloud_cost_ai_observations": GreenhouseAiCloudCostAiObservations;
+  "greenhouse_ai.cloud_cost_alert_dispatches": GreenhouseAiCloudCostAlertDispatches;
   "greenhouse_ai.credit_ledger": GreenhouseAiCreditLedger;
   "greenhouse_ai.credit_wallets": GreenhouseAiCreditWallets;
   "greenhouse_ai.member_tool_licenses": GreenhouseAiMemberToolLicenses;
@@ -7511,14 +8035,22 @@ export interface DB {
   "greenhouse_finance.account_signal_matching_rules": GreenhouseFinanceAccountSignalMatchingRules;
   "greenhouse_finance.accounts": GreenhouseFinanceAccounts;
   "greenhouse_finance.bank_statement_rows": GreenhouseFinanceBankStatementRows;
+  "greenhouse_finance.beneficiary_payment_profile_audit_log": GreenhouseFinanceBeneficiaryPaymentProfileAuditLog;
+  "greenhouse_finance.beneficiary_payment_profiles": GreenhouseFinanceBeneficiaryPaymentProfiles;
   "greenhouse_finance.client_economics": GreenhouseFinanceClientEconomics;
   "greenhouse_finance.client_profiles": GreenhouseFinanceClientProfiles;
   "greenhouse_finance.cost_allocations": GreenhouseFinanceCostAllocations;
+  "greenhouse_finance.economic_category_manual_queue": GreenhouseFinanceEconomicCategoryManualQueue;
+  "greenhouse_finance.economic_category_resolution_log": GreenhouseFinanceEconomicCategoryResolutionLog;
   "greenhouse_finance.economic_indicators": GreenhouseFinanceEconomicIndicators;
   "greenhouse_finance.exchange_rates": GreenhouseFinanceExchangeRates;
   "greenhouse_finance.expense_attribution_audit": GreenhouseFinanceExpenseAttributionAudit;
   "greenhouse_finance.expense_attribution_rules": GreenhouseFinanceExpenseAttributionRules;
+  "greenhouse_finance.expense_distribution_ai_suggestions": GreenhouseFinanceExpenseDistributionAiSuggestions;
+  "greenhouse_finance.expense_distribution_policy": GreenhouseFinanceExpenseDistributionPolicy;
+  "greenhouse_finance.expense_distribution_resolution": GreenhouseFinanceExpenseDistributionResolution;
   "greenhouse_finance.expense_payments": GreenhouseFinanceExpensePayments;
+  "greenhouse_finance.expense_payments_normalized": GreenhouseFinanceExpensePaymentsNormalized;
   "greenhouse_finance.expenses": GreenhouseFinanceExpenses;
   "greenhouse_finance.external_cash_signals": GreenhouseFinanceExternalCashSignals;
   "greenhouse_finance.external_signal_auto_adopt_policies": GreenhouseFinanceExternalSignalAutoAdoptPolicies;
@@ -7529,13 +8061,21 @@ export interface DB {
   "greenhouse_finance.income": GreenhouseFinanceIncome;
   "greenhouse_finance.income_line_items": GreenhouseFinanceIncomeLineItems;
   "greenhouse_finance.income_payments": GreenhouseFinanceIncomePayments;
+  "greenhouse_finance.income_payments_normalized": GreenhouseFinanceIncomePaymentsNormalized;
   "greenhouse_finance.income_settlement_reconciliation": GreenhouseFinanceIncomeSettlementReconciliation;
   "greenhouse_finance.instrument_category_kpi_rules": GreenhouseFinanceInstrumentCategoryKpiRules;
   "greenhouse_finance.instrument_category_provider_rules": GreenhouseFinanceInstrumentCategoryProviderRules;
   "greenhouse_finance.internal_account_type_catalog": GreenhouseFinanceInternalAccountTypeCatalog;
+  "greenhouse_finance.known_payroll_vendors": GreenhouseFinanceKnownPayrollVendors;
+  "greenhouse_finance.known_regulators": GreenhouseFinanceKnownRegulators;
   "greenhouse_finance.loan_accounts": GreenhouseFinanceLoanAccounts;
   "greenhouse_finance.nubox_emission_log": GreenhouseFinanceNuboxEmissionLog;
   "greenhouse_finance.payment_instrument_admin_audit_log": GreenhouseFinancePaymentInstrumentAdminAuditLog;
+  "greenhouse_finance.payment_obligations": GreenhouseFinancePaymentObligations;
+  "greenhouse_finance.payment_order_artifacts": GreenhouseFinancePaymentOrderArtifacts;
+  "greenhouse_finance.payment_order_lines": GreenhouseFinancePaymentOrderLines;
+  "greenhouse_finance.payment_order_state_transitions": GreenhouseFinancePaymentOrderStateTransitions;
+  "greenhouse_finance.payment_orders": GreenhouseFinancePaymentOrders;
   "greenhouse_finance.payment_provider_catalog": GreenhouseFinancePaymentProviderCatalog;
   "greenhouse_finance.products": GreenhouseFinanceProducts;
   "greenhouse_finance.purchase_orders": GreenhouseFinancePurchaseOrders;
@@ -7582,16 +8122,20 @@ export interface DB {
   "greenhouse_payroll.chile_previred_indicators": GreenhousePayrollChilePreviredIndicators;
   "greenhouse_payroll.chile_tax_brackets": GreenhousePayrollChileTaxBrackets;
   "greenhouse_payroll.compensation_versions": GreenhousePayrollCompensationVersions;
+  "greenhouse_payroll.payroll_adjustments": GreenhousePayrollPayrollAdjustments;
   "greenhouse_payroll.payroll_bonus_config": GreenhousePayrollPayrollBonusConfig;
   "greenhouse_payroll.payroll_entries": GreenhousePayrollPayrollEntries;
   "greenhouse_payroll.payroll_export_packages": GreenhousePayrollPayrollExportPackages;
   "greenhouse_payroll.payroll_period_reopen_audit": GreenhousePayrollPayrollPeriodReopenAudit;
   "greenhouse_payroll.payroll_periods": GreenhousePayrollPayrollPeriods;
   "greenhouse_payroll.payroll_receipts": GreenhousePayrollPayrollReceipts;
+  "greenhouse_payroll.payslip_deliveries": GreenhousePayrollPayslipDeliveries;
   "greenhouse_payroll.previred_afp_rates": GreenhousePayrollPreviredAfpRates;
   "greenhouse_payroll.previred_period_indicators": GreenhousePayrollPreviredPeriodIndicators;
   "greenhouse_payroll.projected_payroll_promotions": GreenhousePayrollProjectedPayrollPromotions;
   "greenhouse_serving.agency_performance_reports": GreenhouseServingAgencyPerformanceReports;
+  "greenhouse_serving.auth_attempts": GreenhouseServingAuthAttempts;
+  "greenhouse_serving.auth_magic_links": GreenhouseServingAuthMagicLinks;
   "greenhouse_serving.client_360": GreenhouseServingClient360;
   "greenhouse_serving.client_capability_360": GreenhouseServingClientCapability360;
   "greenhouse_serving.client_labor_cost_allocation": GreenhouseServingClientLaborCostAllocation;

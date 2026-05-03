@@ -10,6 +10,7 @@ import { getCloudObservabilityPosture, getCloudSentryIncidents } from '@/lib/clo
 import { getCloudPostgresPosture } from '@/lib/cloud/postgres'
 import { readAiLlmOperationsSnapshot } from '@/lib/ico-engine/ai/llm-enrichment-reader'
 import { getNotionDeliveryDataQualityOverview } from '@/lib/integrations/notion-delivery-data-quality'
+import { getEffectiveLatestNotionSyncAt } from '@/lib/integrations/notion-sync-freshness'
 import { countIncomesWithSettlementDrift } from '@/lib/finance/income-settlement'
 import { getFinanceLedgerHealth } from '@/lib/finance/ledger-health'
 import {
@@ -755,11 +756,7 @@ export const getOperationsOverview = async (): Promise<OperationsOverview> => {
     safeCount(`SELECT COUNT(*) AS cnt FROM greenhouse_notifications.notifications`),
     safeCount(`SELECT COUNT(*) AS cnt FROM greenhouse_notifications.notifications WHERE status = 'failed'`),
 
-    runGreenhousePostgresQuery<Record<string, unknown> & { last_sync: string | null }>(
-      `SELECT MAX(last_synced_at)::text AS last_sync FROM greenhouse_core.space_notion_sources WHERE sync_enabled = TRUE`
-    )
-      .then(rows => rows[0]?.last_sync ?? null)
-      .catch(() => null),
+    getEffectiveLatestNotionSyncAt().catch(() => null),
 
     runGreenhousePostgresQuery<Record<string, unknown> & { last_sync: string | null }>(
       `SELECT MAX(hubspot_last_synced_at)::text AS last_sync FROM greenhouse_core.services`

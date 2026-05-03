@@ -7,6 +7,8 @@ const mockResolveAutoAllocation = vi.fn()
 const mockEnsureOrganizationForClient = vi.fn()
 
 vi.mock('@/lib/postgres/client', () => ({
+  onGreenhousePostgresReset: () => () => {},
+  isGreenhousePostgresRetryableConnectionError: () => false,
   runGreenhousePostgresQuery: (...args: unknown[]) => mockRunGreenhousePostgresQuery(...args),
   withGreenhousePostgresTransaction: (...args: unknown[]) => mockWithGreenhousePostgresTransaction(...args),
   isGreenhousePostgresConfigured: () => mockIsGreenhousePostgresConfigured()
@@ -431,11 +433,17 @@ describe('createFinanceIncomeInPostgres', () => {
     expect(result.incomeId).toBe('INC-202603-001')
     expect(result.clientName).toBe('Acme Corp')
 
-    // client.query called twice: INSERT income + INSERT outbox event
-    expect(mockClientQuery).toHaveBeenCalledTimes(2)
-    const firstCall = mockClientQuery.mock.calls[0]?.[0] as string
+    // TASK-768: client.query called 3 times:
+    //   1. INSERT economic_category_resolution_log (resolver write-time)
+    //   2. INSERT income
+    //   3. INSERT outbox event
+    expect(mockClientQuery).toHaveBeenCalledTimes(3)
 
-    expect(firstCall).toContain('INSERT INTO greenhouse_finance.income')
+    // Verify INSERT income is among the calls (no longer first due to resolver)
+    const calls = mockClientQuery.mock.calls.map(c => c[0] as string)
+
+    expect(calls.some(s => s.includes('INSERT INTO greenhouse_finance.income (\n'))).toBe(true)
+    expect(calls.some(s => s.includes('economic_category_resolution_log'))).toBe(true)
   })
 })
 
@@ -487,9 +495,14 @@ describe('createFinanceExpenseInPostgres', () => {
 
     expect(mockWithGreenhousePostgresTransaction).toHaveBeenCalledTimes(1)
     expect(result.expenseId).toBe('EXP-202603-001')
-    const insertQuery = mockClientQuery.mock.calls[0]?.[0] as string
 
-    expect(insertQuery).toContain('INSERT INTO greenhouse_finance.expenses')
+    // TASK-768: resolver canónico ejecuta antes del INSERT principal.
+    // El INSERT a expenses ya no es el primer query. Verificamos que está
+    // en la lista de queries ejecutadas.
+    const queries = mockClientQuery.mock.calls.map(c => c[0] as string)
+
+    expect(queries.some(s => /INSERT INTO greenhouse_finance\.expenses/.test(s))).toBe(true)
+    expect(queries.some(s => s.includes('economic_category_resolution_log'))).toBe(true)
   })
 
   it('uses provided external client directly without calling withGreenhousePostgresTransaction', async () => {

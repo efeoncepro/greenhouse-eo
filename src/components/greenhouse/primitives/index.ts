@@ -18,3 +18,5 @@ export type {
   TotalsLadderCurrency,
   TotalsLadderProps
 } from './TotalsLadder'
+export { default as InlineNumericEditor } from './InlineNumericEditor'
+export type { InlineNumericEditorProps, InlineNumericEditorCurrency } from './InlineNumericEditor'

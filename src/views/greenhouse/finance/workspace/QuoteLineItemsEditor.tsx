@@ -37,6 +37,7 @@ import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 
 import EmptyState from '@/components/greenhouse/EmptyState'
+import { DataTableShell } from '@/components/greenhouse/data-table'
 import { useListAnimation } from '@/hooks/useListAnimation'
 import type {
   PricingLineOutputV2,
@@ -566,7 +567,7 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
             </Typography>
           </CardContent>
         ) : (
-          <Box sx={{ overflowX: 'auto' }}>
+          <DataTableShell identifier='quote-line-items-summary' ariaLabel='Resumen de lineas del quote'>
             <Table size='small'>
               <TableHead>
                 <TableRow>
@@ -635,7 +636,7 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
                 })}
               </TableBody>
             </Table>
-          </Box>
+          </DataTableShell>
         )}
       </Card>
     )
@@ -805,10 +806,10 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
           />
         </CardContent>
       ) : (
-        <Box
-          sx={{
-            overflowX: 'auto',
-
+        <DataTableShell
+          identifier='quote-line-items-editor'
+          ariaLabel='Editor de lineas del quote'
+          containerSx={{
             // Density post-TASK-508: reduce padding vertical de body cells
             // para llegar a ~48px por row (target enterprise Linear/Notion).
             '& .MuiTableBody-root .MuiTableCell-root': { py: 0.75 },
@@ -1213,7 +1214,7 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
               })}
             </TableBody>
           </Table>
-        </Box>
+        </DataTableShell>
       )}
 
       {globalWarnings.length > 0 ? (

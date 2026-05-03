@@ -77,7 +77,7 @@ const DetailRow = ({ label, value, mono }: { label: string; value: string | null
       sx={{
         textAlign: 'right',
         wordBreak: 'break-all',
-        ...(mono ? { fontFamily: 'monospace', fontSize: '0.8rem' } : {})
+        ...(mono ? { fontSize: '0.8rem' } : {})
       }}
     >
       {value || '—'}
@@ -148,7 +148,7 @@ const EmailDeliveryDetailDrawer = ({ open, delivery, onClose, onRetry }: Props) 
                 borderLeft: theme => `4px solid ${theme.palette.error.main}`
               }}
             >
-              <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8rem', wordBreak: 'break-all' }}>
+              <Typography variant='body2' sx={{ fontSize: '0.8rem', wordBreak: 'break-all' }}>
                 {delivery.errorMessage}
               </Typography>
             </Card>

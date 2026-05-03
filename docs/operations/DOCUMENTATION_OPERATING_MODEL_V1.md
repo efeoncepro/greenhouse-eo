@@ -6,6 +6,8 @@ Reducir duplicacion documental sin perder continuidad, trazabilidad ni contexto 
 ## Regla base
 Cada cambio debe documentarse, pero no cada documento debe repetir la historia completa.
 
+La calidad de solucion no debe duplicarse en cada spec. La fuente canonica transversal es `docs/operations/SOLUTION_QUALITY_OPERATING_MODEL_V1.md`: soluciones seguras, robustas, resilientes y escalables por defecto; workarounds solo temporales, reversibles y documentados.
+
 ## Layout del repo
 
 ### 1. Raiz operativa
@@ -44,6 +46,7 @@ Cada cambio debe documentarse, pero no cada documento debe repetir la historia c
 - `project_context.md`
 - Aqui vive el estado actual del repo, stack, rutas, librerias activas, deploy y restricciones.
 - Debe responder: que existe hoy, que se usa hoy, que sigue pendiente hoy.
+- La especializacion canonica para `project_context.md` + `Handoff.md` + `Handoff.archive.md` vive en `docs/operations/CONTEXT_HANDOFF_OPERATING_MODEL_V1.md`.
 
 ### 3. Continuidad de turno
 - `Handoff.md`
@@ -54,6 +57,7 @@ Cada cambio debe documentarse, pero no cada documento debe repetir la historia c
   - riesgos o pendientes
 - Formato corto. No duplicar arquitectura.
 - Si hace falta conservar historia detallada, moverla a `Handoff.archive.md` y dejar en `Handoff.md` solo el estado activo.
+- No borrar historia auditable para reducir tamano: preservar en `Handoff.archive.md`, task complete, issue resuelto o doc canonica, y dejar puntero corto cuando siga siendo relevante.
 
 ### 4. Registro de cambios
 - `changelog.md`
@@ -65,6 +69,12 @@ Cada cambio debe documentarse, pero no cada documento debe repetir la historia c
   - `docs/ui/GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md`
   - `docs/ui/SKY_TENANT_EXECUTIVE_SLICE_V1.md`
 - Deben contener contrato y decisiones de su dominio, no repetir contexto general del repo.
+
+### 5.0. Calidad de solucion transversal
+- `docs/operations/SOLUTION_QUALITY_OPERATING_MODEL_V1.md`
+- Aqui vive la regla anti-parche para todos los agentes y dominios.
+- Otros documentos deben enlazar esta fuente cuando necesiten reforzar el criterio, no copiar definiciones largas.
+- Si un dominio necesita criterios adicionales, debe extender esta regla con constraints especificos sin rebajar el baseline.
 
 ### 5.1. Auditorias tecnicas y operativas
 - `docs/audits/`

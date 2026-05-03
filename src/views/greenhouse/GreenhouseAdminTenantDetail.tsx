@@ -119,12 +119,12 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
         <Typography variant='overline' color='text.secondary'>Identificadores</Typography>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
           <i className='tabler-fingerprint' style={{ fontSize: 16, color: 'var(--mui-palette-text-secondary)' }} />
-          <Typography variant='body2' sx={{ fontFamily: 'monospace', fontWeight: 600 }}>{data.publicId}</Typography>
+          <Typography variant='body2' sx={{ fontWeight: 600 }}>{data.publicId}</Typography>
         </Box>
         {data.hubspotCompanyId && (
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
             <Box component='img' src='/images/integrations/hubspot.svg' alt='HubSpot' sx={{ width: 16, height: 16, objectFit: 'contain' }} />
-            <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
+            <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>
               HubSpot: {data.hubspotCompanyId}
             </Typography>
           </Box>

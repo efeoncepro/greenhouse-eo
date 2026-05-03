@@ -5,11 +5,14 @@ import LeaveRequestDecisionEmail from '@/emails/LeaveRequestDecisionEmail'
 import LeaveRequestPendingReviewEmail from '@/emails/LeaveRequestPendingReviewEmail'
 import LeaveRequestSubmittedEmail from '@/emails/LeaveRequestSubmittedEmail'
 import LeaveReviewConfirmationEmail from '@/emails/LeaveReviewConfirmationEmail'
+import MagicLinkEmail from '@/emails/MagicLinkEmail'
 import NotificationEmail from '@/emails/NotificationEmail'
 import PasswordResetEmail from '@/emails/PasswordResetEmail'
 import PayrollExportReadyEmail, { type CurrencyBreakdown } from '@/emails/PayrollExportReadyEmail'
 import PayrollLiquidacionV2Email from '@/emails/PayrollLiquidacionV2Email'
 import PayrollReceiptEmail from '@/emails/PayrollReceiptEmail'
+import PayrollPaymentCommittedEmail from '@/emails/PayrollPaymentCommittedEmail'
+import PayrollPaymentCancelledEmail from '@/emails/PayrollPaymentCancelledEmail'
 import QuoteSharePromptEmail from '@/emails/QuoteSharePromptEmail'
 import WeeklyExecutiveDigestEmail from '@/emails/WeeklyExecutiveDigestEmail'
 import VerifyEmail from '@/emails/VerifyEmail'
@@ -251,6 +254,32 @@ registerTemplate('password_reset', (context: {
   }
 })
 
+// TASK-742 Capa 5 \u2014 Magic-link self-recovery
+registerTemplate('magic_link', (context: {
+  magicLinkUrl: string
+  userName?: string
+  locale?: 'es' | 'en'
+  expiresInMinutes?: number
+}) => {
+  const locale = context.locale || 'es'
+  const minutes = context.expiresInMinutes ?? 15
+
+  return {
+    subject: locale === 'en'
+      ? `Sign in to Greenhouse \u2014 link valid ${minutes} min`
+      : `Acceso a Greenhouse \u2014 enlace v\u00e1lido ${minutes} min`,
+    react: MagicLinkEmail({
+      magicLinkUrl: context.magicLinkUrl,
+      userName: context.userName,
+      locale,
+      expiresInMinutes: minutes
+    }),
+    text: locale === 'en'
+      ? [`Sign in to Greenhouse. Valid ${minutes} minutes.`, '', `Link: ${context.magicLinkUrl}`].join('\n')
+      : [`Entra a Greenhouse. V\u00e1lido por ${minutes} minutos.`, '', `Enlace: ${context.magicLinkUrl}`].join('\n')
+  }
+})
+
 registerTemplate('invitation', (context: {
   inviteUrl: string
   inviterName: string
@@ -370,6 +399,62 @@ registerTemplate('payroll_receipt', (context: {
     content: context.pdfBuffer,
     contentType: 'application/pdf'
   }]
+}))
+
+// TASK-759b — Promesa pre-pago (sin PDF)
+registerTemplate('payroll_payment_committed', (context: {
+  fullName: string
+  periodYear: number
+  periodMonth: number
+  entryCurrency: 'CLP' | 'USD'
+  netTotal: number
+  payRegime: 'chile' | 'international'
+  scheduledFor: string | null
+  processorLabel: string | null
+}) => ({
+  subject: context.payRegime === 'chile'
+    ? `Tu pago de ${MONTH_NAMES[context.periodMonth - 1] ?? String(context.periodMonth)} ${context.periodYear} está programado`
+    : `Your ${MONTH_NAMES[context.periodMonth - 1] ?? String(context.periodMonth)} ${context.periodYear} payment is scheduled`,
+  react: PayrollPaymentCommittedEmail({
+    fullName: context.fullName,
+    periodYear: context.periodYear,
+    periodMonth: context.periodMonth,
+    entryCurrency: context.entryCurrency,
+    netTotal: context.netTotal,
+    payRegime: context.payRegime,
+    scheduledFor: context.scheduledFor,
+    processorLabel: context.processorLabel
+  }),
+  text: context.payRegime === 'chile'
+    ? `Hola ${context.fullName.split(' ')[0]}, tu pago de ${MONTH_NAMES[context.periodMonth - 1]} ${context.periodYear} (${formatMoney(context.netTotal, context.entryCurrency)}) fue aprobado y está programado. Te enviaremos el recibo apenas se ejecute.`
+    : `Hi ${context.fullName.split(' ')[0]}, your ${MONTH_NAMES[context.periodMonth - 1]} ${context.periodYear} payment (${formatMoney(context.netTotal, context.entryCurrency)}) has been approved and is scheduled. We will send the receipt once executed.`
+}))
+
+// TASK-759c — Compensación cancelación (sin PDF)
+registerTemplate('payroll_payment_cancelled', (context: {
+  fullName: string
+  periodYear: number
+  periodMonth: number
+  entryCurrency: 'CLP' | 'USD'
+  netTotal: number
+  payRegime: 'chile' | 'international'
+  cancellationReason: string | null
+}) => ({
+  subject: context.payRegime === 'chile'
+    ? `Actualización sobre tu pago de ${MONTH_NAMES[context.periodMonth - 1] ?? String(context.periodMonth)} ${context.periodYear}`
+    : `Update on your ${MONTH_NAMES[context.periodMonth - 1] ?? String(context.periodMonth)} ${context.periodYear} payment`,
+  react: PayrollPaymentCancelledEmail({
+    fullName: context.fullName,
+    periodYear: context.periodYear,
+    periodMonth: context.periodMonth,
+    entryCurrency: context.entryCurrency,
+    netTotal: context.netTotal,
+    payRegime: context.payRegime,
+    cancellationReason: context.cancellationReason
+  }),
+  text: context.payRegime === 'chile'
+    ? `Hola ${context.fullName.split(' ')[0]}, detectamos un problema con el pago programado de ${MONTH_NAMES[context.periodMonth - 1]} ${context.periodYear} (${formatMoney(context.netTotal, context.entryCurrency)}). Lo estamos resolviendo.`
+    : `Hi ${context.fullName.split(' ')[0]}, we detected an issue with the scheduled payment for ${MONTH_NAMES[context.periodMonth - 1]} ${context.periodYear} (${formatMoney(context.netTotal, context.entryCurrency)}). We are resolving it.`
 }))
 
 registerTemplate('payroll_liquidacion_v2', (context: {

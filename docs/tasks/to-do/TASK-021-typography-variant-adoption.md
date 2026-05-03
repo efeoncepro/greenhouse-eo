@@ -1,5 +1,21 @@
 # CODEX TASK — Typography Variant Adoption: Migración de fontWeight/fontFamily hardcodeados a theme variants
 
+## Delta 2026-05-02 — supersedida parcialmente por TASK-567 (EPIC-004)
+
+El barrido de `fontFamily` hardcodeada en UI productiva fue ejecutado por **TASK-567** (Slices 2-3) bajo el contrato Geist + Poppins (post TASK-566 pivot). Ese trabajo:
+
+- Eliminó 300 occurrences de `fontFamily: 'monospace'`/`'Poppins'`/composite mono stacks vía codemod conservador (262 + 38 reemplazos automáticos en 135 archivos)
+- 6 casos especiales resueltos manualmente (InputProps.sx anidado, ternarios, NexaThread `<code>` con eslint-disable justificado)
+- Activó la regla `greenhouse/no-hardcoded-fontfamily` en modo `error` para bloquear regresiones desde CI
+- Excluye legítimamente: `src/components/theme/**`, `src/@core/theme/**`, `src/app/global-error.tsx`, `src/app/public/**`, `src/emails/**`, `src/lib/finance/pdf/**`
+
+**Lo que TASK-021 sigue cubriendo** (no superado por TASK-567):
+
+- Migración de `fontWeight` hardcodeado a variants semánticos (TASK-567 explícitamente declaró fontWeight como out-of-scope; queda como follow-up si discovery posterior lo justifica)
+- Adopción opt-in de `monoId`/`monoAmount`/`kpiValue` en componentes que tras el sweep perdieron tabular-nums (TASK-567 eliminó la fontFamily redundante; TASK-021 puede subir variants donde el contexto lo amerite — IDs, montos, KPIs)
+
+Nota: las menciones a "DM Sans" en este documento son obsoletas — el contrato vigente es **Geist Sans (default) + Poppins (display)**.
+
 ## Resumen
 
 El theme MUI de Greenhouse (`mergedTheme.ts`) ya define la jerarquía tipográfica correcta — DM Sans como default, Poppins para headings/buttons/overline, y tres custom variants (`monoId`, `monoAmount`, `kpiValue`). Sin embargo, **56+ instancias** en 37 archivos siguen hardcodeando `fontWeight`, `fontFamily` o ambos en `sx` props, lo que:

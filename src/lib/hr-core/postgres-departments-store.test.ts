@@ -18,6 +18,8 @@ vi.mock('@/lib/db', () => ({
 }))
 
 vi.mock('@/lib/postgres/client', () => ({
+  onGreenhousePostgresReset: () => () => {},
+  isGreenhousePostgresRetryableConnectionError: () => false,
   isGreenhousePostgresConfigured: () => true
 }))
 

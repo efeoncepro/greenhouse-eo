@@ -3,11 +3,49 @@
 > **Tipo de documento:** Spec de arquitectura
 > **Version:** 1.0
 > **Creado:** 2026-04-26
-> **Ultima actualizacion:** 2026-04-26
+> **Ultima actualizacion:** 2026-04-30
 > **Scope:** Deep links, route references, action URLs, share links, unfurls y navegacion cross-surface de Greenhouse
 > **Docs relacionados:** `GREENHOUSE_ARCHITECTURE_V1.md`, `GREENHOUSE_IDENTITY_ACCESS_V2.md`, `GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md`, `GREENHOUSE_PORTAL_VIEWS_V1.md`, `GREENHOUSE_NOTIFICATION_HUB_V1.md`, `GREENHOUSE_TEAMS_BOT_INTERACTION_V1.md`, `GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md`
 
 ---
+
+## Delta 2026-04-30 — TASK-694 aterriza la foundation runtime inicial
+
+- Ya existe un runtime compartido en `src/lib/navigation/deep-links/**` con:
+  - `types.ts`
+  - `base-url.ts`
+  - `access.ts`
+  - `registry.ts`
+  - `resolver.ts`
+  - `definitions/*`
+- Contrato inicial materializado:
+  - referencias semánticas `kind + id + action + audience`
+  - resolución a `href`, `absoluteUrl`, `canonicalPath`, `fallbackHref` y metadata de acceso
+  - degradación segura a `status='invalid_reference'` sin throw para consumers legacy
+  - precedence explícita de base URL: override caller → `NEXTAUTH_URL` → `NEXT_PUBLIC_APP_URL` → `VERCEL_URL` → `http://localhost:3000`
+- Definitions iniciales activas:
+  - `home`
+  - `ops_health`
+  - `person`
+  - `quote`
+  - `income`
+  - `expense`
+  - `leave_request`
+  - `payroll_period`
+  - `public_quote_share`
+- Alineaciones cerradas en runtime:
+  - `payroll_period` resuelve a `/hr/payroll/periods/:periodId` y no a query string sobre `/hr/payroll`
+  - `person` usa `viewCode='equipo.personas'`
+  - `ops_health` reutiliza `platform.health.read`
+  - `home` interno sigue siendo startup-policy-first; no asume un `viewCode` único materializado
+- Consumers migrados en este corte:
+  - `src/app/api/admin/teams/test/route.ts` ahora resuelve `ops_health` vía deep links para producir `absoluteUrl`
+  - `src/lib/webhooks/consumers/notification-mapping.ts` migra selectivamente `person`, `income` y `expense`, preservando `actionUrl` legacy relativo
+- Quedan fuera de este corte:
+  - sidebar/search/home masivos
+  - Notification Hub full cutover
+  - `action_link_json` o cualquier persistencia nueva
+  - rewrite del carril público `quote-share`
 
 ## 1. Objetivo
 
@@ -17,7 +55,7 @@ La tesis es simple:
 
 > Un deep link de Greenhouse no debe ser solo una URL. Debe ser una referencia semantica a una entidad, vista o accion, resuelta por una capa canonica que conoce permisos, audiencia, ambiente, fallback y metadata de preview.
 
-Esta arquitectura no implementa la capa todavia. Define el contrato objetivo para futuras tasks.
+Esta arquitectura ya tiene una primera foundation runtime conservadora. Sigue definiendo la direccion objetivo para futuras tasks de adopcion masiva.
 
 ---
 
@@ -529,4 +567,3 @@ Hasta que esta capability exista, cualquier nuevo modulo que agregue links en no
 - capability requerida, si aplica
 - fallback cuando no hay acceso
 - si el link es relativo, absoluto, publico o short link
-

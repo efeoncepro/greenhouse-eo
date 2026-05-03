@@ -6,6 +6,8 @@ const mockRunGreenhousePostgresQuery = vi.fn()
 const mockIsGreenhousePostgresConfigured = vi.fn(() => true)
 
 vi.mock('@/lib/postgres/client', () => ({
+  onGreenhousePostgresReset: () => () => {},
+  isGreenhousePostgresRetryableConnectionError: () => false,
   isGreenhousePostgresConfigured: () => mockIsGreenhousePostgresConfigured(),
   runGreenhousePostgresQuery: (...args: unknown[]) => mockRunGreenhousePostgresQuery(...args)
 }))
@@ -63,7 +65,9 @@ describe('payroll-receipts-store schema compatibility', () => {
 
     expect(insertCall).toBeTruthy()
     expect(String(insertCall?.[0])).not.toContain('asset_id')
-    expect(insertCall?.[1]).toHaveLength(19)
+
+    // 19 base columns + 2 TASK-759 (delivery_trigger + payment_order_line_id) = 21
+    expect(insertCall?.[1]).toHaveLength(21)
     expect(insertCall?.[1]).not.toContain('asset-1')
     expect(insertCall?.[1]).toContain('greenhouse-private-assets-dev')
   })
@@ -97,7 +101,9 @@ describe('payroll-receipts-store schema compatibility', () => {
 
     expect(insertCall).toBeTruthy()
     expect(String(insertCall?.[0])).toContain('asset_id')
-    expect(insertCall?.[1]).toHaveLength(20)
+
+    // 20 base columns + 2 TASK-759 (delivery_trigger + payment_order_line_id) = 22
+    expect(insertCall?.[1]).toHaveLength(22)
     expect(insertCall?.[1]).toContain('asset-2')
   })
 

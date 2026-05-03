@@ -107,11 +107,13 @@ export const resolveChileEmployerCostAmounts = async ({
   payRegime,
   contractType,
   imponibleBase,
+  cesantiaBase,
   periodDate
 }: {
   payRegime: 'chile' | 'intl'
   contractType: 'indefinido' | 'plazo_fijo'
   imponibleBase: number
+  cesantiaBase?: number
   periodDate: string
 }): Promise<ChileEmployerCostAmounts | null> => {
   if (payRegime !== 'chile') {
@@ -120,12 +122,13 @@ export const resolveChileEmployerCostAmounts = async ({
 
   const roundCurrency = (value: number) => Math.round(value * 100) / 100
   const safeBase = Math.max(0, imponibleBase)
+  const safeCesantiaBase = Math.max(0, cesantiaBase ?? imponibleBase)
   const sisRate = await getSisRate(periodDate)
-  const cesantiaRate = contractType === 'plazo_fijo' ? 0 : 0.024
+  const { employerRate: cesantiaRate } = await getChileUnemploymentRatesForPeriod(periodDate, contractType)
   const mutualRate = 0.0093
 
   const sisAmount = roundCurrency(safeBase * sisRate)
-  const cesantiaAmount = roundCurrency(safeBase * cesantiaRate)
+  const cesantiaAmount = roundCurrency(safeCesantiaBase * cesantiaRate)
   const mutualAmount = roundCurrency(safeBase * mutualRate)
 
   return {
@@ -217,16 +220,17 @@ const getPreviredIndicatorsRowForPeriod = async ({
   return runGreenhousePostgresQuery<ChilePreviredIndicatorRow>(
     `
       SELECT
-        period_year,
-        period_month,
-        imm_clp,
+        EXTRACT(YEAR FROM indicator_date)::integer AS period_year,
+        EXTRACT(MONTH FROM indicator_date)::integer AS period_month,
+        imm_value AS imm_clp,
         sis_rate,
-        tope_afp_uf,
-        tope_cesantia_uf,
+        afp_top_unf AS tope_afp_uf,
+        unemployment_top_unf AS tope_cesantia_uf,
         source
       FROM greenhouse_payroll.previred_period_indicators
-      WHERE period_year = $1
-        AND period_month = $2
+      WHERE indicator_date >= make_date($1, $2, 1)
+        AND indicator_date < (make_date($1, $2, 1) + INTERVAL '1 month')
+      ORDER BY indicator_date DESC
       LIMIT 1
     `,
     [year, month]
@@ -368,6 +372,7 @@ export const getChileAfpRatesForPeriod = async ({
 
   return runGreenhousePostgresQuery<{
     afp_name: string
+    worker_rate: number | string
     total_rate: number | string
     source: string | null
     period_year: number | string
@@ -376,27 +381,28 @@ export const getChileAfpRatesForPeriod = async ({
     `
       SELECT
         afp_name,
+        worker_rate,
         total_rate,
         source,
-        period_year,
-        period_month
+        EXTRACT(YEAR FROM indicator_date)::integer AS period_year,
+        EXTRACT(MONTH FROM indicator_date)::integer AS period_month
       FROM greenhouse_payroll.previred_afp_rates
-      WHERE period_year = $1
-        AND period_month = $2
-      ORDER BY afp_name ASC
+      WHERE indicator_date >= make_date($1, $2, 1)
+        AND indicator_date < (make_date($1, $2, 1) + INTERVAL '1 month')
+      ORDER BY indicator_date DESC, afp_name ASC
     `,
     [year, month]
   )
     .then(rows =>
       rows
         .filter(r => normalizeString(r.afp_name))
-      .map(r => ({
-        afpName: normalizeString(r.afp_name),
-        workerRate: toNumber(r.total_rate),
-        totalRate: toNumber(r.total_rate),
-        source: normalizeString(r.source) || 'manual',
-        periodYear: Number(r.period_year),
-        periodMonth: Number(r.period_month)
+        .map(r => ({
+          afpName: normalizeString(r.afp_name),
+          workerRate: toNumber(r.worker_rate),
+          totalRate: toNumber(r.total_rate),
+          source: normalizeString(r.source) || 'manual',
+          periodYear: Number(r.period_year),
+          periodMonth: Number(r.period_month)
         }))
         .filter(r => Number.isFinite(r.totalRate) && r.totalRate >= 0 && r.totalRate <= 1)
     )
@@ -447,7 +453,17 @@ export const getAfpRateForCode = async (afpCode: string, periodDate: string) => 
 export const getUnemploymentRateForPeriod = async (
   _periodDate: string,
   contractType: 'indefinido' | 'plazo_fijo'
-) => (contractType === 'plazo_fijo' ? 0.03 : 0.006)
+) => (contractType === 'plazo_fijo' ? 0 : 0.006)
+
+export const getChileUnemploymentRatesForPeriod = async (
+  periodDate: string,
+  contractType: 'indefinido' | 'plazo_fijo'
+) => {
+  const workerRate = await getUnemploymentRateForPeriod(periodDate, contractType)
+  const employerRate = contractType === 'plazo_fijo' ? 0.03 : 0.024
+
+  return { workerRate, employerRate }
+}
 
 export const resolveChileAfpRateForCompensation = async ({
   year,

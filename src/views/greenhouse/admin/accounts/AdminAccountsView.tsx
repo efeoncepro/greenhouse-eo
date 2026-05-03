@@ -126,7 +126,7 @@ const columns: ColumnDef<OrganizationListItem, any>[] = [
             <Typography variant='body2' sx={{ fontWeight: 600 }}>
               {org.organizationName}
             </Typography>
-            <Typography variant='caption' color='text.secondary' sx={{ fontFamily: 'monospace', fontSize: '0.75rem' }}>
+            <Typography variant='caption' color='text.secondary' sx={{ fontSize: '0.75rem' }}>
               {org.publicId}
               {flag ? ` ${flag}` : ''}
             </Typography>

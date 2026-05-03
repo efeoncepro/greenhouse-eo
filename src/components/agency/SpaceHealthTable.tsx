@@ -147,7 +147,6 @@ const SpaceHealthTable = ({ spaces }: Props) => {
                     bgcolor: color.bg,
                     color: color.text,
                     fontSize: '0.75rem',
-                    fontFamily: 'Poppins',
                     fontWeight: 500
                   }}
                 >

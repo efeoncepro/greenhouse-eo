@@ -14,6 +14,8 @@ const mockMarkRefreshCompleted = vi.fn()
 const mockMarkRefreshFailed = vi.fn()
 
 vi.mock('@/lib/postgres/client', () => ({
+  onGreenhousePostgresReset: () => () => {},
+  isGreenhousePostgresRetryableConnectionError: () => false,
   runGreenhousePostgresQuery: (...args: unknown[]) => mockQuery(...args)
 }))
 

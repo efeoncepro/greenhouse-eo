@@ -80,14 +80,14 @@ const ceColumnHelper = createColumnHelper<ClientEconomicsSnapshot>()
  
 const ceColumns: ColumnDef<ClientEconomicsSnapshot, any>[] = [
   ceColumnHelper.accessor('clientName', { header: 'Space', cell: ({ getValue }) => <Typography variant='body2' fontWeight={600}>{getValue()}</Typography> }),
-  ceColumnHelper.accessor('totalRevenueClp', { header: 'Ingreso', cell: ({ getValue }) => <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>{formatCLP(getValue())}</Typography>, meta: { align: 'right' } }),
-  ceColumnHelper.accessor('directCostsClp', { header: 'C. directos', cell: ({ getValue }) => <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>{formatCLP(getValue())}</Typography>, meta: { align: 'right' } }),
-  ceColumnHelper.accessor('indirectCostsClp', { header: 'C. indirectos', cell: ({ getValue }) => <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>{formatCLP(getValue())}</Typography>, meta: { align: 'right' } }),
+  ceColumnHelper.accessor('totalRevenueClp', { header: 'Ingreso', cell: ({ getValue }) => <Typography variant='body2'>{formatCLP(getValue())}</Typography>, meta: { align: 'right' } }),
+  ceColumnHelper.accessor('directCostsClp', { header: 'C. directos', cell: ({ getValue }) => <Typography variant='body2'>{formatCLP(getValue())}</Typography>, meta: { align: 'right' } }),
+  ceColumnHelper.accessor('indirectCostsClp', { header: 'C. indirectos', cell: ({ getValue }) => <Typography variant='body2'>{formatCLP(getValue())}</Typography>, meta: { align: 'right' } }),
   ceColumnHelper.accessor('grossMarginPercent', { header: 'Margen bruto', cell: ({ getValue }) => <CustomChip round='true' size='small' color={getMarginChipColor(getValue())} label={formatPercent(getValue())} />, meta: { align: 'right' } }),
   ceColumnHelper.accessor('netMarginPercent', { header: 'Margen neto', cell: ({ getValue }) => <CustomChip round='true' size='small' color={getMarginChipColor(getValue())} label={formatPercent(getValue())} />, meta: { align: 'right' } }),
   ceColumnHelper.accessor('headcountFte', { header: 'FTE', cell: ({ getValue }) => getValue() != null ? getValue().toFixed(1) : '—', meta: { align: 'center' } }),
-  ceColumnHelper.accessor('revenuePerFte', { header: 'Ingreso/FTE', cell: ({ getValue }) => getValue() != null ? <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>{formatCLP(getValue())}</Typography> : '—', meta: { align: 'right' } }),
-  ceColumnHelper.accessor('costPerFte', { header: 'Costo/FTE', cell: ({ getValue }) => getValue() != null ? <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>{formatCLP(getValue())}</Typography> : '—', meta: { align: 'right' } })
+  ceColumnHelper.accessor('revenuePerFte', { header: 'Ingreso/FTE', cell: ({ getValue }) => getValue() != null ? <Typography variant='body2'>{formatCLP(getValue())}</Typography> : '—', meta: { align: 'right' } }),
+  ceColumnHelper.accessor('costPerFte', { header: 'Costo/FTE', cell: ({ getValue }) => getValue() != null ? <Typography variant='body2'>{formatCLP(getValue())}</Typography> : '—', meta: { align: 'right' } })
 ]
 
 type SortDir = 'asc' | 'desc'

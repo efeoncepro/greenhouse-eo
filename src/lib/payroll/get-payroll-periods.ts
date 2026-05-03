@@ -8,6 +8,7 @@ import {
   buildPayrollQueryTypes,
   PayrollValidationError,
   buildPeriodId,
+  getPayrollPeriodEndDate,
   normalizeNullableString,
   runPayrollQuery,
   toNullableNumber,
@@ -26,6 +27,8 @@ import {
   pgCreatePayrollPeriod,
   pgUpdatePayrollPeriod
 } from '@/lib/payroll/postgres-store'
+import { buildPayrollTaxTableVersion } from '@/lib/payroll/tax-table-version-format'
+import { resolvePayrollTaxTableVersion } from '@/lib/payroll/tax-table-version'
 
 const PAYROLL_PERIOD_MUTATION_TYPES = {
   calculatedAt: 'TIMESTAMP',
@@ -55,9 +58,6 @@ type PayrollPeriodRow = {
 
 const getProjectId = () => getBigQueryProjectId()
 
-const buildPayrollPeriodIndicatorDate = (year: number, month: number) =>
-  `${year}-${String(month).padStart(2, '0')}-31`
-
 const resolvePayrollPeriodUfValue = async ({
   year,
   month,
@@ -73,10 +73,36 @@ const resolvePayrollPeriodUfValue = async ({
 
   const snapshot = await getHistoricalEconomicIndicatorForPeriod({
     indicatorCode: 'UF',
-    periodDate: buildPayrollPeriodIndicatorDate(year, month)
+    periodDate: getPayrollPeriodEndDate(year, month)
   })
 
   return snapshot?.value ?? null
+}
+
+const resolvePersistedPayrollTaxTableVersion = async ({
+  year,
+  month,
+  taxTableVersion
+}: {
+  year: number
+  month: number
+  taxTableVersion?: string | null
+}) => {
+  const normalizedTaxTableVersion = normalizeNullableString(taxTableVersion)
+
+  const resolved = await resolvePayrollTaxTableVersion({
+    year,
+    month,
+    requestedVersion: normalizedTaxTableVersion
+  })
+
+  if (normalizedTaxTableVersion && !resolved) {
+    throw new PayrollValidationError(
+      `taxTableVersion is not available for ${year}-${String(month).padStart(2, '0')}. Leave it empty to auto-resolve or sync Chile tax tables first.`
+    )
+  }
+
+  return resolved
 }
 
 const normalizePayrollPeriod = (row: PayrollPeriodRow): PayrollPeriod => ({
@@ -185,12 +211,18 @@ export const createPayrollPeriod = async (input: CreatePayrollPeriodInput) => {
     throw new PayrollValidationError('Payroll period already exists.', 409)
   }
 
+  const resolvedTaxTableVersion = await resolvePersistedPayrollTaxTableVersion({
+    year: input.year,
+    month: input.month,
+    taxTableVersion: input.taxTableVersion
+  })
+
   const createParams = {
     periodId,
     year: input.year,
     month: input.month,
     ufValue: resolvedUfValue,
-    taxTableVersion: normalizeNullableString(input.taxTableVersion),
+    taxTableVersion: resolvedTaxTableVersion,
     notes: normalizeNullableString(input.notes)
   }
 
@@ -271,9 +303,29 @@ export const updatePayrollPeriod = async (periodId: string, input: UpdatePayroll
   const nextYear = resolvedYear
   const nextMonth = resolvedMonth
   const nextUfValue = resolvedUfValue
+  const nextPeriodId = buildPeriodId(nextYear, nextMonth)
+  const identityChanged = nextPeriodId !== current.periodId
+  const currentCanonicalTaxTableVersion = buildPayrollTaxTableVersion(current.year, current.month)
+
+  const shouldAutoMigrateTaxTable =
+    input.taxTableVersion === undefined &&
+    identityChanged &&
+    (current.taxTableVersion == null || current.taxTableVersion === currentCanonicalTaxTableVersion)
 
   const nextTaxTableVersion =
-    input.taxTableVersion === undefined ? current.taxTableVersion : normalizeNullableString(input.taxTableVersion)
+    input.taxTableVersion !== undefined
+      ? await resolvePersistedPayrollTaxTableVersion({
+          year: nextYear,
+          month: nextMonth,
+          taxTableVersion: input.taxTableVersion
+        })
+      : shouldAutoMigrateTaxTable
+        ? await resolvePersistedPayrollTaxTableVersion({
+            year: nextYear,
+            month: nextMonth,
+            taxTableVersion: null
+          })
+        : current.taxTableVersion
 
   const nextNotes = input.notes === undefined ? current.notes : normalizeNullableString(input.notes)
 
@@ -288,9 +340,6 @@ export const updatePayrollPeriod = async (periodId: string, input: UpdatePayroll
   if (nextUfValue !== undefined && nextUfValue !== null && (!Number.isFinite(nextUfValue) || nextUfValue < 0)) {
     throw new PayrollValidationError('ufValue must be a non-negative number when provided.')
   }
-
-  const nextPeriodId = buildPeriodId(nextYear, nextMonth)
-  const identityChanged = nextPeriodId !== current.periodId
 
   const requiresReset = doesPayrollPeriodUpdateRequireReset({
     currentYear: current.year,

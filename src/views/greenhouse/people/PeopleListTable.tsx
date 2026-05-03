@@ -115,7 +115,7 @@ const PeopleListTable = ({ data }: Props) => {
       columnHelper.accessor('totalFte', {
         header: 'FTE',
         cell: ({ getValue }) => (
-          <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
+          <Typography variant='body2'>
             {formatFte(getValue())}
           </Typography>
         )

@@ -133,6 +133,7 @@ Reglas obligatorias:
 
 - [ ] Actualizar `Handoff.md` con resumen de migración.
 - [ ] Registrar en `TASK-266` que el groundwork de emails está listo para locales reales.
+- [ ] **Promote `greenhouse/no-untokenized-copy` a error mode** (heredado de TASK-265 Slice 5). Editar `eslint.config.mjs`: cambiar `'warn'` → `'error'` en la rule, verificar `pnpm lint` clean (0 errors), commit con la promoción. Esta task es la última del programa de sweep; al cerrar, el gate definitivo bloquea regresiones desde CI.
 
 ## Open Questions
 

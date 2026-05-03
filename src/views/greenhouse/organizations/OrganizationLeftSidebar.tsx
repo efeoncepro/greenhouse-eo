@@ -98,7 +98,7 @@ const OrganizationLeftSidebar = ({ detail, isAdmin, syncing, onEditOrganization,
             {detail.taxId && (
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                 <i className='tabler-receipt' style={{ fontSize: 16, color: 'var(--mui-palette-text-secondary)' }} />
-                <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
+                <Typography variant='body2'>
                   {detail.taxIdType ? `${detail.taxIdType}: ` : ''}{detail.taxId}
                 </Typography>
               </Box>
@@ -113,13 +113,13 @@ const OrganizationLeftSidebar = ({ detail, isAdmin, syncing, onEditOrganization,
         <Typography variant='overline' color='text.secondary'>Identificadores</Typography>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
           <i className='tabler-fingerprint' style={{ fontSize: 16, color: 'var(--mui-palette-text-secondary)' }} />
-          <Typography variant='body2' sx={{ fontFamily: 'monospace', fontWeight: 600 }}>{detail.publicId}</Typography>
+          <Typography variant='body2' sx={{ fontWeight: 600 }}>{detail.publicId}</Typography>
         </Box>
         {detail.hubspotCompanyId && (
           <>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
               <Box component='img' src='/images/integrations/hubspot.svg' alt='HubSpot' sx={{ width: 16, height: 16, objectFit: 'contain' }} />
-              <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
+              <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>
                 HubSpot: {detail.hubspotCompanyId}
               </Typography>
             </Box>

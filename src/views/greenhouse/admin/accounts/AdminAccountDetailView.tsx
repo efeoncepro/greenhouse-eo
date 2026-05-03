@@ -244,7 +244,7 @@ const AdminAccountDetailView = ({ organizationId }: Props) => {
 
         <Box sx={{ textAlign: 'center' }}>
           <Typography variant='h5'>{detail.organizationName}</Typography>
-          <Typography variant='caption' color='text.secondary' sx={{ fontFamily: 'monospace', fontSize: '0.75rem' }}>
+          <Typography variant='caption' color='text.secondary' sx={{ fontSize: '0.75rem' }}>
             {detail.publicId}
           </Typography>
         </Box>
@@ -300,7 +300,7 @@ const AdminAccountDetailView = ({ organizationId }: Props) => {
                   alt='HubSpot'
                   sx={{ width: 16, height: 16, objectFit: 'contain' }}
                 />
-                <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
+                <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>
                   HubSpot: {detail.hubspotCompanyId}
                 </Typography>
               </Box>
@@ -308,7 +308,7 @@ const AdminAccountDetailView = ({ organizationId }: Props) => {
             {detail.taxId && (
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                 <i className='tabler-receipt' style={{ fontSize: 16, color: 'var(--mui-palette-text-secondary)' }} />
-                <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
+                <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>
                   {detail.taxIdType ? `${detail.taxIdType}: ` : ''}{detail.taxId}
                 </Typography>
               </Box>
@@ -455,7 +455,7 @@ const AdminAccountDetailView = ({ organizationId }: Props) => {
                               label={STATUS_LABEL[spaceStatus] ?? spaceStatus}
                             />
                           </Box>
-                          <Typography variant='caption' color='text.secondary' sx={{ fontFamily: 'monospace', fontSize: '0.75rem' }}>
+                          <Typography variant='caption' color='text.secondary' sx={{ fontSize: '0.75rem' }}>
                             {orgSpace?.publicId ?? space.spaceId}
                           </Typography>
 

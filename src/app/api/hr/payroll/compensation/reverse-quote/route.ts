@@ -3,14 +3,12 @@ import { NextResponse } from 'next/server'
 import { toPayrollErrorResponse } from '@/lib/payroll/api-response'
 import { parsePayrollNumber } from '@/lib/payroll/shared'
 import { computeGrossFromNet } from '@/lib/payroll/reverse-payroll'
+import { resolvePayrollTaxTableVersion } from '@/lib/payroll/tax-table-version'
 import { getHistoricalEconomicIndicatorForPeriod } from '@/lib/finance/economic-indicators'
 import { getImmForPeriod } from '@/lib/payroll/chile-previsional-helpers'
 import { requireHrTenantContext } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
-
-const buildTaxTableVersion = (year: number, month: number) =>
-  `gael-${year}-${String(month).padStart(2, '0')}`
 
 export async function POST(request: Request) {
   const { tenant, errorResponse } = await requireHrTenantContext()
@@ -38,12 +36,23 @@ export async function POST(request: Request) {
 
     const year = Number(periodDate.slice(0, 4))
     const month = Number(periodDate.slice(5, 7))
+    const resolvedTaxTableVersion = await resolvePayrollTaxTableVersion({ year, month })
 
     const [ufSnapshot, utmSnapshot, immValue] = await Promise.all([
       getHistoricalEconomicIndicatorForPeriod({ indicatorCode: 'UF', periodDate }),
       getHistoricalEconomicIndicatorForPeriod({ indicatorCode: 'UTM', periodDate }),
       getImmForPeriod(periodDate)
     ])
+
+    if (!resolvedTaxTableVersion) {
+      return NextResponse.json(
+        {
+          error:
+            'No existe una tabla tributaria Chile sincronizada para ese mes. Sincroniza la base previsional antes de cotizar o calcular nómina Chile.'
+        },
+        { status: 409 }
+      )
+    }
 
     // Reverse calculation:
     // - Uses LEGAL 7% health (fonasa), not the member's Isapre plan
@@ -75,7 +84,7 @@ export async function POST(request: Request) {
       apvAmount: 0,
       unemploymentRate: parsePayrollNumber(body.unemploymentRate, 'unemploymentRate', { allowNull: true, min: 0, max: 1 }),
       ufValue: ufSnapshot?.value ?? null,
-      taxTableVersion: buildTaxTableVersion(year, month),
+      taxTableVersion: resolvedTaxTableVersion,
       utmValue: utmSnapshot?.value ?? null,
       minBaseSalary: typeof immValue === 'number' && immValue > 0 ? immValue : 0
     })
@@ -126,7 +135,7 @@ export async function POST(request: Request) {
       indicators: {
         ufValue: ufSnapshot?.value ?? null,
         utmValue: utmSnapshot?.value ?? null,
-        taxTableVersion: buildTaxTableVersion(year, month)
+        taxTableVersion: resolvedTaxTableVersion
       }
     })
   } catch (error) {

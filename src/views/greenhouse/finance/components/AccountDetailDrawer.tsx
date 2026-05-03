@@ -22,6 +22,9 @@ import TableCell from '@mui/material/TableCell'
 import TableContainer from '@mui/material/TableContainer'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
+import ToggleButton from '@mui/material/ToggleButton'
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup'
+import MuiTooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 
 import CustomChip from '@core/components/mui/Chip'
@@ -154,6 +157,15 @@ type FreshnessSignal = {
   label: string | null
 }
 
+type TemporalMode = 'snapshot' | 'period' | 'audit'
+
+type MovementsWindow = {
+  fromDate: string
+  toDate: string
+  mode: TemporalMode
+  label: string
+}
+
 type DetailResponse = {
   account: AccountOverview
   currentBalance: AccountBalance
@@ -163,6 +175,8 @@ type DetailResponse = {
   movements: Movement[]
   /** TASK-706 — populated when account.instrumentCategory === 'payroll_processor'. */
   processor?: ProcessorDigest | null
+  /** TASK-776 — echo back de la ventana temporal usada para movements. */
+  movementsWindow?: MovementsWindow
 }
 
 type Props = {
@@ -209,6 +223,11 @@ const AccountDetailDrawer = ({ open, accountId, year, month, onClose, onSuccess 
   const [error, setError] = useState<string | null>(null)
   const [detail, setDetail] = useState<DetailResponse | null>(null)
   const [closingPeriod, setClosingPeriod] = useState(false)
+  // TASK-776 — modo temporal del drawer. Inicial NULL hasta que llegue el
+  // primer detail (ahí leemos `account.instrumentCategory` y resolvemos default
+  // declarativo del profile). Mientras tanto, el primer fetch usa el default
+  // canonico del backend (snapshot 30 dias) si el caller no envía mode.
+  const [temporalMode, setTemporalMode] = useState<TemporalMode | null>(null)
 
   const fetchDetail = useCallback(async () => {
     if (!open || !accountId) return
@@ -217,7 +236,19 @@ const AccountDetailDrawer = ({ open, accountId, year, month, onClose, onSuccess 
     setError(null)
 
     try {
-      const res = await fetch(`/api/finance/bank/${accountId}?year=${year}&month=${month}`, { cache: 'no-store' })
+      const params = new URLSearchParams({ year: String(year), month: String(month) })
+
+      // TASK-776 — primera carga: deja al backend resolver default desde
+      // categoria. Cargas siguientes: pasamos el modo elegido por el operador.
+      if (temporalMode) {
+        params.set('mode', temporalMode)
+      } else {
+        // Default seguro mientras esperamos categoria: snapshot 30d.
+        params.set('mode', 'snapshot')
+        params.set('windowDays', '30')
+      }
+
+      const res = await fetch(`/api/finance/bank/${accountId}?${params.toString()}`, { cache: 'no-store' })
 
       if (!res.ok) {
         const body = await res.json().catch(() => ({}))
@@ -235,11 +266,17 @@ const AccountDetailDrawer = ({ open, accountId, year, month, onClose, onSuccess 
     } finally {
       setLoading(false)
     }
-  }, [accountId, month, open, year])
+  }, [accountId, month, open, year, temporalMode])
 
   useEffect(() => {
     void fetchDetail()
   }, [fetchDetail])
+
+  // TASK-776 — reset modo cuando cambia la cuenta (cada cuenta hereda el
+  // default declarativo de su categoria via primera carga).
+  useEffect(() => {
+    setTemporalMode(null)
+  }, [accountId])
 
   const canClosePeriod = useMemo(() => {
     if (!detail?.account || detail.account.isPeriodClosed) {
@@ -451,7 +488,7 @@ const AccountDetailDrawer = ({ open, accountId, year, month, onClose, onSuccess 
                             <Typography variant='caption' color='text.secondary' sx={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                               {field.label}
                             </Typography>
-                            <Typography variant='body2' sx={{ fontWeight: 600, fontFamily: field.label === 'Tarjeta' ? 'monospace' : undefined }}>
+                            <Typography variant={field.label === 'Tarjeta' ? 'monoId' : 'body2'} sx={{ fontWeight: 600 }}>
                               {field.value}
                             </Typography>
                           </Box>
@@ -628,11 +665,54 @@ const AccountDetailDrawer = ({ open, accountId, year, month, onClose, onSuccess 
               <Card>
                 <CardHeader
                   title={profile?.movements.sectionTitle ?? 'Movimientos recientes'}
-                  subheader={profile?.movements.sectionSubtitle ?? ''}
+                  subheader={
+                    <Stack direction='row' spacing={1} alignItems='center' useFlexGap flexWrap='wrap'>
+                      <Typography variant='caption' color='text.secondary'>
+                        {profile?.movements.sectionSubtitle ?? ''}
+                      </Typography>
+                      {detail.movementsWindow ? (
+                        <CustomChip
+                          round='true'
+                          size='small'
+                          variant='tonal'
+                          color='info'
+                          label={`Mostrando: ${detail.movementsWindow.label}`}
+                        />
+                      ) : null}
+                    </Stack>
+                  }
+                  action={
+                    // TASK-776 — selector inline de los 3 modos canónicos.
+                    // Default declarativo viene del profile (categoria) en
+                    // primera carga; operador puede cambiarlo on-demand.
+                    <ToggleButtonGroup
+                      size='small'
+                      value={temporalMode ?? detail.movementsWindow?.mode ?? 'snapshot'}
+                      exclusive
+                      onChange={(_, next: TemporalMode | null) => {
+                        if (next) setTemporalMode(next)
+                      }}
+                      aria-label='Ventana temporal de movimientos'
+                    >
+                      <MuiTooltip title='Últimos 30 días — qué pasa con esta cuenta hoy'>
+                        <ToggleButton value='snapshot'>Reciente</ToggleButton>
+                      </MuiTooltip>
+                      <MuiTooltip title='Mes calendario seleccionado en el dashboard padre'>
+                        <ToggleButton value='period'>Período</ToggleButton>
+                      </MuiTooltip>
+                      <MuiTooltip title='Histórico completo desde el ancla del OTB'>
+                        <ToggleButton value='audit'>Histórico</ToggleButton>
+                      </MuiTooltip>
+                    </ToggleButtonGroup>
+                  }
                 />
                 <CardContent sx={{ pt: 0 }}>
                   {detail.movements.length === 0 ? (
-                    detail.activeOtb && detail.activeOtb.supersededTransactionsCount > 0 ? (
+                    // TASK-776 — banner OTB SOLO cuando estamos en modo 'audit'
+                    // o 'period' apuntando a un mes pre-anchor (semánticamente
+                    // relevante). En modo 'snapshot' sin movimientos, mostrar
+                    // hint para cambiar a Histórico.
+                    detail.activeOtb && detail.activeOtb.supersededTransactionsCount > 0 && detail.movementsWindow?.mode !== 'snapshot' ? (
                       <Alert severity='info'>
                         <Typography variant='body2' sx={{ fontWeight: 600, mb: 0.5 }}>
                           Cuenta anclada al {formatDate(detail.activeOtb.genesisDate)} con saldo {formatAmount(detail.activeOtb.openingBalance, detail.account.currency)} ({detail.activeOtb.auditStatus})
@@ -640,6 +720,15 @@ const AccountDetailDrawer = ({ open, accountId, year, month, onClose, onSuccess 
                         <Typography variant='caption' display='block'>
                           {detail.activeOtb.supersededTransactionsCount} movimientos previos al ancla quedan en audit (encapsulados en el saldo opening). En el período consultado no hay movimientos posteriores al ancla todavía.
                         </Typography>
+                      </Alert>
+                    ) : detail.movementsWindow?.mode === 'snapshot' ? (
+                      <Alert severity='info'>
+                        Sin movimientos en los últimos {Math.max(1, Math.round((Date.parse(detail.movementsWindow.toDate) - Date.parse(detail.movementsWindow.fromDate)) / 86_400_000) + 1)} días.{' '}
+                        {detail.activeOtb && detail.activeOtb.supersededTransactionsCount > 0 ? (
+                          <>Cambia a <strong>Histórico</strong> para ver desde el ancla del OTB.</>
+                        ) : (
+                          <>Cambia a <strong>Período</strong> o <strong>Histórico</strong> para ampliar la ventana.</>
+                        )}
                       </Alert>
                     ) : (
                       <Alert severity='info'>

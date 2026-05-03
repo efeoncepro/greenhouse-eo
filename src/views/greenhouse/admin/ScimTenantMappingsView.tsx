@@ -156,9 +156,7 @@ export default function ScimTenantMappingsView({ mappings: initialMappings }: Pr
                       </Typography>
                     </TableCell>
                     <TableCell>
-                      <Typography variant='caption' fontFamily='monospace'>
-                        {m.microsoft_tenant_id.slice(0, 8)}...
-                      </Typography>
+                      <Typography variant='monoId'>{m.microsoft_tenant_id.slice(0, 8)}...</Typography>
                     </TableCell>
                     <TableCell>{m.client_id}</TableCell>
                     <TableCell>

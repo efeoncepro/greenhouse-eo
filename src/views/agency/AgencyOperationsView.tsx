@@ -127,7 +127,7 @@ const eventColumnHelper = createColumnHelper<RecentEvent>()
 const eventColumns: ColumnDef<RecentEvent, any>[] = [
   eventColumnHelper.accessor('eventType', {
     header: 'Tipo',
-    cell: ({ getValue }) => <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>{getValue()}</Typography>
+    cell: ({ getValue }) => <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>{getValue()}</Typography>
   }),
   {
     id: 'aggregate',
@@ -158,7 +158,7 @@ const projColumns: ColumnDef<FailedProjection, any>[] = [
     id: 'entity',
     header: 'Entidad',
     accessorFn: (row: FailedProjection) => `${row.entityType}:${row.entityId}`,
-    cell: ({ row }: { row: { original: FailedProjection } }) => <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>{row.original.entityType}:{row.original.entityId.slice(0, 12)}</Typography>
+    cell: ({ row }: { row: { original: FailedProjection } }) => <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>{row.original.entityType}:{row.original.entityId.slice(0, 12)}</Typography>
   },
   projColumnHelper.accessor('failedAt', {
     header: 'Hora',

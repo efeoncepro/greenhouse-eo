@@ -10,6 +10,11 @@ import { getPayrollEntries, getPayrollEntryById } from '@/lib/payroll/get-payrol
 import { getPayrollPeriod } from '@/lib/payroll/get-payroll-periods'
 import { PayrollValidationError } from '@/lib/payroll/shared'
 import { getOperatingEntityIdentity, type OperatingEntityIdentity } from '@/lib/account-360/organization-identity'
+import { getAdjustmentsByEntry } from '@/lib/payroll/adjustments/apply-adjustment'
+import {
+  getEntryAdjustmentBreakdown,
+  type EntryAdjustmentBreakdown
+} from '@/lib/payroll/adjustments/breakdown'
 
 const LOGO_PATH = path.join(process.cwd(), 'public/branding/logo-full.png')
 
@@ -476,7 +481,17 @@ const PeriodReportDocument = ({ period, entries, operatingEntity }: { period: Pa
 
 // ─── Individual Receipt PDF ───────────────────────────────────────
 
-const ReceiptDocument = ({ entry, period, operatingEntity }: { entry: PayrollEntry; period: PayrollPeriod; operatingEntity: OperatingEntityIdentity | null }) => {
+const ReceiptDocument = ({
+  entry,
+  period,
+  operatingEntity,
+  breakdown
+}: {
+  entry: PayrollEntry
+  period: PayrollPeriod
+  operatingEntity: OperatingEntityIdentity | null
+  breakdown: EntryAdjustmentBreakdown
+}) => {
   const monthName = MONTH_NAMES[period.month - 1] ?? String(period.month)
   const currency = entry.currency
   const isChile = entry.payRegime === 'chile'
@@ -633,10 +648,48 @@ const ReceiptDocument = ({ entry, period, operatingEntity }: { entry: PayrollEnt
             <Text style={s.tableValue}>{value}</Text>
           </View>
         ))}
+        {breakdown.factorApplied !== 1 && !breakdown.excluded && (
+          <View style={[s.tableRow, { backgroundColor: '#fff8e6' }]}>
+            <Text style={s.tableLabel}>Bruto efectivo (factor {(breakdown.factorApplied * 100).toFixed(0)}%)</Text>
+            <Text style={s.tableValue}>{fmtCurrency(entry.grossTotal, currency)}</Text>
+          </View>
+        )}
         <View style={s.tableTotalRow}>
           <Text style={s.tableTotalLabel}>Total bruto</Text>
           <Text style={s.tableTotalValue}>{fmtCurrency(entry.grossTotal, currency)}</Text>
         </View>
+
+        {/* TASK-745d — Adjustments visibility */}
+        {breakdown.excluded && (
+          <View style={{ marginTop: 8, padding: 8, backgroundColor: '#fff0f0', borderLeft: '3pt solid #c0392b' }}>
+            <Text style={{ fontSize: 10, fontWeight: 700, color: '#c0392b' }}>
+              Excluido de esta nómina — {breakdown.excluded.reasonLabel}
+            </Text>
+            <Text style={{ fontSize: 9, color: '#555', marginTop: 2 }}>{breakdown.excluded.reasonNote}</Text>
+            <Text style={{ fontSize: 8, color: '#888', marginTop: 2 }}>
+              Solicitado por {breakdown.excluded.requestedBy}
+            </Text>
+          </View>
+        )}
+
+        {breakdown.fixedDeductions.length > 0 && (
+          <>
+            <SectionHeader title="Descuentos pactados" />
+            {breakdown.fixedDeductions.map((fd, i) => (
+              <View key={`fd-${i}`} style={[s.tableRow, i % 2 === 1 ? s.tableRowAlt : {}]}>
+                <View style={{ flex: 1 }}>
+                  <Text style={s.tableLabel}>{fd.reasonLabel}</Text>
+                  <Text style={{ fontSize: 8, color: '#888', marginTop: 1 }}>{fd.reasonNote}</Text>
+                </View>
+                <Text style={s.tableValue}>− {fmtCurrency(fd.amount, fd.currency as 'CLP' | 'USD')}</Text>
+              </View>
+            ))}
+            <View style={s.tableTotalRow}>
+              <Text style={s.tableTotalLabel}>Total descuentos pactados</Text>
+              <Text style={s.tableTotalValue}>− {fmtCurrency(breakdown.totalFixedDeductionAmount, currency)}</Text>
+            </View>
+          </>
+        )}
 
         {/* Attendance */}
         {attendanceRows.length > 0 && (
@@ -666,6 +719,18 @@ const ReceiptDocument = ({ entry, period, operatingEntity }: { entry: PayrollEnt
               <Text style={s.tableTotalValue}>{fmtCurrency(entry.chileTotalDeductions, currency)}</Text>
             </View>
           </>
+        )}
+
+        {breakdown.manualOverride && (
+          <View style={{ marginTop: 8, padding: 8, backgroundColor: '#fff8e6', borderLeft: '3pt solid #d99c1f' }}>
+            <Text style={{ fontSize: 10, fontWeight: 700, color: '#a37310' }}>
+              Override manual de neto — {breakdown.manualOverride.reasonLabel}
+            </Text>
+            <Text style={{ fontSize: 9, color: '#555', marginTop: 2 }}>{breakdown.manualOverride.reasonNote}</Text>
+            <Text style={{ fontSize: 8, color: '#888', marginTop: 2 }}>
+              Aplicado por {breakdown.manualOverride.requestedBy}
+            </Text>
+          </View>
         )}
 
         {/* Net total hero */}
@@ -733,7 +798,12 @@ export const generatePayrollReceiptPdf = async (entryId: string): Promise<Buffer
   }
 
   const operatingEntity = await getOperatingEntityIdentity()
-  const stream = await renderToStream(<ReceiptDocument entry={entry} period={period} operatingEntity={operatingEntity} />)
+  const adjustments = await getAdjustmentsByEntry(entryId, { activeOnly: true })
+  const breakdown = getEntryAdjustmentBreakdown(adjustments)
+
+  const stream = await renderToStream(
+    <ReceiptDocument entry={entry} period={period} operatingEntity={operatingEntity} breakdown={breakdown} />
+  )
 
   const chunks: Uint8Array[] = []
 

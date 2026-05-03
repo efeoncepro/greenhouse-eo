@@ -17,6 +17,8 @@ const mockResolveIdentifier = vi.fn()
 // ---------------------------------------------------------------------------
 
 vi.mock('@/lib/postgres/client', () => ({
+  onGreenhousePostgresReset: () => () => {},
+  isGreenhousePostgresRetryableConnectionError: () => false,
   isGreenhousePostgresConfigured: () => mockIsConfigured(),
   runGreenhousePostgresQuery: (...args: unknown[]) => mockPgQuery(...args)
 }))
@@ -118,7 +120,8 @@ const minimalAccess: PersonAccess = {
   canViewHrProfile: false,
   canViewAiTools: false,
   canViewIdentityContext: false,
-  canViewAccessContext: false
+  canViewAccessContext: false,
+  canViewPaymentProfile: false
 }
 
 const makePgMemberRow = (overrides: Record<string, unknown> = {}) => ({

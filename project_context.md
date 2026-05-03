@@ -1,3 +1,212 @@
+## Estado vigente para agentes
+
+- `AGENTS.md` y `CLAUDE.md` son los puntos de entrada operativos para agentes; ambos deben mantenerse alineados cuando cambie un contrato transversal.
+- `docs/operations/SOLUTION_QUALITY_OPERATING_MODEL_V1.md` es el contrato transversal anti-parche: Greenhouse espera soluciones seguras, robustas, resilientes y escalables por defecto; workarounds solo temporales, reversibles y documentados.
+- `docs/operations/CONTEXT_HANDOFF_OPERATING_MODEL_V1.md` gobierna la convivencia entre `project_context.md`, `Handoff.md` y `Handoff.archive.md`: no se pierde auditoria, se separa estado activo de historia.
+- `project_context.md` debe leerse como estado vigente + deltas historicos. Si un delta antiguo contradice esta cabecera, `AGENTS.md`, arquitectura vigente o runtime real, prevalece el contrato vigente y debe documentarse el drift.
+- `Handoff.md` sigue siendo util para construir: contiene contexto operacional rico. No debe recortarse ni archivarse agresivamente sin preservar texto completo y dejar referencias.
+- `Handoff.archive.md` es la caja negra historica para auditoria de resoluciones; una entrada antigua no debe tratarse como source of truth vigente sin contrastar con task, issue, arquitectura, codigo y runtime.
+- `docs/operations/CODEX_EXECUTION_PROMPT_V1.md` es el prompt robusto para ejecucion Codex de `TASK-###`; no reemplaza las reglas del repo, las comprime.
+- `docs/tasks/TASK_PROCESS.md` sigue gobernando lifecycle de tasks; una task no esta cerrada si carpeta, `Lifecycle`, README y docs vivas no estan sincronizados.
+- Para verificar higiene de contexto sin modificar archivos, usar `pnpm docs:context-check`. El check es no destructivo por defecto y existe para avisar drift, no para borrar memoria.
+- Preview/Staging/Production vigentes deben seguir lo declarado en `AGENTS.md` y `RELEASE_CHANNELS_OPERATING_MODEL_V1.md`; si un delta antiguo de Vercel contradice esos contratos, tratarlo como historia y revalidar con Vercel CLI/runtime.
+
+## Delta 2026-05-03 TASK-777 expense distribution close gate
+
+- Finance management accounting ya no debe consumir `expenses.economic_category` directo como decisión final de P&L. La primitive canónica es `greenhouse_finance.expense_distribution_resolution`.
+- `shared_operational_overhead` es el único lane que alimenta overhead operacional compartido. Payroll/provider, regulatorio, tributario, financiero y treasury transit quedan fuera por contrato.
+- `checkPeriodReadiness` ahora incluye un gate de distribución: un período no está listo si faltan resoluciones activas, existen resoluciones `manual_required`/`blocked`/`unallocated`, o el pool operacional está contaminado.
+- IA de distribución vive solo como advisory layer en `src/lib/finance/expense-distribution-intelligence/*`, con kill-switch `FINANCE_DISTRIBUTION_AI_ENABLED=false` por defecto. Una sugerencia nunca escribe P&L ni cierra períodos; solo aprobación humana puede materializar una resolución `source='ai_approved'`.
+- Superficies protegidas: `account_balances`, normalized payment readers, settlement legs, payment orders, bank reconciliation y saldos de caja siguen fuera del alcance de distribución económica.
+
+## Delta 2026-05-03 Codex finance/accounting operator skill
+
+- Codex ahora tiene una skill local y una global llamadas `greenhouse-finance-accounting-operator`.
+- Paths canonicos:
+  - repo local: `.codex/skills/greenhouse-finance-accounting-operator/SKILL.md`
+  - global usuario: `/Users/jreye/.codex/skills/greenhouse-finance-accounting-operator/SKILL.md`
+- La skill no se apoya solo en el runtime Greenhouse. Tambien obliga a contrastar decisiones con marcos externos y mejores practicas de mercado:
+  - `IFRS Conceptual Framework`
+  - `IAS 1`
+  - `IAS 7`
+  - `IFRS 7`
+  - `IFRS 15`
+  - `IFRS 16`
+  - `COSO`
+  - `AICPA/CIMA Global Management Accounting Principles`
+  - `AFP` para treasury y payments controls
+- Uso esperado:
+  - auditoria de P&L, overhead, cashflow, payments, reconciliacion, tax/fiscal treatment, period close y cost attribution
+  - diseño de fixes y recomendaciones guiadas por contabilidad financiera, cost accounting, treasury y controles, no solo por conveniencia del schema actual
+- Regla operativa nueva:
+  - si el runtime del repo discrepa de mejores practicas contables/financieras, el agente debe explicitar el drift y no normalizarlo silenciosamente como si fuera correcto por existir en codigo
+  - la skill ahora incluye modos operativos y runbooks para `audit`, `recommend`, `execute`, `close_governance` y `reconcile`; no debe usarse solo como checklist teórico
+
+## Delta 2026-05-03 Postgres TLS recovery cubre raw pg + Kysely
+
+- Sentry production `JAVASCRIPT-NEXTJS-2N` reportó `ssl/tls alert bad certificate` en `POST /api/webhooks/hubspot-companies`, pero la investigación mostró que el patrón también golpeaba crons, SCIM y sync: no era un bug de HubSpot ni del webhook.
+- La capa canónica ahora está en `src/lib/postgres/client.ts` + `src/lib/db.ts`:
+  - `client.ts` exporta detección retryable, listeners de reset y sigue siendo el único owner de `Pool`/Cloud SQL Connector.
+  - `db.ts` invalida Kysely cuando se resetea Postgres y usa un pool adapter dinámico para reintentar `connect()` una vez ante errores TLS retryable.
+- Regla operativa nueva: ante errores Cloud SQL TLS en runtime, no parchear endpoints aislados. Endurecer primero la primitive común Postgres/Kysely y preservar el guardrail de no reintentar callbacks transaccionales ya ejecutados.
+
+## Delta 2026-05-01 DESIGN.md adoption for agent-facing UI contract
+
+- El repo ahora versiona `DESIGN.md` en la raiz como contrato visual legible por agentes.
+- `DESIGN.md` no reemplaza `docs/architecture/GREENHOUSE_DESIGN_TOKENS_V1.md`: la arquitectura/token doc sigue siendo la fuente canónica extensa; `DESIGN.md` funciona como capa portátil y compacta para herramientas y agentes que leen contexto de repo.
+- La baseline declarada en `DESIGN.md` queda alineada al runtime actual:
+  - `Poppins` para display controlado
+  - `Geist Sans` para body, tablas, formularios, labels, KPIs, IDs y montos
+  - máximo 2 familias activas por surface
+  - `DM Sans`, `Inter` y familias monospace quedan fuera del baseline
+- El CLI oficial `@google/design.md` queda integrado localmente via `package.json`:
+  - `pnpm design:lint`
+  - `pnpm design:diff`
+  - `pnpm design:export:tailwind`
+- Regla operativa nueva para trabajo UI: además de `AGENTS.md`, `CLAUDE.md`, `full-version`, Vuexy docs y arquitectura relevante, los agentes deben leer `DESIGN.md` antes de generar o refactorizar UI visible.
+- Convencion de mantenimiento:
+  - `DESIGN.md` evoluciona cada vez que cambia el contrato visual real del producto
+  - primero cambia/decide runtime, luego se sincroniza `DESIGN.md`, luego se corre `pnpm design:lint`
+  - si el cambio es estructural, tambien se sincroniza `docs/architecture/GREENHOUSE_DESIGN_TOKENS_V1.md`
+  - `DESIGN.md` no debe contener estado especulativo o futuro no aprobado
+
+## Delta 2026-05-01 Payment Orders como modulo de Tesoreria/Finance
+
+- Se definio arquitectura nueva para `Payment Orders` en `docs/architecture/GREENHOUSE_PAYMENT_ORDERS_ARCHITECTURE_V1.md`.
+- Decision canonica:
+  - `Payroll` calcula y exporta obligaciones.
+  - `Finance/Tesoreria` crea ordenes de pago, resuelve instrumentos, registra pagos, modela settlement legs y concilia.
+  - `payroll_period.exported` no significa `paid`.
+- El modulo pertenece a `greenhouse_finance`, no a `greenhouse_payroll`, porque debe servir tambien para proveedores, impuestos, anticipos, prestamos, reembolsos y cuenta corriente accionista.
+- Se abrio programa de implementacion por tasks:
+  - `TASK-747` umbrella Payment Orders Program
+  - `TASK-748` Payment Obligations Foundation
+  - `TASK-749` Beneficiary Payment Profiles + Routing Policies
+  - `TASK-750` Payment Orders, Batches, Payment Calendar + Maker-Checker Runtime
+  - `TASK-751` Payroll Settlement Orchestration + Reconciliation Integration
+- Regla de rollout: primero obligaciones read-only/idempotentes, luego perfiles/routing, luego ordenes/batches/calendario, y finalmente integracion Payroll->settlement->conciliacion.
+
+## Delta 2026-05-01 Claude skill invocable para auditoria de Payroll
+
+- Claude ahora tiene la skill local invocable `greenhouse-payroll-auditor`.
+- Vive en `.claude/skills/greenhouse-payroll-auditor/SKILL.md`, siguiendo la convencion oficial vigente de Claude Skills.
+- Reutiliza el mismo criterio operativo de la skill Codex:
+  - legislacion y formulas Chile en `references/chile-payroll-law.md`
+  - runtime Greenhouse Payroll en `references/greenhouse-payroll-runtime.md`
+  - trabajadores remotos/internacionales, Deel/EOR/contractor y KPI ICO en `references/international-remote-payroll.md`
+- Nota de convencion: `AGENTS.md` y `CLAUDE.md` ya no indican que las skills nuevas deban nacer como `skill.md` minuscula; ese patron queda como compatibilidad legacy.
+
+## Delta 2026-05-01 TASK-741 cierra MCP Remote Gateway V1
+
+- Greenhouse ya expone el MCP read-only por HTTP remoto privado en `GET/POST/DELETE /api/mcp/greenhouse`.
+- El gateway remoto vive en:
+  - `src/mcp/greenhouse/remote.ts`
+  - `src/app/api/mcp/greenhouse/route.ts`
+- Transporte oficial: `WebStandardStreamableHTTPServerTransport` de `@modelcontextprotocol/sdk`.
+- Modo V1: `stateless` + `enableJsonResponse`, pensado para App Router/Vercel sin guardar sesiones MCP en memoria.
+- Auth V1: `Authorization: Bearer <GREENHOUSE_MCP_REMOTE_GATEWAY_TOKEN>`.
+- Downstream preservado: el gateway reutiliza `createGreenhouseMcpServer()` y por lo tanto usa el mismo mapping read-only que `pnpm mcp:greenhouse`, bajando solo a `api/platform/ecosystem/*` con `GREENHOUSE_MCP_*`.
+- Variables nuevas:
+  - `GREENHOUSE_MCP_REMOTE_GATEWAY_TOKEN` — habilita/protege el gateway remoto HTTP.
+  - `GREENHOUSE_MCP_REMOTE_MAX_BODY_BYTES` — budget opcional de request body; default `1000000`.
+- `TASK-659` sigue siendo la dueña de OAuth/hosted auth multiusuario; `TASK-741` no introduce OAuth, refresh tokens ni user-delegated scopes.
+
+## Delta 2026-05-01 TASK-744 Payroll compliance cerrada en staging
+
+- `TASK-744` quedo cerrada en `docs/tasks/complete/TASK-744-payroll-chile-compliance-remediation.md` sobre `develop`.
+- Abril 2026 fue recalculado en staging despues del deploy `418d3c9a` antes de aprobacion/export:
+  - Humberly Henriquez y Luis Reyes: `contractTypeSnapshot=honorarios`, retencion SII `0.1525`, sin deducciones dependientes Chile.
+  - Valentina Hoyos: `contractTypeSnapshot=indefinido`, calculo Chile dependiente con deducciones estatutarias.
+  - Melkin Hernandez, Daniela Ferreira y Andres Carlosama: `payRegime=international`, `payrollVia=deel`, `kpiDataSource=ico`, sin deducciones Chile.
+- `pnpm pg:connect:migrate` confirma que no quedan migraciones pendientes para esta task y regenera `src/types/db.d.ts` sin diff.
+- `pnpm pg:doctor` vuelve a correr desde CLI sin arrastrar imports `server-only`; el doctor usa un cliente Postgres directo con perfil de herramientas y mantiene soporte para Cloud SQL Connector/Secret Manager.
+- El coverage de CI ya no depende del mes calendario real en `space-360.test.ts`; se fija el reloj en abril 2026 para el caso que valida el período de insights Nexa.
+
+## Delta 2026-05-01 Skill local invocable para auditoria de Payroll Efeonce
+
+- Nueva skill local Codex invocable como `$greenhouse-payroll-auditor`.
+- Vive en `.codex/skills/greenhouse-payroll-auditor/` y fue validada con `skill-creator`.
+- Proposito:
+  - auditar, revisar y proponer fixes robustos para Payroll Efeonce/Greenhouse
+  - cubrir trabajadores dependientes Chile, honorarios, Deel/EOR/contractor internacional, KPI ICO, asistencia/licencias, PREVIRED/ImpUnico, impuestos, deducciones, costos empleador, readiness y exports
+- La skill usa disclosure progresivo:
+  - `SKILL.md` liviano para el workflow operativo
+  - `references/chile-payroll-law.md` para reglas/fuentes oficiales Chile
+  - `references/greenhouse-payroll-runtime.md` para formulas, paths y watchlist del runtime actual
+  - `references/international-remote-payroll.md` para regimenes remotos/internacionales y limites de Deel/EOR
+- Watchlist operacional incorporado:
+  - verificar retencion SII honorarios 2026 contra fuente oficial antes de liquidar
+  - revisar split trabajador/empleador de Seguro de Cesantia por tipo de contrato
+  - verificar aplicacion de topes AFP/salud/cesantia/SIS/mutual en sueldos altos
+  - no omitir KPI ICO para trabajadores internacionales con bonos OTD/RPA
+
+## Delta 2026-05-01 Payroll readiness y roster borrador ya siguen el contrato real de calculo
+
+- `sync-previred` ya no asume columnas inexistentes en `greenhouse_payroll.chile_afp_rates`: la tabla canónica desplegada persiste `total_rate` por AFP/período, mientras el split legacy (`worker_rate`) queda acotado a snapshots `previred_*`.
+- Los fallbacks legacy de payroll Chile vuelven a ser operativos:
+  - `previred_period_indicators` se lee por `indicator_date` y aliases reales del schema histórico
+  - `previred_afp_rates` se lee por `indicator_date` preservando `worker_rate` cuando existe
+- La verificación E2E canónica con el usuario agente quedó reprobadamente viva en staging:
+  - `pnpm test:e2e:setup` genera `.auth/storageState.json`
+  - `pnpm exec playwright test tests/e2e/smoke/hr-payroll.spec.ts --project=chromium` pasa contra `greenhouse-eo-env-staging-efeonce-7670142f.vercel.app`
+
+- `Payroll` ahora separa explícitamente dos conceptos que antes se mezclaban en UI/runtime:
+  - `colaboradores elegibles para cálculo`
+  - `entries ya materializadas`
+- En períodos `draft`, la UI puede mostrar roster elegible sin que existan todavía `payroll_entries`; esto evita el falso `0 colaboradores` cuando el borrador aún no se calculó.
+- Se agregó la capa canónica `src/lib/payroll/compensation-requirements.ts` para decidir por compensación:
+  - cuándo `KPI ICO` es realmente obligatorio
+  - cuándo asistencia/licencias puede cambiar el monto pagado
+  - cuándo Chile requiere tabla tributaria
+- Regla nueva del cálculo oficial:
+  - si falta `KPI ICO` para un colaborador con bono variable real, el cálculo bloquea antes de persistir entries
+  - si falta asistencia/licencias para un colaborador cuyo pago depende de asistencia, el cálculo bloquea antes de persistir entries
+  - `honorarios`, `Deel` y compensaciones sin exposición KPI dejan de contaminar readiness con falsos positivos
+- Operación nueva:
+  - `sync-previred` queda programado en `vercel.json`
+  - cada corrida registra `greenhouse_sync.source_sync_runs`
+  - el detector `previred_sync_freshness` vuelve a leer frescura real desde `finished_at`
+
+## Delta 2026-04-30 TASK-694 aterriza Deep Link Platform Foundation
+
+- Ya existe foundation runtime compartida en `src/lib/navigation/deep-links/**`.
+- El runtime nuevo resuelve referencias semánticas a `href`, `absoluteUrl`, `canonicalPath`, fallback y metadata de acceso reutilizando:
+  - `VIEW_REGISTRY`
+  - `VIEW_ENTITLEMENT_BINDINGS`
+  - `portalHomePath`
+  - builders públicos existentes cuando aplica
+- Definitions iniciales activas:
+  - `home`, `ops_health`, `person`, `quote`, `income`, `expense`, `leave_request`, `payroll_period`, `public_quote_share`
+- Regla de adopción nueva:
+  - consumers nuevos o de bajo riesgo que hoy armen URLs internas manualmente deben preferir `resolveGreenhouseDeepLink()`
+  - el output legacy `actionUrl` puede seguir existiendo como string derivado mientras Notification Hub, Home, API Platform app y Teams terminan su convergencia
+- Alineaciones cerradas:
+  - `payroll_period` canónico = `/hr/payroll/periods/:periodId`
+  - `person` canónico = `/people/:memberId`
+  - `home` interno sigue siendo startup-policy-first; no existe un `viewCode` único materializado para toda la surface
+- Primeros consumers migrados:
+  - `src/app/api/admin/teams/test/route.ts`
+  - `src/lib/webhooks/consumers/notification-mapping.ts` (solo casos `person`, `income`, `expense`)
+
+## Delta 2026-04-30 Manual Teams Announcement Helper
+
+- Greenhouse ya tiene un helper canónico para anuncios manuales vía Greenhouse TeamBot.
+- Artefactos principales:
+  - `src/config/manual-teams-announcements.ts` — registry code-versioned de destinos manuales permitidos
+  - `src/lib/communications/manual-teams-announcements.ts` — preview, validación, fingerprint y envío auditable
+  - `scripts/send-manual-teams-announcement.ts` — CLI operativa
+  - `docs/operations/manual-teams-announcements.md` — runbook
+- Comando canónico:
+  - `pnpm teams:announce`
+- Guardrails operativos:
+  - usar `--dry-run` para preview
+  - usar `--yes` para envío real
+  - body desde `--body-file` con párrafos separados por línea en blanco
+  - CTA `https` obligatorio
+  - destinos manuales salen del registry en código, no de texto libre
+- Regla de reutilización:
+  - ante solicitudes futuras de enviar mensajes por Greenhouse/TeamBot, preferir este helper antes de improvisar scripts temporales o usar el conector personal de Teams
+
 ## Delta 2026-04-30 Audits Folder Now Has Canonical Operating Status
 
 - `docs/audits/` ya es una categoria documental formal del repo.
@@ -76,6 +285,44 @@
   - `notion`, `hubspot`, `nubox`, `frame_io` desde `integration_registry`.
   - `teams`, `mercado_publico`, `zapsign` como runtime/helper existente pendiente de manifest/managed state.
 - Antes de crear nuevas integraciones productivas, revisar esta arquitectura y declarar manifest, scopes, secrets refs, data role, readiness, safe modes, data touched, ownership y access model cuando aplique.
+
+## Delta 2026-04-30 TASK-647 cierra MCP read-only adapter V1
+
+- Greenhouse ya tiene un runtime MCP local read-only downstream de `api/platform/ecosystem/*` en `src/mcp/greenhouse/**`.
+- El server expone por stdio cinco tools base:
+  - `get_context`
+  - `list_organizations`
+  - `get_organization`
+  - `list_capabilities`
+  - `get_integration_readiness`
+- Regla de arquitectura preservada: el MCP no lee SQL directo, no hace writes y no duplica auth, scope, request logging ni rate limits; todo baja al carril ecosystem existente.
+- Entry point operativo local:
+  - `pnpm mcp:greenhouse`
+  - `scripts/run-greenhouse-mcp.ts`
+- Variables de entorno nuevas para operación local/controlada:
+  - `GREENHOUSE_MCP_API_BASE_URL`
+  - `GREENHOUSE_MCP_CONSUMER_TOKEN`
+  - `GREENHOUSE_MCP_EXTERNAL_SCOPE_TYPE`
+  - `GREENHOUSE_MCP_EXTERNAL_SCOPE_ID`
+  - `GREENHOUSE_MCP_API_VERSION` (opcional; default `2026-04-25`)
+- `.vscode/mcp.json` puede registrar el server local sin embutir secrets, usando `inputs` interactivos.
+- `get_platform_health` queda explícitamente fuera del corte mínimo, pero el runtime ya quedó diseñado para agregar esa tool sobre el mismo cliente downstream sin romper la V1.
+
+## Delta 2026-04-30 TASK-647 cierra follow-ups read-only desbloqueados
+
+- El MCP read-only ya expone extensiones downstream seguras sobre el mismo cliente HTTP:
+  - `get_platform_health`
+  - `list_event_types`
+  - `list_webhook_subscriptions`
+  - `get_webhook_subscription`
+  - `list_webhook_deliveries`
+  - `get_webhook_delivery`
+- Guardrails nuevos del client MCP:
+  - timeout configurable `GREENHOUSE_MCP_REQUEST_TIMEOUT_MS` (default `15000`)
+  - validación runtime del payload `platform-health.v1` antes de devolver `ok`
+- Regla preservada:
+  - event control plane por MCP sigue siendo solo lectura
+  - `create/update subscription`, `retry delivery`, OAuth hosted (`TASK-659`) e ICO ecosystem surface (`TASK-648`) siguen como workstreams separados
 
 ## Delta 2026-04-26 Greenhouse Deep Link Platform documentada
 
@@ -3542,6 +3789,18 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - `Editar período` ahora permite corregir `year/month` además de `ufValue`, `taxTableVersion` y `notes`
   - si ese cambio altera la base de cálculo (`year`, `month`, `ufValue` o `taxTableVersion`), el período vuelve a `draft` y sus `payroll_entries` se eliminan para obligar un recálculo limpio
   - no se permite “renombrar” un período exportado ni moverlo encima de un `periodId` ya existente
+
+## Delta 2026-04-30 Payroll tax table auto-resolution — operador no debe adivinar `gael-YYYY-MM`
+
+- Se cerró una brecha de UX/robustez en `Payroll`: el modal de creación pedía implícitamente una `taxTableVersion` Chile que el operador no tenía por qué conocer y todavía mostraba un placeholder legacy `SII-*`.
+- Regla operativa derivada:
+  - la `taxTableVersion` canonica para Chile sigue siendo `gael-YYYY-MM`
+  - pero el operador no debe memorizarla ni escribirla manualmente en el flujo normal
+- Comportamiento derivado:
+  - al crear o editar un período, Greenhouse intenta resolver automáticamente la tabla tributaria sincronizada del mes imputable
+  - si existe una única versión sincronizada para ese mes, puede reutilizarla aunque no coincida exactamente con el nombre canónico esperado
+  - si no existe tabla tributaria sincronizada para el mes, el período puede quedar en `draft`, pero `readiness`, `calculate`, `recalculate` y `reverse quote` bloquean con mensaje explícito antes de producir cálculo Chile inválido
+  - el override manual de `taxTableVersion` sigue existiendo solo como camino avanzado y se valida contra versiones realmente disponibles del mes
 
 ## Delta 2026-03-21 Payroll KPI source cutover — ICO becomes the monthly source of truth
 

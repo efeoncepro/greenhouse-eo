@@ -27,6 +27,8 @@ import Typography from '@mui/material/Typography'
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 
+import { DataTableShell } from '@/components/greenhouse/data-table'
+
 import type { CommercialModelCode } from '@/lib/commercial/pricing-governance-types'
 import type { PricingEngineInputV2, PricingLineInputV2, PricingOutputCurrency } from '@/lib/finance/pricing/contracts'
 import { ROLE_CODES } from '@/config/role-codes'
@@ -638,7 +640,7 @@ const QuoteCreateDrawer = ({
                   Agrega al menos un ítem para estimar el precio y la salud de margen.
                 </Alert>
               ) : (
-                <Box sx={{ overflowX: 'auto' }}>
+                <DataTableShell identifier='quote-create-line-items' ariaLabel='Lineas del quote en construccion'>
                   <Table size='small'>
                     <TableHead>
                       <TableRow>
@@ -731,7 +733,7 @@ const QuoteCreateDrawer = ({
                       ))}
                     </TableBody>
                   </Table>
-                </Box>
+                </DataTableShell>
               )}
             </Box>
           )}

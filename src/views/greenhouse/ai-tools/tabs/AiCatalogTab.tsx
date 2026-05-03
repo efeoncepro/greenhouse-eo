@@ -295,7 +295,7 @@ const AiCatalogTab = ({ tools, providers, meta, onRefresh }: Props) => {
           const tool = row.original
 
           return (
-            <Typography sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
+            <Typography sx={{ fontSize: '0.8rem' }}>
               {tool.costModel === 'per_credit' || tool.costModel === 'hybrid'
                 ? `${formatCost(tool.creditUnitCost, tool.creditUnitCurrency)} / ${tool.creditUnitName ?? 'unit'}`
                 : tool.costModel === 'subscription'

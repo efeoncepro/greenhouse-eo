@@ -1,164 +1,25 @@
 import { NextResponse } from 'next/server'
 
+import { runIcoMemberSync } from '@/lib/cron-orchestrators'
 import { requireCronAuth } from '@/lib/cron/require-cron-auth'
-import { checkIntegrationReadiness } from '@/lib/integrations/readiness'
 
-import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
-import { buildMetricTrustMapFromRow, serializeMetricTrustMap } from '@/lib/ico-engine/metric-trust-policy'
-import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
-
+/**
+ * TASK-775 Slice 9 — Vercel cron fallback manual.
+ * Path scheduler canónico: Cloud Scheduler ops-ico-member-sync → ops-worker.
+ * Lógica en src/lib/cron-orchestrators/index.ts (runIcoMemberSync).
+ */
 export const dynamic = 'force-dynamic'
-
-interface BqRow {
-  member_id: string
-  period_year: number
-  period_month: number
-  rpa_avg: number | null
-  rpa_median: number | null
-  otd_pct: number | null
-  ftr_pct: number | null
-  cycle_time_avg_days: number | null
-  cycle_time_variance?: number | null
-  throughput_count: number | null
-  pipeline_velocity: number | null
-  stuck_asset_count: number | null
-  stuck_asset_pct: number | null
-  total_tasks: number | null
-  completed_tasks: number | null
-  active_tasks: number | null
-  on_time_count: number | null
-  late_drop_count: number | null
-  overdue_count: number | null
-  carry_over_count: number | null
-  overdue_carried_forward_count: number | null
-  rpa_eligible_task_count?: number | null
-  rpa_missing_task_count?: number | null
-  rpa_non_positive_task_count?: number | null
-}
-
-const toNum = (v: unknown): number | null => {
-  if (v === null || v === undefined) return null
-  if (typeof v === 'number') return v
-
-  if (typeof v === 'string') {
-    const n = Number(v)
-
-    return Number.isFinite(n) ? n : null
-  }
-
-  if (typeof v === 'object' && v !== null && 'value' in v) return toNum((v as { value: unknown }).value)
-
-  return null
-}
 
 export async function GET(request: Request) {
   const { authorized, errorResponse } = requireCronAuth(request)
 
-  if (!authorized) {
-    return errorResponse
-  }
-
-  // ── Readiness gate: ICO depends on Notion upstream ──
-  try {
-    const readiness = await checkIntegrationReadiness('notion')
-
-    if (!readiness.ready) {
-      console.log(`[ico-member-sync] Skipped: Notion upstream not ready — ${readiness.reason}`)
-
-      return NextResponse.json({ skipped: true, reason: readiness.reason })
-    }
-  } catch (error) {
-    console.warn('[ico-member-sync] Readiness check failed, proceeding anyway:', error)
-  }
+  if (!authorized) return errorResponse
 
   try {
-    const startMs = Date.now()
-    const projectId = getBigQueryProjectId()
-    const bigQuery = getBigQueryClient()
+    const result = await runIcoMemberSync()
 
-    // Sync last 3 months (covers late materializations)
-    const now = new Date()
-    const periods: Array<{ year: number; month: number }> = []
-
-    for (let i = 0; i < 3; i++) {
-      const d = new Date(now.getFullYear(), now.getMonth() - i, 1)
-
-      periods.push({ year: d.getFullYear(), month: d.getMonth() + 1 })
-    }
-
-    let totalUpserted = 0
-
-    for (const { year, month } of periods) {
-      const [rows] = await bigQuery.query({
-        query: `SELECT *
-                FROM \`${projectId}.ico_engine.metrics_by_member\`
-                WHERE period_year = @year AND period_month = @month`,
-        params: { year, month }
-      })
-
-      for (const raw of rows as BqRow[]) {
-        const metricTrustJson = serializeMetricTrustMap(
-          buildMetricTrustMapFromRow(raw as unknown as Parameters<typeof buildMetricTrustMapFromRow>[0])
-        )
-
-        await runGreenhousePostgresQuery(
-          `INSERT INTO greenhouse_serving.ico_member_metrics (
-            member_id, period_year, period_month,
-            rpa_avg, rpa_median, otd_pct, ftr_pct,
-            cycle_time_avg_days, throughput_count, pipeline_velocity,
-            stuck_asset_count, stuck_asset_pct,
-            total_tasks, completed_tasks, active_tasks,
-            on_time_count, late_drop_count, overdue_count, carry_over_count, overdue_carried_forward_count,
-            metric_trust_json,
-            materialized_at
-          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21::jsonb, NOW())
-          ON CONFLICT (member_id, period_year, period_month) DO UPDATE SET
-            rpa_avg = EXCLUDED.rpa_avg,
-            rpa_median = EXCLUDED.rpa_median,
-            otd_pct = EXCLUDED.otd_pct,
-            ftr_pct = EXCLUDED.ftr_pct,
-            cycle_time_avg_days = EXCLUDED.cycle_time_avg_days,
-            throughput_count = EXCLUDED.throughput_count,
-            pipeline_velocity = EXCLUDED.pipeline_velocity,
-            stuck_asset_count = EXCLUDED.stuck_asset_count,
-            stuck_asset_pct = EXCLUDED.stuck_asset_pct,
-            total_tasks = EXCLUDED.total_tasks,
-            completed_tasks = EXCLUDED.completed_tasks,
-            active_tasks = EXCLUDED.active_tasks,
-            on_time_count = EXCLUDED.on_time_count,
-            late_drop_count = EXCLUDED.late_drop_count,
-            overdue_count = EXCLUDED.overdue_count,
-            carry_over_count = EXCLUDED.carry_over_count,
-            overdue_carried_forward_count = EXCLUDED.overdue_carried_forward_count,
-            metric_trust_json = EXCLUDED.metric_trust_json,
-            materialized_at = NOW()`,
-          [
-            raw.member_id, raw.period_year, raw.period_month,
-            toNum(raw.rpa_avg), toNum(raw.rpa_median), toNum(raw.otd_pct), toNum(raw.ftr_pct),
-            toNum(raw.cycle_time_avg_days), toNum(raw.throughput_count), toNum(raw.pipeline_velocity),
-            toNum(raw.stuck_asset_count), toNum(raw.stuck_asset_pct),
-            toNum(raw.total_tasks), toNum(raw.completed_tasks), toNum(raw.active_tasks),
-            toNum(raw.on_time_count), toNum(raw.late_drop_count), toNum(raw.overdue_count),
-            toNum(raw.carry_over_count), toNum(raw.overdue_carried_forward_count),
-            metricTrustJson
-          ]
-        )
-        totalUpserted++
-      }
-    }
-
-    const durationMs = Date.now() - startMs
-
-    console.log(`[ico-member-sync] ${totalUpserted} rows upserted across ${periods.length} periods in ${durationMs}ms`)
-
-    return NextResponse.json({
-      upserted: totalUpserted,
-      periods: periods.map(p => `${p.year}-${String(p.month).padStart(2, '0')}`),
-      durationMs
-    })
+    return NextResponse.json(result)
   } catch (error) {
-    console.error('[ico-member-sync] Cron failed:', error)
-
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }

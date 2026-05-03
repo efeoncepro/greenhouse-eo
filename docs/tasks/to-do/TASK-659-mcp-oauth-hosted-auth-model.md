@@ -48,7 +48,7 @@ Reglas obligatorias:
 
 ## Normative Docs
 
-- `docs/tasks/to-do/TASK-647-greenhouse-mcp-read-only-adapter-v1.md`
+- `docs/tasks/complete/TASK-647-greenhouse-mcp-read-only-adapter-v1.md`
 - `docs/tasks/in-progress/TASK-649-api-platform-completion-program.md`
 
 ## Dependencies & Impact

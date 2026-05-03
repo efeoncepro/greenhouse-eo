@@ -3,7 +3,7 @@ import type { PersonHrContext } from '@/lib/person-360/get-person-hr'
 import type { CompensationVersion, PayrollEntry } from '@/types/payroll'
 import type { TeamMemberProfile } from '@/types/team'
 
-export type PersonTab = 'profile' | 'activity' | 'memberships' | 'economy' | 'ai-tools'
+export type PersonTab = 'profile' | 'activity' | 'memberships' | 'economy' | 'payment' | 'ai-tools'
 
 /** @deprecated Legacy tab values — kept for URL redirect compatibility */
 export type LegacyPersonTab = 'compensation' | 'payroll' | 'finance' | 'hr-profile' | 'identity' | 'intelligence'
@@ -124,6 +124,7 @@ export interface PersonAccess {
   canViewAiTools: boolean
   canViewIdentityContext: boolean
   canViewAccessContext: boolean
+  canViewPaymentProfile: boolean
   visibleTabs: PersonTab[]
 }
 

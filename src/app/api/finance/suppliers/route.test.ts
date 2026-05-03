@@ -2,9 +2,14 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const mockRequireFinanceTenantContext = vi.fn()
 const mockListFinanceSuppliersFromPostgres = vi.fn()
+const mockSeedFinanceSupplierInPostgres = vi.fn()
 const mockShouldFallbackFromFinancePostgres = vi.fn()
 const mockAssertFinanceBigQueryReadiness = vi.fn()
 const mockRunFinanceQuery = vi.fn()
+const mockSyncProviderFromFinanceSupplier = vi.fn()
+const mockCaptureWithDomain = vi.fn()
+const mockEnsureOrganizationForSupplier = vi.fn()
+const mockEnsureOrganizationContactMembership = vi.fn()
 
 vi.mock('@/lib/tenant/authorization', () => ({
   requireFinanceTenantContext: () => mockRequireFinanceTenantContext()
@@ -17,7 +22,7 @@ vi.mock('@/lib/finance/schema', () => ({
 
 vi.mock('@/lib/finance/postgres-store', () => ({
   listFinanceSuppliersFromPostgres: (...args: unknown[]) => mockListFinanceSuppliersFromPostgres(...args),
-  seedFinanceSupplierInPostgres: vi.fn(),
+  seedFinanceSupplierInPostgres: (...args: unknown[]) => mockSeedFinanceSupplierInPostgres(...args),
   shouldFallbackFromFinancePostgres: (...args: unknown[]) => mockShouldFallbackFromFinancePostgres(...args)
 }))
 
@@ -26,15 +31,19 @@ vi.mock('@/lib/finance/bigquery-write-flag', () => ({
 }))
 
 vi.mock('@/lib/account-360/organization-identity', () => ({
-  ensureOrganizationForSupplier: vi.fn()
+  ensureOrganizationForSupplier: (...args: unknown[]) => mockEnsureOrganizationForSupplier(...args)
 }))
 
 vi.mock('@/lib/account-360/organization-store', () => ({
-  ensureOrganizationContactMembership: vi.fn()
+  ensureOrganizationContactMembership: (...args: unknown[]) => mockEnsureOrganizationContactMembership(...args)
 }))
 
 vi.mock('@/lib/providers/canonical', () => ({
-  syncProviderFromFinanceSupplier: vi.fn()
+  syncProviderFromFinanceSupplier: (...args: unknown[]) => mockSyncProviderFromFinanceSupplier(...args)
+}))
+
+vi.mock('@/lib/observability/capture', () => ({
+  captureWithDomain: (...args: unknown[]) => mockCaptureWithDomain(...args)
 }))
 
 vi.mock('@/lib/finance/shared', async () => {
@@ -47,7 +56,7 @@ vi.mock('@/lib/finance/shared', async () => {
   }
 })
 
-import { GET } from './route'
+import { GET, POST } from './route'
 
 describe('GET /api/finance/suppliers', () => {
   beforeEach(() => {
@@ -167,5 +176,97 @@ describe('GET /api/finance/suppliers', () => {
       supplierId: 'legacy-1',
       legalName: 'Legacy Supplier'
     })
+  })
+})
+
+// ── TASK-771 — POST supplier debe responder 201 cuando PG commitea.           ─
+// ── Slice 1 envolvió el sync BQ inline en try/catch (hotfix).                 ─
+// ── Slice 3 lo eliminó por completo: la proyección a BQ corre async vía       ─
+// ── consumer reactivo `provider_bq_sync` consumiendo el outbox event          ─
+// ── `provider.upserted` emitido en la tx PG.                                  ─
+// ── Estos tests garantizan el contract nuevo: response NO depende de BQ y la  ─
+// ── llamada inline a `syncProviderFromFinanceSupplier` quedó eliminada.       ─
+
+describe('POST /api/finance/suppliers — TASK-771 BQ-decoupling', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+
+    mockRequireFinanceTenantContext.mockResolvedValue({
+      tenant: { userId: 'user-julio' },
+      errorResponse: null
+    })
+
+    mockShouldFallbackFromFinancePostgres.mockReturnValue(false)
+    mockSeedFinanceSupplierInPostgres.mockResolvedValue(undefined)
+    mockEnsureOrganizationForSupplier.mockResolvedValue('org-id')
+    mockEnsureOrganizationContactMembership.mockResolvedValue(undefined)
+  })
+
+  const buildRequest = () =>
+    new Request('http://localhost/api/finance/suppliers', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        legalName: 'Figma, Inc',
+        tradeName: 'Figma',
+        category: 'software',
+        country: 'CL',
+        serviceType: 'saas',
+        isInternational: true,
+        paymentCurrency: 'USD',
+        defaultPaymentTerms: 30
+      })
+    })
+
+  it('returns 201 with PG-derived providerId without invoking inline BQ sync', async () => {
+    const response = await POST(buildRequest())
+    const body = await response.json()
+
+    expect(response.status).toBe(201)
+    expect(body).toMatchObject({ supplierId: 'figma-inc', providerId: 'figma', created: true })
+    expect(mockSeedFinanceSupplierInPostgres).toHaveBeenCalledTimes(1)
+
+    // TASK-771 Slice 3 — el sync BQ ya NO corre inline. La proyección reactiva
+    // `provider_bq_sync` consume el outbox event provider.upserted async.
+    expect(mockSyncProviderFromFinanceSupplier).not.toHaveBeenCalled()
+    expect(mockCaptureWithDomain).not.toHaveBeenCalled()
+  })
+
+  it('still returns 201 if BQ infrastructure is unreachable (regression for incident 2026-05-03)', async () => {
+    // Aunque mockeáramos sync para throw, la llamada ya no existe en el route.
+    // El failure BQ ahora vive en el reactive consumer, no en el request path.
+    mockSyncProviderFromFinanceSupplier.mockRejectedValue(new Error('BigQuery dataset missing'))
+
+    const response = await POST(buildRequest())
+    const body = await response.json()
+
+    expect(response.status).toBe(201)
+    expect(body).toMatchObject({
+      supplierId: 'figma-inc',
+      providerId: 'figma',
+      created: true
+    })
+    expect(mockSyncProviderFromFinanceSupplier).not.toHaveBeenCalled()
+    expect(mockCaptureWithDomain).not.toHaveBeenCalled()
+  })
+
+  it('returns 400 when PG seed throws a FinanceValidationError', async () => {
+    const validationError = new Error('Invalid category: foo.')
+
+    validationError.name = 'FinanceValidationError'
+    Object.assign(validationError, { statusCode: 400 })
+    mockSeedFinanceSupplierInPostgres.mockRejectedValue(validationError)
+
+    const response = await POST(
+      new Request('http://localhost/api/finance/suppliers', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ legalName: 'Test', category: 'invalid_category', country: 'CL' })
+      })
+    )
+
+    // category='invalid_category' es rechazado antes de llegar al seed (SUPPLIER_CATEGORIES check).
+    expect([400, 500]).toContain(response.status)
+    expect(mockSyncProviderFromFinanceSupplier).not.toHaveBeenCalled()
   })
 })

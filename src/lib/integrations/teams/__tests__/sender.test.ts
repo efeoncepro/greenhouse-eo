@@ -8,6 +8,8 @@ const pgQueryMock = vi.fn()
 const resolveSecretByRefMock = vi.fn()
 
 vi.mock('@/lib/postgres/client', () => ({
+  onGreenhousePostgresReset: () => () => {},
+  isGreenhousePostgresRetryableConnectionError: () => false,
   runGreenhousePostgresQuery: (...args: unknown[]) => pgQueryMock(...args)
 }))
 

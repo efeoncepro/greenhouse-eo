@@ -479,13 +479,13 @@ const ExpenseContent = ({ data, theme, chartCurrencyTab, setChartCurrencyTab, ye
                 <Grid container spacing={2}>
                   <Grid size={{ xs: 6 }}>
                     <Typography variant='caption' color='text.secondary'>Bruto acumulado</Typography>
-                    <Typography variant='body1' fontWeight={600} sx={{ fontFamily: 'monospace' }}>
+                    <Typography variant='body1' fontWeight={600}>
                       {formatCurrency(chileRegime.gross, 'CLP')}
                     </Typography>
                   </Grid>
                   <Grid size={{ xs: 6 }}>
                     <Typography variant='caption' color='text.secondary'>Neto acumulado</Typography>
-                    <Typography variant='body1' fontWeight={600} sx={{ fontFamily: 'monospace' }}>
+                    <Typography variant='body1' fontWeight={600}>
                       {formatCurrency(chileRegime.net, 'CLP')}
                     </Typography>
                   </Grid>
@@ -505,13 +505,13 @@ const ExpenseContent = ({ data, theme, chartCurrencyTab, setChartCurrencyTab, ye
                 <Grid container spacing={2}>
                   <Grid size={{ xs: 6 }}>
                     <Typography variant='caption' color='text.secondary'>Bruto acumulado</Typography>
-                    <Typography variant='body1' fontWeight={600} sx={{ fontFamily: 'monospace' }}>
+                    <Typography variant='body1' fontWeight={600}>
                       {formatCurrency(intlRegime.gross, 'USD')}
                     </Typography>
                   </Grid>
                   <Grid size={{ xs: 6 }}>
                     <Typography variant='caption' color='text.secondary'>Neto acumulado</Typography>
-                    <Typography variant='body1' fontWeight={600} sx={{ fontFamily: 'monospace' }}>
+                    <Typography variant='body1' fontWeight={600}>
                       {formatCurrency(intlRegime.net, 'USD')}
                     </Typography>
                   </Grid>
@@ -563,27 +563,27 @@ const ExpenseContent = ({ data, theme, chartCurrencyTab, setChartCurrencyTab, ye
                         <Typography variant='body2'>{period.headcount}</Typography>
                       </TableCell>
                       <TableCell align='right'>
-                        <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
+                        <Typography variant='body2'>
                           {clpBucket ? formatCurrency(clpBucket.gross, 'CLP') : '—'}
                         </Typography>
                       </TableCell>
                       <TableCell align='right'>
-                        <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
+                        <Typography variant='body2'>
                           {clpBucket ? formatCurrency(clpBucket.net, 'CLP') : '—'}
                         </Typography>
                       </TableCell>
                       <TableCell align='right'>
-                        <Typography variant='body2' color='error.main' sx={{ fontFamily: 'monospace' }}>
+                        <Typography variant='body2' color='error.main'>
                           {clpBucket && clpBucket.deductions > 0 ? `- ${formatCurrency(clpBucket.deductions, 'CLP')}` : '—'}
                         </Typography>
                       </TableCell>
                       <TableCell align='right'>
-                        <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
+                        <Typography variant='body2'>
                           {usdBucket ? formatCurrency(usdBucket.gross, 'USD') : '—'}
                         </Typography>
                       </TableCell>
                       <TableCell align='right'>
-                        <Typography variant='subtitle2' sx={{ fontFamily: 'monospace', fontWeight: 700 }}>
+                        <Typography variant='subtitle2' sx={{ fontWeight: 700 }}>
                           {usdBucket ? formatCurrency(usdBucket.net, 'USD') : '—'}
                         </Typography>
                       </TableCell>

@@ -25,6 +25,7 @@ import Typography from '@mui/material/Typography'
 import { useListAnimation } from '@/hooks/useListAnimation'
 import useQuotesList from '@/hooks/useQuotesList'
 import useViewTransitionRouter from '@/hooks/useViewTransitionRouter'
+import { DataTableShell } from '@/components/greenhouse/data-table'
 
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
@@ -213,7 +214,7 @@ const QuotesListView = () => {
             </Typography>
           </Box>
         ) : (
-          <Box sx={{ overflowX: 'auto' }}>
+          <DataTableShell identifier='finance-quotes-list' ariaLabel='Listado de cotizaciones'>
             <Table size='small'>
               <TableHead>
                 <TableRow>
@@ -247,7 +248,6 @@ const QuotesListView = () => {
                         <Typography
                           variant='body2'
                           sx={{
-                            fontFamily: 'monospace',
                             fontSize: '0.8rem',
                             viewTransitionName: `quote-identity-${q.quoteId}`
                           }}
@@ -270,7 +270,7 @@ const QuotesListView = () => {
                         <Typography variant='body2' color='text.secondary'>{formatDate(q.dueDate)}</Typography>
                       </TableCell>
                       <TableCell align='right'>
-                        <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>{formatCLP(q.totalAmountClp)}</Typography>
+                        <Typography variant='body2'>{formatCLP(q.totalAmountClp)}</Typography>
                       </TableCell>
                       <TableCell>
                         {q.currentVersion && q.currentVersion > 1 ? (
@@ -297,7 +297,7 @@ const QuotesListView = () => {
                 })}
               </TableBody>
             </Table>
-          </Box>
+          </DataTableShell>
         )}
       </Card>
     </Stack>

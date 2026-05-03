@@ -201,7 +201,7 @@ const QuoteVersionsTimeline = ({
                       <Typography variant='caption' color='text.secondary'>
                         Total
                       </Typography>
-                      <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
+                      <Typography variant='body2'>
                         {formatCLP(version.totalPrice)}
                       </Typography>
                     </Box>
@@ -215,7 +215,7 @@ const QuoteVersionsTimeline = ({
                       <Typography variant='caption' color='text.secondary'>
                         Descuento
                       </Typography>
-                      <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
+                      <Typography variant='body2'>
                         {formatCLP(version.totalDiscount)}
                       </Typography>
                     </Box>

@@ -71,7 +71,7 @@ export const computeChileTax = async ({
      WHERE tax_table_version = $1
      ORDER BY bracket_order ASC`,
     [taxTableVersion]
-  ).catch(() => [] as TaxBracketRow[])
+  )
 
   if (brackets.length === 0) {
     return {

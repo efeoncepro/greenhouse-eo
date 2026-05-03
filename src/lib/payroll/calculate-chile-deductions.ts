@@ -6,6 +6,8 @@ import {
   getAfpRateForCode,
   getImmForPeriod,
   getUnemploymentRateForPeriod,
+  getTopeAfpForPeriod,
+  getTopeCesantiaForPeriod,
   resolveChileEmployerCostAmounts,
   resolveChileHealthSplitAmounts,
   resolveChileAfpRateSplitForCompensation,
@@ -159,7 +161,30 @@ export const calculatePayrollTotals = async ({
     }
   }
 
+  if (contractType !== 'indefinido' && contractType !== 'plazo_fijo') {
+    throw new PayrollValidationError('Chile dependent payroll totals require an indefinido or plazo_fijo contract.', 400, {
+      contractType
+    })
+  }
+
   const imponibleBase = Math.max(0, baseSalary + fixedBonusAmount + totalVariableBonus + gratificationLegalAmount)
+  const topeAfpUf = await getTopeAfpForPeriod(fallbackPeriodDate)
+  const topeCesantiaUf = await getTopeCesantiaForPeriod(fallbackPeriodDate)
+
+  const resolveCappedBase = (topeUf: number) => {
+    if (topeUf <= 0) {
+      return imponibleBase
+    }
+
+    if (typeof ufValue !== 'number' || !Number.isFinite(ufValue) || ufValue <= 0) {
+      throw new PayrollValidationError('UF value is required to apply Chile statutory imponible caps.', 400)
+    }
+
+    return Math.min(imponibleBase, roundCurrency(topeUf * ufValue))
+  }
+
+  const pensionHealthAccidentBase = resolveCappedBase(topeAfpUf)
+  const cesantiaBase = resolveCappedBase(topeCesantiaUf)
 
   const normalizedAfpRate =
     typeof afpRate === 'number' && Number.isFinite(afpRate)
@@ -197,15 +222,15 @@ export const calculatePayrollTotals = async ({
     ? resolvedSplitRates.cotizacionRate + resolvedSplitRates.comisionRate
     : normalizedAfpRate
 
-  const chileContractType = contractType === 'plazo_fijo' ? 'plazo_fijo' : 'indefinido'
+  const chileContractType = contractType
 
   const derivedUnemploymentRate =
     typeof unemploymentRate === 'number' && Number.isFinite(unemploymentRate)
       ? unemploymentRate
       : await getUnemploymentRateForPeriod(fallbackPeriodDate, chileContractType)
 
-  const afpCotizacionAmount = roundCurrency(imponibleBase * resolvedSplitRates.cotizacionRate)
-  const afpComisionAmount = roundCurrency(imponibleBase * resolvedSplitRates.comisionRate)
+  const afpCotizacionAmount = roundCurrency(pensionHealthAccidentBase * resolvedSplitRates.cotizacionRate)
+  const afpComisionAmount = roundCurrency(pensionHealthAccidentBase * resolvedSplitRates.comisionRate)
   const afpAmount = roundCurrency(afpCotizacionAmount + afpComisionAmount)
 
   let healthAmount = 0
@@ -217,24 +242,25 @@ export const calculatePayrollTotals = async ({
 
     healthAmount = roundCurrency((healthPlanUf || 0) * (ufValue || 0))
   } else {
-    healthAmount = roundCurrency(imponibleBase * 0.07)
+    healthAmount = roundCurrency(pensionHealthAccidentBase * 0.07)
   }
 
   const healthSplit = resolveChileHealthSplitAmounts({
     payRegime,
     healthSystem,
-    imponibleBase,
+    imponibleBase: pensionHealthAccidentBase,
     totalHealthAmount: healthAmount
   })
 
   const employerCosts = await resolveChileEmployerCostAmounts({
     payRegime,
     contractType: chileContractType,
-    imponibleBase,
+    imponibleBase: pensionHealthAccidentBase,
+    cesantiaBase,
     periodDate: fallbackPeriodDate
   })
 
-  const unemploymentAmount = roundCurrency(imponibleBase * derivedUnemploymentRate)
+  const unemploymentAmount = roundCurrency(cesantiaBase * derivedUnemploymentRate)
   const normalizedApvAmount = hasApv ? roundCurrency(apvAmount || 0) : 0
   const normalizedTaxAmount = roundCurrency(taxAmount || 0)
   const taxableBase = roundCurrency(Math.max(0, imponibleBase - afpAmount - healthAmount - unemploymentAmount))

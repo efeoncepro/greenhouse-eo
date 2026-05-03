@@ -312,7 +312,7 @@ const IncomeDetailView = () => {
       {/* Header */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 2 }}>
         <Box>
-          <Typography variant='h4' sx={{ fontFamily: 'Poppins, sans-serif', fontWeight: 600, mb: 0.5 }}>
+          <Typography variant='h4' sx={{ fontWeight: 600, mb: 0.5 }}>
             {data.invoiceNumber || data.incomeId}
           </Typography>
           <Typography variant='body2' color='text.secondary'>
@@ -479,7 +479,7 @@ const IncomeDetailView = () => {
                     </Grid>
                     <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                       <Typography variant='caption' color='text.secondary'>Track SII</Typography>
-                      <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
+                      <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>
                         {data.nuboxSiiTrackId || '—'}
                       </Typography>
                     </Grid>

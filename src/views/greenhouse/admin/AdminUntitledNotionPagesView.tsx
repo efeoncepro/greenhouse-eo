@@ -187,7 +187,7 @@ const AdminUntitledNotionPagesView = ({ overview }: Props) => {
                   </TableCell>
                   <TableCell>
                     <Tooltip title={row.sourceId} arrow>
-                      <Typography variant='caption' sx={{ fontFamily: 'monospace' }}>
+                      <Typography variant='caption'>
                         {row.sourceId.slice(0, 12)}…
                       </Typography>
                     </Tooltip>

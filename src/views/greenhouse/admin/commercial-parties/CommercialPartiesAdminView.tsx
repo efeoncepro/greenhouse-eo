@@ -385,7 +385,7 @@ const CommercialPartiesAdminView = ({ data }: Props) => {
                               <Typography variant='body2' sx={{ fontWeight: 600 }}>
                                 {party.displayName}
                               </Typography>
-                              <Typography variant='caption' color='text.secondary' sx={{ fontFamily: 'monospace' }}>
+                              <Typography variant='caption' color='text.secondary'>
                                 {party.publicId ?? party.commercialPartyId}
                               </Typography>
                               <Typography variant='caption' color='text.secondary'>
@@ -430,7 +430,7 @@ const CommercialPartiesAdminView = ({ data }: Props) => {
                           {party.clientId ? (
                             <Stack spacing={0.5}>
                               <CustomChip label='Client enlazado' color='success' size='small' variant='outlined' round='true' />
-                              <Typography variant='caption' color='text.secondary' sx={{ fontFamily: 'monospace' }}>
+                              <Typography variant='caption' color='text.secondary'>
                                 {party.clientId}
                               </Typography>
                             </Stack>

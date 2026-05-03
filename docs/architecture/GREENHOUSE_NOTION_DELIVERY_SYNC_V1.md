@@ -1,7 +1,7 @@
 # GREENHOUSE_NOTION_DELIVERY_SYNC_V1
 
 > **Type**: Canonical architecture spec
-> **Version**: 1.0
+> **Version**: 1.1
 > **Status**: Production
 > **Created**: 2026-04-26
 > **Owners**: Reliability + Delivery
@@ -46,6 +46,55 @@ multi-property cascade, but Postgres never saw them.
 [Surfaces]
 ```
 
+## Delta 2026-05-02 — freshness metadata drift BigQuery ↔ PostgreSQL
+
+Contexto: durante la investigacion del `RpA Global = 3` en `/agency`, se detecto que mayo 2026 **si** tenia datos Notion y rows de delivery en BigQuery, pero varios readers operativos seguian mostrando `last_synced_at = NULL` porque leian `greenhouse_core.space_notion_sources` en PostgreSQL mientras el upstream `notion-bq-sync` actualizaba solo `greenhouse.space_notion_sources` en BigQuery.
+
+Evidencia observada en staging/produccion:
+
+- BigQuery `greenhouse.space_notion_sources.last_synced_at` se actualizaba diariamente por `space_id`.
+- PostgreSQL `greenhouse_core.space_notion_sources.last_synced_at` seguia nulo para los mismos spaces activos.
+- `INFORMATION_SCHEMA.JOBS_BY_PROJECT` mostro el writer upstream:
+
+```sql
+UPDATE `efeonce-group.greenhouse.space_notion_sources`
+SET last_synced_at = CURRENT_TIMESTAMP()
+WHERE space_id = @space_id
+```
+
+Actor: `183008134038-compute@developer.gserviceaccount.com`.
+
+### Decision canonica
+
+El binding canonico del onboarding Notion sigue viviendo en **PostgreSQL** (`greenhouse_core.space_notion_sources`). BigQuery mantiene la replica analitica/operativa que consume el pipeline upstream. Cuando ambas capas divergen:
+
+- **PostgreSQL** sigue siendo la fuente de verdad de dominio para el binding del Space.
+- **BigQuery** se acepta como señal de freshness observable del upstream.
+- El portal debe **reconciliar** el freshness BQ → PG en el siguiente drain programado, no dejar las surfaces mintiendo con `NULL`.
+
+### Nueva sub-etapa dentro de Step 2
+
+```
+[BQ conformed: greenhouse_conformed.delivery_*]
+       │
+       │  Step 2a — projectNotionDeliveryToPostgres
+       │  (delivery entities BQ -> PG)
+       │
+       │  Step 2b — reconcileNotionFreshnessToPostgres
+       │  (greenhouse.space_notion_sources.last_synced_at -> greenhouse_core.space_notion_sources.last_synced_at)
+       ▼
+[PG runtime + PG binding metadata]
+```
+
+La reconciliacion vive en `src/lib/integrations/notion-sync-freshness.ts` y hoy se ejecuta desde `syncBqConformedToPostgres()`.
+
+### Reglas nuevas
+
+1. `last_synced_at` para Notion **no** debe leerse solo desde PostgreSQL a ciegas si la surface necesita mostrar frescura actual.
+2. Cualquier reader operativo puede usar `BigQuery` como fallback de lectura mientras el writer upstream siga fuera de este repo.
+3. El writer ideal de largo plazo es dual-write en el servicio upstream (`notion-bq-sync`): actualizar BigQuery y PostgreSQL en la misma corrida.
+4. Mientras ese dual-write no exista, el `BQ -> PG drain` del portal es el mecanismo oficial de autocuracion.
+
 ## Trigger topology (canonical)
 
 | Trigger                                                           | Cron / freq            | Path                                                                                              | Purpose                                                                                                       |
@@ -76,6 +125,7 @@ Lives in `src/lib/sync/sync-bq-conformed-to-postgres.ts`. **The piece that close
 - Maps to PG row shape, coercing fractional BQ-formula values to PG INTEGER via `toInteger()` (`Math.trunc`, not `Math.round`, to preserve "days passed so far" semantics).
 - Calls `projectNotionDeliveryToPostgres({ ... })` which UPSERTs by `notion_*_id` per row.
 - Optionally marks rows missing from the batch as `is_deleted=TRUE` (mirrors the BQ staged-swap semantics) when `replaceMissingForSpaces=true`.
+- Since `2026-05-02`, also calls `reconcileNotionFreshnessToPostgres()` to mirror `greenhouse.space_notion_sources.last_synced_at` back into `greenhouse_core.space_notion_sources.last_synced_at`.
 
 Independent of Step 1 — runs even when Step 1 says "skipped" because BQ is already current. PG can be stale even when BQ is fresh; this step ensures they stay aligned.
 
@@ -162,6 +212,7 @@ table-level locks — safe to interleave with reactive event handlers.
 ## Files
 
 - Helpers: `src/lib/sync/project-notion-delivery-to-postgres.ts`, `src/lib/sync/sync-bq-conformed-to-postgres.ts`
+- Freshness reconciliation + fallback readers: `src/lib/integrations/notion-sync-freshness.ts`
 - Orchestrator: `src/lib/integrations/notion-sync-orchestration.ts`
 - BQ writer: `src/lib/sync/sync-notion-conformed.ts`
 - Cloud Run endpoint: `services/ops-worker/server.ts` (`POST /notion-conformed/sync`)
@@ -184,3 +235,4 @@ table-level locks — safe to interleave with reactive event handlers.
 | Version | Date       | Change                                                                                                                          |
 | ------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------- |
 | 1.0     | 2026-04-26 | Initial spec promoted to canonical after the PG drift incident. Cloud Run path declared canonical, manual script demoted.        |
+| 1.1     | 2026-05-02 | Documents BigQuery↔PostgreSQL freshness drift and the canonical reconciliation step `reconcileNotionFreshnessToPostgres()`.     |

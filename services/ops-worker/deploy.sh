@@ -228,6 +228,13 @@ ENV_VARS="${ENV_VARS},HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL=${HUBSPOT_GREENHOU
 RELIABILITY_AI_OBSERVER_ENABLED="${RELIABILITY_AI_OBSERVER_ENABLED:-true}"
 ENV_VARS="${ENV_VARS},RELIABILITY_AI_OBSERVER_ENABLED=${RELIABILITY_AI_OBSERVER_ENABLED}"
 
+# TASK-769 — Cloud Cost FinOps AI kill-switch.
+# Deterministic cost alerts run even when this is false. AI interpretation is
+# opt-in because every Gemini call costs tokens. Enable explicitly with:
+# `CLOUD_COST_AI_COPILOT_ENABLED=true ENV=staging bash services/ops-worker/deploy.sh`.
+CLOUD_COST_AI_COPILOT_ENABLED="${CLOUD_COST_AI_COPILOT_ENABLED:-false}"
+ENV_VARS="${ENV_VARS},CLOUD_COST_AI_COPILOT_ENABLED=${CLOUD_COST_AI_COPILOT_ENABLED}"
+
 if [ -n "${RESEND_API_KEY_SECRET_REF}" ]; then
   ENV_VARS="${ENV_VARS},RESEND_API_KEY_SECRET_REF=${RESEND_API_KEY_SECRET_REF}"
 else
@@ -423,6 +430,177 @@ upsert_scheduler_job \
   '{"domain":"cost_intelligence","batchSize":500}'
 echo "  -> ops-reactive-cost-intelligence: */10 * * * * (cost_intelligence domain)"
 
+# ─── Outbox publisher (TASK-773) ─────────────────────────────────────────────
+# Migración desde Vercel cron /api/cron/outbox-publish (que solo corre en
+# producción) a Cloud Scheduler (que corre por proyecto GCP, igual en staging
+# y prod). Cierra clase de bugs invisibles donde flujos write-then-projection
+# de Finance funcionan en producción pero quedan colgados en staging.
+#
+# Cron */2 min: más frecuente que el original */5 para mejor SLA. Costo
+# negligible (< 1s CPU por run cuando no hay events). State machine:
+# pending → publishing → published/failed/dead_letter (max 5 retries).
+upsert_scheduler_job \
+  "ops-outbox-publish" \
+  "*/2 * * * *" \
+  "/outbox/publish-batch" \
+  '{"batchSize":500,"maxRetries":5}'
+echo "  -> ops-outbox-publish: */2 * * * * (outbox PG → BQ raw publisher, TASK-773)"
+
+# Email deliverability monitor — TASK-775 Slice 2.
+#
+# Cron 0 */6 * * * America/Santiago: 4 runs/día. Cómputa bounce/complaint rate
+# de los últimos 7 días sobre `greenhouse_notifications.email_deliveries` y
+# emite outbox events `email.deliverability.alert` si excede thresholds Gmail
+# (2% bounces, 0.1% complaints).
+#
+# Razón Cloud Scheduler: el cron Vercel original NUNCA disparaba alerts en
+# staging porque Vercel custom env no ejecuta crons. Cloud Scheduler corre por
+# proyecto GCP, igual en staging y prod.
+upsert_scheduler_job \
+  "ops-email-deliverability-monitor" \
+  "0 */6 * * *" \
+  "/email-deliverability-monitor" \
+  '{}'
+echo "  -> ops-email-deliverability-monitor: 0 */6 * * * (bounce/complaint monitor, TASK-775)"
+
+# Nubox sync crons — TASK-775 Slice 3.
+#
+# 3 jobs migrados del Vercel cron lane:
+#   - ops-nubox-balance-sync (cada 4h): rebajá balance_nubox en PG income/expenses
+#     desde BQ conformed, emite outbox events de divergence. Lightweight.
+#   - ops-nubox-sync (07:30 daily): 3-fase Nubox API → BQ raw → conformed → PG.
+#     Heavy — corre en horario de baja demanda.
+#   - ops-nubox-quotes-hot-sync (cada 15min): quotes hot path para periods activos.
+#
+# Razón Cloud Scheduler: balances Nubox en staging quedaban stale para QA porque
+# Vercel custom env no ejecuta crons. Cloud Scheduler corre por proyecto GCP.
+upsert_scheduler_job \
+  "ops-nubox-balance-sync" \
+  "0 */4 * * *" \
+  "/nubox/balance-sync" \
+  '{}'
+echo "  -> ops-nubox-balance-sync: 0 */4 * * * (Nubox balances → PG + divergence outbox, TASK-775)"
+
+upsert_scheduler_job \
+  "ops-nubox-sync" \
+  "30 7 * * *" \
+  "/nubox/sync" \
+  '{}'
+echo "  -> ops-nubox-sync: 30 7 * * * (3-fase Nubox API → BQ raw → conformed → PG, TASK-775)"
+
+upsert_scheduler_job \
+  "ops-nubox-quotes-hot-sync" \
+  "*/15 * * * *" \
+  "/nubox/quotes-hot-sync" \
+  '{}'
+echo "  -> ops-nubox-quotes-hot-sync: */15 * * * * (Nubox quotes hot path, TASK-775)"
+
+# ─── TASK-775 Slice 7 mass migration (12 crons) ─────────────────────────────
+#
+# Migración bulk de los crons restantes del Vercel cron lane: webhook-dispatch,
+# email-delivery-retry, entra-*, hubspot-*, sync-conformed-recovery, recon-auto-match.
+#
+# Razón unificada: todos son async-critical (alimentan o consumen pipelines downstream
+# que QA y staging necesitan probar). Vercel custom env NO ejecuta crons → flow
+# downstream se rompe silenciosamente. Cloud Scheduler corre por proyecto GCP, igual
+# en cualquier env.
+
+upsert_scheduler_job \
+  "ops-webhook-dispatch" \
+  "*/2 * * * *" \
+  "/webhook-dispatch" \
+  '{}'
+echo "  -> ops-webhook-dispatch: */2 * * * * (outbound webhooks, TASK-775)"
+
+upsert_scheduler_job \
+  "ops-email-delivery-retry" \
+  "*/5 * * * *" \
+  "/email-delivery-retry" \
+  '{}'
+echo "  -> ops-email-delivery-retry: */5 * * * * (failed email retry, TASK-775)"
+
+upsert_scheduler_job \
+  "ops-entra-profile-sync" \
+  "0 8 * * *" \
+  "/entra/profile-sync" \
+  '{}'
+echo "  -> ops-entra-profile-sync: 0 8 * * * (Entra users + manager sync, TASK-775)"
+
+upsert_scheduler_job \
+  "ops-entra-webhook-renew" \
+  "0 6 */2 * *" \
+  "/entra/webhook-renew" \
+  '{}'
+echo "  -> ops-entra-webhook-renew: 0 6 */2 * * (Entra webhook subscription renew, TASK-775)"
+
+upsert_scheduler_job \
+  "ops-hubspot-quotes-sync" \
+  "0 */6 * * *" \
+  "/hubspot/quotes-sync" \
+  '{}'
+echo "  -> ops-hubspot-quotes-sync: 0 */6 * * * (HubSpot quotes sync, TASK-775)"
+
+upsert_scheduler_job \
+  "ops-hubspot-company-lifecycle-sync" \
+  "0 */6 * * *" \
+  "/hubspot/company-lifecycle-sync" \
+  '{}'
+echo "  -> ops-hubspot-company-lifecycle-sync: 0 */6 * * * (HubSpot lifecycle sync, TASK-775)"
+
+upsert_scheduler_job \
+  "ops-hubspot-companies-sync" \
+  "*/10 * * * *" \
+  "/hubspot/companies-sync" \
+  '{}'
+echo "  -> ops-hubspot-companies-sync: */10 * * * * (HubSpot companies incremental, TASK-775)"
+
+upsert_scheduler_job \
+  "ops-hubspot-companies-sync-full" \
+  "0 3 * * *" \
+  "/hubspot/companies-sync" \
+  '{"fullResync":true}'
+echo "  -> ops-hubspot-companies-sync-full: 0 3 * * * (HubSpot companies daily full resync, TASK-775)"
+
+upsert_scheduler_job \
+  "ops-hubspot-deals-sync" \
+  "0 */4 * * *" \
+  "/hubspot/deals-sync" \
+  '{}'
+echo "  -> ops-hubspot-deals-sync: 0 */4 * * * (HubSpot deals sync, TASK-775)"
+
+upsert_scheduler_job \
+  "ops-hubspot-products-sync" \
+  "0 8 * * *" \
+  "/hubspot/products-sync" \
+  '{}'
+echo "  -> ops-hubspot-products-sync: 0 8 * * * (HubSpot products sync, TASK-775)"
+
+upsert_scheduler_job \
+  "ops-notion-conformed-recovery" \
+  "*/30 * * * *" \
+  "/notion-conformed/recovery" \
+  '{}'
+echo "  -> ops-notion-conformed-recovery: */30 * * * * (Notion sync recovery retries, TASK-775)"
+
+upsert_scheduler_job \
+  "ops-reconciliation-auto-match" \
+  "45 7 * * *" \
+  "/reconciliation/auto-match" \
+  '{}'
+echo "  -> ops-reconciliation-auto-match: 45 7 * * * (continuous bank statement auto-match, TASK-775)"
+
+# ICO member sync — TASK-775 Slice 9.
+#
+# Async-critical: alimenta /people/[id]/ico (métricas RPA, OTD, FTR, throughput)
+# que QA y operadores usan en staging para validar el motor ICO. Si queda stale
+# en staging, QA cree que el motor está roto.
+upsert_scheduler_job \
+  "ops-ico-member-sync" \
+  "30 10 * * *" \
+  "/ico/member-sync" \
+  '{}'
+echo "  -> ops-ico-member-sync: 30 10 * * * (ICO member metrics BQ → PG, TASK-775)"
+
 # Global projection recovery — unchanged lane.
 upsert_scheduler_job \
   "ops-reactive-recover" \
@@ -495,6 +673,17 @@ upsert_scheduler_job \
   '{"triggeredBy":"cloud_scheduler"}'
 echo "  -> ops-reliability-ai-watch: 0 */1 * * * (Reliability AI Observer, TASK-638 — gated by RELIABILITY_AI_OBSERVER_ENABLED)"
 
+# TASK-769 — Cloud Cost Intelligence.
+# Runs deterministic Billing Export alert sweep first, then optional AI FinOps
+# copilot if CLOUD_COST_AI_COPILOT_ENABLED=true. Six-hour cadence is enough for
+# Billing Export latency while still catching same-day drift after materialize.
+upsert_scheduler_job \
+  "ops-cloud-cost-ai-watch" \
+  "15 */6 * * *" \
+  "/cloud-cost-ai-watch" \
+  '{"triggeredBy":"cloud_scheduler"}'
+echo "  -> ops-cloud-cost-ai-watch: 15 */6 * * * (Cloud Cost Intelligence, TASK-769 — AI gated by CLOUD_COST_AI_COPILOT_ENABLED)"
+
 # Notion BQ raw → conformed → PG cycle. Replaces the historically-flaky Vercel
 # `/api/cron/sync-conformed` (20 7 * * *) with a Cloud Scheduler + Cloud Run
 # path that has built-in retry semantics and longer timeout. The Vercel cron
@@ -507,6 +696,18 @@ upsert_scheduler_job \
   '{"executionSource":"scheduled_primary"}'
 echo "  -> ops-notion-conformed-sync: 20 7 * * * (Notion daily BQ + PG sync, replaces Vercel /api/cron/sync-conformed)"
 
+# TASK-742 Capa 6 — Identity auth providers smoke lane.
+# Hits the portal /api/auth/health, Microsoft OIDC discovery, and runs an
+# in-process JWT roundtrip every 5 minutes. Persists smoke_lane_runs row that
+# the Reliability subsystem 'Identity Auth Providers' rolls up. Fires Sentry
+# domain=identity when any probe fails.
+upsert_scheduler_job \
+  "ops-identity-auth-smoke" \
+  "*/5 * * * *" \
+  "/smoke/identity-auth-providers" \
+  '{"triggeredBy":"cloud_scheduler"}'
+echo "  -> ops-identity-auth-smoke: */5 * * * * (TASK-742 — auth providers synthetic monitor)"
+
 echo ""
 echo "=== Deployment complete ==="
 echo ""
@@ -515,4 +716,4 @@ echo "  1. Verify health:  gcloud run services proxy ${SERVICE_NAME} --port=9092
 echo "  2. Run a lane manually:  gcloud scheduler jobs run ops-reactive-finance --project=${PROJECT_ID} --location=${REGION}"
 echo "  3. Check queue depth:  gcloud run services proxy ${SERVICE_NAME} --port=9092 & sleep 3 && curl -s 'http://localhost:9092/reactive/queue-depth?domain=finance'"
 echo "  4. Check logs:  gcloud logging read 'resource.labels.service_name=\"${SERVICE_NAME}\"' --project=${PROJECT_ID} --limit=10"
-echo "  5. Active scheduler jobs: ops-reactive-{organization,finance,people,notifications,delivery,cost-intelligence,recover} + ops-nexa-weekly-digest"
+echo "  5. Active scheduler jobs: ops-reactive-{organization,finance,people,notifications,delivery,cost-intelligence,recover} + ops-nexa-weekly-digest + ops-reliability-ai-watch + ops-cloud-cost-ai-watch"

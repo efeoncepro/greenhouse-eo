@@ -16,6 +16,9 @@ import { operatingEntityMembershipProjection } from './operating-entity-membersh
 import { projectedPayrollProjection } from './projected-payroll'
 import { leavePayrollRecalculationProjection } from './leave-payroll-recalculation'
 import { payrollReceiptsProjection } from './payroll-receipts'
+import { payslipOnPaymentPaidProjection } from './payslip-on-payment-paid'
+import { payslipOnPaymentApprovedProjection } from './payslip-on-payment-approved'
+import { payslipOnPaymentCancelledProjection } from './payslip-on-payment-cancelled'
 import { payrollExportReadyProjection } from './payroll-export-ready'
 import { periodClosureStatusProjection } from './period-closure-status'
 import { commercialCostAttributionProjection } from './commercial-cost-attribution'
@@ -24,6 +27,8 @@ import { operationalPlProjection } from './operational-pl'
 import { providerToolingProjection } from './provider-tooling'
 import { staffAugPlacementProjection } from './staff-augmentation'
 import { financeExpenseReactiveIntakeProjection } from './finance-expense-reactive-intake'
+import { paymentObligationsFromPayrollProjection } from './payment-obligations-from-payroll'
+import { recordExpensePaymentFromOrderProjection } from './record-expense-payment-from-order'
 import { payrollReliquidationDeltaProjection } from './payroll-reliquidation-delta'
 import { agencyPerformanceReportProjection } from './agency-performance-report'
 import { icoAiSignalsProjection } from './ico-ai-signals'
@@ -46,6 +51,7 @@ import { pricingCatalogApprovalNotifierProjection } from './pricing-catalog-appr
 import { productCatalogPricesRecomputeProjection } from './product-catalog-prices-recompute'
 import { productCatalogPricesSyncProjection } from './product-catalog-prices-sync'
 import { teamsNotifyProjection } from './teams-notify'
+import { providerBqSyncProjection } from './provider-bq-sync'
 
 // DEPRECATED: personOperationalProjection removed — replaced by personIntelligenceProjection
 // DEPRECATED: icoMemberProjection kept for backward compat (BQ → Postgres sync) but person_intelligence
@@ -72,10 +78,15 @@ export const ensureProjectionsRegistered = () => {
   registerProjection(projectedPayrollProjection)
   registerProjection(leavePayrollRecalculationProjection)
   registerProjection(payrollReceiptsProjection)
+  registerProjection(payslipOnPaymentPaidProjection)
+  registerProjection(payslipOnPaymentApprovedProjection)
+  registerProjection(payslipOnPaymentCancelledProjection)
   registerProjection(payrollExportReadyProjection)
   registerProjection(periodClosureStatusProjection)
   registerProjection(providerToolingProjection)
   registerProjection(financeExpenseReactiveIntakeProjection)
+  registerProjection(paymentObligationsFromPayrollProjection)
+  registerProjection(recordExpensePaymentFromOrderProjection)
   registerProjection(payrollReliquidationDeltaProjection)
   registerProjection(accountBalancesProjection)
   registerProjection(staffAugPlacementProjection)
@@ -102,4 +113,5 @@ export const ensureProjectionsRegistered = () => {
   registerProjection(quoteToCashAutopromoterProjection)
   registerProjection(vatMonthlyPositionProjection)
   registerProjection(teamsNotifyProjection)
+  registerProjection(providerBqSyncProjection) // TASK-771 — provider.upserted → BQ MERGE + fin_suppliers UPDATE
 }

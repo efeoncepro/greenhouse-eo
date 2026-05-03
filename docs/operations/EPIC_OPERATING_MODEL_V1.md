@@ -9,6 +9,8 @@ Definir cómo funcionan los `EPIC-###` en Greenhouse: cuándo usar un epic, cuá
 Un epic coordina un programa cross-domain o multi-task.  
 Una task sigue siendo la unidad ejecutable del repo.
 
+Todo epic debe respetar `docs/operations/SOLUTION_QUALITY_OPERATING_MODEL_V1.md`: coordinar soluciones canonicas, no acumular parches inconexos bajo un paraguas documental.
+
 Un epic:
 
 - no reemplaza las tasks

@@ -18,10 +18,12 @@ import Stack from '@mui/material/Stack'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
-import TableContainer from '@mui/material/TableContainer'
+
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
+
+import { DataTableShell } from '@/components/greenhouse/data-table'
 
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
@@ -199,7 +201,7 @@ const CashInListView = () => {
     return (
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
         <Box>
-          <Typography variant='h4' sx={{ fontFamily: 'Poppins, sans-serif', fontWeight: 600, mb: 1 }}>
+          <Typography variant='h4' sx={{ fontWeight: 600, mb: 1 }}>
             Cobros
           </Typography>
           <Typography variant='body2' color='text.secondary'>
@@ -227,7 +229,7 @@ const CashInListView = () => {
       {/* Header */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 2 }}>
         <Box>
-          <Typography variant='h4' sx={{ fontFamily: 'Poppins, sans-serif', fontWeight: 600, mb: 1 }}>
+          <Typography variant='h4' sx={{ fontWeight: 600, mb: 1 }}>
             Cobros
           </Typography>
           <Typography variant='body2' color='text.secondary'>
@@ -316,7 +318,7 @@ const CashInListView = () => {
         <Divider />
 
         {/* Table content */}
-        <TableContainer>
+        <DataTableShell identifier='cash-in-list' ariaLabel='Lista de pagos recibidos (cash-in)'>
           <Table>
             <TableHead>
               <TableRow>
@@ -409,7 +411,7 @@ const CashInListView = () => {
               )}
             </TableBody>
           </Table>
-        </TableContainer>
+        </DataTableShell>
 
         {/* Pagination */}
         {total > 0 && (

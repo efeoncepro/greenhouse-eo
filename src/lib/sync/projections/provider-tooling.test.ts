@@ -12,6 +12,8 @@ vi.mock('@/lib/providers/provider-tooling-snapshots', () => ({
 // payload carries schemaVersion: 2 plus the period envelope. Only the underlying
 // postgres call is stubbed.
 vi.mock('@/lib/postgres/client', () => ({
+  onGreenhousePostgresReset: () => () => {},
+  isGreenhousePostgresRetryableConnectionError: () => false,
   runGreenhousePostgresQuery: (...args: unknown[]) => mockRunGreenhousePostgresQuery(...args)
 }))
 

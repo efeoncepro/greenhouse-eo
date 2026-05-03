@@ -1,0 +1,182 @@
+# TASK-567 — Typography Code Sweep + ESLint Governance Rule
+
+## Delta 2026-05-01 (tarde) — pivot a Geist
+
+Tras cerrar TASK-566 con Inter y validar visualmente, el usuario decidió pivotar a **Geist Sans** como product UI base (mismo contrato `Poppins display + sans product` ahora con Geist en vez de Inter). El sweep que esta task ejecuta debe leer "Geist" donde el cuerpo abajo dice "Inter":
+
+- Toda referencia a "foundation Inter" se interpreta como "foundation Geist"
+- Las prohibiciones ESLint contra `var(--font-dm-sans)` y `'DM Sans'` siguen vigentes
+- Se agrega prohibición ESLint contra `var(--font-inter)` y `'Inter'` literal en código nuevo (sin retroceder a Inter en el barrido)
+- Geist Mono **NO** se introduce; `monoId/monoAmount` siguen sobre Geist Sans + `tabular-nums`
+- Pesos canónicos por variant son los del bump 1.2 de `GREENHOUSE_DESIGN_TOKENS_V1.md`
+
+## Status
+
+- Lifecycle: `complete`
+- Priority: `P2`
+- Impact: `Medio-alto`
+- Effort: `Medio` (~1 día)
+- Type: `implementation`
+- Epic: `EPIC-004`
+- Status real: `Cerrada 2026-05-02`
+- Rank: `TBD`
+- Domain: `ui` + `platform`
+- Blocked by: `TASK-566`
+- Branch: `develop`
+
+## Resolution Log 2026-05-02
+
+Cerrada en una sola sesión. Orden invertido vs spec original (gate antes que sweep) por robustez:
+
+### Slice 3a — Rule en modo `warn` (gate establecido primero)
+
+- `eslint-plugins/greenhouse/rules/no-hardcoded-fontfamily.mjs` — AST vanilla, scope universal sobre `Property` con key `fontFamily` y value literal/template puro
+- Mensajes accionables por familia: `monospace`, `inter`, `dmSans`, `geistMono`, `poppins`, `geist`, `generic`
+- Allowlist para CSS-wide values: `inherit`, `initial`, `unset`, `revert`, `revert-layer`
+- Registrada en `eslint-plugins/greenhouse/index.mjs` (v1.1.0) y aplicada en `eslint.config.mjs`
+- Snapshot inicial: 311 warnings, 0 errors
+
+### Slice 2 — Sweep automatizado (codemod conservador)
+
+- Pass 1: `'monospace'` literal en `sx={{ ... }}` y `style={{ ... }}` — 262 reemplazos en 112 archivos
+- Pass 2: `'Poppins'`, `'Poppins, sans-serif'`, `'Inter'`, `'DM Sans'`, composite mono stacks (`'ui-monospace, SF Mono, monospace'`) — 38 reemplazos en 24 archivos
+- Codemod scripts: `/tmp/codemod-fontfamily.mjs` y `/tmp/codemod-fontfamily-pass2.mjs` (artifacts; no commiteados al repo)
+
+### Slice 2c — 9 casos especiales manuales
+
+- `PersonProfileTab.tsx` (×2): ternario `mono ? { fontFamily: 'monospace' } : undefined` → `variant={mono ? 'monoId' : 'body2'}`
+- `CreateHesDrawer.tsx`, `CreatePurchaseOrderDrawer.tsx`, `CreateIncomeDrawer.tsx`, `EditProfileDrawer.tsx` (×6): `InputProps={{ sx: { fontFamily: 'monospace', ... } }}` → eliminada la fontFamily, preservado fontSize/bgcolor
+- `NexaThread.tsx`: `<code>` markdown rendering — eslint-disable-next-line con justificación (excepción válida documentada en spec)
+
+### Slice 3b — Rule promovida a modo `error`
+
+- `eslint.config.mjs`: `'greenhouse/no-hardcoded-fontfamily': 'error'`
+- Excluidos por scope: `src/components/theme/**`, `src/@core/theme/**`, `src/app/global-error.tsx`, `src/app/public/**`, `src/emails/**`, `src/lib/finance/pdf/**`
+- `pnpm lint` final: 0 errors, 0 warnings
+
+### Slice 4 — Reclasificación TASK-021
+
+- Nota delta agregada al inicio de `docs/tasks/to-do/TASK-021-typography-variant-adoption.md`
+- TASK-021 sigue cubriendo `fontWeight` migration y adopción opt-in de variants semánticos donde aplique
+
+### Verification ejecutada
+
+- `pnpm lint`: 0 problems
+- `npx tsc --noEmit`: 0 errors
+- 135 archivos modificados, 335 inserciones, 373 deleciones (delta -38 LOC)
+
+### Acceptance criteria (cerrados)
+
+- [x] grep de `fontFamily:` en UI productiva deja solo casos justificados (1 con eslint-disable, en NexaThread `<code>`)
+- [x] grep de `fontFamily: 'monospace'` en `src/**` da 0 (excluyendo el caso justificado)
+- [x] `pnpm lint` falla si alguien agrega `fontFamily: 'monospace'` (rule en error mode)
+- [x] `TASK-021` referenciada como supersedida parcialmente
+- [x] Mensajes de error accionables por familia (7 messageIds distintos)
+- [x] Excepción válida documentada en NexaThread con razón inline; ningún disable inválido
+
+### Follow-ups (open questions)
+
+- Migración de `fontWeight` hardcodeado (declarado out-of-scope en spec) — pendiente en TASK-021
+- Adopción opt-in de `monoId/monoAmount` donde el sweep eliminó tabular-nums — pendiente en TASK-021
+- Tests con `RuleTester` para la rule local (no hay infra de tests para rules locales hoy) — follow-up si emerge regresión
+
+## Summary
+
+Después de la foundation Inter, hacer el sweep de `fontFamily` hardcodeada, eliminar el uso literal de monospace en componentes y dejar una regla ESLint que bloquee regresiones.
+
+## Why This Task Exists
+
+Aunque `TASK-566` corrija el theme, el repo seguirá drifteando si los componentes continúan usando:
+
+- `sx={{ fontFamily: ... }}`
+- `fontFamily: 'monospace'`
+- refs heredadas a `DM Sans`, `Geist` o Poppins fuera de `h1-h4`
+
+Además, `TASK-021` fue escrita para el mundo `DM Sans + Poppins`; esta task la supersede parcialmente dentro del nuevo contrato `Poppins + Inter`.
+
+## Goal
+
+- Cero `fontFamily` hardcodeada en componentes productivos salvo excepciones justificadas
+- Cero `fontFamily: 'monospace'` en `src/**`
+- ESLint rule local activa
+- `monoId` / `monoAmount` usados como API semántica cuando aplique
+
+## Architecture Alignment
+
+- `docs/architecture/GREENHOUSE_DESIGN_TOKENS_V1.md`
+- `docs/tasks/to-do/TASK-021-typography-variant-adoption.md`
+- `docs/tasks/to-do/TASK-566-typography-foundation-geist-poppins-theme.md`
+
+## Files Owned
+
+- `eslint.config.mjs`
+- `eslint-plugins/greenhouse/**` o ubicación real equivalente para rules locales
+- componentes descubiertos por grep en `src/app/**`, `src/views/**`, `src/components/**`
+- `docs/tasks/to-do/TASK-021-typography-variant-adoption.md`
+- `docs/tasks/README.md`
+
+## Current Repo State
+
+- Existen múltiples overrides de `fontFamily` y monospace en el repo
+- `TASK-021` inventarió parte del problema, pero bajo el baseline viejo
+- No existe una rule específica que gobierne el contrato tipográfico nuevo
+
+## Scope
+
+### Slice 1 — Discovery exhaustiva
+
+- inventario de `fontFamily:`
+- inventario de `fontFamily: 'monospace'`
+- categorización:
+  - redundante
+  - migrable a `monoId` / `monoAmount`
+  - excepción justificada
+
+### Slice 2 — Sweep
+
+- remover overrides redundantes
+- mover IDs/montos a variants semánticos
+- borrar referencias legacy a `DM Sans` o `Geist` en product UI
+
+### Slice 3 — ESLint rule
+
+La rule debe bloquear:
+
+- `fontFamily` hardcodeada en `sx`, `styled`, `StyleSheet.create` o patrones equivalentes dentro de UI productiva
+- `fontFamily: 'monospace'`
+- referencias directas a `DM Sans` o `Geist` en product UI una vez landed `TASK-566`
+
+Excepciones:
+
+- comentarios explícitos con `eslint-disable-next-line`
+- casos de marketing o branding realmente documentados
+- cualquier excepción debe dejar justificación legible, no solo el disable
+
+### Slice 4 — Reclasificar TASK-021
+
+- actualizar su nota para dejar explícito que fue absorbida parcialmente por `EPIC-004`
+
+## Out of Scope
+
+- no tocar `layout.tsx` ni `mergedTheme.ts`
+- no tocar emails o PDFs
+- no correr Figma o Playwright
+
+## Acceptance Criteria
+
+- [ ] grep de `fontFamily:` en UI productiva deja solo casos justificados
+- [ ] grep de `fontFamily: 'monospace'` en `src/**` da 0
+- [ ] `pnpm lint` falla si alguien agrega `fontFamily: 'monospace'`
+- [ ] `TASK-021` queda referenciada como supersedida parcialmente por `TASK-567`
+- [ ] La rule deja mensajes de error accionables que indiquen usar variants/tokens en vez de solo fallar genéricamente
+- [ ] La task documenta al menos un ejemplo de excepción válida y uno inválido
+
+## Verification
+
+- `pnpm lint`
+- `pnpm build`
+- grep manual pre/post
+
+## Open Questions
+
+- La rule puede limitarse a `fontFamily` en esta fase. El control de `fontWeight` hardcodeado puede quedar como follow-up si discovery lo justifica.

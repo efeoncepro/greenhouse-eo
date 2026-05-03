@@ -7,6 +7,7 @@ Documentacion oficial de la plataforma Greenhouse. Cada documento describe como 
 ### Identidad y acceso
 
 - [Sistema de Identidad, Roles y Acceso](identity/sistema-identidad-roles-acceso.md) — roles, permisos, supervisoria, responsabilidades operativas, candados de seguridad
+- [Sistema de Autenticación Resiliente](identity/sistema-auth-resiliente.md) — 7 capas defensivas que protegen el flujo de login (secret hygiene, readiness contract, observability, schema integrity, magic-link self-recovery, smoke lane sintética, rotation playbook). Postmortem de ISSUE-061 y guía de diagnóstico
 
 ### Admin Center
 
@@ -18,8 +19,9 @@ Documentacion oficial de la plataforma Greenhouse. Cada documento describe como 
 
 ### Plataforma interna y calidad
 
-- [API Platform Ecosystem](plataforma/api-platform-ecosystem.md) — nueva lane ecosystem-facing de APIs machine-to-machine: cómo funciona hoy, qué expone, cómo convive con `/api/integrations/v1/*` y cuál es el camino correcto de hardening sin romper consumers actuales
+- [API Platform Ecosystem](plataforma/api-platform-ecosystem.md) — nueva lane ecosystem-facing de APIs machine-to-machine: cómo funciona hoy, qué expone, cómo convive con `/api/integrations/v1/*`, cómo sirve al MCP local/remoto y cuál es el camino correcto de hardening sin romper consumers actuales
 - [Platform Health API](plataforma/platform-health-api.md) — contrato `platform-health.v1` para preflight programático de agentes (MCP, Teams bot, CI): estado global, safe modes determinísticos, fuentes consultadas, recomendaciones accionables, redacción agresiva de secretos
+- [Deep Link Platform](plataforma/deep-link-platform.md) — capa compartida para resolver referencias semánticas a links canónicos, URLs absolutas por ambiente, fallback y metadata de acceso sin repartir strings de ruta por todo el portal
 - [Capa de Contexto Estructurado](plataforma/capa-contexto-estructurado.md) — memoria estructurada sidecar para payloads normalizados, auditoría, replay operativo y trabajo asistido por agentes sin reemplazar la verdad relacional
 - [Mi Perfil](plataforma/mi-perfil.md) — vista personal del colaborador: datos de identidad, equipos, proyectos, colegas y actividad reciente
 - [Sister Platform Bindings](plataforma/sister-platform-bindings.md) — enlace formal entre scopes externos de apps hermanas y scopes internos de Greenhouse
@@ -46,12 +48,14 @@ Documentacion oficial de la plataforma Greenhouse. Cada documento describe como 
 - [HES — Recepción y validación de servicio](finance/hes-recepcion-y-validacion.md) — hoja de entrada de servicio como respaldo recibido del cliente, estados visibles y herencia documental desde la OC
 - [PDF de Cotización — Documento Enterprise](finance/pdf-cotizacion-enterprise.md) — PDF rediseñado nivel enterprise con 8 secciones modulares (5 always + 3 conditional), branding Efeonce + sub-brand identification, fonts DM Sans + Poppins, QR signed para verificación de autenticidad y endpoint público que valida contra DB. Adaptativo: 2-3 páginas para quotes chicas / 6-7 páginas para enterprise. Shipped en TASK-629.
 - [Modulos de Caja — Cobros, Pagos, Banco, Cuenta Accionista y Posicion de Caja](finance/modulos-caja-cobros-pagos.md) — cobros (cash in), pagos (cash out), tesoreria por instrumento, cuenta corriente accionista y diferencia devengado vs caja
+- [Distribución de costos para P&L operativo](finance/distribucion-costos-pnl.md) — contrato funcional TASK-777 para separar labor/provider payroll, regulatorio, financiero y overhead operacional antes de materializar márgenes por cliente
 - [Finance Movement Feed](finance/finance-movement-feed.md) — primitive reusable para mostrar movimientos financieros con identidad visual, instrumento, estado, subtotales y virtualizacion sin mezclar UI con calculos de saldo
 
 ### HR y Nomina
 
 - [Sistema de Permisos y Licencias](hr/sistema-permisos-leave.md) — tipos de permiso, medio dia (AM/PM), calculo de dias habiles, flujo de aprobacion, saldo y acumulacion
 - [Jerarquía de Reporte y Supervisoría](hr/jerarquia-reporte-supervisoria.md) — gestion de supervisores, delegaciones temporales, historial y diferencias con departamentos
+- [Periodos de Nomina](hr/periodos-de-nomina.md) — como se crea el mes imputable oficial, cuando Greenhouse resuelve automaticamente UF y tabla tributaria Chile, y por que el calculo se bloquea si falta sincronizacion del mes
 - [Reliquidacion de Nomina](hr/reliquidacion-de-nomina.md) — reapertura de periodos exportados, versionamiento de entradas (v1/v2), delta a finanzas, ventana de 45 dias, auditoria inmutable
 - [Objetivos y OKRs](hr/objetivos-okrs.md) — ciclos de objetivos, goals en cascada (empresa, departamento, individual), key results medibles, elegibilidad por contrato, self-service y admin
 
@@ -65,6 +69,7 @@ Documentacion oficial de la plataforma Greenhouse. Cada documento describe como 
 - [Ops Worker — Crons Reactivos en Cloud Run](operations/ops-worker-reactive-crons.md) — servicio Cloud Run que procesa eventos reactivos del outbox, corridas scheduladas, ESM/CJS shim pattern, monitoreo en Ops Health
 - [Commercial Cost Worker](operations/commercial-cost-worker.md) — worker Cloud Run dedicado para la base de costos comercial, su ledger de corridas por periodo/scope y la separacion respecto de `ops-worker`
 - [Postura Cloud GCP](operations/postura-cloud-gcp.md) — estado auditado de Cloud Run, Secret Manager, Cloud SQL, PostgreSQL y BigQuery; qué está sano, qué sigue riesgoso y cómo leer la topología compartida actual
+- [Cloud Cost Intelligence y Copiloto FinOps](operations/cloud-cost-intelligence-finops.md) — lectura funcional del modulo TASK-769: costos GCP, proyeccion, drivers deterministas, alertas tempranas y capa AI para priorizar optimizaciones
 - [Acceso Programatico a Staging](operations/acceso-programatico-staging.md) — como agentes y CI acceden a Staging, bypass de SSO, comando `staging:request`, troubleshooting
 
 ### Delivery

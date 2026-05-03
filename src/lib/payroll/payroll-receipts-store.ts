@@ -6,6 +6,9 @@ import { normalizeNullableString, toNumber, toTimestampString } from '@/lib/payr
 
 export type PayrollReceiptStatus = 'generated' | 'generation_failed' | 'email_sent' | 'email_failed'
 
+// TASK-759 — which lifecycle event triggered each delivery (audit canónico).
+export type PayrollReceiptDeliveryTrigger = 'period_exported' | 'payment_paid' | 'manual_resend'
+
 export interface PayrollReceiptRecord {
   receiptId: string
   entryId: string
@@ -27,6 +30,8 @@ export interface PayrollReceiptRecord {
   emailDeliveryId: string | null
   emailError: string | null
   templateVersion: string | null
+  deliveryTrigger: PayrollReceiptDeliveryTrigger | null
+  paymentOrderLineId: string | null
   createdAt: string | null
   updatedAt: string | null
 }
@@ -52,8 +57,18 @@ type PayrollReceiptRow = {
   email_delivery_id: string | null
   email_error: string | null
   template_version: string | null
+  delivery_trigger: string | null
+  payment_order_line_id: string | null
   created_at: { value?: string } | string | null
   updated_at: { value?: string } | string | null
+}
+
+const normalizeDeliveryTrigger = (value: string | null): PayrollReceiptDeliveryTrigger | null => {
+  if (value === 'period_exported' || value === 'payment_paid' || value === 'manual_resend') {
+    return value
+  }
+
+  return null
 }
 
 const normalizeReceiptStatus = (value: string | null): PayrollReceiptStatus => {
@@ -85,6 +100,8 @@ const mapReceipt = (row: PayrollReceiptRow): PayrollReceiptRecord => ({
   emailDeliveryId: normalizeNullableString(row.email_delivery_id),
   emailError: normalizeNullableString(row.email_error),
   templateVersion: normalizeNullableString(row.template_version),
+  deliveryTrigger: normalizeDeliveryTrigger(row.delivery_trigger),
+  paymentOrderLineId: normalizeNullableString(row.payment_order_line_id),
   createdAt: toTimestampString(row.created_at),
   updatedAt: toTimestampString(row.updated_at)
 })
@@ -167,6 +184,8 @@ const buildSavePayrollReceiptStatement = async (input: {
   emailDeliveryId?: string | null
   emailError?: string | null
   templateVersion?: string | null
+  deliveryTrigger?: PayrollReceiptDeliveryTrigger | null
+  paymentOrderLineId?: string | null
 }) => {
   const capabilities = await ensurePayrollReceiptsSchemaCapabilities()
 
@@ -208,7 +227,9 @@ const buildSavePayrollReceiptStatement = async (input: {
     'email_sent_at',
     'email_delivery_id',
     'email_error',
-    'template_version'
+    'template_version',
+    'delivery_trigger',
+    'payment_order_line_id'
   )
 
   values.push(
@@ -222,7 +243,9 @@ const buildSavePayrollReceiptStatement = async (input: {
     input.emailSentAt ?? null,
     input.emailDeliveryId ?? null,
     input.emailError ?? null,
-    input.templateVersion ?? null
+    input.templateVersion ?? null,
+    input.deliveryTrigger ?? null,
+    input.paymentOrderLineId ?? null
   )
 
   const placeholders = values.map((_, index) => `$${index + 1}`)
@@ -250,6 +273,8 @@ const buildSavePayrollReceiptStatement = async (input: {
     'email_delivery_id = COALESCE(EXCLUDED.email_delivery_id, greenhouse_payroll.payroll_receipts.email_delivery_id)',
     'email_error = EXCLUDED.email_error',
     'template_version = COALESCE(EXCLUDED.template_version, greenhouse_payroll.payroll_receipts.template_version)',
+    'delivery_trigger = COALESCE(EXCLUDED.delivery_trigger, greenhouse_payroll.payroll_receipts.delivery_trigger)',
+    'payment_order_line_id = COALESCE(EXCLUDED.payment_order_line_id, greenhouse_payroll.payroll_receipts.payment_order_line_id)',
     'updated_at = CURRENT_TIMESTAMP'
   )
 
@@ -377,6 +402,8 @@ export const savePayrollReceipt = async (input: {
   emailDeliveryId?: string | null
   emailError?: string | null
   templateVersion?: string | null
+  deliveryTrigger?: PayrollReceiptDeliveryTrigger | null
+  paymentOrderLineId?: string | null
 }) => {
   await assertPayrollReceiptsReady()
 
