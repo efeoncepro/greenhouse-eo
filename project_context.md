@@ -10,6 +10,14 @@
 - Para verificar higiene de contexto sin modificar archivos, usar `pnpm docs:context-check`. El check es no destructivo por defecto y existe para avisar drift, no para borrar memoria.
 - Preview/Staging/Production vigentes deben seguir lo declarado en `AGENTS.md` y `RELEASE_CHANNELS_OPERATING_MODEL_V1.md`; si un delta antiguo de Vercel contradice esos contratos, tratarlo como historia y revalidar con Vercel CLI/runtime.
 
+## Delta 2026-05-03 Postgres TLS recovery cubre raw pg + Kysely
+
+- Sentry production `JAVASCRIPT-NEXTJS-2N` reportó `ssl/tls alert bad certificate` en `POST /api/webhooks/hubspot-companies`, pero la investigación mostró que el patrón también golpeaba crons, SCIM y sync: no era un bug de HubSpot ni del webhook.
+- La capa canónica ahora está en `src/lib/postgres/client.ts` + `src/lib/db.ts`:
+  - `client.ts` exporta detección retryable, listeners de reset y sigue siendo el único owner de `Pool`/Cloud SQL Connector.
+  - `db.ts` invalida Kysely cuando se resetea Postgres y usa un pool adapter dinámico para reintentar `connect()` una vez ante errores TLS retryable.
+- Regla operativa nueva: ante errores Cloud SQL TLS en runtime, no parchear endpoints aislados. Endurecer primero la primitive común Postgres/Kysely y preservar el guardrail de no reintentar callbacks transaccionales ya ejecutados.
+
 ## Delta 2026-05-01 DESIGN.md adoption for agent-facing UI contract
 
 - El repo ahora versiona `DESIGN.md` en la raiz como contrato visual legible por agentes.

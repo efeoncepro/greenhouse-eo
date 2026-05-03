@@ -1,5 +1,13 @@
 # Handoff.md
 
+## Sesion 2026-05-03 — Postgres TLS bad certificate runtime hardening
+
+- **Trigger:** Sentry production `JAVASCRIPT-NEXTJS-2N` (`POST /api/webhooks/hubspot-companies`) reportó `ssl/tls alert bad certificate` desde `src/lib/postgres/client.ts`.
+- **Diagnóstico:** no es bug del webhook ni de HubSpot. Vercel logs mostraron el mismo patrón en webhooks, crons, SCIM y sync; causa probable: Cloud SQL Connector/pool en runtime Vercel warm con certificado TLS efímero o conexión stale.
+- **Fix aplicado:** `src/lib/postgres/client.ts` ahora expone detección retryable + listeners de reset; `src/lib/db.ts` invalida Kysely cuando se resetea Postgres y usa un pool adapter dinámico que reintenta `connect()` una vez ante errores TLS retryable.
+- **Guardrail:** `withGreenhousePostgresTransaction` solo reintenta el arranque de transacción (`connect`/`BEGIN`), no callbacks ya ejecutados ni `COMMIT`, para evitar duplicar writes.
+- **Validación:** `pnpm exec vitest run src/lib/db.test.ts src/lib/postgres/client.test.ts`, eslint focalizado, `npx tsc --noEmit`, `pnpm pg:doctor`, `pnpm lint` y `pnpm build` verdes. `pnpm lint` mantiene 318 warnings legacy de copy.
+
 ## Sesion 2026-05-03 — TASK-772 cerrada (Finance Expense Supplier Hydration & Cash-Out Selection Integrity)
 
 - **Lifecycle:** `complete` (movida a `complete/`, README/registry sincronizados).

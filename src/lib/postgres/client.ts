@@ -26,7 +26,16 @@ declare global {
   var __greenhousePostgresPoolPromise: Promise<Pool> | undefined
    
   var __greenhousePostgresConnector: Connector | undefined
+
+  var __greenhousePostgresResetListeners: Set<GreenhousePostgresResetListener> | undefined
 }
+
+type GreenhousePostgresResetReason = {
+  source: 'close' | 'pool_error' | 'retryable_error'
+  error?: unknown
+}
+
+type GreenhousePostgresResetListener = (reason: GreenhousePostgresResetReason) => void
 
 const toIpType = (value: string | undefined) => {
   switch ((value || '').trim().toUpperCase()) {
@@ -47,7 +56,7 @@ const normalizeNumber = (value: string | undefined, fallback: number) => {
   return Number.isFinite(parsed) ? parsed : fallback
 }
 
-const isRetryableConnectionError = (error: unknown) => {
+export const isGreenhousePostgresRetryableConnectionError = (error: unknown) => {
   if (!(error instanceof Error)) {
     return false
   }
@@ -56,6 +65,7 @@ const isRetryableConnectionError = (error: unknown) => {
 
   return [
     'ssl alert bad certificate',
+    'tls alert bad certificate',
     'connection terminated unexpectedly',
     'the database system is starting up',
     'server closed the connection unexpectedly',
@@ -64,6 +74,25 @@ const isRetryableConnectionError = (error: unknown) => {
     'read econnreset',
     'write epipe'
   ].some(fragment => message.includes(fragment))
+}
+
+export const onGreenhousePostgresReset = (listener: GreenhousePostgresResetListener) => {
+  globalThis.__greenhousePostgresResetListeners ??= new Set()
+  globalThis.__greenhousePostgresResetListeners.add(listener)
+
+  return () => {
+    globalThis.__greenhousePostgresResetListeners?.delete(listener)
+  }
+}
+
+const notifyGreenhousePostgresReset = (reason: GreenhousePostgresResetReason) => {
+  for (const listener of globalThis.__greenhousePostgresResetListeners ?? []) {
+    try {
+      listener(reason)
+    } catch (error) {
+      console.warn('Greenhouse Postgres reset listener failed.', error)
+    }
+  }
 }
 
 export const getGreenhousePostgresConfig = (): GreenhousePostgresConfig => ({
@@ -151,7 +180,7 @@ const buildPool = async () => {
 
     pool.on('error', error => {
       console.error('Greenhouse Postgres pool emitted an error; resetting connector state.', error)
-      void closeGreenhousePostgres().catch(closeError => {
+      void closeGreenhousePostgres({ source: 'pool_error', error }).catch(closeError => {
         console.error('Unable to close Greenhouse Postgres after pool error.', closeError)
       })
     })
@@ -168,7 +197,7 @@ const buildPool = async () => {
 
   pool.on('error', error => {
     console.error('Greenhouse Postgres pool emitted an error; resetting direct connection state.', error)
-    void closeGreenhousePostgres().catch(closeError => {
+    void closeGreenhousePostgres({ source: 'pool_error', error }).catch(closeError => {
       console.error('Unable to close Greenhouse Postgres after direct pool error.', closeError)
     })
   })
@@ -192,12 +221,12 @@ export const runGreenhousePostgresQuery = async <T extends Record<string, unknow
 
     return result.rows
   } catch (error) {
-    if (!isRetryableConnectionError(error)) {
+    if (!isGreenhousePostgresRetryableConnectionError(error)) {
       throw error
     }
 
     console.warn('Retrying Greenhouse Postgres query after retryable connection failure.', error)
-    await closeGreenhousePostgres().catch(() => undefined)
+    await closeGreenhousePostgres({ source: 'retryable_error', error }).catch(() => undefined)
 
     const pool = await getGreenhousePostgresPool()
     const result = await pool.query<T>(text, values)
@@ -206,54 +235,50 @@ export const runGreenhousePostgresQuery = async <T extends Record<string, unknow
   }
 }
 
-export const withGreenhousePostgresTransaction = async <T>(callback: (client: PoolClient) => Promise<T>) => {
+const acquireGreenhouseTransactionClient = async (attempt = 0): Promise<PoolClient> => {
+  let client: PoolClient | null = null
+
   try {
     const pool = await getGreenhousePostgresPool()
-    const client = await pool.connect()
 
-    try {
-      await client.query('BEGIN')
+    client = await pool.connect()
+    await client.query('BEGIN')
 
-      const result = await callback(client)
-
-      await client.query('COMMIT')
-
-      return result
-    } catch (error) {
-      await client.query('ROLLBACK').catch(() => undefined)
-      throw error
-    } finally {
-      client.release()
-    }
+    return client
   } catch (error) {
-    if (!isRetryableConnectionError(error)) {
+    if (client) {
+      client.release()
+    }
+
+    if (attempt > 0 || !isGreenhousePostgresRetryableConnectionError(error)) {
       throw error
     }
 
-    console.warn('Retrying Greenhouse Postgres transaction after retryable connection failure.', error)
-    await closeGreenhousePostgres().catch(() => undefined)
+    console.warn('Retrying Greenhouse Postgres transaction startup after retryable connection failure.', error)
+    await closeGreenhousePostgres({ source: 'retryable_error', error }).catch(() => undefined)
 
-    const pool = await getGreenhousePostgresPool()
-    const client = await pool.connect()
-
-    try {
-      await client.query('BEGIN')
-
-      const result = await callback(client)
-
-      await client.query('COMMIT')
-
-      return result
-    } catch (retryError) {
-      await client.query('ROLLBACK').catch(() => undefined)
-      throw retryError
-    } finally {
-      client.release()
-    }
+    return acquireGreenhouseTransactionClient(attempt + 1)
   }
 }
 
-export const closeGreenhousePostgres = async () => {
+export const withGreenhousePostgresTransaction = async <T>(callback: (client: PoolClient) => Promise<T>) => {
+  const client = await acquireGreenhouseTransactionClient()
+
+  try {
+    const result = await callback(client)
+
+    await client.query('COMMIT')
+
+    return result
+  } catch (error) {
+    await client.query('ROLLBACK').catch(() => undefined)
+    throw error
+  } finally {
+    client.release()
+  }
+}
+
+export const closeGreenhousePostgres = async (reason: GreenhousePostgresResetReason = { source: 'close' }) => {
   // Clear references BEFORE closing to prevent concurrent requests from
   // acquiring a pool/connector that is being shut down (race condition fix).
   const poolPromise = globalThis.__greenhousePostgresPoolPromise
@@ -261,6 +286,7 @@ export const closeGreenhousePostgres = async () => {
 
   globalThis.__greenhousePostgresPoolPromise = undefined
   globalThis.__greenhousePostgresConnector = undefined
+  notifyGreenhousePostgresReset(reason)
 
   if (poolPromise) {
     const pool = await poolPromise

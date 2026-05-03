@@ -10,7 +10,9 @@ vi.mock('@/lib/secrets/secret-manager', () => ({
 
 import {
   getGreenhousePostgresMissingConfig,
+  isGreenhousePostgresRetryableConnectionError,
   isGreenhousePostgresConfigured,
+  onGreenhousePostgresReset,
   resolveGreenhousePostgresConfig
 } from '@/lib/postgres/client'
 
@@ -18,6 +20,7 @@ describe('postgres secret-manager config', () => {
   afterEach(() => {
     vi.unstubAllEnvs()
     resolveSecret.mockReset()
+    globalThis.__greenhousePostgresResetListeners?.clear()
   })
 
   it('treats password secret ref as enough for configured runtime posture', () => {
@@ -52,5 +55,30 @@ describe('postgres secret-manager config', () => {
     expect(resolveSecret).toHaveBeenCalledWith({
       envVarName: 'GREENHOUSE_POSTGRES_PASSWORD'
     })
+  })
+
+  it('classifies Cloud SQL TLS bad certificate as retryable', () => {
+    expect(isGreenhousePostgresRetryableConnectionError(new Error('ssl/tls alert bad certificate'))).toBe(true)
+    expect(isGreenhousePostgresRetryableConnectionError(new Error('syntax error at or near "FROM"'))).toBe(false)
+  })
+
+  it('lets consumers subscribe and unsubscribe from Postgres reset events', () => {
+    const listener = vi.fn()
+    const unsubscribe = onGreenhousePostgresReset(listener)
+
+    for (const registeredListener of globalThis.__greenhousePostgresResetListeners ?? []) {
+      registeredListener({ source: 'retryable_error' })
+    }
+
+    expect(listener).toHaveBeenCalledWith({ source: 'retryable_error' })
+
+    unsubscribe()
+    listener.mockClear()
+
+    for (const registeredListener of globalThis.__greenhousePostgresResetListeners ?? []) {
+      registeredListener({ source: 'close' })
+    }
+
+    expect(listener).not.toHaveBeenCalled()
   })
 })
