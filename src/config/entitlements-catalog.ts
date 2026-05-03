@@ -232,6 +232,22 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     actions: ['update'] as const,
     defaultScope: 'tenant'
   },
+  // TASK-768 — capability granular para reclasificar economic_category de
+  // expenses (analitica/operativa, NO toca expense_type fiscal/SII).
+  // Reservada FINANCE_ADMIN + EFEONCE_ADMIN. Audit fino + outbox audit
+  // event finance.expense.economic_category_changed v1.
+  {
+    key: 'finance.expenses.reclassify_economic_category',
+    module: 'finance',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'finance.income.reclassify_economic_category',
+    module: 'finance',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
   {
     key: 'finance.cash.adopt-external-signal',
     module: 'finance',
