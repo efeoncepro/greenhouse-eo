@@ -32,6 +32,23 @@ export interface IncomePaymentsClpSummary {
   unreconciledCount: number
   /** Count of payments with `has_clp_drift = TRUE` (non-CLP without persisted amount_clp). */
   driftCount: number
+  /**
+   * TASK-768 — breakdown analítico por dimension `economic_category`.
+   * 8 keys (matching INCOME_ECONOMIC_CATEGORIES). Backwards-compatible: campos
+   * legacy se mantienen, este nuevo field agrega la dimension analitica.
+   */
+  byEconomicCategory: {
+    service_revenue: number
+    client_reimbursement: number
+    factoring_proceeds: number
+    partner_payout_offset: number
+    internal_transfer_in: number
+    tax_refund: number
+    financial_income: number
+    other: number
+  }
+  /** Count of rows where economic_category IS NULL (pre-cutover legacy). */
+  economicCategoryUnresolvedCount: number
 }
 
 export interface IncomePaymentNormalized {
@@ -70,6 +87,15 @@ interface SummaryRow {
   total_payments: string | number | null
   unreconciled_count: string | number | null
   drift_count: string | number | null
+  ec_service_revenue: string | number | null
+  ec_client_reimbursement: string | number | null
+  ec_factoring_proceeds: string | number | null
+  ec_partner_payout_offset: string | number | null
+  ec_internal_transfer_in: string | number | null
+  ec_tax_refund: string | number | null
+  ec_financial_income: string | number | null
+  ec_other: string | number | null
+  ec_unresolved_count: string | number | null
 }
 
 interface PaymentRow {
@@ -143,8 +169,18 @@ export const sumIncomePaymentsClpForPeriod = async (
         COALESCE(SUM(ip.payment_amount_clp), 0)::text                   AS total_clp,
         COUNT(*)::text                                                  AS total_payments,
         COUNT(*) FILTER (WHERE NOT ip.is_reconciled)::text              AS unreconciled_count,
-        COUNT(*) FILTER (WHERE ip.has_clp_drift)::text                  AS drift_count
+        COUNT(*) FILTER (WHERE ip.has_clp_drift)::text                  AS drift_count,
+        COALESCE(SUM(ip.payment_amount_clp) FILTER (WHERE i.economic_category = 'service_revenue'), 0)::text AS ec_service_revenue,
+        COALESCE(SUM(ip.payment_amount_clp) FILTER (WHERE i.economic_category = 'client_reimbursement'), 0)::text AS ec_client_reimbursement,
+        COALESCE(SUM(ip.payment_amount_clp) FILTER (WHERE i.economic_category = 'factoring_proceeds'), 0)::text AS ec_factoring_proceeds,
+        COALESCE(SUM(ip.payment_amount_clp) FILTER (WHERE i.economic_category = 'partner_payout_offset'), 0)::text AS ec_partner_payout_offset,
+        COALESCE(SUM(ip.payment_amount_clp) FILTER (WHERE i.economic_category = 'internal_transfer_in'), 0)::text AS ec_internal_transfer_in,
+        COALESCE(SUM(ip.payment_amount_clp) FILTER (WHERE i.economic_category = 'tax_refund'), 0)::text AS ec_tax_refund,
+        COALESCE(SUM(ip.payment_amount_clp) FILTER (WHERE i.economic_category = 'financial_income'), 0)::text AS ec_financial_income,
+        COALESCE(SUM(ip.payment_amount_clp) FILTER (WHERE i.economic_category = 'other'), 0)::text AS ec_other,
+        COUNT(*) FILTER (WHERE i.economic_category IS NULL)::text AS ec_unresolved_count
       FROM greenhouse_finance.income_payments_normalized ip
+      LEFT JOIN greenhouse_finance.income i ON i.income_id = ip.income_id
       WHERE ip.payment_date BETWEEN ${filter.fromDate}::date AND ${filter.toDate}::date
         ${reconciledClause}
     `.execute(db)
@@ -156,7 +192,18 @@ export const sumIncomePaymentsClpForPeriod = async (
     totalClp: round(toNumber(row?.total_clp)),
     totalPayments: toNumber(row?.total_payments),
     unreconciledCount: toNumber(row?.unreconciled_count),
-    driftCount: toNumber(row?.drift_count)
+    driftCount: toNumber(row?.drift_count),
+    byEconomicCategory: {
+      service_revenue: round(toNumber(row?.ec_service_revenue)),
+      client_reimbursement: round(toNumber(row?.ec_client_reimbursement)),
+      factoring_proceeds: round(toNumber(row?.ec_factoring_proceeds)),
+      partner_payout_offset: round(toNumber(row?.ec_partner_payout_offset)),
+      internal_transfer_in: round(toNumber(row?.ec_internal_transfer_in)),
+      tax_refund: round(toNumber(row?.ec_tax_refund)),
+      financial_income: round(toNumber(row?.ec_financial_income)),
+      other: round(toNumber(row?.ec_other))
+    },
+    economicCategoryUnresolvedCount: toNumber(row?.ec_unresolved_count)
   }
 }
 

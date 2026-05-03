@@ -3702,8 +3702,10 @@ export interface GreenhouseFinanceExpensePayments {
 
 export interface GreenhouseFinanceExpensePaymentsNormalized {
   created_at: Timestamp | null;
+  economic_category: string | null;
   exchange_rate_at_payment: Numeric | null;
   expense_id: string | null;
+  expense_type: string | null;
   fx_gain_loss_clp: Numeric | null;
   has_clp_drift: boolean | null;
   is_reconciled: boolean | null;
@@ -4203,10 +4205,12 @@ export interface GreenhouseFinanceIncomePayments {
 
 export interface GreenhouseFinanceIncomePaymentsNormalized {
   created_at: Timestamp | null;
+  economic_category: string | null;
   exchange_rate_at_payment: Numeric | null;
   fx_gain_loss_clp: Numeric | null;
   has_clp_drift: boolean | null;
   income_id: string | null;
+  income_type: string | null;
   is_reconciled: boolean | null;
   payment_account_id: string | null;
   payment_amount_clp: Numeric | null;
