@@ -82,6 +82,9 @@ interface CashInMovement {
   invoiceDescription: string | null
   paymentDate: string | null
   amount: number
+  amountClp: number
+  hasClpDrift: boolean
+  currency: string
   isReconciled: boolean
   paymentAccountName: string | null
   paymentProviderSlug: string | null
@@ -96,6 +99,9 @@ interface CashOutMovement {
   memberName: string | null
   paymentDate: string | null
   amount: number
+  amountClp: number
+  hasClpDrift: boolean
+  currency: string
   isReconciled: boolean
   paymentAccountName: string | null
   paymentProviderSlug: string | null
@@ -109,6 +115,8 @@ interface PendingMovement {
   partyName: string | null
   date: string | null
   amount: number
+  hasClpDrift: boolean
+  currency: string
   instrumentName: string | null
   instrumentCategory: string | null
   paymentProviderSlug: string | null
@@ -225,6 +233,10 @@ const ReconciliationView = () => {
         const incomeData = await incomeRes.json()
         const expenseData = await expenseRes.json()
 
+        // TASK-774 Slice 7 — usar amountClp (FX-resolved CLP) en la cola de
+        // conciliacion. Mostrar el monto que efectivamente impacta el saldo
+        // de la cuenta CLP. amount nativo + currency quedan disponibles via
+        // hasClpDrift para banner de anomalias si necesita el operador.
         const incomes: PendingMovement[] = (incomeData.items ?? [])
           .map((item: CashInMovement) => ({
             id: item.paymentId,
@@ -232,7 +244,9 @@ const ReconciliationView = () => {
             description: item.invoiceDescription || item.invoiceNumber || item.clientName || item.paymentId,
             partyName: item.clientName || null,
             date: item.paymentDate,
-            amount: item.amount,
+            amount: item.amountClp,
+            hasClpDrift: item.hasClpDrift,
+            currency: item.currency,
             instrumentName: item.paymentAccountName || item.paymentProviderSlug || item.paymentInstrumentCategory || null,
             instrumentCategory: item.paymentInstrumentCategory,
             paymentProviderSlug: item.paymentProviderSlug
@@ -245,7 +259,9 @@ const ReconciliationView = () => {
             description: item.expenseDescription || item.expenseId,
             partyName: item.supplierName || item.memberName || null,
             date: item.paymentDate,
-            amount: -item.amount,
+            amount: -item.amountClp,
+            hasClpDrift: item.hasClpDrift,
+            currency: item.currency,
             instrumentName: item.paymentAccountName || item.paymentProviderSlug || item.paymentInstrumentCategory || null,
             instrumentCategory: item.paymentInstrumentCategory,
             paymentProviderSlug: item.paymentProviderSlug

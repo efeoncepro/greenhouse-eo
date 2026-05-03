@@ -20,6 +20,7 @@ interface PaymentRow {
   expense_id: string
   payment_date: unknown
   amount: unknown
+  amount_clp: unknown
   currency: string
   reference: string | null
   payment_method: string | null
@@ -42,32 +43,55 @@ interface PaymentRow {
 }
 
 // ── Normalizer ──────────────────────────────────────────────────────
+//
+// TASK-774 Slice 7 — exponer SIEMPRE `amountClp` (CLP-equivalente FX-resolved)
+// y `amount` (currency original) lado a lado. Consumers UI deben preferir
+// `amountClp` para mostrar saldo CLP; usar `amount + currency` solo cuando
+// el contexto necesita la moneda original (ej. visualización del documento).
+// La cola de conciliación usa `amountClp` para mostrar el monto que
+// efectivamente impactara el saldo de la cuenta.
 
-const normalizePayment = (row: PaymentRow) => ({
-  paymentId: normalizeString(row.payment_id),
-  expenseId: normalizeString(row.expense_id),
-  paymentDate: toDateString(row.payment_date as string | { value?: string } | null),
-  amount: toNumber(row.amount),
-  currency: normalizeString(row.currency),
-  reference: row.reference ? normalizeString(row.reference) : null,
-  paymentMethod: row.payment_method ? normalizeString(row.payment_method) : null,
-  paymentSource: row.payment_source ? normalizeString(row.payment_source) : null,
-  isReconciled: Boolean(row.is_reconciled),
-  createdAt: toTimestampString(row.created_at as string | { value?: string } | null),
-  expenseDescription: normalizeString(row.expense_description),
-  expenseType: normalizeString(row.expense_type),
-  expenseTotal: toNumber(row.expense_total),
-  supplierId: row.supplier_id ? normalizeString(row.supplier_id) : null,
-  supplierName: row.supplier_name ? normalizeString(row.supplier_name) : null,
-  costCategory: row.cost_category ? normalizeString(row.cost_category) : null,
-  documentNumber: row.document_number ? normalizeString(row.document_number) : null,
-  memberName: row.member_name ? normalizeString(row.member_name) : null,
-  exchangeRateToClp: toNumber(row.exchange_rate_to_clp),
-  paymentAccountId: row.payment_account_id ? normalizeString(row.payment_account_id) : null,
-  paymentAccountName: row.payment_account_name ? normalizeString(row.payment_account_name) : null,
-  paymentProviderSlug: row.payment_provider_slug ? normalizeString(row.payment_provider_slug) : null,
-  paymentInstrumentCategory: row.payment_instrument_category ? normalizeString(row.payment_instrument_category) : null
-})
+const normalizePayment = (row: PaymentRow) => {
+  const amountNative = toNumber(row.amount)
+  const currency = normalizeString(row.currency)
+  const amountClpRaw = toNumber(row.amount_clp)
+
+  // Fallback canónico TASK-766: si amount_clp es NULL pero currency es CLP,
+  // usa amount nativo (que ya está en CLP). Si NULL y non-CLP, marca drift.
+  const amountClp = amountClpRaw > 0
+    ? amountClpRaw
+    : (currency === 'CLP' ? amountNative : 0)
+
+  const hasClpDrift = currency !== 'CLP' && amountClpRaw === 0
+
+  return {
+    paymentId: normalizeString(row.payment_id),
+    expenseId: normalizeString(row.expense_id),
+    paymentDate: toDateString(row.payment_date as string | { value?: string } | null),
+    amount: amountNative,
+    amountClp,
+    hasClpDrift,
+    currency,
+    reference: row.reference ? normalizeString(row.reference) : null,
+    paymentMethod: row.payment_method ? normalizeString(row.payment_method) : null,
+    paymentSource: row.payment_source ? normalizeString(row.payment_source) : null,
+    isReconciled: Boolean(row.is_reconciled),
+    createdAt: toTimestampString(row.created_at as string | { value?: string } | null),
+    expenseDescription: normalizeString(row.expense_description),
+    expenseType: normalizeString(row.expense_type),
+    expenseTotal: toNumber(row.expense_total),
+    supplierId: row.supplier_id ? normalizeString(row.supplier_id) : null,
+    supplierName: row.supplier_name ? normalizeString(row.supplier_name) : null,
+    costCategory: row.cost_category ? normalizeString(row.cost_category) : null,
+    documentNumber: row.document_number ? normalizeString(row.document_number) : null,
+    memberName: row.member_name ? normalizeString(row.member_name) : null,
+    exchangeRateToClp: toNumber(row.exchange_rate_to_clp),
+    paymentAccountId: row.payment_account_id ? normalizeString(row.payment_account_id) : null,
+    paymentAccountName: row.payment_account_name ? normalizeString(row.payment_account_name) : null,
+    paymentProviderSlug: row.payment_provider_slug ? normalizeString(row.payment_provider_slug) : null,
+    paymentInstrumentCategory: row.payment_instrument_category ? normalizeString(row.payment_instrument_category) : null
+  }
+}
 
 // ── GET handler ─────────────────────────────────────────────────────
 
@@ -146,6 +170,7 @@ export async function GET(request: Request) {
         ep.expense_id,
         ep.payment_date,
         ep.amount,
+        ep.amount_clp,
         ep.currency,
         ep.reference,
         ep.payment_method,

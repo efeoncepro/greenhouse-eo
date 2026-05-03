@@ -78,6 +78,15 @@ const PATTERNS = [
   }
 ]
 
+// TASK-774 Slice 7 — el patrón "SELECT ep.amount sin ep.amount_clp adyacente"
+// requiere context-awareness (multi-line SQL con N columnas separadas por
+// coma) que regex no captura sin falsos positivos. Defensa para ese path:
+//   - Tests anti-regresión específicos en cash-out/cash-in route tests que
+//     verifican que la response incluye `amountClp` por item.
+//   - Reliability signal `finance.account_balances.fx_drift` (TASK-774 Slice 4)
+//     detecta el efecto downstream si emerge un nuevo callsite con el bug.
+//   - Code review obligatorio en PRs que toquen finance/cash-* endpoints.
+
 const HELPER_HINT = `
 Use the canonical reader instead:
   • src/lib/finance/expense-payments-reader.ts → sumExpensePaymentsClpForPeriod / listExpensePaymentsNormalized

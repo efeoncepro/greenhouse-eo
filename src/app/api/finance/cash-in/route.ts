@@ -98,6 +98,7 @@ export async function GET(request: Request) {
         ip.income_id,
         ip.payment_date,
         ip.amount,
+        ip.amount_clp,
         ip.currency,
         ip.reference,
         ip.payment_method,
@@ -221,12 +222,24 @@ export async function GET(request: Request) {
     const total = toNumber(countRows[0]?.total ?? 0)
 
     // --- Normalize rows to camelCase ------------------------------------------
-    const items = dataRows.map(row => ({
+    // TASK-774 Slice 7 — exponer SIEMPRE amountClp (FX-resolved) lado a lado
+    // con amount (currency original). Consumers UI deben preferir amountClp
+    // para mostrar saldo CLP. Cola de conciliacion usa amountClp.
+    const items = dataRows.map(row => {
+      const amountNative = roundCurrency(toNumber(row.amount))
+      const currency = normalizeString(row.currency)
+      const amountClpRaw = row.amount_clp != null ? roundCurrency(toNumber(row.amount_clp)) : 0
+      const amountClp = amountClpRaw > 0 ? amountClpRaw : (currency === 'CLP' ? amountNative : 0)
+      const hasClpDrift = currency !== 'CLP' && amountClpRaw === 0
+
+      return ({
       paymentId: normalizeString(row.payment_id),
       incomeId: normalizeString(row.income_id),
       paymentDate: toDateString(row.payment_date as string | null),
-      amount: roundCurrency(toNumber(row.amount)),
-      currency: normalizeString(row.currency),
+      amount: amountNative,
+      amountClp,
+      hasClpDrift,
+      currency,
       reference: row.reference ? normalizeString(row.reference) : null,
       paymentMethod: row.payment_method ? normalizeString(row.payment_method) : null,
       paymentSource: row.payment_source ? normalizeString(row.payment_source) : null,
@@ -242,7 +255,8 @@ export async function GET(request: Request) {
       paymentAccountName: row.payment_account_name ? normalizeString(row.payment_account_name) : null,
       paymentProviderSlug: row.payment_provider_slug ? normalizeString(row.payment_provider_slug) : null,
       paymentInstrumentCategory: row.payment_instrument_category ? normalizeString(row.payment_instrument_category) : null
-    }))
+      })
+    })
 
     return NextResponse.json({
       items,
