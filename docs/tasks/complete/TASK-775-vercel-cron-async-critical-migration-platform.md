@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P0`
 - Impact: `Crítico` (cierra clase entera de bugs invisibles staging async)
 - Effort: `Alto (9-10h)`
