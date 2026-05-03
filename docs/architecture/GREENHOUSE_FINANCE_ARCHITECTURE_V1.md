@@ -2,7 +2,50 @@
 
 > **Version:** 1.0
 > **Created:** 2026-03-30
-> **Last updated:** 2026-05-02
+> **Last updated:** 2026-05-03
+
+## Delta 2026-05-03 — TASK-766 CLP currency reader contract (KPI integrity)
+
+Cierra el incidente 2026-05-02 (`/finance/cash-out` mostraba **$1.017.803.262** vs el valor canónico **$11.546.493** — 88× inflado). Convierte el cómputo de KPIs CLP de payments en single-source-of-truth con enforcement mecánico anti-regresión. Subordina las queries inline `SUM(ep.amount × exchange_rate_to_clp)` que poblaban dashboards finance: ese anti-patrón ahora es bloqueado por lint.
+
+**Causa raíz**: el campo `exchange_rate_to_clp` vive en `expenses` / `income` (documento original), NO en el payment. Cuando un expense USD se paga en CLP nativo (caso CCA shareholder reimbursable TASK-714c — payment HubSpot CCA $1.106.321 CLP sobre expense documentado en USD con rate 910.55), multiplicar el monto CLP por el rate USD del documento infla los KPIs en mil millones por payment. El bug era estructural: cualquier nuevo callsite del anti-patrón lo iba a reintroducir.
+
+**Resolución arquitectónica** (no fix puntual — refactor de contrato):
+
+1. **VIEW canónica `greenhouse_finance.expense_payments_normalized`** (mirror `income_payments_normalized`). Expone `payment_amount_clp` con COALESCE chain: `amount_clp` first → CLP-trivial fallback (`WHEN currency='CLP' THEN amount`) → `NULL` con `has_clp_drift=TRUE`. Aplica filtro 3-axis supersede inline (`superseded_by_payment_id IS NULL AND superseded_by_otb_id IS NULL AND superseded_at IS NULL`). Replica el patrón TASK-571 (`income_settlement_reconciliation`) y TASK-699 (`fx_pnl_breakdown`).
+
+2. **Helper TS canónico** `src/lib/finance/expense-payments-reader.ts` + `income-payments-reader.ts`. API mínima:
+   - `sumExpensePaymentsClpForPeriod({fromDate, toDate, expenseType?, supplierId?, isReconciled?})` → `{totalClp, totalPayments, unreconciledCount, supplierClp, payrollClp, fiscalClp, driftCount}`
+   - `sumIncomePaymentsClpForPeriod({fromDate, toDate, clientProfileId?, isReconciled?})` → `{totalClp, totalPayments, unreconciledCount, driftCount}`
+   - `listExpensePaymentsNormalized` / `listIncomePaymentsNormalized` paginados
+   - `getExpensePaymentsClpDriftCount` / `getIncomePaymentsClpDriftCount` para reliability signals
+
+3. **Backfill defensivo** (Slice 2 migration `20260503015255538`): UPDATE idempotente `amount_clp = amount WHERE currency='CLP' AND amount_clp IS NULL` (caso seguro único). 23 income_payments backfilled. CHECK constraint `payments_amount_clp_required_after_cutover` (NOT VALID + VALIDATE atomic, mirror TASK-708/728, cutover 2026-05-03): rechaza INSERT/UPDATE post-cutover sin `amount_clp` para non-CLP.
+
+4. **2 reliability signals canónicos** (subsystem `Finance Data Quality`):
+   - `finance.expense_payments.clp_drift` (kind=drift, severity=error si count>0, steady=0)
+   - `finance.income_payments.clp_drift` (idem)
+   - Documentados en `GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1.md` Delta 2026-05-03.
+
+5. **Lint rule mecánica** `eslint-plugins/greenhouse/rules/no-untokenized-fx-math.mjs` modo `error` desde commit-1. Detecta 4 patrones (expense + income, con/sin COALESCE):
+   - `ep.amount * exchange_rate_to_clp`
+   - `ep.amount * COALESCE(e.exchange_rate_to_clp, 1)`
+   - `ip.amount * exchange_rate_to_clp`
+   - `ip.amount * COALESCE(i.exchange_rate_to_clp, 1)`
+   Override block exime los 2 readers canónicos. Bloquea cualquier futuro callsite. Patrón heredado de `no-untokenized-copy` (TASK-265).
+
+6. **Repair admin endpoint** `POST /api/admin/finance/payments-clp-repair` (capability granular `finance.payments.repair_clp` — FINANCE_ADMIN + EFEONCE_ADMIN, least-privilege). Body: `{kind, paymentIds?, fromDate?, toDate?, batchSize?, dryRun?}`. Resuelve rate histórico al `payment_date` desde `greenhouse_finance.exchange_rates` (rate vigente al pago, NO el actual). Per-row atomic. Idempotente. Soporta `dryRun=true`. Outbox audit `finance.payments.clp_repaired` v1 (catálogo en `GREENHOUSE_EVENT_CATALOG_V1.md` Delta 2026-05-03).
+
+7. **Migración exhaustiva**: 8 endpoints migrados al helper canónico. Cuatro de ellos tenían leak de supersede pre-migración, fixed automáticamente como bonus:
+   - `/api/finance/cash-out` (Slice 3) — primer migrate, anti-regresión hard `< $20M` en tests
+   - `/api/finance/cash-in`, `/api/finance/cash-position`, `/api/finance/dashboard/{pnl,summary}` (Slice 4a)
+   - `/api/finance/dashboard/cashflow`, `/api/finance/expenses/summary`, `/api/finance/income/summary` (Slice 4b)
+
+**Tests**: 79 totales verdes — 22 readers (Slice 1), 8 reliability signals (Slice 2), 4 cash-out anti-regresión + 10 RuleTester lint cases (Slice 3), 23 endpoint regression (Slice 4), 12 repair helper + endpoint (Slice 5).
+
+**Política consumer (regla dura)**: ningún módulo de Greenhouse puede recomputar saldos CLP de payments fuera de la VIEW + helper canónicos. Replica el patrón de "consumer obligations" definido en `GREENHOUSE_FX_CURRENCY_PLATFORM_V1.md` sección 5 — el lint rule lo enforcea, no es convención.
+
+**Spec canónica**: `docs/tasks/complete/TASK-766-finance-clp-currency-reader-contract.md`. Patrones reusados: TASK-571 (VIEW + helper income_settlement), TASK-699 (FX P&L breakdown contract), TASK-708/728 (CHECK NOT VALID + VALIDATE atomic), TASK-721 (canonical helper enforcement), TASK-765 (reliability signals + outbox audit).
 
 ## Delta 2026-05-02 — TASK-765 Payment Order Bank Settlement (atomic contract)
 

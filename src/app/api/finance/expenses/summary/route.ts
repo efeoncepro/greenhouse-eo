@@ -23,9 +23,7 @@ interface PgExpenseRow extends Record<string, unknown> {
 
 interface PgExpensePaymentRow extends Record<string, unknown> {
   payment_date: string | null
-  amount: string | number
-  currency: string | null
-  exchange_rate_to_clp: string | number | null
+  payment_amount_clp: string | number | null
 }
 
 async function getPostgresFirstSummary() {
@@ -36,14 +34,16 @@ async function getPostgresFirstSummary() {
       `SELECT document_date::text, total_amount_clp
        FROM greenhouse_finance.expenses`
     ),
+    // TASK-766 Slice 4b — canonical CLP reader.
+    // Antes: SELECT ep.amount + JOIN expenses.exchange_rate_to_clp →
+    // multiplicación TS-level (toNumber(row.amount) * rate) que infla
+    // cuando ep.currency ≠ e.currency (caso CCA TASK-714c). Ahora se
+    // consume payment_amount_clp directo desde la VIEW canónica que ya
+    // resuelve el COALESCE (amount_clp persistido > CLP-trivial > NULL)
+    // y filtra 3-axis supersede automáticamente.
     runGreenhousePostgresQuery<PgExpensePaymentRow>(
-      `SELECT
-         ep.payment_date::text,
-         ep.amount,
-         ep.currency,
-         COALESCE(e.exchange_rate_to_clp, 1) AS exchange_rate_to_clp
-       FROM greenhouse_finance.expense_payments ep
-       INNER JOIN greenhouse_finance.expenses e ON e.expense_id = ep.expense_id`
+      `SELECT payment_date::text, payment_amount_clp
+       FROM greenhouse_finance.expense_payments_normalized`
     ),
     runGreenhousePostgresQuery<{ count: string }>(
       `SELECT COUNT(*)::text AS count
@@ -68,11 +68,13 @@ async function getPostgresFirstSummary() {
     .filter((e): e is { period: string; amountClp: number } => Boolean(e.period))
 
   const cashEntries = paymentRows
+    // TASK-766 — payment_amount_clp ya viene en CLP canónico desde la VIEW.
+    // NULL = drift (non-CLP sin amount_clp persistido) → se excluye del SUM,
+    // mismo criterio que sumExpensePaymentsClpForPeriod.
+    .filter(row => row.payment_amount_clp !== null)
     .map(row => ({
       period: getMonthKey(row.payment_date?.slice(0, 10) ?? null),
-      amountClp: row.currency === 'CLP' || !row.currency
-        ? roundCurrency(toNumber(row.amount))
-        : roundCurrency(toNumber(row.amount) * (toNumber(row.exchange_rate_to_clp) || 1))
+      amountClp: roundCurrency(toNumber(row.payment_amount_clp))
     }))
     .filter((e): e is { period: string; amountClp: number } => Boolean(e.period))
 

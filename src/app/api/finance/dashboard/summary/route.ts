@@ -22,7 +22,10 @@ interface PgIncomeRow extends Record<string, unknown> {
 
 interface PgPaymentRow extends Record<string, unknown> {
   payment_date: string | Date | null
-  amount_clp: string | number
+  // TASK-766 — null when payment is non-CLP without persisted amount_clp
+  // (has_clp_drift=TRUE en la VIEW). El consumer con `toNumber` lo trata
+  // como 0 (drift se excluye de totals; reliability signal lo cuenta).
+  amount_clp: string | number | null
 }
 
 interface PgExpenseRow extends Record<string, unknown> {
@@ -91,12 +94,15 @@ async function handlePostgresFirst(monthKeys: string[]) {
          AND COALESCE(dte_type_code, '') NOT IN ('52', 'COT')
          AND COALESCE(is_annulled, FALSE) = FALSE`
     ),
+    // TASK-766 — canonical CLP reader. Reemplaza el anti-patron
+    // `ROUND(ip.amount * COALESCE(i.exchange_rate_to_clp, 1), 2) AS amount_clp`
+    // por SELECT directo a la VIEW income_payments_normalized que expone
+    // `payment_amount_clp` canonico (COALESCE chain) y filtra 3-axis supersede.
     runGreenhousePostgresQuery<PgPaymentRow>(
-      `SELECT ip.payment_date,
-              ROUND(ip.amount * COALESCE(i.exchange_rate_to_clp, 1), 2) AS amount_clp
-       FROM greenhouse_finance.income_payments ip
-       INNER JOIN greenhouse_finance.income i ON i.income_id = ip.income_id
-       WHERE ip.payment_date IS NOT NULL AND ip.amount > 0`
+      `SELECT ipn.payment_date,
+              ipn.payment_amount_clp AS amount_clp
+       FROM greenhouse_finance.income_payments_normalized ipn
+       WHERE ipn.payment_date IS NOT NULL AND ipn.payment_amount_native > 0`
     ),
     runGreenhousePostgresQuery<PgExpenseRow>(
       `SELECT document_date, payment_date, total_amount_clp, payment_status, expense_type

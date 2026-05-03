@@ -1,14 +1,14 @@
 import { NextResponse } from 'next/server'
 
-import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
-import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
+import { sumExpensePaymentsClpForPeriod } from '@/lib/finance/expense-payments-reader'
 import {
   toNumber,
   toDateString,
   toTimestampString,
-  normalizeString,
-  roundCurrency
+  normalizeString
 } from '@/lib/finance/shared'
+import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
+import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
 
@@ -39,16 +39,6 @@ interface PaymentRow {
   payment_account_name: string | null
   payment_provider_slug: string | null
   payment_instrument_category: string | null
-}
-
-interface SummaryRow {
-  [key: string]: unknown
-  total_paid_clp: unknown
-  total_payments: unknown
-  unreconciled_count: unknown
-  supplier_total_clp: unknown
-  payroll_total_clp: unknown
-  fiscal_total_clp: unknown
 }
 
 // ── Normalizer ──────────────────────────────────────────────────────
@@ -185,27 +175,19 @@ export async function GET(request: Request) {
       params
     )
 
-    // ── Summary KPIs ────────────────────────────────────────────────
-    // Re-use only the filter params (not LIMIT/OFFSET)
-    const filterParams = params.slice(0, paramIndex - 2)
-
-    const summaryResult = await runGreenhousePostgresQuery<SummaryRow>(
-      `
-      SELECT
-        COALESCE(SUM(ep.amount * COALESCE(e.exchange_rate_to_clp, 1)), 0) AS total_paid_clp,
-        COUNT(*) AS total_payments,
-        COUNT(*) FILTER (WHERE NOT ep.is_reconciled) AS unreconciled_count,
-        COALESCE(SUM(ep.amount * COALESCE(e.exchange_rate_to_clp, 1)) FILTER (WHERE e.expense_type = 'supplier'), 0) AS supplier_total_clp,
-        COALESCE(SUM(ep.amount * COALESCE(e.exchange_rate_to_clp, 1)) FILTER (WHERE e.expense_type = 'payroll'), 0) AS payroll_total_clp,
-        COALESCE(SUM(ep.amount * COALESCE(e.exchange_rate_to_clp, 1)) FILTER (WHERE e.expense_type IN ('tax', 'social_security')), 0) AS fiscal_total_clp
-      FROM greenhouse_finance.expense_payments ep
-      INNER JOIN greenhouse_finance.expenses e ON e.expense_id = ep.expense_id
-      ${whereClause}
-      `,
-      filterParams
-    )
-
-    const s = summaryResult[0]
+    // ── Summary KPIs (TASK-766 — canonical CLP reader) ──────────────
+    // Reemplaza el anti-patrón `SUM(ep.amount * COALESCE(e.exchange_rate_to_clp, 1))`
+    // por el helper canónico que lee de la VIEW expense_payments_normalized
+    // con `payment_amount_clp` correctamente resuelto. Ver
+    // src/lib/finance/expense-payments-reader.ts para reglas duras + rationale.
+    const summary = await sumExpensePaymentsClpForPeriod({
+      fromDate: fromDate ?? '0001-01-01',
+      toDate: toDate ?? '9999-12-31',
+      expenseType: expenseType ?? undefined,
+      supplierId: supplierId ?? undefined,
+      isReconciled:
+        isReconciledParam === null ? undefined : isReconciledParam === 'true'
+    })
 
     return NextResponse.json({
       items: rows.map(normalizePayment),
@@ -213,12 +195,16 @@ export async function GET(request: Request) {
       page,
       pageSize,
       summary: {
-        totalPaidClp: roundCurrency(toNumber(s?.total_paid_clp)),
-        totalPayments: toNumber(s?.total_payments),
-        unreconciledCount: toNumber(s?.unreconciled_count),
-        supplierTotalClp: roundCurrency(toNumber(s?.supplier_total_clp)),
-        payrollTotalClp: roundCurrency(toNumber(s?.payroll_total_clp)),
-        fiscalTotalClp: roundCurrency(toNumber(s?.fiscal_total_clp))
+        totalPaidClp: summary.totalClp,
+        totalPayments: summary.totalPayments,
+        unreconciledCount: summary.unreconciledCount,
+        supplierTotalClp: summary.supplierClp,
+        payrollTotalClp: summary.payrollClp,
+        fiscalTotalClp: summary.fiscalClp,
+        // TASK-766 — drift count expuesto al UI para que un valor > 0 sea
+        // visible (preludio del banner reliability + reparable via
+        // POST /api/admin/finance/payments-clp-repair).
+        driftCount: summary.driftCount
       }
     })
   } catch (error) {

@@ -268,6 +268,25 @@ export default [
       'greenhouse/no-untokenized-copy': 'warn'
     }
   },
+
+  /*
+    TASK-766 Slice 3 — Finance CLP currency reader gate.
+    Aplica a TODO el codigo del portal (incluye API routes .ts y libs).
+    Mode 'error' desde el primer commit: cero tolerancia a legacy (cualquier
+    hit es risk de KPIs inflados en produccion). Slice 3 migra cash-out;
+    Slice 4 audita el resto del portal antes de mergear. Las excepciones
+    explicitas (helpers/readers canonicos, tests del rule) viven en el
+    bloque de override de abajo.
+  */
+  {
+    files: ['src/**/*.ts', 'src/**/*.tsx'],
+    plugins: {
+      greenhouse: greenhousePlugin
+    },
+    rules: {
+      'greenhouse/no-untokenized-fx-math': 'error'
+    }
+  },
   {
     files: [
       'src/components/theme/**',
@@ -280,6 +299,24 @@ export default [
     rules: {
       'greenhouse/no-hardcoded-fontfamily': 'off',
       'greenhouse/no-untokenized-copy': 'off'
+    }
+  },
+
+  // TASK-766 Slice 3 — la lint rule no-untokenized-fx-math se desactiva
+  // SOLO en los helpers/readers canónicos donde el patrón aparece como
+  // referencia en docstrings y assertion strings de tests (NO en SQL real).
+  // El patrón está prohibido en cualquier otro file del portal.
+  {
+    files: [
+      'src/lib/finance/expense-payments-reader.ts',
+      'src/lib/finance/income-payments-reader.ts',
+      'src/lib/finance/__tests__/expense-payments-reader.test.ts',
+      'src/lib/finance/__tests__/income-payments-reader.test.ts',
+      'eslint-plugins/greenhouse/rules/no-untokenized-fx-math.mjs',
+      'eslint-plugins/greenhouse/rules/__tests__/no-untokenized-fx-math.test.mjs'
+    ],
+    rules: {
+      'greenhouse/no-untokenized-fx-math': 'off'
     }
   },
 

@@ -216,6 +216,22 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     actions: ['update'] as const,
     defaultScope: 'tenant'
   },
+  // TASK-766 Slice 5 — Repair de payments con drift CLP.
+  // Permite a FINANCE_ADMIN / EFEONCE_ADMIN reparar registros de
+  // expense_payments / income_payments con `requires_fx_repair=TRUE`
+  // (non-CLP sin amount_clp poblado). El endpoint resuelve el rate
+  // histórico al payment_date desde greenhouse_finance.exchange_rates y
+  // poblá amount_clp + exchange_rate_at_payment + flips
+  // requires_fx_repair=FALSE. Idempotente. Capability granular nueva
+  // (least-privilege) para audit fino, no se reusa
+  // finance.payroll.rematerialize (dimensiones ortogonales: FX rates
+  // históricos vs payroll expenses).
+  {
+    key: 'finance.payments.repair_clp',
+    module: 'finance',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
   {
     key: 'finance.cash.adopt-external-signal',
     module: 'finance',

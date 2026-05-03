@@ -2,10 +2,51 @@
 
 > Spec canónica del `Reliability Control Plane` de Greenhouse EO. Define el registry por módulo, el modelo unificado de señales, el contrato de evidencia y cómo `Admin Center`, `Ops Health` y `Cloud & Integrations` consumen la lectura consolidada sin duplicar fuentes.
 >
-> Versión: `1.3`
+> Versión: `1.4`
 > Estado: `vigente`
 > Creada: `2026-04-25` por TASK-600
-> Última actualización: `2026-05-02` por TASK-765 (3 signals nuevos para el path payment_order ↔ bank settlement)
+> Última actualización: `2026-05-03` por TASK-766 (2 signals nuevos para drift de currency CLP en payments)
+
+---
+
+## Delta 2026-05-03 — TASK-766 module `finance.payment_orders` (2 signals nuevos para CLP drift)
+
+Cierra el incidente 2026-05-02 (KPIs en `/finance/cash-out` inflados 88× por anti-patrón `SUM(ep.amount × exchange_rate_to_clp)` aplicado a payments con `currency != document.currency`). Agrega 2 signals al subsystem `Finance Data Quality` para detectar payments con `currency != 'CLP' AND amount_clp IS NULL` — la condición que el anti-patrón explotaba.
+
+### Signals nuevos
+
+| `signalKey` | Kind | Severity rule | Steady value | Reader |
+| --- | --- | --- | --- | --- |
+| `finance.expense_payments.clp_drift` | `drift` | `count > 0 → error`; `count === 0 → ok` | `0` | `getExpensePaymentsClpDriftSignal` (`src/lib/reliability/queries/expense-payments-clp-drift.ts`) |
+| `finance.income_payments.clp_drift` | `drift` | `count > 0 → error`; `count === 0 → ok` | `0` | `getIncomePaymentsClpDriftSignal` (`src/lib/reliability/queries/income-payments-clp-drift.ts`) |
+
+Ambos consultan la VIEW canónica `expense_payments_normalized` / `income_payments_normalized` con `WHERE has_clp_drift = TRUE`. Reusan los helpers `getExpensePaymentsClpDriftCount` / `getIncomePaymentsClpDriftCount` para no duplicar SQL.
+
+### Builder + wiring
+
+- `buildFinanceClpDriftSignals` en `src/lib/reliability/signals.ts` — `Promise.all` sobre los 2 readers, retorna `ReliabilitySignal[]`.
+- `getReliabilityOverview` extendido en `src/lib/reliability/get-reliability-overview.ts` con `ReliabilityOverviewSources.financeClpDrift?: { expense, income }`. Pre-fetch `.catch(() => null)` para no romper rollup si la VIEW está en degradación.
+- Subsystem rollup: `Finance Data Quality` (existente). Cualquiera de los 2 signals con `count > 0` flips el subsystem a `error`, lo que escala al rollup `Finance` y al payload de `/api/admin/platform-health` con `safeMode.financeReadSafe=false`.
+
+### Repair path documentado
+
+El AI Observer (TASK-638) capta el signal y enlaza al endpoint admin canónico:
+
+```http
+POST /api/admin/finance/payments-clp-repair
+Body: { kind: 'expense_payments' | 'income_payments', dryRun?: true, ... }
+Capability: finance.payments.repair_clp (FINANCE_ADMIN + EFEONCE_ADMIN)
+```
+
+El endpoint resuelve rate histórico al `payment_date` desde `greenhouse_finance.exchange_rates` y poblá `amount_clp + exchange_rate_at_payment + requires_fx_repair=FALSE` per-row atomic. Idempotente. Outbox audit `finance.payments.clp_repaired` v1.
+
+### Steady state esperado
+
+Post-backfill (Slice 2 migration `20260503015255538`): **drift = 0** en producción.
+
+Post-cutover (2026-05-03): el CHECK constraint `payments_amount_clp_required_after_cutover` (NOT VALID + VALIDATE) impide INSERT/UPDATE de non-CLP sin `amount_clp`. Cualquier reaparición de `count > 0` significa: (a) supersede activo en una fila legacy, (b) bug en `recordExpensePayment` o `recordIncomePayment` (helpers canónicos), o (c) bypass directo del helper. AI Observer alerta con runbook al endpoint repair.
+
+**Spec canónica**: `docs/tasks/complete/TASK-766-finance-clp-currency-reader-contract.md`.
 
 ---
 
