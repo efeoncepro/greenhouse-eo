@@ -11,6 +11,7 @@
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
+- Epic: `EPIC-011`
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `agency`
@@ -47,6 +48,7 @@ La arquitectura ya define surfaces claras para operar el dominio, pero hoy no ex
 Revisar y respetar:
 
 - `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md`
+- `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md`
 - `docs/architecture/GREENHOUSE_UI_PLATFORM_V1.md`
 - `docs/ui/GREENHOUSE_VUEXY_COMPONENT_CATALOG_V1.md`
 - `docs/ui/GREENHOUSE_MODERN_UI_UX_BASELINE_V1.md`
@@ -59,6 +61,9 @@ Reglas obligatorias:
 - el detail shell debe respetar el pattern sidebar + tabs cuando aplique, adaptado al dominio real
 - la publication governance interna no debe exponer lógica paralela al opening, sino controlar la proyección pública derivada
 - no copiar demos de `full-version` tal cual; adaptar semantics y copy al contexto Greenhouse
+- Demand Desk, Pipeline Board y Publication Desk deben vivir bajo una shell común de Hiring con rutas hermanas/deep links, no como pantallas aisladas sin navegación compartida.
+- La UI debe distinguir `views` visibles de capabilities finas: ver, editar, publicar, decidir y handoff.
+- El desk interno no puede mostrar PII pública de postulantes a usuarios sin capability explícita.
 
 ## Normative Docs
 
@@ -84,9 +89,10 @@ Reglas obligatorias:
 
 ### Files owned
 
-- `src/app/(dashboard)`
-- `src/views/greenhouse`
-- `src/components/greenhouse`
+- `src/app/[lang]/(dashboard)/agency/hiring/**` o route group equivalente confirmado en Discovery
+- `src/views/greenhouse/agency/hiring/**`
+- `src/components/greenhouse/hiring/**`
+- `src/lib/hiring/**` solo para readers UI específicos, no foundation duplicada
 - `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md`
 
 ## Current Repo State
@@ -120,16 +126,32 @@ Reglas obligatorias:
 
 - Crear lista institucional de demandas/openings con filtros y KPIs básicos
 - Permitir drilldown hacia pipeline, application o publication governance
+- Implementar dentro de una shell `Hiring Desk` con navegación clara a Demand, Pipeline, Applications y Publication.
+- Respetar capabilities `hiring.demand.read/write` y `hiring.opening.read/write`.
 
 ### Slice 2 — Pipeline Board + Application 360
 
 - Crear board kanban para `HiringApplication`
 - Crear `Application 360` o shell equivalente con overview, evaluations, blockers, decision y handoff
+- Respetar capabilities `hiring.application.read/write/decide`.
+- No renderizar PII, CV/portfolio privado o notas sensibles si el usuario solo tiene acceso de lectura agregado.
 
 ### Slice 3 — Publication Desk
 
 - Crear surface interna para revisar y gobernar qué openings se publican externamente
 - Permitir revisar copy, estado de publicación y acciones de pausar/cerrar/publicar
+- Respetar capability `hiring.opening.publish`.
+- Mostrar diff entre payload interno y payload público allowlist para evitar publicación accidental de datos sensibles.
+
+### Slice 4 — Route + access registration
+
+- Registrar views mínimas del módulo:
+  - `agency.hiring`
+  - `agency.hiring.demand`
+  - `agency.hiring.pipeline`
+  - `agency.hiring.publication`
+  - `agency.hiring.application_detail`
+- Alinear navegación, route guards y entitlements con `GREENHOUSE_IDENTITY_ACCESS_V2`.
 
 ## Out of Scope
 
@@ -161,6 +183,9 @@ pero adaptado al dominio real:
 - [ ] Existe un `Demand Desk` usable sobre los openings/demandas reales del dominio
 - [ ] Existe un `Pipeline Board` donde cada tarjeta representa una `HiringApplication`
 - [ ] Existe un `Application 360` y un `Publication Desk` conectados al foundation runtime real
+- [ ] Las surfaces internas usan rutas hermanas bajo una shell común, con deep links estables
+- [ ] Publication Desk muestra solo payload público allowlist y requiere capability de publicación
+- [ ] Application 360 respeta capabilities para PII, adjuntos privados, notas y decisiones
 
 ## Verification
 
@@ -179,6 +204,7 @@ pero adaptado al dominio real:
 - Talent Pool explícito si el dominio lo necesita como surface separada
 - hiring-aware summaries dentro de `People` o `Agency`
 
-## Open Questions
+## Resolved Open Questions
 
-- si `Demand Desk` y `Publication Desk` conviene dejarlos en una misma route con tabs o como dos routes hermanas desde la primera iteración
+- V1 usa una shell común `Hiring Desk` con rutas hermanas/deep links para Demand, Pipeline, Application Detail y Publication. Esto preserva navegación compartida sin bloquear permisos, URLs compartibles ni crecimiento futuro.
+- `Talent Pool` queda fuera como surface V1. El board y Application 360 pueden mostrar candidates/applications existentes, pero no construyen búsqueda global de talento todavía.
