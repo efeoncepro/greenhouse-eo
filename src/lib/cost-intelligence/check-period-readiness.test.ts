@@ -31,6 +31,7 @@ type Fixtures = {
   incomeCount?: number
   expenseCount?: number
   fxCount?: number
+  distribution?: Record<string, unknown> | null
 }
 
 const buildFixtures = (input: Fixtures = {}): Required<Fixtures> => ({
@@ -51,7 +52,13 @@ const buildFixtures = (input: Fixtures = {}): Required<Fixtures> => ({
   },
   incomeCount: input.incomeCount ?? 1,
   expenseCount: input.expenseCount ?? 1,
-  fxCount: input.fxCount ?? 1
+  fxCount: input.fxCount ?? 1,
+  distribution: input.distribution ?? {
+    total_expenses: input.expenseCount ?? 1,
+    active_resolutions: input.expenseCount ?? 1,
+    unresolved_resolutions: 0,
+    shared_pool_contamination: 0
+  }
 })
 
 const resolveRowsFromSql = (sql: string, fixtures: Required<Fixtures>) => {
@@ -65,6 +72,10 @@ const resolveRowsFromSql = (sql: string, fixtures: Required<Fixtures>) => {
 
   if (sql.includes('FROM greenhouse_payroll.payroll_periods')) {
     return fixtures.payroll ? [fixtures.payroll] : []
+  }
+
+  if (sql.includes('greenhouse_finance.expense_distribution_resolution')) {
+    return fixtures.distribution ? [fixtures.distribution] : []
   }
 
   if (sql.includes('FROM greenhouse_finance.income')) {
@@ -129,6 +140,8 @@ describe('checkPeriodReadiness', () => {
     expect(result.incomeStatus).toBe('complete')
     expect(result.expenseStatus).toBe('complete')
     expect(result.fxStatus).toBe('locked')
+    expect(result.expenseDistributionStatus).toBe('complete')
+    expect(result.expenseDistributionReady).toBe(true)
   })
 
   it('marks the period as not ready when payroll is approved but not exported', async () => {
@@ -140,7 +153,7 @@ describe('checkPeriodReadiness', () => {
 
     expect(result.closureStatus).toBe('open')
     expect(result.isReady).toBe(false)
-    expect(result.readinessPct).toBe(75)
+    expect(result.readinessPct).toBe(80)
     expect(result.payrollStatus).toBe('approved')
     expect(result.payrollClosed).toBe(false)
   })
@@ -155,8 +168,45 @@ describe('checkPeriodReadiness', () => {
 
     expect(result.incomeStatus).toBe('pending')
     expect(result.fxStatus).toBe('pending')
-    expect(result.readinessPct).toBe(50)
+    expect(result.readinessPct).toBe(60)
     expect(result.isReady).toBe(false)
+  })
+
+  it('blocks period readiness when expense distribution has unresolved rows', async () => {
+    wireDefaultQueryMocks({
+      distribution: {
+        total_expenses: 2,
+        active_resolutions: 1,
+        unresolved_resolutions: 1,
+        shared_pool_contamination: 0
+      }
+    })
+
+    const result = await checkPeriodReadiness({ year: 2026, month: 3 })
+
+    expect(result.closureStatus).toBe('open')
+    expect(result.isReady).toBe(false)
+    expect(result.readinessPct).toBe(80)
+    expect(result.expenseDistributionStatus).toBe('pending')
+    expect(result.expenseDistributionReady).toBe(false)
+    expect(result.metrics.expenseDistributionUnresolved).toBe(1)
+  })
+
+  it('blocks period readiness when shared overhead pool is contaminated', async () => {
+    wireDefaultQueryMocks({
+      distribution: {
+        total_expenses: 2,
+        active_resolutions: 2,
+        unresolved_resolutions: 0,
+        shared_pool_contamination: 1
+      }
+    })
+
+    const result = await checkPeriodReadiness({ year: 2026, month: 3 })
+
+    expect(result.isReady).toBe(false)
+    expect(result.expenseDistributionStatus).toBe('blocked')
+    expect(result.metrics.expenseDistributionSharedPoolContamination).toBe(1)
   })
 })
 

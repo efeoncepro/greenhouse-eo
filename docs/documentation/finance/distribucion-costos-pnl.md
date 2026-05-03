@@ -47,3 +47,25 @@ pnpm run finance:materialize-expense-distribution -- --period 202604
 ```
 
 Después de materializar distribución, se deben refrescar las proyecciones de member capacity, commercial cost attribution y operational P&L antes de leer `/finance/intelligence`.
+
+## Gate de cierre
+
+El cierre operativo consulta `checkPeriodReadiness`. El período no queda listo si:
+
+- falta una resolución activa para algún expense del período
+- hay resoluciones `manual_required`, `blocked` o `unallocated`
+- el pool `shared_operational_overhead` contiene categorías laborales, regulatorias, tributarias o financieras
+
+Abril 2026 queda listo con 50 resoluciones activas, 0 unresolved y 0 contaminación. Mayo 2026 aún no queda listo por falta de ingresos/egresos/FX del período, pero no por distribución de costos.
+
+## Sugerencias asistidas
+
+La IA de distribución es opcional y está apagada por defecto con `FINANCE_DISTRIBUTION_AI_ENABLED=false`.
+
+La cola admin vive en:
+
+- `GET /api/admin/finance/expense-distribution/suggestions?year=2026&month=4`
+- `POST /api/admin/finance/expense-distribution/suggestions`
+- `POST /api/admin/finance/expense-distribution/suggestions/[suggestionId]`
+
+Una sugerencia no modifica P&L ni cierra períodos. Solo una aprobación humana puede crear una resolución `ai_approved`; esa resolución queda auditada y sigue sin tocar caja, bancos ni conciliación.

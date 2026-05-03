@@ -319,6 +319,27 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     defaultScope: 'space'
   },
   {
+    // TASK-777 — Read expense distribution review queue and advisory suggestions.
+    key: 'finance.expense_distribution.ai_suggestions.read',
+    module: 'finance',
+    actions: ['read'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    // TASK-777 — Generate advisory-only expense distribution suggestions.
+    key: 'finance.expense_distribution.ai_suggestions.generate',
+    module: 'finance',
+    actions: ['create'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    // TASK-777 — Approve/reject advisory suggestions. Approval creates an auditable ai_approved resolution.
+    key: 'finance.expense_distribution.ai_suggestions.review',
+    module: 'finance',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
     key: 'admin.workspace',
     module: 'admin',
     actions: ['read', 'manage', 'launch'] as const,

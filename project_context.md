@@ -11,6 +11,14 @@
 - Para verificar higiene de contexto sin modificar archivos, usar `pnpm docs:context-check`. El check es no destructivo por defecto y existe para avisar drift, no para borrar memoria.
 - Preview/Staging/Production vigentes deben seguir lo declarado en `AGENTS.md` y `RELEASE_CHANNELS_OPERATING_MODEL_V1.md`; si un delta antiguo de Vercel contradice esos contratos, tratarlo como historia y revalidar con Vercel CLI/runtime.
 
+## Delta 2026-05-03 TASK-777 expense distribution close gate
+
+- Finance management accounting ya no debe consumir `expenses.economic_category` directo como decisión final de P&L. La primitive canónica es `greenhouse_finance.expense_distribution_resolution`.
+- `shared_operational_overhead` es el único lane que alimenta overhead operacional compartido. Payroll/provider, regulatorio, tributario, financiero y treasury transit quedan fuera por contrato.
+- `checkPeriodReadiness` ahora incluye un gate de distribución: un período no está listo si faltan resoluciones activas, existen resoluciones `manual_required`/`blocked`/`unallocated`, o el pool operacional está contaminado.
+- IA de distribución vive solo como advisory layer en `src/lib/finance/expense-distribution-intelligence/*`, con kill-switch `FINANCE_DISTRIBUTION_AI_ENABLED=false` por defecto. Una sugerencia nunca escribe P&L ni cierra períodos; solo aprobación humana puede materializar una resolución `source='ai_approved'`.
+- Superficies protegidas: `account_balances`, normalized payment readers, settlement legs, payment orders, bank reconciliation y saldos de caja siguen fuera del alcance de distribución económica.
+
 ## Delta 2026-05-03 Codex finance/accounting operator skill
 
 - Codex ahora tiene una skill local y una global llamadas `greenhouse-finance-accounting-operator`.

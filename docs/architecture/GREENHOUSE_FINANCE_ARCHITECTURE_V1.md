@@ -22,10 +22,23 @@ Runtime entregado:
 - `greenhouse_finance.expense_distribution_resolution`
 - `greenhouse_finance.expense_distribution_ai_suggestions`
 - `src/lib/finance/expense-distribution/*`
+- `src/lib/finance/expense-distribution-intelligence/*`
+- `GET/POST /api/admin/finance/expense-distribution/suggestions`
+- `POST /api/admin/finance/expense-distribution/suggestions/[suggestionId]`
 - `finance.expense_distribution.unresolved`
 - `finance.expense_distribution.shared_pool_contamination`
+- close gate en `checkPeriodReadiness`: exige resolución activa para cada expense del período y bloquea `manual_required`, `blocked`, `unallocated` o contaminación del pool operacional.
+
+Access model:
+
+- `routeGroups`: sin cambios; las APIs viven bajo Finance/Admin runtime existente.
+- `views`: sin nueva entrada visible/menu en TASK-777.
+- `entitlements`: `finance.expense_distribution.ai_suggestions.read`, `.generate`, `.review`.
+- `startup policy`: sin cambios.
 
 Abril 2026 fue rematerializado con la nueva capa: SKY overhead `$2.278.629,39`, ANAM overhead `$759.543,13`, y contamination/unresolved `0`.
+
+Decisión operativa abril 2026: queda apto para cierre operativo con distribución canónica (`readinessPct=100`, 50/50 resoluciones activas, unresolved `0`). Si abril ya fue comunicado con el P&L anterior, tratar la diferencia como restatement de management accounting, no como corrección de caja.
 
 ## Delta 2026-05-03 — TASK-768 Economic Category Dimension (analytical separation)
 
