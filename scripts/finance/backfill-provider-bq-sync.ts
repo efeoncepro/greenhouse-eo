@@ -42,6 +42,7 @@ const parseArgs = (): CliOptions => {
   const dryRun = args.includes('--dry-run')
 
   const idsArg = args.find(a => a.startsWith('--supplier-ids='))
+
   const supplierIds = idsArg
     ? idsArg.split('=')[1].split(',').map(s => s.trim()).filter(Boolean)
     : KNOWN_AFFECTED_SUPPLIERS
@@ -118,6 +119,7 @@ const main = async () => {
     const result = await processOne(supplierId, dryRun)
 
     results.push(result)
+
     if (result.status === 'synced') {
       console.log(`OK provider=${result.providerId} (${result.providerName})`)
     } else if (result.status === 'skipped_not_found') {
