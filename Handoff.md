@@ -1,5 +1,39 @@
 # Handoff.md
 
+## Sesion 2026-05-03 — TASK-768 cerrada (Finance Expense Economic Category Dimension + ISSUE-065 resolved)
+
+- **Lifecycle:** `complete` (movida a `complete/`)
+- **Branch:** `task/TASK-768-finance-expense-economic-category-dimension`
+- **9 slices entregados end-to-end**:
+  - Slice 1: Schema + columna `economic_category` aditiva + 2 lookup tables seedeadas (17 reguladores chilenos + 8 international payroll vendors) + types TS canónicos (11 expense values, 8 income values)
+  - Slice 2: Helpers identity lookup (extractRutsFromText, lookupMemberByRut/Email/Name, lookupSupplier, lookupKnown*) + resolver canónico con 10 reglas first-match-wins + 26 tests
+  - Slice 3: Backfill defensivo Node script + audit log append-only + manual queue + 49 tests acumulados
+  - Slice 5 (re-orden vs spec): Trigger PG `populate_economic_category_default` BEFORE INSERT (cero invasivo a 12 canonical writers)
+  - Slice 4 (re-orden vs spec): CHECK NOT VALID `required_after_cutover` + canonical_values VALIDATED (11 expense, 8 income enum)
+  - Slice 6: Reclassification endpoints PATCH expense + income con capabilities granulares + audit log + outbox events v1 + 14 tests
+  - Slice 7: VIEWs canónicas extendidas con JOIN economic_category + helpers `byEconomicCategory` breakdown (backwards-compat TASK-766 23 tests verdes) + 2 reliability signals nuevos + builder canónico
+  - Slice 8: Lint rule `greenhouse/no-untokenized-expense-type-for-analytics` mode `error` desde commit-1 + cash-out endpoint expone byEconomicCategory + 11 RuleTester tests
+  - Slice 9: CLAUDE.md sección nueva + 3 arch docs deltas + ISSUE-065 documentado y resuelto + doc funcional + manual de uso + GUARDRAIL anti pre-up-marker bug
+- **Verificación final**:
+  - `pnpm tsc --noEmit`: 0 errors
+  - `pnpm build`: clean
+  - `pnpm test`: **533 files / 3003 tests verdes** (5 skipped, +63 vs TASK-766 baseline 2940)
+  - `pnpm lint`: 0 errors / 318 warnings (todas preexistentes TASK-265, scope aparte)
+- **5 migrations nuevas** aplicadas a dev DB
+- **2 capabilities granulares nuevas** (`finance.expenses.reclassify_economic_category` + `finance.income.reclassify_economic_category`)
+- **2 outbox events v1 nuevos** (`finance.expense.economic_category_changed` + `finance.income.economic_category_changed`)
+- **2 reliability signals nuevos** (`finance.expenses.economic_category_unresolved` + `finance.income.economic_category_unresolved`)
+- **1 lint rule custom nueva** (mode `error` desde commit-1)
+- **Bonus arquitectónico**: nueva sección canónica en CLAUDE.md "Database — Migration markers" que documenta el bug `-- Up Migration` marker descubierto en Slice 1 (silent failure cuando se sobreescribe archivo sin preservar el marker).
+- **KPI/data diff esperado post-deploy**:
+  - KPI Nómina cash-out abril 2026: $1.030.082 (broken) → ~$4M (canónico, suma `labor_cost_internal + labor_cost_external`)
+  - KPI Proveedores baja en proporción (deja de absorber payments labor)
+  - Total Pagado canónico se mantiene en $11.143.931 (cash flow ortogonal a buckets)
+  - Reliability signals iniciales: 161 expenses + 19 income en manual queue (esperado, Nubox imports). Operador resuelve via UI Slice 6 antes de migration follow-up que hará VALIDATE atomic.
+- **ISSUE-065 documentado y resuelto**: `docs/issues/resolved/ISSUE-065-kpi-nomina-mis-classification-by-expense-type-conflate.md`
+- **Próximo step**: PR + merge a `develop` (incluye cambios documentales paralelos de Codex que se incorporan al rebase pre-merge).
+- **Bloqueantes downstream desbloqueados**: TASK-178 (Budget Engine), TASK-710-713 (Member Loaded Cost program), beneficio indirecto a TASK-080+ (ICO Engine) y TASK-705/706 (Cost Attribution).
+
 ## Sesion 2026-05-03 — TASK-768 tomada (Finance Expense Economic Category Dimension)
 
 - **Lifecycle:** `in-progress` (movida de `to-do/` a `in-progress/`)

@@ -6,13 +6,13 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `none`
-- Status real: `Discovery (2026-05-03)`
+- Status real: `Cerrado 2026-05-03`
 - Rank: `TBD`
 - Domain: `finance`
 - Blocked by: `none` (foundations TASK-571, TASK-699, TASK-708/728, TASK-721, TASK-742, TASK-766 ya cerradas)
