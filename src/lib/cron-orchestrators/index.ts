@@ -1,10 +1,13 @@
 import 'server-only'
 
 import { alertCronFailure } from '@/lib/alerts/slack-notify'
+import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
 import { fetchEntraUsersWithManagers } from '@/lib/entra/graph-client'
 import { syncEntraProfiles } from '@/lib/entra/profile-sync'
 import { createOrRenewSubscription } from '@/lib/entra/webhook-subscription'
 import { processFailedEmailDeliveries } from '@/lib/email/delivery'
+import { buildMetricTrustMapFromRow, serializeMetricTrustMap } from '@/lib/ico-engine/metric-trust-policy'
+import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { syncHubSpotCompanies } from '@/lib/hubspot/sync-hubspot-companies'
 import { syncHubSpotCompanyLifecycles } from '@/lib/hubspot/sync-hubspot-company-lifecycle'
 import { syncHubSpotDeals } from '@/lib/hubspot/sync-hubspot-deals'
@@ -226,6 +229,148 @@ export const runHubspotProductsSync = async (): Promise<Record<string, unknown>>
   )
 
   return { ...result, durationMs: Date.now() - startMs }
+}
+
+// ─── ICO member sync (BQ ico_engine.metrics_by_member → PG greenhouse_serving) ─
+
+interface IcoMemberMetricsRow {
+  member_id: string
+  period_year: number
+  period_month: number
+  rpa_avg: number | null
+  rpa_median: number | null
+  otd_pct: number | null
+  ftr_pct: number | null
+  cycle_time_avg_days: number | null
+  cycle_time_variance?: number | null
+  throughput_count: number | null
+  pipeline_velocity: number | null
+  stuck_asset_count: number | null
+  stuck_asset_pct: number | null
+  total_tasks: number | null
+  completed_tasks: number | null
+  active_tasks: number | null
+  on_time_count: number | null
+  late_drop_count: number | null
+  overdue_count: number | null
+  carry_over_count: number | null
+  overdue_carried_forward_count: number | null
+  rpa_eligible_task_count?: number | null
+  rpa_missing_task_count?: number | null
+  rpa_non_positive_task_count?: number | null
+}
+
+const toIcoNum = (v: unknown): number | null => {
+  if (v === null || v === undefined) return null
+  if (typeof v === 'number') return v
+
+  if (typeof v === 'string') {
+    const n = Number(v)
+
+    return Number.isFinite(n) ? n : null
+  }
+
+  if (typeof v === 'object' && v !== null && 'value' in v) return toIcoNum((v as { value: unknown }).value)
+
+  return null
+}
+
+export const runIcoMemberSync = async (): Promise<Record<string, unknown>> => {
+  try {
+    const readiness = await checkIntegrationReadiness('notion')
+
+    if (!readiness.ready) {
+      console.log(`[ico-member-sync] Skipped: Notion upstream not ready — ${readiness.reason}`)
+
+      return { skipped: true, reason: readiness.reason ?? 'upstream_not_ready' }
+    }
+  } catch (error) {
+    console.warn('[ico-member-sync] Readiness check failed, proceeding anyway:', error)
+  }
+
+  const startMs = Date.now()
+  const projectId = getBigQueryProjectId()
+  const bigQuery = getBigQueryClient()
+
+  const now = new Date()
+  const periods: Array<{ year: number; month: number }> = []
+
+  for (let i = 0; i < 3; i++) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1)
+
+    periods.push({ year: d.getFullYear(), month: d.getMonth() + 1 })
+  }
+
+  let totalUpserted = 0
+
+  for (const { year, month } of periods) {
+    const [rows] = await bigQuery.query({
+      query: `SELECT *
+              FROM \`${projectId}.ico_engine.metrics_by_member\`
+              WHERE period_year = @year AND period_month = @month`,
+      params: { year, month }
+    })
+
+    for (const raw of rows as IcoMemberMetricsRow[]) {
+      const metricTrustJson = serializeMetricTrustMap(
+        buildMetricTrustMapFromRow(raw as unknown as Parameters<typeof buildMetricTrustMapFromRow>[0])
+      )
+
+      await runGreenhousePostgresQuery(
+        `INSERT INTO greenhouse_serving.ico_member_metrics (
+          member_id, period_year, period_month,
+          rpa_avg, rpa_median, otd_pct, ftr_pct,
+          cycle_time_avg_days, throughput_count, pipeline_velocity,
+          stuck_asset_count, stuck_asset_pct,
+          total_tasks, completed_tasks, active_tasks,
+          on_time_count, late_drop_count, overdue_count, carry_over_count, overdue_carried_forward_count,
+          metric_trust_json,
+          materialized_at
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21::jsonb, NOW())
+        ON CONFLICT (member_id, period_year, period_month) DO UPDATE SET
+          rpa_avg = EXCLUDED.rpa_avg,
+          rpa_median = EXCLUDED.rpa_median,
+          otd_pct = EXCLUDED.otd_pct,
+          ftr_pct = EXCLUDED.ftr_pct,
+          cycle_time_avg_days = EXCLUDED.cycle_time_avg_days,
+          throughput_count = EXCLUDED.throughput_count,
+          pipeline_velocity = EXCLUDED.pipeline_velocity,
+          stuck_asset_count = EXCLUDED.stuck_asset_count,
+          stuck_asset_pct = EXCLUDED.stuck_asset_pct,
+          total_tasks = EXCLUDED.total_tasks,
+          completed_tasks = EXCLUDED.completed_tasks,
+          active_tasks = EXCLUDED.active_tasks,
+          on_time_count = EXCLUDED.on_time_count,
+          late_drop_count = EXCLUDED.late_drop_count,
+          overdue_count = EXCLUDED.overdue_count,
+          carry_over_count = EXCLUDED.carry_over_count,
+          overdue_carried_forward_count = EXCLUDED.overdue_carried_forward_count,
+          metric_trust_json = EXCLUDED.metric_trust_json,
+          materialized_at = NOW()`,
+        [
+          raw.member_id, raw.period_year, raw.period_month,
+          toIcoNum(raw.rpa_avg), toIcoNum(raw.rpa_median), toIcoNum(raw.otd_pct), toIcoNum(raw.ftr_pct),
+          toIcoNum(raw.cycle_time_avg_days), toIcoNum(raw.throughput_count), toIcoNum(raw.pipeline_velocity),
+          toIcoNum(raw.stuck_asset_count), toIcoNum(raw.stuck_asset_pct),
+          toIcoNum(raw.total_tasks), toIcoNum(raw.completed_tasks), toIcoNum(raw.active_tasks),
+          toIcoNum(raw.on_time_count), toIcoNum(raw.late_drop_count), toIcoNum(raw.overdue_count),
+          toIcoNum(raw.carry_over_count), toIcoNum(raw.overdue_carried_forward_count),
+          metricTrustJson
+        ]
+      )
+      totalUpserted++
+    }
+  }
+
+  const durationMs = Date.now() - startMs
+
+  console.log(`[ico-member-sync] ${totalUpserted} rows upserted across ${periods.length} periods in ${durationMs}ms`)
+
+  return {
+    upserted: totalUpserted,
+    periods: periods.map(p => `${p.year}-${String(p.month).padStart(2, '0')}`),
+    durationMs
+  }
 }
 
 // ─── Notion conformed recovery ──────────────────────────────────────────────

@@ -21,6 +21,7 @@ test.describe('platform.cron.staging_drift — TASK-775', () => {
 
     // Walk modules to find sync module signals
     const allSignals = (body.modules ?? []).flatMap((m: { signals?: unknown[] }) => m.signals ?? [])
+
     const driftSignal = allSignals.find(
       (s: { signalId?: string }) => s.signalId === 'platform.cron.staging_drift'
     )

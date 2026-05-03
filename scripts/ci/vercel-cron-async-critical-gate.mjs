@@ -53,6 +53,7 @@ const ASYNC_CRITICAL_PATH_PATTERNS = [
   /\/api\/cron\/hubspot-/i,
   /\/api\/cron\/entra-/i,
   /\/api\/cron\/nubox-/i,
+  /\/api\/cron\/ico-/i,
   /\/api\/cron\/.*-monitor/i,
   /\/api\/cron\/email-delivery-retry/i,
   /\/api\/cron\/reconciliation-auto-match/i
@@ -64,8 +65,10 @@ const ASYNC_CRITICAL_PATH_PATTERNS = [
  * `services/ops-worker/deploy.sh`.
  */
 const CLOUD_SCHEDULER_JOBS_FOR_VERCEL_CRONS = {
-  // Post-TASK-773 Slice 4: outbox-publish removido de vercel.json. Slices
-  // 2/3/7 podrían agregar entries si dejan fallback Vercel manual.
+  // Patrón: solo agregar entry cuando el path Vercel está activo como fallback
+  // manual. Si el path NO está en vercel.json, el reliability signal marca
+  // orphaned drift. Cuando un cron migra a Cloud Scheduler y se elimina del
+  // vercel.json simultáneamente, NO va al snapshot.
 }
 
 /**

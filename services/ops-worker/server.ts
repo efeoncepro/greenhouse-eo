@@ -36,6 +36,7 @@
  *   POST /hubspot/products-sync        → HubSpot products sync (TASK-775)
  *   POST /notion-conformed/recovery    → Notion conformed retry due runs (TASK-775, replaces Vercel /api/cron/sync-conformed-recovery)
  *   POST /reconciliation/auto-match    → Continuous bank statement auto-match (TASK-775, replaces Vercel /api/cron/reconciliation-auto-match)
+ *   POST /ico/member-sync              → ICO member metrics BQ → PG (TASK-775, replaces Vercel /api/cron/ico-member-sync)
  *
  * Auth: Cloud Run IAM (--no-allow-unauthenticated) + optional CRON_SECRET header
  * Runtime: Node.js 22 via esbuild bundle (handles TypeScript + @/ path aliases)
@@ -85,6 +86,7 @@ import {
   runHubspotDealsSync,
   runHubspotProductsSync,
   runHubspotQuotesSync,
+  runIcoMemberSync,
   runNotionConformedRecovery,
   runReconciliationAutoMatch,
   runWebhookDispatch
@@ -1380,6 +1382,17 @@ const handleReconciliationAutoMatch = wrapCronHandler({
   run: async (): Promise<Record<string, unknown>> => runReconciliationAutoMatch()
 })
 
+// ─── /ico/member-sync ───────────────────────────────────────────────────────
+//
+// TASK-775 Slice 9 — ICO member sync migrado a Cloud Run. Async-critical:
+// alimenta `/people/[id]/ico` que QA usa en staging para validar métricas
+// individuales. Si queda stale en staging, QA cree que el motor está roto.
+const handleIcoMemberSync = wrapCronHandler({
+  name: 'ico-member-sync',
+  domain: 'delivery',
+  run: async (): Promise<Record<string, unknown>> => runIcoMemberSync()
+})
+
 const handleNotionConformedSync = async (req: IncomingMessage, res: ServerResponse) => {
   const body = await readBody(req)
   const rawSource = typeof body.executionSource === 'string' ? body.executionSource.trim() : 'scheduled_primary'
@@ -1880,6 +1893,12 @@ const server = createServer(async (req, res) => {
 
     if (method === 'POST' && path === '/reconciliation/auto-match') {
       await handleReconciliationAutoMatch(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/ico/member-sync') {
+      await handleIcoMemberSync(req, res)
 
       return
     }

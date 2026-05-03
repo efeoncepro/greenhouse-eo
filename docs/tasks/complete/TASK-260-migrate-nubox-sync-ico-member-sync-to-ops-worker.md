@@ -1,8 +1,19 @@
 # TASK-260 — Migrar nubox-sync + ico-member-sync a ops-worker
 
+## Delta 2026-05-03 — Cerrada por TASK-775 Slices 3 + 9
+
+Cerrada como **superada por TASK-775** (Vercel Cron Async-Critical Migration Platform). Ambos crons del scope original migrados al patrón canónico:
+
+- **`nubox-sync`** → Cloud Scheduler `ops-nubox-sync` (TASK-775 Slice 3). Orchestrator puro `runNuboxSyncOrchestration` en `src/lib/nubox/sync-nubox-orchestrator.ts`. Endpoint Cloud Run via `wrapCronHandler` (audit log + runId estable + `captureWithDomain('sync')` + sanitización 502). ✅ Goal cubierto al 100%.
+- **`ico-member-sync`** → Cloud Scheduler `ops-ico-member-sync` (TASK-775 Slice 9 — agregado tras detección 2026-05-03 de que QA usa `/people/[id]/ico` en staging para validar el motor ICO; clasificación corregida de `tooling` a `async_critical`). Orchestrator puro `runIcoMemberSync` en `src/lib/cron-orchestrators/index.ts`. Endpoint Cloud Run via `wrapCronHandler` (`domain: 'delivery'`). Pattern `ico-` agregado al reader runtime + CI gate para que cualquier futuro cron `/api/cron/ico-*` async-critical sea detectado automáticamente, no por caso. ✅ Goal cubierto al 100%.
+- **Bonus cleanup**: entry `/api/cron/ico-materialize` eliminada de vercel.json (era duplicado huérfano — el cron real corre en `ico-batch-worker` Cloud Run via Cloud Scheduler `ico-materialize-daily`). Mapping defensivo agregado al snapshot canónico para que si alguien re-agrega la entry por error, el reader la reconoce como cubierta.
+
+**Status final**: Lifecycle `complete` por consolidación bajo TASK-775. 100% del scope original entregado con patrón canónico (helper `wrapCronHandler` + orchestrator puro + Cloud Scheduler idempotente + reliability signal + CI gate).
+
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete` (cerrada por TASK-775 Slices 3 + 9 — 2026-05-03)
+- Lifecycle (legacy): `to-do`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Medio`

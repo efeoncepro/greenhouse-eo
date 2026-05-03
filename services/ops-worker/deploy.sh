@@ -589,6 +589,18 @@ upsert_scheduler_job \
   '{}'
 echo "  -> ops-reconciliation-auto-match: 45 7 * * * (continuous bank statement auto-match, TASK-775)"
 
+# ICO member sync — TASK-775 Slice 9.
+#
+# Async-critical: alimenta /people/[id]/ico (métricas RPA, OTD, FTR, throughput)
+# que QA y operadores usan en staging para validar el motor ICO. Si queda stale
+# en staging, QA cree que el motor está roto.
+upsert_scheduler_job \
+  "ops-ico-member-sync" \
+  "30 10 * * *" \
+  "/ico/member-sync" \
+  '{}'
+echo "  -> ops-ico-member-sync: 30 10 * * * (ICO member metrics BQ → PG, TASK-775)"
+
 # Global projection recovery — unchanged lane.
 upsert_scheduler_job \
   "ops-reactive-recover" \

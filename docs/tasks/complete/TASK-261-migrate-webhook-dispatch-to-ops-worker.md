@@ -1,8 +1,17 @@
 # TASK-261 — Migrar webhook-dispatch a ops-worker
 
+## Delta 2026-05-03 — Cerrada por TASK-775 Slice 7
+
+Cerrada como **superada por TASK-775** (Vercel Cron Async-Critical Migration Platform):
+
+- **`webhook-dispatch`** → Cloud Scheduler `ops-webhook-dispatch` cron `*/2 min` (TASK-775 Slice 7). Orchestrator puro `runWebhookDispatch` en `src/lib/cron-orchestrators/index.ts`. Endpoint Cloud Run `POST /webhook-dispatch` via `wrapCronHandler` (`domain: 'sync'`) — centraliza runId estable + audit log + `captureWithDomain` + sanitización 502. Run tracking unificado en logs Cloud Run + reliability signal `platform.cron.staging_drift` (steady=0). Slack alert vía `alertCronFailure('webhook-dispatch', error)` preservado. Manual run verificado: `gcloud scheduler jobs run ops-webhook-dispatch` → 13ms response, log canónico `[ops-worker] /<webhook-dispatch> done`. ✅ Goal cubierto al 100%.
+
+**Status final**: Lifecycle `complete` por consolidación bajo TASK-775. 100% del scope original entregado con patrón canónico.
+
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete` (cerrada por TASK-775 Slice 7 — 2026-05-03)
+- Lifecycle (legacy): `to-do`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Bajo`

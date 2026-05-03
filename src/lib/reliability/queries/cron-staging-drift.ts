@@ -56,6 +56,7 @@ const ASYNC_CRITICAL_PATH_PATTERNS = [
   /\/api\/cron\/hubspot-/i,
   /\/api\/cron\/entra-/i,
   /\/api\/cron\/nubox-/i,
+  /\/api\/cron\/ico-/i,
   /\/api\/cron\/.*-monitor/i,
   /\/api\/cron\/email-delivery-retry/i,
   /\/api\/cron\/reconciliation-auto-match/i
