@@ -2,11 +2,16 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const queryMock = vi.fn()
 const clientQueryMock = vi.fn()
-const withTransactionMock = vi.fn(async callback => callback({ query: clientQueryMock }))
+
+const withTransactionMock = vi.fn(
+  async (callback: (client: { query: typeof clientQueryMock }) => unknown) =>
+    callback({ query: clientQueryMock })
+)
 
 vi.mock('@/lib/db', () => ({
   query: (...args: unknown[]) => queryMock(...args),
-  withTransaction: (...args: unknown[]) => withTransactionMock(...args)
+  withTransaction: (callback: (client: { query: typeof clientQueryMock }) => unknown) =>
+    withTransactionMock(callback)
 }))
 
 import {

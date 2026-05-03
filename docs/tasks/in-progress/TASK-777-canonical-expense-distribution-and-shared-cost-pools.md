@@ -8,17 +8,17 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `EPIC-012`
-- Status real: `Diseno`
+- Status real: `Slices 1-4 runtime backend entregados; UI/manual review y AI generator pendientes`
 - Rank: `TBD`
 - Domain: `finance`
 - Blocked by: `none`
-- Branch: `task/TASK-777-canonical-expense-distribution-and-shared-cost-pools`
+- Branch: `task/TASK-777-canonical-expense-distribution`
 - Legacy ID: `[optional]`
 - GitHub Issue: `[optional]`
 
@@ -170,6 +170,53 @@ Estos paths son **protected by default** para TASK-777. Si un plan propone tocar
      El agente que toma esta task ejecuta Discovery y produce
      plan.md segun TASK_PROCESS.md. No llenar al crear la task.
      ═══════════════════════════════════════════════════════════ -->
+
+## Execution checkpoint — 2026-05-03
+
+- Plan/audit aprobado en `docs/tasks/plans/TASK-777-plan.md`.
+- Migración aplicada en Cloud SQL dev/staging:
+  - `greenhouse_finance.expense_distribution_policy`
+  - `greenhouse_finance.expense_distribution_resolution`
+  - `greenhouse_finance.expense_distribution_ai_suggestions`
+- Resolver determinístico implementado en `src/lib/finance/expense-distribution/`.
+- CLI operativo: `pnpm run finance:materialize-expense-distribution -- --period YYYYMM`.
+- Abril 2026 materializado:
+  - 50 expenses scanned
+  - 48 unchanged tras segunda corrida
+  - 2 superseded por nueva regla Xepelin/factoring -> `shared_financial_cost`
+  - 0 blocked
+  - 0 manualRequired
+- Mayo 2026 materializado sin filas (`scanned=0`) porque aún no hay expenses del período.
+- Consumer cutover parcial entregado:
+  - `member_capacity_economics` consume solo `expense_distribution_resolution.distribution_lane='shared_operational_overhead'` para el pool compartido.
+  - `tool-cost-reader` deja de absorber `labor_cost_*`, `regulatory_payment`, `tax`, `financial_cost`, `bank_fee_real` y `financial_settlement` como direct member overhead.
+- Abril 2026 rematerializado en runtime:
+  - member capacity economics: 7 members
+  - commercial cost attribution: 4 allocations
+  - operational P&L: 7 snapshots
+- Resultado visible tras fix:
+  - SKY overhead abril: `$2.278.629,39` (antes se veía `$3.833.182` y luego `4.118.878,63` al cortar solo shared pool; el último inflado venía del direct overhead legacy).
+  - ANAM overhead abril: `$759.543,13`.
+  - SKY gross margin abril: `$1.902.318,83` / `27,56%`.
+- Signals live verificados post-materialización:
+  - `expense_distribution.unresolved` equivalente SQL: `0`.
+  - `expense_distribution.shared_pool_contamination` equivalente SQL: `0`.
+  - `expense_payments` CLP drift: `0`.
+  - `income_payments` CLP drift: `0`.
+- Validación ejecutada:
+  - focused Vitest para resolver/repository/signals/readers críticos: OK.
+  - `pnpm tsc --noEmit`: OK.
+  - `pnpm lint`: OK con warnings legacy `greenhouse/no-untokenized-copy`.
+  - `pnpm pg:doctor`: OK; drift preexistente en `greenhouse_payroll` y `greenhouse_serving` con `can_create=true`.
+  - `pnpm build`: OK.
+- Superficies protegidas no mutadas por código TASK-777: account balances, settlement legs, payment ledgers, payment orders y conciliación. Solo se leyeron facts como evidencia y se validó drift CLP `0`.
+
+### Pendiente antes de completar la task
+
+- Integrar gate de close governance en `check-period-readiness` / TASK-713.
+- Implementar generador IA advisory-only encima de `expense_distribution_ai_suggestions` con kill-switch.
+- Crear surface/manual queue si negocio quiere resolver/override desde UI.
+- Documentar arquitectura final y manual funcional si se expone UI.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 3 — EXECUTION SPEC

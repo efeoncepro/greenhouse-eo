@@ -21,6 +21,7 @@ export const materializeExpenseDistributionPeriod = async (
   period: ExpenseDistributionPeriod
 ): Promise<MaterializeExpenseDistributionPeriodResult> => {
   const expenses = await listExpensesForDistributionPeriod(period)
+
   const result: MaterializeExpenseDistributionPeriodResult = {
     period,
     scanned: expenses.length,

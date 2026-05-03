@@ -14,6 +14,7 @@ const REGULATOR_PATTERN = /\b(previred|afp|isapre|fonasa|mutual|sii|tgr|tesorer[
 
 const asNumber = (value: number | string | null | undefined): number => {
   if (typeof value === 'number') return Number.isFinite(value) ? value : 0
+
   if (typeof value === 'string') {
     const parsed = Number(value)
 
@@ -102,6 +103,7 @@ const buildDraft = ({
 }): ExpenseDistributionResolutionDraft => {
   const period = inferPeriod(expense)
   const amountClp = asNumber(expense.effectiveCostAmountClp) || asNumber(expense.totalAmountClp)
+
   const requiredAnchor =
     lane === 'member_direct_labor' || lane === 'member_direct_tool'
       ? hasMemberAnchor(expense)
