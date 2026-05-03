@@ -6,6 +6,7 @@
 - **Artefacto creado:** `docs/epics/to-do/EPIC-012-finance-five-capabilities-operating-system.md`.
 - **Registros sincronizados:** `docs/epics/EPIC_ID_REGISTRY.md` y `docs/epics/README.md`; siguiente ID disponible queda `EPIC-013`.
 - **Task vinculada:** `TASK-777` ahora declara `Epic: EPIC-012`.
+- **Actualización IA:** `TASK-777` y `EPIC-012` incorporan IA como copiloto de distribución contable para casos ambiguos. Regla dura: IA sugiere con evidencia/confidence/prompt hash y kill-switch; no escribe P&L, no cierra períodos, no modifica snapshots y no materializa reglas sin aprobación humana/audit trail.
 - **Secuencia recomendada:** Wave 1 `TASK-777`; Wave 2 `TASK-713/TASK-393`; Wave 3 `TASK-397`, `TASK-176`, `TASK-710/711/712`, `TASK-707*`, `TASK-756/757`; Wave 4 metric registry + planning/forecast/control tower.
 
 ## Sesion 2026-05-03 — Finance domain end-to-end audit

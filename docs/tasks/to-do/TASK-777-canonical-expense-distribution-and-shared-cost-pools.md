@@ -24,7 +24,7 @@
 
 ## Summary
 
-Formalizar el resolver canónico que decide cómo se distribuye cada `expense` dentro del modelo económico Greenhouse: `member_direct`, `client_direct`, `shared_operational_overhead`, `shared_financial_cost`, `regulatory_payment`, `provider_payroll`, `treasury_transit` o `unallocated`. Hoy el runtime mezcla atajos legacy (`allocated_client_id`, `direct_overhead_member_id`) con pools compartidos demasiado crudos, lo que infla `operational_pl` y termina asignando costos a clientes equivocados.
+Formalizar el resolver canónico que decide cómo se distribuye cada `expense` dentro del modelo económico Greenhouse: `member_direct`, `client_direct`, `shared_operational_overhead`, `shared_financial_cost`, `regulatory_payment`, `provider_payroll`, `treasury_transit` o `unallocated`. Hoy el runtime mezcla atajos legacy (`allocated_client_id`, `direct_overhead_member_id`) con pools compartidos demasiado crudos, lo que infla `operational_pl` y termina asignando costos a clientes equivocados. La task incorpora además un copiloto de IA para sugerir clasificación/distribución en casos ambiguos, sin convertir la IA en source-of-truth ni permitir escrituras contables automáticas.
 
 ## Why This Task Exists
 
@@ -42,6 +42,7 @@ Mientras esto no se resuelva, cerrar períodos produce snapshots defendibles sol
 - Definir e implementar un resolver canónico `expense -> distribution lane` alineado a `economic_category` y al modelo `MLCM_V1`
 - Separar operacional vs financiero vs regulatorio vs payroll/provider en facts/pools distintos antes de distribuir a clientes
 - Dejar `operational_pl`, `member_capacity_economics` y `commercial_cost_attribution` leyendo contratos distribucionales explícitos en vez de pools shared crudos y shortcuts legacy
+- Incorporar IA como motor asistido para detectar ambigüedad, explicar evidencia y proponer reglas/policies revisables; la decisión efectiva sigue siendo determinística y auditable
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
@@ -70,6 +71,9 @@ Reglas obligatorias:
 - `operational_pl` no debe seguir absorbiendo costos financieros, regulatorios o provider-payroll dentro del bucket genérico `overhead_clp`.
 - La política de pool compartido debe ser versionable por período y quedar auditable; no puede depender de un query inline opaco dentro de `member-capacity-economics`.
 - `Previred`, `Deel`, Global66, fees bancarios, factoring y otros processors deben respetar el boundary ya formalizado en `Payment Orders` / treasury. No inventar ledgers alternos ni mover cash de la cuenta pagadora real.
+- La IA solo puede operar como advisory layer: propone `distribution_lane`, rationale, confidence, evidence y/o regla candidata, pero nunca puede cerrar períodos, modificar snapshots cerrados, escribir al P&L ni materializar reglas sin aprobación humana o gate explícito.
+- Toda invocación IA debe ser trazable con `model_id`, `prompt_version`, `prompt_hash`, payload minimizado/sanitizado, output JSON validado, confidence, evidence y decisión humana posterior cuando aplique.
+- Debe existir kill-switch runtime para la capa IA. Con IA deshabilitada, el resolver determinístico y la cola `manual_required` deben seguir funcionando.
 
 ## Normative Docs
 
@@ -109,6 +113,9 @@ Reglas obligatorias:
 - `src/lib/commercial-cost-attribution/member-period-attribution.ts`
 - `src/lib/cost-intelligence/compute-operational-pl.ts`
 - `src/lib/finance/economic-category/`
+- `src/lib/finance/reconciliation-intelligence/` `[referencia de patrón IA guardrailed existente]`
+- `src/lib/finance/ai/` `[referencia de patrón prompt/version/hash existente]`
+- `src/lib/ai/google-genai.ts` `[provider IA existente, si aplica]`
 - `src/lib/finance/` `[verificar reader/store destino exacto]`
 - `docs/architecture/GREENHOUSE_MEMBER_LOADED_COST_MODEL_V1.md`
 - `docs/architecture/GREENHOUSE_MANAGEMENT_ACCOUNTING_ARCHITECTURE_V1.md`
@@ -123,6 +130,7 @@ Reglas obligatorias:
 - `commercial_cost_attribution` ya reparte labor + overhead comercial por cliente y `operational_pl` consume esa capa
 - `TASK-397` ya define que factoring, FX, bank fees y treasury deben vivir como `financial cost`, no como overhead operativo
 - `Payment Orders` ya separa conceptualmente `provider_payroll`, `employer_social_security`, processors y settlement
+- existe patrón IA guardrailed en `src/lib/finance/reconciliation-intelligence/` y enriquecimiento LLM financiero en `src/lib/finance/ai/`, con prompt version/hash y feature flags como referencia reusable
 
 ### Gap
 
@@ -131,6 +139,7 @@ Reglas obligatorias:
 - el pool shared actual mezcla gastos estructurales, regulatorios y financieros sin política explícita
 - no existe snapshot / policy versionada para el shared pool operativo vs financial pool por período
 - `operational_pl` sigue leyendo `overhead_clp` como bucket demasiado amplio y por eso infla clientes concretos con costos que no corresponden
+- no existe copiloto IA especializado en distribución de gastos que ayude a revisar casos ambiguos, proponer reglas de catálogo/proveedor y acelerar la cola manual sin sacrificar auditabilidad
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -180,12 +189,23 @@ Reglas obligatorias:
 - dejar un gate operativo para que mayo 2026 no pueda cerrarse si existen expenses en lanes ambiguas o shared pools contaminados
 - conectar el gate a `TASK-713` / `TASK-393` para que el closing workflow vea este criterio
 
+### Slice 5 — AI-assisted distribution copilot
+
+- reutilizar los patrones existentes de IA financiera guardrailed para procesar solo gastos `unallocated`, `manual_required` o con baja confianza determinística
+- generar sugerencias estructuradas con `suggested_distribution_lane`, `confidence`, `rationale`, `evidence`, `risk_flags`, `proposed_rule`, `requires_human_approval` y `close_impact`
+- persistir sugerencias append-only en el destino que defina el plan (`expense_distribution_ai_suggestions` o cola equivalente), sin mutar `expenses`, snapshots, P&L ni close state
+- permitir que una aprobación humana convierta una sugerencia en regla determinística versionada; la IA no puede ser memoria opaca ni ejecutar reglas por sí misma
+- agregar kill-switch `FINANCE_DISTRIBUTION_AI_ENABLED=false` por defecto hasta validación explícita en staging
+- definir contrato de prompt/version/hash, esquema JSON validado, minimización de datos y logs sin PII innecesaria
+
 ## Out of Scope
 
 - reescribir toda la capa `Payment Orders` o treasury
 - construir la UI completa de budgets/variance/forecast
 - abrir contabilidad legal, doble partida o plan de cuentas formal
 - resolver per-credit telemetry de herramientas externas más allá de lo necesario para respetar `TASK-710`
+- permitir auto-booking, auto-close, auto-restatement o auto-reclassification material por IA sin revisión humana
+- entrenar/fine-tunear un modelo con datos contables internos o crear memoria opaca de decisiones
 
 ## Detailed Spec
 
@@ -199,6 +219,8 @@ La decisión arquitectónica esperada de esta task es:
    - `vendor_cost_saas` / overhead estructural -> `member_direct_tool`, `shared_operational_overhead` o `client_direct_non_labor` según catálogo/anchor real
 3. Los pools compartidos dejan de ser un efecto colateral del query actual y pasan a ser una primitive explícita del modelo MLCM.
 4. `allocated_client_id` y `direct_overhead_member_id` quedan formalmente deprecados como atajos primarios. Solo sobreviven como override/manual exception path durante la migración.
+5. La IA entra después del resolver determinístico, no antes: si el resolver puede decidir con evidencia fuerte, no se invoca IA. Si falta evidencia, la IA ayuda a explicar, priorizar y proponer reglas, pero la decisión runtime sigue siendo una resolución explícita aprobada o una salida `unallocated/manual_required`.
+6. Una sugerencia IA aprobada debe materializarse como catálogo/regla/policy versionada y testeable. No se permite que el P&L dependa de “el modelo dijo X” como fuente primaria.
 
 Casos obligatorios a cubrir en tests/ejemplos de spec:
 
@@ -207,6 +229,8 @@ Casos obligatorios a cubrir en tests/ejemplos de spec:
 - fees de factoring / banco / FX quedan en bucket financiero visible y no en overhead operativo
 - HubSpot / Figma / Nubox / Beeconta pueden seguir como shared operational overhead si no existe un anchor más específico
 - costos generales de empresa que sí deban absorberse compartidamente lo hacen vía policy explícita y snapshot versionado
+- gastos nuevos de proveedor ambiguo generan sugerencia IA y cola de revisión, no distribución silenciosa
+- con `FINANCE_DISTRIBUTION_AI_ENABLED=false`, el sistema conserva salida determinística y marca casos ambiguos como `manual_required`
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 4 — VERIFICATION & CLOSING
@@ -221,6 +245,8 @@ Casos obligatorios a cubrir en tests/ejemplos de spec:
 - [ ] `member_capacity_economics` deja de tratar provider payroll / regulatory payments como overhead directo o shared overhead genérico
 - [ ] `operational_pl.overhead_clp` deja de mezclar costos operativos, regulatorios y financieros
 - [ ] El sistema puede explicar por qué un expense terminó en `member_direct`, `shared operational`, `shared financial`, `regulatory`, `provider_payroll` o `unallocated`
+- [ ] Existe una capa IA opcional/guardrailed que sugiere distribución solo para casos ambiguos, con prompt versionado, output JSON validado, confidence, evidence y kill-switch
+- [ ] Ninguna sugerencia IA puede escribir al P&L, cerrar períodos, modificar snapshots cerrados o convertirse en regla sin aprobación humana/audit trail
 - [ ] Abril 2026 queda evaluado con recomendación explícita de `reopen/restatement/provisional close`
 - [ ] Mayo 2026 no puede cerrarse silenciosamente si hay contaminación de pools shared o lanes ambiguas
 
@@ -231,6 +257,9 @@ Casos obligatorios a cubrir en tests/ejemplos de spec:
 - `pnpm test`
 - validación manual en `/finance/intelligence`
 - comparación manual de abril 2026 antes/después contra snapshots y readers intermedios
+- tests unitarios del resolver con IA deshabilitada
+- tests unitarios del contrato IA: payload sanitizado, prompt hash/version, JSON schema, confidence/risk flags y rechazo de writes automáticos
+- dry-run sobre abril 2026 que compare decisión determinística, sugerencia IA y decisión humana esperada sin mutar datos
 
 ## Closing Protocol
 
@@ -250,9 +279,11 @@ Casos obligatorios a cubrir en tests/ejemplos de spec:
 - `TASK-713`
 - `TASK-393`
 - follow-up posible de migration/runtime para deprecar definitivamente `allocated_client_id` y `direct_overhead_member_id`
+- follow-up posible de UI/admin review queue si el primer slice deja la aprobación solo como primitive backend
 
 ## Open Questions
 
 - si `regulatory_payment` debe vivir completamente fuera de `operational_pl` o entrar como bucket separado de labor/regulatorio según policy de management accounting
 - si el pool financiero debe distribuirse siempre below-operating-margin o si algunas categorías admiten asignación client-direct cuando hay trazabilidad fuerte
 - si conviene materializar una tabla `expense_distribution_resolution` append-only o si basta con readers + snapshot tables en la primera fase
+- si las sugerencias IA viven en la misma cola manual de distribución o en una tabla separada `expense_distribution_ai_suggestions` enlazada a la resolución final

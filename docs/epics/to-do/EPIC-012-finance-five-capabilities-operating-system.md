@@ -15,7 +15,7 @@
 
 ## Summary
 
-Coordina la evolución de Finance hacia cinco capacidades canónicas: `Treasury & Payments`, `Accounting Semantics`, `Management Accounting`, `Close Governance` y `Planning & Control Tower`. El objetivo es que Finance deje de ser un conjunto de dashboards y readers parcialmente correctos, y pase a ser un sistema financiero-operativo auditable, explicable y apto para cerrar períodos con confianza.
+Coordina la evolución de Finance hacia cinco capacidades canónicas: `Treasury & Payments`, `Accounting Semantics`, `Management Accounting`, `Close Governance` y `Planning & Control Tower`. El objetivo es que Finance deje de ser un conjunto de dashboards y readers parcialmente correctos, y pase a ser un sistema financiero-operativo auditable, explicable y apto para cerrar períodos con confianza. Donde exista ambigüedad contable o financiera, el sistema puede usar IA como copiloto de revisión y orquestación, pero nunca como source-of-truth operativo sin reglas, aprobación y audit trail.
 
 ## Why This Epic Exists
 
@@ -33,6 +33,7 @@ Este epic existe para convertir esas piezas en un sistema coherente y ejecutable
 - Finance opera con cinco capacidades explícitas y no con una bolsa de funcionalidades mezcladas.
 - Mayo 2026 puede aspirar a ser el primer cierre finance-grade, sujeto a gates explícitos.
 - `overhead_clp`, costos financieros, payroll/provider payroll, regulatory payments y shared operational overhead quedan separados y explicables.
+- La IA acelera análisis de ambigüedad, propuestas de reglas y priorización de revisión, pero las métricas finales dependen de resoluciones determinísticas/versionadas.
 - Cada métrica visible de Finance declara source reader, lente contable, freshness, close status y degradación.
 - Budget, variance y forecast se construyen solo sobre actuals confiables.
 
@@ -80,11 +81,12 @@ Owner of:
 - expense distribution lanes
 - document-vs-cash semantics
 - financial cost vs operating cost boundaries
+- AI-assisted review for ambiguous accounting/distribution cases
 
 Primary tasks:
 
 - `TASK-768` — completed foundation for `economic_category`
-- `TASK-777` — canonical expense distribution and shared cost pools
+- `TASK-777` — canonical expense distribution, shared cost pools and AI-assisted distribution copilot
 - `TASK-397` — financial costs integration
 - `TASK-224` — document-vs-cash semantic contract
 - `TASK-725` — fiscal scope and legal entity foundation
@@ -157,12 +159,14 @@ Primary tasks:
 - Keep April 2026 explicitly provisional / restatement-needed.
 - Do not close May 2026 as finance-grade until minimum gates exist.
 - Use the existing healthy CLP/payment/account-balance readers as the cash foundation.
+- Treat AI as advisory only until there is an approved deterministic rule/policy path.
 
 ### Wave 1 — Make P&L Trustworthy
 
 - Execute `TASK-777`.
 - Separate `shared_operational_overhead`, `shared_financial_cost`, `provider_payroll`, `regulatory_payment` and `member_direct_labor`.
 - Refactor `member_capacity_economics`, `commercial_cost_attribution` and `operational_pl` away from raw V0 shortcuts.
+- Add guarded AI suggestions for ambiguous expenses, with kill-switch, evidence, confidence, prompt version/hash and human approval before any rule materialization.
 
 ### Wave 2 — Make Close Real
 
@@ -184,7 +188,7 @@ Primary tasks:
 
 ## Child Tasks
 
-- `TASK-777` — first execution task; fixes expense distribution lanes and shared pools
+- `TASK-777` — first execution task; fixes expense distribution lanes/shared pools and adds an AI-assisted review copilot for ambiguous cases
 - `TASK-713` — period closing workflow
 - `TASK-393` — restatements and reclassification governance
 - `TASK-397` — financial costs integration
@@ -210,6 +214,9 @@ Primary tasks:
 - `TASK-282` — payment instrument reconciliation and settlement orchestration
 - `TASK-283` — bank and treasury module
 - `TASK-392` — reliable actual foundation program
+- `TASK-723` — AI-assisted reconciliation intelligence pattern
+- `src/lib/finance/reconciliation-intelligence/` — existing guardrailed Finance AI pattern
+- `src/lib/finance/ai/` — existing prompt/version/hash Finance AI utilities
 - `docs/audits/finance/FINANCE_DOMAIN_AUDIT_2026-05-03.md`
 
 ## Exit Criteria
@@ -217,6 +224,7 @@ Primary tasks:
 - [ ] The five Finance capabilities are documented and mapped to runtime owners.
 - [ ] `overhead_clp` no longer includes provider payroll, regulatory payments or financial costs.
 - [ ] Every expense has either a canonical distribution lane or an explicit unresolved state.
+- [ ] Ambiguous expenses can receive AI-assisted suggestions with evidence/confidence, but only approved deterministic rules affect reporting.
 - [ ] Period close cannot reach finance-grade status while lane ambiguity, CLP drift, payment-order drift or required reconciliation gaps exist.
 - [ ] Payment Orders cover payroll net pay, employer social security/provider payroll paths or explicitly block them with visible close impact.
 - [ ] Core Finance dashboards use document readers for accrual and normalized payment readers for cash.
@@ -229,7 +237,10 @@ Primary tasks:
 - Replacing Nubox/SII fiscal systems as legal source of truth.
 - Rebuilding all Finance UI in one large redesign.
 - Implementing planning/forecast before actuals and close governance are trustworthy.
+- Letting AI auto-book, auto-close, auto-restatement or silently mutate P&L/close snapshots.
 
 ## Delta 2026-05-03
 
 Created after `FINANCE_DOMAIN_AUDIT_2026-05-03` and user decision to frame Finance around five capabilities instead of a single overloaded module.
+
+Updated same day to incorporate AI as an advisory Finance copilot for ambiguous accounting/distribution cases. Runtime authority remains deterministic, versioned and auditable.
