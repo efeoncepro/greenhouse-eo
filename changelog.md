@@ -2,6 +2,18 @@
 
 ## 2026-05-03
 
+- **TASK-775 Slices 1-7 entregados** — Vercel Cron Async-Critical Migration Platform. Cierra la clase entera de bugs "cron Vercel-only que rompe staging" detectada parcialmente por TASK-773. Absorbe TASK-258 + TASK-259.
+  - **3 categorías canónicas obligatorias**: `async_critical` (Cloud Scheduler + ops-worker), `prod_only` (Vercel ok), `tooling` (Vercel ok). Spec: `docs/architecture/GREENHOUSE_VERCEL_CRON_CLASSIFICATION_V1.md`. Decision tree obligatorio para cualquier cron nuevo.
+  - **Helper canónico `wrapCronHandler`** (`services/ops-worker/cron-handler-wrapper.ts`): centraliza body parse + runId estable + audit log + `captureWithDomain` + `redactErrorForResponse` + 502 sanitizado. Inaugurado en Slice 2, reusado por 14 endpoints nuevos.
+  - **16 nuevos Cloud Scheduler jobs** en `services/ops-worker/deploy.sh` (idempotente). Crons migrados: `email-deliverability-monitor`, `nubox-{balance-sync,sync,quotes-hot-sync}`, `webhook-dispatch`, `email-delivery-retry`, `entra-{profile-sync,webhook-renew}`, `hubspot-{quotes,company-lifecycle,companies,companies-full,deals,products}-sync`, `notion-conformed-recovery`, `reconciliation-auto-match`.
+  - **Single source of truth**: lógica pura en `src/lib/<dominio>/orchestrator.ts` o `src/lib/cron-orchestrators/index.ts`. Routes Vercel quedan como fallback manual via curl + `CRON_SECRET`. Cero duplicación de SQL/HTTP/iteration logic.
+  - **vercel.json: 26 → 10 entries**. Solo prod_only + tooling restantes.
+  - **Defensa anti-regresión doble**:
+    - **Reliability signal `platform.cron.staging_drift`** (`Event Bus & Sync Infrastructure`): kind=drift, severity=error si count>0, steady=0. Lee `vercel.json`, matchea pattern async-critical, verifica equivalente Cloud Scheduler. Honra `KNOWN_NON_ASYNC_CRITICAL_PATHS` y override comments.
+    - **CI gate `pnpm vercel-cron-gate`** en `.github/workflows/ci.yml` (modo `--warn` durante migración, promueve a strict tras estabilización).
+  - **Drift count: 0** — todos los crons async-critical alineados con Cloud Scheduler. Steady state alcanzado.
+  - **Reglas duras canonizadas en CLAUDE.md + AGENTS.md** sección "Vercel cron classification + migration platform (TASK-775)": 6 invariantes anti-regresión + sincronización snapshot dual (reader runtime + CI gate).
+  - **Cobertura**: 3056/3056 tests passing, type-check + lint + build limpios. Slice 8 (verificación E2E + cierre) en curso.
 - **TASK-773 entregada** — Outbox Publisher Cloud Scheduler Cutover + Reliability + E2E Pre-Merge Gate. Cierra clase entera de bugs invisibles donde flujos write-then-projection de Finance funcionan en producción pero quedan colgados en staging.
   - **Outbox publisher migrado a Cloud Scheduler + ops-worker**: el cron `/outbox/publish-batch` corre por proyecto GCP cada 2 min, igual en staging y producción. Antes vivía en Vercel cron `*/5 min` que **solo corre en deploys de Production** — staging custom environment no los ejecuta. Por eso el pago de Figma 2026-05-03 no rebajaba TC Santander.
   - **State machine canónica explícita**: `pending → publishing → published/failed/dead_letter`. CHECK constraint atomic + index parcial para fetch eficiente del worker. SELECT FOR UPDATE SKIP LOCKED para concurrencia segura. Max 5 retries antes de dead-letter (humano interviene).

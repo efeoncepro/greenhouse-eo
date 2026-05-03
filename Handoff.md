@@ -1,5 +1,28 @@
 # Handoff.md
 
+## Sesion 2026-05-03 — TASK-775 Slices 1-7 cerrados (Vercel Cron Async-Critical Migration Platform)
+
+- **Lifecycle:** Slices 1-7 deployed en `develop`, Slice 8 (verificación E2E + cierre) en curso.
+- **Branch:** `develop` (instrucción explícita, mismo flujo TASK-771/772/773).
+- **Origen:** auditoría post-TASK-773 reveló 16+ crons async-critical aún en Vercel (= no corren en staging custom env). Absorbe TASK-258 + TASK-259.
+- **8 slices entregados:**
+  - Slice 1: Spec canónica `GREENHOUSE_VERCEL_CRON_CLASSIFICATION_V1.md` (3 categorías + decision tree) + helper `wrapCronHandler` con audit + sanitización + captureWithDomain canónico.
+  - Slice 2: Migración `email-deliverability-monitor` → Cloud Scheduler. Inaugura wrapCronHandler. Drift 16.
+  - Slice 3: Migración 3 nubox crons (balance-sync + sync + quotes-hot-sync) con orchestrators puros. Drift 12.
+  - Slice 4: Cleanup duplicados (sync-conformed, quotation-lifecycle).
+  - Slice 5: Reliability signal `platform.cron.staging_drift` + reader + 6 tests + wire-up overview. Steady=0.
+  - Slice 6: CI gate standalone `pnpm vercel-cron-gate` en `.github/workflows/ci.yml` (warn mode durante migración, promueve a strict tras estabilización).
+  - Slice 7: Mass migration 12 crons (webhook-dispatch, email-delivery-retry, entra-{profile,webhook}, hubspot-{quotes,company-lifecycle,companies,deals,products}, sync-conformed-recovery, reconciliation-auto-match) usando módulo único `src/lib/cron-orchestrators/index.ts`. **Drift = 0**.
+  - Slice 8 (en curso): docs CLAUDE.md + AGENTS.md + Handoff + verificación E2E con Playwright + agent auth contra staging real.
+- **Resultado canónico:**
+  - vercel.json: 26 → 10 entries (solo prod_only + tooling restantes).
+  - 16 nuevos Cloud Scheduler jobs en `services/ops-worker/deploy.sh` (idempotente).
+  - 14 nuevos endpoints Cloud Run en `services/ops-worker/server.ts` via `wrapCronHandler`.
+  - Single source of truth: lógica pura en `src/lib/<dominio>/orchestrator.ts` o `src/lib/cron-orchestrators/index.ts`.
+  - Defensa anti-regresión doble: reliability signal runtime + CI gate pre-merge.
+- **Verde global:** 3056/3056 tests passing, type-check + lint + build limpios.
+- **Lecciones canonizadas en CLAUDE.md + AGENTS.md sección "Vercel cron classification + migration platform (TASK-775)":** 3 categorías obligatorias + patrón wrapCronHandler + 6 reglas duras anti-regresión + sincronización snapshot dual.
+
 ## Sesion 2026-05-03 — Solution Quality Operating Model canonizado
 
 - **Trigger:** el usuario pidio convertir la preferencia recurrente "no parches; soluciones seguras, robustas, resilientes y escalables" en regla permanente para Codex, Claude y docs operativos.

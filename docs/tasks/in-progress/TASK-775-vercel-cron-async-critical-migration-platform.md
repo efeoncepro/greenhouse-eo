@@ -12,7 +12,7 @@
 - Effort: `Alto (9-10h)`
 - Type: `infrastructure-platform`
 - Epic: `none`
-- Status real: `Implementación — auto mode activo, ejecutando slices secuencialmente con commit por slice`
+- Status real: `Slices 1-7 completos (drift signal = 0). Slice 8 (verificación E2E + docs + cierre) en curso 2026-05-03.`
 - Rank: `TBD`
 - Domain: `platform / sync / finance / integrations`
 - Blocked by: `none`
@@ -20,6 +20,17 @@
 - Legacy ID: `none`
 - GitHub Issue: `none`
 - Absorbe: TASK-258 (Migrar sync-conformed a ops-worker), TASK-259 (Migrar entra-profile-sync a ops-worker)
+
+## Estado Slices 2026-05-03
+
+- Slice 1 — Helper canónico `wrapCronHandler` + spec `GREENHOUSE_VERCEL_CRON_CLASSIFICATION_V1.md` — ✅ deployed
+- Slice 2 — Migra `email-deliverability-monitor` → drift 16 — ✅ deployed
+- Slice 3 — Migra 3 nubox crons (balance-sync, sync, quotes-hot-sync) → drift 12 — ✅ deployed
+- Slice 4 — Cleanup duplicados (sync-conformed, quotation-lifecycle) → drift 16 — ✅ deployed
+- Slice 5 — Reliability signal `platform.cron.staging_drift` + reader + tests + wire-up overview → drift 16 — ✅ deployed
+- Slice 6 — CI gate `vercel-cron-async-critical-gate` (warn mode) → drift 16 — ✅ deployed
+- Slice 7 — Mass migration 12 crons (webhook, email, entra, hubspot, recovery, recon) → **drift 0** — ✅ deployed
+- Slice 8 — Verificación E2E + docs + cierre — 🔄 in-progress
 
 ## Summary
 

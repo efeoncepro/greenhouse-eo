@@ -527,6 +527,44 @@ Estos CLIs estan autenticados localmente. Cuando una task toca su dominio, **usa
 - Fuente canónica: `docs/architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md` §4.9 y §5.
 - Documentación funcional: `docs/documentation/operations/ops-worker-reactive-crons.md`
 
+### Vercel cron classification + migration platform (TASK-775)
+
+Toda decisión "dónde vive un cron" pasa por las **3 categorías canónicas** de `docs/architecture/GREENHOUSE_VERCEL_CRON_CLASSIFICATION_V1.md`:
+
+- **`async_critical`** — alimenta o consume pipeline async (outbox, projection, sync downstream) que QA/staging necesita. **Hosting canónico: Cloud Scheduler + ops-worker. NO Vercel cron.** Vercel custom env (staging) NO ejecuta crons → si vive en Vercel, queda invisible en QA y la próxima regresión "cron prod-only que rompe staging" es cuestión de tiempo.
+- **`prod_only`** — side effects que solo importan en producción real (compliance, GDPR cleanup, FX externos públicos). Hosting Vercel cron OK.
+- **`tooling`** — utilitarios para developers/QA/monitoreo. Hosting Vercel cron OK.
+
+**Patrón de migración canónico** (cron nuevo o migración):
+
+1. Lógica pura en `src/lib/<dominio>/<orchestrator>.ts` o `src/lib/cron-orchestrators/index.ts` — reusable desde Vercel route + Cloud Run.
+2. Endpoint Cloud Run en `services/ops-worker/server.ts` via helper canónico `wrapCronHandler({ name, domain, run })` — centraliza `runId`, `captureWithDomain`, `redactErrorForResponse`, audit log, 502 sanitizado.
+3. Cloud Scheduler job en `services/ops-worker/deploy.sh` con `upsert_scheduler_job` (idempotente).
+4. Si era cron Vercel scheduled, eliminar entry de `vercel.json` (la route queda como fallback manual via curl + `CRON_SECRET`).
+5. Sincronizar snapshot `CLOUD_SCHEDULER_JOBS_FOR_VERCEL_CRONS` en **dos** lugares:
+   - `src/lib/reliability/queries/cron-staging-drift.ts` (reader runtime)
+   - `scripts/ci/vercel-cron-async-critical-gate.mjs` (CI gate)
+
+**Defensas anti-regresión**:
+
+- **Reliability signal `platform.cron.staging_drift`** (subsystem `Event Bus & Sync Infrastructure`): kind=`drift`, severity=`error` si count>0, steady=0. Lee `vercel.json`, matchea contra `ASYNC_CRITICAL_PATH_PATTERNS` (`outbox*`, `sync-*`, `*-publish`, `webhook-*`, `hubspot-*`, `entra-*`, `nubox-*`, `*-monitor`, `email-delivery-retry`, `reconciliation-auto-match`), verifica equivalente Cloud Scheduler, honra `KNOWN_NON_ASYNC_CRITICAL_PATHS` (`sync-previred` = prod_only legítimo) y override `// platform-cron-allowed: <reason>` adyacente al path en vercel.json.
+- **CI gate `pnpm vercel-cron-gate`** (`.github/workflows/ci.yml` después de Lint, modo `--warn` durante TASK-775; promueve a strict tras estabilización). Falla CI si detecta async-critical sin equivalent.
+
+**⚠️ Reglas duras** (cualquier agente que toque crons las respeta):
+
+- **NUNCA** agregar a `vercel.json` un path que matchea pattern async-critical sin Cloud Scheduler equivalent. CI gate bloquea, reliability signal alerta. Si emerge un caso legítimo prod_only/tooling cuyo path matchea pattern, agregarlo a `KNOWN_NON_ASYNC_CRITICAL_PATHS` (en AMBOS readers) o usar override comment.
+- **NUNCA** crear handler Cloud Run sin pasar por `wrapCronHandler`. Sin él, perdés runId estable, audit log consistente, captureWithDomain canónico, sanitización de error y 502 contract uniforme.
+- **NUNCA** duplicar lógica de cron entre route Vercel y server.ts del ops-worker. Toda lógica vive en `src/lib/<...>/orchestrator.ts` y ambos endpoints la importan. Single source of truth.
+- **NUNCA** sincronizar `CLOUD_SCHEDULER_JOBS_FOR_VERCEL_CRONS` en uno solo de los dos lugares (reader + gate). Drift entre ambos = falsos positivos en CI o falsos negativos en runtime dashboard.
+- **NUNCA** modificar pattern array en uno solo de los dos lugares. Si emerge un nuevo pattern async-critical, agregarlo en AMBOS con comentario justificando la categoría.
+- Cuando se cree un cron nuevo, **categorizarlo PRIMERO** según las 3 categorías canónicas, luego elegir hosting. NO al revés.
+
+**Spec canónica**: `docs/architecture/GREENHOUSE_VERCEL_CRON_CLASSIFICATION_V1.md` (categorías + decision tree + inventario completo).
+**Helper canónico**: `services/ops-worker/cron-handler-wrapper.ts` (`wrapCronHandler`).
+**Reader runtime**: `src/lib/reliability/queries/cron-staging-drift.ts`.
+**CI gate**: `scripts/ci/vercel-cron-async-critical-gate.mjs`.
+**Orchestrators canónicos**: `src/lib/cron-orchestrators/index.ts` (11 orchestrators puros) + `src/lib/email/deliverability-monitor.ts` + `src/lib/nubox/sync-nubox-orchestrator.ts` + `src/lib/nubox/sync-nubox-balances.ts`.
+
 ### Reliability dashboard hygiene — orphan archive, channel readiness, smoke lane bus, domain incidents (2026-04-26)
 
 Cuatro patrones canónicos que evitan re-introducir falsos positivos o `awaiting_data` perpetuos. Cualquier cambio que toque `projection_refresh_queue`, `teams_notification_channels`, smoke lane readers o Sentry capture debe respetarlos.
