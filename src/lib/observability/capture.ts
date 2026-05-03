@@ -45,6 +45,7 @@ export type CaptureDomain =
   | 'observability'
   | 'home'
   | 'payroll'
+  | 'sync' // TASK-773 — outbox publisher, reactive consumer, projection refreshes
 
 export interface CaptureOptions {
   /** Free-form structured context. Ends up in Sentry's `Additional Data`. */

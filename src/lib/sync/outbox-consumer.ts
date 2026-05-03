@@ -3,7 +3,9 @@ import 'server-only'
 import { randomUUID } from 'node:crypto'
 
 import { getBigQueryClient } from '@/lib/bigquery'
-import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
+import { captureWithDomain } from '@/lib/observability/capture'
+import { redactErrorForResponse } from '@/lib/observability/redact'
+import { runGreenhousePostgresQuery, withGreenhousePostgresTransaction } from '@/lib/postgres/client'
 
 // ── Types ──
 
@@ -12,6 +14,7 @@ export interface OutboxPublishResult {
   eventsRead: number
   eventsPublished: number
   eventsFailed: number
+  eventsDeadLetter: number
   durationMs: number
 }
 
@@ -23,7 +26,12 @@ type OutboxEventRow = {
   payload_json: unknown
   status: string
   occurred_at: string | Date
+  published_attempts: number
 }
+
+// TASK-773 — max retries antes de routear a dead_letter. Cloud Scheduler corre
+// cada 2 min → 10 min de retry total cubre transient BQ failures sin saturar.
+export const OUTBOX_MAX_PUBLISH_ATTEMPTS = 5
 
 // ── Helpers ──
 
@@ -101,34 +109,88 @@ const writeSyncFailure = async ({
 
 // ── Main consumer ──
 
+/**
+ * TASK-773 — Worker outbox publisher con state machine canónica.
+ *
+ * Flujo:
+ *   1. Inicio run + audit en source_sync_runs
+ *   2. Tx 1 — claim batch: SELECT FOR UPDATE SKIP LOCKED + UPDATE
+ *      status='publishing' (lock concurrency-safe sin contención
+ *      cuando hay múltiples instancias del worker corriendo en paralelo).
+ *   3. BigQuery insert batch a greenhouse_raw.postgres_outbox_events.
+ *      Soporta partial failure: rows OK marcan published, rows FAIL
+ *      incrementan published_attempts y vuelven a 'failed' o
+ *      'dead_letter' según OUTBOX_MAX_PUBLISH_ATTEMPTS.
+ *   4. Tx 2 — finaliza state: UPDATE per-event con status final.
+ *   5. Cierre run + audit final.
+ *
+ * Idempotencia:
+ *   - SKIP LOCKED garantiza que dos workers no procesan el mismo event
+ *   - event_id es PK natural en BQ raw (insert con dedup natural)
+ *   - status='publishing' hace que el próximo SELECT no lo revisite
+ *
+ * Recovery:
+ *   - status='failed' es retry-eligible (vuelve al SELECT del próximo run)
+ *   - status='dead_letter' requiere intervención humana (signal alerta)
+ *   - publishing_started_at expirado (>10 min) puede recuperarse via
+ *     /reactive/recover en una task derivada futura
+ */
 export const publishPendingOutboxEvents = async (options?: {
   batchSize?: number
+  maxRetries?: number
 }): Promise<OutboxPublishResult> => {
   const startMs = Date.now()
   const runId = `outbox-${randomUUID()}`
   const batchSize = options?.batchSize ?? 100
+  const maxRetries = options?.maxRetries ?? OUTBOX_MAX_PUBLISH_ATTEMPTS
 
-  // 1. Register run
   await writeSyncRun({ runId, status: 'running' })
 
   try {
-    // 2. Read pending events
-    const events = await runGreenhousePostgresQuery<OutboxEventRow>(
-      `SELECT event_id, aggregate_type, aggregate_id, event_type, payload_json, status, occurred_at
-       FROM greenhouse_sync.outbox_events
-       WHERE status = 'pending'
-       ORDER BY occurred_at ASC
-       LIMIT $1`,
-      [batchSize]
-    )
+    // Step 1 — Claim batch atomically (concurrency-safe via SKIP LOCKED).
+    // Selecciona pending OR failed (retry-eligible). Marca como 'publishing'
+    // dentro de la misma tx para garantizar exclusivo lock semántico.
+    const events = await withGreenhousePostgresTransaction(async client => {
+      const claimed = await client.query<OutboxEventRow>(
+        `SELECT event_id, aggregate_type, aggregate_id, event_type, payload_json, status,
+                occurred_at, published_attempts
+         FROM greenhouse_sync.outbox_events
+         WHERE status IN ('pending', 'failed')
+         ORDER BY occurred_at ASC
+         FOR UPDATE SKIP LOCKED
+         LIMIT $1`,
+        [batchSize]
+      )
+
+      if (claimed.rows.length === 0) return []
+
+      const ids = claimed.rows.map(r => r.event_id)
+
+      await client.query(
+        `UPDATE greenhouse_sync.outbox_events
+         SET status = 'publishing',
+             publishing_started_at = NOW()
+         WHERE event_id = ANY($1)`,
+        [ids]
+      )
+
+      return claimed.rows
+    })
 
     if (events.length === 0) {
       await writeSyncRun({ runId, status: 'succeeded', eventsRead: 0, eventsPublished: 0, notes: 'No pending events' })
 
-      return { runId, eventsRead: 0, eventsPublished: 0, eventsFailed: 0, durationMs: Date.now() - startMs }
+      return {
+        runId,
+        eventsRead: 0,
+        eventsPublished: 0,
+        eventsFailed: 0,
+        eventsDeadLetter: 0,
+        durationMs: Date.now() - startMs
+      }
     }
 
-    // 3. Map to BigQuery format
+    // Step 2 — Map to BigQuery format
     const publishedAt = new Date().toISOString()
 
     const bigQueryRows = events.map(event => ({
@@ -144,99 +206,152 @@ export const publishPendingOutboxEvents = async (options?: {
       publish_run_id: runId
     }))
 
-    // 4. Insert to BigQuery
+    // Step 3 — Insert to BigQuery (handle partial failure)
     const bigQuery = getBigQueryClient()
+    const failedEventIds = new Set<string>()
+    let bqGlobalError: Error | null = null
 
     try {
       await bigQuery.dataset('greenhouse_raw').table('postgres_outbox_events').insert(bigQueryRows)
     } catch (error) {
-      // Handle partial insert failures — BigQuery may reject individual rows
       const bqError = error as { errors?: Array<{ row?: Record<string, unknown>; errors?: unknown[] }> }
 
       if (bqError.errors && Array.isArray(bqError.errors)) {
-        // Extract IDs of failed rows
-        const failedEventIds = new Set<string>()
-
         for (const rowError of bqError.errors) {
           const eventId = rowError.row?.event_id as string | undefined
 
           if (eventId) failedEventIds.add(eventId)
         }
 
-        // If ALL rows failed, treat as total failure
+        // ALL rows failed → treat as global error
         if (failedEventIds.size >= events.length) {
-          throw describeBigQueryInsertError('greenhouse_raw.postgres_outbox_events', error)
+          bqGlobalError = describeBigQueryInsertError('greenhouse_raw.postgres_outbox_events', error)
+          for (const e of events) failedEventIds.add(e.event_id)
+        }
+      } else {
+        // Non-partial error → ALL fail
+        bqGlobalError = describeBigQueryInsertError('greenhouse_raw.postgres_outbox_events', error)
+        for (const e of events) failedEventIds.add(e.event_id)
+      }
+    }
+
+    const successfulEvents = events.filter(e => !failedEventIds.has(e.event_id))
+    const failedEvents = events.filter(e => failedEventIds.has(e.event_id))
+
+    // Step 4 — Finalize state per event (Tx 2)
+    await withGreenhousePostgresTransaction(async client => {
+      // 4a — Successful: status='published', published_at, reset attempts
+      if (successfulEvents.length > 0) {
+        await client.query(
+          `UPDATE greenhouse_sync.outbox_events
+           SET status = 'published',
+               published_at = NOW(),
+               publishing_started_at = NULL,
+               last_publish_error = NULL
+           WHERE event_id = ANY($1)`,
+          [successfulEvents.map(e => e.event_id)]
+        )
+      }
+
+      // 4b — Failed: increment attempts, route to 'failed' or 'dead_letter'
+      // según OUTBOX_MAX_PUBLISH_ATTEMPTS.
+      if (failedEvents.length > 0) {
+        const errorSummary = bqGlobalError
+          ? redactErrorForResponse(bqGlobalError)
+          : 'Partial BigQuery insert: row rejected (see source_sync_failures)'
+
+        // Routing per-event: dead_letter si attempts+1 >= maxRetries
+        const deadLetterIds: string[] = []
+        const failedRetryIds: string[] = []
+
+        for (const ev of failedEvents) {
+          const nextAttempts = (ev.published_attempts ?? 0) + 1
+
+          if (nextAttempts >= maxRetries) {
+            deadLetterIds.push(ev.event_id)
+          } else {
+            failedRetryIds.push(ev.event_id)
+          }
         }
 
-        // Partial failure: mark successful ones as published
-        const successfulIds = events
-          .map(e => e.event_id)
-          .filter(id => !failedEventIds.has(id))
-
-        if (successfulIds.length > 0) {
-          await runGreenhousePostgresQuery(
+        if (failedRetryIds.length > 0) {
+          await client.query(
             `UPDATE greenhouse_sync.outbox_events
-             SET status = 'published', published_at = NOW()
+             SET status = 'failed',
+                 publishing_started_at = NULL,
+                 published_attempts = published_attempts + 1,
+                 last_publish_error = $2
              WHERE event_id = ANY($1)`,
-            [successfulIds]
+            [failedRetryIds, errorSummary.slice(0, 500)]
           )
         }
 
-        await writeSyncFailure({
-          runId,
-          errorMessage: `Partial BigQuery insert: ${failedEventIds.size} of ${events.length} rows failed`,
-          payload: { failedEventIds: Array.from(failedEventIds).slice(0, 20) }
-        })
+        if (deadLetterIds.length > 0) {
+          await client.query(
+            `UPDATE greenhouse_sync.outbox_events
+             SET status = 'dead_letter',
+                 publishing_started_at = NULL,
+                 published_attempts = published_attempts + 1,
+                 last_publish_error = $2,
+                 dead_letter_at = NOW()
+             WHERE event_id = ANY($1)`,
+            [deadLetterIds, errorSummary.slice(0, 500)]
+          )
 
-        await writeSyncRun({
-          runId,
-          status: 'succeeded',
-          eventsRead: events.length,
-          eventsPublished: successfulIds.length,
-          notes: `Partial: ${successfulIds.length} published, ${failedEventIds.size} failed`
-        })
-
-        return {
-          runId,
-          eventsRead: events.length,
-          eventsPublished: successfulIds.length,
-          eventsFailed: failedEventIds.size,
-          durationMs: Date.now() - startMs
+          // Sentry signal — humano debe intervenir
+          captureWithDomain(bqGlobalError ?? new Error(errorSummary), 'sync', {
+            tags: { source: 'outbox_publisher_dead_letter' },
+            extra: { runId, deadLetterCount: deadLetterIds.length, sampleIds: deadLetterIds.slice(0, 10) }
+          })
         }
       }
+    })
 
-      // Non-partial error — rethrow
-      throw describeBigQueryInsertError('greenhouse_raw.postgres_outbox_events', error)
+    // Step 5 — Audit failure if any
+    const eventsDeadLetter = failedEvents.filter(e => (e.published_attempts + 1) >= maxRetries).length
+
+    if (failedEventIds.size > 0) {
+      await writeSyncFailure({
+        runId,
+        errorMessage: bqGlobalError
+          ? bqGlobalError.message.slice(0, 2000)
+          : `Partial BigQuery insert: ${failedEventIds.size} of ${events.length} rows failed`,
+        payload: {
+          failedEventIds: Array.from(failedEventIds).slice(0, 20),
+          deadLetterCount: eventsDeadLetter
+        }
+      }).catch(() => {})
     }
 
-    // 5. Mark all events as published
-    const publishedIds = events.map(e => e.event_id)
+    const eventsPublished = successfulEvents.length
+    const eventsFailed = failedEventIds.size
 
-    await runGreenhousePostgresQuery(
-      `UPDATE greenhouse_sync.outbox_events
-       SET status = 'published', published_at = NOW()
-       WHERE event_id = ANY($1)`,
-      [publishedIds]
-    )
-
-    // 6. Finalize run
     await writeSyncRun({
       runId,
       status: 'succeeded',
       eventsRead: events.length,
-      eventsPublished: events.length
+      eventsPublished,
+      notes: failedEventIds.size > 0
+        ? `Partial: ${eventsPublished} published, ${eventsFailed} failed (${eventsDeadLetter} dead-letter)`
+        : null
     })
 
     return {
       runId,
       eventsRead: events.length,
-      eventsPublished: events.length,
-      eventsFailed: 0,
+      eventsPublished,
+      eventsFailed,
+      eventsDeadLetter,
       durationMs: Date.now() - startMs
     }
   } catch (error) {
-    // Total failure — events remain pending for next cycle
+    // Total failure — events claim was rolled back o BQ catastrophic
     const errorMessage = error instanceof Error ? error.message : String(error)
+
+    captureWithDomain(error, 'sync', {
+      tags: { source: 'outbox_publisher_unexpected' },
+      extra: { runId }
+    })
 
     await writeSyncFailure({ runId, errorMessage }).catch(() => {})
     await writeSyncRun({ runId, status: 'failed', notes: errorMessage.slice(0, 500) }).catch(() => {})

@@ -20,6 +20,7 @@
  *   POST /reliability-ai-watch         → Reliability AI Observer (TASK-638): Gemini watcher over RCP overview
  *   POST /cloud-cost-ai-watch          → Cloud cost FinOps AI + deterministic alert sweep (TASK-769)
  *   POST /notion-conformed/sync        → Notion BQ raw → conformed → PG cycle (replaces Vercel /api/cron/sync-conformed)
+ *   POST /outbox/publish-batch         → Outbox PG → BQ raw publisher with state machine (TASK-773, replaces Vercel /api/cron/outbox-publish)
  *
  * Auth: Cloud Run IAM (--no-allow-unauthenticated) + optional CRON_SECRET header
  * Runtime: Node.js 22 via esbuild bundle (handles TypeScript + @/ path aliases)
@@ -28,6 +29,7 @@
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http'
 
 import { processReactiveEvents, ensureReactiveSchema, sweepAuditOnlyEvents } from '@/lib/sync/reactive-consumer'
+import { publishPendingOutboxEvents, OUTBOX_MAX_PUBLISH_ATTEMPTS } from '@/lib/sync/outbox-consumer'
 import { claimOrphanedRefreshItems, markRefreshCompleted, markRefreshFailed } from '@/lib/sync/refresh-queue'
 import { classifyReactiveError } from '@/lib/sync/reactive-error-classification'
 import { getRegisteredProjections } from '@/lib/sync/projection-registry'
@@ -1132,6 +1134,58 @@ const handleFinanceLedgerHealthCheck = async (_req: IncomingMessage, res: Server
  * Body (optional): `{ "executionSource": "scheduled_primary" | "scheduled_retry" | "manual_admin" }`
  *   - default `scheduled_primary` (full daily run)
  */
+// ─── /outbox/publish-batch ──────────────────────────────────────────────────
+//
+// TASK-773 Slice 2 — Outbox publisher migrado de Vercel cron a ops-worker.
+// Movía outbox events de greenhouse_sync.outbox_events (Postgres) a
+// greenhouse_raw.postgres_outbox_events (BigQuery) y marcaba publish status
+// con state machine canónica (pending → publishing → published/failed/dead_letter).
+//
+// El reactive consumer (/reactive/process-domain) filtra por status='published'
+// — sin este publisher, todos los outbox events quedan invisibles. Por eso
+// migra de Vercel (que solo corre crons en producción) a Cloud Scheduler
+// (que corre por proyecto GCP, igual en staging y prod).
+//
+// Body opcional: {batchSize?: number, maxRetries?: number}
+// Defaults: batchSize=100, maxRetries=OUTBOX_MAX_PUBLISH_ATTEMPTS (5).
+const handleOutboxPublishBatch = async (req: IncomingMessage, res: ServerResponse) => {
+  const body = await readBody(req)
+  const batchSize = typeof body.batchSize === 'number' && body.batchSize > 0
+    ? Math.min(1000, Math.floor(body.batchSize))
+    : 100
+  const maxRetries = typeof body.maxRetries === 'number' && body.maxRetries > 0
+    ? Math.floor(body.maxRetries)
+    : OUTBOX_MAX_PUBLISH_ATTEMPTS
+
+  console.log(`[ops-worker] POST /outbox/publish-batch — batchSize=${batchSize} maxRetries=${maxRetries}`)
+
+  try {
+    const result = await publishPendingOutboxEvents({ batchSize, maxRetries })
+
+    console.log(
+      `[ops-worker] /outbox/publish-batch done — runId=${result.runId} ` +
+      `read=${result.eventsRead} published=${result.eventsPublished} ` +
+      `failed=${result.eventsFailed} deadLetter=${result.eventsDeadLetter} ` +
+      `${result.durationMs}ms`
+    )
+
+    json(res, 200, {
+      ok: true,
+      runId: result.runId,
+      eventsRead: result.eventsRead,
+      eventsPublished: result.eventsPublished,
+      eventsFailed: result.eventsFailed,
+      eventsDeadLetter: result.eventsDeadLetter,
+      durationMs: result.durationMs
+    })
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown outbox publish error'
+
+    console.error('[ops-worker] /outbox/publish-batch failed:', message)
+    json(res, 502, { error: message })
+  }
+}
+
 const handleNotionConformedSync = async (req: IncomingMessage, res: ServerResponse) => {
   const body = await readBody(req)
   const rawSource = typeof body.executionSource === 'string' ? body.executionSource.trim() : 'scheduled_primary'
@@ -1536,6 +1590,12 @@ const server = createServer(async (req, res) => {
 
     if (method === 'POST' && path === '/notion-conformed/sync') {
       await handleNotionConformedSync(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/outbox/publish-batch') {
+      await handleOutboxPublishBatch(req, res)
 
       return
     }
