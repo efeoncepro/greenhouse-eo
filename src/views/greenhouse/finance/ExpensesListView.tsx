@@ -53,6 +53,7 @@ interface Expense {
   paymentStatus: string
   paymentMethod: string | null
   documentNumber: string | null
+  documentDate: string | null
   dueDate: string | null
   supplierId: string | null
   supplierName: string | null
@@ -64,6 +65,15 @@ interface Expense {
 
   // Nubox fields
   nuboxPurchaseId: string | null
+
+  // TASK-772 — display + amount contract canónico (server-resolved)
+  supplierDisplayName: string | null
+  sortDate: string | null
+  amountPaid: number | null
+  amountPaidClp: number
+  amountPaidIsHomogeneous: boolean
+  pendingAmount: number | null
+  pendingAmountClp: number
 }
 
 // ---------------------------------------------------------------------------
@@ -193,9 +203,14 @@ const expColumns: ColumnDef<Expense, any>[] = [
       </Box>
     )
   }),
-  expColumnHelper.accessor('supplierName', {
+  expColumnHelper.accessor('supplierDisplayName', {
     header: 'Proveedor',
-    cell: ({ getValue }) => <Typography variant='body2'>{getValue() || '—'}</Typography>
+    // TASK-772 — display canónico server-side. Fallback chain in case the
+    // backend doesn't populate it (BQ-fallback path o test fixtures).
+    cell: ({ row }) =>
+      <Typography variant='body2'>
+        {row.original.supplierDisplayName || row.original.supplierName || '—'}
+      </Typography>
   }),
   expColumnHelper.accessor('paymentDate', {
     header: 'Fecha',
@@ -237,7 +252,10 @@ const ExpensesListView = () => {
   const [loading, setLoading] = useState(true)
   const [items, setItems] = useState<Expense[]>([])
   const [total, setTotal] = useState(0)
-  const [sorting, setSorting] = useState<SortingState>([{ id: 'paymentDate', desc: true }])
+  // TASK-772 — sort canónico por sortDate (= COALESCE(documentDate, paymentDate, createdAt)).
+  // Antes ordenaba por paymentDate, lo que ocultaba obligaciones recién creadas
+  // sin paymentDate cargada (typical de obligaciones manuales como Figma EXP-202604-008).
+  const [sorting, setSorting] = useState<SortingState>([{ id: 'sortDate', desc: true }])
   const [globalFilter, setGlobalFilter] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
   const [typeFilter, setTypeFilter] = useState('')

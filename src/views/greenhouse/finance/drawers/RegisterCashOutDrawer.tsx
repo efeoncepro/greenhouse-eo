@@ -25,11 +25,21 @@ import PaymentInstrumentChip from '@/components/greenhouse/PaymentInstrumentChip
 interface ExpenseOption {
   expenseId: string
   description: string
-  supplierName: string | null
-  totalAmount: number
-  paidAmount: number
-  pendingAmount: number
+
+  // TASK-772 — supplier identity stable + display label.
+  supplierKey: string             // estable: supplierId || displayName || legacyName || '__unassigned__'
+  supplierLabel: string           // display: displayName || legacyName || 'Sin proveedor'
+  supplierId: string | null       // raw supplierId del backend
+  supplierName: string | null     // snapshot legacy/auditable
+
+  // TASK-772 — amounts canónicos del backend, NUNCA recomputar inline.
+  // Currency original del documento; pendingAmount en moneda original (puede ser null si mix).
   currency: string
+  totalAmount: number             // moneda documento
+  totalAmountClp: number          // CLP equivalente
+  pendingAmount: number | null    // null si mix de monedas heterogéneo
+  pendingAmountClp: number        // siempre confiable
+  amountPaidIsHomogeneous: boolean
 }
 
 const PAYMENT_METHODS = [
@@ -94,14 +104,24 @@ const RegisterCashOutDrawer = ({ open, onClose, onSuccess }: Props) => {
   const [loadingExpenses, setLoadingExpenses] = useState(false)
   const [expensesError, setExpensesError] = useState<string | null>(null)
 
-  // Derived: unique suppliers with pending expenses
+  // TASK-772 — Derived: unique suppliers with pending expenses, agrupados por
+  // supplierKey estable (supplierId || displayName || legacyName). Antes
+  // agrupaba por `supplierName || 'Sin proveedor'` lo que escondía obligaciones
+  // con supplierId válido pero supplierName=null bajo "Sin proveedor"
+  // (root cause del bug Figma EXP-202604-008 visto en Cash-Out drawer).
   const uniqueSuppliers = Array.from(
-    new Map(expenses.map(e => [e.supplierName || 'Sin proveedor', e.supplierName || 'Sin proveedor'])).keys()
-  ).sort((a, b) => a.localeCompare(b))
+    expenses.reduce((acc, e) => {
+      if (!acc.has(e.supplierKey)) acc.set(e.supplierKey, e.supplierLabel)
 
-  // Filtered expenses for selected supplier
+      return acc
+    }, new Map<string, string>()).entries()
+  )
+    .map(([key, label]) => ({ key, label }))
+    .sort((a, b) => a.label.localeCompare(b.label))
+
+  // Filtered expenses for selected supplier (matched by supplierKey, no por label)
   const filteredExpenses = selectedSupplier
-    ? expenses.filter(e => (e.supplierName || 'Sin proveedor') === selectedSupplier)
+    ? expenses.filter(e => e.supplierKey === selectedSupplier)
     : []
 
   // Selected expense for pending balance display
@@ -117,15 +137,52 @@ const RegisterCashOutDrawer = ({ open, onClose, onSuccess }: Props) => {
       if (res.ok) {
         const data = await res.json()
 
-        const items: ExpenseOption[] = (data.items ?? []).map((e: any) => ({
-          expenseId: e.expenseId,
-          description: e.description ?? '',
-          supplierName: e.supplierName ?? null,
-          totalAmount: Number(e.totalAmountClp ?? e.totalAmount ?? 0),
-          paidAmount: Number(e.amountPaid ?? 0),
-          pendingAmount: Math.max(0, Number(e.totalAmountClp ?? e.totalAmount ?? 0) - Number(e.amountPaid ?? 0)),
-          currency: e.currency ?? 'CLP'
-        }))
+        // TASK-772 — consume el contract canónico TASK-772 Slice 1:
+        // supplierDisplayName + pendingAmount (moneda original) + pendingAmountClp.
+        // Fallback chain por compatibilidad con BQ-fallback path (sin enrichment).
+        // NUNCA recomputar pendingAmount = totalAmountClp - amountPaid (mezclaba CLP con
+        // currency original — root cause del display USD inflado a CLP en este drawer).
+        const items: ExpenseOption[] = (data.items ?? []).map((e: any) => {
+          const supplierId: string | null = e.supplierId ?? null
+          const supplierName: string | null = e.supplierName ?? null
+          const supplierDisplayName: string | null = e.supplierDisplayName ?? null
+          const supplierLabel = supplierDisplayName || supplierName || 'Sin proveedor'
+          const supplierKey = supplierId || supplierDisplayName || supplierName || '__unassigned__'
+
+          const currency = e.currency ?? 'CLP'
+          const totalAmount = Number(e.totalAmount ?? 0)
+          const totalAmountClp = Number(e.totalAmountClp ?? totalAmount)
+          const pendingAmountClp = Number(e.pendingAmountClp ?? Math.max(0, totalAmountClp - Number(e.amountPaidClp ?? 0)))
+          const pendingAmountFromContract = e.pendingAmount
+
+          // Si el backend declara pendingAmount=null (mix de monedas) lo respetamos.
+          // Si lo emite como número, lo usamos. Si no viene (BQ-fallback), derivamos
+          // best-effort: para CLP es trivial; para non-CLP lo dejamos como
+          // totalAmount cuando amountPaid no es resoluble.
+          const pendingAmount: number | null =
+            pendingAmountFromContract === null
+              ? null
+              : pendingAmountFromContract !== undefined
+                ? Number(pendingAmountFromContract)
+                : currency === 'CLP'
+                  ? pendingAmountClp
+                  : totalAmount
+
+          return {
+            expenseId: e.expenseId,
+            description: e.description ?? '',
+            supplierKey,
+            supplierLabel,
+            supplierId,
+            supplierName,
+            currency,
+            totalAmount,
+            totalAmountClp,
+            pendingAmount,
+            pendingAmountClp,
+            amountPaidIsHomogeneous: Boolean(e.amountPaidIsHomogeneous ?? true)
+          }
+        })
 
         setExpenses(items)
 
@@ -180,7 +237,14 @@ const RegisterCashOutDrawer = ({ open, onClose, onSuccess }: Props) => {
     const expense = expenses.find(e => e.expenseId === value)
 
     if (expense) {
-      setAmount(String(expense.pendingAmount))
+      // TASK-772 — preferir pendingAmount (moneda original) cuando es resoluble.
+      // Si es null (mix de monedas heterogéneo), caer a pendingAmountClp como
+      // best-effort — el operador puede ajustar manualmente y agregar
+      // exchangeRateOverride en el form. NUNCA mostrar pendingAmountClp con
+      // currency != 'CLP' en el input de monto (root cause del display USD inflado).
+      const initialAmount = expense.pendingAmount ?? expense.pendingAmountClp
+
+      setAmount(String(initialAmount))
     } else {
       setAmount('')
     }
@@ -222,10 +286,17 @@ const RegisterCashOutDrawer = ({ open, onClose, onSuccess }: Props) => {
       return
     }
 
-    if (selectedExpense && Number(amount) > selectedExpense.pendingAmount) {
-      setError(`El monto no puede superar el saldo pendiente (${formatAmount(selectedExpense.pendingAmount, selectedExpense.currency)}).`)
+    // TASK-772 — comparar contra pendingAmount en moneda del documento. Si es
+    // null (mix de monedas), validamos contra pendingAmountClp pero advertimos.
+    if (selectedExpense) {
+      const cap = selectedExpense.pendingAmount ?? selectedExpense.pendingAmountClp
+      const capCurrency = selectedExpense.pendingAmount !== null ? selectedExpense.currency : 'CLP'
 
-      return
+      if (Number(amount) > cap) {
+        setError(`El monto no puede superar el saldo pendiente (${formatAmount(cap, capCurrency)}).`)
+
+        return
+      }
     }
 
     setSaving(true)
@@ -311,11 +382,12 @@ const RegisterCashOutDrawer = ({ open, onClose, onSuccess }: Props) => {
                 : '— Seleccionar proveedor —'}
           </MenuItem>
           {uniqueSuppliers.map(supplier => {
-            const count = expenses.filter(e => (e.supplierName || 'Sin proveedor') === supplier).length
+            // TASK-772 — count via supplierKey estable (NO via supplierName que puede ser null).
+            const count = expenses.filter(e => e.supplierKey === supplier.key).length
 
             return (
-              <MenuItem key={supplier} value={supplier}>
-                {supplier} ({count} {count === 1 ? 'documento' : 'documentos'})
+              <MenuItem key={supplier.key} value={supplier.key}>
+                {supplier.label} ({count} {count === 1 ? 'documento' : 'documentos'})
               </MenuItem>
             )
           })}
@@ -338,11 +410,20 @@ const RegisterCashOutDrawer = ({ open, onClose, onSuccess }: Props) => {
                 ? 'Sin documentos pendientes'
                 : '— Seleccionar documento —'}
           </MenuItem>
-          {filteredExpenses.map(e => (
-            <MenuItem key={e.expenseId} value={e.expenseId}>
-              {e.description} — {formatAmount(e.pendingAmount, e.currency)}
-            </MenuItem>
-          ))}
+          {filteredExpenses.map(e => {
+            // TASK-772 — display monto pendiente en moneda original cuando es resoluble.
+            // Si es null (mix de monedas), mostramos pendingAmountClp con label CLP +
+            // disclaimer "(equiv)" para no engañar al operador.
+            const displayAmount = e.pendingAmount ?? e.pendingAmountClp
+            const displayCurrency = e.pendingAmount !== null ? e.currency : 'CLP'
+            const heteroSuffix = e.pendingAmount === null ? ' (equiv. CLP)' : ''
+
+            return (
+              <MenuItem key={e.expenseId} value={e.expenseId}>
+                {e.description} — {formatAmount(displayAmount, displayCurrency)}{heteroSuffix}
+              </MenuItem>
+            )
+          })}
         </CustomTextField>
 
         <CustomTextField
@@ -355,7 +436,22 @@ const RegisterCashOutDrawer = ({ open, onClose, onSuccess }: Props) => {
           required
           helperText={
             selectedExpense
-              ? `Saldo pendiente: ${formatAmount(selectedExpense.pendingAmount, selectedExpense.currency)}`
+              ? (() => {
+                  // TASK-772 — mostrar pendiente en moneda original + equivalente CLP separado.
+                  // Si la moneda es CLP, no mostrar equivalente. Si es non-CLP, agregar
+                  // sub-info CLP. Si pendingAmount=null (mix), solo CLP con disclaimer.
+                  if (selectedExpense.pendingAmount === null) {
+                    return `Saldo pendiente (equivalente CLP): ${formatAmount(selectedExpense.pendingAmountClp, 'CLP')}`
+                  }
+
+                  const main = `Saldo pendiente: ${formatAmount(selectedExpense.pendingAmount, selectedExpense.currency)}`
+
+                  if (selectedExpense.currency === 'CLP') return main
+
+                  const equiv = `Equivalente CLP: ${formatAmount(selectedExpense.pendingAmountClp, 'CLP')}`
+
+                  return `${main} · ${equiv}`
+                })()
               : undefined
           }
         />
