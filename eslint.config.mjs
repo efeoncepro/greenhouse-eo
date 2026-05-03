@@ -284,7 +284,8 @@ export default [
       greenhouse: greenhousePlugin
     },
     rules: {
-      'greenhouse/no-untokenized-fx-math': 'error'
+      'greenhouse/no-untokenized-fx-math': 'error',
+      'greenhouse/no-untokenized-expense-type-for-analytics': 'error'
     }
   },
   {
@@ -317,6 +318,46 @@ export default [
     ],
     rules: {
       'greenhouse/no-untokenized-fx-math': 'off'
+    }
+  },
+
+  // TASK-768 Slice 8 — la lint rule no-untokenized-expense-type-for-analytics
+  // se desactiva para usos legitimos:
+  //  * SII / IVA / VAT / chile-tax engine (taxonomia fiscal por contrato)
+  //  * Resolver canonico + tests + backfill (necesitan leer expense_type
+  //    como hint del transparent map)
+  //  * Readers que exponen ambas dimensiones simultaneamente
+  //  * cash-out filter operativo (UI permite filter por taxonomia fiscal;
+  //    el KPI rollup analitico ya migra a byEconomicCategory en Slice 7)
+  //  * account-balances label fiscal (label "Cotizacion Previred" para UX
+  //    bancaria, no analytical KPI)
+  //  * processor-digest payroll digest (operacional, no analytical)
+  //  * payroll-expense-materialization-lag signal (materializacion proxy,
+  //    no analytical bucket — TASK-765 ownership preservado)
+  {
+    files: [
+      'src/lib/finance/expense-payments-reader.ts',
+      'src/lib/finance/income-payments-reader.ts',
+      'src/lib/finance/__tests__/expense-payments-reader.test.ts',
+      'src/lib/finance/__tests__/income-payments-reader.test.ts',
+      'src/lib/finance/economic-category/**',
+      'scripts/finance/backfill-economic-category.ts',
+      'src/lib/tax/**',
+      'src/lib/finance/expense-tax-snapshot.ts',
+      'src/lib/finance/income-tax-snapshot.ts',
+      'src/lib/finance/expense-taxonomy.ts',
+      'src/lib/finance/vat-ledger.ts',
+      'src/lib/finance/account-balances.ts',
+      'src/lib/finance/processor-digest.ts',
+      'src/lib/reliability/queries/payroll-expense-materialization-lag.ts',
+      'src/app/api/finance/cash-out/route.ts',
+      'src/app/api/admin/finance/expenses/[id]/economic-category/**',
+      'src/app/api/admin/finance/income/[id]/economic-category/**',
+      'eslint-plugins/greenhouse/rules/no-untokenized-expense-type-for-analytics.mjs',
+      'eslint-plugins/greenhouse/rules/__tests__/no-untokenized-expense-type-for-analytics.test.mjs'
+    ],
+    rules: {
+      'greenhouse/no-untokenized-expense-type-for-analytics': 'off'
     }
   },
 

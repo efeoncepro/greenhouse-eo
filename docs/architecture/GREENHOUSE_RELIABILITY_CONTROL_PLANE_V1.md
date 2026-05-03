@@ -2,10 +2,62 @@
 
 > Spec canónica del `Reliability Control Plane` de Greenhouse EO. Define el registry por módulo, el modelo unificado de señales, el contrato de evidencia y cómo `Admin Center`, `Ops Health` y `Cloud & Integrations` consumen la lectura consolidada sin duplicar fuentes.
 >
-> Versión: `1.4`
+> Versión: `1.5`
 > Estado: `vigente`
 > Creada: `2026-04-25` por TASK-600
-> Última actualización: `2026-05-03` por TASK-766 (2 signals nuevos para drift de currency CLP en payments)
+> Última actualización: `2026-05-03` por TASK-768 (2 signals nuevos para `economic_category_unresolved`)
+
+---
+
+## Delta 2026-05-03 — TASK-768 subsystem `Finance Data Quality` (2 signals nuevos para economic_category)
+
+Cierra ISSUE-065 (KPI Nómina sub-counted ~$3M abril 2026 por mis-clasificación). Agrega 2 signals al subsystem existente para detectar filas en `expenses` / `income` con `economic_category IS NULL` (pre-cutover legacy o trigger bypass).
+
+### Signals nuevos
+
+- `finance.expenses.economic_category_unresolved`
+  - Kind: `drift`
+  - Severity rule: `count > 0 → error`; `count === 0 → ok`
+  - Steady value: `0` post-cleanup manual queue + VALIDATE atomic
+  - Reader: `getExpensesEconomicCategoryUnresolvedSignal` (`src/lib/reliability/queries/economic-category-unresolved.ts`)
+  - Query: `SELECT COUNT(*) FROM greenhouse_finance.expenses WHERE economic_category IS NULL`
+
+- `finance.income.economic_category_unresolved`
+  - Kind: `drift`
+  - Severity rule: idem
+  - Reader: `getIncomeEconomicCategoryUnresolvedSignal`
+
+### Builder canónico
+
+`buildFinanceEconomicCategoryUnresolvedSignals` en `src/lib/reliability/signals.ts:1029-1041` — `Promise.all` sobre los 2 readers, retorna `ReliabilitySignal[]`. Mismo pattern que `buildFinanceClpDriftSignals` (TASK-766).
+
+### Subsystem rollup
+
+Subsystem: `Finance Data Quality` (existente). Cualquiera de los 2 signals con `count > 0` flips el subsystem a `error`, lo que escala al rollup `Finance` y al payload de `/api/admin/platform-health` con `safeMode.financeReadSafe=false`.
+
+### Reclassification path documentado
+
+El AI Observer (TASK-638) capta el signal y enlaza a los endpoints admin canónicos:
+
+```http
+PATCH /api/admin/finance/expenses/{id}/economic-category
+PATCH /api/admin/finance/income/{id}/economic-category
+Body: { economicCategory, reason (min 10 chars), bulkContext? }
+Capabilities: finance.expenses.reclassify_economic_category | finance.income.reclassify_economic_category
+              (FINANCE_ADMIN + EFEONCE_ADMIN, least-privilege)
+```
+
+Los endpoints atómicamente: UPDATE economic_category + INSERT audit log + UPDATE manual_queue → resolved + outbox event v1.
+
+### Steady state esperado
+
+Post-backfill (Slice 3): drift inicial = 161 expenses + 19 income en manual queue (esperado, son Nubox imports con `expense_type='supplier'` sin metadata para auto-resolve).
+
+Post-cleanup manual queue (UI Slice 6 + operador): drift = 0. Migration follow-up hace `VALIDATE CONSTRAINT expenses_economic_category_required_after_cutover` atomic.
+
+Post-cutover (CHECK NOT NULL VALIDATED): cualquier reaparición de count > 0 indica trigger bypass o admin override SQL directo. AI Observer alerta.
+
+**Spec canónica**: `docs/tasks/complete/TASK-768-finance-expense-economic-category-dimension.md`.
 
 ---
 

@@ -11,6 +11,7 @@
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `umbrella`
+- Epic: `EPIC-011`
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `agency`
@@ -62,6 +63,9 @@ Reglas obligatorias:
 - `HiringApplication` es la unidad transaccional del pipeline y la unidad visual del kanban
 - la landing pública de vacantes debe resolver como lens público del mismo `HiringOpening`
 - `Hiring / ATS` no puede absorber `member`, `assignment`, `placement`, payroll ni margin como source of truth
+- `CandidateFacet` debe anclarse a `identity_profile` / `Person`; `member_id` solo aparece si la persona ya tiene faceta colaborador o si un handoff aprobado la crea/promueve downstream.
+- El programa debe declarar ambos planos de acceso: `views` para surfaces visibles y `entitlements/capabilities` para acciones finas.
+- Ninguna child task puede abrir write lanes públicas sin consentimiento, rate limiting, sanitización y reuso del storage privado GCP existente para adjuntos (`GREENHOUSE_PRIVATE_ASSETS_BUCKET` + `greenhouse_core.assets`).
 
 ## Normative Docs
 
@@ -86,6 +90,7 @@ Reglas obligatorias:
 - `TASK-354`
 - `TASK-355`
 - `TASK-356`
+- `TASK-770`
 - futuros readers hiring-aware en `People`, `Agency` y `Person 360`
 
 ### Files owned
@@ -94,6 +99,7 @@ Reglas obligatorias:
 - `docs/tasks/to-do/TASK-354-public-careers-landing-apply-intake.md`
 - `docs/tasks/to-do/TASK-355-hiring-desk-internal-workspaces-publication-governance.md`
 - `docs/tasks/to-do/TASK-356-hiring-handoff-reactive-signals-downstream-bridges.md`
+- `docs/tasks/to-do/TASK-770-hiring-to-hris-collaborator-activation.md`
 
 ## Current Repo State
 
@@ -122,18 +128,27 @@ Reglas obligatorias:
 ### Slice 1 — Domain foundation
 
 - `TASK-353` — aggregates, services, API contract y publicación pública derivada del opening
+- Incluye schema domain-per-schema `greenhouse_hiring` y contrato explícito con `identity_profile`, no tablas sueltas bajo módulos vecinos.
 
 ### Slice 2 — Public candidate entry
 
 - `TASK-354` — landing pública de vacantes, detail público y apply intake
+- Incluye guardrails de entrada pública: consentimiento, abuso/spam, privacidad, retención y adjuntos privados sobre la capability shared de assets existente.
 
 ### Slice 3 — Internal workspaces
 
 - `TASK-355` — Demand Desk, Pipeline Board, Application 360 y Publication Desk
+- Incluye modelo de `views`/`entitlements` para operar demanda, pipeline, publicación y decisión.
 
 ### Slice 4 — Downstream runtime bridges
 
 - `TASK-356` — handoff, eventos `hiring.*`, signals y bridges con HR/Staff Aug/People
+- El handoff V1 es humano-asistido por defecto; no crea `member`, `assignment` ni `placement` automáticamente.
+
+### Slice 5 — Internal hire activation closure
+
+- `TASK-770` — toma handoffs `internal_hire` aprobados y los convierte vía HRIS/People en `member` + onboarding + colaborador activo cuando readiness está completa
+- Cierra el loop end-to-end sin que Hiring cree colaborador, payroll truth ni accesos por side effect.
 
 ## Out of Scope
 
@@ -150,6 +165,7 @@ Secuencia recomendada:
 2. `TASK-354`
 3. `TASK-355`
 4. `TASK-356`
+5. `TASK-770`
 
 Dependencias lógicas:
 
@@ -157,6 +173,7 @@ Dependencias lógicas:
 - `353 -> 355`
 - `353 -> 356`
 - `354` y `355` pueden avanzar en paralelo una vez cerrada `353`
+- `356 -> 770`
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 4 — VERIFICATION & CLOSING
@@ -167,11 +184,14 @@ Dependencias lógicas:
 - [ ] Existe una secuencia explícita de child tasks para foundation, careers público, desk interno y handoff/reactividad
 - [ ] Cada child task tiene ownership, dependencia y alcance distinguible
 - [ ] La umbrella no mezcla coordinación de programa con implementación directa
+- [ ] Las Open Questions del programa quedan resueltas antes de tomar `TASK-353`
+- [ ] Las child tasks no dejan ownership amplio tipo `src/lib` o `src/app` sin subpaths específicos
 
 ## Verification
 
 - Revisión manual de consistencia documental
 - Verificar que `TASK-353` a `TASK-356` existen y están indexadas correctamente
+- Verificar que cada child task mantiene access model, seguridad pública y handoff explícito sin side effects ocultos
 
 ## Closing Protocol
 
@@ -181,7 +201,10 @@ Dependencias lógicas:
 
 - futuros readers hiring-aware en `Person 360`
 - futura capa de analytics/conversion del careers público
+- `TASK-770` para cierre `internal_hire` hasta colaborador activo vía HRIS/People
 
-## Open Questions
+## Resolved Open Questions
 
-- si `Talent Pool` debe entrar dentro de `TASK-355` o si amerita un follow-on propio una vez exista foundation suficiente
+- `Talent Pool` no entra como surface V1 dentro de `TASK-355`. Queda como follow-up propio después de `TASK-353` y `TASK-356`, porque requiere reglas de elegibilidad, retención, búsqueda, consentimiento y deduplicación que exceden el desk operativo inicial.
+- La primera implementación usa `greenhouse_hiring` como schema owner del dominio y referencia `greenhouse_core.identity_profiles` / facetas existentes. No se modela Hiring dentro de `staff_aug_placements` ni como extensión informal de HRIS.
+- La entrada pública parte centralizada para Efeonce/Greenhouse; micrositios por cliente/practice quedan fuera hasta que exista evidencia de necesidad real y governance de branding.

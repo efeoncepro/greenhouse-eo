@@ -55,11 +55,33 @@ export interface ExpensePaymentsClpSummary {
   totalClp: number
   totalPayments: number
   unreconciledCount: number
+  /** Legacy buckets (pre-TASK-768) — preserved for backwards-compat with TASK-766 consumers. */
   supplierClp: number
   payrollClp: number
   fiscalClp: number
   /** Count of payments in the period with `has_clp_drift = TRUE` (non-CLP without persisted amount_clp). */
   driftCount: number
+  /**
+   * TASK-768 — breakdown analítico por dimension `economic_category`.
+   * Single source of truth para KPIs/ICO/Member Loaded Cost/Budget/Cost Attribution.
+   * 11 keys (matching EXPENSE_ECONOMIC_CATEGORIES). NO usar legacy supplierClp/payrollClp/fiscalClp
+   * para análisis nuevo — usar byEconomicCategory.
+   */
+  byEconomicCategory: {
+    labor_cost_internal: number
+    labor_cost_external: number
+    vendor_cost_saas: number
+    vendor_cost_professional_services: number
+    regulatory_payment: number
+    tax: number
+    financial_cost: number
+    bank_fee_real: number
+    overhead: number
+    financial_settlement: number
+    other: number
+  }
+  /** Count of rows where economic_category IS NULL (pre-cutover legacy or trigger bypass). */
+  economicCategoryUnresolvedCount: number
 }
 
 export interface ExpensePaymentNormalized {
@@ -102,6 +124,19 @@ interface SummaryRow {
   payroll_clp: string | number | null
   fiscal_clp: string | number | null
   drift_count: string | number | null
+  // TASK-768 — 11 economic_category buckets + unresolved counter
+  ec_labor_cost_internal: string | number | null
+  ec_labor_cost_external: string | number | null
+  ec_vendor_cost_saas: string | number | null
+  ec_vendor_cost_professional_services: string | number | null
+  ec_regulatory_payment: string | number | null
+  ec_tax: string | number | null
+  ec_financial_cost: string | number | null
+  ec_bank_fee_real: string | number | null
+  ec_overhead: string | number | null
+  ec_financial_settlement: string | number | null
+  ec_other: string | number | null
+  ec_unresolved_count: string | number | null
 }
 
 interface PaymentRow {
@@ -199,7 +234,19 @@ export const sumExpensePaymentsClpForPeriod = async (
         COALESCE(SUM(ep.payment_amount_clp) FILTER (WHERE e.expense_type = 'supplier'), 0)::text AS supplier_clp,
         COALESCE(SUM(ep.payment_amount_clp) FILTER (WHERE e.expense_type = 'payroll'), 0)::text  AS payroll_clp,
         COALESCE(SUM(ep.payment_amount_clp) FILTER (WHERE e.expense_type IN ('tax', 'social_security')), 0)::text AS fiscal_clp,
-        COUNT(*) FILTER (WHERE ep.has_clp_drift)::text                                     AS drift_count
+        COUNT(*) FILTER (WHERE ep.has_clp_drift)::text                                     AS drift_count,
+        COALESCE(SUM(ep.payment_amount_clp) FILTER (WHERE e.economic_category = 'labor_cost_internal'), 0)::text AS ec_labor_cost_internal,
+        COALESCE(SUM(ep.payment_amount_clp) FILTER (WHERE e.economic_category = 'labor_cost_external'), 0)::text AS ec_labor_cost_external,
+        COALESCE(SUM(ep.payment_amount_clp) FILTER (WHERE e.economic_category = 'vendor_cost_saas'), 0)::text AS ec_vendor_cost_saas,
+        COALESCE(SUM(ep.payment_amount_clp) FILTER (WHERE e.economic_category = 'vendor_cost_professional_services'), 0)::text AS ec_vendor_cost_professional_services,
+        COALESCE(SUM(ep.payment_amount_clp) FILTER (WHERE e.economic_category = 'regulatory_payment'), 0)::text AS ec_regulatory_payment,
+        COALESCE(SUM(ep.payment_amount_clp) FILTER (WHERE e.economic_category = 'tax'), 0)::text AS ec_tax,
+        COALESCE(SUM(ep.payment_amount_clp) FILTER (WHERE e.economic_category = 'financial_cost'), 0)::text AS ec_financial_cost,
+        COALESCE(SUM(ep.payment_amount_clp) FILTER (WHERE e.economic_category = 'bank_fee_real'), 0)::text AS ec_bank_fee_real,
+        COALESCE(SUM(ep.payment_amount_clp) FILTER (WHERE e.economic_category = 'overhead'), 0)::text AS ec_overhead,
+        COALESCE(SUM(ep.payment_amount_clp) FILTER (WHERE e.economic_category = 'financial_settlement'), 0)::text AS ec_financial_settlement,
+        COALESCE(SUM(ep.payment_amount_clp) FILTER (WHERE e.economic_category = 'other'), 0)::text AS ec_other,
+        COUNT(*) FILTER (WHERE e.economic_category IS NULL)::text AS ec_unresolved_count
       FROM greenhouse_finance.expense_payments_normalized ep
       INNER JOIN greenhouse_finance.expenses e ON e.expense_id = ep.expense_id
       WHERE ep.payment_date BETWEEN ${filter.fromDate}::date AND ${filter.toDate}::date
@@ -218,7 +265,21 @@ export const sumExpensePaymentsClpForPeriod = async (
     supplierClp: round(toNumber(row?.supplier_clp)),
     payrollClp: round(toNumber(row?.payroll_clp)),
     fiscalClp: round(toNumber(row?.fiscal_clp)),
-    driftCount: toNumber(row?.drift_count)
+    driftCount: toNumber(row?.drift_count),
+    byEconomicCategory: {
+      labor_cost_internal: round(toNumber(row?.ec_labor_cost_internal)),
+      labor_cost_external: round(toNumber(row?.ec_labor_cost_external)),
+      vendor_cost_saas: round(toNumber(row?.ec_vendor_cost_saas)),
+      vendor_cost_professional_services: round(toNumber(row?.ec_vendor_cost_professional_services)),
+      regulatory_payment: round(toNumber(row?.ec_regulatory_payment)),
+      tax: round(toNumber(row?.ec_tax)),
+      financial_cost: round(toNumber(row?.ec_financial_cost)),
+      bank_fee_real: round(toNumber(row?.ec_bank_fee_real)),
+      overhead: round(toNumber(row?.ec_overhead)),
+      financial_settlement: round(toNumber(row?.ec_financial_settlement)),
+      other: round(toNumber(row?.ec_other))
+    },
+    economicCategoryUnresolvedCount: toNumber(row?.ec_unresolved_count)
   }
 }
 

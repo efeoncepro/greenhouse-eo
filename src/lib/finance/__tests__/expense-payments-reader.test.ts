@@ -192,7 +192,21 @@ describe('expense-payments-reader (TASK-766 canonical CLP reader)', () => {
         supplierClp: 0,
         payrollClp: 0,
         fiscalClp: 0,
-        driftCount: 0
+        driftCount: 0,
+        byEconomicCategory: {
+          labor_cost_internal: 0,
+          labor_cost_external: 0,
+          vendor_cost_saas: 0,
+          vendor_cost_professional_services: 0,
+          regulatory_payment: 0,
+          tax: 0,
+          financial_cost: 0,
+          bank_fee_real: 0,
+          overhead: 0,
+          financial_settlement: 0,
+          other: 0
+        },
+        economicCategoryUnresolvedCount: 0
       })
     })
   })

@@ -2,6 +2,50 @@
 
 Catalogo canonico de eventos del sistema de outbox de Greenhouse. Cada evento se registra en `greenhouse_sync.outbox_events` y se publica a BigQuery via el consumer `outbox-publish`.
 
+## Delta 2026-05-03 — TASK-768: Economic Category Dimension audit events
+
+Dos eventos canonicos del dominio finance para hacer auditable las reclasificaciones manuales de `economic_category` (dimension analitica nueva, separada de `expense_type`/`income_type` fiscales). Los emite el endpoint admin de reclassify (Slice 6) y los consume el AI Observer + audit log.
+
+### `finance.expense.economic_category_changed`
+
+Aggregate type: `finance_expense`.
+
+Publisher: `src/app/api/admin/finance/expenses/[id]/economic-category/route.ts` (PATCH gated por capability granular `finance.expenses.reclassify_economic_category`, FINANCE_ADMIN + EFEONCE_ADMIN).
+
+Schema v1:
+
+```ts
+type FinanceExpenseEconomicCategoryChangedV1 = {
+  eventVersion: 'v1'
+  expenseId: string
+  previousCategory: ExpenseEconomicCategory | null  // null si era pre-backfill
+  newCategory: ExpenseEconomicCategory               // 11 valores enum canonicos
+  reason: string                                     // min 10 chars (audit trail)
+  bulkContext: string | null                         // si fue bulk reclassify
+  confidence: 'manual'                               // siempre manual via UI
+  matchedRule: 'manual_reclassify'                   // siempre, vs auto rules
+  actorUserId: string
+  changedAt: string                                  // ISO timestamp
+}
+```
+
+### `finance.income.economic_category_changed`
+
+Mirror para income. Aggregate type: `finance_income`. Schema mirror con `incomeId` + `IncomeEconomicCategory` (8 valores).
+
+Consumers (ambos):
+
+- **Audit log** — fuente de verdad de cuándo y quién reclasifico una fila (los UPDATEs `economic_category` no carry actor; el outbox sí + tabla append-only `economic_category_resolution_log`).
+- **Reliability AI Observer** — correlaciona la curación del signal `finance.expenses.economic_category_unresolved` con la acción humana que la cerró.
+- **Reliability dashboard** — útil para ver "manual queue → reclassify ejecutado → queue vacía" como cycle visible.
+
+Reglas:
+
+- `aggregate_id` = `expenseId` / `incomeId`.
+- Fire-and-forget: si el publish falla, el reclassify no se rollbackea. El endpoint loguea via `captureWithDomain('finance')` y devuelve 200 con `eventId: null`.
+- Idempotente: misma categoria no publica evento.
+- Steady state esperado: 0 events en ventana de 24h post-cleanup del manual queue inicial. Spikes se esperan durante onboarding o cuando emerge un nuevo proveedor que requiere clasificacion manual.
+
 ## Delta 2026-05-03 — TASK-766: CLP currency reader contract
 
 Un nuevo evento canónico del dominio finance para hacer auditable el path de reparación de payments con drift CLP (`currency != 'CLP' AND amount_clp IS NULL`). Lo emite el endpoint admin de slice 5 y lo consume el AI Observer + audit log.

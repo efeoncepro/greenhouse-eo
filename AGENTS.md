@@ -30,6 +30,21 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
 3. Dejar handoff claro para el siguiente agente.
 4. No mezclar refactors grandes con cambios funcionales pequenos.
 
+## Contrato rapido para agentes
+
+Este bloque es el resumen obligatorio antes de ejecutar cualquier cambio. Las secciones posteriores son la fuente detallada y no se deben ignorar cuando el dominio aplique.
+
+- Primero orientarse: leer `project_context.md`, `Handoff.md`, la task/spec aplicable y la arquitectura del dominio antes de escribir.
+- Protocolo TASK-###: usar `docs/tasks/TASK_PROCESS.md` como proceso canonico y `docs/operations/CODEX_EXECUTION_PROMPT_V1.md` como prompt operativo robusto para ejecucion con Codex.
+- Contexto y auditoria: `docs/operations/CONTEXT_HANDOFF_OPERATING_MODEL_V1.md` gobierna como usar `project_context.md`, `Handoff.md` y `Handoff.archive.md` sin perder memoria historica.
+- Source of truth: si task/spec, arquitectura y runtime real discrepan, prevalecen arquitectura vigente + codigo/schema/runtime verificados. Corregir la spec antes de implementar si el drift cambia contrato o bloquea.
+- Proporcionalidad: discovery breve para cambios locales; protocolo completo para cambios cross-domain, auth, billing, finance, data, cloud, migraciones, observabilidad o UI visible.
+- Reutilizar antes de crear: buscar helpers, readers, components, routes, signals, capabilities y docs existentes antes de introducir piezas nuevas.
+- Aislamiento multi-agente: no cambiar la rama de un checkout donde otra persona/agente trabaja; usar `git worktree` y documentar coordinacion en `Handoff.md`.
+- Skills y subagentes: usar skills cuando el dominio matchee y subagentes solo para trabajo paralelo independiente con ownership claro. No delegar el bloqueo inmediato del hilo principal.
+- Seguridad runtime: no improvisar credenciales, pools, env vars, access paths, bypasses, raw errors ni acciones destructivas. Usar los CLIs autenticados con guardrails.
+- Verificacion y cierre: validar con build/lint/test/manual segun aplique, documentar lo no validado, sincronizar docs/task lifecycle y no declarar cerrado algo que siga incompleto.
+
 ## Reglas Operativas
 
 ### 0. Tooling disponible (CLIs autenticadas)
@@ -53,12 +68,22 @@ Estos CLIs estan autenticados localmente. Cuando una task toca su dominio, **usa
 - Leer `project_context.md`.
 - Leer `Handoff.md` para ver trabajo en curso, riesgos y proximos pasos.
 - Usar `Handoff.archive.md` solo si hace falta rastrear contexto historico; no como primera lectura operativa.
+- Para continuidad entre agentes, auditoria historica y compresion segura del handoff, aplicar `docs/operations/CONTEXT_HANDOFF_OPERATING_MODEL_V1.md`. No borrar historia auditable; moverla o enlazarla cuando corresponda.
+- Leer `DESIGN.md` cuando el cambio toque cualquier surface visible o decision visual del portal.
 - Leer la especificacion externa `../Greenhouse_Portal_Spec_v1.md` cuando el cambio afecte producto, autenticacion, data, rutas principales o arquitectura.
 - Si el trabajo requiere specs o briefs, buscarlos primero en `docs/README.md` y luego en la categoria correspondiente dentro de `docs/`.
 - Si existe una auditoria relevante en `docs/audits/` para la zona que vas a tocar, leerla temprano y usarla como contexto operativo; antes de confiar en sus conclusiones, validar si sus hallazgos siguen vigentes en el codebase/runtime actual.
 - Si el trabajo nace de una task del sistema (`TASK-###` nueva o `CODEX_TASK_*` legacy), revisar obligatoriamente la arquitectura antes de implementar:
   - minimo: `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md` y `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
   - ademas: toda arquitectura especializada que aplique al task, por ejemplo identidad, finance, service modules o multitenancy
+- **Source of truth canonico**:
+  - si hay conflicto entre la task, la arquitectura vigente y el runtime/codigo/schema real, prevalece arquitectura + runtime real
+  - si la spec/task esta desactualizada y el drift cambia contrato o bloquea implementacion, corregir primero la task/spec antes de escribir codigo
+  - si el drift no bloquea, documentarlo explicitamente en el handoff/plan y seguir con la implementacion alineada al estado real del repo
+- **Regla de proporcionalidad**:
+  - tasks pequenas/locales pueden hacer discovery, audit y plan de forma breve
+  - tasks cross-domain, shared runtime, migraciones, access model, observabilidad o UI visible deben aplicar el protocolo completo con mayor rigor
+  - cambios sensibles en finance, payroll, auth, billing, cloud, data o produccion deben tratarse como de alto rigor aunque el diff parezca pequeno
 - Si el trabajo toca permisos, navegacion, Home, menu, guards, surfaces por rol o diseño de nuevas capacidades:
   - revisar `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md`
   - revisar `docs/architecture/GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md`
@@ -84,6 +109,14 @@ Estos CLIs estan autenticados localmente. Cuando una task toca su dominio, **usa
   - correr `pnpm pg:doctor` antes de asumir que el acceso esta sano
 - Si una task del sistema contradice la arquitectura vigente, no implementarla tal cual; corregir primero la task o documentar la nueva decision arquitectonica.
 - Si el cambio es UI, UX o seleccion de componentes, usar como criterio operativo los skills locales vigentes (`greenhouse-agent`, `greenhouse-portal-ui-implementer`, `greenhouse-ui-orchestrator` o `greenhouse-vuexy-ui-expert`), revisar `full-version` junto con la documentacion oficial de Vuexy antes de inventar componentes nuevos y leer `DESIGN.md` en raiz como contrato visual legible por agentes.
+- **Regla de reutilizacion**:
+  - reutilizar helpers, readers, components, routes, signals y primitives existentes antes de crear nuevos
+  - no inventar access paths paralelos si ya existe un path canonico del repo para ese dominio
+- **Skills y subagentes**:
+  - cuando el trabajo matchee un skill disponible del entorno, usarlo antes de escribir en ese dominio
+  - usar el conjunto minimo de skills que cubra el trabajo; no cargarlos por reflejo
+  - usar subagentes solo cuando haya trabajo independiente, no bloqueante y con ownership claro de archivos o preguntas
+  - no delegar a subagentes el paso critico inmediato del que depende la siguiente accion local
 - Si el cambio crea o modifica skills locales para agentes:
   - skills de Codex viven en `.codex/skills/<skill-name>/SKILL.md`
   - skills de Claude viven en `.claude/skills/<skill-name>/SKILL.md` (mayuscula — convencion oficial vigente de Claude/Agent Skills)
@@ -136,6 +169,9 @@ Estos CLIs estan autenticados localmente. Cuando una task toca su dominio, **usa
   - El helper canonico de render para UI es `src/test/render.tsx`.
   - Priorizar tests unitarios en logica de dominio (`src/lib/**`) y componentes UI compartidos antes de sumar suites mas pesadas.
 - Si no se pudo validar, registrar exactamente que no se valido y por que en `Handoff.md`.
+- **Regla de cierre**:
+  - no declarar una task/cambio como cerrado sin dejar explicito que cambio, que se reutilizo, que se valido, que no se pudo validar, riesgos/follow-ups y que docs se actualizaron
+  - si la implementacion termino pero el `Lifecycle`, la carpeta de la task y la documentacion viva no quedaron sincronizados, el trabajo no debe presentarse como realmente cerrado
 
 ### 6. Regla de despliegue
 

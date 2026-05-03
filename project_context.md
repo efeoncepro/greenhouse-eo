@@ -1,3 +1,15 @@
+## Estado vigente para agentes
+
+- `AGENTS.md` y `CLAUDE.md` son los puntos de entrada operativos para agentes; ambos deben mantenerse alineados cuando cambie un contrato transversal.
+- `docs/operations/CONTEXT_HANDOFF_OPERATING_MODEL_V1.md` gobierna la convivencia entre `project_context.md`, `Handoff.md` y `Handoff.archive.md`: no se pierde auditoria, se separa estado activo de historia.
+- `project_context.md` debe leerse como estado vigente + deltas historicos. Si un delta antiguo contradice esta cabecera, `AGENTS.md`, arquitectura vigente o runtime real, prevalece el contrato vigente y debe documentarse el drift.
+- `Handoff.md` sigue siendo util para construir: contiene contexto operacional rico. No debe recortarse ni archivarse agresivamente sin preservar texto completo y dejar referencias.
+- `Handoff.archive.md` es la caja negra historica para auditoria de resoluciones; una entrada antigua no debe tratarse como source of truth vigente sin contrastar con task, issue, arquitectura, codigo y runtime.
+- `docs/operations/CODEX_EXECUTION_PROMPT_V1.md` es el prompt robusto para ejecucion Codex de `TASK-###`; no reemplaza las reglas del repo, las comprime.
+- `docs/tasks/TASK_PROCESS.md` sigue gobernando lifecycle de tasks; una task no esta cerrada si carpeta, `Lifecycle`, README y docs vivas no estan sincronizados.
+- Para verificar higiene de contexto sin modificar archivos, usar `pnpm docs:context-check`. El check es no destructivo por defecto y existe para avisar drift, no para borrar memoria.
+- Preview/Staging/Production vigentes deben seguir lo declarado en `AGENTS.md` y `RELEASE_CHANNELS_OPERATING_MODEL_V1.md`; si un delta antiguo de Vercel contradice esos contratos, tratarlo como historia y revalidar con Vercel CLI/runtime.
+
 ## Delta 2026-05-01 DESIGN.md adoption for agent-facing UI contract
 
 - El repo ahora versiona `DESIGN.md` en la raiz como contrato visual legible por agentes.

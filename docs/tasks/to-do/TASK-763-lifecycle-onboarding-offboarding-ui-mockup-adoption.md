@@ -26,6 +26,10 @@
 
 Implementa la shell UI aprobada del módulo `Lifecycle / Onboarding & Offboarding` usando el mockup validado en `docs/mockups/onboarding-module-mockup.html` como referencia visual canónica. La task aterriza la experiencia admin (`HR > Onboarding & Offboarding`), el editor de plantillas, la vista `My Onboarding` y la card compacta en `People 360`, preservando explícitamente que onboarding y offboarding son dos carriles visibles del mismo módulo y no un checklist genérico.
 
+## Delta 2026-05-03 — People 360 debe distinguir contrato, salida y desactivación
+
+La revisión del codebase confirmó que People hoy expone `hireDate` y `contractEndDate`, pero no una fecha canónica de término laboral. Esta UI debe preparar la ficha para leer el lifecycle desde `WorkRelationshipOffboardingCase` y no presentar `Desactivar` como equivalente a offboarding.
+
 ## Why This Task Exists
 
 La foundation funcional y documental del dominio existe en piezas separadas:
@@ -76,6 +80,8 @@ Reglas obligatorias:
   - `views` / route surface visible
   - `entitlements` / acciones finas
 - La UI no debe implicar que el carril de offboarding ya tiene motor completo de finiquitos si ese runtime todavía no existe.
+- La UI debe distinguir `Fin de contrato` de `Salida programada` y `Último día trabajado`.
+- La acción `Desactivar` no debe mostrarse como acción primaria de offboarding laboral; si aparece, debe quedar como operación administrativa/de acceso con copy de advertencia.
 - Reusar componentes compartidos cuando el patrón se repita; no copiar el mockup de forma literal ni introducir HTML paralelo.
 
 ## Normative Docs
@@ -130,6 +136,7 @@ Reglas obligatorias:
 - Offboarding aún tiende a quedar diluido o tratado como checklist secundario.
 - No hay un detail-shell moderno ni roster operativo con la jerarquía aprobada.
 - No existe hoy una card compacta explícita para `People 360`.
+- People/HR profile no tiene salida laboral canónica en runtime; la card debe consumir un read-model de `TASK-760` cuando exista.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -176,10 +183,12 @@ Reglas obligatorias:
 - Pipeline/case lane de salidas con:
   - causal
   - fecha efectiva
+  - último día trabajado
   - access lane
   - handoff
   - payroll/document lane
 - La UI debe dejar claro que una salida no es solo revocar usuario
+- Si solo existe `contractEndDate`, mostrarlo como señal contractual o caso `needs_review`, no como offboarding ejecutado
 
 ### Slice 4 — Templates editor
 
@@ -192,6 +201,8 @@ Reglas obligatorias:
 - Vista self-service `My Onboarding`
 - Card compacta de progreso en `People 360`
 - Estados explícitos: pending, blocked, completed, partial
+- Card lifecycle en People 360 con fecha de ingreso, fin de contrato si existe, salida programada desde `effective_date`, último día trabajado desde `last_working_day` y estado del caso de offboarding.
+- CTA autorizado `Iniciar offboarding` cuando no exista caso activo y la persona tenga relación laboral vigente
 
 ## Out of Scope
 
@@ -254,6 +265,7 @@ Usar el criterio aprobado por skills:
 - [ ] `My Onboarding` y la card de `People 360` quedan implementadas.
 - [ ] El editor de plantillas sigue un patrón list-detail consistente con el mockup.
 - [ ] La implementación no implica capacidades de finiquito todavía no entregadas.
+- [ ] People 360 no confunde `contractEndDate`, salida efectiva y desactivación de usuario.
 
 ## Verification
 

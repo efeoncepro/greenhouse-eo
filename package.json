@@ -11,6 +11,8 @@
     "design:lint": "design.md lint DESIGN.md",
     "design:diff": "design.md diff DESIGN.md DESIGN.prev.md",
     "design:export:tailwind": "design.md export --format tailwind DESIGN.md",
+    "docs:context-check": "node scripts/check-context-handoff.mjs",
+    "docs:context-check:strict": "node scripts/check-context-handoff.mjs --strict",
     "start": "node scripts/run-next-start.mjs",
     "prelint": "pnpm build:icons",
     "lint": "eslint .",

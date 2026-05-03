@@ -3558,6 +3558,36 @@ export interface GreenhouseFinanceCostAllocations {
   updated_at: Generated<Timestamp | null>;
 }
 
+export interface GreenhouseFinanceEconomicCategoryManualQueue {
+  candidate_category: string | null;
+  candidate_confidence: string | null;
+  candidate_evidence: Generated<Json | null>;
+  candidate_rule: string | null;
+  created_at: Generated<Timestamp>;
+  queue_id: string;
+  resolution_note: string | null;
+  resolved_at: Timestamp | null;
+  resolved_by: string | null;
+  status: Generated<string>;
+  target_id: string;
+  target_kind: string;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseFinanceEconomicCategoryResolutionLog {
+  batch_id: string | null;
+  confidence: string;
+  created_at: Generated<Timestamp>;
+  evidence_json: Generated<Json>;
+  log_id: string;
+  matched_rule: string;
+  resolved_at: Generated<Timestamp>;
+  resolved_by: string;
+  resolved_category: string;
+  target_id: string;
+  target_kind: string;
+}
+
 export interface GreenhouseFinanceEconomicIndicators {
   created_at: Generated<Timestamp>;
   frequency: string | null;
@@ -3672,8 +3702,10 @@ export interface GreenhouseFinanceExpensePayments {
 
 export interface GreenhouseFinanceExpensePaymentsNormalized {
   created_at: Timestamp | null;
+  economic_category: string | null;
   exchange_rate_at_payment: Numeric | null;
   expense_id: string | null;
+  expense_type: string | null;
   fx_gain_loss_clp: Numeric | null;
   has_clp_drift: boolean | null;
   is_reconciled: boolean | null;
@@ -3722,6 +3754,10 @@ export interface GreenhouseFinanceExpenses {
   dte_folio: string | null;
   dte_type_code: string | null;
   due_date: Timestamp | null;
+  /**
+   * TASK-768: dimension analitica/operativa. Valores canonicos: labor_cost_internal | labor_cost_external | vendor_cost_saas | vendor_cost_professional_services | regulatory_payment | tax | financial_cost | bank_fee_real | overhead | financial_settlement | other. NULLABLE pre-cutover; CHECK NOT NULL post-cutover (Slice 4). Distinta de expense_type (taxonomia fiscal/SII).
+   */
+  economic_category: string | null;
   /**
    * Canonical operational cost in document currency: subtotal + non_recoverable_tax_amount.
    */
@@ -3990,6 +4026,10 @@ export interface GreenhouseFinanceIncome {
   dte_type_code: string | null;
   dte_type_name: string | null;
   due_date: Timestamp | null;
+  /**
+   * TASK-768: dimension analitica/operativa. Valores canonicos: service_revenue | client_reimbursement | factoring_proceeds | partner_payout_offset | internal_transfer_in | tax_refund | financial_income | other. NULLABLE pre-cutover; CHECK NOT NULL post-cutover (Slice 4).
+   */
+  economic_category: string | null;
   exchange_rate_to_clp: Numeric | null;
   exempt_amount: Numeric | null;
   hes_id: string | null;
@@ -4165,10 +4205,12 @@ export interface GreenhouseFinanceIncomePayments {
 
 export interface GreenhouseFinanceIncomePaymentsNormalized {
   created_at: Timestamp | null;
+  economic_category: string | null;
   exchange_rate_at_payment: Numeric | null;
   fx_gain_loss_clp: Numeric | null;
   has_clp_drift: boolean | null;
   income_id: string | null;
+  income_type: string | null;
   is_reconciled: boolean | null;
   payment_account_id: string | null;
   payment_amount_clp: Numeric | null;
@@ -4234,6 +4276,26 @@ export interface GreenhouseFinanceInternalAccountTypeCatalog {
   family: string;
   is_active: Generated<boolean>;
   type_code: string;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseFinanceKnownPayrollVendors {
+  active: Generated<boolean>;
+  created_at: Generated<Timestamp>;
+  display_name: string;
+  match_regex: string;
+  updated_at: Generated<Timestamp>;
+  vendor_id: string;
+  vendor_type: Generated<string>;
+}
+
+export interface GreenhouseFinanceKnownRegulators {
+  active: Generated<boolean>;
+  created_at: Generated<Timestamp>;
+  display_name: string;
+  jurisdiction: Generated<string>;
+  match_regex: string;
+  regulator_id: string;
   updated_at: Generated<Timestamp>;
 }
 
@@ -7855,6 +7917,8 @@ export interface DB {
   "greenhouse_finance.client_economics": GreenhouseFinanceClientEconomics;
   "greenhouse_finance.client_profiles": GreenhouseFinanceClientProfiles;
   "greenhouse_finance.cost_allocations": GreenhouseFinanceCostAllocations;
+  "greenhouse_finance.economic_category_manual_queue": GreenhouseFinanceEconomicCategoryManualQueue;
+  "greenhouse_finance.economic_category_resolution_log": GreenhouseFinanceEconomicCategoryResolutionLog;
   "greenhouse_finance.economic_indicators": GreenhouseFinanceEconomicIndicators;
   "greenhouse_finance.exchange_rates": GreenhouseFinanceExchangeRates;
   "greenhouse_finance.expense_attribution_audit": GreenhouseFinanceExpenseAttributionAudit;
@@ -7876,6 +7940,8 @@ export interface DB {
   "greenhouse_finance.instrument_category_kpi_rules": GreenhouseFinanceInstrumentCategoryKpiRules;
   "greenhouse_finance.instrument_category_provider_rules": GreenhouseFinanceInstrumentCategoryProviderRules;
   "greenhouse_finance.internal_account_type_catalog": GreenhouseFinanceInternalAccountTypeCatalog;
+  "greenhouse_finance.known_payroll_vendors": GreenhouseFinanceKnownPayrollVendors;
+  "greenhouse_finance.known_regulators": GreenhouseFinanceKnownRegulators;
   "greenhouse_finance.loan_accounts": GreenhouseFinanceLoanAccounts;
   "greenhouse_finance.nubox_emission_log": GreenhouseFinanceNuboxEmissionLog;
   "greenhouse_finance.payment_instrument_admin_audit_log": GreenhouseFinancePaymentInstrumentAdminAuditLog;

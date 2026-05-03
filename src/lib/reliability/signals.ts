@@ -1011,3 +1011,19 @@ export const buildFinanceClpDriftSignals = async (
 
   return [expense, income]
 }
+
+/**
+ * TASK-768 Slice 7 — builder canonico de signals "economic_category_unresolved"
+ * para expenses + income. Mismo patron que buildFinanceClpDriftSignals.
+ * Subsystem rollup: finance_data_quality.
+ */
+export const buildFinanceEconomicCategoryUnresolvedSignals = async (
+  readers: {
+    expenses: () => Promise<ReliabilitySignal>
+    income: () => Promise<ReliabilitySignal>
+  }
+): Promise<ReliabilitySignal[]> => {
+  const [expenses, income] = await Promise.all([readers.expenses(), readers.income()])
+
+  return [expenses, income]
+}

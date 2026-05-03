@@ -198,13 +198,20 @@ export async function GET(request: Request) {
         totalPaidClp: summary.totalClp,
         totalPayments: summary.totalPayments,
         unreconciledCount: summary.unreconciledCount,
+        // Legacy buckets (TASK-766 — preserved for backwards-compat).
         supplierTotalClp: summary.supplierClp,
         payrollTotalClp: summary.payrollClp,
         fiscalTotalClp: summary.fiscalClp,
         // TASK-766 — drift count expuesto al UI para que un valor > 0 sea
         // visible (preludio del banner reliability + reparable via
         // POST /api/admin/finance/payments-clp-repair).
-        driftCount: summary.driftCount
+        driftCount: summary.driftCount,
+        // TASK-768 — breakdown analitico canonico por economic_category.
+        // UI debe migrar a leer estos campos para mostrar Nomina/Proveedores/Fiscal
+        // correctamente clasificados (resuelve mis-clasificacion ~$3M abril 2026).
+        // Total Nomina canonico = labor_cost_internal + labor_cost_external.
+        byEconomicCategory: summary.byEconomicCategory,
+        economicCategoryUnresolvedCount: summary.economicCategoryUnresolvedCount
       }
     })
   } catch (error) {
