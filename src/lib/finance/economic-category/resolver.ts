@@ -222,9 +222,33 @@ export const resolveExpenseEconomicCategory = async (
     }
 
     // Rule 6 — known regulator (Previred, AFP, Mutual, SII, FONASA, Isapre)
+    //
+    // Importante: SII (Servicio de Impuestos Internos) matchea esta regla
+    // pero semánticamente NO es regulatory_payment — es `tax` (pago directo
+    // de impuestos). Si el accounting_type ya viene 'tax', priorizamos esa
+    // semántica fiscal por encima del regex regulator. Para los demás
+    // reguladores (Previred, AFP, Isapre, Mutual, FONASA, TGR), la
+    // categoría correcta SÍ es regulatory_payment.
     const regulator = await lookupKnownRegulator(textForRegex)
 
     if (regulator) {
+      const isSiiMatch = regulator.regulatorId === 'reg-cl-sii'
+      const accountingHintsTax = input.accountingType === 'tax'
+
+      if (isSiiMatch || accountingHintsTax) {
+        return {
+          category: 'tax',
+          confidence: 'high',
+          matchedRule: 'KNOWN_REGULATOR_REGEX_SII_TAX',
+          evidence: {
+            ...evidence,
+            regulator_id: regulator.regulatorId,
+            regulator_name: regulator.displayName,
+            reason: 'SII match → tax category (fiscal direct payment, NOT regulatory)'
+          }
+        }
+      }
+
       return {
         category: 'regulatory_payment',
         confidence: 'high',

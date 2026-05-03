@@ -74,16 +74,31 @@ describe('expense-payments-reader (TASK-766 canonical CLP reader)', () => {
       // Caso real del incidente 2026-05-02: 1 payment HubSpot CCA $1,106,321 CLP
       // sobre un expense USD con rate 910.55. El SQL broken devolvía
       // $1,007,363,090 fantasma. La VIEW devuelve $1,106,321 canonical.
+      //
+      // TASK-768 followup — campos legacy se computan desde economic_category:
+      //   payrollClp  = labor_cost_internal + labor_cost_external
+      //   fiscalClp   = tax + regulatory_payment
+      //   supplierClp = vendor_cost_saas + vendor_cost_professional_services + overhead
       queuedResults.push({
         rows: [
           {
             total_clp: '11546493.17',
             total_payments: '37',
             unreconciled_count: '37',
-            supplier_clp: '5321241.00',
-            payroll_clp: '1432644.17',
-            fiscal_clp: '4308114.00',
-            drift_count: '0'
+            drift_count: '0',
+            // Mapping canónico hipotético del dataset post-resolver
+            ec_labor_cost_internal: '432644.17',
+            ec_labor_cost_external: '1000000.00',
+            ec_vendor_cost_saas: '4321241.00',
+            ec_vendor_cost_professional_services: '500000.00',
+            ec_regulatory_payment: '300000.00',
+            ec_tax: '4008114.00',
+            ec_financial_cost: '0',
+            ec_bank_fee_real: '0',
+            ec_overhead: '500000.00',
+            ec_financial_settlement: '0',
+            ec_other: '484493.99',
+            ec_unresolved_count: '0'
           }
         ]
       })
@@ -96,14 +111,62 @@ describe('expense-payments-reader (TASK-766 canonical CLP reader)', () => {
       // Anti-regresión hard: si volvieran los $1B fantasma el helper debería
       // devolverlos. Confirmamos el shape canónico.
       expect(summary.totalClp).toBe(11_546_493.17)
-      expect(summary.supplierClp).toBe(5_321_241)
+      // Legacy fields ahora se computan desde economic_category:
+      //   payrollClp = 432644.17 + 1000000 = 1432644.17
+      //   fiscalClp = 4008114 + 300000 = 4308114
+      //   supplierClp = 4321241 + 500000 + 500000 = 5321241
       expect(summary.payrollClp).toBe(1_432_644.17)
       expect(summary.fiscalClp).toBe(4_308_114)
+      expect(summary.supplierClp).toBe(5_321_241)
       expect(summary.totalPayments).toBe(37)
       expect(summary.driftCount).toBe(0)
 
       // El total NUNCA puede aproximarse a $1B con un dataset pequeño.
       expect(summary.totalClp).toBeLessThan(20_000_000)
+    })
+
+    it('TASK-768 anti-regresion: payrollClp computed from labor_cost_internal + labor_cost_external (NOT expense_type)', async () => {
+      // Escenario abril 2026 real: KPI Nomina sub-counted en $3M cuando se
+      // leía de expense_type='payroll' (~$1M). Post-fix: lectura desde
+      // economic_category captura los pagos labor mal-clasificados como
+      // supplier (Daniela España, Andrés Colombia, Valentina, Humberly,
+      // Melkin via Deel, FX fees Global66 con context payroll).
+      queuedResults.push({
+        rows: [
+          {
+            total_clp: '11143931.00',
+            total_payments: '35',
+            unreconciled_count: '35',
+            drift_count: '0',
+            ec_labor_cost_internal: '470000',  // ECG Chile (Luis, Humberly anticipo, Valentina)
+            ec_labor_cost_external: '3597092', // Daniela + Andrés + Melkin via Deel + FX fees
+            ec_vendor_cost_saas: '500000',
+            ec_vendor_cost_professional_services: '101150',
+            ec_regulatory_payment: '276223',   // Previred
+            ec_tax: '4308114',                 // SII
+            ec_financial_cost: '102073',
+            ec_bank_fee_real: '19522',
+            ec_overhead: '0',
+            ec_financial_settlement: '0',
+            ec_other: '1769757',
+            ec_unresolved_count: '0'
+          }
+        ]
+      })
+
+      const summary = await sumExpensePaymentsClpForPeriod({
+        fromDate: '2026-04-01',
+        toDate: '2026-04-30'
+      })
+
+      // KPI Nomina canonico: ~$4M (vs $1.03M pre-fix sub-counted)
+      expect(summary.payrollClp).toBe(4_067_092)
+      expect(summary.payrollClp).toBeGreaterThan(3_500_000)
+      // El total se mantiene (cambia solo distribución entre buckets)
+      expect(summary.totalClp).toBe(11_143_931)
+      // byEconomicCategory expone la dimensión rica para consumers nuevos
+      expect(summary.byEconomicCategory.labor_cost_internal).toBe(470_000)
+      expect(summary.byEconomicCategory.labor_cost_external).toBe(3_597_092)
     })
 
     it('emits drift_count signal for non-CLP payments without amount_clp', async () => {

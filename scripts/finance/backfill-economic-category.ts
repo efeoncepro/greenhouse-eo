@@ -197,7 +197,14 @@ const processExpenses = async (options: CliOptions): Promise<BackfillSummary> =>
           continue
         }
 
-        const persistDirectly = result.confidence === 'high' || result.confidence === 'medium'
+        // TASK-768 followup: SIEMPRE persistimos el best-guess del resolver
+        // (incluso confidence low/manual_required) para que la UI no quede
+        // con KPIs en $0. Adicionalmente, casos low/manual_required entran
+        // al manual queue para revisión humana — el operador puede afinar
+        // la clasificación, pero mientras tanto los KPIs tienen un valor
+        // razonable que respeta la decisión del resolver.
+        const needsManualReview =
+          result.confidence === 'low' || result.confidence === 'manual_required'
 
         await withTransaction(async client => {
           await client.query(
@@ -218,15 +225,15 @@ const processExpenses = async (options: CliOptions): Promise<BackfillSummary> =>
             ]
           )
 
-          if (persistDirectly) {
-            await client.query(
-              `UPDATE greenhouse_finance.expenses
-                 SET economic_category = $1
-               WHERE expense_id = $2 AND economic_category IS NULL`,
-              [result.category, row.expense_id]
-            )
-            summary.resolved += 1
-          } else {
+          await client.query(
+            `UPDATE greenhouse_finance.expenses
+               SET economic_category = $1
+             WHERE expense_id = $2 AND economic_category IS NULL`,
+            [result.category, row.expense_id]
+          )
+          summary.resolved += 1
+
+          if (needsManualReview) {
             await client.query(
               `INSERT INTO greenhouse_finance.economic_category_manual_queue
                  (queue_id, target_kind, target_id, candidate_category,
@@ -296,7 +303,9 @@ const processIncome = async (options: CliOptions): Promise<BackfillSummary> => {
           continue
         }
 
-        const persistDirectly = result.confidence === 'high' || result.confidence === 'medium'
+        // TASK-768 followup: persistir SIEMPRE + enqueue manual queue para review
+        const needsManualReview =
+          result.confidence === 'low' || result.confidence === 'manual_required'
 
         await withTransaction(async client => {
           await client.query(
@@ -317,15 +326,15 @@ const processIncome = async (options: CliOptions): Promise<BackfillSummary> => {
             ]
           )
 
-          if (persistDirectly) {
-            await client.query(
-              `UPDATE greenhouse_finance.income
-                 SET economic_category = $1
-               WHERE income_id = $2 AND economic_category IS NULL`,
-              [result.category, row.income_id]
-            )
-            summary.resolved += 1
-          } else {
+          await client.query(
+            `UPDATE greenhouse_finance.income
+               SET economic_category = $1
+             WHERE income_id = $2 AND economic_category IS NULL`,
+            [result.category, row.income_id]
+          )
+          summary.resolved += 1
+
+          if (needsManualReview) {
             await client.query(
               `INSERT INTO greenhouse_finance.economic_category_manual_queue
                  (queue_id, target_kind, target_id, candidate_category,
