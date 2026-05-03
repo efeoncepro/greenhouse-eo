@@ -46,6 +46,7 @@ interface CliOptions {
   fromDate: string
   toDate?: string
   dryRun: boolean
+  evidenceGuard: 'block_on_reconciled_drift' | 'warn_only' | 'off'
 }
 
 const parseArgs = (): CliOptions => {
@@ -55,6 +56,7 @@ const parseArgs = (): CliOptions => {
   const accountIdArg = args.find(a => a.startsWith('--account-id='))
   const fromDateArg = args.find(a => a.startsWith('--from-date='))
   const toDateArg = args.find(a => a.startsWith('--to-date='))
+  const evidenceGuardArg = args.find(a => a.startsWith('--evidence-guard='))
 
   if (!accountIdArg) {
     console.error('ERROR: --account-id=<id> es requerido')
@@ -70,6 +72,16 @@ const parseArgs = (): CliOptions => {
   const accountId = accountIdArg.split('=')[1].trim()
   const fromDate = fromDateArg.split('=')[1].trim()
   const toDate = toDateArg?.split('=')[1].trim()
+  const evidenceGuardRaw = evidenceGuardArg?.split('=')[1].trim() ?? 'block_on_reconciled_drift'
+
+  if (!['block_on_reconciled_drift', 'warn_only', 'off'].includes(evidenceGuardRaw)) {
+    console.error(`ERROR: --evidence-guard debe ser 'block_on_reconciled_drift'|'warn_only'|'off', recibido: ${evidenceGuardRaw}`)
+    console.error('  Default: block_on_reconciled_drift (canónico, respeta snapshots reconciliation aceptados).')
+    console.error('  Use warn_only/off SOLO en recovery one-time post-bug-fix donde el snapshot quedo obsoleto.')
+    process.exit(1)
+  }
+
+  const evidenceGuard = evidenceGuardRaw as CliOptions['evidenceGuard']
 
   if (!/^\d{4}-\d{2}-\d{2}$/.test(fromDate)) {
     console.error(`ERROR: --from-date debe ser YYYY-MM-DD, recibido: ${fromDate}`)
@@ -81,18 +93,27 @@ const parseArgs = (): CliOptions => {
     process.exit(1)
   }
 
-  return { accountId, fromDate, toDate, dryRun }
+  return { accountId, fromDate, toDate, dryRun, evidenceGuard }
 }
 
 const main = async () => {
   const opts = parseArgs()
 
   console.log('─── TASK-774 Slice 5 — backfill account_balances FX fix ───')
-  console.log(`  account_id:  ${opts.accountId}`)
-  console.log(`  from_date:   ${opts.fromDate}`)
-  console.log(`  to_date:     ${opts.toDate ?? 'today'}`)
-  console.log(`  mode:        ${opts.dryRun ? 'DRY-RUN (no writes)' : 'LIVE (rematerializa account_balances)'}`)
+  console.log(`  account_id:      ${opts.accountId}`)
+  console.log(`  from_date:       ${opts.fromDate}`)
+  console.log(`  to_date:         ${opts.toDate ?? 'today'}`)
+  console.log(`  evidence_guard:  ${opts.evidenceGuard}`)
+  console.log(`  mode:            ${opts.dryRun ? 'DRY-RUN (no writes)' : 'LIVE (rematerializa account_balances)'}`)
   console.log('')
+
+  if (opts.evidenceGuard !== 'block_on_reconciled_drift') {
+    console.log(`⚠️  evidenceGuard=${opts.evidenceGuard} declarado explicitamente.`)
+    console.log('   Esto bypass el guardrail TASK-721 que protege snapshots reconciliation aceptados.')
+    console.log('   Usar SOLO en recovery one-time post-bug-fix donde el snapshot quedo obsoleto.')
+    console.log('   El snapshot original se preserva intacto como audit historico.')
+    console.log('')
+  }
 
   if (opts.dryRun) {
     console.log('Dry-run: NO se ejecuta rematerializeAccountBalanceRange.')
@@ -108,7 +129,8 @@ const main = async () => {
       seedDate: opts.fromDate,
       openingBalance: 0,
       endDate: opts.toDate,
-      seedMode: 'active_otb'
+      seedMode: 'active_otb',
+      evidenceGuard: { mode: opts.evidenceGuard }
     })
 
     const durationMs = Date.now() - startMs

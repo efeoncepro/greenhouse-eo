@@ -54,12 +54,17 @@ const QUERY_SQL = `
         THEN COALESCE(sl.amount_clp, CASE WHEN sl.currency = 'CLP' THEN sl.amount END)
         ELSE 0 END), 0) AS expected_settlement_out
     FROM greenhouse_finance.account_balances ab
+    INNER JOIN greenhouse_finance.accounts a ON a.account_id = ab.account_id
     LEFT JOIN greenhouse_finance.settlement_legs sl
       ON sl.instrument_id = ab.account_id
       AND sl.transaction_date = ab.balance_date
       AND sl.superseded_at IS NULL
       AND sl.superseded_by_otb_id IS NULL
     WHERE ab.balance_date >= CURRENT_DATE - INTERVAL '90 days'
+      -- TASK-774 Slice 7b: solo comparar cuentas CLP nativas. Cuentas USD/EUR
+      -- nativas tienen period_inflows/outflows en moneda nativa (NO en CLP)
+      -- y compararlas contra payment_amount_clp generaria falsos positivos.
+      AND a.currency = 'CLP'
     GROUP BY ab.account_id, ab.balance_date, ab.period_inflows, ab.period_outflows
   ),
   expected_payments AS (
