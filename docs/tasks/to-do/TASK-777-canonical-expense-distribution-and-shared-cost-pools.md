@@ -71,6 +71,9 @@ Reglas obligatorias:
 - `operational_pl` no debe seguir absorbiendo costos financieros, regulatorios o provider-payroll dentro del bucket genérico `overhead_clp`.
 - La política de pool compartido debe ser versionable por período y quedar auditable; no puede depender de un query inline opaco dentro de `member-capacity-economics`.
 - `Previred`, `Deel`, Global66, fees bancarios, factoring y otros processors deben respetar el boundary ya formalizado en `Payment Orders` / treasury. No inventar ledgers alternos ni mover cash de la cuenta pagadora real.
+- **No-breakage treasury rule:** esta task NO puede alterar saldos bancarios, account balances, payment ledgers, settlement legs, conciliación bancaria, Payment Orders ni readers CLP-normalizados que ya funcionan. Su alcance es distribución económica/management accounting sobre facts existentes.
+- `TASK-766`, `TASK-774` y `TASK-765` son baseline de integridad que debe preservarse: ningún cambio de esta task puede reintroducir recomputos inline de CLP, paid-without-bank-impact, drift de `account_balances` o movimientos de caja sin settlement/ledger canónico.
+- Cualquier modificación que toque `account_balances`, `expense_payments`, `income_payments`, `settlement_legs`, `payment_orders`, `bank_statement_rows`, `reconciliation_periods` o materializers de banco queda fuera del camino feliz de TASK-777 y requiere mini-plan explícito de compatibilidad + detector antes/después.
 - La IA solo puede operar como advisory layer: propone `distribution_lane`, rationale, confidence, evidence y/o regla candidata, pero nunca puede cerrar períodos, modificar snapshots cerrados, escribir al P&L ni materializar reglas sin aprobación humana o gate explícito.
 - Toda invocación IA debe ser trazable con `model_id`, `prompt_version`, `prompt_hash`, payload minimizado/sanitizado, output JSON validado, confidence, evidence y decisión humana posterior cuando aplique.
 - Debe existir kill-switch runtime para la capa IA. Con IA deshabilitada, el resolver determinístico y la cola `manual_required` deben seguir funcionando.
@@ -86,7 +89,10 @@ Reglas obligatorias:
 
 ### Depends on
 
+- `docs/tasks/complete/TASK-765-payment-order-bank-settlement-resilience.md` `[baseline no-breakage: paid order -> bank impact atomico]`
+- `docs/tasks/complete/TASK-766-finance-clp-currency-reader-contract.md` `[baseline no-breakage: CLP normalized payment readers]`
 - `docs/tasks/complete/TASK-768-finance-expense-economic-category-dimension.md`
+- `docs/tasks/complete/TASK-774-account-balance-clp-native-reader-contract.md` `[baseline no-breakage: account_balances FX consistency]`
 - `docs/tasks/to-do/TASK-176-labor-provisions-fully-loaded-cost.md`
 - `docs/tasks/to-do/TASK-710-tool-consumption-bridge.md`
 - `docs/tasks/to-do/TASK-713-period-closing-workflow.md`
@@ -120,6 +126,24 @@ Reglas obligatorias:
 - `docs/architecture/GREENHOUSE_MEMBER_LOADED_COST_MODEL_V1.md`
 - `docs/architecture/GREENHOUSE_MANAGEMENT_ACCOUNTING_ARCHITECTURE_V1.md`
 - `docs/documentation/finance/categoria-economica-de-pagos.md`
+
+### Protected runtime surfaces
+
+Estos paths son **protected by default** para TASK-777. Si un plan propone tocarlos, debe justificar por qué no basta consumirlos como read-only, declarar riesgo, agregar detector before/after y validar que los saldos siguen iguales salvo cambio intencional documentado:
+
+- `src/lib/finance/account-balances.ts`
+- `src/lib/reliability/queries/account-balances-fx-drift.ts`
+- `greenhouse_finance.account_balances`
+- `greenhouse_finance.expense_payments_normalized`
+- `greenhouse_finance.income_payments_normalized`
+- `greenhouse_finance.expense_payments`
+- `greenhouse_finance.income_payments`
+- `greenhouse_finance.settlement_legs`
+- `greenhouse_finance.payment_orders`
+- `greenhouse_finance.bank_statement_rows`
+- `greenhouse_finance.reconciliation_periods`
+- `src/lib/finance/reconciliation/`
+- `src/lib/finance/payment-orders/` `[verificar path exacto antes de tocar]`
 
 ## Current Repo State
 
@@ -170,6 +194,7 @@ Reglas obligatorias:
   - `unallocated`
 - implementar un resolver canónico sobre `economic_category`, anchors de payroll/payment orders, supplier/provider metadata y evidence real del runtime
 - dejar evidencia/audit de por qué cada expense cayó en esa lane
+- consumir Payment Orders, payments, settlement y reconciliation solo como evidencia read-only; no mutar cash facts ni saldos
 
 ### Slice 2 — Shared pools and policy snapshots
 
@@ -182,12 +207,14 @@ Reglas obligatorias:
 - refactorizar `member_capacity_economics` para que `direct_overhead_target` solo absorba costos realmente member-direct de tipo overhead/tool/equipment, no payroll/provider
 - ajustar `commercial_cost_attribution` y `operational_pl` para leer pools / lanes canónicas separadas
 - asegurar que `overhead_clp` en `operational_pl` represente overhead operativo distribuido y no una mezcla de payroll/regulatorio/financial
+- mantener inalterados los readers de caja/banco: el cutover afecta management views, no `account_balances`, normalized payment readers, settlement or reconciliation matching
 
 ### Slice 4 — April remediation + May gate
 
 - producir un read-only remediation plan para abril 2026: diff entre snapshot actual y distribución canónica esperada, con recomendación explícita de reopen/restatement o cierre provisional
 - dejar un gate operativo para que mayo 2026 no pueda cerrarse si existen expenses en lanes ambiguas o shared pools contaminados
 - conectar el gate a `TASK-713` / `TASK-393` para que el closing workflow vea este criterio
+- incluir baseline before/after de health signals de tesorería para probar que el remediation plan no cambia banco/conciliación/saldos
 
 ### Slice 5 — AI-assisted distribution copilot
 
@@ -201,6 +228,9 @@ Reglas obligatorias:
 ## Out of Scope
 
 - reescribir toda la capa `Payment Orders` o treasury
+- cambiar el cómputo de `account_balances`, normalized payment readers, settlement orchestration o bank reconciliation matching
+- crear ledgers alternos para processors, proveedores, Previred, Deel, Global66, bancos, tarjetas o cuentas corrientes
+- rematerializar saldos bancarios como efecto colateral de reclasificar distribución económica
 - construir la UI completa de budgets/variance/forecast
 - abrir contabilidad legal, doble partida o plan de cuentas formal
 - resolver per-credit telemetry de herramientas externas más allá de lo necesario para respetar `TASK-710`
@@ -221,6 +251,8 @@ La decisión arquitectónica esperada de esta task es:
 4. `allocated_client_id` y `direct_overhead_member_id` quedan formalmente deprecados como atajos primarios. Solo sobreviven como override/manual exception path durante la migración.
 5. La IA entra después del resolver determinístico, no antes: si el resolver puede decidir con evidencia fuerte, no se invoca IA. Si falta evidencia, la IA ayuda a explicar, priorizar y proponer reglas, pero la decisión runtime sigue siendo una resolución explícita aprobada o una salida `unallocated/manual_required`.
 6. Una sugerencia IA aprobada debe materializarse como catálogo/regla/policy versionada y testeable. No se permite que el P&L dependa de “el modelo dijo X” como fuente primaria.
+7. `expense distribution` es una lente de management accounting; no es una instrucción de tesorería. Reclasificar un gasto de `shared_operational_overhead` a `provider_payroll` o `shared_financial_cost` no puede crear, borrar, mover ni recalcular cash movements.
+8. Las vistas de caja/banco/conciliación siguen gobernadas por `expense_payments_normalized`, `income_payments_normalized`, `settlement_legs`, `payment_orders`, `bank_statement_rows`, `reconciliation_periods` y `account_balances`; TASK-777 solo puede leerlas como evidence.
 
 Casos obligatorios a cubrir en tests/ejemplos de spec:
 
@@ -231,6 +263,7 @@ Casos obligatorios a cubrir en tests/ejemplos de spec:
 - costos generales de empresa que sí deban absorberse compartidamente lo hacen vía policy explícita y snapshot versionado
 - gastos nuevos de proveedor ambiguo generan sugerencia IA y cola de revisión, no distribución silenciosa
 - con `FINANCE_DISTRIBUTION_AI_ENABLED=false`, el sistema conserva salida determinística y marca casos ambiguos como `manual_required`
+- después de reclasificar lanes, `finance.account_balances.fx_drift`, payment CLP drift y paid-without-bank-impact siguen en `0`
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 4 — VERIFICATION & CLOSING
@@ -245,6 +278,9 @@ Casos obligatorios a cubrir en tests/ejemplos de spec:
 - [ ] `member_capacity_economics` deja de tratar provider payroll / regulatory payments como overhead directo o shared overhead genérico
 - [ ] `operational_pl.overhead_clp` deja de mezclar costos operativos, regulatorios y financieros
 - [ ] El sistema puede explicar por qué un expense terminó en `member_direct`, `shared operational`, `shared financial`, `regulatory`, `provider_payroll` o `unallocated`
+- [ ] `account_balances`, normalized payment readers, settlement legs, payment orders y reconciliation matching quedan bitácora/semánticamente intactos salvo cambio explícito aprobado fuera de esta task
+- [ ] Los health signals de caja se mantienen sanos: `finance.account_balances.fx_drift = 0`, expense/income payment CLP drift `0`, paid payment orders without bank impact `0`, payment-order dead-letter `0`
+- [ ] No aparece ningún nuevo query/materializer que haga `SUM(payment.amount * expense.exchange_rate_to_clp)` o `SUM(raw amount)` para saldos CLP fuera de las VIEW/helper canónicos
 - [ ] Existe una capa IA opcional/guardrailed que sugiere distribución solo para casos ambiguos, con prompt versionado, output JSON validado, confidence, evidence y kill-switch
 - [ ] Ninguna sugerencia IA puede escribir al P&L, cerrar períodos, modificar snapshots cerrados o convertirse en regla sin aprobación humana/audit trail
 - [ ] Abril 2026 queda evaluado con recomendación explícita de `reopen/restatement/provisional close`
@@ -252,11 +288,18 @@ Casos obligatorios a cubrir en tests/ejemplos de spec:
 
 ## Verification
 
+- `pnpm pg:doctor`
 - `pnpm lint`
 - `pnpm tsc --noEmit`
 - `pnpm test`
 - validación manual en `/finance/intelligence`
+- validación manual read-only en `/finance/bank` y `/finance/reconciliation` cuando el slice toque consumers o close gates
 - comparación manual de abril 2026 antes/después contra snapshots y readers intermedios
+- baseline before/after de `finance.account_balances.fx_drift`
+- baseline before/after de CLP drift en `expense_payments_normalized` e `income_payments_normalized`
+- baseline before/after de Payment Orders paid-without-bank-impact y dead-letter
+- baseline before/after de reconciliation periods afectados: no deben cambiar match status, statement rows ni snapshots como efecto colateral de distribution lanes
+- grep/lint anti-regresión para recomputo inline de CLP en nuevos callsites de finance
 - tests unitarios del resolver con IA deshabilitada
 - tests unitarios del contrato IA: payload sanitizado, prompt hash/version, JSON schema, confidence/risk flags y rechazo de writes automáticos
 - dry-run sobre abril 2026 que compare decisión determinística, sugerencia IA y decisión humana esperada sin mutar datos
