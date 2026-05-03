@@ -2,7 +2,43 @@
 
 > **Version:** 1.0
 > **Created:** 2026-03-30
-> **Last updated:** 2026-05-03 (TASK-768)
+> **Last updated:** 2026-05-03 (TASK-777)
+
+## Delta 2026-05-03 — TASK-777 Expense distribution resolution
+
+TASK-777 agrega la capa canónica `expense_distribution_resolution` entre `expenses.economic_category` y management accounting. `economic_category` define la naturaleza económica del gasto; `distribution_lane` define dónde puede impactar: labor directa, herramienta directa, cliente directo, overhead operacional compartido, costo financiero compartido, regulatorio, provider payroll, treasury transit o unallocated.
+
+Reglas duras:
+
+- Solo `shared_operational_overhead` puede alimentar el pool de overhead operacional de `member_capacity_economics`.
+- `provider_payroll`, `regulatory_payment`, `tax`, `shared_financial_cost` y `treasury_transit` no pueden entrar al overhead operacional por default.
+- `direct_overhead_member_id` es legacy evidence/override, no source of truth para payroll/provider. Los readers deben excluir `labor_cost_*`, regulatorio, tax y financiero de direct overhead.
+- Cash/treasury queda protegido: `account_balances`, payment ledgers, settlement legs, payment orders y conciliación no se mutan por esta capa.
+- IA es advisory-only vía `expense_distribution_ai_suggestions`; no escribe P&L, no cierra períodos ni modifica snapshots sin aprobación/gate explícito.
+
+Runtime entregado:
+
+- `greenhouse_finance.expense_distribution_policy`
+- `greenhouse_finance.expense_distribution_resolution`
+- `greenhouse_finance.expense_distribution_ai_suggestions`
+- `src/lib/finance/expense-distribution/*`
+- `src/lib/finance/expense-distribution-intelligence/*`
+- `GET/POST /api/admin/finance/expense-distribution/suggestions`
+- `POST /api/admin/finance/expense-distribution/suggestions/[suggestionId]`
+- `finance.expense_distribution.unresolved`
+- `finance.expense_distribution.shared_pool_contamination`
+- close gate en `checkPeriodReadiness`: exige resolución activa para cada expense del período y bloquea `manual_required`, `blocked`, `unallocated` o contaminación del pool operacional.
+
+Access model:
+
+- `routeGroups`: sin cambios; las APIs viven bajo Finance/Admin runtime existente.
+- `views`: sin nueva entrada visible/menu en TASK-777.
+- `entitlements`: `finance.expense_distribution.ai_suggestions.read`, `.generate`, `.review`.
+- `startup policy`: sin cambios.
+
+Abril 2026 fue rematerializado con la nueva capa: SKY overhead `$2.278.629,39`, ANAM overhead `$759.543,13`, y contamination/unresolved `0`.
+
+Decisión operativa abril 2026: queda apto para cierre operativo con distribución canónica (`readinessPct=100`, 50/50 resoluciones activas, unresolved `0`). Si abril ya fue comunicado con el P&L anterior, tratar la diferencia como restatement de management accounting, no como corrección de caja.
 
 ## Delta 2026-05-03 — TASK-768 Economic Category Dimension (analytical separation)
 

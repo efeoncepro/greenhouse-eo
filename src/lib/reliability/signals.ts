@@ -1077,3 +1077,25 @@ export const buildFinanceEconomicCategoryUnresolvedSignals = async (
 
   return [expenses, income]
 }
+
+/**
+ * TASK-777 — Expense distribution signals.
+ *
+ * Deterministic gates for the management-accounting distribution layer:
+ * unresolved canonical distributions and legacy shared-pool contamination.
+ * These signals protect P&L consumers before we cut them over from legacy
+ * `expenses.cost_category` heuristics to `expense_distribution_resolution`.
+ */
+export const buildExpenseDistributionSignals = async (
+  readers: {
+    unresolved: () => Promise<ReliabilitySignal>
+    sharedPoolContamination: () => Promise<ReliabilitySignal>
+  }
+): Promise<ReliabilitySignal[]> => {
+  const [unresolved, contamination] = await Promise.all([
+    readers.unresolved(),
+    readers.sharedPoolContamination()
+  ])
+
+  return [unresolved, contamination]
+}

@@ -8,17 +8,17 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `EPIC-012`
-- Status real: `Diseno`
+- Status real: `Completada end-to-end; runtime, gate de cierre, IA advisory y docs sincronizados`
 - Rank: `TBD`
 - Domain: `finance`
 - Blocked by: `none`
-- Branch: `task/TASK-777-canonical-expense-distribution-and-shared-cost-pools`
+- Branch: `task/TASK-777-canonical-expense-distribution`
 - Legacy ID: `[optional]`
 - GitHub Issue: `[optional]`
 
@@ -171,6 +171,69 @@ Estos paths son **protected by default** para TASK-777. Si un plan propone tocar
      plan.md segun TASK_PROCESS.md. No llenar al crear la task.
      ═══════════════════════════════════════════════════════════ -->
 
+## Execution checkpoint — 2026-05-03
+
+- Discovery/audit/plan ejecutados contra la spec y el runtime real. Drift documental detectado: `docs/tasks/plans/TASK-777-plan.md` no existe en esta rama; la evidencia final queda en este checkpoint, `Handoff.md`, arquitectura y docs funcionales.
+- Migración aplicada en Cloud SQL dev/staging:
+  - `greenhouse_finance.expense_distribution_policy`
+  - `greenhouse_finance.expense_distribution_resolution`
+  - `greenhouse_finance.expense_distribution_ai_suggestions`
+- Resolver determinístico implementado en `src/lib/finance/expense-distribution/`.
+- CLI operativo: `pnpm run finance:materialize-expense-distribution -- --period YYYYMM`.
+- Abril 2026 materializado:
+  - 50 expenses scanned
+  - 48 unchanged tras segunda corrida
+  - 2 superseded por nueva regla Xepelin/factoring -> `shared_financial_cost`
+  - 0 blocked
+  - 0 manualRequired
+- Mayo 2026 materializado sin filas (`scanned=0`) porque aún no hay expenses del período.
+- Consumer cutover parcial entregado:
+  - `member_capacity_economics` consume solo `expense_distribution_resolution.distribution_lane='shared_operational_overhead'` para el pool compartido.
+  - `tool-cost-reader` deja de absorber `labor_cost_*`, `regulatory_payment`, `tax`, `financial_cost`, `bank_fee_real` y `financial_settlement` como direct member overhead.
+- Abril 2026 rematerializado en runtime:
+  - member capacity economics: 7 members
+  - commercial cost attribution: 4 allocations
+  - operational P&L: 7 snapshots
+- Resultado visible tras fix:
+  - SKY overhead abril: `$2.278.629,39` (antes se veía `$3.833.182` y luego `4.118.878,63` al cortar solo shared pool; el último inflado venía del direct overhead legacy).
+  - ANAM overhead abril: `$759.543,13`.
+  - SKY gross margin abril: `$1.902.318,83` / `27,56%`.
+- Signals live verificados post-materialización:
+  - `expense_distribution.unresolved` equivalente SQL: `0`.
+  - `expense_distribution.shared_pool_contamination` equivalente SQL: `0`.
+  - `expense_payments` CLP drift: `0`.
+  - `income_payments` CLP drift: `0`.
+- Validación ejecutada:
+  - focused Vitest para resolver/repository/signals/readers críticos: OK.
+  - `pnpm tsc --noEmit`: OK.
+  - `pnpm lint`: OK con warnings legacy `greenhouse/no-untokenized-copy`.
+  - `pnpm pg:doctor`: OK; drift preexistente en `greenhouse_payroll` y `greenhouse_serving` con `can_create=true`.
+  - `pnpm build`: OK.
+- Superficies protegidas no mutadas por código TASK-777: account balances, settlement legs, payment ledgers, payment orders y conciliación. Solo se leyeron facts como evidencia y se validó drift CLP `0`.
+
+### Cierre end-to-end — 2026-05-03
+
+- Gate de close governance integrado en `checkPeriodReadiness`: el período no queda `isReady=true` si existen expenses sin resolución activa, resoluciones `manual_required`/`blocked`/`unallocated`, o contaminación en `shared_operational_overhead`.
+- Verificación runtime read-only:
+  - Abril 2026: `isReady=true`, `readinessPct=100`, `expenseDistributionStatus=complete`, active resolutions `50`, unresolved `0`, shared pool contamination `0`.
+  - Mayo 2026: distribución `complete` con `0` filas; el período sigue `isReady=false` por ingresos/egresos/FX ausentes, no por distribución.
+- IA advisory-only implementada en `src/lib/finance/expense-distribution-intelligence/`:
+  - kill-switch `FINANCE_DISTRIBUTION_AI_ENABLED=false` por defecto.
+  - prompt versionado `expense_distribution_intelligence_v1`.
+  - output JSON validado y persistido append-only en `expense_distribution_ai_suggestions`.
+  - sugerencias solo para queue ambigua (`manual_required`, `blocked`, `unallocated`, confidence baja).
+  - aprobación humana crea resolución `source='ai_approved'`; rechazo solo marca la sugerencia.
+  - ninguna sugerencia escribe P&L, cierra períodos, modifica snapshots, bancos, payment orders ni conciliación.
+- API admin mínima para operar la cola:
+  - `GET /api/admin/finance/expense-distribution/suggestions?year=YYYY&month=M`
+  - `POST /api/admin/finance/expense-distribution/suggestions`
+  - `POST /api/admin/finance/expense-distribution/suggestions/[suggestionId]`
+- Access model:
+  - `routeGroups`: sin cambios; vive bajo Finance/Admin API existente.
+  - `views`: sin nueva surface visible/menu en esta task.
+  - `entitlements`: `finance.expense_distribution.ai_suggestions.{read,generate,review}`.
+  - `startup policy`: sin cambios.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 3 — EXECUTION SPEC
      "Que construyo exactamente, slice por slice?"
@@ -274,17 +337,17 @@ Casos obligatorios a cubrir en tests/ejemplos de spec:
 
 ## Acceptance Criteria
 
-- [ ] Existe un resolver canónico `expense -> distribution lane` documentado e implementado con contrato auditable
-- [ ] `member_capacity_economics` deja de tratar provider payroll / regulatory payments como overhead directo o shared overhead genérico
-- [ ] `operational_pl.overhead_clp` deja de mezclar costos operativos, regulatorios y financieros
-- [ ] El sistema puede explicar por qué un expense terminó en `member_direct`, `shared operational`, `shared financial`, `regulatory`, `provider_payroll` o `unallocated`
-- [ ] `account_balances`, normalized payment readers, settlement legs, payment orders y reconciliation matching quedan bitácora/semánticamente intactos salvo cambio explícito aprobado fuera de esta task
-- [ ] Los health signals de caja se mantienen sanos: `finance.account_balances.fx_drift = 0`, expense/income payment CLP drift `0`, paid payment orders without bank impact `0`, payment-order dead-letter `0`
-- [ ] No aparece ningún nuevo query/materializer que haga `SUM(payment.amount * expense.exchange_rate_to_clp)` o `SUM(raw amount)` para saldos CLP fuera de las VIEW/helper canónicos
-- [ ] Existe una capa IA opcional/guardrailed que sugiere distribución solo para casos ambiguos, con prompt versionado, output JSON validado, confidence, evidence y kill-switch
-- [ ] Ninguna sugerencia IA puede escribir al P&L, cerrar períodos, modificar snapshots cerrados o convertirse en regla sin aprobación humana/audit trail
-- [ ] Abril 2026 queda evaluado con recomendación explícita de `reopen/restatement/provisional close`
-- [ ] Mayo 2026 no puede cerrarse silenciosamente si hay contaminación de pools shared o lanes ambiguas
+- [x] Existe un resolver canónico `expense -> distribution lane` documentado e implementado con contrato auditable
+- [x] `member_capacity_economics` deja de tratar provider payroll / regulatory payments como overhead directo o shared overhead genérico
+- [x] `operational_pl.overhead_clp` deja de mezclar costos operativos, regulatorios y financieros
+- [x] El sistema puede explicar por qué un expense terminó en `member_direct`, `shared operational`, `shared financial`, `regulatory`, `provider_payroll` o `unallocated`
+- [x] `account_balances`, normalized payment readers, settlement legs, payment orders y reconciliation matching quedan bitácora/semánticamente intactos salvo cambio explícito aprobado fuera de esta task
+- [x] Los health signals de caja se mantienen sanos: `finance.account_balances.fx_drift = 0`, expense/income payment CLP drift `0`, paid payment orders without bank impact `0`, payment-order dead-letter `0`
+- [x] No aparece ningún nuevo query/materializer que haga `SUM(payment.amount * expense.exchange_rate_to_clp)` o `SUM(raw amount)` para saldos CLP fuera de las VIEW/helper canónicos
+- [x] Existe una capa IA opcional/guardrailed que sugiere distribución solo para casos ambiguos, con prompt versionado, output JSON validado, confidence, evidence y kill-switch
+- [x] Ninguna sugerencia IA puede escribir al P&L, cerrar períodos, modificar snapshots cerrados o convertirse en regla sin aprobación humana/audit trail
+- [x] Abril 2026 queda evaluado con recomendación explícita de `reopen/restatement/provisional close`
+- [x] Mayo 2026 no puede cerrarse silenciosamente si hay contaminación de pools shared o lanes ambiguas
 
 ## Verification
 
@@ -306,13 +369,13 @@ Casos obligatorios a cubrir en tests/ejemplos de spec:
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
-- [ ] quedó documentada la decisión operativa para abril 2026 y el gate de cierre para mayo 2026
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] quedó documentada la decisión operativa para abril 2026 y el gate de cierre para mayo 2026
 
 ## Follow-ups
 

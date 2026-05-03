@@ -1,5 +1,19 @@
 # Handoff.md
 
+## Sesion 2026-05-03 — TASK-777 completada end-to-end
+
+- **Branch:** `task/TASK-777-canonical-expense-distribution`.
+- **Skill usada:** `greenhouse-finance-accounting-operator` + `greenhouse-agent`.
+- **Entregado:** migración `expense_distribution_policy`, `expense_distribution_resolution`, `expense_distribution_ai_suggestions`; resolver determinístico `expense -> distribution_lane`; materializador por período; signals `finance.expense_distribution.{unresolved,shared_pool_contamination}`; cutover de shared overhead en `member_capacity_economics`; filtro anti-contaminación en `tool-cost-reader`; close gate en `checkPeriodReadiness`; IA advisory-only + cola/API admin de sugerencias.
+- **Runtime aplicado:** `pnpm pg:connect:migrate` OK + tipos DB regenerados; `pnpm run finance:materialize-expense-distribution -- --period 202604` OK; `202605` OK sin filas.
+- **Abril rematerializado:** member capacity 7 members, commercial attribution 4 allocations, operational P&L 7 snapshots.
+- **Resultado P&L abril:** SKY overhead queda `$2.278.629,39`, ANAM overhead `$759.543,13`; SKY margen bruto queda `$1.902.318,83` (`27,56%`). Se elimina fuga legacy donde Deel/provider payroll sumaba `$1.840.249,24` como direct overhead de SKY.
+- **Close gate runtime:** abril 2026 `isReady=true`, readiness `100`, distribution `complete`, active resolutions `50`, unresolved `0`, contamination `0`; mayo distribución `complete` con 0 filas pero `isReady=false` por ingresos/egresos/FX ausentes.
+- **Signals live:** distribution unresolved `0`, shared pool contamination `0`, expense/income CLP drift `0`.
+- **Validacion:** `pnpm build` OK en la rama actual; focused Vitest, `pnpm tsc --noEmit`, `pnpm lint` y `pnpm pg:doctor` ya habian pasado en esta sesion.
+- **No-breakage:** no se mutaron account balances, settlement legs, payment ledgers, payment orders ni conciliación; solo se usaron como superficies protegidas/baseline.
+- **Lifecycle:** TASK-777 movida a `complete`; docs/tasks registry y documentación funcional/arquitectura sincronizadas.
+
 ## Sesion 2026-05-03 — EPIC-012 Finance Five-Capabilities Operating System
 
 - **Trigger:** usuario acepto la recomendacion de ordenar Finance en 5 capacidades: `Treasury & Payments`, `Accounting Semantics`, `Management Accounting`, `Close Governance`, `Planning & Control Tower`.

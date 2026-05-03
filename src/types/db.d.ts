@@ -3689,6 +3689,82 @@ export interface GreenhouseFinanceExpenseAttributionRules {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseFinanceExpenseDistributionAiSuggestions {
+  applied_resolution_id: string | null;
+  confidence: string;
+  created_at: Generated<Timestamp>;
+  evidence_json: Generated<Json>;
+  expense_id: string;
+  input_hash: string;
+  model_id: string;
+  period_month: number;
+  period_year: number;
+  prompt_hash: string;
+  rationale: string;
+  reviewed_at: Timestamp | null;
+  reviewed_by_user_id: string | null;
+  status: Generated<string>;
+  suggested_client_id: string | null;
+  suggested_distribution_lane: string;
+  suggested_member_id: string | null;
+  suggestion_id: string;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseFinanceExpenseDistributionPolicy {
+  created_at: Generated<Timestamp>;
+  declared_at: Generated<Timestamp>;
+  declared_by_user_id: string | null;
+  evidence_json: Generated<Json>;
+  financial_cost_method: Generated<string>;
+  operational_overhead_method: Generated<string>;
+  period_month: number;
+  period_year: number;
+  policy_id: string;
+  policy_version: string;
+  regulatory_payment_method: Generated<string>;
+  status: Generated<string>;
+  superseded_by_policy_id: string | null;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseFinanceExpenseDistributionResolution {
+  amount_clp: Numeric;
+  basis_amount_clp: Numeric | null;
+  client_id: string | null;
+  confidence: Generated<string>;
+  created_at: Generated<Timestamp>;
+  /**
+   * member_direct_labor/tool, client_direct_non_labor, shared_operational_overhead, shared_financial_cost, regulatory_payment, provider_payroll, treasury_transit o unallocated. Solo shared_operational_overhead entra al pool operacional por defecto.
+   */
+  distribution_lane: string;
+  economic_category: string | null;
+  evidence_json: Generated<Json>;
+  expense_id: string;
+  legacy_cost_category: string | null;
+  member_id: string | null;
+  organization_id: string | null;
+  payment_obligation_id: string | null;
+  payment_order_id: string | null;
+  payment_order_line_id: string | null;
+  payroll_entry_id: string | null;
+  payroll_period_id: string | null;
+  period_month: number;
+  period_year: number;
+  policy_id: string | null;
+  resolution_id: string;
+  resolution_status: Generated<string>;
+  resolved_at: Generated<Timestamp>;
+  resolved_by_user_id: string | null;
+  risk_flags: Generated<string[]>;
+  source: string;
+  superseded_at: Timestamp | null;
+  superseded_by_resolution_id: string | null;
+  supplier_id: string | null;
+  tool_catalog_id: string | null;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseFinanceExpensePayments {
   amount: Numeric;
   amount_clp: Numeric | null;
@@ -7970,6 +8046,9 @@ export interface DB {
   "greenhouse_finance.exchange_rates": GreenhouseFinanceExchangeRates;
   "greenhouse_finance.expense_attribution_audit": GreenhouseFinanceExpenseAttributionAudit;
   "greenhouse_finance.expense_attribution_rules": GreenhouseFinanceExpenseAttributionRules;
+  "greenhouse_finance.expense_distribution_ai_suggestions": GreenhouseFinanceExpenseDistributionAiSuggestions;
+  "greenhouse_finance.expense_distribution_policy": GreenhouseFinanceExpenseDistributionPolicy;
+  "greenhouse_finance.expense_distribution_resolution": GreenhouseFinanceExpenseDistributionResolution;
   "greenhouse_finance.expense_payments": GreenhouseFinanceExpensePayments;
   "greenhouse_finance.expense_payments_normalized": GreenhouseFinanceExpensePaymentsNormalized;
   "greenhouse_finance.expenses": GreenhouseFinanceExpenses;
