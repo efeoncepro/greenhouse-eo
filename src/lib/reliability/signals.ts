@@ -630,13 +630,63 @@ export const buildGcpBillingSignals = (overview: GcpBillingOverview): Reliabilit
     kind: 'billing',
     source: 'getGcpBillingOverview',
     label: `GCP cost (${overview.period.days} días)`,
-    severity: 'ok',
-    summary: `Total ${formatCurrency(overview.totalCost, overview.currency)} · top servicio: ${
+    severity: (overview.topDrivers ?? []).some(driver => driver.severity === 'error')
+      ? 'error'
+      : (overview.topDrivers ?? []).some(driver => driver.severity === 'warning')
+        ? 'warning'
+        : 'ok',
+    summary: `Total ${formatCurrency(overview.totalCost, overview.currency)} · forecast ${
+      overview.forecast ? formatCurrency(overview.forecast.monthEndCost, overview.currency) : 'n/d'
+    } · top servicio: ${
       overview.costByService[0]?.serviceDescription ?? 'n/d'
     }.`,
     observedAt: overview.generatedAt,
-    evidence: baseEvidence
+    evidence: [
+      ...baseEvidence,
+      ...(overview.forecast
+        ? [
+            {
+              kind: 'metric' as const,
+              label: 'Forecast mensual',
+              value: formatCurrency(overview.forecast.monthEndCost, overview.currency)
+            }
+          ]
+        : [])
+    ]
   })
+
+  for (const driver of overview.topDrivers ?? []) {
+    if (driver.severity === 'ok') continue
+
+    signals.push({
+      signalId: `cloud.billing.driver.${driver.driverId}`,
+      moduleKey: 'cloud',
+      kind: 'billing',
+      source: 'getGcpBillingOverview',
+      label: `Cost driver: ${driver.serviceDescription}`,
+      severity: driver.severity,
+      summary: driver.summary,
+      observedAt: overview.generatedAt,
+      evidence: [
+        ...baseEvidence,
+        {
+          kind: 'metric',
+          label: 'Threshold',
+          value: driver.threshold
+        },
+        {
+          kind: 'metric',
+          label: 'Share',
+          value: `${driver.share}%`
+        },
+        ...driver.evidence.map(item => ({
+          kind: 'metric' as const,
+          label: item.label,
+          value: item.value
+        }))
+      ]
+    })
+  }
 
   const notion = overview.spotlights.notionBqSync
 

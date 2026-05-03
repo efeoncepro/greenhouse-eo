@@ -138,7 +138,7 @@ export const STATIC_RELIABILITY_REGISTRY: ReliabilityModuleDefinition[] = [
       'src/app/(dashboard)/admin/**',
       'src/views/greenhouse/admin/**'
     ],
-    expectedSignalKinds: ['runtime', 'posture', 'incident', 'cost_guard'],
+    expectedSignalKinds: ['runtime', 'posture', 'incident', 'cost_guard', 'billing'],
     incidentDomainTag: 'cloud'
   },
   {

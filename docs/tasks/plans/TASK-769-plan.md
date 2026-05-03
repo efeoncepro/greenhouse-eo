@@ -196,3 +196,32 @@ Sequential for Slices 1-2 contract foundation. Possible fork after Slice 1:
 - Alert routing must dedupe to avoid notification spam.
 - Avoid creating a second FinOps domain parallel to Reliability; use Cloud domain as canonical owner.
 
+## Delta 2026-05-03 — Human Approved Hardening
+
+- V2 debe ser un superset compatible con V1: ningún consumer actual debe romper si sigue leyendo `totalCost`, `costByDay`, `costByService`, `spotlights`, `source`, `notes` y `error`.
+- Alert routing se implementa como sweep explícito con fingerprint/cooldown; nunca se envían alertas desde render UI ni desde un GET de API.
+- La capa AI debe degradar a `skipped` si falta tabla, kill-switch o Vertex AI; los signals determinísticos y la UI siguen funcionando.
+- El endpoint de copilot en `ops-worker` debe exponer resultado auditable aunque no persista nada: `skippedReason`, counts evaluados, counts persistidos y alertas despachadas.
+
+## Closure 2026-05-03
+
+Implemented end-to-end:
+
+- Billing Export V2 reader with service, resource, forecast and driver contracts.
+- Admin Cloud & Integrations UI for forecast, early alerts, resources/SKUs and latest AI observation.
+- Reliability billing drivers as deterministic `cloud.billing.driver.*` signals.
+- `greenhouse_ai.cloud_cost_ai_observations` and `greenhouse_ai.cloud_cost_alert_dispatches` persistence.
+- ops-worker `POST /cloud-cost-ai-watch` with deterministic alert sweep first, AI opt-in second, and `dryRun=true`.
+- Documentation deltas in Billing Export and Reliability architecture, Handoff and changelog.
+
+Validation summary:
+
+- `pnpm pg:doctor`: OK.
+- `pnpm migrate:up`: OK; regenerated `src/types/db.d.ts`.
+- BigQuery live reader: OK against `efeonce-group.billing_export`.
+- Alert sweep dry-run: OK, 5 eligible drivers, 0 dispatches.
+- AI disabled skip: OK.
+- `pnpm tsc --noEmit`: OK.
+- `pnpm build`: OK.
+- `pnpm test`: 533 files / 3003 tests passed (5 skipped).
+- `pnpm lint`: 0 errors / 318 legacy warnings.

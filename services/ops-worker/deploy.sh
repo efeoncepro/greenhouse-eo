@@ -228,6 +228,13 @@ ENV_VARS="${ENV_VARS},HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL=${HUBSPOT_GREENHOU
 RELIABILITY_AI_OBSERVER_ENABLED="${RELIABILITY_AI_OBSERVER_ENABLED:-true}"
 ENV_VARS="${ENV_VARS},RELIABILITY_AI_OBSERVER_ENABLED=${RELIABILITY_AI_OBSERVER_ENABLED}"
 
+# TASK-769 — Cloud Cost FinOps AI kill-switch.
+# Deterministic cost alerts run even when this is false. AI interpretation is
+# opt-in because every Gemini call costs tokens. Enable explicitly with:
+# `CLOUD_COST_AI_COPILOT_ENABLED=true ENV=staging bash services/ops-worker/deploy.sh`.
+CLOUD_COST_AI_COPILOT_ENABLED="${CLOUD_COST_AI_COPILOT_ENABLED:-false}"
+ENV_VARS="${ENV_VARS},CLOUD_COST_AI_COPILOT_ENABLED=${CLOUD_COST_AI_COPILOT_ENABLED}"
+
 if [ -n "${RESEND_API_KEY_SECRET_REF}" ]; then
   ENV_VARS="${ENV_VARS},RESEND_API_KEY_SECRET_REF=${RESEND_API_KEY_SECRET_REF}"
 else
@@ -495,6 +502,17 @@ upsert_scheduler_job \
   '{"triggeredBy":"cloud_scheduler"}'
 echo "  -> ops-reliability-ai-watch: 0 */1 * * * (Reliability AI Observer, TASK-638 — gated by RELIABILITY_AI_OBSERVER_ENABLED)"
 
+# TASK-769 — Cloud Cost Intelligence.
+# Runs deterministic Billing Export alert sweep first, then optional AI FinOps
+# copilot if CLOUD_COST_AI_COPILOT_ENABLED=true. Six-hour cadence is enough for
+# Billing Export latency while still catching same-day drift after materialize.
+upsert_scheduler_job \
+  "ops-cloud-cost-ai-watch" \
+  "15 */6 * * *" \
+  "/cloud-cost-ai-watch" \
+  '{"triggeredBy":"cloud_scheduler"}'
+echo "  -> ops-cloud-cost-ai-watch: 15 */6 * * * (Cloud Cost Intelligence, TASK-769 — AI gated by CLOUD_COST_AI_COPILOT_ENABLED)"
+
 # Notion BQ raw → conformed → PG cycle. Replaces the historically-flaky Vercel
 # `/api/cron/sync-conformed` (20 7 * * *) with a Cloud Scheduler + Cloud Run
 # path that has built-in retry semantics and longer timeout. The Vercel cron
@@ -527,4 +545,4 @@ echo "  1. Verify health:  gcloud run services proxy ${SERVICE_NAME} --port=9092
 echo "  2. Run a lane manually:  gcloud scheduler jobs run ops-reactive-finance --project=${PROJECT_ID} --location=${REGION}"
 echo "  3. Check queue depth:  gcloud run services proxy ${SERVICE_NAME} --port=9092 & sleep 3 && curl -s 'http://localhost:9092/reactive/queue-depth?domain=finance'"
 echo "  4. Check logs:  gcloud logging read 'resource.labels.service_name=\"${SERVICE_NAME}\"' --project=${PROJECT_ID} --limit=10"
-echo "  5. Active scheduler jobs: ops-reactive-{organization,finance,people,notifications,delivery,cost-intelligence,recover} + ops-nexa-weekly-digest"
+echo "  5. Active scheduler jobs: ops-reactive-{organization,finance,people,notifications,delivery,cost-intelligence,recover} + ops-nexa-weekly-digest + ops-reliability-ai-watch + ops-cloud-cost-ai-watch"

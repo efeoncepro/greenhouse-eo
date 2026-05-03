@@ -510,3 +510,20 @@ ops-worker gana por: ya corre 7+ jobs Scheduler, WIF nativo evita rotar Vertex A
   - Cloud Scheduler job: `ops-reliability-ai-watch` en [`services/ops-worker/deploy.sh`](../../services/ops-worker/deploy.sh)
   - UI: [`src/components/greenhouse/admin/ReliabilityAiWatcherCard.tsx`](../../src/components/greenhouse/admin/ReliabilityAiWatcherCard.tsx)
   - Migration: [`migrations/20260425211608760_task-638-reliability-ai-observations.sql`](../../migrations/20260425211608760_task-638-reliability-ai-observations.sql)
+
+## Delta 2026-05-03 — TASK-769 Billing como señal esperada de Cloud
+
+TASK-769 promueve `billing` a señal esperada del módulo `cloud` y agrega drivers FinOps con evidencia:
+
+- `STATIC_RELIABILITY_REGISTRY.cloud.expectedSignalKinds` ahora incluye `billing`.
+- `buildGcpBillingSignals()` eleva la severidad de `cloud.billing.gcp_export` cuando los drivers determinísticos traen `warning` o `error`.
+- Cada driver no-OK se proyecta como señal `cloud.billing.driver.<driverId>` con threshold, share y evidencia de Billing Export.
+- La IA FinOps no define severidad del RCP. Solo agrega narrativa persistida y auditable para Admin Center; las alertas y RCP siguen siendo determinísticos.
+- Steady state esperado: `cloud.billing.gcp_export` existe siempre que el reader Billing se ejecute; drivers adicionales deberían tender a 0 en operación optimizada.
+
+Artefactos canónicos nuevos:
+
+- Alert sweep: [`src/lib/cloud/gcp-billing-alerts.ts`](../../src/lib/cloud/gcp-billing-alerts.ts)
+- FinOps AI runner/persist: [`src/lib/cloud/finops-ai/`](../../src/lib/cloud/finops-ai/)
+- Migration: [`migrations/20260503115518831_task-769-cloud-cost-ai-observations.sql`](../../migrations/20260503115518831_task-769-cloud-cost-ai-observations.sql)
+- ops-worker endpoint: `POST /cloud-cost-ai-watch` en [`services/ops-worker/server.ts`](../../services/ops-worker/server.ts)
