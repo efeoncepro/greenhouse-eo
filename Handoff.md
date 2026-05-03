@@ -1,5 +1,19 @@
 # Handoff.md
 
+## Sesion 2026-05-02 — TASK-766 tomada (Finance CLP-Currency Reader Contract Resilience)
+
+- **Lifecycle:** `in-progress` (movida de `to-do/` a `in-progress/`)
+- **Branch:** `task/TASK-766-finance-clp-currency-reader-contract`
+- **Trigger:** post-merge TASK-765, usuario reportó KPIs inflados en `/finance/cash-out`. Investigación SQL confirmó bug arquitectónico: `SUM(ep.amount × COALESCE(e.exchange_rate_to_clp, 1))` infla 88× cuando un payment CLP toca un expense USD (caso CCA TASK-714c — HubSpot $1,106,321 × rate 910.55 = $1B fantasma).
+- **Decisión arquitectónica:** NO fix puntual al endpoint. Solución de raíz en 5 slices: VIEW canónica `expense_payments_normalized` + helper TS + lint rule custom + reliability signals + backfill + repair endpoint. Mismo patrón TASK-571/699/721.
+- **4 Open Questions resueltas pre-execution con opción más robusta:**
+  - Q1 — `income_payments.amount_clp` ya existe (verificado SQL): cero migración estructural extra.
+  - Q2 — Cutover `2026-05-03 00:00:00+00`, VALIDATE atomic post-backfill.
+  - Q3 — Capability `finance.payments.repair_clp` nueva granular (least-privilege).
+  - Q4 — Lint rule mode `error` desde commit 1 (cero tolerancia a legacy).
+- **Próximo step:** Discovery en paralelo (callsites del anti-patrón en portal + reliability registry + lint rule template + schema verification) → plan.md → STOP checkpoint humano (P0).
+- **Blast radius:** producción tiene KPIs inflados visibles en `/finance/cash-out`. Fix llegará a `develop` → `main` por staged rollout.
+
 ## Sesion 2026-05-02 — TASK-765 cerrada (Payment Order ↔ Bank Settlement Resilience + Recovery del incidente 2026-05-01)
 
 - **Lifecycle:** `complete` (movida de `in-progress/` a `complete/`)
