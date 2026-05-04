@@ -50,6 +50,7 @@ export const AGGREGATE_TYPES = {
   compensationVersion: 'compensation_version',
   projectedPayroll: 'projected_payroll',
   payrollPrevisionalSnapshot: 'payroll_previsional_snapshot',
+  payrollFinalSettlement: 'payroll_final_settlement',
 
   // AI Tools
   aiTool: 'ai_tool',
@@ -232,6 +233,11 @@ export const EVENT_TYPES = {
   workRelationshipOffboardingCaseScheduled: 'work_relationship_offboarding_case.scheduled',
   workRelationshipOffboardingCaseExecuted: 'work_relationship_offboarding_case.executed',
   workRelationshipOffboardingCaseCancelled: 'work_relationship_offboarding_case.cancelled',
+
+  // Payroll Final Settlement (TASK-761)
+  payrollFinalSettlementCalculated: 'payroll.final_settlement.calculated',
+  payrollFinalSettlementApproved: 'payroll.final_settlement.approved',
+  payrollFinalSettlementCancelled: 'payroll.final_settlement.cancelled',
 
   // Identity
   reconciliationProposed: 'identity.reconciliation.proposed',

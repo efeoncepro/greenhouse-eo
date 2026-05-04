@@ -2,6 +2,14 @@
 
 ## 2026-05-04
 
+- **TASK-761 implementada — Payroll Final Settlement / Finiquito Engine Chile V1.** Greenhouse agrega un aggregate canonico de finiquito separado de la nomina mensual para renuncia de trabajador dependiente Chile.
+  - **Schema/runtime:** nuevas tablas `greenhouse_payroll.final_settlements` y `greenhouse_payroll.final_settlement_events`, ligadas obligatoriamente a `greenhouse_hr.work_relationship_offboarding_cases`, con versionamiento, snapshots JSONB, readiness persistida y audit trail append-only.
+  - **Engine V1:** `src/lib/payroll/final-settlement/**` calcula `pending_salary`, `pending_fixed_allowances`, `proportional_vacation` y `statutory_deductions` desde caso aprobado/agendado, compensacion vigente, saldo de vacaciones y overlap de nomina mensual.
+  - **Guardrails:** bloquea honorarios, contractors, Deel/EOR e internacional; no calcula desde `contractEndDate` ni `member.active`; un settlement aprobado exige cancelacion/reemision antes de recalcular.
+  - **APIs y eventos:** endpoints bajo `/api/hr/offboarding/cases/[caseId]/final-settlement/**`; outbox `payroll.final_settlement.calculated|approved|cancelled`.
+  - **Access model:** capability nueva `hr.final_settlement` (`read/create/update/approve/manage`) mapeada a view `equipo.offboarding`; routeGroups/startup policy sin cambios.
+  - **Docs:** arquitectura Payroll, documentacion funcional y manual HR sincronizados con la frontera TASK-762 (documento formal futuro).
+
 - **TASK-760 completada — Workforce Offboarding Runtime Foundation.** Greenhouse ahora tiene agregado canonico `WorkRelationshipOffboardingCase` para modelar salidas laborales/contractuales sin depender de `member.active`, SCIM ni checklists legacy.
   - **Schema/runtime:** nuevas tablas `greenhouse_hr.work_relationship_offboarding_cases` y `greenhouse_hr.work_relationship_offboarding_case_events`, con guardrails de fechas (`effective_date`, `last_working_day`), indice unico de caso activo y audit trail append-only. Migracion aplicada en Cloud SQL y `src/types/db.d.ts` regenerado.
   - **Dominio:** `src/lib/workforce/offboarding/**` agrega state machine, resolver de lane (`internal_payroll`, `external_payroll`, `non_payroll`, `identity_only`, `relationship_transition`, `unknown`), eventos outbox y scanner de contratos proximos/vencidos.

@@ -109,6 +109,15 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     defaultScope: 'tenant'
   },
   {
+    // TASK-761 — finiquito/final settlement Chile dependiente.
+    // read=ver settlement; create=calcular; update=revisar; approve=aprobar;
+    // manage=cancelar/reemitir antes de documento formal.
+    key: 'hr.final_settlement',
+    module: 'hr',
+    actions: ['read', 'create', 'update', 'approve', 'manage'] as const,
+    defaultScope: 'tenant'
+  },
+  {
     // TASK-745 — crear / revertir adjustments de payroll por entry
     key: 'hr.payroll_adjustments',
     module: 'hr',

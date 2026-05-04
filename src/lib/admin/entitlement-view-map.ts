@@ -47,7 +47,10 @@ const resolveBindingsForView = (view: GovernanceViewRegistryEntry): ViewEntitlem
       return [toBinding(view, 'hr.org_chart', ['read'])]
 
     case 'equipo.offboarding':
-      return [toBinding(view, 'hr.offboarding_case', ['read', 'create', 'update', 'approve', 'manage'])]
+      return [
+        toBinding(view, 'hr.offboarding_case', ['read', 'create', 'update', 'approve', 'manage']),
+        toBinding(view, 'hr.final_settlement', ['read', 'create', 'update', 'approve', 'manage'])
+      ]
 
     case 'finanzas.inteligencia':
       return [toBinding(view, 'finance.status', ['read'])]

@@ -1,5 +1,26 @@
 # GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md
 
+## Delta 2026-05-04 — TASK-761: Final Settlement / Finiquito Chile V1
+
+Payroll ahora tiene un agregado canonico separado para finiquitos Chile dependientes:
+
+- `greenhouse_payroll.final_settlements`
+- `greenhouse_payroll.final_settlement_events`
+- `src/lib/payroll/final-settlement/**`
+
+Reglas canonicas:
+
+- El finiquito no es un `payroll_entry` mensual ni un `payroll_adjustment`; vive como settlement versionado ligado a `greenhouse_hr.work_relationship_offboarding_cases`.
+- V1 solo calcula `resignation` para trabajador dependiente Chile con `contract_type in ('indefinido','plazo_fijo')`, `pay_regime='chile'`, `payroll_via='internal'` y lane `internal_payroll`.
+- `honorarios`, `contractor`, `eor`, `Deel` e internacional quedan bloqueados como regimenes no soportados por este engine.
+- La fecha de calculo sale de `offboarding_case.effective_date` y `last_working_day`; `contract_end_date_snapshot` se persiste solo como evidencia.
+- El resultado conserva `source_snapshot_json`, `breakdown_json`, `explanation_json` y `readiness_json`; cada linea declara `component_code`, `basis`, `formula_ref`, `source_ref` y `taxability`.
+- Un settlement aprobado no se recalcula en sitio. V1 exige cancelacion/reemision antes de crear otra version.
+- Eventos outbox versionados: `payroll.final_settlement.calculated`, `payroll.final_settlement.approved`, `payroll.final_settlement.cancelled`.
+- Access model: view `equipo.offboarding` sigue siendo la surface visible; capability fina `hr.final_settlement` gobierna lectura, calculo, aprobacion y cancelacion. Startup policy no cambia.
+
+La formula de feriado proporcional sigue el criterio publico de Direccion del Trabajo: dias habiles acumulados desde contratacion o ultima anualidad y luego conversion a dias corridos compensables desde el dia siguiente al termino. Como el runtime actual no conserva `last_annual_vacation_date`, V1 usa `greenhouse_hr.leave_balances` como saldo conciliado y bloquea si no existe evidencia de vacaciones.
+
 ## Delta 2026-05-01 — TASK-745: Payroll Adjustments Foundation V1
 
 Se introduce el modelo canonico **event-sourced** para ajustar el pago de un entry en una nomina puntual: tabla `greenhouse_payroll.payroll_adjustments` con 5 kinds (`exclude`, `gross_factor`, `gross_factor_per_component`, `fixed_deduction`, `manual_override`), composables ortogonalmente.

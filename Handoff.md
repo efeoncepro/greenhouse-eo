@@ -1,5 +1,16 @@
 # Handoff.md
 
+## Sesion 2026-05-04 — TASK-761 Payroll Final Settlement / Finiquito Engine Chile — completada
+
+- **Branch:** `develop` por instruccion explicita del usuario; no se creo ni cambio a `task/TASK-761-payroll-final-settlement-finiquito-engine-chile`.
+- **Lifecycle:** `complete`; task movida `to-do` → `in-progress` → `complete`; `docs/tasks/README.md` y `TASK_ID_REGISTRY` sincronizados.
+- **Skills:** `greenhouse-payroll-auditor` invocada por requerimiento del usuario; `greenhouse-agent` cargada para rutas/API/surface Greenhouse si aplica.
+- **Slices entregados:** migracion `greenhouse_payroll.final_settlements` + `final_settlement_events`; dominio `src/lib/payroll/final-settlement/**` con readiness/calculo/store; APIs `GET/POST /api/hr/offboarding/cases/[caseId]/final-settlement`, `POST /approve`, `POST /cancel`; eventos outbox `payroll.final_settlement.calculated|approved|cancelled`; capability `hr.final_settlement` mapeada a `equipo.offboarding`; docs funcionales/manual.
+- **Runtime:** `pnpm pg:connect:migrate` aplicado contra Cloud SQL `greenhouse_app`; `src/types/db.d.ts` regenerado. `pnpm pg:doctor` OK.
+- **Drift detectado:** spec sugeria path `/api/hr/offboarding/[caseId]/...`; runtime real de TASK-760 usa `/api/hr/offboarding/cases/[caseId]/...`, asi se implemento. No existe `last_annual_vacation_date`; V1 usa `leave_balances` como saldo conciliado y bloquea si falta. `schema-snapshot-baseline.sql` no reflejaba TASK-760; source real usado: migraciones + db.d.ts + runtime.
+- **Frontera TASK-762:** settlement aprobado queda listo para documento formal futuro, pero TASK-761 no emite finiquito PDF, no crea payment order y no marca pago ejecutado.
+- **Verificacion:** `pnpm pg:connect:migrate` OK; `pnpm pg:doctor` OK; `pnpm vitest run src/lib/payroll` 46 files / 348 tests OK; `pnpm exec tsc --noEmit --pretty false` OK; `pnpm lint` exit 0 con 316 warnings legacy TASK-265; `pnpm build` OK.
+
 ## Sesion 2026-05-04 — TASK-760 Workforce Offboarding Runtime Foundation — completada
 
 - **Branch:** `develop` por instrucción explícita del usuario; no se creó ni cambió a `task/TASK-760-workforce-offboarding-runtime-foundation`.

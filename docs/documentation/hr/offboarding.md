@@ -56,14 +56,17 @@ Greenhouse resuelve una lane para orientar los pasos posteriores:
 
 ## Frontera con Payroll
 
-TASK-760 solo crea el caso y la lane. No calcula finiquitos, no genera documentos de termino y no crea payment orders.
+TASK-760 crea el caso y la lane. TASK-761 agrega el aggregate de finiquito para la lane `internal_payroll`, pero mantiene la frontera: el finiquito no crea payment orders ni emite el documento formal de termino.
 
-La lane `internal_payroll` es el hook para TASK-761. El motor de finiquito debe consumir un caso aprobado con `effective_date`, `last_working_day`, causal y snapshot contractual, no `member.active` ni `contractEndDate` directo.
+El motor de finiquito consume un caso aprobado o agendado con `effective_date`, `last_working_day`, causal y snapshot contractual. No calcula desde `member.active` ni desde `contractEndDate` directo.
+
+Para V1 solo se soporta renuncia de trabajador dependiente Chile con payroll interno. Honorarios, Deel/EOR, contractors e internacional quedan bloqueados como regimenes no soportados por el engine interno.
 
 ## Acceso
 
 - Surface visible: view `equipo.offboarding` en `/hr/offboarding`.
 - Autorizacion fina: capability `hr.offboarding_case` con acciones `read`, `create`, `update`, `approve`, `manage`.
+- Finiquito: capability `hr.final_settlement` con acciones `read`, `create`, `update`, `approve`, `manage`.
 - Route groups reutilizados: `hr` y `people`.
 - Startup policy: sin cambios.
 

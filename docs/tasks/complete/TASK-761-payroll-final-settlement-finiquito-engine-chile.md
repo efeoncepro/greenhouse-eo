@@ -6,19 +6,35 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `EPIC-010`
-- Status real: `Diseno`
+- Status real: `Cerrada 2026-05-04`
 - Rank: `TBD`
 - Domain: `hr`
 - Blocked by: `TASK-760`
-- Branch: `task/TASK-761-payroll-final-settlement-finiquito-engine-chile`
+- Branch: `develop` (instruccion explicita de ejecucion)
 - Legacy ID: `none`
 - GitHub Issue: `none`
+
+## Delta 2026-05-04 — Implementacion cerrada
+
+Se implemento el engine V1 como aggregate separado de payroll mensual:
+
+- tablas `greenhouse_payroll.final_settlements` y `greenhouse_payroll.final_settlement_events`
+- dominio `src/lib/payroll/final-settlement/**`
+- APIs `GET/POST /api/hr/offboarding/cases/[caseId]/final-settlement`, `POST /approve`, `POST /cancel`
+- eventos `payroll.final_settlement.calculated`, `payroll.final_settlement.approved`, `payroll.final_settlement.cancelled`
+- capability `hr.final_settlement` mapeada a `equipo.offboarding`
+
+Drift resuelto:
+
+- La ruta runtime se implemento bajo `/api/hr/offboarding/cases/[caseId]/final-settlement/**` para alinearse con el path real de TASK-760.
+- No existe `last_annual_vacation_date` en runtime; V1 usa `greenhouse_hr.leave_balances` como saldo conciliado y bloquea si falta evidencia.
+- `schema-snapshot-baseline.sql` no reflejaba TASK-760; fuente operativa usada: migraciones aplicadas + `src/types/db.d.ts` regenerado.
 
 ## Summary
 
@@ -202,15 +218,15 @@ Readiness mínimo:
 
 ## Acceptance Criteria
 
-- [ ] Existe runtime separado de payroll mensual para finiquito/final settlement.
-- [ ] Se puede calcular un caso V1 de renuncia Chile dependiente desde un offboarding case.
-- [ ] El resultado queda auditable y explicable.
-- [ ] No se contamina el motor de payroll mensual con lógica ad hoc de finiquito.
-- [ ] El motor falla cerrado si solo existe `contractEndDate`, `member.active = false` o una desactivación administrativa sin caso aprobado.
-- [ ] El settlement separa componentes de cálculo y no mezcla feriado proporcional, remuneraciones pendientes, descuentos y neto en un único monto opaco.
-- [ ] Honorarios, Deel/EOR, contractor e internacional quedan bloqueados explícitamente como regímenes no soportados por V1.
-- [ ] Existe readiness con blockers/warnings y evidencia para offboarding case, compensación, vacaciones, overlap de payroll mensual, cotizaciones y tratamiento tributario/previsional.
-- [ ] Recalcular un settlement aprobado no muta el histórico; crea nueva versión o exige flujo de cancelación/reemisión.
+- [x] Existe runtime separado de payroll mensual para finiquito/final settlement.
+- [x] Se puede calcular un caso V1 de renuncia Chile dependiente desde un offboarding case.
+- [x] El resultado queda auditable y explicable.
+- [x] No se contamina el motor de payroll mensual con lógica ad hoc de finiquito.
+- [x] El motor falla cerrado si solo existe `contractEndDate`, `member.active = false` o una desactivación administrativa sin caso aprobado.
+- [x] El settlement separa componentes de cálculo y no mezcla feriado proporcional, remuneraciones pendientes, descuentos y neto en un único monto opaco.
+- [x] Honorarios, Deel/EOR, contractor e internacional quedan bloqueados explícitamente como regímenes no soportados por V1.
+- [x] Existe readiness con blockers/warnings y evidencia para offboarding case, compensación, vacaciones, overlap de payroll mensual, cotizaciones y tratamiento tributario/previsional.
+- [x] Recalcular un settlement aprobado no muta el histórico; crea nueva versión o exige flujo de cancelación/reemisión.
 
 ## Verification
 
@@ -225,11 +241,11 @@ Readiness mínimo:
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado
-- [ ] archivo movido a la carpeta correcta
-- [ ] `docs/tasks/README.md` sincronizado
-- [ ] `Handoff.md` actualizado
-- [ ] arquitectura/documentación actualizadas
+- [x] `Lifecycle` sincronizado
+- [x] archivo movido a la carpeta correcta
+- [x] `docs/tasks/README.md` sincronizado
+- [x] `Handoff.md` actualizado
+- [x] arquitectura/documentación actualizadas
 
 ## Follow-ups
 

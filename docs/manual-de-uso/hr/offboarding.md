@@ -57,11 +57,17 @@ En la ficha HR de una persona, Greenhouse muestra:
 
 Si no hay caso activo, el CTA `Iniciar offboarding` abre la vista con el colaborador preseleccionado.
 
+## Finiquito
+
+Cuando el caso corresponde a renuncia Chile dependiente con payroll interno, Payroll puede calcular el final settlement desde el caso aprobado o agendado.
+
+El calculo exige capability `hr.final_settlement`, usa `effective_date` y `last_working_day`, y queda separado de la nomina mensual. Si el settlement ya fue aprobado y necesita cambio, se cancela con razon auditable y se recalcula una nueva version.
+
 ## Que no hacer
 
 - No uses `Desactivar` como sustituto de salida laboral.
 - No uses `contractEndDate` como fecha efectiva de salida sin abrir caso.
-- No calcules ni emitas finiquito desde esta vista; eso pertenece a la lane de Payroll final.
+- No emitas documento formal desde esta vista; eso pertenece a la lane documental posterior.
 - No cierres un caso si faltan handoffs, assets, permisos o aprobaciones criticas.
 
 ## Problemas comunes

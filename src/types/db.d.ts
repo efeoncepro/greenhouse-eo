@@ -5601,6 +5601,65 @@ export interface GreenhousePayrollCompensationVersions {
   version_id: string;
 }
 
+export interface GreenhousePayrollFinalSettlementEvents {
+  actor_user_id: string | null;
+  created_at: Generated<Timestamp>;
+  event_id: string;
+  event_type: string;
+  final_settlement_id: string;
+  from_status: string | null;
+  offboarding_case_id: string;
+  payload: Generated<Json>;
+  reason: string | null;
+  to_status: string | null;
+}
+
+export interface GreenhousePayrollFinalSettlements {
+  approved_at: Timestamp | null;
+  approved_by_user_id: string | null;
+  breakdown_json: Generated<Json>;
+  calculated_at: Timestamp | null;
+  calculated_by_user_id: string | null;
+  calculation_status: Generated<string>;
+  cancel_reason: string | null;
+  cancelled_at: Timestamp | null;
+  cancelled_by_user_id: string | null;
+  compensation_version_id: string | null;
+  /**
+   * Contract end date snapshot retained as evidence only. final settlement calculation is driven by offboarding effective_date and last_working_day.
+   */
+  contract_end_date_snapshot: Timestamp | null;
+  contract_type_snapshot: string;
+  created_at: Generated<Timestamp>;
+  currency: Generated<string>;
+  deduction_total: Generated<Numeric>;
+  effective_date: Timestamp;
+  explanation_json: Generated<Json>;
+  final_settlement_id: string;
+  gross_total: Generated<Numeric>;
+  hire_date_snapshot: Timestamp | null;
+  last_working_day: Timestamp;
+  legal_entity_organization_id: string | null;
+  member_id: string;
+  net_payable: Generated<Numeric>;
+  offboarding_case_id: string;
+  pay_regime_snapshot: string;
+  payroll_via_snapshot: string;
+  person_legal_entity_relationship_id: string | null;
+  profile_id: string;
+  readiness_has_blockers: Generated<boolean>;
+  /**
+   * Auditable blockers/warnings/evidence used to approve or block final settlement lifecycle transitions.
+   */
+  readiness_json: Generated<Json>;
+  readiness_status: Generated<string>;
+  separation_type: string;
+  settlement_version: Generated<number>;
+  source_snapshot_json: Generated<Json>;
+  supersedes_final_settlement_id: string | null;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhousePayrollPayrollAdjustments {
   adjustment_id: string;
   approved_at: Timestamp | null;
@@ -8222,6 +8281,8 @@ export interface DB {
   "greenhouse_payroll.chile_previred_indicators": GreenhousePayrollChilePreviredIndicators;
   "greenhouse_payroll.chile_tax_brackets": GreenhousePayrollChileTaxBrackets;
   "greenhouse_payroll.compensation_versions": GreenhousePayrollCompensationVersions;
+  "greenhouse_payroll.final_settlement_events": GreenhousePayrollFinalSettlementEvents;
+  "greenhouse_payroll.final_settlements": GreenhousePayrollFinalSettlements;
   "greenhouse_payroll.payroll_adjustments": GreenhousePayrollPayrollAdjustments;
   "greenhouse_payroll.payroll_bonus_config": GreenhousePayrollPayrollBonusConfig;
   "greenhouse_payroll.payroll_entries": GreenhousePayrollPayrollEntries;
