@@ -1,5 +1,14 @@
 # Handoff.md
 
+## Sesion 2026-05-04 — TASK-758 Payroll Receipt Render Contract Hardening (4 regímenes) — en curso
+
+- **Trigger**: auditoría profunda de recibos detectó que el bug `isChile = payRegime === 'chile'` afecta a 3/4 regímenes (no solo honorarios). TASK-758 ampliada de 1 a 4 regímenes + canonización de mockup HTML como contrato visual vinculante.
+- **Branch**: `develop` (instrucción explícita del usuario: implementar sin cambiar de rama).
+- **Lifecycle**: `in-progress`. Mockup `docs/mockups/task-758-receipt-render-4-regimes.html` aprobado y vinculante 1:1.
+- **Helper canónico**: `src/lib/payroll/receipt-presenter.ts` 🆕 — `resolveReceiptRegime` + `buildReceiptPresentation` puro, server-safe, exhaustiveness `never`-check. Será exportado para TASK-782.
+- **Bump**: `RECEIPT_TEMPLATE_VERSION` 3→4 al cierre de Slice 3 (PDF).
+- **Audit aplicado** (FASE 2 pre-execution): pendiente de impresión en próximo turno.
+
 ## Sesion 2026-05-04 — TASK-764 DESIGN.md Contract Hardening end-to-end
 
 - **Trigger**: `DESIGN.md` adoptado 2026-05-01 quedó como contrato decorativo (sin CI gate, 16 warnings activos, sync no verificada con `GREENHOUSE_DESIGN_TOKENS_V1.md`, skills UI no lo cargaban automático, `design:diff` roto por `DESIGN.prev.md` inexistente).
