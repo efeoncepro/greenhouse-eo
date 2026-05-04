@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="UTF-8">
+<title>TASK-782 — Mockup PDF reporte mensual + Excel export (post-fix)</title>
+<style>
+  /* ───── Tokens canónicos (paridad TASK-758 + V1) ───── */
+  :root {
+    --brand-blue: #023c70;
+    --brand-light: #F7F9FC;
+    --brand-accent-bg: #E8EFF7;
+    --text-primary: #1a1a1a;
+    --text-muted: #666666;
+    --text-faint: #999999;
+    --border-light: #e0e0e0;
+    --border-strong: #c4cdd5;
+    --info-bg: #EAF4FB;
+    --info-border: #0375DB;
+    --warning-bg: #FFF8E6;
+    --warning-border: #d99c1f;
+    --error-bg: #FFF0F0;
+    --error-border: #c0392b;
+    --success-text: #2E7D32;
+
+    /* Badges régimen — paridad mockup TASK-758 */
+    --badge-cldep-bg: #d4edda; --badge-cldep-text: #155724;
+    --badge-hon-bg: #ffe8c2;   --badge-hon-text: #8a4a00;
+    --badge-deel-bg: #fff3d6;  --badge-deel-text: #8a6010;
+    --badge-int-bg: #e0e7ff;   --badge-int-text: #2c3e91;
+
+    /* Excel green */
+    --excel-green: #1F7244;
+    --excel-tab-bg: #E5F2EA;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    padding: 32px 16px;
+    font-family: 'Geist Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #f1f3f6;
+    color: var(--text-primary);
+    line-height: 1.45;
+    font-size: 14px;
+  }
+
+  .legend {
+    max-width: 1280px;
+    margin: 0 auto 32px;
+    padding: 18px 24px;
+    background: #fff;
+    border-radius: 6px; /* customBorderRadius.md */
+    border: 1px solid var(--border-light);
+  }
+
+  .legend h1 {
+    margin: 0 0 8px;
+    font-size: 18px;
+    color: var(--brand-blue);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  .legend h2 {
+    font-size: 13px;
+    color: var(--brand-blue);
+    margin: 14px 0 6px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+  }
+
+  .legend p {
+    margin: 4px 0;
+    color: var(--text-muted);
+    font-size: 13px;
+  }
+
+  .legend strong { color: var(--text-primary); }
+
+  .legend code,
+  .diff-callouts code {
+    background: #eef1f5;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  }
+
+  .legend ul {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin: 0;
+    padding-left: 18px;
+    line-height: 1.6;
+  }
+
+  .container {
+    max-width: 1280px;
+    margin: 0 auto;
+  }
+
+  /* ───── Surface label ───── */
+  .surface-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 32px 0 12px;
+    padding: 0 4px;
+  }
+
+  .surface-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--brand-blue);
+    letter-spacing: -0.01em;
+  }
+
+  .surface-pill {
+    background: var(--brand-blue);
+    color: #fff;
+    padding: 4px 12px;
+    border-radius: 9999px;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  /* ───── PDF Period Report (landscape simulado) ───── */
+  .pdf-page {
+    background: #fff;
+    border: 1px solid var(--border-strong);
+    border-radius: 6px;
+    padding: 32px 40px 24px;
+    box-shadow: 0 6px 18px rgba(2, 60, 112, 0.08);
+    color: var(--text-primary);
+    font-size: 11px;
+    /* Simulando landscape LETTER aspect 11:8.5 */
+    aspect-ratio: 11 / 8.5;
+    overflow: auto;
+  }
+
+  .pdf-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 6px;
+  }
+
+  .pdf-logo {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    color: var(--brand-blue);
+    letter-spacing: -0.01em;
+  }
+
+  .pdf-company {
+    border-left: 3px solid var(--brand-blue);
+    padding-left: 8px;
+    margin-top: 6px;
+  }
+
+  .pdf-company-text {
+    font-size: 9px;
+    color: var(--text-muted);
+    margin: 1px 0;
+  }
+
+  .pdf-period {
+    text-align: right;
+  }
+
+  .pdf-period-label {
+    font-size: 14px;
+    font-weight: 700;
+    margin: 0;
+    color: var(--text-primary);
+  }
+
+  .pdf-period-sub {
+    font-size: 9px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+
+  .pdf-accent {
+    border-bottom: 2px solid var(--brand-blue);
+    margin-bottom: 14px;
+  }
+
+  .pdf-doc-title {
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--brand-blue);
+    letter-spacing: 2.5px;
+    text-align: center;
+    margin: 4px 0 14px;
+    text-transform: uppercase;
+  }
+
+  /* Summary strip ampliado: 8 KPIs en lugar de 6 */
+  .pdf-summary {
+    background: var(--brand-light);
+    display: flex;
+    padding: 10px 12px;
+    margin-bottom: 12px;
+    gap: 0;
+    border-radius: 4px;
+  }
+
+  .pdf-summary-item {
+    flex: 1;
+    padding: 0 8px;
+    border-right: 0.5px solid var(--border-light);
+    min-width: 0;
+  }
+
+  .pdf-summary-item:last-child { border-right: none; }
+
+  .pdf-summary-label {
+    font-size: 7px;
+    color: var(--text-muted);
+    letter-spacing: 1.2px;
+    margin-bottom: 2px;
+    text-transform: uppercase;
+  }
+
+  .pdf-summary-value {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .pdf-meta-row {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 10px;
+  }
+
+  .pdf-meta-item {
+    font-size: 9px;
+    color: var(--text-muted);
+  }
+
+  /* Section header (Detalle) */
+  .pdf-section-header {
+    display: flex;
+    align-items: center;
+    margin: 12px 0 6px;
+  }
+
+  .pdf-section-accent {
+    width: 3px;
+    height: 11px;
+    background: var(--brand-blue);
+    margin-right: 6px;
+  }
+
+  .pdf-section-title {
+    font-size: 7px;
+    font-weight: 700;
+    color: var(--brand-blue);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
+
+  /* Table */
+  .pdf-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 9px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .pdf-table thead th {
+    background: var(--brand-blue);
+    color: #fff;
+    font-weight: 700;
+    font-size: 8px;
+    padding: 6px 4px;
+    text-align: left;
+  }
+
+  .pdf-table thead th.num { text-align: right; }
+  .pdf-table thead th.center { text-align: center; }
+
+  .pdf-table tbody td {
+    padding: 5px 4px;
+    border-bottom: 0.5px solid var(--border-light);
+    font-size: 9px;
+    color: var(--text-primary);
+  }
+
+  .pdf-table tbody tr.alt td { background: var(--brand-light); }
+  .pdf-table tbody td.num { text-align: right; }
+  .pdf-table tbody td.center { text-align: center; }
+  .pdf-table tbody td.dim { color: var(--text-faint); }
+
+  /* Group divider rows */
+  .pdf-group-divider td {
+    background: #d6e0eb !important;
+    color: var(--brand-blue) !important;
+    font-weight: 700;
+    font-size: 8px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 6px 6px !important;
+  }
+
+  /* Subtotal rows */
+  .pdf-subtotal td {
+    background: var(--brand-accent-bg) !important;
+    border-top: 1.5px solid var(--brand-blue);
+    font-weight: 700;
+    padding: 6px 4px !important;
+  }
+
+  /* Régimen badge inline */
+  .badge {
+    display: inline-block;
+    padding: 1px 6px;
+    border-radius: 9999px;
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+
+  .badge-cldep { background: var(--badge-cldep-bg); color: var(--badge-cldep-text); }
+  .badge-hon { background: var(--badge-hon-bg); color: var(--badge-hon-text); }
+  .badge-deel { background: var(--badge-deel-bg); color: var(--badge-deel-text); }
+  .badge-int { background: var(--badge-int-bg); color: var(--badge-int-text); }
+
+  .pdf-footer {
+    margin-top: 12px;
+    padding-top: 6px;
+    border-top: 0.5px solid var(--border-light);
+    display: flex;
+    justify-content: space-between;
+    font-size: 8px;
+    color: var(--text-faint);
+  }
+
+  /* ───── Excel mockup ───── */
+  .excel-window {
+    background: #fff;
+    border: 1px solid var(--border-strong);
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(2, 60, 112, 0.06);
+    overflow: hidden;
+  }
+
+  .excel-toolbar {
+    background: var(--excel-green);
+    color: #fff;
+    padding: 8px 16px;
+    font-size: 12px;
+    font-weight: 600;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .excel-toolbar-icons {
+    display: flex;
+    gap: 8px;
+    font-size: 11px;
+    opacity: 0.85;
+  }
+
+  .excel-content {
+    padding: 0;
+    background: #fff;
+  }
+
+  .excel-grid {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .excel-grid th {
+    background: var(--excel-tab-bg);
+    color: var(--excel-green);
+    font-weight: 700;
+    font-size: 10px;
+    padding: 6px 8px;
+    text-align: left;
+    border: 1px solid var(--border-light);
+    letter-spacing: 0.3px;
+  }
+
+  .excel-grid th.num, .excel-grid td.num { text-align: right; }
+  .excel-grid th.center, .excel-grid td.center { text-align: center; }
+
+  .excel-grid td {
+    padding: 5px 8px;
+    border: 1px solid var(--border-light);
+    color: var(--text-primary);
+    font-size: 10.5px;
+  }
+
+  .excel-grid td.dim { color: var(--text-faint); }
+
+  .excel-section-row td {
+    background: #d6e0eb;
+    color: var(--brand-blue);
+    font-weight: 700;
+    font-size: 10px;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    padding: 7px 8px;
+    border-color: var(--border-strong);
+  }
+
+  .excel-subtotal td {
+    background: var(--brand-accent-bg);
+    font-weight: 700;
+    border-top: 1.5px solid var(--brand-blue);
+  }
+
+  .excel-tabs {
+    display: flex;
+    background: #f6f8fa;
+    border-top: 1px solid var(--border-strong);
+    padding: 4px 8px 0;
+    gap: 2px;
+    font-size: 11px;
+  }
+
+  .excel-tab {
+    padding: 6px 14px;
+    background: #e9eef3;
+    border: 1px solid var(--border-strong);
+    border-bottom: none;
+    border-radius: 4px 4px 0 0;
+    color: var(--text-muted);
+    cursor: pointer;
+  }
+
+  .excel-tab.active {
+    background: #fff;
+    color: var(--brand-blue);
+    font-weight: 700;
+    position: relative;
+    z-index: 1;
+    border-bottom: 1px solid #fff;
+    margin-bottom: -1px;
+  }
+
+  /* ───── Diff callouts ───── */
+  .diff-callouts {
+    background: #FAFCFF;
+    border: 1px dashed #c4d3e3;
+    border-radius: 4px;
+    padding: 14px 18px;
+    margin-top: 16px;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  .diff-callouts h4 {
+    margin: 0 0 8px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--brand-blue);
+  }
+
+  .diff-callouts ul {
+    margin: 0;
+    padding-left: 18px;
+  }
+
+  .diff-callouts li { margin: 4px 0; }
+  .diff-callouts .added { color: var(--success-text); }
+  .diff-callouts .removed { color: var(--error-border); text-decoration: line-through; opacity: 0.85; }
+  .diff-callouts .renamed { color: var(--warning-border); }
+
+  /* InfoBlock genérico */
+  .info-block {
+    margin-top: 14px;
+    padding: 12px 14px;
+    border-left: 3px solid var(--info-border);
+    background: var(--info-bg);
+    border-radius: 0 4px 4px 0;
+  }
+
+  .info-block.warning { border-left-color: var(--warning-border); background: var(--warning-bg); }
+  .info-block.error { border-left-color: var(--error-border); background: var(--error-bg); }
+
+  .info-title { font-size: 12px; font-weight: 700; margin: 0 0 4px; color: var(--text-primary); }
+  .info-body { font-size: 11px; color: var(--text-muted); margin: 0; line-height: 1.5; }
+
+  /* Comparison side-by-side hoy vs post-fix */
+  .compare-wrap {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 16px 0;
+  }
+
+  .compare-card {
+    background: #fff;
+    border: 1px solid var(--border-light);
+    border-radius: 6px;
+    padding: 16px;
+    font-size: 11px;
+  }
+
+  .compare-card.before {
+    border-left: 4px solid var(--error-border);
+  }
+
+  .compare-card.after {
+    border-left: 4px solid var(--success-text);
+  }
+
+  .compare-card h3 {
+    font-size: 11px;
+    margin: 0 0 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .compare-card.before h3 { color: var(--error-border); }
+  .compare-card.after h3 { color: var(--success-text); }
+
+  .compare-card pre {
+    background: #f7f9fc;
+    padding: 8px 10px;
+    border-radius: 4px;
+    font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+    font-size: 10px;
+    color: var(--text-primary);
+    margin: 0;
+    overflow-x: auto;
+    line-height: 1.5;
+  }
+
+  @media (max-width: 1100px) {
+    .pdf-page { aspect-ratio: auto; }
+    .compare-wrap { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<section class="legend" aria-labelledby="mockup-title">
+  <h1 id="mockup-title">TASK-782 — Mockup PDF reporte mensual + Excel export (post-fix)</h1>
+  <p><strong>Audience:</strong> operador HR / compliance / SII / PREVIRED. <strong>NO</strong> es el recibo individual del colaborador (eso vive en TASK-758).</p>
+  <p><strong>Bug raíz hoy:</strong> tanto el <code>PeriodReportDocument</code> (PDF reporte mensual) como <code>generate-payroll-excel.ts</code> agregan honorarios al pool "Chile" sin distinción. Como el motor asigna <code>chileTotalDeductions = siiRetentionAmount</code> para honorarios, el subtotal "Total descuentos Chile" mezcla descuentos previsionales (AFP/salud/cesantía/IUSC) con retención SII de boletas — un agente SII/PREVIRED que descargue el reporte ve un agregado inflado.</p>
+  <p><strong>Fix:</strong> ambos surfaces consumen <code>resolveReceiptRegime</code> exportado por TASK-758 — single source of truth — y separan en 4 grupos canónicos (<code>chile_dependent</code> / <code>honorarios</code> / <code>international_deel</code> / <code>international_internal</code>) con subtotales independientes.</p>
+
+  <h2>Notas de implementación (skills aplicadas)</h2>
+  <ul>
+    <li><strong>Tokens (V1 + DESIGN.md):</strong> <code>Geist Sans</code> body + <code>Poppins</code> display; <code>font-variant-numeric: tabular-nums</code> en todas las celdas numéricas — alineación monoespaciada SIN monospace; <code>customBorderRadius.md</code> = 6px (cards), <code>.sm</code> = 4px (info-blocks); spacing scale {0.5, 1, 1.5, 2, 3, 4, 5, 6, 8, 10, 12} — sin valores off-scale.</li>
+    <li><strong>Color (semántica V1):</strong> <code>info</code>/<code>warning</code>/<code>error</code> reservados para STATES; badges régimen <code>CL-DEP</code> (verde) / <code>HON</code> (ámbar) / <code>DEEL</code> (mostaza) / <code>INT</code> (índigo) — paridad mockup TASK-758. Brand blue <code>#023c70</code> (role <code>account</code>) preservado para headers PDF.</li>
+    <li><strong>A11y (WCAG 2.2 AA):</strong> tablas con <code>&lt;caption&gt;</code> + <code>scope="col"</code> en headers; cada `<article>` lleva <code>aria-label</code> resumen; subtotales NO comunican estado solo por color — siempre llevan label semántico ("Total descuentos previsionales", "Total retención SII"); contraste verificado (text-muted #666 sobre brand-light #F7F9FC = 7:1, brand-blue #023c70 sobre brand-accent-bg #E8EFF7 = 9.4:1).</li>
+    <li><strong>Microinteracciones (greenhouse-microinteractions + microinteractions-auditor):</strong> exports estáticos — sin motion. La UI surrounding (PayrollPeriodView que dispara la descarga) sí debe usar: (a) loading button durante generación PDF/Excel — <code>CircularProgress size={14}</code> dentro del Button + texto "Generando…"; (b) <code>react-toastify</code> con <code>type='success'</code> al completar + link al archivo; (c) <code>role="status" aria-live="polite"</code> en el contenedor de descarga.</li>
+    <li><strong>Payroll skill (greenhouse-payroll-auditor):</strong> separación honorarios / dependientes preserva la invariante "Classify before calculating". El reporte no debe sumar SII retention al pool previsional — eso permite reconciliación natural contra F29/PREVIRED. Costo empleador (SIS, cesantía empleador, mutual) NO se incluye en este mockup — feature operador-facing distinto, follow-up explícito.</li>
+    <li><strong>Helper compartido (TASK-758):</strong> ambos surfaces consumen <code>resolveReceiptRegime(entry)</code> + <code>groupEntriesByRegime(entries)</code>. NO duplicar lógica de detección de régimen. Cualquier nuevo <code>ContractType</code> rompe build vía <code>never</code>-check.</li>
+  </ul>
+</section>
+
+<div class="container">
+
+<!-- ════════════════════════════════════════════════════════════
+     PDF MOCKUP — PeriodReportDocument (landscape LETTER)
+     ════════════════════════════════════════════════════════════ -->
+<div class="surface-header">
+  <div class="surface-title">PDF · Reporte de nómina mensual (landscape)</div>
+  <div class="surface-pill">PERIODREPORTDOCUMENT</div>
+</div>
+
+<article class="pdf-page" aria-label="Mockup PDF reporte de nómina abril 2026 — 8 colaboradores, 4 dependientes Chile, 2 honorarios, 2 Deel">
+  <div class="pdf-header">
+    <div>
+      <div class="pdf-logo">Efeonce</div>
+      <div class="pdf-company">
+        <div class="pdf-company-text">Efeonce Group SpA</div>
+        <div class="pdf-company-text">RUT 76.123.456-7</div>
+        <div class="pdf-company-text">Av. Apoquindo 4500, Las Condes</div>
+      </div>
+    </div>
+    <div class="pdf-period">
+      <p class="pdf-period-label">Abril 2026</p>
+      <p class="pdf-period-sub">Reporte de nómina</p>
+      <p class="pdf-period-sub">2026-04</p>
+    </div>
+  </div>
+  <div class="pdf-accent"></div>
+  <p class="pdf-doc-title">REPORTE DE NÓMINA</p>
+
+  <!-- Summary strip ampliado: 8 KPIs (antes 6) -->
+  <div class="pdf-summary">
+    <div class="pdf-summary-item">
+      <div class="pdf-summary-label">Colaboradores</div>
+      <div class="pdf-summary-value">8</div>
+    </div>
+    <div class="pdf-summary-item">
+      <div class="pdf-summary-label">Estado</div>
+      <div class="pdf-summary-value">Aprobado</div>
+    </div>
+    <div class="pdf-summary-item">
+      <div class="pdf-summary-label">CL-DEP</div>
+      <div class="pdf-summary-value">4</div>
+    </div>
+    <div class="pdf-summary-item">
+      <div class="pdf-summary-label">HON</div>
+      <div class="pdf-summary-value">2</div>
+    </div>
+    <div class="pdf-summary-item">
+      <div class="pdf-summary-label">DEEL</div>
+      <div class="pdf-summary-value">2</div>
+    </div>
+    <div class="pdf-summary-item">
+      <div class="pdf-summary-label">Bruto CLP</div>
+      <div class="pdf-summary-value">$13.798.792</div>
+    </div>
+    <div class="pdf-summary-item">
+      <div class="pdf-summary-label">Neto CLP</div>
+      <div class="pdf-summary-value">$11.150.945</div>
+    </div>
+    <div class="pdf-summary-item">
+      <div class="pdf-summary-label">Bruto USD</div>
+      <div class="pdf-summary-value">US$ 7.100,00</div>
+    </div>
+  </div>
+
+  <div class="pdf-meta-row">
+    <div class="pdf-meta-item">UF: $39.123,55</div>
+    <div class="pdf-meta-item">UTM: $68.034</div>
+    <div class="pdf-meta-item">Aprobado: 2026-05-02</div>
+    <div class="pdf-meta-item">Tabla tributaria: 2026-04</div>
+  </div>
+
+  <div class="pdf-section-header">
+    <div class="pdf-section-accent"></div>
+    <div class="pdf-section-title">Detalle — 8 colaboradores agrupados por régimen</div>
+  </div>
+
+  <table class="pdf-table" role="table" aria-label="Detalle de nómina abril 2026 agrupado por régimen">
+    <caption style="caption-side: top; text-align: left; font-size: 8px; color: var(--text-muted); margin-bottom: 4px;">
+      Subtotales separados: descuentos previsionales (CL-DEP) y retención SII (HON) NO se mezclan.
+    </caption>
+    <thead>
+      <tr>
+        <th scope="col" style="width: 17%;">Nombre</th>
+        <th scope="col" class="center" style="width: 7%;">Régimen</th>
+        <th scope="col" class="center" style="width: 5%;">Mon.</th>
+        <th scope="col" class="num" style="width: 9%;">Base</th>
+        <th scope="col" class="num" style="width: 8%;">OTD</th>
+        <th scope="col" class="num" style="width: 8%;">RpA</th>
+        <th scope="col" class="num" style="width: 9%;">Bruto</th>
+        <th scope="col" class="num" style="width: 10%;">Desc. previs.</th>
+        <th scope="col" class="num" style="width: 10%;">Retención SII</th>
+        <th scope="col" class="num" style="width: 9%;">Neto</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Group 1: Chile dependiente -->
+      <tr class="pdf-group-divider"><td colspan="10">Chile dependiente · 4 colaboradores</td></tr>
+      <tr>
+        <td>Valentina Hoyos</td>
+        <td class="center"><span class="badge badge-cldep">CL-DEP</span></td>
+        <td class="center">CLP</td>
+        <td class="num">$1.800.000</td>
+        <td class="num">$120.000</td>
+        <td class="num">$80.000</td>
+        <td class="num">$2.389.396</td>
+        <td class="num">$496.097</td>
+        <td class="num dim">—</td>
+        <td class="num">$1.893.299</td>
+      </tr>
+      <tr class="alt">
+        <td>César Pérez</td>
+        <td class="center"><span class="badge badge-cldep">CL-DEP</span></td>
+        <td class="center">CLP</td>
+        <td class="num">$2.500.000</td>
+        <td class="num">$300.000</td>
+        <td class="num">$0</td>
+        <td class="num">$3.009.396</td>
+        <td class="num">$754.538</td>
+        <td class="num dim">—</td>
+        <td class="num">$2.300.000</td>
+      </tr>
+      <tr>
+        <td>Carla Bravo</td>
+        <td class="center"><span class="badge badge-cldep">CL-DEP</span></td>
+        <td class="center">CLP</td>
+        <td class="num">$1.450.000</td>
+        <td class="num">$80.000</td>
+        <td class="num">$60.000</td>
+        <td class="num">$1.799.396</td>
+        <td class="num">$391.215</td>
+        <td class="num dim">—</td>
+        <td class="num">$1.408.181</td>
+      </tr>
+      <tr class="alt">
+        <td>Pedro Carrasco <span style="color: var(--error-border); font-size: 8px;">⚠ excluido</span></td>
+        <td class="center"><span class="badge badge-cldep">CL-DEP</span></td>
+        <td class="center">CLP</td>
+        <td class="num dim">—</td>
+        <td class="num dim">—</td>
+        <td class="num dim">—</td>
+        <td class="num">$0</td>
+        <td class="num">$0</td>
+        <td class="num dim">—</td>
+        <td class="num">$0</td>
+      </tr>
+      <tr class="pdf-subtotal">
+        <td colspan="6" style="text-align: left; padding-left: 8px;">Total Chile dependiente</td>
+        <td class="num">$7.198.188</td>
+        <td class="num">$1.641.850</td>
+        <td class="num dim">—</td>
+        <td class="num">$5.601.480</td>
+      </tr>
+
+      <!-- Group 2: Honorarios -->
+      <tr class="pdf-group-divider"><td colspan="10">Honorarios · 2 colaboradores</td></tr>
+      <tr>
+        <td>Humberly Henríquez</td>
+        <td class="center"><span class="badge badge-hon">HON</span></td>
+        <td class="center">CLP</td>
+        <td class="num">$1.500.000</td>
+        <td class="num dim">—</td>
+        <td class="num dim">—</td>
+        <td class="num">$1.700.000</td>
+        <td class="num dim">—</td>
+        <td class="num">$259.250</td>
+        <td class="num">$1.440.750</td>
+      </tr>
+      <tr class="alt">
+        <td>Luis Reyes</td>
+        <td class="center"><span class="badge badge-hon">HON</span></td>
+        <td class="center">CLP</td>
+        <td class="num">$1.200.000</td>
+        <td class="num dim">—</td>
+        <td class="num dim">—</td>
+        <td class="num">$900.000</td>
+        <td class="num dim">—</td>
+        <td class="num">$137.250</td>
+        <td class="num">$762.750</td>
+      </tr>
+      <tr class="pdf-subtotal">
+        <td colspan="6" style="text-align: left; padding-left: 8px;">Total Honorarios</td>
+        <td class="num">$2.600.000</td>
+        <td class="num dim">—</td>
+        <td class="num">$396.500</td>
+        <td class="num">$2.203.500</td>
+      </tr>
+
+      <!-- Group 3: Internacional Deel -->
+      <tr class="pdf-group-divider"><td colspan="10">Internacional Deel · 2 colaboradores</td></tr>
+      <tr>
+        <td>Daniela Ferreira</td>
+        <td class="center"><span class="badge badge-deel">DEEL</span></td>
+        <td class="center">USD</td>
+        <td class="num">US$ 3.200,00</td>
+        <td class="num">US$ 200,00</td>
+        <td class="num">US$ 150,00</td>
+        <td class="num">US$ 3.900,00</td>
+        <td class="num dim">—</td>
+        <td class="num dim">—</td>
+        <td class="num">US$ 3.900,00</td>
+      </tr>
+      <tr class="alt">
+        <td>Andrés Carlosama</td>
+        <td class="center"><span class="badge badge-deel">DEEL</span></td>
+        <td class="center">USD</td>
+        <td class="num">US$ 2.800,00</td>
+        <td class="num">US$ 180,00</td>
+        <td class="num">US$ 120,00</td>
+        <td class="num">US$ 3.200,00</td>
+        <td class="num dim">—</td>
+        <td class="num dim">—</td>
+        <td class="num">US$ 3.200,00</td>
+      </tr>
+      <tr class="pdf-subtotal">
+        <td colspan="6" style="text-align: left; padding-left: 8px;">Total Internacional Deel</td>
+        <td class="num">US$ 7.100,00</td>
+        <td class="num dim">—</td>
+        <td class="num dim">—</td>
+        <td class="num">US$ 7.100,00</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="pdf-footer">
+    <span>Efeonce Group SpA — Abril 2026</span>
+    <span>efeoncepro.com</span>
+    <span>Generado: 2026-05-04</span>
+  </div>
+</article>
+
+<!-- Compare hoy vs post-fix -->
+<div class="compare-wrap">
+  <div class="compare-card before">
+    <h3>Hoy (v3) — bug</h3>
+    <pre>Régimen column:    CL / INT  (2 valores)
+
+Total Chile        $9.798.188
+Descuentos         $2.038.350   ← MEZCLA $1.641.850 prev. + $396.500 SII
+Neto               $7.804.980
+
+Total Internacional US$ 7.100,00
+Descuentos          —
+Neto                US$ 7.100,00</pre>
+    <p style="font-size: 11px; color: var(--error-border); margin: 8px 0 0;">
+      <strong>Compliance ve:</strong> $2.038.350 como "descuentos previsionales Chile" → reconciliación contra PREVIRED falla por $396.500 que en realidad son retención SII de boletas.
+    </p>
+  </div>
+  <div class="compare-card after">
+    <h3>Post-fix — TASK-782</h3>
+    <pre>Régimen column:    CL-DEP / HON / DEEL / INT  (4 valores)
+
+Total Chile dep.    $7.198.188
+Desc. previsionales $1.641.850   ← solo AFP/salud/cesantía/IUSC
+Retención SII       —
+Neto                $5.601.480
+
+Total Honorarios    $2.600.000
+Desc. previsionales —
+Retención SII       $396.500     ← columna propia, separada
+Neto                $2.203.500
+
+Total Internacional US$ 7.100,00
+Desc. previsionales —
+Retención SII       —
+Neto                US$ 7.100,00</pre>
+    <p style="font-size: 11px; color: var(--success-text); margin: 8px 0 0;">
+      <strong>Compliance ve:</strong> $1.641.850 prev. concilia 1:1 con PREVIRED · $396.500 SII concilia 1:1 con F29 retenciones honorarios.
+    </p>
+  </div>
+</div>
+
+<div class="diff-callouts">
+  <h4>Cambios PDF vs v3</h4>
+  <ul>
+    <li class="added">+ Summary strip ampliado: 8 KPIs (antes 6) — agrega contadores #CL-DEP, #HON, #DEEL</li>
+    <li class="added">+ Columna régimen con 4 valores distinguibles (badges color-coded paridad TASK-758)</li>
+    <li class="added">+ <strong>Columna nueva "Retención SII"</strong> separada de "Desc. previs." — celdas vacías = `—` (text-faint, NO `$0` que confunde)</li>
+    <li class="added">+ Group divider rows entre regímenes (visualmente claro: ejecutivo no necesita leer la columna régimen para entender)</li>
+    <li class="added">+ 3 subtotales separados (Total Chile dep / Total Honorarios / Total Internacional Deel), cada uno con su columna de descuento correspondiente y `—` en las que no aplican</li>
+    <li class="added">+ Estado terminal `excluded` muestra fila con `$0` total y warning chip "⚠ excluido" en el nombre</li>
+    <li class="added">+ Meta row ampliada: UF + UTM + Aprobado + Tabla tributaria</li>
+    <li class="renamed">⇄ "Descuentos" → split en "Desc. previs." (CL-DEP) + "Retención SII" (HON)</li>
+    <li class="removed">− Subtotal único "Total Chile" mezclando dependientes + honorarios</li>
+    <li class="removed">− Régimen con solo "CL" / "INT" (indistinguible para compliance)</li>
+  </ul>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════
+     EXCEL MOCKUP — generate-payroll-excel.ts
+     ════════════════════════════════════════════════════════════ -->
+<div class="surface-header" style="margin-top: 48px;">
+  <div class="surface-title">Excel · Export operador (multi-sheet)</div>
+  <div class="surface-pill">GENERATE-PAYROLL-EXCEL</div>
+</div>
+
+<div class="excel-window">
+  <div class="excel-toolbar">
+    <span>📊 nomina-abril-2026.xlsx</span>
+    <span class="excel-toolbar-icons">⬇ Descargar &nbsp;·&nbsp; 🖨 Imprimir &nbsp;·&nbsp; 📤 Compartir</span>
+  </div>
+
+  <div class="excel-content">
+    <table class="excel-grid" role="table" aria-label="Hoja Chile — abril 2026 con secciones separadas dependientes y honorarios">
+      <caption style="caption-side: top; text-align: left; padding: 8px 12px; background: #fafcff; font-size: 11px; color: var(--text-muted); border-bottom: 1px solid var(--border-light);">
+        <strong>Pestaña activa:</strong> Chile · Dos secciones internas (dependientes + honorarios) con subtotales independientes.
+      </caption>
+      <thead>
+        <tr>
+          <th scope="col" style="width: 4%;">#</th>
+          <th scope="col" style="width: 16%;">Nombre</th>
+          <th scope="col" class="center" style="width: 8%;">Régimen</th>
+          <th scope="col" class="num" style="width: 9%;">Bruto</th>
+          <th scope="col" class="num" style="width: 8%;">Gratif.</th>
+          <th scope="col" class="num" style="width: 8%;">AFP</th>
+          <th scope="col" class="num" style="width: 8%;">Salud</th>
+          <th scope="col" class="num" style="width: 7%;">Cesantía</th>
+          <th scope="col" class="num" style="width: 7%;">IUSC</th>
+          <th scope="col" class="num" style="width: 6%;">APV</th>
+          <th scope="col" class="num" style="width: 8%;">Tasa SII</th>
+          <th scope="col" class="num" style="width: 9%;">Retención SII</th>
+          <th scope="col" class="num" style="width: 9%;">Neto</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="excel-section-row"><td colspan="13">▼ Sección 1 · Chile dependiente (4 colaboradores)</td></tr>
+        <tr>
+          <td class="center">1</td>
+          <td>Valentina Hoyos</td>
+          <td class="center"><span class="badge badge-cldep">CL-DEP</span></td>
+          <td class="num">$2.389.396</td>
+          <td class="num">$209.396</td>
+          <td class="num">$269.285</td>
+          <td class="num">$167.258</td>
+          <td class="num">$14.336</td>
+          <td class="num">$45.218</td>
+          <td class="num">$0</td>
+          <td class="num dim">—</td>
+          <td class="num dim">—</td>
+          <td class="num">$1.893.299</td>
+        </tr>
+        <tr>
+          <td class="center">2</td>
+          <td>César Pérez</td>
+          <td class="center"><span class="badge badge-cldep">CL-DEP</span></td>
+          <td class="num">$3.009.396</td>
+          <td class="num">$209.396</td>
+          <td class="num">$318.394</td>
+          <td class="num">$255.658</td>
+          <td class="num">$18.056</td>
+          <td class="num">$112.430</td>
+          <td class="num">$50.000</td>
+          <td class="num dim">—</td>
+          <td class="num dim">—</td>
+          <td class="num">$2.300.000</td>
+        </tr>
+        <tr>
+          <td class="center">3</td>
+          <td>Carla Bravo</td>
+          <td class="center"><span class="badge badge-cldep">CL-DEP</span></td>
+          <td class="num">$1.799.396</td>
+          <td class="num">$209.396</td>
+          <td class="num">$202.835</td>
+          <td class="num">$125.958</td>
+          <td class="num">$10.796</td>
+          <td class="num">$32.408</td>
+          <td class="num">$19.218</td>
+          <td class="num dim">—</td>
+          <td class="num dim">—</td>
+          <td class="num">$1.408.181</td>
+        </tr>
+        <tr>
+          <td class="center">4</td>
+          <td>Pedro Carrasco <span style="color: var(--error-border); font-size: 9px;">⚠ excluido</span></td>
+          <td class="center"><span class="badge badge-cldep">CL-DEP</span></td>
+          <td class="num">$0</td>
+          <td class="num dim">—</td>
+          <td class="num dim">—</td>
+          <td class="num dim">—</td>
+          <td class="num dim">—</td>
+          <td class="num dim">—</td>
+          <td class="num dim">—</td>
+          <td class="num dim">—</td>
+          <td class="num dim">—</td>
+          <td class="num">$0</td>
+        </tr>
+        <tr class="excel-subtotal">
+          <td colspan="3" style="text-align: right;">Total descuentos previsionales</td>
+          <td class="num">$7.198.188</td>
+          <td class="num">$628.188</td>
+          <td class="num">$790.514</td>
+          <td class="num">$548.874</td>
+          <td class="num">$43.188</td>
+          <td class="num">$190.056</td>
+          <td class="num">$69.218</td>
+          <td class="num dim">—</td>
+          <td class="num dim">—</td>
+          <td class="num">$5.601.480</td>
+        </tr>
+
+        <tr class="excel-section-row"><td colspan="13">▼ Sección 2 · Honorarios (2 colaboradores)</td></tr>
+        <tr>
+          <td class="center">5</td>
+          <td>Humberly Henríquez</td>
+          <td class="center"><span class="badge badge-hon">HON</span></td>
+          <td class="num">$1.700.000</td>
+          <td class="num dim">—</td>
+          <td class="num dim">—</td>
+          <td class="num dim">—</td>
+          <td class="num dim">—</td>
+          <td class="num dim">—</td>
+          <td class="num dim">—</td>
+          <td class="num">15,25%</td>
+          <td class="num">$259.250</td>
+          <td class="num">$1.440.750</td>
+        </tr>
+        <tr>
+          <td class="center">6</td>
+          <td>Luis Reyes</td>
+          <td class="center"><span class="badge badge-hon">HON</span></td>
+          <td class="num">$900.000</td>
+          <td class="num dim">—</td>
+          <td class="num dim">—</td>
+          <td class="num dim">—</td>
+          <td class="num dim">—</td>
+          <td class="num dim">—</td>
+          <td class="num dim">—</td>
+          <td class="num">15,25%</td>
+          <td class="num">$137.250</td>
+          <td class="num">$762.750</td>
+        </tr>
+        <tr class="excel-subtotal">
+          <td colspan="3" style="text-align: right;">Total retención SII honorarios</td>
+          <td class="num">$2.600.000</td>
+          <td class="num dim">—</td>
+          <td class="num dim">—</td>
+          <td class="num dim">—</td>
+          <td class="num dim">—</td>
+          <td class="num dim">—</td>
+          <td class="num dim">—</td>
+          <td class="num">15,25%</td>
+          <td class="num">$396.500</td>
+          <td class="num">$2.203.500</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Excel tabs row -->
+    <div class="excel-tabs">
+      <div class="excel-tab">📋 Resumen</div>
+      <div class="excel-tab active">🇨🇱 Chile</div>
+      <div class="excel-tab">🌍 Internacional</div>
+    </div>
+  </div>
+</div>
+
+<div class="info-block" style="margin-top: 16px;">
+  <p class="info-title">Layout decision: dos secciones dentro de una sola pestaña Chile</p>
+  <p class="info-body">
+    El operador HR / compliance lee el mes calendario completo de pago Chile en una sola pestaña, con secciones internas separadas para dependientes y honorarios. Esto preserva la lectura unificada por mes (use case principal del operador) y mantiene la disaggregación auditable. Si compliance pidiera pestañas separadas más adelante, el refactor es trivial — la separación viene del helper canónico, no del layout.
+    Alternativa <strong>rechazada</strong>: pestañas separadas <code>Chile - Dependientes</code> y <code>Chile - Honorarios</code> — fragmenta lectura mensual sin ganar nada operativo.
+  </p>
+</div>
+
+<div class="info-block warning" style="margin-top: 12px;">
+  <p class="info-title">Pestaña Internacional — paridad estructural</p>
+  <p class="info-body">
+    NO modelada en este mockup por simplicidad visual. Sigue el mismo patrón: dos secciones internas (Internacional Deel / Internacional interno) con subtotales separados. Sin columnas de descuentos previsionales ni retención SII (no aplican). Columna informativa adicional <code>deelContractId</code> para la sección Deel cuando existe.
+  </p>
+</div>
+
+<div class="diff-callouts">
+  <h4>Cambios Excel vs v3</h4>
+  <ul>
+    <li class="added">+ Pestaña Chile dividida en 2 secciones internas (`▼ Sección 1 Chile dependiente` / `▼ Sección 2 Honorarios`) con subtotales independientes</li>
+    <li class="added">+ Columnas nuevas dedicadas a honorarios: <code>Tasa SII</code> + <code>Retención SII</code></li>
+    <li class="added">+ Para honorarios, columnas previsionales (AFP/Salud/Cesantía/IUSC/APV) llenas con <code>—</code> (text-faint), NUNCA <code>$0</code> (lectura ambigua)</li>
+    <li class="added">+ Para dependientes, columnas SII (Tasa/Retención) llenas con <code>—</code></li>
+    <li class="added">+ Subtotal "Total descuentos previsionales" (solo dependientes) ≠ Subtotal "Total retención SII honorarios" (solo honorarios)</li>
+    <li class="added">+ Badge régimen color-coded en columna 3 (paridad PDF + recibos TASK-758)</li>
+    <li class="renamed">⇄ Subtotal único "Total descuentos Chile" → 2 subtotales independientes</li>
+    <li class="removed">− Mezcla AFP/salud/cesantía/IUSC con retención SII en pool indiferenciado</li>
+    <li class="removed">− Honorarios sin columna propia para tasa/retención</li>
+  </ul>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════
+     IMPLEMENTATION RULES (vinculantes)
+     ════════════════════════════════════════════════════════════ -->
+
+<section class="legend" style="margin-top: 32px;">
+  <h2 style="margin-top: 0;">Reglas duras de implementación (vinculantes)</h2>
+  <ol style="font-size: 12px; color: var(--text-muted); padding-left: 20px; line-height: 1.7;">
+    <li><strong>Single source of truth para clasificación</strong>: ambos surfaces consumen <code>resolveReceiptRegime</code> exportado por TASK-758. Helper auxiliar <code>groupEntriesByRegime(entries)</code> retorna <code>Record&lt;ReceiptRegime, PayrollEntry[]&gt;</code>. NUNCA reimplementar el detector inline.</li>
+    <li><strong>Orden canónico de regímenes en ambos surfaces</strong>: <code>chile_dependent → honorarios → international_deel → international_internal</code>. Stable. No depende del orden alfabético del nombre.</li>
+    <li><strong>Régimen column con 4 valores</strong> (badges color-coded paridad TASK-758): <code>CL-DEP</code> verde · <code>HON</code> ámbar · <code>DEEL</code> mostaza · <code>INT</code> índigo. Los hex viven en <code>receipt-presenter.ts</code> y se exportan para reuso aquí.</li>
+    <li><strong>Celdas no aplicables = <code>—</code> con clase <code>dim</code></strong> (text-faint), NUNCA <code>$0</code>. Honorarios en columnas previsionales = <code>—</code>. Dependientes en columnas SII = <code>—</code>. Distinción semántica: <code>$0</code> = aplica pero el monto es cero; <code>—</code> = no aplica al régimen.</li>
+    <li><strong>Subtotales mutuamente excluyentes</strong>: "Total descuentos previsionales" suma SOLO dependientes; "Total retención SII honorarios" suma SOLO honorarios. Cualquier cross-contamination = bug.</li>
+    <li><strong>Estado terminal <code>excluded</code></strong>: fila se renderiza con <code>$0</code> en columna Bruto/Neto y <code>—</code> en todas las demás + chip warning "⚠ excluido" en el nombre. NO se omite (operador necesita contar el universo).</li>
+    <li><strong>Tokens prohibidos (heredados auditoría TASK-758)</strong>:
+      <ul style="margin-top: 4px;">
+        <li>NUNCA <code>font-family: monospace</code> en celdas user-facing.</li>
+        <li>NUNCA <code>font-feature-settings: 'tnum'</code> — usar <code>font-variant-numeric: tabular-nums</code>.</li>
+        <li>NUNCA <code>borderRadius</code> off-scale (3, 5, 7, 12). Cards = <code>customBorderRadius.md</code> (6).</li>
+        <li>NUNCA spacing off-scale (36, 28). Usar <code>spacing(n)</code> con escala canónica.</li>
+        <li>NUNCA color como única señal — subtotales llevan label semántico explícito.</li>
+      </ul>
+    </li>
+    <li><strong>A11y mandatorio</strong>: tabla con <code>&lt;caption&gt;</code> describiendo agrupación; <code>&lt;th scope="col"&gt;</code> en headers; group divider rows con texto descriptivo + colspan completo (no solo color); aria-label en el componente raíz del PDF/Excel describiendo período + cardinalidad.</li>
+    <li><strong>Microinteracciones de la UI surrounding</strong> (PayrollPeriodView que dispara descarga):
+      <ul style="margin-top: 4px;">
+        <li>Loading button: <code>&lt;CircularProgress size={14} /&gt;</code> dentro del Button + texto <code>"Generando PDF…"</code> / <code>"Generando Excel…"</code></li>
+        <li>Toast success: <code>react-toastify</code> con <code>autoClose: 4000</code>, link al archivo</li>
+        <li><code>role="status" aria-live="polite"</code> en el contenedor de descarga para screen readers</li>
+        <li>Respetar <code>useReducedMotion</code> — sin animaciones decorativas en el flujo de export</li>
+      </ul>
+    </li>
+    <li><strong>Validación visual side-by-side al cierre</strong>: 3 capturas adjuntas al PR — mockup HTML actual + PDF generado real + Excel real abierto en LibreOffice/Excel. Diff estructural permitido sólo en rendering de fuente y antialiasing.</li>
+    <li><strong>Out of scope explícito</strong>:
+      <ul style="margin-top: 4px;">
+        <li>NO incluir costo empleador (SIS, cesantía empleador, mutual) — feature operador-facing distinto, follow-up.</li>
+        <li>NO modificar el recibo individual (TASK-758 owns).</li>
+        <li>NO mezclar Payment Orders ni accounting downstream.</li>
+        <li>NO bumpar <code>RECEIPT_TEMPLATE_VERSION</code> — esa constante rige el recibo individual, no el reporte mensual.</li>
+      </ul>
+    </li>
+  </ol>
+</section>
+
+</div>
+
+</body>
+</html>

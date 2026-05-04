@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="UTF-8">
+<title>TASK-758 — Mockup recibos por régimen (4 casos)</title>
+<style>
+  /* ───── Tokens (paridad con generate-payroll-pdf.tsx + DESIGN.md) ───── */
+  :root {
+    --brand-blue: #023c70;
+    --brand-light: #F7F9FC;
+    --brand-accent-bg: #E8EFF7;
+    --text-primary: #1a1a1a;
+    --text-muted: #666666;
+    --text-faint: #999999;
+    --border-light: #e0e0e0;
+    --info-bg: #EAF4FB;
+    --info-border: #0375DB;
+    --warning-bg: #FFF8E6;
+    --warning-border: #d99c1f;
+    --error-bg: #FFF0F0;
+    --error-border: #c0392b;
+    --success-text: #2E7D32;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    padding: 32px 16px;
+    font-family: 'Geist Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #f1f3f6;
+    color: var(--text-primary);
+    line-height: 1.45;
+    font-size: 14px;
+  }
+
+  .legend {
+    max-width: 1180px;
+    margin: 0 auto 32px;
+    padding: 18px 24px;
+    background: #fff;
+    border-radius: 8px;
+    border: 1px solid var(--border-light);
+  }
+
+  .legend h1 {
+    margin: 0 0 8px;
+    font-size: 18px;
+    color: var(--brand-blue);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  .legend p {
+    margin: 4px 0;
+    color: var(--text-muted);
+    font-size: 13px;
+  }
+
+  .legend strong {
+    color: var(--text-primary);
+  }
+
+  /* .legend code: anotación técnica (no parte del recibo en sí), monospace permitido
+     porque vive en una capa de "documentación" del mockup, no en el contenido user-facing */
+  .legend code,
+  .diff-callouts code {
+    background: #eef1f5;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  }
+
+  .grid {
+    max-width: 1180px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 32px;
+  }
+
+  /* ───── Recibo (mockup unificado preview MUI ≡ PDF) ─────
+     border-radius 6px = theme.shape.customBorderRadius.md (cards canónico)
+     padding 32/32/24 = spacing(8/8/6) — todos en escala
+  */
+  .receipt {
+    background: #fff;
+    border-radius: 6px;
+    border: 1px solid var(--border-light);
+    padding: 32px 32px 24px;
+    box-shadow: 0 4px 12px rgba(2, 60, 112, 0.06);
+    color: var(--text-primary);
+    font-size: 12px;
+    position: relative;
+  }
+
+  .receipt-tag {
+    position: absolute;
+    top: -10px;
+    left: 24px;
+    background: var(--brand-blue);
+    color: #fff;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    padding: 4px 10px;
+    border-radius: 3px;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  /* Header */
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 8px;
+  }
+
+  .logo {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    color: var(--brand-blue);
+    letter-spacing: -0.01em;
+  }
+
+  .company-block {
+    border-left: 3px solid var(--brand-blue);
+    padding-left: 8px;
+    margin-top: 6px;
+  }
+
+  .company-text {
+    font-size: 10px;
+    color: var(--text-muted);
+    margin: 1px 0;
+  }
+
+  .header-right {
+    text-align: right;
+  }
+
+  .period-label {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+  }
+
+  .period-sub {
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+
+  .header-accent {
+    border-bottom: 2px solid var(--brand-blue);
+    margin-bottom: 18px;
+  }
+
+  .doc-title {
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--brand-blue);
+    letter-spacing: 2.5px;
+    text-align: center;
+    margin: 4px 0 18px;
+    text-transform: uppercase;
+  }
+
+  /* Employee box (4 fields, 2x2 grid) */
+  .employee-box {
+    background: var(--brand-light);
+    padding: 14px 14px 6px;
+    margin-bottom: 18px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .employee-field { margin-bottom: 8px; }
+
+  .employee-label {
+    font-size: 9px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin-bottom: 2px;
+  }
+
+  .employee-value {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  .employee-meta {
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-top: 2px;
+    font-weight: 400;
+  }
+
+  /* Section header */
+  .section-header {
+    display: flex;
+    align-items: center;
+    margin-top: 16px;
+    margin-bottom: 6px;
+  }
+
+  .section-accent {
+    width: 3px;
+    height: 12px;
+    background: var(--brand-blue);
+    margin-right: 8px;
+  }
+
+  .section-title {
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--brand-blue);
+    letter-spacing: 1.6px;
+    text-transform: uppercase;
+  }
+
+  /* Table rows */
+  .row {
+    display: flex;
+    padding: 6px 10px;
+    border-bottom: 0.5px solid var(--border-light);
+    font-size: 11px;
+  }
+
+  .row.alt { background: var(--brand-light); }
+
+  .row-label {
+    flex: 0 0 60%;
+    color: var(--text-primary);
+  }
+
+  .row-label.indent {
+    padding-left: 14px;
+    color: var(--text-muted);
+    font-size: 10.5px;
+  }
+
+  .row-value {
+    flex: 0 0 40%;
+    text-align: right;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .total-row {
+    display: flex;
+    padding: 8px 10px;
+    border-top: 1.5px solid var(--brand-blue);
+    background: var(--brand-accent-bg);
+    font-weight: 700;
+    font-size: 11px;
+  }
+
+  .total-row .row-label,
+  .total-row .row-value { font-weight: 700; }
+
+  /* Info / warning blocks */
+  .info-block {
+    margin-top: 14px;
+    padding: 12px 14px;
+    border-left: 3px solid var(--info-border);
+    background: var(--info-bg);
+    border-radius: 0 4px 4px 0; /* sm = customBorderRadius.sm */
+  }
+
+  .info-block.warning {
+    border-left-color: var(--warning-border);
+    background: var(--warning-bg);
+  }
+
+  .info-block.error {
+    border-left-color: var(--error-border);
+    background: var(--error-bg);
+  }
+
+  .info-title {
+    font-size: 11px;
+    font-weight: 700;
+    margin: 0 0 4px;
+    color: var(--text-primary);
+  }
+
+  .info-body {
+    font-size: 10.5px;
+    color: var(--text-muted);
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  .info-meta {
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-top: 6px;
+    font-variant-numeric: tabular-nums; /* canónico: NO monospace; tabular-nums sobre Geist Sans */
+    letter-spacing: 0.02em;
+  }
+
+  /* Net hero */
+  .net-hero {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--brand-blue);
+    color: #fff;
+    padding: 14px 18px;
+    margin-top: 18px;
+    border-radius: 2px;
+  }
+
+  .net-hero-label {
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .net-hero-value {
+    font-size: 16px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .net-footnote {
+    font-size: 10px;
+    color: var(--text-muted);
+    font-style: italic;
+    margin-top: 6px;
+  }
+
+  /* Footer */
+  .footer {
+    margin-top: 18px;
+    padding-top: 8px;
+    border-top: 0.5px solid var(--border-light);
+    display: flex;
+    justify-content: space-between;
+    font-size: 9px;
+    color: var(--text-faint);
+  }
+
+  /* Diff annotations */
+  .diff-callouts {
+    background: #FAFCFF;
+    border: 1px dashed #c4d3e3;
+    border-radius: 4px;
+    padding: 12px 14px;
+    margin-top: 14px;
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  .diff-callouts h4 {
+    margin: 0 0 6px;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--brand-blue);
+  }
+
+  .diff-callouts ul {
+    margin: 0;
+    padding-left: 16px;
+  }
+
+  .diff-callouts li { margin: 3px 0; }
+  .diff-callouts .added { color: var(--success-text); }
+  .diff-callouts .removed { color: var(--error-border); text-decoration: line-through; opacity: 0.85; }
+  .diff-callouts .renamed { color: var(--warning-border); }
+
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: 600;
+    background: #eef1f5;
+    color: var(--text-muted);
+    margin-left: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .badge.deel {
+    background: #fff3d6;
+    color: #8a6010;
+  }
+
+  .badge.honorarios {
+    background: #ffe8c2;
+    color: #8a4a00;
+  }
+
+  .badge.indef {
+    background: #d4edda;
+    color: #155724;
+  }
+
+  .badge.intl {
+    background: #e0e7ff;
+    color: #2c3e91;
+  }
+
+  .empty-row-note {
+    font-size: 10px;
+    color: var(--text-faint);
+    font-style: italic;
+    padding: 4px 10px;
+  }
+
+  /* Wide layout for solo print */
+  @media (max-width: 980px) {
+    .grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<section class="legend" aria-labelledby="mockup-title">
+  <h1 id="mockup-title">TASK-758 — Mockup recibos por régimen (post-fix)</h1>
+  <p><strong>Contrato visual canonizado.</strong> 4 cards = 4 regímenes resueltos por el helper único <code>resolveReceiptRegime(entry)</code>. El <strong>preview MUI</strong> y el <strong>PDF descargable</strong> renderizan este mismo layout, byte-by-byte estructural — son consumers declarativos del mismo <code>buildReceiptPresentation()</code>.</p>
+  <p>Cada card incluye al final un bloque "Cambios vs hoy (v3)" que diferencia <span style="color: var(--success-text)">añadido</span>, <span style="color: var(--error-border); text-decoration: line-through; opacity: 0.85">eliminado</span> y <span style="color: var(--warning-border)">renombrado</span>.</p>
+  <p><strong>Template:</strong> <code>RECEIPT_TEMPLATE_VERSION</code> bumpa <code>'3'</code> → <code>'4'</code>. Cache GCS regenera lazy en próximo acceso.</p>
+
+  <h2 style="font-size: 13px; color: var(--brand-blue); margin: 14px 0 6px; text-transform: uppercase; letter-spacing: 1.5px;">Notas de implementación (skills aplicadas)</h2>
+  <ul style="font-size: 12px; color: var(--text-muted); margin: 0; padding-left: 18px; line-height: 1.6;">
+    <li><strong>Tokens (V1 + DESIGN.md):</strong> tipografía <code>Geist Sans</code> body + <code>Poppins</code> display (max 2 familias); <code>font-variant-numeric: tabular-nums</code> para todos los números — NUNCA <code>monospace</code> en surfaces user-facing; spacing scale {0.5, 1, 1.5, 2, 3, 4, 5, 6, 8, 10, 12}; <code>customBorderRadius.md</code> = 6 (cards), <code>.sm</code> = 4 (info-blocks).</li>
+    <li><strong>Color (semántica V1):</strong> <code>info</code>/<code>warning</code>/<code>error</code> reservados para STATES (info-block azul = aclaración, warning amarillo = adjustment, error rojo = excluded). <code>--success-text: #2E7D32</code> es la variante contrast-safe del lime <code>#6ec207</code> (que falla 4.5:1 sobre blanco — solo apto para chips/borders).</li>
+    <li><strong>A11y (WCAG 2.2 AA):</strong> cada <code>&lt;article&gt;</code> recibe <code>aria-label</code> con régimen + nombre para anuncio único de screen reader. InfoBlock variants (<code>info</code>/<code>warning</code>/<code>error</code>) NO comunican estado solo por color — siempre llevan título + body explicativo. Diff annotations llevan tokens semánticos de texto (línea tachada para "removed", color para refuerzo, NO color como única señal).</li>
+    <li><strong>Motion (greenhouse-microinteractions):</strong> el recibo en sí es estático — display, no interactivo. EN PRODUCCIÓN, el <code>PayrollReceiptDialog</code> que envuelve este preview debe: (a) mostrar <code>Skeleton</code> MUI cuando el PDF se está regenerando por mismatch de <code>RECEIPT_TEMPLATE_VERSION</code>; (b) <code>role="status"</code> + <code>aria-live="polite"</code> en el contenedor que muestra "Regenerando recibo…"; (c) respetar <code>prefers-reduced-motion</code> en el dialog open/close (200ms decelerado canónico, sin transform de gran amplitud).</li>
+    <li><strong>Microinteracciones del receipt:</strong> ninguna intrínseca al recibo. Botones de acción ("Descargar PDF", "Reenviar email") viven fuera del recibo — son responsabilidad del Dialog/Toolbar que lo monta, no de este contrato.</li>
+    <li><strong>Loading lazy:</strong> primer acceso post-bump v3→v4 dispara regen (~2s en server). UI debe mostrar <code>&lt;Skeleton variant="rectangular" height={500} /&gt;</code> + texto "Regenerando recibo con plantilla actualizada…" en <code>role="status"</code>. NO usar spinner suelto (rompe layout).</li>
+  </ul>
+</section>
+
+<div class="grid">
+
+<!-- ════════════════════════════════════════════════════════════
+     CARD 1 — chile_dependent (indefinido)
+     ════════════════════════════════════════════════════════════ -->
+<article class="receipt" aria-label="Recibo régimen Chile dependiente — Valentina Hoyos, Indefinido, Abril 2026, líquido $1.893.299">
+  <span class="receipt-tag">chile_dependent</span>
+  <div class="header">
+    <div>
+      <div class="logo">Efeonce</div>
+      <div class="company-block">
+        <div class="company-text">Efeonce Group SpA</div>
+        <div class="company-text">RUT 76.123.456-7</div>
+        <div class="company-text">Av. Apoquindo 4500, Las Condes</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <p class="period-label">Abril 2026</p>
+      <p class="period-sub">Recibo de remuneraciones</p>
+      <p class="period-sub">2026-04</p>
+    </div>
+  </div>
+  <div class="header-accent"></div>
+  <p class="doc-title">RECIBO DE REMUNERACIONES</p>
+
+  <div class="employee-box">
+    <div class="employee-field">
+      <div class="employee-label">Nombre</div>
+      <div class="employee-value">Valentina Hoyos</div>
+    </div>
+    <div class="employee-field">
+      <div class="employee-label">Email</div>
+      <div class="employee-value">valentina@efeonce.org</div>
+    </div>
+    <div class="employee-field">
+      <div class="employee-label">Tipo de contrato</div>
+      <div class="employee-value">Indefinido <span class="badge indef">CL-DEP</span></div>
+      <div class="employee-meta">Régimen Chile · Moneda CLP</div>
+    </div>
+    <div class="employee-field">
+      <div class="employee-label">AFP / Salud</div>
+      <div class="employee-value">Habitat · Fonasa</div>
+    </div>
+  </div>
+
+  <div class="section-header"><div class="section-accent"></div><div class="section-title">Haberes</div></div>
+  <div class="row"><div class="row-label">Sueldo base</div><div class="row-value">$1.800.000</div></div>
+  <div class="row alt"><div class="row-label">Gratificación legal</div><div class="row-value">$209.396</div></div>
+  <div class="row"><div class="row-label">Asignación teletrabajo</div><div class="row-value">$80.000</div></div>
+  <div class="row alt"><div class="row-label">Colación</div><div class="row-value">$60.000</div></div>
+  <div class="row"><div class="row-label">Movilización</div><div class="row-value">$40.000</div></div>
+  <div class="row alt"><div class="row-label">Bono OTD (95.0% → factor 100.0%)</div><div class="row-value">$120.000</div></div>
+  <div class="row"><div class="row-label">Bono RpA (4.6 → factor 100.0%)</div><div class="row-value">$80.000</div></div>
+  <div class="total-row"><div class="row-label">Total bruto</div><div class="row-value">$2.389.396</div></div>
+
+  <div class="section-header"><div class="section-accent"></div><div class="section-title">Asistencia</div></div>
+  <div class="row"><div class="row-label">Días hábiles en período</div><div class="row-value">22</div></div>
+  <div class="row alt"><div class="row-label">Días presentes</div><div class="row-value">22</div></div>
+  <div class="row"><div class="row-label">Días ausentes</div><div class="row-value">0</div></div>
+  <div class="row alt"><div class="row-label">Días licencia</div><div class="row-value">0</div></div>
+
+  <div class="section-header"><div class="section-accent"></div><div class="section-title">Descuentos legales</div></div>
+  <div class="row"><div class="row-label">AFP Habitat (11.27%)</div><div class="row-value">$269.285</div></div>
+  <div class="row alt"><div class="row-label indent">↳ Cotización (10.00%)</div><div class="row-value">$238.940</div></div>
+  <div class="row"><div class="row-label indent">↳ Comisión (1.27%)</div><div class="row-value">$30.345</div></div>
+  <div class="row alt"><div class="row-label">Salud obligatoria 7% (Fonasa)</div><div class="row-value">$167.258</div></div>
+  <div class="row"><div class="row-label">Salud voluntaria</div><div class="row-value">$0</div></div>
+  <div class="row alt"><div class="row-label">Seguro cesantía (0.6%)</div><div class="row-value">$14.336</div></div>
+  <div class="row"><div class="row-label">Impuesto único</div><div class="row-value">$45.218</div></div>
+  <div class="total-row"><div class="row-label">Total descuentos</div><div class="row-value">$496.097</div></div>
+
+  <div class="net-hero">
+    <span class="net-hero-label">Líquido a pagar</span>
+    <span class="net-hero-value">$1.893.299</span>
+  </div>
+
+  <div class="footer">
+    <span>Efeonce Group SpA — Abril 2026</span>
+    <span>efeoncepro.com</span>
+    <span>Generado: 2026-05-04</span>
+  </div>
+
+  <div class="diff-callouts">
+    <h4>Cambios vs v3</h4>
+    <ul>
+      <li class="added">+ "Tipo de contrato: Indefinido" en header (era solo "Régimen: Chile")</li>
+      <li class="added">+ Fila <strong>Gratificación legal</strong> en haberes cuando <code>chileGratificacionLegalAmount &gt; 0</code> (antes: persistido pero NO renderizado)</li>
+      <li class="added">+ Salud split obligatoria/voluntaria cuando los fields están poblados (antes: solo total agregado)</li>
+      <li class="added">+ Badge <code>CL-DEP</code> en header</li>
+    </ul>
+  </div>
+</article>
+
+<!-- ════════════════════════════════════════════════════════════
+     CARD 2 — honorarios
+     ════════════════════════════════════════════════════════════ -->
+<article class="receipt" aria-label="Recibo régimen Honorarios — Humberly Henríquez, Abril 2026, líquido $1.440.750">
+  <span class="receipt-tag" style="background: #8a4a00;">honorarios</span>
+  <div class="header">
+    <div>
+      <div class="logo">Efeonce</div>
+      <div class="company-block">
+        <div class="company-text">Efeonce Group SpA</div>
+        <div class="company-text">RUT 76.123.456-7</div>
+        <div class="company-text">Av. Apoquindo 4500, Las Condes</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <p class="period-label">Abril 2026</p>
+      <p class="period-sub">Recibo de remuneraciones</p>
+      <p class="period-sub">2026-04</p>
+    </div>
+  </div>
+  <div class="header-accent"></div>
+  <p class="doc-title">RECIBO DE REMUNERACIONES</p>
+
+  <div class="employee-box">
+    <div class="employee-field">
+      <div class="employee-label">Nombre</div>
+      <div class="employee-value">Humberly Henríquez</div>
+    </div>
+    <div class="employee-field">
+      <div class="employee-label">Email</div>
+      <div class="employee-value">humberly@efeonce.org</div>
+    </div>
+    <div class="employee-field">
+      <div class="employee-label">Tipo de contrato</div>
+      <div class="employee-value">Honorarios <span class="badge honorarios">HON</span></div>
+      <div class="employee-meta">Boleta de honorarios Chile · Moneda CLP</div>
+    </div>
+    <div class="employee-field">
+      <div class="employee-label">Tasa SII 2026</div>
+      <div class="employee-value">15,25%</div>
+    </div>
+  </div>
+
+  <div class="section-header"><div class="section-accent"></div><div class="section-title">Haberes</div></div>
+  <div class="row"><div class="row-label">Sueldo base</div><div class="row-value">$1.500.000</div></div>
+  <div class="row alt"><div class="row-label">Bono fijo (Liderazgo Q1)</div><div class="row-value">$200.000</div></div>
+  <div class="total-row"><div class="row-label">Total bruto</div><div class="row-value">$1.700.000</div></div>
+
+  <div class="section-header"><div class="section-accent"></div><div class="section-title">Retención honorarios</div></div>
+  <div class="row"><div class="row-label">Tasa SII</div><div class="row-value">15,25%</div></div>
+  <div class="row alt"><div class="row-label">Retención honorarios</div><div class="row-value">$259.250</div></div>
+  <div class="total-row"><div class="row-label">Total retención</div><div class="row-value">$259.250</div></div>
+
+  <div class="info-block">
+    <p class="info-title">Boleta de honorarios Chile</p>
+    <p class="info-body">Art. 74 N°2 LIR · Tasa SII 2026: 15,25%. Esta retención se entera al SII por la empresa pagadora.</p>
+  </div>
+
+  <div class="net-hero">
+    <span class="net-hero-label">Líquido a pagar</span>
+    <span class="net-hero-value">$1.440.750</span>
+  </div>
+
+  <div class="footer">
+    <span>Efeonce Group SpA — Abril 2026</span>
+    <span>efeoncepro.com</span>
+    <span>Generado: 2026-05-04</span>
+  </div>
+
+  <div class="diff-callouts">
+    <h4>Cambios vs v3 (BUG → FIX)</h4>
+    <ul>
+      <li class="removed">− Bloque "Descuentos legales" con AFP/Salud/Cesantía/IUSC en "—" (bug raíz)</li>
+      <li class="removed">− Filas-fantasma: "Asignación teletrabajo $0", "Colación $0", "Movilización $0", "Bono OTD (— → factor —) $0", "Bono RpA (— → factor —) $0"</li>
+      <li class="removed">− Header "Régimen: Chile" (indistinguible de dependiente Chile)</li>
+      <li class="renamed">⇄ "Total descuentos" → "Total retención"</li>
+      <li class="added">+ Sección "Retención honorarios" con label correcto</li>
+      <li class="added">+ Filas explícitas "Tasa SII" y "Retención honorarios"</li>
+      <li class="added">+ InfoBlock canónico "Boleta de honorarios Chile · Art. 74 N°2 LIR"</li>
+      <li class="added">+ "Tipo de contrato: Honorarios" + badge <code>HON</code> en header</li>
+    </ul>
+  </div>
+</article>
+
+<!-- ════════════════════════════════════════════════════════════
+     CARD 3 — international_deel (contractor)
+     ════════════════════════════════════════════════════════════ -->
+<article class="receipt" aria-label="Recibo régimen Internacional Deel — Daniela Ferreira, Contractor, Abril 2026, monto bruto US$ 3.900,00 — pago final emitido por Deel">
+  <span class="receipt-tag" style="background: #8a6010;">international_deel</span>
+  <div class="header">
+    <div>
+      <div class="logo">Efeonce</div>
+      <div class="company-block">
+        <div class="company-text">Efeonce Group SpA</div>
+        <div class="company-text">RUT 76.123.456-7</div>
+        <div class="company-text">Av. Apoquindo 4500, Las Condes</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <p class="period-label">Abril 2026</p>
+      <p class="period-sub">Recibo de remuneraciones</p>
+      <p class="period-sub">2026-04</p>
+    </div>
+  </div>
+  <div class="header-accent"></div>
+  <p class="doc-title">RECIBO DE REMUNERACIONES</p>
+
+  <div class="employee-box">
+    <div class="employee-field">
+      <div class="employee-label">Nombre</div>
+      <div class="employee-value">Daniela Ferreira</div>
+    </div>
+    <div class="employee-field">
+      <div class="employee-label">Email</div>
+      <div class="employee-value">daniela@efeonce.org</div>
+    </div>
+    <div class="employee-field">
+      <div class="employee-label">Tipo de contrato</div>
+      <div class="employee-value">Contractor (Deel) <span class="badge deel">DEEL</span></div>
+      <div class="employee-meta">Régimen internacional · Moneda USD</div>
+    </div>
+    <div class="employee-field">
+      <div class="employee-label">Empleador legal</div>
+      <div class="employee-value">Deel Inc.</div>
+      <div class="employee-meta">Compliance jurisdicción: España</div>
+    </div>
+  </div>
+
+  <div class="section-header"><div class="section-accent"></div><div class="section-title">Haberes</div></div>
+  <div class="row"><div class="row-label">Sueldo base</div><div class="row-value">US$ 3.200,00</div></div>
+  <div class="row alt"><div class="row-label">Asignación teletrabajo</div><div class="row-value">US$ 100,00</div></div>
+  <div class="row"><div class="row-label">Bono fijo (Lead Content)</div><div class="row-value">US$ 250,00</div></div>
+  <div class="row alt"><div class="row-label">Bono OTD (92.0% → factor 100.0%)</div><div class="row-value">US$ 200,00</div></div>
+  <div class="row"><div class="row-label">Bono RpA (4.4 → factor 100.0%)</div><div class="row-value">US$ 150,00</div></div>
+  <div class="total-row"><div class="row-label">Total bruto</div><div class="row-value">US$ 3.900,00</div></div>
+
+  <div class="info-block">
+    <p class="info-title">Pago administrado por Deel</p>
+    <p class="info-body">Greenhouse registra el monto bruto y los bonos KPI calculados (OTD/RpA). Deel emite el recibo legal del país del trabajador y aplica las retenciones, cotizaciones e impuestos correspondientes a esa jurisdicción.</p>
+    <p class="info-meta">Contrato Deel: deel-cnt-7c4a-9f12</p>
+  </div>
+
+  <div class="net-hero">
+    <span class="net-hero-label">Monto bruto registrado</span>
+    <span class="net-hero-value">US$ 3.900,00</span>
+  </div>
+  <p class="net-footnote">El líquido final lo determina Deel según las retenciones aplicables en el país del trabajador.</p>
+
+  <div class="footer">
+    <span>Efeonce Group SpA — Abril 2026</span>
+    <span>efeoncepro.com</span>
+    <span>Generado: 2026-05-04</span>
+  </div>
+
+  <div class="diff-callouts">
+    <h4>Cambios vs v3</h4>
+    <ul>
+      <li class="added">+ Sección informativa "Pago administrado por Deel" con texto canónico (antes: ningún contexto)</li>
+      <li class="added">+ <code>deelContractId</code> visible en infoBlock (antes: persistido pero NO renderizado)</li>
+      <li class="added">+ "Tipo de contrato: Contractor (Deel)" + badge <code>DEEL</code> en header (antes: solo "Régimen: Internacional")</li>
+      <li class="added">+ "Empleador legal: Deel Inc." en employee-box</li>
+      <li class="renamed">⇄ Hero "Líquido a pagar" → "Monto bruto registrado" + footnote explicativo (más honesto: el líquido lo emite Deel)</li>
+      <li class="removed">− Filas-fantasma "Colación $0" / "Movilización $0" (no aplican a Deel)</li>
+    </ul>
+  </div>
+</article>
+
+<!-- ════════════════════════════════════════════════════════════
+     CARD 4 — international_internal
+     ════════════════════════════════════════════════════════════ -->
+<article class="receipt" aria-label="Recibo régimen Internacional interno — Andrés Carlosama, Abril 2026, líquido US$ 3.200,00, jurisdicción Colombia">
+  <span class="receipt-tag" style="background: #2c3e91;">international_internal</span>
+  <div class="header">
+    <div>
+      <div class="logo">Efeonce</div>
+      <div class="company-block">
+        <div class="company-text">Efeonce Group SpA</div>
+        <div class="company-text">RUT 76.123.456-7</div>
+        <div class="company-text">Av. Apoquindo 4500, Las Condes</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <p class="period-label">Abril 2026</p>
+      <p class="period-sub">Recibo de remuneraciones</p>
+      <p class="period-sub">2026-04</p>
+    </div>
+  </div>
+  <div class="header-accent"></div>
+  <p class="doc-title">RECIBO DE REMUNERACIONES</p>
+
+  <div class="employee-box">
+    <div class="employee-field">
+      <div class="employee-label">Nombre</div>
+      <div class="employee-value">Andrés Carlosama</div>
+    </div>
+    <div class="employee-field">
+      <div class="employee-label">Email</div>
+      <div class="employee-value">andres@efeonce.org</div>
+    </div>
+    <div class="employee-field">
+      <div class="employee-label">Tipo de contrato</div>
+      <div class="employee-value">Internacional interno <span class="badge intl">INT</span></div>
+      <div class="employee-meta">Régimen internacional · Moneda USD</div>
+    </div>
+    <div class="employee-field">
+      <div class="employee-label">Jurisdicción</div>
+      <div class="employee-value">Colombia</div>
+    </div>
+  </div>
+
+  <div class="section-header"><div class="section-accent"></div><div class="section-title">Haberes</div></div>
+  <div class="row"><div class="row-label">Sueldo base</div><div class="row-value">US$ 2.800,00</div></div>
+  <div class="row alt"><div class="row-label">Asignación teletrabajo</div><div class="row-value">US$ 100,00</div></div>
+  <div class="row"><div class="row-label">Bono OTD (88.0% → factor 100.0%)</div><div class="row-value">US$ 180,00</div></div>
+  <div class="row alt"><div class="row-label">Bono RpA (4.2 → factor 100.0%)</div><div class="row-value">US$ 120,00</div></div>
+  <div class="total-row"><div class="row-label">Total bruto</div><div class="row-value">US$ 3.200,00</div></div>
+
+  <div class="info-block">
+    <p class="info-title">Régimen internacional</p>
+    <p class="info-body">Sin descuentos previsionales Chile. El pago se procesa según los términos del contrato internacional acordado con el trabajador.</p>
+  </div>
+
+  <div class="net-hero">
+    <span class="net-hero-label">Líquido a pagar</span>
+    <span class="net-hero-value">US$ 3.200,00</span>
+  </div>
+
+  <div class="footer">
+    <span>Efeonce Group SpA — Abril 2026</span>
+    <span>efeoncepro.com</span>
+    <span>Generado: 2026-05-04</span>
+  </div>
+
+  <div class="diff-callouts">
+    <h4>Cambios vs v3</h4>
+    <ul>
+      <li class="added">+ Sección informativa "Régimen internacional" con texto canónico (antes: ningún contexto)</li>
+      <li class="added">+ "Tipo de contrato: Internacional interno" + badge <code>INT</code> en header</li>
+      <li class="added">+ Slot "Jurisdicción" en employee-box (informativo)</li>
+      <li class="removed">− Filas-fantasma "Colación $0" / "Movilización $0"</li>
+    </ul>
+  </div>
+</article>
+
+</div>
+
+<!-- ════════════════════════════════════════════════════════════
+     EDGE CASES
+     ════════════════════════════════════════════════════════════ -->
+
+<section class="legend" style="margin-top: 40px;">
+  <h1>Edge cases / variantes (mismo helper, distinto adjustment state)</h1>
+  <p>Los siguientes recibos demuestran que el helper canónico maneja correctamente combinaciones régimen × adjustment.</p>
+</section>
+
+<div class="grid">
+
+<!-- EDGE A — Honorarios con bruto reducido por adjustment -->
+<article class="receipt" aria-label="Edge case: Honorarios con bruto efectivo reducido al 75% — Luis Reyes, líquido $762.750">
+  <span class="receipt-tag" style="background: #8a4a00;">honorarios + bruto reducido</span>
+  <div class="header">
+    <div>
+      <div class="logo">Efeonce</div>
+      <div class="company-block">
+        <div class="company-text">Efeonce Group SpA</div>
+        <div class="company-text">RUT 76.123.456-7</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <p class="period-label">Abril 2026</p>
+      <p class="period-sub">Recibo de remuneraciones</p>
+    </div>
+  </div>
+  <div class="header-accent"></div>
+  <p class="doc-title">RECIBO DE REMUNERACIONES</p>
+
+  <div class="employee-box">
+    <div class="employee-field">
+      <div class="employee-label">Nombre</div>
+      <div class="employee-value">Luis Reyes</div>
+    </div>
+    <div class="employee-field">
+      <div class="employee-label">Tipo de contrato</div>
+      <div class="employee-value">Honorarios <span class="badge honorarios">HON</span></div>
+    </div>
+  </div>
+
+  <div class="section-header"><div class="section-accent"></div><div class="section-title">Haberes</div></div>
+  <div class="row"><div class="row-label">Sueldo base</div><div class="row-value">$1.200.000</div></div>
+  <div class="row alt" style="background: #fff8e6;"><div class="row-label">Bruto efectivo (factor 75%)</div><div class="row-value">$900.000</div></div>
+  <div class="total-row"><div class="row-label">Total bruto</div><div class="row-value">$900.000</div></div>
+
+  <div class="info-block warning">
+    <p class="info-title">Bruto efectivo aplicado</p>
+    <p class="info-body">Se aplicó factor 75% al bruto natural por solicitud aprobada de pago parcial. La retención SII se recalcula sobre el bruto efectivo, no sobre el bruto natural.</p>
+  </div>
+
+  <div class="section-header"><div class="section-accent"></div><div class="section-title">Retención honorarios</div></div>
+  <div class="row"><div class="row-label">Tasa SII</div><div class="row-value">15,25%</div></div>
+  <div class="row alt"><div class="row-label">Retención honorarios (sobre bruto efectivo)</div><div class="row-value">$137.250</div></div>
+  <div class="total-row"><div class="row-label">Total retención</div><div class="row-value">$137.250</div></div>
+
+  <div class="info-block">
+    <p class="info-title">Boleta de honorarios Chile</p>
+    <p class="info-body">Art. 74 N°2 LIR · Tasa SII 2026: 15,25%.</p>
+  </div>
+
+  <div class="net-hero">
+    <span class="net-hero-label">Líquido a pagar</span>
+    <span class="net-hero-value">$762.750</span>
+  </div>
+
+  <div class="diff-callouts">
+    <h4>Comportamiento canónico</h4>
+    <ul>
+      <li>El bruto efectivo se calcula por <code>compute-net.ts</code> (motor intacto)</li>
+      <li>El recibo refleja el <code>siiRetentionAmount</code> ya recalculado sobre el bruto efectivo</li>
+      <li>InfoBlock warning amarillo aclara la reducción al colaborador</li>
+    </ul>
+  </div>
+</article>
+
+<!-- EDGE B — Chile dependiente con APV + manual override -->
+<article class="receipt" aria-label="Edge case: Chile dependiente plazo fijo con APV y override manual — César Pérez, líquido ajustado $2.300.000">
+  <span class="receipt-tag">chile_dependent + APV + override</span>
+  <div class="header">
+    <div>
+      <div class="logo">Efeonce</div>
+      <div class="company-block">
+        <div class="company-text">Efeonce Group SpA</div>
+        <div class="company-text">RUT 76.123.456-7</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <p class="period-label">Abril 2026</p>
+      <p class="period-sub">Recibo de remuneraciones</p>
+    </div>
+  </div>
+  <div class="header-accent"></div>
+  <p class="doc-title">RECIBO DE REMUNERACIONES</p>
+
+  <div class="employee-box">
+    <div class="employee-field">
+      <div class="employee-label">Nombre</div>
+      <div class="employee-value">César Pérez</div>
+    </div>
+    <div class="employee-field">
+      <div class="employee-label">Tipo de contrato</div>
+      <div class="employee-value">Plazo fijo <span class="badge indef">CL-DEP</span></div>
+    </div>
+  </div>
+
+  <div class="section-header"><div class="section-accent"></div><div class="section-title">Haberes</div></div>
+  <div class="row"><div class="row-label">Sueldo base</div><div class="row-value">$2.500.000</div></div>
+  <div class="row alt"><div class="row-label">Gratificación legal</div><div class="row-value">$209.396</div></div>
+  <div class="row"><div class="row-label">Bono fijo (Q1 leadership)</div><div class="row-value">$300.000</div></div>
+  <div class="total-row"><div class="row-label">Total bruto</div><div class="row-value">$3.009.396</div></div>
+
+  <div class="section-header"><div class="section-accent"></div><div class="section-title">Descuentos legales</div></div>
+  <div class="row"><div class="row-label">AFP Modelo (10.58%)</div><div class="row-value">$318.394</div></div>
+  <div class="row alt"><div class="row-label indent">↳ Cotización (10.00%)</div><div class="row-value">$300.940</div></div>
+  <div class="row"><div class="row-label indent">↳ Comisión (0.58%)</div><div class="row-value">$17.454</div></div>
+  <div class="row alt"><div class="row-label">Salud obligatoria 7% (Isapre Colmena)</div><div class="row-value">$210.658</div></div>
+  <div class="row"><div class="row-label">Salud voluntaria</div><div class="row-value">$45.000</div></div>
+  <div class="row alt"><div class="row-label">Seguro cesantía (0.6%)</div><div class="row-value">$18.056</div></div>
+  <div class="row"><div class="row-label">Impuesto único</div><div class="row-value">$112.430</div></div>
+  <div class="row alt"><div class="row-label">APV</div><div class="row-value">$50.000</div></div>
+  <div class="total-row"><div class="row-label">Total descuentos</div><div class="row-value">$754.538</div></div>
+
+  <div class="info-block warning">
+    <p class="info-title">Override manual de neto — Ajuste retroactivo Q1</p>
+    <p class="info-body">El líquido fue ajustado manualmente a solicitud del colaborador. Diferencia retroactiva por reliquidación bono Q1.</p>
+    <p class="info-meta">Aplicado por payroll@efeonce.org</p>
+  </div>
+
+  <div class="net-hero">
+    <span class="net-hero-label">Líquido a pagar</span>
+    <span class="net-hero-value">$2.300.000</span>
+  </div>
+  <p class="net-footnote">* Monto neto ajustado manualmente: ajuste retroactivo Q1.</p>
+
+  <div class="diff-callouts">
+    <h4>Comportamiento canónico</h4>
+    <ul>
+      <li>Plazo fijo y indefinido comparten layout (ambos = <code>chile_dependent</code>)</li>
+      <li>Salud split obligatoria + voluntaria visible cuando ambos &gt; 0</li>
+      <li>APV se renderiza al final del bloque cuando &gt; 0</li>
+      <li>Manual override genera infoBlock warning + footnote en el hero</li>
+    </ul>
+  </div>
+</article>
+
+<!-- EDGE C — Excluido de esta nómina (estado terminal) -->
+<article class="receipt" aria-label="Edge case: Colaborador excluido de esta nómina — Pedro Carrasco, monto $0">
+  <span class="receipt-tag" style="background: var(--error-border);">excluded</span>
+  <div class="header">
+    <div>
+      <div class="logo">Efeonce</div>
+      <div class="company-block">
+        <div class="company-text">Efeonce Group SpA</div>
+        <div class="company-text">RUT 76.123.456-7</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <p class="period-label">Abril 2026</p>
+      <p class="period-sub">Recibo de remuneraciones</p>
+    </div>
+  </div>
+  <div class="header-accent"></div>
+  <p class="doc-title">RECIBO DE REMUNERACIONES</p>
+
+  <div class="employee-box">
+    <div class="employee-field">
+      <div class="employee-label">Nombre</div>
+      <div class="employee-value">Pedro Carrasco</div>
+    </div>
+    <div class="employee-field">
+      <div class="employee-label">Tipo de contrato</div>
+      <div class="employee-value">Indefinido <span class="badge indef">CL-DEP</span></div>
+    </div>
+  </div>
+
+  <div class="info-block error">
+    <p class="info-title">Excluido de esta nómina — Licencia médica completa del período</p>
+    <p class="info-body">El colaborador no acumuló días imponibles en abril 2026. La cobertura económica corre por cuenta del sistema previsional (subsidio incapacidad laboral). No se calculan haberes ni descuentos para este período.</p>
+    <p class="info-meta">Solicitado por hr@efeonce.org · 2026-04-15</p>
+  </div>
+
+  <div class="net-hero" style="background: var(--text-faint); opacity: 0.85;">
+    <span class="net-hero-label">Sin pago este período</span>
+    <span class="net-hero-value">$0</span>
+  </div>
+
+  <div class="diff-callouts">
+    <h4>Comportamiento canónico (estado terminal)</h4>
+    <ul>
+      <li>InfoBlock <code>error</code> rojo es OBLIGATORIO — explica causa, alcance y recovery (cobertura previsional)</li>
+      <li>Hero degradado a gris <code>--text-faint</code> + label "Sin pago este período" (NUNCA "Líquido a pagar $0" — confunde)</li>
+      <li>Bloques de Haberes / Descuentos / Asistencia se OMITEN — solo header + infoBlock + hero degradado</li>
+      <li>Pattern reusable cuando <code>breakdown.excluded</code> existe en el helper</li>
+    </ul>
+  </div>
+</article>
+
+</div>
+
+</body>
+</html>
