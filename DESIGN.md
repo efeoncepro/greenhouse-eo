@@ -9,6 +9,7 @@ colors:
   secondary: "#023C70"
   secondary-light: "#035A9E"
   secondary-dark: "#022A4E"
+  info: "#0375DB"
   neutral: "#F8F9FA"
   surface: "#FFFFFF"
   surface-alt: "#FAFBFC"
