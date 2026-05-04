@@ -28,6 +28,7 @@ _Pendiente._
 
 - [Offboarding](hr/offboarding.md) — como abrir, revisar y avanzar casos canonicos de salida sin confundirlos con desactivacion de acceso ni finiquito.
 - [Checklists de Onboarding y Offboarding](hr/onboarding-offboarding-checklists.md) — como crear checklists operativos, completar tareas y no confundirlos con el caso formal de salida.
+- [Usar Lifecycle / Onboarding y Offboarding](hr/onboarding-y-offboarding.md) — overview HR, editor de plantillas, tareas propias y card lifecycle en People 360.
 - [Finiquitos Chile](hr/finiquitos.md) — como calcular, revisar, aprobar y cancelar un final settlement Chile dependiente desde un caso de offboarding aprobado.
 - [Periodos de nomina](hr/periodos-de-nomina.md) — como crear, editar y calcular periodos sin adivinar la version tributaria Chile; cuando Greenhouse la resuelve solo y cuando un override manual si aplica.
 - [Descargar y reconciliar la nomina mensual](hr/descargar-y-reconciliar-nomina.md) — paso a paso para descargar recibos individuales, PDF reporte mensual y Excel; donde leer los totales para reconciliar contra Previred (cotizaciones) y F29 (retencion SII honorarios) sin manipular el archivo.

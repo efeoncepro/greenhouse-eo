@@ -65,17 +65,6 @@ const roleLabel: Record<string, string> = {
   delivery: 'Delivery'
 }
 
-const statusColor: Record<string, 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'info'> = {
-  active: 'primary',
-  completed: 'success',
-  cancelled: 'default',
-  blocked: 'error',
-  pending: 'warning',
-  in_progress: 'info',
-  done: 'success',
-  skipped: 'default'
-}
-
 const itemStatusLabel: Record<string, string> = {
   pending: 'Pendiente',
   in_progress: 'En curso',
@@ -104,8 +93,6 @@ const laneLabel: Record<string, string> = {
 }
 
 const assignedRoles: HrOnboardingAssignedRole[] = ['hr', 'it', 'supervisor', 'collaborator', 'payroll', 'delivery']
-
-const today = () => new Date().toISOString().slice(0, 10)
 
 const formatDate = (value?: string | null) => {
   if (!value) return 'Sin fecha'

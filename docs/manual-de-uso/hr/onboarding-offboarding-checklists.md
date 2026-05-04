@@ -13,9 +13,10 @@ Necesitas acceso HR para operar `/hr/onboarding`. Los colaboradores con acceso a
 ## Crear un checklist
 
 1. Entra a `/hr/onboarding`.
-2. Selecciona el colaborador.
-3. Elige `Entrada` o `Salida operativa`.
-4. Crea el checklist.
+2. Usa la tarjeta `Crear checklist`.
+3. Selecciona el colaborador.
+4. Elige `Onboarding` o `Offboarding operativo`.
+5. Crea el checklist.
 
 Greenhouse selecciona la plantilla activa que corresponda al tipo y contrato del colaborador. Si ya existe un checklist activo para ese colaborador y tipo, reutiliza ese registro.
 
@@ -32,5 +33,6 @@ En la tabla de checklists activos, HR puede marcar tareas como listas. En `/my/o
 ## Problemas comunes
 
 - **No aparece plantilla:** revisa que exista una plantilla activa para el tipo `onboarding` u `offboarding`.
+- **Necesito cambiar tareas futuras:** usa `/hr/onboarding/templates`; el editor no reescribe instancias antiguas.
 - **No puedo actualizar una tarea en self-service:** solo las tareas asignadas a `Colaborador` son editables desde `/my/onboarding`.
 - **Salida con caso formal:** abre o revisa el caso en `/hr/offboarding`; el checklist es solo la lista operativa hija.

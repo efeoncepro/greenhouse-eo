@@ -204,7 +204,7 @@ describe('PersonHrProfileTab', () => {
     await user.click(screen.getByRole('button', { name: /^guardar$/i }))
 
     await waitFor(() => {
-      expect(screen.getByText('01/04/2026')).toBeInTheDocument()
+      expect(screen.getAllByText('01/04/2026').length).toBeGreaterThan(0)
     })
 
     expect(screen.getByText('+56 9 5555 5555')).toBeInTheDocument()

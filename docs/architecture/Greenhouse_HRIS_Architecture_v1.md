@@ -1,5 +1,16 @@
 # Greenhouse HRIS Architecture V1
 
+## Delta 2026-05-04 — TASK-763 Lifecycle UI adoption
+
+La UI de checklists converge en una shell `Lifecycle / Onboarding & Offboarding`:
+
+- `/hr/onboarding` deja de ser una tabla plana y pasa a mostrar first fold, carriles Onboarding/Offboarding, KPIs, roster operativo y lane visible de casos de salida.
+- `/hr/onboarding/templates` usa patron list-detail para editar plantillas y tareas.
+- `/my/onboarding` muestra siguiente accion, progreso propio y estados `pending`, `blocked`, `overdue`, `completed`.
+- People 360 incorpora card compacta de lifecycle laboral con fecha de ingreso, fin de contrato, salida programada, ultimo dia trabajado y estado del caso de offboarding.
+
+Frontera canonica sin cambios: `onboarding_instances[type=offboarding]` sigue siendo checklist operativo hijo. `WorkRelationshipOffboardingCase` define la salida formal; Payroll final y documento formal viven en sus aggregates propios.
+
 ## Delta 2026-05-04 — TASK-030 Onboarding/Offboarding Checklists Runtime
 
 `greenhouse_hr` ahora materializa el runtime operativo de checklists HRIS:

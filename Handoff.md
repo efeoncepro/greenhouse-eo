@@ -1,12 +1,17 @@
 # Handoff.md
 
-## Sesion 2026-05-04 — TASK-763 Lifecycle Onboarding & Offboarding UI Mockup Adoption — retomada
+## Sesion 2026-05-04 — TASK-763 Lifecycle Onboarding & Offboarding UI Mockup Adoption — completada
 
 - **Branch:** `task/TASK-763-lifecycle-onboarding-offboarding-ui-mockup-adoption`, fast-forward desde `develop` `29804193`.
-- **Lifecycle:** `in-progress`; task movida desde `to-do` y README/registry sincronizados.
+- **Lifecycle:** `complete`; task movida `to-do` → `in-progress` → `complete`; README/registry sincronizados.
 - **Ownership:** no hay PR abierto para TASK-763. La rama previa era solo discovery bloqueada; se retoma ahora que `TASK-030`, `TASK-760`, `TASK-761` y `TASK-762` están completas.
 - **Skills:** `greenhouse-agent`, `greenhouse-ui-orchestrator` y `greenhouse-ux-content-accessibility`.
 - **Frontera segura:** la shell debe adoptar el mockup sin simular runtime: checklists viven en `greenhouse_hr.onboarding_*`; offboarding formal vive en `work_relationship_offboarding_cases` + settlement/document payroll; la UI no debe presentar desactivación ni checklist como finiquito/salida ejecutada.
+- **Slices entregados:** shell HR Lifecycle `/hr/onboarding` con summary/roster/offboarding lane/create checklist; editor list-detail `/hr/onboarding/templates`; vista self-service `/my/onboarding`; card compacta `Lifecycle laboral` en People 360 con ingreso, fin de contrato, salida programada, último día trabajado y CTA autorizado.
+- **Reuso:** APIs existentes `/api/hr/onboarding/**`, `/api/my/onboarding`, `/api/hr/offboarding/cases`, `WorkRelationshipOffboardingCase`, types `HrMember`, `HrOnboardingInstance`, `HrOnboardingTemplate`; sin migraciones ni rutas nuevas.
+- **Docs:** changelog, arquitectura HRIS, documentación funcional/manual de uso de Lifecycle y checklist, task markdown, README/registry.
+- **Verificación:** `pnpm pg:doctor` OK; `pnpm exec tsc --noEmit --pretty false` OK; targeted Vitest HR onboarding/My onboarding/People card OK (32 tests); `pnpm design:lint` 0 errors / 0 warnings / 1 info; `pnpm lint` exit 0 con 316 warnings legacy TASK-265; `pnpm build` OK; `pnpm test` full tuvo 1 timeout flaky conocido en `HrHierarchyView.test.tsx`, rerun aislado OK.
+- **Drift detectado:** la spec original apuntaba a paths `to-do/` y `src/app/[lang]/...`; runtime real usa tasks completas y `src/app/(dashboard)/...`. `schema-snapshot-baseline.sql` no refleja aún las migraciones HR/Payroll recientes, por lo que se contrastó contra migraciones, `src/types/db.d.ts` y Cloud SQL.
 
 ## Sesion 2026-05-04 — TASK-030 HRIS Onboarding/Offboarding Checklists — completada
 

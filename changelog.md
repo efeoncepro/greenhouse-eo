@@ -2,6 +2,13 @@
 
 ## 2026-05-04
 
+- **TASK-763 implementada — Lifecycle Onboarding & Offboarding UI Mockup Adoption.** La experiencia HR adopta la shell aprobada en `docs/mockups/onboarding-module-mockup.html` sobre runtime real.
+  - **HR Lifecycle:** `/hr/onboarding` ahora muestra first fold dominante, carriles Onboarding/Offboarding, KPIs, roster operativo, bloqueos y lane visible de casos formales de offboarding.
+  - **Plantillas:** `/hr/onboarding/templates` usa editor list-detail con biblioteca, tareas, owner, vencimiento, obligatoriedad y reordenamiento.
+  - **Self-service:** `/my/onboarding` muestra progreso personal, proxima accion y estados pendiente/bloqueado/vencido/completo.
+  - **People 360:** nueva card compacta `Lifecycle laboral` separa fecha de ingreso, fin de contrato, salida programada y ultimo dia trabajado; `Fin de contrato` queda como senal contractual, no como salida ejecutada.
+  - **Frontera:** no se agregan capabilities ni migraciones. La UI reutiliza `greenhouse_hr.onboarding_*`, `WorkRelationshipOffboardingCase`, settlements/documentos existentes y mantiene que checklist offboarding no emite finiquito ni revoca acceso.
+
 - **TASK-030 implementada — HRIS Onboarding/Offboarding Checklists Runtime.** Greenhouse materializa checklists operativos reutilizables sin contradecir el programa canonico de Offboarding.
   - **Schema/runtime:** nuevas tablas `greenhouse_hr.onboarding_templates`, `onboarding_template_items`, `onboarding_instances` y `onboarding_instance_items`, con plantillas seed, snapshots de tareas, due dates, progreso y FK opcional a `work_relationship_offboarding_cases`.
   - **Dominio:** `src/lib/hr-onboarding/**` agrega store transaccional, instanciacion idempotente, completitud automatica por tareas obligatorias y proyeccion reactiva desde eventos `member.created|updated|deactivated`.

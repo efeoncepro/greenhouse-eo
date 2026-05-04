@@ -8,13 +8,13 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `optional`
-- Status real: `Diseno`
+- Status real: `Completada 2026-05-04`
 - Rank: `TBD`
 - Domain: `hr`
 - Blocked by: `none` (TASK-030, TASK-760, TASK-761 y TASK-762 completas)
@@ -89,8 +89,8 @@ Reglas obligatorias:
 - `docs/mockups/onboarding-module-mockup.html`
 - `docs/ui/GREENHOUSE_MODERN_UI_UX_BASELINE_V1.md`
 - `docs/ui/GREENHOUSE_UI_REQUEST_BRIEF_TEMPLATE.md`
-- `docs/tasks/to-do/TASK-030-hris-onboarding-offboarding.md`
-- `docs/tasks/to-do/TASK-760-workforce-offboarding-runtime-foundation.md`
+- `docs/tasks/complete/TASK-030-hris-onboarding-offboarding.md`
+- `docs/tasks/complete/TASK-760-workforce-offboarding-runtime-foundation.md`
 
 ## Dependencies & Impact
 
@@ -100,7 +100,7 @@ Reglas obligatorias:
 - `TASK-760` para que el carril offboarding no quede como semántica falsa
 - `src/views/greenhouse/**`
 - `src/components/greenhouse/**`
-- `src/app/[lang]/(dashboard)/hr/**`
+- `src/app/(dashboard)/hr/**`
 
 ### Blocks / Impacts
 
@@ -110,10 +110,10 @@ Reglas obligatorias:
 
 ### Files owned
 
-- `src/app/[lang]/(dashboard)/hr/onboarding/page.tsx`
-- `src/app/[lang]/(dashboard)/hr/onboarding/templates/page.tsx`
-- `src/app/[lang]/(dashboard)/hr/onboarding/instances/[instanceId]/page.tsx`
-- `src/app/[lang]/(dashboard)/my/onboarding/page.tsx`
+- `src/app/(dashboard)/hr/onboarding/page.tsx`
+- `src/app/(dashboard)/hr/onboarding/templates/page.tsx`
+- `src/app/(dashboard)/hr/onboarding/instances/[instanceId]/page.tsx`
+- `src/app/(dashboard)/my/onboarding/page.tsx`
 - `src/views/greenhouse/hr-onboarding/**`
 - `src/components/greenhouse/**` (solo si emerge primitive reusable real)
 - `docs/documentation/hr/onboarding-offboarding-lifecycle.md`
@@ -266,12 +266,12 @@ Usar el criterio aprobado por skills:
 
 ## Acceptance Criteria
 
-- [ ] Existe una shell UI moderna del módulo Lifecycle basada en el mockup aprobado.
-- [ ] Offboarding tiene una lane explícita y visible dentro del módulo.
-- [ ] `My Onboarding` y la card de `People 360` quedan implementadas.
-- [ ] El editor de plantillas sigue un patrón list-detail consistente con el mockup.
-- [ ] La implementación no implica capacidades de finiquito todavía no entregadas.
-- [ ] People 360 no confunde `contractEndDate`, salida efectiva y desactivación de usuario.
+- [x] Existe una shell UI moderna del módulo Lifecycle basada en el mockup aprobado.
+- [x] Offboarding tiene una lane explícita y visible dentro del módulo.
+- [x] `My Onboarding` y la card de `People 360` quedan implementadas.
+- [x] El editor de plantillas sigue un patrón list-detail consistente con el mockup.
+- [x] La implementación no implica capacidades de finiquito todavía no entregadas.
+- [x] People 360 no confunde `contractEndDate`, salida efectiva y desactivación de usuario.
 
 ## Verification
 
@@ -282,15 +282,15 @@ Usar el criterio aprobado por skills:
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
-- [ ] el mockup aprobado sigue enlazado en docs como referencia visual de implementación
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] el mockup aprobado sigue enlazado en docs como referencia visual de implementación
 
 ## Follow-ups
 
-- Desacoplar o absorber el brief legacy de `TASK-030` una vez que la shell y runtime real converjan.
-- Integrar `TASK-761` y `TASK-762` en el lane de offboarding cuando existan runtime y documento de finiquito.
+- Mantener `TASK-030` como runtime checklist y `TASK-760`/`761`/`762` como runtime formal de salida/finiquito; TASK-763 solo adopta la shell UI y no fusiona esos contratos.
+- Si se agrega automatización futura al lane offboarding, debe operar contra los APIs canónicos de cases/settlement/document y no desde completion de checklist.

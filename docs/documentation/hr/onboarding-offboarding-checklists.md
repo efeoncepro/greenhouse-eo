@@ -11,6 +11,8 @@
 
 Los checklists permiten convertir procesos repetibles de entrada y salida en tareas asignables a HR, IT, supervisor, payroll, delivery o colaborador.
 
+Desde TASK-763, estos checklists se operan dentro de la shell `Lifecycle / Onboarding & Offboarding`, que mantiene dos carriles visibles: ingreso y salida operativa. La shell vive en `/hr/onboarding` y el editor list-detail en `/hr/onboarding/templates`.
+
 ## Que es fuente de verdad
 
 - La plantilla define tareas reutilizables.
