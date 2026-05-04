@@ -41,6 +41,35 @@ type Props = {
 
 const cardBorderSx = { border: (theme: Theme) => `1px solid ${theme.palette.divider}` }
 
+const offboardingStatusLabel: Record<string, string> = {
+  draft: 'Borrador',
+  needs_review: 'Requiere revisión',
+  approved: 'Aprobado',
+  scheduled: 'Programado',
+  blocked: 'Bloqueado',
+  executed: 'Ejecutado',
+  cancelled: 'Cancelado'
+}
+
+const offboardingStatusColor: Record<string, 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'info'> = {
+  draft: 'secondary',
+  needs_review: 'warning',
+  approved: 'info',
+  scheduled: 'primary',
+  blocked: 'error',
+  executed: 'success',
+  cancelled: 'default'
+}
+
+const offboardingLaneLabel: Record<string, string> = {
+  internal_payroll: 'Payroll interno',
+  external_payroll: 'Payroll externo',
+  non_payroll: 'Sin payroll',
+  identity_only: 'Solo acceso',
+  relationship_transition: 'Transición',
+  unknown: 'Por revisar'
+}
+
 const DetailRow = ({ label, value }: { label: string; value: string }) => (
   <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 3, py: 0.5 }}>
     <Typography variant='body2' color='text.secondary'>{label}</Typography>
@@ -368,24 +397,90 @@ const PersonHrProfileTab = ({ memberId, hrContext = null, defaultOperationalMetr
         />
       </Grid>
 
+      <Grid size={{ xs: 12 }}>
+        <Card elevation={0} sx={cardBorderSx}>
+          <CardHeader
+            title='Lifecycle laboral'
+            subheader='Distingue contrato, salida laboral y acceso administrativo.'
+            avatar={
+              <Avatar variant='rounded' sx={{ bgcolor: viewModel.employment.offboardingCaseId ? 'warning.lightOpacity' : 'primary.lightOpacity' }}>
+                <i
+                  className={viewModel.employment.offboardingCaseId ? 'tabler-door-exit' : 'tabler-route'}
+                  style={{
+                    fontSize: 22,
+                    color: viewModel.employment.offboardingCaseId ? 'var(--mui-palette-warning-main)' : 'var(--mui-palette-primary-main)'
+                  }}
+                />
+              </Avatar>
+            }
+            action={
+              viewModel.employment.offboardingCaseId ? (
+                <CustomChip
+                  round='true'
+                  variant='tonal'
+                  color={offboardingStatusColor[viewModel.employment.offboardingStatus ?? ''] ?? 'warning'}
+                  label={offboardingStatusLabel[viewModel.employment.offboardingStatus ?? ''] ?? viewModel.employment.offboardingStatus ?? 'Caso activo'}
+                />
+              ) : (
+                <Button
+                  component={Link}
+                  href={`/hr/offboarding?memberId=${memberId}`}
+                  size='small'
+                  variant='tonal'
+                  color='warning'
+                  startIcon={<i className='tabler-door-exit' />}
+                >
+                  Iniciar offboarding
+                </Button>
+              )
+            }
+          />
+          <Divider />
+          <CardContent>
+            <Grid container spacing={4}>
+              <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                <Typography variant='caption' color='text.secondary'>Fecha de ingreso</Typography>
+                <Typography fontWeight={700}>{formatDate(effectiveHireDate)}</Typography>
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                <Typography variant='caption' color='text.secondary'>Fin de contrato</Typography>
+                <Typography fontWeight={700}>{viewModel.employment.contractEndDate ? formatDate(viewModel.employment.contractEndDate) : 'Sin fecha contractual'}</Typography>
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                <Typography variant='caption' color='text.secondary'>Salida programada</Typography>
+                <Typography fontWeight={700}>{formatDate(viewModel.employment.effectiveExitDate)}</Typography>
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                <Typography variant='caption' color='text.secondary'>Último día trabajado</Typography>
+                <Typography fontWeight={700}>{formatDate(viewModel.employment.lastWorkingDay)}</Typography>
+              </Grid>
+            </Grid>
+
+            <Box sx={{ mt: 4 }}>
+              {viewModel.employment.offboardingCaseId ? (
+                <Alert severity={viewModel.employment.offboardingStatus === 'blocked' ? 'error' : 'warning'}>
+                  Caso {viewModel.employment.offboardingPublicId ?? viewModel.employment.offboardingCaseId} activo en lane{' '}
+                  {offboardingLaneLabel[viewModel.employment.offboardingRuleLane ?? ''] ?? viewModel.employment.offboardingRuleLane ?? 'por revisar'}.
+                  El checklist operativo y el finiquito se gobiernan desde HR, no desde la desactivación de usuario.
+                </Alert>
+              ) : viewModel.employment.contractEndDate ? (
+                <Alert severity='info'>
+                  Hay una fecha de fin de contrato registrada. Úsala como señal contractual; no equivale a salida ejecutada ni a revocación de acceso.
+                </Alert>
+              ) : (
+                <Alert severity='success'>No hay salida laboral programada para este colaborador.</Alert>
+              )}
+            </Box>
+          </CardContent>
+        </Card>
+      </Grid>
+
       <Grid size={{ xs: 12, md: 6 }}>
         <Card elevation={0} sx={cardBorderSx}>
           <CardHeader
             title='Información laboral'
             action={
               <Stack direction='row' spacing={2}>
-                {!viewModel.employment.offboardingCaseId && (
-                  <Button
-                    component={Link}
-                    href={`/hr/offboarding?memberId=${memberId}`}
-                    size='small'
-                    variant='tonal'
-                    color='warning'
-                    startIcon={<i className='tabler-door-exit' />}
-                  >
-                    Iniciar offboarding
-                  </Button>
-                )}
                 <Button
                   size='small'
                   variant='tonal'
