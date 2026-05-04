@@ -165,6 +165,20 @@ Si el readiness detecta que una entry ya calculada mezcla regimenes incompatible
 
 Melkin Hernandez, Daniela Ferreira y Andres Carlosama deben mantenerse como internacionales/Deel. Si tienen bono variable, siguen requiriendo KPI ICO, pero no deben recibir deducciones Chile.
 
+## Como se ve el recibo segun el regimen (TASK-758)
+
+Desde `RECEIPT_TEMPLATE_VERSION = '4'` (2026-05-04) Greenhouse emite el recibo individual con un contrato visual canonico distinto por regimen. Tanto la vista previa que ve el operador como el PDF descargable que recibe el colaborador renderizan exactamente el mismo layout.
+
+| Regimen | Que ve el colaborador |
+| --- | --- |
+| Chile dependiente (`indefinido`/`plazo_fijo`) | Bloque "Descuentos legales" completo: AFP con cotizacion + comision separadas, salud obligatoria 7% + voluntaria si la hay, seguro cesantia, impuesto unico, APV cuando aplica. Si la compensacion incluye gratificacion legal, aparece como haber explicito. |
+| Honorarios | Bloque "Retencion honorarios" con Tasa SII + monto retenido. Nota informativa "Boleta de honorarios Chile · Art. 74 N°2 LIR". No aparecen filas de AFP, salud, cesantia ni impuesto unico. |
+| Contractor o EOR via Deel | Sin bloque de descuentos legales. Aparece la nota "Pago administrado por Deel" explicando que el liquido legal lo emite Deel en la jurisdiccion del trabajador, mas el `Contrato Deel` cuando esta registrado. Hero dice "Monto bruto registrado". |
+| Internacional interno (sin Deel) | Sin bloque de descuentos legales. Aparece la nota "Regimen internacional · Sin descuentos previsionales Chile". |
+| Excluido del periodo | El recibo se emite igual con un banner rojo explicando la causa, omite haberes/asistencia/descuentos, y el hero pasa a estado "Sin pago este periodo · $0" en gris. |
+
+Cualquier nuevo tipo de contrato debe declarar primero su comportamiento de recibo en `src/lib/payroll/receipt-presenter.ts` antes de mergear codigo — el helper canonico tiene un `never`-check que rompe build sin esa rama.
+
 ---
 
 ## Referencias

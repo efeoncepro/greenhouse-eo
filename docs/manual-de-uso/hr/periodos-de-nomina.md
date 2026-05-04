@@ -147,6 +147,19 @@ No. Ese valor es informativo. En el flujo normal no debes escribirlo manualmente
 
 Es esperado. Si cambias la base de calculo del periodo, Greenhouse elimina las entries calculadas para obligar un recalculo limpio con los valores correctos del nuevo mes.
 
+### Por que el recibo de un honorario no muestra AFP
+
+Los recibos individuales se ajustan al regimen del colaborador. Para `honorarios`, el motor solo genera la retencion SII, asi que el recibo:
+
+- muestra el bloque "Retencion honorarios" con la tasa SII vigente del año.
+- no muestra AFP, salud, seguro cesantia, impuesto unico ni APV — esos descuentos no aplican legalmente.
+- no muestra colacion, movilizacion ni teletrabajo — no son haberes de honorarios.
+- agrega la nota "Boleta de honorarios Chile · Art. 74 N°2 LIR" para que el colaborador entienda el respaldo legal.
+
+Para colaboradores Deel/Contractor/EOR, el recibo es informativo: muestra el monto bruto registrado en Greenhouse, el ID de contrato Deel cuando lo tenemos, y aclara que el liquido legal del pais del trabajador lo emite Deel.
+
+Si recibes un recibo de honorario con filas de AFP/salud en blanco o un recibo Deel sin contexto, ese recibo viene de la version `v3` (legacy). Pidele al equipo de Payroll re-generar el recibo: el portal lo regenera automaticamente la primera vez que el colaborador o el operador acceden al PDF. Cualquier diferencia visible nueva entre la vista previa y el PDF descargable es un bug — ambas surfaces consumen el mismo contrato canonico.
+
 ## Que no hacer
 
 - No inventes una version tributaria solo para destrabar el flujo.

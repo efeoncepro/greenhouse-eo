@@ -1,13 +1,20 @@
 # Handoff.md
 
-## Sesion 2026-05-04 — TASK-758 Payroll Receipt Render Contract Hardening (4 regímenes) — en curso
+## Sesion 2026-05-04 — TASK-758 Payroll Receipt Render Contract Hardening (4 regímenes) — completada
 
 - **Trigger**: auditoría profunda de recibos detectó que el bug `isChile = payRegime === 'chile'` afecta a 3/4 regímenes (no solo honorarios). TASK-758 ampliada de 1 a 4 regímenes + canonización de mockup HTML como contrato visual vinculante.
 - **Branch**: `develop` (instrucción explícita del usuario: implementar sin cambiar de rama).
-- **Lifecycle**: `in-progress`. Mockup `docs/mockups/task-758-receipt-render-4-regimes.html` aprobado y vinculante 1:1.
-- **Helper canónico**: `src/lib/payroll/receipt-presenter.ts` 🆕 — `resolveReceiptRegime` + `buildReceiptPresentation` puro, server-safe, exhaustiveness `never`-check. Será exportado para TASK-782.
-- **Bump**: `RECEIPT_TEMPLATE_VERSION` 3→4 al cierre de Slice 3 (PDF).
-- **Audit aplicado** (FASE 2 pre-execution): pendiente de impresión en próximo turno.
+- **Lifecycle**: `complete`. Mockup `docs/mockups/task-758-receipt-render-4-regimes.html` aprobado y vinculante 1:1.
+- **5 slices entregados**:
+  - **Slice 1**: helper canónico `src/lib/payroll/receipt-presenter.ts` con `resolveReceiptRegime` + `buildReceiptPresentation` + `groupEntriesByRegime` (export para TASK-782) + `RECEIPT_REGIME_BADGES` + 46 tests verde.
+  - **Slice 2**: `PayrollReceiptCard.tsx` refactor declarativo + 13 tests render verde. `aria-label` resumen por régimen, info blocks alert, hero variant degraded para excluded.
+  - **Slice 3**: `ReceiptDocument` (PDF) refactor declarativo + bump `RECEIPT_TEMPLATE_VERSION` 3→4. Estilos PDF nuevos: `netHeroDegraded`, `infoBlock`/`infoBlockWarning`/`infoBlockError`. Lazy regen automático downstream sin migración.
+  - **Slice 4**: `ProjectedPayrollView` converge al detector canónico — reemplaza `isHonorariosProjectedEntry` y `isInternationalRegime` locales por `resolveReceiptRegime`.
+  - **Slice 5**: docs (CLAUDE.md sección nueva, arch doc §25.b, doc funcional, manual de uso, changelog). Bonus: 3 warnings preexistentes de `greenhouse/no-untokenized-copy` resueltos vía `aria.previousMonth/nextMonth`, `GH_PAYROLL_PROJECTED_ARIA`, `empty.noResults`.
+- **Verificación**: 360/360 tests payroll verde (59 nuevos). `tsc --noEmit` clean. `eslint` 0 errors / 0 warnings en files owned. Anti-regression grep contra `monospace`, `font-feature-settings: 'tnum'`, `borderRadius` off-scale → 0 hits.
+- **Open Questions resueltas pre-execution**: costo empleador queda OOS (audience operador-facing distinto, no follow-up automático); `netLabel` Deel = "Monto bruto registrado" + footnote; `infoBlock` `international_internal` y `_deel` mismo `variant: 'info'` con título/body distintos.
+- **TASK-782 desbloqueada**: helper exportado + `groupEntriesByRegime` + badges canónicos listos para reuso operador-facing (PeriodReportDocument + Excel).
+- **Próximo paso**: tomar TASK-782 cuando el usuario autorice (queda blocked-by TASK-758 ✅ resuelto).
 
 ## Sesion 2026-05-04 — TASK-764 DESIGN.md Contract Hardening end-to-end
 

@@ -6,17 +6,17 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `optional`
-- Status real: `En implementación`
+- Status real: `Cerrada (2026-05-04)`
 - Rank: `TBD`
 - Domain: `hr`
 - Blocked by: `none`
-- Branch: `task/TASK-758-payroll-receipt-render-contract`
+- Branch: `develop` (instrucción explícita del usuario: implementar sin cambiar de rama)
 - Legacy ID: `none`
 - GitHub Issue: `none`
 

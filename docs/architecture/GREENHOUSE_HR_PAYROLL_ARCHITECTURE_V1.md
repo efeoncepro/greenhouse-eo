@@ -1318,6 +1318,69 @@ Ambas rutas (`/api/hr/payroll/entries/[entryId]/receipt` y `/api/my/payroll/entr
 | `public/branding/logo-full.png` | Logo Efeonce (PNG, @react-pdf/renderer compatible) |
 | `scripts/migrations/add-receipt-template-version.sql` | DDL para columna `template_version` |
 
+## 25.b Receipt presentation contract (TASK-758, v4 desde 2026-05-04)
+
+A partir de `RECEIPT_TEMPLATE_VERSION = '4'`, ambas surfaces de recibo individual (preview MUI `PayrollReceiptCard` y PDF `ReceiptDocument`) consumen el helper canónico **`buildReceiptPresentation`** desde `src/lib/payroll/receipt-presenter.ts`. Cero lógica de detección de régimen vive en los componentes — sólo render declarativo del struct.
+
+### Detector canónico
+
+```ts
+resolveReceiptRegime(entry) →
+  | 'chile_dependent'      // contractTypeSnapshot ∈ {indefinido, plazo_fijo}
+  | 'honorarios'           // contractTypeSnapshot === 'honorarios'
+  | 'international_deel'   // contractTypeSnapshot ∈ {contractor, eor} OR payrollVia === 'deel'
+  | 'international_internal' // payRegime === 'international' sin Deel
+```
+
+Cascade:
+1. **Primario**: `contractTypeSnapshot` (canónico, persistido por el motor).
+2. **Fallback honorarios legacy**: `payRegime === 'chile' && siiRetentionAmount > 0`.
+3. **Fallback Deel legacy**: `payrollVia === 'deel'`.
+4. **Fallback international**: `payRegime === 'international'`.
+5. **Default seguro**: `chile_dependent` (conservador para data corrupta).
+
+### Exhaustiveness check
+
+El switch de `buildReceiptPresentation` cierra con `const _exhaustive: never = regime`. Si emerge un nuevo `ContractType` y nadie agrega su rama, **TS rompe build**.
+
+### Comportamiento canónico por régimen
+
+| Régimen | Bloque deducción | InfoBlock canónico | Hero | Tipo de contrato |
+| --- | --- | --- | --- | --- |
+| `chile_dependent` | `Descuentos legales` (AFP split + salud obl/vol + cesantía + IUSC + APV + gratificación legal informativa) | — | `Líquido a pagar` | `CONTRACT_LABELS[indefinido / plazo_fijo].label` |
+| `honorarios` | `Retención honorarios` (Tasa SII + Retención honorarios) | `Boleta de honorarios Chile · Art. 74 N°2 LIR · Tasa SII <year>` | `Líquido a pagar` | `Honorarios` |
+| `international_deel` | (ninguno) | `Pago administrado por Deel` + `meta: deelContractId` cuando existe | `Monto bruto registrado` + footnote canónico | `Contractor (Deel)` / `EOR (Deel)` |
+| `international_internal` | (ninguno) | `Régimen internacional · Sin descuentos previsionales Chile` | `Líquido a pagar` | `Internacional` |
+| **`excluded` (terminal)** | (omitido) | `Excluido de esta nómina — <reasonLabel>` (variant `error`) | `Sin pago este período · $0` (degraded gris) | (mantiene contractTypeLabel) |
+
+### Reglas duras de implementación (vinculantes)
+
+- **NUNCA** ramificar render por `entry.payRegime === 'chile'` solo. Toda detección pasa por `resolveReceiptRegime`.
+- **NUNCA** `font-family: monospace` en surfaces user-facing del recibo. Para `deelContractId` o IDs técnicos: `font-variant-numeric: tabular-nums` + `letter-spacing: 0.02em` sobre Geist Sans.
+- **NUNCA** `font-feature-settings: 'tnum'`. Usar `font-variant-numeric: tabular-nums` (canónica V1).
+- **NUNCA** `borderRadius` off-scale (3, 5, 7, 12). Usar tokens `customBorderRadius.{xs:2, sm:4, md:6, lg:8, xl:10}`.
+- **NUNCA** color como única señal de estado. InfoBlock siempre lleva título + body explicativo.
+- **NUNCA** lime `#6ec207` para texto sobre blanco (falla 4.5:1). Variante contrast-safe `#2E7D32` cuando emerja necesidad.
+- Cada nuevo `ContractType` agregado en `src/types/hr-contracts.ts` requiere extender el switch de `buildReceiptPresentation` antes de mergear (defendido por exhaustiveness check).
+- Mockup canónico vinculante: `docs/mockups/task-758-receipt-render-4-regimes.html`. Cualquier desviación visual requiere update + re-aprobación del mockup ANTES de mergear.
+
+### Reusabilidad cross-task
+
+- `resolveReceiptRegime` y `groupEntriesByRegime` son **exports públicos** consumidos por TASK-782 (`PeriodReportDocument` + `generate-payroll-excel.ts`) — single source of truth de clasificación de régimen across surfaces operador-facing.
+- `RECEIPT_REGIME_BADGES` y `RECEIPT_REGIME_DISPLAY_ORDER` también exportados — mismo design system de badges en preview, PDF, period report y Excel.
+
+### Archivos owned
+
+| Archivo | Propósito |
+|---|---|
+| `src/lib/payroll/receipt-presenter.ts` | Helper canónico (puro, server-safe) |
+| `src/lib/payroll/receipt-presenter.test.ts` | Tests matriz régimen × adjustments (46 tests) |
+| `src/lib/payroll/generate-payroll-pdf.tsx` | `ReceiptDocument` consumer + `RECEIPT_TEMPLATE_VERSION = '4'` |
+| `src/views/greenhouse/payroll/PayrollReceiptCard.tsx` | Preview MUI consumer |
+| `src/views/greenhouse/payroll/PayrollReceiptCard.test.tsx` | Tests render (13 tests) |
+| `src/views/greenhouse/payroll/ProjectedPayrollView.tsx` | Detector convergence (reusa `resolveReceiptRegime`) |
+| `docs/mockups/task-758-receipt-render-4-regimes.html` | Mockup canónico vinculante |
+
 ### Archivos runtime
 
 - `src/lib/payroll/reverse-payroll.ts` — motor `computeGrossFromNet()`

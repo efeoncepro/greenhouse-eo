@@ -1,5 +1,10 @@
 # TASK-782 — Payroll Period Report + Excel Honorarios Disaggregation
 
+## Delta 2026-05-04
+
+- Blocker resuelto: TASK-758 cerrada en `develop`. El helper canónico `resolveReceiptRegime` + `groupEntriesByRegime` + `RECEIPT_REGIME_BADGES` + `RECEIPT_REGIME_DISPLAY_ORDER` ya están exportados desde `src/lib/payroll/receipt-presenter.ts` listos para reuso operador-facing.
+- `Blocked by` puede pasar a `none` cuando un agente tome esta task — el contrato canónico del que depende ya existe en runtime.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
