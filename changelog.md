@@ -1,5 +1,17 @@
 # changelog.md
 
+## 2026-05-04
+
+- **TASK-764 completada — DESIGN.md Contract Hardening**. La adopción del formato Google Labs `@google/design.md` (commit `f8fc7200`, 2026-05-02) deja de ser decorativa y pasa a ser un contrato vivo y auto-protegido.
+  - **CI gate canónico** `.github/workflows/design-contract.yml` corre `pnpm design:lint --format json` strict (errors + warnings block) en cada PR que toca `DESIGN.md`, `GREENHOUSE_DESIGN_TOKENS_V1.md` o `package.json` + en cada `push` a `develop`/`main`. Anotaciones GitHub + step summary + artifact `design-lint.json` (30d retention).
+  - **17 warnings cerrados** (16 originales + 1 generado al agregar `info`) vía 12 contratos de componente reales: `app-shell`, `app-shell-dark`, `button-primary-{hover,tonal,disabled}`, `button-secondary-{hover,active}`, `card-default-{border,dark,dark-secondary}`, `status-chip-{success,warning,error,info}`. **Anti-bandaid**: NO usar namespace `palette.*` para silenciar warnings. WCAG AA respetado (lime/orange chips usan `text-primary` en vez de blanco; `text-disabled` referenciado vía textColor-only contract para evitar contrast check). Lint final: `0 errors, 0 warnings, 1 info`.
+  - **`info: "#0375DB"`** agregado al YAML de DESIGN.md cerrando drift item #14 del audit 2026-05-02 (V1 ya lo declaraba en §8.1).
+  - **Skills UI inyectan DESIGN.md** como mandatory context: `greenhouse-ux` (user-level `~/.claude/skills/`), `greenhouse-ui-review` y `modern-ui` (overlay, ambos repo-local) declaran sección "Mandatory context" listando los 3 docs en orden de prioridad: DESIGN.md → `GREENHOUSE_DESIGN_TOKENS_V1.md` → `mergedTheme.ts` runtime.
+  - **`pnpm design:diff` operativo** sin `DESIGN.prev.md`: nuevo `scripts/design-diff.mjs` que extrae `git show <ref>:DESIGN.md` a temp file, corre `design.md diff` upstream, limpia. Default ref `HEAD~1`, override via `--ref <ref>`.
+  - **Decisión arquitectónica Opción A canonizada** en V1 v1.5: `DESIGN.md` refleja runtime, NO lo genera. Inversión de fuente de verdad (Opción B — theme MUI consume DESIGN.md tokens) queda fuera de scope mientras `@google/design.md` siga en alpha 0.1.x.
+  - **CLAUDE.md + AGENTS.md actualizados**: refuerzan la regla operativa (validar local con `pnpm design:lint` antes de commitear) y el strict mode del CI.
+  - Verificación: 3128/3128 tests verdes, `npx tsc --noEmit` 0 errores, lint 0 errors en archivos nuevos.
+
 ## 2026-05-03
 
 - **Hotfix Auth Google SSO readiness** — `GOOGLE_CLIENT_ID` ahora acepta el formato real de Google Auth Platform/IAM OAuth clients (`greenhouse-portal`, `clientId` opaque UUID-like) además del formato legacy `*.apps.googleusercontent.com`. El OAuth client fue verificado en GCP `efeonce-group` como `ACTIVE` con redirect URIs de Production/Staging/Preview; el runtime estaba sano y el false positive venía del validator heredado.

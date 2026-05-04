@@ -29,17 +29,17 @@ Los Slices originales 1-6 de la task se mantienen pero con scope concreto:
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `none`
-- Status real: `Diseño`
+- Status real: `Cerrada 2026-05-04 — 6 slices entregados, contract gate live + strict, Opción A canónica`
 - Rank: `TBD`
 - Domain: `ui`
 - Blocked by: `none`
-- Branch: `task/TASK-764-design-md-contract-hardening`
+- Branch: `develop` (commits fd95bdbc → 15a77a04)
 - Legacy ID: `none`
 - GitHub Issue: `none`
 

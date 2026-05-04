@@ -1,5 +1,22 @@
 # Handoff.md
 
+## Sesion 2026-05-04 — TASK-764 DESIGN.md Contract Hardening end-to-end
+
+- **Trigger**: `DESIGN.md` adoptado 2026-05-01 quedó como contrato decorativo (sin CI gate, 16 warnings activos, sync no verificada con `GREENHOUSE_DESIGN_TOKENS_V1.md`, skills UI no lo cargaban automático, `design:diff` roto por `DESIGN.prev.md` inexistente).
+- **6 slices entregados (sin cambiar de rama, todo en `develop`)**:
+  - **Slice 1** ✅: `.github/workflows/design-contract.yml` con `pnpm design:lint --format json` parseado por jq, anotaciones GitHub + step summary, artifact `design-lint.json` (30d retention). Modo fail-soft inicial.
+  - **Slice 2** ✅: `info: "#0375DB"` agregado al YAML de DESIGN.md (cierra drift item #14). Sync con V1 ya cumplida en v1.4 (Delta 2026-05-02). Lint subió a 17 warnings transitorio.
+  - **Slice 3** ✅: 12 contratos de componente nuevos resuelven los 17 warnings: `app-shell`, `app-shell-dark`, `button-primary-{hover,tonal,disabled}`, `button-secondary-{hover,active}`, `card-default-{border,dark,dark-secondary}`, `status-chip-{success,warning,error,info}`. Anti-bandaid: NO `palette.*` namespace (TASK-764 OQ1). WCAG AA respetado (lime/orange chips usan `text-primary` en lugar de blanco; `text-disabled` referenciado vía textColor-only contract para evitar contrast check). Lint final: `0 errors, 0 warnings, 1 info`.
+  - **Slice 4** ✅: Skills UI (`greenhouse-ux` user-level `~/.claude/skills/`, `greenhouse-ui-review` y `modern-ui` overlay repo-local) declaran "Mandatory context" listando los 3 docs en orden: DESIGN.md → V1 → runtime.
+  - **Slice 5** ✅: `scripts/design-diff.mjs` wrapper que extrae `git show <ref>:DESIGN.md` a temp file, corre `design.md diff`, limpia. `--ref` flag + positional shorthand. Eliminado `DESIGN.prev.md` drift latency.
+  - **Slice 6** ✅: `STRICT_WARNINGS=true` activado. V1 spec bumped a v1.5 con Delta 2026-05-04 + ADR Opción A canonizada (DESIGN.md refleja runtime, NO lo genera; Opción B blocked por `@google/design.md@^0.1.1` alpha). CLAUDE.md + AGENTS.md refuerzan el gate.
+- **Open Questions resueltas pre-execution**:
+  - OQ1 (¿linter audita namespace `palette.*`?) → NO bandaid; usar contratos reales.
+  - OQ2 (¿mantener `design:diff` o eliminar?) → mantener via wrapper Node.
+  - OQ3 + Slice 6 → Opción A confirmada, heredada de THEME_TOKEN_CONTRACT_V1 §1.4.
+- **Verificación**: 3128/3128 tests verdes, `npx tsc --noEmit` 0 errores, `pnpm lint scripts/design-diff.mjs` 0 errores (autofix), `pnpm design:lint` 0/0/1, `pnpm design:diff` operativo contra `HEAD~1`.
+- **Pendiente operativo**: push final + verificar CI gate corre verde.
+
 ## Sesion 2026-05-04 — TASK-780 Home Rollout Flag Platform end-to-end
 
 - **Trigger:** usuario detectó divergencia visible entre `dev-greenhouse.efeoncepro.com/home` (V2 con KPI cards) y `greenhouse.efeoncepro.com/home` (legacy Nexa Insights). Sospechó que su merge a producción había omitido cambios.
