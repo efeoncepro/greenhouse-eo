@@ -87,6 +87,7 @@ export async function PATCH(
         case 'emails[type eq "work"].value':
           updates.email = String(value)
           break
+
         case 'externalid': {
           const microsoftOid = String(value)
 
@@ -109,6 +110,7 @@ export async function PATCH(
           updates.microsoftOid = microsoftOid
           break
         }
+
         default:
           // Entra sometimes sends without path, with value as object
           if (!path && typeof value === 'object' && value !== null) {
@@ -116,6 +118,7 @@ export async function PATCH(
 
             if ('active' in obj) updates.active = Boolean(obj.active)
             if ('displayName' in obj) updates.displayName = String(obj.displayName)
+
             if ('externalId' in obj) {
               const microsoftOid = String(obj.externalId)
 
