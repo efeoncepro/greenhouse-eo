@@ -1,0 +1,108 @@
+name: Design Contract
+
+# TASK-764 — DESIGN.md contract gate.
+# Validates the design contract (`DESIGN.md`) on every PR that touches the
+# contract surface or the canonical token spec. Fail-soft initially: errors
+# block, warnings report only. After Slice 3 closes the 16 active warnings,
+# strict mode activates (warnings also block) — see env.STRICT_WARNINGS below.
+
+on:
+  pull_request:
+    paths:
+      - 'DESIGN.md'
+      - 'docs/architecture/GREENHOUSE_DESIGN_TOKENS_V1.md'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - '.github/workflows/design-contract.yml'
+  push:
+    branches:
+      - develop
+      - main
+    paths:
+      - 'DESIGN.md'
+      - 'docs/architecture/GREENHOUSE_DESIGN_TOKENS_V1.md'
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  lint:
+    name: Validate DESIGN.md
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      # Set to 'true' once Slice 3 closes the 16 active warnings.
+      # When true, summary.warnings > 0 also fails the job. Slice 6 flips this.
+      STRICT_WARNINGS: 'false'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run design:lint (JSON)
+        id: design_lint
+        run: |
+          pnpm design:lint --format json 2>/dev/null \
+            | sed -n '/^{/,$p' > design-lint.json
+          echo "Lint output saved to design-lint.json"
+
+      - name: Parse summary
+        id: summary
+        run: |
+          ERRORS=$(jq -r '.summary.errors' design-lint.json)
+          WARNINGS=$(jq -r '.summary.warnings' design-lint.json)
+          INFOS=$(jq -r '.summary.infos' design-lint.json)
+          echo "errors=$ERRORS" >> "$GITHUB_OUTPUT"
+          echo "warnings=$WARNINGS" >> "$GITHUB_OUTPUT"
+          echo "infos=$INFOS" >> "$GITHUB_OUTPUT"
+          echo "## DESIGN.md lint summary" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Severity | Count |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| --- | --- |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Errors | $ERRORS |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Warnings | $WARNINGS |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Infos | $INFOS |" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Report errors
+        if: ${{ steps.summary.outputs.errors != '0' }}
+        run: |
+          echo "::error::DESIGN.md has ${{ steps.summary.outputs.errors }} error(s) — blocking."
+          jq -r '.findings[] | select(.severity=="error") | "::error file=DESIGN.md::\(.path) — \(.message)"' design-lint.json
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "### Errors" >> "$GITHUB_STEP_SUMMARY"
+          jq -r '.findings[] | select(.severity=="error") | "- `\(.path)` — \(.message)"' design-lint.json >> "$GITHUB_STEP_SUMMARY"
+          exit 1
+
+      - name: Report warnings
+        if: ${{ steps.summary.outputs.warnings != '0' }}
+        run: |
+          jq -r '.findings[] | select(.severity=="warning") | "::warning file=DESIGN.md::\(.path) — \(.message)"' design-lint.json
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "### Warnings" >> "$GITHUB_STEP_SUMMARY"
+          jq -r '.findings[] | select(.severity=="warning") | "- `\(.path)` — \(.message)"' design-lint.json >> "$GITHUB_STEP_SUMMARY"
+          if [ "$STRICT_WARNINGS" = "true" ]; then
+            echo "::error::DESIGN.md has ${{ steps.summary.outputs.warnings }} warning(s) — blocking under STRICT_WARNINGS=true."
+            exit 1
+          fi
+
+      - name: Upload lint report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: design-lint-report
+          path: design-lint.json
+          retention-days: 30

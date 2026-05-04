@@ -29,7 +29,7 @@ Los Slices originales 1-6 de la task se mantienen pero con scope concreto:
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Medio`
