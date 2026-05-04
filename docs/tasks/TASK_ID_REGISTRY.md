@@ -849,7 +849,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-760` | `complete` | Workforce Offboarding Runtime Foundation | `docs/tasks/complete/TASK-760-workforce-offboarding-runtime-foundation.md` |
 | `TASK-761` | `complete` | Payroll Final Settlement / Finiquito Engine Chile | `docs/tasks/complete/TASK-761-payroll-final-settlement-finiquito-engine-chile.md` |
 | `TASK-762` | `complete` | Finiquito Document Generation + Approval Flow | `docs/tasks/complete/TASK-762-finiquito-document-generation-approval-flow.md` |
-| `TASK-763` | `to-do` | Lifecycle Onboarding & Offboarding UI Mockup Adoption | `docs/tasks/to-do/TASK-763-lifecycle-onboarding-offboarding-ui-mockup-adoption.md` |
+| `TASK-763` | `in-progress` | Lifecycle Onboarding & Offboarding UI Mockup Adoption | `docs/tasks/in-progress/TASK-763-lifecycle-onboarding-offboarding-ui-mockup-adoption.md` |
 | `TASK-764` | `to-do` | DESIGN.md Contract Hardening (CI gate + spec sync + token hygiene + agent injection) | `docs/tasks/to-do/TASK-764-design-md-contract-hardening.md` |
 | `TASK-765` | `complete` | Payment Order ↔ Bank Settlement Resilience (atomic mark-paid + materialize-or-throw + reliability signals + state machine hardening + recovery del incidente 2026-05-01) | `docs/tasks/complete/TASK-765-payment-order-bank-settlement-resilience.md` |
 | `TASK-766` | `complete` | Finance CLP-Currency Reader Contract Resilience (VIEW expense_payments_normalized + helper canónico + lint rule no-untokenized-fx-math + reliability signal + repair endpoint + recovery del bug KPIs inflados 88× 2026-05-02) | `docs/tasks/complete/TASK-766-finance-clp-currency-reader-contract.md` |

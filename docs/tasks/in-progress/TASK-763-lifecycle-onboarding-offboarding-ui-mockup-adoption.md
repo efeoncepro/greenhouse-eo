@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -17,7 +17,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `hr`
-- Blocked by: `TASK-030`, `TASK-760`
+- Blocked by: `none` (TASK-030, TASK-760, TASK-761 y TASK-762 completas)
 - Branch: `task/TASK-763-lifecycle-onboarding-offboarding-ui-mockup-adoption`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -123,7 +123,13 @@ Reglas obligatorias:
 
 ### Already exists
 
-- Task legacy `TASK-030` con rutas, tablas, templates y superficies propuestas.
+- `TASK-030` completada con runtime real de checklists HRIS:
+  - `greenhouse_hr.onboarding_templates`
+  - `greenhouse_hr.onboarding_template_items`
+  - `greenhouse_hr.onboarding_instances`
+  - `greenhouse_hr.onboarding_instance_items`
+  - APIs `/api/hr/onboarding/**` y `/api/my/onboarding`.
+- `TASK-760`, `TASK-761` y `TASK-762` completadas con caso de offboarding, settlement final y documento de finiquito.
 - Mockup aprobado:
   - `docs/mockups/onboarding-module-mockup.html`
 - Arquitectura formal de offboarding:
@@ -132,7 +138,7 @@ Reglas obligatorias:
 
 ### Gap
 
-- No existe la shell UI implementada del módulo.
+- Existe una primera UI funcional de TASK-030, pero todavía es plana y no adopta la shell visual aprobada de Lifecycle.
 - Offboarding aún tiende a quedar diluido o tratado como checklist secundario.
 - No hay un detail-shell moderno ni roster operativo con la jerarquía aprobada.
 - No existe hoy una card compacta explícita para `People 360`.

@@ -1,5 +1,13 @@
 # Handoff.md
 
+## Sesion 2026-05-04 — TASK-763 Lifecycle Onboarding & Offboarding UI Mockup Adoption — retomada
+
+- **Branch:** `task/TASK-763-lifecycle-onboarding-offboarding-ui-mockup-adoption`, fast-forward desde `develop` `29804193`.
+- **Lifecycle:** `in-progress`; task movida desde `to-do` y README/registry sincronizados.
+- **Ownership:** no hay PR abierto para TASK-763. La rama previa era solo discovery bloqueada; se retoma ahora que `TASK-030`, `TASK-760`, `TASK-761` y `TASK-762` están completas.
+- **Skills:** `greenhouse-agent`, `greenhouse-ui-orchestrator` y `greenhouse-ux-content-accessibility`.
+- **Frontera segura:** la shell debe adoptar el mockup sin simular runtime: checklists viven en `greenhouse_hr.onboarding_*`; offboarding formal vive en `work_relationship_offboarding_cases` + settlement/document payroll; la UI no debe presentar desactivación ni checklist como finiquito/salida ejecutada.
+
 ## Sesion 2026-05-04 — TASK-030 HRIS Onboarding/Offboarding Checklists — completada
 
 - **Branch:** `develop` por instruccion explicita del usuario; no se crea branch `task/TASK-030-...`.

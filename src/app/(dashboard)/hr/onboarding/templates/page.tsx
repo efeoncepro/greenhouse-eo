@@ -26,7 +26,7 @@ const Page = async () => {
     redirect(tenant.portalHomePath)
   }
 
-  return <HrOnboardingView />
+  return <HrOnboardingView mode='templates' />
 }
 
 export default Page
