@@ -22274,7 +22274,11 @@ Cierre operativo:
 - Limpieza smoke: 2 usuarios sinteticos `scim-smoke-*` removidos y 2 outbox events asociados removidos; quedan solo audit logs SCIM como evidencia.
 - Logs SCIM desde `2026-05-04T10:33:00Z`: `LIST 200` y `CREATE 201`; cero `CREATE 500` nuevos.
 - Azure SCIM job sigue `Active`, sin quarantine; ultimo ciclo manual/reciente `Succeeded`, `steadyStateLastAchievedTime=2026-05-04T10:33:32Z`.
+- Commit docs `6c745ed` quedo desplegado en Production y Staging. Health productivo responde `ok=true`, `version=6c745ed`, `environment=production`.
+- Se ejecuto `restart` oficial de Microsoft Graph con `resetScope=Escrows`; luego `start` del job. El ciclo `2026-05-04T10:48:22Z` termino `Succeeded`, sin `error` ni quarantine.
+- Se ejecuto `provisionOnDemand` oficial de Microsoft Graph para el usuario real asignado `support@efeoncepro.com` usando rule `03f7d90d-bf71-41b1-bda6-aaf0ddbee5d8`. Resultado Entra: `EntryExportAdd=Success`, `User was created in customappsso`, target SCIM id `823d3170-cb62-4087-99d2-7efae2089bb8`.
+- Verificacion DB del usuario real: `support@efeoncepro.com` quedo con `scim_id`, `client_id=NULL`, `tenant_type='efeonce_internal'`, `auth_mode='microsoft_sso'`, `status='active'`, `provisioned_by='scim'`, role `collaborator` con `client_id=NULL` y `scope_level=NULL`.
 
 Nota residual:
 
-- Azure aun reporta `countEscrowed=9` y `countEntitledForProvisioning=0`. Eso no es un error del endpoint Greenhouse (no hay `error`, no hay quarantine y no hay nuevos 500); parece scope/assignment de Entra. Si se requiere 100% semantico de altas reales desde Entra, revisar en Azure Provisioning Logs cuales objetos estan escrowed y por que no estan entitled/exported.
+- Azure sigue reportando `countEscrowed=9` en el ciclo regular aunque el `provisionOnDemand` real ya crea correctamente. Interpretacion vigente: el endpoint Greenhouse esta sano; los escrows restantes son estado/backlog del motor de Entra y deben revisarse desde Provisioning Logs si se quiere limpiar historico/cadencia regular completa. No aplicar SQL manual para "arreglar" ese contador.
