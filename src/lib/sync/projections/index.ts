@@ -52,6 +52,7 @@ import { productCatalogPricesRecomputeProjection } from './product-catalog-price
 import { productCatalogPricesSyncProjection } from './product-catalog-prices-sync'
 import { teamsNotifyProjection } from './teams-notify'
 import { providerBqSyncProjection } from './provider-bq-sync'
+import { hrOnboardingAutoCreateProjection } from './hr-onboarding-auto-create'
 
 // DEPRECATED: personOperationalProjection removed — replaced by personIntelligenceProjection
 // DEPRECATED: icoMemberProjection kept for backward compat (BQ → Postgres sync) but person_intelligence
@@ -114,4 +115,5 @@ export const ensureProjectionsRegistered = () => {
   registerProjection(vatMonthlyPositionProjection)
   registerProjection(teamsNotifyProjection)
   registerProjection(providerBqSyncProjection) // TASK-771 — provider.upserted → BQ MERGE + fin_suppliers UPDATE
+  registerProjection(hrOnboardingAutoCreateProjection)
 }

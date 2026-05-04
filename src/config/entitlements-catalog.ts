@@ -127,6 +127,28 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     defaultScope: 'tenant'
   },
   {
+    // TASK-030 — plantillas reutilizables de checklist HRIS.
+    key: 'hr.onboarding_template',
+    module: 'hr',
+    actions: ['read', 'create', 'update', 'manage'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    // TASK-030 — instancias operativas de onboarding/offboarding.
+    // Offboarding formal sigue viviendo en hr.offboarding_case.
+    key: 'hr.onboarding_instance',
+    module: 'hr',
+    actions: ['read', 'create', 'update', 'manage'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    // TASK-030 — self-service de tareas asignadas al colaborador.
+    key: 'my.onboarding',
+    module: 'my_workspace',
+    actions: ['read', 'update'] as const,
+    defaultScope: 'own'
+  },
+  {
     // TASK-745 — crear / revertir adjustments de payroll por entry
     key: 'hr.payroll_adjustments',
     module: 'hr',

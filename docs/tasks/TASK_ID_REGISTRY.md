@@ -44,7 +44,7 @@ Registro canonico de asignacion de IDs `TASK-###` para evitar colisiones y renum
 | `TASK-027` | `to-do`          | `HRIS Document Vault`                                              | `docs/tasks/to-do/TASK-027-hris-document-vault.md`                      |
 | `TASK-028` | `to-do`          | `CODEX_TASK_HRIS_Expense_Reports`                                  | `docs/tasks/to-do/TASK-028-hris-expense-reports.md`                     |
 | `TASK-029` | `to-do`          | `CODEX_TASK_HRIS_Goals_OKRs`                                       | `docs/tasks/to-do/TASK-029-hris-goals-okrs.md`                          |
-| `TASK-030` | `to-do`          | `CODEX_TASK_HRIS_Onboarding_Offboarding`                           | `docs/tasks/to-do/TASK-030-hris-onboarding-offboarding.md`              |
+| `TASK-030` | `complete`       | `CODEX_TASK_HRIS_Onboarding_Offboarding`                           | `docs/tasks/complete/TASK-030-hris-onboarding-offboarding.md`           |
 | `TASK-031` | `to-do`          | `HRIS Performance Evaluations`                                     | `docs/tasks/to-do/TASK-031-hris-performance-evaluations.md`             |
 | `TASK-032` | `to-do`          | Login Dark Mode Polish                                             | `docs/tasks/to-do/TASK-032-login-dark-mode-polish.md`                   |
 | `TASK-033` | `to-do`          | `CODEX_TASK_Campaign_360` (brief historico)                        | `docs/tasks/to-do/TASK-033-campaign-360-brief.md`                       |

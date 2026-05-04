@@ -2,6 +2,13 @@
 
 ## 2026-05-04
 
+- **TASK-030 implementada — HRIS Onboarding/Offboarding Checklists Runtime.** Greenhouse materializa checklists operativos reutilizables sin contradecir el programa canonico de Offboarding.
+  - **Schema/runtime:** nuevas tablas `greenhouse_hr.onboarding_templates`, `onboarding_template_items`, `onboarding_instances` y `onboarding_instance_items`, con plantillas seed, snapshots de tareas, due dates, progreso y FK opcional a `work_relationship_offboarding_cases`.
+  - **Dominio:** `src/lib/hr-onboarding/**` agrega store transaccional, instanciacion idempotente, completitud automatica por tareas obligatorias y proyeccion reactiva desde eventos `member.created|updated|deactivated`.
+  - **APIs y UI:** endpoints `/api/hr/onboarding/**`, `/api/my/onboarding`, alias `/api/hr/onboarding/my`; surfaces `/hr/onboarding` y `/my/onboarding`.
+  - **Access model:** views `equipo.onboarding` y `mi_ficha.onboarding`; capabilities `hr.onboarding_template`, `hr.onboarding_instance`, `my.onboarding`; routeGroups `hr`/`my`; startup policy sin cambios.
+  - **Frontera Offboarding:** checklist tipo `offboarding` es herramienta operativa hija. El caso formal sigue en `WorkRelationshipOffboardingCase`; completar checklist no ejecuta salida, no revoca acceso y no emite finiquito.
+
 - **TASK-762 implementada — Finiquito Document Generation + Approval Flow.** Greenhouse convierte un settlement final aprobado en documento formal versionado y trazable.
   - **Schema/runtime:** nuevas tablas `greenhouse_payroll.final_settlement_documents` y `greenhouse_payroll.final_settlement_document_events`, con snapshot/hash inmutable, asset privado, approval snapshot, estados de emision/firma/rechazo/anulacion/supersession y audit trail append-only.
   - **Documento/PDF:** renderer server-side `@react-pdf/renderer`, `snapshot_hash` SHA-256 canonico y `content_hash` del PDF; assets privados con owner aggregate `final_settlement_document`.

@@ -15,7 +15,7 @@ const HrPage = async () => {
 
   const hasAccess = hasAnyAuthorizedViewCode({
     tenant,
-    viewCodes: ['equipo.nomina', 'equipo.nomina_proyectada', 'equipo.permisos', 'equipo.jerarquia', 'equipo.organigrama', 'equipo.departamentos', 'equipo.asistencia', 'equipo.offboarding'],
+    viewCodes: ['equipo.nomina', 'equipo.nomina_proyectada', 'equipo.permisos', 'equipo.jerarquia', 'equipo.organigrama', 'equipo.departamentos', 'equipo.asistencia', 'equipo.offboarding', 'equipo.onboarding'],
     fallback: tenant.routeGroups.includes('hr') || tenant.roleCodes.includes(ROLE_CODES.EFEONCE_ADMIN)
   })
 

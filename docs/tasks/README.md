@@ -21,6 +21,7 @@ Panel operativo de tasks del repo.
 Primer bloque operativo asignado:
 
 - `TASK-001` a `TASK-052` asignados (backlog activo, briefs historicos, specs de apoyo)
+- `TASK-030` ✅ — HRIS Fase 1B: Onboarding y Offboarding Checklists. Runtime canónico de templates, instancias, items, auto-creación idempotente, self-service y frontera explícita con `WorkRelationshipOffboardingCase`. Spec: `complete/TASK-030-hris-onboarding-offboarding.md`.
 - `TASK-053` a `TASK-056` asignados
 - siguiente ID disponible: `TASK-782`
 - `TASK-726` ✅ — Finance Movement Feed Foundation. Implementa la primitive reusable aprobada en `docs/mockups/finance-movement-feed-mockup.html`: feed financiero adaptable, virtualizacion encapsulada con `@tanstack/react-virtual`, resolver visual sobre catalogos existentes y primera integracion read-only en `/finance/reconciliation`. Spec: `complete/TASK-726-finance-movement-feed-foundation.md`.

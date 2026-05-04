@@ -1,5 +1,20 @@
 # CODEX TASK — HRIS Fase 1B: Onboarding y Offboarding Checklists
 
+## Status
+
+- Lifecycle: `complete`
+- Priority: `P1`
+- Impact: `Alto`
+- Effort: `Alto`
+- Type: `implementation`
+- Epic: `optional`
+- Status real: `Completada 2026-05-04`
+- Rank: `legacy`
+- Domain: `hr`
+- Blocked by: `none`
+- Branch: `develop` (excepcion explicita solicitada por usuario)
+- Legacy ID: `CODEX_TASK_HRIS_Onboarding_Offboarding`
+
 ## Delta 2026-04-01 — TASK-026 ya resuelta
 
 - `greenhouse_core.members` ya publica `contract_type`, `pay_regime`, `payroll_via` y `deel_contract_id` como canon de contratación.

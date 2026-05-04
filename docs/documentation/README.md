@@ -57,6 +57,7 @@ Documentacion oficial de la plataforma Greenhouse. Cada documento describe como 
 ### HR y Nomina
 
 - [Sistema de Permisos y Licencias](hr/sistema-permisos-leave.md) — tipos de permiso, medio dia (AM/PM), calculo de dias habiles, flujo de aprobacion, saldo y acumulacion
+- [Checklists de Onboarding y Offboarding](hr/onboarding-offboarding-checklists.md) — plantillas e instancias operativas HRIS, self-service del colaborador y frontera con el caso formal de offboarding
 - [Offboarding laboral y contractual](hr/offboarding.md) — casos canonicos de salida, estados, lanes, triggers HR/SCIM/Admin/contract expiry y frontera con Payroll final
 - [Finiquitos Chile](hr/finiquitos.md) — aggregate de final settlement separado de nomina mensual para renuncia Chile dependiente, readiness legal/previsional y versionamiento auditable
 - [Jerarquía de Reporte y Supervisoría](hr/jerarquia-reporte-supervisoria.md) — gestion de supervisores, delegaciones temporales, historial y diferencias con departamentos

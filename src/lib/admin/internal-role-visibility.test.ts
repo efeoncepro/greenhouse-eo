@@ -45,7 +45,7 @@ const TASK_727_GRANTS: Record<string, string[]> = {
     'gestion.operaciones', 'gestion.capacidad',
     'equipo.personas', 'equipo.nomina', 'equipo.nomina_proyectada', 'equipo.permisos',
     'equipo.jerarquia', 'equipo.organigrama', 'equipo.departamentos', 'equipo.asistencia',
-    'equipo.objetivos', 'equipo.evaluaciones',
+    'equipo.objetivos', 'equipo.evaluaciones', 'equipo.onboarding',
     'finanzas.resumen', 'finanzas.ingresos', 'finanzas.egresos', 'finanzas.conciliacion',
     'finanzas.ordenes_pago',
     'finanzas.banco', 'finanzas.cuenta_corriente_accionista', 'finanzas.clientes',
@@ -102,6 +102,7 @@ const TASK_727_GRANTS: Record<string, string[]> = {
   hr_payroll: [
     'equipo.personas', 'equipo.nomina', 'equipo.nomina_proyectada', 'equipo.permisos',
     'equipo.jerarquia', 'equipo.organigrama', 'equipo.departamentos', 'equipo.asistencia',
+    'equipo.onboarding',
     ...MI_FICHA_VIEW_CODES
   ].sort(),
 
@@ -138,16 +139,16 @@ describe('TASK-727: Internal role × view matrix', () => {
     expect(ALL_INTERNAL_VIEW_CODES.length).toBeGreaterThanOrEqual(60)
   })
 
-  it('mi_ficha has 10 views', () => {
-    expect(MI_FICHA_VIEW_CODES).toHaveLength(10)
+  it('mi_ficha has 11 views', () => {
+    expect(MI_FICHA_VIEW_CODES).toHaveLength(11)
   })
 
   it('finanzas has 14 views', () => {
     expect(FINANZAS_VIEW_CODES).toHaveLength(14)
   })
 
-  it('equipo has 11 views (incluye offboarding y nomina_proyectada)', () => {
-    expect(EQUIPO_VIEW_CODES).toHaveLength(11)
+  it('equipo has 12 views (incluye offboarding, onboarding y nomina_proyectada)', () => {
+    expect(EQUIPO_VIEW_CODES).toHaveLength(12)
   })
 
   // ─────────────────────────────────────────────────────────────────────────────

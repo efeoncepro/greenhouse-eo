@@ -28,6 +28,7 @@ export const AGGREGATE_TYPES = {
   leaveRequest: 'leave_request',
   leaveBalance: 'leave_balance',
   workRelationshipOffboardingCase: 'work_relationship_offboarding_case',
+  onboardingInstance: 'onboarding_instance',
 
   // HR Goals (TASK-029)
   goal: 'goal',
@@ -208,6 +209,14 @@ export const EVENT_TYPES = {
   memberCreated: 'member.created',
   memberUpdated: 'member.updated',
   memberDeactivated: 'member.deactivated',
+  hrOnboardingInstanceCreated: 'hr.onboarding.instance_created',
+  hrOnboardingItemCompleted: 'hr.onboarding.item_completed',
+  hrOnboardingInstanceCompleted: 'hr.onboarding.instance_completed',
+  hrOnboardingInstanceCancelled: 'hr.onboarding.instance_cancelled',
+  hrOffboardingInstanceCreated: 'hr.offboarding.instance_created',
+  hrOffboardingItemCompleted: 'hr.offboarding.item_completed',
+  hrOffboardingInstanceCompleted: 'hr.offboarding.instance_completed',
+  hrOffboardingInstanceCancelled: 'hr.offboarding.instance_cancelled',
   memberSkillUpserted: 'member_skill.upserted',
   memberSkillVerified: 'member_skill.verified',
   memberSkillRejected: 'member_skill.rejected',
@@ -700,6 +709,7 @@ export const REACTIVE_EVENT_TYPES = [
   EVENT_TYPES.financeAiLlmEnrichmentsMaterialized,
   EVENT_TYPES.memberCreated,
   EVENT_TYPES.memberUpdated,
+  EVENT_TYPES.memberDeactivated,
   EVENT_TYPES.memberSkillUpserted,
   EVENT_TYPES.memberSkillDeleted,
 

@@ -1,5 +1,25 @@
 # Greenhouse HRIS Architecture V1
 
+## Delta 2026-05-04 — TASK-030 Onboarding/Offboarding Checklists Runtime
+
+`greenhouse_hr` ahora materializa el runtime operativo de checklists HRIS:
+
+- `onboarding_templates`
+- `onboarding_template_items`
+- `onboarding_instances`
+- `onboarding_instance_items`
+
+La feature expone APIs bajo `/api/hr/onboarding/**`, self-service en `/api/my/onboarding`, vistas `/hr/onboarding` y `/my/onboarding`, y eventos outbox `hr.onboarding.*` / `hr.offboarding.*`.
+
+Decisión canónica: estos checklists son una herramienta operativa hija. No definen el alta laboral, no reemplazan un futuro `WorkRelationshipOnboardingCase` y no reemplazan `WorkRelationshipOffboardingCase`. Para salida formal, `onboarding_instances.offboarding_case_id` enlaza opcionalmente con `greenhouse_hr.work_relationship_offboarding_cases`.
+
+Access model:
+
+- `routeGroups`: `hr` para operación HR, `my` para self-service.
+- `views`: `equipo.onboarding`, `mi_ficha.onboarding`.
+- `entitlements`: `hr.onboarding_template`, `hr.onboarding_instance`, `my.onboarding`.
+- `startup policy`: sin cambios.
+
 ## Delta 2026-04-16 — TASK-029 Goals & OKRs implementado
 
 - 4 tablas creadas en `greenhouse_hr`: `goal_cycles`, `goals`, `goal_key_results`, `goal_progress`

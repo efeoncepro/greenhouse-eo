@@ -185,7 +185,15 @@ La implementacion V1 vive en `src/lib/workforce/offboarding/**` y expone:
 
 `contract_end_date_snapshot` es evidencia de revision. No reemplaza `effective_date` y no habilita finiquito por si sola.
 
-El enlace con HRIS checklist legacy queda como `legacy_checklist_ref JSONB` porque las tablas de templates/instances de TASK-030 estan documentadas, pero no existen en el runtime real al momento de TASK-760.
+Desde TASK-030, el checklist operativo ya existe en runtime como `greenhouse_hr.onboarding_instances` y puede enlazar opcionalmente con el caso mediante `onboarding_instances.offboarding_case_id`.
+
+`legacy_checklist_ref JSONB` se mantiene como campo de compatibilidad/auditoria en el caso canonico. No es la fuente primaria del checklist nuevo y no debe usarse para inferir estado legal, aprobacion, ejecucion ni finiquito.
+
+Frontera no negociable:
+
+- `work_relationship_offboarding_cases` define el proceso formal de salida.
+- `onboarding_instances` tipo `offboarding` define tareas operativas hijas.
+- completar un checklist no ejecuta el caso, no revoca acceso por si solo y no emite finiquito.
 
 ## Four-Lane Model
 

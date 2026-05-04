@@ -254,6 +254,32 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     }
   }
 
+  if (hasRouteGroup(subject, 'hr') || hasAuthorizedView(subject, 'equipo.onboarding') || hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
+    const source: TenantEntitlementSource = hasRouteGroup(subject, 'hr')
+      ? 'route_group'
+      : hasAuthorizedView(subject, 'equipo.onboarding')
+        ? 'authorized_view'
+        : 'role'
+
+    for (const action of ['read', 'create', 'update', 'manage'] as const) {
+      addEntitlement(entries, {
+        module: 'hr',
+        capability: 'hr.onboarding_template',
+        action,
+        scope: 'tenant',
+        source
+      })
+
+      addEntitlement(entries, {
+        module: 'hr',
+        capability: 'hr.onboarding_instance',
+        action,
+        scope: 'tenant',
+        source
+      })
+    }
+  }
+
   if (hasRouteGroup(subject, 'finance') || hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
     const source: TenantEntitlementSource = hasRouteGroup(subject, 'finance') ? 'route_group' : 'role'
 
@@ -575,13 +601,15 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     })
   }
 
-  if (hasRouteGroup(subject, 'my')) {
+  if (hasRouteGroup(subject, 'my') || hasAuthorizedView(subject, 'mi_ficha.onboarding')) {
+    const source: TenantEntitlementSource = hasAuthorizedView(subject, 'mi_ficha.onboarding') ? 'authorized_view' : 'route_group'
+
     addEntitlement(entries, {
       module: 'my_workspace',
       capability: 'my_workspace.workspace',
       action: 'read',
       scope: 'own',
-      source: 'route_group'
+      source
     })
 
     addEntitlement(entries, {
@@ -589,7 +617,23 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       capability: 'my_workspace.workspace',
       action: 'launch',
       scope: 'own',
-      source: 'route_group'
+      source
+    })
+
+    addEntitlement(entries, {
+      module: 'my_workspace',
+      capability: 'my.onboarding',
+      action: 'read',
+      scope: 'own',
+      source
+    })
+
+    addEntitlement(entries, {
+      module: 'my_workspace',
+      capability: 'my.onboarding',
+      action: 'update',
+      scope: 'own',
+      source
     })
   }
 

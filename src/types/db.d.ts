@@ -5291,6 +5291,76 @@ export interface GreenhouseHrLeaveTypes {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseHrOnboardingInstanceItems {
+  assigned_role_snapshot: string;
+  completed_at: Timestamp | null;
+  completed_by_user_id: string | null;
+  created_at: Generated<Timestamp>;
+  display_order_snapshot: Generated<number>;
+  due_date: Timestamp | null;
+  instance_id: string;
+  instance_item_id: string;
+  item_description_snapshot: string | null;
+  item_title_snapshot: string;
+  metadata_json: Generated<Json>;
+  notes: string | null;
+  required_snapshot: Generated<boolean>;
+  status: Generated<string>;
+  template_item_id: string;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseHrOnboardingInstances {
+  cancellation_reason: string | null;
+  cancelled_at: Timestamp | null;
+  completed_at: Timestamp | null;
+  created_at: Generated<Timestamp>;
+  created_by_user_id: string | null;
+  instance_id: string;
+  instance_type: string;
+  member_id: string;
+  metadata_json: Generated<Json>;
+  /**
+   * Optional link to the canonical WorkRelationshipOffboardingCase. Checklist does not define the workforce exit event.
+   */
+  offboarding_case_id: string | null;
+  source: Generated<string>;
+  source_ref: Generated<Json>;
+  start_date: Timestamp;
+  status: Generated<string>;
+  template_id: string;
+  updated_at: Generated<Timestamp>;
+  updated_by_user_id: string | null;
+}
+
+export interface GreenhouseHrOnboardingTemplateItems {
+  assigned_role: string;
+  created_at: Generated<Timestamp>;
+  display_order: Generated<number>;
+  due_days_offset: Generated<number>;
+  item_description: string | null;
+  item_id: string;
+  item_title: string;
+  metadata_json: Generated<Json>;
+  required: Generated<boolean>;
+  template_id: string;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseHrOnboardingTemplates {
+  active: Generated<boolean>;
+  applicable_contract_types: Generated<string[]>;
+  created_at: Generated<Timestamp>;
+  created_by_user_id: string | null;
+  description: string | null;
+  metadata_json: Generated<Json>;
+  template_id: string;
+  template_name: string;
+  template_type: string;
+  updated_at: Generated<Timestamp>;
+  updated_by_user_id: string | null;
+}
+
 export interface GreenhouseHrWorkflowApprovalSnapshots {
   authority_source: string;
   created_at: Generated<Timestamp>;
@@ -5347,7 +5417,7 @@ export interface GreenhouseHrWorkRelationshipOffboardingCases {
   last_working_day: Timestamp | null;
   last_working_day_after_effective_reason: string | null;
   /**
-   * Optional reference to future/legacy HRIS checklist runtime. Nullable-by-json because TASK-030 checklist tables are documented but not deployed.
+   * Compatibility/audit reference for legacy checklist payloads. TASK-030 runtime checklists now live in greenhouse_hr.onboarding_instances and may link via onboarding_instances.offboarding_case_id.
    */
   legacy_checklist_ref: Generated<Json>;
   legal_entity_organization_id: string | null;
@@ -8336,6 +8406,10 @@ export interface DB {
   "greenhouse_hr.leave_request_actions": GreenhouseHrLeaveRequestActions;
   "greenhouse_hr.leave_requests": GreenhouseHrLeaveRequests;
   "greenhouse_hr.leave_types": GreenhouseHrLeaveTypes;
+  "greenhouse_hr.onboarding_instance_items": GreenhouseHrOnboardingInstanceItems;
+  "greenhouse_hr.onboarding_instances": GreenhouseHrOnboardingInstances;
+  "greenhouse_hr.onboarding_template_items": GreenhouseHrOnboardingTemplateItems;
+  "greenhouse_hr.onboarding_templates": GreenhouseHrOnboardingTemplates;
   "greenhouse_hr.work_relationship_offboarding_case_events": GreenhouseHrWorkRelationshipOffboardingCaseEvents;
   "greenhouse_hr.work_relationship_offboarding_cases": GreenhouseHrWorkRelationshipOffboardingCases;
   "greenhouse_hr.workflow_approval_snapshots": GreenhouseHrWorkflowApprovalSnapshots;

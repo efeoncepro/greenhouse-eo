@@ -200,6 +200,14 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
     routeGroup: 'hr'
   },
   {
+    viewCode: 'equipo.onboarding',
+    section: 'equipo',
+    label: 'Onboarding',
+    description: 'Checklists operativos reutilizables para entradas y salidas.',
+    routePath: '/hr/onboarding',
+    routeGroup: 'hr'
+  },
+  {
     viewCode: 'finanzas.resumen',
     section: 'finanzas',
     label: 'Resumen financiero',
@@ -534,6 +542,14 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
     label: 'Mi organización',
     description: 'Directorio, colegas y contexto organizacional cercano.',
     routePath: '/my/organization',
+    routeGroup: 'my'
+  },
+  {
+    viewCode: 'mi_ficha.onboarding',
+    section: 'mi_ficha',
+    label: 'Mi onboarding',
+    description: 'Tareas personales asignadas en checklists de entrada o salida.',
+    routePath: '/my/onboarding',
     routeGroup: 'my'
   },
   {

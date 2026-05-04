@@ -29,7 +29,7 @@ Contrato arquitectonico nuevo desde 2026-04-25.
 
 Estado actual del repo:
 
-- existe onboarding legacy como checklist/template dentro de HRIS
+- existe onboarding como checklist/template operativo dentro de HRIS (`greenhouse_hr.onboarding_*`, TASK-030)
 - existe soporte parcial de `onboarding` como dominio de approval workflow
 - `SCIM` y Admin Center ya cubren partes del provisioning tecnico de acceso
 - `members` y `People` ya pueden mostrar una persona activa en runtime
@@ -86,7 +86,7 @@ Consecuencias del gap actual:
 | Relacion persona -> entidad legal | `person_legal_entity_relationships` | el onboarding debe poder resolverse contra la relacion juridica/economica que comienza |
 | Contexto contractual operativo | `greenhouse_core.members` | `employment_type`, `contract_type`, `pay_regime`, `payroll_via`, `deel_contract_id` son snapshot minimo del caso |
 | Transacciones de payroll | `greenhouse_payroll.*` | payroll consume el caso; no define el inicio de relacion |
-| Checklist operativo | `greenhouse_hr.onboarding_*` legacy u objeto sucesor | el checklist ejecuta tareas; no define el evento de alta |
+| Checklist operativo | `greenhouse_hr.onboarding_*` | el checklist ejecuta tareas; no define el evento de alta |
 
 ## Distinciones no negociables
 

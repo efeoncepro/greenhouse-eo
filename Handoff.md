@@ -1,5 +1,27 @@
 # Handoff.md
 
+## Sesion 2026-05-04 — TASK-030 HRIS Onboarding/Offboarding Checklists — completada
+
+- **Branch:** `develop` por instruccion explicita del usuario; no se crea branch `task/TASK-030-...`.
+- **Lifecycle:** `complete`; task movida `to-do` -> `in-progress` -> `complete`; `docs/tasks/README.md` y `TASK_ID_REGISTRY` sincronizados.
+- **Ownership:** no hay PR ni branch activa para TASK-030; solo existe branch TASK-763 previa de discovery.
+- **Skills:** `greenhouse-payroll-auditor` invocada por requerimiento del usuario para clasificacion contractual/payroll; `greenhouse-agent` para runtime Greenhouse/App Router/UI si aplica.
+- **Slices entregados:** migraciones `greenhouse_hr.onboarding_templates`, `onboarding_template_items`, `onboarding_instances`, `onboarding_instance_items` + sync de comentario `legacy_checklist_ref`; store `src/lib/hr-onboarding/**`; auto-creacion reactiva desde `member.created|updated|deactivated`; APIs `/api/hr/onboarding/**`, `/api/my/onboarding`, alias `/api/hr/onboarding/my`; UI `/hr/onboarding`, `/hr/onboarding/templates`, `/my/onboarding`; access model `equipo.onboarding`, `mi_ficha.onboarding`, `hr.onboarding_template`, `hr.onboarding_instance`, `my.onboarding`.
+- **Frontera Offboarding:** checklist tipo `offboarding` es herramienta operativa hija. `WorkRelationshipOffboardingCase` sigue siendo source of truth de salida laboral; completar checklist no ejecuta salida, no revoca acceso y no emite finiquito.
+- **Runtime:** `pnpm pg:connect:migrate` aplicado contra Cloud SQL `greenhouse_app`; `src/types/db.d.ts` regenerado.
+- **Verificacion:** `pnpm exec tsc --noEmit --pretty false` OK; `pnpm test` 559 files / 3211 passed / 5 skipped OK; `pnpm build` OK; `pnpm pg:doctor` OK; `pnpm design:lint` 0 errors / 0 warnings / 1 info; `pnpm lint` exit 0 con 316 warnings legacy TASK-265.
+- **Drift detectado:** spec legacy pedia notificaciones email in-scope, pero runtime/arquitectura actual no tiene contrato de asignacion/notificacion por task-owner listo. Se implementaron eventos outbox versionados como foundation; email/reminders quedan downstream sin bloquear V1. Spec tambien asumía checklist legacy no desplegado; ahora queda materializado.
+
+## Sesion 2026-05-04 — TASK-763 Lifecycle Onboarding & Offboarding UI Mockup Adoption — bloqueada en Discovery
+
+- **Branch:** `task/TASK-763-lifecycle-onboarding-offboarding-ui-mockup-adoption`.
+- **Lifecycle:** se restauro a `to-do` porque la task declara `Blocked by: TASK-030, TASK-760`; `TASK-760` esta completa, pero `TASK-030` sigue en `to-do`.
+- **Ownership:** primer barrido no encontro PR ni branch activa para TASK-763. Rama creada desde `develop` actual solo para discovery; no hay implementacion.
+- **Skills:** `greenhouse-agent`, `greenhouse-ui-orchestrator` y `greenhouse-ux-content-accessibility` cargadas para UI visible, patron Vuexy/MUI y copy/estados.
+- **Bloqueo verificado:** no existen tablas/API `greenhouse_hr.onboarding_templates`, `onboarding_template_items`, `onboarding_instances` ni `onboarding_instance_items` en `docs/architecture/schema-snapshot-baseline.sql`, `src/types/db.d.ts`, `migrations/` o `src/app/api/hr/onboarding/**`. Implementar la shell de TASK-763 ahora obligaria a simular runtime o degradar el contrato de checklist.
+- **Frontera segura:** no escribir UI Lifecycle hasta cerrar TASK-030 o redefinir formalmente TASK-763 para un shell read-only sin checklist runtime.
+- **Actualizacion 2026-05-04:** TASK-030 ya quedo completa; TASK-763 puede retomarse usando `greenhouse_hr.onboarding_*`, `/api/hr/onboarding/**` y `/api/my/onboarding` como runtime real.
+
 ## Sesion 2026-05-04 — TASK-762 Finiquito Document Generation + Approval Flow — completada
 
 - **Branch:** `develop` por instruccion explicita del usuario; no se creo ni cambio a `task/TASK-762-finiquito-document-generation-approval-flow`.
