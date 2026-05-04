@@ -124,6 +124,7 @@ where lower(cu.email) = lower('<email>');
 Resultado esperado para Efeonce interno:
 
 - `has_scim_id = true`
+- `microsoft_oid` es un UUID de Entra, no un nickname
 - `client_id = NULL`
 - `tenant_type = efeonce_internal`
 - `auth_mode = microsoft_sso`
@@ -166,6 +167,14 @@ az rest --method POST \
 ### El job esta `Succeeded` pero `countEscrowed` no baja
 
 Ejecuta `provisionOnDemand` para un usuario real en scope. Si exporta con success y la DB queda correcta, el endpoint Greenhouse esta sano. Revisa provisioning logs de Entra para entender el backlog; no hagas SQL manual.
+
+### El usuario se crea pero no queda linkeado a Microsoft SSO
+
+Revisa el mapping de Entra. Para usuarios, `externalId` debe mapear desde `objectId`. No debe mapear desde `mailNickname`. Greenhouse rechaza `externalId` no UUID en `CREATE` para evitar usuarios SCIM con `microsoft_oid` incorrecto.
+
+### Faltan avatar, cargo o datos extendidos
+
+No lo arregles en SCIM primero. SCIM trae lifecycle y atributos basicos; avatar y enriquecimiento extendido se sincronizan por Microsoft Graph/profile sync. Revisa `/api/cron/entra-profile-sync`, los logs de Graph y la documentacion de autenticacion resiliente.
 
 ### `/Users` devuelve 401 con bearer
 

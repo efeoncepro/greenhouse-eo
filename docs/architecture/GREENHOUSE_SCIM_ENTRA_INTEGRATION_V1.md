@@ -37,6 +37,7 @@ Operational evidence:
 - Production `/api/scim/v2/Users?count=1` with bearer returns `200`.
 - Microsoft Graph `provisionOnDemand` for `support@efeoncepro.com` returned `EntryExportAdd=Success` and created the user in Greenhouse.
 - DB verification confirmed the real user was created as an internal Efeonce SCIM user with role `collaborator`.
+- Follow-up closure: Entra user mapping now sends `externalId <= objectId`, not `mailNickname`. Greenhouse enforces this contract on SCIM user `CREATE` and can update `microsoft_oid` from SCIM `PATCH externalId`.
 
 Residual Entra note: the regular provisioning job can still show historical `countEscrowed` after previous failures. Do not fix that counter with SQL. Use Microsoft Graph provisioning logs, `restart` with `resetScope=Escrows`, and `provisionOnDemand` for controlled validation.
 
@@ -45,6 +46,7 @@ Residual Entra note: the regular provisioning job can still show historical `cou
 | Domain | Authority | Notes |
 |--------|-----------|-------|
 | Identity existence, account status, basic profile | Entra ID | `active`, `userName`, `displayName` flow from Entra via SCIM |
+| Stable Microsoft identity link | Entra ID | SCIM `externalId` must be the Entra `objectId`; Greenhouse persists it as `client_users.microsoft_oid` |
 | Authorization, roles, scopes, operational context | Greenhouse | Role assignments, space access, org scoping are Greenhouse-managed |
 | Enrichment profile (jobTitle, country, city, phone) | Entra ID | Synced via Graph API cron, not SCIM |
 | Reporting hierarchy formal | Greenhouse | `greenhouse_core.reporting_lines` remains canonical; Entra only proposes drift for review |
@@ -409,6 +411,7 @@ Healthy result:
 After success, verify Postgres:
 
 - `client_users.scim_id IS NOT NULL`
+- `client_users.microsoft_oid` is the Entra UUID object ID, never `mailNickname`
 - Internal Efeonce user: `client_id IS NULL`
 - Internal Efeonce user: `tenant_type = 'efeonce_internal'`
 - `auth_mode = 'microsoft_sso'`

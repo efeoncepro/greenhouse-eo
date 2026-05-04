@@ -26,10 +26,12 @@ SCIM sincroniza atributos basicos de lifecycle:
 - email / `userName`
 - nombre visible / `displayName`
 - estado activo / inactivo
-- identificador externo de Entra
+- identificador externo de Entra (`externalId = objectId`)
 - grupos asignados desde Entra
 
 SCIM no es el dueno de permisos finos, rutas, vistas ni responsabilidades operativas. Esas decisiones viven en Greenhouse.
+
+SCIM tampoco reemplaza el enriquecimiento por Graph. Datos como avatar, cargo extendido, telefono, pais, ciudad, manager y otros campos profesionales siguen entrando por el profile sync / Graph API cuando no son parte estable del contrato SCIM.
 
 ## Como se provisiona un usuario interno Efeonce
 
@@ -41,6 +43,7 @@ El contrato canonico post-incidente 2026-05-04 es:
 - El usuario se crea en `client_users` con `client_id=NULL`.
 - El usuario queda con `tenant_type='efeonce_internal'`.
 - El login queda configurado con `auth_mode='microsoft_sso'`.
+- `microsoft_oid` queda con el `objectId` real de Entra, no con `mailNickname`.
 - El origen queda como `provisioned_by='scim'`.
 - Se asigna el rol base definido por el mapping, hoy `collaborator`.
 
@@ -88,6 +91,9 @@ Validacion ejecutada:
 - `/Users` con bearer productivo respondio `200`.
 - `provisionOnDemand` desde Microsoft Entra para `support@efeoncepro.com` termino `EntryExportAdd=Success`.
 - La DB confirmo usuario interno con `client_id=NULL`, `tenant_type='efeonce_internal'`, `auth_mode='microsoft_sso'`, `provisioned_by='scim'` y rol `collaborator`.
+- Se corrigio el mapping Entra para que `externalId` use `objectId`; Greenhouse ahora rechaza `externalId` no UUID en `CREATE` y puede actualizar `microsoft_oid` desde `PATCH`.
+- Los 8 usuarios activos del grupo `Efeonce Group` fueron validados con `provisionOnDemand` y terminaron con export exitoso; el grupo fue validado como `RedundantExport`.
+- La DB quedo con 11/11 usuarios SCIM usando `microsoft_oid` UUID valido.
 
 ## Reglas duras
 

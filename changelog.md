@@ -7843,3 +7843,4 @@ Comando operativo:
 
 - Identity / SCIM: se corrigió el contrato de tenant mapping interno Efeonce. `client_id=NULL` ahora es semántica canónica para provisioning interno, los mappings externos quedan protegidos por FK a `greenhouse_core.clients`, y SCIM ya no intenta crear usuarios con el pseudo-client legacy `efeonce-admin`.
 - Identity / SCIM: se verificó provisioning real desde Microsoft Entra con `provisionOnDemand`; `support@efeoncepro.com` fue creado correctamente en Greenhouse como tenant interno, con `client_id=NULL`, `tenant_type='efeonce_internal'` y rol `collaborator`.
+- Identity / SCIM: se corrigió el mapping real de Entra para que user `externalId` use `objectId` y no `mailNickname`; Greenhouse ahora rechaza `CREATE` SCIM con `externalId` no UUID y acepta `PATCH externalId` para mantener `microsoft_oid` canónico. Los 8 usuarios activos de `Efeonce Group` validaron `EntryExportUpdate=Success`.

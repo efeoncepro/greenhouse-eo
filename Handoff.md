@@ -22290,3 +22290,15 @@ Cierre operativo:
 Nota residual:
 
 - Azure sigue reportando `countEscrowed=9` en el ciclo regular aunque el `provisionOnDemand` real ya crea correctamente. Interpretacion vigente: el endpoint Greenhouse esta sano; los escrows restantes son estado/backlog del motor de Entra y deben revisarse desde Provisioning Logs si se quiere limpiar historico/cadencia regular completa. No aplicar SQL manual para "arreglar" ese contador.
+
+Actualizacion posterior de cierre SCIM:
+
+- Se detecto un segundo drift no aceptable: Entra enviaba `externalId <= mailNickname` para usuarios, pero Greenhouse usa `externalId` como `client_users.microsoft_oid`. Esto podia crear usuarios con OID falso aunque el export fuera exitoso.
+- Se corrigio el schema real del job SCIM en Microsoft Graph: user `externalId <= objectId`. El resto de mappings de usuario se preservo (`displayName`, `givenName`, `surname`, `mail`, `userPrincipalName`, `jobTitle`, `department`, telefonos, direccion, grupos). Avatar/datos extendidos siguen por Graph profile sync, no por SCIM.
+- Commit `156b4f9c` pusheado a `develop` y `main`: Greenhouse ahora rechaza `CREATE` SCIM si `externalId` no es UUID de Entra y acepta `PATCH externalId` para reparar `microsoft_oid` cuando Entra corrige el mapping.
+- Produccion `156b4f9` quedo `Ready`; `/api/internal/health` responde `ok=true`, `version=156b4f9`, `environment=production`.
+- `provisionOnDemand` de `support@efeoncepro.com` post-fix termino `Update` + `EntryExportUpdate=Success`; DB quedo con `microsoft_oid=f58eb5cc-83e0-43dd-8147-a31fc7a8d350`.
+- DB verificada: 11/11 usuarios con `scim_id` tienen `microsoft_oid` UUID valido; 0 usuarios SCIM con OID no UUID.
+- `provisionOnDemand` de los 8 usuarios activos de `Efeonce Group` termino `Success` + `EntryExportUpdate=Success` para todos.
+- `provisionOnDemand` del grupo `Efeonce Group` termino sin error y con `RedundantExport`; el grupo ya existia en Greenhouse.
+- Se ejecuto `restart` con `resetScope="Watermark, Escrows, QuarantineState"`; Graph mostro momentaneamente `countEscrowed=0` y `statusCode=NotRun` tras reset. Al llamar `start`, Microsoft volvio a mostrar el ultimo ciclo regular antiguo (`lastBegan=2026-05-04T10:48:22Z`, `countEscrowed=9`) sin iniciar ciclo nuevo inmediato. Interpretacion: todos los objetos del scope ya validan por `provisionOnDemand`; el contador del ciclo regular queda dependiente de la proxima corrida automatica del servicio Entra. No queda evidencia de error activo en Greenhouse ni en export on-demand.
