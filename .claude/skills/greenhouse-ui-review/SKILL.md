@@ -14,9 +14,18 @@ type: gate
 
 ## Prerequisites
 
+- `DESIGN.md` (repo root) exists and `pnpm design:lint` reports 0 errors / 0 warnings. The TASK-764 contract gate enforces this on every PR; if local lint fails, fix before review.
 - `docs/architecture/GREENHOUSE_DESIGN_TOKENS_V1.md` exists and is current.
 - `docs/architecture/GREENHOUSE_UI_PLATFORM_V1.md` is accessible.
 - Target component file is ready to review (no WIP scaffolding).
+
+## Mandatory context (load BEFORE running checklist)
+
+1. `DESIGN.md` — compact agent-facing contract; lists every component variant the audit can reference (e.g. `button-primary-hover`, `status-chip-success`, `card-default-dark`).
+2. `docs/architecture/GREENHOUSE_DESIGN_TOKENS_V1.md` — extended canonical spec used by §1-§7 of the checklist below.
+3. `src/components/theme/mergedTheme.ts` — runtime authority for hex resolution.
+
+When DESIGN.md and V1 disagree on structure, V1 is canonical (extended). When V1 and runtime disagree on a value, **runtime wins** and the docs update.
 
 ## Gate contract
 
