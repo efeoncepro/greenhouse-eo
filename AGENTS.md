@@ -71,7 +71,7 @@ Estos CLIs estan autenticados localmente. Cuando una task toca su dominio, **usa
 - Leer `Handoff.md` para ver trabajo en curso, riesgos y proximos pasos.
 - Usar `Handoff.archive.md` solo si hace falta rastrear contexto historico; no como primera lectura operativa.
 - Para continuidad entre agentes, auditoria historica y compresion segura del handoff, aplicar `docs/operations/CONTEXT_HANDOFF_OPERATING_MODEL_V1.md`. No borrar historia auditable; moverla o enlazarla cuando corresponda.
-- Leer `DESIGN.md` cuando el cambio toque cualquier surface visible o decision visual del portal.
+- Leer `DESIGN.md` cuando el cambio toque cualquier surface visible o decision visual del portal. **Validar local con `pnpm design:lint`** (debe reportar 0 errors / 0 warnings) antes de commitear cualquier cambio al frontmatter — el CI gate `.github/workflows/design-contract.yml` (TASK-764) bloquea PRs en modo strict.
 - Leer la especificacion externa `../Greenhouse_Portal_Spec_v1.md` cuando el cambio afecte producto, autenticacion, data, rutas principales o arquitectura.
 - Si el trabajo requiere specs o briefs, buscarlos primero en `docs/README.md` y luego en la categoria correspondiente dentro de `docs/`.
 - Si existe una auditoria relevante en `docs/audits/` para la zona que vas a tocar, leerla temprano y usarla como contexto operativo; antes de confiar en sus conclusiones, validar si sus hallazgos siguen vigentes en el codebase/runtime actual.

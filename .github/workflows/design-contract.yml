@@ -32,9 +32,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     env:
-      # Set to 'true' once Slice 3 closes the 16 active warnings.
-      # When true, summary.warnings > 0 also fails the job. Slice 6 flips this.
-      STRICT_WARNINGS: 'false'
+      # Slice 3 closed all 16 (then 17 with info) warnings via component
+      # contracts (commit 721e07f4). Slice 6 activates strict mode: any
+      # warning regression now blocks PRs. Flip to 'false' only as an
+      # emergency escape hatch with explicit ADR; do NOT silence drift here.
+      STRICT_WARNINGS: 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
