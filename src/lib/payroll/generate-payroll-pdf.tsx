@@ -15,6 +15,12 @@ import {
   getEntryAdjustmentBreakdown,
   type EntryAdjustmentBreakdown
 } from '@/lib/payroll/adjustments/breakdown'
+import {
+  buildReceiptPresentation,
+  type ReceiptInfoBlock,
+  type ReceiptInfoBlockVariant,
+  type ReceiptPresenterEntry
+} from '@/lib/payroll/receipt-presenter'
 
 const LOGO_PATH = path.join(process.cwd(), 'public/branding/logo-full.png')
 
@@ -22,8 +28,16 @@ const LOGO_PATH = path.join(process.cwd(), 'public/branding/logo-full.png')
  * Bump this constant whenever the receipt/report PDF template changes
  * (branding, layout, fields, colors). Stale cached PDFs with a different
  * version are lazily regenerated on next access.
+ *
+ * v4 (2026-05-04, TASK-758): canonical 4-regime presenter consumed via
+ * `buildReceiptPresentation` (chile_dependent / honorarios / international_deel
+ * / international_internal). Adds `Tipo de contrato` field, contextual employee
+ * field per regime, gratificación legal, salud split obl/vol, infoBlocks
+ * (Boleta SII / Pago Deel / Régimen internacional), excluded terminal state
+ * with degraded hero, "Monto bruto registrado" hero variant for Deel, and
+ * removes filas-fantasma in honorarios/Deel.
  */
-export const RECEIPT_TEMPLATE_VERSION = '3'
+export const RECEIPT_TEMPLATE_VERSION = '4'
 
 const BRAND_BLUE = '#023c70'
 const BRAND_LIGHT = '#F7F9FC'
@@ -44,18 +58,6 @@ const fmtCurrency = (value: number | null, currency: string): string => {
   return currency === 'CLP'
     ? `$${Math.round(value).toLocaleString('es-CL')}`
     : `US$${value.toFixed(2)}`
-}
-
-const fmtPercent = (value: number | null): string => {
-  if (value === null) return '—'
-
-  return `${value.toFixed(1)}%`
-}
-
-const fmtFactor = (value: number | null): string => {
-  if (value === null) return '—'
-
-  return `${(value * 100).toFixed(1)}%`
 }
 
 // ─── Styles ──────────────────────────────────────────────────────────
@@ -223,6 +225,64 @@ const s = StyleSheet.create({
     fontSize: 14,
     fontFamily: 'Helvetica-Bold',
     color: '#ffffff'
+  },
+
+  // ── Degraded hero (excluded terminal state) ──
+  netHeroDegraded: {
+    flexDirection: 'row' as const,
+    justifyContent: 'space-between' as const,
+    alignItems: 'center' as const,
+    backgroundColor: TEXT_FAINT,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    marginTop: 16,
+    opacity: 0.85
+  },
+
+  // ── Info blocks (info / warning / error) ──
+  infoBlock: {
+    marginTop: 10,
+    paddingVertical: 8,
+    paddingHorizontal: 10,
+    borderLeftWidth: 3,
+    borderLeftColor: '#0375DB',
+    backgroundColor: '#EAF4FB',
+    borderRadius: 2
+  },
+  infoBlockWarning: {
+    marginTop: 10,
+    paddingVertical: 8,
+    paddingHorizontal: 10,
+    borderLeftWidth: 3,
+    borderLeftColor: '#d99c1f',
+    backgroundColor: '#FFF8E6',
+    borderRadius: 2
+  },
+  infoBlockError: {
+    marginTop: 10,
+    paddingVertical: 8,
+    paddingHorizontal: 10,
+    borderLeftWidth: 3,
+    borderLeftColor: '#c0392b',
+    backgroundColor: '#FFF0F0',
+    borderRadius: 2
+  },
+  infoBlockTitle: {
+    fontSize: 10,
+    fontFamily: 'Helvetica-Bold',
+    color: TEXT_PRIMARY,
+    marginBottom: 3
+  },
+  infoBlockBody: {
+    fontSize: 9,
+    color: TEXT_MUTED,
+    lineHeight: 1.45
+  },
+  infoBlockMeta: {
+    fontSize: 8,
+    color: TEXT_FAINT,
+    marginTop: 4,
+    letterSpacing: 0.4
   },
 
   // ── Footer ──
@@ -481,6 +541,91 @@ const PeriodReportDocument = ({ period, entries, operatingEntity }: { period: Pa
 
 // ─── Individual Receipt PDF ───────────────────────────────────────
 
+const toReceiptPresenterEntry = (entry: PayrollEntry, period: PayrollPeriod): ReceiptPresenterEntry => {
+  const periodDate = `${period.year}-${String(period.month).padStart(2, '0')}-01`
+
+  const aux = entry as PayrollEntry & {
+    chileColacion?: number | null
+    chileMovilizacion?: number | null
+  }
+
+  const colacion =
+    entry.chileColacionAmount ?? aux.chileColacion ?? entry.colacionAmount ?? null
+
+  const movilizacion =
+    entry.chileMovilizacionAmount ?? aux.chileMovilizacion ?? entry.movilizacionAmount ?? null
+
+  return {
+    payRegime: entry.payRegime,
+    contractTypeSnapshot: entry.contractTypeSnapshot ?? null,
+    payrollVia: entry.payrollVia ?? null,
+    currency: entry.currency,
+    memberName: entry.memberName,
+    memberEmail: entry.memberEmail,
+    deelContractId: entry.deelContractId ?? null,
+    baseSalary: entry.baseSalary,
+    adjustedBaseSalary: entry.adjustedBaseSalary,
+    remoteAllowance: entry.remoteAllowance,
+    adjustedRemoteAllowance: entry.adjustedRemoteAllowance,
+    fixedBonusLabel: entry.fixedBonusLabel,
+    fixedBonusAmount: entry.fixedBonusAmount,
+    adjustedFixedBonusAmount: entry.adjustedFixedBonusAmount,
+    bonusOtdAmount: entry.bonusOtdAmount,
+    bonusRpaAmount: entry.bonusRpaAmount,
+    bonusOtherAmount: entry.bonusOtherAmount,
+    bonusOtherDescription: entry.bonusOtherDescription,
+    chileColacionAmount: colacion,
+    chileMovilizacionAmount: movilizacion,
+    chileGratificacionLegalAmount: entry.chileGratificacionLegalAmount,
+    grossTotal: entry.grossTotal,
+    netTotal: entry.netTotal,
+    kpiOtdPercent: entry.kpiOtdPercent,
+    kpiRpaAvg: entry.kpiRpaAvg,
+    bonusOtdProrationFactor: entry.bonusOtdProrationFactor,
+    bonusRpaProrationFactor: entry.bonusRpaProrationFactor,
+    workingDaysInPeriod: entry.workingDaysInPeriod,
+    daysPresent: entry.daysPresent,
+    daysAbsent: entry.daysAbsent,
+    daysOnLeave: entry.daysOnLeave,
+    daysOnUnpaidLeave: entry.daysOnUnpaidLeave,
+    chileAfpName: entry.chileAfpName,
+    chileAfpRate: entry.chileAfpRate,
+    chileAfpAmount: entry.chileAfpAmount,
+    chileAfpCotizacionAmount: entry.chileAfpCotizacionAmount,
+    chileAfpComisionAmount: entry.chileAfpComisionAmount,
+    chileHealthSystem: entry.chileHealthSystem,
+    chileHealthAmount: entry.chileHealthAmount,
+    chileHealthObligatoriaAmount: entry.chileHealthObligatoriaAmount,
+    chileHealthVoluntariaAmount: entry.chileHealthVoluntariaAmount,
+    chileUnemploymentRate: entry.chileUnemploymentRate,
+    chileUnemploymentAmount: entry.chileUnemploymentAmount,
+    chileTaxAmount: entry.chileTaxAmount,
+    chileApvAmount: entry.chileApvAmount,
+    chileTotalDeductions: entry.chileTotalDeductions,
+    siiRetentionRate: entry.siiRetentionRate ?? null,
+    siiRetentionAmount: entry.siiRetentionAmount ?? null,
+    manualOverride: entry.manualOverride,
+    manualOverrideNote: entry.manualOverrideNote,
+    periodDate
+  }
+}
+
+const InfoBlockPdf = ({ block }: { block: ReceiptInfoBlock }) => {
+  const variantStyle: Record<ReceiptInfoBlockVariant, ReturnType<typeof StyleSheet.create>[string]> = {
+    info: s.infoBlock,
+    warning: s.infoBlockWarning,
+    error: s.infoBlockError
+  }
+
+  return (
+    <View style={variantStyle[block.variant]}>
+      <Text style={s.infoBlockTitle}>{block.title}</Text>
+      <Text style={s.infoBlockBody}>{block.body}</Text>
+      {block.meta && <Text style={s.infoBlockMeta}>{block.meta}</Text>}
+    </View>
+  )
+}
+
 const ReceiptDocument = ({
   entry,
   period,
@@ -493,259 +638,138 @@ const ReceiptDocument = ({
   breakdown: EntryAdjustmentBreakdown
 }) => {
   const monthName = MONTH_NAMES[period.month - 1] ?? String(period.month)
-  const currency = entry.currency
-  const isChile = entry.payRegime === 'chile'
   const generatedAt = new Date().toISOString().split('T')[0]
-
-  const entryWithAllowances = entry as PayrollEntry & {
-    chileColacionAmount?: number | null
-    chileMovilizacionAmount?: number | null
-    chileColacion?: number | null
-    chileMovilizacion?: number | null
-    colacionAmount?: number | null
-    movilizacionAmount?: number | null
-    totalHaberesNoImponibles?: number | null
-  }
-
-  const colacion =
-    entryWithAllowances.chileColacionAmount ??
-    entryWithAllowances.chileColacion ??
-    entryWithAllowances.colacionAmount ??
-    0
-
-  const movilizacion =
-    entryWithAllowances.chileMovilizacionAmount ??
-    entryWithAllowances.chileMovilizacion ??
-    entryWithAllowances.movilizacionAmount ??
-    0
-
-  const hasAttendanceAdjustment = entry.adjustedBaseSalary != null && entry.adjustedBaseSalary !== entry.baseSalary
-  const effectiveFixedBonusAmount = entry.adjustedFixedBonusAmount ?? entry.fixedBonusAmount
-
-  const haberesRows: [string, string][] = [
-    ['Sueldo base', fmtCurrency(entry.baseSalary, currency)]
-  ]
-
-  if (hasAttendanceAdjustment) {
-    haberesRows.push(
-      ['Sueldo base ajustado (por inasistencia)', fmtCurrency(entry.adjustedBaseSalary, currency)]
-    )
-  }
-
-  haberesRows.push(
-    ['Asignación teletrabajo', fmtCurrency(entry.remoteAllowance, currency)]
-  )
-
-  if (hasAttendanceAdjustment && entry.adjustedRemoteAllowance != null) {
-    haberesRows.push(
-      ['Teletrabajo ajustado (por inasistencia)', fmtCurrency(entry.adjustedRemoteAllowance, currency)]
-    )
-  }
-
-  if (entry.fixedBonusAmount > 0) {
-    haberesRows.push([
-      entry.fixedBonusLabel ? `Bono fijo (${entry.fixedBonusLabel})` : 'Bono fijo',
-      fmtCurrency(entry.fixedBonusAmount, currency)
-    ])
-  }
-
-  if (entry.adjustedFixedBonusAmount != null && entry.adjustedFixedBonusAmount !== entry.fixedBonusAmount) {
-    haberesRows.push([
-      entry.fixedBonusLabel
-        ? `Bono fijo ajustado (${entry.fixedBonusLabel})`
-        : 'Bono fijo ajustado (por inasistencia)',
-      fmtCurrency(effectiveFixedBonusAmount, currency)
-    ])
-  }
-
-  if (colacion > 0) {
-    haberesRows.push(['Colación', fmtCurrency(colacion, currency)])
-  }
-
-  if (movilizacion > 0) {
-    haberesRows.push(['Movilización', fmtCurrency(movilizacion, currency)])
-  }
-
-  haberesRows.push(
-    [`Bono OTD (${fmtPercent(entry.kpiOtdPercent)} → factor ${fmtFactor(entry.bonusOtdProrationFactor)})`, fmtCurrency(entry.bonusOtdAmount, currency)],
-    [`Bono RpA (${entry.kpiRpaAvg != null ? entry.kpiRpaAvg.toFixed(1) : '—'} → factor ${fmtFactor(entry.bonusRpaProrationFactor)})`, fmtCurrency(entry.bonusRpaAmount, currency)]
-  )
-
-  if (entry.bonusOtherAmount > 0) {
-    haberesRows.push(
-      [`Bono adicional${entry.bonusOtherDescription ? ` (${entry.bonusOtherDescription})` : ''}`, fmtCurrency(entry.bonusOtherAmount, currency)]
-    )
-  }
-
-  const attendanceRows: [string, string][] = entry.workingDaysInPeriod != null ? [
-    ['Días hábiles en período', String(entry.workingDaysInPeriod)],
-    ['Días presentes', String(entry.daysPresent ?? '—')],
-    ['Días ausentes', String(entry.daysAbsent ?? 0)],
-    ['Días licencia', String(entry.daysOnLeave ?? 0)],
-    ['Días licencia no remunerada', String(entry.daysOnUnpaidLeave ?? 0)]
-  ] : []
-
-  const deductionRows: [string, string][] = []
-
-  if (isChile) {
-    deductionRows.push([
-      `AFP ${entry.chileAfpName ?? ''} (${entry.chileAfpRate != null ? (entry.chileAfpRate * 100).toFixed(2) : '—'}%)`,
-      fmtCurrency(entry.chileAfpAmount, currency)
-    ])
-
-    if (entry.chileAfpCotizacionAmount != null || entry.chileAfpComisionAmount != null) {
-      deductionRows.push(
-        ['↳ Cotización', fmtCurrency(entry.chileAfpCotizacionAmount, currency)],
-        ['↳ Comisión', fmtCurrency(entry.chileAfpComisionAmount, currency)]
-      )
-    }
-
-    deductionRows.push(
-      [`Salud (${entry.chileHealthSystem ?? '—'})`, fmtCurrency(entry.chileHealthAmount, currency)],
-      [`Seguro cesantía (${entry.chileUnemploymentRate != null ? (entry.chileUnemploymentRate * 100).toFixed(1) : '—'}%)`, fmtCurrency(entry.chileUnemploymentAmount, currency)],
-      ['Impuesto único', fmtCurrency(entry.chileTaxAmount, currency)]
-    )
-  }
-
-  if (isChile && entry.chileApvAmount != null && entry.chileApvAmount > 0) {
-    deductionRows.push(['APV', fmtCurrency(entry.chileApvAmount, currency)])
-  }
+  const presentation = buildReceiptPresentation(toReceiptPresenterEntry(entry, period), breakdown)
 
   return (
     <Document>
       <Page size="LETTER" style={s.page}>
         {/* Header */}
-        <PdfHeader operatingEntity={operatingEntity} monthName={monthName} year={period.year} docType="Recibo de remuneraciones" periodId={period.periodId} />
+        <PdfHeader
+          operatingEntity={operatingEntity}
+          monthName={monthName}
+          year={period.year}
+          docType="Recibo de remuneraciones"
+          periodId={period.periodId}
+        />
 
-        {/* Document title */}
         <Text style={s.docTitle}>RECIBO DE REMUNERACIONES</Text>
 
-        {/* Employee info — 2-column grid */}
+        {/* Employee box — 4 fields canonical, contextual field 4 per regime */}
         <View style={s.employeeBox}>
-          <View style={s.employeeField}>
-            <Text style={s.employeeLabel}>Nombre</Text>
-            <Text style={s.employeeValue}>{entry.memberName}</Text>
-          </View>
-          <View style={s.employeeField}>
-            <Text style={s.employeeLabel}>Email</Text>
-            <Text style={s.employeeValue}>{entry.memberEmail}</Text>
-          </View>
-          <View style={s.employeeField}>
-            <Text style={s.employeeLabel}>Régimen</Text>
-            <Text style={s.employeeValue}>{isChile ? 'Chile' : 'Internacional'}</Text>
-          </View>
-          <View style={s.employeeField}>
-            <Text style={s.employeeLabel}>Moneda</Text>
-            <Text style={s.employeeValue}>{currency}</Text>
-          </View>
+          {presentation.employeeFields.map((field, i) => (
+            <View key={`employee-${i}`} style={s.employeeField}>
+              <Text style={s.employeeLabel}>{field.label}</Text>
+              <Text style={s.employeeValue}>{field.value}</Text>
+              {field.meta && (
+                <Text style={{ fontSize: 7, color: TEXT_MUTED, marginTop: 1 }}>{field.meta}</Text>
+              )}
+            </View>
+          ))}
         </View>
+
+        {/* Excluded short-circuit — minimal layout per mockup */}
+        {presentation.isExcluded && presentation.infoBlock && (
+          <InfoBlockPdf block={presentation.infoBlock} />
+        )}
 
         {/* Haberes */}
-        <SectionHeader title="Haberes" />
-        {haberesRows.map(([label, value], i) => (
-          <View key={`h-${i}`} style={[s.tableRow, i % 2 === 1 ? s.tableRowAlt : {}]}>
-            <Text style={s.tableLabel}>{label}</Text>
-            <Text style={s.tableValue}>{value}</Text>
-          </View>
-        ))}
-        {breakdown.factorApplied !== 1 && !breakdown.excluded && (
-          <View style={[s.tableRow, { backgroundColor: '#fff8e6' }]}>
-            <Text style={s.tableLabel}>Bruto efectivo (factor {(breakdown.factorApplied * 100).toFixed(0)}%)</Text>
-            <Text style={s.tableValue}>{fmtCurrency(entry.grossTotal, currency)}</Text>
-          </View>
-        )}
-        <View style={s.tableTotalRow}>
-          <Text style={s.tableTotalLabel}>Total bruto</Text>
-          <Text style={s.tableTotalValue}>{fmtCurrency(entry.grossTotal, currency)}</Text>
-        </View>
-
-        {/* TASK-745d — Adjustments visibility */}
-        {breakdown.excluded && (
-          <View style={{ marginTop: 8, padding: 8, backgroundColor: '#fff0f0', borderLeft: '3pt solid #c0392b' }}>
-            <Text style={{ fontSize: 10, fontWeight: 700, color: '#c0392b' }}>
-              Excluido de esta nómina — {breakdown.excluded.reasonLabel}
-            </Text>
-            <Text style={{ fontSize: 9, color: '#555', marginTop: 2 }}>{breakdown.excluded.reasonNote}</Text>
-            <Text style={{ fontSize: 8, color: '#888', marginTop: 2 }}>
-              Solicitado por {breakdown.excluded.requestedBy}
-            </Text>
-          </View>
-        )}
-
-        {breakdown.fixedDeductions.length > 0 && (
+        {!presentation.isExcluded && (
           <>
-            <SectionHeader title="Descuentos pactados" />
-            {breakdown.fixedDeductions.map((fd, i) => (
-              <View key={`fd-${i}`} style={[s.tableRow, i % 2 === 1 ? s.tableRowAlt : {}]}>
-                <View style={{ flex: 1 }}>
-                  <Text style={s.tableLabel}>{fd.reasonLabel}</Text>
-                  <Text style={{ fontSize: 8, color: '#888', marginTop: 1 }}>{fd.reasonNote}</Text>
-                </View>
-                <Text style={s.tableValue}>− {fmtCurrency(fd.amount, fd.currency as 'CLP' | 'USD')}</Text>
+            <SectionHeader title="Haberes" />
+            {presentation.haberesRows.map((row, i) => (
+              <View key={row.key} style={[s.tableRow, i % 2 === 1 ? s.tableRowAlt : {}]}>
+                <Text style={[s.tableLabel, row.variant === 'indent' ? { paddingLeft: 14, color: TEXT_MUTED } : {}]}>
+                  {row.label}
+                </Text>
+                <Text style={s.tableValue}>{row.amount}</Text>
               </View>
             ))}
             <View style={s.tableTotalRow}>
-              <Text style={s.tableTotalLabel}>Total descuentos pactados</Text>
-              <Text style={s.tableTotalValue}>− {fmtCurrency(breakdown.totalFixedDeductionAmount, currency)}</Text>
+              <Text style={s.tableTotalLabel}>Total bruto</Text>
+              <Text style={s.tableTotalValue}>{presentation.grossTotal}</Text>
             </View>
           </>
         )}
 
-        {/* Attendance */}
-        {attendanceRows.length > 0 && (
+        {/* Adjustments banner — bruto efectivo aplicado */}
+        {presentation.adjustmentsBanner && <InfoBlockPdf block={presentation.adjustmentsBanner} />}
+
+        {/* Attendance — chile_dependent only */}
+        {!presentation.isExcluded && presentation.attendanceRows.length > 0 && (
           <>
             <SectionHeader title="Asistencia" />
-            {attendanceRows.map(([label, value], i) => (
-              <View key={`a-${i}`} style={[s.tableRow, i % 2 === 1 ? s.tableRowAlt : {}]}>
-                <Text style={s.tableLabel}>{label}</Text>
-                <Text style={s.tableValue}>{value}</Text>
+            {presentation.attendanceRows.map((row, i) => (
+              <View key={row.key} style={[s.tableRow, i % 2 === 1 ? s.tableRowAlt : {}]}>
+                <Text style={s.tableLabel}>{row.label}</Text>
+                <Text style={s.tableValue}>{row.amount}</Text>
               </View>
             ))}
           </>
         )}
 
-        {/* Deductions (Chile only) */}
-        {deductionRows.length > 0 && (
+        {/* Deduction section — Descuentos legales / Retención honorarios */}
+        {!presentation.isExcluded && presentation.deductionSection && (
           <>
-            <SectionHeader title="Descuentos legales" />
-            {deductionRows.map(([label, value], i) => (
-              <View key={`d-${i}`} style={[s.tableRow, i % 2 === 1 ? s.tableRowAlt : {}]}>
-                <Text style={s.tableLabel}>{label}</Text>
-                <Text style={s.tableValue}>{value}</Text>
+            <SectionHeader title={presentation.deductionSection.title} />
+            {presentation.deductionSection.rows.map((row, i) => (
+              <View key={row.key} style={[s.tableRow, i % 2 === 1 ? s.tableRowAlt : {}]}>
+                <Text style={[s.tableLabel, row.variant === 'indent' ? { paddingLeft: 14, color: TEXT_MUTED } : {}]}>
+                  {row.label}
+                </Text>
+                <Text style={s.tableValue}>{row.amount}</Text>
               </View>
             ))}
             <View style={s.tableTotalRow}>
-              <Text style={s.tableTotalLabel}>Total descuentos</Text>
-              <Text style={s.tableTotalValue}>{fmtCurrency(entry.chileTotalDeductions, currency)}</Text>
+              <Text style={s.tableTotalLabel}>{presentation.deductionSection.totalLabel}</Text>
+              <Text style={s.tableTotalValue}>{presentation.deductionSection.totalAmount}</Text>
             </View>
           </>
         )}
 
-        {breakdown.manualOverride && (
-          <View style={{ marginTop: 8, padding: 8, backgroundColor: '#fff8e6', borderLeft: '3pt solid #d99c1f' }}>
-            <Text style={{ fontSize: 10, fontWeight: 700, color: '#a37310' }}>
-              Override manual de neto — {breakdown.manualOverride.reasonLabel}
-            </Text>
-            <Text style={{ fontSize: 9, color: '#555', marginTop: 2 }}>{breakdown.manualOverride.reasonNote}</Text>
-            <Text style={{ fontSize: 8, color: '#888', marginTop: 2 }}>
-              Aplicado por {breakdown.manualOverride.requestedBy}
-            </Text>
-          </View>
+        {/* Info block — Boleta SII / Pago Deel / Régimen internacional */}
+        {!presentation.isExcluded && presentation.infoBlock && (
+          <InfoBlockPdf block={presentation.infoBlock} />
         )}
 
-        {/* Net total hero */}
-        <View style={s.netHero}>
-          <Text style={s.netHeroLabel}>Líquido a pagar</Text>
-          <Text style={s.netHeroValue}>{fmtCurrency(entry.netTotal, currency)}</Text>
+        {/* Fixed deductions */}
+        {presentation.fixedDeductionsSection && (
+          <>
+            <SectionHeader title={presentation.fixedDeductionsSection.title} />
+            {presentation.fixedDeductionsSection.rows.map((row, i) => (
+              <View key={row.key} style={[s.tableRow, i % 2 === 1 ? s.tableRowAlt : {}]}>
+                <Text style={s.tableLabel}>{row.label}</Text>
+                <Text style={s.tableValue}>{row.amount}</Text>
+              </View>
+            ))}
+            <View style={s.tableTotalRow}>
+              <Text style={s.tableTotalLabel}>{presentation.fixedDeductionsSection.totalLabel}</Text>
+              <Text style={s.tableTotalValue}>{presentation.fixedDeductionsSection.totalAmount}</Text>
+            </View>
+          </>
+        )}
+
+        {/* Manual override block */}
+        {presentation.manualOverrideBlock && <InfoBlockPdf block={presentation.manualOverrideBlock} />}
+
+        {/* Hero — primary or degraded */}
+        <View style={presentation.hero.variant === 'degraded' ? s.netHeroDegraded : s.netHero}>
+          <Text style={s.netHeroLabel}>{presentation.hero.label}</Text>
+          <Text style={s.netHeroValue}>{presentation.hero.amount}</Text>
         </View>
-        {entry.manualOverride && (
+
+        {presentation.hero.footnote && (
           <Text style={{ fontSize: 7, color: TEXT_MUTED, fontStyle: 'italic', marginTop: 4 }}>
-            {`* Monto neto ajustado manualmente${entry.manualOverrideNote ? `: ${entry.manualOverrideNote}` : ''}`}
+            {presentation.hero.footnote}
           </Text>
         )}
 
-        {/* Footer */}
-        <PdfFooter operatingEntity={operatingEntity} monthName={monthName} year={period.year} generatedAt={generatedAt} />
+        <PdfFooter
+          operatingEntity={operatingEntity}
+          monthName={monthName}
+          year={period.year}
+          generatedAt={generatedAt}
+        />
       </Page>
     </Document>
   )
