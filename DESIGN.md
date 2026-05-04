@@ -114,23 +114,55 @@ spacing:
   xl: 32px
   xxl: 40px
 components:
+  app-shell:
+    backgroundColor: "{colors.neutral}"
+    textColor: "{colors.text-primary}"
+  app-shell-dark:
+    backgroundColor: "{colors.background-dark}"
+    textColor: "{colors.text-primary-dark}"
   button-primary:
     backgroundColor: "{colors.primary}"
     textColor: "{colors.on-primary}"
     typography: "{typography.label-md}"
     rounded: "{rounded.md}"
     padding: 12px
+  button-primary-hover:
+    backgroundColor: "{colors.primary-dark}"
+    textColor: "{colors.on-primary}"
+  button-primary-tonal:
+    backgroundColor: "{colors.primary-light}"
+    textColor: "{colors.text-primary}"
+  button-primary-disabled:
+    textColor: "{colors.text-disabled}"
+    typography: "{typography.label-md}"
   button-secondary:
     backgroundColor: "{colors.secondary}"
     textColor: "{colors.on-primary}"
     typography: "{typography.label-md}"
     rounded: "{rounded.md}"
     padding: 12px
+  button-secondary-hover:
+    backgroundColor: "{colors.secondary-light}"
+    textColor: "{colors.on-primary}"
+  button-secondary-active:
+    backgroundColor: "{colors.secondary-dark}"
+    textColor: "{colors.on-primary}"
   card-default:
     backgroundColor: "{colors.surface}"
     textColor: "{colors.on-surface}"
     rounded: "{rounded.md}"
     padding: 24px
+  card-default-border:
+    backgroundColor: "{colors.border-subtle}"
+    height: 1px
+  card-default-dark:
+    backgroundColor: "{colors.surface-dark}"
+    textColor: "{colors.on-surface-dark}"
+    rounded: "{rounded.md}"
+    padding: 24px
+  card-default-dark-secondary:
+    backgroundColor: "{colors.surface-dark}"
+    textColor: "{colors.text-secondary-dark}"
   card-floating:
     backgroundColor: "{colors.surface}"
     textColor: "{colors.on-surface}"
@@ -146,6 +178,30 @@ components:
   status-chip:
     backgroundColor: "{colors.surface-alt}"
     textColor: "{colors.text-secondary}"
+    typography: "{typography.body-md}"
+    rounded: "{rounded.md}"
+    padding: 8px
+  status-chip-success:
+    backgroundColor: "{colors.success}"
+    textColor: "{colors.text-primary}"
+    typography: "{typography.body-md}"
+    rounded: "{rounded.md}"
+    padding: 8px
+  status-chip-warning:
+    backgroundColor: "{colors.warning}"
+    textColor: "{colors.text-primary}"
+    typography: "{typography.body-md}"
+    rounded: "{rounded.md}"
+    padding: 8px
+  status-chip-error:
+    backgroundColor: "{colors.error}"
+    textColor: "{colors.on-primary}"
+    typography: "{typography.body-md}"
+    rounded: "{rounded.md}"
+    padding: 8px
+  status-chip-info:
+    backgroundColor: "{colors.info}"
+    textColor: "{colors.on-primary}"
     typography: "{typography.body-md}"
     rounded: "{rounded.md}"
     padding: 8px
@@ -232,13 +288,23 @@ Do not introduce arbitrary radii or make the system softer than the token scale 
 Buttons:
 
 - `button-primary` is the main action
+- `button-primary-hover` (darker tone) is the canonical pressed/hovered state of the primary CTA
+- `button-primary-tonal` is a soft-tone alternative that uses the primary-light fill with dark text — reserved for secondary placements where the primary CTA already exists nearby
+- `button-primary-disabled` is the disabled variant; relies on text-disabled and inherits the primary surface
 - `button-secondary` is an intentional structural action, not a ghost button substitute
+- `button-secondary-hover` and `button-secondary-active` darken the secondary navy on interaction
 - button text stays sentence-case, never all caps
 
 Cards:
 
 - `card-default` is the baseline surface for forms, dashboards, and operational panels
+- `card-default-border` references the subtle 1px border applied to default cards and dividers
+- `card-default-dark` and `card-default-dark-secondary` are the dark-mode counterparts (paper + secondary text on dark surfaces)
 - `card-floating` is for sticky summary docks, drawers, or elevated moments that need more presence
+
+App shell:
+
+- `app-shell` and `app-shell-dark` define the global page chrome (background + body text) for light and dark themes; product surfaces sit on top of this canvas
 
 Inputs:
 
@@ -249,6 +315,8 @@ Status chips:
 
 - small, readable, and semantically colored when needed
 - they should not become miniature banners
+- semantic variants are first-class: `status-chip-success`, `status-chip-warning`, `status-chip-error`, `status-chip-info`. Pick the one that matches the operational meaning; never repurpose them for decorative emphasis
+- `status-chip` is the neutral fallback for stateless metadata
 
 Data-heavy UI:
 
