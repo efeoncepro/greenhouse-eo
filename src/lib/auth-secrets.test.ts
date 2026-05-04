@@ -19,8 +19,8 @@ describe('auth-secrets', () => {
     vi.stubEnv('NEXTAUTH_SECRET', '')
     vi.stubEnv('AZURE_AD_CLIENT_SECRET', '')
     vi.stubEnv('GOOGLE_CLIENT_SECRET', '')
-    vi.stubEnv('AZURE_AD_CLIENT_ID', 'azure-client-id')
-    vi.stubEnv('GOOGLE_CLIENT_ID', 'google-client-id')
+    vi.stubEnv('AZURE_AD_CLIENT_ID', '3626642f-0451-4eb2-8c29-d2211ab3176c')
+    vi.stubEnv('GOOGLE_CLIENT_ID', 'a1fcb039b-cb54-41a3-8988-3acad9901c96')
     resolveSecret
       .mockResolvedValueOnce({
         source: 'secret_manager',
@@ -61,7 +61,7 @@ describe('auth-secrets', () => {
     vi.stubEnv('NEXTAUTH_SECRET', '')
     vi.stubEnv('AZURE_AD_CLIENT_SECRET', '')
     vi.stubEnv('GOOGLE_CLIENT_SECRET', '')
-    vi.stubEnv('AZURE_AD_CLIENT_ID', 'azure-client-id')
+    vi.stubEnv('AZURE_AD_CLIENT_ID', '3626642f-0451-4eb2-8c29-d2211ab3176c')
     resolveSecret
       .mockResolvedValueOnce({
         source: 'env',
@@ -90,5 +90,40 @@ describe('auth-secrets', () => {
     await authSecretsModule.ensureAuthSecretsResolved()
 
     expect(authSecretsModule.hasMicrosoftAuthProvider()).toBe(false)
+  })
+
+  it('does not enable Google SSO when client id fails canonical validation', async () => {
+    vi.stubEnv('NEXTAUTH_SECRET', '')
+    vi.stubEnv('AZURE_AD_CLIENT_SECRET', '')
+    vi.stubEnv('GOOGLE_CLIENT_SECRET', '')
+    vi.stubEnv('GOOGLE_CLIENT_ID', '123456789012-something.invalid.com')
+    resolveSecret
+      .mockResolvedValueOnce({
+        source: 'env',
+        value: 'nextauth-secret',
+        envVarName: 'NEXTAUTH_SECRET',
+        secretRefEnvVarName: 'NEXTAUTH_SECRET_SECRET_REF',
+        secretRef: null
+      })
+      .mockResolvedValueOnce({
+        source: 'unconfigured',
+        value: null,
+        envVarName: 'AZURE_AD_CLIENT_SECRET',
+        secretRefEnvVarName: 'AZURE_AD_CLIENT_SECRET_SECRET_REF',
+        secretRef: null
+      })
+      .mockResolvedValueOnce({
+        source: 'env',
+        value: 'google-client-secret',
+        envVarName: 'GOOGLE_CLIENT_SECRET',
+        secretRefEnvVarName: 'GOOGLE_CLIENT_SECRET_SECRET_REF',
+        secretRef: null
+      })
+
+    const authSecretsModule = await import('@/lib/auth-secrets')
+
+    await authSecretsModule.ensureAuthSecretsResolved()
+
+    expect(authSecretsModule.hasGoogleAuthProvider()).toBe(false)
   })
 })
