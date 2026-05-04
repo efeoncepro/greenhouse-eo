@@ -2,6 +2,12 @@
 
 ## 2026-05-04
 
+- **Hotfix HR Offboarding/Finiquito — casos ejecutados siguen visibles y el cierre interno exige finiquito.**
+  - `/hr/offboarding` deja de consultar solo `status=active`; ahora muestra casos no cancelados, incluyendo `executed`, para que un caso ejecutado con finiquito pendiente no desaparezca del operador.
+  - El carril `Finiquito` expone el cálculo/aprobación del `final_settlement` antes del documento: `Calcular`, `Aprobar cálculo`, neto CLP y blockers de readiness.
+  - El documento queda bloqueado hasta que el settlement esté aprobado; evita renderizar PDF sobre cálculo inexistente.
+  - El engine permite calcular casos `executed` como recuperación auditable de casos legacy ya cerrados; futuras ejecuciones `internal_payroll` quedan bloqueadas si no existe settlement aprobado y documento emitido.
+
 - **TASK-763 implementada — Lifecycle Onboarding & Offboarding UI Mockup Adoption.** La experiencia HR adopta la shell aprobada en `docs/mockups/onboarding-module-mockup.html` sobre runtime real.
   - **HR Lifecycle:** `/hr/onboarding` ahora muestra first fold dominante, carriles Onboarding/Offboarding, KPIs, roster operativo, bloqueos y lane visible de casos formales de offboarding.
   - **Plantillas:** `/hr/onboarding/templates` usa editor list-detail con biblioteca, tareas, owner, vencimiento, obligatoriedad y reordenamiento.

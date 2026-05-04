@@ -192,13 +192,13 @@ export const buildFinalSettlementReadiness = (context: FinalSettlementCalculatio
   checks.push(buildCheck({
     code: 'offboarding_case_approved',
     status:
-      (offboardingCase.status === 'approved' || offboardingCase.status === 'scheduled') &&
+      (offboardingCase.status === 'approved' || offboardingCase.status === 'scheduled' || offboardingCase.status === 'executed') &&
       Boolean(offboardingCase.effectiveDate) &&
       Boolean(offboardingCase.lastWorkingDay) &&
       offboardingCase.separationType === 'resignation'
         ? 'passed'
         : 'blocked',
-    message: 'El caso debe estar aprobado o agendado, con fecha efectiva, ultimo dia trabajado y causal resignation.',
+    message: 'El caso debe estar aprobado, agendado o ejecutado para recuperacion, con fecha efectiva, ultimo dia trabajado y causal resignation.',
     evidence: {
       status: offboardingCase.status,
       effectiveDate: offboardingCase.effectiveDate,

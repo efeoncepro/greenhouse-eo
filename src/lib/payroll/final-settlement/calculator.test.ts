@@ -228,4 +228,32 @@ describe('final settlement calculator', () => {
     })
     expect(result.totals.grossTotal).toBeGreaterThan(result.totals.deductionTotal)
   })
+
+  it('allows calculating an already executed case for recovery when canonical dates are present', async () => {
+    const result = await calculateFinalSettlement({
+      offboardingCase: {
+        ...baseCase,
+        status: 'executed',
+        executedAt: '2026-05-16T00:00:00.000Z'
+      },
+      compensation,
+      leaveBalance: {
+        balanceId: 'lb-1',
+        year: 2026,
+        allowanceDays: 15,
+        progressiveExtraDays: 0,
+        carriedOverDays: 0,
+        adjustmentDays: 0,
+        usedDays: 10,
+        reservedDays: 0,
+        availableDays: 5
+      },
+      payrollOverlap: { covered: false, periodId: '2026-05', status: null, entryId: null, ufValue: null, taxTableVersion: null },
+      hireDate: '2024-01-01',
+      previredEvidence: { period: '2026-04', status: 'paid' }
+    })
+
+    expect(result.readiness.status).toBe('ready')
+    expect(result.sourceSnapshot?.offboardingCaseId).toBe('offboarding-case-1')
+  })
 })

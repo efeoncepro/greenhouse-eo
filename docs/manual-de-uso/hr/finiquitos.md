@@ -36,6 +36,8 @@ El motor de finiquitos calcula y guarda el cierre final de una renuncia Chile de
 10. Emite el documento y descarga el PDF privado.
 11. Cuando exista evidencia externa, registra firma/ratificacion. Si la persona firma con reserva de derechos, marca la reserva y deja nota.
 
+Si un caso ya aparece como `Ejecutado` pero no tiene finiquito, no desaparece de `/hr/offboarding`: usa `Calcular` en el carril `Finiquito` para recuperar el settlement desde las fechas canonicas del caso. Esta recuperacion existe para corregir cierres incompletos; el flujo normal debe aprobar settlement y emitir documento antes de ejecutar la salida.
+
 ## Estados
 
 | Estado | Significado |
@@ -69,6 +71,7 @@ El motor de finiquitos calcula y guarda el cierre final de una renuncia Chile de
 - No trates honorarios, Deel/EOR o internacionales como Chile dependiente.
 - No marques `signed_or_ratified` sin evidencia o referencia externa.
 - No uses el PDF como prueba de pago: el flujo documental no crea ni ejecuta pagos.
+- No ejecutes un caso `Payroll interno` sin cálculo aprobado y documento emitido; Greenhouse bloquea esa transición para evitar cierres laborales incompletos.
 
 ## Problemas comunes
 

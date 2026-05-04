@@ -31,6 +31,7 @@ import CustomChip from '@core/components/mui/Chip'
 
 import type { HrMemberOption } from '@/types/hr-core'
 import type { OffboardingCase, OffboardingCaseStatus, OffboardingSeparationType } from '@/lib/workforce/offboarding'
+import type { FinalSettlement, FinalSettlementStatus } from '@/lib/payroll/final-settlement'
 import type { FinalSettlementDocument } from '@/lib/payroll/final-settlement/document-types'
 import { formatDate } from '@views/greenhouse/hr-core/helpers'
 
@@ -50,6 +51,10 @@ type ContractExpiryScanResponse = {
 
 type FinalSettlementDocumentResponse = {
   document: FinalSettlementDocument | null
+}
+
+type FinalSettlementResponse = {
+  settlement: FinalSettlement | null
 }
 
 const statusColor: Record<string, 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'info'> = {
@@ -107,6 +112,28 @@ const documentStatusLabel: Record<string, string> = {
   cancelled: 'Cancelado'
 }
 
+const settlementStatusColor: Record<FinalSettlementStatus | 'none', 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'info'> = {
+  none: 'default',
+  draft: 'secondary',
+  calculated: 'info',
+  reviewed: 'warning',
+  approved: 'success',
+  issued: 'success',
+  cancelled: 'default'
+}
+
+const settlementStatusLabel: Record<FinalSettlementStatus | 'none', string> = {
+  none: 'Sin cálculo',
+  draft: 'Borrador',
+  calculated: 'Calculado',
+  reviewed: 'Revisado',
+  approved: 'Cálculo aprobado',
+  issued: 'Emitido',
+  cancelled: 'Cancelado'
+}
+
+const activeStatuses = new Set<OffboardingCaseStatus>(['draft', 'needs_review', 'approved', 'scheduled', 'blocked'])
+
 const nextStatusFor = (status: OffboardingCaseStatus): OffboardingCaseStatus | null => {
   if (status === 'draft' || status === 'needs_review') return 'approved'
   if (status === 'approved') return 'scheduled'
@@ -140,10 +167,17 @@ const HrOffboardingView = () => {
   const [lastWorkingDay, setLastWorkingDay] = useState(today())
   const [notes, setNotes] = useState('')
   const [scanMessage, setScanMessage] = useState<string | null>(null)
+  const [settlementsByCaseId, setSettlementsByCaseId] = useState<Record<string, FinalSettlement | null>>({})
+  const [settlementSavingCaseId, setSettlementSavingCaseId] = useState<string | null>(null)
   const [documentsByCaseId, setDocumentsByCaseId] = useState<Record<string, FinalSettlementDocument | null>>({})
 
   const activeCases = useMemo(
-    () => cases.filter(item => item.status !== 'executed' && item.status !== 'cancelled'),
+    () => cases.filter(item => activeStatuses.has(item.status)),
+    [cases]
+  )
+
+  const visibleCases = useMemo(
+    () => cases.filter(item => item.status !== 'cancelled'),
     [cases]
   )
 
@@ -153,7 +187,7 @@ const HrOffboardingView = () => {
 
     try {
       const [casesRes, membersRes] = await Promise.all([
-        fetch('/api/hr/offboarding/cases?status=active'),
+        fetch('/api/hr/offboarding/cases?limit=200'),
         fetch('/api/hr/core/members/options')
       ])
 
@@ -162,6 +196,20 @@ const HrOffboardingView = () => {
 
       const casesPayload = await casesRes.json() as CasesResponse
       const membersPayload = await membersRes.json() as MembersResponse
+
+      const settlementPairs = await Promise.all(
+        casesPayload.cases.map(async item => {
+          const settlementRes = await fetch(`/api/hr/offboarding/cases/${item.offboardingCaseId}/final-settlement`)
+
+          if (!settlementRes.ok) {
+            return [item.offboardingCaseId, null] as const
+          }
+
+          const settlementPayload = await settlementRes.json() as FinalSettlementResponse
+
+          return [item.offboardingCaseId, settlementPayload.settlement] as const
+        })
+      )
 
       const documentPairs = await Promise.all(
         casesPayload.cases.map(async item => {
@@ -178,6 +226,7 @@ const HrOffboardingView = () => {
       )
 
       setCases(casesPayload.cases)
+      setSettlementsByCaseId(Object.fromEntries(settlementPairs))
       setDocumentsByCaseId(Object.fromEntries(documentPairs))
       setMembers(membersPayload.members)
     } catch (err) {
@@ -331,8 +380,51 @@ const HrOffboardingView = () => {
     }
   }
 
+  const runSettlementAction = async (
+    item: OffboardingCase,
+    action: 'calculate' | 'approve'
+  ) => {
+    setSettlementSavingCaseId(item.offboardingCaseId)
+    setError(null)
+    setScanMessage(null)
+
+    try {
+      const endpoint = action === 'calculate'
+        ? `/api/hr/offboarding/cases/${item.offboardingCaseId}/final-settlement`
+        : `/api/hr/offboarding/cases/${item.offboardingCaseId}/final-settlement/approve`
+
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(action === 'calculate' ? { sourceRef: { source: 'offboarding_surface' } } : {})
+      })
+
+      if (!res.ok) {
+        const payload = await res.json().catch(() => ({}))
+
+        throw new Error(payload.error || 'No se pudo actualizar el cálculo de finiquito.')
+      }
+
+      await loadData()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error operando cálculo de finiquito.')
+    } finally {
+      setSettlementSavingCaseId(null)
+    }
+  }
+
+  const settlementActionFor = (settlement: FinalSettlement | null) => {
+    if (!settlement || settlement.calculationStatus === 'cancelled') return { action: 'calculate' as const, label: 'Calcular' }
+
+    if (settlement.calculationStatus === 'calculated' || settlement.calculationStatus === 'reviewed') {
+      return { action: 'approve' as const, label: 'Aprobar cálculo' }
+    }
+
+    return null
+  }
+
   const documentActionFor = (document: FinalSettlementDocument | null) => {
-    if (!document) return { action: 'render' as const, label: 'Renderizar' }
+    if (!document) return { action: 'render' as const, label: 'Renderizar doc.' }
     if (document.documentStatus === 'rendered') return { action: 'submit-review' as const, label: 'Enviar a revisión' }
     if (document.documentStatus === 'in_review') return { action: 'approve' as const, label: 'Aprobar doc.' }
     if (document.documentStatus === 'approved') return { action: 'issue' as const, label: 'Emitir' }
@@ -452,7 +544,7 @@ const HrOffboardingView = () => {
       </Card>
 
       <Card elevation={0} sx={{ border: theme => `1px solid ${theme.palette.divider}` }}>
-        <CardHeader title='Casos activos' subheader='Estados previos a ejecutado/cancelado' />
+        <CardHeader title='Casos de salida' subheader='Incluye casos activos y ejecutados con finiquito pendiente o emitido' />
         <Divider />
         <TableContainer>
           <Table>
@@ -469,16 +561,20 @@ const HrOffboardingView = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {activeCases.length === 0 ? (
+              {visibleCases.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={8}>
                     <Typography variant='body2' color='text.secondary' sx={{ py: 4, textAlign: 'center' }}>
-                      No hay casos activos de offboarding.
+                      No hay casos de offboarding para revisar.
                     </Typography>
                   </TableCell>
                 </TableRow>
-              ) : activeCases.map(item => (
+              ) : visibleCases.map(item => (
                 (() => {
+                  const settlement = settlementsByCaseId[item.offboardingCaseId] ?? null
+                  const settlementAction = settlementActionFor(settlement)
+                  const settlementBusy = settlementSavingCaseId === item.offboardingCaseId
+                  const settlementApproved = settlement ? ['approved', 'issued'].includes(settlement.calculationStatus) : false
                   const document = documentsByCaseId[item.offboardingCaseId] ?? null
                   const documentAction = documentActionFor(document)
                   const documentBusy = documentSavingCaseId === item.offboardingCaseId
@@ -501,6 +597,36 @@ const HrOffboardingView = () => {
                       <TableCell>{formatDate(item.lastWorkingDay)}</TableCell>
                       <TableCell>
                         <Stack spacing={1.5} alignItems='flex-start'>
+                          <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap alignItems='center'>
+                            <CustomChip
+                              round='true'
+                              size='small'
+                              color={settlementStatusColor[settlement?.calculationStatus ?? 'none'] ?? 'default'}
+                              label={settlementStatusLabel[settlement?.calculationStatus ?? 'none'] ?? settlement?.calculationStatus ?? 'Sin cálculo'}
+                            />
+                            {settlement && (
+                              <Typography variant='caption' color='text.secondary'>
+                                Neto {new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(settlement.netPayable)}
+                              </Typography>
+                            )}
+                          </Stack>
+                          {settlement?.readinessHasBlockers && (
+                            <Typography variant='caption' color='error.main'>
+                              Hay blockers de cálculo. Revisa vacaciones, compensación y régimen.
+                            </Typography>
+                          )}
+                          <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
+                            {settlementAction && (
+                              <Button
+                                size='small'
+                                variant='tonal'
+                                disabled={settlementBusy || saving}
+                                onClick={() => runSettlementAction(item, settlementAction.action)}
+                              >
+                                {settlementBusy ? 'Procesando' : settlementAction.label}
+                              </Button>
+                            )}
+                          </Stack>
                           <CustomChip
                             round='true'
                             size='small'
@@ -517,7 +643,7 @@ const HrOffboardingView = () => {
                               <Button
                                 size='small'
                                 variant='tonal'
-                                disabled={documentBusy || saving}
+                                disabled={documentBusy || saving || !settlementApproved}
                                 onClick={() => runDocumentAction(item, documentAction.action)}
                               >
                                 {documentBusy ? 'Procesando' : documentAction.label}
@@ -529,6 +655,11 @@ const HrOffboardingView = () => {
                               </Button>
                             )}
                           </Stack>
+                          {!settlementApproved && (
+                            <Typography variant='caption' color='text.secondary'>
+                              El documento se habilita cuando el cálculo queda aprobado.
+                            </Typography>
+                          )}
                         </Stack>
                       </TableCell>
                       <TableCell align='right'>

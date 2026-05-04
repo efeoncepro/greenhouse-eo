@@ -18,6 +18,8 @@ No se calcula desde `contractEndDate`, `member.active` ni una desactivacion admi
 - snapshot contractual
 - lane `internal_payroll`
 
+La pantalla `/hr/offboarding` debe mantener visibles los casos `executed` no cancelados para recuperacion auditada. Si un caso fue ejecutado antes de tener settlement, Greenhouse permite calcularlo desde sus fechas canonicas y deja evidencia en el aggregate de finiquito. Ese camino es recuperacion, no el flujo feliz.
+
 ## Alcance V1
 
 V1 soporta solo renuncia de trabajador dependiente Chile con:
@@ -79,3 +81,5 @@ Desde TASK-762, el settlement aprobado habilita el documento formal de finiquito
 ## Fronteras
 
 El flujo de finiquito no crea payment orders, no marca pagos como ejecutados y no ejecuta offboarding/acceso. La emision documental tampoco cambia por si sola el estado del settlement calculado.
+
+Para evitar cierres incompletos, una ejecucion futura de offboarding `internal_payroll` exige settlement aprobado y documento emitido o ratificado. Si falta cualquiera de esos hitos, la transicion a `executed` falla cerrada y la persona sigue en la cola operativa.

@@ -282,6 +282,58 @@ const publishCaseEvent = async (
   )
 }
 
+const assertPayrollExecutionReadiness = async (client: PoolClient, current: OffboardingCase) => {
+  if (current.status !== 'scheduled' || current.ruleLane !== 'internal_payroll') return
+
+  if (current.requiresPayrollClosure) {
+    const settlementRows = await client.query<{ calculation_status: string; readiness_has_blockers: boolean }>(
+      `
+        SELECT calculation_status, readiness_has_blockers
+        FROM greenhouse_payroll.final_settlements
+        WHERE offboarding_case_id = $1
+        ORDER BY settlement_version DESC, created_at DESC
+        LIMIT 1
+      `,
+      [current.offboardingCaseId]
+    )
+
+    const settlement = settlementRows.rows[0]
+
+    if (!settlement || settlement.readiness_has_blockers || !['approved', 'issued'].includes(settlement.calculation_status)) {
+      throw new HrCoreValidationError('Internal payroll offboarding requires an approved final settlement before execution.', 409, {
+        offboardingCaseId: current.offboardingCaseId,
+        publicId: current.publicId,
+        required: 'final_settlement.approved',
+        currentStatus: settlement?.calculation_status ?? null
+      })
+    }
+  }
+
+  if (current.requiresHrDocuments) {
+    const documentRows = await client.query<{ document_status: string }>(
+      `
+        SELECT document_status
+        FROM greenhouse_payroll.final_settlement_documents
+        WHERE offboarding_case_id = $1
+        ORDER BY document_version DESC, created_at DESC
+        LIMIT 1
+      `,
+      [current.offboardingCaseId]
+    )
+
+    const document = documentRows.rows[0]
+
+    if (!document || !['issued', 'signed_or_ratified'].includes(document.document_status)) {
+      throw new HrCoreValidationError('Internal payroll offboarding requires an issued final settlement document before execution.', 409, {
+        offboardingCaseId: current.offboardingCaseId,
+        publicId: current.publicId,
+        required: 'final_settlement_document.issued',
+        currentStatus: document?.document_status ?? null
+      })
+    }
+  }
+}
+
 export const listOffboardingCases = async (filters: OffboardingCaseListFilters = {}) => {
   const params: unknown[] = []
   const where: string[] = []
@@ -643,6 +695,10 @@ export const transitionOffboardingCase = async ({
     }
 
     assertOffboardingTransition(current, input)
+
+    if (input.status === 'executed') {
+      await assertPayrollExecutionReadiness(client, current)
+    }
 
     const nextEffectiveDate = input.effectiveDate !== undefined ? input.effectiveDate : current.effectiveDate
     const nextLastWorkingDay = input.lastWorkingDay !== undefined ? input.lastWorkingDay : current.lastWorkingDay

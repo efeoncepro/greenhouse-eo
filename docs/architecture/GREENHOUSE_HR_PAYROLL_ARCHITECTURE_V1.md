@@ -1,5 +1,16 @@
 # GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md
 
+## Delta 2026-05-04 — Offboarding execution guard + finiquito recovery
+
+El carril de finiquito queda protegido contra dos fallas operativas:
+
+- `/hr/offboarding` no debe filtrar exclusivamente por casos activos. Los casos `executed` no cancelados siguen visibles para auditoria, descarga y recuperacion de finiquito.
+- El engine de final settlement acepta casos `executed` solo como recuperacion auditada cuando ya existen `effective_date`, `last_working_day`, causal `resignation` y lane `internal_payroll`.
+- Futuras transiciones a `executed` de casos `internal_payroll` fallan cerradas si no existe `greenhouse_payroll.final_settlements.calculation_status in ('approved','issued')`.
+- Si `requires_hr_documents=true`, la ejecucion tambien exige `greenhouse_payroll.final_settlement_documents.document_status in ('issued','signed_or_ratified')`.
+
+Esto mantiene separadas las responsabilidades: `WorkRelationshipOffboardingCase` orquesta la salida, `final_settlements` calcula el cierre payroll y `final_settlement_documents` congela el artefacto formal. La UI puede recuperar un caso historico incompleto, pero el runtime impide crear nuevos cierres incompletos.
+
 ## Delta 2026-05-04 — TASK-762: Documento Formal de Finiquito
 
 Payroll agrega el aggregate documental que convierte un `final_settlement` aprobado en artefacto formal versionado:

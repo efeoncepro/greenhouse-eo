@@ -1,5 +1,15 @@
 # Handoff.md
 
+## Sesion 2026-05-04 — Hotfix HR Offboarding/Finiquito visibility + execution guard
+
+- **Branch:** `develop`.
+- **Trigger:** en staging, Valentina Hoyos tenia un caso de renuncia creado y transicionado a `executed`, pero `/hr/offboarding` consultaba solo `status=active`; el caso desaparecia de la tabla y no habia carril visible para calcular/aprobar finiquito.
+- **Causa raiz:** contrato UI/runtime incompleto: el finiquito puede requerir recuperacion despues de `executed`, pero la surface ocultaba terminales y solo exponia el flujo documental, no el settlement calculation lane.
+- **Fix:** `/hr/offboarding` carga hasta 200 casos no cancelados, mantiene contador de activos separado, muestra `executed`, expone `Calcular`/`Aprobar calculo`, neto CLP, blockers y bloquea documento hasta settlement aprobado.
+- **Guardrail runtime:** `transitionOffboardingCase` bloquea nuevas transiciones `internal_payroll -> executed` si falta settlement aprobado/issued o documento emitido/ratificado; el calculator acepta `executed` solo para recuperacion auditada con fechas canonicas.
+- **Verificacion:** targeted Vitest offboarding/final-settlement/state-machine 3 files / 9 tests OK; `pnpm exec tsc --noEmit --pretty false` OK; targeted ESLint OK; `pnpm design:lint` 0 errors / 0 warnings / 1 info; `pnpm build` OK.
+- **Docs:** changelog, arquitectura Payroll HR, documentacion funcional y manual de finiquitos actualizados.
+
 ## Sesion 2026-05-04 — TASK-763 Lifecycle Onboarding & Offboarding UI Mockup Adoption — completada
 
 - **Branch:** `task/TASK-763-lifecycle-onboarding-offboarding-ui-mockup-adoption`, fast-forward desde `develop` `29804193`.
