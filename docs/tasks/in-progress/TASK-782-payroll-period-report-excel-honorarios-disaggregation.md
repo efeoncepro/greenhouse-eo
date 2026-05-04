@@ -11,17 +11,17 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Bajo`
 - Type: `implementation`
 - Epic: `optional`
-- Status real: `Diseno`
+- Status real: `En implementación`
 - Rank: `TBD`
 - Domain: `hr`
-- Blocked by: `TASK-758`
-- Branch: `task/TASK-782-payroll-period-report-excel-honorarios`
+- Blocked by: `none` (TASK-758 cerrada 2026-05-04, helper canónico ya exportado)
+- Branch: `develop` (instrucción explícita del usuario: implementar sin cambiar de rama)
 - Legacy ID: `none`
 - GitHub Issue: `none`
 

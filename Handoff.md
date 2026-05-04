@@ -1,5 +1,13 @@
 # Handoff.md
 
+## Sesion 2026-05-04 — TASK-782 Payroll Period Report + Excel Honorarios Disaggregation — en curso
+
+- **Trigger**: blocker de TASK-782 resuelto (TASK-758 cerrada). Ahora habilita la corrección operador-facing del PDF reporte mensual + Excel para que compliance/SII/PREVIRED puedan reconciliar sin mezclar retención SII honorarios con descuentos previsionales reales.
+- **Branch**: `develop` (instrucción explícita: implementar sin cambiar de rama).
+- **Lifecycle**: `in-progress`. Mockup `docs/mockups/task-782-period-report-excel-honorarios-disaggregation.html` aprobado y vinculante 1:1.
+- **Reuso canónico**: `resolveReceiptRegime` + `groupEntriesByRegime` + `RECEIPT_REGIME_BADGES` + `RECEIPT_REGIME_DISPLAY_ORDER` desde `src/lib/payroll/receipt-presenter.ts` (TASK-758).
+- **Scope**: PeriodReportDocument PDF (3-4 grupos + 4-value Régimen column + 2 columnas separadas Desc. previs / Retención SII + 4 subtotales) + generate-payroll-excel.ts (2 secciones internas en hoja Chile + columnas `Tasa SII` / `Retención SII`).
+
 ## Sesion 2026-05-04 — TASK-758 Payroll Receipt Render Contract Hardening (4 regímenes) — completada
 
 - **Trigger**: auditoría profunda de recibos detectó que el bug `isChile = payRegime === 'chile'` afecta a 3/4 regímenes (no solo honorarios). TASK-758 ampliada de 1 a 4 regímenes + canonización de mockup HTML como contrato visual vinculante.
