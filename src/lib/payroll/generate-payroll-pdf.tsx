@@ -2,6 +2,8 @@ import 'server-only'
 
 import path from 'path'
 
+import { Fragment } from 'react'
+
 import { Document, Image, Page, StyleSheet, Text, View, renderToStream } from '@react-pdf/renderer'
 
 import type { PayrollEntry, PayrollPeriod } from '@/types/payroll'
@@ -17,9 +19,13 @@ import {
 } from '@/lib/payroll/adjustments/breakdown'
 import {
   buildReceiptPresentation,
+  groupEntriesByRegime,
+  RECEIPT_REGIME_BADGES,
+  RECEIPT_REGIME_DISPLAY_ORDER,
   type ReceiptInfoBlock,
   type ReceiptInfoBlockVariant,
-  type ReceiptPresenterEntry
+  type ReceiptPresenterEntry,
+  type ReceiptRegime
 } from '@/lib/payroll/receipt-presenter'
 
 const LOGO_PATH = path.join(process.cwd(), 'public/branding/logo-full.png')
@@ -402,44 +408,112 @@ const PdfFooter = ({ operatingEntity, monthName, year, generatedAt }: {
 
 // ─── Period Report PDF ────────────────────────────────────────────
 
+// TASK-782 — 10 columnas canónicas (porcentajes per spec aprobada en mockup).
+// Desc. previs. y Retención SII separadas: chile_dependent llena la primera con `—` en la segunda; honorarios al revés.
 const COL_WIDTHS = {
-  name: '20%',
-  regime: '8%',
-  currency: '6%',
-  base: '10%',
-  bonus: '9%',
-  gross: '10%',
-  deductions: '10%',
-  net: '10%'
+  name: '17%',
+  regime: '7%',
+  currency: '5%',
+  base: '9%',
+  otd: '8%',
+  rpa: '8%',
+  gross: '9%',
+  prevDeductions: '10%',
+  siiRetention: '10%',
+  net: '9%'
+}
+
+const REGIME_GROUP_LABELS: Record<ReceiptRegime, string> = {
+  chile_dependent: 'Chile dependiente',
+  honorarios: 'Honorarios',
+  international_deel: 'Internacional Deel',
+  international_internal: 'Internacional interno'
+}
+
+// TASK-782 — currency canónica por régimen para el subtotal row.
+const REGIME_CURRENCY: Record<ReceiptRegime, 'CLP' | 'USD'> = {
+  chile_dependent: 'CLP',
+  honorarios: 'CLP',
+  international_deel: 'USD',
+  international_internal: 'USD'
+}
+
+const formatStatus = (status: string): string => {
+  if (status === 'exported') return 'Exportado'
+  if (status === 'approved') return 'Aprobado'
+  if (status === 'calculated') return 'Calculado'
+  if (status === 'reopened') return 'Reabierto'
+  if (status === 'draft') return 'Borrador'
+
+  return status
+}
+
+// TASK-782 — Excluded entries: bruto/neto = $0, columnas dim "—".
+const isExcludedEntry = (entry: PayrollEntry): boolean => {
+  return entry.grossTotal === 0 && entry.netTotal === 0
 }
 
 const PeriodReportDocument = ({ period, entries, operatingEntity }: { period: PayrollPeriod; entries: PayrollEntry[]; operatingEntity: OperatingEntityIdentity | null }) => {
   const monthName = MONTH_NAMES[period.month - 1] ?? String(period.month)
   const generatedAt = new Date().toISOString().split('T')[0]
 
-  const chileEntries = entries.filter(e => e.payRegime === 'chile')
-  const intlEntries = entries.filter(e => e.payRegime === 'international')
+  // TASK-782 — group entries by canonical regime using exported helper.
+  const groups = groupEntriesByRegime(entries)
 
-  const totalGrossClp = chileEntries.reduce((sum, e) => sum + e.grossTotal, 0)
-  const totalNetClp = chileEntries.reduce((sum, e) => sum + e.netTotal, 0)
-  const totalDeductionsClp = chileEntries.reduce((sum, e) => sum + (e.chileTotalDeductions ?? 0), 0)
-  const totalGrossUsd = intlEntries.reduce((sum, e) => sum + e.grossTotal, 0)
-  const totalNetUsd = intlEntries.reduce((sum, e) => sum + e.netTotal, 0)
+  // Per-regime totals + per-currency aggregates.
+  const totalsByRegime = RECEIPT_REGIME_DISPLAY_ORDER.map(regime => {
+    const groupEntries = groups[regime]
+    const isHonorarios = regime === 'honorarios'
 
-  // Build summary KPI items
+    return {
+      regime,
+      entries: groupEntries,
+      count: groupEntries.length,
+      totalGross: groupEntries.reduce((sum, e) => sum + e.grossTotal, 0),
+      totalNet: groupEntries.reduce((sum, e) => sum + e.netTotal, 0),
+      // Previsional deductions: only chile_dependent has them. Honorarios chileTotalDeductions
+      // === siiRetentionAmount per motor — DO NOT mix into the previsional pool.
+      totalPrevDeductions: regime === 'chile_dependent'
+        ? groupEntries.reduce((sum, e) => sum + (e.chileTotalDeductions ?? 0), 0)
+        : 0,
+      // SII retention: only honorarios.
+      totalSiiRetention: isHonorarios
+        ? groupEntries.reduce((sum, e) => sum + (e.siiRetentionAmount ?? 0), 0)
+        : 0
+    }
+  })
+
+  const totalGrossClp = totalsByRegime
+    .filter(g => REGIME_CURRENCY[g.regime] === 'CLP')
+    .reduce((sum, g) => sum + g.totalGross, 0)
+
+  const totalNetClp = totalsByRegime
+    .filter(g => REGIME_CURRENCY[g.regime] === 'CLP')
+    .reduce((sum, g) => sum + g.totalNet, 0)
+
+  const totalGrossUsd = totalsByRegime
+    .filter(g => REGIME_CURRENCY[g.regime] === 'USD')
+    .reduce((sum, g) => sum + g.totalGross, 0)
+
+  // TASK-782 — Summary strip ampliado: contadores per-régimen visibles solo si N > 0.
   const summaryItems: Array<{ label: string; value: string }> = [
     { label: 'COLABORADORES', value: String(entries.length) },
-    { label: 'ESTADO', value: period.status === 'exported' ? 'Exportado' : period.status === 'approved' ? 'Aprobado' : period.status }
+    { label: 'ESTADO', value: formatStatus(period.status) }
   ]
 
-  if (chileEntries.length > 0) {
+  for (const { regime, count } of totalsByRegime) {
+    if (count > 0) {
+      summaryItems.push({ label: `# ${RECEIPT_REGIME_BADGES[regime].code}`, value: String(count) })
+    }
+  }
+
+  if (totalGrossClp > 0) {
     summaryItems.push({ label: 'BRUTO CLP', value: fmtCurrency(totalGrossClp, 'CLP') })
     summaryItems.push({ label: 'NETO CLP', value: fmtCurrency(totalNetClp, 'CLP') })
   }
 
-  if (intlEntries.length > 0) {
+  if (totalGrossUsd > 0) {
     summaryItems.push({ label: 'BRUTO USD', value: fmtCurrency(totalGrossUsd, 'USD') })
-    summaryItems.push({ label: 'NETO USD', value: fmtCurrency(totalNetUsd, 'USD') })
   }
 
   return (
@@ -447,10 +521,9 @@ const PeriodReportDocument = ({ period, entries, operatingEntity }: { period: Pa
       <Page size="LETTER" orientation="landscape" style={s.page}>
         <PdfHeader operatingEntity={operatingEntity} monthName={monthName} year={period.year} docType="Reporte de nómina" periodId={period.periodId} />
 
-        {/* Document title */}
         <Text style={s.docTitle}>REPORTE DE NÓMINA</Text>
 
-        {/* Summary strip */}
+        {/* Summary strip ampliado */}
         <View style={{ backgroundColor: BRAND_LIGHT, flexDirection: 'row', paddingVertical: 10, paddingHorizontal: 12, marginBottom: 14 }}>
           {summaryItems.map((item, i) => (
             <View key={i} style={{ flex: 1, paddingHorizontal: 6, borderRightWidth: i < summaryItems.length - 1 ? 0.5 : 0, borderRightColor: BORDER_LIGHT }}>
@@ -460,9 +533,9 @@ const PeriodReportDocument = ({ period, entries, operatingEntity }: { period: Pa
           ))}
         </View>
 
-        {/* Meta — compact row for UF and approval date */}
-        {(period.ufValue != null || period.approvedAt) && (
-          <View style={{ flexDirection: 'row', marginBottom: 10, gap: 16 }}>
+        {/* Meta row — UF + UTM + Aprobado + Tabla tributaria (ítems sólo si están poblados) */}
+        {(period.ufValue != null || period.approvedAt || period.taxTableVersion) && (
+          <View style={{ flexDirection: 'row', marginBottom: 10, gap: 16, flexWrap: 'wrap' }}>
             {period.ufValue != null && (
               <Text style={{ fontSize: 8, color: TEXT_MUTED }}>
                 {`UF: $${period.ufValue.toLocaleString('es-CL')}`}
@@ -473,65 +546,115 @@ const PeriodReportDocument = ({ period, entries, operatingEntity }: { period: Pa
                 {`Aprobado: ${period.approvedAt}`}
               </Text>
             )}
+            {period.taxTableVersion && (
+              <Text style={{ fontSize: 8, color: TEXT_MUTED }}>
+                {`Tabla tributaria: ${period.taxTableVersion}`}
+              </Text>
+            )}
           </View>
         )}
 
-        {/* Table */}
-        <SectionHeader title={`Detalle — ${entries.length} miembros`} />
+        {/* Section header */}
+        <SectionHeader title={`Detalle — ${entries.length} colaboradores agrupados por régimen`} />
 
+        {/* Header row — 10 columnas canónicas */}
         <View style={s.reportTableHeader}>
           <Text style={{ ...s.reportTableHeaderCell, width: COL_WIDTHS.name }}>Nombre</Text>
-          <Text style={{ ...s.reportTableHeaderCell, width: COL_WIDTHS.regime }}>Régimen</Text>
-          <Text style={{ ...s.reportTableHeaderCell, width: COL_WIDTHS.currency }}>Mon.</Text>
+          <Text style={{ ...s.reportTableHeaderCell, width: COL_WIDTHS.regime, textAlign: 'center' as const }}>Régimen</Text>
+          <Text style={{ ...s.reportTableHeaderCell, width: COL_WIDTHS.currency, textAlign: 'center' as const }}>Mon.</Text>
           <Text style={{ ...s.reportTableHeaderCell, width: COL_WIDTHS.base, textAlign: 'right' as const }}>Base</Text>
-          <Text style={{ ...s.reportTableHeaderCell, width: COL_WIDTHS.bonus, textAlign: 'right' as const }}>Bono OTD</Text>
-          <Text style={{ ...s.reportTableHeaderCell, width: COL_WIDTHS.bonus, textAlign: 'right' as const }}>Bono RpA</Text>
+          <Text style={{ ...s.reportTableHeaderCell, width: COL_WIDTHS.otd, textAlign: 'right' as const }}>OTD</Text>
+          <Text style={{ ...s.reportTableHeaderCell, width: COL_WIDTHS.rpa, textAlign: 'right' as const }}>RpA</Text>
           <Text style={{ ...s.reportTableHeaderCell, width: COL_WIDTHS.gross, textAlign: 'right' as const }}>Bruto</Text>
-          <Text style={{ ...s.reportTableHeaderCell, width: COL_WIDTHS.deductions, textAlign: 'right' as const }}>Descuentos</Text>
+          <Text style={{ ...s.reportTableHeaderCell, width: COL_WIDTHS.prevDeductions, textAlign: 'right' as const }}>Desc. previs.</Text>
+          <Text style={{ ...s.reportTableHeaderCell, width: COL_WIDTHS.siiRetention, textAlign: 'right' as const }}>Retención SII</Text>
           <Text style={{ ...s.reportTableHeaderCell, width: COL_WIDTHS.net, textAlign: 'right' as const }}>Neto</Text>
         </View>
 
-        {entries.map((entry, i) => (
-          <View key={entry.entryId} style={[s.reportTableRow, i % 2 === 1 ? s.reportTableRowAlt : {}]}>
-            <Text style={{ ...s.reportTableCell, width: COL_WIDTHS.name }}>{entry.memberName}</Text>
-            <Text style={{ ...s.reportTableCell, width: COL_WIDTHS.regime }}>{entry.payRegime === 'chile' ? 'CL' : 'INT'}</Text>
-            <Text style={{ ...s.reportTableCell, width: COL_WIDTHS.currency }}>{entry.currency}</Text>
-            <Text style={{ ...s.reportTableCellRight, width: COL_WIDTHS.base }}>{fmtCurrency(entry.adjustedBaseSalary ?? entry.baseSalary, entry.currency)}</Text>
-            <Text style={{ ...s.reportTableCellRight, width: COL_WIDTHS.bonus }}>{fmtCurrency(entry.bonusOtdAmount, entry.currency)}</Text>
-            <Text style={{ ...s.reportTableCellRight, width: COL_WIDTHS.bonus }}>{fmtCurrency(entry.bonusRpaAmount, entry.currency)}</Text>
-            <Text style={{ ...s.reportTableCellRight, width: COL_WIDTHS.gross }}>{fmtCurrency(entry.grossTotal, entry.currency)}</Text>
-            <Text style={{ ...s.reportTableCellRight, width: COL_WIDTHS.deductions }}>{fmtCurrency(entry.chileTotalDeductions, entry.currency)}</Text>
-            <Text style={{ ...s.reportTableCellRight, width: COL_WIDTHS.net }}>{fmtCurrency(entry.netTotal, entry.currency)}</Text>
-          </View>
-        ))}
+        {/* Per-regime sections (canonical order, omit groups with N=0) */}
+        {totalsByRegime.map(group => {
+          if (group.count === 0) return null
+          const isHonorarios = group.regime === 'honorarios'
+          const isChileDep = group.regime === 'chile_dependent'
+          const groupCurrency = REGIME_CURRENCY[group.regime]
+          const dimCell = { ...s.reportTableCellRight, color: TEXT_FAINT }
 
-        {chileEntries.length > 0 && (
-          <View style={s.reportTotalsRow}>
-            <Text style={{ ...s.reportTotalsCell, width: COL_WIDTHS.name, textAlign: 'left' as const }}>Total Chile</Text>
-            <Text style={{ ...s.reportTotalsCell, width: COL_WIDTHS.regime }}>{' '}</Text>
-            <Text style={{ ...s.reportTotalsCell, width: COL_WIDTHS.currency }}>CLP</Text>
-            <Text style={{ ...s.reportTotalsCell, width: COL_WIDTHS.base }}>{' '}</Text>
-            <Text style={{ ...s.reportTotalsCell, width: COL_WIDTHS.bonus }}>{' '}</Text>
-            <Text style={{ ...s.reportTotalsCell, width: COL_WIDTHS.bonus }}>{' '}</Text>
-            <Text style={{ ...s.reportTotalsCell, width: COL_WIDTHS.gross }}>{fmtCurrency(totalGrossClp, 'CLP')}</Text>
-            <Text style={{ ...s.reportTotalsCell, width: COL_WIDTHS.deductions }}>{fmtCurrency(totalDeductionsClp, 'CLP')}</Text>
-            <Text style={{ ...s.reportTotalsCell, width: COL_WIDTHS.net }}>{fmtCurrency(totalNetClp, 'CLP')}</Text>
-          </View>
-        )}
+          return (
+            <Fragment key={group.regime}>
+              {/* Group divider row */}
+              <View style={{ flexDirection: 'row', backgroundColor: '#d6e0eb', paddingVertical: 6, paddingHorizontal: 6 }}>
+                <Text style={{ width: '100%', fontSize: 8, fontFamily: 'Helvetica-Bold', color: BRAND_BLUE, letterSpacing: 1, textTransform: 'uppercase' as const }}>
+                  {`${REGIME_GROUP_LABELS[group.regime]} · ${group.count} colaboradores`}
+                </Text>
+              </View>
 
-        {intlEntries.length > 0 && (
-          <View style={s.reportTotalsRow}>
-            <Text style={{ ...s.reportTotalsCell, width: COL_WIDTHS.name, textAlign: 'left' as const }}>Total Internacional</Text>
-            <Text style={{ ...s.reportTotalsCell, width: COL_WIDTHS.regime }}>{' '}</Text>
-            <Text style={{ ...s.reportTotalsCell, width: COL_WIDTHS.currency }}>USD</Text>
-            <Text style={{ ...s.reportTotalsCell, width: COL_WIDTHS.base }}>{' '}</Text>
-            <Text style={{ ...s.reportTotalsCell, width: COL_WIDTHS.bonus }}>{' '}</Text>
-            <Text style={{ ...s.reportTotalsCell, width: COL_WIDTHS.bonus }}>{' '}</Text>
-            <Text style={{ ...s.reportTotalsCell, width: COL_WIDTHS.gross }}>{fmtCurrency(totalGrossUsd, 'USD')}</Text>
-            <Text style={{ ...s.reportTotalsCell, width: COL_WIDTHS.deductions }}>{' '}</Text>
-            <Text style={{ ...s.reportTotalsCell, width: COL_WIDTHS.net }}>{fmtCurrency(totalNetUsd, 'USD')}</Text>
-          </View>
-        )}
+              {/* Entry rows */}
+              {group.entries.map((entry, i) => {
+                const excluded = isExcludedEntry(entry)
+                const dim = excluded ? { color: TEXT_FAINT } : {}
+
+                return (
+                  <View key={entry.entryId} style={[s.reportTableRow, i % 2 === 1 ? s.reportTableRowAlt : {}]}>
+                    <Text style={{ ...s.reportTableCell, width: COL_WIDTHS.name, ...dim }}>
+                      {entry.memberName}{excluded ? ' (excluido)' : ''}
+                    </Text>
+                    <Text style={{ ...s.reportTableCell, width: COL_WIDTHS.regime, textAlign: 'center' as const }}>
+                      {RECEIPT_REGIME_BADGES[group.regime].code}
+                    </Text>
+                    <Text style={{ ...s.reportTableCell, width: COL_WIDTHS.currency, textAlign: 'center' as const }}>
+                      {entry.currency}
+                    </Text>
+                    <Text style={{ ...s.reportTableCellRight, width: COL_WIDTHS.base, ...dim }}>
+                      {excluded ? '—' : fmtCurrency(entry.adjustedBaseSalary ?? entry.baseSalary, entry.currency)}
+                    </Text>
+                    <Text style={{ ...s.reportTableCellRight, width: COL_WIDTHS.otd, ...dim }}>
+                      {excluded ? '—' : fmtCurrency(entry.bonusOtdAmount, entry.currency)}
+                    </Text>
+                    <Text style={{ ...s.reportTableCellRight, width: COL_WIDTHS.rpa, ...dim }}>
+                      {excluded ? '—' : fmtCurrency(entry.bonusRpaAmount, entry.currency)}
+                    </Text>
+                    <Text style={{ ...s.reportTableCellRight, width: COL_WIDTHS.gross }}>
+                      {fmtCurrency(entry.grossTotal, entry.currency)}
+                    </Text>
+                    <Text style={{ ...s.reportTableCellRight, width: COL_WIDTHS.prevDeductions, ...(isChileDep && !excluded ? {} : { color: TEXT_FAINT }) }}>
+                      {isChileDep && !excluded
+                        ? fmtCurrency(entry.chileTotalDeductions, entry.currency)
+                        : '—'}
+                    </Text>
+                    <Text style={{ ...s.reportTableCellRight, width: COL_WIDTHS.siiRetention, ...(isHonorarios && !excluded ? {} : { color: TEXT_FAINT }) }}>
+                      {isHonorarios && !excluded
+                        ? fmtCurrency(entry.siiRetentionAmount ?? null, entry.currency)
+                        : '—'}
+                    </Text>
+                    <Text style={{ ...s.reportTableCellRight, width: COL_WIDTHS.net }}>
+                      {fmtCurrency(entry.netTotal, entry.currency)}
+                    </Text>
+                  </View>
+                )
+              })}
+
+              {/* Per-regime subtotal row */}
+              <View style={s.reportTotalsRow}>
+                <Text style={{ ...s.reportTotalsCell, width: COL_WIDTHS.name, textAlign: 'left' as const, paddingLeft: 6 }}>
+                  {`Total ${REGIME_GROUP_LABELS[group.regime]}`}
+                </Text>
+                <Text style={{ ...s.reportTotalsCell, width: COL_WIDTHS.regime }}>{' '}</Text>
+                <Text style={{ ...s.reportTotalsCell, width: COL_WIDTHS.currency, textAlign: 'center' as const }}>{groupCurrency}</Text>
+                <Text style={{ ...s.reportTotalsCell, width: COL_WIDTHS.base }}>{' '}</Text>
+                <Text style={{ ...s.reportTotalsCell, width: COL_WIDTHS.otd }}>{' '}</Text>
+                <Text style={{ ...s.reportTotalsCell, width: COL_WIDTHS.rpa }}>{' '}</Text>
+                <Text style={{ ...s.reportTotalsCell, width: COL_WIDTHS.gross }}>{fmtCurrency(group.totalGross, groupCurrency)}</Text>
+                <Text style={{ ...s.reportTotalsCell, width: COL_WIDTHS.prevDeductions, ...(isChileDep ? {} : dimCell) }}>
+                  {isChileDep ? fmtCurrency(group.totalPrevDeductions, groupCurrency) : '—'}
+                </Text>
+                <Text style={{ ...s.reportTotalsCell, width: COL_WIDTHS.siiRetention, ...(isHonorarios ? {} : dimCell) }}>
+                  {isHonorarios ? fmtCurrency(group.totalSiiRetention, groupCurrency) : '—'}
+                </Text>
+                <Text style={{ ...s.reportTotalsCell, width: COL_WIDTHS.net }}>{fmtCurrency(group.totalNet, groupCurrency)}</Text>
+              </View>
+            </Fragment>
+          )
+        })}
 
         <PdfFooter operatingEntity={operatingEntity} monthName={monthName} year={period.year} generatedAt={generatedAt} />
       </Page>
