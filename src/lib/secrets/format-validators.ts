@@ -88,8 +88,12 @@ const FORMAT_RULES: Record<string, FormatRule> = {
   GOOGLE_CLIENT_ID: {
     minLen: 30,
     maxLen: 200,
-    shape: /^[0-9]+-[A-Za-z0-9_]+\.apps\.googleusercontent\.com$/u,
-    description: 'Google OAuth client_id (ends with .apps.googleusercontent.com)'
+    // Google Auth Platform supports both the legacy OAuth client id shape
+    // (`*.apps.googleusercontent.com`) and IAM OAuth clients whose clientId is
+    // an opaque UUID-like identifier (for example `greenhouse-portal` in GCP).
+    shape:
+      /^(?:[0-9]+-[A-Za-z0-9_]+\.apps\.googleusercontent\.com|[a-z0-9][a-z0-9-]{28,198}[a-z0-9])$/u,
+    description: 'Google OAuth client_id (legacy Google client id or Google Auth Platform IAM client id)'
   },
   // NEXTAUTH_URL: HTTPS canonical URL con host válido y sin trailing slash.
   NEXTAUTH_URL: {

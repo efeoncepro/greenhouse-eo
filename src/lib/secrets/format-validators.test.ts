@@ -117,6 +117,12 @@ describe('validateSecretFormat', () => {
       expect(r.ok).toBe(true)
     })
 
+    it('accepts Google Auth Platform IAM OAuth client id shape', () => {
+      const r = validateSecretFormat('GOOGLE_CLIENT_ID', 'a1fcb039b-cb54-41a3-8988-3acad9901c96')
+
+      expect(r.ok).toBe(true)
+    })
+
     it('rejects malformed Google client_id', () => {
       const r = validateSecretFormat('GOOGLE_CLIENT_ID', '123456789012-something.invalid.com')
 

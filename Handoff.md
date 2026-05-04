@@ -1,5 +1,13 @@
 # Handoff.md
 
+## Sesion 2026-05-03 — Hotfix Google SSO readiness en Production/Staging
+
+- **Trigger:** tras promover `develop` a `main`, `/api/auth/health` en Production quedo `overallStatus=degraded` por `GOOGLE_CLIENT_ID: wrong_shape`.
+- **Causa raíz:** no era un env inventado. `gcloud iam oauth-clients list --project=efeonce-group --location=global` confirma OAuth client `greenhouse-portal` `ACTIVE`, `clientId` opaque UUID-like y redirect URIs correctas para `greenhouse.efeoncepro.com`, `dev-greenhouse.efeoncepro.com`, `pre-greenhouse.efeoncepro.com`, branch legacy `feature/google-sso` y localhost. El validator heredado solo aceptaba el formato legacy `*.apps.googleusercontent.com`.
+- **Fix aplicado:** `src/lib/secrets/format-validators.ts` acepta ambos formatos canónicos de Google OAuth client id: legacy Google OAuth y Google Auth Platform/IAM OAuth clients.
+- **Validacion local:** `pnpm exec vitest run src/lib/secrets/format-validators.test.ts src/lib/auth/readiness.test.ts` OK; `pnpm exec tsc --noEmit --pretty false` OK.
+- **Pendiente operativo:** post-deploy verificar `/api/auth/health` en Production y Staging/develop; debería quedar Google `ready`.
+
 ## Sesion 2026-05-03 — TASK-777 completada end-to-end
 
 - **Branch:** `task/TASK-777-canonical-expense-distribution`.
