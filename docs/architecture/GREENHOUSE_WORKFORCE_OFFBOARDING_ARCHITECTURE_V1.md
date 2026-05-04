@@ -28,12 +28,25 @@ Contrato arquitectonico nuevo desde 2026-04-25.
 
 Estado actual del repo:
 
-- existe soporte parcial de `offboarding` como dominio de approval workflow
+- existe soporte de `offboarding` como dominio de approval workflow
+- existe el agregado canonico `greenhouse_hr.work_relationship_offboarding_cases`
+- existe el aggregate Payroll `greenhouse_payroll.final_settlements`
+- existe el aggregate documental `greenhouse_payroll.final_settlement_documents`
 - existe offboarding legacy como checklist/template dentro de HRIS
 - existe desactivacion de usuarios via Admin Center y SCIM
-- no existe todavia un agregado canonico que orqueste salida laboral, acceso, payroll y limpieza operativa end-to-end
+- no existe todavia orquestacion end-to-end automatica de acceso, assets, handoffs y pago
 
 Este documento fija la direccion canonica para cerrar ese gap.
+
+## Delta 2026-05-04 — TASK-762
+
+El caso de offboarding `internal_payroll` ya puede conectar con documento formal de finiquito:
+
+- `TASK-760` abre y gobierna el caso.
+- `TASK-761` calcula/aprueba el settlement final.
+- `TASK-762` renderiza, revisa, aprueba, emite y registra firma/ratificacion del documento formal.
+
+La surface visible sigue siendo `/hr/offboarding` / `equipo.offboarding`. El documento no ejecuta acceso, no cierra el caso por si mismo y no crea pagos.
 
 ## Core Thesis
 

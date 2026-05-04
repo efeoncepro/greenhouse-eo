@@ -2,6 +2,13 @@
 
 ## 2026-05-04
 
+- **TASK-762 implementada — Finiquito Document Generation + Approval Flow.** Greenhouse convierte un settlement final aprobado en documento formal versionado y trazable.
+  - **Schema/runtime:** nuevas tablas `greenhouse_payroll.final_settlement_documents` y `greenhouse_payroll.final_settlement_document_events`, con snapshot/hash inmutable, asset privado, approval snapshot, estados de emision/firma/rechazo/anulacion/supersession y audit trail append-only.
+  - **Documento/PDF:** renderer server-side `@react-pdf/renderer`, `snapshot_hash` SHA-256 canonico y `content_hash` del PDF; assets privados con owner aggregate `final_settlement_document`.
+  - **Workflow:** rutas bajo `/api/hr/offboarding/cases/[caseId]/final-settlement/document/**` para renderizar, enviar a revision, aprobar, emitir, anular, rechazar y registrar firma/ratificacion externa.
+  - **Access model:** capability nueva `hr.final_settlement_document` (`read/create/update/approve/manage`) mapeada a `equipo.offboarding`; routeGroups/startup policy sin cambios.
+  - **Frontera:** no crea payment orders, no marca pagos ejecutados, no ejecuta offboarding/acceso y no muta el settlement calculado a `issued` en V1.
+
 - **TASK-761 implementada — Payroll Final Settlement / Finiquito Engine Chile V1.** Greenhouse agrega un aggregate canonico de finiquito separado de la nomina mensual para renuncia de trabajador dependiente Chile.
   - **Schema/runtime:** nuevas tablas `greenhouse_payroll.final_settlements` y `greenhouse_payroll.final_settlement_events`, ligadas obligatoriamente a `greenhouse_hr.work_relationship_offboarding_cases`, con versionamiento, snapshots JSONB, readiness persistida y audit trail append-only.
   - **Engine V1:** `src/lib/payroll/final-settlement/**` calcula `pending_salary`, `pending_fixed_allowances`, `proportional_vacation` y `statutory_deductions` desde caso aprobado/agendado, compensacion vigente, saldo de vacaciones y overlap de nomina mensual.

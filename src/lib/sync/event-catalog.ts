@@ -51,6 +51,7 @@ export const AGGREGATE_TYPES = {
   projectedPayroll: 'projected_payroll',
   payrollPrevisionalSnapshot: 'payroll_previsional_snapshot',
   payrollFinalSettlement: 'payroll_final_settlement',
+  payrollFinalSettlementDocument: 'payroll_final_settlement_document',
 
   // AI Tools
   aiTool: 'ai_tool',
@@ -238,6 +239,16 @@ export const EVENT_TYPES = {
   payrollFinalSettlementCalculated: 'payroll.final_settlement.calculated',
   payrollFinalSettlementApproved: 'payroll.final_settlement.approved',
   payrollFinalSettlementCancelled: 'payroll.final_settlement.cancelled',
+
+  // Payroll Final Settlement Documents (TASK-762)
+  hrFinalSettlementDocumentRendered: 'hr.final_settlement_document.rendered',
+  hrFinalSettlementDocumentSubmittedForReview: 'hr.final_settlement_document.submitted_for_review',
+  hrFinalSettlementDocumentApproved: 'hr.final_settlement_document.approved',
+  hrFinalSettlementDocumentIssued: 'hr.final_settlement_document.issued',
+  hrFinalSettlementDocumentRejected: 'hr.final_settlement_document.rejected',
+  hrFinalSettlementDocumentVoided: 'hr.final_settlement_document.voided',
+  hrFinalSettlementDocumentSuperseded: 'hr.final_settlement_document.superseded',
+  hrFinalSettlementDocumentSignedOrRatified: 'hr.final_settlement_document.signed_or_ratified',
 
   // Identity
   reconciliationProposed: 'identity.reconciliation.proposed',

@@ -66,6 +66,16 @@ Los blockers impiden calcular o aprobar. Los warnings quedan como evidencia para
 
 Un settlement aprobado no se modifica silenciosamente. Si hay que recalcular, V1 exige cancelar y reemitir una version nueva.
 
+## Documento formal
+
+Desde TASK-762, el settlement aprobado habilita el documento formal de finiquito:
+
+- El documento vive en `greenhouse_payroll.final_settlement_documents`.
+- El PDF queda como asset privado en `greenhouse_core.assets`.
+- El documento guarda `snapshot_json`, `snapshot_hash` y `content_hash`; no se recalcula desde datos vivos despues de renderizar.
+- La aprobacion del documento usa `workflow_approval_snapshots` y es distinta de la aprobacion del calculo.
+- La emision deja el documento pendiente de firma/ratificacion externa. Greenhouse registra evidencia, reserva de derechos, rechazo, anulacion o reemision, pero no reemplaza al proceso externo.
+
 ## Fronteras
 
-Este motor no crea payment orders, no marca pagos como ejecutados y no emite el documento formal. TASK-762 consume el settlement aprobado para generar el documento de finiquito.
+El flujo de finiquito no crea payment orders, no marca pagos como ejecutados y no ejecuta offboarding/acceso. La emision documental tampoco cambia por si sola el estado del settlement calculado.

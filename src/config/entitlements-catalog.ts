@@ -118,6 +118,15 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     defaultScope: 'tenant'
   },
   {
+    // TASK-762 — documento formal de finiquito.
+    // create=render/reemitir; update=enviar a revision / registrar firma;
+    // approve=aprobacion documental; manage=emitir/anular.
+    key: 'hr.final_settlement_document',
+    module: 'hr',
+    actions: ['read', 'create', 'update', 'approve', 'manage'] as const,
+    defaultScope: 'tenant'
+  },
+  {
     // TASK-745 — crear / revertir adjustments de payroll por entry
     key: 'hr.payroll_adjustments',
     module: 'hr',

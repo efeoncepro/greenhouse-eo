@@ -16,6 +16,7 @@ El motor de finiquitos calcula y guarda el cierre final de una renuncia Chile de
 
 - Necesitas acceso a `equipo.offboarding`.
 - Necesitas capability `hr.final_settlement`.
+- Para documento formal necesitas capability `hr.final_settlement_document`.
 - El caso de offboarding debe estar `approved` o `scheduled`.
 - El colaborador debe ser Chile dependiente con payroll interno.
 - Debe existir compensacion vigente y saldo de vacaciones conciliado.
@@ -29,7 +30,11 @@ El motor de finiquitos calcula y guarda el cierre final de una renuncia Chile de
 4. Revisa el breakdown de haberes, vacaciones, descuentos y neto.
 5. Revisa readiness: blockers detienen el flujo; warnings requieren criterio HR/legal.
 6. Si esta correcto, aprueba el settlement.
-7. Usa el settlement aprobado como input para la documentacion formal cuando TASK-762 este disponible.
+7. En el carril `Finiquito`, renderiza el documento.
+8. Envia el documento a revision.
+9. Aprueba el documento.
+10. Emite el documento y descarga el PDF privado.
+11. Cuando exista evidencia externa, registra firma/ratificacion. Si la persona firma con reserva de derechos, marca la reserva y deja nota.
 
 ## Estados
 
@@ -42,6 +47,19 @@ El motor de finiquitos calcula y guarda el cierre final de una renuncia Chile de
 | `issued` | Reservado para documento formal emitido. |
 | `cancelled` | Cancelado; permite recalcular una nueva version. |
 
+## Estados del documento
+
+| Estado | Significado |
+| --- | --- |
+| `rendered` | PDF generado desde settlement aprobado y snapshot inmutable. |
+| `in_review` | Documento enviado a revision HR. |
+| `approved` | Aprobacion documental lista para emision. |
+| `issued` | Documento emitido; queda pendiente de firma/ratificacion externa. |
+| `signed_or_ratified` | Evidencia o referencia externa registrada. |
+| `rejected` | Rechazado por trabajador/a. |
+| `voided` | Anulado con razon auditable. |
+| `superseded` | Reemplazado por una nueva version. |
+
 ## Que no hacer
 
 - No uses nomina mensual como sustituto del finiquito.
@@ -49,6 +67,8 @@ El motor de finiquitos calcula y guarda el cierre final de una renuncia Chile de
 - No apruebes si hay blockers de regimen, compensacion o vacaciones.
 - No uses descuentos manuales sin `source_ref`.
 - No trates honorarios, Deel/EOR o internacionales como Chile dependiente.
+- No marques `signed_or_ratified` sin evidencia o referencia externa.
+- No uses el PDF como prueba de pago: el flujo documental no crea ni ejecuta pagos.
 
 ## Problemas comunes
 
@@ -68,5 +88,8 @@ Cancela el settlement con razon auditable y vuelve a calcular. No se sobrescribe
 
 - `greenhouse_payroll.final_settlements`
 - `greenhouse_payroll.final_settlement_events`
+- `greenhouse_payroll.final_settlement_documents`
+- `greenhouse_payroll.final_settlement_document_events`
 - `src/lib/payroll/final-settlement/**`
 - `/api/hr/offboarding/cases/[caseId]/final-settlement`
+- `/api/hr/offboarding/cases/[caseId]/final-settlement/document`

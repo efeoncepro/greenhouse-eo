@@ -27,7 +27,7 @@ La vista `Offboarding` permite abrir y operar casos de salida laboral o contract
 5. Agrega notas si hay contexto operativo o legal relevante.
 6. Haz clic en `Crear`.
 
-El caso queda con lane resuelta automaticamente. Si corresponde a payroll interno Chile, Greenhouse marca que requiere cierre de payroll y reconciliacion de leave, pero no calcula finiquito en esta etapa.
+El caso queda con lane resuelta automaticamente. Si corresponde a payroll interno Chile, Greenhouse marca que requiere cierre de payroll y reconciliacion de leave. Desde ese caso puedes calcular el finiquito, aprobar el settlement y avanzar el documento formal en el carril `Finiquito`.
 
 ## Revisar contratos proximos o vencidos
 

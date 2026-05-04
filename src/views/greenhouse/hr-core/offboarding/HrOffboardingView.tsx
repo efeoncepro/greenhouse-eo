@@ -31,6 +31,7 @@ import CustomChip from '@core/components/mui/Chip'
 
 import type { HrMemberOption } from '@/types/hr-core'
 import type { OffboardingCase, OffboardingCaseStatus, OffboardingSeparationType } from '@/lib/workforce/offboarding'
+import type { FinalSettlementDocument } from '@/lib/payroll/final-settlement/document-types'
 import { formatDate } from '@views/greenhouse/hr-core/helpers'
 
 type CasesResponse = {
@@ -45,6 +46,10 @@ type ContractExpiryScanResponse = {
   opened: OffboardingCase[]
   scanned: number
   skipped: Array<{ memberId: string; reason: string }>
+}
+
+type FinalSettlementDocumentResponse = {
+  document: FinalSettlementDocument | null
 }
 
 const statusColor: Record<string, 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'info'> = {
@@ -76,6 +81,32 @@ const laneLabel: Record<string, string> = {
   unknown: 'Por revisar'
 }
 
+const documentStatusColor: Record<string, 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'info'> = {
+  draft: 'secondary',
+  rendered: 'info',
+  in_review: 'warning',
+  approved: 'primary',
+  issued: 'success',
+  signed_or_ratified: 'success',
+  rejected: 'error',
+  voided: 'default',
+  superseded: 'default',
+  cancelled: 'default'
+}
+
+const documentStatusLabel: Record<string, string> = {
+  draft: 'Borrador',
+  rendered: 'Renderizado',
+  in_review: 'En revisión',
+  approved: 'Aprobado',
+  issued: 'Emitido',
+  signed_or_ratified: 'Firmado/ratificado',
+  rejected: 'Rechazado',
+  voided: 'Anulado',
+  superseded: 'Reemitido',
+  cancelled: 'Cancelado'
+}
+
 const nextStatusFor = (status: OffboardingCaseStatus): OffboardingCaseStatus | null => {
   if (status === 'draft' || status === 'needs_review') return 'approved'
   if (status === 'approved') return 'scheduled'
@@ -101,6 +132,7 @@ const HrOffboardingView = () => {
   const [members, setMembers] = useState<HrMemberOption[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [documentSavingCaseId, setDocumentSavingCaseId] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [memberId, setMemberId] = useState(initialMemberId)
   const [separationType, setSeparationType] = useState<OffboardingSeparationType>('resignation')
@@ -108,6 +140,7 @@ const HrOffboardingView = () => {
   const [lastWorkingDay, setLastWorkingDay] = useState(today())
   const [notes, setNotes] = useState('')
   const [scanMessage, setScanMessage] = useState<string | null>(null)
+  const [documentsByCaseId, setDocumentsByCaseId] = useState<Record<string, FinalSettlementDocument | null>>({})
 
   const activeCases = useMemo(
     () => cases.filter(item => item.status !== 'executed' && item.status !== 'cancelled'),
@@ -130,7 +163,22 @@ const HrOffboardingView = () => {
       const casesPayload = await casesRes.json() as CasesResponse
       const membersPayload = await membersRes.json() as MembersResponse
 
+      const documentPairs = await Promise.all(
+        casesPayload.cases.map(async item => {
+          const documentRes = await fetch(`/api/hr/offboarding/cases/${item.offboardingCaseId}/final-settlement/document`)
+
+          if (!documentRes.ok) {
+            return [item.offboardingCaseId, null] as const
+          }
+
+          const documentPayload = await documentRes.json() as FinalSettlementDocumentResponse
+
+          return [item.offboardingCaseId, documentPayload.document] as const
+        })
+      )
+
       setCases(casesPayload.cases)
+      setDocumentsByCaseId(Object.fromEntries(documentPairs))
       setMembers(membersPayload.members)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error cargando offboarding.')
@@ -240,6 +288,57 @@ const HrOffboardingView = () => {
     } finally {
       setSaving(false)
     }
+  }
+
+  const runDocumentAction = async (
+    item: OffboardingCase,
+    action: 'render' | 'submit-review' | 'approve' | 'issue' | 'sign-or-ratify'
+  ) => {
+    setDocumentSavingCaseId(item.offboardingCaseId)
+    setError(null)
+    setScanMessage(null)
+
+    try {
+      const endpoint = action === 'render'
+        ? `/api/hr/offboarding/cases/${item.offboardingCaseId}/final-settlement/document`
+        : `/api/hr/offboarding/cases/${item.offboardingCaseId}/final-settlement/document/${action}`
+
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(action === 'sign-or-ratify'
+          ? {
+            signatureEvidenceRef: {
+              source: 'external_process_placeholder',
+              recordedFrom: 'offboarding_surface',
+              recordedAt: new Date().toISOString()
+            }
+          }
+          : {})
+      })
+
+      if (!res.ok) {
+        const payload = await res.json().catch(() => ({}))
+
+        throw new Error(payload.error || 'No se pudo actualizar el documento de finiquito.')
+      }
+
+      await loadData()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error operando documento de finiquito.')
+    } finally {
+      setDocumentSavingCaseId(null)
+    }
+  }
+
+  const documentActionFor = (document: FinalSettlementDocument | null) => {
+    if (!document) return { action: 'render' as const, label: 'Renderizar' }
+    if (document.documentStatus === 'rendered') return { action: 'submit-review' as const, label: 'Enviar a revisión' }
+    if (document.documentStatus === 'in_review') return { action: 'approve' as const, label: 'Aprobar doc.' }
+    if (document.documentStatus === 'approved') return { action: 'issue' as const, label: 'Emitir' }
+    if (document.documentStatus === 'issued') return { action: 'sign-or-ratify' as const, label: 'Registrar ratificación' }
+
+    return null
   }
 
   if (loading) {
@@ -365,43 +464,85 @@ const HrOffboardingView = () => {
                 <TableCell>Lane</TableCell>
                 <TableCell>Salida efectiva</TableCell>
                 <TableCell>Último día</TableCell>
+                <TableCell>Finiquito</TableCell>
                 <TableCell align='right'>Acción</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {activeCases.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7}>
+                  <TableCell colSpan={8}>
                     <Typography variant='body2' color='text.secondary' sx={{ py: 4, textAlign: 'center' }}>
                       No hay casos activos de offboarding.
                     </Typography>
                   </TableCell>
                 </TableRow>
               ) : activeCases.map(item => (
-                <TableRow key={item.offboardingCaseId} hover>
-                  <TableCell>
-                    <Stack spacing={0.5}>
-                      <Typography variant='body2' fontWeight={600}>{item.publicId}</Typography>
-                      <Typography variant='caption' color='text.secondary'>{item.separationType}</Typography>
-                    </Stack>
-                  </TableCell>
-                  <TableCell>{members.find(member => member.memberId === item.memberId)?.displayName ?? item.memberId}</TableCell>
-                  <TableCell>
-                    <CustomChip round='true' size='small' color={statusColor[item.status] ?? 'default'} label={statusLabel[item.status] ?? item.status} />
-                  </TableCell>
-                  <TableCell>{laneLabel[item.ruleLane] ?? item.ruleLane}</TableCell>
-                  <TableCell>{formatDate(item.effectiveDate)}</TableCell>
-                  <TableCell>{formatDate(item.lastWorkingDay)}</TableCell>
-                  <TableCell align='right'>
-                    {nextStatusFor(item.status) ? (
-                      <Button size='small' variant='tonal' disabled={saving} onClick={() => transitionCase(item)}>
-                        {nextLabelFor(item.status)}
-                      </Button>
-                    ) : (
-                      <Typography variant='caption' color='text.secondary'>Sin acción</Typography>
-                    )}
-                  </TableCell>
-                </TableRow>
+                (() => {
+                  const document = documentsByCaseId[item.offboardingCaseId] ?? null
+                  const documentAction = documentActionFor(document)
+                  const documentBusy = documentSavingCaseId === item.offboardingCaseId
+                  const downloadUrl = document?.pdfAssetId ? `/api/assets/private/${encodeURIComponent(document.pdfAssetId)}` : null
+
+                  return (
+                    <TableRow key={item.offboardingCaseId} hover>
+                      <TableCell>
+                        <Stack spacing={0.5}>
+                          <Typography variant='body2' fontWeight={600}>{item.publicId}</Typography>
+                          <Typography variant='caption' color='text.secondary'>{item.separationType}</Typography>
+                        </Stack>
+                      </TableCell>
+                      <TableCell>{members.find(member => member.memberId === item.memberId)?.displayName ?? item.memberId}</TableCell>
+                      <TableCell>
+                        <CustomChip round='true' size='small' color={statusColor[item.status] ?? 'default'} label={statusLabel[item.status] ?? item.status} />
+                      </TableCell>
+                      <TableCell>{laneLabel[item.ruleLane] ?? item.ruleLane}</TableCell>
+                      <TableCell>{formatDate(item.effectiveDate)}</TableCell>
+                      <TableCell>{formatDate(item.lastWorkingDay)}</TableCell>
+                      <TableCell>
+                        <Stack spacing={1.5} alignItems='flex-start'>
+                          <CustomChip
+                            round='true'
+                            size='small'
+                            color={documentStatusColor[document?.documentStatus ?? 'draft'] ?? 'default'}
+                            label={document ? documentStatusLabel[document.documentStatus] ?? document.documentStatus : 'Sin documento'}
+                          />
+                          {document?.readiness.status === 'needs_review' && (
+                            <Typography variant='caption' color='warning.main'>
+                              Revisar entidad legal antes de emitir.
+                            </Typography>
+                          )}
+                          <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
+                            {documentAction && (
+                              <Button
+                                size='small'
+                                variant='tonal'
+                                disabled={documentBusy || saving}
+                                onClick={() => runDocumentAction(item, documentAction.action)}
+                              >
+                                {documentBusy ? 'Procesando' : documentAction.label}
+                              </Button>
+                            )}
+                            {downloadUrl && (
+                              <Button size='small' variant='text' href={downloadUrl} target='_blank' rel='noreferrer'>
+                                PDF
+                              </Button>
+                            )}
+                          </Stack>
+                        </Stack>
+                      </TableCell>
+                      <TableCell align='right'>
+                        {nextStatusFor(item.status) ? (
+                          <Button size='small' variant='tonal' disabled={saving} onClick={() => transitionCase(item)}>
+                            {nextLabelFor(item.status)}
+                          </Button>
+                        ) : (
+                          <Typography variant='caption' color='text.secondary'>Sin acción</Typography>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  )
+                })()
               ))}
             </TableBody>
           </Table>

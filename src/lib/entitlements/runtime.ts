@@ -243,6 +243,14 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
         scope: 'tenant',
         source
       })
+
+      addEntitlement(entries, {
+        module: 'hr',
+        capability: 'hr.final_settlement_document',
+        action,
+        scope: 'tenant',
+        source
+      })
     }
   }
 

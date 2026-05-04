@@ -1,5 +1,17 @@
 # Handoff.md
 
+## Sesion 2026-05-04 — TASK-762 Finiquito Document Generation + Approval Flow — completada
+
+- **Branch:** `develop` por instruccion explicita del usuario; no se creo ni cambio a `task/TASK-762-finiquito-document-generation-approval-flow`.
+- **Lifecycle:** `complete`; task movida `to-do` → `in-progress` → `complete`; `docs/tasks/README.md` y `TASK_ID_REGISTRY` sincronizados.
+- **Skills:** `greenhouse-payroll-auditor` invocada por requerimiento del usuario; `greenhouse-agent` cargada para rutas/API/surface Greenhouse; `greenhouse-ux-content-accessibility` usado para copy visible en offboarding.
+- **Discovery inicial:** no hay PR ni branch activa para TASK-762; Handoff solo marcaba TASK-761 como frontera documental futura. `pnpm pg:doctor` OK con drift operativo ya conocido: runtime conserva `CREATE` en `greenhouse_payroll` y `greenhouse_serving`, no usar como contrato aprobado.
+- **Slices entregados:** migracion `greenhouse_payroll.final_settlement_documents` + `final_settlement_document_events`; dominio `src/lib/payroll/final-settlement/document-*` con snapshot/hash/PDF/store; assets privados `final_settlement_document`; APIs `GET/POST /document`, `POST /submit-review|approve|issue|void|reject-worker|sign-or-ratify`; eventos outbox `hr.final_settlement_document.*`; capability `hr.final_settlement_document`; UI en `/hr/offboarding`.
+- **Runtime:** `pnpm pg:connect:migrate` aplicado contra Cloud SQL `greenhouse_app`; `src/types/db.d.ts` regenerado.
+- **Decisiones:** aggregate documental vive en `greenhouse_payroll` como hijo del settlement; `workflow_approval_snapshots` se reutiliza para aprobacion `offboarding/hr_review`; firma electronica full queda fuera, se registra evidencia/ref externa; `final_settlements.calculation_status` no se muta a `issued` en V1 para mantener separada la aprobacion de calculo.
+- **Frontera:** documento/workflow desde `final_settlements` aprobado sin recalcular, sin payment orders, sin marcar pago y sin ejecutar offboarding/acceso.
+- **Verificacion:** `pnpm pg:connect:migrate` OK; `pnpm pg:doctor` OK; `pnpm tsc --noEmit --pretty false` OK; `pnpm lint` exit 0 con 316 warnings legacy TASK-265; `pnpm test` 559 files / 3211 passed / 5 skipped OK; `pnpm build` OK.
+
 ## Sesion 2026-05-04 — TASK-761 Payroll Final Settlement / Finiquito Engine Chile — completada
 
 - **Branch:** `develop` por instruccion explicita del usuario; no se creo ni cambio a `task/TASK-761-payroll-final-settlement-finiquito-engine-chile`.

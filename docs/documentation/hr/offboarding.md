@@ -56,9 +56,9 @@ Greenhouse resuelve una lane para orientar los pasos posteriores:
 
 ## Frontera con Payroll
 
-TASK-760 crea el caso y la lane. TASK-761 agrega el aggregate de finiquito para la lane `internal_payroll`, pero mantiene la frontera: el finiquito no crea payment orders ni emite el documento formal de termino.
+TASK-760 crea el caso y la lane. TASK-761 agrega el aggregate de finiquito para la lane `internal_payroll`. TASK-762 agrega el documento formal desde el settlement aprobado, con aprobacion documental independiente, asset privado y estados de emision/firma/ratificacion.
 
-El motor de finiquito consume un caso aprobado o agendado con `effective_date`, `last_working_day`, causal y snapshot contractual. No calcula desde `member.active` ni desde `contractEndDate` directo.
+El motor de finiquito consume un caso aprobado o agendado con `effective_date`, `last_working_day`, causal y snapshot contractual. No calcula desde `member.active` ni desde `contractEndDate` directo. El documento formal consume el settlement aprobado; no recalcula montos desde datos vivos.
 
 Para V1 solo se soporta renuncia de trabajador dependiente Chile con payroll interno. Honorarios, Deel/EOR, contractors e internacional quedan bloqueados como regimenes no soportados por el engine interno.
 
@@ -67,6 +67,7 @@ Para V1 solo se soporta renuncia de trabajador dependiente Chile con payroll int
 - Surface visible: view `equipo.offboarding` en `/hr/offboarding`.
 - Autorizacion fina: capability `hr.offboarding_case` con acciones `read`, `create`, `update`, `approve`, `manage`.
 - Finiquito: capability `hr.final_settlement` con acciones `read`, `create`, `update`, `approve`, `manage`.
+- Documento de finiquito: capability `hr.final_settlement_document` con acciones `read`, `create`, `update`, `approve`, `manage`.
 - Route groups reutilizados: `hr` y `people`.
 - Startup policy: sin cambios.
 

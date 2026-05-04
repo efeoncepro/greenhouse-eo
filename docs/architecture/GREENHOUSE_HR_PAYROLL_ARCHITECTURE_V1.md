@@ -1,5 +1,28 @@
 # GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md
 
+## Delta 2026-05-04 — TASK-762: Documento Formal de Finiquito
+
+Payroll agrega el aggregate documental que convierte un `final_settlement` aprobado en artefacto formal versionado:
+
+- `greenhouse_payroll.final_settlement_documents`
+- `greenhouse_payroll.final_settlement_document_events`
+- `src/lib/payroll/final-settlement/document-*`
+
+Reglas canonicas:
+
+- El documento nace solo desde `greenhouse_payroll.final_settlements.calculation_status='approved'`; no acepta montos libres ni recalcula desde datos vivos.
+- `snapshot_json` congela settlement, colaborador, entidad legal, breakdown, readiness y metadata legal/template. `snapshot_hash` es SHA-256 canonico y las transiciones de aprobacion/emision fallan si no coincide.
+- `content_hash` preserva el SHA-256 del PDF renderizado. El PDF se guarda como asset privado en `greenhouse_core.assets` con owner aggregate `final_settlement_document`.
+- La aprobacion documental es separada de la aprobacion del calculo: usa `greenhouse_hr.workflow_approval_snapshots` con `workflow_domain='offboarding'` y `stage_code='hr_review'`.
+- V1 no orquesta firma electronica full; registra evidencia o referencia externa para `signed_or_ratified` y soporta reserva de derechos, rechazo, anulacion y reemision/supersession sin destruir historico.
+- Eventos outbox versionados: `hr.final_settlement_document.rendered`, `approved`, `issued`, `voided`, `signed_or_ratified`; adicionalmente se registran `submitted_for_review`, `rejected` y `superseded`.
+- Access model: view `equipo.offboarding`; capability fina `hr.final_settlement_document` gobierna lectura, render, revision, aprobacion, emision y anulacion. `routeGroups` y startup policy no cambian.
+
+Fronteras:
+
+- No crea `payment_orders`, no marca pago ejecutado y no ejecuta offboarding/acceso.
+- `final_settlements.calculation_status` no se mueve a `issued` en V1; el estado de emision vive en el aggregate documental.
+
 ## Delta 2026-05-04 — TASK-761: Final Settlement / Finiquito Chile V1
 
 Payroll ahora tiene un agregado canonico separado para finiquitos Chile dependientes:

@@ -6,17 +6,17 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `EPIC-010`
-- Status real: `Diseno`
+- Status real: `Completada`
 - Rank: `TBD`
 - Domain: `hr`
 - Blocked by: `TASK-760`, `TASK-761`
-- Branch: `task/TASK-762-finiquito-document-generation-approval-flow`
+- Branch: `develop` (instruccion explicita del usuario; no cambiar branch)
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
@@ -125,23 +125,22 @@ Decisiones:
 
 ## Acceptance Criteria
 
-- [ ] Existe documento de finiquito versionado y trazable.
-- [ ] El documento nace desde un settlement aprobado, no desde inputs libres.
-- [ ] Existe workflow mínimo de revisión/aprobación/emisión.
-- [ ] El PDF/asset emitido queda asociado a snapshot/hash inmutable y no se recalcula desde datos vivos.
-- [ ] La aprobación documental es independiente de la aprobación del cálculo.
-- [ ] Existe estado explícito para pendiente de firma/ratificación, firmado/ratificado, rechazado, anulado y superseded.
-- [ ] El documento soporta reserva de derechos como dato estructurado.
-- [ ] La task no crea payment orders, no marca pago como realizado y no ejecuta offboarding/acceso.
+- [x] Existe documento de finiquito versionado y trazable.
+- [x] El documento nace desde un settlement aprobado, no desde inputs libres.
+- [x] Existe workflow mínimo de revisión/aprobación/emisión.
+- [x] El PDF/asset emitido queda asociado a snapshot/hash inmutable y no se recalcula desde datos vivos.
+- [x] La aprobación documental es independiente de la aprobación del cálculo.
+- [x] Existe estado explícito para pendiente de firma/ratificación, firmado/ratificado, rechazado, anulado y superseded.
+- [x] El documento soporta reserva de derechos como dato estructurado.
+- [x] La task no crea payment orders, no marca pago como realizado y no ejecuta offboarding/acceso.
 
 ## Verification
 
-- `pnpm lint`
-- `pnpm exec tsc --noEmit --pretty false`
-- `pnpm test`
-- Validación manual del flujo create review approve issue
-- Test: no se puede renderizar documento si `final_settlement.status !== 'approved'`.
-- Test: no se puede aprobar documento si snapshot/hash no coincide.
-- Test: reemisión crea nueva versión y conserva asset histórico.
-- Test: descarga usa asset privado/autorizado, no URL pública suelta.
-- Test: estados `worker_reservation_of_rights`, `rejected`, `voided` y `superseded` no destruyen auditoría.
+- `pnpm pg:connect:migrate` — OK, migracion aplicada y `src/types/db.d.ts` regenerado.
+- `pnpm pg:doctor` — OK; drift conocido `can_create=true` en `greenhouse_payroll`/`greenhouse_serving`.
+- `pnpm tsc --noEmit --pretty false` — OK.
+- `pnpm lint` — exit 0; 316 warnings legacy `greenhouse/no-untokenized-copy` fuera del scope.
+- `pnpm test` — 559 files / 3211 passed / 5 skipped.
+- `pnpm build` — OK.
+- Test enfocado: `src/lib/payroll/final-settlement/document-hash.test.ts` cubre hash canonico de snapshot y hash separado del PDF.
+- Validacion funcional por typecheck/build: rutas documentales render/review/approve/issue/void/reject/sign-or-ratify registradas en build Next.

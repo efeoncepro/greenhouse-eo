@@ -5601,6 +5601,77 @@ export interface GreenhousePayrollCompensationVersions {
   version_id: string;
 }
 
+export interface GreenhousePayrollFinalSettlementDocumentEvents {
+  actor_user_id: string | null;
+  created_at: Generated<Timestamp>;
+  event_id: string;
+  event_type: string;
+  final_settlement_document_id: string;
+  final_settlement_id: string;
+  from_status: string | null;
+  offboarding_case_id: string;
+  payload: Generated<Json>;
+  reason: string | null;
+  to_status: string | null;
+}
+
+export interface GreenhousePayrollFinalSettlementDocuments {
+  approval_snapshot_id: string | null;
+  approved_at: Timestamp | null;
+  approved_by_user_id: string | null;
+  asset_id: string | null;
+  cancel_reason: string | null;
+  cancelled_at: Timestamp | null;
+  cancelled_by_user_id: string | null;
+  content_hash: string | null;
+  created_at: Generated<Timestamp>;
+  created_by_user_id: string | null;
+  document_status: Generated<string>;
+  document_template_code: Generated<string>;
+  document_template_version: string;
+  document_version: Generated<number>;
+  final_settlement_document_id: string;
+  final_settlement_id: string;
+  issued_at: Timestamp | null;
+  issued_by_user_id: string | null;
+  legal_entity_organization_id: string;
+  member_id: string;
+  offboarding_case_id: string;
+  pdf_asset_id: string | null;
+  person_legal_entity_relationship_id: string | null;
+  profile_id: string;
+  readiness_json: Generated<Json>;
+  rejected_by_worker_at: Timestamp | null;
+  rejected_by_worker_by_user_id: string | null;
+  rejected_by_worker_reason: string | null;
+  render_error: string | null;
+  render_status: Generated<string>;
+  review_requested_at: Timestamp | null;
+  review_requested_by_user_id: string | null;
+  settlement_version: number;
+  signature_evidence_asset_id: string | null;
+  signature_evidence_ref: Generated<Json>;
+  signature_status: Generated<string>;
+  signed_or_ratified_at: Timestamp | null;
+  signed_or_ratified_by_user_id: string | null;
+  /**
+   * SHA-256 over canonical snapshot_json. Approval and issue transitions fail closed if the hash no longer matches the stored snapshot.
+   */
+  snapshot_hash: string;
+  /**
+   * Immutable render snapshot copied from the approved final settlement, offboarding case, collaborator, legal entity and template metadata.
+   */
+  snapshot_json: Generated<Json>;
+  supersedes_document_id: string | null;
+  updated_at: Generated<Timestamp>;
+  updated_by_user_id: string | null;
+  void_reason: string | null;
+  voided_at: Timestamp | null;
+  voided_by_user_id: string | null;
+  worker_reservation_notes: string | null;
+  worker_reservation_of_rights: Generated<boolean>;
+}
+
 export interface GreenhousePayrollFinalSettlementEvents {
   actor_user_id: string | null;
   created_at: Generated<Timestamp>;
@@ -8281,6 +8352,8 @@ export interface DB {
   "greenhouse_payroll.chile_previred_indicators": GreenhousePayrollChilePreviredIndicators;
   "greenhouse_payroll.chile_tax_brackets": GreenhousePayrollChileTaxBrackets;
   "greenhouse_payroll.compensation_versions": GreenhousePayrollCompensationVersions;
+  "greenhouse_payroll.final_settlement_document_events": GreenhousePayrollFinalSettlementDocumentEvents;
+  "greenhouse_payroll.final_settlement_documents": GreenhousePayrollFinalSettlementDocuments;
   "greenhouse_payroll.final_settlement_events": GreenhousePayrollFinalSettlementEvents;
   "greenhouse_payroll.final_settlements": GreenhousePayrollFinalSettlements;
   "greenhouse_payroll.payroll_adjustments": GreenhousePayrollPayrollAdjustments;

@@ -49,7 +49,8 @@ const resolveBindingsForView = (view: GovernanceViewRegistryEntry): ViewEntitlem
     case 'equipo.offboarding':
       return [
         toBinding(view, 'hr.offboarding_case', ['read', 'create', 'update', 'approve', 'manage']),
-        toBinding(view, 'hr.final_settlement', ['read', 'create', 'update', 'approve', 'manage'])
+        toBinding(view, 'hr.final_settlement', ['read', 'create', 'update', 'approve', 'manage']),
+        toBinding(view, 'hr.final_settlement_document', ['read', 'create', 'update', 'approve', 'manage'])
       ]
 
     case 'finanzas.inteligencia':

@@ -71,6 +71,7 @@ const CONTEXT_RETENTION_CLASS: Record<GreenhouseAssetContext, GreenhouseAssetRet
   payroll_receipt: 'payroll_receipt',
   payroll_export_pdf: 'payroll_export',
   payroll_export_csv: 'payroll_export',
+  final_settlement_document: 'final_settlement_document',
   certification_draft: 'hr_certification',
   certification: 'hr_certification',
   evidence_draft: 'hr_evidence',
@@ -90,6 +91,7 @@ const CONTEXT_PREFIX: Record<GreenhouseAssetContext, string> = {
   payroll_receipt: 'payroll-receipts',
   payroll_export_pdf: 'payroll-export-packages',
   payroll_export_csv: 'payroll-export-packages',
+  final_settlement_document: 'final-settlement-documents',
   certification_draft: 'certifications',
   certification: 'certifications',
   evidence_draft: 'evidence',
@@ -630,7 +632,7 @@ export const upsertSystemGeneratedAsset = async ({
   assetId?: string | null
   ownerAggregateType: Extract<
     GreenhouseAssetContext,
-    'master_agreement' | 'payroll_receipt' | 'payroll_export_pdf' | 'payroll_export_csv' | 'quote_pdf'
+    'master_agreement' | 'payroll_receipt' | 'payroll_export_pdf' | 'payroll_export_csv' | 'final_settlement_document' | 'quote_pdf'
   >
   ownerAggregateId: string
   ownerClientId?: string | null
@@ -743,7 +745,7 @@ export const storeSystemGeneratedPrivateAsset = async ({
   assetId?: string | null
   ownerAggregateType: Extract<
     GreenhouseAssetContext,
-    'master_agreement' | 'payroll_receipt' | 'payroll_export_pdf' | 'payroll_export_csv' | 'quote_pdf'
+    'master_agreement' | 'payroll_receipt' | 'payroll_export_pdf' | 'payroll_export_csv' | 'final_settlement_document' | 'quote_pdf'
   >
   ownerAggregateId: string
   ownerClientId?: string | null
@@ -820,6 +822,14 @@ const canAccessPayrollReceiptAsset = (tenant: TenantContext, asset: GreenhouseAs
 const canAccessPayrollExportAsset = (tenant: TenantContext) =>
   hasRouteGroup(tenant, 'hr') || hasRouteGroup(tenant, 'finance') || hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)
 
+const canAccessFinalSettlementDocumentAsset = (tenant: TenantContext, asset: GreenhouseAssetRecord) => {
+  if (asset.ownerMemberId && tenant.memberId && asset.ownerMemberId === tenant.memberId) {
+    return true
+  }
+
+  return hasRouteGroup(tenant, 'hr') || hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)
+}
+
 const canAccessCertificationAsset = (tenant: TenantContext, asset: GreenhouseAssetRecord) => {
   if (asset.ownerMemberId && tenant.memberId && asset.ownerMemberId === tenant.memberId) {
     return true
@@ -850,6 +860,8 @@ export const canTenantAccessAsset = ({
     case 'payroll_export_pdf':
     case 'payroll_export_csv':
       return canAccessPayrollExportAsset(tenant)
+    case 'final_settlement_document':
+      return canAccessFinalSettlementDocumentAsset(tenant, asset)
     case 'certification_draft':
     case 'certification':
     case 'evidence_draft':

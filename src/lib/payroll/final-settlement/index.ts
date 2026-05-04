@@ -1,3 +1,5 @@
 export * from './types'
 export * from './calculator'
 export * from './store'
+export * from './document-types'
+export * from './document-store'
