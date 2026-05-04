@@ -26,6 +26,7 @@ interface UpdateUserInput {
   active?: boolean
   displayName?: string
   email?: string
+  microsoftOid?: string
 }
 
 interface TenantMapping {
@@ -319,6 +320,12 @@ export const updateUser = async (
 
     setClauses.push(`microsoft_email = $${paramIdx}`)
     values.push(updates.email.toLowerCase())
+    paramIdx++
+  }
+
+  if (updates.microsoftOid !== undefined) {
+    setClauses.push(`microsoft_oid = $${paramIdx}`)
+    values.push(updates.microsoftOid)
     paramIdx++
   }
 

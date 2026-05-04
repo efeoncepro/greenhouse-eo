@@ -8,6 +8,8 @@ import type { ScimPatchRequest } from '@/types/scim'
 
 export const dynamic = 'force-dynamic'
 
+const MICROSOFT_OBJECT_ID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
 // ── GET /api/scim/v2/Users/[id] — Get single user ──
 
 export async function GET(
@@ -65,7 +67,7 @@ export async function PATCH(
     }
 
     // Parse SCIM patch operations
-    const updates: { active?: boolean; displayName?: string; email?: string } = {}
+    const updates: { active?: boolean; displayName?: string; email?: string; microsoftOid?: string } = {}
 
     for (const op of body.Operations || []) {
       const path = op.path?.toLowerCase()
@@ -85,6 +87,28 @@ export async function PATCH(
         case 'emails[type eq "work"].value':
           updates.email = String(value)
           break
+        case 'externalid': {
+          const microsoftOid = String(value)
+
+          if (!MICROSOFT_OBJECT_ID_PATTERN.test(microsoftOid)) {
+            await logScimOperation({
+              operation: 'UPDATE',
+              scimId: user.scim_id,
+              externalId: microsoftOid,
+              email: user.email,
+              responseStatus: 400,
+              errorMessage: 'SCIM externalId must be the Microsoft Entra objectId'
+            })
+
+            return NextResponse.json(
+              toScimError('externalId must be the Microsoft Entra objectId', 400),
+              { status: 400 }
+            )
+          }
+
+          updates.microsoftOid = microsoftOid
+          break
+        }
         default:
           // Entra sometimes sends without path, with value as object
           if (!path && typeof value === 'object' && value !== null) {
@@ -92,6 +116,27 @@ export async function PATCH(
 
             if ('active' in obj) updates.active = Boolean(obj.active)
             if ('displayName' in obj) updates.displayName = String(obj.displayName)
+            if ('externalId' in obj) {
+              const microsoftOid = String(obj.externalId)
+
+              if (!MICROSOFT_OBJECT_ID_PATTERN.test(microsoftOid)) {
+                await logScimOperation({
+                  operation: 'UPDATE',
+                  scimId: user.scim_id,
+                  externalId: microsoftOid,
+                  email: user.email,
+                  responseStatus: 400,
+                  errorMessage: 'SCIM externalId must be the Microsoft Entra objectId'
+                })
+
+                return NextResponse.json(
+                  toScimError('externalId must be the Microsoft Entra objectId', 400),
+                  { status: 400 }
+                )
+              }
+
+              updates.microsoftOid = microsoftOid
+            }
           }
 
           break

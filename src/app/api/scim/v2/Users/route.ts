@@ -17,6 +17,8 @@ import type { ScimCreateUserRequest } from '@/types/scim'
 
 export const dynamic = 'force-dynamic'
 
+const MICROSOFT_OBJECT_ID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
 // ── GET /api/scim/v2/Users — List or filter users ──
 
 export async function GET(request: Request) {
@@ -94,22 +96,35 @@ export async function POST(request: Request) {
       return NextResponse.json(toScimError('userName and email are required', 400), { status: 400 })
     }
 
+    if (!externalId || !MICROSOFT_OBJECT_ID_PATTERN.test(externalId)) {
+      await logScimOperation({
+        operation: 'CREATE',
+        externalId,
+        email,
+        responseStatus: 400,
+        errorMessage: 'SCIM externalId must be the Microsoft Entra objectId'
+      })
+
+      return NextResponse.json(
+        toScimError('externalId must be the Microsoft Entra objectId', 400),
+        { status: 400 }
+      )
+    }
+
     // Check if user already exists by externalId or email
-    if (externalId) {
-      const existing = await getUserByExternalId(externalId)
+    const existing = await getUserByExternalId(externalId)
 
-      if (existing) {
-        await logScimOperation({
-          operation: 'CREATE',
-          scimId: existing.scim_id,
-          externalId,
-          email,
-          responseStatus: 409,
-          errorMessage: 'User already exists by externalId'
-        })
+    if (existing) {
+      await logScimOperation({
+        operation: 'CREATE',
+        scimId: existing.scim_id,
+        externalId,
+        email,
+        responseStatus: 409,
+        errorMessage: 'User already exists by externalId'
+      })
 
-        return NextResponse.json(toScimError('User already exists', 409), { status: 409 })
-      }
+      return NextResponse.json(toScimError('User already exists', 409), { status: 409 })
     }
 
     const existingByEmail = await getUserByEmail(email)
