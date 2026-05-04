@@ -1,5 +1,20 @@
 # Handoff.md
 
+## Sesion 2026-05-04 — TASK-780 Home Rollout Flag Platform end-to-end
+
+- **Trigger:** usuario detectó divergencia visible entre `dev-greenhouse.efeoncepro.com/home` (V2 con KPI cards) y `greenhouse.efeoncepro.com/home` (legacy Nexa Insights). Sospechó que su merge a producción había omitido cambios.
+- **Diagnóstico:** `main` y `develop` están en el mismo SHA (`c132f4ee`). Ambos deploys (production + staging) corren del mismo commit. La diferencia era runtime: env var `HOME_V2_ENABLED=true` solo seteada en staging. Patrón frágil: requiere redeploy para flipear, no permite rollback gradual, no escala a más features con flag.
+- **Solución end-to-end (TASK-780, 4 fases):**
+  - **Phase 1 (bloqueada por sandbox):** flip env var `HOME_V2_ENABLED=true` en Vercel Production + Preview. Comandos preparados, esperando OK explícito del usuario.
+  - **Phase 2 ✅:** migration `20260504102323120_task-780-home-rollout-flags.sql` con tabla canónica scope-aware (`user > role > tenant > global`), CHECK constraints, audit trigger, idempotent seed. Resolver `src/lib/home/rollout-flags.ts` (PG-first → env fallback → conservative default disabled, in-memory cache TTL 30s). Mutation store + admin REST endpoint `GET/POST/DELETE /api/admin/home/rollout-flags`.
+  - **Phase 3 ✅:** reliability signal `home.rollout.drift` en `/admin/operations` con detección triple (missing global row, PG↔env divergence, opt-out rate > 5%). Sentry tag `home_version: 'v2' | 'legacy'` via `captureHomeShellError` para distinguir errores por variante. Defensive try/catch en `page.tsx`: V2 falla → degrade graceful a legacy + capture domain incident.
+  - **Phase 4 (deprecación):** plan documentado para post-30-day stable.
+- **Tests:** 30 tests nuevos verdes (12 resolver + 10 store + 8 drift signal). Suite full home + reliability: 146/146 verde.
+- **Validación:** `npx tsc --noEmit` OK, `pnpm lint` 0 errors en archivos nuevos, `pnpm build` OK.
+- **Migration aplicada:** local PG via `pnpm pg:connect:migrate`; tabla + seed verificados.
+- **Doc canónica:** `docs/tasks/in-progress/TASK-780-home-rollout-flag-platform.md` con runbook operacional (SQL idempotent + curl endpoint admin) y plan deprecación legacy fase 5.
+- **Pendiente operativo:** (a) merge develop→main, (b) Phase 1 flip env vars producción cuando user OK, (c) verificar `/admin/operations` muestra signal `home.rollout.drift` severity=ok post-deploy.
+
 ## Sesion 2026-05-03 — Hotfix Google SSO readiness en Production/Staging
 
 - **Trigger:** tras promover `develop` a `main`, `/api/auth/health` en Production quedo `overallStatus=degraded` por `GOOGLE_CLIENT_ID: wrong_shape`.
@@ -22249,8 +22264,17 @@ Validaciones locales:
 - `pnpm exec tsc --noEmit --pretty false` → pass.
 - `pnpm exec vitest run src/lib/auth/readiness.test.ts` → pass.
 
-Pendiente inmediato:
+Cierre operativo:
 
-- Deployar codigo SCIM a `develop` y `main`.
-- Ejecutar POST SCIM controlado con usuario sintetico temporal despues del deploy y limpiar el usuario/role/outbox resultante.
-- Re-ejecutar/provisionar on-demand desde Azure y confirmar que no aparecen nuevos `CREATE 500`.
+- Commit `d04213fd` pusheado a `develop` y `main`.
+- Produccion Vercel `d04213f` quedo `Ready` y aliada a `greenhouse.efeoncepro.com`.
+- Staging Vercel `d04213f` quedo `Ready`.
+- Smoke SCIM production `POST /api/scim/v2/Users` con usuario sintetico temporal → HTTP 201.
+- Verificacion DB del smoke: `client_id=NULL`, `tenant_type='efeonce_internal'`, `auth_mode='microsoft_sso'`, `provisioned_by='scim'`, role `collaborator` con `client_id=NULL` y `scope_level=NULL`.
+- Limpieza smoke: 2 usuarios sinteticos `scim-smoke-*` removidos y 2 outbox events asociados removidos; quedan solo audit logs SCIM como evidencia.
+- Logs SCIM desde `2026-05-04T10:33:00Z`: `LIST 200` y `CREATE 201`; cero `CREATE 500` nuevos.
+- Azure SCIM job sigue `Active`, sin quarantine; ultimo ciclo manual/reciente `Succeeded`, `steadyStateLastAchievedTime=2026-05-04T10:33:32Z`.
+
+Nota residual:
+
+- Azure aun reporta `countEscrowed=9` y `countEntitledForProvisioning=0`. Eso no es un error del endpoint Greenhouse (no hay `error`, no hay quarantine y no hay nuevos 500); parece scope/assignment de Entra. Si se requiere 100% semantico de altas reales desde Entra, revisar en Azure Provisioning Logs cuales objetos estan escrowed y por que no estan entitled/exported.
