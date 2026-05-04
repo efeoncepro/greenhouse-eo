@@ -1237,6 +1237,8 @@ El drawer muestra un desglose en tiempo real con tres secciones semánticas:
 
 ## 25. Receipt PDF branding and template versioning
 
+> **Spec dedicada**: el contrato canónico end-to-end de outputs de un periodo Payroll (recibo individual + PDF reporte mensual + Excel export) vive en [`GREENHOUSE_PAYROLL_PERIOD_OUTPUTS_V1.md`](./GREENHOUSE_PAYROLL_PERIOD_OUTPUTS_V1.md). Esta sección §25 + §25.b + §25.c queda como referencia rápida; el V1 dedicado tiene la matriz completa de regimenes, layouts, reglas duras, tests y reusabilidad cross-task.
+
 ### Branding
 
 Los recibos individuales y reportes de período se generan con `@react-pdf/renderer` y llevan la identidad visual de Efeonce:

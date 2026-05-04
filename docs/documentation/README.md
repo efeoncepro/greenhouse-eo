@@ -59,6 +59,7 @@ Documentacion oficial de la plataforma Greenhouse. Cada documento describe como 
 - [Sistema de Permisos y Licencias](hr/sistema-permisos-leave.md) — tipos de permiso, medio dia (AM/PM), calculo de dias habiles, flujo de aprobacion, saldo y acumulacion
 - [Jerarquía de Reporte y Supervisoría](hr/jerarquia-reporte-supervisoria.md) — gestion de supervisores, delegaciones temporales, historial y diferencias con departamentos
 - [Periodos de Nomina](hr/periodos-de-nomina.md) — como se crea el mes imputable oficial, cuando Greenhouse resuelve automaticamente UF y tabla tributaria Chile, y por que el calculo se bloquea si falta sincronizacion del mes
+- [Recibos y reporte mensual de nomina](hr/recibos-y-reporte-mensual.md) — los 4 regimenes canonicos del recibo (Chile dependiente / Honorarios / Internacional Deel / Internacional interno), como funcionan el PDF reporte mensual y el Excel del operador, y por que los subtotales `Total descuentos previsionales` y `Total retencion SII honorarios` son mutuamente excluyentes
 - [Reliquidacion de Nomina](hr/reliquidacion-de-nomina.md) — reapertura de periodos exportados, versionamiento de entradas (v1/v2), delta a finanzas, ventana de 45 dias, auditoria inmutable
 - [Objetivos y OKRs](hr/objetivos-okrs.md) — ciclos de objetivos, goals en cascada (empresa, departamento, individual), key results medibles, elegibilidad por contrato, self-service y admin
 
