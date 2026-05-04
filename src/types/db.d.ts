@@ -6232,6 +6232,32 @@ export interface GreenhouseServingHomePulseSnapshots {
   ttl_ends_at: Timestamp;
 }
 
+export interface GreenhouseServingHomeRolloutFlags {
+  created_at: Generated<Timestamp>;
+  /**
+   * TRUE → variant active for matching subjects. FALSE → variant disabled.
+   */
+  enabled: Generated<boolean>;
+  /**
+   * Stable identifier of the rollout flag. Today: home_v2_shell. Future shell variants extend the CHECK constraint.
+   */
+  flag_key: string;
+  id: Generated<Int8>;
+  /**
+   * Free-text audit note: why this row exists. Required by ops practice.
+   */
+  reason: string | null;
+  /**
+   * tenant_id | role_code | user_id; NULL when scope_type=global
+   */
+  scope_id: string | null;
+  /**
+   * global | tenant | role | user
+   */
+  scope_type: string;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseServingIcoAiEnrichmentRuns {
   completed_at: Timestamp | null;
   error_message: string | null;
@@ -8153,6 +8179,7 @@ export interface DB {
   "greenhouse_serving.finance_ai_signals": GreenhouseServingFinanceAiSignals;
   "greenhouse_serving.home_block_flags": GreenhouseServingHomeBlockFlags;
   "greenhouse_serving.home_pulse_snapshots": GreenhouseServingHomePulseSnapshots;
+  "greenhouse_serving.home_rollout_flags": GreenhouseServingHomeRolloutFlags;
   "greenhouse_serving.ico_ai_enrichment_runs": GreenhouseServingIcoAiEnrichmentRuns;
   "greenhouse_serving.ico_ai_signal_enrichment_history": GreenhouseServingIcoAiSignalEnrichmentHistory;
   "greenhouse_serving.ico_ai_signal_enrichments": GreenhouseServingIcoAiSignalEnrichments;

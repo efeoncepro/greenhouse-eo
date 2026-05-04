@@ -130,9 +130,14 @@ export const resolveHomeBlockFlags = async (subject: HomeFlagSubject): Promise<R
 }
 
 /**
- * Global rollout flag. Drives v1 vs v2 home rendering at deploy time.
- * Honors per-user opt-out via `client_users.home_v2_opt_out` (read by
- * the page, not here — this only governs the global default).
+ * @deprecated Replaced by PG-backed resolver in `./rollout-flags.ts`.
+ *
+ * Kept temporarily as a sync escape hatch for code paths that cannot await
+ * (e.g. cold-start telemetry). New callers MUST use `isHomeV2EnabledForSubject`
+ * from `./rollout-flags.ts` — it supports per-user/per-role/per-tenant scope
+ * precedence, in-memory cache, and graceful fallback.
+ *
+ * Schedule for removal: TASK-780 Phase 4 (post 30-day stable rollout).
  */
 export const isHomeV2GloballyEnabled = (): boolean => {
   const value = (process.env.HOME_V2_ENABLED ?? '').trim().toLowerCase()

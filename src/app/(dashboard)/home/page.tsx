@@ -3,8 +3,9 @@ import 'server-only'
 import { requireServerSession } from '@/lib/auth/require-server-session'
 import { buildHomeEntitlementsContext } from '@/lib/home/build-home-entitlements-context'
 import { composeHomeSnapshot } from '@/lib/home/compose-home-snapshot'
-import { isHomeV2GloballyEnabled } from '@/lib/home/flags'
 import { getHomeUserIdentity } from '@/lib/home/get-home-user-identity'
+import { captureHomeShellError } from '@/lib/home/observability'
+import { resolveHomeRolloutFlag } from '@/lib/home/rollout-flags'
 import type { HomeUiDensity } from '@/lib/home/contract'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import HomeShellV2 from '@/views/greenhouse/home/v2/HomeShellV2'
@@ -43,17 +44,46 @@ export default async function HomePage() {
   const session = await requireServerSession()
   const { user } = session
 
-  const [preferences, identity] = await Promise.all([
+  const [preferences, identity, rolloutFlag] = await Promise.all([
     fetchUserPreferences(user.userId),
-    getHomeUserIdentity(user.userId)
+    getHomeUserIdentity(user.userId),
+    resolveHomeRolloutFlag('home_v2_shell', {
+      userId: user.userId,
+      tenantId: user.clientId ?? null,
+      roleCodes: user.roleCodes ?? []
+    })
   ])
 
-  const v2Enabled = isHomeV2GloballyEnabled() && preferences.home_v2_opt_out !== true
+  const v2Enabled = rolloutFlag.enabled && preferences.home_v2_opt_out !== true
 
   if (!v2Enabled) {
     return <HomeViewLegacy />
   }
 
+  try {
+    return await renderV2(user, preferences, identity)
+  } catch (error) {
+    // V2 composer falla → degrade honesta a legacy. Sentry tag home_version=v2
+    // queda en el evento para que reliability dashboards distingan errores
+    // por variante. NUNCA dejar la página en estado roto: la mejor experiencia
+    // de fallback es la home legacy que ya corre estable hace meses.
+    captureHomeShellError(error, 'v2', {
+      stage: 'render_v2_shell',
+      userId: user.userId,
+      tenantId: user.clientId ?? null,
+      flagSource: rolloutFlag.source,
+      flagScopeType: rolloutFlag.scopeType
+    })
+
+    return <HomeViewLegacy />
+  }
+}
+
+async function renderV2(
+  user: Awaited<ReturnType<typeof requireServerSession>>['user'],
+  preferences: UserPreferencesRow,
+  identity: Awaited<ReturnType<typeof getHomeUserIdentity>>
+) {
   const homeEntitlements = buildHomeEntitlementsContext({
     userId: user.userId,
     tenantType: user.tenantType,

@@ -37,6 +37,7 @@ import { getPaymentOrdersDeadLetterSignal } from './queries/payment-orders-dead-
 import { getPaidOrdersWithoutExpensePaymentSignal } from './queries/payment-orders-paid-without-expense-payment'
 import { getPayrollExpenseMaterializationLagSignal } from './queries/payroll-expense-materialization-lag'
 import { getProviderBqSyncDeadLetterSignal } from './queries/provider-bq-sync-dead-letter'
+import { getHomeRolloutDriftSignal } from './queries/home-rollout-drift'
 import { getOutboxUnpublishedLagSignal } from './queries/outbox-unpublished-lag'
 import { getOutboxDeadLetterSignal } from './queries/outbox-dead-letter'
 import { getCronStagingDriftSignal } from './queries/cron-staging-drift'
@@ -324,6 +325,15 @@ interface ReliabilityOverviewSources {
    * o costos financieros. Steady state = 0 antes de cerrar períodos.
    */
   expenseDistribution?: ReliabilitySignal[] | null
+
+  /**
+   * TASK-780 Phase 3 — Home rollout drift signal:
+   *   - home.rollout.drift (PG flag vs env fallback divergence + opt-out rate)
+   * Steady state = 0. Si > 0, divergencia entre la flag PG canónica y la env
+   * var fallback (riesgo de variantes inconsistentes durante PG outages), o
+   * opt-out rate > 5% (regresión UX en V2 que empuja a usuarios a legacy).
+   */
+  homeRolloutDrift?: ReliabilitySignal | null
 }
 
 export const buildReliabilityOverview = (
@@ -369,7 +379,9 @@ export const buildReliabilityOverview = (
     // TASK-774 Slice 4 — Account balances FX drift (closing_balance vs recompute).
     ...(sources.accountBalancesFxDrift ? [sources.accountBalancesFxDrift] : []),
     // TASK-777 Slice 3 — Expense distribution gates.
-    ...(sources.expenseDistribution ?? [])
+    ...(sources.expenseDistribution ?? []),
+    // TASK-780 Phase 3 — Home rollout drift (PG flag vs env + opt-out rate).
+    ...(sources.homeRolloutDrift ? [sources.homeRolloutDrift] : [])
   ]
 
   const signalsByModule = new Map<string, ReliabilitySignal[]>()
@@ -588,6 +600,13 @@ export const getReliabilityOverview = async (
           sharedPoolContamination: getExpenseDistributionSharedPoolContaminationSignal
         }).catch(() => null)
 
+  // TASK-780 Phase 3 — Home rollout drift signal. Lee PG flag vs env fallback
+  // y opt-out rate. Degrada honestamente a `unknown` si PG falla.
+  const homeRolloutDrift =
+    preloadedSources.homeRolloutDrift !== undefined
+      ? preloadedSources.homeRolloutDrift
+      : await getHomeRolloutDriftSignal().catch(() => null)
+
   return buildReliabilityOverview(operations, {
     billing,
     notionOperational,
@@ -602,7 +621,8 @@ export const getReliabilityOverview = async (
     outboxHealth,
     cronStagingDrift,
     accountBalancesFxDrift,
-    expenseDistribution
+    expenseDistribution,
+    homeRolloutDrift
   })
 }
 

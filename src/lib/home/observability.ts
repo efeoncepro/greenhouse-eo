@@ -68,6 +68,12 @@ export interface RecordHomeRenderInput {
   cacheHits: number
   cacheMisses: number
   contractVersion: string
+  /**
+   * TASK-780 — Shell variant rendered for this request. Lets log analytics
+   * compute V2 / legacy split per audience without joining against the flag
+   * resolver state at query time.
+   */
+  homeVersion?: HomeVersionTag
 }
 
 export const recordHomeRender = (input: RecordHomeRenderInput): void => {
@@ -83,6 +89,7 @@ export const recordHomeRender = (input: RecordHomeRenderInput): void => {
       durationMs: Math.round(input.durationMs),
       audienceKey: input.audienceKey,
       tenantId: input.tenantId,
+      homeVersion: input.homeVersion ?? 'v2',
       blocks: input.blocks,
       ok: input.ok,
       degraded: input.degraded,
@@ -99,9 +106,40 @@ export const recordHomeRender = (input: RecordHomeRenderInput): void => {
  * Forward a block-level error to Sentry with `domain=home`. Returns the
  * Sentry event id when available so the renderer can surface it for
  * support workflows.
+ *
+ * TASK-780 — `homeVersion` tag distinguishes errors per shell variant
+ * (`v2` vs `legacy`). Lets reliability dashboards compare incident rates
+ * between the two during rollout, and gives the deprecation gate a hard
+ * objective signal: legacy can be removed once `homeVersion=v2` errors
+ * stay ≤ legacy errors for 30 consecutive days.
  */
-export const captureHomeError = (err: unknown, blockId: HomeBlockId, extra?: Record<string, unknown>): string | undefined =>
-  captureWithDomain(err, 'home', { extra: { blockId, ...extra }, tags: { blockId } })
+export type HomeVersionTag = 'v2' | 'legacy'
+
+export const captureHomeError = (
+  err: unknown,
+  blockId: HomeBlockId,
+  extra?: Record<string, unknown>,
+  homeVersion: HomeVersionTag = 'v2'
+): string | undefined =>
+  captureWithDomain(err, 'home', {
+    extra: { blockId, homeVersion, ...extra },
+    tags: { blockId, home_version: homeVersion }
+  })
+
+/**
+ * Forward a shell-level error to Sentry with `domain=home`. Use for errors
+ * in the page layer (composer, identity lookup, flag resolution) that are
+ * not scoped to a single block.
+ */
+export const captureHomeShellError = (
+  err: unknown,
+  homeVersion: HomeVersionTag,
+  extra?: Record<string, unknown>
+): string | undefined =>
+  captureWithDomain(err, 'home', {
+    extra: { homeVersion, ...extra },
+    tags: { home_version: homeVersion }
+  })
 
 export const summarizeOutcomes = (snapshot: HomeSnapshotV1) => {
   return snapshot.blocks.reduce(

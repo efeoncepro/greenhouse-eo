@@ -44,6 +44,7 @@ export async function POST(request: Request) {
   }
 
   const normalizedClientId = String(body.clientId || '').trim() || null
+
   const id = normalizedClientId
     ? `scim-tm-${normalizedClientId}`
     : `scim-tm-${String(body.microsoftTenantId).toLowerCase()}`

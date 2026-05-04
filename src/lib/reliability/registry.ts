@@ -228,6 +228,7 @@ export const STATIC_RELIABILITY_REGISTRY: ReliabilityModuleDefinition[] = [
     ],
     dependencies: [
       'greenhouse_serving.home_block_flags',
+      'greenhouse_serving.home_rollout_flags',
       'greenhouse_serving.home_pulse_snapshots',
       'greenhouse_serving.user_recent_items',
       'greenhouse_core.client_users (home_default_view, ui_density, home_v2_opt_out)'
@@ -236,9 +237,11 @@ export const STATIC_RELIABILITY_REGISTRY: ReliabilityModuleDefinition[] = [
     filesOwned: [
       'src/lib/home/**',
       'src/views/greenhouse/home/v2/**',
-      'src/app/api/home/snapshot/v2/**'
+      'src/app/api/home/snapshot/v2/**',
+      'src/app/api/admin/home/rollout-flags/**'
     ],
-    expectedSignalKinds: ['runtime', 'incident'],
+    // TASK-780 Phase 3 — drift signal cubre divergencia PG ↔ env y opt-out rate.
+    expectedSignalKinds: ['runtime', 'incident', 'drift'],
     incidentDomainTag: 'home'
   },
   {
