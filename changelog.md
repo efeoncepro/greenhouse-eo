@@ -7837,3 +7837,4 @@ Comando operativo:
 # 2026-05-03
 
 - Docs operativos: se formalizo `SOLUTION_QUALITY_OPERATING_MODEL_V1` como contrato transversal anti-parche para agentes, enlazado desde `AGENTS.md`, `CLAUDE.md`, `TASK_PROCESS`, prompt Codex y modelos operativos.
+- Identity / Microsoft SSO: se rotó de forma segura el `AZURE_AD_CLIENT_SECRET` rechazado por Entra ID (`AADSTS7000215`) y se endureció `/api/auth/health` con un token probe específico para detectar `invalid_client` antes de que el usuario llegue al callback OAuth.

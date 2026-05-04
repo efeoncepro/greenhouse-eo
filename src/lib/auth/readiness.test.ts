@@ -39,7 +39,15 @@ describe('Auth readiness contract — TASK-742 Capa 2', () => {
 
   describe('buildAuthReadinessSnapshot', () => {
     it('marks azure-ad ready when discovery succeeds and secrets pass format', async () => {
-      global.fetch = vi.fn(async () => new Response('{}', { status: 200 })) as typeof fetch
+      global.fetch = vi.fn(async url => {
+        if (String(url).includes('/token')) {
+          return new Response(JSON.stringify({ error: 'invalid_grant', error_codes: [53003] }), {
+            status: 400
+          })
+        }
+
+        return new Response('{}', { status: 200 })
+      }) as typeof fetch
 
       const snap = await buildAuthReadinessSnapshot({
         azureAdClientSecret: 'AbCdE.fGhIjK_lMn~OpQrStUvWxYz0123-456789ab',
@@ -51,6 +59,29 @@ describe('Auth readiness contract — TASK-742 Capa 2', () => {
 
       expect(azure?.status).toBe('ready')
       expect(snap.nextAuthSecretReady).toBe(true)
+    })
+
+    it('marks azure-ad degraded when Entra rejects the client secret value', async () => {
+      global.fetch = vi.fn(async url => {
+        if (String(url).includes('/token')) {
+          return new Response(JSON.stringify({ error: 'invalid_client', error_codes: [7000215] }), {
+            status: 401
+          })
+        }
+
+        return new Response('{}', { status: 200 })
+      }) as typeof fetch
+
+      const snap = await buildAuthReadinessSnapshot({
+        azureAdClientSecret: 'AbCdE.fGhIjK_lMn~OpQrStUvWxYz0123-456789ab',
+        googleClientSecret: null,
+        nextAuthSecret: 'a'.repeat(64)
+      })
+
+      const azure = snap.providers.find(p => p.provider === 'azure-ad')
+
+      expect(azure?.status).toBe('degraded')
+      expect(azure?.failingStage).toBe('client_secret_invalid')
     })
 
     it('marks azure-ad degraded when OIDC discovery returns 500', async () => {
@@ -162,9 +193,10 @@ describe('Auth readiness contract — TASK-742 Capa 2', () => {
       })
 
       expect(first.generatedAt).toBe(second.generatedAt)
-      // Only azure-ad is configured here, so only 1 OIDC discovery call. Cache hit
-      // on the second invocation means fetch is NOT called again.
-      expect(fetchMock).toHaveBeenCalledTimes(1)
+      // Only azure-ad is configured here, so the first invocation performs
+      // OIDC discovery + token probe. Cache hit on the second invocation
+      // means fetch is NOT called again.
+      expect(fetchMock).toHaveBeenCalledTimes(2)
     })
   })
 })

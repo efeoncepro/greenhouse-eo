@@ -22179,3 +22179,40 @@ v2026-04-27-release → 1c195532
 - Release driver: Julio Reyes + Claude Opus 4.7 (1M context)
 - Ventana on-call: 4h post-merge
 - Rollback procedure documentado en PR #98 description
+
+## Sesion 2026-05-03 — Produccion Microsoft SSO invalid_client resuelto con rotacion segura
+
+Incidente productivo: "Entrar con Microsoft" redirigia a `/login?...&error=OAuthCallback` en `greenhouse.efeoncepro.com`.
+
+Diagnostico verificado en Vercel logs:
+
+- Endpoint afectado: `GET /api/auth/callback/azure-ad`.
+- Error real: NextAuth `OAUTH_CALLBACK_ERROR` con Azure `AADSTS7000215`.
+- Semantica: Entra ID rechazo el valor publicado como `AZURE_AD_CLIENT_SECRET` para App Registration `3626642f-0451-4eb2-8c29-d2211ab3176c`.
+- Diferente de `ISSUE-061`: la App seguia correctamente en `AzureADMultipleOrgs` y con redirect URIs de production/staging registradas.
+
+Remediacion ejecutada sin exponer secretos:
+
+- Azure CLI: `az ad app credential reset --append` creo credential nuevo `greenhouse-production-staging-2026-05-04` por 2 anos.
+- Validacion previa contra Microsoft token endpoint: respuesta `invalid_grant` por Conditional Access, no `invalid_client`; esto confirma que el secret nuevo es aceptado por Entra.
+- Vercel actualizado: `AZURE_AD_CLIENT_SECRET` en `production`, `staging` y `preview --git-branch develop`.
+- GCP Secret Manager actualizado: nuevas versiones en `greenhouse-azure-ad-client-secret-production` y `greenhouse-azure-ad-client-secret-staging`.
+- El credential anterior NO se elimino todavia; queda como rollback temporal hasta confirmar estabilidad post-login.
+
+Hardening anti-regresion:
+
+- `src/lib/auth/readiness.ts` ahora agrega token probe especifico para Azure: degrada provider si Microsoft responde `invalid_client` / `AADSTS7000215`, pero acepta `invalid_grant` porque prueba que el secret fue aceptado y el bloqueo ocurrio despues.
+- Tests agregados/ajustados en `src/lib/auth/readiness.test.ts`.
+- Issue documentado: `docs/issues/resolved/ISSUE-066-microsoft-sso-invalid-client-secret.md`.
+
+Validaciones locales:
+
+- `pnpm exec vitest run src/lib/auth/readiness.test.ts src/lib/auth-secrets.test.ts src/lib/secrets/format-validators.test.ts` → pass, 35 tests.
+- `pnpm exec tsc --noEmit --pretty false` → pass.
+
+Pendiente operativo inmediato:
+
+- Confirmar que el redeploy productivo posterior a la rotacion queda `Ready` y validar `/api/auth/health`.
+- Redeploy staging para que consuma el secret nuevo.
+- Commit/push del hardening y promocion develop → main.
+- Retirar credential Azure anterior cuando Microsoft SSO quede confirmado estable en production + staging.

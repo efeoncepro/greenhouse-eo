@@ -16,12 +16,15 @@ import { isKnownSecretFormat, validateSecretFormat } from '@/lib/secrets/format-
  * Goals:
  *   1. Detect malformed secrets (delegated to Capa 1 validators).
  *   2. Detect unreachable OIDC discovery endpoints (DNS, mTLS, region).
- *   3. Detect a NEXTAUTH_SECRET that cannot sign+verify a JWT round-trip.
+ *   3. Detect Azure client_secret values that are well-formed but rejected
+ *      by Entra ID during token exchange (`AADSTS7000215` / `invalid_client`).
+ *   4. Detect a NEXTAUTH_SECRET that cannot sign+verify a JWT round-trip.
  *
  * Non-goals:
- *   - DO NOT call Azure /token endpoint with real client_credentials —
- *     that would require additional API permissions and cumulatively
- *     consumes Azure quota. OIDC discovery is the safe smoke surface.
+ *   - DO NOT require a successful Azure token issue. Conditional Access can
+ *     correctly block client_credentials with `invalid_grant`; that still
+ *     proves the secret is accepted. Only `invalid_client` degrades the
+ *     provider because it means the configured secret value is wrong.
  *   - DO NOT cache aggressively in Layer 2 itself. The Platform Health
  *     composer already TTL-caches the assembled payload (30s).
  */
@@ -30,6 +33,8 @@ const OIDC_DISCOVERY_TIMEOUT_MS = 5_000
 
 const MICROSOFT_OIDC_DISCOVERY_URL =
   'https://login.microsoftonline.com/common/v2.0/.well-known/openid-configuration'
+
+const MICROSOFT_TOKEN_URL = 'https://login.microsoftonline.com/common/oauth2/v2.0/token'
 
 const GOOGLE_OIDC_DISCOVERY_URL = 'https://accounts.google.com/.well-known/openid-configuration'
 
@@ -45,6 +50,9 @@ export interface AuthProviderHealth {
     | 'secret_format_invalid'
     | 'oidc_discovery_failed'
     | 'oidc_discovery_timeout'
+    | 'token_probe_failed'
+    | 'token_probe_timeout'
+    | 'client_secret_invalid'
     | 'jwt_self_test_failed'
     | 'unconfigured'
   /** ISO timestamp of the most recent self-test. */
@@ -94,6 +102,63 @@ const probeOidcDiscovery = async (
     return {
       ok: false,
       failingStage: 'oidc_discovery_failed',
+      reason: error instanceof Error ? error.message : 'unknown_error'
+    }
+  }
+}
+
+const probeAzureClientSecret = async ({
+  clientId,
+  clientSecret
+}: {
+  clientId: string
+  clientSecret: string
+}): Promise<{ ok: boolean; failingStage: AuthProviderHealth['failingStage']; reason?: string }> => {
+  const body = new URLSearchParams({
+    client_id: clientId,
+    client_secret: clientSecret,
+    grant_type: 'client_credentials',
+    scope: 'https://graph.microsoft.com/.default'
+  })
+
+  try {
+    const controller = new AbortController()
+    const timer = setTimeout(() => controller.abort(), OIDC_DISCOVERY_TIMEOUT_MS)
+
+    try {
+      const response = await fetch(MICROSOFT_TOKEN_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body,
+        signal: controller.signal,
+        redirect: 'manual'
+      })
+
+      const payload = (await response.json().catch(() => ({}))) as {
+        error?: string
+        error_codes?: number[]
+      }
+
+      if (payload.error === 'invalid_client') {
+        return {
+          ok: false,
+          failingStage: 'client_secret_invalid',
+          reason: 'Azure rejected AZURE_AD_CLIENT_SECRET during token probe'
+        }
+      }
+
+      return { ok: true, failingStage: undefined }
+    } finally {
+      clearTimeout(timer)
+    }
+  } catch (error) {
+    if (error instanceof DOMException && error.name === 'AbortError') {
+      return { ok: false, failingStage: 'token_probe_timeout', reason: 'timeout' }
+    }
+
+    return {
+      ok: false,
+      failingStage: 'token_probe_failed',
       reason: error instanceof Error ? error.message : 'unknown_error'
     }
   }
@@ -210,6 +275,23 @@ const probeProvider = async ({
       failingStage: probe.failingStage,
       reason: probe.reason,
       checkedAt
+    }
+  }
+
+  if (provider === 'azure-ad') {
+    const tokenProbe = await probeAzureClientSecret({
+      clientId,
+      clientSecret: clientSecretValue
+    })
+
+    if (!tokenProbe.ok) {
+      return {
+        provider,
+        status: 'degraded',
+        failingStage: tokenProbe.failingStage,
+        reason: tokenProbe.reason,
+        checkedAt
+      }
     }
   }
 
