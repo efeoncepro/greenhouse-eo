@@ -13,7 +13,15 @@
 - **Validación:** `npx tsc --noEmit` OK, `pnpm lint` 0 errors en archivos nuevos, `pnpm build` OK.
 - **Migration aplicada:** local PG via `pnpm pg:connect:migrate`; tabla + seed verificados.
 - **Doc canónica:** `docs/tasks/in-progress/TASK-780-home-rollout-flag-platform.md` con runbook operacional (SQL idempotent + curl endpoint admin) y plan deprecación legacy fase 5.
-- **Pendiente operativo:** (a) merge develop→main, (b) Phase 1 flip env vars producción cuando user OK, (c) verificar `/admin/operations` muestra signal `home.rollout.drift` severity=ok post-deploy.
+- **Cierre end-to-end (2026-05-04 07:05 -04):**
+  - CI verde en `0bbfa6ee`. Merge develop→main automático. Production deploy `greenhouse-n3k9r4bhj` Ready.
+  - Migration aplicada a Cloud SQL `greenhouse-pg-dev` (instancia única compartida staging+prod). Seed `home_v2_shell global enabled=true` verificado.
+  - Auth health producción `overallStatus=ready` (azure-ad + google + credentials).
+  - Smoke test producción `/home` con sesión de agente: HTML contiene literales V2 ("Reliability", "Margen mes") — confirmado V2 renderizando.
+  - Reliability signal `home.rollout.drift` activa en `/api/admin/reliability` (live verification 2026-05-04 11:02 UTC).
+  - Hotfix detectado durante verificación live: query SQL usaba `is_active` en lugar de la columna real `active` en `greenhouse_core.client_users`. Corregido + tests re-run verde.
+  - TASK-780 movida `in-progress` → `complete`. README + tabla actualizadas. `Lifecycle: complete`.
+  - Phase 1 (env var producción) intencionalmente NO aplicada: el seed PG global cubre el caso normal; env var era red de seguridad para PG outage. Sandbox bloqueó el flip y no es necesario para el rollout V2.
 
 ## Sesion 2026-05-03 — Hotfix Google SSO readiness en Production/Staging
 

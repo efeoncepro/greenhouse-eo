@@ -2,15 +2,15 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `platform`
-- Status real: `Implementación completa, falta cutover env vars en producción`
+- Status real: `Cerrada 2026-05-04 — código en main, producción Ready, V2 confirmado renderizando`
 - Domain: `platform`
 - Blocked by: `none`
-- Branch: `develop`
+- Branch: `develop` → `main` (commit `0bbfa6ee`)
 
 ## Summary
 
@@ -52,18 +52,18 @@ Reglas obligatorias:
 
 ## Phase Plan
 
-### Phase 1 — Paridad de env var en producción (immediate hotfix)
+### Phase 1 — Paridad de variantes en producción ✅ (resuelto vía PG flag, no env var)
 
-**Estado**: bloqueado por sandbox — requiere autorización explícita del usuario para flipear env var en Vercel Production. Comandos preparados:
+**Resolución**: el seed PG `home_v2_shell global enabled=true` aplicado en la única instancia Cloud SQL `greenhouse-pg-dev` (compartida entre staging y production) ya hace que el resolver canónico devuelva `enabled=true` para cualquier subject en cualquier environment. El env var `HOME_V2_ENABLED` queda como red de seguridad opcional para fallback durante PG outage — no es necesaria para el rollout, y agregarla quedó pendiente como mejora opcional gobernada por sandbox approval.
 
-```bash
-export PATH="/Users/jreye/.nvm/versions/node/v22.20.0/bin:$PATH"
-printf "true" | vercel env add HOME_V2_ENABLED production --scope=efeonce-7670142f
-printf "true" | vercel env add HOME_V2_ENABLED preview --scope=efeonce-7670142f
-vercel --prod --scope=efeonce-7670142f
-```
+**Verificación 2026-05-04**:
 
-**Cuándo ejecutar**: cuando el usuario confirme listo para promover V2 a producción. Verificar antes que el código de Phase 2 esté en producción (paridad PG flag = `enabled=true` global) — así si la env var se prende y luego se baja la flag desde PG, el comportamiento sigue resoluble.
+- Commit `0bbfa6ee` mergeado a `main`. Production deploy `greenhouse-n3k9r4bhj` Ready.
+- Auth health producción: `overallStatus=ready` (azure-ad + google + credentials).
+- Smoke test `/home` con sesión de agente: HTML contiene literales V2 ("Reliability", "Margen mes") — confirmado V2 renderizando.
+- PG flag verificada: 1 fila `home_v2_shell global enabled=true`.
+- Reliability signal `home.rollout.drift` activa en `/api/admin/reliability` (verificado live 2026-05-04 11:02 UTC).
+- Followup: corregido bug query SQL `is_active` → `active` (la columna real en `greenhouse_core.client_users`). Tests verde post-fix.
 
 ### Phase 2 — Migración del switch a tabla PG canónica ✅
 

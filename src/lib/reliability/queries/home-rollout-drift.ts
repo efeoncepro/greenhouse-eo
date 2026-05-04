@@ -35,7 +35,7 @@ const QUERY_SQL = `
       COUNT(*) FILTER (WHERE home_v2_opt_out = TRUE) AS opted_out,
       COUNT(*)                                       AS total_active
     FROM greenhouse_core.client_users
-    WHERE is_active = TRUE
+    WHERE active = TRUE
   ),
   global_flag AS (
     SELECT enabled
