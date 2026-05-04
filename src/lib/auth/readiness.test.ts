@@ -99,6 +99,21 @@ describe('Auth readiness contract — TASK-742 Capa 2', () => {
       expect(azure?.failingStage).toBe('secret_format_invalid')
     })
 
+    it('marks google ready with Google Auth Platform IAM OAuth client id shape', async () => {
+      process.env.GOOGLE_CLIENT_ID = 'a1fcb039b-cb54-41a3-8988-3acad9901c96'
+      global.fetch = vi.fn(async () => new Response('{}', { status: 200 })) as typeof fetch
+
+      const snap = await buildAuthReadinessSnapshot({
+        azureAdClientSecret: null,
+        googleClientSecret: 'GOCSPX-abcdefghijklmnopqrstuvwxyz123456789',
+        nextAuthSecret: 'a'.repeat(64)
+      })
+
+      const google = snap.providers.find(p => p.provider === 'google')
+
+      expect(google?.status).toBe('ready')
+    })
+
     it('marks credentials provider degraded if NEXTAUTH_SECRET is empty', async () => {
       global.fetch = vi.fn(async () => new Response('{}', { status: 200 })) as typeof fetch
 

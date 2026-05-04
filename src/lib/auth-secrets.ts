@@ -1,6 +1,7 @@
 import 'server-only'
 
 import { getAuthReadinessSnapshot, type AuthReadinessSnapshot } from '@/lib/auth/readiness'
+import { validateSecretFormat } from '@/lib/secrets/format-validators'
 import { resolveSecret, type SecretResolution } from '@/lib/secrets/secret-manager'
 
 // TASK-765 follow-up — eliminamos top-level await para preservar
@@ -118,7 +119,15 @@ export const getAzureAdClientSecret = () => readSyncSecret('AZURE_AD_CLIENT_SECR
 export const getGoogleClientSecret = () => readSyncSecret('GOOGLE_CLIENT_SECRET', 'googleClient')
 
 export const hasMicrosoftAuthProvider = () =>
-  Boolean(process.env.AZURE_AD_CLIENT_ID?.trim() && getAzureAdClientSecret())
+  Boolean(
+    process.env.AZURE_AD_CLIENT_ID?.trim() &&
+      validateSecretFormat('AZURE_AD_CLIENT_ID', process.env.AZURE_AD_CLIENT_ID.trim()).ok &&
+      getAzureAdClientSecret()
+  )
 
 export const hasGoogleAuthProvider = () =>
-  Boolean(process.env.GOOGLE_CLIENT_ID?.trim() && getGoogleClientSecret())
+  Boolean(
+    process.env.GOOGLE_CLIENT_ID?.trim() &&
+      validateSecretFormat('GOOGLE_CLIENT_ID', process.env.GOOGLE_CLIENT_ID.trim()).ok &&
+      getGoogleClientSecret()
+  )
