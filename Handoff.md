@@ -22210,9 +22210,17 @@ Validaciones locales:
 - `pnpm exec vitest run src/lib/auth/readiness.test.ts src/lib/auth-secrets.test.ts src/lib/secrets/format-validators.test.ts` → pass, 35 tests.
 - `pnpm exec tsc --noEmit --pretty false` → pass.
 
-Pendiente operativo inmediato:
+Cierre operativo:
 
-- Confirmar que el redeploy productivo posterior a la rotacion queda `Ready` y validar `/api/auth/health`.
-- Redeploy staging para que consuma el secret nuevo.
-- Commit/push del hardening y promocion develop → main.
-- Retirar credential Azure anterior cuando Microsoft SSO quede confirmado estable en production + staging.
+- Produccion `fdd3656` quedo `Ready` en Vercel y aliada a `greenhouse.efeoncepro.com`.
+- Staging `fdd3656` quedo `Ready` en Vercel y aliada a `dev-greenhouse.efeoncepro.com`.
+- `https://greenhouse.efeoncepro.com/api/internal/health` → `ok=true`, `version=fdd3656`, `environment=production`.
+- `https://greenhouse.efeoncepro.com/api/auth/health` → `overallStatus=ready`; `azure-ad`, `google`, `credentials` en `ready`.
+- Staging `/api/auth/health` via `vercel curl` → `overallStatus=ready`; `azure-ad`, `google`, `credentials` en `ready`.
+- `https://greenhouse.efeoncepro.com/api/auth/session` → HTTP 200 `{}`.
+- Hardening commit `fdd36564` pusheado a `develop` y `main`.
+- Archivo temporal local con el secret rotado eliminado.
+
+Follow-up recomendado:
+
+- Retirar credential Azure anterior cuando Microsoft SSO quede confirmado estable en production + staging durante una ventana operativa corta. No se elimino durante el incidente para preservar rollback seguro.
