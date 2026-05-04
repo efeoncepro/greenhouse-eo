@@ -32,6 +32,8 @@ export const aria: AriaCopy = {
   paginationNext: 'Página siguiente',
   paginationFirst: 'Primera página',
   paginationLast: 'Última página',
+  previousMonth: 'Mes anterior',
+  nextMonth: 'Mes siguiente',
   rowActions: 'Acciones de fila',
   moreActions: 'Más acciones',
   notifications: 'Notificaciones',

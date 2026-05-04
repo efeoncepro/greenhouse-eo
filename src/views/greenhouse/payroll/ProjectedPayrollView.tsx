@@ -42,7 +42,9 @@ import CustomTextField from '@core/components/mui/TextField'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 
 import { computeCurrencyDelta, formatDeltaLabel, payrollTrendDirection } from '@/lib/finance/currency-comparison'
+import { getMicrocopy } from '@/lib/copy'
 import { resolveReceiptRegime, type ReceiptRegime } from '@/lib/payroll/receipt-presenter'
+import { GH_PAYROLL_PROJECTED_ARIA } from '@/config/greenhouse-nomenclature'
 import { formatCurrency } from './helpers'
 
 import tableStyles from '@core/styles/table.module.css'
@@ -239,6 +241,7 @@ const readNonTaxableAllowances = (entry: ProjectedEntry) => {
 // ── Component ──
 
 const ProjectedPayrollView = () => {
+  const t = getMicrocopy()
   const [mode, setMode] = useState<ProjectionMode>('projected_month_end')
   const [data, setData] = useState<ProjectedData | null>(null)
   const [loading, setLoading] = useState(true)
@@ -463,15 +466,15 @@ const ProjectedPayrollView = () => {
                   onClick={() => void promoteProjection()}
                   disabled={promoting || loading}
                   startIcon={promoting ? <CircularProgress size={14} color='inherit' /> : <i className='tabler-arrow-forward-up' />}
-                  aria-label={data?.official ? `Recalcular nómina oficial para ${MONTHS[month - 1]} ${year}` : `Crear borrador oficial para ${MONTHS[month - 1]} ${year}`}
+                  aria-label={GH_PAYROLL_PROJECTED_ARIA.promoteToOfficial({ hasOfficial: Boolean(data?.official), monthLabel: MONTHS[month - 1], year })}
                 >
                   {data?.official ? 'Recalcular oficial' : 'Crear borrador oficial'}
                 </Button>
-                <IconButton size='small' onClick={() => navMonth(-1)} aria-label='Mes anterior'>
+                <IconButton size='small' onClick={() => navMonth(-1)} aria-label={t.aria.previousMonth}>
                   <i className='tabler-chevron-left' style={{ fontSize: 18 }} />
                 </IconButton>
                 <Typography variant='body2' fontWeight={600}>{MONTHS[month - 1]} {year}</Typography>
-                <IconButton size='small' onClick={() => navMonth(1)} aria-label='Mes siguiente'>
+                <IconButton size='small' onClick={() => navMonth(1)} aria-label={t.aria.nextMonth}>
                   <i className='tabler-chevron-right' style={{ fontSize: 18 }} />
                 </IconButton>
               </Box>
@@ -702,7 +705,7 @@ const ProjectedPayrollView = () => {
                   {table.getRowModel().rows.length === 0 ? (
                     <tr>
                       <td colSpan={columns.length} style={{ textAlign: 'center', padding: '2rem' }}>
-                        <Typography variant='body2' color='text.secondary'>Sin resultados</Typography>
+                        <Typography variant='body2' color='text.secondary'>{t.empty.noResults}</Typography>
                       </td>
                     </tr>
                   ) : (

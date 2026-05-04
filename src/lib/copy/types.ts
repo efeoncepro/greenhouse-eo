@@ -229,6 +229,8 @@ export interface AriaCopy {
   paginationNext: string
   paginationFirst: string
   paginationLast: string
+  previousMonth: string
+  nextMonth: string
   rowActions: string
   moreActions: string
   notifications: string

@@ -1312,6 +1312,18 @@ export const GH_COMPENSATION = {
   bonusHelperText: 'Monto al 100% de cumplimiento'
 } as const
 
+// ─── Payroll Projected View — domain aria-labels ───────────────────────────
+//
+// aria-labels parametrizados específicos del flujo de nómina proyectada.
+// Genérico vive en src/lib/copy aria.previousMonth/nextMonth; estos son
+// dominio Payroll y combinan acción + período mensual.
+export const GH_PAYROLL_PROJECTED_ARIA = {
+  promoteToOfficial: ({ hasOfficial, monthLabel, year }: { hasOfficial: boolean; monthLabel: string; year: number }) =>
+    hasOfficial
+      ? `Recalcular nómina oficial para ${monthLabel} ${year}`
+      : `Crear borrador oficial para ${monthLabel} ${year}`
+} as const
+
 // ─── Nexa Insights Namespace ──────────────────────────────────────────────
 
 export const GH_NEXA = {
