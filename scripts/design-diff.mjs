@@ -33,7 +33,9 @@ const passthrough = []
 
 for (let i = 0; i < args.length; i++) {
   const arg = args[i]
+
   if (arg === '--') continue // pnpm forwarder, ignore
+
   if (arg === '--ref' && args[i + 1]) {
     ref = args[++i]
   } else if (arg === '--help' || arg === '-h') {
@@ -65,6 +67,7 @@ const beforePath = join(tmpDir, 'DESIGN.before.md')
 
 try {
   let beforeContent
+
   try {
     beforeContent = execFileSync('git', ['show', `${ref}:${TARGET_FILE}`], {
       encoding: 'utf8'
