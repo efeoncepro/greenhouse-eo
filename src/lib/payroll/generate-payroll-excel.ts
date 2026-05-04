@@ -13,6 +13,11 @@ import {
 import type { PayrollAdjustment } from '@/types/payroll-adjustments'
 import { getPayrollPeriod } from '@/lib/payroll/get-payroll-periods'
 import { PayrollValidationError } from '@/lib/payroll/shared'
+import {
+  groupEntriesByRegime,
+  RECEIPT_REGIME_BADGES,
+  type ReceiptRegime
+} from '@/lib/payroll/receipt-presenter'
 
 const MONTH_NAMES = [
   'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
@@ -95,9 +100,12 @@ const buildResumenSheet = (
 
   sheet.addRow([])
 
-  // Summary totals
-  const chileEntries = entries.filter(e => e.payRegime === 'chile')
-  const intlEntries = entries.filter(e => e.payRegime === 'international')
+  // TASK-782 — group by canonical regime (single source of truth, exported by TASK-758).
+  const groups = groupEntriesByRegime(entries)
+  const chileDepEntries = groups.chile_dependent
+  const honorariosEntries = groups.honorarios
+  const deelEntries = groups.international_deel
+  const intlInternalEntries = groups.international_internal
 
   const summaryTitle = sheet.addRow(['Totales', ''])
 
@@ -108,15 +116,30 @@ const buildResumenSheet = (
 
   applyHeaderStyle(summaryHeaders)
 
+  const sumGross = (list: PayrollEntry[]) => list.reduce((sum, e) => sum + e.grossTotal, 0)
+  const sumNet = (list: PayrollEntry[]) => list.reduce((sum, e) => sum + e.netTotal, 0)
+
+  // TASK-782 — `Total descuentos previsionales` (only chile_dependent) is mutually
+  // exclusive from `Total retención SII honorarios` (only honorarios). Previously
+  // a single `Total descuentos CLP` mixed both because the engine assigns
+  // `chileTotalDeductions = siiRetentionAmount` for honorarios.
+  const totalPrevDeductionsClp = chileDepEntries.reduce((sum, e) => sum + (e.chileTotalDeductions ?? 0), 0)
+  const totalSiiRetentionClp = honorariosEntries.reduce((sum, e) => sum + (e.siiRetentionAmount ?? 0), 0)
+
   const summaryData: [string, string][] = [
     ['Total miembros', String(entries.length)],
-    ['Miembros Chile', String(chileEntries.length)],
-    ['Miembros Internacional', String(intlEntries.length)],
-    ['Total bruto CLP', formatCurrency(chileEntries.reduce((sum, e) => sum + e.grossTotal, 0), 'CLP')],
-    ['Total neto CLP', formatCurrency(chileEntries.reduce((sum, e) => sum + e.netTotal, 0), 'CLP')],
-    ['Total descuentos CLP', formatCurrency(chileEntries.reduce((sum, e) => sum + (e.chileTotalDeductions ?? 0), 0), 'CLP')],
-    ['Total bruto USD', formatCurrency(intlEntries.reduce((sum, e) => sum + e.grossTotal, 0), 'USD')],
-    ['Total neto USD', formatCurrency(intlEntries.reduce((sum, e) => sum + e.netTotal, 0), 'USD')]
+    ['# Chile dependiente (CL-DEP)', String(chileDepEntries.length)],
+    ['# Honorarios (HON)', String(honorariosEntries.length)],
+    ['# Internacional Deel (DEEL)', String(deelEntries.length)],
+    ['# Internacional interno (INT)', String(intlInternalEntries.length)],
+    ['Total bruto Chile dependiente CLP', formatCurrency(sumGross(chileDepEntries), 'CLP')],
+    ['Total descuentos previsionales CLP', formatCurrency(totalPrevDeductionsClp, 'CLP')],
+    ['Total neto Chile dependiente CLP', formatCurrency(sumNet(chileDepEntries), 'CLP')],
+    ['Total bruto Honorarios CLP', formatCurrency(sumGross(honorariosEntries), 'CLP')],
+    ['Total retención SII honorarios CLP', formatCurrency(totalSiiRetentionClp, 'CLP')],
+    ['Total neto Honorarios CLP', formatCurrency(sumNet(honorariosEntries), 'CLP')],
+    ['Total bruto Internacional Deel USD', formatCurrency(sumGross(deelEntries), 'USD')],
+    ['Total bruto Internacional interno USD', formatCurrency(sumGross(intlInternalEntries), 'USD')]
   ]
 
   for (const [label, value] of summaryData) {
@@ -365,6 +388,329 @@ const buildAsistenciaSheet = (
   return sheet
 }
 
+// ═════════════════════════════════════════════════════════════════════════
+// TASK-782 — Canonical sheets per regime (Chile + Internacional)
+// Each sheet has 2 internal sections so compliance/SII/PREVIRED can read
+// the month unified while keeping subtotals mutually exclusive.
+// ═════════════════════════════════════════════════════════════════════════
+
+const SECTION_ROW_FILL_ARGB = 'FFD6E0EB' // brand-blue tint, matches PDF group dividers
+const SUBTOTAL_FILL_ARGB = 'FFE8EFF7' // brand-accent-bg
+
+const applySectionRowStyle = (row: ExcelJS.Row) => {
+  row.eachCell(cell => {
+    cell.font = { bold: true, color: { argb: 'FF023C70' }, size: 10 }
+    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: SECTION_ROW_FILL_ARGB } }
+    cell.alignment = { horizontal: 'left', vertical: 'middle' }
+  })
+}
+
+const applySubtotalRowStyle = (row: ExcelJS.Row) => {
+  row.eachCell(cell => {
+    cell.font = { bold: true, size: 10 }
+    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: SUBTOTAL_FILL_ARGB } }
+    cell.border = { top: { style: 'medium', color: { argb: 'FF023C70' } } }
+  })
+}
+
+const buildChileSheet = (
+  workbook: ExcelJS.Workbook,
+  groups: Record<ReceiptRegime, PayrollEntry[]>
+) => {
+  const chileDep = groups.chile_dependent
+  const honorarios = groups.honorarios
+
+  // Skip the entire sheet if nothing applies (keeps the workbook lean for
+  // periods made entirely of Deel/internacional entries).
+  if (chileDep.length === 0 && honorarios.length === 0) return null
+
+  const sheet = workbook.addWorksheet('Chile')
+
+  // 13 columns canónicas per approved mockup.
+  const headers = [
+    '#',
+    'Nombre',
+    'Régimen',
+    'Bruto',
+    'Gratif.',
+    'AFP',
+    'Salud',
+    'Cesantía',
+    'IUSC',
+    'APV',
+    'Tasa SII',
+    'Retención SII',
+    'Neto'
+  ]
+
+  sheet.columns = headers.map((header, i) => ({
+    header,
+    key: `col_${i}`,
+    width: i === 0 ? 5 : i === 1 ? 28 : i === 2 ? 12 : 14
+  }))
+
+  applyHeaderStyle(sheet.getRow(1))
+
+  let runningIndex = 1
+
+  // ── Section 1 · Chile dependiente ──
+  if (chileDep.length > 0) {
+    const sectionRow = sheet.addRow([
+      `▼ Sección 1 · Chile dependiente (${chileDep.length} colaboradores)`
+    ])
+
+    sheet.mergeCells(sectionRow.number, 1, sectionRow.number, headers.length)
+    applySectionRowStyle(sectionRow)
+
+    for (const entry of chileDep) {
+      const row = sheet.addRow([
+        runningIndex++,
+        entry.memberName,
+        RECEIPT_REGIME_BADGES.chile_dependent.code,
+        entry.grossTotal,
+        entry.chileGratificacionLegalAmount ?? 0,
+        entry.chileAfpAmount ?? 0,
+        entry.chileHealthAmount ?? 0,
+        entry.chileUnemploymentAmount ?? 0,
+        entry.chileTaxAmount ?? 0,
+        entry.chileApvAmount ?? 0,
+        '—', // Tasa SII not applicable
+        '—', // Retención SII not applicable
+        entry.netTotal
+      ])
+
+      // Currency cells (CLP, integer formatting). Skip Tasa SII / Retención SII (text "—").
+      for (const col of [4, 5, 6, 7, 8, 9, 10, 13]) {
+        const cell = row.getCell(col)
+
+        if (typeof cell.value === 'number') applyCurrencyFormat(cell, 'CLP')
+      }
+
+      // Dim the SII columns (col 11/12) for chile_dependent rows.
+      row.getCell(11).font = { color: { argb: 'FF999999' } }
+      row.getCell(11).alignment = { horizontal: 'right' }
+      row.getCell(12).font = { color: { argb: 'FF999999' } }
+      row.getCell(12).alignment = { horizontal: 'right' }
+    }
+
+    const subtotal = sheet.addRow([
+      '',
+      'Total descuentos previsionales',
+      '',
+      chileDep.reduce((s, e) => s + e.grossTotal, 0),
+      chileDep.reduce((s, e) => s + (e.chileGratificacionLegalAmount ?? 0), 0),
+      chileDep.reduce((s, e) => s + (e.chileAfpAmount ?? 0), 0),
+      chileDep.reduce((s, e) => s + (e.chileHealthAmount ?? 0), 0),
+      chileDep.reduce((s, e) => s + (e.chileUnemploymentAmount ?? 0), 0),
+      chileDep.reduce((s, e) => s + (e.chileTaxAmount ?? 0), 0),
+      chileDep.reduce((s, e) => s + (e.chileApvAmount ?? 0), 0),
+      '—',
+      '—',
+      chileDep.reduce((s, e) => s + e.netTotal, 0)
+    ])
+
+    for (const col of [4, 5, 6, 7, 8, 9, 10, 13]) {
+      const cell = subtotal.getCell(col)
+
+      if (typeof cell.value === 'number') applyCurrencyFormat(cell, 'CLP')
+    }
+
+    subtotal.getCell(2).note = 'Suma SOLO descuentos previsionales (AFP/Salud/Cesantía/IUSC/APV) de colaboradores chile_dependent. Reconciliable contra Previred.'
+    applySubtotalRowStyle(subtotal)
+  }
+
+  // ── Section 2 · Honorarios ──
+  if (honorarios.length > 0) {
+    const sectionRow = sheet.addRow([
+      `▼ Sección 2 · Honorarios (${honorarios.length} colaboradores)`
+    ])
+
+    sheet.mergeCells(sectionRow.number, 1, sectionRow.number, headers.length)
+    applySectionRowStyle(sectionRow)
+
+    for (const entry of honorarios) {
+      const row = sheet.addRow([
+        runningIndex++,
+        entry.memberName,
+        RECEIPT_REGIME_BADGES.honorarios.code,
+        entry.grossTotal,
+        '—', // Gratif. not applicable
+        '—', // AFP
+        '—', // Salud
+        '—', // Cesantía
+        '—', // IUSC
+        '—', // APV
+        entry.siiRetentionRate ?? null,
+        entry.siiRetentionAmount ?? 0,
+        entry.netTotal
+      ])
+
+      for (const col of [4, 12, 13]) {
+        const cell = row.getCell(col)
+
+        if (typeof cell.value === 'number') applyCurrencyFormat(cell, 'CLP')
+      }
+
+      // Tasa SII as percentage.
+      const tasaCell = row.getCell(11)
+
+      if (typeof tasaCell.value === 'number') applyPercentFormat(tasaCell)
+
+      // Dim previsional columns (cols 5..10) for honorarios rows.
+      for (const col of [5, 6, 7, 8, 9, 10]) {
+        row.getCell(col).font = { color: { argb: 'FF999999' } }
+        row.getCell(col).alignment = { horizontal: 'right' }
+      }
+    }
+
+    const subtotal = sheet.addRow([
+      '',
+      'Total retención SII honorarios',
+      '',
+      honorarios.reduce((s, e) => s + e.grossTotal, 0),
+      '—',
+      '—',
+      '—',
+      '—',
+      '—',
+      '—',
+      '—',
+      honorarios.reduce((s, e) => s + (e.siiRetentionAmount ?? 0), 0),
+      honorarios.reduce((s, e) => s + e.netTotal, 0)
+    ])
+
+    for (const col of [4, 12, 13]) {
+      const cell = subtotal.getCell(col)
+
+      if (typeof cell.value === 'number') applyCurrencyFormat(cell, 'CLP')
+    }
+
+    subtotal.getCell(2).note = 'Suma SOLO retención SII de boletas honorarios (Art. 74 N°2 LIR). Reconciliable contra F29 retenciones honorarios. NO mezclar con descuentos previsionales.'
+    applySubtotalRowStyle(subtotal)
+  }
+
+  return sheet
+}
+
+const buildInternationalSheet = (
+  workbook: ExcelJS.Workbook,
+  groups: Record<ReceiptRegime, PayrollEntry[]>
+) => {
+  const deel = groups.international_deel
+  const intlInternal = groups.international_internal
+
+  if (deel.length === 0 && intlInternal.length === 0) return null
+
+  const sheet = workbook.addWorksheet('Internacional')
+
+  // 6 columns canónicas + Contrato Deel / Jurisdicción contextual.
+  const headers = ['#', 'Nombre', 'Régimen', 'Moneda', 'Bruto', 'Neto', 'Contrato Deel / Jurisdicción']
+
+  sheet.columns = headers.map((header, i) => ({
+    header,
+    key: `col_${i}`,
+    width: i === 0 ? 5 : i === 1 ? 28 : i === 6 ? 28 : 14
+  }))
+
+  applyHeaderStyle(sheet.getRow(1))
+
+  let runningIndex = 1
+
+  // ── Section 1 · Internacional Deel ──
+  if (deel.length > 0) {
+    const sectionRow = sheet.addRow([
+      `▼ Sección 1 · Internacional Deel (${deel.length} colaboradores)`
+    ])
+
+    sheet.mergeCells(sectionRow.number, 1, sectionRow.number, headers.length)
+    applySectionRowStyle(sectionRow)
+
+    for (const entry of deel) {
+      const row = sheet.addRow([
+        runningIndex++,
+        entry.memberName,
+        RECEIPT_REGIME_BADGES.international_deel.code,
+        entry.currency,
+        entry.grossTotal,
+        entry.netTotal,
+        entry.deelContractId ?? ''
+      ])
+
+      for (const col of [5, 6]) {
+        const cell = row.getCell(col)
+
+        if (typeof cell.value === 'number') applyCurrencyFormat(cell, entry.currency)
+      }
+    }
+
+    const subtotal = sheet.addRow([
+      '',
+      'Total Internacional Deel',
+      '',
+      'USD',
+      deel.reduce((s, e) => s + e.grossTotal, 0),
+      deel.reduce((s, e) => s + e.netTotal, 0),
+      ''
+    ])
+
+    for (const col of [5, 6]) {
+      const cell = subtotal.getCell(col)
+
+      if (typeof cell.value === 'number') applyCurrencyFormat(cell, 'USD')
+    }
+
+    applySubtotalRowStyle(subtotal)
+  }
+
+  // ── Section 2 · Internacional interno ──
+  if (intlInternal.length > 0) {
+    const sectionRow = sheet.addRow([
+      `▼ Sección 2 · Internacional interno (${intlInternal.length} colaboradores)`
+    ])
+
+    sheet.mergeCells(sectionRow.number, 1, sectionRow.number, headers.length)
+    applySectionRowStyle(sectionRow)
+
+    for (const entry of intlInternal) {
+      const row = sheet.addRow([
+        runningIndex++,
+        entry.memberName,
+        RECEIPT_REGIME_BADGES.international_internal.code,
+        entry.currency,
+        entry.grossTotal,
+        entry.netTotal,
+        '' // jurisdicción persistida queda como follow-up
+      ])
+
+      for (const col of [5, 6]) {
+        const cell = row.getCell(col)
+
+        if (typeof cell.value === 'number') applyCurrencyFormat(cell, entry.currency)
+      }
+    }
+
+    const subtotal = sheet.addRow([
+      '',
+      'Total Internacional interno',
+      '',
+      'USD',
+      intlInternal.reduce((s, e) => s + e.grossTotal, 0),
+      intlInternal.reduce((s, e) => s + e.netTotal, 0),
+      ''
+    ])
+
+    for (const col of [5, 6]) {
+      const cell = subtotal.getCell(col)
+
+      if (typeof cell.value === 'number') applyCurrencyFormat(cell, 'USD')
+    }
+
+    applySubtotalRowStyle(subtotal)
+  }
+
+  return sheet
+}
+
 export const generatePayrollExcel = async (periodId: string): Promise<Buffer> => {
   const period = await getPayrollPeriod(periodId)
 
@@ -401,7 +747,12 @@ export const generatePayrollExcel = async (periodId: string): Promise<Buffer> =>
   workbook.creator = 'Greenhouse EO'
   workbook.created = new Date()
 
+  // TASK-782 — group entries by canonical regime for the new sheets.
+  const groups = groupEntriesByRegime(entries)
+
   buildResumenSheet(workbook, period, entries)
+  buildChileSheet(workbook, groups)
+  buildInternationalSheet(workbook, groups)
   buildDetalleSheet(workbook, entries, breakdownsByEntry)
   buildAsistenciaSheet(workbook, entries)
 
