@@ -9,7 +9,7 @@
     "prebuild": "pnpm build:icons && pnpm catalog:check",
     "build": "node scripts/run-next-build.mjs",
     "design:lint": "design.md lint DESIGN.md",
-    "design:diff": "design.md diff DESIGN.md DESIGN.prev.md",
+    "design:diff": "node scripts/design-diff.mjs",
     "design:export:tailwind": "design.md export --format tailwind DESIGN.md",
     "docs:context-check": "node scripts/check-context-handoff.mjs",
     "docs:context-check:strict": "node scripts/check-context-handoff.mjs --strict",
