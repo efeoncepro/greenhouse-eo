@@ -179,6 +179,27 @@ Desde `RECEIPT_TEMPLATE_VERSION = '4'` (2026-05-04) Greenhouse emite el recibo i
 
 Cualquier nuevo tipo de contrato debe declarar primero su comportamiento de recibo en `src/lib/payroll/receipt-presenter.ts` antes de mergear codigo — el helper canonico tiene un `never`-check que rompe build sin esa rama.
 
+## Reporte mensual y export Excel para el operador (TASK-782)
+
+El PDF del reporte mensual y el archivo Excel que descarga el operador despues de aprobar el periodo separan las cuatro familias de regimen en grupos independientes con subtotales no mezclados.
+
+| Que aparece | Donde |
+| --- | --- |
+| Contadores `# CL-DEP / # HON / # DEEL / # INT` con la cantidad de colaboradores por regimen | summary strip del PDF + hoja `Resumen` del Excel |
+| Columnas separadas `Desc. previs.` y `Retencion SII` | tabla del PDF + hoja `Chile` del Excel |
+| Subtotales `Total descuentos previsionales` (solo dependientes) y `Total retencion SII honorarios` (solo honorarios) | PDF + Excel |
+| Hoja `Chile` con dos secciones internas (Chile dependiente + Honorarios) cuando ambos regimenes existen en el periodo | Excel |
+| Hoja `Internacional` con dos secciones internas (Deel + interno) cuando ambos existen | Excel |
+| Estado `excluido` visible en el PDF como fila con `$0` y chip `(excluido)` | PDF |
+
+Para el operador esto significa que:
+
+- al reconciliar el archivo contra Previred, mira el subtotal `Total descuentos previsionales` y solo encuentra cotizaciones reales (AFP, salud, cesantia, IUSC, APV).
+- al reconciliar contra el F29 retenciones honorarios, mira el subtotal `Total retencion SII honorarios` y solo encuentra retenciones de boletas.
+- los pagos Deel quedan en su propia hoja con el `Contrato Deel` cuando esta registrado, sin mezclar con retenciones Chile.
+
+Si un regimen no tiene ningun colaborador en el periodo, su grupo y su contador se omiten completamente en lugar de aparecer con `0` (lectura mas limpia).
+
 ---
 
 ## Referencias

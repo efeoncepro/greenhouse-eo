@@ -1,12 +1,20 @@
 # Handoff.md
 
-## Sesion 2026-05-04 — TASK-782 Payroll Period Report + Excel Honorarios Disaggregation — en curso
+## Sesion 2026-05-04 — TASK-782 Payroll Period Report + Excel Honorarios Disaggregation — completada
 
-- **Trigger**: blocker de TASK-782 resuelto (TASK-758 cerrada). Ahora habilita la corrección operador-facing del PDF reporte mensual + Excel para que compliance/SII/PREVIRED puedan reconciliar sin mezclar retención SII honorarios con descuentos previsionales reales.
+- **Trigger**: blocker de TASK-782 resuelto (TASK-758 cerrada). Habilita la corrección operador-facing del PDF reporte mensual + Excel para que compliance/SII/PREVIRED puedan reconciliar sin mezclar retención SII honorarios con descuentos previsionales reales.
 - **Branch**: `develop` (instrucción explícita: implementar sin cambiar de rama).
-- **Lifecycle**: `in-progress`. Mockup `docs/mockups/task-782-period-report-excel-honorarios-disaggregation.html` aprobado y vinculante 1:1.
-- **Reuso canónico**: `resolveReceiptRegime` + `groupEntriesByRegime` + `RECEIPT_REGIME_BADGES` + `RECEIPT_REGIME_DISPLAY_ORDER` desde `src/lib/payroll/receipt-presenter.ts` (TASK-758).
-- **Scope**: PeriodReportDocument PDF (3-4 grupos + 4-value Régimen column + 2 columnas separadas Desc. previs / Retención SII + 4 subtotales) + generate-payroll-excel.ts (2 secciones internas en hoja Chile + columnas `Tasa SII` / `Retención SII`).
+- **Lifecycle**: `complete`. Mockup `docs/mockups/task-782-period-report-excel-honorarios-disaggregation.html` aprobado y vinculante 1:1.
+- **4 slices entregados**:
+  - **Slice 1** (`bc410d7c`): PDF `PeriodReportDocument` consume `groupEntriesByRegime` con 4 grupos canónicos en orden estable + group dividers + 4 subtotales mutuamente excluyentes + 10 columnas (nueva `Retención SII` separada de `Desc. previs.`) + summary strip ampliado a 8 KPIs con counters per-régimen + estado `excluded` visible con chip `(excluido)` + meta row con `Tabla tributaria`.
+  - **Slice 2** (`4786e81e`): Excel `Resumen` con 4-regime counters + 2 subtotales separados (`Total descuentos previsionales CLP` + `Total retención SII honorarios CLP`); 2 sheets nuevas `Chile` (13 columnas, 2 secciones internas, cell.note reconciliación Previred/F29) + `Internacional` (7 columnas, 2 secciones internas, columna `Contrato Deel`); `Detalle` y `Asistencia & Bonos` preservados backwards-compat.
+  - **Slice 3** (`d5291fba`): 12 tests anti-regression nuevos (5 PDF estructural via pdf-parse + 7 Excel estructural via ExcelJS). Tests verifican mutually exclusive subtotals, 4-value Régimen badges, omisión de grupos vacíos, sheets opcionales, ANTI-REGRESSION del legacy `Total descuentos CLP` mixed.
+  - **Slice 4** (closing): docs CLAUDE.md sección nueva, arch §25.c, doc funcional + manual de uso con sección reconciliación Previred + F29, changelog, Handoff cierre.
+- **Verificación**: 372/372 tests payroll verde (12 nuevos). `tsc --noEmit` clean. `eslint` 0 errors / 0 warnings en files owned. `pnpm build` ✓ Compiled 29.3s. Anti-regression grep contra tokens prohibidos → 0 hits.
+- **Open Questions resueltas pre-execution**: OQ1 (Excel 2 secciones en pestaña Chile vs 2 pestañas separadas) → 2 secciones internas (lectura mensual unificada). OQ2 (PDF Régimen column 4 valores vs 2) → 4 valores distinguibles (paridad badges TASK-758).
+- **Próximo paso**: ninguno bloqueante. Cualquier nueva surface operador-facing que muestre agregaciones mensuales por régimen debe consumir `groupEntriesByRegime` + tokens canónicos vía las reglas duras de CLAUDE.md.
+
+## Sesion 2026-05-04 — TASK-782 Payroll Period Report + Excel Honorarios Disaggregation — en curso (superseded por entry "completada" arriba)
 
 ## Sesion 2026-05-04 — TASK-758 Payroll Receipt Render Contract Hardening (4 regímenes) — completada
 

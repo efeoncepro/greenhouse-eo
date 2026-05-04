@@ -11,13 +11,13 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Bajo`
 - Type: `implementation`
 - Epic: `optional`
-- Status real: `En implementación`
+- Status real: `Cerrada (2026-05-04)`
 - Rank: `TBD`
 - Domain: `hr`
 - Blocked by: `none` (TASK-758 cerrada 2026-05-04, helper canónico ya exportado)

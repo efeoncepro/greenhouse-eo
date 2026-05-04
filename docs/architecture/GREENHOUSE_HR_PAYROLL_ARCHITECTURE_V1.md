@@ -1398,6 +1398,48 @@ El switch de `buildReceiptPresentation` cierra con `const _exhaustive: never = r
 - El excedente Isapre se muestra pero no altera el sueldo base.
 - Para internacional, el salary base es input directo (sin reverse).
 
+## 25.c Period report + Excel export (TASK-782, desde 2026-05-04)
+
+`PeriodReportDocument` (PDF reporte mensual del operador) y `generate-payroll-excel.ts` (export operador-facing) consumen el helper canónico `groupEntriesByRegime` exportado por TASK-758. Single source of truth de clasificación de régimen across receipts (recibo individual) y reporte/export operador-facing.
+
+### Reglas duras (vinculantes)
+
+- **NUNCA** sumar `chileTotalDeductions` cross-régimen como subtotal único. El motor asigna `chileTotalDeductions = siiRetentionAmount` para honorarios — sumar todo bajo "Total descuentos Chile" mezcla retención SII con cotizaciones previsionales reales y rompe reconciliación contra Previred + F29.
+- **Subtotales mutuamente excluyentes** en ambas surfaces:
+  - `Total descuentos previsionales` (solo `chile_dependent`) — reconciliable contra Previred.
+  - `Total retención SII honorarios` (solo `honorarios`) — reconciliable contra F29 retenciones honorarios.
+- **Régimen column con 4 valores** (`CL-DEP`/`HON`/`DEEL`/`INT`) reusando tokens `RECEIPT_REGIME_BADGES` exportados desde `receipt-presenter.ts`.
+- **Orden canónico** preservado vía `RECEIPT_REGIME_DISPLAY_ORDER`: chile_dependent → honorarios → international_deel → international_internal.
+- **Grupos vacíos se omiten completos** (divider + filas + subtotal). PDF: omite el group section. Excel: omite la sheet entera si ambas secciones están vacías.
+- **Celdas N/A llenan con `—`** (clase `dim` text-faint), NUNCA `$0`. Distinción semántica: `$0` = aplica pero monto cero; `—` = no aplica al régimen.
+- **Estado `excluded` (`grossTotal === 0 && netTotal === 0`)** se renderiza visible en el PDF con chip `(excluido)` inline + Base/OTD/RpA dim `—`. El operador necesita contar el universo.
+
+### PDF — 10 columnas canónicas (porcentajes exactos)
+
+`name: 17%, regime: 7%, currency: 5%, base: 9%, otd: 8%, rpa: 8%, gross: 9%, prevDeductions: 10%, siiRetention: 10%, net: 9%`. Headers: `Nombre | Régimen | Mon. | Base | OTD | RpA | Bruto | Desc. previs. | Retención SII | Neto`.
+
+Summary strip ampliado: counters per-régimen visibles solo si N > 0. KPIs canónicos: `COLABORADORES | ESTADO | # CL-DEP | # HON | # DEEL | # INT | BRUTO CLP | NETO CLP | BRUTO USD`.
+
+Meta row: `UF | Aprobado | Tabla tributaria` (cada ítem se omite si null).
+
+### Excel — sheets canónicas
+
+| Sheet | Contenido | Comportamiento |
+| --- | --- | --- |
+| `Resumen` | Period metadata + 4-regime counters + 4 mutually exclusive subtotals + per-currency totals | Sin sección legacy `Total descuentos CLP` |
+| `Chile` | 13 columnas: `# / Nombre / Régimen / Bruto / Gratif. / AFP / Salud / Cesantía / IUSC / APV / Tasa SII / Retención SII / Neto`; 2 secciones internas (Chile dependiente + Honorarios) con cell.note explicando reconciliación canónica | Omitida si ambas secciones vacías |
+| `Internacional` | 7 columnas: `# / Nombre / Régimen / Moneda / Bruto / Neto / Contrato Deel o Jurisdicción`; 2 secciones internas (Deel + interno) | Omitida si ambas secciones vacías |
+| `Detalle` | Audit raw — todas las columnas, todos los entries unificados | Preservado backwards-compat |
+| `Asistencia & Bonos` | Días + factores KPI + bonos | Preservado |
+
+### Archivos owned
+
+- `src/lib/payroll/generate-payroll-pdf.tsx` — `PeriodReportDocument` consumer
+- `src/lib/payroll/generate-payroll-excel.ts` — Resumen + Chile + Internacional builders
+- `src/lib/payroll/generate-payroll-pdf.test.ts` 🆕 — 5 anti-regression tests
+- `src/lib/payroll/generate-payroll-excel.test.ts` 🆕 — 7 structural tests
+- `docs/mockups/task-782-period-report-excel-honorarios-disaggregation.html` — mockup vinculante
+
 ## 26. Reliquidación de nómina (TASK-409)
 
 Spec técnica completa del flujo de reliquidación implementado en TASK-409 (umbrella), TASK-410 (foundation), TASK-411 (finance delta consumer), TASK-412 (admin UI). Para la documentación funcional en lenguaje simple, ver `docs/documentation/hr/reliquidacion-de-nomina.md`.

@@ -160,6 +160,16 @@ Para colaboradores Deel/Contractor/EOR, el recibo es informativo: muestra el mon
 
 Si recibes un recibo de honorario con filas de AFP/salud en blanco o un recibo Deel sin contexto, ese recibo viene de la version `v3` (legacy). Pidele al equipo de Payroll re-generar el recibo: el portal lo regenera automaticamente la primera vez que el colaborador o el operador acceden al PDF. Cualquier diferencia visible nueva entre la vista previa y el PDF descargable es un bug — ambas surfaces consumen el mismo contrato canonico.
 
+### Donde leo los totales del mes para reconciliar con Previred y SII
+
+El PDF del reporte mensual y el Excel del periodo aprobado separan los totales por regimen en lugar de mezclarlos:
+
+- **Reconciliacion con Previred (cotizaciones)**: leer el subtotal `Total descuentos previsionales` en el PDF o en el Excel hoja `Chile` seccion 1. Suma SOLO AFP, salud, seguro cesantia, IUSC y APV de colaboradores Chile dependientes (`indefinido` y `plazo_fijo`). No incluye honorarios.
+- **Reconciliacion con F29 retenciones honorarios**: leer el subtotal `Total retencion SII honorarios` en el PDF o en el Excel hoja `Chile` seccion 2. Suma SOLO la retencion SII de las boletas de honorarios. No incluye cotizaciones.
+- **Pagos Deel**: viven en la hoja `Internacional` seccion 1 con su `Contrato Deel`. Greenhouse registra el bruto que se le envia a Deel; el liquido legal lo emite Deel en la jurisdiccion del trabajador.
+
+Si en el reporte mensual o en el Excel ves un subtotal `Total descuentos CLP` (sin la palabra "previsionales") es un archivo legacy del periodo `v3` antes del 4 de mayo de 2026 — re-aprueba o re-exporta el periodo para regenerar el archivo con el nuevo contrato canonico.
+
 ## Que no hacer
 
 - No inventes una version tributaria solo para destrabar el flujo.

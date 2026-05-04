@@ -1,5 +1,10 @@
 # TASK-745 — Payroll Adjustments Foundation V1
 
+## Delta 2026-05-04
+
+- TASK-758 + TASK-782 cerradas. Ambas pasaron por `generate-payroll-pdf.tsx` y `generate-payroll-excel.ts` (refactor a `buildReceiptPresentation` + `groupEntriesByRegime`) preservando 100% los paths de adjustments — `EntryAdjustmentBreakdown` con `excluded`/`factorApplied`/`fixedDeductions`/`manualOverride` siguen visibles en el recibo individual (TASK-758) y en la columna `Excluido`/`Descuento adicional`/`Factor aplicado`/`Override neto` del sheet `Detalle` del Excel (TASK-782). El sheet `Chile` y el sheet `Internacional` nuevos NO incluyen las columnas de adjustment porque son agregaciones operador-facing — el detalle adjustment vive en `Detalle` (preservado backwards-compat).
+- No hay scope drift: cuando esta task se tome, las "líneas de ajuste" siguen renderizándose por el mismo helper `getEntryAdjustmentBreakdown`.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
