@@ -35,6 +35,7 @@ _Pendiente._
 ### Plataforma
 
 - [MCP Greenhouse Read-Only](plataforma/mcp-greenhouse-read-only.md) — cómo levantar el MCP local `stdio` o conectarse al gateway remoto HTTP privado, qué variables necesita, qué tools read-only existen hoy, qué límites de scope respeta y qué follow-ups siguen fuera de alcance.
+- [Validar el contrato visual DESIGN.md](plataforma/validar-contrato-visual-design-md.md) — paso a paso para validar localmente con `pnpm design:lint`, comparar versiones con `pnpm design:diff`, agregar tokens nuevos siguiendo el patrón canónico (sin atajos prohibidos), resolver warnings comunes, y verificar que el CI gate aprobó tu PR.
 
 ## Plantilla recomendada
 
