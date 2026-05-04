@@ -18,7 +18,7 @@ La diferencia con otras capas de documentacion:
 
 ### Identidad y acceso
 
-_Pendiente._
+- [SCIM con Microsoft Entra](identity/scim-entra-provisioning.md) — como verificar provisioning, usar `provisionOnDemand`, interpretar `countEscrowed` y evitar fixes manuales inseguros sobre usuarios o mappings.
 
 ### Admin Center
 

@@ -19,6 +19,27 @@ Use together with:
 
 Implemented and active in production. SCIM provisioning job is running in Entra, scoped to the "Efeonce Group" group. Profile sync cron runs daily at 08:00 UTC.
 
+### Production Incident Closure — 2026-05-04
+
+On 2026-05-04, Microsoft Entra provisioning was failing on SCIM `CREATE` for internal Efeonce users because the internal tenant mapping used the legacy pseudo-client `efeonce-admin`. That value does not exist in `greenhouse_core.clients`, so `client_users.client_id` failed `client_users_client_id_fkey`.
+
+Canonical fix:
+
+- Internal Efeonce provisioning uses `scim_tenant_mappings.client_id = NULL`.
+- External/client tenant mappings must use a real `greenhouse_core.clients.client_id`.
+- `scim_tenant_mappings_client_id_fkey` prevents future mappings from pointing to non-existent clients.
+- Internal SCIM-created users persist as `tenant_type='efeonce_internal'`, `client_id=NULL`, `auth_mode='microsoft_sso'`, and receive a baseline role assignment with `client_id=NULL` and `scope_level=NULL`.
+
+Operational evidence:
+
+- Production SCIM discovery returns `200`.
+- Production `/api/scim/v2/Users` without bearer returns `401`.
+- Production `/api/scim/v2/Users?count=1` with bearer returns `200`.
+- Microsoft Graph `provisionOnDemand` for `support@efeoncepro.com` returned `EntryExportAdd=Success` and created the user in Greenhouse.
+- DB verification confirmed the real user was created as an internal Efeonce SCIM user with role `collaborator`.
+
+Residual Entra note: the regular provisioning job can still show historical `countEscrowed` after previous failures. Do not fix that counter with SQL. Use Microsoft Graph provisioning logs, `restart` with `resetScope=Escrows`, and `provisionOnDemand` for controlled validation.
+
 ## Source-of-Truth Boundaries
 
 | Domain | Authority | Notes |
@@ -250,6 +271,7 @@ New columns added to support SCIM lifecycle tracking:
 |------|---------|
 | `migrations/20260403002621463_scim-provisioning-tables.sql` | Users: `scim_tenant_mappings`, `scim_sync_log`, `client_users` columns |
 | `migrations/20260403023326254_scim-groups.sql` | Groups: `scim_groups`, `scim_group_memberships` |
+| `migrations/20260504102236037_scim-internal-tenant-null-client-mapping.sql` | Internal Efeonce tenant mapping uses `client_id=NULL`; external mappings get FK protection |
 
 ## Identity Graph Integration
 
@@ -327,6 +349,71 @@ The separation exists because the original Greenhouse app accumulated a ghost pr
 | `scim-bearer-token` | GCP Secret Manager | Canonical token storage |
 | `AZURE_AD_CLIENT_ID` | Vercel | Graph API client credentials (app ID) |
 | `AZURE_AD_CLIENT_SECRET` | Vercel / Secret Manager | Graph API client credentials (secret) |
+
+## Operational Verification Runbook
+
+Use this runbook when SCIM looks degraded in Entra or users are not appearing in Greenhouse.
+
+### 1. Verify Greenhouse endpoint health
+
+- `GET /api/scim/v2/ServiceProviderConfig` should return `200` without bearer auth.
+- `GET /api/scim/v2/Users?count=1` should return `401` without bearer auth.
+- `GET /api/scim/v2/Users?count=1` should return `200` with the production SCIM bearer token.
+
+### 2. Verify Entra provisioning job state
+
+Use Azure CLI / Microsoft Graph against service principal `GH SCIM`:
+
+- Service principal ID: `fe7a54ef-844f-4cbc-acee-3349d914f1ce`
+- Job ID: `scim.a80bf6c17c454d70b04351389622a0e4.4d89f061-eeb0-4aa8-ac94-df57d37e8c2a`
+
+Healthy steady state:
+
+- `schedule.state = Active`
+- `status.code = Active`
+- `status.lastExecution.state = Succeeded`
+- `status.quarantine = null`
+- `status.lastExecution.error = null`
+
+### 3. Reprocess historical escrows safely
+
+If the job shows historical escrow after Greenhouse has been fixed, use the official Microsoft Graph restart API:
+
+```bash
+az rest --method POST \
+  --url "https://graph.microsoft.com/v1.0/servicePrincipals/${SP_ID}/synchronization/jobs/${JOB_ID}/restart" \
+  --headers 'Content-Type=application/json' \
+  --body '{"criteria":{"resetScope":"Escrows"}}'
+```
+
+Then start the job:
+
+```bash
+az rest --method POST \
+  --url "https://graph.microsoft.com/v1.0/servicePrincipals/${SP_ID}/synchronization/jobs/${JOB_ID}/start"
+```
+
+Do not mutate Greenhouse users manually to clear Entra escrow counters.
+
+### 4. Validate a real Entra user end-to-end
+
+Use Microsoft Graph `provisionOnDemand` for one assigned user in scope. This is stronger than a direct `curl` because it exercises Entra scoping, mapping, matching, export, and Greenhouse SCIM persistence.
+
+Healthy result:
+
+- `EntryImport = Success`
+- `EntrySynchronizationScoping = Success`
+- `EntrySynchronizationAdd` or `EntrySynchronizationUpdate = Success`
+- `EntryExportAdd` or `EntryExportUpdate = Success`
+
+After success, verify Postgres:
+
+- `client_users.scim_id IS NOT NULL`
+- Internal Efeonce user: `client_id IS NULL`
+- Internal Efeonce user: `tenant_type = 'efeonce_internal'`
+- `auth_mode = 'microsoft_sso'`
+- `provisioned_by = 'scim'`
+- role assignment exists with expected `role_code`
 
 ## Vercel Cron Registration
 
