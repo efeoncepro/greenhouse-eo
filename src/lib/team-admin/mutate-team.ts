@@ -9,6 +9,7 @@ import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
 import { isGreenhousePostgresConfigured, runGreenhousePostgresQuery, withGreenhousePostgresTransaction } from '@/lib/postgres/client'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
+import { openOffboardingNeedsReviewFromMember } from '@/lib/workforce/offboarding'
 import { getPeopleTableColumns, toContactChannel, toDateString, toNumber, toStringArray } from '@/lib/people/shared'
 import type {
   CreateAssignmentInput,
@@ -2028,6 +2029,34 @@ export const deactivateMember = async ({
     throw new TeamAdminValidationError('Deactivated member could not be reloaded.', 500)
   }
 
+  let offboardingGuardrail:
+    | { kind: 'identity_only_case_opened'; offboardingCaseId: string }
+    | { kind: 'identity_only_case_failed'; error: string }
+
+  try {
+    const offboardingCase = await openOffboardingNeedsReviewFromMember({
+      memberId: updated.memberId,
+      source: 'admin',
+      separationType: 'identity_only',
+      actorUserId,
+      sourceRef: {
+        source: 'deactivateMember',
+        actorEmail
+      },
+      notes: 'Desactivación administrativa/identity-only. No representa por sí sola una salida laboral.'
+    })
+
+    offboardingGuardrail = {
+      kind: 'identity_only_case_opened',
+      offboardingCaseId: offboardingCase.offboardingCaseId
+    }
+  } catch (error) {
+    offboardingGuardrail = {
+      kind: 'identity_only_case_failed',
+      error: error instanceof Error ? error.message : String(error)
+    }
+  }
+
   await writeAuditEvent({
     actorUserId,
     eventType: 'admin.team_member.deactivated',
@@ -2035,7 +2064,9 @@ export const deactivateMember = async ({
     targetEntityId: updated.memberId,
     payload: {
       actorEmail,
-      memberId: updated.memberId
+      memberId: updated.memberId,
+      deactivationKind: 'administrative_identity_only',
+      offboardingGuardrail
     }
   })
 

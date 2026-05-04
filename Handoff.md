@@ -1,5 +1,16 @@
 # Handoff.md
 
+## Sesion 2026-05-04 — TASK-760 Workforce Offboarding Runtime Foundation — completada
+
+- **Branch:** `develop` por instrucción explícita del usuario; no se creó ni cambió a `task/TASK-760-workforce-offboarding-runtime-foundation`.
+- **Lifecycle:** `complete`; task movida `to-do` → `in-progress` → `complete`; `docs/tasks/README.md` y `TASK_ID_REGISTRY` sincronizados.
+- **Skills:** `greenhouse-payroll-auditor` invocada por requerimiento del usuario para validar límites Payroll/finiquito; `greenhouse-agent` cargada para surfaces Next.js/Vuexy/People/HR.
+- **Slices entregados:** migración `greenhouse_hr.work_relationship_offboarding_cases` + audit trail; dominio `src/lib/workforce/offboarding/**` con lane resolver/state machine/store; APIs HR offboarding + contract-expiry scan; surface `/hr/offboarding`; People 360 CTA/card; guardrails SCIM/Admin; access model `equipo.offboarding` + `hr.offboarding_case`.
+- **Runtime:** `pnpm pg:connect:migrate` aplicado contra Cloud SQL `greenhouse_app` como `greenhouse_ops`; `src/types/db.d.ts` regenerado.
+- **Drift detectado:** TASK-760 asumía checklist/template HRIS existente; runtime real no tiene tablas/routes de TASK-030. Decisión: `legacy_checklist_ref JSONB` opcional como reference no-FK hasta que TASK-030 exista.
+- **Frontera Payroll:** lane `internal_payroll` queda como hook para TASK-761; no se calculó finiquito ni se emitieron documentos.
+- **Verificación:** `pnpm exec tsc --noEmit --pretty false` OK; targeted Vitest offboarding + People tabs 5 files / 14 tests OK; `pnpm pg:connect:migrate` OK; `pnpm pg:doctor` OK; `pnpm lint` exit 0 con 316 warnings legacy TASK-265; `pnpm build` OK; `pnpm test` 557 files / 3207 passed / 5 skipped OK. Primer full test tuvo 1 timeout flaky en `HrHierarchyView.test.tsx` y conteo de vistas desactualizado; el conteo se actualizó a 11 y el test flaky pasó aislado + en full rerun.
+
 ## Sesion 2026-05-04 — TASK-782 Payroll Period Report + Excel Honorarios Disaggregation — completada
 
 - **Trigger**: blocker de TASK-782 resuelto (TASK-758 cerrada). Habilita la corrección operador-facing del PDF reporte mensual + Excel para que compliance/SII/PREVIRED puedan reconciliar sin mezclar retención SII honorarios con descuentos previsionales reales.

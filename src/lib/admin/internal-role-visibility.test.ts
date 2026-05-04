@@ -146,8 +146,8 @@ describe('TASK-727: Internal role × view matrix', () => {
     expect(FINANZAS_VIEW_CODES).toHaveLength(14)
   })
 
-  it('equipo has 10 views (incluye nomina_proyectada)', () => {
-    expect(EQUIPO_VIEW_CODES).toHaveLength(10)
+  it('equipo has 11 views (incluye offboarding y nomina_proyectada)', () => {
+    expect(EQUIPO_VIEW_CODES).toHaveLength(11)
   })
 
   // ─────────────────────────────────────────────────────────────────────────────

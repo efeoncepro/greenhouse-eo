@@ -21,6 +21,14 @@ export interface PersonHrContext {
   payRegime?: string | null
   payrollVia?: string | null
   deelContractId?: string | null
+  offboarding: {
+    offboardingCaseId: string
+    publicId: string
+    status: string
+    ruleLane: string
+    effectiveDate: string | null
+    lastWorkingDay: string | null
+  } | null
   supervisorMemberId: string | null
   supervisorName: string | null
   compensation: {
@@ -79,6 +87,15 @@ type HrRow = {
   compensation_contract_type: string | null
 }
 
+type OffboardingRow = {
+  offboarding_case_id: string
+  public_id: string
+  status: string
+  rule_lane: string
+  effective_date: string | null
+  last_working_day: string | null
+}
+
 // ── Helpers ──
 
 const toNum = (v: unknown): number => {
@@ -113,6 +130,26 @@ export const getPersonHrContext = async (identifier: string): Promise<PersonHrCo
 
   if (!row) return null
 
+  const offboardingRows = await runGreenhousePostgresQuery<OffboardingRow>(
+    `
+      SELECT
+        offboarding_case_id,
+        public_id,
+        status,
+        rule_lane,
+        effective_date,
+        last_working_day
+      FROM greenhouse_hr.work_relationship_offboarding_cases
+      WHERE member_id = $1
+        AND status NOT IN ('executed', 'cancelled')
+      ORDER BY created_at DESC
+      LIMIT 1
+    `,
+    [row.member_id]
+  )
+
+  const offboarding = offboardingRows[0] ?? null
+
   return {
     identityProfileId: row.identity_profile_id,
     eoId: row.eo_id,
@@ -129,6 +166,16 @@ export const getPersonHrContext = async (identifier: string): Promise<PersonHrCo
     payRegime: row.pay_regime,
     payrollVia: row.payroll_via,
     deelContractId: row.deel_contract_id,
+    offboarding: offboarding
+      ? {
+          offboardingCaseId: offboarding.offboarding_case_id,
+          publicId: offboarding.public_id,
+          status: offboarding.status,
+          ruleLane: offboarding.rule_lane,
+          effectiveDate: toDateStr(offboarding.effective_date),
+          lastWorkingDay: toDateStr(offboarding.last_working_day)
+        }
+      : null,
     supervisorMemberId: row.reports_to_member_id,
     supervisorName: row.supervisor_name,
     compensation: {

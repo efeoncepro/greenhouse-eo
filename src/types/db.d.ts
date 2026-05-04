@@ -5314,6 +5314,75 @@ export interface GreenhouseHrWorkflowApprovalSnapshots {
   workflow_entity_id: string;
 }
 
+export interface GreenhouseHrWorkRelationshipOffboardingCaseEvents {
+  actor_user_id: string | null;
+  created_at: Generated<Timestamp>;
+  event_id: string;
+  event_type: string;
+  from_status: string | null;
+  offboarding_case_id: string;
+  payload: Generated<Json>;
+  reason: string | null;
+  source: Generated<string>;
+  to_status: string | null;
+}
+
+export interface GreenhouseHrWorkRelationshipOffboardingCases {
+  approved_at: Timestamp | null;
+  blocked_reason: string | null;
+  cancelled_at: Timestamp | null;
+  /**
+   * Contractual end date snapshot. It is evidence/review input only and never replaces effective_date.
+   */
+  contract_end_date_snapshot: Timestamp | null;
+  contract_type_snapshot: string;
+  country_code: string | null;
+  created_at: Generated<Timestamp>;
+  created_by_user_id: string | null;
+  deel_contract_id_snapshot: string | null;
+  effective_date: Timestamp | null;
+  employment_type: string | null;
+  executed_at: Timestamp | null;
+  greenhouse_execution_mode: Generated<string>;
+  last_working_day: Timestamp | null;
+  last_working_day_after_effective_reason: string | null;
+  /**
+   * Optional reference to future/legacy HRIS checklist runtime. Nullable-by-json because TASK-030 checklist tables are documented but not deployed.
+   */
+  legacy_checklist_ref: Generated<Json>;
+  legal_entity_organization_id: string | null;
+  member_id: string | null;
+  metadata_json: Generated<Json>;
+  notes: string | null;
+  offboarding_case_id: string;
+  organization_id: string | null;
+  pay_regime_snapshot: string;
+  payroll_via_snapshot: string;
+  person_legal_entity_relationship_id: string | null;
+  profile_id: string;
+  public_id: string;
+  reason_code: string | null;
+  relationship_type: string;
+  requires_access_revocation: Generated<boolean>;
+  requires_approval_reassignment: Generated<boolean>;
+  requires_asset_recovery: Generated<boolean>;
+  requires_assignment_handoff: Generated<boolean>;
+  requires_hr_documents: Generated<boolean>;
+  requires_leave_reconciliation: Generated<boolean>;
+  requires_payroll_closure: Generated<boolean>;
+  rule_lane: string;
+  scheduled_at: Timestamp | null;
+  separation_type: string;
+  source: string;
+  source_ref: Generated<Json>;
+  space_id: string | null;
+  status: Generated<string>;
+  submitted_at: Timestamp | null;
+  updated_at: Generated<Timestamp>;
+  updated_by_user_id: string | null;
+  user_id: string | null;
+}
+
 export interface GreenhouseNotificationsEmailDeliveries {
   actor_email: string | null;
   attachment_size_bytes: number | null;
@@ -8137,6 +8206,8 @@ export interface DB {
   "greenhouse_hr.leave_request_actions": GreenhouseHrLeaveRequestActions;
   "greenhouse_hr.leave_requests": GreenhouseHrLeaveRequests;
   "greenhouse_hr.leave_types": GreenhouseHrLeaveTypes;
+  "greenhouse_hr.work_relationship_offboarding_case_events": GreenhouseHrWorkRelationshipOffboardingCaseEvents;
+  "greenhouse_hr.work_relationship_offboarding_cases": GreenhouseHrWorkRelationshipOffboardingCases;
   "greenhouse_hr.workflow_approval_snapshots": GreenhouseHrWorkflowApprovalSnapshots;
   "greenhouse_notifications.email_deliveries": GreenhouseNotificationsEmailDeliveries;
   "greenhouse_notifications.email_engagement": GreenhouseNotificationsEmailEngagement;

@@ -220,6 +220,24 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     })
   }
 
+  if (hasRouteGroup(subject, 'hr') || hasAuthorizedView(subject, 'equipo.offboarding') || hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
+    const source: TenantEntitlementSource = hasRouteGroup(subject, 'hr')
+      ? 'route_group'
+      : hasAuthorizedView(subject, 'equipo.offboarding')
+        ? 'authorized_view'
+        : 'role'
+
+    for (const action of ['read', 'create', 'update', 'approve', 'manage'] as const) {
+      addEntitlement(entries, {
+        module: 'hr',
+        capability: 'hr.offboarding_case',
+        action,
+        scope: 'tenant',
+        source
+      })
+    }
+  }
+
   if (hasRouteGroup(subject, 'finance') || hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
     const source: TenantEntitlementSource = hasRouteGroup(subject, 'finance') ? 'route_group' : 'role'
 

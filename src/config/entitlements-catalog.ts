@@ -100,6 +100,15 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     defaultScope: 'tenant'
   },
   {
+    // TASK-760 — caso canonico de offboarding laboral/contractual.
+    // create=abrir caso; update=review/schedule/block/cancel no terminal;
+    // approve=aprobacion HR; manage=ejecucion/cancelacion sensible.
+    key: 'hr.offboarding_case',
+    module: 'hr',
+    actions: ['read', 'create', 'update', 'approve', 'manage'] as const,
+    defaultScope: 'tenant'
+  },
+  {
     // TASK-745 — crear / revertir adjustments de payroll por entry
     key: 'hr.payroll_adjustments',
     module: 'hr',

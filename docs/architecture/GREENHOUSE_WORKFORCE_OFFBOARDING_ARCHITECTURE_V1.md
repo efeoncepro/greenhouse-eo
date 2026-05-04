@@ -153,6 +153,27 @@ Alias aceptables en UI/documentacion operativa:
 | `reason_code` / `notes` | justificacion operativa/legal |
 | `rule_lane` | lane resuelto por matriz: `internal_payroll`, `external_payroll`, `non_payroll`, `identity_only`, etc. |
 
+### Runtime V1 implementado — TASK-760 (2026-05-04)
+
+El agregado canonico quedo materializado en PostgreSQL como:
+
+- `greenhouse_hr.work_relationship_offboarding_cases`
+- `greenhouse_hr.work_relationship_offboarding_case_events`
+
+La implementacion V1 vive en `src/lib/workforce/offboarding/**` y expone:
+
+- state machine ejecutable (`draft`, `needs_review`, `approved`, `scheduled`, `blocked`, `executed`, `cancelled`)
+- resolucion deterministica de lane (`internal_payroll`, `external_payroll`, `non_payroll`, `identity_only`, `relationship_transition`, `unknown`)
+- API `GET/POST /api/hr/offboarding/cases`
+- API `POST /api/hr/offboarding/cases/[caseId]/transition`
+- API `POST /api/hr/offboarding/cases/contract-expiry/scan` para abrir revisiones por `contract_end_date` proximo/vencido sin ejecutar offboarding
+- surface `HR > Offboarding` en `/hr/offboarding`
+- card/CTA en People 360 que separa `hireDate`, `contractEndDate`, salida efectiva y ultimo dia trabajado
+
+`contract_end_date_snapshot` es evidencia de revision. No reemplaza `effective_date` y no habilita finiquito por si sola.
+
+El enlace con HRIS checklist legacy queda como `legacy_checklist_ref JSONB` porque las tablas de templates/instances de TASK-030 estan documentadas, pero no existen en el runtime real al momento de TASK-760.
+
 ## Four-Lane Model
 
 Todo caso de offboarding debe partirse conceptualmente en cuatro carriles.

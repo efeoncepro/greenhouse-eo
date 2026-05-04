@@ -6,17 +6,17 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `EPIC-010`
-- Status real: `Diseno`
+- Status real: `Implementado`
 - Rank: `TBD`
 - Domain: `hr`
 - Blocked by: `none`
-- Branch: `task/TASK-760-workforce-offboarding-runtime-foundation`
+- Branch: `develop` (instruccion explicita de ejecucion)
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
@@ -192,30 +192,32 @@ Reglas obligatorias:
 
 ## Acceptance Criteria
 
-- [ ] Existe agregado canónico `OffboardingCase` con estado y lane formal.
-- [ ] Se puede abrir y operar un caso de renuncia manualmente desde HR.
-- [ ] People/HR distingue fecha de ingreso, fin de contrato, salida efectiva y último día trabajado.
-- [ ] `contractEndDate` no se usa como fuente de verdad de término laboral ni como input directo de finiquito.
-- [ ] `deactivateMember` no representa silenciosamente un término laboral; queda guardrail o derivación a offboarding.
-- [ ] Existe hook explícito para lane de payroll final sin calcular todavía el finiquito.
-- [ ] La task no depende de implementar Onboarding.
+- [x] Existe agregado canónico `OffboardingCase` con estado y lane formal.
+- [x] Se puede abrir y operar un caso de renuncia manualmente desde HR.
+- [x] People/HR distingue fecha de ingreso, fin de contrato, salida efectiva y último día trabajado.
+- [x] `contractEndDate` no se usa como fuente de verdad de término laboral ni como input directo de finiquito.
+- [x] `deactivateMember` no representa silenciosamente un término laboral; queda guardrail o derivación a offboarding.
+- [x] Existe hook explícito para lane de payroll final sin calcular todavía el finiquito.
+- [x] La task no depende de implementar Onboarding.
 
 ## Verification
 
-- `pnpm lint`
-- `pnpm exec tsc --noEmit --pretty false`
-- `pnpm test`
-- Validación manual de crear y mover un caso de offboarding en preview/local
-- Test unitario/read-model que pruebe `contractEndDate` vs `effective_date` como conceptos distintos
-- Grep/revisión: no introducir `terminationDate` plano como owner canónico fuera del agregado/read-model derivado
+- `pnpm exec tsc --noEmit --pretty false` — OK
+- `pnpm exec vitest run src/lib/workforce/offboarding src/views/greenhouse/people/tabs/person-hr-profile-view-model.test.ts src/views/greenhouse/people/tabs/PersonHrProfileTab.test.tsx src/views/greenhouse/people/tabs/PersonProfileTab.test.tsx` — OK, 5 files / 14 tests
+- `pnpm pg:connect:migrate` — OK, Cloud SQL `greenhouse_app`, `src/types/db.d.ts` regenerado
+- `pnpm pg:doctor` — OK, runtime role y schemata sanos
+- `pnpm lint` — OK, 0 errores / 316 warnings legacy TASK-265
+- `pnpm test` — OK, 557 files / 3207 passed / 5 skipped
+- `pnpm build` — OK
+- Validación manual preview/local — no ejecutada en navegador; surface compila y rutas/API/typecheck OK
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado
-- [ ] archivo movido a la carpeta correcta
-- [ ] `docs/tasks/README.md` sincronizado
-- [ ] `Handoff.md` actualizado
-- [ ] docs funcionales/arquitectura actualizadas si cambió contrato
+- [x] `Lifecycle` sincronizado
+- [x] archivo movido a la carpeta correcta
+- [x] `docs/tasks/README.md` sincronizado
+- [x] `Handoff.md` actualizado
+- [x] docs funcionales/arquitectura actualizadas si cambió contrato
 
 ## Follow-ups
 

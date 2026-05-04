@@ -214,11 +214,13 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
             children: [
               { label: nl(GH_HR_NAV.team), href: '/hr/team' },
               { label: nl(GH_HR_NAV.approvals), href: '/hr/approvals' },
-              { label: nl(GH_HR_NAV.departments), href: '/hr/departments' }
+              { label: nl(GH_HR_NAV.departments), href: '/hr/departments' },
+              { label: nl(GH_HR_NAV.offboarding), href: '/hr/offboarding' }
             ].filter(item => {
               if (item.href === '/hr/team') return canSeeHrTeamWorkspace
               if (item.href === '/hr/approvals') return canSeeHrTeamWorkspace
               if (item.href === '/hr/departments') return canSeeView('equipo.departamentos', true)
+              if (item.href === '/hr/offboarding') return canSeeView('equipo.offboarding', true)
 
               return true
             })

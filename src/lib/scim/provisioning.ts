@@ -5,6 +5,7 @@ import { randomUUID } from 'node:crypto'
 import { getDb, query } from '@/lib/db'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
+import { openOffboardingNeedsReviewFromMember } from '@/lib/workforce/offboarding'
 
 import type { ScimUserRow } from './formatters'
 
@@ -103,6 +104,27 @@ const USER_SELECT_COLUMNS = [
   'created_at',
   'updated_at'
 ] as const
+
+const getMemberIdForScimUser = async (userId: string, email: string | null | undefined) => {
+  const rows = await query<{ member_id: string }>(
+    `
+      SELECT m.member_id
+      FROM greenhouse_core.client_users cu
+      INNER JOIN greenhouse_core.members m
+        ON m.identity_profile_id = cu.identity_profile_id
+        OR lower(m.primary_email) = lower(cu.email)
+        OR lower(m.primary_email) = lower(cu.microsoft_email)
+      WHERE cu.user_id = $1
+         OR lower(cu.email) = lower($2)
+         OR lower(cu.microsoft_email) = lower($2)
+      ORDER BY m.active DESC, m.created_at ASC
+      LIMIT 1
+    `,
+    [userId, email ?? '']
+  )
+
+  return rows[0]?.member_id ?? null
+}
 
 export const getUserByScimId = async (scimId: string): Promise<ScimUserRow | null> => {
   const db = await getDb()
@@ -366,6 +388,27 @@ export const updateUser = async (
       eventType: EVENT_TYPES.userDeactivated,
       payload: { userId: rows[0].user_id, deactivatedBy: 'scim' }
     }).catch(() => {})
+
+    getMemberIdForScimUser(rows[0].user_id, rows[0].email)
+      .then(memberId => {
+        if (!memberId) return null
+
+        return openOffboardingNeedsReviewFromMember({
+          memberId,
+          source: 'scim',
+          separationType: 'identity_only',
+          actorUserId: rows[0].user_id,
+          sourceRef: {
+            source: 'scim.updateUser',
+            scimId: rows[0].scim_id,
+            updates
+          },
+          notes: 'SCIM desactivó acceso. Requiere revisión HR si corresponde a salida laboral.'
+        })
+      })
+      .catch(error => {
+        console.warn('[scim] Unable to open offboarding needs_review case after deactivation:', error)
+      })
   } else if (updates.active === true) {
     publishOutboxEvent({
       aggregateType: AGGREGATE_TYPES.userLifecycle,

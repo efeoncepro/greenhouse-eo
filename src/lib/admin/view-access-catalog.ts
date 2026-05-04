@@ -192,6 +192,14 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
     routeGroup: 'hr'
   },
   {
+    viewCode: 'equipo.offboarding',
+    section: 'equipo',
+    label: 'Offboarding',
+    description: 'Casos de salida laboral o contractual y lanes downstream.',
+    routePath: '/hr/offboarding',
+    routeGroup: 'hr'
+  },
+  {
     viewCode: 'finanzas.resumen',
     section: 'finanzas',
     label: 'Resumen financiero',

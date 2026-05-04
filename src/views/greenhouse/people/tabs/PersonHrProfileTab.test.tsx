@@ -45,7 +45,8 @@ const hrContext: PersonHrContext = {
     pendingRequests: 1,
     approvedRequestsThisYear: 2,
     totalApprovedDaysThisYear: 4
-  }
+  },
+  offboarding: null
 }
 
 const fallbackOperationalMetrics: PersonOperationalMetrics = {

@@ -27,6 +27,7 @@ export const AGGREGATE_TYPES = {
   // HR
   leaveRequest: 'leave_request',
   leaveBalance: 'leave_balance',
+  workRelationshipOffboardingCase: 'work_relationship_offboarding_case',
 
   // HR Goals (TASK-029)
   goal: 'goal',
@@ -225,6 +226,12 @@ export const EVENT_TYPES = {
   assignmentCreated: 'assignment.created',
   assignmentUpdated: 'assignment.updated',
   assignmentRemoved: 'assignment.removed',
+  workRelationshipOffboardingCaseCreated: 'work_relationship_offboarding_case.created',
+  workRelationshipOffboardingCaseUpdated: 'work_relationship_offboarding_case.updated',
+  workRelationshipOffboardingCaseApproved: 'work_relationship_offboarding_case.approved',
+  workRelationshipOffboardingCaseScheduled: 'work_relationship_offboarding_case.scheduled',
+  workRelationshipOffboardingCaseExecuted: 'work_relationship_offboarding_case.executed',
+  workRelationshipOffboardingCaseCancelled: 'work_relationship_offboarding_case.cancelled',
 
   // Identity
   reconciliationProposed: 'identity.reconciliation.proposed',

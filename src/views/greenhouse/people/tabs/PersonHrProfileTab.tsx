@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react'
 
+import Link from 'next/link'
+
 import Alert from '@mui/material/Alert'
 import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
@@ -371,15 +373,29 @@ const PersonHrProfileTab = ({ memberId, hrContext = null, defaultOperationalMetr
           <CardHeader
             title='Información laboral'
             action={
-              <Button
-                size='small'
-                variant='tonal'
-                color='primary'
-                startIcon={<i className='tabler-edit' />}
-                onClick={handleOpenEmploymentDialog}
-              >
-                Editar ingreso
-              </Button>
+              <Stack direction='row' spacing={2}>
+                {!viewModel.employment.offboardingCaseId && (
+                  <Button
+                    component={Link}
+                    href={`/hr/offboarding?memberId=${memberId}`}
+                    size='small'
+                    variant='tonal'
+                    color='warning'
+                    startIcon={<i className='tabler-door-exit' />}
+                  >
+                    Iniciar offboarding
+                  </Button>
+                )}
+                <Button
+                  size='small'
+                  variant='tonal'
+                  color='primary'
+                  startIcon={<i className='tabler-edit' />}
+                  onClick={handleOpenEmploymentDialog}
+                >
+                  Editar ingreso
+                </Button>
+              </Stack>
             }
             avatar={
               <Avatar variant='rounded' sx={{ bgcolor: 'primary.lightOpacity' }}>
@@ -408,6 +424,16 @@ const PersonHrProfileTab = ({ memberId, hrContext = null, defaultOperationalMetr
                 <DetailRow label='Fecha ingreso' value={formatDate(effectiveHireDate)} />
                 {viewModel.employment.contractEndDate && (
                   <DetailRow label='Fin contrato' value={formatDate(viewModel.employment.contractEndDate)} />
+                )}
+                {viewModel.employment.offboardingCaseId && (
+                  <>
+                    <Divider sx={{ my: 1 }} />
+                    <DetailRow label='Caso offboarding' value={viewModel.employment.offboardingPublicId ?? viewModel.employment.offboardingCaseId} />
+                    <DetailRow label='Estado offboarding' value={viewModel.employment.offboardingStatus ?? '—'} />
+                    <DetailRow label='Salida efectiva' value={formatDate(viewModel.employment.effectiveExitDate)} />
+                    <DetailRow label='Último día trabajado' value={formatDate(viewModel.employment.lastWorkingDay)} />
+                    <DetailRow label='Lane' value={viewModel.employment.offboardingRuleLane ?? '—'} />
+                  </>
                 )}
                 <DetailRow label='Asistencia diaria' value={viewModel.employment.dailyRequired ? 'Sí' : 'No'} />
                 <Divider sx={{ my: 1 }} />

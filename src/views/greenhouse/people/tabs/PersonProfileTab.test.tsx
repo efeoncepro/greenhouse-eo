@@ -120,7 +120,8 @@ const detail: PersonDetail = {
       pendingRequests: 1,
       approvedRequestsThisYear: 2,
       totalApprovedDaysThisYear: 4
-    }
+    },
+    offboarding: null
   },
   deliveryContext: null,
   identityContext: null,

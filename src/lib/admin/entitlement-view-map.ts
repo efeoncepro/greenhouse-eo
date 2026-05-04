@@ -46,6 +46,9 @@ const resolveBindingsForView = (view: GovernanceViewRegistryEntry): ViewEntitlem
     case 'equipo.organigrama':
       return [toBinding(view, 'hr.org_chart', ['read'])]
 
+    case 'equipo.offboarding':
+      return [toBinding(view, 'hr.offboarding_case', ['read', 'create', 'update', 'approve', 'manage'])]
+
     case 'finanzas.inteligencia':
       return [toBinding(view, 'finance.status', ['read'])]
 
@@ -66,4 +69,3 @@ const resolveBindingsForView = (view: GovernanceViewRegistryEntry): ViewEntitlem
 }
 
 export const VIEW_ENTITLEMENT_BINDINGS = VIEW_REGISTRY.flatMap(resolveBindingsForView)
-

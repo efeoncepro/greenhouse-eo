@@ -28,6 +28,12 @@ export type PersonHrProfileViewModel = {
     currency: string | null
     baseSalary: number | null
     contractType: string | null
+    offboardingCaseId: string | null
+    offboardingPublicId: string | null
+    offboardingStatus: string | null
+    offboardingRuleLane: string | null
+    effectiveExitDate: string | null
+    lastWorkingDay: string | null
   }
   leave: {
     available: number
@@ -226,7 +232,13 @@ export const buildPersonHrProfileViewModel = ({
     deelContractId: hrContext?.deelContractId ?? null,
     currency: hrContext?.compensation.currency ?? null,
     baseSalary: hrContext?.compensation.baseSalary ?? null,
-    contractType: hrContext?.contractType ?? hrContext?.compensation.contractType ?? null
+    contractType: hrContext?.contractType ?? hrContext?.compensation.contractType ?? null,
+    offboardingCaseId: hrContext?.offboarding?.offboardingCaseId ?? null,
+    offboardingPublicId: hrContext?.offboarding?.publicId ?? null,
+    offboardingStatus: hrContext?.offboarding?.status ?? null,
+    offboardingRuleLane: hrContext?.offboarding?.ruleLane ?? null,
+    effectiveExitDate: hrContext?.offboarding?.effectiveDate ?? null,
+    lastWorkingDay: hrContext?.offboarding?.lastWorkingDay ?? null
   }
 
   const hasEmploymentData = Boolean(
@@ -241,6 +253,7 @@ export const buildPersonHrProfileViewModel = ({
       employment.currency ||
       employment.baseSalary !== null ||
       employment.contractType ||
+      employment.offboardingCaseId ||
       employment.deelContractId ||
       employment.dailyRequired !== null
   )
