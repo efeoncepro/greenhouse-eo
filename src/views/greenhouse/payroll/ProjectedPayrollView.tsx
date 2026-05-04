@@ -42,6 +42,7 @@ import CustomTextField from '@core/components/mui/TextField'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 
 import { computeCurrencyDelta, formatDeltaLabel, payrollTrendDirection } from '@/lib/finance/currency-comparison'
+import { resolveReceiptRegime, type ReceiptRegime } from '@/lib/payroll/receipt-presenter'
 import { formatCurrency } from './helpers'
 
 import tableStyles from '@core/styles/table.module.css'
@@ -187,10 +188,25 @@ const chipTooltip = (color: 'success' | 'warning' | 'error' | 'secondary') => {
   return ''
 }
 
-const isInternationalRegime = (e: ProjectedEntry) =>
-  e.payRegime === 'international' || (e.currency === 'USD' && e.chileTotalDeductions === 0)
+// TASK-758 — single source of truth for regime classification.
+// ProjectedEntry shape doesn't carry contractTypeSnapshot/payrollVia, so the
+// detector falls through to legacy fallbacks (siiRetentionAmount > 0 for
+// honorarios, payRegime === 'international' for international_internal).
+const projectedRegime = (e: ProjectedEntry): ReceiptRegime =>
+  resolveReceiptRegime({
+    contractTypeSnapshot: null,
+    payRegime: e.payRegime === 'international' ? 'international' : 'chile',
+    payrollVia: undefined,
+    siiRetentionAmount: e.siiRetentionAmount
+  })
 
-const isHonorariosProjectedEntry = (e: ProjectedEntry) => (e.siiRetentionAmount ?? 0) > 0
+const isInternationalRegime = (e: ProjectedEntry) => {
+  const regime = projectedRegime(e)
+
+  return regime === 'international_deel' || regime === 'international_internal'
+}
+
+const isHonorariosProjectedEntry = (e: ProjectedEntry) => projectedRegime(e) === 'honorarios'
 
 const currencySummaryLabel = (byCurrency: Record<string, number>) => {
   const parts: string[] = []
