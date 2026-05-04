@@ -176,7 +176,7 @@ Maps a Microsoft Entra tenant to a Greenhouse client context, controlling which 
 | `scim_tenant_mapping_id` | uuid | Primary key |
 | `microsoft_tenant_id` | text | Entra tenant ID (unique) |
 | `tenant_name` | text | Human-readable label |
-| `client_id` | uuid | FK to `greenhouse_core.clients` |
+| `client_id` | text nullable | FK to `greenhouse_core.clients`; `NULL` represents the internal Efeonce tenant |
 | `space_id` | uuid | FK to `greenhouse_core.spaces` |
 | `default_role_code` | text | Role assigned to newly provisioned users |
 | `allowed_email_domains` | text[] | Domains that may be provisioned (e.g., `{efeoncepro.com, efeonce.org, efeonce.cl}`) |
@@ -362,6 +362,8 @@ Profile attributes like job title, country, and phone number change infrequently
 ### Decision 6: Tenant mapping table for multi-tenant readiness
 
 Although only the Efeonce Group tenant is configured today, the `scim_tenant_mappings` table supports future multi-tenant SCIM provisioning. Each tenant mapping declares its allowed email domains, default role, and auto-provision flag, enabling new client organizations to onboard without code changes.
+
+Internal Efeonce provisioning uses `client_id=NULL` by contract. External/client tenant mappings must use a real `greenhouse_core.clients.client_id`; the database enforces this with `scim_tenant_mappings_client_id_fkey` so a legacy pseudo-client such as `efeonce-admin` cannot silently break Entra CREATE operations again.
 
 ## File Inventory
 

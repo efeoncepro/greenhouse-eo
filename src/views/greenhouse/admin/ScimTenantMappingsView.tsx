@@ -27,7 +27,7 @@ type TenantMapping = {
   scim_tenant_mapping_id: string
   microsoft_tenant_id: string
   tenant_name: string | null
-  client_id: string
+  client_id: string | null
   default_role_code: string
   allowed_email_domains: string[]
   auto_provision: boolean
@@ -152,13 +152,13 @@ export default function ScimTenantMappingsView({ mappings: initialMappings }: Pr
                   <TableRow key={m.scim_tenant_mapping_id}>
                     <TableCell>
                       <Typography variant='body2' fontWeight={600}>
-                        {m.tenant_name || m.client_id}
+                        {m.tenant_name || m.client_id || 'Tenant interno'}
                       </Typography>
                     </TableCell>
                     <TableCell>
                       <Typography variant='monoId'>{m.microsoft_tenant_id.slice(0, 8)}...</Typography>
                     </TableCell>
-                    <TableCell>{m.client_id}</TableCell>
+                    <TableCell>{m.client_id || 'Interno Efeonce'}</TableCell>
                     <TableCell>
                       <Chip label={m.default_role_code} size='small' variant='outlined' />
                     </TableCell>
@@ -225,7 +225,7 @@ export default function ScimTenantMappingsView({ mappings: initialMappings }: Pr
             />
             <TextField
               label='Client ID (Greenhouse)'
-              placeholder='efeonce-admin'
+              placeholder='Vacío para tenant interno; client_id real para clientes'
               fullWidth
               size='small'
               value={form.clientId}
@@ -261,7 +261,7 @@ export default function ScimTenantMappingsView({ mappings: initialMappings }: Pr
           <Button
             variant='contained'
             onClick={handleCreate}
-            disabled={saving || !form.microsoftTenantId || !form.clientId}
+            disabled={saving || !form.microsoftTenantId}
           >
             {saving ? 'Guardando...' : 'Crear'}
           </Button>

@@ -36,14 +36,17 @@ export async function POST(request: Request) {
 
   const body = await request.json().catch(() => null)
 
-  if (!body?.microsoftTenantId || !body?.clientId) {
+  if (!body?.microsoftTenantId) {
     return NextResponse.json(
-      { error: 'microsoftTenantId and clientId are required' },
+      { error: 'microsoftTenantId is required' },
       { status: 400 }
     )
   }
 
-  const id = `scim-tm-${body.clientId}`
+  const normalizedClientId = String(body.clientId || '').trim() || null
+  const id = normalizedClientId
+    ? `scim-tm-${normalizedClientId}`
+    : `scim-tm-${String(body.microsoftTenantId).toLowerCase()}`
 
   const rows = await query<Record<string, unknown>>(
     `INSERT INTO greenhouse_core.scim_tenant_mappings (
@@ -64,7 +67,7 @@ export async function POST(request: Request) {
       id,
       body.microsoftTenantId,
       body.tenantName || null,
-      body.clientId,
+      normalizedClientId,
       body.defaultRoleCode || 'collaborator',
       body.allowedEmailDomains || [],
       body.autoProvision !== false

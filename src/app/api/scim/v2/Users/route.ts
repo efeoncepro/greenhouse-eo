@@ -157,7 +157,7 @@ export async function POST(request: Request) {
       )
     }
 
-    const isEfeonce = mapping.client_id === 'efeonce-admin'
+    const isInternalTenant = mapping.client_id === null
 
     const newUser = await createUser({
       email,
@@ -166,7 +166,7 @@ export async function POST(request: Request) {
       microsoftTenantId: mapping.microsoft_tenant_id,
       microsoftEmail: email,
       clientId: mapping.client_id,
-      tenantType: isEfeonce ? 'efeonce_internal' : 'client',
+      tenantType: isInternalTenant ? 'efeonce_internal' : 'client',
       defaultRoleCode: mapping.default_role_code,
       active
     })

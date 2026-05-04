@@ -35,7 +35,7 @@ export async function PATCH(
 
   if (body.clientId !== undefined) {
     sets.push(`client_id = $${idx++}`)
-    values.push(body.clientId)
+    values.push(String(body.clientId || '').trim() || null)
   }
 
   if (body.defaultRoleCode !== undefined) {

@@ -22224,3 +22224,33 @@ Cierre operativo:
 Follow-up recomendado:
 
 - Retirar credential Azure anterior cuando Microsoft SSO quede confirmado estable en production + staging durante una ventana operativa corta. No se elimino durante el incidente para preservar rollback seguro.
+
+## Sesion 2026-05-04 — SCIM Entra provisioning: CREATE 500 por mapping legacy corregido
+
+Verificacion SCIM end-to-end con Azure CLI + Vercel + Postgres:
+
+- Endpoint discovery productivo `/api/scim/v2/ServiceProviderConfig` responde 200.
+- `/api/scim/v2/Users` sin bearer responde 401.
+- Con bearer real de produccion, `/Users?count=1` responde 200 con `totalResults=40`; `/Groups?count=1` responde 200 con `totalResults=1`.
+- Azure Enterprise App `GH SCIM` (`servicePrincipalId=fe7a54ef-844f-4cbc-acee-3349d914f1ce`) tiene job `scim.a80bf6c17c454d70b04351389622a0e4.4d89f061-eeb0-4aa8-ac94-df57d37e8c2a` en `Active`, sin quarantine; ultima ejecucion `Succeeded` el 2026-05-04 09:47:23Z.
+- Postgres mostro `CREATE 500` recurrente por `client_users_client_id_fkey`: el mapping interno `scim-tm-efeonce` apuntaba al pseudo-client legacy `efeonce-admin`, que no existe en `greenhouse_core.clients`.
+
+Fix robusto aplicado:
+
+- Migration `20260504102236037_scim-internal-tenant-null-client-mapping.sql` aplicada en Cloud SQL.
+- `greenhouse_core.scim_tenant_mappings.client_id` ahora permite `NULL` para tenant interno Efeonce.
+- Mapping `scim-tm-efeonce` quedo con `client_id=NULL`.
+- Se agrego FK `scim_tenant_mappings_client_id_fkey` para que cualquier mapping externo non-null deba apuntar a un cliente real.
+- Runtime SCIM crea usuarios internos con `tenant_type='efeonce_internal'`, `client_id=NULL` y role assignment sin scope `tenant_all` falso.
+- Admin UI/API de SCIM mappings ahora permite `clientId` vacio para tenant interno y normaliza vacio a `NULL`.
+
+Validaciones locales:
+
+- `pnpm exec tsc --noEmit --pretty false` → pass.
+- `pnpm exec vitest run src/lib/auth/readiness.test.ts` → pass.
+
+Pendiente inmediato:
+
+- Deployar codigo SCIM a `develop` y `main`.
+- Ejecutar POST SCIM controlado con usuario sintetico temporal despues del deploy y limpiar el usuario/role/outbox resultante.
+- Re-ejecutar/provisionar on-demand desde Azure y confirmar que no aparecen nuevos `CREATE 500`.

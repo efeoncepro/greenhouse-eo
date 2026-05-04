@@ -16,7 +16,7 @@ interface CreateUserInput {
   microsoftOid: string
   microsoftTenantId?: string | null
   microsoftEmail: string
-  clientId: string
+  clientId: string | null
   tenantType: string
   defaultRoleCode: string
   active: boolean
@@ -32,7 +32,7 @@ interface TenantMapping {
   scim_tenant_mapping_id: string
   microsoft_tenant_id: string
   tenant_name: string | null
-  client_id: string
+  client_id: string | null
   space_id: string | null
   default_role_code: string
   allowed_email_domains: string[]
@@ -213,8 +213,7 @@ export const listUsers = async (
 export const createUser = async (input: CreateUserInput): Promise<ScimUserRow> => {
   const userId = randomUUID()
   const scimId = randomUUID()
-
-  const isEfeonce = input.clientId === 'efeonce-admin'
+  const isInternalTenant = input.tenantType === 'efeonce_internal' || input.clientId === null
 
   const rows = await query<ScimUserRow>(
     `INSERT INTO greenhouse_core.client_users (
@@ -235,7 +234,7 @@ export const createUser = async (input: CreateUserInput): Promise<ScimUserRow> =
       input.clientId,
       input.email.toLowerCase(),
       input.displayName,
-      isEfeonce ? 'efeonce_internal' : (input.tenantType || 'client'),
+      isInternalTenant ? 'efeonce_internal' : (input.tenantType || 'client'),
       'microsoft_sso',
       input.active,
       input.microsoftOid,
@@ -254,10 +253,16 @@ export const createUser = async (input: CreateUserInput): Promise<ScimUserRow> =
       assigned_by_user_id, created_at, updated_at
     ) VALUES (
       $1, $2, $3, $4,
-      'tenant_all', 'active', true, CURRENT_TIMESTAMP,
+      $5, 'active', true, CURRENT_TIMESTAMP,
       'scim-provisioning', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
     )`,
-    [assignmentId, userId, input.defaultRoleCode, input.clientId]
+    [
+      assignmentId,
+      userId,
+      input.defaultRoleCode,
+      input.clientId,
+      isInternalTenant ? null : 'tenant_all'
+    ]
   )
 
   // Publish outbox event

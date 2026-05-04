@@ -2465,7 +2465,10 @@ export interface GreenhouseCoreScimTenantMappings {
   active: Generated<boolean>;
   allowed_email_domains: Generated<string[]>;
   auto_provision: Generated<boolean>;
-  client_id: string;
+  /**
+   * Nullable Greenhouse client scope for SCIM provisioning. NULL means internal Efeonce tenant; non-NULL must reference greenhouse_core.clients(client_id).
+   */
+  client_id: string | null;
   created_at: Generated<Timestamp>;
   default_role_code: Generated<string>;
   microsoft_tenant_id: string;
