@@ -118,6 +118,34 @@ Reglas obligatorias:
 - Routing por país/zona horaria (no hay caso reportado)
 - Approval workflows multi-checker (solo maker-checker simple)
 
+## Composition with TASK-756 (auto-generation)
+
+TASK-756 agrupa obligations por `(provider_slug, currency, payment_method)` resuelto via `resolvePaymentRoute()`. Cuando esta task introduce splits + threshold routing, el agrupador de TASK-756 puede generar grupos malformados. Política canónica de composición:
+
+- **Splits (Slice 3)**: el resolver canónico debe expandir el split ANTES de devolver al agrupador. Una obligation con profile que tiene splits 70/30 se expande a 2 obligation-legs lógicos, cada uno con `(provider_slug, currency, payment_method)` propio. El agrupador de 756 los reparte naturalmente entre N orders. NO modificar el agrupador de 756.
+- **Threshold routing (Slice 4)**: el resolver canónico debe leer las routing_rules del profile + el monto de la obligation y devolver el `(provider_slug, payment_method)` post-rule ANTES del agrupador. La regla matchea per-amount, no per-profile. NO modificar el agrupador de 756.
+- **Bulk approve (Slice 1)**: cada row del bulk respeta maker-checker individual contra `created_by` (la regla NO depende de TASK-756). Confirmar que `auto-generation` user nunca queda en queue de bulk approve manual (filtrar por `created_by != 'system:auto-generation'`).
+
+## Reliability Signals
+
+- `finance.payment_profiles.bulk_approve_self_skipped` — kind=`drift`, severity=`info`. Counter de rows skipeados por self-approval en bulk. Útil para detectar admins que crean+aprueban en serie. Steady variable.
+- `finance.payment_profiles.splits_percentage_drift` — kind=`drift`, severity=`error` si > 0. Counts profiles con splits cuyo SUM(percentage) ≠ 100. Steady = 0. La CHECK constraint debería atrapar esto al INSERT, este signal es defense-in-depth.
+
+## Outbox Events Introduced (v1)
+
+- `finance.payment_profile.bulk_approved` v1 — `{profileIds[], reason, actorUserId, skippedCount, skippedReasons[]}`. Consumer: audit log.
+- `finance.payment_profile.split_declared` v1 — `{profileId, splits[], totalPercentage}`. Consumer: routing resolver cache invalidation.
+- `finance.payment_profile.routing_rule_updated` v1 — `{profileId, rules[]}`. Consumer: routing resolver cache invalidation.
+
+## Reversibility & Staged Rollout
+
+Quadrant: MOVE WITH CARE (additive features, two-way reversible vía feature flags).
+
+- Slice 1 (bulk approve) ships gated por capability `finance.payment_profiles.bulk_approve` (nueva, FINANCE_ADMIN only).
+- Slice 3 (splits) gated por feature flag `payment_profiles.splits_enabled` per tenant. Profiles legacy sin splits siguen funcionando intactos.
+- Slice 4 (threshold routing) gated por feature flag `payment_profiles.threshold_routing_enabled` per tenant.
+- Slice 2 (diff viewer) read-only, zero risk.
+
 ## Acceptance Criteria
 
 - [ ] Bulk approve aprueba 5+ perfiles en una llamada respetando maker-checker individual

@@ -194,8 +194,32 @@ y mostrar count + CTA "Aprobar pendientes" → /finance/payment-orders.
 
 - Auto-aprobación (siempre requiere maker-checker humano)
 - Programación automática de fecha (V2)
-- Splits multi-method (queda en TASK-755)
+- Splits multi-method (queda en TASK-755 — composition policy declarada en esa task: el resolver expande splits ANTES del agrupador, no se modifica este agrupador)
 - Procesamiento de obligations fuera de payroll (supplier invoices, tax)
+
+## Reliability Signals
+
+- `finance.payment_orders.obligations_orphaned_after_export` — kind=`drift`, severity=`warning` si > 0 < 24h post-export, severity=`error` si > 0 después de 24h. Counts obligations con `status='generated' AND source_kind='payroll' AND` no entran en ninguna order activa por skip de `resolvePaymentRoute()`. Steady = 0 en periodos cerrados. Subsystem rollup: `Finance Data Quality`. Reader: `src/lib/reliability/queries/payroll-orphaned-obligations.ts`. Sin este signal el flujo es operator-blind: "queda visible en queue" depende de que el operator mire — no es resilience.
+- `finance.payment_orders.auto_generation_lag` — kind=`lag`, severity=`error` si gap entre `payroll_period.exported` event y primera order auto-generated > 5 min (excluyendo casos de drift legítimo). Steady = 0.
+
+## Outbox Events Introduced (v1)
+
+Hereda los eventos de TASK-750 sin re-declarar. Adiciones específicas:
+
+- `finance.payment_orders.auto_generation_completed` v1 — `{periodId, year, month, ordersCreated[], skippedObligations[], skipReasons[]}`. Consumer: audit + reliability signal counter.
+- `finance.payment_orders.auto_generation_failed` v1 — `{periodId, error, retries}`. Consumer: dead letter + Sentry domain finance.
+
+## Reversibility & Staged Rollout
+
+Quadrant: **STOP** (auto-generación de orders financieros + side effects downstream).
+
+Staged rollout obligatorio:
+
+1. Helper canónico (Slice 1) shipped sin proyección activa. Smoke con manual trigger endpoint (Slice 4).
+2. Projection consumer (Slice 2) gated por feature flag `payroll.orders_auto_generation_enabled` per tenant. Default OFF en production hasta validar 1 ciclo completo en staging.
+3. Idempotency partial unique index (Slice 3) ship antes de activar el consumer.
+4. Reversibility: si el consumer genera orders incorrectas, el flag OFF detiene futuras + las creadas se cancelan via UI normal (state `cancelled` libera obligations).
+5. ADR opcional embebido en spec — declarar la decisión en `GREENHOUSE_PAYMENT_ORDERS_ARCHITECTURE_V1.md` antes de mergear.
 
 ## Acceptance Criteria
 

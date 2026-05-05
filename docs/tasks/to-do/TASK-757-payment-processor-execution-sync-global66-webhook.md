@@ -207,6 +207,31 @@ Reglas obligatorias:
   de Greenhouse pueden mutar.
 - Dejar smoke test reproducible con payload sintético/real redactado.
 
+### Slice 5 — Helper canónico `markPaymentOrderFailedAtomic`
+
+La state machine de `payment_orders` ya incluye `failed` (TASK-750 migration
+documenta `failed = error submission`) pero no existe helper TS atomic. Sin
+él, el primer evento `failed` real de Global66 va a improvisar — riesgo de
+state machine zombie.
+
+Helper a entregar: `markPaymentOrderFailedAtomic({orderId, failureReason,
+externalReference, failedAt, actorUserId})`:
+
+1. `SELECT FOR UPDATE` sobre la order.
+2. Validar transición canónica: solo desde `submitted` (NO desde `paid` —
+   un `paid` no se desfase a `failed`; eso requiere reverse manual).
+3. Validar `assertValidPaymentOrderStateTransition(currentState, 'failed')`.
+4. UPDATE state='failed' + failed_at + failure_reason.
+5. `recordPaymentOrderStateTransition(...)` audit log append-only.
+6. `publishOutboxEvent('finance.payment_order.failed', ...)`.
+7. NO libera obligations automáticamente — el operator decide si re-crear
+   order o cancelar para liberar.
+8. ROLLBACK completo si cualquier step falla.
+
+Caller del helper en este task: el adapter Global66 cuando traduce un
+processor_status_raw equivalente a `failed`. Out of scope: cancelación
+masiva de obligations, retry automático, escalation a humano.
+
 ## Out of Scope
 
 - Envío outbound desde Greenhouse hacia la API de Global66 para crear remesas.
@@ -277,6 +302,31 @@ como source of truth única del cash.
   revisión sin mutar la order.
 - [ ] El contrato operativo/documental del endpoint Global66 queda registrado
   en docs del repo.
+
+## Reliability Signals
+
+- `webhook.processor.unmatched` — kind=`drift`, severity=`warning` si > 3/h, severity=`error` si > 0 después de 24h. Counts receipts inbound persistidos en `webhook_inbox_events` con `status='manual_review'` (no correlación contra payment_order). Steady = 0. Subsystem rollup: `Event Bus & Sync Infrastructure`. Reader: `src/lib/reliability/queries/webhook-processor-unmatched.ts`.
+- `webhook.processor.lag` — kind=`lag`, severity=`error` si gap entre `webhook_inbox_events.received_at` y `processed_at` > 5 min en steady state. Steady = 0. Detecta worker caído sin necesidad de mirar Cloud Run logs.
+- `finance.payment_orders.failed_without_recovery` — kind=`drift`, severity=`warning` si > 0 después de 7 días. Counts orders en state `failed` que no transitionaron a recovery (re-create / cancel) en 7 días. Patrón anti-zombie como TASK-765.
+
+## Outbox Events Introduced (v1)
+
+- `finance.payment_order.processor_event_received` v1 — `{orderId, processorSlug, processorReference, processorStatusRaw, sourceEventId, occurredAt, action ('noop'|'submit'|'mark_paid'|'mark_failed'|'manual_review')}`. Consumer: audit timeline UI + reliability counter.
+- `finance.payment_order.failed` v1 — `{orderId, failureReason, externalReference, failedAt, actorUserId, processorSlug}`. Consumer: alerting + reliability signal counter + Sentry domain finance.
+- `finance.webhook.processor.unmatched` v1 — `{webhookEndpointKey, sourceEventId, processorReference, payloadDigest}`. Consumer: anomaly detection + ops queue.
+
+## Reversibility & Staged Rollout
+
+Quadrant: **STOP** (external contract con processor + auto-mutation de payment state).
+
+Staged rollout obligatorio:
+
+1. Slice 1 (correlation helper) ship sin handler activo. Smoke con payload sintético via tests.
+2. Slice 5 (`markPaymentOrderFailedAtomic`) ship antes que Slice 2 — sin él, fallback es `manual_review` para todos los `failed`.
+3. Slice 2 (Global66 handler) gated por feature flag `webhooks.processor.global66_enabled`. Default OFF en production. Activar en staging primero, validar 1 ciclo completo de remesa real con payload no-sintético.
+4. Slice 3 (idempotency + reproceso) ship antes de cualquier activación en production.
+5. Reversibility: si el adapter mute orders incorrectamente, flag OFF detiene futuras + las que mutaron incorrectamente se reverten via `cancel` UI normal (no se touch state directly).
+6. ADR opcional embebido en `GREENHOUSE_PAYMENT_ORDERS_ARCHITECTURE_V1.md` y `GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md` — declarar la decisión de mutación auto vs manual_review boundary antes de mergear.
 
 ## Verification
 

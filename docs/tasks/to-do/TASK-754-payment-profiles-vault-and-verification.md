@@ -59,10 +59,12 @@ Revisar y respetar:
 Reglas obligatorias:
 
 - Secret Manager IAM debe restringir acceso a un service account dedicado del runtime de Greenhouse — nunca al usuario directamente
-- Vault refs deben tener formato canónico `gh-payment-profile-<profileId>` para trazabilidad
-- Migration del schema debe ser aditiva: NO borrar `account_number_full` hasta que TODO esté migrado
+- Vault refs deben tener formato canónico `gh-pp-<tenantId>-<profileId>` para trazabilidad y para evitar collision cross-tenant si dos tenants generan profileIds que chocan
+- Migration del schema debe ser aditiva: NO borrar `account_number_full` hasta que TODO esté migrado y haya pasado >= 30 días sin acceso a la column en logs
 - Backfill: rotación gradual con dual-write durante el cutover
 - Verificación con micro-deposit es opcional (flag por perfil) — algunos rails no lo soportan (Deel, manual_cash)
+- **Retention policy**: secrets de profiles `cancelled` / `superseded` viven 7 años (fiscal SII Chile Art 17 CT) en Secret Manager, después archive a Cold Storage. Job mensual en `ops-worker`. NO delete inmediato.
+- **KMS posture**: V1 usa Secret Manager scalar (alineado con TASK-784 que desistió de KMS envelope para PII V1). KMS envelope queda como follow-up unificado V2 si Ley 21.719 lo escala — declarar consistencia explícita en el spec, no divergir.
 
 ## Dependencies & Impact
 
@@ -131,6 +133,31 @@ Reglas obligatorias:
 - [ ] Reveal sensitive requiere second factor + audit
 - [ ] Verificación con micro-deposit funciona end-to-end para bank_transfer
 - [ ] Helper `vault.read` falla con error claro si no hay capability + reason
+- [ ] Reliability signals registrados (ver sección abajo)
+- [ ] Outbox events v1 declarados en `docs/architecture/GREENHOUSE_EVENT_CATALOG_V1.md`
+
+## Reliability Signals
+
+- `finance.payment_profiles.vault_unmigrated_count` — kind=`drift`, severity=`error` si > 0 después del cutover. Counts profiles con `account_number_full IS NOT NULL AND vault_ref IS NULL`. Steady = 0. Subsystem rollup: `Finance Data Quality`.
+- `finance.payment_profiles.vault_access_anomaly` — kind=`drift`, severity=`warning` si actor excede 3 reveals/24h. Steady = 0. Subsystem rollup: `Finance Data Quality`. Patrón replicado de TASK-784 reveal anomaly.
+
+## Outbox Events Introduced (v1)
+
+- `finance.payment_profile.vault_provisioned` v1 — `{profileId, vaultRef, provisionedAt, actorUserId}`. Consumer: audit log + reliability counter.
+- `finance.payment_profile.vault_accessed` v1 — `{profileId, vaultRef, actorUserId, reason, accessedAt, ip, userAgent}`. Consumer: anomaly detection + audit.
+- `finance.payment_profile.verification_completed` v1 — `{profileId, verificationStatus, verifiedAt, attempts}`. Consumer: profile activation projection.
+
+## Reversibility & Staged Rollout
+
+Quadrant: **STOP** (one-way + large blast — PII bancaria movida a Secret Manager).
+
+Staged rollout obligatorio:
+
+1. Slice 1 + 2 con dual-write activo. Reversibility: feature flag `payment_profiles.read_prefer_vault` que vuelve a leer column si el vault falla.
+2. Validación staging: backfill manual + smoke 100% reveal vía vault + verificar audit log + reliability signals en steady=0.
+3. Slice 3 (second factor) gated por feature flag `payment_profiles.reveal_requires_second_factor` rollouteable per tenant.
+4. Slice 4 (micro-deposit) opt-in per profile — no bloquea profiles existing.
+5. Migration final NULL-out de `account_number_full` solo después de >= 30 días sin accesos a column en logs (verify via Cloud Logging query).
 
 ## Verification
 
