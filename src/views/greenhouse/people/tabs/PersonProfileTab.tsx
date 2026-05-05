@@ -440,7 +440,10 @@ const PersonProfileTab = ({ detail }: Props) => {
 
       {/* ── Section 2.5: Identidad legal (TASK-784) ─────────────────── */}
       <Grid size={{ xs: 12 }}>
-        <PersonLegalProfileSection memberId={member.memberId} />
+        <PersonLegalProfileSection
+          memberId={member.memberId}
+          collaboratorName={member.displayName ?? undefined}
+        />
       </Grid>
 
       {/* ── Section 3: Actividad operativa ─────────────────────────── */}

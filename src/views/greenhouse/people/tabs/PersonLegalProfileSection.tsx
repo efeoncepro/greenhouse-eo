@@ -6,139 +6,109 @@ import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
-import CardContent from '@mui/material/CardContent'
-import CardHeader from '@mui/material/CardHeader'
-import Chip from '@mui/material/Chip'
-import Dialog from '@mui/material/Dialog'
-import DialogActions from '@mui/material/DialogActions'
-import DialogContent from '@mui/material/DialogContent'
-import DialogTitle from '@mui/material/DialogTitle'
-import Divider from '@mui/material/Divider'
-import LinearProgress from '@mui/material/LinearProgress'
 import Skeleton from '@mui/material/Skeleton'
 import Stack from '@mui/material/Stack'
-import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
+import { alpha, useTheme } from '@mui/material/styles'
 
-interface DocumentDto {
-  documentId: string
-  documentType: string
-  countryCode: string
-  displayMask: string
-  verificationStatus: 'pending_review' | 'verified' | 'rejected' | 'archived' | 'expired'
-  source: string
-  declaredAt: string
-  rejectedReason: string | null
-}
+import { toast } from 'sonner'
 
-interface AddressDto {
-  addressId: string
-  addressType: 'legal' | 'residence' | 'mailing' | 'emergency'
-  countryCode: string
-  presentationMask: string
-  city: string
-  region: string | null
-  verificationStatus: DocumentDto['verificationStatus']
-  source: string
-  declaredAt: string
-  rejectedReason: string | null
-}
+import CustomChip from '@core/components/mui/Chip'
+import type { ThemeColor } from '@core/types'
 
-interface ResponseDto {
-  memberId: string
-  profileId: string
-  documents: DocumentDto[]
-  addresses: AddressDto[]
-  readiness: {
-    finalSettlementChile: { ready: boolean; blockers: string[]; warnings: string[] }
-    payrollChileDependent: { ready: boolean; blockers: string[]; warnings: string[] }
-  }
-  capabilities: {
-    canVerify: boolean
-    canHrUpdate: boolean
-    canRevealSensitive: boolean
-  }
-}
+import HrAddressEditForm from './legal-profile-hr/HrAddressEditForm'
+import HrAuditLog from './legal-profile-hr/HrAuditLog'
+import HrDocumentEditForm from './legal-profile-hr/HrDocumentEditForm'
+import HrItemRow from './legal-profile-hr/HrItemRow'
+import HrReadinessBoard from './legal-profile-hr/HrReadinessBoard'
+import HrRejectDialog from './legal-profile-hr/HrRejectDialog'
+import HrRevealDialog from './legal-profile-hr/HrRevealDialog'
+import { HR_LEGAL_COPY, daysSince } from './legal-profile-hr/copy'
+import {
+  accentForStatus,
+  type ActiveEdit,
+  type AddressDto,
+  type DocumentDto,
+  type HrLegalProfileResponseDto,
+  type LegalDocumentStatus
+} from './legal-profile-hr/types'
 
 interface PersonLegalProfileSectionProps {
   memberId: string
+  /** Nombre del colaborador para microcopy contextual ("Pedir a Valentina") */
+  collaboratorName?: string
 }
 
-const STATUS_LABELS: Record<DocumentDto['verificationStatus'], string> = {
-  pending_review: 'Pendiente',
-  verified: 'Verificado',
-  rejected: 'Rechazado',
-  archived: 'Archivado',
-  expired: 'Vencido'
+type AddressKind = 'legal' | 'residence' | 'mailing' | 'emergency'
+
+const ADDRESS_ICONS: Record<AddressKind, string> = {
+  legal: 'tabler-home',
+  residence: 'tabler-bed',
+  mailing: 'tabler-mail',
+  emergency: 'tabler-heart-handshake'
 }
 
-const STATUS_COLORS: Record<DocumentDto['verificationStatus'], 'default' | 'success' | 'warning' | 'error'> = {
+const STATUS_TO_CHIP_ICON: Record<LegalDocumentStatus | 'missing', string> = {
+  pending_review: 'tabler-clock',
+  verified: 'tabler-check',
+  rejected: 'tabler-x',
+  archived: 'tabler-archive',
+  expired: 'tabler-calendar-off',
+  missing: 'tabler-circle'
+}
+
+const STATUS_TO_CHIP_COLOR: Record<LegalDocumentStatus | 'missing', ThemeColor> = {
   pending_review: 'warning',
   verified: 'success',
   rejected: 'error',
-  archived: 'default',
-  expired: 'default'
+  archived: 'secondary',
+  expired: 'secondary',
+  missing: 'error'
 }
 
-const ADDRESS_LABELS: Record<AddressDto['addressType'], string> = {
-  legal: 'Direccion legal',
-  residence: 'Residencia',
-  mailing: 'Correspondencia',
-  emergency: 'Contacto de emergencia'
-}
+const PersonLegalProfileSection = ({ memberId, collaboratorName }: PersonLegalProfileSectionProps) => {
+  const theme = useTheme()
+  const displayName = collaboratorName?.split(' ')[0] ?? 'el colaborador'
 
-const formatDeclared = (iso: string): string => {
-  try {
-    return new Date(iso).toLocaleDateString('es-CL', { day: 'numeric', month: 'short', year: 'numeric' })
-  } catch {
-    return iso
-  }
-}
-
-const cardBorderSx = {
-  border: '1px solid',
-  borderColor: 'divider'
-}
-
-const PersonLegalProfileSection = ({ memberId }: PersonLegalProfileSectionProps) => {
-  const [data, setData] = useState<ResponseDto | null>(null)
+  const [data, setData] = useState<HrLegalProfileResponseDto | null>(null)
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [fetchError, setFetchError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
+  const [activeEdit, setActiveEdit] = useState<ActiveEdit>(null)
+  const [serverErrorById, setServerErrorById] = useState<Record<string, string | null>>({})
 
-  const [rejectDialog, setRejectDialog] = useState<{
-    kind: 'document' | 'address'
+  // reveal & reject dialogs
+  const [revealState, setRevealState] = useState<{
+    open: boolean
+    targetKind: 'document' | 'address'
     targetId: string
-  } | null>(null)
+    revealedValue: string | null
+  }>({ open: false, targetKind: 'document', targetId: '', revealedValue: null })
 
-  const [rejectReason, setRejectReason] = useState('')
-
-  const [revealDialog, setRevealDialog] = useState<{
-    kind: 'document' | 'address'
+  const [rejectState, setRejectState] = useState<{
+    open: boolean
+    targetKind: 'document' | 'address'
     targetId: string
-  } | null>(null)
-
-  const [revealReason, setRevealReason] = useState('')
-  const [revealValue, setRevealValue] = useState<string | null>(null)
+  }>({ open: false, targetKind: 'document', targetId: '' })
 
   const load = useCallback(async () => {
     setLoading(true)
-    setError(null)
+    setFetchError(null)
 
     try {
-      const r = await fetch(`/api/hr/people/${encodeURIComponent(memberId)}/legal-profile`, { cache: 'no-store' })
+      const r = await fetch(`/api/hr/people/${encodeURIComponent(memberId)}/legal-profile`, {
+        cache: 'no-store'
+      })
 
       if (!r.ok) {
         const body = await r.json().catch(() => ({}))
 
-        throw new Error(body?.error ?? 'Error al cargar datos legales')
+        throw new Error(body?.error ?? HR_LEGAL_COPY.fetchError)
       }
 
-      const json = (await r.json()) as ResponseDto
-
-      setData(json)
+      setData((await r.json()) as HrLegalProfileResponseDto)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error desconocido')
+      setFetchError(err instanceof Error ? err.message : HR_LEGAL_COPY.fetchError)
     } finally {
       setLoading(false)
     }
@@ -148,453 +118,946 @@ const PersonLegalProfileSection = ({ memberId }: PersonLegalProfileSectionProps)
     load()
   }, [load])
 
-  const handleVerifyDocument = async (documentId: string) => {
+  const documents = useMemo(() => data?.documents ?? [], [data])
+  const addresses = useMemo(() => data?.addresses ?? [], [data])
+
+  const capabilities = data?.capabilities ?? {
+    canVerify: false,
+    canHrUpdate: false,
+    canRevealSensitive: false
+  }
+
+  const addressByKind = useMemo(() => {
+    const map = new Map<AddressKind, AddressDto>()
+
+    for (const a of addresses) {
+      const existing = map.get(a.addressType)
+
+      if (
+        !existing ||
+        (existing.verificationStatus !== 'verified' && a.verificationStatus === 'verified')
+      ) {
+        map.set(a.addressType, a)
+      }
+    }
+
+    return map
+  }, [addresses])
+
+  // Header chip global
+  const headerChip = useMemo(() => {
+    const totalActive =
+      documents.filter(d => d.verificationStatus !== 'archived').length +
+      addresses.filter(a => a.verificationStatus !== 'archived').length
+
+    if (totalActive === 0) {
+      return {
+        label: HR_LEGAL_COPY.card.chipEmpty,
+        color: 'error' as ThemeColor,
+        icon: 'tabler-alert-circle'
+      }
+    }
+
+    const pending = [...documents, ...addresses].filter(
+      i => i.verificationStatus === 'pending_review'
+    ).length
+
+    const rejected = [...documents, ...addresses].filter(
+      i => i.verificationStatus === 'rejected'
+    ).length
+
+    const requiresLegalAddress = !addressByKind.get('legal')
+
+    const requiresVerifiedDoc = documents.every(
+      d => d.verificationStatus !== 'verified'
+    )
+
+    const missingCount = (requiresLegalAddress ? 1 : 0) + (requiresVerifiedDoc ? 1 : 0)
+
+    if (rejected > 0) {
+      return {
+        label: HR_LEGAL_COPY.card.chipRejected(rejected),
+        color: 'error' as ThemeColor,
+        icon: 'tabler-x'
+      }
+    }
+
+    if (pending > 0 || missingCount > 0) {
+      const label =
+        pending > 0 && missingCount > 0
+          ? HR_LEGAL_COPY.card.chipMixed(pending, missingCount)
+          : pending > 0
+            ? HR_LEGAL_COPY.card.chipPending(pending)
+            : HR_LEGAL_COPY.card.chipMissing(missingCount)
+
+      return { label, color: 'warning' as ThemeColor, icon: 'tabler-clock' }
+    }
+
+    return {
+      label: HR_LEGAL_COPY.card.chipLista,
+      color: 'success' as ThemeColor,
+      icon: 'tabler-check'
+    }
+  }, [documents, addresses, addressByKind])
+
+  const isEditingThis = (
+    kind: 'document' | 'address',
+    id?: string,
+    addressType?: AddressKind
+  ): boolean => {
+    if (!activeEdit) return false
+    if (activeEdit.kind !== kind) return false
+
+    if (activeEdit.kind === 'document') {
+      const existing = activeEdit.target.existingDocumentId
+
+      return existing === id || (id === undefined && !existing)
+    }
+
+    const existing = activeEdit.target.existingAddressId
+
+    return (
+      activeEdit.target.addressType === addressType &&
+      (existing === id || (id === undefined && !existing))
+    )
+  }
+
+  const cancelEdit = () => setActiveEdit(null)
+
+  // ── Mutations ────────────────────────────────────────────────────
+
+  const submitVerifyDocument = async (documentId: string) => {
     setSubmitting(true)
-    setError(null)
 
     try {
       const r = await fetch(
         `/api/hr/people/${encodeURIComponent(memberId)}/legal-profile/document/${encodeURIComponent(documentId)}/verify`,
-        { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({}) }
+        {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({})
+        }
       )
 
-      if (!r.ok) {
-        const body = await r.json().catch(() => ({}))
-
-        throw new Error(body?.error ?? 'Error al verificar documento')
-      }
-
+      if (!r.ok) throw new Error((await r.json().catch(() => ({})))?.error ?? HR_LEGAL_COPY.toasts.error)
+      toast.success(`${HR_LEGAL_COPY.toasts.verified} · ${HR_LEGAL_COPY.toasts.verifiedBody}`)
       await load()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error desconocido')
+      toast.error(err instanceof Error ? err.message : HR_LEGAL_COPY.toasts.error)
     } finally {
       setSubmitting(false)
     }
   }
 
-  const handleVerifyAddress = async (addressId: string) => {
+  const submitVerifyAddress = async (addressId: string) => {
     setSubmitting(true)
-    setError(null)
 
     try {
       const r = await fetch(
         `/api/hr/people/${encodeURIComponent(memberId)}/legal-profile/address/${encodeURIComponent(addressId)}/verify`,
-        { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({}) }
+        {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({})
+        }
       )
 
-      if (!r.ok) {
-        const body = await r.json().catch(() => ({}))
-
-        throw new Error(body?.error ?? 'Error al verificar direccion')
-      }
-
+      if (!r.ok) throw new Error((await r.json().catch(() => ({})))?.error ?? HR_LEGAL_COPY.toasts.error)
+      toast.success(`${HR_LEGAL_COPY.toasts.verified} · ${HR_LEGAL_COPY.toasts.verifiedBody}`)
       await load()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error desconocido')
+      toast.error(err instanceof Error ? err.message : HR_LEGAL_COPY.toasts.error)
     } finally {
       setSubmitting(false)
     }
   }
 
-  const handleRejectSubmit = async () => {
-    if (!rejectDialog) return
-
-    if (rejectReason.trim().length < 10) {
-      setError('El motivo debe tener al menos 10 caracteres')
-
-      return
-    }
-
+  const submitReject = async (reason: string) => {
+    if (!rejectState.open) return
     setSubmitting(true)
-    setError(null)
 
     try {
       const path =
-        rejectDialog.kind === 'document'
-          ? `/api/hr/people/${encodeURIComponent(memberId)}/legal-profile/document/${encodeURIComponent(rejectDialog.targetId)}/reject`
-          : `/api/hr/people/${encodeURIComponent(memberId)}/legal-profile/address/${encodeURIComponent(rejectDialog.targetId)}/reject`
+        rejectState.targetKind === 'document'
+          ? `/api/hr/people/${encodeURIComponent(memberId)}/legal-profile/document/${encodeURIComponent(rejectState.targetId)}/reject`
+          : `/api/hr/people/${encodeURIComponent(memberId)}/legal-profile/address/${encodeURIComponent(rejectState.targetId)}/reject`
 
       const r = await fetch(path, {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ rejectedReason: rejectReason.trim() })
+        body: JSON.stringify({ rejectedReason: reason })
       })
 
-      if (!r.ok) {
-        const body = await r.json().catch(() => ({}))
-
-        throw new Error(body?.error ?? 'Error al rechazar')
-      }
-
-      setRejectDialog(null)
-      setRejectReason('')
+      if (!r.ok) throw new Error((await r.json().catch(() => ({})))?.error ?? HR_LEGAL_COPY.toasts.error)
+      toast.success(`${HR_LEGAL_COPY.toasts.rejected} · ${HR_LEGAL_COPY.toasts.rejectedBody}`)
+      setRejectState({ open: false, targetKind: 'document', targetId: '' })
       await load()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error desconocido')
+      toast.error(err instanceof Error ? err.message : HR_LEGAL_COPY.toasts.error)
     } finally {
       setSubmitting(false)
     }
   }
 
-  const handleRevealSubmit = async () => {
-    if (!revealDialog) return
-
-    if (revealReason.trim().length < 5) {
-      setError('El motivo debe tener al menos 5 caracteres (auditado)')
-
-      return
-    }
-
+  const submitReveal = async (reason: string) => {
+    if (!revealState.open) return
     setSubmitting(true)
-    setError(null)
 
     try {
       const path =
-        revealDialog.kind === 'document'
-          ? `/api/hr/people/${encodeURIComponent(memberId)}/legal-profile/document/${encodeURIComponent(revealDialog.targetId)}/reveal`
-          : `/api/hr/people/${encodeURIComponent(memberId)}/legal-profile/address/${encodeURIComponent(revealDialog.targetId)}/reveal`
+        revealState.targetKind === 'document'
+          ? `/api/hr/people/${encodeURIComponent(memberId)}/legal-profile/document/${encodeURIComponent(revealState.targetId)}/reveal`
+          : `/api/hr/people/${encodeURIComponent(memberId)}/legal-profile/address/${encodeURIComponent(revealState.targetId)}/reveal`
 
       const r = await fetch(path, {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ reason: revealReason.trim() })
+        body: JSON.stringify({ reason })
       })
 
-      if (!r.ok) {
-        const body = await r.json().catch(() => ({}))
-
-        throw new Error(body?.error ?? 'Error al revelar valor')
-      }
-
+      if (!r.ok) throw new Error((await r.json().catch(() => ({})))?.error ?? HR_LEGAL_COPY.toasts.error)
       const result = await r.json()
 
-      setRevealValue(
-        revealDialog.kind === 'document'
+      const value =
+        revealState.targetKind === 'document'
           ? result?.document?.valueFull ?? null
           : result?.address?.presentationText ?? null
-      )
-      setRevealReason('')
+
+      setRevealState(prev => ({ ...prev, revealedValue: value }))
+      toast.success(HR_LEGAL_COPY.toasts.revealLogged)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error desconocido')
+      toast.error(err instanceof Error ? err.message : HR_LEGAL_COPY.toasts.error)
     } finally {
       setSubmitting(false)
     }
   }
 
-  const closeRevealDialog = () => {
-    setRevealDialog(null)
-    setRevealValue(null)
-    setRevealReason('')
+  const submitHrDocument = async (input: {
+    countryCode: string
+    documentType: string
+    rawValue: string
+    reason: string
+  }) => {
+    const slotId = activeEdit?.kind === 'document' ? activeEdit.target.existingDocumentId ?? 'doc-new' : 'doc-new'
+
+    setSubmitting(true)
+    setServerErrorById(prev => ({ ...prev, [slotId]: null }))
+
+    try {
+      const r = await fetch(`/api/hr/people/${encodeURIComponent(memberId)}/legal-profile/document`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(input)
+      })
+
+      if (!r.ok) throw new Error((await r.json().catch(() => ({})))?.error ?? HR_LEGAL_COPY.toasts.error)
+      toast.success(`${HR_LEGAL_COPY.toasts.hrCreated} · ${HR_LEGAL_COPY.toasts.hrCreatedBody}`)
+      setActiveEdit(null)
+      await load()
+    } catch (err) {
+      setServerErrorById(prev => ({
+        ...prev,
+        [slotId]: err instanceof Error ? err.message : HR_LEGAL_COPY.toasts.error
+      }))
+    } finally {
+      setSubmitting(false)
+    }
   }
 
-  const blockerLabels = useMemo<Record<string, string>>(
-    () => ({
-      cl_rut_missing: 'Falta declarar RUT',
-      cl_rut_pending_review: 'RUT pendiente de revision',
-      cl_rut_rejected: 'RUT rechazado',
-      cl_rut_archived_or_expired: 'RUT archivado o vencido',
-      address_missing_legal: 'Falta direccion legal',
-      address_missing_residence: 'Falta direccion de residencia',
-      profile_missing: 'Profile no vinculado'
-    }),
-    []
-  )
+  const submitHrAddress = async (input: {
+    addressType: AddressKind
+    countryCode: string
+    streetLine1: string
+    city: string
+    region: string | null
+    postalCode: string | null
+    reason: string
+  }) => {
+    const slotId =
+      activeEdit?.kind === 'address'
+        ? activeEdit.target.existingAddressId ?? `addr-new-${input.addressType}`
+        : `addr-new-${input.addressType}`
+
+    setSubmitting(true)
+    setServerErrorById(prev => ({ ...prev, [slotId]: null }))
+
+    try {
+      const r = await fetch(`/api/hr/people/${encodeURIComponent(memberId)}/legal-profile/address`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(input)
+      })
+
+      if (!r.ok) throw new Error((await r.json().catch(() => ({})))?.error ?? HR_LEGAL_COPY.toasts.error)
+      toast.success(`${HR_LEGAL_COPY.toasts.hrCreated} · ${HR_LEGAL_COPY.toasts.hrCreatedBody}`)
+      setActiveEdit(null)
+      await load()
+    } catch (err) {
+      setServerErrorById(prev => ({
+        ...prev,
+        [slotId]: err instanceof Error ? err.message : HR_LEGAL_COPY.toasts.error
+      }))
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  // ── Render helpers ───────────────────────────────────────────────
+
+  const renderDocumentItem = (doc: DocumentDto) => {
+    const accent = accentForStatus(doc.verificationStatus)
+    const docTypeName = HR_LEGAL_COPY.documentTypeLabels[doc.documentType] ?? doc.documentType
+    const editing = isEditingThis('document', doc.documentId)
+    const slotKey = `doc-${doc.documentId}`
+
+    const subtitle =
+      doc.verificationStatus === 'pending_review' ? (
+        HR_LEGAL_COPY.itemSubs.pendingDays(displayName, daysSince(doc.declaredAt))
+      ) : doc.verificationStatus === 'verified' ? (
+        HR_LEGAL_COPY.itemSubs.verifiedDays(daysSince(doc.verifiedAt))
+      ) : doc.verificationStatus === 'rejected' ? (
+        HR_LEGAL_COPY.itemSubs.rejectedWaiting(displayName)
+      ) : null
+
+    const actions =
+      doc.verificationStatus === 'pending_review' ? (
+        <>
+          {capabilities.canVerify ? (
+            <Button
+              size='small'
+              variant='tonal'
+              color='success'
+              disabled={submitting}
+              onClick={() => submitVerifyDocument(doc.documentId)}
+              startIcon={<i className='tabler-check' style={{ fontSize: 14 }} aria-hidden='true' />}
+            >
+              {HR_LEGAL_COPY.actions.verify}
+            </Button>
+          ) : null}
+          {capabilities.canVerify ? (
+            <Button
+              size='small'
+              variant='tonal'
+              color='error'
+              disabled={submitting}
+              onClick={() =>
+                setRejectState({ open: true, targetKind: 'document', targetId: doc.documentId })
+              }
+              startIcon={<i className='tabler-x' style={{ fontSize: 14 }} aria-hidden='true' />}
+            >
+              {HR_LEGAL_COPY.actions.reject}
+            </Button>
+          ) : null}
+          {capabilities.canRevealSensitive ? (
+            <Button
+              size='small'
+              variant='outlined'
+              color='secondary'
+              disabled={submitting}
+              onClick={() =>
+                setRevealState({
+                  open: true,
+                  targetKind: 'document',
+                  targetId: doc.documentId,
+                  revealedValue: null
+                })
+              }
+              startIcon={<i className='tabler-eye' style={{ fontSize: 14 }} aria-hidden='true' />}
+            >
+              {HR_LEGAL_COPY.actions.revealDocument}
+            </Button>
+          ) : null}
+          {capabilities.canHrUpdate ? (
+            <Button
+              size='small'
+              variant='text'
+              color='secondary'
+              disabled={submitting}
+              onClick={() =>
+                setActiveEdit({
+                  kind: 'document',
+                  target: {
+                    initialCountry: doc.countryCode,
+                    initialType: doc.documentType,
+                    existingDocumentId: doc.documentId
+                  }
+                })
+              }
+              startIcon={<i className='tabler-edit' style={{ fontSize: 14 }} aria-hidden='true' />}
+            >
+              {HR_LEGAL_COPY.actions.edit}
+            </Button>
+          ) : null}
+        </>
+      ) : doc.verificationStatus === 'verified' ? (
+        <>
+          {capabilities.canRevealSensitive ? (
+            <Button
+              size='small'
+              variant='outlined'
+              color='secondary'
+              disabled={submitting}
+              onClick={() =>
+                setRevealState({
+                  open: true,
+                  targetKind: 'document',
+                  targetId: doc.documentId,
+                  revealedValue: null
+                })
+              }
+              startIcon={<i className='tabler-eye' style={{ fontSize: 14 }} aria-hidden='true' />}
+            >
+              {HR_LEGAL_COPY.actions.revealDocument}
+            </Button>
+          ) : null}
+          {capabilities.canHrUpdate ? (
+            <Button
+              size='small'
+              variant='text'
+              color='secondary'
+              disabled={submitting}
+              onClick={() =>
+                setActiveEdit({
+                  kind: 'document',
+                  target: {
+                    initialCountry: doc.countryCode,
+                    initialType: doc.documentType,
+                    existingDocumentId: doc.documentId
+                  }
+                })
+              }
+              startIcon={<i className='tabler-edit' style={{ fontSize: 14 }} aria-hidden='true' />}
+            >
+              {HR_LEGAL_COPY.actions.editReReview}
+            </Button>
+          ) : null}
+        </>
+      ) : doc.verificationStatus === 'rejected' ? (
+        capabilities.canHrUpdate ? (
+          <Button
+            size='small'
+            variant='outlined'
+            color='secondary'
+            disabled={submitting}
+            onClick={() =>
+              setActiveEdit({
+                kind: 'document',
+                target: {
+                  initialCountry: doc.countryCode,
+                  initialType: doc.documentType,
+                  existingDocumentId: doc.documentId
+                }
+              })
+            }
+            startIcon={<i className='tabler-pencil-plus' style={{ fontSize: 14 }} aria-hidden='true' />}
+          >
+            {HR_LEGAL_COPY.actions.edit}
+          </Button>
+        ) : null
+      ) : null
+
+    const preBanner =
+      doc.verificationStatus === 'rejected' && doc.rejectedReason ? (
+        <Alert severity='error' role='status' icon={<i className='tabler-message-2-exclamation' style={{ fontSize: 18 }} />}>
+          <strong>{HR_LEGAL_COPY.rejectedBanner}</strong> {doc.rejectedReason}
+        </Alert>
+      ) : null
+
+    return (
+      <HrItemRow
+        key={slotKey}
+        iconClassName={doc.documentType === 'CL_RUT' ? 'tabler-id' : 'tabler-id-badge-2'}
+        title={docTypeName}
+        mask={doc.displayMask}
+        chipLabel={
+          doc.verificationStatus === 'pending_review' && daysSince(doc.declaredAt) > 0
+            ? `${HR_LEGAL_COPY.states.pending_review} · ${daysSince(doc.declaredAt)} ${daysSince(doc.declaredAt) === 1 ? 'día' : 'días'}`
+            : HR_LEGAL_COPY.states[doc.verificationStatus] ?? null
+        }
+        chipColor={STATUS_TO_CHIP_COLOR[doc.verificationStatus]}
+        chipIcon={STATUS_TO_CHIP_ICON[doc.verificationStatus]}
+        subtitle={subtitle}
+        accent={accent}
+        actions={actions}
+        preActionsBanner={preBanner}
+        expandedForm={
+          editing ? (
+            <HrDocumentEditForm
+              initialCountry={doc.countryCode}
+              initialType={doc.documentType}
+              submitting={submitting}
+              serverError={serverErrorById[slotKey] ?? null}
+              onSubmit={submitHrDocument}
+              onCancel={cancelEdit}
+            />
+          ) : undefined
+        }
+      />
+    )
+  }
+
+  const renderEmptyDocumentRow = () => {
+    const slotKey = 'doc-required-missing'
+    const editing = isEditingThis('document', undefined)
+
+    return (
+      <HrItemRow
+        key={slotKey}
+        iconClassName='tabler-id'
+        title={HR_LEGAL_COPY.documentTypeLabels.CL_RUT}
+        chipLabel={HR_LEGAL_COPY.states.missing}
+        chipColor='error'
+        chipIcon='tabler-circle'
+        subtitle={HR_LEGAL_COPY.itemSubs.notDeclaredByCollaborator(displayName, 'su RUT')}
+        accent='error'
+        actions={
+          <>
+            <Button
+              size='small'
+              variant='contained'
+              color='primary'
+              startIcon={<i className='tabler-mail-forward' style={{ fontSize: 14 }} aria-hidden='true' />}
+              disabled
+            >
+              {HR_LEGAL_COPY.actions.askCollaborator(displayName)}
+            </Button>
+            {capabilities.canHrUpdate ? (
+              <Button
+                size='small'
+                variant='outlined'
+                color='secondary'
+                disabled={submitting || editing}
+                onClick={() =>
+                  setActiveEdit({ kind: 'document', target: { initialCountry: 'CL', initialType: 'CL_RUT' } })
+                }
+                startIcon={<i className='tabler-pencil-plus' style={{ fontSize: 14 }} aria-hidden='true' />}
+              >
+                {HR_LEGAL_COPY.actions.editLoad}
+              </Button>
+            ) : null}
+          </>
+        }
+        expandedForm={
+          editing ? (
+            <HrDocumentEditForm
+              submitting={submitting}
+              serverError={serverErrorById[slotKey] ?? null}
+              onSubmit={submitHrDocument}
+              onCancel={cancelEdit}
+            />
+          ) : undefined
+        }
+      />
+    )
+  }
+
+  const renderAddressItem = (addr: AddressDto) => {
+    const accent = accentForStatus(addr.verificationStatus)
+    const slotKey = `addr-${addr.addressId}`
+    const editing = isEditingThis('address', addr.addressId, addr.addressType)
+
+    const subtitle =
+      addr.verificationStatus === 'pending_review' ? (
+        HR_LEGAL_COPY.itemSubs.pendingDays(displayName, daysSince(addr.declaredAt))
+      ) : addr.verificationStatus === 'verified' ? (
+        `${addr.presentationMask} — ${HR_LEGAL_COPY.itemSubs.verifiedAddressDays(daysSince(addr.verifiedAt))}`
+      ) : addr.verificationStatus === 'rejected' ? (
+        HR_LEGAL_COPY.itemSubs.rejectedWaiting(displayName)
+      ) : (
+        addr.presentationMask
+      )
+
+    const actions = (
+      <>
+        {addr.verificationStatus === 'pending_review' && capabilities.canVerify ? (
+          <>
+            <Button
+              size='small'
+              variant='tonal'
+              color='success'
+              disabled={submitting}
+              onClick={() => submitVerifyAddress(addr.addressId)}
+              startIcon={<i className='tabler-check' style={{ fontSize: 14 }} aria-hidden='true' />}
+            >
+              {HR_LEGAL_COPY.actions.verify}
+            </Button>
+            <Button
+              size='small'
+              variant='tonal'
+              color='error'
+              disabled={submitting}
+              onClick={() =>
+                setRejectState({ open: true, targetKind: 'address', targetId: addr.addressId })
+              }
+              startIcon={<i className='tabler-x' style={{ fontSize: 14 }} aria-hidden='true' />}
+            >
+              {HR_LEGAL_COPY.actions.reject}
+            </Button>
+          </>
+        ) : null}
+        {capabilities.canRevealSensitive && addr.verificationStatus !== 'archived' ? (
+          <Button
+            size='small'
+            variant='outlined'
+            color='secondary'
+            disabled={submitting}
+            onClick={() =>
+              setRevealState({
+                open: true,
+                targetKind: 'address',
+                targetId: addr.addressId,
+                revealedValue: null
+              })
+            }
+            startIcon={<i className='tabler-eye' style={{ fontSize: 14 }} aria-hidden='true' />}
+          >
+            {HR_LEGAL_COPY.actions.revealAddress}
+          </Button>
+        ) : null}
+        {capabilities.canHrUpdate ? (
+          <Button
+            size='small'
+            variant='text'
+            color='secondary'
+            disabled={submitting}
+            onClick={() =>
+              setActiveEdit({
+                kind: 'address',
+                target: {
+                  addressType: addr.addressType,
+                  initialCountry: addr.countryCode,
+                  existingAddressId: addr.addressId
+                }
+              })
+            }
+            startIcon={<i className='tabler-edit' style={{ fontSize: 14 }} aria-hidden='true' />}
+          >
+            {HR_LEGAL_COPY.actions.edit}
+          </Button>
+        ) : null}
+      </>
+    )
+
+    const preBanner =
+      addr.verificationStatus === 'rejected' && addr.rejectedReason ? (
+        <Alert severity='error' role='status' icon={<i className='tabler-message-2-exclamation' style={{ fontSize: 18 }} />}>
+          <strong>{HR_LEGAL_COPY.rejectedBanner}</strong> {addr.rejectedReason}
+        </Alert>
+      ) : null
+
+    return (
+      <HrItemRow
+        key={slotKey}
+        iconClassName={ADDRESS_ICONS[addr.addressType]}
+        title={HR_LEGAL_COPY.addressTypeLabels[addr.addressType]}
+        chipLabel={
+          addr.verificationStatus === 'verified'
+            ? HR_LEGAL_COPY.states.verified_address
+            : HR_LEGAL_COPY.states[addr.verificationStatus] ?? null
+        }
+        chipColor={STATUS_TO_CHIP_COLOR[addr.verificationStatus]}
+        chipIcon={STATUS_TO_CHIP_ICON[addr.verificationStatus]}
+        subtitle={subtitle}
+        accent={accent}
+        actions={actions}
+        preActionsBanner={preBanner}
+        expandedForm={
+          editing ? (
+            <HrAddressEditForm
+              fixedAddressType={addr.addressType}
+              initialCountry={addr.countryCode}
+              submitting={submitting}
+              serverError={serverErrorById[slotKey] ?? null}
+              onSubmit={submitHrAddress}
+              onCancel={cancelEdit}
+            />
+          ) : undefined
+        }
+      />
+    )
+  }
+
+  const renderEmptyAddressRow = (kind: AddressKind, isRequired: boolean) => {
+    const slotKey = `addr-empty-${kind}`
+    const editing = isEditingThis('address', undefined, kind)
+    const isOptional = !isRequired
+
+    return (
+      <HrItemRow
+        key={slotKey}
+        iconClassName={ADDRESS_ICONS[kind]}
+        title={`${HR_LEGAL_COPY.addressTypeLabels[kind]}${isOptional ? ' (opcional)' : ''}`}
+        chipLabel={isRequired ? HR_LEGAL_COPY.states.missing : null}
+        chipColor={isRequired ? 'error' : 'secondary'}
+        chipIcon={isRequired ? 'tabler-circle' : null}
+        subtitle={
+          isRequired
+            ? HR_LEGAL_COPY.itemSubs.addressNotDeclaredYet(displayName)
+            : 'No declarada. No es obligatoria para finiquito.'
+        }
+        accent={isRequired ? 'error' : 'neutral'}
+        actions={
+          isRequired ? (
+            <>
+              <Button
+                size='small'
+                variant='contained'
+                color='primary'
+                disabled
+                startIcon={<i className='tabler-mail-forward' style={{ fontSize: 14 }} aria-hidden='true' />}
+              >
+                {HR_LEGAL_COPY.actions.askCollaborator(displayName)}
+              </Button>
+              {capabilities.canHrUpdate ? (
+                <Button
+                  size='small'
+                  variant='outlined'
+                  color='secondary'
+                  disabled={submitting || editing}
+                  onClick={() =>
+                    setActiveEdit({ kind: 'address', target: { addressType: kind, initialCountry: 'CL' } })
+                  }
+                  startIcon={<i className='tabler-pencil-plus' style={{ fontSize: 14 }} aria-hidden='true' />}
+                >
+                  {HR_LEGAL_COPY.actions.editLoad}
+                </Button>
+              ) : null}
+            </>
+          ) : capabilities.canHrUpdate ? (
+            <Button
+              size='small'
+              variant='text'
+              color='secondary'
+              disabled={submitting || editing}
+              onClick={() =>
+                setActiveEdit({ kind: 'address', target: { addressType: kind, initialCountry: 'CL' } })
+              }
+              startIcon={<i className='tabler-pencil-plus' style={{ fontSize: 14 }} aria-hidden='true' />}
+            >
+              {HR_LEGAL_COPY.actions.editLoad}
+            </Button>
+          ) : null
+        }
+        expandedForm={
+          editing ? (
+            <HrAddressEditForm
+              fixedAddressType={kind}
+              submitting={submitting}
+              serverError={serverErrorById[slotKey] ?? null}
+              onSubmit={submitHrAddress}
+              onCancel={cancelEdit}
+            />
+          ) : undefined
+        }
+      />
+    )
+  }
+
+  // ── Render ───────────────────────────────────────────────────────
 
   if (loading) {
     return (
-      <Card elevation={0} sx={cardBorderSx}>
-        <CardHeader title='Identidad legal' subheader='Cargando…' />
-        <CardContent>
-          <Stack spacing={1.5}>
-            <Skeleton variant='text' width='75%' />
-            <Skeleton variant='text' width='60%' />
-            <Skeleton variant='text' width='70%' />
+      <Card elevation={0} sx={{ border: `1px solid ${theme.palette.divider}` }}>
+        <Box sx={{ p: 5 }}>
+          <Stack spacing={3}>
+            <Skeleton variant='rounded' height={56} />
+            <Skeleton variant='rounded' height={88} />
+            <Skeleton variant='rounded' height={88} />
+            <Skeleton variant='rounded' height={88} />
           </Stack>
-        </CardContent>
+        </Box>
       </Card>
     )
   }
 
+  if (fetchError) {
+    return (
+      <Alert severity='error' role='alert'>
+        {fetchError}
+      </Alert>
+    )
+  }
+
+  const requiresLegalAddress = !addressByKind.get('legal')
+  const hasAnyVerifiedDoc = documents.some(d => d.verificationStatus === 'verified')
+
   return (
-    <Card elevation={0} sx={cardBorderSx}>
-      <CardHeader
-        title='Identidad legal'
-        subheader='Documentos y direcciones (TASK-784) — masking por default; reveal con motivo + audit'
-      />
-      <Divider />
-      <CardContent>
-        {submitting ? <LinearProgress sx={{ mb: 3 }} /> : null}
-
-        {error ? (
-          <Alert severity='error' sx={{ mb: 3 }} onClose={() => setError(null)}>
-            {error}
-          </Alert>
-        ) : null}
-
-        {data?.readiness?.finalSettlementChile?.blockers?.length ? (
-          <Alert severity='warning' sx={{ mb: 3 }}>
-            <Typography variant='body2' sx={{ fontWeight: 600 }}>
-              Bloqueadores para emitir finiquito Chile
-            </Typography>
-            <Box component='ul' sx={{ m: 0, pl: 3 }}>
-              {data.readiness.finalSettlementChile.blockers.map(b => (
-                <li key={b}>
-                  <Typography variant='body2'>{blockerLabels[b] ?? b}</Typography>
-                </li>
-              ))}
-            </Box>
-          </Alert>
-        ) : null}
-
-        <Stack spacing={5}>
-          <Box>
-            <Typography variant='subtitle2' sx={{ mb: 2 }}>
-              Documentos
-            </Typography>
-            {data?.documents?.length ? (
-              <Stack spacing={2}>
-                {data.documents.map(doc => (
-                  <Box
-                    key={doc.documentId}
-                    sx={{ p: 3, border: '1px solid', borderColor: 'divider', borderRadius: 1 }}
-                  >
-                    <Stack direction='row' alignItems='flex-start' justifyContent='space-between' spacing={2}>
-                      <Stack spacing={0.5}>
-                        <Typography variant='body2' sx={{ fontWeight: 600 }}>
-                          {doc.documentType.replace(/_/g, ' ')} ({doc.countryCode})
-                        </Typography>
-                        <Typography variant='body2' sx={{ fontVariantNumeric: 'tabular-nums' }}>
-                          {doc.displayMask}
-                        </Typography>
-                        <Typography variant='caption' color='text.secondary'>
-                          {doc.source} · declarado {formatDeclared(doc.declaredAt)}
-                        </Typography>
-                        {doc.rejectedReason ? (
-                          <Typography variant='caption' color='error'>
-                            Motivo de rechazo: {doc.rejectedReason}
-                          </Typography>
-                        ) : null}
-                      </Stack>
-                      <Chip
-                        size='small'
-                        label={STATUS_LABELS[doc.verificationStatus]}
-                        color={STATUS_COLORS[doc.verificationStatus]}
-                        variant={doc.verificationStatus === 'verified' ? 'filled' : 'tonal'}
-                      />
-                    </Stack>
-
-                    <Stack direction='row' spacing={1} sx={{ mt: 2 }}>
-                      {doc.verificationStatus === 'pending_review' && data.capabilities.canVerify ? (
-                        <Button
-                          size='small'
-                          variant='contained'
-                          color='success'
-                          disabled={submitting}
-                          onClick={() => handleVerifyDocument(doc.documentId)}
-                        >
-                          Verificar
-                        </Button>
-                      ) : null}
-                      {(doc.verificationStatus === 'pending_review' || doc.verificationStatus === 'verified') &&
-                      data.capabilities.canVerify ? (
-                        <Button
-                          size='small'
-                          variant='outlined'
-                          color='error'
-                          disabled={submitting}
-                          onClick={() => setRejectDialog({ kind: 'document', targetId: doc.documentId })}
-                        >
-                          Rechazar
-                        </Button>
-                      ) : null}
-                      {data.capabilities.canRevealSensitive && doc.verificationStatus !== 'archived' &&
-                      doc.verificationStatus !== 'expired' ? (
-                        <Button
-                          size='small'
-                          variant='outlined'
-                          color='warning'
-                          disabled={submitting}
-                          onClick={() => setRevealDialog({ kind: 'document', targetId: doc.documentId })}
-                        >
-                          Ver completo
-                        </Button>
-                      ) : null}
-                    </Stack>
-                  </Box>
-                ))}
-              </Stack>
-            ) : (
-              <Typography variant='body2' color='text.secondary'>
-                Sin documentos registrados.
-              </Typography>
-            )}
-          </Box>
-
-          <Divider />
-
-          <Box>
-            <Typography variant='subtitle2' sx={{ mb: 2 }}>
-              Direcciones
-            </Typography>
-            {data?.addresses?.length ? (
-              <Stack spacing={2}>
-                {data.addresses.map(addr => (
-                  <Box
-                    key={addr.addressId}
-                    sx={{ p: 3, border: '1px solid', borderColor: 'divider', borderRadius: 1 }}
-                  >
-                    <Stack direction='row' alignItems='flex-start' justifyContent='space-between' spacing={2}>
-                      <Stack spacing={0.5}>
-                        <Typography variant='body2' sx={{ fontWeight: 600 }}>
-                          {ADDRESS_LABELS[addr.addressType]}
-                        </Typography>
-                        <Typography variant='body2'>{addr.presentationMask}</Typography>
-                        <Typography variant='caption' color='text.secondary'>
-                          {addr.source} · declarada {formatDeclared(addr.declaredAt)}
-                        </Typography>
-                        {addr.rejectedReason ? (
-                          <Typography variant='caption' color='error'>
-                            Motivo de rechazo: {addr.rejectedReason}
-                          </Typography>
-                        ) : null}
-                      </Stack>
-                      <Chip
-                        size='small'
-                        label={STATUS_LABELS[addr.verificationStatus]}
-                        color={STATUS_COLORS[addr.verificationStatus]}
-                        variant={addr.verificationStatus === 'verified' ? 'filled' : 'tonal'}
-                      />
-                    </Stack>
-
-                    <Stack direction='row' spacing={1} sx={{ mt: 2 }}>
-                      {addr.verificationStatus === 'pending_review' && data.capabilities.canVerify ? (
-                        <Button
-                          size='small'
-                          variant='contained'
-                          color='success'
-                          disabled={submitting}
-                          onClick={() => handleVerifyAddress(addr.addressId)}
-                        >
-                          Verificar
-                        </Button>
-                      ) : null}
-                      {(addr.verificationStatus === 'pending_review' || addr.verificationStatus === 'verified') &&
-                      data.capabilities.canVerify ? (
-                        <Button
-                          size='small'
-                          variant='outlined'
-                          color='error'
-                          disabled={submitting}
-                          onClick={() => setRejectDialog({ kind: 'address', targetId: addr.addressId })}
-                        >
-                          Rechazar
-                        </Button>
-                      ) : null}
-                      {data.capabilities.canRevealSensitive ? (
-                        <Button
-                          size='small'
-                          variant='outlined'
-                          color='warning'
-                          disabled={submitting}
-                          onClick={() => setRevealDialog({ kind: 'address', targetId: addr.addressId })}
-                        >
-                          Ver completa
-                        </Button>
-                      ) : null}
-                    </Stack>
-                  </Box>
-                ))}
-              </Stack>
-            ) : (
-              <Typography variant='body2' color='text.secondary'>
-                Sin direcciones registradas.
-              </Typography>
-            )}
-          </Box>
-        </Stack>
-      </CardContent>
-
-      <Dialog open={Boolean(rejectDialog)} onClose={() => setRejectDialog(null)} fullWidth maxWidth='sm'>
-        <DialogTitle>Rechazar {rejectDialog?.kind === 'document' ? 'documento' : 'direccion'}</DialogTitle>
-        <DialogContent>
-          <Typography variant='body2' color='text.secondary' sx={{ mb: 3 }}>
-            El motivo se persiste en audit log y se notifica al colaborador. Minimo 10 caracteres.
-          </Typography>
-          <TextField
-            fullWidth
-            multiline
-            minRows={3}
-            label='Motivo del rechazo'
-            value={rejectReason}
-            onChange={e => setRejectReason(e.target.value)}
+    <Card
+      elevation={0}
+      sx={{
+        border: `1px solid ${theme.palette.divider}`,
+        borderRadius: theme.shape.customBorderRadius.lg,
+        overflow: 'hidden'
+      }}
+    >
+      {/* Header */}
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 4,
+          px: 6,
+          py: 5,
+          borderBottom: `1px solid ${theme.palette.divider}`
+        }}
+      >
+        <Box
+          aria-hidden='true'
+          sx={{
+            width: 44,
+            height: 44,
+            borderRadius: theme.shape.customBorderRadius.md,
+            backgroundColor:
+              headerChip.color === 'success'
+                ? alpha(theme.palette.success.main, 0.12)
+                : alpha(theme.palette.primary.main, 0.16),
+            color:
+              headerChip.color === 'success'
+                ? theme.palette.success.main
+                : theme.palette.primary.main,
+            display: 'grid',
+            placeItems: 'center',
+            flexShrink: 0
+          }}
+        >
+          <i
+            className={headerChip.color === 'success' ? 'tabler-shield-check' : 'tabler-id'}
+            style={{ fontSize: 22 }}
           />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setRejectDialog(null)} disabled={submitting}>
-            Cancelar
-          </Button>
-          <Button
-            variant='contained'
-            color='error'
-            onClick={handleRejectSubmit}
-            disabled={submitting || rejectReason.trim().length < 10}
-          >
-            Rechazar
-          </Button>
-        </DialogActions>
-      </Dialog>
+        </Box>
+        <Box sx={{ flex: 1, minWidth: 0 }}>
+          <Typography variant='h6' sx={{ fontWeight: 600 }}>
+            {HR_LEGAL_COPY.card.title}
+          </Typography>
+          <Typography variant='body2' color='text.secondary'>
+            {HR_LEGAL_COPY.card.subtitle}
+          </Typography>
+        </Box>
+        <CustomChip
+          round='true'
+          variant='tonal'
+          color={headerChip.color}
+          label={headerChip.label}
+          icon={
+            <i
+              className={headerChip.icon}
+              style={{ fontSize: 16, marginLeft: 4 }}
+              aria-hidden='true'
+            />
+          }
+        />
+      </Box>
 
-      <Dialog open={Boolean(revealDialog)} onClose={closeRevealDialog} fullWidth maxWidth='sm'>
-        <DialogTitle>Ver valor completo</DialogTitle>
-        <DialogContent>
-          {revealValue ? (
-            <Stack spacing={2}>
-              <Typography variant='body2' color='text.secondary'>
-                Valor revelado. Esta accion quedo registrada en audit log con tu usuario, motivo y timestamp.
-              </Typography>
-              <Box
-                sx={{
-                  p: 3,
-                  bgcolor: 'background.default',
-                  borderRadius: 1,
-                  fontVariantNumeric: 'tabular-nums',
-                  letterSpacing: '0.04em'
-                }}
-              >
-                <Typography variant='body1'>{revealValue}</Typography>
-              </Box>
-            </Stack>
-          ) : (
-            <Stack spacing={2}>
-              <Typography variant='body2' color='text.secondary'>
-                Solo se permite ver el valor completo con motivo registrado en audit log. Minimo 5
-                caracteres.
-              </Typography>
-              <TextField
-                fullWidth
-                multiline
-                minRows={3}
-                label='Motivo'
-                value={revealReason}
-                onChange={e => setRevealReason(e.target.value)}
-              />
-            </Stack>
-          )}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={closeRevealDialog}>Cerrar</Button>
-          {!revealValue ? (
-            <Button
-              variant='contained'
-              color='warning'
-              onClick={handleRevealSubmit}
-              disabled={submitting || revealReason.trim().length < 5}
+      <Box sx={{ p: 6 }}>
+        {/* Readiness board */}
+        {data ? (
+          <HrReadinessBoard
+            finalSettlement={data.readiness.finalSettlementChile}
+            payroll={data.readiness.payrollChileDependent}
+          />
+        ) : null}
+
+        {/* Documentos */}
+        <Box component='section' sx={{ mb: 6 }}>
+          <Stack
+            direction='row'
+            alignItems='center'
+            justifyContent='space-between'
+            sx={{ mb: 3, px: 1 }}
+          >
+            <Typography
+              variant='overline'
+              color='text.secondary'
+              sx={{ fontWeight: 600, letterSpacing: '0.1em' }}
             >
-              Revelar
-            </Button>
-          ) : null}
-        </DialogActions>
-      </Dialog>
+              {HR_LEGAL_COPY.sections.documents}
+            </Typography>
+            <Typography variant='caption' color='text.secondary'>
+              {documents.length === 0
+                ? HR_LEGAL_COPY.counts.documentsZero
+                : HR_LEGAL_COPY.counts.documents(
+                    documents.length,
+                    documents.filter(d => d.verificationStatus === 'verified').length,
+                    documents.filter(d => d.verificationStatus === 'pending_review').length
+                  )}
+            </Typography>
+          </Stack>
+          <Stack spacing={3}>
+            {documents.length === 0 || !hasAnyVerifiedDoc
+              ? [...documents.map(renderDocumentItem), !hasAnyVerifiedDoc && documents.length === 0
+                  ? renderEmptyDocumentRow()
+                  : null].filter(Boolean)
+              : documents.map(renderDocumentItem)}
+          </Stack>
+        </Box>
+
+        {/* Direcciones */}
+        <Box component='section' sx={{ mb: 6 }}>
+          <Stack
+            direction='row'
+            alignItems='center'
+            justifyContent='space-between'
+            sx={{ mb: 3, px: 1 }}
+          >
+            <Typography
+              variant='overline'
+              color='text.secondary'
+              sx={{ fontWeight: 600, letterSpacing: '0.1em' }}
+            >
+              {HR_LEGAL_COPY.sections.addresses}
+            </Typography>
+            <Typography variant='caption' color='text.secondary'>
+              {addresses.length === 0
+                ? HR_LEGAL_COPY.counts.addressesZero
+                : HR_LEGAL_COPY.counts.addresses(
+                    addresses.length,
+                    addresses.filter(a => a.verificationStatus === 'verified').length
+                  )}
+            </Typography>
+          </Stack>
+          <Stack spacing={3}>
+            {addressByKind.get('legal')
+              ? renderAddressItem(addressByKind.get('legal')!)
+              : renderEmptyAddressRow('legal', requiresLegalAddress)}
+            {addressByKind.get('residence')
+              ? renderAddressItem(addressByKind.get('residence')!)
+              : renderEmptyAddressRow('residence', false)}
+            {addressByKind.get('emergency')
+              ? renderAddressItem(addressByKind.get('emergency')!)
+              : renderEmptyAddressRow('emergency', false)}
+          </Stack>
+        </Box>
+
+        <HrAuditLog memberId={memberId} />
+      </Box>
+
+      {/* Reject dialog */}
+      <HrRejectDialog
+        open={rejectState.open}
+        collaboratorName={collaboratorName ?? displayName}
+        kind={rejectState.targetKind}
+        submitting={submitting}
+        onSubmit={submitReject}
+        onClose={() => setRejectState({ open: false, targetKind: 'document', targetId: '' })}
+      />
+
+      {/* Reveal dialog */}
+      <HrRevealDialog
+        open={revealState.open}
+        collaboratorName={collaboratorName ?? displayName}
+        kind={revealState.targetKind}
+        submitting={submitting}
+        revealedValue={revealState.revealedValue}
+        onSubmitReveal={submitReveal}
+        onClose={() =>
+          setRevealState({
+            open: false,
+            targetKind: 'document',
+            targetId: '',
+            revealedValue: null
+          })
+        }
+      />
     </Card>
   )
 }
