@@ -7,6 +7,7 @@ import {
   PaymentOrderConflictError,
   PaymentOrderValidationError
 } from '@/lib/finance/payment-orders/errors'
+import { validatePaymentOrderSourceAccount } from '@/lib/finance/payment-orders/source-instrument-policy'
 
 export const dynamic = 'force-dynamic'
 
@@ -74,8 +75,17 @@ export async function PATCH(
     }
 
     // Validar estado actual
-    const orderRows = await query<{ state: string }>(
-      `SELECT state FROM greenhouse_finance.payment_orders WHERE order_id = $1 LIMIT 1`,
+    const orderRows = await query<{
+      state: string
+      processor_slug: string | null
+      payment_method: string | null
+      currency: string
+      metadata_json: Record<string, unknown> | null
+    }>(
+      `SELECT state, processor_slug, payment_method, currency, metadata_json
+         FROM greenhouse_finance.payment_orders
+        WHERE order_id = $1
+        LIMIT 1`,
       [orderId]
     )
 
@@ -92,25 +102,27 @@ export async function PATCH(
       )
     }
 
-    // Validar que la cuenta exista
-    const accountRows = await query<{ account_id: string }>(
-      `SELECT account_id FROM greenhouse_finance.accounts WHERE account_id = $1 LIMIT 1`,
-      [sourceAccountId]
+    const policy = await validatePaymentOrderSourceAccount(
+      {
+        query: async <T extends Record<string, unknown>>(text: string, values?: unknown[]) => ({
+          rows: await query<T>(text, values ?? [])
+        })
+      },
+      {
+        processorSlug: orderRows[0].processor_slug,
+        paymentMethod: orderRows[0].payment_method,
+        currency: orderRows[0].currency,
+        sourceAccountId
+      }
     )
-
-    if (accountRows.length === 0) {
-      throw new PaymentOrderValidationError(
-        `Cuenta ${sourceAccountId} no existe en greenhouse_finance.accounts`,
-        'validation_error',
-        404
-      )
-    }
 
     await query(
       `UPDATE greenhouse_finance.payment_orders
-          SET source_account_id = $2, updated_at = now()
+          SET source_account_id = $2,
+              metadata_json = COALESCE(metadata_json, '{}'::jsonb) || jsonb_build_object('treasury_source_policy', $3::jsonb),
+              updated_at = now()
         WHERE order_id = $1`,
-      [orderId, sourceAccountId]
+      [orderId, sourceAccountId, JSON.stringify(policy.snapshot)]
     )
 
     const order = await getPaymentOrderWithLines(orderId)

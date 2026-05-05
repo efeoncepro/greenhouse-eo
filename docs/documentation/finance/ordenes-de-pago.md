@@ -3,8 +3,23 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
 > **Version:** 1.0
 > **Creado:** 2026-05-01 por Julio Reyes
-> **Ultima actualizacion:** 2026-05-01 por Julio Reyes
+> **Ultima actualizacion:** 2026-05-05 por Julio Reyes
 > **Documentacion tecnica:** [docs/architecture/GREENHOUSE_PAYMENT_ORDERS_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_PAYMENT_ORDERS_ARCHITECTURE_V1.md)
+
+## Processor vs instrumento de salida
+
+Una orden de pago separa dos decisiones:
+
+- **Processor / metodo:** quien ejecuta o coordina el pago (`Deel`, `Global66`, banco, etc.).
+- **Instrumento de salida:** cuenta, fintech o tarjeta real que se rebaja o contrae deuda.
+
+Ejemplos:
+
+- **Deel contractor:** `processor=deel`, pero el instrumento de salida puede ser `Santander Corp TC`. Deel no aparece como cuenta origen si solo opera como rail.
+- **Global66 contractor:** `processor=global66` y el instrumento de salida puede ser `Global66` si existe como fintech/cuenta activa.
+- **Banco directo:** `processor` puede quedar vacío o `bank_transfer`, y el instrumento de salida es la cuenta bancaria real.
+
+No marques una orden como pagada usando un processor como si fuera caja. Si falta el instrumento de salida, la orden queda bloqueada hasta asignarlo.
 
 ## Que es
 

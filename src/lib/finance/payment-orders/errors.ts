@@ -13,6 +13,9 @@ export type PaymentOrderErrorCode =
   | 'invalid_state_transition'
   // Slice 1 — source_account hard-gate
   | 'source_account_required'
+  | 'source_account_inactive'
+  | 'source_account_not_found'
+  | 'processor_cannot_be_source_account'
   // Slice 4 — resolver loud
   | 'expense_unresolved'
   | 'settlement_blocked'

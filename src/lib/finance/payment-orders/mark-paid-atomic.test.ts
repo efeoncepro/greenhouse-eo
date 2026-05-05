@@ -68,6 +68,21 @@ const buildFakeClient = (sequence: FakeClientCallSequence) => {
   const client = {
     query: vi.fn(async (sql: string, params: unknown[] = []) => {
       calls.push({ sql, params })
+
+      if (sql.includes('FROM greenhouse_finance.accounts')) {
+        return {
+          rows: [{
+            account_id: params[0] ?? 'santander-clp',
+            currency: 'CLP',
+            instrument_category: 'bank_account',
+            provider_slug: 'santander',
+            is_active: true,
+            default_for: ['payroll']
+          }],
+          rowCount: 1
+        }
+      }
+
       const next = queue.shift()
 
       // Si se acaba la cola, devolver vacio (las consultas extras se manejan
@@ -128,6 +143,27 @@ const baseLineRow = {
   period_id: '2026-04'
 }
 
+const activeSourceAccountResponse = (accountId: unknown = 'santander-clp') => ({
+  rows: [{
+    account_id: accountId,
+    currency: 'CLP',
+    instrument_category: 'bank_account',
+    provider_slug: 'santander',
+    is_active: true,
+    default_for: ['payroll']
+  }],
+  rowCount: 1
+})
+
+const accountAwareSequenceQuery = (allResponses: Array<{ rows: Array<Record<string, unknown>>; rowCount?: number }>) =>
+  vi.fn(async (sql: string, params: unknown[] = []) => {
+    if (sql.includes('FROM greenhouse_finance.accounts')) {
+      return activeSourceAccountResponse(params[0])
+    }
+
+    return allResponses.shift() ?? { rows: [], rowCount: 0 }
+  })
+
 const setupHappyPath = () => {
   const fakeClient = buildFakeClient({
     selectForUpdate: { rows: [baseOrderRow], rowCount: 1 },
@@ -161,9 +197,7 @@ const setupHappyPath = () => {
     { rows: [{ expense_id: 'EXP-202604-003' }], rowCount: 1 } // resolve expense
   ]
 
-  fakeClient.client.query.mockImplementation(async () => {
-    return allResponses.shift() ?? { rows: [], rowCount: 0 }
-  })
+  fakeClient.client.query.mockImplementation(accountAwareSequenceQuery(allResponses))
 
   mocks.withTransaction.mockImplementation(async fn => fn(fakeClient.client))
   mocks.recordPaymentOrderStateTransition.mockResolvedValue({
@@ -300,7 +334,7 @@ describe('markPaymentOrderPaidAtomic', () => {
     ]
 
     const c = {
-      query: vi.fn(async () => allResponses.shift() ?? { rows: [], rowCount: 0 })
+      query: accountAwareSequenceQuery(allResponses)
     }
 
     mocks.withTransaction.mockImplementation(async fn => fn(c))
@@ -337,7 +371,7 @@ describe('markPaymentOrderPaidAtomic', () => {
     ]
 
     const c = {
-      query: vi.fn(async () => allResponses.shift() ?? { rows: [], rowCount: 0 })
+      query: accountAwareSequenceQuery(allResponses)
     }
 
     mocks.withTransaction.mockImplementation(async fn => fn(c))
@@ -376,7 +410,7 @@ describe('markPaymentOrderPaidAtomic', () => {
     ]
 
     const c = {
-      query: vi.fn(async () => allResponses.shift() ?? { rows: [], rowCount: 0 })
+      query: accountAwareSequenceQuery(allResponses)
     }
 
     mocks.withTransaction.mockImplementation(async fn => fn(c))
@@ -431,7 +465,7 @@ describe('markPaymentOrderPaidAtomic', () => {
     ]
 
     const c = {
-      query: vi.fn(async () => allResponses.shift() ?? { rows: [], rowCount: 0 })
+      query: accountAwareSequenceQuery(allResponses)
     }
 
     mocks.withTransaction.mockImplementation(async fn => fn(c))

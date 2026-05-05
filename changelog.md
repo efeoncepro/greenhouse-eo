@@ -2,6 +2,8 @@
 
 ## 2026-05-05
 
+- **TASK-799 completa — Payment Orders separa processor e instrumento de salida.** Deel deja de tratarse como cuenta origen cuando opera solo como rail; Global66 puede ser instrumento de salida cuando existe como fintech activa. La UI de Payment Orders cambia a "instrumento de salida", la creación de órdenes puede usar método automático por perfil de pago y PATCH/mark-paid validan la compatibilidad del instrumento antes de rebajar caja/deuda.
+
 - **TASK-753 implementada — `/my/payment-profile` self-service para Mi cuenta de pago.** El colaborador ahora ve su cuenta de pago activa (datos enmascarados), puede solicitar un cambio (entra como pendiente de revisión) y recibe email cuando finance la aprueba/cancela/reemplaza.
   - **Vista personal:** ruta `/my/payment-profile` con cuenta activa + banner "En revisión" cuando hay pending + dialog "Solicitar cambio" con form CL/USD.
   - **Maker-checker explícito:** el dialog explica al colaborador que finance debe aprobar; el endpoint admin ya rechazaba auto-aprobación (TS+DB trigger TASK-749). El colaborador puede cancelar su propia solicitud pending pero NUNCA aprobarla.

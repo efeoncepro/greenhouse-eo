@@ -4,6 +4,26 @@
 > **Created:** 2026-03-30
 > **Last updated:** 2026-05-05 (Contractor Engagements + Payables)
 
+## Delta 2026-05-05 — TASK-799 Processor/source separation for payment orders
+
+Payment Orders separa tres conceptos que no deben conflarse:
+
+- `processor_slug` / `payment_method`: rail operativo (`deel`, `global66`, `previred`, etc.).
+- `source_account_id`: instrumento financiero real que se rebaja o contrae deuda.
+- `settlement_groups` / `settlement_legs`: cadena conciliable de funding, FX, fee y payout cuando el pago no es directo.
+
+Reglas canónicas:
+
+- Deel no debe usarse como `source_account_id` cuando opera solo como processor/rail. Para el flujo operativo actual, Deel se financia desde `santander-corp-clp` (TC Santander Corp); el pago de la TC desde Santander CLP es un settlement interno separado.
+- Global66 puede ser processor y también source instrument cuando existe como fintech/cuenta activa (`global66-clp` hoy). Si el flujo requiere fondeo previo Santander -> Global66, se modela con `settlement_legs` de funding/internal transfer, no como una segunda orden de payroll.
+- `payment_platform` solo contribuye a cash si el producto mantiene saldo propio explícito. Si un provider opera solo como processor, no debe aparecer en el selector de instrumento de salida.
+
+Runtime:
+
+- `src/lib/finance/payment-orders/source-instrument-policy.ts` es el helper V1 de policy code-versioned.
+- `createPaymentOrderFromObligations` guarda snapshot `metadata_json.treasury_source_policy`.
+- PATCH de `source_account_id` y `markPaymentOrderPaidAtomic` validan la policy antes de registrar downstream.
+
 ## Delta 2026-05-05 — Contractor payables bridge
 
 Se agrega arquitectura complementaria para pagos contractor/freelance/profesional independiente:

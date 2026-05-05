@@ -33,6 +33,7 @@ import { toast } from 'sonner'
 import CustomTextField from '@core/components/mui/TextField'
 
 import { DataTableShell } from '@/components/greenhouse/data-table'
+import { getMicrocopy } from '@/lib/copy'
 import type {
   PaymentOrderBlockedReason,
   PaymentOrderState,
@@ -56,7 +57,7 @@ const SOURCE_ACCOUNT_PATCHABLE_STATES: ReadonlySet<PaymentOrderState> = new Set(
 const BLOCKED_REASON_BODY: Record<PaymentOrderBlockedReason, string> = {
   expense_unresolved:
     'No se encontró el expense de payroll para este período/miembro. Verifica que la nómina del período esté exportada y materializada.',
-  account_missing: 'Falta la cuenta bancaria origen.',
+  account_missing: 'Falta el instrumento financiero de salida.',
   cutover_violation: 'Falla de constraint financiero — contacta al admin.',
   materializer_dead_letter:
     'Materializador de payroll en dead-letter para este período.',
@@ -90,6 +91,8 @@ interface BankAccountOption {
   bankName: string
   currency: string
   isActive: boolean
+  instrumentCategory?: string | null
+  providerSlug?: string | null
 }
 
 interface OrderDetailDrawerProps {
@@ -138,7 +141,19 @@ const formatDate = (d: string | null) => {
   return new Date(d).toLocaleDateString('es-CL', { day: '2-digit', month: 'short', year: 'numeric' })
 }
 
+const isDeelRail = (order: PaymentOrderWithLines | null) =>
+  order?.processorSlug === 'deel' || order?.paymentMethod === 'deel'
+
+const canUseAsSourceInstrument = (account: BankAccountOption, order: PaymentOrderWithLines | null) => {
+  if (!account.isActive) return false
+  if (account.instrumentCategory === 'payroll_processor') return false
+  if (isDeelRail(order) && account.providerSlug === 'deel') return false
+
+  return !order || account.currency === order.currency || account.instrumentCategory === 'credit_card' || account.providerSlug === 'global66'
+}
+
 const OrderDetailDrawer = ({ order, loading, onClose, onActionComplete }: OrderDetailDrawerProps) => {
+  const microcopy = getMicrocopy()
   const [actionInFlight, setActionInFlight] = useState(false)
   const [pickerOpen, setPickerOpen] = useState(false)
   const [accounts, setAccounts] = useState<BankAccountOption[]>([])
@@ -165,7 +180,7 @@ const OrderDetailDrawer = ({ order, loading, onClose, onActionComplete }: OrderD
     if (!order) return null
 
     if (order.state === 'submitted' && !order.sourceAccountId) {
-      return 'Asigna primero la cuenta bancaria origen para poder marcar la orden como pagada.'
+      return 'Asigna primero el instrumento financiero de salida para poder marcar la orden como pagada.'
     }
 
     return null
@@ -183,9 +198,9 @@ const OrderDetailDrawer = ({ order, loading, onClose, onActionComplete }: OrderD
         if (cancelled) return
         const items: BankAccountOption[] = Array.isArray(data?.items) ? data.items : []
 
-        // Filtrar por moneda de la orden + activas (defensa adicional al server-side).
+        // Filtrar por elegibilidad operacional; la API vuelve a validar.
         const filtered = items.filter(
-          a => a.isActive && (!order || a.currency === order.currency)
+          a => canUseAsSourceInstrument(a, order)
         )
 
         setAccounts(filtered)
@@ -246,17 +261,17 @@ const OrderDetailDrawer = ({ order, loading, onClose, onActionComplete }: OrderD
       const json = await r.json()
 
       if (!r.ok) {
-        toast.error(json.error ?? 'No fue posible asignar la cuenta origen. Intenta de nuevo.')
+        toast.error(json.error ?? 'No fue posible asignar el instrumento de salida. Intenta de nuevo.')
 
         return
       }
 
-      toast.success('Cuenta origen actualizada.')
+      toast.success('Instrumento de salida actualizado.')
       setPickerOpen(false)
       await onActionComplete()
     } catch (e) {
       console.error(e)
-      toast.error('No fue posible asignar la cuenta origen. Intenta de nuevo.')
+      toast.error('No fue posible asignar el instrumento de salida. Intenta de nuevo.')
     } finally {
       setActionInFlight(false)
     }
@@ -269,7 +284,7 @@ const OrderDetailDrawer = ({ order, loading, onClose, onActionComplete }: OrderD
     if (!order) return
 
     if (!order.sourceAccountId) {
-      toast.error('Asigna primero la cuenta bancaria origen para recuperar la orden.')
+      toast.error('Asigna primero el instrumento financiero de salida para recuperar la orden.')
 
       return
     }
@@ -382,7 +397,7 @@ const OrderDetailDrawer = ({ order, loading, onClose, onActionComplete }: OrderD
     >
       <Box sx={{ p: 4, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Typography variant='h6'>Detalle de orden</Typography>
-        <IconButton onClick={onClose} aria-label='Cerrar drawer'>
+        <IconButton onClick={onClose} aria-label={microcopy.aria.closeDrawer}>
           <i className='tabler-x' />
         </IconButton>
       </Box>
@@ -564,10 +579,10 @@ const OrderDetailDrawer = ({ order, loading, onClose, onActionComplete }: OrderD
             </Alert>
           ) : null}
 
-          {/* TASK-765 Slice 1: Cuenta bancaria origen — hard-gate visible.
+          {/* TASK-799: Instrumento de salida — hard-gate visible.
               Banner warning cuando falta + picker para asignarla. */}
           <Stack spacing={2}>
-            <Typography variant='subtitle2'>Cuenta bancaria origen</Typography>
+            <Typography variant='subtitle2'>Instrumento de salida</Typography>
             <Stack direction='row' spacing={2} alignItems='center' flexWrap='wrap' useFlexGap>
               {order.sourceAccountId ? (
                 <Chip
@@ -594,16 +609,16 @@ const OrderDetailDrawer = ({ order, loading, onClose, onActionComplete }: OrderD
                   onClick={() => setPickerOpen(true)}
                   disabled={actionInFlight}
                 >
-                  {order.sourceAccountId ? 'Cambiar cuenta' : 'Asignar cuenta origen'}
+                  {order.sourceAccountId ? 'Cambiar instrumento' : 'Asignar instrumento'}
                 </Button>
               ) : null}
             </Stack>
             {sourceAccountMissingForFlow ? (
               <Alert severity='warning' icon={<i className='tabler-alert-triangle' aria-hidden='true' />}>
-                <AlertTitle>Falta la cuenta bancaria origen</AlertTitle>
+                <AlertTitle>Falta el instrumento de salida</AlertTitle>
                 <Typography variant='body2'>
-                  Esta orden no puede marcarse como pagada hasta que asignes desde qué cuenta sale el
-                  dinero. Sin esto, el banco no rebaja saldo y la conciliación queda incompleta.
+                  Esta orden no puede marcarse como pagada hasta que asignes qué cuenta, fintech o tarjeta
+                  financia el pago. El processor puede ser distinto del instrumento que se rebaja.
                 </Typography>
               </Alert>
             ) : null}
@@ -672,33 +687,33 @@ const OrderDetailDrawer = ({ order, loading, onClose, onActionComplete }: OrderD
         </Stack>
       )}
 
-      {/* TASK-765 Slice 1: picker dialog para asignar cuenta origen */}
+      {/* TASK-799: picker dialog para asignar instrumento de salida */}
       <Dialog open={pickerOpen} onClose={() => setPickerOpen(false)} maxWidth='xs' fullWidth>
-        <DialogTitle>Asignar cuenta bancaria origen</DialogTitle>
+        <DialogTitle>Asignar instrumento de salida</DialogTitle>
         <DialogContent dividers>
           <Stack spacing={3}>
             <Typography variant='body2' color='text.secondary'>
-              La cuenta desde donde se transfiere el pago. Solo cuentas activas en la moneda de la
-              orden.
+              Selecciona el instrumento financiero que se rebaja o contrae deuda. Deel y otros processors
+              no aparecen como origen cuando solo operan como rail.
             </Typography>
             <CustomTextField
               select
-              label='Cuenta'
+              label='Instrumento'
               value={selectedAccountId}
               onChange={e => setSelectedAccountId(e.target.value)}
               fullWidth
               disabled={accountsLoading}
               helperText={
                 accountsLoading
-                  ? 'Cargando cuentas…'
+                  ? 'Cargando instrumentos...'
                   : accounts.length === 0
-                    ? `No hay cuentas activas en ${order?.currency ?? 'la moneda solicitada'}.`
+                    ? `No hay instrumentos activos compatibles con ${order?.currency ?? 'la moneda solicitada'}.`
                     : null
               }
               SelectProps={{ displayEmpty: true }}
             >
               <MenuItem value='' disabled>
-                Selecciona una cuenta
+                Selecciona un instrumento
               </MenuItem>
               {accounts.map(account => (
                 <MenuItem key={account.accountId} value={account.accountId}>

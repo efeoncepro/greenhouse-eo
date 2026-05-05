@@ -885,3 +885,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-796` | `to-do` | Contractor Self-Service Hub (EPIC-013 child 8/10) | `docs/tasks/to-do/TASK-796-contractor-self-service-hub.md` |
 | `TASK-797` | `to-do` | Contractor Closure + Transition Controls (EPIC-013 child 9/10) | `docs/tasks/to-do/TASK-797-contractor-closure-transition-controls.md` |
 | `TASK-798` | `to-do` | Contractor Reliability + Ops Control Plane (EPIC-013 child 10/10) | `docs/tasks/to-do/TASK-798-contractor-reliability-ops-control-plane.md` |
+| `TASK-799` | `complete` | Payment Order Processor Source + Settlement Policy | `docs/tasks/complete/TASK-799-payment-order-processor-source-settlement-policy.md` |

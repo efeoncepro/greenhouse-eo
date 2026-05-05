@@ -15,6 +15,7 @@ import {
   PaymentOrderValidationError
 } from './errors'
 import { mapOrderRow, type OrderRow } from './row-mapper'
+import { resolvePaymentOrderSourcePolicy } from './source-instrument-policy'
 import { recordPaymentOrderStateTransition } from './state-transitions-audit'
 import { assertSourceAccountForPaid } from './transitions'
 
@@ -47,7 +48,9 @@ import { assertSourceAccountForPaid } from './transitions'
 interface OrderHeaderRow extends Record<string, unknown> {
   order_id: string
   state: string
+  processor_slug: string | null
   payment_method: string | null
+  currency: string
   source_account_id: string | null
   paid_at: string | null
   external_reference: string | null
@@ -192,6 +195,13 @@ export async function markPaymentOrderPaidAtomic(
     // 2. Hard-gate source_account_id (slice 1 mirror, defense in depth).
     assertSourceAccountForPaid(input.orderId, row.source_account_id, 'paid')
 
+    const sourcePolicy = await resolvePaymentOrderSourcePolicy(client, {
+      processorSlug: row.processor_slug,
+      paymentMethod: row.payment_method,
+      currency: row.currency,
+      sourceAccountId: row.source_account_id
+    })
+
     // 3. UPDATE state=paid + paid_at + external_reference.
     const updated = await client.query<OrderRow>(
       `UPDATE greenhouse_finance.payment_orders
@@ -214,11 +224,12 @@ export async function markPaymentOrderPaidAtomic(
         toState: 'paid',
         actorUserId: input.paidBy,
         reason: 'mark_paid_atomic',
-        metadata: {
-          externalReference: input.externalReference ?? null,
-          sourceAccountId: order.sourceAccountId,
-          path: 'atomic'
-        }
+          metadata: {
+            externalReference: input.externalReference ?? null,
+            sourceAccountId: order.sourceAccountId,
+            treasurySourcePolicy: sourcePolicy.snapshot,
+            path: 'atomic'
+          }
       },
       client
     )
@@ -340,6 +351,7 @@ export async function markPaymentOrderPaidAtomic(
             paymentMethod: order.paymentMethod ?? null,
             paymentAccountId: order.sourceAccountId ?? null,
             paymentSource: 'payroll_system',
+            settlementConfig: sourcePolicy.settlementConfig,
             reference:
               order.externalReference ?? `order:${order.orderId}/line:${line.line_id}`,
             actorUserId: input.paidBy,

@@ -1,5 +1,29 @@
 # Greenhouse Payment Orders Architecture V1
 
+## Delta 2026-05-05 — TASK-799 Processor Source + Settlement Policy
+
+Payment Orders V1 distingue de forma obligatoria:
+
+- `processor_slug`: procesador/rail operativo (`deel`, `global66`, etc.).
+- `payment_method`: método operativo visible.
+- `source_account_id`: cuenta, fintech, tarjeta o instrumento real que financia la salida.
+
+Esta distinción evita que processors sin saldo propio se presenten como bancos. El caso canónico es Deel: Greenhouse puede pagar Deel con la TC Santander Corp y Deel ejecuta el payout, pero `deel` no es el instrumento que se rebaja. Global66 sí puede operar como fintech/cuenta cuando existe un account activo.
+
+Runtime:
+
+- Helper: `src/lib/finance/payment-orders/source-instrument-policy.ts`.
+- Create: `createPaymentOrderFromObligations` resuelve source default y persiste `metadata_json.treasury_source_policy`.
+- PATCH: `/api/admin/finance/payment-orders/[orderId]` valida cuenta activa + compatibilidad processor/source.
+- Paid: `markPaymentOrderPaidAtomic` valida la misma policy y conserva atomicidad con `recordExpensePayment`.
+
+Reglas:
+
+- `provider_slug='deel'` no puede ser `source_account_id` para orders Deel.
+- `instrument_category='payroll_processor'` no puede ser `source_account_id`.
+- `provider_slug='global66'` puede ser source cuando la cuenta fintech está activa.
+- Cualquier funding/FX/fee adicional debe vivir en `settlement_groups` / `settlement_legs`, no en una columna paralela inventada.
+
 ## Delta 2026-05-01 — TASK-751: Payroll Settlement Orchestration + Reconciliation Wireup (V1)
 
 Cierra el ciclo end-to-end: cuando una `payment_order` (TASK-750) pasa a

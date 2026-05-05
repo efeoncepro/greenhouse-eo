@@ -46,11 +46,14 @@ const PAYMENT_METHODS: Array<{ value: PaymentOrderPaymentMethod; label: string }
   { value: 'paypal', label: 'PayPal' },
   { value: 'wise', label: 'Wise' },
   { value: 'deel', label: 'Deel' },
+  { value: 'global66', label: 'Global66' },
   { value: 'manual_cash', label: 'Efectivo manual' },
   { value: 'check', label: 'Cheque' },
   { value: 'sii_pec', label: 'SII / PEC' },
   { value: 'other', label: 'Otro' }
 ]
+
+const AUTO_PAYMENT_METHOD = '__auto__'
 
 const inferBatchKind = (obligations: PaymentObligation[]): PaymentOrderBatchKind => {
   const sources = new Set(obligations.map(o => o.sourceKind))
@@ -81,7 +84,7 @@ const inferTitle = (obligations: PaymentObligation[]): string => {
 const CreateOrderDialog = ({ open, onClose, obligations, onCreated }: CreateOrderDialogProps) => {
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
-  const [paymentMethod, setPaymentMethod] = useState<PaymentOrderPaymentMethod>('bank_transfer')
+  const [paymentMethod, setPaymentMethod] = useState<PaymentOrderPaymentMethod | typeof AUTO_PAYMENT_METHOD>(AUTO_PAYMENT_METHOD)
   const [scheduledFor, setScheduledFor] = useState('')
   const [requireApproval, setRequireApproval] = useState(true)
   const [submitting, setSubmitting] = useState(false)
@@ -93,7 +96,7 @@ const CreateOrderDialog = ({ open, onClose, obligations, onCreated }: CreateOrde
     if (open) {
       setTitle(inferredTitle)
       setDescription('')
-      setPaymentMethod('bank_transfer')
+      setPaymentMethod(AUTO_PAYMENT_METHOD)
       setScheduledFor('')
       setRequireApproval(true)
     }
@@ -135,7 +138,7 @@ const CreateOrderDialog = ({ open, onClose, obligations, onCreated }: CreateOrde
           batchKind,
           title: title.trim(),
           description: description.trim() || undefined,
-          paymentMethod,
+          ...(paymentMethod === AUTO_PAYMENT_METHOD ? {} : { paymentMethod }),
           scheduledFor: scheduledFor || undefined,
           obligationIds: obligations.map(o => o.obligationId),
           requireApproval
@@ -209,9 +212,13 @@ const CreateOrderDialog = ({ open, onClose, obligations, onCreated }: CreateOrde
               select
               label='Metodo de pago'
               value={paymentMethod}
-              onChange={e => setPaymentMethod(e.target.value as PaymentOrderPaymentMethod)}
+              onChange={e => setPaymentMethod(e.target.value as PaymentOrderPaymentMethod | typeof AUTO_PAYMENT_METHOD)}
               fullWidth
+              helperText='Automatico usa el perfil de pago activo del beneficiario.'
             >
+              <MenuItem value={AUTO_PAYMENT_METHOD}>
+                Automatico por perfil de pago
+              </MenuItem>
               {PAYMENT_METHODS.map(m => (
                 <MenuItem key={m.value} value={m.value}>
                   {m.label}

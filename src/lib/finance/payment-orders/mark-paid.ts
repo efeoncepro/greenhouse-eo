@@ -9,6 +9,7 @@ import type { PaymentOrder } from '@/types/payment-orders'
 import { PaymentOrderConflictError, PaymentOrderValidationError } from './errors'
 import { markPaymentOrderPaidAtomic } from './mark-paid-atomic'
 import { mapOrderRow, type OrderRow } from './row-mapper'
+import { resolvePaymentOrderSourcePolicy } from './source-instrument-policy'
 import { recordPaymentOrderStateTransition } from './state-transitions-audit'
 import { assertSourceAccountForPaid } from './transitions'
 
@@ -77,6 +78,13 @@ export async function markPaymentOrderPaid(
 
   assertSourceAccountForPaid(input.orderId, row.source_account_id, 'paid')
 
+  const sourcePolicy = await resolvePaymentOrderSourcePolicy(c, {
+    processorSlug: row.processor_slug,
+    paymentMethod: row.payment_method,
+    currency: row.currency,
+    sourceAccountId: row.source_account_id
+  })
+
   const updated = await c.query<OrderRow>(
     `UPDATE greenhouse_finance.payment_orders
         SET state = 'paid',
@@ -121,11 +129,12 @@ export async function markPaymentOrderPaid(
       toState: 'paid',
       actorUserId: input.paidBy,
       reason: 'mark_paid_legacy_with_external_client',
-      metadata: {
-        externalReference: input.externalReference ?? null,
-        sourceAccountId: order.sourceAccountId ?? null,
-        path: 'legacy_external_client'
-      }
+        metadata: {
+          externalReference: input.externalReference ?? null,
+          sourceAccountId: order.sourceAccountId ?? null,
+          treasurySourcePolicy: sourcePolicy.snapshot,
+          path: 'legacy_external_client'
+        }
     },
     c
   )

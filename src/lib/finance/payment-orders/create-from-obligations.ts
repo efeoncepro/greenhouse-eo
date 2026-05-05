@@ -16,6 +16,7 @@ import type {
 
 import { PaymentOrderConflictError, PaymentOrderValidationError } from './errors'
 import { mapOrderRow, type OrderRow } from './row-mapper'
+import { resolvePaymentOrderSourcePolicy } from './source-instrument-policy'
 
 interface ObligationRefRow {
   obligation_id: string
@@ -28,6 +29,7 @@ interface ObligationRefRow {
   status: string
   space_id: string | null
   period_id: string | null
+  metadata_json: Record<string, unknown> | null
 }
 
 const toNumber = (v: unknown): number => {
@@ -117,7 +119,8 @@ export async function createPaymentOrderFromObligations(
     // 1. Fetch obligations + lock vivas
     const result = await c.query<ObligationRefRow>(
       `SELECT obligation_id, amount, currency, beneficiary_type, beneficiary_id,
-              beneficiary_name, obligation_kind, status, space_id, period_id
+              beneficiary_name, obligation_kind, status, space_id, period_id,
+              metadata_json
          FROM greenhouse_finance.payment_obligations
         WHERE obligation_id = ANY($1::text[])
         FOR UPDATE`,
@@ -258,13 +261,26 @@ export async function createPaymentOrderFromObligations(
 
       for (const row of memberRows) {
         try {
-          const route = await resolvePaymentRoute({
-            spaceId: row.space_id,
-            beneficiaryType: 'member',
-            beneficiaryId: row.beneficiary_id,
-            currency: row.currency as 'CLP' | 'USD',
-            obligationKind: row.obligation_kind as 'employee_net_pay'
-          })
+          const metadata = row.metadata_json ?? {}
+          const payrollVia = metadata.payrollVia === 'deel' ? 'deel' : null
+
+          const payRegime = metadata.payRegime === 'international' || metadata.payRegime === 'chile'
+            ? metadata.payRegime
+            : null
+
+          const route = await resolvePaymentRoute(
+            {
+              spaceId: row.space_id,
+              beneficiaryType: 'member',
+              beneficiaryId: row.beneficiary_id,
+              currency: row.currency as 'CLP' | 'USD',
+              obligationKind: row.obligation_kind as 'employee_net_pay'
+            },
+            {
+              payrollVia,
+              payRegime
+            }
+          )
 
           routingSnapshots.push({
             obligationId: row.obligation_id,
@@ -292,6 +308,13 @@ export async function createPaymentOrderFromObligations(
         }
       }
     }
+
+    const treasurySourcePolicy = await resolvePaymentOrderSourcePolicy(c, {
+      processorSlug: resolvedProcessorSlug,
+      paymentMethod: resolvedPaymentMethod,
+      currency,
+      sourceAccountId: input.sourceAccountId ?? null
+    })
 
     // 7. INSERT order
     const orderId = buildOrderId()
@@ -323,7 +346,7 @@ export async function createPaymentOrderFromObligations(
         input.description ?? null,
         resolvedProcessorSlug,
         resolvedPaymentMethod,
-        input.sourceAccountId ?? null,
+        treasurySourcePolicy.sourceAccountId,
         totalAmount,
         currency,
         input.scheduledFor ?? null,
@@ -335,6 +358,7 @@ export async function createPaymentOrderFromObligations(
         requireApproval ? null : new Date().toISOString(),
         JSON.stringify({
           ...(input.metadata ?? {}),
+          treasury_source_policy: treasurySourcePolicy.snapshot,
           ...(routingSnapshots.length > 0 ? { routing_snapshots: routingSnapshots } : {})
         })
       ]

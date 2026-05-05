@@ -1,5 +1,18 @@
 # Handoff.md
 
+## Sesion 2026-05-05 — TASK-799 completa (Payment Order Processor Source + Settlement Policy)
+
+- **Branch:** `develop`.
+- **Trigger:** el usuario aclaro que Deel no es cuenta origen; se paga con TC Santander Corp y Deel paga al contractor. Global66 sí opera como cuenta/saldo para Andrés/Daniela.
+- **Decision:** se creo e implemento `TASK-799` para separar `processor_slug/payment_method` de `source_account_id`, reutilizando `settlement-orchestration`.
+- **Runtime verificado:** DB tiene `deel-clp` activo como `payment_platform`, `global66-clp` activo como `fintech`, `santander-corp-clp` como `credit_card`. Orders USD de abril quedaron canceladas con `bank_transfer` y sin processor/source.
+- **Skills:** `greenhouse-task-planner`, `greenhouse-payroll-auditor`, `greenhouse-finance-accounting-operator`.
+- **Entregado:** helper canonico `source-instrument-policy`, create/patch/mark-paid wiring, selector/copy de "instrumento de salida", docs de arquitectura/funcionales y tests focalizados.
+- **Validacion:** `pnpm exec tsc --noEmit --pretty false` clean; ESLint focalizado 0 errors/0 warnings; Vitest focalizado 22/22 pass; `pnpm design:lint` 0 errors/0 warnings; `pnpm pg:doctor` healthy.
+- **Cuidado multi-agente:** worktree trae un untracked ajeno `tests/e2e/smoke/my-payment-profile-discoverability.spec.ts`; no incluir ni revertir.
+- **Follow-up:** evaluar en task separada si `deel-clp` debe reclasificarse/inactivarse para limpiar KPI/cash historico; no se hizo como parte de esta task para evitar migracion de datos mezclada con el hardening funcional.
+- **Lifecycle:** `docs/tasks/complete/TASK-799-payment-order-processor-source-settlement-policy.md`.
+
 ## Sesion 2026-05-05 — TASK-753 completa (Payment Profiles Self-Service)
 
 - **Branch:** `develop` por instruccion explicita del usuario.
