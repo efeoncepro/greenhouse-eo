@@ -2,7 +2,7 @@ import 'server-only'
 
 import { createElement } from 'react'
 
-import { Document, Page, StyleSheet, Text, View, renderToBuffer } from '@react-pdf/renderer'
+import { Document, Image, Page, StyleSheet, Text, View, renderToBuffer } from '@react-pdf/renderer'
 
 import { ensurePdfFontsRegistered } from '@/lib/finance/pdf/register-fonts'
 
@@ -10,34 +10,71 @@ import type { FinalSettlementDocumentSnapshot } from './document-types'
 
 const styles = StyleSheet.create({
   page: {
-    padding: 40,
+    padding: 36,
     fontFamily: 'Helvetica',
-    fontSize: 9,
-    color: '#1F2933',
-    lineHeight: 1.45
+    fontSize: 8.5,
+    color: '#1A1A2E',
+    lineHeight: 1.42,
+    backgroundColor: '#FFFFFF'
   },
   header: {
-    borderBottom: '1 solid #D7DEE8',
-    paddingBottom: 16,
-    marginBottom: 18
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    borderBottom: '2 solid #0375DB',
+    paddingBottom: 14,
+    marginBottom: 16
+  },
+  logo: {
+    width: 136,
+    height: 36,
+    objectFit: 'contain'
+  },
+  headerMeta: {
+    width: 210,
+    textAlign: 'right'
   },
   title: {
-    fontSize: 18,
+    fontSize: 17,
     fontWeight: 700,
-    marginBottom: 6
+    marginBottom: 5,
+    color: '#023C70'
   },
   subtitle: {
-    color: '#52616F',
-    fontSize: 9
+    color: '#667085',
+    fontSize: 8
+  },
+  statusBand: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 9,
+    border: '1 solid #DBDBDB',
+    backgroundColor: '#F5F9FC',
+    marginBottom: 14
+  },
+  statusText: {
+    fontSize: 9,
+    fontWeight: 700,
+    color: '#023C70'
+  },
+  pill: {
+    paddingVertical: 3,
+    paddingHorizontal: 7,
+    border: '1 solid #0375DB',
+    color: '#023C70',
+    fontSize: 7,
+    textTransform: 'uppercase'
   },
   section: {
-    marginBottom: 14
+    marginBottom: 12
   },
   sectionTitle: {
     fontSize: 11,
     fontWeight: 700,
-    marginBottom: 7,
-    color: '#102A43'
+    marginBottom: 6,
+    color: '#023C70'
   },
   grid: {
     display: 'flex',
@@ -48,7 +85,7 @@ const styles = StyleSheet.create({
     flex: 1
   },
   label: {
-    color: '#66788A',
+    color: '#667085',
     fontSize: 7,
     textTransform: 'uppercase',
     marginBottom: 2
@@ -60,31 +97,49 @@ const styles = StyleSheet.create({
   tableHeader: {
     display: 'flex',
     flexDirection: 'row',
-    borderBottom: '1 solid #D7DEE8',
-    paddingBottom: 5,
-    marginBottom: 4
+    backgroundColor: '#023C70',
+    color: '#FFFFFF',
+    paddingVertical: 5,
+    paddingHorizontal: 6
   },
   tableRow: {
     display: 'flex',
     flexDirection: 'row',
-    borderBottom: '1 solid #EDF2F7',
-    paddingVertical: 5
+    borderBottom: '1 solid #DBDBDB',
+    paddingVertical: 6,
+    paddingHorizontal: 6
   },
   tableCell: {
     flex: 1
   },
+  wideCell: {
+    flex: 1.4
+  },
+  smallCell: {
+    flex: 0.75
+  },
   amountCell: {
-    width: 96,
+    width: 88,
     textAlign: 'right'
   },
+  evidence: {
+    color: '#667085',
+    fontSize: 7
+  },
   totalBox: {
-    marginTop: 8,
+    marginTop: 7,
     padding: 10,
-    border: '1 solid #D7DEE8'
+    border: '1 solid #0375DB',
+    backgroundColor: '#F5F9FC'
+  },
+  netPayable: {
+    fontSize: 11,
+    fontWeight: 700,
+    color: '#023C70'
   },
   warning: {
     padding: 8,
-    border: '1 solid #F0B429',
+    border: '1 solid #F79009',
     backgroundColor: '#FFFBEA',
     marginTop: 8
   },
@@ -96,21 +151,23 @@ const styles = StyleSheet.create({
   },
   signatureLine: {
     flex: 1,
-    borderTop: '1 solid #9AA5B1',
+    borderTop: '1 solid #667085',
     paddingTop: 6,
     textAlign: 'center'
   },
   footer: {
     position: 'absolute',
     bottom: 24,
-    left: 40,
-    right: 40,
+    left: 36,
+    right: 36,
     fontSize: 7,
-    color: '#7B8794',
-    borderTop: '1 solid #EDF2F7',
+    color: '#667085',
+    borderTop: '1 solid #DBDBDB',
     paddingTop: 8
   }
 })
+
+const logoPath = `${process.cwd()}/public/branding/logo-full.png`
 
 const formatCurrency = (amount: number) =>
   new Intl.NumberFormat('es-CL', {
@@ -126,20 +183,75 @@ const Field = ({ label, value }: { label: string; value: string | number | null 
   </View>
 )
 
+const legalTreatmentLabel: Record<string, string> = {
+  remuneration: 'Remuneración',
+  legal_indemnity: 'Indemnización legal',
+  authorized_deduction: 'Deducción autorizada',
+  informational: 'Informativo'
+}
+
+const taxTreatmentLabel: Record<string, string> = {
+  taxable_monthly: 'Tributable',
+  non_income: 'No renta',
+  not_applicable: 'No aplica',
+  needs_review: 'Revisar'
+}
+
+const previsionalTreatmentLabel: Record<string, string> = {
+  contribution_base: 'Imponible',
+  not_contribution_base: 'No imponible',
+  not_applicable: 'No aplica',
+  needs_review: 'Revisar'
+}
+
+const readinessLabel: Record<string, string> = {
+  ready: 'Listo para emisión formal',
+  needs_review: 'Requiere revisión previa',
+  blocked: 'Bloqueado para emisión formal'
+}
+
+const readableEvidence = (evidence: Record<string, unknown> | undefined) => {
+  if (!evidence) return 'Evidencia no adjunta'
+
+  const source = typeof evidence.source === 'string' ? evidence.source : null
+  const label = typeof evidence.label === 'string' ? evidence.label : null
+  const code = typeof evidence.code === 'string' ? evidence.code : null
+  const reason = typeof evidence.reason === 'string' ? evidence.reason : null
+
+  return label ?? reason ?? source ?? code ?? 'Evidencia estructurada'
+}
+
 const FinalSettlementPdfDocument = ({ snapshot }: { snapshot: FinalSettlementDocumentSnapshot }) => {
   const warnings = snapshot.readiness.checks.filter(check => check.status !== 'passed')
+  const readinessStatus = snapshot.readiness.hasBlockers ? 'blocked' : warnings.length > 0 ? 'needs_review' : 'ready'
+  const collaboratorName = snapshot.collaborator.legalName || snapshot.collaborator.displayName || snapshot.finalSettlement.memberId
 
   return (
     <Document
-      title={`Finiquito ${snapshot.collaborator.legalName || snapshot.collaborator.displayName || snapshot.finalSettlement.memberId}`}
+      title={`Finiquito ${collaboratorName}`}
       author='Greenhouse'
     >
       <Page size='LETTER' style={styles.page}>
         <View style={styles.header}>
-          <Text style={styles.title}>Finiquito de contrato de trabajo</Text>
-          <Text style={styles.subtitle}>
-            Documento interno generado desde liquidacion final aprobada. Requiere firma o ratificacion externa para cerrar el proceso.
-          </Text>
+          <View>
+            <Image src={logoPath} style={styles.logo} />
+            <Text style={styles.subtitle}>People Operations · Payroll Chile</Text>
+          </View>
+          <View style={styles.headerMeta}>
+            <Text style={styles.title}>Finiquito de contrato de trabajo</Text>
+            <Text style={styles.subtitle}>Template {snapshot.documentTemplateVersion}</Text>
+            <Text style={styles.subtitle}>Snapshot {snapshot.finalSettlement.finalSettlementId}</Text>
+          </View>
+        </View>
+
+        <View style={styles.statusBand}>
+          <View>
+            <Text style={styles.statusText}>{readinessLabel[readinessStatus]}</Text>
+            <Text style={styles.subtitle}>
+              Documento interno generado desde liquidación final aprobada. La firma o ratificación externa cierra el proceso.
+            </Text>
+          </View>
+          <Text style={styles.pill}>{snapshot.finalSettlement.currency}</Text>
         </View>
 
         <View style={styles.section}>
@@ -175,14 +287,24 @@ const FinalSettlementPdfDocument = ({ snapshot }: { snapshot: FinalSettlementDoc
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Detalle de haberes y descuentos</Text>
           <View style={styles.tableHeader}>
-            <Text style={styles.tableCell}>Concepto</Text>
-            <Text style={styles.tableCell}>Tipo</Text>
+            <Text style={styles.wideCell}>Concepto</Text>
+            <Text style={styles.tableCell}>Tratamiento</Text>
+            <Text style={styles.tableCell}>Evidencia</Text>
             <Text style={styles.amountCell}>Monto</Text>
           </View>
           {snapshot.breakdown.map(line => (
             <View key={line.componentCode} style={styles.tableRow}>
-              <Text style={styles.tableCell}>{line.label}</Text>
-              <Text style={styles.tableCell}>{line.kind === 'deduction' ? 'Descuento' : 'Haber'}</Text>
+              <View style={styles.wideCell}>
+                <Text>{line.label}</Text>
+                <Text style={styles.evidence}>{line.kind === 'deduction' ? 'Descuento' : 'Haber'} · {line.policyCode ?? 'policy pendiente'}</Text>
+              </View>
+              <View style={styles.tableCell}>
+                <Text>{legalTreatmentLabel[line.legalTreatment ?? ''] ?? line.legalTreatment ?? 'Pendiente'}</Text>
+                <Text style={styles.evidence}>
+                  {taxTreatmentLabel[line.taxTreatment ?? ''] ?? line.taxTreatment ?? 'Pendiente'} · {previsionalTreatmentLabel[line.previsionalTreatment ?? ''] ?? line.previsionalTreatment ?? 'Pendiente'}
+                </Text>
+              </View>
+              <Text style={styles.tableCell}>{readableEvidence(line.evidence)}</Text>
               <Text style={styles.amountCell}>{formatCurrency(line.amount)}</Text>
             </View>
           ))}
@@ -195,7 +317,8 @@ const FinalSettlementPdfDocument = ({ snapshot }: { snapshot: FinalSettlementDoc
                 <Field label='Total descuentos' value={formatCurrency(snapshot.finalSettlement.deductionTotal)} />
               </View>
               <View style={styles.column}>
-                <Field label='Liquido a pagar' value={formatCurrency(snapshot.finalSettlement.netPayable)} />
+                <Text style={styles.label}>Líquido / pago neto</Text>
+                <Text style={styles.netPayable}>{formatCurrency(snapshot.finalSettlement.netPayable)}</Text>
               </View>
             </View>
           </View>

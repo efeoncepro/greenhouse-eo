@@ -334,6 +334,32 @@ const assertPayrollExecutionReadiness = async (client: PoolClient, current: Offb
   }
 }
 
+const closeFuturePayrollEligibility = async (
+  client: PoolClient,
+  current: OffboardingCase,
+  lastWorkingDay: string | null
+) => {
+  if (!current.memberId || !lastWorkingDay) {
+    return { updatedCompensationVersions: 0 }
+  }
+
+  const result = await client.query<{ version_id: string }>(
+    `
+      UPDATE greenhouse_payroll.compensation_versions
+      SET
+        effective_to = $2::date,
+        is_current = FALSE
+      WHERE member_id = $1
+        AND effective_from <= $2::date
+        AND (effective_to IS NULL OR effective_to > $2::date)
+      RETURNING version_id
+    `,
+    [current.memberId, lastWorkingDay]
+  )
+
+  return { updatedCompensationVersions: result.rows.length }
+}
+
 export const listOffboardingCases = async (filters: OffboardingCaseListFilters = {}) => {
   const params: unknown[] = []
   const where: string[] = []
@@ -696,12 +722,15 @@ export const transitionOffboardingCase = async ({
 
     assertOffboardingTransition(current, input)
 
-    if (input.status === 'executed') {
-      await assertPayrollExecutionReadiness(client, current)
-    }
-
     const nextEffectiveDate = input.effectiveDate !== undefined ? input.effectiveDate : current.effectiveDate
     const nextLastWorkingDay = input.lastWorkingDay !== undefined ? input.lastWorkingDay : current.lastWorkingDay
+
+    let payrollCutoff: { updatedCompensationVersions: number } | null = null
+
+    if (input.status === 'executed') {
+      await assertPayrollExecutionReadiness(client, current)
+      payrollCutoff = await closeFuturePayrollEligibility(client, current, nextLastWorkingDay)
+    }
 
     const nextExceptionReason =
       input.lastWorkingDayAfterEffectiveReason !== undefined
@@ -751,7 +780,8 @@ export const transitionOffboardingCase = async ({
       payload: {
         effectiveDate: updated.effectiveDate,
         lastWorkingDay: updated.lastWorkingDay,
-        blockedReason: updated.blockedReason
+        blockedReason: updated.blockedReason,
+        payrollCutoff
       }
     })
 

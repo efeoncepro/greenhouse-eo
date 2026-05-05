@@ -3,7 +3,7 @@
 > **Tipo de documento:** Documentacion funcional
 > **Version:** 1.0
 > **Creado:** 2026-05-04 por Codex
-> **Ultima actualizacion:** 2026-05-04 por Codex
+> **Ultima actualizacion:** 2026-05-05 por Codex
 > **Documentacion tecnica:** [GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md)
 
 ## Que es el settlement final
@@ -49,6 +49,15 @@ El settlement separa componentes:
 
 Cada linea guarda formula, base, fuente y tratamiento tributario/previsional.
 
+Desde TASK-783 cada componente trae una policy explicita:
+
+- `proportional_vacation`: indemnizacion legal, no renta, no imponible. No dispara AFP, salud, AFC ni IUSC.
+- `pending_salary` y remuneraciones pendientes: remuneracion tributable/imponible. Solo ellas pueden generar descuentos legales del trabajador.
+- `statutory_deductions`: se calcula sobre delta de remuneracion pendiente, no sobre todo el finiquito.
+- `authorized_deduction`: exige evidencia estructurada antes de permitir neto negativo.
+
+Si aparece un componente sin policy, el calculo falla cerrado.
+
 ## Readiness
 
 Antes de aprobar, Greenhouse revisa:
@@ -64,6 +73,12 @@ Antes de aprobar, Greenhouse revisa:
 
 Los blockers impiden calcular o aprobar. Los warnings quedan como evidencia para revision humana.
 
+## Overlap con nomina mensual
+
+El settlement consulta un `PayrollOverlapLedger` para saber si el mes de salida ya tiene payroll mensual calculado/aprobado/exportado. Si la nomina mensual ya materializo Isapre, AFP, AFC o IUSC, el finiquito no duplica esos descuentos.
+
+Ejemplo: renuncia el 30/04 con abril exportado y solo feriado proporcional pendiente. El resultado esperado es feriado proporcional como haber no imponible/no renta y descuentos previsionales adicionales en `$0`, salvo que exista remuneracion imponible pendiente no cubierta o una deduccion autorizada con evidencia.
+
 ## Versionamiento
 
 Un settlement aprobado no se modifica silenciosamente. Si hay que recalcular, V1 exige cancelar y reemitir una version nueva.
@@ -77,6 +92,13 @@ Desde TASK-762, el settlement aprobado habilita el documento formal de finiquito
 - El documento guarda `snapshot_json`, `snapshot_hash` y `content_hash`; no se recalcula desde datos vivos despues de renderizar.
 - La aprobacion del documento usa `workflow_approval_snapshots` y es distinta de la aprobacion del calculo.
 - La emision deja el documento pendiente de firma/ratificacion externa. Greenhouse registra evidencia, reserva de derechos, rechazo, anulacion o reemision, pero no reemplaza al proceso externo.
+- Desde TASK-783, el PDF debe mostrar marca Greenhouse, entidad legal/RUT, trabajador/RUT, estado textual, tabla `Concepto / Tratamiento / Evidencia / Monto`, totales separados y snapshot/template. La emision formal falla cerrado si falta RUT verificado del trabajador o identidad legal de la entidad empleadora.
+
+## Cierre contractual y proveedor
+
+Honorarios y proveedores no pasan por el engine laboral de finiquito. En `/hr/offboarding` deben verse como `Cierre contractual` o `Cierre proveedor`; no corresponde `Calcular finiquito`. Si hay pagos pendientes de honorarios, se resuelven por el payroll mensual/boleta y retencion SII de honorarios, no por feriado proporcional ni cotizaciones de trabajador dependiente.
+
+El cutoff de elegibilidad payroll futura aplica a todos los lanes: un caso ejecutado con `last_working_day` anterior al inicio del periodo queda fuera del roster mensual siguiente aunque `members.active` siga verdadero para self-service o documentos.
 
 ## Fronteras
 

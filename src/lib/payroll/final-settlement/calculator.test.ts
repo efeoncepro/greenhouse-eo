@@ -160,14 +160,14 @@ describe('final settlement calculator', () => {
     vi.clearAllMocks()
   })
 
-  it('blocks unsupported offboarding lanes before approval', () => {
+  it('blocks unsupported offboarding lanes before approval', async () => {
     const readinessCase = {
       ...baseCase,
       payrollViaSnapshot: 'deel' as const,
       ruleLane: 'external_payroll' as const
     }
 
-    expect(
+    await expect(
       calculateFinalSettlement({
         offboardingCase: readinessCase,
         compensation,
@@ -227,6 +227,82 @@ describe('final settlement calculator', () => {
       contractType: 'indefinido'
     })
     expect(result.totals.grossTotal).toBeGreaterThan(result.totals.deductionTotal)
+    expect(result.breakdown.every(line => line.policyCode)).toBe(true)
+  })
+
+  it('does not deduct monthly statutory amounts from proportional vacation already covered by exported payroll', async () => {
+    const result = await calculateFinalSettlement({
+      offboardingCase: {
+        ...baseCase,
+        status: 'executed',
+        effectiveDate: '2026-04-30',
+        lastWorkingDay: '2026-04-30'
+      },
+      compensation: {
+        ...compensation,
+        baseSalary: 539_658,
+        remoteAllowance: 0,
+        colacionAmount: 0,
+        movilizacionAmount: 0,
+        fixedBonusAmount: 0,
+        healthSystem: 'isapre',
+        healthPlanUf: 4.05
+      },
+      leaveBalance: {
+        balanceId: 'valentina-hoyos-2026-vacation',
+        year: 2026,
+        allowanceDays: 15,
+        progressiveExtraDays: 0,
+        carriedOverDays: 0,
+        adjustmentDays: 0,
+        usedDays: 10.22,
+        reservedDays: 0,
+        availableDays: 4.78
+      },
+      payrollOverlap: {
+        covered: true,
+        periodId: '2026-04',
+        status: 'exported',
+        entryId: '2026-04_valentina-hoyos',
+        ufValue: 40120.2,
+        taxTableVersion: 'gael-2026-04',
+        ledger: {
+          schemaVersion: 1,
+          periodId: '2026-04',
+          periodStatus: 'exported',
+          periodExportedAt: '2026-05-01T17:32:23.355Z',
+          entryId: '2026-04_valentina-hoyos',
+          entryIsActive: true,
+          coveredByMonthlyPayroll: true,
+          ufValue: 40120.2,
+          taxTableVersion: 'gael-2026-04',
+          coveredAmounts: {
+            grossTotal: 832121,
+            taxableBase: 620000,
+            afp: 68200,
+            health: 162475,
+            unemployment: 3720,
+            tax: 0,
+            apv: 0,
+            statutoryDeductions: 234395,
+            netTotal: 596257
+          }
+        }
+      },
+      hireDate: '2024-01-01',
+      previredEvidence: { period: '2026-04', status: 'paid' }
+    })
+
+    const vacationLine = result.breakdown.find(line => line.componentCode === 'proportional_vacation')
+
+    expect(vacationLine).toMatchObject({
+      taxTreatment: 'non_income',
+      previsionalTreatment: 'not_contribution_base',
+      taxability: 'not_taxable'
+    })
+    expect(result.breakdown.some(line => line.componentCode === 'statutory_deductions')).toBe(false)
+    expect(result.totals.deductionTotal).toBe(0)
+    expect(result.totals.netPayable).toBeGreaterThan(0)
   })
 
   it('allows calculating an already executed case for recovery when canonical dates are present', async () => {

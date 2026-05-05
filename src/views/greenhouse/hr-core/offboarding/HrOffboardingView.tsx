@@ -132,6 +132,54 @@ const settlementStatusLabel: Record<FinalSettlementStatus | 'none', string> = {
   cancelled: 'Cancelado'
 }
 
+type ClosureLane = {
+  label: string
+  settlementLabel: string
+  documentLabel: string
+  allowsFinalSettlement: boolean
+  helpText: string | null
+}
+
+const closureLaneFor = (item: OffboardingCase): ClosureLane => {
+  if (item.ruleLane === 'internal_payroll' && item.payrollViaSnapshot === 'internal' && item.countryCode === 'CL') {
+    return {
+      label: 'Finiquito laboral',
+      settlementLabel: 'Finiquito',
+      documentLabel: 'Finiquito laboral',
+      allowsFinalSettlement: true,
+      helpText: null
+    }
+  }
+
+  if (item.contractTypeSnapshot === 'honorarios' || item.ruleLane === 'non_payroll') {
+    return {
+      label: 'Cierre contractual',
+      settlementLabel: 'Sin finiquito laboral',
+      documentLabel: 'Cierre contractual',
+      allowsFinalSettlement: false,
+      helpText: 'Honorarios se cierra como relación contractual; no genera finiquito laboral ni descuentos previsionales.'
+    }
+  }
+
+  if (item.payrollViaSnapshot === 'deel' || item.relationshipType === 'eor' || item.ruleLane === 'external_payroll') {
+    return {
+      label: 'Cierre proveedor',
+      settlementLabel: 'Proveedor externo',
+      documentLabel: 'Documento proveedor',
+      allowsFinalSettlement: false,
+      helpText: 'El cierre se coordina con el proveedor externo; Greenhouse no calcula finiquito laboral interno.'
+    }
+  }
+
+  return {
+    label: 'Revisión legal requerida',
+    settlementLabel: 'Por revisar',
+    documentLabel: 'Por revisar',
+    allowsFinalSettlement: false,
+    helpText: 'La combinación contractual requiere clasificación antes de habilitar documentos o pagos.'
+  }
+}
+
 const activeStatuses = new Set<OffboardingCaseStatus>(['draft', 'needs_review', 'approved', 'scheduled', 'blocked'])
 
 const nextStatusFor = (status: OffboardingCaseStatus): OffboardingCaseStatus | null => {
@@ -413,7 +461,8 @@ const HrOffboardingView = () => {
     }
   }
 
-  const settlementActionFor = (settlement: FinalSettlement | null) => {
+  const settlementActionFor = (item: OffboardingCase, settlement: FinalSettlement | null) => {
+    if (!closureLaneFor(item).allowsFinalSettlement) return null
     if (!settlement || settlement.calculationStatus === 'cancelled') return { action: 'calculate' as const, label: 'Calcular' }
 
     if (settlement.calculationStatus === 'calculated' || settlement.calculationStatus === 'reviewed') {
@@ -572,11 +621,12 @@ const HrOffboardingView = () => {
               ) : visibleCases.map(item => (
                 (() => {
                   const settlement = settlementsByCaseId[item.offboardingCaseId] ?? null
-                  const settlementAction = settlementActionFor(settlement)
+                  const closureLane = closureLaneFor(item)
+                  const settlementAction = settlementActionFor(item, settlement)
                   const settlementBusy = settlementSavingCaseId === item.offboardingCaseId
-                  const settlementApproved = settlement ? ['approved', 'issued'].includes(settlement.calculationStatus) : false
+                  const settlementApproved = closureLane.allowsFinalSettlement && settlement ? ['approved', 'issued'].includes(settlement.calculationStatus) : false
                   const document = documentsByCaseId[item.offboardingCaseId] ?? null
-                  const documentAction = documentActionFor(document)
+                  const documentAction = closureLane.allowsFinalSettlement ? documentActionFor(document) : null
                   const documentBusy = documentSavingCaseId === item.offboardingCaseId
                   const downloadUrl = document?.pdfAssetId ? `/api/assets/private/${encodeURIComponent(document.pdfAssetId)}` : null
 
@@ -592,7 +642,12 @@ const HrOffboardingView = () => {
                       <TableCell>
                         <CustomChip round='true' size='small' color={statusColor[item.status] ?? 'default'} label={statusLabel[item.status] ?? item.status} />
                       </TableCell>
-                      <TableCell>{laneLabel[item.ruleLane] ?? item.ruleLane}</TableCell>
+                      <TableCell>
+                        <Stack spacing={0.5}>
+                          <Typography variant='body2'>{laneLabel[item.ruleLane] ?? item.ruleLane}</Typography>
+                          <Typography variant='caption' color='text.secondary'>{closureLane.label}</Typography>
+                        </Stack>
+                      </TableCell>
                       <TableCell>{formatDate(item.effectiveDate)}</TableCell>
                       <TableCell>{formatDate(item.lastWorkingDay)}</TableCell>
                       <TableCell>
@@ -602,7 +657,9 @@ const HrOffboardingView = () => {
                               round='true'
                               size='small'
                               color={settlementStatusColor[settlement?.calculationStatus ?? 'none'] ?? 'default'}
-                              label={settlementStatusLabel[settlement?.calculationStatus ?? 'none'] ?? settlement?.calculationStatus ?? 'Sin cálculo'}
+                              label={closureLane.allowsFinalSettlement
+                                ? settlementStatusLabel[settlement?.calculationStatus ?? 'none'] ?? settlement?.calculationStatus ?? 'Sin cálculo'
+                                : closureLane.settlementLabel}
                             />
                             {settlement && (
                               <Typography variant='caption' color='text.secondary'>
@@ -613,6 +670,11 @@ const HrOffboardingView = () => {
                           {settlement?.readinessHasBlockers && (
                             <Typography variant='caption' color='error.main'>
                               Hay blockers de cálculo. Revisa vacaciones, compensación y régimen.
+                            </Typography>
+                          )}
+                          {closureLane.helpText && (
+                            <Typography variant='caption' color='text.secondary'>
+                              {closureLane.helpText}
                             </Typography>
                           )}
                           <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
@@ -626,12 +688,24 @@ const HrOffboardingView = () => {
                                 {settlementBusy ? 'Procesando' : settlementAction.label}
                               </Button>
                             )}
+                            {!closureLane.allowsFinalSettlement && item.ruleLane === 'non_payroll' && (
+                              <Button size='small' variant='tonal' href='/hr/payroll'>
+                                Revisar pago pendiente
+                              </Button>
+                            )}
+                            {!closureLane.allowsFinalSettlement && item.ruleLane === 'external_payroll' && (
+                              <Button size='small' variant='tonal' href='/hr/payroll'>
+                                Cierre proveedor
+                              </Button>
+                            )}
                           </Stack>
                           <CustomChip
                             round='true'
                             size='small'
                             color={documentStatusColor[document?.documentStatus ?? 'draft'] ?? 'default'}
-                            label={document ? documentStatusLabel[document.documentStatus] ?? document.documentStatus : 'Sin documento'}
+                            label={closureLane.allowsFinalSettlement
+                              ? document ? documentStatusLabel[document.documentStatus] ?? document.documentStatus : 'Sin documento'
+                              : closureLane.documentLabel}
                           />
                           {document?.readiness.status === 'needs_review' && (
                             <Typography variant='caption' color='warning.main'>
@@ -655,7 +729,7 @@ const HrOffboardingView = () => {
                               </Button>
                             )}
                           </Stack>
-                          {!settlementApproved && (
+                          {closureLane.allowsFinalSettlement && !settlementApproved && (
                             <Typography variant='caption' color='text.secondary'>
                               El documento se habilita cuando el cálculo queda aprobado.
                             </Typography>

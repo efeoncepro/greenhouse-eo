@@ -237,7 +237,11 @@ const getEmployerSnapshot = async (
   }
 }
 
-const buildDocumentReadiness = (settlement: FinalSettlement, employerSource: string): FinalSettlementDocumentReadiness => {
+const buildDocumentReadiness = (
+  settlement: FinalSettlement,
+  employer: FinalSettlementDocumentSnapshot['employer'],
+  collaborator: FinalSettlementDocumentSnapshot['collaborator']
+): FinalSettlementDocumentReadiness => {
   const checks: FinalSettlementDocumentReadiness['checks'] = [
     {
       code: 'settlement_approved',
@@ -253,11 +257,39 @@ const buildDocumentReadiness = (settlement: FinalSettlement, employerSource: str
     },
     {
       code: 'legal_entity_source',
-      status: employerSource === 'settlement_legal_entity' ? 'passed' : 'warning',
+      status: employer.source === 'settlement_legal_entity' ? 'passed' : 'warning',
       severity: 'warning',
-      message: employerSource === 'settlement_legal_entity'
+      message: employer.source === 'settlement_legal_entity'
         ? 'La entidad legal viene del settlement aprobado.'
         : 'La entidad legal se resolvio desde operating entity porque el settlement no la traia.'
+    },
+    {
+      code: 'worker_legal_identity_verified',
+      status: collaborator.taxId ? 'passed' : 'blocked',
+      severity: 'blocker',
+      message: 'La emision formal exige RUT/documento del trabajador verificado desde Datos legales.'
+    },
+    {
+      code: 'employer_legal_identity_present',
+      status: employer.taxId && employer.legalName ? 'passed' : 'blocked',
+      severity: 'blocker',
+      message: 'La emision formal exige entidad legal empleadora con nombre y RUT.'
+    },
+    {
+      code: 'net_payable_non_negative_or_authorized',
+      status: settlement.netPayable >= 0 || settlement.breakdown.some(line => line.componentCode === 'authorized_deduction' && line.evidence)
+        ? 'passed'
+        : 'blocked',
+      severity: 'blocker',
+      message: 'Un liquido negativo bloquea emision salvo deduccion autorizada con evidencia estructurada.'
+    },
+    {
+      code: 'component_policy_evidence_present',
+      status: settlement.breakdown.every(line => line.policyCode && line.legalTreatment && line.taxTreatment && line.previsionalTreatment)
+        ? 'passed'
+        : 'blocked',
+      severity: 'blocker',
+      message: 'Cada linea del documento debe traer policy, tratamiento y evidencia suficiente.'
     }
   ]
 
@@ -280,7 +312,7 @@ const buildDocumentSnapshot = async (settlement: FinalSettlement): Promise<{
     getEmployerSnapshot(settlement.legalEntityOrganizationId)
   ])
 
-  const readiness = buildDocumentReadiness(settlement, employer.source)
+  const readiness = buildDocumentReadiness(settlement, employer, collaborator)
   const generatedAt = new Date().toISOString()
 
   return {

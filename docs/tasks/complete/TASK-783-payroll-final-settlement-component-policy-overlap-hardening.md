@@ -8,17 +8,17 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `EPIC-010`
-- Status real: `Diseno`
+- Status real: `Complete`
 - Rank: `TBD`
 - Domain: `hr`
-- Blocked by: `TASK-784`
-- Branch: `task/TASK-783-payroll-final-settlement-component-policy-overlap-hardening`
+- Blocked by: `none` — `TASK-784` completada el 2026-05-05; ver `docs/tasks/complete/TASK-784-person-legal-profile-identity-documents-foundation.md`.
+- Branch: `develop` — instruccion explicita del usuario: mantenerse en `develop`.
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
@@ -63,7 +63,7 @@ Revisar y respetar:
 - `docs/tasks/complete/TASK-760-workforce-offboarding-runtime-foundation.md`
 - `docs/tasks/complete/TASK-761-payroll-final-settlement-finiquito-engine-chile.md`
 - `docs/tasks/complete/TASK-762-finiquito-document-generation-approval-flow.md`
-- `docs/tasks/to-do/TASK-784-person-legal-profile-identity-documents-foundation.md`
+- `docs/tasks/complete/TASK-784-person-legal-profile-identity-documents-foundation.md`
 
 Reglas obligatorias:
 
@@ -422,28 +422,28 @@ Resultado esperado preliminar:
 
 ## Acceptance Criteria
 
-- [ ] Cada componente de finiquito V1 tiene policy explicita y serializada en `breakdown_json`/`explanation_json`.
-- [ ] El calculator falla cerrado si aparece un componente sin policy o con tratamiento legal/previsional ambiguo.
-- [ ] Existe `PayrollOverlapLedger` reusable y testeado que lee payroll mensual exportado antes de calcular descuentos del settlement.
-- [ ] Finiquito de renuncia con solo feriado proporcional no descuenta AFC/AFP/salud/IUSC.
-- [ ] Si hay remuneracion imponible pendiente, AFC trabajador se descuenta solo sobre ese delta y solo cuando el contrato lo exige.
-- [ ] El sistema no duplica Isapre/AFP/AFC/IUSC ya materializados en un payroll mensual exportado.
-- [ ] Payroll mensual excluye miembros con offboarding `executed` y `last_working_day < periodStart`, aunque `members.active` siga `TRUE`.
-- [ ] La transicion `offboarding_case -> executed` cierra elegibilidad payroll futura de forma auditada y no rompe historicos/exportados.
-- [ ] Honorarios ejecutado no habilita `final_settlement` laboral ni documento de finiquito.
-- [ ] Honorarios con pago pendiente se deriva al tratamiento honorarios/retencion SII, sin AFC/AFP/salud/cesantia/feriado proporcional/IUSC dependiente.
-- [ ] Contractor/EOR/Deel quedan en cierre proveedor/operacional sin calculo legal local automatico.
-- [ ] `net_payable < 0` bloquea aprobacion/emision salvo deducciones autorizadas con evidencia estructurada.
-- [ ] Document render/issue falla cerrado para settlements cancelados/superseded/bloqueados, `readiness_status!='ready'`, identidad legal/trabajador incompleta o liquido negativo no autorizado.
-- [ ] El documento/PDF implementado respeta el mockup aprobado `mockups/finiquito-document-v1/index.html`: logo, entidad legal, RUTs, header/footer, estado visible, tabla Concepto/Tratamiento/Evidencia/Monto, totales y snapshot hash.
-- [ ] El flujo distingue borrador interno de emision formal; borradores bloqueados llevan estado/watermark/copia clara y no habilitan emision.
-- [ ] El caso Valentina-like muestra bloqueo accionable y CTA de emision deshabilitado cuando hay descuento duplicado, overlap no resuelto o liquido negativo.
-- [ ] El caso Luis-like usa documento/surface de `Cierre contractual de prestacion de servicios`, no `Finiquito de contrato de trabajo`.
-- [ ] La UI de `/hr/offboarding` muestra blockers/evidencia de overlap de forma accionable.
-- [ ] La UI distingue `Finiquito laboral`, `Cierre contractual`, `Cierre proveedor` y `Revision legal requerida` segun regimen/lane.
-- [ ] Para honorarios/proveedores la UI no muestra ni permite `Calcular finiquito`; ofrece acciones de cierre contractual/proveedor y pago pendiente cuando aplique.
-- [ ] El caso Valentina queda remediado por cancelacion/reemision auditada y el nuevo calculo no duplica cotizaciones de abril.
-- [ ] Docs vivas quedan sincronizadas.
+- [x] Cada componente de finiquito V1 tiene policy explicita y serializada en `breakdown_json`/`explanation_json`.
+- [x] El calculator falla cerrado si aparece un componente sin policy o con tratamiento legal/previsional ambiguo.
+- [x] Existe `PayrollOverlapLedger` reusable y testeado que lee payroll mensual exportado antes de calcular descuentos del settlement.
+- [x] Finiquito de renuncia con solo feriado proporcional no descuenta AFC/AFP/salud/IUSC.
+- [x] Si hay remuneracion imponible pendiente, AFC trabajador se descuenta solo sobre ese delta y solo cuando el contrato lo exige.
+- [x] El sistema no duplica Isapre/AFP/AFC/IUSC ya materializados en un payroll mensual exportado.
+- [x] Payroll mensual excluye miembros con offboarding `executed` y `last_working_day < periodStart`, aunque `members.active` siga `TRUE`.
+- [x] La transicion `offboarding_case -> executed` cierra elegibilidad payroll futura de forma auditada y no rompe historicos/exportados.
+- [x] Honorarios ejecutado no habilita `final_settlement` laboral ni documento de finiquito.
+- [x] Honorarios con pago pendiente se deriva al tratamiento honorarios/retencion SII, sin AFC/AFP/salud/cesantia/feriado proporcional/IUSC dependiente.
+- [x] Contractor/EOR/Deel quedan en cierre proveedor/operacional sin calculo legal local automatico.
+- [x] `net_payable < 0` bloquea aprobacion/emision salvo deducciones autorizadas con evidencia estructurada.
+- [x] Document render/issue falla cerrado para settlements cancelados/superseded/bloqueados, `readiness_status!='ready'`, identidad legal/trabajador incompleta o liquido negativo no autorizado.
+- [x] El documento/PDF implementado respeta el mockup aprobado `mockups/finiquito-document-v1/index.html`: logo, entidad legal, RUTs, header/footer, estado visible, tabla Concepto/Tratamiento/Evidencia/Monto, totales y snapshot hash.
+- [x] El flujo distingue borrador interno de emision formal; borradores bloqueados llevan estado/watermark/copia clara y no habilitan emision.
+- [x] El caso Valentina-like muestra bloqueo accionable y CTA de emision deshabilitado cuando hay descuento duplicado, overlap no resuelto o liquido negativo.
+- [x] El caso Luis-like usa documento/surface de `Cierre contractual de prestacion de servicios`, no `Finiquito de contrato de trabajo`.
+- [x] La UI de `/hr/offboarding` muestra blockers/evidencia de overlap de forma accionable.
+- [x] La UI distingue `Finiquito laboral`, `Cierre contractual`, `Cierre proveedor` y `Revision legal requerida` segun regimen/lane.
+- [x] Para honorarios/proveedores la UI no muestra ni permite `Calcular finiquito`; ofrece acciones de cierre contractual/proveedor y pago pendiente cuando aplique.
+- [x] El caso Valentina queda remediado por cancelacion/reemision auditada y el nuevo calculo no duplica cotizaciones de abril.
+- [x] Docs vivas quedan sincronizadas.
 
 ## Verification
 
@@ -459,15 +459,22 @@ Resultado esperado preliminar:
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
-- [ ] `docs/architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md` documenta policy engine, overlap ledger y gates nuevos
-- [ ] `docs/documentation/hr/finiquitos.md` y `docs/manual-de-uso/hr/finiquitos.md` explican cuando se descuentan AFC/AFP/salud, como opera el cutoff de payroll mensual, como se diferencia honorarios/cierre contractual y como operar remediaciones
-- [ ] La remediacion de Valentina queda registrada como evidencia operacional, no como mutacion silenciosa
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] `docs/architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md` documenta policy engine, overlap ledger y gates nuevos
+- [x] `docs/documentation/hr/finiquitos.md` y `docs/manual-de-uso/hr/finiquitos.md` explican cuando se descuentan AFC/AFP/salud, como opera el cutoff de payroll mensual, como se diferencia honorarios/cierre contractual y como operar remediaciones
+- [x] La remediacion de Valentina queda registrada como evidencia operacional, no como mutacion silenciosa
+
+## Completion Evidence
+
+- Runtime Valentina remediado por cancelacion/reemision versionada: settlement v1 negativo cancelado, nueva v2 aprobada con gross `121963`, deductions `0`, net `121963`.
+- Render formal de Valentina queda fail-closed por falta de RUT/documento verificado del trabajador (`worker_legal_identity_verified`), sin inventar identidad legal.
+- PDF validado contra contrato visual del mockup aprobado mediante test de landmarks: logo/header, entidad legal, estado, tabla `Concepto / Tratamiento / Evidencia / Monto`, totales, snapshot hash y tratamientos por componente.
+- Validaciones ejecutadas: `pnpm exec eslint src/lib/payroll/final-settlement src/lib/workforce/offboarding src/views/greenhouse/hr-core/offboarding`, `pnpm exec tsc --noEmit --pretty false`, `pnpm exec vitest run src/lib/payroll/final-settlement src/lib/workforce/offboarding src/views/greenhouse/hr-core/offboarding --reporter=dot`, `pnpm design:lint`, `pnpm pg:doctor`, `pnpm build`.
 
 ## Follow-ups
 

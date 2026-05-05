@@ -21,6 +21,16 @@ export interface FinalSettlementReadiness {
 }
 
 export type FinalSettlementComponentKind = 'earning' | 'deduction' | 'employer_cost'
+export type FinalSettlementComponentCode =
+  | 'pending_salary'
+  | 'pending_fixed_allowances'
+  | 'monthly_gratification_due'
+  | 'proportional_vacation'
+  | 'used_or_advanced_vacation_adjustment'
+  | 'statutory_deductions'
+  | 'authorized_deduction'
+  | 'payroll_overlap_adjustment'
+
 export type FinalSettlementTaxability =
   | 'taxable_imponible'
   | 'taxable_non_imponible'
@@ -29,8 +39,51 @@ export type FinalSettlementTaxability =
   | 'not_taxable'
   | 'needs_review'
 
+export type FinalSettlementLegalTreatment =
+  | 'remuneration'
+  | 'legal_indemnity'
+  | 'authorized_deduction'
+  | 'employer_cost'
+  | 'informational'
+
+export type FinalSettlementTaxTreatment =
+  | 'taxable_monthly'
+  | 'non_income'
+  | 'not_applicable'
+  | 'needs_review'
+
+export type FinalSettlementPrevisionalTreatment =
+  | 'contribution_base'
+  | 'not_contribution_base'
+  | 'employer_only'
+  | 'not_applicable'
+  | 'needs_review'
+
+export type FinalSettlementOverlapBehavior =
+  | 'deduct_delta_only'
+  | 'never_duplicate_monthly'
+  | 'not_applicable'
+
+export interface AuthorizedDeductionEvidence {
+  sourceRef: Record<string, unknown>
+  actorUserId?: string | null
+  reason: string
+  authorizedAt?: string | null
+}
+
+export interface FinalSettlementComponentPolicy {
+  componentCode: FinalSettlementComponentCode
+  policyCode: string
+  legalTreatment: FinalSettlementLegalTreatment
+  taxTreatment: FinalSettlementTaxTreatment
+  previsionalTreatment: FinalSettlementPrevisionalTreatment
+  overlapBehavior: FinalSettlementOverlapBehavior
+  requiresSourceRef: boolean
+  blocksApprovalWhenAmbiguous: boolean
+}
+
 export interface FinalSettlementBreakdownLine {
-  componentCode: string
+  componentCode: FinalSettlementComponentCode | string
   label: string
   kind: FinalSettlementComponentKind
   amount: number
@@ -38,6 +91,12 @@ export interface FinalSettlementBreakdownLine {
   formulaRef: string
   sourceRef: Record<string, unknown>
   taxability: FinalSettlementTaxability
+  policyCode?: string
+  legalTreatment?: FinalSettlementLegalTreatment
+  taxTreatment?: FinalSettlementTaxTreatment
+  previsionalTreatment?: FinalSettlementPrevisionalTreatment
+  overlapBehavior?: FinalSettlementOverlapBehavior
+  evidence?: Record<string, unknown>
 }
 
 export interface FinalSettlementTotals {
@@ -60,7 +119,7 @@ export interface FinalSettlementExplanation {
 }
 
 export interface FinalSettlementSourceSnapshot {
-  schemaVersion: 1
+  schemaVersion: 1 | 2
   offboardingCaseId: string
   memberId: string
   profileId: string
@@ -76,6 +135,7 @@ export interface FinalSettlementSourceSnapshot {
   contractType: Extract<ContractType, 'indefinido' | 'plazo_fijo'>
   payRegime: Extract<PayRegime, 'chile'>
   payrollVia: Extract<PayrollVia, 'internal'>
+  payrollOverlapLedger?: Record<string, unknown>
 }
 
 export interface FinalSettlement {
@@ -123,9 +183,10 @@ export interface CalculateFinalSettlementInput {
   actorUserId: string
   sourceRef?: Record<string, unknown>
   manualDeductions?: Array<{
-    componentCode: string
+    componentCode: 'authorized_deduction'
     label: string
     amount: number
     sourceRef: Record<string, unknown>
+    reason?: string
   }>
 }

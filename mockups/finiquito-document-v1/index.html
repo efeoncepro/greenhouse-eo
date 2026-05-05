@@ -1,0 +1,852 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mockup finiquito Greenhouse</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --blue: #0375db;
+      --blue-dark: #023c70;
+      --ink: #1a1a2e;
+      --muted: #667085;
+      --soft: #f8f9fa;
+      --paper: #ffffff;
+      --line: #dbdbdb;
+      --ok: #2f7d32;
+      --warn: #b45309;
+      --bad: #bb1954;
+      --info: #024c8f;
+      --green-soft: #eaf7df;
+      --warn-soft: #fff4de;
+      --bad-soft: #fde9f1;
+      --info-soft: #e8f2fc;
+      --shadow: 0 18px 45px rgba(16, 24, 40, .11);
+      --radius: 8px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--soft);
+      color: var(--ink);
+      font-family: "Geist Sans", "Geist", Arial, sans-serif;
+      line-height: 1.45;
+    }
+
+    button, input, select { font: inherit; }
+
+    .app {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 320px minmax(0, 1fr);
+    }
+
+    .rail {
+      background: #ffffff;
+      border-right: 1px solid var(--line);
+      padding: 28px 24px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow: auto;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 30px;
+    }
+
+    .brand img { width: 150px; height: auto; display: block; }
+
+    .eyebrow {
+      text-transform: uppercase;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+    }
+
+    h1, h2, h3, p { margin: 0; }
+
+    h1 {
+      font-family: Poppins, "Geist Sans", Arial, sans-serif;
+      font-size: 24px;
+      line-height: 1.2;
+      margin-bottom: 10px;
+    }
+
+    .rail p {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .tabs {
+      display: grid;
+      gap: 8px;
+      margin-top: 24px;
+    }
+
+    .tab {
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: var(--radius);
+      padding: 12px;
+      text-align: left;
+      cursor: pointer;
+      color: var(--ink);
+      transition: border-color .15s ease, box-shadow .15s ease, transform .15s ease;
+    }
+
+    .tab:hover { border-color: #9fcdf5; transform: translateY(-1px); }
+    .tab:focus-visible { outline: 3px solid #9fcdf5; outline-offset: 2px; }
+    .tab[aria-selected="true"] {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(3, 117, 219, .12);
+    }
+
+    .tab strong { display: block; font-size: 14px; margin-bottom: 3px; }
+    .tab span { display: block; color: var(--muted); font-size: 12px; }
+
+    .checks {
+      margin-top: 26px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .check {
+      display: grid;
+      grid-template-columns: 22px 1fr;
+      gap: 8px;
+      align-items: start;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .dot {
+      width: 22px;
+      height: 22px;
+      border-radius: 999px;
+      display: inline-grid;
+      place-items: center;
+      font-size: 12px;
+      font-weight: 800;
+      background: var(--info-soft);
+      color: var(--info);
+    }
+
+    .main {
+      padding: 30px;
+      display: grid;
+      gap: 18px;
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 18px;
+      align-items: center;
+      padding: 18px 20px;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: 0 8px 24px rgba(16, 24, 40, .06);
+    }
+
+    .summary h2 {
+      font-family: Poppins, "Geist Sans", Arial, sans-serif;
+      font-size: 18px;
+      margin-bottom: 4px;
+    }
+
+    .summary p { color: var(--muted); font-size: 14px; }
+
+    .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+    .btn {
+      min-height: 40px;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      padding: 0 14px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+    }
+
+    .btn:hover { transform: translateY(-1px); }
+    .btn:focus-visible { outline: 3px solid #9fcdf5; outline-offset: 2px; }
+    .btn.primary { background: var(--blue); color: #fff; }
+    .btn.secondary { background: #fff; color: var(--blue-dark); border-color: var(--line); }
+    .btn.danger { background: var(--bad-soft); color: var(--bad); border-color: #f7bdd2; }
+    .btn[disabled] { opacity: .55; cursor: not-allowed; transform: none; }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(620px, 1fr) 340px;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .sheetWrap {
+      background: #dfe6ee;
+      padding: 24px;
+      border-radius: var(--radius);
+      overflow: auto;
+    }
+
+    .sheet {
+      width: min(100%, 900px);
+      min-height: 1165px;
+      margin: 0 auto;
+      background: var(--paper);
+      box-shadow: var(--shadow);
+      border-radius: 4px;
+      padding: 44px 52px;
+      position: relative;
+    }
+
+    .docHeader {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 20px;
+      padding-bottom: 18px;
+      border-bottom: 3px solid var(--blue-dark);
+    }
+
+    .docHeader img { width: 156px; height: auto; display: block; margin-bottom: 12px; }
+    .legalBlock { color: var(--muted); font-size: 12px; }
+    .legalBlock strong { color: var(--ink); display: block; font-size: 13px; margin-bottom: 2px; }
+
+    .docMeta {
+      text-align: right;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .statusPill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 12px;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .statusPill.ready { background: var(--green-soft); color: var(--ok); }
+    .statusPill.blocked { background: var(--bad-soft); color: var(--bad); }
+    .statusPill.contract { background: var(--info-soft); color: var(--info); }
+
+    .docTitle {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 210px;
+      gap: 24px;
+      margin: 30px 0 22px;
+      align-items: start;
+    }
+
+    .docTitle h2 {
+      font-family: Poppins, "Geist Sans", Arial, sans-serif;
+      font-size: 28px;
+      line-height: 1.18;
+      margin-bottom: 8px;
+    }
+
+    .docTitle p { color: var(--muted); font-size: 14px; }
+
+    .netBox {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 14px;
+      text-align: right;
+      background: #fbfcfd;
+    }
+
+    .netBox span { display: block; color: var(--muted); font-size: 12px; text-transform: uppercase; font-weight: 800; letter-spacing: .8px; }
+    .netBox strong { display: block; font-size: 28px; font-variant-numeric: tabular-nums; margin-top: 4px; }
+    .netBox small { color: var(--muted); }
+
+    .section { margin-top: 22px; }
+    .section h3 {
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: .7px;
+      color: var(--blue-dark);
+      margin-bottom: 10px;
+    }
+
+    .partyGrid, .factsGrid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .field {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 10px 12px;
+      min-height: 58px;
+    }
+
+    .field span {
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      font-weight: 800;
+      letter-spacing: .7px;
+      margin-bottom: 3px;
+    }
+
+    .field strong { font-size: 14px; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th {
+      text-align: left;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .7px;
+      font-size: 10px;
+      border-bottom: 1px solid var(--line);
+      padding: 9px 8px;
+    }
+
+    td {
+      border-bottom: 1px solid #eef1f4;
+      padding: 11px 8px;
+      vertical-align: top;
+    }
+
+    td.amount, th.amount {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      border-radius: 999px;
+      padding: 3px 8px;
+      font-size: 11px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .tag.ok { background: var(--green-soft); color: var(--ok); }
+    .tag.warn { background: var(--warn-soft); color: var(--warn); }
+    .tag.bad { background: var(--bad-soft); color: var(--bad); }
+    .tag.info { background: var(--info-soft); color: var(--info); }
+
+    .evidence {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 4px;
+    }
+
+    .totals {
+      margin-left: auto;
+      width: 360px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .totalRow {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 12px;
+      border-bottom: 1px solid #eef1f4;
+      font-size: 13px;
+    }
+
+    .totalRow:last-child {
+      border-bottom: 0;
+      background: #f7fbff;
+      font-weight: 900;
+      color: var(--blue-dark);
+    }
+
+    .statement {
+      border-left: 4px solid var(--blue);
+      padding: 12px 14px;
+      background: #f7fbff;
+      color: #23364d;
+      font-size: 13px;
+    }
+
+    .signatureGrid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 34px;
+      margin-top: 52px;
+    }
+
+    .signature {
+      border-top: 1px solid #8b98a8;
+      padding-top: 9px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .footer {
+      position: absolute;
+      left: 52px;
+      right: 52px;
+      bottom: 28px;
+      border-top: 1px solid var(--line);
+      padding-top: 9px;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 10px;
+    }
+
+    .side {
+      display: grid;
+      gap: 14px;
+      position: sticky;
+      top: 18px;
+    }
+
+    .panel {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 16px;
+      box-shadow: 0 8px 24px rgba(16, 24, 40, .05);
+    }
+
+    .panel h3 {
+      font-size: 15px;
+      margin-bottom: 10px;
+    }
+
+    .gate {
+      display: grid;
+      grid-template-columns: 26px 1fr;
+      gap: 10px;
+      padding: 10px 0;
+      border-top: 1px solid #eef1f4;
+      font-size: 13px;
+    }
+
+    .gate:first-of-type { border-top: 0; }
+    .gate strong { display: block; margin-bottom: 2px; }
+    .gate span { color: var(--muted); }
+
+    .mini {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .hidden { display: none; }
+
+    @media (max-width: 1180px) {
+      .app { grid-template-columns: 1fr; }
+      .rail { position: static; height: auto; }
+      .workspace { grid-template-columns: 1fr; }
+      .side { position: static; }
+    }
+
+    @media (max-width: 760px) {
+      .main { padding: 16px; }
+      .summary, .docHeader, .docTitle, .partyGrid, .factsGrid { grid-template-columns: 1fr; }
+      .docMeta { text-align: left; }
+      .sheetWrap { padding: 12px; }
+      .sheet { padding: 28px 20px; min-height: 0; }
+      .totals { width: 100%; }
+      .footer { position: static; margin-top: 34px; }
+      .signatureGrid { grid-template-columns: 1fr; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        scroll-behavior: auto !important;
+        transition-duration: .001ms !important;
+        animation-duration: .001ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="rail">
+      <div class="brand">
+        <img src="../../public/branding/logo-full.png" alt="Efeonce Greenhouse">
+      </div>
+      <div class="eyebrow">Mockup aprobacion</div>
+      <h1>Documento de salida laboral</h1>
+      <p>Propuesta visual y de contenido para reemplazar el PDF mínimo actual por un artefacto auditado, lane-aware y listo para revisión legal/operativa.</p>
+
+      <div class="tabs" role="tablist" aria-label="Escenarios de documento">
+        <button class="tab" id="tab-ready" role="tab" aria-selected="true" aria-controls="panel-ready" data-scenario="ready">
+          <strong>Finiquito laboral listo</strong>
+          <span>Dependiente Chile con política y evidencia completa.</span>
+        </button>
+        <button class="tab" id="tab-blocked" role="tab" aria-selected="false" aria-controls="panel-blocked" data-scenario="blocked">
+          <strong>Valentina bloqueado</strong>
+          <span>Renuncia con líquido negativo y descuento duplicado.</span>
+        </button>
+        <button class="tab" id="tab-contract" role="tab" aria-selected="false" aria-controls="panel-contract" data-scenario="contract">
+          <strong>Luis honorarios</strong>
+          <span>Cierre contractual, sin finiquito laboral.</span>
+        </button>
+      </div>
+
+      <div class="checks" aria-label="Decisiones del mockup">
+        <div class="check"><span class="dot">1</span><span>El documento formal falla cerrado si faltan identidad, política o evidencia.</span></div>
+        <div class="check"><span class="dot">2</span><span>La tabla de montos explica tratamiento legal, previsional y fuente.</span></div>
+        <div class="check"><span class="dot">3</span><span>Honorarios y proveedores tienen documento propio, no un finiquito laboral maquillado.</span></div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <section class="summary" aria-live="polite">
+        <div>
+          <h2 id="scenarioTitle">Finiquito laboral listo para revisión</h2>
+          <p id="scenarioSubtitle">Vista de aprobación previa a emisión. El operador puede revisar cálculo, evidencia y documento en la misma pantalla.</p>
+        </div>
+        <div class="actions">
+          <button class="btn secondary" type="button">Descargar borrador</button>
+          <button class="btn secondary" type="button">Solicitar revisión legal</button>
+          <button class="btn primary" id="issueButton" type="button">Emitir documento</button>
+        </div>
+      </section>
+
+      <section class="workspace">
+        <div class="sheetWrap">
+          <article class="sheet" id="documentSheet" aria-labelledby="docHeading">
+            <header class="docHeader">
+              <div>
+                <img src="../../public/branding/logo-full.png" alt="Efeonce Greenhouse">
+                <div class="legalBlock">
+                  <strong>Efeonce Group SpA</strong>
+                  RUT 77.357.182-1<br>
+                  Dr. Manuel Barros Borgoño 71 of. 05, Providencia, Santiago, Chile
+                </div>
+              </div>
+              <div class="docMeta">
+                <span class="statusPill ready" id="docStatus">✓ Listo para emitir</span><br>
+                Documento GH-FIN-2026-00042<br>
+                Snapshot fs-v2 · Hash 9e71a4c<br>
+                Generado 04/05/2026 18:42
+              </div>
+            </header>
+
+            <section class="docTitle">
+              <div>
+                <h2 id="docHeading">Finiquito de contrato de trabajo</h2>
+                <p id="docIntro">Propuesta de finiquito para relación laboral dependiente en Chile. La emisión queda sujeta a ratificación externa, firma y evidencia de cotizaciones cuando corresponda.</p>
+              </div>
+              <div class="netBox">
+                <span id="netLabel">Líquido a pagar</span>
+                <strong id="netAmount">$121.963</strong>
+                <small id="netHelp">Sin descuentos previsionales pendientes.</small>
+              </div>
+            </section>
+
+            <section class="section">
+              <h3>Partes</h3>
+              <div class="partyGrid">
+                <div class="field"><span>Empleador</span><strong>Efeonce Group SpA</strong></div>
+                <div class="field"><span>Trabajador/a</span><strong id="workerName">Valentina Hoyos</strong></div>
+                <div class="field"><span>RUT empleador</span><strong>77.357.182-1</strong></div>
+                <div class="field"><span>RUT trabajador/a</span><strong id="workerRut">19.234.567-8</strong></div>
+                <div class="field"><span>Domicilio empleador</span><strong>Providencia, Santiago</strong></div>
+                <div class="field"><span>Cargo</span><strong id="workerRole">People Operations Analyst</strong></div>
+              </div>
+            </section>
+
+            <section class="section">
+              <h3>Relación y causal</h3>
+              <div class="factsGrid">
+                <div class="field"><span>Fecha ingreso</span><strong>01/08/2025</strong></div>
+                <div class="field"><span>Último día trabajado</span><strong>30/04/2026</strong></div>
+                <div class="field"><span>Fecha término</span><strong>30/04/2026</strong></div>
+                <div class="field"><span>Causal</span><strong id="causalText">Renuncia voluntaria</strong></div>
+                <div class="field"><span>Régimen</span><strong id="regimeText">Chile dependiente · internal payroll</strong></div>
+                <div class="field"><span>Pago mensual usado como evidencia</span><strong id="overlapText">Payroll abril 2026 exportado</strong></div>
+              </div>
+            </section>
+
+            <section class="section">
+              <h3>Detalle auditable de haberes y descuentos</h3>
+              <table aria-label="Detalle de finiquito">
+                <thead>
+                  <tr>
+                    <th>Concepto</th>
+                    <th>Tratamiento</th>
+                    <th>Evidencia</th>
+                    <th class="amount">Monto</th>
+                  </tr>
+                </thead>
+                <tbody id="lineItems">
+                  <tr>
+                    <td><strong>Feriado proporcional</strong><div class="evidence">Policy `proportional_vacation.v1`</div></td>
+                    <td><span class="tag ok">No imponible</span> <span class="tag info">No tributable</span></td>
+                    <td>Art. 73 Código del Trabajo · SII vacaciones en finiquito</td>
+                    <td class="amount">$121.963</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Salud / Isapre</strong><div class="evidence">Overlap con nómina mensual</div></td>
+                    <td><span class="tag ok">Ya cubierto</span></td>
+                    <td>Payroll abril 2026 · entry pe-04-valentina</td>
+                    <td class="amount">$0</td>
+                  </tr>
+                  <tr>
+                    <td><strong>AFC trabajador</strong><div class="evidence">Sin remuneración imponible pendiente</div></td>
+                    <td><span class="tag ok">No aplica</span></td>
+                    <td>Contrato indefinido; base pendiente $0</td>
+                    <td class="amount">$0</td>
+                  </tr>
+                </tbody>
+              </table>
+            </section>
+
+            <section class="section">
+              <div class="totals" id="totalsBlock">
+                <div class="totalRow"><span>Total haberes</span><strong>$121.963</strong></div>
+                <div class="totalRow"><span>Total descuentos autorizados</span><strong>$0</strong></div>
+                <div class="totalRow"><span>Líquido a pagar</span><strong>$121.963</strong></div>
+              </div>
+            </section>
+
+            <section class="section">
+              <h3>Declaración operativa</h3>
+              <p class="statement" id="statementText">Greenhouse registra este documento como propuesta interna versionada. La firma, ratificación o reserva de derechos se registra como evidencia externa y no reemplaza el acto ante ministro de fe cuando aplique.</p>
+            </section>
+
+            <section class="signatureGrid" id="signatures">
+              <div class="signature">Representante empleador<br>Efeonce Group SpA</div>
+              <div class="signature">Trabajador/a<br>Valentina Hoyos</div>
+            </section>
+
+            <footer class="footer">
+              <span>Documento confidencial · Efeonce Group SpA · RUT 77.357.182-1</span>
+              <span>Página 1 de 1 · Template cl_final_settlement_document_v2</span>
+            </footer>
+          </article>
+        </div>
+
+        <aside class="side" aria-label="Readiness del documento">
+          <section class="panel">
+            <h3>Readiness de emisión</h3>
+            <div id="readinessList">
+              <div class="gate"><span class="dot">✓</span><div><strong>Identidad completa</strong><span>Logo, entidad legal, RUT y domicilio cargados.</span></div></div>
+              <div class="gate"><span class="dot">✓</span><div><strong>Cálculo listo</strong><span>Sin líquido negativo ni descuentos duplicados.</span></div></div>
+              <div class="gate"><span class="dot">✓</span><div><strong>Política por componente</strong><span>Cada línea declara tratamiento y evidencia.</span></div></div>
+              <div class="gate"><span class="dot">✓</span><div><strong>Overlap resuelto</strong><span>Payroll mensual exportado se usa como evidencia, no se duplica.</span></div></div>
+            </div>
+          </section>
+
+          <section class="panel">
+            <h3>Microinteracciones propuestas</h3>
+            <p class="mini">El botón de emisión se bloquea con causa visible, el cambio de escenario actualiza un live region, y los estados no dependen solo del color. En producción: toast + estado inline; errores críticos nunca toast-only.</p>
+          </section>
+
+          <section class="panel">
+            <h3>Contrato UI</h3>
+            <p class="mini" id="contractText">Para dependiente Chile, la pantalla puede mostrar finiquito laboral, cálculo, documento, revisión y emisión. Para honorarios/proveedor, se reemplaza por cierre contractual.</p>
+          </section>
+        </aside>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const scenarios = {
+      ready: {
+        title: 'Finiquito laboral listo para revisión',
+        subtitle: 'Vista de aprobación previa a emisión. El operador puede revisar cálculo, evidencia y documento en la misma pantalla.',
+        statusClass: 'ready',
+        status: '✓ Listo para emitir',
+        button: { text: 'Emitir documento', disabled: false, danger: false },
+        heading: 'Finiquito de contrato de trabajo',
+        intro: 'Propuesta de finiquito para relación laboral dependiente en Chile. La emisión queda sujeta a ratificación externa, firma y evidencia de cotizaciones cuando corresponda.',
+        worker: 'Valentina Hoyos',
+        rut: '19.234.567-8',
+        role: 'People Operations Analyst',
+        causal: 'Renuncia voluntaria',
+        regime: 'Chile dependiente · internal payroll',
+        overlap: 'Payroll abril 2026 exportado',
+        netLabel: 'Líquido a pagar',
+        netAmount: '$121.963',
+        netHelp: 'Sin descuentos previsionales pendientes.',
+        lines: [
+          ['Feriado proporcional', 'Policy `proportional_vacation.v1`', ['No imponible', 'No tributable'], 'Art. 73 Código del Trabajo · SII vacaciones en finiquito', '$121.963'],
+          ['Salud / Isapre', 'Overlap con nómina mensual', ['Ya cubierto'], 'Payroll abril 2026 · entry pe-04-valentina', '$0'],
+          ['AFC trabajador', 'Sin remuneración imponible pendiente', ['No aplica'], 'Contrato indefinido; base pendiente $0', '$0']
+        ],
+        totals: ['$121.963', '$0', '$121.963'],
+        statement: 'Greenhouse registra este documento como propuesta interna versionada. La firma, ratificación o reserva de derechos se registra como evidencia externa y no reemplaza el acto ante ministro de fe cuando aplique.',
+        gates: [
+          ['✓', 'Identidad completa', 'Logo, entidad legal, RUT y domicilio cargados.'],
+          ['✓', 'Cálculo listo', 'Sin líquido negativo ni descuentos duplicados.'],
+          ['✓', 'Política por componente', 'Cada línea declara tratamiento y evidencia.'],
+          ['✓', 'Overlap resuelto', 'Payroll mensual exportado se usa como evidencia, no se duplica.']
+        ],
+        contract: 'Para dependiente Chile, la pantalla puede mostrar finiquito laboral, cálculo, documento, revisión y emisión. Para honorarios/proveedor, se reemplaza por cierre contractual.'
+      },
+      blocked: {
+        title: 'Valentina requiere reemisión antes de emitir',
+        subtitle: 'El documento queda bloqueado porque el cálculo tiene líquido negativo por descuento de Isapre ya cubierto en nómina abril.',
+        statusClass: 'blocked',
+        status: '✕ Bloqueado',
+        button: { text: 'Emitir bloqueado', disabled: true, danger: true },
+        heading: 'Borrador interno de finiquito',
+        intro: 'Este borrador no puede emitirse. Se debe cancelar el settlement aprobado, recalcular con política por componente y generar una nueva versión auditada.',
+        worker: 'Valentina Hoyos',
+        rut: '19.234.567-8',
+        role: 'People Operations Analyst',
+        causal: 'Renuncia voluntaria',
+        regime: 'Chile dependiente · internal payroll',
+        overlap: 'Payroll abril 2026 exportado · descuento detectado',
+        netLabel: 'Líquido observado',
+        netAmount: '-$40.512',
+        netHelp: 'No emitible sin deducción autorizada y evidencia.',
+        lines: [
+          ['Feriado proporcional', 'Policy `proportional_vacation.v1`', ['No imponible', 'No tributable'], 'Art. 73 Código del Trabajo · SII vacaciones en finiquito', '$121.963'],
+          ['Isapre descontada nuevamente', 'Deducción mensual duplicada', ['Bloquea'], 'Ya existe en payroll abril 2026 exportado', '-$162.475'],
+          ['AFC trabajador', 'No corresponde sobre feriado proporcional', ['No aplica'], 'Base imponible pendiente $0', '$0']
+        ],
+        totals: ['$121.963', '$162.475', '-$40.512'],
+        statement: 'Acción requerida: cancelar esta versión, recalcular usando overlap ledger y emitir solo cuando el readiness vuelva a ready. El documento formal no debe esconder warnings críticos.',
+        gates: [
+          ['✓', 'Identidad completa', 'Logo, entidad legal, RUT y domicilio cargados.'],
+          ['✕', 'Cálculo no emitible', 'Líquido negativo sin deducción autorizada.'],
+          ['✕', 'Overlap no resuelto', 'Isapre aparece como descuento duplicado.'],
+          ['✓', 'Frontera laboral correcta', 'El caso sí corresponde a finiquito laboral, pero requiere reemisión.']
+        ],
+        contract: 'El operador debe ver el motivo exacto del bloqueo y el siguiente paso: cancelar/reemitir. No debe existir CTA activo de emisión formal.'
+      },
+      contract: {
+        title: 'Luis se cierra por contrato de honorarios',
+        subtitle: 'La UI no muestra cálculo de finiquito laboral. El flujo valida último pago, boleta, retención SII y corte de elegibilidad futura.',
+        statusClass: 'contract',
+        status: '• Cierre contractual',
+        button: { text: 'Cerrar contrato', disabled: false, danger: false },
+        heading: 'Cierre contractual de prestación de servicios',
+        intro: 'Documento operativo para cierre de honorarios. No constituye finiquito laboral ni calcula cotizaciones de trabajador dependiente.',
+        worker: 'Luis Martínez',
+        rut: '17.456.789-0',
+        role: 'Consultor de contenido',
+        causal: 'Término de prestación de servicios',
+        regime: 'Honorarios · internal payment',
+        overlap: 'Último pago y boleta SII pendientes de confirmación',
+        netLabel: 'Pago pendiente estimado',
+        netAmount: '$423.750',
+        netHelp: 'Sujeto a boleta y retención SII 2026.',
+        lines: [
+          ['Servicio devengado pendiente', 'Honorarios bruto', ['Tributable'], 'Contrato de servicios · abril 2026', '$500.000'],
+          ['Retención SII honorarios', 'Retención 2026', ['Retención'], 'Tasa 15,25% vigente 2026', '-$76.250'],
+          ['Finiquito laboral', 'No corresponde', ['Bloqueado'], 'No existe relación laboral dependiente en este lane', '$0']
+        ],
+        totals: ['$500.000', '$76.250', '$423.750'],
+        statement: 'Greenhouse registra el cierre contractual, evidencia de boleta/pago y cutoff de pagos futuros. Si aparecen señales de subordinación o dependencia, el flujo cambia a revisión legal.',
+        gates: [
+          ['✓', 'Régimen clasificado', 'Contrato honorarios detectado antes de calcular.'],
+          ['✓', 'Sin finiquito laboral', 'No se aplican AFP, salud, AFC ni IUSC dependiente.'],
+          ['!', 'Boleta pendiente', 'Se requiere evidencia SII antes de cerrar pago.'],
+          ['✓', 'Cutoff futuro', 'El offboarding ejecutado excluye períodos posteriores.']
+        ],
+        contract: 'Para honorarios, el CTA correcto es cerrar contrato/revisar pago pendiente. Mostrar “Calcular finiquito” sería un error de producto y de riesgo legal.'
+      }
+    };
+
+    const tagClass = label => {
+      if (label === 'Bloquea' || label === 'Bloqueado') return 'bad';
+      if (label === 'Retención' || label === 'Tributable') return 'warn';
+      if (label === 'Ya cubierto' || label === 'No aplica' || label === 'No imponible' || label === 'No tributable') return 'ok';
+      return 'info';
+    };
+
+    const renderLines = lines => lines.map(line => `
+      <tr>
+        <td><strong>${line[0]}</strong><div class="evidence">${line[1]}</div></td>
+        <td>${line[2].map(tag => `<span class="tag ${tagClass(tag)}">${tag}</span>`).join(' ')}</td>
+        <td>${line[3]}</td>
+        <td class="amount">${line[4]}</td>
+      </tr>
+    `).join('');
+
+    const renderGates = gates => gates.map(gate => `
+      <div class="gate"><span class="dot">${gate[0]}</span><div><strong>${gate[1]}</strong><span>${gate[2]}</span></div></div>
+    `).join('');
+
+    const setScenario = key => {
+      const scenario = scenarios[key];
+      document.querySelectorAll('.tab').forEach(tab => {
+        tab.setAttribute('aria-selected', String(tab.dataset.scenario === key));
+      });
+
+      document.getElementById('scenarioTitle').textContent = scenario.title;
+      document.getElementById('scenarioSubtitle').textContent = scenario.subtitle;
+      const issueButton = document.getElementById('issueButton');
+      issueButton.textContent = scenario.button.text;
+      issueButton.disabled = scenario.button.disabled;
+      issueButton.className = `btn ${scenario.button.danger ? 'danger' : 'primary'}`;
+
+      const docStatus = document.getElementById('docStatus');
+      docStatus.className = `statusPill ${scenario.statusClass}`;
+      docStatus.textContent = scenario.status;
+      document.getElementById('docHeading').textContent = scenario.heading;
+      document.getElementById('docIntro').textContent = scenario.intro;
+      document.getElementById('workerName').textContent = scenario.worker;
+      document.getElementById('workerRut').textContent = scenario.rut;
+      document.getElementById('workerRole').textContent = scenario.role;
+      document.getElementById('causalText').textContent = scenario.causal;
+      document.getElementById('regimeText').textContent = scenario.regime;
+      document.getElementById('overlapText').textContent = scenario.overlap;
+      document.getElementById('netLabel').textContent = scenario.netLabel;
+      document.getElementById('netAmount').textContent = scenario.netAmount;
+      document.getElementById('netHelp').textContent = scenario.netHelp;
+      document.getElementById('lineItems').innerHTML = renderLines(scenario.lines);
+      document.getElementById('totalsBlock').innerHTML = `
+        <div class="totalRow"><span>Total haberes</span><strong>${scenario.totals[0]}</strong></div>
+        <div class="totalRow"><span>Total descuentos / retenciones</span><strong>${scenario.totals[1]}</strong></div>
+        <div class="totalRow"><span>Líquido / pago neto</span><strong>${scenario.totals[2]}</strong></div>
+      `;
+      document.getElementById('statementText').textContent = scenario.statement;
+      document.getElementById('readinessList').innerHTML = renderGates(scenario.gates);
+      document.getElementById('contractText').textContent = scenario.contract;
+      document.querySelectorAll('.signature').forEach((node, index) => {
+        if (key === 'contract') {
+          node.innerHTML = index === 0 ? 'Responsable Efeonce<br>Cierre contractual' : 'Prestador/a de servicios<br>Luis Martínez';
+        } else {
+          node.innerHTML = index === 0 ? 'Representante empleador<br>Efeonce Group SpA' : 'Trabajador/a<br>Valentina Hoyos';
+        }
+      });
+    };
+
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => setScenario(tab.dataset.scenario));
+    });
+  </script>
+</body>
+</html>

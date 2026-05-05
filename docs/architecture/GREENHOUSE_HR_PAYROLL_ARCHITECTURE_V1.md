@@ -1784,3 +1784,39 @@ Cuando emerja un gap operativo no cubierto:
 4. Test vitest con happy path + edge case + fail-soft.
 
 No requiere migration. No requiere cambio de UI (Ops Health renderiza automáticamente cualquier métrica nueva del subsystem).
+
+## 28. Final Settlement Policy + Overlap Hardening (TASK-783)
+
+El finiquito laboral Chile dependiente opera con policy por componente y ledger de solapamiento contra nómina mensual. El aggregate sigue separado de `payroll_entries`: un settlement aprobado no muta entries exportadas ni se corrige in-place; la remediación canónica es cancelar y reemitir una nueva versión.
+
+### 28.1 Policy por componente
+
+`src/lib/payroll/final-settlement/policies.ts` define el registry V1 para `pending_salary`, `pending_fixed_allowances`, `monthly_gratification_due`, `proportional_vacation`, `used_or_advanced_vacation_adjustment`, `statutory_deductions`, `authorized_deduction` y `payroll_overlap_adjustment`.
+
+Cada línea de `breakdown_json` debe traer `policyCode`, `legalTreatment`, `taxTreatment`, `previsionalTreatment`, `overlapBehavior` y evidencia/source ref suficiente. El calculator falla cerrado si aparece un componente sin policy.
+
+Regla crítica:
+
+- `proportional_vacation` es `legal_indemnity`, `non_income`, `not_contribution_base`, `never_duplicate_monthly`.
+- AFP, salud, cesantía e IUSC solo aplican sobre remuneración imponible/tributable pendiente, no sobre feriado proporcional.
+- `netPayable < 0` bloquea aprobación y emisión salvo `authorized_deduction` con evidencia estructurada.
+
+### 28.2 PayrollOverlapLedger
+
+`src/lib/payroll/final-settlement/overlap-ledger.ts` lee el período mensual y la entry activa del miembro para el mes de `lastWorkingDay`. El ledger captura estado/exportación, `entryId`, montos brutos, base imponible, AFP, salud, cesantía, impuesto, APV, total de descuentos y neto ya materializados.
+
+Si el período mensual está `calculated`, `approved` o `exported` y existe entry activa, el finiquito calcula solo delta pendiente. En un caso como renuncia al 30/04 con abril exportado y solo feriado proporcional, el settlement no descuenta Isapre/AFP/AFC/IUSC por segunda vez.
+
+### 28.3 Cutoff de elegibilidad payroll
+
+`src/lib/payroll/postgres-store.ts` excluye del roster mensual a miembros con offboarding `executed` y `last_working_day < period_start`, aunque `members.active = TRUE`. La transición de offboarding a `executed` también cierra versiones abiertas en `greenhouse_payroll.compensation_versions.effective_to = last_working_day` y deja `payrollCutoff` en el evento del caso.
+
+El mes que contiene `last_working_day` permanece calculable; el mes posterior queda excluido por offboarding ejecutado.
+
+### 28.4 Frontera por régimen
+
+El final settlement laboral V1 solo aplica a `internal_payroll` + Chile dependiente (`indefinido`/`plazo_fijo`). Honorarios, contractor, EOR/Deel e internacional no generan finiquito laboral ni documento "Finiquito de contrato de trabajo". La UI debe proyectar `Cierre contractual` o `Cierre proveedor` y no mostrar CTA de cálculo de finiquito laboral para esos lanes.
+
+### 28.5 Documento PDF
+
+El PDF de finiquito usa el contrato visual aprobado en `mockups/finiquito-document-v1/index.html`: branding Greenhouse, entidad legal/RUT, trabajador/RUT, estado textual visible, tabla `Concepto / Tratamiento / Evidencia / Monto`, totales separados y footer con template/snapshot. El render formal falla cerrado si falta identidad legal verificada del trabajador, entidad empleadora, policy/evidencia por línea o si el neto negativo no está autorizado.

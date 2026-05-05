@@ -3,7 +3,7 @@
 > **Tipo de documento:** Manual de uso
 > **Version:** 1.0
 > **Creado:** 2026-05-04 por Codex
-> **Ultima actualizacion:** 2026-05-04 por Codex
+> **Ultima actualizacion:** 2026-05-05 por Codex
 > **Modulo:** HR / Payroll
 > **Ruta en portal:** `/hr/offboarding`
 > **Documentacion relacionada:** [Finiquitos Chile](../../documentation/hr/finiquitos.md), [GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md)
@@ -38,6 +38,23 @@ El motor de finiquitos calcula y guarda el cierre final de una renuncia Chile de
 
 Si un caso ya aparece como `Ejecutado` pero no tiene finiquito, no desaparece de `/hr/offboarding`: usa `Calcular` en el carril `Finiquito` para recuperar el settlement desde las fechas canonicas del caso. Esta recuperacion existe para corregir cierres incompletos; el flujo normal debe aprobar settlement y emitir documento antes de ejecutar la salida.
 
+## Revision del calculo
+
+Antes de aprobar, confirma tres puntos:
+
+- `Feriado proporcional` debe aparecer como no renta/no imponible y no debe cargar AFP, salud, AFC ni IUSC por si solo.
+- Si el mes de salida ya esta calculado/aprobado/exportado, el ledger de overlap debe explicar que descuentos mensuales ya quedaron cubiertos.
+- Un neto negativo solo es aprobable si existe una `authorized_deduction` con evidencia estructurada; de lo contrario el sistema bloquea.
+
+## Lanes no laborales
+
+No todos los casos de offboarding son finiquitos:
+
+- `Finiquito laboral`: Chile dependiente con payroll interno. Permite calcular, aprobar y generar documento.
+- `Cierre contractual`: honorarios. No muestra `Calcular finiquito`; revisa pago pendiente/boleta/retencion SII por los flujos de payroll mensual que correspondan.
+- `Cierre proveedor`: Deel/EOR/contractor externo. Greenhouse registra el cierre operativo; el proveedor es owner del payroll legal.
+- `Revision legal requerida`: clasificacion ambigua. No fuerces calculo automatico.
+
 ## Estados
 
 | Estado | Significado |
@@ -69,6 +86,8 @@ Si un caso ya aparece como `Ejecutado` pero no tiene finiquito, no desaparece de
 - No apruebes si hay blockers de regimen, compensacion o vacaciones.
 - No uses descuentos manuales sin `source_ref`.
 - No trates honorarios, Deel/EOR o internacionales como Chile dependiente.
+- No apruebes un liquido negativo sin evidencia de deduccion autorizada.
+- No emitas documento si falta RUT verificado del trabajador o identidad legal de la entidad empleadora.
 - No marques `signed_or_ratified` sin evidencia o referencia externa.
 - No uses el PDF como prueba de pago: el flujo documental no crea ni ejecuta pagos.
 - No ejecutes un caso `Payroll interno` sin cálculo aprobado y documento emitido; Greenhouse bloquea esa transición para evitar cierres laborales incompletos.
@@ -86,6 +105,10 @@ V1 solo cubre renuncia de trabajador dependiente Chile con payroll interno. Otro
 ### Necesito recalcular un settlement aprobado
 
 Cancela el settlement con razon auditable y vuelve a calcular. No se sobrescribe el historico aprobado.
+
+### El documento no se puede renderizar por identidad legal
+
+Revisa `Datos legales` del trabajador. El PDF formal exige RUT/documento verificado desde el perfil legal canonico; no usa `organizations.tax_id` para personas naturales.
 
 ## Referencias tecnicas
 

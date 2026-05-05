@@ -13,9 +13,9 @@ import { PayrollValidationError, normalizeNullableString, toNumber } from '@/lib
 import {
   calculateFinalSettlement,
   type FinalSettlementCompensationSnapshot,
-  type FinalSettlementLeaveSnapshot,
-  type FinalSettlementPayrollOverlapSnapshot
+  type FinalSettlementLeaveSnapshot
 } from './calculator'
+import { readPayrollOverlapLedger } from './overlap-ledger'
 import type {
   CalculateFinalSettlementInput,
   FinalSettlement,
@@ -65,14 +65,6 @@ type LeaveBalanceRow = {
   adjustment_days: number | string
   used_days: number | string
   reserved_days: number | string
-}
-
-type PayrollOverlapRow = {
-  period_id: string
-  status: string | null
-  entry_id: string | null
-  uf_value: number | string | null
-  tax_table_version: string | null
 }
 
 const toDateString = (value: unknown): string | null => {
@@ -243,39 +235,17 @@ const getLeaveBalanceSnapshot = async (memberId: string, year: number) => {
   return rows[0] ? mapLeaveBalance(rows[0]) : null
 }
 
-const getPayrollOverlapSnapshot = async (memberId: string, lastWorkingDay: string): Promise<FinalSettlementPayrollOverlapSnapshot> => {
-  const year = Number(lastWorkingDay.slice(0, 4))
-  const month = Number(lastWorkingDay.slice(5, 7))
-  const periodId = `${year}-${String(month).padStart(2, '0')}`
-
-  const rows = await query<PayrollOverlapRow>(
-    `
-      SELECT
-        pp.period_id,
-        pp.status,
-        pe.entry_id,
-        pp.uf_value,
-        pp.tax_table_version
-      FROM greenhouse_payroll.payroll_periods pp
-      LEFT JOIN greenhouse_payroll.payroll_entries pe
-        ON pe.period_id = pp.period_id
-       AND pe.member_id = $1
-       AND COALESCE(pe.is_active, TRUE) = TRUE
-      WHERE pp.period_id = $2
-      LIMIT 1
-    `,
-    [memberId, periodId]
-  ).catch(() => [])
-
-  const row = rows[0]
+const getPayrollOverlapSnapshot = async (memberId: string, lastWorkingDay: string) => {
+  const ledger = await readPayrollOverlapLedger(memberId, lastWorkingDay)
 
   return {
-    covered: Boolean(row?.entry_id && row.status && ['calculated', 'approved', 'exported'].includes(row.status)),
-    periodId,
-    status: row?.status ?? null,
-    entryId: row?.entry_id ?? null,
-    ufValue: row?.uf_value == null ? null : toNumber(row.uf_value),
-    taxTableVersion: row?.tax_table_version ?? null
+    covered: ledger.coveredByMonthlyPayroll,
+    periodId: ledger.periodId,
+    status: ledger.periodStatus,
+    entryId: ledger.entryId,
+    ufValue: ledger.ufValue,
+    taxTableVersion: ledger.taxTableVersion,
+    ledger
   }
 }
 
@@ -597,6 +567,24 @@ export const approveFinalSettlementForCase = async ({
 
   if (current.readinessHasBlockers || current.breakdown.some(line => line.taxability === 'needs_review')) {
     throw new PayrollValidationError('Final settlement has readiness blockers.', 409, current.readiness)
+  }
+
+  const negativeNetWithoutEvidence =
+    current.netPayable < 0 &&
+    !current.breakdown.some(line =>
+      line.componentCode === 'authorized_deduction' &&
+      line.kind === 'deduction' &&
+      line.amount > 0 &&
+      line.evidence &&
+      Object.keys(line.evidence).length > 0
+    )
+
+  if (negativeNetWithoutEvidence) {
+    throw new PayrollValidationError('Negative final settlement net requires authorized deduction evidence.', 409, {
+      finalSettlementId: current.finalSettlementId,
+      netPayable: current.netPayable,
+      required: 'authorized_deduction.evidence'
+    })
   }
 
   if (!['calculated', 'reviewed'].includes(current.calculationStatus)) {

@@ -2,6 +2,14 @@
 
 ## 2026-05-05
 
+- **TASK-783 implementada — Payroll Final Settlement Policy + Overlap Hardening.** El finiquito Chile dependiente ahora calcula con policy por componente y ledger de overlap contra nomina mensual exportada.
+  - **Policy engine:** `src/lib/payroll/final-settlement/policies.ts` exige tratamiento legal/tributario/previsional por linea; `proportional_vacation` queda como no renta/no imponible y no dispara AFP/salud/AFC/IUSC.
+  - **Overlap ledger:** el settlement lee payroll mensual del periodo de termino y solo calcula deltas pendientes, evitando doble Isapre/AFP/AFC/IUSC cuando la nomina ya fue exportada.
+  - **Guards:** aprobacion/documento bloquean liquidos negativos sin `authorized_deduction` con evidencia y PDF formal exige identidad legal trabajador/empleador completa.
+  - **Roster cutoff:** payroll mensual excluye offboarding `executed` con `last_working_day < period_start`; la transicion a executed cierra elegibilidad futura en compensation versions.
+  - **UI/PDF:** `/hr/offboarding` distingue `Finiquito laboral`, `Cierre contractual`, `Cierre proveedor` y `Revision legal requerida`; honorarios/proveedor no muestran CTA laboral. El PDF adopta el mockup aprobado con logo, estado textual, tabla Concepto/Tratamiento/Evidencia/Monto y totales separados.
+  - **Remediacion runtime:** Valentina v1 fue cancelada con razon auditable y reemitida como v2 aprobada: gross `$121.963`, deductions `$0`, net `$121.963`. El render formal queda correctamente bloqueado hasta verificar RUT trabajador en Datos legales.
+
 - **TASK-784 implementada — Person Legal Profile + Identity Documents Foundation.** Greenhouse ahora tiene fuente canonica para identidad legal de personas naturales (RUT chileno + 23 tipos internacionales) y direcciones, separada de `organizations.tax_id` (que sigue siendo identidad tributaria de organizaciones para facturacion).
   - **Schema canonico:** 4 tablas nuevas en `greenhouse_core` (`person_identity_documents`, `person_addresses`, 2 audit logs append-only via trigger). Anclados a `identity_profiles.profile_id`. Partial UNIQUE para historial sin bloquear nuevas declaraciones.
   - **Modulo canonico:** `src/lib/person-legal-profile/` con normalize CL_RUT modulo-11, masking precomputado, reveal pattern TASK-697 (capability + reason ≥5 + audit + outbox), snapshots server-only para document generators (final_settlement, payroll_receipt, honorarios_closure, onboarding_contract), readiness gates para 5 use cases.

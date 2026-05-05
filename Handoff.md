@@ -1,5 +1,25 @@
 # Handoff.md
 
+## Sesion 2026-05-05 — TASK-783 implementada y Valentina remediada
+
+- **Branch:** `develop` por instruccion explicita del usuario. No se creo branch `task/*`.
+- **Skills:** `greenhouse-payroll-auditor` usado como criterio operativo para policy, overlap, gates de documento, honorarios/proveedor y remediacion.
+- **Slices entregados:** policy engine por componente (`src/lib/payroll/final-settlement/policies.ts`), `PayrollOverlapLedger`, deducciones sobre delta pendiente, guard de neto negativo autorizado, readiness documental con identidad legal, cutoff de elegibilidad payroll en offboarding ejecutado, UI lane-aware y PDF alineado al mockup aprobado `mockups/finiquito-document-v1/index.html`.
+- **Remediacion runtime:** settlement legacy de Valentina (`final-settlement-3e2ab951-27d2-4400-8196-c3296a3524f8`, v1, net `-40512`) cancelado con razon `TASK-783 remediation...`; nueva v2 aprobada `final-settlement-661a942b-9793-458a-9dbc-0b4fd4f7020e` con gross `121963`, deductions `0`, net `121963`, componente unico `proportional_vacation` (`non_income`, `not_contribution_base`).
+- **Documento Valentina:** render formal intentado y bloqueado correctamente por `worker_legal_identity_verified` hasta que exista RUT/documento verificado en Datos legales. No se forzo ni invento identidad personal.
+- **Validacion:** `pnpm exec eslint src/lib/payroll/final-settlement src/lib/workforce/offboarding src/views/greenhouse/hr-core/offboarding`; `pnpm exec tsc --noEmit --pretty false`; `pnpm exec vitest run src/lib/payroll/final-settlement src/lib/workforce/offboarding src/views/greenhouse/hr-core/offboarding --reporter=dot` (17 tests); `pnpm design:lint`; `pnpm pg:doctor`; `pnpm build`. Vitest emite un warning MSW ruidoso por un asset WASM interno de render PDF, pero la suite pasa y valida landmarks del mockup aprobado.
+- **Lifecycle:** `docs/tasks/complete/TASK-783-payroll-final-settlement-component-policy-overlap-hardening.md`; indice `docs/tasks/README.md` sincronizado como cerrada.
+- **Cuidado multi-agente:** el worktree ya traia cambios ajenos en `docs/tasks/to-do/TASK-785...`, `docs/tasks/to-do/TASK-786...` y `mockups/`; no revertirlos ni incluirlos en commit/PR de TASK-783 salvo los archivos de mockup como referencia ya existentes.
+
+## Sesion 2026-05-05 — TASK-783 tomada en develop (Discovery en curso)
+
+- **Branch:** `develop` por instruccion explicita del usuario; no se crea ni cambia a branch `task/*`.
+- **Ownership:** no hay PR abierto ni branch activa para `TASK-783`; se toma la task como `in-progress`.
+- **Lifecycle:** `to-do` -> `in-progress`; `Blocked by` pasa a `none` porque `TASK-784` ya esta completa y su reader canonico de identidad legal esta disponible.
+- **Skills:** `greenhouse-payroll-auditor` obligatoria para cada decision de formula/readiness/gates; se revalidaran los invariantes de regimen, overlap mensual, feriado proporcional, honorarios y frontera Deel/EOR.
+- **Guardrail:** worktree ya trae cambios ajenos en `TASK-785`, `TASK-786` y `mockups/`; no revertirlos ni mezclarlos con el alcance de `TASK-783`.
+- **Pendiente inmediato:** completar Discovery/Audit/Mapa/Plan antes de escribir runtime; por ser `P0` + `Effort Alto`, checkpoint humano aplica antes de FASE 5.
+
 ## Sesion 2026-05-05 — TASK-784 pepper PII provisionado en Secret Manager + staging verificado
 
 - **Branch:** `develop`; no se tocaron cambios no trackeados de HR/personas ni `mockups/`.

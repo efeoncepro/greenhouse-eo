@@ -68,8 +68,30 @@ const membersPayload = {
       memberId: 'valentina-hoyos',
       displayName: 'Valentina Hoyos',
       roleTitle: 'People Ops'
+    },
+    {
+      memberId: 'contractor-honorarios',
+      displayName: 'Consultor Honorarios',
+      roleTitle: 'Advisor'
     }
   ]
+}
+
+const honorariosCase = {
+  ...executedCase,
+  offboardingCaseId: 'offboarding-case-honorarios',
+  publicId: 'EO-OFF-2026-HON',
+  profileId: 'profile-honorarios',
+  memberId: 'contractor-honorarios',
+  userId: 'user-honorarios',
+  personLegalEntityRelationshipId: 'rel-honorarios',
+  relationshipType: 'contractor',
+  employmentType: 'contractor',
+  contractTypeSnapshot: 'honorarios',
+  payrollViaSnapshot: 'none',
+  ruleLane: 'non_payroll',
+  requiresPayrollClosure: false,
+  requiresLeaveReconciliation: false
 }
 
 describe('HrOffboardingView', () => {
@@ -81,7 +103,7 @@ describe('HrOffboardingView', () => {
       const url = String(input)
 
       if (url === '/api/hr/offboarding/cases?limit=200') {
-        return Response.json({ cases: [executedCase] })
+        return Response.json({ cases: [executedCase, honorariosCase] })
       }
 
       if (url === '/api/hr/core/members/options') {
@@ -93,6 +115,14 @@ describe('HrOffboardingView', () => {
       }
 
       if (url === '/api/hr/offboarding/cases/offboarding-case-valentina/final-settlement/document' && !init?.method) {
+        return Response.json({ document: null })
+      }
+
+      if (url === '/api/hr/offboarding/cases/offboarding-case-honorarios/final-settlement' && !init?.method) {
+        return Response.json({ settlement: null })
+      }
+
+      if (url === '/api/hr/offboarding/cases/offboarding-case-honorarios/final-settlement/document' && !init?.method) {
         return Response.json({ document: null })
       }
 
@@ -123,7 +153,7 @@ describe('HrOffboardingView', () => {
 
     expect(await screen.findByText('EO-OFF-2026-VAL')).toBeInTheDocument()
     expect(screen.getByText('Valentina Hoyos')).toBeInTheDocument()
-    expect(screen.getByText('Ejecutado')).toBeInTheDocument()
+    expect(screen.getAllByText('Ejecutado').length).toBeGreaterThan(0)
     expect(screen.getByText('Sin cálculo')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Renderizar doc.' })).toBeDisabled()
 
@@ -135,5 +165,17 @@ describe('HrOffboardingView', () => {
         expect.objectContaining({ method: 'POST' })
       )
     })
+  })
+
+  it('does not expose laboral finiquito actions for honorarios closures', async () => {
+    const { default: HrOffboardingView } = await import('./HrOffboardingView')
+
+    renderWithTheme(<HrOffboardingView />)
+
+    expect(await screen.findByText('EO-OFF-2026-HON')).toBeInTheDocument()
+    expect(screen.getAllByText('Cierre contractual').length).toBeGreaterThan(0)
+    expect(screen.getByText('Sin finiquito laboral')).toBeInTheDocument()
+    expect(screen.getByText(/Honorarios se cierra como relación contractual/)).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Revisar pago pendiente' })).toHaveAttribute('href', '/hr/payroll')
   })
 })

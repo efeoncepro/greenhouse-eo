@@ -16,6 +16,8 @@ import type {
   FinalSettlementSourceSnapshot,
   FinalSettlementTotals
 } from './types'
+import type { PayrollOverlapLedger } from './overlap-ledger'
+import { assertFinalSettlementPolicies, withFinalSettlementPolicy } from './policies'
 
 export interface FinalSettlementCompensationSnapshot {
   versionId: string
@@ -62,6 +64,7 @@ export interface FinalSettlementPayrollOverlapSnapshot {
   entryId: string | null
   ufValue: number | null
   taxTableVersion: string | null
+  ledger?: PayrollOverlapLedger
 }
 
 export interface FinalSettlementCalculationContext {
@@ -76,6 +79,7 @@ export interface FinalSettlementCalculationContext {
     label: string
     amount: number
     sourceRef: Record<string, unknown>
+    reason?: string
   }>
 }
 
@@ -243,7 +247,7 @@ export const buildFinalSettlementReadiness = (context: FinalSettlementCalculatio
     code: 'payroll_period_overlap_checked',
     status: 'passed',
     message: 'Se reviso si el periodo mensual del ultimo dia trabajado ya cubre remuneracion.',
-    evidence: { ...payrollOverlap }
+    evidence: payrollOverlap.ledger ? { ...payrollOverlap.ledger } : { ...payrollOverlap }
   }))
 
   checks.push(buildCheck({
@@ -296,8 +300,9 @@ export const calculateFinalSettlement = async (context: FinalSettlementCalculati
   }
 
   const daysInMonth = getDaysInMonth(offboardingCase.lastWorkingDay)
-  const payableDays = payrollOverlap.covered ? 0 : getDayOfMonth(offboardingCase.lastWorkingDay)
-  const prorationFactor = payrollOverlap.covered ? 0 : roundTwo(payableDays / daysInMonth)
+  const monthlyPayrollCoversPeriod = payrollOverlap.ledger?.coveredByMonthlyPayroll ?? payrollOverlap.covered
+  const payableDays = monthlyPayrollCoversPeriod ? 0 : getDayOfMonth(offboardingCase.lastWorkingDay)
+  const prorationFactor = monthlyPayrollCoversPeriod ? 0 : roundTwo(payableDays / daysInMonth)
   const countryCode = offboardingCase.countryCode ?? 'CL'
 
   const pendingBaseSalary = roundCurrency(compensation.baseSalary * prorationFactor)
@@ -389,18 +394,21 @@ export const calculateFinalSettlement = async (context: FinalSettlementCalculati
   const vacationAmount = roundCurrency(vacationCalendar.calendarDays * dailyVacationBase)
   const manualDeductions = context.manualDeductions ?? []
 
+  const statutoryDeductionAmount = pendingBaseSalary + pendingFixedBonus > 0
+    ? payrollTotals.chileTotalDeductions ?? 0
+    : 0
+
   const breakdown: FinalSettlementBreakdownLine[] = [
-    {
+    withFinalSettlementPolicy({
       componentCode: 'pending_salary',
       label: 'Remuneracion pendiente',
       kind: 'earning' as const,
       amount: pendingBaseSalary,
       basis: { payableDays, daysInMonth, prorationFactor, monthlyBaseSalary: compensation.baseSalary },
       formulaRef: 'cl.final_settlement.pending_salary.v1',
-      sourceRef: { ...payrollOverlap },
-      taxability: 'taxable_imponible' as const
-    },
-    {
+      sourceRef: payrollOverlap.ledger ? { payrollOverlapLedger: payrollOverlap.ledger } : { ...payrollOverlap }
+    }),
+    withFinalSettlementPolicy({
       componentCode: 'pending_fixed_allowances',
       label: 'Haberes fijos proporcionales',
       kind: 'earning' as const,
@@ -413,10 +421,10 @@ export const calculateFinalSettlement = async (context: FinalSettlementCalculati
         prorationFactor
       },
       formulaRef: 'cl.final_settlement.pending_fixed_allowances.v1',
-      sourceRef: { compensationVersionId: compensation.versionId, payrollOverlap },
-      taxability: 'taxable_non_imponible' as const
-    },
-    {
+      sourceRef: { compensationVersionId: compensation.versionId, payrollOverlapLedger: payrollOverlap.ledger ?? payrollOverlap },
+      taxability: pendingFixedBonus > 0 ? undefined : 'taxable_non_imponible'
+    }),
+    withFinalSettlementPolicy({
       componentCode: 'proportional_vacation',
       label: 'Feriado proporcional o pendiente',
       kind: 'earning' as const,
@@ -429,13 +437,16 @@ export const calculateFinalSettlement = async (context: FinalSettlementCalculati
       },
       formulaRef: 'cl.final_settlement.proportional_vacation.dt.v1',
       sourceRef: { leaveBalanceId: leaveBalance.balanceId, dtUrl: 'https://www.dt.gob.cl/portal/1628/w3-article-60200.html' },
-      taxability: 'taxable_imponible' as const
-    },
-    {
+      evidence: {
+        siiUrl: 'https://www.sii.cl/preguntas_frecuentes/declaracion_renta/001_140_5683.htm',
+        treatment: 'Ingreso no renta por vacaciones indemnizadas en finiquito.'
+      }
+    }),
+    withFinalSettlementPolicy({
       componentCode: 'statutory_deductions',
       label: 'Descuentos legales remuneraciones finales',
       kind: 'deduction' as const,
-      amount: payrollTotals.chileTotalDeductions ?? 0,
+      amount: statutoryDeductionAmount,
       basis: {
         afp: payrollTotals.chileAfpAmount,
         health: payrollTotals.chileHealthAmount,
@@ -447,25 +458,34 @@ export const calculateFinalSettlement = async (context: FinalSettlementCalculati
         taxComputed: tax.computed
       },
       formulaRef: 'cl.payroll.dependent.statutory_deductions.v1',
-      sourceRef: { compensationVersionId: compensation.versionId, taxTableVersion },
-      taxability: 'deduction_statutory' as const
-    },
-    ...manualDeductions.map(deduction => ({
-      componentCode: deduction.componentCode,
+      sourceRef: {
+        compensationVersionId: compensation.versionId,
+        taxTableVersion,
+        payrollOverlapLedger: payrollOverlap.ledger ?? payrollOverlap,
+        deductionBase: 'pending_taxable_remuneration_delta_only'
+      }
+    }),
+    ...manualDeductions.map(deduction => withFinalSettlementPolicy({
+      componentCode: 'authorized_deduction',
       label: deduction.label,
       kind: 'deduction' as const,
       amount: roundCurrency(deduction.amount),
-      basis: { manual: true },
+      basis: { manual: true, requestedComponentCode: deduction.componentCode },
       formulaRef: 'cl.final_settlement.authorized_deduction.v1',
       sourceRef: deduction.sourceRef,
-      taxability: 'deduction_authorized' as const
+      evidence: {
+        reason: deduction.reason ?? 'authorized_deduction',
+        sourceRef: deduction.sourceRef
+      }
     }))
   ].filter(line => line.amount !== 0)
+
+  assertFinalSettlementPolicies(breakdown)
 
   const totals = buildTotals(breakdown)
 
   const sourceSnapshot: FinalSettlementSourceSnapshot = {
-    schemaVersion: 1,
+    schemaVersion: 2,
     offboardingCaseId: offboardingCase.offboardingCaseId,
     memberId: offboardingCase.memberId ?? compensation.memberId,
     profileId: offboardingCase.profileId,
@@ -480,7 +500,8 @@ export const calculateFinalSettlement = async (context: FinalSettlementCalculati
     separationType: 'resignation',
     contractType: compensation.contractType,
     payRegime: 'chile',
-    payrollVia: 'internal'
+    payrollVia: 'internal',
+    payrollOverlapLedger: payrollOverlap.ledger as unknown as Record<string, unknown> | undefined
   }
 
   return {

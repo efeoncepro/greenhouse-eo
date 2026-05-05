@@ -871,7 +871,15 @@ export const pgGetApplicableCompensationVersionsForPeriod = async (periodStart: 
         ON cv.member_id = m.member_id
        AND cv.effective_from <= $2::date
        AND (cv.effective_to IS NULL OR cv.effective_to >= $1::date)
-          WHERE m.active = TRUE
+      WHERE m.active = TRUE
+        AND NOT EXISTS (
+          SELECT 1
+          FROM greenhouse_hr.work_relationship_offboarding_cases AS oc
+          WHERE oc.member_id = m.member_id
+            AND oc.status = 'executed'
+            AND oc.last_working_day IS NOT NULL
+            AND oc.last_working_day < $1::date
+        )
       ORDER BY m.member_id, cv.effective_from DESC, cv.version DESC
     `,
     [periodStart, periodEnd]
