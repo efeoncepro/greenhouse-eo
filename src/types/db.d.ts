@@ -2298,6 +2298,119 @@ export interface GreenhouseCorePermissionSets {
   view_codes: Generated<string[]>;
 }
 
+export interface GreenhouseCorePersonAddressAuditLog {
+  action: string;
+  actor_email: string | null;
+  actor_user_id: string | null;
+  address_id: string;
+  audit_id: string;
+  created_at: Generated<Timestamp>;
+  diff_json: Generated<Json>;
+  ip_address: string | null;
+  profile_id: string;
+  reason: string | null;
+  user_agent: string | null;
+}
+
+export interface GreenhouseCorePersonAddresses {
+  address_id: string;
+  address_type: string;
+  archived_at: Timestamp | null;
+  city: string;
+  country_code: string;
+  created_at: Generated<Timestamp>;
+  declared_at: Generated<Timestamp>;
+  declared_by_user_id: string | null;
+  evidence_asset_id: string | null;
+  notes: string | null;
+  postal_code: string | null;
+  /**
+   * Version enmascarada para display default (ej. "Las Condes, RM, CL"). NUNCA expone street_line_1 al render default.
+   */
+  presentation_mask: string;
+  /**
+   * Version completa formateada para snapshots autorizados (final_settlement, payroll_receipt). Reveal con capability + audit.
+   */
+  presentation_text: string;
+  profile_id: string;
+  region: string | null;
+  rejected_at: Timestamp | null;
+  rejected_by_user_id: string | null;
+  rejected_reason: string | null;
+  source: string;
+  street_line_1: string;
+  street_line_2: string | null;
+  updated_at: Generated<Timestamp>;
+  valid_from: Timestamp | null;
+  valid_until: Timestamp | null;
+  verification_status: Generated<string>;
+  verified_at: Timestamp | null;
+  verified_by_user_id: string | null;
+}
+
+export interface GreenhouseCorePersonIdentityDocumentAuditLog {
+  action: string;
+  actor_email: string | null;
+  actor_user_id: string | null;
+  audit_id: string;
+  created_at: Generated<Timestamp>;
+  diff_json: Generated<Json>;
+  document_id: string;
+  ip_address: string | null;
+  profile_id: string;
+  reason: string | null;
+  user_agent: string | null;
+}
+
+export interface GreenhouseCorePersonIdentityDocuments {
+  archived_at: Timestamp | null;
+  country_code: string;
+  created_at: Generated<Timestamp>;
+  declared_at: Generated<Timestamp>;
+  declared_by_user_id: string | null;
+  /**
+   * Mascara legible (e.g. "xx.xxx.678-K"). Precomputada al write. Default reader expone esta — NUNCA value_full.
+   */
+  display_mask: string;
+  document_id: string;
+  document_type: string;
+  evidence_asset_id: string | null;
+  issuing_country: string | null;
+  notes: string | null;
+  /**
+   * FK identity_profiles.profile_id (Person 360 root). RESTRICT on delete — un profile con documentos no se borra; archivar via verification_status.
+   */
+  profile_id: string;
+  rejected_at: Timestamp | null;
+  rejected_by_user_id: string | null;
+  rejected_reason: string | null;
+  /**
+   * self_declared (colaborador via /my/profile) | hr_declared (HR cargo) | legacy_bigquery_member_profile (backfill TASK-784 Slice 6) | migration (data migration) | automated_provider (futuro: Registro Civil, etc.).
+   */
+  source: string;
+  updated_at: Generated<Timestamp>;
+  valid_from: Timestamp | null;
+  valid_until: Timestamp | null;
+  /**
+   * Valor completo del documento. Plaintext at rest. Solo lectura via reveal capability + audit. Cloud SQL cifra a nivel disco; grants estrictos limitan acceso a `greenhouse_runtime`.
+   */
+  value_full: string;
+  /**
+   * SHA-256 de pepper||value_normalized. Pepper desde GCP Secret Manager `greenhouse-pii-normalization-pepper`. Sin pepper, hash es trivialmente reversible para RUTs cortos.
+   */
+  value_hash: string;
+  /**
+   * Valor normalizado (sin puntos/guiones, uppercase para letras). Usado para hash + dedup interno.
+   */
+  value_normalized: string;
+  /**
+   * pending_review (default self/hr declared) -> verified (HR verifico) | rejected (HR rechazo, requiere reason) | archived (operador retira) | expired (post valid_until).
+   */
+  verification_status: Generated<string>;
+  verified_at: Timestamp | null;
+  verified_by_user_id: string | null;
+}
+
 export interface GreenhouseCorePersonLegalEntityRelationships {
   created_at: Generated<Timestamp>;
   created_by_user_id: string | null;
@@ -8294,6 +8407,10 @@ export interface DB {
   "greenhouse_core.organization_lifecycle_history": GreenhouseCoreOrganizationLifecycleHistory;
   "greenhouse_core.organizations": GreenhouseCoreOrganizations;
   "greenhouse_core.permission_sets": GreenhouseCorePermissionSets;
+  "greenhouse_core.person_address_audit_log": GreenhouseCorePersonAddressAuditLog;
+  "greenhouse_core.person_addresses": GreenhouseCorePersonAddresses;
+  "greenhouse_core.person_identity_document_audit_log": GreenhouseCorePersonIdentityDocumentAuditLog;
+  "greenhouse_core.person_identity_documents": GreenhouseCorePersonIdentityDocuments;
   "greenhouse_core.person_legal_entity_relationships": GreenhouseCorePersonLegalEntityRelationships;
   "greenhouse_core.person_memberships": GreenhouseCorePersonMemberships;
   "greenhouse_core.providers": GreenhouseCoreProviders;
