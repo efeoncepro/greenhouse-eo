@@ -156,6 +156,7 @@ describe('renderFinalSettlementDocumentPdf', () => {
     expect(text).not.toContain('Policy')
     expect(text).not.toContain('Evidencia estructurada')
     expect(text).not.toContain('Sin descuentos previsionales pendientes')
+    expect(text).not.toContain('Monto líquido calculado en esta versión')
     expect(text).toContain('Documento confidencial')
     expect(text.toLocaleLowerCase('es-CL')).toContain('líquido / pago neto')
   })

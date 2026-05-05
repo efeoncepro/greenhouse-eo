@@ -119,11 +119,13 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins Bold',
     color: '#023C70',
     fontSize: 16,
-    marginBottom: 3
+    lineHeight: 1.15,
+    marginBottom: 8
   },
   netHelp: {
     color: '#667085',
-    fontSize: 7
+    fontSize: 7,
+    lineHeight: 1.35
   },
   section: {
     marginBottom: 8
@@ -449,7 +451,7 @@ const FinalSettlementPdfDocument = ({ snapshot }: { snapshot: FinalSettlementDoc
     ? 'Monto negativo: requiere regularización antes de firma.'
     : snapshot.finalSettlement.deductionTotal > 0
       ? 'Incluye descuentos o retenciones detallados abajo.'
-      : 'Monto líquido calculado en esta versión.'
+      : null
 
   return (
     <Document
@@ -485,7 +487,7 @@ const FinalSettlementPdfDocument = ({ snapshot }: { snapshot: FinalSettlementDoc
           <View style={styles.netBox}>
             <Text style={styles.netLabel}>Líquido a pagar</Text>
             <Text style={styles.netAmount}>{formatCurrency(snapshot.finalSettlement.netPayable)}</Text>
-            <Text style={styles.netHelp}>{netHelp}</Text>
+            {netHelp ? <Text style={styles.netHelp}>{netHelp}</Text> : null}
           </View>
         </View>
 

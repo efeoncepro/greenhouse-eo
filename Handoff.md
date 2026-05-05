@@ -1,5 +1,15 @@
 # Handoff.md
 
+## Sesion 2026-05-05 — Finiquito PDF net summary layout polish
+
+- **Branch:** `develop`; ajuste acotado al renderer/test de finiquito PDF.
+- **Trigger:** el PDF reemitido ya traia la redaccion corregida, pero el helper de la caja `Liquido a pagar` se montaba visualmente sobre el monto en Adobe/Chrome PDF viewer.
+- **Causa raiz:** el helper del net summary se renderizaba siempre, incluso en el estado normal sin descuentos/retenciones. En PDF la caja compacta no garantizaba suficiente separacion vertical entre un monto grande y texto auxiliar multilinea.
+- **Fix UI/UX:** la caja principal queda como KPI limpio (`Líquido a pagar` + monto). El helper solo aparece cuando aporta una decision accionable: monto negativo o descuentos/retenciones. Se agrego line-height/margen explicito al monto para robustecer el layout cuando el helper si exista.
+- **Guardrail:** `document-pdf.test.tsx` verifica que el caso normal ya no emite el helper `Monto líquido calculado en esta versión`.
+- **Validacion:** `pnpm exec vitest run src/lib/payroll/final-settlement/document-pdf.test.tsx --reporter=verbose` OK; `pnpm exec eslint src/lib/payroll/final-settlement/document-pdf.tsx src/lib/payroll/final-settlement/document-pdf.test.tsx` OK; `pnpm exec tsc --noEmit --pretty false` OK; `pnpm design:lint` OK 0 errors / 0 warnings. Render visual local generado con `renderFinalSettlementDocumentPdf` + `pdftoppm` confirma que el monto ya no queda montado.
+- **Pendiente:** commit/push/deploy y reemitir el PDF para generar un asset nuevo con la composicion corregida.
+
 ## Sesion 2026-05-05 — Finiquito document version contract hardening
 
 - **Branch:** `develop`; fix listo para commit/push acotado a finiquitos.
