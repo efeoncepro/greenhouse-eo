@@ -141,13 +141,10 @@ const formatDate = (d: string | null) => {
   return new Date(d).toLocaleDateString('es-CL', { day: '2-digit', month: 'short', year: 'numeric' })
 }
 
-const isDeelRail = (order: PaymentOrderWithLines | null) =>
-  order?.processorSlug === 'deel' || order?.paymentMethod === 'deel'
-
 const canUseAsSourceInstrument = (account: BankAccountOption, order: PaymentOrderWithLines | null) => {
   if (!account.isActive) return false
   if (account.instrumentCategory === 'payroll_processor') return false
-  if (isDeelRail(order) && account.providerSlug === 'deel') return false
+  if (account.providerSlug === 'deel') return false
 
   return !order || account.currency === order.currency || account.instrumentCategory === 'credit_card' || account.providerSlug === 'global66'
 }

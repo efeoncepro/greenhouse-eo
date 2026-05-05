@@ -98,6 +98,19 @@ describe('resolvePaymentOrderSourcePolicy', () => {
     } satisfies Partial<PaymentOrderValidationError>)
   })
 
+  it('rejects Deel as source instrument even when the order was created with a legacy generic rail', async () => {
+    await expect(
+      resolvePaymentOrderSourcePolicy(makeClient(), {
+        processorSlug: null,
+        paymentMethod: 'bank_transfer',
+        currency: 'CLP',
+        sourceAccountId: 'deel-clp'
+      })
+    ).rejects.toMatchObject({
+      code: 'processor_cannot_be_source_account'
+    } satisfies Partial<PaymentOrderValidationError>)
+  })
+
   it('allows Global66 active fintech as source instrument', async () => {
     const result = await resolvePaymentOrderSourcePolicy(makeClient(), {
       processorSlug: 'global66',

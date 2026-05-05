@@ -81,10 +81,7 @@ const findFirstActiveAccount = async (
   return result.rows[0] ?? null
 }
 
-const assertAccountCanSettleOrder = (
-  account: AccountPolicyRow,
-  context: PaymentOrderSourcePolicyContext
-) => {
+const assertAccountCanSettleOrder = (account: AccountPolicyRow) => {
   if (!account.is_active) {
     throw new PaymentOrderValidationError(
       `El instrumento ${account.account_id} no esta activo.`,
@@ -93,7 +90,7 @@ const assertAccountCanSettleOrder = (
     )
   }
 
-  if (isDeelRail(context) && normalize(account.provider_slug) === 'deel') {
+  if (normalize(account.provider_slug) === 'deel') {
     throw new PaymentOrderValidationError(
       'Deel opera como processor/rail en esta orden, no como instrumento financiero de salida. Selecciona la TC o cuenta real que financia el cargo.',
       'processor_cannot_be_source_account',
@@ -145,7 +142,7 @@ export const resolvePaymentOrderSourcePolicy = async (
       )
     }
 
-    assertAccountCanSettleOrder(account, context)
+    assertAccountCanSettleOrder(account)
 
     return buildResolution(context, account, 'explicit_source_account')
   }
@@ -158,7 +155,7 @@ export const resolvePaymentOrderSourcePolicy = async (
     )
 
     if (account) {
-      assertAccountCanSettleOrder(account, context)
+      assertAccountCanSettleOrder(account)
 
       return buildResolution(context, account, 'default_deel_corporate_card')
     }
@@ -178,7 +175,7 @@ export const resolvePaymentOrderSourcePolicy = async (
     )
 
     if (fallback) {
-      assertAccountCanSettleOrder(fallback, context)
+      assertAccountCanSettleOrder(fallback)
 
       return buildResolution(context, fallback, preferred ? 'default_global66_same_currency' : 'default_global66_active_account')
     }
