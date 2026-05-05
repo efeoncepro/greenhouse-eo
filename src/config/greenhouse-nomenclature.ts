@@ -117,6 +117,7 @@ export const GH_MY_NAV = {
   delivery: { label: 'Mi Delivery', subtitle: 'Tareas, proyectos y CRM' },
   profile: { label: 'Mi Perfil', subtitle: 'Identidad y datos personales' },
   payroll: { label: 'Mi Nómina', subtitle: 'Liquidaciones y compensación' },
+  paymentProfile: { label: 'Mi Cuenta de Pago', subtitle: 'Donde recibes tus pagos' },
   leave: { label: 'Mis Permisos', subtitle: 'Saldos y solicitudes' },
   goals: { label: 'Mis Objetivos', subtitle: 'OKRs y key results del ciclo' },
   evaluations: { label: 'Mis Evaluaciones', subtitle: 'Feedback 360 y resultados' },

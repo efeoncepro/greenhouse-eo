@@ -501,6 +501,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           { label: nl(GH_MY_NAV.delivery), href: '/my/delivery', icon: 'tabler-list-check' },
           { label: nl(GH_MY_NAV.profile), href: '/my/profile', icon: 'tabler-user-circle' },
           { label: nl(GH_MY_NAV.payroll), href: '/my/payroll', icon: 'tabler-receipt' },
+          { label: nl(GH_MY_NAV.paymentProfile), href: '/my/payment-profile', icon: 'tabler-credit-card' },
           { label: nl(GH_MY_NAV.leave), href: '/my/leave', icon: 'tabler-calendar-event' },
           { label: nl(GH_MY_NAV.goals), href: '/my/goals', icon: 'tabler-target' },
           { label: nl(GH_MY_NAV.evaluations), href: '/my/evaluations', icon: 'tabler-clipboard-check' },
@@ -511,6 +512,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           if (item.href === '/my/delivery') return canSeeView('mi_ficha.mi_delivery', true)
           if (item.href === '/my/profile') return canSeeView('mi_ficha.mi_perfil', true)
           if (item.href === '/my/payroll') return canSeeView('mi_ficha.mi_nomina', true)
+          if (item.href === '/my/payment-profile') return canSeeView('mi_ficha.mi_cuenta_pago', true)
           if (item.href === '/my/leave') return canSeeView('mi_ficha.mis_permisos', true)
           if (item.href === '/my/goals') return canSeeView('mi_ficha.mis_objetivos', true)
           if (item.href === '/my/evaluations') return canSeeView('mi_ficha.mis_evaluaciones', true)
@@ -600,6 +602,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           { label: nl(GH_MY_NAV.delivery), href: '/my/delivery', icon: 'tabler-list-check' },
           { label: nl(GH_MY_NAV.profile), href: '/my/profile', icon: 'tabler-user-circle' },
           { label: nl(GH_MY_NAV.payroll), href: '/my/payroll', icon: 'tabler-receipt' },
+          { label: nl(GH_MY_NAV.paymentProfile), href: '/my/payment-profile', icon: 'tabler-credit-card' },
           { label: nl(GH_MY_NAV.leave), href: '/my/leave', icon: 'tabler-calendar-event' },
           { label: nl(GH_MY_NAV.goals), href: '/my/goals', icon: 'tabler-target' },
           { label: nl(GH_MY_NAV.evaluations), href: '/my/evaluations', icon: 'tabler-clipboard-check' },
@@ -610,6 +613,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           if (item.href === '/my/delivery') return canSeeView('mi_ficha.mi_delivery', true)
           if (item.href === '/my/profile') return canSeeView('mi_ficha.mi_perfil', true)
           if (item.href === '/my/payroll') return canSeeView('mi_ficha.mi_nomina', true)
+          if (item.href === '/my/payment-profile') return canSeeView('mi_ficha.mi_cuenta_pago', true)
           if (item.href === '/my/leave') return canSeeView('mi_ficha.mis_permisos', true)
           if (item.href === '/my/goals') return canSeeView('mi_ficha.mis_objetivos', true)
           if (item.href === '/my/evaluations') return canSeeView('mi_ficha.mis_evaluaciones', true)

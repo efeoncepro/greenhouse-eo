@@ -22,6 +22,7 @@ import ConnectionsTab from './my-profile/tabs/ConnectionsTab'
 import SecurityTab from './my-profile/tabs/SecurityTab'
 import SkillsCertificationsTab from './my-profile/tabs/SkillsCertificationsTab'
 import LegalProfileTab from './my-profile/tabs/LegalProfileTab'
+import MyPaymentProfileView from './MyPaymentProfileView'
 
 // ── Helpers ──
 
@@ -308,6 +309,12 @@ const MyProfileView = () => {
               iconPosition='start'
             />
             <Tab
+              icon={<i className='tabler-credit-card' />}
+              value='payment'
+              label='Cuenta de pago'
+              iconPosition='start'
+            />
+            <Tab
               icon={<i className='tabler-lock' />}
               value='security'
               label='Seguridad'
@@ -341,6 +348,13 @@ const MyProfileView = () => {
           </TabPanel>
           <TabPanel value='legal' className='p-0 pbs-6'>
             <LegalProfileTab />
+          </TabPanel>
+          <TabPanel value='payment' className='p-0 pbs-6'>
+            {/* TASK-753 — Mismo componente canonico que renderiza /my/payment-profile.
+                Single source of truth: ambas surfaces consumen MyPaymentProfileView,
+                que es data-driven (fetcha su propio /api/my/payment-profile + context).
+                Cero duplicacion logica; doble entrypoint para discoverability. */}
+            <MyPaymentProfileView />
           </TabPanel>
           <TabPanel value='security' className='p-0 pbs-6'>
             <SecurityTab />
