@@ -22749,3 +22749,26 @@ Pendiente operativo:
 
 - Commit/push y despliegue posterior a esta correccion.
 - Para ver el PDF corregido en el caso real de Valentina, el documento debe regenerarse/reemitirse luego de que el commit quede desplegado; el asset PDF antiguo no cambia retroactivamente.
+
+Actualizacion posterior de auditoria UI/UX/Payroll:
+
+- Se revisaron las marcas visuales señaladas en el PDF regenerado. Hallazgos principales:
+  - el monto liquido no debe afirmar "Sin descuentos previsionales pendientes", porque el PDF no es certificado previsional;
+  - `Policy ...`, `Evidencia estructurada` e `internal payroll` son trazabilidad interna y no deben exponerse en un documento firmable;
+  - `Declaracion operativa` mezclaba lenguaje de sistema con una constancia que debe ser entendible por empleador/trabajador;
+  - `Requiere revision` como copy externo era impreciso para el destinatario; debe expresarse como revision interna o bloqueo para firma.
+- Fix aplicado en `document-pdf.tsx`:
+  - readiness visible: `Listo para firma`, `Revision interna requerida`, `Bloqueado para firma`;
+  - `internal payroll` -> `nomina interna`;
+  - columna `Evidencia` -> `Respaldo`;
+  - se elimina `Policy` visible y se reemplaza por descripciones humanas por componente;
+  - net box usa `Monto liquido calculado en esta version`;
+  - declaracion final cambia a `Constancia para firma y ratificacion`, alineada a firma/ratificacion ante ministro de fe y reserva de derechos.
+- Tests actualizados para bloquear regresiones de copy interno (`Policy`, `internal payroll`, `Evidencia estructurada`, `Sin descuentos previsionales pendientes`).
+
+Validaciones adicionales:
+
+- `pnpm exec vitest run src/lib/payroll/final-settlement/document-pdf.test.tsx --reporter=verbose` -> pass.
+- `pnpm exec eslint src/lib/payroll/final-settlement/document-pdf.tsx src/lib/payroll/final-settlement/document-pdf.test.tsx` -> pass.
+- `pnpm exec tsc --noEmit --pretty false` -> pass.
+- `pnpm design:lint` -> 0 errors / 0 warnings.

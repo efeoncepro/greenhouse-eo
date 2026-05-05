@@ -7997,6 +7997,7 @@ Comando operativo:
 
 - HR / Offboarding: se endureció el contrato de documentos de finiquito versionados. Los PDFs de settlements cancelados quedan como evidencia histórica descargable, pero ya no habilitan `Reemitir`, revisión ni emisión sobre el settlement vigente; el flujo ofrece generar el documento vigente y el backend ancla todas las acciones documentales al settlement aprobado actual.
 - HR / Payroll: el PDF de finiquito ahora usa readiness documental para el estado visible de emisión, no warnings operacionales del cálculo. Esto evita falsos `Requiere revisión`, mantiene la maqueta aprobada en una página Letter y conserva numeración real `Página X de Y`.
+- HR / Payroll: se saneó el copy del PDF de finiquito para separar trazabilidad interna de documento firmable. El PDF ya no expone `Policy`, `internal payroll`, `Evidencia estructurada` ni afirma ausencia de descuentos previsionales pendientes desde el monto líquido; usa lenguaje de respaldo, nómina interna y constancia para firma/ratificación.
 
 # 2026-05-04
 

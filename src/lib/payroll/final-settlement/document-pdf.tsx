@@ -351,8 +351,8 @@ const Field = ({ label, value }: { label: string; value: string | number | null 
 
 const legalTreatmentLabel: Record<string, string> = {
   remuneration: 'Remuneración',
-  legal_indemnity: 'Indemnización legal',
-  authorized_deduction: 'Deducción autorizada',
+  legal_indemnity: 'Compensación legal',
+  authorized_deduction: 'Descuento autorizado',
   informational: 'Informativo'
 }
 
@@ -371,9 +371,9 @@ const previsionalTreatmentLabel: Record<string, string> = {
 }
 
 const readinessLabel: Record<string, string> = {
-  ready: 'Listo para emitir',
-  needs_review: 'Requiere revisión',
-  blocked: 'Bloqueado'
+  ready: 'Listo para firma',
+  needs_review: 'Revisión interna requerida',
+  blocked: 'Bloqueado para firma'
 }
 
 const readinessPillStyle = (status: keyof typeof readinessLabel) => {
@@ -388,18 +388,39 @@ const separationTypeLabel: Record<string, string> = {
 }
 
 const payrollViaLabel: Record<string, string> = {
-  internal: 'internal payroll'
+  internal: 'nómina interna'
 }
 
 const readableEvidence = (evidence: Record<string, unknown> | undefined) => {
-  if (!evidence) return 'Evidencia no adjunta'
+  if (!evidence) return 'Respaldo pendiente'
+
+  if (evidence.coveredByMonthlyPayroll === true) {
+    return 'Remuneración mensual conciliada'
+  }
 
   const source = typeof evidence.source === 'string' ? evidence.source : null
   const label = typeof evidence.label === 'string' ? evidence.label : null
-  const code = typeof evidence.code === 'string' ? evidence.code : null
   const reason = typeof evidence.reason === 'string' ? evidence.reason : null
 
-  return label ?? reason ?? source ?? code ?? 'Evidencia estructurada'
+  if (label) return label
+  if (reason) return reason
+
+  return source ? 'Respaldo documentado' : 'Respaldo estructurado'
+}
+
+const lineBasisLabel = (line: FinalSettlementDocumentSnapshot['breakdown'][number]) => {
+  const labelByComponent: Record<string, string> = {
+    pending_salary: 'Remuneración pendiente de pago',
+    pending_fixed_allowances: 'Asignaciones pendientes',
+    monthly_gratification_due: 'Gratificación pendiente',
+    proportional_vacation: 'Compensación por feriado proporcional',
+    used_or_advanced_vacation_adjustment: 'Ajuste de feriado usado o anticipado',
+    statutory_deductions: 'Descuento legal o retención',
+    authorized_deduction: 'Descuento autorizado con respaldo',
+    payroll_overlap_adjustment: 'Ajuste para evitar duplicidad de pago'
+  }
+
+  return labelByComponent[line.componentCode] ?? 'Concepto respaldado por cálculo versionado'
 }
 
 const lineTreatmentTags = (line: FinalSettlementDocumentSnapshot['breakdown'][number]) => {
@@ -425,10 +446,10 @@ const FinalSettlementPdfDocument = ({ snapshot }: { snapshot: FinalSettlementDoc
   const regime = `${snapshot.finalSettlement.payRegimeSnapshot === 'chile' ? 'Chile dependiente' : snapshot.finalSettlement.payRegimeSnapshot} · ${payrollViaLabel[snapshot.finalSettlement.payrollViaSnapshot] ?? snapshot.finalSettlement.payrollViaSnapshot}`
 
   const netHelp = snapshot.finalSettlement.netPayable < 0
-    ? 'Líquido negativo: requiere deducción autorizada o reemisión.'
+    ? 'Monto negativo: requiere regularización antes de firma.'
     : snapshot.finalSettlement.deductionTotal > 0
-      ? 'Incluye descuentos / retenciones autorizadas.'
-      : 'Sin descuentos previsionales pendientes.'
+      ? 'Incluye descuentos o retenciones detallados abajo.'
+      : 'Monto líquido calculado en esta versión.'
 
   return (
     <Document
@@ -457,8 +478,8 @@ const FinalSettlementPdfDocument = ({ snapshot }: { snapshot: FinalSettlementDoc
           <View style={styles.titleCopy}>
             <Text style={styles.title}>Finiquito de contrato de trabajo</Text>
             <Text style={styles.subtitle}>
-              Propuesta de finiquito para relación laboral dependiente en Chile. La emisión queda sujeta a ratificación externa,
-              firma y evidencia de cotizaciones cuando corresponda.
+              Proyecto de finiquito para relación laboral dependiente en Chile. Su validez queda sujeta a firma o ratificación
+              ante ministro de fe cuando corresponda.
             </Text>
           </View>
           <View style={styles.netBox}>
@@ -488,23 +509,23 @@ const FinalSettlementPdfDocument = ({ snapshot }: { snapshot: FinalSettlementDoc
             <Field label='Fecha término' value={formatDate(snapshot.finalSettlement.effectiveDate)} />
             <Field label='Causal' value={separationTypeLabel[snapshot.finalSettlement.separationType] ?? snapshot.finalSettlement.separationType} />
             <Field label='Régimen' value={regime} />
-            <Field label='Pago mensual usado como evidencia' value={readableEvidence(snapshot.sourceSnapshot.payrollOverlapLedger)} />
+            <Field label='Respaldo de remuneración mensual' value={readableEvidence(snapshot.sourceSnapshot.payrollOverlapLedger)} />
           </View>
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Detalle auditable de haberes y descuentos</Text>
+          <Text style={styles.sectionTitle}>Detalle de haberes, descuentos y retenciones</Text>
           <View style={styles.tableHeader}>
             <Text style={styles.conceptCell}>Concepto</Text>
             <Text style={styles.treatmentCell}>Tratamiento</Text>
-            <Text style={styles.evidenceCell}>Evidencia</Text>
+            <Text style={styles.evidenceCell}>Respaldo</Text>
             <Text style={styles.amountCell}>Monto</Text>
           </View>
           {snapshot.breakdown.map(line => (
             <View key={line.componentCode} style={styles.tableRow}>
               <View style={styles.conceptCell}>
                 <Text style={styles.conceptLabel}>{line.label}</Text>
-                <Text style={styles.evidence}>Policy {line.policyCode ?? line.formulaRef ?? 'pendiente'}</Text>
+                <Text style={styles.evidence}>{lineBasisLabel(line)}</Text>
               </View>
               <View style={styles.treatmentCell}>
                 <View style={styles.tagLine}>
@@ -554,10 +575,11 @@ const FinalSettlementPdfDocument = ({ snapshot }: { snapshot: FinalSettlementDoc
         )}
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Declaración operativa</Text>
+          <Text style={styles.sectionTitle}>Constancia para firma y ratificación</Text>
           <Text style={styles.statement}>
-            Greenhouse registra este documento como propuesta interna versionada. La firma, ratificación o reserva de derechos se
-            registra como evidencia externa y no reemplaza el acto ante ministro de fe cuando aplique.
+            Este documento resume los haberes, descuentos y pagos asociados al término de la relación laboral. La firma o
+            ratificación debe realizarse ante ministro de fe cuando corresponda. La persona trabajadora puede formular reserva
+            de derechos al momento de firmar.
           </Text>
         </View>
 
