@@ -2,6 +2,15 @@
 
 ## 2026-05-05
 
+- **TASK-753 implementada — `/my/payment-profile` self-service para Mi cuenta de pago.** El colaborador ahora ve su cuenta de pago activa (datos enmascarados), puede solicitar un cambio (entra como pendiente de revisión) y recibe email cuando finance la aprueba/cancela/reemplaza.
+  - **Vista personal:** ruta `/my/payment-profile` con cuenta activa + banner "En revisión" cuando hay pending + dialog "Solicitar cambio" con form CL/USD.
+  - **Maker-checker explícito:** el dialog explica al colaborador que finance debe aprobar; el endpoint admin ya rechazaba auto-aprobación (TS+DB trigger TASK-749). El colaborador puede cancelar su propia solicitud pending pero NUNCA aprobarla.
+  - **Email transaccional al beneficiario:** template `BeneficiaryPaymentProfileChangedEmail` con 4 variantes (registrado/aprobado/reemplazado/cancelado), datos siempre enmascarados (NUNCA `account_number_full`), warning "si no reconoces este cambio" cuando NO fue self-service.
+  - **Reactive projection:** consume los 4 outbox events `finance.beneficiary_payment_profile.{created,approved,superseded,cancelled}` y dispara el email. Idempotente vía sourceEventId.
+  - **Ops queue:** `/admin/finance/payment-profiles` muestra badge "Solicitado por colaborador" para diferenciar pendings de finance vs self-service.
+  - **Capabilities granulares:** `personal_workspace.payment_profile.{read_self,request_change_self}` (scope=own). Diferenciadas de las admin `finance.payment_profiles.*`.
+  - **Reuso 100%:** `createPaymentProfile`, `cancelPaymentProfile`, `listPaymentProfiles`, `sendEmail`, `registerProjection`, `requireMyTenantContext`. Cero schema changes, cero outbox events nuevos.
+
 - **TASK-759e implementada — `/my/payroll` ahora muestra el lifecycle completo del pago.** El colaborador ya no ve solo el calculo de su nomina; ve cuando le pagan, por que medio, si ya le pagaron y la lista de comunicaciones recibidas.
   - **Mini-timeline en latest period card:** 5 steps data-driven (Calculo aprobado → Orden creada → Pago programado → Pago ejecutado → Recibo enviado) que leen el state machine real (`paymentStatus`, `paymentOrder.scheduledFor`, `paymentOrder.paidAt`, `payslipDeliveryTimeline`).
   - **Drawer detail per row:** click en cualquier liquidacion del historial abre un drawer con monto, procesador, fecha programada, fecha de pago, referencia externa copyable y timeline cronologico de todas las comunicaciones (period_exported / payment_committed / payment_paid / payment_cancelled / payment_revised / manual_resend). Tolerante a kinds de TASK-759b/c que aun no estan implementados.

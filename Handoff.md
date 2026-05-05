@@ -1,5 +1,19 @@
 # Handoff.md
 
+## Sesion 2026-05-05 — TASK-753 completa (Payment Profiles Self-Service)
+
+- **Branch:** `develop` por instruccion explicita del usuario.
+- **Skills aplicadas:** `greenhouse-backend` (capabilities + helpers + endpoints + projection), `greenhouse-dev` + `greenhouse-ux` (page + view + dialog), `greenhouse-ux-writing` (copy es-CL).
+- **Open Questions resueltas pre-execution:** TASK-716 NO bloqueante (es manual Teams, no email hub) → `sendEmail` directo. Ruta `/my/*` (no `/me/*`). Capabilities scope=own.
+- **Slices entregados (3 + tests):**
+  - **Slice 1:** capabilities `personal_workspace.payment_profile.{read_self,request_change_self}`; helpers self-service (forces ownership + flag `requested_by='member'`); endpoints GET/POST `/api/my/payment-profile` + POST cancel-request; viewCode `mi_ficha.mi_cuenta_pago`; page + view single-card flat + RequestChangeDialog.
+  - **Slice 2:** Email template `BeneficiaryPaymentProfileChangedEmail` 4 kinds masked; helper `notifyBeneficiaryOfPaymentProfileChange`; projection `payment-profile-notifications` reactive consumer 4 outbox events canonicos.
+  - **Slice 3:** Badge "Solicitado por colaborador" en `PaymentProfilesPanel`.
+- **Maker-checker:** ya enforced en TASK-749 (TS+DB). NO requirio fix.
+- **Tests:** 19/19 verde. **Validacion:** tsc clean, ESLint 0 errors, build OK.
+- **Sin schema changes / sin nuevos outbox events / sin nuevos reliability signals.**
+- **Lifecycle:** `docs/tasks/complete/TASK-753-payment-profiles-self-service.md`.
+
 ## Sesion 2026-05-05 — TASK-759e completa (`/my/payroll` lifecycle + drawer + self-service resend)
 
 - **Branch:** `develop` por instruccion explicita del usuario.
