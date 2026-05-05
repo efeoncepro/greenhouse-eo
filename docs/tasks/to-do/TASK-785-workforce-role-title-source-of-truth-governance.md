@@ -75,6 +75,7 @@ Reglas obligatorias:
 - Commercial cost/pricing no debe inferir costo desde texto libre si existe role/seniority/catalogo; texto libre puede ser presentacional.
 - Si Entra y Greenhouse difieren, el sistema debe mostrar drift/review y source, no resolver con ultimo writer gana.
 - Access model debe separar quien puede ver cargo, cambiar cargo base, cambiar override cliente y aprobar drift.
+- El colaborador nunca puede modificar su propio cargo desde self-service. `/my/profile` es read-only para cargo; solo HR/admin autorizado puede cambiar cargo base con fecha efectiva, razon y auditoria.
 
 ## Normative Docs
 
@@ -99,9 +100,20 @@ Reglas obligatorias:
 - `src/lib/entra/profile-sync.ts`
 - `src/lib/person-360/**`
 - `src/lib/people/get-person-detail.ts`
+- `src/lib/people/get-people-list.ts`
+- `src/views/greenhouse/people/PersonProfileHeader.tsx`
+- `src/views/greenhouse/people/PeopleListTable.tsx`
+- `src/views/greenhouse/people/PeopleListFilters.tsx`
 - `src/lib/team-admin/mutate-team.ts`
+- `src/views/greenhouse/people/drawers/CreateMemberDrawer.tsx`
+- `src/views/greenhouse/people/drawers/EditProfileDrawer.tsx`
+- `src/app/api/admin/team/members/**`
+- `src/lib/sync/projections/assignment-membership-sync.ts`
 - `src/lib/agency/team-capacity-store.ts`
 - `src/lib/commercial-cost-basis/people-role-cost-basis.ts`
+- `src/lib/finance/payment-instruments/responsibles.ts`
+- `src/app/api/finance/quotes/pricing/lookup/route.ts`
+- `src/lib/finance/quote-share/**`
 - `src/lib/payroll/final-settlement/document-store.ts`
 
 ### Blocks / Impacts
@@ -124,6 +136,13 @@ Reglas obligatorias:
 - `src/lib/commercial-cost-basis/**`
 - `src/lib/payroll/final-settlement/**`
 - `src/views/greenhouse/people/**`
+- `src/views/greenhouse/my/MyProfileView.tsx`
+- `src/views/greenhouse/my/my-profile/MyProfileHeader.tsx`
+- `src/views/greenhouse/my/my-profile/MyProfileSidebar.tsx`
+- `src/app/(dashboard)/my/profile/page.tsx`
+- `src/types/team.ts`
+- `src/types/people.ts`
+- `src/types/person-complete-360.ts`
 - `docs/architecture/GREENHOUSE_SCIM_ENTRA_INTEGRATION_V1.md`
 - `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
 - `docs/documentation/hr/`
@@ -140,7 +159,23 @@ Reglas obligatorias:
 - `src/lib/entra/profile-sync.ts` tambien actualiza `members.role_title` desde `entra.jobTitle`, lo que puede pisar cambios operativos HR.
 - `greenhouse_core.members` ya contiene `role_title`, `role_category`, `org_role_id`, `profession_id` y `seniority_level`.
 - `greenhouse_core.client_team_assignments` ya contiene `role_title_override`.
+- `greenhouse_core.identity_profiles.job_title` alimenta `greenhouse_serving.person_360.resolved_job_title` via `COALESCE(ip.job_title, first_contact.job_title)` en las views/migraciones de Person 360.
+- `greenhouse_core.person_memberships.role_label` existe para rol/etiqueta por membresia de una persona en una organizacion/space; hoy puede derivarse desde `members.role_title` via `assignment-membership-sync`.
+- `greenhouse_core.roles.role_code`, `user_role_assignments.role_code`, `role_view_assignments.role_code` y `role_entitlement_defaults.role_code` son acceso/autorizacion, no cargo laboral ni categoria operativa.
+- `greenhouse_commercial.sellable_roles.role_code`, `role_rate_cards.role_code`, `quotation_line_items.role_code` y tablas de pricing/cost basis son roles comerciales/SKU/rate-card, no cargo laboral de persona.
 - Person 360 y People detail ya leen role/title/seniority y assignments.
+- People list (`/people`) muestra hoy `roleTitle` como columna `Cargo` y `roleCategory` como columna/filtro `Rol` (`PeopleListTable` + `PeopleListFilters`).
+- El header visible de Persona 360 (`src/views/greenhouse/people/PersonProfileHeader.tsx`) muestra hoy `member.roleTitle` en la bajada bajo el nombre, junto a `roleCategory` y `Efeonce Team`.
+- Mi Perfil (`/my/profile`) muestra hoy el cargo desde `identity.resolvedJobTitle` en:
+  - header hero (`src/views/greenhouse/my/my-profile/MyProfileHeader.tsx`) como texto con icono briefcase y chip;
+  - bloque "Sobre mi" (`src/views/greenhouse/my/MyProfileView.tsx`) como `Cargo`;
+  - sidebar legacy/shared (`src/views/greenhouse/my/my-profile/MyProfileSidebar.tsx`) cuando se use ese componente.
+- `CreateMemberDrawer` y `EditProfileDrawer` editan hoy `roleTitle` y `roleCategory` directamente contra `/api/admin/team/members`, sin razon ni fecha efectiva.
+- `PersonLeftSidebar`, `PersonProfileTab`, `PersonIdentityTab`, `PersonIntelligenceTab` y tests asociados tambien renderizan cargo/categoria/roles de acceso en Person 360.
+- Finance/commercial usa job/cargo en busquedas y documentos:
+  - payment instrument responsibles usa `p360.resolved_job_title`, `m.headline`, `ip.job_title` y `roleCodes` para candidatos;
+  - quote lookup busca personas por `role_title`;
+  - quote/PDF/email usa `team_members.job_title` o fallback `Account Lead` como cargo del vendedor.
 - Commercial cost basis ya distingue fuentes como `assignment_role_title_override` y `member_role_title`.
 - Final settlement document store lee `COALESCE(ip.job_title, pm.role_label)` para el cargo del snapshot.
 
@@ -150,6 +185,13 @@ Reglas obligatorias:
 - No hay drift review para job title equivalente al modelo de reporting hierarchy.
 - No hay historial efectivo de cambios de cargo si un cambio afecta documentos, payroll, costos o staffing historico.
 - No hay resolver unico de "cargo para contexto X"; cada consumer decide con su propio fallback.
+- El header de Persona 360 puede seguir mostrando un cargo ambiguo si no se migra explicitamente al resolver `internal_profile`.
+- People list puede seguir mezclando conceptos si `Cargo` y `Rol` no quedan gobernados: `Cargo` debe ser cargo interno efectivo; `Rol` debe representar categoria/familia/capacidad operativa, no cargo laboral ni rol de autorizacion.
+- Mi Perfil puede seguir mostrando `identity.resolvedJobTitle` como si fuera cargo laboral oficial, aunque provenga de Entra/Graph o de fallback 360, si no se migra explicitamente al mismo contrato `internal_profile`.
+- Los drawers/admin endpoints actuales permiten update directo de cargo/categoria sin historial efectivo ni auditoria de razon; deben migrar a mutacion gobernada.
+- `person_memberships.role_label` puede quedar stale si cambia `members.role_title` despues de creada la membresia; TASK-785 debe decidir si se recalcula, snapshottea o expone como label contextual por membresia.
+- `person_360.resolved_job_title` hoy prioriza identidad/CRM; no puede seguir siendo el valor por defecto para cargo laboral interno en self-service/HR/documentos.
+- Finance/commercial/quote surfaces deben decidir por contexto: vendedor/responsable puede usar label profesional interno, pero pricing debe usar role_code/rate-card y documentos laborales deben usar cargo laboral efectivo.
 - El cargo de cliente puede confundirse con cargo base si la UI/copy no lo separa.
 - No esta claro si HR cambia cargo desde Greenhouse, desde Entra, o desde ambos con gobierno.
 - No hay acceptance contract para documentos: cargo del trabajador debe snapshotearse desde cargo laboral efectivo, no desde identidad Microsoft si HR lo overrideo.
@@ -201,6 +243,8 @@ Reglas obligatorias:
   - cargo de identidad Microsoft
   - cargos por asignacion cliente
   - drift pendiente si aplica
+- Reflejar el mismo significado en `/my/profile`: el colaborador debe ver su cargo interno Efeonce efectivo como fuente principal, y cualquier dato Microsoft/cliente debe rotularse como fuente secundaria/contextual.
+- Mantener `/my/profile` sin controles de edicion de cargo. Si se agrega una solicitud de cambio futura, debe ser un workflow de request/review separado, no un update directo sobre `members.role_title`.
 - No permitir que un override de cliente cambie el cargo base.
 - Definir capabilities para `workforce.role_title.update`, `workforce.role_title.review_drift` o nombres alineados al runtime.
 
@@ -214,6 +258,10 @@ Reglas obligatorias:
 ### Slice 6 — Consumers cutover
 
 - Migrar People 360, People detail, Capacity/Staffing, Commercial cost basis y final settlement document store al resolver canonico cuando aplique.
+- Migrar explicitamente el header de Persona 360 (`PersonProfileHeader`) para que la linea bajo el nombre use el resolver canonico de contexto `internal_profile`: cargo laboral interno efectivo + source/label claro cuando haya drift, no `identity_profiles.job_title` ni override cliente.
+- Migrar explicitamente `/my/profile` (`MyProfileView`, `MyProfileHeader` y `MyProfileSidebar`) para que hero, chip y "Sobre mi > Cargo" usen el mismo resolver `internal_profile` que People 360, evitando que `identity.resolvedJobTitle`/Entra sea presentado como cargo laboral oficial sin source.
+- Migrar `CreateMemberDrawer`, `EditProfileDrawer` y `/api/admin/team/members/**` para que cambios de cargo/categoria pasen por la mutacion gobernada con razon, fecha efectiva, source y audit.
+- Revisar `PersonLeftSidebar`, `PersonProfileTab`, `PersonIdentityTab`, `PersonIntelligenceTab`, `assignment-membership-sync`, `payment-instruments/responsibles`, quote lookup y quote document/email renderers para usar el contexto correcto o documentar por que quedan fuera del resolver laboral.
 - Para documentos payroll/finiquito, snapshotear cargo laboral efectivo al momento del documento.
 - Para commercial/pricing, usar role/seniority/catalogo para costo y texto solo como label.
 
@@ -229,6 +277,7 @@ Reglas obligatorias:
 - No redisenar todo SCIM ni Entra provisioning.
 - No mover roles de autorizacion, route groups ni permisos a partir del cargo textual.
 - No usar cargo para decidir payroll legal, contrato o regimen.
+- No permitir self-service mutation de cargo por parte del colaborador.
 - No reemplazar `client_team_assignments`; solo gobernar su override de cargo.
 - No rehacer el catalogo comercial de roles/precios salvo wiring al resolver.
 - No mezclar esta task con TASK-784 de documentos legales/personales.
@@ -239,15 +288,19 @@ Reglas obligatorias:
 
 - `identity_profiles.job_title`: enriquecimiento de identidad proveniente de Entra/Graph o CRM; util para Admin/identity context y comparacion de drift.
 - `members.role_title`: cargo operativo/laboral interno de la persona en Greenhouse/Efeonce.
+- `members.role_category`: familia/categoria operativa para agrupacion, filtros y capacidad (`design`, `operations`, etc.). No es cargo laboral, no es rol de autorizacion y no debe usarse como titulo en documentos.
 - `members.org_role_id/profession_id/seniority_level`: estructura canónica preferida para catálogos, staffing y costos cuando este disponible.
 - `client_team_assignments.role_title_override`: titulo visible para una asignacion cliente especifica.
+- `person_memberships.role_label`: etiqueta contextual de membresia en organizacion/space; puede servir para Account/Organization 360, pero no debe ser source primaria para cargo laboral interno salvo snapshot/documento historico deliberado.
+- `greenhouse_core.roles.role_code` / `user_role_assignments.role_code`: rol de acceso/autorizacion.
+- `greenhouse_commercial.*.role_code`: rol comercial/SKU/rate-card para pricing/costing.
 - Snapshot documental: copia inmutable del cargo resuelto al momento de emitir documento.
 
 ### Access model decision
 
 - `routeGroups`: usar `hr` / `people` existentes.
-- `views`: People/HR profile existente; no crear surface nueva salvo que Discovery demuestre que hace falta.
-- `entitlements`: separar update de cargo base, update de override cliente y review de drift.
+- `views`: People/HR profile existente para mutacion; `/my/profile` solo lectura del cargo interno efectivo.
+- `entitlements`: separar update de cargo base, update de override cliente y review de drift. No asignar `workforce.role_title.update` a colaboradores sobre si mismos.
 - `startup policy`: sin cambios.
 
 ### What else to consider
@@ -258,6 +311,9 @@ Reglas obligatorias:
 - Cliente puede pedir un titulo comercial distinto al cargo real; eso es assignment override, no cambio laboral.
 - En documentos legales, usar cargo laboral efectivo, no titulo comercial del cliente.
 - En propuestas/quotes/client-safe profiles, usar cargo assignment/client-safe si existe.
+- En el header de Persona 360, usar cargo interno Efeonce por defecto. Si se muestra cargo Microsoft o cargo cliente-facing, debe ser una segunda linea/chip contextual con source explicita, no reemplazar silenciosamente el cargo base.
+- En `/my/profile`, el cargo que ve el colaborador debe ser el mismo cargo interno efectivo que ve HR en contexto `internal_profile`; no debe depender de que Microsoft tenga `jobTitle` actualizado.
+- En `/people`, columna `Cargo` debe usar el cargo interno efectivo resuelto para `internal_profile`; columna/filtro `Rol` debe seguir usando `role_category` como categoria operativa con label claro. No renombrar ni reutilizar `Rol` para roles de permisos (`roleCodes`) ni para cargo textual.
 - En Entra, `jobTitle` puede estar desactualizado; debe proponer drift, no ganar siempre.
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -273,6 +329,12 @@ Reglas obligatorias:
 - [ ] Entra/Graph no sobrescribe silenciosamente `members.role_title` cuando HR/Greenhouse es owner del cargo operativo.
 - [ ] Existe drift/review o reliability signal para diferencias entre cargo Microsoft y cargo Greenhouse.
 - [ ] Existe resolver canonico para cargo por contexto y al menos People 360/documentos/costos usan el resolver donde aplica.
+- [ ] `/people` mantiene distincion explicita: `Cargo` = cargo interno efectivo; `Rol` = categoria/familia operativa (`role_category`) para filtro/agrupacion, no autorizacion ni cargo legal.
+- [ ] La bajada del header de Persona 360 bajo el nombre del colaborador usa el cargo interno efectivo resuelto para `internal_profile`, con fallback/source visible y sin mezclar override cliente ni `identity_profiles.job_title` como autoridad laboral.
+- [ ] `/my/profile` muestra el mismo cargo interno efectivo en hero/chip y "Sobre mi > Cargo"; si se muestra cargo Microsoft o assignment override, queda rotulado como fuente secundaria/contextual y no como cargo base.
+- [ ] `/my/profile` no expone controles ni endpoint self-service para editar cargo; cualquier cambio de cargo requiere HR/admin entitlement, razon, fecha efectiva y audit log.
+- [ ] Drawers/endpoints admin de creacion/edicion de colaboradores no escriben `role_title`/`role_category` directo sin auditoria; usan mutacion gobernada o quedan bloqueados hasta migrar.
+- [ ] `person_memberships.role_label`, `resolved_job_title`, quote/payment responsible labels y `role_code` comercial/acceso quedan mapeados por contexto para evitar que se traten como cargo laboral base.
 - [ ] HR puede cambiar cargo base con razon y fecha efectiva si la task implementa UI de mutacion.
 - [ ] Cargo cliente-facing se gestiona como override de asignacion y no cambia el cargo base.
 - [ ] Finiquito/documentos snapshottean cargo laboral efectivo, no cargo live ni cargo de cliente.

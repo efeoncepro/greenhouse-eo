@@ -1,0 +1,1359 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TASK-784 · Datos legales redesign</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.18.0/dist/tabler-icons.min.css">
+  <style>
+    :root {
+      color-scheme: light;
+
+      /* Greenhouse canonical tokens (V1) */
+      --primary: #7367F0;
+      --primary-light: rgba(115, 103, 240, 0.16);
+      --primary-darker: #685dd8;
+      --success: #6EC207;
+      --success-tonal-bg: rgba(110, 194, 7, 0.12);
+      --success-tonal-fg: #4d8b04;
+      --warning: #FF6500;
+      --warning-tonal-bg: rgba(255, 101, 0, 0.12);
+      --warning-tonal-fg: #b34800;
+      --error: #BB1954;
+      --error-tonal-bg: rgba(187, 25, 84, 0.12);
+      --error-tonal-fg: #8a113c;
+      --info: #00BAD1;
+
+      --text-primary: #2F2B3D;
+      --text-secondary: rgba(47, 43, 61, 0.68);
+      --text-disabled: rgba(47, 43, 61, 0.42);
+      --divider: rgba(47, 43, 61, 0.12);
+
+      --bg-canvas: #F8F7FA;
+      --bg-paper: #FFFFFF;
+      --bg-rail: #2F2B3D;
+      --bg-rail-hover: rgba(255, 255, 255, 0.06);
+
+      /* customBorderRadius (theme.shape) */
+      --r-xs: 2px;
+      --r-sm: 4px;
+      --r-md: 6px;
+      --r-lg: 8px;
+      --r-xl: 10px;
+      --r-pill: 9999px;
+
+      /* spacing scale: spacing(n) = 4n */
+      --s-1: 4px;
+      --s-2: 8px;
+      --s-3: 12px;
+      --s-4: 16px;
+      --s-5: 20px;
+      --s-6: 24px;
+      --s-8: 32px;
+      --s-10: 40px;
+      --s-12: 48px;
+
+      --shadow-sm: 0 2px 4px rgba(47, 43, 61, 0.04);
+      --shadow-md: 0 4px 18px rgba(47, 43, 61, 0.08);
+      --shadow-lg: 0 12px 32px rgba(47, 43, 61, 0.12);
+
+      --ease-out: cubic-bezier(0.2, 0, 0, 1);
+      --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+      --d-fast: 150ms;
+      --d-base: 200ms;
+      --d-slow: 300ms;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--bg-canvas);
+      color: var(--text-primary);
+      font-family: "Geist Sans", "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      font-size: 15px;
+      line-height: 1.45;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button, input, select, textarea { font: inherit; color: inherit; }
+    button { cursor: pointer; }
+
+    /* ─────── App shell ─────── */
+    .app {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 248px minmax(0, 1fr);
+    }
+
+    .rail {
+      background: var(--bg-rail);
+      color: rgba(255, 255, 255, 0.78);
+      padding: var(--s-6) var(--s-4);
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    .rail__brand {
+      display: flex;
+      align-items: center;
+      gap: var(--s-2);
+      padding: 0 var(--s-3) var(--s-6);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      margin-bottom: var(--s-4);
+    }
+    .rail__brand-logo {
+      width: 28px; height: 28px;
+      border-radius: var(--r-md);
+      background: linear-gradient(135deg, var(--primary), #5a4fd5);
+      display: grid; place-items: center;
+      color: white; font-weight: 600;
+    }
+    .rail__brand-name { font-weight: 600; color: white; letter-spacing: -0.01em; }
+
+    .rail__group { margin-bottom: var(--s-6); }
+    .rail__group-label {
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.42);
+      padding: 0 var(--s-3);
+      margin-bottom: var(--s-2);
+    }
+    .rail__item {
+      display: flex; align-items: center; gap: var(--s-3);
+      padding: var(--s-2) var(--s-3);
+      border-radius: var(--r-md);
+      color: rgba(255, 255, 255, 0.72);
+      font-size: 14px;
+      cursor: pointer;
+      transition: background var(--d-fast) var(--ease-out);
+    }
+    .rail__item:hover { background: var(--bg-rail-hover); color: white; }
+    .rail__item.active {
+      background: var(--primary);
+      color: white;
+      box-shadow: 0 2px 6px rgba(115, 103, 240, 0.4);
+    }
+    .rail__item i { font-size: 18px; }
+    .rail__item-meta { display: flex; flex-direction: column; }
+    .rail__item-meta small { font-size: 11px; opacity: 0.7; }
+
+    /* ─────── Top bar ─────── */
+    .topbar {
+      background: var(--bg-paper);
+      border-bottom: 1px solid var(--divider);
+      padding: var(--s-3) var(--s-6);
+      display: flex; align-items: center; gap: var(--s-4);
+      position: sticky; top: 0; z-index: 10;
+    }
+    .topbar__search {
+      flex: 1;
+      display: flex; align-items: center; gap: var(--s-2);
+      padding: var(--s-2) var(--s-3);
+      background: var(--bg-canvas);
+      border-radius: var(--r-md);
+      color: var(--text-secondary);
+      font-size: 14px;
+    }
+    .topbar__icon {
+      width: 36px; height: 36px;
+      display: grid; place-items: center;
+      border-radius: var(--r-md);
+      color: var(--text-secondary);
+      background: transparent;
+      border: none;
+      transition: background var(--d-fast) var(--ease-out);
+    }
+    .topbar__icon:hover { background: var(--bg-canvas); }
+    .topbar__icon i { font-size: 20px; }
+
+    .topbar__avatar {
+      width: 36px; height: 36px;
+      border-radius: var(--r-pill);
+      background: linear-gradient(135deg, #7367F0, #5a4fd5);
+      color: white;
+      display: grid; place-items: center;
+      font-size: 13px; font-weight: 600;
+    }
+
+    /* ─────── Page ─────── */
+    .page {
+      max-width: 880px;
+      margin: 0 auto;
+      padding: var(--s-8) var(--s-6) var(--s-12);
+    }
+
+    /* ─────── Profile header ─────── */
+    .profile-banner {
+      height: 120px;
+      background: linear-gradient(135deg, #1a1a4e, #2d2278 50%, #1a1a4e);
+      border-radius: var(--r-lg) var(--r-lg) 0 0;
+      position: relative;
+      overflow: hidden;
+    }
+    .profile-banner::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 20% 30%, rgba(115, 103, 240, 0.4), transparent 50%),
+        radial-gradient(circle at 80% 60%, rgba(0, 186, 209, 0.3), transparent 40%);
+    }
+    .profile-card {
+      background: var(--bg-paper);
+      border-radius: 0 0 var(--r-lg) var(--r-lg);
+      padding: 0 var(--s-6) var(--s-5);
+      display: flex; align-items: flex-end; gap: var(--s-5);
+      margin-top: -48px;
+      position: relative;
+      box-shadow: var(--shadow-sm);
+    }
+    .profile-card__avatar {
+      width: 96px; height: 96px;
+      border-radius: var(--r-pill);
+      background: linear-gradient(135deg, #7367F0, #5a4fd5);
+      color: white;
+      display: grid; place-items: center;
+      font-size: 32px; font-weight: 600;
+      border: 4px solid var(--bg-paper);
+      box-shadow: var(--shadow-md);
+    }
+    .profile-card__meta { padding-bottom: var(--s-2); flex: 1; }
+    .profile-card__name {
+      font-size: 20px; font-weight: 600; color: var(--text-primary);
+      margin: 0 0 var(--s-1);
+    }
+    .profile-card__title {
+      display: flex; align-items: center; gap: var(--s-2);
+      color: var(--text-secondary); font-size: 14px;
+    }
+    .profile-card__title i { font-size: 16px; }
+
+    /* ─────── Tabs ─────── */
+    .tabs {
+      display: flex; gap: var(--s-1);
+      margin: var(--s-6) 0 var(--s-5);
+      border-bottom: 1px solid var(--divider);
+      overflow-x: auto;
+    }
+    .tab {
+      display: flex; align-items: center; gap: var(--s-2);
+      padding: var(--s-3) var(--s-4);
+      color: var(--text-secondary);
+      font-size: 14px; font-weight: 500;
+      background: none; border: none;
+      border-bottom: 2px solid transparent;
+      transition: color var(--d-fast) var(--ease-out), border-color var(--d-fast) var(--ease-out);
+      white-space: nowrap;
+    }
+    .tab i { font-size: 16px; }
+    .tab:hover { color: var(--text-primary); }
+    .tab.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+
+    /* ─────── Hero strip (rediseño core) ─────── */
+    .hero {
+      background: var(--bg-paper);
+      border: 1px solid var(--divider);
+      border-radius: var(--r-lg);
+      padding: var(--s-6);
+      margin-bottom: var(--s-6);
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: var(--s-6);
+      align-items: center;
+    }
+    @media (max-width: 720px) {
+      .hero { grid-template-columns: 1fr; }
+    }
+    .hero__intro { display: flex; gap: var(--s-4); align-items: flex-start; }
+    .hero__icon {
+      width: 44px; height: 44px;
+      border-radius: var(--r-md);
+      background: var(--primary-light);
+      color: var(--primary);
+      display: grid; place-items: center;
+      flex-shrink: 0;
+    }
+    .hero__icon i { font-size: 22px; }
+    .hero__title {
+      font-size: 18px; font-weight: 600; margin: 0 0 var(--s-1);
+      letter-spacing: -0.01em;
+    }
+    .hero__lead {
+      color: var(--text-secondary);
+      font-size: 14px;
+      margin: 0;
+      max-width: 56ch;
+    }
+    .hero__progress { min-width: 240px; }
+    .hero__progress-row {
+      display: flex; align-items: baseline; justify-content: space-between;
+      gap: var(--s-3);
+      margin-bottom: var(--s-2);
+    }
+    .hero__progress-label {
+      font-size: 12px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+    .hero__progress-count {
+      font-size: 22px; font-weight: 600;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.02em;
+    }
+    .hero__progress-bar {
+      height: 8px;
+      background: var(--bg-canvas);
+      border-radius: var(--r-pill);
+      overflow: hidden;
+      position: relative;
+    }
+    .hero__progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), #8c7ff5);
+      border-radius: var(--r-pill);
+      transition: width 600ms var(--ease-out);
+    }
+    .hero__progress-dots {
+      display: flex; gap: var(--s-2);
+      margin-top: var(--s-3);
+    }
+    .hero__progress-dot {
+      width: 10px; height: 10px;
+      border-radius: var(--r-pill);
+      background: var(--bg-canvas);
+      border: 1.5px solid var(--divider);
+      transition: background var(--d-base) var(--ease-out), border-color var(--d-base) var(--ease-out);
+    }
+    .hero__progress-dot.complete {
+      background: var(--success);
+      border-color: var(--success);
+    }
+    .hero__progress-dot.pending {
+      background: var(--warning);
+      border-color: var(--warning);
+    }
+
+    .hero__privacy {
+      grid-column: 1 / -1;
+      margin-top: var(--s-2);
+      padding-top: var(--s-4);
+      border-top: 1px solid var(--divider);
+    }
+    .hero__privacy summary {
+      cursor: pointer;
+      list-style: none;
+      display: flex; align-items: center; gap: var(--s-2);
+      color: var(--text-secondary);
+      font-size: 13px;
+      font-weight: 500;
+      user-select: none;
+    }
+    .hero__privacy summary::-webkit-details-marker { display: none; }
+    .hero__privacy summary i.chevron {
+      transition: transform var(--d-base) var(--ease-out);
+      font-size: 16px;
+    }
+    .hero__privacy[open] summary i.chevron { transform: rotate(180deg); }
+    .hero__privacy-body {
+      margin-top: var(--s-3);
+      padding-left: var(--s-6);
+      color: var(--text-secondary);
+      font-size: 13px;
+      line-height: 1.65;
+    }
+    .hero__privacy-body ul { margin: 0; padding-left: var(--s-4); }
+    .hero__privacy-body li { margin-bottom: var(--s-1); }
+
+    /* ─────── Section ─────── */
+    .section {
+      margin-bottom: var(--s-8);
+    }
+    .section__header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: var(--s-3);
+      padding: 0 var(--s-1);
+    }
+    .section__title {
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      font-weight: 600;
+      margin: 0;
+    }
+    .section__hint {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+    .section__list {
+      display: flex; flex-direction: column;
+      gap: var(--s-3);
+    }
+
+    /* ─────── Item card ─────── */
+    .item {
+      background: var(--bg-paper);
+      border: 1px solid var(--divider);
+      border-left: 4px solid var(--divider);
+      border-radius: var(--r-lg);
+      transition: box-shadow var(--d-base) var(--ease-out), border-color var(--d-base) var(--ease-out);
+      overflow: hidden;
+    }
+    .item:hover { box-shadow: var(--shadow-md); }
+    .item--success { border-left-color: var(--success); }
+    .item--warning { border-left-color: var(--warning); }
+    .item--error { border-left-color: var(--error); }
+
+    .item__header {
+      display: flex; align-items: center; gap: var(--s-4);
+      padding: var(--s-5) var(--s-5);
+      cursor: pointer;
+      width: 100%;
+      background: none;
+      border: none;
+      text-align: left;
+    }
+    .item__header:focus-visible {
+      outline: 2px solid var(--primary);
+      outline-offset: -2px;
+    }
+    .item__icon {
+      width: 40px; height: 40px;
+      border-radius: var(--r-md);
+      display: grid; place-items: center;
+      flex-shrink: 0;
+      font-size: 20px;
+    }
+    .item--success .item__icon { background: var(--success-tonal-bg); color: var(--success-tonal-fg); }
+    .item--warning .item__icon { background: var(--warning-tonal-bg); color: var(--warning-tonal-fg); }
+    .item--error .item__icon { background: var(--error-tonal-bg); color: var(--error-tonal-fg); }
+    .item--empty .item__icon { background: var(--bg-canvas); color: var(--text-secondary); }
+
+    .item__main { flex: 1; min-width: 0; }
+    .item__title {
+      font-size: 15px;
+      font-weight: 600;
+      margin: 0 0 var(--s-1);
+      color: var(--text-primary);
+    }
+    .item__subtitle {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin: 0;
+    }
+    .item__value {
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0.04em;
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+    .item__chip {
+      flex-shrink: 0;
+      display: inline-flex; align-items: center; gap: var(--s-1);
+      padding: var(--s-1) var(--s-3);
+      border-radius: var(--r-pill);
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.01em;
+    }
+    .item__chip i { font-size: 14px; }
+    .item__chip--success { background: var(--success-tonal-bg); color: var(--success-tonal-fg); }
+    .item__chip--warning { background: var(--warning-tonal-bg); color: var(--warning-tonal-fg); }
+    .item__chip--error { background: var(--error-tonal-bg); color: var(--error-tonal-fg); }
+    .item__chip--neutral {
+      background: var(--bg-canvas);
+      color: var(--text-secondary);
+    }
+    .item__chip-anim {
+      animation: chipIn var(--d-base) var(--ease-out);
+    }
+    @keyframes chipIn {
+      from { opacity: 0; transform: scale(0.85); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .item__chevron {
+      color: var(--text-secondary);
+      font-size: 18px;
+      transition: transform var(--d-base) var(--ease-out);
+      flex-shrink: 0;
+    }
+    .item--expanded .item__chevron { transform: rotate(180deg); }
+
+    /* ─────── Item state body (status block) ─────── */
+    .item__status {
+      padding: 0 var(--s-5) var(--s-5);
+      display: flex; align-items: center; gap: var(--s-3);
+      color: var(--text-secondary);
+      font-size: 13px;
+      border-top: 1px solid var(--divider);
+      padding-top: var(--s-4);
+    }
+    .item__status i { font-size: 18px; flex-shrink: 0; color: var(--primary); }
+    .item__status-text { flex: 1; }
+    .item__status-action {
+      background: none;
+      border: 1px solid var(--divider);
+      color: var(--text-primary);
+      padding: var(--s-1) var(--s-3);
+      border-radius: var(--r-md);
+      font-size: 13px;
+      font-weight: 500;
+      transition: background var(--d-fast) var(--ease-out);
+    }
+    .item__status-action:hover { background: var(--bg-canvas); }
+
+    /* ─────── Item form (expanded) ─────── */
+    .item__form {
+      padding: var(--s-5) var(--s-5) var(--s-6);
+      border-top: 1px solid var(--divider);
+      background: linear-gradient(180deg, var(--bg-canvas), var(--bg-paper));
+    }
+    .item__form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--s-4);
+      margin-bottom: var(--s-4);
+    }
+    @media (max-width: 600px) {
+      .item__form-grid { grid-template-columns: 1fr; }
+    }
+    .item__form-grid .full { grid-column: 1 / -1; }
+
+    .field { display: flex; flex-direction: column; gap: var(--s-1); }
+    .field__label {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      letter-spacing: 0.02em;
+    }
+    .field__input,
+    .field__select {
+      padding: var(--s-3);
+      border: 1px solid var(--divider);
+      border-radius: var(--r-md);
+      background: var(--bg-paper);
+      transition: border-color var(--d-fast) var(--ease-out), box-shadow var(--d-fast) var(--ease-out);
+      color: var(--text-primary);
+      font-size: 14px;
+    }
+    .field__input:focus,
+    .field__select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(115, 103, 240, 0.16);
+    }
+    .field__input--mono { font-variant-numeric: tabular-nums; letter-spacing: 0.04em; }
+    .field__hint { font-size: 12px; color: var(--text-secondary); }
+    .field__error { font-size: 12px; color: var(--error); display: flex; align-items: center; gap: var(--s-1); }
+    .field__error i { font-size: 14px; }
+
+    .item__form-actions {
+      display: flex; justify-content: flex-end; gap: var(--s-2);
+      padding-top: var(--s-3);
+      border-top: 1px solid var(--divider);
+    }
+    .btn {
+      padding: var(--s-2) var(--s-5);
+      border-radius: var(--r-md);
+      font-size: 14px; font-weight: 500;
+      border: none;
+      transition: background var(--d-fast) var(--ease-out), transform var(--d-fast) var(--ease-out), box-shadow var(--d-fast) var(--ease-out);
+      display: inline-flex; align-items: center; gap: var(--s-2);
+    }
+    .btn:focus-visible {
+      outline: 2px solid var(--primary);
+      outline-offset: 2px;
+    }
+    .btn--primary {
+      background: var(--primary);
+      color: white;
+      box-shadow: 0 2px 6px rgba(115, 103, 240, 0.32);
+    }
+    .btn--primary:hover {
+      background: var(--primary-darker);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(115, 103, 240, 0.4);
+    }
+    .btn--primary:active { transform: translateY(0); }
+    .btn--text {
+      background: transparent;
+      color: var(--text-secondary);
+    }
+    .btn--text:hover {
+      background: var(--bg-canvas);
+      color: var(--text-primary);
+    }
+    .btn--loading { pointer-events: none; opacity: 0.85; }
+    .btn-spinner {
+      width: 14px; height: 14px;
+      border: 2px solid rgba(255,255,255,0.4);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ─────── Empty add card ─────── */
+    .item--empty .item__header {
+      cursor: pointer;
+      color: var(--text-secondary);
+    }
+    .item--empty .item__title {
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+    .item--empty:hover {
+      border-color: var(--primary);
+      background: rgba(115, 103, 240, 0.02);
+    }
+
+    /* ─────── Rejected reason inline ─────── */
+    .reject-banner {
+      margin: 0 var(--s-5) var(--s-5);
+      padding: var(--s-3) var(--s-4);
+      background: var(--error-tonal-bg);
+      border-radius: var(--r-md);
+      color: var(--error-tonal-fg);
+      font-size: 13px;
+      display: flex; align-items: flex-start; gap: var(--s-2);
+    }
+    .reject-banner i { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+
+    /* ─────── State variant switcher (mockup-only top bar) ─────── */
+    .variant-switcher {
+      position: sticky; top: 60px; z-index: 5;
+      background: var(--bg-paper);
+      border-bottom: 1px solid var(--divider);
+      padding: var(--s-3) var(--s-6);
+      display: flex; gap: var(--s-2);
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .variant-switcher__label {
+      font-size: 12px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      font-weight: 500;
+      margin-right: var(--s-2);
+    }
+    .variant-switcher__btn {
+      padding: var(--s-1) var(--s-3);
+      border-radius: var(--r-pill);
+      font-size: 12px;
+      border: 1px solid var(--divider);
+      background: var(--bg-paper);
+      color: var(--text-secondary);
+      font-weight: 500;
+      transition: all var(--d-fast) var(--ease-out);
+    }
+    .variant-switcher__btn:hover { color: var(--text-primary); border-color: var(--text-secondary); }
+    .variant-switcher__btn.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    .variant-pane { display: none; }
+    .variant-pane.active { display: block; }
+
+    /* ─────── EmptyState (first-use) ─────── */
+    .empty-state {
+      background: var(--bg-paper);
+      border: 1px solid var(--divider);
+      border-radius: var(--r-lg);
+      padding: var(--s-12) var(--s-6);
+      text-align: center;
+      display: flex; flex-direction: column; align-items: center; gap: var(--s-3);
+    }
+    .empty-state__icon {
+      width: 80px; height: 80px;
+      border-radius: var(--r-pill);
+      background: var(--primary-light);
+      color: var(--primary);
+      display: grid; place-items: center;
+      font-size: 36px;
+      margin-bottom: var(--s-2);
+    }
+    .empty-state__title {
+      font-size: 18px; font-weight: 600; margin: 0;
+    }
+    .empty-state__lead {
+      color: var(--text-secondary);
+      max-width: 44ch;
+      font-size: 14px;
+      margin: 0;
+    }
+
+    /* ─────── Toast (mockup illustrative) ─────── */
+    .toast-host {
+      position: fixed;
+      bottom: var(--s-6);
+      right: var(--s-6);
+      z-index: 50;
+      display: flex; flex-direction: column; gap: var(--s-3);
+    }
+    .toast {
+      background: var(--bg-paper);
+      border: 1px solid var(--divider);
+      border-left: 4px solid var(--success);
+      border-radius: var(--r-md);
+      padding: var(--s-3) var(--s-4);
+      box-shadow: var(--shadow-lg);
+      display: flex; align-items: flex-start; gap: var(--s-3);
+      max-width: 360px;
+      animation: toastIn var(--d-slow) var(--ease-out);
+    }
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .toast i { color: var(--success); font-size: 20px; flex-shrink: 0; }
+    .toast__title { font-size: 14px; font-weight: 600; margin: 0 0 2px; }
+    .toast__body { font-size: 13px; color: var(--text-secondary); margin: 0; }
+
+    /* Note for reviewer */
+    .reviewer-note {
+      max-width: 880px; margin: 0 auto;
+      padding: var(--s-4) var(--s-6) 0;
+      color: var(--text-secondary);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    .reviewer-note strong { color: var(--text-primary); }
+    .reviewer-note code {
+      font-family: ui-monospace, monospace;
+      background: var(--bg-canvas);
+      padding: 0 var(--s-1);
+      border-radius: var(--r-xs);
+      font-size: 11px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="app">
+  <!-- ─────── Sidebar ─────── -->
+  <aside class="rail" aria-label="Navegación">
+    <div class="rail__brand">
+      <div class="rail__brand-logo">G</div>
+      <div class="rail__brand-name">Greenhouse</div>
+    </div>
+
+    <div class="rail__group">
+      <div class="rail__group-label">Mi ficha</div>
+      <div class="rail__item active" aria-current="page">
+        <i class="ti ti-user-circle"></i>
+        <div class="rail__item-meta"><span>Mi Perfil</span><small>Identidad y datos personales</small></div>
+      </div>
+      <div class="rail__item">
+        <i class="ti ti-users"></i>
+        <span>Mis Asignaciones</span>
+      </div>
+      <div class="rail__item">
+        <i class="ti ti-chart-bar"></i>
+        <span>Mi Desempeño</span>
+      </div>
+      <div class="rail__item">
+        <i class="ti ti-checklist"></i>
+        <span>Mi Delivery</span>
+      </div>
+      <div class="rail__item">
+        <i class="ti ti-cash"></i>
+        <span>Mi Nómina</span>
+      </div>
+    </div>
+  </aside>
+
+  <main>
+    <!-- Top bar -->
+    <div class="topbar">
+      <div class="topbar__search">
+        <i class="ti ti-search"></i>
+        <span>Buscar</span>
+        <span style="margin-left:auto; font-size:12px; opacity:0.6;">⌘K</span>
+      </div>
+      <button class="topbar__icon" aria-label="Tema"><i class="ti ti-sun"></i></button>
+      <button class="topbar__icon" aria-label="Accesos"><i class="ti ti-grid-dots"></i></button>
+      <button class="topbar__icon" aria-label="Notificaciones"><i class="ti ti-bell"></i></button>
+      <div class="topbar__avatar" aria-label="Tu cuenta">JR</div>
+    </div>
+
+    <!-- Variant switcher (mockup-only) -->
+    <nav class="variant-switcher" aria-label="Estados del rediseño">
+      <span class="variant-switcher__label">Estados:</span>
+      <button class="variant-switcher__btn active" data-variant="partial">Pendiente parcial</button>
+      <button class="variant-switcher__btn" data-variant="empty">Empty / first-use</button>
+      <button class="variant-switcher__btn" data-variant="rejected">Rechazado</button>
+      <button class="variant-switcher__btn" data-variant="verified">Todo verificado</button>
+      <button class="variant-switcher__btn" data-variant="submitting">Submitting</button>
+    </nav>
+
+    <p class="reviewer-note">
+      <strong>Mockup TASK-784 redesign · /my/profile › Datos legales.</strong>
+      Cambia el estado arriba para ver: empty / partial pending / rejected / verified / submitting.
+      Tokens canónicos Greenhouse V1, container-queries-ready, WCAG 2.2 AA, reduced-motion safe.
+    </p>
+
+    <div class="page">
+      <!-- Profile header (compartido) -->
+      <header class="profile-banner" aria-hidden="true"></header>
+      <div class="profile-card">
+        <div class="profile-card__avatar">JR</div>
+        <div class="profile-card__meta">
+          <h1 class="profile-card__name">Julio Reyes</h1>
+          <div class="profile-card__title">
+            <i class="ti ti-briefcase"></i>
+            <span>Managing Director &amp; GTM</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <nav class="tabs" role="tablist" aria-label="Secciones de tu perfil">
+        <button class="tab" role="tab"><i class="ti ti-user-check"></i>Perfil</button>
+        <button class="tab" role="tab"><i class="ti ti-users"></i>Equipos</button>
+        <button class="tab" role="tab"><i class="ti ti-layout-grid"></i>Proyectos</button>
+        <button class="tab" role="tab"><i class="ti ti-link"></i>Colegas</button>
+        <button class="tab" role="tab"><i class="ti ti-certificate"></i>Skills y certificaciones</button>
+        <button class="tab active" role="tab" aria-selected="true"><i class="ti ti-id-badge-2"></i>Datos legales</button>
+        <button class="tab" role="tab"><i class="ti ti-lock"></i>Seguridad</button>
+      </nav>
+
+      <!-- ─────── VARIANT: PARTIAL (default) ─────── -->
+      <div class="variant-pane active" data-pane="partial">
+
+        <!-- Hero strip -->
+        <section class="hero" aria-labelledby="legal-hero-title" role="region">
+          <div class="hero__intro">
+            <div class="hero__icon" aria-hidden="true">
+              <i class="ti ti-shield-lock"></i>
+            </div>
+            <div>
+              <h2 class="hero__title" id="legal-hero-title">Tus datos legales</h2>
+              <p class="hero__lead">
+                Tu identidad y dirección oficial. Solo tú los declaras — nadie más los ve sin tu autorización registrada en auditoría.
+              </p>
+            </div>
+          </div>
+          <div class="hero__progress" role="status" aria-live="polite">
+            <div class="hero__progress-row">
+              <span class="hero__progress-label">Progreso</span>
+              <span class="hero__progress-count">2<span style="color:var(--text-secondary); font-weight:500;">/4</span></span>
+            </div>
+            <div class="hero__progress-bar" role="progressbar" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100" aria-label="Progreso de datos legales">
+              <div class="hero__progress-fill" style="width: 50%"></div>
+            </div>
+            <div class="hero__progress-dots" aria-hidden="true">
+              <span class="hero__progress-dot pending" title="Documento de identidad — pendiente"></span>
+              <span class="hero__progress-dot complete" title="Dirección legal — verificada"></span>
+              <span class="hero__progress-dot" title="Dirección de residencia — sin declarar"></span>
+              <span class="hero__progress-dot" title="Contacto de emergencia — sin declarar"></span>
+            </div>
+          </div>
+
+          <details class="hero__privacy">
+            <summary>
+              <i class="ti ti-info-circle"></i>
+              Cómo se usan tus datos
+              <i class="ti ti-chevron-down chevron" style="margin-left:auto;"></i>
+            </summary>
+            <div class="hero__privacy-body">
+              <ul>
+                <li>Después de guardarlos, solo verás la versión enmascarada (xx.xxx.678-K).</li>
+                <li>HR puede ver el valor completo solo con motivo registrado en audit log.</li>
+                <li>Nunca aparecen en logs, alertas, prompts de IA ni mensajes de error.</li>
+                <li>Cumplimos Ley 19.628 y Ley 21.719 sobre datos personales.</li>
+              </ul>
+            </div>
+          </details>
+        </section>
+
+        <!-- Section: Identificación -->
+        <section class="section" aria-labelledby="sec-id">
+          <header class="section__header">
+            <h3 class="section__title" id="sec-id">Identificación</h3>
+            <span class="section__hint">Documentos de identidad por país</span>
+          </header>
+
+          <div class="section__list">
+            <!-- ITEM: pending -->
+            <article class="item item--warning">
+              <button class="item__header" aria-expanded="false">
+                <div class="item__icon" aria-hidden="true"><i class="ti ti-id"></i></div>
+                <div class="item__main">
+                  <h4 class="item__title">RUT (Chile)</h4>
+                  <p class="item__subtitle">
+                    <span class="item__value">xx.xxx.678-K</span>
+                    · Declarado hace 3 días
+                  </p>
+                </div>
+                <span class="item__chip item__chip--warning item__chip-anim">
+                  <i class="ti ti-clock"></i>Pendiente
+                </span>
+                <i class="ti ti-chevron-down item__chevron"></i>
+              </button>
+              <div class="item__status">
+                <i class="ti ti-eye-search" aria-hidden="true"></i>
+                <span class="item__status-text">HR está revisando tu documento. Te avisaremos cuando quede verificado.</span>
+                <button class="item__status-action">Editar</button>
+              </div>
+            </article>
+
+            <!-- ITEM: empty/optional add -->
+            <article class="item item--empty">
+              <button class="item__header" aria-expanded="false">
+                <div class="item__icon" aria-hidden="true"><i class="ti ti-plus"></i></div>
+                <div class="item__main">
+                  <h4 class="item__title">Agregar otro documento</h4>
+                  <p class="item__subtitle">Pasaporte, documento internacional, etc. (opcional)</p>
+                </div>
+                <i class="ti ti-chevron-down item__chevron"></i>
+              </button>
+            </article>
+          </div>
+        </section>
+
+        <!-- Section: Direcciones -->
+        <section class="section" aria-labelledby="sec-addr">
+          <header class="section__header">
+            <h3 class="section__title" id="sec-addr">Direcciones</h3>
+            <span class="section__hint">Una activa por tipo</span>
+          </header>
+
+          <div class="section__list">
+
+            <!-- ITEM: verified -->
+            <article class="item item--success">
+              <button class="item__header" aria-expanded="false">
+                <div class="item__icon" aria-hidden="true"><i class="ti ti-home"></i></div>
+                <div class="item__main">
+                  <h4 class="item__title">Dirección legal</h4>
+                  <p class="item__subtitle">Las Condes · Región Metropolitana · CL</p>
+                </div>
+                <span class="item__chip item__chip--success">
+                  <i class="ti ti-check"></i>Verificada
+                </span>
+                <i class="ti ti-chevron-down item__chevron"></i>
+              </button>
+              <div class="item__status">
+                <i class="ti ti-shield-check" style="color: var(--success);" aria-hidden="true"></i>
+                <span class="item__status-text">Verificada por HR el 2 mayo 2026 · Lista para emitir documentos formales.</span>
+                <button class="item__status-action">Editar</button>
+              </div>
+            </article>
+
+            <!-- ITEM: empty optional -->
+            <article class="item item--empty">
+              <button class="item__header" aria-expanded="false">
+                <div class="item__icon" aria-hidden="true"><i class="ti ti-mail"></i></div>
+                <div class="item__main">
+                  <h4 class="item__title">Dirección de correspondencia</h4>
+                  <p class="item__subtitle">Donde recibir cartas físicas (opcional)</p>
+                </div>
+                <i class="ti ti-chevron-down item__chevron"></i>
+              </button>
+            </article>
+
+            <!-- ITEM: empty optional -->
+            <article class="item item--empty">
+              <button class="item__header" aria-expanded="false">
+                <div class="item__icon" aria-hidden="true"><i class="ti ti-heart-handshake"></i></div>
+                <div class="item__main">
+                  <h4 class="item__title">Contacto de emergencia</h4>
+                  <p class="item__subtitle">Persona y teléfono para casos urgentes (opcional)</p>
+                </div>
+                <i class="ti ti-chevron-down item__chevron"></i>
+              </button>
+            </article>
+
+          </div>
+        </section>
+
+      </div><!-- /partial pane -->
+
+      <!-- ─────── VARIANT: EMPTY ─────── -->
+      <div class="variant-pane" data-pane="empty">
+
+        <section class="hero" aria-labelledby="legal-hero-title-2" role="region">
+          <div class="hero__intro">
+            <div class="hero__icon" aria-hidden="true">
+              <i class="ti ti-shield-lock"></i>
+            </div>
+            <div>
+              <h2 class="hero__title" id="legal-hero-title-2">Tus datos legales</h2>
+              <p class="hero__lead">
+                Para emitir tu finiquito y contrato formal necesitamos tu identidad legal y dirección.
+              </p>
+            </div>
+          </div>
+          <div class="hero__progress" role="status" aria-live="polite">
+            <div class="hero__progress-row">
+              <span class="hero__progress-label">Progreso</span>
+              <span class="hero__progress-count">0<span style="color:var(--text-secondary); font-weight:500;">/4</span></span>
+            </div>
+            <div class="hero__progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+              <div class="hero__progress-fill" style="width: 0%"></div>
+            </div>
+            <div class="hero__progress-dots" aria-hidden="true">
+              <span class="hero__progress-dot"></span>
+              <span class="hero__progress-dot"></span>
+              <span class="hero__progress-dot"></span>
+              <span class="hero__progress-dot"></span>
+            </div>
+          </div>
+        </section>
+
+        <div class="empty-state">
+          <div class="empty-state__icon" aria-hidden="true">
+            <i class="ti ti-id-badge-2"></i>
+          </div>
+          <h2 class="empty-state__title">Empecemos por tu identidad legal</h2>
+          <p class="empty-state__lead">
+            Te tomará menos de un minuto. Solo necesitas tu RUT a mano. Después podrás agregar tu dirección.
+          </p>
+          <button class="btn btn--primary" style="margin-top: var(--s-3);">
+            <i class="ti ti-arrow-right"></i>
+            Declarar mi RUT
+          </button>
+        </div>
+
+      </div><!-- /empty pane -->
+
+      <!-- ─────── VARIANT: REJECTED ─────── -->
+      <div class="variant-pane" data-pane="rejected">
+
+        <section class="hero" aria-labelledby="legal-hero-title-3" role="region">
+          <div class="hero__intro">
+            <div class="hero__icon" aria-hidden="true">
+              <i class="ti ti-shield-lock"></i>
+            </div>
+            <div>
+              <h2 class="hero__title" id="legal-hero-title-3">Tus datos legales</h2>
+              <p class="hero__lead">
+                Tu identidad y dirección oficial. Solo tú los declaras — nadie más los ve sin tu autorización.
+              </p>
+            </div>
+          </div>
+          <div class="hero__progress" role="status" aria-live="polite">
+            <div class="hero__progress-row">
+              <span class="hero__progress-label">Progreso</span>
+              <span class="hero__progress-count">1<span style="color:var(--text-secondary); font-weight:500;">/4</span></span>
+            </div>
+            <div class="hero__progress-bar" role="progressbar" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">
+              <div class="hero__progress-fill" style="width: 25%; background: linear-gradient(90deg, var(--error), #d4326e);"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section">
+          <header class="section__header">
+            <h3 class="section__title">Identificación</h3>
+          </header>
+
+          <div class="section__list">
+
+            <!-- ITEM: rejected (form expanded) -->
+            <article class="item item--error item--expanded">
+              <button class="item__header" aria-expanded="true">
+                <div class="item__icon" aria-hidden="true"><i class="ti ti-alert-triangle"></i></div>
+                <div class="item__main">
+                  <h4 class="item__title">RUT (Chile)</h4>
+                  <p class="item__subtitle">Vuelve a declararlo con la corrección que pidió HR.</p>
+                </div>
+                <span class="item__chip item__chip--error">
+                  <i class="ti ti-x"></i>Rechazado
+                </span>
+                <i class="ti ti-chevron-down item__chevron"></i>
+              </button>
+
+              <div class="reject-banner" role="status">
+                <i class="ti ti-message-2-exclamation"></i>
+                <div>
+                  <strong>HR pidió corregir:</strong>
+                  Falta el dígito verificador. Lo enviaste como "12.345.678" sin el "-K".
+                </div>
+              </div>
+
+              <div class="item__form">
+                <div class="item__form-grid">
+                  <div class="field">
+                    <label class="field__label" for="r-country">País emisor</label>
+                    <select class="field__select" id="r-country">
+                      <option>🇨🇱 Chile</option>
+                      <option>🇦🇷 Argentina</option>
+                      <option>🇧🇷 Brasil</option>
+                      <option>🇨🇴 Colombia</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label class="field__label" for="r-type">Tipo de documento</label>
+                    <select class="field__select" id="r-type">
+                      <option>RUT</option>
+                      <option>Pasaporte</option>
+                    </select>
+                  </div>
+                  <div class="field full">
+                    <label class="field__label" for="r-rut">RUT</label>
+                    <input class="field__input field__input--mono" id="r-rut" placeholder="12.345.678-K" value="12.345.678">
+                    <span class="field__error" role="alert">
+                      <i class="ti ti-alert-circle"></i>
+                      Falta el dígito verificador (0-9 o K).
+                    </span>
+                  </div>
+                </div>
+                <div class="item__form-actions">
+                  <button class="btn btn--text">Cancelar</button>
+                  <button class="btn btn--primary">
+                    <i class="ti ti-send"></i>
+                    Guardar y enviar a revisión
+                  </button>
+                </div>
+              </div>
+            </article>
+
+          </div>
+        </section>
+
+      </div><!-- /rejected pane -->
+
+      <!-- ─────── VARIANT: VERIFIED ─────── -->
+      <div class="variant-pane" data-pane="verified">
+
+        <section class="hero" aria-labelledby="legal-hero-title-4" role="region" style="border-color: var(--success); background: linear-gradient(180deg, rgba(110,194,7,0.04), var(--bg-paper));">
+          <div class="hero__intro">
+            <div class="hero__icon" aria-hidden="true" style="background: var(--success-tonal-bg); color: var(--success-tonal-fg);">
+              <i class="ti ti-shield-check"></i>
+            </div>
+            <div>
+              <h2 class="hero__title" id="legal-hero-title-4">Listo. Todos tus datos están verificados.</h2>
+              <p class="hero__lead">
+                Puedes recibir cualquier documento formal sin bloqueos. Si algo cambia (mudanza, RUT nuevo), edita la fila correspondiente.
+              </p>
+            </div>
+          </div>
+          <div class="hero__progress" role="status">
+            <div class="hero__progress-row">
+              <span class="hero__progress-label">Progreso</span>
+              <span class="hero__progress-count" style="color: var(--success);">4<span style="color:var(--text-secondary); font-weight:500;">/4</span></span>
+            </div>
+            <div class="hero__progress-bar" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+              <div class="hero__progress-fill" style="width: 100%; background: var(--success);"></div>
+            </div>
+            <div class="hero__progress-dots" aria-hidden="true">
+              <span class="hero__progress-dot complete"></span>
+              <span class="hero__progress-dot complete"></span>
+              <span class="hero__progress-dot complete"></span>
+              <span class="hero__progress-dot complete"></span>
+            </div>
+          </div>
+        </section>
+
+        <section class="section">
+          <header class="section__header"><h3 class="section__title">Identificación</h3></header>
+          <div class="section__list">
+            <article class="item item--success">
+              <button class="item__header" aria-expanded="false">
+                <div class="item__icon"><i class="ti ti-id"></i></div>
+                <div class="item__main">
+                  <h4 class="item__title">RUT (Chile)</h4>
+                  <p class="item__subtitle"><span class="item__value">xx.xxx.678-K</span> · Verificado por HR el 2 mayo 2026</p>
+                </div>
+                <span class="item__chip item__chip--success"><i class="ti ti-check"></i>Verificado</span>
+                <i class="ti ti-chevron-down item__chevron"></i>
+              </button>
+            </article>
+          </div>
+        </section>
+
+        <section class="section">
+          <header class="section__header"><h3 class="section__title">Direcciones</h3></header>
+          <div class="section__list">
+            <article class="item item--success">
+              <button class="item__header" aria-expanded="false">
+                <div class="item__icon"><i class="ti ti-home"></i></div>
+                <div class="item__main">
+                  <h4 class="item__title">Dirección legal</h4>
+                  <p class="item__subtitle">Las Condes · Región Metropolitana · CL</p>
+                </div>
+                <span class="item__chip item__chip--success"><i class="ti ti-check"></i>Verificada</span>
+                <i class="ti ti-chevron-down item__chevron"></i>
+              </button>
+            </article>
+            <article class="item item--success">
+              <button class="item__header" aria-expanded="false">
+                <div class="item__icon"><i class="ti ti-bed"></i></div>
+                <div class="item__main">
+                  <h4 class="item__title">Residencia</h4>
+                  <p class="item__subtitle">Providencia · Región Metropolitana · CL</p>
+                </div>
+                <span class="item__chip item__chip--success"><i class="ti ti-check"></i>Verificada</span>
+                <i class="ti ti-chevron-down item__chevron"></i>
+              </button>
+            </article>
+            <article class="item item--success">
+              <button class="item__header" aria-expanded="false">
+                <div class="item__icon"><i class="ti ti-heart-handshake"></i></div>
+                <div class="item__main">
+                  <h4 class="item__title">Contacto de emergencia</h4>
+                  <p class="item__subtitle">Maria Reyes · +56 9 ••• 4321</p>
+                </div>
+                <span class="item__chip item__chip--success"><i class="ti ti-check"></i>Verificado</span>
+                <i class="ti ti-chevron-down item__chevron"></i>
+              </button>
+            </article>
+          </div>
+        </section>
+
+      </div><!-- /verified pane -->
+
+      <!-- ─────── VARIANT: SUBMITTING ─────── -->
+      <div class="variant-pane" data-pane="submitting">
+
+        <section class="hero" aria-labelledby="legal-hero-title-5" role="region">
+          <div class="hero__intro">
+            <div class="hero__icon"><i class="ti ti-shield-lock"></i></div>
+            <div>
+              <h2 class="hero__title" id="legal-hero-title-5">Tus datos legales</h2>
+              <p class="hero__lead">Tu identidad y dirección oficial. Solo tú los declaras.</p>
+            </div>
+          </div>
+          <div class="hero__progress" role="status">
+            <div class="hero__progress-row">
+              <span class="hero__progress-label">Progreso</span>
+              <span class="hero__progress-count">0<span style="color:var(--text-secondary); font-weight:500;">/4</span></span>
+            </div>
+            <div class="hero__progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+              <div class="hero__progress-fill" style="width: 0%"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section">
+          <header class="section__header"><h3 class="section__title">Identificación</h3></header>
+          <div class="section__list">
+
+            <article class="item item--error item--expanded">
+              <button class="item__header" aria-expanded="true">
+                <div class="item__icon"><i class="ti ti-id"></i></div>
+                <div class="item__main">
+                  <h4 class="item__title">RUT (Chile)</h4>
+                  <p class="item__subtitle">Necesario para emitir tu finiquito y contrato formal.</p>
+                </div>
+                <span class="item__chip item__chip--error"><i class="ti ti-circle"></i>Falta</span>
+                <i class="ti ti-chevron-down item__chevron"></i>
+              </button>
+              <div class="item__form">
+                <div class="item__form-grid">
+                  <div class="field">
+                    <label class="field__label" for="s-country">País emisor</label>
+                    <select class="field__select" id="s-country" disabled>
+                      <option>🇨🇱 Chile</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label class="field__label" for="s-type">Tipo de documento</label>
+                    <select class="field__select" id="s-type" disabled>
+                      <option>RUT</option>
+                    </select>
+                  </div>
+                  <div class="field full">
+                    <label class="field__label" for="s-rut">RUT</label>
+                    <input class="field__input field__input--mono" id="s-rut" value="12.345.678-K" disabled>
+                    <span class="field__hint">Después de guardar verás solo "xx.xxx.678-K".</span>
+                  </div>
+                </div>
+                <div class="item__form-actions">
+                  <button class="btn btn--text" disabled>Cancelar</button>
+                  <button class="btn btn--primary btn--loading" aria-busy="true" disabled>
+                    <span class="btn-spinner" aria-hidden="true"></span>
+                    Guardando…
+                  </button>
+                </div>
+              </div>
+            </article>
+
+          </div>
+        </section>
+
+      </div><!-- /submitting pane -->
+
+    </div><!-- /page -->
+  </main>
+</div>
+
+<!-- Toast (only shows in verified by default) -->
+<div class="toast-host" aria-live="polite" aria-atomic="true" id="toast-host"></div>
+
+<script>
+  // Variant switcher
+  const switcher = document.querySelector('.variant-switcher');
+  const panes = document.querySelectorAll('.variant-pane');
+  const buttons = document.querySelectorAll('.variant-switcher__btn');
+  const toastHost = document.getElementById('toast-host');
+
+  buttons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = btn.dataset.variant;
+      buttons.forEach(b => b.classList.toggle('active', b === btn));
+      panes.forEach(p => p.classList.toggle('active', p.dataset.pane === target));
+
+      if (target === 'verified') {
+        showToast('Listo · Tu dirección quedó verificada', 'HR confirmó la información hace un momento.');
+      }
+    });
+  });
+
+  function showToast(title, body) {
+    toastHost.innerHTML = '';
+    const t = document.createElement('div');
+    t.className = 'toast';
+    t.setAttribute('role', 'status');
+    t.innerHTML = `
+      <i class="ti ti-circle-check"></i>
+      <div>
+        <p class="toast__title">${title}</p>
+        <p class="toast__body">${body}</p>
+      </div>
+    `;
+    toastHost.appendChild(t);
+    setTimeout(() => { if (t.parentNode) t.remove(); }, 4500);
+  }
+
+  // Item expand/collapse demo (just toggles aria-expanded + class)
+  document.querySelectorAll('.item__header').forEach(btn => {
+    btn.addEventListener('click', e => {
+      // skip the rejected/submitting forced-open ones
+      const item = btn.closest('.item');
+      if (item.classList.contains('item--expanded')) {
+        item.classList.remove('item--expanded');
+        btn.setAttribute('aria-expanded', 'false');
+      } else {
+        item.classList.add('item--expanded');
+        btn.setAttribute('aria-expanded', 'true');
+      }
+    });
+  });
+</script>
+
+</body>
+</html>
