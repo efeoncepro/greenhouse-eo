@@ -886,3 +886,14 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-797` | `to-do` | Contractor Closure + Transition Controls (EPIC-013 child 9/10) | `docs/tasks/to-do/TASK-797-contractor-closure-transition-controls.md` |
 | `TASK-798` | `to-do` | Contractor Reliability + Ops Control Plane (EPIC-013 child 10/10) | `docs/tasks/to-do/TASK-798-contractor-reliability-ops-control-plane.md` |
 | `TASK-799` | `complete` | Payment Order Processor Source + Settlement Policy | `docs/tasks/complete/TASK-799-payment-order-processor-source-settlement-policy.md` |
+| `TASK-800` | `to-do` | Production GCP WIF-Only Auth Posture Hardening | `docs/tasks/to-do/TASK-800-production-gcp-wif-only-auth-posture-hardening.md` |
+| `TASK-801` | `to-do` | Engagement Primitive: services + cost_attribution Extension (EPIC-014 child 1/10) | `docs/tasks/to-do/TASK-801-engagement-primitive-services-extension.md` |
+| `TASK-802` | `to-do` | Engagement Commercial Terms Time-Versioned (EPIC-014 child 2/10) | `docs/tasks/to-do/TASK-802-engagement-commercial-terms-time-versioned.md` |
+| `TASK-803` | `to-do` | Engagement Phases + Outcomes + Lineage (EPIC-014 child 3/10) | `docs/tasks/to-do/TASK-803-engagement-phases-outcomes-lineage.md` |
+| `TASK-804` | `to-do` | Engagement Approvals Workflow + Capacity Warning Soft (EPIC-014 child 4/10) | `docs/tasks/to-do/TASK-804-engagement-approvals-capacity-warning.md` |
+| `TASK-805` | `to-do` | Engagement Progress Snapshots Weekly Cadence (EPIC-014 child 5/10) | `docs/tasks/to-do/TASK-805-engagement-progress-snapshots.md` |
+| `TASK-806` | `to-do` | VIEW gtm_investment_pnl + Reclassifier Helper (EPIC-014 child 6/10) | `docs/tasks/to-do/TASK-806-gtm-investment-pnl-view-reclassifier.md` |
+| `TASK-807` | `to-do` | Commercial Health Reliability Subsystem NEW (EPIC-014 child 7/10) | `docs/tasks/to-do/TASK-807-commercial-health-reliability-subsystem.md` |
+| `TASK-808` | `to-do` | Engagement Audit Log + Outbox Events v1 + Reactive Consumers (EPIC-014 child 8/10) | `docs/tasks/to-do/TASK-808-engagement-audit-log-outbox-events-reactive-consumers.md` |
+| `TASK-809` | `to-do` | Sample Sprints UI + Wizards (EPIC-014 child 9/10) | `docs/tasks/to-do/TASK-809-sample-sprints-ui-wizards.md` |
+| `TASK-810` | `to-do` | Engagement Anti-Zombie CHECK Constraint NOT VALID + VALIDATE (EPIC-014 child 10/10) | `docs/tasks/to-do/TASK-810-engagement-anti-zombie-check-constraint.md` |
