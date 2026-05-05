@@ -242,6 +242,35 @@ Estos CLIs estan autenticados localmente. Cuando una task toca su dominio, **usa
   - `npx pnpm lint`, o
   - validacion manual suficiente cuando el cambio no rompa build pero afecte UI o deploy
 - Si no se pudo validar, no hacer `push` como si el cambio estuviera cerrado. Dejarlo explicitado en `Handoff.md`.
+
+### Git hooks canonicos (Husky + lint-staged) — autoenforcement local
+
+Desde 2026-05-05 el repo tiene 2 git hooks instalados que se activan automaticamente al `pnpm install` (via `"prepare": "husky"` script). Cualquier agente (Claude Code, Codex, Cursor, futuro) que clone el repo los hereda sin configuracion adicional.
+
+| Hook | Que corre | Que bloquea | Latencia |
+| --- | --- | --- | --- |
+| **`.husky/pre-commit`** | `pnpm exec lint-staged` → `eslint --fix --cache` sobre archivos staged | Errores no auto-fixable | < 5s |
+| **`.husky/pre-push`** | `pnpm lint` (full repo) + `pnpm exec tsc --noEmit` | Cualquier 1+ error de lint o tsc | < 90s |
+
+**Reglas duras** (multi-agente):
+
+- **NUNCA** ejecutar `git commit --no-verify` o `git push --no-verify` sin autorizacion explicita del usuario. Bypassear los hooks rompe el contrato con el CI gate y deja errores que otro agente tiene que limpiar despues. Ese antipattern (revert+repush ciclos) es justamente lo que los hooks previenen.
+- **NUNCA** desinstalar / deshabilitar / mover los hooks sin discutir antes con el usuario. Los hooks son infra compartida; ajustarlos sin autorizacion afecta a todos los agentes futuros.
+- Si un hook falla por causa ajena a tu cambio (e.g. un warning preexistente que escalo a error porque otro agente flipeo una rule), arreglalo solo si la regla esta en `error`. Warnings no bloquean. Si error preexistente bloquea, documenta en commit message + abre issue/task para el cleanup separado.
+- Si necesitas saltar el hook por emergencia documentada (e.g. hotfix de produccion bloqueante, deploy time-critical), pide autorizacion al usuario primero, documenta el bypass en el commit message con razon + fecha + task de cleanup posterior.
+- Los hooks NO reemplazan el CI gate. CI sigue siendo la ultima linea de defensa. La idea es que CI casi nunca falle porque los hooks ya filtraron el 99% de los errores antes del push.
+
+**Si el hook ejecuta lento o tiene falsos positivos**:
+
+- ESLint cache local en `node_modules/.cache/eslint-staged` reduce latencia del pre-commit a < 5s. Si el cache se corrompe, `rm -rf node_modules/.cache/eslint-staged` lo regenera.
+- Si pre-push tarda > 2 min consistentemente, abrir issue. El target es < 90s.
+- NUNCA loopear con bypass — eso solo posterga el problema y rompe el contrato con el equipo.
+
+Documentacion canonica:
+
+- Spec arquitectura: `docs/architecture/GREENHOUSE_GIT_HOOKS_AUTOENFORCEMENT_V1.md`
+- Doc funcional (lenguaje simple): `docs/documentation/plataforma/git-hooks-pre-commit-pre-push.md`
+- Configuracion: `package.json` (`"lint-staged"` block + `"prepare"` script), `.husky/pre-commit`, `.husky/pre-push`
 - Mensajes de commit:
   - `feat: ...`
   - `fix: ...`
