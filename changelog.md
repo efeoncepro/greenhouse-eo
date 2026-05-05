@@ -7993,6 +7993,10 @@ Comando operativo:
 - Docs operativos: se formalizo `SOLUTION_QUALITY_OPERATING_MODEL_V1` como contrato transversal anti-parche para agentes, enlazado desde `AGENTS.md`, `CLAUDE.md`, `TASK_PROCESS`, prompt Codex y modelos operativos.
 - Identity / Microsoft SSO: se rotó de forma segura el `AZURE_AD_CLIENT_SECRET` rechazado por Entra ID (`AADSTS7000215`) y se endureció `/api/auth/health` con un token probe específico para detectar `invalid_client` antes de que el usuario llegue al callback OAuth.
 
+# 2026-05-05
+
+- HR / Offboarding: se endureció el contrato de documentos de finiquito versionados. Los PDFs de settlements cancelados quedan como evidencia histórica descargable, pero ya no habilitan `Reemitir`, revisión ni emisión sobre el settlement vigente; el flujo ofrece generar el documento vigente y el backend ancla todas las acciones documentales al settlement aprobado actual.
+
 # 2026-05-04
 
 - Identity / SCIM: se corrigió el contrato de tenant mapping interno Efeonce. `client_id=NULL` ahora es semántica canónica para provisioning interno, los mappings externos quedan protegidos por FK a `greenhouse_core.clients`, y SCIM ya no intenta crear usuarios con el pseudo-client legacy `efeonce-admin`.

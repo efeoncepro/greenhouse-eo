@@ -112,6 +112,15 @@ const issuedDocument = {
   pdfAssetId: 'asset-finiquito-v1'
 }
 
+const historicalDocument = {
+  ...issuedDocument,
+  finalSettlementDocumentId: 'final-settlement-document-historical',
+  finalSettlementId: 'final-settlement-cancelled',
+  documentStatus: 'rendered',
+  documentVersion: 1,
+  pdfAssetId: 'asset-finiquito-historical'
+}
+
 describe('HrOffboardingView', () => {
   beforeEach(() => {
     vi.clearAllMocks()
@@ -258,6 +267,70 @@ describe('HrOffboardingView', () => {
         expect.objectContaining({
           method: 'POST',
           body: JSON.stringify({ reason: 'Reemisión por plantilla aprobada TASK-783' })
+        })
+      )
+    })
+  })
+
+  it('keeps historical settlement documents read-only and generates the current document instead', async () => {
+    const user = userEvent.setup()
+
+    fetchMock.mockImplementation(async (input: RequestInfo | URL, init?: RequestInit) => {
+      const url = String(input)
+
+      if (url === '/api/hr/offboarding/cases?limit=200') {
+        return Response.json({ cases: [executedCase] })
+      }
+
+      if (url === '/api/hr/core/members/options') {
+        return Response.json(membersPayload)
+      }
+
+      if (url === '/api/hr/offboarding/cases/offboarding-case-valentina/final-settlement' && !init?.method) {
+        return Response.json({
+          settlement: {
+            ...approvedSettlement,
+            finalSettlementId: 'final-settlement-current'
+          }
+        })
+      }
+
+      if (url === '/api/hr/offboarding/cases/offboarding-case-valentina/final-settlement/document' && !init?.method) {
+        return Response.json({ document: historicalDocument })
+      }
+
+      if (url === '/api/hr/offboarding/cases/offboarding-case-valentina/final-settlement/document' && init?.method === 'POST') {
+        return Response.json({
+          document: {
+            ...issuedDocument,
+            finalSettlementDocumentId: 'final-settlement-document-current',
+            finalSettlementId: 'final-settlement-current',
+            documentStatus: 'rendered',
+            documentVersion: 2,
+            pdfAssetId: 'asset-finiquito-current'
+          }
+        }, { status: 201 })
+      }
+
+      throw new Error(`Unexpected fetch: ${url}`)
+    })
+
+    const { default: HrOffboardingView } = await import('./HrOffboardingView')
+
+    renderWithTheme(<HrOffboardingView />)
+
+    expect(await screen.findByText('EO-OFF-2026-VAL')).toBeInTheDocument()
+    expect(screen.getByText(/PDF histórico de un cálculo anterior/)).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Reemitir' })).not.toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Generar doc. vigente' }))
+
+    await waitFor(() => {
+      expect(fetchMock).toHaveBeenCalledWith(
+        '/api/hr/offboarding/cases/offboarding-case-valentina/final-settlement/document',
+        expect.objectContaining({
+          method: 'POST',
+          body: JSON.stringify({})
         })
       )
     })

@@ -493,8 +493,12 @@ const HrOffboardingView = () => {
     return null
   }
 
-  const documentActionFor = (document: FinalSettlementDocument | null) => {
+  const documentBelongsToSettlement = (document: FinalSettlementDocument | null, settlement: FinalSettlement | null) =>
+    Boolean(document && settlement && document.finalSettlementId === settlement.finalSettlementId)
+
+  const documentActionFor = (document: FinalSettlementDocument | null, settlement: FinalSettlement | null) => {
     if (!document) return { action: 'render' as const, label: 'Renderizar doc.' }
+    if (!documentBelongsToSettlement(document, settlement)) return { action: 'render' as const, label: 'Generar doc. vigente' }
     if (document.documentStatus === 'rendered') return { action: 'submit-review' as const, label: 'Enviar a revisión' }
     if (document.documentStatus === 'in_review') return { action: 'approve' as const, label: 'Aprobar doc.' }
     if (document.documentStatus === 'approved') return { action: 'issue' as const, label: 'Emitir' }
@@ -503,8 +507,12 @@ const HrOffboardingView = () => {
     return null
   }
 
-  const canReissueDocument = (document: FinalSettlementDocument | null) =>
-    Boolean(document && ['rendered', 'in_review', 'approved', 'issued'].includes(document.documentStatus))
+  const canReissueDocument = (document: FinalSettlementDocument | null, settlement: FinalSettlement | null) =>
+    Boolean(
+      documentBelongsToSettlement(document, settlement)
+      && document
+      && ['rendered', 'in_review', 'approved', 'issued'].includes(document.documentStatus)
+    )
 
   const submitReissue = async () => {
     if (!reissueTarget) return
@@ -717,7 +725,8 @@ const HrOffboardingView = () => {
                   const settlementBusy = settlementSavingCaseId === item.offboardingCaseId
                   const settlementApproved = closureLane.allowsFinalSettlement && settlement ? ['approved', 'issued'].includes(settlement.calculationStatus) : false
                   const document = documentsByCaseId[item.offboardingCaseId] ?? null
-                  const documentAction = closureLane.allowsFinalSettlement ? documentActionFor(document) : null
+                  const documentAction = closureLane.allowsFinalSettlement ? documentActionFor(document, settlement) : null
+                  const documentIsHistorical = Boolean(document && settlement && document.finalSettlementId !== settlement.finalSettlementId)
                   const documentBusy = documentSavingCaseId === item.offboardingCaseId
                   const downloadUrl = document?.pdfAssetId ? `/api/assets/private/${encodeURIComponent(document.pdfAssetId)}` : null
 
@@ -803,6 +812,11 @@ const HrOffboardingView = () => {
                               Revisar entidad legal antes de emitir.
                             </Typography>
                           )}
+                          {documentIsHistorical && (
+                            <Typography variant='caption' color='warning.main'>
+                              PDF histórico de un cálculo anterior. Genera el documento vigente antes de enviarlo a revisión o reemitir.
+                            </Typography>
+                          )}
                           <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
                             {documentAction && (
                               <Button
@@ -814,7 +828,7 @@ const HrOffboardingView = () => {
                                 {documentBusy ? 'Procesando' : documentAction.label}
                               </Button>
                             )}
-                            {canReissueDocument(document) && (
+                            {canReissueDocument(document, settlement) && (
                               <Button
                                 size='small'
                                 variant='outlined'

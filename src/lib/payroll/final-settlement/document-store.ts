@@ -34,6 +34,10 @@ import type { FinalSettlement } from './types'
 type JsonRecord = Record<string, unknown>
 type QueryableClient = Pick<PoolClient, 'query'>
 type FinalSettlementDocumentRow = Record<string, any>
+type CurrentSettlementRow = {
+  final_settlement_id: string
+  calculation_status: string
+}
 
 type CollaboratorRow = {
   member_id: string
@@ -127,6 +131,8 @@ const queryRows = async <T extends Record<string, unknown>>(text: string, values
 
   return query<T>(text, values)
 }
+
+const INACTIVE_DOCUMENT_STATUSES = new Set(['rejected', 'voided', 'superseded', 'cancelled'])
 
 const getCollaboratorSnapshot = async (memberId: string, profileId: string): Promise<FinalSettlementDocumentSnapshot['collaborator']> => {
   const rows = await queryRows<CollaboratorRow>(
@@ -507,22 +513,27 @@ export const renderFinalSettlementDocumentForCase = async (input: RenderFinalSet
       `
         SELECT *
         FROM greenhouse_payroll.final_settlement_documents
-        WHERE final_settlement_id = $1
+        WHERE offboarding_case_id = $1
         ORDER BY document_version DESC, created_at DESC
         FOR UPDATE
       `,
-      [settlement.finalSettlementId]
+      [settlement.offboardingCaseId]
     )
 
-    const latest = currentRows.rows[0] ? mapDocumentRow(currentRows.rows[0]) : null
-    const active = currentRows.rows.map(mapDocumentRow).find(doc => !['rejected', 'voided', 'superseded', 'cancelled'].includes(doc.documentStatus))
+    const documents = currentRows.rows.map(mapDocumentRow)
+    const latest = documents[0] ?? null
+    const currentSettlementDocuments = documents.filter(doc => doc.finalSettlementId === settlement.finalSettlementId)
+    const active = currentSettlementDocuments.find(doc => !INACTIVE_DOCUMENT_STATUSES.has(doc.documentStatus))
 
     if (active && !input.reissue) {
       return active
     }
 
     if (input.reissue && !active) {
-      throw new PayrollValidationError('No active final settlement document exists to reissue.', 409)
+      throw new PayrollValidationError('No active final settlement document exists for the approved settlement. Generate the current document before reissuing it.', 409, {
+        finalSettlementId: settlement.finalSettlementId,
+        settlementVersion: settlement.settlementVersion
+      })
     }
 
     if (active?.documentStatus === 'signed_or_ratified') {
@@ -566,7 +577,8 @@ export const renderFinalSettlementDocumentForCase = async (input: RenderFinalSet
     const snapshotHash = computeJsonSha256(snapshot)
     const pdfBytes = await renderFinalSettlementDocumentPdf(snapshot)
     const contentHash = computeBytesSha256(pdfBytes)
-    const fileName = `finiquito-${settlement.memberId}-v${settlement.settlementVersion}-d${(latest?.documentVersion ?? 0) + 1}.pdf`
+    const documentVersion = (latest?.documentVersion ?? 0) + 1
+    const fileName = `finiquito-${settlement.memberId}-v${settlement.settlementVersion}-d${documentVersion}.pdf`
 
     const asset = await storeSystemGeneratedPrivateAsset({
       ownerAggregateType: 'final_settlement_document',
@@ -580,15 +592,13 @@ export const renderFinalSettlementDocumentForCase = async (input: RenderFinalSet
         finalSettlementId: settlement.finalSettlementId,
         offboardingCaseId: settlement.offboardingCaseId,
         settlementVersion: settlement.settlementVersion,
-        documentVersion: (latest?.documentVersion ?? 0) + 1,
+        documentVersion,
         reissue: Boolean(input.reissue),
         reissueReason,
         snapshotHash,
         contentHash
       }
     })
-
-    const documentVersion = (latest?.documentVersion ?? 0) + 1
 
     const result = await client.query<FinalSettlementDocumentRow>(
       `
@@ -665,17 +675,47 @@ export const renderFinalSettlementDocumentForCase = async (input: RenderFinalSet
   })
 }
 
-const getCurrentDocumentForUpdate = async (client: PoolClient, offboardingCaseId: string) => {
-  const rows = await client.query<FinalSettlementDocumentRow>(
+const getCurrentApprovedSettlementForUpdate = async (client: PoolClient, offboardingCaseId: string) => {
+  const settlementRows = await client.query<CurrentSettlementRow>(
     `
-      SELECT *
-      FROM greenhouse_payroll.final_settlement_documents
+      SELECT final_settlement_id, calculation_status
+      FROM greenhouse_payroll.final_settlements
       WHERE offboarding_case_id = $1
-      ORDER BY document_version DESC, created_at DESC
+      ORDER BY settlement_version DESC, created_at DESC
       LIMIT 1
       FOR UPDATE
     `,
     [offboardingCaseId]
+  )
+
+  const settlement = settlementRows.rows[0] ?? null
+
+  if (!settlement) {
+    throw new PayrollValidationError('Final settlement not found.', 404)
+  }
+
+  if (settlement.calculation_status !== 'approved') {
+    throw new PayrollValidationError('Only approved final settlements can operate a finiquito document.', 409, {
+      status: settlement.calculation_status
+    })
+  }
+
+  return settlement
+}
+
+const getCurrentDocumentForUpdate = async (client: PoolClient, offboardingCaseId: string) => {
+  const settlement = await getCurrentApprovedSettlementForUpdate(client, offboardingCaseId)
+
+  const rows = await client.query<FinalSettlementDocumentRow>(
+    `
+      SELECT *
+      FROM greenhouse_payroll.final_settlement_documents
+      WHERE final_settlement_id = $1
+      ORDER BY document_version DESC, created_at DESC
+      LIMIT 1
+      FOR UPDATE
+    `,
+    [settlement.final_settlement_id]
   )
 
   const document = rows.rows[0] ? mapDocumentRow(rows.rows[0]) : null

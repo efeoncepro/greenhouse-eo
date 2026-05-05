@@ -1,5 +1,17 @@
 # Handoff.md
 
+## Sesion 2026-05-05 — Finiquito document version contract hardening
+
+- **Branch:** `develop`; fix listo para commit/push acotado a finiquitos.
+- **Trigger:** al usar `Reemitir` sobre Valentina en `/hr/offboarding`, la UI mostraba un PDF `Renderizado` y boton `Reemitir`, pero la API respondia `No active final settlement document exists to reissue.`
+- **Causa raiz:** el GET de documento leia el ultimo PDF por `offboarding_case_id`, mientras `reissue` buscaba documento activo dentro del `final_settlement_id` aprobado vigente. El caso Valentina tenia settlement v1 cancelado con documento rendered y settlement v2 aprobado sin documento. La UI trataba el PDF historico de v1 como accionable para v2.
+- **Fix backend:** `renderFinalSettlementDocumentForCase()` ahora bloquea/ordena documentos por caso, pero solo considera activo el documento del settlement aprobado vigente. La numeracion `document_version` queda global por caso para no duplicar versiones al regenerar despues de una remediacion de settlement. Las acciones de lifecycle (`submit`, `approve`, `issue`, `void`, `reject`, `sign/ratify`) se anclan al documento del settlement aprobado vigente y dejan de operar sobre historicos de settlements cancelados.
+- **Fix UI:** `/hr/offboarding` distingue PDF historico de documento vigente. Si el PDF pertenece a un settlement anterior, conserva link de descarga como evidencia, muestra warning accionable y ofrece `Generar doc. vigente`; no muestra `Reemitir` ni acciones de revision/emision sobre el historico.
+- **Guardrail:** `HrOffboardingView.test.tsx` cubre el caso settlement v2 aprobado + PDF historico v1: no aparece `Reemitir` y el CTA correcto hace POST al render canonico del documento vigente.
+- **Validacion:** `pnpm exec vitest run src/views/greenhouse/hr-core/offboarding/HrOffboardingView.test.tsx --reporter=verbose` OK; `pnpm exec eslint src/lib/payroll/final-settlement/document-store.ts src/views/greenhouse/hr-core/offboarding/HrOffboardingView.tsx src/views/greenhouse/hr-core/offboarding/HrOffboardingView.test.tsx` OK; `pnpm exec tsc --noEmit --pretty false` OK; `pnpm design:lint` OK con 0 errors / 0 warnings.
+- **Pendiente antes de cerrar:** commitear/pushear y verificar deployment de staging.
+- **Cuidado multi-agente:** se preservan cambios ajenos de notification-hub/tasks y smoke payment-profile sin tocar.
+
 ## Sesion 2026-05-05 — Talent Review API access aligned with admin surface
 
 - **Branch:** `develop`; se prepara commit/push.
