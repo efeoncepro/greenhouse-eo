@@ -1,5 +1,9 @@
 # TASK-518 — ApexCharts deprecation; consolidate all charts on Recharts
 
+## Cierre 2026-05-05 — `won't do` formalizado
+
+La task ya estaba autodeclarada como "DESCARTADA" en Delta 2026-04-26 (rev2) abajo. Movida a `complete/` con `Lifecycle: complete` (won't do) para sacarla del backlog activo. Política canónica de charts vigente fijada en CLAUDE.md: **ECharts** tier 1 nuevo (TASK-641), **ApexCharts** tier 2 oficial vigente sin deadline, **Recharts** solo sparklines. Si emerge necesidad real de migrar (a11y por contrato cliente, TTI lento mobile), se abre task nueva con destino correcto.
+
 ## Delta 2026-04-26 (rev2) — DESCARTADA por priorización de impacto visual
 
 **Decisión revisada 2026-04-26 (corrige decisión previa del mismo día)**: la migración masiva a Recharts **se descarta**, no solo se difiere. Razón: Greenhouse prioriza **impacto visual** (wow factor, enganche en dashboards) sobre bundle/a11y/ecosystem. Recharts sin una capa custom `GhChart` se ve menos atractivo que el Apex actual — migrar bajaría el tier visual del portal, lo opuesto a lo deseado.
@@ -61,7 +65,7 @@ Cuando se cumpla el trigger, esta spec se relee, el rank se mueve a P2, y se eje
 
 ## Status
 
-- Lifecycle: `to-do — diferida hasta trigger condition`
+- Lifecycle: `complete` (won't do — descartada 2026-04-26, formalizada 2026-05-05)
 - Priority: `P4` (era P3 — degradada 2026-04-26 tras audit)
 - Impact: `Medio` (consistencia visual + a11y + bundle)
 - Effort: `Medio-Alto` (32 archivos; QA visual manual)

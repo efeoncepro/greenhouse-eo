@@ -1,5 +1,9 @@
 # TASK-178 — Finance Budget Engine: Budget vs. Actual & Variance Analysis
 
+## Cierre 2026-05-05 — Absorbida por TASK-395 (Management Accounting Planning Engine)
+
+Esta task queda formalmente cerrada como **superseded** por consolidación. El propio Delta 2026-04-28 (abajo) ya declaraba "consolidación pendiente con TASK-395"; TASK-395 §Summary explícitamente dice "Absorbe y expande TASK-178" y la lista en sus `Files owned`. La consolidación reduce duplicación de scope sobre el modelo dimensional `member_loaded_cost_per_period_budget` definido en `GREENHOUSE_MEMBER_LOADED_COST_MODEL_V1.md`. Ejecutar todo el budget engine bajo TASK-395 (planning engine enterprise: budgets versionados + drivers + escenarios + workflow de aprobación + locks). Esta spec queda como referencia histórica del scope original más acotado.
+
 ## Delta 2026-04-28 — Subordinada al programa Member Loaded Cost Model
 
 Esta task se solapa parcialmente con TASK-395 (planning engine). Ambas implementan **budget overlay sobre el modelo dimensional Member-Loaded** (`docs/architecture/GREENHOUSE_MEMBER_LOADED_COST_MODEL_V1.md`). El budget engine produce `member_loaded_cost_per_period_budget` y `client_full_cost_per_period_budget` con la misma cardinalidad/shape que los facts actual. Variance se computa como diff entre snapshots actual y budget. Coordinación TASK-178 ↔ TASK-395 pendiente: probable consolidación.
@@ -8,7 +12,7 @@ Esta task se solapa parcialmente con TASK-395 (planning engine). Ambas implement
 
 | Campo | Valor |
 |-------|-------|
-| Lifecycle | `to-do` |
+| Lifecycle | `complete` (superseded por TASK-395 — 2026-05-05) |
 | Priority | `P2` |
 | Impact | `Alto` |
 | Effort | `Alto` |

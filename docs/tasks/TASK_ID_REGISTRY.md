@@ -227,7 +227,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-175` | `to-do` | Finance Core Test Coverage & Regression Safety Net | `docs/tasks/to-do/TASK-175-finance-core-test-coverage.md` |
 | `TASK-176` | `to-do` | Labor Provisions: Fully-Loaded Cost Model Completeness | `docs/tasks/to-do/TASK-176-labor-provisions-fully-loaded-cost.md` |
 | `TASK-177` | `to-do` | Operational P&L: Business Unit Scope Materialization | `docs/tasks/to-do/TASK-177-operational-pl-business-unit-scope.md` |
-| `TASK-178` | `to-do` | Finance Budget Engine: Budget vs. Actual & Variance Analysis | `docs/tasks/to-do/TASK-178-finance-budget-engine.md` |
+| `TASK-178` | `complete` (superseded por TASK-395 — 2026-05-05) | Finance Budget Engine: Budget vs. Actual & Variance Analysis | `docs/tasks/complete/TASK-178-finance-budget-engine.md` |
 | `TASK-179` | `to-do` | Finance Reconciliation Postgres-Only Cutover & Integration Hardening | `docs/tasks/to-do/TASK-179-finance-reconciliation-cutover-hardening.md` |
 | `TASK-180` | `complete` | HR Departments Postgres Runtime Cutover | `docs/tasks/complete/TASK-180-hr-departments-postgres-runtime-cutover.md` |
 | `TASK-181` | `in-progress` | Finance Clients: Canonical Source Migration to Organizations | `docs/tasks/in-progress/TASK-181-finance-clients-organization-canonical-source.md` |
@@ -571,7 +571,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-515` | `to-do` | jsonwebtoken → jose | `docs/tasks/to-do/TASK-515-jsonwebtoken-to-jose.md` |
 | `TASK-516` | `to-do` | NextAuth v4 → Auth.js v5 migration | `docs/tasks/to-do/TASK-516-nextauth-v4-to-authjs-v5.md` |
 | `TASK-517` | `to-do` | Playwright E2E smoke suite | `docs/tasks/to-do/TASK-517-playwright-e2e-smoke-suite.md` |
-| `TASK-518` | `to-do` | ApexCharts deprecation; consolidate on Recharts | `docs/tasks/to-do/TASK-518-apexcharts-deprecation.md` |
+| `TASK-518` | `complete` (won't do — 2026-05-05) | ApexCharts deprecation; consolidate on Recharts | `docs/tasks/complete/TASK-518-apexcharts-deprecation.md` |
 | `TASK-519` | `to-do` | react-datepicker → MUI X DatePicker | `docs/tasks/to-do/TASK-519-datepicker-to-mui-x.md` |
 | `TASK-520` | `to-do` | mapbox-gl → maplibre-gl | `docs/tasks/to-do/TASK-520-mapbox-to-maplibre.md` |
 | `TASK-521` | `to-do` | classnames → clsx + tailwind-merge | `docs/tasks/to-do/TASK-521-classnames-to-clsx-tailwind-merge.md` |
