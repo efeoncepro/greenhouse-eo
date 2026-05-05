@@ -751,6 +751,16 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       scope: 'own',
       source
     })
+
+    // TASK-759e — Self-service resend del propio recibo de nomina.
+    // Scope 'own' siempre. Rate-limit lo aplica el endpoint, no el catalog.
+    addEntitlement(entries, {
+      module: 'my_workspace',
+      capability: 'personal_workspace.payslip.resend_self',
+      action: 'update',
+      scope: 'own',
+      source
+    })
   }
 
   if (hasRouteGroup(subject, 'ai_tooling')) {

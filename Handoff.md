@@ -1,5 +1,39 @@
 # Handoff.md
 
+## Sesion 2026-05-05 — TASK-759e completa (`/my/payroll` lifecycle + drawer + self-service resend)
+
+- **Branch:** `develop` por instruccion explicita del usuario.
+- **Skills aplicadas:** `greenhouse-backend` (capability + endpoint + rate-limit), `greenhouse-dev` + `greenhouse-ux` (drawer + mini-timeline), `greenhouse-ux-writing` (copy es-CL).
+- **Surface entregada:** `/my/payroll` ahora muestra el lifecycle completo del pago al colaborador, no solo el calculo:
+  - **Mini-timeline en card "Ultimo periodo"** — 5 steps data-driven (Calculo → Orden → Programado → Pagado → Recibo) que leen `paymentStatus`, `paymentOrder.scheduledFor`, `paymentOrder.paidAt`, `payslipDeliveryTimeline`. Sin estados inventados.
+  - **Drawer detail per row** — click en row de history → drawer 480px con: header con periodo + chip de estado, seccion Liquidacion (Bruto/Neto/Moneda), seccion Pago (procesador + scheduled + paidAt + external reference copyable con `<Typography variant='monoId'>`), seccion Comunicaciones (timeline cronologico de TODOS los `payslip_deliveries` con dot-color + chip de status + errorMessage opcional), seccion Resend (boton self-service capability-aware).
+  - **Rows clickeables con keyboard** — `tabIndex={0}`, `role='button'`, focus-visible outline, Enter/Space activan. Boton "PDF" en row sigue funcionando (stopPropagation).
+  - **Boton "Ver detalle" + "Descargar PDF"** lado a lado en latest period card.
+- **Backend:**
+  - **Capability nueva** `personal_workspace.payslip.resend_self` (module=`my_workspace`, action=`update`, scope=`own`). Wired en `runtime.ts` para route_group=`my`. Catalog en `src/config/entitlements-catalog.ts`. Diferente de la admin `finance.payslip.resend` (order-wide).
+  - **Helper canonico** `src/lib/payroll/payslip-resend-rate-limit.ts` `checkPayslipResendRateLimit({memberId, entryId, windowMinutes=60})`. NO crea tabla — la fuente de verdad es `greenhouse_payroll.payslip_deliveries` (TASK-759 V2). Returns `{allowed, retryAfterSeconds, lastResendAt}`.
+  - **Endpoint nuevo** `POST /api/my/payroll/entries/[entryId]/resend-receipt`. Auth: `requireMyTenantContext` + assert `entry.memberId === session.memberId`. Capability gate. Rate limit 1x/hora. Reusa `sendPayslipForEntry({trigger:'manual_resend'})`. 429 con `Retry-After` header. captureWithDomain('payroll', ...) en catch. Sanitizacion de errores via `redactErrorForResponse`.
+- **Tests anti-regression (8/8 pass):**
+  - `src/lib/payroll/payslip-resend-rate-limit.test.ts` — 4 tests (allow/block/custom window/params).
+  - `src/views/greenhouse/my/MyPayrollView.test.tsx` — 4 tests (empty state, status chip Pagado/Cancelado, drawer open + resend button visible). `@vitest-environment jsdom`.
+- **Validacion:** `npx tsc --noEmit` clean, `npx eslint` 0 errors (4 warnings heredados de patrones pre-existentes — territorio TASK-408 cleanup, no regresion nueva), `pnpm test` 17/17 pass (8 nuevos + 9 TASK-785 anti-regression), `pnpm build` OK — ruta `/my/payroll` compila.
+- **Reuso (no se duplico nada):** `getPayrollPaymentStatusForPeriod`, `getPayslipDeliveriesForEntry`, `sendPayslipForEntry`, `requireMyTenantContext`, `can`, `captureWithDomain`, `redactErrorForResponse`, `<Typography variant='monoId'>`, `CustomChip`, `MyPayrollEntryDrawer` (componente nuevo single-purpose).
+- **Frontera con TASK-759b/c** (`payment_committed` / `payment_cancelled` / `payment_revised`): la UI es tolerante a su ausencia. Cuando esas tasks materialicen sus delivery rows, el timeline las renderizara automaticamente sin cambio de codigo aqui.
+- **Lifecycle:** `docs/tasks/complete/TASK-759e-mi-greenhouse-mis-pagos.md`. README.md sincronizado.
+
+## Sesion 2026-05-05 — Arquitectura Contractor Engagements + Payables documentada
+
+- **Trigger:** Valentina Hoyos cerro relacion dependiente Chile (`indefinido`, ultimo dia `2026-04-30`) y podria iniciar nueva relacion contractor/honorarios desde `2026-05-04`.
+- **Decision:** no reactivar ni mutar la relacion laboral anterior. La misma persona canonica abre una relacion juridica/economica nueva (`contractor`/`honorarios`) con lifecycle y pagos propios.
+- **Doc nuevo:** `docs/architecture/GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md`.
+- **Docs enlazadas:** `GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md`, `GREENHOUSE_WORKFORCE_OFFBOARDING_ARCHITECTURE_V1.md`, `GREENHOUSE_PERSON_LEGAL_ENTITY_RELATIONSHIPS_V1.md`, `GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`.
+- **Contrato:** `ContractorEngagement -> WorkSubmission/Invoice -> ContractorPayable -> Finance Payment Obligation -> Payment Order`. Contractor payment no es finiquito, no es payroll adjustment y no muta banco directo.
+- **Expansion internacional:** el doc distingue Chile honorarios, contractor internacional directo, contractor via Deel/Remote/Oyster y EOR/provider. Agrega `tax_residency_country_code`, `payment_currency`, `fx_policy_code`, provider contract/worker/invoice/payout IDs y matriz de tax/payment owner.
+- **Invoices/assets:** las boletas/invoices de contractors se suben por `GreenhouseFileUploader` + `POST /api/assets/private`, con bytes en el bucket privado GCS existente y registry en `greenhouse_core.assets`. No crear bucket/uploader paralelo ni guardar URLs libres. El doc propone contextos `contractor_invoice(_draft)`, `contractor_work_evidence(_draft)`, `provider_invoice(_draft)` y `provider_payout_statement`, mas `contractor_invoice_assets` para soportes.
+- **Pendientes resueltos:** ownership fisico Workforce/HR, Payroll solo consumidor/compatibility; `member_id` no auto-creado; no auto-approval V1; VAT/IVA/facturas comerciales quedan en Finance AP; `tax_compliance_owner`, FX, KPI/bonus, payment profile, dedupe/idempotency y closure policy quedan como gates.
+- **Market input:** Deel/Oyster/Remote revalidados para fixed, PAYG, milestone, timesheets, invoices, approvals y charge/payout separation; SII 2026 honorarios `15.25%`.
+- **Pendiente:** convertir la arquitectura en tasks runtime (`TASK-788` a `TASK-793`) antes de implementar.
+
 ## Sesion 2026-05-05 — TASK-785 completa (Workforce Role Title Source of Truth + Drift Governance)
 
 - **Branch:** `develop` por instruccion explicita del usuario. No se creo branch `task/*`.

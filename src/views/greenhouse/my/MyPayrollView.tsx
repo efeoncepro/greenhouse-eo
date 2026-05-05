@@ -12,6 +12,7 @@ import Alert from '@mui/material/Alert'
 import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
 import Button from '@mui/material/Button'
+import Stack from '@mui/material/Stack'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
@@ -22,6 +23,7 @@ import Typography from '@mui/material/Typography'
 
 import CustomChip from '@core/components/mui/Chip'
 import { downloadPayrollReceiptPdf } from '@/lib/payroll/download-payroll-receipt'
+import MyPayrollEntryDrawer from './MyPayrollEntryDrawer'
 
 interface PayslipDeliveryEvent {
   deliveryKind: string
@@ -105,10 +107,110 @@ const formatPaymentDate = (iso: string | null): string => {
   return d.toLocaleDateString('es-CL', { day: '2-digit', month: 'short', year: 'numeric' })
 }
 
+interface MiniTimelineStep {
+  label: string
+  state: 'done' | 'current' | 'pending' | 'failed' | 'cancelled'
+  detail: string | null
+}
+
+/**
+ * TASK-759e — Deriva los 5 steps del lifecycle de pago para el mini-timeline
+ * en la card "Último período". Data-driven desde paymentStatus + paymentOrder
+ * + payslipDeliveryTimeline. NUNCA inventa estados.
+ */
+const buildMiniTimeline = (entry: PayrollEntry): MiniTimelineStep[] => {
+  const status = entry.paymentStatus ?? 'awaiting_order'
+  const order = entry.paymentOrder
+  const timeline = entry.payslipDeliveryTimeline ?? []
+
+  const exportedDelivery = timeline.find(t => t.deliveryKind === 'period_exported' && t.status === 'sent' && !t.superseded)
+  const paidDelivery = timeline.find(t => t.deliveryKind === 'payment_paid' && t.status === 'sent' && !t.superseded)
+  const isCancelled = status === 'cancelled'
+
+  const calc: MiniTimelineStep = {
+    label: 'Cálculo aprobado',
+    state: 'done',
+    detail: exportedDelivery?.sentAt ? formatPaymentDate(exportedDelivery.sentAt) : null
+  }
+
+  const orderCreated: MiniTimelineStep = {
+    label: 'Orden creada',
+    state: order ? (isCancelled ? 'cancelled' : 'done') : 'pending',
+    detail: order?.scheduledFor ? `Programada para ${formatPaymentDate(order.scheduledFor)}` : null
+  }
+
+  const scheduled: MiniTimelineStep = {
+    label: 'Pago programado',
+    state: isCancelled
+      ? 'cancelled'
+      : status === 'order_paid'
+        ? 'done'
+        : status === 'order_approved'
+          ? 'current'
+          : order?.scheduledFor
+            ? 'current'
+            : 'pending',
+    detail: order?.scheduledFor ? formatPaymentDate(order.scheduledFor) : null
+  }
+
+  const paid: MiniTimelineStep = {
+    label: 'Pago ejecutado',
+    state: isCancelled ? 'cancelled' : status === 'order_paid' ? 'done' : 'pending',
+    detail: order?.paidAt ? formatPaymentDate(order.paidAt) : null
+  }
+
+  const receiptSent: MiniTimelineStep = {
+    label: 'Recibo enviado',
+    state: paidDelivery ? 'done' : exportedDelivery ? 'done' : 'pending',
+    detail: (paidDelivery ?? exportedDelivery)?.sentAt ? formatPaymentDate((paidDelivery ?? exportedDelivery)!.sentAt) : null
+  }
+
+  return [calc, orderCreated, scheduled, paid, receiptSent]
+}
+
+const MiniTimeline = ({ steps }: { steps: MiniTimelineStep[] }) => (
+  <Stack direction='row' spacing={2} sx={{ mt: 2, flexWrap: 'wrap' }}>
+    {steps.map((step, idx) => {
+      const iconClass =
+        step.state === 'done'
+          ? 'tabler-circle-check-filled'
+          : step.state === 'current'
+            ? 'tabler-clock'
+            : step.state === 'failed'
+              ? 'tabler-alert-circle'
+              : step.state === 'cancelled'
+                ? 'tabler-x'
+                : 'tabler-circle-dotted'
+
+      const iconColor =
+        step.state === 'done'
+          ? 'var(--mui-palette-success-main)'
+          : step.state === 'current'
+            ? 'var(--mui-palette-info-main)'
+            : step.state === 'failed' || step.state === 'cancelled'
+              ? 'var(--mui-palette-error-main)'
+              : 'var(--mui-palette-text-disabled)'
+
+      return (
+        <Box key={idx} sx={{ display: 'flex', alignItems: 'flex-start', gap: 1, minWidth: 160 }}>
+          <i className={iconClass} style={{ fontSize: 18, color: iconColor, marginTop: 2 }} aria-hidden='true' />
+          <Box>
+            <Typography variant='caption' fontWeight={600}>{step.label}</Typography>
+            <Typography variant='caption' color='text.disabled' sx={{ display: 'block' }}>
+              {step.detail ?? (step.state === 'pending' ? 'Pendiente' : step.state === 'cancelled' ? 'Cancelado' : '—')}
+            </Typography>
+          </Box>
+        </Box>
+      )
+    })}
+  </Stack>
+)
+
 const MyPayrollView = () => {
   const [data, setData] = useState<PayrollData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [drawerEntry, setDrawerEntry] = useState<PayrollEntry | null>(null)
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -185,29 +287,45 @@ const MyPayrollView = () => {
           <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
             <CardHeader title='Último período' subheader={`${MONTHS[latest.month]} ${latest.year}`} />
             <Divider />
-            <CardContent sx={{ display: 'flex', gap: 6 }}>
-              <Box>
-                <Typography variant='caption' color='text.secondary'>Bruto</Typography>
-                <Typography variant='h5'>{fmt(latest.grossTotal, latest.currency)}</Typography>
+            <CardContent>
+              <Box sx={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
+                <Box>
+                  <Typography variant='caption' color='text.secondary'>Bruto</Typography>
+                  <Typography variant='h5'>{fmt(latest.grossTotal, latest.currency)}</Typography>
+                </Box>
+                <Box>
+                  <Typography variant='caption' color='text.secondary'>Neto</Typography>
+                  <Typography variant='h5' color='success.main'>{fmt(latest.netTotal, latest.currency)}</Typography>
+                </Box>
+                <Box>
+                  <Typography variant='caption' color='text.secondary'>Moneda</Typography>
+                  <Typography variant='h5'>{latest.currency}</Typography>
+                </Box>
+                <Box sx={{ ml: 'auto', display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Button
+                    variant='tonal'
+                    color='secondary'
+                    startIcon={<i className='tabler-info-circle' />}
+                    onClick={() => setDrawerEntry(latest)}
+                    aria-label={`Ver detalle del período ${MONTHS[latest.month]} ${latest.year}`}
+                  >
+                    Ver detalle
+                  </Button>
+                  <Button
+                    variant='tonal'
+                    startIcon={<i className='tabler-file-download' />}
+                    onClick={() => { void handleDownloadReceipt(latest) }}
+                    aria-label={`Descargar recibo PDF de ${MONTHS[latest.month]} ${latest.year}`}
+                  >
+                    Descargar PDF
+                  </Button>
+                </Box>
               </Box>
-              <Box>
-                <Typography variant='caption' color='text.secondary'>Neto</Typography>
-                <Typography variant='h5' color='success.main'>{fmt(latest.netTotal, latest.currency)}</Typography>
-              </Box>
-              <Box>
-                <Typography variant='caption' color='text.secondary'>Moneda</Typography>
-                <Typography variant='h5'>{latest.currency}</Typography>
-              </Box>
-              <Box sx={{ ml: 'auto', display: 'flex', alignItems: 'center' }}>
-                <Button
-                  variant='tonal'
-                  startIcon={<i className='tabler-file-download' />}
-                  onClick={() => { void handleDownloadReceipt(latest) }}
-                  aria-label={`Descargar recibo PDF de ${MONTHS[latest.month]} ${latest.year}`}
-                >
-                  Descargar PDF
-                </Button>
-              </Box>
+
+              <Divider sx={{ my: 3 }} />
+
+              <Typography variant='overline' color='text.secondary'>Estado del pago</Typography>
+              <MiniTimeline steps={buildMiniTimeline(latest)} />
             </CardContent>
           </Card>
         </Grid>
@@ -253,7 +371,21 @@ const MyPayrollView = () => {
                         : '—'
 
                     return (
-                      <TableRow key={e.entryId} hover>
+                      <TableRow
+                        key={e.entryId}
+                        hover
+                        onClick={() => setDrawerEntry(e)}
+                        onKeyDown={ev => {
+                          if (ev.key === 'Enter' || ev.key === ' ') {
+                            ev.preventDefault()
+                            setDrawerEntry(e)
+                          }
+                        }}
+                        tabIndex={0}
+                        role='button'
+                        aria-label={`Ver detalle del período ${MONTHS[e.month]} ${e.year}`}
+                        sx={{ cursor: 'pointer', '&:focus-visible': { outline: '2px solid', outlineColor: 'primary.main', outlineOffset: -2 } }}
+                      >
                         <TableCell><Typography variant='body2' fontWeight={600}>{MONTHS[e.month]} {e.year}</Typography></TableCell>
                         <TableCell align='right'>{fmt(e.grossTotal, e.currency)}</TableCell>
                         <TableCell align='right'><Typography fontWeight={600}>{fmt(e.netTotal, e.currency)}</Typography></TableCell>
@@ -275,7 +407,7 @@ const MyPayrollView = () => {
                             size='small'
                             variant='tonal'
                             startIcon={<i className='tabler-file-download' />}
-                            onClick={() => { void handleDownloadReceipt(e) }}
+                            onClick={ev => { ev.stopPropagation(); void handleDownloadReceipt(e) }}
                             aria-label={`Descargar recibo PDF de ${MONTHS[e.month]} ${e.year}`}
                           >
                             PDF
@@ -290,6 +422,13 @@ const MyPayrollView = () => {
           )}
         </Card>
       </Grid>
+
+      <MyPayrollEntryDrawer
+        open={drawerEntry !== null}
+        onClose={() => setDrawerEntry(null)}
+        entry={drawerEntry}
+        canResend
+      />
     </Grid>
   )
 }

@@ -1,8 +1,9 @@
 # TASK-759e — Extender `/my/payroll` con estado de pago + delivery timeline
 
-> **Status**: to-do
-> **Lifecycle**: to-do
-> **Owner**: TBD
+> **Status**: complete
+> **Lifecycle**: complete
+> **Completed**: 2026-05-05
+> **Owner**: Julio Reyes (Claude Opus 4.7)
 > **Created**: 2026-05-01
 > **Parent**: TASK-759
 > **Dependencies**: TASK-759 V1 + 759b + 759c (delivery timeline data)

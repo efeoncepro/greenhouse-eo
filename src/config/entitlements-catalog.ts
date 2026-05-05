@@ -532,6 +532,15 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     defaultScope: 'own'
   },
   {
+    // TASK-759e — Self-service resend del propio recibo de nomina desde
+    // /my/payroll. Scope estricto 'own' (NUNCA tenant). Rate-limited 1x/hora
+    // per (memberId, entryId). Diferente de finance.payslip.resend (admin op).
+    key: 'personal_workspace.payslip.resend_self',
+    module: 'my_workspace',
+    actions: ['update'] as const,
+    defaultScope: 'own'
+  },
+  {
     key: 'person.legal_profile.hr_update',
     module: 'hr',
     actions: ['create', 'update'] as const,
