@@ -13,6 +13,9 @@ import PayrollLiquidacionV2Email from '@/emails/PayrollLiquidacionV2Email'
 import PayrollReceiptEmail from '@/emails/PayrollReceiptEmail'
 import PayrollPaymentCommittedEmail from '@/emails/PayrollPaymentCommittedEmail'
 import PayrollPaymentCancelledEmail from '@/emails/PayrollPaymentCancelledEmail'
+import BeneficiaryPaymentProfileChangedEmail, {
+  type PaymentProfileEmailKind
+} from '@/emails/BeneficiaryPaymentProfileChangedEmail'
 import QuoteSharePromptEmail from '@/emails/QuoteSharePromptEmail'
 import WeeklyExecutiveDigestEmail from '@/emails/WeeklyExecutiveDigestEmail'
 import VerifyEmail from '@/emails/VerifyEmail'
@@ -428,6 +431,48 @@ registerTemplate('payroll_payment_committed', (context: {
   text: context.payRegime === 'chile'
     ? `Hola ${context.fullName.split(' ')[0]}, tu pago de ${MONTH_NAMES[context.periodMonth - 1]} ${context.periodYear} (${formatMoney(context.netTotal, context.entryCurrency)}) fue aprobado y está programado. Te enviaremos el recibo apenas se ejecute.`
     : `Hi ${context.fullName.split(' ')[0]}, your ${MONTH_NAMES[context.periodMonth - 1]} ${context.periodYear} payment (${formatMoney(context.netTotal, context.entryCurrency)}) has been approved and is scheduled. We will send the receipt once executed.`
+}))
+
+// TASK-753 — Notificación al beneficiario cuando su perfil de pago cambia
+const PROFILE_KIND_SUBJECTS: Record<PaymentProfileEmailKind, string> = {
+  created: 'Solicitud de cambio de cuenta de pago registrada',
+  approved: 'Tu cuenta de pago fue aprobada',
+  superseded: 'Tu cuenta de pago fue reemplazada',
+  cancelled: 'Tu solicitud de cambio fue cancelada'
+}
+
+registerTemplate('beneficiary_payment_profile_changed', (context: {
+  fullName: string
+  kind: PaymentProfileEmailKind
+  providerLabel: string | null
+  bankName: string | null
+  accountNumberMasked: string | null
+  currency: 'CLP' | 'USD'
+  effectiveAt: string | null
+  reason: string | null
+  requestedByMember: boolean
+}) => ({
+  subject: PROFILE_KIND_SUBJECTS[context.kind],
+  react: BeneficiaryPaymentProfileChangedEmail({
+    fullName: context.fullName,
+    kind: context.kind,
+    providerLabel: context.providerLabel,
+    bankName: context.bankName,
+    accountNumberMasked: context.accountNumberMasked,
+    currency: context.currency,
+    effectiveAt: context.effectiveAt,
+    reason: context.reason,
+    requestedByMember: context.requestedByMember
+  }),
+  text:
+    `Hola ${context.fullName.split(' ')[0]}, ` +
+    (context.kind === 'created'
+      ? 'registramos una solicitud de cambio en tu cuenta de pago. Finance la revisará pronto.'
+      : context.kind === 'approved'
+        ? `tu cuenta de pago (${context.accountNumberMasked ?? '••••'}) quedó activa.`
+        : context.kind === 'superseded'
+          ? `tu cuenta de pago activa fue reemplazada por una nueva (${context.accountNumberMasked ?? '••••'}).`
+          : 'tu solicitud de cambio fue cancelada.')
 }))
 
 // TASK-759c — Compensación cancelación (sin PDF)

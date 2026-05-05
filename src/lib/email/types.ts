@@ -12,6 +12,7 @@ export type EmailType =
   | 'payroll_liquidacion_v2'
   | 'payroll_payment_committed'
   | 'payroll_payment_cancelled'
+  | 'beneficiary_payment_profile_changed'
   | 'notification'
   | 'weekly_executive_digest'
   | 'leave_request_decision'
@@ -44,6 +45,7 @@ export const EMAIL_PRIORITY_MAP: Record<string, EmailPriority> = {
   payroll_liquidacion_v2:       'transactional',
   payroll_payment_committed:    'transactional',
   payroll_payment_cancelled:    'transactional',
+  beneficiary_payment_profile_changed: 'transactional',
   weekly_executive_digest:      'broadcast',
   quote_share:                  'transactional',
 }

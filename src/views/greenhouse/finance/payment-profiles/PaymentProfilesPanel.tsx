@@ -264,13 +264,25 @@ const PaymentProfilesPanel = ({
                     </Typography>
                   </TableCell>
                   <TableCell>
-                    {profile.providerSlug ? (
-                      <Chip size='small' variant='tonal' color='info' label={profile.providerSlug} />
-                    ) : (
-                      <Typography variant='caption' color='text.secondary'>
-                        —
-                      </Typography>
-                    )}
+                    <Stack direction='row' spacing={0.5} alignItems='center' flexWrap='wrap'>
+                      {profile.providerSlug ? (
+                        <Chip size='small' variant='tonal' color='info' label={profile.providerSlug} />
+                      ) : (
+                        <Typography variant='caption' color='text.secondary'>
+                          —
+                        </Typography>
+                      )}
+                      {profile.metadataJson?.requested_by === 'member' && (
+                        <Chip
+                          size='small'
+                          variant='outlined'
+                          color='warning'
+                          icon={<i className='tabler-user-plus' style={{ fontSize: 14 }} />}
+                          label='Solicitado por colaborador'
+                          sx={{ ml: 0.5 }}
+                        />
+                      )}
+                    </Stack>
                   </TableCell>
                   <TableCell>
                     <Typography variant='body2'>{profile.paymentMethod ?? '—'}</Typography>
