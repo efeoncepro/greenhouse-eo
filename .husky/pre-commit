@@ -1,0 +1,11 @@
+#!/usr/bin/env sh
+# Greenhouse — pre-commit hook canonico.
+#
+# Corre lint-staged: eslint --fix sobre archivos staged. Idempotent.
+# Si quedan errors NO auto-fixable, bloquea el commit.
+#
+# Bypass legitimo (solo en emergencias documentadas): `git commit --no-verify`.
+# La regla canonica en CLAUDE.md / AGENTS.md prohibe --no-verify sin autorizacion
+# explicita del usuario.
+
+pnpm exec lint-staged

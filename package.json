@@ -125,7 +125,13 @@
     "email:dev": "email dev --dir src/emails --port 3001",
     "postinstall": "npm run build:icons",
     "clean": "node scripts/clean-paths.mjs .next-local .next",
-    "clear": "node scripts/clean-paths.mjs node_modules .next-local .next"
+    "clear": "node scripts/clean-paths.mjs node_modules .next-local .next",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,mjs,mts,js,jsx}": [
+      "eslint --fix --cache --cache-location node_modules/.cache/eslint-staged"
+    ]
   },
   "dependencies": {
     "@assistant-ui/react": "^0.12.21",
@@ -258,8 +264,10 @@
     "eslint-config-prettier": "10.1.8",
     "eslint-import-resolver-typescript": "4.4.4",
     "eslint-plugin-import": "2.32.0",
+    "husky": "^9.1.7",
     "jsdom": "^29.0.0",
     "kysely-codegen": "^0.20.0",
+    "lint-staged": "^16.4.0",
     "msw": "^2.13.4",
     "node-pg-migrate": "^8.0.4",
     "postcss": "8.5.6",

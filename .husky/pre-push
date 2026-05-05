@@ -1,0 +1,26 @@
+#!/usr/bin/env sh
+# Greenhouse — pre-push hook canonico.
+#
+# Defense in depth sobre pre-commit:
+#   - pre-commit lint-staged solo fija archivos staged. Si un archivo NO staged
+#     pero presente en el repo tiene errores (e.g. otro agente edito sin staged),
+#     pre-commit no los detecta.
+#   - pre-push corre el lint full + tsc full. Bloquea push si hay 1+ error.
+#
+# Skip via `git push --no-verify` requiere autorizacion explicita del usuario
+# (regla canonica en CLAUDE.md / AGENTS.md).
+#
+# Latencia esperada:
+#   - lint full: ~15-30s (cached entre runs)
+#   - tsc --noEmit: ~30-60s (cached con --incremental)
+#   Total: <90s. Acceptable cost vs CI revert+repush ciclos.
+
+set -e
+
+echo "[pre-push] Running pnpm lint (full repo)…"
+pnpm lint
+
+echo "[pre-push] Running pnpm tsc --noEmit…"
+pnpm exec tsc --noEmit
+
+echo "[pre-push] OK — pushing."

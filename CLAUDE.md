@@ -1700,6 +1700,39 @@ Toda surface que muestre o consuma identidad legal de una persona natural (RUT, 
 
 **Spec canonica**: `docs/tasks/in-progress/TASK-785-workforce-role-title-source-of-truth-governance.md`. Migración: `migrations/20260505123242929_task-785-role-title-governance.sql`. Pattern fuente: `reporting_hierarchy_drift_proposals` (TASK-731).
 
+### Git hooks canonicos (Husky + lint-staged) — auto-prevention de errores CI
+
+Repo tiene 2 hooks instalados via Husky 9 (`pnpm prepare` los activa
+automaticamente al `pnpm install`):
+
+- **`.husky/pre-commit`**: corre `pnpm exec lint-staged` → `eslint --fix` sobre
+  archivos staged. Errores auto-fixable se aplican; errores no-fixable bloquean
+  el commit. Latencia tipica < 5s (cache eslint en `node_modules/.cache/eslint-staged`).
+- **`.husky/pre-push`**: corre `pnpm lint` (full repo) + `pnpm exec tsc --noEmit`.
+  Bloquea push si hay 1+ error. Latencia tipica < 90s. Defense in depth sobre
+  pre-commit (cubre archivos NO staged que otro agente pudo dejar rotos).
+
+**Reglas duras**:
+
+- **NUNCA** ejecutar `git commit --no-verify` o `git push --no-verify` sin
+  autorizacion explicita del usuario. Bypassear los hooks rompe el contrato
+  con el CI gate y deja errores que otro agente tiene que limpiar despues
+  (anti-pattern: el ciclo de revert+repush que vimos pre-2026-05-05).
+- **NUNCA** desinstalar / deshabilitar / mover los hooks sin discutir antes.
+  Estan disenados para autoenforcement — todos los agentes (Claude, Codex,
+  Cursor) los heredan al clonar el repo.
+- Si un hook falla por causa ajena a tu cambio (e.g. lint warning preexistente
+  en archivo NO tocado), arreglalo solo si la regla esta en `error`. Warnings
+  no bloquean. Si error preexistente bloquea, documenta en commit message
+  y abrir issue/task para el cleanup separado.
+- Si necesitas saltar el hook por emergencia documentada (e.g. hotfix de
+  produccion bloqueante), pide autorizacion al usuario primero, documenta el
+  bypass en el commit message con razon + fecha + task de cleanup posterior.
+
+**Beneficio para multi-agente**: cualquier agente (presente o futuro) que
+clone el repo y haga `pnpm install` recibe los hooks automaticamente. El CI
+gate sigue activo como tercera linea de defensa.
+
 ### Otras convenciones
 
 - Line endings: LF (ver `.gitattributes`)
