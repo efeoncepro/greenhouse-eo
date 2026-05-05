@@ -2,7 +2,136 @@
 
 > **Version:** 1.0
 > **Created:** 2026-03-30
-> **Last updated:** 2026-05-05 (Contractor Engagements + Payables)
+> **Last updated:** 2026-05-05 (TASK-753 Payment Profiles Self-Service + inline drain)
+
+## Delta 2026-05-05 — TASK-753 Payment Profiles Self-Service (regime-aware + inline drain)
+
+### Why
+
+Antes de TASK-753 los colaboradores no tenían visibilidad de su cuenta de pago registrada y abrian tickets manuales a finance para cualquier cambio. La spec original asumía que el self-service era simple "form → POST → finance approves" pero al implementar emergieron 3 problemas no contemplados que requirieron rediseño:
+
+1. **Decisión cruzada operacional vs. declarativa**: el form original mezclaba inputs declarativos del colaborador (banco, número de cuenta, RUT) con decisiones operacionales de finance (proveedor, método de envío). El colaborador NO tiene contexto para elegir provider/method (depende de costo + corridor + relación bancaria + KYC). Solución: se eliminaron esos campos del form self-service. Finance los completa al aprobar.
+
+2. **Discoverability cero**: la ruta `/my/payment-profile` existía pero no estaba ni en el menú ni como tab dentro de `/my/profile`. Solución: 3-capa canonica (viewCode catalog + nomenclatura `GH_MY_NAV.paymentProfile` + menu lateral + tab dentro de Mi Perfil) — single source of truth en React (`MyPaymentProfileView` rendered en ambas surfaces), doble entrypoint visible.
+
+3. **Latencia 5-7 min en notificaciones**: el email transaccional ("solicitud registrada", "aprobada", "cancelada") dependía del cron `ops-outbox-publish` (cada 2min) + cron `ops-reactive-finance` (cada 5min). Worst-case 7 min entre submit y email — UX pobre. Solución: drain inline del pipeline outbox+reactive en el response cycle (idempotency-by-design preserva el cron como safety net).
+
+### Schema (sin migration nueva — reusa TASK-749)
+
+`greenhouse_finance.beneficiary_payment_profiles` ya existe (TASK-749). El self-service usa `metadata_json` para extras:
+
+```json
+{
+  "regime": "chile_dependent | honorarios_chile | international",
+  "source": "my_payment_profile_self_service",
+  "requested_by": "member",
+  "requested_at": "ISO 8601",
+  "account_type_cl": "cuenta_corriente | cuenta_vista | cuenta_rut | chequera_electronica",
+  "rut_titular": "12.345.678-5"
+}
+```
+
+Finance lee `metadata_json` al revisar la cola para evaluar KYC + diferenciar self-service de admin-creado. NO requiere columnas nuevas.
+
+### Regime-aware form (3 ramas + estado degradado)
+
+Helper canonico `resolveSelfServicePaymentProfileContext(memberId)` infiere régimen + currency desde `members.pay_regime + location_country`, pre-rellena identidad legal desde TASK-784 (`person_identity_documents.canonical_email`, `legal_full_name`, `display_mask`).
+
+| Regime | Campos del form | Currency inferida |
+| --- | --- | --- |
+| `chile_dependent` / `honorarios_chile` | banco · tipo cuenta · número · RUT (módulo-11) · titular | CLP |
+| `international` | país · banco · SWIFT/BIC · IBAN/cuenta · titular legal | USD |
+| `unset` | (degraded — sin form, CTA "Contactar finance") | null |
+
+**Validators schema-driven** (`self-service-validators.ts`) corren cliente Y servidor (defense in depth). RUT módulo-11 + SWIFT regex `^[A-Z]{4}[A-Z]{2}[A-Z0-9]{2}([A-Z0-9]{3})?$` + CL account types enum.
+
+### Inline drain pattern (canonico para self-service surfaces)
+
+Después del commit del `createPaymentProfile` (o `cancelPaymentProfile`), el helper `drainOutboxPipelineForFinance` invoca **inline** dentro del response cycle:
+
+1. `publishPendingOutboxEvents({ batchSize: 50 })` → flip `pending → published` para el evento recién insertado.
+2. `processReactiveEvents({ domain: 'finance', batchSize: 25 })` → procesa la projection `payment_profile_notifications` → email transaccional via `sendEmail`.
+
+**Idempotency-by-design** (sin migration ni nueva infra):
+- `publishPendingOutboxEvents` usa `FOR UPDATE SKIP LOCKED` — concurrencia segura con cron `ops-outbox-publish`.
+- `processReactiveEvents` usa `outbox_reactive_log` con `UNIQUE (event_id, handler)` + `ON CONFLICT DO UPDATE` — concurrencia segura con cron `ops-reactive-finance`.
+- Si ambos (inline + cron) procesan el mismo evento, **solo uno gana el lock / inserta la log row** → cero duplicados de email.
+
+**Failure mode preservado** (eventual consistency):
+- Si la llamada inline falla (network blip, lambda timeout, Resend down): `captureWithDomain('finance', ...)` reporta a Sentry, NO se relanza al caller.
+- El profile y el outbox event ya están persistidos atómicamente.
+- El cron de outbox publica en ≤2 min; el reactive consumer procesa en ≤5 min. **Worst-case latency idéntica al diseño previo**.
+- **El contract con el caller no cambió**: 201 con el shape original incluso si drain falla.
+
+**Latencia resultante**:
+
+| Camino | Latencia | Cuándo |
+| --- | --- | --- |
+| Drain inline exitoso | ~1-2 s | ~99% de los casos |
+| Cron de respaldo | ≤5 min | Si Resend caído / network blip / lambda timeout |
+
+### Idempotency entre inline y cron — análisis formal
+
+Caso A: drain inline exitoso → cron al próximo tick (`SELECT FROM outbox_events WHERE status='published' AND NOT EXISTS log row`) → fetcha 0 → no-op.
+
+Caso B: drain inline falla en step 1 (publish) → evento sigue `pending` → cron `ops-outbox-publish` lo recoge → cron `ops-reactive-finance` lo procesa al próximo tick.
+
+Caso C: drain inline exitoso en step 1 pero falla en step 2 (react) → evento `published`, log row ausente → cron `ops-reactive-finance` lo procesa.
+
+Caso D: drain inline + cron concurrente en step 2 → `outbox_reactive_log` tiene `UNIQUE (event_id, handler)`. Primer `INSERT ... ON CONFLICT DO UPDATE` gana, el segundo hace UPDATE no-op. **Solo un email se envía** (porque sendEmail se llama solo cuando la log row se INSERT-a, no cuando se UPDATE-a).
+
+### Capabilities granulares (least privilege)
+
+| Capability | Module | Scope | Acción permitida |
+| --- | --- | --- | --- |
+| `personal_workspace.payment_profile.read_self` | my_workspace | own | Leer perfiles propios masked |
+| `personal_workspace.payment_profile.request_change_self` | my_workspace | own | Crear solicitud de cambio (entra como `pending_approval`) + cancelar la propia |
+| `finance.payment_profiles.approve` | finance | tenant | Aprobar perfiles (con guard: `actorUserId !== createdBy`) |
+
+**Maker-checker enforced en 2 capas**:
+- TS: `approvePaymentProfile` rechaza si `row.created_by === input.approvedBy` (status 403).
+- DB trigger `assert_payment_profile_maker_checker` enforce a nivel database para defense in depth.
+
+### Discoverability — 3 capas canónicas
+
+| Capa | Archivo | Contenido |
+| --- | --- | --- |
+| ViewCode | `src/lib/admin/view-access-catalog.ts` | `mi_ficha.mi_cuenta_pago` con `routePath: /my/payment-profile`, `routeGroup: my` |
+| Nomenclatura | `src/config/greenhouse-nomenclature.ts` | `GH_MY_NAV.paymentProfile = { label: 'Mi Cuenta de Pago', subtitle: 'Donde recibes tus pagos' }` |
+| Discovery | `src/components/layout/vertical/VerticalMenu.tsx` | Item en sección "Mi Ficha" gated por `canSeeView('mi_ficha.mi_cuenta_pago', true)` (defense in depth: capability + viewCode + page guard) |
+| Discovery (alterno) | `src/views/greenhouse/my/MyProfileView.tsx` | Tab "Cuenta de pago" que renderiza el mismo `<MyPaymentProfileView />` (single source of truth en React) |
+
+### Reglas duras (TASK-753 invariants)
+
+- **NUNCA** auto-aprobar (TS + DB trigger).
+- **NUNCA** exponer `provider_slug` ni `payment_method` en el form self-service. Esos los decide finance al aprobar.
+- **NUNCA** lanzar errores del drain inline al caller. El contract con el colaborador (perfil persistido + outbox queued) ya está cumplido. Drain es accelerator best-effort.
+- **NUNCA** ejecutar inline drain con batchSize > 100 (latencia inline acotada).
+
+### Frontera con TASK-754 / TASK-755 (futuro)
+
+- **TASK-754** Vault externo: `account_number_full` movido a GCP Secret Manager con `vault_ref` opaco. Reveal sensitive con second factor + audit. Pendiente.
+- **TASK-755** Ops avanzadas: bulk approve queue real, diff viewer, splits multi-method, routing por amount threshold. Pendiente — esperar feedback de uso real antes de construir.
+
+### Files owned
+
+- `src/lib/finance/beneficiary-payment-profiles/self-service.ts` (helpers + drain)
+- `src/lib/finance/beneficiary-payment-profiles/resolve-self-service-context.ts` (regime resolver)
+- `src/lib/finance/beneficiary-payment-profiles/self-service-validators.ts` (schema-driven validators)
+- `src/lib/finance/beneficiary-payment-profiles/notify-beneficiary.ts` (email helper)
+- `src/lib/sync/projections/payment-profile-notifications.ts` (reactive consumer)
+- `src/app/api/my/payment-profile/{route.ts, context/route.ts, [profileId]/cancel-request/route.ts}`
+- `src/app/(dashboard)/my/payment-profile/page.tsx`
+- `src/views/greenhouse/my/{MyPaymentProfileView.tsx, payment-profile/RequestChangeDialog.tsx}`
+- `src/emails/BeneficiaryPaymentProfileChangedEmail.tsx`
+
+### Spec canónica
+
+`docs/tasks/complete/TASK-753-payment-profiles-self-service.md` (lifecycle: complete; 4 commits a develop)
+
+### Doc funcional
+
+`docs/documentation/finance/mi-cuenta-de-pago-self-service.md`
 
 ## Delta 2026-05-05 — TASK-799 Processor/source separation for payment orders
 
