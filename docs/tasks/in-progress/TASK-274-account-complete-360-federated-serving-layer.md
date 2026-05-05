@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress` (drift fix 2026-05-05 — folder + Lifecycle alineados; Phase F en curso con commits 5c3d0d11 + 6308564c)
 - Priority: `P1`
 - Impact: `Critico`
 - Effort: `Alto`

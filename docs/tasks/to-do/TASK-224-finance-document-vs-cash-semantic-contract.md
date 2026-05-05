@@ -42,7 +42,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `to-do` (revertida 2026-05-05 — solo 1 commit doc-only en 60+ días, ningún slice empezado; vuelve a backlog para re-triage)
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`

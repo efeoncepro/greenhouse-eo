@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete` (closed 2026-05-05 — `dd3fe199 feat(my-profile): TASK-257 enterprise redesign` shipped, MyProfileView + sidebar/header componentes en develop)
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Alto`

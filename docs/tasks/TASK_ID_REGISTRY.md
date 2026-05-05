@@ -273,7 +273,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-221` | `to-do` | Revenue Enabled Measurement Model & Attribution Policy | `docs/tasks/to-do/TASK-221-revenue-enabled-measurement-model-attribution-policy.md` |
 | `TASK-222` | `complete` | Creative Velocity Review, Tiered Metric Surfacing & Client Narrative | `docs/tasks/complete/TASK-222-creative-velocity-review-tiered-metric-surfacing.md` |
 | `TASK-223` | `complete` | ICO Methodological Accelerators Instrumentation | `docs/tasks/complete/TASK-223-ico-methodological-accelerators-instrumentation.md` |
-| `TASK-224` | `in-progress` | Finance Document vs Cash Semantic Contract | `docs/tasks/in-progress/TASK-224-finance-document-vs-cash-semantic-contract.md` |
+| `TASK-224` | `to-do` (reverted 2026-05-05 — stalled 60+ días) | Finance Document vs Cash Semantic Contract | `docs/tasks/to-do/TASK-224-finance-document-vs-cash-semantic-contract.md` |
 | `TASK-225` | `in-progress` | Internal Roles, Hierarchies & Approval Ownership Model | `docs/tasks/in-progress/TASK-225-internal-roles-hierarchies-approval-ownership-model.md` |
 | `TASK-226` | `to-do` | Superadministrador Bootstrap & Assignment Policy | `docs/tasks/to-do/TASK-226-superadministrador-bootstrap-assignment-policy.md` |
 | `TASK-227` | `to-do` | Operational Responsibility Registry | `docs/tasks/to-do/TASK-227-operational-responsibility-registry.md` |
@@ -306,7 +306,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-253` | `complete` | Identity Spec Residual Gaps (Approval Snapshot + Audit Events) | `docs/tasks/complete/TASK-253-identity-spec-residual-gaps.md` |
 | `TASK-255` | `complete` | Mi Perfil: fix identity chain so profile never shows "Perfil no disponible" | `docs/tasks/complete/TASK-255-mi-perfil-identity-chain-fix.md` |
 | `TASK-256` | `complete` | Entra Profile Completeness: avatar sync + identity link for all internal users | `docs/tasks/complete/TASK-256-entra-profile-completeness-avatar-identity-link.md` |
-| `TASK-257` | `to-do` | Mi Perfil: enterprise redesign con patron Vuexy User View (sidebar + tabs) | `docs/tasks/to-do/TASK-257-mi-perfil-enterprise-redesign.md` |
+| `TASK-257` | `complete` (closed 2026-05-05 — code shipped en `dd3fe199`, lifecycle drift) | Mi Perfil: enterprise redesign con patron Vuexy User View (sidebar + tabs) | `docs/tasks/complete/TASK-257-mi-perfil-enterprise-redesign.md` |
 | `TASK-258` | `to-do` | Migrar sync-conformed + sync-conformed-recovery a ops-worker | `docs/tasks/to-do/TASK-258-migrate-sync-conformed-to-ops-worker.md` |
 | `TASK-259` | `to-do` | Migrar entra-profile-sync a ops-worker | `docs/tasks/to-do/TASK-259-migrate-entra-profile-sync-to-ops-worker.md` |
 | `TASK-260` | `to-do` | Migrar nubox-sync + ico-member-sync a ops-worker | `docs/tasks/to-do/TASK-260-migrate-nubox-sync-ico-member-sync-to-ops-worker.md` |
@@ -638,7 +638,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-582` | `to-do` | Monthly Project Provisioning Admin Surface with Preview — EPIC-005 child 6/6 | `docs/tasks/to-do/TASK-582-monthly-project-provisioning-admin-surface.md` |
 | `TASK-583` | `to-do` | HubSpot Quote Native Publish & Tax Finalization | `docs/tasks/to-do/TASK-583-hubspot-quote-native-publish-tax-finalization.md` |
 | `TASK-584` | `in-progress` | PostgreSQL Migration Tooling Hardening | `docs/tasks/in-progress/TASK-584-postgres-migration-tooling-hardening.md` |
-| `TASK-585` | `in-progress` | Notion BQ Sync Cost Efficiency & Invocation Hardening | `docs/tasks/in-progress/TASK-585-notion-bq-sync-cost-efficiency-hardening.md` |
+| `TASK-585` | `to-do` (reverted 2026-05-05 — stalled 30+ días, runtime externo GCP) | Notion BQ Sync Cost Efficiency & Invocation Hardening | `docs/tasks/to-do/TASK-585-notion-bq-sync-cost-efficiency-hardening.md` |
 | `TASK-586` | `to-do` | Notion Sync & Billing Export Observability in Admin Center | `docs/tasks/to-do/TASK-586-notion-sync-billing-observability.md` |
 | `TASK-587` | `complete` | HubSpot Products Full-Fidelity Bidirectional Sync Expansion (umbrella — 5 fases A-E cerradas) | `docs/tasks/complete/TASK-587-hubspot-products-full-fidelity-sync.md` |
 | `TASK-588` | `complete` | Project Title Resolution Hardening en Conformed Sync (fix ICO "Sin nombre") | `docs/tasks/complete/TASK-588-project-title-resolution-conformed-sync-hardening.md` |

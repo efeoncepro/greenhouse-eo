@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `to-do` (revertida 2026-05-05 — 30+ días sin commits; Delta 2026-04-24 dice "minScale=0 vive en GCP" runtime externo; vuelve a backlog para re-triage o cierre como deferido a ops GCP)
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
