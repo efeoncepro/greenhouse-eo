@@ -15,7 +15,7 @@
 - Status real: `Bloqueada por identity cutover del catálogo legacy`
 - Rank: `TBD`
 - Domain: `crm + platform`
-- Blocked by: `TASK-563` + `validacion >=4 semanas en production`
+- Blocked by: `validacion >=4 semanas en production` (TASK-563 completada — pending solo gate de validación operativa desde 2026-05-05)
 - Branch: `task/TASK-549-product-catalog-policy-enforcement-cleanup`
 - Legacy ID: `[optional]`
 - GitHub Issue: `[optional]`

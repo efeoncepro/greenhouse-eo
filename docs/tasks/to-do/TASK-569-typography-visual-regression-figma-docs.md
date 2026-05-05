@@ -22,7 +22,7 @@ Tras cerrar TASK-566 con Inter y validar visualmente, el usuario decidió pivota
 - Status real: `Diseño`
 - Rank: `TBD`
 - Domain: `ui` + `platform` + `content`
-- Blocked by: `TASK-566` + `TASK-567` + `TASK-568`
+- Blocked by: `TASK-567` + `TASK-568` (TASK-566 completada — desbloqueado parcial 2026-05-05)
 - Branch: `task/TASK-569-typography-regression-figma-docs`
 
 ## Summary

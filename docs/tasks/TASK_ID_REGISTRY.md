@@ -47,13 +47,13 @@ Registro canonico de asignacion de IDs `TASK-###` para evitar colisiones y renum
 | `TASK-030` | `complete`       | `CODEX_TASK_HRIS_Onboarding_Offboarding`                           | `docs/tasks/complete/TASK-030-hris-onboarding-offboarding.md`           |
 | `TASK-031` | `to-do`          | `HRIS Performance Evaluations`                                     | `docs/tasks/to-do/TASK-031-hris-performance-evaluations.md`             |
 | `TASK-032` | `to-do`          | Login Dark Mode Polish                                             | `docs/tasks/to-do/TASK-032-login-dark-mode-polish.md`                   |
-| `TASK-033` | `to-do`          | `CODEX_TASK_Campaign_360` (brief historico)                        | `docs/tasks/to-do/TASK-033-campaign-360-brief.md`                       |
-| `TASK-034` | `to-do`          | `CODEX_TASK_Business_Units_Canonical` (brief historico)            | `docs/tasks/to-do/TASK-034-business-units-canonical-brief.md`           |
-| `TASK-035` | `to-do`          | `CODEX_TASK_FrameIO_BigQuery_Analytics_Pipeline` (brief historico) | `docs/tasks/to-do/TASK-035-frameio-analytics-brief.md`                  |
-| `TASK-036` | `to-do`          | `CODEX_TASK_Greenhouse_Home_Nexa` (brief historico)                | `docs/tasks/to-do/TASK-036-greenhouse-home-nexa-brief.md`               |
+| `TASK-033` | `reference`      | `CODEX_TASK_Campaign_360` (brief historico)                        | `docs/tasks/briefs/TASK-033-campaign-360-brief.md`                      |
+| `TASK-034` | `reference`      | `CODEX_TASK_Business_Units_Canonical` (brief historico)            | `docs/tasks/briefs/TASK-034-business-units-canonical-brief.md`          |
+| `TASK-035` | `reference`      | `CODEX_TASK_FrameIO_BigQuery_Analytics_Pipeline` (brief historico) | `docs/tasks/briefs/TASK-035-frameio-analytics-brief.md`                 |
+| `TASK-036` | `reference`      | `CODEX_TASK_Greenhouse_Home_Nexa` (brief historico)                | `docs/tasks/briefs/TASK-036-greenhouse-home-nexa-brief.md`              |
 | `TASK-037` | `complete`       | `CODEX_TASK_SCIM_User_Provisioning` (brief historico)              | `docs/tasks/to-do/TASK-037-scim-user-provisioning-brief.md`             |
 | `TASK-038` | `complete`       | `CODEX_TASK_Staff_Augmentation_Module` (brief historico absorbido) | `docs/tasks/complete/TASK-038-staff-augmentation-module-brief.md`       |
-| `TASK-039` | `to-do`          | `Data Node Product Vision (Legacy Reference)`                      | `docs/tasks/to-do/TASK-039-data-node-architecture-v1.md`                |
+| `TASK-039` | `reference`      | `Data Node Product Vision (Legacy Reference)`                      | `docs/tasks/briefs/TASK-039-data-node-architecture-v1.md`               |
 | `TASK-040` | `to-do`          | `Data Node Operating Baseline`                                     | `docs/tasks/to-do/TASK-040-data-node-architecture-v2.md`                |
 
 | `TASK-041` | `complete` | `CODEX_TASK_Staff_Augmentation_HRIS_Addendum` (absorbida) | `docs/tasks/complete/TASK-041-staff-augmentation-hris-addendum.md` |

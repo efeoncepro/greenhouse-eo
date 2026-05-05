@@ -14,7 +14,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `hr`
-- Blocked by: `TASK-337`
+- Blocked by: `none` (TASK-337 completada — desbloqueada 2026-05-05)
 - Branch: `task/TASK-338-compensation-arrangement-canonical-runtime-foundation`
 - Legacy ID: `none`
 - GitHub Issue: `none`

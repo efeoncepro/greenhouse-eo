@@ -1,5 +1,7 @@
 # CODEX TASK — Greenhouse Home: Vista Principal con Agente Conversacional Nexa
 
+> **Reclasificado 2026-05-05** — movido de `to-do/` a `briefs/`. Este documento es referencia de framing de producto, no task ejecutable. Implementación viva: runtime activo en `/api/home/nexa` (TASK-110), `in-progress/TASK-696-smart-home-v2-enterprise.md`. NO tomar como baseline técnica.
+
 ## Delta 2026-03-28
 - El runtime activo de `/api/home/nexa` ya soporta tool calling operativo y devuelve `toolInvocations` para `check_payroll`, `get_otd`, `check_emails`, `get_capacity` y `pending_invoices` — cerrado por trabajo en `TASK-110`.
 

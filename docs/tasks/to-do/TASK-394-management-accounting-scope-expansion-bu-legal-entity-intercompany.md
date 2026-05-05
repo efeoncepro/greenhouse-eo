@@ -18,7 +18,7 @@ Esta task aporta dimensiones **business_unit** y **legal_entity** al programa ca
 - Status real: `Diseno estructural`
 - Rank: `TBD`
 - Domain: `finance`
-- Blocked by: `TASK-392`
+- Blocked by: `none` (TASK-392 completada — desbloqueada 2026-05-05)
 - Branch: `task/TASK-394-management-accounting-scope-expansion`
 - Legacy ID: `none`
 - GitHub Issue: `none`

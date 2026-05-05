@@ -22,7 +22,7 @@ Tras cerrar TASK-566 con Inter y validar visualmente, el usuario decidió pivota
 - Status real: `Diseño`
 - Rank: `TBD`
 - Domain: `ui` + `platform`
-- Blocked by: `TASK-566`
+- Blocked by: `none` (TASK-566 completada — desbloqueada 2026-05-05)
 - Branch: `task/TASK-568-typography-email-pdf`
 
 ## Summary

@@ -14,7 +14,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `data`
-- Blocked by: `TASK-313`
+- Blocked by: `none` (TASK-313 completada — desbloqueada 2026-05-05)
 - Branch: `task/TASK-315-talent-taxonomy-canonical-model`
 - Legacy ID: `none`
 - GitHub Issue: `none`

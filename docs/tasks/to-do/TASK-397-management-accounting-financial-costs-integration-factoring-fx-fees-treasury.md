@@ -18,7 +18,7 @@ Esta task **agrega el `cost_dimension='financial'` al modelo dimensional** defin
 - Status real: `Diseno estructural`
 - Rank: `TBD`
 - Domain: `finance`
-- Blocked by: `TASK-392`
+- Blocked by: `none` (TASK-392 completada — desbloqueada 2026-05-05)
 - Branch: `task/TASK-397-management-accounting-financial-costs-integration`
 - Legacy ID: `none`
 - GitHub Issue: `none`

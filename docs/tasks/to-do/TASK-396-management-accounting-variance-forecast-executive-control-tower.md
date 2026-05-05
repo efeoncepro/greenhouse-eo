@@ -18,7 +18,7 @@ Esta task **lee margen y variance del Fact 4 `client_full_cost_per_period`** def
 - Status real: `Diseno estructural`
 - Rank: `TBD`
 - Domain: `finance`
-- Blocked by: `TASK-392, TASK-395`
+- Blocked by: `TASK-395` (TASK-392 completada — depende solo de TASK-395 desde 2026-05-05)
 - Branch: `task/TASK-396-management-accounting-variance-forecast-control-tower`
 - Legacy ID: `none`
 - GitHub Issue: `none`

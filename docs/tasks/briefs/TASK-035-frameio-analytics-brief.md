@@ -1,5 +1,7 @@
 # CODEX_TASK: Frame.io → BigQuery Analytics Pipeline
 
+> **Reclasificado 2026-05-05** — movido de `to-do/` a `briefs/`. Este documento es referencia de framing de producto, no task ejecutable. Implementación viva en `to-do/TASK-020-frameio-bigquery-analytics-pipeline.md` (v2). NO tomar como baseline técnica.
+
 ## Estado 2026-03-19
 
 Este brief sigue capturando bien el problema de negocio y el gap real de data para `Creative Hub` e `ICO`, pero ya no debe implementarse literalmente como baseline tecnica del proyecto.

@@ -18,7 +18,7 @@ Esta task implementa **Fase 5: Pluggable Overhead Strategies + Budget capability
 - Status real: `Diseno estructural`
 - Rank: `TBD`
 - Domain: `finance`
-- Blocked by: `TASK-392`
+- Blocked by: `none` (TASK-392 completada — desbloqueada 2026-05-05)
 - Branch: `task/TASK-395-management-accounting-planning-engine`
 - Legacy ID: `none`
 - GitHub Issue: `none`

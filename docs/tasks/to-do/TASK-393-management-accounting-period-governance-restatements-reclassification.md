@@ -18,7 +18,7 @@ Esta task implementa **§5 Snapshots Inmutables + §6 Period Closing Workflow** 
 - Status real: `Diseno estructural`
 - Rank: `TBD`
 - Domain: `finance`
-- Blocked by: `TASK-392`
+- Blocked by: `none` (TASK-392 completada — desbloqueada 2026-05-05)
 - Branch: `task/TASK-393-management-accounting-period-governance`
 - Legacy ID: `none`
 - GitHub Issue: `none`

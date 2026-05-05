@@ -1,5 +1,7 @@
 # TASK-039 — Data Node Product Vision (Legacy Reference)
 
+> **Reclasificado 2026-05-05** — movido de `to-do/` a `briefs/`. Este documento es referencia legacy de visión de producto, no task ejecutable. La spec auto-declara "no ejecutar literalmente". Baseline operativa vigente en `to-do/TASK-040-data-node-architecture-v2.md`.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -8,7 +10,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `reference` (movido a `briefs/` 2026-05-05; no es task ejecutable)
 - Priority: `P3`
 - Impact: `Medio`
 - Effort: `Bajo`

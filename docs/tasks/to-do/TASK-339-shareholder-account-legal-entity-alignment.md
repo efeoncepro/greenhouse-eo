@@ -14,7 +14,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `finance`
-- Blocked by: `TASK-337`
+- Blocked by: `none` (TASK-337 completada — desbloqueada 2026-05-05)
 - Branch: `task/TASK-339-shareholder-account-legal-entity-alignment`
 - Legacy ID: `follow-on de TASK-284 y TASK-306`
 - GitHub Issue: `none`

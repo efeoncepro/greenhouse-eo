@@ -1,5 +1,7 @@
 # CODEX TASK — Business Units: Dimension Table Canónica y Sinergias Cross-System
 
+> **Reclasificado 2026-05-05** — movido de `to-do/` a `briefs/`. Este documento es referencia de framing de producto, no task ejecutable. Implementación viva en `in-progress/TASK-016-business-units-canonical.md`. NO tomar como baseline técnica.
+
 ## Delta 2026-03-31
 - Fase 1 implementada en TASK-016. Ver `docs/tasks/in-progress/TASK-016-business-units-canonical.md`.
 - Arquitectura v2 usa `business_line_metadata` (1:1 sobre service_modules.module_code), NO `business_units(slug)` propuesta aquí.

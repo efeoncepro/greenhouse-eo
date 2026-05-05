@@ -18,7 +18,7 @@ Esta task **endurece los endpoints y proyecciones del programa Member Loaded Cos
 - Status real: `Diseno estructural`
 - Rank: `TBD`
 - Domain: `finance`
-- Blocked by: `TASK-392`
+- Blocked by: `none` (TASK-392 completada — desbloqueada 2026-05-05)
 - Branch: `task/TASK-398-management-accounting-enterprise-hardening`
 - Legacy ID: `none`
 - GitHub Issue: `none`

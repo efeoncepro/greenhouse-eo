@@ -1,5 +1,7 @@
 # TASK-033 — Campaign 360 Brief
 
+> **Reclasificado 2026-05-05** — movido de `to-do/` a `briefs/`. Este documento es referencia de framing de producto, no task ejecutable. Implementación viva en `to-do/TASK-017-campaign-360.md`. NO tomar como baseline técnica.
+
 ## Estado
 
 Brief historico de producto saneado al 2026-03-24.
