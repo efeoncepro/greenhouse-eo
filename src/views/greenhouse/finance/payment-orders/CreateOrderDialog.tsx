@@ -116,6 +116,12 @@ const CreateOrderDialog = ({ open, onClose, obligations, onCreated }: CreateOrde
   }, [obligations])
 
   const handleSubmit = async () => {
+    if (obligations.length === 0) {
+      toast.error('Selecciona al menos una obligación por programar.')
+
+      return
+    }
+
     if (isMixed) {
       toast.error('No se pueden mezclar monedas en una sola orden. Crea una orden por moneda.')
 
@@ -253,7 +259,7 @@ const CreateOrderDialog = ({ open, onClose, obligations, onCreated }: CreateOrde
         <Button onClick={onClose} disabled={submitting}>
           Cancelar
         </Button>
-        <Button variant='contained' onClick={handleSubmit} disabled={submitting || isMixed}>
+        <Button variant='contained' onClick={handleSubmit} disabled={submitting || isMixed || obligations.length === 0}>
           {submitting ? 'Creando…' : 'Crear orden'}
         </Button>
       </DialogActions>

@@ -13,6 +13,10 @@ import type {
   PaymentOrderCurrency,
   PaymentOrderPaymentMethod
 } from '@/types/payment-orders'
+import {
+  canCreatePaymentOrderFromObligationStatus,
+  type PaymentObligationStatus
+} from '@/types/payment-obligations'
 
 import { PaymentOrderConflictError, PaymentOrderValidationError } from './errors'
 import { mapOrderRow, type OrderRow } from './row-mapper'
@@ -138,9 +142,10 @@ export async function createPaymentOrderFromObligations(
       )
     }
 
-    // 2. Validar status (no puede haber cancelled/superseded/paid/closed)
-    const blockedStatuses = new Set(['cancelled', 'superseded', 'paid', 'closed'])
-    const blocked = result.rows.filter(r => blockedStatuses.has(r.status))
+    // 2. Validar status: una orden nueva solo puede tomar obligaciones no lockeadas y por programar.
+    const blocked = result.rows.filter(r =>
+      !canCreatePaymentOrderFromObligationStatus(r.status as PaymentObligationStatus)
+    )
 
     if (blocked.length > 0) {
       throw new PaymentOrderConflictError(

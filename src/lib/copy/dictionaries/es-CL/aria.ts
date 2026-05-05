@@ -39,5 +39,7 @@ export const aria: AriaCopy = {
   notifications: 'Notificaciones',
   userMenu: 'Menú de usuario',
   language: 'Idioma',
-  theme: 'Tema'
+  theme: 'Tema',
+  paymentOrderTabs: 'Pestañas de órdenes de pago',
+  paymentObligationFilters: 'Filtros de obligaciones'
 }

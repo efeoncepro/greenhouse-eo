@@ -237,6 +237,8 @@ export interface AriaCopy {
   userMenu: string
   language: string
   theme: string
+  paymentOrderTabs: string
+  paymentObligationFilters: string
 }
 
 /**

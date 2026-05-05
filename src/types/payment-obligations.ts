@@ -26,6 +26,17 @@ export const PAYMENT_OBLIGATION_STATUSES = [
 
 export type PaymentObligationStatus = (typeof PAYMENT_OBLIGATION_STATUSES)[number]
 
+export const PAYMENT_OBLIGATION_ORDER_CREATABLE_STATUSES = [
+  'generated',
+  'partially_paid'
+] as const satisfies readonly PaymentObligationStatus[]
+
+export const canCreatePaymentOrderFromObligationStatus = (
+  status: PaymentObligationStatus
+): boolean => PAYMENT_OBLIGATION_ORDER_CREATABLE_STATUSES.includes(
+  status as (typeof PAYMENT_OBLIGATION_ORDER_CREATABLE_STATUSES)[number]
+)
+
 export const PAYMENT_OBLIGATION_SOURCE_KINDS = [
   'payroll',
   'supplier_invoice',

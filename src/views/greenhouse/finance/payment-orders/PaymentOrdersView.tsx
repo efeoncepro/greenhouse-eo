@@ -15,8 +15,12 @@ import Typography from '@mui/material/Typography'
 import { toast } from 'sonner'
 
 import EmptyState from '@/components/greenhouse/EmptyState'
+import { getMicrocopy } from '@/lib/copy'
 import type { PaymentOrdersKpis } from '@/lib/finance/payment-orders/get-kpis'
-import type { PaymentObligation } from '@/types/payment-obligations'
+import {
+  canCreatePaymentOrderFromObligationStatus,
+  type PaymentObligation
+} from '@/types/payment-obligations'
 import type { PaymentOrder, PaymentOrderWithLines } from '@/types/payment-orders'
 
 import PaymentOrdersKpiRow from './PaymentOrdersKpiRow'
@@ -32,6 +36,8 @@ import CreateOrderDialog from './CreateOrderDialog'
 type TabKey = 'obligations' | 'orders' | 'reconciliation' | 'events'
 
 const PaymentOrdersView = () => {
+  const microcopy = getMicrocopy()
+
   const [tab, setTab] = useState<TabKey>('obligations')
 
   const [kpis, setKpis] = useState<PaymentOrdersKpis | null>(null)
@@ -110,17 +116,66 @@ const PaymentOrdersView = () => {
     void loadOrders()
   }, [loadKpis, loadObligations, loadOrders])
 
+  // ── Selection helpers ──────────────────────────────────────
+
+  const obligationsAvailableForOrder = useMemo(
+    () => obligations.filter(o => canCreatePaymentOrderFromObligationStatus(o.status)),
+    [obligations]
+  )
+
+  const selectableObligationIds = useMemo(
+    () => new Set(obligationsAvailableForOrder.map(o => o.obligationId)),
+    [obligationsAvailableForOrder]
+  )
+
+  useEffect(() => {
+    setSelectedObligationIds(prev => {
+      let changed = false
+      const next = new Set<string>()
+
+      prev.forEach(id => {
+        if (selectableObligationIds.has(id)) {
+          next.add(id)
+        } else {
+          changed = true
+        }
+      })
+
+      return changed ? next : prev
+    })
+  }, [selectableObligationIds])
+
+  const toggleObligation = useCallback((id: string) => {
+    setSelectedObligationIds(prev => {
+      if (!selectableObligationIds.has(id)) return prev
+
+      const next = new Set(prev)
+
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+
+      return next
+    })
+  }, [selectableObligationIds])
+
+  const clearSelection = useCallback(() => setSelectedObligationIds(new Set()), [])
+
+  const selectedObligations = useMemo(
+    () => obligationsAvailableForOrder.filter(o => selectedObligationIds.has(o.obligationId)),
+    [obligationsAvailableForOrder, selectedObligationIds]
+  )
+
   // ── Actions ─────────────────────────────────────────────────
 
   const handleOpenCreate = useCallback(() => {
-    if (selectedObligationIds.size === 0) {
-      toast.info('Selecciona al menos una obligación')
+    if (selectedObligations.length === 0) {
+      toast.info('Selecciona al menos una obligación por programar')
 
       return
     }
 
     setCreateDialogOpen(true)
-  }, [selectedObligationIds])
+  }, [selectedObligations])
 
   const handleOrderCreated = useCallback(
     async (order: PaymentOrder) => {
@@ -160,31 +215,6 @@ const PaymentOrdersView = () => {
     }
   }, [loadKpis, loadObligations, loadOrders, drawerOrder, handleOpenOrder])
 
-  // ── Selection helpers ──────────────────────────────────────
-
-  const obligationsAvailableForOrder = useMemo(
-    () => obligations.filter(o => o.status === 'generated' || o.status === 'partially_paid'),
-    [obligations]
-  )
-
-  const toggleObligation = useCallback((id: string) => {
-    setSelectedObligationIds(prev => {
-      const next = new Set(prev)
-
-      if (next.has(id)) next.delete(id)
-      else next.add(id)
-
-      return next
-    })
-  }, [])
-
-  const clearSelection = useCallback(() => setSelectedObligationIds(new Set()), [])
-
-  const selectedObligations = useMemo(
-    () => obligationsAvailableForOrder.filter(o => selectedObligationIds.has(o.obligationId)),
-    [obligationsAvailableForOrder, selectedObligationIds]
-  )
-
   // ── Render ──────────────────────────────────────────────────
 
   return (
@@ -209,9 +239,9 @@ const PaymentOrdersView = () => {
               variant='contained'
               startIcon={<i className='tabler-clipboard-plus' />}
               onClick={handleOpenCreate}
-              disabled={selectedObligationIds.size === 0}
+              disabled={selectedObligations.length === 0}
             >
-              Crear orden ({selectedObligationIds.size})
+              Crear orden ({selectedObligations.length})
             </Button>
           </Stack>
         </CardContent>
@@ -231,7 +261,7 @@ const PaymentOrdersView = () => {
               onChange={(_, v) => setTab(v as TabKey)}
               variant='scrollable'
               scrollButtons='auto'
-              aria-label='Pestañas de Órdenes de pago'
+              aria-label={microcopy.aria.paymentOrderTabs}
             >
               <Tab value='obligations' label={`Obligaciones (${obligationsAvailableForOrder.length})`} />
               <Tab value='orders' label={`Órdenes de pago (${orders.length})`} />
@@ -254,6 +284,7 @@ const PaymentOrdersView = () => {
                 obligations={obligations}
                 loading={obligationsLoading}
                 selectedIds={selectedObligationIds}
+                selectableIds={selectableObligationIds}
                 onToggle={toggleObligation}
                 onClearSelection={clearSelection}
                 onCreateOrder={handleOpenCreate}

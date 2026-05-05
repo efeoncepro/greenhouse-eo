@@ -22,12 +22,18 @@ import TableRow from '@mui/material/TableRow'
 import CustomAvatar from '@core/components/mui/Avatar'
 
 import { DataTableShell } from '@/components/greenhouse/data-table'
-import type { PaymentObligation, PaymentObligationKind } from '@/types/payment-obligations'
+import { getMicrocopy } from '@/lib/copy'
+import {
+  canCreatePaymentOrderFromObligationStatus,
+  type PaymentObligation,
+  type PaymentObligationKind
+} from '@/types/payment-obligations'
 
 interface ObligationsTabProps {
   obligations: PaymentObligation[]
   loading: boolean
   selectedIds: Set<string>
+  selectableIds: Set<string>
   onToggle: (id: string) => void
   onClearSelection: () => void
   onCreateOrder: () => void
@@ -190,11 +196,14 @@ const ObligationsTab = ({
   obligations,
   loading,
   selectedIds,
+  selectableIds,
   onToggle,
   onClearSelection,
   onCreateOrder,
   onOpenObligation
 }: ObligationsTabProps) => {
+  const microcopy = getMicrocopy()
+
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all')
   const [periodFilter, setPeriodFilter] = useState<string | 'all'>('all')
@@ -224,7 +233,7 @@ const ObligationsTab = ({
     let list = obligations
 
     if (statusFilter === 'to_schedule') {
-      list = list.filter(o => o.status === 'generated' || o.status === 'partially_paid')
+      list = list.filter(o => canCreatePaymentOrderFromObligationStatus(o.status))
     } else if (statusFilter === 'overdue') {
       list = list.filter(isOverdue)
     } else if (statusFilter === 'usd_only') {
@@ -256,7 +265,7 @@ const ObligationsTab = ({
   // ── Counters per filter chip (computed over full obligations to keep counts stable) ──
   const counters = useMemo(() => {
     const total = obligations.length
-    const toSchedule = obligations.filter(o => o.status === 'generated' || o.status === 'partially_paid').length
+    const toSchedule = obligations.filter(o => canCreatePaymentOrderFromObligationStatus(o.status)).length
     const overdue = obligations.filter(isOverdue).length
     const usdOnly = obligations.filter(o => o.currency === 'USD').length
 
@@ -264,8 +273,9 @@ const ObligationsTab = ({
   }, [obligations])
 
   // ── Selection on filtered set only ───────────────────────────
-  const selectedFiltered = filtered.filter(o => selectedIds.has(o.obligationId))
-  const allFilteredSelected = filtered.length > 0 && selectedFiltered.length === filtered.length
+  const selectableFiltered = filtered.filter(o => selectableIds.has(o.obligationId))
+  const selectedFiltered = selectableFiltered.filter(o => selectedIds.has(o.obligationId))
+  const allFilteredSelected = selectableFiltered.length > 0 && selectedFiltered.length === selectableFiltered.length
 
   const toggleAll = () => {
     if (allFilteredSelected) {
@@ -274,13 +284,16 @@ const ObligationsTab = ({
       return
     }
 
-    filtered.forEach(o => {
+    selectableFiltered.forEach(o => {
       if (!selectedIds.has(o.obligationId)) onToggle(o.obligationId)
     })
   }
 
   // ── Bulk bar advice (mockup §"BULK BAR") ─────────────────────
-  const selectedAll = useMemo(() => obligations.filter(o => selectedIds.has(o.obligationId)), [obligations, selectedIds])
+  const selectedAll = useMemo(
+    () => obligations.filter(o => selectableIds.has(o.obligationId) && selectedIds.has(o.obligationId)),
+    [obligations, selectableIds, selectedIds]
+  )
 
   const totalSelectedClp = selectedAll.filter(o => o.currency === 'CLP').reduce((s, o) => s + o.amount, 0)
   const totalSelectedUsd = selectedAll.filter(o => o.currency === 'USD').reduce((s, o) => s + o.amount, 0)
@@ -312,7 +325,7 @@ const ObligationsTab = ({
   return (
     <Stack spacing={4}>
       {/* ── BULK BAR ───────────────────────────────────────────── */}
-      {selectedIds.size > 0 ? (
+      {selectedAll.length > 0 ? (
         <Box
           role='status'
           aria-live='polite'
@@ -333,7 +346,7 @@ const ObligationsTab = ({
           <Stack direction='row' spacing={3} alignItems='center' flexWrap='wrap' useFlexGap>
             <Chip
               size='small'
-              label={`${selectedIds.size} seleccionada${selectedIds.size === 1 ? '' : 's'}`}
+              label={`${selectedAll.length} seleccionada${selectedAll.length === 1 ? '' : 's'}`}
               sx={{ backgroundColor: 'rgba(255,255,255,0.18)', color: 'inherit', fontWeight: 600 }}
             />
             <Stack direction='row' spacing={2} alignItems='center' flexWrap='wrap' useFlexGap>
@@ -379,7 +392,7 @@ const ObligationsTab = ({
         alignItems='center'
         flexWrap='wrap'
         role='toolbar'
-        aria-label='Filtros de obligaciones'
+        aria-label={microcopy.aria.paymentObligationFilters}
         useFlexGap
       >
         <TextField
@@ -478,6 +491,7 @@ const ObligationsTab = ({
                   checked={allFilteredSelected}
                   indeterminate={!allFilteredSelected && selectedFiltered.length > 0}
                   onChange={toggleAll}
+                  disabled={selectableFiltered.length === 0}
                   inputProps={{ 'aria-label': 'Seleccionar todas las visibles' }}
                 />
               </TableCell>
@@ -502,9 +516,7 @@ const ObligationsTab = ({
             ) : null}
             {filtered.map(o => {
               const kindMeta = obligationKindMeta[o.obligationKind]
-              const isReconciled = o.status === 'reconciled' || o.status === 'closed'
-              const isCancelled = o.status === 'cancelled' || o.status === 'superseded'
-              const canSelect = !isReconciled && !isCancelled
+              const canSelect = selectableIds.has(o.obligationId)
               const ajusteMonto = (o.metadataJson?.adjustmentAmount as number | undefined) ?? null
 
               return (
