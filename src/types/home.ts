@@ -11,6 +11,10 @@ export interface ModuleCard {
   isNew?: boolean
 }
 
+// TASK-553 — `HomeRecommendedShortcut` is the Home-facing projection of a
+// `CanonicalShortcut` from `src/lib/shortcuts/catalog.ts`. `id` mirrors the
+// canonical `key`. Header surfaces consume the catalog directly via
+// `resolveAvailableShortcuts` / `resolveRecommendedShortcuts`.
 export interface HomeRecommendedShortcut {
   id: string
   label: string
