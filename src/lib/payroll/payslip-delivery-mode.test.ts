@@ -17,15 +17,24 @@ afterEach(() => {
 })
 
 describe('payslip delivery mode flag (TASK-759)', () => {
-  it('defaults to legacy_export when env var is unset', () => {
+  it('defaults to both when env var is unset (TASK-753 hardening 2026-05-05)', () => {
     delete process.env.GREENHOUSE_PAYSLIP_DELIVERY_MODE
-    expect(getPaymentDeliveryMode()).toBe('legacy_export')
+    expect(getPaymentDeliveryMode()).toBe('both')
+    // Both triggers active — idempotency-by-design en sendPayslipForEntry
+    // previene duplicados via (entry_id, delivery_kind) check.
     expect(shouldSendOnExport()).toBe(true)
-    expect(shouldSendOnPayment()).toBe(false)
+    expect(shouldSendOnPayment()).toBe(true)
   })
 
-  it('defaults to legacy_export when env var is invalid', () => {
+  it('defaults to both when env var is invalid', () => {
     process.env.GREENHOUSE_PAYSLIP_DELIVERY_MODE = 'something_random'
+    expect(getPaymentDeliveryMode()).toBe('both')
+    expect(shouldSendOnExport()).toBe(true)
+    expect(shouldSendOnPayment()).toBe(true)
+  })
+
+  it('respects legacy_export mode when explicitly set (rollback path)', () => {
+    process.env.GREENHOUSE_PAYSLIP_DELIVERY_MODE = 'legacy_export'
     expect(getPaymentDeliveryMode()).toBe('legacy_export')
     expect(shouldSendOnExport()).toBe(true)
     expect(shouldSendOnPayment()).toBe(false)
