@@ -21,6 +21,7 @@ import ProjectsTab from './my-profile/tabs/ProjectsTab'
 import ConnectionsTab from './my-profile/tabs/ConnectionsTab'
 import SecurityTab from './my-profile/tabs/SecurityTab'
 import SkillsCertificationsTab from './my-profile/tabs/SkillsCertificationsTab'
+import LegalProfileTab from './my-profile/tabs/LegalProfileTab'
 
 // ── Helpers ──
 
@@ -301,6 +302,12 @@ const MyProfileView = () => {
               iconPosition='start'
             />
             <Tab
+              icon={<i className='tabler-id-badge-2' />}
+              value='legal'
+              label='Datos legales'
+              iconPosition='start'
+            />
+            <Tab
               icon={<i className='tabler-lock' />}
               value='security'
               label='Seguridad'
@@ -331,6 +338,9 @@ const MyProfileView = () => {
           </TabPanel>
           <TabPanel value='skills' className='p-0 pbs-6'>
             <SkillsCertificationsTab mode='self' memberId='' />
+          </TabPanel>
+          <TabPanel value='legal' className='p-0 pbs-6'>
+            <LegalProfileTab />
           </TabPanel>
           <TabPanel value='security' className='p-0 pbs-6'>
             <SecurityTab />

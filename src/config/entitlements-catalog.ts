@@ -517,6 +517,43 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     module: 'agency',
     actions: ['read'] as const,
     defaultScope: 'team'
+  },
+  // TASK-784 — Person Legal Profile capabilities
+  {
+    key: 'person.legal_profile.read_masked',
+    module: 'people',
+    actions: ['read'] as const,
+    defaultScope: 'own'
+  },
+  {
+    key: 'person.legal_profile.self_update',
+    module: 'my_workspace',
+    actions: ['create', 'update'] as const,
+    defaultScope: 'own'
+  },
+  {
+    key: 'person.legal_profile.hr_update',
+    module: 'hr',
+    actions: ['create', 'update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'person.legal_profile.verify',
+    module: 'hr',
+    actions: ['approve'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'person.legal_profile.reveal_sensitive',
+    module: 'hr',
+    actions: ['read'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'person.legal_profile.export_snapshot',
+    module: 'hr',
+    actions: ['export'] as const,
+    defaultScope: 'tenant'
   }
 ] as const
 

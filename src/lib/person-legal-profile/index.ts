@@ -64,6 +64,7 @@ export type { SnapshotInput } from './snapshots'
 export {
   assessPersonLegalReadiness
 } from './readiness'
+export { resolveProfileIdForMember } from './profile-resolver'
 export type {
   ReadinessUseCase,
   ReadinessBlocker,

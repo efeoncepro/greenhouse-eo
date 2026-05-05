@@ -185,6 +185,47 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
   if (hasRouteGroup(subject, 'hr') || hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
     const source: TenantEntitlementSource = hasRouteGroup(subject, 'hr') ? 'route_group' : 'role'
 
+    // TASK-784 — HR puede actualizar/verificar datos legales de personas.
+    addEntitlement(entries, {
+      module: 'people',
+      capability: 'person.legal_profile.read_masked',
+      action: 'read',
+      scope: 'tenant',
+      source
+    })
+
+    addEntitlement(entries, {
+      module: 'hr',
+      capability: 'person.legal_profile.hr_update',
+      action: 'create',
+      scope: 'tenant',
+      source
+    })
+
+    addEntitlement(entries, {
+      module: 'hr',
+      capability: 'person.legal_profile.hr_update',
+      action: 'update',
+      scope: 'tenant',
+      source
+    })
+
+    addEntitlement(entries, {
+      module: 'hr',
+      capability: 'person.legal_profile.verify',
+      action: 'approve',
+      scope: 'tenant',
+      source
+    })
+
+    addEntitlement(entries, {
+      module: 'hr',
+      capability: 'person.legal_profile.export_snapshot',
+      action: 'export',
+      scope: 'tenant',
+      source
+    })
+
     addEntitlement(entries, {
       module: 'hr',
       capability: 'hr.leave_backfill',
@@ -433,6 +474,15 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       scope: 'tenant',
       source: 'role'
     })
+
+    // TASK-784 — Reveal sensitive identity document/address. Least privilege.
+    addEntitlement(entries, {
+      module: 'hr',
+      capability: 'person.legal_profile.reveal_sensitive',
+      action: 'read',
+      scope: 'tenant',
+      source: 'role'
+    })
   }
 
   // TASK-722 — Reconciliation workbench capabilities.
@@ -631,6 +681,31 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     addEntitlement(entries, {
       module: 'my_workspace',
       capability: 'my.onboarding',
+      action: 'update',
+      scope: 'own',
+      source
+    })
+
+    // TASK-784 — Self-service de datos legales (documento + direccion).
+    addEntitlement(entries, {
+      module: 'people',
+      capability: 'person.legal_profile.read_masked',
+      action: 'read',
+      scope: 'own',
+      source
+    })
+
+    addEntitlement(entries, {
+      module: 'my_workspace',
+      capability: 'person.legal_profile.self_update',
+      action: 'create',
+      scope: 'own',
+      source
+    })
+
+    addEntitlement(entries, {
+      module: 'my_workspace',
+      capability: 'person.legal_profile.self_update',
       action: 'update',
       scope: 'own',
       source
