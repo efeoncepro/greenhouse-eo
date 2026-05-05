@@ -139,8 +139,10 @@ describe('TASK-727: Internal role × view matrix', () => {
     expect(ALL_INTERNAL_VIEW_CODES.length).toBeGreaterThanOrEqual(60)
   })
 
-  it('mi_ficha has 11 views', () => {
-    expect(MI_FICHA_VIEW_CODES).toHaveLength(11)
+  it('mi_ficha has 12 views including payment profile and onboarding self-service', () => {
+    expect(MI_FICHA_VIEW_CODES).toHaveLength(12)
+    expect(MI_FICHA_VIEW_CODES).toContain('mi_ficha.mi_cuenta_pago')
+    expect(MI_FICHA_VIEW_CODES).toContain('mi_ficha.onboarding')
   })
 
   it('finanzas has 14 views', () => {

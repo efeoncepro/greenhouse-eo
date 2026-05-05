@@ -82,7 +82,12 @@ export const SHORTCUT_CATALOG = [
     subtitle: 'Directorio del equipo',
     route: '/people',
     icon: 'tabler-address-book',
-    module: 'people'
+    module: 'people',
+    requiredCapability: {
+      capability: 'people.directory',
+      action: 'read',
+      scope: 'tenant'
+    }
   },
   {
     key: 'hr',

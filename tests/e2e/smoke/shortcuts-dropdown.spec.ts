@@ -5,6 +5,18 @@ const AGENT_EMAIL = process.env.AGENT_AUTH_EMAIL || 'agent@greenhouse.efeonce.or
 const BASE_URL = process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:3000'
 const VERCEL_BYPASS = process.env.VERCEL_AUTOMATION_BYPASS_SECRET || ''
 
+type ShortcutPayloadItem = {
+  key: string
+  label: string
+  subtitle: string
+}
+
+type ShortcutsPayload = {
+  recommended: ShortcutPayloadItem[]
+  available: ShortcutPayloadItem[]
+  pinned: ShortcutPayloadItem[]
+}
+
 // TASK-553 — End-to-end validation of <ShortcutsDropdown />.
 //
 // Validates the phase state machine fix that resolved the infinite-loop
@@ -15,7 +27,7 @@ const VERCEL_BYPASS = process.env.VERCEL_AUTOMATION_BYPASS_SECRET || ''
 // Hard guarantees the test asserts:
 //  1. The panel transitions out of the loading state within ~5s.
 //  2. The dropdown renders shortcuts (recommended fallback for fresh user).
-//  3. The "+" flow opens add mode and closes back to view mode after pin.
+//  3. The "+" flow opens add mode and closes back to view mode after pin when an option is available.
 //  4. The total number of GET /api/me/shortcuts calls stays bounded
 //     (< 8) — the loop reproduced HUNDREDS of identical calls per second.
 
@@ -66,7 +78,7 @@ test.describe('shortcuts dropdown — TASK-553', () => {
     ])
   })
 
-  test('opens, loads, supports add + unpin without infinite loop', async ({ page }) => {
+  test('opens, loads, supports add flow without infinite loop', async ({ page }) => {
     const shortcutsCalls: { method: string; status: number }[] = []
 
     page.on('response', response => {
@@ -81,6 +93,20 @@ test.describe('shortcuts dropdown — TASK-553', () => {
 
     // Make sure we're authenticated (not bounced to /login)
     await expect(page).not.toHaveURL(/\/login/, { timeout: 5000 })
+
+    const apiResponse = await page.request.get(`${BASE_URL}/api/me/shortcuts`, {
+      headers: VERCEL_BYPASS ? { 'x-vercel-protection-bypass': VERCEL_BYPASS } : undefined
+    })
+
+    expect(apiResponse.ok(), `GET /api/me/shortcuts failed: ${apiResponse.status()}`).toBe(true)
+
+    const shortcuts = (await apiResponse.json()) as ShortcutsPayload
+    const pinnedKeys = new Set(shortcuts.pinned.map(shortcut => shortcut.key))
+    const initialVisibleShortcut = shortcuts.pinned[0] ?? shortcuts.recommended[0]
+    const initialVisibleLabel = initialVisibleShortcut?.label ?? ''
+    const candidateToPin = shortcuts.available.find(shortcut => !pinnedKeys.has(shortcut.key))
+
+    expect(initialVisibleShortcut, 'expected at least one pinned or recommended shortcut').toBeTruthy()
 
     // Capture pre-open state
     await page.screenshot({ path: 'tmp/shortcuts-00-home.png', fullPage: false })
@@ -101,11 +127,12 @@ test.describe('shortcuts dropdown — TASK-553', () => {
 
     await page.screenshot({ path: 'tmp/shortcuts-01-loaded.png', fullPage: false })
 
-    // Recommended fallback for an admin tenant should show "Administracion".
-    // The tile's <a> wraps avatar + label + subtitle, so use a substring match.
-    const adminTile = page.getByRole('link').filter({ hasText: 'Administracion' }).first()
+    // The dropdown shows pinned shortcuts when they exist, otherwise the
+    // recommended fallback. Assert the server-declared contract, not a fixed
+    // seed state for the shared CI user.
+    const visibleTile = page.getByRole('link').filter({ hasText: initialVisibleLabel }).first()
 
-    await expect(adminTile).toBeVisible({ timeout: 3000 })
+    await expect(visibleTile).toBeVisible({ timeout: 3000 })
 
     // Snapshot the initial GET count BEFORE we trigger more interactions
     const initialGets = shortcutsCalls.filter(c => c.method === 'GET').length
@@ -125,11 +152,17 @@ test.describe('shortcuts dropdown — TASK-553', () => {
 
     await page.screenshot({ path: 'tmp/shortcuts-03-add-mode.png', fullPage: false })
 
-    // Click the first available row to pin it. The "Cuentas y accesos" subtitle
-    // is unique to "Usuarios" so use it as a stable target.
-    const availableRow = page.getByRole('button').filter({ hasText: 'Cuentas y accesos' }).first()
+    if (!candidateToPin) {
+      console.log('No available shortcut left to pin for this user; add-mode smoke covered.')
+    }
 
-    if ((await availableRow.count()) > 0) {
+    // Click the first server-declared available row to pin it. This keeps the
+    // smoke resilient when the shared agent user already has different pins.
+    const availableRow = candidateToPin
+      ? page.getByRole('button').filter({ hasText: candidateToPin.label }).first()
+      : page.getByRole('button').filter({ hasText: 'Cuentas y accesos' }).first()
+
+    if (candidateToPin && (await availableRow.count()) > 0) {
       await availableRow.click()
 
       // Should return to view mode automatically with new pin

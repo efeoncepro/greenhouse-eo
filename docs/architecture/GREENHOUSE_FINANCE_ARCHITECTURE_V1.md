@@ -97,6 +97,7 @@ Caso D: drain inline + cron concurrente en step 2 → `outbox_reactive_log` tien
 | Capa | Archivo | Contenido |
 | --- | --- | --- |
 | ViewCode | `src/lib/admin/view-access-catalog.ts` | `mi_ficha.mi_cuenta_pago` con `routePath: /my/payment-profile`, `routeGroup: my` |
+| Access persistido | `migrations/20260505183808725_seed-my-payment-profile-view-access.sql` | Siembra `mi_ficha.mi_cuenta_pago` y `mi_ficha.onboarding` en `greenhouse_core.view_registry` + grants para roles internos con `mi_ficha` completa |
 | Nomenclatura | `src/config/greenhouse-nomenclature.ts` | `GH_MY_NAV.paymentProfile = { label: 'Mi Cuenta de Pago', subtitle: 'Donde recibes tus pagos' }` |
 | Discovery | `src/components/layout/vertical/VerticalMenu.tsx` | Item en sección "Mi Ficha" gated por `canSeeView('mi_ficha.mi_cuenta_pago', true)` (defense in depth: capability + viewCode + page guard) |
 | Discovery (alterno) | `src/views/greenhouse/my/MyProfileView.tsx` | Tab "Cuenta de pago" que renderiza el mismo `<MyPaymentProfileView />` (single source of truth en React) |

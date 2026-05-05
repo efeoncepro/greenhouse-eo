@@ -48,6 +48,8 @@ test.describe('TASK-753 /my/payment-profile self-service contract', () => {
   test('POST /api/my/payment-profile rejects without auth (401/403)', async ({ playwright }) => {
     // Fresh request context WITHOUT storageState cookies → unauthenticated
     const ctx = await playwright.request.newContext({
+      baseURL: process.env.PLAYWRIGHT_BASE_URL || process.env.AGENT_AUTH_BASE_URL || 'http://localhost:3000',
+      storageState: { cookies: [], origins: [] },
       extraHTTPHeaders: process.env.VERCEL_AUTOMATION_BYPASS_SECRET
         ? { 'x-vercel-protection-bypass': process.env.VERCEL_AUTOMATION_BYPASS_SECRET }
         : undefined
@@ -63,8 +65,10 @@ test.describe('TASK-753 /my/payment-profile self-service contract', () => {
     await ctx.dispose()
   })
 
-  test('POST /api/my/payment-profile/context endpoint requires capability', async ({ playwright }) => {
+  test('GET /api/my/payment-profile/context endpoint requires auth', async ({ playwright }) => {
     const ctx = await playwright.request.newContext({
+      baseURL: process.env.PLAYWRIGHT_BASE_URL || process.env.AGENT_AUTH_BASE_URL || 'http://localhost:3000',
+      storageState: { cookies: [], origins: [] },
       extraHTTPHeaders: process.env.VERCEL_AUTOMATION_BYPASS_SECRET
         ? { 'x-vercel-protection-bypass': process.env.VERCEL_AUTOMATION_BYPASS_SECRET }
         : undefined

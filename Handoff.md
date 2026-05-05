@@ -1,5 +1,15 @@
 # Handoff.md
 
+## Sesion 2026-05-05 — CI/Smoke production promotion hardening
+
+- **Branch:** `develop` y `main` estaban alineadas en `491ea26e` cuando GitHub reporto rojo en `CI - main` y `Playwright E2E smoke - develop`.
+- **Causa raiz CI:** `mi_ficha.mi_cuenta_pago` y `mi_ficha.onboarding` existian en el catalogo de codigo, pero no en `greenhouse_core.view_registry` ni `greenhouse_core.role_view_assignments`; la matriz de access persistida estaba atrasada. Tambien `people` shortcut dependia solo de modulo `people`, lo que dejaba pasar `person.legal_profile.read_masked` como falso positivo de directorio.
+- **Causa raiz Playwright:** los tests de `/api/my/payment-profile` no forzaban `storageState` vacio en el request context y recibian 422 de usuario agent autenticado sin member. El smoke de shortcuts asumía usuario CI sin pins y buscaba siempre "Administracion".
+- **Fix:** nueva migracion `20260505183808725_seed-my-payment-profile-view-access.sql` siembra las 2 vistas personales y 10 grants por vista para roles internos con `mi_ficha` completa; `people` shortcut ahora exige capability fina `people.directory:read:tenant`; smokes son auth/data-state aware.
+- **Runtime DB:** migracion aplicada con `pnpm pg:connect:migrate`; verificado en Cloud SQL: ambas vistas presentes y 10 grants por vista.
+- **Validacion local:** `pnpm exec vitest run src/lib/shortcuts/resolver.test.ts src/lib/admin/internal-role-visibility.test.ts --reporter=verbose`; `pnpm exec tsc --noEmit --pretty false`; Playwright focalizado contra staging `.vercel.app` (7/7 pass); `pnpm test:coverage` (577 files, 3350 pass, 5 skipped); `pnpm lint` (0 errors, 320 baseline warnings); `pnpm build` OK.
+- **Cuidado multi-agente:** no tocar ni incluir los untracked ajenos `tests/e2e/smoke/my-payment-profile-discoverability.spec.ts` ni `docs/architecture/GREENHOUSE_PILOT_ENGAGEMENT_ARCHITECTURE_V1.md`.
+
 ## Sesion 2026-05-05 — Promocion develop -> production
 
 - **Branch base:** `develop` en `7b12d661`.
