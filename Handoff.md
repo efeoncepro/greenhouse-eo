@@ -1,5 +1,15 @@
 # Handoff.md
 
+## Sesion 2026-05-05 — Promocion develop -> production
+
+- **Branch base:** `develop` en `7b12d661`.
+- **Operacion:** fast-forward de `main` remoto desde `ab717b54` a `7b12d661` usando `git push origin refs/remotes/origin/develop:refs/heads/main`; sin merge manual ni force.
+- **Vercel:** deployment production `dpl_2n9TADWeG4hJPBGYXouH4kKGpnY3` (`greenhouse-5t7aktxo5-efeonce-7670142f.vercel.app`) quedo `Ready` y alias `greenhouse.efeoncepro.com`.
+- **Validacion pre-produccion:** staging `greenhouse-pyo07p68n-efeonce-7670142f.vercel.app` en commit `7b12d66`, health OK, Postgres/BigQuery OK, source-options Deel -> Santander Corp verificado.
+- **Validacion produccion:** `/api/internal/health` responde 200 en `greenhouse.efeoncepro.com`, version `7b12d66`, runtime Postgres/BigQuery OK; `/api/auth/session` responde `{}` sin 500; logs production error-level sin hallazgos.
+- **Riesgo heredado:** health production queda `overallStatus=degraded` por postura GCP `mixed`: WIF configurado, pero `GOOGLE_APPLICATION_CREDENTIALS_JSON` sigue presente como fallback. Runtime esta operativo, pero conviene retirar la SA key cuando se confirme OIDC/WIF activo en production sin fallback.
+- **Cuidado multi-agente:** se preserva sin tocar el untracked ajeno `tests/e2e/smoke/my-payment-profile-discoverability.spec.ts`.
+
 ## Sesion 2026-05-05 — TASK-799 hardening end-to-end (processor funding policies)
 
 - **Branch:** `develop`.
