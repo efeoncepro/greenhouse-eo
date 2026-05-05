@@ -27,6 +27,8 @@ import HorizontalWithAvatar from '@components/card-statistics/HorizontalWithAvat
 
 import type { PersonDetail } from '@/types/people'
 
+import PersonLegalProfileSection from './PersonLegalProfileSection'
+
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
@@ -435,6 +437,11 @@ const PersonProfileTab = ({ detail }: Props) => {
           </Card>
         </Grid>
       )}
+
+      {/* ── Section 2.5: Identidad legal (TASK-784) ─────────────────── */}
+      <Grid size={{ xs: 12 }}>
+        <PersonLegalProfileSection memberId={member.memberId} />
+      </Grid>
 
       {/* ── Section 3: Actividad operativa ─────────────────────────── */}
       {hasDelivery && deliveryContext && (
