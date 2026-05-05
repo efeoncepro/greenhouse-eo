@@ -5,8 +5,13 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
+import Card from '@mui/material/Card'
+import Divider from '@mui/material/Divider'
+import Link from '@mui/material/Link'
 import Skeleton from '@mui/material/Skeleton'
 import Stack from '@mui/material/Stack'
+import Typography from '@mui/material/Typography'
+import { alpha, useTheme } from '@mui/material/styles'
 
 import { toast } from 'sonner'
 
@@ -36,6 +41,7 @@ const ADDRESS_KIND_ICONS: Record<AddressKind, string> = {
 const REQUIRED_ADDRESS_KINDS: AddressKind[] = ['legal']
 
 const LegalProfileTab = () => {
+  const theme = useTheme()
   const [data, setData] = useState<LegalProfileResponseDto | null>(null)
   const [loading, setLoading] = useState(true)
   const [fetchError, setFetchError] = useState<string | null>(null)
@@ -490,41 +496,95 @@ const LegalProfileTab = () => {
         : 'documento de identidad'
 
     return (
-      <Box>
-        <LegalProfileHero
-          completed={0}
-          total={totalSlots}
-          dotsState={['empty', 'empty', 'empty', 'empty']}
-          variant='empty'
-        />
-        <EmptyState
-          icon='tabler-id-badge-2'
-          title={LEGAL_PROFILE_COPY.firstUse.title}
-          description={LEGAL_PROFILE_COPY.firstUse.description(docName)}
-          action={
-            <Button
-              variant='contained'
-              color='primary'
-              onClick={() => toggleExpanded('doc-required-missing')}
-              startIcon={<i className='tabler-arrow-right' style={{ fontSize: 16 }} aria-hidden='true' />}
-            >
-              {LEGAL_PROFILE_COPY.firstUse.cta(docName)}
-            </Button>
-          }
-        />
+      <Card
+        elevation={0}
+        sx={{
+          border: `1px solid ${theme.palette.divider}`,
+          borderRadius: theme.shape.customBorderRadius.lg,
+          overflow: 'hidden',
+          boxShadow: `0 1px 2px ${alpha(theme.palette.text.primary, 0.04)}`
+        }}
+      >
+        <LegalProfileHero completed={0} total={totalSlots} variant='empty' />
+        <Box sx={{ borderTop: `1px solid ${theme.palette.divider}` }}>
+          <EmptyState
+            icon='tabler-id-badge-2'
+            title={LEGAL_PROFILE_COPY.firstUse.title}
+            description={LEGAL_PROFILE_COPY.firstUse.description(docName)}
+            action={
+              <Button
+                variant='contained'
+                color='primary'
+                onClick={() => toggleExpanded('doc-required-missing')}
+                startIcon={<i className='tabler-arrow-right' style={{ fontSize: 16 }} aria-hidden='true' />}
+              >
+                {LEGAL_PROFILE_COPY.firstUse.cta(docName)}
+              </Button>
+            }
+          />
+        </Box>
         {expanded['doc-required-missing'] ? (
-          <Box sx={{ mt: 6 }}>{renderRequiredDocumentMissing()}</Box>
+          <Box sx={{ borderTop: `1px solid ${theme.palette.divider}` }}>
+            {renderRequiredDocumentMissing()}
+          </Box>
         ) : null}
-      </Box>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 2,
+            flexWrap: 'wrap',
+            px: 6,
+            py: 3,
+            borderTop: `1px solid ${theme.palette.divider}`,
+            backgroundColor: alpha(theme.palette.text.primary, 0.025),
+            fontSize: 12,
+            color: 'text.secondary'
+          }}
+        >
+          <Stack direction='row' spacing={1} alignItems='center'>
+            <i className='tabler-shield-lock' style={{ fontSize: 14 }} aria-hidden='true' />
+            <Typography variant='caption' color='text.secondary'>
+              Tus datos estan protegidos
+            </Typography>
+          </Stack>
+          <Link
+            href='#'
+            underline='none'
+            color='text.secondary'
+            sx={{
+              fontSize: 12,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 0.5,
+              '&:hover': { color: 'text.primary' }
+            }}
+          >
+            <i className='tabler-info-circle' style={{ fontSize: 14 }} aria-hidden='true' />
+            {LEGAL_PROFILE_COPY.hero.privacyToggle}
+          </Link>
+        </Box>
+      </Card>
     )
   }
 
   return (
-    <Box>
+    <Card
+      elevation={0}
+      sx={{
+        border: `1px solid ${theme.palette.divider}`,
+        borderRadius: theme.shape.customBorderRadius.lg,
+        overflow: 'hidden',
+        boxShadow: `0 1px 2px ${alpha(theme.palette.text.primary, 0.04)}`,
+        ...(heroVariant === 'complete' && {
+          borderColor: theme.palette.success.main
+        })
+      }}
+    >
       <LegalProfileHero
         completed={completedCount}
         total={totalSlots}
-        dotsState={slotStates}
         variant={heroVariant}
       />
 
@@ -533,11 +593,21 @@ const LegalProfileTab = () => {
         hint={LEGAL_PROFILE_COPY.sections.identification.hint}
       >
         {documents.length > 0 ? (
-          documents.map(doc => renderDocumentItem(doc))
+          documents.map((doc, i) => (
+            <Box key={doc.documentId}>
+              {i > 0 ? <Divider sx={{ mx: 6 }} /> : null}
+              {renderDocumentItem(doc)}
+            </Box>
+          ))
         ) : (
           renderRequiredDocumentMissing()
         )}
-        {documents.length > 0 ? renderEmptyDocumentSlot() : null}
+        {documents.length > 0 ? (
+          <Box>
+            <Divider sx={{ mx: 6 }} />
+            {renderEmptyDocumentSlot()}
+          </Box>
+        ) : null}
       </LegalProfileSection>
 
       <LegalProfileSection
@@ -545,10 +615,58 @@ const LegalProfileTab = () => {
         hint={LEGAL_PROFILE_COPY.sections.addresses.hint}
       >
         {legalAddr ? renderAddressItem(legalAddr) : renderEmptyAddressSlot('legal')}
+        <Divider sx={{ mx: 6 }} />
         {residenceAddr ? renderAddressItem(residenceAddr) : renderEmptyAddressSlot('residence')}
+        <Divider sx={{ mx: 6 }} />
         {emergencyAddr ? renderAddressItem(emergencyAddr) : renderEmptyAddressSlot('emergency')}
       </LegalProfileSection>
-    </Box>
+
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 2,
+          flexWrap: 'wrap',
+          px: 6,
+          py: 3,
+          borderTop: `1px solid ${theme.palette.divider}`,
+          backgroundColor: alpha(theme.palette.text.primary, 0.025)
+        }}
+      >
+        <Stack direction='row' spacing={1} alignItems='center'>
+          <i
+            className={heroVariant === 'complete' ? 'tabler-shield-check' : 'tabler-shield-lock'}
+            style={{
+              fontSize: 14,
+              color:
+                heroVariant === 'complete'
+                  ? theme.palette.success.main
+                  : theme.palette.text.secondary
+            }}
+            aria-hidden='true'
+          />
+          <Typography variant='caption' color='text.secondary'>
+            Tus datos estan protegidos
+          </Typography>
+        </Stack>
+        <Link
+          href='#'
+          underline='none'
+          color='text.secondary'
+          sx={{
+            fontSize: 12,
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 0.5,
+            '&:hover': { color: 'text.primary' }
+          }}
+        >
+          <i className='tabler-info-circle' style={{ fontSize: 14 }} aria-hidden='true' />
+          {LEGAL_PROFILE_COPY.hero.privacyToggle}
+        </Link>
+      </Box>
+    </Card>
   )
 }
 

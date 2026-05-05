@@ -3,7 +3,6 @@
 import type { ReactNode } from 'react'
 
 import Box from '@mui/material/Box'
-import Card from '@mui/material/Card'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { alpha, useTheme } from '@mui/material/styles'
@@ -23,9 +22,9 @@ interface HrItemRowProps {
   chipIcon?: string | null
   subtitle?: ReactNode
   accent: ItemAccent
-  /** Acciones (botones) inline */
+  /** Acciones (botones) inline a la derecha */
   actions?: ReactNode
-  /** Banner por encima de las acciones (e.g. reject reason) */
+  /** Banner por encima del row (e.g. reject reason) */
   preActionsBanner?: ReactNode
   /** Form embebido (cuando esta editando HR-direct) */
   expandedForm?: ReactNode
@@ -38,6 +37,15 @@ const ACCENT_PALETTE: Record<ItemAccent, 'success' | 'warning' | 'error' | 'seco
   neutral: 'secondary'
 }
 
+/**
+ * TASK-784 flat redesign — HR row primitive without Card wrapper.
+ *
+ * NO Card, NO border, NO borderRadius, NO box-shadow, NO borderLeft accent.
+ * Estado se comunica por chip + icon tinted bg + subtitle tonal.
+ *
+ * Container raiz lo provee PersonLegalProfileSection con un solo borde y
+ * <Divider/> entre rows.
+ */
 const HrItemRow = ({
   iconClassName,
   title,
@@ -54,9 +62,6 @@ const HrItemRow = ({
   const theme = useTheme()
   const paletteKey = ACCENT_PALETTE[accent]
 
-  const accentColor =
-    paletteKey === 'secondary' ? theme.palette.divider : theme.palette[paletteKey].main
-
   const iconBg =
     paletteKey === 'secondary'
       ? alpha(theme.palette.text.primary, 0.04)
@@ -70,20 +75,25 @@ const HrItemRow = ({
   const resolvedChipColor: ThemeColor =
     chipColor ?? (paletteKey === 'secondary' ? 'secondary' : (paletteKey as ThemeColor))
 
+  // Sangrado: alineacion con el icon (px:6 + 36px + gap:4 = ~80px)
+  const indentLeft = `calc(${theme.spacing(6)} + 36px + ${theme.spacing(4)})`
+
   return (
-    <Card
-      elevation={0}
+    <Box
       sx={{
-        border: `1px solid ${theme.palette.divider}`,
-        borderLeft: `4px solid ${accentColor}`,
-        borderRadius: theme.shape.customBorderRadius.md,
-        transition: theme.transitions.create('box-shadow', { duration: 200 }),
-        '&:hover': {
-          boxShadow: `0 4px 18px ${alpha(theme.palette.text.primary, 0.08)}`
-        }
+        transition: theme.transitions.create('background-color', { duration: 150 }),
+        '&:hover': { backgroundColor: alpha(theme.palette.text.primary, 0.025) }
       }}
     >
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 4, px: 5, py: 4 }}>
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 4,
+          px: 6,
+          py: 4
+        }}
+      >
         <Box
           aria-hidden='true'
           sx={{
@@ -136,6 +146,7 @@ const HrItemRow = ({
                     aria-hidden='true'
                   />
                 }
+                sx={{ height: 20, '& .MuiChip-label': { px: 1.5, fontSize: 11 } }}
               />
             ) : null}
           </Stack>
@@ -145,37 +156,41 @@ const HrItemRow = ({
             </Typography>
           ) : null}
         </Box>
+        {actions ? (
+          <Box
+            sx={{ display: 'flex', gap: 1, flexShrink: 0, flexWrap: 'wrap' }}
+            role='group'
+            aria-label={`Acciones para ${title}`}
+          >
+            {actions}
+          </Box>
+        ) : null}
       </Box>
 
-      {preActionsBanner ? <Box sx={{ px: 5, pb: 3 }}>{preActionsBanner}</Box> : null}
-
-      {actions ? (
+      {preActionsBanner ? (
         <Box
           sx={{
-            display: 'flex',
-            gap: 2,
-            flexWrap: 'wrap',
-            px: 5,
+            pl: indentLeft,
+            pr: 6,
             pb: 4,
-            pt: 3,
-            borderTop: `1px solid ${theme.palette.divider}`
+            mt: -1
           }}
         >
-          {actions}
+          {preActionsBanner}
         </Box>
       ) : null}
 
       {expandedForm ? (
         <Box
           sx={{
-            borderTop: `1px solid ${theme.palette.divider}`,
-            background: `linear-gradient(180deg, ${alpha(theme.palette.text.primary, 0.02)}, ${theme.palette.background.paper})`
+            backgroundColor: alpha(theme.palette.text.primary, 0.02),
+            borderTop: `1px solid ${theme.palette.divider}`
           }}
         >
           {expandedForm}
         </Box>
       ) : null}
-    </Card>
+    </Box>
   )
 }
 

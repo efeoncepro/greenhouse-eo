@@ -6,6 +6,7 @@ import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
+import Divider from '@mui/material/Divider'
 import Skeleton from '@mui/material/Skeleton'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
@@ -903,31 +904,45 @@ const PersonLegalProfileSection = ({ memberId, collaboratorName }: PersonLegalPr
   const requiresLegalAddress = !addressByKind.get('legal')
   const hasAnyVerifiedDoc = documents.some(d => d.verificationStatus === 'verified')
 
+  // Lista efectiva de documentos a renderizar
+  const docsToRender =
+    documents.length === 0 || !hasAnyVerifiedDoc
+      ? [...documents, ...(documents.length === 0 && !hasAnyVerifiedDoc ? ['__missing__' as const] : [])]
+      : documents
+
+  // Lista efectiva de address slots
+  const addressSlots: Array<
+    | { kind: 'present'; addr: AddressDto }
+    | { kind: 'empty'; addressType: AddressKind; required: boolean }
+  > = [
+    addressByKind.get('legal')
+      ? { kind: 'present' as const, addr: addressByKind.get('legal')! }
+      : { kind: 'empty' as const, addressType: 'legal' as AddressKind, required: requiresLegalAddress },
+    addressByKind.get('residence')
+      ? { kind: 'present' as const, addr: addressByKind.get('residence')! }
+      : { kind: 'empty' as const, addressType: 'residence' as AddressKind, required: false },
+    addressByKind.get('emergency')
+      ? { kind: 'present' as const, addr: addressByKind.get('emergency')! }
+      : { kind: 'empty' as const, addressType: 'emergency' as AddressKind, required: false }
+  ]
+
   return (
     <Card
       elevation={0}
       sx={{
         border: `1px solid ${theme.palette.divider}`,
         borderRadius: theme.shape.customBorderRadius.lg,
-        overflow: 'hidden'
+        overflow: 'hidden',
+        boxShadow: `0 1px 2px ${alpha(theme.palette.text.primary, 0.04)}`
       }}
     >
-      {/* Header */}
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 4,
-          px: 6,
-          py: 5,
-          borderBottom: `1px solid ${theme.palette.divider}`
-        }}
-      >
+      {/* Header — sin border-bottom propio (lo provee el readiness strip) */}
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, px: 6, py: 5 }}>
         <Box
           aria-hidden='true'
           sx={{
-            width: 44,
-            height: 44,
+            width: 40,
+            height: 40,
             borderRadius: theme.shape.customBorderRadius.md,
             backgroundColor:
               headerChip.color === 'success'
@@ -944,112 +959,132 @@ const PersonLegalProfileSection = ({ memberId, collaboratorName }: PersonLegalPr
         >
           <i
             className={headerChip.color === 'success' ? 'tabler-shield-check' : 'tabler-id'}
-            style={{ fontSize: 22 }}
+            style={{ fontSize: 20 }}
           />
         </Box>
         <Box sx={{ flex: 1, minWidth: 0 }}>
-          <Typography variant='h6' sx={{ fontWeight: 600 }}>
+          <Typography variant='subtitle1' sx={{ fontWeight: 600, lineHeight: 1.3 }}>
             {HR_LEGAL_COPY.card.title}
           </Typography>
-          <Typography variant='body2' color='text.secondary'>
+          <Typography variant='caption' color='text.secondary' sx={{ fontSize: 13 }}>
             {HR_LEGAL_COPY.card.subtitle}
           </Typography>
         </Box>
         <CustomChip
           round='true'
+          size='small'
           variant='tonal'
           color={headerChip.color}
           label={headerChip.label}
           icon={
             <i
               className={headerChip.icon}
-              style={{ fontSize: 16, marginLeft: 4 }}
+              style={{ fontSize: 14, marginLeft: 4 }}
               aria-hidden='true'
             />
           }
         />
       </Box>
 
-      <Box sx={{ p: 6 }}>
-        {/* Readiness board */}
-        {data ? (
-          <HrReadinessBoard
-            finalSettlement={data.readiness.finalSettlementChile}
-            payroll={data.readiness.payrollChileDependent}
-          />
-        ) : null}
+      {/* Readiness strip — integrado al container, NO 2 cards anidadas */}
+      {data ? (
+        <HrReadinessBoard
+          finalSettlement={data.readiness.finalSettlementChile}
+          payroll={data.readiness.payrollChileDependent}
+        />
+      ) : null}
 
-        {/* Documentos */}
-        <Box component='section' sx={{ mb: 6 }}>
-          <Stack
-            direction='row'
-            alignItems='center'
-            justifyContent='space-between'
-            sx={{ mb: 3, px: 1 }}
+      {/* Documentos */}
+      <Box component='section'>
+        <Stack
+          direction='row'
+          alignItems='center'
+          justifyContent='space-between'
+          sx={{ px: 6, py: 3 }}
+        >
+          <Typography
+            variant='caption'
+            sx={{
+              fontWeight: 600,
+              letterSpacing: '0.1em',
+              textTransform: 'uppercase',
+              color: 'text.secondary',
+              fontSize: 11
+            }}
           >
-            <Typography
-              variant='overline'
-              color='text.secondary'
-              sx={{ fontWeight: 600, letterSpacing: '0.1em' }}
-            >
-              {HR_LEGAL_COPY.sections.documents}
-            </Typography>
-            <Typography variant='caption' color='text.secondary'>
-              {documents.length === 0
-                ? HR_LEGAL_COPY.counts.documentsZero
-                : HR_LEGAL_COPY.counts.documents(
-                    documents.length,
-                    documents.filter(d => d.verificationStatus === 'verified').length,
-                    documents.filter(d => d.verificationStatus === 'pending_review').length
-                  )}
-            </Typography>
-          </Stack>
-          <Stack spacing={3}>
-            {documents.length === 0 || !hasAnyVerifiedDoc
-              ? [...documents.map(renderDocumentItem), !hasAnyVerifiedDoc && documents.length === 0
-                  ? renderEmptyDocumentRow()
-                  : null].filter(Boolean)
-              : documents.map(renderDocumentItem)}
-          </Stack>
-        </Box>
+            {HR_LEGAL_COPY.sections.documents}
+          </Typography>
+          <Typography variant='caption' color='text.secondary' sx={{ fontSize: 12 }}>
+            {documents.length === 0
+              ? HR_LEGAL_COPY.counts.documentsZero
+              : HR_LEGAL_COPY.counts.documents(
+                  documents.length,
+                  documents.filter(d => d.verificationStatus === 'verified').length,
+                  documents.filter(d => d.verificationStatus === 'pending_review').length
+                )}
+          </Typography>
+        </Stack>
+        {docsToRender.map((entry, i) => (
+          <Box key={typeof entry === 'string' ? entry : entry.documentId}>
+            {i > 0 ? <Divider sx={{ mx: 6 }} /> : null}
+            {typeof entry === 'string' ? renderEmptyDocumentRow() : renderDocumentItem(entry)}
+          </Box>
+        ))}
+      </Box>
 
-        {/* Direcciones */}
-        <Box component='section' sx={{ mb: 6 }}>
-          <Stack
-            direction='row'
-            alignItems='center'
-            justifyContent='space-between'
-            sx={{ mb: 3, px: 1 }}
+      {/* Direcciones */}
+      <Box component='section' sx={{ borderTop: `1px solid ${theme.palette.divider}` }}>
+        <Stack
+          direction='row'
+          alignItems='center'
+          justifyContent='space-between'
+          sx={{ px: 6, py: 3 }}
+        >
+          <Typography
+            variant='caption'
+            sx={{
+              fontWeight: 600,
+              letterSpacing: '0.1em',
+              textTransform: 'uppercase',
+              color: 'text.secondary',
+              fontSize: 11
+            }}
           >
-            <Typography
-              variant='overline'
-              color='text.secondary'
-              sx={{ fontWeight: 600, letterSpacing: '0.1em' }}
-            >
-              {HR_LEGAL_COPY.sections.addresses}
-            </Typography>
-            <Typography variant='caption' color='text.secondary'>
-              {addresses.length === 0
-                ? HR_LEGAL_COPY.counts.addressesZero
-                : HR_LEGAL_COPY.counts.addresses(
-                    addresses.length,
-                    addresses.filter(a => a.verificationStatus === 'verified').length
-                  )}
-            </Typography>
-          </Stack>
-          <Stack spacing={3}>
-            {addressByKind.get('legal')
-              ? renderAddressItem(addressByKind.get('legal')!)
-              : renderEmptyAddressRow('legal', requiresLegalAddress)}
-            {addressByKind.get('residence')
-              ? renderAddressItem(addressByKind.get('residence')!)
-              : renderEmptyAddressRow('residence', false)}
-            {addressByKind.get('emergency')
-              ? renderAddressItem(addressByKind.get('emergency')!)
-              : renderEmptyAddressRow('emergency', false)}
-          </Stack>
-        </Box>
+            {HR_LEGAL_COPY.sections.addresses}
+          </Typography>
+          <Typography variant='caption' color='text.secondary' sx={{ fontSize: 12 }}>
+            {addresses.length === 0
+              ? HR_LEGAL_COPY.counts.addressesZero
+              : HR_LEGAL_COPY.counts.addresses(
+                  addresses.length,
+                  addresses.filter(a => a.verificationStatus === 'verified').length
+                )}
+          </Typography>
+        </Stack>
+        {addressSlots.map((slot, i) => (
+          <Box key={slot.kind === 'present' ? slot.addr.addressId : `empty-${slot.addressType}`}>
+            {i > 0 ? <Divider sx={{ mx: 6 }} /> : null}
+            {slot.kind === 'present'
+              ? renderAddressItem(slot.addr)
+              : renderEmptyAddressRow(slot.addressType, slot.required)}
+          </Box>
+        ))}
+      </Box>
 
+      {/* Footer with audit link — discreto, no acordeon dentro del card */}
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'flex-start',
+          gap: 4,
+          flexWrap: 'wrap',
+          px: 6,
+          py: 3,
+          borderTop: `1px solid ${theme.palette.divider}`,
+          backgroundColor: alpha(theme.palette.text.primary, 0.025)
+        }}
+      >
         <HrAuditLog memberId={memberId} />
       </Box>
 

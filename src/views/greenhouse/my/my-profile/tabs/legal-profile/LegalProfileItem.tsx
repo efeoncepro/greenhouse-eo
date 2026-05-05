@@ -3,8 +3,8 @@
 import type { ReactNode } from 'react'
 
 import Box from '@mui/material/Box'
-import Card from '@mui/material/Card'
 import Collapse from '@mui/material/Collapse'
+import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { alpha, useTheme } from '@mui/material/styles'
 
@@ -37,6 +37,24 @@ const ACCENT_COLOR_MAP: Record<ItemAccent, 'success' | 'warning' | 'error' | 'se
   neutral: 'secondary'
 }
 
+const STATUS_TO_CHIP_ICON: Record<LegalDocumentStatus | 'missing', string> = {
+  pending_review: 'tabler-clock',
+  verified: 'tabler-check',
+  rejected: 'tabler-x',
+  archived: 'tabler-archive',
+  expired: 'tabler-calendar-off',
+  missing: 'tabler-circle'
+}
+
+/**
+ * TASK-784 flat redesign — Single-container pattern.
+ *
+ * NO Card wrapper, NO border, NO borderRadius, NO box-shadow, NO borderLeft
+ * accent. Estado se comunica por chip + icon tinted bg + subtitle tonal.
+ *
+ * El componente padre (LegalProfileTab) provee el unico container y dibuja
+ * `<Divider/>` entre items.
+ */
 const LegalProfileItem = ({
   iconClassName,
   title,
@@ -52,11 +70,6 @@ const LegalProfileItem = ({
   const theme = useTheme()
   const isAdd = variant === 'add'
   const accentPaletteKey = ACCENT_COLOR_MAP[accent]
-
-  const accentColor =
-    accentPaletteKey === 'secondary'
-      ? theme.palette.divider
-      : theme.palette[accentPaletteKey].main
 
   const iconBg =
     accentPaletteKey === 'secondary'
@@ -75,34 +88,15 @@ const LegalProfileItem = ({
   const chipColor: ThemeColor =
     accentPaletteKey === 'secondary' ? 'secondary' : (accentPaletteKey as ThemeColor)
 
-  const chipIcon =
-    status === 'verified'
-      ? 'tabler-check'
-      : status === 'pending_review'
-        ? 'tabler-clock'
-        : status === 'rejected'
-          ? 'tabler-x'
-          : status === 'missing'
-            ? 'tabler-circle'
-            : null
+  const chipIcon = status ? STATUS_TO_CHIP_ICON[status] : null
 
   return (
-    <Card
-      elevation={0}
+    <Box
       sx={{
-        border: `1px solid ${theme.palette.divider}`,
-        borderLeft: `4px solid ${accentColor}`,
-        borderRadius: theme.shape.customBorderRadius.lg,
-        transition: theme.transitions.create(['box-shadow', 'border-color'], { duration: 200 }),
-        overflow: 'hidden',
-        ...(isAdd && {
-          '&:hover': {
-            borderColor: 'primary.main',
-            backgroundColor: alpha(theme.palette.primary.main, 0.02)
-          }
-        }),
+        backgroundColor: 'transparent',
+        transition: theme.transitions.create('background-color', { duration: 150 }),
         '&:hover': {
-          boxShadow: `0 4px 18px ${alpha(theme.palette.text.primary, 0.08)}`
+          backgroundColor: alpha(theme.palette.text.primary, 0.025)
         }
       }}
     >
@@ -115,8 +109,8 @@ const LegalProfileItem = ({
           display: 'flex',
           alignItems: 'center',
           gap: 4,
-          px: 5,
-          py: 5,
+          px: 6,
+          py: 4,
           width: '100%',
           background: 'none',
           border: 'none',
@@ -133,8 +127,8 @@ const LegalProfileItem = ({
         <Box
           aria-hidden='true'
           sx={{
-            width: 40,
-            height: 40,
+            width: 36,
+            height: 36,
             borderRadius: theme.shape.customBorderRadius.md,
             backgroundColor: iconBg,
             color: iconFg,
@@ -143,42 +137,49 @@ const LegalProfileItem = ({
             flexShrink: 0
           }}
         >
-          <i className={iconClassName} style={{ fontSize: 20 }} />
+          <i className={iconClassName} style={{ fontSize: 18 }} />
         </Box>
         <Box sx={{ flex: 1, minWidth: 0 }}>
-          <Typography
-            variant='body1'
-            sx={{
-              fontWeight: 600,
-              mb: subtitle ? 0.5 : 0,
-              color: isAdd ? 'text.secondary' : 'text.primary'
-            }}
+          <Stack
+            direction='row'
+            alignItems='center'
+            spacing={2}
+            flexWrap='wrap'
+            sx={{ mb: subtitle ? 0.5 : 0 }}
           >
-            {title}
-          </Typography>
+            <Typography
+              variant='body2'
+              sx={{
+                fontWeight: isAdd ? 500 : 600,
+                color: isAdd ? 'text.secondary' : 'text.primary'
+              }}
+            >
+              {title}
+            </Typography>
+            {chipLabel && chipIcon ? (
+              <CustomChip
+                round='true'
+                size='small'
+                variant='tonal'
+                color={chipColor}
+                label={chipLabel}
+                icon={
+                  <i
+                    className={chipIcon}
+                    style={{ fontSize: 12, marginLeft: 4 }}
+                    aria-hidden='true'
+                  />
+                }
+                sx={{ height: 20, '& .MuiChip-label': { px: 1.5, fontSize: 11 } }}
+              />
+            ) : null}
+          </Stack>
           {subtitle ? (
-            <Typography variant='body2' color='text.secondary' component='div'>
+            <Typography variant='caption' color='text.secondary' component='div'>
               {subtitle}
             </Typography>
           ) : null}
         </Box>
-        {chipLabel && chipIcon ? (
-          <CustomChip
-            round='true'
-            size='small'
-            variant='tonal'
-            color={chipColor}
-            label={chipLabel}
-            icon={
-              <i
-                className={chipIcon}
-                style={{ fontSize: 14, marginLeft: 4 }}
-                aria-hidden='true'
-              />
-            }
-            sx={{ flexShrink: 0 }}
-          />
-        ) : null}
         <i
           className='tabler-chevron-down'
           style={{
@@ -196,12 +197,13 @@ const LegalProfileItem = ({
         <Box
           sx={{
             display: 'flex',
-            alignItems: 'center',
-            gap: 3,
-            px: 5,
-            pt: 4,
-            pb: 5,
-            borderTop: `1px solid ${theme.palette.divider}`,
+            alignItems: 'flex-start',
+            gap: 2,
+            // Sangrado: mismo offset del icon (px:6 + 36px + gap 4 = ~80px)
+            pl: `calc(${theme.spacing(6)} + 36px + ${theme.spacing(4)})`,
+            pr: 6,
+            pb: 4,
+            mt: -2,
             color: 'text.secondary',
             fontSize: 13
           }}
@@ -214,15 +216,15 @@ const LegalProfileItem = ({
         {form ? (
           <Box
             sx={{
-              borderTop: `1px solid ${theme.palette.divider}`,
-              background: `linear-gradient(180deg, ${alpha(theme.palette.text.primary, 0.02)}, ${theme.palette.background.paper})`
+              backgroundColor: alpha(theme.palette.text.primary, 0.02),
+              borderTop: `1px solid ${theme.palette.divider}`
             }}
           >
             {form}
           </Box>
         ) : null}
       </Collapse>
-    </Card>
+    </Box>
   )
 }
 

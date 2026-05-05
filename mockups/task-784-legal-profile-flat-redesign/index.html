@@ -1,0 +1,1081 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TASK-784 · Flat redesign (single container)</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.18.0/dist/tabler-icons.min.css">
+  <style>
+    :root {
+      color-scheme: light;
+      --primary: #7367F0;
+      --primary-light: rgba(115, 103, 240, 0.16);
+      --primary-darker: #685dd8;
+      --success: #6EC207;
+      --success-tonal-bg: rgba(110, 194, 7, 0.12);
+      --success-tonal-fg: #4d8b04;
+      --warning: #FF6500;
+      --warning-tonal-bg: rgba(255, 101, 0, 0.12);
+      --warning-tonal-fg: #b34800;
+      --error: #BB1954;
+      --error-tonal-bg: rgba(187, 25, 84, 0.12);
+      --error-tonal-fg: #8a113c;
+      --info: #00BAD1;
+
+      --text-primary: #2F2B3D;
+      --text-secondary: rgba(47, 43, 61, 0.68);
+      --text-disabled: rgba(47, 43, 61, 0.42);
+      --divider: rgba(47, 43, 61, 0.10);
+      --row-hover: rgba(47, 43, 61, 0.025);
+      --form-bg: rgba(47, 43, 61, 0.02);
+
+      --bg-canvas: #F8F7FA;
+      --bg-paper: #FFFFFF;
+
+      --r-sm: 4px; --r-md: 6px; --r-lg: 8px; --r-pill: 9999px;
+
+      --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px;
+      --s-5: 20px; --s-6: 24px; --s-8: 32px; --s-10: 40px; --s-12: 48px;
+
+      --shadow-card: 0 1px 2px rgba(47, 43, 61, 0.04);
+      --shadow-card-hover: 0 4px 14px rgba(47, 43, 61, 0.06);
+
+      --ease-out: cubic-bezier(0.2, 0, 0, 1);
+      --d-fast: 150ms;
+      --d-base: 200ms;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg-canvas);
+      color: var(--text-primary);
+      font-family: "Geist Sans", "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      font-size: 15px;
+      line-height: 1.45;
+      -webkit-font-smoothing: antialiased;
+    }
+    button, input, select, textarea { font: inherit; color: inherit; }
+    button { cursor: pointer; }
+
+    /* Variant switcher (mockup-only) */
+    .variant-switcher {
+      position: sticky; top: 0; z-index: 20;
+      background: var(--bg-paper);
+      border-bottom: 1px solid var(--divider);
+      padding: var(--s-3) var(--s-6);
+      display: flex; gap: var(--s-2);
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .variant-switcher__label {
+      font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase;
+      color: var(--text-secondary); font-weight: 500; margin-right: var(--s-2);
+    }
+    .vbtn {
+      padding: var(--s-1) var(--s-3);
+      border-radius: var(--r-pill);
+      font-size: 12px;
+      border: 1px solid var(--divider);
+      background: var(--bg-paper);
+      color: var(--text-secondary);
+      font-weight: 500;
+      transition: all var(--d-fast) var(--ease-out);
+    }
+    .vbtn:hover { color: var(--text-primary); border-color: var(--text-secondary); }
+    .vbtn.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+    .pane { display: none; }
+    .pane.active { display: block; }
+
+    .reviewer-note {
+      max-width: 920px; margin: 0 auto;
+      padding: var(--s-4) var(--s-6) 0;
+      color: var(--text-secondary);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    .reviewer-note strong { color: var(--text-primary); }
+
+    /* Page shell */
+    .shell {
+      max-width: 920px;
+      margin: 0 auto;
+      padding: var(--s-6) var(--s-6) var(--s-12);
+    }
+
+    /* ───── THE single container card ───── */
+    .legal-card {
+      background: var(--bg-paper);
+      border: 1px solid var(--divider);
+      border-radius: var(--r-lg);
+      box-shadow: var(--shadow-card);
+      overflow: hidden;
+    }
+
+    /* Hero — sin borde, vive dentro del container */
+    .hero {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: var(--s-6);
+      padding: var(--s-6) var(--s-6) var(--s-5);
+      align-items: center;
+    }
+    @media (max-width: 720px) {
+      .hero { grid-template-columns: 1fr; }
+    }
+    .hero__intro { display: flex; gap: var(--s-3); align-items: flex-start; }
+    .hero__icon {
+      width: 40px; height: 40px;
+      border-radius: var(--r-md);
+      background: var(--primary-light);
+      color: var(--primary);
+      display: grid; place-items: center;
+      flex-shrink: 0;
+    }
+    .hero__icon i { font-size: 20px; }
+    .hero__icon.success { background: var(--success-tonal-bg); color: var(--success-tonal-fg); }
+    .hero__title {
+      font-size: 17px; font-weight: 600; margin: 0 0 2px;
+      letter-spacing: -0.01em;
+    }
+    .hero__lead {
+      color: var(--text-secondary); font-size: 13px; margin: 0;
+      max-width: 56ch; line-height: 1.5;
+    }
+    .hero__progress {
+      min-width: 220px;
+      display: flex; flex-direction: column; gap: var(--s-2);
+    }
+    .hero__progress-row {
+      display: flex; align-items: baseline; justify-content: space-between;
+    }
+    .hero__progress-label {
+      font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--text-secondary); font-weight: 600;
+    }
+    .hero__progress-count {
+      font-size: 17px; font-weight: 600;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.01em;
+    }
+    .hero__progress-bar {
+      height: 6px;
+      background: var(--row-hover);
+      border-radius: var(--r-pill);
+      overflow: hidden;
+    }
+    .hero__progress-fill {
+      height: 100%;
+      background: var(--primary);
+      border-radius: var(--r-pill);
+      transition: width 600ms var(--ease-out);
+    }
+    .hero__progress-fill.success { background: var(--success); }
+    .hero__progress-fill.error { background: var(--error); }
+
+    /* Section header — overline + counter, sin card */
+    .section-head {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: var(--s-4) var(--s-6) var(--s-3);
+      border-top: 1px solid var(--divider);
+    }
+    .section-head__title {
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      font-weight: 600;
+      margin: 0;
+    }
+    .section-head__count {
+      font-size: 12px; color: var(--text-secondary);
+    }
+
+    /* Row — sin card, sin border, sin radius. Solo flex + padding + hover bg */
+    .row {
+      display: flex; align-items: center; gap: var(--s-4);
+      padding: var(--s-4) var(--s-6);
+      transition: background var(--d-fast) var(--ease-out);
+    }
+    .row + .row {
+      border-top: 1px solid var(--divider);
+    }
+    .row:hover { background: var(--row-hover); }
+    .row.is-clickable { cursor: pointer; }
+
+    .row__icon {
+      width: 36px; height: 36px;
+      border-radius: var(--r-md);
+      display: grid; place-items: center;
+      flex-shrink: 0; font-size: 18px;
+      background: rgba(47, 43, 61, 0.04);
+      color: var(--text-secondary);
+    }
+    .row__icon.success { background: var(--success-tonal-bg); color: var(--success-tonal-fg); }
+    .row__icon.warning { background: var(--warning-tonal-bg); color: var(--warning-tonal-fg); }
+    .row__icon.error { background: var(--error-tonal-bg); color: var(--error-tonal-fg); }
+
+    .row__main { flex: 1; min-width: 0; }
+    .row__title-line {
+      display: flex; align-items: center; gap: var(--s-2);
+      flex-wrap: wrap;
+    }
+    .row__title {
+      font-size: 14px; font-weight: 600;
+      color: var(--text-primary);
+    }
+    .row__mask {
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0.04em;
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+    .row__sub {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+    .row__chip {
+      display: inline-flex; align-items: center; gap: var(--s-1);
+      padding: 2px var(--s-2);
+      border-radius: var(--r-pill);
+      font-size: 11px; font-weight: 500;
+      animation: chipIn var(--d-base) var(--ease-out);
+    }
+    @keyframes chipIn {
+      from { opacity: 0; transform: scale(0.85); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .row__chip i { font-size: 12px; }
+    .row__chip.success { background: var(--success-tonal-bg); color: var(--success-tonal-fg); }
+    .row__chip.warning { background: var(--warning-tonal-bg); color: var(--warning-tonal-fg); }
+    .row__chip.error { background: var(--error-tonal-bg); color: var(--error-tonal-fg); }
+    .row__chip.neutral { background: rgba(47, 43, 61, 0.06); color: var(--text-secondary); }
+
+    .row__actions {
+      display: flex; gap: var(--s-2);
+      flex-shrink: 0;
+    }
+    .row__chevron {
+      color: var(--text-secondary); font-size: 18px;
+      transition: transform var(--d-base) var(--ease-out);
+      flex-shrink: 0;
+    }
+    .row.is-expanded .row__chevron { transform: rotate(180deg); }
+
+    /* Buttons */
+    .btn {
+      padding: 6px var(--s-3);
+      border-radius: var(--r-md);
+      font-size: 13px; font-weight: 500;
+      border: none;
+      transition: all var(--d-fast) var(--ease-out);
+      display: inline-flex; align-items: center; gap: var(--s-1);
+      white-space: nowrap;
+    }
+    .btn:focus-visible {
+      outline: 2px solid var(--primary);
+      outline-offset: 2px;
+    }
+    .btn i { font-size: 14px; }
+    .btn--primary {
+      background: var(--primary);
+      color: white;
+    }
+    .btn--primary:hover { background: var(--primary-darker); }
+    .btn--success-tonal {
+      background: var(--success-tonal-bg);
+      color: var(--success-tonal-fg);
+    }
+    .btn--success-tonal:hover { background: var(--success); color: white; }
+    .btn--error-tonal {
+      background: var(--error-tonal-bg);
+      color: var(--error-tonal-fg);
+    }
+    .btn--error-tonal:hover { background: var(--error); color: white; }
+    .btn--outline {
+      background: transparent;
+      color: var(--text-primary);
+      border: 1px solid var(--divider);
+    }
+    .btn--outline:hover {
+      background: var(--row-hover);
+      border-color: var(--text-secondary);
+    }
+    .btn--text {
+      background: transparent;
+      color: var(--text-secondary);
+    }
+    .btn--text:hover { background: var(--row-hover); color: var(--text-primary); }
+    .btn--sm { padding: 4px var(--s-2); font-size: 12px; }
+
+    /* Inline status block (debajo del row, sin card) */
+    .row-status {
+      padding: 0 var(--s-6) var(--s-4);
+      padding-left: calc(var(--s-6) + 36px + var(--s-4));
+      display: flex; align-items: center; gap: var(--s-2);
+      color: var(--text-secondary);
+      font-size: 13px;
+      margin-top: -10px;
+    }
+    .row-status i { font-size: 16px; }
+
+    /* Reject reason — único Alert MUI-style permitido como excepción (es información crítica) */
+    .reject-banner {
+      margin: 0 var(--s-6) var(--s-3);
+      margin-left: calc(var(--s-6) + 36px + var(--s-4));
+      padding: var(--s-3);
+      background: var(--error-tonal-bg);
+      border-left: 3px solid var(--error);
+      border-radius: var(--r-sm);
+      color: var(--error-tonal-fg);
+      font-size: 13px;
+      display: flex; align-items: flex-start; gap: var(--s-2);
+    }
+    .reject-banner i { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+
+    /* Form expandido — sub-bg apenas perceptible, NO double container */
+    .row-form {
+      padding: var(--s-5) var(--s-6) var(--s-5);
+      padding-left: calc(var(--s-6) + 36px + var(--s-4));
+      background: var(--form-bg);
+      border-top: 1px solid var(--divider);
+    }
+    .row-form__grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--s-3);
+      margin-bottom: var(--s-3);
+    }
+    @media (max-width: 600px) {
+      .row-form__grid { grid-template-columns: 1fr; }
+    }
+    .row-form__grid .full { grid-column: 1 / -1; }
+
+    .field { display: flex; flex-direction: column; gap: 4px; }
+    .field__label {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      letter-spacing: 0.02em;
+    }
+    .field__input,
+    .field__select {
+      padding: var(--s-2) var(--s-3);
+      border: 1px solid var(--divider);
+      border-radius: var(--r-md);
+      background: var(--bg-paper);
+      transition: all var(--d-fast) var(--ease-out);
+      color: var(--text-primary);
+      font-size: 14px;
+    }
+    .field__input:focus,
+    .field__select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(115, 103, 240, 0.16);
+    }
+    .field__input--mono { font-variant-numeric: tabular-nums; letter-spacing: 0.04em; }
+    .field__hint {
+      font-size: 11px; color: var(--text-secondary);
+    }
+
+    .row-form__actions {
+      display: flex; justify-content: space-between; align-items: center; gap: var(--s-2);
+      padding-top: var(--s-3);
+      border-top: 1px solid var(--divider);
+      flex-wrap: wrap;
+    }
+    .row-form__sign {
+      font-size: 11px; color: var(--text-secondary);
+      display: flex; align-items: center; gap: 4px;
+    }
+
+    /* Footer del container — privacy link discreto */
+    .legal-card__footer {
+      padding: var(--s-3) var(--s-6);
+      border-top: 1px solid var(--divider);
+      display: flex; align-items: center; justify-content: space-between;
+      gap: var(--s-2); flex-wrap: wrap;
+      background: var(--row-hover);
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+    .legal-card__footer a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      display: inline-flex; align-items: center; gap: 4px;
+      transition: color var(--d-fast) var(--ease-out);
+    }
+    .legal-card__footer a:hover { color: var(--text-primary); }
+
+    /* Header chip global del container */
+    .legal-card__header {
+      display: flex; align-items: center; gap: var(--s-3);
+      padding: var(--s-5) var(--s-6) var(--s-2);
+    }
+    .legal-card__head-chip {
+      display: inline-flex; align-items: center; gap: var(--s-1);
+      padding: 4px var(--s-3);
+      border-radius: var(--r-pill);
+      font-size: 12px; font-weight: 500;
+      flex-shrink: 0;
+      margin-left: auto;
+    }
+    .legal-card__head-chip i { font-size: 14px; }
+    .legal-card__head-chip.success { background: var(--success-tonal-bg); color: var(--success-tonal-fg); }
+    .legal-card__head-chip.warning { background: var(--warning-tonal-bg); color: var(--warning-tonal-fg); }
+    .legal-card__head-chip.error { background: var(--error-tonal-bg); color: var(--error-tonal-fg); }
+
+    /* Empty hero (cuando no hay nada declarado) */
+    .empty-state {
+      padding: var(--s-12) var(--s-6);
+      text-align: center;
+      display: flex; flex-direction: column; align-items: center; gap: var(--s-3);
+      border-top: 1px solid var(--divider);
+    }
+    .empty-state__icon {
+      width: 64px; height: 64px;
+      border-radius: var(--r-pill);
+      background: var(--primary-light);
+      color: var(--primary);
+      display: grid; place-items: center;
+      font-size: 28px;
+      margin-bottom: var(--s-2);
+    }
+    .empty-state__title {
+      font-size: 16px; font-weight: 600; margin: 0;
+    }
+    .empty-state__lead {
+      color: var(--text-secondary);
+      max-width: 44ch;
+      font-size: 13px;
+      margin: 0;
+    }
+
+    /* Readiness mini-board (HR view solamente, integrado dentro del container) */
+    .readiness-strip {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1px;
+      background: var(--divider);
+      border-top: 1px solid var(--divider);
+      border-bottom: 1px solid var(--divider);
+    }
+    @media (max-width: 720px) {
+      .readiness-strip { grid-template-columns: 1fr; }
+    }
+    .readiness-cell {
+      background: var(--bg-paper);
+      padding: var(--s-4) var(--s-6);
+    }
+    .readiness-cell__head {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: var(--s-2);
+    }
+    .readiness-cell__title {
+      font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--text-secondary); font-weight: 600;
+    }
+    .readiness-cell__status {
+      display: inline-flex; align-items: center; gap: var(--s-1);
+      font-size: 13px; font-weight: 600;
+    }
+    .readiness-cell__status.ok { color: var(--success-tonal-fg); }
+    .readiness-cell__status.warn { color: var(--warning-tonal-fg); }
+    .readiness-cell__status.bad { color: var(--error-tonal-fg); }
+    .readiness-cell__list {
+      list-style: none; padding: 0; margin: 0;
+      font-size: 13px; color: var(--text-secondary);
+    }
+    .readiness-cell__list li {
+      padding: 2px 0;
+      display: flex; align-items: flex-start; gap: var(--s-2);
+    }
+    .readiness-cell__list li i { font-size: 13px; margin-top: 3px; flex-shrink: 0; }
+    .readiness-cell__list li.ok i { color: var(--success); }
+    .readiness-cell__list li.bad i { color: var(--error); }
+
+    /* Comparison strip (mockup-only) */
+    .comparison {
+      max-width: 920px; margin: 0 auto;
+      padding: 0 var(--s-6) var(--s-6);
+    }
+    .comparison__strip {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--s-4);
+      padding: var(--s-4);
+      background: var(--bg-paper);
+      border: 1px solid var(--divider);
+      border-radius: var(--r-md);
+    }
+    @media (max-width: 720px) {
+      .comparison__strip { grid-template-columns: 1fr; }
+    }
+    .comparison__col h4 {
+      font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--text-secondary); margin: 0 0 var(--s-2); font-weight: 600;
+    }
+    .comparison__col p { margin: 0; font-size: 13px; line-height: 1.5; }
+    .comparison__col.bad { color: var(--error-tonal-fg); }
+    .comparison__col.good { color: var(--success-tonal-fg); }
+
+  </style>
+</head>
+<body>
+
+<nav class="variant-switcher" aria-label="Estados">
+  <span class="variant-switcher__label">Vistas:</span>
+  <button class="vbtn active" data-variant="self-pending">/my/profile · pendiente</button>
+  <button class="vbtn" data-variant="self-empty">/my/profile · empty</button>
+  <button class="vbtn" data-variant="self-verified">/my/profile · verificado</button>
+  <button class="vbtn" data-variant="hr-pending">/people/[slug] · HR pendiente</button>
+  <button class="vbtn" data-variant="hr-rejected">/people/[slug] · HR rechazado</button>
+  <button class="vbtn" data-variant="hr-edit">/people/[slug] · HR editando</button>
+</nav>
+
+<p class="reviewer-note">
+  <strong>TASK-784 flat redesign · single container.</strong> Una sola card raíz, divisores internos,
+  estado por chip + icon tinted (sin borderLeft accent), forms expandidos con sub-bg apenas
+  perceptible. Privacy en footer link, no acordeón. Hero compact 1-row.
+</p>
+
+<div class="comparison">
+  <div class="comparison__strip">
+    <div class="comparison__col bad">
+      <h4>❌ Antes</h4>
+      <p>3 capas de cards anidadas (page card + hero card + N item cards) cada una con su borde + radius + shadow + borderLeft accent. Efecto "rectángulos pesados montados".</p>
+    </div>
+    <div class="comparison__col good">
+      <h4>✓ Ahora</h4>
+      <p>1 sola card raíz. Hero, secciones e items como flex rows con padding + divisores + hover bg. Estado comunicado por chip + icon tinted. Visual editorial, no boxy.</p>
+    </div>
+  </div>
+</div>
+
+<main class="shell">
+
+  <!-- ═══ /my/profile · pendiente parcial (default) ═══ -->
+  <div class="pane active" data-pane="self-pending">
+    <article class="legal-card">
+
+      <!-- Hero -->
+      <div class="hero">
+        <div class="hero__intro">
+          <div class="hero__icon"><i class="ti ti-shield-lock"></i></div>
+          <div>
+            <h1 class="hero__title">Tus datos legales</h1>
+            <p class="hero__lead">
+              Tu identidad y dirección oficial. Solo tú los declaras — nadie más los ve sin tu autorización registrada en auditoría.
+            </p>
+          </div>
+        </div>
+        <div class="hero__progress" role="status" aria-live="polite">
+          <div class="hero__progress-row">
+            <span class="hero__progress-label">Progreso</span>
+            <span class="hero__progress-count">2 / 4</span>
+          </div>
+          <div class="hero__progress-bar" role="progressbar" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100">
+            <div class="hero__progress-fill" style="width: 50%"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section: Identificación -->
+      <div class="section-head">
+        <h2 class="section-head__title">Identificación</h2>
+        <span class="section-head__count">1 documento · 0 verificados · 1 pendiente</span>
+      </div>
+
+      <div class="row is-clickable">
+        <div class="row__icon warning"><i class="ti ti-id"></i></div>
+        <div class="row__main">
+          <div class="row__title-line">
+            <span class="row__title">RUT (Chile)</span>
+            <span class="row__mask">xx.xxx.678-K</span>
+            <span class="row__chip warning"><i class="ti ti-clock"></i>Pendiente</span>
+          </div>
+          <div class="row__sub">Declarado hace 3 días · HR está revisando</div>
+        </div>
+        <button class="btn btn--text btn--sm">Editar</button>
+      </div>
+
+      <div class="row is-clickable">
+        <div class="row__icon"><i class="ti ti-plus"></i></div>
+        <div class="row__main">
+          <div class="row__title-line">
+            <span class="row__title" style="font-weight: 500; color: var(--text-secondary);">Agregar otro documento</span>
+            <span class="row__chip neutral">opcional</span>
+          </div>
+          <div class="row__sub">Pasaporte, documento internacional, etc.</div>
+        </div>
+        <i class="ti ti-chevron-down row__chevron" aria-hidden="true"></i>
+      </div>
+
+      <!-- Section: Direcciones -->
+      <div class="section-head">
+        <h2 class="section-head__title">Direcciones</h2>
+        <span class="section-head__count">1 verificada · 1 pendiente · 2 sin declarar</span>
+      </div>
+
+      <div class="row is-clickable">
+        <div class="row__icon success"><i class="ti ti-home"></i></div>
+        <div class="row__main">
+          <div class="row__title-line">
+            <span class="row__title">Dirección legal</span>
+            <span class="row__chip success"><i class="ti ti-check"></i>Verificada</span>
+          </div>
+          <div class="row__sub">Las Condes · Región Metropolitana · CL · Verificada hace 12 días</div>
+        </div>
+        <button class="btn btn--text btn--sm">Editar</button>
+      </div>
+
+      <div class="row is-clickable">
+        <div class="row__icon"><i class="ti ti-bed"></i></div>
+        <div class="row__main">
+          <div class="row__title-line">
+            <span class="row__title" style="font-weight: 500; color: var(--text-secondary);">Residencia</span>
+            <span class="row__chip neutral">opcional</span>
+          </div>
+          <div class="row__sub">Donde vives actualmente</div>
+        </div>
+        <i class="ti ti-chevron-down row__chevron" aria-hidden="true"></i>
+      </div>
+
+      <div class="row is-clickable">
+        <div class="row__icon"><i class="ti ti-heart-handshake"></i></div>
+        <div class="row__main">
+          <div class="row__title-line">
+            <span class="row__title" style="font-weight: 500; color: var(--text-secondary);">Contacto de emergencia</span>
+            <span class="row__chip neutral">opcional</span>
+          </div>
+          <div class="row__sub">Persona y teléfono para casos urgentes</div>
+        </div>
+        <i class="ti ti-chevron-down row__chevron" aria-hidden="true"></i>
+      </div>
+
+      <!-- Footer privacy link -->
+      <footer class="legal-card__footer">
+        <span><i class="ti ti-shield-lock" style="font-size: 14px;"></i> Tus datos están protegidos</span>
+        <a href="#"><i class="ti ti-info-circle" style="font-size: 14px;"></i>Cómo se usan tus datos</a>
+      </footer>
+    </article>
+  </div>
+
+  <!-- ═══ /my/profile · empty (first-use) ═══ -->
+  <div class="pane" data-pane="self-empty">
+    <article class="legal-card">
+
+      <div class="hero">
+        <div class="hero__intro">
+          <div class="hero__icon"><i class="ti ti-shield-lock"></i></div>
+          <div>
+            <h1 class="hero__title">Tus datos legales</h1>
+            <p class="hero__lead">
+              Para emitir tu finiquito y contrato formal necesitamos tu identidad legal y dirección.
+            </p>
+          </div>
+        </div>
+        <div class="hero__progress">
+          <div class="hero__progress-row">
+            <span class="hero__progress-label">Progreso</span>
+            <span class="hero__progress-count">0 / 4</span>
+          </div>
+          <div class="hero__progress-bar" role="progressbar" aria-valuenow="0">
+            <div class="hero__progress-fill" style="width: 0%"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="empty-state">
+        <div class="empty-state__icon"><i class="ti ti-id-badge-2"></i></div>
+        <h2 class="empty-state__title">Empecemos por tu identidad legal</h2>
+        <p class="empty-state__lead">
+          Te tomará menos de un minuto. Solo necesitas tu RUT a mano. Después podrás agregar tu dirección.
+        </p>
+        <button class="btn btn--primary" style="margin-top: var(--s-3);">
+          <i class="ti ti-arrow-right"></i>Declarar mi RUT
+        </button>
+      </div>
+
+      <footer class="legal-card__footer">
+        <span><i class="ti ti-shield-lock" style="font-size: 14px;"></i> Tus datos están protegidos</span>
+        <a href="#"><i class="ti ti-info-circle" style="font-size: 14px;"></i>Cómo se usan tus datos</a>
+      </footer>
+    </article>
+  </div>
+
+  <!-- ═══ /my/profile · todo verificado ═══ -->
+  <div class="pane" data-pane="self-verified">
+    <article class="legal-card" style="border-color: var(--success);">
+
+      <div class="hero" style="background: linear-gradient(180deg, rgba(110,194,7,0.04), transparent);">
+        <div class="hero__intro">
+          <div class="hero__icon success"><i class="ti ti-shield-check"></i></div>
+          <div>
+            <h1 class="hero__title">Listo. Todos tus datos están verificados.</h1>
+            <p class="hero__lead">
+              Puedes recibir cualquier documento formal sin bloqueos. Si algo cambia, edita la fila correspondiente.
+            </p>
+          </div>
+        </div>
+        <div class="hero__progress">
+          <div class="hero__progress-row">
+            <span class="hero__progress-label">Progreso</span>
+            <span class="hero__progress-count" style="color: var(--success-tonal-fg);">4 / 4</span>
+          </div>
+          <div class="hero__progress-bar">
+            <div class="hero__progress-fill success" style="width: 100%"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-head">
+        <h2 class="section-head__title">Identificación</h2>
+        <span class="section-head__count">1 verificado</span>
+      </div>
+
+      <div class="row">
+        <div class="row__icon success"><i class="ti ti-id"></i></div>
+        <div class="row__main">
+          <div class="row__title-line">
+            <span class="row__title">RUT (Chile)</span>
+            <span class="row__mask">xx.xxx.678-K</span>
+            <span class="row__chip success"><i class="ti ti-check"></i>Verificado</span>
+          </div>
+          <div class="row__sub">Verificado por HR hace 12 días</div>
+        </div>
+        <button class="btn btn--text btn--sm">Editar</button>
+      </div>
+
+      <div class="section-head">
+        <h2 class="section-head__title">Direcciones</h2>
+        <span class="section-head__count">3 verificadas</span>
+      </div>
+
+      <div class="row">
+        <div class="row__icon success"><i class="ti ti-home"></i></div>
+        <div class="row__main">
+          <div class="row__title-line">
+            <span class="row__title">Dirección legal</span>
+            <span class="row__chip success"><i class="ti ti-check"></i>Verificada</span>
+          </div>
+          <div class="row__sub">Las Condes · RM · CL</div>
+        </div>
+        <button class="btn btn--text btn--sm">Editar</button>
+      </div>
+
+      <div class="row">
+        <div class="row__icon success"><i class="ti ti-bed"></i></div>
+        <div class="row__main">
+          <div class="row__title-line">
+            <span class="row__title">Residencia</span>
+            <span class="row__chip success"><i class="ti ti-check"></i>Verificada</span>
+          </div>
+          <div class="row__sub">Providencia · RM · CL</div>
+        </div>
+        <button class="btn btn--text btn--sm">Editar</button>
+      </div>
+
+      <div class="row">
+        <div class="row__icon success"><i class="ti ti-heart-handshake"></i></div>
+        <div class="row__main">
+          <div class="row__title-line">
+            <span class="row__title">Contacto de emergencia</span>
+            <span class="row__chip success"><i class="ti ti-check"></i>Verificado</span>
+          </div>
+          <div class="row__sub">María Reyes · +56 9 ••• 4321</div>
+        </div>
+        <button class="btn btn--text btn--sm">Editar</button>
+      </div>
+
+      <footer class="legal-card__footer">
+        <span><i class="ti ti-shield-check" style="font-size: 14px; color: var(--success-tonal-fg);"></i> Tus datos están protegidos</span>
+        <a href="#"><i class="ti ti-info-circle" style="font-size: 14px;"></i>Cómo se usan tus datos</a>
+      </footer>
+    </article>
+  </div>
+
+  <!-- ═══ /people/[slug] · HR pendiente ═══ -->
+  <div class="pane" data-pane="hr-pending">
+    <article class="legal-card">
+
+      <div class="legal-card__header">
+        <div class="hero__icon"><i class="ti ti-id"></i></div>
+        <div>
+          <div style="font-size: 16px; font-weight: 600;">Identidad legal</div>
+          <div style="font-size: 13px; color: var(--text-secondary);">Documentos y direcciones de identidad</div>
+        </div>
+        <span class="legal-card__head-chip warning">
+          <i class="ti ti-clock"></i>1 pendiente · 1 falta
+        </span>
+      </div>
+
+      <!-- Readiness mini-board: integrado al container, sin cards anidadas -->
+      <div class="readiness-strip">
+        <div class="readiness-cell">
+          <div class="readiness-cell__head">
+            <span class="readiness-cell__title">Finiquito Chile</span>
+            <span class="readiness-cell__status warn">
+              <i class="ti ti-alert-triangle"></i>2 bloqueadores
+            </span>
+          </div>
+          <ul class="readiness-cell__list">
+            <li class="bad"><i class="ti ti-x"></i>RUT pendiente de tu revisión</li>
+            <li class="bad"><i class="ti ti-x"></i>Falta dirección legal</li>
+          </ul>
+        </div>
+        <div class="readiness-cell">
+          <div class="readiness-cell__head">
+            <span class="readiness-cell__title">Payroll Chile</span>
+            <span class="readiness-cell__status ok">
+              <i class="ti ti-check"></i>Lista
+            </span>
+          </div>
+          <ul class="readiness-cell__list">
+            <li class="ok"><i class="ti ti-check"></i>Suficiente para liquidar nómina mensual</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="section-head">
+        <h2 class="section-head__title">Documentos</h2>
+        <span class="section-head__count">1 pendiente</span>
+      </div>
+
+      <div class="row">
+        <div class="row__icon warning"><i class="ti ti-id"></i></div>
+        <div class="row__main">
+          <div class="row__title-line">
+            <span class="row__title">RUT (Chile)</span>
+            <span class="row__mask">xx.xxx.678-K</span>
+            <span class="row__chip warning"><i class="ti ti-clock"></i>Pendiente · 3 días</span>
+          </div>
+          <div class="row__sub">Declarado por Valentina hace 3 días · Esperando tu revisión</div>
+        </div>
+        <div class="row__actions">
+          <button class="btn btn--success-tonal btn--sm"><i class="ti ti-check"></i>Verificar</button>
+          <button class="btn btn--error-tonal btn--sm"><i class="ti ti-x"></i>Rechazar</button>
+          <button class="btn btn--outline btn--sm"><i class="ti ti-eye"></i>Ver</button>
+          <button class="btn btn--text btn--sm"><i class="ti ti-edit"></i>Editar</button>
+        </div>
+      </div>
+
+      <div class="section-head">
+        <h2 class="section-head__title">Direcciones</h2>
+        <span class="section-head__count">0 declaradas</span>
+      </div>
+
+      <div class="row">
+        <div class="row__icon error"><i class="ti ti-home"></i></div>
+        <div class="row__main">
+          <div class="row__title-line">
+            <span class="row__title">Dirección legal</span>
+            <span class="row__chip error"><i class="ti ti-circle"></i>Falta</span>
+          </div>
+          <div class="row__sub">Necesaria para emitir su finiquito laboral</div>
+        </div>
+        <div class="row__actions">
+          <button class="btn btn--primary btn--sm"><i class="ti ti-mail-forward"></i>Pedir a Valentina</button>
+          <button class="btn btn--outline btn--sm"><i class="ti ti-pencil-plus"></i>Cargar yo</button>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="row__icon"><i class="ti ti-bed"></i></div>
+        <div class="row__main">
+          <div class="row__title-line">
+            <span class="row__title" style="font-weight: 500; color: var(--text-secondary);">Residencia</span>
+            <span class="row__chip neutral">opcional</span>
+          </div>
+          <div class="row__sub">No declarada</div>
+        </div>
+        <button class="btn btn--text btn--sm">Cargar yo</button>
+      </div>
+
+      <div class="row">
+        <div class="row__icon"><i class="ti ti-heart-handshake"></i></div>
+        <div class="row__main">
+          <div class="row__title-line">
+            <span class="row__title" style="font-weight: 500; color: var(--text-secondary);">Contacto de emergencia</span>
+            <span class="row__chip neutral">opcional</span>
+          </div>
+          <div class="row__sub">No declarado</div>
+        </div>
+        <button class="btn btn--text btn--sm">Cargar yo</button>
+      </div>
+
+      <footer class="legal-card__footer">
+        <a href="#"><i class="ti ti-history" style="font-size: 14px;"></i>Ver historial de cambios (3 eventos)</a>
+        <a href="#"><i class="ti ti-info-circle" style="font-size: 14px;"></i>Cómo HR debe usar estos datos</a>
+      </footer>
+    </article>
+  </div>
+
+  <!-- ═══ /people/[slug] · HR rechazado ═══ -->
+  <div class="pane" data-pane="hr-rejected">
+    <article class="legal-card">
+
+      <div class="legal-card__header">
+        <div class="hero__icon" style="background: var(--error-tonal-bg); color: var(--error-tonal-fg);"><i class="ti ti-id"></i></div>
+        <div>
+          <div style="font-size: 16px; font-weight: 600;">Identidad legal</div>
+          <div style="font-size: 13px; color: var(--text-secondary);">Documentos y direcciones de identidad</div>
+        </div>
+        <span class="legal-card__head-chip error">
+          <i class="ti ti-alert-circle"></i>1 rechazado
+        </span>
+      </div>
+
+      <div class="section-head">
+        <h2 class="section-head__title">Documentos</h2>
+      </div>
+
+      <div class="row">
+        <div class="row__icon error"><i class="ti ti-id"></i></div>
+        <div class="row__main">
+          <div class="row__title-line">
+            <span class="row__title">RUT (Chile)</span>
+            <span class="row__chip error"><i class="ti ti-x"></i>Rechazado por ti</span>
+          </div>
+          <div class="row__sub">Esperando que Valentina corrija</div>
+        </div>
+      </div>
+
+      <div class="reject-banner">
+        <i class="ti ti-message-2-exclamation"></i>
+        <div>
+          <strong>Tu motivo:</strong>
+          Falta el dígito verificador. Envió "12.345.678" sin el "-K".
+        </div>
+      </div>
+
+      <div class="row" style="border-top: none; padding-top: 0;">
+        <div style="width: 36px;"></div>
+        <div class="row__actions" style="margin-left: auto;">
+          <button class="btn btn--primary btn--sm"><i class="ti ti-mail-forward"></i>Recordar a Valentina</button>
+          <button class="btn btn--outline btn--sm"><i class="ti ti-pencil-plus"></i>Editar yo (HR)</button>
+          <button class="btn btn--text btn--sm"><i class="ti ti-archive"></i>Archivar rechazo</button>
+        </div>
+      </div>
+
+      <footer class="legal-card__footer">
+        <a href="#"><i class="ti ti-history" style="font-size: 14px;"></i>Ver historial</a>
+      </footer>
+    </article>
+  </div>
+
+  <!-- ═══ /people/[slug] · HR editando inline ═══ -->
+  <div class="pane" data-pane="hr-edit">
+    <article class="legal-card">
+
+      <div class="legal-card__header">
+        <div class="hero__icon"><i class="ti ti-id"></i></div>
+        <div>
+          <div style="font-size: 16px; font-weight: 600;">Identidad legal</div>
+          <div style="font-size: 13px; color: var(--text-secondary);">Documentos y direcciones de identidad</div>
+        </div>
+        <span class="legal-card__head-chip warning">
+          <i class="ti ti-edit"></i>Editando — modo HR
+        </span>
+      </div>
+
+      <div class="section-head">
+        <h2 class="section-head__title">Documentos</h2>
+      </div>
+
+      <div class="row is-expanded">
+        <div class="row__icon warning"><i class="ti ti-id"></i></div>
+        <div class="row__main">
+          <div class="row__title-line">
+            <span class="row__title">RUT (Chile)</span>
+            <span class="row__mask">xx.xxx.678-K</span>
+            <span class="row__chip warning"><i class="ti ti-clock"></i>Pendiente</span>
+          </div>
+          <div class="row__sub">Editando como HR — el cambio se registrará en audit con tu identidad.</div>
+        </div>
+        <i class="ti ti-chevron-down row__chevron" aria-hidden="true"></i>
+      </div>
+
+      <div class="row-form">
+        <div class="row-form__grid">
+          <div class="field">
+            <label class="field__label">País emisor</label>
+            <select class="field__select"><option>🇨🇱 Chile</option></select>
+          </div>
+          <div class="field">
+            <label class="field__label">Tipo de documento</label>
+            <select class="field__select"><option>RUT</option></select>
+          </div>
+          <div class="field full">
+            <label class="field__label">RUT</label>
+            <input class="field__input field__input--mono" value="12.345.678-K">
+          </div>
+          <div class="field full">
+            <label class="field__label">Motivo del cambio HR (visible en audit log)</label>
+            <input class="field__input" placeholder="Ej. Valentina envió el RUT con typo, lo cargo yo con su autorización" value="Valentina envió el RUT con typo, lo cargo yo con su autorización verbal">
+            <span class="field__hint">Mínimo 10 caracteres. Quedará permanente en audit log.</span>
+          </div>
+        </div>
+        <div class="row-form__actions">
+          <span class="row-form__sign">
+            <i class="ti ti-shield-lock" style="font-size: 13px;"></i>
+            Cambio firmado como HR · Quedará en audit log
+          </span>
+          <div style="display: flex; gap: var(--s-2);">
+            <button class="btn btn--text btn--sm">Cancelar</button>
+            <button class="btn btn--primary btn--sm"><i class="ti ti-device-floppy"></i>Guardar cambio HR</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-head">
+        <h2 class="section-head__title">Direcciones</h2>
+      </div>
+
+      <div class="row">
+        <div class="row__icon error"><i class="ti ti-home"></i></div>
+        <div class="row__main">
+          <div class="row__title-line">
+            <span class="row__title">Dirección legal</span>
+            <span class="row__chip error"><i class="ti ti-circle"></i>Falta</span>
+          </div>
+          <div class="row__sub">Cárgala con autorización del colaborador</div>
+        </div>
+        <div class="row__actions">
+          <button class="btn btn--primary btn--sm">Pedir a Valentina</button>
+          <button class="btn btn--outline btn--sm">Cargar yo</button>
+        </div>
+      </div>
+
+      <footer class="legal-card__footer">
+        <a href="#"><i class="ti ti-history" style="font-size: 14px;"></i>Ver historial</a>
+      </footer>
+    </article>
+  </div>
+
+</main>
+
+<script>
+  const buttons = document.querySelectorAll('.vbtn');
+  const panes = document.querySelectorAll('.pane');
+
+  buttons.forEach(b => {
+    b.addEventListener('click', () => {
+      buttons.forEach(x => x.classList.toggle('active', x === b));
+      panes.forEach(p => p.classList.toggle('active', p.dataset.pane === b.dataset.variant));
+    });
+  });
+</script>
+
+</body>
+</html>
