@@ -9,6 +9,30 @@
 - **Docs tocadas:** `docs/tasks/to-do/TASK-786-person-contact-professional-presence-governance.md`, `docs/tasks/TASK_ID_REGISTRY.md`, `docs/tasks/README.md`.
 - **Pendiente:** implementar resolver/policy de presencia profesional y deep link actions para Teams/Slack usando `src/lib/navigation/deep-links/**`.
 
+## Sesion 2026-05-05 — TASK-784 Person Legal Profile + Identity Documents Foundation — completada
+
+- **Branch:** `develop` (commits directos por instrucción "mantente en develop"). 9 commits secuenciales por slice + cierre.
+- **Lifecycle:** `to-do` → `in-progress` → `complete`. README/registry sincronizados.
+- **Skills invocadas:** `greenhouse-backend` (schema, helpers, readers, reveal pattern, reliability signals), `greenhouse-dev` + `greenhouse-ux` + `greenhouse-ux-writing` (self-service `/my/profile` + HR review surface + copy es-CL país-aware), `greenhouse-payroll-auditor` (readiness gates finiquito + invariante `organizations.tax_id` intacto), `gcp-bigquery` (backfill script).
+- **Slices entregados (7):**
+  - **Slice 1 — Schema + audit logs + module skeleton.** Migration `20260505015628132` agrega 4 tablas a `greenhouse_core` (person_identity_documents, person_addresses, 2 audit logs append-only via trigger). 24 document types + 4 address types canónicos. Partial UNIQUE para historial. Module skeleton con types canónicos (Masked vs Sensitive vs Snapshot). Pepper secret registrado.
+  - **Slice 2 — Readers + masking + reveal + sanitizer extension.** normalize CL_RUT modulo-11 + 23 generic validators. mask `xx.xxx.NNN-K`. reveal pattern TASK-697 (capability + reason ≥5 + audit + outbox). store con UPSERT idempotente por value_hash. snapshots server-only. readiness gates 5 use cases. 12 outbox events v1. redact.ts cubre CL_RUT.
+  - **Slice 3 — /my/profile self-service section.** 6 capabilities en entitlements catalog + runtime wire-up. API `/api/my/legal-profile`. UI `LegalProfileTab` país-aware con readiness banner.
+  - **Slice 4 — HR review + Person 360 integration.** 7 endpoints HR (`verify`/`reject`/`reveal` × document+address). Componente `PersonLegalProfileSection` embebido en `PersonHrProfileTab`.
+  - **Slice 5 — Finiquito readiness wiring.** `document-store.ts` ahora usa `readFinalSettlementSnapshot`. `taxId` solo se llena cuando verified. Defensive degradation. 5 readiness tests.
+  - **Slice 6 — Legacy backfill + coverage audit.** `scripts/identity/backfill-legacy-bq-documents.ts` idempotente. `coverage-audit.ts` reporta gaps por status.
+  - **Slice 7 — Reliability + docs + closing.** Modulo `identity` en `STATIC_RELIABILITY_REGISTRY`. 4 reliability signals. CLAUDE.md sección + EVENT_CATALOG Delta + doc funcional + 2 manuales.
+- **Decisiones canónicas resueltas en Plan Mode:**
+  - **Encryption strategy:** TASK-697 pattern (plaintext at rest + grants estrictos + reveal capability + audit + sanitizers). NO KMS envelope V1.
+  - **Pepper:** secret `greenhouse-pii-normalization-pepper` registrado. **Pendiente**: crear secret en GCP Secret Manager antes de prod.
+  - **Module location:** `src/lib/person-legal-profile/` separado de identity-lookup finance.
+  - **Anchor:** `identity_profiles.profile_id`, no `members`.
+- **Verificación final:** 52 module + redact tests verde. tsc + eslint sobre código tocado verde.
+- **Coordinación cross-task:** TASK-783 puede consumir `assessPersonLegalReadiness`. TASK-762 cierra gap `taxId: null`.
+- **Pendientes operativos:**
+  - Crear secret `greenhouse-pii-normalization-pepper` en GCP Secret Manager (proyecto `efeonce-group`) antes de cualquier write en prod.
+  - Ejecutar backfill `--commit` primero en staging.
+
 ## Sesion 2026-05-04 — TASK-784 movida a `in-progress` (Discovery + Plan, sin código)
 
 - **Branch:** `develop` (instrucción usuario "mantente en develop", sin branch feature).

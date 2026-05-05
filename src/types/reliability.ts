@@ -21,6 +21,7 @@ export type ReliabilityModuleKey =
   | 'home'
   | 'payroll'
   | 'sync' // TASK-773 — outbox publisher + reactive consumer + projection refreshes
+  | 'identity' // TASK-784 — Person legal profile + auth + SCIM
 
 export type ReliabilityModuleDomain =
   | 'platform'
@@ -30,6 +31,7 @@ export type ReliabilityModuleDomain =
   | 'home'
   | 'hr'
   | 'sync' // TASK-773
+  | 'identity' // TASK-784
 
 export type ReliabilitySignalKind =
   | 'runtime'

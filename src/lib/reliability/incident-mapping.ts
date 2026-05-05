@@ -71,6 +71,17 @@ const MODULE_TITLE_HINTS: Record<ReliabilityModuleKey, string[]> = {
     'projection refresh',
     'projection_refresh_queue',
     'event bus'
+  ],
+  // TASK-784 — identity & access (auth + person legal profile + SCIM).
+  identity: [
+    'auth',
+    'identity',
+    'rut',
+    'scim',
+    'magic-link',
+    'azure ad',
+    'next-auth',
+    'reveal_sensitive'
   ]
 }
 
@@ -94,6 +105,9 @@ const MODULE_PRIORITY: Record<ReliabilityModuleKey, number> = {
   // el finance es el dueño del side effect operacional). Sync solo gana
   // cuando el incident es puramente del event bus.
   sync: 10,
+  // TASK-784 — identity prioridad alta: si un incident matchea ambos `auth`
+  // y `cloud`, identity gana (auth es dueño del flujo).
+  identity: 32,
   cloud: 1
 }
 

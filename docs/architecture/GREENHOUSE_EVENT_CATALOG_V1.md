@@ -2,6 +2,29 @@
 
 Catalogo canonico de eventos del sistema de outbox de Greenhouse. Cada evento se registra en `greenhouse_sync.outbox_events` y se publica a BigQuery via el consumer `outbox-publish`.
 
+## Delta 2026-05-05 — TASK-784: Person Legal Profile (12 events v1)
+
+Reglas duras: NUNCA loggear `value_full`, `value_normalized`, `street_line_1`, `presentation_text` en payloads de outbox. Los payloads describen WHICH document/address cambio + el actor + razon, pero no el valor.
+
+Aggregate types: `person_identity_document`, `person_address`.
+
+| Event | Trigger | Payload (no value_full) |
+|---|---|---|
+| `person.identity_document.declared` | self-service o HR declara documento nuevo | `{ documentId, profileId, documentType, countryCode, source, declaredByUserId }` |
+| `person.identity_document.updated` | metadata refresh sin cambiar valor | `{ documentId, profileId, documentType, countryCode, source }` |
+| `person.identity_document.verified` | HR aprueba | `{ documentId, profileId, verifiedByUserId }` |
+| `person.identity_document.rejected` | HR rechaza con reason | `{ documentId, profileId, rejectedByUserId, rejectedReason }` |
+| `person.identity_document.archived` | superseded o archive manual | `{ documentId, profileId, actorUserId }` |
+| `person.identity_document.revealed_sensitive` | reveal con capability + reason | `{ documentId, profileId, actorUserId, reason, revealedFields }` |
+| `person.address.declared` | self-service o HR declara | `{ addressId, profileId, addressType, countryCode, source }` |
+| `person.address.updated` | metadata refresh | `{ addressId, profileId, addressType, countryCode, source }` |
+| `person.address.verified` | HR aprueba | `{ addressId, profileId, verifiedByUserId }` |
+| `person.address.rejected` | HR rechaza con reason | `{ addressId, profileId, rejectedByUserId, rejectedReason }` |
+| `person.address.archived` | superseded o archive manual | `{ addressId, profileId, actorUserId }` |
+| `person.address.revealed_sensitive` | reveal con capability + reason | `{ addressId, profileId, actorUserId, reason, revealedFields }` |
+
+Reactive consumers: ninguno V1. El reliability signal `identity.legal_profile.reveal_anomaly_rate` lee `person_identity_document_audit_log` directo (no via outbox) — el outbox da auditoria cross-system, el audit log es la fuente authoritative dentro del runtime.
+
 ## Delta 2026-05-03 — TASK-768: Economic Category Dimension audit events
 
 Dos eventos canonicos del dominio finance para hacer auditable las reclasificaciones manuales de `economic_category` (dimension analitica nueva, separada de `expense_type`/`income_type` fiscales). Los emite el endpoint admin de reclassify (Slice 6) y los consume el AI Observer + audit log.

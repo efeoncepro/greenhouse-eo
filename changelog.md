@@ -1,5 +1,20 @@
 # changelog.md
 
+## 2026-05-05
+
+- **TASK-784 implementada — Person Legal Profile + Identity Documents Foundation.** Greenhouse ahora tiene fuente canonica para identidad legal de personas naturales (RUT chileno + 23 tipos internacionales) y direcciones, separada de `organizations.tax_id` (que sigue siendo identidad tributaria de organizaciones para facturacion).
+  - **Schema canonico:** 4 tablas nuevas en `greenhouse_core` (`person_identity_documents`, `person_addresses`, 2 audit logs append-only via trigger). Anclados a `identity_profiles.profile_id`. Partial UNIQUE para historial sin bloquear nuevas declaraciones.
+  - **Modulo canonico:** `src/lib/person-legal-profile/` con normalize CL_RUT modulo-11, masking precomputado, reveal pattern TASK-697 (capability + reason ≥5 + audit + outbox), snapshots server-only para document generators (final_settlement, payroll_receipt, honorarios_closure, onboarding_contract), readiness gates para 5 use cases.
+  - **Self-service:** nuevo tab "Datos legales" en `/my/profile` con formularios país-aware (RUT cuando Chile, "documento de identidad" como fallback). Despues de guardar, el valor solo aparece como mascara — el sistema NUNCA vuelve a mostrar el RUT completo al colaborador.
+  - **HR review:** seccion "Identidad legal" en perfil HR del colaborador con verify/reject/reveal. Reveal exige motivo ≥5 chars y queda en audit log con actor + ip + user_agent + timestamp. Reliability signal alerta cuando un usuario hace > 3 reveals en 24h.
+  - **Finiquito desbloqueado:** `final_settlement_documents` ya no hardcodea `taxId: null`. Ahora consume `readFinalSettlementSnapshot` y emite el RUT solo si esta verificado. Defensive: si el reader falla, el finiquito sigue emitiendose con `taxId=null` (no bloqueante).
+  - **Capabilities granulares (6):** `person.legal_profile.{read_masked, self_update, hr_update, verify, reveal_sensitive, export_snapshot}`. Reveal_sensitive least privilege (EFEONCE_ADMIN/FINANCE_ADMIN solo).
+  - **Outbox events (12 v1):** `person.identity_document.{declared, updated, verified, rejected, archived, revealed_sensitive}` + `person.address.*`.
+  - **Reliability signals (4) bajo modulo `identity`:** pending_review_overdue (drift), payroll_chile_blocking_finiquito (data_quality), reveal_anomaly_rate (drift), evidence_orphan (data_quality). Visibles en `/admin/operations`.
+  - **Sanitizers:** `redactSensitive` en logs/Sentry/HTTP responses ahora cubre CL_RUT con o sin puntos. `sanitizePiiText` (AI prompts) ya cubria.
+  - **Backfill BigQuery → PG:** scripts en `scripts/identity/` (`backfill-legacy-bq-documents.ts` + `coverage-audit.ts`). Idempotente, dry-run default. Status `pending_review` (no auto-trust).
+  - **Pendiente operativo:** crear secret `greenhouse-pii-normalization-pepper` en GCP Secret Manager antes del primer write en prod.
+
 ## 2026-05-04
 
 - **TASK-553 implementada — Quick Access Shortcuts Platform.** El boton de grilla con `+` arriba a la derecha del portal pasa de decoración a capacidad real.

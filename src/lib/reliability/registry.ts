@@ -313,6 +313,44 @@ export const STATIC_RELIABILITY_REGISTRY: ReliabilityModuleDefinition[] = [
     ],
     expectedSignalKinds: ['subsystem', 'lag', 'dead_letter', 'incident', 'drift'],
     incidentDomainTag: 'sync'
+  },
+  {
+    // TASK-784 — Person Legal Profile foundation. Identity domain rolls up
+    // auth incidents (TASK-742) + SCIM drift (TASK-781 follow-up) + new
+    // person legal profile signals introduced here.
+    moduleKey: 'identity',
+    label: 'Identity & Access',
+    description:
+      'Identidad legal de personas, autenticacion (NextAuth + Azure AD), SCIM/Entra sync y readiness para finiquitos/payroll/honorarios.',
+    domain: 'identity',
+    routes: [
+      { path: '/admin/users', label: 'Usuarios admin' },
+      { path: '/my/profile', label: 'Mi perfil' }
+    ],
+    apis: [
+      { path: '/api/my/legal-profile', label: 'Self-service legal profile' },
+      { path: '/api/auth/health', label: 'Auth readiness' }
+    ],
+    dependencies: [
+      'greenhouse_core.identity_profiles',
+      'greenhouse_core.person_identity_documents',
+      'greenhouse_core.person_addresses',
+      'greenhouse_core.client_users',
+      'GCP Secret Manager (greenhouse-pii-normalization-pepper)',
+      'Azure AD (multi-tenant)'
+    ],
+    smokeTests: [
+      'tests/e2e/smoke/auth-providers.spec.ts'
+    ],
+    filesOwned: [
+      'src/lib/person-legal-profile/**',
+      'src/lib/auth/**',
+      'src/lib/entra/**',
+      'src/app/api/my/legal-profile/**',
+      'src/app/api/hr/people/**/legal-profile/**'
+    ],
+    expectedSignalKinds: ['incident', 'drift', 'data_quality'],
+    incidentDomainTag: 'identity'
   }
 ]
 

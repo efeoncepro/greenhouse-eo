@@ -32,6 +32,10 @@ import {
   getExpenseDistributionUnresolvedSignal
 } from './queries/expense-distribution'
 import { getExpensePaymentsClpDriftSignal } from './queries/expense-payments-clp-drift'
+import { getIdentityLegalProfileEvidenceOrphanSignal } from './queries/identity-legal-profile-evidence-orphan'
+import { getIdentityLegalProfilePayrollBlockingSignal } from './queries/identity-legal-profile-payroll-blocking'
+import { getIdentityLegalProfilePendingOverdueSignal } from './queries/identity-legal-profile-pending-overdue'
+import { getIdentityLegalProfileRevealAnomalySignal } from './queries/identity-legal-profile-reveal-anomaly'
 import { getIncomePaymentsClpDriftSignal } from './queries/income-payments-clp-drift'
 import { getPaymentOrdersDeadLetterSignal } from './queries/payment-orders-dead-letter'
 import { getPaidOrdersWithoutExpensePaymentSignal } from './queries/payment-orders-paid-without-expense-payment'
@@ -344,6 +348,16 @@ interface ReliabilityOverviewSources {
    * filtered at read time — but signals catalog retirement drift to ops).
    */
   shortcutsInvalidPins?: ReliabilitySignal | null
+
+  /**
+   * TASK-784 Slice 7 — Person Legal Profile signals (4):
+   *   - identity.legal_profile.pending_review_overdue (drift, warning)
+   *   - identity.legal_profile.payroll_chile_blocking_finiquito (data_quality, error)
+   *   - identity.legal_profile.reveal_anomaly_rate (drift, warning|error)
+   *   - identity.legal_profile.evidence_orphan (data_quality, error)
+   * Roll up bajo moduleKey 'identity'.
+   */
+  identityLegalProfile?: ReliabilitySignal[] | null
 }
 
 export const buildReliabilityOverview = (
@@ -393,7 +407,9 @@ export const buildReliabilityOverview = (
     // TASK-780 Phase 3 — Home rollout drift (PG flag vs env + opt-out rate).
     ...(sources.homeRolloutDrift ? [sources.homeRolloutDrift] : []),
     // TASK-553 Slice 4 — Quick Access Shortcuts catalog drift.
-    ...(sources.shortcutsInvalidPins ? [sources.shortcutsInvalidPins] : [])
+    ...(sources.shortcutsInvalidPins ? [sources.shortcutsInvalidPins] : []),
+    // TASK-784 Slice 7 — Identity legal profile signals (4).
+    ...(sources.identityLegalProfile ?? [])
   ]
 
   const signalsByModule = new Map<string, ReliabilitySignal[]>()
@@ -626,6 +642,21 @@ export const getReliabilityOverview = async (
       ? preloadedSources.shortcutsInvalidPins
       : await getShortcutsInvalidPinsSignal().catch(() => null)
 
+  // TASK-784 Slice 7 — Identity legal profile signals (4 readers en paralelo).
+  // Cada uno degrada honestamente a `unknown` si su query falla. Roll up
+  // bajo moduleKey 'identity' via incidentDomainTag.
+  const identityLegalProfile =
+    preloadedSources.identityLegalProfile !== undefined
+      ? preloadedSources.identityLegalProfile
+      : await Promise.all([
+          getIdentityLegalProfilePendingOverdueSignal().catch(() => null),
+          getIdentityLegalProfilePayrollBlockingSignal().catch(() => null),
+          getIdentityLegalProfileRevealAnomalySignal().catch(() => null),
+          getIdentityLegalProfileEvidenceOrphanSignal().catch(() => null)
+        ])
+          .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
+          .catch(() => null)
+
   return buildReliabilityOverview(operations, {
     billing,
     notionOperational,
@@ -642,7 +673,8 @@ export const getReliabilityOverview = async (
     accountBalancesFxDrift,
     expenseDistribution,
     homeRolloutDrift,
-    shortcutsInvalidPins
+    shortcutsInvalidPins,
+    identityLegalProfile
   })
 }
 
