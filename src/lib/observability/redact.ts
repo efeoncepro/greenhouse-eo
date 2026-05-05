@@ -74,6 +74,28 @@ const PATTERNS: RedactionPattern[] = [
     label: 'email',
     pattern: /\b([A-Za-z0-9])[A-Za-z0-9._%+-]*@([A-Za-z0-9.-]+\.[A-Za-z]{2,})\b/g,
     replacement: '$1***@$2'
+  },
+  // TASK-784 — Chilean RUT con al menos un separador explicito (.,- o espacio).
+  // Patron 1: con puntos (12.345.678-K). Patron 2: sin puntos pero con guion (12345678-K).
+  // Evita capturar secuencias planas de digitos (esas las cubre long_numeric_id).
+  {
+    label: 'cl_rut_dotted',
+    pattern: /\b\d{1,2}\.\d{3}\.\d{3}[-\s]?[\dKk]\b/g,
+    replacement: '[redacted:rut]'
+  },
+  {
+    label: 'cl_rut_dashed',
+    pattern: /\b\d{7,9}[-\s][\dKk]\b/g,
+    replacement: '[redacted:rut]'
+  },
+  // TASK-784 — National ID-like sequences (8-12 contiguous digits).
+  // Conservador: solo cuando estan precedidos/seguidos de boundary literal
+  // y no estan dentro de un timestamp/sequence canonico (numero <= 6 o > 14
+  // chars no aplica).
+  {
+    label: 'long_numeric_id',
+    pattern: /(?<![\d.-])\d{8,12}(?![\d.-])/g,
+    replacement: '[redacted:long-id]'
   }
 ]
 

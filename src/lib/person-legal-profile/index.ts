@@ -19,3 +19,55 @@ import 'server-only'
 
 export * from './errors'
 export * from './types'
+export * from './mask'
+export * from './normalize'
+export {
+  declareIdentityDocument,
+  verifyIdentityDocument,
+  rejectIdentityDocument,
+  archiveIdentityDocument,
+  declarePersonAddress,
+  verifyPersonAddress,
+  rejectPersonAddress
+} from './store'
+export type {
+  DeclareIdentityDocumentInput,
+  VerifyIdentityDocumentInput,
+  RejectIdentityDocumentInput,
+  DeclarePersonAddressInput,
+  VerifyPersonAddressInput,
+  RejectPersonAddressInput
+} from './store'
+export {
+  listIdentityDocumentsForProfileMasked,
+  getActiveIdentityDocumentMasked,
+  getVerifiedClRutForProfile,
+  listAddressesForProfileMasked,
+  getActiveAddressMasked,
+  listIdentityDocumentAuditLog,
+  listAddressAuditLog
+} from './readers'
+export type { PersonLegalAuditLogEntry } from './readers'
+export {
+  revealPersonIdentityDocument,
+  revealPersonAddress
+} from './reveal'
+export type {
+  RevealIdentityDocumentInput,
+  RevealPersonAddressInput
+} from './reveal'
+export {
+  readPersonLegalSnapshot,
+  readFinalSettlementSnapshot
+} from './snapshots'
+export type { SnapshotInput } from './snapshots'
+export {
+  assessPersonLegalReadiness
+} from './readiness'
+export type {
+  ReadinessUseCase,
+  ReadinessBlocker,
+  ReadinessWarning,
+  ReadinessResult,
+  AssessReadinessOptions
+} from './readiness'

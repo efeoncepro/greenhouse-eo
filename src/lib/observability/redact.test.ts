@@ -125,3 +125,45 @@ describe('redactErrorForResponse', () => {
     expect(redactErrorForResponse({ random: 'object' })).toBe('unknown_error')
   })
 })
+
+describe('TASK-784 redact extension — RUT + long ids', () => {
+  it('redacts CL_RUT con puntos + guion', () => {
+    const out = redactSensitive('Operacion fallo para RUT 12.345.678-K')
+
+    expect(out).not.toContain('12.345.678-K')
+    expect(out).toContain('[redacted:rut]')
+  })
+
+  it('redacts CL_RUT sin puntos', () => {
+    const out = redactSensitive('Doc=12345678-K rejected')
+
+    expect(out).not.toContain('12345678-K')
+    expect(out).toContain('[redacted:rut]')
+  })
+
+  it('redacts multiples RUTs en el mismo string', () => {
+    const out = redactSensitive('A 12.345.678-K B 8.765.432-1 done')
+
+    expect(out).not.toContain('12.345.678-K')
+    expect(out).not.toContain('8.765.432-1')
+  })
+
+  it('redacts long numeric id 8-12 digitos', () => {
+    const out = redactSensitive('SSN=987654321 fallback')
+
+    expect(out).toContain('[redacted:long-id]')
+    expect(out).not.toContain('987654321')
+  })
+
+  it('NO redacta strings cortas con digitos pequenos', () => {
+    expect(redactSensitive('user = 1234')).toContain('1234')
+    expect(redactSensitive('id 42')).toContain('42')
+  })
+
+  it('scrubea RUT en error.message', () => {
+    const err = new Error('Failed for 12.345.678-K')
+    const out = redactErrorForResponse(err)
+
+    expect(out).not.toContain('12.345.678-K')
+  })
+})

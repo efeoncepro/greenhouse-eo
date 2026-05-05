@@ -177,7 +177,11 @@ export const AGGREGATE_TYPES = {
   sisterPlatformBinding: 'sister_platform_binding',
 
   // Identity credential (TASK-451)
-  identityCredential: 'identity_credential'
+  identityCredential: 'identity_credential',
+
+  // Person Legal Profile (TASK-784)
+  personIdentityDocument: 'person_identity_document',
+  personAddress: 'person_address'
 } as const
 
 export type AggregateType = (typeof AGGREGATE_TYPES)[keyof typeof AGGREGATE_TYPES]
@@ -635,7 +639,21 @@ export const EVENT_TYPES = {
   sisterPlatformBindingDeprecated: 'sister_platform_binding.deprecated',
 
   // Identity credential (TASK-451)
-  identityPasswordHashRotated: 'identity.password_hash.rotated'
+  identityPasswordHashRotated: 'identity.password_hash.rotated',
+
+  // Person Legal Profile (TASK-784)
+  personIdentityDocumentDeclared: 'person.identity_document.declared',
+  personIdentityDocumentUpdated: 'person.identity_document.updated',
+  personIdentityDocumentVerified: 'person.identity_document.verified',
+  personIdentityDocumentRejected: 'person.identity_document.rejected',
+  personIdentityDocumentArchived: 'person.identity_document.archived',
+  personIdentityDocumentRevealedSensitive: 'person.identity_document.revealed_sensitive',
+  personAddressDeclared: 'person.address.declared',
+  personAddressUpdated: 'person.address.updated',
+  personAddressVerified: 'person.address.verified',
+  personAddressRejected: 'person.address.rejected',
+  personAddressArchived: 'person.address.archived',
+  personAddressRevealedSensitive: 'person.address.revealed_sensitive'
 } as const
 
 export type EventType = (typeof EVENT_TYPES)[keyof typeof EVENT_TYPES]
