@@ -142,16 +142,10 @@ export const LEGAL_PROFILE_COPY = {
   fetchError: 'No pudimos cargar tus datos legales. Intenta actualizar la pagina.'
 } as const
 
-export const COUNTRY_OPTIONS: ReadonlyArray<{ code: string; flag: string; name: string }> = [
-  { code: 'CL', flag: '🇨🇱', name: 'Chile' },
-  { code: 'AR', flag: '🇦🇷', name: 'Argentina' },
-  { code: 'BR', flag: '🇧🇷', name: 'Brasil' },
-  { code: 'CO', flag: '🇨🇴', name: 'Colombia' },
-  { code: 'MX', flag: '🇲🇽', name: 'Mexico' },
-  { code: 'PE', flag: '🇵🇪', name: 'Peru' },
-  { code: 'UY', flag: '🇺🇾', name: 'Uruguay' },
-  { code: 'US', flag: '🇺🇸', name: 'Estados Unidos' }
-]
+// COUNTRY_OPTIONS now lives in src/lib/locale/countries.ts as canonical
+// dataset. Forms import COUNTRIES_SORTED directly from there.
+// This export kept as legacy alias.
+export { COUNTRIES_SORTED as COUNTRY_OPTIONS } from '@/lib/locale/countries'
 
 /** Document types disponibles por pais. CL_RUT primero cuando aplica. */
 export const DOC_TYPES_BY_COUNTRY: Record<string, ReadonlyArray<string>> = {

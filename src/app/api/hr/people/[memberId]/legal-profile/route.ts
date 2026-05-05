@@ -9,7 +9,7 @@ import {
   getDefaultDocumentTypeForCountry,
   listAddressesForProfileMasked,
   listIdentityDocumentsForProfileMasked,
-  resolveMemberCountry,
+  resolvePersonCountry,
   resolveProfileIdForMember
 } from '@/lib/person-legal-profile'
 import { requireHrCoreReadTenantContext } from '@/lib/hr-core/shared'
@@ -47,7 +47,7 @@ export async function GET(_request: Request, { params }: RouteParams) {
         listAddressesForProfileMasked(profileId),
         assessPersonLegalReadiness({ profileId, useCase: 'final_settlement_chile' }),
         assessPersonLegalReadiness({ profileId, useCase: 'payroll_chile_dependent' }),
-        resolveMemberCountry(memberId)
+        resolvePersonCountry(memberId, profileId)
       ])
 
     const expectedDocumentType = getDefaultDocumentTypeForCountry(memberCountry)

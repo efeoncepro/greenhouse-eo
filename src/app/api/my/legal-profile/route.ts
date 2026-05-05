@@ -10,7 +10,7 @@ import {
   isPersonDocumentType,
   listAddressesForProfileMasked,
   listIdentityDocumentsForProfileMasked,
-  resolveMemberCountry,
+  resolvePersonCountry,
   resolveProfileIdForMember,
   assessPersonLegalReadiness
 } from '@/lib/person-legal-profile'
@@ -48,7 +48,10 @@ export async function GET() {
       return errorResponse(409, 'Identity profile not linked to this user', 'profile_not_linked')
     }
 
-    const memberCountry = tenant.memberId ? await resolveMemberCountry(tenant.memberId) : null
+    const memberCountry = tenant.memberId
+      ? await resolvePersonCountry(tenant.memberId, profileId)
+      : null
+
     const expectedDocumentType = getDefaultDocumentTypeForCountry(memberCountry)
 
     const [documents, addresses] = await Promise.all([
