@@ -897,3 +897,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-808` | `to-do` | Engagement Audit Log + Outbox Events v1 + Reactive Consumers (EPIC-014 child 8/10) | `docs/tasks/to-do/TASK-808-engagement-audit-log-outbox-events-reactive-consumers.md` |
 | `TASK-809` | `to-do` | Sample Sprints UI + Wizards (EPIC-014 child 9/10) | `docs/tasks/to-do/TASK-809-sample-sprints-ui-wizards.md` |
 | `TASK-810` | `to-do` | Engagement Anti-Zombie CHECK Constraint NOT VALID + VALIDATE (EPIC-014 child 10/10) | `docs/tasks/to-do/TASK-810-engagement-anti-zombie-check-constraint.md` |
+| `TASK-694` | `to-do` | Notification Hub V1.5 — Engagement Metrics + Template Schema + Timezone + Ack Idempotent + Failure Matrix (follow-up post Delta v0.2 de TASK-690) | `docs/tasks/to-do/TASK-694-notification-hub-v1-5-engagement-templates-failure-resilience.md` |

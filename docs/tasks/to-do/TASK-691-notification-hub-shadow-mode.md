@@ -11,11 +11,53 @@
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
-- Status real: `Diseno`
+- Status real: `Diseno (Delta v0.1 aplicado tras auditoría arch-architect 2026-05-05)`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `TASK-690` (contrato + tablas + adapters skeleton)
 - Branch: `task/TASK-691-notification-hub-shadow-mode`
+
+## Delta v0.1 (2026-05-05) — pre-flight corrections post-auditoría arch-architect
+
+Hereda los fixes de TASK-690 Delta v0.1 (D1–D5, S1–S5, m1–m5). Adicionalmente, esta task corrige:
+
+### S6 — Latency p95 ≤ 100ms target irreal → calibrar a 250ms
+
+Acceptance criteria de "Fase 2 → Fase 3" declara `Reporte de latencia del dual-write: p95 ≤ 100ms`. Para INSERT a 3 tablas + idempotency check + reactive consumer wakeup bajo carga real, 100ms es agresivo y puede generar falsos rojos. **Fix**: target inicial **p95 ≤ 250ms**. Si baseline de staging muestra que se puede bajar, ajustar antes de Production. Lo importante NO es el número absoluto sino que `p95(legacy + shadow) - p95(legacy_solo) ≤ 50%` — esa delta es la métrica real.
+
+### S7 — Cron de parity report en Cloud Scheduler, no Vercel cron
+
+`Reporte de parity diario` declarado como "cron diario" sin home. Por TASK-775 (cron classification), un parity check de async-critical va a **Cloud Scheduler + ops-worker**, no Vercel cron (Vercel scheduled crons no corren en Staging custom env, exactamente el bug class que TASK-775 cerró). **Fix**: declarar Cloud Scheduler job `ops-notifications-hub-parity-check` (cron `0 9 * * *` America/Santiago) → endpoint `POST /notifications-hub/parity-report` en `services/ops-worker/server.ts`. Helper canónico vive en `src/lib/notifications/hub/parity-report.ts` (reusable desde ops-worker + admin endpoint manual).
+
+### S8 — Reliability signal canónica `shadow_parity_drift`
+
+La parity query existe pero no se materializa como signal. **Fix**: agregar al registry de TASK-690 Slice 6:
+
+```ts
+{
+  name: 'commercial.engagement.shadow_parity_drift',  // → mover a 'notifications.hub.shadow_parity_drift'
+  kind: 'drift',
+  severity: count > 5% ? 'error' : (count > 1% ? 'warning' : 'ok'),
+  steady: 0,
+  current: parityDriftPercent,
+  detectionQuery: '...parity SQL from docs/operations/notification-hub-shadow-parity.md...',
+  runbook: 'docs/operations/notification-hub-rollback.md',
+  subsystem: 'notifications.hub',
+}
+```
+
+Reader vive en `src/lib/reliability/queries/notifications-hub-shadow-drift.ts` (clonado del patrón `cron-staging-drift.ts`). Visible en `/admin/operations` automáticamente. **Sin esto, el drift detectado por el cron no se rollupea al subsystem ni dispara alerts vía registry.**
+
+### S9 — Capability granular del flag
+
+"Cualquier engineer con permission `developer`" es muy laxo. **Fix**: declarar capability `platform.notifications.hub.flag_modify` (NEW) restricted a EFEONCE_ADMIN. Lista explícita de owners de rotation on-call documentada en `docs/operations/notification-hub-rollback.md` con email + responsabilidad horaria. Cambios al flag exigen audit log row con `capability_check_passed`, `actor_user_id`, `previous_mode`, `new_mode`, `reason ≥ 10 chars`.
+
+### Score 4-pilar post-Delta v0.1 (estimado)
+
+- v0.0 (original): 8.125/10 (Safety 9, Robustness 8, Resilience 8, Scalability 7.5).
+- v0.1 (post-Delta): **8.625/10** estimado (Safety 9, Robustness 8.5, Resilience 9, Scalability 8).
+
+Mejoras: signal canónica del drift (+Resilience), latency target realista (+Scalability), Cron home definido (+Resilience), capability del flag con audit (+Safety).
 
 ## Summary
 

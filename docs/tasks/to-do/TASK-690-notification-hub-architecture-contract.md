@@ -11,12 +11,269 @@
 - Impact: `Alto`
 - Effort: `Medio-Alto`
 - Type: `architecture`
-- Status real: `Diseno`
+- Status real: `Diseno (Delta v0.1 aplicado tras auditoría arch-architect 2026-05-05)`
 - Rank: `TBD`
 - Domain: `platform`
-- Blocked by: `none` (depende lógicamente de TASK-669 + TASK-671 cerradas, ambas ya en producción)
+- Blocked by: `none` (depende lógicamente de TASK-669 + TASK-671 — ver Delta v0.1 §D5 sobre status real)
 - Branch: `task/TASK-690-notification-hub-architecture-contract`
 - Legacy ID: `none`
+
+## Delta v0.1 (2026-05-05) — pre-flight corrections post-auditoría arch-architect
+
+Auditoría reveló **5 errores materiales + 7 issues estructurales + 1 namespace collision**. Aplicar antes de tomar Slice 1.
+
+### D1 — Fix: `sendTransactionalEmail` no existe → usar `sendEmail`
+
+Slice 3 cita `wrapper sobre src/lib/email/sendTransactionalEmail`. La función real es `sendEmail<TContext>` exportada en `src/lib/email/delivery.ts:965`. **Fix**: Slice 3 wrappea `sendEmail` con TContext=NotificationIntent.
+
+### D2 — Fix: `email_log.email_id` no existe → usar `greenhouse_notifications.notification_log.log_id`
+
+Slice 3 cita "persiste `email_log.email_id`". La tabla real es `greenhouse_notifications.notification_log` con columnas `log_id` (PK), `notification_id`, `category`, `channel`, `status`, `error_message`, `skip_reason`, `metadata`, `created_at`, `user_id`. **Fix**: el adapter `email.ts` persiste `notification_log.log_id` en `notification_deliveries.adapter_target` (string).
+
+### D3 — Fix: 3 events ausentes en EVENT_CATALOG
+
+`finance.expense.approval_pending`, `delivery.daily_pulse.materialized`, `ops.error.unhandled` **no están declarados** en `GREENHOUSE_EVENT_CATALOG_V1.md` (solo `payroll_period.calculated` existe en línea 437). **Fix**: nuevo Slice 0 (pre-Slice 1) — declarar los 3 events v1 en EVENT_CATALOG con schema mínimo + payload shape antes de cualquier código que los referencie. Sin esto, `notification-kind-defaults.ts` en Slice 2 referencia globs sin emisor.
+
+### D4 — Fix: `'notifications.hub'` no soportado en `CaptureDomain` union
+
+`src/lib/observability/capture.ts:33-48` declara `CaptureDomain` union con 13 valores; `'notifications.hub'` no está. **Fix**: Slice 6 (Reliability hookup) debe **explícitamente** agregar `'notifications.hub'` al union de `CaptureDomain` en `capture.ts`. Sin esto, todo `captureWithDomain(err, 'notifications.hub', ...)` falla TypeScript build.
+
+### D5 — Status real de TASK-669/671 verificado
+
+Registry confirma: TASK-669 está `to-do` (NO cerrada), TASK-671 está `in-progress` con label "code complete, pending Azure tenant deploy". El runtime de `postTeamsCard` y `notification-mark-read.ts` SÍ existe en develop, pero el **cierre formal está pendiente**. **Fix**: blocked-by no es "TASK-669/671 cerradas en producción" sino "TASK-669/671 mergeadas a develop con runtime verificado en staging — cierre formal pendiente". Slice 1 puede arrancar sobre el runtime mergeado, pero sin asumir contracts de tasks no cerradas.
+
+### S1 — Atomicity transaccional (Robustness)
+
+Slice 4 declara `recordIntent` + `recordDelivery` separados. **Riesgo**: intent commit + delivery fail = state inconsistente. **Fix**: declarar pattern canónico transaccional (similar a EPIC-014 §8 / TASK-765):
+
+```sql
+BEGIN;
+  INSERT INTO greenhouse_core.notification_intents (...) ON CONFLICT (dedup_key) DO NOTHING RETURNING intent_id;
+  INSERT INTO greenhouse_core.notification_deliveries (intent_id, channel, ...) [...]; -- per channel
+  -- adapter calls son post-COMMIT (fire-and-forget con outbox events si necesitan retry)
+COMMIT;
+```
+
+Si conflict en intent (duplicado), el INSERT de deliveries skipea (helper devuelve `{ wasDuplicate: true }`).
+
+### S2 — UNIQUE `(intent_id, channel)` en deliveries
+
+Spec §4 debe declarar explícitamente `UNIQUE (intent_id, channel)` en `notification_deliveries` para que un mismo intent NO produzca 2 deliveries en el mismo canal. **Fix**: verificar/agregar al DDL en Slice 1.
+
+### S3 — `tenant_id NOT NULL` en intents desde V1 (Scalability)
+
+TASK-693 declara multi-tenant Out of Scope V1. Pero agregar `tenant_id` después es expand-contract caro. **Fix**: §4 de spec debe declarar `tenant_id TEXT NOT NULL DEFAULT 'efeonce'` en `notification_intents` desde Slice 1. Cuando llegue multi-tenant real, solo se cambia el default + se agrega capability scoping.
+
+### S4 — Namespace collision: `notification_preferences` ya existe
+
+`greenhouse_notifications.notification_preferences` **ya existe** en el repo (TASK-128 era / projection legacy) con shape `(preference_id, user_id, category, email_enabled, in_app_enabled, muted_until, updated_at)`. La spec del Hub quiere crear `greenhouse_core.notification_preferences` con shape distinta (per channel + quiet hours + min_severity).
+
+**Fix opciones** (decidir antes de Slice 1):
+
+1. **Renombrar la tabla nueva** a `greenhouse_core.notification_hub_preferences` para evitar collision. Migración path: TASK-693 cuando active UI, deprecar la legacy con backfill.
+2. **Reusar `greenhouse_notifications.notification_preferences`** + extenderla con columnas nuevas (more invasive — afecta projections legacy hoy).
+
+**Recomendación**: opción 1 (rename a `notification_hub_preferences`). Cero riesgo de breakage de projections viejas durante shadow/cutover.
+
+### S5 — Restricción capability del flag
+
+TASK-691 dice "cualquier engineer con permission `developer`". Para kill-switch de notificaciones cross-platform, eso es laxo. **Fix**: declarar capability `platform.notifications.hub.flag_modify` en Slice 6, restricted a EFEONCE_ADMIN + lista explícita de 2-3 on-call rotation. Documentar en runbook quién owna.
+
+### m1-m5 — Issues menores (apply best-effort)
+
+- Cleanup terminológico: `not_configured` es `ReliabilitySeverity` value, no status. Verificar que el modulo registration usa la column correcta (`severity` vs `status`).
+- Sync §Files owned con Slice 8 (agregar `mode.ts`, `dual-write.ts`, snapshot tests paths).
+- Clarificar "registerTemplate análogo a `registerProjection`" (no clonado — `registerTemplate` es nuevo).
+- `unregisterProjection` no existe en `projection-registry.ts` (verificado — solo `registerProjection`, `getRegisteredProjections`, etc.). El compromiso B de TASK-691 que dice "no toca unregisterProjection" es semánticamente correcto pero confunde — refactor a "no llama a `registerProjection` desde el código del Hub durante shadow; las projections viejas siguen registradas tal cual".
+- Open Q nuevo: `aadObjectId` rotation — declarar en TASK-693 cómo se detecta/recupera cuando un Entra ObjectID se invalida.
+
+### Score 4-pilar post-Delta v0.1 (estimado)
+
+- v0.0 (original): 7.75/10 (Safety 8, Robustness 7, Resilience 8.5, Scalability 7.5).
+- v0.1 (post-Delta): **8.5/10** estimado (Safety 8.5, Robustness 8.5, Resilience 8.5, Scalability 8.5).
+
+Bloqueantes resueltos. Spec lista para tomar Slice 0 (declarar events) → Slice 1 (DDL).
+
+## Delta v0.2 (2026-05-05) — 5 bloqueantes adicionales (afectan DDL/modelo core, no aplazables)
+
+Auditoría profunda post-Delta v0.1 detectó **5 issues que cambian schema o modelo core**. Si se agregan después de Slice 1, son expand-contract caros. **Deben incorporarse al Slice 1 antes de la migration.**
+
+### B1 — Rate limiting + coalescing per recipient × event_type
+
+**Riesgo no tratado**: bug en Finance (loop accidental) emite 10K events del mismo `event_type` para el mismo approver → 40K notificaciones (4 canales × 10K). Catastrofe reputacional + costo.
+
+**Fix DDL**:
+
+```sql
+-- Agregar a notification_intents (Slice 1):
+coalesce_window_minutes INT NOT NULL DEFAULT 5,
+coalesced_count INT NOT NULL DEFAULT 1,
+coalesced_into UUID REFERENCES greenhouse_core.notification_intents(intent_id) ON DELETE SET NULL,
+
+-- Index para detección de coalescing window:
+CREATE INDEX notification_intents_coalesce_idx
+  ON greenhouse_core.notification_intents (recipient_member_id, event_type, created_at DESC)
+  WHERE coalesced_into IS NULL;
+
+-- Rate limit table:
+CREATE TABLE greenhouse_core.notification_rate_limits (
+  rate_limit_id        UUID PRIMARY KEY,
+  recipient_member_id  TEXT NOT NULL,
+  event_type           TEXT NOT NULL,
+  window_start         TIMESTAMPTZ NOT NULL,
+  window_end           TIMESTAMPTZ NOT NULL,
+  intent_count         INT NOT NULL DEFAULT 0,
+  max_per_window       INT NOT NULL DEFAULT 100,
+  CHECK (window_end > window_start),
+  UNIQUE (recipient_member_id, event_type, window_start)
+);
+```
+
+**Helper canónico**: `recordIntent` invoca `checkRateLimit(memberId, eventType)` antes del INSERT. Si `intent_count >= max_per_window`, el helper:
+1. Coalesce: si existe intent en ventana < `coalesce_window_minutes` con mismo `(recipient, event_type)`, hace UPDATE `coalesced_count += 1` en lugar de INSERT nuevo.
+2. Drop: si supera `max_per_window` (default 100/24h), persiste audit row con `dropped_reason='rate_limited'` y NO dispatcha.
+
+**Override**: capability `platform.notifications.hub.bypass_rate_limit` para bulk legítimo (ej. payroll period close). Audit log de cada bypass.
+
+**Reliability signal nueva**: `notifications.hub.rate_limit_exceeded` (kind=drift, severity=warning si > 0/24h, error si > 100/24h).
+
+### B2 — Cascade behavior + offboarded members
+
+**Riesgo no tratado**: member offboarded queda con intents `pending` que dispatchan a un usuario que ya no existe. Audit log apunta a member borrado. `acknowledgeIntent` falla con FK violation.
+
+**Fix DDL** explícito:
+
+```sql
+ALTER TABLE greenhouse_core.notification_intents
+  ADD COLUMN recipient_member_id TEXT NOT NULL REFERENCES greenhouse_core.members(member_id) ON DELETE NO ACTION,
+  ADD COLUMN actor_user_id TEXT REFERENCES greenhouse_core.client_users(user_id) ON DELETE SET NULL,
+  ADD COLUMN cancelled_reason TEXT,
+  ADD COLUMN cancelled_at TIMESTAMPTZ;
+```
+
+`ON DELETE NO ACTION` para `recipient_member_id` (audit trail preserved — no se borran intents al borrar member). `ON DELETE SET NULL` para `actor_user_id` (preserve audit even if actor offboarded — patrón TASK-760/761/762).
+
+**Helper canónico nuevo** en `src/lib/notifications/hub/lifecycle.ts`:
+
+```ts
+cancelPendingIntentsForMember(memberId: string, reason: string, actorUserId: string): {
+  cancelled: number;
+  intentsAffected: string[];
+}
+```
+
+Invocado desde el offboarding flow (TASK-760 case → integration point en TASK-695 follow-up). Marca status='cancelled' + cancelled_reason + cancelled_at + emite outbox event `service.engagement.notification_intents_cancelled` v1.
+
+**Reliability signal nueva**: `notifications.hub.orphan_intents` detecta intents `status='pending'` apuntando a members con `lifecycle_stage='offboarded'`. Steady=0.
+
+### B3 — `correlation_id` semántica explícita + helper canónico
+
+**Riesgo no tratado**: `dedup_key = sha256(eventType + recipientMemberId + correlationId)`. Si `correlation_id` shape varía entre emisores (UUID random vs trace_id vs aggregate_id), dedup es impredecible. Mismo evento puede dedupearse o no según quién lo emite.
+
+**Fix de definición**:
+
+```ts
+// src/lib/notifications/hub/correlation.ts (NUEVO)
+type CorrelationContext = {
+  aggregateType: string;     // 'expense', 'payroll_period', 'engagement', 'task', etc.
+  aggregateId: string;       // UUID/PK del agregado
+  eventTime?: Date;          // default NOW(), bucket a hora completa para coalescing
+  bucket?: 'minute'|'hour'|'day'; // default 'hour'
+}
+
+buildCorrelationId(ctx: CorrelationContext): string
+// Returns: `${aggregateType}:${aggregateId}:${bucketed_iso_timestamp}`
+// Example: "expense:abc-123:2026-05-05T10:00:00Z"
+```
+
+**Reglas duras agregadas a §10 de spec**:
+
+- NUNCA usar `correlation_id` como UUID random (rompe deduplicación natural).
+- NUNCA omitir `aggregateType` (collision risk: `aggregate_id` puede repetirse cross-types).
+- Default bucket = 'hour' — 2 emisiones del mismo aggregate dentro de la misma hora se deduplican.
+- Override bucket = 'minute' para events high-frequency (ej. `delivery.daily_pulse.materialized` puede llegar 24x/día).
+
+**Test canónico**: 2 emisiones del mismo `(aggregateType, aggregateId, eventTime within bucket)` produce el mismo `correlation_id` → mismo `dedup_key` → ON CONFLICT DO NOTHING bloquea duplicado.
+
+### B4 — Critical severity whitelist (anti-abuse)
+
+**Riesgo no tratado**: cualquier emisor que ponga `severity: 'critical'` bypassa quiet hours del user. Sin gate, nuevo dominio mañana puede declarar critical arbitraria → spam crítico que rompe la confianza del subsystem.
+
+**Fix de modelo**: declaración canónica en `notification-kind-defaults.ts` de qué events **pueden** ser `severity='critical'`:
+
+```ts
+// src/lib/notifications/hub/critical-allowlist.ts (NUEVO)
+export const CRITICAL_SEVERITY_ALLOWLIST: Set<string> = new Set([
+  'ops.error.unhandled',                      // si severity-derived es critical
+  'finance.payment.failed_at_settlement',     // pagos no procesados (TASK-765 family)
+  'identity.auth.security_breach',            // auth attack patterns
+  'platform.health.subsystem_critical',       // platform health alerts
+  // Lista cerrada — agregar requiere review arquitectónico explícito
+]);
+```
+
+**Helper canónico**: `recordIntent` valida `severity === 'critical' → CRITICAL_SEVERITY_ALLOWLIST.has(eventType)`. Si fail → audit log + `severity` se downgrade a `warning` automáticamente + reliability signal emite.
+
+**Reliability signal nueva**: `notifications.hub.unauthorized_critical_attempted` (kind=drift, severity=error if count>0). Cualquier intento bloqueado indica abuse o bug.
+
+**Lint rule** (V1.5 follow-up): `greenhouse/no-critical-severity-without-allowlist` que detecta literal `'critical'` en código fuera del allowlist.
+
+### B5 — GDPR retention + pseudonymization (Open Q4 resuelto V1)
+
+**Riesgo no tratado**: `payload_json` contiene PII (member name, expense amounts, internal contracts). Sin retention policy declarada V1, viola GDPR Art. 5 (storage limitation) + Ley 21.719 Chile.
+
+**Fix de DDL + procesos**:
+
+```sql
+-- notification_intents:
+ALTER TABLE greenhouse_core.notification_intents
+  ADD COLUMN payload_redacted_at TIMESTAMPTZ,    -- timestamp del scrubbing
+  ADD COLUMN archive_eligible_at TIMESTAMPTZ NOT NULL
+    DEFAULT (NOW() + INTERVAL '90 days');         -- retention 90d hard
+
+-- Index para scheduled archival:
+CREATE INDEX notification_intents_archive_idx
+  ON greenhouse_core.notification_intents (archive_eligible_at)
+  WHERE payload_redacted_at IS NULL;
+```
+
+**Procesos canónicos**:
+
+1. **Persistencia**: `recordIntent` aplica `redactSensitive(payload_json)` ANTES del INSERT. Solo strip de PII patterns (emails, phones, RUTs, nombres completos) — preserva semántica para audit.
+
+2. **Pseudonymization en lugar de delete** (right-to-be-forgotten compliant):
+
+```ts
+// src/lib/notifications/hub/pseudonymize.ts (NUEVO)
+pseudonymizeIntentsForMember(memberId: string, reason: string): {
+  pseudonymized: number;
+  hashedRecipient: string; // sha256(memberId + tenant_pepper) — irreversible mapping
+}
+```
+
+   - Reemplaza `recipient_member_id` con hash determinístico.
+   - Reemplaza `payload_json` con `{ "_pseudonymized": true, "original_event_type": "..." }`.
+   - **NO borra** la fila — preserva audit trail. Solo PII se va.
+   - Patrón canónico TASK-784 (person legal profile reveal) aplicado al Hub.
+
+3. **Cron de archival**: `ops-notifications-hub-archival` Cloud Scheduler job (daily) que:
+   - SELECT intents `archive_eligible_at < NOW()` AND `payload_redacted_at IS NULL`.
+   - Export a BigQuery `greenhouse_archive.notification_intents_archived`.
+   - UPDATE Postgres con `payload_redacted_at = NOW()` + `payload_json = NULL`.
+   - Outbox event `service.engagement.notification_intents_archived` v1 con count.
+
+**Reliability signal nueva**: `notifications.hub.gdpr_retention_overdue` detecta rows con `archive_eligible_at < NOW() - INTERVAL '7 days'` AND `payload_redacted_at IS NULL`. Steady=0. > 0 = compliance gap.
+
+### Score 4-pilar post-Delta v0.2 (estimado)
+
+- v0.1 (Delta): 8.5/10.
+- v0.2 (Delta + 5 bloqueantes): **9.0/10** estimado.
+
+Mejoras: rate limiting impide catastrofes (+Safety, +Resilience), cascade explícito (+Robustness), correlation_id determinístico (+Robustness), critical whitelist (+Safety), GDPR compliance V1 (+Safety, +Resilience).
+
+### Nuevas dependencias en Slice 1 (Delta v0.2)
+
+Slice 1 expande para incluir las 5 nuevas tablas/columns + 1 nueva tabla (`notification_rate_limits`) + 1 nueva capability (`platform.notifications.hub.bypass_rate_limit`) + 4 nuevos helpers TS (`buildCorrelationId`, `cancelPendingIntentsForMember`, `pseudonymizeIntentsForMember`, `checkRateLimit`).
 
 ## Summary
 

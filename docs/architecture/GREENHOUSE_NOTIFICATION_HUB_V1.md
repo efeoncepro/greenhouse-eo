@@ -405,6 +405,88 @@ Para mentions de **terceros** dentro del card (ej. "asignado a <at>otro miembro<
 - TASK-690: extender la interfaz `NotificationTemplate.variants.teams_*` para devolver `TeamsTemplateOutput` (no solo card). Adapter teams-channel/teams-dm parsea el output y construye el activity. Tests: validar `entities[].mentioned.id` empieza con `29:`, `text` matches `<at>` tag exactly, mismatch surface as warning.
 - TASK-693: implementar `mentionedMemberIds` en los 6 event types prioritarios + UI preferences gain `disable_channel_wide_mentions` per channel.
 
+## 11.5. Open Questions V2+ (declaradas tras auditoría arch-architect 2026-05-05)
+
+5 issues identificados que NO bloquean V1 ni V1.5 (TASK-694) pero deben resolverse antes de V2 al escalar el Hub. Declarados explícitamente para evitar que se escondan como deuda técnica silenciosa.
+
+### Open Q V2-1 — Email bounce handling y SPF/DKIM/DMARC alignment
+
+V1 wrappea `sendEmail` sin tratar bounces ni hard delivery failures explícitamente. Riesgos no resueltos:
+
+- **Bounces**: email rebotó (address inválido, mailbox full). ¿Se persiste en `notification_deliveries.adapter_status='bounced'`? ¿Auto-retry?
+- **Spam marking** del provider del recipient (Outlook/Gmail/etc.) no es observable hoy.
+- **SPF/DKIM/DMARC alignment**: ¿los emails del Hub pasan por el mismo dominio de envío que `sendEmail` actual? Mal alignment = silenciosamente droppeados.
+
+**Propuesta V2**:
+
+- Mapping `provider.bounce_event` → `adapter_status='bounced'` con `error_code` específico.
+- Auto-suspension de email channel para users con > 3 bounces consecutivos (cambio a Teams/in-app fallback automático).
+- Reliability signal `notifications.hub.email_bounce_rate` (warning si > 5% trailing 7d).
+- Doc explícito SPF/DKIM/DMARC setup heredado del transport.
+
+**Trigger para V2**: cuando email volume > 1000/día o cuando primer incidente real de bounces silenciosos surja.
+
+### Open Q V2-2 — Throughput limits del transport Teams
+
+Bot Framework Connector tiene rate limits oficiales de Microsoft (~1800 req/min per bot). Si el Hub bursts más (ej. payroll period close emite 200 notifications en 30s), Microsoft empieza a 429.
+
+**Propuesta V2**:
+
+- Token bucket interno en `teams-channel.ts` y `teams-dm.ts` con cap < limit Microsoft.
+- Reliability signal `notifications.hub.teams_rate_limit_hit` (steady=0).
+- Documentar el rate limit upstream en spec §6.
+- Considerar batch mode si Microsoft expone API de bulk (verificar docs Bot Framework).
+
+**Trigger para V2**: cuando 1er 429 real de Teams se observe en `notification_deliveries.adapter_response_json`, o cuando volume estimado > 500 Teams DMs/min.
+
+### Open Q V2-3 — Template versioning explícito
+
+Hoy si cambia el copy de un template, los users que ya recibieron el viejo y los nuevos ven copy distinto. Sin tracking, no hay reproducibilidad ni rollback de templates.
+
+**Propuesta V2**:
+
+- `notification_intents.template_version` (string) persiste qué versión se usó al dispatch.
+- Templates declarados con `version: 1`, `version: 2`, etc.
+- Helper `resolveTemplate(eventType, version?)` con default a la última versión + override per-test.
+- Reliability signal `notifications.hub.template_version_drift` (detecta cuando dispatches activos usan template_versions distintas para el mismo event_type — indica rollout incompleto).
+
+**Trigger para V2**: cuando primera revisión real de copy ocurra y operadores quieran rollback automático.
+
+### Open Q V2-4 — i18n / multi-language support
+
+Hoy users de Greenhouse son chilenos (es-CL). Pero los Globe clients (Sky, etc.) son multinacionales — mañana un cliente Globe alemán recibe notificaciones en español por default.
+
+**Propuesta V2**:
+
+- Per-template `variants[locale]` en lugar de variant único (`variants.in_app['es-CL']`, `variants.in_app['en-US']`).
+- `members.preferred_locale` columna (si no existe) o `notification_preferences.locale`.
+- Default fallback: locale del template → `es-CL` → `en-US`.
+- Considerar i18n library (`next-intl`, `react-intl`, `i18next`) — alineación con el resto del portal.
+
+**Trigger para V2**: cuando primer cliente Globe non-Spanish-speaking sea onboarded como tenant del portal (no solo del bridge HubSpot).
+
+### Open Q V2-5 — Action.Submit security nivel 2 (anti-replay + JWT validation explícito)
+
+V1 valida `recipient_member_id = principal.memberId` (anti-spoofing básico). Pero gaps no resueltos:
+
+- ¿Validación explícita de JWT signature + expiry en `handlers/notification-mark-read.ts`? V1 lo asume del Bot Framework SDK.
+- **Replay attacks**: un Action.Submit puede ser capturado por proxy y re-enviado. Hoy no hay nonce.
+- **Rate limit per (memberId, action_type)** para prevenir replay storms (mismo user clickeando 100x "approve" — bug o ataque).
+- Pentest mínimo del flow Action.Submit nunca se ejecutó.
+
+**Propuesta V2**:
+
+- Validación explícita JWT signature + expiry con assertion + audit log si fail.
+- Nonce + timestamp en cada Action.Submit (idempotency key derivada — replay ataca un nonce ya consumido).
+- Rate limit `platform.notifications.hub.action_submit` per (memberId, action_type) con backoff.
+- Test de seguridad explícito en backlog separado (TASK-696 candidate).
+
+**Trigger para V2**: cuando primer pentest formal se programe, o cuando un Action.Submit muta state crítico ($ amounts, role grants, etc.).
+
+### Cómo se actualiza esta sección
+
+Cada Open Q se mueve a "Resuelto" con TASK-### asignada cuando el trigger condition se materialice. NO se borran históricamente — si una Q se descarta (ej. multi-language deferral indefinido), se marca `STATUS: deferido por <razón>` con fecha y autor. Audit trail de decisiones.
+
 ## 12. Referencias
 
 - Código (Fase 1, a crear en TASK-690):

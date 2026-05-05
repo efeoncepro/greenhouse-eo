@@ -11,11 +11,59 @@
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
-- Status real: `Diseno`
+- Status real: `Diseno (Delta v0.1 aplicado tras auditoría arch-architect 2026-05-05)`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `TASK-692` (cutover con projection canónica activa)
 - Branch: `task/TASK-693-notification-hub-bidirectional-ui`
+
+## Delta v0.1 (2026-05-05) — pre-flight corrections post-auditoría arch-architect
+
+Hereda Deltas de TASK-690/691/692. Adicionalmente para bidireccional + UI + mentions:
+
+### S13 — Resolver namespace collision de `notification_preferences`
+
+Heredado de TASK-690 D6 (S4): la tabla legacy `greenhouse_notifications.notification_preferences` (TASK-128 era) ya existe con shape `(preference_id, user_id, category, email_enabled, in_app_enabled, muted_until, updated_at)`. La nueva del Hub (Delta TASK-690 recomienda renombrar a `greenhouse_core.notification_hub_preferences`) tiene shape distinta (per channel + quiet hours + min_severity).
+
+**Fix UI**: el wizard `/settings/notifications` lee/escribe `greenhouse_core.notification_hub_preferences` (nueva, canónica). Migration path para migrar legacy preferences: helper `migrateLegacyPreferencesToHub(userId)` opcional, ejecutable per-user al primer save desde el wizard nuevo. Sin esto, los users con preferences viejas pierden config al cambiar a UI nueva.
+
+### S14 — `aadObjectId` rotation handling (Open Q nuevo)
+
+Microsoft Entra Object IDs **pueden rotar** raramente (re-creación del usuario, soft-delete + restore, tenant migration). El adapter `teams-channel.ts` / `teams-dm.ts` dropea silenciosamente cuando mention no es miembro. **Riesgo no tratado**: si rotation real ocurre, los mentions quedan apuntando a IDs viejos sin reconciliation.
+
+**Fix V1**: declarar reliability signal `notifications.hub.stale_member_aadid` (kind=`drift`, severity=`warning` si > 0). Reader query:
+
+```sql
+SELECT m.member_id, m.azure_oid AS persisted_aadid, ...
+FROM greenhouse_core.members m
+JOIN greenhouse_commercial.engagement_audit_log eal
+  ON eal.payload_json->>'recipientMemberId' = m.member_id
+WHERE eal.event_kind = 'progress_snapshot_recorded'
+  AND eal.payload_json->>'mention_dropped_not_in_team' = 'true'
+  AND eal.occurred_at > NOW() - INTERVAL '7 days';
+```
+
+Si emite warning, runbook manual: re-fetch ObjectID via Graph API + update `members.azure_oid`. **Fix V2**: reconciliation cron automático (out of scope V1, declarar Open Q).
+
+### S15 — Action.Submit handler `finance.expense.approve` necesita capability check
+
+Acceptance criteria dice "actualiza `expense.status='approved'` + intent". **Falta**: el handler debe validar que `principal.userId` tiene capability `finance.expense.approve` ANTES de mutar. Sin esto, cualquier user con acceso al chat de Teams puede aprobar expenses ajenos. **Fix**: declarar en acceptance criteria explícito: handler invoca `assertCapability(principal, 'finance.expense.approve')` antes del UPDATE. Si fail → audit log + reject card update.
+
+### S16 — Test E2E mentions con membership real
+
+Smoke real en staging "emitir un `finance.expense.approval_pending` que mencione al approver real" debe verificar **3 escenarios**:
+1. Approver es miembro del team → mention OK + push notification recibido.
+2. Approver NO es miembro del team → mention dropped silenciosamente + log `mention_dropped_not_in_team` + delivery sigue success.
+3. `aadObjectId` stale (simulado) → mention dropped + reliability signal `stale_member_aadid` emite.
+
+Sin los 3 escenarios, el test E2E no cubre el path real de Microsoft Teams.
+
+### Score 4-pilar post-Delta v0.1 (estimado)
+
+- v0.0 (original): 7.625/10 (Safety 8, Robustness 7.5, Resilience 7.5, Scalability 7.5).
+- v0.1 (post-Delta): **8.5/10** estimado (Safety 9, Robustness 8.5, Resilience 8.5, Scalability 8).
+
+Mejoras: capability check anti-spoofing en handler (+Safety), `aadObjectId` rotation con signal (+Resilience), namespace collision resuelta (+Robustness), test E2E cubre 3 escenarios reales (+Robustness).
 
 ## Summary
 

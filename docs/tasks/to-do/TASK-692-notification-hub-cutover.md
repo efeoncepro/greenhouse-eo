@@ -11,11 +11,42 @@
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
-- Status real: `Diseno`
+- Status real: `Diseno (Delta v0.1 aplicado tras auditoría arch-architect 2026-05-05)`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `TASK-691` (sombra validada con 7 días de parity sin discrepancias)
 - Branch: `task/TASK-692-notification-hub-cutover`
+
+## Delta v0.1 (2026-05-05) — pre-flight corrections post-auditoría arch-architect
+
+Hereda Deltas de TASK-690 + TASK-691. Adicionalmente para cutover:
+
+### S10 — `notifications-v2.ts` naming
+
+La task referencia `src/lib/sync/projections/notifications-v2.ts` como rewrite de `notifications.ts`. **Riesgo**: `-v2` suffix es vocabulary debt — cuando llegue v3, ¿lo llamamos `-v3`? **Fix recomendado**: renombrar a `notifications-hub.ts` (semántico, no versionado). Plan migration: `notifications.ts` (legacy) coexiste con `notifications-hub.ts` (canónico) hasta TASK-693 closeout, después se borra el legacy.
+
+### S11 — Lint rule custom para enforcement
+
+Acceptance dice "Lint rule custom o documentación reforzada". Documentación reforzada NO es enforcement. **Fix**: priorizar lint rule custom (patrón TASK-768 `greenhouse/no-untokenized-expense-type-for-analytics` precedent) en lugar de relegarlo a "documentación reforzada":
+
+```js
+// eslint-plugins/greenhouse/rules/no-direct-notification-write.mjs
+// Bloquea: INSERT INTO greenhouse_core.notifications, postTeamsCard()
+// Allowed override: src/lib/notifications/hub/adapters/**
+```
+
+Modo `error` desde V1. Override block en `eslint.config.mjs` exime los adapters canónicos.
+
+### S12 — Smoke E2E del cutover en Playwright + agent auth
+
+Acceptance dice "Smoke real en staging: dispara un evento de cada dominio". **Fix**: especificar Playwright + Chromium + agent auth (patrón TASK-773 finance E2E gate). Smoke spec vive en `tests/e2e/smoke/notification-hub-cutover.spec.ts` con 5 cases (1 por dominio) que verifican delivery por TODOS los canales esperados según defaults.
+
+### Score 4-pilar post-Delta v0.1 (estimado)
+
+- v0.0 (original): 8.375/10 (Safety 9, Robustness 8.5, Resilience 8.5, Scalability 7.5).
+- v0.1 (post-Delta): **8.875/10** estimado (Safety 9, Robustness 8.5, Resilience 9, Scalability 9).
+
+Mejoras: lint rule mecánica (+Robustness), smoke E2E canónico (+Resilience), naming sin versionado (+Scalability long-term).
 
 ## Summary
 
