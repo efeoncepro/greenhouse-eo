@@ -1,5 +1,15 @@
 # Handoff.md
 
+## Sesion 2026-05-05 — Talent Review API access aligned with admin surface
+
+- **Branch:** `develop`; se prepara commit/push.
+- **Trigger:** `/admin/talent-review` cargaba en staging/develop pero en production mostraba "No pudimos cargar la cola de revision" para el mismo usuario superadministrador.
+- **Diagnostico:** el query de Talent Review contra Cloud SQL funciona con `greenhouse_app` y devuelve datos (`verified=21`). El codigo del reader no cambio entre production `aa06ca5` y develop `adfe568a`. La diferencia visible esta en el snapshot de sesion/menu: la pagina se muestra por `authorizedViews` (`administracion.equipo`), pero el endpoint `/api/hr/core/talent-review` usaba `requireHrTenantContext`, que exige `routeGroup='hr'` o rol superadmin en el JWT. Si production tiene un JWT/snapshot mas viejo o parcial, la pagina puede verse pero la API queda fuera de contrato.
+- **Fix:** nuevo `requireTalentReviewTenantContext()` en `src/lib/tenant/authorization.ts`, alineado con la surface del sidebar: acepta `authorizedViews=['administracion.equipo']` con fallback a `hr`, `admin` o `EFEONCE_ADMIN`. `/api/hr/core/talent-review` usa ese guard especifico.
+- **Guardrail:** `authorization.test.ts` cubre que la API de Talent Review permite el mismo view code que la sidebar y rechaza usuarios sin view/fallback.
+- **Validacion:** `pnpm exec vitest run src/lib/tenant/authorization.test.ts --reporter=verbose` OK; `pnpm exec eslint src/lib/tenant/authorization.ts src/lib/tenant/authorization.test.ts src/app/api/hr/core/talent-review/route.ts` OK; `pnpm exec tsc --noEmit --pretty false` OK.
+- **Pendiente operativo:** tras deploy a staging, promover a production para corregir `greenhouse.efeoncepro.com`. Si el navegador productivo mantiene JWT viejo, cerrar sesion/volver a entrar refresca el snapshot, pero el guard queda robustecido para que la API y la pagina no vuelvan a divergir.
+
 ## Sesion 2026-05-05 — Finiquito PDF contract regression + reemision auditada
 
 - **Branch:** workspace actual sobre `develop`; no se hizo commit ni push.

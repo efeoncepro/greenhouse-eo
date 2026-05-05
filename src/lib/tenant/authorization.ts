@@ -350,6 +350,35 @@ export const requireHrTenantContext = async () => {
   }
 }
 
+export const requireTalentReviewTenantContext = async () => {
+  const { tenant, unauthorizedResponse } = await requireTenantContext()
+
+  if (!tenant) {
+    return {
+      tenant: null,
+      errorResponse: unauthorizedResponse
+    }
+  }
+
+  const hasAccess = hasAuthorizedViewCode({
+    tenant,
+    viewCode: 'administracion.equipo',
+    fallback: hasRouteGroup(tenant, 'hr') || hasRouteGroup(tenant, 'admin') || hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)
+  })
+
+  if (!hasAccess) {
+    return {
+      tenant: null,
+      errorResponse: NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+  }
+
+  return {
+    tenant,
+    errorResponse: null
+  }
+}
+
 export const requireEmployeeTenantContext = async () => {
   const { tenant, unauthorizedResponse } = await requireTenantContext()
 

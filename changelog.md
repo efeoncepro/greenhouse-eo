@@ -2,6 +2,8 @@
 
 ## 2026-05-05
 
+- **Talent Review alinea API y surface admin.** `/admin/talent-review` ya no depende solo del route group HR para cargar la cola: el endpoint `/api/hr/core/talent-review` usa el mismo contrato de visibilidad que el menú (`administracion.equipo`) con fallback a HR/Admin/superadmin. Esto evita que una página visible falle al cargar datos por drift de snapshot de sesión.
+
 - **Finiquito PDF alineado al mockup aprobado + reemisión auditable.** El generador formal de finiquitos deja de usar la plantilla minimalista previa y ahora renderiza el contrato aprobado: logo/entidad legal/RUT/domicilio, estado textual, documento/hash/snapshot, caja de líquido a pagar, partes, relación/causal/régimen, tabla auditable `Concepto / Tratamiento / Evidencia / Monto`, totales separados, declaración operativa, firmas y footer confidencial. El test del PDF ahora cubre esos landmarks y se corrigió el formateo de fechas `YYYY-MM-DD` para evitar drift por timezone.
   - **Reemisión segura:** `/hr/offboarding` expone `Reemitir` para documentos activos reemitibles. La acción exige razón auditable, supersede el documento anterior, conserva su asset privado histórico y genera una nueva versión/hash/asset sin mutar evidencia previa. Documentos `signed_or_ratified` no se reemiten.
   - **Clasificación robusta:** casos Chile dependiente interno como Valentina ya no dependen de `countryCode` para caer en `Finiquito laboral`; la UI usa lane, payroll interno, régimen Chile y tipo de contrato.

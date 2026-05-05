@@ -11,7 +11,11 @@ vi.mock('@/lib/reporting-hierarchy/access', () => ({
   getSupervisorScopeForTenant: (...args: unknown[]) => mockGetSupervisorScopeForTenant(...args)
 }))
 
-import { requirePeopleTenantContext, resolveHrOrgChartAccessContext } from '@/lib/tenant/authorization'
+import {
+  requirePeopleTenantContext,
+  requireTalentReviewTenantContext,
+  resolveHrOrgChartAccessContext
+} from '@/lib/tenant/authorization'
 
 describe('requirePeopleTenantContext', () => {
   beforeEach(() => {
@@ -197,5 +201,67 @@ describe('resolveHrOrgChartAccessContext', () => {
       supervisorScope: null
     })
     expect(mockGetSupervisorScopeForTenant).not.toHaveBeenCalled()
+  })
+})
+
+describe('requireTalentReviewTenantContext', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('allows the admin talent review API when the tenant has the same view used by the sidebar', async () => {
+    mockGetTenantContext.mockResolvedValue({
+      userId: 'user-admin-team',
+      clientId: 'efeonce',
+      clientName: 'Efeonce',
+      tenantType: 'efeonce_internal',
+      roleCodes: ['operations_admin'],
+      primaryRoleCode: 'operations_admin',
+      routeGroups: ['admin'],
+      authorizedViews: ['administracion.equipo'],
+      projectScopes: [],
+      campaignScopes: [],
+      businessLines: [],
+      serviceModules: [],
+      role: 'Operations Admin',
+      projectIds: [],
+      featureFlags: [],
+      timezone: 'America/Santiago',
+      portalHomePath: '/admin',
+      authMode: 'sso'
+    })
+
+    const result = await requireTalentReviewTenantContext()
+
+    expect(result.tenant?.userId).toBe('user-admin-team')
+    expect(result.errorResponse).toBeNull()
+  })
+
+  it('rejects the admin talent review API when neither the admin team view nor fallback access is present', async () => {
+    mockGetTenantContext.mockResolvedValue({
+      userId: 'user-no-team-view',
+      clientId: 'efeonce',
+      clientName: 'Efeonce',
+      tenantType: 'efeonce_internal',
+      roleCodes: ['finance_analyst'],
+      primaryRoleCode: 'finance_analyst',
+      routeGroups: ['finance'],
+      authorizedViews: ['finanzas.resumen'],
+      projectScopes: [],
+      campaignScopes: [],
+      businessLines: [],
+      serviceModules: [],
+      role: 'Finance Analyst',
+      projectIds: [],
+      featureFlags: [],
+      timezone: 'America/Santiago',
+      portalHomePath: '/finance',
+      authMode: 'sso'
+    })
+
+    const result = await requireTalentReviewTenantContext()
+
+    expect(result.tenant).toBeNull()
+    expect(result.errorResponse?.status).toBe(403)
   })
 })

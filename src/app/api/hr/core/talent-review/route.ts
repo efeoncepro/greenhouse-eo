@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 
-import { requireHrTenantContext } from '@/lib/tenant/authorization'
+import { requireTalentReviewTenantContext } from '@/lib/tenant/authorization'
 import {
   getTalentReviewQueue,
   getTalentReviewSummary
@@ -14,7 +14,7 @@ const VALID_ITEM_TYPES = ['skill', 'certification', 'tool'] as const
 const VALID_EXPIRY_FILTERS = ['expiring_soon', 'expired'] as const
 
 export async function GET(request: Request) {
-  const { tenant, errorResponse } = await requireHrTenantContext()
+  const { tenant, errorResponse } = await requireTalentReviewTenantContext()
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
