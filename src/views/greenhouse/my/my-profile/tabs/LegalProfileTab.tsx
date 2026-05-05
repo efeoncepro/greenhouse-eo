@@ -5,118 +5,49 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
-import Card from '@mui/material/Card'
-import CardContent from '@mui/material/CardContent'
-import Chip from '@mui/material/Chip'
-import Divider from '@mui/material/Divider'
-import FormControl from '@mui/material/FormControl'
-import FormHelperText from '@mui/material/FormHelperText'
-import Grid from '@mui/material/Grid'
-import InputLabel from '@mui/material/InputLabel'
-import LinearProgress from '@mui/material/LinearProgress'
-import MenuItem from '@mui/material/MenuItem'
-import Select from '@mui/material/Select'
+import Skeleton from '@mui/material/Skeleton'
 import Stack from '@mui/material/Stack'
-import TextField from '@mui/material/TextField'
-import Typography from '@mui/material/Typography'
 
-interface DocumentMaskedDto {
-  documentId: string
-  countryCode: string
-  documentType: string
-  displayMask: string
-  verificationStatus: 'pending_review' | 'verified' | 'rejected' | 'archived' | 'expired'
-  source: string
-  declaredAt: string
-  rejectedReason: string | null
+import { toast } from 'sonner'
+
+import EmptyState from '@/components/greenhouse/EmptyState'
+
+import LegalProfileAddressForm from './legal-profile/LegalProfileAddressForm'
+import LegalProfileDocumentForm from './legal-profile/LegalProfileDocumentForm'
+import LegalProfileHero from './legal-profile/LegalProfileHero'
+import LegalProfileItem from './legal-profile/LegalProfileItem'
+import LegalProfileSection from './legal-profile/LegalProfileSection'
+import {
+  LEGAL_PROFILE_COPY,
+  formatRelativeDeclared,
+  formatVerifiedDate
+} from './legal-profile/copy'
+import { accentForStatus, type AddressDto, type DocumentDto, type LegalProfileResponseDto } from './legal-profile/types'
+
+type AddressKind = 'legal' | 'residence' | 'mailing' | 'emergency'
+
+const ADDRESS_KIND_ICONS: Record<AddressKind, string> = {
+  legal: 'tabler-home',
+  residence: 'tabler-bed',
+  mailing: 'tabler-mail',
+  emergency: 'tabler-heart-handshake'
 }
 
-interface AddressMaskedDto {
-  addressId: string
-  addressType: 'legal' | 'residence' | 'mailing' | 'emergency'
-  countryCode: string
-  presentationMask: string
-  city: string
-  region: string | null
-  verificationStatus: DocumentMaskedDto['verificationStatus']
-  source: string
-  declaredAt: string
-  rejectedReason: string | null
-}
-
-interface ReadinessResultDto {
-  ready: boolean
-  blockers: string[]
-  warnings: string[]
-}
-
-interface LegalProfileResponseDto {
-  profileId: string
-  documents: DocumentMaskedDto[]
-  addresses: AddressMaskedDto[]
-  readiness: {
-    payrollChileDependent: ReadinessResultDto
-    finalSettlementChile: ReadinessResultDto
-  }
-}
-
-const STATUS_LABELS: Record<DocumentMaskedDto['verificationStatus'], string> = {
-  pending_review: 'Pendiente de revision',
-  verified: 'Verificado',
-  rejected: 'Rechazado',
-  archived: 'Archivado',
-  expired: 'Vencido'
-}
-
-const STATUS_COLORS: Record<DocumentMaskedDto['verificationStatus'], 'default' | 'success' | 'warning' | 'error'> = {
-  pending_review: 'warning',
-  verified: 'success',
-  rejected: 'error',
-  archived: 'default',
-  expired: 'default'
-}
-
-const ADDRESS_TYPE_LABELS: Record<AddressMaskedDto['addressType'], string> = {
-  legal: 'Direccion legal',
-  residence: 'Residencia',
-  mailing: 'Correspondencia',
-  emergency: 'Contacto de emergencia'
-}
-
-const formatDeclared = (iso: string): string => {
-  try {
-    return new Date(iso).toLocaleDateString('es-CL', { day: 'numeric', month: 'short', year: 'numeric' })
-  } catch {
-    return iso
-  }
-}
-
-const documentTypeLabel = (type: string, country: string): string => {
-  if (type === 'CL_RUT') return 'RUT (Chile)'
-
-  return `${type.replace(/_/g, ' ')} (${country})`
-}
+const REQUIRED_ADDRESS_KINDS: AddressKind[] = ['legal']
 
 const LegalProfileTab = () => {
   const [data, setData] = useState<LegalProfileResponseDto | null>(null)
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [fetchError, setFetchError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
-  const [docCountry, setDocCountry] = useState('CL')
-  const [docType, setDocType] = useState('CL_RUT')
-  const [docValue, setDocValue] = useState('')
-
-  const [addrType, setAddrType] = useState<AddressMaskedDto['addressType']>('legal')
-  const [addrCountry, setAddrCountry] = useState('CL')
-  const [addrStreet, setAddrStreet] = useState('')
-  const [addrCity, setAddrCity] = useState('')
-  const [addrRegion, setAddrRegion] = useState('')
-  const [addrPostal, setAddrPostal] = useState('')
+  // expansion state per item id (or pseudo-id for empty add slots)
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({})
+  const [serverErrorById, setServerErrorById] = useState<Record<string, string | null>>({})
 
   const load = useCallback(async () => {
     setLoading(true)
-    setError(null)
+    setFetchError(null)
 
     try {
       const r = await fetch('/api/my/legal-profile', { cache: 'no-store' })
@@ -124,14 +55,12 @@ const LegalProfileTab = () => {
       if (!r.ok) {
         const body = await r.json().catch(() => ({}))
 
-        throw new Error(body?.error ?? 'Error al cargar tus datos legales')
+        throw new Error(body?.error ?? LEGAL_PROFILE_COPY.fetchError)
       }
 
-      const json = (await r.json()) as LegalProfileResponseDto
-
-      setData(json)
+      setData((await r.json()) as LegalProfileResponseDto)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error desconocido')
+      setFetchError(err instanceof Error ? err.message : LEGAL_PROFILE_COPY.fetchError)
     } finally {
       setLoading(false)
     }
@@ -141,370 +70,465 @@ const LegalProfileTab = () => {
     load()
   }, [load])
 
-  const handleDocumentSubmit = async () => {
-    if (!docValue.trim()) {
-      setError('Ingresa el numero de documento')
+  const documents = useMemo(() => data?.documents ?? [], [data])
+  const addresses = useMemo(() => data?.addresses ?? [], [data])
 
-      return
-    }
+  const addressByKind = useMemo(() => {
+    const map = new Map<AddressKind, AddressDto>()
 
-    setSubmitting(true)
-    setError(null)
+    for (const a of addresses) {
+      // Prefer verified over pending if multiple
+      const existing = map.get(a.addressType)
 
-    try {
-      const r = await fetch('/api/my/legal-profile', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({
-          kind: 'document',
-          countryCode: docCountry,
-          documentType: docType,
-          rawValue: docValue.trim()
-        })
-      })
-
-      if (!r.ok) {
-        const body = await r.json().catch(() => ({}))
-
-        throw new Error(body?.error ?? 'Error al guardar el documento')
+      if (
+        !existing ||
+        (existing.verificationStatus !== 'verified' && a.verificationStatus === 'verified')
+      ) {
+        map.set(a.addressType, a)
       }
-
-      setDocValue('')
-      await load()
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error desconocido')
-    } finally {
-      setSubmitting(false)
-    }
-  }
-
-  const handleAddressSubmit = async () => {
-    if (!addrStreet.trim() || !addrCity.trim()) {
-      setError('Calle y ciudad son requeridas')
-
-      return
     }
 
-    setSubmitting(true)
-    setError(null)
+    return map
+  }, [addresses])
 
-    try {
-      const r = await fetch('/api/my/legal-profile', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({
-          kind: 'address',
-          addressType: addrType,
-          countryCode: addrCountry,
-          streetLine1: addrStreet.trim(),
-          city: addrCity.trim(),
-          region: addrRegion.trim() || null,
-          postalCode: addrPostal.trim() || null
+  // Progress: 4 items canónicos
+  //   1. Documento principal (CL_RUT u otro primario)
+  //   2. Direccion legal
+  //   3. Direccion de residencia
+  //   4. Contacto de emergencia
+  const primaryDoc = documents[0]
+  const legalAddr = addressByKind.get('legal') ?? null
+  const residenceAddr = addressByKind.get('residence') ?? null
+  const emergencyAddr = addressByKind.get('emergency') ?? null
+
+  const slotStates: Array<'complete' | 'pending' | 'empty'> = [
+    primaryDoc?.verificationStatus === 'verified'
+      ? 'complete'
+      : primaryDoc?.verificationStatus === 'pending_review'
+        ? 'pending'
+        : 'empty',
+    legalAddr?.verificationStatus === 'verified'
+      ? 'complete'
+      : legalAddr?.verificationStatus === 'pending_review'
+        ? 'pending'
+        : 'empty',
+    residenceAddr?.verificationStatus === 'verified'
+      ? 'complete'
+      : residenceAddr?.verificationStatus === 'pending_review'
+        ? 'pending'
+        : 'empty',
+    emergencyAddr?.verificationStatus === 'verified'
+      ? 'complete'
+      : emergencyAddr?.verificationStatus === 'pending_review'
+        ? 'pending'
+        : 'empty'
+  ]
+
+  const completedCount = slotStates.filter(s => s === 'complete').length
+  const totalSlots = 4
+
+  const isEmptyFirstUse = documents.length === 0 && addresses.length === 0
+
+  const isAllVerified =
+    completedCount === totalSlots && slotStates.every(s => s === 'complete')
+
+  const heroVariant: 'default' | 'empty' | 'complete' = isAllVerified
+    ? 'complete'
+    : isEmptyFirstUse
+      ? 'empty'
+      : 'default'
+
+  const toggleExpanded = (id: string) =>
+    setExpanded(prev => ({ ...prev, [id]: !prev[id] }))
+
+  const closeExpanded = (id: string) =>
+    setExpanded(prev => ({ ...prev, [id]: false }))
+
+  // ── Submit handlers ──────────────────────────────────────────────
+
+  const submitDocument = useCallback(
+    async (
+      slotId: string,
+      input: { countryCode: string; documentType: string; rawValue: string }
+    ) => {
+      setSubmitting(true)
+      setServerErrorById(prev => ({ ...prev, [slotId]: null }))
+
+      try {
+        const r = await fetch('/api/my/legal-profile', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ kind: 'document', ...input })
         })
-      })
 
-      if (!r.ok) {
-        const body = await r.json().catch(() => ({}))
+        if (!r.ok) {
+          const body = await r.json().catch(() => ({}))
 
-        throw new Error(body?.error ?? 'Error al guardar la direccion')
+          throw new Error(body?.error ?? LEGAL_PROFILE_COPY.toasts.saveError)
+        }
+
+        toast.success(`${LEGAL_PROFILE_COPY.toasts.documentSaved} · ${LEGAL_PROFILE_COPY.toasts.documentSavedBody}`)
+        closeExpanded(slotId)
+        await load()
+      } catch (err) {
+        setServerErrorById(prev => ({
+          ...prev,
+          [slotId]: err instanceof Error ? err.message : LEGAL_PROFILE_COPY.toasts.saveError
+        }))
+      } finally {
+        setSubmitting(false)
       }
-
-      setAddrStreet('')
-      setAddrCity('')
-      setAddrRegion('')
-      setAddrPostal('')
-      await load()
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error desconocido')
-    } finally {
-      setSubmitting(false)
-    }
-  }
-
-  const blockerLabels = useMemo<Record<string, string>>(
-    () => ({
-      cl_rut_missing: 'Falta declarar tu RUT',
-      cl_rut_pending_review: 'Tu RUT esta pendiente de revision por HR',
-      cl_rut_rejected: 'Tu RUT fue rechazado — vuelve a declararlo',
-      cl_rut_archived_or_expired: 'Tu RUT esta archivado o vencido',
-      address_missing_legal: 'Falta tu direccion legal',
-      address_missing_residence: 'Falta tu direccion de residencia',
-      profile_missing: 'Tu perfil de identidad no esta vinculado',
-      document_missing: 'Falta declarar un documento',
-      document_pending_review: 'Tu documento esta pendiente de revision'
-    }),
-    []
+    },
+    [load]
   )
 
-  if (loading) return <LinearProgress />
+  const submitAddress = useCallback(
+    async (
+      slotId: string,
+      input: {
+        addressType: AddressKind
+        countryCode: string
+        streetLine1: string
+        city: string
+        region: string | null
+        postalCode: string | null
+      }
+    ) => {
+      setSubmitting(true)
+      setServerErrorById(prev => ({ ...prev, [slotId]: null }))
+
+      try {
+        const r = await fetch('/api/my/legal-profile', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ kind: 'address', ...input })
+        })
+
+        if (!r.ok) {
+          const body = await r.json().catch(() => ({}))
+
+          throw new Error(body?.error ?? LEGAL_PROFILE_COPY.toasts.saveError)
+        }
+
+        toast.success(`${LEGAL_PROFILE_COPY.toasts.addressSaved} · ${LEGAL_PROFILE_COPY.toasts.addressSavedBody}`)
+        closeExpanded(slotId)
+        await load()
+      } catch (err) {
+        setServerErrorById(prev => ({
+          ...prev,
+          [slotId]: err instanceof Error ? err.message : LEGAL_PROFILE_COPY.toasts.saveError
+        }))
+      } finally {
+        setSubmitting(false)
+      }
+    },
+    [load]
+  )
+
+  // ── Render helpers ───────────────────────────────────────────────
+
+  const renderDocumentItem = (doc: DocumentDto) => {
+    const accent = accentForStatus(doc.verificationStatus)
+    const slotId = `doc-${doc.documentId}`
+    const isExpanded = Boolean(expanded[slotId])
+    const isRejected = doc.verificationStatus === 'rejected'
+
+    // Auto-expand rejected by default first time
+    const effectiveExpanded = isExpanded || (isRejected && expanded[slotId] !== false)
+
+    const subtitleNode = (
+      <span>
+        <Box
+          component='span'
+          sx={{
+            fontVariantNumeric: 'tabular-nums',
+            letterSpacing: '0.04em',
+            fontWeight: 500,
+            color: 'text.primary'
+          }}
+        >
+          {doc.displayMask}
+        </Box>
+        <Box component='span' sx={{ color: 'text.secondary' }}>
+          {' · '}
+          {formatRelativeDeclared(doc.declaredAt)}
+        </Box>
+      </span>
+    )
+
+    const statusBlock =
+      doc.verificationStatus === 'pending_review' ? (
+        <>
+          <i className='tabler-eye-search' aria-hidden='true' style={{ fontSize: 18, color: 'inherit' }} />
+          <Box sx={{ flex: 1 }}>{LEGAL_PROFILE_COPY.statusBlock.pending_review}</Box>
+        </>
+      ) : doc.verificationStatus === 'verified' ? (
+        <>
+          <i className='tabler-shield-check' aria-hidden='true' style={{ fontSize: 18, color: 'inherit' }} />
+          <Box sx={{ flex: 1 }}>
+            {LEGAL_PROFILE_COPY.statusBlock.verified}
+            {doc.verifiedAt ? ` · ${formatVerifiedDate(doc.verifiedAt)}` : ''}
+          </Box>
+        </>
+      ) : isRejected && doc.rejectedReason ? (
+        <Alert severity='error' role='status' sx={{ flex: 1 }}>
+          <strong>{LEGAL_PROFILE_COPY.statusBlock.rejected_prefix}</strong> {doc.rejectedReason}
+        </Alert>
+      ) : null
+
+    const docTypeKey = doc.documentType
+    const docTitle = `${LEGAL_PROFILE_COPY.documentTypeLabels[docTypeKey] ?? docTypeKey} (${doc.countryCode})`
+
+    return (
+      <LegalProfileItem
+        key={doc.documentId}
+        iconClassName={doc.documentType === 'CL_RUT' ? 'tabler-id' : 'tabler-id-badge-2'}
+        title={docTitle}
+        subtitle={subtitleNode}
+        accent={accent}
+        status={doc.verificationStatus}
+        expanded={effectiveExpanded}
+        onToggle={() => toggleExpanded(slotId)}
+        statusBlock={statusBlock}
+        form={
+          <LegalProfileDocumentForm
+            initialCountry={doc.countryCode}
+            initialType={doc.documentType}
+            submitting={submitting}
+            serverError={serverErrorById[slotId] ?? null}
+            onSubmit={input => submitDocument(slotId, input)}
+            onCancel={() => closeExpanded(slotId)}
+          />
+        }
+      />
+    )
+  }
+
+  const renderAddressItem = (addr: AddressDto) => {
+    const accent = accentForStatus(addr.verificationStatus)
+    const slotId = `addr-${addr.addressId}`
+    const isExpanded = Boolean(expanded[slotId])
+    const isRejected = addr.verificationStatus === 'rejected'
+
+    const subtitleNode = (
+      <Box component='span' sx={{ color: 'text.secondary' }}>
+        {addr.presentationMask}
+      </Box>
+    )
+
+    const statusBlock =
+      addr.verificationStatus === 'pending_review' ? (
+        <>
+          <i className='tabler-eye-search' aria-hidden='true' style={{ fontSize: 18, color: 'inherit' }} />
+          <Box sx={{ flex: 1 }}>{LEGAL_PROFILE_COPY.statusBlock.pending_review_address}</Box>
+        </>
+      ) : addr.verificationStatus === 'verified' ? (
+        <>
+          <i className='tabler-shield-check' aria-hidden='true' style={{ fontSize: 18, color: 'inherit' }} />
+          <Box sx={{ flex: 1 }}>
+            {LEGAL_PROFILE_COPY.statusBlock.verified_address}
+            {addr.verifiedAt ? ` · ${formatVerifiedDate(addr.verifiedAt)}` : ''}
+          </Box>
+        </>
+      ) : isRejected && addr.rejectedReason ? (
+        <Alert severity='error' role='status' sx={{ flex: 1 }}>
+          <strong>{LEGAL_PROFILE_COPY.statusBlock.rejected_prefix}</strong> {addr.rejectedReason}
+        </Alert>
+      ) : null
+
+    return (
+      <LegalProfileItem
+        key={addr.addressId}
+        iconClassName={ADDRESS_KIND_ICONS[addr.addressType]}
+        title={LEGAL_PROFILE_COPY.addressTypeLabels[addr.addressType]}
+        subtitle={subtitleNode}
+        accent={accent}
+        status={addr.verificationStatus}
+        expanded={isExpanded || isRejected}
+        onToggle={() => toggleExpanded(slotId)}
+        statusBlock={statusBlock}
+        form={
+          <LegalProfileAddressForm
+            fixedAddressType={addr.addressType}
+            initialCountry={addr.countryCode}
+            submitting={submitting}
+            serverError={serverErrorById[slotId] ?? null}
+            onSubmit={input => submitAddress(slotId, input)}
+            onCancel={() => closeExpanded(slotId)}
+          />
+        }
+      />
+    )
+  }
+
+  const renderEmptyAddressSlot = (kind: AddressKind) => {
+    const slotId = `addr-empty-${kind}`
+    const isExpanded = Boolean(expanded[slotId])
+    const isRequired = REQUIRED_ADDRESS_KINDS.includes(kind)
+    const title = LEGAL_PROFILE_COPY.addressTypeLabels[kind]
+
+    return (
+      <LegalProfileItem
+        key={slotId}
+        iconClassName={isRequired ? ADDRESS_KIND_ICONS[kind] : ADDRESS_KIND_ICONS[kind]}
+        title={title}
+        subtitle={
+          isRequired
+            ? LEGAL_PROFILE_COPY.statusBlock.missing_required
+            : LEGAL_PROFILE_COPY.addressTypeHints[kind]
+        }
+        accent={isRequired ? 'error' : 'neutral'}
+        status={isRequired ? 'missing' : undefined}
+        expanded={isExpanded || isRequired}
+        onToggle={() => toggleExpanded(slotId)}
+        variant={isRequired ? 'item' : 'add'}
+        form={
+          <LegalProfileAddressForm
+            fixedAddressType={kind}
+            submitting={submitting}
+            serverError={serverErrorById[slotId] ?? null}
+            onSubmit={input => submitAddress(slotId, input)}
+            onCancel={() => closeExpanded(slotId)}
+          />
+        }
+      />
+    )
+  }
+
+  const renderEmptyDocumentSlot = () => {
+    const slotId = 'doc-empty-add'
+    const isExpanded = Boolean(expanded[slotId])
+
+    return (
+      <LegalProfileItem
+        key={slotId}
+        iconClassName='tabler-plus'
+        title={LEGAL_PROFILE_COPY.empty.addDocumentTitle}
+        subtitle={LEGAL_PROFILE_COPY.empty.addDocumentHint}
+        accent='neutral'
+        expanded={isExpanded}
+        onToggle={() => toggleExpanded(slotId)}
+        variant='add'
+        form={
+          <LegalProfileDocumentForm
+            submitting={submitting}
+            serverError={serverErrorById[slotId] ?? null}
+            onSubmit={input => submitDocument(slotId, input)}
+            onCancel={() => closeExpanded(slotId)}
+          />
+        }
+      />
+    )
+  }
+
+  const renderRequiredDocumentMissing = () => {
+    const slotId = 'doc-required-missing'
+    const isExpanded = Boolean(expanded[slotId])
+
+    return (
+      <LegalProfileItem
+        key={slotId}
+        iconClassName='tabler-id'
+        title={LEGAL_PROFILE_COPY.documentTypeLabels.CL_RUT + ' (Chile)'}
+        subtitle={LEGAL_PROFILE_COPY.statusBlock.missing_required}
+        accent='error'
+        status='missing'
+        expanded={isExpanded || true}
+        onToggle={() => toggleExpanded(slotId)}
+        form={
+          <LegalProfileDocumentForm
+            submitting={submitting}
+            serverError={serverErrorById[slotId] ?? null}
+            onSubmit={input => submitDocument(slotId, input)}
+            onCancel={() => closeExpanded(slotId)}
+          />
+        }
+      />
+    )
+  }
+
+  // ── Render ───────────────────────────────────────────────────────
+
+  if (loading) {
+    return (
+      <Stack spacing={6}>
+        <Skeleton variant='rounded' height={140} />
+        <Skeleton variant='rounded' height={88} />
+        <Skeleton variant='rounded' height={88} />
+        <Skeleton variant='rounded' height={88} />
+      </Stack>
+    )
+  }
+
+  if (fetchError) {
+    return (
+      <Alert severity='error' role='alert' sx={{ mb: 4 }}>
+        {fetchError}
+      </Alert>
+    )
+  }
+
+  // First-use state — empty state grande
+  if (isEmptyFirstUse) {
+    return (
+      <Box>
+        <LegalProfileHero
+          completed={0}
+          total={totalSlots}
+          dotsState={['empty', 'empty', 'empty', 'empty']}
+          variant='empty'
+        />
+        <EmptyState
+          icon='tabler-id-badge-2'
+          title={LEGAL_PROFILE_COPY.firstUse.title}
+          description={LEGAL_PROFILE_COPY.firstUse.description}
+          action={
+            <Button
+              variant='contained'
+              color='primary'
+              onClick={() => toggleExpanded('doc-required-missing')}
+              startIcon={<i className='tabler-arrow-right' style={{ fontSize: 16 }} aria-hidden='true' />}
+            >
+              {LEGAL_PROFILE_COPY.firstUse.cta}
+            </Button>
+          }
+        />
+        {expanded['doc-required-missing'] ? (
+          <Box sx={{ mt: 6 }}>{renderRequiredDocumentMissing()}</Box>
+        ) : null}
+      </Box>
+    )
+  }
 
   return (
     <Box>
-      {error ? (
-        <Alert severity='error' sx={{ mb: 4 }} onClose={() => setError(null)}>
-          {error}
-        </Alert>
-      ) : null}
+      <LegalProfileHero
+        completed={completedCount}
+        total={totalSlots}
+        dotsState={slotStates}
+        variant={heroVariant}
+      />
 
-      {data?.readiness?.finalSettlementChile?.blockers?.length ? (
-        <Alert severity='warning' sx={{ mb: 4 }}>
-          <Typography variant='body2' sx={{ fontWeight: 600 }}>
-            Datos pendientes para emitir documentos formales
-          </Typography>
-          <Box component='ul' sx={{ m: 0, pl: 3 }}>
-            {data.readiness.finalSettlementChile.blockers.map(b => (
-              <li key={b}>
-                <Typography variant='body2'>{blockerLabels[b] ?? b}</Typography>
-              </li>
-            ))}
-          </Box>
-        </Alert>
-      ) : null}
+      <LegalProfileSection
+        title={LEGAL_PROFILE_COPY.sections.identification.title}
+        hint={LEGAL_PROFILE_COPY.sections.identification.hint}
+      >
+        {documents.length > 0 ? (
+          documents.map(doc => renderDocumentItem(doc))
+        ) : (
+          renderRequiredDocumentMissing()
+        )}
+        {documents.length > 0 ? renderEmptyDocumentSlot() : null}
+      </LegalProfileSection>
 
-      <Grid container spacing={6}>
-        <Grid size={{ xs: 12, md: 6 }}>
-          <Card>
-            <CardContent>
-              <Stack spacing={4}>
-                <Box>
-                  <Typography variant='h6'>Documento de identidad</Typography>
-                  <Typography variant='body2' color='text.secondary'>
-                    Ingresa tu RUT si eres colaborador en Chile, o tu documento equivalente.
-                    Tu valor completo NUNCA se muestra despues de guardarlo — solo HR puede verlo,
-                    con motivo y registro de auditoria.
-                  </Typography>
-                </Box>
-
-                <Stack spacing={3}>
-                  {data?.documents?.length ? (
-                    data.documents.map(doc => (
-                      <Box key={doc.documentId} sx={{ p: 3, border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
-                        <Stack direction='row' alignItems='center' justifyContent='space-between'>
-                          <Stack spacing={0.5}>
-                            <Typography variant='body2' sx={{ fontWeight: 600 }}>
-                              {documentTypeLabel(doc.documentType, doc.countryCode)}
-                            </Typography>
-                            <Typography variant='body2' sx={{ fontVariantNumeric: 'tabular-nums', letterSpacing: '0.04em' }}>
-                              {doc.displayMask}
-                            </Typography>
-                            <Typography variant='caption' color='text.secondary'>
-                              Declarado {formatDeclared(doc.declaredAt)}
-                            </Typography>
-                            {doc.rejectedReason ? (
-                              <Typography variant='caption' color='error'>
-                                Motivo del rechazo: {doc.rejectedReason}
-                              </Typography>
-                            ) : null}
-                          </Stack>
-                          <Chip
-                            size='small'
-                            label={STATUS_LABELS[doc.verificationStatus]}
-                            color={STATUS_COLORS[doc.verificationStatus]}
-                            variant={doc.verificationStatus === 'verified' ? 'filled' : 'tonal'}
-                          />
-                        </Stack>
-                      </Box>
-                    ))
-                  ) : (
-                    <Typography variant='body2' color='text.secondary'>
-                      Aun no has declarado tu documento de identidad.
-                    </Typography>
-                  )}
-                </Stack>
-
-                <Divider />
-
-                <Stack spacing={2}>
-                  <Typography variant='subtitle2'>Declarar / actualizar documento</Typography>
-
-                  <FormControl size='small'>
-                    <InputLabel>Pais emisor</InputLabel>
-                    <Select
-                      label='Pais emisor'
-                      value={docCountry}
-                      onChange={e => setDocCountry(String(e.target.value))}
-                    >
-                      <MenuItem value='CL'>Chile</MenuItem>
-                      <MenuItem value='AR'>Argentina</MenuItem>
-                      <MenuItem value='BR'>Brasil</MenuItem>
-                      <MenuItem value='CO'>Colombia</MenuItem>
-                      <MenuItem value='MX'>Mexico</MenuItem>
-                      <MenuItem value='PE'>Peru</MenuItem>
-                      <MenuItem value='UY'>Uruguay</MenuItem>
-                      <MenuItem value='US'>Estados Unidos</MenuItem>
-                    </Select>
-                  </FormControl>
-
-                  <FormControl size='small'>
-                    <InputLabel>Tipo de documento</InputLabel>
-                    <Select
-                      label='Tipo de documento'
-                      value={docType}
-                      onChange={e => setDocType(String(e.target.value))}
-                    >
-                      <MenuItem value='CL_RUT'>RUT (Chile)</MenuItem>
-                      <MenuItem value='CL_PASSPORT'>Pasaporte (Chile)</MenuItem>
-                      <MenuItem value='AR_DNI'>DNI (Argentina)</MenuItem>
-                      <MenuItem value='BR_CPF'>CPF (Brasil)</MenuItem>
-                      <MenuItem value='CO_CC'>Cedula (Colombia)</MenuItem>
-                      <MenuItem value='MX_RFC'>RFC (Mexico)</MenuItem>
-                      <MenuItem value='PE_DNI'>DNI (Peru)</MenuItem>
-                      <MenuItem value='UY_CI'>Cedula (Uruguay)</MenuItem>
-                      <MenuItem value='US_SSN'>SSN (US)</MenuItem>
-                      <MenuItem value='US_PASSPORT'>Pasaporte (US)</MenuItem>
-                      <MenuItem value='GENERIC_PASSPORT'>Pasaporte (otro pais)</MenuItem>
-                      <MenuItem value='GENERIC_NATIONAL_ID'>Documento nacional (otro pais)</MenuItem>
-                    </Select>
-                  </FormControl>
-
-                  <TextField
-                    size='small'
-                    label={docType === 'CL_RUT' ? 'RUT' : 'Numero de documento'}
-                    placeholder={docType === 'CL_RUT' ? '12.345.678-K' : 'Ingresa el numero de documento'}
-                    value={docValue}
-                    onChange={e => setDocValue(e.target.value)}
-                  />
-
-                  <FormHelperText>
-                    Despues de guardar veras solo los ultimos digitos. Tu valor completo NUNCA aparece
-                    en logs ni se comparte sin tu autorizacion.
-                  </FormHelperText>
-
-                  <Button
-                    variant='contained'
-                    onClick={handleDocumentSubmit}
-                    disabled={submitting || !docValue.trim()}
-                  >
-                    Guardar documento
-                  </Button>
-                </Stack>
-              </Stack>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        <Grid size={{ xs: 12, md: 6 }}>
-          <Card>
-            <CardContent>
-              <Stack spacing={4}>
-                <Box>
-                  <Typography variant='h6'>Direcciones</Typography>
-                  <Typography variant='body2' color='text.secondary'>
-                    Tu direccion legal se usa para documentos formales (finiquito, contrato).
-                    La direccion de residencia es para entregas y comunicaciones.
-                  </Typography>
-                </Box>
-
-                <Stack spacing={3}>
-                  {data?.addresses?.length ? (
-                    data.addresses.map(addr => (
-                      <Box key={addr.addressId} sx={{ p: 3, border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
-                        <Stack direction='row' alignItems='center' justifyContent='space-between'>
-                          <Stack spacing={0.5}>
-                            <Typography variant='body2' sx={{ fontWeight: 600 }}>
-                              {ADDRESS_TYPE_LABELS[addr.addressType]}
-                            </Typography>
-                            <Typography variant='body2'>{addr.presentationMask}</Typography>
-                            <Typography variant='caption' color='text.secondary'>
-                              Declarada {formatDeclared(addr.declaredAt)}
-                            </Typography>
-                            {addr.rejectedReason ? (
-                              <Typography variant='caption' color='error'>
-                                Motivo del rechazo: {addr.rejectedReason}
-                              </Typography>
-                            ) : null}
-                          </Stack>
-                          <Chip
-                            size='small'
-                            label={STATUS_LABELS[addr.verificationStatus]}
-                            color={STATUS_COLORS[addr.verificationStatus]}
-                            variant={addr.verificationStatus === 'verified' ? 'filled' : 'tonal'}
-                          />
-                        </Stack>
-                      </Box>
-                    ))
-                  ) : (
-                    <Typography variant='body2' color='text.secondary'>
-                      Aun no has declarado direcciones.
-                    </Typography>
-                  )}
-                </Stack>
-
-                <Divider />
-
-                <Stack spacing={2}>
-                  <Typography variant='subtitle2'>Declarar / actualizar direccion</Typography>
-
-                  <FormControl size='small'>
-                    <InputLabel>Tipo</InputLabel>
-                    <Select
-                      label='Tipo'
-                      value={addrType}
-                      onChange={e => setAddrType(e.target.value as AddressMaskedDto['addressType'])}
-                    >
-                      <MenuItem value='legal'>Direccion legal</MenuItem>
-                      <MenuItem value='residence'>Residencia</MenuItem>
-                      <MenuItem value='mailing'>Correspondencia</MenuItem>
-                      <MenuItem value='emergency'>Contacto de emergencia</MenuItem>
-                    </Select>
-                  </FormControl>
-
-                  <FormControl size='small'>
-                    <InputLabel>Pais</InputLabel>
-                    <Select label='Pais' value={addrCountry} onChange={e => setAddrCountry(String(e.target.value))}>
-                      <MenuItem value='CL'>Chile</MenuItem>
-                      <MenuItem value='AR'>Argentina</MenuItem>
-                      <MenuItem value='BR'>Brasil</MenuItem>
-                      <MenuItem value='CO'>Colombia</MenuItem>
-                      <MenuItem value='MX'>Mexico</MenuItem>
-                      <MenuItem value='PE'>Peru</MenuItem>
-                      <MenuItem value='UY'>Uruguay</MenuItem>
-                      <MenuItem value='US'>Estados Unidos</MenuItem>
-                    </Select>
-                  </FormControl>
-
-                  <TextField
-                    size='small'
-                    label='Calle y numero'
-                    placeholder='Av. Apoquindo 1234, Depto 501'
-                    value={addrStreet}
-                    onChange={e => setAddrStreet(e.target.value)}
-                  />
-
-                  <TextField
-                    size='small'
-                    label='Ciudad'
-                    value={addrCity}
-                    onChange={e => setAddrCity(e.target.value)}
-                  />
-
-                  <TextField
-                    size='small'
-                    label='Region / Estado'
-                    value={addrRegion}
-                    onChange={e => setAddrRegion(e.target.value)}
-                  />
-
-                  <TextField
-                    size='small'
-                    label='Codigo postal (opcional)'
-                    value={addrPostal}
-                    onChange={e => setAddrPostal(e.target.value)}
-                  />
-
-                  <Button
-                    variant='contained'
-                    onClick={handleAddressSubmit}
-                    disabled={submitting || !addrStreet.trim() || !addrCity.trim()}
-                  >
-                    Guardar direccion
-                  </Button>
-                </Stack>
-              </Stack>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
+      <LegalProfileSection
+        title={LEGAL_PROFILE_COPY.sections.addresses.title}
+        hint={LEGAL_PROFILE_COPY.sections.addresses.hint}
+      >
+        {legalAddr ? renderAddressItem(legalAddr) : renderEmptyAddressSlot('legal')}
+        {residenceAddr ? renderAddressItem(residenceAddr) : renderEmptyAddressSlot('residence')}
+        {emergencyAddr ? renderAddressItem(emergencyAddr) : renderEmptyAddressSlot('emergency')}
+      </LegalProfileSection>
     </Box>
   )
 }
