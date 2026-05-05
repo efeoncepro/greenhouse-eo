@@ -14,15 +14,9 @@ import UserDropdown from '@components/layout/shared/UserDropdown'
 // Util Imports
 import { verticalLayoutClasses } from '@layouts/utils/layoutClasses'
 
-// Shortcuts data
-const shortcuts = [
-  { url: '/finance', icon: 'tabler-chart-bar', title: 'Finanzas', subtitle: 'Dashboard' },
-  { url: '/finance/income', icon: 'tabler-cash', title: 'Ventas', subtitle: 'Documentos de venta' },
-  { url: '/admin/users', icon: 'tabler-users', title: 'Usuarios', subtitle: 'Gestión' },
-  { url: '/admin/roles', icon: 'tabler-lock', title: 'Roles', subtitle: 'Permisos' },
-  { url: '/hr/payroll', icon: 'tabler-report-money', title: 'Nómina', subtitle: 'People' },
-  { url: '/admin/settings', icon: 'tabler-settings', title: 'Configuración', subtitle: 'Sistema' }
-]
+// TASK-553 — Shortcuts data is no longer hardcoded here. ShortcutsDropdown
+// is self-contained: it reads /api/me/shortcuts (canonical resolver +
+// per-user pins). To register a new shortcut, extend src/lib/shortcuts/catalog.ts.
 
 const NavbarContent = () => {
   return (
@@ -33,7 +27,7 @@ const NavbarContent = () => {
       </div>
       <div className='flex items-center gap-1'>
         <ModeDropdown />
-        <ShortcutsDropdown shortcuts={shortcuts} />
+        <ShortcutsDropdown />
         <NotificationDropdown />
         <UserDropdown />
       </div>
