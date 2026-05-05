@@ -2868,6 +2868,24 @@ export interface GreenhouseCoreUserRoleAssignments {
   user_id: string;
 }
 
+export interface GreenhouseCoreUserShortcutPins {
+  created_at: Generated<Timestamp>;
+  /**
+   * Operator-provided sort order, non-negative. Ties break by created_at ASC.
+   */
+  display_order: Generated<number>;
+  pin_id: Generated<Int8>;
+  /**
+   * Stable identifier from CanonicalShortcut.key. Unknown keys are tolerated at read time (filtered out) but rejected at write time.
+   */
+  shortcut_key: string;
+  updated_at: Generated<Timestamp>;
+  /**
+   * FK greenhouse_core.client_users(user_id). CASCADE on user delete.
+   */
+  user_id: string;
+}
+
 export interface GreenhouseCoreUserViewOverrides {
   expires_at: Timestamp | null;
   granted_at: Generated<Timestamp>;
@@ -8309,6 +8327,7 @@ export interface DB {
   "greenhouse_core.user_permission_set_assignments": GreenhouseCoreUserPermissionSetAssignments;
   "greenhouse_core.user_project_scopes": GreenhouseCoreUserProjectScopes;
   "greenhouse_core.user_role_assignments": GreenhouseCoreUserRoleAssignments;
+  "greenhouse_core.user_shortcut_pins": GreenhouseCoreUserShortcutPins;
   "greenhouse_core.user_view_overrides": GreenhouseCoreUserViewOverrides;
   "greenhouse_core.v_client_active_modules": GreenhouseCoreVClientActiveModules;
   "greenhouse_core.view_access_log": GreenhouseCoreViewAccessLog;
