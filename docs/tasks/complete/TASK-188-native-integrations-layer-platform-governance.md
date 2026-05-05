@@ -73,7 +73,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete` (closed 2026-05-05 — 6/6 acceptance criteria done, spec publicado, lifecycle drift)
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Alto`

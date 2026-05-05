@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete` (closed 2026-05-05 — `src/lib/finance/fx/provider-adapter.ts` + tests merged en `3d0cc914`)
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`

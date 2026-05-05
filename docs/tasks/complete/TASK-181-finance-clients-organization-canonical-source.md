@@ -33,7 +33,7 @@
 
 | Campo | Valor |
 |-------|-------|
-| Lifecycle | `in-progress` |
+| Lifecycle | `complete` (closed 2026-05-05 — code shipped en `4cb78296`, lifecycle drift) |
 | Priority | `P1` |
 | Impact | `Alto` |
 | Effort | `Medio` |

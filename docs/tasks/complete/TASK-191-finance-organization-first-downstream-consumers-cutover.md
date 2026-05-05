@@ -2,7 +2,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete` (closed 2026-05-05 — Implementation complete + verified per status real, lifecycle drift)
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`

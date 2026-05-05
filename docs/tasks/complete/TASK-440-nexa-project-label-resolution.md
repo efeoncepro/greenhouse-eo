@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete` (closed 2026-05-05 — `entity-display-resolution.{ts,test.ts}` shipped via 8ebb28e6 + 99d4deb7)
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`

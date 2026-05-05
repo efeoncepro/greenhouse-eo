@@ -134,12 +134,12 @@ Registro canonico de asignacion de IDs `TASK-###` para evitar colisiones y renum
 | `TASK-107` | `complete` | Auth Email Verification Request Flow | `docs/tasks/complete/TASK-107-auth-email-verification-request-flow.md` |
 | `TASK-108` | `complete` | Admin Center Governance Shell | `docs/tasks/complete/TASK-108-admin-center-governance-shell.md` |
 | `TASK-109` | `to-do` | Projected Payroll Runtime Hardening and Observability | `docs/tasks/to-do/TASK-109-projected-payroll-runtime-hardening-observability.md` |
-| `TASK-110` | `in-progress` | Nexa: assistant-ui Feature Adoption | `docs/tasks/in-progress/TASK-110-nexa-assistant-ui-features.md` |
+| `TASK-110` | `complete` (closed 2026-05-05 — lifecycle drift) | Nexa: assistant-ui Feature Adoption | `docs/tasks/complete/TASK-110-nexa-assistant-ui-features.md` |
 | `TASK-111` | `complete` | Admin Center Secret Ref Governance UI | `docs/tasks/complete/TASK-111-admin-center-secret-ref-governance-ui.md` |
 | `TASK-112` | `complete` | Admin Center Integration Health and Freshness UI | `docs/tasks/complete/TASK-112-admin-center-integration-health-freshness-ui.md` |
 | `TASK-113` | `complete` | Admin Center Ops Audit Trail UI | `docs/tasks/complete/TASK-113-admin-center-ops-audit-trail-ui.md` |
 | `TASK-114` | `complete` | Nexa Backend: Persistence, Feedback & Dynamic Suggestions | `docs/tasks/complete/TASK-114-nexa-backend-persistence-suggestions.md` |
-| `TASK-115` | `to-do` | Nexa UI: Edit, Suggestions, Feedback, Floating & Thread History | `docs/tasks/to-do/TASK-115-nexa-ui-completion.md` |
+| `TASK-115` | `complete` (closed 2026-05-05 — lifecycle drift) | Nexa UI: Edit, Suggestions, Feedback, Floating & Thread History | `docs/tasks/complete/TASK-115-nexa-ui-completion.md` |
 | `TASK-116` | `to-do` | Sidebar Navigation Audit & Remediation | `docs/tasks/to-do/TASK-116-sidebar-navigation-audit-remediation.md` |
 | `TASK-117` | `complete` | Payroll Last Business Day Auto-Calculation | `docs/tasks/complete/TASK-117-payroll-last-business-day-auto-calculation.md` |
 | `TASK-118` | `complete` | ICO AI Core: Embedded Intelligence Layer | `docs/tasks/complete/TASK-118-ico-ai-core-embedded-intelligence.md` |
@@ -230,17 +230,17 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-178` | `complete` (superseded por TASK-395 — 2026-05-05) | Finance Budget Engine: Budget vs. Actual & Variance Analysis | `docs/tasks/complete/TASK-178-finance-budget-engine.md` |
 | `TASK-179` | `to-do` | Finance Reconciliation Postgres-Only Cutover & Integration Hardening | `docs/tasks/to-do/TASK-179-finance-reconciliation-cutover-hardening.md` |
 | `TASK-180` | `complete` | HR Departments Postgres Runtime Cutover | `docs/tasks/complete/TASK-180-hr-departments-postgres-runtime-cutover.md` |
-| `TASK-181` | `in-progress` | Finance Clients: Canonical Source Migration to Organizations | `docs/tasks/in-progress/TASK-181-finance-clients-organization-canonical-source.md` |
+| `TASK-181` | `complete` (closed 2026-05-05 — lifecycle drift) | Finance Clients: Canonical Source Migration to Organizations | `docs/tasks/complete/TASK-181-finance-clients-organization-canonical-source.md` |
 | `TASK-182` | `complete` | Finance Expense Drawer: Agency Taxonomy, Cross-Module Synergies & Automation | `docs/tasks/complete/TASK-182-finance-expense-drawer-agency-taxonomy.md` |
 | `TASK-183` | `complete` | Finance Expenses Reactive Intake & Cost Ledger Hardening | `docs/tasks/complete/TASK-183-finance-expenses-reactive-intake-cost-ledger.md` |
 | `TASK-184` | `in-progress` | Database Migration Framework (node-pg-migrate) | `docs/tasks/in-progress/TASK-184-database-migration-framework.md` |
 | `TASK-185` | `in-progress` | Database Tooling Foundation (db.ts + Kysely + Migrations) | `docs/tasks/in-progress/TASK-185_Database_Tooling_Foundation.md` |
 | `TASK-186` | `complete` | Delivery Metrics Trust: Notion Property Audit & Conformed Contract Hardening | `docs/tasks/complete/TASK-186-delivery-metrics-trust-notion-property-audit-contract.md` |
 | `TASK-187` | `complete` | Notion Integration Formalization: Space Onboarding, Schema Governance & KPI Readiness | `docs/tasks/complete/TASK-187-notion-integration-formalization-space-onboarding-schema-governance.md` |
-| `TASK-188` | `to-do` | Native Integrations Layer: Platform Governance, Runtime Contracts & Shared Operating Model | `docs/tasks/to-do/TASK-188-native-integrations-layer-platform-governance.md` |
+| `TASK-188` | `complete` (closed 2026-05-05 — lifecycle drift) | Native Integrations Layer: Platform Governance, Runtime Contracts & Shared Operating Model | `docs/tasks/complete/TASK-188-native-integrations-layer-platform-governance.md` |
 | `TASK-189` | `complete` | ICO Period Filter: Due-Date Anchor & Carry-Over Logic | `docs/tasks/complete/TASK-189-ico-period-filter-due-date-anchor.md` |
 | `TASK-190` | `to-do` | Platform Temporal Scope Contract & Cross-Module Time Semantics | `docs/tasks/to-do/TASK-190-platform-temporal-scope-contract-cross-module-parity.md` |
-| `TASK-191` | `in-progress` | Finance Organization-First Downstream Consumers Cutover | `docs/tasks/in-progress/TASK-191-finance-organization-first-downstream-consumers-cutover.md` |
+| `TASK-191` | `complete` (closed 2026-05-05 — lifecycle drift) | Finance Organization-First Downstream Consumers Cutover | `docs/tasks/complete/TASK-191-finance-organization-first-downstream-consumers-cutover.md` |
 | `TASK-192` | `complete` | Finance Org-First Materialized Serving Cutover | `docs/tasks/complete/TASK-192-finance-org-first-materialized-serving-cutover.md` |
 | `TASK-193` | `in-progress` | Person ↔ Organization Synergy Activation | `docs/tasks/in-progress/TASK-193-person-organization-synergy-activation.md` |
 | `TASK-194` | `to-do` | Expense Payment Ledger Separation | `docs/tasks/to-do/TASK-194-expense-payment-ledger-separation.md` |
@@ -285,9 +285,9 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-233` | `to-do` | Three.js 3D Logo Animation | `docs/tasks/to-do/TASK-233-threejs-3d-logo-animation.md` |
 | `TASK-234` | `complete` | Codex Skills: Animation Library Knowledge Sync | `docs/tasks/complete/TASK-234-codex-skills-animation-library-sync.md` |
 | `TASK-235` | `to-do` | Agency ICO LLM Insights UI Surfacing | `docs/tasks/to-do/TASK-235-agency-ico-llm-insights-ui.md` |
-| `TASK-236` | `to-do` | Agency: Resilience & Feedback Patterns | `docs/tasks/to-do/TASK-236-agency-resilience-feedback-patterns.md` |
-| `TASK-237` | `to-do` | Agency ICO Engine Tab: UX Redesign | `docs/tasks/to-do/TASK-237-agency-ico-engine-tab-ux-redesign.md` |
-| `TASK-238` | `to-do` | Agency Workspace & Space 360: Data Storytelling UX | `docs/tasks/to-do/TASK-238-agency-workspace-data-storytelling-ux.md` |
+| `TASK-236` | `complete` (closed 2026-05-05 — lifecycle drift) | Agency: Resilience & Feedback Patterns | `docs/tasks/complete/TASK-236-agency-resilience-feedback-patterns.md` |
+| `TASK-237` | `complete` (closed 2026-05-05 — lifecycle drift) | Agency ICO Engine Tab: UX Redesign | `docs/tasks/complete/TASK-237-agency-ico-engine-tab-ux-redesign.md` |
+| `TASK-238` | `complete` (closed 2026-05-05 — lifecycle drift) | Agency Workspace & Space 360: Data Storytelling UX | `docs/tasks/complete/TASK-238-agency-workspace-data-storytelling-ux.md` |
 | `TASK-239` | `to-do` | Nexa Insights: Prompt Enrichment con Glosario de Métricas y Cadena Causal | `docs/tasks/to-do/TASK-239-nexa-advisory-prompt-enrichment-metric-glossary.md` |
 | `TASK-240` | `complete` | Nexa Insights: Menciones Interactivas de Spaces y Miembros | `docs/tasks/complete/TASK-240-nexa-insights-entity-mentions.md` |
 | `TASK-241` | `complete` | Migrar procesos batch pesados a Cloud Run | `docs/tasks/complete/TASK-241-batch-processes-cloud-run-migration.md` |
@@ -295,7 +295,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-243` | `to-do` | Nexa Insights en Person 360 | `docs/tasks/to-do/TASK-243-nexa-insights-person-360.md` |
 | `TASK-244` | `to-do` | Nexa Insights Widget en Home Dashboard | `docs/tasks/to-do/TASK-244-nexa-insights-home-dashboard.md` |
 | `TASK-245` | `to-do` | Finance Signal Engine | `docs/tasks/to-do/TASK-245-finance-signal-engine.md` |
-| `TASK-246` | `to-do` | Narrativa ejecutiva semanal de Nexa | `docs/tasks/to-do/TASK-246-nexa-weekly-executive-digest.md` |
+| `TASK-246` | `complete` (closed 2026-05-05 — digest engine + email + ops-worker live) | Narrativa ejecutiva semanal de Nexa | `docs/tasks/complete/TASK-246-nexa-weekly-executive-digest.md` |
 | `TASK-247` | `complete` | Identity & Platform Block Hardening | `docs/tasks/complete/TASK-247-identity-platform-block-hardening.md` |
 | `TASK-248` | `complete` | Identity & Access Spec Compliance | `docs/tasks/complete/TASK-248-identity-access-spec-compliance.md` |
 | `TASK-249` | `complete` | Test Observability MVP | `docs/tasks/complete/TASK-249-test-observability-mvp.md` |
@@ -489,7 +489,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-437` | `to-do` | Nexa Cross-Domain Causality Engine | `docs/tasks/to-do/TASK-437-nexa-cross-domain-causality.md` |
 | `TASK-438` | `to-do` | Nexa Contextual Chat Per Domain (Copilot by Surface) | `docs/tasks/to-do/TASK-438-nexa-contextual-chat-per-domain.md` |
 | `TASK-439` | `to-do` | Nexa Daily Role-Based Briefing | `docs/tasks/to-do/TASK-439-nexa-daily-role-based-briefing.md` |
-| `TASK-440` | `in-progress` | Nexa Insights Project Label Resolution | `docs/tasks/in-progress/TASK-440-nexa-project-label-resolution.md` |
+| `TASK-440` | `complete` (closed 2026-05-05 — lifecycle drift) | Nexa Insights Project Label Resolution | `docs/tasks/complete/TASK-440-nexa-project-label-resolution.md` |
 | `TASK-441` | `to-do`       | Nexa Mentions Resolver + Allowlist + Sanitization | `docs/tasks/to-do/TASK-441-nexa-mentions-resolver-allowlist-sanitization.md` |
 | `TASK-442` | `to-do`       | Nexa Mentions Registry + Entity Expansion | `docs/tasks/to-do/TASK-442-nexa-mentions-registry-entity-expansion.md` |
 | `TASK-443` | `to-do`       | Nexa Thread Chat Mention Rendering (Quick Win) | `docs/tasks/to-do/TASK-443-nexa-thread-chat-mention-rendering.md` |

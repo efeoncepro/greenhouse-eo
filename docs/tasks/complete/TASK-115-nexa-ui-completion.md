@@ -11,7 +11,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete` (closed 2026-05-05 — code shipped en `14b75aac`, lifecycle drift)
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`

@@ -15,7 +15,7 @@ No bloquea el cierre de TASK-246 — solo unifica el composer. Cuando se ejecute
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete` (closed 2026-05-05 — digest engine + email template + ops-worker endpoint live, solo manual smoke pendiente)
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`

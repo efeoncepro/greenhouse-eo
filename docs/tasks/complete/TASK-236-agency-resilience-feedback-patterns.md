@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete` (closed 2026-05-05 — merge commit `de982a8f` shipped, lifecycle drift)
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
