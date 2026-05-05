@@ -19,6 +19,7 @@ Usar junto con:
 - `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
 - `docs/architecture/GREENHOUSE_PERSON_ORGANIZATION_MODEL_V1.md`
 - `docs/architecture/GREENHOUSE_PERSON_IDENTITY_CONSUMPTION_V1.md`
+- `docs/architecture/GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md`
 - `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`
 - `docs/architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md`
 
@@ -34,6 +35,12 @@ Delta 2026-04-18:
 - el backfill inicial materializa solo relaciones con fuente verificable en runtime actual:
   - `employee` para personas activas del operating entity
   - `shareholder_current_account_holder` para perfiles con `shareholder_accounts`
+
+Delta 2026-05-05:
+
+- Una persona puede cerrar una relacion `employee` y abrir una relacion `contractor`/`honorarios` con la misma entidad legal sin mutar la relacion anterior.
+- Las relaciones contractor alimentan `ContractorEngagement`, no `FinalSettlement`.
+- Caso motivador: Valentina Hoyos conserva su `identity_profile`; la relacion dependiente terminada queda historica y la nueva relacion desde `2026-05-04` debe modelarse como contractor/honorarios separada.
 
 ## Core Thesis
 

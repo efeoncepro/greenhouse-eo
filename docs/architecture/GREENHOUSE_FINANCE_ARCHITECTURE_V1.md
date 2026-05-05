@@ -2,7 +2,20 @@
 
 > **Version:** 1.0
 > **Created:** 2026-03-30
-> **Last updated:** 2026-05-03 (TASK-777)
+> **Last updated:** 2026-05-05 (Contractor Engagements + Payables)
+
+## Delta 2026-05-05 — Contractor payables bridge
+
+Se agrega arquitectura complementaria para pagos contractor/freelance/profesional independiente:
+
+- `docs/architecture/GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md`
+
+Regla canonica:
+
+- HR/Contractor domain aprueba engagement, evidencia, invoice/boleta y `contractor_payable`.
+- Finance recibe solo payables listos y genera `payment_obligations` / `payment_orders`.
+- El dominio contractor nunca muta banco, `expense_payments` ni `settlement_legs` directamente.
+- Pagos via Deel/Remote/Oyster deben distinguir cargo proveedor, payout contractor, fees y FX; economicamente no deben caer como overhead proveedor generico si representan costo laboral externo.
 
 ## Delta 2026-05-03 — TASK-777 Expense distribution resolution
 

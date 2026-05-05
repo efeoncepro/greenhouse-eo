@@ -875,3 +875,13 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-786` | `to-do` | Person Contact & Professional Presence Governance | `docs/tasks/to-do/TASK-786-person-contact-professional-presence-governance.md` |
 | `TASK-787` | `to-do` | Person Country Reconciliation (Entra ↔ Declared) | `docs/tasks/to-do/TASK-787-person-country-reconciliation-entra-declared.md` |
 | `TASK-788` | `to-do` | Workforce Role Title Effective-Dating + Compensation-Coupled Promotions | `docs/tasks/to-do/TASK-788-workforce-role-title-effective-dating-promotion-flow.md` |
+| `TASK-789` | `to-do` | Workforce Relationship Transition: Employee to Contractor (EPIC-013 child 1/10) | `docs/tasks/to-do/TASK-789-workforce-relationship-transition-employee-to-contractor.md` |
+| `TASK-790` | `to-do` | Contractor Engagements Runtime + Classification Risk (EPIC-013 child 2/10) | `docs/tasks/to-do/TASK-790-contractor-engagements-runtime-classification-risk.md` |
+| `TASK-791` | `to-do` | Contractor Invoice Assets + Greenhouse Uploader Contexts (EPIC-013 child 3/10) | `docs/tasks/to-do/TASK-791-contractor-invoice-assets-uploader-contexts.md` |
+| `TASK-792` | `to-do` | Contractor Work Submissions + Approval/Dispute Flow (EPIC-013 child 4/10) | `docs/tasks/to-do/TASK-792-contractor-work-submissions-approval-dispute-flow.md` |
+| `TASK-793` | `to-do` | Contractor Payables to Finance Payment Obligations Bridge (EPIC-013 child 5/10) | `docs/tasks/to-do/TASK-793-contractor-payables-finance-obligations-bridge.md` |
+| `TASK-794` | `to-do` | Chile Honorarios Compliance + SII Retention (EPIC-013 child 6/10) | `docs/tasks/to-do/TASK-794-chile-honorarios-compliance-sii-retention.md` |
+| `TASK-795` | `to-do` | International Contractor + Provider Boundary + FX Policy (EPIC-013 child 7/10) | `docs/tasks/to-do/TASK-795-international-contractor-provider-boundary-fx-policy.md` |
+| `TASK-796` | `to-do` | Contractor Self-Service Hub (EPIC-013 child 8/10) | `docs/tasks/to-do/TASK-796-contractor-self-service-hub.md` |
+| `TASK-797` | `to-do` | Contractor Closure + Transition Controls (EPIC-013 child 9/10) | `docs/tasks/to-do/TASK-797-contractor-closure-transition-controls.md` |
+| `TASK-798` | `to-do` | Contractor Reliability + Ops Control Plane (EPIC-013 child 10/10) | `docs/tasks/to-do/TASK-798-contractor-reliability-ops-control-plane.md` |

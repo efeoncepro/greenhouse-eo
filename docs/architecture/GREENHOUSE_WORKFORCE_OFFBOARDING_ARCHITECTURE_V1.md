@@ -16,6 +16,7 @@ Usar junto con:
 - `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
 - `docs/architecture/GREENHOUSE_PERSON_COMPLETE_360_V1.md`
 - `docs/architecture/GREENHOUSE_PERSON_LEGAL_ENTITY_RELATIONSHIPS_V1.md`
+- `docs/architecture/GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md`
 - `docs/architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md`
 - `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md`
 - `docs/architecture/GREENHOUSE_SCIM_ENTRA_INTEGRATION_V1.md`
@@ -25,6 +26,12 @@ Usar junto con:
 ## Status
 
 Contrato arquitectonico nuevo desde 2026-04-25.
+
+Delta 2026-05-05:
+
+- Las transiciones `employee -> contractor/honorarios` deben cerrar la relacion laboral anterior y abrir una relacion contractor separada bajo el mismo `identity_profile`.
+- El cierre contractor/proveedor no usa `final_settlements` ni documento de finiquito laboral.
+- La arquitectura canonica de pagos contractor vive en `GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md`.
 
 Estado actual del repo:
 

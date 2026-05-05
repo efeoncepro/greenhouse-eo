@@ -26,7 +26,8 @@ Registro canónico de asignación de IDs `EPIC-###` para evitar colisiones y ren
 | `EPIC-010` | `to-do` | `docs/epics/to-do/EPIC-010-workforce-offboarding-finiquito-foundation.md` |
 | `EPIC-011` | `to-do` | `docs/epics/to-do/EPIC-011-hiring-ats-end-to-end-program.md` |
 | `EPIC-012` | `to-do` | `docs/epics/to-do/EPIC-012-finance-five-capabilities-operating-system.md` |
+| `EPIC-013` | `to-do` | `docs/epics/to-do/EPIC-013-contractor-engagements-global-payables-program.md` |
 
 ## Siguiente ID disponible
 
-- `EPIC-013`
+- `EPIC-014`

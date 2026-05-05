@@ -26,13 +26,15 @@
 - **Trigger:** Valentina Hoyos cerro relacion dependiente Chile (`indefinido`, ultimo dia `2026-04-30`) y podria iniciar nueva relacion contractor/honorarios desde `2026-05-04`.
 - **Decision:** no reactivar ni mutar la relacion laboral anterior. La misma persona canonica abre una relacion juridica/economica nueva (`contractor`/`honorarios`) con lifecycle y pagos propios.
 - **Doc nuevo:** `docs/architecture/GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md`.
+- **Programa creado:** `EPIC-013` con child tasks `TASK-789`..`TASK-798` en `docs/tasks/to-do/` para relationship transition, engagement runtime, invoice assets/uploader, work submissions, payables bridge, Chile honorarios, internacional/provider+FX, self-service, closure y reliability.
 - **Docs enlazadas:** `GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md`, `GREENHOUSE_WORKFORCE_OFFBOARDING_ARCHITECTURE_V1.md`, `GREENHOUSE_PERSON_LEGAL_ENTITY_RELATIONSHIPS_V1.md`, `GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`.
 - **Contrato:** `ContractorEngagement -> WorkSubmission/Invoice -> ContractorPayable -> Finance Payment Obligation -> Payment Order`. Contractor payment no es finiquito, no es payroll adjustment y no muta banco directo.
 - **Expansion internacional:** el doc distingue Chile honorarios, contractor internacional directo, contractor via Deel/Remote/Oyster y EOR/provider. Agrega `tax_residency_country_code`, `payment_currency`, `fx_policy_code`, provider contract/worker/invoice/payout IDs y matriz de tax/payment owner.
 - **Invoices/assets:** las boletas/invoices de contractors se suben por `GreenhouseFileUploader` + `POST /api/assets/private`, con bytes en el bucket privado GCS existente y registry en `greenhouse_core.assets`. No crear bucket/uploader paralelo ni guardar URLs libres. El doc propone contextos `contractor_invoice(_draft)`, `contractor_work_evidence(_draft)`, `provider_invoice(_draft)` y `provider_payout_statement`, mas `contractor_invoice_assets` para soportes.
+- **Nota de dependencia:** `TASK-753` esta registrado como Payment Profiles Self-Service, pero el archivo no aparece en `docs/tasks/to-do/` en el estado local verificado; `TASK-796` queda bloqueado por recuperar/crear esa spec antes de implementacion.
 - **Pendientes resueltos:** ownership fisico Workforce/HR, Payroll solo consumidor/compatibility; `member_id` no auto-creado; no auto-approval V1; VAT/IVA/facturas comerciales quedan en Finance AP; `tax_compliance_owner`, FX, KPI/bonus, payment profile, dedupe/idempotency y closure policy quedan como gates.
 - **Market input:** Deel/Oyster/Remote revalidados para fixed, PAYG, milestone, timesheets, invoices, approvals y charge/payout separation; SII 2026 honorarios `15.25%`.
-- **Pendiente:** convertir la arquitectura en tasks runtime (`TASK-788` a `TASK-793`) antes de implementar.
+- **Pendiente:** comenzar implementacion por `TASK-789`/`TASK-790` y recuperar spec de `TASK-753` antes del self-service contractor.
 
 ## Sesion 2026-05-05 — TASK-785 completa (Workforce Role Title Source of Truth + Drift Governance)
 

@@ -1,5 +1,20 @@
 # GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md
 
+## Delta 2026-05-05 — Contractor engagements no son finiquito ni payroll dependiente
+
+Se agrega arquitectura complementaria para contractor/freelance/profesional independiente:
+
+- `docs/architecture/GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md`
+
+Regla canonica:
+
+- una persona puede terminar una relacion dependiente y abrir una nueva relacion contractor sin mutar el historico laboral
+- contractor payments nacen desde engagement, evidencia de trabajo e invoice/boleta; no desde `final_settlements` ni desde `payroll_adjustments`
+- Chile honorarios aplica retencion SII segun policy versionada; no aplica AFP/salud/AFC/IUSC dependiente
+- Finance sigue siendo owner de obligations, payment orders, expense payments y banco
+
+Caso motivador: Valentina Hoyos termina relacion `indefinido` el `2026-04-30` y puede iniciar nueva relacion contractor el `2026-05-04`; el nuevo flujo debe abrir una relacion separada y pagar por `ContractorEngagement -> ContractorPayable -> Finance`, no por finiquito.
+
 ## Delta 2026-05-04 — Offboarding execution guard + finiquito recovery
 
 El carril de finiquito queda protegido contra dos fallas operativas:
