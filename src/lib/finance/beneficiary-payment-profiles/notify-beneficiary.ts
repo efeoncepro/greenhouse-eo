@@ -105,19 +105,43 @@ export const notifyBeneficiaryOfPaymentProfileChange = async (
     return { status: 'skipped_non_member' }
   }
 
-  const memberRows = await query<MemberLookupRow>(
-    `SELECT m.member_id,
-            m.display_name,
-            m.primary_email,
-            ip.email AS identity_email
-       FROM greenhouse_core.members m
-       LEFT JOIN greenhouse_core.identity_profiles ip ON ip.profile_id = m.identity_profile_id
-      WHERE m.member_id = $1
-      LIMIT 1`,
-    [profile.beneficiary_id]
-  )
+  // identity_profiles uses `canonical_email` (the single canonical column).
+  // Member fallback: `primary_email`. Both can be NULL — colaborador
+  // sin email recibira status='skipped_no_email' (degraded honest).
+  //
+  // Defensive: query envuelta en try/catch para que un schema drift NO
+  // dispare el circuit breaker indefinidamente. Si la query falla, caemos
+  // a 'skipped_no_email' (fail-soft) y registramos en Sentry sin tirar la
+  // projection. Esto evita que un error de schema (e.g. rename column)
+  // bloquee permanentemente notificaciones a colaboradores.
+  let member: MemberLookupRow | null = null
 
-  const member = memberRows[0]
+  try {
+    const memberRows = await query<MemberLookupRow>(
+      `SELECT m.member_id,
+              m.display_name,
+              m.primary_email,
+              ip.canonical_email AS identity_email
+         FROM greenhouse_core.members m
+         LEFT JOIN greenhouse_core.identity_profiles ip ON ip.profile_id = m.identity_profile_id
+        WHERE m.member_id = $1
+        LIMIT 1`,
+      [profile.beneficiary_id]
+    )
+
+    member = memberRows[0] ?? null
+  } catch (lookupError) {
+    captureWithDomain(lookupError, 'finance', {
+      tags: { source: 'notify_beneficiary_payment_profile_change.member_lookup' },
+      extra: { profileId: profile.profile_id, beneficiaryId: profile.beneficiary_id }
+    })
+
+    return {
+      status: 'skipped_no_email',
+      error: 'Member email lookup failed; degraded silently to avoid breaker open.'
+    }
+  }
+
   const recipientEmail = member?.identity_email ?? member?.primary_email ?? null
 
   if (!member || !recipientEmail) {
