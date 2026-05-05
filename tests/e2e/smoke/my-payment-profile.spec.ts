@@ -110,11 +110,12 @@ test.describe('TASK-753 /my/payment-profile self-service contract', () => {
  * + the live HTML when accessible.
  */
 test.describe('TASK-753 anti-regression: provider/method removed from self-service', () => {
-  test('mockup HTML in repo does not contain provider/method labels', async ({ request }) => {
+  test('mockup HTML in repo does not contain provider/method labels', async () => {
     // The mockup file is the source of truth for the redesign approval.
     // It must NOT contain "Proveedor" or "Método" labels.
     const fs = await import('node:fs/promises')
     const path = await import('node:path')
+
     const mockupPath = path.resolve(
       process.cwd(),
       'docs/mockups/task-753-my-payment-profile-self-service-redesign.html'

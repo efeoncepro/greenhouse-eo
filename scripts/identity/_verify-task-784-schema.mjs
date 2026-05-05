@@ -4,18 +4,22 @@
  *
  * Requires Cloud SQL Proxy on 127.0.0.1:15432 (run `pnpm pg:connect` first).
  */
-import pg from 'pg'
 import fs from 'node:fs'
 import path from 'node:path'
 
+import pg from 'pg'
+
 const envPath = path.resolve(process.cwd(), '.env.local')
+
 const env = fs
   .readFileSync(envPath, 'utf8')
   .split('\n')
   .reduce((acc, line) => {
     const m = line.match(/^([A-Z_][A-Z0-9_]*)=(.*)$/)
+
     if (m) acc[m[1]] = m[2].replace(/^["']|["']$/g, '')
-    return acc
+    
+return acc
   }, {})
 
 const password =
@@ -37,6 +41,7 @@ const client = new pg.Client({
 })
 
 await client.connect()
+
 try {
   const tables = await client.query(`
     SELECT tablename FROM pg_tables
@@ -45,6 +50,7 @@ try {
                         'person_identity_document_audit_log', 'person_address_audit_log')
     ORDER BY tablename
   `)
+
   console.log('--- tables ---')
   console.log(tables.rows.map(r => r.tablename).join('\n') || '(none)')
 
@@ -56,6 +62,7 @@ try {
                          'person_identity_document_audit_log', 'person_address_audit_log')
     ORDER BY table_name, grantee, privilege_type
   `)
+
   console.log('\n--- grants ---')
   console.log(
     grants.rows.map(r => `${r.table_name} | ${r.grantee} | ${r.privilege_type}`).join('\n')
@@ -69,6 +76,7 @@ try {
                                   'person_identity_document_audit_log', 'person_address_audit_log')
     ORDER BY event_object_table, trigger_name
   `)
+
   console.log('\n--- triggers ---')
   console.log(
     triggers.rows
@@ -82,6 +90,7 @@ try {
       AND tablename IN ('person_identity_documents', 'person_addresses')
     ORDER BY tablename, indexname
   `)
+
   console.log('\n--- indexes ---')
   console.log(indexes.rows.map(r => `${r.tablename} | ${r.indexname}`).join('\n'))
 } finally {
