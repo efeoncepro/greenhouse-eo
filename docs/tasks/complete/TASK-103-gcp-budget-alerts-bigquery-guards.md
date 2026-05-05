@@ -1,5 +1,16 @@
 # TASK-103 — GCP Budget Alerts & BigQuery Cost Guards
 
+## Cierre 2026-05-05 — Absorbida por Billing Export Observability canónico
+
+Cerrada como **superseded**. La spec canónica `GREENHOUSE_BILLING_EXPORT_OBSERVABILITY_V1.md` + el runtime ya implementado entrega cobertura más robusta que los budget alerts manuales que esta task pedía configurar en GCP Console:
+
+- `src/lib/cloud/gcp-billing.ts` + `gcp-billing-alerts.ts` — readers canónicos sobre el export GCP Billing → BigQuery
+- `/api/admin/cloud/gcp-billing` — admin endpoint read-only
+- `src/lib/cloud/finops-ai/runner.ts` — FinOps AI watcher (extiende patrón TASK-638)
+- Reliability signals `cloud.billing.gcp` integradas en RCP
+
+GCP Billing export a BigQuery > alerts via Console + email (más granular, queryable, integrable con AI watcher). Slice 2 (BigQuery cost guards via `maximumBytesBilled` wrapper) ya quedó shipped en `getBigQueryClient()` con `getBlockedQueries()` reactivo en Admin Center. La task queda como histórica — los pasos manuales pendientes ya no son necesarios bajo la postura actual.
+
 ## Delta 2026-04-25 — Reliability Control Plane V1 reserva boundary cloud.billing
 
 - TASK-600 entregó la foundation `Reliability Control Plane V1`. La señal `cloud.cost_guard.bigquery` ya consume `getBlockedQueries()` desde el adapter `buildCloudSignals()` en `src/lib/reliability/signals.ts` — la parte ya implementada de esta task aparece automáticamente en la lectura "Confiabilidad por módulo" del Admin Center.
@@ -78,7 +89,7 @@ Depende de que los budgets estén creados. Usa la capa de email delivery (`src/l
 
 | Campo | Valor |
 |-------|-------|
-| Lifecycle | `in-progress` |
+| Lifecycle | `complete` (closed 2026-05-05 — superseded por GREENHOUSE_BILLING_EXPORT_OBSERVABILITY_V1) |
 | Priority | `P2` |
 | Impact | `Medio` |
 | Effort | `Bajo` |

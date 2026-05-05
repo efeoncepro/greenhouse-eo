@@ -127,7 +127,7 @@ Registro canonico de asignacion de IDs `TASK-###` para evitar colisiones y renum
 | `TASK-100` | `complete` | CI Pipeline: Add Test Step | `docs/tasks/complete/TASK-100-ci-pipeline-test-step.md` |
 | `TASK-101` | `complete` | Cron Auth Standardization | `docs/tasks/complete/TASK-101-cron-auth-standardization.md` |
 | `TASK-102` | `complete` | Database Resilience Baseline | `docs/tasks/complete/TASK-102-database-resilience-baseline.md` |
-| `TASK-103` | `in-progress` | GCP Budget Alerts & BigQuery Cost Guards | `docs/tasks/in-progress/TASK-103-gcp-budget-alerts-bigquery-guards.md` |
+| `TASK-103` | `complete` (superseded 2026-05-05 — Billing Export Observability canónico) | GCP Budget Alerts & BigQuery Cost Guards | `docs/tasks/complete/TASK-103-gcp-budget-alerts-bigquery-guards.md` |
 | `TASK-104` | `complete` | Payroll Export Email Redesign | `docs/tasks/complete/TASK-104-payroll-export-email-redesign.md` |
 | `TASK-105` | `complete` | Lint Debt Stabilization | `docs/tasks/complete/TASK-105-lint-debt-stabilization.md` |
 | `TASK-106` | `complete` | Email Delivery Admin UI | `docs/tasks/complete/TASK-106-email-delivery-admin-ui.md` |
