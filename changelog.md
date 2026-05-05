@@ -2,6 +2,17 @@
 
 ## 2026-05-05
 
+- **TASK-785 implementada — Workforce Role Title Source of Truth + Drift Governance.** Greenhouse ahora trata `members.role_title` como fuente de verdad laboral del cargo, con governance dura para evitar overwrites silenciosos desde Entra/Graph y un review queue para HR.
+  - **Schema canonico:** `members` recibe 4 columnas nuevas (`role_title_source`, `role_title_updated_by_user_id`, `role_title_updated_at`, `last_human_update_at`). Audit log append-only en `member_role_title_audit_log` con triggers PG anti-update/anti-delete. Drift queue en `greenhouse_sync.member_role_title_drift_proposals` (clone TASK-731).
+  - **Sync Entra governance:** `applyEntraRoleTitle()` skipea overwrite cuando `source='hr_manual' AND last_human_update_at IS NOT NULL` y registra drift_proposal cuando los valores divergen. Wrapping try/catch en `entra/profile-sync.ts` mantiene el sync upstream resiliente (drift es non-blocking).
+  - **Resolver canonico per-context (6):** `resolveRoleTitle({memberId, context})` para `internal_profile | client_assignment | payroll_document | commercial_cost | staffing | identity_admin`. Single source of truth para "cargo a mostrar en X surface" — devuelve `{value, source, sourceLabel, hasDriftWithEntra, assignmentOverride}`.
+  - **API gobernada:** `PATCH /api/admin/team/members/[memberId]/role-title` (capability `workforce.role_title.update`), `GET /api/hr/workforce/role-title-drift` + `POST /api/hr/workforce/role-title-drift/[proposalId]/resolve` (capability `workforce.role_title.review_drift`), `GET /api/hr/workforce/members/[memberId]/role-title` (governance reader). Reason >=10 chars obligatorio.
+  - **HR UI surface:** `MemberRoleTitleSection` (single-card flat, Vuexy-aligned) montada en `PersonHrProfileTab`. Muestra cargo actual + chip de source + valor Entra + banner de drift. Dialogos editar/resolver capability-aware.
+  - **Reliability:** 2 signals bajo modulo `identity` — `workforce.role_title.drift_with_entra` (drift, warning, informativo) + `workforce.role_title.unresolved_drift_overdue` (drift, error, steady=0).
+  - **Outbox:** 3 events v1 — `member.role_title.changed`, `member.role_title.drift_proposed`, `member.role_title.drift_resolved`.
+  - **Capabilities:** 3 nuevas — `workforce.role_title.update`, `workforce.role_title.review_drift`, `workforce.assignment_role_override` (HR + EFEONCE_ADMIN).
+  - **Resultado:** HR mantiene control formal del cargo con audit, Entra propone valores via review queue, los consumers (finiquito, payroll PDF, KPIs comerciales, staff augmentation, /people, /my/profile) consumen el resolver canonico per-context y nunca reinventan fallback. Cero break en SCIM/Entra upstream (try/catch + non-blocking drift).
+
 - **TASK-783 implementada — Payroll Final Settlement Policy + Overlap Hardening.** El finiquito Chile dependiente ahora calcula con policy por componente y ledger de overlap contra nomina mensual exportada.
   - **Policy engine:** `src/lib/payroll/final-settlement/policies.ts` exige tratamiento legal/tributario/previsional por linea; `proportional_vacation` queda como no renta/no imponible y no dispara AFP/salud/AFC/IUSC.
   - **Overlap ledger:** el settlement lee payroll mensual del periodo de termino y solo calcula deltas pendientes, evitando doble Isapre/AFP/AFC/IUSC cuando la nomina ya fue exportada.

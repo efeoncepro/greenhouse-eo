@@ -321,7 +321,7 @@ export const STATIC_RELIABILITY_REGISTRY: ReliabilityModuleDefinition[] = [
     moduleKey: 'identity',
     label: 'Identity & Access',
     description:
-      'Identidad legal de personas, autenticacion (NextAuth + Azure AD), SCIM/Entra sync y readiness para finiquitos/payroll/honorarios.',
+      'Identidad legal de personas, autenticacion (NextAuth + Azure AD), SCIM/Entra sync, role title governance y readiness para finiquitos/payroll/honorarios.',
     domain: 'identity',
     routes: [
       { path: '/admin/users', label: 'Usuarios admin' },
@@ -329,13 +329,16 @@ export const STATIC_RELIABILITY_REGISTRY: ReliabilityModuleDefinition[] = [
     ],
     apis: [
       { path: '/api/my/legal-profile', label: 'Self-service legal profile' },
-      { path: '/api/auth/health', label: 'Auth readiness' }
+      { path: '/api/auth/health', label: 'Auth readiness' },
+      { path: '/api/hr/workforce/role-title-drift', label: 'Role title drift queue' }
     ],
     dependencies: [
       'greenhouse_core.identity_profiles',
       'greenhouse_core.person_identity_documents',
       'greenhouse_core.person_addresses',
       'greenhouse_core.client_users',
+      'greenhouse_core.member_role_title_audit_log',
+      'greenhouse_sync.member_role_title_drift_proposals',
       'GCP Secret Manager (greenhouse-pii-normalization-pepper)',
       'Azure AD (multi-tenant)'
     ],
@@ -346,8 +349,11 @@ export const STATIC_RELIABILITY_REGISTRY: ReliabilityModuleDefinition[] = [
       'src/lib/person-legal-profile/**',
       'src/lib/auth/**',
       'src/lib/entra/**',
+      'src/lib/workforce/role-title/**',
       'src/app/api/my/legal-profile/**',
-      'src/app/api/hr/people/**/legal-profile/**'
+      'src/app/api/hr/people/**/legal-profile/**',
+      'src/app/api/hr/workforce/**',
+      'src/app/api/admin/team/members/**/role-title/**'
     ],
     expectedSignalKinds: ['incident', 'drift', 'data_quality'],
     incidentDomainTag: 'identity'

@@ -42,6 +42,10 @@ import { getPaidOrdersWithoutExpensePaymentSignal } from './queries/payment-orde
 import { getPayrollExpenseMaterializationLagSignal } from './queries/payroll-expense-materialization-lag'
 import { getProviderBqSyncDeadLetterSignal } from './queries/provider-bq-sync-dead-letter'
 import { getHomeRolloutDriftSignal } from './queries/home-rollout-drift'
+import {
+  getRoleTitleDriftWithEntraSignal,
+  getRoleTitleUnresolvedDriftOverdueSignal
+} from './queries/role-title-drift'
 import { getShortcutsInvalidPinsSignal } from './queries/shortcuts-invalid-pins'
 import { getOutboxUnpublishedLagSignal } from './queries/outbox-unpublished-lag'
 import { getOutboxDeadLetterSignal } from './queries/outbox-dead-letter'
@@ -358,6 +362,14 @@ interface ReliabilityOverviewSources {
    * Roll up bajo moduleKey 'identity'.
    */
   identityLegalProfile?: ReliabilitySignal[] | null
+
+  /**
+   * TASK-785 Slice 7 — Workforce role title governance signals (2):
+   *   - workforce.role_title.drift_with_entra (drift, warning)
+   *   - workforce.role_title.unresolved_drift_overdue (drift, error)
+   * Roll up bajo moduleKey 'identity'.
+   */
+  workforceRoleTitle?: ReliabilitySignal[] | null
 }
 
 export const buildReliabilityOverview = (
@@ -409,7 +421,9 @@ export const buildReliabilityOverview = (
     // TASK-553 Slice 4 — Quick Access Shortcuts catalog drift.
     ...(sources.shortcutsInvalidPins ? [sources.shortcutsInvalidPins] : []),
     // TASK-784 Slice 7 — Identity legal profile signals (4).
-    ...(sources.identityLegalProfile ?? [])
+    ...(sources.identityLegalProfile ?? []),
+    // TASK-785 Slice 7 — Workforce role title governance signals (2).
+    ...(sources.workforceRoleTitle ?? [])
   ]
 
   const signalsByModule = new Map<string, ReliabilitySignal[]>()
@@ -657,6 +671,19 @@ export const getReliabilityOverview = async (
           .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
           .catch(() => null)
 
+  // TASK-785 Slice 7 — Workforce role title governance signals (2 readers en
+  // paralelo). Cada uno degrada honestamente a `unknown` si su query falla.
+  // Roll up bajo moduleKey 'identity'.
+  const workforceRoleTitle =
+    preloadedSources.workforceRoleTitle !== undefined
+      ? preloadedSources.workforceRoleTitle
+      : await Promise.all([
+          getRoleTitleDriftWithEntraSignal().catch(() => null),
+          getRoleTitleUnresolvedDriftOverdueSignal().catch(() => null)
+        ])
+          .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
+          .catch(() => null)
+
   return buildReliabilityOverview(operations, {
     billing,
     notionOperational,
@@ -674,7 +701,8 @@ export const getReliabilityOverview = async (
     expenseDistribution,
     homeRolloutDrift,
     shortcutsInvalidPins,
-    identityLegalProfile
+    identityLegalProfile,
+    workforceRoleTitle
   })
 }
 

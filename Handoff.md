@@ -1,5 +1,24 @@
 # Handoff.md
 
+## Sesion 2026-05-05 — TASK-785 completa (Workforce Role Title Source of Truth + Drift Governance)
+
+- **Branch:** `develop` por instruccion explicita del usuario. No se creo branch `task/*`.
+- **Skills:** `greenhouse-ux`, `greenhouse-ux-writing`, `microinteractions-auditor` aplicadas al diseñar `MemberRoleTitleSection` (single-card flat pattern, sin card-on-card; Vuexy-aligned).
+- **Slices entregados (7):**
+  1. Schema canonico — `role_title_source` + `last_human_update_at` + `member_role_title_audit_log` (append-only via triggers PG anti-update/delete) + `member_role_title_drift_proposals` (review queue clone de TASK-731).
+  2. Sync Entra governance — `applyEntraRoleTitle` no-blocking que skipea overwrites cuando `role_title_source='hr_manual' AND last_human_update_at IS NOT NULL` y registra `drift_proposal`. Wrapping try/catch en `entra/profile-sync.ts` para no romper SCIM upstream.
+  3. Resolver canonico per-context (6) — `resolveRoleTitle({memberId, context})` para `internal_profile | client_assignment | payroll_document | commercial_cost | staffing | identity_admin`. 8 tests pass.
+  4. Mutation API — `PATCH /api/admin/team/members/[memberId]/role-title` capability-gated (`workforce.role_title.update:update`), reason >=10, atomic: SELECT FOR UPDATE → UPDATE source=hr_manual + last_human_update_at=NOW → resolve pending drift como rejected → audit + outbox event `member.role_title.changed`.
+  5. HR drift queue API — `GET /api/hr/workforce/role-title-drift` + `POST /api/hr/workforce/role-title-drift/[proposalId]/resolve` capability-gated (`review_drift:read | approve`), atomic transition + audit + outbox event `member.role_title.drift_resolved`.
+  6. UI consumers cutover — `MemberRoleTitleSection` (single-card flat) montada en `PersonHrProfileTab` antes del legal profile. Lee `/api/hr/workforce/members/[memberId]/role-title` (governance reader: cargo + source chip + Entra job_title + drift banner + pending proposal id). Dialogos editar (PATCH) y resolver (POST) capability-aware.
+  7. Reliability + docs — 2 signals bajo modulo `identity`: `workforce.role_title.drift_with_entra` (drift, warning, informativo) + `workforce.role_title.unresolved_drift_overdue` (drift, error, steady=0). CLAUDE.md sección canonica añadida. Registry actualizado con dependencies + filesOwned + apis.
+- **Capabilities añadidas (3):** `workforce.role_title.update`, `workforce.role_title.review_drift`, `workforce.assignment_role_override` (para uso futuro). Wired en `runtime.ts` para HR + EFEONCE_ADMIN.
+- **Outbox events añadidos (3):** `member.role_title.changed`, `member.role_title.drift_proposed`, `member.role_title.drift_resolved` v1.
+- **Validación:** `npx tsc --noEmit` (clean), `npx eslint` modulos tocados (clean), `pnpm test src/lib/workforce/role-title src/views/greenhouse/people/tabs/PersonHrProfileTab` (11/11 pass).
+- **Commits:** `f3e4f814` (Slice 1 schema), `1f2d0f78` (Slices 2-4 governance + resolver + mutation API), `a7f3c8c7` (Slice 5 drift queue API), `d98f1063` (Slice 6 HR section + governance reader). Slice 7 commit pending al cierre.
+- **Lifecycle:** `docs/tasks/complete/TASK-785-workforce-role-title-source-of-truth-governance.md`; indice `docs/tasks/README.md` sincronizado como cerrada.
+- **Cuidado multi-agente:** worktree contiene cambios ajenos en `mockups/`. No revertir ni mezclar fuera del alcance TASK-785.
+
 ## Sesion 2026-05-05 — TASK-783 implementada y Valentina remediada
 
 - **Branch:** `develop` por instruccion explicita del usuario. No se creo branch `task/*`.
