@@ -1,12 +1,72 @@
 import 'server-only'
 
 import { query } from '@/lib/db'
+import { captureWithDomain } from '@/lib/observability/capture'
+import { publishPendingOutboxEvents } from '@/lib/sync/outbox-consumer'
+import { processReactiveEvents } from '@/lib/sync/reactive-consumer'
 
 import { cancelPaymentProfile } from './cancel-profile'
 import { createPaymentProfile, type CreatePaymentProfileInput } from './create-profile'
 import { PaymentProfileConflictError, PaymentProfileValidationError } from './errors'
 import { listPaymentProfiles } from './list-profiles'
 import type { BeneficiaryPaymentProfileSafe } from '@/types/payment-profiles'
+
+/**
+ * TASK-753 — Drena inline el pipeline outbox+reactive después de un write
+ * de self-service. La meta: el colaborador percibe la notificación dentro
+ * del response cycle (~1-2s) en lugar de esperar al ciclo cron (5min worst).
+ *
+ * **Robustez via idempotency-by-design**:
+ *  - `publishPendingOutboxEvents` usa `FOR UPDATE SKIP LOCKED` — concurrencia
+ *    segura con el cron `ops-outbox-publish` (cada 2min).
+ *  - `processReactiveEvents` usa `outbox_reactive_log` con UNIQUE
+ *    `(event_id, handler)` + `ON CONFLICT DO UPDATE` — concurrencia segura
+ *    con el cron `ops-reactive-finance` (cada 5min).
+ *  - Si esta llamada inline FALLA (network blip, lambda timeout, Resend
+ *    down): el evento queda persistido en outbox; el cron lo procesa al
+ *    próximo tick. Eventual consistency preservada.
+ *  - Si esta llamada inline EXITOSA: el cron al próximo tick fetcha 0
+ *    eventos pendientes para ese profile (no-op). Cero duplicados.
+ *
+ * **NUNCA** lanza errores hacia el caller. La intención es "best effort
+ * accelerator"; el contract con el colaborador (perfil persistido + outbox
+ * event encolado) ya está cumplido al momento de invocar este helper. Toda
+ * falla queda en Sentry para auditoría sin afectar response.
+ */
+const drainOutboxPipelineForFinance = async (context: {
+  profileId: string
+  operation: 'created' | 'cancelled'
+}): Promise<void> => {
+  try {
+    // Step 1: flip pending → published para el evento recién insertado.
+    // El cron `ops-outbox-publish` haría esto cada 2min; lo hacemos ahora.
+    await publishPendingOutboxEvents({ batchSize: 50 })
+  } catch (error) {
+    captureWithDomain(error, 'finance', {
+      tags: { source: 'self_service_inline_drain.publish' },
+      extra: context
+    })
+
+    // No throw — cron retoma. Si publish falla aquí, react no puede continuar
+    // (el evento sigue pending), pero el cron `ops-outbox-publish` lo
+    // recogerá automáticamente.
+    return
+  }
+
+  try {
+    // Step 2: procesar el evento published, dispara projection
+    // `payment_profile_notifications` → email transaccional.
+    // Domain filter limita el batch a eventos finance — bajo overhead.
+    await processReactiveEvents({ domain: 'finance', batchSize: 25 })
+  } catch (error) {
+    captureWithDomain(error, 'finance', {
+      tags: { source: 'self_service_inline_drain.react' },
+      extra: context
+    })
+
+    // No throw — cron `ops-reactive-finance` retomará.
+  }
+}
 
 /**
  * TASK-753 — Wrappers de self-service sobre el modulo canonico
@@ -106,7 +166,7 @@ export const createSelfServicePaymentProfileRequest = async (
   // semántica desde la UI self-service.
   const routingReference = input.swiftBic?.trim() || input.routingReference || null
 
-  return createPaymentProfile({
+  const result = await createPaymentProfile({
     spaceId: input.spaceId ?? null,
     beneficiaryType: 'member',
     beneficiaryId: input.memberId,
@@ -137,6 +197,15 @@ export const createSelfServicePaymentProfileRequest = async (
       ...(input.rut ? { rut_titular: input.rut } : {})
     }
   })
+
+  // Drain inline para que el email salga dentro del response cycle.
+  // Idempotente vs cron; falla degrada a eventual consistency (cron retoma).
+  await drainOutboxPipelineForFinance({
+    profileId: result.profile.profileId,
+    operation: 'created'
+  })
+
+  return result
 }
 
 export interface CancelSelfServiceProfileInput {
@@ -205,9 +274,17 @@ export const cancelSelfServicePaymentProfile = async (
     )
   }
 
-  return cancelPaymentProfile({
+  const result = await cancelPaymentProfile({
     profileId: input.profileId,
     cancelledBy: input.userId,
     reason: input.reason.trim()
   })
+
+  // Drain inline para que la notificación de cancelación salga inmediato.
+  await drainOutboxPipelineForFinance({
+    profileId: input.profileId,
+    operation: 'cancelled'
+  })
+
+  return result
 }
