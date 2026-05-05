@@ -12,10 +12,10 @@ import type { FinalSettlementDocumentSnapshot } from './document-types'
 
 const styles = StyleSheet.create({
   page: {
-    paddingTop: 34,
-    paddingRight: 38,
-    paddingBottom: 44,
-    paddingLeft: 38,
+    paddingTop: 28,
+    paddingRight: 32,
+    paddingBottom: 34,
+    paddingLeft: 32,
     fontFamily: 'DM Sans',
     fontSize: 8,
     color: '#1A1A2E',
@@ -26,18 +26,18 @@ const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingBottom: 16,
+    paddingBottom: 12,
     borderBottom: '1.4 solid #D7E2EA',
-    marginBottom: 18
+    marginBottom: 13
   },
   headerLeft: {
     width: 300
   },
   logo: {
-    width: 150,
-    height: 34,
+    width: 140,
+    height: 30,
     objectFit: 'contain',
-    marginBottom: 10
+    marginBottom: 7
   },
   legalBlock: {
     color: '#425466',
@@ -85,15 +85,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: 18
+    marginBottom: 12
   },
   titleCopy: {
     width: 335
   },
   title: {
     fontFamily: 'Poppins Bold',
-    fontSize: 20,
-    marginBottom: 5,
+    fontSize: 18,
+    lineHeight: 1.18,
+    marginBottom: 9,
     color: '#102A43'
   },
   subtitle: {
@@ -125,7 +126,7 @@ const styles = StyleSheet.create({
     fontSize: 7
   },
   section: {
-    marginBottom: 13
+    marginBottom: 8
   },
   sectionTitle: {
     fontFamily: 'Poppins',
@@ -149,8 +150,8 @@ const styles = StyleSheet.create({
   },
   field: {
     width: '50%',
-    minHeight: 40,
-    paddingVertical: 8,
+    minHeight: 34,
+    paddingVertical: 6,
     paddingHorizontal: 9,
     borderRight: '1 solid #E3E8EF',
     borderBottom: '1 solid #E3E8EF'
@@ -172,7 +173,7 @@ const styles = StyleSheet.create({
     borderBottom: '1.2 solid #C9D6E2',
     borderTop: '1.2 solid #C9D6E2',
     backgroundColor: '#F8FAFC',
-    paddingVertical: 7,
+    paddingVertical: 5,
     paddingHorizontal: 7,
     color: '#425466',
     fontFamily: 'DM Sans Bold'
@@ -181,7 +182,7 @@ const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'row',
     borderBottom: '1 solid #E3E8EF',
-    paddingVertical: 8,
+    paddingVertical: 5,
     paddingHorizontal: 7
   },
   conceptCell: {
@@ -242,7 +243,7 @@ const styles = StyleSheet.create({
   totals: {
     border: '1.2 solid #D7E2EA',
     borderRadius: 8,
-    padding: 10,
+    padding: 8,
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'space-between'
@@ -256,7 +257,7 @@ const styles = StyleSheet.create({
     color: '#023C70'
   },
   warning: {
-    padding: 10,
+    padding: 8,
     border: '1 solid #F79009',
     backgroundColor: '#FFFBEA',
     marginBottom: 12
@@ -269,7 +270,7 @@ const styles = StyleSheet.create({
   signatures: {
     display: 'flex',
     flexDirection: 'row',
-    marginTop: 30
+    marginTop: 20
   },
   signatureLine: {
     width: '47%',
@@ -280,9 +281,9 @@ const styles = StyleSheet.create({
   },
   footer: {
     position: 'absolute',
-    bottom: 24,
-    left: 38,
-    right: 38,
+    bottom: 18,
+    left: 32,
+    right: 32,
     fontSize: 7,
     color: '#667085',
     borderTop: '1 solid #D7E2EA',
@@ -410,8 +411,14 @@ const lineTreatmentTags = (line: FinalSettlementDocumentSnapshot['breakdown'][nu
 }
 
 const FinalSettlementPdfDocument = ({ snapshot }: { snapshot: FinalSettlementDocumentSnapshot }) => {
-  const warnings = snapshot.readiness.checks.filter(check => check.status !== 'passed')
-  const readinessStatus = snapshot.readiness.hasBlockers ? 'blocked' : warnings.length > 0 ? 'needs_review' : 'ready'
+  const documentReadiness = snapshot.documentReadiness ?? {
+    status: snapshot.readiness.hasBlockers ? 'blocked' : 'ready',
+    hasBlockers: snapshot.readiness.hasBlockers,
+    checks: snapshot.readiness.checks.filter(check => check.status === 'blocked')
+  }
+
+  const warnings = documentReadiness.checks.filter(check => check.status !== 'passed')
+  const readinessStatus = documentReadiness.status
   const collaboratorName = snapshot.collaborator.legalName || snapshot.collaborator.displayName || snapshot.finalSettlement.memberId
   const fingerprint = shortHash(snapshot)
   const documentNumber = `GH-FIN-${new Date(snapshot.generatedAt).getFullYear()}-${snapshot.finalSettlement.finalSettlementId.slice(0, 8)}`
@@ -559,9 +566,11 @@ const FinalSettlementPdfDocument = ({ snapshot }: { snapshot: FinalSettlementDoc
           <Text style={styles.signatureLine}>Trabajador/a{'\n'}{collaboratorName}</Text>
         </View>
 
-        <View style={styles.footer}>
+        <View style={styles.footer} fixed>
           <Text>Documento confidencial · {snapshot.employer.legalName} · RUT {snapshot.employer.taxId ?? 'Pendiente'}</Text>
-          <Text>Página 1 de 1 · Template {snapshot.documentTemplateCode} · {snapshot.documentTemplateVersion}</Text>
+          <Text render={({ pageNumber, totalPages }) => (
+            `Página ${pageNumber} de ${totalPages} · Template ${snapshot.documentTemplateCode} · ${snapshot.documentTemplateVersion}`
+          )} />
         </View>
       </Page>
     </Document>

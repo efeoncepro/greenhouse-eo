@@ -22716,3 +22716,36 @@ Actualizacion posterior de cierre SCIM:
 - `provisionOnDemand` de los 8 usuarios activos de `Efeonce Group` termino `Success` + `EntryExportUpdate=Success` para todos.
 - `provisionOnDemand` del grupo `Efeonce Group` termino sin error y con `RedundantExport`; el grupo ya existia en Greenhouse.
 - Se ejecuto `restart` con `resetScope="Watermark, Escrows, QuarantineState"`; Graph mostro momentaneamente `countEscrowed=0` y `statusCode=NotRun` tras reset. Al llamar `start`, Microsoft volvio a mostrar el ultimo ciclo regular antiguo (`lastBegan=2026-05-04T10:48:22Z`, `countEscrowed=9`) sin iniciar ciclo nuevo inmediato. Interpretacion: todos los objetos del scope ya validan por `provisionOnDemand`; el contador del ciclo regular queda dependiente de la proxima corrida automatica del servicio Entra. No queda evidencia de error activo en Greenhouse ni en export on-demand.
+## Sesion 2026-05-05 — Finiquito PDF: readiness documental y maqueta aprobada
+
+Contexto:
+
+- El PDF adjunto `finiquito-valentina-hoyos-v2-d3.pdf` fue revisado con criterios de UI, UX y Payroll.
+- El documento ya usaba parte de la maqueta aprobada `mockups/finiquito-document-v1/index.html`, pero seguia saliendo como `Requiere revision`, el titulo se montaba sobre el subtitulo y el contenido se partia en 2 paginas aunque el footer declaraba `Pagina 1 de 1`.
+
+Causa raiz:
+
+- El renderer PDF estaba usando `snapshot.readiness` del settlement/calculo para el estado visible de emision documental.
+- Esa readiness incluye advertencias operacionales del calculo, por ejemplo retencion de evidencia previsional, que no deben convertir un documento emitible en `Requiere revision`.
+- El store ya calculaba `documentReadiness` con `buildDocumentReadiness()`, pero no lo persistia dentro del snapshot; por eso el PDF no podia distinguir readiness de calculo vs readiness documental.
+
+Fix aplicado:
+
+- `FinalSettlementDocumentSnapshot` ahora puede incluir `documentReadiness`.
+- `buildDocumentSnapshot()` persiste esa readiness documental en el snapshot.
+- `document-pdf.tsx` usa `documentReadiness` para estado visible y warnings de emision, con fallback conservador para snapshots legacy que solo bloquea por checks realmente bloqueantes.
+- Se compactaron paddings, header, secciones, filas, totales y firmas para sostener la maqueta en una pagina Letter sin solapamiento.
+- El footer ahora calcula `Pagina X de Y` con metadata real de `react-pdf`, no texto hardcoded.
+- Regresion agregada: si el settlement tiene warning operacional pero el documento esta listo, el PDF debe decir `Listo para emitir`, no `Requiere revision`, y no debe mostrar bloque `Readiness de emision`.
+
+Validaciones:
+
+- `pnpm exec vitest run src/lib/payroll/final-settlement/document-pdf.test.tsx --reporter=verbose` -> pass, 2 tests. Queda el warning conocido de MSW por asset wasm/font de react-pdf, no bloqueante.
+- `pnpm exec eslint src/lib/payroll/final-settlement/document-pdf.tsx src/lib/payroll/final-settlement/document-pdf.test.tsx src/lib/payroll/final-settlement/document-store.ts src/lib/payroll/final-settlement/document-types.ts` -> pass.
+- `pnpm exec tsc --noEmit --pretty false` -> pass.
+- `pnpm design:lint` -> 0 errors / 0 warnings.
+
+Pendiente operativo:
+
+- Commit/push y despliegue posterior a esta correccion.
+- Para ver el PDF corregido en el caso real de Valentina, el documento debe regenerarse/reemitirse luego de que el commit quede desplegado; el asset PDF antiguo no cambia retroactivamente.

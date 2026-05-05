@@ -376,7 +376,8 @@ const buildDocumentSnapshot = async (settlement: FinalSettlement): Promise<{
       sourceSnapshot: settlement.sourceSnapshot,
       breakdown: settlement.breakdown,
       explanation: settlement.explanation,
-      readiness: settlement.readiness
+      readiness: settlement.readiness,
+      documentReadiness: readiness
     },
     readiness
   }

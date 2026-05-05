@@ -7996,6 +7996,7 @@ Comando operativo:
 # 2026-05-05
 
 - HR / Offboarding: se endureció el contrato de documentos de finiquito versionados. Los PDFs de settlements cancelados quedan como evidencia histórica descargable, pero ya no habilitan `Reemitir`, revisión ni emisión sobre el settlement vigente; el flujo ofrece generar el documento vigente y el backend ancla todas las acciones documentales al settlement aprobado actual.
+- HR / Payroll: el PDF de finiquito ahora usa readiness documental para el estado visible de emisión, no warnings operacionales del cálculo. Esto evita falsos `Requiere revisión`, mantiene la maqueta aprobada en una página Letter y conserva numeración real `Página X de Y`.
 
 # 2026-05-04
 

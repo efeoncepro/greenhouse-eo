@@ -116,16 +116,29 @@ const snapshot: FinalSettlementDocumentSnapshot = {
     status: 'ready',
     hasBlockers: false,
     checks: []
+  },
+  documentReadiness: {
+    status: 'ready',
+    hasBlockers: false,
+    checks: []
   }
 }
 
 describe('renderFinalSettlementDocumentPdf', () => {
   it('renders the approved finiquito mockup landmarks and policy columns', async () => {
     const buffer = await renderFinalSettlementDocumentPdf(snapshot)
-    const text = await extractText(buffer)
 
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const pdfParse = require('pdf-parse/lib/pdf-parse.js') as (
+      buf: Buffer
+    ) => Promise<{ text: string; numpages: number }>
+
+    const { text, numpages } = await pdfParse(buffer)
+
+    expect(numpages).toBe(1)
     expect(text.replace(/\s+/g, ' ')).toContain('Finiquito de contrato de trabajo')
     expect(text).toContain('Listo para emitir')
+    expect(text).not.toContain('Requiere revisión')
     expect(text).toContain('Documento GH-FIN-2026-')
     expect(text).toContain('Snapshot fs-v1')
     expect(text).toContain('Tratamiento')
@@ -139,5 +152,34 @@ describe('renderFinalSettlementDocumentPdf', () => {
     expect(text).toContain('Declaración operativa')
     expect(text).toContain('Documento confidencial')
     expect(text.toLocaleLowerCase('es-CL')).toContain('líquido / pago neto')
+  })
+
+  it('uses document readiness instead of settlement warnings for the visible issuance state', async () => {
+    const buffer = await renderFinalSettlementDocumentPdf({
+      ...snapshot,
+      readiness: {
+        status: 'needs_review',
+        hasBlockers: false,
+        checks: [
+          {
+            code: 'payroll_evidence_retention',
+            status: 'warning',
+            severity: 'warning',
+            message: 'Debe conservarse evidencia operacional de cotizaciones previsionales previas al termino.'
+          }
+        ]
+      },
+      documentReadiness: {
+        status: 'ready',
+        hasBlockers: false,
+        checks: []
+      }
+    })
+
+    const text = await extractText(buffer)
+
+    expect(text).toContain('Listo para emitir')
+    expect(text).not.toContain('Requiere revisión')
+    expect(text).not.toContain('Readiness de emisión')
   })
 })

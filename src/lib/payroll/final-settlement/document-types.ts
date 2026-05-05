@@ -102,6 +102,7 @@ export interface FinalSettlementDocumentSnapshot {
   breakdown: FinalSettlementBreakdownLine[]
   explanation: FinalSettlementExplanation
   readiness: FinalSettlementReadiness
+  documentReadiness?: FinalSettlementDocumentReadiness
 }
 
 export interface FinalSettlementDocument {
