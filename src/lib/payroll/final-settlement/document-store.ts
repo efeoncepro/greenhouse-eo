@@ -16,6 +16,8 @@ import { storeSystemGeneratedPrivateAsset } from '@/lib/storage/greenhouse-asset
 import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 
+import { readFinalSettlementSnapshot } from '@/lib/person-legal-profile'
+
 import { computeBytesSha256, computeJsonSha256 } from './document-hash'
 import { renderFinalSettlementDocumentPdf } from './document-pdf'
 import {
@@ -157,13 +159,33 @@ const getCollaboratorSnapshot = async (memberId: string, profileId: string): Pro
     throw new PayrollValidationError('Collaborator snapshot not found for final settlement document.', 409)
   }
 
+  // TASK-784 — consume canonical person legal profile snapshot.
+  // Returns CL_RUT in `taxId` only when document is verification_status='verified'.
+  // Pending/rejected/archived → `taxId` stays null (no auto-trust).
+  // Logs an `export_snapshot` audit row in the same query for traceability.
+  let taxId: string | null = null
+
+  try {
+    const snapshot = await readFinalSettlementSnapshot(row.profile_id, null)
+
+    if (snapshot.document?.verificationStatus === 'verified') {
+      taxId = snapshot.document.valueFull
+    }
+  } catch {
+    // Defensive: if pepper missing, secret manager down, or any reader fails,
+    // the snapshot stays null — finiquito can still emit informally and the
+    // reliability signal will surface the gap. Do NOT block emission on
+    // person legal profile failure.
+    taxId = null
+  }
+
   return {
     memberId: row.member_id,
     profileId: row.profile_id,
     displayName: row.display_name,
     legalName: row.legal_name ?? row.full_name,
     primaryEmail: row.primary_email ?? row.canonical_email,
-    taxId: null,
+    taxId,
     jobTitle: row.job_title
   }
 }
