@@ -541,6 +541,24 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     defaultScope: 'own'
   },
   {
+    // TASK-753 — Self-service: el colaborador lee su propio perfil de pago
+    // (masked siempre). Scope 'own'. Diferente de finance.payment_profiles.read
+    // (admin op tenant-scope).
+    key: 'personal_workspace.payment_profile.read_self',
+    module: 'my_workspace',
+    actions: ['read'] as const,
+    defaultScope: 'own'
+  },
+  {
+    // TASK-753 — Self-service: el colaborador solicita cambio de su propio
+    // perfil de pago. La creacion entra como pending_approval; finance aprueba
+    // con maker-checker (NUNCA puede auto-aprobar). Scope 'own'.
+    key: 'personal_workspace.payment_profile.request_change_self',
+    module: 'my_workspace',
+    actions: ['create'] as const,
+    defaultScope: 'own'
+  },
+  {
     key: 'person.legal_profile.hr_update',
     module: 'hr',
     actions: ['create', 'update'] as const,

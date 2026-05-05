@@ -481,6 +481,14 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
     routeGroup: 'my'
   },
   {
+    viewCode: 'mi_ficha.mi_cuenta_pago',
+    section: 'mi_ficha',
+    label: 'Mi cuenta de pago',
+    description: 'Perfil de pago y solicitud de cambio. TASK-753.',
+    routePath: '/my/payment-profile',
+    routeGroup: 'my'
+  },
+  {
     viewCode: 'mi_ficha.mi_inicio',
     section: 'mi_ficha',
     label: 'Mi Greenhouse',

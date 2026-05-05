@@ -761,6 +761,24 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       scope: 'own',
       source
     })
+
+    // TASK-753 — Self-service del propio perfil de pago: lectura masked +
+    // solicitud de cambio (entra como pending_approval). NUNCA aprueba.
+    addEntitlement(entries, {
+      module: 'my_workspace',
+      capability: 'personal_workspace.payment_profile.read_self',
+      action: 'read',
+      scope: 'own',
+      source
+    })
+
+    addEntitlement(entries, {
+      module: 'my_workspace',
+      capability: 'personal_workspace.payment_profile.request_change_self',
+      action: 'create',
+      scope: 'own',
+      source
+    })
   }
 
   if (hasRouteGroup(subject, 'ai_tooling')) {

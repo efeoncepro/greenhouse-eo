@@ -2,7 +2,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P3`
 - Impact: `Medio`
 - Effort: `Medio`
@@ -11,7 +11,8 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `finance`
-- Blocked by: `TASK-749`, `TASK-716` (Notification Hub)
+- Blocked by: `TASK-749` ✅
+- Notes: TASK-716 (Notification Hub) NO es bloqueante; el spec original lo asumia, pero TASK-716 es manual Teams announcements, no hub de email transaccional. Resolucion 2026-05-05: usar `sendEmail` directo (mismo patron que TASK-759 V1 + leave/payroll emails). Si emerge un hub canonico, se migra via adapter.
 - Branch: `task/TASK-753-payment-profiles-self-service`
 - Legacy ID: `none`
 - GitHub Issue: `none`
