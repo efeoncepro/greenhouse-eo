@@ -5,7 +5,10 @@ import type { PoolClient } from 'pg'
 import { withTransaction } from '@/lib/db'
 import { recordExpensePayment } from '@/lib/finance/expense-payment-ledger'
 import { materializePayrollExpensesForExportedPeriod } from '@/lib/finance/payroll-expense-reactive'
+import { captureWithDomain } from '@/lib/observability/capture'
+import { publishPendingOutboxEvents } from '@/lib/sync/outbox-consumer'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
+import { processReactiveEvents } from '@/lib/sync/reactive-consumer'
 import type { PaymentOrder } from '@/types/payment-orders'
 
 import {
@@ -163,13 +166,64 @@ const resolvePayrollExpenseIdInTx = async (
  *   Re-llamar markPaymentOrderPaidAtomic con misma orderId post-paid es
  *   no-op (el SELECT inicial detecta state=paid y retorna sin mutaciones).
  */
+/**
+ * TASK-753 hardening — Drena inline el pipeline outbox+reactive despues
+ * del commit del paid. La meta: las projections downstream
+ * (`payslip_on_payment_paid` para emails, `record_expense_payment_from_order`
+ * safety net, `account_balances` rematerialization) corran dentro del
+ * response cycle (~1-2s) en lugar de esperar al cron (5min worst).
+ *
+ * Idempotency-by-design (NUNCA produce duplicados vs cron):
+ *  - publishPendingOutboxEvents usa FOR UPDATE SKIP LOCKED.
+ *  - processReactiveEvents usa outbox_reactive_log con UNIQUE
+ *    (event_id, handler) + ON CONFLICT DO UPDATE.
+ *
+ * Failure mode preservado (eventual consistency):
+ *  - Si la llamada inline FALLA: captureWithDomain('finance', ...) reporta
+ *    a Sentry, NO se relanza. El order ya esta paid; el outbox event ya
+ *    esta encolado. Cron de respaldo procesa al proximo tick.
+ *  - El contract con el caller (return value de markPaymentOrderPaidAtomic)
+ *    NO cambia.
+ *
+ * NUNCA throws hacia el caller — best effort accelerator.
+ */
+const drainOutboxPipelineAfterMarkPaid = async (orderId: string): Promise<void> => {
+  try {
+    await publishPendingOutboxEvents({ batchSize: 50 })
+  } catch (error) {
+    captureWithDomain(error, 'finance', {
+      tags: { source: 'mark_paid_atomic_inline_drain.publish' },
+      extra: { orderId }
+    })
+
+    return
+  }
+
+  try {
+    // Domain 'notifications' incluye payslip_on_payment_paid + teams_notify;
+    // Domain 'finance' cubre record_expense_payment + account_balances +
+    // operational_pl + commercial_cost_attribution + period_closure_status.
+    // Drenamos AMBOS en paralelo para que el flujo end-to-end llegue al
+    // colaborador sin esperar al cron.
+    await Promise.allSettled([
+      processReactiveEvents({ domain: 'notifications', batchSize: 25 }),
+      processReactiveEvents({ domain: 'finance', batchSize: 25 })
+    ])
+  } catch (error) {
+    captureWithDomain(error, 'finance', {
+      tags: { source: 'mark_paid_atomic_inline_drain.react' },
+      extra: { orderId }
+    })
+  }
+}
+
 export async function markPaymentOrderPaidAtomic(
   input: MarkPaymentOrderPaidAtomicInput
 ): Promise<MarkPaymentOrderPaidAtomicResult> {
   if (!input.orderId) throw new PaymentOrderValidationError('orderId requerido')
   if (!input.paidBy) throw new PaymentOrderValidationError('paidBy requerido')
 
-  return withTransaction(async (client: PoolClient) => {
+  const result = await withTransaction(async (client: PoolClient) => {
     // 1. SELECT FOR UPDATE — lock row contra concurrent transitions.
     const current = await client.query<OrderHeaderRow & OrderRow>(
       `SELECT *
@@ -411,4 +465,12 @@ export async function markPaymentOrderPaidAtomic(
       auditTransitionId: auditTransition.transitionId
     }
   })
+
+  // Post-commit: drena el pipeline INLINE para que las projections downstream
+  // (payslip emails, record_expense_payment safety net, account_balances
+  // rematerialization) corran en el response cycle. Cron permanece como
+  // safety net via idempotency-by-design.
+  await drainOutboxPipelineAfterMarkPaid(input.orderId)
+
+  return result
 }
