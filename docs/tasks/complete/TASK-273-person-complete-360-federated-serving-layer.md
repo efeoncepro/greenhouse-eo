@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete` (closed 2026-05-05 — Phases A-F shipped, GREENHOUSE_PERSON_COMPLETE_360_V1.md spec publicado, 3 legacy resolvers @deprecated, TASK-011 subsumida. Cleanup residual opcional: 2 API routes /api/my/{assignments,payroll} siguen consumiendo resolvers @deprecated — no bloquea cierre)
 - Priority: `P1`
 - Impact: `Critico`
 - Effort: `Alto`

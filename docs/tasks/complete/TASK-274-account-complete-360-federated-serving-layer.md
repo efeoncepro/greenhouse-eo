@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress` (drift fix 2026-05-05 — folder + Lifecycle alineados; Phase F en curso con commits 5c3d0d11 + 6308564c)
+- Lifecycle: `complete` (closed 2026-05-05 — Phases A-F shipped, GREENHOUSE_ACCOUNT_COMPLETE_360_V1.md spec publicado, 2 legacy resolvers @deprecated, 5 organization tabs migradas al endpoint 360. Cleanup residual opcional: 3 API routes /api/organizations/[id]/{economics,finance,executive} siguen consumiendo resolvers @deprecated — no bloquea cierre)
 - Priority: `P1`
 - Impact: `Critico`
 - Effort: `Alto`
