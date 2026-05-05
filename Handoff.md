@@ -1,5 +1,53 @@
 # Handoff.md
 
+## Sesion 2026-05-04 — TASK-786 creada: Person Contact & Professional Presence Governance
+
+- **Branch:** `develop`.
+- **Trigger:** el usuario pregunto que otros datos faltan en perfil/persona: redes sociales, Behance, sitio web y enlace directo a Teams.
+- **Decision:** crear `TASK-786` como task P1 separada de TASK-784 y TASK-785. El repo ya tiene links profesionales (`linkedin_url`, `portfolio_url`, `behance_url`, `github_url`, `dribbble_url`, etc.) y `/api/my/professional-links`; el gap real es visibilidad/policy/client-safe + normalizacion + deep links Teams/Slack derivados desde `teams_user_id`/`slack_user_id`, no URLs manuales.
+- **Fronteras:** datos legales privados quedan en TASK-784; cargo laboral/cliente queda en TASK-785; esta task cubre presencia profesional, contacto interno, preferencias de contacto y acciones de colaboracion.
+- **Docs tocadas:** `docs/tasks/to-do/TASK-786-person-contact-professional-presence-governance.md`, `docs/tasks/TASK_ID_REGISTRY.md`, `docs/tasks/README.md`.
+- **Pendiente:** implementar resolver/policy de presencia profesional y deep link actions para Teams/Slack usando `src/lib/navigation/deep-links/**`.
+
+## Sesion 2026-05-04 — TASK-784 movida a `in-progress` (Discovery + Plan, sin código)
+
+- **Branch:** `develop` (instrucción usuario "mantente en develop", sin branch feature).
+- **Lifecycle:** `to-do` → `in-progress`. README + registry sincronizados.
+- **Skills planeadas:** `greenhouse-backend` (schema + readers + reveal + reliability), `greenhouse-dev` + `greenhouse-ux` + `greenhouse-ux-writing` (self-service `/my/profile` + HR review tab + copy es-CL país-aware), `greenhouse-payroll-auditor` (readiness gates finiquito/honorarios consumiendo TASK-783).
+- **Discovery completo (3 subagentes Explore + 4 lecturas directas):**
+  - `greenhouse_core.identity_profiles` no tiene columnas de documento legal — solo `full_name`, `canonical_email`, `job_title`. Schema PG canónico hoy NO conoce RUT personal.
+  - Documento de identidad personal vive HOY solo en BigQuery `greenhouse_hr.member_profiles.identity_document_*` (legacy). Postgres no tiene fuente canónica.
+  - `final_settlement_documents` document-store.ts:166 hardcodea `taxId: null` (gap concreto que TASK-784 cierra para TASK-783/TASK-762).
+  - TASK-697 `revealPaymentProfileSensitive` (`src/lib/finance/beneficiary-payment-profiles/reveal-sensitive.ts`) es el patrón canónico replicable: capability previa al helper + reason ≥5 chars + `writeProfileAuditEntry` + outbox `revealed_sensitive`. Plaintext at rest con grants estrictos `greenhouse_runtime`.
+  - Asset infra: `createPrivatePendingAsset` + `storeSystemGeneratedPrivateAsset` ya soportan content-hash dedup y per-user ownership; falta agregar contextType `mi_perfil_documento_evidencia` (TASK-721 pattern reusable).
+  - Sanitizers: `redactSensitive`/`redactObjectStrings`/`redactErrorForResponse` (logs/Sentry/HTTP) + `sanitizePiiText` (AI) ya existen. AI sanitizer ya redacta RUT formato chileno (`<rut>`). Falta helper `maskRut(value)` para display canónico (`xx.xxx.678-K`).
+  - `captureWithDomain` ya tiene `'identity'` en CaptureDomain union (TASK-742). Falta wire-up en `RELIABILITY_REGISTRY` con `moduleKey: 'identity'`, `incidentDomainTag: 'identity'`, `expectedSignalKinds: ['incident', 'drift', 'data_quality']`.
+  - **No existe primitive de cifrado a nivel columna**. Decisión Phase 4: replicar pattern TASK-697 (plaintext + reveal audit + grants estrictos) en lugar de introducir KMS envelope encryption nuevo (out of scope foundation; follow-up si emerge requisito de compliance fuerte).
+  - Entitlements catalog: TS-only en `src/config/entitlements-catalog.ts` con shape `{ key, module, actions[], defaultScope }`. Capabilities nuevas se agregan al array + se mapean en `src/lib/entitlements/runtime.ts` por `route_group`/`role_code`.
+  - Person 360: `src/lib/person-360/get-person-profile.ts` + `get-person-hr.ts` son los readers a extender con `legalProfile` facet.
+- **Decision pendiente checkpoint humano (P0 stop):** scope completo de 7 slices implica ~3-5 sesiones. Solicitar autorización antes de FASE 5.
+- **Plan completo en este markdown** (zona Plan Mode dentro de la spec).
+- **Pendiente:** human checkpoint sobre Plan FASE 4 antes de empezar código.
+
+## Sesion 2026-05-04 — TASK-785 creada: Workforce Role Title Source of Truth + Assignment Override Governance
+
+- **Branch:** `develop`.
+- **Trigger:** el usuario pregunto donde vive el cargo, si se trae por SCIM/Entra, como cambiarlo y como separar cargo Efeonce vs cargo frente a cliente.
+- **Decision:** crear `TASK-785` como task P1 separada de TASK-784. El cargo no es dato legal personal; es una frontera workforce/identity/staffing/commercial con tres capas: `identity_profiles.job_title` (Entra/Graph enrichment), `members.role_title` + catalogos (cargo laboral/operativo Greenhouse) y `client_team_assignments.role_title_override` (titulo visible por asignacion cliente).
+- **Riesgo detectado:** `src/lib/entra/profile-sync.ts` hoy actualiza tambien `members.role_title` desde `entra.jobTitle`, lo que puede pisar cambios HR. La task exige drift/review y precedence en vez de ultimo writer gana.
+- **Docs tocadas:** `docs/tasks/to-do/TASK-785-workforce-role-title-source-of-truth-governance.md`, `docs/tasks/TASK_ID_REGISTRY.md`, `docs/tasks/README.md`.
+- **Pendiente:** implementar contrato/resolver y ajustar Entra profile sync para que no sobrescriba cargo operativo HR sin gobierno.
+
+## Sesion 2026-05-04 — TASK-784 creada: Person Legal Profile + Identity Documents Foundation
+
+- **Branch:** `develop`.
+- **Trigger:** al revisar finiquitos/offboarding se detecto que Greenhouse no tiene fuente canonica Postgres para RUT/documento de identidad ni direccion de personas; `final_settlement_documents` queda con `taxId: null` y BigQuery conserva solo campos legacy parciales.
+- **Skills:** `greenhouse-payroll-auditor` para frontera payroll/finiquito/honorarios y `greenhouse-task-planner` para registrar la task canonica.
+- **Decision:** crear `TASK-784` como fundacion P0 antes de implementar el hardening documental de TASK-783. Incluye self-service en `/my/profile`, revision/verificacion HR, documentos por pais, direcciones, masking/reveal auditado, readiness para finiquito/nomina/honorarios y sanitizacion de logs/events.
+- **Regla clave:** `organizations.tax_id` se mantiene intacto como identidad tributaria de organizaciones, entidades legales, clientes, proveedores empresa y facturacion. La nueva capa cubre identidad legal de personas naturales y no debe reemplazar facturacion.
+- **Docs tocadas:** `docs/tasks/to-do/TASK-784-person-legal-profile-identity-documents-foundation.md`, `docs/tasks/TASK_ID_REGISTRY.md`, `docs/tasks/README.md`, `docs/tasks/to-do/TASK-783-payroll-final-settlement-component-policy-overlap-hardening.md`.
+- **Pendiente:** implementar TASK-784 end-to-end antes de emitir finiquitos/documentos formales dependientes de identidad legal de persona; TASK-783 queda bloqueada por esta foundation.
+
 ## Sesion 2026-05-04 — TASK-553 Quick Access Shortcuts Platform — completada
 
 - **Branch:** `develop` (commits directos por instruccion del usuario "mantente en develop"). 4 commits secuenciales por slice + cierre.
@@ -18,7 +66,8 @@
 - **Branch:** `develop`.
 - **Trigger:** auditoria del finiquito de Valentina Hoyos detecto settlement aprobado con `net_payable=-40.512` por doble descuento de Isapre de abril ya exportado, cuando el caso de renuncia 30/04/2026 observaba solo `proportional_vacation=121.963`.
 - **Skills:** `greenhouse-payroll-auditor` para el criterio payroll/legal y `greenhouse-task-planner` para registrar task canonica.
-- **Decision:** crear `TASK-783` como follow-up P0, no parche local. La solucion propuesta es policy engine por componente + payroll overlap ledger + gates fail-closed para netos negativos/deducciones duplicadas + remediacion auditada por cancelacion/reemision.
+- **Decision:** crear `TASK-783` como follow-up P0, no parche local. La solucion propuesta es policy engine por componente + payroll overlap ledger + cutoff de elegibilidad payroll posterior a offboarding ejecutado + frontera multi-regimen para honorarios/proveedores sin finiquito laboral + UI lane-aware (`Finiquito laboral` vs `Cierre contractual` vs `Cierre proveedor`) + gates fail-closed para netos negativos/deducciones duplicadas + remediacion auditada por cancelacion/reemision.
+- **Mockup aprobado 2026-05-04:** usuario aprobo `mockups/finiquito-document-v1/index.html` como contrato visual/contenido del nuevo documento/surface. Se incorporo en `TASK-783` como regla dura: logo + entidad legal + RUTs + header/footer + estado visible + tabla Concepto/Tratamiento/Evidencia/Monto + totales + snapshot hash; Valentina-like bloquea emision con causa accionable; Luis/honorarios usa `Cierre contractual`, nunca `Finiquito de contrato de trabajo`.
 - **Docs tocadas:** `docs/tasks/to-do/TASK-783-payroll-final-settlement-component-policy-overlap-hardening.md`, `docs/tasks/TASK_ID_REGISTRY.md`, `docs/tasks/README.md`.
 - **Pendiente:** implementar TASK-783 end-to-end si el usuario autoriza; no se cambio runtime ni DB en esta sesion.
 

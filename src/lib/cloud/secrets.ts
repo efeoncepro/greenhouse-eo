@@ -38,6 +38,11 @@ const TRACKED_SECRET_ENTRIES = [
     key: 'slack_alerts_webhook',
     envVarName: 'SLACK_ALERTS_WEBHOOK_URL',
     classification: 'runtime'
+  },
+  {
+    key: 'pii_normalization_pepper',
+    envVarName: 'GREENHOUSE_PII_NORMALIZATION_PEPPER',
+    classification: 'runtime'
   }
 ] as const
 
