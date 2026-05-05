@@ -1,0 +1,613 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Mockup TASK-753 — Mi cuenta de pago (rediseño)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.34.0/dist/tabler-icons.min.css" />
+  <style>
+    :root {
+      /* Greenhouse semantic palette */
+      --gh-primary: #7367F0;
+      --gh-primary-light: rgba(115,103,240,0.12);
+      --gh-info: #00BAD1;
+      --gh-info-light: rgba(0,186,209,0.12);
+      --gh-success: #6EC207;
+      --gh-success-light: rgba(110,194,7,0.12);
+      --gh-warning: #FF6500;
+      --gh-warning-light: rgba(255,101,0,0.12);
+      --gh-error: #BB1954;
+      --gh-error-light: rgba(187,25,84,0.12);
+      --gh-secondary: #808390;
+
+      /* Surfaces */
+      --bg-page: #F8F7FA;
+      --bg-card: #FFFFFF;
+      --bg-elevated: #F8FAFC;
+      --bg-overlay: rgba(38,43,67,0.55);
+
+      /* Text */
+      --text-primary: #2F2B3D;
+      --text-secondary: #6F6B7D;
+      --text-disabled: #B7B5BD;
+
+      /* Border / divider */
+      --border: #DBDADE;
+      --border-strong: #B7B5BD;
+
+      /* Radius (TASK-758 canonical) */
+      --r-xs: 2px; --r-sm: 4px; --r-md: 6px; --r-lg: 8px; --r-xl: 10px;
+
+      /* Shadows */
+      --shadow-1: 0 2px 6px 0 rgba(47,43,61,0.14);
+      --shadow-2: 0 4px 18px 0 rgba(47,43,61,0.20);
+      --shadow-dialog: 0 20px 50px -10px rgba(47,43,61,0.30);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg-page);
+      color: var(--text-primary);
+      font-size: 14px;
+      line-height: 1.5;
+      letter-spacing: 0;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ───────── Mockup chrome ───────── */
+    .controls {
+      position: fixed; top: 12px; left: 50%; transform: translateX(-50%);
+      z-index: 200; background: var(--bg-card);
+      border: 1px solid var(--border); border-radius: var(--r-xl);
+      padding: 8px; display: flex; gap: 4px;
+      box-shadow: var(--shadow-1);
+    }
+    .controls button {
+      font-family: inherit; font-size: 13px; font-weight: 500;
+      padding: 8px 14px; border-radius: var(--r-md);
+      border: 1px solid transparent; background: transparent;
+      color: var(--text-secondary); cursor: pointer;
+      transition: background 150ms ease-out, color 150ms ease-out;
+    }
+    .controls button:hover { background: var(--bg-elevated); color: var(--text-primary); }
+    .controls button.active { background: var(--gh-primary-light); color: var(--gh-primary); }
+    .controls .label {
+      font-size: 11px; color: var(--text-disabled); padding: 0 8px;
+      align-self: center; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;
+    }
+
+    /* ───────── Page background (simulated portal) ───────── */
+    .page {
+      min-height: 100vh; padding: 80px 32px 32px;
+      background:
+        linear-gradient(180deg, rgba(115,103,240,0.04) 0%, transparent 200px),
+        var(--bg-page);
+    }
+    .page-header { max-width: 880px; margin: 0 auto 24px; }
+    .page-header h1 {
+      font-size: 22px; font-weight: 700; margin: 0 0 4px;
+      color: var(--text-primary);
+    }
+    .page-header p {
+      margin: 0; color: var(--text-secondary); font-size: 14px;
+    }
+
+    /* ───────── Dialog ───────── */
+    .dialog-backdrop {
+      position: fixed; inset: 0; background: var(--bg-overlay);
+      display: flex; align-items: flex-start; justify-content: center;
+      padding: 64px 16px;
+      animation: fadeIn 150ms ease-out;
+    }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes slideUp { from { transform: translateY(8px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    @media (prefers-reduced-motion: reduce) {
+      .dialog-backdrop { animation: none; }
+      .dialog { animation: none !important; }
+    }
+
+    .dialog {
+      background: var(--bg-card); border-radius: var(--r-xl);
+      width: 100%; max-width: 560px; box-shadow: var(--shadow-dialog);
+      animation: slideUp 200ms cubic-bezier(0.2, 0, 0, 1);
+      overflow: hidden;
+    }
+
+    .dialog-header { padding: 24px 24px 0; }
+    .dialog-header h2 {
+      font-size: 18px; font-weight: 700; margin: 0 0 4px;
+      color: var(--text-primary);
+    }
+    .dialog-header p {
+      font-size: 13px; color: var(--text-secondary); margin: 0;
+      line-height: 1.55;
+    }
+
+    .dialog-body { padding: 16px 24px 24px; }
+
+    .dialog-footer {
+      padding: 12px 24px 20px;
+      display: flex; justify-content: flex-end; gap: 8px;
+      border-top: 1px solid var(--border); margin-top: 8px;
+    }
+
+    /* ───────── Regime banner ───────── */
+    .regime-banner {
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px 14px; border-radius: var(--r-md);
+      background: var(--gh-info-light);
+      border: 1px solid color-mix(in oklch, var(--gh-info), white 40%);
+      margin: 16px 0 20px;
+    }
+    .regime-banner.degraded {
+      background: var(--gh-warning-light);
+      border-color: color-mix(in oklch, var(--gh-warning), white 40%);
+    }
+    .regime-banner i {
+      font-size: 18px; color: var(--gh-info); flex-shrink: 0;
+    }
+    .regime-banner.degraded i { color: var(--gh-warning); }
+    .regime-banner-body { flex-grow: 1; min-width: 0; }
+    .regime-banner-title {
+      font-size: 13px; font-weight: 600; color: var(--text-primary);
+      margin: 0 0 2px; line-height: 1.3;
+    }
+    .regime-banner-sub {
+      font-size: 12px; color: var(--text-secondary);
+      margin: 0; line-height: 1.4;
+    }
+    .regime-banner-sub a {
+      color: var(--gh-primary); text-decoration: none;
+      font-weight: 500;
+    }
+    .regime-banner-sub a:hover { text-decoration: underline; }
+
+    /* ───────── Form ───────── */
+    .field { margin-bottom: 14px; }
+    .field-row { display: flex; gap: 12px; }
+    .field-row > .field { flex: 1; min-width: 0; margin-bottom: 14px; }
+
+    label.field-label {
+      display: block; font-size: 12px; font-weight: 500;
+      color: var(--text-secondary); margin: 0 0 6px;
+    }
+    label.field-label .req { color: var(--gh-error); margin-left: 2px; }
+
+    .input, .select {
+      width: 100%; height: 40px;
+      border: 1px solid var(--border); border-radius: var(--r-md);
+      padding: 0 12px; font: inherit; color: var(--text-primary);
+      background: var(--bg-card);
+      transition: border-color 150ms ease-out, box-shadow 150ms ease-out;
+      font-variant-numeric: tabular-nums;
+    }
+    .input::placeholder { color: var(--text-disabled); }
+    .input:focus, .select:focus {
+      outline: none; border-color: var(--gh-primary);
+      box-shadow: 0 0 0 3px var(--gh-primary-light);
+    }
+    .input.has-error {
+      border-color: var(--gh-error);
+    }
+    .input.has-error:focus {
+      box-shadow: 0 0 0 3px var(--gh-error-light);
+    }
+    .input.prefilled {
+      background: var(--bg-elevated);
+    }
+    .field-helper {
+      font-size: 11px; color: var(--text-secondary);
+      margin: 4px 2px 0; line-height: 1.4;
+    }
+    .field-error {
+      font-size: 11px; color: var(--gh-error);
+      margin: 4px 2px 0; line-height: 1.4;
+      display: flex; align-items: center; gap: 4px;
+    }
+    .field-warn {
+      font-size: 11px; color: var(--gh-warning);
+      margin: 4px 2px 0; line-height: 1.4;
+      display: flex; align-items: center; gap: 4px;
+    }
+    .field-preview {
+      font-size: 11px; color: var(--text-disabled);
+      margin: 4px 2px 0; line-height: 1.4;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0.02em;
+    }
+    .field-preview strong {
+      color: var(--text-primary); font-weight: 500;
+    }
+
+    .textarea {
+      width: 100%; min-height: 64px; resize: vertical;
+      border: 1px solid var(--border); border-radius: var(--r-md);
+      padding: 10px 12px; font: inherit;
+      background: var(--bg-card);
+    }
+    .textarea:focus {
+      outline: none; border-color: var(--gh-primary);
+      box-shadow: 0 0 0 3px var(--gh-primary-light);
+    }
+
+    /* Autocomplete (simulated select with native styling cleanup) */
+    .select-wrap { position: relative; }
+    .select {
+      appearance: none; -webkit-appearance: none;
+      padding-right: 36px; cursor: pointer;
+    }
+    .select-wrap::after {
+      content: ''; position: absolute; right: 14px; top: 50%;
+      width: 10px; height: 10px;
+      border-right: 2px solid var(--text-secondary);
+      border-bottom: 2px solid var(--text-secondary);
+      transform: translateY(-75%) rotate(45deg);
+      pointer-events: none;
+    }
+
+    /* Identity card (TASK-784 link) */
+    .identity-card {
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px 12px; border-radius: var(--r-md);
+      border: 1px solid var(--border);
+      background: var(--bg-elevated);
+    }
+    .identity-card i { color: var(--text-secondary); font-size: 18px; }
+    .identity-card-body { flex-grow: 1; min-width: 0; }
+    .identity-card-label {
+      font-size: 11px; color: var(--text-secondary);
+      margin: 0; text-transform: uppercase;
+      letter-spacing: 0.5px; font-weight: 500;
+    }
+    .identity-card-value {
+      font-size: 13px; color: var(--text-primary); font-weight: 500;
+      margin: 2px 0 0;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0.02em;
+    }
+    .identity-card a {
+      font-size: 12px; color: var(--gh-primary); text-decoration: none;
+      font-weight: 500; flex-shrink: 0;
+    }
+    .identity-card a:hover { text-decoration: underline; }
+
+    /* Section divider with title */
+    .section-title {
+      font-size: 11px; color: var(--text-secondary);
+      text-transform: uppercase; letter-spacing: 0.5px;
+      font-weight: 600; margin: 16px 0 8px;
+    }
+
+    /* Buttons */
+    .btn {
+      height: 38px; padding: 0 16px;
+      border-radius: var(--r-md); border: 1px solid transparent;
+      font: inherit; font-weight: 500; font-size: 13px;
+      cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
+      transition: background 150ms ease-out, color 150ms ease-out, border-color 150ms ease-out;
+    }
+    .btn-primary {
+      background: var(--gh-primary); color: white;
+    }
+    .btn-primary:hover { background: color-mix(in oklch, var(--gh-primary), black 8%); }
+    .btn-primary:disabled {
+      background: var(--gh-primary-light); color: var(--gh-primary);
+      cursor: not-allowed; opacity: 0.7;
+    }
+    .btn-tonal-secondary {
+      background: rgba(128,131,144,0.12); color: var(--gh-secondary);
+    }
+    .btn-tonal-secondary:hover { background: rgba(128,131,144,0.20); }
+    .btn-tonal-primary {
+      background: var(--gh-primary-light); color: var(--gh-primary);
+    }
+    .btn-tonal-primary:hover { background: color-mix(in oklch, var(--gh-primary-light), white 0%); }
+    .btn-link {
+      background: transparent; color: var(--gh-primary);
+      padding: 0; height: auto; font-size: 12px;
+      text-decoration: none; font-weight: 500;
+    }
+    .btn-link:hover { text-decoration: underline; }
+
+    /* Footer disclaimer */
+    .disclaimer {
+      font-size: 11px; color: var(--text-secondary);
+      line-height: 1.5; margin-top: 16px;
+      padding: 10px 12px; border-radius: var(--r-md);
+      background: var(--bg-elevated);
+      border-left: 3px solid var(--gh-info);
+    }
+    .disclaimer strong { color: var(--text-primary); font-weight: 600; }
+
+    /* Branch toggle (mockup-only) */
+    .branch-hidden { display: none; }
+
+    /* Degraded state */
+    .degraded-empty {
+      text-align: center; padding: 24px 16px;
+    }
+    .degraded-empty .icon-wrap {
+      width: 56px; height: 56px; border-radius: 50%;
+      background: var(--gh-warning-light);
+      display: inline-flex; align-items: center; justify-content: center;
+      margin-bottom: 12px;
+    }
+    .degraded-empty .icon-wrap i {
+      color: var(--gh-warning); font-size: 28px;
+    }
+    .degraded-empty h3 {
+      font-size: 16px; font-weight: 600; margin: 0 0 6px;
+      color: var(--text-primary);
+    }
+    .degraded-empty p {
+      font-size: 13px; color: var(--text-secondary);
+      margin: 0 0 20px; line-height: 1.5;
+    }
+    .degraded-empty .btn-primary { margin-right: 8px; }
+
+    /* Tab simulator for branch demo */
+    .branch-pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 10px; border-radius: 12px;
+      background: var(--gh-success-light); color: var(--gh-success);
+      font-size: 11px; font-weight: 600;
+    }
+    .branch-pill i { font-size: 12px; }
+  </style>
+</head>
+<body>
+
+<div class="controls" role="tablist" aria-label="Cambiar régimen para previsualizar">
+  <span class="label">Régimen</span>
+  <button class="active" onclick="setBranch('chile')">CL dependiente</button>
+  <button onclick="setBranch('honorarios')">Honorarios CL</button>
+  <button onclick="setBranch('international')">Internacional</button>
+  <button onclick="setBranch('unset')">Régimen unset (degraded)</button>
+</div>
+
+<div class="page">
+  <div class="page-header">
+    <h1>Mi cuenta de pago</h1>
+    <p>Vista del colaborador. La cuenta donde recibes tus pagos. Si quieres cambiarla, finance debe aprobar.</p>
+  </div>
+
+  <div class="dialog-backdrop">
+    <div class="dialog" role="dialog" aria-labelledby="dlg-title" aria-modal="true">
+      <div class="dialog-header">
+        <h2 id="dlg-title">Solicitar cambio de cuenta de pago</h2>
+        <p>Declara los datos de tu cuenta. Finance valida y elige el medio de envío.</p>
+      </div>
+
+      <div class="dialog-body">
+
+        <!-- ═══ Banner régimen detectado ═══ -->
+        <div class="regime-banner" id="banner-active">
+          <i class="ti ti-info-circle"></i>
+          <div class="regime-banner-body">
+            <p class="regime-banner-title" id="regime-title">Régimen detectado: Chile dependiente (CLP)</p>
+            <p class="regime-banner-sub">Inferido de tu contrato y país. Si es incorrecto, <a href="#">contacta a finance</a>.</p>
+          </div>
+          <span class="branch-pill"><i class="ti ti-shield-check"></i><span id="regime-pill">Auto</span></span>
+        </div>
+
+        <div class="regime-banner degraded branch-hidden" id="banner-degraded">
+          <i class="ti ti-alert-triangle"></i>
+          <div class="regime-banner-body">
+            <p class="regime-banner-title">Aún no podemos identificar tu régimen</p>
+            <p class="regime-banner-sub">Falta información en tu identidad. Finance debe completarla antes.</p>
+          </div>
+        </div>
+
+        <!-- ═══ Branch A: Chile dependiente / honorarios ═══ -->
+        <div id="branch-chile">
+
+          <div class="field-row">
+            <div class="field">
+              <label class="field-label" for="bank-cl">Banco<span class="req">*</span></label>
+              <div class="select-wrap">
+                <select id="bank-cl" class="select">
+                  <option>Banco de Chile</option>
+                  <option>BCI</option>
+                  <option>Santander Chile</option>
+                  <option>BancoEstado</option>
+                  <option>Scotiabank</option>
+                  <option>Itaú</option>
+                  <option>Banco Falabella</option>
+                  <option>Banco Security</option>
+                  <option>Banco Bice</option>
+                  <option>Banco Internacional</option>
+                  <option>Banco Consorcio</option>
+                  <option>Banco Ripley</option>
+                  <option>Coopeuch</option>
+                  <option>Otro (especificar abajo)</option>
+                </select>
+              </div>
+            </div>
+            <div class="field">
+              <label class="field-label" for="acct-type-cl">Tipo de cuenta<span class="req">*</span></label>
+              <div class="select-wrap">
+                <select id="acct-type-cl" class="select">
+                  <option>Cuenta corriente</option>
+                  <option>Cuenta vista</option>
+                  <option>Cuenta RUT</option>
+                  <option>Chequera electrónica</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="acct-cl">Número de cuenta<span class="req">*</span></label>
+            <input id="acct-cl" class="input" placeholder="Solo números" inputmode="numeric" value="123456789012" />
+            <p class="field-preview">Vista previa: <strong>•••• 9012</strong></p>
+            <p class="field-helper">Solo se mostrarán los últimos 4 dígitos en la app. El número completo nunca se muestra después.</p>
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label class="field-label" for="rut-cl">RUT del titular<span class="req">*</span></label>
+              <input id="rut-cl" class="input" placeholder="12.345.678-9" value="12.345.678-9" />
+              <p class="field-helper">RUT del titular. Debe coincidir con tu identidad legal.</p>
+            </div>
+            <div class="field">
+              <label class="field-label" for="holder-cl">Nombre del titular<span class="req">*</span></label>
+              <input id="holder-cl" class="input prefilled" value="María González Rojas" />
+              <p class="field-helper">Pre-llenado con tu identidad legal. Editable.</p>
+            </div>
+          </div>
+
+          <div class="section-title">Identidad legal</div>
+          <div class="identity-card">
+            <i class="ti ti-id"></i>
+            <div class="identity-card-body">
+              <p class="identity-card-label">Documento verificado</p>
+              <p class="identity-card-value">CL_RUT 12.345.•••-• · Verificado</p>
+            </div>
+            <a href="#">Editar en Datos legales</a>
+          </div>
+
+          <div class="field" style="margin-top: 14px;">
+            <label class="field-label" for="notes-cl">Comentario (opcional)</label>
+            <textarea id="notes-cl" class="textarea" placeholder="¿Algo que finance debería saber?"></textarea>
+          </div>
+        </div>
+
+        <!-- ═══ Branch B: Internacional ═══ -->
+        <div id="branch-international" class="branch-hidden">
+
+          <div class="field-row">
+            <div class="field">
+              <label class="field-label" for="country-intl">País del banco<span class="req">*</span></label>
+              <div class="select-wrap">
+                <select id="country-intl" class="select">
+                  <option>🇨🇴 Colombia</option>
+                  <option>🇲🇽 México</option>
+                  <option>🇵🇪 Perú</option>
+                  <option>🇪🇸 España</option>
+                  <option>🇺🇸 Estados Unidos</option>
+                  <option>🇦🇷 Argentina</option>
+                  <option>🇧🇷 Brasil</option>
+                </select>
+              </div>
+            </div>
+            <div class="field">
+              <label class="field-label" for="bank-intl">Banco<span class="req">*</span></label>
+              <input id="bank-intl" class="input" placeholder="Bancolombia" value="Bancolombia" />
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="swift-intl">SWIFT/BIC<span class="req">*</span></label>
+            <input id="swift-intl" class="input" placeholder="COLOCOBM" style="text-transform: uppercase;" value="COLOCOBM" />
+            <p class="field-helper">Código BIC/SWIFT del banco. 8 u 11 caracteres alfanuméricos.</p>
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="iban-intl">IBAN o número de cuenta<span class="req">*</span></label>
+            <input id="iban-intl" class="input" placeholder="Solo el número de cuenta o IBAN completo" value="00770005120004567" />
+            <p class="field-preview">Vista previa: <strong>•••• 4567</strong></p>
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="holder-intl">Nombre legal del titular<span class="req">*</span></label>
+            <input id="holder-intl" class="input prefilled" value="Daniela Ramírez Pérez" />
+            <p class="field-helper">Pre-llenado con tu identidad legal. Debe coincidir exactamente con el banco.</p>
+          </div>
+
+          <div class="section-title">Identidad legal</div>
+          <div class="identity-card">
+            <i class="ti ti-id"></i>
+            <div class="identity-card-body">
+              <p class="identity-card-label">Documento verificado</p>
+              <p class="identity-card-value">CO_CC 1.020.•••.•••  · Verificado</p>
+            </div>
+            <a href="#">Editar en Datos legales</a>
+          </div>
+
+          <div class="field" style="margin-top: 14px;">
+            <label class="field-label" for="notes-intl">Comentario (opcional)</label>
+            <textarea id="notes-intl" class="textarea" placeholder="¿Algo que finance debería saber? (ej. cuenta intermediaria)"></textarea>
+          </div>
+        </div>
+
+        <!-- ═══ Branch C: Régimen unset (degraded) ═══ -->
+        <div id="branch-unset" class="branch-hidden">
+          <div class="degraded-empty">
+            <div class="icon-wrap"><i class="ti ti-shield-x"></i></div>
+            <h3>Aún no podemos identificar tu régimen</h3>
+            <p>Falta información en tu identidad legal y/o contrato laboral. Finance la completará primero, y luego podrás declarar tu cuenta de pago.</p>
+            <button class="btn btn-primary"><i class="ti ti-mail"></i> Contactar finance</button>
+            <button class="btn btn-tonal-secondary">Cerrar</button>
+          </div>
+        </div>
+
+        <!-- ═══ Disclaimer maker-checker ═══ -->
+        <div class="disclaimer" id="disclaimer">
+          <strong>Esta solicitud entra como pendiente de revisión.</strong> Finance valida los datos y elige el medio de envío más eficiente para tu régimen. Te avisamos por email cuando quede activa. Por seguridad, nunca podrás aprobar tu propio cambio.
+        </div>
+
+      </div>
+
+      <div class="dialog-footer" id="footer-active">
+        <button class="btn btn-tonal-secondary">Cancelar</button>
+        <button class="btn btn-primary" id="submit-btn">
+          <span>Enviar solicitud</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function setBranch(branch) {
+    // controls active state
+    document.querySelectorAll('.controls button').forEach(b => b.classList.remove('active'));
+    event && event.target && event.target.classList.add('active');
+
+    const $ = (id) => document.getElementById(id);
+
+    const branches = ['chile', 'international', 'unset'];
+    branches.forEach(b => $(`branch-${b}`).classList.add('branch-hidden'));
+
+    const banner = $('banner-active');
+    const bannerDegraded = $('banner-degraded');
+    const disclaimer = $('disclaimer');
+    const footer = $('footer-active');
+
+    if (branch === 'unset') {
+      $('branch-unset').classList.remove('branch-hidden');
+      banner.classList.add('branch-hidden');
+      bannerDegraded.classList.remove('branch-hidden');
+      disclaimer.style.display = 'none';
+      footer.style.display = 'none';
+      return;
+    }
+
+    banner.classList.remove('branch-hidden');
+    bannerDegraded.classList.add('branch-hidden');
+    disclaimer.style.display = '';
+    footer.style.display = '';
+
+    if (branch === 'international') {
+      $('branch-international').classList.remove('branch-hidden');
+      $('regime-title').textContent = 'Régimen detectado: Internacional (USD) · Colombia';
+      $('regime-pill').textContent = 'Auto';
+    } else if (branch === 'honorarios') {
+      $('branch-chile').classList.remove('branch-hidden');
+      $('regime-title').textContent = 'Régimen detectado: Honorarios Chile (CLP)';
+      $('regime-pill').textContent = 'Auto';
+    } else {
+      $('branch-chile').classList.remove('branch-hidden');
+      $('regime-title').textContent = 'Régimen detectado: Chile dependiente (CLP)';
+      $('regime-pill').textContent = 'Auto';
+    }
+  }
+</script>
+
+</body>
+</html>

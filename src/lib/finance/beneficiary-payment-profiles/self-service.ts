@@ -53,13 +53,30 @@ export interface CreateSelfServiceProfileRequestInput {
   currency: 'CLP' | 'USD'
   beneficiaryName?: string | null
   countryCode?: string | null
+  /**
+   * Regime detected server-side via resolveSelfServicePaymentProfileContext.
+   * Persistido en metadata_json para que finance ops sepa de qué rama vino la
+   * solicitud (no es la decision final de provider/method — eso lo hace
+   * finance al aprobar).
+   */
+  regime?: 'chile_dependent' | 'honorarios_chile' | 'international' | null
+  /** NO se acepta del frontend self-service — finance lo decide al aprobar. */
   providerSlug?: string | null
+  /** NO se acepta del frontend self-service — finance lo decide al aprobar. */
   paymentMethod?: CreatePaymentProfileInput['paymentMethod']
   accountHolderName?: string | null
   accountNumberFull?: string | null
   bankName?: string | null
   routingReference?: string | null
   notes?: string | null
+
+  // Regime-specific extras → metadata_json (NO columnas, NO migration)
+  /** CL only — cuenta_corriente | cuenta_vista | cuenta_rut | chequera_electronica */
+  accountTypeCl?: 'cuenta_corriente' | 'cuenta_vista' | 'cuenta_rut' | 'chequera_electronica' | null
+  /** CL only — RUT del titular en formato canónico (12.345.678-9) */
+  rut?: string | null
+  /** Internacional only — duplica routingReference para semántica clara desde UI */
+  swiftBic?: string | null
 }
 
 export interface CreateSelfServiceProfileRequestResult {
@@ -84,6 +101,11 @@ export const createSelfServicePaymentProfileRequest = async (
     throw new PaymentProfileValidationError('userId es requerido')
   }
 
+  // Internacional: el SWIFT/BIC se persiste como `routingReference` (columna
+  // canónica TASK-749). El alias `swiftBic` en el input es solo para claridad
+  // semántica desde la UI self-service.
+  const routingReference = input.swiftBic?.trim() || input.routingReference || null
+
   return createPaymentProfile({
     spaceId: input.spaceId ?? null,
     beneficiaryType: 'member',
@@ -91,19 +113,28 @@ export const createSelfServicePaymentProfileRequest = async (
     beneficiaryName: input.beneficiaryName ?? null,
     countryCode: input.countryCode ?? null,
     currency: input.currency,
+
+    // Frontend self-service NUNCA elige provider/method — finance decide al
+    // aprobar. Si el caller incluye uno (path admin), se respeta (back-compat).
     providerSlug: input.providerSlug ?? null,
     paymentMethod: input.paymentMethod ?? null,
+
     accountHolderName: input.accountHolderName ?? null,
     accountNumberFull: input.accountNumberFull ?? null,
     bankName: input.bankName ?? null,
-    routingReference: input.routingReference ?? null,
+    routingReference,
     notes: input.notes ?? null,
     requireApproval: true,
     createdBy: input.userId,
     metadata: {
       requested_by: 'member',
       requested_at: new Date().toISOString(),
-      source: 'my_payment_profile_self_service'
+      source: 'my_payment_profile_self_service',
+      regime: input.regime ?? null,
+      // Regime-specific data persisted as metadata (NO column, NO migration).
+      // Finance reads this to assess KYC completeness before approving.
+      ...(input.accountTypeCl ? { account_type_cl: input.accountTypeCl } : {}),
+      ...(input.rut ? { rut_titular: input.rut } : {})
     }
   })
 }

@@ -12,23 +12,11 @@ import {
 } from '@/lib/finance/beneficiary-payment-profiles/self-service'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { redactErrorForResponse } from '@/lib/observability/redact'
+import { resolveSelfServicePaymentProfileContext } from '@/lib/finance/beneficiary-payment-profiles/resolve-self-service-context'
+import { validateSelfServiceSubmission } from '@/lib/finance/beneficiary-payment-profiles/self-service-validators'
 import { requireMyTenantContext } from '@/lib/tenant/authorization'
-import type { BeneficiaryPaymentProfilePaymentMethod } from '@/types/payment-profiles'
 
 export const dynamic = 'force-dynamic'
-
-const VALID_PAYMENT_METHODS: BeneficiaryPaymentProfilePaymentMethod[] = [
-  'bank_transfer',
-  'wire',
-  'check',
-  'manual_cash',
-  'deel',
-  'wise',
-  'paypal',
-  'global66',
-  'sii_pec',
-  'other'
-]
 
 /**
  * TASK-753 — `/api/my/payment-profile`.
@@ -73,16 +61,24 @@ export async function GET() {
 }
 
 interface RequestBody {
+  // Regime-aware payload from self-service UI (TASK-753 redesign).
+  // Currency + countryCode + regime son INFERIDOS server-side, pero
+  // aceptamos los del cliente para back-compat con consumers viejos.
   currency?: 'CLP' | 'USD'
   beneficiaryName?: string | null
   countryCode?: string | null
-  providerSlug?: string | null
-  paymentMethod?: BeneficiaryPaymentProfilePaymentMethod | null
   accountHolderName?: string | null
   accountNumberFull?: string | null
   bankName?: string | null
-  routingReference?: string | null
   notes?: string | null
+
+  // CL-specific
+  accountTypeCl?: 'cuenta_corriente' | 'cuenta_vista' | 'cuenta_rut' | 'chequera_electronica' | null
+  rut?: string | null
+
+  // International-specific
+  swiftBic?: string | null
+  ibanOrAccount?: string | null
 }
 
 export async function POST(request: Request) {
@@ -116,38 +112,65 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Session user id missing', code: 'unauthorized' }, { status: 401 })
   }
 
-  if (body.currency !== 'CLP' && body.currency !== 'USD') {
+  // Resolve regime server-side (NO trust client). Source of truth: members + identity_profiles.
+  const context = await resolveSelfServicePaymentProfileContext(memberId)
+
+  if (context.regime === 'unset') {
     return NextResponse.json(
-      { error: 'currency debe ser CLP o USD', code: 'invalid_input' },
+      {
+        error: context.unsetReason ?? 'No podemos identificar tu régimen. Contacta a finance.',
+        code: 'regime_unset'
+      },
+      { status: 422 }
+    )
+  }
+
+  // Validate regime-aware. Cliente puede usar la misma rule set para UX hint;
+  // server SIEMPRE re-valida (defense in depth).
+  const accountForValidation =
+    context.regime === 'international' ? body.ibanOrAccount ?? body.accountNumberFull : body.accountNumberFull
+
+  const validation = validateSelfServiceSubmission(context.regime, {
+    bankName: body.bankName,
+    accountNumberFull: accountForValidation,
+    accountHolderName: body.accountHolderName,
+    accountTypeCl: body.accountTypeCl,
+    rut: body.rut,
+    countryCode: body.countryCode ?? context.countryCode,
+    swiftBic: body.swiftBic,
+    ibanOrAccount: body.ibanOrAccount,
+    notes: body.notes
+  })
+
+  if (!validation.ok) {
+    return NextResponse.json(
+      {
+        error: 'Datos invalidos. Revisa los campos marcados.',
+        code: 'invalid_input',
+        fieldErrors: validation.errors
+      },
       { status: 400 }
     )
   }
 
-  if (
-    body.paymentMethod !== undefined &&
-    body.paymentMethod !== null &&
-    !VALID_PAYMENT_METHODS.includes(body.paymentMethod)
-  ) {
-    return NextResponse.json(
-      { error: 'paymentMethod invalido', code: 'invalid_input' },
-      { status: 400 }
-    )
-  }
+  // Currency es inferida del régimen, no del cliente.
+  const currency: 'CLP' | 'USD' = context.currency ?? (body.currency === 'USD' ? 'USD' : 'CLP')
 
   try {
     const result = await createSelfServicePaymentProfileRequest({
       memberId,
       userId: session.user.id,
-      currency: body.currency,
-      beneficiaryName: body.beneficiaryName ?? null,
-      countryCode: body.countryCode ?? null,
-      providerSlug: body.providerSlug ?? null,
-      paymentMethod: body.paymentMethod ?? null,
+      currency,
+      regime: context.regime,
+      beneficiaryName: body.beneficiaryName ?? context.legalFullName,
+      countryCode: body.countryCode ?? context.countryCode,
       accountHolderName: body.accountHolderName ?? null,
-      accountNumberFull: body.accountNumberFull ?? null,
+      accountNumberFull: accountForValidation ?? null,
       bankName: body.bankName ?? null,
-      routingReference: body.routingReference ?? null,
-      notes: body.notes ?? null
+      notes: body.notes ?? null,
+      accountTypeCl: body.accountTypeCl ?? null,
+      rut: body.rut ?? null,
+      swiftBic: body.swiftBic ?? null
     })
 
     return NextResponse.json(result, { status: 201 })
