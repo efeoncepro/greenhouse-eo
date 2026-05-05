@@ -22,3 +22,8 @@ export type { ApplyRoleTitleResult } from './sync-from-entra'
 export { resolveRoleTitle } from './resolver'
 export { updateMemberRoleTitle } from './store'
 export type { UpdateMemberRoleTitleResult } from './store'
+export {
+  listPendingRoleTitleDriftProposals,
+  resolveRoleTitleDriftProposal
+} from './drift-store'
+export type { DriftProposalDto, DriftDecision } from './drift-store'
