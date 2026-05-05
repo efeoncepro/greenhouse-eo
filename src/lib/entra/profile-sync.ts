@@ -3,6 +3,7 @@ import 'server-only'
 import { query } from '@/lib/db'
 import { uploadGreenhouseMediaAsset } from '@/lib/storage/greenhouse-media'
 import { setUserAvatarAssetPath } from '@/lib/admin/media-assets'
+import { applyEntraRoleTitle } from '@/lib/workforce/role-title'
 
 import { buildEfeonceEmailAliasCandidates } from '@/lib/tenant/internal-email-aliases'
 
@@ -193,8 +194,9 @@ export const syncEntraProfiles = async (
         }
       }
 
-      // 4. Update members
+      // 4. Update members (TASK-785 — role_title via governed helper).
       if (gh.member_id) {
+        // 4a. Generic fields (location, phone) — unconditional overwrite (legacy behavior).
         const memberChanges = buildMemberChanges(entra)
 
         if (memberChanges.sets.length > 0) {
@@ -210,6 +212,21 @@ export const syncEntraProfiles = async (
           )
 
           if (mResult.length > 0) result.membersUpdated++
+        }
+
+        // 4b. role_title — governed: skip if HR override active, register drift.
+        if (entra.jobTitle) {
+          try {
+            const roleTitleResult = await applyEntraRoleTitle({
+              memberId: gh.member_id,
+              entraJobTitle: entra.jobTitle
+            })
+
+            if (roleTitleResult.applied) result.membersUpdated++
+          } catch (err) {
+            // Defensive: do NOT block Entra sync if drift module fails.
+            console.warn('[entra-sync] applyEntraRoleTitle failed (non-blocking):', err)
+          }
         }
       }
 
@@ -369,18 +386,19 @@ function buildUserChanges(gh: GhUser, entra: EntraUserProfile) {
   return { sets, values }
 }
 
+/**
+ * TASK-785 — Splits member updates into two groups:
+ *  - generic fields (location_country/city, phone) → unconditional overwrite if distinct.
+ *  - role_title → governed; ONLY overwrite when:
+ *      role_title_source IN ('unset', 'entra', 'migration')
+ *      AND last_human_update_at IS NULL
+ *    Otherwise, the sync caller registers a drift proposal.
+ */
 function buildMemberChanges(entra: EntraUserProfile) {
   const sets: string[] = []
   const values: unknown[] = []
   const conditions: string[] = []
   let idx = 1
-
-  if (entra.jobTitle) {
-    sets.push(`role_title = $${idx}`)
-    conditions.push(`role_title IS DISTINCT FROM $${idx}`)
-    values.push(entra.jobTitle)
-    idx++
-  }
 
   if (entra.country) {
     sets.push(`location_country = $${idx}`)

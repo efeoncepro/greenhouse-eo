@@ -554,6 +554,25 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     module: 'hr',
     actions: ['export'] as const,
     defaultScope: 'tenant'
+  },
+  // TASK-785 — Workforce role title governance
+  {
+    key: 'workforce.role_title.update',
+    module: 'hr',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'workforce.role_title.review_drift',
+    module: 'hr',
+    actions: ['read', 'approve'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'workforce.assignment_role_override',
+    module: 'hr',
+    actions: ['create', 'update'] as const,
+    defaultScope: 'tenant'
   }
 ] as const
 

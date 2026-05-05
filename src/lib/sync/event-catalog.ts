@@ -653,7 +653,12 @@ export const EVENT_TYPES = {
   personAddressVerified: 'person.address.verified',
   personAddressRejected: 'person.address.rejected',
   personAddressArchived: 'person.address.archived',
-  personAddressRevealedSensitive: 'person.address.revealed_sensitive'
+  personAddressRevealedSensitive: 'person.address.revealed_sensitive',
+
+  // TASK-785 — Workforce role title governance
+  memberRoleTitleChanged: 'member.role_title.changed',
+  memberRoleTitleDriftProposed: 'member.role_title.drift_proposed',
+  memberRoleTitleDriftResolved: 'member.role_title.drift_resolved'
 } as const
 
 export type EventType = (typeof EVENT_TYPES)[keyof typeof EVENT_TYPES]

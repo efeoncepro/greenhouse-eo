@@ -226,6 +226,47 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       source
     })
 
+    // TASK-785 — workforce role title governance
+    addEntitlement(entries, {
+      module: 'hr',
+      capability: 'workforce.role_title.update',
+      action: 'update',
+      scope: 'tenant',
+      source
+    })
+
+    addEntitlement(entries, {
+      module: 'hr',
+      capability: 'workforce.role_title.review_drift',
+      action: 'read',
+      scope: 'tenant',
+      source
+    })
+
+    addEntitlement(entries, {
+      module: 'hr',
+      capability: 'workforce.role_title.review_drift',
+      action: 'approve',
+      scope: 'tenant',
+      source
+    })
+
+    addEntitlement(entries, {
+      module: 'hr',
+      capability: 'workforce.assignment_role_override',
+      action: 'create',
+      scope: 'tenant',
+      source
+    })
+
+    addEntitlement(entries, {
+      module: 'hr',
+      capability: 'workforce.assignment_role_override',
+      action: 'update',
+      scope: 'tenant',
+      source
+    })
+
     addEntitlement(entries, {
       module: 'hr',
       capability: 'hr.leave_backfill',
