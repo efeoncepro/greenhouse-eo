@@ -2056,6 +2056,23 @@ export interface GreenhouseCoreMemberLanguages {
   visibility: Generated<string>;
 }
 
+export interface GreenhouseCoreMemberRoleTitleAuditLog {
+  action: string;
+  actor_email: string | null;
+  actor_user_id: string | null;
+  audit_id: string;
+  created_at: Generated<Timestamp>;
+  diff_json: Generated<Json>;
+  effective_at: Generated<Timestamp>;
+  ip_address: string | null;
+  member_id: string;
+  new_role_title: string | null;
+  old_role_title: string | null;
+  reason: string | null;
+  source: string;
+  user_agent: string | null;
+}
+
 export interface GreenhouseCoreMembers {
   /**
    * Free-text professional bio (Sobre mi)
@@ -2101,6 +2118,10 @@ export interface GreenhouseCoreMembers {
   identity_profile_id: string | null;
   job_level: string | null;
   languages: string[] | null;
+  /**
+   * TASK-785 — timestamp last time HR mutated role_title via governed mutation. Entra sync skips overwrite when non-null AND source=hr_manual.
+   */
+  last_human_update_at: Timestamp | null;
   last_name: string | null;
   legal_name: string | null;
   /**
@@ -2129,6 +2150,12 @@ export interface GreenhouseCoreMembers {
   reports_to_member_id: string | null;
   role_category: string | null;
   role_title: string | null;
+  /**
+   * TASK-785 — origin of current role_title value. unset|entra|hr_manual|migration|self_declared_pending
+   */
+  role_title_source: Generated<string>;
+  role_title_updated_at: Timestamp | null;
+  role_title_updated_by_user_id: string | null;
   seniority_level: string | null;
   slack_user_id: string | null;
   status: Generated<string>;
@@ -7869,6 +7896,28 @@ export interface GreenhouseSyncIntegrationSpaceReadiness {
   warning_issues_json: Generated<Json>;
 }
 
+export interface GreenhouseSyncMemberRoleTitleDriftProposals {
+  created_at: Generated<Timestamp>;
+  current_role_title: string | null;
+  current_source: string | null;
+  drift_kind: string;
+  evidence_json: Generated<Json>;
+  first_detected_at: Generated<Timestamp>;
+  last_detected_at: Generated<Timestamp>;
+  member_id: string;
+  occurrence_count: Generated<number>;
+  policy_action: Generated<string>;
+  proposal_id: string;
+  proposed_role_title: string | null;
+  resolution_note: string | null;
+  resolved_at: Timestamp | null;
+  resolved_by_user_id: string | null;
+  source_sync_run_id: string | null;
+  source_system: Generated<string>;
+  status: Generated<string>;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseSyncNotionPublicationRuns {
   completed_at: Timestamp | null;
   created_by: string | null;
@@ -8398,6 +8447,7 @@ export interface DB {
   "greenhouse_core.member_endorsements": GreenhouseCoreMemberEndorsements;
   "greenhouse_core.member_evidence": GreenhouseCoreMemberEvidence;
   "greenhouse_core.member_languages": GreenhouseCoreMemberLanguages;
+  "greenhouse_core.member_role_title_audit_log": GreenhouseCoreMemberRoleTitleAuditLog;
   "greenhouse_core.member_skills": GreenhouseCoreMemberSkills;
   "greenhouse_core.member_tools": GreenhouseCoreMemberTools;
   "greenhouse_core.members": GreenhouseCoreMembers;
@@ -8643,6 +8693,7 @@ export interface DB {
   "greenhouse_sync.integration_schema_drifts": GreenhouseSyncIntegrationSchemaDrifts;
   "greenhouse_sync.integration_schema_snapshots": GreenhouseSyncIntegrationSchemaSnapshots;
   "greenhouse_sync.integration_space_readiness": GreenhouseSyncIntegrationSpaceReadiness;
+  "greenhouse_sync.member_role_title_drift_proposals": GreenhouseSyncMemberRoleTitleDriftProposals;
   "greenhouse_sync.notion_publication_runs": GreenhouseSyncNotionPublicationRuns;
   "greenhouse_sync.notion_space_kpi_readiness": GreenhouseSyncNotionSpaceKpiReadiness;
   "greenhouse_sync.notion_space_schema_drift_events": GreenhouseSyncNotionSpaceSchemaDriftEvents;
