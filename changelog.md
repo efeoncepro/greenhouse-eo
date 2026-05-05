@@ -2,6 +2,10 @@
 
 ## 2026-05-05
 
+- **Finiquito PDF alineado al mockup aprobado + reemisión auditable.** El generador formal de finiquitos deja de usar la plantilla minimalista previa y ahora renderiza el contrato aprobado: logo/entidad legal/RUT/domicilio, estado textual, documento/hash/snapshot, caja de líquido a pagar, partes, relación/causal/régimen, tabla auditable `Concepto / Tratamiento / Evidencia / Monto`, totales separados, declaración operativa, firmas y footer confidencial. El test del PDF ahora cubre esos landmarks y se corrigió el formateo de fechas `YYYY-MM-DD` para evitar drift por timezone.
+  - **Reemisión segura:** `/hr/offboarding` expone `Reemitir` para documentos activos reemitibles. La acción exige razón auditable, supersede el documento anterior, conserva su asset privado histórico y genera una nueva versión/hash/asset sin mutar evidencia previa. Documentos `signed_or_ratified` no se reemiten.
+  - **Clasificación robusta:** casos Chile dependiente interno como Valentina ya no dependen de `countryCode` para caer en `Finiquito laboral`; la UI usa lane, payroll interno, régimen Chile y tipo de contrato.
+
 - **TASK-799 completa — Payment Orders separa processor e instrumento de salida.** Deel deja de tratarse como cuenta origen cuando opera solo como rail; Global66 puede ser instrumento de salida cuando existe como fintech activa. La UI de Payment Orders cambia a "instrumento de salida", la creación de órdenes puede usar método automático por perfil de pago y PATCH/mark-paid validan la compatibilidad del instrumento antes de rebajar caja/deuda.
 
 - **TASK-753 implementada — `/my/payment-profile` self-service para Mi cuenta de pago.** El colaborador ahora ve su cuenta de pago activa (datos enmascarados), puede solicitar un cambio (entra como pendiente de revisión) y recibe email cuando finance la aprueba/cancela/reemplaza.

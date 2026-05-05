@@ -94,6 +94,24 @@ const honorariosCase = {
   requiresLeaveReconciliation: false
 }
 
+const approvedSettlement = {
+  finalSettlementId: 'final-settlement-valentina',
+  offboardingCaseId: 'offboarding-case-valentina',
+  calculationStatus: 'approved',
+  readinessHasBlockers: false,
+  netPayable: 121963
+}
+
+const issuedDocument = {
+  finalSettlementDocumentId: 'final-settlement-document-v1',
+  offboardingCaseId: 'offboarding-case-valentina',
+  finalSettlementId: 'final-settlement-valentina',
+  documentStatus: 'issued',
+  documentVersion: 1,
+  readiness: { status: 'ready', hasBlockers: false, checks: [] },
+  pdfAssetId: 'asset-finiquito-v1'
+}
+
 describe('HrOffboardingView', () => {
   beforeEach(() => {
     vi.clearAllMocks()
@@ -154,6 +172,7 @@ describe('HrOffboardingView', () => {
     expect(await screen.findByText('EO-OFF-2026-VAL')).toBeInTheDocument()
     expect(screen.getByText('Valentina Hoyos')).toBeInTheDocument()
     expect(screen.getAllByText('Ejecutado').length).toBeGreaterThan(0)
+    expect(screen.getByText('Finiquito laboral')).toBeInTheDocument()
     expect(screen.getByText('Sin cálculo')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Renderizar doc.' })).toBeDisabled()
 
@@ -177,5 +196,70 @@ describe('HrOffboardingView', () => {
     expect(screen.getByText('Sin finiquito laboral')).toBeInTheDocument()
     expect(screen.getByText(/Honorarios se cierra como relación contractual/)).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Revisar pago pendiente' })).toHaveAttribute('href', '/hr/payroll')
+  })
+
+  it('reissues an active finiquito document with an auditable reason', async () => {
+    const user = userEvent.setup()
+
+    fetchMock.mockImplementation(async (input: RequestInfo | URL, init?: RequestInit) => {
+      const url = String(input)
+
+      if (url === '/api/hr/offboarding/cases?limit=200') {
+        return Response.json({ cases: [{ ...executedCase, countryCode: null }] })
+      }
+
+      if (url === '/api/hr/core/members/options') {
+        return Response.json(membersPayload)
+      }
+
+      if (url === '/api/hr/offboarding/cases/offboarding-case-valentina/final-settlement' && !init?.method) {
+        return Response.json({ settlement: approvedSettlement })
+      }
+
+      if (url === '/api/hr/offboarding/cases/offboarding-case-valentina/final-settlement/document' && !init?.method) {
+        return Response.json({ document: issuedDocument })
+      }
+
+      if (url === '/api/hr/offboarding/cases/offboarding-case-valentina/final-settlement/document/reissue' && init?.method === 'POST') {
+        return Response.json({
+          document: {
+            ...issuedDocument,
+            finalSettlementDocumentId: 'final-settlement-document-v2',
+            documentStatus: 'rendered',
+            documentVersion: 2,
+            supersedesDocumentId: 'final-settlement-document-v1',
+            pdfAssetId: 'asset-finiquito-v2'
+          }
+        }, { status: 201 })
+      }
+
+      throw new Error(`Unexpected fetch: ${url}`)
+    })
+
+    const { default: HrOffboardingView } = await import('./HrOffboardingView')
+
+    renderWithTheme(<HrOffboardingView />)
+
+    expect(await screen.findByText('EO-OFF-2026-VAL')).toBeInTheDocument()
+    expect(screen.getByText('Finiquito laboral')).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Reemitir' }))
+    const reasonField = await screen.findByRole('textbox')
+
+    await user.type(
+      reasonField,
+      'Reemisión por plantilla aprobada TASK-783'
+    )
+    await user.click(screen.getByRole('button', { name: 'Reemitir' }))
+
+    await waitFor(() => {
+      expect(fetchMock).toHaveBeenCalledWith(
+        '/api/hr/offboarding/cases/offboarding-case-valentina/final-settlement/document/reissue',
+        expect.objectContaining({
+          method: 'POST',
+          body: JSON.stringify({ reason: 'Reemisión por plantilla aprobada TASK-783' })
+        })
+      )
+    })
   })
 })

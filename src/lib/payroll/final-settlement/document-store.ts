@@ -484,6 +484,12 @@ export const getLatestFinalSettlementDocumentForCase = async (offboardingCaseId:
 }
 
 export const renderFinalSettlementDocumentForCase = async (input: RenderFinalSettlementDocumentInput) => {
+  const reissueReason = input.reissue ? normalizeNullableString(input.reason) : null
+
+  if (input.reissue && (!reissueReason || reissueReason.length < 10)) {
+    throw new PayrollValidationError('Reissue reason is required and must be at least 10 characters.', 400)
+  }
+
   const settlement = await getLatestFinalSettlementForCase(input.offboardingCaseId)
 
   if (!settlement) {
@@ -495,35 +501,6 @@ export const renderFinalSettlementDocumentForCase = async (input: RenderFinalSet
       status: settlement.calculationStatus
     })
   }
-
-  const { snapshot, readiness } = await buildDocumentSnapshot(settlement)
-
-  if (readiness.hasBlockers) {
-    throw new PayrollValidationError('Final settlement document is not ready to render.', 409, readiness)
-  }
-
-  const documentId = `final-settlement-document-${randomUUID()}`
-  const snapshotHash = computeJsonSha256(snapshot)
-  const pdfBytes = await renderFinalSettlementDocumentPdf(snapshot)
-  const contentHash = computeBytesSha256(pdfBytes)
-  const fileName = `finiquito-${settlement.memberId}-v${settlement.settlementVersion}.pdf`
-
-  const asset = await storeSystemGeneratedPrivateAsset({
-    ownerAggregateType: 'final_settlement_document',
-    ownerAggregateId: documentId,
-    ownerMemberId: settlement.memberId,
-    fileName,
-    mimeType: 'application/pdf',
-    bytes: pdfBytes,
-    actorUserId: input.actorUserId,
-    metadata: {
-      finalSettlementId: settlement.finalSettlementId,
-      offboardingCaseId: settlement.offboardingCaseId,
-      settlementVersion: settlement.settlementVersion,
-      snapshotHash,
-      contentHash
-    }
-  })
 
   return withTransaction(async client => {
     const currentRows = await client.query<FinalSettlementDocumentRow>(
@@ -542,6 +519,16 @@ export const renderFinalSettlementDocumentForCase = async (input: RenderFinalSet
 
     if (active && !input.reissue) {
       return active
+    }
+
+    if (input.reissue && !active) {
+      throw new PayrollValidationError('No active final settlement document exists to reissue.', 409)
+    }
+
+    if (active?.documentStatus === 'signed_or_ratified') {
+      throw new PayrollValidationError('Signed or ratified final settlement documents cannot be reissued. Void or create a legal remediation flow instead.', 409, {
+        status: active.documentStatus
+      })
     }
 
     if (active && input.reissue) {
@@ -564,10 +551,42 @@ export const renderFinalSettlementDocumentForCase = async (input: RenderFinalSet
         fromStatus: active.documentStatus,
         toStatus: 'superseded',
         actorUserId: input.actorUserId,
-        reason: input.reason ?? null
+        reason: reissueReason
       })
-      await publishDocumentEvent(client, EVENT_TYPES.hrFinalSettlementDocumentSuperseded, superseded)
+      await publishDocumentEvent(client, EVENT_TYPES.hrFinalSettlementDocumentSuperseded, superseded, { reason: reissueReason })
     }
+
+    const { snapshot, readiness } = await buildDocumentSnapshot(settlement)
+
+    if (readiness.hasBlockers) {
+      throw new PayrollValidationError('Final settlement document is not ready to render.', 409, readiness)
+    }
+
+    const documentId = `final-settlement-document-${randomUUID()}`
+    const snapshotHash = computeJsonSha256(snapshot)
+    const pdfBytes = await renderFinalSettlementDocumentPdf(snapshot)
+    const contentHash = computeBytesSha256(pdfBytes)
+    const fileName = `finiquito-${settlement.memberId}-v${settlement.settlementVersion}-d${(latest?.documentVersion ?? 0) + 1}.pdf`
+
+    const asset = await storeSystemGeneratedPrivateAsset({
+      ownerAggregateType: 'final_settlement_document',
+      ownerAggregateId: documentId,
+      ownerMemberId: settlement.memberId,
+      fileName,
+      mimeType: 'application/pdf',
+      bytes: pdfBytes,
+      actorUserId: input.actorUserId,
+      metadata: {
+        finalSettlementId: settlement.finalSettlementId,
+        offboardingCaseId: settlement.offboardingCaseId,
+        settlementVersion: settlement.settlementVersion,
+        documentVersion: (latest?.documentVersion ?? 0) + 1,
+        reissue: Boolean(input.reissue),
+        reissueReason,
+        snapshotHash,
+        contentHash
+      }
+    })
 
     const documentVersion = (latest?.documentVersion ?? 0) + 1
 
@@ -633,9 +652,14 @@ export const renderFinalSettlementDocumentForCase = async (input: RenderFinalSet
       fromStatus: null,
       toStatus: document.documentStatus,
       actorUserId: input.actorUserId,
-      payload: { reissue: Boolean(input.reissue), pdfAssetId: document.pdfAssetId }
+      reason: reissueReason,
+      payload: { reissue: Boolean(input.reissue), supersedesDocumentId: active?.finalSettlementDocumentId ?? null, pdfAssetId: document.pdfAssetId }
     })
-    await publishDocumentEvent(client, EVENT_TYPES.hrFinalSettlementDocumentRendered, document)
+    await publishDocumentEvent(client, EVENT_TYPES.hrFinalSettlementDocumentRendered, document, {
+      reissue: Boolean(input.reissue),
+      supersedesDocumentId: active?.finalSettlementDocumentId ?? null,
+      reason: reissueReason
+    })
 
     return document
   })

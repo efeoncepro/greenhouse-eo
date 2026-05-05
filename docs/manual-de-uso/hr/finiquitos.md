@@ -38,6 +38,14 @@ El motor de finiquitos calcula y guarda el cierre final de una renuncia Chile de
 
 Si un caso ya aparece como `Ejecutado` pero no tiene finiquito, no desaparece de `/hr/offboarding`: usa `Calcular` en el carril `Finiquito` para recuperar el settlement desde las fechas canonicas del caso. Esta recuperacion existe para corregir cierres incompletos; el flujo normal debe aprobar settlement y emitir documento antes de ejecutar la salida.
 
+## Reemision de documento
+
+Si el PDF ya fue generado con una plantilla o contenido incorrecto, no se corrige el asset anterior. Usa `Reemitir` desde el carril `Finiquito`, escribe una razon operacional clara y confirma la accion.
+
+Greenhouse marca el documento activo como `superseded`, conserva el PDF anterior como evidencia historica y genera una nueva version con snapshot, hash y asset privado nuevos. La razon queda en los eventos del documento para auditoria.
+
+No se puede reemitir un documento que ya esta `signed_or_ratified`. En ese caso se debe tratar como remediacion legal/operativa separada, porque ya existe evidencia externa asociada.
+
 ## Revision del calculo
 
 Antes de aprobar, confirma tres puntos:
@@ -106,6 +114,10 @@ V1 solo cubre renuncia de trabajador dependiente Chile con payroll interno. Otro
 
 Cancela el settlement con razon auditable y vuelve a calcular. No se sobrescribe el historico aprobado.
 
+### Necesito regenerar solo el PDF/documento
+
+Usa `Reemitir` con una razon de al menos 10 caracteres. Esto no recalcula el settlement aprobado: solo reemplaza funcionalmente el documento activo por una nueva version auditable.
+
 ### El documento no se puede renderizar por identidad legal
 
 Revisa `Datos legales` del trabajador. El PDF formal exige RUT/documento verificado desde el perfil legal canonico; no usa `organizations.tax_id` para personas naturales.
@@ -119,3 +131,4 @@ Revisa `Datos legales` del trabajador. El PDF formal exige RUT/documento verific
 - `src/lib/payroll/final-settlement/**`
 - `/api/hr/offboarding/cases/[caseId]/final-settlement`
 - `/api/hr/offboarding/cases/[caseId]/final-settlement/document`
+- `/api/hr/offboarding/cases/[caseId]/final-settlement/document/reissue`

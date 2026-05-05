@@ -11,6 +11,10 @@ import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import CardHeader from '@mui/material/CardHeader'
 import Divider from '@mui/material/Divider'
+import Dialog from '@mui/material/Dialog'
+import DialogActions from '@mui/material/DialogActions'
+import DialogContent from '@mui/material/DialogContent'
+import DialogTitle from '@mui/material/DialogTitle'
 import FormControl from '@mui/material/FormControl'
 import Grid from '@mui/material/Grid'
 import InputLabel from '@mui/material/InputLabel'
@@ -140,8 +144,16 @@ type ClosureLane = {
   helpText: string | null
 }
 
+const chileDependentContracts = new Set(['indefinido', 'plazo_fijo'])
+
+const isChileDependentInternalPayrollCase = (item: OffboardingCase) =>
+  item.ruleLane === 'internal_payroll'
+  && item.payrollViaSnapshot === 'internal'
+  && item.payRegimeSnapshot === 'chile'
+  && chileDependentContracts.has(item.contractTypeSnapshot)
+
 const closureLaneFor = (item: OffboardingCase): ClosureLane => {
-  if (item.ruleLane === 'internal_payroll' && item.payrollViaSnapshot === 'internal' && item.countryCode === 'CL') {
+  if (isChileDependentInternalPayrollCase(item)) {
     return {
       label: 'Finiquito laboral',
       settlementLabel: 'Finiquito',
@@ -218,6 +230,8 @@ const HrOffboardingView = () => {
   const [settlementsByCaseId, setSettlementsByCaseId] = useState<Record<string, FinalSettlement | null>>({})
   const [settlementSavingCaseId, setSettlementSavingCaseId] = useState<string | null>(null)
   const [documentsByCaseId, setDocumentsByCaseId] = useState<Record<string, FinalSettlementDocument | null>>({})
+  const [reissueTarget, setReissueTarget] = useState<OffboardingCase | null>(null)
+  const [reissueReason, setReissueReason] = useState('')
 
   const activeCases = useMemo(
     () => cases.filter(item => activeStatuses.has(item.status)),
@@ -389,7 +403,8 @@ const HrOffboardingView = () => {
 
   const runDocumentAction = async (
     item: OffboardingCase,
-    action: 'render' | 'submit-review' | 'approve' | 'issue' | 'sign-or-ratify'
+    action: 'render' | 'submit-review' | 'approve' | 'issue' | 'sign-or-ratify' | 'reissue',
+    options?: { reason?: string }
   ) => {
     setDocumentSavingCaseId(item.offboardingCaseId)
     setError(null)
@@ -398,20 +413,26 @@ const HrOffboardingView = () => {
     try {
       const endpoint = action === 'render'
         ? `/api/hr/offboarding/cases/${item.offboardingCaseId}/final-settlement/document`
+        : action === 'reissue'
+          ? `/api/hr/offboarding/cases/${item.offboardingCaseId}/final-settlement/document/reissue`
         : `/api/hr/offboarding/cases/${item.offboardingCaseId}/final-settlement/document/${action}`
 
       const res = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(action === 'sign-or-ratify'
-          ? {
+        body: JSON.stringify(
+          action === 'sign-or-ratify'
+            ? {
             signatureEvidenceRef: {
               source: 'external_process_placeholder',
               recordedFrom: 'offboarding_surface',
               recordedAt: new Date().toISOString()
             }
           }
-          : {})
+            : action === 'reissue'
+              ? { reason: options?.reason }
+              : {}
+        )
       })
 
       if (!res.ok) {
@@ -482,6 +503,25 @@ const HrOffboardingView = () => {
     return null
   }
 
+  const canReissueDocument = (document: FinalSettlementDocument | null) =>
+    Boolean(document && ['rendered', 'in_review', 'approved', 'issued'].includes(document.documentStatus))
+
+  const submitReissue = async () => {
+    if (!reissueTarget) return
+
+    const reason = reissueReason.trim()
+
+    if (reason.length < 10) {
+      setError('Para reemitir el documento, indica una razón operacional de al menos 10 caracteres.')
+
+      return
+    }
+
+    await runDocumentAction(reissueTarget, 'reissue', { reason })
+    setReissueTarget(null)
+    setReissueReason('')
+  }
+
   if (loading) {
     return (
       <Stack spacing={6}>
@@ -515,6 +555,57 @@ const HrOffboardingView = () => {
 
       {error && <Alert severity='error' onClose={() => setError(null)}>{error}</Alert>}
       {scanMessage && <Alert severity='info' onClose={() => setScanMessage(null)}>{scanMessage}</Alert>}
+
+      <Dialog
+        open={Boolean(reissueTarget)}
+        onClose={() => {
+          if (documentSavingCaseId) return
+
+          setReissueTarget(null)
+          setReissueReason('')
+        }}
+        fullWidth
+        maxWidth='sm'
+      >
+        <DialogTitle>Reemitir documento de finiquito</DialogTitle>
+        <DialogContent>
+          <Stack spacing={3} sx={{ pt: 1 }}>
+            <Alert severity='warning'>
+              La versión actual quedará como reemitida y se generará un nuevo PDF versionado. El asset anterior se conserva para auditoría.
+            </Alert>
+            <TextField
+              autoFocus
+              label='Razón de reemisión'
+              value={reissueReason}
+              onChange={event => setReissueReason(event.target.value)}
+              minRows={3}
+              multiline
+              fullWidth
+              required
+              helperText='Ejemplo: reemisión por actualización de plantilla aprobada o corrección documental auditada.'
+            />
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            variant='text'
+            disabled={Boolean(documentSavingCaseId)}
+            onClick={() => {
+              setReissueTarget(null)
+              setReissueReason('')
+            }}
+          >
+            Cancelar
+          </Button>
+          <Button
+            variant='contained'
+            disabled={Boolean(documentSavingCaseId) || reissueReason.trim().length < 10}
+            onClick={submitReissue}
+          >
+            {documentSavingCaseId ? 'Reemitiendo' : 'Reemitir'}
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       <Card elevation={0} sx={{ border: theme => `1px solid ${theme.palette.divider}` }}>
         <CardHeader
@@ -721,6 +812,20 @@ const HrOffboardingView = () => {
                                 onClick={() => runDocumentAction(item, documentAction.action)}
                               >
                                 {documentBusy ? 'Procesando' : documentAction.label}
+                              </Button>
+                            )}
+                            {canReissueDocument(document) && (
+                              <Button
+                                size='small'
+                                variant='outlined'
+                                disabled={documentBusy || saving || !settlementApproved}
+                                onClick={() => {
+                                  setError(null)
+                                  setReissueReason('')
+                                  setReissueTarget(item)
+                                }}
+                              >
+                                Reemitir
                               </Button>
                             )}
                             {downloadUrl && (

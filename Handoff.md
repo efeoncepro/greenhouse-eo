@@ -1,5 +1,20 @@
 # Handoff.md
 
+## Sesion 2026-05-05 — Finiquito PDF contract regression + reemision auditada
+
+- **Branch:** workspace actual sobre `develop`; no se hizo commit ni push.
+- **Trigger:** el PDF de finiquito generado en produccion/staging no se parecia al mockup aprobado de `mockups/finiquito-document-v1/index.html`; salia como plantilla minimalista V1. Ademas no habia flujo visible para regenerar/reemitir el PDF ya materializado como asset privado.
+- **Causa raiz:** `src/lib/payroll/final-settlement/document-pdf.tsx` seguia renderizando una composicion generica previa: header simple, sin bloque legal robusto, sin caja de liquido, sin documento/hash visible, sin tabla auditable completa ni footer del contrato aprobado. El test existente solo cubria landmarks muy debiles y no prevenia la regresion visual/contenido.
+- **Fix:** el renderer ahora consume el snapshot canonico y proyecta el contrato aprobado: logo/entidad/RUT/domicilio, estado textual, documento `GH-FIN-*`, snapshot version + hash del snapshot, fecha generada, caja `Liquido a pagar`, partes, relacion/causal/regimen, tabla `Concepto / Tratamiento / Evidencia / Monto`, totales separados, declaracion operativa, firmas con entidad/trabajador y footer confidencial. Tambien se corrigio el formateo de fechas `YYYY-MM-DD` para no desplazarlas por timezone.
+- **Reemision segura:** se agrego `POST /api/hr/offboarding/cases/[caseId]/final-settlement/document/reissue`, capability `hr.final_settlement_document:manage`, razon obligatoria >= 10 caracteres, bloqueo para documentos `signed_or_ratified`, supersede transaccional del documento activo y nueva version/asset/hash sin mutar el PDF anterior. El store ya no renderiza ni sube asset cuando solo devuelve un documento activo existente.
+- **UI `/hr/offboarding`:** el carril `Finiquito laboral` expone `Reemitir` para documentos activos reemitibles, abre dialog con razon auditable y conserva las acciones de revision/emision/ratificacion. Se corrigio la clasificacion de Valentina-like cases: Chile dependiente interno ya no depende de `countryCode='CL'`, sino de `ruleLane`, `payrollViaSnapshot`, `payRegimeSnapshot` y `contractTypeSnapshot`.
+- **Guardrail:** `document-pdf.test.tsx` ahora exige los landmarks del mockup aprobado, metadata documental, fecha legal sin drift, regimen, declaracion operativa y footer. Esto evita volver silenciosamente al PDF minimalista.
+- **Guardrail UI/API:** `HrOffboardingView.test.tsx` cubre caso Valentina con `countryCode=null`, confirma `Finiquito laboral` y verifica reemision por endpoint explicito con razon.
+- **Validacion:** `pnpm exec eslint src/views/greenhouse/hr-core/offboarding/HrOffboardingView.tsx src/views/greenhouse/hr-core/offboarding/HrOffboardingView.test.tsx 'src/app/api/hr/offboarding/cases/[caseId]/final-settlement/document/reissue/route.ts' src/lib/payroll/final-settlement/document-store.ts src/lib/payroll/final-settlement/document-pdf.tsx src/lib/payroll/final-settlement/document-pdf.test.tsx` OK; `pnpm exec vitest run src/views/greenhouse/hr-core/offboarding/HrOffboardingView.test.tsx --reporter=verbose` OK; `pnpm exec vitest run src/lib/payroll/final-settlement/document-pdf.test.tsx src/lib/payroll/final-settlement/document-hash.test.ts --reporter=verbose` OK; `pnpm exec tsc --noEmit --pretty false` OK. Vitest mantiene warning heredado de MSW por asset wasm/font no interceptado, sin fallar.
+- **Operacion pendiente:** PDFs ya emitidos son assets privados inmutables; no se deben mutar in-place. Tras deploy, usar `Reemitir` en `/hr/offboarding` para generar el nuevo documento activo con la plantilla corregida y conservar el PDF defectuoso como evidencia superseded.
+- **Docs:** actualizados `docs/documentation/hr/finiquitos.md`, `docs/manual-de-uso/hr/finiquitos.md` y `changelog.md`.
+- **Cuidado multi-agente:** siguen presentes cambios/untracked ajenos de engagement tasks y smoke payment-profile; no tocarlos ni incluirlos.
+
 ## Sesion 2026-05-05 — CI/Smoke production promotion hardening
 
 - **Branch:** `develop` y `main` estaban alineadas en `491ea26e` cuando GitHub reporto rojo en `CI - main` y `Playwright E2E smoke - develop`.

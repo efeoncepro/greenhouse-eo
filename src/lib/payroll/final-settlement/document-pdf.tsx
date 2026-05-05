@@ -1,5 +1,7 @@
 import 'server-only'
 
+import { createHash } from 'node:crypto'
+
 import { createElement } from 'react'
 
 import { Document, Image, Page, StyleSheet, Text, View, renderToBuffer } from '@react-pdf/renderer'
@@ -10,160 +12,284 @@ import type { FinalSettlementDocumentSnapshot } from './document-types'
 
 const styles = StyleSheet.create({
   page: {
-    padding: 36,
-    fontFamily: 'Helvetica',
-    fontSize: 8.5,
+    paddingTop: 34,
+    paddingRight: 38,
+    paddingBottom: 44,
+    paddingLeft: 38,
+    fontFamily: 'DM Sans',
+    fontSize: 8,
     color: '#1A1A2E',
-    lineHeight: 1.42,
+    lineHeight: 1.38,
     backgroundColor: '#FFFFFF'
   },
   header: {
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'space-between',
-    borderBottom: '2 solid #0375DB',
-    paddingBottom: 14,
-    marginBottom: 16
+    paddingBottom: 16,
+    borderBottom: '1.4 solid #D7E2EA',
+    marginBottom: 18
+  },
+  headerLeft: {
+    width: 300
   },
   logo: {
-    width: 136,
-    height: 36,
-    objectFit: 'contain'
+    width: 150,
+    height: 34,
+    objectFit: 'contain',
+    marginBottom: 10
   },
-  headerMeta: {
-    width: 210,
+  legalBlock: {
+    color: '#425466',
+    fontSize: 7.6,
+    lineHeight: 1.42
+  },
+  legalName: {
+    fontFamily: 'DM Sans Bold',
+    color: '#102A43',
+    fontSize: 8.3
+  },
+  docMeta: {
+    width: 214,
     textAlign: 'right'
   },
-  title: {
-    fontSize: 17,
-    fontWeight: 700,
-    marginBottom: 5,
-    color: '#023C70'
+  statusPill: {
+    alignSelf: 'flex-end',
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    borderRadius: 999,
+    backgroundColor: '#EAF7EF',
+    color: '#137A45',
+    border: '1 solid #B8E6C9',
+    fontFamily: 'DM Sans Bold',
+    fontSize: 7,
+    marginBottom: 7
   },
-  subtitle: {
+  statusPillBlocked: {
+    backgroundColor: '#FFF2F2',
+    color: '#A32929',
+    border: '1 solid #F1B8B8'
+  },
+  statusPillReview: {
+    backgroundColor: '#FFF7E8',
+    color: '#9A5A00',
+    border: '1 solid #F3D19B'
+  },
+  metaText: {
     color: '#667085',
-    fontSize: 8
+    fontSize: 7.2,
+    lineHeight: 1.45
   },
-  statusBand: {
+  titleBlock: {
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 9,
-    border: '1 solid #DBDBDB',
-    backgroundColor: '#F5F9FC',
-    marginBottom: 14
+    alignItems: 'flex-start',
+    marginBottom: 18
   },
-  statusText: {
-    fontSize: 9,
-    fontWeight: 700,
-    color: '#023C70'
+  titleCopy: {
+    width: 335
   },
-  pill: {
-    paddingVertical: 3,
-    paddingHorizontal: 7,
-    border: '1 solid #0375DB',
-    color: '#023C70',
+  title: {
+    fontFamily: 'Poppins Bold',
+    fontSize: 20,
+    marginBottom: 5,
+    color: '#102A43'
+  },
+  subtitle: {
+    color: '#526173',
+    fontSize: 8.1,
+    lineHeight: 1.45
+  },
+  netBox: {
+    width: 150,
+    padding: 12,
+    border: '1.4 solid #0375DB',
+    backgroundColor: '#F5FBFF',
+    borderRadius: 8
+  },
+  netLabel: {
+    color: '#526173',
     fontSize: 7,
-    textTransform: 'uppercase'
+    textTransform: 'uppercase',
+    marginBottom: 4
+  },
+  netAmount: {
+    fontFamily: 'Poppins Bold',
+    color: '#023C70',
+    fontSize: 16,
+    marginBottom: 3
+  },
+  netHelp: {
+    color: '#667085',
+    fontSize: 7
   },
   section: {
-    marginBottom: 12
+    marginBottom: 13
   },
   sectionTitle: {
+    fontFamily: 'Poppins',
     fontSize: 11,
-    fontWeight: 700,
-    marginBottom: 6,
-    color: '#023C70'
+    marginBottom: 7,
+    color: '#102A43'
   },
-  grid: {
+  partyGrid: {
     display: 'flex',
     flexDirection: 'row',
-    gap: 12
+    flexWrap: 'wrap',
+    borderTop: '1 solid #E3E8EF',
+    borderLeft: '1 solid #E3E8EF'
   },
-  column: {
-    flex: 1
+  factsGrid: {
+    display: 'flex',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    borderTop: '1 solid #E3E8EF',
+    borderLeft: '1 solid #E3E8EF'
+  },
+  field: {
+    width: '50%',
+    minHeight: 40,
+    paddingVertical: 8,
+    paddingHorizontal: 9,
+    borderRight: '1 solid #E3E8EF',
+    borderBottom: '1 solid #E3E8EF'
   },
   label: {
     color: '#667085',
     fontSize: 7,
     textTransform: 'uppercase',
-    marginBottom: 2
+    marginBottom: 3
   },
   value: {
-    fontSize: 9,
-    marginBottom: 6
+    fontFamily: 'DM Sans Medium',
+    fontSize: 8.7,
+    color: '#233142'
   },
   tableHeader: {
     display: 'flex',
     flexDirection: 'row',
-    backgroundColor: '#023C70',
-    color: '#FFFFFF',
-    paddingVertical: 5,
-    paddingHorizontal: 6
+    borderBottom: '1.2 solid #C9D6E2',
+    borderTop: '1.2 solid #C9D6E2',
+    backgroundColor: '#F8FAFC',
+    paddingVertical: 7,
+    paddingHorizontal: 7,
+    color: '#425466',
+    fontFamily: 'DM Sans Bold'
   },
   tableRow: {
     display: 'flex',
     flexDirection: 'row',
-    borderBottom: '1 solid #DBDBDB',
-    paddingVertical: 6,
-    paddingHorizontal: 6
+    borderBottom: '1 solid #E3E8EF',
+    paddingVertical: 8,
+    paddingHorizontal: 7
   },
-  tableCell: {
-    flex: 1
+  conceptCell: {
+    width: 150,
+    paddingRight: 8
   },
-  wideCell: {
-    flex: 1.4
+  treatmentCell: {
+    width: 135,
+    paddingRight: 8
   },
-  smallCell: {
-    flex: 0.75
+  evidenceCell: {
+    width: 168,
+    paddingRight: 8
   },
   amountCell: {
-    width: 88,
-    textAlign: 'right'
+    width: 72,
+    textAlign: 'right',
+    fontFamily: 'DM Sans Medium'
+  },
+  conceptLabel: {
+    fontFamily: 'DM Sans Bold',
+    fontSize: 8.3,
+    marginBottom: 3
   },
   evidence: {
     color: '#667085',
     fontSize: 7
   },
-  totalBox: {
-    marginTop: 7,
+  tagLine: {
+    display: 'flex',
+    flexDirection: 'row',
+    flexWrap: 'wrap'
+  },
+  tag: {
+    paddingVertical: 2,
+    paddingHorizontal: 5,
+    borderRadius: 999,
+    marginRight: 4,
+    marginBottom: 3,
+    fontSize: 6.6,
+    fontFamily: 'DM Sans Bold'
+  },
+  tagOk: {
+    color: '#137A45',
+    backgroundColor: '#EAF7EF',
+    border: '1 solid #B8E6C9'
+  },
+  tagInfo: {
+    color: '#035A9E',
+    backgroundColor: '#EAF4FF',
+    border: '1 solid #BBD9F5'
+  },
+  tagWarn: {
+    color: '#9A5A00',
+    backgroundColor: '#FFF7E8',
+    border: '1 solid #F3D19B'
+  },
+  totals: {
+    border: '1.2 solid #D7E2EA',
+    borderRadius: 8,
     padding: 10,
-    border: '1 solid #0375DB',
-    backgroundColor: '#F5F9FC'
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between'
+  },
+  totalItem: {
+    width: '31%'
   },
   netPayable: {
+    fontFamily: 'Poppins Bold',
     fontSize: 11,
-    fontWeight: 700,
     color: '#023C70'
   },
   warning: {
-    padding: 8,
+    padding: 10,
     border: '1 solid #F79009',
     backgroundColor: '#FFFBEA',
-    marginTop: 8
+    marginBottom: 12
+  },
+  statement: {
+    fontSize: 8,
+    color: '#344054',
+    lineHeight: 1.48
   },
   signatures: {
     display: 'flex',
     flexDirection: 'row',
-    gap: 24,
-    marginTop: 32
+    marginTop: 30
   },
   signatureLine: {
-    flex: 1,
+    width: '47%',
     borderTop: '1 solid #667085',
     paddingTop: 6,
-    textAlign: 'center'
+    textAlign: 'center',
+    marginRight: 20
   },
   footer: {
     position: 'absolute',
     bottom: 24,
-    left: 36,
-    right: 36,
+    left: 38,
+    right: 38,
     fontSize: 7,
     color: '#667085',
-    borderTop: '1 solid #DBDBDB',
-    paddingTop: 8
+    borderTop: '1 solid #D7E2EA',
+    paddingTop: 7,
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between'
   }
 })
 
@@ -176,8 +302,47 @@ const formatCurrency = (amount: number) =>
     maximumFractionDigits: 0
   }).format(amount)
 
+const formatDate = (value: string | null | undefined) => {
+  if (!value) return 'Pendiente'
+
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    const [year, month, day] = value.split('-')
+
+    return `${day}-${month}-${year}`
+  }
+
+  const date = new Date(value)
+
+  if (Number.isNaN(date.getTime())) return value
+
+  return new Intl.DateTimeFormat('es-CL', {
+    timeZone: 'America/Santiago',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  }).format(date)
+}
+
+const formatDateTime = (value: string) => {
+  const date = new Date(value)
+
+  if (Number.isNaN(date.getTime())) return value
+
+  return new Intl.DateTimeFormat('es-CL', {
+    timeZone: 'America/Santiago',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit'
+  }).format(date)
+}
+
+const shortHash = (value: unknown) =>
+  createHash('sha256').update(JSON.stringify(value)).digest('hex').slice(0, 8)
+
 const Field = ({ label, value }: { label: string; value: string | number | null | undefined }) => (
-  <View>
+  <View style={styles.field}>
     <Text style={styles.label}>{label}</Text>
     <Text style={styles.value}>{value == null || value === '' ? 'Pendiente' : String(value)}</Text>
   </View>
@@ -192,7 +357,7 @@ const legalTreatmentLabel: Record<string, string> = {
 
 const taxTreatmentLabel: Record<string, string> = {
   taxable_monthly: 'Tributable',
-  non_income: 'No renta',
+  non_income: 'No tributable',
   not_applicable: 'No aplica',
   needs_review: 'Revisar'
 }
@@ -205,9 +370,24 @@ const previsionalTreatmentLabel: Record<string, string> = {
 }
 
 const readinessLabel: Record<string, string> = {
-  ready: 'Listo para emisión formal',
-  needs_review: 'Requiere revisión previa',
-  blocked: 'Bloqueado para emisión formal'
+  ready: 'Listo para emitir',
+  needs_review: 'Requiere revisión',
+  blocked: 'Bloqueado'
+}
+
+const readinessPillStyle = (status: keyof typeof readinessLabel) => {
+  if (status === 'blocked') return [styles.statusPill, styles.statusPillBlocked]
+  if (status === 'needs_review') return [styles.statusPill, styles.statusPillReview]
+
+  return styles.statusPill
+}
+
+const separationTypeLabel: Record<string, string> = {
+  resignation: 'Renuncia voluntaria'
+}
+
+const payrollViaLabel: Record<string, string> = {
+  internal: 'internal payroll'
 }
 
 const readableEvidence = (evidence: Record<string, unknown> | undefined) => {
@@ -221,10 +401,27 @@ const readableEvidence = (evidence: Record<string, unknown> | undefined) => {
   return label ?? reason ?? source ?? code ?? 'Evidencia estructurada'
 }
 
+const lineTreatmentTags = (line: FinalSettlementDocumentSnapshot['breakdown'][number]) => {
+  const legal = legalTreatmentLabel[line.legalTreatment ?? ''] ?? line.legalTreatment
+  const tax = taxTreatmentLabel[line.taxTreatment ?? ''] ?? line.taxTreatment
+  const previsional = previsionalTreatmentLabel[line.previsionalTreatment ?? ''] ?? line.previsionalTreatment
+
+  return [legal, tax, previsional].filter((value): value is string => Boolean(value))
+}
+
 const FinalSettlementPdfDocument = ({ snapshot }: { snapshot: FinalSettlementDocumentSnapshot }) => {
   const warnings = snapshot.readiness.checks.filter(check => check.status !== 'passed')
   const readinessStatus = snapshot.readiness.hasBlockers ? 'blocked' : warnings.length > 0 ? 'needs_review' : 'ready'
   const collaboratorName = snapshot.collaborator.legalName || snapshot.collaborator.displayName || snapshot.finalSettlement.memberId
+  const fingerprint = shortHash(snapshot)
+  const documentNumber = `GH-FIN-${new Date(snapshot.generatedAt).getFullYear()}-${snapshot.finalSettlement.finalSettlementId.slice(0, 8)}`
+  const regime = `${snapshot.finalSettlement.payRegimeSnapshot === 'chile' ? 'Chile dependiente' : snapshot.finalSettlement.payRegimeSnapshot} · ${payrollViaLabel[snapshot.finalSettlement.payrollViaSnapshot] ?? snapshot.finalSettlement.payrollViaSnapshot}`
+
+  const netHelp = snapshot.finalSettlement.netPayable < 0
+    ? 'Líquido negativo: requiere deducción autorizada o reemisión.'
+    : snapshot.finalSettlement.deductionTotal > 0
+      ? 'Incluye descuentos / retenciones autorizadas.'
+      : 'Sin descuentos previsionales pendientes.'
 
   return (
     <Document
@@ -233,100 +430,116 @@ const FinalSettlementPdfDocument = ({ snapshot }: { snapshot: FinalSettlementDoc
     >
       <Page size='LETTER' style={styles.page}>
         <View style={styles.header}>
-          <View>
+          <View style={styles.headerLeft}>
             <Image src={logoPath} style={styles.logo} />
-            <Text style={styles.subtitle}>People Operations · Payroll Chile</Text>
+            <Text style={styles.legalName}>{snapshot.employer.legalName}</Text>
+            <Text style={styles.legalBlock}>
+              RUT {snapshot.employer.taxId ?? 'Pendiente'}{'\n'}
+              {snapshot.employer.legalAddress ?? 'Domicilio legal pendiente'}
+            </Text>
           </View>
-          <View style={styles.headerMeta}>
-            <Text style={styles.title}>Finiquito de contrato de trabajo</Text>
-            <Text style={styles.subtitle}>Template {snapshot.documentTemplateVersion}</Text>
-            <Text style={styles.subtitle}>Snapshot {snapshot.finalSettlement.finalSettlementId}</Text>
+          <View style={styles.docMeta}>
+            <Text style={readinessPillStyle(readinessStatus)}>{readinessLabel[readinessStatus]}</Text>
+            <Text style={styles.metaText}>Documento {documentNumber}</Text>
+            <Text style={styles.metaText}>Snapshot fs-v{snapshot.finalSettlement.settlementVersion} · Hash {fingerprint}</Text>
+            <Text style={styles.metaText}>Generado {formatDateTime(snapshot.generatedAt)}</Text>
           </View>
         </View>
 
-        <View style={styles.statusBand}>
-          <View>
-            <Text style={styles.statusText}>{readinessLabel[readinessStatus]}</Text>
+        <View style={styles.titleBlock}>
+          <View style={styles.titleCopy}>
+            <Text style={styles.title}>Finiquito de contrato de trabajo</Text>
             <Text style={styles.subtitle}>
-              Documento interno generado desde liquidación final aprobada. La firma o ratificación externa cierra el proceso.
+              Propuesta de finiquito para relación laboral dependiente en Chile. La emisión queda sujeta a ratificación externa,
+              firma y evidencia de cotizaciones cuando corresponda.
             </Text>
           </View>
-          <Text style={styles.pill}>{snapshot.finalSettlement.currency}</Text>
+          <View style={styles.netBox}>
+            <Text style={styles.netLabel}>Líquido a pagar</Text>
+            <Text style={styles.netAmount}>{formatCurrency(snapshot.finalSettlement.netPayable)}</Text>
+            <Text style={styles.netHelp}>{netHelp}</Text>
+          </View>
         </View>
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Partes</Text>
-          <View style={styles.grid}>
-            <View style={styles.column}>
-              <Field label='Empleador' value={snapshot.employer.legalName} />
-              <Field label='RUT empleador' value={snapshot.employer.taxId} />
-              <Field label='Domicilio' value={snapshot.employer.legalAddress} />
-            </View>
-            <View style={styles.column}>
-              <Field label='Trabajador/a' value={snapshot.collaborator.legalName || snapshot.collaborator.displayName} />
-              <Field label='RUT trabajador/a' value={snapshot.collaborator.taxId} />
-              <Field label='Cargo' value={snapshot.collaborator.jobTitle} />
-            </View>
+          <View style={styles.partyGrid}>
+            <Field label='Empleador' value={snapshot.employer.legalName} />
+            <Field label='Trabajador/a' value={snapshot.collaborator.legalName || snapshot.collaborator.displayName} />
+            <Field label='RUT empleador' value={snapshot.employer.taxId} />
+            <Field label='RUT trabajador/a' value={snapshot.collaborator.taxId} />
+            <Field label='Domicilio empleador' value={snapshot.employer.legalAddress} />
+            <Field label='Cargo' value={snapshot.collaborator.jobTitle} />
           </View>
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Relacion laboral</Text>
-          <View style={styles.grid}>
-            <View style={styles.column}>
-              <Field label='Fecha ingreso' value={snapshot.finalSettlement.hireDateSnapshot} />
-              <Field label='Ultimo dia trabajado' value={snapshot.finalSettlement.lastWorkingDay} />
-            </View>
-            <View style={styles.column}>
-              <Field label='Fecha termino' value={snapshot.finalSettlement.effectiveDate} />
-              <Field label='Causal' value='Renuncia voluntaria' />
-            </View>
+          <Text style={styles.sectionTitle}>Relación y causal</Text>
+          <View style={styles.factsGrid}>
+            <Field label='Fecha ingreso' value={formatDate(snapshot.finalSettlement.hireDateSnapshot)} />
+            <Field label='Último día trabajado' value={formatDate(snapshot.finalSettlement.lastWorkingDay)} />
+            <Field label='Fecha término' value={formatDate(snapshot.finalSettlement.effectiveDate)} />
+            <Field label='Causal' value={separationTypeLabel[snapshot.finalSettlement.separationType] ?? snapshot.finalSettlement.separationType} />
+            <Field label='Régimen' value={regime} />
+            <Field label='Pago mensual usado como evidencia' value={readableEvidence(snapshot.sourceSnapshot.payrollOverlapLedger)} />
           </View>
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Detalle de haberes y descuentos</Text>
+          <Text style={styles.sectionTitle}>Detalle auditable de haberes y descuentos</Text>
           <View style={styles.tableHeader}>
-            <Text style={styles.wideCell}>Concepto</Text>
-            <Text style={styles.tableCell}>Tratamiento</Text>
-            <Text style={styles.tableCell}>Evidencia</Text>
+            <Text style={styles.conceptCell}>Concepto</Text>
+            <Text style={styles.treatmentCell}>Tratamiento</Text>
+            <Text style={styles.evidenceCell}>Evidencia</Text>
             <Text style={styles.amountCell}>Monto</Text>
           </View>
           {snapshot.breakdown.map(line => (
             <View key={line.componentCode} style={styles.tableRow}>
-              <View style={styles.wideCell}>
-                <Text>{line.label}</Text>
-                <Text style={styles.evidence}>{line.kind === 'deduction' ? 'Descuento' : 'Haber'} · {line.policyCode ?? 'policy pendiente'}</Text>
+              <View style={styles.conceptCell}>
+                <Text style={styles.conceptLabel}>{line.label}</Text>
+                <Text style={styles.evidence}>Policy {line.policyCode ?? line.formulaRef ?? 'pendiente'}</Text>
               </View>
-              <View style={styles.tableCell}>
-                <Text>{legalTreatmentLabel[line.legalTreatment ?? ''] ?? line.legalTreatment ?? 'Pendiente'}</Text>
-                <Text style={styles.evidence}>
-                  {taxTreatmentLabel[line.taxTreatment ?? ''] ?? line.taxTreatment ?? 'Pendiente'} · {previsionalTreatmentLabel[line.previsionalTreatment ?? ''] ?? line.previsionalTreatment ?? 'Pendiente'}
-                </Text>
+              <View style={styles.treatmentCell}>
+                <View style={styles.tagLine}>
+                  {lineTreatmentTags(line).map((tag, index) => (
+                    <Text
+                      key={`${line.componentCode}-${tag}`}
+                      style={[
+                        styles.tag,
+                        index === 0 ? styles.tagInfo : tag.includes('Revisar') ? styles.tagWarn : styles.tagOk
+                      ]}
+                    >
+                      {tag}
+                    </Text>
+                  ))}
+                </View>
               </View>
-              <Text style={styles.tableCell}>{readableEvidence(line.evidence)}</Text>
+              <Text style={styles.evidenceCell}>{readableEvidence(line.evidence)}</Text>
               <Text style={styles.amountCell}>{formatCurrency(line.amount)}</Text>
             </View>
           ))}
-          <View style={styles.totalBox}>
-            <View style={styles.grid}>
-              <View style={styles.column}>
-                <Field label='Total haberes' value={formatCurrency(snapshot.finalSettlement.grossTotal)} />
-              </View>
-              <View style={styles.column}>
-                <Field label='Total descuentos' value={formatCurrency(snapshot.finalSettlement.deductionTotal)} />
-              </View>
-              <View style={styles.column}>
-                <Text style={styles.label}>Líquido / pago neto</Text>
-                <Text style={styles.netPayable}>{formatCurrency(snapshot.finalSettlement.netPayable)}</Text>
-              </View>
+        </View>
+
+        <View style={styles.section}>
+          <View style={styles.totals}>
+            <View style={styles.totalItem}>
+              <Text style={styles.label}>Total haberes</Text>
+              <Text style={styles.value}>{formatCurrency(snapshot.finalSettlement.grossTotal)}</Text>
+            </View>
+            <View style={styles.totalItem}>
+              <Text style={styles.label}>Total descuentos / retenciones</Text>
+              <Text style={styles.value}>{formatCurrency(snapshot.finalSettlement.deductionTotal)}</Text>
+            </View>
+            <View style={styles.totalItem}>
+              <Text style={styles.label}>Líquido / pago neto</Text>
+              <Text style={styles.netPayable}>{formatCurrency(snapshot.finalSettlement.netPayable)}</Text>
             </View>
           </View>
         </View>
 
         {warnings.length > 0 && (
           <View style={styles.warning}>
-            <Text style={styles.sectionTitle}>Advertencias de revision</Text>
+            <Text style={styles.sectionTitle}>Readiness de emisión</Text>
             {warnings.map(check => (
               <Text key={check.code}>- {check.message}</Text>
             ))}
@@ -334,21 +547,22 @@ const FinalSettlementPdfDocument = ({ snapshot }: { snapshot: FinalSettlementDoc
         )}
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Ratificacion y reserva de derechos</Text>
-          <Text>
-            La persona trabajadora puede aceptar, aceptar con reserva de derechos o rechazar la propuesta en el proceso externo
-            correspondiente. Greenhouse registra ese resultado como evidencia, sin ejecutar pagos ni sustituir al ministro de fe.
+          <Text style={styles.sectionTitle}>Declaración operativa</Text>
+          <Text style={styles.statement}>
+            Greenhouse registra este documento como propuesta interna versionada. La firma, ratificación o reserva de derechos se
+            registra como evidencia externa y no reemplaza el acto ante ministro de fe cuando aplique.
           </Text>
         </View>
 
         <View style={styles.signatures}>
-          <Text style={styles.signatureLine}>Representante empleador</Text>
-          <Text style={styles.signatureLine}>Trabajador/a</Text>
+          <Text style={styles.signatureLine}>Representante empleador{'\n'}{snapshot.employer.legalName}</Text>
+          <Text style={styles.signatureLine}>Trabajador/a{'\n'}{collaboratorName}</Text>
         </View>
 
-        <Text style={styles.footer}>
-          Template {snapshot.documentTemplateVersion} · Snapshot {snapshot.finalSettlement.finalSettlementId} · Generado {snapshot.generatedAt}
-        </Text>
+        <View style={styles.footer}>
+          <Text>Documento confidencial · {snapshot.employer.legalName} · RUT {snapshot.employer.taxId ?? 'Pendiente'}</Text>
+          <Text>Página 1 de 1 · Template {snapshot.documentTemplateCode} · {snapshot.documentTemplateVersion}</Text>
+        </View>
       </Page>
     </Document>
   )

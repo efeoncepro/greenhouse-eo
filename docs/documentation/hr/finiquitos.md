@@ -83,6 +83,8 @@ Ejemplo: renuncia el 30/04 con abril exportado y solo feriado proporcional pendi
 
 Un settlement aprobado no se modifica silenciosamente. Si hay que recalcular, V1 exige cancelar y reemitir una version nueva.
 
+El documento formal tambien es versionado. Si el PDF activo fue generado con una plantilla equivocada o requiere regeneracion sin cambiar el calculo aprobado, la salida canonica es `Reemitir`: Greenhouse exige una razon auditable, marca el documento activo como `superseded`, conserva su asset privado anterior y genera una nueva version con snapshot/hash/content hash propios. No se reemiten documentos `signed_or_ratified`, porque ya existe evidencia externa asociada.
+
 ## Documento formal
 
 Desde TASK-762, el settlement aprobado habilita el documento formal de finiquito:
