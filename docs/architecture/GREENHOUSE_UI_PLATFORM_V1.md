@@ -1,7 +1,8 @@
 # Greenhouse EO — UI Platform Architecture V1
 
-> **Version:** 1.3
+> **Version:** 1.4
 > **Created:** 2026-03-30
+> **Updated:** 2026-05-04 — v1.4: Quick Access Shortcuts Platform (TASK-553). Catálogo canónico `src/lib/shortcuts/catalog.ts` + resolver dual-plane (`module` + opcional `viewCode` + opcional `requiredCapability`) compartido entre Home `recommendedShortcuts` y header `<ShortcutsDropdown />`. Persistencia per-usuario en `greenhouse_core.user_shortcut_pins` vía `/api/me/shortcuts`. Ver Delta 2026-05-04 abajo.
 > **Updated:** 2026-04-20 — v1.3: Floating UI (`@floating-ui/react` 0.27) introducido como stack oficial de positioning para popovers (TASK-509). Primer consumer: `TotalsLadder`. TASK-510 backlog migra el resto. Ver Delta 2026-04-20b abajo.
 > **Updated:** 2026-04-20 — v1.2: `TotalsLadder` primitive extiende su API con `addonsSegment?: { count, amount, onClick, ariaExpanded } | null` (TASK-507) para renderizar un segmento interactivo inline dentro de la ladder de ajustes. Pattern: acciones contextuales viven con sus datos, no como chips flotantes separados. Ver Delta 2026-04-20 abajo.
 > **Updated:** 2026-04-19 — v1.1: registry de primitives `src/components/greenhouse/primitives/` gana 3 componentes nuevos extraídos de `QuoteSummaryDock` (TASK-505). Ver Delta 2026-04-19 abajo.
@@ -12,6 +13,64 @@
 ## Overview
 
 Greenhouse EO es un portal Next.js 16 App Router con MUI 7.x envuelto por el starter-kit Vuexy. Este documento es la referencia canónica de la plataforma UI: stack, librerías disponibles, patrones de componentes, convenciones de estado, y reglas de adopción.
+
+## Delta 2026-05-04 — Quick Access Shortcuts Platform (TASK-553)
+
+Tres capas canónicas reemplazan los arrays de shortcuts hardcodeados que vivían en `vertical/NavbarContent.tsx` y `horizontal/NavbarContent.tsx`. Home y header ahora resuelven shortcuts desde la misma fuente autorizada.
+
+### Capas
+
+| Capa | Fuente | Persistencia | Visibilidad |
+|------|--------|--------------|-------------|
+| **Recommended** | Top-N (default 4) ordenado por `audienceKey` desde `AUDIENCE_SHORTCUT_ORDER` | No | Filtrado por acceso real |
+| **Available** | Catálogo completo filtrado por dual-plane gate | No | Drives flujo `+ Agregar acceso` |
+| **Pinned** | `greenhouse_core.user_shortcut_pins` (per-user) | PG, CASCADE on user delete | Revalidado server-side en cada lectura |
+
+### Componentes canónicos
+
+- `src/lib/shortcuts/catalog.ts` — `CanonicalShortcut` + `SHORTCUT_CATALOG` (13 entradas iniciales) + `AUDIENCE_SHORTCUT_ORDER` per `HomeAudienceKey` + helpers `getShortcutByKey` / `isKnownShortcutKey`. Para registrar un shortcut nuevo, agregar entry acá. **NO hardcodear** arrays en componentes.
+- `src/lib/shortcuts/resolver.ts` — `resolveAvailableShortcuts(subject)`, `resolveRecommendedShortcuts(subject, limit?)`, `validateShortcutAccess(subject, key)` (write-path boolean), `projectShortcutForHome(shortcut)` (legacy projection bridge para `HomeRecommendedShortcut`).
+- `src/lib/shortcuts/pins-store.ts` — persistence helpers: `listUserShortcutPins`, `pinShortcut` (idempotent), `unpinShortcut` (idempotent), `reorderUserShortcutPins` (atomic), `listDistinctPinnedShortcutKeys` (signal helper).
+- `src/components/layout/shared/ShortcutsDropdown.tsx` — self-contained header dropdown. `useSession` + lazy fetch en primer open. View mode (pinned o recommended fallback) + Add mode (available − pinned). Ya **no acepta props** — los `NavbarContent` lo renderizan vacío.
+
+### Dual-plane access gate
+
+Cada `CanonicalShortcut` declara como mínimo `module: GreenhouseEntitlementModule` (gate `canSeeModule`). Opcionalmente:
+
+```ts
+viewCode?: string                        // user.authorizedViews.includes(viewCode)
+requiredCapability?: {                   // can(subject, capability, action, scope)
+  capability: EntitlementCapabilityKey
+  action: EntitlementAction
+  scope?: EntitlementScope
+}
+```
+
+Las tres dimensiones se AND-ean. La `validateShortcutAccess` retorna `false` para llaves desconocidas (catálogo retirado) y para cualquier fallo de plano.
+
+### API canónica
+
+| Method | Path | Propósito |
+|--------|------|----------|
+| GET    | `/api/me/shortcuts` | `{ recommended, available, pinned }` para el usuario actual |
+| POST   | `/api/me/shortcuts` | Pin idempotente. Body: `{ shortcutKey }`. Valida acceso server-side |
+| DELETE | `/api/me/shortcuts/[shortcutKey]` | Unpin idempotente (sin gate de acceso — un usuario puede siempre quitar lo que pineó) |
+| PUT    | `/api/me/shortcuts/order` | Reorder atómico. Body: `{ orderedKeys: string[] }` |
+
+Auth: `getServerAuthSession` + capability `home.shortcuts:read` + `validateShortcutAccess` server-side antes de cualquier write. Errores sanitizados con `redactErrorForResponse` + `captureWithDomain('home', ...)`.
+
+### Reliability signal
+
+`home.shortcuts.invalid_pins` (kind `drift`, severity `warning` si > 0). Detecta llaves pineadas que ya no existen en el catálogo TS. UX no se rompe (lectura las filtra), pero ops queda enterado del drift y puede limpiar / restaurar.
+
+### Reglas duras
+
+- **NUNCA** declarar shortcuts hardcodeados en un layout o NavbarContent. La fuente única es `src/lib/shortcuts/catalog.ts`.
+- **NUNCA** decidir visibilidad de un shortcut desde el cliente. El cliente lee `/api/me/shortcuts` que ya devuelve solo lo autorizado.
+- **NUNCA** persistir un pin sin pasar por `validateShortcutAccess` server-side. El POST handler lo enforce.
+- **NUNCA** mostrar un shortcut pineado sin re-validar su acceso al render. El reader del API ya lo filtra; cualquier consumer alternativo (futuras superficies) debe pasar por el resolver.
+- **NUNCA** mezclar el shape de header (`{key, label, subtitle, route, icon, module}`) con el legacy de Home (`{id, label, route, icon, module}`). Use `projectShortcutForHome` cuando necesite el shape legacy.
+- Cuando emerja una surface nueva (Mi Greenhouse, command palette, settings personales) que necesite shortcuts adaptativos, debe consumir el resolver — no copiar el catálogo.
 
 ## Delta 2026-05-02 — Copy System Contract (TASK-265)
 

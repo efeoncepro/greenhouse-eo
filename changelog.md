@@ -2,6 +2,14 @@
 
 ## 2026-05-04
 
+- **TASK-553 implementada — Quick Access Shortcuts Platform.** El boton de grilla con `+` arriba a la derecha del portal pasa de decoración a capacidad real.
+  - **Catalogo canonico:** [src/lib/shortcuts/catalog.ts](src/lib/shortcuts/catalog.ts) con 13 entradas + ordenamiento por audiencia (admin / internal / hr / finance / collaborator / client). Los `NavbarContent` ya no traen arrays hardcodeados.
+  - **Resolver dual-plane:** [src/lib/shortcuts/resolver.ts](src/lib/shortcuts/resolver.ts) valida acceso por `module` + opcional `viewCode` (`authorizedViews`) + opcional `requiredCapability` (motor `can()`). El mismo resolver alimenta Home `recommendedShortcuts` y header dropdown — cero drift.
+  - **Persistencia per-usuario:** nueva tabla `greenhouse_core.user_shortcut_pins` (CASCADE on user delete, audit trigger, ownership canónica). API `/api/me/shortcuts` (GET list + POST pin), `/api/me/shortcuts/[shortcutKey]` (DELETE unpin), `/api/me/shortcuts/order` (PUT reorder atómico). Auth `getServerAuthSession` + capability `home.shortcuts:read` + `validateShortcutAccess` server-side antes de cualquier write.
+  - **Flujo `+ Agregar acceso` real:** `ShortcutsDropdown` self-contained con `useSession` + lazy fetch + view/add modes + pin/unpin con hover-reveal `×`. Estados loading/error/empty explicitos. Copy es-CL tuteo validada por skill `greenhouse-ux-writing` (no anglicismos: "Agrega" no "Pinea", "Intenta de nuevo" no "Reintenta").
+  - **Reliability:** signal `home.shortcuts.invalid_pins` (kind drift, severity warning si > 0). La UI no se rompe por llaves retiradas del catalogo — el reader las filtra y ops detecta el drift.
+  - **Docs:** [docs/documentation/plataforma/accesos-rapidos.md](docs/documentation/plataforma/accesos-rapidos.md), [docs/manual-de-uso/plataforma/accesos-rapidos.md](docs/manual-de-uso/plataforma/accesos-rapidos.md), Delta en [GREENHOUSE_UI_PLATFORM_V1.md](docs/architecture/GREENHOUSE_UI_PLATFORM_V1.md).
+
 - **Hotfix HR Offboarding/Finiquito — casos ejecutados siguen visibles y el cierre interno exige finiquito.**
   - `/hr/offboarding` deja de consultar solo `status=active`; ahora muestra casos no cancelados, incluyendo `executed`, para que un caso ejecutado con finiquito pendiente no desaparezca del operador.
   - El carril `Finiquito` expone el cálculo/aprobación del `final_settlement` antes del documento: `Calcular`, `Aprobar cálculo`, neto CLP y blockers de readiness.

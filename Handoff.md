@@ -1,5 +1,27 @@
 # Handoff.md
 
+## Sesion 2026-05-04 — TASK-553 Quick Access Shortcuts Platform — completada
+
+- **Branch:** `develop` (commits directos por instruccion del usuario "mantente en develop"). 4 commits secuenciales por slice + cierre.
+- **Lifecycle:** `to-do` → `in-progress` → `complete`. README/registry sincronizados.
+- **Skills invocadas:** `greenhouse-backend` (catalogo + resolver + persistence + API) + `greenhouse-ux-writing` (validacion copy es-CL tuteo).
+- **Slices entregados:**
+  - **Slice 1 — Catalogo + resolver canonico.** `src/lib/shortcuts/catalog.ts` (13 entradas + `AUDIENCE_SHORTCUT_ORDER`) + `resolver.ts` (resolveAvailable / resolveRecommended / validateShortcutAccess + projectShortcutForHome). Home `build-home-entitlements-context.ts` delega al resolver. Tests 9/9 + contrato Home preservado.
+  - **Slice 2 — Persistencia + API.** Migracion `greenhouse_core.user_shortcut_pins` (FK CASCADE on user delete, audit trigger, ownership ops + grants runtime). Store `pins-store.ts` con listUserShortcutPins / pinShortcut idempotente / unpinShortcut idempotente / reorderUserShortcutPins atomico + helpers para reliability signal. APIs `/api/me/shortcuts/{,[shortcutKey],order}` con auth `home.shortcuts:read` + `validateShortcutAccess` server-side + redactErrorForResponse + captureWithDomain('home'). Tests 11/11.
+  - **Slice 3 — Header dropdown activado.** `ShortcutsDropdown` self-contained: useSession + lazy fetch + view/add modes + pin/unpin con hover-reveal × + estados loading/error/empty. `NavbarContent` vertical + horizontal eliminan arrays hardcodeados. Copy validado por skill.
+  - **Slice 4 — Convergencia + reliability + docs.** Reliability signal `home.shortcuts.invalid_pins` (kind drift, severity warning si > 0). Doc funcional `docs/documentation/plataforma/accesos-rapidos.md`. Manual `docs/manual-de-uso/plataforma/accesos-rapidos.md`. Arch doc `GREENHOUSE_UI_PLATFORM_V1.md` Delta 2026-05-04. CLAUDE.md sección con invariantes.
+- **Verificacion final:** 46/46 home + shortcuts tests verdes; tsc + eslint limpios sobre archivos tocados; migration aplicada local; tipos `db.d.ts` regenerados; no hay consumers residuales de `ShortcutsType`.
+- **Pendiente / follow-ups (out of scope V1):** drag-and-drop reorder en UI (API ya existe), analytics de adopcion, presets administrables desde Admin Center, extension del contrato a otras superficies adaptativas (mi-greenhouse, command palette).
+
+## Sesion 2026-05-04 — TASK-783 creada: Payroll Final Settlement Component Policy + Overlap Hardening
+
+- **Branch:** `develop`.
+- **Trigger:** auditoria del finiquito de Valentina Hoyos detecto settlement aprobado con `net_payable=-40.512` por doble descuento de Isapre de abril ya exportado, cuando el caso de renuncia 30/04/2026 observaba solo `proportional_vacation=121.963`.
+- **Skills:** `greenhouse-payroll-auditor` para el criterio payroll/legal y `greenhouse-task-planner` para registrar task canonica.
+- **Decision:** crear `TASK-783` como follow-up P0, no parche local. La solucion propuesta es policy engine por componente + payroll overlap ledger + gates fail-closed para netos negativos/deducciones duplicadas + remediacion auditada por cancelacion/reemision.
+- **Docs tocadas:** `docs/tasks/to-do/TASK-783-payroll-final-settlement-component-policy-overlap-hardening.md`, `docs/tasks/TASK_ID_REGISTRY.md`, `docs/tasks/README.md`.
+- **Pendiente:** implementar TASK-783 end-to-end si el usuario autoriza; no se cambio runtime ni DB en esta sesion.
+
 ## Sesion 2026-05-04 — Hotfix HR Offboarding/Finiquito visibility + execution guard
 
 - **Branch:** `develop`.

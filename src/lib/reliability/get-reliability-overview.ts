@@ -38,6 +38,7 @@ import { getPaidOrdersWithoutExpensePaymentSignal } from './queries/payment-orde
 import { getPayrollExpenseMaterializationLagSignal } from './queries/payroll-expense-materialization-lag'
 import { getProviderBqSyncDeadLetterSignal } from './queries/provider-bq-sync-dead-letter'
 import { getHomeRolloutDriftSignal } from './queries/home-rollout-drift'
+import { getShortcutsInvalidPinsSignal } from './queries/shortcuts-invalid-pins'
 import { getOutboxUnpublishedLagSignal } from './queries/outbox-unpublished-lag'
 import { getOutboxDeadLetterSignal } from './queries/outbox-dead-letter'
 import { getCronStagingDriftSignal } from './queries/cron-staging-drift'
@@ -334,6 +335,15 @@ interface ReliabilityOverviewSources {
    * opt-out rate > 5% (regresión UX en V2 que empuja a usuarios a legacy).
    */
   homeRolloutDrift?: ReliabilitySignal | null
+
+  /**
+   * TASK-553 Slice 4 — Quick Access Shortcuts catalog drift signal:
+   *   - home.shortcuts.invalid_pins (distinct shortcut_keys pinned that are no
+   *     longer in the canonical catalog).
+   * Steady state = 0. Severity `warning` if > 0 (UI is unaffected — pins are
+   * filtered at read time — but signals catalog retirement drift to ops).
+   */
+  shortcutsInvalidPins?: ReliabilitySignal | null
 }
 
 export const buildReliabilityOverview = (
@@ -381,7 +391,9 @@ export const buildReliabilityOverview = (
     // TASK-777 Slice 3 — Expense distribution gates.
     ...(sources.expenseDistribution ?? []),
     // TASK-780 Phase 3 — Home rollout drift (PG flag vs env + opt-out rate).
-    ...(sources.homeRolloutDrift ? [sources.homeRolloutDrift] : [])
+    ...(sources.homeRolloutDrift ? [sources.homeRolloutDrift] : []),
+    // TASK-553 Slice 4 — Quick Access Shortcuts catalog drift.
+    ...(sources.shortcutsInvalidPins ? [sources.shortcutsInvalidPins] : [])
   ]
 
   const signalsByModule = new Map<string, ReliabilitySignal[]>()
@@ -607,6 +619,13 @@ export const getReliabilityOverview = async (
       ? preloadedSources.homeRolloutDrift
       : await getHomeRolloutDriftSignal().catch(() => null)
 
+  // TASK-553 Slice 4 — Quick Access Shortcuts catalog drift. Lee distinct
+  // shortcut_keys pineados y los cruza contra el catálogo canónico TS.
+  const shortcutsInvalidPins =
+    preloadedSources.shortcutsInvalidPins !== undefined
+      ? preloadedSources.shortcutsInvalidPins
+      : await getShortcutsInvalidPinsSignal().catch(() => null)
+
   return buildReliabilityOverview(operations, {
     billing,
     notionOperational,
@@ -622,7 +641,8 @@ export const getReliabilityOverview = async (
     cronStagingDrift,
     accountBalancesFxDrift,
     expenseDistribution,
-    homeRolloutDrift
+    homeRolloutDrift,
+    shortcutsInvalidPins
   })
 }
 
