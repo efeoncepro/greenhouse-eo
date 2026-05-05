@@ -197,18 +197,23 @@ const AvailableRow = ({
   </Button>
 )
 
+type LoadPhase = 'idle' | 'loading' | 'loaded' | 'error'
+
 const ShortcutsDropdown = () => {
   // States
   const [open, setOpen] = useState(false)
   const [mode, setMode] = useState<ViewMode>('view')
   const [data, setData] = useState<ShortcutsResponse | null>(null)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState(false)
+  const [phase, setPhase] = useState<LoadPhase>('idle')
   const [busyKey, setBusyKey] = useState<string | null>(null)
 
   // Refs
   const anchorRef = useRef<HTMLButtonElement>(null)
   const ref = useRef<HTMLDivElement | null>(null)
+  // AbortController de la fetch en vuelo. Vive en ref para NO abortar en cada
+  // re-render del effect (root cause del bucle infinito previo: cleanup
+  // destructivo + dependencia en `loading` re-disparaba la fetch).
+  const fetchRef = useRef<AbortController | null>(null)
 
   // Hooks
   const { status } = useSession()
@@ -216,12 +221,22 @@ const ShortcutsDropdown = () => {
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'))
   const { settings } = useSettings()
 
-  const refresh = useCallback(async (signal?: AbortSignal) => {
-    setLoading(true)
-    setError(false)
+  const refresh = useCallback(async () => {
+    // Cancelar cualquier fetch en vuelo (retry manual o pin/unpin concurrente).
+    fetchRef.current?.abort()
+
+    const controller = new AbortController()
+
+    fetchRef.current = controller
+    setPhase('loading')
 
     try {
-      const response = await fetch('/api/me/shortcuts', { signal, credentials: 'same-origin' })
+      const response = await fetch('/api/me/shortcuts', {
+        signal: controller.signal,
+        credentials: 'same-origin'
+      })
+
+      if (controller.signal.aborted) return
 
       if (!response.ok) {
         throw new Error(`Status ${response.status}`)
@@ -229,28 +244,37 @@ const ShortcutsDropdown = () => {
 
       const body = (await response.json()) as ShortcutsResponse
 
+      if (controller.signal.aborted) return
+
       setData(body)
+      setPhase('loaded')
     } catch (err) {
-      if ((err as Error)?.name !== 'AbortError') {
-        setError(true)
+      if ((err as Error)?.name === 'AbortError' || controller.signal.aborted) {
+        return
       }
+
+      setPhase('error')
     } finally {
-      setLoading(false)
+      if (fetchRef.current === controller) {
+        fetchRef.current = null
+      }
     }
   }, [])
 
-  // Lazy-load on first open. Avoids fetching for users who never expand.
+  // Lazy-load on first open. Gate por `phase === 'idle'` evita re-fetch en
+  // bucle: una vez que pasamos a loading/loaded/error, NO se re-trigea
+  // automáticamente. La recuperación manual del estado `error` la dispara
+  // el botón "Intentar de nuevo".
   useEffect(() => {
-    if (!open || data || loading || status !== 'authenticated') {
+    if (!open || status !== 'authenticated' || phase !== 'idle') {
       return
     }
 
-    const controller = new AbortController()
+    refresh()
+  }, [open, status, phase, refresh])
 
-    refresh(controller.signal)
-
-    return () => controller.abort()
-  }, [open, data, loading, status, refresh])
+  // Cleanup solo al unmount. NO abortar en cada cambio de dependencia.
+  useEffect(() => () => fetchRef.current?.abort(), [])
 
   useEffect(() => {
     const adjustPopoverHeight = () => {
@@ -314,7 +338,7 @@ const ShortcutsDropdown = () => {
         await refresh()
         setMode('view')
       } catch {
-        setError(true)
+        setPhase('error')
       } finally {
         setBusyKey(null)
       }
@@ -338,7 +362,7 @@ const ShortcutsDropdown = () => {
 
         await refresh()
       } catch {
-        setError(true)
+        setPhase('error')
       } finally {
         setBusyKey(null)
       }
@@ -347,7 +371,7 @@ const ShortcutsDropdown = () => {
   )
 
   const renderViewMode = () => {
-    if (loading && !data) {
+    if (phase === 'loading' && !data) {
       return (
         <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 1.5 }}>
           <CircularProgress size={24} />
@@ -358,7 +382,7 @@ const ShortcutsDropdown = () => {
       )
     }
 
-    if (error && !data) {
+    if (phase === 'error' && !data) {
       return (
         <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 1.5, px: 4, textAlign: 'center' }}>
           <Typography variant='body2' color='text.secondary'>
@@ -412,7 +436,7 @@ const ShortcutsDropdown = () => {
   }
 
   const renderAddMode = () => {
-    if (loading && !data) {
+    if (phase === 'loading' && !data) {
       return (
         <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 1.5 }}>
           <CircularProgress size={24} />
@@ -509,7 +533,7 @@ const ShortcutsDropdown = () => {
                             size='small'
                             className='text-textPrimary'
                             onClick={() => setMode('add')}
-                            disabled={!canAdd || loading}
+                            disabled={!canAdd || phase === 'loading'}
                             aria-label={COPY.addAria}
                           >
                             <i className='tabler-plus' />
