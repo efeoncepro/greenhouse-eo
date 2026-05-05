@@ -1,7 +1,7 @@
 # TASK-759 — Payslip Delivery On Payment Paid (split lifecycle)
 
-> **Status**: in-progress
-> **Lifecycle**: in-progress
+> **Status**: complete (closed 2026-05-05)
+> **Lifecycle**: complete (V1 ejecución path shipped — 4 delivery_kinds activos: period_exported, payment_paid, payment_cancelled, manual_resend. Mode 'both' en producción. Verificado hoy con Melkin payment paid + email template v4. Children 759b/c/d/f son V2 follow-ups separados)
 > **Owner**: Julio Reyes
 > **Created**: 2026-05-01
 > **Dependencies**: TASK-748 (Payment Obligations), TASK-750 (Payment Orders), TASK-751 (Payroll Settlement Wiring)

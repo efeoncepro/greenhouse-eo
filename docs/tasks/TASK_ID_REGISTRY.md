@@ -746,7 +746,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-668` | `to-do` | Nubox Ops Replay & Enterprise Promotion | `docs/tasks/to-do/TASK-668-nubox-ops-replay-enterprise-promotion.md` |
 | `TASK-669` | `to-do` | Teams Workflow Notifications Channel | `docs/tasks/to-do/TASK-669-teams-workflow-notifications-channel.md` |
 | `TASK-670` | `to-do` | Brand Icon Library React Adapter | `docs/tasks/to-do/TASK-670-brand-icon-library-react-adapter.md` |
-| `TASK-671` | `in-progress` | Greenhouse Teams Bot Platform (Bot Framework + Graph) — code complete, pending Azure tenant deploy | `docs/tasks/in-progress/TASK-671-greenhouse-teams-bot-platform.md` |
+| `TASK-671` | `complete` (closed 2026-05-05 — Azure deploy + cutover) | Greenhouse Teams Bot Platform (Bot Framework + Graph) | `docs/tasks/complete/TASK-671-greenhouse-teams-bot-platform.md` |
 | `TASK-672` | `to-do` | Platform Health API Contract | `docs/tasks/to-do/TASK-672-platform-health-api-contract.md` |
 | `TASK-673` | `complete` | Mercado Publico Licitaciones Intelligence (POC + Validacion de Matcher) | `docs/tasks/complete/TASK-673-mercadopublico-poc.md` |
 | `TASK-674` | `to-do` | Commercial Public Procurement Architecture Contract | `docs/tasks/to-do/TASK-674-commercial-public-procurement-architecture-contract.md` |
@@ -771,7 +771,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-693` | `to-do` | Notification Hub Bidireccional + UI Preferences + Mentions | `docs/tasks/to-do/TASK-693-notification-hub-bidirectional-ui.md` |
 | `TASK-694` | `complete` | Deep Link Platform Foundation | `docs/tasks/complete/TASK-694-deep-link-platform-foundation.md` |
 | `TASK-695` | `to-do` | Nexa Insights via Notification Hub (Teams + In-App + Email) | `docs/tasks/to-do/TASK-695-nexa-insights-teams-delivery.md` |
-| `TASK-696` | `in-progress` | Smart Home v2 (Enterprise-grade redesign — registry + contract + observability + 7 blocks) | `docs/tasks/in-progress/TASK-696-smart-home-v2-enterprise.md` |
+| `TASK-696` | `complete` (closed 2026-05-05 — Waves 1-7 shipped) | Smart Home v2 (Enterprise-grade redesign — registry + contract + observability + 7 blocks) | `docs/tasks/complete/TASK-696-smart-home-v2-enterprise.md` |
 | `TASK-697` | `complete` | Payment Instrument Admin Workspace Enterprise | `docs/tasks/complete/TASK-697-payment-instrument-admin-workspace-enterprise.md` |
 | `TASK-698` | `to-do` | Nexa Conversation Drawer (cierre del Hero AI Smart Home v2) | `docs/tasks/to-do/TASK-698-nexa-conversation-drawer.md` |
 | `TASK-699` | `complete` | Banco "Resultado cambiario" Canonical FX P&L Pipeline | `docs/tasks/complete/TASK-699-banco-fx-result-canonical-pipeline.md` |
@@ -840,7 +840,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-756` | `to-do` | Auto-generación de Payment Orders desde Payroll exportado (puente operativo faltante) | `docs/tasks/to-do/TASK-756-payroll-orders-auto-generation.md` |
 | `TASK-757` | `to-do` | Payment Processor Execution Sync + Global66 Webhook Adapter V1 | `docs/tasks/to-do/TASK-757-payment-processor-execution-sync-global66-webhook.md` |
 | `TASK-758` | `complete` | Payroll Receipt Render Contract Hardening (4 regímenes: chile_dependent, honorarios, international_deel, international_internal — helper canónico `resolveReceiptRegime` + `buildReceiptPresentation` puro server-safe con exhaustiveness `never`-check; cierra bug raíz `isChile=payRegime==='chile'` que afecta a 3/4 regímenes; RECEIPT_TEMPLATE_VERSION 3→4 lazy regen; ProjectedPayrollView converge al detector canónico; mockup vinculante 5-skills aprobado; F6 PeriodReport+Excel queda en TASK-782) | `docs/tasks/complete/TASK-758-payroll-honorarios-receipt-render-contract-hardening.md` |
-| `TASK-759` | `in-progress` | Payslip Delivery On Payment Paid (split lifecycle) | `docs/tasks/in-progress/TASK-759-payslip-delivery-on-payment-paid.md` |
+| `TASK-759` | `complete` (closed 2026-05-05 — V1 ejecución path shipped) | Payslip Delivery On Payment Paid (split lifecycle) | `docs/tasks/complete/TASK-759-payslip-delivery-on-payment-paid.md` |
 | `TASK-759b` | `to-do` | Payslip Payment Committed Promise (V2 sub-task) | `docs/tasks/to-do/TASK-759b-payslip-payment-committed-promise.md` |
 | `TASK-759c` | `to-do` | Payslip Cancellation & Revision Compensation (V2 sub-task) | `docs/tasks/to-do/TASK-759c-payslip-cancellation-revision-compensation.md` |
 | `TASK-759d` | `to-do` | Payslip UI Timeline + Capability finance.payslip.resend (V2 sub-task) | `docs/tasks/to-do/TASK-759d-payslip-ui-timeline-capability.md` |

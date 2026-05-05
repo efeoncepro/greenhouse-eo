@@ -6,12 +6,12 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete` (closed 2026-05-05 — Azure deploy completo: secret greenhouse-teams-bot-client-credentials provisionado en GCP, 3 canales delivery-pulse + finance-alerts + ops-alerts migrados a channel_kind='teams_bot' con provisioning_status='ready' en producción)
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio-Alto`
 - Type: `implementation`
-- Status real: `Code complete — pending Azure tenant deploy + manifest upload + cutover`
+- Status real: `Closed — Azure deploy + cutover completos en producción`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `TASK-669` (foundation transport-agnostic ya en develop)

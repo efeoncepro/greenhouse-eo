@@ -2,7 +2,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete` (closed 2026-05-05 — 11 loaders + 16 v2 components + 4 DB tables shipped: home_block_flags, home_pulse_snapshots, user_recent_items, home_rollout_flags. Flag HOME_V2_ENABLED + reliability signal home-rollout-drift activos. Waves 1-7 shipping)
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
