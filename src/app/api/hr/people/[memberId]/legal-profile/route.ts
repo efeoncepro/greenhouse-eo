@@ -9,7 +9,7 @@ import {
   getDefaultDocumentTypeForCountry,
   listAddressesForProfileMasked,
   listIdentityDocumentsForProfileMasked,
-  resolvePersonCountry,
+  resolveMemberCountry,
   resolveProfileIdForMember
 } from '@/lib/person-legal-profile'
 import { requireHrCoreReadTenantContext } from '@/lib/hr-core/shared'
@@ -41,23 +41,32 @@ export async function GET(_request: Request, { params }: RouteParams) {
       return errorResponse(404, 'Member or profile not found', 'profile_not_linked')
     }
 
-    const [documents, addresses, readinessFinalSettlement, readinessPayrollChile, memberCountry] =
-      await Promise.all([
-        listIdentityDocumentsForProfileMasked(profileId),
-        listAddressesForProfileMasked(profileId),
-        assessPersonLegalReadiness({ profileId, useCase: 'final_settlement_chile' }),
-        assessPersonLegalReadiness({ profileId, useCase: 'payroll_chile_dependent' }),
-        resolvePersonCountry(memberId, profileId)
-      ])
+    // Sequential queries — sequential reuses the same physical PG connection
+    // (each query() releases it back to the pool). Promise.all() would open
+    // N concurrent connections and exhausts the pool when /people/[slug]
+    // also fetches person-360, ico, hr-core in parallel from the same render.
+    const documents = await listIdentityDocumentsForProfileMasked(profileId)
+    const addresses = await listAddressesForProfileMasked(profileId)
 
-    const expectedDocumentType = getDefaultDocumentTypeForCountry(memberCountry)
+    const readinessFinalSettlement = await assessPersonLegalReadiness({
+      profileId,
+      useCase: 'final_settlement_chile'
+    })
+
+    const readinessPayrollChile = await assessPersonLegalReadiness({
+      profileId,
+      useCase: 'payroll_chile_dependent'
+    })
+
+    const expectedCountry = await resolveMemberCountry(memberId)
+    const expectedDocumentType = getDefaultDocumentTypeForCountry(expectedCountry)
 
     return NextResponse.json({
       memberId,
       profileId,
       documents,
       addresses,
-      expectedCountry: memberCountry,
+      expectedCountry,
       expectedDocumentType,
       readiness: {
         finalSettlementChile: readinessFinalSettlement,

@@ -10,7 +10,7 @@ import {
   isPersonDocumentType,
   listAddressesForProfileMasked,
   listIdentityDocumentsForProfileMasked,
-  resolvePersonCountry,
+  resolveMemberCountry,
   resolveProfileIdForMember,
   assessPersonLegalReadiness
 } from '@/lib/person-legal-profile'
@@ -48,28 +48,30 @@ export async function GET() {
       return errorResponse(409, 'Identity profile not linked to this user', 'profile_not_linked')
     }
 
-    const memberCountry = tenant.memberId
-      ? await resolvePersonCountry(tenant.memberId, profileId)
-      : null
+    // Sequential queries — each query() takes a connection from the pool
+    // and releases it. Sequential reuses the same physical connection;
+    // Promise.all() opens N concurrent connections and exhausts the pool
+    // when many requests overlap.
+    const documents = await listIdentityDocumentsForProfileMasked(profileId)
+    const addresses = await listAddressesForProfileMasked(profileId)
+    const expectedCountry = tenant.memberId ? await resolveMemberCountry(tenant.memberId) : null
+    const expectedDocumentType = getDefaultDocumentTypeForCountry(expectedCountry)
 
-    const expectedDocumentType = getDefaultDocumentTypeForCountry(memberCountry)
+    const readinessPayrollChile = await assessPersonLegalReadiness({
+      profileId,
+      useCase: 'payroll_chile_dependent'
+    })
 
-    const [documents, addresses] = await Promise.all([
-      listIdentityDocumentsForProfileMasked(profileId),
-      listAddressesForProfileMasked(profileId)
-    ])
-
-    // Readiness para 2 use cases mas relevantes para self-service
-    const [readinessPayrollChile, readinessFinalSettlement] = await Promise.all([
-      assessPersonLegalReadiness({ profileId, useCase: 'payroll_chile_dependent' }),
-      assessPersonLegalReadiness({ profileId, useCase: 'final_settlement_chile' })
-    ])
+    const readinessFinalSettlement = await assessPersonLegalReadiness({
+      profileId,
+      useCase: 'final_settlement_chile'
+    })
 
     return NextResponse.json({
       profileId,
       documents,
       addresses,
-      expectedCountry: memberCountry,
+      expectedCountry,
       expectedDocumentType,
       readiness: {
         payrollChileDependent: readinessPayrollChile,

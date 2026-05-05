@@ -67,8 +67,7 @@ export {
 export { resolveProfileIdForMember } from './profile-resolver'
 export {
   getDefaultDocumentTypeForCountry,
-  resolveMemberCountry,
-  resolvePersonCountry
+  resolveMemberCountry
 } from './country-defaults'
 export type {
   ReadinessUseCase,
