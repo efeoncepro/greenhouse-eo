@@ -27,3 +27,5 @@ export {
   resolveRoleTitleDriftProposal
 } from './drift-store'
 export type { DriftProposalDto, DriftDecision } from './drift-store'
+export { getRoleTitleGovernanceForMember } from './governance-reader'
+export type { RoleTitleGovernanceDto } from './governance-reader'
