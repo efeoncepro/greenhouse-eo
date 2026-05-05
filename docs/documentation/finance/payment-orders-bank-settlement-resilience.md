@@ -31,6 +31,16 @@ Cuando marcas una orden como pagada, el sistema corre todos estos pasos como una
 
 > Detalle tecnico: `markPaymentOrderPaidAtomic` en [src/lib/finance/payment-orders/mark-paid-atomic.ts](../../../src/lib/finance/payment-orders/mark-paid-atomic.ts).
 
+## Instrumentos de salida y processors
+
+El selector de "instrumento origen" no lista bancos por filtro visual: consulta al backend las opciones validas para esa orden. Esto importa cuando el metodo visible es un processor.
+
+- **Deel**: se paga con Santander Corp CLP y Deel queda como intermediario/counterparty del settlement. Deel no se rebaja como cuenta bancaria.
+- **Global66**: puede aparecer como instrumento si existe como fintech/cuenta activa con saldo propio.
+- **Santander USD u otra cuenta directa**: solo aparece si la orden y la policy permiten pago directo en esa moneda.
+
+Si falta una policy para un processor, el sistema falla cerrado: no inventa una cuenta por similitud de moneda ni deja marcar pagada la orden hasta registrar la policy correcta.
+
 ## Las 3 protecciones nuevas
 
 | Proteccion | Que hace | Donde la ves |

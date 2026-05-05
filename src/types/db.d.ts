@@ -4685,6 +4685,28 @@ export interface GreenhouseFinancePaymentOrderLines {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseFinancePaymentOrderProcessorFundingPolicies {
+  created_at: Generated<Timestamp>;
+  /**
+   * Optional processor/intermediary instrument used as counterparty evidence, never as source_account_id.
+   */
+  intermediary_account_id: string | null;
+  is_active: Generated<boolean>;
+  metadata_json: Generated<Json>;
+  notes: string | null;
+  order_currency: string | null;
+  payment_method: string | null;
+  policy_id: string;
+  priority: Generated<number>;
+  processor_slug: string | null;
+  settlement_mode: Generated<string>;
+  /**
+   * Real account, fintech, card or instrument that funds/debits the order.
+   */
+  source_account_id: string;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseFinancePaymentOrders {
   approved_at: Timestamp | null;
   approved_by: string | null;
@@ -8558,6 +8580,7 @@ export interface DB {
   "greenhouse_finance.payment_obligations": GreenhouseFinancePaymentObligations;
   "greenhouse_finance.payment_order_artifacts": GreenhouseFinancePaymentOrderArtifacts;
   "greenhouse_finance.payment_order_lines": GreenhouseFinancePaymentOrderLines;
+  "greenhouse_finance.payment_order_processor_funding_policies": GreenhouseFinancePaymentOrderProcessorFundingPolicies;
   "greenhouse_finance.payment_order_state_transitions": GreenhouseFinancePaymentOrderStateTransitions;
   "greenhouse_finance.payment_orders": GreenhouseFinancePaymentOrders;
   "greenhouse_finance.payment_provider_catalog": GreenhouseFinancePaymentProviderCatalog;

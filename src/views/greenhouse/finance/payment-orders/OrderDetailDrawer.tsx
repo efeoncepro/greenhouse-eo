@@ -85,14 +85,18 @@ const resolveBlockedBody = (reason: string, detail: string) => {
   return detail ? `Settlement bloqueado: ${detail}` : 'Settlement bloqueado.'
 }
 
-interface BankAccountOption {
+interface SourceInstrumentOption {
   accountId: string
   accountName: string
   bankName: string
   currency: string
-  isActive: boolean
-  instrumentCategory?: string | null
-  providerSlug?: string | null
+  instrumentCategory: string
+  providerSlug: string | null
+  recommended: boolean
+  reason: string
+  settlementMode: 'direct' | 'via_intermediary'
+  intermediaryAccountId: string | null
+  intermediaryName: string | null
 }
 
 interface OrderDetailDrawerProps {
@@ -141,20 +145,12 @@ const formatDate = (d: string | null) => {
   return new Date(d).toLocaleDateString('es-CL', { day: '2-digit', month: 'short', year: 'numeric' })
 }
 
-const canUseAsSourceInstrument = (account: BankAccountOption, order: PaymentOrderWithLines | null) => {
-  if (!account.isActive) return false
-  if (account.instrumentCategory === 'payroll_processor') return false
-  if (account.providerSlug === 'deel') return false
-
-  return !order || account.currency === order.currency || account.instrumentCategory === 'credit_card' || account.providerSlug === 'global66'
-}
-
 const OrderDetailDrawer = ({ order, loading, onClose, onActionComplete }: OrderDetailDrawerProps) => {
   const microcopy = getMicrocopy()
   const [actionInFlight, setActionInFlight] = useState(false)
   const [pickerOpen, setPickerOpen] = useState(false)
-  const [accounts, setAccounts] = useState<BankAccountOption[]>([])
-  const [accountsLoading, setAccountsLoading] = useState(false)
+  const [sourceOptions, setSourceOptions] = useState<SourceInstrumentOption[]>([])
+  const [sourceOptionsLoading, setSourceOptionsLoading] = useState(false)
   const [selectedAccountId, setSelectedAccountId] = useState('')
 
   // TASK-765 Slice 1: reglas de gating para hard-gate UX.
@@ -183,39 +179,41 @@ const OrderDetailDrawer = ({ order, loading, onClose, onActionComplete }: OrderD
     return null
   }, [order])
 
-  // Fetch accounts solo cuando se abre el picker — evita carga innecesaria.
+  // Fetch source options from the server policy. The UI never decides treasury
+  // eligibility by itself; it only renders what the backend allows.
   useEffect(() => {
-    if (!pickerOpen) return
+    if (!pickerOpen || !order?.orderId) return
     let cancelled = false
 
-    setAccountsLoading(true)
-    fetch('/api/finance/accounts?isActive=true')
+    setSourceOptionsLoading(true)
+    fetch(`/api/admin/finance/payment-orders/${order.orderId}/source-options`)
       .then(r => r.json())
       .then(data => {
         if (cancelled) return
-        const items: BankAccountOption[] = Array.isArray(data?.items) ? data.items : []
+        const options: SourceInstrumentOption[] = Array.isArray(data?.options) ? data.options : []
 
-        // Filtrar por elegibilidad operacional; la API vuelve a validar.
-        const filtered = items.filter(
-          a => canUseAsSourceInstrument(a, order)
-        )
-
-        setAccounts(filtered)
+        setSourceOptions(options)
 
         // Pre-seleccionar la cuenta actual si existe.
         if (order?.sourceAccountId) {
           setSelectedAccountId(order.sourceAccountId)
-        } else if (filtered.length === 1) {
-          setSelectedAccountId(filtered[0].accountId)
         } else {
-          setSelectedAccountId('')
+          const recommended = options.find(option => option.recommended)
+
+          if (recommended) {
+            setSelectedAccountId(recommended.accountId)
+          } else if (options.length === 1) {
+            setSelectedAccountId(options[0].accountId)
+          } else {
+            setSelectedAccountId('')
+          }
         }
       })
       .catch(() => {
-        if (!cancelled) toast.error('No fue posible cargar las cuentas. Intenta de nuevo.')
+        if (!cancelled) toast.error('No fue posible cargar los instrumentos elegibles. Intenta de nuevo.')
       })
       .finally(() => {
-        if (!cancelled) setAccountsLoading(false)
+        if (!cancelled) setSourceOptionsLoading(false)
       })
 
     return () => {
@@ -237,12 +235,16 @@ const OrderDetailDrawer = ({ order, loading, onClose, onActionComplete }: OrderD
   const sourceAccountInfo = useMemo(() => {
     if (!order?.sourceAccountId) return null
 
-    const match = accounts.find(a => a.accountId === order.sourceAccountId)
+    const match = sourceOptions.find(a => a.accountId === order.sourceAccountId)
 
-    if (match) return `${match.accountName} · ${match.bankName} (${match.currency})`
+    if (match) {
+      const counterparty = match.intermediaryName ? ` → ${match.intermediaryName}` : ''
+
+      return `${match.accountName} · ${match.bankName} (${match.currency})${counterparty}`
+    }
 
     return order.sourceAccountId
-  }, [order, accounts])
+  }, [order, sourceOptions])
 
   const handleAssignSourceAccount = async () => {
     if (!order || !selectedAccountId) return
@@ -699,12 +701,12 @@ const OrderDetailDrawer = ({ order, loading, onClose, onActionComplete }: OrderD
               value={selectedAccountId}
               onChange={e => setSelectedAccountId(e.target.value)}
               fullWidth
-              disabled={accountsLoading}
+              disabled={sourceOptionsLoading}
               helperText={
-                accountsLoading
+                sourceOptionsLoading
                   ? 'Cargando instrumentos...'
-                  : accounts.length === 0
-                    ? `No hay instrumentos activos compatibles con ${order?.currency ?? 'la moneda solicitada'}.`
+                  : sourceOptions.length === 0
+                    ? 'No hay instrumentos elegibles para este processor y moneda. Revisa la policy de funding.'
                     : null
               }
               SelectProps={{ displayEmpty: true }}
@@ -712,12 +714,28 @@ const OrderDetailDrawer = ({ order, loading, onClose, onActionComplete }: OrderD
               <MenuItem value='' disabled>
                 Selecciona un instrumento
               </MenuItem>
-              {accounts.map(account => (
-                <MenuItem key={account.accountId} value={account.accountId}>
-                  {account.accountName} · {account.bankName} ({account.currency})
+              {sourceOptions.map(option => (
+                <MenuItem key={option.accountId} value={option.accountId}>
+                  {option.accountName} · {option.bankName} ({option.currency})
+                  {option.intermediaryName ? ` → ${option.intermediaryName}` : ''}
+                  {option.recommended ? ' · recomendado' : ''}
                 </MenuItem>
               ))}
             </CustomTextField>
+            {sourceOptions.map(option => (
+              option.accountId === selectedAccountId ? (
+                <Alert key={option.accountId} severity='info' icon={<i className='tabler-route' aria-hidden='true' />}>
+                  <AlertTitle>
+                    {option.settlementMode === 'via_intermediary'
+                      ? 'Pago vía processor'
+                      : 'Pago directo'}
+                  </AlertTitle>
+                  <Typography variant='body2'>
+                    {option.reason}
+                  </Typography>
+                </Alert>
+              ) : null
+            ))}
           </Stack>
         </DialogContent>
         <DialogActions>
@@ -727,9 +745,9 @@ const OrderDetailDrawer = ({ order, loading, onClose, onActionComplete }: OrderD
           <Button
             variant='contained'
             onClick={handleAssignSourceAccount}
-            disabled={actionInFlight || !selectedAccountId || accountsLoading}
+            disabled={actionInFlight || !selectedAccountId || sourceOptionsLoading}
           >
-            {actionInFlight ? 'Asignando…' : 'Asignar cuenta'}
+            {actionInFlight ? 'Asignando…' : 'Asignar instrumento'}
           </Button>
         </DialogActions>
       </Dialog>

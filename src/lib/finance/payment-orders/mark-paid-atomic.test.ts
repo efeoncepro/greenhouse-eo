@@ -157,6 +157,10 @@ const activeSourceAccountResponse = (accountId: unknown = 'santander-clp') => ({
 
 const accountAwareSequenceQuery = (allResponses: Array<{ rows: Array<Record<string, unknown>>; rowCount?: number }>) =>
   vi.fn(async (sql: string, params: unknown[] = []) => {
+    if (sql.includes('payment_order_processor_funding_policies')) {
+      return { rows: [], rowCount: 0 }
+    }
+
     if (sql.includes('FROM greenhouse_finance.accounts')) {
       return activeSourceAccountResponse(params[0])
     }

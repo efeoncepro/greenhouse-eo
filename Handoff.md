@@ -1,5 +1,16 @@
 # Handoff.md
 
+## Sesion 2026-05-05 — TASK-799 hardening end-to-end (processor funding policies)
+
+- **Branch:** `develop`.
+- **Trigger:** staging seguia mostrando solo Santander USD para ordenes Deel/Melkin; ademas una creacion mixta mostraba seleccion vacia y error `obligationIds debe contener...`. El usuario pidio causa raiz, sin parches, y no romper flujos existentes.
+- **Decision:** mover la compatibilidad processor/source a registry runtime `greenhouse_finance.payment_order_processor_funding_policies` + endpoint server-driven de opciones. La UI ya no infiere elegibilidad de cuentas localmente.
+- **Runtime/DB:** migration `20260505172907393_payment-order-processor-funding-policy.sql` crea policies para Deel USD/CLP: source real `santander-corp-clp`, intermediario `deel-clp`, settlement `via_intermediary`.
+- **Settlement:** `intermediaryMode='counterparty_only'` registra Deel como counterparty/intermediario sin crear funding leg extra; evita doble rebaja y mantiene la rebaja real en Santander Corp.
+- **UI/API:** `GET /api/admin/finance/payment-orders/[orderId]/source-options` entrega opciones elegibles. `OrderDetailDrawer` consume ese endpoint y muestra “Santander Corp -> Deel” como flujo operativo, no Santander USD por moneda.
+- **Validacion:** Vitest focalizado payment-orders + row mapper/status readers pass; ESLint focalizado clean; `pnpm exec tsc --noEmit --pretty false` clean; `pnpm build` OK; migration aplicada/verificada con `pnpm pg:connect:migrate`.
+- **Cuidado multi-agente:** no tocar ni agregar el untracked ajeno `tests/e2e/smoke/my-payment-profile-discoverability.spec.ts`.
+
 ## Sesion 2026-05-05 — TASK-799 completa (Payment Order Processor Source + Settlement Policy)
 
 - **Branch:** `develop`.

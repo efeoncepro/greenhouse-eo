@@ -35,6 +35,8 @@ type PaymentSettlementContextRow = {
 export interface SettlementConfigurationInput {
   settlementMode?: SettlementMode | null
   fundingInstrumentId?: string | null
+  intermediaryInstrumentId?: string | null
+  intermediaryMode?: 'counterparty_only' | 'funding_balance' | null
   feeAmount?: number | null
   feeCurrency?: string | null
   feeReference?: string | null
@@ -290,6 +292,11 @@ const buildSettlementLegPlan = async (
 
   const fundingInstrumentId = str(input.settlementConfig?.fundingInstrumentId)
   const mainInstrumentId = str(input.paymentAccountId)
+  const intermediaryInstrumentId = str(input.settlementConfig?.intermediaryInstrumentId)
+
+  const intermediaryMode = normalizeString(input.settlementConfig?.intermediaryMode) === 'funding_balance'
+    ? 'funding_balance'
+    : 'counterparty_only'
 
   // TASK-708 Slice 4 — invariante de defensa estructural: cualquier payment
   // canónico (income_payment / expense_payment) que llega aca DEBE traer su
@@ -307,7 +314,7 @@ const buildSettlementLegPlan = async (
   }
 
   const instrumentCurrencyMap = await loadInstrumentCurrencies(
-    [fundingInstrumentId, mainInstrumentId].filter((value): value is string => Boolean(value)),
+    [fundingInstrumentId, mainInstrumentId, intermediaryInstrumentId].filter((value): value is string => Boolean(value)),
     input.client
   )
 
@@ -319,6 +326,7 @@ const buildSettlementLegPlan = async (
     && fundingInstrumentId
     && mainInstrumentId
     && fundingInstrumentId !== mainInstrumentId
+    && intermediaryMode === 'funding_balance'
   ) {
     const fundingCurrency = instrumentCurrencyMap.get(fundingInstrumentId) || 'CLP'
 
@@ -362,7 +370,9 @@ const buildSettlementLegPlan = async (
     legType: baseLegType,
     direction: paymentDirection,
     instrumentId: mainInstrumentId,
-    counterpartyInstrumentId: settlementMode === 'via_intermediary' ? fundingInstrumentId : null,
+    counterpartyInstrumentId: settlementMode === 'via_intermediary'
+      ? intermediaryInstrumentId ?? fundingInstrumentId
+      : null,
     currency,
     amount,
     amountClp,
@@ -401,7 +411,7 @@ const buildSettlementLegPlan = async (
     })
   }
 
-  const resolvedMode: SettlementMode = legs.length > 1 ? 'mixed' : 'direct'
+  const resolvedMode: SettlementMode = settlementMode === 'via_intermediary' || legs.length > 1 ? 'mixed' : 'direct'
 
   return {
     settlementMode: resolvedMode,

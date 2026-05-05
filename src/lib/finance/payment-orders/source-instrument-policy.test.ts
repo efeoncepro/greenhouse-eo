@@ -3,7 +3,10 @@ import { describe, expect, it, vi } from 'vitest'
 vi.mock('server-only', () => ({}))
 
 import type { PaymentOrderValidationError } from './errors'
-import { resolvePaymentOrderSourcePolicy } from './source-instrument-policy'
+import {
+  listPaymentOrderSourceInstrumentOptions,
+  resolvePaymentOrderSourcePolicy
+} from './source-instrument-policy'
 
 type SourcePolicyClient = Parameters<typeof resolvePaymentOrderSourcePolicy>[0]
 
@@ -53,6 +56,45 @@ const rows: AccountRow[] = [
 
 const makeClient = (): SourcePolicyClient => ({
   query: async <T extends Record<string, unknown>>(sql: string, values: unknown[] = []) => {
+    if (sql.includes('payment_order_processor_funding_policies')) {
+      const rail = values[0]
+      const currency = values[1]
+      const sourceAccountId = values[2]
+      const matchesDeel = rail === 'deel' && (currency === 'USD' || currency === 'CLP')
+      const source = rows.find(row => row.account_id === 'santander-corp-clp')
+      const intermediary = rows.find(row => row.account_id === 'deel-clp')
+
+      if (!matchesDeel || !source || !intermediary) return { rows: [] as T[] }
+      if (sourceAccountId && sourceAccountId !== source.account_id) return { rows: [] as T[] }
+
+      return {
+        rows: ([{
+          policy_id: `popfp-deel-${String(currency).toLowerCase()}-santander-corp`,
+          processor_slug: 'deel',
+          payment_method: 'deel',
+          order_currency: currency,
+          source_account_id: source.account_id,
+          intermediary_account_id: intermediary.account_id,
+          settlement_mode: 'via_intermediary',
+          priority: 10,
+          notes: 'Deel funded by Santander Corp',
+          source_account_name: 'Santander Corp.',
+          source_bank_name: 'Santander Corp.',
+          source_currency: source.currency,
+          source_instrument_category: source.instrument_category,
+          source_provider_slug: source.provider_slug,
+          source_is_active: source.is_active,
+          source_default_for: source.default_for,
+          intermediary_account_name: 'Deel',
+          intermediary_bank_name: 'Deel',
+          intermediary_currency: intermediary.currency,
+          intermediary_instrument_category: intermediary.instrument_category,
+          intermediary_provider_slug: intermediary.provider_slug,
+          intermediary_is_active: intermediary.is_active
+        }] as unknown) as T[]
+      }
+    }
+
     if (sql.includes('account_id = $1')) {
       return { rows: rows.filter(row => row.account_id === values[0]) as T[] }
     }
@@ -74,7 +116,7 @@ const makeClient = (): SourcePolicyClient => ({
 })
 
 describe('resolvePaymentOrderSourcePolicy', () => {
-  it('defaults Deel orders to Santander corporate card, not Deel', async () => {
+  it('defaults Deel orders to configured Santander corporate funding policy, not Deel', async () => {
     const result = await resolvePaymentOrderSourcePolicy(makeClient(), {
       processorSlug: 'deel',
       paymentMethod: 'deel',
@@ -82,7 +124,27 @@ describe('resolvePaymentOrderSourcePolicy', () => {
     })
 
     expect(result.sourceAccountId).toBe('santander-corp-clp')
-    expect(result.snapshot.reason).toBe('default_deel_corporate_card')
+    expect(result.snapshot.reason).toBe('default_processor_policy:popfp-deel-usd-santander-corp')
+    expect(result.snapshot.intermediaryAccountId).toBe('deel-clp')
+    expect(result.settlementConfig).toMatchObject({
+      settlementMode: 'via_intermediary',
+      fundingInstrumentId: 'santander-corp-clp',
+      intermediaryInstrumentId: 'deel-clp',
+      intermediaryMode: 'counterparty_only'
+    })
+  })
+
+  it('keeps Deel settlement policy when source account is explicitly assigned', async () => {
+    const result = await resolvePaymentOrderSourcePolicy(makeClient(), {
+      processorSlug: null,
+      paymentMethod: 'deel',
+      currency: 'USD',
+      sourceAccountId: 'santander-corp-clp'
+    })
+
+    expect(result.sourceAccountId).toBe('santander-corp-clp')
+    expect(result.snapshot.reason).toBe('explicit_source_account_with_processor_policy')
+    expect(result.settlementConfig?.intermediaryInstrumentId).toBe('deel-clp')
   })
 
   it('rejects Deel as source instrument for Deel rail', async () => {
@@ -120,6 +182,22 @@ describe('resolvePaymentOrderSourcePolicy', () => {
 
     expect(result.sourceAccountId).toBe('global66-clp')
     expect(result.snapshot.reason).toBe('default_global66_active_account')
+  })
+
+  it('lists Deel source options from processor funding policy only', async () => {
+    const options = await listPaymentOrderSourceInstrumentOptions(makeClient(), {
+      processorSlug: 'deel',
+      paymentMethod: 'deel',
+      currency: 'USD'
+    })
+
+    expect(options).toHaveLength(1)
+    expect(options[0]).toMatchObject({
+      accountId: 'santander-corp-clp',
+      recommended: true,
+      settlementMode: 'via_intermediary',
+      intermediaryAccountId: 'deel-clp'
+    })
   })
 
   it('rejects payroll processors as source instruments', async () => {

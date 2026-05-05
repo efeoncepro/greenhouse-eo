@@ -13,6 +13,8 @@ Esta distinción evita que processors sin saldo propio se presenten como bancos.
 Runtime:
 
 - Helper: `src/lib/finance/payment-orders/source-instrument-policy.ts`.
+- Policy table: `greenhouse_finance.payment_order_processor_funding_policies` define, por processor/metodo/moneda, el instrumento financiero real, el intermediario operativo opcional y el modo de settlement.
+- UI source picker: `GET /api/admin/finance/payment-orders/[orderId]/source-options` es la fuente server-side para opciones elegibles; la UI no filtra cuentas por su cuenta.
 - Create: `createPaymentOrderFromObligations` resuelve source default y persiste `metadata_json.treasury_source_policy`.
 - PATCH: `/api/admin/finance/payment-orders/[orderId]` valida cuenta activa + compatibilidad processor/source.
 - Paid: `markPaymentOrderPaidAtomic` valida la misma policy y conserva atomicidad con `recordExpensePayment`.
@@ -21,8 +23,10 @@ Reglas:
 
 - `provider_slug='deel'` no puede ser `source_account_id` para orders Deel.
 - `instrument_category='payroll_processor'` no puede ser `source_account_id`.
+- Para Deel USD/CLP, la policy vigente usa `source_account_id='santander-corp-clp'` e `intermediary_account_id='deel-clp'`; Deel queda como counterparty/intermediario auditable, no como cuenta rebajada.
 - `provider_slug='global66'` puede ser source cuando la cuenta fintech está activa.
 - Cualquier funding/FX/fee adicional debe vivir en `settlement_groups` / `settlement_legs`, no en una columna paralela inventada.
+- Si un processor no mantiene saldo propio, `settlementConfig.intermediaryMode='counterparty_only'`: el settlement rebaja solo el source real y registra el processor como `counterparty_instrument_id`, evitando doble rebaja.
 
 ## Delta 2026-05-01 — TASK-751: Payroll Settlement Orchestration + Reconciliation Wireup (V1)
 

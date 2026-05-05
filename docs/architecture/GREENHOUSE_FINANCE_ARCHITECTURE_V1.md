@@ -149,9 +149,12 @@ Reglas canónicas:
 
 Runtime:
 
-- `src/lib/finance/payment-orders/source-instrument-policy.ts` es el helper V1 de policy code-versioned.
+- `greenhouse_finance.payment_order_processor_funding_policies` es el registry runtime de funding por processor/metodo/moneda. Evita hardcodes en UI y permite agregar rails nuevos con seed/migracion auditada.
+- `src/lib/finance/payment-orders/source-instrument-policy.ts` es el helper V1 que lee ese registry y conserva fallback seguro cuando el schema todavia no existe.
+- `GET /api/admin/finance/payment-orders/[orderId]/source-options` entrega al selector las opciones elegibles desde backend; Finance UI no decide la compatibilidad de cuentas localmente.
 - `createPaymentOrderFromObligations` guarda snapshot `metadata_json.treasury_source_policy`.
 - PATCH de `source_account_id` y `markPaymentOrderPaidAtomic` validan la policy antes de registrar downstream.
+- Para Deel, el settlement usa `santander-corp-clp` como source real y `deel-clp` como intermediario/counterparty con `intermediaryMode='counterparty_only'`; no se crea un funding leg adicional que doble-rebaje saldos.
 
 ## Delta 2026-05-05 — Contractor payables bridge
 
