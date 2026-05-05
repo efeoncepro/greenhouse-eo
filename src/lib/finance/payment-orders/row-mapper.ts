@@ -23,26 +23,26 @@ export interface OrderRow extends Record<string, unknown> {
   total_amount: number | string
   currency: string
   fx_rate_snapshot: number | string | null
-  fx_locked_at: string | null
-  scheduled_for: string | null
-  due_date: string | null
-  submitted_at: string | null
-  paid_at: string | null
+  fx_locked_at: string | Date | null
+  scheduled_for: string | Date | null
+  due_date: string | Date | null
+  submitted_at: string | Date | null
+  paid_at: string | Date | null
   state: string
   require_approval: boolean
   created_by: string
   approved_by: string | null
-  approved_at: string | null
+  approved_at: string | Date | null
   cancelled_by: string | null
   cancelled_reason: string | null
-  cancelled_at: string | null
+  cancelled_at: string | Date | null
   superseded_by: string | null
   external_reference: string | null
   external_status: string | null
   failure_reason: string | null
   metadata_json: Record<string, unknown> | null
-  created_at: string
-  updated_at: string
+  created_at: string | Date
+  updated_at: string | Date
 }
 
 export interface OrderLineRow extends Record<string, unknown> {
@@ -105,6 +105,12 @@ const toIsoString = (value: unknown): string => {
   return new Date().toISOString()
 }
 
+const toNullableIsoString = (value: unknown): string | null => {
+  if (value === null || value === undefined) return null
+
+  return toIsoString(value)
+}
+
 export const mapOrderRow = (row: OrderRow): PaymentOrder => ({
   orderId: row.order_id,
   spaceId: row.space_id,
@@ -118,19 +124,19 @@ export const mapOrderRow = (row: OrderRow): PaymentOrder => ({
   totalAmount: toNumber(row.total_amount),
   currency: row.currency as PaymentOrderCurrency,
   fxRateSnapshot: toNullableNumber(row.fx_rate_snapshot),
-  fxLockedAt: row.fx_locked_at,
-  scheduledFor: row.scheduled_for,
-  dueDate: row.due_date,
-  submittedAt: row.submitted_at,
-  paidAt: row.paid_at,
+  fxLockedAt: toNullableIsoString(row.fx_locked_at),
+  scheduledFor: toNullableIsoString(row.scheduled_for),
+  dueDate: toNullableIsoString(row.due_date),
+  submittedAt: toNullableIsoString(row.submitted_at),
+  paidAt: toNullableIsoString(row.paid_at),
   state: row.state as PaymentOrderState,
   requireApproval: row.require_approval,
   createdBy: row.created_by,
   approvedBy: row.approved_by,
-  approvedAt: row.approved_at,
+  approvedAt: toNullableIsoString(row.approved_at),
   cancelledBy: row.cancelled_by,
   cancelledReason: row.cancelled_reason,
-  cancelledAt: row.cancelled_at,
+  cancelledAt: toNullableIsoString(row.cancelled_at),
   supersededBy: row.superseded_by,
   externalReference: row.external_reference,
   externalStatus: row.external_status,

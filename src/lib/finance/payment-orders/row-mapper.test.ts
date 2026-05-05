@@ -52,6 +52,51 @@ describe('payment-orders row-mapper', () => {
       expect(result.totalAmount).toBe(12345.67)
       expect(result.metadataJson).toEqual({})
     })
+
+    it('normalizes postgres Date timestamps to ISO strings', () => {
+      const paidAt = new Date('2026-05-05T15:39:44.321Z')
+
+      const row: OrderRow = {
+        order_id: 'por-1',
+        space_id: null,
+        batch_kind: 'payroll',
+        period_id: null,
+        title: 'Test',
+        description: null,
+        processor_slug: null,
+        payment_method: null,
+        source_account_id: 'santander-clp',
+        total_amount: 12345.67,
+        currency: 'CLP',
+        fx_rate_snapshot: null,
+        fx_locked_at: null,
+        scheduled_for: null,
+        due_date: null,
+        submitted_at: null,
+        paid_at: paidAt,
+        state: 'paid',
+        require_approval: true,
+        created_by: 'user-1',
+        approved_by: null,
+        approved_at: null,
+        cancelled_by: null,
+        cancelled_reason: null,
+        cancelled_at: null,
+        superseded_by: null,
+        external_reference: null,
+        external_status: null,
+        failure_reason: null,
+        metadata_json: null,
+        created_at: paidAt,
+        updated_at: paidAt
+      }
+
+      const result = mapOrderRow(row)
+
+      expect(result.paidAt).toBe('2026-05-05T15:39:44.321Z')
+      expect(result.createdAt).toBe('2026-05-05T15:39:44.321Z')
+      expect(result.updatedAt).toBe('2026-05-05T15:39:44.321Z')
+    })
   })
 
   describe('mapOrderLineRow', () => {
