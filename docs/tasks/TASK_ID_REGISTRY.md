@@ -873,3 +873,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-784` | `to-do` | Person Legal Profile + Identity Documents Foundation | `docs/tasks/to-do/TASK-784-person-legal-profile-identity-documents-foundation.md` |
 | `TASK-785` | `to-do` | Workforce Role Title Source of Truth + Assignment Override Governance | `docs/tasks/to-do/TASK-785-workforce-role-title-source-of-truth-governance.md` |
 | `TASK-786` | `to-do` | Person Contact & Professional Presence Governance | `docs/tasks/to-do/TASK-786-person-contact-professional-presence-governance.md` |
+| `TASK-787` | `to-do` | Person Country Reconciliation (Entra ↔ Declared) | `docs/tasks/to-do/TASK-787-person-country-reconciliation-entra-declared.md` |
