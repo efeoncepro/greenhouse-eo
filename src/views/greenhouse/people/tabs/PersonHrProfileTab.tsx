@@ -32,6 +32,7 @@ import type { HrMemberProfile } from '@/types/hr-core'
 import type { PersonOperationalMetrics } from '@/types/people'
 import { contractTypeLabel, employmentTypeLabel, formatDate, healthSystemLabel, jobLevelLabel, payrollViaLabel } from '@views/greenhouse/hr-core/helpers'
 import { buildPersonHrProfileViewModel } from './person-hr-profile-view-model'
+import PersonLegalProfileSection from './PersonLegalProfileSection'
 
 type Props = {
   memberId: string
@@ -618,6 +619,10 @@ const PersonHrProfileTab = ({ memberId, hrContext = null, defaultOperationalMetr
             )}
           </CardContent>
         </Card>
+      </Grid>
+
+      <Grid size={{ xs: 12 }}>
+        <PersonLegalProfileSection memberId={memberId} />
       </Grid>
 
       {(viewModel.supplemental.hasSkillsTools || !supplementalLoaded) && (
