@@ -46,6 +46,10 @@ export interface LegalProfileResponseDto {
   profileId: string
   documents: DocumentDto[]
   addresses: AddressDto[]
+  /** ISO 3166-1 alpha-2 from members.location_country, or null if unknown. */
+  expectedCountry: string | null
+  /** Canonical document type for that country (CL_RUT, AR_DNI, etc.), or null. */
+  expectedDocumentType: string | null
   readiness: {
     payrollChileDependent: ReadinessResultDto
     finalSettlementChile: ReadinessResultDto

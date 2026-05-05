@@ -145,6 +145,8 @@ export const HR_LEGAL_COPY = {
   },
   anomaly: (n: number) =>
     `Has revelado ${n} datos sensibles en las ultimas 24h. Considera si todos los reveals fueron necesarios. Cada uno queda en audit log.`,
+  /** Generico cuando no se conoce el pais del colaborador */
+  genericDocumentTitle: 'Documento de identidad',
   documentTypeLabels: {
     CL_RUT: 'RUT (Chile)',
     CL_PASSPORT: 'Pasaporte (Chile)',

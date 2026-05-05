@@ -6,8 +6,10 @@ import { redactErrorForResponse } from '@/lib/observability/redact'
 import {
   PersonLegalProfileError,
   assessPersonLegalReadiness,
+  getDefaultDocumentTypeForCountry,
   listAddressesForProfileMasked,
   listIdentityDocumentsForProfileMasked,
+  resolveMemberCountry,
   resolveProfileIdForMember
 } from '@/lib/person-legal-profile'
 import { requireHrCoreReadTenantContext } from '@/lib/hr-core/shared'
@@ -39,18 +41,24 @@ export async function GET(_request: Request, { params }: RouteParams) {
       return errorResponse(404, 'Member or profile not found', 'profile_not_linked')
     }
 
-    const [documents, addresses, readinessFinalSettlement, readinessPayrollChile] = await Promise.all([
-      listIdentityDocumentsForProfileMasked(profileId),
-      listAddressesForProfileMasked(profileId),
-      assessPersonLegalReadiness({ profileId, useCase: 'final_settlement_chile' }),
-      assessPersonLegalReadiness({ profileId, useCase: 'payroll_chile_dependent' })
-    ])
+    const [documents, addresses, readinessFinalSettlement, readinessPayrollChile, memberCountry] =
+      await Promise.all([
+        listIdentityDocumentsForProfileMasked(profileId),
+        listAddressesForProfileMasked(profileId),
+        assessPersonLegalReadiness({ profileId, useCase: 'final_settlement_chile' }),
+        assessPersonLegalReadiness({ profileId, useCase: 'payroll_chile_dependent' }),
+        resolveMemberCountry(memberId)
+      ])
+
+    const expectedDocumentType = getDefaultDocumentTypeForCountry(memberCountry)
 
     return NextResponse.json({
       memberId,
       profileId,
       documents,
       addresses,
+      expectedCountry: memberCountry,
+      expectedDocumentType,
       readiness: {
         finalSettlementChile: readinessFinalSettlement,
         payrollChileDependent: readinessPayrollChile

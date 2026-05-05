@@ -65,6 +65,10 @@ export {
   assessPersonLegalReadiness
 } from './readiness'
 export { resolveProfileIdForMember } from './profile-resolver'
+export {
+  getDefaultDocumentTypeForCountry,
+  resolveMemberCountry
+} from './country-defaults'
 export type {
   ReadinessUseCase,
   ReadinessBlocker,

@@ -599,16 +599,29 @@ const PersonLegalProfileSection = ({ memberId, collaboratorName }: PersonLegalPr
   const renderEmptyDocumentRow = () => {
     const slotKey = 'doc-required-missing'
     const editing = isEditingThis('document', undefined)
+    const expectedCountry = data?.expectedCountry ?? null
+    const expectedType = data?.expectedDocumentType ?? null
+
+    // Country-aware title + subtitle:
+    //   - Si conocemos el pais y tipo canonico → "DNI (Argentina)" / "documento DNI"
+    //   - Si no conocemos pais → "Documento de identidad" generico
+    const docTitle = expectedType
+      ? HR_LEGAL_COPY.documentTypeLabels[expectedType] ?? HR_LEGAL_COPY.genericDocumentTitle
+      : HR_LEGAL_COPY.genericDocumentTitle
+
+    const docName = expectedType
+      ? `su ${(HR_LEGAL_COPY.documentTypeLabels[expectedType] ?? 'documento de identidad').replace(/\s*\(.+\)$/, '')}`
+      : 'su documento de identidad'
 
     return (
       <HrItemRow
         key={slotKey}
         iconClassName='tabler-id'
-        title={HR_LEGAL_COPY.documentTypeLabels.CL_RUT}
+        title={docTitle}
         chipLabel={HR_LEGAL_COPY.states.missing}
         chipColor='error'
         chipIcon='tabler-circle'
-        subtitle={HR_LEGAL_COPY.itemSubs.notDeclaredByCollaborator(displayName, 'su RUT')}
+        subtitle={HR_LEGAL_COPY.itemSubs.notDeclaredByCollaborator(displayName, docName)}
         accent='error'
         actions={
           <>
@@ -628,7 +641,13 @@ const PersonLegalProfileSection = ({ memberId, collaboratorName }: PersonLegalPr
                 color='secondary'
                 disabled={submitting || editing}
                 onClick={() =>
-                  setActiveEdit({ kind: 'document', target: { initialCountry: 'CL', initialType: 'CL_RUT' } })
+                  setActiveEdit({
+                    kind: 'document',
+                    target: {
+                      initialCountry: expectedCountry ?? undefined,
+                      initialType: expectedType ?? undefined
+                    }
+                  })
                 }
                 startIcon={<i className='tabler-pencil-plus' style={{ fontSize: 14 }} aria-hidden='true' />}
               >
@@ -640,6 +659,8 @@ const PersonLegalProfileSection = ({ memberId, collaboratorName }: PersonLegalPr
         expandedForm={
           editing ? (
             <HrDocumentEditForm
+              initialCountry={expectedCountry ?? undefined}
+              initialType={expectedType ?? undefined}
               submitting={submitting}
               serverError={serverErrorById[slotKey] ?? null}
               onSubmit={submitHrDocument}
@@ -781,6 +802,7 @@ const PersonLegalProfileSection = ({ memberId, collaboratorName }: PersonLegalPr
     const slotKey = `addr-empty-${kind}`
     const editing = isEditingThis('address', undefined, kind)
     const isOptional = !isRequired
+    const expectedCountry = data?.expectedCountry ?? undefined
 
     return (
       <HrItemRow
@@ -815,7 +837,7 @@ const PersonLegalProfileSection = ({ memberId, collaboratorName }: PersonLegalPr
                   color='secondary'
                   disabled={submitting || editing}
                   onClick={() =>
-                    setActiveEdit({ kind: 'address', target: { addressType: kind, initialCountry: 'CL' } })
+                    setActiveEdit({ kind: 'address', target: { addressType: kind, initialCountry: expectedCountry } })
                   }
                   startIcon={<i className='tabler-pencil-plus' style={{ fontSize: 14 }} aria-hidden='true' />}
                 >
@@ -830,7 +852,7 @@ const PersonLegalProfileSection = ({ memberId, collaboratorName }: PersonLegalPr
               color='secondary'
               disabled={submitting || editing}
               onClick={() =>
-                setActiveEdit({ kind: 'address', target: { addressType: kind, initialCountry: 'CL' } })
+                setActiveEdit({ kind: 'address', target: { addressType: kind, initialCountry: expectedCountry } })
               }
               startIcon={<i className='tabler-pencil-plus' style={{ fontSize: 14 }} aria-hidden='true' />}
             >

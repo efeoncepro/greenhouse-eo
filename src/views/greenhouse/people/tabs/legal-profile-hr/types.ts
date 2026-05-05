@@ -47,6 +47,10 @@ export interface HrLegalProfileResponseDto {
   profileId: string
   documents: DocumentDto[]
   addresses: AddressDto[]
+  /** ISO alpha-2 from members.location_country, or null if unknown. */
+  expectedCountry: string | null
+  /** Canonical document type for that country (CL_RUT, AR_DNI, etc.), or null. */
+  expectedDocumentType: string | null
   readiness: {
     finalSettlementChile: ReadinessResultDto
     payrollChileDependent: ReadinessResultDto

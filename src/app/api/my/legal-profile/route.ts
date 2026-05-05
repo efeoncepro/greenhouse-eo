@@ -6,9 +6,11 @@ import {
   PersonLegalProfileError,
   declareIdentityDocument,
   declarePersonAddress,
+  getDefaultDocumentTypeForCountry,
   isPersonDocumentType,
   listAddressesForProfileMasked,
   listIdentityDocumentsForProfileMasked,
+  resolveMemberCountry,
   resolveProfileIdForMember,
   assessPersonLegalReadiness
 } from '@/lib/person-legal-profile'
@@ -46,6 +48,9 @@ export async function GET() {
       return errorResponse(409, 'Identity profile not linked to this user', 'profile_not_linked')
     }
 
+    const memberCountry = tenant.memberId ? await resolveMemberCountry(tenant.memberId) : null
+    const expectedDocumentType = getDefaultDocumentTypeForCountry(memberCountry)
+
     const [documents, addresses] = await Promise.all([
       listIdentityDocumentsForProfileMasked(profileId),
       listAddressesForProfileMasked(profileId)
@@ -61,6 +66,8 @@ export async function GET() {
       profileId,
       documents,
       addresses,
+      expectedCountry: memberCountry,
+      expectedDocumentType,
       readiness: {
         payrollChileDependent: readinessPayrollChile,
         finalSettlementChile: readinessFinalSettlement

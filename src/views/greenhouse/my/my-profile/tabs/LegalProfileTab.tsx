@@ -424,12 +424,21 @@ const LegalProfileTab = () => {
   const renderRequiredDocumentMissing = () => {
     const slotId = 'doc-required-missing'
     const isExpanded = Boolean(expanded[slotId])
+    const expectedCountry = data?.expectedCountry ?? null
+    const expectedType = data?.expectedDocumentType ?? null
+
+    // Country-aware title:
+    //   - Si conocemos el pais y tipo canonico → "DNI (Argentina)"
+    //   - Si no conocemos pais → "Documento de identidad" (generico)
+    const title = expectedType
+      ? LEGAL_PROFILE_COPY.documentTypeLabels[expectedType] ?? LEGAL_PROFILE_COPY.genericDocumentTitle
+      : LEGAL_PROFILE_COPY.genericDocumentTitle
 
     return (
       <LegalProfileItem
         key={slotId}
         iconClassName='tabler-id'
-        title={LEGAL_PROFILE_COPY.documentTypeLabels.CL_RUT + ' (Chile)'}
+        title={title}
         subtitle={LEGAL_PROFILE_COPY.statusBlock.missing_required}
         accent='error'
         status='missing'
@@ -437,6 +446,8 @@ const LegalProfileTab = () => {
         onToggle={() => toggleExpanded(slotId)}
         form={
           <LegalProfileDocumentForm
+            initialCountry={expectedCountry ?? undefined}
+            initialType={expectedType ?? undefined}
             submitting={submitting}
             serverError={serverErrorById[slotId] ?? null}
             onSubmit={input => submitDocument(slotId, input)}
@@ -470,6 +481,14 @@ const LegalProfileTab = () => {
 
   // First-use state — empty state grande
   if (isEmptyFirstUse) {
+    const expectedType = data?.expectedDocumentType ?? null
+
+    const docName = expectedType === 'CL_RUT'
+      ? 'RUT'
+      : expectedType
+        ? (LEGAL_PROFILE_COPY.documentTypeLabels[expectedType] ?? 'documento de identidad').replace(/\s*\(.+\)$/, '')
+        : 'documento de identidad'
+
     return (
       <Box>
         <LegalProfileHero
@@ -481,7 +500,7 @@ const LegalProfileTab = () => {
         <EmptyState
           icon='tabler-id-badge-2'
           title={LEGAL_PROFILE_COPY.firstUse.title}
-          description={LEGAL_PROFILE_COPY.firstUse.description}
+          description={LEGAL_PROFILE_COPY.firstUse.description(docName)}
           action={
             <Button
               variant='contained'
@@ -489,7 +508,7 @@ const LegalProfileTab = () => {
               onClick={() => toggleExpanded('doc-required-missing')}
               startIcon={<i className='tabler-arrow-right' style={{ fontSize: 16 }} aria-hidden='true' />}
             >
-              {LEGAL_PROFILE_COPY.firstUse.cta}
+              {LEGAL_PROFILE_COPY.firstUse.cta(docName)}
             </Button>
           }
         />

@@ -63,9 +63,9 @@ export const LEGAL_PROFILE_COPY = {
   },
   firstUse: {
     title: 'Empecemos por tu identidad legal',
-    description:
-      'Te tomara menos de un minuto. Solo necesitas tu RUT a mano. Despues podras agregar tu direccion.',
-    cta: 'Declarar mi RUT'
+    description: (docName: string) =>
+      `Te tomara menos de un minuto. Solo necesitas tu ${docName} a mano. Despues podras agregar tu direccion.`,
+    cta: (docName: string) => `Declarar mi ${docName}`
   },
   itemActions: {
     edit: 'Editar',
@@ -89,8 +89,10 @@ export const LEGAL_PROFILE_COPY = {
     rutHint:
       'Despues de guardar veras solo "xx.xxx.NNN-K". Tu valor completo nunca aparece en logs ni se comparte sin tu autorizacion.'
   },
+  /** Generico cuando no se conoce el pais del colaborador */
+  genericDocumentTitle: 'Documento de identidad',
   documentTypeLabels: {
-    CL_RUT: 'RUT',
+    CL_RUT: 'RUT (Chile)',
     CL_PASSPORT: 'Pasaporte (Chile)',
     AR_DNI: 'DNI (Argentina)',
     AR_CUIL: 'CUIL (Argentina)',
