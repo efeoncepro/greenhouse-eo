@@ -1,5 +1,23 @@
 # Handoff.md
 
+## Sesion 2026-05-05 — TASK-784 pepper PII provisionado en Secret Manager + staging verificado
+
+- **Branch:** `develop`; no se tocaron cambios no trackeados de HR/personas ni `mockups/`.
+- **Trigger:** `/my/profile` mostraba `Person legal profile pepper unavailable` al guardar RUT/documento legal.
+- **Causa raiz:** el código canónico (`src/lib/person-legal-profile/normalize-pepper.ts`) ya resolvía `GREENHOUSE_PII_NORMALIZATION_PEPPER` vía `*_SECRET_REF`, pero el secreto `greenhouse-pii-normalization-pepper` no existía en GCP Secret Manager y Vercel Staging/Preview/Production no tenían `GREENHOUSE_PII_NORMALIZATION_PEPPER_SECRET_REF`.
+- **Fix aplicado (sin exponer secreto):**
+  - Creado `greenhouse-pii-normalization-pepper` en GCP Secret Manager (`efeonce-group`) con payload aleatorio de 64 hex chars.
+  - Otorgado `roles/secretmanager.secretAccessor` al runtime SA `greenhouse-portal@efeonce-group.iam.gserviceaccount.com`.
+  - Agregado `GREENHOUSE_PII_NORMALIZATION_PEPPER_SECRET_REF=greenhouse-pii-normalization-pepper` en Vercel `staging`, `preview` generico y `production`.
+  - Retirado el fallback crudo `GREENHOUSE_PII_NORMALIZATION_PEPPER` que habia quedado temporalmente en `staging`.
+  - Redeployado Staging sin arrastrar worktree local: `dpl_BRFDomRfNRM1LswMxZd5egBLT1Co` (`greenhouse-5jo6n2475-efeonce-7670142f.vercel.app`) Ready y alias `dev-greenhouse.efeoncepro.com`.
+- **Validacion:**
+  - `vercel env ls` confirma solo `GREENHOUSE_PII_NORMALIZATION_PEPPER_SECRET_REF` en Staging/Preview/Production.
+  - `gcloud secrets get-iam-policy` confirma `roles/secretmanager.secretAccessor` para el runtime SA.
+  - `pnpm staging:request /api/internal/health --pretty` responde `HTTP 200`, `overallStatus=ok`, `pii_normalization_pepper.source=secret_manager`, `secretRefConfigured=true`.
+  - `pnpm staging:request /api/my/legal-profile --pretty` ya no falla por pepper; responde `409 profile_not_linked` para el usuario agente de prueba, esperado por falta de identity profile enlazado en ese usuario sintético.
+- **Pendiente:** pedir al usuario refrescar `/my/profile` en `dev-greenhouse.efeoncepro.com` y guardar nuevamente el RUT; si aparece otro error, diagnosticarlo como flujo funcional distinto, no como falta de pepper.
+
 ## Sesion 2026-05-04 — TASK-786 creada: Person Contact & Professional Presence Governance
 
 - **Branch:** `develop`.
@@ -30,7 +48,7 @@
 - **Verificación final:** 52 module + redact tests verde. tsc + eslint sobre código tocado verde.
 - **Coordinación cross-task:** TASK-783 puede consumir `assessPersonLegalReadiness`. TASK-762 cierra gap `taxId: null`.
 - **Pendientes operativos:**
-  - Crear secret `greenhouse-pii-normalization-pepper` en GCP Secret Manager (proyecto `efeonce-group`) antes de cualquier write en prod.
+  - ~~Crear secret `greenhouse-pii-normalization-pepper` en GCP Secret Manager (proyecto `efeonce-group`) antes de cualquier write en prod.~~ Resuelto el 2026-05-05; ver entrada de handoff superior.
   - Ejecutar backfill `--commit` primero en staging.
 
 ## Sesion 2026-05-04 — TASK-784 movida a `in-progress` (Discovery + Plan, sin código)
