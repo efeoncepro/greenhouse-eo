@@ -181,11 +181,13 @@ const styles = StyleSheet.create({
     fontFamily: 'DM Sans Bold'
   },
   tableRow: {
-    display: 'flex',
-    flexDirection: 'row',
     borderBottom: '1 solid #E3E8EF',
     paddingVertical: 5,
     paddingHorizontal: 7
+  },
+  tableRowMain: {
+    display: 'flex',
+    flexDirection: 'row'
   },
   conceptCell: {
     width: 150,
@@ -212,6 +214,11 @@ const styles = StyleSheet.create({
   evidence: {
     color: '#667085',
     fontSize: 7
+  },
+  calculationText: {
+    color: '#526173',
+    fontSize: 6.6,
+    lineHeight: 1.32
   },
   tagLine: {
     display: 'flex',
@@ -304,6 +311,18 @@ const formatCurrency = (amount: number) =>
     currency: 'CLP',
     maximumFractionDigits: 0
   }).format(amount)
+
+const formatDecimal = (amount: number) =>
+  new Intl.NumberFormat('es-CL', {
+    maximumFractionDigits: 2,
+    minimumFractionDigits: Number.isInteger(amount) ? 0 : 2
+  }).format(amount)
+
+const toFiniteNumber = (value: unknown): number | null => {
+  const numericValue = typeof value === 'number' ? value : typeof value === 'string' ? Number(value) : NaN
+
+  return Number.isFinite(numericValue) ? numericValue : null
+}
 
 const formatDate = (value: string | null | undefined) => {
   if (!value) return 'Pendiente'
@@ -410,6 +429,18 @@ const readableEvidence = (evidence: Record<string, unknown> | undefined) => {
   return source ? 'Respaldo documentado' : 'Respaldo estructurado'
 }
 
+const lineEvidenceLabel = (line: FinalSettlementDocumentSnapshot['breakdown'][number]) => {
+  if (line.componentCode === 'proportional_vacation') {
+    return 'Saldo de vacaciones + regla DT art. 73'
+  }
+
+  if (line.componentCode === 'pending_salary' || line.componentCode === 'pending_fixed_allowances') {
+    return readableEvidence(line.sourceRef?.payrollOverlapLedger as Record<string, unknown> | undefined)
+  }
+
+  return readableEvidence(line.evidence)
+}
+
 const lineBasisLabel = (line: FinalSettlementDocumentSnapshot['breakdown'][number]) => {
   const labelByComponent: Record<string, string> = {
     pending_salary: 'Remuneración pendiente de pago',
@@ -431,6 +462,72 @@ const lineTreatmentTags = (line: FinalSettlementDocumentSnapshot['breakdown'][nu
   const previsional = previsionalTreatmentLabel[line.previsionalTreatment ?? ''] ?? line.previsionalTreatment
 
   return [legal, tax, previsional].filter((value): value is string => Boolean(value))
+}
+
+const lineCalculationDetails = (line: FinalSettlementDocumentSnapshot['breakdown'][number]) => {
+  if (line.componentCode === 'proportional_vacation') {
+    const businessVacationDays = toFiniteNumber(line.basis.businessVacationDays)
+    const compensatedCalendarDays = toFiniteNumber(line.basis.compensatedCalendarDays)
+    const dailyVacationBase = toFiniteNumber(line.basis.dailyVacationBase)
+    const details: string[] = []
+
+    if (businessVacationDays != null || compensatedCalendarDays != null) {
+      const days = [
+        businessVacationDays != null ? `días hábiles a indemnizar ${formatDecimal(businessVacationDays)}` : null,
+        compensatedCalendarDays != null ? `días corridos compensados ${formatDecimal(compensatedCalendarDays)}` : null
+      ].filter((value): value is string => Boolean(value))
+
+      details.push(`Base de cálculo: ${days.join(' · ')}`)
+    }
+
+    if (compensatedCalendarDays != null && dailyVacationBase != null) {
+      details.push(`Cálculo: ${formatDecimal(compensatedCalendarDays)} x base diaria ${formatCurrency(dailyVacationBase)} = ${formatCurrency(line.amount)}`)
+    } else if (dailyVacationBase != null) {
+      details.push(`Base diaria: ${formatCurrency(dailyVacationBase)}`)
+    }
+
+    details.push('Fuente: saldo de vacaciones registrado y regla DT de feriado proporcional.')
+
+    return details
+  }
+
+  if (line.componentCode === 'pending_salary') {
+    const payableDays = toFiniteNumber(line.basis.payableDays)
+    const daysInMonth = toFiniteNumber(line.basis.daysInMonth)
+    const monthlyBaseSalary = toFiniteNumber(line.basis.monthlyBaseSalary)
+    const details: string[] = []
+
+    if (payableDays != null && daysInMonth != null) {
+      details.push(`Días remunerados pendientes: ${formatDecimal(payableDays)} de ${formatDecimal(daysInMonth)}`)
+    }
+
+    if (monthlyBaseSalary != null) {
+      details.push(`Base mensual: ${formatCurrency(monthlyBaseSalary)}`)
+    }
+
+    return details
+  }
+
+  if (line.componentCode === 'statutory_deductions') {
+    const deductionLabels: Array<[string, unknown]> = [
+      ['AFP', line.basis.afp],
+      ['Salud', line.basis.health],
+      ['Cesantía', line.basis.unemployment],
+      ['Impuesto único', line.basis.tax],
+      ['APV', line.basis.apv]
+    ]
+
+    const populatedDeductions = deductionLabels
+      .map(([label, value]) => [label, toFiniteNumber(value)] as const)
+      .filter(([, value]) => value != null && value > 0)
+      .map(([label, value]) => `${label}: ${formatCurrency(value ?? 0)}`)
+
+    return populatedDeductions.length > 0
+      ? populatedDeductions
+      : ['Sin descuentos legales adicionales en esta propuesta.']
+  }
+
+  return []
 }
 
 const FinalSettlementPdfDocument = ({ snapshot }: { snapshot: FinalSettlementDocumentSnapshot }) => {
@@ -523,31 +620,42 @@ const FinalSettlementPdfDocument = ({ snapshot }: { snapshot: FinalSettlementDoc
             <Text style={styles.evidenceCell}>Respaldo</Text>
             <Text style={styles.amountCell}>Monto</Text>
           </View>
-          {snapshot.breakdown.map(line => (
-            <View key={line.componentCode} style={styles.tableRow}>
-              <View style={styles.conceptCell}>
-                <Text style={styles.conceptLabel}>{line.label}</Text>
-                <Text style={styles.evidence}>{lineBasisLabel(line)}</Text>
-              </View>
-              <View style={styles.treatmentCell}>
-                <View style={styles.tagLine}>
-                  {lineTreatmentTags(line).map((tag, index) => (
-                    <Text
-                      key={`${line.componentCode}-${tag}`}
-                      style={[
-                        styles.tag,
-                        index === 0 ? styles.tagInfo : tag.includes('Revisar') ? styles.tagWarn : styles.tagOk
-                      ]}
-                    >
-                      {tag}
-                    </Text>
-                  ))}
+          {snapshot.breakdown.map(line => {
+            const calculationDetails = lineCalculationDetails(line)
+
+            return (
+              <View key={line.componentCode} style={styles.tableRow}>
+                <View style={styles.tableRowMain}>
+                  <View style={styles.conceptCell}>
+                    <Text style={styles.conceptLabel}>{line.label}</Text>
+                    <Text style={styles.evidence}>{lineBasisLabel(line)}</Text>
+                  </View>
+                  <View style={styles.treatmentCell}>
+                    <View style={styles.tagLine}>
+                      {lineTreatmentTags(line).map((tag, index) => (
+                        <Text
+                          key={`${line.componentCode}-${tag}`}
+                          style={[
+                            styles.tag,
+                            index === 0 ? styles.tagInfo : tag.includes('Revisar') ? styles.tagWarn : styles.tagOk
+                          ]}
+                        >
+                          {tag}
+                        </Text>
+                      ))}
+                    </View>
+                  </View>
+                  <View style={styles.evidenceCell}>
+                    <Text>{lineEvidenceLabel(line)}</Text>
+                    {calculationDetails.map(detail => (
+                      <Text key={`${line.componentCode}-${detail}`} style={styles.calculationText}>{detail}</Text>
+                    ))}
+                  </View>
+                  <Text style={styles.amountCell}>{formatCurrency(line.amount)}</Text>
                 </View>
               </View>
-              <Text style={styles.evidenceCell}>{readableEvidence(line.evidence)}</Text>
-              <Text style={styles.amountCell}>{formatCurrency(line.amount)}</Text>
-            </View>
-          ))}
+            )
+          })}
         </View>
 
         <View style={styles.section}>

@@ -2,6 +2,8 @@
 
 ## 2026-05-05
 
+- **Finiquito PDF expone desglose legal/auditable del cálculo.** La tabla del documento formal ahora proyecta, desde el snapshot versionado del settlement, la base y formula del componente cuando existe información suficiente. Para `Feriado proporcional` muestra días hábiles a indemnizar, días corridos compensados, base diaria, cálculo `días corridos x base diaria = monto` y respaldo `saldo de vacaciones + regla DT art. 73`, sin recalcular fuera del engine de Payroll.
+
 - **Finiquito PDF limpia caja de líquido a pagar.** El resumen principal del documento ya no muestra helper permanente en el caso normal sin descuentos/retenciones, evitando que el texto auxiliar se monte visualmente sobre el monto en viewers PDF. La ayuda queda reservada para estados accionables como monto negativo o descuentos/retenciones.
 
 - **Talent Review alinea API y surface admin.** `/admin/talent-review` ya no depende solo del route group HR para cargar la cola: el endpoint `/api/hr/core/talent-review` usa el mismo contrato de visibilidad que el menú (`administracion.equipo`) con fallback a HR/Admin/superadmin. Esto evita que una página visible falle al cargar datos por drift de snapshot de sesión.

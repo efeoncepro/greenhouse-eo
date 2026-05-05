@@ -31,10 +31,11 @@ El motor de finiquitos calcula y guarda el cierre final de una renuncia Chile de
 5. Revisa readiness: blockers detienen el flujo; warnings requieren criterio HR/legal.
 6. Si esta correcto, aprueba el settlement.
 7. En el carril `Finiquito`, renderiza el documento.
-8. Envia el documento a revision.
-9. Aprueba el documento.
-10. Emite el documento y descarga el PDF privado.
-11. Cuando exista evidencia externa, registra firma/ratificacion. Si la persona firma con reserva de derechos, marca la reserva y deja nota.
+8. Abre el PDF y valida que cada monto relevante tenga respaldo suficiente. En `Feriado proporcional`, confirma que aparezcan dias habiles a indemnizar, dias corridos compensados, base diaria y formula del monto.
+9. Envia el documento a revision.
+10. Aprueba el documento.
+11. Emite el documento y descarga el PDF privado.
+12. Cuando exista evidencia externa, registra firma/ratificacion. Si la persona firma con reserva de derechos, marca la reserva y deja nota.
 
 Si un caso ya aparece como `Ejecutado` pero no tiene finiquito, no desaparece de `/hr/offboarding`: usa `Calcular` en el carril `Finiquito` para recuperar el settlement desde las fechas canonicas del caso. Esta recuperacion existe para corregir cierres incompletos; el flujo normal debe aprobar settlement y emitir documento antes de ejecutar la salida.
 
@@ -51,6 +52,7 @@ No se puede reemitir un documento que ya esta `signed_or_ratified`. En ese caso 
 Antes de aprobar, confirma tres puntos:
 
 - `Feriado proporcional` debe aparecer como no renta/no imponible y no debe cargar AFP, salud, AFC ni IUSC por si solo.
+- El PDF debe mostrar el desglose del feriado proporcional desde el snapshot versionado: dias habiles, dias corridos compensados, base diaria, formula y respaldo DT/saldo de vacaciones.
 - Si el mes de salida ya esta calculado/aprobado/exportado, el ledger de overlap debe explicar que descuentos mensuales ya quedaron cubiertos.
 - Un neto negativo solo es aprobable si existe una `authorized_deduction` con evidencia estructurada; de lo contrario el sistema bloquea.
 

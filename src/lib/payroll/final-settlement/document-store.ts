@@ -341,6 +341,12 @@ const buildDocumentSnapshot = async (settlement: FinalSettlement): Promise<{
           verifiedAt: '2026-05-04'
         },
         {
+          code: 'dt_feriado_proporcional',
+          label: 'DT: calculo de feriado proporcional',
+          url: 'https://www.dt.gob.cl/portal/1628/w3-article-60200.html',
+          verifiedAt: '2026-05-05'
+        },
+        {
           code: 'dt_cotizaciones_termino',
           label: 'DT: cotizaciones al termino de contrato',
           url: 'https://www.dt.gob.cl/portal/1628/w3-article-60573.html',

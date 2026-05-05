@@ -89,7 +89,11 @@ const snapshot: FinalSettlementDocumentSnapshot = {
       label: 'Feriado proporcional',
       kind: 'earning',
       amount: 121963,
-      basis: {},
+      basis: {
+        businessVacationDays: 2.5,
+        compensatedCalendarDays: 3,
+        dailyVacationBase: 40654.333
+      },
       formulaRef: 'proportional_vacation_v1',
       sourceRef: {},
       taxability: 'not_taxable',
@@ -144,7 +148,16 @@ describe('renderFinalSettlementDocumentPdf', () => {
     expect(text).toContain('Tratamiento')
     expect(text).toContain('Respaldo')
     expect(text).toContain('Feriado proporcional')
-    expect(text).toContain('Compensación por feriado proporcional')
+    const normalizedText = text.replace(/\s+/g, ' ')
+    const lowerText = normalizedText.toLocaleLowerCase('es-CL')
+
+    expect(normalizedText).toContain('Compensación por feriado proporcional')
+    expect(normalizedText).toContain('Base de cálculo')
+    expect(lowerText).toContain('días hábiles a indemnizar')
+    expect(lowerText).toContain('días corridos compensados')
+    expect(lowerText).toContain('base diaria')
+    expect(normalizedText).toContain('Saldo de vacaciones + regla DT art. 73')
+    expect(normalizedText).toContain('Fuente: saldo de vacaciones registrado y regla DT de feriado proporcional')
     expect(text).toContain('No tributable')
     expect(text).toContain('No imponible')
     expect(text).toContain('Relación y causal')

@@ -94,7 +94,8 @@ Desde TASK-762, el settlement aprobado habilita el documento formal de finiquito
 - El documento guarda `snapshot_json`, `snapshot_hash` y `content_hash`; no se recalcula desde datos vivos despues de renderizar.
 - La aprobacion del documento usa `workflow_approval_snapshots` y es distinta de la aprobacion del calculo.
 - La emision deja el documento pendiente de firma/ratificacion externa. Greenhouse registra evidencia, reserva de derechos, rechazo, anulacion o reemision, pero no reemplaza al proceso externo.
-- Desde TASK-783, el PDF debe mostrar marca Greenhouse, entidad legal/RUT, trabajador/RUT, estado textual, tabla `Concepto / Tratamiento / Evidencia / Monto`, totales separados y snapshot/template. La emision formal falla cerrado si falta RUT verificado del trabajador o identidad legal de la entidad empleadora.
+- Desde TASK-783, el PDF debe mostrar marca Greenhouse, entidad legal/RUT, trabajador/RUT, estado textual, tabla `Concepto / Tratamiento / Respaldo / Monto`, totales separados y snapshot/template. La emision formal falla cerrado si falta RUT verificado del trabajador o identidad legal de la entidad empleadora.
+- Desde 2026-05-05, la columna `Respaldo` tambien proyecta el detalle auditable del calculo cuando el componente trae base suficiente en el snapshot. Para `proportional_vacation`, el PDF muestra dias habiles a indemnizar, dias corridos compensados, base diaria, formula de multiplicacion y referencia a saldo de vacaciones + regla DT de feriado proporcional. El renderer no recalcula montos: solo presenta la base persistida por el engine de Payroll.
 
 ## Cierre contractual y proveedor
 

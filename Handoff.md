@@ -1,5 +1,15 @@
 # Handoff.md
 
+## Sesion 2026-05-05 — Finiquito PDF calculation disclosure
+
+- **Branch:** `develop`; cambio acotado al contrato documental del PDF de finiquito.
+- **Trigger:** el PDF reemitido ya seguia el mockup aprobado, pero el monto de `Feriado proporcional` seguia viendose como una cifra aislada. El usuario pidio revisar con Payroll/UI/UX si legalmente y operativamente debia mostrar el desglose de donde sale el monto.
+- **Decision Payroll:** no recalcular en el renderer. El PDF solo proyecta la base versionada del settlement (`basis`, `formulaRef`, `sourceRef`) persistida por el engine. Para `proportional_vacation` muestra dias habiles a indemnizar, dias corridos compensados, base diaria, formula y fuente `saldo de vacaciones + regla DT art. 73`.
+- **Fix UI/UX:** el desglose vive en la columna `Respaldo`, debajo de la fuente, en tipografia secundaria compacta. No vuelve a meter texto auxiliar dentro del KPI `Liquido a pagar`, evitando el solapamiento anterior.
+- **Guardrail:** `document-pdf.test.tsx` ahora exige el desglose auditable, la referencia DT/saldo de vacaciones y que el PDF siga en una pagina.
+- **Validacion:** `pnpm exec vitest run src/lib/payroll/final-settlement/document-pdf.test.tsx --reporter=verbose` OK; `pnpm exec eslint src/lib/payroll/final-settlement/document-pdf.tsx src/lib/payroll/final-settlement/document-pdf.test.tsx src/lib/payroll/final-settlement/document-store.ts` OK; `pnpm exec tsc --noEmit --pretty false` OK; `pnpm design:lint` OK 0 errors / 0 warnings; render visual local `/tmp/greenhouse-finiquito-layout.pdf` confirma una pagina sin texto montado.
+- **Pendiente:** commit/push y verificar deployments.
+
 ## Sesion 2026-05-05 — Finiquito PDF net summary layout polish
 
 - **Branch:** `develop`; ajuste acotado al renderer/test de finiquito PDF.
