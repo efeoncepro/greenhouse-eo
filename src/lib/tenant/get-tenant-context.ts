@@ -4,6 +4,7 @@ import { getServerAuthSession } from '@/lib/auth'
 import { getCachedBusinessLineSummaries } from '@/lib/business-line/metadata'
 import type { BusinessLineMetadataSummary } from '@/types/business-line'
 import type { SupervisorAccessSummary } from '@/lib/reporting-hierarchy/types'
+import type { Locale } from '@/lib/copy'
 
 export interface TenantContext {
   userId: string
@@ -24,6 +25,10 @@ export interface TenantContext {
   timezone: string
   portalHomePath: string
   authMode: string
+  preferredLocale: Locale | null
+  tenantDefaultLocale: Locale | null
+  legacyLocale: Locale | null
+  effectiveLocale: Locale
 
   // Business line enrichment (cached server-side, not stored in JWT)
   businessLineMetadata?: BusinessLineMetadataSummary[]
@@ -72,6 +77,10 @@ export const getTenantContext = async (): Promise<TenantContext | null> => {
     timezone: session.user.timezone,
     portalHomePath: session.user.portalHomePath,
     authMode: session.user.authMode,
+    preferredLocale: session.user.preferredLocale,
+    tenantDefaultLocale: session.user.tenantDefaultLocale,
+    legacyLocale: session.user.legacyLocale,
+    effectiveLocale: session.user.effectiveLocale,
 
     // Business line enrichment
     businessLineMetadata,

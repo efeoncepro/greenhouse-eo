@@ -377,6 +377,14 @@ export const GH_MESSAGES = {
     'Revisa como esta vinculada tu identidad de acceso dentro de Greenhouse.',
   settings_preferences_title: 'Preferences',
   settings_preferences_subtitle: 'Ajusta tus preferencias de visibilidad del servicio.',
+  settings_locale_title: 'Idioma del portal',
+  settings_locale_description:
+    'Define el idioma que Greenhouse usara para tu sesion. Si no eliges uno, se usa el default de tu space.',
+  settings_locale_label: 'Idioma',
+  settings_locale_loading: 'Cargando idioma...',
+  settings_locale_saving: 'Guardando idioma...',
+  settings_locale_saved: 'Idioma guardado.',
+  settings_locale_error: 'No pudimos guardar el idioma. Intenta de nuevo.',
   settings_digest_title: 'Resumen semanal del cliente',
   settings_digest_description:
     'Recibe cada viernes un resumen breve del status del ciclo, la presion de revision y el feedback pendiente.',

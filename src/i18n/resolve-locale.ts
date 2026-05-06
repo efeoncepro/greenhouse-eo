@@ -5,6 +5,9 @@ import { defaultLocale, locales, normalizeLocale } from './locales'
 import type { Locale } from '@/lib/copy'
 
 type LocaleResolutionInput = {
+  userLocale?: string | null
+  tenantLocale?: string | null
+  legacyLocale?: string | null
   cookieLocale?: string | null
   acceptLanguage?: string | null
 }
@@ -30,9 +33,24 @@ const parseAcceptLanguage = (header: string | null | undefined): string[] => {
 }
 
 export const resolveLocaleFromRequest = ({
+  userLocale,
+  tenantLocale,
+  legacyLocale,
   cookieLocale,
   acceptLanguage
 }: LocaleResolutionInput = {}): Locale => {
+  const userMatch = normalizeLocale(userLocale)
+
+  if (userMatch) return userMatch
+
+  const tenantMatch = normalizeLocale(tenantLocale)
+
+  if (tenantMatch) return tenantMatch
+
+  const legacyMatch = normalizeLocale(legacyLocale)
+
+  if (legacyMatch) return legacyMatch
+
   const cookieMatch = normalizeLocale(cookieLocale)
 
   if (cookieMatch) return cookieMatch

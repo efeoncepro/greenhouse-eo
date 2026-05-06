@@ -63,7 +63,11 @@ const adminTenant: TenantContext = {
   featureFlags: [],
   timezone: 'America/Santiago',
   portalHomePath: '/hr',
-  authMode: 'credentials'
+  authMode: 'credentials',
+  preferredLocale: 'es-CL',
+  tenantDefaultLocale: 'es-CL',
+  legacyLocale: 'es-CL',
+  effectiveLocale: 'es-CL'
 }
 
 describe('listLeaveRequestsFromPostgres', () => {

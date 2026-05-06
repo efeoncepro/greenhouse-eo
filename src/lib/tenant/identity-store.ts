@@ -168,6 +168,13 @@ type Session360Row = Record<string, unknown> & {
   organization_id: string | null
   organization_public_id: string | null
   organization_name: string | null
+
+  // Locale persistence — TASK-431
+  legacy_locale: string | null
+  preferred_locale: string | null
+  organization_default_locale: string | null
+  client_default_locale: string | null
+  effective_locale: string | null
 }
 
 // ── Main lookup functions ───────────────────────────────────
@@ -221,6 +228,13 @@ const sessionRowToAccessRow = async (row: Session360Row) => {
     organization_id: row.organization_id ?? null,
     organization_public_id: row.organization_public_id ?? null,
     organization_name: row.organization_name ?? null,
+
+    // Locale persistence
+    legacy_locale: row.legacy_locale ?? null,
+    preferred_locale: row.preferred_locale ?? null,
+    organization_default_locale: row.organization_default_locale ?? null,
+    client_default_locale: row.client_default_locale ?? null,
+    effective_locale: row.effective_locale ?? null,
 
     // Collaborator identity
     member_id: row.member_id ?? null,

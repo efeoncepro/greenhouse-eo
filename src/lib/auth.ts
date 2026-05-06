@@ -1,9 +1,11 @@
 import { getServerSession, type NextAuthOptions } from 'next-auth'
+import type { JWT } from 'next-auth/jwt'
 import AzureADProvider from 'next-auth/providers/azure-ad'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import GoogleProvider from 'next-auth/providers/google'
 
 import { ROLE_CODES } from '@/config/role-codes'
+import { defaultLocale, normalizeLocale } from '@/i18n/locales'
 import { recordAuthAttempt } from '@/lib/auth/attempt-tracker'
 import {
   getAzureAdClientSecret,
@@ -29,6 +31,38 @@ import { resolvePortalHomePath } from '@/lib/tenant/resolve-portal-home-path'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 import { resolveSupervisorAccessSummaryFromMinimalContext } from '@/lib/reporting-hierarchy/access'
+import { getUserLocalePreferenceSnapshot } from '@/lib/i18n/locale-preferences'
+
+type LocaleTokenSnapshot = {
+  preferredLocale: string | null
+  tenantDefaultLocale: string | null
+  legacyLocale: string | null
+  effectiveLocale: string
+}
+
+const applyLocaleToToken = (token: JWT, snapshot: LocaleTokenSnapshot) => {
+  token.preferredLocale = normalizeLocale(snapshot.preferredLocale) ?? null
+  token.tenantDefaultLocale = normalizeLocale(snapshot.tenantDefaultLocale) ?? null
+  token.legacyLocale = normalizeLocale(snapshot.legacyLocale) ?? null
+  token.effectiveLocale = normalizeLocale(snapshot.effectiveLocale) ?? defaultLocale
+}
+
+const refreshLocaleToken = async (token: JWT) => {
+  const userId = typeof token.userId === 'string' ? token.userId : typeof token.sub === 'string' ? token.sub : ''
+
+  if (!userId) {
+    token.effectiveLocale = normalizeLocale(token.effectiveLocale) ?? defaultLocale
+
+    return
+  }
+
+  try {
+    applyLocaleToToken(token, await getUserLocalePreferenceSnapshot(userId))
+  } catch (error) {
+    console.warn('Unable to refresh locale preference for session token.', { userId }, error)
+    token.effectiveLocale = normalizeLocale(token.effectiveLocale) ?? defaultLocale
+  }
+}
 
 const getMicrosoftProfileIdentity = ({
   profile,
@@ -309,6 +343,10 @@ const createAuthOptions = (): NextAuthOptions => {
             provider: 'credentials',
             microsoftEmail: tenant.microsoftEmail,
             googleEmail: tenant.googleEmail,
+            preferredLocale: tenant.preferredLocale,
+            tenantDefaultLocale: tenant.tenantDefaultLocale,
+            legacyLocale: tenant.legacyLocale,
+            effectiveLocale: tenant.effectiveLocale,
 
             // Account 360
             spaceId: tenant.spaceId ?? undefined,
@@ -567,6 +605,10 @@ const createAuthOptions = (): NextAuthOptions => {
         token.provider = user.provider
         token.microsoftEmail = user.microsoftEmail
         token.googleEmail = user.googleEmail
+        token.preferredLocale = user.preferredLocale
+        token.tenantDefaultLocale = user.tenantDefaultLocale
+        token.legacyLocale = user.legacyLocale
+        token.effectiveLocale = user.effectiveLocale
 
         // Account 360
         token.spaceId = user.spaceId
@@ -633,6 +675,8 @@ const createAuthOptions = (): NextAuthOptions => {
           // Collaborator identity
           token.memberId = tenant.memberId ?? undefined
           token.identityProfileId = tenant.identityProfileId ?? undefined
+
+          applyLocaleToToken(token, tenant)
         }
       }
 
@@ -691,6 +735,8 @@ const createAuthOptions = (): NextAuthOptions => {
           // Collaborator identity
           token.memberId = tenant.memberId ?? undefined
           token.identityProfileId = tenant.identityProfileId ?? undefined
+
+          applyLocaleToToken(token, tenant)
         }
       }
 
@@ -700,6 +746,8 @@ const createAuthOptions = (): NextAuthOptions => {
         roleCodes: Array.isArray(token.roleCodes) ? token.roleCodes : [],
         routeGroups: Array.isArray(token.routeGroups) ? token.routeGroups : []
       })
+
+      await refreshLocaleToken(token)
 
       // TASK-727 — Resolve supervisor scope summary una vez por sesión y persistir en JWT.
       // Si la fila ya existe (refresh) y tenemos memberId, solo recomputamos cuando es la
@@ -785,6 +833,10 @@ const createAuthOptions = (): NextAuthOptions => {
         session.user.provider = typeof token.provider === 'string' ? token.provider : 'credentials'
         session.user.microsoftEmail = typeof token.microsoftEmail === 'string' ? token.microsoftEmail : null
         session.user.googleEmail = typeof token.googleEmail === 'string' ? token.googleEmail : null
+        session.user.preferredLocale = normalizeLocale(token.preferredLocale) ?? null
+        session.user.tenantDefaultLocale = normalizeLocale(token.tenantDefaultLocale) ?? null
+        session.user.legacyLocale = normalizeLocale(token.legacyLocale) ?? null
+        session.user.effectiveLocale = normalizeLocale(token.effectiveLocale) ?? defaultLocale
 
         // Account 360
         session.user.spaceId = typeof token.spaceId === 'string' ? token.spaceId : undefined

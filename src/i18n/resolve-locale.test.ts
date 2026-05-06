@@ -4,6 +4,33 @@ import { defaultLocale, normalizeLocale } from './locales'
 import { resolveLocaleFromRequest } from './resolve-locale'
 
 describe('Greenhouse i18n locale resolver', () => {
+  it('prioritizes persisted user locale before tenant, legacy, cookie and browser', () => {
+    expect(resolveLocaleFromRequest({
+      userLocale: 'en-US',
+      tenantLocale: 'es-CL',
+      legacyLocale: 'es',
+      cookieLocale: 'es-CL',
+      acceptLanguage: 'es-CL,es;q=0.9'
+    })).toBe('en-US')
+  })
+
+  it('uses tenant locale before legacy, cookie and browser when user preference is absent', () => {
+    expect(resolveLocaleFromRequest({
+      tenantLocale: 'en-US',
+      legacyLocale: 'es',
+      cookieLocale: 'es-CL',
+      acceptLanguage: 'es-CL,es;q=0.9'
+    })).toBe('en-US')
+  })
+
+  it('uses normalized legacy locale before cookie as a migration fallback', () => {
+    expect(resolveLocaleFromRequest({
+      legacyLocale: 'en',
+      cookieLocale: 'es-CL',
+      acceptLanguage: 'es-CL,es;q=0.9'
+    })).toBe('en-US')
+  })
+
   it('uses gh_locale cookie when it contains a supported platform locale', () => {
     expect(resolveLocaleFromRequest({ cookieLocale: 'en-US', acceptLanguage: 'es-CL,es;q=0.9' })).toBe('en-US')
   })

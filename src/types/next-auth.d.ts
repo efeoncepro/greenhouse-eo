@@ -1,5 +1,6 @@
 import type { DefaultSession } from 'next-auth'
 
+import type { Locale } from '@/lib/copy'
 import type { SupervisorAccessSummary } from '@/lib/reporting-hierarchy/types'
 
 declare module 'next-auth' {
@@ -26,6 +27,10 @@ declare module 'next-auth' {
     provider: string
     microsoftEmail: string | null
     googleEmail: string | null
+    preferredLocale: Locale | null
+    tenantDefaultLocale: Locale | null
+    legacyLocale: Locale | null
+    effectiveLocale: Locale
 
     // Account 360
     spaceId?: string
@@ -65,6 +70,10 @@ declare module 'next-auth' {
       provider: string
       microsoftEmail: string | null
       googleEmail: string | null
+      preferredLocale: Locale | null
+      tenantDefaultLocale: Locale | null
+      legacyLocale: Locale | null
+      effectiveLocale: Locale
 
       // Account 360
       spaceId?: string
@@ -107,6 +116,10 @@ declare module 'next-auth/jwt' {
     provider?: string
     microsoftEmail?: string | null
     googleEmail?: string | null
+    preferredLocale?: Locale | null
+    tenantDefaultLocale?: Locale | null
+    legacyLocale?: Locale | null
+    effectiveLocale?: Locale
 
     // Account 360
     spaceId?: string
