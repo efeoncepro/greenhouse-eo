@@ -13,6 +13,9 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
 import EmptyState from '@/components/greenhouse/EmptyState'
+import { getMicrocopy } from '@/lib/copy'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 interface ReconciliationPeriodSummary {
   periodId: string
@@ -34,7 +37,7 @@ interface OrphanSnapshot {
   currency: string
 }
 
-const MONTHS_ES = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
+const MONTHS_ES = GREENHOUSE_COPY.months.short
 
 const statusMeta: Record<string, { label: string; color: 'primary' | 'info' | 'warning' | 'success' | 'error' | 'secondary' }> = {
   open: { label: 'Abierta', color: 'warning' },

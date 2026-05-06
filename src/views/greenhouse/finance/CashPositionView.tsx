@@ -34,6 +34,9 @@ import {
   Legend,
   ReferenceLine
 } from '@/libs/Recharts'
+import { getMicrocopy } from '@/lib/copy'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 // ---------------------------------------------------------------------------
 // Types
@@ -92,7 +95,7 @@ const formatYAxis = (val: number): string => {
   return `$${val}`
 }
 
-const MONTH_SHORT = ['', 'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
+const MONTH_SHORT = ['', ...GREENHOUSE_COPY.months.short]
 
 // ---------------------------------------------------------------------------
 // Component

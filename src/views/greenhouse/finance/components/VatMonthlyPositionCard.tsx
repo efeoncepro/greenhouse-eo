@@ -18,6 +18,9 @@ import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
 
 import type { VatLedgerEntry, VatMonthlyPosition } from './vat-monthly-position-types'
+import { getMicrocopy } from '@/lib/copy'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 const formatCLP = (amount: number) =>
   new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(amount)
@@ -25,7 +28,7 @@ const formatCLP = (amount: number) =>
 const formatPeriodLabel = (periodId: string) => {
   const [year, month] = periodId.split('-')
   const monthIndex = Number(month)
-  const monthLabels = ['', 'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
+  const monthLabels = ['', ...GREENHOUSE_COPY.months.short]
 
   return `${monthLabels[monthIndex] ?? periodId} ${year}`
 }

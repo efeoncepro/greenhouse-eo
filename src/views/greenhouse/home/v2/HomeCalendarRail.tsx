@@ -15,6 +15,9 @@ import OptionMenu from '@core/components/option-menu'
 import type { ThemeColor } from '@core/types'
 
 import type { CalendarEventKind, HomeCalendarEvent, HomeCalendarRailData } from '@/lib/home/contract'
+import { getMicrocopy } from '@/lib/copy'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 interface HomeCalendarRailProps {
   data: HomeCalendarRailData
@@ -30,7 +33,7 @@ const KIND_META: Record<CalendarEventKind, { icon: string; color: ThemeColor }> 
   holiday: { icon: 'tabler-confetti', color: 'success' }
 }
 
-const MONTH_SHORT = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
+const MONTH_SHORT = GREENHOUSE_COPY.months.short
 
 const formatDayBlock = (iso: string): { day: string; month: string } => {
   const date = new Date(iso)

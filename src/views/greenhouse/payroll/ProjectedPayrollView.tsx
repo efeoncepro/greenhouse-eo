@@ -49,6 +49,8 @@ import { formatCurrency } from './helpers'
 
 import tableStyles from '@core/styles/table.module.css'
 
+const GREENHOUSE_COPY = getMicrocopy()
+
 // ── Types ──
 
 type ProjectionMode = 'actual_to_date' | 'projected_month_end'
@@ -162,7 +164,7 @@ interface ProjectedData {
 
 // ── Helpers ──
 
-const MONTHS = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
+const MONTHS = GREENHOUSE_COPY.months.long
 
 const otdColor = (pct: number | null) => {
   if (pct == null) return 'secondary'

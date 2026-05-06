@@ -29,6 +29,9 @@ import CustomChip from '@core/components/mui/Chip'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 import ReconciliationMatchDialog from '@views/greenhouse/finance/dialogs/ReconciliationMatchDialog'
 import ImportStatementDrawer from '@views/greenhouse/finance/drawers/ImportStatementDrawer'
+import { getMicrocopy } from '@/lib/copy'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 // ---------------------------------------------------------------------------
 // Types
@@ -149,7 +152,7 @@ const SUGGESTION_TYPE_LABELS: Record<string, string> = {
   anomaly: 'Anomalía'
 }
 
-const MONTH_NAMES = ['', 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
+const MONTH_NAMES = ['', ...GREENHOUSE_COPY.months.long]
 
 const INSTRUMENT_CATEGORY_LABELS: Record<string, string> = {
   bank_account: 'Cuenta bancaria',

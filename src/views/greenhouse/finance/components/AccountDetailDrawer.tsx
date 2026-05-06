@@ -46,6 +46,9 @@ import {
   type InstrumentDetailProfile
 } from '@/lib/finance/instrument-presentation'
 import type { TreasuryBankAccountOverview } from '@/lib/finance/account-balances'
+import { getMicrocopy } from '@/lib/copy'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 // TASK-714 — drawer consumes the canonical TreasuryBankAccountOverview shape
 // directly (extended with cardLastFour/cardNetwork/accountKind by the API).
@@ -206,7 +209,7 @@ const formatDate = (date: string | null) => {
 const formatMonth = (date: string) => {
   const [year, month] = date.split('-')
   const monthIndex = Number(month) - 1
-  const MONTHS = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
+  const MONTHS = GREENHOUSE_COPY.months.short
 
   return `${MONTHS[monthIndex] || month} ${year.slice(2)}`
 }

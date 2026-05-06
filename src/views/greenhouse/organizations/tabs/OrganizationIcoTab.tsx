@@ -24,12 +24,15 @@ import type { SpaceMetricSnapshot, MetricValue } from '@/lib/ico-engine/read-met
 import { CSC_PHASE_LABELS, CSC_CHART_COLORS, type CscPhase } from '@/lib/ico-engine/metric-registry'
 
 import type { OrganizationDetailData } from '../types'
+import { getMicrocopy } from '@/lib/copy'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'))
 
 // ── Constants ─────────────────────────────────────────────────────────
 
-const MONTH_SHORT = ['', 'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
+const MONTH_SHORT = ['', ...GREENHOUSE_COPY.months.short]
 
 const TREND_LINE_COLORS = Object.values(CSC_CHART_COLORS)
 

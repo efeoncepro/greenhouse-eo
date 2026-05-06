@@ -46,6 +46,9 @@ import {
   formatTimestamp,
   periodStatusConfig
 } from './helpers'
+import { getMicrocopy } from '@/lib/copy'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 type Props = {
   period: PayrollPeriod | null
@@ -999,20 +1002,7 @@ const PayrollPeriodTab = ({
                 value={editMonth}
                 onChange={e => setEditMonth(Number(e.target.value))}
               >
-                {[
-                  'Enero',
-                  'Febrero',
-                  'Marzo',
-                  'Abril',
-                  'Mayo',
-                  'Junio',
-                  'Julio',
-                  'Agosto',
-                  'Septiembre',
-                  'Octubre',
-                  'Noviembre',
-                  'Diciembre'
-                ].map((label, index) => (
+                {GREENHOUSE_COPY.months.long.map((label, index) => (
                   <MenuItem key={label} value={index + 1}>
                     {label}
                   </MenuItem>

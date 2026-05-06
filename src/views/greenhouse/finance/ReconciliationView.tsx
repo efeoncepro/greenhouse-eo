@@ -44,6 +44,9 @@ import type { FinanceMovementFeedItem, FinanceMovementFeedSummaryItem } from '@/
 import tableStyles from '@core/styles/table.module.css'
 import CreateReconciliationPeriodDrawer from '@views/greenhouse/finance/drawers/CreateReconciliationPeriodDrawer'
 import CreateAccountDrawer from '@views/greenhouse/finance/drawers/CreateAccountDrawer'
+import { getMicrocopy } from '@/lib/copy'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 // ---------------------------------------------------------------------------
 // Types
@@ -135,7 +138,7 @@ const STATUS_CONFIG: Record<string, { label: string; color: 'success' | 'warning
 
 const ARCHIVE_REASON_MIN_LENGTH = 8
 
-const MONTH_NAMES = ['', 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
+const MONTH_NAMES = ['', ...GREENHOUSE_COPY.months.long]
 
 // ---------------------------------------------------------------------------
 // Helpers

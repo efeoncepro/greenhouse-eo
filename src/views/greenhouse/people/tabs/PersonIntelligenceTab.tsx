@@ -18,6 +18,9 @@ import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSu
 import { AgencyMetricStatusChip, getAgencyMetricFooterLabel } from '@/components/agency/metric-trust'
 import AppRecharts from '@/libs/styles/AppRecharts'
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from '@/libs/Recharts'
+import { getMicrocopy } from '@/lib/copy'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 // ── Types ──
 
@@ -37,7 +40,7 @@ interface IntelligenceResponse { memberId: string; current: Snapshot | null; tre
 
 // ── Helpers ──
 
-const MONTHS = ['', 'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
+const MONTHS = ['', ...GREENHOUSE_COPY.months.short]
 
 const healthConfig: Record<string, { label: string; color: 'success' | 'warning' | 'error' }> = {
   green: { label: 'Óptimo', color: 'success' },

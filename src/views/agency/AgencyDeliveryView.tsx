@@ -35,6 +35,9 @@ import {
 import type { AgencyDeliveryTrendMonth, AgencyPulseKpis, AgencySpaceHealth } from '@/lib/agency/agency-queries'
 
 import tableStyles from '@core/styles/table.module.css'
+import { getMicrocopy } from '@/lib/copy'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'))
 
@@ -48,7 +51,7 @@ type TrendMonth = AgencyDeliveryTrendMonth
 
 type SemaphoreColor = 'success' | 'warning' | 'error'
 
-const MONTH_ABBR = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
+const MONTH_ABBR = GREENHOUSE_COPY.months.short
 
 const rpaColor = (v: number | null | undefined): { color: SemaphoreColor; label: string } => {
   if (v == null) return { color: 'secondary' as SemaphoreColor, label: '—' }

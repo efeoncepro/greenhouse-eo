@@ -26,12 +26,15 @@ import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSu
 import CustomChip from '@core/components/mui/Chip'
 
 import type { PersonFinanceOverview } from '@/types/people'
+import { getMicrocopy } from '@/lib/copy'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
-const MONTH_SHORT = ['', 'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
+const MONTH_SHORT = ['', ...GREENHOUSE_COPY.months.short]
 
 const formatCLP = (amount: number): string =>
   new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(amount)

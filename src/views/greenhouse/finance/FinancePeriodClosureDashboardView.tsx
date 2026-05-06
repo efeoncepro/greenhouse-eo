@@ -37,6 +37,9 @@ import CustomAvatar from '@core/components/mui/Avatar'
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 import { EmptyState, ExecutiveCardShell } from '@/components/greenhouse'
+import { getMicrocopy } from '@/lib/copy'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 type PeriodClosureLifecycle = 'open' | 'ready' | 'closed' | 'reopened'
 type PayrollClosureStatus = 'pending' | 'calculated' | 'approved' | 'exported'
@@ -114,7 +117,7 @@ const PERIOD_FILTER_OPTIONS: Array<{ value: PeriodFilter; label: string }> = [
   { value: 'closed', label: 'Cerrados' }
 ]
 
-const MONTH_LABELS = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
+const MONTH_LABELS = GREENHOUSE_COPY.months.long
 
 const formatCurrency = (value: number) =>
   new Intl.NumberFormat('es-CL', {

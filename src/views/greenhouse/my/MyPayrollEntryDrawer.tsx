@@ -15,8 +15,11 @@ import Typography from '@mui/material/Typography'
 import type { Theme } from '@mui/material/styles'
 
 import CustomChip from '@core/components/mui/Chip'
+import { getMicrocopy } from '@/lib/copy'
 
-const MONTHS = ['', 'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
+const GREENHOUSE_COPY = getMicrocopy()
+
+const MONTHS = ['', ...GREENHOUSE_COPY.months.short]
 
 const PROCESSOR_LABELS: Record<string, string> = {
   deel: 'Deel',

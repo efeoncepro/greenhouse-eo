@@ -35,10 +35,13 @@ import { HorizontalWithSubtitle } from '@/components/card-statistics'
 import type { PayrollCurrency } from '@/types/payroll'
 import type { PersonnelExpenseReport, PersonnelExpenseCurrencyMeta } from '@/lib/payroll/personnel-expense'
 import { formatCurrency, formatPeriodLabel } from './helpers'
+import { getMicrocopy } from '@/lib/copy'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'))
 
-const SHORT_MONTH_NAMES = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
+const SHORT_MONTH_NAMES = GREENHOUSE_COPY.months.short
 
 const formatMonthRange = (meta: PersonnelExpenseCurrencyMeta): string => {
   if (meta.periodCount === 1) {

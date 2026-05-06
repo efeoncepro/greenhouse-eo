@@ -59,6 +59,9 @@ import CreateIncomeDrawer from '@views/greenhouse/finance/drawers/CreateIncomeDr
 import CreateExpenseDrawer from '@views/greenhouse/finance/drawers/CreateExpenseDrawer'
 import VatMonthlyPositionCard from '@views/greenhouse/finance/components/VatMonthlyPositionCard'
 import type { VatMonthlyPositionPayload } from '@views/greenhouse/finance/components/vat-monthly-position-types'
+import { getMicrocopy } from '@/lib/copy'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'), { ssr: false })
 
@@ -250,7 +253,7 @@ const formatDate = (date: string | null): string => {
   return `${day}/${month}/${year}`
 }
 
-const MONTH_SHORT = ['', 'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
+const MONTH_SHORT = ['', ...GREENHOUSE_COPY.months.short]
 
 // ---------------------------------------------------------------------------
 // Chart config builders

@@ -12,6 +12,9 @@ import type { SxProps, Theme } from '@mui/material/styles'
 import { useTheme } from '@mui/material/styles'
 
 import CustomTextField from '@core/components/mui/TextField'
+import { getMicrocopy } from '@/lib/copy'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 // ── Types ──
 
@@ -47,10 +50,7 @@ const MONTHS_SHORT = [
   'jul', 'ago', 'sep', 'oct', 'nov', 'dic'
 ]
 
-const MONTHS_SELECT = [
-  'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-  'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
-]
+const MONTHS_SELECT = GREENHOUSE_COPY.months.long
 
 // ── Helpers ──
 

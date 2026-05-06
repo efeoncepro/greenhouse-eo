@@ -41,6 +41,9 @@ import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSu
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 import OptionMenu from '@core/components/option-menu'
+import { getMicrocopy } from '@/lib/copy'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'), { ssr: false })
 
@@ -106,7 +109,7 @@ const formatPercent = (value: number | null): string => {
   return `${(value * 100).toFixed(1)}%`
 }
 
-const MONTH_SHORT = ['', 'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
+const MONTH_SHORT = ['', ...GREENHOUSE_COPY.months.short]
 
 const YEARS = Array.from({ length: 7 }, (_, i) => new Date().getFullYear() - 3 + i)
 

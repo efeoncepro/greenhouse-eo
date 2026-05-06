@@ -24,6 +24,9 @@ import Typography from '@mui/material/Typography'
 import CustomChip from '@core/components/mui/Chip'
 import { downloadPayrollReceiptPdf } from '@/lib/payroll/download-payroll-receipt'
 import MyPayrollEntryDrawer from './MyPayrollEntryDrawer'
+import { getMicrocopy } from '@/lib/copy'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 interface PayslipDeliveryEvent {
   deliveryKind: string
@@ -77,7 +80,7 @@ interface PayrollData {
   } | null
 }
 
-const MONTHS = ['', 'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
+const MONTHS = ['', ...GREENHOUSE_COPY.months.short]
 
 const fmt = (amount: number, currency: string) =>
   new Intl.NumberFormat('es-CL', { style: 'currency', currency: currency === 'USD' ? 'USD' : 'CLP', maximumFractionDigits: 0 }).format(amount)

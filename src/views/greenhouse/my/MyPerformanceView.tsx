@@ -17,6 +17,9 @@ import CustomChip from '@core/components/mui/Chip'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 import AppRecharts from '@/libs/styles/AppRecharts'
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from '@/libs/Recharts'
+import { getMicrocopy } from '@/lib/copy'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 interface IcoData {
   hasData: boolean
@@ -53,7 +56,7 @@ interface PerfData {
   operational: OperationalData | null
 }
 
-const MONTHS = ['', 'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
+const MONTHS = ['', ...GREENHOUSE_COPY.months.short]
 const pct = (v: number | null) => v != null ? `${Math.round(v)}%` : '—'
 const num = (v: number | null) => v != null ? String(Math.round(v)) : '—'
 
