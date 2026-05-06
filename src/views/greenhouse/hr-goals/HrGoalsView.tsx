@@ -30,6 +30,8 @@ import Typography from '@mui/material/Typography'
 import TabContext from '@mui/lab/TabContext'
 import TabPanel from '@mui/lab/TabPanel'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomChip from '@core/components/mui/Chip'
 import CustomTabList from '@core/components/mui/TabList'
 import CustomTextField from '@core/components/mui/TextField'
@@ -44,6 +46,8 @@ import type {
   GoalsResponse,
   CreateGoalCycleInput
 } from '@/types/hr-goals'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 // ── Constants ──
 
@@ -587,9 +591,7 @@ const HrGoalsView = () => {
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDialogOpen(false)} color='secondary'>
-            Cancelar
-          </Button>
+          <Button onClick={() => setDialogOpen(false)} color='secondary'>{GREENHOUSE_COPY.actions.cancel}</Button>
           <Button
             variant='contained'
             onClick={handleCreateCycle}

@@ -51,7 +51,6 @@ import tableStyles from '@core/styles/table.module.css'
 import CreateIncomeDrawer from '@views/greenhouse/finance/drawers/CreateIncomeDrawer'
 
 const GREENHOUSE_COPY = getMicrocopy()
-
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -649,9 +648,7 @@ const IncomeListView = () => {
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setBatchDialogOpen(false)} disabled={batchEmitting}>
-            Cancelar
-          </Button>
+          <Button onClick={() => setBatchDialogOpen(false)} disabled={batchEmitting}>{GREENHOUSE_COPY.actions.cancel}</Button>
           <Button
             variant='contained'
             color='primary'

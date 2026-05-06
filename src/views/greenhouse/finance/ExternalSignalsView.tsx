@@ -30,6 +30,8 @@ import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 import { toast } from 'sonner'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 import CustomAvatar from '@core/components/mui/Avatar'
 import CustomChip from '@core/components/mui/Chip'
@@ -42,6 +44,8 @@ import type {
   ExternalCashSignalResolutionStatus,
   ListSignalsResult
 } from '@/lib/finance/external-cash-signals'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 interface SignalRow extends ExternalCashSignal {
   matchedRuleId: string | null
@@ -597,9 +601,7 @@ const AdoptDialog = ({ signal, onClose, onSuccess }: AdoptDialogProps) => {
         </Stack>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} disabled={submitting}>
-          Cancelar
-        </Button>
+        <Button onClick={onClose} disabled={submitting}>{GREENHOUSE_COPY.actions.cancel}</Button>
         <Button onClick={handleSubmit} variant='contained' disabled={!accountId || submitting} startIcon={<i className='tabler-check' aria-hidden />}>
           {submitting ? 'Adoptando...' : 'Adoptar y crear pago'}
         </Button>
@@ -667,9 +669,7 @@ const DismissDialog = ({ signal, onClose, onSuccess }: DismissDialogProps) => {
         />
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} disabled={submitting}>
-          Cancelar
-        </Button>
+        <Button onClick={onClose} disabled={submitting}>{GREENHOUSE_COPY.actions.cancel}</Button>
         <Button onClick={handleSubmit} variant='contained' color='error' disabled={!reasonValid || submitting}>
           {submitting ? 'Descartando...' : 'Descartar señal'}
         </Button>

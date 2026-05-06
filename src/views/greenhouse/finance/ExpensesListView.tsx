@@ -40,7 +40,6 @@ import tableStyles from '@core/styles/table.module.css'
 import CreateExpenseDrawer from '@views/greenhouse/finance/drawers/CreateExpenseDrawer'
 
 const GREENHOUSE_COPY = getMicrocopy()
-
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------

@@ -11,7 +11,11 @@ import DialogTitle from '@mui/material/DialogTitle'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomTextField from '@core/components/mui/TextField'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 export interface QuoteSaveAsTemplatePayload {
   templateName: string
@@ -159,9 +163,7 @@ const QuoteSaveAsTemplateDialog = ({
         </Stack>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose} disabled={submitting}>
-          Cancelar
-        </Button>
+        <Button onClick={handleClose} disabled={submitting}>{GREENHOUSE_COPY.actions.cancel}</Button>
         <Button
           variant='contained'
           startIcon={<i className='tabler-template' />}

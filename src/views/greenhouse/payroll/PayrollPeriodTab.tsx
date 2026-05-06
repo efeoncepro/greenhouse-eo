@@ -1038,9 +1038,7 @@ const PayrollPeriodTab = ({
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button variant='tonal' color='secondary' onClick={() => setEditMetaOpen(false)} disabled={editSaving}>
-            Cancelar
-          </Button>
+          <Button variant='tonal' color='secondary' onClick={() => setEditMetaOpen(false)} disabled={editSaving}>{GREENHOUSE_COPY.actions.cancel}</Button>
           <Button variant='contained' onClick={handleSaveMeta} disabled={editSaving}>
             {editSaving ? 'Guardando...' : 'Guardar'}
           </Button>

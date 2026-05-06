@@ -30,11 +30,15 @@ import { useTheme } from '@mui/material/styles'
 
 import type { ApexOptions } from 'apexcharts'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import type { PersonDetail } from '@/types/people'
 import type { PayrollEntry } from '@/types/payroll'
 import { formatCurrency, regimeLabel, formatPeriodIdLabel } from '@views/greenhouse/payroll/helpers'
 import { downloadPayrollReceiptPdf } from '@/lib/payroll/download-payroll-receipt'
 import PersonFinanceTab from './PersonFinanceTab'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'))
 
@@ -173,9 +177,7 @@ const PersonEconomyTab = ({ detail, onEditCompensation }: Props) => {
                       variant='tonal'
                       startIcon={<i className='tabler-edit' />}
                       onClick={onEditCompensation}
-                    >
-                      Editar
-                    </Button>
+                    >{GREENHOUSE_COPY.actions.edit}</Button>
                   )
                 : undefined
             }

@@ -24,6 +24,8 @@ import ToggleButtonGroup from '@mui/material/ToggleButtonGroup'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 
@@ -41,6 +43,8 @@ import QuoteBuilderActions, {
 } from './QuoteBuilderActions'
 import QuoteTotalsFooter from './QuoteTotalsFooter'
 import AddonSuggestionsPanel from './AddonSuggestionsPanel'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 type PricingModel = 'staff_aug' | 'retainer' | 'project'
 
@@ -786,9 +790,7 @@ const QuoteCreateDrawer = ({
 
       <Divider />
       <Box sx={{ display: 'flex', gap: 2, p: 4 }}>
-        <Button variant='tonal' color='secondary' onClick={onClose} fullWidth disabled={submitting}>
-          Cancelar
-        </Button>
+        <Button variant='tonal' color='secondary' onClick={onClose} fullWidth disabled={submitting}>{GREENHOUSE_COPY.actions.cancel}</Button>
         <Button variant='contained' onClick={handleSubmit} disabled={submitting} fullWidth startIcon={<i className='tabler-device-floppy' />}>
           {submitting ? 'Creando…' : 'Crear cotización'}
         </Button>

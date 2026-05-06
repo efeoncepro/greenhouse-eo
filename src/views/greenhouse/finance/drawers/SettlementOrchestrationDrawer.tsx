@@ -35,7 +35,6 @@ import PaymentInstrumentChip from '@/components/greenhouse/PaymentInstrumentChip
 import type { InstrumentCategory } from '@/config/payment-instruments'
 
 const GREENHOUSE_COPY = getMicrocopy()
-
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -685,9 +684,7 @@ const SettlementOrchestrationDrawer = ({ open, paymentType, paymentId, onClose, 
                   )}
 
                   <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
-                    <Button variant='outlined' onClick={onClose}>
-                      Cerrar
-                    </Button>
+                    <Button variant='outlined' onClick={onClose}>{GREENHOUSE_COPY.actions.close}</Button>
                     <Button
                       variant='contained'
                       onClick={handleSubmit}

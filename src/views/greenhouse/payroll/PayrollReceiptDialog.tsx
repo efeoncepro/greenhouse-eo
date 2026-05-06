@@ -9,10 +9,14 @@ import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import type { PayrollEntry, PayrollPeriod } from '@/types/payroll'
 import { useOperatingEntity } from '@/context/OperatingEntityContext'
 import { downloadPayrollReceiptPdf } from '@/lib/payroll/download-payroll-receipt'
 import PayrollReceiptCard from './PayrollReceiptCard'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 type Props = {
   open: boolean
@@ -72,9 +76,7 @@ const PayrollReceiptDialog = ({ open, onClose, entry, period }: Props) => {
         >
           Descargar PDF
         </Button>
-        <Button variant='tonal' color='secondary' onClick={onClose}>
-          Cerrar
-        </Button>
+        <Button variant='tonal' color='secondary' onClick={onClose}>{GREENHOUSE_COPY.actions.close}</Button>
       </DialogActions>
     </Dialog>
   )

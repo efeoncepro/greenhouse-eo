@@ -40,6 +40,8 @@ import { createColumnHelper, flexRender, getCoreRowModel, getSortedRowModel, use
 import type { ColumnDef, SortingState } from '@tanstack/react-table'
 import classnames from 'classnames'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomChip from '@core/components/mui/Chip'
 import CustomTabList from '@core/components/mui/TabList'
 
@@ -55,6 +57,8 @@ import type {
 } from '@/types/service-sla'
 
 import tableStyles from '@core/styles/table.module.css'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 // ── Types ──────────────────────────────────────────────────────────────
 
@@ -923,18 +927,14 @@ const ServiceDetailView = ({ serviceId }: Props) => {
                               </TableCell>
                               <TableCell align='right'>
                                 <Stack direction='row' spacing={1} justifyContent='flex-end'>
-                                  <Button size='small' variant='outlined' onClick={() => openEditSlaDialog(item.definition)}>
-                                    Editar
-                                  </Button>
+                                  <Button size='small' variant='outlined' onClick={() => openEditSlaDialog(item.definition)}>{GREENHOUSE_COPY.actions.edit}</Button>
                                   <Button
                                     size='small'
                                     variant='text'
                                     color='error'
                                     onClick={() => deleteDefinition(item.definition.definitionId)}
                                     disabled={slaSaving}
-                                  >
-                                    Eliminar
-                                  </Button>
+                                  >{GREENHOUSE_COPY.actions.delete}</Button>
                                 </Stack>
                               </TableCell>
                             </TableRow>
@@ -1124,9 +1124,7 @@ const ServiceDetailView = ({ serviceId }: Props) => {
           </Stack>
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 3 }}>
-          <Button onClick={closeSlaDialog} color='secondary' disabled={slaSaving}>
-            Cancelar
-          </Button>
+          <Button onClick={closeSlaDialog} color='secondary' disabled={slaSaving}>{GREENHOUSE_COPY.actions.cancel}</Button>
           <Button variant='contained' onClick={submitSlaForm} disabled={slaSaving}>
             {slaSaving ? 'Guardando...' : 'Guardar definición'}
           </Button>

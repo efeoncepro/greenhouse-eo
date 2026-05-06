@@ -23,6 +23,8 @@ import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 import type { Theme } from '@mui/material/styles'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomChip from '@core/components/mui/Chip'
 
 import { HorizontalWithSubtitle } from '@/components/card-statistics'
@@ -34,6 +36,8 @@ import { contractTypeLabel, employmentTypeLabel, formatDate, healthSystemLabel, 
 import { buildPersonHrProfileViewModel } from './person-hr-profile-view-model'
 import MemberRoleTitleSection from './MemberRoleTitleSection'
 import PersonLegalProfileSection from './PersonLegalProfileSection'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 type Props = {
   memberId: string
@@ -793,9 +797,7 @@ const PersonHrProfileTab = ({ memberId, hrContext = null, defaultOperationalMetr
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button variant='tonal' color='secondary' onClick={handleCloseEmploymentDialog} disabled={savingEmployment}>
-            Cancelar
-          </Button>
+          <Button variant='tonal' color='secondary' onClick={handleCloseEmploymentDialog} disabled={savingEmployment}>{GREENHOUSE_COPY.actions.cancel}</Button>
           <Button variant='contained' onClick={handleSaveEmployment} disabled={savingEmployment}>
             {savingEmployment ? 'Guardando...' : 'Guardar'}
           </Button>

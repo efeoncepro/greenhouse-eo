@@ -33,6 +33,8 @@ import Typography from '@mui/material/Typography'
 
 import { toast } from 'sonner'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomAvatar from '@core/components/mui/Avatar'
 import CustomTextField from '@core/components/mui/TextField'
 
@@ -49,6 +51,8 @@ import type {
   HrMemberOptionsResponse
 } from '@/types/hr-core'
 import { getInitials } from '@/utils/getInitials'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 type MemberChoice = {
   memberId: string
@@ -2090,9 +2094,7 @@ const HrHierarchyView = () => {
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button variant='text' color='secondary' onClick={() => setChangeDialogOpen(false)}>
-            Cancelar
-          </Button>
+          <Button variant='text' color='secondary' onClick={() => setChangeDialogOpen(false)}>{GREENHOUSE_COPY.actions.cancel}</Button>
           <Button variant='contained' onClick={() => void submitChangeSupervisor()} disabled={savingAction === 'change'}>
             {savingAction === 'change' ? <CircularProgress size={18} color='inherit' /> : 'Guardar cambio'}
           </Button>
@@ -2188,9 +2190,7 @@ const HrHierarchyView = () => {
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button variant='text' color='secondary' onClick={() => setBulkDialogOpen(false)}>
-            Cancelar
-          </Button>
+          <Button variant='text' color='secondary' onClick={() => setBulkDialogOpen(false)}>{GREENHOUSE_COPY.actions.cancel}</Button>
           <Button variant='contained' onClick={() => void submitBulkReassign()} disabled={savingAction === 'bulk'}>
             {savingAction === 'bulk' ? <CircularProgress size={18} color='inherit' /> : 'Reasignar reportes'}
           </Button>
@@ -2277,9 +2277,7 @@ const HrHierarchyView = () => {
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button variant='text' color='secondary' onClick={() => setDelegationDialogOpen(false)}>
-            Cancelar
-          </Button>
+          <Button variant='text' color='secondary' onClick={() => setDelegationDialogOpen(false)}>{GREENHOUSE_COPY.actions.cancel}</Button>
           <Button
             variant='contained'
             onClick={() => void submitDelegation()}

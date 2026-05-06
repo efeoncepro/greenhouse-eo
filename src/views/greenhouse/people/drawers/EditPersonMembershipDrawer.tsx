@@ -14,10 +14,14 @@ import Stack from '@mui/material/Stack'
 import Switch from '@mui/material/Switch'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomTextField from '@core/components/mui/TextField'
 
 import type { PersonDetailAssignment } from '@/types/people'
 import { formatFte } from '../helpers'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 const MEMBERSHIP_TYPES = [
   { value: 'team_member', label: 'Equipo Efeonce' },
@@ -335,9 +339,7 @@ const EditPersonMembershipDrawer = ({ open, memberId, membership, assignment, on
       <Divider />
       <Box sx={{ p: 4 }}>
         <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
-          <Button variant='tonal' color='secondary' onClick={onClose} fullWidth>
-            Cancelar
-          </Button>
+          <Button variant='tonal' color='secondary' onClick={onClose} fullWidth>{GREENHOUSE_COPY.actions.cancel}</Button>
           <Button variant='contained' onClick={handleSave} disabled={saving} fullWidth>
             {saving ? 'Guardando...' : 'Guardar'}
           </Button>

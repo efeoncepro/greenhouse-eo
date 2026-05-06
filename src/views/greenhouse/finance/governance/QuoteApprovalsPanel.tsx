@@ -322,9 +322,7 @@ const QuoteApprovalsPanel = ({
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button onClick={closeDialog} disabled={submitting}>
-            Cancelar
-          </Button>
+          <Button onClick={closeDialog} disabled={submitting}>{GREENHOUSE_COPY.actions.cancel}</Button>
           <Button
             onClick={handleConfirm}
             variant='contained'

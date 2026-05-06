@@ -33,6 +33,8 @@ import TableRow from '@mui/material/TableRow'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomChip from '@core/components/mui/Chip'
 
 import EmptyState from '@/components/greenhouse/EmptyState'
@@ -46,6 +48,8 @@ import type {
   ServiceSlaUnit
 } from '@/types/service-sla'
 import type { ServiceListItem } from '@/lib/services/service-store'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 type Props = {
   services: ServiceListItem[]
@@ -689,12 +693,8 @@ return
                             </TableCell>
                             <TableCell align='right'>
                               <Stack direction='row' spacing={1} justifyContent='flex-end'>
-                                <Button size='small' variant='outlined' onClick={() => openEditDialog(item.definition)}>
-                                  Editar
-                                </Button>
-                                <Button size='small' variant='text' color='error' onClick={() => deleteDefinition(item.definition.definitionId)} disabled={saving}>
-                                  Eliminar
-                                </Button>
+                                <Button size='small' variant='outlined' onClick={() => openEditDialog(item.definition)}>{GREENHOUSE_COPY.actions.edit}</Button>
+                                <Button size='small' variant='text' color='error' onClick={() => deleteDefinition(item.definition.definitionId)} disabled={saving}>{GREENHOUSE_COPY.actions.delete}</Button>
                               </Stack>
                             </TableCell>
                           </TableRow>
@@ -845,9 +845,7 @@ return
           </Stack>
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 3 }}>
-          <Button onClick={closeDialog} color='secondary' disabled={saving}>
-            Cancelar
-          </Button>
+          <Button onClick={closeDialog} color='secondary' disabled={saving}>{GREENHOUSE_COPY.actions.cancel}</Button>
           <Button variant='contained' onClick={saveDefinition} disabled={saving}>
             {saving ? 'Guardando...' : 'Guardar definición'}
           </Button>

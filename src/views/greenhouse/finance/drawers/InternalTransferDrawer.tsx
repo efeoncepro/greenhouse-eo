@@ -14,9 +14,13 @@ import MenuItem from '@mui/material/MenuItem'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomTextField from '@core/components/mui/TextField'
 import PaymentInstrumentChip from '@/components/greenhouse/PaymentInstrumentChip'
 import type { InstrumentCategory } from '@/config/payment-instruments'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 type AccountOption = {
   accountId: string
@@ -280,9 +284,7 @@ const InternalTransferDrawer = ({ open, accounts, onClose, onSuccess }: Props) =
         />
 
         <Stack direction='row' spacing={3} justifyContent='flex-end'>
-          <Button variant='tonal' color='secondary' onClick={onClose} disabled={saving}>
-            Cancelar
-          </Button>
+          <Button variant='tonal' color='secondary' onClick={onClose} disabled={saving}>{GREENHOUSE_COPY.actions.cancel}</Button>
           <Button variant='contained' onClick={handleSubmit} disabled={saving}>
             {saving ? 'Registrando...' : 'Registrar transferencia'}
           </Button>

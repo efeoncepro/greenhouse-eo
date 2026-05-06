@@ -11,7 +11,11 @@ import DialogTitle from '@mui/material/DialogTitle'
 import Stack from '@mui/material/Stack'
 import TextField from '@mui/material/TextField'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import type { BusinessLineMetadata } from '@/types/business-line'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 type Props = {
   open: boolean
@@ -119,17 +123,13 @@ const BusinessLineEditDialog = ({ open, metadata, onClose, onSaved }: Props) => 
         </Stack>
       </DialogContent>
       <DialogActions sx={{ px: 3, pb: 3 }}>
-        <Button onClick={onClose} color='secondary' disabled={saving}>
-          Cancelar
-        </Button>
+        <Button onClick={onClose} color='secondary' disabled={saving}>{GREENHOUSE_COPY.actions.cancel}</Button>
         <Button
           variant='contained'
           onClick={handleSave}
           disabled={saving || !label.trim()}
           startIcon={saving ? <CircularProgress size={16} color='inherit' /> : undefined}
-        >
-          Guardar
-        </Button>
+        >{GREENHOUSE_COPY.actions.save}</Button>
       </DialogActions>
     </Dialog>
   )

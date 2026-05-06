@@ -29,8 +29,12 @@ import Stack from '@mui/material/Stack'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import { GOVERNANCE_SECTIONS, SECTION_ACCENT, VIEW_REGISTRY, type GovernanceSection } from '@/lib/admin/view-access-catalog'
 import type { PermissionSetSummary, PermissionSetDetail, PermissionSetUserAssignment } from '@/types/permission-sets'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 // ── Constants ──
 
@@ -847,7 +851,7 @@ const PermissionSetsTab = () => {
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setCreateOpen(false)}>Cancelar</Button>
+          <Button onClick={() => setCreateOpen(false)}>{GREENHOUSE_COPY.actions.cancel}</Button>
           <Button
             variant='contained'
             onClick={handleCreateSubmit}
@@ -904,7 +908,7 @@ const PermissionSetsTab = () => {
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setAssignDialogOpen(false)}>Cancelar</Button>
+          <Button onClick={() => setAssignDialogOpen(false)}>{GREENHOUSE_COPY.actions.cancel}</Button>
           <Button
             variant='contained'
             onClick={handleAssignSubmit}
@@ -932,7 +936,7 @@ const PermissionSetsTab = () => {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDeleteConfirmOpen(false)}>Cancelar</Button>
+          <Button onClick={() => setDeleteConfirmOpen(false)}>{GREENHOUSE_COPY.actions.cancel}</Button>
           <Button variant='contained' color='error' onClick={handleDeleteConfirm}>
             Eliminar set
           </Button>
@@ -958,7 +962,7 @@ const PermissionSetsTab = () => {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setRemoveConfirmOpen(false)}>Cancelar</Button>
+          <Button onClick={() => setRemoveConfirmOpen(false)}>{GREENHOUSE_COPY.actions.cancel}</Button>
           <Button variant='contained' color='error' onClick={handleRemoveUserConfirm}>
             Revocar acceso
           </Button>

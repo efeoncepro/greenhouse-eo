@@ -33,6 +33,8 @@ import Typography from '@mui/material/Typography'
 import TabContext from '@mui/lab/TabContext'
 import TabPanel from '@mui/lab/TabPanel'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import { DataTableShell } from '@/components/greenhouse/data-table'
 
 import CustomChip from '@core/components/mui/Chip'
@@ -53,6 +55,8 @@ import type {
   EvalSummaryWithDetails,
   EvalType
 } from '@/types/hr-evals'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 // ── Constants ──
 
@@ -876,7 +880,7 @@ const HrEvalsView = () => {
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDialogOpen(false)} color='secondary'>Cancelar</Button>
+          <Button onClick={() => setDialogOpen(false)} color='secondary'>{GREENHOUSE_COPY.actions.cancel}</Button>
           <Button
             variant='contained'
             onClick={handleCreateCycle}

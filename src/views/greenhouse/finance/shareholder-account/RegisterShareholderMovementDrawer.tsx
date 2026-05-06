@@ -19,6 +19,8 @@ import MenuItem from '@mui/material/MenuItem'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomTextField from '@core/components/mui/TextField'
 
 import type { ShareholderAccountSummary, ShareholderMovementSourceSummary, ShareholderMovementSourceType } from './types'
@@ -32,6 +34,8 @@ import {
   SHAREHOLDER_MOVEMENT_SEARCHABLE_SOURCE_TYPES,
   SHAREHOLDER_MOVEMENT_SOURCE_TYPE_OPTIONS
 } from './utils'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 type Props = {
   open: boolean
@@ -721,9 +725,7 @@ const RegisterShareholderMovementDrawer = ({
         />
 
         <Stack direction='row' spacing={3} justifyContent='flex-end'>
-          <Button variant='tonal' color='secondary' onClick={onClose} disabled={saving}>
-            Cancelar
-          </Button>
+          <Button variant='tonal' color='secondary' onClick={onClose} disabled={saving}>{GREENHOUSE_COPY.actions.cancel}</Button>
           <Button variant='contained' onClick={handleSubmit} disabled={saving || !accounts.length}>
             {saving ? 'Guardando...' : 'Registrar movimiento'}
           </Button>

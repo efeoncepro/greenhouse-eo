@@ -21,9 +21,13 @@ import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomTextField from '@core/components/mui/TextField'
 import PaymentInstrumentChip from '@/components/greenhouse/PaymentInstrumentChip'
 import type { InstrumentCategory } from '@/config/payment-instruments'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 type AccountOption = {
   accountId: string
@@ -254,9 +258,7 @@ const AssignAccountDrawer = ({ open, accounts, payments, onClose, onSuccess }: P
         ) : null}
 
         <Stack direction='row' spacing={3} justifyContent='flex-end'>
-          <Button variant='tonal' color='secondary' onClick={onClose} disabled={saving}>
-            Cancelar
-          </Button>
+          <Button variant='tonal' color='secondary' onClick={onClose} disabled={saving}>{GREENHOUSE_COPY.actions.cancel}</Button>
           <Button variant='contained' onClick={handleSubmit} disabled={saving || !payments.length}>
             {saving ? 'Asignando...' : 'Asignar instrumento'}
           </Button>

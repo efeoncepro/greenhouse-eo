@@ -38,7 +38,6 @@ import tableStyles from '@core/styles/table.module.css'
 import CreateHesDrawer from '@views/greenhouse/finance/drawers/CreateHesDrawer'
 
 const GREENHOUSE_COPY = getMicrocopy()
-
 // ── Types ──
 
 interface Hes {

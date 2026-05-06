@@ -13,11 +13,15 @@ import CircularProgress from '@mui/material/CircularProgress'
 import Grid from '@mui/material/Grid'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomAvatar from '@core/components/mui/Avatar'
 import CustomAutocomplete from '@core/components/mui/Autocomplete'
 import CustomTextField from '@core/components/mui/TextField'
 
 import { roleColorFor, roleIconFor, toTitleCase } from './helpers'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 // ── Types ──
 
@@ -386,9 +390,7 @@ const UserRoleManager = ({ userId, initialRoleCodes }: Props) => {
                         setIsEditing(false)
                       }}
                       aria-label='Cancelar la edicion de roles'
-                    >
-                      Cancelar
-                    </Button>
+                    >{GREENHOUSE_COPY.actions.cancel}</Button>
                   </Grid>
                 </Grid>
               </form>

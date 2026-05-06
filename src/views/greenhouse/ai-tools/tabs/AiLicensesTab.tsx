@@ -28,6 +28,8 @@ import type { ColumnDef, FilterFn } from '@tanstack/react-table'
 import { rankItem } from '@tanstack/match-sorter-utils'
 import classnames from 'classnames'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomAvatar from '@core/components/mui/Avatar'
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
@@ -38,6 +40,8 @@ import { licenseStatusConfig, accessLevelConfig, formatDate } from '../helpers'
 import { getInitials } from '@/utils/getInitials'
 
 import tableStyles from '@core/styles/table.module.css'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
   const itemRank = rankItem(row.getValue(columnId), value)
@@ -409,9 +413,7 @@ const AiLicensesTab = ({ licenses, tools, meta, onRefresh }: Props) => {
         </DialogContent>
         <Divider />
         <DialogActions sx={{ px: 4, py: 2.5 }}>
-          <Button variant='tonal' color='secondary' onClick={() => setDialogOpen(false)} disabled={saving}>
-            Cancelar
-          </Button>
+          <Button variant='tonal' color='secondary' onClick={() => setDialogOpen(false)} disabled={saving}>{GREENHOUSE_COPY.actions.cancel}</Button>
           <Button variant='contained' onClick={handleSave} disabled={saving || !formMember || !formTool}>
             {saving ? 'Asignando...' : 'Asignar licencia'}
           </Button>

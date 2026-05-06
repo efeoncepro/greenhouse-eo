@@ -21,11 +21,15 @@ import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 import PaymentInstrumentChip from '@/components/greenhouse/PaymentInstrumentChip'
 import RegisterCashOutDrawer from '@views/greenhouse/finance/drawers/RegisterCashOutDrawer'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 // ---------------------------------------------------------------------------
 // Types
@@ -495,9 +499,7 @@ const CashOutListView = () => {
                   disabled={page >= totalPages}
                   onClick={() => setPage(p => p + 1)}
                   endIcon={<i className='tabler-chevron-right' />}
-                >
-                  Siguiente
-                </Button>
+                >{GREENHOUSE_COPY.actions.next}</Button>
               </Box>
             </Box>
           </>

@@ -23,6 +23,8 @@ import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import { DataTableShell } from '@/components/greenhouse/data-table'
 
 import CustomChip from '@core/components/mui/Chip'
@@ -30,6 +32,8 @@ import CustomTextField from '@core/components/mui/TextField'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 import PaymentInstrumentChip from '@/components/greenhouse/PaymentInstrumentChip'
 import RegisterCashInDrawer from '@views/greenhouse/finance/drawers/RegisterCashInDrawer'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 // ---------------------------------------------------------------------------
 // Types
@@ -438,9 +442,7 @@ const CashInListView = () => {
                     disabled={page >= totalPages}
                     onClick={() => setPage(prev => Math.min(totalPages, prev + 1))}
                     endIcon={<i className='tabler-chevron-right' />}
-                  >
-                    Siguiente
-                  </Button>
+                  >{GREENHOUSE_COPY.actions.next}</Button>
                 </Stack>
               </Stack>
             </CardContent>

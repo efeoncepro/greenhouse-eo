@@ -12,7 +12,11 @@ import Stack from '@mui/material/Stack'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import { GH_SKILLS_CERTS } from '@/config/greenhouse-nomenclature'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 const MAX_CHARS = 500
 
@@ -62,9 +66,7 @@ const AboutMeCard = ({ value, editable, onSave }: AboutMeCardProps) => {
           title={GH_SKILLS_CERTS.section_about_me}
           action={
             <Stack direction='row' spacing={1}>
-              <Button size='small' onClick={handleCancel} disabled={saving}>
-                Cancelar
-              </Button>
+              <Button size='small' onClick={handleCancel} disabled={saving}>{GREENHOUSE_COPY.actions.cancel}</Button>
               <Button size='small' variant='contained' onClick={handleSave} disabled={saving}>
                 {saving ? 'Guardando...' : 'Guardar'}
               </Button>

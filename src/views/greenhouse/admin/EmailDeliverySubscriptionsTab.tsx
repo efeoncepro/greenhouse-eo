@@ -16,8 +16,12 @@ import Grid from '@mui/material/Grid'
 import MenuItem from '@mui/material/MenuItem'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomIconButton from '@core/components/mui/IconButton'
 import CustomTextField from '@core/components/mui/TextField'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 interface Subscription {
   subscriptionId: string
@@ -130,9 +134,7 @@ const EmailDeliverySubscriptionsTab = () => {
                       variant='text'
                       startIcon={<i className='tabler-plus' />}
                       onClick={() => { setAddEmailType(type); setAddDialogOpen(true) }}
-                    >
-                      Agregar
-                    </Button>
+                    >{GREENHOUSE_COPY.actions.add}</Button>
                   </Box>
 
                   {subs.length === 0 ? (
@@ -204,7 +206,7 @@ const EmailDeliverySubscriptionsTab = () => {
           </Grid>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setAddDialogOpen(false)}>Cancelar</Button>
+          <Button onClick={() => setAddDialogOpen(false)}>{GREENHOUSE_COPY.actions.cancel}</Button>
           <Button variant='contained' onClick={handleAdd} disabled={!addEmailType || !addEmail.includes('@')}>
             Agregar suscriptor
           </Button>
@@ -222,7 +224,7 @@ const EmailDeliverySubscriptionsTab = () => {
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setRemoveTarget(null)}>Cancelar</Button>
+          <Button onClick={() => setRemoveTarget(null)}>{GREENHOUSE_COPY.actions.cancel}</Button>
           <Button variant='contained' color='error' onClick={handleRemove}>
             Quitar suscriptor
           </Button>

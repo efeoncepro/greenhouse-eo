@@ -34,7 +34,6 @@ import SettlementOrchestrationDrawer from '@views/greenhouse/finance/drawers/Set
 import FactoringOperationDrawer from '@views/greenhouse/finance/drawers/FactoringOperationDrawer'
 
 const GREENHOUSE_COPY = getMicrocopy()
-
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -349,9 +348,7 @@ const IncomeDetailView = () => {
           >
             Registrar en CCA
           </Button>
-          <Button variant='outlined' component={Link} href='/finance/income' startIcon={<i className='tabler-arrow-left' />}>
-            Volver
-          </Button>
+          <Button variant='outlined' component={Link} href='/finance/income' startIcon={<i className='tabler-arrow-left' />}>{GREENHOUSE_COPY.actions.back}</Button>
         </Box>
       </Box>
 
@@ -562,7 +559,7 @@ const IncomeDetailView = () => {
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setEmitDialogOpen(false)} disabled={emitting}>Cancelar</Button>
+          <Button onClick={() => setEmitDialogOpen(false)} disabled={emitting}>{GREENHOUSE_COPY.actions.cancel}</Button>
           <Button variant='contained' color='primary' onClick={handleEmitDte} disabled={emitting}>
             {emitting ? 'Emitiendo...' : 'Emitir DTE'}
           </Button>

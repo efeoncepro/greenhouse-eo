@@ -2,7 +2,10 @@
 
 import { useState } from 'react'
 
+import { getMicrocopy } from '@/lib/copy'
 import styles from './styles.module.css'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 interface Props {
   acceptUrl: string
@@ -179,9 +182,7 @@ return
           className={`${styles.btn} ${styles.btnOutlined}`}
           onClick={() => setShowForm(false)}
           disabled={state.kind === 'submitting'}
-        >
-          Cancelar
-        </button>
+        >{GREENHOUSE_COPY.actions.cancel}</button>
         <button
           type='submit'
           className={`${styles.btn} ${styles.btnPrimary}`}

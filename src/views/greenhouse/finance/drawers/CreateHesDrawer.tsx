@@ -21,6 +21,8 @@ import MenuItem from '@mui/material/MenuItem'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 import {
@@ -28,6 +30,8 @@ import {
   loadFinanceClientContactOptions,
   type FinanceContactOption
 } from './financeClientContacts'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 // ── Types ──
 
@@ -792,9 +796,7 @@ const CreateHesDrawer = ({ open, onClose, onSuccess, editHes = null }: Props) =>
                 />
                 <Grid container spacing={2}>
                   <Grid size={{ xs: 6 }}>
-                    <Button variant='outlined' color='secondary' fullWidth onClick={() => setShowApproveField(false)}>
-                      Cancelar
-                    </Button>
+                    <Button variant='outlined' color='secondary' fullWidth onClick={() => setShowApproveField(false)}>{GREENHOUSE_COPY.actions.cancel}</Button>
                   </Grid>
                   <Grid size={{ xs: 6 }}>
                     <Button
@@ -817,9 +819,7 @@ const CreateHesDrawer = ({ open, onClose, onSuccess, editHes = null }: Props) =>
                 />
                 <Grid container spacing={2}>
                   <Grid size={{ xs: 6 }}>
-                    <Button variant='outlined' color='secondary' fullWidth onClick={() => setShowRejectField(false)}>
-                      Cancelar
-                    </Button>
+                    <Button variant='outlined' color='secondary' fullWidth onClick={() => setShowRejectField(false)}>{GREENHOUSE_COPY.actions.cancel}</Button>
                   </Grid>
                   <Grid size={{ xs: 6 }}>
                     <Button
@@ -853,7 +853,7 @@ const CreateHesDrawer = ({ open, onClose, onSuccess, editHes = null }: Props) =>
         <>
           <Divider />
           <Box sx={{ display: 'flex', gap: 2, p: 4 }}>
-            <Button variant='outlined' color='secondary' onClick={handleClose} fullWidth>Cancelar</Button>
+            <Button variant='outlined' color='secondary' onClick={handleClose} fullWidth>{GREENHOUSE_COPY.actions.cancel}</Button>
             <Button variant='contained' color='primary' onClick={handleSubmit} disabled={saving} fullWidth startIcon={<i className='tabler-check' />}>
               {saving ? 'Guardando...' : 'Registrar HES recibida'}
             </Button>

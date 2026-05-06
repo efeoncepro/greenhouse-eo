@@ -24,6 +24,8 @@ import Stack from '@mui/material/Stack'
 import Switch from '@mui/material/Switch'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomTextField from '@core/components/mui/TextField'
 
 import type {
@@ -37,6 +39,8 @@ import type {
 import { getCompensationSaveMode } from '@/lib/payroll/compensation-versioning'
 import { CONTRACT_DERIVATIONS, CONTRACT_LABELS, contractAllowsRemoteAllowance } from '@/types/hr-contracts'
 import { formatCurrency } from '@/lib/format'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 export type CompensationSavePayload = {
   mode: 'create' | 'update'
@@ -621,7 +625,7 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
             <Button variant='contained' fullWidth onClick={handleSubmit} disabled={saving}>
               {saving ? 'Guardando...' : ev ? (saveMode === 'update' ? 'Guardar cambios' : 'Crear nueva versión') : 'Crear compensación'}
             </Button>
-            <Button variant='tonal' color='secondary' fullWidth onClick={onClose} disabled={saving}>Cancelar</Button>
+            <Button variant='tonal' color='secondary' fullWidth onClick={onClose} disabled={saving}>{GREENHOUSE_COPY.actions.cancel}</Button>
           </Stack>
         </Stack>
       </Stack>

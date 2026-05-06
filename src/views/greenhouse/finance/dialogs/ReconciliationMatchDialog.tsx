@@ -23,8 +23,12 @@ import Skeleton from '@mui/material/Skeleton'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 // ---------------------------------------------------------------------------
 // Types
@@ -572,9 +576,7 @@ const ReconciliationMatchDialog = ({ open, periodId, row, initialCandidateId = n
 
         {/* Right side: primary actions */}
         <Box sx={{ display: 'flex', gap: 2 }}>
-          <Button variant='outlined' color='secondary' onClick={onClose} disabled={submitting}>
-            Cancelar
-          </Button>
+          <Button variant='outlined' color='secondary' onClick={onClose} disabled={submitting}>{GREENHOUSE_COPY.actions.cancel}</Button>
 
           {mode === 'match' && (
             <Button

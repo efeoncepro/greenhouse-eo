@@ -18,7 +18,11 @@ import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 import type { Theme } from '@mui/material/styles'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomChip from '@core/components/mui/Chip'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 const cardBorderSx = { border: (theme: Theme) => `1px solid ${theme.palette.divider}` }
 
@@ -261,9 +265,7 @@ const MemberRoleTitleSection = ({ memberId }: Props) => {
               color='primary'
               startIcon={<i className='tabler-edit' />}
               onClick={openEdit}
-            >
-              Editar
-            </Button>
+            >{GREENHOUSE_COPY.actions.edit}</Button>
           )}
         </Stack>
 
@@ -364,9 +366,7 @@ const MemberRoleTitleSection = ({ memberId }: Props) => {
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button variant='tonal' color='secondary' onClick={() => setEditOpen(false)} disabled={saving}>
-            Cancelar
-          </Button>
+          <Button variant='tonal' color='secondary' onClick={() => setEditOpen(false)} disabled={saving}>{GREENHOUSE_COPY.actions.cancel}</Button>
           <Button variant='contained' onClick={handleSaveEdit} disabled={saving}>
             {saving ? 'Guardando...' : 'Guardar'}
           </Button>
@@ -412,9 +412,7 @@ const MemberRoleTitleSection = ({ memberId }: Props) => {
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button variant='tonal' color='secondary' onClick={() => setResolveOpen(false)} disabled={resolving}>
-            Cancelar
-          </Button>
+          <Button variant='tonal' color='secondary' onClick={() => setResolveOpen(false)} disabled={resolving}>{GREENHOUSE_COPY.actions.cancel}</Button>
           <Button variant='contained' onClick={handleResolve} disabled={resolving}>
             {resolving ? 'Resolviendo...' : 'Resolver'}
           </Button>

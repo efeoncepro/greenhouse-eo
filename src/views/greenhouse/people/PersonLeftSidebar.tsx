@@ -10,6 +10,8 @@ import Chip from '@mui/material/Chip'
 import Divider from '@mui/material/Divider'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import { GH_INTERNAL_MESSAGES } from '@/config/greenhouse-nomenclature'
 import TeamAvatar from '@/components/greenhouse/TeamAvatar'
 import { formatCurrency } from '@views/greenhouse/payroll/helpers'
@@ -17,6 +19,8 @@ import { formatCurrency } from '@views/greenhouse/payroll/helpers'
 import type { PersonDetail } from '@/types/people'
 import { countryFlag, formatFte, roleCategoryLabel, safeRoleCategory } from './helpers'
 import IntegrationStatus from './components/IntegrationStatus'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 type Props = {
   detail: PersonDetail
@@ -153,9 +157,7 @@ const PersonLeftSidebar = ({ detail, isAdmin, onEditProfile, onDeactivate, onEdi
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <Typography variant='overline' color='text.secondary'>Compensación</Typography>
               {isAdmin && onEditCompensation && (
-                <Button size='small' startIcon={<i className='tabler-edit' style={{ fontSize: 14 }} />} onClick={onEditCompensation} sx={{ minWidth: 0, fontSize: '0.75rem', py: 0 }}>
-                  Editar
-                </Button>
+                <Button size='small' startIcon={<i className='tabler-edit' style={{ fontSize: 14 }} />} onClick={onEditCompensation} sx={{ minWidth: 0, fontSize: '0.75rem', py: 0 }}>{GREENHOUSE_COPY.actions.edit}</Button>
               )}
             </Box>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>

@@ -33,7 +33,6 @@ import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 
 const GREENHOUSE_COPY = getMicrocopy()
-
 // ── Types ──
 
 interface Quote {

@@ -24,9 +24,13 @@ import TableRow from '@mui/material/TableRow'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import { DataTableShell } from '@/components/greenhouse/data-table'
 
 import type { ProductCatalogDetailData } from './detail-data'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 // ─────────────────────────────────────────────────────────────
 // TASK-605 Fase E — Detail editor (MVP, no tabs — single page
@@ -646,9 +650,7 @@ return
         <Button variant='contained' size='large' onClick={handleSaveDetail} disabled={isPending}>
           Guardar cambios
         </Button>
-        <Button variant='outlined' href='/admin/commercial/product-catalog' disabled={isPending}>
-          Volver
-        </Button>
+        <Button variant='outlined' href='/admin/commercial/product-catalog' disabled={isPending}>{GREENHOUSE_COPY.actions.back}</Button>
       </Stack>
     </Box>
   )

@@ -690,9 +690,7 @@ const FinancePeriodClosureDashboardView = ({ canManageClosure, canReopen }: Prop
                                   variant='contained'
                                   onClick={() => void openCloseDialog(period)}
                                   disabled={actionLoadingPeriodId === period.periodId}
-                                >
-                                  Cerrar
-                                </Button>
+                                >{GREENHOUSE_COPY.actions.close}</Button>
                               ) : null}
                               {canReopenThisPeriod ? (
                                 <Button
@@ -925,9 +923,7 @@ const FinancePeriodClosureDashboardView = ({ canManageClosure, canReopen }: Prop
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setCloseDialogPeriod(null)} disabled={Boolean(actionLoadingPeriodId)}>
-            Cancelar
-          </Button>
+          <Button onClick={() => setCloseDialogPeriod(null)} disabled={Boolean(actionLoadingPeriodId)}>{GREENHOUSE_COPY.actions.cancel}</Button>
           <Button
             variant='contained'
             onClick={() => void handleClosePeriod()}
@@ -963,9 +959,7 @@ const FinancePeriodClosureDashboardView = ({ canManageClosure, canReopen }: Prop
               setReopenReason('')
             }}
             disabled={Boolean(actionLoadingPeriodId)}
-          >
-            Cancelar
-          </Button>
+          >{GREENHOUSE_COPY.actions.cancel}</Button>
           <Button
             variant='contained'
             color='warning'

@@ -14,8 +14,12 @@ import Stack from '@mui/material/Stack'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import BrandLogo from '@/components/greenhouse/BrandLogo'
 import { GH_SKILLS_CERTS } from '@/config/greenhouse-nomenclature'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 type ProfessionalLinks = {
   linkedinUrl: string | null
@@ -105,9 +109,7 @@ const ProfessionalLinksCard = ({ links, editable, onSave }: ProfessionalLinksCar
           title={GH_SKILLS_CERTS.section_professional_links}
           action={
             <Stack direction='row' spacing={1}>
-              <Button size='small' onClick={handleCancel} disabled={saving}>
-                Cancelar
-              </Button>
+              <Button size='small' onClick={handleCancel} disabled={saving}>{GREENHOUSE_COPY.actions.cancel}</Button>
               <Button size='small' variant='contained' onClick={handleSave} disabled={saving}>
                 {saving ? 'Guardando...' : 'Guardar'}
               </Button>

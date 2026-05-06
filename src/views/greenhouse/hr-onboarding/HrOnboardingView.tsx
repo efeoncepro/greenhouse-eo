@@ -30,6 +30,8 @@ import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 import type { Theme } from '@mui/material/styles'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomChip from '@core/components/mui/Chip'
 
 import type { OffboardingCase } from '@/lib/workforce/offboarding'
@@ -41,6 +43,8 @@ import type {
   HrOnboardingTemplateItem,
   HrOnboardingTemplateType
 } from '@/types/hr-onboarding'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 type ViewMode = 'overview' | 'templates'
 
@@ -581,9 +585,7 @@ const HrOnboardingView = ({ mode = 'overview' }: { mode?: ViewMode }) => {
                             <TextField fullWidth size='small' type='number' label='Días' value={newItemDueOffset} onChange={event => setNewItemDueOffset(Number(event.target.value))} />
                           </Grid>
                           <Grid size={{ xs: 12, md: 2 }}>
-                            <Button fullWidth variant='contained' disabled={saving || !newItemTitle.trim()} onClick={addItem}>
-                              Agregar
-                            </Button>
+                            <Button fullWidth variant='contained' disabled={saving || !newItemTitle.trim()} onClick={addItem}>{GREENHOUSE_COPY.actions.add}</Button>
                           </Grid>
                         </Grid>
                         <Stack direction='row' spacing={1} alignItems='center'>

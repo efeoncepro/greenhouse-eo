@@ -30,7 +30,6 @@ import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSu
 import type { GoalCycle, GoalKeyResult, GoalStatus, GoalWithDetails } from '@/types/hr-goals'
 
 const GREENHOUSE_COPY = getMicrocopy()
-
 // ── Status display config ──
 
 const STATUS_CONFIG: Record<GoalStatus, { label: string; color: 'success' | 'warning' | 'error' | 'info' | 'default'; icon: string }> = {
@@ -498,9 +497,7 @@ const MyGoalsView = () => {
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button onClick={closeProgressDialog} disabled={saving}>
-            Cancelar
-          </Button>
+          <Button onClick={closeProgressDialog} disabled={saving}>{GREENHOUSE_COPY.actions.cancel}</Button>
           <Button
             variant='contained'
             onClick={handleSaveProgress}

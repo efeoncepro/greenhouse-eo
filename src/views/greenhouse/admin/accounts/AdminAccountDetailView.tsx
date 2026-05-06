@@ -23,11 +23,15 @@ import MenuItem from '@mui/material/MenuItem'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomAvatar from '@core/components/mui/Avatar'
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 
 import type { OrganizationDetailData, OrganizationSpace } from '@/views/greenhouse/organizations/types'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 // ── Helpers ──────────────────────────────────────────────────────────────
 
@@ -564,9 +568,7 @@ const AdminAccountDetailView = ({ organizationId }: Props) => {
         </Stack>
       </DialogContent>
       <DialogActions>
-        <Button onClick={() => setCreateDialogOpen(false)} color='secondary'>
-          Cancelar
-        </Button>
+        <Button onClick={() => setCreateDialogOpen(false)} color='secondary'>{GREENHOUSE_COPY.actions.cancel}</Button>
         <Button
           variant='contained'
           onClick={handleCreateSpace}

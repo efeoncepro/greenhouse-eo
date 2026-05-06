@@ -18,9 +18,13 @@ import MenuItem from '@mui/material/MenuItem'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import ImpactPreviewPanel from '@/components/greenhouse/pricing/ImpactPreviewPanel'
 
 import CustomTextField from '@core/components/mui/TextField'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 type AddonType = 'overhead_fixed' | 'fee_percentage' | 'fee_fixed' | 'resource_month' | 'adjustment_pct'
 
@@ -489,9 +493,7 @@ const EditOverheadDrawer = ({ open, overheadId, onClose, onSuccess }: Props) => 
         </Box>
       ) : null}
       <Box sx={{ display: 'flex', gap: 2, p: 4 }}>
-        <Button variant='outlined' color='secondary' onClick={handleClose} fullWidth disabled={saving}>
-          Cancelar
-        </Button>
+        <Button variant='outlined' color='secondary' onClick={handleClose} fullWidth disabled={saving}>{GREENHOUSE_COPY.actions.cancel}</Button>
         <Button
           variant='contained'
           color='primary'

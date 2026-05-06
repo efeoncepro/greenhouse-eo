@@ -23,12 +23,16 @@ import { useTheme } from '@mui/material/styles'
 
 import type { ApexOptions } from 'apexcharts'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomAvatar from '@core/components/mui/Avatar'
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 
 import type { AiCreditWallet, AiTool, AiToolingAdminMetadata, ReloadReason } from '@/types/ai-tools'
 import { walletStatusConfig, balanceHealthConfig, walletScopeLabel, reloadReasonLabel, formatDate } from '../helpers'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'))
 
@@ -453,9 +457,7 @@ return theme.palette.secondary.main
                           <Button variant='tonal' size='small' color='success' fullWidth onClick={() => openReload(wallet)} startIcon={<i className='tabler-plus' />}>
                             Recargar
                           </Button>
-                          <Button variant='tonal' size='small' color='secondary' fullWidth onClick={() => openEdit(wallet)} startIcon={<i className='tabler-pencil' />}>
-                            Editar
-                          </Button>
+                          <Button variant='tonal' size='small' color='secondary' fullWidth onClick={() => openEdit(wallet)} startIcon={<i className='tabler-pencil' />}>{GREENHOUSE_COPY.actions.edit}</Button>
                         </Stack>
                       </CardContent>
                     </Card>
@@ -579,7 +581,7 @@ return theme.palette.secondary.main
         </DialogContent>
         <Divider />
         <DialogActions sx={{ px: 4, py: 2.5 }}>
-          <Button variant='tonal' color='secondary' onClick={() => setCreateOpen(false)} disabled={saving}>Cancelar</Button>
+          <Button variant='tonal' color='secondary' onClick={() => setCreateOpen(false)} disabled={saving}>{GREENHOUSE_COPY.actions.cancel}</Button>
           <Button variant='contained' onClick={handleCreate} disabled={saving || !formTool || !formValidFrom || (formScope === 'client' && !formClient)}>
             {saving ? 'Creando...' : 'Crear wallet'}
           </Button>
@@ -676,7 +678,7 @@ return theme.palette.secondary.main
         </DialogContent>
         <Divider />
         <DialogActions sx={{ px: 4, py: 2.5 }}>
-          <Button variant='tonal' color='secondary' onClick={() => setEditOpen(false)} disabled={saving}>Cancelar</Button>
+          <Button variant='tonal' color='secondary' onClick={() => setEditOpen(false)} disabled={saving}>{GREENHOUSE_COPY.actions.cancel}</Button>
           <Button variant='contained' onClick={handleEdit} disabled={saving || !editValidFrom}>
             {saving ? 'Guardando...' : 'Guardar cambios'}
           </Button>
@@ -742,7 +744,7 @@ return theme.palette.secondary.main
         </DialogContent>
         <Divider />
         <DialogActions sx={{ px: 4, py: 2.5 }}>
-          <Button variant='tonal' color='secondary' onClick={() => setReloadOpen(false)} disabled={saving}>Cancelar</Button>
+          <Button variant='tonal' color='secondary' onClick={() => setReloadOpen(false)} disabled={saving}>{GREENHOUSE_COPY.actions.cancel}</Button>
           <Button variant='contained' color='success' onClick={handleReload} disabled={saving || !reloadAmount}>
             {saving ? 'Recargando...' : 'Recargar'}
           </Button>

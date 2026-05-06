@@ -21,6 +21,8 @@ import Slider from '@mui/material/Slider'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomTextField from '@core/components/mui/TextField'
 
 import {
@@ -37,6 +39,8 @@ import type { PayrollAdjustment, AdjustmentKind } from '@/types/payroll-adjustme
 import type { PayrollEntry } from '@/types/payroll'
 
 import { formatCurrency } from './helpers'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 type Mode = 'normal' | 'percentage' | 'exclude'
 
@@ -379,9 +383,7 @@ const PayrollEntryAdjustDialog = ({ open, onClose, entry, onSubmitted }: Props) 
         </Stack>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} disabled={submitting}>
-          Cancelar
-        </Button>
+        <Button onClick={onClose} disabled={submitting}>{GREENHOUSE_COPY.actions.cancel}</Button>
         <Button
           variant='contained'
           color='primary'

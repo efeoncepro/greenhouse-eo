@@ -50,7 +50,6 @@ import {
 } from '@/lib/finance/quotation-access'
 
 const GREENHOUSE_COPY = getMicrocopy()
-
 // ── Types ──
 
 interface QuoteDetail {
@@ -854,9 +853,7 @@ const QuoteDetailView = () => {
                   /edit instead of cutting.
                 */
                 onClick={() => morphRouter.push(`/finance/quotes/${quoteId}/edit`)}
-              >
-                Editar
-              </Button>
+              >{GREENHOUSE_COPY.actions.edit}</Button>
             )}
             {canManageCurrentQuote && (
               <Button

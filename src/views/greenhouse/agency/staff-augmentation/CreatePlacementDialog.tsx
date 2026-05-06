@@ -18,7 +18,11 @@ import Typography from '@mui/material/Typography'
 
 import { toast } from 'sonner'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomTextField from '@core/components/mui/TextField'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 type AssignmentOption = {
   assignmentId: string
@@ -382,7 +386,7 @@ const CreatePlacementDialog = ({ open, onClose, onCreated, initialAssignmentId, 
 
   const actions = (
     <>
-      <Button onClick={onClose} color='secondary' disabled={loading}>Cancelar</Button>
+      <Button onClick={onClose} color='secondary' disabled={loading}>{GREENHOUSE_COPY.actions.cancel}</Button>
       <Button onClick={handleSubmit} variant='contained' disabled={loading || metaLoading || !assignmentId}>
         {loading ? 'Creando…' : 'Crear placement'}
       </Button>
@@ -395,7 +399,7 @@ const CreatePlacementDialog = ({ open, onClose, onCreated, initialAssignmentId, 
         <CardHeader
           title='Crear placement'
           subheader='Alta comercial-operativa sobre un assignment existente.'
-          action={<Button onClick={onClose} color='secondary'>Cerrar</Button>}
+          action={<Button onClick={onClose} color='secondary'>{GREENHOUSE_COPY.actions.close}</Button>}
         />
         <Divider />
         <CardContent>

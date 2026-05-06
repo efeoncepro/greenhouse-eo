@@ -1018,9 +1018,7 @@ const ReconciliationView = () => {
             color='secondary'
             onClick={handleCloseArchiveDialog}
             disabled={archiveSubmitting}
-          >
-            Cancelar
-          </Button>
+          >{GREENHOUSE_COPY.actions.cancel}</Button>
           <Button
             variant='contained'
             color='primary'

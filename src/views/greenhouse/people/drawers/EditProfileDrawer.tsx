@@ -13,10 +13,14 @@ import MenuItem from '@mui/material/MenuItem'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomTextField from '@core/components/mui/TextField'
 
 import type { PersonDetailMember } from '@/types/people'
 import type { TeamContactChannel, TeamRoleCategory } from '@/types/team'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 const ROLE_CATEGORIES: TeamRoleCategory[] = ['account', 'operations', 'strategy', 'design', 'development', 'media']
 
@@ -292,9 +296,7 @@ const EditProfileDrawer = ({ open, member, onClose, onSuccess }: Props) => {
 
       <Divider />
       <Box sx={{ display: 'flex', gap: 2, p: 4 }}>
-        <Button variant='tonal' color='secondary' onClick={onClose} fullWidth>
-          Cancelar
-        </Button>
+        <Button variant='tonal' color='secondary' onClick={onClose} fullWidth>{GREENHOUSE_COPY.actions.cancel}</Button>
         <Button variant='contained' onClick={handleSubmit} disabled={saving} fullWidth>
           {saving ? 'Guardando...' : 'Guardar cambios'}
         </Button>

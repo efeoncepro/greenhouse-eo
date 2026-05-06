@@ -24,6 +24,8 @@ import ToggleButton from '@mui/material/ToggleButton'
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomAvatar from '@core/components/mui/Avatar'
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
@@ -37,6 +39,8 @@ import {
   getProvidersByCategory,
   type InstrumentCategory
 } from '@/config/payment-instruments'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 type Props = {
   open: boolean
@@ -582,9 +586,7 @@ const CreatePaymentInstrumentDrawer = ({ open, onClose, onSuccess }: Props) => {
               Cambiar categoria
             </Button>
           ) : null}
-          <Button variant='outlined' color='secondary' onClick={handleClose} fullWidth disabled={saving}>
-            Cancelar
-          </Button>
+          <Button variant='outlined' color='secondary' onClick={handleClose} fullWidth disabled={saving}>{GREENHOUSE_COPY.actions.cancel}</Button>
           {step === 2 ? (
             <Button
               variant='contained'

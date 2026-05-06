@@ -17,6 +17,8 @@ import Typography from '@mui/material/Typography'
 
 import { toast } from 'sonner'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomTextField from '@core/components/mui/TextField'
 
 import type { PaymentObligation } from '@/types/payment-obligations'
@@ -25,6 +27,8 @@ import type {
   PaymentOrderBatchKind,
   PaymentOrderPaymentMethod
 } from '@/types/payment-orders'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 interface CreateOrderDialogProps {
   open: boolean
@@ -256,9 +260,7 @@ const CreateOrderDialog = ({ open, onClose, obligations, onCreated }: CreateOrde
         </Stack>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} disabled={submitting}>
-          Cancelar
-        </Button>
+        <Button onClick={onClose} disabled={submitting}>{GREENHOUSE_COPY.actions.cancel}</Button>
         <Button variant='contained' onClick={handleSubmit} disabled={submitting || isMixed || obligations.length === 0}>
           {submitting ? 'Creando…' : 'Crear orden'}
         </Button>

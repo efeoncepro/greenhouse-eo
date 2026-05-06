@@ -40,6 +40,8 @@ import type {
   PaymentOrderWithLines
 } from '@/types/payment-orders'
 
+const GREENHOUSE_COPY = getMicrocopy()
+
 // TASK-765 Slice 1: estados pre-paid donde el operator todavia puede asignar
 // la cuenta origen. Refleja PATCHABLE_STATES del API route.
 const SOURCE_ACCOUNT_PATCHABLE_STATES: ReadonlySet<PaymentOrderState> = new Set([
@@ -657,9 +659,7 @@ const OrderDetailDrawer = ({ order, loading, onClose, onActionComplete }: OrderD
                 </Tooltip>
               ) : null}
               {['draft', 'pending_approval', 'approved', 'scheduled'].includes(order.state) ? (
-                <Button variant='outlined' color='error' onClick={handleCancel} disabled={actionInFlight}>
-                  Cancelar
-                </Button>
+                <Button variant='outlined' color='error' onClick={handleCancel} disabled={actionInFlight}>{GREENHOUSE_COPY.actions.cancel}</Button>
               ) : null}
             </Stack>
           </Stack>
@@ -739,9 +739,7 @@ const OrderDetailDrawer = ({ order, loading, onClose, onActionComplete }: OrderD
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setPickerOpen(false)} disabled={actionInFlight}>
-            Cancelar
-          </Button>
+          <Button onClick={() => setPickerOpen(false)} disabled={actionInFlight}>{GREENHOUSE_COPY.actions.cancel}</Button>
           <Button
             variant='contained'
             onClick={handleAssignSourceAccount}

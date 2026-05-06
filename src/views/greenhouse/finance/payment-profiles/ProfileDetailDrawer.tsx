@@ -510,9 +510,7 @@ const ProfileDetailDrawer = ({ profileId, onClose, onActionComplete }: ProfileDe
                       startIcon={<i className='tabler-circle-x' />}
                       onClick={handleCancel}
                       disabled={actionInFlight}
-                    >
-                      Cancelar
-                    </Button>
+                    >{GREENHOUSE_COPY.actions.cancel}</Button>
                   ) : null}
                 </Stack>
               </Stack>

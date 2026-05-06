@@ -20,6 +20,8 @@ import Rating from '@mui/material/Rating'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
@@ -34,6 +36,8 @@ import type {
   Rating as RatingType,
   SubmitResponseInput
 } from '@/types/hr-evals'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 // ── Constants ──
 
@@ -555,7 +559,7 @@ const MyEvalsView = () => {
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={closeEvalDialog} color='secondary'>Cancelar</Button>
+          <Button onClick={closeEvalDialog} color='secondary'>{GREENHOUSE_COPY.actions.cancel}</Button>
           <Button
             variant='contained'
             onClick={handleSubmitEval}

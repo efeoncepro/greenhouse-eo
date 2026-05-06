@@ -33,6 +33,8 @@ import TextField from '@mui/material/TextField'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomAvatar from '@core/components/mui/Avatar'
 
 import EmptyState from '@components/greenhouse/EmptyState'
@@ -44,6 +46,8 @@ import {
 } from '@/config/responsibility-codes'
 import type { ResponsibilityType, ScopeType } from '@/config/responsibility-codes'
 import { getInitials } from '@/utils/getInitials'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 // ── Types ──
 
@@ -640,9 +644,7 @@ const AdminResponsibilitiesView = () => {
         </DialogContent>
         <Divider />
         <DialogActions sx={{ px: 3, py: 2 }}>
-          <Button onClick={handleCloseDialog} color='secondary'>
-            Cancelar
-          </Button>
+          <Button onClick={handleCloseDialog} color='secondary'>{GREENHOUSE_COPY.actions.cancel}</Button>
           <Button
             variant='contained'
             onClick={handleCreate}

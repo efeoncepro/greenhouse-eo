@@ -1,7 +1,6 @@
 'use client'
 
 import '@assistant-ui/react-markdown/styles/dot.css'
-
 import { useCallback, useState } from 'react'
 
 import Box from '@mui/material/Box'
@@ -22,6 +21,8 @@ import {
 } from '@assistant-ui/react'
 import { MarkdownTextPrimitive } from '@assistant-ui/react-markdown'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomAvatar from '@core/components/mui/Avatar'
 import CustomTextField from '@core/components/mui/TextField'
 
@@ -29,6 +30,8 @@ import type { NexaModelId } from '@/config/nexa-models'
 
 import NexaModelSelector from './NexaModelSelector'
 import NexaToolRenderer from './NexaToolRenderers'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 export interface NexaThreadProps {
   onBack?: () => void
@@ -168,10 +171,10 @@ const UserMessage = () => (
               </ComposerPrimitive.Input>
               <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, p: 1 }}>
                 <ComposerPrimitive.Cancel asChild>
-                  <Button size='small' variant='outlined' color='secondary'>Cancelar</Button>
+                  <Button size='small' variant='outlined' color='secondary'>{GREENHOUSE_COPY.actions.cancel}</Button>
                 </ComposerPrimitive.Cancel>
                 <ComposerPrimitive.Send asChild>
-                  <Button size='small' variant='contained'>Guardar</Button>
+                  <Button size='small' variant='contained'>{GREENHOUSE_COPY.actions.save}</Button>
                 </ComposerPrimitive.Send>
               </Box>
             </Box>

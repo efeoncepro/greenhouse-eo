@@ -13,10 +13,14 @@ import MenuItem from '@mui/material/MenuItem'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomTextField from '@core/components/mui/TextField'
 
 import type { CreateLeaveRequestInput, HrLeaveType, LeaveDayPeriod } from '@/types/hr-core'
 import GreenhouseFileUploader, { type UploadedFileValue } from './GreenhouseFileUploader'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 type LeaveRequestDialogProps = {
   open: boolean
@@ -257,9 +261,7 @@ const LeaveRequestDialog = ({
         </Stack>
       </DialogContent>
       <DialogActions>
-        <Button variant='tonal' color='secondary' onClick={handleClose} disabled={saving}>
-          Cancelar
-        </Button>
+        <Button variant='tonal' color='secondary' onClick={handleClose} disabled={saving}>{GREENHOUSE_COPY.actions.cancel}</Button>
         <Button
           variant='contained'
           onClick={handleSubmit}

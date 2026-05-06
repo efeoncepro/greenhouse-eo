@@ -30,6 +30,8 @@ import TimelineSeparator from '@mui/lab/TimelineSeparator'
 import TabContext from '@mui/lab/TabContext'
 import TabPanel from '@mui/lab/TabPanel'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import { ExecutiveCardShell, ExecutiveMiniStatCard } from '@/components/greenhouse'
 
 import CustomChip from '@core/components/mui/Chip'
@@ -48,6 +50,8 @@ import {
   type CommercialPartyStage,
   type CommercialPartyDetailData
 } from './types'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 type Props = {
   data: CommercialPartyDetailData | null
@@ -609,9 +613,7 @@ const CommercialPartyDetailView = ({ data, canOverride }: Props) => {
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setTransitionOpen(false)} color='inherit'>
-            Cancelar
-          </Button>
+          <Button onClick={() => setTransitionOpen(false)} color='inherit'>{GREENHOUSE_COPY.actions.cancel}</Button>
           <Button
             onClick={() => void handleOverride()}
             variant='contained'

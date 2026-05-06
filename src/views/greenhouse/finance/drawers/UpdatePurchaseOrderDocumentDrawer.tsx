@@ -14,7 +14,11 @@ import Link from '@mui/material/Link'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import GreenhouseFileUploader, { type UploadedFileValue } from '@/components/greenhouse/GreenhouseFileUploader'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 type PurchaseOrderDocumentTarget = {
   poId: string
@@ -162,9 +166,7 @@ const UpdatePurchaseOrderDocumentDrawer = ({ open, purchaseOrder, onClose, onSuc
       <Divider />
 
       <Box sx={{ display: 'flex', gap: 2, p: 4 }}>
-        <Button variant='outlined' color='secondary' onClick={handleClose} fullWidth disabled={saving}>
-          Cancelar
-        </Button>
+        <Button variant='outlined' color='secondary' onClick={handleClose} fullWidth disabled={saving}>{GREENHOUSE_COPY.actions.cancel}</Button>
         <Button
           variant='contained'
           color='primary'

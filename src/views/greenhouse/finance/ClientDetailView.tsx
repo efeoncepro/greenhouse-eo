@@ -38,7 +38,6 @@ import { ROLE_CODES } from '@/config/role-codes'
 import AddMembershipDrawer from '@/views/greenhouse/organizations/drawers/AddMembershipDrawer'
 
 const GREENHOUSE_COPY = getMicrocopy()
-
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------

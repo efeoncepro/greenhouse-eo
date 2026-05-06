@@ -21,6 +21,8 @@ import Stack from '@mui/material/Stack'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomChip from '@core/components/mui/Chip'
 
 import HorizontalWithAvatar from '@components/card-statistics/HorizontalWithAvatar'
@@ -28,6 +30,8 @@ import HorizontalWithAvatar from '@components/card-statistics/HorizontalWithAvat
 import type { PersonDetail } from '@/types/people'
 
 import PersonLegalProfileSection from './PersonLegalProfileSection'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -591,9 +595,7 @@ const PersonProfileTab = ({ detail }: Props) => {
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button variant='tonal' color='secondary' onClick={handleCloseEmploymentDialog} disabled={savingEmployment}>
-            Cancelar
-          </Button>
+          <Button variant='tonal' color='secondary' onClick={handleCloseEmploymentDialog} disabled={savingEmployment}>{GREENHOUSE_COPY.actions.cancel}</Button>
           <Button variant='contained' onClick={handleSaveEmployment} disabled={savingEmployment}>
             {savingEmployment ? 'Guardando...' : 'Guardar'}
           </Button>

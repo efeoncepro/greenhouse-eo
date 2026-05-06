@@ -21,8 +21,12 @@ import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 // ── Types ──
 
@@ -180,7 +184,7 @@ const CreateProductDrawer = ({
           {error && <Typography variant='body2' color='error' role='alert'>{error}</Typography>}
 
           <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
-            <Button variant='tonal' color='secondary' onClick={handleClose} disabled={submitting}>Cancelar</Button>
+            <Button variant='tonal' color='secondary' onClick={handleClose} disabled={submitting}>{GREENHOUSE_COPY.actions.cancel}</Button>
             <Button variant='contained' onClick={handleSubmit} disabled={submitting}>
               {submitting ? 'Creando...' : 'Crear producto'}
             </Button>

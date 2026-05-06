@@ -570,9 +570,7 @@ const PaymentInstrumentDetailView = ({ accountId }: Props) => {
                 <Button variant='tonal' color='secondary' onClick={() => void loadDetail('refresh')} startIcon={<i className='tabler-refresh' />}>
                   Actualizar
                 </Button>
-                <Button component={Link} href='/admin/payment-instruments' variant='outlined' color='secondary' startIcon={<i className='tabler-arrow-left' />}>
-                  Volver
-                </Button>
+                <Button component={Link} href='/admin/payment-instruments' variant='outlined' color='secondary' startIcon={<i className='tabler-arrow-left' />}>{GREENHOUSE_COPY.actions.back}</Button>
               </Stack>
             </Stack>
           </CardContent>
@@ -1189,9 +1187,7 @@ const PaymentInstrumentDetailView = ({ accountId }: Props) => {
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button color='secondary' onClick={() => setRevealField(null)}>
-            Cancelar
-          </Button>
+          <Button color='secondary' onClick={() => setRevealField(null)}>{GREENHOUSE_COPY.actions.cancel}</Button>
           <Button
             variant='contained'
             disabled={revealing || revealReason.trim().length < 12}

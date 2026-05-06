@@ -57,7 +57,6 @@ import {
 } from './paymentInstrumentAdminAdapters'
 
 const GREENHOUSE_COPY = getMicrocopy()
-
 const columnHelper = createColumnHelper<PaymentInstrumentListItem>()
 
 const readinessTone: Record<ReadinessStatus, { label: string; color: 'success' | 'warning' | 'error' | 'secondary'; icon: string }> = {
