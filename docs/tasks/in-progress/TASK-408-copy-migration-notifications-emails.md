@@ -28,7 +28,7 @@ Derivada de `TASK-265`. Ejecuta la migración de copy shared en dos superficies 
 
 Las notificaciones y emails son superficies externas de alto impacto:
 
-- `src/config/notification-categories.ts` define 12 categorías con labels + descriptions inline en español. Cualquier cambio de copy aquí se propaga a UI de preferencias, correos de digest y notificaciones in-app.
+- `src/config/notification-categories.ts` define 13 categorías con labels + descriptions inline en español. Cualquier cambio de copy aquí se propaga a UI de preferencias, correos de digest y notificaciones in-app.
 - Los emails son la superficie externa más visible: llegan a personas fuera del portal (clientes, stakeholders, colaboradores). Un error de migración aquí es más caro que en el shell.
 - **13 de 17 templates** implementan patrones bilingües ad-hoc (verificado 2026-05-06: cascade `locale === 'en' ? '...' : '...'` inline). El componente compartido `EmailLayout.tsx` también tiene strings institucionales bilingües inline (footer, unsubscribe link). Ningún template consume `getMicrocopy` o `@/lib/copy` hoy — los emails son una isla desconectada del contrato canónico.
 - Mezclar esto con `TASK-407` habría generado un PR gigante mezclando refactor puro UI con delivery externo.
@@ -112,11 +112,11 @@ Reglas obligatorias:
 
 ### Slice 0 (BLOQUEANTE) — Foundation: namespace `emails` + locale resolver + snapshot baseline
 
-**Razón**: el sweep no puede iniciar sin (a) un namespace canónico donde aterrice el copy institucional de emails, (b) un helper para resolver `locale` al render time que TASK-266 pueda consumir sin refactor adicional, y (c) snapshot tests baseline para los 15 templates sin cobertura — sin éstos, "diff cero" es manualmente inverificable y la regresión silenciosa es inevitable.
+**Razón**: el sweep no puede iniciar sin (a) un namespace canónico donde aterrice el copy institucional de emails, (b) un helper para resolver `locale` al render time que TASK-266 pueda consumir sin refactor adicional, y (c) snapshot tests baseline para los 17 templates reales — sin éstos, "diff cero" es manualmente inverificable y la regresión silenciosa es inevitable.
 
 - **0.a** — Crear namespace `emails` en [src/lib/copy/dictionaries/es-CL/emails.ts](../../src/lib/copy/dictionaries/es-CL/emails.ts) con sub-claves: `subjects`, `previewTexts`, `footer` (institucional + disclaimer + unsubscribe label), `ctas` (genéricos como "Ver en Greenhouse", "Abrir Greenhouse", "Ver propuesta"), `greetings` ("Hola %{name}"), `signoff`. Extender [src/lib/copy/types.ts](../../src/lib/copy/types.ts) con la union nueva. Stub `en-US` mirror de `es-CL` (TASK-266 lo traduce sin tocar consumers).
 - **0.b** — Helper canónico `resolveEmailLocale({ recipientUserId?, tenantId?, override? })` en [src/lib/email/locale-resolver.ts](../../src/lib/email/locale-resolver.ts). Resolución cascada: `override` → `users.locale` (PG, lookup por `recipientUserId`) → `tenants.default_locale` (PG) → `'es-CL'` fallback. Server-only, idempotente, con TTL cache 60s in-process. **La implementación queda con stub `'es-CL'` siempre** hasta que TASK-266 active el lookup PG-backed — el contrato queda declarado para que consumers no se reescriban.
-- **0.c** — Vitest snapshot tests baseline para los **15 templates sin cobertura** (`InvitationEmail`, `LeaveRequestDecisionEmail`, `LeaveRequestPendingReviewEmail`, `LeaveRequestSubmittedEmail`, `LeaveReviewConfirmationEmail`, `MagicLinkEmail`, `NotificationEmail`, `PasswordResetEmail`, `PayrollLiquidacionV2Email`, `PayrollPaymentCancelledEmail`, `PayrollPaymentCommittedEmail`, `QuoteSharePromptEmail`, `VerifyEmail`, `WeeklyExecutiveDigestEmail`, `BeneficiaryPaymentProfileChangedEmail`). Cada test: render con fixture de props canónica + `expect(html).toMatchSnapshot()` + `expect(subject).toMatchSnapshot()`. Total: 15 archivos `*.test.tsx` nuevos. Patrón heredado de [PayrollExportReadyEmail.test.tsx](../../src/emails/PayrollExportReadyEmail.test.tsx) y [PayrollReceiptEmail.test.tsx](../../src/emails/PayrollReceiptEmail.test.tsx).
+- **0.c** — Vitest snapshot tests baseline para los **17 templates reales** (`InvitationEmail`, `LeaveRequestDecisionEmail`, `LeaveRequestPendingReviewEmail`, `LeaveRequestSubmittedEmail`, `LeaveReviewConfirmationEmail`, `MagicLinkEmail`, `NotificationEmail`, `PasswordResetEmail`, `PayrollExportReadyEmail`, `PayrollReceiptEmail`, `PayrollLiquidacionV2Email`, `PayrollPaymentCancelledEmail`, `PayrollPaymentCommittedEmail`, `QuoteSharePromptEmail`, `VerifyEmail`, `WeeklyExecutiveDigestEmail`, `BeneficiaryPaymentProfileChangedEmail`). Cada test: render con fixture de props canónica + `expect(html).toMatchSnapshot()` + assertions de tokens de personalizacion. Patrón heredado de [PayrollExportReadyEmail.test.tsx](../../src/emails/PayrollExportReadyEmail.test.tsx) y [PayrollReceiptEmail.test.tsx](../../src/emails/PayrollReceiptEmail.test.tsx).
 
 **Verificación Slice 0**: `pnpm test src/emails` pasa con 17 snapshots verdes ANTES de que cualquier slice de migración mergee. Cualquier slice posterior que cambie un byte de output rompe el snapshot — el operador re-aprueba con `pnpm test -u` solo si el cambio es intencional (debe documentarse en PR description).
 
@@ -124,10 +124,12 @@ Reglas obligatorias:
 
 ### Slice 1 — Notification categories
 
-- Migrar las 12 categorías de `notification-categories.ts` a `getMicrocopy().emails.notificationCategories.<code>.{label,description}` o equivalente.
+- Migrar las categorías de `notification-categories.ts` a `getMicrocopy().emails.notificationCategories.<code>.{label,description}` o equivalente.
 - **Subjects canónicos por categoría**: extender el shape de `NotificationCategoryConfig` con `subjectKey: string` opcional que apunta a `getMicrocopy().emails.subjects.<key>`. **Decisión declarada (resuelve open question 1)**: los subjects de emails transactionales viven junto al `code` de la categoría/evento porque atan subject al evento canónico — i18n future-proof, single source of truth, alineado con `GREENHOUSE_EVENT_CATALOG_V1.md` donde cada evento outbox tiene metadata canónica.
-- Labels/descriptions consumen dictionary-ready; el resto del shape (code, channels, audience, priority, subjectKey) queda en TS.
+- Labels/descriptions consumen dictionary-ready; el resto del shape (code, channels, audience, priority) queda en TS.
 - Validar que admin-notifications UI, preferencias y digest usan los labels migrados sin cambios visuales (snapshot test del componente Vitest cubre).
+
+**Estado 2026-05-06**: Slice 1 entregado como mejora incremental segura. Runtime real tenia 13 categorias, no 12; se migraron las 13. `label` y `description` salen de `getMicrocopy().emails.notificationCategories`, pero `code`, `defaultChannels`, `audience`, `priority`, `icon`, eventos, projections, webhooks, outbox, retry/idempotency y delivery siguen intactos. Se agrego `isNotificationCategoryCode()` para validar accesos dinamicos desde API/preferences. `subjectKey` queda diferido hasta un slice que conecte subjects con un consumer activo; agregar metadata muerta ahora aumentaria drift sin proteger delivery.
 
 ### Slice 2 — Email shell institucional (`EmailLayout` + `EmailButton`)
 
@@ -174,7 +176,7 @@ Anclados al baseline 2026-05-06:
 
 - [x] **Slice 0 mergeado** antes de cualquier sweep: namespace `emails` declarado, helper `resolveEmailLocale` con stub, 15 snapshot tests baseline verdes. Nota: runtime real tiene 17 templates cubiertos en una suite baseline compartida.
 - [x] **17 templates** tienen snapshot test (`pnpm test src/emails` corre 17 con 0 fallos).
-- [ ] **12 categorías** de `notification-categories.ts` consumen `getMicrocopy` para `label` + `description`; cada categoría tiene `subjectKey` cuando aplica.
+- [x] **13 categorías** de `notification-categories.ts` consumen `getMicrocopy` para `label` + `description`; `subjectKey` diferido hasta conectar un consumer activo seguro.
 - [ ] **0 strings bilingües ad-hoc** (`locale === 'en' ? ... : ...`) restantes en `src/emails/` — verificación: `rg "locale\s*===\s*['\"]en['\"]" src/emails/ | wc -l` retorna 0.
 - [ ] **0 imports de `greenhouse-nomenclature.ts`** desde `src/emails/` — verificación: `rg "from\s+['\"]@/config/greenhouse-nomenclature" src/emails/ | wc -l` retorna 0 (invariante preservada).
 - [ ] **Diff de snapshot bytes pre/post migración** = 0 para cada template (cada PR documenta esto en description).
@@ -196,7 +198,7 @@ Anclados al baseline 2026-05-06:
 
 - **PR-by-slice + PR-by-grupo cohesivo**, no mega-PR.
 - **Slice 0**: 1 PR (foundation, sin riesgo runtime — solo agrega tipos, helper stub, y snapshot baseline).
-- **Slice 1**: 1 PR (notification-categories — 12 categorías, scope acotado).
+- **Slice 1**: 1 PR (notification-categories — 13 categorías, scope acotado).
 - **Slice 2**: 1 PR (EmailLayout + EmailButton — alto blast radius porque afecta los 17 templates a la vez; snapshot tests existentes son la red).
 - **Slice 3**: 5 PRs particionados por grupo cohesivo (payroll, leave, auth, finance, digest). Permite revert granular si un grupo regresiona.
 - **Slice 4**: 1 PR (reliability signal — reader + wire).

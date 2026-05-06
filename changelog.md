@@ -4,6 +4,8 @@
 
 - **TASK-408 Slice 0 — foundation segura para emails dictionary-ready.** Se agrega el namespace `emails` en `src/lib/copy`, un resolver server-only de locale email con fallback estable `es-CL`, y baseline de snapshots para los 17 templates reales. Los snapshots incluyen assertions de tokens de personalizacion para preservar nombres, cliente, montos, periodos, links y unsubscribe antes de migrar copy institucional.
 
+- **TASK-408 Slice 1 — categorías de notificación dictionary-ready sin tocar delivery.** Las 13 categorías reales de `src/config/notification-categories.ts` ahora toman `label` y `description` desde `getMicrocopy().emails.notificationCategories`, manteniendo intactos `code`, canales, audiencia, prioridad, iconos, `NotificationService`, webhooks, projections, outbox y envío de emails. Se agrega test de contrato de categorías y test del endpoint de preferencias para ignorar categorías desconocidas de forma segura.
+
 - **Hardening de verificacion HR/UI.** El test de HR Hierarchy para delegacion temporal deja de depender de `userEvent` async para abrir un dialog simple, y `EmptyState` cancela el fetch de Lottie al desmontar para evitar rechazos tardios durante teardown de jsdom o unmounts reales.
 
 - **TASK-407 completa — migración shared copy sin cambio funcional.** El gate `greenhouse/no-untokenized-copy` ahora detecta arrays de meses y CTAs JSX text, `src/lib/copy/` expone `buildStatusMap()` type-safe, y las superficies compartidas migran meses, status maps, CTAs base, aria-labels, empty states y secondary props fuera de literals inline. El contador del gate queda en 0 warnings y 0 disables; `TASK-408` puede promover la regla a `error`.

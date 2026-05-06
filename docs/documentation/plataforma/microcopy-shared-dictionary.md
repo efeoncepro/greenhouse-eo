@@ -19,6 +19,7 @@ El objetivo no es traducir todo el portal todavia. El objetivo es evitar drift: 
 - `src/lib/copy/` quedo como fuente canonica de microcopy funcional shared.
 - `getMicrocopy(locale?)` es la API publica para leer acciones, estados, loading, empty states, meses, aria-labels, errores, feedback y tiempo relativo.
 - TASK-408 Slice 0 agrego `emails` como namespace para copy institucional de emails. No reemplaza los tokens de personalizacion; los subject builders reciben valores como periodo, monto o cliente desde el caller.
+- TASK-408 Slice 1 agrego `emails.notificationCategories` para labels y descripciones de las 13 categorias reales de notificaciones. El catalogo operativo sigue en `src/config/notification-categories.ts`: ahi viven `code`, canales por defecto, audiencia, prioridad e icono.
 - `buildStatusMap()` permite construir status maps type-safe sin repetir labels inline.
 - La regla ESLint `greenhouse/no-untokenized-copy` se extendio para detectar arrays de meses y CTAs JSX text, ademas de los patrones ya existentes.
 - El sweep de `src/views`, `src/components` y `src/app` quedo en 0 warnings para `greenhouse/no-untokenized-copy`.
@@ -31,6 +32,7 @@ El objetivo no es traducir todo el portal todavia. El objetivo es evitar drift: 
 | Nomenclatura de producto | `src/config/greenhouse-nomenclature.ts` | Pulse, Spaces, Mi Greenhouse, Torre de control |
 | Microcopy funcional shared | `src/lib/copy/` | Guardar, Cancelar, Pendiente, Sin resultados, Cerrar dialogo |
 | Copy institucional de emails | `src/lib/copy/dictionaries/es-CL/emails.ts` | Footer, disclaimers y builders de subject que reciben tokens |
+| Copy visible de categorias de notificacion | `src/lib/copy/dictionaries/es-CL/emails.ts` | Labels/descriptions de preferencias y centro de notificaciones |
 | Copy de dominio local | Cerca del dominio | Estado legal especifico de Payroll o Finance |
 
 ## Uso basico
@@ -115,3 +117,9 @@ TASK-408 Slice 0 agrego validacion focal adicional:
 - Snapshot baseline de los 17 templates en `src/emails/EmailTemplateBaseline.test.tsx`.
 - Assertions de tokens personalizados para nombre, cliente, montos, periodos, links y unsubscribe.
 - Test unitario de `src/lib/email/locale-resolver.ts`.
+
+TASK-408 Slice 1 agrega:
+
+- `src/config/notification-categories.test.ts` para proteger las 13 categorias, copy dictionary-backed y metadata runtime intacta.
+- `src/app/api/notifications/preferences/route.test.ts` para validar que preferencias lee el catalogo real y que categorias desconocidas se ignoran sin writes.
+- Focal sobre `NotificationService`, projection reactiva, webhook dispatch y snapshots de emails para confirmar que eventos y delivery no cambiaron.

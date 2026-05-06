@@ -126,6 +126,8 @@ export type {
   MicrocopyDictionary,
   MicrocopyNamespace,
   MonthsCopy,
+  NotificationCategoryCopy,
+  NotificationCategoryCopyCode,
   StatesCopy,
   TimeCopy
 } from './types'

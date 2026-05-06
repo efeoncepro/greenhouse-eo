@@ -373,6 +373,18 @@ Reglas canonicas para emails:
 - Los callers siguen mandando contexto de negocio (`fullName`, `periodLabel`, `netTotal`, `clientName`, `shareUrl`, etc.). Durante la migracion, los snapshots deben probar que esos tokens siguen presentes.
 - `resolveEmailLocale()` normaliza `es|en|es-CL|en-US` sin cambiar el contrato actual de templates (`locale?: 'es' | 'en'`).
 
+### Delta 2026-05-06 — TASK-408 Slice 1 notification categories
+
+`src/config/notification-categories.ts` mantiene ownership del contrato operativo de notificaciones: `code`, `defaultChannels`, `audience`, `priority` e `icon`. Desde Slice 1, el copy visible (`label`, `description`) vive en `getMicrocopy().emails.notificationCategories`.
+
+Reglas canonicas:
+
+- No cambiar `code` para migraciones de copy. Los codes conectan preferencias, dispatch, logs, projections, webhooks y consumidores downstream.
+- No tocar `NotificationService`, outbox, event types, retries, webhooks ni `sendEmail` para migrar labels/descriptions.
+- Toda categoria nueva debe agregar entrada en `EmailsCopy.notificationCategories`; `src/config/notification-categories.test.ts` valida paridad y metadata estable.
+- Los accesos dinamicos deben pasar por `isNotificationCategoryCode()` antes de indexar el catalogo.
+- `subjectKey` solo debe agregarse cuando exista un consumer activo y testeado. Metadata muerta en el catalogo introduce drift y no protege delivery.
+
 ### Coordinación con i18n (TASK-266)
 
 `src/lib/copy/` está locale-aware desde día uno (`Locale = 'es-CL' | 'en-US'`). Cuando TASK-266 / TASK-430 active i18n real:

@@ -292,6 +292,29 @@ export interface TimeCopy {
   tomorrow: string
 }
 
+export type NotificationCategoryCopyCode =
+  | 'delivery_update'
+  | 'sprint_milestone'
+  | 'feedback_requested'
+  | 'report_ready'
+  | 'leave_status'
+  | 'leave_review'
+  | 'payroll_ready'
+  | 'assignment_change'
+  | 'ico_alert'
+  | 'capacity_warning'
+  | 'payroll_ops'
+  | 'finance_alert'
+  | 'system_event'
+
+export type NotificationCategoryCopy = Record<
+  NotificationCategoryCopyCode,
+  {
+    label: string
+    description: string
+  }
+>
+
 /**
  * Copy institucional compartido por emails y notificaciones externas.
  * TASK-408 lo introduce como namespace foundation antes de migrar templates:
@@ -308,6 +331,7 @@ export interface EmailsCopy {
     brandSignature: string
     linkLabel: string
   }
+  notificationCategories: NotificationCategoryCopy
   subjects: {
     passwordReset: string
     magicLink: (minutes: number) => string

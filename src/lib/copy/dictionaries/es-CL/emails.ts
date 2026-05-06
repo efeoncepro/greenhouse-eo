@@ -11,6 +11,60 @@ export const emails: EmailsCopy = {
     brandSignature: '— Greenhouse by Efeonce Group',
     linkLabel: 'Enlace'
   },
+  notificationCategories: {
+    delivery_update: {
+      label: 'Delivery updates',
+      description: 'Asset aprobado, entregado o con cambios solicitados'
+    },
+    sprint_milestone: {
+      label: 'Hitos de ciclo',
+      description: 'Inicio, cierre y alertas de ciclos de producción'
+    },
+    feedback_requested: {
+      label: 'Feedback solicitado',
+      description: 'Se necesita tu revisión o aprobación'
+    },
+    report_ready: {
+      label: 'Reporte disponible',
+      description: 'Tu reporte programado está listo para descargar'
+    },
+    leave_status: {
+      label: 'Permisos',
+      description: 'Solicitud de permiso aprobada o rechazada'
+    },
+    leave_review: {
+      label: 'Revisión de permisos',
+      description: 'Solicitudes pendientes de revisión por supervisor o HR'
+    },
+    payroll_ready: {
+      label: 'Liquidación disponible',
+      description: 'Tu liquidación del período está lista para revisión'
+    },
+    assignment_change: {
+      label: 'Asignaciones',
+      description: 'Nueva asignación o cambio de proyecto'
+    },
+    ico_alert: {
+      label: 'Alertas ICO',
+      description: 'Métrica ICO cruzó umbral de semáforo'
+    },
+    capacity_warning: {
+      label: 'Capacidad del equipo',
+      description: 'Utilización sobre 90% o riesgo de sobreasignación'
+    },
+    payroll_ops: {
+      label: 'Operación de nómina',
+      description: 'Hitos operativos de cálculo y revisión del período oficial'
+    },
+    finance_alert: {
+      label: 'Alertas financieras',
+      description: 'Pagos registrados, gastos significativos y cierre de período'
+    },
+    system_event: {
+      label: 'Eventos del sistema',
+      description: 'Nuevo usuario, sync fallido, cambio de configuración'
+    }
+  },
   subjects: {
     passwordReset: 'Restablece tu contraseña — Greenhouse',
     magicLink: minutes => `Acceso a Greenhouse — enlace válido ${minutes} min`,

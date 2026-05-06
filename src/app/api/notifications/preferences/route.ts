@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 
 import { requireTenantContext } from '@/lib/tenant/authorization'
 import { NotificationService } from '@/lib/notifications/notification-service'
-import { NOTIFICATION_CATEGORIES } from '@/config/notification-categories'
+import { isNotificationCategoryCode, NOTIFICATION_CATEGORIES } from '@/config/notification-categories'
 import { ensureNotificationSchema } from '@/lib/notifications/schema'
 
 export const dynamic = 'force-dynamic'
@@ -61,7 +61,7 @@ export async function PUT(request: Request) {
     }
 
     for (const pref of updates) {
-      if (!pref.category || !NOTIFICATION_CATEGORIES[pref.category]) continue
+      if (!isNotificationCategoryCode(pref.category)) continue
 
       await NotificationService.upsertPreference(
         tenant.userId,
