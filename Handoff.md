@@ -1,3 +1,37 @@
+# Sesion 2026-05-06 — TASK-813 cerrada en develop (HubSpot p_services inbound sync + legacy cleanup)
+
+- **Branch:** `develop` por instruccion explicita del usuario.
+- **Skills invocadas:** `arch-architect` (overlay Greenhouse) + `greenhouse-backend`. Fases 1-6 ejecutadas con audit corregido tras feedback de Codex.
+- **Audit pre-implementacion**: detecté 2 errores criticos vs spec original
+  1. Mi audit inicial reporto 3 huerfanos (Loyal/Motogas/Aguas Andinas) — error: solo consulte `core.organizations` + `crm.companies`. Realidad: solo Loyal es huerfano real. Aguas Andinas + Motogas son clients con space faltante (fix automatizable, no queue manual).
+  2. Spec asumia `p_services` URLs en HubSpot API — realidad: HubSpot espera `0-162` objectTypeId. Bridge Cloud Run tiene bug en 3 callsites pero NO esta en scope reparar el bridge ahora.
+- **Mitigacion**: helper directo `src/lib/hubspot/list-services-for-company.ts` (bypass del bridge) usa `HUBSPOT_ACCESS_TOKEN` env o secret `gcp:hubspot-access-token`. Bridge fix queda como follow-up task (3 substituciones triviales). Mantiene blast radius local.
+- **Open Questions resueltas pre-implementacion**:
+  - Q1 (huerfanos reales o errores HubSpot) → no asumir, queue manual via reliability signal.
+  - Q2 (module_id NULL) → patron `hubspot_sync_status='unmapped'` (no inventar default), downstream filtra por flag.
+  - Q3 (orgs mapeo) → 5 directos + 2 sin space + 1 huerfano real (corregido tras audit live).
+  - Q4 (TASK-806 orden) → no bloqueante.
+- **Bug fix critico** en `service-sync.ts:resolveOrgIdForClient`: query SQL referenciaba `clients.organization_id` (columna inexistente) y pg lo resolvía al outer scope retornando primera organization arbitraria de la tabla (EASY RETAIL). Fix: joinear via `hubspot_company_id` compartido.
+- **Slices entregados (en `develop`)**:
+  - **Slice 1**: registry `moduleKey: 'commercial'` agregado a `ReliabilityModuleKey` + 3 readers nuevos (`services-sync-lag`, `services-organization-unresolved`, `services-legacy-residual-reads`) + wire-up en `getReliabilityOverview`. Title hints + priority en incident-mapping.
+  - **Slice 2**: `archive-legacy-seed.ts` idempotente. Archivó las 30 filas con `engagement_kind='discovery'` + `status='legacy_seed_archived'` + 30 outbox events v1. Re-run reporta 0 candidatos (idempotencia OK).
+  - **Slice 3**: `backfill-from-hubspot.ts` via HubSpot direct API. Materializó 4 services HubSpot 0-162 (Aguas Andinas, ANAM, Motogas, Sky Airline) con `hubspot_sync_status='unmapped'`. Auto-creó 2 spaces (Aguas Andinas + Motogas con `numeric_code` 12 y 13). Otros 7 clients tienen 0 services en HubSpot.
+  - **Slice 4**: webhook handler `hubspot-services.ts` con signature v3 + INSERT en `webhook_endpoints` (`endpoint_key='hubspot-services'`, `auth_mode='provider_native'`, `secret_ref='HUBSPOT_APP_CLIENT_SECRET'`).
+  - **Slice 6**: ya cubierto en Slice 1.
+  - **Slice 8**: docs CLAUDE.md sección p_services webhook + EVENT_CATALOG Delta + 3 outbox events v1 documentados.
+- **Slices diferidos**:
+  - **Slice 5** (Cloud Scheduler cron safety-net) — requiere deploy ops-worker, follow-up task.
+  - **Slice 7** (UI admin manual queue) — depende de TASK-555 (commercial routeGroup), follow-up task.
+- **Hallazgo HubSpot-side (no es bug del codigo)**: asociaciones HubSpot company→service estan cruzadas para Aguas Andinas↔ANAM. Greenhouse refleja fielmente lo que HubSpot dice (regla canonica "HubSpot SoT"). Operador comercial debe corregir asociaciones en HubSpot; el siguiente sync rematerializa con dato correcto.
+- **Verificacion runtime**: `pnpm exec tsc --noEmit` clean, `pnpm lint` clean (pre-push hooks pasaron en cada commit), 14 test files / 123 tests reliability verde.
+- **Commits creados** (4 slices + audit deltas):
+  - `e0ea61ff` Slice 1 — reliability registry + 3 signals
+  - `df96ef4e` Slice 2 — archive legacy seed script
+  - `40202bc0` Slice 3 — HubSpot direct API + backfill + auto-space
+  - `a6b3a9a2` Slice 4 — webhook handler hubspot-services
+- **Outbox events v1 nuevos** (3 documentados en EVENT_CATALOG): `commercial.service_engagement.materialized`, `commercial.service_engagement.archived_legacy_seed`, `commercial.space.auto_created`.
+- **Reliability signals nuevos** (3, subsystem `commercial`): sync_lag (lag/warning), organization_unresolved (drift/error >7d), legacy_residual_reads (drift/error). Todos steady state = 0 esperado.
+
 # Sesion 2026-05-06 — TASK-801 cerrada en develop (engagement primitive Slice 1)
 
 - **Branch:** `develop` por instruccion explicita del usuario; no se crea `task/TASK-801-engagement-primitive-services-extension`.
