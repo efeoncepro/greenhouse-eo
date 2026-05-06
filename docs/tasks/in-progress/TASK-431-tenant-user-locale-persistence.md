@@ -6,16 +6,16 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
-- Status real: `Diseno`
+- Status real: `En implementacion`
 - Rank: `TBD`
 - Domain: `identity`
 - Blocked by: `none` — `TASK-428` publico la detection hierarchy y `TASK-430` activo el runtime `next-intl`.
-- Branch: `task/TASK-431-tenant-user-locale-persistence`
+- Branch: `develop` — por instruccion explicita del usuario; no crear/cambiar a branch task.
 - Legacy ID: —
 - GitHub Issue: —
 - Parent: `TASK-266` (umbrella)

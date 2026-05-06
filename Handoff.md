@@ -1,3 +1,10 @@
+# Sesion 2026-05-06 — TASK-431 tomada en develop
+
+- **Branch:** `develop` por instruccion explicita del usuario; no se crea `task/TASK-431-tenant-user-locale-persistence`.
+- **Ownership:** no habia PR abierto ni branch local/remota obvia para `TASK-431`; se toma la task y se mueve a `docs/tasks/in-progress/`.
+- **Scope esperado:** persistencia canonica de locale user/tenant sobre Identity V2 + runtime `next-intl`: `identity_profiles.preferred_locale` -> tenant/account default -> cookie `gh_locale` -> `Accept-Language` -> `es-CL`.
+- **Guardrail inicial:** no tocar access model como permisos; locale es presentacion. Si hay UI admin, debe reutilizar guards existentes (`requireAdminTenantContext`) y documentar que `routeGroups`, `views`, `entitlements` y startup policy no cambian salvo capability explicita existente.
+
 # Sesion 2026-05-06 — TASK-430 cerrada en develop
 
 - **Branch:** `develop` por instruccion explicita del usuario; no se crea `task/TASK-430-dictionary-foundation-activation`.
