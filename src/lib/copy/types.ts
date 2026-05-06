@@ -498,6 +498,34 @@ export interface PayrollLiquidacionV2EmailTemplateCopy {
   automatedFooterPrefix: string
 }
 
+export interface WeeklyExecutiveDigestEmailTemplateCopy {
+  subject: string
+  previewText: (periodLabel: string, totalInsights: number, spacesAffected: number) => string
+  kickerPrefix: string
+  heading: string
+  intro: string
+  includedInsightsLabel: string
+  severityDistributionLabel: string
+  affectedSpacesLabel: string
+  severitySummary: (criticalCount: number, warningCount: number, infoCount: number) => string
+  severityLabels: {
+    critical: string
+    warning: string
+    info: string
+  }
+  spaceLabel: string
+  insightsUnit: (count: number) => string
+  emptySpaceInsights: string
+  rootCauseLabel: string
+  defaultInsightAction: string
+  emptyHeading: string
+  emptyBody: string
+  cta: string
+  closingLink: string
+  defaultClosingNote: string
+  plainTextOpenPortal: string
+}
+
 /**
  * Copy institucional compartido por emails y notificaciones externas.
  * TASK-408 lo introduce como namespace foundation antes de migrar templates:
@@ -533,6 +561,7 @@ export interface EmailsCopy {
     paymentCancelled: PayrollPaymentCancelledEmailTemplateCopy
     liquidacionV2: PayrollLiquidacionV2EmailTemplateCopy
   }
+  weeklyExecutiveDigest: WeeklyExecutiveDigestEmailTemplateCopy
   notificationCategories: NotificationCategoryCopy
   subjects: {
     passwordReset: string

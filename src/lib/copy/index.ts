@@ -143,7 +143,8 @@ export type {
   PayrollReceiptEmailTemplateCopy,
   StatesCopy,
   TimeCopy,
-  VerifyEmailTemplateCopy
+  VerifyEmailTemplateCopy,
+  WeeklyExecutiveDigestEmailTemplateCopy
 } from './types'
 
 export { DEFAULT_LOCALE, SUPPORTED_LOCALES } from './types'

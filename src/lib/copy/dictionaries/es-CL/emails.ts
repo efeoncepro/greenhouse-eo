@@ -212,6 +212,33 @@ export const emails: EmailsCopy = {
       automatedFooterPrefix: 'Greenhouse by Efeonce Group SpA · Este es un correo automático enviado desde '
     }
   },
+  weeklyExecutiveDigest: {
+    subject: 'Resumen semanal — Nexa Insights',
+    previewText: (periodLabel, totalInsights, spacesAffected) => `${periodLabel} · ${totalInsights} insights · ${spacesAffected} espacios`,
+    kickerPrefix: 'NEXA INSIGHTS · ',
+    heading: 'Resumen semanal para liderazgo',
+    intro: 'Lo más relevante de la semana, ordenado por impacto y listo para lectura rápida.',
+    includedInsightsLabel: 'Insights incluidos',
+    severityDistributionLabel: 'Distribución por severidad',
+    affectedSpacesLabel: 'Espacios afectados',
+    severitySummary: (criticalCount, warningCount, infoCount) => `${criticalCount} críticos · ${warningCount} en seguimiento · ${infoCount} informativos`,
+    severityLabels: {
+      critical: 'Crítico',
+      warning: 'Seguimiento',
+      info: 'Informativo'
+    },
+    spaceLabel: 'Espacio',
+    insightsUnit: count => count === 1 ? 'insight' : 'insights',
+    emptySpaceInsights: 'No hubo insights materializados para este espacio en el período.',
+    rootCauseLabel: 'Causa probable',
+    defaultInsightAction: 'Abrir detalle',
+    emptyHeading: 'Sin insights para mostrar',
+    emptyBody: 'No se materializaron insights en este período. Cuando haya novedades, aparecerán aquí con enlaces directos al portal.',
+    cta: 'Abrir Greenhouse',
+    closingLink: 'Ver en Greenhouse',
+    defaultClosingNote: 'Resumen automático basado en los insights materializados del período. Abre Greenhouse para ver el detalle completo.',
+    plainTextOpenPortal: 'Abre el portal para ver el detalle completo.'
+  },
   notificationCategories: {
     delivery_update: {
       label: 'Delivery updates',
@@ -282,7 +309,7 @@ export const emails: EmailsCopy = {
       superseded: 'Tu cuenta de pago fue reemplazada',
       cancelled: 'Tu solicitud de cambio fue cancelada'
     },
-    weeklyExecutiveDigest: periodLabel => `Digest ejecutivo — ${periodLabel}`,
+    weeklyExecutiveDigest: () => 'Resumen semanal — Nexa Insights',
     leaveRequestDecision: leaveTypeName => `Actualización de permiso — ${leaveTypeName}`,
     leaveReviewConfirmation: leaveTypeName => `Revisión registrada — ${leaveTypeName}`,
     leaveRequestSubmitted: leaveTypeName => `Solicitud de permiso enviada — ${leaveTypeName}`,

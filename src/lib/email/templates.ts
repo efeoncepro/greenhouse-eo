@@ -18,6 +18,7 @@ import BeneficiaryPaymentProfileChangedEmail, {
 } from '@/emails/BeneficiaryPaymentProfileChangedEmail'
 import QuoteSharePromptEmail from '@/emails/QuoteSharePromptEmail'
 import WeeklyExecutiveDigestEmail from '@/emails/WeeklyExecutiveDigestEmail'
+import { getMicrocopy } from '@/lib/copy'
 import VerifyEmail from '@/emails/VerifyEmail'
 import type { WeeklyDigestEmailContext } from '@/lib/nexa/digest'
 
@@ -831,9 +832,11 @@ registerTemplate('leave_request_pending_review', (context: {
 
 registerTemplate('weekly_executive_digest', (context: WeeklyDigestEmailContext) => {
   const previewPeriodLabel = context.periodLabel || 'Semana del 8 al 14 de abril de 2026'
+  const t = getMicrocopy().emails.weeklyExecutiveDigest
+  const subject = t.subject
 
   return {
-    subject: 'Resumen semanal — Nexa Insights',
+    subject,
     react: WeeklyExecutiveDigestEmail({
       periodLabel: previewPeriodLabel,
       totalInsights: context.totalInsights,
@@ -847,11 +850,11 @@ registerTemplate('weekly_executive_digest', (context: WeeklyDigestEmailContext) 
       unsubscribeUrl: context.unsubscribeUrl
     }),
     text: [
-      'Resumen semanal — Nexa Insights',
+      subject,
       '',
       `Período: ${previewPeriodLabel}`,
       '',
-      'Abre el portal para ver el detalle completo.'
+      t.plainTextOpenPortal
     ].join('\n')
   }
 })

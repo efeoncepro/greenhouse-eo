@@ -18,6 +18,8 @@
 
 - **TASK-408 Slice 3E — payroll employee-facing migrado sin tocar delivery.** `PayrollReceiptEmail`, `PayrollPaymentCommittedEmail`, `PayrollPaymentCancelledEmail` y `PayrollLiquidacionV2Email` consumen `getMicrocopy().emails.payroll.*` para copy estatico, preservando tokens de personalizacion, montos, periodos, fechas, links, adjuntos PDF, lifecycle de pago, outbox, webhooks y eventos reactivos. Los snapshots de los 17 templates siguen byte-estables.
 
+- **TASK-408 Slice 3F — Nexa Insights digest migrado con frontera de contenido.** `WeeklyExecutiveDigestEmail` consume `getMicrocopy().emails.weeklyExecutiveDigest` para copy estructural reusable y subject/plain text. Headlines, narrativas, root causes, spaces, links y action labels siguen viniendo de la lane materializada de Nexa, sin tocar ops-worker, delivery, outbox ni eventos.
+
 - **Hardening de verificacion HR/UI.** El test de HR Hierarchy para delegacion temporal deja de depender de `userEvent` async para abrir un dialog simple, y `EmptyState` cancela el fetch de Lottie al desmontar para evitar rechazos tardios durante teardown de jsdom o unmounts reales.
 
 - **TASK-407 completa — migración shared copy sin cambio funcional.** El gate `greenhouse/no-untokenized-copy` ahora detecta arrays de meses y CTAs JSX text, `src/lib/copy/` expone `buildStatusMap()` type-safe, y las superficies compartidas migran meses, status maps, CTAs base, aria-labels, empty states y secondary props fuera de literals inline. El contador del gate queda en 0 warnings y 0 disables; `TASK-408` puede promover la regla a `error`.

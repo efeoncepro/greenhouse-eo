@@ -159,6 +159,8 @@ Reglas obligatorias:
 
 **Estado 2026-05-06**: Slice 3E migra la cohorte payroll employee-facing (`PayrollReceiptEmail`, `PayrollPaymentCommittedEmail`, `PayrollPaymentCancelledEmail`, `PayrollLiquidacionV2Email`) a `getMicrocopy().emails.payroll.*`. La migracion separa copy estatico de tokens runtime para conservar la serializacion HTML de React Email: nombres, periodos, montos, fechas, procesador, motivo de cancelacion, links y adjuntos PDF siguen viniendo de props/callers. Snapshot baseline sigue byte-estable; no se tocaron `sendEmail`, subjects, payment lifecycle, attachment delivery, outbox, webhooks, projections ni eventos reactivos.
 
+**Estado 2026-05-06**: Slice 3F migra `WeeklyExecutiveDigestEmail` (Nexa Insights) de forma deliberadamente limitada: solo copy estructural reusable (`subject`, labels, headings, severity labels, empty states, CTA, plain text) vive en `getMicrocopy().emails.weeklyExecutiveDigest`. El contenido propio de Nexa (`headline`, `narrative`, `rootCauseNarrative`, `space.name`, `href`, `actionLabel`, `closingNote` caller-provided) sigue siendo runtime/materializado y no se dictionary-fica. Snapshot baseline sigue byte-estable; no se tocaron `src/lib/nexa/digest`, ops-worker, delivery, outbox, webhooks, projections ni eventos reactivos.
+
 ### Slice 4 — Reliability signal `notifications.email.render_failure_rate`
 
 - Reader: [src/lib/reliability/queries/email-render-failure.ts](../../src/lib/reliability/queries/email-render-failure.ts). Cuenta failures de render del outbox consumer en últimas 24h sobre `greenhouse_sync.outbox_events WHERE event_type LIKE 'notification.email.%' AND status='failed' AND last_error LIKE '%render%'`.

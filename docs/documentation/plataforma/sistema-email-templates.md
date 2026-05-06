@@ -189,6 +189,18 @@ La frontera de personalizacion se mantiene igual:
 
 Este slice no cambia `sendEmail`, Resend, `email_deliveries`, subjects, payment orders, outbox, webhooks, projections ni eventos reactivos de Payroll. Solo cambia la fuente de copy renderizado.
 
+## TASK-408 Slice 3F: Nexa Insights digest
+
+`WeeklyExecutiveDigestEmail` toma copy estructural desde `getMicrocopy().emails.weeklyExecutiveDigest`.
+
+Por el tipo de contenido de Nexa Insights, la migracion es intencionalmente limitada:
+
+- El dictionary contiene subject, encabezados, labels de resumen, labels de severidad, empty states, CTA, link de cierre y texto plain.
+- `headline`, `narrative`, `rootCauseNarrative`, `space.name`, `space.href`, `actionLabel`, `actionUrl` y `closingNote` enviado por el caller siguen viniendo de `src/lib/nexa/digest` y de la lane materializada.
+- El snapshot HTML se mantiene byte-estable; cualquier cambio visible en un digest Nexa debe tratarse como decision de producto, no como side effect de i18n.
+
+Este slice no cambia ops-worker, generacion/materializacion de insights, recipients, unsubscribe, `sendEmail`, Resend, `email_deliveries`, outbox, webhooks, projections ni eventos reactivos.
+
 La primitive `selectEmailTemplateCopy()` permite repetir este patron en los siguientes templates sin tocar delivery:
 
 - `es` / `es-CL` / default → dictionary de plataforma.

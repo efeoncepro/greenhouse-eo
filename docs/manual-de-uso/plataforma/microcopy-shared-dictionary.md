@@ -85,6 +85,17 @@ const t = getMicrocopy().emails.payroll.receipt
 
 Ese patron preserva la capa de personalizacion de React Email: `firstName`, `monthName`, `periodYear`, montos, URLs y adjuntos no se guardan como texto fijo dentro del dictionary.
 
+8. En emails de Nexa Insights, migra solo el marco estructural:
+
+```tsx
+const t = getMicrocopy().emails.weeklyExecutiveDigest
+
+<Heading>{t.heading}</Heading>
+<Text>{renderNarrative(insight.narrative)}</Text>
+```
+
+Las narrativas, titulares, root causes, espacios y links de Nexa son contenido materializado. Deben seguir llegando desde `src/lib/nexa/digest` o el caller, no desde `src/lib/copy`.
+
 ## Donde poner un texto nuevo
 
 | Caso | Donde vive |
@@ -101,6 +112,7 @@ Ese patron preserva la capa de personalizacion de React Email: `firstName`, `mon
 - No duplicar `Pendiente`, `Aprobado`, `Rechazado` en mapas locales si existen en `states`.
 - No agregar un namespace shared para una sola pantalla.
 - No meter nombres, montos, periodos, links, motivos o adjuntos de emails dentro del dictionary.
+- No mover narrativas generadas/materializadas de Nexa Insights al dictionary.
 - No importar `src/lib/copy` con `server-only`; debe funcionar en cliente y servidor.
 - No usar `eslint-disable` para evitar migrar un string shared.
 
