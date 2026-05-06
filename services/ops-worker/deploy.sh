@@ -576,6 +576,13 @@ upsert_scheduler_job \
 echo "  -> ops-hubspot-products-sync: 0 8 * * * (HubSpot products sync, TASK-775)"
 
 upsert_scheduler_job \
+  "ops-hubspot-services-sync" \
+  "0 6 * * *" \
+  "/hubspot/services-sync" \
+  '{}'
+echo "  -> ops-hubspot-services-sync: 0 6 * * * (HubSpot p_services 0-162 safety-net, TASK-813)"
+
+upsert_scheduler_job \
   "ops-notion-conformed-recovery" \
   "*/30 * * * *" \
   "/notion-conformed/recovery" \

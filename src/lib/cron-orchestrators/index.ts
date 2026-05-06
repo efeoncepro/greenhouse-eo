@@ -231,6 +231,50 @@ export const runHubspotProductsSync = async (): Promise<Record<string, unknown>>
   return { ...result, durationMs: Date.now() - startMs }
 }
 
+// ─── HubSpot p_services (0-162) safety-net pull (TASK-813 Slice 5) ──────────
+//
+// Cron diario que llama a syncAllOrganizationServices como safety net cuando
+// el webhook hubspot-services pierde events (HubSpot retries exhausted, handler
+// bug). Categoría `prod_only` per TASK-775 — no async-critical porque webhook
+// es path canónico real-time. Schedule: 0 6 * * * America/Santiago.
+export const runHubspotServicesSync = async (): Promise<Record<string, unknown>> => {
+  const readiness = await checkHubspotReadiness('hubspot-services-sync')
+
+  if (!readiness.ready) {
+    return { skipped: true, reason: readiness.reason }
+  }
+
+  const startMs = Date.now()
+  const { syncAllOrganizationServices } = await import('@/lib/services/service-sync')
+
+  const result = await syncAllOrganizationServices({
+    createMissingSpace: false,
+    createdBySource: 'ops-worker:hubspot-services-sync'
+  })
+
+  const totals = result.results.reduce(
+    (acc, r) => {
+      acc.created += r.created
+      acc.updated += r.updated
+      acc.skipped += r.skipped
+      acc.errors += r.errors.length
+
+      return acc
+    },
+    { created: 0, updated: 0, skipped: 0, errors: 0 }
+  )
+
+  console.log(
+    `[hubspot-services-sync] ${result.organizations} clients, ${totals.created} created, ${totals.updated} updated, ${totals.skipped} skipped, ${totals.errors} errors, ${Date.now() - startMs}ms`
+  )
+
+  return {
+    organizations: result.organizations,
+    ...totals,
+    durationMs: Date.now() - startMs
+  }
+}
+
 // ─── ICO member sync (BQ ico_engine.metrics_by_member → PG greenhouse_serving) ─
 
 interface IcoMemberMetricsRow {

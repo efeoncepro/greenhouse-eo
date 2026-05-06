@@ -86,6 +86,7 @@ import {
   runHubspotDealsSync,
   runHubspotProductsSync,
   runHubspotQuotesSync,
+  runHubspotServicesSync,
   runIcoMemberSync,
   runNotionConformedRecovery,
   runReconciliationAutoMatch,
@@ -1364,6 +1365,15 @@ const handleHubspotProductsSync = wrapCronHandler({
   run: async (): Promise<Record<string, unknown>> => runHubspotProductsSync()
 })
 
+// TASK-813 Slice 5 — HubSpot p_services (0-162) safety-net cron diario.
+// Path canónico real-time: webhook hubspot-services. Este cron es fallback
+// cuando webhook pierde events (retries exhausted, handler bug).
+const handleHubspotServicesSync = wrapCronHandler({
+  name: 'hubspot-services-sync',
+  domain: 'integrations.hubspot',
+  run: async (): Promise<Record<string, unknown>> => runHubspotServicesSync()
+})
+
 // ─── /notion-conformed/recovery ─────────────────────────────────────────────
 //
 // TASK-775 Slice 7 — Notion conformed recovery migrado a Cloud Run.
@@ -1875,6 +1885,12 @@ const server = createServer(async (req, res) => {
 
     if (method === 'POST' && path === '/hubspot/deals-sync') {
       await handleHubspotDealsSync(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/hubspot/services-sync') {
+      await handleHubspotServicesSync(req, res)
 
       return
     }

@@ -325,16 +325,18 @@ registerInboundHandler('hubspot-services', async (inboxEvent, rawBody, parsedPay
 
   // If ALL services failed, throw to escalate. If only some failed, log but
   // mark inbox as processed (partial success).
+  //
+  // Cuando TODOS los failures son organization_unresolved, el throw lleva
+  // prefix audit-friendly para que el reliability signal
+  // commercial.service_engagement.organization_unresolved los cuente vía
+  // webhook_inbox_events.error_message LIKE 'organization_unresolved:%'.
   if (failures.length === serviceObjects.length && failures.length > 0) {
-    throw new Error(`All ${failures.length} service syncs failed: ${failures.slice(0, 3).join('; ')}`)
-  }
+    const allUnresolved = failures.every(f => f.startsWith('organization_unresolved:'))
 
-  // Surface organization_unresolved markers in error_message so the
-  // reliability signal can detect them via LIKE pattern. Webhook inbox
-  // marks the row failed when handler throws — we deliberately throw
-  // when *all* services failed; partial failures stay logged in Sentry only.
-  if (failures.some(f => f.startsWith('organization_unresolved:'))) {
-    // Attach unresolved markers as a soft anomaly — log via Sentry only.
-    // No throw because partial success means inbox row is processed OK.
+    if (allUnresolved) {
+      throw new Error(`organization_unresolved:${failures.slice(0, 3).join('; ')}`)
+    }
+
+    throw new Error(`All ${failures.length} service syncs failed: ${failures.slice(0, 3).join('; ')}`)
   }
 })
