@@ -1,8 +1,11 @@
 // Type Imports
 import type { HorizontalMenuDataType } from '@/types/menuTypes'
-import { GH_CLIENT_NAV } from '@/config/greenhouse-nomenclature'
+import { getGreenhouseNavigationCopy } from '@/config/greenhouse-navigation-copy'
 
-const horizontalMenuData = (): HorizontalMenuDataType[] => [
+const horizontalMenuData = (locale?: string | null): HorizontalMenuDataType[] => {
+  const { client: GH_CLIENT_NAV } = getGreenhouseNavigationCopy(locale)
+
+  return [
   {
     label: GH_CLIENT_NAV.dashboard.label,
     href: '/home',
@@ -28,6 +31,7 @@ const horizontalMenuData = (): HorizontalMenuDataType[] => [
     href: '/updates',
     icon: 'tabler-bell'
   }
-]
+  ]
+}
 
 export default horizontalMenuData

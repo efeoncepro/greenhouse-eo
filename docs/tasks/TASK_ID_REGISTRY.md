@@ -479,7 +479,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-408` | `in-progress` | Copy Migration: Notification Categories + Institutional Emails (split de TASK-265) | `docs/tasks/in-progress/TASK-408-copy-migration-notifications-emails.md` |
 | `TASK-428` | `complete` | i18n Architecture Decision (library + routing + locales) — child de TASK-266 | `docs/tasks/complete/TASK-428-i18n-architecture-decision.md` |
 | `TASK-429` | `complete` | Locale-Aware Formatting Utilities — child de TASK-266 | `docs/tasks/complete/TASK-429-locale-aware-formatting-utilities.md` |
-| `TASK-430` | `to-do` | Dictionary Foundation Activation — child de TASK-266 | `docs/tasks/to-do/TASK-430-dictionary-foundation-activation.md` |
+| `TASK-430` | `in-progress` | Dictionary Foundation Activation — child de TASK-266 | `docs/tasks/in-progress/TASK-430-dictionary-foundation-activation.md` |
 | `TASK-431` | `to-do` | Tenant + User Locale Persistence Model — child de TASK-266 | `docs/tasks/to-do/TASK-431-tenant-user-locale-persistence.md` |
 | `TASK-432` | `to-do` | Client Portal Nexa Pulse (Client-Facing Insights) | `docs/tasks/to-do/TASK-432-client-portal-nexa-pulse.md` |
 | `TASK-433` | `to-do` | Payroll Signal Engine | `docs/tasks/to-do/TASK-433-payroll-signal-engine.md` |

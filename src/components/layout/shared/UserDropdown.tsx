@@ -6,6 +6,7 @@ import type { MouseEvent } from 'react'
 import { useRouter } from 'next/navigation'
 
 import { signOut, useSession } from 'next-auth/react'
+import { useLocale } from 'next-intl'
 
 import { styled } from '@mui/material/styles'
 import Avatar from '@mui/material/Avatar'
@@ -21,7 +22,7 @@ import Popper from '@mui/material/Popper'
 import Typography from '@mui/material/Typography'
 
 import { useSettings } from '@core/hooks/useSettings'
-import { GH_CLIENT_NAV, GH_INTERNAL_NAV } from '@/config/greenhouse-nomenclature'
+import { getGreenhouseNavigationCopy } from '@/config/greenhouse-navigation-copy'
 import { GH_MESSAGES } from '@/lib/copy/client-portal'
 
 const BadgeContentSpan = styled('span')({
@@ -39,9 +40,11 @@ const UserDropdown = () => {
   const router = useRouter()
   const { settings } = useSettings()
   const { data: session } = useSession()
+  const locale = useLocale()
   const dashboardHref = session?.user?.portalHomePath || '/home'
   const isInternalUser = session?.user?.routeGroups?.includes('internal') ?? false
   const isAdminUser = session?.user?.routeGroups?.includes('admin') ?? false
+  const { client: GH_CLIENT_NAV, internal: GH_INTERNAL_NAV } = getGreenhouseNavigationCopy(locale)
 
   const avatarSrc =
     session?.user?.avatarUrl && session.user.userId

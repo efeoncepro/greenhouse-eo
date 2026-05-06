@@ -1,4 +1,5 @@
 import type { NextConfig } from 'next'
+import createNextIntlPlugin from 'next-intl/plugin'
 import { withSentryConfig } from '@sentry/nextjs'
 
 const sourcemapsReady =
@@ -19,7 +20,9 @@ const nextConfig: NextConfig = {
   }
 }
 
-export default withSentryConfig(nextConfig, {
+const withNextIntl = createNextIntlPlugin()
+
+export default withSentryConfig(withNextIntl(nextConfig), {
   authToken: process.env.SENTRY_AUTH_TOKEN,
   org: process.env.SENTRY_ORG,
   project: process.env.SENTRY_PROJECT,

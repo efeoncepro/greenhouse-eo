@@ -1,5 +1,7 @@
 import { Geist, Poppins } from 'next/font/google'
 
+import { getLocale } from 'next-intl/server'
+
 import type { Metadata } from 'next'
 
 // MUI Imports
@@ -13,6 +15,9 @@ import type { ChildrenType } from '@core/types'
 
 // Util Imports
 import { getSystemMode } from '@core/utils/serverHelpers'
+import { localeDirections } from '@/i18n/locales'
+
+import type { Locale } from '@/lib/copy'
 
 // Style Imports
 import '@/app/globals.css'
@@ -56,15 +61,14 @@ export const metadata: Metadata = {
 const RootLayout = async (props: ChildrenType) => {
   const { children } = props
 
-  // Type guard to ensure lang is a valid Locale
-
   // Vars
 
   const systemMode = await getSystemMode()
-  const direction = 'ltr'
+  const locale = (await getLocale()) as Locale
+  const direction = localeDirections[locale] ?? 'ltr'
 
   return (
-    <html id='__next' lang='en' dir={direction} suppressHydrationWarning>
+    <html id='__next' lang={locale} dir={direction} suppressHydrationWarning>
       <body className={`${geist.variable} ${poppins.variable} flex is-full min-bs-full flex-auto flex-col`}>
         <InitColorSchemeScript attribute='data' defaultMode={systemMode} />
         {children}

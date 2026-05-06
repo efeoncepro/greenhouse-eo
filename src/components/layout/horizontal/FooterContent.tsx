@@ -3,16 +3,18 @@
 import Link from 'next/link'
 
 import classnames from 'classnames'
+import { useLocale } from 'next-intl'
 
 import useHorizontalNav from '@menu/hooks/useHorizontalNav'
 
 import BrandWordmark from '@/components/greenhouse/BrandWordmark'
 import { horizontalLayoutClasses } from '@layouts/utils/layoutClasses'
-import { GH_CLIENT_NAV } from '@/config/greenhouse-nomenclature'
+import { getGreenhouseNavigationCopy } from '@/config/greenhouse-navigation-copy'
 import { GH_MESSAGES } from '@/lib/copy/client-portal'
 
 const FooterContent = () => {
   const { isBreakpointReached } = useHorizontalNav()
+  const { client: GH_CLIENT_NAV } = getGreenhouseNavigationCopy(useLocale())
 
   return (
     <div className={classnames(horizontalLayoutClasses.footerContent, 'flex items-center justify-between flex-wrap gap-4')}>

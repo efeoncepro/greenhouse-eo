@@ -1,3 +1,10 @@
+# Sesion 2026-05-06 — TASK-430 tomada en develop
+
+- **Branch:** `develop` por instruccion explicita del usuario; no se crea `task/TASK-430-dictionary-foundation-activation`.
+- **Ownership:** no habia PR abierto ni branch local/remota obvia para `TASK-430`; se toma la task y se mueve a `docs/tasks/in-progress/`.
+- **Plan aprobado:** ejecutar foundation `next-intl` sin locale prefix privado, resolver locale via cookie `gh_locale` + `Accept-Language` + fallback `es-CL`, preservar `src/proxy.ts`, y mantener persistencia DB para `TASK-431`.
+- **Riesgo clave:** `src/lib/copy` contiene funciones en `time`/`emails`; no se debe pasar el dictionary completo como `next-intl` messages serializables. Usar subset shared serializable + APIs canonicas de `src/lib/copy`.
+
 # Sesion 2026-05-06 — TASK-428 tomada en develop
 
 - **Branch:** `develop` por instruccion explicita del usuario; no se crea `task/TASK-428-i18n-architecture-decision`.
