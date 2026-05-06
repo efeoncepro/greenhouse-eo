@@ -41,6 +41,9 @@ import { getPaymentOrdersDeadLetterSignal } from './queries/payment-orders-dead-
 import { getPaidOrdersWithoutExpensePaymentSignal } from './queries/payment-orders-paid-without-expense-payment'
 import { getPayrollExpenseMaterializationLagSignal } from './queries/payroll-expense-materialization-lag'
 import { getProviderBqSyncDeadLetterSignal } from './queries/provider-bq-sync-dead-letter'
+import { getServicesLegacyResidualReadsSignal } from './queries/services-legacy-residual-reads'
+import { getServicesOrganizationUnresolvedSignal } from './queries/services-organization-unresolved'
+import { getServicesSyncLagSignal } from './queries/services-sync-lag'
 import { getHomeRolloutDriftSignal } from './queries/home-rollout-drift'
 import {
   getRoleTitleDriftWithEntraSignal,
@@ -380,6 +383,15 @@ interface ReliabilityOverviewSources {
    * Roll up bajo moduleKey 'identity'.
    */
   workforceRoleTitle?: ReliabilitySignal[] | null
+
+  /**
+   * TASK-813 Slice 6 — Commercial engagement instance (HubSpot p_services 0-162) signals (3):
+   *   - commercial.service_engagement.sync_lag (lag, warning)
+   *   - commercial.service_engagement.organization_unresolved (drift, error)
+   *   - commercial.service_engagement.legacy_residual_reads (drift, error)
+   * Roll up bajo moduleKey 'commercial'. TASK-807 formaliza el subsystem.
+   */
+  servicesEngagement?: ReliabilitySignal[] | null
 }
 
 export const buildReliabilityOverview = (
@@ -435,7 +447,9 @@ export const buildReliabilityOverview = (
     // TASK-784 Slice 7 — Identity legal profile signals (4).
     ...(sources.identityLegalProfile ?? []),
     // TASK-785 Slice 7 — Workforce role title governance signals (2).
-    ...(sources.workforceRoleTitle ?? [])
+    ...(sources.workforceRoleTitle ?? []),
+    // TASK-813 Slice 6 — Commercial engagement instance signals (3).
+    ...(sources.servicesEngagement ?? [])
   ]
 
   const signalsByModule = new Map<string, ReliabilitySignal[]>()
@@ -703,6 +717,20 @@ export const getReliabilityOverview = async (
           .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
           .catch(() => null)
 
+  // TASK-813 Slice 6 — Commercial engagement instance signals (3 readers en
+  // paralelo). Cada uno degrada honestamente a `unknown` si su query falla.
+  // Roll up bajo moduleKey 'commercial'. TASK-807 formaliza el subsystem.
+  const servicesEngagement =
+    preloadedSources.servicesEngagement !== undefined
+      ? preloadedSources.servicesEngagement
+      : await Promise.all([
+          getServicesSyncLagSignal().catch(() => null),
+          getServicesOrganizationUnresolvedSignal().catch(() => null),
+          getServicesLegacyResidualReadsSignal().catch(() => null)
+        ])
+          .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
+          .catch(() => null)
+
   return buildReliabilityOverview(operations, {
     billing,
     notionOperational,
@@ -722,7 +750,8 @@ export const getReliabilityOverview = async (
     homeRolloutDrift,
     shortcutsInvalidPins,
     identityLegalProfile,
-    workforceRoleTitle
+    workforceRoleTitle,
+    servicesEngagement
   })
 }
 

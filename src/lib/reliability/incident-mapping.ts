@@ -82,6 +82,15 @@ const MODULE_TITLE_HINTS: Record<ReliabilityModuleKey, string[]> = {
     'azure ad',
     'next-auth',
     'reveal_sensitive'
+  ],
+  // TASK-813 — commercial engagement instance sync (HubSpot p_services 0-162).
+  commercial: [
+    'hubspot p_services',
+    'p_services',
+    'service_engagement',
+    'hubspot-services',
+    'service sync',
+    'commercial.service'
   ]
 }
 
@@ -108,6 +117,10 @@ const MODULE_PRIORITY: Record<ReliabilityModuleKey, number> = {
   // TASK-784 — identity prioridad alta: si un incident matchea ambos `auth`
   // y `cloud`, identity gana (auth es dueño del flujo).
   identity: 32,
+  // TASK-813 — commercial: prioridad media. Cuando un incident HubSpot toca
+  // commercial y cloud, commercial gana (es el dueño del side effect).
+  // Más bajo que finance porque emergencias finance dominan operacionalmente.
+  commercial: 18,
   cloud: 1
 }
 

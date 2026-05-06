@@ -12,7 +12,7 @@ Soft dep TASK-555 sigue pendiente. Si se ejecuta antes de TASK-555, las capabili
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
