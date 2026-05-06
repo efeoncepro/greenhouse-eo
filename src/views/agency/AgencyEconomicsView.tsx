@@ -33,7 +33,6 @@ import tableStyles from '@core/styles/table.module.css'
 import { getMicrocopy } from '@/lib/copy'
 
 const GREENHOUSE_COPY = getMicrocopy()
-
 // ── Types ──
 
 interface PnlData {

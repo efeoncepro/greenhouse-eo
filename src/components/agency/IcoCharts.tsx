@@ -14,7 +14,6 @@ import { CSC_PHASE_LABELS, type CscPhase } from '@/lib/ico-engine/metric-registr
 import { getMicrocopy } from '@/lib/copy'
 
 const GREENHOUSE_COPY = getMicrocopy()
-
 const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'))
 
 // ─── Trend Types ────────────────────────────────────────────────────────────

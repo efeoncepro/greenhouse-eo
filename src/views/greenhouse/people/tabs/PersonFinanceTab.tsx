@@ -29,7 +29,6 @@ import type { PersonFinanceOverview } from '@/types/people'
 import { getMicrocopy } from '@/lib/copy'
 
 const GREENHOUSE_COPY = getMicrocopy()
-
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------

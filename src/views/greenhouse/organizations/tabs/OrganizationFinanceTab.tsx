@@ -27,7 +27,6 @@ import type { OrganizationDetailData, OrganizationFinanceSummary } from '../type
 import { getMicrocopy } from '@/lib/copy'
 
 const GREENHOUSE_COPY = getMicrocopy()
-
 // ── Helpers ────────────────────────────────────────────────────────────
 
 const MONTH_SHORT = ['', ...GREENHOUSE_COPY.months.short]

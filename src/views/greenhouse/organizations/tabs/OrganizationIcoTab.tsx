@@ -27,7 +27,6 @@ import type { OrganizationDetailData } from '../types'
 import { getMicrocopy } from '@/lib/copy'
 
 const GREENHOUSE_COPY = getMicrocopy()
-
 const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'))
 
 // ── Constants ─────────────────────────────────────────────────────────

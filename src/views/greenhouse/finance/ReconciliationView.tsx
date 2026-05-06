@@ -47,7 +47,6 @@ import CreateAccountDrawer from '@views/greenhouse/finance/drawers/CreateAccount
 import { getMicrocopy } from '@/lib/copy'
 
 const GREENHOUSE_COPY = getMicrocopy()
-
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------

@@ -30,7 +30,6 @@ import type { IcoMetricSnapshot, MetricValue, CscDistributionEntry } from '@/lib
 import { getMicrocopy } from '@/lib/copy'
 
 const GREENHOUSE_COPY = getMicrocopy()
-
 const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'))
 
 // ── Constants ─────────────────────────────────────────────────────────

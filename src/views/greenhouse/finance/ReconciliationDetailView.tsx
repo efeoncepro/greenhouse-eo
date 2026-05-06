@@ -32,7 +32,6 @@ import ImportStatementDrawer from '@views/greenhouse/finance/drawers/ImportState
 import { getMicrocopy } from '@/lib/copy'
 
 const GREENHOUSE_COPY = getMicrocopy()
-
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------

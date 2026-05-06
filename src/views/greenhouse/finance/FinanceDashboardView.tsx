@@ -62,7 +62,6 @@ import type { VatMonthlyPositionPayload } from '@views/greenhouse/finance/compon
 import { getMicrocopy } from '@/lib/copy'
 
 const GREENHOUSE_COPY = getMicrocopy()
-
 const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'), { ssr: false })
 
 // ---------------------------------------------------------------------------

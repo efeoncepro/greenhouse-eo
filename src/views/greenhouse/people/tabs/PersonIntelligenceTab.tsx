@@ -21,7 +21,6 @@ import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tool
 import { getMicrocopy } from '@/lib/copy'
 
 const GREENHOUSE_COPY = getMicrocopy()
-
 // ── Types ──
 
 interface MetricValue { metricId: string; value: number | null; zone: string | null }

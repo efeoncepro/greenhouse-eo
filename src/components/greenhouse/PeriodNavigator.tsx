@@ -15,7 +15,6 @@ import CustomTextField from '@core/components/mui/TextField'
 import { getMicrocopy } from '@/lib/copy'
 
 const GREENHOUSE_COPY = getMicrocopy()
-
 // ── Types ──
 
 export interface PeriodValue {

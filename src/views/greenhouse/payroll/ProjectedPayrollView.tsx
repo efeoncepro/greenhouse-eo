@@ -50,7 +50,6 @@ import { formatCurrency } from './helpers'
 import tableStyles from '@core/styles/table.module.css'
 
 const GREENHOUSE_COPY = getMicrocopy()
-
 // ── Types ──
 
 type ProjectionMode = 'actual_to_date' | 'projected_month_end'

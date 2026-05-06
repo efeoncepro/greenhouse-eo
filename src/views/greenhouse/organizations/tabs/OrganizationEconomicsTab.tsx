@@ -31,7 +31,6 @@ import type { OrganizationDetailData } from '../types'
 import { getMicrocopy } from '@/lib/copy'
 
 const GREENHOUSE_COPY = getMicrocopy()
-
 // ── Types ──
 
 interface EconomicsCurrent {
