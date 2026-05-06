@@ -39,6 +39,9 @@ import CreateProfileDialog from './CreateProfileDialog'
 import PaymentProfileCard from './PaymentProfileCard'
 import ProfileDetailDrawer from './ProfileDetailDrawer'
 
+const TASK407_ARIA_CARGANDO_PERFILES_DE_PAGO = "Cargando perfiles de pago"
+
+
 const STATUS_LABEL: Record<BeneficiaryPaymentProfileStatus, string> = {
   draft: 'Borrador',
   pending_approval: 'Pendiente aprobacion',
@@ -195,7 +198,7 @@ const PaymentProfilesPanel = ({
 
       {loading ? (
         <Box sx={{ py: 2 }}>
-          <LinearProgress aria-label='Cargando perfiles de pago' />
+          <LinearProgress aria-label={TASK407_ARIA_CARGANDO_PERFILES_DE_PAGO} />
         </Box>
       ) : profiles.length === 0 ? (
         <EmptyState

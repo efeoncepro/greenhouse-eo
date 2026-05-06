@@ -46,6 +46,11 @@ import EditSellableRoleDrawer from './drawers/EditSellableRoleDrawer'
 import BulkEditDrawer from './drawers/BulkEditDrawer'
 import { GH_PRICING_GOVERNANCE } from '@/config/greenhouse-nomenclature'
 
+const TASK407_ARIA_VOLVER_AL_CATALOGO = "Volver al catálogo"
+const TASK407_ARIA_FILTRAR_POR_CATEGORIA = "Filtrar por categoría"
+const TASK407_ARIA_FILTRAR_POR_ESTADO = "Filtrar por estado"
+
+
 // ── Types ──────────────────────────────────────────────────────────────
 
 interface SellableRoleItem {
@@ -407,7 +412,7 @@ const SellableRolesListView = () => {
       <Grid size={{ xs: 12 }}>
         <Stack direction='row' spacing={2} alignItems='center' sx={{ mb: 1 }}>
           <Tooltip title='Volver al catálogo'>
-            <IconButton component='a' href='/admin/pricing-catalog' size='small' aria-label='Volver al catálogo'>
+            <IconButton component='a' href='/admin/pricing-catalog' size='small' aria-label={TASK407_ARIA_VOLVER_AL_CATALOGO}>
               <i className='tabler-arrow-left' />
             </IconButton>
           </Tooltip>
@@ -473,7 +478,7 @@ const SellableRolesListView = () => {
                   value={categoryFilter}
                   onChange={e => setCategoryFilter(e.target.value)}
                   sx={{ minWidth: 140 }}
-                  aria-label='Filtrar por categoría'
+                  aria-label={TASK407_ARIA_FILTRAR_POR_CATEGORIA}
                 >
                   <MenuItem value='all'>Todas las categorías</MenuItem>
                   {Object.entries(CATEGORY_LABELS).map(([k, v]) => (
@@ -488,7 +493,7 @@ const SellableRolesListView = () => {
                   value={statusFilter}
                   onChange={e => setStatusFilter(e.target.value as typeof statusFilter)}
                   sx={{ minWidth: 120 }}
-                  aria-label='Filtrar por estado'
+                  aria-label={TASK407_ARIA_FILTRAR_POR_ESTADO}
                 >
                   <MenuItem value='active'>Activos</MenuItem>
                   <MenuItem value='inactive'>Inactivos</MenuItem>

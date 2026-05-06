@@ -29,6 +29,11 @@ import { formatFte } from '@/views/greenhouse/people/helpers'
 import tableStyles from '@core/styles/table.module.css'
 
 import type { OrganizationPerson } from '../types'
+import { getMicrocopy } from '@/lib/copy'
+
+const GREENHOUSE_COPY = getMicrocopy()
+const TASK407_ARIA_CONTACTO_PRINCIPAL = "Contacto principal"
+
 
 type Props = {
   organizationId: string
@@ -119,7 +124,7 @@ const columns: ColumnDef<OrganizationPerson, any>[] = [
   colHelper.accessor('isPrimary', {
     header: 'Principal',
     cell: ({ getValue }) => getValue()
-      ? <i className='tabler-star-filled' style={{ fontSize: 16, color: 'var(--mui-palette-warning-main)' }} aria-label='Contacto principal' />
+      ? <i className='tabler-star-filled' style={{ fontSize: 16, color: 'var(--mui-palette-warning-main)' }} aria-label={TASK407_ARIA_CONTACTO_PRINCIPAL} />
       : <Typography variant='body2' color='text.secondary'>—</Typography>,
     meta: { align: 'center' }
   })
@@ -264,7 +269,7 @@ const OrganizationPeopleTab = ({ organizationId, isAdmin, onAddMembership }: Pro
                   </thead>
                   <tbody>
                     {table.getRowModel().rows.length === 0 ? (
-                      <tr><td colSpan={columns.length} style={{ textAlign: 'center', padding: '2rem' }}><Typography variant='body2' color='text.secondary'>Sin resultados</Typography></td></tr>
+                      <tr><td colSpan={columns.length} style={{ textAlign: 'center', padding: '2rem' }}><Typography variant='body2' color='text.secondary'>{GREENHOUSE_COPY.empty.noResults}</Typography></td></tr>
                     ) : table.getRowModel().rows.map(row => (
                       <tr key={row.id}>
                         {row.getVisibleCells().map(cell => (

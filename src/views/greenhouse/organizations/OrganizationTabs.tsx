@@ -23,6 +23,9 @@ import OrganizationProjectsTab from './tabs/OrganizationProjectsTab'
 import OrganizationIcoTab from './tabs/OrganizationIcoTab'
 import OrganizationIntegrationsTab from './tabs/OrganizationIntegrationsTab'
 
+const TASK407_ARIA_SECCIONES_DE_LA_ORGANIZACION = "Secciones de la organización"
+
+
 // Consolidated from 7 tabs to 4:
 // Operaciones = ICO + Overview
 // Finanzas = Finance + Economics
@@ -82,7 +85,7 @@ const OrganizationTabs = ({ detail, isAdmin, onAddMembership }: Props) => {
             onChange={handleChange}
             variant='scrollable'
             pill='true'
-            aria-label='Secciones de la organización'
+            aria-label={TASK407_ARIA_SECCIONES_DE_LA_ORGANIZACION}
           >
             {TAB_CONFIG.map(tab => (
               <Tab

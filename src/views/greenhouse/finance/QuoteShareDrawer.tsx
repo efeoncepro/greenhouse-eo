@@ -22,6 +22,10 @@ import {
 } from '@mui/material'
 
 import CustomChip from '@core/components/mui/Chip'
+import { getMicrocopy } from '@/lib/copy'
+
+const GREENHOUSE_COPY = getMicrocopy()
+
 
 interface ShareLinkSummary {
   shortCode: string
@@ -390,7 +394,7 @@ return
               {quotationNumber}
             </Typography>
           </Box>
-          <IconButton onClick={onClose} size='small' aria-label='Cerrar'>
+          <IconButton onClick={onClose} size='small' aria-label={GREENHOUSE_COPY.actions.close}>
             <i className='tabler-x' />
           </IconButton>
         </Box>

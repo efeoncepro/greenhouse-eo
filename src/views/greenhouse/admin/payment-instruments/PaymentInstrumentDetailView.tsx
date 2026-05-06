@@ -55,6 +55,11 @@ import {
   type SectionHealth
 } from './paymentInstrumentAdminAdapters'
 
+const TASK407_ARIA_CARGANDO_WORKSPACE_DEL_INSTRUMENTO_DE_PAGO = "Cargando workspace del instrumento de pago"
+const TASK407_ARIA_ACTUALIZANDO_DETALLE_DEL_INSTRUMENTO = "Actualizando detalle del instrumento"
+const TASK407_ARIA_SECCIONES_DEL_WORKSPACE_DE_INSTRUMENTO_DE_PAGO = "Secciones del workspace de instrumento de pago"
+
+
 const GREENHOUSE_COPY = getMicrocopy()
 
 type Props = {
@@ -469,7 +474,7 @@ const PaymentInstrumentDetailView = ({ accountId }: Props) => {
 
   if (loading) {
     return (
-      <Grid container spacing={5} role='status' aria-live='polite' aria-label='Cargando workspace del instrumento de pago'>
+      <Grid container spacing={5} role='status' aria-live='polite' aria-label={TASK407_ARIA_CARGANDO_WORKSPACE_DEL_INSTRUMENTO_DE_PAGO}>
         <Grid size={{ xs: 12 }}>
           <Stack spacing={1}>
             <Skeleton variant='text' width={280} height={28} />
@@ -538,7 +543,7 @@ const PaymentInstrumentDetailView = ({ accountId }: Props) => {
 
       <Grid size={{ xs: 12 }}>
         <Card elevation={0} sx={{ border: theme => `1px solid ${theme.palette.divider}`, overflow: 'hidden' }}>
-          {refreshing ? <LinearProgress aria-label='Actualizando detalle del instrumento' /> : null}
+          {refreshing ? <LinearProgress aria-label={TASK407_ARIA_ACTUALIZANDO_DETALLE_DEL_INSTRUMENTO} /> : null}
           <CardContent>
             <Stack direction={{ xs: 'column', lg: 'row' }} spacing={5} justifyContent='space-between'>
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={3} alignItems={{ xs: 'flex-start', sm: 'center' }}>
@@ -611,7 +616,7 @@ const PaymentInstrumentDetailView = ({ accountId }: Props) => {
               onChange={(_, value: ActiveTab) => setActiveTab(value)}
               variant='scrollable'
               allowScrollButtonsMobile
-              aria-label='Secciones del workspace de instrumento de pago'
+              aria-label={TASK407_ARIA_SECCIONES_DEL_WORKSPACE_DE_INSTRUMENTO_DE_PAGO}
             >
               <Tab value='configuration' label='Configuracion' icon={<i className='tabler-adjustments' />} iconPosition='start' />
               <Tab value='activity' label='Actividad' icon={<i className='tabler-activity' />} iconPosition='start' />

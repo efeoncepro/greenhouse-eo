@@ -31,6 +31,11 @@ import type { PersonDetail } from '@/types/people'
 
 import PersonLegalProfileSection from './PersonLegalProfileSection'
 
+const TASK407_ARIA_DATOS_LABORALES = "Datos laborales"
+const TASK407_ARIA_IDENTIDAD_Y_ACCESO = "Identidad y acceso"
+const TASK407_ARIA_ACTIVIDAD_OPERATIVA = "Actividad operativa"
+
+
 const GREENHOUSE_COPY = getMicrocopy()
 
 // ---------------------------------------------------------------------------
@@ -259,7 +264,7 @@ const PersonProfileTab = ({ detail }: Props) => {
       {hasHr && (
         <Grid size={{ xs: 12 }}>
           <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
-            <Accordion defaultExpanded disableGutters elevation={0} aria-label='Datos laborales'>
+            <Accordion defaultExpanded disableGutters elevation={0} aria-label={TASK407_ARIA_DATOS_LABORALES}>
               <AccordionSummary expandIcon={<i className='tabler-chevron-down' />}>
                 <Stack direction='row' spacing={2} alignItems='center'>
                   <Avatar variant='rounded' sx={{ bgcolor: 'warning.lightOpacity' }}>
@@ -304,7 +309,7 @@ const PersonProfileTab = ({ detail }: Props) => {
       {hasIdentityOrAccess && (
         <Grid size={{ xs: 12 }}>
           <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
-            <Accordion defaultExpanded={false} disableGutters elevation={0} aria-label='Identidad y acceso'>
+            <Accordion defaultExpanded={false} disableGutters elevation={0} aria-label={TASK407_ARIA_IDENTIDAD_Y_ACCESO}>
               <AccordionSummary expandIcon={<i className='tabler-chevron-down' />}>
                 <Stack direction='row' spacing={2} alignItems='center'>
                   <Avatar variant='rounded' sx={{ bgcolor: 'info.lightOpacity' }}>
@@ -454,7 +459,7 @@ const PersonProfileTab = ({ detail }: Props) => {
       {hasDelivery && deliveryContext && (
         <Grid size={{ xs: 12 }}>
           <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
-            <Accordion defaultExpanded={false} disableGutters elevation={0} aria-label='Actividad operativa'>
+            <Accordion defaultExpanded={false} disableGutters elevation={0} aria-label={TASK407_ARIA_ACTIVIDAD_OPERATIVA}>
               <AccordionSummary expandIcon={<i className='tabler-chevron-down' />}>
                 <Stack direction='row' spacing={2} alignItems='center'>
                   <Avatar variant='rounded' sx={{ bgcolor: 'success.lightOpacity' }}>

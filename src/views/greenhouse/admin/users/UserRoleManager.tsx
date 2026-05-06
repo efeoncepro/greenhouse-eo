@@ -21,6 +21,13 @@ import CustomTextField from '@core/components/mui/TextField'
 
 import { roleColorFor, roleIconFor, toTitleCase } from './helpers'
 
+const TASK407_ARIA_CARGANDO_CONFIGURACION_DE_ROLES = "Cargando configuracion de roles"
+const TASK407_ARIA_ROLES_ASIGNADOS_ACTUALMENTE = "Roles asignados actualmente"
+const TASK407_ARIA_MODULOS_HABILITADOS = "Modulos habilitados"
+const TASK407_ARIA_MODULOS_QUE_SE_HABILITARAN = "Modulos que se habilitaran"
+const TASK407_ARIA_CANCELAR_LA_EDICION_DE_ROLES = "Cancelar la edicion de roles"
+
+
 const GREENHOUSE_COPY = getMicrocopy()
 
 // ── Types ──
@@ -155,7 +162,7 @@ const UserRoleManager = ({ userId, initialRoleCodes }: Props) => {
     return (
       <Card>
         <CardContent sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
-          <CircularProgress aria-label='Cargando configuracion de roles' />
+          <CircularProgress aria-label={TASK407_ARIA_CARGANDO_CONFIGURACION_DE_ROLES} />
         </CardContent>
       </Card>
     )
@@ -181,7 +188,7 @@ const UserRoleManager = ({ userId, initialRoleCodes }: Props) => {
               <Typography className='uppercase' variant='body2' color='text.disabled'>
                 Roles asignados
               </Typography>
-              <Box role='list' aria-label='Roles asignados actualmente' className='flex flex-wrap gap-2'>
+              <Box role='list' aria-label={TASK407_ARIA_ROLES_ASIGNADOS_ACTUALMENTE} className='flex flex-wrap gap-2'>
                 {currentAssignments.length === 0 ? (
                   <Typography color='text.secondary' role='status'>
                     Este usuario no tiene roles asignados. Agrega al menos un rol para que pueda acceder al portal.
@@ -209,7 +216,7 @@ const UserRoleManager = ({ userId, initialRoleCodes }: Props) => {
                   <Typography color='text.secondary'>
                     La combinacion de roles habilita acceso a los siguientes modulos del portal.
                   </Typography>
-                  <Box role='group' aria-label='Modulos habilitados' className='flex flex-wrap gap-2'>
+                  <Box role='group' aria-label={TASK407_ARIA_MODULOS_HABILITADOS} className='flex flex-wrap gap-2'>
                     {derivedRouteGroups.map(group => (
                       <div key={group} className='flex items-center gap-2'>
                         <i className='tabler-circle-filled text-[8px] text-textSecondary' aria-hidden='true' />
@@ -346,7 +353,7 @@ const UserRoleManager = ({ userId, initialRoleCodes }: Props) => {
                       <Typography className='mbe-4' color='text.secondary'>
                         {`Con esta configuracion, el usuario tendra acceso a ${derivedRouteGroups.length} ${derivedRouteGroups.length === 1 ? 'modulo' : 'modulos'}:`}
                       </Typography>
-                      <Box className='flex flex-wrap gap-2' role='group' aria-label='Modulos que se habilitaran'>
+                      <Box className='flex flex-wrap gap-2' role='group' aria-label={TASK407_ARIA_MODULOS_QUE_SE_HABILITARAN}>
                         {derivedRouteGroups.map(group => (
                           <Chip
                             key={group}
@@ -389,7 +396,7 @@ const UserRoleManager = ({ userId, initialRoleCodes }: Props) => {
                         handleReset()
                         setIsEditing(false)
                       }}
-                      aria-label='Cancelar la edicion de roles'
+                      aria-label={TASK407_ARIA_CANCELAR_LA_EDICION_DE_ROLES}
                     >{GREENHOUSE_COPY.actions.cancel}</Button>
                   </Grid>
                 </Grid>

@@ -56,6 +56,14 @@ import QuoteLineWarning from '@/components/greenhouse/pricing/QuoteLineWarning'
 
 import QuoteLineCostStack from './QuoteLineCostStack'
 
+const TASK407_ARIA_EXPANDIR_DETALLE = "Expandir detalle"
+const TASK407_ARIA_ACCIONES = "Acciones"
+const TASK407_ARIA_CALCULANDO_PRECIO_DEL_CATALOGO = "Calculando precio del catálogo"
+const TASK407_ARIA_CALCULANDO_SUBTOTAL = "Calculando subtotal"
+const TASK407_ARIA_SUBTOTAL_SIN_DATOS_SUFICIENTES = "Subtotal sin datos suficientes"
+const TASK407_ARIA_AVISOS_DEL_MOTOR_DE_PRICING = "Avisos del motor de pricing"
+
+
 export type QuoteLineSource = 'catalog' | 'service' | 'template' | 'manual'
 
 export interface QuoteLineItem {
@@ -805,14 +813,14 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
           <Table size='small'>
             <TableHead>
               <TableRow>
-                <TableCell sx={{ width: 32, minWidth: 32 }} aria-label='Expandir detalle' />
+                <TableCell sx={{ width: 32, minWidth: 32 }} aria-label={TASK407_ARIA_EXPANDIR_DETALLE} />
                 <TableCell sx={{ minWidth: 220 }}>Ítem</TableCell>
                 <TableCell sx={{ minWidth: 160 }}>Tipo</TableCell>
                 <TableCell sx={{ minWidth: 90 }} align='right'>Cantidad</TableCell>
                 <TableCell sx={{ minWidth: 110 }}>Unidad</TableCell>
                 <TableCell sx={{ minWidth: 130 }} align='right'>Precio unitario</TableCell>
                 <TableCell sx={{ minWidth: 110 }} align='right'>Subtotal</TableCell>
-                <TableCell sx={{ minWidth: 100 }} align='right' aria-label='Acciones' />
+                <TableCell sx={{ minWidth: 100 }} align='right' aria-label={TASK407_ARIA_ACCIONES} />
               </TableRow>
             </TableHead>
             <TableBody ref={draftTableBodyRef}>
@@ -1016,7 +1024,7 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
                               precio distinto, crea una línea manual (direct_cost).
                             */
                             simulating && enginePrice === null ? (
-                              <Skeleton variant='text' width={110} height={22} aria-label='Calculando precio del catálogo' />
+                              <Skeleton variant='text' width={110} height={22} aria-label={TASK407_ARIA_CALCULANDO_PRECIO_DEL_CATALOGO} />
                             ) : displayedUnitPrice !== null ? (
                               <Stack spacing={0.25} alignItems='flex-end'>
                                 <Typography
@@ -1067,9 +1075,9 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
                       </TableCell>
                       <TableCell align='right'>
                         {simulating && !hasManualPrice && subtotal === 0 ? (
-                          <Skeleton variant='text' width={90} height={22} sx={{ ml: 'auto' }} aria-label='Calculando subtotal' />
+                          <Skeleton variant='text' width={90} height={22} sx={{ ml: 'auto' }} aria-label={TASK407_ARIA_CALCULANDO_SUBTOTAL} />
                         ) : subtotal === 0 && enginePrice === null && !hasManualPrice ? (
-                          <Typography variant='body2' sx={{ fontVariantNumeric: 'tabular-nums', color: 'text.secondary' }} aria-label='Subtotal sin datos suficientes'>
+                          <Typography variant='body2' sx={{ fontVariantNumeric: 'tabular-nums', color: 'text.secondary' }} aria-label={TASK407_ARIA_SUBTOTAL_SIN_DATOS_SUFICIENTES}>
                             —
                           </Typography>
                         ) : (
@@ -1348,7 +1356,7 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
         }}
       >
         {warningIndex !== null && currentWarnings.length > 0 ? (
-          <Box sx={{ p: 2 }} role='dialog' aria-label='Avisos del motor de pricing'>
+          <Box sx={{ p: 2 }} role='dialog' aria-label={TASK407_ARIA_AVISOS_DEL_MOTOR_DE_PRICING}>
             <QuoteLineWarning warnings={currentWarnings} rowIndex={warningIndex} />
           </Box>
         ) : null}

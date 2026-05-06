@@ -386,7 +386,7 @@ const CreateDealDrawer = ({
           </Box>
           <IconButton
             onClick={() => (creating ? undefined : onClose())}
-            aria-label='Cerrar'
+            aria-label={GREENHOUSE_COPY.actions.close}
             size='small'
           >
             <i className='tabler-x' />

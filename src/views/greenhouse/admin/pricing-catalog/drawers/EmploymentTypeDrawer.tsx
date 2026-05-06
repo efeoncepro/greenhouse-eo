@@ -240,7 +240,7 @@ const EmploymentTypeDrawer = ({ open, mode, initial, onClose, onSuccess }: Props
         <Typography variant='h6'>
           {mode === 'create' ? 'Nueva modalidad de contrato' : 'Editar modalidad de contrato'}
         </Typography>
-        <IconButton onClick={handleClose} size='small' aria-label='Cerrar'>
+        <IconButton onClick={handleClose} size='small' aria-label={GREENHOUSE_COPY.actions.close}>
           <i className='tabler-x' />
         </IconButton>
       </Box>

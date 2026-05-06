@@ -43,6 +43,9 @@ import CustomTextField from '@core/components/mui/TextField'
 import OptionMenu from '@core/components/option-menu'
 import { getMicrocopy } from '@/lib/copy'
 
+const TASK407_ARIA_GRAFICO_DE_EVOLUCION_MARGEN_BRUTO_PROMEDIO_Y_MARGEN_NETO_P = "Gráfico de evolución: margen bruto promedio y margen neto promedio de los últimos 6 meses"
+
+
 const GREENHOUSE_COPY = getMicrocopy()
 const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'), { ssr: false })
 
@@ -761,7 +764,7 @@ const ClientEconomicsView = ({ embedded = false }: { embedded?: boolean }) => {
           <CardContent>
             <figure
               role='img'
-              aria-label='Gráfico de evolución: margen bruto promedio y margen neto promedio de los últimos 6 meses'
+              aria-label={TASK407_ARIA_GRAFICO_DE_EVOLUCION_MARGEN_BRUTO_PROMEDIO_Y_MARGEN_NETO_P}
               style={{ margin: 0 }}
             >
               <AppReactApexCharts

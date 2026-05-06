@@ -26,6 +26,14 @@ import Typography from '@mui/material/Typography'
 
 import CustomChip from '@core/components/mui/Chip'
 
+const TASK407_ARIA_IDIOMA_DEL_TEMPLATE = "Idioma del template"
+const TASK407_ARIA_VIEWPORT_DE_PREVIEW = "Viewport de preview"
+const TASK407_ARIA_DESKTOP = "Desktop"
+const TASK407_ARIA_MOBILE = "Mobile"
+const TASK407_ARIA_ALTERNAR_PANEL_DE_DATOS_DE_EJEMPLO = "Alternar panel de datos de ejemplo"
+const TASK407_ARIA_CERRAR_PANEL_DE_DATOS = "Cerrar panel de datos"
+
+
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -312,7 +320,7 @@ const EmailTemplatePreviewView = () => {
               exclusive
               onChange={handleLocaleChange}
               size='small'
-              aria-label='Idioma del template'
+              aria-label={TASK407_ARIA_IDIOMA_DEL_TEMPLATE}
             >
               <ToggleButton value='es' sx={{ textTransform: 'none', px: 2 }}>
                 ES
@@ -328,12 +336,12 @@ const EmailTemplatePreviewView = () => {
               exclusive
               onChange={handleViewportChange}
               size='small'
-              aria-label='Viewport de preview'
+              aria-label={TASK407_ARIA_VIEWPORT_DE_PREVIEW}
             >
-              <ToggleButton value='desktop' aria-label='Desktop'>
+              <ToggleButton value='desktop' aria-label={TASK407_ARIA_DESKTOP}>
                 <i className='tabler-device-desktop' style={{ fontSize: 18 }} />
               </ToggleButton>
-              <ToggleButton value='mobile' aria-label='Mobile'>
+              <ToggleButton value='mobile' aria-label={TASK407_ARIA_MOBILE}>
                 <i className='tabler-device-mobile' style={{ fontSize: 18 }} />
               </ToggleButton>
             </ToggleButtonGroup>
@@ -355,7 +363,7 @@ const EmailTemplatePreviewView = () => {
 
             {/* Props panel toggle */}
             <Tooltip title={propsOpen ? 'Ocultar datos de ejemplo' : 'Mostrar datos de ejemplo'}>
-              <IconButton size='small' onClick={togglePropsPanel} aria-label='Alternar panel de datos de ejemplo'>
+              <IconButton size='small' onClick={togglePropsPanel} aria-label={TASK407_ARIA_ALTERNAR_PANEL_DE_DATOS_DE_EJEMPLO}>
                 <i className='tabler-adjustments-horizontal' style={{ fontSize: 18 }} />
               </IconButton>
             </Tooltip>
@@ -444,7 +452,7 @@ const EmailTemplatePreviewView = () => {
               title='Datos de ejemplo'
               titleTypographyProps={{ variant: 'subtitle1' }}
               action={
-                <IconButton size='small' onClick={togglePropsPanel} aria-label='Cerrar panel de datos'>
+                <IconButton size='small' onClick={togglePropsPanel} aria-label={TASK407_ARIA_CERRAR_PANEL_DE_DATOS}>
                   <i className='tabler-x' style={{ fontSize: 16 }} />
                 </IconButton>
               }

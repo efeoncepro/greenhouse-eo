@@ -32,6 +32,9 @@ import PeopleListFilters from './PeopleListFilters'
 
 import tableStyles from '@core/styles/table.module.css'
 
+const TASK407_EMPTY_NO_SE_ENCONTRARON_COLABORADORES = "No se encontraron colaboradores"
+
+
 const columnHelper = createColumnHelper<PersonListItem>()
 
 type Props = {
@@ -190,7 +193,7 @@ const PeopleListTable = ({ data }: Props) => {
               <tr>
                 <td colSpan={columns.length} className='text-center'>
                   <Typography color='text.secondary' sx={{ py: 4 }}>
-                    No se encontraron colaboradores
+                    {TASK407_EMPTY_NO_SE_ENCONTRARON_COLABORADORES}
                   </Typography>
                 </td>
               </tr>

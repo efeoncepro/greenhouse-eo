@@ -156,7 +156,7 @@ const CreateProductDrawer = ({
       <Box sx={{ p: 4 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 4 }}>
           <Typography variant='h6'>Nuevo producto HubSpot</Typography>
-          <IconButton onClick={handleClose} aria-label='Cerrar'>
+          <IconButton onClick={handleClose} aria-label={GREENHOUSE_COPY.actions.close}>
             <i className='tabler-x' />
           </IconButton>
         </Box>

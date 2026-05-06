@@ -50,6 +50,10 @@ import { buildStatusMap , getMicrocopy } from '@/lib/copy'
 import tableStyles from '@core/styles/table.module.css'
 import CreateIncomeDrawer from '@views/greenhouse/finance/drawers/CreateIncomeDrawer'
 
+const TASK407_ARIA_VER_DTE_EN_PDF = "Ver DTE en PDF"
+const TASK407_ARIA_VER_XML_DEL_DTE = "Ver XML del DTE"
+
+
 const GREENHOUSE_COPY = getMicrocopy()
 // ---------------------------------------------------------------------------
 // Types
@@ -324,7 +328,7 @@ const IncomeListView = () => {
                 rel='noopener noreferrer'
                 onClick={e => e.stopPropagation()}
                 sx={{ display: 'inline-flex', color: 'error.main', '&:hover': { color: 'error.dark' } }}
-                aria-label='Ver DTE en PDF'
+                aria-label={TASK407_ARIA_VER_DTE_EN_PDF}
               >
                 <i className='tabler-file-type-pdf' style={{ fontSize: 16 }} />
               </Box>
@@ -337,7 +341,7 @@ const IncomeListView = () => {
                 rel='noopener noreferrer'
                 onClick={e => e.stopPropagation()}
                 sx={{ display: 'inline-flex', color: 'info.main', '&:hover': { color: 'info.dark' } }}
-                aria-label='Ver XML del DTE'
+                aria-label={TASK407_ARIA_VER_XML_DEL_DTE}
               >
                 <i className='tabler-code' style={{ fontSize: 14 }} />
               </Box>

@@ -18,6 +18,12 @@ import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSu
 
 import { EmptyState, ExecutiveCardShell, MetricList } from '@/components/greenhouse'
 
+const TASK407_COPY_GASTO_FINANCIERO_OBSERVADO = "Gasto financiero observado"
+const TASK407_COPY_SUSCRIPCIONES_MODELADAS = "Suscripciones modeladas"
+const TASK407_COPY_USO_POR_CREDITOS = "Uso por créditos"
+const TASK407_COPY_EXPOSICION_DE_PAYROLL = "Exposición de payroll"
+
+
 export interface SupplierProviderToolingSnapshot {
   providerId: string
   providerName: string
@@ -204,22 +210,22 @@ const SupplierProviderToolingTab = ({ supplierId, supplierName, providerId, prov
             <MetricList
               items={[
                 {
-                  label: 'Gasto financiero observado',
+                  label: TASK407_COPY_GASTO_FINANCIERO_OBSERVADO,
                   value: formatClp(providerTooling.financeExpenseTotalClp),
                   detail: `${providerTooling.financeExpenseCount} egresos asociados a ${supplierName}.`
                 },
                 {
-                  label: 'Suscripciones modeladas',
+                  label: TASK407_COPY_SUSCRIPCIONES_MODELADAS,
                   value: formatClp(providerTooling.subscriptionCostTotalClp),
                   detail: `${providerTooling.activeLicenseCount} licencias activas con costo recurrente proyectado.`
                 },
                 {
-                  label: 'Uso por créditos',
+                  label: TASK407_COPY_USO_POR_CREDITOS,
                   value: formatClp(providerTooling.usageCostTotalClp),
                   detail: `${providerTooling.activeWalletCount} wallets activas con consumo imputado al período.`
                 },
                 {
-                  label: 'Exposición de payroll',
+                  label: TASK407_COPY_EXPOSICION_DE_PAYROLL,
                   value: formatClp(providerTooling.licensedMemberPayrollCostClp),
                   detail: `${providerTooling.payrollMemberCount} personas con costo empresa vinculadas al uso del provider.`
                 }

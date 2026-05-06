@@ -21,6 +21,9 @@ import CustomTextField from '@core/components/mui/TextField'
 import type { PersonDetailAssignment } from '@/types/people'
 import { formatFte } from '../helpers'
 
+const TASK407_ARIA_AGREGAR_ASIGNACION_OPERATIVA = "Agregar asignación operativa"
+
+
 const GREENHOUSE_COPY = getMicrocopy()
 
 const MEMBERSHIP_TYPES = [
@@ -212,7 +215,7 @@ const EditPersonMembershipDrawer = ({ open, memberId, membership, assignment, on
           <Typography variant='h6'>Editar membresía</Typography>
           <Typography variant='caption' color='text.secondary'>{membership.organizationName}</Typography>
         </Box>
-        <IconButton onClick={onClose} size='small' aria-label='Cerrar'>
+        <IconButton onClick={onClose} size='small' aria-label={GREENHOUSE_COPY.actions.close}>
           <i className='tabler-x' />
         </IconButton>
       </Box>
@@ -314,7 +317,7 @@ const EditPersonMembershipDrawer = ({ open, memberId, membership, assignment, on
             onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setShowAssignmentForm(true) } }}
             tabIndex={0}
             role='button'
-            aria-label='Agregar asignación operativa'
+            aria-label={TASK407_ARIA_AGREGAR_ASIGNACION_OPERATIVA}
             sx={{
               p: 2,
               border: '1px dashed',

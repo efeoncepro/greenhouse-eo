@@ -30,6 +30,9 @@ import type {
   CapabilityTierMatrixCell
 } from '@/types/capabilities'
 
+const TASK407_ARIA_MATRIZ_DE_VISIBILIDAD_POR_TIER_PARA_CREATIVE_VELOCITY_REVI = "Matriz de visibilidad por tier para Creative Velocity Review"
+
+
 type CapabilityCardProps = {
   card: CapabilityModuleCard
   data: CapabilityModuleData
@@ -517,7 +520,7 @@ const TierMatrixCard = ({ card, cardData }: TypedCapabilityCardProps<'tier-matri
             overflow: 'hidden'
           }}
         >
-          <Table size='small' aria-label='Matriz de visibilidad por tier para Creative Velocity Review'>
+          <Table size='small' aria-label={TASK407_ARIA_MATRIZ_DE_VISIBILIDAD_POR_TIER_PARA_CREATIVE_VELOCITY_REVI}>
             <TableHead>
               <TableRow sx={{ bgcolor: theme => alpha(theme.palette.action.hover, 0.72) }}>
                 <TableCell sx={{ fontWeight: 700 }}>Metrica</TableCell>

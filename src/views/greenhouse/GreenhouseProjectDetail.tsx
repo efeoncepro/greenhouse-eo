@@ -26,6 +26,9 @@ import { EmptyState, ProjectTeamSection } from '@/components/greenhouse'
 import { GH_CLIENT_NAV, GH_LABELS, GH_MESSAGES } from '@/config/greenhouse-nomenclature'
 import type { GreenhouseProjectDetailData, GreenhouseProjectTasksData } from '@/types/greenhouse-project-detail'
 
+const TASK407_ARIA_BREADCRUMBS = "breadcrumbs"
+
+
 interface Props {
   projectId: string
 }
@@ -106,7 +109,7 @@ const GreenhouseProjectDetail = ({ projectId }: Props) => {
   return (
     <Stack spacing={6}>
       <Stack spacing={1.5}>
-        <Breadcrumbs aria-label='breadcrumbs'>
+        <Breadcrumbs aria-label={TASK407_ARIA_BREADCRUMBS}>
           <Typography component={Link} href='/home' color='inherit'>
             {GH_CLIENT_NAV.dashboard.label}
           </Typography>

@@ -13,6 +13,10 @@ import Typography from '@mui/material/Typography'
 
 import type { NexaThreadListItem } from '@/lib/nexa/nexa-contract'
 
+const TASK407_ARIA_HISTORIAL_DE_CONVERSACIONES = "Historial de conversaciones"
+const TASK407_ARIA_CERRAR_HISTORIAL = "Cerrar historial"
+
+
 interface Props {
   open: boolean
   onClose: () => void
@@ -85,14 +89,14 @@ const NexaThreadSidebar = ({ open, onClose, activeThreadId, onSelectThread, onNe
       anchor='left'
       open={open}
       onClose={onClose}
-      aria-label='Historial de conversaciones'
+      aria-label={TASK407_ARIA_HISTORIAL_DE_CONVERSACIONES}
       PaperProps={{ sx: { width: { xs: '100vw', sm: 320 } } }}
     >
       <Stack sx={{ height: '100%' }}>
         {/* Header */}
         <Stack direction='row' justifyContent='space-between' alignItems='center' sx={{ p: 2.5 }}>
           <Typography variant='h6'>Conversaciones</Typography>
-          <IconButton size='small' onClick={onClose} aria-label='Cerrar historial'>
+          <IconButton size='small' onClick={onClose} aria-label={TASK407_ARIA_CERRAR_HISTORIAL}>
             <i className='tabler-x' style={{ fontSize: '1.125rem' }} />
           </IconButton>
         </Stack>

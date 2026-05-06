@@ -44,6 +44,9 @@ import { toolCategoryConfig, costModelConfig, formatCost } from '../helpers'
 
 import tableStyles from '@core/styles/table.module.css'
 
+const TASK407_EMPTY_NO_SE_ENCONTRARON_HERRAMIENTAS = "No se encontraron herramientas"
+
+
 const GREENHOUSE_COPY = getMicrocopy()
 
 const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
@@ -453,7 +456,7 @@ const AiCatalogTab = ({ tools, providers, meta, onRefresh }: Props) => {
                       <CustomAvatar variant='rounded' skin='light' color='warning' size={48}>
                         <i className='tabler-database-off' style={{ fontSize: 24 }} />
                       </CustomAvatar>
-                      <Typography color='text.secondary'>No se encontraron herramientas</Typography>
+                      <Typography color='text.secondary'>{TASK407_EMPTY_NO_SE_ENCONTRARON_HERRAMIENTAS}</Typography>
                       {(filterCategory || filterProvider || globalFilter) && (
                         <Button
                           variant='tonal' size='small' color='secondary'

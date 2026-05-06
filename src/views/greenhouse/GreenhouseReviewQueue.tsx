@@ -30,6 +30,10 @@ import TablePaginationComponent from '@components/TablePaginationComponent'
 import { fuzzyFilter } from '@/components/tableUtils'
 
 import tableStyles from '@core/styles/table.module.css'
+import { getMicrocopy } from '@/lib/copy'
+
+const GREENHOUSE_COPY = getMicrocopy()
+
 
 // ── Types ──
 
@@ -275,7 +279,7 @@ const GreenhouseReviewQueue = () => {
                   </thead>
                   <tbody>
                     {reviewTable.getRowModel().rows.length === 0 ? (
-                      <tr><td colSpan={reviewColumns.length} style={{ textAlign: 'center', padding: '2rem' }}><Typography variant='body2' color='text.secondary'>Sin resultados</Typography></td></tr>
+                      <tr><td colSpan={reviewColumns.length} style={{ textAlign: 'center', padding: '2rem' }}><Typography variant='body2' color='text.secondary'>{GREENHOUSE_COPY.empty.noResults}</Typography></td></tr>
                     ) : reviewTable.getRowModel().rows.map(row => (
                       <tr key={row.id}>
                         {row.getVisibleCells().map(cell => (

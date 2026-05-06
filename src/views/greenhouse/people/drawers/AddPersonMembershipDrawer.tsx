@@ -162,7 +162,7 @@ const AddPersonMembershipDrawer = ({ open, memberId, memberName, onClose, onSucc
           <Typography variant='h6'>Vincular a organización</Typography>
           <Typography variant='caption' color='text.secondary'>{memberName}</Typography>
         </Box>
-        <IconButton onClick={onClose} size='small' aria-label='Cerrar'>
+        <IconButton onClick={onClose} size='small' aria-label={GREENHOUSE_COPY.actions.close}>
           <i className='tabler-x' />
         </IconButton>
       </Box>

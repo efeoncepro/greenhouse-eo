@@ -24,6 +24,10 @@ import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSu
 
 import ClientSafeTalentCard, { type ClientSafeTalentProfile } from '@/components/greenhouse/ClientSafeTalentCard'
 import { GH_CLIENT_TALENT } from '@/config/greenhouse-nomenclature'
+import { getMicrocopy } from '@/lib/copy'
+
+const GREENHOUSE_COPY = getMicrocopy()
+
 
 // ── Types ──
 
@@ -254,7 +258,7 @@ const GreenhouseClientTeam = () => {
           <IconButton
             onClick={() => setSelectedMemberId(null)}
             size='small'
-            aria-label='Cerrar'
+            aria-label={GREENHOUSE_COPY.actions.close}
           >
             <i className='tabler-x' style={{ fontSize: 20 }} />
           </IconButton>

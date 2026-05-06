@@ -14,6 +14,9 @@ import type { PricingAddonOutputV2, PricingOutputCurrency } from '@/lib/finance/
 
 import { formatOutputMoney } from './QuoteTotalsFooter'
 
+const TASK407_ARIA_ADDONS_SUGERIDOS = "Addons sugeridos"
+
+
 export interface AddonSuggestionsPanelProps {
 
   /** Addons visibles al cliente, mezclados: los ya aplicados (como línea) y
@@ -53,7 +56,7 @@ const AddonSuggestionsPanel = ({
   return (
     <Box
       component='aside'
-      aria-label='Addons sugeridos'
+      aria-label={TASK407_ARIA_ADDONS_SUGERIDOS}
       sx={theme => ({
         border: `1px solid ${theme.palette.divider}`,
         borderRadius: 1,

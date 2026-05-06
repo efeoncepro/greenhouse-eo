@@ -28,6 +28,10 @@ import type {
   BeneficiaryPaymentProfileStatus
 } from '@/types/payment-profiles'
 
+const TASK407_ARIA_CERRAR_DRAWER = "Cerrar drawer"
+const TASK407_ARIA_CARGANDO_PERFIL_DE_PAGO = "Cargando perfil de pago"
+
+
 const GREENHOUSE_COPY = getMicrocopy()
 
 interface ProfileDetailDrawerProps {
@@ -302,7 +306,7 @@ const ProfileDetailDrawer = ({ profileId, onClose, onActionComplete }: ProfileDe
             </Typography>
           ) : null}
         </Stack>
-        <IconButton onClick={onClose} aria-label='Cerrar drawer'>
+        <IconButton onClick={onClose} aria-label={TASK407_ARIA_CERRAR_DRAWER}>
           <i className='tabler-x' />
         </IconButton>
       </Box>
@@ -310,7 +314,7 @@ const ProfileDetailDrawer = ({ profileId, onClose, onActionComplete }: ProfileDe
 
       {loading || !profile ? (
         <Box sx={{ p: 4 }}>
-          <LinearProgress aria-label='Cargando perfil de pago' />
+          <LinearProgress aria-label={TASK407_ARIA_CARGANDO_PERFIL_DE_PAGO} />
         </Box>
       ) : (
         <Stack spacing={4} sx={{ p: 4 }}>

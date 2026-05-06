@@ -17,6 +17,9 @@ import Stack from '@mui/material/Stack'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 
+const TASK407_ARIA_CERRAR_VISTA_PREVIA = "Cerrar vista previa"
+
+
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`
 
 // ---------------------------------------------------------------------------
@@ -382,7 +385,7 @@ const CertificatePreviewDialog = ({
               <i className='tabler-download' />
             </IconButton>
           </Tooltip>
-          <IconButton onClick={handleClose} aria-label='Cerrar vista previa' size='small'>
+          <IconButton onClick={handleClose} aria-label={TASK407_ARIA_CERRAR_VISTA_PREVIA} size='small'>
             <i className='tabler-x' />
           </IconButton>
         </Stack>

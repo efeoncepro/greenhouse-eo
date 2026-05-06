@@ -21,6 +21,9 @@ import { HorizontalWithSubtitle } from '@/components/card-statistics'
 
 import type { PayrollPeriodDownstreamSummary } from '@/lib/finance/payment-orders/payroll-status-reader'
 
+const TASK407_ARIA_CARGANDO_ESTADO_DOWNSTREAM_DEL_PERIODO = "Cargando estado downstream del periodo"
+
+
 interface Props {
   periodId: string
   /**
@@ -110,7 +113,7 @@ const PayrollPaymentStatusCard = ({ periodId, summary: externalSummary, loading:
       <CardContent>
         {loading && (
           <Box sx={{ py: 2 }} role='status' aria-live='polite'>
-            <LinearProgress aria-label='Cargando estado downstream del periodo' />
+            <LinearProgress aria-label={TASK407_ARIA_CARGANDO_ESTADO_DOWNSTREAM_DEL_PERIODO} />
             <Typography variant='caption' color='text.secondary' sx={{ display: 'block', mt: 1 }}>
               Cargando estado de pago...
             </Typography>

@@ -210,7 +210,7 @@ const CreateShareholderAccountDrawer = ({ open, onClose, onSuccess }: Props) => 
             Registra la cuenta bilateral con la persona canónica del accionista y deja listo el saldo para operar.
           </Typography>
         </Box>
-        <IconButton size='small' onClick={onClose} aria-label='Cerrar'>
+        <IconButton size='small' onClick={onClose} aria-label={GREENHOUSE_COPY.actions.close}>
           <i className='tabler-x' />
         </IconButton>
       </Box>

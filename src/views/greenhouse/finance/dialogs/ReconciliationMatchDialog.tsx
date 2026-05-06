@@ -28,6 +28,9 @@ import { getMicrocopy } from '@/lib/copy'
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 
+const TASK407_EMPTY_NO_SE_ENCONTRARON_CANDIDATOS_PARA_CONCILIAR_AJUSTA_LOS_FIL = "No se encontraron candidatos para conciliar. Ajusta los filtros o verifica que existan registros en el periodo."
+
+
 const GREENHOUSE_COPY = getMicrocopy()
 
 // ---------------------------------------------------------------------------
@@ -302,7 +305,7 @@ const ReconciliationMatchDialog = ({ open, periodId, row, initialCandidateId = n
             {mode === 'unmatch' ? 'Deshacer conciliacion' : mode === 'exclude' ? 'Excluir movimiento' : 'Conciliar movimiento'}
           </Typography>
         </Box>
-        <IconButton onClick={onClose} size='small' aria-label='Cerrar'>
+        <IconButton onClick={onClose} size='small' aria-label={GREENHOUSE_COPY.actions.close}>
           <i className='tabler-x' />
         </IconButton>
       </DialogTitle>
@@ -446,7 +449,7 @@ const ReconciliationMatchDialog = ({ open, periodId, row, initialCandidateId = n
               ) : candidates.length === 0 ? (
                 <Box sx={{ textAlign: 'center', py: 6 }} role='status'>
                   <Typography variant='body2' color='text.secondary'>
-                    No se encontraron candidatos para conciliar. Ajusta los filtros o verifica que existan registros en el periodo.
+                    {TASK407_EMPTY_NO_SE_ENCONTRARON_CANDIDATOS_PARA_CONCILIAR_AJUSTA_LOS_FIL}
                   </Typography>
                 </Box>
               ) : (

@@ -14,6 +14,11 @@ import ToggleButton from '@mui/material/ToggleButton'
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup'
 import Typography from '@mui/material/Typography'
 
+const TASK407_ARIA_CAMBIAR_VISTA_DE_MONEDA = "Cambiar vista de moneda"
+const TASK407_ARIA_VER_EN_MONEDA_DEL_CLIENTE = "Ver en moneda del cliente"
+const TASK407_ARIA_VER_EN_USD_CANONICAL = "Ver en USD canonical"
+
+
 interface FxSnapshotPayload {
   quotationId: string
   outputCurrency: string
@@ -142,12 +147,12 @@ const QuoteCurrencyView = ({
               onChange={(_, next) => {
                 if (next) setView(next as CurrencyView)
               }}
-              aria-label='Cambiar vista de moneda'
+              aria-label={TASK407_ARIA_CAMBIAR_VISTA_DE_MONEDA}
             >
-              <ToggleButton value='client' aria-label='Ver en moneda del cliente'>
+              <ToggleButton value='client' aria-label={TASK407_ARIA_VER_EN_MONEDA_DEL_CLIENTE}>
                 {outputCurrency.toUpperCase()}
               </ToggleButton>
-              <ToggleButton value='base' aria-label='Ver en USD canonical'>
+              <ToggleButton value='base' aria-label={TASK407_ARIA_VER_EN_USD_CANONICAL}>
                 {snapshot?.baseCurrency ?? 'USD'}
               </ToggleButton>
             </ToggleButtonGroup>

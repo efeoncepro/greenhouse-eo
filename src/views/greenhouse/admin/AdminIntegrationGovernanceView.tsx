@@ -38,6 +38,9 @@ import type {
 import type { IntegrationHealth, IntegrationReadiness, IntegrationType, IntegrationWithHealth } from '@/types/integrations'
 import AdminOpsActionButton from './AdminOpsActionButton'
 
+const TASK407_EMPTY_NO_SE_ENCONTRARON_INTEGRACIONES_EN_EL_REGISTRY_LA_TABLA = "No se encontraron integraciones en el registry. La tabla"
+
+
 type Props = {
   integrations: IntegrationWithHealth[]
   notionDataQualityOverview: IntegrationDataQualityOverview | null
@@ -254,7 +257,7 @@ const AdminIntegrationGovernanceView = ({
 
       {integrations.length === 0 && (
         <Alert severity='info' variant='outlined'>
-          No se encontraron integraciones en el registry. La tabla <code>greenhouse_sync.integration_registry</code> puede
+          {TASK407_EMPTY_NO_SE_ENCONTRARON_INTEGRACIONES_EN_EL_REGISTRY_LA_TABLA} <code>greenhouse_sync.integration_registry</code> puede
           estar vacia o la consulta fallo. Verifica que la migracion se haya aplicado correctamente.
         </Alert>
       )}

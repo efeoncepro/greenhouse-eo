@@ -43,6 +43,12 @@ import {
   getTrend
 } from '@views/greenhouse/dashboard/helpers'
 
+const TASK407_ARIA_GRAFICO_DE_DISTRIBUCION_DE_ASSETS_POR_ESTADO = "Grafico de distribucion de assets por estado"
+const TASK407_ARIA_GRAFICO_DE_ASSETS_COMPLETADOS_POR_SEMANA_EN_LOS_ULTIMOS_3_ = "Grafico de assets completados por semana en los ultimos 3 meses"
+const TASK407_ARIA_GRAFICO_DE_RPA_PROMEDIO_POR_PROYECTO = "Grafico de RpA promedio por proyecto"
+const TASK407_ARIA_GRAFICO_DE_TENDENCIA_MENSUAL_DE_OTD = "Grafico de tendencia mensual de OTD%"
+
+
 type GreenhouseDashboardProps = {
   clientName: string
   data: GreenhouseDashboardData
@@ -213,7 +219,7 @@ const GreenhouseDashboard = ({ clientName, data, teamMembersData = null }: Green
                   description={GH_MESSAGES.chart_empty_description}
                 />
               ) : (
-                <Box aria-label='Grafico de distribucion de assets por estado'>
+                <Box aria-label={TASK407_ARIA_GRAFICO_DE_DISTRIBUCION_DE_ASSETS_POR_ESTADO}>
                   <AppReactApexCharts type='donut' height={320} width='100%' series={donutSeries} options={statusMixOptions} />
                 </Box>
               )}
@@ -229,7 +235,7 @@ const GreenhouseDashboard = ({ clientName, data, teamMembersData = null }: Green
                   description={GH_MESSAGES.chart_empty_description}
                 />
               ) : (
-                <Box aria-label='Grafico de assets completados por semana en los ultimos 3 meses'>
+                <Box aria-label={TASK407_ARIA_GRAFICO_DE_ASSETS_COMPLETADOS_POR_SEMANA_EN_LOS_ULTIMOS_3_}>
                   <AppReactApexCharts type='bar' height={320} width='100%' series={cadenceSeries} options={weeklyCadenceOptions} />
                 </Box>
               )}
@@ -245,7 +251,7 @@ const GreenhouseDashboard = ({ clientName, data, teamMembersData = null }: Green
                   description={GH_MESSAGES.chart_empty_description}
                 />
               ) : (
-                <Box aria-label='Grafico de RpA promedio por proyecto'>
+                <Box aria-label={TASK407_ARIA_GRAFICO_DE_RPA_PROMEDIO_POR_PROYECTO}>
                   <AppReactApexCharts type='bar' height={320} width='100%' series={projectRpaSeries} options={projectRpaOptions} />
                 </Box>
               )}
@@ -261,7 +267,7 @@ const GreenhouseDashboard = ({ clientName, data, teamMembersData = null }: Green
                   description={GH_MESSAGES.chart_empty_description}
                 />
               ) : (
-                <Box aria-label='Grafico de tendencia mensual de OTD%'>
+                <Box aria-label={TASK407_ARIA_GRAFICO_DE_TENDENCIA_MENSUAL_DE_OTD}>
                   <AppReactApexCharts type='line' height={320} width='100%' series={otdTrendSeries} options={otdTrendOptions} />
                 </Box>
               )}

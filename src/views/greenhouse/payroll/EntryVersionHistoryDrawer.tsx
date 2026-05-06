@@ -19,6 +19,9 @@ import CustomChip from '@core/components/mui/Chip'
 import { formatCurrency, formatDateTime } from '@/lib/format'
 import type { PayrollCurrency } from '@/types/payroll'
 
+const TASK407_ARIA_CERRAR_HISTORIAL_DE_VERSIONES = "Cerrar historial de versiones"
+
+
 // TASK-412 — side drawer that lists every version of a payroll entry
 // (v1, v2, …) so HR admins can audit what changed between reliquidations.
 // Reads `/api/hr/payroll/entries/[entryId]/versions` on open.
@@ -158,7 +161,7 @@ const EntryVersionHistoryDrawer = ({ open, onClose, entryId, memberName }: Props
               </Typography>
             )}
           </Stack>
-          <IconButton onClick={onClose} size='small' aria-label='Cerrar historial de versiones'>
+          <IconButton onClick={onClose} size='small' aria-label={TASK407_ARIA_CERRAR_HISTORIAL_DE_VERSIONES}>
             <i className='tabler-x' />
           </IconButton>
         </Box>

@@ -748,7 +748,7 @@ const EditServiceDrawer = ({ open, moduleId, onClose, onSuccess }: EditServiceDr
             </Typography>
           ) : null}
         </Box>
-        <IconButton onClick={handleClose} size='small' aria-label='Cerrar'>
+        <IconButton onClick={handleClose} size='small' aria-label={GREENHOUSE_COPY.actions.close}>
           <i className='tabler-x' />
         </IconButton>
       </Box>

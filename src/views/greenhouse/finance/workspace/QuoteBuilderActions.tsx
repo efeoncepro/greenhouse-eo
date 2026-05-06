@@ -14,6 +14,9 @@ import { GH_PRICING } from '@/config/greenhouse-nomenclature'
 
 import CurrencySwitcher from '@/components/greenhouse/pricing/CurrencySwitcher'
 
+const TASK407_ARIA_CONTEXTO_DE_LA_COTIZACION = "Contexto de la cotización"
+
+
 export interface QuoteBuilderState {
   businessLineCode: string | null
   commercialModel: CommercialModelCode
@@ -58,7 +61,7 @@ const QuoteBuilderActions = ({ state, onChange, options, disabled = false }: Quo
   const selectedCountryFactor = options.countryFactors.find(c => c.code === state.countryFactorCode)
 
   return (
-    <Stack spacing={3} component='aside' aria-label='Contexto de la cotización'>
+    <Stack spacing={3} component='aside' aria-label={TASK407_ARIA_CONTEXTO_DE_LA_COTIZACION}>
       <CustomTextField
         select
         fullWidth

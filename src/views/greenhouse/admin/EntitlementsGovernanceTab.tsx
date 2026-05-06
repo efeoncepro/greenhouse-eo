@@ -33,6 +33,9 @@ import type {
   RoleEntitlementDefaultInput
 } from '@/lib/admin/entitlements-governance'
 
+const TASK407_ARIA_DEFAULTS_POR_ROL = "Defaults por rol"
+
+
 type Props = {
   data: EntitlementsGovernanceOverview
 }
@@ -257,7 +260,7 @@ const EntitlementsGovernanceTab = ({ data }: Props) => {
             </Grid>
 
             <DataTableShell identifier='entitlements-role-defaults' ariaLabel='Defaults por rol'>
-              <Table size='small' aria-label='Defaults por rol'>
+              <Table size='small' aria-label={TASK407_ARIA_DEFAULTS_POR_ROL}>
                 <TableHead>
                   <TableRow>
                     <TableCell>Capability</TableCell>

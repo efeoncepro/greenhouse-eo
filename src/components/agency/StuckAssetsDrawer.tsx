@@ -16,6 +16,10 @@ import CustomChip from '@core/components/mui/Chip'
 
 import { GH_AGENCY, GH_COLORS } from '@/config/greenhouse-nomenclature'
 import { CSC_PHASE_LABELS, type CscPhase } from '@/lib/ico-engine/metric-registry'
+import { getMicrocopy } from '@/lib/copy'
+
+const GREENHOUSE_COPY = getMicrocopy()
+
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -94,7 +98,7 @@ const StuckAssetsDrawer = ({ open, spaceId, onClose }: Props) => {
             {spaceId}
           </Typography>
         </Stack>
-        <IconButton onClick={onClose} aria-label='Cerrar'>
+        <IconButton onClick={onClose} aria-label={GREENHOUSE_COPY.actions.close}>
           <i className='tabler-x' />
         </IconButton>
       </Stack>

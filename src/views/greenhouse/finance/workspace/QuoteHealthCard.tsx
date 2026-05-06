@@ -13,6 +13,10 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
 import CustomChip from '@core/components/mui/Chip'
+import { getMicrocopy } from '@/lib/copy'
+
+const GREENHOUSE_COPY = getMicrocopy()
+
 
 interface QuoteHealthAlert {
   level: 'error' | 'warning' | 'info'
@@ -91,7 +95,7 @@ const STATUS_META: Record<HealthStatus, { label: string; color: SemanticColor; i
     headline: 'Margen bajo el piso autorizado'
   },
   unknown: {
-    label: 'Sin datos',
+    label: GREENHOUSE_COPY.empty.noData,
     color: 'secondary',
     icon: 'tabler-help',
     headline: 'Aún sin margen calculado'

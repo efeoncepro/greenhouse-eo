@@ -8,6 +8,9 @@ import FinanceMovementFeed from './FinanceMovementFeed'
 import { FINANCE_MOVEMENT_PROVIDER_CATALOG } from './finance-movement-provider-catalog'
 import type { FinanceMovementFeedItem } from './finance-movement-feed.types'
 
+const TASK407_COPY_COLA_VISIBLE = "Cola visible"
+
+
 const items: FinanceMovementFeedItem[] = [
   {
     id: 'exp-pay-1',
@@ -48,7 +51,7 @@ describe('FinanceMovementFeed', () => {
         summaryItems={[
           {
             id: 'pending',
-            label: 'Cola visible',
+            label: TASK407_COPY_COLA_VISIBLE,
             value: '2 movimientos',
             helper: 'Cobros y pagos sin match',
             icon: 'tabler-list-search',

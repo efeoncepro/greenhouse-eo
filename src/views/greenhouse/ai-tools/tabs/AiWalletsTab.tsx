@@ -297,7 +297,7 @@ return theme.palette.secondary.main
               </CustomAvatar>
               {hasFilters ? (
                 <>
-                  <Typography variant='h6' color='text.secondary'>Sin resultados</Typography>
+                  <Typography variant='h6' color='text.secondary'>{GREENHOUSE_COPY.empty.noResults}</Typography>
                   <Typography variant='body2' color='text.disabled'>
                     No hay wallets que coincidan con los filtros.
                   </Typography>

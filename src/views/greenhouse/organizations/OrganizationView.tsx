@@ -27,6 +27,10 @@ import OrganizationTabs from './OrganizationTabs'
 import EditOrganizationDrawer from './drawers/EditOrganizationDrawer'
 import AddMembershipDrawer from './drawers/AddMembershipDrawer'
 
+const TASK407_ARIA_SINCRONIZAR_CON_HUBSPOT = "Sincronizar con HubSpot"
+const TASK407_ARIA_EDITAR_ORGANIZACION = "Editar organización"
+
+
 // ── Helpers ──
 
 const COUNTRY_FLAGS: Record<string, string> = {
@@ -226,7 +230,7 @@ const OrganizationView = ({ organizationId }: Props) => {
                   <CustomIconButton
                     variant='tonal' color='warning' size='small'
                     onClick={handleSyncHubspot} disabled={syncing}
-                    aria-label='Sincronizar con HubSpot'
+                    aria-label={TASK407_ARIA_SINCRONIZAR_CON_HUBSPOT}
                   >
                     {syncing ? <CircularProgress size={18} color='inherit' /> : <i className='tabler-refresh' />}
                   </CustomIconButton>
@@ -235,7 +239,7 @@ const OrganizationView = ({ organizationId }: Props) => {
                   <CustomIconButton
                     variant='tonal' color='primary' size='small'
                     onClick={() => setEditDrawerOpen(true)}
-                    aria-label='Editar organización'
+                    aria-label={TASK407_ARIA_EDITAR_ORGANIZACION}
                   >
                     <i className='tabler-edit' />
                   </CustomIconButton>

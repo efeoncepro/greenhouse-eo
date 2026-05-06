@@ -17,6 +17,9 @@ import type { ThemeColor } from '@core/types'
 
 import type { ClosingTrafficLight, HomeClosingCountdownData, HomeClosingCountdownItem } from '@/lib/home/contract'
 
+const TASK407_ARIA_CIERRES_EN_CURSO = "Cierres en curso"
+
+
 interface HomeClosingCountdownProps {
   data: HomeClosingCountdownData
 }
@@ -53,7 +56,7 @@ export const HomeClosingCountdown = ({ data }: HomeClosingCountdownProps) => {
   if (!data || data.items.length === 0) return null
 
   return (
-    <Card component='section' aria-label='Cierres en curso'>
+    <Card component='section' aria-label={TASK407_ARIA_CIERRES_EN_CURSO}>
       <CardHeader
         avatar={<i className='tabler-flag text-xl' />}
         title='Cierres en curso'

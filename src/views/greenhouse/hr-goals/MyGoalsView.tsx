@@ -29,6 +29,9 @@ import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSu
 
 import type { GoalCycle, GoalKeyResult, GoalStatus, GoalWithDetails } from '@/types/hr-goals'
 
+const TASK407_ARIA_SELECCIONAR_CICLO = "Seleccionar ciclo"
+
+
 const GREENHOUSE_COPY = getMicrocopy()
 // ── Status display config ──
 
@@ -226,7 +229,7 @@ const MyGoalsView = () => {
                   value={selectedCycleId}
                   onChange={e => handleCycleChange(e.target.value)}
                   sx={{ minWidth: 180 }}
-                  aria-label='Seleccionar ciclo'
+                  aria-label={TASK407_ARIA_SELECCIONAR_CICLO}
                 >
                   {visibleCycles.map(c => (
                     <MenuItem key={c.cycleId} value={c.cycleId}>

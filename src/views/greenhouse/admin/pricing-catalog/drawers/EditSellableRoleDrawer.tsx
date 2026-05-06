@@ -40,6 +40,9 @@ import {
   type PricingTierCode
 } from '@/lib/commercial/pricing-governance-types'
 
+const TASK407_ARIA_SECCIONES_DEL_ROL = "Secciones del rol"
+
+
 const GREENHOUSE_COPY = getMicrocopy()
 
 // Inline para evitar importar `sellable-roles-seed.ts` que depende de node:fs/promises.
@@ -1019,7 +1022,7 @@ const EditSellableRoleDrawer = ({ open, roleId, onClose, onSuccess }: EditSellab
             </Typography>
           )}
         </Box>
-        <IconButton onClick={handleClose} size='small' aria-label='Cerrar'>
+        <IconButton onClick={handleClose} size='small' aria-label={GREENHOUSE_COPY.actions.close}>
           <i className='tabler-x' />
         </IconButton>
       </Box>
@@ -1041,7 +1044,7 @@ const EditSellableRoleDrawer = ({ open, roleId, onClose, onSuccess }: EditSellab
               onChange={(_, v: TabValue) => setTab(v)}
               variant='scrollable'
               scrollButtons='auto'
-              aria-label='Secciones del rol'
+              aria-label={TASK407_ARIA_SECCIONES_DEL_ROL}
             >
               <Tab
                 value='info'

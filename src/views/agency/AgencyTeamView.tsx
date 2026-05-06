@@ -497,7 +497,7 @@ return acc }, {} as Record<string, number>)
                   {table.getRowModel().rows.length === 0 ? (
                     <tr>
                       <td colSpan={colCount} style={{ textAlign: 'center', padding: '2rem' }}>
-                        <Typography variant='body2' color='text.secondary'>Sin resultados</Typography>
+                        <Typography variant='body2' color='text.secondary'>{GREENHOUSE_COPY.empty.noResults}</Typography>
                       </td>
                     </tr>
                   ) : (

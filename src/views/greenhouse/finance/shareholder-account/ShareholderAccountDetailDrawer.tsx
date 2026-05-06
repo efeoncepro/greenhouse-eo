@@ -48,6 +48,10 @@ import {
   normalizeShareholderBalance,
   normalizeShareholderMovement
 } from './utils'
+import { getMicrocopy } from '@/lib/copy'
+
+const GREENHOUSE_COPY = getMicrocopy()
+
 
 type Props = {
   open: boolean
@@ -369,7 +373,7 @@ const ShareholderAccountDetailDrawer = ({
             Saldo actual, filtros mínimos y trazabilidad de cada movimiento bilateral.
           </Typography>
         </Box>
-        <IconButton size='small' onClick={onClose} aria-label='Cerrar'>
+        <IconButton size='small' onClick={onClose} aria-label={GREENHOUSE_COPY.actions.close}>
           <i className='tabler-x' />
         </IconButton>
       </Box>

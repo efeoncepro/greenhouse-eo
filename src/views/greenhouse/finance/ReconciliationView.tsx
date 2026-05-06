@@ -990,7 +990,7 @@ const ReconciliationView = () => {
               </Typography>
             )}
           </Box>
-          <IconButton size='small' onClick={handleCloseArchiveDialog} disabled={archiveSubmitting} aria-label='Cerrar'>
+          <IconButton size='small' onClick={handleCloseArchiveDialog} disabled={archiveSubmitting} aria-label={GREENHOUSE_COPY.actions.close}>
             <i className='tabler-x' style={{ fontSize: 18 }} />
           </IconButton>
         </DialogTitle>

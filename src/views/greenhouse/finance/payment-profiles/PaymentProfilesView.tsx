@@ -43,6 +43,10 @@ import type { PaymentProfileQueueSummary } from '@/lib/finance/beneficiary-payme
 
 import ProfileDetailDrawer from './ProfileDetailDrawer'
 
+const TASK407_ARIA_CARGANDO_UNIVERSO_DE_PERFILES = "Cargando universo de perfiles"
+const TASK407_ARIA_ABRIR_EN_360 = "Abrir en 360"
+
+
 type StatusFilter = BeneficiaryPaymentProfileStatus | 'all'
 type CurrencyFilter = BeneficiaryPaymentProfileCurrency | 'all'
 type BeneficiaryTypeFilter = BeneficiaryPaymentProfileBeneficiaryType | 'all'
@@ -457,7 +461,7 @@ const PaymentProfilesView = () => {
 
             {profilesLoading ? (
               <Box sx={{ py: 2 }}>
-                <LinearProgress aria-label='Cargando universo de perfiles' />
+                <LinearProgress aria-label={TASK407_ARIA_CARGANDO_UNIVERSO_DE_PERFILES} />
               </Box>
             ) : tableEmpty ? (
               <EmptyState
@@ -482,7 +486,7 @@ const PaymentProfilesView = () => {
                       <TableCell>Estado</TableCell>
                       <TableCell>Maker</TableCell>
                       <TableCell>Checker</TableCell>
-                      <TableCell aria-label='Abrir en 360' />
+                      <TableCell aria-label={TASK407_ARIA_ABRIR_EN_360} />
                     </TableRow>
                   </TableHead>
                   <TableBody>

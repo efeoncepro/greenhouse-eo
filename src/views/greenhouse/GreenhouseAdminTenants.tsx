@@ -33,6 +33,10 @@ import type { AdminTenantsOverview } from '@/lib/admin/get-admin-tenants-overvie
 import { GH_INTERNAL_MESSAGES, GH_INTERNAL_NAV } from '@/config/greenhouse-nomenclature'
 
 import tableStyles from '@core/styles/table.module.css'
+import { getMicrocopy } from '@/lib/copy'
+
+const GREENHOUSE_COPY = getMicrocopy()
+
 
 type TenantRow = AdminTenantsOverview['tenants'][number]
 
@@ -250,7 +254,7 @@ const GreenhouseAdminTenants = ({ data }: Props) => {
                 </thead>
                 <tbody>
                   {table.getRowModel().rows.length === 0 ? (
-                    <tr><td colSpan={columns.length} style={{ textAlign: 'center', padding: '2rem' }}><Typography variant='body2' color='text.secondary'>Sin resultados</Typography></td></tr>
+                    <tr><td colSpan={columns.length} style={{ textAlign: 'center', padding: '2rem' }}><Typography variant='body2' color='text.secondary'>{GREENHOUSE_COPY.empty.noResults}</Typography></td></tr>
                   ) : table.getRowModel().rows.map(row => (
                     <tr key={row.id}>
                       {row.getVisibleCells().map(cell => (

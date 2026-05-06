@@ -9,6 +9,9 @@ import { alpha, useTheme } from '@mui/material/styles'
 
 import type { PricingEngineOutputV2, PricingOutputCurrency } from '@/lib/finance/pricing/contracts'
 
+const TASK407_ARIA_CALCULANDO_PRECIOS = "Calculando precios"
+
+
 const CURRENCY_LOCALE: Record<PricingOutputCurrency, string> = {
   CLP: 'es-CL',
   USD: 'en-US',
@@ -176,7 +179,7 @@ const QuoteTotalsFooter = ({ output, outputCurrency, loading = false, error = nu
             </Box>
           </Stack>
         ) : loading ? (
-          <CircularProgress size={20} aria-label='Calculando precios' />
+          <CircularProgress size={20} aria-label={TASK407_ARIA_CALCULANDO_PRECIOS} />
         ) : null}
       </Stack>
     </Box>

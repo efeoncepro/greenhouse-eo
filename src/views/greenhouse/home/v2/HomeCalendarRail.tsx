@@ -17,6 +17,9 @@ import type { ThemeColor } from '@core/types'
 import type { CalendarEventKind, HomeCalendarEvent, HomeCalendarRailData } from '@/lib/home/contract'
 import { getMicrocopy } from '@/lib/copy'
 
+const TASK407_ARIA_PROXIMOS_EVENTOS = "Próximos eventos"
+
+
 const GREENHOUSE_COPY = getMicrocopy()
 
 interface HomeCalendarRailProps {
@@ -132,7 +135,7 @@ export const HomeCalendarRail = ({ data }: HomeCalendarRailProps) => {
   if (!data || data.events.length === 0) return null
 
   return (
-    <Card component='aside' aria-label='Próximos eventos'>
+    <Card component='aside' aria-label={TASK407_ARIA_PROXIMOS_EVENTOS}>
       <CardHeader
         avatar={<i className='tabler-calendar-event text-xl' />}
         title='Próximos eventos'

@@ -45,6 +45,10 @@ import type {
   ListSignalsResult
 } from '@/lib/finance/external-cash-signals'
 
+const TASK407_ARIA_CARGANDO_SENALES = "Cargando señales"
+const TASK407_ARIA_COLA_DE_SENALES_EXTERNAS_DE_CAJA = "Cola de señales externas de caja"
+
+
 const GREENHOUSE_COPY = getMicrocopy()
 
 interface SignalRow extends ExternalCashSignal {
@@ -255,7 +259,7 @@ const ExternalSignalsView = ({ initial }: Props) => {
           subheader='Pulse · operación canónica de cash externa'
         />
         <Divider />
-        {loading && <LinearProgress aria-label='Cargando señales' />}
+        {loading && <LinearProgress aria-label={TASK407_ARIA_CARGANDO_SENALES} />}
         <CardContent>
           <Stack direction={{ xs: 'column', md: 'row' }} spacing={3} sx={{ mb: 4 }}>
             <CustomTextField
@@ -329,7 +333,7 @@ const ExternalSignalsView = ({ initial }: Props) => {
             />
           ) : (
             <TableContainer>
-              <Table size='small' aria-label='Cola de señales externas de caja'>
+              <Table size='small' aria-label={TASK407_ARIA_COLA_DE_SENALES_EXTERNAS_DE_CAJA}>
                 <caption style={{ position: 'absolute', left: -9999, top: -9999 }}>
                   Lista de {data.total} señales externas pendientes de resolución
                 </caption>

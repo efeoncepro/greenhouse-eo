@@ -33,6 +33,10 @@ import PaymentHistoryTable from '@views/greenhouse/finance/components/PaymentHis
 import SettlementOrchestrationDrawer from '@views/greenhouse/finance/drawers/SettlementOrchestrationDrawer'
 import FactoringOperationDrawer from '@views/greenhouse/finance/drawers/FactoringOperationDrawer'
 
+const TASK407_ARIA_ACTUALIZAR_ESTADO_DEL_DTE_EN_SII = "Actualizar estado del DTE en SII"
+const TASK407_ARIA_EMITIR_DOCUMENTO_TRIBUTARIO_ELECTRONICO = "Emitir documento tributario electrónico"
+
+
 const GREENHOUSE_COPY = getMicrocopy()
 // ---------------------------------------------------------------------------
 // Types
@@ -514,7 +518,7 @@ const IncomeDetailView = () => {
                       startIcon={<i className='tabler-refresh' />}
                       onClick={handleRefreshDteStatus}
                       disabled={refreshingDte}
-                      aria-label='Actualizar estado del DTE en SII'
+                      aria-label={TASK407_ARIA_ACTUALIZAR_ESTADO_DEL_DTE_EN_SII}
                     >
                       {refreshingDte ? 'Consultando...' : 'Actualizar estado'}
                     </Button>
@@ -530,7 +534,7 @@ const IncomeDetailView = () => {
                     color='primary'
                     startIcon={<i className='tabler-file-upload' />}
                     onClick={() => setEmitDialogOpen(true)}
-                    aria-label='Emitir documento tributario electrónico'
+                    aria-label={TASK407_ARIA_EMITIR_DOCUMENTO_TRIBUTARIO_ELECTRONICO}
                   >
                     Emitir DTE
                   </Button>

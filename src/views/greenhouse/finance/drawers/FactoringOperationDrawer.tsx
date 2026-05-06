@@ -244,7 +244,7 @@ const FactoringOperationDrawer = ({ open, onClose, onSuccess, incomeId, nominalA
           <Typography variant='h6'>Ceder a factoring</Typography>
           <Typography variant='caption' color='text.secondary'>Cesión de factura — registro atómico</Typography>
         </Box>
-        <IconButton onClick={handleClose} size='small' aria-label='Cerrar'>
+        <IconButton onClick={handleClose} size='small' aria-label={GREENHOUSE_COPY.actions.close}>
           <i className='tabler-x' />
         </IconButton>
       </Box>

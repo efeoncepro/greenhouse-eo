@@ -41,6 +41,9 @@ import type {
 import { getInitials } from '@/utils/getInitials'
 import { leaveStatusConfig, getLeaveTypeConfig, attendanceStatusConfig, formatDate } from './helpers'
 
+const TASK407_EMPTY_NO_HAY_REGISTROS_DE_ASISTENCIA_RECIENTES = "No hay registros de asistencia recientes."
+
+
 const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'))
 
 const HrCoreDashboard = () => {
@@ -377,7 +380,7 @@ const HrCoreDashboard = () => {
           {attSummary.total === 0 ? (
             <Stack alignItems='center' spacing={1} sx={{ py: 6 }}>
               <i className='tabler-clock-off' style={{ fontSize: 40, color: 'var(--mui-palette-text-disabled)' }} />
-              <Typography color='text.secondary'>No hay registros de asistencia recientes.</Typography>
+              <Typography color='text.secondary'>{TASK407_EMPTY_NO_HAY_REGISTROS_DE_ASISTENCIA_RECIENTES}</Typography>
             </Stack>
           ) : (
             <Grid container spacing={6} alignItems='center'>

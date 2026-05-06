@@ -363,7 +363,7 @@ const SettlementOrchestrationDrawer = ({ open, paymentType, paymentId, onClose, 
             Revisa la cadena de liquidación y agrega tramos intermedios cuando el pago pase por otro rail.
           </Typography>
         </Box>
-        <IconButton onClick={onClose} size='small' aria-label='Cerrar'>
+        <IconButton onClick={onClose} size='small' aria-label={GREENHOUSE_COPY.actions.close}>
           <i className='tabler-x' />
         </IconButton>
       </Box>

@@ -30,6 +30,9 @@ import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tool
 import type { OrganizationDetailData } from '../types'
 import { getMicrocopy } from '@/lib/copy'
 
+const TASK407_EMPTY_NO_HAY_DATOS_ECONOMICOS_PARA_ESTE_PERIODO = "No hay datos económicos para este período"
+
+
 const GREENHOUSE_COPY = getMicrocopy()
 // ── Types ──
 
@@ -315,7 +318,7 @@ const OrganizationEconomicsTab = ({ detail }: Props) => {
           <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
             <CardContent>
               <Box sx={{ textAlign: 'center', py: 4 }} role='status'>
-                <Typography variant='h6' sx={{ mb: 1 }}>No hay datos econ&oacute;micos para este per&iacute;odo</Typography>
+                <Typography variant='h6' sx={{ mb: 1 }}>{TASK407_EMPTY_NO_HAY_DATOS_ECONOMICOS_PARA_ESTE_PERIODO}</Typography>
                 <Typography variant='body2' color='text.secondary'>
                   Los datos aparecer&aacute;n cuando haya ingresos y asignaciones de equipo activas para {detail.organizationName}.
                 </Typography>

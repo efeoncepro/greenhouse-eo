@@ -20,6 +20,9 @@ import OptionMenu from '@core/components/option-menu'
 
 import type { HomeRecentItem, HomeRecentsRailData } from '@/lib/home/contract'
 
+const TASK407_ARIA_CONTINUA_DONDE_LO_DEJASTE = "Continúa donde lo dejaste"
+
+
 interface HomeRecentsRailProps {
   data: HomeRecentsRailData
 }
@@ -125,7 +128,7 @@ export const HomeRecentsRail = ({ data }: HomeRecentsRailProps) => {
   if (allItems.length === 0) return null
 
   return (
-    <Card component='aside' aria-label='Continúa donde lo dejaste'>
+    <Card component='aside' aria-label={TASK407_ARIA_CONTINUA_DONDE_LO_DEJASTE}>
       <CardHeader
         avatar={<i className='tabler-history text-xl' />}
         title='Continúa donde lo dejaste'

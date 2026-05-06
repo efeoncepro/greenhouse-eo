@@ -24,6 +24,10 @@ import type { OperationsHealthStatus, OperationsOverview, OperationsSubsystem } 
 import AdminOperationalActionsPanel from './AdminOperationalActionsPanel'
 import AdminOpsActionButton from './AdminOpsActionButton'
 
+const TASK407_COPY_DESPACHAR_WEBHOOKS = "Despachar webhooks"
+const TASK407_COPY_RE_DISPARAR_SERVICES_SYNC = "Re-disparar services sync"
+
+
 type Props = {
   data: OperationsOverview
 }
@@ -658,7 +662,7 @@ const AdminCloudIntegrationsView = ({ data }: Props) => {
           actions={[
             {
               id: 'dispatch-webhooks',
-              label: 'Despachar webhooks',
+              label: TASK407_COPY_DESPACHAR_WEBHOOKS,
               description: 'Procesa deliveries pendientes o en retry de la cola outbound.',
               endpoint: '/api/admin/ops/webhook-dispatch',
               confirmTitle: '¿Despachar webhooks pendientes?',
@@ -667,7 +671,7 @@ const AdminCloudIntegrationsView = ({ data }: Props) => {
             },
             {
               id: 'services-sync',
-              label: 'Re-disparar services sync',
+              label: TASK407_COPY_RE_DISPARAR_SERVICES_SYNC,
               description: 'Ejecuta manualmente la sincronización HubSpot -> Services para organizaciones activas.',
               endpoint: '/api/admin/ops/services-sync',
               confirmTitle: '¿Re-disparar services sync?',

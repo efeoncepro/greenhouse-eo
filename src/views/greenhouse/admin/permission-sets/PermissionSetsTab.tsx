@@ -34,6 +34,9 @@ import { getMicrocopy } from '@/lib/copy'
 import { GOVERNANCE_SECTIONS, SECTION_ACCENT, VIEW_REGISTRY, type GovernanceSection } from '@/lib/admin/view-access-catalog'
 import type { PermissionSetSummary, PermissionSetDetail, PermissionSetUserAssignment } from '@/types/permission-sets'
 
+const TASK407_ARIA_CERRAR_PANEL = "Cerrar panel"
+
+
 const GREENHOUSE_COPY = getMicrocopy()
 
 // ── Constants ──
@@ -596,7 +599,7 @@ const PermissionSetsTab = () => {
                   </Tooltip>
                 ) : null}
               </Stack>
-              <IconButton size='small' onClick={() => setSelectedSetId(null)} aria-label='Cerrar panel'>
+              <IconButton size='small' onClick={() => setSelectedSetId(null)} aria-label={TASK407_ARIA_CERRAR_PANEL}>
                 <i className='tabler-x' />
               </IconButton>
             </Stack>

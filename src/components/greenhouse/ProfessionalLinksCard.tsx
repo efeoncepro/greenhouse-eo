@@ -19,6 +19,9 @@ import { getMicrocopy } from '@/lib/copy'
 import BrandLogo from '@/components/greenhouse/BrandLogo'
 import { GH_SKILLS_CERTS } from '@/config/greenhouse-nomenclature'
 
+const TASK407_ARIA_EDITAR_LINKS_PROFESIONALES = "Editar links profesionales"
+
+
 const GREENHOUSE_COPY = getMicrocopy()
 
 type ProfessionalLinks = {
@@ -152,7 +155,7 @@ const ProfessionalLinksCard = ({ links, editable, onSave }: ProfessionalLinksCar
         title={GH_SKILLS_CERTS.section_professional_links}
         action={
           editable ? (
-            <IconButton size='small' onClick={handleEdit} aria-label='Editar links profesionales'>
+            <IconButton size='small' onClick={handleEdit} aria-label={TASK407_ARIA_EDITAR_LINKS_PROFESIONALES}>
               <i className='tabler-pencil' />
             </IconButton>
           ) : undefined

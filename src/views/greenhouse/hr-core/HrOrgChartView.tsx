@@ -41,6 +41,9 @@ import OrgLeadershipNodeCard, {
 } from '@/components/greenhouse/OrgLeadershipNodeCard'
 import OrgChartNodeCard, { type OrgChartNodeCardData, type OrgChartNodeCardNode } from '@/components/greenhouse/OrgChartNodeCard'
 
+const TASK407_ARIA_CAMBIAR_LECTURA_DEL_ORGANIGRAMA = "Cambiar lectura del organigrama"
+
+
 const STRUCTURE_NODE_WIDTH = 320
 const STRUCTURE_NODE_HEIGHT = 228
 const LEADERSHIP_NODE_WIDTH = 320
@@ -560,7 +563,7 @@ const HrOrgChartView = () => {
                     size='small'
                     value={viewMode}
                     onChange={handleViewModeChange}
-                    aria-label='Cambiar lectura del organigrama'
+                    aria-label={TASK407_ARIA_CAMBIAR_LECTURA_DEL_ORGANIGRAMA}
                   >
                     <ToggleButton value='structure'>Estructura</ToggleButton>
                     <ToggleButton value='leaders'>Líderes y equipos</ToggleButton>

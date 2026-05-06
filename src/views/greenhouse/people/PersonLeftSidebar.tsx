@@ -20,6 +20,11 @@ import type { PersonDetail } from '@/types/people'
 import { countryFlag, formatFte, roleCategoryLabel, safeRoleCategory } from './helpers'
 import IntegrationStatus from './components/IntegrationStatus'
 
+const TASK407_COPY_MICROSOFT = "Microsoft"
+const TASK407_COPY_NOTION = "Notion"
+const TASK407_COPY_HUBSPOT = "HubSpot"
+
+
 const GREENHOUSE_COPY = getMicrocopy()
 
 type Props = {
@@ -118,9 +123,9 @@ const PersonLeftSidebar = ({ detail, isAdmin, onEditProfile, onDeactivate, onEdi
         <Typography variant='overline' color='text.secondary'>Integraciones</Typography>
         <IntegrationStatus
           items={[
-            { label: 'Microsoft', linked: integrations.microsoftLinked },
-            { label: 'Notion', linked: integrations.notionLinked },
-            { label: 'HubSpot', linked: integrations.hubspotLinked }
+            { label: TASK407_COPY_MICROSOFT, linked: integrations.microsoftLinked },
+            { label: TASK407_COPY_NOTION, linked: integrations.notionLinked },
+            { label: TASK407_COPY_HUBSPOT, linked: integrations.hubspotLinked }
           ]}
         />
       </CardContent>

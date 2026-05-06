@@ -33,6 +33,9 @@ import type { PayrollEntry } from '@/types/payroll'
 import { downloadPayrollReceiptPdf } from '@/lib/payroll/download-payroll-receipt'
 import { formatCurrency, formatPeriodIdLabel } from '@views/greenhouse/payroll/helpers'
 
+const TASK407_ARIA_IR_AL_MODULO_DE_NOMINA = "Ir al módulo de nómina"
+
+
 const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'))
 
 type Props = {
@@ -269,7 +272,7 @@ const PersonPayrollTab = ({ entries: initialEntries, memberId }: Props) => {
             size='small'
             color='secondary'
             startIcon={<i className='tabler-external-link' aria-hidden='true' />}
-            aria-label='Ir al módulo de nómina'
+            aria-label={TASK407_ARIA_IR_AL_MODULO_DE_NOMINA}
           >
             Ver en módulo de nómina
           </Button>

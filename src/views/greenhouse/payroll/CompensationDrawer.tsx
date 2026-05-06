@@ -333,7 +333,7 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
             <Typography variant='h6' fontWeight={600}>{ev ? 'Editar compensación' : 'Nueva compensación'}</Typography>
             <Typography variant='body2' color='text.secondary'>{memberName}</Typography>
           </Box>
-          <IconButton onClick={onClose} size='small' aria-label='Cerrar'>
+          <IconButton onClick={onClose} size='small' aria-label={GREENHOUSE_COPY.actions.close}>
             <i className='tabler-x' />
           </IconButton>
         </Stack>

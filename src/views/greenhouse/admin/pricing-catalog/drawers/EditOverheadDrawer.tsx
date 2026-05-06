@@ -249,7 +249,7 @@ const EditOverheadDrawer = ({ open, overheadId, onClose, onSuccess }: Props) => 
             </Typography>
           ) : null}
         </Box>
-        <IconButton onClick={handleClose} size='small' aria-label='Cerrar' disabled={saving}>
+        <IconButton onClick={handleClose} size='small' aria-label={GREENHOUSE_COPY.actions.close} disabled={saving}>
           <i className='tabler-x' />
         </IconButton>
       </Box>

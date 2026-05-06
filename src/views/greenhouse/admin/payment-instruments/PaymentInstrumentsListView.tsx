@@ -56,6 +56,11 @@ import {
   type ReadinessStatus
 } from './paymentInstrumentAdminAdapters'
 
+const TASK407_ARIA_ACTUALIZANDO_INSTRUMENTOS_DE_PAGO = "Actualizando instrumentos de pago"
+const TASK407_ARIA_BUSCAR_INSTRUMENTOS_DE_PAGO = "Buscar instrumentos de pago"
+const TASK407_ARIA_CARGANDO_TABLA_DE_INSTRUMENTOS = "Cargando tabla de instrumentos"
+
+
 const GREENHOUSE_COPY = getMicrocopy()
 const columnHelper = createColumnHelper<PaymentInstrumentListItem>()
 
@@ -364,7 +369,7 @@ const PaymentInstrumentsListView = () => {
 
       <Grid size={{ xs: 12 }}>
         <Card elevation={0} sx={{ border: theme => `1px solid ${theme.palette.divider}`, overflow: 'hidden' }}>
-          {refreshing ? <LinearProgress aria-label='Actualizando instrumentos de pago' /> : null}
+          {refreshing ? <LinearProgress aria-label={TASK407_ARIA_ACTUALIZANDO_INSTRUMENTOS_DE_PAGO} /> : null}
           <CardHeader
             title='Registro operativo'
             subheader={data ? `${filteredItems.length} de ${data.total} instrumentos visibles` : 'Cargando instrumentos'}
@@ -375,7 +380,7 @@ const PaymentInstrumentsListView = () => {
                 value={search}
                 onChange={event => setSearch(event.target.value)}
                 sx={{ minWidth: { xs: 220, sm: 360 } }}
-                aria-label='Buscar instrumentos de pago'
+                aria-label={TASK407_ARIA_BUSCAR_INSTRUMENTOS_DE_PAGO}
                 slotProps={{
                   input: {
                     startAdornment: <i className='tabler-search' style={{ fontSize: 18, marginRight: 8, opacity: 0.6 }} />
@@ -388,7 +393,7 @@ const PaymentInstrumentsListView = () => {
 
           {loading && !data ? (
             <CardContent>
-              <Stack spacing={2} role='status' aria-label='Cargando tabla de instrumentos'>
+              <Stack spacing={2} role='status' aria-label={TASK407_ARIA_CARGANDO_TABLA_DE_INSTRUMENTOS}>
                 {[0, 1, 2, 3, 4].map(item => (
                   <Skeleton key={item} variant='rounded' height={58} />
                 ))}

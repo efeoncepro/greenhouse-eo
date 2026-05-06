@@ -40,6 +40,11 @@ import type { PayrollEntry } from '@/types/payroll'
 
 import { formatCurrency } from './helpers'
 
+const TASK407_COPY_0 = "0%"
+const TASK407_COPY_50 = "50%"
+const TASK407_COPY_100 = "100%"
+
+
 const GREENHOUSE_COPY = getMicrocopy()
 
 type Mode = 'normal' | 'percentage' | 'exclude'
@@ -279,9 +284,9 @@ const PayrollEntryAdjustDialog = ({ open, onClose, entry, onSubmitted }: Props) 
                 valueLabelDisplay='auto'
                 valueLabelFormat={v => `${v}%`}
                 marks={[
-                  { value: 0, label: '0%' },
-                  { value: 50, label: '50%' },
-                  { value: 100, label: '100%' }
+                  { value: 0, label: TASK407_COPY_0 },
+                  { value: 50, label: TASK407_COPY_50 },
+                  { value: 100, label: TASK407_COPY_100 }
                 ]}
               />
             </Box>

@@ -48,6 +48,10 @@ import {
 import type { TreasuryBankAccountOverview } from '@/lib/finance/account-balances'
 import { getMicrocopy } from '@/lib/copy'
 
+const TASK407_ARIA_CERRAR_DETALLE = "Cerrar detalle"
+const TASK407_ARIA_VENTANA_TEMPORAL_DE_MOVIMIENTOS = "Ventana temporal de movimientos"
+
+
 const GREENHOUSE_COPY = getMicrocopy()
 
 // TASK-714 — drawer consumes the canonical TreasuryBankAccountOverview shape
@@ -427,7 +431,7 @@ const AccountDetailDrawer = ({ open, accountId, year, month, onClose, onSuccess 
             {profile?.drawerSubtitle ?? 'Cargando...'}
           </Typography>
         </Box>
-        <IconButton size='small' onClick={onClose} aria-label='Cerrar detalle'>
+        <IconButton size='small' onClick={onClose} aria-label={TASK407_ARIA_CERRAR_DETALLE}>
           <i className='tabler-x' />
         </IconButton>
       </Box>
@@ -695,7 +699,7 @@ const AccountDetailDrawer = ({ open, accountId, year, month, onClose, onSuccess 
                       onChange={(_, next: TemporalMode | null) => {
                         if (next) setTemporalMode(next)
                       }}
-                      aria-label='Ventana temporal de movimientos'
+                      aria-label={TASK407_ARIA_VENTANA_TEMPORAL_DE_MOVIMIENTOS}
                     >
                       <MuiTooltip title='Últimos 30 días — qué pasa con esta cuenta hoy'>
                         <ToggleButton value='snapshot'>Reciente</ToggleButton>

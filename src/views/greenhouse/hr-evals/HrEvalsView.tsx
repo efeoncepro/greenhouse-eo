@@ -56,6 +56,10 @@ import type {
   EvalType
 } from '@/types/hr-evals'
 
+const TASK407_ARIA_FILTRAR_POR_TIPO = "Filtrar por tipo"
+const TASK407_ARIA_SECCIONES_DE_EVALUACIONES = "Secciones de evaluaciones"
+
+
 const GREENHOUSE_COPY = getMicrocopy()
 
 // ── Constants ──
@@ -514,7 +518,7 @@ const HrEvalsView = () => {
               value={typeFilter}
               onChange={e => setTypeFilter(e.target.value as EvalType | 'all')}
               sx={{ minWidth: 160 }}
-              aria-label='Filtrar por tipo'
+              aria-label={TASK407_ARIA_FILTRAR_POR_TIPO}
             >
               <MenuItem value='all'>Todos los tipos</MenuItem>
               <MenuItem value='self'>Autoevaluacion</MenuItem>
@@ -738,7 +742,7 @@ const HrEvalsView = () => {
       <Grid size={{ xs: 12 }}>
         <TabContext value={tab}>
           <Card elevation={0} sx={{ border: theme => `1px solid ${theme.palette.divider}` }}>
-            <CustomTabList onChange={(_, v: string) => setTab(v)} aria-label='Secciones de evaluaciones'>
+            <CustomTabList onChange={(_, v: string) => setTab(v)} aria-label={TASK407_ARIA_SECCIONES_DE_EVALUACIONES}>
               <Tab label='Ciclos' value='cycles' icon={<i className='tabler-refresh' />} iconPosition='start' />
               <Tab label='Asignaciones' value='assignments' icon={<i className='tabler-users' />} iconPosition='start' />
               <Tab label='Resultados' value='results' icon={<i className='tabler-chart-bar' />} iconPosition='start' />

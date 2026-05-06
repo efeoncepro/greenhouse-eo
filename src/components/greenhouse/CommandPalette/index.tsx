@@ -12,6 +12,10 @@ import { GOVERNANCE_SECTIONS, VIEW_REGISTRY, type GovernanceSection } from '@/li
 
 import './styles.css'
 
+const TASK407_ARIA_ABRIR_BUSCADOR_RAPIDO = "Abrir buscador rápido"
+const TASK407_ARIA_BUSCAR_EN_GREENHOUSE = "Buscar en Greenhouse"
+
+
 /**
  * TASK-696 — Smart Home v2 Command Palette.
  *
@@ -187,7 +191,7 @@ export const CommandPalette = ({
           type='button'
           className='gh-cmdk-trigger'
           onClick={() => setOpen(true)}
-          aria-label='Abrir buscador rápido'
+          aria-label={TASK407_ARIA_ABRIR_BUSCADOR_RAPIDO}
         >
           <i className='tabler-search' />
           <span>{triggerLabel}</span>
@@ -208,7 +212,7 @@ export const CommandPalette = ({
                   value={search}
                   onValueChange={setSearch}
                   placeholder='Buscar vistas, acciones, atajos...'
-                  aria-label='Buscar en Greenhouse'
+                  aria-label={TASK407_ARIA_BUSCAR_EN_GREENHOUSE}
                 />
                 <kbd>esc</kbd>
               </div>

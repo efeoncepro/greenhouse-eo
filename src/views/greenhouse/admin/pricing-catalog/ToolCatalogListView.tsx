@@ -45,6 +45,11 @@ import BulkEditDrawer from './drawers/BulkEditDrawer'
 import { GH_PRICING_GOVERNANCE } from '@/config/greenhouse-nomenclature'
 import { formatNumber } from '@/lib/format'
 
+const TASK407_ARIA_VOLVER_AL_CATALOGO = "Volver al catálogo"
+const TASK407_ARIA_FILTRAR_POR_CATEGORIA = "Filtrar por categoría"
+const TASK407_ARIA_FILTRAR_POR_ESTADO = "Filtrar por estado"
+
+
 // ── Types ──────────────────────────────────────────────────────────────
 
 interface ToolItem {
@@ -398,7 +403,7 @@ const ToolCatalogListView = () => {
       <Grid size={{ xs: 12 }}>
         <Stack direction='row' spacing={2} alignItems='center' sx={{ mb: 1 }}>
           <Tooltip title='Volver al catálogo'>
-            <IconButton component='a' href='/admin/pricing-catalog' size='small' aria-label='Volver al catálogo'>
+            <IconButton component='a' href='/admin/pricing-catalog' size='small' aria-label={TASK407_ARIA_VOLVER_AL_CATALOGO}>
               <i className='tabler-arrow-left' />
             </IconButton>
           </Tooltip>
@@ -462,7 +467,7 @@ const ToolCatalogListView = () => {
                   value={categoryFilter}
                   onChange={e => setCategoryFilter(e.target.value)}
                   sx={{ minWidth: 160 }}
-                  aria-label='Filtrar por categoría'
+                  aria-label={TASK407_ARIA_FILTRAR_POR_CATEGORIA}
                 >
                   <MenuItem value='all'>Todas las categorías</MenuItem>
                   {categoryOptions.map(c => (
@@ -477,7 +482,7 @@ const ToolCatalogListView = () => {
                   value={statusFilter}
                   onChange={e => setStatusFilter(e.target.value as typeof statusFilter)}
                   sx={{ minWidth: 120 }}
-                  aria-label='Filtrar por estado'
+                  aria-label={TASK407_ARIA_FILTRAR_POR_ESTADO}
                 >
                   <MenuItem value='active'>Activas</MenuItem>
                   <MenuItem value='inactive'>Inactivas</MenuItem>

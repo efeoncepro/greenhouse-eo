@@ -31,6 +31,9 @@ import ReconciliationMatchDialog from '@views/greenhouse/finance/dialogs/Reconci
 import ImportStatementDrawer from '@views/greenhouse/finance/drawers/ImportStatementDrawer'
 import { getMicrocopy } from '@/lib/copy'
 
+const TASK407_ARIA_SUGERENCIAS_DE_CONCILIACION = "Sugerencias de conciliación"
+
+
 const GREENHOUSE_COPY = getMicrocopy()
 // ---------------------------------------------------------------------------
 // Types
@@ -731,7 +734,7 @@ const ReconciliationDetailView = () => {
 
       <Card
         component='aside'
-        aria-label='Sugerencias de conciliación'
+        aria-label={TASK407_ARIA_SUGERENCIAS_DE_CONCILIACION}
         elevation={0}
         sx={{ border: t => `1px solid ${t.palette.divider}` }}
       >

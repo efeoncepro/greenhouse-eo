@@ -32,6 +32,9 @@ import { GH_TALENT_DISCOVERY } from '@/config/greenhouse-nomenclature'
 import type { SkillCatalogItem } from '@/types/agency-skills'
 import type { ToolCatalogItem } from '@/types/talent-taxonomy'
 
+const TASK407_ARIA_VERIFICADA = "Verificada"
+
+
 /* ─── Types (aligned to backend TalentDiscoveryResult / TalentDiscoverySummary) ─── */
 
 interface TopSkill {
@@ -539,7 +542,7 @@ function TalentCard({ person }: { person: TalentDiscoveryItem }) {
                     label={
                       <Box component='span' sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5 }}>
                         {skill.verified && (
-                          <i className='tabler-check' style={{ fontSize: 12 }} aria-label='Verificada' />
+                          <i className='tabler-check' style={{ fontSize: 12 }} aria-label={TASK407_ARIA_VERIFICADA} />
                         )}
                         {skill.skillName}
                       </Box>

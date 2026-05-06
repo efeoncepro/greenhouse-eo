@@ -19,6 +19,9 @@ import useReducedMotion from '@/hooks/useReducedMotion'
 
 import type { HomePulseStripData, PulseKpiCard } from '@/lib/home/contract'
 
+const TASK407_ARIA_TU_PULSO_DE_HOY = "Tu pulso de hoy"
+
+
 interface HomePulseStripProps {
   data: HomePulseStripData
 }
@@ -182,7 +185,7 @@ export const HomePulseStrip = ({ data }: HomePulseStripProps) => {
   const md = cardsToRender.length === 4 ? 3 : cardsToRender.length === 3 ? 4 : cardsToRender.length === 2 ? 6 : 12
 
   return (
-    <Grid container spacing={4} component='section' aria-label='Tu pulso de hoy' alignItems='stretch'>
+    <Grid container spacing={4} component='section' aria-label={TASK407_ARIA_TU_PULSO_DE_HOY} alignItems='stretch'>
       {cardsToRender.map((card, index) => (
         <Grid key={card.kpiId} size={{ xs: 12, sm: 6, md }}>
           <PulseCardSlot card={card} index={index} />

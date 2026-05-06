@@ -11,6 +11,11 @@ import AppReactApexCharts from '@/libs/styles/AppReactApexCharts'
 import type { GreenhouseDashboardData } from '@/types/greenhouse-dashboard'
 import { createMonthlyAdjustmentOptions, createMonthlyOnTimeOptions } from '@views/greenhouse/dashboard/chart-options'
 
+const TASK407_COPY_ENTREGABLES_VISIBLES = "Entregables visibles"
+const TASK407_COPY_SIN_AJUSTES_CLIENTE = "Sin ajustes cliente"
+const TASK407_COPY_RONDAS_DE_AJUSTE = "Rondas de ajuste"
+
+
 type DeliverySignalsSectionProps = {
   data: GreenhouseDashboardData
 }
@@ -118,17 +123,17 @@ const DeliverySignalsSection = ({ data }: DeliverySignalsSectionProps) => {
             <MetricList
               items={[
                 {
-                  label: 'Entregables visibles',
+                  label: TASK407_COPY_ENTREGABLES_VISIBLES,
                   value: String(totalDeliverablesVisible),
                   detail: 'Total visible en la ventana mensual actual.'
                 },
                 {
-                  label: 'Sin ajustes cliente',
+                  label: TASK407_COPY_SIN_AJUSTES_CLIENTE,
                   value: String(totalDeliverablesWithoutAdjustments),
                   detail: 'Base inicial de First-Time Right mientras madura el modelo formal.'
                 },
                 {
-                  label: 'Rondas de ajuste',
+                  label: TASK407_COPY_RONDAS_DE_AJUSTE,
                   value: String(totalClientAdjustmentRounds),
                   detail: 'Suma de Client Change Round Final en el alcance visible.'
                 }
@@ -168,17 +173,17 @@ const DeliverySignalsSection = ({ data }: DeliverySignalsSectionProps) => {
           <MetricList
             items={[
               {
-                label: 'Entregables visibles',
+                label: TASK407_COPY_ENTREGABLES_VISIBLES,
                 value: String(totalDeliverablesVisible),
                 detail: 'Total visible en la serie mensual actual.'
               },
               {
-                label: 'Sin ajustes cliente',
+                label: TASK407_COPY_SIN_AJUSTES_CLIENTE,
                 value: String(totalDeliverablesWithoutAdjustments),
                 detail: 'Base inicial de First-Time Right mientras madura el modelo formal.'
               },
               {
-                label: 'Rondas de ajuste',
+                label: TASK407_COPY_RONDAS_DE_AJUSTE,
                 value: String(totalClientAdjustmentRounds),
                 detail: 'Suma de Client Change Round Final en el alcance visible.'
               }

@@ -18,6 +18,9 @@ import Typography from '@mui/material/Typography'
 import { getMicrocopy } from '@/lib/copy'
 import CustomChip from '@core/components/mui/Chip'
 
+const TASK407_ARIA_CONVERTIR_COTIZACION_A_FACTURA_DIRECTA = "Convertir cotización a factura directa"
+
+
 const GREENHOUSE_COPY = getMicrocopy()
 
 interface DocumentChainPurchaseOrder {
@@ -353,7 +356,7 @@ const QuoteDocumentChain = ({
                   disabled={converting}
                   startIcon={<i className='tabler-receipt' aria-hidden='true' />}
                   onClick={onConvertSimple}
-                  aria-label='Convertir cotización a factura directa'
+                  aria-label={TASK407_ARIA_CONVERTIR_COTIZACION_A_FACTURA_DIRECTA}
                 >
                   {converting ? 'Convirtiendo…' : 'Convertir a factura'}
                 </Button>

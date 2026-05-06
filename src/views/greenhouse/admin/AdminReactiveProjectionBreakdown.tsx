@@ -17,6 +17,9 @@ import { useTheme } from '@mui/material/styles'
 import { ExecutiveCardShell, ExecutiveMiniStatCard } from '@/components/greenhouse'
 import type { ReactiveProjectionBreakdown } from '@/lib/operations/get-reactive-projection-breakdown'
 
+const TASK407_ARIA_DETALLE_DE_PROYECCIONES_REACTIVAS_POR_HANDLER = "Detalle de proyecciones reactivas por handler"
+
+
 type Props = {
   breakdown: ReactiveProjectionBreakdown | null
 }
@@ -130,7 +133,7 @@ const AdminReactiveProjectionBreakdown = ({ breakdown }: Props) => {
         <Card variant='outlined'>
           <CardContent>
             <TableContainer>
-              <Table size='small' aria-label='Detalle de proyecciones reactivas por handler'>
+              <Table size='small' aria-label={TASK407_ARIA_DETALLE_DE_PROYECCIONES_REACTIVAS_POR_HANDLER}>
                 <TableHead>
                   <TableRow>
                     <TableCell scope='col'>Proyeccion</TableCell>

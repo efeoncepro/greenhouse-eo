@@ -6,6 +6,12 @@ import { cleanup, fireEvent } from '@testing-library/react'
 import { renderWithTheme } from '@/test/render'
 
 import EntitySummaryDock from '../EntitySummaryDock'
+import { getMicrocopy } from '@/lib/copy'
+
+const GREENHOUSE_COPY = getMicrocopy()
+const TASK407_COPY_EMITIR = "Emitir"
+const TASK407_COPY_GUARDAR_BORRADOR = "Guardar borrador"
+
 
 afterEach(cleanup)
 
@@ -15,7 +21,7 @@ describe('EntitySummaryDock', () => {
       <EntitySummaryDock
         ariaLabel='Resumen del documento'
         centerSlot={<span data-testid='dock-center'>Total $1.000</span>}
-        primaryCta={{ label: 'Guardar', onClick: () => {} }}
+        primaryCta={{ label: GREENHOUSE_COPY.actions.save, onClick: () => {} }}
       />
     )
 
@@ -28,7 +34,7 @@ describe('EntitySummaryDock', () => {
       <EntitySummaryDock
         ariaLabel='Resumen'
         emptyStateMessage='Agrega ítems para ver el total.'
-        primaryCta={{ label: 'Guardar', onClick: () => {} }}
+        primaryCta={{ label: GREENHOUSE_COPY.actions.save, onClick: () => {} }}
       />
     )
 
@@ -40,7 +46,7 @@ describe('EntitySummaryDock', () => {
       <EntitySummaryDock
         ariaLabel='Resumen'
         simulationError='Error al simular precios.'
-        primaryCta={{ label: 'Guardar', onClick: () => {} }}
+        primaryCta={{ label: GREENHOUSE_COPY.actions.save, onClick: () => {} }}
       />
     )
 
@@ -53,7 +59,7 @@ describe('EntitySummaryDock', () => {
     const { getByRole } = renderWithTheme(
       <EntitySummaryDock
         ariaLabel='Resumen'
-        primaryCta={{ label: 'Emitir', onClick }}
+        primaryCta={{ label: TASK407_COPY_EMITIR, onClick }}
       />
     )
 
@@ -66,7 +72,7 @@ describe('EntitySummaryDock', () => {
       <EntitySummaryDock
         ariaLabel='Resumen'
         primaryCta={{
-          label: 'Emitir',
+          label: TASK407_COPY_EMITIR,
           onClick: () => {},
           disabled: true,
           disabledReason: 'Faltan ítems en la cotización.'
@@ -88,8 +94,8 @@ describe('EntitySummaryDock', () => {
     const { getByRole } = renderWithTheme(
       <EntitySummaryDock
         ariaLabel='Resumen'
-        primaryCta={{ label: 'Emitir', onClick: () => {} }}
-        secondaryCta={{ label: 'Guardar borrador', onClick: onSecondary }}
+        primaryCta={{ label: TASK407_COPY_EMITIR, onClick: () => {} }}
+        secondaryCta={{ label: TASK407_COPY_GUARDAR_BORRADOR, onClick: onSecondary }}
       />
     )
 

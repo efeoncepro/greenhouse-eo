@@ -12,6 +12,11 @@ import AppReactApexCharts from '@/libs/styles/AppReactApexCharts'
 import type { GreenhouseDashboardData } from '@/types/greenhouse-dashboard'
 import { createQualitySignalsOptions } from '@views/greenhouse/dashboard/chart-options'
 
+const TASK407_COPY_RPA_ULTIMO_MES = "RpA ultimo mes"
+const TASK407_COPY_FIRST_TIME_RIGHT = "First-Time Right"
+const TASK407_COPY_MESES_VISIBLES = "Meses visibles"
+
+
 type QualitySignalsSectionProps = {
   data: GreenhouseDashboardData
 }
@@ -94,7 +99,7 @@ const QualitySignalsSection = ({ data }: QualitySignalsSectionProps) => {
           <MetricList
             items={[
               {
-                label: 'RpA ultimo mes',
+                label: TASK407_COPY_RPA_ULTIMO_MES,
                 value: latestQualitySignal?.avgRpa != null ? latestQualitySignal.avgRpa.toFixed(1) : 'Sin dato',
                 detail:
                   latestQualitySignal?.rpaSource === 'seeded'
@@ -102,12 +107,12 @@ const QualitySignalsSection = ({ data }: QualitySignalsSectionProps) => {
                     : 'Valor medido desde el dato disponible en tareas.'
               },
               {
-                label: 'First-Time Right',
+                label: TASK407_COPY_FIRST_TIME_RIGHT,
                 value: latestQualitySignal?.firstTimeRightPct != null ? `${latestQualitySignal.firstTimeRightPct}%` : 'Sin dato',
                 detail: 'Calculado como entregables sin ajustes cliente sobre entregables visibles del mes.'
               },
               {
-                label: 'Meses visibles',
+                label: TASK407_COPY_MESES_VISIBLES,
                 value: String(data.qualitySignals.length),
                 detail: 'Ventana mensual visible para calidad en el dashboard.'
               }
@@ -140,7 +145,7 @@ const QualitySignalsSection = ({ data }: QualitySignalsSectionProps) => {
         <MetricList
           items={[
             {
-              label: 'RpA ultimo mes',
+              label: TASK407_COPY_RPA_ULTIMO_MES,
               value: latestQualitySignal?.avgRpa != null ? latestQualitySignal.avgRpa.toFixed(1) : 'Sin dato',
               detail:
                 latestQualitySignal?.rpaSource === 'seeded'
@@ -148,12 +153,12 @@ const QualitySignalsSection = ({ data }: QualitySignalsSectionProps) => {
                   : 'Valor medido desde el dato disponible en tareas.'
             },
             {
-              label: 'First-Time Right',
+              label: TASK407_COPY_FIRST_TIME_RIGHT,
               value: latestQualitySignal?.firstTimeRightPct != null ? `${latestQualitySignal.firstTimeRightPct}%` : 'Sin dato',
               detail: 'Calculado como entregables sin ajustes cliente sobre entregables visibles del mes.'
             },
             {
-              label: 'Meses visibles',
+              label: TASK407_COPY_MESES_VISIBLES,
               value: String(data.qualitySignals.length),
               detail: 'Ventana mensual visible para calidad en el dashboard.'
             }

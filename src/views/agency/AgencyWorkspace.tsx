@@ -34,6 +34,9 @@ import AgencyCapacityView from './AgencyCapacityView'
 import AgencyIcoEngineView from './AgencyIcoEngineView'
 import type { AgencyIcoData } from './AgencyIcoEngineView'
 
+const TASK407_ARIA_SECCIONES_DEL_WORKSPACE_DE_AGENCIA = "Secciones del workspace de agencia"
+
+
 type AgencyTab = 'pulse' | 'spaces' | 'capacidad' | 'ico'
 
 const VALID_TABS: AgencyTab[] = ['pulse', 'spaces', 'capacidad', 'ico']
@@ -235,7 +238,7 @@ const AgencyWorkspace = ({ pulseKpis, pulseSpaces, pulseStatusMix, pulseWeeklyAc
           <CustomTabList
             onChange={handleChange}
             variant='scrollable'
-            aria-label='Secciones del workspace de agencia'
+            aria-label={TASK407_ARIA_SECCIONES_DEL_WORKSPACE_DE_AGENCIA}
           >
             {TAB_CONFIG.map(tab => (
               <Tab

@@ -34,6 +34,10 @@ import AdminOperationalActionsPanel from './AdminOperationalActionsPanel'
 import AdminOpsActionButton from './AdminOpsActionButton'
 import AdminReactiveProjectionBreakdown from './AdminReactiveProjectionBreakdown'
 
+const TASK407_COPY_REPLAY_REACTIVE = "Replay reactive"
+const TASK407_COPY_RETRY_FAILED_EMAILS = "Retry failed emails"
+
+
 type Props = {
   data: OperationsOverview
   reactiveBreakdown?: ReactiveProjectionBreakdown | null
@@ -1236,7 +1240,7 @@ const AdminOpsHealthView = ({
           actions={[
             {
               id: 'replay-reactive',
-              label: 'Replay reactive',
+              label: TASK407_COPY_REPLAY_REACTIVE,
               description:
                 'Ejecuta el consumer reactivo canónico. Úsalo cuando exista backlog oculto o handlers degradados visibles.',
               endpoint: '/api/admin/ops/replay-reactive',
@@ -1247,7 +1251,7 @@ const AdminOpsHealthView = ({
             },
             {
               id: 'retry-email-delivery',
-              label: 'Retry failed emails',
+              label: TASK407_COPY_RETRY_FAILED_EMAILS,
               description: 'Procesa manualmente deliveries fallidas elegibles dentro de la ventana activa de retry.',
               endpoint: '/api/admin/ops/email-delivery-retry',
               confirmTitle: '¿Reintentar correos fallidos?',

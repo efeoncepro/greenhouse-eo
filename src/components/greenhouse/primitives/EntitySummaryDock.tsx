@@ -21,6 +21,9 @@ import {
   type SaveStateKind
 } from '.'
 
+const TASK407_ARIA_CARGANDO = "Cargando"
+
+
 export interface EntitySummaryDockCta {
   label: string
   onClick: () => void
@@ -219,7 +222,7 @@ const EntitySummaryDock = ({
                 disabled={Boolean(secondaryCta.disabled || secondaryCta.loading)}
                 startIcon={
                   secondaryCta.loading ? (
-                    <CircularProgress size={16} color='inherit' aria-label='Cargando' />
+                    <CircularProgress size={16} color='inherit' aria-label={TASK407_ARIA_CARGANDO} />
                   ) : secondaryCta.iconClassName ? (
                     <i className={secondaryCta.iconClassName} aria-hidden='true' />
                   ) : undefined
@@ -240,7 +243,7 @@ const EntitySummaryDock = ({
                   aria-describedby={isPrimaryDisabled && primaryCta.disabledReason ? reasonId : undefined}
                   startIcon={
                     primaryCta.loading ? (
-                      <CircularProgress size={16} color='inherit' aria-label='Cargando' />
+                      <CircularProgress size={16} color='inherit' aria-label={TASK407_ARIA_CARGANDO} />
                     ) : primaryCta.iconClassName ? (
                       <i className={primaryCta.iconClassName} aria-hidden='true' />
                     ) : undefined

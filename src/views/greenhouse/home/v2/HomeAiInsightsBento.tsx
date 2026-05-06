@@ -23,6 +23,9 @@ import useReducedMotion from '@/hooks/useReducedMotion'
 
 import type { HomeAiInsightCard, HomeAiInsightsBentoData } from '@/lib/home/contract'
 
+const TASK407_ARIA_NEXA_INSIGHTS = "Nexa Insights"
+
+
 interface HomeAiInsightsBentoProps {
   data: HomeAiInsightsBentoData
 }
@@ -136,7 +139,7 @@ export const HomeAiInsightsBento = ({ data }: HomeAiInsightsBentoProps) => {
 
   if (!data || data.cards.length === 0) {
     return (
-      <Card component='section' aria-label='Nexa Insights'>
+      <Card component='section' aria-label={TASK407_ARIA_NEXA_INSIGHTS}>
         <CardHeader
           avatar={<i className='tabler-sparkles text-xl text-primary' />}
           title='Nexa Insights'
@@ -154,7 +157,7 @@ export const HomeAiInsightsBento = ({ data }: HomeAiInsightsBentoProps) => {
   }
 
   return (
-    <Card component='section' aria-label='Nexa Insights'>
+    <Card component='section' aria-label={TASK407_ARIA_NEXA_INSIGHTS}>
       <CardHeader
         avatar={<i className='tabler-sparkles text-xl text-primary' />}
         title='Nexa Insights'

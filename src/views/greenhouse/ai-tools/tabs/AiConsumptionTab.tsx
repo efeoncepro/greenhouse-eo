@@ -42,6 +42,9 @@ import { ledgerEntryTypeConfig, formatTimestamp, formatCost } from '../helpers'
 
 import tableStyles from '@core/styles/table.module.css'
 
+const TASK407_EMPTY_NO_SE_ENCONTRARON_MOVIMIENTOS = "No se encontraron movimientos"
+
+
 const GREENHOUSE_COPY = getMicrocopy()
 
 const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
@@ -346,7 +349,7 @@ const AiConsumptionTab = ({ meta }: Props) => {
                       <CustomAvatar variant='rounded' skin='light' color='warning' size={48}>
                         <i className='tabler-receipt-off' style={{ fontSize: 24 }} />
                       </CustomAvatar>
-                      <Typography color='text.secondary'>No se encontraron movimientos</Typography>
+                      <Typography color='text.secondary'>{TASK407_EMPTY_NO_SE_ENCONTRARON_MOVIMIENTOS}</Typography>
                       {(filterWallet || filterMember || globalFilter) && (
                         <Button
                           variant='tonal' size='small' color='secondary'

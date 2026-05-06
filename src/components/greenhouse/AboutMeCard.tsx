@@ -16,6 +16,9 @@ import { getMicrocopy } from '@/lib/copy'
 
 import { GH_SKILLS_CERTS } from '@/config/greenhouse-nomenclature'
 
+const TASK407_ARIA_EDITAR_BIOGRAFIA = "Editar biografía"
+
+
 const GREENHOUSE_COPY = getMicrocopy()
 
 const MAX_CHARS = 500
@@ -107,7 +110,7 @@ const AboutMeCard = ({ value, editable, onSave }: AboutMeCardProps) => {
         title={GH_SKILLS_CERTS.section_about_me}
         action={
           editable ? (
-            <IconButton size='small' onClick={handleEdit} aria-label='Editar biografía'>
+            <IconButton size='small' onClick={handleEdit} aria-label={TASK407_ARIA_EDITAR_BIOGRAFIA}>
               <i className='tabler-pencil' />
             </IconButton>
           ) : undefined

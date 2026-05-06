@@ -32,6 +32,10 @@ import type { PersonDetailAssignment } from '@/types/people'
 import type { MembershipRowData } from '../drawers/EditPersonMembershipDrawer'
 import { formatFte } from '../helpers'
 
+const TASK407_ARIA_CONTACTO_PRINCIPAL = "Contacto principal"
+const TASK407_ARIA_VINCULAR_A_ORGANIZACION = "Vincular a organización"
+
+
 interface PersonMembership {
   membershipId: string
   publicId: string
@@ -261,7 +265,7 @@ const PersonMembershipsTab = ({ memberId, assignments, isAdmin, reloadKey, onAdd
                         </TableCell>
                         <TableCell align='center'>
                           {m.isPrimary ? (
-                            <i className='tabler-star-filled' style={{ fontSize: 16, color: 'var(--mui-palette-warning-main)' }} aria-label='Contacto principal' />
+                            <i className='tabler-star-filled' style={{ fontSize: 16, color: 'var(--mui-palette-warning-main)' }} aria-label={TASK407_ARIA_CONTACTO_PRINCIPAL} />
                           ) : (
                             <Typography variant='body2' color='text.secondary'>—</Typography>
                           )}
@@ -296,7 +300,7 @@ const PersonMembershipsTab = ({ memberId, assignments, isAdmin, reloadKey, onAdd
                 }}
                 tabIndex={0}
                 role='button'
-                aria-label='Vincular a organización'
+                aria-label={TASK407_ARIA_VINCULAR_A_ORGANIZACION}
                 sx={{
                   p: 2,
                   border: '1px dashed',

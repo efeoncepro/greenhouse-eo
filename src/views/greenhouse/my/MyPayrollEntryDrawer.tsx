@@ -17,6 +17,10 @@ import type { Theme } from '@mui/material/styles'
 import CustomChip from '@core/components/mui/Chip'
 import { getMicrocopy } from '@/lib/copy'
 
+const TASK407_ARIA_CERRAR_DETALLE = "Cerrar detalle"
+const TASK407_ARIA_COPIAR_REFERENCIA_EXTERNA = "Copiar referencia externa"
+
+
 const GREENHOUSE_COPY = getMicrocopy()
 const MONTHS = ['', ...GREENHOUSE_COPY.months.short]
 
@@ -191,7 +195,7 @@ const MyPayrollEntryDrawer = ({ open, onClose, entry, canResend }: Props) => {
           <Typography variant='h6'>{MONTHS[entry.month]} {entry.year}</Typography>
         </Box>
         <CustomChip round='true' size='small' variant='tonal' color={statusMeta.color} label={statusMeta.label} />
-        <IconButton onClick={onClose} aria-label='Cerrar detalle'>
+        <IconButton onClick={onClose} aria-label={TASK407_ARIA_CERRAR_DETALLE}>
           <i className='tabler-x' />
         </IconButton>
       </Box>
@@ -236,7 +240,7 @@ const MyPayrollEntryDrawer = ({ open, onClose, entry, canResend }: Props) => {
                     <IconButton
                       size='small'
                       onClick={() => void handleCopy('Referencia', entry.paymentOrder!.externalReference!)}
-                      aria-label='Copiar referencia externa'
+                      aria-label={TASK407_ARIA_COPIAR_REFERENCIA_EXTERNA}
                     >
                       <i className='tabler-copy' style={{ fontSize: 16 }} />
                     </IconButton>

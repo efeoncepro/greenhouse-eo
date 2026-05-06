@@ -28,6 +28,9 @@ import CustomAvatar from '@core/components/mui/Avatar'
 import type { PaymentObligationDetail } from '@/lib/finance/payment-obligations/get-obligation-detail'
 import type { PaymentObligationKind, PaymentObligationStatus } from '@/types/payment-obligations'
 
+const TASK407_ARIA_CERRAR_DETALLE = "Cerrar detalle"
+
+
 const GREENHOUSE_COPY = getMicrocopy()
 
 interface ObligationDetailDrawerProps {
@@ -196,7 +199,7 @@ const ObligationDetailDrawer = ({ obligationId, onClose }: ObligationDetailDrawe
             </Typography>
           ) : null}
         </Stack>
-        <IconButton onClick={onClose} aria-label='Cerrar detalle' size='small'>
+        <IconButton onClick={onClose} aria-label={TASK407_ARIA_CERRAR_DETALLE} size='small'>
           <i className='tabler-x' />
         </IconButton>
       </Box>

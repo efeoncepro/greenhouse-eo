@@ -31,6 +31,9 @@ import CustomTextField from '@core/components/mui/TextField'
 
 import type { OrganizationDetailData, OrganizationSpace } from '@/views/greenhouse/organizations/types'
 
+const TASK407_ARIA_NAVEGACION_DE_CUENTA = "Navegacion de cuenta"
+
+
 const GREENHOUSE_COPY = getMicrocopy()
 
 // ── Helpers ──────────────────────────────────────────────────────────────
@@ -588,7 +591,7 @@ const AdminAccountDetailView = ({ organizationId }: Props) => {
       <Grid container spacing={6}>
         {/* Breadcrumbs */}
         <Grid size={{ xs: 12 }}>
-          <Breadcrumbs aria-label='Navegacion de cuenta'>
+          <Breadcrumbs aria-label={TASK407_ARIA_NAVEGACION_DE_CUENTA}>
             <Typography
               component={Link}
               href='/admin'

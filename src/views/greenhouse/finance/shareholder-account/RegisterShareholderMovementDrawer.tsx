@@ -426,7 +426,7 @@ const RegisterShareholderMovementDrawer = ({
             Carga un cargo o abono bilateral sobre la cuenta corriente accionista.
           </Typography>
         </Box>
-        <IconButton size='small' onClick={onClose} aria-label='Cerrar'>
+        <IconButton size='small' onClick={onClose} aria-label={GREENHOUSE_COPY.actions.close}>
           <i className='tabler-x' />
         </IconButton>
       </Box>

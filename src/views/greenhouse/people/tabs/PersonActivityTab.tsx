@@ -29,6 +29,9 @@ import type { MemberNexaInsightsPayload } from '@/lib/ico-engine/ai/llm-types'
 import type { IcoMetricSnapshot, MetricValue, CscDistributionEntry } from '@/lib/ico-engine/read-metrics'
 import { getMicrocopy } from '@/lib/copy'
 
+const TASK407_ARIA_RADAR_DE_SALUD_OPERATIVA_PERSONAL = "Radar de salud operativa personal"
+
+
 const GREENHOUSE_COPY = getMicrocopy()
 const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'))
 
@@ -527,7 +530,7 @@ const PersonActivityTab = ({ memberId }: Props) => {
               description='No pudimos cargar el radar de salud.'
             >
               <ExecutiveCardShell title='Salud operativa' subtitle='Dimensiones normalizadas (100 = óptimo)'>
-                <figure role='img' aria-label='Radar de salud operativa personal' style={{ margin: 0 }}>
+                <figure role='img' aria-label={TASK407_ARIA_RADAR_DE_SALUD_OPERATIVA_PERSONAL} style={{ margin: 0 }}>
                   <AppReactApexCharts
                     type='radar'
                     height={380}

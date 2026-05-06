@@ -38,6 +38,9 @@ import { formatCurrency, regimeLabel, formatPeriodIdLabel } from '@views/greenho
 import { downloadPayrollReceiptPdf } from '@/lib/payroll/download-payroll-receipt'
 import PersonFinanceTab from './PersonFinanceTab'
 
+const TASK407_ARIA_IR_AL_MODULO_DE_NOMINA = "Ir al modulo de nomina"
+
+
 const GREENHOUSE_COPY = getMicrocopy()
 
 const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'))
@@ -349,7 +352,7 @@ const PersonEconomyTab = ({ detail, onEditCompensation }: Props) => {
                         size='small'
                         color='secondary'
                         startIcon={<i className='tabler-external-link' aria-hidden='true' />}
-                        aria-label='Ir al modulo de nomina'
+                        aria-label={TASK407_ARIA_IR_AL_MODULO_DE_NOMINA}
                       >
                         Ver en modulo de nomina
                       </Button>

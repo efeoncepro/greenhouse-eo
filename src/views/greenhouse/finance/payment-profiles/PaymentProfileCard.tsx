@@ -31,6 +31,9 @@ import type {
   BeneficiaryPaymentProfileStatus
 } from '@/types/payment-profiles'
 
+const TASK407_ARIA_CARGANDO_AUDIT_LOG = "Cargando audit log"
+
+
 const GREENHOUSE_COPY = getMicrocopy()
 
 const STATUS_LABEL: Record<BeneficiaryPaymentProfileStatus, string> = {
@@ -504,7 +507,7 @@ const PaymentProfileCard = ({ profile, onActionComplete }: PaymentProfileCardPro
 
           {auditLoading ? (
             <Box sx={{ pt: 2 }}>
-              <LinearProgress aria-label='Cargando audit log' />
+              <LinearProgress aria-label={TASK407_ARIA_CARGANDO_AUDIT_LOG} />
             </Box>
           ) : audit.length === 0 ? (
             <Typography variant='body2' color='text.secondary' sx={{ pt: 2 }}>

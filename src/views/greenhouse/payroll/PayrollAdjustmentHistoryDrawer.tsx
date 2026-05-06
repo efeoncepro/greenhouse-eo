@@ -190,7 +190,7 @@ const PayrollAdjustmentHistoryDrawer = ({
           </Typography>
         )}
         <Box sx={{ flex: 1 }} />
-        <IconButton onClick={onClose} aria-label='Cerrar'>
+        <IconButton onClick={onClose} aria-label={GREENHOUSE_COPY.actions.close}>
           <i className='tabler-x' />
         </IconButton>
       </Box>

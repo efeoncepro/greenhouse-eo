@@ -41,6 +41,9 @@ import { getInitials } from '@/utils/getInitials'
 
 import tableStyles from '@core/styles/table.module.css'
 
+const TASK407_EMPTY_NO_SE_ENCONTRARON_LICENCIAS = "No se encontraron licencias"
+
+
 const GREENHOUSE_COPY = getMicrocopy()
 
 const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
@@ -310,7 +313,7 @@ const AiLicensesTab = ({ licenses, tools, meta, onRefresh }: Props) => {
                       <CustomAvatar variant='rounded' skin='light' color='info' size={48}>
                         <i className='tabler-key-off' style={{ fontSize: 24 }} />
                       </CustomAvatar>
-                      <Typography color='text.secondary'>No se encontraron licencias</Typography>
+                      <Typography color='text.secondary'>{TASK407_EMPTY_NO_SE_ENCONTRARON_LICENCIAS}</Typography>
                       {(filterStatus || globalFilter) && (
                         <Button
                           variant='tonal' size='small' color='secondary'

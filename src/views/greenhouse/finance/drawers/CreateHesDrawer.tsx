@@ -521,7 +521,7 @@ const CreateHesDrawer = ({ open, onClose, onSuccess, editHes = null }: Props) =>
             />
           )}
         </Box>
-        <IconButton onClick={handleClose} size='small' aria-label='Cerrar'>
+        <IconButton onClick={handleClose} size='small' aria-label={GREENHOUSE_COPY.actions.close}>
           <i className='tabler-x' />
         </IconButton>
       </Box>

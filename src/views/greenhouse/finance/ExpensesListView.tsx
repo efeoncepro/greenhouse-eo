@@ -39,6 +39,9 @@ import { buildStatusMap , getMicrocopy } from '@/lib/copy'
 import tableStyles from '@core/styles/table.module.css'
 import CreateExpenseDrawer from '@views/greenhouse/finance/drawers/CreateExpenseDrawer'
 
+const TASK407_ARIA_VER_DTE_EN_PDF = "Ver DTE en PDF"
+
+
 const GREENHOUSE_COPY = getMicrocopy()
 // ---------------------------------------------------------------------------
 // Types
@@ -198,7 +201,7 @@ const expColumns: ColumnDef<Expense, any>[] = [
               rel='noopener noreferrer'
               onClick={e => e.stopPropagation()}
               sx={{ display: 'inline-flex', color: 'error.main', '&:hover': { color: 'error.dark' } }}
-              aria-label='Ver DTE en PDF'
+              aria-label={TASK407_ARIA_VER_DTE_EN_PDF}
             >
               <i className='tabler-file-type-pdf' style={{ fontSize: 16 }} />
             </Box>

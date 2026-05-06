@@ -40,6 +40,9 @@ import AuditRevertConfirmDialog from '@/components/greenhouse/pricing/AuditRever
 import { GH_PRICING_GOVERNANCE } from '@/config/greenhouse-nomenclature'
 import { formatDateTime as formatLocaleDateTime } from '@/lib/format'
 
+const TASK407_ARIA_VOLVER_AL_CATALOGO = "Volver al catálogo"
+
+
 // ── Types ──────────────────────────────────────────────────────────────
 
 type EntityType =
@@ -315,7 +318,7 @@ const AuditLogTimelineView = ({ canRevert = false }: AuditLogTimelineViewProps) 
               component='a'
               href='/admin/pricing-catalog'
               size='small'
-              aria-label='Volver al catálogo'
+              aria-label={TASK407_ARIA_VOLVER_AL_CATALOGO}
             >
               <i className='tabler-arrow-left' />
             </IconButton>

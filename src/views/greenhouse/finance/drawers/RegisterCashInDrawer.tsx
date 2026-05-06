@@ -271,7 +271,7 @@ const RegisterCashInDrawer = ({ open, onClose, onSuccess }: Props) => {
     >
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 4 }}>
         <Typography variant='h6'>Registrar cobro</Typography>
-        <IconButton onClick={handleClose} size='small' aria-label='Cerrar'>
+        <IconButton onClick={handleClose} size='small' aria-label={GREENHOUSE_COPY.actions.close}>
           <i className='tabler-x' />
         </IconButton>
       </Box>

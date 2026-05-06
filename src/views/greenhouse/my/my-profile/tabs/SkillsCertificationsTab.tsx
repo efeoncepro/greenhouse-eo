@@ -59,6 +59,9 @@ import { TOOL_PROFICIENCY_LEVELS, TOOL_CATEGORY_VALUES, LANGUAGE_PROFICIENCY_LEV
 import type { MemberEvidence, MemberEndorsement, EvidenceType } from '@/types/reputation'
 import { EVIDENCE_TYPES } from '@/types/reputation'
 
+const TASK407_ARIA_EDITAR_TITULAR_PROFESIONAL = "Editar titular profesional"
+
+
 const GREENHOUSE_COPY = getMicrocopy()
 
 const CertificatePreviewDialog = dynamic(
@@ -1738,7 +1741,7 @@ function HeadlineCard({
         title={GH_SKILLS_CERTS.section_headline}
         action={
           editable ? (
-            <IconButton size='small' onClick={handleEdit} aria-label='Editar titular profesional'>
+            <IconButton size='small' onClick={handleEdit} aria-label={TASK407_ARIA_EDITAR_TITULAR_PROFESIONAL}>
               <i className='tabler-pencil' />
             </IconButton>
           ) : undefined
