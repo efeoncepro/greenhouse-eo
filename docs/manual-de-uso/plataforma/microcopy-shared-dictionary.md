@@ -1,0 +1,103 @@
+# Usar microcopy shared
+
+> **Tipo de documento:** Manual de uso
+> **Version:** 1.0
+> **Creado:** 2026-05-06
+> **Modulo:** Plataforma
+> **Ruta en portal:** Transversal
+> **Documentacion relacionada:** [Microcopy shared y dictionary-ready](../../documentation/plataforma/microcopy-shared-dictionary.md)
+> **Arquitectura relacionada:** [GREENHOUSE_UI_PLATFORM_V1.md](../../architecture/GREENHOUSE_UI_PLATFORM_V1.md#delta-2026-05-02--copy-system-contract-task-265)
+
+## Para que sirve
+
+Esta guia explica como agregar o reutilizar textos cortos compartidos sin reintroducir hardcodes. Aplica a botones, estados, mensajes vacios, labels accesibles, meses y microcopy funcional repetido en varias vistas.
+
+## Antes de empezar
+
+- Revisa si el texto ya existe en `getMicrocopy()`.
+- Decide si es nomenclatura de producto, microcopy shared o copy de dominio.
+- Mantiene `es-CL` como default hasta que el runtime i18n active locales reales.
+- Si el texto sera visible para usuarios, privilegia claridad antes que tono decorativo.
+
+## Paso a paso
+
+1. Importa el dictionary:
+
+```ts
+import { getMicrocopy } from '@/lib/copy'
+```
+
+2. Lee el namespace que necesitas:
+
+```tsx
+const t = getMicrocopy()
+
+<Button>{t.actions.save}</Button>
+<Button variant='outlined'>{t.actions.cancel}</Button>
+```
+
+3. Para estados comunes, usa `states`:
+
+```tsx
+<Chip label={t.states.pending} />
+```
+
+4. Para accesibilidad, usa `aria`:
+
+```tsx
+<IconButton aria-label={t.aria.closeDialog}>
+  <i className='tabler-x' />
+</IconButton>
+```
+
+5. Para meses, usa el array canonico:
+
+```ts
+const monthLabel = t.months.short[monthIndex]
+```
+
+6. Si necesitas un status map, usa `buildStatusMap`:
+
+```ts
+import { buildStatusMap, getMicrocopy } from '@/lib/copy'
+
+const t = getMicrocopy()
+
+const labels = buildStatusMap({
+  pending: t.states.pending,
+  approved: t.states.approved
+})
+```
+
+## Donde poner un texto nuevo
+
+| Caso | Donde vive |
+| --- | --- |
+| Nombre de una capacidad Greenhouse | `src/config/greenhouse-nomenclature.ts` |
+| CTA base, estado, loading, empty, aria o mes reutilizable | `src/lib/copy/dictionaries/es-CL/` |
+| Copy unico de una pantalla o regla de negocio | Cerca del modulo |
+
+## Que no hacer
+
+- No escribir `<Button>Guardar</Button>` si existe `t.actions.save`.
+- No crear `const MONTHS = [...]` local.
+- No duplicar `Pendiente`, `Aprobado`, `Rechazado` en mapas locales si existen en `states`.
+- No agregar un namespace shared para una sola pantalla.
+- No importar `src/lib/copy` con `server-only`; debe funcionar en cliente y servidor.
+- No usar `eslint-disable` para evitar migrar un string shared.
+
+## Problemas comunes
+
+| Problema | Causa probable | Que hacer |
+| --- | --- | --- |
+| ESLint advierte `no-untokenized-copy` | Hay copy shared hardcodeado | Migrar a `getMicrocopy()` o justificar que es domain-specific. |
+| No encuentro una key | Puede ser copy de dominio o falta una shared key real | Si se reusa en varias surfaces, agregar key con paridad de locales. |
+| El texto es de producto | No debe vivir en `src/lib/copy` | Usar `greenhouse-nomenclature.ts`. |
+| El texto necesita traduccion real | TASK-407 no traduce | Mantener key dictionary-ready y esperar runtime i18n de TASK-430. |
+
+## Referencias tecnicas
+
+- `src/lib/copy/`
+- `eslint-plugins/greenhouse/rules/no-untokenized-copy.mjs`
+- [TASK-407](../../tasks/complete/TASK-407-copy-migration-shared-shell-components.md)
+

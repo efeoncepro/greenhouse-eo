@@ -225,6 +225,11 @@ Toda string visible al usuario en Greenhouse EO vive en una de **dos capas canó
 
 ### API pública del módulo de microcopy
 
+Documentos operativos:
+
+- Funcional: [`docs/documentation/plataforma/microcopy-shared-dictionary.md`](../documentation/plataforma/microcopy-shared-dictionary.md)
+- Manual operativo: [`docs/manual-de-uso/plataforma/microcopy-shared-dictionary.md`](../manual-de-uso/plataforma/microcopy-shared-dictionary.md)
+
 ```ts
 import { getMicrocopy } from '@/lib/copy'
 
@@ -339,6 +344,17 @@ ESLint rule `greenhouse/no-untokenized-copy` (TASK-265 Slice 5a) detecta:
 Excluidos por scope: `src/components/theme/**`, `src/@core/**`, `src/app/global-error.tsx`, `src/app/public/**`, `src/emails/**`, `src/lib/finance/pdf/**`, tests.
 
 Modo: `warn` durante TASK-265 + sweeps TASK-407/408. Promueve a `error` al cierre TASK-408.
+
+### Delta 2026-05-06 — TASK-407 sweep shared shell/componentes
+
+TASK-407 extendio el gate `greenhouse/no-untokenized-copy` para cubrir arrays de meses y CTAs JSX text, agrego `buildStatusMap()` en `src/lib/copy/` y migro el copy shared de `src/views`, `src/components` y `src/app` fuera de literals inline.
+
+Estado canonico post-sweep:
+
+- 0 warnings `greenhouse/no-untokenized-copy` en `src/views`, `src/components` y `src/app`.
+- 0 disables de `greenhouse/no-untokenized-copy` en `src/`.
+- Meses, CTAs base, aria-labels, empty states, secondary props compartidas y status maps reutilizables consumen `src/lib/copy/`.
+- `TASK-408` mantiene ownership de notifications/emails y promueve la rule a `error` al cierre.
 
 ### Coordinación con i18n (TASK-266)
 

@@ -697,14 +697,14 @@ El portal no grita. El único caso donde un "!" es apropiado es en un momento de
 
 ### 14.3 Proceso de creación de nuevo microcopy
 
-Cuando un agente de desarrollo o diseñador necesite escribir microcopy nuevo que no esté en `greenhouse-nomenclature.ts`:
+Cuando un agente de desarrollo o diseñador necesite escribir microcopy nuevo que no esté en las capas canonicas (`greenhouse-nomenclature.ts` para nomenclatura de producto y `src/lib/copy/` para microcopy funcional shared):
 
 1. **Identificar el tipo** (label, tooltip, empty state, error, confirmación, loading)
 2. **Identificar la zona** (experiencia, datos, o error)
 3. **Escribir la versión funcional primero** — la que un ingeniero pondría
 4. **Evaluar si la zona permite tono Greenhouse** — si sí, ajustar. Si no, dejar funcional.
 5. **Verificar spanglish** — ¿el término en inglés es natural para la audiencia? Si sí, dejarlo. Si no, español.
-6. **Agregar al archivo de constantes** — nunca hardcodear. Todo microcopy vive en `greenhouse-nomenclature.ts`.
+6. **Agregarlo a la capa correcta** — nunca hardcodear copy shared. La nomenclatura de producto vive en `greenhouse-nomenclature.ts`; CTAs, estados, meses, empty states, loading, feedback y aria-labels reutilizables viven en `src/lib/copy/` (ver `GREENHOUSE_UI_PLATFORM_V1.md`).
 
 ### 14.4 Microcopy que NO existe todavía (pendiente de definir)
 

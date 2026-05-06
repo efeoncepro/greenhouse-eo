@@ -22884,3 +22884,23 @@ Riesgos / notas:
 
 - La limpieza estandariza formatos visibles hacia los defaults canónicos de Greenhouse; puede haber diferencias menores de presentación frente a formatos raw anteriores, pero ahora quedan cubiertas por helpers reutilizables, lint y documentación.
 - No hubo migraciones, capabilities, access model, events ni signals nuevos.
+
+## Sesion 2026-05-06 — Docs follow-up TASK-407/TASK-429
+
+Contexto:
+
+- El usuario pidio confirmar que lo entregado en TASK-407 y TASK-429 estuviera documentado en arquitectura, documentacion funcional y manual de uso.
+
+Cambios:
+
+- TASK-429 ya tenia cobertura en `GREENHOUSE_UI_PLATFORM_V1.md`, `docs/documentation/plataforma/formateo-locale-aware.md` y `docs/manual-de-uso/plataforma/formateo-locale-aware.md`.
+- Se agrego cobertura faltante de TASK-407:
+  - `docs/documentation/plataforma/microcopy-shared-dictionary.md`
+  - `docs/manual-de-uso/plataforma/microcopy-shared-dictionary.md`
+  - indices `docs/documentation/README.md` y `docs/manual-de-uso/README.md`
+  - delta de TASK-407 en `GREENHOUSE_UI_PLATFORM_V1.md`
+- Se corrigio el drift en `Greenhouse_Nomenclatura_Portal_v3.md`: ya no declara que todo microcopy vive en `greenhouse-nomenclature.ts`; ahora distingue nomenclatura de producto vs `src/lib/copy/`.
+
+Validacion:
+
+- `git diff --check` -> pass.
