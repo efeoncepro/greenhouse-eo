@@ -205,6 +205,7 @@ Anclados al baseline 2026-05-06:
 - [x] **Diff de snapshot bytes pre/post migración** = 0 para cada template migrado en slices 3A-3H. Verificado por `src/emails/EmailTemplateBaseline.test.tsx` en cada slice y suite completa post Slice 4.
 - [x] **Reliability signal `notifications.email.render_failure_rate`** declarado y wired al overview. Pendiente operacional post-deploy: observar `/admin/operations` durante 24h y confirmar count = 0.
 - [x] `pnpm build`, `pnpm lint`, `npx tsc --noEmit`, `pnpm test` pasan en verificacion final 2026-05-06: lint pass, tsc pass, build pass, test completo pass (589 files / 3419 passed / 5 skipped).
+- [x] Admin preview catalog cubre todos los 17 templates registrados, incluyendo `quote_share` para smoke finance/Nexa-adjacent sin tocar flujos de negocio.
 - [ ] **Smoke staging** ejecutado: 5 emails de grupos cohesivos enviados a inbox de prueba, comparados visualmente con baseline.
 
 ## Verification
@@ -215,6 +216,7 @@ Anclados al baseline 2026-05-06:
 - `rg "from\s+['\"]@/lib/copy" src/emails/` retorna ≥17 (todos los templates conectados).
 - Snapshot tests cubren 17 templates × {html, subject, previewText} = 51 assertions.
 - Verificacion final 2026-05-06: `rg "locale\s*===\s*['\"]en['\"]" src/emails/ | wc -l` = 0; `rg "from\s+['\"]@/config/greenhouse-nomenclature" src/emails/ | wc -l` = 0; `rg "from\s+['\"]@/lib/copy" src/emails/ | wc -l` = 18; `rg "eslint-disable.*no-untokenized-copy" src/ | wc -l` = 0.
+- `src/lib/email/templates.test.ts` exige que `getPreviewCatalog()` exponga todos los templates registrados por `listRegisteredTemplates()`. Esto protege el smoke staging: si se registra un email nuevo, queda obligado a tener metadata de preview antes de cerrar.
 - Reliability dashboard muestra `notifications.email.render_failure_rate` con steady=0 durante 24h post-deploy.
 - Smoke staging: 5 emails enviados, recibidos, comparados pixel-by-pixel con captura baseline pre-migración.
 

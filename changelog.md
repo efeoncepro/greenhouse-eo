@@ -8037,6 +8037,7 @@ Comando operativo:
 
 - Platform / Reliability: TASK-408 agregó `notifications.email.render_failure_rate`, un signal read-only que detecta fallas de render/template en emails durante 24h usando `email_deliveries` y `outbox_reactive_log`. Protege la migración de copy sin cambiar templates, Resend, delivery, outbox publisher ni reactive consumer.
 - Platform / Microcopy: `greenhouse/no-untokenized-copy` quedó promovida a `error` con baseline 0 warnings y 0 disables, bloqueando nuevas regresiones de copy compartido hardcodeado en CI.
+- Admin / Email Preview: TASK-408 completo el catalogo de preview para los 17 templates registrados y agrego un test que impide registrar emails sin metadata de preview, desbloqueando smoke staging seguro por cohortes.
 
 # 2026-05-04
 

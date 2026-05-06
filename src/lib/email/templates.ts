@@ -999,6 +999,87 @@ registerPreviewMeta('payroll_liquidacion_v2', {
   ]
 })
 
+registerPreviewMeta('payroll_payment_committed', {
+  label: 'Pago de nomina programado',
+  description: 'Aviso al colaborador de que su pago fue aprobado y quedo programado',
+  domain: 'payroll',
+  supportsLocale: false,
+  defaultProps: {
+    fullName: 'Maria Gonzalez Rojas',
+    periodYear: 2026,
+    periodMonth: 3,
+    entryCurrency: 'CLP',
+    netTotal: 1480000,
+    payRegime: 'chile',
+    scheduledFor: '2026-04-05T14:00:00.000Z',
+    processorLabel: 'Banco de Chile'
+  },
+  propsSchema: [
+    { key: 'fullName', label: 'Nombre completo', type: 'text' },
+    { key: 'periodYear', label: 'Ano', type: 'number' },
+    { key: 'periodMonth', label: 'Mes (1-12)', type: 'number' },
+    { key: 'entryCurrency', label: 'Moneda', type: 'select', options: ['CLP', 'USD'] },
+    { key: 'netTotal', label: 'Liquido', type: 'number' },
+    { key: 'payRegime', label: 'Regimen', type: 'select', options: ['chile', 'international'] },
+    { key: 'scheduledFor', label: 'Fecha programada', type: 'text' },
+    { key: 'processorLabel', label: 'Procesador', type: 'text' }
+  ]
+})
+
+registerPreviewMeta('payroll_payment_cancelled', {
+  label: 'Pago de nomina cancelado',
+  description: 'Aviso al colaborador cuando un pago programado requiere correccion',
+  domain: 'payroll',
+  supportsLocale: false,
+  defaultProps: {
+    fullName: 'Maria Gonzalez Rojas',
+    periodYear: 2026,
+    periodMonth: 3,
+    entryCurrency: 'CLP',
+    netTotal: 1480000,
+    payRegime: 'chile',
+    cancellationReason: 'Ajuste operacional detectado antes de liberar el pago.'
+  },
+  propsSchema: [
+    { key: 'fullName', label: 'Nombre completo', type: 'text' },
+    { key: 'periodYear', label: 'Ano', type: 'number' },
+    { key: 'periodMonth', label: 'Mes (1-12)', type: 'number' },
+    { key: 'entryCurrency', label: 'Moneda', type: 'select', options: ['CLP', 'USD'] },
+    { key: 'netTotal', label: 'Liquido', type: 'number' },
+    { key: 'payRegime', label: 'Regimen', type: 'select', options: ['chile', 'international'] },
+    { key: 'cancellationReason', label: 'Motivo de cancelacion', type: 'text' }
+  ]
+})
+
+registerPreviewMeta('beneficiary_payment_profile_changed', {
+  label: 'Perfil de pago actualizado',
+  description: 'Aviso al beneficiario cuando cambia su perfil de pago aprobado',
+  domain: 'finance',
+  supportsLocale: false,
+  defaultProps: {
+    fullName: 'Maria Gonzalez Rojas',
+    kind: 'approved',
+    providerLabel: 'Banco de Chile',
+    bankName: 'Banco de Chile',
+    accountNumberMasked: '.... 4321',
+    currency: 'CLP',
+    effectiveAt: '2026-04-05T14:00:00.000Z',
+    reason: 'Actualizacion validada por Finance Ops.',
+    requestedByMember: true
+  },
+  propsSchema: [
+    { key: 'fullName', label: 'Nombre completo', type: 'text' },
+    { key: 'kind', label: 'Tipo de aviso', type: 'select', options: ['approved', 'updated', 'cancelled'] },
+    { key: 'providerLabel', label: 'Proveedor', type: 'text' },
+    { key: 'bankName', label: 'Banco', type: 'text' },
+    { key: 'accountNumberMasked', label: 'Cuenta enmascarada', type: 'text' },
+    { key: 'currency', label: 'Moneda', type: 'select', options: ['CLP', 'USD'] },
+    { key: 'effectiveAt', label: 'Fecha efectiva', type: 'text' },
+    { key: 'reason', label: 'Motivo', type: 'text' },
+    { key: 'requestedByMember', label: 'Solicitado por colaborador', type: 'boolean' }
+  ]
+})
+
 registerPreviewMeta('leave_request_decision', {
   label: 'Decision de permiso (solicitante)',
   description: 'Notifica al colaborador que su solicitud de permiso fue aprobada, rechazada o cancelada',
@@ -1267,4 +1348,58 @@ registerTemplate<QuoteShareContext>('quote_share', context => {
       .filter(line => line !== null)
       .join('\n')
   }
+})
+
+registerPreviewMeta('magic_link', {
+  label: 'Acceso por magic link',
+  description: 'Email critico con enlace temporal para iniciar sesion sin contrasena',
+  domain: 'identity',
+  supportsLocale: true,
+  defaultProps: {
+    magicLinkUrl: 'https://greenhouse.efeoncepro.com/auth/magic-link?token=preview-token',
+    userName: 'Maria Gonzalez',
+    expiresInMinutes: 15
+  },
+  propsSchema: [
+    { key: 'userName', label: 'Nombre del destinatario', type: 'text' },
+    { key: 'magicLinkUrl', label: 'URL de acceso', type: 'text' },
+    { key: 'expiresInMinutes', label: 'Minutos de vigencia', type: 'number' }
+  ]
+})
+
+registerPreviewMeta('quote_share', {
+  label: 'Propuesta compartida',
+  description: 'Email comercial con link publico de propuesta y metadata opcional de PDF',
+  domain: 'finance',
+  supportsLocale: false,
+  defaultProps: {
+    shareUrl: 'https://greenhouse.efeoncepro.com/q/preview-token',
+    quotationNumber: 'Q-2026-0042',
+    versionNumber: 3,
+    clientName: 'ACME SpA',
+    recipientName: 'Maria Gonzalez',
+    totalLabel: 'USD 18,500.00',
+    validUntilLabel: '30 de abril de 2026',
+    senderName: 'Julio Reyes',
+    senderRole: 'Finance Ops',
+    senderEmail: 'julio.reyes@efeonce.org',
+    customMessage: 'Te comparto la propuesta actualizada para revision.',
+    hasPdfAttached: true,
+    pdfFileName: 'Q-2026-0042-v3.pdf'
+  },
+  propsSchema: [
+    { key: 'shareUrl', label: 'URL publica', type: 'text' },
+    { key: 'quotationNumber', label: 'Numero de propuesta', type: 'text' },
+    { key: 'versionNumber', label: 'Version', type: 'number' },
+    { key: 'clientName', label: 'Cliente', type: 'text' },
+    { key: 'recipientName', label: 'Destinatario', type: 'text' },
+    { key: 'totalLabel', label: 'Total', type: 'text' },
+    { key: 'validUntilLabel', label: 'Valida hasta', type: 'text' },
+    { key: 'senderName', label: 'Remitente', type: 'text' },
+    { key: 'senderRole', label: 'Cargo del remitente', type: 'text' },
+    { key: 'senderEmail', label: 'Email del remitente', type: 'text' },
+    { key: 'customMessage', label: 'Mensaje custom', type: 'text' },
+    { key: 'hasPdfAttached', label: 'Incluye PDF', type: 'boolean' },
+    { key: 'pdfFileName', label: 'Nombre del PDF', type: 'text' }
+  ]
 })

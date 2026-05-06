@@ -23074,3 +23074,31 @@ Pendiente operativo antes de cerrar lifecycle de TASK-408:
 
 - Smoke staging de 5 grupos cohesivos de emails (payroll, leave, auth, finance, digest/Nexa Insights) contra inbox QA y comparacion visual.
 - Observacion 24h post-deploy de `notifications.email.render_failure_rate` en `/admin/operations` con steady=0.
+
+## Sesion 2026-05-06 — TASK-408 smoke enablement: admin preview catalog completo
+
+Contexto:
+
+- Tras push a `develop` (`96490aa5`), Vercel Staging desplego correctamente y `pnpm staging:request` autentico contra `https://greenhouse-rgnqvisgu-efeonce-7670142f.vercel.app`.
+- El endpoint `/api/admin/emails/preview` respondio 200, pero el catalogo admin exponia 12 templates aunque `src/lib/email/templates.ts` registra 17. El gap bloqueaba un smoke seguro de finance porque `quote_share` no estaba disponible via preview/test dispatch.
+
+Cambios aplicados:
+
+- `src/lib/email/templates.ts` agrega `registerPreviewMeta` para los 5 templates faltantes:
+  - `magic_link`
+  - `payroll_payment_committed`
+  - `payroll_payment_cancelled`
+  - `beneficiary_payment_profile_changed`
+  - `quote_share`
+- `src/lib/email/templates.test.ts` ahora exige que `getPreviewCatalog()` cubra todo `listRegisteredTemplates()`.
+
+Rationale:
+
+- Es una mejora de observabilidad/smoke, no cambia templates, `sendEmail`, Resend, delivery retry, outbox, notification preferences, webhooks ni eventos reactivos.
+- Permite ejecutar el smoke de 5 grupos cohesivos desde `/api/admin/emails/preview` con `sourceEntity=email_preview_test`, aislado de flujos reales de negocio.
+
+Validacion focal:
+
+- `pnpm exec vitest run src/lib/email/templates.test.ts src/emails/EmailTemplateBaseline.test.tsx --reporter=verbose` -> pass, 2 files / 21 tests.
+- `pnpm exec eslint src/lib/email/templates.ts src/lib/email/templates.test.ts --max-warnings=0` -> pass.
+- `pnpm exec tsc --noEmit --pretty false` -> pass.
