@@ -1,9 +1,63 @@
 # TASK-422 — Finance Metric Quality Gates Runtime + Stale Data UX (v2)
 
+## Delta 2026-05-05 — pre-execution hardening (priority + execution order)
+
+Re-priorización P2 → **P1** y reordenamiento de la cadena de ejecución del programa Finance Metric Registry.
+
+### Por qué P1 (no P2)
+
+`qualityGates` declarados sin enforcement runtime es **peor que no declararlos** — genera falsa confianza. Si TASK-419 (dashboard cutover) cierra sin TASK-422, queda activo el bug raíz que motivó el programa: "0 signals = todo bien O cron caído, no sabes cuál". Anti-pattern Pilar 3 Resilience canónico ("UI shows $0 for both 'no data' and 'data fetch failed'").
+
+Además, si TASK-420 (Cost Intelligence + cross-module consumers Agency/Org 360/People/Home/Nexa) cablea el dashboard sin gates de freshness, después es **5× más caro retrofitearlo** — mismo error de TASK-265 → 407 que motivó pre-execution audit recalibrar densidad real.
+
+### Orden canónico de ejecución revisado
+
+```text
+416 → 417 → 418 → 419 → 422 → 420 → 421 → 423 → 425 → 424 → 426 → 427
+                          ↑
+                          422 entra ANTES de 420 (no después)
+```
+
+**422 entra ANTES de 420** porque:
+
+1. Cierra el contract de honesty del dashboard antes que cross-module consumers lo hereden
+2. TASK-419 ya declara la state machine canónica `<MetricKpiCard>` (Delta 2026-05-05) — 422 implementa los lifecycles `loading → fresh → stale` sin redefinir el contract
+3. Cost Intelligence views (TASK-420) y Agency/Org 360/People/Home consumers heredan automáticamente la stale UX sin trabajo adicional
+
+### Sinergia obligatoria con TASK-419 (state machine canónica)
+
+`<MetricKpiCard>` declara 5 estados en TASK-419 Delta. TASK-422 implementa la transición `loading → fresh → stale` consumiendo:
+
+- `isMetricFresh(metricId, servingRow)` → mapea a `state: 'fresh' | 'stale'`
+- `areRequiredInputsReady(metricId, period)` → mapea a `state: 'failed'` si quality gate roto + freshness SLA excedido > 2×
+
+**NO** redefinir nuevos states; consumir el enum `METRIC_KPI_CARD_STATES` declarado en TASK-419.
+
+### Sinergia con TASK-425 (DAG runtime cascade)
+
+TASK-425 implementa `recomputing` en el mismo state machine. La precedencia ya declarada en TASK-419 Delta:
+
+```text
+recomputing > stale > failed > fresh > loading
+```
+
+Cuando ambos `stale` (freshness excedido) y `recomputing` (cascade in progress) son true, prevalece `recomputing` — es transición que va a cerrar el stale al completar.
+
+### Reliability signal canónico
+
+Agregar al scope (no estaba explícito en spec original): `finance.metrics.stale_count` (kind=`drift`, severity=`warning` si count>0, `error` si > 5 métricas stale simultáneamente). Subsystem rollup: `Finance Data Quality`. Visible en `/admin/operations`.
+
+### Acceptance criteria adicionales
+
+- [ ] Priority actualizado a P1 en `docs/tasks/README.md`
+- [ ] `<MetricKpiCard>` consume `METRIC_KPI_CARD_STATES` declarado en TASK-419 (NO redefine)
+- [ ] Reliability signal `finance.metrics.stale_count` registrada en `RELIABILITY_REGISTRY` con domain `finance`
+- [ ] Endpoint `/api/finance/intelligence/health` retorna shape compatible con `Platform Health V1` contract (TASK-672)
+
 ## Status
 
 - Lifecycle: `to-do`
-- Priority: `P2`
+- Priority: `P1` (re-priorizado desde P2 por Delta 2026-05-05)
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
