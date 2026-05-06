@@ -348,6 +348,24 @@ Modo: `warn` durante TASK-265 + sweeps TASK-407/408. Promueve a `error` al cierr
 2. Conectar `getMicrocopy(locale)` a la fuente de locale (sesión user, persistencia tenant per TASK-431)
 3. La API pública NO cambia → consumers no reescriben nada
 
+### Formatting Locale-Aware (TASK-429)
+
+`src/lib/format/` es la primitive canónica para formateo visible y exportable:
+
+- `formatDate`, `formatDateTime`, `formatISODateKey`
+- `formatCurrency`, `formatAccountingCurrency`
+- `formatNumber`, `formatInteger`, `formatPercent`
+- `formatRelative`, `selectPlural`
+
+Reglas:
+
+- El locale default inicial es `es-CL`; `Locale` se reutiliza desde `src/lib/copy/types.ts` y acepta overrides BCP 47 para transiciones (`pt-BR`, etc.).
+- La timezone operacional sigue siendo `America/Santiago`; no confundir locale de presentación con timezone de payroll/finance.
+- Fechas date-only `YYYY-MM-DD` se formatean desde UTC noon para evitar drift de día.
+- Keys operacionales `YYYY-MM-DD` deben usar `formatISODateKey`, no `toISOString().slice(...)` ni `Intl.DateTimeFormat('en-CA')` inline.
+- Monedas visibles deben pasar por `formatCurrency`; `formatAccountingCurrency` es opt-in para negative accounting.
+- No usar `new Intl.*` ni `toLocaleString` / `toLocaleDateString` / `toLocaleTimeString` directo en surfaces visibles. ESLint rule `greenhouse/no-raw-locale-formatting` corre en modo `warn` incremental sobre `src/views`, `src/components` y `src/app`.
+
 ### Coordinación con Kortex (Slice 4 — exploratorio)
 
 La separación capas (product nomenclature vs functional microcopy) habilita extracción futura del copy institucional reusable a un paquete compartible con Kortex sin arrastrar lenguaje de producto Greenhouse:

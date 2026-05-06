@@ -22,6 +22,7 @@ import { getActiveOpeningTrialBalance } from '@/lib/finance/account-opening-tria
 import { getOpenDriftSummariesForAccounts } from '@/lib/finance/reconciliation/snapshots'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { getProcessorDigest, type TreasuryProcessorDigest } from '@/lib/finance/processor-digest'
+import { formatISODateKey } from '@/lib/format'
 
 type QueryableClient = Pick<PoolClient, 'query'>
 
@@ -503,8 +504,7 @@ const mapAccountBalanceRow = (row: AccountBalanceRow): AccountBalanceRecord => (
   closedAt: row.closed_at ? new Date(row.closed_at).toISOString() : null
 })
 
-const getTodayInSantiago = () =>
-  new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Santiago' }).format(new Date())
+const getTodayInSantiago = () => formatISODateKey(new Date())
 
 const getAccountRow = async (accountId: string, client?: QueryableClient) => {
   const rows = await queryRows<AccountRow & { account_kind?: string }>(

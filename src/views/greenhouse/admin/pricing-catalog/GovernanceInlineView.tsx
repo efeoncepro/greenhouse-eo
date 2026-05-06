@@ -27,6 +27,7 @@ import Typography from '@mui/material/Typography'
 
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
+import { formatNumber } from '@/lib/format'
 
 // ── Types ──────────────────────────────────────────────────────────────
 
@@ -96,7 +97,7 @@ type GovernanceType =
 // ── Helpers ────────────────────────────────────────────────────────────
 
 const formatPct = (value: number): string =>
-  `${new Intl.NumberFormat('es-CL', { maximumFractionDigits: 1 }).format(value)}%`
+  `${formatNumber(value, { maximumFractionDigits: 1 })}%`
 
 // ── Inline editable cell ───────────────────────────────────────────────
 

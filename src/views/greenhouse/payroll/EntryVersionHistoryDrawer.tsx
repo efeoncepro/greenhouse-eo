@@ -16,6 +16,7 @@ import Typography from '@mui/material/Typography'
 
 import CustomChip from '@core/components/mui/Chip'
 
+import { formatCurrency, formatDateTime } from '@/lib/format'
 import type { PayrollCurrency } from '@/types/payroll'
 
 // TASK-412 — side drawer that lists every version of a payroll entry
@@ -52,23 +53,20 @@ interface Props {
 
 const formatMoney = (value: number, currency: PayrollCurrency) =>
   currency === 'CLP'
-    ? `$${Math.round(value).toLocaleString('es-CL')}`
-    : `US$${value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+    ? formatCurrency(Math.round(value), 'CLP')
+    : formatCurrency(value, 'USD', { currencySymbol: 'US$' }, 'en-US')
 
 const formatAbsoluteTime = (value: string | null) => {
   if (!value) return '—'
 
-  try {
-    return new Date(value).toLocaleString('es-CL', {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    })
-  } catch {
-    return value
-  }
+  return formatDateTime(value, {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    fallback: value
+  })
 }
 
 const formatSignedMoney = (delta: number, currency: PayrollCurrency) => {

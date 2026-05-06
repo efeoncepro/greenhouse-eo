@@ -4,6 +4,7 @@ import Chip from '@mui/material/Chip'
 import { alpha, useTheme } from '@mui/material/styles'
 
 import { GH_COLORS, GH_PRICING } from '@/config/greenhouse-nomenclature'
+import { formatPercent } from '@/lib/format'
 
 export type MarginStatus = 'critical' | 'attention' | 'optimal' | 'overshoot'
 
@@ -38,7 +39,7 @@ const STATUS_META: Record<MarginStatus, { icon: string; tone: 'error' | 'warning
 }
 
 const formatPct = (value: number) =>
-  new Intl.NumberFormat('es-CL', { style: 'percent', minimumFractionDigits: 1, maximumFractionDigits: 1 }).format(value)
+  formatPercent(value, { minimumFractionDigits: 1, maximumFractionDigits: 1 })
 
 const MarginIndicatorBadge = ({
   marginPct,

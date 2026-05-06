@@ -43,6 +43,7 @@ import CreateToolDrawer from './drawers/CreateToolDrawer'
 import EditToolDrawer from './drawers/EditToolDrawer'
 import BulkEditDrawer from './drawers/BulkEditDrawer'
 import { GH_PRICING_GOVERNANCE } from '@/config/greenhouse-nomenclature'
+import { formatNumber } from '@/lib/format'
 
 // ── Types ──────────────────────────────────────────────────────────────
 
@@ -70,7 +71,7 @@ interface ListResponse {
 const formatAmount = (amount: number | null, currency: string | null): string => {
   if (amount == null) return '—'
 
-  const value = new Intl.NumberFormat('es-CL', { maximumFractionDigits: 2 }).format(amount)
+  const value = formatNumber(amount, { maximumFractionDigits: 2 })
 
   return currency ? `${currency} ${value}` : value
 }

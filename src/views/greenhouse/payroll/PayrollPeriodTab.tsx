@@ -38,7 +38,14 @@ import {
 import PayrollEntryTable from './PayrollEntryTable'
 import PayrollPaymentStatusCard from './PayrollPaymentStatusCard'
 import ReopenPeriodDialog from './ReopenPeriodDialog'
-import { buildPayrollCurrencySummary, formatCurrency, formatPeriodLabel, formatTimestamp, periodStatusConfig } from './helpers'
+import {
+  buildPayrollCurrencySummary,
+  formatCurrency,
+  formatDecimal,
+  formatPeriodLabel,
+  formatTimestamp,
+  periodStatusConfig
+} from './helpers'
 
 type Props = {
   period: PayrollPeriod | null
@@ -530,7 +537,7 @@ const PayrollPeriodTab = ({
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <HorizontalWithSubtitle
               title='Valor UF'
-              stats={period.ufValue ? period.ufValue.toLocaleString('es-CL') : '—'}
+              stats={period.ufValue ? formatDecimal(period.ufValue, 2) : '—'}
               avatarIcon='tabler-chart-dots'
               avatarColor='info'
               subtitle={period.ufValue ? 'Sincronizado' : 'Pendiente de sincronizar'}

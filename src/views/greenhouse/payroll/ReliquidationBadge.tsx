@@ -4,6 +4,8 @@ import Tooltip from '@mui/material/Tooltip'
 
 import CustomChip from '@core/components/mui/Chip'
 
+import { formatDate as formatLocaleDate } from '@/lib/format'
+
 // TASK-412 — inline chip that marks entries belonging to a reliquidation
 // (version > 1). Renders nothing for v1 entries so the default table stays
 // visually clean.
@@ -16,15 +18,12 @@ interface Props {
 const formatDate = (value: string | null | undefined) => {
   if (!value) return null
 
-  try {
-    return new Date(value).toLocaleDateString('es-CL', {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric'
-    })
-  } catch {
-    return null
-  }
+  return formatLocaleDate(value, {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+    fallback: ''
+  }) || null
 }
 
 const ReliquidationBadge = ({ version, reliquidatedAt }: Props) => {

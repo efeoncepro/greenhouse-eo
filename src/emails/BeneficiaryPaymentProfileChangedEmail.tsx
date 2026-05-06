@@ -1,5 +1,7 @@
 import { Heading, Section, Text } from '@react-email/components'
 
+import { formatDate } from '@/lib/format'
+
 import EmailButton from './components/EmailButton'
 import EmailLayout from './components/EmailLayout'
 import { APP_URL, EMAIL_COLORS, EMAIL_FONTS } from './constants'
@@ -60,15 +62,12 @@ const KIND_INTROS: Record<PaymentProfileEmailKind, (firstName: string, requested
 const formatDateLabel = (iso: string | null): string => {
   if (!iso) return 'Sin fecha registrada'
 
-  try {
-    return new Date(iso).toLocaleDateString('es-CL', {
-      day: '2-digit',
-      month: 'long',
-      year: 'numeric'
-    })
-  } catch {
-    return iso
-  }
+  return formatDate(iso, {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+    fallback: iso
+  })
 }
 
 const summaryRow = (label: string, value: string, emphasis = false) => (

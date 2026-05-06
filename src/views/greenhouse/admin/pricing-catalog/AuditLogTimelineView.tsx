@@ -38,6 +38,7 @@ import CustomTextField from '@core/components/mui/TextField'
 import AuditDiffViewer from '@/components/greenhouse/pricing/AuditDiffViewer'
 import AuditRevertConfirmDialog from '@/components/greenhouse/pricing/AuditRevertConfirmDialog'
 import { GH_PRICING_GOVERNANCE } from '@/config/greenhouse-nomenclature'
+import { formatDateTime as formatLocaleDateTime } from '@/lib/format'
 
 // ── Types ──────────────────────────────────────────────────────────────
 
@@ -198,13 +199,14 @@ const formatDateTime = (iso: string): string => {
 
   if (Number.isNaN(date.getTime())) return iso
 
-  return new Intl.DateTimeFormat('es-CL', {
+  return formatLocaleDateTime(iso, {
     day: '2-digit',
     month: 'short',
     year: 'numeric',
     hour: '2-digit',
-    minute: '2-digit'
-  }).format(date)
+    minute: '2-digit',
+    fallback: iso
+  })
 }
 
 const hasDetails = (summary: Record<string, unknown>): boolean => {

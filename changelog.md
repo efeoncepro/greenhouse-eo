@@ -1,5 +1,9 @@
 # changelog.md
 
+## 2026-05-06
+
+- **TASK-429 completa — formato locale-aware canónico.** Se agrega `src/lib/format/` para centralizar moneda, fechas, datetime, keys ISO operacionales, números, porcentajes, tiempo relativo y pluralización. Finance, Payroll, emails, pricing/admin-pricing y dashboard migran sus formateos visibles críticos desde `Intl.*` / `toLocale*` directo a la primitive compartida. ESLint suma `greenhouse/no-raw-locale-formatting` en modo `warn` incremental para evitar nuevas regresiones sin romper deuda histórica.
+
 ## 2026-05-05
 
 - **Finiquito PDF expone desglose legal/auditable del cálculo.** La tabla del documento formal ahora proyecta, desde el snapshot versionado del settlement, la base y formula del componente cuando existe información suficiente. Para `Feriado proporcional` muestra días hábiles a indemnizar, días corridos compensados, base diaria, cálculo `días corridos x base diaria = monto` y respaldo `saldo de vacaciones + regla DT art. 73`, sin recalcular fuera del engine de Payroll.

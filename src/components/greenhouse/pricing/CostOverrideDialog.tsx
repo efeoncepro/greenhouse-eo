@@ -21,6 +21,7 @@ import Typography from '@mui/material/Typography'
 import CostDeltaChip from './CostDeltaChip'
 import CostSourceChip, { type CostSourceKind } from './CostSourceChip'
 import { GH_PRICING } from '@/config/greenhouse-nomenclature'
+import { formatDate } from '@/lib/format'
 import { computeOverrideDelta } from '@/lib/finance/pricing/override-delta'
 import {
   QUOTATION_LINE_COST_OVERRIDE_CATEGORIES,
@@ -98,8 +99,8 @@ const formatRelativeDate = (iso: string): string => {
   const days = Math.floor(diffSec / 86400)
 
   if (days < 30) return `hace ${days} día${days === 1 ? '' : 's'}`
-  
-return date.toLocaleDateString('es-CL')
+
+  return formatDate(date)
 }
 
 /**

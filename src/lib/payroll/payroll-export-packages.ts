@@ -5,6 +5,7 @@ import { Buffer } from 'node:buffer'
 import type { CurrencyBreakdown } from '@/emails/PayrollExportReadyEmail'
 import { query } from '@/lib/db'
 import { sendEmail } from '@/lib/email/delivery'
+import { formatCurrency } from '@/lib/format'
 import { generatePayrollCsv } from '@/lib/payroll/export-payroll'
 import { generatePayrollPeriodPdf } from '@/lib/payroll/generate-payroll-pdf'
 import { getPayrollEntries } from '@/lib/payroll/get-payroll-entries'
@@ -28,9 +29,12 @@ const MONTH_NAMES = [
 ]
 
 const formatMoney = (value: number, currency: string) =>
-  currency === 'CLP'
-    ? `$${Math.round(value).toLocaleString('es-CL')}`
-    : `US$${value.toFixed(2)}`
+  formatCurrency(
+    value,
+    currency as 'CLP' | 'USD',
+    currency === 'USD' ? { currencySymbol: 'US$' } : {},
+    currency === 'USD' ? 'en-US' : undefined
+  )
 
 const buildBreakdowns = (
   entries: Awaited<ReturnType<typeof getPayrollEntries>>

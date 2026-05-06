@@ -3,6 +3,7 @@ import { Heading, Img, Section, Text } from '@react-email/components'
 import EmailButton from './components/EmailButton'
 import EmailLayout from './components/EmailLayout'
 import { APP_URL, EMAIL_COLORS, EMAIL_FONTS } from './constants'
+import { formatDate as formatLocaleDate } from '@/lib/format'
 
 const MEDIA_BUCKET = process.env.GREENHOUSE_PUBLIC_MEDIA_BUCKET || 'efeonce-group-greenhouse-public-media-prod'
 const HERO_IMAGE_URL = `https://storage.googleapis.com/${MEDIA_BUCKET}/emails/leave-pending-review.png`
@@ -19,15 +20,12 @@ interface LeaveRequestPendingReviewEmailProps {
 }
 
 const formatDate = (dateStr: string, locale: 'es' | 'en') => {
-  try {
-    return new Intl.DateTimeFormat(locale === 'en' ? 'en-US' : 'es-CL', {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric'
-    }).format(new Date(dateStr + 'T12:00:00'))
-  } catch {
-    return dateStr
-  }
+  return formatLocaleDate(dateStr, {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+    fallback: dateStr
+  }, locale === 'en' ? 'en-US' : 'es-CL')
 }
 
 const summaryRow = (label: string, value: string, emphasis = false) => (

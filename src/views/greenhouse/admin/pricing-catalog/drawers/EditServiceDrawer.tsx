@@ -27,6 +27,7 @@ import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 
 import { GH_PRICING } from '@/config/greenhouse-nomenclature'
+import { formatCurrency } from '@/lib/format'
 
 // ── Types ──────────────────────────────────────────────────────────────
 
@@ -169,7 +170,7 @@ const COPY = GH_PRICING.adminServices
 const fmtUsd = (value: number | null | undefined): string => {
   if (value === null || value === undefined || !Number.isFinite(value)) return '—'
 
-  return `$${value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD`
+  return `${formatCurrency(value, 'USD', {}, 'en-US')} USD`
 }
 
 const fmtPct = (value: number | null | undefined): string => {

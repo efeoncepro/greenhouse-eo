@@ -7,6 +7,7 @@ import {
   runGreenhousePostgresQuery,
   withGreenhousePostgresTransaction
 } from '@/lib/postgres/client'
+import { formatISODateKey } from '@/lib/format'
 import {
   FinanceValidationError,
   normalizeString,
@@ -240,7 +241,7 @@ const SUPPLIER_ORGANIZATION_CONTACTS_LATERAL_SQL = `
 `
 
 const getCurrentSantiagoPeriod = () => {
-  const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Santiago' }).format(new Date())
+  const today = formatISODateKey(new Date())
   const match = today.match(/^(\d{4})-(\d{2})-\d{2}$/)
 
   if (!match) {

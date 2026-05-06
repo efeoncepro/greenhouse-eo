@@ -10,6 +10,7 @@ import type {
 } from '@/types/payroll'
 
 import { captureWithDomain } from '@/lib/observability/capture'
+import { formatISODateKey } from '@/lib/format'
 import { ensurePayrollInfrastructure } from '@/lib/payroll/schema'
 import { listPayrollCompensationMembers } from '@/lib/payroll/get-payroll-members'
 import {
@@ -173,10 +174,7 @@ const normalizeChileAfpSplitRates = ({
   }
 }
 
-const getCurrentDateString = () =>
-  new Intl.DateTimeFormat('en-CA', {
-    timeZone: 'America/Santiago'
-  }).format(new Date())
+const getCurrentDateString = () => formatISODateKey(new Date())
 
 const isCurrentCompensationWindow = ({
   effectiveFrom,

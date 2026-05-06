@@ -17,6 +17,7 @@ import {
   getSiiRetentionRate,
   type ContractType
 } from '@/types/hr-contracts'
+import { formatCurrency as formatLocaleCurrency, formatPercent as formatLocalePercent } from '@/lib/format'
 
 import type { EntryAdjustmentBreakdown } from './adjustments/breakdown'
 
@@ -233,23 +234,7 @@ export type ReceiptPresenterEntry = {
 // ──────────────────────────────────────────────────────────────────────
 
 const formatCurrency = (amount: number | null | undefined, currency: 'CLP' | 'USD'): string => {
-  if (amount == null) return '—'
-
-  if (currency === 'CLP') {
-    return new Intl.NumberFormat('es-CL', {
-      style: 'currency',
-      currency: 'CLP',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0
-    }).format(amount)
-  }
-
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  }).format(amount)
+  return formatLocaleCurrency(amount, currency, currency === 'USD' ? { currencySymbol: 'US$' } : {}, currency === 'USD' ? 'en-US' : undefined)
 }
 
 const formatRate = (rate: number | null | undefined, decimals = 2): string => {
@@ -259,9 +244,7 @@ const formatRate = (rate: number | null | undefined, decimals = 2): string => {
 }
 
 const formatPercent = (value: number | null | undefined): string => {
-  if (value == null) return '—'
-
-  return `${value.toFixed(1)}%`
+  return formatLocalePercent(value, { input: 'percentage', minimumFractionDigits: 1, maximumFractionDigits: 1 })
 }
 
 const formatFactor = (value: number | null | undefined): string => {

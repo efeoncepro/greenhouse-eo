@@ -1,5 +1,15 @@
 # Handoff.md
 
+## Sesion 2026-05-06 — TASK-429 cerrada en develop
+
+- **Branch:** `develop` por instruccion explicita del usuario; no se crea `task/TASK-429-locale-aware-formatting-utilities`.
+- **Lifecycle:** `TASK-429` se movio de `docs/tasks/to-do/` a `docs/tasks/complete/`; `docs/tasks/README.md` y `TASK-266` sincronizados.
+- **Entrega:** foundation canonica `src/lib/format/` con currency/date/datetime/ISO date key/number/integer/percent/relative/plural; default `es-CL`, timezone operacional `America/Santiago`, date-only sin drift.
+- **Migracion:** scope critico Finance/Payroll/emails/payroll views/pricing/admin-pricing/dashboard/finance movement feed consume la utility; grep de `new Intl.*`, `toLocaleString`, `toLocaleDateString`, `toLocaleTimeString` en ese scope queda en 0.
+- **Guardrail:** ESLint rule `greenhouse/no-raw-locale-formatting` en `warn` incremental para `src/views`, `src/components`, `src/app`; no bloquea deuda historica ni tests.
+- **Validacion:** `pnpm exec tsc --noEmit --pretty false` OK; vitest focal (`src/lib/format`, finance PDF formatters, finiquito PDF, payroll receipt/export emails) OK 5 files / 24 tests; rule test `node eslint-plugins/greenhouse/rules/__tests__/no-raw-locale-formatting.test.mjs` OK.
+- **Pendiente/riesgo:** `pnpm lint` conserva warnings preexistentes de `greenhouse/no-untokenized-copy`; no son de TASK-429. `pnpm build` queda pendiente post-lint full si se requiere gate completo antes de push final.
+
 ## Sesion 2026-05-05 — Finiquito PDF calculation disclosure
 
 - **Branch:** `develop`; cambio acotado al contrato documental del PDF de finiquito.

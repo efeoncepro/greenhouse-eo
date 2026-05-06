@@ -36,6 +36,7 @@ import type {
 } from '@/types/payroll'
 import { getCompensationSaveMode } from '@/lib/payroll/compensation-versioning'
 import { CONTRACT_DERIVATIONS, CONTRACT_LABELS, contractAllowsRemoteAllowance } from '@/types/hr-contracts'
+import { formatCurrency } from '@/lib/format'
 
 export type CompensationSavePayload = {
   mode: 'create' | 'update'
@@ -67,9 +68,7 @@ type ReverseQuoteResult = {
 }
 
 const fmt = (n: number | null | undefined) =>
-  n != null
-    ? new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(n)
-    : '-'
+  n != null ? formatCurrency(n, 'CLP') : '-'
 
 const sectionSx = {
   p: 2, borderRadius: 1.5,
@@ -279,7 +278,7 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
 
     try {
       const resolvedChangeReason = isChileEmployee && desiredNet > 0 && !changeReason.includes('líquido')
-        ? `${changeReason.trim()} [Líquido deseado: $${desiredNet.toLocaleString('es-CL')}]`
+        ? `${changeReason.trim()} [Líquido deseado: ${formatCurrency(desiredNet, 'CLP')}]`
         : changeReason.trim()
 
       const input: CreateCompensationVersionInput = {

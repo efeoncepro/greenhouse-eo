@@ -6,16 +6,16 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
-- Status real: `Diseno`
+- Status real: `Entregada 2026-05-06`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none` — entregable independiente, puede arrancar sin `TASK-265` ni `TASK-428`.
-- Branch: `task/TASK-429-locale-aware-formatting-utilities`
+- Branch: `develop` — instrucción explícita del usuario; no se creó `task/*` para esta ejecución.
 - Legacy ID: —
 - GitHub Issue: —
 - Parent: `TASK-266` (umbrella)
@@ -145,3 +145,29 @@ Reglas obligatorias:
 
 - ¿La utility debe exponer también `parseDate` / `parseNumber` por locale, o solo formateo?
 - ¿Finance necesita una segunda capa de formateo contable (signos, paréntesis para negativos, CR/DR) separada del formateo general?
+
+## Execution Notes — 2026-05-06
+
+### Open Questions Resueltas
+
+- `parseDate` / `parseNumber`: fuera de scope para esta entrega. La tarea activa solo formateo; parsing por locale requiere UX de inputs, validación y errores localizados, por lo que debe vivir en una task posterior con contrato de forms.
+- Capa contable Finance: se entrega como función explícita `formatAccountingCurrency` sobre la misma foundation, no como wrapper paralelo. Rationale: evita duplicar reglas de currency/locale y mantiene el formato contable opt-in.
+
+### Entrega
+
+- Foundation canónica `src/lib/format/` con date, datetime, ISO date keys, currency, accounting currency, number, integer, percent, relative y plural.
+- Default locale inicial `es-CL`, timezone operacional `America/Santiago` y date-only strings sin drift por timezone.
+- Migración de call sites visibles y críticos en `src/lib/finance/**`, `src/lib/payroll/**`, `src/emails/**`, payroll views, pricing/admin-pricing, dashboard y finance movement feed.
+- Guardrail ESLint `greenhouse/no-raw-locale-formatting` en modo `warn`, scoped a surfaces visibles (`src/views`, `src/components`, `src/app`) para evitar nuevas llamadas crudas a `Intl.*` / `toLocale*` sin romper deuda histórica.
+
+### Conteo Post-Migración
+
+- Scope crítico migrado (`src/lib/finance`, `src/lib/payroll`, `src/emails`, payroll views, pricing/admin-pricing, dashboard, finance movement feed): `0` usos directos de `new Intl.*`, `toLocaleString`, `toLocaleDateString` o `toLocaleTimeString`.
+- Quedan menciones textuales a `es-CL` / `en-US` cuando son argumentos explícitos de la utility, tests, comentarios o casing (`toLocaleLowerCase`) fuera del anti-pattern de formateo.
+
+### Validación
+
+- `pnpm exec tsc --noEmit --pretty false` — OK.
+- `pnpm exec vitest run src/lib/format/__tests__/format.test.ts src/lib/finance/pdf/__tests__/formatters.test.ts src/lib/payroll/final-settlement/document-pdf.test.tsx src/emails/PayrollReceiptEmail.test.tsx src/emails/PayrollExportReadyEmail.test.tsx --reporter=verbose` — OK, 5 files / 24 tests.
+- `node eslint-plugins/greenhouse/rules/__tests__/no-raw-locale-formatting.test.mjs` — OK.
+- Grep post-migración del scope crítico — OK, 0 raw formatters directos.

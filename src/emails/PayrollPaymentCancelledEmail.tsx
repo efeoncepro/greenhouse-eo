@@ -1,5 +1,7 @@
 import { Heading, Section, Text } from '@react-email/components'
 
+import { formatCurrency } from '@/lib/format'
+
 import EmailButton from './components/EmailButton'
 import EmailLayout from './components/EmailLayout'
 import { APP_URL, EMAIL_COLORS, EMAIL_FONTS } from './constants'
@@ -20,9 +22,7 @@ const MONTH_NAMES = [
 ]
 
 const formatMoney = (value: number, currency: 'CLP' | 'USD') =>
-  currency === 'CLP'
-    ? `$${Math.round(value).toLocaleString('es-CL')}`
-    : `US$${value.toFixed(2)}`
+  formatCurrency(value, currency, currency === 'USD' ? { currencySymbol: 'US$' } : {}, currency === 'USD' ? 'en-US' : undefined)
 
 export default function PayrollPaymentCancelledEmail({
   fullName = 'María González Rojas',

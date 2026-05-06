@@ -18,6 +18,7 @@ import Typography from '@mui/material/Typography'
 
 import CustomChip from '@core/components/mui/Chip'
 
+import { formatCurrency, formatDateTime } from '@/lib/format'
 import { ADJUSTMENT_REASON_LABELS } from '@/lib/payroll/adjustments/reason-codes'
 import type { PayrollAdjustment, AdjustmentStatus } from '@/types/payroll-adjustments'
 
@@ -59,13 +60,13 @@ const formatPayloadSummary = (kind: string, payload: Record<string, unknown>): s
   if (kind === 'fixed_deduction') {
     const a = Number((payload as { amount?: number }).amount)
 
-    return Number.isFinite(a) ? `$${a.toLocaleString('es-CL')}` : '—'
+    return Number.isFinite(a) ? formatCurrency(a, 'CLP') : '—'
   }
 
   if (kind === 'manual_override') {
     const v = Number((payload as { netClp?: number }).netClp)
 
-    return Number.isFinite(v) ? `Neto $${v.toLocaleString('es-CL')}` : '—'
+    return Number.isFinite(v) ? `Neto ${formatCurrency(v, 'CLP')}` : '—'
   }
 
   return ''
@@ -74,11 +75,7 @@ const formatPayloadSummary = (kind: string, payload: Record<string, unknown>): s
 const formatTimestamp = (iso: string | null): string => {
   if (!iso) return '—'
 
-  try {
-    return new Date(iso).toLocaleString('es-CL', { dateStyle: 'medium', timeStyle: 'short' })
-  } catch {
-    return iso
-  }
+  return formatDateTime(iso, { dateStyle: 'medium', timeStyle: 'short', fallback: iso })
 }
 
 const PayrollAdjustmentHistoryDrawer = ({

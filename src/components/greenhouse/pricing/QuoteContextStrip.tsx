@@ -18,6 +18,7 @@ import FieldsProgressChip from '@/components/greenhouse/primitives/FieldsProgres
 import useReducedMotion from '@/hooks/useReducedMotion'
 import { motion } from '@/libs/FramerMotion'
 import { GH_PRICING } from '@/config/greenhouse-nomenclature'
+import { formatDate } from '@/lib/format'
 import type { CommercialModelCode } from '@/lib/commercial/pricing-governance-types'
 import type { PricingOutputCurrency } from '@/lib/finance/pricing/contracts'
 
@@ -358,9 +359,7 @@ const QuoteContextStrip = ({
   const validUntilValue = values.validUntil
     ? (() => {
         try {
-          return new Intl.DateTimeFormat('es-CL', { day: '2-digit', month: 'short', year: 'numeric' }).format(
-            new Date(values.validUntil)
-          )
+          return formatDate(values.validUntil, { day: '2-digit', month: 'short', year: 'numeric' })
         } catch {
           return values.validUntil
         }

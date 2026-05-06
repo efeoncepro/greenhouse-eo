@@ -23,6 +23,7 @@ import {
 } from '@/types/hr-contracts'
 
 import { captureWithDomain } from '@/lib/observability/capture'
+import { formatISODateKey } from '@/lib/format'
 import {
   isGreenhousePostgresConfigured,
   runGreenhousePostgresQuery,
@@ -365,8 +366,7 @@ const toPgTimestampString = (value: string | Date | null | undefined): string | 
   return typeof value === 'string' ? value : null
 }
 
-const getCurrentDateString = () =>
-  new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Santiago' }).format(new Date())
+const getCurrentDateString = () => formatISODateKey(new Date())
 
 const addDaysToDateString = (dateString: string, days: number) => {
   const date = new Date(`${dateString}T00:00:00.000Z`)

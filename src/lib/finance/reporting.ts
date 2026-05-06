@@ -1,6 +1,7 @@
 import 'server-only'
 
 import { roundCurrency } from '@/lib/finance/shared'
+import { formatISODateKey } from '@/lib/format'
 
 const FINANCE_TIMEZONE = 'America/Santiago'
 
@@ -12,15 +13,7 @@ export type MonthlyAmountEntry = {
 
 /** Returns { year, month } based on the business timezone (America/Santiago). */
 export const getFinanceCurrentPeriod = () => {
-  const parts = new Intl.DateTimeFormat('en-CA', {
-    timeZone: FINANCE_TIMEZONE,
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit'
-  }).formatToParts(new Date())
-
-  const year = Number(parts.find(p => p.type === 'year')!.value)
-  const month = Number(parts.find(p => p.type === 'month')!.value)
+  const [year, month] = formatISODateKey(new Date(), FINANCE_TIMEZONE).split('-').map(Number)
 
   return { year, month }
 }

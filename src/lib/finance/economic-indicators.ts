@@ -18,6 +18,7 @@ import {
 } from '@/lib/finance/postgres-store'
 import { isFinanceBigQueryWriteEnabled } from '@/lib/finance/bigquery-write-flag'
 import { buildUsdClpRatePairs, upsertExchangeRates } from '@/lib/finance/exchange-rates'
+import { formatISODateKey } from '@/lib/format'
 
 const MINDICADOR_BASE_URL = 'https://mindicador.cl/api'
 
@@ -72,10 +73,7 @@ const DEFINITIONS: Record<EconomicIndicatorCode, EconomicIndicatorDefinition> = 
   IMM: { code: 'IMM', path: 'imm', unit: 'Pesos', frequency: 'monthly', provider: 'manual_only' }
 }
 
-const getTodayInSantiago = () =>
-  new Intl.DateTimeFormat('en-CA', {
-    timeZone: 'America/Santiago'
-  }).format(new Date())
+const getTodayInSantiago = () => formatISODateKey(new Date())
 
 const buildIndicatorId = (indicatorCode: EconomicIndicatorCode, indicatorDate: string) => `${indicatorCode}_${indicatorDate}`
 

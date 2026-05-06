@@ -14,6 +14,7 @@ import Typography from '@mui/material/Typography'
 import { alpha } from '@mui/material/styles'
 
 import { GH_PRICING_GOVERNANCE } from '@/config/greenhouse-nomenclature'
+import { formatCurrency } from '@/lib/format'
 
 export interface ImpactPreviewSample {
   quotationId: string
@@ -60,15 +61,7 @@ export interface ImpactPreviewPanelProps {
 const formatClp = (value: number): string => {
   if (!Number.isFinite(value) || value === 0) return '$0'
 
-  try {
-    return new Intl.NumberFormat('es-CL', {
-      style: 'currency',
-      currency: 'CLP',
-      maximumFractionDigits: 0
-    }).format(value)
-  } catch {
-    return `$${Math.round(value).toLocaleString('es-CL')}`
-  }
+  return formatCurrency(value, 'CLP')
 }
 
 const HIGH_IMPACT_QUOTES_THRESHOLD = 20

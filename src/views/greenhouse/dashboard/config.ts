@@ -4,6 +4,7 @@ import type {
   GreenhouseKpiTone
 } from '@/types/greenhouse-dashboard'
 import type { ChipGroupItem } from '@/components/greenhouse'
+import { formatDateTime } from '@/lib/format'
 
 export type DashboardTheme = 'general' | 'creative' | 'crm' | 'web'
 
@@ -91,7 +92,7 @@ export const formatSyncedAt = (value: string | null) => {
     return 'sin sincronizacion registrada'
   }
 
-  return new Date(value).toLocaleString('es-CL')
+  return formatDateTime(value, { fallback: value })
 }
 
 export const formatDelta = (value: number) => {

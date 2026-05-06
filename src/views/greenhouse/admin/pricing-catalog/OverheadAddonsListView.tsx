@@ -43,6 +43,7 @@ import CreateOverheadDrawer from './drawers/CreateOverheadDrawer'
 import EditOverheadDrawer from './drawers/EditOverheadDrawer'
 import BulkEditDrawer from './drawers/BulkEditDrawer'
 import { GH_PRICING_GOVERNANCE } from '@/config/greenhouse-nomenclature'
+import { formatNumber } from '@/lib/format'
 
 // ── Types ──────────────────────────────────────────────────────────────
 
@@ -96,11 +97,11 @@ const formatValue = (item: OverheadItem): string => {
   }
 
   if (item.finalPriceUsd != null) {
-    return `USD ${new Intl.NumberFormat('es-CL').format(item.finalPriceUsd)}`
+    return `USD ${formatNumber(item.finalPriceUsd)}`
   }
 
   if (item.costInternalUsd > 0) {
-    return `USD ${new Intl.NumberFormat('es-CL').format(item.costInternalUsd)} (costo)`
+    return `USD ${formatNumber(item.costInternalUsd)} (costo)`
   }
 
   return '—'

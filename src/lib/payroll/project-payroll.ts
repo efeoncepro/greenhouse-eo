@@ -9,6 +9,7 @@ import type {
 } from '@/types/payroll'
 
 import { getHistoricalEconomicIndicatorForPeriod } from '@/lib/finance/economic-indicators'
+import { formatISODateKey } from '@/lib/format'
 import { DEFAULT_BONUS_PRORATION_CONFIG, normalizeBonusProrationConfig } from '@/lib/payroll/bonus-config'
 import { buildPayrollEntry } from '@/lib/payroll/calculate-payroll'
 import { requiresPayrollAttendanceSignal, requiresPayrollKpi } from '@/lib/payroll/compensation-requirements'
@@ -57,7 +58,7 @@ const getPeriodEnd = (year: number, month: number) => {
   return end.toISOString().slice(0, 10)
 }
 
-const getToday = () => new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Santiago' }).format(new Date())
+const getToday = () => formatISODateKey(new Date())
 
 const getBonusConfig = async (periodEnd: string): Promise<BonusProrationConfig> => {
   if (isPayrollPostgresEnabled()) {

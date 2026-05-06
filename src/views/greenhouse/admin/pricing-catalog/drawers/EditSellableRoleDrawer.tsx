@@ -28,6 +28,7 @@ import { TabContext, TabList, TabPanel } from '@mui/lab'
 
 import ImpactPreviewPanel from '@/components/greenhouse/pricing/ImpactPreviewPanel'
 import { GH_PRICING_GOVERNANCE } from '@/config/greenhouse-nomenclature'
+import { formatCurrency, formatNumber } from '@/lib/format'
 
 import CustomTextField from '@core/components/mui/TextField'
 
@@ -167,7 +168,7 @@ const todayIso = (): string => new Date().toISOString().slice(0, 10)
 const fmtUsd = (value: number | null | undefined): string => {
   if (value === null || value === undefined || !Number.isFinite(value)) return '—'
 
-  return `$${value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+  return formatCurrency(value, 'USD', {}, 'en-US')
 }
 
 const fmtPct = (value: number | null | undefined): string => {
@@ -180,10 +181,10 @@ const fmtPrice = (value: number | null | undefined, currency: string): string =>
   if (value === null || value === undefined || !Number.isFinite(value)) return '—'
   const digits = currency === 'CLP' || currency === 'COP' ? 0 : 2
 
-  return `${currency} ${value.toLocaleString('en-US', {
+  return `${currency} ${formatNumber(value, {
     minimumFractionDigits: digits,
     maximumFractionDigits: digits
-  })}`
+  }, 'en-US')}`
 }
 
 const fmtDate = (value: string): string => {

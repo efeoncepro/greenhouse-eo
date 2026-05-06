@@ -40,6 +40,7 @@ import tableStyles from '@core/styles/table.module.css'
 import EmploymentTypeDrawer, {
   type EmploymentTypeFormValues
 } from './drawers/EmploymentTypeDrawer'
+import { formatNumber } from '@/lib/format'
 
 // ── Types ──────────────────────────────────────────────────────────────
 
@@ -79,7 +80,7 @@ const formatPct = (value: number | null): string =>
 const formatCurrency = (value: number | null | undefined, currency = 'USD'): string => {
   if (value === null || value === undefined) return '—'
 
-  return `${currency} ${new Intl.NumberFormat('es-CL', { maximumFractionDigits: 0 }).format(value)}`
+  return `${currency} ${formatNumber(value, { maximumFractionDigits: 0 })}`
 }
 
 // ── Columns ────────────────────────────────────────────────────────────

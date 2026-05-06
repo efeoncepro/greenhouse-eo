@@ -265,7 +265,12 @@ export default [
       // instancias), status maps inline (100), loading strings (94),
       // empty states (31) + cobertura secundaria de label/placeholder/
       // helperText/title/subtitle.
-      'greenhouse/no-untokenized-copy': 'warn'
+      'greenhouse/no-untokenized-copy': 'warn',
+      // TASK-429 — locale-aware formatting utilities.
+      // Modo warn inicial: existe deuda histórica en views/emails. El gate
+      // deja visible cualquier uso nuevo de Intl/toLocale* directo sin romper
+      // el baseline mientras los slices de migración bajan el inventario.
+      'greenhouse/no-raw-locale-formatting': 'warn'
     }
   },
 

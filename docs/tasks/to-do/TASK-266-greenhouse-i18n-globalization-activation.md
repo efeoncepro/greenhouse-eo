@@ -21,7 +21,7 @@
 - GitHub Issue: —
 - Children:
   - `TASK-428` — i18n architecture decision (library + routing strategy)
-  - `TASK-429` — locale-aware formatting utilities (independiente, puede arrancar sin 265)
+  - `TASK-429` — locale-aware formatting utilities (complete 2026-05-06)
   - `TASK-430` — dictionary foundation activation (depende de 265 + 428)
   - `TASK-431` — tenant + user locale persistence model (depende de 428; requiere PG migration)
   - (futuros, derivar cuando corresponda) — shared shell rollout, emails localization, SEO & routing deep-links

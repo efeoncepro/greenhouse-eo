@@ -5,6 +5,7 @@ import MenuItem from '@mui/material/MenuItem'
 import CustomTextField from '@core/components/mui/TextField'
 
 import { GH_PRICING } from '@/config/greenhouse-nomenclature'
+import { formatDate, formatNumber } from '@/lib/format'
 import type { PricingOutputCurrency } from '@/lib/finance/pricing/contracts'
 
 /**
@@ -45,14 +46,14 @@ const formatAsOf = (isoDate: string): string => {
 
     if (Number.isNaN(date.getTime())) return isoDate
 
-    return new Intl.DateTimeFormat('es-CL', { day: '2-digit', month: 'short' }).format(date)
+    return formatDate(date, { day: '2-digit', month: 'short', fallback: isoDate })
   } catch {
     return isoDate
   }
 }
 
 const formatRate = (rate: number): string =>
-  new Intl.NumberFormat('es-CL', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(rate)
+  formatNumber(rate, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 
 const CurrencySwitcher = ({
   value,
