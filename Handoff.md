@@ -23128,7 +23128,6 @@ Evidencia runtime:
 
 No validado aun:
 
-- Comparacion visual humana del inbox contra baseline. `agent-qa@efeoncepro.com` no existe como buzon verificable; se ejecuto re-smoke a `jreyes@efeoncepro.com`.
 - Observacion 24h post-deploy del signal para cerrar lifecycle de TASK-408.
 
 Revalidacion posterior:
@@ -23150,3 +23149,4 @@ Re-smoke a buzon real:
   - `weekly_executive_digest` -> delivery `5118bc2e-ed7c-4c2a-9ea2-74adc5382694`, Resend `77bbcd25-61a1-41c2-83f5-c2b14d0437ad`.
 - KPI posterior: `sentToday=19`, `failedToday=0`, `pendingRetry=0`, `deliveryRate=100`.
 - Signal posterior: `notifications.email.render_failure_rate` severity `ok`, `total_render_failures=0`, `delivery_render_failures=0`, `reactive_render_failures=0`, `delivery_failure_rate_percent=0.00`.
+- Confirmacion visual humana: usuario reviso el inbox `jreyes@efeoncepro.com` y reporto "Se ven perfectos".

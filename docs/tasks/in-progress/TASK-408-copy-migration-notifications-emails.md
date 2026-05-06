@@ -207,7 +207,7 @@ Anclados al baseline 2026-05-06:
 - [x] `pnpm build`, `pnpm lint`, `npx tsc --noEmit`, `pnpm test` pasan en verificacion final 2026-05-06: lint pass, tsc pass, build pass, test completo pass (589 files / 3419 passed / 5 skipped).
 - [x] Admin preview catalog cubre todos los 17 templates registrados, incluyendo `quote_share` para smoke finance/Nexa-adjacent sin tocar flujos de negocio.
 - [x] **Smoke staging delivery/render** ejecutado 2026-05-06: 5 emails de grupos cohesivos enviados via `/api/admin/emails/preview`, todos aceptados por Resend, persistidos en `email_deliveries` con `status=sent`, `failedToday=0`, con `sourceEntity=email_preview_test`.
-- [x] **Smoke staging real inbox** ejecutado 2026-05-06 contra `jreyes@efeoncepro.com`: los 5 grupos cohesivos fueron aceptados por Resend y persistidos en `email_deliveries` con `status=sent`; validacion visual humana del inbox queda como confirmacion opcional fuera del gate tecnico.
+- [x] **Smoke staging real inbox** ejecutado 2026-05-06 contra `jreyes@efeoncepro.com`: los 5 grupos cohesivos fueron aceptados por Resend, persistidos en `email_deliveries` con `status=sent` y confirmados visualmente por el usuario como correctos.
 
 ## Verification
 
@@ -230,6 +230,8 @@ Revalidacion post-documentation push: `https://greenhouse-dqaqhwmw4-efeonce-7670
 Metodo seguro: `POST /api/admin/emails/preview`; esto ejercita `sendEmail`, Resend y `email_deliveries` usando `sourceEntity=email_preview_test`, sin tocar payroll lifecycle, leave workflow, quote lifecycle, Nexa digest jobs, outbox publisher, reactive consumer, notification preferences ni webhooks. Nota 2026-05-06: `agent-qa@efeoncepro.com` fue usado como destinatario tecnico para probar acceptance del provider, pero no existe como buzon verificable; por eso no se usa como gate visual.
 
 Re-smoke a buzon real 2026-05-06: se reenviaron los mismos 5 templates a `jreyes@efeoncepro.com` via el mismo endpoint seguro. Todos quedaron `status=sent`, KPI `failedToday=0`, `deliveryRate=100`, y `notifications.email.render_failure_rate` siguio `ok` con `total_render_failures=0`.
+
+Confirmacion visual humana: usuario reviso los correos en `jreyes@efeoncepro.com` y reporto "Se ven perfectos".
 
 - Payroll: `payroll_export` -> batch `a9c9b85f-c8a0-4b1a-a2a0-9b69c36d310a`, delivery `6dcb749c-1d3e-47b5-9c63-0af0c0affdce`, Resend `f9f1c0b6-745b-4dce-8e3f-f4a56d4cf6db`, status `sent`.
 - Leave: `leave_request_pending_review` -> batch `3cae9bb7-4c6d-4ea1-a9d1-313caef3ed5c`, delivery `e05b0845-6e9f-47f0-a0ff-5ccfc8f641df`, Resend `7f3d32f0-1052-43a1-82ee-92e12ce1b1f4`, status `sent`.
