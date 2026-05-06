@@ -385,6 +385,17 @@ Reglas canonicas:
 - Los accesos dinamicos deben pasar por `isNotificationCategoryCode()` antes de indexar el catalogo.
 - `subjectKey` solo debe agregarse cuando exista un consumer activo y testeado. Metadata muerta en el catalogo introduce drift y no protege delivery.
 
+### Delta 2026-05-06 — TASK-408 Slice 2A EmailLayout
+
+`src/emails/components/EmailLayout.tsx` consume `getMicrocopy().emails.layout` para el shell institucional en español: `logoAlt`, `tagline`, `automatedDisclaimer` y `unsubscribe`.
+
+Reglas canonicas:
+
+- El shell puede leer copy institucional compartido, pero no debe resolver ni mutar tokens de personalizacion.
+- `en` conserva fallback legacy mientras `en-US` siga siendo mirror de `es-CL`; no degradar correos internacionales para cumplir una migracion mecanica.
+- `EmailButton` no debe crecer API de copy hasta que exista un consumer activo. Hoy recibe `children`; los CTAs de dominio se migran por template en Slice 3.
+- Cualquier cambio al shell debe correr `src/emails/EmailTemplateBaseline.test.tsx` para proteger los 17 templates.
+
 ### Coordinación con i18n (TASK-266)
 
 `src/lib/copy/` está locale-aware desde día uno (`Locale = 'es-CL' | 'en-US'`). Cuando TASK-266 / TASK-430 active i18n real:

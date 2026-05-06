@@ -154,6 +154,17 @@ La regla es:
 
 Esto evita que la migracion a dictionary convierta emails dinamicos en texto fijo o pierda datos como nombre, monto, periodo, `unsubscribeUrl` o links de accion.
 
+## TASK-408 Slice 2A: shell institucional
+
+`EmailLayout` ahora toma el copy institucional compartido desde `getMicrocopy().emails.layout` para el footer y el alt del logo en espanol. Esto no cambia el contenido de negocio ni los tokens del email.
+
+Frontera operativa:
+
+- `EmailLayout` no genera nombres, montos, periodos, clientes ni enlaces de negocio.
+- `unsubscribeUrl` sigue llegando desde la capa de delivery/tokens; el layout solo renderiza el link si existe.
+- El footer `en` conserva el texto legacy mientras `en-US` sea mirror de `es-CL`, para no convertir correos internacionales a espanol por accidente.
+- `EmailButton` sigue recibiendo `children`; los textos de CTA se migran por template en Slice 3.
+
 ## Soporte de idioma (i18n)
 
 Los emails de Greenhouse soportan espanol e ingles. El idioma se determina asi:

@@ -135,9 +135,11 @@ Reglas obligatorias:
 
 **Por qué primero el shell**: [EmailLayout.tsx](../../src/emails/components/EmailLayout.tsx) tiene su propia lógica bilingüe ad-hoc inline (footer disclaimer, unsubscribe link). Es la mayor concentración de copy institucional shared y es consumido por los 17 templates. Migrarlo primero baja el blast radius del Slice 3 (templates individuales heredan el shell ya migrado).
 
-- `EmailLayout.tsx` consume `getMicrocopy(locale).emails.footer.{disclaimer,unsubscribe,signature}` — locale resuelto via `resolveEmailLocale` (stub durante TASK-408, real en TASK-266).
-- `EmailButton.tsx` acepta children o `actionKey: keyof emails.ctas` y resuelve internamente — patrón type-safe que previene CTAs inline en templates downstream.
+- `EmailLayout.tsx` consume `getMicrocopy().emails.layout.{logoAlt,tagline,automatedDisclaimer,unsubscribe}` para el shell institucional `es`. Mientras `en-US` siga como mirror de `es-CL`, el footer `en` conserva fallback legacy para no degradar correos internacionales.
+- `EmailButton.tsx` conserva `children` y no agrega `actionKey` hasta que exista un consumer activo. El componente no contiene copy propio; forzar una API nueva ahora seria metadata muerta y aumentaria drift.
 - Snapshot tests del shell con fixtures de los 4 locales esperados (es-CL hoy + 3 stubs idénticos para validar que la API no rompe).
+
+**Estado 2026-05-06**: Slice 2A entregado solo para `EmailLayout`. El HTML de los 17 templates se mantiene estable por snapshot baseline. `EmailButton` queda diferido porque hoy no tiene copy interno; los CTAs viven en cada template y se migran en Slice 3 por grupo cohesivo. No se tocaron delivery, Resend, outbox/webhooks, event types, retries ni tokens de personalizacion.
 
 ### Slice 3 — Templates individuales (17 templates)
 
