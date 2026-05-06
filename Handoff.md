@@ -22942,3 +22942,28 @@ Cambios:
 Validacion:
 
 - `git diff --check` -> pass.
+
+## Sesion 2026-05-06 — TASK-408 Slice 3G: payroll export + beneficiary payment profile
+
+Contexto:
+
+- Tras migrar Nexa Insights, se verifico el catalogo real de 17 emails y quedaban con copy estructural local `PayrollExportReadyEmail`, `BeneficiaryPaymentProfileChangedEmail` y `QuoteSharePromptEmail`.
+- Para avanzar con menor blast radius se tomo primero `payroll_export` + `beneficiary_payment_profile_changed`, preservando tokens runtime y datos sensibles.
+
+Cambios aplicados:
+
+- `PayrollExportReadyEmail` ahora consume `getMicrocopy().emails.payroll.exportReady` para preview, overline, heading, labels, adjuntos, CTA, metadata copy y footer.
+- `BeneficiaryPaymentProfileChangedEmail` ahora consume `getMicrocopy().emails.beneficiaryPaymentProfileChanged` para headings/previews por estado, intros, labels, CTA, avisos de seguridad y plain text del registry.
+- `src/lib/email/templates.ts` reutiliza los subjects existentes del dictionary para `payroll_export` y `beneficiary_payment_profile_changed`, y el plain text de esos templates toma copy estructural del dictionary.
+- Se preserva como runtime: periodo, entry count, montos, breakdowns, adjuntos, exportedBy/exportedAt, proveedor/banco, cuenta enmascarada, moneda, fechas, motivo, masking y links.
+- No se tocaron Resend, `sendEmail`, `email_deliveries`, package documental de payroll export, lifecycle de perfil de pago, outbox, webhooks, projections ni eventos reactivos.
+
+Validacion:
+
+- `pnpm exec tsc --noEmit --pretty false` -> pass.
+- `pnpm exec vitest run src/lib/email/template-copy.test.ts src/lib/email/templates.test.ts src/emails/EmailTemplateBaseline.test.tsx src/emails/PayrollExportReadyEmail.test.tsx --reporter=verbose` -> pass, 4 files / 26 tests.
+- `pnpm exec eslint src/emails/PayrollExportReadyEmail.tsx src/emails/BeneficiaryPaymentProfileChangedEmail.tsx src/lib/email/templates.ts src/lib/copy/types.ts src/lib/copy/index.ts src/lib/copy/dictionaries/es-CL/emails.ts --max-warnings=0` -> pass.
+
+Siguiente paso recomendado:
+
+- Migrar `QuoteSharePromptEmail` + `quote_share` registry/plain-text como siguiente slice, cuidando `customMessage`, PDF attachment metadata, recipient/client/sender fields y share URL como runtime.

@@ -452,6 +452,36 @@ export interface PayrollReceiptEmailTemplateCopy {
   automatedFooter: (appUrl: string) => string
 }
 
+export interface PayrollExportEmailTemplateCopy {
+  previewText: (periodLabel: string, netTotalDisplay: string) => string
+  kickerPrefix: string
+  heading: string
+  bodyPrefix: string
+  bodyEntryCountPrefix: string
+  bodyEntryCountLabel: string
+  bodyEntryCountStrongSuffix: string
+  bodyEntryCountSuffix: string
+  collaboratorsLabel: string
+  grossLabel: string
+  netLabel: string
+  netTotalLabel: string
+  attachmentsHeading: string
+  payrollReportTitle: string
+  payrollReportSubtitle: string
+  payrollReportPlainTextSubtitle: string
+  payrollDetailTitle: string
+  payrollDetailSubtitle: string
+  payrollDetailPlainTextSubtitle: string
+  exportedByPrefix: string
+  exportedByFallback: string
+  exportedAtLabel: string
+  cta: string
+  automatedFooter: string
+  plainTextSeparator: string
+  plainTextAttachments: string
+  plainTextCta: string
+}
+
 export interface PayrollPaymentCommittedEmailTemplateCopy {
   previewText: (periodLabel: string) => string
   heading: string
@@ -496,6 +526,29 @@ export interface PayrollLiquidacionV2EmailTemplateCopy {
   cta: string
   supportNote: string
   automatedFooterPrefix: string
+}
+
+export type BeneficiaryPaymentProfileChangedKind = 'created' | 'approved' | 'superseded' | 'cancelled'
+
+export interface BeneficiaryPaymentProfileChangedEmailTemplateCopy {
+  heading: Record<BeneficiaryPaymentProfileChangedKind, string>
+  previewText: Record<BeneficiaryPaymentProfileChangedKind, string>
+  intro: Record<BeneficiaryPaymentProfileChangedKind, (firstName: string, requestedByMember: boolean) => string>
+  missingDate: string
+  providerLabel: string
+  bankLabel: string
+  accountLabel: string
+  currencyLabel: string
+  cancelledDateLabel: string
+  effectiveDateLabel: string
+  reasonLabel: string
+  maskedFallback: string
+  cta: string
+  securityNotice: string
+  unrecognizedChangeNotice: string
+  automatedFooterPrefix: string
+  automatedFooter: (appUrl: string) => string
+  plainText: Record<BeneficiaryPaymentProfileChangedKind, (firstName: string, accountNumberMasked: string) => string>
 }
 
 export interface WeeklyExecutiveDigestEmailTemplateCopy {
@@ -556,11 +609,13 @@ export interface EmailsCopy {
     reviewConfirmation: LeaveReviewConfirmationEmailTemplateCopy
   }
   payroll: {
+    exportReady: PayrollExportEmailTemplateCopy
     receipt: PayrollReceiptEmailTemplateCopy
     paymentCommitted: PayrollPaymentCommittedEmailTemplateCopy
     paymentCancelled: PayrollPaymentCancelledEmailTemplateCopy
     liquidacionV2: PayrollLiquidacionV2EmailTemplateCopy
   }
+  beneficiaryPaymentProfileChanged: BeneficiaryPaymentProfileChangedEmailTemplateCopy
   weeklyExecutiveDigest: WeeklyExecutiveDigestEmailTemplateCopy
   notificationCategories: NotificationCategoryCopy
   subjects: {

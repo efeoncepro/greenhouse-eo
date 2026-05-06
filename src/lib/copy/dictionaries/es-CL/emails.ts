@@ -152,6 +152,35 @@ export const emails: EmailsCopy = {
     }
   },
   payroll: {
+    exportReady: {
+      previewText: (periodLabel, netTotalDisplay) => `Nómina ${periodLabel} cerrada — neto total ${netTotalDisplay}`,
+      kickerPrefix: 'NÓMINA · ',
+      heading: 'Nómina cerrada y lista para revisión',
+      bodyPrefix: 'El período ',
+      bodyEntryCountPrefix: ' fue cerrado con',
+      bodyEntryCountLabel: 'colaboradores',
+      bodyEntryCountStrongSuffix: ' colaboradores',
+      bodyEntryCountSuffix: '. Adjuntamos el reporte y el detalle para tu revisión.',
+      collaboratorsLabel: 'Colaboradores',
+      grossLabel: 'Bruto',
+      netLabel: 'Neto',
+      netTotalLabel: 'Neto total a pagar',
+      attachmentsHeading: 'Adjuntos incluidos',
+      payrollReportTitle: 'Reporte de nómina (PDF)',
+      payrollReportSubtitle: 'Resumen por colaborador en formato imprimible',
+      payrollReportPlainTextSubtitle: 'resumen por colaborador',
+      payrollDetailTitle: 'Detalle de nómina (CSV)',
+      payrollDetailSubtitle: 'Desglose completo para contabilidad',
+      payrollDetailPlainTextSubtitle: 'desglose completo para contabilidad',
+      exportedByPrefix: 'Exportado por ',
+      exportedByFallback: 'Greenhouse',
+      exportedAtLabel: 'Fecha',
+      cta: 'Ver nómina en Greenhouse',
+      automatedFooter: 'Efeonce Group SpA · efeoncepro.com',
+      plainTextSeparator: '═══════════════════',
+      plainTextAttachments: 'ADJUNTOS',
+      plainTextCta: 'Ver nómina en Greenhouse'
+    },
     receipt: {
       previewText: periodLabel => `Tu recibo de nómina de ${periodLabel} ya está disponible`,
       heading: 'Liquidación de remuneraciones',
@@ -210,6 +239,52 @@ export const emails: EmailsCopy = {
       cta: 'Ver liquidación actualizada',
       supportNote: 'Si tienes dudas sobre este ajuste, contacta al equipo de Personas — quedamos atentos para ayudarte a revisar los detalles.',
       automatedFooterPrefix: 'Greenhouse by Efeonce Group SpA · Este es un correo automático enviado desde '
+    }
+  },
+  beneficiaryPaymentProfileChanged: {
+    heading: {
+      created: 'Solicitud de cambio registrada',
+      approved: 'Tu cuenta de pago fue aprobada',
+      superseded: 'Tu cuenta de pago fue reemplazada',
+      cancelled: 'Tu solicitud de cambio fue cancelada'
+    },
+    previewText: {
+      created: 'Tu solicitud está en revisión por finance',
+      approved: 'Tu cuenta de pago quedó activa',
+      superseded: 'Tu cuenta activa fue reemplazada por una nueva',
+      cancelled: 'Tu solicitud fue cancelada'
+    },
+    intro: {
+      created: (firstName, requestedByMember) =>
+        requestedByMember
+          ? `Hola ${firstName}, registramos tu solicitud de cambio de cuenta de pago. Finance la revisará en las próximas horas y recibirás otro mail cuando quede activa.`
+          : `Hola ${firstName}, finance registró una nueva cuenta de pago para ti. Verifica que los datos sean correctos. Si no reconoces este cambio, responde este mail al equipo de finance de inmediato.`,
+      approved: firstName =>
+        `Hola ${firstName}, tu cuenta de pago quedó activa. Los próximos pagos se ejecutarán a esta cuenta.`,
+      superseded: firstName =>
+        `Hola ${firstName}, tu cuenta de pago activa fue reemplazada por una nueva. La cuenta anterior queda fuera de uso.`,
+      cancelled: firstName =>
+        `Hola ${firstName}, tu solicitud de cambio de cuenta de pago fue cancelada. Si no fuiste tú, contacta a finance.`
+    },
+    missingDate: 'Sin fecha registrada',
+    providerLabel: 'Proveedor',
+    bankLabel: 'Banco',
+    accountLabel: 'Cuenta',
+    currencyLabel: 'Moneda',
+    cancelledDateLabel: 'Fecha de cancelación',
+    effectiveDateLabel: 'Fecha efectiva',
+    reasonLabel: 'Motivo',
+    maskedFallback: '—',
+    cta: 'Ver mi cuenta de pago',
+    securityNotice: 'Por seguridad, NUNCA mostramos el número completo de tu cuenta. Si necesitas verificar el dato, ingresa al portal con tu sesión.',
+    unrecognizedChangeNotice: 'Si no reconoces este cambio, responde este mail o contacta a finance de inmediato.',
+    automatedFooterPrefix: 'Greenhouse by Efeonce Group SpA · Este es un correo automático enviado desde ',
+    automatedFooter: appUrl => `Greenhouse by Efeonce Group SpA · Este es un correo automático enviado desde ${appUrl}`,
+    plainText: {
+      created: firstName => `Hola ${firstName}, registramos una solicitud de cambio en tu cuenta de pago. Finance la revisará pronto.`,
+      approved: (firstName, accountNumberMasked) => `Hola ${firstName}, tu cuenta de pago (${accountNumberMasked}) quedó activa.`,
+      superseded: (firstName, accountNumberMasked) => `Hola ${firstName}, tu cuenta de pago activa fue reemplazada por una nueva (${accountNumberMasked}).`,
+      cancelled: firstName => `Hola ${firstName}, tu solicitud de cambio fue cancelada.`
     }
   },
   weeklyExecutiveDigest: {

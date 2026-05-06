@@ -66,33 +66,37 @@ const buildPayrollExportPlainText = (context: {
   netTotalDisplay: string
   exportedBy?: string | null
   exportedAt?: string | null
-}) => [
-  `NÓMINA — ${context.periodLabel.toUpperCase()}`,
-  '═══════════════════',
-  '',
-  'Nómina cerrada y lista para revisión.',
-  '',
-  `Colaboradores: ${context.entryCount}`,
-  '',
-  ...context.breakdowns.flatMap(b => [
-    `${b.regimeLabel} (${b.currency})`,
-    `  Bruto:  ${b.grossTotal}`,
-    `  Neto:   ${b.netTotal}`,
-    ''
-  ]),
-  '───────────────────',
-  'ADJUNTOS',
-  '• Reporte de nómina (PDF) — resumen por colaborador',
-  '• Detalle de nómina (CSV) — desglose completo para contabilidad',
-  '',
-  context.exportedBy ? `Exportado por ${context.exportedBy}` : 'Exportado por Greenhouse',
-  context.exportedAt ? `Fecha: ${formatShortDateTime(context.exportedAt) ?? context.exportedAt}` : '',
-  '',
-  '→ Ver nómina en Greenhouse:',
-  `  ${process.env.NEXT_PUBLIC_APP_URL || 'https://greenhouse.efeoncepro.com'}/hr/payroll`,
-  '',
-  '— Greenhouse by Efeonce Group'
-].filter(Boolean).join('\n')
+}) => {
+  const t = getMicrocopy().emails.payroll.exportReady
+
+  return [
+    `${t.kickerPrefix.replace(' · ', ' — ')}${context.periodLabel.toUpperCase()}`,
+    t.plainTextSeparator,
+    '',
+    `${t.heading}.`,
+    '',
+    `${t.collaboratorsLabel}: ${context.entryCount}`,
+    '',
+    ...context.breakdowns.flatMap(b => [
+      `${b.regimeLabel} (${b.currency})`,
+      `  ${t.grossLabel}:  ${b.grossTotal}`,
+      `  ${t.netLabel}:   ${b.netTotal}`,
+      ''
+    ]),
+    '───────────────────',
+    t.plainTextAttachments,
+    `• ${t.payrollReportTitle} — ${t.payrollReportPlainTextSubtitle}`,
+    `• ${t.payrollDetailTitle} — ${t.payrollDetailPlainTextSubtitle}`,
+    '',
+    context.exportedBy ? `${t.exportedByPrefix}${context.exportedBy}` : `${t.exportedByPrefix}${t.exportedByFallback}`,
+    context.exportedAt ? `${t.exportedAtLabel}: ${formatShortDateTime(context.exportedAt) ?? context.exportedAt}` : '',
+    '',
+    `→ ${t.plainTextCta}:`,
+    `  ${process.env.NEXT_PUBLIC_APP_URL || 'https://greenhouse.efeoncepro.com'}/hr/payroll`,
+    '',
+    getMicrocopy().emails.common.brandSignature
+  ].filter(Boolean).join('\n')
+}
 
 const buildPayrollReceiptPlainText = (context: {
   fullName: string
@@ -358,7 +362,7 @@ registerTemplate('payroll_export', (context: {
   attachments?: EmailAttachment[]
   unsubscribeUrl?: string
 }) => ({
-  subject: `Nómina cerrada — ${context.periodLabel} · ${context.entryCount} colaboradores`,
+  subject: getMicrocopy().emails.subjects.payrollExport(context.periodLabel, context.entryCount),
   react: PayrollExportReadyEmail({
     periodLabel: context.periodLabel,
     entryCount: context.entryCount,
@@ -434,14 +438,6 @@ registerTemplate('payroll_payment_committed', (context: {
     : `Hi ${context.fullName.split(' ')[0]}, your ${MONTH_NAMES[context.periodMonth - 1]} ${context.periodYear} payment (${formatMoney(context.netTotal, context.entryCurrency)}) has been approved and is scheduled. We will send the receipt once executed.`
 }))
 
-// TASK-753 — Notificación al beneficiario cuando su perfil de pago cambia
-const PROFILE_KIND_SUBJECTS: Record<PaymentProfileEmailKind, string> = {
-  created: 'Solicitud de cambio de cuenta de pago registrada',
-  approved: 'Tu cuenta de pago fue aprobada',
-  superseded: 'Tu cuenta de pago fue reemplazada',
-  cancelled: 'Tu solicitud de cambio fue cancelada'
-}
-
 registerTemplate('beneficiary_payment_profile_changed', (context: {
   fullName: string
   kind: PaymentProfileEmailKind
@@ -452,29 +448,26 @@ registerTemplate('beneficiary_payment_profile_changed', (context: {
   effectiveAt: string | null
   reason: string | null
   requestedByMember: boolean
-}) => ({
-  subject: PROFILE_KIND_SUBJECTS[context.kind],
-  react: BeneficiaryPaymentProfileChangedEmail({
-    fullName: context.fullName,
-    kind: context.kind,
-    providerLabel: context.providerLabel,
-    bankName: context.bankName,
-    accountNumberMasked: context.accountNumberMasked,
-    currency: context.currency,
-    effectiveAt: context.effectiveAt,
-    reason: context.reason,
-    requestedByMember: context.requestedByMember
-  }),
-  text:
-    `Hola ${context.fullName.split(' ')[0]}, ` +
-    (context.kind === 'created'
-      ? 'registramos una solicitud de cambio en tu cuenta de pago. Finance la revisará pronto.'
-      : context.kind === 'approved'
-        ? `tu cuenta de pago (${context.accountNumberMasked ?? '••••'}) quedó activa.`
-        : context.kind === 'superseded'
-          ? `tu cuenta de pago activa fue reemplazada por una nueva (${context.accountNumberMasked ?? '••••'}).`
-          : 'tu solicitud de cambio fue cancelada.')
-}))
+}) => {
+  const t = getMicrocopy().emails.beneficiaryPaymentProfileChanged
+  const firstName = context.fullName.split(' ')[0] || context.fullName
+
+  return {
+    subject: getMicrocopy().emails.subjects.beneficiaryPaymentProfileChanged[context.kind],
+    react: BeneficiaryPaymentProfileChangedEmail({
+      fullName: context.fullName,
+      kind: context.kind,
+      providerLabel: context.providerLabel,
+      bankName: context.bankName,
+      accountNumberMasked: context.accountNumberMasked,
+      currency: context.currency,
+      effectiveAt: context.effectiveAt,
+      reason: context.reason,
+      requestedByMember: context.requestedByMember
+    }),
+    text: t.plainText[context.kind](firstName, context.accountNumberMasked ?? '••••')
+  }
+})
 
 // TASK-759c — Compensación cancelación (sin PDF)
 registerTemplate('payroll_payment_cancelled', (context: {

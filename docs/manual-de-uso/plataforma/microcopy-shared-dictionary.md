@@ -96,6 +96,16 @@ const t = getMicrocopy().emails.weeklyExecutiveDigest
 
 Las narrativas, titulares, root causes, espacios y links de Nexa son contenido materializado. Deben seguir llegando desde `src/lib/nexa/digest` o el caller, no desde `src/lib/copy`.
 
+9. En emails con datos operativos o sensibles, migra solo labels y frases reutilizables:
+
+```tsx
+const t = getMicrocopy().emails.beneficiaryPaymentProfileChanged
+
+{summaryRow(t.accountLabel, accountNumberMasked ?? t.maskedFallback, true)}
+```
+
+`accountNumberMasked`, montos, breakdowns de nomina, proveedor, banco, motivo, fechas, adjuntos y links deben seguir viniendo del runtime/caller. El dictionary no guarda datos de negocio ni valores sensibles.
+
 ## Donde poner un texto nuevo
 
 | Caso | Donde vive |

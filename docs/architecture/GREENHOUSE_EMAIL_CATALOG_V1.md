@@ -40,7 +40,9 @@ El catalogo de emails empezo a consumir `src/lib/copy/` para copy institucional 
 - `selectEmailIntlDateLocale()` centraliza la proyeccion de locale Intl para fechas de emails.
 - Los tokens de personalizacion (`recipient`, `client`, `platform`, periodos, montos, fechas, links, motivos, procesadores y adjuntos) siguen viniendo de `src/lib/email/tokens.ts`, `src/lib/email/delivery.ts` o de props/callers de dominio. El dictionary no debe capturar datos de negocio.
 
-En payroll, `PayrollReceiptEmail`, `PayrollPaymentCommittedEmail`, `PayrollPaymentCancelledEmail` y `PayrollLiquidacionV2Email` leen copy desde `emails.payroll.*`, pero mantienen intactos payment lifecycle, subjects, attachment delivery, outbox, webhooks y projections.
+En payroll, `PayrollReceiptEmail`, `PayrollPaymentCommittedEmail`, `PayrollPaymentCancelledEmail`, `PayrollLiquidacionV2Email` y `PayrollExportReadyEmail` leen copy desde `emails.payroll.*`, pero mantienen intactos payment lifecycle, payroll export package, subjects contractuales, attachment delivery, outbox, webhooks y projections.
+
+En finance/payroll beneficiary profile, `BeneficiaryPaymentProfileChangedEmail` lee copy estructural desde `emails.beneficiaryPaymentProfileChanged`. Los datos sensibles y de negocio (`accountNumberMasked`, proveedor, banco, moneda, fechas, motivo y actor/request source) siguen viniendo del runtime. El dictionary no debe almacenar ni inferir numeros de cuenta completos.
 
 En Nexa Insights, `WeeklyExecutiveDigestEmail` lee solo copy estructural desde `emails.weeklyExecutiveDigest`. El contenido de insight (`headline`, `narrative`, `rootCauseNarrative`, spaces, links y action labels) sigue perteneciendo a la lane materializada de Nexa y no debe dictionary-ficarse. Los snapshots de `src/emails/EmailTemplateBaseline.test.tsx` son el gate canonico: una migracion de copy no debe cambiar bytes de HTML salvo decision explicita documentada.
 

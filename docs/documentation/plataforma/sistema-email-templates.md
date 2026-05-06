@@ -201,6 +201,19 @@ Por el tipo de contenido de Nexa Insights, la migracion es intencionalmente limi
 
 Este slice no cambia ops-worker, generacion/materializacion de insights, recipients, unsubscribe, `sendEmail`, Resend, `email_deliveries`, outbox, webhooks, projections ni eventos reactivos.
 
+## TASK-408 Slice 3G: payroll export y perfil de pago
+
+`PayrollExportReadyEmail` y `BeneficiaryPaymentProfileChangedEmail` toman copy estatico desde `getMicrocopy().emails.payroll.exportReady` y `getMicrocopy().emails.beneficiaryPaymentProfileChanged`.
+
+La frontera de personalizacion se mantiene igual:
+
+- payroll export conserva como runtime `periodLabel`, `entryCount`, `breakdowns`, `netTotalDisplay`, `exportedBy`, `exportedAt`, adjuntos y `unsubscribeUrl`.
+- perfil de pago conserva como runtime `fullName`, `providerLabel`, `bankName`, `accountNumberMasked`, `currency`, `effectiveAt`, `reason` y `requestedByMember`.
+- la cuenta bancaria sigue siempre enmascarada; el dictionary no recibe ni modela numeros completos.
+- los snapshots HTML se mantienen byte-estables para evitar cambios accidentales en clientes de correo.
+
+Este slice no cambia Resend, `sendEmail`, `email_deliveries`, package documental de payroll export, lifecycle de cuenta de pago, masking, outbox, webhooks, projections ni eventos reactivos.
+
 La primitive `selectEmailTemplateCopy()` permite repetir este patron en los siguientes templates sin tocar delivery:
 
 - `es` / `es-CL` / default → dictionary de plataforma.

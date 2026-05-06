@@ -27,6 +27,7 @@ El objetivo no es traducir todo el portal todavia. El objetivo es evitar drift: 
 - TASK-408 Slice 3D agrega `selectEmailIntlDateLocale()` para que el locale Intl de fechas en emails no se resuelva con ternarios ad-hoc dentro de templates.
 - TASK-408 Slice 3E migra la cohorte payroll employee-facing a `emails.payroll.*`. El dictionary guarda copy estatico; nombres, periodos, montos, fechas, procesador, motivos, links y adjuntos PDF siguen como tokens/props del runtime de Payroll.
 - TASK-408 Slice 3F migra el digest de Nexa Insights a `emails.weeklyExecutiveDigest` solo para copy estructural reusable. Headlines, narrativas, root causes, spaces, links y action labels siguen viniendo de la lane materializada de Nexa.
+- TASK-408 Slice 3G migra `PayrollExportReadyEmail` y `BeneficiaryPaymentProfileChangedEmail` a `emails.payroll.exportReady` y `emails.beneficiaryPaymentProfileChanged`. Los valores sensibles o de negocio siguen como props: montos, breakdowns, adjuntos, export metadata, proveedor/banco, cuenta enmascarada, fechas y motivo.
 - `buildStatusMap()` permite construir status maps type-safe sin repetir labels inline.
 - La regla ESLint `greenhouse/no-untokenized-copy` se extendio para detectar arrays de meses y CTAs JSX text, ademas de los patrones ya existentes.
 - El sweep de `src/views`, `src/components` y `src/app` quedo en 0 warnings para `greenhouse/no-untokenized-copy`.
