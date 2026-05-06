@@ -171,6 +171,7 @@ Esta task es una **umbrella pura**: coordina el programa i18n/globalization, no 
 
 - Shared shell rollout por locale (derivar de `TASK-407` cuando dictionary foundation esté lista).
 - Emails localization (derivar de `TASK-408` cuando `TASK-430` haya conectado el primer locale no-`es-CL`).
+  - Estado 2026-05-06 heredado de `TASK-408`: el namespace `emails` ya existe en la capa `src/lib/copy`, los 17 templates institucionales consumen `getMicrocopy`, y `resolveEmailLocale` declara el contrato que esta umbrella debe activar con lookup PG-backed. Para habilitar `en-US` real no se debe reescribir templates; el siguiente paso canónico es poblar el dictionary y activar la resolución por usuario/tenant.
 - SEO, caching y testing cross-locale.
 - Módulos de dominio priorizados por footprint cliente (Finance multi-currency display, payroll reports).
 

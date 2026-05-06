@@ -23045,3 +23045,32 @@ Cambios aplicados:
 Riesgos:
 
 - Cambio de guardrail/CI, no runtime. No toca emails, templates, `sendEmail`, Resend, notification preferences, outbox, reactive consumer, webhooks ni eventos.
+
+## Sesion 2026-05-06 — TASK-408 cierre local: verificacion final e invariantes
+
+Contexto:
+
+- Tras promover `greenhouse/no-untokenized-copy` a `error`, se ejecuto el cierre local de evidencia sin tocar runtime de email/notificaciones/eventos.
+- `TASK-407` esta en `docs/tasks/complete/` y confirma Slice 0: la rule cubre month arrays + JSX text CTAs, por lo que el error mode de TASK-408 cubre los 6 patterns del programa.
+
+Evidencia local:
+
+- `pnpm lint` -> pass.
+- `pnpm exec tsc --noEmit --pretty false` -> pass.
+- `pnpm build` -> pass.
+- `pnpm test` -> pass, 589 files / 3419 tests passed / 5 skipped.
+- Invariantes TASK-408:
+  - `rg "locale\\s*===\\s*['\\\"]en['\\\"]" src/emails/ | wc -l` = 0.
+  - `rg "from\\s+['\\\"]@/config/greenhouse-nomenclature" src/emails/ | wc -l` = 0.
+  - `rg "from\\s+['\\\"]@/lib/copy" src/emails/ | wc -l` = 18 (>=17 esperado).
+  - `rg "eslint-disable.*no-untokenized-copy" src/ | wc -l` = 0.
+
+Docs sincronizadas:
+
+- `TASK-408` marca la verificacion local final, la dependencia TASK-407 y los invariantes como cerrados.
+- `TASK-266` registra que `emails` ya esta listo para poblar `en-US` real: los templates no deben reescribirse; el siguiente paso es activar dictionary + lookup PG-backed en `resolveEmailLocale`.
+
+Pendiente operativo antes de cerrar lifecycle de TASK-408:
+
+- Smoke staging de 5 grupos cohesivos de emails (payroll, leave, auth, finance, digest/Nexa Insights) contra inbox QA y comparacion visual.
+- Observacion 24h post-deploy de `notifications.email.render_failure_rate` en `/admin/operations` con steady=0.

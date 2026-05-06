@@ -204,7 +204,7 @@ Anclados al baseline 2026-05-06:
 - [x] **0 imports de `greenhouse-nomenclature.ts`** desde `src/emails/` — verificación 2026-05-06: `rg "from\s+['\"]@/config/greenhouse-nomenclature" src/emails/ | wc -l` retorna 0.
 - [x] **Diff de snapshot bytes pre/post migración** = 0 para cada template migrado en slices 3A-3H. Verificado por `src/emails/EmailTemplateBaseline.test.tsx` en cada slice y suite completa post Slice 4.
 - [x] **Reliability signal `notifications.email.render_failure_rate`** declarado y wired al overview. Pendiente operacional post-deploy: observar `/admin/operations` durante 24h y confirmar count = 0.
-- [ ] `pnpm build`, `pnpm lint`, `npx tsc --noEmit`, `pnpm test` pasan en cada PR de slice.
+- [x] `pnpm build`, `pnpm lint`, `npx tsc --noEmit`, `pnpm test` pasan en verificacion final 2026-05-06: lint pass, tsc pass, build pass, test completo pass (589 files / 3419 passed / 5 skipped).
 - [ ] **Smoke staging** ejecutado: 5 emails de grupos cohesivos enviados a inbox de prueba, comparados visualmente con baseline.
 
 ## Verification
@@ -214,6 +214,7 @@ Anclados al baseline 2026-05-06:
 - `rg "from\s+['\"]@/config/greenhouse-nomenclature" src/emails/` retorna 0 (invariante).
 - `rg "from\s+['\"]@/lib/copy" src/emails/` retorna ≥17 (todos los templates conectados).
 - Snapshot tests cubren 17 templates × {html, subject, previewText} = 51 assertions.
+- Verificacion final 2026-05-06: `rg "locale\s*===\s*['\"]en['\"]" src/emails/ | wc -l` = 0; `rg "from\s+['\"]@/config/greenhouse-nomenclature" src/emails/ | wc -l` = 0; `rg "from\s+['\"]@/lib/copy" src/emails/ | wc -l` = 18; `rg "eslint-disable.*no-untokenized-copy" src/ | wc -l` = 0.
 - Reliability dashboard muestra `notifications.email.render_failure_rate` con steady=0 durante 24h post-deploy.
 - Smoke staging: 5 emails enviados, recibidos, comparados pixel-by-pixel con captura baseline pre-migración.
 
@@ -251,13 +252,13 @@ Anclados al baseline 2026-05-06:
 
 ## Closing Protocol
 
-- [ ] Actualizar `Handoff.md` con resumen de migración (incluyendo el delta de snapshot tests: 2 → 17).
-- [ ] Registrar en `TASK-266` que (a) namespace `emails` está listo para poblarse en `en-US` real, (b) `resolveEmailLocale` espera lookup PG-backed, (c) los 17 templates ya consumen `getMicrocopy` — solo se necesita activar el dictionary.
-- [ ] **Confirmar que TASK-407 Slice 0 mergeó** la extensión de la rule a month arrays + JSX text CTAs. Sin Slice 0, el `error` mode dejaría dos patterns expuestos a drift silencioso.
+- [x] Actualizar `Handoff.md` con resumen de migración (incluyendo el delta de snapshot tests: 2 → 17).
+- [x] Registrar en `TASK-266` que (a) namespace `emails` está listo para poblarse en `en-US` real, (b) `resolveEmailLocale` espera lookup PG-backed, (c) los 17 templates ya consumen `getMicrocopy` — solo se necesita activar el dictionary.
+- [x] **Confirmar que TASK-407 Slice 0 mergeó** la extensión de la rule a month arrays + JSX text CTAs. Verificado en `docs/tasks/complete/TASK-407-copy-migration-shared-shell-components.md`: Lifecycle `complete`, Slice 0 marcado complete, rule cubre month arrays + JSX text CTAs y tests de la rule pasan.
 - [x] **Promote `greenhouse/no-untokenized-copy` a error mode** (heredado de TASK-265 Slice 5). `eslint.config.mjs` usa `'error'` desde Slice 5 guardrail; baseline previo 0 warnings.
 - [x] **Auditar disables**: `rg "eslint-disable.*no-untokenized-copy" src/ | wc -l` = 0.
 - [ ] **Verificar reliability signal** durante 24h post-deploy de cada slice: `notifications.email.render_failure_rate` steady=0. Captura del dashboard adjunta al Handoff.
-- [ ] **Verificar invariantes** una última vez: `rg "from\s+['\"]@/config/greenhouse-nomenclature" src/emails/ | wc -l` = 0; `rg "locale\s*===\s*['\"]en['\"]" src/emails/ | wc -l` = 0.
+- [x] **Verificar invariantes** una última vez: `rg "from\s+['\"]@/config/greenhouse-nomenclature" src/emails/ | wc -l` = 0; `rg "locale\s*===\s*['\"]en['\"]" src/emails/ | wc -l` = 0.
 
 ## Open Questions
 
