@@ -92,7 +92,18 @@ const extractServiceIdsFromEvents = (events: HubSpotEvent[]): string[] => {
     const subscriptionType = String(event.subscriptionType || '')
     const objectId = String(event.objectId)
 
-    if (subscriptionType.startsWith('p_services.') && objectId) {
+    // HubSpot puede enviar el subscriptionType en distintos formatos según
+    // platform version y fuente de la suscripción:
+    //   - `service.creation` / `service.propertyChange` (HubSpot platform 2025.2 — name canónico del custom object 0-162)
+    //   - `p_services.creation` / `p_services.propertyChange` (legacy/alias)
+    //   - `0-162.creation` / `0-162.propertyChange` (objectTypeId-based)
+    // Aceptar todos para resiliencia contra refactors HubSpot-side.
+    const isServiceEvent =
+      subscriptionType.startsWith('service.') ||
+      subscriptionType.startsWith('p_services.') ||
+      subscriptionType.startsWith('0-162.')
+
+    if (isServiceEvent && objectId) {
       ids.add(objectId)
     }
   }
@@ -234,31 +245,14 @@ const resolveCompanyForService = async (serviceId: string): Promise<string | nul
   return first ? String(first.toObjectId) : null
 }
 
-registerInboundHandler('hubspot-services', async (inboxEvent, rawBody, parsedPayload) => {
-  const headers = inboxEvent.headers_json as Record<string, string>
-  const signature = headers[SIGNATURE_HEADER] ?? ''
-  const timestamp = headers[TIMESTAMP_HEADER] ?? ''
-
-  const requestUri = headers['x-forwarded-uri']
-    ?? headers['x-original-url']
-    ?? 'https://greenhouse.efeoncepro.com/api/webhooks/hubspot-services'
-
-  const secret = await resolveSecret('HUBSPOT_APP_CLIENT_SECRET')
-
-  if (!secret) {
-    throw new Error('HUBSPOT_APP_CLIENT_SECRET not configured (cannot verify webhook signature)')
-  }
-
-  const valid = await validateHubSpotSignature(rawBody, signature, timestamp, secret, requestUri, 'POST')
-
-  if (!valid) {
-    throw new Error('HubSpot signature validation failed')
-  }
-
-  const events = Array.isArray(parsedPayload) ? (parsedPayload as HubSpotEvent[]) : []
-
-  if (events.length === 0) return
-
+/**
+ * TASK-813 Slice 4 — Procesa events p_services pre-filtrados (firma ya
+ * validada por el caller). Reusable desde `hubspot-companies.ts` cuando
+ * un mismo webhook target HubSpot recibe events de múltiples object types
+ * (HubSpot Developer Platform constraint: solo 1 webhooks component por
+ * app — todos los events convergen al mismo target URL).
+ */
+export const processHubSpotServiceEvents = async (events: HubSpotEvent[]): Promise<void> => {
   const serviceIds = extractServiceIdsFromEvents(events)
 
   if (serviceIds.length === 0) return
@@ -342,4 +336,39 @@ registerInboundHandler('hubspot-services', async (inboxEvent, rawBody, parsedPay
 
     throw new Error(`All ${failures.length} service syncs failed: ${failures.slice(0, 3).join('; ')}`)
   }
+}
+
+/**
+ * Endpoint registrado: recibe webhooks dirigidos a `hubspot-services`
+ * directamente (legacy/standalone path). El target real configurado en
+ * HubSpot Developer Platform es `hubspot-companies` (constraint: 1 webhook
+ * por app), pero este endpoint queda como entry point alternativo para
+ * tests o configuraciones futuras.
+ */
+registerInboundHandler('hubspot-services', async (inboxEvent, rawBody, parsedPayload) => {
+  const headers = inboxEvent.headers_json as Record<string, string>
+  const signature = headers[SIGNATURE_HEADER] ?? ''
+  const timestamp = headers[TIMESTAMP_HEADER] ?? ''
+
+  const requestUri = headers['x-forwarded-uri']
+    ?? headers['x-original-url']
+    ?? 'https://greenhouse.efeoncepro.com/api/webhooks/hubspot-services'
+
+  const secret = await resolveSecret('HUBSPOT_APP_CLIENT_SECRET')
+
+  if (!secret) {
+    throw new Error('HUBSPOT_APP_CLIENT_SECRET not configured (cannot verify webhook signature)')
+  }
+
+  const valid = await validateHubSpotSignature(rawBody, signature, timestamp, secret, requestUri, 'POST')
+
+  if (!valid) {
+    throw new Error('HubSpot signature validation failed')
+  }
+
+  const events = Array.isArray(parsedPayload) ? (parsedPayload as HubSpotEvent[]) : []
+
+  if (events.length === 0) return
+
+  await processHubSpotServiceEvents(events)
 })

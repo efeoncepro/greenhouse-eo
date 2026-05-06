@@ -89,6 +89,71 @@
           "objectType": "contact",
           "propertyName": "lifecyclestage",
           "active": true
+        },
+        {
+          "subscriptionType": "object.creation",
+          "objectType": "service",
+          "active": true
+        },
+        {
+          "subscriptionType": "object.propertyChange",
+          "objectType": "service",
+          "propertyName": "hs_name",
+          "active": true
+        },
+        {
+          "subscriptionType": "object.propertyChange",
+          "objectType": "service",
+          "propertyName": "ef_linea_de_servicio",
+          "active": true
+        },
+        {
+          "subscriptionType": "object.propertyChange",
+          "objectType": "service",
+          "propertyName": "ef_servicio_especifico",
+          "active": true
+        },
+        {
+          "subscriptionType": "object.propertyChange",
+          "objectType": "service",
+          "propertyName": "ef_total_cost",
+          "active": true
+        },
+        {
+          "subscriptionType": "object.propertyChange",
+          "objectType": "service",
+          "propertyName": "ef_amount_paid",
+          "active": true
+        },
+        {
+          "subscriptionType": "object.propertyChange",
+          "objectType": "service",
+          "propertyName": "ef_start_date",
+          "active": true
+        },
+        {
+          "subscriptionType": "object.propertyChange",
+          "objectType": "service",
+          "propertyName": "ef_target_end_date",
+          "active": true
+        },
+        {
+          "subscriptionType": "object.propertyChange",
+          "objectType": "service",
+          "propertyName": "ef_modalidad",
+          "active": true
+        },
+        {
+          "subscriptionType": "object.propertyChange",
+          "objectType": "service",
+          "propertyName": "ef_billing_frequency",
+          "active": true
+        },
+        {
+          "subscriptionType": "object.propertyChange",
+          "objectType": "service",
+          "propertyName": "ef_currency",
+          "active": true
         }
       ]
     }
