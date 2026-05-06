@@ -88,6 +88,10 @@ Reglas obligatorias:
 9. **TASK-809** — UI `/agency/sample-sprints` + wizards declaración / approval / progress / outcome + agrupación per-cliente
 10. **TASK-810** — CHECK constraint anti-zombie (NOT VALID + VALIDATE atomic, patrón TASK-708/766/774)
 
+### Children (sibling — incorporada 2026-05-06)
+
+- **TASK-813** — HubSpot p_services (0-162) bidirectional sync activation + phantom seed cleanup. Sibling derivada de auditoría arch-architect 2026-05-06: 30 filas fantasma en `core.services` seedeadas como cross-product `service_modules × clients`, 16 services reales en HubSpot 0-162 sin sincronizar, 3 huérfanos sin org Greenhouse. Soft dep TASK-555, hard dep TASK-801 (consume `engagement_kind`). Recomendado correr **inmediatamente después de TASK-801** y **antes de TASK-802 onward** para que las extensiones del engagement primitive no se declaren contra services fantasma.
+
 ## Métricas de éxito del Epic
 
 - ≥ 1 Sample Sprint declarado y convertido end-to-end via UI (smoke con Sky Content Lead).

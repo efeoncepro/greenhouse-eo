@@ -1,5 +1,12 @@
 # TASK-802 — Engagement Commercial Terms Time-Versioned
 
+## Delta 2026-05-06
+
+- Auditoría arch-architect detectó 30 filas fantasma en `core.services` (cross-product `service_modules × clients` del 2026-03-16, `hubspot_service_id IS NULL`).
+- **TASK-813** archiva esas 30 filas con `active=FALSE` + `status='legacy_seed_archived'` antes de que esta task corra. Sin ese cleanup previo, los helpers `declareCommercialTerms` podrían registrar términos comerciales contra services fantasma → datos inválidos en `engagement_commercial_terms`.
+- Recomendación: agregar `WHERE active=TRUE AND status != 'legacy_seed_archived'` al UI selector y queries que listen services elegibles para declarar terms.
+- Soft dep agregado: TASK-813 (recomendado correr antes; no rompe TASK-802 si no se respeta, solo introduce ruido en la nueva tabla).
+
 ## Status
 
 - Lifecycle: `to-do`

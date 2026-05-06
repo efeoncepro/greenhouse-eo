@@ -1,5 +1,11 @@
 # TASK-801 — Engagement Primitive: services + cost_attribution Extension
 
+## Delta 2026-05-06
+
+- Auditoría arch-architect detectó 30 filas fantasma en `core.services` seedeadas el 2026-03-16 como cross-product `service_modules × clients` con `hubspot_service_id IS NULL`. Después de aplicar la DDL de TASK-801 (que defaultea `engagement_kind='regular'` para todas), **TASK-813 reclasificará esas 30 filas a `engagement_kind='discovery'` + `status='legacy_seed_archived'` + `active=FALSE`**.
+- No requiere cambio en la DDL de TASK-801. El default `'regular'` es backward-compat correcto; TASK-813 corrige las fantasmas post-migration.
+- Recomendación: **correr TASK-813 inmediatamente después de TASK-801** y antes de TASK-802 onward, para evitar que las extensiones (`engagement_commercial_terms`, `engagement_phases`, etc.) se declaren contra services fantasma.
+
 ## Status
 
 - Lifecycle: `to-do`

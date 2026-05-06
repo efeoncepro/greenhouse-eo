@@ -1,5 +1,10 @@
 # TASK-557.1 — Legacy Quotes Cleanup & Limbo State Audit
 
+## Delta 2026-05-06
+
+- **TASK-813** (HubSpot p_services 0-162 sync + phantom seed cleanup) clona el patrón "audit + 3 categorías" introducido aquí — script idempotente con dry-run, categorización (recuperable / excluible / histórica), reporte counts pre/post. Reusar la misma forma de output + flags CLI para consistencia operacional.
+- Sibling pattern: ambas tasks atacan limbos legacy en distintos dominios (quotes vs services). Coordinar formato de reportes para que el operador comercial vea un mismo shape.
+
 ## Status
 
 - Lifecycle: `to-do`

@@ -1,5 +1,13 @@
 # TASK-555 — Commercial Access Model Foundation
 
+## Delta 2026-05-06
+
+- **TASK-813** (HubSpot p_services 0-162 sync activation) consume el namespace `commercial.*` definido por esta task y registra capabilities nuevas que deben quedar previstas en el contrato:
+  - `commercial.service_engagement.sync` — invocar sync de un service desde HubSpot (FINANCE_ADMIN + EFEONCE_ADMIN, server-only).
+  - `commercial.service_engagement.resolve_orphan` — UI admin para resolver huérfanos HubSpot sin org Greenhouse (FINANCE_ADMIN + EFEONCE_ADMIN).
+  - `commercial.service_engagement.archive_legacy` — script-level capability para el cleanup script de fantasmas.
+- Soft dep: TASK-813 espera tener el routeGroup `commercial` listo para no entrar bajo `finanzas.*` transicional. Si TASK-555 no cierra antes, TASK-813 documenta la transition path y el rebanding posterior.
+
 ## Status
 
 - Lifecycle: `to-do`
