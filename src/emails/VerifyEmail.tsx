@@ -1,5 +1,8 @@
 import { Heading, Section, Text } from '@react-email/components'
 
+import { getMicrocopy, type VerifyEmailTemplateCopy } from '@/lib/copy'
+import { selectEmailTemplateCopy } from '@/lib/email/template-copy'
+
 import EmailButton from './components/EmailButton'
 import EmailLayout from './components/EmailLayout'
 import { EMAIL_COLORS, EMAIL_FONTS } from './constants'
@@ -10,34 +13,25 @@ interface VerifyEmailProps {
   locale?: 'es' | 'en'
 }
 
+const LEGACY_EN_VERIFY_EMAIL_COPY: VerifyEmailTemplateCopy = {
+  heading: 'Confirm your email',
+  greeting: name => name ? `Hi ${name},` : 'Hi,',
+  body: 'we need to verify that this email address belongs to you to complete your Greenhouse account setup.',
+  validityPrefix: 'Click the button below to confirm. The link is valid for ',
+  validityBold: '24 hours',
+  validitySuffix: '.',
+  cta: 'Confirm my email',
+  disclaimer: 'If you did not create a Greenhouse account, you can safely ignore this email.',
+  fallback: 'If the button does not work, copy and paste this address into your browser:',
+  previewText: 'Confirm your email to complete your Greenhouse registration'
+}
+
 export default function VerifyEmail({
   verifyUrl = 'https://greenhouse.efeoncepro.com/auth/verify-email?token=preview-token',
   userName = 'María González',
   locale = 'es'
 }: VerifyEmailProps) {
-  const t = locale === 'en' ? {
-    heading: 'Confirm your email',
-    greeting: (name?: string) => name ? `Hi ${name},` : 'Hi,',
-    body: 'we need to verify that this email address belongs to you to complete your Greenhouse account setup.',
-    validityPrefix: 'Click the button below to confirm. The link is valid for ',
-    validityBold: '24 hours',
-    validitySuffix: '.',
-    cta: 'Confirm my email',
-    disclaimer: 'If you did not create a Greenhouse account, you can safely ignore this email.',
-    fallback: 'If the button does not work, copy and paste this address into your browser:',
-    previewText: 'Confirm your email to complete your Greenhouse registration'
-  } : {
-    heading: 'Confirma tu correo electr\u00f3nico',
-    greeting: (name?: string) => name ? `Hola ${name.split(' ')[0]},` : 'Hola,',
-    body: 'necesitamos verificar que esta direcci\u00f3n de correo te pertenece para completar la configuraci\u00f3n de tu cuenta en Greenhouse.',
-    validityPrefix: 'Haz clic en el siguiente bot\u00f3n para confirmar. El enlace es v\u00e1lido por ',
-    validityBold: '24 horas',
-    validitySuffix: '.',
-    cta: 'Confirmar mi correo',
-    disclaimer: 'Si no creaste una cuenta en Greenhouse, puedes ignorar este correo de forma segura.',
-    fallback: 'Si el bot\u00f3n no funciona, copia y pega esta direcci\u00f3n en tu navegador:',
-    previewText: 'Confirma tu correo para completar tu registro en Greenhouse'
-  }
+  const t = selectEmailTemplateCopy(locale, getMicrocopy().emails.auth.verifyEmail, LEGACY_EN_VERIFY_EMAIL_COPY)
 
   return (
     <EmailLayout previewText={t.previewText} locale={locale}>

@@ -165,6 +165,16 @@ Frontera operativa:
 - El footer `en` conserva el texto legacy mientras `en-US` sea mirror de `es-CL`, para no convertir correos internacionales a espanol por accidente.
 - `EmailButton` sigue recibiendo `children`; los textos de CTA se migran por template en Slice 3.
 
+## TASK-408 Slice 3A: templates auth incrementales
+
+`VerifyEmail` es el primer template individual migrado a dictionary. El copy en espanol vive en `getMicrocopy().emails.auth.verifyEmail`; el copy ingles queda como fallback legacy mientras `en-US` sea mirror de `es-CL`.
+
+La primitive `selectEmailTemplateCopy()` permite repetir este patron en los siguientes templates sin tocar delivery:
+
+- `es` / `es-CL` / default → dictionary de plataforma.
+- `en` / `en-US` → fallback legacy temporal.
+- No cambia subject registry, URLs, tokens ni contexto del caller.
+
 ## Soporte de idioma (i18n)
 
 Los emails de Greenhouse soportan espanol e ingles. El idioma se determina asi:

@@ -129,7 +129,8 @@ export type {
   NotificationCategoryCopy,
   NotificationCategoryCopyCode,
   StatesCopy,
-  TimeCopy
+  TimeCopy,
+  VerifyEmailTemplateCopy
 } from './types'
 
 export { DEFAULT_LOCALE, SUPPORTED_LOCALES } from './types'

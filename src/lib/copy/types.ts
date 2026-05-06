@@ -315,6 +315,19 @@ export type NotificationCategoryCopy = Record<
   }
 >
 
+export interface VerifyEmailTemplateCopy {
+  heading: string
+  greeting: (name?: string) => string
+  body: string
+  validityPrefix: string
+  validityBold: string
+  validitySuffix: string
+  cta: string
+  disclaimer: string
+  fallback: string
+  previewText: string
+}
+
 /**
  * Copy institucional compartido por emails y notificaciones externas.
  * TASK-408 lo introduce como namespace foundation antes de migrar templates:
@@ -330,6 +343,9 @@ export interface EmailsCopy {
   common: {
     brandSignature: string
     linkLabel: string
+  }
+  auth: {
+    verifyEmail: VerifyEmailTemplateCopy
   }
   notificationCategories: NotificationCategoryCopy
   subjects: {

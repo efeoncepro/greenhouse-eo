@@ -149,6 +149,8 @@ Reglas obligatorias:
 - Cada template migrado refresca su snapshot test en el mismo PR (esperado: byte-idéntico al baseline; cualquier delta es bug).
 - **Particionamiento por grupo cohesivo** (ver Rollout Policy): payroll-related (5 templates) → un PR; leave-related (4) → otro PR; auth/identity (Verify, MagicLink, PasswordReset, Invitation) → otro PR; finance/quote (Beneficiary, QuoteShare) → otro PR; weekly digest + notification genérico → otro PR. Total: 5 PRs para Slice 3.
 
+**Estado 2026-05-06**: Slice 3A inicia por el template de menor blast radius del grupo auth: `VerifyEmail`. Se agrego `selectEmailTemplateCopy()` para que los templates consuman dictionary `es` sin convertir `en` a espanol mientras `en-US` siga como mirror. `VerifyEmail` consume `getMicrocopy().emails.auth.verifyEmail` para `es` y conserva fallback legacy para `en`. Snapshot baseline sigue estable; no se tocaron subject registry, delivery auth, URLs ni handlers.
+
 ### Slice 4 — Reliability signal `notifications.email.render_failure_rate`
 
 - Reader: [src/lib/reliability/queries/email-render-failure.ts](../../src/lib/reliability/queries/email-render-failure.ts). Cuenta failures de render del outbox consumer en últimas 24h sobre `greenhouse_sync.outbox_events WHERE event_type LIKE 'notification.email.%' AND status='failed' AND last_error LIKE '%render%'`.

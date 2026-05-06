@@ -11,6 +11,20 @@ export const emails: EmailsCopy = {
     brandSignature: '— Greenhouse by Efeonce Group',
     linkLabel: 'Enlace'
   },
+  auth: {
+    verifyEmail: {
+      heading: 'Confirma tu correo electrónico',
+      greeting: name => name ? `Hola ${name.split(' ')[0]},` : 'Hola,',
+      body: 'necesitamos verificar que esta dirección de correo te pertenece para completar la configuración de tu cuenta en Greenhouse.',
+      validityPrefix: 'Haz clic en el siguiente botón para confirmar. El enlace es válido por ',
+      validityBold: '24 horas',
+      validitySuffix: '.',
+      cta: 'Confirmar mi correo',
+      disclaimer: 'Si no creaste una cuenta en Greenhouse, puedes ignorar este correo de forma segura.',
+      fallback: 'Si el botón no funciona, copia y pega esta dirección en tu navegador:',
+      previewText: 'Confirma tu correo para completar tu registro en Greenhouse'
+    }
+  },
   notificationCategories: {
     delivery_update: {
       label: 'Delivery updates',

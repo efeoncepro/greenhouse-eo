@@ -396,6 +396,17 @@ Reglas canonicas:
 - `EmailButton` no debe crecer API de copy hasta que exista un consumer activo. Hoy recibe `children`; los CTAs de dominio se migran por template en Slice 3.
 - Cualquier cambio al shell debe correr `src/emails/EmailTemplateBaseline.test.tsx` para proteger los 17 templates.
 
+### Delta 2026-05-06 — TASK-408 Slice 3A template copy selector
+
+`src/lib/email/template-copy.ts` introduce `selectEmailTemplateCopy(locale, platformCopy, legacyEnglishCopy)`.
+
+Reglas canonicas:
+
+- Mientras `en-US` sea mirror de `es-CL`, un template migrado debe usar dictionary para `es` y fallback legacy para `en`.
+- El fallback `en` es temporal y local al template migrado; se retira cuando TASK-266 entregue dictionary `en-US` real.
+- La primitive no toca delivery, subjects, URL generation, tokens ni render context. Solo selecciona copy.
+- Cada template migrado debe mantener snapshot estable y cubrir su output en `EmailTemplateBaseline.test.tsx` o test focal equivalente.
+
 ### Coordinación con i18n (TASK-266)
 
 `src/lib/copy/` está locale-aware desde día uno (`Locale = 'es-CL' | 'en-US'`). Cuando TASK-266 / TASK-430 active i18n real:
