@@ -23025,3 +23025,23 @@ Validacion:
 No validado:
 
 - Ejecucion directa del SELECT del reader contra PG via script ad hoc: el intento no se conto como evidencia porque el proxy `pnpm pg:connect` no quedo vivo en este shell. La query queda cubierta por typecheck, unit tests mockeados, `pg:doctor` y build; se recomienda observar el signal en `/admin/operations` tras deploy.
+
+## Sesion 2026-05-06 — TASK-408 Slice 5 guardrail: no-untokenized-copy error mode
+
+Contexto:
+
+- ADC/GCP se reautenticaron correctamente (`gcloud auth login` + `gcloud auth application-default login`) y `pnpm pg:doctor` volvio a pasar contra `greenhouse-pg-dev`.
+- Tras Slice 4, quedaba el cierre mecanico de TASK-408: confirmar baseline y promover `greenhouse/no-untokenized-copy` de `warn` a `error`.
+
+Cambios aplicados:
+
+- `eslint.config.mjs` promueve `greenhouse/no-untokenized-copy` a `error` para `src/views`, `src/components` y `src/app`.
+- Task y docs funcionales actualizadas con baseline:
+  - `rg "locale\\s*===\\s*['\\\"]en['\\\"]" src/emails/ | wc -l` = 0.
+  - `rg "from\\s+['\\\"]@/config/greenhouse-nomenclature" src/emails/ | wc -l` = 0.
+  - `rg "eslint-disable.*no-untokenized-copy" src/ | wc -l` = 0.
+  - ESLint focal pre-promocion sobre `src/views src/components src/app` = 0 mensajes, 0 `no-untokenized-copy`.
+
+Riesgos:
+
+- Cambio de guardrail/CI, no runtime. No toca emails, templates, `sendEmail`, Resend, notification preferences, outbox, reactive consumer, webhooks ni eventos.
