@@ -1,3 +1,20 @@
+# Sesion 2026-05-06 — TASK-812 creada (Compliance Exports Chile: Planilla Previred + LRE)
+
+- **Branch:** `develop` (task creation only — no implementation yet).
+- **Origen:** usuario detecto que Nubox vende generacion de archivos Previred + LRE, mientras que Greenhouse ya calcula todas las cotizaciones previsionales Chile correctamente en `payroll_entries`. Gap real: falta la capa de proyeccion a los formatos oficiales que aceptan las autoridades (`previred.cl` + `lre.dt.gob.cl`).
+- **Skill greenhouse-payroll-auditor invocada** y produjo brief de validacion: layout Previred posicional 105 columnas Latin-1 CRLF; schema LRE oficial Decreto N°9 / Res. Ex. 1.110 (2021); honorarios fuera de LRE/Previred (van en DJ 1879 SII anual); edge cases canonizados (licencias medicas con subsidio Isapre, vacaciones proporcionales en finiquito, ingresos/egresos parciales del periodo); riesgos compliance (multa DT 5-20 UTM por LRE incorrecto, AFP rechaza Previred mal declarado).
+- **Skill greenhouse-task-planner invocada** y produjo el archivo canonico `docs/tasks/to-do/TASK-812-compliance-exports-chile-previred-planilla-lre-libro.md` siguiendo `TASK_TEMPLATE.md`.
+- **Alcance ejecutable**:
+  - Slice 1 — Planilla Previred TXT (ASCII Latin-1, layout posicional, tabla seed `previred_institution_codes` con 7 AFPs + 8 isapres + FONASA, generador puro `chile-previred-planilla.ts`, endpoint `GET /api/hr/payroll/periods/[id]/export/previred`, capability `hr.payroll.export_previred`, outbox event `payroll.export.previred_generated` v1, tests paridad financiera contra `payment_order` social_security canonizado por TASK-707a/TASK-765).
+  - Slice 2 — LRE XML DT (XSD oficial DT commiteado, tabla seed `lre_concept_codes` con ~50 conceptos canonicos, mapping declarativo `payroll_entries → concept_code`, generador puro `chile-lre-libro.ts`, validacion XSD pre-emit, endpoint `POST /api/hr/payroll/periods/[id]/export/lre`, reliability signal `payroll.lre.export_drift`, outbox event `payroll.export.lre_generated` v1).
+- **Out of scope explicito**: DJ 1879 SII honorarios anual (follow-up); integracion API directa con previred.cl o DT.cl (no APIs publicas documentadas); rectificacion de periodos ya declarados; calculo de Horas Extras en el motor (Slice 2 emite 0 con warning + abre TASK follow-up explicita).
+- **Dependencies**: TASK-784 (Person Legal Profile + Identity Documents) es **hard blocker** para Slice 1 — sin RUT canonico verificado en `greenhouse_core.person_identity_documents`, no se puede emitir Planilla Previred valida. TASK-707a (Previred Detection + Canonical State Runtime) provee el `payment_order` para test paridad. TASK-765 (Payment Order ↔ Bank Settlement) ya canonizada.
+- **Riesgos anti-parche declarados**: paridad financiera contra `payment_order` social_security NO negociable; validacion XSD pre-emit obligatoria (archivo mal formado es PEOR que no entregarlo, queda fijado en sistema DT y requiere rectificacion formal); honorarios excluidos verificadamente de ambos archivos via tests.
+- **Open questions** registradas en la task: layout Previred 2026 vigente (Discovery requerido bajando PDF oficial); version XSD LRE actual (v3 vs v4); codigo Planvital (29 vs 08 — verificar contra `previred.com`); decision XSD validation library (xmllint shell-out vs pure-JS); subsystem `Payroll Compliance` nuevo vs rolear bajo `Payroll Operations`.
+- **Registry sincronizado**: `docs/tasks/TASK_ID_REGISTRY.md` agrega fila `TASK-812`, `docs/tasks/README.md` agrega bullet 🆕 `TASK-812` y bumpea siguiente ID disponible a `TASK-813`.
+- **Validacion**: archivo creado conforme `TASK_TEMPLATE.md` (Zone 0/1/3/4 completas, Zone 2 vacia para el agente que tome la task), paths reales o marcados con `[verificar]` cuando no se confirmaron en Discovery.
+- **No se ejecuto**: implementacion. La task queda en `to-do/` esperando agente que la tome.
+
 # Sesion 2026-05-06 — TASK-431 cerrada en develop
 
 - **Branch:** `develop` por instruccion explicita del usuario; no se crea `task/TASK-431-tenant-user-locale-persistence`.
