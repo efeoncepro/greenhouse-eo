@@ -113,7 +113,20 @@ const t = getMicrocopy().emails.beneficiaryPaymentProfileChanged
 | Nombre de una capacidad Greenhouse | `src/config/greenhouse-nomenclature.ts` |
 | CTA base, estado, loading, empty, aria o mes reutilizable | `src/lib/copy/dictionaries/es-CL/` |
 | Heading, label, CTA o disclaimer reusable de email | `src/lib/copy/dictionaries/es-CL/emails.ts` |
+| Microcopy reutilizable de dominio | `src/lib/copy/<domain>.ts` |
 | Copy unico de una pantalla o regla de negocio | Cerca del modulo |
+
+Despues de TASK-811, estos modulos de dominio existen y deben reutilizarse antes de crear otro:
+
+| Dominio | Modulo |
+| --- | --- |
+| Agency | `src/lib/copy/agency.ts` |
+| Portal cliente / team | `src/lib/copy/client-portal.ts` |
+| Admin / internal | `src/lib/copy/admin.ts` |
+| Pricing / quote governance | `src/lib/copy/pricing.ts` |
+| Workforce / skills / talent | `src/lib/copy/workforce.ts` |
+| Finance MRR/ARR | `src/lib/copy/finance.ts` |
+| Payroll projected | `src/lib/copy/payroll.ts` |
 
 ## Que no hacer
 
@@ -121,6 +134,7 @@ const t = getMicrocopy().emails.beneficiaryPaymentProfileChanged
 - No crear `const MONTHS = [...]` local.
 - No duplicar `Pendiente`, `Aprobado`, `Rechazado` en mapas locales si existen en `states`.
 - No agregar un namespace shared para una sola pantalla.
+- No volver a poner microcopy de dominio en `greenhouse-nomenclature.ts`; ese archivo queda para navegacion, shell institucional, product nomenclature y `GH_COLORS` transicional.
 - No meter nombres, montos, periodos, links, motivos o adjuntos de emails dentro del dictionary.
 - No mover narrativas generadas/materializadas de Nexa Insights al dictionary.
 - No importar `src/lib/copy` con `server-only`; debe funcionar en cliente y servidor.

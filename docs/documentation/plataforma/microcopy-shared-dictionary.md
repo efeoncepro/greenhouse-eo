@@ -31,6 +31,7 @@ El objetivo no es traducir todo el portal todavia. El objetivo es evitar drift: 
 - TASK-408 Slice 3H migra `QuoteSharePromptEmail` y `quote_share` a `emails.quoteShare`. La propuesta, version, cliente, destinatario, mensaje custom, total, vigencia, PDF, sender y share URL siguen viniendo del flujo de cotizaciones.
 - TASK-408 Slice 4 agrega `notifications.email.render_failure_rate` como signal de reliability. No mueve mas copy: detecta fallas de render/template en `email_deliveries` y `outbox_reactive_log` durante 24h para proteger el sweep sin tocar `sendEmail`, Resend, outbox ni reactive consumer.
 - TASK-408 Slice 5 promueve `greenhouse/no-untokenized-copy` a `error` con baseline 0 warnings y 0 disables, cerrando el gate mecanico para futuras regresiones de copy compartido en `src/views`, `src/components` y `src/app`.
+- TASK-811 recorto `src/config/greenhouse-nomenclature.ts`: el archivo queda para navegacion, labels institucionales de shell, product nomenclature y `GH_COLORS` transicional. El microcopy reutilizable de dominios ahora vive en modulos type-safe dentro de `src/lib/copy/*`.
 - `buildStatusMap()` permite construir status maps type-safe sin repetir labels inline.
 - La regla ESLint `greenhouse/no-untokenized-copy` se extendio para detectar arrays de meses y CTAs JSX text, ademas de los patrones ya existentes.
 - El sweep de `src/views`, `src/components` y `src/app` quedo en 0 warnings para `greenhouse/no-untokenized-copy`.
@@ -46,6 +47,7 @@ El objetivo no es traducir todo el portal todavia. El objetivo es evitar drift: 
 | Copy visible de categorias de notificacion | `src/lib/copy/dictionaries/es-CL/emails.ts` | Labels/descriptions de preferencias y centro de notificaciones |
 | Shell institucional de email | `src/emails/components/EmailLayout.tsx` + `emails.layout` | Logo alt, tagline, disclaimer, unsubscribe label |
 | Copy de templates migrados | `emails.<grupo>.<template>` + `selectEmailTemplateCopy()` | Auth, Notification, Leave, Payroll y Nexa digest `es` desde dictionary, `en` fallback legacy donde aplica |
+| Microcopy reutilizable de dominio | `src/lib/copy/*` | Agency, portal cliente/team, admin/internal, pricing, workforce, finance MRR/ARR y payroll projected |
 | Copy de dominio local | Cerca del dominio | Estado legal especifico de Payroll o Finance |
 
 ## Uso basico
@@ -97,6 +99,7 @@ const statusLabels = buildStatusMap({
 
 - Si el texto aparece en varias superficies y describe una accion, estado, empty, loading, aria-label o mes, debe vivir en `src/lib/copy/`.
 - Si el texto nombra una capacidad propia del producto, debe vivir en `greenhouse-nomenclature.ts`.
+- Si el texto es microcopy de dominio reutilizado por varias superficies, debe vivir en el modulo de dominio correspondiente bajo `src/lib/copy/*` en vez de volver a `greenhouse-nomenclature.ts`.
 - Si el texto explica una regla de negocio especifica de una pantalla, puede vivir localmente, con nombre claro y sin duplicar shared copy.
 - Si falta una key shared, agregarla al dictionary con paridad de locales y test cuando aplique.
 - No crear un namespace nuevo si solo lo usa una superficie.
