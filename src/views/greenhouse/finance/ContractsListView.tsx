@@ -24,6 +24,7 @@ import Typography from '@mui/material/Typography'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
+import { buildStatusMap } from '@/lib/copy'
 
 type ContractStatus = 'draft' | 'active' | 'paused' | 'terminated' | 'completed' | 'renewed'
 
@@ -47,11 +48,13 @@ interface ContractListItem {
 }
 
 const STATUS_META: Record<string, { label: string; color: 'success' | 'warning' | 'error' | 'secondary' | 'info' | 'primary' }> = {
-  draft: { label: 'Borrador', color: 'secondary' },
-  active: { label: 'Activo', color: 'success' },
-  paused: { label: 'Pausado', color: 'warning' },
+  ...buildStatusMap({
+    draft: { copyKey: 'draft', color: 'secondary' },
+    active: { copyKey: 'active', color: 'success' },
+    paused: { copyKey: 'paused', color: 'warning' },
+    completed: { copyKey: 'completed', color: 'info' }
+  }),
   terminated: { label: 'Terminado', color: 'error' },
-  completed: { label: 'Completado', color: 'info' },
   renewed: { label: 'Renovado', color: 'primary' }
 }
 

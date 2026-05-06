@@ -21,10 +21,14 @@ import TableRow from '@mui/material/TableRow'
 
 import { toast } from 'sonner'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomAvatar from '@core/components/mui/Avatar'
 
 import type { PaymentObligationDetail } from '@/lib/finance/payment-obligations/get-obligation-detail'
 import type { PaymentObligationKind, PaymentObligationStatus } from '@/types/payment-obligations'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 interface ObligationDetailDrawerProps {
   obligationId: string | null
@@ -73,7 +77,7 @@ const obligationKindMeta: Record<PaymentObligationKind, { label: string; color: 
 const statusMeta: Record<PaymentObligationStatus, { label: string; color: 'primary' | 'info' | 'warning' | 'success' | 'error' | 'secondary' }> = {
   generated: { label: 'Generada', color: 'primary' },
   scheduled: { label: 'Programada', color: 'info' },
-  partially_paid: { label: 'Parcial', color: 'warning' },
+  partially_paid: { label: GREENHOUSE_COPY.states.partial, color: 'warning' },
   paid: { label: 'Pagada', color: 'success' },
   reconciled: { label: 'Conciliada', color: 'info' },
   closed: { label: 'Cerrada', color: 'secondary' },
@@ -95,7 +99,7 @@ const eventTypeMeta = (eventType: string): { label: string; icon: string; color:
 
 const orderStateMeta = (state: string): { label: string; color: 'primary' | 'info' | 'warning' | 'success' | 'error' | 'secondary' } => {
   const map: Record<string, { label: string; color: 'primary' | 'info' | 'warning' | 'success' | 'error' | 'secondary' }> = {
-    draft: { label: 'Borrador', color: 'secondary' },
+    draft: { label: GREENHOUSE_COPY.states.draft, color: 'secondary' },
     pending_approval: { label: 'Pendiente aprobación', color: 'warning' },
     approved: { label: 'Aprobada', color: 'info' },
     scheduled: { label: 'Programada', color: 'info' },

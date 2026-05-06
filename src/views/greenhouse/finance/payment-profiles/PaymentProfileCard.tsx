@@ -22,12 +22,16 @@ import Typography from '@mui/material/Typography'
 
 import { toast } from 'sonner'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import type {
   BeneficiaryPaymentProfileAuditAction,
   BeneficiaryPaymentProfileAuditEntry,
   BeneficiaryPaymentProfileSafe,
   BeneficiaryPaymentProfileStatus
 } from '@/types/payment-profiles'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 const STATUS_LABEL: Record<BeneficiaryPaymentProfileStatus, string> = {
   draft: 'Borrador',
@@ -56,7 +60,7 @@ const AUDIT_ACTION_META: Record<
   updated: { icon: 'tabler-edit', label: 'Actualizado', color: 'info' },
   approved: { icon: 'tabler-check', label: 'Perfil aprobado', color: 'success' },
   superseded: { icon: 'tabler-replace', label: 'Reemplazado por nueva version', color: 'default' },
-  cancelled: { icon: 'tabler-circle-x', label: 'Cancelado', color: 'error' },
+  cancelled: { icon: 'tabler-circle-x', label: GREENHOUSE_COPY.states.cancelled, color: 'error' },
   revealed_sensitive: {
     icon: 'tabler-eye',
     label: 'Datos sensibles revelados',

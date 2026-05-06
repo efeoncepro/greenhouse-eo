@@ -21,10 +21,14 @@ import TableRow from '@mui/material/TableRow'
 import Tabs from '@mui/material/Tabs'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 import CustomChip from '@core/components/mui/Chip'
 
 import QuoteDocumentChain from './workspace/QuoteDocumentChain'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 type ContractTab = 'overview' | 'quotes' | 'chain' | 'profitability'
 
@@ -89,11 +93,11 @@ interface ChainState {
 }
 
 const STATUS_META: Record<string, { label: string; color: 'success' | 'warning' | 'error' | 'secondary' | 'info' | 'primary' }> = {
-  draft: { label: 'Borrador', color: 'secondary' },
-  active: { label: 'Activo', color: 'success' },
-  paused: { label: 'Pausado', color: 'warning' },
+  draft: { label: GREENHOUSE_COPY.states.draft, color: 'secondary' },
+  active: { label: GREENHOUSE_COPY.states.active, color: 'success' },
+  paused: { label: GREENHOUSE_COPY.states.paused, color: 'warning' },
   terminated: { label: 'Terminado', color: 'error' },
-  completed: { label: 'Completado', color: 'info' },
+  completed: { label: GREENHOUSE_COPY.states.completed, color: 'info' },
   renewed: { label: 'Renovado', color: 'primary' }
 }
 

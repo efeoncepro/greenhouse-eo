@@ -45,9 +45,12 @@ import CustomTextField from '@core/components/mui/TextField'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 import TablePaginationComponent from '@components/TablePaginationComponent'
 import { fuzzyFilter } from '@/components/tableUtils'
+import { buildStatusMap , getMicrocopy } from '@/lib/copy'
 
 import tableStyles from '@core/styles/table.module.css'
 import CreateIncomeDrawer from '@views/greenhouse/finance/drawers/CreateIncomeDrawer'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 // ---------------------------------------------------------------------------
 // Types
@@ -96,25 +99,29 @@ const DOC_TYPE_CHIP: Record<string, { label: string; color: 'primary' | 'error' 
 // ---------------------------------------------------------------------------
 
 const STATUS_CONFIG: Record<string, { label: string; color: 'success' | 'warning' | 'error' | 'info' | 'secondary' }> = {
-  paid: { label: 'Pagado', color: 'success' },
-  partial: { label: 'Parcial', color: 'warning' },
-  pending: { label: 'Pendiente', color: 'info' },
-  overdue: { label: 'Vencido', color: 'error' },
+  ...buildStatusMap({
+    paid: { copyKey: 'paid', color: 'success' },
+    partial: { copyKey: 'partial', color: 'warning' },
+    pending: { copyKey: 'pending', color: 'info' },
+    overdue: { copyKey: 'expired', color: 'error' }
+  }),
   written_off: { label: 'Castigado', color: 'secondary' }
 }
 
 const STATUS_OPTIONS = [
   { value: '', label: 'Todos los estados' },
-  { value: 'pending', label: 'Pendiente' },
-  { value: 'partial', label: 'Parcial' },
-  { value: 'paid', label: 'Pagado' },
-  { value: 'overdue', label: 'Vencido' }
+  { value: 'pending', label: GREENHOUSE_COPY.states.pending },
+  { value: 'partial', label: GREENHOUSE_COPY.states.partial },
+  { value: 'paid', label: GREENHOUSE_COPY.states.paid },
+  { value: 'overdue', label: GREENHOUSE_COPY.states.expired }
 ]
 
 const DTE_STATUS_CONFIG: Record<string, { label: string; color: 'success' | 'warning' | 'error' | 'secondary'; icon: string }> = {
   emitted: { label: 'Emitido', color: 'success', icon: 'tabler-check' },
-  pending: { label: 'Pendiente', color: 'warning', icon: 'tabler-clock' },
-  rejected: { label: 'Rechazado', color: 'error', icon: 'tabler-x' },
+  ...buildStatusMap({
+    pending: { copyKey: 'pending', color: 'warning', icon: 'tabler-clock' },
+    rejected: { copyKey: 'rejected', color: 'error', icon: 'tabler-x' }
+  }),
   annulled: { label: 'Anulado', color: 'secondary', icon: 'tabler-ban' }
 }
 

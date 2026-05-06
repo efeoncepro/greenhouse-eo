@@ -16,11 +16,15 @@ import Stack from '@mui/material/Stack'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomChip from '@core/components/mui/Chip'
 
 import { formatCurrency, formatDateTime } from '@/lib/format'
 import { ADJUSTMENT_REASON_LABELS } from '@/lib/payroll/adjustments/reason-codes'
 import type { PayrollAdjustment, AdjustmentStatus } from '@/types/payroll-adjustments'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 interface Props {
   open: boolean
@@ -34,7 +38,7 @@ const STATUS_CHIP: Record<
   AdjustmentStatus,
   { label: string; color: 'success' | 'warning' | 'secondary' | 'error' }
 > = {
-  active: { label: 'Activo', color: 'success' },
+  active: { label: GREENHOUSE_COPY.states.active, color: 'success' },
   pending_approval: { label: 'Pendiente aprobacion', color: 'warning' },
   reverted: { label: 'Revertido', color: 'error' },
   superseded: { label: 'Reemplazado', color: 'secondary' }

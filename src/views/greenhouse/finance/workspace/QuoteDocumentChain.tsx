@@ -15,7 +15,10 @@ import Stack from '@mui/material/Stack'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
 import CustomChip from '@core/components/mui/Chip'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 interface DocumentChainPurchaseOrder {
   poId: string
@@ -118,8 +121,8 @@ const formatDate = (iso: string | null): string => {
 }
 
 const QUOTATION_STATUS_META: Record<string, { label: string; color: SemanticColor }> = {
-  draft: { label: 'Borrador', color: 'secondary' },
-  in_review: { label: 'En revisión', color: 'info' },
+  draft: { label: GREENHOUSE_COPY.states.draft, color: 'secondary' },
+  in_review: { label: GREENHOUSE_COPY.states.inReview, color: 'info' },
   pending_approval: { label: 'En aprobación', color: 'warning' },
   approval_rejected: { label: 'Revisión requerida', color: 'error' },
   issued: { label: 'Emitida', color: 'info' },
@@ -139,7 +142,7 @@ const PO_STATUS_META: Record<DocumentChainPurchaseOrder['status'], { label: stri
 }
 
 const HES_STATUS_META: Record<DocumentChainServiceEntry['status'], { label: string; color: SemanticColor }> = {
-  draft: { label: 'Borrador', color: 'info' },
+  draft: { label: GREENHOUSE_COPY.states.draft, color: 'info' },
   submitted: { label: 'Enviada', color: 'warning' },
   approved: { label: 'Aprobada', color: 'success' },
   rejected: { label: 'Rechazada', color: 'error' },
@@ -147,7 +150,7 @@ const HES_STATUS_META: Record<DocumentChainServiceEntry['status'], { label: stri
 }
 
 const INCOME_STATUS_META: Record<DocumentChainIncome['paymentStatus'], { label: string; color: SemanticColor }> = {
-  pending: { label: 'Pendiente', color: 'warning' },
+  pending: { label: GREENHOUSE_COPY.states.pending, color: 'warning' },
   partial: { label: 'Pago parcial', color: 'info' },
   paid: { label: 'Pagada', color: 'success' },
   overdue: { label: 'Vencida', color: 'error' },

@@ -61,7 +61,7 @@
 import { enUS } from './dictionaries/en-US'
 import { esCL } from './dictionaries/es-CL'
 import { DEFAULT_LOCALE } from './types'
-import type { GetMicrocopy, Locale, MicrocopyDictionary } from './types'
+import type { GetMicrocopy, Locale, MicrocopyDictionary, StatesCopy } from './types'
 
 const DICTIONARIES: Record<Locale, MicrocopyDictionary> = {
   'es-CL': esCL,
@@ -77,6 +77,40 @@ const DICTIONARIES: Record<Locale, MicrocopyDictionary> = {
  */
 export const getMicrocopy: GetMicrocopy = (locale = DEFAULT_LOCALE) => {
   return DICTIONARIES[locale] ?? DICTIONARIES[DEFAULT_LOCALE]
+}
+
+export type StatusCopyKey = keyof StatesCopy
+
+export type StatusMapDefinitionEntry = {
+  copyKey: StatusCopyKey
+  [key: string]: unknown
+}
+
+export type BuiltStatusMap<TDefinition extends Record<string, StatusMapDefinitionEntry>> = {
+  [Key in keyof TDefinition]: Omit<TDefinition[Key], 'copyKey'> & {
+    label: string
+  }
+}
+
+export const buildStatusMap = <const TDefinition extends Record<string, StatusMapDefinitionEntry>>(
+  definition: TDefinition,
+  locale: Locale = DEFAULT_LOCALE
+): BuiltStatusMap<TDefinition> => {
+  const copy = getMicrocopy(locale)
+
+  return Object.fromEntries(
+    Object.entries(definition).map(([key, entry]) => {
+      const { copyKey, ...rest } = entry
+
+      return [
+        key,
+        {
+          ...rest,
+          label: copy.states[copyKey]
+        }
+      ]
+    })
+  ) as BuiltStatusMap<TDefinition>
 }
 
 export type {

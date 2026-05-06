@@ -27,10 +27,14 @@ import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomTextField from '@core/components/mui/TextField'
 
 import PaymentInstrumentChip from '@/components/greenhouse/PaymentInstrumentChip'
 import type { InstrumentCategory } from '@/config/payment-instruments'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 // ---------------------------------------------------------------------------
 // Types
@@ -165,7 +169,7 @@ const DIRECTION_LABELS: Record<'incoming' | 'outgoing', string> = {
 
 const LEG_STATUS_LABELS: Record<string, { label: string; color: 'success' | 'warning' | 'secondary' | 'info' }> = {
   reconciled: { label: 'Conciliado', color: 'success' },
-  pending: { label: 'Pendiente', color: 'warning' },
+  pending: { label: GREENHOUSE_COPY.states.pending, color: 'warning' },
   settled: { label: 'Liquidado', color: 'info' }
 }
 

@@ -19,12 +19,16 @@ import Typography from '@mui/material/Typography'
 
 import { toast } from 'sonner'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import type {
   BeneficiaryPaymentProfileAuditAction,
   BeneficiaryPaymentProfileAuditEntry,
   BeneficiaryPaymentProfileSafe,
   BeneficiaryPaymentProfileStatus
 } from '@/types/payment-profiles'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 interface ProfileDetailDrawerProps {
   profileId: string | null
@@ -57,9 +61,9 @@ const AUDIT_ACTION_META: Record<
 > = {
   created: { icon: 'tabler-plus', label: 'Creado', color: 'primary' },
   updated: { icon: 'tabler-edit', label: 'Actualizado', color: 'info' },
-  approved: { icon: 'tabler-check', label: 'Aprobado', color: 'success' },
+  approved: { icon: 'tabler-check', label: GREENHOUSE_COPY.states.approved, color: 'success' },
   superseded: { icon: 'tabler-replace', label: 'Superado', color: 'default' },
-  cancelled: { icon: 'tabler-circle-x', label: 'Cancelado', color: 'error' },
+  cancelled: { icon: 'tabler-circle-x', label: GREENHOUSE_COPY.states.cancelled, color: 'error' },
   revealed_sensitive: {
     icon: 'tabler-eye',
     label: 'Datos sensibles revelados',

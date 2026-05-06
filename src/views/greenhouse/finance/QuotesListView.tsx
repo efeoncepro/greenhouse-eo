@@ -22,6 +22,8 @@ import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import { useListAnimation } from '@/hooks/useListAnimation'
 import useQuotesList from '@/hooks/useQuotesList'
 import useViewTransitionRouter from '@/hooks/useViewTransitionRouter'
@@ -29,6 +31,8 @@ import { DataTableShell } from '@/components/greenhouse/data-table'
 
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 // ── Types ──
 
@@ -55,7 +59,7 @@ interface Quote {
 // ── Status config ──
 
 const STATUS_CONFIG: Record<string, { label: string; color: 'success' | 'info' | 'error' | 'primary' | 'secondary' | 'warning' }> = {
-  draft: { label: 'Borrador', color: 'secondary' },
+  draft: { label: GREENHOUSE_COPY.states.draft, color: 'secondary' },
   pending_approval: { label: 'En aprobación', color: 'warning' },
   approval_rejected: { label: 'Revisión requerida', color: 'error' },
   issued: { label: 'Emitida', color: 'info' },

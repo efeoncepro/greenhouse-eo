@@ -31,6 +31,8 @@ import {
 import type { ColumnDef, SortingState } from '@tanstack/react-table'
 import classnames from 'classnames'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomAvatar from '@core/components/mui/Avatar'
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
@@ -54,13 +56,15 @@ import {
   type ReadinessStatus
 } from './paymentInstrumentAdminAdapters'
 
+const GREENHOUSE_COPY = getMicrocopy()
+
 const columnHelper = createColumnHelper<PaymentInstrumentListItem>()
 
 const readinessTone: Record<ReadinessStatus, { label: string; color: 'success' | 'warning' | 'error' | 'secondary'; icon: string }> = {
   ready: { label: 'Listo', color: 'success', icon: 'tabler-circle-check' },
   needs_configuration: { label: 'Configurar', color: 'warning', icon: 'tabler-alert-triangle' },
   at_risk: { label: 'En riesgo', color: 'error', icon: 'tabler-circle-x' },
-  inactive: { label: 'Inactivo', color: 'secondary', icon: 'tabler-player-pause' }
+  inactive: { label: GREENHOUSE_COPY.states.inactive, color: 'secondary', icon: 'tabler-player-pause' }
 }
 
 const EmptyState = ({ search, onCreate }: { search: string; onCreate: () => void }) => (

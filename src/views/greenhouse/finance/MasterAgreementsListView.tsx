@@ -27,6 +27,7 @@ import Typography from '@mui/material/Typography'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
+import { buildStatusMap } from '@/lib/copy'
 
 type MasterAgreementStatus = 'draft' | 'active' | 'expired' | 'terminated' | 'superseded'
 type ViewMode = 'table' | 'cards'
@@ -57,9 +58,11 @@ interface MasterAgreementListItem {
 }
 
 const STATUS_META: Record<string, { label: string; color: 'success' | 'warning' | 'error' | 'secondary' | 'info' | 'primary' }> = {
-  draft: { label: 'Borrador', color: 'secondary' },
-  active: { label: 'Activo', color: 'success' },
-  expired: { label: 'Vencido', color: 'warning' },
+  ...buildStatusMap({
+    draft: { copyKey: 'draft', color: 'secondary' },
+    active: { copyKey: 'active', color: 'success' },
+    expired: { copyKey: 'expired', color: 'warning' }
+  }),
   terminated: { label: 'Terminado', color: 'error' },
   superseded: { label: 'Sustituido', color: 'info' }
 }

@@ -29,11 +29,15 @@ import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomChip from '@core/components/mui/Chip'
 import CustomTabList from '@core/components/mui/TabList'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 import { ROLE_CODES } from '@/config/role-codes'
 import AddMembershipDrawer from '@/views/greenhouse/organizations/drawers/AddMembershipDrawer'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 // ---------------------------------------------------------------------------
 // Types
@@ -138,10 +142,10 @@ const formatDate = (dateStr: string | null): string => {
 }
 
 const statusConfig: Record<string, { color: 'success' | 'warning' | 'info' | 'error'; label: string }> = {
-  paid: { color: 'success', label: 'Pagado' },
-  partial: { color: 'warning', label: 'Parcial' },
-  pending: { color: 'info', label: 'Pendiente' },
-  overdue: { color: 'error', label: 'Vencido' }
+  paid: { color: 'success', label: GREENHOUSE_COPY.states.paid },
+  partial: { color: 'warning', label: GREENHOUSE_COPY.states.partial },
+  pending: { color: 'info', label: GREENHOUSE_COPY.states.pending },
+  overdue: { color: 'error', label: GREENHOUSE_COPY.states.expired }
 }
 
 const roleLabels: Record<string, string> = {

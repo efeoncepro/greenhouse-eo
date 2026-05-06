@@ -34,9 +34,12 @@ import CustomTextField from '@core/components/mui/TextField'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 import TablePaginationComponent from '@components/TablePaginationComponent'
 import { fuzzyFilter } from '@/components/tableUtils'
+import { buildStatusMap , getMicrocopy } from '@/lib/copy'
 
 import tableStyles from '@core/styles/table.module.css'
 import CreateExpenseDrawer from '@views/greenhouse/finance/drawers/CreateExpenseDrawer'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 // ---------------------------------------------------------------------------
 // Types
@@ -81,11 +84,13 @@ interface Expense {
 // ---------------------------------------------------------------------------
 
 const STATUS_CONFIG: Record<string, { label: string; color: 'success' | 'warning' | 'error' | 'info' | 'secondary' }> = {
-  paid: { label: 'Pagado', color: 'success' },
-  scheduled: { label: 'Programado', color: 'info' },
-  pending: { label: 'Pendiente', color: 'warning' },
-  overdue: { label: 'Vencido', color: 'error' },
-  cancelled: { label: 'Cancelado', color: 'secondary' }
+  ...buildStatusMap({
+    paid: { copyKey: 'paid', color: 'success' },
+    scheduled: { copyKey: 'scheduled', color: 'info' },
+    pending: { copyKey: 'pending', color: 'warning' },
+    overdue: { copyKey: 'expired', color: 'error' },
+    cancelled: { copyKey: 'cancelled', color: 'secondary' }
+  })
 }
 
 const TYPE_CONFIG: Record<string, { label: string; color: 'primary' | 'info' | 'warning' | 'error' | 'secondary' }> = {
@@ -101,10 +106,10 @@ const TYPE_CONFIG: Record<string, { label: string; color: 'primary' | 'info' | '
 
 const STATUS_OPTIONS = [
   { value: '', label: 'Todos los estados' },
-  { value: 'pending', label: 'Pendiente' },
-  { value: 'scheduled', label: 'Programado' },
-  { value: 'paid', label: 'Pagado' },
-  { value: 'overdue', label: 'Vencido' }
+  { value: 'pending', label: GREENHOUSE_COPY.states.pending },
+  { value: 'scheduled', label: GREENHOUSE_COPY.states.scheduled },
+  { value: 'paid', label: GREENHOUSE_COPY.states.paid },
+  { value: 'overdue', label: GREENHOUSE_COPY.states.expired }
 ]
 
 const TYPE_OPTIONS = [
@@ -122,7 +127,7 @@ const TYPE_OPTIONS = [
 const SII_STATUS_CONFIG: Record<string, { label: string; color: 'success' | 'error' | 'warning' | 'secondary' }> = {
   Aceptado: { label: 'Aceptado', color: 'success' },
   Reclamado: { label: 'Reclamado', color: 'error' },
-  Pendiente: { label: 'Pendiente', color: 'warning' }
+  Pendiente: { label: GREENHOUSE_COPY.states.pending, color: 'warning' }
 }
 
 // ---------------------------------------------------------------------------

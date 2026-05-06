@@ -27,6 +27,8 @@ import {
 import type { ColumnDef, SortingState } from '@tanstack/react-table'
 import classnames from 'classnames'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
@@ -34,6 +36,8 @@ import TablePaginationComponent from '@components/TablePaginationComponent'
 import { fuzzyFilter } from '@/components/tableUtils'
 import tableStyles from '@core/styles/table.module.css'
 import CreateHesDrawer from '@views/greenhouse/finance/drawers/CreateHesDrawer'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 // ── Types ──
 
@@ -58,7 +62,7 @@ interface Hes {
 // ── Config ──
 
 const STATUS_CONFIG: Record<string, { label: string; color: 'success' | 'info' | 'error' | 'warning' | 'secondary' }> = {
-  draft: { label: 'Borrador', color: 'secondary' },
+  draft: { label: GREENHOUSE_COPY.states.draft, color: 'secondary' },
   submitted: { label: 'Recibida', color: 'info' },
   approved: { label: 'Validada', color: 'success' },
   rejected: { label: 'Observada', color: 'warning' },
@@ -67,7 +71,7 @@ const STATUS_CONFIG: Record<string, { label: string; color: 'success' | 'info' |
 
 const STATUS_OPTIONS = [
   { value: '', label: 'Todos los estados' },
-  { value: 'draft', label: 'Borrador' },
+  { value: 'draft', label: GREENHOUSE_COPY.states.draft },
   { value: 'submitted', label: 'Recibidas' },
   { value: 'approved', label: 'Validadas' },
   { value: 'rejected', label: 'Observadas' }

@@ -20,7 +20,11 @@ import Stack from '@mui/material/Stack'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomChip from '@core/components/mui/Chip'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 export interface ApprovalStep {
   stepId: string
@@ -52,9 +56,9 @@ interface Props {
 }
 
 const STATUS_CHIP: Record<string, { label: string; color: 'warning' | 'success' | 'error' | 'secondary' }> = {
-  pending: { label: 'Pendiente', color: 'warning' },
-  approved: { label: 'Aprobado', color: 'success' },
-  rejected: { label: 'Rechazado', color: 'error' },
+  pending: { label: GREENHOUSE_COPY.states.pending, color: 'warning' },
+  approved: { label: GREENHOUSE_COPY.states.approved, color: 'success' },
+  rejected: { label: GREENHOUSE_COPY.states.rejected, color: 'error' },
   skipped: { label: 'Omitido', color: 'secondary' }
 }
 

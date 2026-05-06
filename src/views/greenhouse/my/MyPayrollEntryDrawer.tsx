@@ -18,7 +18,6 @@ import CustomChip from '@core/components/mui/Chip'
 import { getMicrocopy } from '@/lib/copy'
 
 const GREENHOUSE_COPY = getMicrocopy()
-
 const MONTHS = ['', ...GREENHOUSE_COPY.months.short]
 
 const PROCESSOR_LABELS: Record<string, string> = {
@@ -43,9 +42,9 @@ const DELIVERY_KIND_LABELS: Record<string, string> = {
 const PAYMENT_STATUS_META: Record<string, { label: string; color: 'primary' | 'info' | 'warning' | 'success' | 'error' | 'secondary' }> = {
   awaiting_order: { label: 'Por programar', color: 'warning' },
   order_pending: { label: 'En aprobación', color: 'warning' },
-  order_approved: { label: 'Programado', color: 'info' },
-  order_paid: { label: 'Pagado', color: 'success' },
-  cancelled: { label: 'Cancelado', color: 'error' }
+  order_approved: { label: GREENHOUSE_COPY.states.scheduled, color: 'info' },
+  order_paid: { label: GREENHOUSE_COPY.states.paid, color: 'success' },
+  cancelled: { label: GREENHOUSE_COPY.states.cancelled, color: 'error' }
 }
 
 interface PayslipDeliveryEvent {

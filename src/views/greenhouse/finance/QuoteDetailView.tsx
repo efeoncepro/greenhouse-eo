@@ -25,6 +25,8 @@ import TableRow from '@mui/material/TableRow'
 import Tabs from '@mui/material/Tabs'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomChip from '@core/components/mui/Chip'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 
@@ -46,6 +48,8 @@ import {
   canManageFinanceQuotes,
   isEditableFinanceQuotationStatus
 } from '@/lib/finance/quotation-access'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 // ── Types ──
 
@@ -121,7 +125,7 @@ interface QuoteViewerContext {
 // ── Config ──
 
 const STATUS_CONFIG: Record<string, { label: string; color: 'success' | 'info' | 'error' | 'primary' | 'secondary' | 'warning' }> = {
-  draft: { label: 'Borrador', color: 'secondary' },
+  draft: { label: GREENHOUSE_COPY.states.draft, color: 'secondary' },
   pending_approval: { label: 'En aprobación', color: 'warning' },
   approval_rejected: { label: 'Revisión requerida', color: 'error' },
   issued: { label: 'Emitida', color: 'info' },

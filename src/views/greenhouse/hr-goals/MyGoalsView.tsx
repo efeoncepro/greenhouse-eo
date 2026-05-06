@@ -21,20 +21,24 @@ import MenuItem from '@mui/material/MenuItem'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 
 import type { GoalCycle, GoalKeyResult, GoalStatus, GoalWithDetails } from '@/types/hr-goals'
 
+const GREENHOUSE_COPY = getMicrocopy()
+
 // ── Status display config ──
 
 const STATUS_CONFIG: Record<GoalStatus, { label: string; color: 'success' | 'warning' | 'error' | 'info' | 'default'; icon: string }> = {
-  on_track: { label: 'En curso', color: 'success', icon: 'tabler-circle-check' },
+  on_track: { label: GREENHOUSE_COPY.states.inProgress, color: 'success', icon: 'tabler-circle-check' },
   at_risk: { label: 'En riesgo', color: 'warning', icon: 'tabler-alert-triangle' },
-  behind: { label: 'Atrasado', color: 'error', icon: 'tabler-alert-circle' },
-  completed: { label: 'Completado', color: 'info', icon: 'tabler-trophy' },
-  cancelled: { label: 'Cancelado', color: 'default', icon: 'tabler-circle-x' }
+  behind: { label: GREENHOUSE_COPY.states.overdue, color: 'error', icon: 'tabler-alert-circle' },
+  completed: { label: GREENHOUSE_COPY.states.completed, color: 'info', icon: 'tabler-trophy' },
+  cancelled: { label: GREENHOUSE_COPY.states.cancelled, color: 'default', icon: 'tabler-circle-x' }
 }
 
 const pct = (v: number) => `${Math.round(v)}%`

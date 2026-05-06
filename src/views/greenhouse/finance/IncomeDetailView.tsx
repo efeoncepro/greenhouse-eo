@@ -24,12 +24,16 @@ import Skeleton from '@mui/material/Skeleton'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomChip from '@core/components/mui/Chip'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 import PaymentRegistrationCard from '@views/greenhouse/finance/components/PaymentRegistrationCard'
 import PaymentHistoryTable from '@views/greenhouse/finance/components/PaymentHistoryTable'
 import SettlementOrchestrationDrawer from '@views/greenhouse/finance/drawers/SettlementOrchestrationDrawer'
 import FactoringOperationDrawer from '@views/greenhouse/finance/drawers/FactoringOperationDrawer'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 // ---------------------------------------------------------------------------
 // Types
@@ -131,8 +135,8 @@ const statusLabel = (status: string) => {
 
 const DTE_STATUS_CONFIG: Record<string, { label: string; color: 'success' | 'warning' | 'error' | 'secondary'; icon: string }> = {
   emitted: { label: 'Emitido', color: 'success', icon: 'tabler-check' },
-  pending: { label: 'Pendiente', color: 'warning', icon: 'tabler-clock' },
-  rejected: { label: 'Rechazado', color: 'error', icon: 'tabler-x' },
+  pending: { label: GREENHOUSE_COPY.states.pending, color: 'warning', icon: 'tabler-clock' },
+  rejected: { label: GREENHOUSE_COPY.states.rejected, color: 'error', icon: 'tabler-x' },
   annulled: { label: 'Anulado', color: 'secondary', icon: 'tabler-ban' }
 }
 

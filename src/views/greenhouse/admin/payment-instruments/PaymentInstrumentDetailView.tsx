@@ -27,6 +27,8 @@ import Tab from '@mui/material/Tab'
 import Tabs from '@mui/material/Tabs'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomAvatar from '@core/components/mui/Avatar'
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
@@ -52,6 +54,8 @@ import {
   type ReadinessStatus,
   type SectionHealth
 } from './paymentInstrumentAdminAdapters'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 type Props = {
   accountId: string
@@ -127,7 +131,7 @@ const readinessCopy: Record<ReadinessStatus, { label: string; color: 'success' |
     helper: 'Hay dependencias que pueden afectar pagos, cobros o conciliacion.'
   },
   inactive: {
-    label: 'Inactivo',
+    label: GREENHOUSE_COPY.states.inactive,
     color: 'secondary',
     helper: 'No deberia usarse en nuevos flujos hasta reactivarlo.'
   }
@@ -140,8 +144,8 @@ const checkCopy: Record<CheckStatus, { icon: string; color: 'success' | 'warning
 }
 
 const sectionCopy: Record<SectionHealth, { label: string; color: 'success' | 'warning' | 'error' }> = {
-  ok: { label: 'Disponible', color: 'success' },
-  partial: { label: 'Parcial', color: 'warning' },
+  ok: { label: GREENHOUSE_COPY.states.available, color: 'success' },
+  partial: { label: GREENHOUSE_COPY.states.partial, color: 'warning' },
   error: { label: 'Con error', color: 'error' }
 }
 
