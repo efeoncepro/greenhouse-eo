@@ -1,7 +1,8 @@
 # Greenhouse EO — UI Platform Architecture V1
 
-> **Version:** 1.6
+> **Version:** 1.7
 > **Created:** 2026-03-30
+> **Updated:** 2026-05-06 — v1.7: TASK-428 publica `GREENHOUSE_I18N_ARCHITECTURE_V1.md`: `next-intl` como librería App Router, portal privado state-only sin locale prefix por defecto, `en-US` como primera activación, `pt-BR` planned, y TASK-431 debe absorber `client_users.locale` legacy. Ver Delta 2026-05-06b abajo.
 > **Updated:** 2026-05-06 — v1.6: TASK-811 recorta `src/config/greenhouse-nomenclature.ts` a navegación/product nomenclature + tokens visuales transicionales. Domain microcopy reutilizable se extrae a módulos type-safe en `src/lib/copy/*` (`agency`, `client-portal`, `admin`, `pricing`, `workforce`, `finance`, `payroll`). Ver Delta 2026-05-06 abajo.
 > **Updated:** 2026-05-05 — v1.5: Quote Builder primitives extraction Sprint 3 (TASK-498). Tres primitives nuevos en `src/components/greenhouse/primitives/` (`EntitySummaryDock`, `CardHeaderWithBadge`, `FormSectionAccordion`) habilitan invoice / PO / contract / finiquito builders sin re-implementar el chasis. `ContextChipStrip` recibe `overflowAfter` con dropdown "+M más" canónico. Quote Builder migrado: `QuoteSummaryDock` queda como adapter thin sobre `EntitySummaryDock`, conservando API histórica. Ver Delta 2026-05-05 abajo.
 > **Updated:** 2026-05-04 — v1.4: Quick Access Shortcuts Platform (TASK-553). Catálogo canónico `src/lib/shortcuts/catalog.ts` + resolver dual-plane (`module` + opcional `viewCode` + opcional `requiredCapability`) compartido entre Home `recommendedShortcuts` y header `<ShortcutsDropdown />`. Persistencia per-usuario en `greenhouse_core.user_shortcut_pins` vía `/api/me/shortcuts`. Ver Delta 2026-05-04 abajo.
@@ -15,6 +16,22 @@
 ## Overview
 
 Greenhouse EO es un portal Next.js 16 App Router con MUI 7.x envuelto por el starter-kit Vuexy. Este documento es la referencia canónica de la plataforma UI: stack, librerías disponibles, patrones de componentes, convenciones de estado, y reglas de adopción.
+
+## Delta 2026-05-06b — TASK-428 i18n architecture decision
+
+La arquitectura i18n canónica vive en [`GREENHOUSE_I18N_ARCHITECTURE_V1.md`](./GREENHOUSE_I18N_ARCHITECTURE_V1.md).
+
+Decisiones vigentes:
+
+- `next-intl` es la librería elegida para el runtime App Router.
+- El portal privado mantiene URLs sin prefijo de locale por defecto; el locale se resuelve por sesión/cookie/header y se aplica por provider/layout.
+- Prefixes de locale quedan reservados para rutas públicas, SEO o entrypoints localizados explícitos. No se aplican a `/api/*`, NextAuth callbacks ni staging automation.
+- `es-CL` sigue siendo default; `en-US` es el primer locale de activación; `pt-BR` queda planned first-class detrás de cobertura de dictionary y validación comercial.
+- `src/lib/format/` sigue siendo la primitive canónica para fechas, moneda, números, porcentajes y pluralización visible. i18n no reemplaza TASK-429.
+- React Email y background jobs no dependen del provider App Router; consumen dictionaries/core APIs y el bridge `src/lib/email/locale-resolver.ts`.
+- TASK-431 debe normalizar/absorber `greenhouse_core.client_users.locale` legacy antes de materializar `identity_profiles.preferred_locale` o tenant defaults.
+
+Access model: sin cambios en `routeGroups`, `views`, `entitlements` ni startup policy. Locale es preferencia de presentación, no autorización.
 
 ## Delta 2026-05-06 — TASK-811 nomenclature domain microcopy trim
 

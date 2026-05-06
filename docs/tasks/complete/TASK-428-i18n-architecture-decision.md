@@ -6,23 +6,23 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Medio`
 - Type: `design`
-- Status real: `Diseno`
+- Status real: `Cerrada 2026-05-06`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none`
-- Branch: `task/TASK-428-i18n-architecture-decision`
+- Branch: `develop` (por instruccion explicita del usuario; no se crea branch task)
 - Legacy ID: —
 - GitHub Issue: —
 - Parent: `TASK-266` (umbrella)
 
 ## Summary
 
-Primera child task de la umbrella `TASK-266`. Entrega un ADR consolidado con las decisiones de plataforma que todas las demás child tasks de i18n consumen: librería (probable `next-intl`), estrategia de routing (prefijo por locale vs state-only), lista first-class de locales, estrategia de detección y fallback, y namespaces de diccionarios. No implementa código — deja el contrato que `TASK-429`, `TASK-430` y `TASK-431` obedecen.
+Primera child task de la umbrella `TASK-266`. Entrega un ADR consolidado con las decisiones de plataforma que todas las demás child tasks de i18n consumen: librería i18n (`next-intl`), estrategia de routing (prefijo por locale vs state-only), lista first-class de locales, estrategia de detección y fallback, y namespaces de diccionarios. No implementa código — deja el contrato que `TASK-429`, `TASK-430` y `TASK-431` obedecen.
 
 ## Why This Task Exists
 
@@ -59,7 +59,7 @@ Reglas obligatorias:
 
 ## Normative Docs
 
-- `docs/tasks/to-do/TASK-266-greenhouse-i18n-globalization-activation.md`
+- `docs/tasks/complete/TASK-266-greenhouse-i18n-globalization-activation.md`
 - `full-version/src/configs/i18n.ts`
 - `full-version/src/utils/getDictionary.ts`
 
@@ -118,21 +118,21 @@ Reglas obligatorias:
 
 ## Out of Scope
 
-- Implementar la librería elegida.
+- Implementar la librería i18n elegida: `next-intl`.
 - Migrar superficies (eso es `TASK-430` y sus children).
 - Crear utilities de formatting (eso es `TASK-429`).
 - Persistir locale en PG (eso es `TASK-431`).
 
 ## Acceptance Criteria
 
-- [ ] ADR publicado en `docs/architecture/GREENHOUSE_I18N_ARCHITECTURE_V1.md` con:
+- [x] ADR publicado en `docs/architecture/GREENHOUSE_I18N_ARCHITECTURE_V1.md` con:
   - Locales first-class validados
   - Librería elegida con justificación
   - Routing strategy con análisis de impacto
   - Detection hierarchy con puntos de resolución
   - Namespaces y contrato de type safety
-- [ ] `GREENHOUSE_UI_PLATFORM_V1.md` linkea al ADR.
-- [ ] `TASK-430` y `TASK-431` pueden arrancar sin ambigüedad tras cerrar esta task.
+- [x] `GREENHOUSE_UI_PLATFORM_V1.md` linkea al ADR.
+- [x] `TASK-430` y `TASK-431` pueden arrancar sin ambigüedad tras cerrar esta task.
 
 ## Verification
 
@@ -141,11 +141,19 @@ Reglas obligatorias:
 
 ## Closing Protocol
 
-- [ ] Publicar ADR.
-- [ ] Notificar a `TASK-430` y `TASK-431` que pueden arrancar.
-- [ ] Actualizar `TASK-266` con decisiones tomadas.
+- [x] Publicar ADR.
+- [x] Notificar a `TASK-430` y `TASK-431` que pueden arrancar.
+- [x] Actualizar `TASK-266` con decisiones tomadas.
 
 ## Open Questions
 
 - ¿`next-intl` soporta emails SSR fuera del App Router? Validar para no pintar `TASK-408`/emails localization en una esquina.
 - ¿El prefijo de routing afecta el acceso programático de agentes (`staging-request.mjs`)?
+
+## Decisions resolved before implementation
+
+- `next-intl` se elige como libreria del portal App Router. Para emails SSR/background jobs no se dependera del provider de App Router; se usaran dictionaries/core APIs y el bridge existente `src/lib/email/locale-resolver.ts`.
+- La estrategia de routing es hibrida conservadora: el portal privado mantiene URLs sin prefijo de locale; los prefixes quedan reservados para rutas publicas/SEO/localized entrypoints futuros.
+- `staging-request.mjs`, `/api/*`, auth callbacks y rutas privadas actuales no deben recibir prefijo de locale.
+- Locales: `es-CL` activo/default, `en-US` como primer locale de activacion en TASK-430, `pt-BR` planned first-class gated por cobertura de dictionary y validacion comercial.
+- `client_users.locale` existe como legacy (`es`/`en`); TASK-431 debe normalizar/absorberlo antes de crear preferencia canonica sobre `identity_profiles.preferred_locale`.

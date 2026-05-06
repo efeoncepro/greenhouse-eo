@@ -2,6 +2,8 @@
 
 ## 2026-05-06
 
+- **TASK-428 — i18n architecture ADR.** Se publica `docs/architecture/GREENHOUSE_I18N_ARCHITECTURE_V1.md`: `next-intl` como runtime App Router, portal privado sin locale prefix por defecto, `en-US` como primera activación, `pt-BR` planned, emails SSR sin provider App Router, y TASK-431 debe absorber `client_users.locale` legacy. `TASK-266` queda cerrada como umbrella formalizada.
+
 - **TASK-811 — greenhouse-nomenclature domain microcopy trim.** `src/config/greenhouse-nomenclature.ts` baja de 2.747 a 410 líneas y queda centrado en navegación/product nomenclature + `GH_COLORS` transicional. El microcopy de Agency, portal cliente/team, admin/internal, pricing, workforce, finance MRR/ARR y payroll projected se extrajo a módulos type-safe en `src/lib/copy/*`; `GH_COMPENSATION` se eliminó como orphan verificado. No se reescribió copy ni se tocó runtime/data/events.
 
 - **TASK-408 Slice 0 — foundation segura para emails dictionary-ready.** Se agrega el namespace `emails` en `src/lib/copy`, un resolver server-only de locale email con fallback estable `es-CL`, y baseline de snapshots para los 17 templates reales. Los snapshots incluyen assertions de tokens de personalizacion para preservar nombres, cliente, montos, periodos, links y unsubscribe antes de migrar copy institucional.

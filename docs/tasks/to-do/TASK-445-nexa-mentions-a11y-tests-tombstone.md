@@ -57,7 +57,7 @@ Reglas obligatorias:
 
 ## Normative Docs
 
-- `docs/tasks/to-do/TASK-428-i18n-architecture-decision.md`
+- `docs/tasks/complete/TASK-428-i18n-architecture-decision.md`
 - `docs/tasks/to-do/TASK-441-nexa-mentions-resolver-allowlist-sanitization.md`
 
 ## Dependencies & Impact

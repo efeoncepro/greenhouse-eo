@@ -315,7 +315,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-263` | `to-do` | Permission Sets: CRUD enterprise para asignacion de vistas por persona y perfil | `docs/tasks/to-do/TASK-263-permission-sets-enterprise-view-access.md` |
 | `TASK-264` | `to-do` | Greenhouse Theme Canonicalization & Kortex Brand Contract | `docs/tasks/to-do/TASK-264-greenhouse-theme-canonicalization-kortex-brand-contract.md` |
 | `TASK-265` | `complete` | Greenhouse Nomenclature, Dictionary & Kortex Copy Contract | `docs/tasks/complete/TASK-265-greenhouse-nomenclature-dictionary-kortex-copy-contract.md` |
-| `TASK-266` | `to-do` | Greenhouse i18n & Globalization Activation | `docs/tasks/to-do/TASK-266-greenhouse-i18n-globalization-activation.md` |
+| `TASK-266` | `complete` | Greenhouse i18n & Globalization Activation | `docs/tasks/complete/TASK-266-greenhouse-i18n-globalization-activation.md` |
 | `TASK-267` | `to-do` | Reenviar email de onboarding desde ficha de usuario | `docs/tasks/to-do/TASK-267-admin-resend-onboarding-email.md` |
 | `TASK-268` | `to-do` | Boton "Revisar acceso" navega al tab Accesos | `docs/tasks/to-do/TASK-268-admin-review-access-button.md` |
 | `TASK-269` | `to-do` | Email Delivery Enterprise Hardening: Context Resolver, i18n, Rate Limit, Bounce Handling | `docs/tasks/to-do/TASK-269-email-delivery-enterprise-hardening.md` |
@@ -476,9 +476,9 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-426` | `to-do` | Finance Metric Cross-Domain References (v2) | `docs/tasks/to-do/TASK-426-finance-metric-cross-domain-references.md` |
 | `TASK-427` | `to-do` | Finance Metric Registry Sharding (trigger-based) | `docs/tasks/to-do/TASK-427-finance-metric-registry-sharding.md` |
 | `TASK-407` | `complete` | Copy Migration: Shared Shell + Components (split de TASK-265) | `docs/tasks/complete/TASK-407-copy-migration-shared-shell-components.md` |
-| `TASK-408` | `to-do` | Copy Migration: Notification Categories + Institutional Emails (split de TASK-265) | `docs/tasks/to-do/TASK-408-copy-migration-notifications-emails.md` |
-| `TASK-428` | `to-do` | i18n Architecture Decision (library + routing + locales) — child de TASK-266 | `docs/tasks/to-do/TASK-428-i18n-architecture-decision.md` |
-| `TASK-429` | `to-do` | Locale-Aware Formatting Utilities — child de TASK-266 | `docs/tasks/to-do/TASK-429-locale-aware-formatting-utilities.md` |
+| `TASK-408` | `in-progress` | Copy Migration: Notification Categories + Institutional Emails (split de TASK-265) | `docs/tasks/in-progress/TASK-408-copy-migration-notifications-emails.md` |
+| `TASK-428` | `complete` | i18n Architecture Decision (library + routing + locales) — child de TASK-266 | `docs/tasks/complete/TASK-428-i18n-architecture-decision.md` |
+| `TASK-429` | `complete` | Locale-Aware Formatting Utilities — child de TASK-266 | `docs/tasks/complete/TASK-429-locale-aware-formatting-utilities.md` |
 | `TASK-430` | `to-do` | Dictionary Foundation Activation — child de TASK-266 | `docs/tasks/to-do/TASK-430-dictionary-foundation-activation.md` |
 | `TASK-431` | `to-do` | Tenant + User Locale Persistence Model — child de TASK-266 | `docs/tasks/to-do/TASK-431-tenant-user-locale-persistence.md` |
 | `TASK-432` | `to-do` | Client Portal Nexa Pulse (Client-Facing Insights) | `docs/tasks/to-do/TASK-432-client-portal-nexa-pulse.md` |

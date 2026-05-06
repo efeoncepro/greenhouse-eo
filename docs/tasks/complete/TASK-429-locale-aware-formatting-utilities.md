@@ -56,7 +56,7 @@ Reglas obligatorias:
 
 ## Normative Docs
 
-- `docs/tasks/to-do/TASK-266-greenhouse-i18n-globalization-activation.md`
+- `docs/tasks/complete/TASK-266-greenhouse-i18n-globalization-activation.md`
 - Cualquier utility de formato existente en `src/lib/` (inventariar en planning).
 
 ## Dependencies & Impact

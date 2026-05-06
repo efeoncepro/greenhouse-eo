@@ -393,7 +393,7 @@ This is a dedicated task, not a routine addition.
 
 - **Multi-currency output client-facing UI** — owned by [TASK-466](../tasks/to-do/TASK-466-multi-currency-quote-output.md).
 - **Management accounting FX (factoring, treasury)** — owned by [TASK-397](../tasks/to-do/TASK-397-management-accounting-financial-costs-integration-factoring-fx-fees-treasury.md).
-- **Locale-aware formatting** — owned by [TASK-429](../tasks/to-do/TASK-429-locale-aware-formatting-utilities.md).
+- **Locale-aware formatting** — owned by [TASK-429](../tasks/complete/TASK-429-locale-aware-formatting-utilities.md).
 - **Expanding `operational_pl`, `member_capacity_economics` or payroll to new currencies** — each has its own compatibility concern and must ship under its own migration task.
 
 This spec builds the foundation; it does not migrate the consumers.

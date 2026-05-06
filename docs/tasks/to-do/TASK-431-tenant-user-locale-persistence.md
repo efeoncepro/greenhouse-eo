@@ -14,7 +14,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `identity`
-- Blocked by: `TASK-428` (detection hierarchy decidida)
+- Blocked by: `none` — `TASK-428` ya publico la detection hierarchy.
 - Branch: `task/TASK-431-tenant-user-locale-persistence`
 - Legacy ID: —
 - GitHub Issue: —
@@ -60,7 +60,7 @@ Reglas obligatorias:
 
 ## Normative Docs
 
-- `docs/tasks/to-do/TASK-428-i18n-architecture-decision.md`
+- `docs/tasks/complete/TASK-428-i18n-architecture-decision.md`
 - `docs/tasks/to-do/TASK-430-dictionary-foundation-activation.md`
 - `docs/architecture/GREENHOUSE_DATABASE_TOOLING_V1.md`
 
@@ -68,7 +68,7 @@ Reglas obligatorias:
 
 ### Depends on
 
-- `TASK-428` cerrada — necesita conocer la lista de locales válidos y la detection hierarchy.
+- `TASK-428` cerrada — lista de locales y detection hierarchy publicadas en `docs/architecture/GREENHOUSE_I18N_ARCHITECTURE_V1.md`.
 - No depende de `TASK-430` necesariamente — puede ejecutarse en paralelo si `TASK-430` está avanzada.
 
 ### Blocks / Impacts
@@ -96,14 +96,15 @@ Reglas obligatorias:
 ### Slice 1 — Schema migration
 
 - Migración PG:
-  - `greenhouse_core.tenants.default_locale` (nullable, string BCP 47, CHECK contra lista válida)
-  - `greenhouse_core.identity_profiles.preferred_locale` (nullable, mismo CHECK)
+- Default locale de tenant/account según el owner real de Identity/Account vigente (nullable, string BCP 47, CHECK contra lista válida)
+- `greenhouse_core.identity_profiles.preferred_locale` (nullable, mismo CHECK)
+- Normalización/absorción del legacy `greenhouse_core.client_users.locale` (`es` → `es-CL`, `en` → `en-US`) antes de exponer la preferencia canónica.
 - Regenerar tipos con `pnpm db:generate-types`.
 - Seed values razonables para tenants existentes (probable `es-CL`).
 
 ### Slice 2 — Runtime resolution
 
-- Implementar resolver: `user.preferred_locale` → `tenant.default_locale` → `Accept-Language` → fallback.
+- Implementar resolver: `identity_profiles.preferred_locale` → tenant/account default locale → cookie `gh_locale` → `Accept-Language` → fallback `es-CL`.
 - Integrar con NextAuth callback para que la sesión incluya `effectiveLocale`.
 - Actualizar `src/lib/format/locale-context.ts` (creado por `TASK-429`) para leer del resolver.
 
@@ -117,7 +118,7 @@ Reglas obligatorias:
 ### Slice 4 — Cross-tenant semantics
 
 - Decidir qué locale aplica cuando un colaborador interno (`efeonce_internal`) ve un tenant cliente con otro locale default.
-- Regla propuesta: siempre gana `user.preferred_locale` si existe; si no, el locale del tenant cliente. Validar con ops.
+- Regla decidida por TASK-428: siempre gana la preferencia del usuario si existe; si no, gana el locale default del tenant/account cliente; si no, fallback.
 
 ## Out of Scope
 
@@ -148,6 +149,6 @@ Reglas obligatorias:
 
 ## Open Questions
 
-- ¿Cross-tenant (colaborador interno viendo tenant cliente) — manda user o tenant? Validar con ops.
-- ¿Qué pasa con agentes (agent-auth) — locale fijo en `es-CL` o leen de algún lado?
-- ¿Emails enviados a destinatarios sin sesión (p.ej. clientes que reciben un email) — qué locale usan?
+- Resuelta por TASK-428: cross-tenant manda user preference si existe; si no, tenant/account default.
+- Resuelta por TASK-428: agent-auth default `es-CL` hasta que el agente tenga preferencia persistida.
+- Resuelta por TASK-428: destinatarios sin sesión usan locale explícito/recipient preference cuando exista; si no, fallback `es-CL`.

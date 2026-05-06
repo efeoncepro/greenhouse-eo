@@ -1,6 +1,7 @@
 ## Estado vigente para agentes
 
 - `AGENTS.md` y `CLAUDE.md` son los puntos de entrada operativos para agentes; ambos deben mantenerse alineados cuando cambie un contrato transversal.
+- **i18n/globalization vigente:** `docs/architecture/GREENHOUSE_I18N_ARCHITECTURE_V1.md` es el ADR canónico. Greenhouse usará `next-intl` para App Router, mantiene el portal privado sin locale prefix por defecto, conserva `/api/*`/auth/staging automation sin prefijo, activa `en-US` como primera fase y deja `pt-BR` planned detrás de cobertura/piloto. `src/lib/format/` sigue gobernando valores; `src/lib/copy/` gobierna microcopy. `TASK-266` y `TASK-428` quedan cerradas administrativamente; `TASK-430`/`TASK-431` implementan runtime y persistencia.
 - `docs/operations/SOLUTION_QUALITY_OPERATING_MODEL_V1.md` es el contrato transversal anti-parche: Greenhouse espera soluciones seguras, robustas, resilientes y escalables por defecto; workarounds solo temporales, reversibles y documentados.
 - `docs/operations/CONTEXT_HANDOFF_OPERATING_MODEL_V1.md` gobierna la convivencia entre `project_context.md`, `Handoff.md` y `Handoff.archive.md`: no se pierde auditoria, se separa estado activo de historia.
 - `project_context.md` debe leerse como estado vigente + deltas historicos. Si un delta antiguo contradice esta cabecera, `AGENTS.md`, arquitectura vigente o runtime real, prevalece el contrato vigente y debe documentarse el drift.

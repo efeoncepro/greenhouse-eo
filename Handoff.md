@@ -1,3 +1,13 @@
+# Sesion 2026-05-06 — TASK-428 tomada en develop
+
+- **Branch:** `develop` por instruccion explicita del usuario; no se crea `task/TASK-428-i18n-architecture-decision`.
+- **Ownership:** no habia PR abierto ni branch local/remota obvia para `TASK-428`; se tomo la task y se movio a `docs/tasks/in-progress/`.
+- **Discovery clave:** `TASK-429` ya esta complete, `src/lib/copy/` ya soporta `es-CL` + `en-US` stub, `src/lib/format/` es la primitive canonica de formatting, `src/proxy.ts` ya es el boundary Next.js proxy, y `greenhouse_core.client_users.locale` existe como legacy (`es`/`en`) mientras `tenant.default_locale` / `identity_profiles.preferred_locale` aun no existen.
+- **Decisiones pre-implementacion:** elegir `next-intl` para App Router, mantener portal privado sin locale prefix por defecto, reservar prefixes para public/SEO routes, conservar `/api/*`/auth/staging automation sin prefijo, y resolver emails SSR via dictionaries/core APIs sin depender de provider App Router.
+- **Validacion runtime previa:** `pnpm pg:doctor` OK.
+- **Entrega:** ADR nuevo `docs/architecture/GREENHOUSE_I18N_ARCHITECTURE_V1.md`; `GREENHOUSE_UI_PLATFORM_V1.md` v1.7 linkea el ADR; `TASK-430`/`TASK-431` quedan actualizadas para consumir decisiones cerradas; `TASK-266` se cierra como umbrella formalizada; `TASK_ID_REGISTRY.md` corrige drift de `TASK-408`/`TASK-429`.
+- **Access model:** sin cambios en `routeGroups`, `views`, `entitlements` ni startup policy. Locale queda como preferencia de presentacion, no autorizacion.
+
 # Sesion 2026-05-06 — TASK-811 cerrada en develop
 
 - **Branch:** `develop` por instruccion explicita del usuario; no se crea `task/TASK-811-greenhouse-nomenclature-domain-microcopy-trim`.
