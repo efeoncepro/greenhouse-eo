@@ -149,6 +149,9 @@ const upsertServiceFromHubSpot = async (
     )
     ON CONFLICT (hubspot_service_id) DO UPDATE SET
       name = EXCLUDED.name,
+      space_id = EXCLUDED.space_id,
+      organization_id = EXCLUDED.organization_id,
+      hubspot_company_id = EXCLUDED.hubspot_company_id,
       total_cost = EXCLUDED.total_cost,
       amount_paid = EXCLUDED.amount_paid,
       currency = EXCLUDED.currency,
