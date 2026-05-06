@@ -1,9 +1,9 @@
 # Sistema de Email — Entrega, Templates y Proteccion
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.3
+> **Version:** 1.4
 > **Creado:** 2026-04-06 por Claude (asistido por Julio Reyes)
-> **Ultima actualizacion:** 2026-04-17 por Codex
+> **Ultima actualizacion:** 2026-05-06 por Codex
 > **Documentacion tecnica:** `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md` (seccion email delivery), `docs/architecture/GREENHOUSE_EMAIL_CATALOG_V1.md`
 
 ## Que es
@@ -61,6 +61,16 @@ Hoy Greenhouse **no** tiene todavía:
 | Notificacion generica | `src/emails/NotificationEmail.tsx` | system | es, en | No |
 | Recibo de nomina | `src/emails/PayrollReceiptEmail.tsx` | payroll | es (chile), en (international) | Si |
 | Exportacion de nomina lista | `src/emails/PayrollExportReadyEmail.tsx` | payroll | es | Si |
+| Pago programado | `src/emails/PayrollPaymentCommittedEmail.tsx` | payroll | es, en por regimen | Si |
+| Pago cancelado / en revision | `src/emails/PayrollPaymentCancelledEmail.tsx` | payroll | es, en por regimen | Si |
+| Liquidacion v2 actualizada | `src/emails/PayrollLiquidacionV2Email.tsx` | payroll | es | Si |
+| Cambio de cuenta de pago | `src/emails/BeneficiaryPaymentProfileChangedEmail.tsx` | finance/payroll | es | Si |
+| Permiso aprobado/rechazado | `src/emails/LeaveRequestDecisionEmail.tsx` | hr | es, en | Si |
+| Confirmacion de revision de permiso | `src/emails/LeaveReviewConfirmationEmail.tsx` | hr | es, en | Si |
+| Solicitud de permiso enviada | `src/emails/LeaveRequestSubmittedEmail.tsx` | hr | es, en | Si |
+| Solicitud de permiso por revisar | `src/emails/LeaveRequestPendingReviewEmail.tsx` | hr | es, en | Si |
+| Magic link | `src/emails/MagicLinkEmail.tsx` | identity | es, en | Si |
+| Propuesta comercial compartida | `src/emails/QuoteSharePromptEmail.tsx` | commercial | es | Si |
 | Resumen ejecutivo semanal Nexa | `src/emails/WeeklyExecutiveDigestEmail.tsx` | delivery | es | Si |
 
 Los 4 templates de identidad (invitacion, reset, verificacion, notificacion) soportan espanol e ingles a traves de la prop `locale`. Los templates de payroll usan su propia logica de idioma basada en `payRegime` (chile = espanol, international = ingles).
@@ -130,6 +140,19 @@ Estos son los datos que el Context Resolver auto-resuelve para cada destinatario
 | `platform.logoUrl` | `string` | URL publica del logo para emails |
 
 > Detalle tecnico: definidos en `src/lib/email/tokens.ts` como interfaces TypeScript (`ResolvedRecipientContext`, `ResolvedClientContext`, `ResolvedPlatformContext`).
+
+## TASK-408 Slice 0: dictionary-ready sin perder personalizacion
+
+TASK-408 comenzo la migracion de copy de emails hacia `src/lib/copy/`, pero la capa de personalizacion se mantiene separada y protegida.
+
+La regla es:
+
+- `src/lib/email/tokens.ts` define el contexto canonico del destinatario, cliente y plataforma.
+- `src/lib/email/delivery.ts` mergea ese contexto con los valores enviados por el caller. El caller mantiene prioridad para datos especificos como montos, periodos, cliente, links, adjuntos y mensajes personalizados.
+- `src/lib/copy/dictionaries/es-CL/emails.ts` guarda copy institucional reusable y builders de subject que reciben tokens como parametros.
+- `src/emails/EmailTemplateBaseline.test.tsx` snapshottea los 17 templates y verifica snippets de tokens personalizados para detectar regresiones antes de tocar delivery real.
+
+Esto evita que la migracion a dictionary convierta emails dinamicos en texto fijo o pierda datos como nombre, monto, periodo, `unsubscribeUrl` o links de accion.
 
 ## Soporte de idioma (i18n)
 

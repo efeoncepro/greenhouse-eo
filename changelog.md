@@ -2,6 +2,10 @@
 
 ## 2026-05-06
 
+- **TASK-408 Slice 0 — foundation segura para emails dictionary-ready.** Se agrega el namespace `emails` en `src/lib/copy`, un resolver server-only de locale email con fallback estable `es-CL`, y baseline de snapshots para los 17 templates reales. Los snapshots incluyen assertions de tokens de personalizacion para preservar nombres, cliente, montos, periodos, links y unsubscribe antes de migrar copy institucional.
+
+- **Hardening de verificacion HR/UI.** El test de HR Hierarchy para delegacion temporal deja de depender de `userEvent` async para abrir un dialog simple, y `EmptyState` cancela el fetch de Lottie al desmontar para evitar rechazos tardios durante teardown de jsdom o unmounts reales.
+
 - **TASK-407 completa — migración shared copy sin cambio funcional.** El gate `greenhouse/no-untokenized-copy` ahora detecta arrays de meses y CTAs JSX text, `src/lib/copy/` expone `buildStatusMap()` type-safe, y las superficies compartidas migran meses, status maps, CTAs base, aria-labels, empty states y secondary props fuera de literals inline. El contador del gate queda en 0 warnings y 0 disables; `TASK-408` puede promover la regla a `error`.
 
 - **TASK-429 completa — formato locale-aware canónico.** Se agrega `src/lib/format/` para centralizar moneda, fechas, datetime, hora, keys ISO operacionales, números, porcentajes, tiempo relativo y pluralización. Finance, Payroll, emails, pricing/admin-pricing, dashboard y el sweep transversal de UI migran sus formateos visibles desde `Intl.*` / `toLocale*` directo a la primitive compartida. ESLint `greenhouse/no-raw-locale-formatting` queda en 0 warnings sobre el repo.

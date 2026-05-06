@@ -50,6 +50,7 @@ export type MicrocopyNamespace =
   | 'errors' // Mensajes de error genéricos shared
   | 'feedback' // Toasts, snackbars, confirmaciones genéricas
   | 'time' // Formatos de tiempo relativo: hace X minutos, ayer, etc.
+  | 'emails' // Copy institucional compartido por templates y notification delivery
 
 /**
  * Estructura raíz de un dictionary completo por locale.
@@ -65,6 +66,7 @@ export interface MicrocopyDictionary {
   errors: ErrorsCopy
   feedback: FeedbackCopy
   time: TimeCopy
+  emails: EmailsCopy
 }
 
 /**
@@ -288,6 +290,47 @@ export interface TimeCopy {
   yesterday: string
   today: string
   tomorrow: string
+}
+
+/**
+ * Copy institucional compartido por emails y notificaciones externas.
+ * TASK-408 lo introduce como namespace foundation antes de migrar templates:
+ * primero snapshot baseline, luego consumo progresivo sin cambios de output.
+ */
+export interface EmailsCopy {
+  layout: {
+    logoAlt: string
+    tagline: string
+    automatedDisclaimer: string
+    unsubscribe: string
+  }
+  common: {
+    brandSignature: string
+    linkLabel: string
+  }
+  subjects: {
+    passwordReset: string
+    magicLink: (minutes: number) => string
+    invitation: string
+    verifyEmail: string
+    payrollExport: (periodLabel: string, entryCount: number) => string
+    payrollReceipt: (periodLabel: string) => string
+    payrollLiquidacionV2: (periodLabel: string) => string
+    payrollPaymentCommitted: (periodLabel: string) => string
+    payrollPaymentCancelled: (periodLabel: string) => string
+    beneficiaryPaymentProfileChanged: {
+      created: string
+      approved: string
+      superseded: string
+      cancelled: string
+    }
+    weeklyExecutiveDigest: (periodLabel: string) => string
+    leaveRequestDecision: (leaveTypeName: string) => string
+    leaveReviewConfirmation: (leaveTypeName: string) => string
+    leaveRequestSubmitted: (leaveTypeName: string) => string
+    leaveRequestPendingReview: (memberName: string, leaveTypeName: string) => string
+    quoteShare: (quotationNumber: string) => string
+  }
 }
 
 /**

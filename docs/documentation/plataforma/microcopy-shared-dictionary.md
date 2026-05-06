@@ -18,6 +18,7 @@ El objetivo no es traducir todo el portal todavia. El objetivo es evitar drift: 
 
 - `src/lib/copy/` quedo como fuente canonica de microcopy funcional shared.
 - `getMicrocopy(locale?)` es la API publica para leer acciones, estados, loading, empty states, meses, aria-labels, errores, feedback y tiempo relativo.
+- TASK-408 Slice 0 agrego `emails` como namespace para copy institucional de emails. No reemplaza los tokens de personalizacion; los subject builders reciben valores como periodo, monto o cliente desde el caller.
 - `buildStatusMap()` permite construir status maps type-safe sin repetir labels inline.
 - La regla ESLint `greenhouse/no-untokenized-copy` se extendio para detectar arrays de meses y CTAs JSX text, ademas de los patrones ya existentes.
 - El sweep de `src/views`, `src/components` y `src/app` quedo en 0 warnings para `greenhouse/no-untokenized-copy`.
@@ -29,6 +30,7 @@ El objetivo no es traducir todo el portal todavia. El objetivo es evitar drift: 
 | --- | --- | --- |
 | Nomenclatura de producto | `src/config/greenhouse-nomenclature.ts` | Pulse, Spaces, Mi Greenhouse, Torre de control |
 | Microcopy funcional shared | `src/lib/copy/` | Guardar, Cancelar, Pendiente, Sin resultados, Cerrar dialogo |
+| Copy institucional de emails | `src/lib/copy/dictionaries/es-CL/emails.ts` | Footer, disclaimers y builders de subject que reciben tokens |
 | Copy de dominio local | Cerca del dominio | Estado legal especifico de Payroll o Finance |
 
 ## Uso basico
@@ -52,6 +54,16 @@ const shortMonth = t.months.short[monthIndex]
 const longMonth = t.months.long[monthIndex]
 ```
 
+Para emails:
+
+```ts
+const t = getMicrocopy()
+
+const subject = t.emails.subjects.payrollExport(periodLabel, entryCount)
+```
+
+Los valores personalizados (`periodLabel`, `entryCount`, nombres, montos, links y unsubscribe) siguen viniendo de la capa de delivery/templates. No deben hardcodearse dentro del dictionary.
+
 Para status maps:
 
 ```ts
@@ -73,6 +85,7 @@ const statusLabels = buildStatusMap({
 - Si el texto explica una regla de negocio especifica de una pantalla, puede vivir localmente, con nombre claro y sin duplicar shared copy.
 - Si falta una key shared, agregarla al dictionary con paridad de locales y test cuando aplique.
 - No crear un namespace nuevo si solo lo usa una superficie.
+- En emails, preservar siempre la capa `src/lib/email/tokens.ts` y el merge de `src/lib/email/delivery.ts`: el dictionary no sustituye el contexto de destinatario ni los datos de negocio.
 
 ## Guardrails
 
@@ -97,3 +110,8 @@ La entrega de TASK-407 paso:
 - ESLint focal sobre `src/views`, `src/components` y `src/app` con 0 warnings `greenhouse/no-untokenized-copy`.
 - `pnpm lint`, `pnpm exec tsc --noEmit --pretty false`, `pnpm test` y `pnpm build`.
 
+TASK-408 Slice 0 agrego validacion focal adicional:
+
+- Snapshot baseline de los 17 templates en `src/emails/EmailTemplateBaseline.test.tsx`.
+- Assertions de tokens personalizados para nombre, cliente, montos, periodos, links y unsubscribe.
+- Test unitario de `src/lib/email/locale-resolver.ts`.

@@ -221,7 +221,7 @@ Toda string visible al usuario en Greenhouse EO vive en una de **dos capas canó
 | Capa | Path | Propósito | Locale-aware |
 |---|---|---|---|
 | **Product nomenclature** | `src/config/greenhouse-nomenclature.ts` | Lenguaje propio del producto: Pulse, Spaces, Ciclos, Mi Greenhouse, Torre de control. Navegación. Labels institucionales del shell. | No (es-CL only por design) |
-| **Functional shared microcopy** | `src/lib/copy/` (TASK-265) | CTAs base, estados operativos, loading/processing, empty states, meses, aria-labels, errores genéricos, feedback toasts, tiempo relativo. | Sí (`es-CL` default, `en-US` stub para TASK-266) |
+| **Functional shared microcopy** | `src/lib/copy/` (TASK-265) | CTAs base, estados operativos, loading/processing, empty states, meses, aria-labels, errores genéricos, feedback toasts, tiempo relativo, copy institucional de emails. | Sí (`es-CL` default, `en-US` stub para TASK-266) |
 
 ### API pública del módulo de microcopy
 
@@ -264,6 +264,9 @@ const fullMonth = t.months.long[monthIndex]   // 'Enero' .. 'Diciembre'
 // Tiempo relativo (functions)
 <span>{t.time.minutesAgo(5)}</span>          // 'Hace 5 minutos'
 <span>{t.time.minutesAgo(1)}</span>          // 'Hace 1 minuto'
+
+// Emails institucionales (TASK-408 Slice 0)
+const subject = t.emails.subjects.payrollExport('Marzo 2026', 4)
 ```
 
 ### Decision tree (donde escribir copy nuevo)
@@ -272,8 +275,11 @@ const fullMonth = t.months.long[monthIndex]   // 'Enero' .. 'Diciembre'
 ¿Es product nomenclature (Pulse, Spaces, Ciclos, Mi Greenhouse, Torre de control)?
   → src/config/greenhouse-nomenclature.ts
 
-¿Es navegación, label institucional del shell, o categoría de notificación?
-  → src/config/greenhouse-nomenclature.ts (TASK-408 migra notification-categories ahí)
+¿Es navegación o label institucional del shell?
+  → src/config/greenhouse-nomenclature.ts
+
+¿Es subject/footer/copy institucional compartido de email o categoría de notificación?
+  → src/lib/copy/dictionaries/es-CL/emails.ts (TASK-408)
 
 ¿Es microcopy funcional reusada en >3 surfaces (CTAs, estados, loading, empty, aria)?
   → src/lib/copy/dictionaries/es-CL/<namespace>.ts
@@ -355,6 +361,17 @@ Estado canonico post-sweep:
 - 0 disables de `greenhouse/no-untokenized-copy` en `src/`.
 - Meses, CTAs base, aria-labels, empty states, secondary props compartidas y status maps reutilizables consumen `src/lib/copy/`.
 - `TASK-408` mantiene ownership de notifications/emails y promueve la rule a `error` al cierre.
+
+### Delta 2026-05-06 — TASK-408 Slice 0 emails foundation
+
+TASK-408 Slice 0 agrega el namespace `emails` a `src/lib/copy/`, el helper server-side `src/lib/email/locale-resolver.ts` y snapshot baseline de los 17 templates React Email antes de migrar copy.
+
+Reglas canonicas para emails:
+
+- La personalizacion vive en `src/lib/email/tokens.ts` + el merge de `src/lib/email/delivery.ts`. No mover nombres, montos, periodos, cliente, links o unsubscribe al dictionary como valores fijos.
+- El dictionary `emails` solo almacena copy institucional reusable: footer, disclaimers, labels y subject builders que reciben tokens como argumentos.
+- Los callers siguen mandando contexto de negocio (`fullName`, `periodLabel`, `netTotal`, `clientName`, `shareUrl`, etc.). Durante la migracion, los snapshots deben probar que esos tokens siguen presentes.
+- `resolveEmailLocale()` normaliza `es|en|es-CL|en-US` sin cambiar el contrato actual de templates (`locale?: 'es' | 'en'`).
 
 ### Coordinación con i18n (TASK-266)
 

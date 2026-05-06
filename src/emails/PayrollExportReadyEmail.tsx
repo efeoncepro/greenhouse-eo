@@ -1,3 +1,5 @@
+import { Fragment } from 'react'
+
 import { Heading, Section, Text } from '@react-email/components'
 
 import EmailButton from './components/EmailButton'
@@ -168,11 +170,11 @@ export default function PayrollExportReadyEmail({
           <tbody>
             {summaryRow('Colaboradores', String(entryCount))}
             {breakdowns.map((b) => (
-              <>
+              <Fragment key={`${b.regimeLabel}-${b.currency}`}>
                 {regimeHeaderRow(`${b.regimeLabel} (${b.currency})`)}
                 {summaryRow('Bruto', b.grossTotal, true)}
                 {summaryRow('Neto', b.netTotal, true)}
-              </>
+              </Fragment>
             ))}
           </tbody>
         </table>

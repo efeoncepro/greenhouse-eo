@@ -1,5 +1,16 @@
 # Handoff.md
 
+## Sesion 2026-05-06 — TASK-408 Slice 0 tomada en develop
+
+- **Branch:** `develop` por instruccion explicita del usuario; no se crea `task/TASK-408-copy-migration-notifications-emails`.
+- **Ownership:** no habia PR abierto ni branch local/remota obvia para `TASK-408`; se tomo la task y se movio a `docs/tasks/in-progress/`.
+- **Scope Slice 0:** foundation aditiva para namespace `emails`, helper canonico de locale email y snapshot baseline de templates antes de migrar copy. Entregado con 17 snapshots y assertions explicitas de tokens de personalizacion.
+- **Guardrail:** no tocar `sendEmail`, Resend, `NOTIFICATION_CATEGORIES`, outbox/webhooks, `EmailLayout` ni `EmailButton` hasta tener snapshots baseline verdes.
+- **Tokens de personalizacion:** preservar la capa `src/lib/email/tokens.ts` + merge de `delivery.ts`; snapshots deben cubrir nombre, cliente, montos, periodos, links y unsubscribe para detectar cualquier perdida de contexto.
+- **Hardening de tests observado durante verificacion:** el test de delegacion temporal de HR Hierarchy ahora usa `fireEvent.click` para abrir el dialog sin depender del delay async de `userEvent` en una vista pesada. `EmptyState` mueve el fetch de Lottie a `useEffect` con cancelacion por unmount para evitar `setState` despues del teardown de jsdom o de un unmount real.
+- **Validacion:** `pnpm exec vitest run src/lib/email/locale-resolver.test.ts src/emails/EmailTemplateBaseline.test.tsx --reporter=verbose` OK; `pnpm exec vitest run src/emails src/lib/email/locale-resolver.test.ts --reporter=verbose` OK; focal HR Hierarchy OK; focal EmptyState/Space360 OK; `pnpm exec tsc --noEmit --pretty false` OK; `pnpm lint` OK; `pnpm test` OK (585 suites, 3407 tests, 5 skipped); `pnpm build` OK.
+- **Riesgo observado:** spec declaraba 12 categorias, runtime tiene 13 en `src/config/notification-categories.ts`; se debe migrar el runtime real en Slice 1.
+
 ## Sesion 2026-05-06 — TASK-407 tomada en develop
 
 - **Branch:** `develop` por instruccion explicita del usuario; no se crea `task/TASK-407-copy-migration-shared-shell-components`.

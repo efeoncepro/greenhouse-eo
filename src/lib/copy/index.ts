@@ -117,6 +117,7 @@ export type {
   ActionsCopy,
   AriaCopy,
   EmptyCopy,
+  EmailsCopy,
   ErrorsCopy,
   FeedbackCopy,
   GetMicrocopy,

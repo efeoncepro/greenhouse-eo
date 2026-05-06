@@ -6,12 +6,12 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
-- Status real: `Diseno`
+- Status real: `En implementacion`
 - Rank: `TBD`
 - Domain: `content`
 - Blocked by: `TASK-265` — requiere contrato canónico y capa dictionary-ready. Closing Protocol (promote rule a `error`) requiere además **TASK-407 Slice 0 mergeado** — la rule debe estar extendida a month arrays + JSX text CTAs antes de promover, para que el `error` mode cubra los 6 patterns que el sweep ataca, no solo los 4 originales.
@@ -120,6 +120,8 @@ Reglas obligatorias:
 
 **Verificación Slice 0**: `pnpm test src/emails` pasa con 17 snapshots verdes ANTES de que cualquier slice de migración mergee. Cualquier slice posterior que cambie un byte de output rompe el snapshot — el operador re-aprueba con `pnpm test -u` solo si el cambio es intencional (debe documentarse en PR description).
 
+**Estado 2026-05-06**: Slice 0 entregado en `develop` como foundation aditiva. Se declaro `emails` en `src/lib/copy`, se agrego `src/lib/email/locale-resolver.ts` con stub seguro a `es-CL`, y se cubrieron los 17 templates reales con snapshot baseline + assertions de tokens de personalizacion (nombres, cliente, montos, periodos, links y unsubscribe). No se tocaron `sendEmail`, Resend, outbox/webhooks, `NOTIFICATION_CATEGORIES`, `EmailLayout` ni `EmailButton`.
+
 ### Slice 1 — Notification categories
 
 - Migrar las 12 categorías de `notification-categories.ts` a `getMicrocopy().emails.notificationCategories.<code>.{label,description}` o equivalente.
@@ -170,8 +172,8 @@ Reglas obligatorias:
 
 Anclados al baseline 2026-05-06:
 
-- [ ] **Slice 0 mergeado** antes de cualquier sweep: namespace `emails` declarado, helper `resolveEmailLocale` con stub, 15 snapshot tests baseline verdes.
-- [ ] **17 templates** tienen snapshot test (`pnpm test src/emails` corre 17 con 0 fallos).
+- [x] **Slice 0 mergeado** antes de cualquier sweep: namespace `emails` declarado, helper `resolveEmailLocale` con stub, 15 snapshot tests baseline verdes. Nota: runtime real tiene 17 templates cubiertos en una suite baseline compartida.
+- [x] **17 templates** tienen snapshot test (`pnpm test src/emails` corre 17 con 0 fallos).
 - [ ] **12 categorías** de `notification-categories.ts` consumen `getMicrocopy` para `label` + `description`; cada categoría tiene `subjectKey` cuando aplica.
 - [ ] **0 strings bilingües ad-hoc** (`locale === 'en' ? ... : ...`) restantes en `src/emails/` — verificación: `rg "locale\s*===\s*['\"]en['\"]" src/emails/ | wc -l` retorna 0.
 - [ ] **0 imports de `greenhouse-nomenclature.ts`** desde `src/emails/` — verificación: `rg "from\s+['\"]@/config/greenhouse-nomenclature" src/emails/ | wc -l` retorna 0 (invariante preservada).

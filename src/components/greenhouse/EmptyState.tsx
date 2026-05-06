@@ -1,6 +1,6 @@
 'use client'
 
-import { type ReactNode, Suspense, useState } from 'react'
+import { type ReactNode, Suspense, useCallback, useEffect, useState } from 'react'
 
 import Box from '@mui/material/Box'
 import Stack from '@mui/material/Stack'
@@ -31,6 +31,7 @@ const EmptyState = ({
   const theme = useTheme()
   const prefersReduced = useReducedMotion()
   const [lottieError, setLottieError] = useState(false)
+  const handleLottieError = useCallback(() => setLottieError(true), [])
 
   const showLottie = Boolean(animatedIcon) && !lottieError && !prefersReduced
 
@@ -50,7 +51,7 @@ const EmptyState = ({
       <Stack spacing={1.5} alignItems='center' textAlign='center' sx={{ maxWidth: 360 }}>
         {showLottie ? (
           <Suspense fallback={<StaticIcon icon={icon} theme={theme} />}>
-            <LottieIcon src={animatedIcon!} onError={() => setLottieError(true)} />
+            <LottieIcon src={animatedIcon!} onError={handleLottieError} />
           </Suspense>
         ) : (
           <StaticIcon icon={icon} theme={theme} />
@@ -89,17 +90,26 @@ function StaticIcon({ icon, theme }: { icon: string; theme: Theme }) {
 function LottieIcon({ src, onError }: { src: string; onError: () => void }) {
   const [data, setData] = useState<object | null>(null)
 
-  // Fetch JSON once on mount
-  useState(() => {
+  useEffect(() => {
+    let active = true
+
     fetch(src)
       .then(r => {
         if (!r.ok) throw new Error(`HTTP ${r.status}`)
 
         return r.json()
       })
-      .then(setData)
-      .catch(onError)
-  })
+      .then(animationData => {
+        if (active) setData(animationData)
+      })
+      .catch(() => {
+        if (active) onError()
+      })
+
+    return () => {
+      active = false
+    }
+  }, [onError, src])
 
   if (!data) return null
 
