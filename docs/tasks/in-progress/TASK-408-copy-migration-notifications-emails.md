@@ -225,6 +225,8 @@ Anclados al baseline 2026-05-06:
 
 Deployment: `https://greenhouse-p3vsyz3t4-efeonce-7670142f.vercel.app` (`develop` commit `945b8ea6`).
 
+Revalidacion post-documentation push: `https://greenhouse-dqaqhwmw4-efeonce-7670142f.vercel.app` (`develop` commit `03a90f77`) listo en Vercel Staging, catalogo admin mantiene 17/17 templates, los 5 smoke deliveries siguen como los ultimos `email_preview_test`, KPI `failedToday=0`, `deliveryRate=100`, y `notifications.email.render_failure_rate` sigue `ok` con `total_render_failures=0`.
+
 Metodo seguro: `POST /api/admin/emails/preview` con `recipientEmail=agent-qa@efeoncepro.com`; esto ejercita `sendEmail`, Resend y `email_deliveries` usando `sourceEntity=email_preview_test`, sin tocar payroll lifecycle, leave workflow, quote lifecycle, Nexa digest jobs, outbox publisher, reactive consumer, notification preferences ni webhooks.
 
 Resultados:

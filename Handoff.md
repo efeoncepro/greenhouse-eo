@@ -23130,3 +23130,10 @@ No validado aun:
 
 - Comparacion visual del inbox `agent-qa@efeoncepro.com` contra baseline. El smoke ya valida render + send + persistencia + Resend ID; falta inspeccion visual humana/inbox.
 - Observacion 24h post-deploy del signal para cerrar lifecycle de TASK-408.
+
+Revalidacion posterior:
+
+- Deployment final de `develop` tras commit documental: `https://greenhouse-dqaqhwmw4-efeonce-7670142f.vercel.app` (`03a90f77`) quedo `Ready`.
+- `GET /api/admin/emails/preview` -> 17/17 templates.
+- `GET /api/admin/email-deliveries?limit=5` -> los 5 smoke deliveries siguen como los ultimos `email_preview_test`; KPI `failedToday=0`, `deliveryRate=100`.
+- `GET /api/admin/reliability` -> `notifications.email.render_failure_rate` severity `ok`, `total_render_failures=0`, `delivery_render_failures=0`, `reactive_render_failures=0`, `delivery_failure_rate_percent=0.00`.
