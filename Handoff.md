@@ -23102,3 +23102,31 @@ Validacion focal:
 - `pnpm exec vitest run src/lib/email/templates.test.ts src/emails/EmailTemplateBaseline.test.tsx --reporter=verbose` -> pass, 2 files / 21 tests.
 - `pnpm exec eslint src/lib/email/templates.ts src/lib/email/templates.test.ts --max-warnings=0` -> pass.
 - `pnpm exec tsc --noEmit --pretty false` -> pass.
+
+## Sesion 2026-05-06 — TASK-408 staging smoke: 5 cohorts sent
+
+Contexto:
+
+- Commit `945b8ea6` fue empujado a `develop`; pre-push corrio `pnpm lint` + `pnpm tsc --noEmit` y paso.
+- Vercel Staging completo deployment `https://greenhouse-p3vsyz3t4-efeonce-7670142f.vercel.app`.
+- `pnpm staging:request` autentico correctamente via agent session en ese deployment.
+
+Smoke ejecutado:
+
+- Catalogo admin `/api/admin/emails/preview` -> 17 templates disponibles.
+- Se enviaron 5 emails a `agent-qa@efeoncepro.com` via `POST /api/admin/emails/preview`, todos con `sourceEntity=email_preview_test`:
+  - `payroll_export` -> delivery `6e7b33ef-f8b3-4771-826d-f5958f293992`, Resend `a5c1e8f2-72f2-4627-bb2e-a731c949340f`.
+  - `leave_request_pending_review` -> delivery `d0642f9e-94a6-49da-80ea-d256acedf158`, Resend `af7c1393-8239-4a74-a0c0-a5c616c2c96b`.
+  - `invitation` -> delivery `b3f189dd-f5f1-4189-930d-8f0f4f7dd366`, Resend `cc00926c-dca8-4f31-b276-91ea59abc207`.
+  - `quote_share` -> delivery `08f4b29d-d03f-47ec-9322-75343667e196`, Resend `05e52375-5f8f-4f40-9b6c-adb5591ae819`.
+  - `weekly_executive_digest` -> delivery `bbc78c09-19e5-4d62-b224-f2b55f9fbd59`, Resend `dc91e2f8-8a9e-46e3-a768-6d714b5a2b6d`.
+
+Evidencia runtime:
+
+- `/api/admin/email-deliveries?limit=20`: los 5 smoke deliveries aparecen `status=sent`; KPI `failedToday=0`, `deliveryRate=100`.
+- `/api/admin/reliability`: `notifications.email.render_failure_rate` severity `ok`, `total_render_failures=0`, `delivery_render_failures=0`, `reactive_render_failures=0`, `delivery_failure_rate_percent=0.00`.
+
+No validado aun:
+
+- Comparacion visual del inbox `agent-qa@efeoncepro.com` contra baseline. El smoke ya valida render + send + persistencia + Resend ID; falta inspeccion visual humana/inbox.
+- Observacion 24h post-deploy del signal para cerrar lifecycle de TASK-408.

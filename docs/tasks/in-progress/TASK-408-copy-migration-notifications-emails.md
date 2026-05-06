@@ -206,7 +206,8 @@ Anclados al baseline 2026-05-06:
 - [x] **Reliability signal `notifications.email.render_failure_rate`** declarado y wired al overview. Pendiente operacional post-deploy: observar `/admin/operations` durante 24h y confirmar count = 0.
 - [x] `pnpm build`, `pnpm lint`, `npx tsc --noEmit`, `pnpm test` pasan en verificacion final 2026-05-06: lint pass, tsc pass, build pass, test completo pass (589 files / 3419 passed / 5 skipped).
 - [x] Admin preview catalog cubre todos los 17 templates registrados, incluyendo `quote_share` para smoke finance/Nexa-adjacent sin tocar flujos de negocio.
-- [ ] **Smoke staging** ejecutado: 5 emails de grupos cohesivos enviados a inbox de prueba, comparados visualmente con baseline.
+- [x] **Smoke staging delivery/render** ejecutado 2026-05-06: 5 emails de grupos cohesivos enviados via `/api/admin/emails/preview` a `agent-qa@efeoncepro.com`, todos `status=sent`, `failedToday=0`, con `sourceEntity=email_preview_test`.
+- [ ] **Smoke staging visual inbox**: comparar en inbox QA los 5 emails recibidos contra baseline visual.
 
 ## Verification
 
@@ -219,6 +220,25 @@ Anclados al baseline 2026-05-06:
 - `src/lib/email/templates.test.ts` exige que `getPreviewCatalog()` exponga todos los templates registrados por `listRegisteredTemplates()`. Esto protege el smoke staging: si se registra un email nuevo, queda obligado a tener metadata de preview antes de cerrar.
 - Reliability dashboard muestra `notifications.email.render_failure_rate` con steady=0 durante 24h post-deploy.
 - Smoke staging: 5 emails enviados, recibidos, comparados pixel-by-pixel con captura baseline pre-migración.
+
+### Smoke staging 2026-05-06
+
+Deployment: `https://greenhouse-p3vsyz3t4-efeonce-7670142f.vercel.app` (`develop` commit `945b8ea6`).
+
+Metodo seguro: `POST /api/admin/emails/preview` con `recipientEmail=agent-qa@efeoncepro.com`; esto ejercita `sendEmail`, Resend y `email_deliveries` usando `sourceEntity=email_preview_test`, sin tocar payroll lifecycle, leave workflow, quote lifecycle, Nexa digest jobs, outbox publisher, reactive consumer, notification preferences ni webhooks.
+
+Resultados:
+
+- Payroll: `payroll_export` -> batch `67bb3b47-819f-4af2-9ceb-99d1a38fd928`, delivery `6e7b33ef-f8b3-4771-826d-f5958f293992`, Resend `a5c1e8f2-72f2-4627-bb2e-a731c949340f`, status `sent`.
+- Leave: `leave_request_pending_review` -> batch `d869a00a-aea4-4d3e-9c5d-edd5e2cb941d`, delivery `d0642f9e-94a6-49da-80ea-d256acedf158`, Resend `af7c1393-8239-4a74-a0c0-a5c616c2c96b`, status `sent`.
+- Auth: `invitation` -> batch `925a7272-3a87-47a8-b845-8c21d670fc6d`, delivery `b3f189dd-f5f1-4189-930d-8f0f4f7dd366`, Resend `cc00926c-dca8-4f31-b276-91ea59abc207`, status `sent`.
+- Finance: `quote_share` -> batch `f65a537a-b123-4e5d-b360-7ec196ad17bd`, delivery `08f4b29d-d03f-47ec-9322-75343667e196`, Resend `05e52375-5f8f-4f40-9b6c-adb5591ae819`, status `sent`.
+- Digest/Nexa Insights: `weekly_executive_digest` -> batch `900e2ebc-0865-46bf-a0f1-fc262c62bea4`, delivery `bbc78c09-19e5-4d62-b224-f2b55f9fbd59`, Resend `dc91e2f8-8a9e-46e3-a768-6d714b5a2b6d`, status `sent`.
+
+Immediate reliability check:
+
+- `/api/admin/email-deliveries?limit=20`: latest 5 `email_preview_test` rows all `status=sent`; KPI `failedToday=0`, `deliveryRate=100`.
+- `/api/admin/reliability`: `notifications.email.render_failure_rate` severity `ok`, `total_render_failures=0`, `delivery_render_failures=0`, `reactive_render_failures=0`, `delivery_failure_rate_percent=0.00`.
 
 ## Rollout Policy
 
