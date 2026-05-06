@@ -2,6 +2,8 @@
 
 ## 2026-05-06
 
+- **TASK-407 completa — migración shared copy sin cambio funcional.** El gate `greenhouse/no-untokenized-copy` ahora detecta arrays de meses y CTAs JSX text, `src/lib/copy/` expone `buildStatusMap()` type-safe, y las superficies compartidas migran meses, status maps, CTAs base, aria-labels, empty states y secondary props fuera de literals inline. El contador del gate queda en 0 warnings y 0 disables; `TASK-408` puede promover la regla a `error`.
+
 - **TASK-429 completa — formato locale-aware canónico.** Se agrega `src/lib/format/` para centralizar moneda, fechas, datetime, keys ISO operacionales, números, porcentajes, tiempo relativo y pluralización. Finance, Payroll, emails, pricing/admin-pricing y dashboard migran sus formateos visibles críticos desde `Intl.*` / `toLocale*` directo a la primitive compartida. ESLint suma `greenhouse/no-raw-locale-formatting` en modo `warn` incremental para evitar nuevas regresiones sin romper deuda histórica.
 
 ## 2026-05-05

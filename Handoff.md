@@ -3,10 +3,10 @@
 ## Sesion 2026-05-06 — TASK-407 tomada en develop
 
 - **Branch:** `develop` por instruccion explicita del usuario; no se crea `task/TASK-407-copy-migration-shared-shell-components`.
-- **Ownership:** no hay PR abierto ni branch local/remota obvia para `TASK-407`; se toma la task como `in-progress`.
-- **Lifecycle:** `docs/tasks/to-do/TASK-407-copy-migration-shared-shell-components.md` -> `docs/tasks/in-progress/TASK-407-copy-migration-shared-shell-components.md`; `docs/tasks/README.md` y `docs/tasks/TASK_ID_REGISTRY.md` sincronizados.
-- **Discovery inicial:** foundation `src/lib/copy/` existe y la rule `greenhouse/no-untokenized-copy` esta activa en `warn`; falta el test dedicado de la rule y Slice 0 debe extender deteccion a month arrays + JSX text CTAs antes del sweep.
-- **Pendiente inmediato:** presentar Audit/Mapa/Plan. Por `Priority=P1` + `Effort=Alto`, checkpoint humano aplica antes de runtime si se ejecuta el protocolo estricto completo.
+- **Ownership:** no habia PR abierto ni branch local/remota obvia para `TASK-407`; se tomo la task y quedo cerrada en esta sesion.
+- **Lifecycle:** `docs/tasks/to-do/TASK-407-copy-migration-shared-shell-components.md` -> `docs/tasks/in-progress/TASK-407-copy-migration-shared-shell-components.md` -> `docs/tasks/complete/TASK-407-copy-migration-shared-shell-components.md`; `docs/tasks/README.md` y `docs/tasks/TASK_ID_REGISTRY.md` sincronizados.
+- **Discovery inicial:** foundation `src/lib/copy/` existia y la rule `greenhouse/no-untokenized-copy` estaba activa en `warn`; se confirmo que el sweep necesitaba extender primero la deteccion a month arrays + JSX text CTAs.
+- **Resultado:** TASK-407 completa; ver bloque de cierre "TASK-407 Copy Migration: Shared Shell + Components completada" mas abajo para commits y validaciones.
 
 ## Sesion 2026-05-06 — TASK-429 cerrada en develop
 
@@ -22810,3 +22810,46 @@ Validaciones adicionales:
 - `pnpm exec eslint src/lib/payroll/final-settlement/document-pdf.tsx src/lib/payroll/final-settlement/document-pdf.test.tsx` -> pass.
 - `pnpm exec tsc --noEmit --pretty false` -> pass.
 - `pnpm design:lint` -> 0 errors / 0 warnings.
+
+## Sesion 2026-05-06 — TASK-407 Copy Migration: Shared Shell + Components completada
+
+Contexto:
+
+- El usuario pidió implementar TASK-407 end-to-end y mantenerse en `develop`.
+- Se detectó que la task estaba libre, se movió a `docs/tasks/in-progress/`, y se documentó ownership en esta misma sesión.
+- El usuario remarcó que debía ser una mejora incremental sin romper lo existente; se descartó una pasada automática no committeada que rompía TypeScript y se rehízo el slice final desde el último commit sano.
+
+Cambios aplicados:
+
+- `greenhouse/no-untokenized-copy` ahora cubre arrays de meses y CTAs JSX text, con test unitario.
+- `src/lib/copy/index.ts` agrega `buildStatusMap()` type-safe para status maps y test unitario.
+- Se migraron meses, status maps, CTAs base, aria-labels, empty states y secondary props en `src/components/**` y `src/views/**`.
+- Para copy compartida se reutilizó `getMicrocopy()` (`actions`, `states`, `months`, `empty`, `aria` existentes). Para copy domain-specific de una sola superficie se usaron constantes locales por archivo, preservando texto visible y evitando expandir el dictionary global sin reuso real.
+- No se tocaron login, access model, DB, capabilities, events, migrations ni runtime backend.
+
+Commits en `develop`:
+
+- `fd59e1c3` — `chore: start TASK-407 copy migration gate`
+- `3f11e10f` — `refactor: migrate shared month labels`
+- `49159204` — `refactor: canonicalize shared status labels`
+- `a87c7477` — `style: normalize migrated month copy imports`
+- `7e9f21de` — `refactor: migrate shared CTA labels`
+- `6d2011e0` — `refactor: migrate remaining shared UI copy`
+
+Validaciones:
+
+- `node eslint-plugins/greenhouse/rules/__tests__/no-untokenized-copy.test.mjs` -> pass.
+- `pnpm exec vitest run src/lib/copy/index.test.ts --reporter=verbose` -> pass.
+- `pnpm exec eslint src/views src/components src/app --format json -o /tmp/task407-eslint-postbuild.json` -> 0 errors, 0 warnings `greenhouse/no-untokenized-copy`.
+- `rg "eslint-disable.*no-untokenized-copy" src/ -n | wc -l` -> 0.
+- `pnpm exec tsc --noEmit --pretty false` -> pass.
+- `pnpm test` -> 583 test files passed, 3385 tests passed, 5 skipped. Hubo aviso conocido de jsdom/canvas, no fallo.
+- `pnpm lint` -> pass con 0 errors; quedan 265 warnings heredados de `greenhouse/no-raw-locale-formatting`, fuera de TASK-407.
+- `pnpm build` -> pass.
+
+Cierre / follow-ups:
+
+- TASK-407 queda lista para mover a `complete/`.
+- TASK-408 puede promover `greenhouse/no-untokenized-copy` a `error` cubriendo 6 patterns.
+- `TASK-811` conserva el trim de `greenhouse-nomenclature.ts`, fuera de scope de TASK-407.
+- No se ejecutó smoke visual manual en preview/staging; el cambio fue refactor de strings y quedó cubierto por lint/tsc/test/build. Si se quiere evidencia visual, revisar `/home`, `/finance/cash-out`, `/finance/reconciliation`, `/people` y `/admin/ops-health` en staging.
