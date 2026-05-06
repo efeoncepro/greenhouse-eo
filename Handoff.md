@@ -1,3 +1,36 @@
+# Sesion 2026-05-06 — TASK-801 cerrada en develop (engagement primitive Slice 1)
+
+- **Branch:** `develop` por instruccion explicita del usuario; no se crea `task/TASK-801-engagement-primitive-services-extension`.
+- **Skill arch-architect invocada** con overlay Greenhouse, fases 1–6 ejecutadas en orden. **Skill greenhouse-backend invocada** antes de escribir la migration.
+- **Discovery (Fase 1) detecto 2 desvios criticos vs spec** (heredados de `GREENHOUSE_PILOT_ENGAGEMENT_ARCHITECTURE_V1.md` §3.2):
+  1. `services.service_id` es `TEXT` no `UUID` — spec declaraba FK como `UUID REFERENCES services(service_id)` pero realidad del repo es `text`. Ajuste mecanico aplicado.
+  2. `commercial_cost_attribution_v2` es **VIEW** no TABLE — creada por TASK-708 y refinada en TASK-709b (UNION ALL de 3 CTEs). `ALTER TABLE` no aplica. Ajuste arquitectural: `CREATE OR REPLACE VIEW` agregando `'operational'::TEXT AS attribution_intent` literal en cada SELECT, preservando shape exacto.
+- **Auditoria (Fase 2)** imprimio reporte canonico identificando los 2 supuestos desactualizados, codigo existente reutilizable (TASK-709b VIEW como template, scripts/migrate.ts), y dependencias faltantes = ninguna. Spec corregida con Delta 2026-05-06 pre-implementacion antes de tocar codigo.
+- **Mapa de conexiones (Fase 3)**: 4 columnas nuevas, 0 eventos emitidos hoy (TASK-808 introduce los 9 outbox events), consumers actuales NO afectados (todos usan SELECT explicito por columnas, no SELECT *), defaults `'regular'` y `'operational'` preservan semantica 100%. Productores futuros: TASK-802/803/808/813. Consumidores futuros: TASK-806 (gtm_investment_pnl filter), TASK-809 (UI sample sprints), TASK-810 (anti-zombie CHECK).
+- **Plan (Fase 4)**: artefacto unico = migration; ningun helper/route/UI/event publisher/consumer en esta task (es DDL puro).
+- **Implementacion (Fase 5)**: migration `20260506200742463_task-801-engagement-primitive-services-extension.sql` creada via `pnpm migrate:create`, aplicada via `pnpm pg:connect:migrate`. Output: `Migrations complete!` + `Types updated in src/types/db.d.ts (368 tablas, 969ms)`.
+- **Verificacion DDL post-migration via `information_schema` y `pg_constraint`** (anti TASK-768 silent failure):
+  - `greenhouse_core.services.engagement_kind` text NOT NULL DEFAULT `'regular'` con CHECK enum {regular,pilot,trial,poc,discovery}.
+  - `greenhouse_core.services.commitment_terms_json` jsonb NULL.
+  - `greenhouse_core.client_team_assignments.service_id` text NULL FK to services con `ON DELETE SET NULL`.
+  - `greenhouse_serving.commercial_cost_attribution.attribution_intent` text NOT NULL DEFAULT `'operational'` con CHECK enum {operational,pilot,trial,poc,discovery,overhead}.
+  - Indice partial `client_team_assignments_service_idx WHERE service_id IS NOT NULL` creado.
+  - VIEW `commercial_cost_attribution_v2` reescrita preservando shape exacto TASK-709b + nueva columna `attribution_intent` literal `'operational'`.
+- **Backward compat 100% verificado**: 30/30 services preservan `engagement_kind='regular'`, 9/9 CCA rows preservan `attribution_intent='operational'`.
+- **Verificacion runtime (Fase 6)**: `pnpm exec tsc --noEmit` clean, `pnpm lint` clean, `pnpm test src/lib/services src/lib/commercial-cost-attribution` 39/39 pass, `pnpm build` clean.
+- **Docs actualizados**: spec arch `GREENHOUSE_PILOT_ENGAGEMENT_ARCHITECTURE_V1.md` con `Delta v1.3 (2026-05-06)` documentando los 2 ajustes vs spec + hard rule futura ("toda FK a `services.service_id` debe ser TEXT no UUID; toda extension de CCA v2 debe ser CREATE OR REPLACE VIEW no ALTER TABLE"); `docs/tasks/README.md` con bullet ✅ TASK-801 cerrada; `docs/tasks/TASK_ID_REGISTRY.md` con lifecycle complete; `Handoff.md` (este entry); `changelog.md`.
+- **Acceptance criteria todos verdes**:
+  - `pnpm migrate:up` aplica sin errores ✅
+  - `pnpm db:generate-types` regenera `db.d.ts` con las 4 columnas tipadas ✅
+  - `\d+ services` muestra `engagement_kind` + `commitment_terms_json` con CHECK ✅
+  - `\d+ client_team_assignments` muestra `service_id` con FK ✅
+  - CCA v1 + v2 muestran `attribution_intent` con CHECK ✅
+  - `pnpm test` verde sin nuevos tests; consumers existentes no rotos ✅
+  - SQL count: 30 regular = total services (backward compat) ✅
+  - SQL count: 9 operational = total CCA (backward compat) ✅
+- **Habilita downstream**: TASK-802 (commercial_terms time-versioned), TASK-803 (phases/outcomes/lineage), TASK-806 (gtm_investment_pnl reclassifier), TASK-813 (HubSpot sync + phantom cleanup, recomendado correr inmediatamente despues de esta).
+- **Sin cambios de access model**: capabilities sin tocar (TASK-555 las introducira en namespace `commercial.*`); routeGroups sin tocar; views/entitlements sin tocar; startup policy sin tocar. Es DDL puro de capa 1, schema-level only.
+
 # Sesion 2026-05-06 — TASK-813 creada + orden de ejecucion EPIC-014/EPIC-002 documentado
 
 - **Branch:** `develop` (planning + spec creation only — no implementation).

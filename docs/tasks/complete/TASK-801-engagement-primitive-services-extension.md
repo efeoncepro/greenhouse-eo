@@ -1,5 +1,13 @@
 # TASK-801 — Engagement Primitive: services + cost_attribution Extension
 
+## Delta 2026-05-06 (post-audit Phase 2 — pre-implementación)
+
+Auditoría pre-implementación detectó dos desvíos vs el repo real. Spec arch heredada (`GREENHOUSE_PILOT_ENGAGEMENT_ARCHITECTURE_V1.md` §3.2) tiene la misma desviación; ambos ajustes son mecánicos y preservan el intent.
+
+1. **`services.service_id` es `TEXT`, no `UUID`.** Spec declara FK como `UUID REFERENCES services(service_id)`. Realidad: el PK de `services` es `text` y `assignment_id` también es `text`. **Ajuste**: usar `service_id TEXT REFERENCES greenhouse_core.services(service_id)`.
+
+2. **`commercial_cost_attribution_v2` es VIEW, no TABLE.** Creada en TASK-708 y refinada en TASK-709b. Es UNION ALL de 3 CTEs. No se le puede `ALTER TABLE`. **Ajuste**: usar `CREATE OR REPLACE VIEW` agregando `'operational'::TEXT AS attribution_intent` literal. La columna existe en el shape para que consumers downstream puedan filtrarla; cuando TASK-802/806 introduzcan JOIN a `engagement_commercial_terms`, la derivación real se actualiza.
+
 ## Delta 2026-05-06
 
 - Auditoría arch-architect detectó 30 filas fantasma en `core.services` seedeadas el 2026-03-16 como cross-product `service_modules × clients` con `hubspot_service_id IS NULL`. Después de aplicar la DDL de TASK-801 (que defaultea `engagement_kind='regular'` para todas), **TASK-813 reclasificará esas 30 filas a `engagement_kind='discovery'` + `status='legacy_seed_archived'` + `active=FALSE`**.
@@ -8,16 +16,34 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Bajo`
 - Type: `migration`
 - Epic: `EPIC-014`
-- Status real: `Diseño aprobado`
+- Status real: `Implementado y verificado 2026-05-06`
 - Domain: `commercial`
 - Blocked by: `none`
-- Branch: `task/TASK-801-engagement-primitive-services-extension`
+- Branch: `develop` (migration directa, sin branch dedicado)
+- Migration: `20260506200742463_task-801-engagement-primitive-services-extension.sql`
+
+## Closure Evidence (2026-05-06)
+
+- Migration aplicada vía `pnpm pg:connect:migrate` — output `Migrations complete!` + `Types updated in src/types/db.d.ts`.
+- 4 columnas creadas verificadas via `information_schema.columns`:
+  - `greenhouse_core.services.engagement_kind` text NOT NULL DEFAULT 'regular'
+  - `greenhouse_core.services.commitment_terms_json` jsonb NULL
+  - `greenhouse_core.client_team_assignments.service_id` text NULL
+  - `greenhouse_serving.commercial_cost_attribution.attribution_intent` text NOT NULL DEFAULT 'operational'
+- 2 CHECK constraints verificados via `pg_constraint`:
+  - `services_engagement_kind_check` enforces enum {regular,pilot,trial,poc,discovery}
+  - `commercial_cost_attribution_attribution_intent_check` enforces enum {operational,pilot,trial,poc,discovery,overhead}
+- 1 índice partial verificado via `pg_indexes`: `client_team_assignments_service_idx WHERE service_id IS NOT NULL`
+- VIEW `commercial_cost_attribution_v2` reescrita preservando shape TASK-709b + columna `attribution_intent` literal `'operational'`. SELECT live retorna 9 rows con dimensión nueva visible.
+- Backward compat 100%: 30/30 services preservan `engagement_kind='regular'`, 9/9 attribution rows preservan `attribution_intent='operational'`.
+- Types regenerados en `src/types/db.d.ts` (368 tablas introspected, 969ms).
+- Verificación: `pnpm exec tsc --noEmit` clean, `pnpm lint` clean, `pnpm test src/lib/services src/lib/commercial-cost-attribution` 39/39 pass, `pnpm build` clean.
 
 ## Summary
 

@@ -1841,6 +1841,10 @@ export interface GreenhouseCoreClientTeamAssignments {
   hours_per_month: number | null;
   member_id: string;
   role_title_override: string | null;
+  /**
+   * FK opcional a services. NULL = asignación al cliente en general (legacy). NOT NULL = asignación a service específico (Sample Sprint, contrato puntual). Habilita distinción "Valentina en Sky en general" vs "Valentina en Sky Content Lead Sprint".
+   */
+  service_id: string | null;
   start_date: Timestamp | null;
   updated_at: Generated<Timestamp>;
 }
@@ -2649,10 +2653,18 @@ export interface GreenhouseCoreServices {
   active: Generated<boolean>;
   amount_paid: Generated<Numeric | null>;
   billing_frequency: Generated<string | null>;
+  /**
+   * Términos del engagement (JSONB libre): success_criteria, decision_deadline, expected_internal_cost_clp. Se formaliza en tabla engagement_commercial_terms via TASK-802.
+   */
+  commitment_terms_json: Json | null;
   country: Generated<string | null>;
   created_at: Generated<Timestamp>;
   created_by: string | null;
   currency: Generated<string>;
+  /**
+   * Sub-tipo de engagement comercial. UI brand "Sample Sprint" envuelve los 4 valores non-regular. Genérico para sobrevivir marketing pivots — ver EPIC-014.
+   */
+  engagement_kind: Generated<string>;
   hubspot_company_id: string | null;
   hubspot_deal_id: string | null;
   hubspot_last_synced_at: Timestamp | null;
@@ -6446,6 +6458,10 @@ export interface GreenhouseServingClientLaborCostAllocationConsolidated {
 
 export interface GreenhouseServingCommercialCostAttribution {
   allocation_ratio: Generated<Numeric>;
+  /**
+   * Dimensión de intent de atribución. operational = cobro al cliente (default). pilot/trial/poc/discovery = costo GTM Investment (no cobrado, ver gtm_investment_pnl TASK-806). overhead = costo compartido. La VIEW canónica gtm_investment_pnl filtra por este campo.
+   */
+  attribution_intent: Generated<string>;
   base_labor_cost_target: Generated<Numeric>;
   client_id: string;
   client_name: string;
@@ -6469,6 +6485,7 @@ export interface GreenhouseServingCommercialCostAttribution {
 
 export interface GreenhouseServingCommercialCostAttributionV2 {
   amount_clp: Numeric | null;
+  attribution_intent: string | null;
   client_id: string | null;
   cost_dimension: string | null;
   fte_contribution: Numeric | null;

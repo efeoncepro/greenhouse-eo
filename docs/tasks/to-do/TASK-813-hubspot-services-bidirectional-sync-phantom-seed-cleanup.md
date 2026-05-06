@@ -1,5 +1,11 @@
 # TASK-813 — HubSpot p_services (0-162) Sync Activation + Phantom Seed Cleanup
 
+## Delta 2026-05-06 (post TASK-801 cierre)
+
+Hard dep TASK-801 cerrada en `develop` (migration `20260506200742463_task-801-engagement-primitive-services-extension.sql` aplicada). El column `engagement_kind` ya está disponible con DEFAULT `'regular'` para las 30 filas legacy. Esta task ya puede ejecutarse — Slice 2 (archive script) puede setear `engagement_kind='discovery'` directamente.
+
+Soft dep TASK-555 sigue pendiente. Si se ejecuta antes de TASK-555, las capabilities de TASK-813 (`commercial.service_engagement.{sync,resolve_orphan,archive_legacy}`) viven temporalmente en namespace `finanzas.*` con TODO de migración.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
