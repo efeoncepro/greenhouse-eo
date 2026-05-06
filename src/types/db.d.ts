@@ -1792,6 +1792,7 @@ export interface GreenhouseCoreClients {
   client_name: string;
   country_code: string | null;
   created_at: Generated<Timestamp>;
+  default_locale: string | null;
   hubspot_company_id: string | null;
   legal_name: string | null;
   /**
@@ -1955,6 +1956,7 @@ export interface GreenhouseCoreIdentityProfiles {
   job_title: string | null;
   merged_into_profile_id: string | null;
   notes: string | null;
+  preferred_locale: string | null;
   primary_source_object_id: string | null;
   primary_source_object_type: string | null;
   primary_source_system: string | null;
@@ -2281,6 +2283,7 @@ export interface GreenhouseCoreOrganizations {
   commercial_party_id: Generated<string>;
   country: Generated<string | null>;
   created_at: Generated<Timestamp>;
+  default_locale: string | null;
   hubspot_company_id: string | null;
   industry: string | null;
   /**
@@ -7612,9 +7615,11 @@ export interface GreenhouseServingSession360 {
   active: boolean | null;
   auth_mode: string | null;
   avatar_url: string | null;
+  client_default_locale: string | null;
   client_id: string | null;
   client_name: string | null;
   default_portal_home_path: string | null;
+  effective_locale: string | null;
   email: string | null;
   feature_flags: string[] | null;
   full_name: string | null;
@@ -7623,15 +7628,18 @@ export interface GreenhouseServingSession360 {
   identity_profile_id: string | null;
   last_login_at: Timestamp | null;
   last_login_provider: string | null;
+  legacy_locale: string | null;
   member_id: string | null;
   microsoft_email: string | null;
   microsoft_oid: string | null;
   microsoft_tenant_id: string | null;
+  organization_default_locale: string | null;
   organization_id: string | null;
   organization_name: string | null;
   organization_public_id: string | null;
   password_hash: string | null;
   password_hash_algorithm: string | null;
+  preferred_locale: string | null;
   public_id: string | null;
   role_codes: string[] | null;
   route_groups: string[] | null;
