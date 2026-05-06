@@ -1,5 +1,8 @@
 import { Heading, Section, Text } from '@react-email/components'
 
+import { getMicrocopy, type NotificationEmailTemplateCopy } from '@/lib/copy'
+import { selectEmailTemplateCopy } from '@/lib/email/template-copy'
+
 import EmailButton from './components/EmailButton'
 import EmailLayout from './components/EmailLayout'
 import { EMAIL_COLORS, EMAIL_FONTS } from './constants'
@@ -14,6 +17,12 @@ interface NotificationEmailProps {
   unsubscribeUrl?: string
 }
 
+const LEGACY_EN_NOTIFICATION_EMAIL_COPY: NotificationEmailTemplateCopy = {
+  greeting: name => name ? `Hi ${name},` : 'Hi,',
+  defaultAction: 'View in Greenhouse',
+  fallback: 'If the button does not work, copy and paste this address into your browser:'
+}
+
 export default function NotificationEmail({
   title = 'Nuevo activo disponible para revisión',
   body = 'El equipo de diseño subió 3 nuevos archivos al proyecto Campaña Q2. Requieren tu aprobación antes del viernes.',
@@ -23,15 +32,7 @@ export default function NotificationEmail({
   locale = 'es',
   unsubscribeUrl
 }: NotificationEmailProps) {
-  const t = locale === 'en' ? {
-    greeting: (name?: string) => name ? `Hi ${name},` : 'Hi,',
-    defaultAction: 'View in Greenhouse',
-    fallback: 'If the button does not work, copy and paste this address into your browser:'
-  } : {
-    greeting: (name?: string) => name ? `Hola ${name.split(' ')[0]},` : 'Hola,',
-    defaultAction: 'Ver en Greenhouse',
-    fallback: 'Si el bot\u00f3n no funciona, copia y pega esta direcci\u00f3n en tu navegador:'
-  }
+  const t = selectEmailTemplateCopy(locale, getMicrocopy().emails.genericNotification, LEGACY_EN_NOTIFICATION_EMAIL_COPY)
 
   return (
     <EmailLayout previewText={title} locale={locale} unsubscribeUrl={unsubscribeUrl}>

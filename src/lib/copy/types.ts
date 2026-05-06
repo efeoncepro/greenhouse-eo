@@ -355,6 +355,12 @@ export interface InvitationEmailTemplateCopy {
   previewText: (inviter: string, client: string) => string
 }
 
+export interface NotificationEmailTemplateCopy {
+  greeting: (name?: string) => string
+  defaultAction: string
+  fallback: string
+}
+
 /**
  * Copy institucional compartido por emails y notificaciones externas.
  * TASK-408 lo introduce como namespace foundation antes de migrar templates:
@@ -377,6 +383,7 @@ export interface EmailsCopy {
     passwordReset: PasswordResetEmailTemplateCopy
     invitation: InvitationEmailTemplateCopy
   }
+  genericNotification: NotificationEmailTemplateCopy
   notificationCategories: NotificationCategoryCopy
   subjects: {
     passwordReset: string

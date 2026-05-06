@@ -128,6 +128,7 @@ export type {
   MicrocopyDictionary,
   MicrocopyNamespace,
   MonthsCopy,
+  NotificationEmailTemplateCopy,
   NotificationCategoryCopy,
   NotificationCategoryCopyCode,
   PasswordResetEmailTemplateCopy,

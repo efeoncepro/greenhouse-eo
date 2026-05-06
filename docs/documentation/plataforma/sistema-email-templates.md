@@ -169,6 +169,8 @@ Frontera operativa:
 
 `VerifyEmail`, `MagicLinkEmail`, `PasswordResetEmail` e `InvitationEmail` son los primeros templates individuales migrados a dictionary. El copy en espanol vive en `getMicrocopy().emails.auth.*`; el copy ingles queda como fallback legacy mientras `en-US` sea mirror de `es-CL`.
 
+`NotificationEmail` usa el mismo selector con `getMicrocopy().emails.genericNotification` para copy fallback del render. El titulo, cuerpo, CTA explicita, URL de accion y unsubscribe siguen siendo payload dinamico del pipeline de notificaciones.
+
 La primitive `selectEmailTemplateCopy()` permite repetir este patron en los siguientes templates sin tocar delivery:
 
 - `es` / `es-CL` / default → dictionary de plataforma.

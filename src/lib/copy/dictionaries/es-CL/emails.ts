@@ -60,6 +60,11 @@ export const emails: EmailsCopy = {
       previewText: (inviter, client) => `${inviter} te invitó a ${client} en Greenhouse`
     }
   },
+  genericNotification: {
+    greeting: name => name ? `Hola ${name.split(' ')[0]},` : 'Hola,',
+    defaultAction: 'Ver en Greenhouse',
+    fallback: 'Si el botón no funciona, copia y pega esta dirección en tu navegador:'
+  },
   notificationCategories: {
     delivery_update: {
       label: 'Delivery updates',

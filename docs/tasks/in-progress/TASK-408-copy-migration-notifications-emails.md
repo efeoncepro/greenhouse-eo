@@ -151,6 +151,8 @@ Reglas obligatorias:
 
 **Estado 2026-05-06**: Slice 3A cierra el grupo auth con templates de bajo blast radius: `VerifyEmail`, `MagicLinkEmail`, `PasswordResetEmail` e `InvitationEmail`. Se agrego `selectEmailTemplateCopy()` para que los templates consuman dictionary `es` sin convertir `en` a espanol mientras `en-US` siga como mirror. Estos templates consumen `getMicrocopy().emails.auth.*` para `es` y conservan fallback legacy para `en`. Snapshot baseline sigue estable; no se tocaron subject registry, delivery auth, URLs ni handlers.
 
+**Estado 2026-05-06**: Slice 3B migra `NotificationEmail` a `getMicrocopy().emails.genericNotification` con fallback legacy `en`. Snapshot baseline sigue estable; no se tocaron `NotificationService`, payloads, preferencias, unsubscribe, outbox, webhooks ni eventos reactivos.
+
 ### Slice 4 — Reliability signal `notifications.email.render_failure_rate`
 
 - Reader: [src/lib/reliability/queries/email-render-failure.ts](../../src/lib/reliability/queries/email-render-failure.ts). Cuenta failures de render del outbox consumer en últimas 24h sobre `greenhouse_sync.outbox_events WHERE event_type LIKE 'notification.email.%' AND status='failed' AND last_error LIKE '%render%'`.
