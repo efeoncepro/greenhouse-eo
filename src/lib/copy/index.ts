@@ -121,6 +121,7 @@ export type {
   ErrorsCopy,
   FeedbackCopy,
   GetMicrocopy,
+  InvitationEmailTemplateCopy,
   LoadingCopy,
   Locale,
   MagicLinkEmailTemplateCopy,

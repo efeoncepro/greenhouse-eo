@@ -8,7 +8,7 @@
 
 - **TASK-408 Slice 2A — EmailLayout consume microcopy sin cambiar templates.** El shell compartido de emails toma logo alt, tagline, disclaimer y unsubscribe desde `getMicrocopy().emails.layout` para `es`, conserva fallback legacy en `en` mientras `en-US` sea mirror, y mantiene snapshots de los 17 templates sin cambios. `EmailButton` queda intacto porque no contiene copy propio.
 
-- **TASK-408 Slice 3A — templates auth migrados con fallback seguro.** Se agrega `selectEmailTemplateCopy()` para que los templates puedan consumir dictionary `es` sin degradar `en` mientras `en-US` siga como mirror. `VerifyEmail`, `MagicLinkEmail` y `PasswordResetEmail` usan `getMicrocopy().emails.auth.*` con snapshot byte-estable.
+- **TASK-408 Slice 3A — templates auth migrados con fallback seguro.** Se agrega `selectEmailTemplateCopy()` para que los templates puedan consumir dictionary `es` sin degradar `en` mientras `en-US` siga como mirror. `VerifyEmail`, `MagicLinkEmail`, `PasswordResetEmail` e `InvitationEmail` usan `getMicrocopy().emails.auth.*` con snapshot byte-estable.
 
 - **Hardening de verificacion HR/UI.** El test de HR Hierarchy para delegacion temporal deja de depender de `userEvent` async para abrir un dialog simple, y `EmptyState` cancela el fetch de Lottie al desmontar para evitar rechazos tardios durante teardown de jsdom o unmounts reales.
 

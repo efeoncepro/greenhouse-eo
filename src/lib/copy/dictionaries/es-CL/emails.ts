@@ -45,6 +45,19 @@ export const emails: EmailsCopy = {
       disclaimer: 'Si no realizaste esta solicitud, no te preocupes — tu contraseña actual sigue siendo segura y no se ha modificado. Puedes ignorar este correo.',
       fallback: 'Si el botón no funciona, copia y pega esta dirección en tu navegador:',
       previewText: 'Solicitud de cambio de contraseña — enlace válido por 1 hora'
+    },
+    invitation: {
+      heading: 'Te han invitado a Greenhouse',
+      greeting: name => name ? `Hola ${name.split(' ')[0]},` : 'Hola,',
+      bodyPrefix: 'te invitó a unirte al equipo de',
+      bodySuffix: ' en Efeonce Greenhouse™, la plataforma de gestión y operaciones.',
+      validityPrefix: 'Solo necesitas crear tu contraseña para activar tu cuenta. El enlace es válido por ',
+      validityBold: '72 horas',
+      validitySuffix: '.',
+      cta: 'Activar mi cuenta',
+      disclaimer: 'Si no esperabas esta invitación, puedes ignorar este correo de forma segura.',
+      fallback: 'Si el botón no funciona, copia y pega esta dirección en tu navegador:',
+      previewText: (inviter, client) => `${inviter} te invitó a ${client} en Greenhouse`
     }
   },
   notificationCategories: {

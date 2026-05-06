@@ -167,7 +167,7 @@ Frontera operativa:
 
 ## TASK-408 Slice 3A: templates auth incrementales
 
-`VerifyEmail`, `MagicLinkEmail` y `PasswordResetEmail` son los primeros templates individuales migrados a dictionary. El copy en espanol vive en `getMicrocopy().emails.auth.*`; el copy ingles queda como fallback legacy mientras `en-US` sea mirror de `es-CL`.
+`VerifyEmail`, `MagicLinkEmail`, `PasswordResetEmail` e `InvitationEmail` son los primeros templates individuales migrados a dictionary. El copy en espanol vive en `getMicrocopy().emails.auth.*`; el copy ingles queda como fallback legacy mientras `en-US` sea mirror de `es-CL`.
 
 La primitive `selectEmailTemplateCopy()` permite repetir este patron en los siguientes templates sin tocar delivery:
 
