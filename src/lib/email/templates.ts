@@ -1216,13 +1216,14 @@ interface QuoteShareContext extends Record<string, unknown> {
 }
 
 registerTemplate<QuoteShareContext>('quote_share', context => {
+  const t = getMicrocopy().emails.quoteShare
   const greetingName = context.recipientName?.split(' ')[0] ?? null
-  const greeting = greetingName ? `Hola ${greetingName},` : 'Hola,'
+  const greeting = t.greeting(greetingName)
 
   return {
     subject:
       context.subject
-      ?? `Propuesta ${context.quotationNumber} v${context.versionNumber} para ${context.clientName}`,
+      ?? getMicrocopy().emails.subjects.quoteShare(context.quotationNumber, context.versionNumber, context.clientName),
     react: QuoteSharePromptEmail({
       shareUrl: context.shareUrl,
       quotationNumber: context.quotationNumber,
@@ -1239,24 +1240,24 @@ registerTemplate<QuoteShareContext>('quote_share', context => {
       pdfFileName: context.pdfFileName ?? null
     }),
     text: [
-      `PROPUESTA ${context.quotationNumber} v${context.versionNumber}`,
-      `PARA: ${context.clientName}`,
-      '═══════════════════════════════════',
+      t.plainTextHeader(context.quotationNumber, context.versionNumber),
+      `${t.plainTextClientPrefix}${context.clientName}`,
+      t.plainTextSeparator,
       '',
       greeting,
       '',
       context.customMessage ?? '',
       context.customMessage ? '' : null,
-      `Te comparto la propuesta comercial que preparamos para tu equipo en ${context.clientName}.`,
+      t.plainTextBody(context.clientName),
       '',
       context.hasPdfAttached && context.pdfFileName
-        ? `📎 ADJUNTO: ${context.pdfFileName}`
+        ? `${t.plainTextAttachmentPrefix}${context.pdfFileName}`
         : null,
       context.hasPdfAttached ? '' : null,
-      `Inversión total: ${context.totalLabel}`,
-      context.validUntilLabel ? `Válida hasta: ${context.validUntilLabel}` : null,
+      `${t.plainTextTotalPrefix}${context.totalLabel}`,
+      context.validUntilLabel ? `${t.plainTextValidUntilPrefix}${context.validUntilLabel}` : null,
       '',
-      `→ Ver propuesta online (con opción de aceptar):`,
+      `→ ${t.plainTextCta}:`,
       `  ${context.shareUrl}`,
       '',
       `— ${context.senderName}`,

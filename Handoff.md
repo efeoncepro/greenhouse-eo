@@ -22967,3 +22967,27 @@ Validacion:
 Siguiente paso recomendado:
 
 - Migrar `QuoteSharePromptEmail` + `quote_share` registry/plain-text como siguiente slice, cuidando `customMessage`, PDF attachment metadata, recipient/client/sender fields y share URL como runtime.
+
+## Sesion 2026-05-06 — TASK-408 Slice 3H: quote share
+
+Contexto:
+
+- Tras Slice 3G, el email principal restante con copy estructural local era `QuoteSharePromptEmail` + registry `quote_share`.
+- Este email es comercial y puede incluir mensaje humano custom, PDF y link publico de aceptacion; esos valores se preservan como runtime.
+
+Cambios aplicados:
+
+- `QuoteSharePromptEmail` ahora consume `getMicrocopy().emails.quoteShare` para preview, overline, greeting, body estructural, total label, valid-until label, attachment label, CTA, fallback link y closing note.
+- `src/lib/email/templates.ts` usa `emails.quoteShare` para plain text y `emails.subjects.quoteShare(quotationNumber, versionNumber, clientName)` para el subject default, preservando override via `context.subject`.
+- Se preserva como runtime: `customMessage`, `shareUrl`, `quotationNumber`, `versionNumber`, `clientName`, `recipientName`, `totalLabel`, `validUntilLabel`, `senderName`, `senderRole`, `senderEmail`, `hasPdfAttached` y `pdfFileName`.
+- No se tocaron quote lifecycle, public share route, generacion/attachment PDF, Resend, `sendEmail`, `email_deliveries`, outbox, webhooks, projections ni eventos reactivos.
+
+Validacion focal:
+
+- `pnpm exec tsc --noEmit --pretty false` -> pass.
+- `pnpm exec vitest run src/lib/email/templates.test.ts src/emails/EmailTemplateBaseline.test.tsx --reporter=verbose` -> pass, 2 files / 20 tests.
+- `pnpm exec eslint src/emails/QuoteSharePromptEmail.tsx src/lib/email/templates.ts src/lib/copy/types.ts src/lib/copy/index.ts src/lib/copy/dictionaries/es-CL/emails.ts --max-warnings=0` -> pass.
+
+Siguiente paso recomendado:
+
+- Completar limpieza de registry/plain-text para templates ya migrados que aun tienen ternarios/local copy fuera de `src/emails`, o avanzar con Slice 4 reliability signal `notifications.email.render_failure_rate`.

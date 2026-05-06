@@ -287,6 +287,30 @@ export const emails: EmailsCopy = {
       cancelled: firstName => `Hola ${firstName}, tu solicitud de cambio fue cancelada.`
     }
   },
+  quoteShare: {
+    previewText: (quotationNumber, versionNumber, clientName) => `Propuesta ${quotationNumber} v${versionNumber} para ${clientName}`,
+    overline: 'Propuesta para',
+    greeting: firstName => firstName ? `Hola ${firstName},` : 'Hola,',
+    bodyPrefix: 'Te comparto la propuesta comercial',
+    bodyVersionSeparator: ' v',
+    bodyClientPrefix: 'que preparamos para tu equipo en ',
+    bodyWithPdfSuffix: ' Adjuntamos el PDF para tu conveniencia y también puedes revisarla y aceptarla directamente desde el link.',
+    bodyWithoutPdfSuffix: ' Puedes revisarla, descargarla en PDF y aceptarla directamente desde el link.',
+    totalLabel: 'Inversión total',
+    validUntilPrefix: 'Válida hasta el ',
+    attachmentPrefix: '📎 Adjunto: ',
+    cta: 'Ver propuesta',
+    fallback: 'Si el botón no funciona, copia este link en tu navegador:',
+    closingNote: 'Cualquier duda, escríbeme directamente.',
+    plainTextHeader: (quotationNumber, versionNumber) => `PROPUESTA ${quotationNumber} v${versionNumber}`,
+    plainTextClientPrefix: 'PARA: ',
+    plainTextSeparator: '═══════════════════════════════════',
+    plainTextBody: clientName => `Te comparto la propuesta comercial que preparamos para tu equipo en ${clientName}.`,
+    plainTextAttachmentPrefix: '📎 ADJUNTO: ',
+    plainTextTotalPrefix: 'Inversión total: ',
+    plainTextValidUntilPrefix: 'Válida hasta: ',
+    plainTextCta: 'Ver propuesta online (con opción de aceptar)'
+  },
   weeklyExecutiveDigest: {
     subject: 'Resumen semanal — Nexa Insights',
     previewText: (periodLabel, totalInsights, spacesAffected) => `${periodLabel} · ${totalInsights} insights · ${spacesAffected} espacios`,
@@ -389,6 +413,6 @@ export const emails: EmailsCopy = {
     leaveReviewConfirmation: leaveTypeName => `Revisión registrada — ${leaveTypeName}`,
     leaveRequestSubmitted: leaveTypeName => `Solicitud de permiso enviada — ${leaveTypeName}`,
     leaveRequestPendingReview: (memberName, leaveTypeName) => `${memberName} — ${leaveTypeName}`,
-    quoteShare: quotationNumber => `Propuesta ${quotationNumber} lista para revisión`
+    quoteShare: (quotationNumber, versionNumber, clientName) => `Propuesta ${quotationNumber} v${versionNumber} para ${clientName}`
   }
 }

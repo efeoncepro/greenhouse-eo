@@ -44,6 +44,8 @@ En payroll, `PayrollReceiptEmail`, `PayrollPaymentCommittedEmail`, `PayrollPayme
 
 En finance/payroll beneficiary profile, `BeneficiaryPaymentProfileChangedEmail` lee copy estructural desde `emails.beneficiaryPaymentProfileChanged`. Los datos sensibles y de negocio (`accountNumberMasked`, proveedor, banco, moneda, fechas, motivo y actor/request source) siguen viniendo del runtime. El dictionary no debe almacenar ni inferir numeros de cuenta completos.
 
+En finance/quote share, `QuoteSharePromptEmail` lee copy estructural desde `emails.quoteShare`. La cotizacion, version, cliente, destinatario, mensaje custom, total, vigencia, PDF attachment metadata, sender y share URL siguen perteneciendo al runtime de Quote Builder/Public Share. El dictionary no reemplaza mensajes humanos ni payload comercial.
+
 En Nexa Insights, `WeeklyExecutiveDigestEmail` lee solo copy estructural desde `emails.weeklyExecutiveDigest`. El contenido de insight (`headline`, `narrative`, `rootCauseNarrative`, spaces, links y action labels) sigue perteneciendo a la lane materializada de Nexa y no debe dictionary-ficarse. Los snapshots de `src/emails/EmailTemplateBaseline.test.tsx` son el gate canonico: una migracion de copy no debe cambiar bytes de HTML salvo decision explicita documentada.
 
 ## Estado

@@ -22,6 +22,8 @@
 
 - **TASK-408 Slice 3G — payroll export y perfil de pago migrados sin tocar datos sensibles.** `PayrollExportReadyEmail` y `BeneficiaryPaymentProfileChangedEmail` consumen copy estructural desde `getMicrocopy().emails.payroll.exportReady` y `getMicrocopy().emails.beneficiaryPaymentProfileChanged`. Periodos, montos, breakdowns, adjuntos, cuenta enmascarada, proveedor/banco, fechas y motivos siguen viniendo del runtime; snapshots HTML quedan byte-estables.
 
+- **TASK-408 Slice 3H — quote share migrado sin tocar payload comercial.** `QuoteSharePromptEmail` y `quote_share` consumen copy estructural desde `getMicrocopy().emails.quoteShare`. Custom message, quote/version/client, recipient, total, vigencia, PDF, sender y share URL siguen viniendo del flujo de cotizaciones; el subject default conserva su salida actual y los snapshots siguen byte-estables.
+
 - **Hardening de verificacion HR/UI.** El test de HR Hierarchy para delegacion temporal deja de depender de `userEvent` async para abrir un dialog simple, y `EmptyState` cancela el fetch de Lottie al desmontar para evitar rechazos tardios durante teardown de jsdom o unmounts reales.
 
 - **TASK-407 completa — migración shared copy sin cambio funcional.** El gate `greenhouse/no-untokenized-copy` ahora detecta arrays de meses y CTAs JSX text, `src/lib/copy/` expone `buildStatusMap()` type-safe, y las superficies compartidas migran meses, status maps, CTAs base, aria-labels, empty states y secondary props fuera de literals inline. El contador del gate queda en 0 warnings y 0 disables; `TASK-408` puede promover la regla a `error`.

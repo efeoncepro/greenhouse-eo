@@ -144,6 +144,7 @@ export type {
   PayrollPaymentCancelledEmailTemplateCopy,
   PayrollPaymentCommittedEmailTemplateCopy,
   PayrollReceiptEmailTemplateCopy,
+  QuoteShareEmailTemplateCopy,
   StatesCopy,
   TimeCopy,
   VerifyEmailTemplateCopy,

@@ -163,6 +163,8 @@ Reglas obligatorias:
 
 **Estado 2026-05-06**: Slice 3G migra `PayrollExportReadyEmail` y `BeneficiaryPaymentProfileChangedEmail` a `getMicrocopy().emails.payroll.exportReady` y `getMicrocopy().emails.beneficiaryPaymentProfileChanged`. La migracion mantiene byte-estable el snapshot HTML y preserva tokens de negocio: periodo, montos, breakdowns, adjuntos, exportedBy/exportedAt, proveedor/banco, cuenta enmascarada, moneda, fecha efectiva/cancelacion y motivo siguen viniendo de props/callers. No se tocaron Resend, delivery, masking, finance beneficiary profile lifecycle, payroll export package, subjects contractuales, outbox, webhooks, projections ni eventos reactivos.
 
+**Estado 2026-05-06**: Slice 3H migra `QuoteSharePromptEmail` y el registry `quote_share` a `getMicrocopy().emails.quoteShare`. La migracion conserva como runtime `customMessage`, `shareUrl`, quotation number/version, client, recipient, total, valid-until, sender fields, PDF flag y filename. Snapshot baseline sigue byte-estable; no se tocaron quote lifecycle, public share route, PDF attachment generation, Resend, delivery, outbox, webhooks, projections ni eventos reactivos.
+
 ### Slice 4 — Reliability signal `notifications.email.render_failure_rate`
 
 - Reader: [src/lib/reliability/queries/email-render-failure.ts](../../src/lib/reliability/queries/email-render-failure.ts). Cuenta failures de render del outbox consumer en últimas 24h sobre `greenhouse_sync.outbox_events WHERE event_type LIKE 'notification.email.%' AND status='failed' AND last_error LIKE '%render%'`.

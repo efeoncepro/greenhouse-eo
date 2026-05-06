@@ -551,6 +551,31 @@ export interface BeneficiaryPaymentProfileChangedEmailTemplateCopy {
   plainText: Record<BeneficiaryPaymentProfileChangedKind, (firstName: string, accountNumberMasked: string) => string>
 }
 
+export interface QuoteShareEmailTemplateCopy {
+  previewText: (quotationNumber: string, versionNumber: number, clientName: string) => string
+  overline: string
+  greeting: (firstName?: string | null) => string
+  bodyPrefix: string
+  bodyVersionSeparator: string
+  bodyClientPrefix: string
+  bodyWithPdfSuffix: string
+  bodyWithoutPdfSuffix: string
+  totalLabel: string
+  validUntilPrefix: string
+  attachmentPrefix: string
+  cta: string
+  fallback: string
+  closingNote: string
+  plainTextHeader: (quotationNumber: string, versionNumber: number) => string
+  plainTextClientPrefix: string
+  plainTextSeparator: string
+  plainTextBody: (clientName: string) => string
+  plainTextAttachmentPrefix: string
+  plainTextTotalPrefix: string
+  plainTextValidUntilPrefix: string
+  plainTextCta: string
+}
+
 export interface WeeklyExecutiveDigestEmailTemplateCopy {
   subject: string
   previewText: (periodLabel: string, totalInsights: number, spacesAffected: number) => string
@@ -616,6 +641,7 @@ export interface EmailsCopy {
     liquidacionV2: PayrollLiquidacionV2EmailTemplateCopy
   }
   beneficiaryPaymentProfileChanged: BeneficiaryPaymentProfileChangedEmailTemplateCopy
+  quoteShare: QuoteShareEmailTemplateCopy
   weeklyExecutiveDigest: WeeklyExecutiveDigestEmailTemplateCopy
   notificationCategories: NotificationCategoryCopy
   subjects: {
@@ -639,7 +665,7 @@ export interface EmailsCopy {
     leaveReviewConfirmation: (leaveTypeName: string) => string
     leaveRequestSubmitted: (leaveTypeName: string) => string
     leaveRequestPendingReview: (memberName: string, leaveTypeName: string) => string
-    quoteShare: (quotationNumber: string) => string
+    quoteShare: (quotationNumber: string, versionNumber: number, clientName: string) => string
   }
 }
 

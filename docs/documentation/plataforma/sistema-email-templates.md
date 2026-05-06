@@ -214,6 +214,20 @@ La frontera de personalizacion se mantiene igual:
 
 Este slice no cambia Resend, `sendEmail`, `email_deliveries`, package documental de payroll export, lifecycle de cuenta de pago, masking, outbox, webhooks, projections ni eventos reactivos.
 
+## TASK-408 Slice 3H: quote share
+
+`QuoteSharePromptEmail` y el registry `quote_share` toman copy estatico desde `getMicrocopy().emails.quoteShare`.
+
+La frontera de personalizacion se mantiene igual:
+
+- `quotationNumber`, `versionNumber`, `clientName`, `recipientName`, `totalLabel`, `validUntilLabel`, `senderName`, `senderRole`, `senderEmail` y `shareUrl` siguen viniendo del flujo de cotizaciones.
+- `customMessage` sigue siendo mensaje humano del sender y nunca se reemplaza por copy del dictionary.
+- `hasPdfAttached` y `pdfFileName` siguen viniendo del runtime de PDF/attachment; el dictionary solo contiene labels como "Adjunto" o "Ver propuesta".
+- el subject default conserva el contrato visible `Propuesta <numero> v<version> para <cliente>` y sigue permitiendo override via `context.subject`.
+- el snapshot HTML se mantiene byte-estable.
+
+Este slice no cambia lifecycle de cotizaciones, public share route, generacion/attachment de PDF, Resend, `sendEmail`, `email_deliveries`, outbox, webhooks, projections ni eventos reactivos.
+
 La primitive `selectEmailTemplateCopy()` permite repetir este patron en los siguientes templates sin tocar delivery:
 
 - `es` / `es-CL` / default → dictionary de plataforma.
