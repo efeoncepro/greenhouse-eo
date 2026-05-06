@@ -1,7 +1,8 @@
 # Greenhouse i18n Architecture V1
 
-> Version: 1.0
+> Version: 1.1
 > Created: 2026-05-06
+> Updated: 2026-05-06 — TASK-430 runtime activation
 > Owner: Platform UI / Identity
 > Source task: `TASK-428`
 
@@ -27,10 +28,10 @@ Greenhouse is currently a private enterprise portal on Next.js 16 App Router.
 
 Runtime facts verified for this ADR:
 
-- The portal root layout hardcodes `<html lang='en'>`; this must be corrected when runtime i18n activates.
+- The portal root layout uses the effective locale in `<html lang>`.
 - The dashboard layout is dynamic because it depends on the authenticated session.
 - `src/proxy.ts` already owns the Next.js proxy boundary for security headers.
-- `src/lib/copy/` is locale-aware with `es-CL` default and `en-US` as a type-safe stub.
+- `src/lib/copy/` is locale-aware with `es-CL` default and translated `en-US` shared namespaces.
 - `src/lib/format/` is the canonical formatting layer and must remain separate from translated copy.
 - `src/lib/email/locale-resolver.ts` maps legacy email locales (`es`, `en`) to platform locales (`es-CL`, `en-US`).
 - PostgreSQL currently has legacy `greenhouse_core.client_users.locale TEXT DEFAULT 'es'`.
@@ -260,16 +261,18 @@ Future settings surfaces that let a user change locale must reuse existing setti
 
 ## TASK-430 Contract
 
-`TASK-430` should:
+`TASK-430` delivered:
 
-- install `next-intl`
-- configure provider/request loading for App Router
-- preserve private URLs without locale prefixes
-- compose any proxy needs inside `src/proxy.ts`
-- correct `<html lang>` from hardcoded `en` to effective locale
-- activate `en-US` as the first translated proof-of-runtime
-- keep `src/lib/format/` as the formatting boundary
-- keep `/api/*`, auth callbacks and staging automation unprefixed
+- `next-intl` installed and composed in `next.config.ts`
+- provider/request loading configured for App Router
+- private URLs preserved without locale prefixes
+- `src/proxy.ts` preserved without i18n routing because TASK-430 does not need prefixes
+- `<html lang>` corrected from hardcoded `en` to effective locale
+- `en-US` activated for shell navigation and shared namespaces
+- `src/lib/format/` kept as the formatting boundary
+- `/api/*`, auth callbacks and staging automation kept unprefixed
+
+`TASK-430` intentionally did not pass the full `src/lib/copy` dictionary as `next-intl` messages because `time` and `emails` contain functions. The App Router provider receives a serializable shared subset from `src/i18n/messages.ts`; emails and background jobs continue to use dictionaries/core APIs outside the provider.
 
 ## TASK-431 Contract
 

@@ -18,7 +18,7 @@ Tambien aplica al copy institucional de emails. En ese caso la regla principal e
 
 - Revisa si el texto ya existe en `getMicrocopy()`.
 - Decide si es nomenclatura de producto, microcopy shared o copy de dominio.
-- Mantiene `es-CL` como default hasta que el runtime i18n active locales reales.
+- Mantiene `es-CL` como default. `en-US` ya esta activo para namespaces shared desde TASK-430.
 - Si el texto sera visible para usuarios, privilegia claridad antes que tono decorativo.
 
 ## Paso a paso
@@ -148,7 +148,7 @@ Despues de TASK-811, estos modulos de dominio existen y deben reutilizarse antes
 | No encuentro una key | Puede ser copy de dominio o falta una shared key real | Si se reusa en varias surfaces, agregar key con paridad de locales. |
 | Un snapshot de email cambia al migrar copy | Se mezclo un token dinamico dentro de una funcion/string de dictionary | Separar copy estatico y token runtime; no actualizar snapshot salvo cambio intencional. |
 | El texto es de producto | No debe vivir en `src/lib/copy` | Usar `greenhouse-nomenclature.ts`. |
-| El texto necesita traduccion real | TASK-407 no traduce | Mantener key dictionary-ready y esperar runtime i18n de TASK-430. |
+| El texto necesita traduccion real | La surface aun no fue migrada | Agregar traduccion al namespace compartido o abrir child task si es copy profundo de modulo/email. |
 
 ## Referencias tecnicas
 

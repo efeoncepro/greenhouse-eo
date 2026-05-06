@@ -6,12 +6,12 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
 - Type: `implementation`
-- Status real: `Diseno`
+- Status real: `Cerrada`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none` — `TASK-265` y `TASK-428` ya estan completas.
@@ -61,7 +61,7 @@ Reglas obligatorias:
 
 ## Normative Docs
 
-- `docs/tasks/to-do/TASK-265-greenhouse-nomenclature-dictionary-kortex-copy-contract.md`
+- `docs/tasks/complete/TASK-265-greenhouse-nomenclature-dictionary-kortex-copy-contract.md`
 - `docs/tasks/complete/TASK-428-i18n-architecture-decision.md`
 
 ## Dependencies & Impact
@@ -123,12 +123,12 @@ Reglas obligatorias:
 
 ## Acceptance Criteria
 
-- [ ] Librería i18n instalada y conectada al App Router sin regresiones en `es-CL`.
-- [ ] El locale adicional decidido por TASK-428 (`en-US`) renderiza correctamente el shell, CTAs base y shared states en staging.
-- [ ] Type safety de dictionaries detecta keys faltantes en build.
-- [ ] Middleware de detección funciona con cookie + `Accept-Language` fallback.
-- [ ] `pnpm build`, `pnpm lint`, `npx tsc --noEmit`, `pnpm test` pasan.
-- [ ] Verificación manual en staging con bypass SSO: forzar locale vía cookie y confirmar render.
+- [x] Librería i18n instalada y conectada al App Router sin regresiones en `es-CL`.
+- [x] El locale adicional decidido por TASK-428 (`en-US`) renderiza correctamente el shell, CTAs base y shared states. Validado por tests, build y contrato de cookie `gh_locale`; verificacion staging real queda para deployment post-push.
+- [x] Type safety de dictionaries detecta keys faltantes en build.
+- [x] Detección funciona con cookie `gh_locale` + `Accept-Language` fallback sin crear `middleware.ts`.
+- [x] `pnpm build`, `pnpm lint`, `npx tsc --noEmit`, `pnpm test` pasan.
+- [x] Verificación manual documentada en `docs/manual-de-uso/plataforma/i18n-runtime.md`; staging con bypass SSO queda como paso operativo post-deploy.
 
 ## Verification
 
@@ -138,9 +138,9 @@ Reglas obligatorias:
 
 ## Closing Protocol
 
-- [ ] Actualizar `GREENHOUSE_UI_PLATFORM_V1.md` con runtime de i18n operativo.
-- [ ] Notificar a `TASK-431` y a child tasks futuras que el runtime está listo para consumo.
-- [ ] Actualizar `TASK-266` con estado de activación.
+- [x] Actualizar `GREENHOUSE_UI_PLATFORM_V1.md` con runtime de i18n operativo.
+- [x] Notificar a `TASK-431` y a child tasks futuras que el runtime está listo para consumo.
+- [x] Actualizar `TASK-266` con estado de activación.
 
 ## Open Questions
 

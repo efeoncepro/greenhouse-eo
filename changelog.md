@@ -2,6 +2,8 @@
 
 ## 2026-05-06
 
+- **TASK-430 — runtime i18n activado.** Se instala `next-intl`, se compone con Sentry en `next.config.ts`, el App Router queda envuelto con `NextIntlClientProvider`, `<html lang>` usa el locale efectivo y `src/i18n/*` resuelve `gh_locale` + `Accept-Language` + fallback `es-CL` sin prefijar rutas privadas. `en-US` ya tiene traducciones para shell navigation y namespaces shared (`actions`, `states`, `loading`, `empty`, `months`, `aria`, `errors`, `feedback`, `time`). Persistencia user/tenant queda para TASK-431; emails siguen fuera del provider App Router.
+
 - **TASK-428 — i18n architecture ADR.** Se publica `docs/architecture/GREENHOUSE_I18N_ARCHITECTURE_V1.md`: `next-intl` como runtime App Router, portal privado sin locale prefix por defecto, `en-US` como primera activación, `pt-BR` planned, emails SSR sin provider App Router, y TASK-431 debe absorber `client_users.locale` legacy. `TASK-266` queda cerrada como umbrella formalizada.
 
 - **TASK-811 — greenhouse-nomenclature domain microcopy trim.** `src/config/greenhouse-nomenclature.ts` baja de 2.747 a 410 líneas y queda centrado en navegación/product nomenclature + `GH_COLORS` transicional. El microcopy de Agency, portal cliente/team, admin/internal, pricing, workforce, finance MRR/ARR y payroll projected se extrajo a módulos type-safe en `src/lib/copy/*`; `GH_COMPENSATION` se eliminó como orphan verificado. No se reescribió copy ni se tocó runtime/data/events.

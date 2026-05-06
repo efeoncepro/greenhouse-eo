@@ -1,9 +1,12 @@
-# Sesion 2026-05-06 — TASK-430 tomada en develop
+# Sesion 2026-05-06 — TASK-430 cerrada en develop
 
 - **Branch:** `develop` por instruccion explicita del usuario; no se crea `task/TASK-430-dictionary-foundation-activation`.
-- **Ownership:** no habia PR abierto ni branch local/remota obvia para `TASK-430`; se toma la task y se mueve a `docs/tasks/in-progress/`.
+- **Ownership/lifecycle:** no habia PR abierto ni branch local/remota obvia para `TASK-430`; la task se tomo, planifico, implemento y cerro en `docs/tasks/complete/`.
 - **Plan aprobado:** ejecutar foundation `next-intl` sin locale prefix privado, resolver locale via cookie `gh_locale` + `Accept-Language` + fallback `es-CL`, preservar `src/proxy.ts`, y mantener persistencia DB para `TASK-431`.
-- **Riesgo clave:** `src/lib/copy` contiene funciones en `time`/`emails`; no se debe pasar el dictionary completo como `next-intl` messages serializables. Usar subset shared serializable + APIs canonicas de `src/lib/copy`.
+- **Entrega:** `next-intl` instalado; `next.config.ts` compone `next-intl/plugin` con Sentry; `src/i18n/*` resuelve locale y messages serializables; `Providers` envuelve con `NextIntlClientProvider`; `src/app/layout.tsx` usa `<html lang>` efectivo; `en-US` tiene shared namespaces reales y shell navigation via `src/config/greenhouse-navigation-copy.ts`.
+- **Frontera intencional:** `src/lib/copy` contiene funciones en `time`/`emails`; no se pasa el dictionary completo como `next-intl` messages. Emails conservan fallback fuera del provider App Router; persistencia user/tenant queda en `TASK-431`.
+- **Validacion:** `pnpm lint` OK; `pnpm exec tsc --noEmit --pretty false` OK; `pnpm design:lint` OK 0 errors/0 warnings; `pnpm pg:doctor` OK con drift conocido `can_create=true` en serving/payroll; `pnpm test` OK (592 files, 3429 passed, 5 skipped); `pnpm build` OK.
+- **Docs:** `GREENHOUSE_I18N_ARCHITECTURE_V1.md`, `GREENHOUSE_UI_PLATFORM_V1.md`, `docs/documentation/plataforma/i18n-runtime.md`, `docs/manual-de-uso/plataforma/i18n-runtime.md`, microcopy docs/manual, `project_context.md`, `changelog.md`, `TASK-431`, `TASK-266`, README/registry de tasks.
 
 # Sesion 2026-05-06 — TASK-428 tomada en develop
 

@@ -31,6 +31,7 @@ Documentacion oficial de la plataforma Greenhouse. Cada documento describe como 
 - [Sistema de Observabilidad de Tests](plataforma/sistema-observabilidad-de-tests.md) — inventario del suite, resultados, coverage, artifacts y como leer la ultima corrida sin abrir logs crudos
 - [Sistema de Email Templates](plataforma/sistema-email-templates.md) — inventario de templates (react-email + Resend), design tokens, assets de marca, workflow Figma ↔ codigo
 - [Microcopy shared y dictionary-ready](plataforma/microcopy-shared-dictionary.md) — contrato funcional para usar `src/lib/copy`, `getMicrocopy` y `buildStatusMap` sin reintroducir hardcodes de CTAs, estados, meses, empty states o aria-labels
+- [Runtime i18n de Greenhouse](plataforma/i18n-runtime.md) — runtime `next-intl` del App Router: locale por cookie/header, provider, shell `en-US`, sin prefijos privados y frontera con TASK-431
 - [Formateo locale-aware](plataforma/formateo-locale-aware.md) — capa canonica `src/lib/format` para fechas, monedas, numeros, porcentajes, plurales y textos relativos; separa locale, timezone operacional y copy traducible
 - [Reliability Control Plane y AI Observer](plataforma/reliability-control-plane.md) — lectura unificada de salud por modulo, capa narrativa Gemini Flash hosted en ops-worker + Cloud Scheduler, kill-switch opt-in, dedup por fingerprint, anti-feedback loop
 

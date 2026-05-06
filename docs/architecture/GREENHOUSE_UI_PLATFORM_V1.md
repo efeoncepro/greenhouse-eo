@@ -1,7 +1,8 @@
 # Greenhouse EO — UI Platform Architecture V1
 
-> **Version:** 1.7
+> **Version:** 1.8
 > **Created:** 2026-03-30
+> **Updated:** 2026-05-06 — v1.8: TASK-430 activa el runtime `next-intl` sin prefijar el portal privado. `src/i18n/*` resuelve locale con cookie `gh_locale` + `Accept-Language` + fallback `es-CL`, el App Router queda envuelto por `NextIntlClientProvider`, `<html lang>` usa locale efectivo y `en-US` ya cubre shell navigation + namespaces shared serializables. Ver Delta 2026-05-06c abajo.
 > **Updated:** 2026-05-06 — v1.7: TASK-428 publica `GREENHOUSE_I18N_ARCHITECTURE_V1.md`: `next-intl` como librería App Router, portal privado state-only sin locale prefix por defecto, `en-US` como primera activación, `pt-BR` planned, y TASK-431 debe absorber `client_users.locale` legacy. Ver Delta 2026-05-06b abajo.
 > **Updated:** 2026-05-06 — v1.6: TASK-811 recorta `src/config/greenhouse-nomenclature.ts` a navegación/product nomenclature + tokens visuales transicionales. Domain microcopy reutilizable se extrae a módulos type-safe en `src/lib/copy/*` (`agency`, `client-portal`, `admin`, `pricing`, `workforce`, `finance`, `payroll`). Ver Delta 2026-05-06 abajo.
 > **Updated:** 2026-05-05 — v1.5: Quote Builder primitives extraction Sprint 3 (TASK-498). Tres primitives nuevos en `src/components/greenhouse/primitives/` (`EntitySummaryDock`, `CardHeaderWithBadge`, `FormSectionAccordion`) habilitan invoice / PO / contract / finiquito builders sin re-implementar el chasis. `ContextChipStrip` recibe `overflowAfter` con dropdown "+M más" canónico. Quote Builder migrado: `QuoteSummaryDock` queda como adapter thin sobre `EntitySummaryDock`, conservando API histórica. Ver Delta 2026-05-05 abajo.
@@ -16,6 +17,32 @@
 ## Overview
 
 Greenhouse EO es un portal Next.js 16 App Router con MUI 7.x envuelto por el starter-kit Vuexy. Este documento es la referencia canónica de la plataforma UI: stack, librerías disponibles, patrones de componentes, convenciones de estado, y reglas de adopción.
+
+## Delta 2026-05-06c — TASK-430 i18n runtime activation
+
+El runtime i18n del App Router ya está activo.
+
+Artefactos canónicos:
+
+- `next.config.ts` compone `next-intl/plugin` con `withSentryConfig`.
+- `src/i18n/request.ts` es el request config de `next-intl`.
+- `src/i18n/resolve-locale.ts` resuelve locale con cookie `gh_locale`, header `Accept-Language` y fallback `es-CL`.
+- `src/i18n/messages.ts` expone messages shared serializables para `NextIntlClientProvider`; no serializa funciones de `emails` ni `time`.
+- `src/components/Providers.tsx` envuelve el portal con `NextIntlClientProvider`.
+- `src/app/layout.tsx` usa el locale efectivo en `<html lang>`.
+- `src/config/greenhouse-navigation-copy.ts` entrega navegación de shell en `es-CL`/`en-US` sin mover product marks ni rutas.
+- `src/lib/copy/dictionaries/en-US/*` contiene traducciones reales para `actions`, `states`, `loading`, `empty`, `months`, `aria`, `errors`, `feedback` y `time`.
+
+Reglas nuevas:
+
+- No crear `middleware.ts` para i18n del portal privado.
+- No agregar locale prefixes a rutas privadas ni APIs.
+- Consumers nuevos que necesiten locale runtime deben usar `next-intl` o helpers bajo `src/i18n/*`; consumers legacy pueden seguir con `getMicrocopy()` hasta su rollout.
+- No pasar `getMicrocopy(locale)` completo como messages al cliente: el dictionary contiene funciones en `emails` y `time`.
+- Emails y background jobs siguen fuera del provider App Router; se mantienen en `src/lib/email/locale-resolver.ts` + dictionaries/core APIs hasta su rollout.
+- `TASK-431` sigue siendo el owner de persistencia user/tenant y de exponer `effectiveLocale` en sesión.
+
+Access model: sin cambios en `routeGroups`, `views`, `entitlements` ni startup policy.
 
 ## Delta 2026-05-06b — TASK-428 i18n architecture decision
 

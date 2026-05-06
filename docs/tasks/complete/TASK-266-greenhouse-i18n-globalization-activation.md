@@ -22,7 +22,7 @@
 - Children:
   - `TASK-428` — i18n architecture decision (complete 2026-05-06)
   - `TASK-429` — locale-aware formatting utilities (complete 2026-05-06)
-  - `TASK-430` — dictionary foundation activation (depende de 265 + 428)
+  - `TASK-430` — dictionary foundation activation (complete 2026-05-06)
   - `TASK-431` — tenant + user locale persistence model (depende de 428; requiere PG migration)
   - (futuros, derivar cuando corresponda) — shared shell rollout, emails localization, SEO & routing deep-links
 
@@ -123,7 +123,7 @@ Reglas obligatorias:
 
 ### Already exists
 
-- El portal actual es efectivamente `es-only` en código (0 paquetes i18n instalados: ni `next-intl`, ni `next-i18next`, ni `react-intl`). `TASK-430` instala la librería decidida.
+- El portal ya tiene `next-intl` instalado y conectado al App Router desde `TASK-430`.
 - Existe una capa propia de nomenclature/microcopy ya separada: `src/config/greenhouse-nomenclature.ts` queda para navegación/product nomenclature y `src/lib/copy/*` queda para microcopy functional/domain reusable (`TASK-265`, `TASK-407`, `TASK-408`, `TASK-811`).
 - Vuexy full-version sí trae i18n config + dictionaries listos como referencia (`full-version/src/configs/i18n.ts` con `en/fr/ar` + `langDirection`, `full-version/src/utils/getDictionary.ts`, `full-version/src/data/dictionaries/*.json`).
 - `TASK-429` cerró la primitive canónica `src/lib/format/` y el baseline `greenhouse/no-raw-locale-formatting` quedó en cero warnings para el portal.
@@ -135,7 +135,7 @@ Reglas obligatorias:
 
 - `TASK-428` publica la locale strategy formal en `docs/architecture/GREENHOUSE_I18N_ARCHITECTURE_V1.md`.
 - No hay persistencia canónica de preferencia por usuario/tenant todavía: `TASK-431` la implementa y debe absorber el legacy `client_users.locale`.
-- No hay runtime i18n instalado todavía: `TASK-430` instala `next-intl`, activa provider y conecta `en-US`.
+- Runtime i18n activo: `TASK-430` instala `next-intl`, activa provider y conecta `en-US` para shell/shared copy sin prefijar rutas privadas.
 - `pt-BR` queda planned first-class, no activo hasta tener cobertura de dictionary y validación comercial/piloto.
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -161,7 +161,7 @@ Esta task es una **umbrella pura**: coordina el programa i18n/globalization, no 
 |----|---------|---------|---------------|
 | `TASK-428` | Architecture decision: `next-intl`, routing híbrido state-only privado + prefixes públicos futuros, locales first-class, fallback strategy | complete | — |
 | `TASK-429` | Formatting utilities centrales (`src/lib/format/`) para reemplazar 254+ call sites de `Intl.*` con `es-CL` hardcoded | none | Sí — puede arrancar sin 265 ni 428 |
-| `TASK-430` | Dictionary foundation activation: conectar locales reales sobre la capa dictionary-ready | `TASK-265`, `TASK-428` | — |
+| `TASK-430` | Dictionary foundation activation: conectar locales reales sobre la capa dictionary-ready | complete | — |
 | `TASK-431` | Tenant + user locale persistence (migración PG, Identity V2 coordination) | `TASK-428` | Sí con 429/430 |
 
 ### Child tasks futuras (crear cuando corresponda)

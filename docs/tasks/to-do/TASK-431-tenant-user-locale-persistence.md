@@ -14,7 +14,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `identity`
-- Blocked by: `none` — `TASK-428` ya publico la detection hierarchy.
+- Blocked by: `none` — `TASK-428` publico la detection hierarchy y `TASK-430` activo el runtime `next-intl`.
 - Branch: `task/TASK-431-tenant-user-locale-persistence`
 - Legacy ID: —
 - GitHub Issue: —
@@ -26,7 +26,7 @@ Agrega persistencia de preferencia de locale al modelo de tenant y al perfil de 
 
 ## Why This Task Exists
 
-Sin persistencia, el runtime de i18n (`TASK-430`) solo puede confiar en cookie + `Accept-Language` — eso se pierde al cerrar sesión y no permite que un admin de tenant fije el locale default para todos sus usuarios.
+Sin persistencia, el runtime de i18n (`TASK-430`) solo puede confiar en cookie `gh_locale` + `Accept-Language` — eso se pierde al cerrar sesión y no permite que un admin de tenant fije el locale default para todos sus usuarios.
 
 Para clientes enterprise de Efeonce distribuidos por América:
 
@@ -61,7 +61,7 @@ Reglas obligatorias:
 ## Normative Docs
 
 - `docs/tasks/complete/TASK-428-i18n-architecture-decision.md`
-- `docs/tasks/to-do/TASK-430-dictionary-foundation-activation.md`
+- `docs/tasks/complete/TASK-430-dictionary-foundation-activation.md`
 - `docs/architecture/GREENHOUSE_DATABASE_TOOLING_V1.md`
 
 ## Dependencies & Impact
@@ -69,7 +69,7 @@ Reglas obligatorias:
 ### Depends on
 
 - `TASK-428` cerrada — lista de locales y detection hierarchy publicadas en `docs/architecture/GREENHOUSE_I18N_ARCHITECTURE_V1.md`.
-- No depende de `TASK-430` necesariamente — puede ejecutarse en paralelo si `TASK-430` está avanzada.
+- `TASK-430` cerrada — runtime `next-intl`, provider App Router, shell `en-US` y fallback `gh_locale` + `Accept-Language` ya disponibles.
 
 ### Blocks / Impacts
 

@@ -115,9 +115,9 @@ const statusLabels = buildStatusMap({
 
 ## Relacion con i18n
 
-`src/lib/copy/` ya acepta locale y mantiene `es-CL` como default. El locale `en-US` existe como stub para paridad type-safe. La traduccion real y el runtime i18n viven en el programa `TASK-266`, especialmente `TASK-428` y `TASK-430`.
+`src/lib/copy/` ya acepta locale y mantiene `es-CL` como default. Desde TASK-430, `en-US` tiene traduccion real para los namespaces shared (`actions`, `states`, `loading`, `empty`, `months`, `aria`, `errors`, `feedback`, `time`) y el App Router corre sobre `next-intl`.
 
-TASK-407 deja las superficies compartidas listas para ese runtime: cuando los dictionaries reales existan, los consumers no deberian necesitar reescritura.
+Los emails y superficies profundas siguen en rollout incremental. No pases el dictionary completo como messages al cliente: `emails` y parte de `time` contienen funciones. Usa el subset serializable de `src/i18n/messages.ts` para provider/runtime y `getMicrocopy(locale)` para consumers que ya trabajan con la capa shared.
 
 ## Validacion aplicada
 
