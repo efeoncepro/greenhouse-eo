@@ -7,7 +7,7 @@
 - **Scope Slice 0:** foundation aditiva para namespace `emails`, helper canonico de locale email y snapshot baseline de templates antes de migrar copy. Entregado con 17 snapshots y assertions explicitas de tokens de personalizacion.
 - **Scope Slice 1:** las 13 categorias reales de `src/config/notification-categories.ts` consumen `getMicrocopy().emails.notificationCategories.<code>.{label,description}` con fallback legacy interno. Se agrego type guard `isNotificationCategoryCode()` para accesos dinamicos seguros desde API/preferences.
 - **Scope Slice 2A:** `EmailLayout` consume `getMicrocopy().emails.layout` para logo alt, tagline, disclaimer y unsubscribe en `es`. Footer `en` conserva fallback legacy mientras `en-US` siga como mirror de `es-CL`, para no romper correos internacionales. `EmailButton` no se toca porque no tiene copy propio.
-- **Scope Slice 3A:** primitive `selectEmailTemplateCopy()` para migrar templates sin degradar `en` mientras `en-US` es mirror; `VerifyEmail` y `MagicLinkEmail` usan `getMicrocopy().emails.auth.*` para copy `es` y fallback legacy `en`.
+- **Scope Slice 3A:** primitive `selectEmailTemplateCopy()` para migrar templates sin degradar `en` mientras `en-US` es mirror; `VerifyEmail`, `MagicLinkEmail` y `PasswordResetEmail` usan `getMicrocopy().emails.auth.*` para copy `es` y fallback legacy `en`.
 - **Guardrail:** no tocar `sendEmail`, Resend, `NOTIFICATION_CATEGORIES`, outbox/webhooks, `EmailLayout` ni `EmailButton` hasta tener snapshots baseline verdes.
 - **Tokens de personalizacion:** preservar la capa `src/lib/email/tokens.ts` + merge de `delivery.ts`; snapshots deben cubrir nombre, cliente, montos, periodos, links y unsubscribe para detectar cualquier perdida de contexto.
 - **Delivery/eventos intactos:** Slice 1 no toca `NotificationService.dispatch`, `sendEmail`, event types, outbox, projections, webhooks, retry/idempotency ni categorias `code`; solo cambia la fuente de `label/description`.
@@ -19,7 +19,7 @@
 - **Validacion full post Slice 1:** `pnpm lint` OK; `pnpm exec tsc --noEmit --pretty false` OK; `pnpm test` OK (587 suites, 3411 tests, 5 skipped); `pnpm build` OK.
 - **Validacion Slice 2A focal:** `src/emails/components/EmailLayout.test.tsx`, `src/emails/EmailTemplateBaseline.test.tsx`, `src/emails/PayrollReceiptEmail.test.tsx`, `src/lib/email/templates.test.ts` OK; `pnpm exec tsc --noEmit --pretty false` OK.
 - **Validacion full post Slice 2A:** `pnpm lint` OK; `pnpm exec tsc --noEmit --pretty false` OK; `pnpm test` OK (588 suites, 3413 tests, 5 skipped); `pnpm build` OK.
-- **Validacion Slice 3A focal:** `src/lib/email/template-copy.test.ts`, `src/emails/EmailTemplateBaseline.test.tsx` (incluye `VerifyEmail` y `MagicLinkEmail`), `src/lib/email/templates.test.ts` OK; `pnpm exec tsc --noEmit --pretty false` OK; ESLint focal OK.
+- **Validacion Slice 3A focal:** `src/lib/email/template-copy.test.ts`, `src/emails/EmailTemplateBaseline.test.tsx` (incluye `VerifyEmail`, `MagicLinkEmail` y `PasswordResetEmail`), `src/lib/email/templates.test.ts` OK; `pnpm exec tsc --noEmit --pretty false` OK; ESLint focal OK.
 - **Validacion full post Slice 3A:** `pnpm lint` OK; `pnpm exec tsc --noEmit --pretty false` OK; `pnpm test` OK (589 suites, 3415 tests, 5 skipped); `pnpm build` OK.
 - **Riesgo observado:** spec declaraba 12 categorias, runtime tiene 13 en `src/config/notification-categories.ts`; Slice 1 migro el runtime real (13). `subjectKey` queda diferido hasta no tener un consumer activo seguro, para no tocar subjects/delivery en este slice.
 

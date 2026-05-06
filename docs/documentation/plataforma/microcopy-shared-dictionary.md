@@ -21,7 +21,7 @@ El objetivo no es traducir todo el portal todavia. El objetivo es evitar drift: 
 - TASK-408 Slice 0 agrego `emails` como namespace para copy institucional de emails. No reemplaza los tokens de personalizacion; los subject builders reciben valores como periodo, monto o cliente desde el caller.
 - TASK-408 Slice 1 agrego `emails.notificationCategories` para labels y descripciones de las 13 categorias reales de notificaciones. El catalogo operativo sigue en `src/config/notification-categories.ts`: ahi viven `code`, canales por defecto, audiencia, prioridad e icono.
 - TASK-408 Slice 2A conecto `EmailLayout` a `emails.layout` para el shell institucional en espanol. El footer ingles conserva fallback legacy hasta que `en-US` deje de ser mirror.
-- TASK-408 Slice 3A agrega `selectEmailTemplateCopy()` y migra `VerifyEmail`/`MagicLinkEmail` a `emails.auth.*` para espanol, preservando fallback ingles legacy.
+- TASK-408 Slice 3A agrega `selectEmailTemplateCopy()` y migra `VerifyEmail`/`MagicLinkEmail`/`PasswordResetEmail` a `emails.auth.*` para espanol, preservando fallback ingles legacy.
 - `buildStatusMap()` permite construir status maps type-safe sin repetir labels inline.
 - La regla ESLint `greenhouse/no-untokenized-copy` se extendio para detectar arrays de meses y CTAs JSX text, ademas de los patrones ya existentes.
 - El sweep de `src/views`, `src/components` y `src/app` quedo en 0 warnings para `greenhouse/no-untokenized-copy`.
@@ -36,7 +36,7 @@ El objetivo no es traducir todo el portal todavia. El objetivo es evitar drift: 
 | Copy institucional de emails | `src/lib/copy/dictionaries/es-CL/emails.ts` | Footer, disclaimers y builders de subject que reciben tokens |
 | Copy visible de categorias de notificacion | `src/lib/copy/dictionaries/es-CL/emails.ts` | Labels/descriptions de preferencias y centro de notificaciones |
 | Shell institucional de email | `src/emails/components/EmailLayout.tsx` + `emails.layout` | Logo alt, tagline, disclaimer, unsubscribe label |
-| Copy de templates migrados | `emails.<grupo>.<template>` + `selectEmailTemplateCopy()` | VerifyEmail/MagicLink `es` desde dictionary, `en` fallback legacy |
+| Copy de templates migrados | `emails.<grupo>.<template>` + `selectEmailTemplateCopy()` | VerifyEmail/MagicLink/PasswordReset `es` desde dictionary, `en` fallback legacy |
 | Copy de dominio local | Cerca del dominio | Estado legal especifico de Payroll o Finance |
 
 ## Uso basico
@@ -136,4 +136,4 @@ TASK-408 Slice 2A agrega:
 TASK-408 Slice 3A agrega:
 
 - `src/lib/email/template-copy.test.ts` para proteger la seleccion dictionary/fallback por locale.
-- Snapshot baseline de `VerifyEmail` y `MagicLinkEmail` estable despues de mover copy `es` a `emails.auth.*`.
+- Snapshot baseline de `VerifyEmail`, `MagicLinkEmail` y `PasswordResetEmail` estable despues de mover copy `es` a `emails.auth.*`.

@@ -33,6 +33,18 @@ export const emails: EmailsCopy = {
       disclaimer: 'Si no solicitaste este correo, puedes ignorarlo. Tu cuenta sigue siendo segura.',
       fallback: 'Si el botón no funciona, copia y pega esta dirección en tu navegador:',
       previewText: expiresInMinutes => `Enlace de acceso mágico — válido por ${expiresInMinutes} minutos`
+    },
+    passwordReset: {
+      heading: 'Restablece tu contraseña',
+      greeting: name => name ? `Hola ${name.split(' ')[0]},` : 'Hola,',
+      body: 'recibimos tu solicitud para cambiar la contraseña de tu cuenta en Greenhouse.',
+      validityPrefix: 'Haz clic en el siguiente botón para elegir una nueva contraseña. El enlace es válido por ',
+      validityBold: '1 hora',
+      validitySuffix: ' y solo puede usarse una vez.',
+      cta: 'Cambiar mi contraseña',
+      disclaimer: 'Si no realizaste esta solicitud, no te preocupes — tu contraseña actual sigue siendo segura y no se ha modificado. Puedes ignorar este correo.',
+      fallback: 'Si el botón no funciona, copia y pega esta dirección en tu navegador:',
+      previewText: 'Solicitud de cambio de contraseña — enlace válido por 1 hora'
     }
   },
   notificationCategories: {

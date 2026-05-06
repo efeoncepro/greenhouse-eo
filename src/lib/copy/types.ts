@@ -339,6 +339,8 @@ export interface MagicLinkEmailTemplateCopy {
   previewText: (expiresInMinutes: number) => string
 }
 
+export type PasswordResetEmailTemplateCopy = VerifyEmailTemplateCopy
+
 /**
  * Copy institucional compartido por emails y notificaciones externas.
  * TASK-408 lo introduce como namespace foundation antes de migrar templates:
@@ -358,6 +360,7 @@ export interface EmailsCopy {
   auth: {
     verifyEmail: VerifyEmailTemplateCopy
     magicLink: MagicLinkEmailTemplateCopy
+    passwordReset: PasswordResetEmailTemplateCopy
   }
   notificationCategories: NotificationCategoryCopy
   subjects: {

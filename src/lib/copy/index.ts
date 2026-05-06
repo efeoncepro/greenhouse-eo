@@ -129,6 +129,7 @@ export type {
   MonthsCopy,
   NotificationCategoryCopy,
   NotificationCategoryCopyCode,
+  PasswordResetEmailTemplateCopy,
   StatesCopy,
   TimeCopy,
   VerifyEmailTemplateCopy
