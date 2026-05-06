@@ -37,6 +37,7 @@ import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 
 import EmptyState from '@/components/greenhouse/EmptyState'
+import { CardHeaderWithBadge } from '@/components/greenhouse/primitives'
 import { DataTableShell } from '@/components/greenhouse/data-table'
 import { useListAnimation } from '@/hooks/useListAnimation'
 import type {
@@ -644,27 +645,12 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
 
   return (
     <Card elevation={0} sx={theme => ({ border: `1px solid ${theme.palette.divider}`, borderRadius: `${theme.shape.customBorderRadius.lg}px` })}>
-      <CardHeader
-        title={
-          <Stack direction='row' spacing={1} alignItems='center'>
-            <Typography variant='h6' sx={{ fontWeight: 600 }}>
-              Ítems de la cotización
-            </Typography>
-            <CustomChip
-              round='true'
-              size='small'
-              variant='tonal'
-              color={draftLines.length === 0 ? 'secondary' : 'primary'}
-              label={String(draftLines.length)}
-            />
-          </Stack>
-        }
+      <CardHeaderWithBadge
+        title='Ítems de la cotización'
+        badgeValue={draftLines.length}
+        badgeColor={draftLines.length === 0 ? 'secondary' : 'primary'}
         subheader={draftLines.length === 0 ? undefined : 'Agrega ítems vendibles desde el catálogo o crea una línea manual.'}
-        avatar={
-          <Avatar variant='rounded' sx={{ bgcolor: 'primary.lightOpacity', width: 40, height: 40 }}>
-            <i className='tabler-list-details' style={{ fontSize: 20, color: 'var(--mui-palette-primary-main)' }} />
-          </Avatar>
-        }
+        avatarIcon='tabler-list-details'
         action={headerAction}
       />
       <Divider />

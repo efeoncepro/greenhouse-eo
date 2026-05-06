@@ -2,16 +2,17 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto` (afecta futuros builders — invoice, PO, contract)
 - Effort: `Alto`
 - Type: `refactor` + `platform`
-- Status real: `Backlog`
+- Status real: `Shipped`
 - Rank: `Post-TASK-497`
 - Domain: `ui` + `platform`
 - Blocked by: `none`
-- Branch: `task/TASK-498-ui-primitives-platform`
+- Branch: `develop` (shipped directo, refactor de UI sin riesgo de DB)
+- Closed: `2026-05-05`
 
 ## Summary
 
@@ -81,3 +82,27 @@ Generalizar props:
 
 - TASK-499 resto del audit backlog
 - Usar los primitives en el proximo builder que se construya
+
+## Delivery 2026-05-05
+
+Shipped en `develop` directo (no se creó `task/TASK-498-*` porque es refactor puro de primitives sin riesgo de datos).
+
+**Primitives nuevos** (`src/components/greenhouse/primitives/`):
+
+- `EntitySummaryDock.tsx` — chasis sticky-bottom 3-zona genérico. Slot-based (`centerSlot`, `leftSlotExtra`) + helpers (`saveState`, `marginIndicator`, `simulationError`, `emptyStateMessage`). CTAs canónicas con `disabledReason` → Tooltip + `aria-describedby` + visuallyHidden id. **Ajuste vs spec original:** se generalizó vía slots `ReactNode` en lugar del `totals: Array<{label,value,…}>` que la spec proponía — el slot conserva integración con `TotalsLadder` + `addonsSegment` y permite a invoice/PO/contract componer su propio centro sin perder TASK-507/509.
+- `CardHeaderWithBadge.tsx` — `CardHeader` con title + badge inline. `title: string` activa la composición canónica `<Stack>{h6}{CustomChip}</Stack>`; `title: ReactNode` lo respeta tal cual y omite el badge default.
+- `FormSectionAccordion.tsx` — Accordion con border + `customBorderRadius.lg` + supresión de `:before`. Soporta `id` para ARIA bindings (`${id}-header` ↔ `${id}-content`), `summaryCount` opcional, modo controlado (`expanded` + `onChange`).
+
+**Primitive extendido**: `ContextChipStrip.tsx` recibe prop `overflowAfter?: number | null`. Cuando `Children.count > overflowAfter`, renderiza inline los primeros N + chip "+M más" que abre MUI `Menu` con los restantes (`aria-haspopup='menu' aria-expanded aria-controls`).
+
+**Migraciones del Quote Builder**:
+
+- `src/components/greenhouse/pricing/QuoteSummaryDock.tsx` — adapter thin sobre `EntitySummaryDock`. API pública intacta para `QuoteBuilderShell`.
+- `src/views/greenhouse/finance/workspace/QuoteLineItemsEditor.tsx` — vista editable consume `<CardHeaderWithBadge title='Ítems de la cotización' badgeValue={draftLines.length} …/>`. Vista readonly preserva `CardHeader` MUI (sin badge → no requiere migración).
+- `src/views/greenhouse/finance/workspace/QuoteBuilderShell.tsx` — Accordion "Detalle y notas" reemplazado por `<FormSectionAccordion id='quote-detail' iconClassName='tabler-notes' …/>`. Se eliminaron imports `Accordion / AccordionDetails / AccordionSummary / Typography` ya no usados.
+
+**Tests**: 4 archivos nuevos en `src/components/greenhouse/primitives/__tests__/` (EntitySummaryDock, CardHeaderWithBadge, FormSectionAccordion, ContextChipStrip — 23 cases). Suite completa pasa: 581 files, 3377 tests, 5 skipped.
+
+**Doc actualizada**: `docs/architecture/GREENHOUSE_UI_PLATFORM_V1.md` v1.5 — "Delta 2026-05-05 — Quote Builder primitives extraction Sprint 3 (TASK-498)" con uso canónico de los 4 primitives + reglas de migración.
+
+**Gates verdes**: `npx tsc --noEmit` clean, `pnpm lint` 0 errors (328 warnings pre-existentes en otros archivos), `pnpm test` all green.

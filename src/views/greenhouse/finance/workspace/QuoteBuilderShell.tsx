@@ -4,19 +4,17 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { useRouter } from 'next/navigation'
 
-import Accordion from '@mui/material/Accordion'
-import AccordionDetails from '@mui/material/AccordionDetails'
-import AccordionSummary from '@mui/material/AccordionSummary'
 import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Stack from '@mui/material/Stack'
 import Tooltip from '@mui/material/Tooltip'
-import Typography from '@mui/material/Typography'
 
 import { toast } from 'sonner'
 
 import CustomTextField from '@core/components/mui/TextField'
+
+import { FormSectionAccordion } from '@/components/greenhouse/primitives'
 
 import type { CommercialModelCode } from '@/lib/commercial/pricing-governance-types'
 import { requiresHubSpotQuoteCommercialContext } from '@/lib/commercial/quote-hubspot-sync-context'
@@ -1716,46 +1714,26 @@ const QuoteBuilderShell = ({
             }
           />
 
-          <Accordion
-            elevation={0}
+          <FormSectionAccordion
+            id='quote-detail'
+            title={GH_PRICING.detailAccordion.title}
+            iconClassName='tabler-notes'
             defaultExpanded={builderState.description.length > 0}
-            sx={theme => ({
-              border: `1px solid ${theme.palette.divider}`,
-              borderRadius: `${theme.shape.customBorderRadius.lg}px`,
-              '&:before': { display: 'none' },
-              '&.Mui-expanded': { margin: 0 },
-              '&:first-of-type': { borderRadius: `${theme.shape.customBorderRadius.lg}px` },
-              '&:last-of-type': { borderRadius: `${theme.shape.customBorderRadius.lg}px` }
-            })}
           >
-            <AccordionSummary
-              expandIcon={<i className='tabler-chevron-down' aria-hidden='true' />}
-              aria-controls='quote-detail-content'
-              id='quote-detail-header'
-            >
-              <Stack direction='row' spacing={1.5} alignItems='center'>
-                <i className='tabler-notes' aria-hidden='true' style={{ fontSize: 20 }} />
-                <Typography variant='subtitle1' sx={{ fontWeight: 600 }}>
-                  {GH_PRICING.detailAccordion.title}
-                </Typography>
-              </Stack>
-            </AccordionSummary>
-            <AccordionDetails id='quote-detail-content'>
-              <CustomTextField
-                fullWidth
-                multiline
-                minRows={3}
-                size='small'
-                label={GH_PRICING.detailAccordion.descriptionLabel}
-                value={builderState.description}
-                disabled={submitting}
-                onChange={event =>
-                  setBuilderState(prev => ({ ...prev, description: event.target.value }))
-                }
-                placeholder={GH_PRICING.detailAccordion.descriptionPlaceholder}
-              />
-            </AccordionDetails>
-          </Accordion>
+            <CustomTextField
+              fullWidth
+              multiline
+              minRows={3}
+              size='small'
+              label={GH_PRICING.detailAccordion.descriptionLabel}
+              value={builderState.description}
+              disabled={submitting}
+              onChange={event =>
+                setBuilderState(prev => ({ ...prev, description: event.target.value }))
+              }
+              placeholder={GH_PRICING.detailAccordion.descriptionPlaceholder}
+            />
+          </FormSectionAccordion>
         </Stack>
 
         <QuoteSummaryDock

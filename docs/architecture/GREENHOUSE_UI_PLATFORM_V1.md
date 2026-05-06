@@ -1,7 +1,8 @@
 # Greenhouse EO — UI Platform Architecture V1
 
-> **Version:** 1.4
+> **Version:** 1.5
 > **Created:** 2026-03-30
+> **Updated:** 2026-05-05 — v1.5: Quote Builder primitives extraction Sprint 3 (TASK-498). Tres primitives nuevos en `src/components/greenhouse/primitives/` (`EntitySummaryDock`, `CardHeaderWithBadge`, `FormSectionAccordion`) habilitan invoice / PO / contract / finiquito builders sin re-implementar el chasis. `ContextChipStrip` recibe `overflowAfter` con dropdown "+M más" canónico. Quote Builder migrado: `QuoteSummaryDock` queda como adapter thin sobre `EntitySummaryDock`, conservando API histórica. Ver Delta 2026-05-05 abajo.
 > **Updated:** 2026-05-04 — v1.4: Quick Access Shortcuts Platform (TASK-553). Catálogo canónico `src/lib/shortcuts/catalog.ts` + resolver dual-plane (`module` + opcional `viewCode` + opcional `requiredCapability`) compartido entre Home `recommendedShortcuts` y header `<ShortcutsDropdown />`. Persistencia per-usuario en `greenhouse_core.user_shortcut_pins` vía `/api/me/shortcuts`. Ver Delta 2026-05-04 abajo.
 > **Updated:** 2026-04-20 — v1.3: Floating UI (`@floating-ui/react` 0.27) introducido como stack oficial de positioning para popovers (TASK-509). Primer consumer: `TotalsLadder`. TASK-510 backlog migra el resto. Ver Delta 2026-04-20b abajo.
 > **Updated:** 2026-04-20 — v1.2: `TotalsLadder` primitive extiende su API con `addonsSegment?: { count, amount, onClick, ariaExpanded } | null` (TASK-507) para renderizar un segmento interactivo inline dentro de la ladder de ajustes. Pattern: acciones contextuales viven con sus datos, no como chips flotantes separados. Ver Delta 2026-04-20 abajo.
@@ -13,6 +14,145 @@
 ## Overview
 
 Greenhouse EO es un portal Next.js 16 App Router con MUI 7.x envuelto por el starter-kit Vuexy. Este documento es la referencia canónica de la plataforma UI: stack, librerías disponibles, patrones de componentes, convenciones de estado, y reglas de adopción.
+
+## Delta 2026-05-05 — Quote Builder primitives extraction Sprint 3 (TASK-498)
+
+El Quote Builder publicó 4 capacidades nuevas al registry canónico de primitives. Hoy las consume sólo el quote builder; mañana las consumen invoice builder, PO builder, contract builder, finiquito generator y cualquier entity-form que necesite el mismo chasis sticky-bottom + section accordion + card-header-with-badge + chip-strip overflow.
+
+```
+src/components/greenhouse/primitives/
+├── EntitySummaryDock.tsx        # nuevo (TASK-498)
+├── CardHeaderWithBadge.tsx      # nuevo (TASK-498)
+├── FormSectionAccordion.tsx     # nuevo (TASK-498)
+├── ContextChipStrip.tsx         # extendido (TASK-498)  — `overflowAfter` prop
+├── …                            # primitives previos (TASK-487, TASK-505, TASK-507, TASK-509)
+└── index.ts
+```
+
+### `EntitySummaryDock`
+
+Generic sticky-bottom cockpit primitive. Chasis canónico de cualquier builder enterprise (quote, invoice, purchase order, contract, finiquito, statement of work). Layout 3-zona Grid 3/6/3 en md+, single-column en xs.
+
+```tsx
+import {
+  EntitySummaryDock,
+  TotalsLadder,
+  type EntitySummaryDockSaveState
+} from '@/components/greenhouse/primitives'
+
+<EntitySummaryDock
+  ariaLabel='Resumen de la cotización'
+  saveState={{ kind: 'dirty', changeCount: 2 }}
+  marginIndicator={{ classification: 'healthy', marginPct: 0.494, tierRange: null }}
+  centerSlot={
+    <TotalsLadder
+      subtotal={2923500}
+      factor={1.15}
+      ivaAmount={558345}
+      total={3921845}
+      currency='CLP'
+    />
+  }
+  emptyStateMessage='Agrega ítems para ver el total.' /* fallback cuando centerSlot=null */
+  simulationError='Error al simular precios.'        /* opcional, alert top */
+  primaryCta={{
+    label: 'Guardar y emitir',
+    onClick: () => handleSubmit(),
+    iconClassName: 'tabler-file-check',
+    loading: submitting,
+    disabled: notReady,
+    disabledReason: 'Faltan ítems en la cotización.'
+  }}
+  secondaryCta={{ label: 'Guardar borrador', onClick: () => handleDraft() }}
+/>
+```
+
+Props clave:
+
+- `centerSlot: ReactNode` — totales, KPIs, métricas. Cuando `null/undefined` y hay `emptyStateMessage`, se renderiza la leyenda con icono.
+- `saveState`, `marginIndicator`, `leftSlotExtra` — composiciones declarativas de la zona izquierda. Usan los primitives existentes (`SaveStateIndicator`, `MarginHealthChip`).
+- `primaryCta` / `secondaryCta` — objetos canónicos `{ label, onClick, loading?, disabled?, iconClassName?, disabledReason? }`. El primary CTA encapsula el patrón Tooltip-on-disabled + `aria-describedby` + visuallyHidden id.
+- `simulationError: ReactNode | string | null` — Alert inline en la parte superior del dock.
+
+A11y: `<aside role='status' aria-live='polite'>` consolidada en el root. Cuando `disabled && disabledReason`, el primary CTA se envuelve en Tooltip + `<span sx={visuallyHidden} id="${id}-cta-reason">` con la razón completa.
+
+### `CardHeaderWithBadge`
+
+Card header con title + badge inline. Pattern enterprise (Linear / Notion / Stripe Billing): identifica la sección y comunica scale (count) en un solo phrase visual.
+
+```tsx
+import { CardHeaderWithBadge } from '@/components/greenhouse/primitives'
+
+<CardHeaderWithBadge
+  title='Ítems de la cotización'
+  badgeValue={draftLines.length}
+  badgeColor={draftLines.length === 0 ? 'secondary' : 'primary'}
+  subheader='Agrega ítems vendibles desde el catálogo o crea una línea manual.'
+  avatarIcon='tabler-list-details'
+  action={headerAction}
+/>
+```
+
+Props:
+
+- `title: string | ReactNode` — string compone canónicamente `<Stack>{h6}{badge}</Stack>`. ReactNode lo respeta tal cual y omite el badge default.
+- `badgeValue: string | number` — valor stringificado para el chip.
+- `badgeColor` (default `primary`), `badgeVariant` (default `tonal`), `badgeAriaLabel?` — control fino del chip.
+- `subheader`, `avatarIcon`, `avatarIconColor`, `action` — passthrough estándar de `CardHeader`.
+
+Reglas de uso: el consumer decide `badgeColor` semánticamente (no se deriva automáticamente de `count`).
+
+### `FormSectionAccordion`
+
+Accordion canónico para secciones de formulario colapsables. Aplica el patrón Greenhouse: border 1px divider + `customBorderRadius.lg`, suprime `:before` divider, mantiene márgenes consistentes en estado expanded.
+
+```tsx
+import { FormSectionAccordion } from '@/components/greenhouse/primitives'
+
+<FormSectionAccordion
+  id='quote-detail'
+  title='Detalle y notas'
+  iconClassName='tabler-notes'
+  defaultExpanded={description.length > 0}
+  summaryCount={attachments.length || null}
+>
+  <CustomTextField multiline label='Descripción' value={description} onChange={…} />
+</FormSectionAccordion>
+```
+
+Props:
+
+- `title`, `iconClassName?`, `defaultExpanded?`, `summaryCount?`, `summaryCountColor?`
+- `expanded` + `onChange` para modo controlado
+- `id` deriva ARIA bindings (`${id}-header` ↔ `${id}-content`)
+
+### `ContextChipStrip` overflow extension
+
+`ContextChipStrip` gana prop `overflowAfter?: number | null`. Cuando `Children.count(children) > overflowAfter`, renderiza inline solo los primeros N y agrupa el resto en un dropdown menu accionable por chip "+M más" — pattern de overflow de Linear / GitHub repo header / Stripe Billing filtros.
+
+```tsx
+import { ContextChipStrip, ContextChip } from '@/components/greenhouse/primitives'
+
+<ContextChipStrip ariaLabel='Filtros de cotización' overflowAfter={6}>
+  {fields.map(f => <ContextChip key={f.id} {...f} />)}
+</ContextChipStrip>
+```
+
+Props nuevas:
+
+- `overflowAfter?: number | null` — límite. `null/undefined` = comportamiento default (todos inline).
+- `overflowMoreLabel?: string` — copy localizable. Default `'más'`.
+- `overflowMenuAriaLabel?: string` — default `${ariaLabel} — opciones adicionales`.
+
+A11y: el chip overflow tiene `aria-haspopup='menu' aria-expanded` + `aria-controls`. El menu usa `dense` MenuList con cada child en un `MenuItem` (preserva el rendering del child sin ripple).
+
+### Migración Quote Builder (Slice 5)
+
+- `QuoteSummaryDock` → adapter thin sobre `EntitySummaryDock`. Conserva la API pública (subtotal/factor/ivaAmount/total/addons/marginPct/saveState) y mapea a los slots genéricos. Cero cambio para el consumer (`QuoteBuilderShell`).
+- `QuoteLineItemsEditor` (vista editable) → consume `CardHeaderWithBadge` directamente. La vista readonly permanece con `CardHeader` MUI por simplicidad (sin badge).
+- `QuoteBuilderShell` → "Detalle y notas" Accordion inline reemplazado por `<FormSectionAccordion id='quote-detail' …>`.
+
+Reusable platform-wide. Sin domain logic. Tokens canónicos (`customBorderRadius.lg`, `theme.palette.divider`, `theme.zIndex.appBar - 2`). Apto para Quote / Invoice / Purchase Order / Contract / Reconciliation Workbench / HR Profile / Settings.
 
 ## Delta 2026-05-04 — Quick Access Shortcuts Platform (TASK-553)
 
