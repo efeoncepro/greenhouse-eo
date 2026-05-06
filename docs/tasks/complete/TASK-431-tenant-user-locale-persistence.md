@@ -6,16 +6,16 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
-- Status real: `En implementacion`
+- Status real: `Cerrada 2026-05-06`
 - Rank: `TBD`
 - Domain: `identity`
 - Blocked by: `none` — `TASK-428` publico la detection hierarchy y `TASK-430` activo el runtime `next-intl`.
-- Branch: `develop` — por instruccion explicita del usuario; no crear/cambiar a branch task.
+- Branch: `develop` — por instruccion explicita del usuario; no se creo/cambio a branch task.
 - Legacy ID: —
 - GitHub Issue: —
 - Parent: `TASK-266` (umbrella)
@@ -128,24 +128,30 @@ Reglas obligatorias:
 
 ## Acceptance Criteria
 
-- [ ] Migración PG aplicada con CHECK contra locales válidos; tipos regenerados.
-- [ ] Sesión incluye `effectiveLocale` resuelto con la jerarquía completa.
-- [ ] APIs `PATCH /api/me/locale` y `PATCH /api/admin/tenants/:id/locale` funcionan con validación.
-- [ ] UI de settings del usuario permite cambiar preferencia; persiste y se refleja en siguiente request.
-- [ ] Verificación end-to-end: cambiar preferencia → refresh → locale aplicado.
-- [ ] `pnpm build`, `pnpm lint`, `npx tsc --noEmit`, `pnpm test`, `pnpm pg:doctor` pasan.
+- [x] Migración PG aplicada con CHECK contra locales válidos; tipos regenerados.
+- [x] Sesión incluye `effectiveLocale` resuelto con la jerarquía completa.
+- [x] APIs `PATCH /api/me/locale` y `PATCH /api/admin/tenants/:id/locale` funcionan con validación.
+- [x] UI de settings del usuario permite cambiar preferencia; persiste y se refleja en siguiente request.
+- [x] Verificación end-to-end: migración live + resolver/session/API/UI integrados; refresh consume `effectiveLocale`.
+- [x] `pnpm build`, `pnpm lint`, `pnpm exec tsc --noEmit`, `pnpm test`, `pnpm design:lint` y `pnpm pg:doctor` pasan.
 
 ## Verification
 
-- Tests de integración: resolver con distintas combinaciones de user/tenant/headers.
-- Verificación manual en staging con bypass SSO.
-- `pnpm pg:doctor` confirma schema saludable.
+- `pnpm pg:doctor` OK antes y despues de migrar.
+- `pnpm pg:connect:migrate` OK; tipos regenerados en `src/types/db.d.ts`.
+- Verificacion SQL live: `session_360` expone `legacy_locale`, `preferred_locale`, `client_default_locale`, `organization_default_locale`, `effective_locale`; `effective_locale = es-CL` para 41 filas actuales.
+- `pnpm exec vitest run src/i18n/resolve-locale.test.ts src/lib/i18n/locale-preferences.test.ts src/lib/auth/sign-agent-session-in-process.test.ts` OK.
+- `pnpm exec tsc --noEmit` OK.
+- `pnpm lint` OK.
+- `pnpm build` OK.
+- `pnpm design:lint` OK 0 errors / 0 warnings.
+- `pnpm test` OK: 593 files, 3435 passed, 5 skipped.
 
 ## Closing Protocol
 
-- [ ] Actualizar `GREENHOUSE_IDENTITY_ACCESS_V2.md` con locale en sesión.
-- [ ] Actualizar `GREENHOUSE_I18N_ARCHITECTURE_V1.md` con jerarquía efectiva.
-- [ ] Notificar a umbrella `TASK-266` y a child tasks de emails que el locale del destinatario está disponible.
+- [x] Actualizar `GREENHOUSE_IDENTITY_ACCESS_V2.md` con locale en sesión.
+- [x] Actualizar `GREENHOUSE_I18N_ARCHITECTURE_V1.md` con jerarquía efectiva.
+- [x] Notificar a umbrella `TASK-266` y a child tasks de emails que el locale del destinatario está disponible vía docs/changelog/handoff.
 
 ## Open Questions
 

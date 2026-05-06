@@ -2,6 +2,8 @@
 
 ## 2026-05-06
 
+- **TASK-431 — persistencia de locale user/tenant.** Se agregan `identity_profiles.preferred_locale`, `organizations.default_locale` y `clients.default_locale` con CHECK `es-CL|en-US`, backfill desde `client_users.locale`, y `session_360.effective_locale`. NextAuth/JWT, agent sessions y API Platform contexts exponen `effectiveLocale`; `/api/me/locale` y `/api/admin/tenants/[id]/locale` permiten actualizar preferencias con guards existentes. Settings y Admin Tenants incluyen dropdown de idioma sin cambiar access model, rutas privadas ni entitlements.
+
 - **TASK-430 — runtime i18n activado.** Se instala `next-intl`, se compone con Sentry en `next.config.ts`, el App Router queda envuelto con `NextIntlClientProvider`, `<html lang>` usa el locale efectivo y `src/i18n/*` resuelve `gh_locale` + `Accept-Language` + fallback `es-CL` sin prefijar rutas privadas. `en-US` ya tiene traducciones para shell navigation y namespaces shared (`actions`, `states`, `loading`, `empty`, `months`, `aria`, `errors`, `feedback`, `time`). Persistencia user/tenant queda para TASK-431; emails siguen fuera del provider App Router.
 
 - **TASK-428 — i18n architecture ADR.** Se publica `docs/architecture/GREENHOUSE_I18N_ARCHITECTURE_V1.md`: `next-intl` como runtime App Router, portal privado sin locale prefix por defecto, `en-US` como primera activación, `pt-BR` planned, emails SSR sin provider App Router, y TASK-431 debe absorber `client_users.locale` legacy. `TASK-266` queda cerrada como umbrella formalizada.

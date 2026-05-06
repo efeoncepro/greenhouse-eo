@@ -1,8 +1,8 @@
 # Greenhouse i18n Architecture V1
 
-> Version: 1.1
+> Version: 1.2
 > Created: 2026-05-06
-> Updated: 2026-05-06 — TASK-430 runtime activation
+> Updated: 2026-05-06 — TASK-431 persisted locale preferences
 > Owner: Platform UI / Identity
 > Source task: `TASK-428`
 
@@ -34,8 +34,12 @@ Runtime facts verified for this ADR:
 - `src/lib/copy/` is locale-aware with `es-CL` default and translated `en-US` shared namespaces.
 - `src/lib/format/` is the canonical formatting layer and must remain separate from translated copy.
 - `src/lib/email/locale-resolver.ts` maps legacy email locales (`es`, `en`) to platform locales (`es-CL`, `en-US`).
-- PostgreSQL currently has legacy `greenhouse_core.client_users.locale TEXT DEFAULT 'es'`.
-- PostgreSQL does not yet have tenant default locale or identity profile preferred locale columns.
+- PostgreSQL has legacy `greenhouse_core.client_users.locale TEXT DEFAULT 'es'` as compatibility state.
+- PostgreSQL has canonical persisted locale fields from TASK-431:
+  - `greenhouse_core.identity_profiles.preferred_locale`
+  - `greenhouse_core.organizations.default_locale`
+  - `greenhouse_core.clients.default_locale`
+- `greenhouse_serving.session_360` exposes `preferred_locale`, tenant defaults and `effective_locale` for session resolution.
 
 ## Decision Summary
 
@@ -46,7 +50,7 @@ Runtime facts verified for this ADR:
 | Default locale | `es-CL`. |
 | Phase 1 activation locale | `en-US`. |
 | Planned first-class locale | `pt-BR`, gated by dictionary coverage and business validation before activation. |
-| Detection after persistence | user preferred locale → tenant default locale → cookie/manual override → `Accept-Language` → `es-CL`. |
+| Detection after persistence | user preferred locale → tenant default locale → legacy user locale → cookie/manual override → `Accept-Language` → `es-CL`. |
 | Detection before persistence | explicit public route locale when present → cookie/manual override → `Accept-Language` → `es-CL`. |
 | Formatting | Keep `src/lib/format/` as the canonical formatting primitive; i18n does not replace it. |
 | Access model | Locale is presentation state, not authorization. No routeGroups, views, entitlements, or startup policy changes. |
@@ -154,9 +158,10 @@ Once persistence exists:
 
 1. user preferred locale
 2. tenant default locale
-3. cookie/manual override for temporary testing or unauthenticated public routes
-4. `Accept-Language`
-5. `DEFAULT_LOCALE` (`es-CL`)
+3. legacy user locale from `client_users.locale` during compatibility reads
+4. cookie/manual override for temporary testing or unauthenticated public routes
+5. `Accept-Language`
+6. `DEFAULT_LOCALE` (`es-CL`)
 
 The session should expose `effectiveLocale` as a platform locale (`es-CL`, `en-US`, `pt-BR`, etc.).
 
@@ -235,7 +240,7 @@ Rules:
 - Keep `src/lib/email/locale-resolver.ts` as the bridge from legacy `es|en` inputs.
 - Use dictionary/core APIs for SSR email rendering.
 - Personalization tokens stay outside dictionaries: names, amounts, periods, URLs, unsubscribe links, generated narratives, client names and dynamic labels remain runtime data.
-- If recipient locale is unknown, default to `es-CL` until `TASK-431` exposes persisted recipient locale.
+- If recipient locale is unknown, default to `es-CL`. TASK-431 makes recipient preference available through Identity/session primitives; email-specific rollout tasks should consume that value explicitly instead of depending on the App Router provider.
 
 ## Formatting Boundary
 
@@ -276,14 +281,15 @@ Future settings surfaces that let a user change locale must reuse existing setti
 
 ## TASK-431 Contract
 
-`TASK-431` should:
+`TASK-431` delivered:
 
-- implement persisted preference/default locale according to the hierarchy above
-- normalize legacy `client_users.locale`
-- expose `effectiveLocale` in session/JWT safely
-- define update APIs and UI using existing settings/admin entitlement patterns
-- keep agent-auth default stable
-- document recipient-locale behavior for emails
+- persisted preference/default locale with nullable-first schema and CHECK constraints for `es-CL` and `en-US`
+- legacy `client_users.locale` normalization (`es` → `es-CL`, `en` → `en-US`)
+- `effectiveLocale` in `session_360`, `TenantAccessRecord`, NextAuth JWT/session, tenant context and app platform contexts
+- `PATCH /api/me/locale` plus user settings dropdown
+- `PATCH /api/admin/tenants/[id]/locale` plus admin tenant settings dropdown
+- agent-session locale fields carried from the same tenant access record
+- access model unchanged: locale remains presentation state
 
 ## Verification Expectations
 
@@ -308,8 +314,8 @@ For `TASK-431`:
 - `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md`
 - `docs/architecture/GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md`
 - `docs/tasks/complete/TASK-429-locale-aware-formatting-utilities.md`
-- `docs/tasks/to-do/TASK-430-dictionary-foundation-activation.md`
-- `docs/tasks/to-do/TASK-431-tenant-user-locale-persistence.md`
+- `docs/tasks/complete/TASK-430-dictionary-foundation-activation.md`
+- `docs/tasks/complete/TASK-431-tenant-user-locale-persistence.md`
 - Next.js Proxy docs: `https://nextjs.org/docs/app/api-reference/file-conventions/proxy`
 - next-intl App Router docs: `https://next-intl.dev/docs/getting-started/app-router`
 - next-intl core library docs: `https://next-intl.dev/docs/environments/core-library`

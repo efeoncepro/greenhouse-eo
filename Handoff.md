@@ -1,9 +1,12 @@
-# Sesion 2026-05-06 — TASK-431 tomada en develop
+# Sesion 2026-05-06 — TASK-431 cerrada en develop
 
 - **Branch:** `develop` por instruccion explicita del usuario; no se crea `task/TASK-431-tenant-user-locale-persistence`.
-- **Ownership:** no habia PR abierto ni branch local/remota obvia para `TASK-431`; se toma la task y se mueve a `docs/tasks/in-progress/`.
-- **Scope esperado:** persistencia canonica de locale user/tenant sobre Identity V2 + runtime `next-intl`: `identity_profiles.preferred_locale` -> tenant/account default -> cookie `gh_locale` -> `Accept-Language` -> `es-CL`.
-- **Guardrail inicial:** no tocar access model como permisos; locale es presentacion. Si hay UI admin, debe reutilizar guards existentes (`requireAdminTenantContext`) y documentar que `routeGroups`, `views`, `entitlements` y startup policy no cambian salvo capability explicita existente.
+- **Ownership/lifecycle:** no habia PR abierto ni branch local/remota obvia para `TASK-431`; se tomo, implemento y cerro en `docs/tasks/complete/`.
+- **Entrega:** migracion PG `20260506180640149_task-431-tenant-user-locale-persistence.sql` agrega `identity_profiles.preferred_locale`, `organizations.default_locale`, `clients.default_locale`, CHECK `es-CL|en-US`, backfill desde `client_users.locale` y `greenhouse_serving.session_360.effective_locale`.
+- **Runtime:** `TenantAccessRecord`, NextAuth JWT/session, `TenantContext`, agent sessions y API Platform contexts exponen `preferredLocale`, `tenantDefaultLocale`, `legacyLocale` y `effectiveLocale`. Resolver efectivo: user preference -> tenant/account default -> legacy user locale -> cookie -> `Accept-Language` -> `es-CL`.
+- **APIs/UI:** `PATCH /api/me/locale` + Settings personal; `PATCH /api/admin/tenants/[id]/locale` + Admin Tenants Settings. Guards existentes: `requireTenantContext` y `requireAdminTenantContext`.
+- **Access model:** sin cambios en `routeGroups`, `views`, `authorizedViews`, `view_code`, `entitlements` ni startup policy. Locale queda como presentacion, no autorizacion.
+- **Validacion:** `pnpm pg:doctor` OK; `pnpm pg:connect:migrate` OK; SQL live verificado (`session_360.effective_locale = es-CL` para 41 filas); `pnpm exec vitest run src/i18n/resolve-locale.test.ts src/lib/i18n/locale-preferences.test.ts src/lib/auth/sign-agent-session-in-process.test.ts` OK; `pnpm exec tsc --noEmit` OK; `pnpm lint` OK; `pnpm build` OK; `pnpm design:lint` OK 0 errors/0 warnings; `pnpm test` OK (593 files, 3435 passed, 5 skipped).
 
 # Sesion 2026-05-06 — TASK-430 cerrada en develop
 
