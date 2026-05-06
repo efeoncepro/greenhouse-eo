@@ -192,7 +192,7 @@ Para cada slice mergeado a `develop` antes de promover a TASK-408 Closing Protoc
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`

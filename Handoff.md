@@ -1,5 +1,13 @@
 # Handoff.md
 
+## Sesion 2026-05-06 — TASK-407 tomada en develop
+
+- **Branch:** `develop` por instruccion explicita del usuario; no se crea `task/TASK-407-copy-migration-shared-shell-components`.
+- **Ownership:** no hay PR abierto ni branch local/remota obvia para `TASK-407`; se toma la task como `in-progress`.
+- **Lifecycle:** `docs/tasks/to-do/TASK-407-copy-migration-shared-shell-components.md` -> `docs/tasks/in-progress/TASK-407-copy-migration-shared-shell-components.md`; `docs/tasks/README.md` y `docs/tasks/TASK_ID_REGISTRY.md` sincronizados.
+- **Discovery inicial:** foundation `src/lib/copy/` existe y la rule `greenhouse/no-untokenized-copy` esta activa en `warn`; falta el test dedicado de la rule y Slice 0 debe extender deteccion a month arrays + JSX text CTAs antes del sweep.
+- **Pendiente inmediato:** presentar Audit/Mapa/Plan. Por `Priority=P1` + `Effort=Alto`, checkpoint humano aplica antes de runtime si se ejecuta el protocolo estricto completo.
+
 ## Sesion 2026-05-06 — TASK-429 cerrada en develop
 
 - **Branch:** `develop` por instruccion explicita del usuario; no se crea `task/TASK-429-locale-aware-formatting-utilities`.

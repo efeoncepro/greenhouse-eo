@@ -475,7 +475,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-425` | `to-do` | Finance Metric Dependency DAG Runtime Propagation (v2) | `docs/tasks/to-do/TASK-425-finance-metric-dependency-dag-runtime-propagation.md` |
 | `TASK-426` | `to-do` | Finance Metric Cross-Domain References (v2) | `docs/tasks/to-do/TASK-426-finance-metric-cross-domain-references.md` |
 | `TASK-427` | `to-do` | Finance Metric Registry Sharding (trigger-based) | `docs/tasks/to-do/TASK-427-finance-metric-registry-sharding.md` |
-| `TASK-407` | `to-do` | Copy Migration: Shared Shell + Components (split de TASK-265) | `docs/tasks/to-do/TASK-407-copy-migration-shared-shell-components.md` |
+| `TASK-407` | `in-progress` | Copy Migration: Shared Shell + Components (split de TASK-265) | `docs/tasks/in-progress/TASK-407-copy-migration-shared-shell-components.md` |
 | `TASK-408` | `to-do` | Copy Migration: Notification Categories + Institutional Emails (split de TASK-265) | `docs/tasks/to-do/TASK-408-copy-migration-notifications-emails.md` |
 | `TASK-428` | `to-do` | i18n Architecture Decision (library + routing + locales) — child de TASK-266 | `docs/tasks/to-do/TASK-428-i18n-architecture-decision.md` |
 | `TASK-429` | `to-do` | Locale-Aware Formatting Utilities — child de TASK-266 | `docs/tasks/to-do/TASK-429-locale-aware-formatting-utilities.md` |
