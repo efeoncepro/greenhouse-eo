@@ -171,6 +171,8 @@ Frontera operativa:
 
 `NotificationEmail` usa el mismo selector con `getMicrocopy().emails.genericNotification` para copy fallback del render. El titulo, cuerpo, CTA explicita, URL de accion y unsubscribe siguen siendo payload dinamico del pipeline de notificaciones.
 
+La cohorte leave usa `getMicrocopy().emails.leave.*` para headings por estado, badges, labels de resumen, pluralizacion de dias, disclaimers y fallbacks. Los datos operativos (`memberName`, `leaveTypeName`, fechas, dias, motivo, notas, reviewer/actor) siguen llegando desde el runtime del modulo HR y no se persistieron en el dictionary.
+
 La primitive `selectEmailTemplateCopy()` permite repetir este patron en los siguientes templates sin tocar delivery:
 
 - `es` / `es-CL` / default → dictionary de plataforma.

@@ -1,9 +1,12 @@
 import { Heading, Img, Section, Text } from '@react-email/components'
 
+import { getMicrocopy, type LeaveRequestSubmittedEmailTemplateCopy } from '@/lib/copy'
+import { selectEmailTemplateCopy } from '@/lib/email/template-copy'
+import { formatDate as formatLocaleDate } from '@/lib/format'
+
 import EmailButton from './components/EmailButton'
 import EmailLayout from './components/EmailLayout'
 import { APP_URL, EMAIL_COLORS, EMAIL_FONTS } from './constants'
-import { formatDate as formatLocaleDate } from '@/lib/format'
 
 const MEDIA_BUCKET = process.env.GREENHOUSE_PUBLIC_MEDIA_BUCKET || 'efeonce-group-greenhouse-public-media-prod'
 const HERO_IMAGE_URL = `https://storage.googleapis.com/${MEDIA_BUCKET}/emails/leave-submitted.png`
@@ -59,28 +62,20 @@ const summaryRow = (label: string, value: string, emphasis = false) => (
   </table>
 )
 
-const getTranslations = (locale: 'es' | 'en') => {
-  const isEn = locale === 'en'
-
-  return {
-    heading: isEn ? 'Request submitted' : 'Solicitud enviada',
-    greeting: (name: string) => isEn ? `Hi ${name},` : `Hola ${name},`,
-    body: (type: string, days: number) => isEn
-      ? `Your ${type} request for ${days} ${days === 1 ? 'day' : 'days'} has been submitted and is pending review. We'll notify you as soon as a decision is made.`
-      : `Tu solicitud de ${type} por ${days} ${days === 1 ? 'día' : 'días'} fue enviada y está pendiente de revisión. Te avisaremos cuando haya una decisión.`,
-    cardType: isEn ? 'Type' : 'Tipo',
-    cardFrom: isEn ? 'From' : 'Desde',
-    cardTo: isEn ? 'To' : 'Hasta',
-    cardDays: isEn ? 'Days' : 'Días',
-    cardStatus: isEn ? 'Status' : 'Estado',
-    statusPending: isEn ? 'Pending review' : 'Pendiente de revisión',
-    reasonHeader: isEn ? 'Your reason' : 'Tu motivo',
-    cta: isEn ? 'View my leave' : 'Ver mis permisos',
-    fallback: isEn
-      ? 'If the button does not work, copy and paste this address into your browser:'
-      : 'Si el botón no funciona, copia y pega esta dirección en tu navegador:',
-    daysUnit: (days: number) => isEn ? (days === 1 ? 'day' : 'days') : (days === 1 ? 'día' : 'días')
-  }
+const LEGACY_EN_LEAVE_REQUEST_SUBMITTED_EMAIL_COPY: LeaveRequestSubmittedEmailTemplateCopy = {
+  heading: 'Request submitted',
+  greeting: name => `Hi ${name},`,
+  body: (type, days) => `Your ${type} request for ${days} ${days === 1 ? 'day' : 'days'} has been submitted and is pending review. We'll notify you as soon as a decision is made.`,
+  cardType: 'Type',
+  cardFrom: 'From',
+  cardTo: 'To',
+  cardDays: 'Days',
+  cardStatus: 'Status',
+  statusPending: 'Pending review',
+  reasonHeader: 'Your reason',
+  cta: 'View my leave',
+  fallback: 'If the button does not work, copy and paste this address into your browser:',
+  daysUnit: days => days === 1 ? 'day' : 'days'
 }
 
 export default function LeaveRequestSubmittedEmail({
@@ -92,7 +87,12 @@ export default function LeaveRequestSubmittedEmail({
   reason,
   locale = 'es'
 }: LeaveRequestSubmittedEmailProps) {
-  const t = getTranslations(locale)
+  const t = selectEmailTemplateCopy(
+    locale,
+    getMicrocopy().emails.leave.requestSubmitted,
+    LEGACY_EN_LEAVE_REQUEST_SUBMITTED_EMAIL_COPY
+  )
+
   const appUrl = `${APP_URL}/my/leave`
 
   return (

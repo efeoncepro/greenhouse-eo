@@ -1,9 +1,12 @@
 import { Heading, Img, Section, Text } from '@react-email/components'
 
+import { getMicrocopy, type LeaveReviewConfirmationEmailTemplateCopy } from '@/lib/copy'
+import { selectEmailTemplateCopy } from '@/lib/email/template-copy'
+import { formatDate as formatLocaleDate } from '@/lib/format'
+
 import EmailButton from './components/EmailButton'
 import EmailLayout from './components/EmailLayout'
 import { APP_URL, EMAIL_COLORS, EMAIL_FONTS } from './constants'
-import { formatDate as formatLocaleDate } from '@/lib/format'
 
 const MEDIA_BUCKET = process.env.GREENHOUSE_PUBLIC_MEDIA_BUCKET || 'efeonce-group-greenhouse-public-media-prod'
 const HERO_IMAGE_URL = `https://storage.googleapis.com/${MEDIA_BUCKET}/emails/leave-review-v2.png`
@@ -70,46 +73,50 @@ const summaryRow = (label: string, value: React.ReactNode, emphasis = false) => 
   </table>
 )
 
-const getTranslations = (locale: 'es' | 'en', status: LeaveStatus) => {
-  const isEn = locale === 'en'
+const LEGACY_EN_LEAVE_REVIEW_CONFIRMATION_EMAIL_COPY: LeaveReviewConfirmationEmailTemplateCopy = {
+  heading: {
+    approved: 'Leave approved',
+    rejected: 'Leave rejected',
+    cancelled: 'Leave cancelled'
+  },
+  greeting: name => `Hi ${name},`,
+  body: {
+    approved: (member, type, days) => `We recorded your approval of ${member}'s ${type} request for ${days} ${days === 1 ? 'day' : 'days'}. The team member has been notified and the leave is now on the team calendar.`,
+    rejected: (member, type) => `We recorded your decision on ${member}'s ${type} request. The team member has been notified and may submit a new request if needed.`,
+    cancelled: (member, type) => `${member}'s ${type} request has been cancelled. The reserved days have been returned to their available balance.`
+  },
+  cardMember: 'Team member',
+  cardType: 'Type',
+  cardPeriod: 'Period',
+  cardDays: 'Days',
+  cardStatus: 'Status',
+  statusBadge: {
+    approved: 'Approved',
+    rejected: 'Rejected',
+    cancelled: 'Cancelled'
+  },
+  notesHeader: 'Your notes',
+  reasonHeader: 'Original request reason',
+  cta: 'View team leave',
+  fallback: 'If the button does not work, copy and paste this address into your browser:',
+  disclaimer: 'This email confirms an action you took in Greenhouse. If you do not recognize this action, contact the platform administrator immediately.',
+  daysUnit: days => days === 1 ? 'day' : 'days'
+}
 
-  return {
-    heading: isEn
-      ? { approved: 'Leave approved', rejected: 'Leave rejected', cancelled: 'Leave cancelled' }[status]
-      : { approved: 'Permiso aprobado', rejected: 'Permiso rechazado', cancelled: 'Permiso cancelado' }[status],
-    greeting: (name: string) => isEn ? `Hi ${name},` : `Hola ${name},`,
-    body: {
-      approved: (member: string, type: string, days: number) =>
-        isEn
-          ? `We recorded your approval of ${member}'s ${type} request for ${days} ${days === 1 ? 'day' : 'days'}. The team member has been notified and the leave is now on the team calendar.`
-          : `Registramos tu aprobación de la solicitud de ${type} de ${member} por ${days} ${days === 1 ? 'día' : 'días'}. El colaborador ya fue notificado y el permiso aparece en el calendario del equipo.`,
-      rejected: (member: string, type: string) =>
-        isEn
-          ? `We recorded your decision on ${member}'s ${type} request. The team member has been notified and may submit a new request if needed.`
-          : `Registramos tu decisión sobre la solicitud de ${type} de ${member}. El colaborador fue notificado y puede enviar una nueva solicitud si lo requiere.`,
-      cancelled: (member: string, type: string) =>
-        isEn
-          ? `${member}'s ${type} request has been cancelled. The reserved days have been returned to their available balance.`
-          : `La solicitud de ${type} de ${member} fue cancelada. Los días reservados volvieron al saldo disponible del colaborador.`
-    }[status],
-    cardMember: isEn ? 'Team member' : 'Colaborador',
-    cardType: isEn ? 'Type' : 'Tipo',
-    cardPeriod: isEn ? 'Period' : 'Periodo',
-    cardDays: isEn ? 'Days' : 'Días',
-    cardStatus: isEn ? 'Status' : 'Estado',
-    statusBadge: isEn
-      ? { approved: 'Approved', rejected: 'Rejected', cancelled: 'Cancelled' }[status]
-      : { approved: 'Aprobado', rejected: 'Rechazado', cancelled: 'Cancelado' }[status],
-    notesHeader: isEn ? 'Your notes' : 'Tus observaciones',
-    reasonHeader: isEn ? 'Original request reason' : 'Motivo de la solicitud',
-    cta: isEn ? 'View team leave' : 'Ver permisos del equipo',
-    fallback: isEn
-      ? 'If the button does not work, copy and paste this address into your browser:'
-      : 'Si el botón no funciona, copia y pega esta dirección en tu navegador:',
-    disclaimer: isEn
-      ? 'This email confirms an action you took in Greenhouse. If you do not recognize this action, contact the platform administrator immediately.'
-      : 'Este correo confirma una acción que realizaste en Greenhouse. Si no reconoces esta acción, contacta al administrador de la plataforma de inmediato.',
-    daysUnit: (days: number) => isEn ? (days === 1 ? 'day' : 'days') : (days === 1 ? 'día' : 'días')
+const buildBodyText = (
+  t: LeaveReviewConfirmationEmailTemplateCopy,
+  status: LeaveStatus,
+  memberName: string,
+  leaveTypeName: string,
+  requestedDays: number
+) => {
+  switch (status) {
+    case 'approved':
+      return t.body.approved(memberName, leaveTypeName, requestedDays)
+    case 'rejected':
+      return t.body.rejected(memberName, leaveTypeName)
+    case 'cancelled':
+      return t.body.cancelled(memberName, leaveTypeName)
   }
 }
 
@@ -125,20 +132,21 @@ export default function LeaveReviewConfirmationEmail({
   reason = 'Necesito tomar mis vacaciones pendientes del periodo anterior.',
   locale = 'es'
 }: LeaveReviewConfirmationEmailProps) {
-  const t = getTranslations(locale, status)
+  const t = selectEmailTemplateCopy(
+    locale,
+    getMicrocopy().emails.leave.reviewConfirmation,
+    LEGACY_EN_LEAVE_REVIEW_CONFIRMATION_EMAIL_COPY
+  )
+
   const styles = STATUS_STYLES[status]
   const appUrl = `${APP_URL}/hr/leave`
-
-  const bodyText = status === 'approved'
-    ? (t.body as (a: string, b: string, c: number) => string)(memberName, leaveTypeName, requestedDays)
-    : status === 'rejected'
-      ? (t.body as (a: string, b: string) => string)(memberName, leaveTypeName)
-      : (t.body as (a: string, b: string) => string)(memberName, leaveTypeName)
+  const heading = t.heading[status]
+  const bodyText = buildBodyText(t, status, memberName, leaveTypeName, requestedDays)
 
   const periodDisplay = `${formatDate(startDate, locale)} – ${formatDate(endDate, locale)}`
 
   return (
-    <EmailLayout previewText={t.heading} locale={locale}>
+    <EmailLayout previewText={heading} locale={locale}>
       {/* Hero image */}
       <Img
         src={HERO_IMAGE_URL}
@@ -163,7 +171,7 @@ export default function LeaveReviewConfirmationEmail({
         margin: '0 0 8px',
         lineHeight: '32px'
       }}>
-        {t.heading}
+        {heading}
       </Heading>
 
       {/* Greeting + body */}
@@ -200,7 +208,7 @@ export default function LeaveReviewConfirmationEmail({
             fontSize: '12px',
             fontWeight: 600
           }}>
-            {t.statusBadge}
+            {t.statusBadge[status]}
           </span>
         ))}
       </Section>

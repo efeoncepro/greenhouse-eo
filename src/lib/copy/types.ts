@@ -361,6 +361,80 @@ export interface NotificationEmailTemplateCopy {
   fallback: string
 }
 
+export type LeaveEmailStatus = 'approved' | 'rejected' | 'cancelled'
+
+export interface LeaveRequestDecisionEmailTemplateCopy {
+  heading: Record<LeaveEmailStatus, string>
+  greeting: (name: string) => string
+  body: {
+    approved: (actor: string, type: string, days: number) => string
+    rejected: (actor: string, type: string) => string
+    cancelled: (type: string) => string
+  }
+  cardType: string
+  cardFrom: string
+  cardTo: string
+  cardDays: string
+  statusBadge: Record<LeaveEmailStatus, string>
+  notesHeader: string
+  cta: string
+  fallback: string
+  daysUnit: (days: number) => string
+}
+
+export interface LeaveRequestSubmittedEmailTemplateCopy {
+  heading: string
+  greeting: (name: string) => string
+  body: (type: string, days: number) => string
+  cardType: string
+  cardFrom: string
+  cardTo: string
+  cardDays: string
+  cardStatus: string
+  statusPending: string
+  reasonHeader: string
+  cta: string
+  fallback: string
+  daysUnit: (days: number) => string
+}
+
+export interface LeaveRequestPendingReviewEmailTemplateCopy {
+  heading: string
+  greeting: (name: string) => string
+  body: (member: string, type: string, days: number) => string
+  cardMember: string
+  cardType: string
+  cardPeriod: string
+  cardDays: string
+  reasonHeader: string
+  cta: string
+  fallback: string
+  disclaimer: string
+  daysUnit: (days: number) => string
+}
+
+export interface LeaveReviewConfirmationEmailTemplateCopy {
+  heading: Record<LeaveEmailStatus, string>
+  greeting: (name: string) => string
+  body: {
+    approved: (member: string, type: string, days: number) => string
+    rejected: (member: string, type: string) => string
+    cancelled: (member: string, type: string) => string
+  }
+  cardMember: string
+  cardType: string
+  cardPeriod: string
+  cardDays: string
+  cardStatus: string
+  statusBadge: Record<LeaveEmailStatus, string>
+  notesHeader: string
+  reasonHeader: string
+  cta: string
+  fallback: string
+  disclaimer: string
+  daysUnit: (days: number) => string
+}
+
 /**
  * Copy institucional compartido por emails y notificaciones externas.
  * TASK-408 lo introduce como namespace foundation antes de migrar templates:
@@ -384,6 +458,12 @@ export interface EmailsCopy {
     invitation: InvitationEmailTemplateCopy
   }
   genericNotification: NotificationEmailTemplateCopy
+  leave: {
+    requestDecision: LeaveRequestDecisionEmailTemplateCopy
+    requestSubmitted: LeaveRequestSubmittedEmailTemplateCopy
+    requestPendingReview: LeaveRequestPendingReviewEmailTemplateCopy
+    reviewConfirmation: LeaveReviewConfirmationEmailTemplateCopy
+  }
   notificationCategories: NotificationCategoryCopy
   subjects: {
     passwordReset: string

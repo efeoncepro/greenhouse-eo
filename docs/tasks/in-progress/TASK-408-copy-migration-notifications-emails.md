@@ -153,6 +153,8 @@ Reglas obligatorias:
 
 **Estado 2026-05-06**: Slice 3B migra `NotificationEmail` a `getMicrocopy().emails.genericNotification` con fallback legacy `en`. Snapshot baseline sigue estable; no se tocaron `NotificationService`, payloads, preferencias, unsubscribe, outbox, webhooks ni eventos reactivos.
 
+**Estado 2026-05-06**: Slice 3C migra la cohorte leave (`LeaveRequestDecisionEmail`, `LeaveRequestSubmittedEmail`, `LeaveRequestPendingReviewEmail`, `LeaveReviewConfirmationEmail`) a `getMicrocopy().emails.leave.*` con fallback legacy `en`. Snapshot baseline sigue estable; no se tocaron handlers HR, approval authority, calendario operativo, balances, rutas, subjects, delivery, outbox, webhooks ni eventos reactivos.
+
 ### Slice 4 — Reliability signal `notifications.email.render_failure_rate`
 
 - Reader: [src/lib/reliability/queries/email-render-failure.ts](../../src/lib/reliability/queries/email-render-failure.ts). Cuenta failures de render del outbox consumer en últimas 24h sobre `greenhouse_sync.outbox_events WHERE event_type LIKE 'notification.email.%' AND status='failed' AND last_error LIKE '%render%'`.

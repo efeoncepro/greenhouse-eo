@@ -65,6 +65,92 @@ export const emails: EmailsCopy = {
     defaultAction: 'Ver en Greenhouse',
     fallback: 'Si el botón no funciona, copia y pega esta dirección en tu navegador:'
   },
+  leave: {
+    requestDecision: {
+      heading: {
+        approved: 'Solicitud aprobada',
+        rejected: 'Solicitud no aprobada',
+        cancelled: 'Solicitud cancelada'
+      },
+      greeting: name => `Hola ${name},`,
+      body: {
+        approved: (actor, type, days) => `${actor} aprobó tu solicitud de ${type} por ${days} ${days === 1 ? 'día' : 'días'}. Ya está registrada en el calendario del equipo.`,
+        rejected: (actor, type) => `${actor} revisó tu solicitud de ${type} y no pudo aprobarla en esta oportunidad. Revisa las observaciones y, si lo necesitas, puedes enviar una nueva solicitud.`,
+        cancelled: type => `Tu solicitud de ${type} fue cancelada. Los días reservados volvieron a tu saldo disponible.`
+      },
+      cardType: 'Tipo',
+      cardFrom: 'Desde',
+      cardTo: 'Hasta',
+      cardDays: 'Días',
+      statusBadge: {
+        approved: 'Aprobado',
+        rejected: 'Rechazado',
+        cancelled: 'Cancelado'
+      },
+      notesHeader: 'Observaciones del revisor',
+      cta: 'Ver mis permisos',
+      fallback: 'Si el botón no funciona, copia y pega esta dirección en tu navegador:',
+      daysUnit: days => days === 1 ? 'día' : 'días'
+    },
+    requestSubmitted: {
+      heading: 'Solicitud enviada',
+      greeting: name => `Hola ${name},`,
+      body: (type, days) => `Tu solicitud de ${type} por ${days} ${days === 1 ? 'día' : 'días'} fue enviada y está pendiente de revisión. Te avisaremos cuando haya una decisión.`,
+      cardType: 'Tipo',
+      cardFrom: 'Desde',
+      cardTo: 'Hasta',
+      cardDays: 'Días',
+      cardStatus: 'Estado',
+      statusPending: 'Pendiente de revisión',
+      reasonHeader: 'Tu motivo',
+      cta: 'Ver mis permisos',
+      fallback: 'Si el botón no funciona, copia y pega esta dirección en tu navegador:',
+      daysUnit: days => days === 1 ? 'día' : 'días'
+    },
+    requestPendingReview: {
+      heading: 'Solicitud de permiso por revisar',
+      greeting: name => `Hola ${name},`,
+      body: (member, type, days) => `${member} envió una solicitud de ${type} por ${days} ${days === 1 ? 'día' : 'días'} y necesita tu revisión. Aprueba o rechaza desde el panel de permisos.`,
+      cardMember: 'Colaborador',
+      cardType: 'Tipo',
+      cardPeriod: 'Periodo',
+      cardDays: 'Días',
+      reasonHeader: 'Motivo de la solicitud',
+      cta: 'Revisar solicitud',
+      fallback: 'Si el botón no funciona, copia y pega esta dirección en tu navegador:',
+      disclaimer: 'Recibes este correo porque eres revisor de solicitudes de permisos en Greenhouse.',
+      daysUnit: days => days === 1 ? 'día' : 'días'
+    },
+    reviewConfirmation: {
+      heading: {
+        approved: 'Permiso aprobado',
+        rejected: 'Permiso rechazado',
+        cancelled: 'Permiso cancelado'
+      },
+      greeting: name => `Hola ${name},`,
+      body: {
+        approved: (member, type, days) => `Registramos tu aprobación de la solicitud de ${type} de ${member} por ${days} ${days === 1 ? 'día' : 'días'}. El colaborador ya fue notificado y el permiso aparece en el calendario del equipo.`,
+        rejected: (member, type) => `Registramos tu decisión sobre la solicitud de ${type} de ${member}. El colaborador fue notificado y puede enviar una nueva solicitud si lo requiere.`,
+        cancelled: (member, type) => `La solicitud de ${type} de ${member} fue cancelada. Los días reservados volvieron al saldo disponible del colaborador.`
+      },
+      cardMember: 'Colaborador',
+      cardType: 'Tipo',
+      cardPeriod: 'Periodo',
+      cardDays: 'Días',
+      cardStatus: 'Estado',
+      statusBadge: {
+        approved: 'Aprobado',
+        rejected: 'Rechazado',
+        cancelled: 'Cancelado'
+      },
+      notesHeader: 'Tus observaciones',
+      reasonHeader: 'Motivo de la solicitud',
+      cta: 'Ver permisos del equipo',
+      fallback: 'Si el botón no funciona, copia y pega esta dirección en tu navegador:',
+      disclaimer: 'Este correo confirma una acción que realizaste en Greenhouse. Si no reconoces esta acción, contacta al administrador de la plataforma de inmediato.',
+      daysUnit: days => days === 1 ? 'día' : 'días'
+    }
+  },
   notificationCategories: {
     delivery_update: {
       label: 'Delivery updates',

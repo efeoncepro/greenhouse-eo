@@ -1,9 +1,12 @@
 import { Heading, Img, Section, Text } from '@react-email/components'
 
+import { getMicrocopy, type LeaveRequestDecisionEmailTemplateCopy } from '@/lib/copy'
+import { selectEmailTemplateCopy } from '@/lib/email/template-copy'
+import { formatDate as formatLocaleDate } from '@/lib/format'
+
 import EmailButton from './components/EmailButton'
 import EmailLayout from './components/EmailLayout'
 import { APP_URL, EMAIL_COLORS, EMAIL_FONTS } from './constants'
-import { formatDate as formatLocaleDate } from '@/lib/format'
 
 const MEDIA_BUCKET = process.env.GREENHOUSE_PUBLIC_MEDIA_BUCKET || 'efeonce-group-greenhouse-public-media-prod'
 const HERO_IMAGE_URL = `https://storage.googleapis.com/${MEDIA_BUCKET}/emails/leave-decision-v2.png`
@@ -69,41 +72,47 @@ const summaryRow = (label: string, value: string, emphasis = false) => (
   </table>
 )
 
-const getTranslations = (locale: 'es' | 'en', status: LeaveStatus) => {
-  const isEn = locale === 'en'
+const LEGACY_EN_LEAVE_REQUEST_DECISION_EMAIL_COPY: LeaveRequestDecisionEmailTemplateCopy = {
+  heading: {
+    approved: 'Request approved',
+    rejected: 'Request not approved',
+    cancelled: 'Request cancelled'
+  },
+  greeting: name => `Hi ${name},`,
+  body: {
+    approved: (actor, type, days) => `${actor} approved your ${type} request for ${days} ${days === 1 ? 'day' : 'days'}. It has been added to the team calendar.`,
+    rejected: (actor, type) => `${actor} reviewed your ${type} request and was unable to approve it at this time. Please review the notes below and feel free to submit a new request if needed.`,
+    cancelled: type => `Your ${type} request has been cancelled. The reserved days have been returned to your available balance.`
+  },
+  cardType: 'Type',
+  cardFrom: 'From',
+  cardTo: 'To',
+  cardDays: 'Days',
+  statusBadge: {
+    approved: 'Approved',
+    rejected: 'Rejected',
+    cancelled: 'Cancelled'
+  },
+  notesHeader: 'Reviewer notes',
+  cta: 'View my leave',
+  fallback: 'If the button does not work, copy and paste this address into your browser:',
+  daysUnit: days => days === 1 ? 'day' : 'days'
+}
 
-  return {
-    heading: isEn
-      ? { approved: 'Request approved', rejected: 'Request not approved', cancelled: 'Request cancelled' }[status]
-      : { approved: 'Solicitud aprobada', rejected: 'Solicitud no aprobada', cancelled: 'Solicitud cancelada' }[status],
-    greeting: (name: string) => isEn ? `Hi ${name},` : `Hola ${name},`,
-    body: {
-      approved: (actor: string, type: string, days: number) =>
-        isEn
-          ? `${actor} approved your ${type} request for ${days} ${days === 1 ? 'day' : 'days'}. It has been added to the team calendar.`
-          : `${actor} aprobó tu solicitud de ${type} por ${days} ${days === 1 ? 'día' : 'días'}. Ya está registrada en el calendario del equipo.`,
-      rejected: (actor: string, type: string) =>
-        isEn
-          ? `${actor} reviewed your ${type} request and was unable to approve it at this time. Please review the notes below and feel free to submit a new request if needed.`
-          : `${actor} revisó tu solicitud de ${type} y no pudo aprobarla en esta oportunidad. Revisa las observaciones y, si lo necesitas, puedes enviar una nueva solicitud.`,
-      cancelled: (type: string) =>
-        isEn
-          ? `Your ${type} request has been cancelled. The reserved days have been returned to your available balance.`
-          : `Tu solicitud de ${type} fue cancelada. Los días reservados volvieron a tu saldo disponible.`
-    }[status],
-    cardType: isEn ? 'Type' : 'Tipo',
-    cardFrom: isEn ? 'From' : 'Desde',
-    cardTo: isEn ? 'To' : 'Hasta',
-    cardDays: isEn ? 'Days' : 'Días',
-    statusBadge: isEn
-      ? { approved: 'Approved', rejected: 'Rejected', cancelled: 'Cancelled' }[status]
-      : { approved: 'Aprobado', rejected: 'Rechazado', cancelled: 'Cancelado' }[status],
-    notesHeader: isEn ? 'Reviewer notes' : 'Observaciones del revisor',
-    cta: isEn ? 'View my leave' : 'Ver mis permisos',
-    fallback: isEn
-      ? 'If the button does not work, copy and paste this address into your browser:'
-      : 'Si el botón no funciona, copia y pega esta dirección en tu navegador:',
-    daysUnit: (days: number) => isEn ? (days === 1 ? 'day' : 'days') : (days === 1 ? 'día' : 'días')
+const buildBodyText = (
+  t: LeaveRequestDecisionEmailTemplateCopy,
+  status: LeaveStatus,
+  actorFirstName: string,
+  leaveTypeName: string,
+  requestedDays: number
+) => {
+  switch (status) {
+    case 'approved':
+      return t.body.approved(actorFirstName, leaveTypeName, requestedDays)
+    case 'rejected':
+      return t.body.rejected(actorFirstName, leaveTypeName)
+    case 'cancelled':
+      return t.body.cancelled(leaveTypeName)
   }
 }
 
@@ -118,19 +127,20 @@ export default function LeaveRequestDecisionEmail({
   notes,
   locale = 'es'
 }: LeaveRequestDecisionEmailProps) {
-  const t = getTranslations(locale, status)
+  const t = selectEmailTemplateCopy(
+    locale,
+    getMicrocopy().emails.leave.requestDecision,
+    LEGACY_EN_LEAVE_REQUEST_DECISION_EMAIL_COPY
+  )
+
   const styles = STATUS_STYLES[status]
   const actorFirstName = actorName.split(' ')[0] || actorName
   const appUrl = `${APP_URL}/my/leave`
-
-  const bodyText = status === 'approved'
-    ? (t.body as (a: string, b: string, c: number) => string)(actorFirstName, leaveTypeName, requestedDays)
-    : status === 'rejected'
-      ? (t.body as (a: string, b: string) => string)(actorFirstName, leaveTypeName)
-      : (t.body as (a: string) => string)(leaveTypeName)
+  const heading = t.heading[status]
+  const bodyText = buildBodyText(t, status, actorFirstName, leaveTypeName, requestedDays)
 
   return (
-    <EmailLayout previewText={t.heading} locale={locale}>
+    <EmailLayout previewText={heading} locale={locale}>
       {/* Hero image */}
       <Img
         src={HERO_IMAGE_URL}
@@ -161,7 +171,7 @@ export default function LeaveRequestDecisionEmail({
           textTransform: 'uppercase' as const,
           letterSpacing: '0.5px'
         }}>
-          {t.statusBadge}
+          {t.statusBadge[status]}
         </span>
       </Section>
 
@@ -174,7 +184,7 @@ export default function LeaveRequestDecisionEmail({
         margin: '0 0 8px',
         lineHeight: '32px'
       }}>
-        {t.heading}
+        {heading}
       </Heading>
 
       {/* Greeting + body */}
