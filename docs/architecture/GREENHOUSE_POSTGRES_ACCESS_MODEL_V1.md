@@ -1,5 +1,22 @@
 # Greenhouse PostgreSQL Access Model V1
 
+## Delta 2026-05-06 — Runtime schema CREATE drift remediated
+
+- Se cerró el drift operativo documentado el 2026-04-23: `greenhouse_app` ya no tiene `CREATE` directo en:
+  - `greenhouse_serving`
+  - `greenhouse_payroll`
+- Causa verificada: `greenhouse_runtime` ya estaba correcto (`CREATE=false`), pero el login runtime `greenhouse_app` conservaba un grant directo `UC` en ambos schemas.
+- Remediación versionada: migración `20260506184507048_revoke-runtime-schema-create-drift.sql`.
+- Estado steady:
+  - `greenhouse_app`: `USAGE` solamente en ambos schemas.
+  - `greenhouse_runtime`: `USAGE` solamente en ambos schemas.
+  - `greenhouse_migrator`: conserva `USAGE, CREATE`.
+  - `greenhouse_ops`: conserva ownership y `USAGE, CREATE`.
+- Regla vigente:
+  - el runtime no puede crear tablas, vistas, funciones ni índices ad hoc en `greenhouse_payroll` o `greenhouse_serving`.
+  - cualquier materialización/projection legítima debe seguir usando grants estrechos por tabla y migraciones versionadas.
+  - si `pg:doctor` vuelve a reportar `can_create=true` para runtime, tratarlo como regresión de seguridad operativa.
+
 ## Delta 2026-05-03 — Runtime TLS recovery covers raw pg and Kysely pools
 
 - Incidente production `JAVASCRIPT-NEXTJS-2N` en Sentry reportó `ssl/tls alert bad certificate` durante `POST /api/webhooks/hubspot-companies`.
@@ -18,6 +35,7 @@
   - `greenhouse_serving`
   - `greenhouse_payroll`
 - Ese estado contradice el modelo canónico de este documento y la reconciliación versionada de grants.
+- Estado: **resuelto el 2026-05-06** por la migración `20260506184507048_revoke-runtime-schema-create-drift.sql`.
 - Regla explícita:
   - no documentar ni usar ese acceso como si fuera comportamiento aprobado
   - tratarlo como drift operativo hasta que los grants reales vuelvan a alinearse con el contrato

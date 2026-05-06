@@ -1,3 +1,11 @@
+# Sesion 2026-05-06 — Postgres runtime CREATE drift cerrado
+
+- **Finding:** `pg:doctor` venia reportando `can_create=true` para runtime en `greenhouse_payroll` y `greenhouse_serving`.
+- **Diagnostico:** el role grupal `greenhouse_runtime` ya estaba correcto (`CREATE=false`); el drift venia de grant directo `greenhouse_app=UC/greenhouse_ops` en ambos schemas.
+- **Fix aplicado:** migracion `20260506184507048_revoke-runtime-schema-create-drift.sql` revoca `CREATE` de `greenhouse_app`, `greenhouse_runtime` y `PUBLIC` en ambos schemas, preservando `USAGE` para runtime y `USAGE, CREATE` para `greenhouse_migrator`/`greenhouse_ops`.
+- **Validacion:** `pnpm pg:connect:migrate` OK; `pnpm pg:doctor` OK con `can_create=false` en todos los schemas runtime; query admin explicita confirma `greenhouse_app=U`, `greenhouse_runtime=U`, `greenhouse_migrator=UC`, `greenhouse_ops=UC` para `greenhouse_payroll` y `greenhouse_serving`.
+- **Access model:** sin cambios de DML por tabla; solo se cierra DDL ad hoc desde runtime.
+
 # Sesion 2026-05-06 — TASK-812 creada (Compliance Exports Chile: Planilla Previred + LRE)
 
 - **Branch:** `develop` (task creation only — no implementation yet).
