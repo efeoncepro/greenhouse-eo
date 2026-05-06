@@ -352,6 +352,11 @@ Modo: `warn` durante TASK-265 + sweeps TASK-407/408. Promueve a `error` al cierr
 
 `src/lib/format/` es la primitive canónica para formateo visible y exportable:
 
+Documentacion relacionada:
+
+- Funcional: [`docs/documentation/plataforma/formateo-locale-aware.md`](../documentation/plataforma/formateo-locale-aware.md)
+- Manual operativo: [`docs/manual-de-uso/plataforma/formateo-locale-aware.md`](../manual-de-uso/plataforma/formateo-locale-aware.md)
+
 - `formatDate`, `formatDateTime`, `formatISODateKey`
 - `formatCurrency`, `formatAccountingCurrency`
 - `formatNumber`, `formatInteger`, `formatPercent`
