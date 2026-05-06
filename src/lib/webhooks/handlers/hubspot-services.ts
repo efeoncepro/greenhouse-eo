@@ -3,9 +3,17 @@ import { createHmac, timingSafeEqual } from 'node:crypto'
 import { batchReadServices } from '@/lib/hubspot/list-services-for-company'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
-import { publishOutboxEvent } from '@/lib/sync/publish-event'
+import { upsertServiceFromHubSpot, type UpsertServiceSpace } from '@/lib/services/upsert-service-from-hubspot'
 import { registerInboundHandler } from '@/lib/webhooks/inbound'
 import { resolveSecret } from '@/lib/webhooks/signing'
+
+/**
+ * TASK-813a — Canonical prefix for organization_unresolved errors.
+ * El reliability signal `commercial.service_engagement.organization_unresolved`
+ * detecta vía LIKE `'organization_unresolved:%'` en webhook_inbox_events.error_message.
+ * Cambiar el prefix sin actualizar el reader rompe el signal silenciosamente.
+ */
+export const ORG_UNRESOLVED_ERROR_PREFIX = 'organization_unresolved:' as const
 
 /**
  * HubSpot p_services (object 0-162) webhook handler — TASK-813 Slice 4.
@@ -119,96 +127,19 @@ const SPACE_BY_HS_COMPANY_SQL = `
   LIMIT 1
 `
 
-const upsertServiceFromHubSpot = async (
+const upsertServiceForWebhook = async (
   serviceId: string,
   hubspotCompanyId: string,
   props: Record<string, string | undefined>,
   space: SpaceLookup
 ): Promise<void> => {
-  const internalServiceId = `SVC-HS-${serviceId}`
-  const name = props.hs_name || `Service ${serviceId}`
-  const lineaDeServicio = props.ef_linea_de_servicio ?? 'efeonce_digital'
-  const servicioEspecifico = props.ef_servicio_especifico ?? 'consulting'
-  const modalidad = props.ef_modalidad ?? 'continua'
-  const billingFrequency = props.ef_billing_frequency ?? 'monthly'
-  const country = props.ef_country ?? 'CL'
-  const currency = props.ef_currency ?? 'CLP'
-  const totalCost = props.ef_total_cost ? Number(props.ef_total_cost) : 0
-  const amountPaid = props.ef_amount_paid ? Number(props.ef_amount_paid) : 0
-  const startDate = props.ef_start_date || null
-  const targetEndDate = props.ef_target_end_date || null
-  const notionProjectId = props.ef_notion_project_id || null
-  const hubspotDealId = props.ef_deal_id || null
-  const syncStatus = props.ef_linea_de_servicio ? 'synced' : 'unmapped'
-
-  const result = await runGreenhousePostgresQuery<{ action: string }>(
-    `INSERT INTO greenhouse_core.services (
-      service_id, hubspot_service_id, name, space_id, organization_id,
-      hubspot_company_id, hubspot_deal_id,
-      pipeline_stage, start_date, target_end_date,
-      total_cost, amount_paid, currency,
-      linea_de_servicio, servicio_especifico, modalidad, billing_frequency, country,
-      notion_project_id, hubspot_last_synced_at, hubspot_sync_status,
-      active, status, created_at, updated_at
-    ) VALUES (
-      $1, $2, $3, $4, $5, $6, $7,
-      'active', $8::date, $9::date,
-      $10, $11, $12,
-      $13, $14, $15, $16, $17,
-      $18, NOW(), $19,
-      TRUE, 'active', NOW(), NOW()
-    )
-    ON CONFLICT (hubspot_service_id) DO UPDATE SET
-      name = EXCLUDED.name,
-      space_id = EXCLUDED.space_id,
-      organization_id = EXCLUDED.organization_id,
-      hubspot_company_id = EXCLUDED.hubspot_company_id,
-      total_cost = EXCLUDED.total_cost,
-      amount_paid = EXCLUDED.amount_paid,
-      currency = EXCLUDED.currency,
-      start_date = EXCLUDED.start_date,
-      target_end_date = EXCLUDED.target_end_date,
-      notion_project_id = EXCLUDED.notion_project_id,
-      hubspot_deal_id = EXCLUDED.hubspot_deal_id,
-      linea_de_servicio = EXCLUDED.linea_de_servicio,
-      servicio_especifico = EXCLUDED.servicio_especifico,
-      hubspot_last_synced_at = NOW(),
-      hubspot_sync_status = EXCLUDED.hubspot_sync_status,
-      updated_at = NOW()
-    RETURNING CASE WHEN xmax = 0 THEN 'created' ELSE 'updated' END AS action`,
-    [
-      internalServiceId, serviceId, name, space.space_id, space.organization_id,
-      hubspotCompanyId, hubspotDealId,
-      startDate, targetEndDate,
-      totalCost, amountPaid, currency,
-      lineaDeServicio, servicioEspecifico, modalidad, billingFrequency, country,
-      notionProjectId, syncStatus
-    ]
-  )
-
-  const action = (result[0]?.action ?? 'skipped') as 'created' | 'updated' | 'skipped'
-
-  if (action === 'created' || action === 'updated') {
-    await publishOutboxEvent({
-      aggregateType: 'service_engagement',
-      aggregateId: internalServiceId,
-      eventType: 'commercial.service_engagement.materialized',
-      payload: {
-        version: 1,
-        action,
-        serviceId: internalServiceId,
-        hubspotServiceId: serviceId,
-        hubspotCompanyId,
-        name,
-        spaceId: space.space_id,
-        clientId: space.client_id,
-        organizationId: space.organization_id,
-        syncStatus,
-        materializedAt: new Date().toISOString(),
-        source: 'hubspot-services-webhook'
-      }
-    })
-  }
+  await upsertServiceFromHubSpot({
+    hubspotServiceId: serviceId,
+    hubspotCompanyId,
+    space: space as UpsertServiceSpace,
+    properties: props,
+    source: 'hubspot-services-webhook'
+  })
 }
 
 const resolveCompanyForService = async (serviceId: string): Promise<string | null> => {
@@ -309,7 +240,7 @@ export const processHubSpotServiceEvents = async (events: HubSpotEvent[]): Promi
         continue
       }
 
-      await upsertServiceFromHubSpot(svc.id, hubspotCompanyId, svc.properties, spaceRows[0])
+      await upsertServiceForWebhook(svc.id, hubspotCompanyId, svc.properties, spaceRows[0])
     } catch (err) {
       captureWithDomain(err, 'integrations.hubspot', {
         level: 'error',

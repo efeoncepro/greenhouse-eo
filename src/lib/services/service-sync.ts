@@ -5,6 +5,8 @@ import {
   type HubSpotGreenhouseServiceProfile
 } from '@/lib/integrations/hubspot-greenhouse-service'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
+import { allocateSpaceNumericCode } from '@/lib/services/allocate-space-numeric-code'
+import { upsertServiceFromHubSpot } from '@/lib/services/upsert-service-from-hubspot'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 
 interface SpaceRow extends Record<string, unknown> {
@@ -58,21 +60,8 @@ const resolveOrgIdForClient = async (clientId: string): Promise<string | null> =
   return rows[0]?.organization_id ?? null
 }
 
-const allocateSpaceNumericCode = async (): Promise<string> => {
-  // numeric_code es CHAR(2) UNIQUE con CHECK '^[0-9]{2}$'. Buscar próximo libre 01-99.
-  const rows = await runGreenhousePostgresQuery<{ numeric_code: string }>(
-    `SELECT numeric_code FROM greenhouse_core.spaces ORDER BY numeric_code DESC LIMIT 1`
-  )
-
-  const last = parseInt(rows[0]?.numeric_code ?? '00', 10)
-  const next = last + 1
-
-  if (next > 99) {
-    throw new Error('Cannot allocate numeric_code: spaces table is at max (99). Schema needs widening.')
-  }
-
-  return String(next).padStart(2, '0')
-}
+// allocateSpaceNumericCode movido a src/lib/services/allocate-space-numeric-code.ts (TASK-813a)
+// con pg_advisory_xact_lock para evitar race condition.
 
 const createSpaceForClient = async (
   client: ClientLookup,
@@ -169,7 +158,7 @@ const resolveSpaceForCompany = async (
   return null
 }
 
-const upsertServiceFromHubSpot = async (
+const upsertServiceFromHubSpotProfile = async (
   svc: HubSpotGreenhouseServiceProfile,
   space: SpaceRow
 ): Promise<'created' | 'updated' | 'skipped'> => {
@@ -177,78 +166,33 @@ const upsertServiceFromHubSpot = async (
 
   if (!hubspotServiceId) return 'skipped'
 
-  const serviceId = `SVC-HS-${hubspotServiceId}`
-  const name = svc.identity.name || `Service ${hubspotServiceId}`
-  const lineaDeServicio = svc.classification.lineaDeServicio || 'efeonce_digital'
-  const servicioEspecifico = svc.classification.servicioEspecifico || 'consulting'
-  const modalidad = svc.classification.modalidad || 'continua'
-  const billingFrequency = svc.classification.billingFrequency || 'monthly'
-  const country = svc.classification.country || 'CL'
-  const totalCost = svc.financial.totalCost ?? 0
-  const amountPaid = svc.financial.amountPaid ?? 0
-  const currency = svc.financial.currency || 'CLP'
-  const startDate = svc.dates.startDate || null
-  const targetEndDate = svc.dates.targetEndDate || null
-  const notionProjectId = svc.references.notionProjectId || null
-  const hubspotDealId = svc.references.hubspotDealId || null
+  // Adapt el shape del bridge profile al canonical helper TASK-813a.
+  // El bridge ya entrega valores con defaults aplicados (legacy behavior:
+  // syncStatus='synced' siempre porque viene del bridge enriquecido). El
+  // helper canónico decide syncStatus por presencia de ef_linea_de_servicio.
+  const result = await upsertServiceFromHubSpot({
+    hubspotServiceId,
+    hubspotCompanyId: space.client_id,
+    space: { space_id: space.space_id, client_id: space.client_id, organization_id: space.organization_id },
+    properties: {
+      hs_name: svc.identity.name,
+      ef_linea_de_servicio: svc.classification.lineaDeServicio,
+      ef_servicio_especifico: svc.classification.servicioEspecifico,
+      ef_modalidad: svc.classification.modalidad,
+      ef_billing_frequency: svc.classification.billingFrequency,
+      ef_country: svc.classification.country,
+      ef_currency: svc.financial.currency,
+      ef_total_cost: svc.financial.totalCost ?? 0,
+      ef_amount_paid: svc.financial.amountPaid ?? 0,
+      ef_start_date: svc.dates.startDate,
+      ef_target_end_date: svc.dates.targetEndDate,
+      ef_notion_project_id: svc.references.notionProjectId,
+      ef_deal_id: svc.references.hubspotDealId
+    },
+    source: 'service-sync:syncServicesForCompany'
+  })
 
-  const result = await runGreenhousePostgresQuery<{ action: string }>(
-    `INSERT INTO greenhouse_core.services (
-      service_id, hubspot_service_id, name, space_id, organization_id,
-      hubspot_company_id, hubspot_deal_id,
-      pipeline_stage, start_date, target_end_date,
-      total_cost, amount_paid, currency,
-      linea_de_servicio, servicio_especifico, modalidad, billing_frequency, country,
-      notion_project_id, hubspot_last_synced_at, hubspot_sync_status,
-      active, status, created_at, updated_at
-    ) VALUES (
-      $1, $2, $3, $4, $5, $6, $7,
-      'active', $8::date, $9::date,
-      $10, $11, $12,
-      $13, $14, $15, $16, $17,
-      $18, NOW(), 'synced',
-      TRUE, 'active', NOW(), NOW()
-    )
-    ON CONFLICT (hubspot_service_id) DO UPDATE SET
-      name = EXCLUDED.name,
-      space_id = EXCLUDED.space_id,
-      organization_id = EXCLUDED.organization_id,
-      hubspot_company_id = EXCLUDED.hubspot_company_id,
-      total_cost = EXCLUDED.total_cost,
-      amount_paid = EXCLUDED.amount_paid,
-      currency = EXCLUDED.currency,
-      start_date = EXCLUDED.start_date,
-      target_end_date = EXCLUDED.target_end_date,
-      linea_de_servicio = EXCLUDED.linea_de_servicio,
-      servicio_especifico = EXCLUDED.servicio_especifico,
-      notion_project_id = EXCLUDED.notion_project_id,
-      hubspot_deal_id = EXCLUDED.hubspot_deal_id,
-      hubspot_last_synced_at = NOW(),
-      hubspot_sync_status = 'synced',
-      updated_at = NOW()
-    RETURNING CASE WHEN xmax = 0 THEN 'created' ELSE 'updated' END AS action`,
-    [
-      serviceId, hubspotServiceId, name, space.space_id, space.organization_id,
-      space.client_id, hubspotDealId,
-      startDate, targetEndDate,
-      totalCost, amountPaid, currency,
-      lineaDeServicio, servicioEspecifico, modalidad, billingFrequency, country,
-      notionProjectId
-    ]
-  )
-
-  const action = (result[0]?.action ?? 'skipped') as 'created' | 'updated' | 'skipped'
-
-  if (action === 'created' || action === 'updated') {
-    await publishOutboxEvent({
-      aggregateType: 'service',
-      aggregateId: serviceId,
-      eventType: `service.${action}`,
-      payload: { hubspotServiceId, name, lineaDeServicio, servicioEspecifico, spaceId: space.space_id }
-    })
-  }
-
-  return action
+  return result.action
 }
 
 export const syncServicesForCompany = async (
@@ -285,7 +229,7 @@ export const syncServicesForCompany = async (
 
   for (const svc of services) {
     try {
-      const action = await upsertServiceFromHubSpot(svc, space)
+      const action = await upsertServiceFromHubSpotProfile(svc, space)
 
       if (action === 'created') result.created++
       else if (action === 'updated') result.updated++
