@@ -46,7 +46,7 @@ import type {
   PricingV2LineType,
   PricingWarning
 } from '@/lib/finance/pricing/contracts'
-import { GH_PRICING } from '@/config/greenhouse-nomenclature'
+import { GH_PRICING } from '@/lib/copy/pricing'
 
 import type { SellableSelection } from '@/components/greenhouse/pricing/SellableItemPickerDrawer'
 import CostOverrideDialog, {

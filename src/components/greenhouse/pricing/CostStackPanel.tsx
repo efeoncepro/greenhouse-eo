@@ -16,7 +16,7 @@ import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
 
-import { GH_PRICING } from '@/config/greenhouse-nomenclature'
+import { GH_PRICING } from '@/lib/copy/pricing'
 import { formatCurrency, formatNumber, formatPercent } from '@/lib/format'
 import type { PricingOutputCurrency } from '@/lib/finance/pricing/contracts'
 

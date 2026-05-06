@@ -6,16 +6,16 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Medio`
 - Type: `implementation`
-- Status real: `Diseno`
+- Status real: `Cerrada 2026-05-06`
 - Rank: `TBD`
 - Domain: `content`
 - Blocked by: `TASK-407` (sweep shared shell + rule extendida) + `TASK-408` (promote rule a `error` mode + emails/notifications migrados).
-- Branch: `task/TASK-811-greenhouse-nomenclature-domain-microcopy-trim`
+- Branch: `develop` (por instruccion explicita del usuario; no se creo branch `task/*`)
 - Legacy ID: — (originalmente Slice 7 de TASK-407 según Delta 2026-05-02; ID corregido 2026-05-06 — TASK-409 está burned por `payroll-reliquidation-program`).
 - GitHub Issue: —
 - Parent: `TASK-265` (split-off final del programa de copy migration).
@@ -164,6 +164,15 @@ Categorización auditada en TASK-407 Delta 2026-05-02 (líneas 44-56 de TASK-407
 
 - ¿`GH_PRICING` necesita un namespace dedicado en `src/lib/copy/` (`pricing`) o sus entries microcopy encajan en `actions`/`labels` existentes? Decidir en Slice 1.
 - ¿`GH_COMPENSATION` (0 importers) es realmente orphan o hay imports indirectos via `re-export`? Validar con grep + tsc trace antes de eliminar.
+
+## Execution Notes 2026-05-06
+
+- `GH_PRICING` y `GH_PRICING_GOVERNANCE` se migraron juntos a `src/lib/copy/pricing.ts`: tienen 24 y 11 importers respectivamente, por lo que un namespace dedicado es más robusto que diluirlos en `actions`/`labels`.
+- `GH_COMPENSATION` se eliminó: `rg "GH_COMPENSATION" src` retorna 0 y no existe re-export runtime.
+- `TASK-408` conserva lifecycle administrativo `in-progress` por observación 24h del signal, pero los prerrequisitos runtime para este trim están cumplidos: rule en `error`, emails sin imports de nomenclature y smoke staging/inbox verde. Drift documentado en `Handoff.md`.
+- El trim fue move-only: no se reescribieron strings visibles ni se tocaron rutas, acceso, DB, workers, events, notification delivery o email delivery.
+- `greenhouse-nomenclature.ts` queda en 410 líneas y ya no exporta `GH_AGENCY`, `GH_LABELS`, `GH_TEAM`, `GH_MESSAGES`, `GH_INTERNAL_MESSAGES`, `GH_PAYROLL_PROJECTED_ARIA`, `GH_SKILLS_CERTS`, `GH_TALENT_DISCOVERY`, `GH_CLIENT_TALENT`, `GH_PRICING`, `GH_PRICING_GOVERNANCE`, `GH_MRR_ARR_DASHBOARD` ni `GH_COMPENSATION`.
+- Validación: `pnpm exec tsc --noEmit --pretty false` OK; ESLint focal OK; `pnpm lint` OK; `pnpm build` OK; `pnpm design:lint` OK 0 errors/0 warnings; `pnpm test` tuvo 1 flake externo en `with-source-timeout.test.ts` (`29ms >= 30ms`) y el rerun focal pasó.
 
 ## 4-Pillar Score
 

@@ -28,7 +28,7 @@ import { getMicrocopy } from '@/lib/copy'
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 
-import { GH_PRICING } from '@/config/greenhouse-nomenclature'
+import { GH_PRICING } from '@/lib/copy/pricing'
 import { formatCurrency } from '@/lib/format'
 
 const GREENHOUSE_COPY = getMicrocopy()

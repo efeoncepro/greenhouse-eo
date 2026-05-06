@@ -29,7 +29,7 @@ import { TabContext, TabList, TabPanel } from '@mui/lab'
 import { getMicrocopy } from '@/lib/copy'
 
 import ImpactPreviewPanel from '@/components/greenhouse/pricing/ImpactPreviewPanel'
-import { GH_PRICING_GOVERNANCE } from '@/config/greenhouse-nomenclature'
+import { GH_PRICING_GOVERNANCE } from '@/lib/copy/pricing'
 import { formatCurrency, formatNumber } from '@/lib/format'
 
 import CustomTextField from '@core/components/mui/TextField'

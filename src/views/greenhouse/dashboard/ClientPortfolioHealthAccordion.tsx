@@ -8,7 +8,7 @@ import Chip from '@mui/material/Chip'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
-import { GH_MESSAGES } from '@/config/greenhouse-nomenclature'
+import { GH_MESSAGES } from '@/lib/copy/client-portal'
 import type { GreenhouseDashboardData } from '@/types/greenhouse-dashboard'
 
 type ClientPortfolioHealthAccordionProps = {

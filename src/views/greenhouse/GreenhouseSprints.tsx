@@ -7,7 +7,8 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
 import { EmptyState } from '@/components/greenhouse'
-import { GH_CLIENT_NAV, GH_LABELS, GH_MESSAGES, GH_TEAM } from '@/config/greenhouse-nomenclature'
+import { GH_CLIENT_NAV } from '@/config/greenhouse-nomenclature'
+import { GH_LABELS, GH_MESSAGES, GH_TEAM } from '@/lib/copy/client-portal'
 import type { GreenhouseDashboardData } from '@/types/greenhouse-dashboard'
 
 const GreenhouseSprints = ({ data }: { data: GreenhouseDashboardData }) => {

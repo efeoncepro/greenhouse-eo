@@ -12,7 +12,8 @@ import { TabContext, TabPanel } from '@mui/lab'
 
 import CustomTabList from '@core/components/mui/TabList'
 
-import { GH_MRR_ARR_DASHBOARD, GH_PIPELINE_COMMERCIAL } from '@/config/greenhouse-nomenclature'
+import { GH_PIPELINE_COMMERCIAL } from '@/config/greenhouse-nomenclature'
+import { GH_MRR_ARR_DASHBOARD } from '@/lib/copy/finance'
 
 import FinancePeriodClosureDashboardView from './FinancePeriodClosureDashboardView'
 import ClientEconomicsView from './ClientEconomicsView'

@@ -3,7 +3,8 @@
 import Chip from '@mui/material/Chip'
 import { alpha, useTheme } from '@mui/material/styles'
 
-import { GH_COLORS, GH_PRICING } from '@/config/greenhouse-nomenclature'
+import { GH_COLORS } from '@/config/greenhouse-nomenclature'
+import { GH_PRICING } from '@/lib/copy/pricing'
 import { formatPercent } from '@/lib/format'
 
 export type MarginStatus = 'critical' | 'attention' | 'optimal' | 'overshoot'

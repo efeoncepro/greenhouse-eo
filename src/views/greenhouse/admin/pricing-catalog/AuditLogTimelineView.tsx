@@ -37,7 +37,7 @@ import CustomTextField from '@core/components/mui/TextField'
 
 import AuditDiffViewer from '@/components/greenhouse/pricing/AuditDiffViewer'
 import AuditRevertConfirmDialog from '@/components/greenhouse/pricing/AuditRevertConfirmDialog'
-import { GH_PRICING_GOVERNANCE } from '@/config/greenhouse-nomenclature'
+import { GH_PRICING_GOVERNANCE } from '@/lib/copy/pricing'
 import { formatDateTime as formatLocaleDateTime } from '@/lib/format'
 
 const TASK407_ARIA_VOLVER_AL_CATALOGO = "Volver al catálogo"

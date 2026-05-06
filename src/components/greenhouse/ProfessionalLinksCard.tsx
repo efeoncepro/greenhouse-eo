@@ -17,7 +17,7 @@ import Typography from '@mui/material/Typography'
 import { getMicrocopy } from '@/lib/copy'
 
 import BrandLogo from '@/components/greenhouse/BrandLogo'
-import { GH_SKILLS_CERTS } from '@/config/greenhouse-nomenclature'
+import { GH_SKILLS_CERTS } from '@/lib/copy/workforce'
 
 const TASK407_ARIA_EDITAR_LINKS_PROFESIONALES = "Editar links profesionales"
 

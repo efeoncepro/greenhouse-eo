@@ -38,7 +38,7 @@ import { BusinessLineBadge } from '@/components/greenhouse'
 import EmptyState from '@components/greenhouse/EmptyState'
 import { resolveBrandAssets } from '@/components/greenhouse/brand-assets'
 
-import { GH_INTERNAL_MESSAGES } from '@/config/greenhouse-nomenclature'
+import { GH_INTERNAL_MESSAGES } from '@/lib/copy/admin'
 import { getInitials } from '@/utils/getInitials'
 
 import tableStyles from '@core/styles/table.module.css'

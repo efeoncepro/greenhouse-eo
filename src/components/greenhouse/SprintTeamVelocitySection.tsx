@@ -11,7 +11,7 @@ import Typography from '@mui/material/Typography'
 import { alpha } from '@mui/material/styles'
 
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
-import { GH_MESSAGES, GH_TEAM } from '@/config/greenhouse-nomenclature'
+import { GH_MESSAGES, GH_TEAM } from '@/lib/copy/client-portal'
 import type { TeamBySprintPayload } from '@/types/team'
 import { getRpaStatus } from '@views/greenhouse/dashboard/helpers'
 

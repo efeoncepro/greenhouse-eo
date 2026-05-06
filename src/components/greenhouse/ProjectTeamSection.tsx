@@ -19,7 +19,8 @@ import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
 
-import { GH_COLORS, GH_MESSAGES, GH_TEAM } from '@/config/greenhouse-nomenclature'
+import { GH_COLORS } from '@/config/greenhouse-nomenclature'
+import { GH_MESSAGES, GH_TEAM } from '@/lib/copy/client-portal'
 import type { TeamByProjectPayload } from '@/types/team'
 import { getRpaStatus } from '@views/greenhouse/dashboard/helpers'
 

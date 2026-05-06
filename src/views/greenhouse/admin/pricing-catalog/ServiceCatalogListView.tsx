@@ -37,7 +37,7 @@ import CustomTextField from '@core/components/mui/TextField'
 
 import tableStyles from '@core/styles/table.module.css'
 
-import { GH_PRICING } from '@/config/greenhouse-nomenclature'
+import { GH_PRICING } from '@/lib/copy/pricing'
 
 import CreateServiceDrawer from './drawers/CreateServiceDrawer'
 import EditServiceDrawer from './drawers/EditServiceDrawer'

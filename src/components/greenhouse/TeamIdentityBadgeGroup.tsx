@@ -3,7 +3,7 @@
 import Chip from '@mui/material/Chip'
 import Stack from '@mui/material/Stack'
 
-import { GH_TEAM } from '@/config/greenhouse-nomenclature'
+import { GH_TEAM } from '@/lib/copy/client-portal'
 import type { TeamIdentityConfidence, TeamIdentityProvider } from '@/types/team'
 
 import GhIcon from './GhIcon'

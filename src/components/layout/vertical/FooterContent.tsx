@@ -8,7 +8,8 @@ import useVerticalNav from '@menu/hooks/useVerticalNav'
 
 import BrandWordmark from '@/components/greenhouse/BrandWordmark'
 import { verticalLayoutClasses } from '@layouts/utils/layoutClasses'
-import { GH_CLIENT_NAV, GH_MESSAGES } from '@/config/greenhouse-nomenclature'
+import { GH_CLIENT_NAV } from '@/config/greenhouse-nomenclature'
+import { GH_MESSAGES } from '@/lib/copy/client-portal'
 
 const FooterContent = () => {
   const { isBreakpointReached } = useVerticalNav()

@@ -2,6 +2,8 @@
 
 ## 2026-05-06
 
+- **TASK-811 — greenhouse-nomenclature domain microcopy trim.** `src/config/greenhouse-nomenclature.ts` baja de 2.747 a 410 líneas y queda centrado en navegación/product nomenclature + `GH_COLORS` transicional. El microcopy de Agency, portal cliente/team, admin/internal, pricing, workforce, finance MRR/ARR y payroll projected se extrajo a módulos type-safe en `src/lib/copy/*`; `GH_COMPENSATION` se eliminó como orphan verificado. No se reescribió copy ni se tocó runtime/data/events.
+
 - **TASK-408 Slice 0 — foundation segura para emails dictionary-ready.** Se agrega el namespace `emails` en `src/lib/copy`, un resolver server-only de locale email con fallback estable `es-CL`, y baseline de snapshots para los 17 templates reales. Los snapshots incluyen assertions de tokens de personalizacion para preservar nombres, cliente, montos, periodos, links y unsubscribe antes de migrar copy institucional.
 
 - **TASK-408 Slice 1 — categorías de notificación dictionary-ready sin tocar delivery.** Las 13 categorías reales de `src/config/notification-categories.ts` ahora toman `label` y `description` desde `getMicrocopy().emails.notificationCategories`, manteniendo intactos `code`, canales, audiencia, prioridad, iconos, `NotificationService`, webhooks, projections, outbox y envío de emails. Se agrega test de contrato de categorías y test del endpoint de preferencias para ignorar categorías desconocidas de forma segura.

@@ -16,7 +16,7 @@ import CustomChip from '@core/components/mui/Chip'
 
 import DebouncedInput from '@/components/DebouncedInput'
 import EmptyState from '@/components/greenhouse/EmptyState'
-import { GH_PRICING } from '@/config/greenhouse-nomenclature'
+import { GH_PRICING } from '@/lib/copy/pricing'
 
 import type { QuoteCreateTemplate } from './quote-builder-types'
 

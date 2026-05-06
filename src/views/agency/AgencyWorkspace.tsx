@@ -20,7 +20,7 @@ import CustomTabList from '@core/components/mui/TabList'
 import { visuallyHiddenSx } from '@/components/greenhouse/accessibility'
 import EmptyState from '@/components/greenhouse/EmptyState'
 import SectionErrorBoundary from '@/components/greenhouse/SectionErrorBoundary'
-import { GH_AGENCY } from '@/config/greenhouse-nomenclature'
+import { GH_AGENCY } from '@/lib/copy/agency'
 import type {
   AgencyChartStatusItem,
   AgencyChartWeeklyPoint,

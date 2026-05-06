@@ -27,7 +27,7 @@ import CustomTextField from '@core/components/mui/TextField'
 
 import BrandLogo from '@/components/greenhouse/BrandLogo'
 import EmptyState from '@/components/greenhouse/EmptyState'
-import { GH_TALENT_DISCOVERY } from '@/config/greenhouse-nomenclature'
+import { GH_TALENT_DISCOVERY } from '@/lib/copy/workforce'
 
 import type { SkillCatalogItem } from '@/types/agency-skills'
 import type { ToolCatalogItem } from '@/types/talent-taxonomy'

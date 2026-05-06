@@ -20,7 +20,8 @@ import type { ColumnDef, SortingState } from '@tanstack/react-table'
 import classnames from 'classnames'
 
 import type { AdminAccessOverview } from '@/lib/admin/get-admin-access-overview'
-import { GH_INTERNAL_MESSAGES, GH_INTERNAL_NAV } from '@/config/greenhouse-nomenclature'
+import { GH_INTERNAL_NAV } from '@/config/greenhouse-nomenclature'
+import { GH_INTERNAL_MESSAGES } from '@/lib/copy/admin'
 
 import tableStyles from '@core/styles/table.module.css'
 

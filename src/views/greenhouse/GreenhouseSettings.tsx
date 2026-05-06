@@ -12,7 +12,8 @@ import Typography from '@mui/material/Typography'
 import { signIn, useSession } from 'next-auth/react'
 
 import { TeamDossierSection } from '@/components/greenhouse'
-import { GH_CLIENT_NAV, GH_MESSAGES } from '@/config/greenhouse-nomenclature'
+import { GH_CLIENT_NAV } from '@/config/greenhouse-nomenclature'
+import { GH_MESSAGES } from '@/lib/copy/client-portal'
 
 const settingsRows = [
   {

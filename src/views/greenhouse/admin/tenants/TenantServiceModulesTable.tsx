@@ -22,7 +22,7 @@ import CustomTextField from '@core/components/mui/TextField'
 import TablePaginationComponent from '@components/TablePaginationComponent'
 
 import { BusinessLineBadge } from '@/components/greenhouse'
-import { GH_INTERNAL_MESSAGES } from '@/config/greenhouse-nomenclature'
+import { GH_INTERNAL_MESSAGES } from '@/lib/copy/admin'
 import type { TenantCapabilityRecord } from '@/lib/admin/tenant-capability-types'
 
 import tableStyles from '@core/styles/table.module.css'

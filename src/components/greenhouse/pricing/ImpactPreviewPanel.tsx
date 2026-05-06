@@ -13,7 +13,7 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { alpha } from '@mui/material/styles'
 
-import { GH_PRICING_GOVERNANCE } from '@/config/greenhouse-nomenclature'
+import { GH_PRICING_GOVERNANCE } from '@/lib/copy/pricing'
 import { formatCurrency } from '@/lib/format'
 
 export interface ImpactPreviewSample {

@@ -15,7 +15,8 @@ import Skeleton from '@mui/material/Skeleton'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
-import { GH_CLIENT_NAV, GH_LABELS, GH_MESSAGES } from '@/config/greenhouse-nomenclature'
+import { GH_CLIENT_NAV } from '@/config/greenhouse-nomenclature'
+import { GH_LABELS, GH_MESSAGES } from '@/lib/copy/client-portal'
 import type { GreenhouseProjectsData } from '@/types/greenhouse-projects'
 import { formatDate as formatGreenhouseDate } from '@/lib/format'
 

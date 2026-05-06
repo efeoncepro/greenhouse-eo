@@ -11,7 +11,7 @@ import CustomChip from '@core/components/mui/Chip'
 import CustomIconButton from '@core/components/mui/IconButton'
 import CustomTextField from '@core/components/mui/TextField'
 
-import { GH_AGENCY } from '@/config/greenhouse-nomenclature'
+import { GH_AGENCY } from '@/lib/copy/agency'
 import type { AgencySpaceHealth } from '@/lib/agency/agency-queries'
 import { getSpaceHealth, type SpaceHealthZone } from './space-health'
 

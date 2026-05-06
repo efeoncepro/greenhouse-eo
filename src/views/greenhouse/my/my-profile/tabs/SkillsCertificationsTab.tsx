@@ -34,7 +34,7 @@ import GreenhouseFileUploader, { type UploadedFileValue } from '@/components/gre
 import ProfessionalLinksCard from '@/components/greenhouse/ProfessionalLinksCard'
 import AboutMeCard from '@/components/greenhouse/AboutMeCard'
 import BrandLogo from '@/components/greenhouse/BrandLogo'
-import { GH_SKILLS_CERTS } from '@/config/greenhouse-nomenclature'
+import { GH_SKILLS_CERTS } from '@/lib/copy/workforce'
 
 import type {
   MemberSkill,

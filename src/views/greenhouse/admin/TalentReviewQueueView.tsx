@@ -39,7 +39,7 @@ import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSu
 import TablePaginationComponent from '@components/TablePaginationComponent'
 
 import { EmptyState } from '@/components/greenhouse'
-import { GH_SKILLS_CERTS } from '@/config/greenhouse-nomenclature'
+import { GH_SKILLS_CERTS } from '@/lib/copy/workforce'
 import { getInitials } from '@/utils/getInitials'
 
 import tableStyles from '@core/styles/table.module.css'

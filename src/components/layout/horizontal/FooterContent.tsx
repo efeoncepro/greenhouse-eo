@@ -8,7 +8,8 @@ import useHorizontalNav from '@menu/hooks/useHorizontalNav'
 
 import BrandWordmark from '@/components/greenhouse/BrandWordmark'
 import { horizontalLayoutClasses } from '@layouts/utils/layoutClasses'
-import { GH_CLIENT_NAV, GH_MESSAGES } from '@/config/greenhouse-nomenclature'
+import { GH_CLIENT_NAV } from '@/config/greenhouse-nomenclature'
+import { GH_MESSAGES } from '@/lib/copy/client-portal'
 
 const FooterContent = () => {
   const { isBreakpointReached } = useHorizontalNav()

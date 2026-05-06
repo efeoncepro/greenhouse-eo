@@ -4,7 +4,7 @@ import MenuItem from '@mui/material/MenuItem'
 
 import CustomTextField from '@core/components/mui/TextField'
 
-import { GH_PRICING } from '@/config/greenhouse-nomenclature'
+import { GH_PRICING } from '@/lib/copy/pricing'
 import { formatDate, formatNumber } from '@/lib/format'
 import type { PricingOutputCurrency } from '@/lib/finance/pricing/contracts'
 

@@ -42,7 +42,7 @@ import tableStyles from '@core/styles/table.module.css'
 import CreateOverheadDrawer from './drawers/CreateOverheadDrawer'
 import EditOverheadDrawer from './drawers/EditOverheadDrawer'
 import BulkEditDrawer from './drawers/BulkEditDrawer'
-import { GH_PRICING_GOVERNANCE } from '@/config/greenhouse-nomenclature'
+import { GH_PRICING_GOVERNANCE } from '@/lib/copy/pricing'
 import { formatNumber } from '@/lib/format'
 
 const TASK407_ARIA_VOLVER_AL_CATALOGO = "Volver al catálogo"

@@ -30,7 +30,7 @@ import { isIssueableFinanceQuotationStatus } from '@/lib/finance/quotation-acces
 import useParties, { type PartySearchError, type PartySearchItem } from '@/hooks/useParties'
 import usePricingConfig from '@/hooks/usePricingConfig'
 import usePricingSimulation from '@/hooks/usePricingSimulation'
-import { GH_PRICING } from '@/config/greenhouse-nomenclature'
+import { GH_PRICING } from '@/lib/copy/pricing'
 import { previewChileTaxAmounts } from '@/lib/finance/pricing/quotation-tax-constants'
 
 import AddLineSplitButton from '@/components/greenhouse/pricing/AddLineSplitButton'

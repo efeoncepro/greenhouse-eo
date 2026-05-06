@@ -17,7 +17,7 @@ import ContextChip, {
 import FieldsProgressChip from '@/components/greenhouse/primitives/FieldsProgressChip'
 import useReducedMotion from '@/hooks/useReducedMotion'
 import { motion } from '@/libs/FramerMotion'
-import { GH_PRICING } from '@/config/greenhouse-nomenclature'
+import { GH_PRICING } from '@/lib/copy/pricing'
 import { formatDate } from '@/lib/format'
 import type { CommercialModelCode } from '@/lib/commercial/pricing-governance-types'
 import type { PricingOutputCurrency } from '@/lib/finance/pricing/contracts'

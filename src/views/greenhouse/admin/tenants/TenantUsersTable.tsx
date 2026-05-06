@@ -30,7 +30,7 @@ import OptionMenu from '@core/components/option-menu'
 import TablePaginationComponent from '@components/TablePaginationComponent'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 
-import { GH_INTERNAL_MESSAGES } from '@/config/greenhouse-nomenclature'
+import { GH_INTERNAL_MESSAGES } from '@/lib/copy/admin'
 import type { AdminTenantUserRow } from '@/lib/admin/get-admin-tenant-detail'
 import { getInitials } from '@/utils/getInitials'
 

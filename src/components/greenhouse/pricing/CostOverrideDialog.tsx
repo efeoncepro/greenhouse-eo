@@ -20,7 +20,7 @@ import Typography from '@mui/material/Typography'
 
 import CostDeltaChip from './CostDeltaChip'
 import CostSourceChip, { type CostSourceKind } from './CostSourceChip'
-import { GH_PRICING } from '@/config/greenhouse-nomenclature'
+import { GH_PRICING } from '@/lib/copy/pricing'
 import { formatDate } from '@/lib/format'
 import { computeOverrideDelta } from '@/lib/finance/pricing/override-delta'
 import {

@@ -8,7 +8,7 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { alpha, useTheme } from '@mui/material/styles'
 
-import { GH_MESSAGES } from '@/config/greenhouse-nomenclature'
+import { GH_MESSAGES } from '@/lib/copy/client-portal'
 import { BrandLogo, EmptyState, ExecutiveCardShell } from '@/components/greenhouse'
 import type { GreenhouseDashboardTooling } from '@/types/greenhouse-dashboard'
 

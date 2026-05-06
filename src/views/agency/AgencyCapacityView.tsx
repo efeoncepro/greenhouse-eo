@@ -6,7 +6,7 @@ import Typography from '@mui/material/Typography'
 
 import SectionErrorBoundary from '@/components/greenhouse/SectionErrorBoundary'
 import CapacityOverview from '@/components/agency/CapacityOverview'
-import { GH_AGENCY } from '@/config/greenhouse-nomenclature'
+import { GH_AGENCY } from '@/lib/copy/agency'
 import type { CapacityBreakdownData } from '@/components/agency/CapacityOverview'
 
 type Props = {

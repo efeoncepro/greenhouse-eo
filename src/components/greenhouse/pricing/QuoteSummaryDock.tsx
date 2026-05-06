@@ -9,7 +9,7 @@ import {
   type MarginClassification,
   type MarginTierRange
 } from '@/components/greenhouse/primitives'
-import { GH_PRICING } from '@/config/greenhouse-nomenclature'
+import { GH_PRICING } from '@/lib/copy/pricing'
 import type { PricingOutputCurrency } from '@/lib/finance/pricing/contracts'
 
 export interface QuoteSummaryDockProps {

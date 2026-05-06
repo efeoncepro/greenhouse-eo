@@ -1,3 +1,14 @@
+# Sesion 2026-05-06 — TASK-811 cerrada en develop
+
+- **Branch:** `develop` por instruccion explicita del usuario; no se crea `task/TASK-811-greenhouse-nomenclature-domain-microcopy-trim`.
+- **Ownership:** no habia PR abierto ni branch local/remota obvia para `TASK-811`; se tomo y cerro en esta sesion. `Lifecycle`, `docs/tasks/README.md` y `docs/tasks/TASK_ID_REGISTRY.md` apuntan al path complete.
+- **Drift administrativo relevante:** `TASK-811` declara bloqueo por `TASK-408` cerrada. Runtime/codigo ya cumplen los prerrequisitos de `TASK-408` para este trim (`greenhouse/no-untokenized-copy` en `error`, 0 imports de nomenclature desde emails, smoke staging/inbox OK), pero `TASK-408` conserva lifecycle `in-progress` por observacion 24h del signal. Se trata como drift no bloqueante para `TASK-811`; no cerrar `TASK-408` desde esta task.
+- **Entrega:** `src/config/greenhouse-nomenclature.ts` baja de 2.747 a 410 lineas. Queda con navegacion/product nomenclature (`GH_*_NAV`, `GH_NEXA`, `GH_PIPELINE_COMMERCIAL`) y `GH_COLORS` transicional out-of-scope. Domain microcopy se mueve a `src/lib/copy/agency.ts`, `client-portal.ts`, `admin.ts`, `pricing.ts`, `workforce.ts`, `finance.ts` y `payroll.ts`.
+- **Orphan eliminado:** `GH_COMPENSATION` se elimino tras confirmar 0 importers runtime (`rg "GH_COMPENSATION" src` = 0).
+- **No se toco:** rutas, access model, DB/schema, workers, outbox/events, notification delivery, email delivery ni strings visibles.
+- **Docs:** `GREENHOUSE_UI_PLATFORM_V1.md` v1.6, `changelog.md`, `docs/tasks/README.md`, `docs/tasks/TASK_ID_REGISTRY.md` y lifecycle de `TASK-811` sincronizados. Task cerrada en `docs/tasks/complete/TASK-811-greenhouse-nomenclature-domain-microcopy-trim.md`.
+- **Validacion:** `pnpm exec tsc --noEmit --pretty false` OK; ESLint focal OK; `pnpm lint` OK; `pnpm build` OK; `pnpm design:lint` OK 0 errors/0 warnings. `pnpm test` completo tuvo 1 flake externo (`src/lib/platform-health/with-source-timeout.test.ts`, 29ms vs >=30ms), y el rerun focal paso 5/5.
+
 # Handoff.md
 
 ## Sesion 2026-05-06 — TASK-408 Slice 0 + Slice 1 + Slice 2A + Slice 3A-3E tomada en develop

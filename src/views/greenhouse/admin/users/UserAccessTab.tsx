@@ -31,7 +31,7 @@ import Typography from '@mui/material/Typography'
 import type { ThemeColor } from '@core/types'
 
 import { ExecutiveMiniStatCard } from '@/components/greenhouse'
-import { GH_INTERNAL_MESSAGES } from '@/config/greenhouse-nomenclature'
+import { GH_INTERNAL_MESSAGES } from '@/lib/copy/admin'
 import { GOVERNANCE_SECTIONS } from '@/lib/admin/view-access-catalog'
 import type {
   EffectiveEntitlementRecord,

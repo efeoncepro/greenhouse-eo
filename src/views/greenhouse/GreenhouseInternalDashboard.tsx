@@ -11,7 +11,7 @@ import Typography from '@mui/material/Typography'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 import SectionErrorBoundary from '@components/greenhouse/SectionErrorBoundary'
 
-import { GH_INTERNAL_MESSAGES } from '@/config/greenhouse-nomenclature'
+import { GH_INTERNAL_MESSAGES } from '@/lib/copy/admin'
 import type { InternalDashboardOverview } from '@/lib/internal/get-internal-dashboard-overview'
 
 import InternalControlTowerTable from './internal/dashboard/InternalControlTowerTable'

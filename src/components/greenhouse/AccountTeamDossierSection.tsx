@@ -5,7 +5,8 @@ import Box from '@mui/material/Box'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
-import { GH_COLORS, GH_MESSAGES, GH_TEAM } from '@/config/greenhouse-nomenclature'
+import { GH_COLORS } from '@/config/greenhouse-nomenclature'
+import { GH_MESSAGES, GH_TEAM } from '@/lib/copy/client-portal'
 import type { GreenhouseDashboardAccountTeam } from '@/types/greenhouse-dashboard'
 
 import { getBrandDisplayLabel } from './brand-assets'

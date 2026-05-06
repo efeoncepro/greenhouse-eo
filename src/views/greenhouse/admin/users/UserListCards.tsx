@@ -5,7 +5,7 @@ import Grid from '@mui/material/Grid'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 
 import type { AdminAccessOverview } from '@/lib/admin/get-admin-access-overview'
-import { GH_INTERNAL_MESSAGES } from '@/config/greenhouse-nomenclature'
+import { GH_INTERNAL_MESSAGES } from '@/lib/copy/admin'
 import { formatNumber as formatGreenhouseNumber } from '@/lib/format'
 
 type Props = {

@@ -8,7 +8,8 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
 import { SprintTeamVelocitySection } from '@/components/greenhouse'
-import { GH_CLIENT_NAV, GH_MESSAGES } from '@/config/greenhouse-nomenclature'
+import { GH_CLIENT_NAV } from '@/config/greenhouse-nomenclature'
+import { GH_MESSAGES } from '@/lib/copy/client-portal'
 
 const TASK407_ARIA_BREADCRUMBS = "breadcrumbs"
 

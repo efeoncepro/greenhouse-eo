@@ -44,7 +44,7 @@ import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSu
 import { computeCurrencyDelta, formatDeltaLabel, payrollTrendDirection } from '@/lib/finance/currency-comparison'
 import { getMicrocopy } from '@/lib/copy'
 import { resolveReceiptRegime, type ReceiptRegime } from '@/lib/payroll/receipt-presenter'
-import { GH_PAYROLL_PROJECTED_ARIA } from '@/config/greenhouse-nomenclature'
+import { GH_PAYROLL_PROJECTED_ARIA } from '@/lib/copy/payroll'
 import { formatCurrency } from './helpers'
 
 import tableStyles from '@core/styles/table.module.css'

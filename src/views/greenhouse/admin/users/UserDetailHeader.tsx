@@ -11,7 +11,7 @@ import Typography from '@mui/material/Typography'
 import { toast } from 'sonner'
 
 import { IdentityImageUploader } from '@/components/greenhouse'
-import { GH_INTERNAL_MESSAGES } from '@/config/greenhouse-nomenclature'
+import { GH_INTERNAL_MESSAGES } from '@/lib/copy/admin'
 import type { AdminUserDetail } from '@/lib/admin/get-admin-user-detail'
 import { getInitials } from '@/utils/getInitials'
 

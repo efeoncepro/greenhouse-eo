@@ -24,7 +24,7 @@ import Typography from '@mui/material/Typography'
 
 import CustomChip from '@core/components/mui/Chip'
 
-import { GH_PRICING_GOVERNANCE } from '@/config/greenhouse-nomenclature'
+import { GH_PRICING_GOVERNANCE } from '@/lib/copy/pricing'
 
 interface DiffRow {
   entityType: string

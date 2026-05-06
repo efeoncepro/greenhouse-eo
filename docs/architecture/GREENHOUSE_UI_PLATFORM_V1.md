@@ -1,7 +1,8 @@
 # Greenhouse EO — UI Platform Architecture V1
 
-> **Version:** 1.5
+> **Version:** 1.6
 > **Created:** 2026-03-30
+> **Updated:** 2026-05-06 — v1.6: TASK-811 recorta `src/config/greenhouse-nomenclature.ts` a navegación/product nomenclature + tokens visuales transicionales. Domain microcopy reutilizable se extrae a módulos type-safe en `src/lib/copy/*` (`agency`, `client-portal`, `admin`, `pricing`, `workforce`, `finance`, `payroll`). Ver Delta 2026-05-06 abajo.
 > **Updated:** 2026-05-05 — v1.5: Quote Builder primitives extraction Sprint 3 (TASK-498). Tres primitives nuevos en `src/components/greenhouse/primitives/` (`EntitySummaryDock`, `CardHeaderWithBadge`, `FormSectionAccordion`) habilitan invoice / PO / contract / finiquito builders sin re-implementar el chasis. `ContextChipStrip` recibe `overflowAfter` con dropdown "+M más" canónico. Quote Builder migrado: `QuoteSummaryDock` queda como adapter thin sobre `EntitySummaryDock`, conservando API histórica. Ver Delta 2026-05-05 abajo.
 > **Updated:** 2026-05-04 — v1.4: Quick Access Shortcuts Platform (TASK-553). Catálogo canónico `src/lib/shortcuts/catalog.ts` + resolver dual-plane (`module` + opcional `viewCode` + opcional `requiredCapability`) compartido entre Home `recommendedShortcuts` y header `<ShortcutsDropdown />`. Persistencia per-usuario en `greenhouse_core.user_shortcut_pins` vía `/api/me/shortcuts`. Ver Delta 2026-05-04 abajo.
 > **Updated:** 2026-04-20 — v1.3: Floating UI (`@floating-ui/react` 0.27) introducido como stack oficial de positioning para popovers (TASK-509). Primer consumer: `TotalsLadder`. TASK-510 backlog migra el resto. Ver Delta 2026-04-20b abajo.
@@ -14,6 +15,34 @@
 ## Overview
 
 Greenhouse EO es un portal Next.js 16 App Router con MUI 7.x envuelto por el starter-kit Vuexy. Este documento es la referencia canónica de la plataforma UI: stack, librerías disponibles, patrones de componentes, convenciones de estado, y reglas de adopción.
+
+## Delta 2026-05-06 — TASK-811 nomenclature domain microcopy trim
+
+`src/config/greenhouse-nomenclature.ts` deja de ser el contenedor de domain microcopy. Su contrato activo queda acotado a:
+
+- navegación y labels institucionales de shell (`GH_CLIENT_NAV`, `GH_INTERNAL_NAV`, `GH_*_NAV`)
+- product nomenclature estable (`GH_NEXA`, `GH_PIPELINE_COMMERCIAL`)
+- tokens visuales transicionales (`GH_COLORS`, out of scope de TASK-811 hasta su absorción final en theme)
+
+El microcopy reutilizable de dominios vive ahora en módulos type-safe bajo `src/lib/copy/`:
+
+| Módulo | Exports |
+| --- | --- |
+| `src/lib/copy/agency.ts` | `GH_AGENCY` |
+| `src/lib/copy/client-portal.ts` | `GH_LABELS`, `GH_TEAM`, `GH_MESSAGES` |
+| `src/lib/copy/admin.ts` | `GH_INTERNAL_MESSAGES` |
+| `src/lib/copy/pricing.ts` | `GH_PRICING`, `GH_PRICING_GOVERNANCE` |
+| `src/lib/copy/workforce.ts` | `GH_SKILLS_CERTS`, `GH_TALENT_DISCOVERY`, `GH_CLIENT_TALENT` |
+| `src/lib/copy/finance.ts` | `GH_MRR_ARR_DASHBOARD` |
+| `src/lib/copy/payroll.ts` | `GH_PAYROLL_PROJECTED_ARIA` |
+
+Reglas nuevas:
+
+- No agregar nuevo domain microcopy a `greenhouse-nomenclature.ts`.
+- Si una surface necesita copy de dominio reutilizado en varias superficies, crear o extender un módulo domain-specific dentro de `src/lib/copy/`.
+- Si el texto es CTA/estado/loading/empty/aria/mes shared, usar `getMicrocopy()` y sus namespaces existentes.
+- Si el texto es único de una pantalla, puede vivir cerca del dominio, pero no debe duplicar shared copy.
+- `GH_COMPENSATION` fue eliminado por orphan real (0 importers runtime).
 
 ## Delta 2026-05-05 — Quote Builder primitives extraction Sprint 3 (TASK-498)
 

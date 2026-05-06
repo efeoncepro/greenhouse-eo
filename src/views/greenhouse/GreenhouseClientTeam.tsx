@@ -23,7 +23,7 @@ import CustomChip from '@core/components/mui/Chip'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 
 import ClientSafeTalentCard, { type ClientSafeTalentProfile } from '@/components/greenhouse/ClientSafeTalentCard'
-import { GH_CLIENT_TALENT } from '@/config/greenhouse-nomenclature'
+import { GH_CLIENT_TALENT } from '@/lib/copy/workforce'
 import { getMicrocopy } from '@/lib/copy'
 
 const GREENHOUSE_COPY = getMicrocopy()

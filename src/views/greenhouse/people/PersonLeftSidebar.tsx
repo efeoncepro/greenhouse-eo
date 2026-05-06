@@ -12,7 +12,7 @@ import Typography from '@mui/material/Typography'
 
 import { getMicrocopy } from '@/lib/copy'
 
-import { GH_INTERNAL_MESSAGES } from '@/config/greenhouse-nomenclature'
+import { GH_INTERNAL_MESSAGES } from '@/lib/copy/admin'
 import TeamAvatar from '@/components/greenhouse/TeamAvatar'
 import { formatCurrency } from '@views/greenhouse/payroll/helpers'
 

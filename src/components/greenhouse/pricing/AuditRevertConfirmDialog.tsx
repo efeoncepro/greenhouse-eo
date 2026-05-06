@@ -15,7 +15,7 @@ import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 
 import AuditDiffViewer from './AuditDiffViewer'
-import { GH_PRICING_GOVERNANCE } from '@/config/greenhouse-nomenclature'
+import { GH_PRICING_GOVERNANCE } from '@/lib/copy/pricing'
 
 const REASON_MIN = 15
 const REASON_MAX = 500

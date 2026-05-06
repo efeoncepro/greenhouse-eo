@@ -3,7 +3,7 @@
 import type { Theme } from '@mui/material/styles'
 
 import type { ThemeColor } from '@core/types'
-import { GH_LABELS, GH_MESSAGES } from '@/config/greenhouse-nomenclature'
+import { GH_LABELS, GH_MESSAGES } from '@/lib/copy/client-portal'
 import {
   formatDate,
   formatDateTime,

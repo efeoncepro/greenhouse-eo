@@ -4,7 +4,7 @@ import Grid from '@mui/material/Grid'
 import Typography from '@mui/material/Typography'
 
 import PricingCatalogNavCard from '@/components/greenhouse/pricing/PricingCatalogNavCard'
-import { GH_PRICING } from '@/config/greenhouse-nomenclature'
+import { GH_PRICING } from '@/lib/copy/pricing'
 
 export interface PricingCatalogCounts {
   roles: number

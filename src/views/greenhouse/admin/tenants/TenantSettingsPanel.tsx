@@ -12,7 +12,7 @@ import Typography from '@mui/material/Typography'
 import CustomAvatar from '@core/components/mui/Avatar'
 import CustomChip from '@core/components/mui/Chip'
 
-import { GH_INTERNAL_MESSAGES } from '@/config/greenhouse-nomenclature'
+import { GH_INTERNAL_MESSAGES } from '@/lib/copy/admin'
 import type { AdminTenantDetail } from '@/lib/admin/get-admin-tenant-detail'
 import { formatDateTime, getDisplayNote } from '@views/greenhouse/admin/tenants/helpers'
 

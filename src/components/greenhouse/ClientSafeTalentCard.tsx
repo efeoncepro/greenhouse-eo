@@ -13,7 +13,7 @@ import CustomAvatar from '@core/components/mui/Avatar'
 
 import BrandLogo from '@/components/greenhouse/BrandLogo'
 import VerifiedByEfeonceBadge from '@/components/greenhouse/VerifiedByEfeonceBadge'
-import { GH_CLIENT_TALENT } from '@/config/greenhouse-nomenclature'
+import { GH_CLIENT_TALENT } from '@/lib/copy/workforce'
 import { formatDate as formatGreenhouseDate } from '@/lib/format'
 
 // ── Types ──

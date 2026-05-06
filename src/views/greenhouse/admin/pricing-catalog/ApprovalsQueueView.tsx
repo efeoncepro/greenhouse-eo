@@ -24,7 +24,7 @@ import { getMicrocopy } from '@/lib/copy'
 import CustomChip from '@core/components/mui/Chip'
 
 import AuditDiffViewer from '@/components/greenhouse/pricing/AuditDiffViewer'
-import { GH_PRICING_GOVERNANCE } from '@/config/greenhouse-nomenclature'
+import { GH_PRICING_GOVERNANCE } from '@/lib/copy/pricing'
 import { formatDateTime } from '@/lib/format'
 
 const GREENHOUSE_COPY = getMicrocopy()

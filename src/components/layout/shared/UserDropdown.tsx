@@ -21,7 +21,8 @@ import Popper from '@mui/material/Popper'
 import Typography from '@mui/material/Typography'
 
 import { useSettings } from '@core/hooks/useSettings'
-import { GH_CLIENT_NAV, GH_INTERNAL_NAV, GH_MESSAGES } from '@/config/greenhouse-nomenclature'
+import { GH_CLIENT_NAV, GH_INTERNAL_NAV } from '@/config/greenhouse-nomenclature'
+import { GH_MESSAGES } from '@/lib/copy/client-portal'
 
 const BadgeContentSpan = styled('span')({
   width: 8,

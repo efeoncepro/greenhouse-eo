@@ -44,7 +44,7 @@ import { PRICING_TIER_LABELS, type PricingTierCode } from '@/lib/commercial/pric
 import CreateSellableRoleDrawer from './drawers/CreateSellableRoleDrawer'
 import EditSellableRoleDrawer from './drawers/EditSellableRoleDrawer'
 import BulkEditDrawer from './drawers/BulkEditDrawer'
-import { GH_PRICING_GOVERNANCE } from '@/config/greenhouse-nomenclature'
+import { GH_PRICING_GOVERNANCE } from '@/lib/copy/pricing'
 
 const TASK407_ARIA_VOLVER_AL_CATALOGO = "Volver al catálogo"
 const TASK407_ARIA_FILTRAR_POR_CATEGORIA = "Filtrar por categoría"

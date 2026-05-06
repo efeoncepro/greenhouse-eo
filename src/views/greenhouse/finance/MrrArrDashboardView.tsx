@@ -30,7 +30,7 @@ import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSu
 
 import CustomChip from '@core/components/mui/Chip'
 
-import { GH_MRR_ARR_DASHBOARD } from '@/config/greenhouse-nomenclature'
+import { GH_MRR_ARR_DASHBOARD } from '@/lib/copy/finance'
 
 import type {
   ContractMrrArrSnapshotRow,

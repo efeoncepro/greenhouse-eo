@@ -5,7 +5,7 @@ import Card from '@mui/material/Card'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
-import { GH_AGENCY } from '@/config/greenhouse-nomenclature'
+import { GH_AGENCY } from '@/lib/copy/agency'
 import type { AgencyPulseKpis } from '@/lib/agency/agency-queries'
 import { formatDateTime as formatGreenhouseDateTime } from '@/lib/format'
 

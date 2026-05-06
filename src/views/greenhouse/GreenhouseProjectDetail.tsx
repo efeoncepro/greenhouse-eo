@@ -23,7 +23,8 @@ import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
 
 import { EmptyState, ProjectTeamSection } from '@/components/greenhouse'
-import { GH_CLIENT_NAV, GH_LABELS, GH_MESSAGES } from '@/config/greenhouse-nomenclature'
+import { GH_CLIENT_NAV } from '@/config/greenhouse-nomenclature'
+import { GH_LABELS, GH_MESSAGES } from '@/lib/copy/client-portal'
 import type { GreenhouseProjectDetailData, GreenhouseProjectTasksData } from '@/types/greenhouse-project-detail'
 import { formatDate as formatGreenhouseDate } from '@/lib/format'
 

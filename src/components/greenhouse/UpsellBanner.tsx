@@ -6,7 +6,8 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { alpha } from '@mui/material/styles'
 
-import { GH_COLORS, GH_TEAM } from '@/config/greenhouse-nomenclature'
+import { GH_COLORS } from '@/config/greenhouse-nomenclature'
+import { GH_TEAM } from '@/lib/copy/client-portal'
 
 type UpsellBannerProps = {
   utilizationPercent: number
