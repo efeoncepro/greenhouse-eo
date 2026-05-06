@@ -5,7 +5,7 @@ import { resolveSecret } from '@/lib/webhooks/signing'
 import { syncHubSpotCompanyById } from '@/lib/hubspot/sync-company-by-id'
 import { syncTenantCapabilitiesFromIntegration } from '@/lib/integrations/greenhouse-integration'
 import { captureWithDomain } from '@/lib/observability/capture'
-import { processHubSpotServiceEvents } from './hubspot-services'
+import { enqueueHubSpotServiceEventsAsync } from './hubspot-services'
 
 /**
  * HubSpot companies webhook handler — TASK-706.
@@ -147,14 +147,17 @@ return t.startsWith('service.') || t.startsWith('p_services.') || t.startsWith('
 
   if (serviceEvents.length > 0) {
     try {
-      await processHubSpotServiceEvents(serviceEvents)
+      // TASK-813b — Path canónico async: emite outbox event, retorna inmediato.
+      // La projection hubspot_services_intake hace HubSpot fetch + UPSERT en
+      // ops-reactive-finance cron, fuera del webhook request path. Latencia
+      // del webhook < 100ms (sólo INSERT outbox).
+      await enqueueHubSpotServiceEventsAsync(serviceEvents, 'hubspot-companies-webhook-delegation')
     } catch (err) {
-      // Service flow failure no aborta company flow: cada uno se reporta
-      // independiente. Sentry ya capturó internamente (captureWithDomain
-      // dentro de processHubSpotServiceEvents).
+      // Si el publishOutboxEvent falla (PG unreachable), capturamos en Sentry
+      // pero NO abortamos el company flow. HubSpot reintenta el webhook completo.
       captureWithDomain(err, 'integrations.hubspot', {
         level: 'error',
-        tags: { source: 'hubspot-companies-webhook', step: 'delegate-services' },
+        tags: { source: 'hubspot-companies-webhook', step: 'delegate-services-async' },
         extra: { serviceEventCount: serviceEvents.length }
       })
     }

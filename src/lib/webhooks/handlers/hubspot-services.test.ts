@@ -16,11 +16,9 @@ const fetchMock = vi.fn<(input: RequestInfo | URL, init?: RequestInit) => Promis
 
 global.fetch = fetchMock as unknown as typeof fetch
 
-const buildResponse = (body: unknown, status = 200): Response =>
-  new Response(JSON.stringify(body), {
-    status,
-    headers: { 'Content-Type': 'application/json' }
-  })
+// buildResponse no longer needed in async refactor — webhook ya no hace
+// HubSpot fetch en request path. Mantenido como referencia para tests futuros.
+// Removed to satisfy no-unused-vars.
 
 const captureMock = vi.fn()
 const queryMock = vi.fn()
@@ -127,27 +125,15 @@ describe('hubspot-services webhook handler', () => {
     expect(batchReadMock).not.toHaveBeenCalled()
   })
 
-  it('procesa p_services.creation y materializa via UPSERT con outbox event', async () => {
+  it('post async refactor: webhook emite outbox event y retorna inmediato sin fetch HubSpot', async () => {
+    // TASK-813b: el handler ya no hace HubSpot fetch en el request path.
+    // Solo emite outbox event `commercial.service_engagement.intake_requested`
+    // que la projection hubspot_services_intake consume async via cron.
     const handler = handlersByCode['hubspot-services']
     const events = [{ subscriptionType: 'p_services.creation', objectId: 551519372424 }]
     const rawBody = JSON.stringify(events)
     const ts = String(Date.now())
     const sig = buildHubSpotSignature(rawBody, ts, 'test-secret')
-
-    // 1ra llamada: association lookup HubSpot → company id
-    fetchMock.mockResolvedValueOnce(
-      buildResponse({ results: [{ toObjectId: 30825221458 }] }))
-
-    // 2nda+: PG queries (space lookup + INSERT/UPDATE)
-    queryMock
-      .mockResolvedValueOnce([
-        {
-          space_id: 'space-sky-airline',
-          client_id: 'hubspot-company-30825221458',
-          organization_id: 'org-sky'
-        }
-      ])
-      .mockResolvedValueOnce([{ action: 'created' }])
 
     const headers = {
       'x-hubspot-signature-v3': sig,
@@ -157,143 +143,33 @@ describe('hubspot-services webhook handler', () => {
 
     await handler(buildInboxEvent(headers), rawBody, events)
 
-    expect(batchReadMock).toHaveBeenCalledWith(['551519372424'])
-    expect(queryMock).toHaveBeenCalledTimes(2)
+    // No HubSpot fetch in request path
+    expect(batchReadMock).not.toHaveBeenCalled()
+    expect(fetchMock).not.toHaveBeenCalled()
+    // No DB queries in request path
+    expect(queryMock).not.toHaveBeenCalled()
+
+    // Solo 1 outbox event emitido (intake_requested)
     expect(publishMock).toHaveBeenCalledTimes(1)
     expect(publishMock).toHaveBeenCalledWith(
       expect.objectContaining({
-        eventType: 'commercial.service_engagement.materialized',
-        aggregateType: 'service_engagement',
+        eventType: 'commercial.service_engagement.intake_requested',
+        aggregateType: 'hubspot_services_batch',
         payload: expect.objectContaining({
           version: 1,
-          action: 'created',
-          syncStatus: 'unmapped',
-          source: 'hubspot-services-webhook'
+          serviceIds: ['551519372424'],
+          source: 'hubspot-services-webhook-direct'
         })
       })
     )
   })
 
-  it('marca syncStatus=synced cuando ef_linea_de_servicio está poblado', async () => {
+  it('async: deduplica multiple events por service_id en el batch', async () => {
     const handler = handlersByCode['hubspot-services']
-
-    batchReadMock.mockResolvedValueOnce([
-      {
-        id: '551519372424',
-        properties: {
-          hs_name: 'Sky Airline - Diseño digital',
-          ef_linea_de_servicio: 'globe'
-        }
-      }
-    ])
-
-    const events = [{ subscriptionType: 'p_services.creation', objectId: 551519372424 }]
-    const rawBody = JSON.stringify(events)
-    const ts = String(Date.now())
-    const sig = buildHubSpotSignature(rawBody, ts, 'test-secret')
-
-    fetchMock.mockResolvedValueOnce(
-      buildResponse({ results: [{ toObjectId: 30825221458 }] }))
-
-    queryMock
-      .mockResolvedValueOnce([
-        { space_id: 'space-sky', client_id: 'hubspot-company-30825221458', organization_id: 'org-sky' }
-      ])
-      .mockResolvedValueOnce([{ action: 'updated' }])
-
-    const headers = {
-      'x-hubspot-signature-v3': sig,
-      'x-hubspot-request-timestamp': ts,
-      'x-forwarded-uri': TARGET_URI
-    }
-
-    await handler(buildInboxEvent(headers), rawBody, events)
-
-    expect(publishMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        payload: expect.objectContaining({
-          syncStatus: 'synced',
-          action: 'updated'
-        })
-      })
-    )
-  })
-
-  it('reporta organization_unresolved cuando no hay association HubSpot', async () => {
-    const handler = handlersByCode['hubspot-services']
-    const events = [{ subscriptionType: 'p_services.creation', objectId: 551519372424 }]
-    const rawBody = JSON.stringify(events)
-    const ts = String(Date.now())
-    const sig = buildHubSpotSignature(rawBody, ts, 'test-secret')
-
-    // No association
-    fetchMock.mockResolvedValueOnce(
-      buildResponse({ results: [] }))
-
-    const headers = {
-      'x-hubspot-signature-v3': sig,
-      'x-hubspot-request-timestamp': ts,
-      'x-forwarded-uri': TARGET_URI
-    }
-
-    // Single service failed (organization_unresolved) → throw con prefix
-    // audit-friendly para que reliability signal lo detecte vía LIKE.
-    await expect(handler(buildInboxEvent(headers), rawBody, events)).rejects.toThrow(/^organization_unresolved:/)
-
-    expect(captureMock).toHaveBeenCalledTimes(1)
-    expect(captureMock).toHaveBeenCalledWith(
-      expect.objectContaining({ message: expect.stringMatching(/^organization_unresolved:/) }),
-      'integrations.hubspot',
-      expect.objectContaining({
-        level: 'warning',
-        tags: expect.objectContaining({ reason: 'no_company_association' })
-      })
-    )
-    expect(publishMock).not.toHaveBeenCalled()
-  })
-
-  it('reporta organization_unresolved cuando company existe pero no hay space en GH', async () => {
-    const handler = handlersByCode['hubspot-services']
-    const events = [{ subscriptionType: 'p_services.creation', objectId: 551519372424 }]
-    const rawBody = JSON.stringify(events)
-    const ts = String(Date.now())
-    const sig = buildHubSpotSignature(rawBody, ts, 'test-secret')
-
-    fetchMock.mockResolvedValueOnce(
-      buildResponse({ results: [{ toObjectId: 99999 }] }))
-
-    // No space found
-    queryMock.mockResolvedValueOnce([])
-
-    const headers = {
-      'x-hubspot-signature-v3': sig,
-      'x-hubspot-request-timestamp': ts,
-      'x-forwarded-uri': TARGET_URI
-    }
-
-    await expect(handler(buildInboxEvent(headers), rawBody, events)).rejects.toThrow(/^organization_unresolved:/)
-
-    expect(captureMock).toHaveBeenCalledTimes(1)
-    expect(captureMock).toHaveBeenCalledWith(
-      expect.objectContaining({ message: expect.stringMatching(/^organization_unresolved:.*:99999$/) }),
-      'integrations.hubspot',
-      expect.objectContaining({
-        tags: expect.objectContaining({ reason: 'no_greenhouse_space' })
-      })
-    )
-    expect(publishMock).not.toHaveBeenCalled()
-  })
-
-  it('lanza error cuando TODOS los services fallan (HubSpot reintentará)', async () => {
-    const handler = handlersByCode['hubspot-services']
-
-    batchReadMock.mockResolvedValueOnce([
-      { id: '111', properties: { hs_name: 'svc 111', ef_linea_de_servicio: undefined } },
-      { id: '222', properties: { hs_name: 'svc 222', ef_linea_de_servicio: undefined } }
-    ])
 
     const events = [
       { subscriptionType: 'p_services.creation', objectId: 111 },
+      { subscriptionType: 'p_services.propertyChange', objectId: 111, propertyName: 'hs_name' },
       { subscriptionType: 'p_services.creation', objectId: 222 }
     ]
 
@@ -301,8 +177,36 @@ describe('hubspot-services webhook handler', () => {
     const ts = String(Date.now())
     const sig = buildHubSpotSignature(rawBody, ts, 'test-secret')
 
-    // Both lookups return no association → both unresolved
-    fetchMock.mockResolvedValue(buildResponse({ results: [] }))
+    const headers = {
+      'x-hubspot-signature-v3': sig,
+      'x-hubspot-request-timestamp': ts,
+      'x-forwarded-uri': TARGET_URI
+    }
+
+    await handler(buildInboxEvent(headers), rawBody, events)
+
+    expect(publishMock).toHaveBeenCalledTimes(1)
+    expect(publishMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        payload: expect.objectContaining({
+          serviceIds: ['111', '222']
+        })
+      })
+    )
+  })
+
+  it('async: acepta multiple subscriptionType formats (service.* / p_services.* / 0-162.*)', async () => {
+    const handler = handlersByCode['hubspot-services']
+
+    const events = [
+      { subscriptionType: 'service.creation', objectId: 100 },
+      { subscriptionType: 'p_services.propertyChange', objectId: 200 },
+      { subscriptionType: '0-162.propertyChange', objectId: 300 }
+    ]
+
+    const rawBody = JSON.stringify(events)
+    const ts = String(Date.now())
+    const sig = buildHubSpotSignature(rawBody, ts, 'test-secret')
 
     const headers = {
       'x-hubspot-signature-v3': sig,
@@ -310,11 +214,16 @@ describe('hubspot-services webhook handler', () => {
       'x-forwarded-uri': TARGET_URI
     }
 
-    // Cuando todos los failures son organization_unresolved, el throw lleva
-    // prefix audit-friendly. Aceptamos el prefix tanto en mensaje raw como
-    // dentro del fallback "All N service syncs failed: organization_unresolved:..."
-    // (defensive — resilient to refactor future del path de error).
-    await expect(handler(buildInboxEvent(headers), rawBody, events)).rejects.toThrow(/organization_unresolved:/)
+    await handler(buildInboxEvent(headers), rawBody, events)
+
+    expect(publishMock).toHaveBeenCalledTimes(1)
+    expect(publishMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        payload: expect.objectContaining({
+          serviceIds: expect.arrayContaining(['100', '200', '300'])
+        })
+      })
+    )
   })
 
   it('skip cuando no hay events o no hay services p_services.*', async () => {

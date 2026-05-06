@@ -4,6 +4,7 @@ import { batchReadServices } from '@/lib/hubspot/list-services-for-company'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { upsertServiceFromHubSpot, type UpsertServiceSpace } from '@/lib/services/upsert-service-from-hubspot'
+import { publishOutboxEvent } from '@/lib/sync/publish-event'
 import { registerInboundHandler } from '@/lib/webhooks/inbound'
 import { resolveSecret } from '@/lib/webhooks/signing'
 
@@ -177,11 +178,44 @@ const resolveCompanyForService = async (serviceId: string): Promise<string | nul
 }
 
 /**
- * TASK-813 Slice 4 — Procesa events p_services pre-filtrados (firma ya
- * validada por el caller). Reusable desde `hubspot-companies.ts` cuando
- * un mismo webhook target HubSpot recibe events de múltiples object types
- * (HubSpot Developer Platform constraint: solo 1 webhooks component por
- * app — todos los events convergen al mismo target URL).
+ * TASK-813b — Async intake. Emite el outbox event que la projection
+ * `hubspot_services_intake` consume vía ops-reactive-finance cron. Webhook
+ * retorna < 100ms sin esperar HubSpot fetch. Patrón canónico TASK-771/773.
+ *
+ * Source: identifica el origen para audit (hubspot-services-webhook,
+ * hubspot-companies-webhook-delegation, etc.).
+ */
+export const enqueueHubSpotServiceEventsAsync = async (
+  events: HubSpotEvent[],
+  source: string
+): Promise<{ enqueued: number }> => {
+  const serviceIds = extractServiceIdsFromEvents(events)
+
+  if (serviceIds.length === 0) {
+    return { enqueued: 0 }
+  }
+
+  // Aggregate id es el primer service id (audit-friendly per batch). El payload
+  // contiene la lista completa para que la projection refresh procese todos.
+  await publishOutboxEvent({
+    aggregateType: 'hubspot_services_batch',
+    aggregateId: serviceIds[0],
+    eventType: 'commercial.service_engagement.intake_requested',
+    payload: {
+      version: 1,
+      serviceIds,
+      source,
+      enqueuedAt: new Date().toISOString()
+    }
+  })
+
+  return { enqueued: serviceIds.length }
+}
+
+/**
+ * TASK-813 Slice 4 (legacy sync path) — Procesa events p_services
+ * sincrono. Mantenido para tests + fallback ops manual. El path canónico
+ * en producción es `enqueueHubSpotServiceEventsAsync` (async via outbox).
  */
 export const processHubSpotServiceEvents = async (events: HubSpotEvent[]): Promise<void> => {
   const serviceIds = extractServiceIdsFromEvents(events)
@@ -301,5 +335,6 @@ registerInboundHandler('hubspot-services', async (inboxEvent, rawBody, parsedPay
 
   if (events.length === 0) return
 
-  await processHubSpotServiceEvents(events)
+  // TASK-813b — Path canónico async: emite outbox event, retorna inmediato.
+  await enqueueHubSpotServiceEventsAsync(events, 'hubspot-services-webhook-direct')
 })
