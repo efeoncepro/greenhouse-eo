@@ -53,68 +53,137 @@ Categorización de los 22 top-level exports (auditada hoy):
 | `GH_PRICING` | 1623-2326 | Mixed | Auditar entry-by-entry; product-related mantiene, microcopy migra |
 | `GH_PIPELINE_COMMERCIAL` | 2327-2408 | Product nomenclature ✓ | Mantener |
 
-**Decisión scope Slice 4**: NO refactorizar `greenhouse-nomenclature.ts` en TASK-407. Razón: trim full toca 26 importers de `GH_MESSAGES`, riesgo alto de regresión, y compite con el trabajo del lint-driven sweep. **Mover el trim a TASK-409 nueva** (derivada explícita), bloqueada por TASK-407 + TASK-408.
+**Decisión scope Slice 4**: NO refactorizar `greenhouse-nomenclature.ts` en TASK-407. Razón: trim full toca 26 importers de `GH_MESSAGES`, riesgo alto de regresión, y compite con el trabajo del lint-driven sweep. **Mover el trim a TASK-811** (derivada explícita, ID asignado 2026-05-06; TASK-409 está burned por `payroll-reliquidation-program`), bloqueada por TASK-407 + TASK-408.
 
 ### Reordenamiento del Scope (Slices) por densidad real
 
-Se reordena la priorización para atacar el caso dominante primero — **aria-labels (202)** son 64% del baseline lint:
+Se reordena la priorización para atacar el caso dominante primero — **aria-labels** son ~63% del baseline lint (medición 2026-05-06: **328 warnings** totales de `no-untokenized-copy`, alineado con el 318 declarado el 2026-05-02).
 
-#### Slice 1 (NUEVO) — aria-labels (caso dominante)
+#### Slice 0 (NUEVO, BLOQUEANTE) — Extender rule ESLint para cubrir Slices 5/6
 
-- **Target**: 202 aria-label literales en `src/views`, `src/components`, `src/app`
-- **Reemplazo**: `getMicrocopy().aria.<key>` para los más comunes (close, navigate, sort, paginate, etc.); aria-labels específicos de dominio quedan inline pero pasan por skill `greenhouse-ux-writing` para validar tono
-- **Impacto**: bajar el lint warning count de 318 → ~116
+**Razón**: el sweep de Slices 5 (month arrays) y 6 (JSX text CTAs) cierra el lint counter pero **NO bloquea regresiones futuras** — la rule actual `no-untokenized-copy` no detecta esos patterns (solo aria-labels, status maps, empty states, secondary props). Sin extender la rule antes del sweep, TASK-408 Closing Protocol no puede promover a `error` con seguridad: la promoción cierra el gate sobre los 4 patterns ya cubiertos pero deja month arrays y CTAs JSX text expuestos a drift silencioso.
 
-#### Slice 2 (RENUMERADO) — status maps inline
+- **Target**:
+  - **5a** — Detector de month arrays hardcoded: `ArrayExpression` con 12 elementos string que matcheen `Ene|Feb|Mar|...|Dic` (variantes short y long, con/sin tildes). Mensaje accionable: `Use getMicrocopy().months.short[i] o months.long[i]`.
+  - **5b** — Detector de JSX text CTAs: `JSXText` cuyo trim() ∈ {`Guardar`, `Cancelar`, `Editar`, `Eliminar`, `Confirmar`, `Volver`, `Continuar`, `Siguiente`, `Cerrar`, `Aceptar`, `Crear`, `Agregar`}. Mensaje: `Use {getMicrocopy().actions.<key>}`.
+- **Implementación**: extender [eslint-plugins/greenhouse/rules/no-untokenized-copy.mjs](../../eslint-plugins/greenhouse/rules/no-untokenized-copy.mjs) con dos visitor handlers nuevos (`ArrayExpression` y `JSXText`). Tests en `eslint-plugins/greenhouse/rules/__tests__/no-untokenized-copy.test.mjs` cubriendo positivos + negativos.
+- **Modo**: agregar warnings al baseline existente (modo `warn` heredado). El sweep de Slices 5/6 los baja a 0; TASK-408 promueve a `error` cubriendo 6 patterns en lugar de 4.
+- **Verificación**: `pnpm lint` post-extensión muestra warnings adicionales para los 30 month arrays + N CTAs JSX text encontrados; el baseline para Slices 5/6 queda mecánicamente medible (no por grep ad-hoc).
+- **Bloqueante**: Slices 5 y 6 no inician hasta que Slice 0 mergee. Slices 1-4 pueden ejecutarse en paralelo (no dependen de la extensión).
 
-- **Target**: 59 status maps con `{ label: 'Pendiente'/'Activo'/etc }`
-- **Reemplazo**: `getMicrocopy().states.<key>` o un helper `buildStatusMap()` que componga el mapa desde el dictionary
-- **Impacto**: 116 → 57
+#### Slice 1 — aria-labels (caso dominante)
 
-#### Slice 3 (RENUMERADO) — empty states + loading
+- **Target**: ~206 aria-label literales en `src/views`, `src/components`, `src/app` (medición 2026-05-06).
+- **Reemplazo**: `getMicrocopy().aria.<key>` para los comunes (close, navigate, sort, paginate, expand, collapse, etc.). Para aria-labels de dominio, ver **Escape Hatch Policy** abajo.
+- **Impacto**: 328 → ~120.
 
-- **Target**: 23 empty states + 0 loading literales (rule no detectó loading hoy, verificar en sweep)
-- **Reemplazo**: `getMicrocopy().empty.<key>` y `getMicrocopy().loading.<key>`
-- **Impacto**: 57 → 34
+#### Slice 2 — status maps inline + helper canónico `buildStatusMap()`
 
-#### Slice 4 (RENUMERADO) — secondary props (label/placeholder/title)
+- **Target**: 63 status maps con `{ label: 'Pendiente'/'Activo'/etc }` (medición 2026-05-06).
+- **Reemplazo PRIMARIO**: introducir helper `buildStatusMap(definition)` en [src/lib/copy/index.ts](../../src/lib/copy/index.ts) que componga el mapa desde el dictionary `states` con tipado type-safe. Es la primitiva canónica que **previene la regresión** (sin helper, los próximos status maps se vuelven a hardcodear). **Mandatorio, no opcional.**
+- **Reemplazo SECUNDARIO**: callsite-by-callsite consume `buildStatusMap` en lugar de `getMicrocopy().states.<key>` directo cuando hay 3+ keys.
+- **Impacto**: 120 → 57.
 
-- **Target**: 34 secondary prop literales
-- **Reemplazo**: `getMicrocopy()` o `greenhouse-nomenclature.ts` según naturaleza
-- **Impacto**: 34 → 0
+#### Slice 3 — empty states + loading
 
-#### Slice 5 (NUEVO) — month arrays
+- **Target**: 22 empty states + 0 loading literales (medición 2026-05-06; rule cubre loading patterns desde TASK-265 pero baseline ya está en 0 — verificar al cierre).
+- **Reemplazo**: `getMicrocopy().empty.<key>` y `getMicrocopy().loading.<key>`.
+- **Impacto**: 57 → 35.
 
-- **Target**: 30 archivos con `['Ene', ..., 'Dic']` o `['Enero', ..., 'Diciembre']` hardcoded
-- **Reemplazo**: `getMicrocopy().months.short[i]` o `getMicrocopy().months.long[i]`
-- **Nota**: la rule ESLint actual NO detecta arrays de meses (no es un pattern soportado). Sweep manual + grep verifica baseline 0 al cierre.
+#### Slice 4 — secondary props (label/placeholder/title)
 
-#### Slice 6 (NUEVO) — CTAs base hardcoded
+- **Target**: ~35 secondary prop literales.
+- **Reemplazo**: `getMicrocopy()` (microcopy funcional) o `greenhouse-nomenclature.ts` (product nomenclature) según escape hatch policy abajo.
+- **Impacto**: 35 → 0.
 
-- **Target**: 179 archivos con CTAs literales (`>Guardar<`, `label="Cancelar"`, etc.)
-- **Reemplazo**: `getMicrocopy().actions.<key>`
-- **Nota**: la rule ESLint cubre solo cuando están dentro de `sx`/JSXAttribute label/placeholder/etc; los `>Guardar<` como JSX text NO son detectados (out of scope rule actual). Sweep manual + grep verifica baseline 0 al cierre.
+#### Slice 5 — month arrays (depende de Slice 0)
 
-#### Slice 7 (DEFERIDO a TASK-409) — Trim `greenhouse-nomenclature.ts`
+- **Target**: 30 archivos con `['Ene', ..., 'Dic']` o `['Enero', ..., 'Diciembre']` hardcoded.
+- **Reemplazo**: `getMicrocopy().months.short[i]` o `getMicrocopy().months.long[i]`.
+- **Detección**: rule extendida en Slice 0 produce warnings deterministas. Baseline post-Slice 0 es mecánicamente medible.
 
-- Originalmente Slice 4 de TASK-407
-- Movido a task derivada nueva (TASK-409) por ownership claro y scope independiente
-- Bloqueada por TASK-407 + TASK-408 cerradas
+#### Slice 6 — CTAs base hardcoded en JSX text (depende de Slice 0)
 
-### Acceptance criteria recalibrados
+- **Target**: ~179 archivos con CTAs literales (`>Guardar<`, etc.).
+- **Reemplazo**: `getMicrocopy().actions.<key>`.
+- **Detección**: rule extendida en Slice 0 (handler `JSXText`) produce warnings deterministas. Baseline post-Slice 0 es mecánicamente medible.
 
-Los criterios cuantitativos viejos eran "0 month arrays + 0 CTAs base". Los nuevos son:
+#### Slice 7 (DEFERIDO a TASK-811) — Trim `greenhouse-nomenclature.ts`
 
-- [ ] `pnpm lint` warnings de `greenhouse/no-untokenized-copy` bajan de **318 → 0** en el scope cubierto (aria-labels + status + empty + secondary)
-- [ ] `rg "'Ene'.*'Feb'.*'Mar'" src/views src/components -t tsx -l | wc -l` retorna **0**
-- [ ] `rg ">Guardar<|label=['\"](Guardar|Cancelar|Editar|Eliminar|Confirmar)['\"]" src/views src/components -t tsx -l | wc -l` retorna **0** (o queda documentado el residual con justificación)
-- [ ] Sin regresiones visuales en preview/staging
+- Originalmente Slice 4 de TASK-407.
+- Movido a task derivada nueva **TASK-811** (Copy Migration: greenhouse-nomenclature.ts Domain Microcopy Trim) por ownership claro y scope independiente.
+- Bloqueada por TASK-407 + TASK-408 cerradas.
+- **Nota crítica**: ID corregido — el Delta original decía TASK-409 pero ese ID está burned por `payroll-reliquidation-program` (complete).
+
+### Defense-in-depth: Escape Hatch Policy
+
+Cuando un string detectado por la rule **no debe migrarse a un namespace shared** (es genuinamente domain-specific o políticamente sensible), el sweep aplica esta policy en orden de preferencia:
+
+1. **Product nomenclature** (Pulse, Spaces, Ciclos, nombres institucionales, copy de marca) → declarar en [src/config/greenhouse-nomenclature.ts](../../src/config/greenhouse-nomenclature.ts) en el namespace correspondiente (`GH_LABELS`, `GH_NEXA`, etc.). Consumer importa desde ahí. La rule no warnsobre imports — solo sobre literales en JSX/sx.
+2. **Domain microcopy reusada en 3+ surfaces** → agregar al namespace correspondiente de [src/lib/copy/dictionaries/es-CL/](../../src/lib/copy/dictionaries/es-CL/) (e.g. `aria.ts` para aria-labels nuevos como `closeFinanceDrawer`, `payrollPeriodSelect`). Validación de tono via skill `greenhouse-ux-writing` antes del PR.
+3. **Domain microcopy 1-shot** (string usado en exactamente 1 callsite, semánticamente único, sin vocación de reuso) → mantener inline con `// eslint-disable-next-line greenhouse/no-untokenized-copy -- <razón>`. Razón obligatoria, mínimo 10 caracteres, debe describir el dominio (e.g. `dominio: detalle bancario Santander Corp, no aplica reuso`). PRs sin razón documentada se rechazan en review.
+
+**Regla dura**: opciones 1 y 2 son preferidas. Opción 3 es escape, no default. Si en review se detectan >5 disables en un solo PR sin justificación clara de unicidad, el PR se rechaza y se requiere consolidar al namespace.
+
+**Validación operativa**: antes de mergear cualquier slice, `rg "eslint-disable.*no-untokenized-copy" src/ | wc -l` debe documentarse en el PR description con delta vs baseline. Crecimiento acumulado >20 disables sin justificación bloquea promoción a `error` en TASK-408.
+
+### Migration Hygiene: PR Strategy
+
+- **Un PR por slice**, no mega-PR. Razón: blast radius granular, revisable independiente, rollback localizado si emerge regresión visual.
+- **Slice 0** (rule extension): PR pequeño, alta confianza (es código de lint rule + tests; no toca surfaces UI).
+- **Slices 1, 2, 3, 4**: pueden ir en paralelo (no dependen entre sí). Cada uno es 1 PR.
+- **Slices 5, 6**: bloqueados por Slice 0. Cada uno es 1 PR.
+- **Tamaño máximo recomendado por PR**: ~50 archivos. Si un slice excede esto (caso probable: Slice 1 con 206 aria-labels, Slice 6 con 179 CTAs), partirlo por subdomain (`finance/`, `hr/`, `agency/`, etc.) — cada subdomain es un PR.
+- **Cada PR**: pasa `pnpm lint` (no introduce warnings nuevos), `npx tsc --noEmit`, smoke verification para las surfaces tocadas.
+
+### Acceptance criteria recalibrados (consolidados)
+
+Sustituyen y consolidan los criterios viejos. **No se duplican con el bloque legacy `## Acceptance Criteria` de abajo** — el legacy queda marcado como superseded.
+
+- [ ] **Slice 0 mergeado** y rule extendida cubre month arrays + JSX text CTAs (verificable: `pnpm lint` muestra warnings nuevos en mes de archivos hardcoded).
+- [ ] `pnpm lint` warnings de `greenhouse/no-untokenized-copy` bajan de **328 → 0** en el scope cubierto por TASK-407 (aria-labels + status + empty + secondary + months + CTAs JSX text). El residuo no-cubierto pasa a TASK-408.
+- [ ] Helper `buildStatusMap()` existe en `src/lib/copy/` con tests unitarios + al menos 5 callsites migrados como referencia.
+- [ ] `rg "'Ene'.*'Feb'.*'Mar'" src/views src/components -t tsx -l | wc -l` retorna **0**.
+- [ ] Disables de la rule (`eslint-disable.*no-untokenized-copy`) están todos justificados con razón ≥10 chars y total ≤20 (documentado en PR descriptions).
+- [ ] Smoke verification ejecutado (ver bloque **Smoke Verification** abajo) — pasa sin regresiones reportadas.
+- [ ] `pnpm build`, `pnpm lint`, `npx tsc --noEmit`, `pnpm test` pasan en cada PR de slice.
+
+### Smoke Verification (reemplaza "no regresiones reportadas tras deploy")
+
+Para cada slice mergeado a `develop` antes de promover a TASK-408 Closing Protocol, ejecutar manualmente en preview/staging:
+
+**Top 10 surfaces shared a verificar visualmente** (cubre las superficies con mayor concentración de aria-labels + CTAs migradas):
+
+1. `/home` — Quick Access Shortcuts dropdown + nav
+2. `/finance/cash-out` — drawer de cuenta bancaria + lista movimientos
+3. `/finance/reconciliation` — workbench + matching modal
+4. `/hr/payroll/[periodId]` — preview liquidación + status chips
+5. `/agency/operations` — tabla operativa + filtros
+6. `/people` — directorio + tabs de perfil
+7. `/admin/team` — tabla con CRUD inline
+8. `/admin/operations` — reliability dashboard + signal cards
+9. Login flow (verificación que NO se tocó copy de login per Out of Scope)
+10. `/admin/notifications` — lista de categorías (referencia para TASK-408)
+
+**Criterio**: cada surface muestra labels/CTAs/aria-labels esperados sin regresiones visuales. Capturas en PR description para los 3 surfaces más afectados por el slice.
+
+**Automatización futura** (opcional, no bloqueante): si emerge necesidad de Playwright snapshot diff durante el sweep, agregarlo como sub-task. Hoy el smoke checklist es suficiente — el riesgo es bajo (refactor puro de strings, sin write paths).
+
+### 4-Pillar Score (post-ajustes)
+
+| Pillar | Score | Justificación |
+| --- | --- | --- |
+| **Safety** | ✅ | Refactor puro, blast radius bajo, sin write paths. PR-by-slice limita scope de cualquier defecto. |
+| **Robustness** | ✅ | Smoke checklist explícito sobre 10 surfaces. `pnpm lint` + `tsc --noEmit` + `test` por PR. Helper `buildStatusMap()` previene la próxima regresión. |
+| **Resilience** | ✅ | Rollback granular: 1 PR = 1 slice = revert localizado. Disables documentados auditan escape hatches. |
+| **Scalability** | ✅ | Slice 0 extiende la rule para cubrir 100% de los patterns que el sweep ataca. TASK-408 puede promover a `error` con seguridad. Sin Slice 0 este pillar fallaría. |
 
 ### Out of scope nuevo
 
-- **Trim de `greenhouse-nomenclature.ts`** → TASK-409 (derivada nueva, bloqueada por TASK-407 + TASK-408)
-- **Promote rule a `error` mode** → TASK-408 Closing Protocol (no esta task)
-- **Login** → diferido (sin cambios)
+- **Trim de `greenhouse-nomenclature.ts`** → **TASK-811** (derivada nueva, bloqueada por TASK-407 + TASK-408).
+- **Promote rule a `error` mode** → TASK-408 Closing Protocol (no esta task).
+- **Login** → diferido (sin cambios).
+- **Notification categories + emails** → TASK-408 (scope independiente).
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
@@ -174,7 +243,7 @@ Reglas obligatorias:
 
 ## Normative Docs
 
-- `docs/tasks/to-do/TASK-265-greenhouse-nomenclature-dictionary-kortex-copy-contract.md`
+- `docs/tasks/complete/TASK-265-greenhouse-nomenclature-dictionary-kortex-copy-contract.md`
 - `docs/architecture/GREENHOUSE_UI_PLATFORM_V1.md`
 
 ## Dependencies & Impact
@@ -188,12 +257,17 @@ Reglas obligatorias:
 
 - `TASK-266` Slice 4 — rollout incremental de locales consume directamente el trabajo de esta migración.
 - `TASK-116` — labels/subtitles del sidebar deben quedar alineados al nuevo contrato.
+- `TASK-408` — Closing Protocol promueve `no-untokenized-copy` a `error`. Depende de Slice 0 de esta task (extensión de la rule a month arrays + JSX text CTAs) para que la promoción cubra los 6 patterns que el sweep ataca, no solo 4.
+- `TASK-811` — Trim de `greenhouse-nomenclature.ts` (Slice 7 originalmente). Bloqueada por TASK-407 + TASK-408 cerradas.
 
 ### Files owned
 
 - `src/components/greenhouse/**` (solo archivos con CTAs/empty/error/loading shared)
 - `src/views/greenhouse/**` (solo strings shared, no dominio local)
 - Arrays de meses en cualquier ubicación
+- `eslint-plugins/greenhouse/rules/no-untokenized-copy.mjs` (Slice 0 — extensión a month arrays + JSX text CTAs)
+- `eslint-plugins/greenhouse/rules/__tests__/no-untokenized-copy.test.mjs` (Slice 0 — tests)
+- `src/lib/copy/index.ts` (Slice 2 — helper `buildStatusMap()`)
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 3 — EXECUTION SPEC
@@ -201,57 +275,38 @@ Reglas obligatorias:
 
 ## Scope
 
-### Slice 1 — Arrays de meses
-
-- Detectar todos los arrays de meses hardcoded (`['Ene', 'Feb', ..., 'Dic']` y variantes).
-- Reemplazar por un helper único que consuma la capa canónica.
-- Validar que las vistas afectadas (analytics, payroll, organization economics) siguen renderizando igual.
-
-### Slice 2 — CTAs base en `src/components/greenhouse/`
-
-- Inventariar strings tipo `Guardar`, `Guardando...`, `Editar`, `Cancelar`, `Confirmar`, `Volver`, `Siguiente`, `Cargando...`.
-- Migrarlos al namespace correspondiente de la capa dictionary-ready.
-- Dejar un ESLint rule o check (si viable) que alerte sobre nuevos hardcodes de estos strings.
-
-### Slice 3 — Empty / error / loading states shared
-
-- Detectar empty states, error messages y loading labels que aparecen en 2+ lugares.
-- Migrar al namespace shared correspondiente.
-- Mantener copy específica de dominio en su lugar si no tiene vocación de reuso.
-
-### Slice 4 — Navegación y labels de shell
-
-- Validar que toda la nav y labels del shell consumen la capa canónica con la nueva estructura (no queda inline).
-- Si `TASK-265` dejó el recorte de `greenhouse-nomenclature.ts` planeado pero no ejecutado, ejecutarlo aquí.
+> **Superseded by Delta 2026-05-02 + ajustes 2026-05-06**. La sección canónica de slices vive arriba en el bloque `### Reordenamiento del Scope (Slices) por densidad real`. Slices canónicos: **0** (rule extension, bloqueante) → **1** (aria-labels) → **2** (status maps + helper `buildStatusMap`) → **3** (empty/loading) → **4** (secondary props) → **5** (month arrays) → **6** (CTAs JSX text). Slice 7 deferido a **TASK-811**.
 
 ## Out of Scope
 
 - Login — diferido.
-- Copy de dominio local sin vocación shared.
+- Copy de dominio local sin vocación shared (escape hatch policy: ver Delta).
 - Traducción a otros locales (eso es `TASK-266` + child tasks).
 - Notifications y emails (eso es `TASK-408`).
+- Trim de `greenhouse-nomenclature.ts` (es `TASK-811`).
 
 ## Acceptance Criteria
 
-- [ ] **0** arrays de meses hardcoded fuera de la capa canónica (validar con grep en `src/views/` y `src/components/`).
-- [ ] **0** CTAs base (`Guardar`, `Cancelar`, `Editar`, `Guardando...`, `Cargando...`, `Confirmar`, `Volver`, `Siguiente`) hardcoded en `src/components/greenhouse/` y en componentes shared de `src/views/greenhouse/` fuera del login.
-- [ ] Empty / error / loading states shared consumen la capa canónica.
-- [ ] `pnpm build`, `pnpm lint`, `npx tsc --noEmit`, `pnpm test` pasan.
-- [ ] Verificación visual en staging: nav, shell, profile cards, analytics con meses, formularios con CTAs base.
-- [ ] No hay regresiones reportadas tras deploy a staging.
+> **Superseded by Delta 2026-05-02 + ajustes 2026-05-06**. La sección canónica de criterios vive arriba en el bloque `### Acceptance criteria recalibrados (consolidados)`.
 
 ## Verification
 
-- `pnpm lint && npx tsc --noEmit && pnpm build && pnpm test`
-- Deploy a preview/staging y revisión manual de vistas shared clave.
-- Grep post-migración confirma baseline cero en los targets medibles.
+- `pnpm lint && npx tsc --noEmit && pnpm build && pnpm test` por cada PR de slice.
+- Smoke verification manual sobre las 10 surfaces shared listadas en el Delta (`### Smoke Verification`).
+- Cuando se cierra el último slice, baseline `pnpm lint | grep "no-untokenized-copy" | wc -l` retorna **0**.
+- `rg "eslint-disable.*no-untokenized-copy" src/ | wc -l` ≤ 20 con razones documentadas.
 
 ## Closing Protocol
 
 - [ ] Actualizar `Handoff.md` con resumen de migración y superficies afectadas.
-- [ ] Ejecutar chequeo de impacto cruzado sobre `TASK-116`, `TASK-266` y `TASK-408`.
-- [ ] Verificar que el contador de warnings de `greenhouse/no-untokenized-copy` (rule introducida por TASK-265 Slice 5) bajó respecto al baseline registrado al cierre de TASK-265. Si quedan 0 warnings en el scope cubierto por esta task (shared shell + componentes), documentar; si no, registrar el delta y dejar el resto a TASK-408.
+- [ ] Ejecutar chequeo de impacto cruzado sobre `TASK-116`, `TASK-266`, `TASK-408` y `TASK-811`.
+- [ ] Verificar que el contador de warnings de `greenhouse/no-untokenized-copy` (rule introducida por TASK-265 Slice 5 + extendida en Slice 0 de esta task) bajó a **0** en el scope cubierto. Si quedan warnings residuales, registrar el delta y categorizar (cubierto por TASK-408 vs out-of-scope).
+- [ ] Confirmar que Slice 0 mergeó la extensión de la rule a month arrays + JSX text CTAs y que TASK-408 puede promover a `error` cubriendo 6 patterns.
+- [ ] Documentar en el PR description final el conteo de `eslint-disable.*no-untokenized-copy` con razones, y validar que está ≤20.
+- [ ] Smoke verification ejecutado en preview/staging sobre las 10 surfaces shared listadas; capturas adjuntas para los 3 surfaces más afectados.
 
 ## Open Questions
 
 - ~~¿Conviene agregar un ESLint rule que alerte sobre hardcodes de CTAs base, o basta con la disciplina de code review?~~ — **Resuelto 2026-05-02 vía TASK-265 Slice 5**: la rule `greenhouse/no-untokenized-copy` fue agregada al programa de TASK-265 (gate antes que sweep, mismo patrón TASK-567). Esta task ejecuta el sweep contra ese baseline.
+- ~~¿Cómo prevenir regresiones en month arrays + CTAs JSX text si la rule no los detecta?~~ — **Resuelto 2026-05-06 vía Slice 0**: la rule se extiende como prerequisito del sweep de Slices 5/6. Sin Slice 0, TASK-408 no puede promover a `error` con seguridad.
+- ~~¿Qué hacer con strings que no encajan en namespaces shared?~~ — **Resuelto 2026-05-06 vía Escape Hatch Policy** (3 niveles: nomenclature → namespace → disable con razón ≥10 chars). Cap de 20 disables totales con auditoría en PR descriptions.
