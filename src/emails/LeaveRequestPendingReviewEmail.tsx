@@ -1,7 +1,7 @@
 import { Heading, Img, Section, Text } from '@react-email/components'
 
 import { getMicrocopy, type LeaveRequestPendingReviewEmailTemplateCopy } from '@/lib/copy'
-import { selectEmailTemplateCopy } from '@/lib/email/template-copy'
+import { selectEmailIntlDateLocale, selectEmailTemplateCopy } from '@/lib/email/template-copy'
 import { formatDate as formatLocaleDate } from '@/lib/format'
 
 import EmailButton from './components/EmailButton'
@@ -28,7 +28,7 @@ const formatDate = (dateStr: string, locale: 'es' | 'en') => {
     month: 'short',
     year: 'numeric',
     fallback: dateStr
-  }, locale === 'en' ? 'en-US' : 'es-CL')
+  }, selectEmailIntlDateLocale(locale))
 }
 
 const summaryRow = (label: string, value: string, emphasis = false) => (

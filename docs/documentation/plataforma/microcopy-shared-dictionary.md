@@ -24,6 +24,7 @@ El objetivo no es traducir todo el portal todavia. El objetivo es evitar drift: 
 - TASK-408 Slice 3A agrega `selectEmailTemplateCopy()` y migra `VerifyEmail`/`MagicLinkEmail`/`PasswordResetEmail`/`InvitationEmail` a `emails.auth.*` para espanol, preservando fallback ingles legacy.
 - TASK-408 Slice 3B migra `NotificationEmail` a `emails.genericNotification` para greeting, default CTA y fallback URL. El contenido dinamico de la notificacion sigue viniendo del caller.
 - TASK-408 Slice 3C migra la cohorte leave a `emails.leave.*`. Los textos por estado, labels y pluralizacion viven en dictionary; fechas, rutas, motivos, notas, tipos de permiso y dias siguen viniendo del runtime/template.
+- TASK-408 Slice 3D agrega `selectEmailIntlDateLocale()` para que el locale Intl de fechas en emails no se resuelva con ternarios ad-hoc dentro de templates.
 - `buildStatusMap()` permite construir status maps type-safe sin repetir labels inline.
 - La regla ESLint `greenhouse/no-untokenized-copy` se extendio para detectar arrays de meses y CTAs JSX text, ademas de los patrones ya existentes.
 - El sweep de `src/views`, `src/components` y `src/app` quedo en 0 warnings para `greenhouse/no-untokenized-copy`.

@@ -13,3 +13,9 @@ export const selectEmailTemplateCopy = <TCopy>(
 ): TCopy => {
   return isEnglishEmailLocale(locale) ? legacyEnglishCopy : platformCopy
 }
+
+export type EmailIntlDateLocale = 'es-CL' | 'en-US'
+
+export const selectEmailIntlDateLocale = (locale: EmailLocaleInput): EmailIntlDateLocale => {
+  return isEnglishEmailLocale(locale) ? 'en-US' : 'es-CL'
+}

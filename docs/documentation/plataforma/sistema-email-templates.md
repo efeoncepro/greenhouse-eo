@@ -173,6 +173,8 @@ Frontera operativa:
 
 La cohorte leave usa `getMicrocopy().emails.leave.*` para headings por estado, badges, labels de resumen, pluralizacion de dias, disclaimers y fallbacks. Los datos operativos (`memberName`, `leaveTypeName`, fechas, dias, motivo, notas, reviewer/actor) siguen llegando desde el runtime del modulo HR y no se persistieron en el dictionary.
 
+Las fechas de templates email usan `selectEmailIntlDateLocale()` para proyectar `es`/`en` a `es-CL`/`en-US` antes de llamar helpers de formato. Los templates no deben reintroducir ternarios locales para decidir el locale Intl.
+
 La primitive `selectEmailTemplateCopy()` permite repetir este patron en los siguientes templates sin tocar delivery:
 
 - `es` / `es-CL` / default → dictionary de plataforma.

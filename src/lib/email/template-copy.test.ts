@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { selectEmailTemplateCopy } from './template-copy'
+import { selectEmailIntlDateLocale, selectEmailTemplateCopy } from './template-copy'
 
 describe('email template copy selector', () => {
   const platformCopy = { heading: 'Confirma tu correo' }
@@ -16,5 +16,13 @@ describe('email template copy selector', () => {
   it('preserves legacy English copy while en-US dictionary is still a mirror stub', () => {
     expect(selectEmailTemplateCopy('en', platformCopy, legacyEnglishCopy)).toBe(legacyEnglishCopy)
     expect(selectEmailTemplateCopy('en-US', platformCopy, legacyEnglishCopy)).toBe(legacyEnglishCopy)
+  })
+
+  it('resolves the Intl date locale for email templates without ad-hoc ternaries', () => {
+    expect(selectEmailIntlDateLocale('es')).toBe('es-CL')
+    expect(selectEmailIntlDateLocale('es-CL')).toBe('es-CL')
+    expect(selectEmailIntlDateLocale(undefined)).toBe('es-CL')
+    expect(selectEmailIntlDateLocale('en')).toBe('en-US')
+    expect(selectEmailIntlDateLocale('en-US')).toBe('en-US')
   })
 })

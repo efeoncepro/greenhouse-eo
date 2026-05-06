@@ -10,6 +10,7 @@
 - **Scope Slice 3A:** primitive `selectEmailTemplateCopy()` para migrar templates sin degradar `en` mientras `en-US` es mirror; `VerifyEmail`, `MagicLinkEmail`, `PasswordResetEmail` e `InvitationEmail` usan `getMicrocopy().emails.auth.*` para copy `es` y fallback legacy `en`.
 - **Scope Slice 3B:** `NotificationEmail` consume `getMicrocopy().emails.genericNotification` para greeting/default CTA/fallback sin tocar `title`, `body`, `actionUrl`, `actionLabel`, `unsubscribeUrl` ni dispatch de notificaciones.
 - **Scope Slice 3C:** cohorte leave (`LeaveRequestDecisionEmail`, `LeaveRequestSubmittedEmail`, `LeaveRequestPendingReviewEmail`, `LeaveReviewConfirmationEmail`) consume `getMicrocopy().emails.leave.*` para copy por estado, labels, pluralizacion y fallbacks, preservando fechas, rutas, imagenes y valores dinamicos.
+- **Scope Slice 3D:** `selectEmailIntlDateLocale()` centraliza el locale Intl de fechas para emails y elimina los `locale === 'en'` restantes en `src/emails` sin cambiar snapshots.
 - **Guardrail:** no tocar `sendEmail`, Resend, `NOTIFICATION_CATEGORIES`, outbox/webhooks, `EmailLayout` ni `EmailButton` hasta tener snapshots baseline verdes.
 - **Tokens de personalizacion:** preservar la capa `src/lib/email/tokens.ts` + merge de `delivery.ts`; snapshots deben cubrir nombre, cliente, montos, periodos, links y unsubscribe para detectar cualquier perdida de contexto.
 - **Delivery/eventos intactos:** Slice 1 no toca `NotificationService.dispatch`, `sendEmail`, event types, outbox, projections, webhooks, retry/idempotency ni categorias `code`; solo cambia la fuente de `label/description`.
@@ -26,6 +27,7 @@
 - **Validacion Slice 3A focal:** `src/lib/email/template-copy.test.ts`, `src/emails/EmailTemplateBaseline.test.tsx` (incluye `VerifyEmail`, `MagicLinkEmail`, `PasswordResetEmail` e `InvitationEmail`), `src/lib/email/templates.test.ts` OK; `pnpm exec tsc --noEmit --pretty false` OK; ESLint focal OK.
 - **Validacion Slice 3B focal:** `src/lib/email/template-copy.test.ts`, `src/emails/EmailTemplateBaseline.test.tsx` (incluye `NotificationEmail`), `src/lib/email/templates.test.ts` OK; `pnpm exec tsc --noEmit --pretty false` OK; ESLint focal OK.
 - **Validacion Slice 3C focal:** `src/lib/email/template-copy.test.ts`, `src/emails/EmailTemplateBaseline.test.tsx` (incluye los 4 templates leave), `src/lib/email/templates.test.ts` OK; `pnpm exec tsc --noEmit --pretty false` OK; ESLint focal OK.
+- **Validacion Slice 3D focal:** `src/lib/email/template-copy.test.ts` cubre `selectEmailIntlDateLocale()`; `rg "locale === 'en'|const isEn = locale ===|const t = locale ===" src/emails` queda sin resultados; snapshots email OK.
 - **Validacion full post Slice 3A:** `pnpm lint` OK; `pnpm exec tsc --noEmit --pretty false` OK; `pnpm test` OK (589 suites, 3415 tests, 5 skipped); `pnpm build` OK.
 - **Riesgo observado:** spec declaraba 12 categorias, runtime tiene 13 en `src/config/notification-categories.ts`; Slice 1 migro el runtime real (13). `subjectKey` queda diferido hasta no tener un consumer activo seguro, para no tocar subjects/delivery en este slice.
 
