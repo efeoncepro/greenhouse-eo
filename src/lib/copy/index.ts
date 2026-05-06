@@ -123,6 +123,7 @@ export type {
   GetMicrocopy,
   LoadingCopy,
   Locale,
+  MagicLinkEmailTemplateCopy,
   MicrocopyDictionary,
   MicrocopyNamespace,
   MonthsCopy,

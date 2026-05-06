@@ -328,6 +328,17 @@ export interface VerifyEmailTemplateCopy {
   previewText: string
 }
 
+export interface MagicLinkEmailTemplateCopy {
+  heading: string
+  greeting: (name?: string) => string
+  body: string
+  validityBold: (expiresInMinutes: number) => string
+  cta: string
+  disclaimer: string
+  fallback: string
+  previewText: (expiresInMinutes: number) => string
+}
+
 /**
  * Copy institucional compartido por emails y notificaciones externas.
  * TASK-408 lo introduce como namespace foundation antes de migrar templates:
@@ -346,6 +357,7 @@ export interface EmailsCopy {
   }
   auth: {
     verifyEmail: VerifyEmailTemplateCopy
+    magicLink: MagicLinkEmailTemplateCopy
   }
   notificationCategories: NotificationCategoryCopy
   subjects: {

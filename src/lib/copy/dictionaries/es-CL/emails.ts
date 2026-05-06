@@ -23,6 +23,16 @@ export const emails: EmailsCopy = {
       disclaimer: 'Si no creaste una cuenta en Greenhouse, puedes ignorar este correo de forma segura.',
       fallback: 'Si el botón no funciona, copia y pega esta dirección en tu navegador:',
       previewText: 'Confirma tu correo para completar tu registro en Greenhouse'
+    },
+    magicLink: {
+      heading: 'Acceso a Greenhouse',
+      greeting: name => name ? `Hola ${name.split(' ')[0]},` : 'Hola,',
+      body: 'usa el botón abajo para entrar a Greenhouse. Este enlace funciona una sola vez y expira en',
+      validityBold: expiresInMinutes => `${expiresInMinutes} minutos`,
+      cta: 'Entrar a Greenhouse',
+      disclaimer: 'Si no solicitaste este correo, puedes ignorarlo. Tu cuenta sigue siendo segura.',
+      fallback: 'Si el botón no funciona, copia y pega esta dirección en tu navegador:',
+      previewText: expiresInMinutes => `Enlace de acceso mágico — válido por ${expiresInMinutes} minutos`
     }
   },
   notificationCategories: {
