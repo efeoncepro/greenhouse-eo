@@ -13,16 +13,118 @@ interface SpaceRow extends Record<string, unknown> {
   organization_id: string | null
 }
 
+interface ClientLookup extends Record<string, unknown> {
+  client_id: string
+  client_name: string
+  organization_id: string | null
+}
+
+export interface ResolveSpaceOptions {
+  /**
+   * TASK-813 Slice 3 — opt-in para crear space automáticamente cuando el
+   * client existe (con hubspot_company_id) pero no tiene space asignado.
+   * Caso real: Aguas Andinas + Motogas SpA en dev. Default FALSE — requiere
+   * autorización explícita del caller (typ. backfill scripts).
+   */
+  createMissingSpace?: boolean
+  /** Source label para audit log del space creado. */
+  createdBySource?: string
+}
+
 interface SyncResult {
   hubspotCompanyId: string
   created: number
   updated: number
   skipped: number
   errors: string[]
+  /** TASK-813 Slice 3 — true si se creó space automático en esta corrida. */
+  spaceAutoCreated?: boolean
 }
 
-const resolveSpaceForCompany = async (hubspotCompanyId: string): Promise<SpaceRow | null> => {
-  const rows = await runGreenhousePostgresQuery<SpaceRow>(
+const resolveOrgIdForClient = async (clientId: string): Promise<string | null> => {
+  // greenhouse_core.clients NO tiene columna organization_id (verificado 2026-05-06).
+  // El único path para asociar client → organization es via hubspot_company_id compartido.
+  const rows = await runGreenhousePostgresQuery<{ organization_id: string }>(
+    `SELECT o.organization_id
+     FROM greenhouse_core.organizations o
+     JOIN greenhouse_core.clients c ON c.hubspot_company_id = o.hubspot_company_id
+     WHERE c.client_id = $1
+       AND c.hubspot_company_id IS NOT NULL
+       AND c.hubspot_company_id != ''
+     LIMIT 1`,
+    [clientId]
+  )
+
+  return rows[0]?.organization_id ?? null
+}
+
+const allocateSpaceNumericCode = async (): Promise<string> => {
+  // numeric_code es CHAR(2) UNIQUE con CHECK '^[0-9]{2}$'. Buscar próximo libre 01-99.
+  const rows = await runGreenhousePostgresQuery<{ numeric_code: string }>(
+    `SELECT numeric_code FROM greenhouse_core.spaces ORDER BY numeric_code DESC LIMIT 1`
+  )
+
+  const last = parseInt(rows[0]?.numeric_code ?? '00', 10)
+  const next = last + 1
+
+  if (next > 99) {
+    throw new Error('Cannot allocate numeric_code: spaces table is at max (99). Schema needs widening.')
+  }
+
+  return String(next).padStart(2, '0')
+}
+
+const createSpaceForClient = async (
+  client: ClientLookup,
+  source: string
+): Promise<SpaceRow> => {
+  const spaceId = `space-${client.client_id}`
+  const orgId = client.organization_id ?? (await resolveOrgIdForClient(client.client_id))
+  const numericCode = await allocateSpaceNumericCode()
+
+  await runGreenhousePostgresQuery(
+    `INSERT INTO greenhouse_core.spaces (
+      space_id, client_id, organization_id, space_name, space_type, status, active, numeric_code,
+      notes, created_at, updated_at
+    ) VALUES (
+      $1, $2, $3, $4, 'client_space', 'active', TRUE, $5,
+      $6, NOW(), NOW()
+    )
+    ON CONFLICT (space_id) DO NOTHING`,
+    [
+      spaceId,
+      client.client_id,
+      orgId,
+      client.client_name,
+      numericCode,
+      `Auto-created by ${source} (TASK-813 Slice 3) for HubSpot p_services materialization`
+    ]
+  )
+
+  await publishOutboxEvent({
+    aggregateType: 'space',
+    aggregateId: spaceId,
+    eventType: 'commercial.space.auto_created',
+    payload: {
+      version: 1,
+      spaceId,
+      clientId: client.client_id,
+      organizationId: orgId,
+      clientName: client.client_name,
+      source,
+      createdAt: new Date().toISOString()
+    }
+  })
+
+  return { space_id: spaceId, client_id: client.client_id, organization_id: orgId }
+}
+
+const resolveSpaceForCompany = async (
+  hubspotCompanyId: string,
+  options: ResolveSpaceOptions = {}
+): Promise<SpaceRow | null> => {
+  // Path canónico: organization → space (modelo formal).
+  const orgPath = await runGreenhousePostgresQuery<SpaceRow>(
     `SELECT s.space_id, s.client_id, s.organization_id
      FROM greenhouse_core.spaces s
      JOIN greenhouse_core.organizations o ON o.organization_id = s.organization_id
@@ -31,7 +133,40 @@ const resolveSpaceForCompany = async (hubspotCompanyId: string): Promise<SpaceRo
     [hubspotCompanyId]
   )
 
-  return rows[0] ?? null
+  if (orgPath[0]) return orgPath[0]
+
+  // Fallback TASK-813: client → space (cliente comercial sin org enriquecida pero con space ya creado).
+  const clientPath = await runGreenhousePostgresQuery<SpaceRow>(
+    `SELECT s.space_id, s.client_id, s.organization_id
+     FROM greenhouse_core.spaces s
+     JOIN greenhouse_core.clients c ON c.client_id = s.client_id
+     WHERE c.hubspot_company_id = $1
+     LIMIT 1`,
+    [hubspotCompanyId]
+  )
+
+  if (clientPath[0]) return clientPath[0]
+
+  // Último recurso TASK-813: client existe pero sin space. Auto-crear si caller autoriza.
+  if (options.createMissingSpace) {
+    // clients no tiene columna organization_id; resolver via hubspot_company_id si match.
+    const clients = await runGreenhousePostgresQuery<ClientLookup>(
+      `SELECT c.client_id, c.client_name,
+              (SELECT o.organization_id FROM greenhouse_core.organizations o
+               WHERE o.hubspot_company_id = c.hubspot_company_id
+               LIMIT 1) AS organization_id
+       FROM greenhouse_core.clients c
+       WHERE c.hubspot_company_id = $1
+       LIMIT 1`,
+      [hubspotCompanyId]
+    )
+
+    if (clients[0]) {
+      return createSpaceForClient(clients[0], options.createdBySource ?? 'service-sync')
+    }
+  }
+
+  return null
 }
 
 const upsertServiceFromHubSpot = async (
@@ -111,15 +246,24 @@ const upsertServiceFromHubSpot = async (
   return action
 }
 
-export const syncServicesForCompany = async (hubspotCompanyId: string): Promise<SyncResult> => {
+export const syncServicesForCompany = async (
+  hubspotCompanyId: string,
+  options: ResolveSpaceOptions = {}
+): Promise<SyncResult> => {
   const result: SyncResult = { hubspotCompanyId, created: 0, updated: 0, skipped: 0, errors: [] }
 
-  const space = await resolveSpaceForCompany(hubspotCompanyId)
+  // Snapshot pre-resolve para detectar si el resolver creó space auto.
+  const preExistingSpace = await resolveSpaceForCompany(hubspotCompanyId, {})
+  const space = preExistingSpace ?? (await resolveSpaceForCompany(hubspotCompanyId, options))
 
   if (!space) {
     result.errors.push(`No space found for HubSpot company ${hubspotCompanyId}`)
 
     return result
+  }
+
+  if (!preExistingSpace) {
+    result.spaceAutoCreated = true
   }
 
   let services: HubSpotGreenhouseServiceProfile[]
@@ -149,23 +293,27 @@ export const syncServicesForCompany = async (hubspotCompanyId: string): Promise<
   return result
 }
 
-export const syncAllOrganizationServices = async (): Promise<{
+export const syncAllOrganizationServices = async (
+  options: ResolveSpaceOptions = {}
+): Promise<{
   organizations: number
   results: SyncResult[]
 }> => {
-  const orgs = await runGreenhousePostgresQuery<{ hubspot_company_id: string }>(
+  // TASK-813 Slice 3 — universo amplio: todos los clients con hubspot_company_id,
+  // no solo organizations. Esto cubre Aguas Andinas + Motogas que estaban sin org.
+  const targets = await runGreenhousePostgresQuery<{ hubspot_company_id: string }>(
     `SELECT DISTINCT hubspot_company_id
-     FROM greenhouse_core.organizations
+     FROM greenhouse_core.clients
      WHERE hubspot_company_id IS NOT NULL AND hubspot_company_id != ''`
   )
 
   const results: SyncResult[] = []
 
-  for (const org of orgs) {
-    const result = await syncServicesForCompany(org.hubspot_company_id)
+  for (const target of targets) {
+    const result = await syncServicesForCompany(target.hubspot_company_id, options)
 
     results.push(result)
   }
 
-  return { organizations: orgs.length, results }
+  return { organizations: targets.length, results }
 }

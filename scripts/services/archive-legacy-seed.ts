@@ -36,7 +36,7 @@ import { publishOutboxEvent } from '@/lib/sync/publish-event'
 loadGreenhouseToolEnv()
 applyGreenhousePostgresProfile('ops')
 
-interface LegacySeedRow {
+interface LegacySeedRow extends Record<string, unknown> {
   service_id: string
   name: string
   status: string

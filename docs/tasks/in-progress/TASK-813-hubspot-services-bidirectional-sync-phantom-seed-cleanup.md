@@ -1,4 +1,46 @@
-# TASK-813 — HubSpot p_services (0-162) Sync Activation + Phantom Seed Cleanup
+# TASK-813 — HubSpot Services (p_services 0-162) Sync + Legacy Cleanup
+
+## Delta 2026-05-06 (v3 — audit corregido + ajustes verificados)
+
+Mi audit inicial fue incorrecto y llevó a un Delta v2 apresurado que aceptó críticas sin verificar. Tras consultar las 3 tablas relevantes (`core.clients`, `core.organizations`, `core.spaces`), la realidad operacional es:
+
+**Universo HubSpot p_services (0-162)**: 16 services activos.
+
+**Clasificación real por bloqueante**:
+
+| Cliente | Services HubSpot | clients | organizations | spaces | Estado materialización |
+| --- | --- | --- | --- | --- | --- |
+| ANAM | 2 | ✅ | ✅ | ✅ | Direct |
+| BeFUN | 1 | ✅ | ✅ | ✅ | Direct |
+| Corp Aldea | 1 | ✅ | ✅ | ✅ | Direct |
+| DDSoft | 1 | ✅ | ✅ | ✅ | Direct |
+| Ecoriles | 1 | ✅ | ✅ | ✅ | Direct |
+| Gobierno RM | 1 | ✅ | ✅ | ✅ | Direct |
+| Mun PAC | 1 | ✅ | ✅ | ✅ | Direct |
+| Sky Airline | 2 | ✅ | ✅ | ✅ | Direct |
+| SSilva | 3 | ✅ | ✅ | ✅ | Direct |
+| **Aguas Andinas** | 1 | ✅ | ✅ | ❌ | Bloqueado por space |
+| **Motogas SpA** | 1 | ✅ | ✅ | ❌ | Bloqueado por space |
+| **Loyal** | 1 | ❌ | ❌ | ❌ | Huérfano real |
+
+**Resumen**: 13 materializables direct, 2 bloqueados por falta de space (fix automatizable), 1 huérfano real.
+
+**Errores de mi audit inicial**:
+
+- Solo consulté `organizations` + `crm.companies`. NO consulté `core.clients` (15 rows). Resultado: reporté 3 huérfanos cuando solo había 1.
+- `service-sync.ts:resolveSpaceForCompany` actual joinea via `organizations` solamente. Falla silencioso cuando organization existe pero space no (caso Aguas Andinas + Motogas).
+
+**Ajustes aplicados**:
+
+1. **Diagnóstico corregido**: 1 huérfano real (Loyal). Spec original decía "3 huérfanos (Loyal, Motogas, Aguas Andinas)" — Motogas y Aguas Andinas NO son huérfanos, son clientes con space faltante.
+
+2. **Slice 3 ampliado**: el backfill ahora **crea spaces faltantes automáticamente** para clients con HubSpot link sin space. Pattern: `space_id='space-<client_id>'`, `name=<client_name>`, FK a client + organization. Esto materializa 15/16 services. Loyal (1 huérfano real) queda en queue manual.
+
+3. **Slice 4 — write-back limitado**: hard rule adicional explícita. Greenhouse SOLO escribe `ef_organization_id`, `ef_space_id`, `ef_engagement_kind` a HubSpot 0-162. NUNCA otras propiedades. Cada write-back emite outbox event `commercial.service_engagement.metadata_pushed_v1` con audit. **Write-back default OFF** — opt-in via feature flag `commercial.engagement.metadata_push_enabled`. V1 de la task NO activa write-back; queda preparado.
+
+4. **Mapping unmapped**: si `ef_linea_de_servicio` es NULL, materializar con `hubspot_sync_status='unmapped'` (no inventar default). Downstream consumers filtran por este flag para excluir de P&L hasta resolver. Más robusto que `module_id='unknown'`.
+
+5. **Naming "Bidirectional"**: Codex sugirió cambiar a "Inbound only". Mantengo la palabra eliminada del title (ya no dice bidirectional) pero la task SÍ contempla write-back limitado opt-in. Más honesto.
 
 ## Delta 2026-05-06 (post TASK-801 cierre)
 
