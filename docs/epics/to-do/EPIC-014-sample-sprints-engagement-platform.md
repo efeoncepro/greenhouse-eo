@@ -92,6 +92,88 @@ Reglas obligatorias:
 
 - **TASK-813** — HubSpot p_services (0-162) bidirectional sync activation + phantom seed cleanup. Sibling derivada de auditoría arch-architect 2026-05-06: 30 filas fantasma en `core.services` seedeadas como cross-product `service_modules × clients`, 16 services reales en HubSpot 0-162 sin sincronizar, 3 huérfanos sin org Greenhouse. Soft dep TASK-555, hard dep TASK-801 (consume `engagement_kind`). Recomendado correr **inmediatamente después de TASK-801** y **antes de TASK-802 onward** para que las extensiones del engagement primitive no se declaren contra services fantasma.
 
+## Orden de ejecución canónico (incorporado 2026-05-06)
+
+Producido por la skill `arch-architect` aplicando reversibilidad + 4-pilar + dependencies cross-EPIC. Combina EPIC-014 children + EPIC-002 (TASK-554/555/556/557/557.1) + TASK-813 sibling.
+
+### Diagrama de fases
+
+```text
+┌─── FASE 1 — FOUNDATION (3 tasks paralelo) ──────────────────┐
+│   TASK-554       TASK-555           TASK-801                │
+│   (sidebar)      (routeGroup)       (engagement_kind DDL)   │
+└──────┬───────────────┬────────────────────┬─────────────────┘
+       │               │                    │
+       │               ↓                    ↓
+       │   ┌──────────────────────┐   ┌──────────────────────┐
+       │   │  FASE 2A — EPIC-002  │   │  FASE 2B — HINGE     │
+       │   │  Comercial adoption  │   │  TASK-807            │
+       │   │  • TASK-557.1        │   │  (Commercial Health) │
+       │   │  • TASK-556          │   │       ↓              │
+       │   │  • TASK-557          │   │  TASK-813 ⭐         │
+       │   │                      │   │  (HubSpot sync +     │
+       │   │                      │   │   phantom cleanup)   │
+       │   └──────────────────────┘   └──────────┬───────────┘
+       │                                          │
+       │                                          ↓
+       │              ┌───────────────────────────────────────┐
+       │              │  FASE 3 — Engagement extensions       │
+       │              │  • TASK-802 (commercial_terms)        │
+       │              │  • TASK-803 (phases + outcomes)       │
+       │              │  • TASK-806 (gtm_investment_pnl)      │
+       │              └────────────┬──────────────────────────┘
+       │                           │
+       │                           ↓
+       │              ┌───────────────────────────────────────┐
+       │              │  FASE 4 — Workflow + capacity         │
+       │              │  • TASK-804 (approvals)               │
+       │              │  • TASK-805 (progress snapshots)      │
+       │              └────────────┬──────────────────────────┘
+       │                           │
+       └───────────────────────────┴──────────┐
+                                              │
+                                              ↓
+                          ┌────────────────────────────────────┐
+                          │  FASE 5 — Async backbone            │
+                          │  TASK-808 (audit log + outbox +     │
+                          │  reactive consumers)                │
+                          └────────────┬───────────────────────┘
+                                       │
+                                       ↓
+                          ┌────────────────────────────────────┐
+                          │  FASE 6 — UI + final gate           │
+                          │  TASK-809 (UI sample sprints)       │
+                          │       ↓                              │
+                          │  TASK-810 (anti-zombie CHECK)       │
+                          └────────────────────────────────────┘
+```
+
+### Reglas duras del orden
+
+1. **TASK-801 antes de cualquier child de EPIC-014.** Sin `engagement_kind` column no funciona ninguna extensión.
+2. **TASK-813 inmediatamente después de TASK-801 y antes de TASK-802 onward.** Si no se respeta, las extensiones (terms/phases/outcomes) se declaran contra los 30 services fantasma del 2026-03-16 → datos basura difíciles de limpiar después.
+3. **TASK-555 antes de TASK-556/557/557.1/813.** Las capabilities `commercial.*` no existen sin la foundation de access model.
+4. **TASK-807 idealmente antes de TASK-813.** Si no, TASK-813 ships con fallback registrando signals sin subsystem-rollup completo.
+5. **TASK-810 al final.** El anti-zombie CHECK solo se valida cuando todos los flows que crean/transicionan engagements están maduros.
+
+### Ruta crítica (longest path)
+
+```text
+TASK-801 → TASK-813 → TASK-803 → TASK-808 → TASK-809 → TASK-810
+```
+
+Es la cadena más larga. Todo lo demás puede paralelizarse alrededor.
+
+### Recomendación operativa por sprints
+
+| Sprint | Tasks | Objetivo |
+| --- | --- | --- |
+| 1 | TASK-554 + TASK-555 + TASK-801 | Foundation paralelo, two-way doors, riesgo bajo |
+| 2 | TASK-807 + TASK-813 | **Hinge crítica**: limpiar dato antes de extender |
+| 3 | TASK-802 + TASK-803 + TASK-806 + TASK-557.1 + TASK-556 + TASK-557 | Extensions + comercial adoption en paralelo |
+| 4 | TASK-804 + TASK-805 + TASK-808 | Workflow + async backbone |
+| 5 | TASK-809 → TASK-810 | UI + gate final secuencial |
+
 ## Métricas de éxito del Epic
 
 - ≥ 1 Sample Sprint declarado y convertido end-to-end via UI (smoke con Sky Content Lead).

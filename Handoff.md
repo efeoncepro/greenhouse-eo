@@ -1,3 +1,31 @@
+# Sesion 2026-05-06 — TASK-813 creada + orden de ejecucion EPIC-014/EPIC-002 documentado
+
+- **Branch:** `develop` (planning + spec creation only — no implementation).
+- **Origen:** auditoria de divergencia HubSpot ↔ Greenhouse en el modelo de servicios. Usuario detecto en HubSpot vista CRM 0-162 con 16 servicios y consulto si coinciden con los de Greenhouse. Skill `arch-architect` invocada con overlay Greenhouse.
+- **Hallazgos via API HubSpot + PG live:**
+  - HubSpot custom object `0-162` tiene 16 servicios reales con `ef_organization_id`, `ef_space_id`, `ef_linea_de_servicio`, `ef_servicio_especifico` TODOS NULL — operador comercial nunca los mapeo.
+  - `greenhouse_core.services` tiene 30 filas seedeadas el 2026-03-16 con pattern `svc-<uuid>`, `created_by` vacio, `hubspot_service_id` NULL, `hubspot_sync_status='pending'`, naming `<module> — <client>` (cross-product `service_modules × clients`).
+  - Bridge code (`src/lib/services/service-sync.ts` + `services/hubspot_greenhouse_integration/hubspot_client.py:get_service`) existe pero NUNCA se invoca: ni cron, ni webhook, ni trigger.
+  - 3 huerfanos en HubSpot sin org Greenhouse: Loyal, Motogas, Aguas Andinas.
+  - 12 de 16 services HubSpot tienen nombre quasi-identico a un deal — coincidencia, no causalidad.
+- **Hipotesis del usuario** ("Greenhouse mapeo contra deals"): parcialmente correcta pero incompleta. Realidad: Greenhouse no mapeo contra nada — los 30 son cross-product seed local. Confusion de nomenclatura porque `<linea> × <cliente>` produce labels similares a deals.
+- **Decision arquitectural canonica reafirmada** (de `GREENHOUSE_PILOT_ENGAGEMENT_ARCHITECTURE_V1.md` + EPIC-014): `core.services` se MANTIENE como engagement primitive — NO se renombra ni se paraleliza. Decision raiz: Sample Sprint NO es entidad nueva; es `service` con `engagement_kind != 'regular'`. TASK-813 es complementaria, no competidora.
+- **TASK-813 creada** con scope acotado: activacion de sync HubSpot 0-162 → `core.services` + cleanup idempotente de las 30 filas fantasma con `engagement_kind='discovery'` + `status='legacy_seed_archived'` (NO DELETE). Hard dep TASK-801, soft dep TASK-555. Plan en 8 slices (DDL signals → archive script → backfill from HubSpot → webhook inbound → Cloud Scheduler safety net → reliability readers → manual queue UI → docs).
+- **Cross-impact deltas** registradas via regla CLAUDE.md de impacto cruzado:
+  - TASK-801: post-migration TASK-813 reclasifica las 30 fantasmas.
+  - TASK-802: recomendar correr TASK-813 antes para no declarar terms contra fantasmas.
+  - TASK-555: 3 capabilities nuevas que TASK-813 registra (`commercial.service_engagement.{sync,resolve_orphan,archive_legacy}`).
+  - TASK-557.1: sibling pattern, mismo template audit + 3 categorias.
+  - EPIC-014: TASK-813 incorporada como sibling derivada.
+- **Orden de ejecucion canonico** documentado en EPIC-014 (seccion "Orden de ejecucion canonico (incorporado 2026-05-06)"): 6 fases, ruta critica `TASK-801 → TASK-813 → TASK-803 → TASK-808 → TASK-809 → TASK-810`, recomendacion 5-sprint con paralelizacion explicita.
+- **Reglas duras del orden:**
+  1. TASK-801 antes de cualquier child de EPIC-014.
+  2. TASK-813 inmediatamente despues de TASK-801 y antes de TASK-802 onward (sin esto, terms/phases/outcomes se declaran contra fantasmas).
+  3. TASK-555 antes de TASK-556/557/557.1/813 (capabilities `commercial.*`).
+  4. TASK-807 idealmente antes de TASK-813 (subsystem rollup).
+  5. TASK-810 al final (anti-zombie CHECK requiere flows maduros).
+- **No se ejecuto:** implementacion. TASK-813 queda en `to-do/` esperando agente que la tome (idealmente despues de TASK-801).
+
 # Sesion 2026-05-06 — Postgres runtime CREATE drift cerrado
 
 - **Finding:** `pg:doctor` venia reportando `can_create=true` para runtime en `greenhouse_payroll` y `greenhouse_serving`.
