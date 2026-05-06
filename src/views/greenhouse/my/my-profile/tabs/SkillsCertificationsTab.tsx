@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useState } from 'react'
 
+import dynamic from 'next/dynamic'
+
 import Alert from '@mui/material/Alert'
 import Autocomplete from '@mui/material/Autocomplete'
 import Avatar from '@mui/material/Avatar'
@@ -26,7 +28,6 @@ import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 
 import VerifiedByEfeonceBadge from '@/components/greenhouse/VerifiedByEfeonceBadge'
-import CertificatePreviewDialog from '@/components/greenhouse/CertificatePreviewDialog'
 import GreenhouseFileUploader, { type UploadedFileValue } from '@/components/greenhouse/GreenhouseFileUploader'
 import ProfessionalLinksCard from '@/components/greenhouse/ProfessionalLinksCard'
 import AboutMeCard from '@/components/greenhouse/AboutMeCard'
@@ -55,6 +56,11 @@ import { SKILL_SENIORITY_LEVELS, SKILL_CATEGORY_VALUES } from '@/types/agency-sk
 import { TOOL_PROFICIENCY_LEVELS, TOOL_CATEGORY_VALUES, LANGUAGE_PROFICIENCY_LEVELS } from '@/types/talent-taxonomy'
 import type { MemberEvidence, MemberEndorsement, EvidenceType } from '@/types/reputation'
 import { EVIDENCE_TYPES } from '@/types/reputation'
+
+const CertificatePreviewDialog = dynamic(
+  () => import('@/components/greenhouse/CertificatePreviewDialog'),
+  { ssr: false }
+)
 
 // ---------------------------------------------------------------------------
 // Types
