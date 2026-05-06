@@ -167,10 +167,15 @@ Reglas obligatorias:
 
 ### Slice 4 — Reliability signal `notifications.email.render_failure_rate`
 
-- Reader: [src/lib/reliability/queries/email-render-failure.ts](../../src/lib/reliability/queries/email-render-failure.ts). Cuenta failures de render del outbox consumer en últimas 24h sobre `greenhouse_sync.outbox_events WHERE event_type LIKE 'notification.email.%' AND status='failed' AND last_error LIKE '%render%'`.
-- Wire en `get-reliability-overview.ts` bajo subsystem `Event Bus & Sync Infrastructure` (mismo subsystem que `sync.outbox.unpublished_lag`). Severity: `error` si count > 0 (steady-state esperado = 0 — el render es determinístico salvo bugs nuevos). Window: 24h rolling. Domain tag: `integrations.notifications`.
-- Captura de errores en el outbox consumer ya existe (`captureWithDomain(err, 'integrations.notifications', { extra })`). Slice solo declara el reader + wiring.
+- Reader: [src/lib/reliability/queries/email-render-failure.ts](../../src/lib/reliability/queries/email-render-failure.ts). Cuenta failures de render/template en últimas 24h sobre las fuentes reales del runtime:
+  - `greenhouse_notifications.email_deliveries WHERE status='failed' AND (error_class='template_error' OR error_message ILIKE render/template patterns)`.
+  - `greenhouse_sync.outbox_reactive_log WHERE result IN ('retry','dead-letter') AND handler LIKE email projection handlers AND last_error ILIKE render/template patterns`.
+- Drift resuelto: la spec inicial apuntaba a `greenhouse_sync.outbox_events.last_error`, pero el schema/runtime real no tiene esa columna. TASK-773 usa `last_publish_error` para publisher PG -> BQ, no para render de emails. Usar `email_deliveries` + `outbox_reactive_log` evita un falso verde cuando falla un template React Email o una projection con side effect de email.
+- Wire en `get-reliability-overview.ts` bajo subsystem `Event Bus & Sync Infrastructure` (mismo subsystem que `sync.outbox.unpublished_lag`). Severity: `error` si count > 0 (steady-state esperado = 0 — el render es determinístico salvo bugs nuevos). Window: 24h rolling. `moduleKey='sync'`, `kind='runtime'`.
+- Captura de errores del reader usa `captureWithDomain(err, 'sync', ...)` porque el signal vive en el control plane del event bus. Las fallas del email engine ya se persisten en `email_deliveries` y se capturan en `sendEmail`.
 - Provee la red de seguridad post-sweep: si un template migrado regresiona en producción, el dashboard lo pinta en < 5 min (cron reliability) en lugar de esperar reporte de usuario.
+
+**Estado 2026-05-06**: Slice 4 agrega `notifications.email.render_failure_rate` con degradacion honesta (`unknown` si la query falla), evidencia separada para `delivery_render_failures`, `reactive_render_failures`, `total_render_failures` y `delivery_failure_rate_percent`, tests unitarios para `ok/error/unknown`, y wiring en `getReliabilityOverview`. No toca templates, Resend, retry policy, notification categories, outbox publisher, reactive consumer ni eventos.
 
 ### Slice 5 — Verificación de delivery + promoción de la rule a `error`
 

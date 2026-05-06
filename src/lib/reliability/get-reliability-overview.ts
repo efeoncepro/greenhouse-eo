@@ -49,6 +49,7 @@ import {
 import { getShortcutsInvalidPinsSignal } from './queries/shortcuts-invalid-pins'
 import { getOutboxUnpublishedLagSignal } from './queries/outbox-unpublished-lag'
 import { getOutboxDeadLetterSignal } from './queries/outbox-dead-letter'
+import { getEmailRenderFailureSignal } from './queries/email-render-failure'
 import { getCronStagingDriftSignal } from './queries/cron-staging-drift'
 import { RELIABILITY_REGISTRY } from './registry'
 import { getReliabilityRegistry } from './registry-store'
@@ -309,6 +310,15 @@ interface ReliabilityOverviewSources {
   outboxHealth?: ReliabilitySignal[] | null
 
   /**
+   * TASK-408 Slice 4 — Email render/template safety net:
+   *   - notifications.email.render_failure_rate
+   * Steady state = 0. Cuenta fallas de render/template en
+   * email_deliveries + outbox_reactive_log para projections con side effect
+   * email. Protege el sweep de copy sin tocar delivery ni templates.
+   */
+  emailRenderFailure?: ReliabilitySignal | null
+
+  /**
    * TASK-775 Slice 5 — Cron staging drift signal:
    *   - platform.cron.staging_drift (Vercel async-critical sin Cloud Scheduler)
    * Steady state = 0. Si > 0, hay crons que no corren en staging (Vercel
@@ -410,6 +420,8 @@ export const buildReliabilityOverview = (
     ...(sources.providerBqSyncDeadLetter ?? []),
     // TASK-773 Slice 4 — Outbox publisher health (lag + dead_letter).
     ...(sources.outboxHealth ?? []),
+    // TASK-408 Slice 4 — Email render/template safety net.
+    ...(sources.emailRenderFailure ? [sources.emailRenderFailure] : []),
     // TASK-775 Slice 5 — Vercel ↔ Cloud Scheduler drift (async-critical crons).
     ...(sources.cronStagingDrift ? [sources.cronStagingDrift] : []),
     // TASK-774 Slice 4 — Account balances FX drift (closing_balance vs recompute).
@@ -619,6 +631,13 @@ export const getReliabilityOverview = async (
           .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
           .catch(() => null)
 
+  // TASK-408 Slice 4 — Email render/template failures. Reader propio con
+  // degradacion honesta para no envenenar todo el reliability overview.
+  const emailRenderFailure =
+    preloadedSources.emailRenderFailure !== undefined
+      ? preloadedSources.emailRenderFailure
+      : await getEmailRenderFailureSignal().catch(() => null)
+
   // TASK-775 Slice 5 — Cron staging drift (Vercel async-critical sin Cloud
   // Scheduler equivalent). Lee vercel.json + snapshot canónico de Cloud
   // Scheduler jobs. Degrada honestamente a `unknown` si vercel.json falla.
@@ -696,6 +715,7 @@ export const getReliabilityOverview = async (
     financeClpDrift,
     providerBqSyncDeadLetter,
     outboxHealth,
+    emailRenderFailure,
     cronStagingDrift,
     accountBalancesFxDrift,
     expenseDistribution,

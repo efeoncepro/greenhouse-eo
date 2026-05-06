@@ -8033,6 +8033,10 @@ Comando operativo:
 - HR / Payroll: el PDF de finiquito ahora usa readiness documental para el estado visible de emisión, no warnings operacionales del cálculo. Esto evita falsos `Requiere revisión`, mantiene la maqueta aprobada en una página Letter y conserva numeración real `Página X de Y`.
 - HR / Payroll: se saneó el copy del PDF de finiquito para separar trazabilidad interna de documento firmable. El PDF ya no expone `Policy`, `internal payroll`, `Evidencia estructurada` ni afirma ausencia de descuentos previsionales pendientes desde el monto líquido; usa lenguaje de respaldo, nómina interna y constancia para firma/ratificación.
 
+# 2026-05-06
+
+- Platform / Reliability: TASK-408 agregó `notifications.email.render_failure_rate`, un signal read-only que detecta fallas de render/template en emails durante 24h usando `email_deliveries` y `outbox_reactive_log`. Protege la migración de copy sin cambiar templates, Resend, delivery, outbox publisher ni reactive consumer.
+
 # 2026-05-04
 
 - Identity / SCIM: se corrigió el contrato de tenant mapping interno Efeonce. `client_id=NULL` ahora es semántica canónica para provisioning interno, los mappings externos quedan protegidos por FK a `greenhouse_core.clients`, y SCIM ya no intenta crear usuarios con el pseudo-client legacy `efeonce-admin`.

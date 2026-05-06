@@ -228,6 +228,17 @@ La frontera de personalizacion se mantiene igual:
 
 Este slice no cambia lifecycle de cotizaciones, public share route, generacion/attachment de PDF, Resend, `sendEmail`, `email_deliveries`, outbox, webhooks, projections ni eventos reactivos.
 
+## TASK-408 Slice 4: reliability de render
+
+El sweep de copy queda cubierto por el signal `notifications.email.render_failure_rate` en el Reliability Control Plane.
+
+El signal mira una ventana rolling de 24h y escala a `error` si aparece cualquier falla de render/template. Lee dos fuentes:
+
+- `greenhouse_notifications.email_deliveries`, para fallas del email engine.
+- `greenhouse_sync.outbox_reactive_log`, para fallas `retry` o `dead-letter` en projections que envian emails/notificaciones.
+
+Esto evita depender de reportes manuales si un template migrado rompe render en runtime. No cambia `sendEmail`, Resend, retry policy, outbox publisher, reactive consumer, webhooks ni la composicion de ningun email.
+
 La primitive `selectEmailTemplateCopy()` permite repetir este patron en los siguientes templates sin tocar delivery:
 
 - `es` / `es-CL` / default → dictionary de plataforma.

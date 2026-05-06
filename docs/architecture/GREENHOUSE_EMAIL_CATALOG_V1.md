@@ -48,6 +48,13 @@ En finance/quote share, `QuoteSharePromptEmail` lee copy estructural desde `emai
 
 En Nexa Insights, `WeeklyExecutiveDigestEmail` lee solo copy estructural desde `emails.weeklyExecutiveDigest`. El contenido de insight (`headline`, `narrative`, `rootCauseNarrative`, spaces, links y action labels) sigue perteneciendo a la lane materializada de Nexa y no debe dictionary-ficarse. Los snapshots de `src/emails/EmailTemplateBaseline.test.tsx` son el gate canonico: una migracion de copy no debe cambiar bytes de HTML salvo decision explicita documentada.
 
+TASK-408 agrega ademas el signal deterministico `notifications.email.render_failure_rate` en el Reliability Control Plane. El signal vive bajo `moduleKey='sync'` porque protege el event bus y las projections con side effect de email, pero lee las fuentes reales de correo:
+
+- `greenhouse_notifications.email_deliveries` para fallas del email engine (`status='failed'`, `error_class='template_error'` o mensajes de render/template).
+- `greenhouse_sync.outbox_reactive_log` para fallas `retry` / `dead-letter` de projections que envian emails (`notification_dispatch`, payroll receipts/export ready, pricing catalog approval, payment profile notifications y payslip lifecycle).
+
+El steady state esperado es `0` fallas de render/template en 24h. Cualquier valor `>0` escala a `error` para detectar regresiones de templates migrados sin cambiar `sendEmail`, Resend, outbox publisher ni reactive consumer.
+
 ## Estado
 
 Baseline de producto y arquitectura al 2026-03-19.

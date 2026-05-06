@@ -22991,3 +22991,37 @@ Validacion focal:
 Siguiente paso recomendado:
 
 - Completar limpieza de registry/plain-text para templates ya migrados que aun tienen ternarios/local copy fuera de `src/emails`, o avanzar con Slice 4 reliability signal `notifications.email.render_failure_rate`.
+
+## Sesion 2026-05-06 — TASK-408 Slice 4: email render reliability signal
+
+Contexto:
+
+- Tras migrar los grupos principales de emails, el siguiente paso mas seguro fue agregar una red de seguridad operacional antes de seguir tocando copy.
+- Drift detectado: la spec de Slice 4 apuntaba a `greenhouse_sync.outbox_events.last_error`, pero el schema/runtime real de TASK-773 usa `last_publish_error` para errores del publisher PG -> BQ. Los errores reales de render/template de emails viven en `greenhouse_notifications.email_deliveries` y, cuando vienen de projections reactivas, en `greenhouse_sync.outbox_reactive_log.last_error`.
+
+Cambios aplicados:
+
+- Nuevo reader `src/lib/reliability/queries/email-render-failure.ts` con signal `notifications.email.render_failure_rate`.
+- Wiring en `getReliabilityOverview` bajo `moduleKey='sync'`, `kind='runtime'`.
+- El signal cuenta ventana rolling 24h y separa evidencia para `delivery_render_failures`, `reactive_render_failures`, `total_render_failures` y `delivery_failure_rate_percent`.
+- Tests unitarios agregados al suite de outbox health para paths `ok`, `error` y `unknown`.
+- Docs actualizadas: task, arquitectura email catalog y documentacion funcional de microcopy/templates.
+
+Riesgos:
+
+- El signal es lectura-only y no cambia delivery, Resend, retry policy, templates, outbox publisher, reactive consumer, webhooks ni eventos.
+
+Validacion:
+
+- `pnpm exec vitest run src/lib/reliability/queries/outbox-health.test.ts --reporter=verbose` -> pass, 9 tests.
+- `pnpm exec eslint src/lib/reliability/queries/email-render-failure.ts src/lib/reliability/queries/outbox-health.test.ts src/lib/reliability/get-reliability-overview.ts --max-warnings=0` -> pass.
+- `git diff --check` -> pass.
+- `pnpm exec tsc --noEmit --pretty false` -> pass.
+- `pnpm pg:doctor` -> pass; runtime profile conectado a `greenhouse-pg-dev`, schemas `greenhouse_notifications` y `greenhouse_sync` con `USAGE`.
+- `pnpm lint` -> pass.
+- `pnpm test` -> pass, 589 suites / 3419 tests / 5 skipped. Aviso conocido de jsdom/canvas sin fallo.
+- `pnpm build` -> pass.
+
+No validado:
+
+- Ejecucion directa del SELECT del reader contra PG via script ad hoc: el intento no se conto como evidencia porque el proxy `pnpm pg:connect` no quedo vivo en este shell. La query queda cubierta por typecheck, unit tests mockeados, `pg:doctor` y build; se recomienda observar el signal en `/admin/operations` tras deploy.
