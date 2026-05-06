@@ -1,7 +1,7 @@
 # Formateo locale-aware
 
 > **Tipo de documento:** Documentacion funcional
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-05-06
 > **Modulo:** Plataforma
 > **Task:** TASK-429
@@ -22,7 +22,9 @@ El objetivo es que Finance, Payroll, HR, PDFs, Excel, emails y vistas del portal
 - Las fechas `YYYY-MM-DD` se formatean sin drift de dia.
 - Las monedas visibles usan helpers canonicos en vez de `Intl.NumberFormat` inline.
 - Los formatos contables negativos son opt-in con `formatAccountingCurrency`.
-- Se agrego la regla ESLint `greenhouse/no-raw-locale-formatting` en modo `warn` para detectar nuevos usos crudos en surfaces visibles.
+- Se agrego `formatTime` para horas visibles sin fecha.
+- Los helpers aceptan `locale` como segundo argumento cuando no hay opciones (`formatNumber(value, 'es-CL')`) y como tercer argumento cuando si hay opciones (`formatNumber(value, { maximumFractionDigits: 2 }, 'es-CL')`).
+- La regla ESLint `greenhouse/no-raw-locale-formatting` detecta usos crudos en surfaces visibles; el baseline del portal quedo en 0 warnings el 2026-05-06.
 
 ## Helpers canonicos
 
@@ -30,6 +32,7 @@ El objetivo es que Finance, Payroll, HR, PDFs, Excel, emails y vistas del portal
 | --- | --- |
 | `formatDate` | Fecha visible para personas. |
 | `formatDateTime` | Fecha y hora visible. |
+| `formatTime` | Hora visible sin fecha. |
 | `formatISODateKey` | Key operacional `YYYY-MM-DD`; no es copy visible. |
 | `formatCurrency` | Monto monetario visible. |
 | `formatAccountingCurrency` | Monto monetario con convencion contable, por ejemplo negativos entre parentesis. |
@@ -44,17 +47,19 @@ El objetivo es que Finance, Payroll, HR, PDFs, Excel, emails y vistas del portal
 Cada caller debe importar desde `@/lib/format` y pasar el dato real mas el contexto de presentacion cuando aplique. Si no se entrega contexto, el sistema usa el default actual: `es-CL` y `America/Santiago`.
 
 ```ts
-import { formatCurrency, formatDate } from '@/lib/format'
+import { formatCurrency, formatDate, formatTime } from '@/lib/format'
 
-formatCurrency(121963, { currency: 'CLP' })
+formatCurrency(121963, 'CLP')
 formatDate('2026-05-06')
+formatTime('2026-05-06T12:30:00.000Z')
 ```
 
 Para un locale distinto, el override debe ser explicito:
 
 ```ts
-formatCurrency(1500, { currency: 'BRL', locale: 'pt-BR' })
-formatDate('2026-05-06', { locale: 'pt-BR', timeZone: 'America/Sao_Paulo' })
+formatCurrency(1500, 'BRL', 'pt-BR')
+formatDate('2026-05-06', { timeZone: 'America/Sao_Paulo' }, 'pt-BR')
+formatTime('2026-05-06T12:30:00.000Z', 'pt-BR')
 ```
 
 ## Brasil u otro pais
@@ -79,6 +84,7 @@ El camino robusto para activar Brasil es:
 
 - No usar `new Intl.*` directo en `src/views`, `src/components` ni `src/app`.
 - No usar `toLocaleString`, `toLocaleDateString` o `toLocaleTimeString` directo en UI visible.
+- No crear singletons locales `new Intl.DateTimeFormat(...)`; ampliar `src/lib/format` si falta una variante.
 - Si el helper no cubre un caso, ampliar `src/lib/format/` con test unitario antes de crear un formatter local.
 - Si un modulo necesita parsing por locale, no improvisar: parsing no fue scope de TASK-429 y requiere contrato separado de inputs, validacion y errores.
 

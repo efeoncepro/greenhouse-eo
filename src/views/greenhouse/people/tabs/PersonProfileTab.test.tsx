@@ -8,6 +8,7 @@ import type { PersonDetail } from '@/types/people'
 import { renderWithTheme } from '@/test/render'
 
 import PersonProfileTab from './PersonProfileTab'
+import { formatDate as formatGreenhouseDate } from '@/lib/format'
 
 const fetchMock = vi.fn()
 
@@ -142,11 +143,11 @@ describe('PersonProfileTab', () => {
   it('exposes hire date editing in the visible profile tab', async () => {
     const user = userEvent.setup()
 
-    const expectedFormattedDate = new Intl.DateTimeFormat('es-CL', {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric'
-    }).format(new Date('2026-04-01'))
+    const expectedFormattedDate = formatGreenhouseDate(new Date('2026-04-01'), {
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric'
+}, 'es-CL')
 
     fetchMock.mockImplementation(async (_input: string | URL | Request, init?: RequestInit) => {
       if (init?.method === 'PATCH') {

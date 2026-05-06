@@ -155,14 +155,16 @@ Reglas obligatorias:
 
 ### Entrega
 
-- Foundation canónica `src/lib/format/` con date, datetime, ISO date keys, currency, accounting currency, number, integer, percent, relative y plural.
+- Foundation canónica `src/lib/format/` con date, datetime, time-only, ISO date keys, currency, accounting currency, number, integer, percent, relative y plural.
+- API tolerante para adopción incremental: helpers con `options` aceptan `locale` como segundo argumento cuando no se requieren opciones (`formatNumber(value, 'es-CL')`) o como tercer argumento cuando sí se pasan opciones (`formatNumber(value, { maximumFractionDigits: 2 }, 'es-CL')`).
 - Default locale inicial `es-CL`, timezone operacional `America/Santiago` y date-only strings sin drift por timezone.
 - Migración de call sites visibles y críticos en `src/lib/finance/**`, `src/lib/payroll/**`, `src/emails/**`, payroll views, pricing/admin-pricing, dashboard y finance movement feed.
-- Guardrail ESLint `greenhouse/no-raw-locale-formatting` en modo `warn`, scoped a surfaces visibles (`src/views`, `src/components`, `src/app`) para evitar nuevas llamadas crudas a `Intl.*` / `toLocale*` sin romper deuda histórica.
+- Guardrail ESLint `greenhouse/no-raw-locale-formatting` en modo `warn`, scoped a surfaces visibles (`src/views`, `src/components`, `src/app`) para evitar nuevas llamadas crudas a `Intl.*` / `toLocale*`.
 
 ### Conteo Post-Migración
 
 - Scope crítico migrado (`src/lib/finance`, `src/lib/payroll`, `src/emails`, payroll views, pricing/admin-pricing, dashboard, finance movement feed): `0` usos directos de `new Intl.*`, `toLocaleString`, `toLocaleDateString` o `toLocaleTimeString`.
+- Sweep completo posterior 2026-05-06: `0` warnings `greenhouse/no-raw-locale-formatting` en todo el repo (`pnpm exec eslint . --format json`).
 - Quedan menciones textuales a `es-CL` / `en-US` cuando son argumentos explícitos de la utility, tests, comentarios o casing (`toLocaleLowerCase`) fuera del anti-pattern de formateo.
 
 ### Validación

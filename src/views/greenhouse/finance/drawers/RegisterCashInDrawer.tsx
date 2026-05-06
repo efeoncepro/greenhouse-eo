@@ -19,6 +19,7 @@ import { getMicrocopy } from '@/lib/copy'
 import CustomTextField from '@core/components/mui/TextField'
 
 import PaymentInstrumentChip from '@/components/greenhouse/PaymentInstrumentChip'
+import { formatCurrency as formatGreenhouseCurrency, formatNumber as formatGreenhouseNumber } from '@/lib/format'
 
 const GREENHOUSE_COPY = getMicrocopy()
 
@@ -63,7 +64,9 @@ type Props = {
 // ---------------------------------------------------------------------------
 
 const formatCurrency = (amount: number, currency: string = 'CLP'): string =>
-  new Intl.NumberFormat('es-CL', { style: 'currency', currency, maximumFractionDigits: currency === 'CLP' ? 0 : 2 }).format(amount)
+  formatGreenhouseCurrency(amount, currency, {
+  maximumFractionDigits: currency === 'CLP' ? 0 : 2
+}, 'es-CL')
 
 // ---------------------------------------------------------------------------
 // Component
@@ -352,7 +355,11 @@ const RegisterCashInDrawer = ({ open, onClose, onSuccess }: Props) => {
         {selectedInvoice?.currency === 'USD' && currentFxRate && (
           <Box sx={{ p: 1.5, bgcolor: 'info.lightOpacity', borderRadius: 1 }}>
             <Typography variant='caption' color='info.main'>
-              Dólar observado: ${new Intl.NumberFormat('es-CL', { maximumFractionDigits: 2 }).format(currentFxRate)} CLP — Equivalente: {new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(Number(amount || 0) * currentFxRate)}
+              Dólar observado: ${formatGreenhouseNumber(currentFxRate, {
+  maximumFractionDigits: 2
+}, 'es-CL')} CLP — Equivalente: {formatGreenhouseCurrency(Number(amount || 0) * currentFxRate, 'CLP', {
+  maximumFractionDigits: 0
+}, 'es-CL')}
             </Typography>
           </Box>
         )}

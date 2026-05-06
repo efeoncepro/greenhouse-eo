@@ -15,6 +15,7 @@ import { getMicrocopy } from '@/lib/copy'
 
 import CustomTextField from '@core/components/mui/TextField'
 import GreenhouseFileUploader, { type UploadedFileValue } from '@/components/greenhouse/GreenhouseFileUploader'
+import { formatCurrency as formatGreenhouseCurrency } from '@/lib/format'
 
 const GREENHOUSE_COPY = getMicrocopy()
 
@@ -44,11 +45,9 @@ const SOURCE_OPTIONS = [
 ]
 
 const formatNumber = (n: number, currency: string) =>
-  new Intl.NumberFormat('es-CL', {
-    style: 'currency',
-    currency,
-    maximumFractionDigits: currency === 'CLP' ? 0 : 2
-  }).format(n)
+  formatGreenhouseCurrency(n, currency, {
+  maximumFractionDigits: currency === 'CLP' ? 0 : 2
+}, 'es-CL')
 
 const nowLocalIso = () => {
   const d = new Date()

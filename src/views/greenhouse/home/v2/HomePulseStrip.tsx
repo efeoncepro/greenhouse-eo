@@ -18,6 +18,7 @@ import { motion } from '@/libs/FramerMotion'
 import useReducedMotion from '@/hooks/useReducedMotion'
 
 import type { HomePulseStripData, PulseKpiCard } from '@/lib/home/contract'
+import { formatCurrency as formatGreenhouseCurrency, formatNumber as formatGreenhouseNumber } from '@/lib/format'
 
 const TASK407_ARIA_TU_PULSO_DE_HOY = "Tu pulso de hoy"
 
@@ -56,12 +57,10 @@ const formatStats = (card: PulseKpiCard): string => {
 
   switch (card.unit) {
     case 'currency':
-      return new Intl.NumberFormat('es-CL', {
-        style: 'currency',
-        currency: card.currency ?? 'CLP',
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0
-      }).format(Math.round(card.value))
+      return formatGreenhouseCurrency(Math.round(card.value), card.currency ?? 'CLP', {
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 0
+}, 'es-CL')
     case 'percentage':
       return `${(Math.round(card.value * 10) / 10).toFixed(1)}%`
     case 'days':
@@ -71,7 +70,7 @@ const formatStats = (card: PulseKpiCard): string => {
     case 'count':
     case 'integer':
     default:
-      return new Intl.NumberFormat('es-CL').format(Math.round(card.value))
+      return formatGreenhouseNumber(Math.round(card.value), 'es-CL')
   }
 }
 

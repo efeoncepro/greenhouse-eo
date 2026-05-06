@@ -58,6 +58,7 @@ import { SKILL_SENIORITY_LEVELS, SKILL_CATEGORY_VALUES } from '@/types/agency-sk
 import { TOOL_PROFICIENCY_LEVELS, TOOL_CATEGORY_VALUES, LANGUAGE_PROFICIENCY_LEVELS } from '@/types/talent-taxonomy'
 import type { MemberEvidence, MemberEndorsement, EvidenceType } from '@/types/reputation'
 import { EVIDENCE_TYPES } from '@/types/reputation'
+import { formatDate as formatGreenhouseDate } from '@/lib/format'
 
 const TASK407_ARIA_EDITAR_TITULAR_PROFESIONAL = "Editar titular profesional"
 
@@ -193,9 +194,11 @@ const formatDate = (date: string | null): string => {
   if (!date) return '—'
 
   try {
-    return new Intl.DateTimeFormat('es-CL', { day: '2-digit', month: 'short', year: 'numeric' }).format(
-      new Date(date)
-    )
+    return formatGreenhouseDate(new Date(date), {
+  day: '2-digit',
+  month: 'short',
+  year: 'numeric'
+}, 'es-CL')
   } catch {
     return date
   }

@@ -29,6 +29,7 @@ import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tool
 
 import type { OrganizationDetailData } from '../types'
 import { getMicrocopy } from '@/lib/copy'
+import { formatCurrency as formatGreenhouseCurrency } from '@/lib/format'
 
 const TASK407_EMPTY_NO_HAY_DATOS_ECONOMICOS_PARA_ESTE_PERIODO = "No hay datos económicos para este período"
 
@@ -102,7 +103,9 @@ interface EconomicsResponse {
 const MONTH_SHORT = ['', ...GREENHOUSE_COPY.months.short]
 
 const formatCLP = (amount: number): string =>
-  new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(amount)
+  formatGreenhouseCurrency(amount, 'CLP', {
+  maximumFractionDigits: 0
+}, 'es-CL')
 
 const formatPercent = (value: number | null): string =>
   value != null ? `${value.toFixed(1)}%` : '—'

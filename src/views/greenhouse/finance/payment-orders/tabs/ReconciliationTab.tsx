@@ -14,6 +14,7 @@ import Typography from '@mui/material/Typography'
 
 import EmptyState from '@/components/greenhouse/EmptyState'
 import { getMicrocopy } from '@/lib/copy'
+import { formatCurrency as formatGreenhouseCurrency, formatDate as formatGreenhouseDate } from '@/lib/format'
 
 const GREENHOUSE_COPY = getMicrocopy()
 
@@ -47,11 +48,9 @@ const statusMeta: Record<string, { label: string; color: 'primary' | 'info' | 'w
 }
 
 const formatAmount = (amount: number, currency: string) =>
-  new Intl.NumberFormat('es-CL', {
-    style: 'currency',
-    currency,
-    maximumFractionDigits: currency === 'USD' ? 2 : 0
-  }).format(amount)
+  formatGreenhouseCurrency(amount, currency, {
+  maximumFractionDigits: currency === 'USD' ? 2 : 0
+}, 'es-CL')
 
 const ReconciliationTab = () => {
   const [periods, setPeriods] = useState<ReconciliationPeriodSummary[]>([])
@@ -223,7 +222,7 @@ const ReconciliationTab = () => {
                   </Typography>
                   <Typography variant='caption' color='text.secondary'>
                     Saldo declarado: {formatAmount(s.closingBalance, s.currency)} ·{' '}
-                    {new Date(s.declaredAt).toLocaleDateString('es-CL')}
+                    {formatGreenhouseDate(new Date(s.declaredAt), 'es-CL')}
                   </Typography>
                 </Stack>
                 <Button

@@ -25,6 +25,7 @@ import Typography from '@mui/material/Typography'
 import { EmptyState, ProjectTeamSection } from '@/components/greenhouse'
 import { GH_CLIENT_NAV, GH_LABELS, GH_MESSAGES } from '@/config/greenhouse-nomenclature'
 import type { GreenhouseProjectDetailData, GreenhouseProjectTasksData } from '@/types/greenhouse-project-detail'
+import { formatDate as formatGreenhouseDate } from '@/lib/format'
 
 const TASK407_ARIA_BREADCRUMBS = "breadcrumbs"
 
@@ -40,7 +41,7 @@ const formatDateLabel = (value: string | null, options?: Intl.DateTimeFormatOpti
 
   const date = value.includes('T') ? new Date(value) : new Date(`${value}T00:00:00`)
 
-  return date.toLocaleString(undefined, options)
+  return formatGreenhouseDate(date, options)
 }
 
 const formatDateRange = (startDate: string | null, endDate: string | null) => {

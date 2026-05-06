@@ -29,6 +29,7 @@ import { getMicrocopy } from '@/lib/copy'
 import { DataTableShell } from '@/components/greenhouse/data-table'
 
 import type { ProductCatalogDetailData } from './detail-data'
+import { formatDate as formatGreenhouseDate, formatNumber as formatGreenhouseNumber } from '@/lib/format'
 
 const GREENHOUSE_COPY = getMicrocopy()
 
@@ -50,7 +51,7 @@ const formatDate = (iso: string | null): string => {
   if (!iso) return '—'
   const d = new Date(iso)
 
-  return Number.isFinite(d.getTime()) ? d.toLocaleString('es-CL') : '—'
+  return Number.isFinite(d.getTime()) ? formatGreenhouseDate(d, 'es-CL') : '—'
 }
 
 const ProductCatalogDetailView = ({ data }: Props) => {
@@ -499,7 +500,7 @@ return
                         <strong>{code}</strong>
                       </TableCell>
                       <TableCell align='right'>
-                        {existing ? existing.unitPrice.toLocaleString('es-CL') : '—'}
+                        {existing ? formatGreenhouseNumber(existing.unitPrice, 'es-CL') : '—'}
                       </TableCell>
                       <TableCell>
                         {existing ? (

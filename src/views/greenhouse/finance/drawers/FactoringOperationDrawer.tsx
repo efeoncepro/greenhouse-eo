@@ -19,6 +19,7 @@ import { getMicrocopy } from '@/lib/copy'
 import CustomTextField from '@core/components/mui/TextField'
 
 import PaymentInstrumentChip from '@/components/greenhouse/PaymentInstrumentChip'
+import { formatCurrency as formatGreenhouseCurrency, formatDate as formatGreenhouseDate, formatNumber as formatGreenhouseNumber } from '@/lib/format'
 
 const GREENHOUSE_COPY = getMicrocopy()
 
@@ -55,10 +56,14 @@ type Props = {
 // ---------------------------------------------------------------------------
 
 const getTodayInSantiago = () =>
-  new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Santiago' }).format(new Date())
+  formatGreenhouseDate(new Date(), {
+  timeZone: 'America/Santiago'
+}, 'en-CA')
 
 const formatCLP = (amount: number): string =>
-  new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(amount)
+  formatGreenhouseCurrency(amount, 'CLP', {
+  maximumFractionDigits: 0
+}, 'es-CL')
 
 const parseSafeNumber = (v: string): number => {
   const n = Number(v.replace(/\./g, '').replace(',', '.'))
@@ -260,7 +265,7 @@ const FactoringOperationDrawer = ({ open, onClose, onSuccess, incomeId, nominalA
             Monto nominal de la factura
           </Typography>
           <Typography variant='h6' color='primary.main' fontWeight={700}>
-            {currency === 'CLP' ? formatCLP(nominalAmount) : `${nominalAmount.toLocaleString('es-CL')} ${currency}`}
+            {currency === 'CLP' ? formatCLP(nominalAmount) : `${formatGreenhouseNumber(nominalAmount, 'es-CL')} ${currency}`}
           </Typography>
           <Typography variant='caption' color='text.secondary'>
             La obligación del cliente quedará saldada en su totalidad

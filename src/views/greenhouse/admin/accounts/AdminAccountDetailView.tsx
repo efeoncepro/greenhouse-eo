@@ -24,6 +24,7 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
 import { getMicrocopy } from '@/lib/copy'
+import { formatDateTime as formatGreenhouseDateTime } from '@/lib/format'
 
 import CustomAvatar from '@core/components/mui/Avatar'
 import CustomChip from '@core/components/mui/Chip'
@@ -69,17 +70,11 @@ const SPACE_TYPE_LABEL: Record<string, string> = {
   internal_space: 'Space interno'
 }
 
-const dateFormatter = new Intl.DateTimeFormat('es-CL', {
-  dateStyle: 'medium',
-  timeStyle: 'short',
-  timeZone: 'America/Santiago'
-})
-
 const formatDate = (iso: string | null) => {
   if (!iso) return null
 
   try {
-    return dateFormatter.format(new Date(iso))
+    return formatGreenhouseDateTime(iso, { dateStyle: 'medium', timeStyle: 'short' })
   } catch {
     return '\u2014'
   }

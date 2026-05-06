@@ -26,6 +26,7 @@ import type { OrganizationDetailData } from './types'
 import OrganizationTabs from './OrganizationTabs'
 import EditOrganizationDrawer from './drawers/EditOrganizationDrawer'
 import AddMembershipDrawer from './drawers/AddMembershipDrawer'
+import { formatCurrency as formatGreenhouseCurrency } from '@/lib/format'
 
 const TASK407_ARIA_SINCRONIZAR_CON_HUBSPOT = "Sincronizar con HubSpot"
 const TASK407_ARIA_EDITAR_ORGANIZACION = "Editar organización"
@@ -46,7 +47,9 @@ const STATUS_LABEL: Record<string, string> = {
 }
 
 const fmtClp = (n: number) =>
-  new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(n)
+  formatGreenhouseCurrency(n, 'CLP', {
+  maximumFractionDigits: 0
+}, 'es-CL')
 
 // ── Types ──
 

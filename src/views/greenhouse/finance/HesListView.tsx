@@ -36,6 +36,7 @@ import TablePaginationComponent from '@components/TablePaginationComponent'
 import { fuzzyFilter } from '@/components/tableUtils'
 import tableStyles from '@core/styles/table.module.css'
 import CreateHesDrawer from '@views/greenhouse/finance/drawers/CreateHesDrawer'
+import { formatCurrency as formatGreenhouseCurrency } from '@/lib/format'
 
 const GREENHOUSE_COPY = getMicrocopy()
 // ── Types ──
@@ -79,7 +80,9 @@ const STATUS_OPTIONS = [
 // ── Helpers ──
 
 const formatCLP = (amount: number) =>
-  new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(amount)
+  formatGreenhouseCurrency(amount, 'CLP', {
+  maximumFractionDigits: 0
+}, 'es-CL')
 
 const formatDate = (date: string | null) => {
   if (!date) return '—'

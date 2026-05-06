@@ -44,6 +44,7 @@ import type {
   ExternalCashSignalResolutionStatus,
   ListSignalsResult
 } from '@/lib/finance/external-cash-signals'
+import { formatCurrency as formatGreenhouseCurrency, formatDate as formatGreenhouseDate, formatNumber as formatGreenhouseNumber } from '@/lib/format'
 
 const TASK407_ARIA_CARGANDO_SENALES = "Cargando señales"
 const TASK407_ARIA_COLA_DE_SENALES_EXTERNAS_DE_CAJA = "Cola de señales externas de caja"
@@ -106,13 +107,11 @@ const SOURCE_LABEL: Record<string, string> = {
 
 const formatAmount = (amount: number, currency: string) => {
   try {
-    return new Intl.NumberFormat('es-CL', {
-      style: 'currency',
-      currency,
-      maximumFractionDigits: 0
-    }).format(amount)
+    return formatGreenhouseCurrency(amount, currency, {
+  maximumFractionDigits: 0
+}, 'es-CL')
   } catch {
-    return `${currency} ${amount.toLocaleString('es-CL')}`
+    return `${currency} ${formatGreenhouseNumber(amount, 'es-CL')}`
   }
 }
 
@@ -120,7 +119,11 @@ const formatDate = (raw: string) => {
   if (!raw) return '—'
 
   try {
-    return new Date(raw).toLocaleDateString('es-CL', { day: '2-digit', month: 'short', year: 'numeric' })
+    return formatGreenhouseDate(new Date(raw), {
+  day: '2-digit',
+  month: 'short',
+  year: 'numeric'
+}, 'es-CL')
   } catch {
     return raw
   }

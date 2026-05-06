@@ -55,6 +55,7 @@ import CostOverrideDialog, {
 import QuoteLineWarning from '@/components/greenhouse/pricing/QuoteLineWarning'
 
 import QuoteLineCostStack from './QuoteLineCostStack'
+import { formatCurrency as formatGreenhouseCurrency, formatNumber as formatGreenhouseNumber } from '@/lib/format'
 
 const TASK407_ARIA_EXPANDIR_DETALLE = "Expandir detalle"
 const TASK407_ARIA_ACCIONES = "Acciones"
@@ -211,13 +212,11 @@ const formatCurrency = (amount: number | null, currency: string): string => {
   if (amount === null || Number.isNaN(amount)) return '—'
 
   try {
-    return new Intl.NumberFormat('es-CL', {
-      style: 'currency',
-      currency,
-      maximumFractionDigits: 0
-    }).format(amount)
+    return formatGreenhouseCurrency(amount, currency, {
+  maximumFractionDigits: 0
+}, 'es-CL')
   } catch {
-    return `${currency} ${Math.round(amount).toLocaleString('es-CL')}`
+    return `${currency} ${formatGreenhouseNumber(Math.round(amount), 'es-CL')}`
   }
 }
 

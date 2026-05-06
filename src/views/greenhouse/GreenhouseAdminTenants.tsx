@@ -34,6 +34,7 @@ import { GH_INTERNAL_MESSAGES, GH_INTERNAL_NAV } from '@/config/greenhouse-nomen
 
 import tableStyles from '@core/styles/table.module.css'
 import { getMicrocopy } from '@/lib/copy'
+import { formatDateTime as formatGreenhouseDateTime } from '@/lib/format'
 
 const GREENHOUSE_COPY = getMicrocopy()
 
@@ -47,7 +48,7 @@ type Props = {
 const formatDateTime = (value: string | null) => {
   if (!value) return GH_INTERNAL_MESSAGES.admin_tenants_no_record
 
-  return new Date(value).toLocaleString('es-CL')
+  return formatGreenhouseDateTime(value, 'es-CL')
 }
 
 const authModeTone = (authMode: string) => {

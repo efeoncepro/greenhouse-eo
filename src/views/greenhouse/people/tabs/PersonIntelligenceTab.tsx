@@ -19,6 +19,7 @@ import { AgencyMetricStatusChip, getAgencyMetricFooterLabel } from '@/components
 import AppRecharts from '@/libs/styles/AppRecharts'
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from '@/libs/Recharts'
 import { getMicrocopy } from '@/lib/copy'
+import { formatNumber as formatGreenhouseNumber } from '@/lib/format'
 
 const GREENHOUSE_COPY = getMicrocopy()
 // ── Types ──
@@ -72,13 +73,13 @@ const fmtNum = (v: number | null | undefined, suffix = ''): string =>
   v != null ? `${Math.round(v * 10) / 10}${suffix}` : '—'
 
 const fmtClp = (v: number | null | undefined): string =>
-  v != null ? `$${Math.round(v).toLocaleString('es-CL')}` : '—'
+  v != null ? `$${formatGreenhouseNumber(Math.round(v), 'es-CL')}` : '—'
 
 const fmtMoney = (v: number | null | undefined, currency: string | null | undefined): string => {
   if (v == null) return '—'
-  if (currency === 'USD') return `US$${Math.round(v).toLocaleString('en-US')}`
+  if (currency === 'USD') return `US$${formatGreenhouseNumber(Math.round(v), 'en-US')}`
 
-  return `$${Math.round(v).toLocaleString('es-CL')}`
+  return `$${formatGreenhouseNumber(Math.round(v), 'es-CL')}`
 }
 
 const fmtUsage = (kind: string | undefined, usedHours: number | null | undefined, usagePercent: number | null | undefined): string => {

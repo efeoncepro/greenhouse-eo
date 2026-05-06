@@ -23,6 +23,7 @@ import {
 
 import CustomChip from '@core/components/mui/Chip'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
+import { formatDate as formatGreenhouseDate, formatNumber as formatGreenhouseNumber } from '@/lib/format'
 
 interface DashboardItem {
   shortCode: string
@@ -55,10 +56,15 @@ interface DashboardData {
 }
 
 const formatCurrency = (value: number, currency: string): string => {
-  if (currency === 'CLP') return `$${Math.round(value).toLocaleString('es-CL')}`
-  if (currency === 'USD') return `US$${value.toLocaleString('es-CL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+  if (currency === 'CLP') return `$${formatGreenhouseNumber(Math.round(value), 'es-CL')}`
+  if (currency === 'USD') return `US$${formatGreenhouseNumber(value, {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2
+}, 'es-CL')}`
 
-  return `${currency} ${value.toLocaleString('es-CL', { minimumFractionDigits: 2 })}`
+  return `${currency} ${formatGreenhouseNumber(value, {
+  minimumFractionDigits: 2
+}, 'es-CL')}`
 }
 
 const formatRelative = (iso: string | null): string => {
@@ -81,7 +87,11 @@ const formatRelative = (iso: string | null): string => {
 const formatDate = (iso: string | null): string => {
   if (!iso) return '—'
 
-  return new Date(iso).toLocaleDateString('es-CL', { day: '2-digit', month: '2-digit', year: 'numeric' })
+  return formatGreenhouseDate(new Date(iso), {
+  day: '2-digit',
+  month: '2-digit',
+  year: 'numeric'
+}, 'es-CL')
 }
 
 /**

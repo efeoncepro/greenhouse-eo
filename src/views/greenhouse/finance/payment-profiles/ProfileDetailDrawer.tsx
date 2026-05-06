@@ -27,6 +27,7 @@ import type {
   BeneficiaryPaymentProfileSafe,
   BeneficiaryPaymentProfileStatus
 } from '@/types/payment-profiles'
+import { formatDateTime as formatGreenhouseDateTime } from '@/lib/format'
 
 const TASK407_ARIA_CERRAR_DRAWER = "Cerrar drawer"
 const TASK407_ARIA_CARGANDO_PERFIL_DE_PAGO = "Cargando perfil de pago"
@@ -75,7 +76,7 @@ const AUDIT_ACTION_META: Record<
   }
 }
 
-const formatTimestamp = (iso: string) => new Date(iso).toLocaleString('es-CL')
+const formatTimestamp = (iso: string) => formatGreenhouseDateTime(iso, 'es-CL')
 
 const ProfileDetailDrawer = ({ profileId, onClose, onActionComplete }: ProfileDetailDrawerProps) => {
   const [profile, setProfile] = useState<BeneficiaryPaymentProfileSafe | null>(null)

@@ -27,6 +27,7 @@ import type {
   PaymentOrderBatchKind,
   PaymentOrderPaymentMethod
 } from '@/types/payment-orders'
+import { formatCurrency as formatGreenhouseCurrency } from '@/lib/format'
 
 const GREENHOUSE_COPY = getMicrocopy()
 
@@ -38,11 +39,9 @@ interface CreateOrderDialogProps {
 }
 
 const formatAmount = (amount: number, currency: string) =>
-  new Intl.NumberFormat('es-CL', {
-    style: 'currency',
-    currency,
-    maximumFractionDigits: currency === 'USD' ? 2 : 0
-  }).format(amount)
+  formatGreenhouseCurrency(amount, currency, {
+  maximumFractionDigits: currency === 'USD' ? 2 : 0
+}, 'es-CL')
 
 const PAYMENT_METHODS: Array<{ value: PaymentOrderPaymentMethod; label: string }> = [
   { value: 'bank_transfer', label: 'Transferencia bancaria' },

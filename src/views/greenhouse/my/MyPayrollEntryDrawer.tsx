@@ -16,6 +16,7 @@ import type { Theme } from '@mui/material/styles'
 
 import CustomChip from '@core/components/mui/Chip'
 import { getMicrocopy } from '@/lib/copy'
+import { formatCurrency as formatGreenhouseCurrency, formatDate as formatGreenhouseDate, formatDateTime as formatGreenhouseDateTime } from '@/lib/format'
 
 const TASK407_ARIA_CERRAR_DETALLE = "Cerrar detalle"
 const TASK407_ARIA_COPIAR_REFERENCIA_EXTERNA = "Copiar referencia externa"
@@ -93,23 +94,21 @@ interface Props {
 }
 
 const fmt = (amount: number, currency: string) =>
-  new Intl.NumberFormat('es-CL', {
-    style: 'currency',
-    currency: currency === 'USD' ? 'USD' : 'CLP',
-    maximumFractionDigits: 0
-  }).format(amount)
+  formatGreenhouseCurrency(amount, currency === 'USD' ? 'USD' : 'CLP', {
+  maximumFractionDigits: 0
+}, 'es-CL')
 
 const formatDateTime = (iso: string | null): string => {
   if (!iso) return '—'
 
   try {
-    return new Date(iso).toLocaleString('es-CL', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    })
+    return formatGreenhouseDateTime(new Date(iso), {
+  day: '2-digit',
+  month: 'short',
+  year: 'numeric',
+  hour: '2-digit',
+  minute: '2-digit'
+}, 'es-CL')
   } catch {
     return iso
   }
@@ -119,7 +118,11 @@ const formatDate = (iso: string | null): string => {
   if (!iso) return '—'
 
   try {
-    return new Date(iso).toLocaleDateString('es-CL', { day: '2-digit', month: 'short', year: 'numeric' })
+    return formatGreenhouseDate(new Date(iso), {
+  day: '2-digit',
+  month: 'short',
+  year: 'numeric'
+}, 'es-CL')
   } catch {
     return iso
   }

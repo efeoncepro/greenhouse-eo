@@ -33,6 +33,7 @@ import CustomTabList from '@core/components/mui/TabList'
 
 import SupplierProviderToolingTab from './SupplierProviderToolingTab'
 import type { SupplierProviderToolingSnapshot } from './SupplierProviderToolingTab'
+import { formatCurrency as formatGreenhouseCurrency } from '@/lib/format'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -128,7 +129,9 @@ const CONTACT_TYPE_LABELS: Record<string, string> = {
 // ---------------------------------------------------------------------------
 
 const formatAmount = (amount: number, currency: string) =>
-  new Intl.NumberFormat('es-CL', { style: 'currency', currency, maximumFractionDigits: currency === 'CLP' ? 0 : 2 }).format(amount)
+  formatGreenhouseCurrency(amount, currency, {
+  maximumFractionDigits: currency === 'CLP' ? 0 : 2
+}, 'es-CL')
 
 const formatDate = (value: string | null | undefined) => {
   if (!value) {

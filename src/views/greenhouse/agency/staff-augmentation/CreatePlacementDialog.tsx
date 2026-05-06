@@ -21,6 +21,7 @@ import { toast } from 'sonner'
 import { getMicrocopy } from '@/lib/copy'
 
 import CustomTextField from '@core/components/mui/TextField'
+import { formatCurrency as formatGreenhouseCurrency } from '@/lib/format'
 
 const GREENHOUSE_COPY = getMicrocopy()
 
@@ -306,11 +307,9 @@ const CreatePlacementDialog = ({ open, onClose, onCreated, initialAssignmentId, 
               {selectedAssignment.organizationLabel ? `${selectedAssignment.organizationLabel} · ` : ''}
               {selectedAssignment.compensation.contractType || 'Sin contract type'} · {selectedAssignment.compensation.payRegime || 'Sin pay regime'}
               {selectedAssignment.compensation.costRateAmount != null
-                ? ` · costo base ${new Intl.NumberFormat('es-CL', {
-                  style: 'currency',
-                  currency: selectedAssignment.compensation.costRateCurrency || 'USD',
-                  maximumFractionDigits: 0
-                }).format(selectedAssignment.compensation.costRateAmount)}`
+                ? ` · costo base ${formatGreenhouseCurrency(selectedAssignment.compensation.costRateAmount, selectedAssignment.compensation.costRateCurrency || 'USD', {
+  maximumFractionDigits: 0
+}, 'es-CL')}`
                 : ' · sin costo base vigente en Payroll'}
             </Alert>
           </Grid>

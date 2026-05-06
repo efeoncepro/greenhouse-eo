@@ -1,5 +1,13 @@
 import { resolveFormatLocale } from './locale-context'
-import { DEFAULT_FORMAT_FALLBACK, OPERATIONAL_TIME_ZONE, type FormatDateOptions, type FormatDateTimeOptions, type FormatValue } from './types'
+import {
+  DEFAULT_FORMAT_FALLBACK,
+  OPERATIONAL_TIME_ZONE,
+  type FormatDateOptions,
+  type FormatDateTimeOptions,
+  type FormatLocale,
+  type FormatTimeOptions,
+  type FormatValue
+} from './types'
 
 const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}$/
 
@@ -24,8 +32,13 @@ const toDate = (value: FormatValue): { date: Date | null; dateOnly: boolean } =>
   return { date: Number.isNaN(date.getTime()) ? null : date, dateOnly: false }
 }
 
-export const formatDate = (value: FormatValue, options: FormatDateOptions = {}, locale?: FormatDateOptions['locale']): string => {
+export const formatDate = (
+  value: FormatValue,
+  optionsOrLocale: FormatDateOptions | FormatLocale = {},
+  locale?: FormatDateOptions['locale']
+): string => {
   const { date, dateOnly } = toDate(value)
+  const options = typeof optionsOrLocale === 'string' ? {} : optionsOrLocale
   const fallback = options.fallback ?? DEFAULT_FORMAT_FALLBACK
 
   if (!date) return fallback
@@ -33,13 +46,18 @@ export const formatDate = (value: FormatValue, options: FormatDateOptions = {}, 
   const { locale: optionLocale, timeZone, ...intlOptions } = options
 
   delete intlOptions.fallback
-  const resolvedLocale = resolveFormatLocale(locale ?? optionLocale)
+  const resolvedLocale = resolveFormatLocale(typeof optionsOrLocale === 'string' ? optionsOrLocale : (locale ?? optionLocale))
   const resolvedTimeZone = dateOnly ? 'UTC' : (timeZone ?? undefined)
+  const hasStyleShortcut = intlOptions.dateStyle != null || intlOptions.timeStyle != null
 
   return new Intl.DateTimeFormat(resolvedLocale, {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
+    ...(hasStyleShortcut
+      ? {}
+      : {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric'
+        }),
     ...(resolvedTimeZone ? { timeZone: resolvedTimeZone } : {}),
     ...intlOptions
   }).format(date)
@@ -47,10 +65,11 @@ export const formatDate = (value: FormatValue, options: FormatDateOptions = {}, 
 
 export const formatDateTime = (
   value: FormatValue,
-  options: FormatDateTimeOptions = {},
+  optionsOrLocale: FormatDateTimeOptions | FormatLocale = {},
   locale?: FormatDateTimeOptions['locale']
 ): string => {
   const { date } = toDate(value)
+  const options = typeof optionsOrLocale === 'string' ? {} : optionsOrLocale
   const fallback = options.fallback ?? DEFAULT_FORMAT_FALLBACK
 
   if (!date) return fallback
@@ -59,7 +78,7 @@ export const formatDateTime = (
 
   delete intlOptions.fallback
 
-  const resolvedLocale = resolveFormatLocale(locale ?? optionLocale)
+  const resolvedLocale = resolveFormatLocale(typeof optionsOrLocale === 'string' ? optionsOrLocale : (locale ?? optionLocale))
   const hasStyleShortcut = intlOptions.dateStyle != null || intlOptions.timeStyle != null
 
   return new Intl.DateTimeFormat(resolvedLocale, {
@@ -72,6 +91,31 @@ export const formatDateTime = (
           hour: '2-digit',
           minute: '2-digit'
         }),
+    timeZone: OPERATIONAL_TIME_ZONE,
+    ...intlOptions
+  }).format(date)
+}
+
+export const formatTime = (
+  value: FormatValue,
+  optionsOrLocale: FormatTimeOptions | FormatLocale = {},
+  locale?: FormatTimeOptions['locale']
+): string => {
+  const { date } = toDate(value)
+  const options = typeof optionsOrLocale === 'string' ? {} : optionsOrLocale
+  const fallback = options.fallback ?? DEFAULT_FORMAT_FALLBACK
+
+  if (!date) return fallback
+
+  const { locale: optionLocale, ...intlOptions } = options
+
+  delete intlOptions.fallback
+
+  const resolvedLocale = resolveFormatLocale(typeof optionsOrLocale === 'string' ? optionsOrLocale : (locale ?? optionLocale))
+
+  return new Intl.DateTimeFormat(resolvedLocale, {
+    hour: '2-digit',
+    minute: '2-digit',
     timeZone: OPERATIONAL_TIME_ZONE,
     ...intlOptions
   }).format(date)

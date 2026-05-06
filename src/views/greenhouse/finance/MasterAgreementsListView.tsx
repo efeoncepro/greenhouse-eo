@@ -28,6 +28,7 @@ import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSu
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 import { buildStatusMap } from '@/lib/copy'
+import { formatDate as formatGreenhouseDate } from '@/lib/format'
 
 type MasterAgreementStatus = 'draft' | 'active' | 'expired' | 'terminated' | 'superseded'
 type ViewMode = 'table' | 'cards'
@@ -83,11 +84,11 @@ const formatDate = (value: string | null) => {
 
   if (Number.isNaN(date.getTime())) return '—'
 
-  return date.toLocaleDateString('es-CL', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric'
-  })
+  return formatGreenhouseDate(date, {
+  day: '2-digit',
+  month: 'short',
+  year: 'numeric'
+}, 'es-CL')
 }
 
 const daysUntil = (value: string | null) => {

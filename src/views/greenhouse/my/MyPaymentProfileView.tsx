@@ -22,6 +22,7 @@ import { getMicrocopy } from '@/lib/copy'
 import CustomChip from '@core/components/mui/Chip'
 
 import RequestChangeDialog from './payment-profile/RequestChangeDialog'
+import { formatDate as formatGreenhouseDate } from '@/lib/format'
 
 const GREENHOUSE_COPY = getMicrocopy()
 
@@ -79,7 +80,11 @@ const formatDate = (iso: string | null): string => {
   if (!iso) return '—'
 
   try {
-    return new Date(iso).toLocaleDateString('es-CL', { day: '2-digit', month: 'short', year: 'numeric' })
+    return formatGreenhouseDate(new Date(iso), {
+  day: '2-digit',
+  month: 'short',
+  year: 'numeric'
+}, 'es-CL')
   } catch {
     return iso
   }

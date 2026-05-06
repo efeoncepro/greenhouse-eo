@@ -11,6 +11,7 @@ import Divider from '@mui/material/Divider'
 import Stack from '@mui/material/Stack'
 
 import CustomTextField from '@core/components/mui/TextField'
+import { formatCurrency as formatGreenhouseCurrency } from '@/lib/format'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -30,7 +31,9 @@ interface PaymentRegistrationCardProps {
 // ---------------------------------------------------------------------------
 
 const formatBalance = (value: number, cur: string) =>
-  new Intl.NumberFormat('es-CL', { style: 'currency', currency: cur, maximumFractionDigits: cur === 'CLP' ? 0 : 2 }).format(value)
+  formatGreenhouseCurrency(value, cur, {
+  maximumFractionDigits: cur === 'CLP' ? 0 : 2
+}, 'es-CL')
 
 const PaymentRegistrationCard = ({
   onSubmit,

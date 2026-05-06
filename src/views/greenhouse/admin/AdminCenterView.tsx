@@ -42,6 +42,7 @@ import {
 import type { DerivedControlTowerTenant } from '../internal/dashboard/helpers'
 
 import AdminCenterSpacesTable from './AdminCenterSpacesTable'
+import { formatNumber as formatGreenhouseNumber } from '@/lib/format'
 
 type StatusFilter = 'all' | 'active' | 'onboarding' | 'attention' | 'inactive'
 
@@ -284,7 +285,7 @@ const buildDomainCards = ({
     points: [
       `${operations.kpis.activeSyncs} fuentes activas de sincronizacion`,
       operations.cloud.cron.secretConfigured ? 'Cron control plane autenticado' : 'CRON_SECRET pendiente',
-      `BigQuery guard: ${operations.cloud.bigquery.maximumBytesBilled.toLocaleString('en-US')} bytes`
+      `BigQuery guard: ${formatGreenhouseNumber(operations.cloud.bigquery.maximumBytesBilled, 'en-US')} bytes`
     ]
   },
   {

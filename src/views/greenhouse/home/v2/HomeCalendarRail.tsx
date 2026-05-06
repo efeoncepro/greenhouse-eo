@@ -16,6 +16,7 @@ import type { ThemeColor } from '@core/types'
 
 import type { CalendarEventKind, HomeCalendarEvent, HomeCalendarRailData } from '@/lib/home/contract'
 import { getMicrocopy } from '@/lib/copy'
+import { formatDate as formatGreenhouseDate } from '@/lib/format'
 
 const TASK407_ARIA_PROXIMOS_EVENTOS = "Próximos eventos"
 
@@ -60,7 +61,9 @@ const formatRelative = (iso: string): string => {
   if (diffDays > 1 && diffDays < 7) return `en ${diffDays} días`
   if (diffDays < 0) return `hace ${Math.abs(diffDays)} d`
 
-  return date.toLocaleDateString('es-CL', { dateStyle: 'medium' })
+  return formatGreenhouseDate(date, {
+  dateStyle: 'medium'
+}, 'es-CL')
 }
 
 const EventRow = ({ event }: { event: HomeCalendarEvent }) => {

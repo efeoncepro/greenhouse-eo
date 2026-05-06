@@ -46,6 +46,7 @@ import {
 } from '@/config/responsibility-codes'
 import type { ResponsibilityType, ScopeType } from '@/config/responsibility-codes'
 import { getInitials } from '@/utils/getInitials'
+import { formatDate as formatGreenhouseDate } from '@/lib/format'
 
 const GREENHOUSE_COPY = getMicrocopy()
 
@@ -94,10 +95,10 @@ const PAGE_SIZE = 10
 const formatDate = (value: string | null) => {
   if (!value) return '—'
 
-  return new Intl.DateTimeFormat('es-CL', {
-    dateStyle: 'medium',
-    timeZone: 'America/Santiago'
-  }).format(new Date(value))
+  return formatGreenhouseDate(new Date(value), {
+  dateStyle: 'medium',
+  timeZone: 'America/Santiago'
+}, 'es-CL')
 }
 
 const sortComparators: Record<SortKey, (a: ResponsibilityRow, b: ResponsibilityRow) => number> = {

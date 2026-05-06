@@ -21,6 +21,7 @@ import Typography from '@mui/material/Typography'
 import CustomTextField from '@core/components/mui/TextField'
 
 import { useTableDensity } from '../data-table/useTableDensity'
+import { formatCurrency as formatGreenhouseCurrency } from '@/lib/format'
 
 export type InlineNumericEditorCurrency = 'CLP' | 'USD'
 
@@ -40,20 +41,16 @@ export interface InlineNumericEditorProps {
 
 const defaultFormatDisplay = (value: number, currency: InlineNumericEditorCurrency): string => {
   if (currency === 'CLP') {
-    return new Intl.NumberFormat('es-CL', {
-      style: 'currency',
-      currency: 'CLP',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0
-    }).format(value)
+    return formatGreenhouseCurrency(value, 'CLP', {
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 0
+}, 'es-CL')
   }
 
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  }).format(value)
+  return formatGreenhouseCurrency(value, 'USD', {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2
+}, 'en-US')
 }
 
 const clamp = (value: number, min: number, max: number) => {

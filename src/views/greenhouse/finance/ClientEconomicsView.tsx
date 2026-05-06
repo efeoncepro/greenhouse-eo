@@ -42,6 +42,7 @@ import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 import OptionMenu from '@core/components/option-menu'
 import { getMicrocopy } from '@/lib/copy'
+import { formatCurrency as formatGreenhouseCurrency } from '@/lib/format'
 
 const TASK407_ARIA_GRAFICO_DE_EVOLUCION_MARGEN_BRUTO_PROMEDIO_Y_MARGEN_NETO_P = "Gráfico de evolución: margen bruto promedio y margen neto promedio de los últimos 6 meses"
 
@@ -102,7 +103,9 @@ type SortDir = 'asc' | 'desc'
 // ---------------------------------------------------------------------------
 
 const formatCLP = (amount: number): string => {
-  return new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(amount)
+  return formatGreenhouseCurrency(amount, 'CLP', {
+  maximumFractionDigits: 0
+}, 'es-CL')
 }
 
 const formatPercent = (value: number | null): string => {

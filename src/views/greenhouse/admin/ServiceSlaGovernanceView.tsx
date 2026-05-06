@@ -48,6 +48,7 @@ import type {
   ServiceSlaUnit
 } from '@/types/service-sla'
 import type { ServiceListItem } from '@/lib/services/service-store'
+import { formatNumber as formatGreenhouseNumber } from '@/lib/format'
 
 const GREENHOUSE_COPY = getMicrocopy()
 
@@ -133,10 +134,14 @@ const SLA_TREND_LABELS: Record<ServiceSlaComplianceItem['trendStatus'], string> 
 const formatSlaValue = (value: number | null, unit: ServiceSlaUnit | null) => {
   if (value == null) return '—'
 
-  if (unit === 'percent') return `${new Intl.NumberFormat('es-CL', { maximumFractionDigits: 1 }).format(value)}%`
+  if (unit === 'percent') return `${formatGreenhouseNumber(value, {
+  maximumFractionDigits: 1
+}, 'es-CL')}%`
   if (unit === 'days' || unit === 'rounds') return String(Math.round(value))
 
-  return new Intl.NumberFormat('es-CL', { maximumFractionDigits: 2 }).format(value)
+  return formatGreenhouseNumber(value, {
+  maximumFractionDigits: 2
+}, 'es-CL')
 }
 
 const formatSlaThreshold = (mode: ServiceSlaComparisonMode, value: number | null, unit: ServiceSlaUnit | null) => {
@@ -674,7 +679,9 @@ return
                                   {SLA_TREND_LABELS[item.trendStatus]}
                                 </Typography>
                                 <Typography variant='caption' color='text.secondary'>
-                                  Delta {item.deltaToTarget == null ? '—' : `${item.deltaToTarget > 0 ? '+' : ''}${new Intl.NumberFormat('es-CL', { maximumFractionDigits: 2 }).format(item.deltaToTarget)}`}
+                                  Delta {item.deltaToTarget == null ? '—' : `${item.deltaToTarget > 0 ? '+' : ''}${formatGreenhouseNumber(item.deltaToTarget, {
+  maximumFractionDigits: 2
+}, 'es-CL')}`}
                                 </Typography>
                               </Stack>
                             </TableCell>

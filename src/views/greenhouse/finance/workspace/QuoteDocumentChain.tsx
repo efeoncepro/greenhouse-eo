@@ -17,6 +17,7 @@ import Typography from '@mui/material/Typography'
 
 import { getMicrocopy } from '@/lib/copy'
 import CustomChip from '@core/components/mui/Chip'
+import { formatCurrency as formatGreenhouseCurrency, formatDate as formatGreenhouseDate, formatNumber as formatGreenhouseNumber } from '@/lib/format'
 
 const TASK407_ARIA_CONVERTIR_COTIZACION_A_FACTURA_DIRECTA = "Convertir cotización a factura directa"
 
@@ -94,22 +95,18 @@ type SemanticColor = 'success' | 'warning' | 'error' | 'info' | 'primary' | 'sec
 const formatCLP = (amount: number | null): string => {
   if (amount === null) return '—'
 
-  return new Intl.NumberFormat('es-CL', {
-    style: 'currency',
-    currency: 'CLP',
-    maximumFractionDigits: 0
-  }).format(amount)
+  return formatGreenhouseCurrency(amount, 'CLP', {
+  maximumFractionDigits: 0
+}, 'es-CL')
 }
 
 const formatAmount = (amount: number, currency: string): string => {
   try {
-    return new Intl.NumberFormat('es-CL', {
-      style: 'currency',
-      currency,
-      maximumFractionDigits: 0
-    }).format(amount)
+    return formatGreenhouseCurrency(amount, currency, {
+  maximumFractionDigits: 0
+}, 'es-CL')
   } catch {
-    return `${currency} ${Math.round(amount).toLocaleString('es-CL')}`
+    return `${currency} ${formatGreenhouseNumber(Math.round(amount), 'es-CL')}`
   }
 }
 
@@ -120,7 +117,11 @@ const formatDate = (iso: string | null): string => {
 
   if (Number.isNaN(d.getTime())) return '—'
 
-  return d.toLocaleDateString('es-CL', { day: '2-digit', month: 'short', year: 'numeric' })
+  return formatGreenhouseDate(d, {
+  day: '2-digit',
+  month: 'short',
+  year: 'numeric'
+}, 'es-CL')
 }
 
 const QUOTATION_STATUS_META: Record<string, { label: string; color: SemanticColor }> = {

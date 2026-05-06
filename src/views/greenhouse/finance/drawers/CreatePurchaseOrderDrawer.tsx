@@ -26,6 +26,7 @@ import {
   loadFinanceClientContactOptions,
   type FinanceContactOption
 } from './financeClientContacts'
+import { formatCurrency as formatGreenhouseCurrency } from '@/lib/format'
 
 const GREENHOUSE_COPY = getMicrocopy()
 
@@ -324,7 +325,9 @@ const CreatePurchaseOrderDrawer = ({ open, onClose, onSuccess }: Props) => {
   }
 
   const formatCLP = (n: number) =>
-    new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(n)
+    formatGreenhouseCurrency(n, 'CLP', {
+  maximumFractionDigits: 0
+}, 'es-CL')
 
   return (
     <Drawer

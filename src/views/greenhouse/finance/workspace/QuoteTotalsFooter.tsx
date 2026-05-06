@@ -8,6 +8,7 @@ import Typography from '@mui/material/Typography'
 import { alpha, useTheme } from '@mui/material/styles'
 
 import type { PricingEngineOutputV2, PricingOutputCurrency } from '@/lib/finance/pricing/contracts'
+import { formatCurrency as formatGreenhouseCurrency, formatNumber as formatGreenhouseNumber, formatPercent as formatGreenhousePercent } from '@/lib/format'
 
 const TASK407_ARIA_CALCULANDO_PRECIOS = "Calculando precios"
 
@@ -25,18 +26,21 @@ const formatMoney = (amount: number, currency: PricingOutputCurrency): string =>
   const locale = CURRENCY_LOCALE[currency] ?? 'es-CL'
 
   try {
-    return new Intl.NumberFormat(locale, {
-      style: 'currency',
-      currency,
-      maximumFractionDigits: 0
-    }).format(amount)
+    return formatGreenhouseCurrency(amount, currency, {
+  maximumFractionDigits: 0
+}, locale)
   } catch {
-    return `${new Intl.NumberFormat(locale, { maximumFractionDigits: 2 }).format(amount)} ${currency}`
+    return `${formatGreenhouseNumber(amount, {
+  maximumFractionDigits: 2
+}, locale)} ${currency}`
   }
 }
 
 const formatPct = (value: number): string =>
-  new Intl.NumberFormat('es-CL', { style: 'percent', minimumFractionDigits: 1, maximumFractionDigits: 1 }).format(value)
+  formatGreenhousePercent(value, {
+  minimumFractionDigits: 1,
+  maximumFractionDigits: 1
+}, 'es-CL')
 
 const classificationMeta: Record<
   PricingEngineOutputV2['aggregateMargin']['classification'],

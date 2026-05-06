@@ -41,6 +41,7 @@ import type {
   NotionSyncOrchestrationRunRecord,
   TenantNotionSyncOrchestrationDetail
 } from '@/types/notion-sync-orchestration'
+import { formatDateTime as formatGreenhouseDateTime } from '@/lib/format'
 
 const GREENHOUSE_COPY = getMicrocopy()
 
@@ -145,11 +146,11 @@ const formatDatetime = (iso: string | null) => {
   if (!iso) return '—'
 
   try {
-    return new Intl.DateTimeFormat('es-CL', {
-      dateStyle: 'medium',
-      timeStyle: 'short',
-      timeZone: 'America/Santiago'
-    }).format(new Date(iso))
+    return formatGreenhouseDateTime(new Date(iso), {
+  dateStyle: 'medium',
+  timeStyle: 'short',
+  timeZone: 'America/Santiago'
+}, 'es-CL')
   } catch {
     return iso
   }

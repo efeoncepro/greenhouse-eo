@@ -19,6 +19,7 @@ import type { Theme } from '@mui/material/styles'
 import CustomChip from '@core/components/mui/Chip'
 
 import type { HrOnboardingInstance, HrOnboardingInstanceItem } from '@/types/hr-onboarding'
+import { formatDate as formatGreenhouseDate } from '@/lib/format'
 
 type InstancesResponse = { instances: HrOnboardingInstance[] }
 
@@ -50,7 +51,11 @@ const today = () => new Date().toISOString().slice(0, 10)
 const formatDate = (value?: string | null) => {
   if (!value) return 'Sin vencimiento'
 
-  return new Intl.DateTimeFormat('es-CL', { day: '2-digit', month: 'short', year: 'numeric' }).format(new Date(`${value.slice(0, 10)}T00:00:00`))
+  return formatGreenhouseDate(new Date(`${value.slice(0, 10)}T00:00:00`), {
+  day: '2-digit',
+  month: 'short',
+  year: 'numeric'
+}, 'es-CL')
 }
 
 const isClosed = (item: HrOnboardingInstanceItem) => item.status === 'done' || item.status === 'skipped'

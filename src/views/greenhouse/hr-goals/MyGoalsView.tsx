@@ -28,6 +28,7 @@ import CustomTextField from '@core/components/mui/TextField'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 
 import type { GoalCycle, GoalKeyResult, GoalStatus, GoalWithDetails } from '@/types/hr-goals'
+import { formatNumber as formatGreenhouseNumber } from '@/lib/format'
 
 const TASK407_ARIA_SELECCIONAR_CICLO = "Seleccionar ciclo"
 
@@ -63,7 +64,7 @@ const formatKrValue = (kr: GoalKeyResult): string => {
     case 'percent':
       return `${current}% / ${target}%`
     case 'currency':
-      return `$${current.toLocaleString('es-CL')} / $${target.toLocaleString('es-CL')}`
+      return `$${formatGreenhouseNumber(current, 'es-CL')} / $${formatGreenhouseNumber(target, 'es-CL')}`
     default:
       return `${current} / ${target}`
   }

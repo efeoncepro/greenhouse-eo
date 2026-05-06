@@ -20,6 +20,7 @@ import CustomAvatar from '@core/components/mui/Avatar'
 
 import AppRecharts from '@/libs/styles/AppRecharts'
 import { ResponsiveContainer, FunnelChart, Funnel, Cell, Tooltip, LabelList } from '@/libs/Recharts'
+import { formatNumber as formatGreenhouseNumber } from '@/lib/format'
 
 // ── Types ──
 
@@ -116,7 +117,7 @@ const CustomFunnelTooltip = ({ active, payload }: { active?: boolean; payload?: 
   return (
     <Box className='recharts-custom-tooltip'>
       <Typography variant='subtitle2' fontWeight={600}>{item.name}</Typography>
-      <Typography variant='body2'>{item.value.toLocaleString('es-CL')} registros</Typography>
+      <Typography variant='body2'>{formatGreenhouseNumber(item.value, 'es-CL')} registros</Typography>
       <Typography variant='body2' color='text.secondary'>{item.pctOfTotal}% del total</Typography>
       {item.conversionRate != null && (
         <Typography variant='body2' color='text.secondary'>
@@ -152,7 +153,7 @@ const CustomFunnelLabel = (props: {
       fontWeight={600}
       style={{ textShadow: '0 1px 3px rgba(0,0,0,0.4)' }}
     >
-      {name} · {(value ?? 0).toLocaleString('es-CL')}
+      {name} · {formatGreenhouseNumber(value ?? 0, 'es-CL')}
     </text>
   )
 }
@@ -203,7 +204,7 @@ const GreenhouseFunnelCard = ({
   const srDescription = data.map((s, i) => {
     const pct = rates[i] != null ? ` (${rates[i]}% conversión)` : ' (100%)'
 
-    return `${s.name}: ${s.value.toLocaleString('es-CL')} registros${pct}`
+    return `${s.name}: ${formatGreenhouseNumber(s.value, 'es-CL')} registros${pct}`
   }).join('. ')
 
   const chartHeight = isMobile ? 200 : height
@@ -212,7 +213,7 @@ const GreenhouseFunnelCard = ({
     <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
       <CardHeader
         title={title}
-        subheader={subtitle ?? `${data.length} etapas · ${totalValue.toLocaleString('es-CL')} registros`}
+        subheader={subtitle ?? `${data.length} etapas · ${formatGreenhouseNumber(totalValue, 'es-CL')} registros`}
         avatar={
           <CustomAvatar variant='rounded' skin='light' color={avatarColor}>
             <i className={classnames(avatarIcon, 'text-[22px]')} />

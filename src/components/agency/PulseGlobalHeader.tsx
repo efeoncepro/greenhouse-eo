@@ -7,6 +7,7 @@ import Typography from '@mui/material/Typography'
 
 import { GH_AGENCY } from '@/config/greenhouse-nomenclature'
 import type { AgencyPulseKpis } from '@/lib/agency/agency-queries'
+import { formatDateTime as formatGreenhouseDateTime } from '@/lib/format'
 
 type Props = {
   kpis: AgencyPulseKpis | null
@@ -16,7 +17,10 @@ const formatSync = (iso: string | null) => {
   if (!iso) return 'Sincronizando…'
 
   try {
-    return new Intl.DateTimeFormat('es-MX', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(iso))
+    return formatGreenhouseDateTime(new Date(iso), {
+  dateStyle: 'medium',
+  timeStyle: 'short'
+}, 'es-MX')
   } catch {
     return iso
   }

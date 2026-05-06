@@ -23,6 +23,7 @@ import { GH_INTERNAL_NAV } from '@/config/greenhouse-nomenclature'
 import type { OperationsHealthStatus, OperationsOverview, OperationsSubsystem } from '@/lib/operations/get-operations-overview'
 import AdminOperationalActionsPanel from './AdminOperationalActionsPanel'
 import AdminOpsActionButton from './AdminOpsActionButton'
+import { formatDateTime as formatGreenhouseDateTime, formatNumber as formatGreenhouseNumber } from '@/lib/format'
 
 const TASK407_COPY_DESPACHAR_WEBHOOKS = "Despachar webhooks"
 const TASK407_COPY_RE_DISPARAR_SERVICES_SYNC = "Re-disparar services sync"
@@ -38,11 +39,11 @@ type SecretGovernanceStatus = 'ok' | 'warning' | 'stale' | 'unverified'
 const formatDateTime = (value: string | null) => {
   if (!value) return 'Sin registro'
 
-  return new Intl.DateTimeFormat('es-CL', {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-    timeZone: 'America/Santiago'
-  }).format(new Date(value))
+  return formatGreenhouseDateTime(new Date(value), {
+  dateStyle: 'medium',
+  timeStyle: 'short',
+  timeZone: 'America/Santiago'
+}, 'es-CL')
 }
 
 const toAdminHealth = (status: OperationsHealthStatus): AdminHealth => {
@@ -310,7 +311,7 @@ const AdminCloudIntegrationsView = ({ data }: Props) => {
                     BigQuery: {data.cloud.bigquery.summary}
                   </Typography>
                   <Typography variant='body2' color='text.secondary'>
-                    maximumBytesBilled: {data.cloud.bigquery.maximumBytesBilled.toLocaleString('en-US')} bytes
+                    maximumBytesBilled: {formatGreenhouseNumber(data.cloud.bigquery.maximumBytesBilled, 'en-US')} bytes
                   </Typography>
                 </Stack>
               </Stack>
@@ -378,12 +379,12 @@ const AdminCloudIntegrationsView = ({ data }: Props) => {
                             </TableCell>
                             <TableCell>
                               <Typography variant='body2' sx={{ fontSize: '0.75rem' }}>
-                                {Number(entry.limit).toLocaleString('en-US')} B
+                                {formatGreenhouseNumber(Number(entry.limit), 'en-US')} B
                               </Typography>
                             </TableCell>
                             <TableCell>
                               <Typography variant='body2' color='text.secondary' sx={{ fontSize: '0.75rem' }}>
-                                {new Date(entry.timestamp).toLocaleString()}
+                                {formatGreenhouseDateTime(entry.timestamp)}
                               </Typography>
                             </TableCell>
                           </TableRow>

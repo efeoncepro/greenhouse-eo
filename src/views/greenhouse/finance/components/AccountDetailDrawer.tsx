@@ -47,6 +47,7 @@ import {
 } from '@/lib/finance/instrument-presentation'
 import type { TreasuryBankAccountOverview } from '@/lib/finance/account-balances'
 import { getMicrocopy } from '@/lib/copy'
+import { formatCurrency as formatGreenhouseCurrency, formatNumber as formatGreenhouseNumber } from '@/lib/format'
 
 const TASK407_ARIA_CERRAR_DETALLE = "Cerrar detalle"
 const TASK407_ARIA_VENTANA_TEMPORAL_DE_MOVIMIENTOS = "Ventana temporal de movimientos"
@@ -196,11 +197,9 @@ type Props = {
 }
 
 const formatAmount = (amount: number, currency: string = 'CLP') =>
-  new Intl.NumberFormat('es-CL', {
-    style: 'currency',
-    currency,
-    maximumFractionDigits: currency === 'CLP' ? 0 : 2
-  }).format(amount)
+  formatGreenhouseCurrency(amount, currency, {
+  maximumFractionDigits: currency === 'CLP' ? 0 : 2
+}, 'es-CL')
 
 const formatDate = (date: string | null) => {
   if (!date) return '—'
@@ -541,7 +540,7 @@ const AccountDetailDrawer = ({ open, accountId, year, month, onClose, onSuccess 
                     }
 
                     if (kpi.key === 'paymentCount') {
-                      return new Intl.NumberFormat('es-CL').format(kpi.value)
+                      return formatGreenhouseNumber(kpi.value, 'es-CL')
                     }
 
                     return formatAmount(kpi.value, detail.account.currency)

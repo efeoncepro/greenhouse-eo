@@ -19,17 +19,18 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
 import type { PaymentObligationsHealthGrid } from '@/lib/finance/payment-obligations/health-grid'
+import { formatDateTime as formatGreenhouseDateTime } from '@/lib/format'
 
 const formatTimestamp = (iso: string | null) => {
   if (!iso) return 'Aún no materializado'
 
-  return new Date(iso).toLocaleString('es-CL', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  })
+  return formatGreenhouseDateTime(new Date(iso), {
+  day: '2-digit',
+  month: 'short',
+  year: 'numeric',
+  hour: '2-digit',
+  minute: '2-digit'
+}, 'es-CL')
 }
 
 const driftMeta: Record<

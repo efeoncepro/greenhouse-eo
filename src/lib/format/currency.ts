@@ -1,14 +1,15 @@
 import { resolveFormatLocale } from './locale-context'
-import { DEFAULT_FORMAT_FALLBACK, type CurrencyCode, type FormatCurrencyOptions } from './types'
+import { DEFAULT_FORMAT_FALLBACK, type CurrencyCode, type FormatCurrencyOptions, type FormatLocale } from './types'
 
 const ZERO_DECIMAL_CURRENCIES = new Set<CurrencyCode>(['CLP', 'COP'])
 
 export const formatCurrency = (
   amount: number | null | undefined,
   currency: CurrencyCode,
-  options: FormatCurrencyOptions = {},
+  optionsOrLocale: FormatCurrencyOptions | FormatLocale = {},
   locale?: FormatCurrencyOptions['locale']
 ): string => {
+  const options = typeof optionsOrLocale === 'string' ? {} : optionsOrLocale
   const fallback = options.fallback ?? DEFAULT_FORMAT_FALLBACK
 
   if (amount == null || !Number.isFinite(amount)) return fallback
@@ -17,13 +18,18 @@ export const formatCurrency = (
 
   delete intlOptions.fallback
 
-  const resolvedLocale = resolveFormatLocale(locale ?? optionLocale)
+  const resolvedLocale = resolveFormatLocale(typeof optionsOrLocale === 'string' ? optionsOrLocale : (locale ?? optionLocale))
   const normalizedCurrency = currency.toUpperCase() as CurrencyCode
   const zeroDecimal = ZERO_DECIMAL_CURRENCIES.has(normalizedCurrency)
+  const defaultFractionDigits = zeroDecimal ? 0 : 2
+  const requestedMinimumFractionDigits = intlOptions.minimumFractionDigits
+  const requestedMaximumFractionDigits = intlOptions.maximumFractionDigits
+  const maximumFractionDigits = requestedMaximumFractionDigits ?? Math.max(defaultFractionDigits, requestedMinimumFractionDigits ?? 0)
+  const minimumFractionDigits = requestedMinimumFractionDigits ?? Math.min(defaultFractionDigits, maximumFractionDigits)
 
   const fractionOptions = {
-    minimumFractionDigits: zeroDecimal ? 0 : 2,
-    maximumFractionDigits: zeroDecimal ? 0 : 2,
+    minimumFractionDigits,
+    maximumFractionDigits,
     ...intlOptions
   }
 
@@ -52,6 +58,10 @@ export const formatCurrency = (
 export const formatAccountingCurrency = (
   amount: number | null | undefined,
   currency: CurrencyCode,
-  options: FormatCurrencyOptions = {},
+  optionsOrLocale: FormatCurrencyOptions | FormatLocale = {},
   locale?: FormatCurrencyOptions['locale']
-): string => formatCurrency(amount, currency, { accounting: true, ...options }, locale)
+): string => {
+  if (typeof optionsOrLocale === 'string') return formatCurrency(amount, currency, { accounting: true }, optionsOrLocale)
+
+  return formatCurrency(amount, currency, { accounting: true, ...optionsOrLocale }, locale)
+}

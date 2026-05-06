@@ -22,6 +22,7 @@ import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 
 import type { PeriodStatus } from '@/types/payroll'
+import { formatDateTime as formatGreenhouseDateTime } from '@/lib/format'
 
 // TASK-412 — admin audit view for payroll period reopen events.
 // Shows every reapertura with fecha, período, operador, motivo, detalle y
@@ -74,13 +75,13 @@ const formatDateTime = (value: string | null) => {
   if (!value) return '—'
 
   try {
-    return new Date(value).toLocaleString('es-CL', {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    })
+    return formatGreenhouseDateTime(new Date(value), {
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric',
+  hour: '2-digit',
+  minute: '2-digit'
+}, 'es-CL')
   } catch {
     return value
   }

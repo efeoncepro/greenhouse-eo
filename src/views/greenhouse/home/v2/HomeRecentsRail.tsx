@@ -19,6 +19,7 @@ import type { ThemeColor } from '@core/types'
 import OptionMenu from '@core/components/option-menu'
 
 import type { HomeRecentItem, HomeRecentsRailData } from '@/lib/home/contract'
+import { formatDate as formatGreenhouseDate } from '@/lib/format'
 
 const TASK407_ARIA_CONTINUA_DONDE_LO_DEJASTE = "Continúa donde lo dejaste"
 
@@ -79,7 +80,9 @@ const formatRelativeTime = (iso: string): string => {
 
   if (days < 30) return `hace ${days} d`
 
-  return new Date(iso).toLocaleDateString('es-CL', { dateStyle: 'medium' })
+  return formatGreenhouseDate(new Date(iso), {
+  dateStyle: 'medium'
+}, 'es-CL')
 }
 
 interface RecentTimelineItemProps {

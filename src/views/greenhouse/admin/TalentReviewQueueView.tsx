@@ -43,6 +43,7 @@ import { GH_SKILLS_CERTS } from '@/config/greenhouse-nomenclature'
 import { getInitials } from '@/utils/getInitials'
 
 import tableStyles from '@core/styles/table.module.css'
+import { formatDate as formatGreenhouseDate } from '@/lib/format'
 
 // ── Types ────────────────────────────────────────────────────────
 
@@ -169,7 +170,10 @@ const formatDate = (value: string | null): string => {
   if (!value) return '—'
 
   try {
-    return new Intl.DateTimeFormat('es-CL', { dateStyle: 'medium', timeZone: 'America/Santiago' }).format(new Date(value))
+    return formatGreenhouseDate(new Date(value), {
+  dateStyle: 'medium',
+  timeZone: 'America/Santiago'
+}, 'es-CL')
   } catch {
     return value
   }

@@ -57,6 +57,7 @@ import type {
 } from '@/types/service-sla'
 
 import tableStyles from '@core/styles/table.module.css'
+import { formatCurrency as formatGreenhouseCurrency, formatDate as formatGreenhouseDate, formatNumber as formatGreenhouseNumber } from '@/lib/format'
 
 const GREENHOUSE_COPY = getMicrocopy()
 
@@ -152,27 +153,31 @@ const LINEA_LABEL: Record<string, string> = {
 const formatCurrency = (amount: number | null, currency: string) => {
   if (amount == null) return '—'
 
-  return new Intl.NumberFormat('es-CL', {
-    style: 'currency',
-    currency: currency || 'CLP',
-    maximumFractionDigits: 0
-  }).format(amount)
+  return formatGreenhouseCurrency(amount, currency || 'CLP', {
+  maximumFractionDigits: 0
+}, 'es-CL')
 }
 
 const formatDate = (date: string | null) => {
   if (!date) return '—'
 
-  return new Date(date + 'T00:00:00').toLocaleDateString('es-CL', {
-    year: 'numeric', month: 'short', day: 'numeric'
-  })
+  return formatGreenhouseDate(new Date(date + 'T00:00:00'), {
+  year: 'numeric',
+  month: 'short',
+  day: 'numeric'
+}, 'es-CL')
 }
 
 const formatTimestamp = (ts: string | null) => {
   if (!ts) return '—'
 
-  return new Date(ts).toLocaleDateString('es-CL', {
-    year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
-  })
+  return formatGreenhouseDate(new Date(ts), {
+  year: 'numeric',
+  month: 'short',
+  day: 'numeric',
+  hour: '2-digit',
+  minute: '2-digit'
+}, 'es-CL')
 }
 
 const FIELD_LABELS: Record<string, string> = {
@@ -253,14 +258,18 @@ const formatSlaValue = (value: number | null, unit: ServiceSlaUnit | null) => {
   if (value == null) return '—'
 
   if (unit === 'percent') {
-    return `${new Intl.NumberFormat('es-CL', { maximumFractionDigits: 1 }).format(value)}%`
+    return `${formatGreenhouseNumber(value, {
+  maximumFractionDigits: 1
+}, 'es-CL')}%`
   }
 
   if (unit === 'days' || unit === 'rounds') {
     return String(Math.round(value))
   }
 
-  return new Intl.NumberFormat('es-CL', { maximumFractionDigits: 2 }).format(value)
+  return formatGreenhouseNumber(value, {
+  maximumFractionDigits: 2
+}, 'es-CL')
 }
 
 const formatSlaThreshold = (mode: ServiceSlaComparisonMode, value: number | null, unit: ServiceSlaUnit | null) => {
@@ -906,7 +915,9 @@ const ServiceDetailView = ({ serviceId }: Props) => {
                                     {SLA_TREND_LABELS[item.trendStatus]}
                                   </Typography>
                                   <Typography variant='caption' color='text.secondary'>
-                                    Delta {item.deltaToTarget == null ? '—' : `${item.deltaToTarget > 0 ? '+' : ''}${new Intl.NumberFormat('es-CL', { maximumFractionDigits: 2 }).format(item.deltaToTarget)}`}
+                                    Delta {item.deltaToTarget == null ? '—' : `${item.deltaToTarget > 0 ? '+' : ''}${formatGreenhouseNumber(item.deltaToTarget, {
+  maximumFractionDigits: 2
+}, 'es-CL')}`}
                                   </Typography>
                                 </Stack>
                               </TableCell>

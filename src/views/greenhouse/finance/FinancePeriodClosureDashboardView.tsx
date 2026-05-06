@@ -38,6 +38,7 @@ import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 import { EmptyState, ExecutiveCardShell } from '@/components/greenhouse'
 import { getMicrocopy } from '@/lib/copy'
+import { formatCurrency as formatGreenhouseCurrency, formatDate as formatGreenhouseDate, formatDateTime as formatGreenhouseDateTime } from '@/lib/format'
 
 const GREENHOUSE_COPY = getMicrocopy()
 
@@ -120,11 +121,9 @@ const PERIOD_FILTER_OPTIONS: Array<{ value: PeriodFilter; label: string }> = [
 const MONTH_LABELS = GREENHOUSE_COPY.months.long
 
 const formatCurrency = (value: number) =>
-  new Intl.NumberFormat('es-CL', {
-    style: 'currency',
-    currency: 'CLP',
-    maximumFractionDigits: 0
-  }).format(value)
+  formatGreenhouseCurrency(value, 'CLP', {
+  maximumFractionDigits: 0
+}, 'es-CL')
 
 const formatMargin = (value: number | null) => {
   if (value == null) return '—'
@@ -145,18 +144,18 @@ const parseDisplayDate = (value: string) => {
 const formatDateTime = (value: string | null) => {
   if (!value) return '—'
 
-  return new Intl.DateTimeFormat('es-CL', {
-    dateStyle: 'medium',
-    timeStyle: 'short'
-  }).format(parseDisplayDate(value))
+  return formatGreenhouseDateTime(parseDisplayDate(value), {
+  dateStyle: 'medium',
+  timeStyle: 'short'
+}, 'es-CL')
 }
 
 const formatDate = (value: string | null) => {
   if (!value) return '—'
 
-  return new Intl.DateTimeFormat('es-CL', {
-    dateStyle: 'medium'
-  }).format(parseDisplayDate(value))
+  return formatGreenhouseDate(parseDisplayDate(value), {
+  dateStyle: 'medium'
+}, 'es-CL')
 }
 
 const getLifecycleChip = (status: PeriodClosureLifecycle) => {

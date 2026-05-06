@@ -25,6 +25,8 @@ export interface FormatDateOptions extends Omit<Intl.DateTimeFormatOptions, 'tim
 
 export interface FormatDateTimeOptions extends Intl.DateTimeFormatOptions, FormatOptions {}
 
+export interface FormatTimeOptions extends Omit<Intl.DateTimeFormatOptions, 'year' | 'month' | 'day' | 'weekday' | 'era' | 'dateStyle'>, FormatOptions {}
+
 export interface FormatNumberOptions extends Intl.NumberFormatOptions, FormatOptions {}
 
 export interface FormatCurrencyOptions extends Omit<Intl.NumberFormatOptions, 'style' | 'currency'>, FormatOptions {

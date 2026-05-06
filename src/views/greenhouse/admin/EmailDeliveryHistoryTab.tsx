@@ -36,6 +36,7 @@ import TablePaginationComponent from '@/components/TablePaginationComponent'
 import EmailDeliveryDetailDrawer from './EmailDeliveryDetailDrawer'
 
 import tableStyles from '@core/styles/table.module.css'
+import { formatDateTime as formatGreenhouseDateTime } from '@/lib/format'
 
 const GREENHOUSE_COPY = getMicrocopy()
 
@@ -117,9 +118,13 @@ const formatRelativeTime = (dateString: string) => {
 }
 
 const formatAbsoluteTime = (dateString: string) =>
-  new Date(dateString).toLocaleString('es-CL', {
-    day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
-  })
+  formatGreenhouseDateTime(new Date(dateString), {
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric',
+  hour: '2-digit',
+  minute: '2-digit'
+}, 'es-CL')
 
 const columnHelper = createColumnHelper<EmailDelivery>()
 

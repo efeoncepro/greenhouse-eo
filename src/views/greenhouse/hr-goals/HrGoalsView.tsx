@@ -46,6 +46,7 @@ import type {
   GoalsResponse,
   CreateGoalCycleInput
 } from '@/types/hr-goals'
+import { formatDate as formatGreenhouseDate } from '@/lib/format'
 
 const GREENHOUSE_COPY = getMicrocopy()
 
@@ -98,7 +99,11 @@ const INITIAL_FORM: CreateGoalCycleInput = {
 
 const formatDate = (iso: string) => {
   try {
-    return new Intl.DateTimeFormat('es-CL', { day: '2-digit', month: 'short', year: 'numeric' }).format(new Date(iso))
+    return formatGreenhouseDate(new Date(iso), {
+  day: '2-digit',
+  month: 'short',
+  year: 'numeric'
+}, 'es-CL')
   } catch {
     return iso
   }

@@ -27,6 +27,7 @@ import CustomChip from '@core/components/mui/Chip'
 import CustomTabList from '@core/components/mui/TabList'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 import type { TimeToMarketMetric } from '@/lib/ico-engine/time-to-market'
+import { formatDate as formatGreenhouseDate, formatNumber as formatGreenhouseNumber } from '@/lib/format'
 
 // ── Types ──
 
@@ -98,12 +99,16 @@ const TYPE_COLORS: Record<string, 'primary' | 'success' | 'warning' | 'info' | '
   campaign: 'primary', launch: 'success', seasonal: 'warning', sprint_group: 'info', always_on: 'secondary'
 }
 
-const formatClp = (n: number) => `$${Math.round(n).toLocaleString('es-CL')}`
+const formatClp = (n: number) => `$${formatGreenhouseNumber(Math.round(n), 'es-CL')}`
 
 const formatDate = (d: string | null) => {
   if (!d) return '—'
 
-  return new Date(d + 'T12:00:00').toLocaleDateString('es-CL', { day: 'numeric', month: 'short', year: 'numeric' })
+  return formatGreenhouseDate(new Date(d + 'T12:00:00'), {
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric'
+}, 'es-CL')
 }
 
 const pctStr = (v: number | null) => v != null ? `${Math.round(v)}%` : '—'

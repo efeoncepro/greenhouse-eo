@@ -31,6 +31,7 @@ import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSu
 import EmptyState from '@/components/greenhouse/EmptyState'
 
 import tableStyles from '@core/styles/table.module.css'
+import { formatCurrency as formatGreenhouseCurrency } from '@/lib/format'
 
 // ── Types ──────────────────────────────────────────────────────────────
 
@@ -92,11 +93,9 @@ const LINEA_LABEL: Record<string, string> = {
 const formatCurrency = (amount: number | null, currency: string) => {
   if (amount == null) return '—'
 
-  return new Intl.NumberFormat('es-CL', {
-    style: 'currency',
-    currency: currency || 'CLP',
-    maximumFractionDigits: 0
-  }).format(amount)
+  return formatGreenhouseCurrency(amount, currency || 'CLP', {
+  maximumFractionDigits: 0
+}, 'es-CL')
 }
 
 // ── Component ──────────────────────────────────────────────────────────

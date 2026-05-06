@@ -46,6 +46,7 @@ import CustomTextField from '@core/components/mui/TextField'
 
 import tableStyles from '@core/styles/table.module.css'
 import { getMicrocopy } from '@/lib/copy'
+import { formatCurrency as formatGreenhouseCurrency, formatNumber as formatGreenhouseNumber } from '@/lib/format'
 
 const GREENHOUSE_COPY = getMicrocopy()
 const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'), { ssr: false })
@@ -148,9 +149,11 @@ const METHOD_LABELS: Record<string, string> = {
 }
 
 const formatClp = (v: number) =>
-  new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(v)
+  formatGreenhouseCurrency(v, 'CLP', {
+  maximumFractionDigits: 0
+}, 'es-CL')
 
-const formatClpShort = (n: number) => `$${Math.round(n).toLocaleString('es-CL')}`
+const formatClpShort = (n: number) => `$${formatGreenhouseNumber(Math.round(n), 'es-CL')}`
 
 // ---------------------------------------------------------------------------
 // Drill-down sub-component

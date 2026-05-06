@@ -36,6 +36,7 @@ import { contractTypeLabel, employmentTypeLabel, formatDate, healthSystemLabel, 
 import { buildPersonHrProfileViewModel } from './person-hr-profile-view-model'
 import MemberRoleTitleSection from './MemberRoleTitleSection'
 import PersonLegalProfileSection from './PersonLegalProfileSection'
+import { formatCurrency as formatGreenhouseCurrency, formatNumber as formatGreenhouseNumber } from '@/lib/format'
 
 const GREENHOUSE_COPY = getMicrocopy()
 
@@ -105,12 +106,10 @@ const formatCurrency = (value: number | null, currency: string | null) => {
   const normalizedCurrency = currency || 'USD'
   const minimumFractionDigits = normalizedCurrency === 'CLP' ? 0 : 2
 
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: normalizedCurrency,
-    minimumFractionDigits,
-    maximumFractionDigits: minimumFractionDigits
-  }).format(value)
+  return formatGreenhouseCurrency(value, normalizedCurrency, {
+  minimumFractionDigits,
+  maximumFractionDigits: minimumFractionDigits
+}, 'en-US')
 }
 
 const PersonHrProfileTab = ({ memberId, hrContext = null, defaultOperationalMetrics = null }: Props) => {
@@ -841,7 +840,7 @@ function FinanceImpactCard({ memberId }: { memberId: string }) {
 
   if (!data || !data.cost) return null
 
-  const formatCLP = (v: number) => `$${Math.round(v).toLocaleString('es-CL')}`
+  const formatCLP = (v: number) => `$${formatGreenhouseNumber(Math.round(v), 'es-CL')}`
 
   const periodLabel = data.cost ? `${String(data.cost.periodMonth).padStart(2, '0')}/${data.cost.periodYear}` : null
 

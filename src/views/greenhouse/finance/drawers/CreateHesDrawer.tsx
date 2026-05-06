@@ -30,6 +30,7 @@ import {
   loadFinanceClientContactOptions,
   type FinanceContactOption
 } from './financeClientContacts'
+import { formatCurrency as formatGreenhouseCurrency } from '@/lib/format'
 
 const GREENHOUSE_COPY = getMicrocopy()
 
@@ -63,7 +64,9 @@ const getClientLabel = (c: ClientOption) =>
 const getClientValue = (client: ClientOption) => client.clientId || client.organizationId || client.clientProfileId
 
 const formatCLP = (n: number) =>
-  new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(n)
+  formatGreenhouseCurrency(n, 'CLP', {
+  maximumFractionDigits: 0
+}, 'es-CL')
 
 // ── Props ──
 

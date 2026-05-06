@@ -32,6 +32,7 @@ import PaymentRegistrationCard from '@views/greenhouse/finance/components/Paymen
 import PaymentHistoryTable from '@views/greenhouse/finance/components/PaymentHistoryTable'
 import SettlementOrchestrationDrawer from '@views/greenhouse/finance/drawers/SettlementOrchestrationDrawer'
 import FactoringOperationDrawer from '@views/greenhouse/finance/drawers/FactoringOperationDrawer'
+import { formatCurrency as formatGreenhouseCurrency } from '@/lib/format'
 
 const TASK407_ARIA_ACTUALIZAR_ESTADO_DEL_DTE_EN_SII = "Actualizar estado del DTE en SII"
 const TASK407_ARIA_EMITIR_DOCUMENTO_TRIBUTARIO_ELECTRONICO = "Emitir documento tributario electrónico"
@@ -98,7 +99,9 @@ interface IncomeDetail {
 // ---------------------------------------------------------------------------
 
 const formatAmount = (amount: number, currency: string) =>
-  new Intl.NumberFormat('es-CL', { style: 'currency', currency, maximumFractionDigits: currency === 'CLP' ? 0 : 2 }).format(amount)
+  formatGreenhouseCurrency(amount, currency, {
+  maximumFractionDigits: currency === 'CLP' ? 0 : 2
+}, 'es-CL')
 
 const formatDate = (dateStr: string | null): string => {
   if (!dateStr) return '—'

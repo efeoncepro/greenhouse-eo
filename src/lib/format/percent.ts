@@ -1,11 +1,12 @@
 import { resolveFormatLocale } from './locale-context'
-import { DEFAULT_FORMAT_FALLBACK, type FormatPercentOptions } from './types'
+import { DEFAULT_FORMAT_FALLBACK, type FormatLocale, type FormatPercentOptions } from './types'
 
 export const formatPercent = (
   value: number | null | undefined,
-  options: FormatPercentOptions = {},
+  optionsOrLocale: FormatPercentOptions | FormatLocale = {},
   locale?: FormatPercentOptions['locale']
 ): string => {
+  const options = typeof optionsOrLocale === 'string' ? {} : optionsOrLocale
   const fallback = options.fallback ?? DEFAULT_FORMAT_FALLBACK
 
   if (value == null || !Number.isFinite(value)) return fallback
@@ -14,7 +15,7 @@ export const formatPercent = (
 
   delete intlOptions.fallback
 
-  const resolvedLocale = resolveFormatLocale(locale ?? optionLocale)
+  const resolvedLocale = resolveFormatLocale(typeof optionsOrLocale === 'string' ? optionsOrLocale : (locale ?? optionLocale))
   const normalized = input === 'percentage' ? value / 100 : value
 
   return new Intl.NumberFormat(resolvedLocale, {

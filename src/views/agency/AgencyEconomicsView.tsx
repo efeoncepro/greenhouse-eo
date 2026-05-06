@@ -31,6 +31,7 @@ import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tool
 
 import tableStyles from '@core/styles/table.module.css'
 import { getMicrocopy } from '@/lib/copy'
+import { formatCurrency as formatGreenhouseCurrency } from '@/lib/format'
 
 const GREENHOUSE_COPY = getMicrocopy()
 // ── Types ──
@@ -61,7 +62,9 @@ interface TrendPeriod {
 const MONTHS = ['', ...GREENHOUSE_COPY.months.short]
 
 const fmtClp = (n: number) =>
-  new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(n)
+  formatGreenhouseCurrency(n, 'CLP', {
+  maximumFractionDigits: 0
+}, 'es-CL')
 
 const pct = (v: number | null | undefined) => v != null ? `${Math.round(v)}%` : '—'
 

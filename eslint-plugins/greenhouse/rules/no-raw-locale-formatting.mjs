@@ -8,7 +8,7 @@ const RAW_INTL_FORMATTERS = new Set(['DateTimeFormat', 'NumberFormat', 'Relative
 const RAW_TO_LOCALE_METHODS = new Set(['toLocaleString', 'toLocaleDateString', 'toLocaleTimeString'])
 
 const FORMAT_HELPER_HINT =
-  'Usa helpers canónicos desde src/lib/format (formatCurrency, formatDate, formatDateTime, formatNumber, formatPercent, formatISODateKey).'
+  'Usa helpers canónicos desde src/lib/format (formatCurrency, formatDate, formatDateTime, formatTime, formatNumber, formatPercent, formatISODateKey).'
 
 const getPropertyName = property => {
   if (!property) return null

@@ -35,6 +35,7 @@ import {
   ReferenceLine
 } from '@/libs/Recharts'
 import { getMicrocopy } from '@/lib/copy'
+import { formatCurrency as formatGreenhouseCurrency } from '@/lib/format'
 
 const GREENHOUSE_COPY = getMicrocopy()
 // ---------------------------------------------------------------------------
@@ -84,7 +85,9 @@ interface CashPositionData {
 // ---------------------------------------------------------------------------
 
 const formatCLP = (amount: number): string => {
-  return new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(amount)
+  return formatGreenhouseCurrency(amount, 'CLP', {
+  maximumFractionDigits: 0
+}, 'es-CL')
 }
 
 const formatYAxis = (val: number): string => {
@@ -356,11 +359,9 @@ const CashPositionView = () => {
                         <TableCell align='right'>
                           {account.currency === 'CLP'
                             ? formatCLP(account.openingBalance)
-                            : new Intl.NumberFormat('es-CL', {
-                                style: 'currency',
-                                currency: account.currency,
-                                maximumFractionDigits: 2
-                              }).format(account.openingBalance)}
+                            : formatGreenhouseCurrency(account.openingBalance, account.currency, {
+  maximumFractionDigits: 2
+}, 'es-CL')}
                         </TableCell>
                       </TableRow>
                     ))}

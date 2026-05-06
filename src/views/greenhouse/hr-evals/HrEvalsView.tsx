@@ -55,6 +55,7 @@ import type {
   EvalSummaryWithDetails,
   EvalType
 } from '@/types/hr-evals'
+import { formatDate as formatGreenhouseDate } from '@/lib/format'
 
 const TASK407_ARIA_FILTRAR_POR_TIPO = "Filtrar por tipo"
 const TASK407_ARIA_SECCIONES_DE_EVALUACIONES = "Secciones de evaluaciones"
@@ -136,7 +137,11 @@ const formatDate = (iso: string | null) => {
   if (!iso) return '-'
 
   try {
-    return new Intl.DateTimeFormat('es-CL', { day: '2-digit', month: 'short', year: 'numeric' }).format(new Date(iso))
+    return formatGreenhouseDate(new Date(iso), {
+  day: '2-digit',
+  month: 'short',
+  year: 'numeric'
+}, 'es-CL')
   } catch {
     return iso
   }

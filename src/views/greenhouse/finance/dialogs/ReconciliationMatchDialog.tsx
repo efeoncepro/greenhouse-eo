@@ -27,6 +27,7 @@ import { getMicrocopy } from '@/lib/copy'
 
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
+import { formatCurrency as formatGreenhouseCurrency } from '@/lib/format'
 
 const TASK407_EMPTY_NO_SE_ENCONTRARON_CANDIDATOS_PARA_CONCILIAR_AJUSTA_LOS_FIL = "No se encontraron candidatos para conciliar. Ajusta los filtros o verifica que existan registros en el periodo."
 
@@ -88,7 +89,9 @@ type Props = {
 // ---------------------------------------------------------------------------
 
 const formatCLP = (amount: number): string =>
-  new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(amount)
+  formatGreenhouseCurrency(amount, 'CLP', {
+  maximumFractionDigits: 0
+}, 'es-CL')
 
 const formatDate = (dateStr: string | null): string => {
   if (!dateStr) return '—'

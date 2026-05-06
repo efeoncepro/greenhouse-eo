@@ -42,6 +42,7 @@ import type {
 import type { PaymentProfileQueueSummary } from '@/lib/finance/beneficiary-payment-profiles/queue-summary'
 
 import ProfileDetailDrawer from './ProfileDetailDrawer'
+import { formatCurrency as formatGreenhouseCurrency, formatDate as formatGreenhouseDate } from '@/lib/format'
 
 const TASK407_ARIA_CARGANDO_UNIVERSO_DE_PERFILES = "Cargando universo de perfiles"
 const TASK407_ARIA_ABRIR_EN_360 = "Abrir en 360"
@@ -100,11 +101,9 @@ const BENEFICIARY_TYPE_LABEL: Record<BeneficiaryPaymentProfileBeneficiaryType, s
 }
 
 const formatAmount = (amount: number, currency: string) =>
-  new Intl.NumberFormat('es-CL', {
-    style: 'currency',
-    currency,
-    maximumFractionDigits: currency === 'USD' ? 2 : 0
-  }).format(amount)
+  formatGreenhouseCurrency(amount, currency, {
+  maximumFractionDigits: currency === 'USD' ? 2 : 0
+}, 'es-CL')
 
 const buildDeepLink = (profile: BeneficiaryPaymentProfileSafe): string => {
   if (profile.beneficiaryType === 'member') {
@@ -307,10 +306,10 @@ const PaymentProfilesView = () => {
                         </Typography>
                       </Stack>
                       <Typography variant='caption' color='text.secondary'>
-                        {new Date(p.createdAt).toLocaleDateString('es-CL', {
-                          day: '2-digit',
-                          month: 'short'
-                        })}
+                        {formatGreenhouseDate(new Date(p.createdAt), {
+  day: '2-digit',
+  month: 'short'
+}, 'es-CL')}
                       </Typography>
                     </Stack>
                   ))}

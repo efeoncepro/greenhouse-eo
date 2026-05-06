@@ -1,7 +1,7 @@
 # Formatear fechas, montos y numeros
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-05-06
 > **Modulo:** Plataforma
 > **Ruta en portal:** Transversal
@@ -28,6 +28,7 @@ import {
   formatCurrency,
   formatDate,
   formatDateTime,
+  formatTime,
   formatISODateKey,
   formatNumber,
   formatPercent
@@ -37,14 +38,15 @@ import {
 2. Para montos visibles, usa `formatCurrency`:
 
 ```ts
-formatCurrency(121963, { currency: 'CLP' })
+formatCurrency(121963, 'CLP')
 ```
 
-3. Para fechas visibles, usa `formatDate` o `formatDateTime`:
+3. Para fechas visibles, usa `formatDate`, `formatDateTime` o `formatTime`:
 
 ```ts
 formatDate('2026-05-06')
 formatDateTime(new Date())
+formatTime(new Date())
 ```
 
 4. Para keys operacionales `YYYY-MM-DD`, usa `formatISODateKey`:
@@ -56,8 +58,9 @@ formatISODateKey(new Date())
 5. Si el tenant o usuario requiere Brasil, pasa contexto explicito:
 
 ```ts
-formatCurrency(1500, { currency: 'BRL', locale: 'pt-BR' })
-formatDate('2026-05-06', { locale: 'pt-BR', timeZone: 'America/Sao_Paulo' })
+formatCurrency(1500, 'BRL', 'pt-BR')
+formatDate('2026-05-06', { timeZone: 'America/Sao_Paulo' }, 'pt-BR')
+formatTime(new Date(), 'pt-BR')
 ```
 
 ## Que helper usar
@@ -68,6 +71,7 @@ formatDate('2026-05-06', { locale: 'pt-BR', timeZone: 'America/Sao_Paulo' })
 | Monto contable negativo | `formatAccountingCurrency` |
 | Fecha | `formatDate` |
 | Fecha y hora | `formatDateTime` |
+| Hora sin fecha | `formatTime` |
 | Key `YYYY-MM-DD` | `formatISODateKey` |
 | Numero decimal | `formatNumber` |
 | Entero | `formatInteger` |
@@ -90,6 +94,7 @@ Esto cambia la forma de mostrar datos, no traduce labels. Los textos visibles se
 - No usar `new Intl.NumberFormat(...)` directo en una vista.
 - No usar `new Intl.DateTimeFormat(...)` directo en una vista.
 - No usar `value.toLocaleString(...)` directo en UI, PDF, Excel o emails.
+- No crear formatters locales singleton para esquivar ESLint.
 - No formatear fechas `YYYY-MM-DD` con `new Date(value)` sin pasar por el helper.
 - No sumar monedas distintas para "arreglar" una visualizacion.
 - No usar `formatCurrency` para convertir FX.

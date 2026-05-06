@@ -28,6 +28,7 @@ import {
   type PaymentObligation,
   type PaymentObligationKind
 } from '@/types/payment-obligations'
+import { formatCurrency as formatGreenhouseCurrency, formatDate as formatGreenhouseDate } from '@/lib/format'
 
 interface ObligationsTabProps {
   obligations: PaymentObligation[]
@@ -43,11 +44,9 @@ interface ObligationsTabProps {
 type StatusFilter = 'all' | 'to_schedule' | 'overdue' | 'usd_only'
 
 const formatAmount = (amount: number, currency: string) =>
-  new Intl.NumberFormat('es-CL', {
-    style: 'currency',
-    currency,
-    maximumFractionDigits: currency === 'USD' ? 2 : 0
-  }).format(amount)
+  formatGreenhouseCurrency(amount, currency, {
+  maximumFractionDigits: currency === 'USD' ? 2 : 0
+}, 'es-CL')
 
 const obligationKindMeta: Record<
   PaymentObligationKind,
@@ -129,7 +128,12 @@ const dueDateLabel = (dueDate: string | null) => {
   today.setHours(0, 0, 0, 0)
   const due = new Date(dueDate + 'T00:00:00')
   const diffDays = Math.floor((due.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
-  const formatted = due.toLocaleDateString('es-CL', { day: '2-digit', month: 'short', year: 'numeric' })
+
+  const formatted = formatGreenhouseDate(due, {
+  day: '2-digit',
+  month: 'short',
+  year: 'numeric'
+}, 'es-CL')
 
   if (diffDays < 0) {
     return (

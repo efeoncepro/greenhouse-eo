@@ -17,6 +17,7 @@ import Typography from '@mui/material/Typography'
 
 import { GH_CLIENT_NAV, GH_LABELS, GH_MESSAGES } from '@/config/greenhouse-nomenclature'
 import type { GreenhouseProjectsData } from '@/types/greenhouse-projects'
+import { formatDate as formatGreenhouseDate } from '@/lib/format'
 
 const fallbackData: GreenhouseProjectsData = {
   items: [],
@@ -33,7 +34,7 @@ const formatDateRange = (startDate: string | null, endDate: string | null) => {
   }
 
   const format = (value: string | null) =>
-    value ? new Date(`${value}T00:00:00`).toLocaleDateString() : GH_MESSAGES.projects_dates_open
+    value ? formatGreenhouseDate(new Date(`${value}T00:00:00`)) : GH_MESSAGES.projects_dates_open
 
   return `${format(startDate)} - ${format(endDate)}`
 }

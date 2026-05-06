@@ -43,6 +43,7 @@ import type {
   HrOnboardingTemplateItem,
   HrOnboardingTemplateType
 } from '@/types/hr-onboarding'
+import { formatDate as formatGreenhouseDate } from '@/lib/format'
 
 const GREENHOUSE_COPY = getMicrocopy()
 
@@ -101,7 +102,11 @@ const assignedRoles: HrOnboardingAssignedRole[] = ['hr', 'it', 'supervisor', 'co
 const formatDate = (value?: string | null) => {
   if (!value) return 'Sin fecha'
 
-  return new Intl.DateTimeFormat('es-CL', { day: '2-digit', month: 'short', year: 'numeric' }).format(new Date(`${value.slice(0, 10)}T00:00:00`))
+  return formatGreenhouseDate(new Date(`${value.slice(0, 10)}T00:00:00`), {
+  day: '2-digit',
+  month: 'short',
+  year: 'numeric'
+}, 'es-CL')
 }
 
 const isItemClosed = (status: string) => status === 'done' || status === 'skipped'

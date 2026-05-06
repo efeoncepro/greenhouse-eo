@@ -54,6 +54,11 @@ import {
   type ReadinessStatus,
   type SectionHealth
 } from './paymentInstrumentAdminAdapters'
+import {
+  formatCurrency as formatGreenhouseCurrency,
+  formatDate as formatGreenhouseDate,
+  formatDateTime as formatGreenhouseDateTime
+} from '@/lib/format'
 
 const TASK407_ARIA_CARGANDO_WORKSPACE_DEL_INSTRUMENTO_DE_PAGO = "Cargando workspace del instrumento de pago"
 const TASK407_ARIA_ACTUALIZANDO_DETALLE_DEL_INSTRUMENTO = "Actualizando detalle del instrumento"
@@ -81,22 +86,11 @@ type ResponsibleCandidate = {
   isFinanceRole: boolean
 }
 
-const dateFormatter = new Intl.DateTimeFormat('es-CL', {
-  dateStyle: 'medium',
-  timeZone: 'America/Santiago'
-})
-
-const dateTimeFormatter = new Intl.DateTimeFormat('es-CL', {
-  dateStyle: 'medium',
-  timeStyle: 'short',
-  timeZone: 'America/Santiago'
-})
-
 const formatDate = (value: string | null | undefined) => {
   if (!value) return 'Sin fecha'
 
   try {
-    return dateFormatter.format(new Date(value))
+    return formatGreenhouseDate(value, { dateStyle: 'medium' })
   } catch {
     return 'Fecha no valida'
   }
@@ -106,18 +100,16 @@ const formatDateTime = (value: string | null | undefined) => {
   if (!value) return 'Sin registro'
 
   try {
-    return dateTimeFormatter.format(new Date(value))
+    return formatGreenhouseDateTime(value, { dateStyle: 'medium', timeStyle: 'short' })
   } catch {
     return 'Fecha no valida'
   }
 }
 
 const formatCurrency = (amount: number | null | undefined, currency: string) =>
-  new Intl.NumberFormat('es-CL', {
-    style: 'currency',
-    currency,
-    maximumFractionDigits: currency === 'CLP' ? 0 : 2
-  }).format(Number(amount ?? 0))
+  formatGreenhouseCurrency(Number(amount ?? 0), currency, {
+  maximumFractionDigits: currency === 'CLP' ? 0 : 2
+}, 'es-CL')
 
 const readinessCopy: Record<ReadinessStatus, { label: string; color: 'success' | 'warning' | 'error' | 'secondary'; helper: string }> = {
   ready: {

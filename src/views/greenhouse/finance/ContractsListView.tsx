@@ -25,6 +25,7 @@ import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSu
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 import { buildStatusMap } from '@/lib/copy'
+import { formatCurrency as formatGreenhouseCurrency, formatDate as formatGreenhouseDate } from '@/lib/format'
 
 type ContractStatus = 'draft' | 'active' | 'paused' | 'terminated' | 'completed' | 'renewed'
 
@@ -84,11 +85,9 @@ const toNumberOrNull = (value: unknown) => {
 const formatCLP = (amount: number | null | undefined) => {
   if (amount === null || amount === undefined) return '—'
 
-  return new Intl.NumberFormat('es-CL', {
-    style: 'currency',
-    currency: 'CLP',
-    maximumFractionDigits: 0
-  }).format(amount)
+  return formatGreenhouseCurrency(amount, 'CLP', {
+  maximumFractionDigits: 0
+}, 'es-CL')
 }
 
 const formatDate = (value: string | null) => {
@@ -98,11 +97,11 @@ const formatDate = (value: string | null) => {
 
   if (Number.isNaN(date.getTime())) return '—'
 
-  return date.toLocaleDateString('es-CL', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric'
-  })
+  return formatGreenhouseDate(date, {
+  day: '2-digit',
+  month: 'short',
+  year: 'numeric'
+}, 'es-CL')
 }
 
 const normalizeContract = (value: unknown): ContractListItem => {

@@ -13,6 +13,8 @@ import Skeleton from '@mui/material/Skeleton'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
+import { formatCurrency as formatGreenhouseCurrency, formatDateTime as formatGreenhouseDateTime } from '@/lib/format'
+
 interface VersionDiffLineItem {
   label: string
   unitPrice: number | null
@@ -69,11 +71,9 @@ interface Props {
 const formatCLP = (amount: number | null) => {
   if (amount === null) return '—'
 
-  return new Intl.NumberFormat('es-CL', {
-    style: 'currency',
-    currency: 'CLP',
-    maximumFractionDigits: 0
-  }).format(amount)
+  return formatGreenhouseCurrency(amount, 'CLP', {
+  maximumFractionDigits: 0
+}, 'es-CL')
 }
 
 const formatDate = (iso: string) => {
@@ -81,7 +81,10 @@ const formatDate = (iso: string) => {
 
   if (Number.isNaN(d.getTime())) return iso
 
-  return d.toLocaleString('es-CL', { dateStyle: 'medium', timeStyle: 'short' })
+  return formatGreenhouseDateTime(d, {
+  dateStyle: 'medium',
+  timeStyle: 'short'
+}, 'es-CL')
 }
 
 const formatPct = (value: number | null) => {

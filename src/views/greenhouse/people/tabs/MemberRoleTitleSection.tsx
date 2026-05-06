@@ -21,6 +21,7 @@ import type { Theme } from '@mui/material/styles'
 import { getMicrocopy } from '@/lib/copy'
 
 import CustomChip from '@core/components/mui/Chip'
+import { formatDate as formatGreenhouseDate } from '@/lib/format'
 
 const GREENHOUSE_COPY = getMicrocopy()
 
@@ -74,7 +75,11 @@ const formatDate = (iso: string | null): string => {
   if (!iso) return '—'
 
   try {
-    return new Date(iso).toLocaleDateString('es-CL', { year: 'numeric', month: 'short', day: 'numeric' })
+    return formatGreenhouseDate(new Date(iso), {
+  year: 'numeric',
+  month: 'short',
+  day: 'numeric'
+}, 'es-CL')
   } catch {
     return iso
   }

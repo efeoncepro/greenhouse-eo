@@ -22853,3 +22853,34 @@ Cierre / follow-ups:
 - TASK-408 puede promover `greenhouse/no-untokenized-copy` a `error` cubriendo 6 patterns.
 - `TASK-811` conserva el trim de `greenhouse-nomenclature.ts`, fuera de scope de TASK-407.
 - No se ejecutó smoke visual manual en preview/staging; el cambio fue refactor de strings y quedó cubierto por lint/tsc/test/build. Si se quiere evidencia visual, revisar `/home`, `/finance/cash-out`, `/finance/reconciliation`, `/people` y `/admin/ops-health` en staging.
+
+## Sesion 2026-05-06 — TASK-429 follow-up: baseline `no-raw-locale-formatting` en cero
+
+Contexto:
+
+- Tras cerrar TASK-407, `pnpm lint` quedaba con 0 errores pero 265 warnings heredados de `greenhouse/no-raw-locale-formatting`.
+- El usuario pidió resolver ese remanente de forma robusta, segura, resiliente y escalable, sin tratarlo como fuera de alcance.
+
+Cambios aplicados:
+
+- Se centralizó el formateo visible restante de `src/components/**` y `src/views/**` en `@/lib/format`, eliminando usos directos de `Intl.NumberFormat`, `Intl.DateTimeFormat`, `toLocaleString`, `toLocaleDateString` y `toLocaleTimeString` en superficies UI.
+- `src/lib/format` agrega `formatTime()` para horas sin fecha y acepta locale como segundo argumento en helpers de fecha, hora, número, moneda y porcentaje.
+- `formatDate()` ahora respeta `dateStyle/timeStyle` sin mezclar defaults incompatibles.
+- `formatCurrency()` normaliza `minimumFractionDigits/maximumFractionDigits` cuando un caller pide solo un límite de fracción, evitando `RangeError` en runtime.
+- La regla `greenhouse/no-raw-locale-formatting` actualizó su hint para incluir `formatTime`.
+- Se actualizaron la arquitectura UI, documentación funcional, manual de uso, changelog e índice/task de TASK-429 para reflejar el contrato vivo y el baseline cero.
+
+Validaciones:
+
+- `pnpm exec eslint . --format json -o /tmp/locale-warnings-final-check.json` + conteo JSON -> `{ errors: 0, warnings: 0, rawLocaleFormattingWarnings: 0 }`.
+- `pnpm lint` -> pass, 0 errors / 0 warnings.
+- `pnpm exec tsc --noEmit --pretty false` -> pass.
+- `pnpm exec vitest run src/lib/format/__tests__/format.test.ts --reporter=verbose` -> pass.
+- Suites inicialmente afectadas por el sweep (`HrHierarchyView`, `FinancePeriodClosureDashboardView`, `CreatePlacementDialog`, `PlacementDetailView`, `StaffAugmentationListView`) -> pass tras hardening de helpers.
+- `pnpm test` -> 583 test files passed, 3386 tests passed, 5 skipped. El aviso conocido de jsdom/canvas sigue sin fallo.
+- `pnpm build` -> pass.
+
+Riesgos / notas:
+
+- La limpieza estandariza formatos visibles hacia los defaults canónicos de Greenhouse; puede haber diferencias menores de presentación frente a formatos raw anteriores, pero ahora quedan cubiertas por helpers reutilizables, lint y documentación.
+- No hubo migraciones, capabilities, access model, events ni signals nuevos.

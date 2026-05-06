@@ -39,6 +39,7 @@ import CustomTabList from '@core/components/mui/TabList'
 import CustomTextField from '@core/components/mui/TextField'
 
 import { GH_INTERNAL_NAV } from '@/config/greenhouse-nomenclature'
+import { formatDateTime as formatGreenhouseDateTime } from '@/lib/format'
 
 import {
   COMMERCIAL_PARTY_CONFLICT_RESOLUTION_LABELS,
@@ -58,16 +59,10 @@ type Props = {
   canOverride: boolean
 }
 
-const dateTimeFormatter = new Intl.DateTimeFormat('es-CL', {
-  dateStyle: 'medium',
-  timeStyle: 'short',
-  timeZone: 'America/Santiago'
-})
-
 const formatDateTime = (value: string | null) => {
   if (!value) return 'Sin registro'
 
-  return dateTimeFormatter.format(new Date(value))
+  return formatGreenhouseDateTime(value, { dateStyle: 'medium', timeStyle: 'short' })
 }
 
 const formatSince = (value: string) => {

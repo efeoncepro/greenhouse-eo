@@ -22,6 +22,7 @@ import { motion } from '@/libs/FramerMotion'
 import useReducedMotion from '@/hooks/useReducedMotion'
 
 import type { HomeAiInsightCard, HomeAiInsightsBentoData } from '@/lib/home/contract'
+import { formatDateTime as formatGreenhouseDateTime } from '@/lib/format'
 
 const TASK407_ARIA_NEXA_INSIGHTS = "Nexa Insights"
 
@@ -163,7 +164,10 @@ export const HomeAiInsightsBento = ({ data }: HomeAiInsightsBentoProps) => {
         title='Nexa Insights'
         subheader={
           data.lastAnalysisAt
-            ? `${data.totalAnalyzed} señales · último análisis ${new Date(data.lastAnalysisAt).toLocaleString('es-CL', { dateStyle: 'short', timeStyle: 'short' })}`
+            ? `${data.totalAnalyzed} señales · último análisis ${formatGreenhouseDateTime(new Date(data.lastAnalysisAt), {
+  dateStyle: 'short',
+  timeStyle: 'short'
+}, 'es-CL')}`
             : `${data.totalAnalyzed} señales analizadas`
         }
         titleTypographyProps={{ variant: 'h5' }}

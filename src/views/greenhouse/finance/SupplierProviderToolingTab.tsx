@@ -17,6 +17,7 @@ import CustomChip from '@core/components/mui/Chip'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 
 import { EmptyState, ExecutiveCardShell, MetricList } from '@/components/greenhouse'
+import { formatCurrency as formatGreenhouseCurrency, formatDate as formatGreenhouseDate, formatDateTime as formatGreenhouseDateTime } from '@/lib/format'
 
 const TASK407_COPY_GASTO_FINANCIERO_OBSERVADO = "Gasto financiero observado"
 const TASK407_COPY_SUSCRIPCIONES_MODELADAS = "Suscripciones modeladas"
@@ -60,22 +61,20 @@ type Props = {
 }
 
 const formatClp = (value: number) =>
-  new Intl.NumberFormat('es-CL', {
-    style: 'currency',
-    currency: 'CLP',
-    maximumFractionDigits: 0
-  }).format(value)
+  formatGreenhouseCurrency(value, 'CLP', {
+  maximumFractionDigits: 0
+}, 'es-CL')
 
 const formatDate = (value: string | null) => {
   if (!value) {
     return '—'
   }
 
-  return new Intl.DateTimeFormat('es-CL', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric'
-  }).format(new Date(value))
+  return formatGreenhouseDate(new Date(value), {
+  day: '2-digit',
+  month: 'short',
+  year: 'numeric'
+}, 'es-CL')
 }
 
 const formatTimestamp = (value: string | null) => {
@@ -83,13 +82,13 @@ const formatTimestamp = (value: string | null) => {
     return '—'
   }
 
-  return new Intl.DateTimeFormat('es-CL', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  }).format(new Date(value))
+  return formatGreenhouseDateTime(new Date(value), {
+  day: '2-digit',
+  month: 'short',
+  year: 'numeric',
+  hour: '2-digit',
+  minute: '2-digit'
+}, 'es-CL')
 }
 
 const titleCase = (value: string | null) => {

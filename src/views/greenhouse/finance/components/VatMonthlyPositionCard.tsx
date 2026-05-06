@@ -19,11 +19,14 @@ import Typography from '@mui/material/Typography'
 
 import type { VatLedgerEntry, VatMonthlyPosition } from './vat-monthly-position-types'
 import { getMicrocopy } from '@/lib/copy'
+import { formatCurrency as formatGreenhouseCurrency, formatDate as formatGreenhouseDate, formatDateTime as formatGreenhouseDateTime } from '@/lib/format'
 
 const GREENHOUSE_COPY = getMicrocopy()
 
 const formatCLP = (amount: number) =>
-  new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(amount)
+  formatGreenhouseCurrency(amount, 'CLP', {
+  maximumFractionDigits: 0
+}, 'es-CL')
 
 const formatPeriodLabel = (periodId: string) => {
   const [year, month] = periodId.split('-')
@@ -185,7 +188,10 @@ const VatMonthlyPositionCard = ({
             <Chip label={statusMeta.label} color={statusMeta.color} />
             <Typography variant='caption' color='text.secondary'>
               {position.materializedAt
-                ? `Actualizado ${new Date(position.materializedAt).toLocaleString('es-CL', { dateStyle: 'short', timeStyle: 'short' })}`
+                ? `Actualizado ${formatGreenhouseDateTime(new Date(position.materializedAt), {
+  dateStyle: 'short',
+  timeStyle: 'short'
+}, 'es-CL')}`
                 : 'Pendiente de materializar'}
             </Typography>
           </Box>
@@ -253,7 +259,7 @@ const VatMonthlyPositionCard = ({
                         />
                       </TableCell>
                       <TableCell>{entry.sourcePublicRef || entry.sourceId}</TableCell>
-                      <TableCell>{new Date(entry.sourceDate).toLocaleDateString('es-CL')}</TableCell>
+                      <TableCell>{formatGreenhouseDate(new Date(entry.sourceDate), 'es-CL')}</TableCell>
                       <TableCell align='right'>{formatCLP(entry.amountClp)}</TableCell>
                     </TableRow>
                   ))}

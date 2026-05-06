@@ -51,6 +51,11 @@ import type {
   HrMemberOptionsResponse
 } from '@/types/hr-core'
 import { getInitials } from '@/utils/getInitials'
+import {
+  formatDate as formatGreenhouseDate,
+  formatDateTime as formatGreenhouseDateTime,
+  formatNumber as formatGreenhouseNumber
+} from '@/lib/format'
 
 const GREENHOUSE_COPY = getMicrocopy()
 
@@ -84,17 +89,6 @@ type DelegationForm = {
 
 type ApiError = { error?: string }
 
-const DATE_FORMAT = new Intl.DateTimeFormat('es-CL', {
-  dateStyle: 'medium',
-  timeZone: 'America/Santiago'
-})
-
-const DATE_TIME_FORMAT = new Intl.DateTimeFormat('es-CL', {
-  dateStyle: 'medium',
-  timeStyle: 'short',
-  timeZone: 'America/Santiago'
-})
-
 const todayIso = () => {
   const now = new Date()
   const offset = now.getTimezoneOffset()
@@ -106,16 +100,16 @@ const todayIso = () => {
 const formatDate = (value: string | null | undefined) => {
   if (!value) return '—'
 
-  return DATE_FORMAT.format(new Date(value))
+  return formatGreenhouseDate(value, { dateStyle: 'medium' })
 }
 
 const formatDateTime = (value: string | null | undefined) => {
   if (!value) return '—'
 
-  return DATE_TIME_FORMAT.format(new Date(value))
+  return formatGreenhouseDateTime(value, { dateStyle: 'medium', timeStyle: 'short' })
 }
 
-const formatCount = (value: number) => new Intl.NumberFormat('es-CL').format(value)
+const formatCount = (value: number) => formatGreenhouseNumber(value, 'es-CL')
 
 type GovernanceActionState =
   | { kind: 'run' }

@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react'
 
 import useReducedMotion from '@/hooks/useReducedMotion'
 import { useInView, useMotionValue, useSpring } from '@/libs/FramerMotion'
+import { formatCurrency as formatGreenhouseCurrency, formatNumber as formatGreenhouseNumber } from '@/lib/format'
 
 type Format = 'currency' | 'percentage' | 'integer'
 
@@ -19,16 +20,16 @@ interface AnimatedCounterProps {
 const formatNumber = (n: number, format: Format, currency: string, locale: string): string => {
   switch (format) {
     case 'currency':
-      return new Intl.NumberFormat(locale, {
-        style: 'currency',
-        currency,
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0
-      }).format(Math.round(n))
+      return formatGreenhouseCurrency(Math.round(n), currency, {
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 0
+}, locale)
     case 'percentage':
       return `${n.toFixed(1)}%`
     case 'integer':
-      return new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }).format(Math.round(n))
+      return formatGreenhouseNumber(Math.round(n), {
+  maximumFractionDigits: 0
+}, locale)
     default:
       return String(n)
   }

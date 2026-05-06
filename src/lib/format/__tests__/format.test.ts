@@ -5,6 +5,7 @@ import {
   formatCurrency,
   formatDate,
   formatDateTime,
+  formatTime,
   formatInteger,
   formatNumber,
   formatPercent,
@@ -33,6 +34,10 @@ describe('locale-aware format utilities', () => {
 
   it('formats datetimes in the operational timezone by default', () => {
     expect(formatDateTime('2026-05-05T22:18:00.000Z', { dateStyle: 'short', timeStyle: 'short' }, 'es-CL')).toContain('05-05-26')
+  })
+
+  it('formats time-only values without adding a date', () => {
+    expect(formatTime('2026-05-05T22:18:00.000Z', {}, 'es-CL')).toMatch(/18:18|6:18/)
   })
 
   it('formats numbers and percentages with locale separators', () => {

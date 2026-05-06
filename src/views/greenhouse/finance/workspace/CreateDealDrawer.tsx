@@ -28,6 +28,7 @@ import useDealCreationContext, {
   type DealCreationContextPipeline,
   type DealCreationContextStage
 } from '@/hooks/useDealCreationContext'
+import { formatNumber as formatGreenhouseNumber } from '@/lib/format'
 
 const GREENHOUSE_COPY = getMicrocopy()
 
@@ -583,7 +584,7 @@ const CreateDealDrawer = ({
                 }}
                 helperText={
                   parsedAmountClp !== null && currency !== 'CLP'
-                    ? `≈ CLP ${parsedAmountClp.toLocaleString('es-CL')}`
+                    ? `≈ CLP ${formatGreenhouseNumber(parsedAmountClp, 'es-CL')}`
                     : 'Opcional. Ajustable luego en HubSpot.'
                 }
               />

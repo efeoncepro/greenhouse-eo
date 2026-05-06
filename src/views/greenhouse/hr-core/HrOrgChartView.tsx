@@ -32,6 +32,7 @@ import dagre from 'dagre'
 import EmptyState from '@components/greenhouse/EmptyState'
 import { GH_COLORS, GH_HR_NAV } from '@/config/greenhouse-nomenclature'
 import { buildOrgLeadershipView, type HrOrgLeadershipEdge, type HrOrgLeadershipNode } from '@/lib/reporting-hierarchy/org-chart-leadership'
+import { formatNumber as formatGreenhouseNumber } from '@/lib/format'
 import type { HrOrgChartEdge, HrOrgChartMemberOption, HrOrgChartNode, HrOrgChartResponse } from '@/types/hr-core'
 import { getInitials } from '@/utils/getInitials'
 
@@ -49,9 +50,7 @@ const STRUCTURE_NODE_HEIGHT = 228
 const LEADERSHIP_NODE_WIDTH = 320
 const LEADERSHIP_NODE_HEIGHT = 268
 
-const formatNumber = new Intl.NumberFormat('es-CL')
-
-const formatCount = (value: number) => formatNumber.format(value)
+const formatCount = (value: number) => formatGreenhouseNumber(value)
 
 const formatRegime = (value: HrOrgChartNode['payRegime']) => {
   if (value === 'chile') return 'Chile'

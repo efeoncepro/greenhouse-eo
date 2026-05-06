@@ -32,6 +32,7 @@ import CustomTextField from '@core/components/mui/TextField'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 import PaymentInstrumentChip from '@/components/greenhouse/PaymentInstrumentChip'
 import RegisterCashInDrawer from '@views/greenhouse/finance/drawers/RegisterCashInDrawer'
+import { formatCurrency as formatGreenhouseCurrency } from '@/lib/format'
 
 const GREENHOUSE_COPY = getMicrocopy()
 
@@ -92,7 +93,9 @@ interface CashInResponse {
 // ---------------------------------------------------------------------------
 
 const formatCurrency = (amount: number, currency: string = 'CLP'): string =>
-  new Intl.NumberFormat('es-CL', { style: 'currency', currency, maximumFractionDigits: currency === 'CLP' ? 0 : 2 }).format(amount)
+  formatGreenhouseCurrency(amount, currency, {
+  maximumFractionDigits: currency === 'CLP' ? 0 : 2
+}, 'es-CL')
 
 const formatDate = (date: string | null): string => {
   if (!date) return '—'

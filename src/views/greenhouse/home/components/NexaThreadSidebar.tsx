@@ -12,6 +12,7 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
 import type { NexaThreadListItem } from '@/lib/nexa/nexa-contract'
+import { formatDate as formatGreenhouseDate } from '@/lib/format'
 
 const TASK407_ARIA_HISTORIAL_DE_CONVERSACIONES = "Historial de conversaciones"
 const TASK407_ARIA_CERRAR_HISTORIAL = "Cerrar historial"
@@ -35,7 +36,10 @@ const formatRelative = (dateStr: string) => {
   if (diffDays === 1) return 'Ayer'
   if (diffDays < 7) return `Hace ${diffDays} dias`
 
-  return new Intl.DateTimeFormat('es-CL', { day: 'numeric', month: 'short' }).format(date)
+  return formatGreenhouseDate(date, {
+  day: 'numeric',
+  month: 'short'
+}, 'es-CL')
 }
 
 const groupByDate = (threads: NexaThreadListItem[]) => {

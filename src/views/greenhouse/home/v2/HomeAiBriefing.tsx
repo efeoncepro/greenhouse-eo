@@ -27,6 +27,7 @@ import { motion } from '@/libs/FramerMotion'
 import useReducedMotion from '@/hooks/useReducedMotion'
 
 import type { AiBriefingNarrativeKind, HomeAiBriefingData } from '@/lib/home/contract'
+import { formatTime as formatGreenhouseTime } from '@/lib/format'
 
 const TASK407_ARIA_BRIEFING_DE_HOY = "Briefing de hoy"
 const TASK407_ARIA_BRIEFING_GENERANDOSE_EN_VIVO = "Briefing generándose en vivo"
@@ -48,7 +49,10 @@ const KIND_META: Record<AiBriefingNarrativeKind, { icon: string; color: ThemeCol
 
 const formatTime = (iso: string): string => {
   try {
-    return new Date(iso).toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' })
+    return formatGreenhouseTime(new Date(iso), {
+  hour: '2-digit',
+  minute: '2-digit'
+}, 'es-CL')
   } catch {
     return ''
   }

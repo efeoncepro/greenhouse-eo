@@ -30,6 +30,7 @@ import HorizontalWithAvatar from '@components/card-statistics/HorizontalWithAvat
 import type { PersonDetail } from '@/types/people'
 
 import PersonLegalProfileSection from './PersonLegalProfileSection'
+import { formatDate as formatGreenhouseDate } from '@/lib/format'
 
 const TASK407_ARIA_DATOS_LABORALES = "Datos laborales"
 const TASK407_ARIA_IDENTIDAD_Y_ACCESO = "Identidad y acceso"
@@ -52,7 +53,11 @@ const formatDate = (iso: string | null | undefined): string => {
 
   if (Number.isNaN(date.getTime())) return ''
 
-  return date.toLocaleDateString('es-CL', { day: 'numeric', month: 'short', year: 'numeric' })
+  return formatGreenhouseDate(date, {
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric'
+}, 'es-CL')
 }
 
 const formatRelativeDate = (iso: string | null | undefined): { text: string; muted: boolean } => {
@@ -72,7 +77,11 @@ const formatRelativeDate = (iso: string | null | undefined): { text: string; mut
   if (diffDays < 30) return { text: `Hace ${Math.floor(diffDays / 7)} semanas`, muted: false }
 
   return {
-    text: date.toLocaleDateString('es-CL', { day: 'numeric', month: 'short', year: 'numeric' }),
+    text: formatGreenhouseDate(date, {
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric'
+}, 'es-CL'),
     muted: false
   }
 }

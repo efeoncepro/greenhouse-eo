@@ -357,7 +357,7 @@ Documentacion relacionada:
 - Funcional: [`docs/documentation/plataforma/formateo-locale-aware.md`](../documentation/plataforma/formateo-locale-aware.md)
 - Manual operativo: [`docs/manual-de-uso/plataforma/formateo-locale-aware.md`](../manual-de-uso/plataforma/formateo-locale-aware.md)
 
-- `formatDate`, `formatDateTime`, `formatISODateKey`
+- `formatDate`, `formatDateTime`, `formatTime`, `formatISODateKey`
 - `formatCurrency`, `formatAccountingCurrency`
 - `formatNumber`, `formatInteger`, `formatPercent`
 - `formatRelative`, `selectPlural`
@@ -367,9 +367,11 @@ Reglas:
 - El locale default inicial es `es-CL`; `Locale` se reutiliza desde `src/lib/copy/types.ts` y acepta overrides BCP 47 para transiciones (`pt-BR`, etc.).
 - La timezone operacional sigue siendo `America/Santiago`; no confundir locale de presentación con timezone de payroll/finance.
 - Fechas date-only `YYYY-MM-DD` se formatean desde UTC noon para evitar drift de día.
+- Horas visibles sin fecha deben usar `formatTime`, no `toLocaleTimeString` directo.
 - Keys operacionales `YYYY-MM-DD` deben usar `formatISODateKey`, no `toISOString().slice(...)` ni `Intl.DateTimeFormat('en-CA')` inline.
 - Monedas visibles deben pasar por `formatCurrency`; `formatAccountingCurrency` es opt-in para negative accounting.
-- No usar `new Intl.*` ni `toLocaleString` / `toLocaleDateString` / `toLocaleTimeString` directo en surfaces visibles. ESLint rule `greenhouse/no-raw-locale-formatting` corre en modo `warn` incremental sobre `src/views`, `src/components` y `src/app`.
+- Los helpers aceptan tanto `formatDate(value, options, locale)` como el atajo `formatDate(value, locale)` cuando no se requieren opciones.
+- No usar `new Intl.*` ni `toLocaleString` / `toLocaleDateString` / `toLocaleTimeString` directo en surfaces visibles. ESLint rule `greenhouse/no-raw-locale-formatting` corre en modo `warn` sobre `src/views`, `src/components` y `src/app`; el baseline del portal queda en 0 warnings desde el sweep 2026-05-06.
 
 ### Coordinación con Kortex (Slice 4 — exploratorio)
 

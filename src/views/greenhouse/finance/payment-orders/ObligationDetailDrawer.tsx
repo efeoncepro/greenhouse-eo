@@ -27,6 +27,7 @@ import CustomAvatar from '@core/components/mui/Avatar'
 
 import type { PaymentObligationDetail } from '@/lib/finance/payment-obligations/get-obligation-detail'
 import type { PaymentObligationKind, PaymentObligationStatus } from '@/types/payment-obligations'
+import { formatCurrency as formatGreenhouseCurrency, formatDate as formatGreenhouseDate, formatDateTime as formatGreenhouseDateTime } from '@/lib/format'
 
 const TASK407_ARIA_CERRAR_DETALLE = "Cerrar detalle"
 
@@ -39,32 +40,30 @@ interface ObligationDetailDrawerProps {
 }
 
 const formatAmount = (amount: number, currency: string) =>
-  new Intl.NumberFormat('es-CL', {
-    style: 'currency',
-    currency,
-    maximumFractionDigits: currency === 'USD' ? 2 : 0
-  }).format(amount)
+  formatGreenhouseCurrency(amount, currency, {
+  maximumFractionDigits: currency === 'USD' ? 2 : 0
+}, 'es-CL')
 
 const formatDateTime = (iso: string | null) => {
   if (!iso) return '—'
 
-  return new Date(iso).toLocaleString('es-CL', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  })
+  return formatGreenhouseDateTime(new Date(iso), {
+  day: '2-digit',
+  month: 'short',
+  year: 'numeric',
+  hour: '2-digit',
+  minute: '2-digit'
+}, 'es-CL')
 }
 
 const formatDate = (iso: string | null) => {
   if (!iso) return '—'
 
-  return new Date(iso).toLocaleDateString('es-CL', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric'
-  })
+  return formatGreenhouseDate(new Date(iso), {
+  day: '2-digit',
+  month: 'short',
+  year: 'numeric'
+}, 'es-CL')
 }
 
 const obligationKindMeta: Record<PaymentObligationKind, { label: string; color: 'primary' | 'info' | 'warning' | 'secondary' }> = {

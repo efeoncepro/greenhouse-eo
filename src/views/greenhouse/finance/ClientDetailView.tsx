@@ -36,6 +36,7 @@ import CustomTabList from '@core/components/mui/TabList'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 import { ROLE_CODES } from '@/config/role-codes'
 import AddMembershipDrawer from '@/views/greenhouse/organizations/drawers/AddMembershipDrawer'
+import { formatCurrency as formatGreenhouseCurrency } from '@/lib/format'
 
 const GREENHOUSE_COPY = getMicrocopy()
 // ---------------------------------------------------------------------------
@@ -124,10 +125,14 @@ interface ClientDetailData {
 // ---------------------------------------------------------------------------
 
 const formatCLP = (amount: number): string =>
-  new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', minimumFractionDigits: 0 }).format(amount)
+  formatGreenhouseCurrency(amount, 'CLP', {
+  minimumFractionDigits: 0
+}, 'es-CL')
 
 const formatAmount = (amount: number, currency: string): string =>
-  new Intl.NumberFormat('es-CL', { style: 'currency', currency, maximumFractionDigits: currency === 'CLP' ? 0 : 2 }).format(amount)
+  formatGreenhouseCurrency(amount, currency, {
+  maximumFractionDigits: currency === 'CLP' ? 0 : 2
+}, 'es-CL')
 
 const formatDate = (dateStr: string | null): string => {
   if (!dateStr) return '—'

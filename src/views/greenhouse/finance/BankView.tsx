@@ -31,6 +31,7 @@ import AccountDetailDrawer from '@/views/greenhouse/finance/components/AccountDe
 import AssignAccountDrawer from '@/views/greenhouse/finance/drawers/AssignAccountDrawer'
 import DeclareReconciliationDrawer from '@/views/greenhouse/finance/drawers/DeclareReconciliationDrawer'
 import InternalTransferDrawer from '@/views/greenhouse/finance/drawers/InternalTransferDrawer'
+import { formatCurrency as formatGreenhouseCurrency } from '@/lib/format'
 
 type Coverage = {
   assignedCount: number
@@ -170,11 +171,9 @@ const getCurrentPeriod = () => {
 }
 
 const formatAmount = (amount: number, currency: string = 'CLP') =>
-  new Intl.NumberFormat('es-CL', {
-    style: 'currency',
-    currency,
-    maximumFractionDigits: currency === 'CLP' ? 0 : 2
-  }).format(amount)
+  formatGreenhouseCurrency(amount, currency, {
+  maximumFractionDigits: currency === 'CLP' ? 0 : 2
+}, 'es-CL')
 
 const formatDate = (date: string | null) => {
   if (!date) return '—'

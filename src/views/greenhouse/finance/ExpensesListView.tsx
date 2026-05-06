@@ -38,6 +38,7 @@ import { buildStatusMap , getMicrocopy } from '@/lib/copy'
 
 import tableStyles from '@core/styles/table.module.css'
 import CreateExpenseDrawer from '@views/greenhouse/finance/drawers/CreateExpenseDrawer'
+import { formatCurrency as formatGreenhouseCurrency } from '@/lib/format'
 
 const TASK407_ARIA_VER_DTE_EN_PDF = "Ver DTE en PDF"
 
@@ -137,11 +138,13 @@ const SII_STATUS_CONFIG: Record<string, { label: string; color: 'success' | 'err
 // ---------------------------------------------------------------------------
 
 const formatCLP = (amount: number): string =>
-  new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(amount)
+  formatGreenhouseCurrency(amount, 'CLP', {
+  maximumFractionDigits: 0
+}, 'es-CL')
 
 const formatAmount = (amount: number, currency: string): string => {
   if (currency === 'USD') {
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount)
+    return formatGreenhouseCurrency(amount, 'USD', 'en-US')
   }
 
   return formatCLP(amount)

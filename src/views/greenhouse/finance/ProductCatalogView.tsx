@@ -25,6 +25,7 @@ import { getMicrocopy } from '@/lib/copy'
 
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
+import { formatCurrency as formatGreenhouseCurrency } from '@/lib/format'
 
 const GREENHOUSE_COPY = getMicrocopy()
 
@@ -63,7 +64,9 @@ const SOURCE_CHIP_CONFIG: Record<string, { label: string; color: 'warning' | 'se
 // ── Helpers ──
 
 const formatCLP = (amount: number) =>
-  new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(amount)
+  formatGreenhouseCurrency(amount, 'CLP', {
+  maximumFractionDigits: 0
+}, 'es-CL')
 
 // ── Create Product Drawer ──
 

@@ -24,6 +24,10 @@ import CustomChip from '@core/components/mui/Chip'
 import CustomTabList from '@core/components/mui/TabList'
 
 import EmptyState from '@/components/greenhouse/EmptyState'
+import {
+  formatCurrency as formatGreenhouseCurrency,
+  formatDateTime as formatGreenhouseDateTime
+} from '@/lib/format'
 
 type PlacementDetail = {
   placementId: string
@@ -98,11 +102,9 @@ const ONBOARDING_COLOR: Record<string, 'secondary' | 'warning' | 'info' | 'succe
 const formatMoney = (amount: number | null | undefined, currency: string | null | undefined) => {
   if (amount == null) return '—'
 
-  return new Intl.NumberFormat('es-CL', {
-    style: 'currency',
-    currency: currency || 'CLP',
-    maximumFractionDigits: 0
-  }).format(amount)
+  return formatGreenhouseCurrency(amount, currency || 'CLP', {
+  maximumFractionDigits: 0
+}, 'es-CL')
 }
 
 interface Props {
@@ -329,7 +331,7 @@ const PlacementDetailView = ({ placementId }: Props) => {
                   <Card key={event.staffAugEventId} variant='outlined'>
                     <CardContent>
                       <Typography variant='body2' fontWeight={600}>{event.description || event.eventType}</Typography>
-                      <Typography variant='caption' color='text.secondary'>{event.eventType} · {new Date(event.createdAt).toLocaleString('es-CL')}</Typography>
+                      <Typography variant='caption' color='text.secondary'>{event.eventType} · {formatGreenhouseDateTime(event.createdAt, 'es-CL')}</Typography>
                     </CardContent>
                   </Card>
                 ))}

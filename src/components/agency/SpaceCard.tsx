@@ -19,6 +19,7 @@ import { GH_COLORS } from '@/config/greenhouse-nomenclature'
 import type { AgencySpaceHealth } from '@/lib/agency/agency-queries'
 import type { SpaceFinanceMetrics } from '@/lib/agency/agency-finance-metrics'
 import { getSpaceHealth, HEALTH_ZONE_LABEL, HEALTH_ZONE_COLOR } from './space-health'
+import { formatNumber as formatGreenhouseNumber } from '@/lib/format'
 
 type Props = {
   space: AgencySpaceHealth
@@ -219,8 +220,8 @@ const SpaceCard = ({ space, financeMetrics }: Props) => {
                 color='primary'
                 variant='tonal'
                 label={financePeriodLabel
-                  ? `$${Math.round(financeMetrics.revenueCurrentMonth / 1000).toLocaleString('es-CL')}K · ${financePeriodLabel}`
-                  : `$${Math.round(financeMetrics.revenueCurrentMonth / 1000).toLocaleString('es-CL')}K`}
+                  ? `$${formatGreenhouseNumber(Math.round(financeMetrics.revenueCurrentMonth / 1000), 'es-CL')}K · ${financePeriodLabel}`
+                  : `$${formatGreenhouseNumber(Math.round(financeMetrics.revenueCurrentMonth / 1000), 'es-CL')}K`}
                 sx={{ height: 18, fontSize: '0.6rem' }}
               />
               {financeMetrics.marginPct !== null && (

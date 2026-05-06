@@ -48,6 +48,7 @@ import {
   canManageFinanceQuotes,
   isEditableFinanceQuotationStatus
 } from '@/lib/finance/quotation-access'
+import { formatCurrency as formatGreenhouseCurrency } from '@/lib/format'
 
 const GREENHOUSE_COPY = getMicrocopy()
 // ── Types ──
@@ -145,7 +146,9 @@ const SOURCE_CHIP_CONFIG: Record<string, { label: string; color: 'info' | 'warni
 // ── Helpers ──
 
 const formatCLP = (amount: number) =>
-  new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(amount)
+  formatGreenhouseCurrency(amount, 'CLP', {
+  maximumFractionDigits: 0
+}, 'es-CL')
 
 const formatDate = (date: string | null) => {
   if (!date) return '—'

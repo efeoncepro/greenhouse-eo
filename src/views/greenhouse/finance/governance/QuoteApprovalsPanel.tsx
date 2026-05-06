@@ -23,6 +23,7 @@ import Typography from '@mui/material/Typography'
 import { getMicrocopy } from '@/lib/copy'
 
 import CustomChip from '@core/components/mui/Chip'
+import { formatDateTime as formatGreenhouseDateTime } from '@/lib/format'
 
 const GREENHOUSE_COPY = getMicrocopy()
 
@@ -68,7 +69,10 @@ const formatDate = (iso: string | null) => {
 
   if (Number.isNaN(d.getTime())) return iso
 
-  return d.toLocaleString('es-CL', { dateStyle: 'medium', timeStyle: 'short' })
+  return formatGreenhouseDateTime(d, {
+  dateStyle: 'medium',
+  timeStyle: 'short'
+}, 'es-CL')
 }
 
 const QuoteApprovalsPanel = ({

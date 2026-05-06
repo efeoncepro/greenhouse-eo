@@ -14,6 +14,8 @@ import ToggleButton from '@mui/material/ToggleButton'
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup'
 import Typography from '@mui/material/Typography'
 
+import { formatNumber as formatGreenhouseNumber } from '@/lib/format'
+
 const TASK407_ARIA_CAMBIAR_VISTA_DE_MONEDA = "Cambiar vista de moneda"
 const TASK407_ARIA_VER_EN_MONEDA_DEL_CLIENTE = "Ver en moneda del cliente"
 const TASK407_ARIA_VER_EN_USD_CANONICAL = "Ver en USD canonical"
@@ -51,17 +53,17 @@ const formatMoney = (value: number | null, currency: string): string => {
   const upper = currency.toUpperCase()
   const fractionDigits = upper === 'CLP' || upper === 'COP' ? 0 : 2
 
-  return new Intl.NumberFormat('es-CL', {
-    minimumFractionDigits: fractionDigits,
-    maximumFractionDigits: fractionDigits
-  }).format(value)
+  return formatGreenhouseNumber(value, {
+  minimumFractionDigits: fractionDigits,
+  maximumFractionDigits: fractionDigits
+}, 'es-CL')
 }
 
 const formatRate = (value: number): string =>
-  new Intl.NumberFormat('es-CL', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 6
-  }).format(value)
+  formatGreenhouseNumber(value, {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 6
+}, 'es-CL')
 
 const formatDate = (iso: string | null): string => {
   if (!iso) return '—'

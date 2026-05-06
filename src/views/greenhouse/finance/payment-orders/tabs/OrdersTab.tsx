@@ -13,6 +13,7 @@ import TableRow from '@mui/material/TableRow'
 
 import { DataTableShell } from '@/components/greenhouse/data-table'
 import type { PaymentOrder, PaymentOrderState } from '@/types/payment-orders'
+import { formatCurrency as formatGreenhouseCurrency, formatDate as formatGreenhouseDate } from '@/lib/format'
 
 interface OrdersTabProps {
   orders: PaymentOrder[]
@@ -21,11 +22,9 @@ interface OrdersTabProps {
 }
 
 const formatAmount = (amount: number, currency: string) =>
-  new Intl.NumberFormat('es-CL', {
-    style: 'currency',
-    currency,
-    maximumFractionDigits: currency === 'USD' ? 2 : 0
-  }).format(amount)
+  formatGreenhouseCurrency(amount, currency, {
+  maximumFractionDigits: currency === 'USD' ? 2 : 0
+}, 'es-CL')
 
 const stateLabels: Record<PaymentOrderState, string> = {
   draft: 'Borrador',
@@ -56,7 +55,11 @@ const stateColors: Record<PaymentOrderState, 'default' | 'primary' | 'secondary'
 const formatDate = (d: string | null) => {
   if (!d) return '—'
 
-  return new Date(d).toLocaleDateString('es-CL', { day: '2-digit', month: 'short', year: 'numeric' })
+  return formatGreenhouseDate(new Date(d), {
+  day: '2-digit',
+  month: 'short',
+  year: 'numeric'
+}, 'es-CL')
 }
 
 const OrdersTab = ({ orders, loading, onOpenOrder }: OrdersTabProps) => {

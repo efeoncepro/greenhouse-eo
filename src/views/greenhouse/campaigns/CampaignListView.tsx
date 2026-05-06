@@ -24,6 +24,7 @@ import { getMicrocopy } from '@/lib/copy'
 
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
+import { formatDate as formatGreenhouseDate, formatNumber as formatGreenhouseNumber } from '@/lib/format'
 
 const GREENHOUSE_COPY = getMicrocopy()
 
@@ -79,12 +80,16 @@ const TYPE_LABELS: Record<string, string> = {
   always_on: 'Always-on'
 }
 
-const formatClp = (n: number) => `$${Math.round(n).toLocaleString('es-CL')}`
+const formatClp = (n: number) => `$${formatGreenhouseNumber(Math.round(n), 'es-CL')}`
 
 const formatDate = (d: string | null) => {
   if (!d) return '—'
 
-  return new Date(d + 'T12:00:00').toLocaleDateString('es-CL', { day: 'numeric', month: 'short', year: 'numeric' })
+  return formatGreenhouseDate(new Date(d + 'T12:00:00'), {
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric'
+}, 'es-CL')
 }
 
 // ── Component ──

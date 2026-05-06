@@ -48,6 +48,7 @@ import GreenhouseCalendar from '@/components/greenhouse/GreenhouseCalendar'
 import LeaveRequestDialog from '@/components/greenhouse/LeaveRequestDialog'
 import { HorizontalWithSubtitle } from '@/components/card-statistics'
 import { getLeaveReviewCapabilities } from '@/lib/hr-core/leave-review-policy'
+import { formatNumber as formatGreenhouseNumber } from '@/lib/format'
 import type {
   CreateLeaveRequestInput,
   HrApprovalAction,
@@ -97,17 +98,12 @@ const emptyRequests: HrLeaveRequest[] = []
 const emptyBalances: HrLeaveBalance[] = []
 const emptyAdjustments: HrLeaveBalanceAdjustmentRecord[] = []
 
-const leaveDaysFormatter = new Intl.NumberFormat('es-CL', {
-  minimumFractionDigits: 0,
-  maximumFractionDigits: 2
-})
-
 const formatLeaveDays = (value: number | null | undefined) => {
   if (value == null || Number.isNaN(value)) {
     return '—'
   }
 
-  return leaveDaysFormatter.format(value)
+  return formatGreenhouseNumber(value, { minimumFractionDigits: 0, maximumFractionDigits: 2 })
 }
 
 const isProportionalVacationAccrualBalance = (balance: HrLeaveBalance) =>

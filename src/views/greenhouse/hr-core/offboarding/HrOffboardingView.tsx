@@ -40,6 +40,7 @@ import type { OffboardingCase, OffboardingCaseStatus, OffboardingSeparationType 
 import type { FinalSettlement, FinalSettlementStatus } from '@/lib/payroll/final-settlement'
 import type { FinalSettlementDocument } from '@/lib/payroll/final-settlement/document-types'
 import { formatDate } from '@views/greenhouse/hr-core/helpers'
+import { formatCurrency as formatGreenhouseCurrency } from '@/lib/format'
 
 const GREENHOUSE_COPY = getMicrocopy()
 
@@ -763,7 +764,9 @@ const HrOffboardingView = () => {
                             />
                             {settlement && (
                               <Typography variant='caption' color='text.secondary'>
-                                Neto {new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(settlement.netPayable)}
+                                Neto {formatGreenhouseCurrency(settlement.netPayable, 'CLP', {
+  maximumFractionDigits: 0
+}, 'es-CL')}
                               </Typography>
                             )}
                           </Stack>

@@ -14,6 +14,7 @@ import Typography from '@mui/material/Typography'
 
 import CustomChip from '@core/components/mui/Chip'
 import { getMicrocopy } from '@/lib/copy'
+import { formatCurrency as formatGreenhouseCurrency, formatNumber as formatGreenhouseNumber } from '@/lib/format'
 
 const GREENHOUSE_COPY = getMicrocopy()
 
@@ -47,13 +48,11 @@ const formatCurrency = (amount: number | null, currency: string): string => {
   if (amount === null) return '—'
 
   try {
-    return new Intl.NumberFormat('es-CL', {
-      style: 'currency',
-      currency,
-      maximumFractionDigits: 0
-    }).format(amount)
+    return formatGreenhouseCurrency(amount, currency, {
+  maximumFractionDigits: 0
+}, 'es-CL')
   } catch {
-    return `${currency} ${Math.round(amount).toLocaleString('es-CL')}`
+    return `${currency} ${formatGreenhouseNumber(Math.round(amount), 'es-CL')}`
   }
 }
 

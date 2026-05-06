@@ -10,6 +10,7 @@ import Typography from '@mui/material/Typography'
 
 import { getMicrocopy } from '@/lib/copy'
 import CustomChip from '@core/components/mui/Chip'
+import { formatDateTime as formatGreenhouseDateTime } from '@/lib/format'
 
 const GREENHOUSE_COPY = getMicrocopy()
 
@@ -66,9 +67,13 @@ const EMAIL_DOMAIN_MAP: Record<string, string> = {
 }
 
 const formatAbsoluteTime = (dateString: string) =>
-  new Date(dateString).toLocaleString('es-CL', {
-    day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
-  })
+  formatGreenhouseDateTime(new Date(dateString), {
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric',
+  hour: '2-digit',
+  minute: '2-digit'
+}, 'es-CL')
 
 const DetailRow = ({ label, value, mono }: { label: string; value: string | null; mono?: boolean }) => (
   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', py: 1.5 }}>

@@ -30,6 +30,7 @@ import type {
   BeneficiaryPaymentProfileSafe,
   BeneficiaryPaymentProfileStatus
 } from '@/types/payment-profiles'
+import { formatDate as formatGreenhouseDate, formatDateTime as formatGreenhouseDateTime } from '@/lib/format'
 
 const TASK407_ARIA_CARGANDO_AUDIT_LOG = "Cargando audit log"
 
@@ -71,7 +72,7 @@ const AUDIT_ACTION_META: Record<
   }
 }
 
-const formatTimestamp = (iso: string) => new Date(iso).toLocaleString('es-CL')
+const formatTimestamp = (iso: string) => formatGreenhouseDateTime(iso, 'es-CL')
 
 interface PaymentProfileCardProps {
   profile: BeneficiaryPaymentProfileSafe
@@ -238,11 +239,11 @@ const PaymentProfileCard = ({ profile, onActionComplete }: PaymentProfileCardPro
   const formatActiveFrom = (date: string | null) => {
     if (!date) return '—'
 
-    return new Date(date + 'T00:00:00').toLocaleDateString('es-CL', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric'
-    })
+    return formatGreenhouseDate(new Date(date + 'T00:00:00'), {
+  day: '2-digit',
+  month: 'short',
+  year: 'numeric'
+}, 'es-CL')
   }
 
   return (

@@ -26,6 +26,7 @@ import { getMicrocopy } from '@/lib/copy'
 
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 import CustomChip from '@core/components/mui/Chip'
+import { formatDate as formatGreenhouseDate } from '@/lib/format'
 
 const GREENHOUSE_COPY = getMicrocopy()
 
@@ -125,11 +126,11 @@ const formatDate = (value: string | null) => {
 
   if (Number.isNaN(date.getTime())) return '—'
 
-  return date.toLocaleDateString('es-CL', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric'
-  })
+  return formatGreenhouseDate(date, {
+  day: '2-digit',
+  month: 'short',
+  year: 'numeric'
+}, 'es-CL')
 }
 
 const toRecord = (value: unknown): Record<string, unknown> =>

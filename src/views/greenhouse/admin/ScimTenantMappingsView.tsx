@@ -24,6 +24,7 @@ import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 
 import { getMicrocopy } from '@/lib/copy'
+import { formatDateTime as formatGreenhouseDateTime } from '@/lib/format'
 
 const GREENHOUSE_COPY = getMicrocopy()
 
@@ -47,11 +48,11 @@ type Props = {
 const formatDate = (value: string | null) => {
   if (!value) return '—'
 
-  return new Intl.DateTimeFormat('es-CL', {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-    timeZone: 'America/Santiago'
-  }).format(new Date(value))
+  return formatGreenhouseDateTime(new Date(value), {
+  dateStyle: 'medium',
+  timeStyle: 'short',
+  timeZone: 'America/Santiago'
+}, 'es-CL')
 }
 
 export default function ScimTenantMappingsView({ mappings: initialMappings }: Props) {

@@ -25,6 +25,7 @@ import CustomChip from '@core/components/mui/Chip'
 import { downloadPayrollReceiptPdf } from '@/lib/payroll/download-payroll-receipt'
 import MyPayrollEntryDrawer from './MyPayrollEntryDrawer'
 import { getMicrocopy } from '@/lib/copy'
+import { formatCurrency as formatGreenhouseCurrency, formatDate as formatGreenhouseDate } from '@/lib/format'
 
 const GREENHOUSE_COPY = getMicrocopy()
 
@@ -83,7 +84,9 @@ interface PayrollData {
 const MONTHS = ['', ...GREENHOUSE_COPY.months.short]
 
 const fmt = (amount: number, currency: string) =>
-  new Intl.NumberFormat('es-CL', { style: 'currency', currency: currency === 'USD' ? 'USD' : 'CLP', maximumFractionDigits: 0 }).format(amount)
+  formatGreenhouseCurrency(amount, currency === 'USD' ? 'USD' : 'CLP', {
+  maximumFractionDigits: 0
+}, 'es-CL')
 
 const PROCESSOR_LABELS: Record<string, string> = {
   deel: 'Deel',
@@ -107,7 +110,11 @@ const formatPaymentDate = (iso: string | null): string => {
   if (!iso) return '—'
   const d = new Date(iso)
 
-  return d.toLocaleDateString('es-CL', { day: '2-digit', month: 'short', year: 'numeric' })
+  return formatGreenhouseDate(d, {
+  day: '2-digit',
+  month: 'short',
+  year: 'numeric'
+}, 'es-CL')
 }
 
 interface MiniTimelineStep {
