@@ -175,6 +175,20 @@ La cohorte leave usa `getMicrocopy().emails.leave.*` para headings por estado, b
 
 Las fechas de templates email usan `selectEmailIntlDateLocale()` para proyectar `es`/`en` a `es-CL`/`en-US` antes de llamar helpers de formato. Los templates no deben reintroducir ternarios locales para decidir el locale Intl.
 
+## TASK-408 Slice 3E: payroll employee-facing
+
+`PayrollReceiptEmail`, `PayrollPaymentCommittedEmail`, `PayrollPaymentCancelledEmail` y `PayrollLiquidacionV2Email` toman copy estatico desde `getMicrocopy().emails.payroll.*`.
+
+La frontera de personalizacion se mantiene igual:
+
+- `fullName` / `firstName` siguen llegando como props o desde el Context Resolver.
+- `monthName`, `periodYear`, fechas programadas y labels de periodo siguen siendo datos de Payroll.
+- montos y monedas siguen formateandose con `@/lib/format`.
+- `processorLabel`, `cancellationReason`, `receiptUrl`, `/my/payroll` y adjuntos PDF siguen viniendo del runtime/caller.
+- la salida HTML de React Email se mantiene byte-estable en snapshots; no se actualizan snapshots para aceptar cambios accidentales.
+
+Este slice no cambia `sendEmail`, Resend, `email_deliveries`, subjects, payment orders, outbox, webhooks, projections ni eventos reactivos de Payroll. Solo cambia la fuente de copy renderizado.
+
 La primitive `selectEmailTemplateCopy()` permite repetir este patron en los siguientes templates sin tocar delivery:
 
 - `es` / `es-CL` / default → dictionary de plataforma.

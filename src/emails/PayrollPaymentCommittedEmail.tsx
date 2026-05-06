@@ -1,5 +1,7 @@
 import { Heading, Section, Text } from '@react-email/components'
 
+import { getMicrocopy, type PayrollPaymentCommittedEmailTemplateCopy } from '@/lib/copy'
+import { selectEmailTemplateCopy } from '@/lib/email/template-copy'
 import { formatCurrency, formatDate } from '@/lib/format'
 
 import EmailButton from './components/EmailButton'
@@ -26,13 +28,31 @@ const formatMoney = (value: number, currency: 'CLP' | 'USD') =>
   formatCurrency(value, currency, currency === 'USD' ? { currencySymbol: 'US$' } : {}, currency === 'USD' ? 'en-US' : undefined)
 
 const formatDateLabel = (iso: string | null, isChile: boolean): string => {
-  if (!iso) return isChile ? 'En los próximos días' : 'In the next few days'
+  const t = selectEmailTemplateCopy(isChile ? 'es' : 'en', getMicrocopy().emails.payroll.paymentCommitted, LEGACY_EN_PAYROLL_PAYMENT_COMMITTED_EMAIL_COPY)
+
+  if (!iso) return t.fallbackScheduledFor
 
   return formatDate(iso, {
     day: '2-digit',
     month: 'long',
     year: 'numeric'
   }, isChile ? 'es-CL' : 'en-US')
+}
+
+const LEGACY_EN_PAYROLL_PAYMENT_COMMITTED_EMAIL_COPY: PayrollPaymentCommittedEmailTemplateCopy = {
+  previewText: periodLabel => `Your ${periodLabel} payment is scheduled`,
+  heading: 'Your payment is scheduled',
+  greetingPrefix: 'Hi ',
+  greetingPeriodPrefix: ', your payment for ',
+  greetingSuffix: ' has been approved by Treasury and is scheduled to be executed shortly. We will send you the final receipt as soon as the payment is confirmed.',
+  periodLabel: 'Period',
+  scheduledForLabel: 'Scheduled for',
+  processorLabel: 'Processor',
+  netLabel: 'Net amount',
+  cta: 'View my payroll',
+  informationalNotice: 'This is an informational notice. The formal receipt with full breakdown will be sent once the payment is executed.',
+  automatedFooter: appUrl => `Greenhouse by Efeonce Group SpA · This is an automated email sent from ${appUrl}`,
+  fallbackScheduledFor: 'In the next few days'
 }
 
 const summaryRow = (label: string, value: string, emphasis = false) => (
@@ -83,10 +103,9 @@ export default function PayrollPaymentCommittedEmail({
 }: PayrollPaymentCommittedEmailProps) {
   const monthName = MONTH_NAMES[periodMonth - 1] ?? String(periodMonth)
   const isChile = payRegime === 'chile'
-
-  const previewText = isChile
-    ? `Tu pago de ${monthName} ${periodYear} está programado`
-    : `Your ${monthName} ${periodYear} payment is scheduled`
+  const t = selectEmailTemplateCopy(isChile ? 'es' : 'en', getMicrocopy().emails.payroll.paymentCommitted, LEGACY_EN_PAYROLL_PAYMENT_COMMITTED_EMAIL_COPY)
+  const periodLabel = `${monthName} ${periodYear}`
+  const previewText = t.previewText(periodLabel)
 
   const appUrl = `${APP_URL}/my/payroll`
   const firstName = fullName.split(' ')[0] || fullName
@@ -101,7 +120,7 @@ export default function PayrollPaymentCommittedEmail({
         margin: '0 0 8px',
         lineHeight: '34px'
       }}>
-        {isChile ? 'Tu pago está programado' : 'Your payment is scheduled'}
+        {t.heading}
       </Heading>
 
       <Text style={{
@@ -110,19 +129,7 @@ export default function PayrollPaymentCommittedEmail({
         lineHeight: '24px',
         margin: '0 0 20px'
       }}>
-        {isChile ? (
-          <>
-            Hola {firstName}, tu pago de <strong>{monthName} {periodYear}</strong> fue aprobado por Tesorería
-            y está programado para ejecutarse próximamente. Te enviaremos el recibo definitivo apenas se
-            confirme el pago.
-          </>
-        ) : (
-          <>
-            Hi {firstName}, your payment for <strong>{monthName} {periodYear}</strong> has been approved by
-            Treasury and is scheduled to be executed shortly. We will send you the final receipt as soon as
-            the payment is confirmed.
-          </>
-        )}
+        {t.greetingPrefix}{firstName}{t.greetingPeriodPrefix}<strong>{monthName} {periodYear}</strong>{t.greetingSuffix}
       </Text>
 
       <Section style={{
@@ -132,23 +139,23 @@ export default function PayrollPaymentCommittedEmail({
         padding: '18px 18px 8px',
         margin: '0 0 24px'
       }}>
-        {summaryRow(isChile ? 'Período' : 'Period', `${monthName} ${periodYear}`)}
+        {summaryRow(t.periodLabel, periodLabel)}
         {summaryRow(
-          isChile ? 'Fecha programada' : 'Scheduled for',
+          t.scheduledForLabel,
           formatDateLabel(scheduledFor, isChile)
         )}
         {processorLabel
-          ? summaryRow(isChile ? 'Procesador' : 'Processor', processorLabel)
+          ? summaryRow(t.processorLabel, processorLabel)
           : null}
         {summaryRow(
-          isChile ? 'Monto neto' : 'Net amount',
+          t.netLabel,
           formatMoney(netTotal, entryCurrency),
           true
         )}
       </Section>
 
       <Section style={{ textAlign: 'center' as const, margin: '0 0 24px' }}>
-        <EmailButton href={appUrl}>{isChile ? 'Ver mi nómina' : 'View my payroll'}</EmailButton>
+        <EmailButton href={appUrl}>{t.cta}</EmailButton>
       </Section>
 
       <Text style={{
@@ -159,9 +166,7 @@ export default function PayrollPaymentCommittedEmail({
         borderTop: `1px solid ${EMAIL_COLORS.border}`,
         paddingTop: '20px'
       }}>
-        {isChile
-          ? 'Esta notificación es solo informativa. El recibo formal con detalle de bruto, descuentos y neto se enviará cuando el pago se ejecute.'
-          : 'This is an informational notice. The formal receipt with full breakdown will be sent once the payment is executed.'}
+        {t.informationalNotice}
       </Text>
 
       <Text style={{
@@ -170,9 +175,7 @@ export default function PayrollPaymentCommittedEmail({
         lineHeight: '18px',
         margin: '0'
       }}>
-        {isChile
-          ? `Greenhouse by Efeonce Group SpA · Este es un correo automático enviado desde ${APP_URL}`
-          : `Greenhouse by Efeonce Group SpA · This is an automated email sent from ${APP_URL}`}
+        {t.automatedFooter(APP_URL)}
       </Text>
     </EmailLayout>
   )

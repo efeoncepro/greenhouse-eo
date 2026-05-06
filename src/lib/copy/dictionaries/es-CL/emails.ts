@@ -151,6 +151,67 @@ export const emails: EmailsCopy = {
       daysUnit: days => days === 1 ? 'día' : 'días'
     }
   },
+  payroll: {
+    receipt: {
+      previewText: periodLabel => `Tu recibo de nómina de ${periodLabel} ya está disponible`,
+      heading: 'Liquidación de remuneraciones',
+      greetingPrefix: 'Hola ',
+      greetingPeriodPrefix: ', tu recibo de nómina de ',
+      greetingSuffix: ' ya está listo. Te dejamos el resumen y adjuntamos el PDF para que puedas revisarlo cuando quieras.',
+      regimeLabel: 'Régimen',
+      regimeValue: 'Chile',
+      currencyLabel: 'Moneda',
+      grossLabel: 'Bruto',
+      deductionsLabel: 'Descuentos',
+      netLabel: 'Líquido',
+      cta: 'Abrir mi nómina',
+      pdfHelp: 'Si no ves el PDF adjunto, revisa la carpeta de descargas de tu correo o ingresa a Greenhouse desde el botón anterior.',
+      automatedFooter: appUrl => `Greenhouse by Efeonce Group SpA · Este es un correo automático enviado desde ${appUrl}`
+    },
+    paymentCommitted: {
+      previewText: periodLabel => `Tu pago de ${periodLabel} está programado`,
+      heading: 'Tu pago está programado',
+      greetingPrefix: 'Hola ',
+      greetingPeriodPrefix: ', tu pago de ',
+      greetingSuffix: ' fue aprobado por Tesorería y está programado para ejecutarse próximamente. Te enviaremos el recibo definitivo apenas se confirme el pago.',
+      periodLabel: 'Período',
+      scheduledForLabel: 'Fecha programada',
+      processorLabel: 'Procesador',
+      netLabel: 'Monto neto',
+      cta: 'Ver mi nómina',
+      informationalNotice: 'Esta notificación es solo informativa. El recibo formal con detalle de bruto, descuentos y neto se enviará cuando el pago se ejecute.',
+      automatedFooter: appUrl => `Greenhouse by Efeonce Group SpA · Este es un correo automático enviado desde ${appUrl}`,
+      fallbackScheduledFor: 'En los próximos días'
+    },
+    paymentCancelled: {
+      previewText: periodLabel => `Actualización sobre tu pago de ${periodLabel}`,
+      heading: 'Actualización sobre tu pago',
+      bodyPrefix: 'Hola ',
+      bodyPeriodPrefix: ', queremos avisarte que detectamos un problema con el pago programado de',
+      bodyAmountPrefix: ' (',
+      bodyAmountSuffix: '). Lo estamos resolviendo y te contactaremos en los próximos días con la actualización.',
+      reasonLabel: 'Motivo:',
+      apology: 'Disculpa el inconveniente. Tu equipo de operaciones ya está al tanto.',
+      cta: 'Ver mi nómina',
+      automatedFooter: appUrl => `Greenhouse by Efeonce Group SpA · Este es un correo automático enviado desde ${appUrl}`
+    },
+    liquidacionV2: {
+      previewText: periodLabel => `Tu liquidación de ${periodLabel} fue actualizada`,
+      heading: 'Actualizamos tu liquidación',
+      bodyPrefix: 'Hola ',
+      bodyPeriodPrefix: ', tu liquidación de ',
+      bodySuffix: ' fue actualizada con una versión nueva. Esta versión reemplaza a la anterior y ya está disponible para que la revises en Greenhouse.',
+      periodLabel: 'Período',
+      currencyLabel: 'Moneda',
+      previousNetLabel: 'Líquido anterior',
+      updatedNetLabel: 'Líquido actualizado',
+      differenceLabel: 'Diferencia',
+      noNetChange: 'Sin cambios netos',
+      cta: 'Ver liquidación actualizada',
+      supportNote: 'Si tienes dudas sobre este ajuste, contacta al equipo de Personas — quedamos atentos para ayudarte a revisar los detalles.',
+      automatedFooterPrefix: 'Greenhouse by Efeonce Group SpA · Este es un correo automático enviado desde '
+    }
+  },
   notificationCategories: {
     delivery_update: {
       label: 'Delivery updates',

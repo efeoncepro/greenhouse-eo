@@ -31,6 +31,17 @@ Pero el sistema **todavía no es**:
 
 En resumen: hoy Greenhouse tiene un **sistema robusto de email transaccional, operativo y de algunos broadcast importantes**, no una suite completa de messaging enterprise generalista.
 
+## Delta 2026-05-06 — TASK-408 copy dictionary sin romper personalizacion
+
+El catalogo de emails empezo a consumir `src/lib/copy/` para copy institucional y de template, pero el contrato arquitectonico separa explicitamente **copy estatico** de **tokens runtime**.
+
+- `src/lib/copy/dictionaries/es-CL/emails.ts` es la fuente de copy reusable para layout, auth, notification, leave y payroll employee-facing.
+- `selectEmailTemplateCopy()` conserva fallback legacy `en` mientras `en-US` siga como mirror de `es-CL`.
+- `selectEmailIntlDateLocale()` centraliza la proyeccion de locale Intl para fechas de emails.
+- Los tokens de personalizacion (`recipient`, `client`, `platform`, periodos, montos, fechas, links, motivos, procesadores y adjuntos) siguen viniendo de `src/lib/email/tokens.ts`, `src/lib/email/delivery.ts` o de props/callers de dominio. El dictionary no debe capturar datos de negocio.
+
+En payroll, `PayrollReceiptEmail`, `PayrollPaymentCommittedEmail`, `PayrollPaymentCancelledEmail` y `PayrollLiquidacionV2Email` leen copy desde `emails.payroll.*`, pero mantienen intactos payment lifecycle, subjects, attachment delivery, outbox, webhooks y projections. Los snapshots de `src/emails/EmailTemplateBaseline.test.tsx` son el gate canonico: una migracion de copy no debe cambiar bytes de HTML salvo decision explicita documentada.
+
 ## Estado
 
 Baseline de producto y arquitectura al 2026-03-19.

@@ -435,6 +435,69 @@ export interface LeaveReviewConfirmationEmailTemplateCopy {
   daysUnit: (days: number) => string
 }
 
+export interface PayrollReceiptEmailTemplateCopy {
+  previewText: (periodLabel: string) => string
+  heading: string
+  greetingPrefix: string
+  greetingPeriodPrefix: string
+  greetingSuffix: string
+  regimeLabel: string
+  regimeValue: string
+  currencyLabel: string
+  grossLabel: string
+  deductionsLabel: string
+  netLabel: string
+  cta: string
+  pdfHelp: string
+  automatedFooter: (appUrl: string) => string
+}
+
+export interface PayrollPaymentCommittedEmailTemplateCopy {
+  previewText: (periodLabel: string) => string
+  heading: string
+  greetingPrefix: string
+  greetingPeriodPrefix: string
+  greetingSuffix: string
+  periodLabel: string
+  scheduledForLabel: string
+  processorLabel: string
+  netLabel: string
+  cta: string
+  informationalNotice: string
+  automatedFooter: (appUrl: string) => string
+  fallbackScheduledFor: string
+}
+
+export interface PayrollPaymentCancelledEmailTemplateCopy {
+  previewText: (periodLabel: string) => string
+  heading: string
+  bodyPrefix: string
+  bodyPeriodPrefix: string
+  bodyAmountPrefix: string
+  bodyAmountSuffix: string
+  reasonLabel: string
+  apology: string
+  cta: string
+  automatedFooter: (appUrl: string) => string
+}
+
+export interface PayrollLiquidacionV2EmailTemplateCopy {
+  previewText: (periodLabel: string) => string
+  heading: string
+  bodyPrefix: string
+  bodyPeriodPrefix: string
+  bodySuffix: string
+  periodLabel: string
+  currencyLabel: string
+  previousNetLabel: string
+  updatedNetLabel: string
+  differenceLabel: string
+  noNetChange: string
+  cta: string
+  supportNote: string
+  automatedFooterPrefix: string
+}
+
 /**
  * Copy institucional compartido por emails y notificaciones externas.
  * TASK-408 lo introduce como namespace foundation antes de migrar templates:
@@ -463,6 +526,12 @@ export interface EmailsCopy {
     requestSubmitted: LeaveRequestSubmittedEmailTemplateCopy
     requestPendingReview: LeaveRequestPendingReviewEmailTemplateCopy
     reviewConfirmation: LeaveReviewConfirmationEmailTemplateCopy
+  }
+  payroll: {
+    receipt: PayrollReceiptEmailTemplateCopy
+    paymentCommitted: PayrollPaymentCommittedEmailTemplateCopy
+    paymentCancelled: PayrollPaymentCancelledEmailTemplateCopy
+    liquidacionV2: PayrollLiquidacionV2EmailTemplateCopy
   }
   notificationCategories: NotificationCategoryCopy
   subjects: {

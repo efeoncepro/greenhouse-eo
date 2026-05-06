@@ -137,6 +137,10 @@ export type {
   NotificationCategoryCopy,
   NotificationCategoryCopyCode,
   PasswordResetEmailTemplateCopy,
+  PayrollLiquidacionV2EmailTemplateCopy,
+  PayrollPaymentCancelledEmailTemplateCopy,
+  PayrollPaymentCommittedEmailTemplateCopy,
+  PayrollReceiptEmailTemplateCopy,
   StatesCopy,
   TimeCopy,
   VerifyEmailTemplateCopy

@@ -1,5 +1,7 @@
 import { Heading, Section, Text } from '@react-email/components'
 
+import { getMicrocopy, type PayrollPaymentCancelledEmailTemplateCopy } from '@/lib/copy'
+import { selectEmailTemplateCopy } from '@/lib/email/template-copy'
 import { formatCurrency } from '@/lib/format'
 
 import EmailButton from './components/EmailButton'
@@ -24,6 +26,19 @@ const MONTH_NAMES = [
 const formatMoney = (value: number, currency: 'CLP' | 'USD') =>
   formatCurrency(value, currency, currency === 'USD' ? { currencySymbol: 'US$' } : {}, currency === 'USD' ? 'en-US' : undefined)
 
+const LEGACY_EN_PAYROLL_PAYMENT_CANCELLED_EMAIL_COPY: PayrollPaymentCancelledEmailTemplateCopy = {
+  previewText: periodLabel => `Update on your ${periodLabel} payment`,
+  heading: 'Payment update',
+  bodyPrefix: 'Hi ',
+  bodyPeriodPrefix: ', we detected an issue with the scheduled payment for',
+  bodyAmountPrefix: ' (',
+  bodyAmountSuffix: '). We are working on it and will contact you in the next few days with the update.',
+  reasonLabel: 'Reason:',
+  apology: 'Sorry for the inconvenience. Your operations team has been notified.',
+  cta: 'View my payroll',
+  automatedFooter: appUrl => `Greenhouse by Efeonce Group SpA · This is an automated email sent from ${appUrl}`
+}
+
 export default function PayrollPaymentCancelledEmail({
   fullName = 'María González Rojas',
   periodYear = 2026,
@@ -35,13 +50,13 @@ export default function PayrollPaymentCancelledEmail({
 }: PayrollPaymentCancelledEmailProps) {
   const monthName = MONTH_NAMES[periodMonth - 1] ?? String(periodMonth)
   const isChile = payRegime === 'chile'
-
-  const previewText = isChile
-    ? `Actualización sobre tu pago de ${monthName} ${periodYear}`
-    : `Update on your ${monthName} ${periodYear} payment`
+  const t = selectEmailTemplateCopy(isChile ? 'es' : 'en', getMicrocopy().emails.payroll.paymentCancelled, LEGACY_EN_PAYROLL_PAYMENT_CANCELLED_EMAIL_COPY)
+  const periodLabel = `${monthName} ${periodYear}`
+  const previewText = t.previewText(periodLabel)
 
   const appUrl = `${APP_URL}/my/payroll`
   const firstName = fullName.split(' ')[0] || fullName
+  const amountLabel = formatMoney(netTotal, entryCurrency)
 
   return (
     <EmailLayout previewText={previewText} lang={isChile ? 'es' : 'en'}>
@@ -53,7 +68,7 @@ export default function PayrollPaymentCancelledEmail({
         margin: '0 0 8px',
         lineHeight: '34px'
       }}>
-        {isChile ? 'Actualización sobre tu pago' : 'Payment update'}
+        {t.heading}
       </Heading>
 
       <Text style={{
@@ -62,19 +77,7 @@ export default function PayrollPaymentCancelledEmail({
         lineHeight: '24px',
         margin: '0 0 20px'
       }}>
-        {isChile ? (
-          <>
-            Hola {firstName}, queremos avisarte que detectamos un problema con el pago programado de
-            <strong> {monthName} {periodYear}</strong> ({formatMoney(netTotal, entryCurrency)}).
-            Lo estamos resolviendo y te contactaremos en los próximos días con la actualización.
-          </>
-        ) : (
-          <>
-            Hi {firstName}, we detected an issue with the scheduled payment for
-            <strong> {monthName} {periodYear}</strong> ({formatMoney(netTotal, entryCurrency)}).
-            We are working on it and will contact you in the next few days with the update.
-          </>
-        )}
+        {t.bodyPrefix}{firstName}{t.bodyPeriodPrefix}<strong> {monthName} {periodYear}</strong>{t.bodyAmountPrefix}{amountLabel}{t.bodyAmountSuffix}
       </Text>
 
       {cancellationReason ? (
@@ -92,7 +95,7 @@ export default function PayrollPaymentCancelledEmail({
             margin: '0',
             fontWeight: 500
           }}>
-            {isChile ? 'Motivo:' : 'Reason:'} {cancellationReason}
+            {t.reasonLabel} {cancellationReason}
           </Text>
         </Section>
       ) : null}
@@ -103,13 +106,11 @@ export default function PayrollPaymentCancelledEmail({
         lineHeight: '22px',
         margin: '0 0 20px'
       }}>
-        {isChile
-          ? 'Disculpa el inconveniente. Tu equipo de operaciones ya está al tanto.'
-          : 'Sorry for the inconvenience. Your operations team has been notified.'}
+        {t.apology}
       </Text>
 
       <Section style={{ textAlign: 'center' as const, margin: '0 0 24px' }}>
-        <EmailButton href={appUrl}>{isChile ? 'Ver mi nómina' : 'View my payroll'}</EmailButton>
+        <EmailButton href={appUrl}>{t.cta}</EmailButton>
       </Section>
 
       <Text style={{
@@ -120,9 +121,7 @@ export default function PayrollPaymentCancelledEmail({
         borderTop: `1px solid ${EMAIL_COLORS.border}`,
         paddingTop: '20px'
       }}>
-        {isChile
-          ? `Greenhouse by Efeonce Group SpA · Este es un correo automático enviado desde ${APP_URL}`
-          : `Greenhouse by Efeonce Group SpA · This is an automated email sent from ${APP_URL}`}
+        {t.automatedFooter(APP_URL)}
       </Text>
     </EmailLayout>
   )

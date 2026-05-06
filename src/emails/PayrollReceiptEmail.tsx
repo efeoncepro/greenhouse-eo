@@ -1,5 +1,7 @@
 import { Heading, Section, Text } from '@react-email/components'
 
+import { getMicrocopy, type PayrollReceiptEmailTemplateCopy } from '@/lib/copy'
+import { selectEmailTemplateCopy } from '@/lib/email/template-copy'
 import { formatCurrency } from '@/lib/format'
 
 import EmailButton from './components/EmailButton'
@@ -24,6 +26,23 @@ const MONTH_NAMES = [
 
 const formatMoney = (value: number, currency: 'CLP' | 'USD') =>
   formatCurrency(value, currency, currency === 'USD' ? { currencySymbol: 'US$' } : {}, currency === 'USD' ? 'en-US' : undefined)
+
+const LEGACY_EN_PAYROLL_RECEIPT_EMAIL_COPY: PayrollReceiptEmailTemplateCopy = {
+  previewText: periodLabel => `Your payment statement for ${periodLabel} is ready`,
+  heading: 'Payment statement',
+  greetingPrefix: 'Hi ',
+  greetingPeriodPrefix: ', your payment statement for ',
+  greetingSuffix: ' is ready. We included a short summary and attached the PDF for your records.',
+  regimeLabel: 'Regime',
+  regimeValue: 'International',
+  currencyLabel: 'Moneda',
+  grossLabel: 'Gross',
+  deductionsLabel: 'Deductions',
+  netLabel: 'Net payment',
+  cta: 'View my payroll',
+  pdfHelp: 'If you do not see the attached PDF, please check your mail downloads or open Greenhouse using the button above.',
+  automatedFooter: appUrl => `Greenhouse by Efeonce Group SpA · This is an automated email sent from ${appUrl}`
+}
 
 const summaryRow = (label: string, value: string, emphasis = false) => (
   <table style={{
@@ -73,11 +92,9 @@ export default function PayrollReceiptEmail({
 }: PayrollReceiptEmailProps) {
   const monthName = MONTH_NAMES[periodMonth - 1] ?? String(periodMonth)
   const isChile = payRegime === 'chile'
-  const regimeLabel = isChile ? 'Liquidación de remuneraciones' : 'Payment statement'
-
-  const previewText = isChile
-    ? `Tu recibo de nómina de ${monthName} ${periodYear} ya está disponible`
-    : `Your payment statement for ${monthName} ${periodYear} is ready`
+  const t = selectEmailTemplateCopy(isChile ? 'es' : 'en', getMicrocopy().emails.payroll.receipt, LEGACY_EN_PAYROLL_RECEIPT_EMAIL_COPY)
+  const periodLabel = `${monthName} ${periodYear}`
+  const previewText = t.previewText(periodLabel)
 
   const appUrl = `${APP_URL}/my/payroll`
   const firstName = fullName.split(' ')[0] || fullName
@@ -92,7 +109,7 @@ export default function PayrollReceiptEmail({
         margin: '0 0 8px',
         lineHeight: '34px',
       }}>
-        {regimeLabel}
+        {t.heading}
       </Heading>
 
       <Text style={{
@@ -101,17 +118,7 @@ export default function PayrollReceiptEmail({
         lineHeight: '24px',
         margin: '0 0 20px',
       }}>
-        {isChile ? (
-          <>
-            Hola {firstName}, tu recibo de nómina de <strong>{monthName} {periodYear}</strong> ya está listo.
-            Te dejamos el resumen y adjuntamos el PDF para que puedas revisarlo cuando quieras.
-          </>
-        ) : (
-          <>
-            Hi {firstName}, your payment statement for <strong>{monthName} {periodYear}</strong> is ready.
-            We included a short summary and attached the PDF for your records.
-          </>
-        )}
+        {t.greetingPrefix}{firstName}{t.greetingPeriodPrefix}<strong>{monthName} {periodYear}</strong>{t.greetingSuffix}
       </Text>
 
       <Section style={{
@@ -121,15 +128,15 @@ export default function PayrollReceiptEmail({
         padding: '18px 18px 8px',
         margin: '0 0 24px',
       }}>
-        {summaryRow(isChile ? 'Régimen' : 'Regime', isChile ? 'Chile' : 'International')}
-        {summaryRow('Moneda', entryCurrency)}
-        {summaryRow(isChile ? 'Bruto' : 'Gross', formatMoney(grossTotal, entryCurrency))}
-        {summaryRow(isChile ? 'Descuentos' : 'Deductions', formatMoney(totalDeductions ?? 0, entryCurrency))}
-        {summaryRow(isChile ? 'Líquido' : 'Net payment', formatMoney(netTotal, entryCurrency), true)}
+        {summaryRow(t.regimeLabel, t.regimeValue)}
+        {summaryRow(t.currencyLabel, entryCurrency)}
+        {summaryRow(t.grossLabel, formatMoney(grossTotal, entryCurrency))}
+        {summaryRow(t.deductionsLabel, formatMoney(totalDeductions ?? 0, entryCurrency))}
+        {summaryRow(t.netLabel, formatMoney(netTotal, entryCurrency), true)}
       </Section>
 
       <Section style={{ textAlign: 'center' as const, margin: '0 0 24px' }}>
-        <EmailButton href={appUrl}>{isChile ? 'Abrir mi nómina' : 'View my payroll'}</EmailButton>
+        <EmailButton href={appUrl}>{t.cta}</EmailButton>
       </Section>
 
       <Text style={{
@@ -140,9 +147,7 @@ export default function PayrollReceiptEmail({
         borderTop: `1px solid ${EMAIL_COLORS.border}`,
         paddingTop: '20px',
       }}>
-        {isChile
-          ? 'Si no ves el PDF adjunto, revisa la carpeta de descargas de tu correo o ingresa a Greenhouse desde el botón anterior.'
-          : 'If you do not see the attached PDF, please check your mail downloads or open Greenhouse using the button above.'}
+        {t.pdfHelp}
       </Text>
 
       <Text style={{
@@ -151,9 +156,7 @@ export default function PayrollReceiptEmail({
         lineHeight: '18px',
         margin: '0',
       }}>
-        {isChile
-          ? `Greenhouse by Efeonce Group SpA · Este es un correo automático enviado desde ${APP_URL}`
-          : `Greenhouse by Efeonce Group SpA · This is an automated email sent from ${APP_URL}`}
+        {t.automatedFooter(APP_URL)}
       </Text>
     </EmailLayout>
   )

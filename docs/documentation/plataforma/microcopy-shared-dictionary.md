@@ -25,6 +25,7 @@ El objetivo no es traducir todo el portal todavia. El objetivo es evitar drift: 
 - TASK-408 Slice 3B migra `NotificationEmail` a `emails.genericNotification` para greeting, default CTA y fallback URL. El contenido dinamico de la notificacion sigue viniendo del caller.
 - TASK-408 Slice 3C migra la cohorte leave a `emails.leave.*`. Los textos por estado, labels y pluralizacion viven en dictionary; fechas, rutas, motivos, notas, tipos de permiso y dias siguen viniendo del runtime/template.
 - TASK-408 Slice 3D agrega `selectEmailIntlDateLocale()` para que el locale Intl de fechas en emails no se resuelva con ternarios ad-hoc dentro de templates.
+- TASK-408 Slice 3E migra la cohorte payroll employee-facing a `emails.payroll.*`. El dictionary guarda copy estatico; nombres, periodos, montos, fechas, procesador, motivos, links y adjuntos PDF siguen como tokens/props del runtime de Payroll.
 - `buildStatusMap()` permite construir status maps type-safe sin repetir labels inline.
 - La regla ESLint `greenhouse/no-untokenized-copy` se extendio para detectar arrays de meses y CTAs JSX text, ademas de los patrones ya existentes.
 - El sweep de `src/views`, `src/components` y `src/app` quedo en 0 warnings para `greenhouse/no-untokenized-copy`.
@@ -39,7 +40,7 @@ El objetivo no es traducir todo el portal todavia. El objetivo es evitar drift: 
 | Copy institucional de emails | `src/lib/copy/dictionaries/es-CL/emails.ts` | Footer, disclaimers y builders de subject que reciben tokens |
 | Copy visible de categorias de notificacion | `src/lib/copy/dictionaries/es-CL/emails.ts` | Labels/descriptions de preferencias y centro de notificaciones |
 | Shell institucional de email | `src/emails/components/EmailLayout.tsx` + `emails.layout` | Logo alt, tagline, disclaimer, unsubscribe label |
-| Copy de templates migrados | `emails.<grupo>.<template>` + `selectEmailTemplateCopy()` | Auth, Notification y Leave `es` desde dictionary, `en` fallback legacy |
+| Copy de templates migrados | `emails.<grupo>.<template>` + `selectEmailTemplateCopy()` | Auth, Notification, Leave y Payroll `es` desde dictionary, `en` fallback legacy donde aplica |
 | Copy de dominio local | Cerca del dominio | Estado legal especifico de Payroll o Finance |
 
 ## Uso basico
@@ -139,4 +140,5 @@ TASK-408 Slice 2A agrega:
 TASK-408 Slice 3A agrega:
 
 - `src/lib/email/template-copy.test.ts` para proteger la seleccion dictionary/fallback por locale.
-- Snapshot baseline de Auth, Notification y Leave estable despues de mover copy `es` a `emails.*`.
+- Snapshot baseline de Auth, Notification, Leave y Payroll estable despues de mover copy `es` a `emails.*`.
+- Tests focales de payroll email confirman que `fullName`/`firstName`, periodos, montos, fechas, procesador, links y adjuntos siguen fuera del dictionary como datos de runtime.
