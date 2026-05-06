@@ -23128,7 +23128,7 @@ Evidencia runtime:
 
 No validado aun:
 
-- Comparacion visual del inbox `agent-qa@efeoncepro.com` contra baseline. El smoke ya valida render + send + persistencia + Resend ID; falta inspeccion visual humana/inbox.
+- Comparacion visual humana del inbox contra baseline. `agent-qa@efeoncepro.com` no existe como buzon verificable; se ejecuto re-smoke a `jreyes@efeoncepro.com`.
 - Observacion 24h post-deploy del signal para cerrar lifecycle de TASK-408.
 
 Revalidacion posterior:
@@ -23137,3 +23137,16 @@ Revalidacion posterior:
 - `GET /api/admin/emails/preview` -> 17/17 templates.
 - `GET /api/admin/email-deliveries?limit=5` -> los 5 smoke deliveries siguen como los ultimos `email_preview_test`; KPI `failedToday=0`, `deliveryRate=100`.
 - `GET /api/admin/reliability` -> `notifications.email.render_failure_rate` severity `ok`, `total_render_failures=0`, `delivery_render_failures=0`, `reactive_render_failures=0`, `delivery_failure_rate_percent=0.00`.
+
+Re-smoke a buzon real:
+
+- Destino confirmado por usuario: `jreyes@efeoncepro.com`.
+- Se reenviaron los 5 templates via `POST /api/admin/emails/preview` en `https://greenhouse-dqaqhwmw4-efeonce-7670142f.vercel.app`.
+- Resultados en `email_deliveries`, todos `status=sent`, `sourceEntity=email_preview_test`:
+  - `payroll_export` -> delivery `6dcb749c-1d3e-47b5-9c63-0af0c0affdce`, Resend `f9f1c0b6-745b-4dce-8e3f-f4a56d4cf6db`.
+  - `leave_request_pending_review` -> delivery `e05b0845-6e9f-47f0-a0ff-5ccfc8f641df`, Resend `7f3d32f0-1052-43a1-82ee-92e12ce1b1f4`.
+  - `invitation` -> delivery `b29c2d6d-5de2-49bd-99ba-9064b420f52e`, Resend `b5e4adf8-fc61-4f12-9b1d-28806df6d5d6`.
+  - `quote_share` -> delivery `cb6c8c74-3c6b-42e4-858d-9a88c49a06ec`, Resend `d8793c81-22b3-42cd-9551-a6877fcddbcf`.
+  - `weekly_executive_digest` -> delivery `5118bc2e-ed7c-4c2a-9ea2-74adc5382694`, Resend `77bbcd25-61a1-41c2-83f5-c2b14d0437ad`.
+- KPI posterior: `sentToday=19`, `failedToday=0`, `pendingRetry=0`, `deliveryRate=100`.
+- Signal posterior: `notifications.email.render_failure_rate` severity `ok`, `total_render_failures=0`, `delivery_render_failures=0`, `reactive_render_failures=0`, `delivery_failure_rate_percent=0.00`.

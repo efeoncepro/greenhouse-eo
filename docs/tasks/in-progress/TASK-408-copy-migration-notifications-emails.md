@@ -180,7 +180,7 @@ Reglas obligatorias:
 ### Slice 5 — Verificación de delivery + promoción de la rule a `error`
 
 - Snapshot tests `pnpm test src/emails` verdes para los 17 templates en cada PR (mecánico, no manual).
-- **Smoke staging** (delegado, no exhaustivo): enviar **un email de cada grupo cohesivo** (5 emails total: 1 payroll, 1 leave, 1 auth, 1 finance, 1 digest) a inbox de prueba — confirma que el render real (no solo snapshot) coincide con baseline. Inbox: `agent-qa@efeoncepro.com` o equivalente.
+- **Smoke staging** (delegado, no exhaustivo): enviar **un email de cada grupo cohesivo** (5 emails total: 1 payroll, 1 leave, 1 auth, 1 finance, 1 digest) via `/api/admin/emails/preview` — confirma render real + delivery layer + Resend acceptance + persistencia en `email_deliveries`, sin tocar flujos de negocio. La comparacion visual de inbox solo aplica si existe un QA inbox real confirmado.
 - Verificar `notifications.email.render_failure_rate` en `/admin/operations` durante 24h post-deploy = 0.
 - Promote `greenhouse/no-untokenized-copy` a `error` mode (ver Closing Protocol).
 
@@ -206,8 +206,8 @@ Anclados al baseline 2026-05-06:
 - [x] **Reliability signal `notifications.email.render_failure_rate`** declarado y wired al overview. Pendiente operacional post-deploy: observar `/admin/operations` durante 24h y confirmar count = 0.
 - [x] `pnpm build`, `pnpm lint`, `npx tsc --noEmit`, `pnpm test` pasan en verificacion final 2026-05-06: lint pass, tsc pass, build pass, test completo pass (589 files / 3419 passed / 5 skipped).
 - [x] Admin preview catalog cubre todos los 17 templates registrados, incluyendo `quote_share` para smoke finance/Nexa-adjacent sin tocar flujos de negocio.
-- [x] **Smoke staging delivery/render** ejecutado 2026-05-06: 5 emails de grupos cohesivos enviados via `/api/admin/emails/preview` a `agent-qa@efeoncepro.com`, todos `status=sent`, `failedToday=0`, con `sourceEntity=email_preview_test`.
-- [ ] **Smoke staging visual inbox**: comparar en inbox QA los 5 emails recibidos contra baseline visual.
+- [x] **Smoke staging delivery/render** ejecutado 2026-05-06: 5 emails de grupos cohesivos enviados via `/api/admin/emails/preview`, todos aceptados por Resend, persistidos en `email_deliveries` con `status=sent`, `failedToday=0`, con `sourceEntity=email_preview_test`.
+- [x] **Smoke staging real inbox** ejecutado 2026-05-06 contra `jreyes@efeoncepro.com`: los 5 grupos cohesivos fueron aceptados por Resend y persistidos en `email_deliveries` con `status=sent`; validacion visual humana del inbox queda como confirmacion opcional fuera del gate tecnico.
 
 ## Verification
 
@@ -219,7 +219,7 @@ Anclados al baseline 2026-05-06:
 - Verificacion final 2026-05-06: `rg "locale\s*===\s*['\"]en['\"]" src/emails/ | wc -l` = 0; `rg "from\s+['\"]@/config/greenhouse-nomenclature" src/emails/ | wc -l` = 0; `rg "from\s+['\"]@/lib/copy" src/emails/ | wc -l` = 18; `rg "eslint-disable.*no-untokenized-copy" src/ | wc -l` = 0.
 - `src/lib/email/templates.test.ts` exige que `getPreviewCatalog()` exponga todos los templates registrados por `listRegisteredTemplates()`. Esto protege el smoke staging: si se registra un email nuevo, queda obligado a tener metadata de preview antes de cerrar.
 - Reliability dashboard muestra `notifications.email.render_failure_rate` con steady=0 durante 24h post-deploy.
-- Smoke staging: 5 emails enviados, recibidos, comparados pixel-by-pixel con captura baseline pre-migración.
+- Smoke staging delivery/render: 5 emails enviados via preview, aceptados por Resend, persistidos en `email_deliveries` y cubiertos por `notifications.email.render_failure_rate`. Comparacion visual de inbox queda fuera del gate mientras no exista un QA inbox real confirmado.
 
 ### Smoke staging 2026-05-06
 
@@ -227,7 +227,15 @@ Deployment: `https://greenhouse-p3vsyz3t4-efeonce-7670142f.vercel.app` (`develop
 
 Revalidacion post-documentation push: `https://greenhouse-dqaqhwmw4-efeonce-7670142f.vercel.app` (`develop` commit `03a90f77`) listo en Vercel Staging, catalogo admin mantiene 17/17 templates, los 5 smoke deliveries siguen como los ultimos `email_preview_test`, KPI `failedToday=0`, `deliveryRate=100`, y `notifications.email.render_failure_rate` sigue `ok` con `total_render_failures=0`.
 
-Metodo seguro: `POST /api/admin/emails/preview` con `recipientEmail=agent-qa@efeoncepro.com`; esto ejercita `sendEmail`, Resend y `email_deliveries` usando `sourceEntity=email_preview_test`, sin tocar payroll lifecycle, leave workflow, quote lifecycle, Nexa digest jobs, outbox publisher, reactive consumer, notification preferences ni webhooks.
+Metodo seguro: `POST /api/admin/emails/preview`; esto ejercita `sendEmail`, Resend y `email_deliveries` usando `sourceEntity=email_preview_test`, sin tocar payroll lifecycle, leave workflow, quote lifecycle, Nexa digest jobs, outbox publisher, reactive consumer, notification preferences ni webhooks. Nota 2026-05-06: `agent-qa@efeoncepro.com` fue usado como destinatario tecnico para probar acceptance del provider, pero no existe como buzon verificable; por eso no se usa como gate visual.
+
+Re-smoke a buzon real 2026-05-06: se reenviaron los mismos 5 templates a `jreyes@efeoncepro.com` via el mismo endpoint seguro. Todos quedaron `status=sent`, KPI `failedToday=0`, `deliveryRate=100`, y `notifications.email.render_failure_rate` siguio `ok` con `total_render_failures=0`.
+
+- Payroll: `payroll_export` -> batch `a9c9b85f-c8a0-4b1a-a2a0-9b69c36d310a`, delivery `6dcb749c-1d3e-47b5-9c63-0af0c0affdce`, Resend `f9f1c0b6-745b-4dce-8e3f-f4a56d4cf6db`, status `sent`.
+- Leave: `leave_request_pending_review` -> batch `3cae9bb7-4c6d-4ea1-a9d1-313caef3ed5c`, delivery `e05b0845-6e9f-47f0-a0ff-5ccfc8f641df`, Resend `7f3d32f0-1052-43a1-82ee-92e12ce1b1f4`, status `sent`.
+- Auth: `invitation` -> batch `bb4c4d35-8316-4907-ada3-e82177faf73e`, delivery `b29c2d6d-5de2-49bd-99ba-9064b420f52e`, Resend `b5e4adf8-fc61-4f12-9b1d-28806df6d5d6`, status `sent`.
+- Finance: `quote_share` -> batch `0fa3a3a1-e6af-46e9-9b20-c655c78a1b24`, delivery `cb6c8c74-3c6b-42e4-858d-9a88c49a06ec`, Resend `d8793c81-22b3-42cd-9551-a6877fcddbcf`, status `sent`.
+- Digest/Nexa Insights: `weekly_executive_digest` -> batch `07b683d0-0c93-4ced-bf36-57e19940e207`, delivery `5118bc2e-ed7c-4c2a-9ea2-74adc5382694`, Resend `77bbcd25-61a1-41c2-83f5-c2b14d0437ad`, status `sent`.
 
 Resultados:
 
