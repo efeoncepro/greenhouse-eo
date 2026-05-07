@@ -25,6 +25,7 @@ import Typography from '@mui/material/Typography'
 import GreenhouseFileUploader, { type UploadedFileValue } from '@/components/greenhouse/GreenhouseFileUploader'
 import SampleSprintsMockupView, {
   type HealthSeverity,
+  type RuntimeSampleSprintOptions,
   type Signal,
   type Sprint,
   type SprintKind,
@@ -367,12 +368,13 @@ const useSampleSprints = (mode: WorkspaceMode, serviceId?: string) => {
   return { items, detail, options, loading, error }
 }
 
-const ListView = ({ items }: { items: SampleSprintItem[] }) => (
+const ListView = ({ items, options }: { items: SampleSprintItem[]; options: RuntimeSampleSprintOptions | null }) => (
   <SampleSprintsMockupView
     variant='runtime'
     sprints={items.map(toSprint)}
     signals={buildRuntimeSignals(items)}
     initialSelectedSprintId={items[0]?.serviceId}
+    runtimeOptions={options}
   />
 )
 
@@ -754,7 +756,7 @@ const SampleSprintsWorkspace = ({ mode, serviceId }: Props) => {
       {mode === 'list' ? null : <Header mode={mode} />}
       {loading ? <LinearProgress /> : null}
       {error ? <Alert severity='error'>{error}</Alert> : null}
-      {!loading && !error && mode === 'list' ? <ListView items={items} /> : null}
+      {!loading && !error && mode === 'list' ? <ListView items={items} options={options} /> : null}
       {!loading && !error && mode === 'declare' ? <DeclareView options={options} /> : null}
       {!loading && !error && detail && mode === 'detail' ? <DetailSummary detail={detail} /> : null}
       {!loading && !error && detail && mode === 'approve' ? <ApproveView detail={detail} /> : null}

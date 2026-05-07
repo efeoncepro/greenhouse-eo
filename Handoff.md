@@ -1,3 +1,17 @@
+# Sesion 2026-05-07 — TASK-809 wizard contract fix (Sample Sprints pantallas internas)
+
+- **Trigger:** el usuario aclaro que no bastaba con alinear el command center: la experiencia de `Declarar Sprint` y las pantallas internas del mockup aprobado tambien debian implementarse en detalle, no como links a formularios alternos.
+- **Skills aplicadas:** `greenhouse-ui-orchestrator` para conservar la composicion Vuexy/MUI aprobada; `greenhouse-ux-content-accessibility` para copy honesto, CTAs verb-led, estados de error/success y campos requeridos; `greenhouse-microinteractions-auditor` para feedback de acciones, disabled states, borradores y smoke de tabs/acciones.
+- **Fix robusto:** el modo runtime de `SampleSprintsMockupView` ahora renderiza wizards in-place con la misma jerarquia del mockup aprobado:
+  - `Declaracion`: Stepper Cliente/Diseño/Equipo/Confirmacion, campos reales de space, tipo, fechas, costo, FTE, miembro propuesto y criterios de exito; `Guardar borrador` persiste draft local y `Solicitar aprobacion` hace POST real a `/api/agency/sample-sprints`.
+  - `Approval`: tabla de capacidad, razon de override/rechazo, approve POST real y reject POST real.
+  - `Progreso`: snapshot semanal con fecha, estado, avance, notas, borrador local y POST real a `/progress`.
+  - `Outcome`: outcome, decision date, lineage opcional por service/quotation, rationale, cancellation reason, metricas JSON, uploader canonico y POST real a `/outcome`.
+  - `Commercial Health`: conserva surface aprobada y link operativo a `/admin/ops-health`.
+- **Backend/API:** nuevo endpoint runtime `POST /api/agency/sample-sprints/[serviceId]/reject` reutiliza helper canonico `rejectEngagement()` y entitlement `commercial.engagement.approve`; no se crea write path paralelo.
+- **Validacion:** `pnpm exec tsc --noEmit` OK; `pnpm lint` OK; `pnpm build` OK; `pnpm design:lint` OK. Playwright autenticado con usuario agente dedicado verifico ruta real y pantallas internas: Declaracion muestra campos/Stepper del mockup y habilita `Solicitar aprobacion` al completar required fields; Approval/Progreso/Outcome renderizan su surface o empty state seguro si no hay Sprint; Commercial Health linkea a Ops Health; sin console errors.
+- **Riesgo/follow-up:** con dataset vacio, Approval/Progreso/Outcome muestran empty state de seleccion; para validar mutaciones destructivas/creacion real con datos seed controlados conviene agregar un E2E fixture dedicado que cree y limpie un Sample Sprint de prueba.
+
 # Sesion 2026-05-07 — TASK-809 visual contract fix (Sample Sprints mockup aprobado)
 
 - **Trigger:** el usuario detecto correctamente que `/agency/sample-sprints` no seguia el mockup aprobado y se habia implementado una UI plana distinta. La fuente aprobada confirmada es `/agency/sample-sprints/mockup` (`src/app/(dashboard)/agency/sample-sprints/mockup/page.tsx` + `src/views/greenhouse/agency/sample-sprints/mockup/SampleSprintsMockupView.tsx`), documentada en EPIC-014/TASK-809.

@@ -1,8 +1,9 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, useTransition } from 'react'
 
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 import Alert from '@mui/material/Alert'
 import AvatarGroup from '@mui/material/AvatarGroup'
@@ -40,6 +41,7 @@ import CustomTextField from '@core/components/mui/TextField'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 
 import EmptyState from '@/components/greenhouse/EmptyState'
+import GreenhouseFileUploader, { type UploadedFileValue } from '@/components/greenhouse/GreenhouseFileUploader'
 import { CardHeaderWithBadge } from '@/components/greenhouse/primitives'
 import useReducedMotion from '@/hooks/useReducedMotion'
 import { getMicrocopy } from '@/lib/copy'
@@ -85,6 +87,42 @@ export type Signal = {
   count: number
   runbook: string
   description: string
+}
+
+export type RuntimeSampleSprintOptions = {
+  spaces: Array<{
+    spaceId: string
+    spaceName: string
+    clientName: string | null
+    organizationId: string | null
+    organizationName: string | null
+  }>
+  members: Array<{
+    memberId: string
+    displayName: string
+    roleTitle: string | null
+  }>
+  conversionTargets: Array<{
+    serviceId: string
+    publicId: string | null
+    name: string
+    spaceName: string | null
+  }>
+  quotations: Array<{
+    quotationId: string
+    quotationNumber: string
+    clientName: string | null
+    status: string
+    totalAmountClp: number | null
+  }>
+}
+
+type RuntimeSampleSprintDetail = {
+  serviceId: string
+  publicId: string | null
+  name: string
+  spaceId: string
+  proposedTeam: Array<{ memberId: string; proposedFte: number; role?: string | null }>
 }
 
 const sprintKinds: Record<SprintKind, { label: string; icon: string; color: HealthSeverity }> = {
@@ -263,6 +301,24 @@ const formatDate = (value: string) => {
   return formatGreenhouseDate(value, { day: '2-digit', month: 'short' }, 'es-CL')
 }
 
+const parseRecord = (value: string, fallback: Record<string, unknown>) => {
+  try {
+    const parsed = JSON.parse(value)
+
+    return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed as Record<string, unknown> : fallback
+  } catch {
+    return fallback
+  }
+}
+
+const buildCriteria = (value: string) => ({
+  summary: value.trim(),
+  checklist: value
+    .split('\n')
+    .map(line => line.trim())
+    .filter(Boolean)
+})
+
 const getDaysToDecision = (date: string) => {
   const now = new Date('2026-05-07T00:00:00')
   const target = new Date(`${date}T00:00:00`)
@@ -277,13 +333,15 @@ type SampleSprintsMockupViewProps = {
   signals?: Signal[]
   variant?: SampleSprintsExperienceVariant
   initialSelectedSprintId?: string
+  runtimeOptions?: RuntimeSampleSprintOptions | null
 }
 
 const SampleSprintsMockupView = ({
   sprints = mockSprints,
   signals = reliabilitySignals,
   variant = 'mockup',
-  initialSelectedSprintId
+  initialSelectedSprintId,
+  runtimeOptions = null
 }: SampleSprintsMockupViewProps = {}) => {
   const theme = useTheme()
   const reducedMotion = useReducedMotion()
@@ -448,13 +506,13 @@ const SampleSprintsMockupView = ({
         </TabPanel>
 
         <TabPanel value='declare' sx={{ p: 0, pt: 6 }}>
-          {variant === 'runtime' ? <RuntimeActionPanel kind='declare' /> : <DeclareWizard />}
+          {variant === 'runtime' ? <RuntimeDeclareWizard options={runtimeOptions} /> : <DeclareWizard />}
         </TabPanel>
 
         <TabPanel value='approval' sx={{ p: 0, pt: 6 }}>
           {selectedSprint ? (
             variant === 'runtime' ? (
-              <RuntimeActionPanel kind='approval' sprint={selectedSprint} />
+              <RuntimeApprovalWizard sprint={selectedSprint} />
             ) : (
               <ApprovalWizard sprint={selectedSprint} approvalOverride={approvalOverride} setApprovalOverride={setApprovalOverride} />
             )
@@ -464,7 +522,7 @@ const SampleSprintsMockupView = ({
         <TabPanel value='progress' sx={{ p: 0, pt: 6 }}>
           {selectedSprint ? (
             variant === 'runtime' ? (
-              <RuntimeActionPanel kind='progress' sprint={selectedSprint} />
+              <RuntimeProgressWizard sprint={selectedSprint} />
             ) : (
               <ProgressWizard sprint={selectedSprint} snapshotNotes={snapshotNotes} setSnapshotNotes={setSnapshotNotes} />
             )
@@ -472,7 +530,7 @@ const SampleSprintsMockupView = ({
         </TabPanel>
 
         <TabPanel value='outcome' sx={{ p: 0, pt: 6 }}>
-          {selectedSprint ? (variant === 'runtime' ? <RuntimeActionPanel kind='outcome' sprint={selectedSprint} /> : <OutcomeWizard sprint={selectedSprint} />) : <NoSprintSelected variant={variant} />}
+          {selectedSprint ? (variant === 'runtime' ? <RuntimeOutcomeWizard sprint={selectedSprint} options={runtimeOptions} /> : <OutcomeWizard sprint={selectedSprint} />) : <NoSprintSelected variant={variant} />}
         </TabPanel>
 
         <TabPanel value='health' sx={{ p: 0, pt: 6 }}>
@@ -1278,93 +1336,441 @@ const OutcomeWizard = ({ sprint }: { sprint: Sprint }) => (
   </Grid>
 )
 
-const RuntimeActionPanel = ({ kind, sprint }: { kind: 'declare' | 'approval' | 'progress' | 'outcome'; sprint?: Sprint }) => {
-  const meta = {
-    declare: {
-      title: 'Declarar Sample Sprint',
-      subheader: 'Usa el formulario transaccional conectado al backend.',
-      icon: 'tabler-forms',
-      href: '/agency/sample-sprints/new',
-      cta: 'Abrir declaración',
-      color: 'primary' as HealthSeverity,
-      bullets: ['Crea el service no regular.', 'Registra criterios de éxito.', 'Dispara approval cuando corresponde.']
-    },
-    approval: {
-      title: 'Aprobar engagement',
-      subheader: sprint ? `${sprint.client} · ${sprint.name}` : 'Selecciona un Sprint para aprobar.',
-      icon: 'tabler-shield-check',
-      href: sprint ? `/agency/sample-sprints/${sprint.id}/approve` : '/agency/sample-sprints',
-      cta: 'Abrir approval',
-      color: 'warning' as HealthSeverity,
-      bullets: ['Valida capacity warning.', 'Audita overrides.', 'Promueve el Sprint a operación.']
-    },
-    progress: {
-      title: 'Registrar snapshot semanal',
-      subheader: sprint ? `${sprint.client} · último snapshot hace ${sprint.lastSnapshotDays} días` : 'Selecciona un Sprint para registrar progreso.',
-      icon: 'tabler-notes',
-      href: sprint ? `/agency/sample-sprints/${sprint.id}/progress` : '/agency/sample-sprints',
-      cta: 'Abrir progreso',
-      color: 'info' as HealthSeverity,
-      bullets: ['Registra métricas JSON.', 'Adjunta notas cualitativas.', 'Mantiene steady el signal de stale progress.']
-    },
-    outcome: {
-      title: 'Registrar outcome',
-      subheader: sprint ? `${sprint.client} · ${sprint.name}` : 'Selecciona un Sprint para cerrar outcome.',
-      icon: 'tabler-flag-check',
-      href: sprint ? `/agency/sample-sprints/${sprint.id}/outcome` : '/agency/sample-sprints',
-      cta: 'Abrir outcome',
-      color: 'primary' as HealthSeverity,
-      bullets: ['Cierra el outcome.', 'Conecta lineage si convierte.', 'Emite audit log y outbox event.']
+const RuntimeDeclareWizard = ({ options }: { options: RuntimeSampleSprintOptions | null }) => {
+  const router = useRouter()
+  const [pending, startTransition] = useTransition()
+  const [feedback, setFeedback] = useState<{ severity: 'success' | 'error' | 'info'; message: string } | null>(null)
+  const [memberId, setMemberId] = useState('')
+  const [proposedFte, setProposedFte] = useState(0.25)
+
+  const [form, setForm] = useState({
+    name: '',
+    spaceId: options?.spaces[0]?.spaceId ?? '',
+    engagementKind: 'pilot' as SprintKind,
+    startDate: new Date().toISOString().slice(0, 10),
+    decisionDeadline: new Date(Date.now() + 21 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10),
+    expectedDurationDays: 21,
+    expectedInternalCostClp: 0,
+    successCriteria: ''
+  })
+
+  useEffect(() => {
+    if (!form.spaceId && options?.spaces[0]?.spaceId) {
+      setForm(current => ({ ...current, spaceId: options.spaces[0].spaceId }))
     }
-  }[kind]
+  }, [form.spaceId, options?.spaces])
+
+  const selectedSpace = options?.spaces.find(space => space.spaceId === form.spaceId)
+  const canSubmit = Boolean(form.name.trim() && form.spaceId && form.successCriteria.trim())
+
+  const saveDraft = () => {
+    window.localStorage.setItem('greenhouse.sample-sprints.declare-draft', JSON.stringify({ ...form, memberId, proposedFte }))
+    setFeedback({ severity: 'success', message: 'Borrador guardado en este navegador.' })
+  }
+
+  const submit = () => {
+    if (!canSubmit) {
+      setFeedback({ severity: 'error', message: 'Completa nombre, cliente y criterios de éxito antes de solicitar aprobación.' })
+
+      return
+    }
+
+    setFeedback(null)
+    startTransition(async () => {
+      const response = await fetch('/api/agency/sample-sprints', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...form,
+          organizationId: selectedSpace?.organizationId ?? null,
+          successCriteria: buildCriteria(form.successCriteria),
+          proposedTeam: memberId ? [{ memberId, proposedFte }] : []
+        })
+      })
+
+      const payload = await response.json().catch(() => null)
+
+      if (!response.ok) {
+        setFeedback({ severity: 'error', message: payload?.error || 'No fue posible declarar el Sample Sprint.' })
+
+        return
+      }
+
+      router.push(`/agency/sample-sprints/${payload.serviceId}`)
+    })
+  }
 
   return (
     <Grid container spacing={6}>
       <Grid size={{ xs: 12, lg: 8 }}>
         <Card>
           <CardHeader
-            title={meta.title}
-            subheader={meta.subheader}
-            avatar={
-              <CustomAvatar skin='light' color={meta.color} variant='rounded'>
-                <i className={meta.icon} />
-              </CustomAvatar>
-            }
+            title='Declarar Sample Sprint'
+            subheader='Crea el engagement en pending_approval con criterio de éxito y costo esperado.'
+            avatar={<CustomAvatar skin='light' color='primary' variant='rounded'><i className='tabler-forms' /></CustomAvatar>}
           />
           <Divider />
           <CardContent>
-            <Stack spacing={5}>
-              <Stepper activeStep={kind === 'declare' ? 1 : kind === 'approval' ? 2 : kind === 'progress' ? 3 : 4}>
-                {['Cliente', 'Diseño', 'Approval', 'Operación', 'Outcome'].map(step => (
-                  <Step key={step}>
-                    <StepLabel>{step}</StepLabel>
-                  </Step>
-                ))}
-              </Stepper>
-              <Grid container spacing={5}>
-                {meta.bullets.map(item => (
-                  <Grid key={item} size={{ xs: 12, md: 4 }}>
-                    <DecisionTile label='Runtime conectado' value={item} icon='tabler-plug-connected' />
-                  </Grid>
-                ))}
+            <Stepper activeStep={1} sx={{ mb: 6 }}>
+              {['Cliente', 'Diseño', 'Equipo', 'Confirmación'].map(step => <Step key={step}><StepLabel>{step}</StepLabel></Step>)}
+            </Stepper>
+            {feedback ? <Alert severity={feedback.severity} sx={{ mb: 5 }}>{feedback.message}</Alert> : null}
+            <Grid container spacing={5}>
+              <Grid size={{ xs: 12, md: 6 }}>
+                <CustomTextField label='Nombre del Sprint' value={form.name} onChange={event => setForm({ ...form, name: event.target.value })} fullWidth required />
               </Grid>
-            </Stack>
+              <Grid size={{ xs: 12, md: 6 }}>
+                <CustomTextField select label='Cliente / Space' value={form.spaceId} onChange={event => setForm({ ...form, spaceId: event.target.value })} fullWidth required>
+                  {(options?.spaces ?? []).map(space => (
+                    <MenuItem key={space.spaceId} value={space.spaceId}>
+                      {space.organizationName || space.clientName || space.spaceName} · {space.spaceName}
+                    </MenuItem>
+                  ))}
+                </CustomTextField>
+              </Grid>
+              <Grid size={{ xs: 12, md: 6 }}>
+                <CustomTextField select label='Tipo de Sprint' value={form.engagementKind} onChange={event => setForm({ ...form, engagementKind: event.target.value as SprintKind })} fullWidth>
+                  {Object.entries(sprintKinds).map(([kind, meta]) => <MenuItem key={kind} value={kind}>{meta.label}</MenuItem>)}
+                </CustomTextField>
+              </Grid>
+              <Grid size={{ xs: 12, md: 3 }}>
+                <CustomTextField label='Inicio' type='date' value={form.startDate} onChange={event => setForm({ ...form, startDate: event.target.value })} fullWidth />
+              </Grid>
+              <Grid size={{ xs: 12, md: 3 }}>
+                <CustomTextField label='Decisión' type='date' value={form.decisionDeadline} onChange={event => setForm({ ...form, decisionDeadline: event.target.value })} fullWidth />
+              </Grid>
+              <Grid size={{ xs: 12, md: 4 }}>
+                <CustomTextField label='Costo interno esperado' type='number' value={form.expectedInternalCostClp} onChange={event => setForm({ ...form, expectedInternalCostClp: Number(event.target.value) })} helperText='Se usa para capacity warning y GTM investment.' fullWidth />
+              </Grid>
+              <Grid size={{ xs: 12, md: 4 }}>
+                <CustomTextField label='Duración estimada' type='number' value={form.expectedDurationDays} onChange={event => setForm({ ...form, expectedDurationDays: Number(event.target.value) })} helperText='Días operativos esperados.' fullWidth />
+              </Grid>
+              <Grid size={{ xs: 12, md: 4 }}>
+                <CustomTextField select label='Miembro propuesto' value={memberId} onChange={event => setMemberId(event.target.value)} fullWidth>
+                  <MenuItem value=''>Sin asignar</MenuItem>
+                  {(options?.members ?? []).map(member => <MenuItem key={member.memberId} value={member.memberId}>{member.displayName}{member.roleTitle ? ` · ${member.roleTitle}` : ''}</MenuItem>)}
+                </CustomTextField>
+              </Grid>
+              <Grid size={{ xs: 12, md: 4 }}>
+                <CustomTextField label='FTE propuesto' type='number' value={proposedFte} onChange={event => setProposedFte(Number(event.target.value))} inputProps={{ min: 0.05, max: 1, step: 0.05 }} fullWidth />
+              </Grid>
+              <Grid size={{ xs: 12 }}>
+                <CustomTextField multiline minRows={4} label='Criterios de éxito' value={form.successCriteria} onChange={event => setForm({ ...form, successCriteria: event.target.value })} helperText='Define evidencia, outcome esperado y condición de conversión.' fullWidth required />
+              </Grid>
+            </Grid>
           </CardContent>
           <Divider />
           <CardContent>
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} justifyContent='flex-end'>
-              <Button component={Link} href='/agency/sample-sprints' variant='tonal' color='secondary'>
-                Volver al board
-              </Button>
-              <Button component={Link} href={meta.href} variant='contained' startIcon={<i className='tabler-external-link' />}>
-                {meta.cta}
+              <Button variant='tonal' color='secondary' onClick={saveDraft} disabled={pending}>Guardar borrador</Button>
+              <Button variant='contained' startIcon={<i className='tabler-send' />} onClick={submit} disabled={pending || !canSubmit}>
+                {pending ? 'Solicitando...' : 'Solicitar aprobación'}
               </Button>
             </Stack>
           </CardContent>
         </Card>
       </Grid>
       <Grid size={{ xs: 12, lg: 4 }}>
-        <SideGuidance title='Runtime real' icon='tabler-shield-check' items={meta.bullets} />
+        <SideGuidance title='Guardrails de declaración' icon='tabler-shield' items={['No se materializa costo hasta approval aprobado.', 'El equipo propuesto debe tener owner y capacidad visible.', 'El Sprint nace como service con engagement_kind no regular.']} />
+      </Grid>
+    </Grid>
+  )
+}
+
+const RuntimeApprovalWizard = ({ sprint }: { sprint: Sprint }) => {
+  const router = useRouter()
+  const [pending, startTransition] = useTransition()
+  const [detail, setDetail] = useState<RuntimeSampleSprintDetail | null>(null)
+  const [approvalOverride, setApprovalOverride] = useState('')
+  const [feedback, setFeedback] = useState<{ severity: 'success' | 'error' | 'info'; message: string } | null>(null)
+  const hasCapacityRisk = sprint.team.some(member => member.availability < 0.1)
+  const proposedMembers = detail?.proposedTeam.map(member => ({ memberId: member.memberId, proposedFte: member.proposedFte })) ?? []
+
+  useEffect(() => {
+    let mounted = true
+
+    fetch(`/api/agency/sample-sprints/${encodeURIComponent(sprint.id)}`, { cache: 'no-store' })
+      .then(response => response.ok ? response.json() : null)
+      .then(payload => {
+        if (mounted) setDetail(payload)
+      })
+      .catch(() => {
+        if (mounted) setFeedback({ severity: 'error', message: 'No fue posible cargar el detalle de approval.' })
+      })
+
+    return () => {
+      mounted = false
+    }
+  }, [sprint.id])
+
+  const submit = (action: 'approve' | 'reject') => {
+    if (action === 'reject' && approvalOverride.trim().length < 10) {
+      setFeedback({ severity: 'error', message: 'Escribe una razón de rechazo de al menos 10 caracteres.' })
+
+      return
+    }
+
+    if (action === 'approve' && hasCapacityRisk && approvalOverride.trim().length < 10) {
+      setFeedback({ severity: 'error', message: 'El warning de capacidad requiere razón de override.' })
+
+      return
+    }
+
+    setFeedback(null)
+    startTransition(async () => {
+      const response = await fetch(`/api/agency/sample-sprints/${encodeURIComponent(sprint.id)}/${action}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(action === 'approve'
+          ? { proposedMembers, capacityOverrideReason: approvalOverride || null }
+          : { rejectionReason: approvalOverride })
+      })
+
+      const payload = await response.json().catch(() => null)
+
+      if (!response.ok) {
+        setFeedback({ severity: 'error', message: payload?.error || `No fue posible ${action === 'approve' ? 'aprobar' : 'rechazar'} el engagement.` })
+
+        return
+      }
+
+      router.refresh()
+      setFeedback({ severity: 'success', message: action === 'approve' ? 'Sample Sprint aprobado.' : 'Sample Sprint rechazado.' })
+    })
+  }
+
+  return (
+    <Grid container spacing={6}>
+      <Grid size={{ xs: 12, lg: 8 }}>
+        <Card>
+          <CardHeader title='Aprobar engagement' subheader={`${sprint.client} · ${sprint.name}`} avatar={<CustomAvatar skin='light' color='warning' variant='rounded'><i className='tabler-shield-check' /></CustomAvatar>} />
+          <CardContent>
+            {feedback ? <Alert severity={feedback.severity} sx={{ mb: 5 }}>{feedback.message}</Alert> : null}
+            {hasCapacityRisk ? <Alert severity='warning' icon={<i className='tabler-alert-triangle' />}>Hay miembros con disponibilidad bajo 10%. Puedes aprobar, pero el override queda auditado.</Alert> : null}
+            <TableContainer sx={{ mt: 5 }}>
+              <Table size='small' aria-label={domainAria.capacityByMember}>
+                <TableHead><TableRow><TableCell>Miembro</TableCell><TableCell>Rol</TableCell><TableCell align='right'>Asignado</TableCell><TableCell align='right'>Disponible</TableCell><TableCell>Estado</TableCell></TableRow></TableHead>
+                <TableBody>
+                  {sprint.team.map(member => (
+                    <TableRow key={member.name}>
+                      <TableCell><Stack direction='row' spacing={2} alignItems='center'><CustomAvatar skin='light' color='primary' size={32}>{member.initials}</CustomAvatar><Typography variant='body2' sx={{ fontWeight: 600 }}>{member.name}</Typography></Stack></TableCell>
+                      <TableCell>{member.role}</TableCell>
+                      <TableCell align='right'>{Math.round(member.allocation * 100)}%</TableCell>
+                      <TableCell align='right'>{Math.round(member.availability * 100)}%</TableCell>
+                      <TableCell><CustomChip round='true' size='small' color={member.availability < 0.1 ? 'warning' : 'success'} variant='tonal' label={member.availability < 0.1 ? 'Requiere override' : 'Disponible'} /></TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+            <CustomTextField sx={{ mt: 5 }} multiline minRows={3} label='Razón de override o rechazo' value={approvalOverride} onChange={event => setApprovalOverride(event.target.value)} helperText='Requerido para rechazar o aprobar con warning. Mínimo 10 caracteres.' fullWidth />
+          </CardContent>
+          <Divider />
+          <CardContent>
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} justifyContent='flex-end'>
+              <Button variant='tonal' color='secondary' startIcon={<i className='tabler-x' />} onClick={() => submit('reject')} disabled={pending}>Rechazar</Button>
+              <Button variant='contained' startIcon={<i className='tabler-check' />} onClick={() => submit('approve')} disabled={pending || (hasCapacityRisk && approvalOverride.length < 10)}>Aprobar Sprint</Button>
+            </Stack>
+          </CardContent>
+        </Card>
+      </Grid>
+      <Grid size={{ xs: 12, lg: 4 }}>
+        <SideGuidance title='Qué queda auditado' icon='tabler-history' items={['Snapshot completo de capacidad.', 'Aprobador y fecha de decisión.', 'Razón de override o rechazo si aplica.']} />
+      </Grid>
+    </Grid>
+  )
+}
+
+const RuntimeProgressWizard = ({ sprint }: { sprint: Sprint }) => {
+  const router = useRouter()
+  const [pending, startTransition] = useTransition()
+  const [feedback, setFeedback] = useState<{ severity: 'success' | 'error'; message: string } | null>(null)
+  const [snapshotDate, setSnapshotDate] = useState(new Date().toISOString().slice(0, 10))
+  const [state, setState] = useState('on_track')
+  const [progressPct, setProgressPct] = useState(sprint.progressPct)
+  const [snapshotNotes, setSnapshotNotes] = useState('Semana con avance fuerte en playbook de operación. Falta cerrar evidencia de ahorro de tiempo.')
+
+  const submit = () => {
+    setFeedback(null)
+    startTransition(async () => {
+      const response = await fetch(`/api/agency/sample-sprints/${encodeURIComponent(sprint.id)}/progress`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          snapshotDate,
+          metricsJson: { deliveryProgressPct: progressPct, weeklyState: state },
+          qualitativeNotes: snapshotNotes || null
+        })
+      })
+
+      const payload = await response.json().catch(() => null)
+
+      if (!response.ok) {
+        setFeedback({ severity: 'error', message: payload?.error || 'No fue posible registrar el snapshot.' })
+
+        return
+      }
+
+      router.refresh()
+      setFeedback({ severity: 'success', message: 'Snapshot semanal registrado.' })
+    })
+  }
+
+  return (
+    <Grid container spacing={6}>
+      <Grid size={{ xs: 12, lg: 8 }}>
+        <Card>
+          <CardHeader
+            title='Registrar snapshot semanal'
+            subheader={`${sprint.client} · último snapshot hace ${sprint.lastSnapshotDays} días`}
+            avatar={<CustomAvatar skin='light' color='info' variant='rounded'><i className='tabler-notes' /></CustomAvatar>}
+            action={<CustomChip round='true' size='small' color={sprint.lastSnapshotDays > 10 ? 'warning' : 'success'} variant='tonal' label={sprint.lastSnapshotDays > 10 ? 'Stale progress' : 'Al día'} />}
+          />
+          <Divider />
+          <CardContent>
+            {feedback ? <Alert severity={feedback.severity} sx={{ mb: 5 }}>{feedback.message}</Alert> : null}
+            <Grid container spacing={5}>
+              <Grid size={{ xs: 12, md: 4 }}>
+                <CustomTextField label='Fecha snapshot' type='date' value={snapshotDate} onChange={event => setSnapshotDate(event.target.value)} helperText='Único por service y día.' fullWidth />
+              </Grid>
+              <Grid size={{ xs: 12, md: 4 }}>
+                <CustomTextField select label='Estado semanal' value={state} onChange={event => setState(event.target.value)} fullWidth>
+                  <MenuItem value='on_track'>En ruta</MenuItem>
+                  <MenuItem value='attention'>Requiere atención</MenuItem>
+                  <MenuItem value='blocked'>Bloqueado</MenuItem>
+                </CustomTextField>
+              </Grid>
+              <Grid size={{ xs: 12, md: 4 }}>
+                <CustomTextField label='Avance estimado' type='number' value={progressPct} onChange={event => setProgressPct(Number(event.target.value))} inputProps={{ min: 0, max: 100 }} fullWidth />
+              </Grid>
+              <Grid size={{ xs: 12 }}>
+                <CustomTextField multiline minRows={5} label='Notas cualitativas' value={snapshotNotes} onChange={event => setSnapshotNotes(event.target.value)} helperText='Resume evidencia, riesgos y próxima acción. Esto alimentará el reporte final.' fullWidth />
+              </Grid>
+            </Grid>
+          </CardContent>
+          <Divider />
+          <CardContent>
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} justifyContent='flex-end'>
+              <Button variant='tonal' color='secondary' onClick={() => window.localStorage.setItem(`greenhouse.sample-sprints.progress-draft.${sprint.id}`, JSON.stringify({ snapshotDate, state, progressPct, snapshotNotes }))} disabled={pending}>Guardar borrador</Button>
+              <Button variant='contained' startIcon={<i className='tabler-device-floppy' />} onClick={submit} disabled={pending || !snapshotDate}>{pending ? 'Registrando...' : 'Registrar snapshot'}</Button>
+            </Stack>
+          </CardContent>
+        </Card>
+      </Grid>
+      <Grid size={{ xs: 12, lg: 4 }}>
+        <SideGuidance title='Cadencia saludable' icon='tabler-calendar-stats' items={['Un snapshot por semana mantiene trazabilidad.', 'Más de 10 días genera reliability signal.', 'Las notas deben poder sostener el outcome final.']} />
+      </Grid>
+    </Grid>
+  )
+}
+
+const RuntimeOutcomeWizard = ({ sprint, options }: { sprint: Sprint; options: RuntimeSampleSprintOptions | null }) => {
+  const router = useRouter()
+  const [pending, startTransition] = useTransition()
+  const [feedback, setFeedback] = useState<{ severity: 'success' | 'error'; message: string } | null>(null)
+  const [file, setFile] = useState<UploadedFileValue | null>(null)
+
+  const [form, setForm] = useState({
+    outcomeKind: 'converted',
+    decisionDate: new Date().toISOString().slice(0, 10),
+    decisionRationale: `${sprint.client} validó el valor operacional y pidió propuesta mensual con continuidad del equipo.`,
+    cancellationReason: '',
+    nextServiceId: '',
+    nextQuotationId: '',
+    metrics: '{"clientImpact":"documented"}'
+  })
+
+  const submit = () => {
+    if (form.decisionRationale.trim().length < 10) {
+      setFeedback({ severity: 'error', message: 'El rationale de decisión debe tener al menos 10 caracteres.' })
+
+      return
+    }
+
+    setFeedback(null)
+    startTransition(async () => {
+      const response = await fetch(`/api/agency/sample-sprints/${encodeURIComponent(sprint.id)}/outcome`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...form,
+          reportAssetId: file?.assetId ?? null,
+          metrics: parseRecord(form.metrics, {})
+        })
+      })
+
+      const payload = await response.json().catch(() => null)
+
+      if (!response.ok) {
+        setFeedback({ severity: 'error', message: payload?.error || 'No fue posible registrar el outcome.' })
+
+        return
+      }
+
+      router.refresh()
+      setFeedback({ severity: 'success', message: 'Outcome registrado.' })
+    })
+  }
+
+  return (
+    <Grid container spacing={6}>
+      <Grid size={{ xs: 12, lg: 8 }}>
+        <Card>
+          <CardHeader title='Registrar outcome' subheader='Cierre transaccional: outcome, lineage, audit log y outbox event.' avatar={<CustomAvatar skin='light' color='primary' variant='rounded'><i className='tabler-flag-check' /></CustomAvatar>} />
+          <Divider />
+          <CardContent>
+            {feedback ? <Alert severity={feedback.severity} sx={{ mb: 5 }}>{feedback.message}</Alert> : null}
+            <Alert severity='info' icon={<i className='tabler-info-circle' />}>Si eliges convertido, el backend ejecuta convertEngagement y emite service.engagement.converted v1.</Alert>
+            <Grid container spacing={5} sx={{ mt: 1 }}>
+              <Grid size={{ xs: 12, md: 6 }}>
+                <CustomTextField select label='Outcome' value={form.outcomeKind} onChange={event => setForm({ ...form, outcomeKind: event.target.value })} fullWidth>
+                  <MenuItem value='converted'>Convertido</MenuItem>
+                  <MenuItem value='adjusted'>Ajustado</MenuItem>
+                  <MenuItem value='dropped'>Descartado</MenuItem>
+                  <MenuItem value='cancelled_by_client'>Cancelado por cliente</MenuItem>
+                  <MenuItem value='cancelled_by_provider'>Cancelado por proveedor</MenuItem>
+                </CustomTextField>
+              </Grid>
+              <Grid size={{ xs: 12, md: 6 }}>
+                <CustomTextField label='Fecha decisión' type='date' value={form.decisionDate} onChange={event => setForm({ ...form, decisionDate: event.target.value })} fullWidth />
+              </Grid>
+              <Grid size={{ xs: 12, md: 6 }}>
+                <CustomTextField select label='Servicio siguiente' value={form.nextServiceId} onChange={event => setForm({ ...form, nextServiceId: event.target.value })} disabled={form.outcomeKind !== 'converted'} fullWidth>
+                  <MenuItem value=''>Sin servicio</MenuItem>
+                  {(options?.conversionTargets ?? []).map(item => <MenuItem key={item.serviceId} value={item.serviceId}>{item.publicId ?? item.serviceId} · {item.name}</MenuItem>)}
+                </CustomTextField>
+              </Grid>
+              <Grid size={{ xs: 12, md: 6 }}>
+                <CustomTextField select label='Cotización siguiente' value={form.nextQuotationId} onChange={event => setForm({ ...form, nextQuotationId: event.target.value })} disabled={form.outcomeKind !== 'converted'} fullWidth>
+                  <MenuItem value=''>Sin cotización</MenuItem>
+                  {(options?.quotations ?? []).map(item => <MenuItem key={item.quotationId} value={item.quotationId}>{item.quotationNumber} · {item.clientName ?? 'Sin cliente'}</MenuItem>)}
+                </CustomTextField>
+              </Grid>
+              <Grid size={{ xs: 12 }}>
+                <CustomTextField multiline minRows={4} label='Rationale de decisión' value={form.decisionRationale} onChange={event => setForm({ ...form, decisionRationale: event.target.value })} helperText='Siempre requerido. Mínimo 10 caracteres.' fullWidth />
+              </Grid>
+              <Grid size={{ xs: 12 }}>
+                <CustomTextField multiline minRows={3} label='Razón de cancelación' disabled={!form.outcomeKind.startsWith('cancelled')} value={form.cancellationReason} onChange={event => setForm({ ...form, cancellationReason: event.target.value })} fullWidth />
+              </Grid>
+              <Grid size={{ xs: 12 }}>
+                <CustomTextField multiline minRows={4} label='Métricas JSON' value={form.metrics} onChange={event => setForm({ ...form, metrics: event.target.value })} fullWidth />
+              </Grid>
+              <Grid size={{ xs: 12 }}>
+                <GreenhouseFileUploader contextType='sample_sprint_report_draft' value={file} onChange={setFile} title='Reporte final' helperText='Adjunta evidencia, reporte o resumen usado para la decisión terminal.' metadataLabel={`Sample Sprint ${sprint.id}`} maxSizeBytes={25 * 1024 * 1024} />
+              </Grid>
+            </Grid>
+          </CardContent>
+          <Divider />
+          <CardContent>
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} justifyContent='flex-end'>
+              <Button variant='tonal' color='secondary' onClick={() => window.localStorage.setItem(`greenhouse.sample-sprints.outcome-draft.${sprint.id}`, JSON.stringify(form))} disabled={pending}>Guardar sin cerrar</Button>
+              <Button variant='contained' startIcon={<i className='tabler-arrow-up-right' />} onClick={submit} disabled={pending}>{pending ? 'Registrando...' : form.outcomeKind === 'converted' ? 'Convertir engagement' : 'Registrar outcome'}</Button>
+            </Stack>
+          </CardContent>
+        </Card>
+      </Grid>
+      <Grid size={{ xs: 12, lg: 4 }}>
+        <ActivityFeed title='Preview de eventos' />
       </Grid>
     </Grid>
   )
