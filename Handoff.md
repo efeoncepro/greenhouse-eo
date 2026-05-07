@@ -1,3 +1,13 @@
+# Sesion 2026-05-07 — TASK-813 follow-ups cerrados (cron safety-net + UI manual queue)
+
+- **Branch:** `develop`, por continuidad de los cierres TASK-554/555/556 y pedido explicito del usuario de resolver los follow-ups end-to-end.
+- **GCloud auth:** ejecutado `gcloud auth login` + `gcloud auth application-default login`; CLI y ADC quedaron alineados en `julio.reyes@efeonce.org` / project `efeonce-group`.
+- **Scheduler live verificado:** `ops-hubspot-services-sync` existe en GCP Cloud Scheduler, `state=ENABLED`, schedule `0 6 * * *`, timezone `America/Santiago`, target `https://ops-worker-y6egnifl6a-uk.a.run.app/hubspot/services-sync`, OIDC service account `greenhouse-portal@efeonce-group.iam.gserviceaccount.com`.
+- **Entrega codigo:** `GET/POST /api/admin/integrations/hubspot/orphan-services` queda gated por `commercial.service_engagement.resolve_orphan` y permite reintentar una company via `syncServicesForCompany(..., {createMissingSpace:true})`; `POST /api/admin/ops/services-sync` queda gated por `commercial.service_engagement.sync` y ejecuta safety-net global con errores redactados/capturados. El cron `runHubspotServicesSync` se alinea al mismo contrato robusto (`createMissingSpace:true`, source `ops-worker:hubspot-services-sync`). Admin > Integraciones renderiza `HubSpotServicesManualQueueCard` con resumen de pendientes, stale >7d, links HubSpot y acciones `Actualizar`, `Reintentar`, `Ejecutar safety-net`.
+- **Access model:** sin `routeGroups`, `views` ni startup policy nuevos. Se reutiliza vista admin existente `/admin/integrations`; autorizacion fina vive en entitlements TASK-555 (`commercial.service_engagement.resolve_orphan` accion `approve`; `commercial.service_engagement.sync` accion `sync`).
+- **Docs:** changelog, spec `GREENHOUSE_HUBSPOT_SERVICES_INTAKE_V1`, doc funcional `servicios-engagement` y manual operativo `sincronizacion-hubspot-servicios` actualizados para reflejar UI manual queue y scheduler real.
+- **Validacion:** `pnpm test src/app/api/admin/integrations/hubspot/orphan-services/route.test.ts src/app/api/admin/ops/services-sync/route.test.ts` OK (2 files / 6 tests), `pnpm exec tsc --noEmit --pretty false` OK, `pnpm design:lint` OK (0 errors / 0 warnings), `pnpm lint` OK, `pnpm build` OK.
+
 # Sesion 2026-05-07 — TASK-556 cerrada en develop (Commercial Surface Adoption)
 
 - **Branch:** `develop` por instruccion explicita del usuario; no se crea `task/TASK-556-commercial-surface-adoption-over-legacy-finance-paths`.

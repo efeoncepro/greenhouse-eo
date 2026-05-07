@@ -3,7 +3,7 @@
 > **Tipo de documento:** Manual operativo paso-a-paso
 > **Version:** 2.0
 > **Creado:** 2026-05-06 por TASK-813
-> **Ultima actualizacion:** 2026-05-07 por TASK-813 (post-merge a main + alto detalle)
+> **Ultima actualizacion:** 2026-05-07 por TASK-813 follow-ups (cron live verificado + UI manual queue)
 > **Documentacion funcional:** `docs/documentation/comercial/servicios-engagement.md`
 > **Spec técnica:** `docs/architecture/GREENHOUSE_HUBSPOT_SERVICES_INTAKE_V1.md`
 
@@ -25,7 +25,8 @@ TASK-813 cerró el bucle: ahora el sync ocurre **automático en tiempo real** cu
 
 | Acción | Permiso necesario |
 |---|---|
-| Operar el sync día a día | `efeonce_admin` o route_group `commercial` |
+| Operar el sync día a día | `commercial.service_engagement.sync` |
+| Resolver services huérfanos desde Admin > Integraciones | `commercial.service_engagement.resolve_orphan` |
 | Reconfigurar webhook | HubSpot Developer Portal admin |
 | Rotar secret HubSpot | GCP Secret Manager IAM `roles/secretmanager.secretVersionManager` |
 | Ejecutar backfill manual | Acceso `gcloud` con SA tenant `efeonce-group` |
@@ -112,7 +113,16 @@ gcloud scheduler jobs describe ops-hubspot-services-sync \
   --location=us-east4 --project=efeonce-group
 ```
 
-Schedule canónico: `0 6 * * *` America/Santiago. Ejecuta el mismo `backfill-from-hubspot.ts --apply` vía endpoint `/hubspot-services/sync` del ops-worker. Idempotente.
+Schedule canónico: `0 6 * * *` America/Santiago. Ejecuta el mismo helper canónico de backfill vía endpoint `/hubspot/services-sync` del ops-worker. Idempotente y con `createMissingSpace=true`, igual que el backfill/admin path.
+
+Estado live verificado el 2026-05-07:
+
+| Campo | Valor |
+|---|---|
+| Job | `projects/efeonce-group/locations/us-east4/jobs/ops-hubspot-services-sync` |
+| State | `ENABLED` |
+| Target | `https://ops-worker-y6egnifl6a-uk.a.run.app/hubspot/services-sync` |
+| Auth | OIDC `greenhouse-portal@efeonce-group.iam.gserviceaccount.com` |
 
 ---
 
@@ -148,6 +158,17 @@ pnpm staging:request /api/admin/integrations/hubspot/orphan-services
 ```
 
 Output: lista de `webhook_inbox_events` con `error_message LIKE 'organization_unresolved:%'`. Cada fila incluye `hubspot_company_id` y `hubspot_service_id` para que el operador comercial decida.
+
+También está disponible en UI:
+
+1. Entrar a **Admin > Integraciones**.
+2. Abrir la tarjeta **HubSpot services manual queue**.
+3. Revisar contadores `Pendientes`, `Sin company`, `Sin space` y `Stale`.
+4. Usar **Abrir en HubSpot** para corregir associations o archivar basura/test en HubSpot.
+5. Usar **Reintentar** cuando la company ya exista/corrigió su asociación; Greenhouse re-ejecuta `syncServicesForCompany` con auto-space habilitado.
+6. Usar **Ejecutar safety-net** solo para drenar todas las companies de una vez; llama `POST /api/admin/ops/services-sync`.
+
+La UI no crea clients ciegos ni escribe a HubSpot. Solo reintenta la proyección HubSpot → Greenhouse después de que el source-of-truth fue corregido.
 
 ### Verificar últimos webhooks recibidos
 
@@ -317,6 +338,8 @@ curl -s -H "Authorization: Bearer $HUBSPOT_ACCESS_TOKEN" \
 | Service en HubSpot era basura/test | Archivar el service en HubSpot. Webhook delete event limpia la cola. |
 | Holding/filial cross-billing (caso ANAM-Aguas Andinas) | Verificar que la company association apunte al pagador. Re-asociar en HubSpot. |
 
+Después de corregir HubSpot o crear el client real, reintentar desde Admin > Integraciones > **HubSpot services manual queue**. El botón **Reintentar** exige `commercial.service_engagement.resolve_orphan` y no bypassa las reglas de source-of-truth.
+
 ### Sync stale (>24h sin updates) sin webhooks pendientes
 
 **Síntoma**: `commercial.service_engagement.sync_lag` en warning/error pero `webhook_inbox_events` está limpio.
@@ -436,6 +459,9 @@ EOF
 | `scripts/services/archive-legacy-seed.ts` | One-shot archive de seed legacy |
 | `services/ops-worker/server.ts` (`handleHubspotServicesSync`) | Cloud Run cron handler |
 | `services/ops-worker/deploy.sh` | Cloud Scheduler upsert idempotente |
+| `src/app/api/admin/integrations/hubspot/orphan-services/route.ts` | API admin list/retry de cola manual |
+| `src/app/api/admin/ops/services-sync/route.ts` | API admin safety-net global |
+| `src/views/greenhouse/admin/HubSpotServicesManualQueueCard.tsx` | UI manual queue en Admin > Integraciones |
 | `src/lib/reliability/queries/services-sync-lag.ts` | Reliability signal #1 |
 | `src/lib/reliability/queries/services-organization-unresolved.ts` | Reliability signal #2 |
 | `src/lib/reliability/queries/services-legacy-residual-reads.ts` | Reliability signal #3 |

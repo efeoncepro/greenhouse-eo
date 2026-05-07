@@ -327,10 +327,18 @@ Formalizado por TASK-555:
 | Capability | Module | Action | Scope | Allowed source |
 |---|---|---|---|---|
 | `commercial.service_engagement.sync` | commercial | sync | tenant | FINANCE_ADMIN + EFEONCE_ADMIN, server-only |
-| `commercial.service_engagement.resolve_orphan` | commercial | approve | tenant | FINANCE_ADMIN + EFEONCE_ADMIN (UI futura) |
+| `commercial.service_engagement.resolve_orphan` | commercial | approve | tenant | FINANCE_ADMIN + EFEONCE_ADMIN |
 | `commercial.service_engagement.archive_legacy` | commercial | delete | tenant | script-level only |
 
-Endpoint admin: `GET /api/admin/integrations/hubspot/orphan-services` (gated por `requireAdminTenantContext` provisional).
+Endpoints admin:
+
+| Endpoint | Acción | Capability |
+|---|---|---|
+| `GET /api/admin/integrations/hubspot/orphan-services` | Lista eventos `organization_unresolved` para cola manual | `commercial.service_engagement.resolve_orphan` / `approve` |
+| `POST /api/admin/integrations/hubspot/orphan-services` | Reintenta una company específica con `syncServicesForCompany` | `commercial.service_engagement.resolve_orphan` / `approve` |
+| `POST /api/admin/ops/services-sync` | Ejecuta safety-net global desde Admin > Integraciones | `commercial.service_engagement.sync` / `sync` |
+
+Surface UI: `src/views/greenhouse/admin/HubSpotServicesManualQueueCard.tsx`, montada en Admin > Integraciones. No introduce `routeGroup` ni `view_code` nuevo; consume la surface admin existente y delega autorizacion fina a entitlements.
 
 ## 10. HubSpot Developer Platform setup
 
@@ -389,7 +397,7 @@ Idempotente. Build version se incrementa automáticamente. La suscripción queda
 
 `ops-reactive-finance` drena el outbox del domain finance — incluye `intake_requested` events de la projection `hubspot_services_intake`.
 
-`ops-hubspot-services-sync` corre `runHubspotServicesSync` orchestrator que llama `syncAllOrganizationServices` (helper legacy via bridge). Sirve como safety-net cuando el webhook real-time pierde events.
+`ops-hubspot-services-sync` corre `runHubspotServicesSync` orchestrator que llama `syncAllOrganizationServices({ createMissingSpace: true, createdBySource: 'ops-worker:hubspot-services-sync' })`. Sirve como safety-net cuando el webhook real-time pierde events y mantiene el mismo contrato robusto que el backfill/admin path: si el client existe pero falta `space`, crea el scaffolding mínimo con audit source explícito.
 
 ## 12. Reglas duras (anti-regresión)
 

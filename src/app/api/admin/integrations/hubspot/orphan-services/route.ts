@@ -1,9 +1,13 @@
 import { NextResponse } from 'next/server'
 
+import { buildTenantEntitlementSubject } from '@/lib/commercial/party/route-entitlement-subject'
+import { hasEntitlement } from '@/lib/entitlements/runtime'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { redactErrorForResponse } from '@/lib/observability/redact'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
+import { syncServicesForCompany } from '@/lib/services/service-sync'
 import { requireAdminTenantContext } from '@/lib/tenant/authorization'
+import type { TenantContext } from '@/lib/tenant/get-tenant-context'
 
 /**
  * TASK-813 Slice 7 — Admin endpoint para listar HubSpot p_services huérfanos.
@@ -15,10 +19,7 @@ import { requireAdminTenantContext } from '@/lib/tenant/authorization'
  *     pero no se promovió a core), o
  *   - Archivar el service en HubSpot (si es un dato basura).
  *
- * UI futura (post TASK-555 commercial routeGroup) consume este endpoint.
- *
- * Capability provisional: `requireAdminTenantContext` (FINANCE_ADMIN +
- * EFEONCE_ADMIN). Cuando TASK-555 cierre, migrar a capability granular
+ * Capability granular post TASK-555:
  * `commercial.service_engagement.resolve_orphan`.
  */
 
@@ -57,6 +58,13 @@ const QUERY_SQL = `
   LIMIT 100
 `
 
+const hasResolveOrphanCapability = (tenant: TenantContext) =>
+  hasEntitlement(
+    buildTenantEntitlementSubject(tenant),
+    'commercial.service_engagement.resolve_orphan',
+    'approve'
+  )
+
 const parseOrphan = (row: OrphanRow): OrphanItem => {
   const error = row.error_message ?? ''
   // error_message format: "organization_unresolved:<svc_id>" or
@@ -92,6 +100,13 @@ export async function GET() {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
+  if (!hasResolveOrphanCapability(tenant)) {
+    return NextResponse.json(
+      { error: 'Missing capability commercial.service_engagement.resolve_orphan.' },
+      { status: 403 }
+    )
+  }
+
   try {
     const rows = await runGreenhousePostgresQuery<OrphanRow>(QUERY_SQL)
     const items = rows.map(parseOrphan)
@@ -104,6 +119,58 @@ export async function GET() {
   } catch (error) {
     captureWithDomain(error, 'integrations.hubspot', {
       tags: { source: 'admin_orphan_services_list' }
+    })
+
+    return NextResponse.json({ error: redactErrorForResponse(error) }, { status: 500 })
+  }
+}
+
+export async function POST(request: Request) {
+  const { tenant, errorResponse } = await requireAdminTenantContext()
+
+  if (!tenant) {
+    return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  if (!hasResolveOrphanCapability(tenant)) {
+    return NextResponse.json(
+      { error: 'Missing capability commercial.service_engagement.resolve_orphan.' },
+      { status: 403 }
+    )
+  }
+
+  let body: { hubspotCompanyId?: unknown }
+
+  try {
+    body = await request.json()
+  } catch {
+    return NextResponse.json({ error: 'Invalid JSON body.' }, { status: 400 })
+  }
+
+  const hubspotCompanyId = typeof body.hubspotCompanyId === 'string' ? body.hubspotCompanyId.trim() : ''
+
+  if (!hubspotCompanyId) {
+    return NextResponse.json({ error: 'hubspotCompanyId is required.' }, { status: 400 })
+  }
+
+  try {
+    const result = await syncServicesForCompany(hubspotCompanyId, {
+      createMissingSpace: true,
+      createdBySource: 'admin:hubspot-orphan-services'
+    })
+
+    return NextResponse.json({
+      hubspotCompanyId,
+      created: result.created,
+      updated: result.updated,
+      skipped: result.skipped,
+      errors: result.errors,
+      spaceAutoCreated: Boolean(result.spaceAutoCreated)
+    })
+  } catch (error) {
+    captureWithDomain(error, 'integrations.hubspot', {
+      tags: { source: 'admin_orphan_services_retry' },
+      extra: { hubspotCompanyId }
     })
 
     return NextResponse.json({ error: redactErrorForResponse(error) }, { status: 500 })

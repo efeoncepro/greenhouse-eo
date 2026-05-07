@@ -144,7 +144,7 @@ ORDER BY 2 DESC;
 1. **Crear el client real** en Greenhouse (via Admin Tenants UI) → siguiente sync materializa el service.
 2. **Archivar el service en HubSpot** si era basura/test → el webhook recibe el delete event y limpia la cola.
 
-Endpoint admin para listar pendientes: `GET /api/admin/integrations/hubspot/orphan-services`.
+Cola admin: Admin > Integraciones muestra la tarjeta **HubSpot services manual queue**. Desde ahí el operador puede ver pendientes `organization_unresolved`, abrir el service/company en HubSpot, reintentar una company ya corregida o ejecutar el safety-net global. El API canónico detrás de la tarjeta es `GET/POST /api/admin/integrations/hubspot/orphan-services`, protegido por `commercial.service_engagement.resolve_orphan`.
 
 ### Escenario 3 — Service de un cliente que existe pero no tiene space
 
@@ -263,7 +263,7 @@ TASK-813 cerró la última pieza faltante en este pipeline: el engagement firmad
 
 ## ¿Qué viene después? (followups documentados)
 
-- **TASK-807**: introducir domain `commercial` en el ops-worker (hoy temporal en `finance`). Permitirá un cron Cloud Scheduler dedicado al pipeline comercial sin acoplamiento con finance.
+- **TASK-807**: introducir rollup/domain `commercial` completo en ops-worker/reliability. El cron dedicado `ops-hubspot-services-sync` ya existe; este follow-up separa mejor dashboards/alert routing para que commercial no dependa del carril finance/reactive.
 - **V1.1 — back-fill de propiedades `ef_*`**: Greenhouse podría escribir `ef_member_loaded_cost_estimate` u otras métricas computadas a HubSpot. Requiere governance review (ya no es solo reader).
 - **Member Loaded Cost integration (TASK-713)**: cuando esté production-ready, los services Greenhouse alimentarán el cálculo de costo cargado per-member-per-client-per-period. Ya está la pieza de attribution lista.
 
