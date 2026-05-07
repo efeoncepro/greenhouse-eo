@@ -123,6 +123,7 @@ const healthSubsystems = (subsystems: OperationsSubsystem[]) =>
       'Reactive Worker',
       'Notificaciones',
       'Teams Notifications',
+      'Commercial Health',
       'Finance Data Quality',
       'Notion Delivery Data Quality'
     ].includes(subsystem.name)

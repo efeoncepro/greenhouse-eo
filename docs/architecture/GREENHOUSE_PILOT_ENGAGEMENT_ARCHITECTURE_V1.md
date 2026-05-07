@@ -9,6 +9,18 @@
 > **Brand UI**: "Sample Sprint" (paraguas comercial). Schema interno usa `engagement_*` genérico — el rebranding marketing no requiere migrations.
 > **Domain boundary:** Commercial (no Finance — ver `GREENHOUSE_COMMERCIAL_FINANCE_DOMAIN_BOUNDARY_V1.md`)
 
+## Delta v1.9 (2026-05-07) — TASK-807 Commercial Health implementada
+
+TASK-807 formaliza `Commercial Health` como subsystem operativo del módulo reliability `commercial`:
+
+1. **Módulo existente, subsystem nuevo:** `commercial` ya existía en `STATIC_RELIABILITY_REGISTRY` por TASK-813; TASK-807 no crea un módulo paralelo, agrega `Commercial Health` como `OperationsSubsystem` y lo mapea a `moduleKey='commercial'`.
+2. **Primitive compartida:** `src/lib/commercial/sample-sprints/health.ts` centraliza los conteos read-only de health para evitar duplicar SQL entre `/admin/ops-health` y `getReliabilityOverview()`.
+3. **Seis signals:** cinco readers nuevos (`overdue_decision`, `budget_overrun`, `zombie`, `unapproved_active`, `conversion_rate_drop`) más `stale_progress` de TASK-805 reutilizado. Todos degradan a `unknown` ante error y no mutan estado.
+4. **Drift resuelto — `transition_event`:** esa columna/tabla no existe en runtime. `zombie` se define como service non-regular elegible, activo por >90 días, sin `engagement_outcomes` y sin `engagement_lineage` como parent/child.
+5. **Budget real:** `budget_overrun` compara `engagement_approvals.expected_internal_cost_clp` contra actuals agrupados por `service_id` desde `greenhouse_serving.commercial_cost_attribution_v2`; no usa solo `gtm_investment_pnl` porque esa view filtra `terms_kind='no_cost'`.
+6. **Conversion threshold:** default `30%`, configurable vía `GREENHOUSE_COMMERCIAL_ENGAGEMENT_CONVERSION_RATE_THRESHOLD` (`0.3` o `30`). Sin outcomes trailing 6m el signal queda `ok` por falta de denominador evaluable.
+7. **Surface real:** el subsystem queda visible en `/admin/ops-health`; referencias históricas a `/admin/operations` deben tratarse como legacy naming del Ops Health dashboard.
+
 ## Delta v1.3 (2026-05-06) — TASK-801 implementada con 2 ajustes vs spec
 
 TASK-801 (Slice 1 / Capa 1 + 1b) cerrada 2026-05-06 vía migration `20260506200742463_task-801-engagement-primitive-services-extension.sql`. Auditoría pre-implementación detectó dos desvíos vs el repo real, corregidos en la migration sin alterar el intent:

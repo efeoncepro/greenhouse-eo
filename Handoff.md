@@ -1,3 +1,15 @@
+# Sesion 2026-05-07 — TASK-807 cerrada en develop (Commercial Health Reliability Subsystem)
+
+- **Branch:** `develop` por instruccion explicita del usuario; no se crea `task/TASK-807-commercial-health-reliability-subsystem`.
+- **Ownership:** no habia PR abierto ni branch local/remota obvia para `TASK-807`; se ejecuto en `develop` por instruccion explicita del usuario.
+- **Entrega:** `Commercial Health` queda formalizado como subsystem operativo en `/admin/ops-health` y como fuente de signals en `getReliabilityOverview()`. Se agregan seis signals `commercial.engagement.{overdue_decision,budget_overrun,zombie,unapproved_active,conversion_rate_drop,stale_progress}` bajo moduleKey `commercial`.
+- **Primitive reusable:** nuevo `src/lib/commercial/sample-sprints/health.ts` centraliza conteos read-only, threshold de conversion y criterios de elegibilidad. `stale_progress` de TASK-805 fue conservado y conectado a esta primitive.
+- **Drift resuelto:** `transition_event` no existe; `zombie` usa ausencia de `engagement_outcomes` + `engagement_lineage`. `budget_overrun` usa `greenhouse_serving.commercial_cost_attribution_v2`, no `gtm_investment_pnl`, porque esa view es solo `no_cost`.
+- **Access model:** sin nuevos `routeGroups`, `views`, `entitlements` ni startup policy. No hubo migrations ni outbox/events nuevos.
+- **Validacion:** `pnpm pg:doctor` OK; focal tests Commercial Health OK (18 tests); `pnpm exec tsc --noEmit --pretty false` OK; `pnpm lint` OK; `pnpm test` completo OK (606 files / 3531 passed / 5 skipped); `pnpm design:lint` OK (0 errors / 0 warnings); `pnpm build` OK.
+- **Lifecycle/docs:** task movida a `docs/tasks/complete/`, `Lifecycle=complete`, `docs/tasks/README.md`, `docs/tasks/TASK_ID_REGISTRY.md`, `GREENHOUSE_PILOT_ENGAGEMENT_ARCHITECTURE_V1.md`, `project_context.md` y `changelog.md` sincronizados.
+- **Follow-ups:** TASK-808 mantiene ownership de audit/outbox engagement; TASK-809 consume estas signals en la UI real/wizards; TASK-810 agrega prevención DB anti-zombie. Runbooks completos quedan para V2, con stubs operativos en summaries/details.
+
 # Sesion 2026-05-07 — TASK-815 cerrada en develop (Direct Service Expense Allocation Primitive)
 
 - **Branch:** `develop` por instruccion explicita del usuario; se corrigio inmediatamente un intento inicial de crear branch y no se volvio a cambiar de rama.

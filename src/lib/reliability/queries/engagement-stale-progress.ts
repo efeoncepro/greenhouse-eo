@@ -1,36 +1,19 @@
 import 'server-only'
 
-import { query } from '@/lib/db'
+import {
+  COMMERCIAL_HEALTH_STALE_PROGRESS_DAYS,
+  countCommercialEngagementStaleProgress
+} from '@/lib/commercial/sample-sprints/health'
 import { captureWithDomain } from '@/lib/observability/capture'
 import type { ReliabilitySignal } from '@/types/reliability'
 
 export const ENGAGEMENT_STALE_PROGRESS_SIGNAL_ID = 'commercial.engagement.stale_progress'
 
-const STALE_PROGRESS_DAYS = 10
-
-const QUERY_SQL = `
-  SELECT COUNT(*)::int AS n
-  FROM (
-    SELECT s.service_id, MAX(ps.snapshot_date) AS last_snapshot
-    FROM greenhouse_core.services s
-    LEFT JOIN greenhouse_commercial.engagement_progress_snapshots ps
-      ON ps.service_id = s.service_id
-    WHERE s.active = TRUE
-      AND s.status = 'active'
-      AND s.engagement_kind != 'regular'
-      AND s.hubspot_sync_status IS DISTINCT FROM 'unmapped'
-    GROUP BY s.service_id
-    HAVING MAX(ps.snapshot_date) IS NULL
-       OR MAX(ps.snapshot_date) < CURRENT_DATE - INTERVAL '${STALE_PROGRESS_DAYS} days'
-  ) stale
-`
-
 export const getEngagementStaleProgressSignal = async (): Promise<ReliabilitySignal> => {
   const observedAt = new Date().toISOString()
 
   try {
-    const rows = await query<{ n: number }>(QUERY_SQL)
-    const count = Number(rows[0]?.n ?? 0)
+    const count = await countCommercialEngagementStaleProgress()
 
     return {
       signalId: ENGAGEMENT_STALE_PROGRESS_SIGNAL_ID,
@@ -41,8 +24,8 @@ export const getEngagementStaleProgressSignal = async (): Promise<ReliabilitySig
       severity: count === 0 ? 'ok' : 'warning',
       summary:
         count === 0
-          ? `Engagements activos con snapshot de progreso al día (≤ ${STALE_PROGRESS_DAYS} días).`
-          : `${count} ${count === 1 ? 'engagement activo' : 'engagements activos'} sin snapshot de progreso reciente (> ${STALE_PROGRESS_DAYS} días).`,
+          ? `Engagements activos con snapshot de progreso al día (≤ ${COMMERCIAL_HEALTH_STALE_PROGRESS_DAYS} días).`
+          : `${count} ${count === 1 ? 'engagement activo' : 'engagements activos'} sin snapshot de progreso reciente (> ${COMMERCIAL_HEALTH_STALE_PROGRESS_DAYS} días).`,
       observedAt,
       evidence: [
         {
@@ -53,7 +36,7 @@ export const getEngagementStaleProgressSignal = async (): Promise<ReliabilitySig
         {
           kind: 'metric',
           label: 'threshold_days',
-          value: String(STALE_PROGRESS_DAYS)
+          value: String(COMMERCIAL_HEALTH_STALE_PROGRESS_DAYS)
         },
         {
           kind: 'metric',

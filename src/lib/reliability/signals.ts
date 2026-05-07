@@ -58,6 +58,9 @@ const SUBSYSTEM_MODULE_MAP: Record<string, ReliabilityModuleKey> = {
   // Finance
   'Finance Data Quality': 'finance',
 
+  // Commercial
+  'Commercial Health': 'commercial',
+
   // Teams notifications & bot (TASK-669 + TASK-671)
   'Teams Notifications': 'integrations.teams',
 
@@ -1098,4 +1101,33 @@ export const buildExpenseDistributionSignals = async (
   ])
 
   return [unresolved, contamination]
+}
+
+/**
+ * TASK-807 — Commercial Health signals.
+ *
+ * Wraps the six deterministic Sample Sprints readers. Each reader owns its
+ * honest degradation path, so this builder can stay a small latency-oriented
+ * Promise.all wrapper.
+ */
+export const buildCommercialHealthSignals = async (
+  readers: {
+    overdueDecision: () => Promise<ReliabilitySignal>
+    budgetOverrun: () => Promise<ReliabilitySignal>
+    zombie: () => Promise<ReliabilitySignal>
+    unapprovedActive: () => Promise<ReliabilitySignal>
+    conversionRateDrop: () => Promise<ReliabilitySignal>
+    staleProgress: () => Promise<ReliabilitySignal>
+  }
+): Promise<ReliabilitySignal[]> => {
+  const [overdue, budget, zombie, unapproved, conversion, stale] = await Promise.all([
+    readers.overdueDecision(),
+    readers.budgetOverrun(),
+    readers.zombie(),
+    readers.unapprovedActive(),
+    readers.conversionRateDrop(),
+    readers.staleProgress()
+  ])
+
+  return [overdue, budget, zombie, unapproved, conversion, stale]
 }

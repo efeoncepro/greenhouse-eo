@@ -53,8 +53,13 @@ import { getShortcutsInvalidPinsSignal } from './queries/shortcuts-invalid-pins'
 import { getOutboxUnpublishedLagSignal } from './queries/outbox-unpublished-lag'
 import { getOutboxDeadLetterSignal } from './queries/outbox-dead-letter'
 import { getEmailRenderFailureSignal } from './queries/email-render-failure'
+import { getEngagementBudgetOverrunSignal } from './queries/engagement-budget-overrun'
+import { getEngagementConversionRateDropSignal } from './queries/engagement-conversion-rate-drop'
+import { getEngagementOverdueDecisionSignal } from './queries/engagement-overdue-decision'
 import { getCronStagingDriftSignal } from './queries/cron-staging-drift'
 import { getEngagementStaleProgressSignal } from './queries/engagement-stale-progress'
+import { getEngagementUnapprovedActiveSignal } from './queries/engagement-unapproved-active'
+import { getEngagementZombieSignal } from './queries/engagement-zombie'
 import { RELIABILITY_REGISTRY } from './registry'
 import { getReliabilityRegistry } from './registry-store'
 import {
@@ -71,6 +76,7 @@ import {
   buildNotionFreshnessSignal,
   buildObservabilityPostureSignal,
   buildFinanceClpDriftSignals,
+  buildCommercialHealthSignals,
   buildExpenseDistributionSignals,
   buildPaymentOrderSettlementSignals,
   buildSentryIncidentSignals,
@@ -395,13 +401,16 @@ interface ReliabilityOverviewSources {
   servicesEngagement?: ReliabilitySignal[] | null
 
   /**
-   * TASK-805 — Sample Sprints weekly progress cadence:
-   *   - commercial.engagement.stale_progress (drift, warning)
-   * Cuenta engagements activos non-regular sin snapshot de progreso en los
-   * ultimos 10 dias. Roll up bajo moduleKey 'commercial'; TASK-807 conserva
-   * el subsystem `Commercial Health` completo.
+   * TASK-807 — Commercial Health signals (6):
+   *   - commercial.engagement.overdue_decision
+   *   - commercial.engagement.budget_overrun
+   *   - commercial.engagement.zombie
+   *   - commercial.engagement.unapproved_active
+   *   - commercial.engagement.conversion_rate_drop
+   *   - commercial.engagement.stale_progress (delivered in TASK-805, reused)
+   * Roll up bajo moduleKey 'commercial'.
    */
-  engagementStaleProgress?: ReliabilitySignal | null
+  commercialHealth?: ReliabilitySignal[] | null
 }
 
 export const buildReliabilityOverview = (
@@ -460,8 +469,8 @@ export const buildReliabilityOverview = (
     ...(sources.workforceRoleTitle ?? []),
     // TASK-813 Slice 6 — Commercial engagement instance signals (3).
     ...(sources.servicesEngagement ?? []),
-    // TASK-805 — Commercial engagement stale progress signal.
-    ...(sources.engagementStaleProgress ? [sources.engagementStaleProgress] : [])
+    // TASK-807 — Commercial Health signals (six Sample Sprints health gates).
+    ...(sources.commercialHealth ?? [])
   ]
 
   const signalsByModule = new Map<string, ReliabilitySignal[]>()
@@ -743,12 +752,20 @@ export const getReliabilityOverview = async (
           .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
           .catch(() => null)
 
-  // TASK-805 — stale progress reader. Degrada honestamente a `unknown` si
-  // la query falla y se inyecta como signal del moduleKey `commercial`.
-  const engagementStaleProgress =
-    preloadedSources.engagementStaleProgress !== undefined
-      ? preloadedSources.engagementStaleProgress
-      : await getEngagementStaleProgressSignal().catch(() => null)
+  // TASK-807 — Commercial Health readers (6). Cada reader degrada
+  // honestamente a `unknown` si su query falla. Incluye stale_progress de
+  // TASK-805 como primitive reutilizada, no recreada.
+  const commercialHealth =
+    preloadedSources.commercialHealth !== undefined
+      ? preloadedSources.commercialHealth
+      : await buildCommercialHealthSignals({
+          overdueDecision: getEngagementOverdueDecisionSignal,
+          budgetOverrun: getEngagementBudgetOverrunSignal,
+          zombie: getEngagementZombieSignal,
+          unapprovedActive: getEngagementUnapprovedActiveSignal,
+          conversionRateDrop: getEngagementConversionRateDropSignal,
+          staleProgress: getEngagementStaleProgressSignal
+        }).catch(() => null)
 
   return buildReliabilityOverview(operations, {
     billing,
@@ -771,7 +788,7 @@ export const getReliabilityOverview = async (
     identityLegalProfile,
     workforceRoleTitle,
     servicesEngagement,
-    engagementStaleProgress
+    commercialHealth
   })
 }
 

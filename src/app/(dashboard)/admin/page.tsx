@@ -8,7 +8,7 @@ import { getInternalDashboardOverview } from '@/lib/internal/get-internal-dashbo
 import { getNotionSyncOperationalOverview } from '@/lib/integrations/notion-sync-operational-overview'
 import { getOperationsOverview } from '@/lib/operations/get-operations-overview'
 import { getLatestAiObservationsByScope } from '@/lib/reliability/ai/reader'
-import { buildReliabilityOverview } from '@/lib/reliability/get-reliability-overview'
+import { getReliabilityOverview } from '@/lib/reliability/get-reliability-overview'
 import { getReliabilityRegistry } from '@/lib/reliability/registry-store'
 import {
   getLatestSweepRun,
@@ -68,7 +68,7 @@ export default async function Page() {
     getLatestAiObservationsByScope().catch(() => null)
   ])
 
-  const reliability = buildReliabilityOverview(operations, {
+  const reliability = await getReliabilityOverview(operations, {
     billing,
     notionOperational,
     syntheticSnapshots,

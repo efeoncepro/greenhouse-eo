@@ -55,4 +55,29 @@ describe('buildSubsystemSignals', () => {
     expect(signals[0]?.summary).toContain('12 procesados')
     expect(signals[0]?.summary).toContain('1 con falla')
   })
+
+  it('maps Commercial Health subsystem to the commercial reliability module', () => {
+    const signals = buildSubsystemSignals([
+      {
+        name: 'Commercial Health',
+        status: 'degraded',
+        processed: 6,
+        failed: 2,
+        lastRun: '2026-05-07T20:00:00.000Z',
+        summary: '2 señales Commercial Health con issue activo.',
+        metrics: [
+          { key: 'engagement_zombie', label: 'Zombie', value: 1, status: 'error' },
+          { key: 'engagement_stale_progress', label: 'Progress stale', value: 1, status: 'warning' }
+        ]
+      }
+    ])
+
+    expect(signals).toHaveLength(1)
+    expect(signals[0]).toMatchObject({
+      signalId: 'subsystem.commercial_health',
+      moduleKey: 'commercial',
+      kind: 'subsystem',
+      severity: 'warning'
+    })
+  })
 })
