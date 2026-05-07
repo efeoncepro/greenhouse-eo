@@ -40,6 +40,7 @@ Este bloque es el resumen obligatorio antes de ejecutar cualquier cambio. Las se
 - Contexto y auditoria: `docs/operations/CONTEXT_HANDOFF_OPERATING_MODEL_V1.md` gobierna como usar `project_context.md`, `Handoff.md` y `Handoff.archive.md` sin perder memoria historica.
 - Source of truth: si task/spec, arquitectura y runtime real discrepan, prevalecen arquitectura vigente + codigo/schema/runtime verificados. Corregir la spec antes de implementar si el drift cambia contrato o bloquea.
 - Calidad de solucion: no entregar parches fragiles si el problema pide causa raiz. Aplicar `docs/operations/SOLUTION_QUALITY_OPERATING_MODEL_V1.md`; cualquier workaround debe ser temporal, reversible, documentado y con owner/retirada.
+- Copy visible: antes de escribir labels, CTAs, empty states, alerts, tooltips, aria-labels o mensajes, buscar/crear la entrada en la capa canonica. `src/lib/copy/*` guarda microcopy funcional y copy reutilizable por dominio; `src/config/greenhouse-nomenclature.ts` guarda solo nomenclatura de producto, navegacion y labels institucionales. No hardcodear copy reusable en JSX.
 - Proporcionalidad: discovery breve para cambios locales; protocolo completo para cambios cross-domain, auth, billing, finance, data, cloud, migraciones, observabilidad o UI visible.
 - Reutilizar antes de crear: buscar helpers, readers, components, routes, signals, capabilities y docs existentes antes de introducir piezas nuevas.
 - Aislamiento multi-agente: no cambiar la rama de un checkout donde otra persona/agente trabaja; usar `git worktree` y documentar coordinacion en `Handoff.md`.
@@ -116,6 +117,12 @@ Estos CLIs estan autenticados localmente. Cuando una task toca su dominio, **usa
   - correr `pnpm pg:doctor` antes de asumir que el acceso esta sano
 - Si una task del sistema contradice la arquitectura vigente, no implementarla tal cual; corregir primero la task o documentar la nueva decision arquitectonica.
 - Si el cambio es UI, UX o seleccion de componentes, usar como criterio operativo los skills locales vigentes (`greenhouse-agent`, `greenhouse-portal-ui-implementer`, `greenhouse-ui-orchestrator` o `greenhouse-vuexy-ui-expert`), revisar `full-version` junto con la documentacion oficial de Vuexy antes de inventar componentes nuevos y leer `DESIGN.md` en raiz como contrato visual legible por agentes.
+- Si el cambio toca copy visible al usuario:
+  - invocar la skill de UX writing/content aplicable antes de fijar tono o wording final
+  - usar `src/lib/copy/` para microcopy funcional shared (`actions`, `states`, `loading`, `empty`, `aria`, `errors`, `feedback`, `time`) y para copy reutilizable por dominio (`src/lib/copy/<domain>.ts`, por ejemplo `agency.ts`, `finance.ts`, `payroll.ts`)
+  - usar `src/config/greenhouse-nomenclature.ts` solo para nomenclatura estable de producto, navegacion, shell y labels institucionales
+  - mantener JSX/componentes libres de strings reutilizables; un literal inline solo es aceptable si es texto unico, no compartido, no de estado/CTA/error/empty/aria y queda justificado por bajo reuse
+  - no promover pantallas desde `/mockup/` a runtime sin extraer primero el shell runtime y migrar el copy productivo a la capa canonica
 - Si el usuario pide un mockup/prototipo visual de Greenhouse, invocar `greenhouse-mockup-builder`: por defecto el mockup debe construirse como ruta real del portal con mock data tipada (`src/app/(dashboard)/.../mockup/page.tsx` + `src/views/greenhouse/.../mockup/*`), usando Vuexy/MUI wrappers y primitives del repo. No crear HTML/CSS aparte salvo que el usuario pida explicitamente un artefacto estatico fuera de la app.
 - **Regla de reutilizacion**:
   - reutilizar helpers, readers, components, routes, signals y primitives existentes antes de crear nuevos
