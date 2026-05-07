@@ -597,6 +597,25 @@ export interface GreenhouseCommercialEngagementPhases {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseCommercialEngagementProgressSnapshots {
+  /**
+   * Schema-flexible V1 progress metrics. Must be a non-empty JSON object; templates by engagement_kind are V2.
+   */
+  metrics_json: Json;
+  qualitative_notes: string | null;
+  recorded_at: Generated<Timestamp>;
+  /**
+   * Actor who recorded the snapshot. Nullable at DB level to preserve history if client_users row is deleted; helper requires input.
+   */
+  recorded_by: string | null;
+  /**
+   * FK to greenhouse_core.services(service_id). TEXT by TASK-801 contract, not UUID.
+   */
+  service_id: string;
+  snapshot_date: Timestamp;
+  snapshot_id: Generated<string>;
+}
+
 export interface GreenhouseCommercialFteHoursGuide {
   effective_from: Generated<Timestamp>;
   fte_fraction: Numeric;
@@ -8553,6 +8572,7 @@ export interface DB {
   "greenhouse_commercial.engagement_lineage": GreenhouseCommercialEngagementLineage;
   "greenhouse_commercial.engagement_outcomes": GreenhouseCommercialEngagementOutcomes;
   "greenhouse_commercial.engagement_phases": GreenhouseCommercialEngagementPhases;
+  "greenhouse_commercial.engagement_progress_snapshots": GreenhouseCommercialEngagementProgressSnapshots;
   "greenhouse_commercial.fte_hours_guide": GreenhouseCommercialFteHoursGuide;
   "greenhouse_commercial.hubspot_deal_pipeline_config": GreenhouseCommercialHubspotDealPipelineConfig;
   "greenhouse_commercial.hubspot_deal_pipeline_defaults": GreenhouseCommercialHubspotDealPipelineDefaults;

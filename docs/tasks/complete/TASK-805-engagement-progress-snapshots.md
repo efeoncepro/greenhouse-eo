@@ -2,16 +2,16 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `EPIC-014`
-- Status real: `Diseño aprobado`
+- Status real: `Cerrada 2026-05-07 en develop`
 - Domain: `commercial`
 - Blocked by: `TASK-801`
-- Branch: `task/TASK-805-engagement-progress-snapshots`
+- Branch: `develop` (por instrucción explícita del usuario; no crear branch task)
 
 ## Summary
 
@@ -34,6 +34,14 @@ Sin snapshots durante operación, el reporte final del Sample Sprint es trabajo 
 - Capability `commercial.engagement.record_progress` con allowed source amplio (operadores no necesitan ser admins).
 - Helpers TS: `recordProgressSnapshot`, `listSnapshotsForService(serviceId)`, `getLatestSnapshot(serviceId)`.
 - Reliability signal `commercial.engagement.stale_progress` integrada al subsystem `Commercial Health` (TASK-807 lo wirea al registry).
+
+## Implementation Notes 2026-05-07
+
+- Drift resuelto: `service_id` es `TEXT`, no `UUID`; DDL y helper siguen el contrato real de TASK-801.
+- `commercial.engagement.record_progress` ya existía en catálogo/runtime; esta task agrega coverage explícito y no duplica capability.
+- `metrics_json` queda flexible en V1, pero debe ser objeto JSON no vacío. Templates por `engagement_kind` quedan fuera de scope/V2.
+- `stale_progress` se integra como signal del `moduleKey='commercial'`; TASK-807 conserva ownership del subsystem completo `Commercial Health`.
+- Sin UI/API/outbox en este slice: TASK-809 conecta la surface aprobada y TASK-808 agrega audit/outbox.
 
 ## Architecture Alignment
 
@@ -90,11 +98,19 @@ Tests:
 
 ## Acceptance Criteria
 
-- DDL + index aplicados.
-- `db.d.ts` regenerado.
-- 3 helpers TS con tests.
-- Reliability signal query verificada con caso 0 (steady) y caso > 0 (warning).
-- Capability registrada y testeada.
+- [x] DDL + index aplicados.
+- [x] `db.d.ts` regenerado.
+- [x] 3 helpers TS con tests.
+- [x] Reliability signal query verificada con caso 0 (steady) y caso > 0 (warning).
+- [x] Capability registrada y testeada.
+
+## Closure 2026-05-07
+
+- Migration aplicada: `20260507152450308_task-805-engagement-progress-snapshots.sql`.
+- Helper entregado: `src/lib/commercial/sample-sprints/progress-recorder.ts`.
+- Reliability entregado: `src/lib/reliability/queries/engagement-stale-progress.ts` + inyección en `get-reliability-overview`.
+- Access model: sin nuevos `routeGroups`, `views` ni startup policy; se reutiliza `commercial.engagement.record_progress`.
+- Validación: `pnpm pg:connect:migrate`, `pnpm pg:doctor`, focal tests, `pnpm exec tsc --noEmit --pretty false`, `pnpm lint`, `pnpm test`, `pnpm build`.
 
 ## Dependencies
 

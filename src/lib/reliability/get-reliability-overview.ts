@@ -54,6 +54,7 @@ import { getOutboxUnpublishedLagSignal } from './queries/outbox-unpublished-lag'
 import { getOutboxDeadLetterSignal } from './queries/outbox-dead-letter'
 import { getEmailRenderFailureSignal } from './queries/email-render-failure'
 import { getCronStagingDriftSignal } from './queries/cron-staging-drift'
+import { getEngagementStaleProgressSignal } from './queries/engagement-stale-progress'
 import { RELIABILITY_REGISTRY } from './registry'
 import { getReliabilityRegistry } from './registry-store'
 import {
@@ -392,6 +393,15 @@ interface ReliabilityOverviewSources {
    * Roll up bajo moduleKey 'commercial'. TASK-807 formaliza el subsystem.
    */
   servicesEngagement?: ReliabilitySignal[] | null
+
+  /**
+   * TASK-805 — Sample Sprints weekly progress cadence:
+   *   - commercial.engagement.stale_progress (drift, warning)
+   * Cuenta engagements activos non-regular sin snapshot de progreso en los
+   * ultimos 10 dias. Roll up bajo moduleKey 'commercial'; TASK-807 conserva
+   * el subsystem `Commercial Health` completo.
+   */
+  engagementStaleProgress?: ReliabilitySignal | null
 }
 
 export const buildReliabilityOverview = (
@@ -449,7 +459,9 @@ export const buildReliabilityOverview = (
     // TASK-785 Slice 7 — Workforce role title governance signals (2).
     ...(sources.workforceRoleTitle ?? []),
     // TASK-813 Slice 6 — Commercial engagement instance signals (3).
-    ...(sources.servicesEngagement ?? [])
+    ...(sources.servicesEngagement ?? []),
+    // TASK-805 — Commercial engagement stale progress signal.
+    ...(sources.engagementStaleProgress ? [sources.engagementStaleProgress] : [])
   ]
 
   const signalsByModule = new Map<string, ReliabilitySignal[]>()
@@ -731,6 +743,13 @@ export const getReliabilityOverview = async (
           .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
           .catch(() => null)
 
+  // TASK-805 — stale progress reader. Degrada honestamente a `unknown` si
+  // la query falla y se inyecta como signal del moduleKey `commercial`.
+  const engagementStaleProgress =
+    preloadedSources.engagementStaleProgress !== undefined
+      ? preloadedSources.engagementStaleProgress
+      : await getEngagementStaleProgressSignal().catch(() => null)
+
   return buildReliabilityOverview(operations, {
     billing,
     notionOperational,
@@ -751,7 +770,8 @@ export const getReliabilityOverview = async (
     shortcutsInvalidPins,
     identityLegalProfile,
     workforceRoleTitle,
-    servicesEngagement
+    servicesEngagement,
+    engagementStaleProgress
   })
 }
 

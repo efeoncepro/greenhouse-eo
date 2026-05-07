@@ -109,6 +109,7 @@ describe('getTenantEntitlements', () => {
     expect(can(entitlements, 'commercial.workspace', 'launch', 'tenant')).toBe(true)
     expect(can(entitlements, 'commercial.quotation', 'create', 'tenant')).toBe(true)
     expect(can(entitlements, 'commercial.engagement.declare', 'create', 'tenant')).toBe(true)
+    expect(can(entitlements, 'commercial.engagement.record_progress', 'update', 'tenant')).toBe(true)
     expect(can(entitlements, 'commercial.engagement.approve', 'approve', 'tenant')).toBe(false)
     expect(can(entitlements, 'finance.status', 'read', 'tenant')).toBe(false)
   })

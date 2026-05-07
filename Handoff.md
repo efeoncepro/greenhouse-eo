@@ -1,3 +1,14 @@
+# Sesion 2026-05-07 — TASK-805 cerrada en develop (Engagement Progress Snapshots)
+
+- **Branch:** `develop` por instruccion explicita del usuario; no se crea `task/TASK-805-engagement-progress-snapshots`.
+- **Entrega:** migration `20260507152450308_task-805-engagement-progress-snapshots.sql` aplicada en dev crea `greenhouse_commercial.engagement_progress_snapshots` con `service_id TEXT`, `recorded_by TEXT`, UNIQUE `(service_id, snapshot_date)`, index `(service_id, snapshot_date DESC)`, `metrics_json` objeto no vacio y triggers append-only.
+- **Helpers:** nuevo `src/lib/commercial/sample-sprints/progress-recorder.ts` expone `recordProgressSnapshot`, `listSnapshotsForService` y `getLatestSnapshot`; reutiliza guard TASK-813, exige actor, mapea duplicado por service/date a error recuperable y rechaza services `regular`.
+- **Reliability:** nuevo reader `commercial.engagement.stale_progress` (`src/lib/reliability/queries/engagement-stale-progress.ts`) se inyecta bajo moduleKey `commercial` y emite warning si un engagement activo non-regular no tiene snapshot reciente (>10 dias). TASK-807 conserva el subsystem `Commercial Health` completo.
+- **Access model:** sin nuevos `routeGroups`, `views` ni startup policy. `commercial.engagement.record_progress` ya existia en catalog/runtime y queda testeado como operator-friendly; `commercial.engagement.approve` sigue admin-only.
+- **No se toco:** UI real, API routes, outbox/audit events ni jobs. TASK-809 conserva la surface real sobre el mockup aprobado `/agency/sample-sprints/mockup`; TASK-808 conserva audit/outbox.
+- **Validacion:** `pnpm pg:connect:migrate` OK + types regenerados; `pnpm pg:doctor` OK; `pnpm test src/lib/commercial/sample-sprints src/lib/reliability/queries/engagement-stale-progress.test.ts src/lib/entitlements/runtime.test.ts` OK (49 tests); `pnpm exec tsc --noEmit --pretty false` OK; `pnpm lint` OK; `pnpm test` completo OK (603 files / 3507 passed / 5 skipped); `pnpm build` OK.
+- **Docs sincronizadas:** task movida a `docs/tasks/complete/`, `docs/tasks/README.md`, `docs/tasks/TASK_ID_REGISTRY.md`, `project_context.md`, `changelog.md` y `GREENHOUSE_PILOT_ENGAGEMENT_ARCHITECTURE_V1.md` actualizados.
+
 # Sesion 2026-05-07 — TASK-804 cerrada en develop (Engagement Approvals + Capacity Warning)
 
 - **Branch:** `develop` por instruccion explicita del usuario; no se creo branch task.

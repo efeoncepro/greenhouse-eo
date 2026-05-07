@@ -59,6 +59,19 @@ TASK-804 (Capa 7 approval + capacity warning soft) quedó implementada vía migr
 6. **Access model:** `commercial.engagement.approve` ya existía en catálogo/runtime y queda EFEONCE_ADMIN-only en V1. TASK-804 agrega test explícito de gating; no crea `routeGroups`, `views` ni startup policy.
 7. **Sin API/UI/outbox en este slice:** TASK-809 toma la surface real y TASK-808 toma audit/outbox; este slice entrega primitives y helpers.
 
+## Delta v1.7 (2026-05-07) — TASK-805 implementada
+
+TASK-805 (Capa 6 progress snapshots) quedó implementada vía migration `20260507152450308_task-805-engagement-progress-snapshots.sql`:
+
+1. **`engagement_progress_snapshots`** persiste snapshots semanales por `service_id + snapshot_date` con `UNIQUE (service_id, snapshot_date)` e índice `(service_id, snapshot_date DESC)` para listados/latest.
+2. **Runtime real preservado:** `service_id` usa `TEXT` hacia `greenhouse_core.services(service_id)` y `recorded_by` usa `TEXT` hacia `greenhouse_core.client_users(user_id)` nullable en DB por `ON DELETE SET NULL`; el helper exige actor input.
+3. **Append-only:** triggers DB bloquean `UPDATE`/`DELETE`. Correcciones futuras deben registrarse como otro snapshot fechado o vía audit/outbox de TASK-808.
+4. **Metrics V1:** `metrics_json` sigue schema-flexible, pero DB y helper exigen objeto JSON no vacío. Templates por `engagement_kind` quedan como V2.
+5. **Helper canónico:** `src/lib/commercial/sample-sprints/progress-recorder.ts` expone `recordProgressSnapshot`, `listSnapshotsForService` y `getLatestSnapshot`; aplica guard TASK-813 y rechaza `services.engagement_kind='regular'`.
+6. **Access model:** `commercial.engagement.record_progress` ya existía en catálogo/runtime y queda operator-friendly para `routeGroup=commercial` / admin; approve sigue admin-only. No se agregan `routeGroups`, `views` ni startup policy.
+7. **Reliability:** `src/lib/reliability/queries/engagement-stale-progress.ts` agrega `commercial.engagement.stale_progress` como signal `drift`/`warning` si un engagement activo non-regular no tiene snapshot reciente (>10 días). Se inyecta bajo `moduleKey='commercial'`; TASK-807 conserva el subsystem `Commercial Health` completo.
+8. **Sin API/UI/outbox en este slice:** TASK-809 toma la surface real y TASK-808 toma audit/outbox.
+
 ## Delta v1.2 (2026-05-05) — pre-flight check + naming "Sample Sprint"
 
 Aplicando red-team pre-épica con `arch-architect`. Cambios:
