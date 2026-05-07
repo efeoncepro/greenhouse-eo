@@ -3,6 +3,11 @@ import 'server-only'
 import type { PoolClient } from 'pg'
 
 import { query, withTransaction } from '@/lib/db'
+import {
+  assertEngagementServiceEligible,
+  buildEligibleServicePredicate,
+  ServiceNotEligibleForEngagementError
+} from './eligibility'
 
 export const ENGAGEMENT_COMMERCIAL_TERMS_KINDS = [
   'committed',
@@ -51,13 +56,6 @@ interface TermsRow extends Record<string, unknown> {
   declared_by: string | null
   declared_at: Date | string
   reason: string
-}
-
-interface ServiceEligibilityRow extends Record<string, unknown> {
-  service_id: string
-  active: boolean
-  status: string
-  hubspot_sync_status: string | null
 }
 
 interface PgErrorLike {
@@ -197,54 +195,20 @@ const assertDeclareInput = (input: DeclareCommercialTermsInput): {
   }
 }
 
-const mapEligibilityFailure = (serviceId: string, row: ServiceEligibilityRow | undefined) => {
-  if (!row) {
-    return new ServiceNotEligibleForCommercialTermsError(
-      `Service ${serviceId} does not exist.`,
-      serviceId,
-      'not_found'
-    )
-  }
-
-  if (row.status === 'legacy_seed_archived') {
-    return new ServiceNotEligibleForCommercialTermsError(
-      `Service ${serviceId} is a TASK-813 legacy seed archive and cannot receive commercial terms.`,
-      serviceId,
-      'legacy_seed_archived'
-    )
-  }
-
-  if (!row.active) {
-    return new ServiceNotEligibleForCommercialTermsError(
-      `Service ${serviceId} is inactive and cannot receive commercial terms.`,
-      serviceId,
-      'inactive'
-    )
-  }
-
-  if (row.hubspot_sync_status === 'unmapped') {
-    return new ServiceNotEligibleForCommercialTermsError(
-      `Service ${serviceId} is unmapped from HubSpot and cannot receive commercial terms.`,
-      serviceId,
-      'unmapped'
-    )
-  }
-
-  return null
-}
-
 const assertServiceEligible = async (client: PoolClient, serviceId: string): Promise<void> => {
-  const result = await client.query<ServiceEligibilityRow>(
-    `SELECT service_id, active, status, hubspot_sync_status
-     FROM greenhouse_core.services
-     WHERE service_id = $1
-     LIMIT 1`,
-    [serviceId]
-  )
+  try {
+    await assertEngagementServiceEligible(client, serviceId)
+  } catch (error) {
+    if (error instanceof ServiceNotEligibleForEngagementError) {
+      throw new ServiceNotEligibleForCommercialTermsError(
+        error.message.replace('engagement operations', 'commercial terms'),
+        error.serviceId,
+        error.reasonCode
+      )
+    }
 
-  const failure = mapEligibilityFailure(serviceId, result.rows[0])
-
-  if (failure) throw failure
+    throw error
+  }
 }
 
 const isUniqueConstraintError = (error: unknown): boolean => {
@@ -272,9 +236,7 @@ export const getActiveCommercialTerms = async (
      WHERE t.service_id = $1
        AND t.effective_from <= $2::date
        AND (t.effective_to IS NULL OR t.effective_to > $2::date)
-       AND s.active = TRUE
-       AND s.status != 'legacy_seed_archived'
-       AND s.hubspot_sync_status IS DISTINCT FROM 'unmapped'
+       AND ${buildEligibleServicePredicate('s')}
      ORDER BY t.effective_from DESC
      LIMIT 1`,
     [normalizedServiceId, dateKey]

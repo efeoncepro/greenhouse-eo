@@ -1,3 +1,14 @@
+# Sesion 2026-05-07 — TASK-803 cerrada en develop (Engagement Phases + Outcomes + Lineage)
+
+- **Branch:** `develop` por instruccion explicita del usuario; no se creo branch task.
+- **Entrega:** migration `20260507135645984_task-803-engagement-phases-outcomes-lineage.sql` aplicada en dev crea `greenhouse_commercial.engagement_phases`, `engagement_outcomes` y `engagement_lineage`. Todas las FKs usan `TEXT`, alineadas al runtime real (`services`, `assets`, `quotations`, `client_users`).
+- **Helpers:** nuevos modulos `src/lib/commercial/sample-sprints/{eligibility,shared,phases,outcomes,lineage}.ts`; `commercial-terms.ts` reutiliza el guard compartido sin romper su error publico historico. TASK-813 queda incorporada como hard guard: no operar sobre services inactivos, `legacy_seed_archived` ni `hubspot_sync_status='unmapped'`.
+- **Contratos DB:** `engagement_outcomes` es append-only por triggers DB; outcome terminal unico por service; cancellation exige reason; conversion exige `next_service_id` o `next_quotation_id`; lineage bloquea parent=child y duplicados parent/child/kind.
+- **No se toco:** routeGroups, views, entitlements, startup policy, UI, API routes, reliability signals ni outbox events. TASK-808 sigue como owner de audit log/outbox engagement.
+- **Validacion:** `pnpm pg:connect:migrate` OK + types regenerados; schema live verificado via `information_schema`/`pg_catalog`; smoke DB transaccional con `ROLLBACK` OK; `pnpm test src/lib/commercial/sample-sprints` OK; `pnpm exec tsc --noEmit --pretty false` OK; `pnpm lint` OK; `pnpm build` OK; `pnpm pg:doctor` OK.
+- **Nota test completo:** `pnpm test` completo tuvo un timeout aislado no relacionado en `src/views/greenhouse/hr-core/HrHierarchyView.test.tsx`; el archivo HR se re-ejecuto aislado y paso. Sin cambios HR/UI en esta task.
+- **Docs sincronizadas:** task movida a `docs/tasks/complete/`, `docs/tasks/README.md`, `changelog.md` y `GREENHOUSE_PILOT_ENGAGEMENT_ARCHITECTURE_V1.md` actualizados.
+
 # Sesion 2026-05-07 — TASK-803 tomada en develop (Engagement Phases + Outcomes + Lineage)
 
 - **Branch:** `develop` por instruccion explicita del usuario; no se crea `task/TASK-803-engagement-phases-outcomes-lineage`.

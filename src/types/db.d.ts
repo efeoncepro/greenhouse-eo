@@ -502,6 +502,66 @@ export interface GreenhouseCommercialEngagementCommercialTerms {
   terms_kind: string;
 }
 
+export interface GreenhouseCommercialEngagementLineage {
+  /**
+   * Child service in the engagement lineage graph. TEXT by services.service_id contract.
+   */
+  child_service_id: string;
+  lineage_id: Generated<string>;
+  /**
+   * Parent service in the engagement lineage graph. TEXT by services.service_id contract.
+   */
+  parent_service_id: string;
+  recorded_at: Generated<Timestamp>;
+  recorded_by: string | null;
+  relationship_kind: string;
+  transition_date: Timestamp;
+  transition_reason: string;
+}
+
+export interface GreenhouseCommercialEngagementOutcomes {
+  cancellation_reason: string | null;
+  decided_at: Generated<Timestamp>;
+  decided_by: string | null;
+  decision_date: Timestamp;
+  decision_rationale: string;
+  metrics_json: Json | null;
+  /**
+   * Optional FK to the canonical quotation that prices the post-conversion service. TEXT by runtime contract.
+   */
+  next_quotation_id: string | null;
+  next_service_id: string | null;
+  outcome_id: Generated<string>;
+  outcome_kind: string;
+  /**
+   * Optional FK to canonical asset registry (greenhouse_core.assets.asset_id). TEXT by runtime contract.
+   */
+  report_asset_id: string | null;
+  /**
+   * FK to greenhouse_core.services(service_id). TEXT by contract (TASK-801), not UUID.
+   */
+  service_id: string;
+}
+
+export interface GreenhouseCommercialEngagementPhases {
+  completed_at: Timestamp | null;
+  completed_by: string | null;
+  created_at: Generated<Timestamp>;
+  deliverables_json: Json | null;
+  end_date: Timestamp | null;
+  phase_id: Generated<string>;
+  phase_kind: string;
+  phase_name: string;
+  phase_order: number;
+  /**
+   * FK to greenhouse_core.services(service_id). TEXT by contract (TASK-801), not UUID.
+   */
+  service_id: string;
+  start_date: Timestamp;
+  status: Generated<string>;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseCommercialFteHoursGuide {
   effective_from: Generated<Timestamp>;
   fte_fraction: Numeric;
@@ -8454,6 +8514,9 @@ export interface DB {
   "greenhouse_commercial.employment_type_aliases": GreenhouseCommercialEmploymentTypeAliases;
   "greenhouse_commercial.employment_types": GreenhouseCommercialEmploymentTypes;
   "greenhouse_commercial.engagement_commercial_terms": GreenhouseCommercialEngagementCommercialTerms;
+  "greenhouse_commercial.engagement_lineage": GreenhouseCommercialEngagementLineage;
+  "greenhouse_commercial.engagement_outcomes": GreenhouseCommercialEngagementOutcomes;
+  "greenhouse_commercial.engagement_phases": GreenhouseCommercialEngagementPhases;
   "greenhouse_commercial.fte_hours_guide": GreenhouseCommercialFteHoursGuide;
   "greenhouse_commercial.hubspot_deal_pipeline_config": GreenhouseCommercialHubspotDealPipelineConfig;
   "greenhouse_commercial.hubspot_deal_pipeline_defaults": GreenhouseCommercialHubspotDealPipelineDefaults;

@@ -36,6 +36,17 @@ TASK-802 corrige Capa 2 antes de implementar contra runtime real:
 2. **`declared_by` queda nullable en DB, requerido por helper.** La spec anterior combinaba `TEXT NOT NULL` con `ON DELETE SET NULL`, contrato contradictorio. Se alinea con TASK-760/761/762: el helper exige actor humano al declarar términos, pero la FK puede quedar `NULL` si el usuario se elimina para preservar historial.
 3. **TASK-813 eligibility guard.** Cualquier write path de terms debe validar que el `service` sea engagement real elegible: `active=TRUE`, `status != 'legacy_seed_archived'` y `hubspot_sync_status IS DISTINCT FROM 'unmapped'`. Las filas archivadas por TASK-813 y las materializadas como `unmapped` no deben recibir términos comerciales operativos.
 
+## Delta v1.5 (2026-05-07) — TASK-803 implementada
+
+TASK-803 (Capas 3, 4 y 5) quedó implementada vía migration `20260507135645984_task-803-engagement-phases-outcomes-lineage.sql`:
+
+1. **`engagement_phases`** modela hitos operativos del engagement con `phase_kind`, `phase_order`, ventana planificada, estado y actor de cierre. `UNIQUE (service_id, phase_order)` evita timeline ambiguo.
+2. **`engagement_outcomes`** modela la decisión terminal con `outcome_kind`, rationale, métricas, asset de reporte y links opcionales a `next_service_id` o `next_quotation_id`. La tabla es append-only por triggers DB: cualquier corrección posterior debe ir por TASK-808 audit/outbox, no por mutación destructiva.
+3. **`engagement_lineage`** modela transiciones parent/child multi-graph con `relationship_kind`, `transition_reason`, `recorded_by` y `UNIQUE (parent_service_id, child_service_id, relationship_kind)`.
+4. **Runtime real preservado:** todas las FKs a `services`, `assets`, `quotations` y `client_users` usan `TEXT`, no `UUID`.
+5. **TASK-813 hard guard reusable:** `src/lib/commercial/sample-sprints/eligibility.ts` centraliza la exclusión de services inactivos, `legacy_seed_archived` y `hubspot_sync_status='unmapped'`. Lo consumen `commercial-terms`, `phases`, `outcomes` y `lineage`.
+6. **Sin access/UI en este slice:** no se agregan `routeGroups`, `views`, `entitlements`, startup policy, APIs, UI, reliability signals ni outbox events. TASK-808 conserva ownership del audit log/outbox de engagement.
+
 ## Delta v1.2 (2026-05-05) — pre-flight check + naming "Sample Sprint"
 
 Aplicando red-team pre-épica con `arch-architect`. Cambios:

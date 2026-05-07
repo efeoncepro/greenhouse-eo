@@ -2,13 +2,13 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `EPIC-014`
-- Status real: `Diseño aprobado`
+- Status real: `Implementada y validada en develop`
 - Domain: `commercial`
 - Blocked by: `TASK-801`
 - Branch: `develop` (por instrucción explícita del usuario; no crear branch task)
@@ -90,10 +90,31 @@ Tests:
 
 ## Acceptance Criteria
 
-- DDL aplicada, columnas + CHECKs + UNIQUE + FKs verificados via `information_schema`.
-- `pnpm db:generate-types` actualiza tipos.
-- 6 helpers TS con tests unitarios + 3 integration tests + 3 constraint enforcement tests.
-- `pnpm test` verde, `pnpm lint` verde.
+- [x] DDL aplicada, columnas + CHECKs + UNIQUE + FKs verificados via `information_schema`.
+- [x] Tipos Kysely regenerados en `src/types/db.d.ts`.
+- [x] 6 helpers TS con tests unitarios, flujo integrado y constraints enforcement.
+- [x] `pnpm lint`, `pnpm exec tsc --noEmit --pretty false`, `pnpm build`, `pnpm pg:doctor` y tests focales verdes.
+- [!] `pnpm test` completo tuvo un timeout aislado en `src/views/greenhouse/hr-core/HrHierarchyView.test.tsx`; el archivo HR se re-ejecutó aislado y pasó. Sin cambios en HR/UI dentro de esta task.
+
+## Implementation Notes
+
+- Migration canónica: `migrations/20260507135645984_task-803-engagement-phases-outcomes-lineage.sql`.
+- Runtime corregido vs spec histórica: todas las FKs a `services`, `assets`, `quotations` y `client_users` usan `TEXT`, alineadas con el schema real.
+- `engagement_outcomes` queda append-only por trigger DB (`UPDATE`/`DELETE` rechazados), porque TASK-808 será owner del audit log/outbox de decisiones.
+- TASK-813 queda absorbida en helper compartido `src/lib/commercial/sample-sprints/eligibility.ts`: los write/read helpers excluyen services inactivos, `legacy_seed_archived` y `hubspot_sync_status='unmapped'`.
+- No se agregan rutas, UI, routeGroups, views, entitlements, startup policy, outbox events ni reliability signals en este slice.
+
+## Verification
+
+- `pnpm pg:connect:migrate`
+- Verificación live de tablas, índices, constraints y triggers via `information_schema`/`pg_catalog`.
+- Smoke DB transaccional con `ROLLBACK`: phase insert válido, cancellation sin reason rechazado, lineage self-link rechazado, outcome update rechazado por append-only trigger.
+- `pnpm test src/lib/commercial/sample-sprints`
+- `pnpm test src/views/greenhouse/hr-core/HrHierarchyView.test.tsx` (rerun aislado del timeout no relacionado)
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm lint`
+- `pnpm build`
+- `pnpm pg:doctor`
 
 ## Dependencies
 
