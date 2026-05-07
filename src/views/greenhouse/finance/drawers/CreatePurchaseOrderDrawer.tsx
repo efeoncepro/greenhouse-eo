@@ -17,6 +17,8 @@ import MenuItem from '@mui/material/MenuItem'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomTextField from '@core/components/mui/TextField'
 import GreenhouseFileUploader, { type UploadedFileValue } from '@/components/greenhouse/GreenhouseFileUploader'
 import {
@@ -24,6 +26,9 @@ import {
   loadFinanceClientContactOptions,
   type FinanceContactOption
 } from './financeClientContacts'
+import { formatCurrency as formatGreenhouseCurrency } from '@/lib/format'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 // ── Types ──
 
@@ -320,7 +325,9 @@ const CreatePurchaseOrderDrawer = ({ open, onClose, onSuccess }: Props) => {
   }
 
   const formatCLP = (n: number) =>
-    new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(n)
+    formatGreenhouseCurrency(n, 'CLP', {
+  maximumFractionDigits: 0
+}, 'es-CL')
 
   return (
     <Drawer
@@ -331,7 +338,7 @@ const CreatePurchaseOrderDrawer = ({ open, onClose, onSuccess }: Props) => {
     >
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 4 }}>
         <Typography variant='h6'>Registrar orden de compra</Typography>
-        <IconButton onClick={handleClose} size='small' aria-label='Cerrar'>
+        <IconButton onClick={handleClose} size='small' aria-label={GREENHOUSE_COPY.actions.close}>
           <i className='tabler-x' />
         </IconButton>
       </Box>
@@ -562,7 +569,7 @@ const CreatePurchaseOrderDrawer = ({ open, onClose, onSuccess }: Props) => {
 
       <Divider />
       <Box sx={{ display: 'flex', gap: 2, p: 4 }}>
-        <Button variant='outlined' color='secondary' onClick={handleClose} fullWidth>Cancelar</Button>
+        <Button variant='outlined' color='secondary' onClick={handleClose} fullWidth>{GREENHOUSE_COPY.actions.cancel}</Button>
         <Button variant='contained' color='primary' onClick={handleSubmit} disabled={saving} fullWidth startIcon={<i className='tabler-check' />}>
           {saving ? 'Guardando...' : 'Registrar OC'}
         </Button>

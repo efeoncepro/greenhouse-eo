@@ -5,6 +5,7 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
 import useReducedMotion from '@/hooks/useReducedMotion'
+import { formatDate as formatGreenhouseDate } from '@/lib/format'
 
 export type SaveStateKind = 'clean' | 'dirty' | 'saving' | 'saved'
 
@@ -28,7 +29,10 @@ const formatRelativeTime = (date: Date): string => {
 
   if (hours < 24) return `hace ${hours}h`
 
-  return date.toLocaleDateString('es-CL', { day: '2-digit', month: 'short' })
+  return formatGreenhouseDate(date, {
+  day: '2-digit',
+  month: 'short'
+}, 'es-CL')
 }
 
 const PRIMARY_LABEL: Record<SaveStateKind, string> = {

@@ -12,6 +12,8 @@ import Skeleton from '@mui/material/Skeleton'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
+import { formatDateTime as formatGreenhouseDateTime } from '@/lib/format'
+
 export interface AuditEntry {
   logId: string
   quotationId: string
@@ -60,7 +62,10 @@ const formatDate = (iso: string) => {
 
   if (Number.isNaN(d.getTime())) return iso
 
-  return d.toLocaleString('es-CL', { dateStyle: 'medium', timeStyle: 'short' })
+  return formatGreenhouseDateTime(d, {
+  dateStyle: 'medium',
+  timeStyle: 'short'
+}, 'es-CL')
 }
 
 const summarizeDetails = (action: string, details: Record<string, unknown>): string | null => {

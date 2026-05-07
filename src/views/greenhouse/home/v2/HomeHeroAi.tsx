@@ -23,6 +23,11 @@ import useReducedMotion from '@/hooks/useReducedMotion'
 
 import type { HomeHeroAiData } from '@/lib/home/contract'
 
+const TASK407_ARIA_ASISTENTE_NEXA = "Asistente Nexa"
+const TASK407_ARIA_PREGUNTA_PARA_NEXA = "Pregunta para Nexa"
+const TASK407_ARIA_ENVIAR_PREGUNTA = "Enviar pregunta"
+
+
 interface HomeHeroAiProps {
   data: HomeHeroAiData
 }
@@ -67,7 +72,7 @@ export const HomeHeroAi = ({ data }: HomeHeroAiProps) => {
   const lastQueryLabel = formatRelativeTime(data.lastQueryAtMs)
 
   return (
-    <Card component='section' aria-label='Asistente Nexa'>
+    <Card component='section' aria-label={TASK407_ARIA_ASISTENTE_NEXA}>
       <CardContent sx={{ position: 'relative', overflow: 'hidden', py: { xs: 4, md: 5 }, px: { xs: 3, md: 5 } }}>
         <motion.div
           initial={reduced ? false : { opacity: 0, y: 8 }}
@@ -129,7 +134,7 @@ export const HomeHeroAi = ({ data }: HomeHeroAiProps) => {
                   value={prompt}
                   onChange={event => setPrompt(event.target.value)}
                   placeholder='Pregunta sobre nómina, OTD, equipo, finanzas…'
-                  aria-label='Pregunta para Nexa'
+                  aria-label={TASK407_ARIA_PREGUNTA_PARA_NEXA}
                   slotProps={{
                     input: {
                       startAdornment: (
@@ -142,7 +147,7 @@ export const HomeHeroAi = ({ data }: HomeHeroAiProps) => {
                           <IconButton
                             type='submit'
                             color='primary'
-                            aria-label='Enviar pregunta'
+                            aria-label={TASK407_ARIA_ENVIAR_PREGUNTA}
                             disabled={!prompt.trim()}
                             edge='end'
                           >

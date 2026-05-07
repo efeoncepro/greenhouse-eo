@@ -16,7 +16,8 @@ import { alpha, useTheme } from '@mui/material/styles'
 
 import CustomChip from '@core/components/mui/Chip'
 
-import { GH_AGENCY, GH_COLORS } from '@/config/greenhouse-nomenclature'
+import { GH_COLORS } from '@/config/greenhouse-nomenclature'
+import { GH_AGENCY } from '@/lib/copy/agency'
 import type { AgencySpaceHealth } from '@/lib/agency/agency-queries'
 import { getSpaceHealth, HEALTH_ZONE_LABEL, HEALTH_ZONE_COLOR, HEALTH_ZONE_ORDER } from './space-health'
 import {

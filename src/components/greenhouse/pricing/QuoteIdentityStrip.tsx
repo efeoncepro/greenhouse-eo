@@ -12,7 +12,7 @@ import { alpha } from '@mui/material/styles'
 
 import CustomChip from '@core/components/mui/Chip'
 
-import { GH_PRICING } from '@/config/greenhouse-nomenclature'
+import { GH_PRICING } from '@/lib/copy/pricing'
 
 export type QuoteStatus = 'draft' | 'pending_approval' | 'approval_rejected' | 'issued' | 'sent' | 'approved' | 'expired' | 'converted'
 

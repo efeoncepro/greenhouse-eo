@@ -1,5 +1,55 @@
 # TASK-419 — Finance Dashboard Cutover to Registry
 
+## Delta 2026-05-05 — pre-execution hardening (resilience pillar)
+
+Auditoría arch detectó colisión latente entre **TASK-419 (cutover)**, **TASK-422 (stale data UX)** y **TASK-425 (DAG runtime cascade)**: las tres extienden el componente `<MetricKpiCard>` con UI states distintos (semáforo, banner stale, "recomputando…") sin contrato unificado. Si se mergea sin orquestar, drift visual garantizado — un KPI en cascada Y stale Y con threshold critical al mismo tiempo (caso real cuando el cron upstream falla mid-cascade) renderiza ambiguo.
+
+**Lección aprendida TASK-776** (`temporalMode` contract de account drawers): la confusión entre snapshot/period/audit emergió por no declarar contract canónico antes de que múltiples surfaces lo extendieran. Aplicar mismo patrón acá ANTES de implementar 422 + 425.
+
+### Decisión canónica — `<MetricKpiCard>` state machine
+
+Declarar en este task (Slice 3) la state machine completa con 5 estados terminales y tokens visuales canónicos. TASK-422 implementa `stale → fresh` lifecycle; TASK-425 implementa `recomputing → fresh`; ambas consumen el contrato sin redefinirlo.
+
+**Estados** (mutuamente excluyentes per render):
+
+| State | Trigger | Visual canónico | Behavior |
+|---|---|---|---|
+| `loading` | Initial fetch / refresh in progress | Skeleton shimmer (Vuexy `<Skeleton variant="rectangular">`) | No tooltip, no value |
+| `fresh` | Data dentro de `freshnessSlaHours` AND quality gates OK | Color de semáforo per `thresholds`, value renderizado, tooltip de description | Default healthy |
+| `stale` | `lastUpdated > freshnessSlaHours` (TASK-422) | Value visible, ícono warning amarillo + tooltip "Datos de hace X — actualización pendiente", color semáforo gris (no se confía en threshold) | NO ocultar value; user debe decidir |
+| `recomputing` | DAG cascade in progress (TASK-425) | Value previo visible (dim 60% opacity), banner sutil "Recomputando…", spinner pequeño esquina superior derecha | Non-blocking; user puede interactuar |
+| `failed` | Dead-letter / freshness SLA excedido > 2× con quality gate roto | Value renderizado con ícono `error` rojo + tooltip "Falla en pipeline — ver Ops Health", semáforo gris | Link a runbook (TASK-422 Ops Health surface) |
+
+**Reglas duras**:
+
+- **NUNCA** mostrar `$0` o `—` cuando `state !== 'fresh'`. El value previo (último conocido) se mantiene visible para todos los estados ≠ `loading`. Cero ocultamiento silencioso (anti-pattern Pilar 3 Resilience).
+- **NUNCA** mezclar dos estados en un render. Si `stale + recomputing` ambos true, prevalece `recomputing` (es transición; stale resolverá al cierre de cascade).
+- **NUNCA** usar color como única señal. Cada estado lleva ícono + tooltip explícito (a11y WCAG 2.2 AA).
+- **NUNCA** cambiar el shape del componente sin extender la state machine. Si emerge `forecasting` (proyección futura) en TASK-425b o similar, agregar al enum + token, NO branchear inline.
+
+**Tokens visuales** (declarar en Slice 3 al implementar):
+
+```ts
+// src/components/greenhouse/MetricKpiCard.tokens.ts
+export const METRIC_KPI_CARD_STATES = {
+  loading:     { color: 'neutral', icon: null, opacity: 1 },
+  fresh:       { color: 'derived_from_thresholds', icon: null, opacity: 1 },
+  stale:       { color: 'grey.500', icon: 'tabler-alert-triangle', opacity: 1, badgeColor: 'warning' },
+  recomputing: { color: 'derived_from_thresholds', icon: 'tabler-loader-2', opacity: 0.6, animation: 'pulse' },
+  failed:      { color: 'grey.500', icon: 'tabler-alert-circle', opacity: 1, badgeColor: 'error' },
+} as const
+```
+
+### Scope adjustment
+
+- **Slice 3** se renombra de "Tooltips desde description" → "**Tooltips + state machine canónica**". Implementa los 5 estados con renderer placeholder para `stale` / `recomputing` / `failed` (TASK-422 + 425 los activan via prop).
+- **Slice 4** (Indicators UF/USD/UTM) ya alineado.
+- Acceptance criterion adicional: "Componente `<MetricKpiCard>` declara las 5 states + tokens; TASK-422 y TASK-425 consumen sin redefinir."
+
+### Sinergia obligatoria con TASK-422 + TASK-425
+
+Cuando TASK-422 cierre, debe pasar `state: 'stale' | 'fresh'` al card según `isMetricFresh()`. Cuando TASK-425 cierre, debe pasar `state: 'recomputing' | 'fresh'` según el state table `metric_materialization_state`. La precedencia ya está definida acá (recomputing > stale > failed > fresh > loading).
+
 ## Status
 
 - Lifecycle: `to-do`

@@ -37,6 +37,10 @@ import type {
 } from '@/types/notion-sync-orchestration'
 import type { IntegrationHealth, IntegrationReadiness, IntegrationType, IntegrationWithHealth } from '@/types/integrations'
 import AdminOpsActionButton from './AdminOpsActionButton'
+import { formatDateTime as formatGreenhouseDateTime } from '@/lib/format'
+
+const TASK407_EMPTY_NO_SE_ENCONTRARON_INTEGRACIONES_EN_EL_REGISTRY_LA_TABLA = "No se encontraron integraciones en el registry. La tabla"
+
 
 type Props = {
   integrations: IntegrationWithHealth[]
@@ -124,11 +128,11 @@ const freshnessBarColor = (percent: number): 'success' | 'warning' | 'error' => 
 const formatDateTime = (value: string | null) => {
   if (!value) return 'Sin registro'
 
-  return new Intl.DateTimeFormat('es-CL', {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-    timeZone: 'America/Santiago'
-  }).format(new Date(value))
+  return formatGreenhouseDateTime(new Date(value), {
+  dateStyle: 'medium',
+  timeStyle: 'short',
+  timeZone: 'America/Santiago'
+}, 'es-CL')
 }
 
 const dataQualityColor = (
@@ -254,7 +258,7 @@ const AdminIntegrationGovernanceView = ({
 
       {integrations.length === 0 && (
         <Alert severity='info' variant='outlined'>
-          No se encontraron integraciones en el registry. La tabla <code>greenhouse_sync.integration_registry</code> puede
+          {TASK407_EMPTY_NO_SE_ENCONTRARON_INTEGRACIONES_EN_EL_REGISTRY_LA_TABLA} <code>greenhouse_sync.integration_registry</code> puede
           estar vacia o la consulta fallo. Verifica que la migracion se haya aplicado correctamente.
         </Alert>
       )}

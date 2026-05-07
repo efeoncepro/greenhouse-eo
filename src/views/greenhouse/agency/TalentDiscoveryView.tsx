@@ -27,10 +27,13 @@ import CustomTextField from '@core/components/mui/TextField'
 
 import BrandLogo from '@/components/greenhouse/BrandLogo'
 import EmptyState from '@/components/greenhouse/EmptyState'
-import { GH_TALENT_DISCOVERY } from '@/config/greenhouse-nomenclature'
+import { GH_TALENT_DISCOVERY } from '@/lib/copy/workforce'
 
 import type { SkillCatalogItem } from '@/types/agency-skills'
 import type { ToolCatalogItem } from '@/types/talent-taxonomy'
+
+const TASK407_ARIA_VERIFICADA = "Verificada"
+
 
 /* ─── Types (aligned to backend TalentDiscoveryResult / TalentDiscoverySummary) ─── */
 
@@ -539,7 +542,7 @@ function TalentCard({ person }: { person: TalentDiscoveryItem }) {
                     label={
                       <Box component='span' sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5 }}>
                         {skill.verified && (
-                          <i className='tabler-check' style={{ fontSize: 12 }} aria-label='Verificada' />
+                          <i className='tabler-check' style={{ fontSize: 12 }} aria-label={TASK407_ARIA_VERIFICADA} />
                         )}
                         {skill.skillName}
                       </Box>

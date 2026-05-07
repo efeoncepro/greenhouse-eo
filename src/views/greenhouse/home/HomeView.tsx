@@ -27,6 +27,10 @@ import NexaInsightsBlock, { type NexaInsightItem } from '@/components/greenhouse
 import { DEFAULT_NEXA_MODEL, resolveNexaModel, type NexaModelId } from '@/config/nexa-models'
 import type { NexaResponse } from '@/lib/nexa/nexa-contract'
 import type { HomeSnapshot } from '@/types/home'
+import { getMicrocopy } from '@/lib/copy'
+
+const GREENHOUSE_COPY = getMicrocopy()
+
 
 const SNAPSHOT_TIMEOUT_MS = 5000
 const NEXA_MODEL_STORAGE_KEY = 'greenhouse:nexa:model'
@@ -434,8 +438,8 @@ const HomeView = () => {
     }
 
     return [
-      { label: 'Nomina del mes', value: 'Sin datos', status: 'secondary', icon: 'tabler-file-invoice' },
-      { label: 'OTD global', value: 'Sin datos', status: 'secondary', icon: 'tabler-target' },
+      { label: 'Nomina del mes', value: GREENHOUSE_COPY.empty.noData, status: 'secondary', icon: 'tabler-file-invoice' },
+      { label: 'OTD global', value: GREENHOUSE_COPY.empty.noData, status: 'secondary', icon: 'tabler-target' },
       { label: 'Correos fallidos', value: '0', status: 'success', icon: 'tabler-mail-check' }
     ]
   }, [snapshot?.financeStatus])

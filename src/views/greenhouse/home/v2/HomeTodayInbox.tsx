@@ -28,6 +28,9 @@ import useReducedMotion from '@/hooks/useReducedMotion'
 
 import type { HomeTodayInboxData, TodayInboxItem, TodayInboxKind, TodayInboxSeverity } from '@/lib/home/contract'
 
+const TASK407_ARIA_TU_DIA = "Tu día"
+
+
 interface HomeTodayInboxProps {
   data: HomeTodayInboxData
 }
@@ -190,7 +193,7 @@ export const HomeTodayInbox = ({ data }: HomeTodayInboxProps) => {
     return (
       <Box
         component='section'
-        aria-label='Tu día'
+        aria-label={TASK407_ARIA_TU_DIA}
         role='status'
         aria-live='polite'
         sx={{
@@ -227,7 +230,7 @@ export const HomeTodayInbox = ({ data }: HomeTodayInboxProps) => {
   }
 
   return (
-    <Card component='section' aria-label='Tu día'>
+    <Card component='section' aria-label={TASK407_ARIA_TU_DIA}>
       <CardHeader
         avatar={<i className='tabler-inbox text-xl' />}
         title='Tu día'

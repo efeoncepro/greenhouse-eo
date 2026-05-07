@@ -30,6 +30,8 @@ import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 import type { Theme } from '@mui/material/styles'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomChip from '@core/components/mui/Chip'
 
 import type { OffboardingCase } from '@/lib/workforce/offboarding'
@@ -41,6 +43,9 @@ import type {
   HrOnboardingTemplateItem,
   HrOnboardingTemplateType
 } from '@/types/hr-onboarding'
+import { formatDate as formatGreenhouseDate } from '@/lib/format'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 type ViewMode = 'overview' | 'templates'
 
@@ -97,7 +102,11 @@ const assignedRoles: HrOnboardingAssignedRole[] = ['hr', 'it', 'supervisor', 'co
 const formatDate = (value?: string | null) => {
   if (!value) return 'Sin fecha'
 
-  return new Intl.DateTimeFormat('es-CL', { day: '2-digit', month: 'short', year: 'numeric' }).format(new Date(`${value.slice(0, 10)}T00:00:00`))
+  return formatGreenhouseDate(new Date(`${value.slice(0, 10)}T00:00:00`), {
+  day: '2-digit',
+  month: 'short',
+  year: 'numeric'
+}, 'es-CL')
 }
 
 const isItemClosed = (status: string) => status === 'done' || status === 'skipped'
@@ -581,9 +590,7 @@ const HrOnboardingView = ({ mode = 'overview' }: { mode?: ViewMode }) => {
                             <TextField fullWidth size='small' type='number' label='Días' value={newItemDueOffset} onChange={event => setNewItemDueOffset(Number(event.target.value))} />
                           </Grid>
                           <Grid size={{ xs: 12, md: 2 }}>
-                            <Button fullWidth variant='contained' disabled={saving || !newItemTitle.trim()} onClick={addItem}>
-                              Agregar
-                            </Button>
+                            <Button fullWidth variant='contained' disabled={saving || !newItemTitle.trim()} onClick={addItem}>{GREENHOUSE_COPY.actions.add}</Button>
                           </Grid>
                         </Grid>
                         <Stack direction='row' spacing={1} alignItems='center'>

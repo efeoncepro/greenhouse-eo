@@ -5,6 +5,7 @@ import Grid from '@mui/material/Grid'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 
 import type { PeopleListPayload } from '@/types/people'
+import { formatNumber as formatGreenhouseNumber } from '@/lib/format'
 
 type Props = {
   summary: PeopleListPayload['summary']
@@ -14,7 +15,7 @@ const PeopleListStats = ({ summary }: Props) => {
   const cards = [
     {
       title: 'Activos',
-      stats: summary.activeMembers.toLocaleString('es-CL'),
+      stats: formatGreenhouseNumber(summary.activeMembers, 'es-CL'),
       avatarIcon: 'tabler-users',
       avatarColor: 'primary' as const,
       subtitle: 'Colaboradores activos'
@@ -28,7 +29,7 @@ const PeopleListStats = ({ summary }: Props) => {
     },
     {
       title: 'Spaces cubiertos',
-      stats: summary.coveredClients.toLocaleString('es-CL'),
+      stats: formatGreenhouseNumber(summary.coveredClients, 'es-CL'),
       avatarIcon: 'tabler-building',
       avatarColor: 'warning' as const,
       subtitle: 'Cuentas con equipo'

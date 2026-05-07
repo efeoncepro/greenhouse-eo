@@ -44,7 +44,10 @@ import type { FinanceMovementFeedItem, FinanceMovementFeedSummaryItem } from '@/
 import tableStyles from '@core/styles/table.module.css'
 import CreateReconciliationPeriodDrawer from '@views/greenhouse/finance/drawers/CreateReconciliationPeriodDrawer'
 import CreateAccountDrawer from '@views/greenhouse/finance/drawers/CreateAccountDrawer'
+import { getMicrocopy } from '@/lib/copy'
+import { formatCurrency as formatGreenhouseCurrency, formatDateTime as formatGreenhouseDateTime, formatTime as formatGreenhouseTime } from '@/lib/format'
 
+const GREENHOUSE_COPY = getMicrocopy()
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -135,14 +138,16 @@ const STATUS_CONFIG: Record<string, { label: string; color: 'success' | 'warning
 
 const ARCHIVE_REASON_MIN_LENGTH = 8
 
-const MONTH_NAMES = ['', 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
+const MONTH_NAMES = ['', ...GREENHOUSE_COPY.months.long]
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
 const formatCLP = (amount: number): string =>
-  new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(amount)
+  formatGreenhouseCurrency(amount, 'CLP', {
+  maximumFractionDigits: 0
+}, 'es-CL')
 
 // ---------------------------------------------------------------------------
 // Component
@@ -600,7 +605,10 @@ const ReconciliationView = () => {
   }, [pendingMovementCount, pendingMovements])
 
   const lastRefreshedLabel = lastRefreshedAt
-    ? `Actualizado ${lastRefreshedAt.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' })}`
+    ? `Actualizado ${formatGreenhouseTime(lastRefreshedAt, {
+  hour: '2-digit',
+  minute: '2-digit'
+}, 'es-CL')}`
     : null
 
   const totalDifference = periods
@@ -715,7 +723,10 @@ const ReconciliationView = () => {
                         </Typography>
                       </Typography>
                       <Typography variant='caption' color='text.secondary' sx={{ display: 'block' }}>
-                        Snapshot: {new Date(snap.snapshotAt).toLocaleString('es-CL', { dateStyle: 'medium', timeStyle: 'short' })}
+                        Snapshot: {formatGreenhouseDateTime(new Date(snap.snapshotAt), {
+  dateStyle: 'medium',
+  timeStyle: 'short'
+}, 'es-CL')}
                         {' · '}
                         Banco: {formatCLP(snap.bankClosingBalance)}
                         {' · '}
@@ -988,7 +999,7 @@ const ReconciliationView = () => {
               </Typography>
             )}
           </Box>
-          <IconButton size='small' onClick={handleCloseArchiveDialog} disabled={archiveSubmitting} aria-label='Cerrar'>
+          <IconButton size='small' onClick={handleCloseArchiveDialog} disabled={archiveSubmitting} aria-label={GREENHOUSE_COPY.actions.close}>
             <i className='tabler-x' style={{ fontSize: 18 }} />
           </IconButton>
         </DialogTitle>
@@ -1016,9 +1027,7 @@ const ReconciliationView = () => {
             color='secondary'
             onClick={handleCloseArchiveDialog}
             disabled={archiveSubmitting}
-          >
-            Cancelar
-          </Button>
+          >{GREENHOUSE_COPY.actions.cancel}</Button>
           <Button
             variant='contained'
             color='primary'

@@ -33,6 +33,8 @@ import {
 import type { ColumnDef, SortingState } from '@tanstack/react-table'
 import classnames from 'classnames'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
@@ -44,6 +46,8 @@ import AssignMemberDrawer from './drawers/AssignMemberDrawer'
 import type { AssignmentToEdit } from './drawers/EditAssignmentDrawer'
 
 import tableStyles from '@core/styles/table.module.css'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 // ── Types ──
 
@@ -493,7 +497,7 @@ return acc }, {} as Record<string, number>)
                   {table.getRowModel().rows.length === 0 ? (
                     <tr>
                       <td colSpan={colCount} style={{ textAlign: 'center', padding: '2rem' }}>
-                        <Typography variant='body2' color='text.secondary'>Sin resultados</Typography>
+                        <Typography variant='body2' color='text.secondary'>{GREENHOUSE_COPY.empty.noResults}</Typography>
                       </td>
                     </tr>
                   ) : (
@@ -684,7 +688,7 @@ return acc }, {} as Record<string, number>)
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setUnassignTarget(null)} disabled={unassigning}>Cancelar</Button>
+          <Button onClick={() => setUnassignTarget(null)} disabled={unassigning}>{GREENHOUSE_COPY.actions.cancel}</Button>
           <Button variant='contained' color='error' onClick={handleUnassign} disabled={unassigning}>
             {unassigning ? 'Desasignando…' : 'Desasignar'}
           </Button>

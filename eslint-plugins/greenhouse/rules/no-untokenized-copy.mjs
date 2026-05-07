@@ -20,6 +20,8 @@
 //   5. Cobertura secundaria    — label, placeholder, helperText, title
 //      cuando son literales (cobertura conservadora; ya estan mayormente
 //      tokenizados en el codebase actual)
+//   6. Month arrays inline     — ['Ene', ..., 'Dic'] / ['Enero', ..., 'Diciembre']
+//   7. JSX text CTAs inline    — <Button>Guardar</Button>, <Button>Cancelar</Button>, etc.
 //
 // Mensajes accionables apuntan al namespace correcto de src/lib/copy.
 //
@@ -54,6 +56,39 @@ const EMPTY_PATTERNS = [
   /^\s*No se encontraron\b/i,
   /^\s*Lista vac[ií]a\s*$/i
 ]
+
+const MONTH_SHORT_VALUES = new Set(['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'])
+
+const MONTH_LONG_VALUES = new Set([
+  'Enero',
+  'Febrero',
+  'Marzo',
+  'Abril',
+  'Mayo',
+  'Junio',
+  'Julio',
+  'Agosto',
+  'Septiembre',
+  'Setiembre',
+  'Octubre',
+  'Noviembre',
+  'Diciembre'
+])
+
+const ACTION_TEXT_TO_KEY = new Map([
+  ['Guardar', 'save'],
+  ['Cancelar', 'cancel'],
+  ['Editar', 'edit'],
+  ['Eliminar', 'delete'],
+  ['Confirmar', 'confirm'],
+  ['Volver', 'back'],
+  ['Continuar', 'continue'],
+  ['Siguiente', 'next'],
+  ['Cerrar', 'close'],
+  ['Aceptar', 'confirm'],
+  ['Crear', 'create'],
+  ['Agregar', 'add']
+])
 
 // Status map keys that signal we're inside a status/state object literal.
 // When a Property has key `label` and any sibling has key matching one of
@@ -113,6 +148,35 @@ const extractLiteralString = node => {
   }
 
   return null
+}
+
+const extractArrayStringValues = node => {
+  if (!node || node.type !== 'ArrayExpression') return null
+
+  const values = []
+
+  for (const element of node.elements) {
+    const value = extractLiteralString(element)
+
+    if (value === null) return null
+
+    values.push(value)
+  }
+
+  return values
+}
+
+const isMonthSequence = values => {
+  if (!Array.isArray(values)) return false
+
+  const normalized = values.map(value => value.trim()).filter(Boolean)
+
+  if (normalized.length !== 12) return false
+
+  const shortMatches = normalized.every(value => MONTH_SHORT_VALUES.has(value))
+  const longMatches = normalized.every(value => MONTH_LONG_VALUES.has(value))
+
+  return shortMatches || longMatches
 }
 
 const extractFromJsxAttributeValue = attrValue => {
@@ -219,12 +283,24 @@ export default {
         "Loading/processing literal hardcoded. Use `getMicrocopy().loading.<key>` from `@/lib/copy` (TASK-265 namespace `loading`). Available: loading, saving, processing, sending, etc.",
       emptyLiteral:
         "Empty state literal hardcoded. Use `getMicrocopy().empty.<key>` from `@/lib/copy` (TASK-265 namespace `empty`). Available: noData, noResults, searchEmpty, firstUseTitle, etc.",
+      monthArrayLiteral:
+        'Month array hardcoded. Use `getMicrocopy().months.short[index]` or `getMicrocopy().months.long[index]` from `@/lib/copy` instead of duplicating month labels.',
+      actionTextLiteral:
+        "CTA text literal hardcoded. Use `getMicrocopy().actions.{actionKey}` from `@/lib/copy` instead of inline `{label}`.",
       secondaryLiteral:
         "Hardcoded copy literal in `{prop}` prop. Use `getMicrocopy()` from `@/lib/copy` for shared microcopy or `greenhouse-nomenclature.ts` for product nomenclature. Skill `greenhouse-ux-writing` valida tono."
     }
   },
   create(context) {
     return {
+      ArrayExpression(node) {
+        const values = extractArrayStringValues(node)
+
+        if (!isMonthSequence(values)) return
+
+        context.report({ node, messageId: 'monthArrayLiteral' })
+      },
+
       // 1. aria-label literal (highest impact: 405 instances)
       JSXAttribute(node) {
         const name = node.name && node.name.name
@@ -296,13 +372,15 @@ export default {
         }
       },
 
-      // 3. Loading + 4. Empty states as JSX text nodes
+      // 3. Loading + 4. Empty states + 7. Shared CTAs as JSX text nodes
       // <Typography>Cargando...</Typography> or <Box>{'Sin datos'}</Box>
       JSXText(node) {
         const value = node.value
 
         if (typeof value !== 'string') return
-        if (value.trim().length === 0) return
+        const normalizedValue = value.trim()
+
+        if (normalizedValue.length === 0) return
 
         if (matchesAny(value, LOADING_PATTERNS)) {
           context.report({ node, messageId: 'loadingLiteral' })
@@ -312,6 +390,21 @@ export default {
 
         if (matchesAny(value, EMPTY_PATTERNS)) {
           context.report({ node, messageId: 'emptyLiteral' })
+
+          return
+        }
+
+        const actionKey = ACTION_TEXT_TO_KEY.get(normalizedValue)
+
+        if (actionKey) {
+          context.report({
+            node,
+            messageId: 'actionTextLiteral',
+            data: {
+              actionKey,
+              label: normalizedValue
+            }
+          })
         }
       }
     }

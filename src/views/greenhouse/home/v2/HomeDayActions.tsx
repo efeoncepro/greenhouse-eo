@@ -17,6 +17,9 @@ import useReducedMotion from '@/hooks/useReducedMotion'
 
 import type { HomeClosingCountdownData, HomeReliabilityRibbonData, HomeTodayInboxData } from '@/lib/home/contract'
 
+const TASK407_ARIA_ACCIONES_RECOMENDADAS_PARA_HOY = "Acciones recomendadas para hoy"
+
+
 interface HomeDayActionsProps {
   closing: HomeClosingCountdownData | null
   inbox: HomeTodayInboxData | null
@@ -105,7 +108,7 @@ export const HomeDayActions = (props: HomeDayActionsProps) => {
     >
       <Box
         component='section'
-        aria-label='Acciones recomendadas para hoy'
+        aria-label={TASK407_ARIA_ACCIONES_RECOMENDADAS_PARA_HOY}
         sx={{
           display: 'flex',
           alignItems: 'center',

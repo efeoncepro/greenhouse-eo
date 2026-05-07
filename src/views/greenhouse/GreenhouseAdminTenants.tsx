@@ -30,9 +30,15 @@ import TablePaginationComponent from '@components/TablePaginationComponent'
 import { fuzzyFilter } from '@/components/tableUtils'
 import { getInitials } from '@/utils/getInitials'
 import type { AdminTenantsOverview } from '@/lib/admin/get-admin-tenants-overview'
-import { GH_INTERNAL_MESSAGES, GH_INTERNAL_NAV } from '@/config/greenhouse-nomenclature'
+import { GH_INTERNAL_NAV } from '@/config/greenhouse-nomenclature'
+import { GH_INTERNAL_MESSAGES } from '@/lib/copy/admin'
 
 import tableStyles from '@core/styles/table.module.css'
+import { getMicrocopy } from '@/lib/copy'
+import { formatDateTime as formatGreenhouseDateTime } from '@/lib/format'
+
+const GREENHOUSE_COPY = getMicrocopy()
+
 
 type TenantRow = AdminTenantsOverview['tenants'][number]
 
@@ -43,7 +49,7 @@ type Props = {
 const formatDateTime = (value: string | null) => {
   if (!value) return GH_INTERNAL_MESSAGES.admin_tenants_no_record
 
-  return new Date(value).toLocaleString('es-CL')
+  return formatGreenhouseDateTime(value, 'es-CL')
 }
 
 const authModeTone = (authMode: string) => {
@@ -250,7 +256,7 @@ const GreenhouseAdminTenants = ({ data }: Props) => {
                 </thead>
                 <tbody>
                   {table.getRowModel().rows.length === 0 ? (
-                    <tr><td colSpan={columns.length} style={{ textAlign: 'center', padding: '2rem' }}><Typography variant='body2' color='text.secondary'>Sin resultados</Typography></td></tr>
+                    <tr><td colSpan={columns.length} style={{ textAlign: 'center', padding: '2rem' }}><Typography variant='body2' color='text.secondary'>{GREENHOUSE_COPY.empty.noResults}</Typography></td></tr>
                   ) : table.getRowModel().rows.map(row => (
                     <tr key={row.id}>
                       {row.getVisibleCells().map(cell => (

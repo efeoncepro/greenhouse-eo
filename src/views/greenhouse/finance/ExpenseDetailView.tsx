@@ -19,11 +19,16 @@ import Grid from '@mui/material/Grid'
 import Skeleton from '@mui/material/Skeleton'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomChip from '@core/components/mui/Chip'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 import PaymentRegistrationCard from '@views/greenhouse/finance/components/PaymentRegistrationCard'
 import PaymentHistoryTable from '@views/greenhouse/finance/components/PaymentHistoryTable'
 import SettlementOrchestrationDrawer from '@views/greenhouse/finance/drawers/SettlementOrchestrationDrawer'
+import { formatCurrency as formatGreenhouseCurrency } from '@/lib/format'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 // ---------------------------------------------------------------------------
 // Types
@@ -61,7 +66,9 @@ interface ExpenseDetail {
 // ---------------------------------------------------------------------------
 
 const formatAmount = (amount: number, currency: string) =>
-  new Intl.NumberFormat('es-CL', { style: 'currency', currency, maximumFractionDigits: currency === 'CLP' ? 0 : 2 }).format(amount)
+  formatGreenhouseCurrency(amount, currency, {
+  maximumFractionDigits: currency === 'CLP' ? 0 : 2
+}, 'es-CL')
 
 const formatDate = (dateStr: string | null): string => {
   if (!dateStr) return '—'
@@ -228,9 +235,7 @@ const ExpenseDetailView = () => {
           >
             Registrar en CCA
           </Button>
-          <Button variant='outlined' component={Link} href='/finance/expenses' startIcon={<i className='tabler-arrow-left' />}>
-            Volver
-          </Button>
+          <Button variant='outlined' component={Link} href='/finance/expenses' startIcon={<i className='tabler-arrow-left' />}>{GREENHOUSE_COPY.actions.back}</Button>
         </Box>
       </Box>
 

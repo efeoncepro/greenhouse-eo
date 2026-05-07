@@ -24,7 +24,7 @@ import CustomAvatar from '@core/components/mui/Avatar'
 import CustomTextField from '@core/components/mui/TextField'
 
 import EmptyState from '@components/greenhouse/EmptyState'
-import { GH_INTERNAL_MESSAGES } from '@/config/greenhouse-nomenclature'
+import { GH_INTERNAL_MESSAGES } from '@/lib/copy/admin'
 import { getInitials } from '@/utils/getInitials'
 
 import type { DerivedControlTowerTenant } from '../internal/dashboard/helpers'

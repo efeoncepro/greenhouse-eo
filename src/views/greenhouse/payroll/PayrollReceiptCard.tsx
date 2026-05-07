@@ -21,6 +21,9 @@ import {
   type ReceiptPresenterEntry
 } from '@/lib/payroll/receipt-presenter'
 import { GH_COLORS } from '@/config/greenhouse-nomenclature'
+import { getMicrocopy } from '@/lib/copy'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 type EmployerInfo = {
   legalName: string
@@ -37,10 +40,7 @@ type Props = {
   adjustmentsBreakdown?: EntryAdjustmentBreakdown
 }
 
-const MONTH_NAMES = [
-  'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-  'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
-]
+const MONTH_NAMES = GREENHOUSE_COPY.months.long
 
 // MUI Alert severity tokens map 1:1 with our infoBlock variants.
 const ALERT_SEVERITY: Record<ReceiptInfoBlockVariant, 'info' | 'warning' | 'error'> = {

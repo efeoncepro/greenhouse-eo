@@ -31,6 +31,30 @@ Pero el sistema **todavía no es**:
 
 En resumen: hoy Greenhouse tiene un **sistema robusto de email transaccional, operativo y de algunos broadcast importantes**, no una suite completa de messaging enterprise generalista.
 
+## Delta 2026-05-06 — TASK-408 copy dictionary sin romper personalizacion
+
+El catalogo de emails empezo a consumir `src/lib/copy/` para copy institucional y de template, pero el contrato arquitectonico separa explicitamente **copy estatico** de **tokens runtime**.
+
+- `src/lib/copy/dictionaries/es-CL/emails.ts` es la fuente de copy reusable para layout, auth, notification, leave y payroll employee-facing.
+- `selectEmailTemplateCopy()` conserva fallback legacy `en` mientras `en-US` siga como mirror de `es-CL`.
+- `selectEmailIntlDateLocale()` centraliza la proyeccion de locale Intl para fechas de emails.
+- Los tokens de personalizacion (`recipient`, `client`, `platform`, periodos, montos, fechas, links, motivos, procesadores y adjuntos) siguen viniendo de `src/lib/email/tokens.ts`, `src/lib/email/delivery.ts` o de props/callers de dominio. El dictionary no debe capturar datos de negocio.
+
+En payroll, `PayrollReceiptEmail`, `PayrollPaymentCommittedEmail`, `PayrollPaymentCancelledEmail`, `PayrollLiquidacionV2Email` y `PayrollExportReadyEmail` leen copy desde `emails.payroll.*`, pero mantienen intactos payment lifecycle, payroll export package, subjects contractuales, attachment delivery, outbox, webhooks y projections.
+
+En finance/payroll beneficiary profile, `BeneficiaryPaymentProfileChangedEmail` lee copy estructural desde `emails.beneficiaryPaymentProfileChanged`. Los datos sensibles y de negocio (`accountNumberMasked`, proveedor, banco, moneda, fechas, motivo y actor/request source) siguen viniendo del runtime. El dictionary no debe almacenar ni inferir numeros de cuenta completos.
+
+En finance/quote share, `QuoteSharePromptEmail` lee copy estructural desde `emails.quoteShare`. La cotizacion, version, cliente, destinatario, mensaje custom, total, vigencia, PDF attachment metadata, sender y share URL siguen perteneciendo al runtime de Quote Builder/Public Share. El dictionary no reemplaza mensajes humanos ni payload comercial.
+
+En Nexa Insights, `WeeklyExecutiveDigestEmail` lee solo copy estructural desde `emails.weeklyExecutiveDigest`. El contenido de insight (`headline`, `narrative`, `rootCauseNarrative`, spaces, links y action labels) sigue perteneciendo a la lane materializada de Nexa y no debe dictionary-ficarse. Los snapshots de `src/emails/EmailTemplateBaseline.test.tsx` son el gate canonico: una migracion de copy no debe cambiar bytes de HTML salvo decision explicita documentada.
+
+TASK-408 agrega ademas el signal deterministico `notifications.email.render_failure_rate` en el Reliability Control Plane. El signal vive bajo `moduleKey='sync'` porque protege el event bus y las projections con side effect de email, pero lee las fuentes reales de correo:
+
+- `greenhouse_notifications.email_deliveries` para fallas del email engine (`status='failed'`, `error_class='template_error'` o mensajes de render/template).
+- `greenhouse_sync.outbox_reactive_log` para fallas `retry` / `dead-letter` de projections que envian emails (`notification_dispatch`, payroll receipts/export ready, pricing catalog approval, payment profile notifications y payslip lifecycle).
+
+El steady state esperado es `0` fallas de render/template en 24h. Cualquier valor `>0` escala a `error` para detectar regresiones de templates migrados sin cambiar `sendEmail`, Resend, outbox publisher ni reactive consumer.
+
 ## Estado
 
 Baseline de producto y arquitectura al 2026-03-19.

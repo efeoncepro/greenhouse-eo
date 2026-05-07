@@ -23,6 +23,7 @@ import CustomAvatar from '@core/components/mui/Avatar'
 
 import { EmptyState, ExecutiveCardShell } from '@/components/greenhouse'
 import CardStatsSquare from '@components/card-statistics/CardStatsSquare'
+import { formatInteger } from '@/lib/format'
 import type { AiCreditWallet, ClientCreditSummary } from '@/types/ai-tools'
 import { balanceHealthConfig, walletStatusConfig, formatDate } from '@views/greenhouse/ai-tools/helpers'
 
@@ -109,13 +110,13 @@ const ClientAiCreditsSection = () => {
           }}
         >
           <CardStatsSquare
-            stats={totalAvailable.toLocaleString('es-CL')}
+            stats={formatInteger(totalAvailable)}
             statsTitle='Créditos disponibles'
             avatarIcon='tabler-coins'
             avatarColor='success'
           />
           <CardStatsSquare
-            stats={totalConsumed.toLocaleString('es-CL')}
+            stats={formatInteger(totalConsumed)}
             statsTitle='Consumidos este mes'
             avatarIcon='tabler-chart-arrows-vertical'
             avatarColor='warning'
@@ -158,7 +159,7 @@ const ClientAiCreditsSection = () => {
                         <Typography variant='body2'>{project.projectName}</Typography>
                       </Stack>
                       <Typography variant='body2' sx={{ fontWeight: 500 }}>
-                        {project.creditsConsumed.toLocaleString('es-CL')}
+                        {formatInteger(project.creditsConsumed)}
                       </Typography>
                     </Stack>
                     <LinearProgress

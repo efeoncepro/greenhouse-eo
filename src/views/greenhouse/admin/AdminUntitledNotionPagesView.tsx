@@ -19,6 +19,7 @@ import type { UntitledEntityKind, UntitledPagesOverview } from '@/lib/delivery/g
 
 import ExecutiveCardShell from '@/components/greenhouse/ExecutiveCardShell'
 import ExecutiveMiniStatCard from '@/components/greenhouse/ExecutiveMiniStatCard'
+import { formatDateTime as formatGreenhouseDateTime } from '@/lib/format'
 
 interface Props {
   overview: UntitledPagesOverview
@@ -40,7 +41,10 @@ const formatDate = (iso: string | null) => {
   if (!iso) return '—'
 
   try {
-    return new Date(iso).toLocaleString('es-CL', { dateStyle: 'short', timeStyle: 'short' })
+    return formatGreenhouseDateTime(new Date(iso), {
+  dateStyle: 'short',
+  timeStyle: 'short'
+}, 'es-CL')
   } catch {
     return iso
   }

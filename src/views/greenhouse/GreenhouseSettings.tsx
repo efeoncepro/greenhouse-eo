@@ -1,10 +1,18 @@
 'use client'
 
+import { useEffect, useState } from 'react'
+
+import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import Chip from '@mui/material/Chip'
+import CircularProgress from '@mui/material/CircularProgress'
+import FormControl from '@mui/material/FormControl'
+import InputLabel from '@mui/material/InputLabel'
+import MenuItem from '@mui/material/MenuItem'
+import Select from '@mui/material/Select'
 import Stack from '@mui/material/Stack'
 import Switch from '@mui/material/Switch'
 import Typography from '@mui/material/Typography'
@@ -12,7 +20,8 @@ import Typography from '@mui/material/Typography'
 import { signIn, useSession } from 'next-auth/react'
 
 import { TeamDossierSection } from '@/components/greenhouse'
-import { GH_CLIENT_NAV, GH_MESSAGES } from '@/config/greenhouse-nomenclature'
+import { GH_CLIENT_NAV } from '@/config/greenhouse-nomenclature'
+import { GH_MESSAGES } from '@/lib/copy/client-portal'
 
 const settingsRows = [
   {
@@ -35,6 +44,22 @@ const providerLabelMap: Record<string, string> = {
   google_sso: GH_MESSAGES.settings_provider_google
 }
 
+type LocaleCode = 'es-CL' | 'en-US'
+
+type LocalePreferencePayload = {
+  preference: {
+    preferredLocale: LocaleCode | null
+    tenantDefaultLocale: LocaleCode | null
+    legacyLocale: LocaleCode | null
+    effectiveLocale: LocaleCode
+  }
+  options: {
+    locale: LocaleCode
+    label: string
+    nativeLabel: string
+  }[]
+}
+
 const GreenhouseSettings = ({
   hasMicrosoftAuth,
   hasGoogleAuth
@@ -43,6 +68,8 @@ const GreenhouseSettings = ({
   hasGoogleAuth: boolean
 }) => {
   const { data: session } = useSession()
+  const [localePayload, setLocalePayload] = useState<LocalePreferencePayload | null>(null)
+  const [localeStatus, setLocaleStatus] = useState<'idle' | 'loading' | 'saving' | 'saved' | 'error'>('loading')
 
   const activeProvider = session?.user?.provider || 'credentials'
   const microsoftEmail = session?.user?.microsoftEmail
@@ -77,6 +104,56 @@ const GreenhouseSettings = ({
       onLink: () => signIn('google', { callbackUrl: '/settings' })
     }
   ] as const
+
+  useEffect(() => {
+    let active = true
+
+    const loadLocale = async () => {
+      setLocaleStatus('loading')
+
+      try {
+        const response = await fetch('/api/me/locale', { cache: 'no-store' })
+
+        if (!response.ok) throw new Error('locale_load_failed')
+
+        const payload = (await response.json()) as LocalePreferencePayload
+
+        if (active) {
+          setLocalePayload(payload)
+          setLocaleStatus('idle')
+        }
+      } catch {
+        if (active) setLocaleStatus('error')
+      }
+    }
+
+    void loadLocale()
+
+    return () => {
+      active = false
+    }
+  }, [])
+
+  const saveLocale = async (locale: LocaleCode) => {
+    setLocaleStatus('saving')
+
+    try {
+      const response = await fetch('/api/me/locale', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ locale })
+      })
+
+      if (!response.ok) throw new Error('locale_save_failed')
+
+      const payload = (await response.json()) as LocalePreferencePayload
+
+      setLocalePayload(payload)
+      setLocaleStatus('saved')
+    } catch {
+      setLocaleStatus('error')
+    }
+  }
 
   return (
     <Stack spacing={6}>
@@ -146,6 +223,45 @@ const GreenhouseSettings = ({
             <Stack spacing={3}>
               <Typography variant='h5'>{GH_MESSAGES.settings_preferences_title}</Typography>
               <Typography color='text.secondary'>{GH_MESSAGES.settings_preferences_subtitle}</Typography>
+              <Box
+                sx={{
+                  p: 2.5,
+                  borderRadius: 3,
+                  border: theme => `1px solid ${theme.palette.divider}`,
+                  display: 'grid',
+                  gap: 2
+                }}
+              >
+                <Box>
+                  <Typography className='font-medium'>{GH_MESSAGES.settings_locale_title}</Typography>
+                  <Typography color='text.secondary'>{GH_MESSAGES.settings_locale_description}</Typography>
+                </Box>
+                <FormControl size='small' fullWidth disabled={localeStatus === 'loading' || localeStatus === 'saving'}>
+                  <InputLabel id='greenhouse-locale-label'>{GH_MESSAGES.settings_locale_label}</InputLabel>
+                  <Select
+                    labelId='greenhouse-locale-label'
+                    label={GH_MESSAGES.settings_locale_label}
+                    value={localePayload?.preference.preferredLocale ?? localePayload?.preference.effectiveLocale ?? ''}
+                    onChange={event => void saveLocale(event.target.value as LocaleCode)}
+                  >
+                    {(localePayload?.options ?? []).map(option => (
+                      <MenuItem key={option.locale} value={option.locale}>
+                        {option.label}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+                {localeStatus === 'loading' || localeStatus === 'saving' ? (
+                  <Stack direction='row' spacing={1.5} alignItems='center'>
+                    <CircularProgress size={16} />
+                    <Typography variant='body2' color='text.secondary'>
+                      {localeStatus === 'loading' ? GH_MESSAGES.settings_locale_loading : GH_MESSAGES.settings_locale_saving}
+                    </Typography>
+                  </Stack>
+                ) : null}
+                {localeStatus === 'saved' ? <Alert severity='success'>{GH_MESSAGES.settings_locale_saved}</Alert> : null}
+                {localeStatus === 'error' ? <Alert severity='error'>{GH_MESSAGES.settings_locale_error}</Alert> : null}
+              </Box>
               {settingsRows.map(row => (
                 <Box
                   key={row.title}

@@ -16,8 +16,9 @@ import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
 
+import { GH_PRICING } from '@/lib/copy/pricing'
+import { formatCurrency, formatNumber, formatPercent } from '@/lib/format'
 import type { PricingOutputCurrency } from '@/lib/finance/pricing/contracts'
-import { GH_PRICING } from '@/config/greenhouse-nomenclature'
 
 import MarginIndicatorBadge from './MarginIndicatorBadge'
 
@@ -56,32 +57,14 @@ export interface CostStackPanelProps {
   defaultExpanded?: boolean
 }
 
-const CURRENCY_LOCALE: Record<PricingOutputCurrency, string> = {
-  CLP: 'es-CL',
-  USD: 'en-US',
-  CLF: 'es-CL',
-  COP: 'es-CO',
-  MXN: 'es-MX',
-  PEN: 'es-PE'
-}
-
 const formatMoney = (amount: number, currency: PricingOutputCurrency): string => {
-  const locale = CURRENCY_LOCALE[currency] ?? 'es-CL'
+  if (currency === 'CLF') return `${formatNumber(amount, { maximumFractionDigits: 2 })} ${currency}`
 
-  try {
-    return new Intl.NumberFormat(locale, {
-      style: 'currency',
-      currency,
-      maximumFractionDigits: 0
-    }).format(amount)
-  } catch {
-    // CLF no tiene soporte ISO — fallback a número + suffix
-    return `${new Intl.NumberFormat(locale, { maximumFractionDigits: 2 }).format(amount)} ${currency}`
-  }
+  return formatCurrency(amount, currency, { maximumFractionDigits: 0 }, currency === 'USD' ? 'en-US' : undefined)
 }
 
 const formatPct = (value: number): string =>
-  new Intl.NumberFormat('es-CL', { style: 'percent', minimumFractionDigits: 1, maximumFractionDigits: 1 }).format(value)
+  formatPercent(value, { minimumFractionDigits: 1, maximumFractionDigits: 1 })
 
 const formatFeeCell = (line: CostStackLine): string => {
   if (line.feeType === 'percent') {

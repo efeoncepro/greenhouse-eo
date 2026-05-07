@@ -35,6 +35,10 @@ import FinanceTab from './tabs/FinanceTab'
 import IcoTab from './tabs/IcoTab'
 import { formatMoney, formatPct, formatRatio, titleize } from './shared'
 
+const TASK407_ARIA_BREADCRUMBS = "breadcrumbs"
+const TASK407_ARIA_SECCIONES_DE_SPACE_360 = "Secciones de Space 360"
+
+
 type TabValue = 'overview' | 'team' | 'services' | 'delivery' | 'finance' | 'ico'
 
 const TAB_CONFIG: Array<{ value: TabValue; label: string; icon: string }> = [
@@ -94,7 +98,7 @@ const Space360View = ({ detail, requestedId }: Props) => {
 
   return (
     <Stack spacing={6}>
-      <Breadcrumbs aria-label='breadcrumbs' sx={{ mb: 2 }}>
+      <Breadcrumbs aria-label={TASK407_ARIA_BREADCRUMBS} sx={{ mb: 2 }}>
         <Typography component={Link} href='/agency?tab=spaces' color='inherit' variant='body2' sx={{ textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}>
           Agencia
         </Typography>
@@ -168,7 +172,7 @@ const Space360View = ({ detail, requestedId }: Props) => {
       </Grid>
 
       <TabContext value={tab}>
-        <CustomTabList onChange={handleTabChange} variant='scrollable' pill='true' aria-label='Secciones de Space 360'>
+        <CustomTabList onChange={handleTabChange} variant='scrollable' pill='true' aria-label={TASK407_ARIA_SECCIONES_DE_SPACE_360}>
           {TAB_CONFIG.map(item => (
             <Tab key={item.value} value={item.value} label={item.label} icon={<i className={item.icon} aria-hidden='true' />} iconPosition='start' />
           ))}

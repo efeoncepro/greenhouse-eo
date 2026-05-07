@@ -7,6 +7,7 @@ import { createElement } from 'react'
 import { Document, Image, Page, StyleSheet, Text, View, renderToBuffer } from '@react-pdf/renderer'
 
 import { ensurePdfFontsRegistered } from '@/lib/finance/pdf/register-fonts'
+import { formatCurrency as formatLocaleCurrency, formatDate as formatLocaleDate, formatDateTime as formatLocaleDateTime, formatNumber } from '@/lib/format'
 
 import type { FinalSettlementDocumentSnapshot } from './document-types'
 
@@ -305,18 +306,13 @@ const styles = StyleSheet.create({
 
 const logoPath = `${process.cwd()}/public/branding/logo-full.png`
 
-const formatCurrency = (amount: number) =>
-  new Intl.NumberFormat('es-CL', {
-    style: 'currency',
-    currency: 'CLP',
-    maximumFractionDigits: 0
-  }).format(amount)
+const formatCurrency = (amount: number) => formatLocaleCurrency(amount, 'CLP')
 
 const formatDecimal = (amount: number) =>
-  new Intl.NumberFormat('es-CL', {
+  formatNumber(amount, {
     maximumFractionDigits: 2,
     minimumFractionDigits: Number.isInteger(amount) ? 0 : 2
-  }).format(amount)
+  })
 
 const toFiniteNumber = (value: unknown): number | null => {
   const numericValue = typeof value === 'number' ? value : typeof value === 'string' ? Number(value) : NaN
@@ -327,22 +323,16 @@ const toFiniteNumber = (value: unknown): number | null => {
 const formatDate = (value: string | null | undefined) => {
   if (!value) return 'Pendiente'
 
-  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
-    const [year, month, day] = value.split('-')
-
-    return `${day}-${month}-${year}`
-  }
-
   const date = new Date(value)
 
-  if (Number.isNaN(date.getTime())) return value
+  if (Number.isNaN(date.getTime()) && !/^\d{4}-\d{2}-\d{2}$/.test(value)) return value
 
-  return new Intl.DateTimeFormat('es-CL', {
+  return formatLocaleDate(value, {
     timeZone: 'America/Santiago',
     year: 'numeric',
     month: '2-digit',
     day: '2-digit'
-  }).format(date)
+  })
 }
 
 const formatDateTime = (value: string) => {
@@ -350,14 +340,14 @@ const formatDateTime = (value: string) => {
 
   if (Number.isNaN(date.getTime())) return value
 
-  return new Intl.DateTimeFormat('es-CL', {
+  return formatLocaleDateTime(value, {
     timeZone: 'America/Santiago',
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
     hour: '2-digit',
     minute: '2-digit'
-  }).format(date)
+  })
 }
 
 const shortHash = (value: unknown) =>

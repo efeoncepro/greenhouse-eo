@@ -1,4 +1,5 @@
 import type { GreenhouseDashboardData, GreenhouseKpiTone } from '@/types/greenhouse-dashboard'
+import { formatDate } from '@/lib/format'
 import {
   buildModuleFocusCards,
   formatDelta,
@@ -82,7 +83,7 @@ const formatRelationshipValue = (data: GreenhouseDashboardData) =>
 
 const formatRelationshipDetail = (data: GreenhouseDashboardData) =>
   data.relationship.startedAt
-    ? `${data.relationship.label}. Inicio visible: ${new Date(`${data.relationship.startedAt}T00:00:00.000Z`).toLocaleDateString('es-CL')}.`
+    ? `${data.relationship.label}. Inicio visible: ${formatDate(data.relationship.startedAt)}.`
     : 'Todavia no hay una primera actividad visible para calcular tenure.'
 
 const lastValues = (values: Array<number | null | undefined>, length = 7) =>

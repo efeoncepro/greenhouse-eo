@@ -8,7 +8,8 @@ import type { ApexOptions } from 'apexcharts'
 
 import ExecutiveCardShell from '@/components/greenhouse/ExecutiveCardShell'
 import EmptyState from '@/components/greenhouse/EmptyState'
-import { GH_AGENCY, GH_COLORS } from '@/config/greenhouse-nomenclature'
+import { GH_COLORS } from '@/config/greenhouse-nomenclature'
+import { GH_AGENCY } from '@/lib/copy/agency'
 import type { AgencySpaceHealth } from '@/lib/agency/agency-queries'
 import { getSpaceHealth, HEALTH_ZONE_LABEL, type SpaceHealthZone } from './space-health'
 

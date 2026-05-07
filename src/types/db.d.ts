@@ -1792,6 +1792,7 @@ export interface GreenhouseCoreClients {
   client_name: string;
   country_code: string | null;
   created_at: Generated<Timestamp>;
+  default_locale: string | null;
   hubspot_company_id: string | null;
   legal_name: string | null;
   /**
@@ -1840,6 +1841,10 @@ export interface GreenhouseCoreClientTeamAssignments {
   hours_per_month: number | null;
   member_id: string;
   role_title_override: string | null;
+  /**
+   * FK opcional a services. NULL = asignación al cliente en general (legacy). NOT NULL = asignación a service específico (Sample Sprint, contrato puntual). Habilita distinción "Valentina en Sky en general" vs "Valentina en Sky Content Lead Sprint".
+   */
+  service_id: string | null;
   start_date: Timestamp | null;
   updated_at: Generated<Timestamp>;
 }
@@ -1955,6 +1960,7 @@ export interface GreenhouseCoreIdentityProfiles {
   job_title: string | null;
   merged_into_profile_id: string | null;
   notes: string | null;
+  preferred_locale: string | null;
   primary_source_object_id: string | null;
   primary_source_object_type: string | null;
   primary_source_system: string | null;
@@ -2281,6 +2287,7 @@ export interface GreenhouseCoreOrganizations {
   commercial_party_id: Generated<string>;
   country: Generated<string | null>;
   created_at: Generated<Timestamp>;
+  default_locale: string | null;
   hubspot_company_id: string | null;
   industry: string | null;
   /**
@@ -2646,10 +2653,18 @@ export interface GreenhouseCoreServices {
   active: Generated<boolean>;
   amount_paid: Generated<Numeric | null>;
   billing_frequency: Generated<string | null>;
+  /**
+   * Términos del engagement (JSONB libre): success_criteria, decision_deadline, expected_internal_cost_clp. Se formaliza en tabla engagement_commercial_terms via TASK-802.
+   */
+  commitment_terms_json: Json | null;
   country: Generated<string | null>;
   created_at: Generated<Timestamp>;
   created_by: string | null;
   currency: Generated<string>;
+  /**
+   * Sub-tipo de engagement comercial. UI brand "Sample Sprint" envuelve los 4 valores non-regular. Genérico para sobrevivir marketing pivots — ver EPIC-014.
+   */
+  engagement_kind: Generated<string>;
   hubspot_company_id: string | null;
   hubspot_deal_id: string | null;
   hubspot_last_synced_at: Timestamp | null;
@@ -6443,6 +6458,10 @@ export interface GreenhouseServingClientLaborCostAllocationConsolidated {
 
 export interface GreenhouseServingCommercialCostAttribution {
   allocation_ratio: Generated<Numeric>;
+  /**
+   * Dimensión de intent de atribución. operational = cobro al cliente (default). pilot/trial/poc/discovery = costo GTM Investment (no cobrado, ver gtm_investment_pnl TASK-806). overhead = costo compartido. La VIEW canónica gtm_investment_pnl filtra por este campo.
+   */
+  attribution_intent: Generated<string>;
   base_labor_cost_target: Generated<Numeric>;
   client_id: string;
   client_name: string;
@@ -6466,6 +6485,7 @@ export interface GreenhouseServingCommercialCostAttribution {
 
 export interface GreenhouseServingCommercialCostAttributionV2 {
   amount_clp: Numeric | null;
+  attribution_intent: string | null;
   client_id: string | null;
   cost_dimension: string | null;
   fte_contribution: Numeric | null;
@@ -7612,9 +7632,11 @@ export interface GreenhouseServingSession360 {
   active: boolean | null;
   auth_mode: string | null;
   avatar_url: string | null;
+  client_default_locale: string | null;
   client_id: string | null;
   client_name: string | null;
   default_portal_home_path: string | null;
+  effective_locale: string | null;
   email: string | null;
   feature_flags: string[] | null;
   full_name: string | null;
@@ -7623,15 +7645,18 @@ export interface GreenhouseServingSession360 {
   identity_profile_id: string | null;
   last_login_at: Timestamp | null;
   last_login_provider: string | null;
+  legacy_locale: string | null;
   member_id: string | null;
   microsoft_email: string | null;
   microsoft_oid: string | null;
   microsoft_tenant_id: string | null;
+  organization_default_locale: string | null;
   organization_id: string | null;
   organization_name: string | null;
   organization_public_id: string | null;
   password_hash: string | null;
   password_hash_algorithm: string | null;
+  preferred_locale: string | null;
   public_id: string | null;
   role_codes: string[] | null;
   route_groups: string[] | null;

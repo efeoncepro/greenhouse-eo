@@ -24,12 +24,18 @@ import type { SpaceMetricSnapshot, MetricValue } from '@/lib/ico-engine/read-met
 import { CSC_PHASE_LABELS, CSC_CHART_COLORS, type CscPhase } from '@/lib/ico-engine/metric-registry'
 
 import type { OrganizationDetailData } from '../types'
+import { getMicrocopy } from '@/lib/copy'
 
+const TASK407_ARIA_RADAR_DE_SALUD_OPERATIVA = "Radar de salud operativa"
+const TASK407_ARIA_EVOLUCION_MENSUAL_DEL_RPA = "Evolución mensual del RpA"
+
+
+const GREENHOUSE_COPY = getMicrocopy()
 const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'))
 
 // ── Constants ─────────────────────────────────────────────────────────
 
-const MONTH_SHORT = ['', 'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
+const MONTH_SHORT = ['', ...GREENHOUSE_COPY.months.short]
 
 const TREND_LINE_COLORS = Object.values(CSC_CHART_COLORS)
 
@@ -464,7 +470,7 @@ const OrganizationIcoTab = ({ detail }: Props) => {
                 title='Salud operativa'
                 subtitle='Dimensiones normalizadas (100 = óptimo)'
               >
-                <figure role='img' aria-label='Radar de salud operativa' style={{ margin: 0 }}>
+                <figure role='img' aria-label={TASK407_ARIA_RADAR_DE_SALUD_OPERATIVA} style={{ margin: 0 }}>
                   <AppReactApexCharts
                     type='radar'
                     height={340}
@@ -521,7 +527,7 @@ const OrganizationIcoTab = ({ detail }: Props) => {
                     description='Se necesitan al menos 2 meses con datos para visualizar tendencias.'
                   />
                 ) : (
-                  <figure role='img' aria-label='Evolución mensual del RpA' style={{ margin: 0 }}>
+                  <figure role='img' aria-label={TASK407_ARIA_EVOLUCION_MENSUAL_DEL_RPA} style={{ margin: 0 }}>
                     <AppReactApexCharts
                       type='line'
                       height={320}

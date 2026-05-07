@@ -19,10 +19,15 @@ import Stack from '@mui/material/Stack'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomChip from '@core/components/mui/Chip'
 
 import AuditDiffViewer from '@/components/greenhouse/pricing/AuditDiffViewer'
-import { GH_PRICING_GOVERNANCE } from '@/config/greenhouse-nomenclature'
+import { GH_PRICING_GOVERNANCE } from '@/lib/copy/pricing'
+import { formatDateTime } from '@/lib/format'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 interface ApprovalEntry {
   approvalId: string
@@ -235,7 +240,7 @@ const ApprovalsQueueView = () => {
                   subheader={
                     <Typography variant='caption' color='text.secondary'>
                       {GH_PRICING_GOVERNANCE.approvals.proposerLabel}: {entry.proposedByName} ·{' '}
-                      {new Date(entry.proposedAt).toLocaleString('es-CL')}
+                      {formatDateTime(entry.proposedAt, { fallback: entry.proposedAt })}
                     </Typography>
                   }
                 />
@@ -358,9 +363,7 @@ const ApprovalsQueueView = () => {
             </Stack>
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => setDecisionTarget(null)} disabled={submitting}>
-              Cancelar
-            </Button>
+            <Button onClick={() => setDecisionTarget(null)} disabled={submitting}>{GREENHOUSE_COPY.actions.cancel}</Button>
             <Button
               variant='contained'
               onClick={() => void handleSubmit()}

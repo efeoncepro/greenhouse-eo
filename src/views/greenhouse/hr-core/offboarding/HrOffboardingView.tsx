@@ -31,6 +31,8 @@ import TableRow from '@mui/material/TableRow'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomChip from '@core/components/mui/Chip'
 
 import type { HrMemberOption } from '@/types/hr-core'
@@ -38,6 +40,9 @@ import type { OffboardingCase, OffboardingCaseStatus, OffboardingSeparationType 
 import type { FinalSettlement, FinalSettlementStatus } from '@/lib/payroll/final-settlement'
 import type { FinalSettlementDocument } from '@/lib/payroll/final-settlement/document-types'
 import { formatDate } from '@views/greenhouse/hr-core/helpers'
+import { formatCurrency as formatGreenhouseCurrency } from '@/lib/format'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 type CasesResponse = {
   cases: OffboardingCase[]
@@ -602,9 +607,7 @@ const HrOffboardingView = () => {
               setReissueTarget(null)
               setReissueReason('')
             }}
-          >
-            Cancelar
-          </Button>
+          >{GREENHOUSE_COPY.actions.cancel}</Button>
           <Button
             variant='contained'
             disabled={Boolean(documentSavingCaseId) || reissueReason.trim().length < 10}
@@ -673,9 +676,7 @@ const HrOffboardingView = () => {
               />
             </Grid>
             <Grid size={{ xs: 12, md: 1 }}>
-              <Button fullWidth variant='contained' disabled={!memberId || saving} onClick={createCase} sx={{ height: 40 }}>
-                Crear
-              </Button>
+              <Button fullWidth variant='contained' disabled={!memberId || saving} onClick={createCase} sx={{ height: 40 }}>{GREENHOUSE_COPY.actions.create}</Button>
             </Grid>
             <Grid size={{ xs: 12 }}>
               <TextField
@@ -763,7 +764,9 @@ const HrOffboardingView = () => {
                             />
                             {settlement && (
                               <Typography variant='caption' color='text.secondary'>
-                                Neto {new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(settlement.netPayable)}
+                                Neto {formatGreenhouseCurrency(settlement.netPayable, 'CLP', {
+  maximumFractionDigits: 0
+}, 'es-CL')}
                               </Typography>
                             )}
                           </Stack>

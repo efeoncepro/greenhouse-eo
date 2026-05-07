@@ -4,7 +4,7 @@ import Box from '@mui/material/Box'
 
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 import AnimatedCounter from '@/components/greenhouse/AnimatedCounter'
-import { GH_AGENCY } from '@/config/greenhouse-nomenclature'
+import { GH_AGENCY } from '@/lib/copy/agency'
 import type { AgencyPulseKpis } from '@/lib/agency/agency-queries'
 import {
   getAgencyMetricFooterLabel,

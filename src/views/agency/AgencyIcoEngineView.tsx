@@ -25,7 +25,7 @@ import IcoCharts from '@/components/agency/IcoCharts'
 import type { RpaTrendBySpace } from '@/components/agency/IcoCharts'
 import SpaceIcoScorecard from '@/components/agency/SpaceIcoScorecard'
 
-import { GH_AGENCY } from '@/config/greenhouse-nomenclature'
+import { GH_AGENCY } from '@/lib/copy/agency'
 import type { SpaceMetricSnapshot } from '@/lib/ico-engine/read-metrics'
 import type { AgencyPerformanceReport } from '@/lib/ico-engine/performance-report'
 import type { AgencyAiLlmSummary } from '@/lib/ico-engine/ai/llm-types'

@@ -14,9 +14,14 @@ import MenuItem from '@mui/material/MenuItem'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomTextField from '@core/components/mui/TextField'
 
 import PaymentInstrumentChip from '@/components/greenhouse/PaymentInstrumentChip'
+import { formatCurrency as formatGreenhouseCurrency, formatDate as formatGreenhouseDate, formatNumber as formatGreenhouseNumber } from '@/lib/format'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 // ---------------------------------------------------------------------------
 // Types
@@ -51,10 +56,14 @@ type Props = {
 // ---------------------------------------------------------------------------
 
 const getTodayInSantiago = () =>
-  new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Santiago' }).format(new Date())
+  formatGreenhouseDate(new Date(), {
+  timeZone: 'America/Santiago'
+}, 'en-CA')
 
 const formatCLP = (amount: number): string =>
-  new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(amount)
+  formatGreenhouseCurrency(amount, 'CLP', {
+  maximumFractionDigits: 0
+}, 'es-CL')
 
 const parseSafeNumber = (v: string): number => {
   const n = Number(v.replace(/\./g, '').replace(',', '.'))
@@ -240,7 +249,7 @@ const FactoringOperationDrawer = ({ open, onClose, onSuccess, incomeId, nominalA
           <Typography variant='h6'>Ceder a factoring</Typography>
           <Typography variant='caption' color='text.secondary'>Cesión de factura — registro atómico</Typography>
         </Box>
-        <IconButton onClick={handleClose} size='small' aria-label='Cerrar'>
+        <IconButton onClick={handleClose} size='small' aria-label={GREENHOUSE_COPY.actions.close}>
           <i className='tabler-x' />
         </IconButton>
       </Box>
@@ -256,7 +265,7 @@ const FactoringOperationDrawer = ({ open, onClose, onSuccess, incomeId, nominalA
             Monto nominal de la factura
           </Typography>
           <Typography variant='h6' color='primary.main' fontWeight={700}>
-            {currency === 'CLP' ? formatCLP(nominalAmount) : `${nominalAmount.toLocaleString('es-CL')} ${currency}`}
+            {currency === 'CLP' ? formatCLP(nominalAmount) : `${formatGreenhouseNumber(nominalAmount, 'es-CL')} ${currency}`}
           </Typography>
           <Typography variant='caption' color='text.secondary'>
             La obligación del cliente quedará saldada en su totalidad
@@ -447,9 +456,7 @@ const FactoringOperationDrawer = ({ open, onClose, onSuccess, incomeId, nominalA
 
       <Divider />
       <Box sx={{ display: 'flex', gap: 2, p: 4 }}>
-        <Button variant='outlined' color='secondary' onClick={handleClose} fullWidth disabled={saving}>
-          Cancelar
-        </Button>
+        <Button variant='outlined' color='secondary' onClick={handleClose} fullWidth disabled={saving}>{GREENHOUSE_COPY.actions.cancel}</Button>
         <Button
           variant='contained'
           color='warning'

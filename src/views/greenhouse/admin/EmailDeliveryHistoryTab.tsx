@@ -24,6 +24,8 @@ import {
   useReactTable
 } from '@tanstack/react-table'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomAvatar from '@core/components/mui/Avatar'
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
@@ -34,6 +36,9 @@ import TablePaginationComponent from '@/components/TablePaginationComponent'
 import EmailDeliveryDetailDrawer from './EmailDeliveryDetailDrawer'
 
 import tableStyles from '@core/styles/table.module.css'
+import { formatDateTime as formatGreenhouseDateTime } from '@/lib/format'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 interface EmailDelivery {
   effectiveStatus: string
@@ -72,7 +77,7 @@ const EMAIL_STATUS_MAP: Record<string, { label: string; color: 'success' | 'erro
   bounced: { label: 'Rebotado', color: 'error' },
   complained: { label: 'Spam', color: 'warning' },
   failed: { label: 'Fallido', color: 'error' },
-  pending: { label: 'Pendiente', color: 'warning' },
+  pending: { label: GREENHOUSE_COPY.states.pending, color: 'warning' },
   skipped: { label: 'Omitido', color: 'secondary' }
 }
 
@@ -113,9 +118,13 @@ const formatRelativeTime = (dateString: string) => {
 }
 
 const formatAbsoluteTime = (dateString: string) =>
-  new Date(dateString).toLocaleString('es-CL', {
-    day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
-  })
+  formatGreenhouseDateTime(new Date(dateString), {
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric',
+  hour: '2-digit',
+  minute: '2-digit'
+}, 'es-CL')
 
 const columnHelper = createColumnHelper<EmailDelivery>()
 

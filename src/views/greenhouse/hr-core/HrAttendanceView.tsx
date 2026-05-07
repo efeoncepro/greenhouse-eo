@@ -31,6 +31,9 @@ import type { HrAttendanceResponse, HrAttendanceStatus } from '@/types/hr-core'
 import { getInitials } from '@/utils/getInitials'
 import { attendanceStatusConfig, formatDate, formatTimestamp, mondayThisWeekISO, todayISO } from './helpers'
 
+const TASK407_EMPTY_NO_HAY_REGISTROS_DE_ASISTENCIA_PARA_EL_RANGO_SELECCIONADO = "No hay registros de asistencia para el rango seleccionado."
+
+
 const HrAttendanceView = () => {
   const [loading, setLoading] = useState(true)
   const [data, setData] = useState<HrAttendanceResponse | null>(null)
@@ -241,7 +244,7 @@ const HrAttendanceView = () => {
                     <TableCell colSpan={7} align='center' sx={{ py: 6 }}>
                       <Stack alignItems='center' spacing={1}>
                         <i className='tabler-clock-off' style={{ fontSize: 40, color: 'var(--mui-palette-text-disabled)' }} />
-                        <Typography color='text.secondary'>No hay registros de asistencia para el rango seleccionado.</Typography>
+                        <Typography color='text.secondary'>{TASK407_EMPTY_NO_HAY_REGISTROS_DE_ASISTENCIA_PARA_EL_RANGO_SELECCIONADO}</Typography>
                       </Stack>
                     </TableCell>
                   </TableRow>

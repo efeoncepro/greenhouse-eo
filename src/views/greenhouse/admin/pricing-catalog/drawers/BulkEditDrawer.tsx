@@ -15,7 +15,11 @@ import Switch from '@mui/material/Switch'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 
-import { GH_PRICING_GOVERNANCE } from '@/config/greenhouse-nomenclature'
+import { GH_PRICING_GOVERNANCE } from '@/lib/copy/pricing'
+import { getMicrocopy } from '@/lib/copy'
+
+const GREENHOUSE_COPY = getMicrocopy()
+
 
 export interface BulkEditDrawerProps {
   open: boolean
@@ -120,7 +124,7 @@ const BulkEditDrawer = ({
             {GH_PRICING_GOVERNANCE.bulkEdit.drawerSubtitle(entityIds.length)}
           </Typography>
         </Stack>
-        <IconButton onClick={handleClose} size='small' disabled={submitting} aria-label='Cerrar'>
+        <IconButton onClick={handleClose} size='small' disabled={submitting} aria-label={GREENHOUSE_COPY.actions.close}>
           <i className='tabler-x' />
         </IconButton>
       </Box>

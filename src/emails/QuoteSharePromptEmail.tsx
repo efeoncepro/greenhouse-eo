@@ -1,5 +1,7 @@
 import { Heading, Section, Text } from '@react-email/components'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import EmailButton from './components/EmailButton'
 import EmailLayout from './components/EmailLayout'
 import { EMAIL_COLORS, EMAIL_FONTS } from './constants'
@@ -52,11 +54,12 @@ export default function QuoteSharePromptEmail({
   hasPdfAttached = false,
   pdfFileName = null
 }: QuoteSharePromptEmailProps) {
+  const t = getMicrocopy().emails.quoteShare
   const firstName = recipientName?.split(' ')[0] ?? null
-  const greeting = firstName ? `Hola ${firstName},` : 'Hola,'
+  const greeting = t.greeting(firstName)
 
   return (
-    <EmailLayout previewText={`Propuesta ${quotationNumber} v${versionNumber} para ${clientName}`}>
+    <EmailLayout previewText={t.previewText(quotationNumber, versionNumber, clientName)}>
       <Section>
         <Text
           style={{
@@ -69,7 +72,7 @@ export default function QuoteSharePromptEmail({
             margin: '0 0 4px 0'
           }}
         >
-          Propuesta para
+          {t.overline}
         </Text>
         <Heading
           as='h1'
@@ -121,14 +124,12 @@ export default function QuoteSharePromptEmail({
             margin: '0 0 16px 0'
           }}
         >
-          Te comparto la propuesta comercial{' '}
+          {t.bodyPrefix}{' '}
           <strong>
-            {quotationNumber} v{versionNumber}
+            {quotationNumber}{t.bodyVersionSeparator}{versionNumber}
           </strong>{' '}
-          que preparamos para tu equipo en {clientName}.
-          {hasPdfAttached
-            ? ' Adjuntamos el PDF para tu conveniencia y también puedes revisarla y aceptarla directamente desde el link.'
-            : ' Puedes revisarla, descargarla en PDF y aceptarla directamente desde el link.'}
+          {t.bodyClientPrefix}{clientName}.
+          {hasPdfAttached ? t.bodyWithPdfSuffix : t.bodyWithoutPdfSuffix}
         </Text>
 
         <Section
@@ -150,7 +151,7 @@ export default function QuoteSharePromptEmail({
               margin: '0 0 4px 0'
             }}
           >
-            Inversión total
+            {t.totalLabel}
           </Text>
           <Text
             style={{
@@ -172,7 +173,7 @@ export default function QuoteSharePromptEmail({
                 margin: 0
               }}
             >
-              Válida hasta el <strong>{validUntilLabel}</strong>
+              {t.validUntilPrefix}<strong>{validUntilLabel}</strong>
             </Text>
           ) : null}
         </Section>
@@ -191,12 +192,12 @@ export default function QuoteSharePromptEmail({
               borderLeft: `3px solid ${EMAIL_COLORS.primary}`
             }}
           >
-            📎 Adjunto: <strong>{pdfFileName}</strong>
+            {t.attachmentPrefix}<strong>{pdfFileName}</strong>
           </Text>
         ) : null}
 
         <Section style={{ textAlign: 'center', margin: '24px 0' }}>
-          <EmailButton href={shareUrl}>Ver propuesta</EmailButton>
+          <EmailButton href={shareUrl}>{t.cta}</EmailButton>
         </Section>
         <Text
           style={{
@@ -208,7 +209,7 @@ export default function QuoteSharePromptEmail({
             wordBreak: 'break-all'
           }}
         >
-          Si el botón no funciona, copia este link en tu navegador:
+          {t.fallback}
           <br />
           <a href={shareUrl} style={{ color: EMAIL_COLORS.primary }}>
             {shareUrl}
@@ -225,7 +226,7 @@ export default function QuoteSharePromptEmail({
             borderTop: `1px solid ${EMAIL_COLORS.border}`
           }}
         >
-          Cualquier duda, escríbeme directamente.
+          {t.closingNote}
           <br />
           <strong>{senderName}</strong>
           {senderRole ? (

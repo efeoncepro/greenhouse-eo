@@ -17,6 +17,8 @@ import Typography from '@mui/material/Typography'
 
 import { toast } from 'sonner'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomTextField from '@core/components/mui/TextField'
 
 import type { PaymentObligation } from '@/types/payment-obligations'
@@ -25,6 +27,9 @@ import type {
   PaymentOrderBatchKind,
   PaymentOrderPaymentMethod
 } from '@/types/payment-orders'
+import { formatCurrency as formatGreenhouseCurrency } from '@/lib/format'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 interface CreateOrderDialogProps {
   open: boolean
@@ -34,11 +39,9 @@ interface CreateOrderDialogProps {
 }
 
 const formatAmount = (amount: number, currency: string) =>
-  new Intl.NumberFormat('es-CL', {
-    style: 'currency',
-    currency,
-    maximumFractionDigits: currency === 'USD' ? 2 : 0
-  }).format(amount)
+  formatGreenhouseCurrency(amount, currency, {
+  maximumFractionDigits: currency === 'USD' ? 2 : 0
+}, 'es-CL')
 
 const PAYMENT_METHODS: Array<{ value: PaymentOrderPaymentMethod; label: string }> = [
   { value: 'bank_transfer', label: 'Transferencia bancaria' },
@@ -256,9 +259,7 @@ const CreateOrderDialog = ({ open, onClose, obligations, onCreated }: CreateOrde
         </Stack>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} disabled={submitting}>
-          Cancelar
-        </Button>
+        <Button onClick={onClose} disabled={submitting}>{GREENHOUSE_COPY.actions.cancel}</Button>
         <Button variant='contained' onClick={handleSubmit} disabled={submitting || isMixed || obligations.length === 0}>
           {submitting ? 'Creando…' : 'Crear orden'}
         </Button>

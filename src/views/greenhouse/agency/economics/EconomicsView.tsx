@@ -37,17 +37,12 @@ import EmptyState from '@/components/greenhouse/EmptyState'
 import HorizontalWithSubtitle from '@/components/card-statistics/HorizontalWithSubtitle'
 import StatsWithAreaChart from '@/components/card-statistics/StatsWithAreaChart'
 import type { AgencyEconomicsResponse, AgencyEconomicsSpaceRow } from '@/types/agency-economics'
+import { formatCurrency as formatGreenhouseCurrency } from '@/lib/format'
 import CustomChip from '@core/components/mui/Chip'
 
 const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'), { ssr: false })
 
-const currencyFormatter = new Intl.NumberFormat('es-CL', {
-  style: 'currency',
-  currency: 'CLP',
-  maximumFractionDigits: 0
-})
-
-const formatMoney = (value: number) => currencyFormatter.format(value)
+const formatMoney = (value: number) => formatGreenhouseCurrency(value, 'CLP', { maximumFractionDigits: 0 })
 
 const formatPct = (value: number | null | undefined) => {
   if (value == null) return 'Sin dato'

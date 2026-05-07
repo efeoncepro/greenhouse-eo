@@ -46,6 +46,14 @@ import {
   type InstrumentDetailProfile
 } from '@/lib/finance/instrument-presentation'
 import type { TreasuryBankAccountOverview } from '@/lib/finance/account-balances'
+import { getMicrocopy } from '@/lib/copy'
+import { formatCurrency as formatGreenhouseCurrency, formatNumber as formatGreenhouseNumber } from '@/lib/format'
+
+const TASK407_ARIA_CERRAR_DETALLE = "Cerrar detalle"
+const TASK407_ARIA_VENTANA_TEMPORAL_DE_MOVIMIENTOS = "Ventana temporal de movimientos"
+
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 // TASK-714 — drawer consumes the canonical TreasuryBankAccountOverview shape
 // directly (extended with cardLastFour/cardNetwork/accountKind by the API).
@@ -189,11 +197,9 @@ type Props = {
 }
 
 const formatAmount = (amount: number, currency: string = 'CLP') =>
-  new Intl.NumberFormat('es-CL', {
-    style: 'currency',
-    currency,
-    maximumFractionDigits: currency === 'CLP' ? 0 : 2
-  }).format(amount)
+  formatGreenhouseCurrency(amount, currency, {
+  maximumFractionDigits: currency === 'CLP' ? 0 : 2
+}, 'es-CL')
 
 const formatDate = (date: string | null) => {
   if (!date) return '—'
@@ -206,7 +212,7 @@ const formatDate = (date: string | null) => {
 const formatMonth = (date: string) => {
   const [year, month] = date.split('-')
   const monthIndex = Number(month) - 1
-  const MONTHS = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
+  const MONTHS = GREENHOUSE_COPY.months.short
 
   return `${MONTHS[monthIndex] || month} ${year.slice(2)}`
 }
@@ -424,7 +430,7 @@ const AccountDetailDrawer = ({ open, accountId, year, month, onClose, onSuccess 
             {profile?.drawerSubtitle ?? 'Cargando...'}
           </Typography>
         </Box>
-        <IconButton size='small' onClick={onClose} aria-label='Cerrar detalle'>
+        <IconButton size='small' onClick={onClose} aria-label={TASK407_ARIA_CERRAR_DETALLE}>
           <i className='tabler-x' />
         </IconButton>
       </Box>
@@ -534,7 +540,7 @@ const AccountDetailDrawer = ({ open, accountId, year, month, onClose, onSuccess 
                     }
 
                     if (kpi.key === 'paymentCount') {
-                      return new Intl.NumberFormat('es-CL').format(kpi.value)
+                      return formatGreenhouseNumber(kpi.value, 'es-CL')
                     }
 
                     return formatAmount(kpi.value, detail.account.currency)
@@ -692,7 +698,7 @@ const AccountDetailDrawer = ({ open, accountId, year, month, onClose, onSuccess 
                       onChange={(_, next: TemporalMode | null) => {
                         if (next) setTemporalMode(next)
                       }}
-                      aria-label='Ventana temporal de movimientos'
+                      aria-label={TASK407_ARIA_VENTANA_TEMPORAL_DE_MOVIMIENTOS}
                     >
                       <MuiTooltip title='Últimos 30 días — qué pasa con esta cuenta hoy'>
                         <ToggleButton value='snapshot'>Reciente</ToggleButton>

@@ -23,6 +23,8 @@ import {
   shouldFallbackFromIdentityPostgres
 } from '@/lib/tenant/identity-store'
 import { resolvePortalHomePath } from '@/lib/tenant/resolve-portal-home-path'
+import { buildLocalePreferenceSnapshot } from '@/lib/i18n/locale-preferences'
+import type { Locale } from '@/lib/copy'
 
 type TenantType = 'client' | 'efeonce_internal'
 
@@ -60,6 +62,13 @@ interface TenantAccessRow {
   organization_id?: string | null
   organization_public_id?: string | null
   organization_name?: string | null
+
+  // Locale persistence
+  legacy_locale?: string | null
+  preferred_locale?: string | null
+  organization_default_locale?: string | null
+  client_default_locale?: string | null
+  effective_locale?: string | null
 
   // Collaborator identity
   member_id?: string | null
@@ -109,6 +118,12 @@ export interface TenantAccessRecord {
   spaceId: string | null
   organizationId: string | null
   organizationName: string | null
+
+  // Locale persistence
+  preferredLocale: Locale | null
+  tenantDefaultLocale: Locale | null
+  legacyLocale: Locale | null
+  effectiveLocale: Locale
 
   // Collaborator identity
   memberId: string | null
@@ -166,6 +181,13 @@ const normalizeTenantAccessRow = (row: TenantAccessRow): TenantAccessRecord => {
   const businessLines = normalizeStringArray(row.business_lines)
   const serviceModules = normalizeStringArray(row.service_modules)
 
+  const localeSnapshot = buildLocalePreferenceSnapshot({
+    preferredLocale: row.preferred_locale,
+    organizationDefaultLocale: row.organization_default_locale,
+    clientDefaultLocale: row.client_default_locale,
+    legacyLocale: row.legacy_locale
+  })
+
   return {
     userId: row.user_id,
     clientId: row.client_id || '',
@@ -207,6 +229,12 @@ const normalizeTenantAccessRow = (row: TenantAccessRow): TenantAccessRecord => {
     spaceId: row.space_id ?? null,
     organizationId: row.organization_id ?? null,
     organizationName: row.organization_name ?? null,
+
+    // Locale persistence
+    preferredLocale: localeSnapshot.preferredLocale,
+    tenantDefaultLocale: localeSnapshot.tenantDefaultLocale,
+    legacyLocale: localeSnapshot.legacyLocale,
+    effectiveLocale: localeSnapshot.effectiveLocale,
 
     // Collaborator identity
     memberId: row.member_id ?? null,
@@ -280,7 +308,16 @@ const getIdentityAccessRecord = async ({
         cu.active,
         cu.status,
         cu.password_hash,
-        cu.password_hash_algorithm
+        cu.password_hash_algorithm,
+        cu.locale AS legacy_locale,
+        CAST(NULL AS STRING) AS preferred_locale,
+        CAST(NULL AS STRING) AS organization_default_locale,
+        CAST(NULL AS STRING) AS client_default_locale,
+        CASE
+          WHEN cu.locale IN ('en', 'en-US') THEN 'en-US'
+          WHEN cu.locale IN ('es', 'es-CL') THEN 'es-CL'
+          ELSE 'es-CL'
+        END AS effective_locale
       FROM \`${projectId}.greenhouse.client_users\` AS cu
       LEFT JOIN \`${projectId}.greenhouse.clients\` AS c
         ON c.client_id = cu.client_id
@@ -330,7 +367,8 @@ const getIdentityAccessRecord = async ({
         cu.active,
         cu.status,
         cu.password_hash,
-        cu.password_hash_algorithm
+        cu.password_hash_algorithm,
+        cu.locale
       LIMIT 1
     `,
     params,

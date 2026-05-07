@@ -24,13 +24,21 @@ import Skeleton from '@mui/material/Skeleton'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomChip from '@core/components/mui/Chip'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 import PaymentRegistrationCard from '@views/greenhouse/finance/components/PaymentRegistrationCard'
 import PaymentHistoryTable from '@views/greenhouse/finance/components/PaymentHistoryTable'
 import SettlementOrchestrationDrawer from '@views/greenhouse/finance/drawers/SettlementOrchestrationDrawer'
 import FactoringOperationDrawer from '@views/greenhouse/finance/drawers/FactoringOperationDrawer'
+import { formatCurrency as formatGreenhouseCurrency } from '@/lib/format'
 
+const TASK407_ARIA_ACTUALIZAR_ESTADO_DEL_DTE_EN_SII = "Actualizar estado del DTE en SII"
+const TASK407_ARIA_EMITIR_DOCUMENTO_TRIBUTARIO_ELECTRONICO = "Emitir documento tributario electrónico"
+
+
+const GREENHOUSE_COPY = getMicrocopy()
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -91,7 +99,9 @@ interface IncomeDetail {
 // ---------------------------------------------------------------------------
 
 const formatAmount = (amount: number, currency: string) =>
-  new Intl.NumberFormat('es-CL', { style: 'currency', currency, maximumFractionDigits: currency === 'CLP' ? 0 : 2 }).format(amount)
+  formatGreenhouseCurrency(amount, currency, {
+  maximumFractionDigits: currency === 'CLP' ? 0 : 2
+}, 'es-CL')
 
 const formatDate = (dateStr: string | null): string => {
   if (!dateStr) return '—'
@@ -131,8 +141,8 @@ const statusLabel = (status: string) => {
 
 const DTE_STATUS_CONFIG: Record<string, { label: string; color: 'success' | 'warning' | 'error' | 'secondary'; icon: string }> = {
   emitted: { label: 'Emitido', color: 'success', icon: 'tabler-check' },
-  pending: { label: 'Pendiente', color: 'warning', icon: 'tabler-clock' },
-  rejected: { label: 'Rechazado', color: 'error', icon: 'tabler-x' },
+  pending: { label: GREENHOUSE_COPY.states.pending, color: 'warning', icon: 'tabler-clock' },
+  rejected: { label: GREENHOUSE_COPY.states.rejected, color: 'error', icon: 'tabler-x' },
   annulled: { label: 'Anulado', color: 'secondary', icon: 'tabler-ban' }
 }
 
@@ -345,9 +355,7 @@ const IncomeDetailView = () => {
           >
             Registrar en CCA
           </Button>
-          <Button variant='outlined' component={Link} href='/finance/income' startIcon={<i className='tabler-arrow-left' />}>
-            Volver
-          </Button>
+          <Button variant='outlined' component={Link} href='/finance/income' startIcon={<i className='tabler-arrow-left' />}>{GREENHOUSE_COPY.actions.back}</Button>
         </Box>
       </Box>
 
@@ -513,7 +521,7 @@ const IncomeDetailView = () => {
                       startIcon={<i className='tabler-refresh' />}
                       onClick={handleRefreshDteStatus}
                       disabled={refreshingDte}
-                      aria-label='Actualizar estado del DTE en SII'
+                      aria-label={TASK407_ARIA_ACTUALIZAR_ESTADO_DEL_DTE_EN_SII}
                     >
                       {refreshingDte ? 'Consultando...' : 'Actualizar estado'}
                     </Button>
@@ -529,7 +537,7 @@ const IncomeDetailView = () => {
                     color='primary'
                     startIcon={<i className='tabler-file-upload' />}
                     onClick={() => setEmitDialogOpen(true)}
-                    aria-label='Emitir documento tributario electrónico'
+                    aria-label={TASK407_ARIA_EMITIR_DOCUMENTO_TRIBUTARIO_ELECTRONICO}
                   >
                     Emitir DTE
                   </Button>
@@ -558,7 +566,7 @@ const IncomeDetailView = () => {
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setEmitDialogOpen(false)} disabled={emitting}>Cancelar</Button>
+          <Button onClick={() => setEmitDialogOpen(false)} disabled={emitting}>{GREENHOUSE_COPY.actions.cancel}</Button>
           <Button variant='contained' color='primary' onClick={handleEmitDte} disabled={emitting}>
             {emitting ? 'Emitiendo...' : 'Emitir DTE'}
           </Button>

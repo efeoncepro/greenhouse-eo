@@ -7,6 +7,7 @@ import { Fragment } from 'react'
 import { Document, Image, Page, StyleSheet, Text, View, renderToStream } from '@react-pdf/renderer'
 
 import type { PayrollEntry, PayrollPeriod } from '@/types/payroll'
+import { formatCurrency as formatLocaleCurrency } from '@/lib/format'
 
 import { getPayrollEntries, getPayrollEntryById } from '@/lib/payroll/get-payroll-entries'
 import { getPayrollPeriod } from '@/lib/payroll/get-payroll-periods'
@@ -59,11 +60,12 @@ const MONTH_NAMES = [
 ]
 
 const fmtCurrency = (value: number | null, currency: string): string => {
-  if (value === null) return '—'
-
-  return currency === 'CLP'
-    ? `$${Math.round(value).toLocaleString('es-CL')}`
-    : `US$${value.toFixed(2)}`
+  return formatLocaleCurrency(
+    value,
+    currency as 'CLP' | 'USD',
+    currency === 'USD' ? { currencySymbol: 'US$' } : {},
+    currency === 'USD' ? 'en-US' : undefined
+  )
 }
 
 // ─── Styles ──────────────────────────────────────────────────────────
@@ -538,7 +540,7 @@ const PeriodReportDocument = ({ period, entries, operatingEntity }: { period: Pa
           <View style={{ flexDirection: 'row', marginBottom: 10, gap: 16, flexWrap: 'wrap' }}>
             {period.ufValue != null && (
               <Text style={{ fontSize: 8, color: TEXT_MUTED }}>
-                {`UF: $${period.ufValue.toLocaleString('es-CL')}`}
+                {`UF: ${formatLocaleCurrency(period.ufValue, 'CLP')}`}
               </Text>
             )}
             {period.approvedAt && (

@@ -2,7 +2,11 @@
 
 import { useState } from 'react'
 
+import { getMicrocopy } from '@/lib/copy'
 import styles from './styles.module.css'
+import { formatDate as formatGreenhouseDate } from '@/lib/format'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 interface Props {
   acceptUrl: string
@@ -18,13 +22,13 @@ type AcceptState =
   | { kind: 'error'; message: string }
 
 const formatDate = (iso: string): string => {
-  return new Date(iso).toLocaleDateString('es-CL', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  })
+  return formatGreenhouseDate(new Date(iso), {
+  day: '2-digit',
+  month: '2-digit',
+  year: 'numeric',
+  hour: '2-digit',
+  minute: '2-digit'
+}, 'es-CL')
 }
 
 /**
@@ -179,9 +183,7 @@ return
           className={`${styles.btn} ${styles.btnOutlined}`}
           onClick={() => setShowForm(false)}
           disabled={state.kind === 'submitting'}
-        >
-          Cancelar
-        </button>
+        >{GREENHOUSE_COPY.actions.cancel}</button>
         <button
           type='submit'
           className={`${styles.btn} ${styles.btnPrimary}`}

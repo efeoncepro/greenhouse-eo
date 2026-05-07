@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useState } from 'react'
 
+import dynamic from 'next/dynamic'
+
 import Alert from '@mui/material/Alert'
 import Autocomplete from '@mui/material/Autocomplete'
 import Avatar from '@mui/material/Avatar'
@@ -25,13 +27,14 @@ import TextField from '@mui/material/TextField'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import VerifiedByEfeonceBadge from '@/components/greenhouse/VerifiedByEfeonceBadge'
-import CertificatePreviewDialog from '@/components/greenhouse/CertificatePreviewDialog'
 import GreenhouseFileUploader, { type UploadedFileValue } from '@/components/greenhouse/GreenhouseFileUploader'
 import ProfessionalLinksCard from '@/components/greenhouse/ProfessionalLinksCard'
 import AboutMeCard from '@/components/greenhouse/AboutMeCard'
 import BrandLogo from '@/components/greenhouse/BrandLogo'
-import { GH_SKILLS_CERTS } from '@/config/greenhouse-nomenclature'
+import { GH_SKILLS_CERTS } from '@/lib/copy/workforce'
 
 import type {
   MemberSkill,
@@ -55,6 +58,17 @@ import { SKILL_SENIORITY_LEVELS, SKILL_CATEGORY_VALUES } from '@/types/agency-sk
 import { TOOL_PROFICIENCY_LEVELS, TOOL_CATEGORY_VALUES, LANGUAGE_PROFICIENCY_LEVELS } from '@/types/talent-taxonomy'
 import type { MemberEvidence, MemberEndorsement, EvidenceType } from '@/types/reputation'
 import { EVIDENCE_TYPES } from '@/types/reputation'
+import { formatDate as formatGreenhouseDate } from '@/lib/format'
+
+const TASK407_ARIA_EDITAR_TITULAR_PROFESIONAL = "Editar titular profesional"
+
+
+const GREENHOUSE_COPY = getMicrocopy()
+
+const CertificatePreviewDialog = dynamic(
+  () => import('@/components/greenhouse/CertificatePreviewDialog'),
+  { ssr: false }
+)
 
 // ---------------------------------------------------------------------------
 // Types
@@ -180,9 +194,11 @@ const formatDate = (date: string | null): string => {
   if (!date) return '—'
 
   try {
-    return new Intl.DateTimeFormat('es-CL', { day: '2-digit', month: 'short', year: 'numeric' }).format(
-      new Date(date)
-    )
+    return formatGreenhouseDate(new Date(date), {
+  day: '2-digit',
+  month: 'short',
+  year: 'numeric'
+}, 'es-CL')
   } catch {
     return date
   }
@@ -365,9 +381,7 @@ function AddSkillDialog({
         </Stack>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose} disabled={submitting}>
-          Cancelar
-        </Button>
+        <Button onClick={handleClose} disabled={submitting}>{GREENHOUSE_COPY.actions.cancel}</Button>
         <Button variant='contained' onClick={handleSubmit} disabled={!selectedSkill || submitting}>
           {submitting ? 'Guardando...' : GH_SKILLS_CERTS.skill_add}
         </Button>
@@ -503,9 +517,7 @@ function AddCertificationDialog({
         </Stack>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose} disabled={submitting}>
-          Cancelar
-        </Button>
+        <Button onClick={handleClose} disabled={submitting}>{GREENHOUSE_COPY.actions.cancel}</Button>
         <Button
           variant='contained'
           onClick={handleSubmit}
@@ -762,9 +774,7 @@ function AddToolDialog({
         </Stack>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose} disabled={submitting}>
-          Cancelar
-        </Button>
+        <Button onClick={handleClose} disabled={submitting}>{GREENHOUSE_COPY.actions.cancel}</Button>
         <Button variant='contained' onClick={handleSubmit} disabled={!selectedTool || submitting}>
           {submitting ? 'Guardando...' : GH_SKILLS_CERTS.tool_add}
         </Button>
@@ -1052,9 +1062,7 @@ function AddLanguageDialog({
         </Stack>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose} disabled={submitting}>
-          Cancelar
-        </Button>
+        <Button onClick={handleClose} disabled={submitting}>{GREENHOUSE_COPY.actions.cancel}</Button>
         <Button
           variant='contained'
           onClick={handleSubmit}
@@ -1322,9 +1330,7 @@ function AddEvidenceDialog({
         </Stack>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose} disabled={submitting}>
-          Cancelar
-        </Button>
+        <Button onClick={handleClose} disabled={submitting}>{GREENHOUSE_COPY.actions.cancel}</Button>
         <Button
           variant='contained'
           onClick={handleSubmit}
@@ -1698,9 +1704,7 @@ function HeadlineCard({
           title={GH_SKILLS_CERTS.section_headline}
           action={
             <Stack direction='row' spacing={1}>
-              <Button size='small' onClick={handleCancel} disabled={saving}>
-                Cancelar
-              </Button>
+              <Button size='small' onClick={handleCancel} disabled={saving}>{GREENHOUSE_COPY.actions.cancel}</Button>
               <Button size='small' variant='contained' onClick={handleSave} disabled={saving}>
                 {saving ? 'Guardando...' : 'Guardar'}
               </Button>
@@ -1740,7 +1744,7 @@ function HeadlineCard({
         title={GH_SKILLS_CERTS.section_headline}
         action={
           editable ? (
-            <IconButton size='small' onClick={handleEdit} aria-label='Editar titular profesional'>
+            <IconButton size='small' onClick={handleEdit} aria-label={TASK407_ARIA_EDITAR_TITULAR_PROFESIONAL}>
               <i className='tabler-pencil' />
             </IconButton>
           ) : undefined

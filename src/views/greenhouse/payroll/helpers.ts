@@ -1,25 +1,10 @@
 import type { PayrollCurrency, PayrollEntry, PeriodStatus, PayRegime } from '@/types/payroll'
+import { formatCurrency as formatLocaleCurrency, formatDateTime, formatNumber, formatPercent as formatLocalePercent } from '@/lib/format'
 
 // ── Currency formatting ──────────────────────────────────────────────
 
 export const formatCurrency = (amount: number | null | undefined, currency: PayrollCurrency): string => {
-  if (amount == null) return '—'
-
-  if (currency === 'CLP') {
-    return new Intl.NumberFormat('es-CL', {
-      style: 'currency',
-      currency: 'CLP',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0
-    }).format(amount)
-  }
-
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  }).format(amount)
+  return formatLocaleCurrency(amount, currency, {}, currency === 'USD' ? 'en-US' : undefined)
 }
 
 export const buildPayrollCurrencySummary = (
@@ -60,15 +45,11 @@ export const buildPayrollCurrencySummary = (
 }
 
 export const formatPercent = (value: number | null | undefined): string => {
-  if (value == null) return '—'
-
-  return `${value.toFixed(1)}%`
+  return formatLocalePercent(value, { input: 'percentage', minimumFractionDigits: 1, maximumFractionDigits: 1 })
 }
 
 export const formatDecimal = (value: number | null | undefined, decimals = 2): string => {
-  if (value == null) return '—'
-
-  return value.toFixed(decimals)
+  return formatNumber(value, { minimumFractionDigits: decimals, maximumFractionDigits: decimals })
 }
 
 // ── Period helpers ───────────────────────────────────────────────────
@@ -160,13 +141,11 @@ export const formatFactor = (value: number | null): string => {
 // ── Timestamp formatting ────────────────────────────────────────────
 
 export const formatTimestamp = (ts: string | null): string => {
-  if (!ts) return '—'
-
-  return new Intl.DateTimeFormat('es-CL', {
+  return formatDateTime(ts, {
     day: '2-digit',
     month: 'short',
     year: 'numeric',
     hour: '2-digit',
     minute: '2-digit'
-  }).format(new Date(ts))
+  })
 }

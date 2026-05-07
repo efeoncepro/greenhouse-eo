@@ -20,6 +20,8 @@ import Typography from '@mui/material/Typography'
 import TabContext from '@mui/lab/TabContext'
 import TabPanel from '@mui/lab/TabPanel'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomTabList from '@core/components/mui/TabList'
 import CustomTextField from '@core/components/mui/TextField'
 
@@ -42,6 +44,8 @@ import PayrollHistoryTab from './PayrollHistoryTab'
 import PayrollPeriodTab from './PayrollPeriodTab'
 import PayrollPersonnelExpenseTab from './PayrollPersonnelExpenseTab'
 import { buildPayrollCurrencySummary, formatCurrency, formatPeriodLabel, periodStatusConfig } from './helpers'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 const PayrollDashboard = () => {
   const [tab, setTab] = useState('period')
@@ -581,12 +585,8 @@ const PayrollDashboard = () => {
             onClick={() => {
               setNewPeriodOpen(false)
             }}
-          >
-            Cancelar
-          </Button>
-          <Button variant='contained' onClick={handleCreatePeriod}>
-            Crear
-          </Button>
+          >{GREENHOUSE_COPY.actions.cancel}</Button>
+          <Button variant='contained' onClick={handleCreatePeriod}>{GREENHOUSE_COPY.actions.create}</Button>
         </DialogActions>
       </Dialog>
     </>

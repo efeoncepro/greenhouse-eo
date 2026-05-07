@@ -9,7 +9,7 @@ import Link from '@mui/material/Link'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
-import { GH_MESSAGES } from '@/config/greenhouse-nomenclature'
+import { GH_MESSAGES } from '@/lib/copy/client-portal'
 import type { GreenhouseDashboardProjectRisk } from '@/types/greenhouse-dashboard'
 import { getProjectAttentionLabel } from '@views/greenhouse/dashboard/helpers'
 

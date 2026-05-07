@@ -21,10 +21,18 @@ import TableRow from '@mui/material/TableRow'
 
 import { toast } from 'sonner'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomAvatar from '@core/components/mui/Avatar'
 
 import type { PaymentObligationDetail } from '@/lib/finance/payment-obligations/get-obligation-detail'
 import type { PaymentObligationKind, PaymentObligationStatus } from '@/types/payment-obligations'
+import { formatCurrency as formatGreenhouseCurrency, formatDate as formatGreenhouseDate, formatDateTime as formatGreenhouseDateTime } from '@/lib/format'
+
+const TASK407_ARIA_CERRAR_DETALLE = "Cerrar detalle"
+
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 interface ObligationDetailDrawerProps {
   obligationId: string | null
@@ -32,32 +40,30 @@ interface ObligationDetailDrawerProps {
 }
 
 const formatAmount = (amount: number, currency: string) =>
-  new Intl.NumberFormat('es-CL', {
-    style: 'currency',
-    currency,
-    maximumFractionDigits: currency === 'USD' ? 2 : 0
-  }).format(amount)
+  formatGreenhouseCurrency(amount, currency, {
+  maximumFractionDigits: currency === 'USD' ? 2 : 0
+}, 'es-CL')
 
 const formatDateTime = (iso: string | null) => {
   if (!iso) return '—'
 
-  return new Date(iso).toLocaleString('es-CL', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  })
+  return formatGreenhouseDateTime(new Date(iso), {
+  day: '2-digit',
+  month: 'short',
+  year: 'numeric',
+  hour: '2-digit',
+  minute: '2-digit'
+}, 'es-CL')
 }
 
 const formatDate = (iso: string | null) => {
   if (!iso) return '—'
 
-  return new Date(iso).toLocaleDateString('es-CL', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric'
-  })
+  return formatGreenhouseDate(new Date(iso), {
+  day: '2-digit',
+  month: 'short',
+  year: 'numeric'
+}, 'es-CL')
 }
 
 const obligationKindMeta: Record<PaymentObligationKind, { label: string; color: 'primary' | 'info' | 'warning' | 'secondary' }> = {
@@ -73,7 +79,7 @@ const obligationKindMeta: Record<PaymentObligationKind, { label: string; color: 
 const statusMeta: Record<PaymentObligationStatus, { label: string; color: 'primary' | 'info' | 'warning' | 'success' | 'error' | 'secondary' }> = {
   generated: { label: 'Generada', color: 'primary' },
   scheduled: { label: 'Programada', color: 'info' },
-  partially_paid: { label: 'Parcial', color: 'warning' },
+  partially_paid: { label: GREENHOUSE_COPY.states.partial, color: 'warning' },
   paid: { label: 'Pagada', color: 'success' },
   reconciled: { label: 'Conciliada', color: 'info' },
   closed: { label: 'Cerrada', color: 'secondary' },
@@ -95,7 +101,7 @@ const eventTypeMeta = (eventType: string): { label: string; icon: string; color:
 
 const orderStateMeta = (state: string): { label: string; color: 'primary' | 'info' | 'warning' | 'success' | 'error' | 'secondary' } => {
   const map: Record<string, { label: string; color: 'primary' | 'info' | 'warning' | 'success' | 'error' | 'secondary' }> = {
-    draft: { label: 'Borrador', color: 'secondary' },
+    draft: { label: GREENHOUSE_COPY.states.draft, color: 'secondary' },
     pending_approval: { label: 'Pendiente aprobación', color: 'warning' },
     approved: { label: 'Aprobada', color: 'info' },
     scheduled: { label: 'Programada', color: 'info' },
@@ -192,7 +198,7 @@ const ObligationDetailDrawer = ({ obligationId, onClose }: ObligationDetailDrawe
             </Typography>
           ) : null}
         </Stack>
-        <IconButton onClick={onClose} aria-label='Cerrar detalle' size='small'>
+        <IconButton onClick={onClose} aria-label={TASK407_ARIA_CERRAR_DETALLE} size='small'>
           <i className='tabler-x' />
         </IconButton>
       </Box>

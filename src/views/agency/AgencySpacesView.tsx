@@ -15,7 +15,7 @@ import SpaceCard from '@/components/agency/SpaceCard'
 import SpaceFilters from '@/components/agency/SpaceFilters'
 import SpaceHealthTable from '@/components/agency/SpaceHealthTable'
 import SpacesCharts from '@/components/agency/SpacesCharts'
-import { GH_AGENCY } from '@/config/greenhouse-nomenclature'
+import { GH_AGENCY } from '@/lib/copy/agency'
 import type { AgencySpaceHealth } from '@/lib/agency/agency-queries'
 import type { SpaceFinanceMetrics } from '@/lib/agency/agency-finance-metrics'
 

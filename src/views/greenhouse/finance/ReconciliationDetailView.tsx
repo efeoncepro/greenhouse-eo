@@ -29,7 +29,13 @@ import CustomChip from '@core/components/mui/Chip'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 import ReconciliationMatchDialog from '@views/greenhouse/finance/dialogs/ReconciliationMatchDialog'
 import ImportStatementDrawer from '@views/greenhouse/finance/drawers/ImportStatementDrawer'
+import { getMicrocopy } from '@/lib/copy'
+import { formatCurrency as formatGreenhouseCurrency, formatDateTime as formatGreenhouseDateTime } from '@/lib/format'
 
+const TASK407_ARIA_SUGERENCIAS_DE_CONCILIACION = "Sugerencias de conciliación"
+
+
+const GREENHOUSE_COPY = getMicrocopy()
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -149,7 +155,7 @@ const SUGGESTION_TYPE_LABELS: Record<string, string> = {
   anomaly: 'Anomalía'
 }
 
-const MONTH_NAMES = ['', 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
+const MONTH_NAMES = ['', ...GREENHOUSE_COPY.months.long]
 
 const INSTRUMENT_CATEGORY_LABELS: Record<string, string> = {
   bank_account: 'Cuenta bancaria',
@@ -165,7 +171,9 @@ const INSTRUMENT_CATEGORY_LABELS: Record<string, string> = {
 // ---------------------------------------------------------------------------
 
 const formatCLP = (amount: number): string =>
-  new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(amount)
+  formatGreenhouseCurrency(amount, 'CLP', {
+  maximumFractionDigits: 0
+}, 'es-CL')
 
 const formatDate = (dateStr: string): string => {
   const [year, month, day] = dateStr.split('-')
@@ -571,7 +579,10 @@ const ReconciliationDetailView = () => {
           <CardHeader
             avatar={<Avatar variant='rounded' sx={{ bgcolor: 'info.lightOpacity' }}><i className='tabler-building-bank' style={{ color: 'inherit' }} /></Avatar>}
             title='Estado bancario'
-            subheader={`Snapshot declarado el ${new Date(bridge.latestSnapshot.snapshotAt).toLocaleString('es-CL', { dateStyle: 'medium', timeStyle: 'short' })} · Fuente: ${bridge.latestSnapshot.sourceKind.replace(/_/g, ' ')}`}
+            subheader={`Snapshot declarado el ${formatGreenhouseDateTime(new Date(bridge.latestSnapshot.snapshotAt), {
+  dateStyle: 'medium',
+  timeStyle: 'short'
+}, 'es-CL')} · Fuente: ${bridge.latestSnapshot.sourceKind.replace(/_/g, ' ')}`}
             action={
               <CustomChip
                 round='true'
@@ -729,7 +740,7 @@ const ReconciliationDetailView = () => {
 
       <Card
         component='aside'
-        aria-label='Sugerencias de conciliación'
+        aria-label={TASK407_ARIA_SUGERENCIAS_DE_CONCILIACION}
         elevation={0}
         sx={{ border: t => `1px solid ${t.palette.divider}` }}
       >

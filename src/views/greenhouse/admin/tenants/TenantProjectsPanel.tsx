@@ -17,7 +17,7 @@ import Typography from '@mui/material/Typography'
 
 import CustomChip from '@core/components/mui/Chip'
 
-import { GH_INTERNAL_MESSAGES } from '@/config/greenhouse-nomenclature'
+import { GH_INTERNAL_MESSAGES } from '@/lib/copy/admin'
 import type { AdminTenantProjectRow } from '@/lib/admin/get-admin-tenant-detail'
 import TenantDetailEmptyState from '@views/greenhouse/admin/tenants/TenantDetailEmptyState'
 

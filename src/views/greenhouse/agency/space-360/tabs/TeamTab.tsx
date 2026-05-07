@@ -21,6 +21,7 @@ import { EmptyState, TeamProgressBar, VerifiedByEfeonceBadge } from '@/component
 import type { Space360Detail } from '@/lib/agency/space-360'
 
 import { formatPct, formatMoney, titleize } from '../shared'
+import { formatCurrency as formatGreenhouseCurrency } from '@/lib/format'
 
 type Props = {
   detail: Space360Detail
@@ -289,11 +290,9 @@ const TeamTab = ({ detail }: Props) => {
                     member.usagePercent != null && { label: 'Uso operativo', value: `${Math.round(member.usagePercent)}%` },
                     member.costPerHourTarget != null && {
                       label: 'Costo / hora',
-                      value: new Intl.NumberFormat('es-CL', {
-                        style: 'currency',
-                        currency: member.targetCurrency || 'CLP',
-                        maximumFractionDigits: 0
-                      }).format(member.costPerHourTarget)
+                      value: formatGreenhouseCurrency(member.costPerHourTarget, member.targetCurrency || 'CLP', {
+  maximumFractionDigits: 0
+}, 'es-CL')
                     },
                     member.placementProviderName && { label: 'Placement / provider', value: member.placementProviderName }
                   ].filter(Boolean) as Array<{ label: string; value: string }>

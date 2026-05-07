@@ -5,7 +5,8 @@ import Grid from '@mui/material/Grid'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 
 import type { AdminAccessOverview } from '@/lib/admin/get-admin-access-overview'
-import { GH_INTERNAL_MESSAGES } from '@/config/greenhouse-nomenclature'
+import { GH_INTERNAL_MESSAGES } from '@/lib/copy/admin'
+import { formatNumber as formatGreenhouseNumber } from '@/lib/format'
 
 type Props = {
   data: AdminAccessOverview
@@ -21,7 +22,7 @@ const UserListCards = ({ data }: Props) => {
   const cards = [
     {
       title: GH_INTERNAL_MESSAGES.admin_users_total,
-      stats: data.totals.totalUsers.toLocaleString('es-CL'),
+      stats: formatGreenhouseNumber(data.totals.totalUsers, 'es-CL'),
       avatarIcon: 'tabler-users',
       avatarColor: 'primary' as const,
       trend: 'neutral' as const,
@@ -30,7 +31,7 @@ const UserListCards = ({ data }: Props) => {
     },
     {
       title: GH_INTERNAL_MESSAGES.admin_users_active,
-      stats: data.totals.activeUsers.toLocaleString('es-CL'),
+      stats: formatGreenhouseNumber(data.totals.activeUsers, 'es-CL'),
       avatarIcon: 'tabler-user-check',
       avatarColor: 'success' as const,
       trend: 'positive' as const,
@@ -39,7 +40,7 @@ const UserListCards = ({ data }: Props) => {
     },
     {
       title: GH_INTERNAL_MESSAGES.admin_users_invited,
-      stats: data.totals.invitedUsers.toLocaleString('es-CL'),
+      stats: formatGreenhouseNumber(data.totals.invitedUsers, 'es-CL'),
       avatarIcon: 'tabler-user-search',
       avatarColor: 'warning' as const,
       trend: 'neutral' as const,
@@ -48,7 +49,7 @@ const UserListCards = ({ data }: Props) => {
     },
     {
       title: GH_INTERNAL_MESSAGES.admin_users_internal,
-      stats: data.totals.internalUsers.toLocaleString('es-CL'),
+      stats: formatGreenhouseNumber(data.totals.internalUsers, 'es-CL'),
       avatarIcon: 'tabler-building-community',
       avatarColor: 'info' as const,
       trend: 'neutral' as const,

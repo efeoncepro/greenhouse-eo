@@ -18,7 +18,12 @@ import Typography from '@mui/material/Typography'
 
 import { toast } from 'sonner'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomTextField from '@core/components/mui/TextField'
+import { formatCurrency as formatGreenhouseCurrency } from '@/lib/format'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 type AssignmentOption = {
   assignmentId: string
@@ -302,11 +307,9 @@ const CreatePlacementDialog = ({ open, onClose, onCreated, initialAssignmentId, 
               {selectedAssignment.organizationLabel ? `${selectedAssignment.organizationLabel} · ` : ''}
               {selectedAssignment.compensation.contractType || 'Sin contract type'} · {selectedAssignment.compensation.payRegime || 'Sin pay regime'}
               {selectedAssignment.compensation.costRateAmount != null
-                ? ` · costo base ${new Intl.NumberFormat('es-CL', {
-                  style: 'currency',
-                  currency: selectedAssignment.compensation.costRateCurrency || 'USD',
-                  maximumFractionDigits: 0
-                }).format(selectedAssignment.compensation.costRateAmount)}`
+                ? ` · costo base ${formatGreenhouseCurrency(selectedAssignment.compensation.costRateAmount, selectedAssignment.compensation.costRateCurrency || 'USD', {
+  maximumFractionDigits: 0
+}, 'es-CL')}`
                 : ' · sin costo base vigente en Payroll'}
             </Alert>
           </Grid>
@@ -382,7 +385,7 @@ const CreatePlacementDialog = ({ open, onClose, onCreated, initialAssignmentId, 
 
   const actions = (
     <>
-      <Button onClick={onClose} color='secondary' disabled={loading}>Cancelar</Button>
+      <Button onClick={onClose} color='secondary' disabled={loading}>{GREENHOUSE_COPY.actions.cancel}</Button>
       <Button onClick={handleSubmit} variant='contained' disabled={loading || metaLoading || !assignmentId}>
         {loading ? 'Creando…' : 'Crear placement'}
       </Button>
@@ -395,7 +398,7 @@ const CreatePlacementDialog = ({ open, onClose, onCreated, initialAssignmentId, 
         <CardHeader
           title='Crear placement'
           subheader='Alta comercial-operativa sobre un assignment existente.'
-          action={<Button onClick={onClose} color='secondary'>Cerrar</Button>}
+          action={<Button onClick={onClose} color='secondary'>{GREENHOUSE_COPY.actions.close}</Button>}
         />
         <Divider />
         <CardContent>

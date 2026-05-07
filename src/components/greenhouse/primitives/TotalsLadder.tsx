@@ -24,6 +24,7 @@ import {
 
 import AnimatedCounter from '@/components/greenhouse/AnimatedCounter'
 import useReducedMotion from '@/hooks/useReducedMotion'
+import { formatCurrency as formatGreenhouseCurrency, formatNumber as formatGreenhouseNumber } from '@/lib/format'
 
 export type TotalsLadderCurrency = 'CLP' | 'USD' | 'CLF' | 'COP' | 'MXN' | 'PEN'
 
@@ -74,13 +75,13 @@ const formatMoney = (amount: number | null, currency: TotalsLadderCurrency): str
   const locale = CURRENCY_LOCALE[currency] ?? 'es-CL'
 
   try {
-    return new Intl.NumberFormat(locale, {
-      style: 'currency',
-      currency,
-      maximumFractionDigits: 0
-    }).format(amount)
+    return formatGreenhouseCurrency(amount, currency, {
+  maximumFractionDigits: 0
+}, locale)
   } catch {
-    return `${new Intl.NumberFormat(locale, { maximumFractionDigits: 2 }).format(amount)} ${currency}`
+    return `${formatGreenhouseNumber(amount, {
+  maximumFractionDigits: 2
+}, locale)} ${currency}`
   }
 }
 

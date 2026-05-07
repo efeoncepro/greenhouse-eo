@@ -40,6 +40,13 @@ import tableStyles from '@core/styles/table.module.css'
 import EmploymentTypeDrawer, {
   type EmploymentTypeFormValues
 } from './drawers/EmploymentTypeDrawer'
+import { formatNumber } from '@/lib/format'
+
+const TASK407_ARIA_VOLVER_AL_CATALOGO = "Volver al catálogo"
+const TASK407_ARIA_FILTRAR_POR_PAIS = "Filtrar por país"
+const TASK407_ARIA_FILTRAR_POR_FUENTE = "Filtrar por fuente"
+const TASK407_ARIA_FILTRAR_POR_ESTADO = "Filtrar por estado"
+
 
 // ── Types ──────────────────────────────────────────────────────────────
 
@@ -79,7 +86,7 @@ const formatPct = (value: number | null): string =>
 const formatCurrency = (value: number | null | undefined, currency = 'USD'): string => {
   if (value === null || value === undefined) return '—'
 
-  return `${currency} ${new Intl.NumberFormat('es-CL', { maximumFractionDigits: 0 }).format(value)}`
+  return `${currency} ${formatNumber(value, { maximumFractionDigits: 0 })}`
 }
 
 // ── Columns ────────────────────────────────────────────────────────────
@@ -418,7 +425,7 @@ const EmploymentTypesListView = () => {
               component='a'
               href='/admin/pricing-catalog'
               size='small'
-              aria-label='Volver al catálogo'
+              aria-label={TASK407_ARIA_VOLVER_AL_CATALOGO}
             >
               <i className='tabler-arrow-left' />
             </IconButton>
@@ -490,7 +497,7 @@ const EmploymentTypesListView = () => {
                   value={countryFilter}
                   onChange={e => setCountryFilter(e.target.value)}
                   sx={{ minWidth: 130 }}
-                  aria-label='Filtrar por país'
+                  aria-label={TASK407_ARIA_FILTRAR_POR_PAIS}
                 >
                   <MenuItem value='all'>Todos los países</MenuItem>
                   {countryOptions.map(c => (
@@ -505,7 +512,7 @@ const EmploymentTypesListView = () => {
                   value={sourceFilter}
                   onChange={e => setSourceFilter(e.target.value)}
                   sx={{ minWidth: 180 }}
-                  aria-label='Filtrar por fuente'
+                  aria-label={TASK407_ARIA_FILTRAR_POR_FUENTE}
                 >
                   <MenuItem value='all'>Todas las fuentes</MenuItem>
                   {sourceOptions.map(s => (
@@ -520,7 +527,7 @@ const EmploymentTypesListView = () => {
                   value={statusFilter}
                   onChange={e => setStatusFilter(e.target.value as typeof statusFilter)}
                   sx={{ minWidth: 120 }}
-                  aria-label='Filtrar por estado'
+                  aria-label={TASK407_ARIA_FILTRAR_POR_ESTADO}
                 >
                   <MenuItem value='active'>Activas</MenuItem>
                   <MenuItem value='inactive'>Inactivas</MenuItem>

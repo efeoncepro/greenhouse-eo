@@ -13,6 +13,7 @@ import type { Space360Detail } from '@/lib/agency/space-360'
 import { EmptyState } from '@/components/greenhouse'
 
 import { formatPct, formatRatio } from '../shared'
+import { formatDateTime as formatGreenhouseDateTime } from '@/lib/format'
 
 type Props = {
   detail: Space360Detail
@@ -101,7 +102,7 @@ const IcoTab = ({ detail }: Props) => {
             <Typography variant='body2'><strong>Carry-Over:</strong> {snapshot.context.carryOverTasks}</Typography>
             <Typography variant='body2'><strong>Overdue Carried Forward:</strong> {snapshot.context.overdueCarriedForwardTasks}</Typography>
             <Typography variant='caption' color='text.secondary'>
-              Engine {snapshot.engineVersion} · calculado {snapshot.computedAt ? new Date(snapshot.computedAt).toLocaleString('es-CL') : 'sin fecha'}
+              Engine {snapshot.engineVersion} · calculado {snapshot.computedAt ? formatGreenhouseDateTime(snapshot.computedAt, 'es-CL') : 'sin fecha'}
             </Typography>
           </CardContent>
         </Card>

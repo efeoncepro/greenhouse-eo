@@ -21,20 +21,27 @@ import MenuItem from '@mui/material/MenuItem'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 
 import type { GoalCycle, GoalKeyResult, GoalStatus, GoalWithDetails } from '@/types/hr-goals'
+import { formatNumber as formatGreenhouseNumber } from '@/lib/format'
 
+const TASK407_ARIA_SELECCIONAR_CICLO = "Seleccionar ciclo"
+
+
+const GREENHOUSE_COPY = getMicrocopy()
 // ── Status display config ──
 
 const STATUS_CONFIG: Record<GoalStatus, { label: string; color: 'success' | 'warning' | 'error' | 'info' | 'default'; icon: string }> = {
-  on_track: { label: 'En curso', color: 'success', icon: 'tabler-circle-check' },
+  on_track: { label: GREENHOUSE_COPY.states.inProgress, color: 'success', icon: 'tabler-circle-check' },
   at_risk: { label: 'En riesgo', color: 'warning', icon: 'tabler-alert-triangle' },
-  behind: { label: 'Atrasado', color: 'error', icon: 'tabler-alert-circle' },
-  completed: { label: 'Completado', color: 'info', icon: 'tabler-trophy' },
-  cancelled: { label: 'Cancelado', color: 'default', icon: 'tabler-circle-x' }
+  behind: { label: GREENHOUSE_COPY.states.overdue, color: 'error', icon: 'tabler-alert-circle' },
+  completed: { label: GREENHOUSE_COPY.states.completed, color: 'info', icon: 'tabler-trophy' },
+  cancelled: { label: GREENHOUSE_COPY.states.cancelled, color: 'default', icon: 'tabler-circle-x' }
 }
 
 const pct = (v: number) => `${Math.round(v)}%`
@@ -57,7 +64,7 @@ const formatKrValue = (kr: GoalKeyResult): string => {
     case 'percent':
       return `${current}% / ${target}%`
     case 'currency':
-      return `$${current.toLocaleString('es-CL')} / $${target.toLocaleString('es-CL')}`
+      return `$${formatGreenhouseNumber(current, 'es-CL')} / $${formatGreenhouseNumber(target, 'es-CL')}`
     default:
       return `${current} / ${target}`
   }
@@ -223,7 +230,7 @@ const MyGoalsView = () => {
                   value={selectedCycleId}
                   onChange={e => handleCycleChange(e.target.value)}
                   sx={{ minWidth: 180 }}
-                  aria-label='Seleccionar ciclo'
+                  aria-label={TASK407_ARIA_SELECCIONAR_CICLO}
                 >
                   {visibleCycles.map(c => (
                     <MenuItem key={c.cycleId} value={c.cycleId}>
@@ -494,9 +501,7 @@ const MyGoalsView = () => {
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button onClick={closeProgressDialog} disabled={saving}>
-            Cancelar
-          </Button>
+          <Button onClick={closeProgressDialog} disabled={saving}>{GREENHOUSE_COPY.actions.cancel}</Button>
           <Button
             variant='contained'
             onClick={handleSaveProgress}

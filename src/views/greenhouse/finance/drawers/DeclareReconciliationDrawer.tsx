@@ -11,8 +11,13 @@ import MenuItem from '@mui/material/MenuItem'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomTextField from '@core/components/mui/TextField'
 import GreenhouseFileUploader, { type UploadedFileValue } from '@/components/greenhouse/GreenhouseFileUploader'
+import { formatCurrency as formatGreenhouseCurrency } from '@/lib/format'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 interface AccountOption {
   accountId: string
@@ -40,11 +45,9 @@ const SOURCE_OPTIONS = [
 ]
 
 const formatNumber = (n: number, currency: string) =>
-  new Intl.NumberFormat('es-CL', {
-    style: 'currency',
-    currency,
-    maximumFractionDigits: currency === 'CLP' ? 0 : 2
-  }).format(n)
+  formatGreenhouseCurrency(n, currency, {
+  maximumFractionDigits: currency === 'CLP' ? 0 : 2
+}, 'es-CL')
 
 const nowLocalIso = () => {
   const d = new Date()
@@ -316,9 +319,7 @@ const DeclareReconciliationDrawer = ({
           />
 
           <Stack direction='row' spacing={2} justifyContent='flex-end'>
-            <Button variant='tonal' color='secondary' onClick={onClose} disabled={submitting}>
-              Cancelar
-            </Button>
+            <Button variant='tonal' color='secondary' onClick={onClose} disabled={submitting}>{GREENHOUSE_COPY.actions.cancel}</Button>
             <Button variant='contained' onClick={handleSubmit} disabled={submitting}>
               {submitting ? 'Declarando…' : 'Declarar conciliación'}
             </Button>

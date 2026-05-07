@@ -127,19 +127,19 @@ Registro canonico de asignacion de IDs `TASK-###` para evitar colisiones y renum
 | `TASK-100` | `complete` | CI Pipeline: Add Test Step | `docs/tasks/complete/TASK-100-ci-pipeline-test-step.md` |
 | `TASK-101` | `complete` | Cron Auth Standardization | `docs/tasks/complete/TASK-101-cron-auth-standardization.md` |
 | `TASK-102` | `complete` | Database Resilience Baseline | `docs/tasks/complete/TASK-102-database-resilience-baseline.md` |
-| `TASK-103` | `in-progress` | GCP Budget Alerts & BigQuery Cost Guards | `docs/tasks/in-progress/TASK-103-gcp-budget-alerts-bigquery-guards.md` |
+| `TASK-103` | `complete` (superseded 2026-05-05 — Billing Export Observability canónico) | GCP Budget Alerts & BigQuery Cost Guards | `docs/tasks/complete/TASK-103-gcp-budget-alerts-bigquery-guards.md` |
 | `TASK-104` | `complete` | Payroll Export Email Redesign | `docs/tasks/complete/TASK-104-payroll-export-email-redesign.md` |
 | `TASK-105` | `complete` | Lint Debt Stabilization | `docs/tasks/complete/TASK-105-lint-debt-stabilization.md` |
 | `TASK-106` | `complete` | Email Delivery Admin UI | `docs/tasks/complete/TASK-106-email-delivery-admin-ui.md` |
 | `TASK-107` | `complete` | Auth Email Verification Request Flow | `docs/tasks/complete/TASK-107-auth-email-verification-request-flow.md` |
 | `TASK-108` | `complete` | Admin Center Governance Shell | `docs/tasks/complete/TASK-108-admin-center-governance-shell.md` |
 | `TASK-109` | `to-do` | Projected Payroll Runtime Hardening and Observability | `docs/tasks/to-do/TASK-109-projected-payroll-runtime-hardening-observability.md` |
-| `TASK-110` | `in-progress` | Nexa: assistant-ui Feature Adoption | `docs/tasks/in-progress/TASK-110-nexa-assistant-ui-features.md` |
+| `TASK-110` | `complete` (closed 2026-05-05 — lifecycle drift) | Nexa: assistant-ui Feature Adoption | `docs/tasks/complete/TASK-110-nexa-assistant-ui-features.md` |
 | `TASK-111` | `complete` | Admin Center Secret Ref Governance UI | `docs/tasks/complete/TASK-111-admin-center-secret-ref-governance-ui.md` |
 | `TASK-112` | `complete` | Admin Center Integration Health and Freshness UI | `docs/tasks/complete/TASK-112-admin-center-integration-health-freshness-ui.md` |
 | `TASK-113` | `complete` | Admin Center Ops Audit Trail UI | `docs/tasks/complete/TASK-113-admin-center-ops-audit-trail-ui.md` |
 | `TASK-114` | `complete` | Nexa Backend: Persistence, Feedback & Dynamic Suggestions | `docs/tasks/complete/TASK-114-nexa-backend-persistence-suggestions.md` |
-| `TASK-115` | `to-do` | Nexa UI: Edit, Suggestions, Feedback, Floating & Thread History | `docs/tasks/to-do/TASK-115-nexa-ui-completion.md` |
+| `TASK-115` | `complete` (closed 2026-05-05 — lifecycle drift) | Nexa UI: Edit, Suggestions, Feedback, Floating & Thread History | `docs/tasks/complete/TASK-115-nexa-ui-completion.md` |
 | `TASK-116` | `to-do` | Sidebar Navigation Audit & Remediation | `docs/tasks/to-do/TASK-116-sidebar-navigation-audit-remediation.md` |
 | `TASK-117` | `complete` | Payroll Last Business Day Auto-Calculation | `docs/tasks/complete/TASK-117-payroll-last-business-day-auto-calculation.md` |
 | `TASK-118` | `complete` | ICO AI Core: Embedded Intelligence Layer | `docs/tasks/complete/TASK-118-ico-ai-core-embedded-intelligence.md` |
@@ -230,17 +230,17 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-178` | `complete` (superseded por TASK-395 — 2026-05-05) | Finance Budget Engine: Budget vs. Actual & Variance Analysis | `docs/tasks/complete/TASK-178-finance-budget-engine.md` |
 | `TASK-179` | `to-do` | Finance Reconciliation Postgres-Only Cutover & Integration Hardening | `docs/tasks/to-do/TASK-179-finance-reconciliation-cutover-hardening.md` |
 | `TASK-180` | `complete` | HR Departments Postgres Runtime Cutover | `docs/tasks/complete/TASK-180-hr-departments-postgres-runtime-cutover.md` |
-| `TASK-181` | `in-progress` | Finance Clients: Canonical Source Migration to Organizations | `docs/tasks/in-progress/TASK-181-finance-clients-organization-canonical-source.md` |
+| `TASK-181` | `complete` (closed 2026-05-05 — lifecycle drift) | Finance Clients: Canonical Source Migration to Organizations | `docs/tasks/complete/TASK-181-finance-clients-organization-canonical-source.md` |
 | `TASK-182` | `complete` | Finance Expense Drawer: Agency Taxonomy, Cross-Module Synergies & Automation | `docs/tasks/complete/TASK-182-finance-expense-drawer-agency-taxonomy.md` |
 | `TASK-183` | `complete` | Finance Expenses Reactive Intake & Cost Ledger Hardening | `docs/tasks/complete/TASK-183-finance-expenses-reactive-intake-cost-ledger.md` |
 | `TASK-184` | `in-progress` | Database Migration Framework (node-pg-migrate) | `docs/tasks/in-progress/TASK-184-database-migration-framework.md` |
 | `TASK-185` | `in-progress` | Database Tooling Foundation (db.ts + Kysely + Migrations) | `docs/tasks/in-progress/TASK-185_Database_Tooling_Foundation.md` |
 | `TASK-186` | `complete` | Delivery Metrics Trust: Notion Property Audit & Conformed Contract Hardening | `docs/tasks/complete/TASK-186-delivery-metrics-trust-notion-property-audit-contract.md` |
 | `TASK-187` | `complete` | Notion Integration Formalization: Space Onboarding, Schema Governance & KPI Readiness | `docs/tasks/complete/TASK-187-notion-integration-formalization-space-onboarding-schema-governance.md` |
-| `TASK-188` | `to-do` | Native Integrations Layer: Platform Governance, Runtime Contracts & Shared Operating Model | `docs/tasks/to-do/TASK-188-native-integrations-layer-platform-governance.md` |
+| `TASK-188` | `complete` (closed 2026-05-05 — lifecycle drift) | Native Integrations Layer: Platform Governance, Runtime Contracts & Shared Operating Model | `docs/tasks/complete/TASK-188-native-integrations-layer-platform-governance.md` |
 | `TASK-189` | `complete` | ICO Period Filter: Due-Date Anchor & Carry-Over Logic | `docs/tasks/complete/TASK-189-ico-period-filter-due-date-anchor.md` |
 | `TASK-190` | `to-do` | Platform Temporal Scope Contract & Cross-Module Time Semantics | `docs/tasks/to-do/TASK-190-platform-temporal-scope-contract-cross-module-parity.md` |
-| `TASK-191` | `in-progress` | Finance Organization-First Downstream Consumers Cutover | `docs/tasks/in-progress/TASK-191-finance-organization-first-downstream-consumers-cutover.md` |
+| `TASK-191` | `complete` (closed 2026-05-05 — lifecycle drift) | Finance Organization-First Downstream Consumers Cutover | `docs/tasks/complete/TASK-191-finance-organization-first-downstream-consumers-cutover.md` |
 | `TASK-192` | `complete` | Finance Org-First Materialized Serving Cutover | `docs/tasks/complete/TASK-192-finance-org-first-materialized-serving-cutover.md` |
 | `TASK-193` | `in-progress` | Person ↔ Organization Synergy Activation | `docs/tasks/in-progress/TASK-193-person-organization-synergy-activation.md` |
 | `TASK-194` | `to-do` | Expense Payment Ledger Separation | `docs/tasks/to-do/TASK-194-expense-payment-ledger-separation.md` |
@@ -273,7 +273,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-221` | `to-do` | Revenue Enabled Measurement Model & Attribution Policy | `docs/tasks/to-do/TASK-221-revenue-enabled-measurement-model-attribution-policy.md` |
 | `TASK-222` | `complete` | Creative Velocity Review, Tiered Metric Surfacing & Client Narrative | `docs/tasks/complete/TASK-222-creative-velocity-review-tiered-metric-surfacing.md` |
 | `TASK-223` | `complete` | ICO Methodological Accelerators Instrumentation | `docs/tasks/complete/TASK-223-ico-methodological-accelerators-instrumentation.md` |
-| `TASK-224` | `in-progress` | Finance Document vs Cash Semantic Contract | `docs/tasks/in-progress/TASK-224-finance-document-vs-cash-semantic-contract.md` |
+| `TASK-224` | `to-do` (reverted 2026-05-05 — stalled 60+ días) | Finance Document vs Cash Semantic Contract | `docs/tasks/to-do/TASK-224-finance-document-vs-cash-semantic-contract.md` |
 | `TASK-225` | `in-progress` | Internal Roles, Hierarchies & Approval Ownership Model | `docs/tasks/in-progress/TASK-225-internal-roles-hierarchies-approval-ownership-model.md` |
 | `TASK-226` | `to-do` | Superadministrador Bootstrap & Assignment Policy | `docs/tasks/to-do/TASK-226-superadministrador-bootstrap-assignment-policy.md` |
 | `TASK-227` | `to-do` | Operational Responsibility Registry | `docs/tasks/to-do/TASK-227-operational-responsibility-registry.md` |
@@ -285,9 +285,9 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-233` | `to-do` | Three.js 3D Logo Animation | `docs/tasks/to-do/TASK-233-threejs-3d-logo-animation.md` |
 | `TASK-234` | `complete` | Codex Skills: Animation Library Knowledge Sync | `docs/tasks/complete/TASK-234-codex-skills-animation-library-sync.md` |
 | `TASK-235` | `to-do` | Agency ICO LLM Insights UI Surfacing | `docs/tasks/to-do/TASK-235-agency-ico-llm-insights-ui.md` |
-| `TASK-236` | `to-do` | Agency: Resilience & Feedback Patterns | `docs/tasks/to-do/TASK-236-agency-resilience-feedback-patterns.md` |
-| `TASK-237` | `to-do` | Agency ICO Engine Tab: UX Redesign | `docs/tasks/to-do/TASK-237-agency-ico-engine-tab-ux-redesign.md` |
-| `TASK-238` | `to-do` | Agency Workspace & Space 360: Data Storytelling UX | `docs/tasks/to-do/TASK-238-agency-workspace-data-storytelling-ux.md` |
+| `TASK-236` | `complete` (closed 2026-05-05 — lifecycle drift) | Agency: Resilience & Feedback Patterns | `docs/tasks/complete/TASK-236-agency-resilience-feedback-patterns.md` |
+| `TASK-237` | `complete` (closed 2026-05-05 — lifecycle drift) | Agency ICO Engine Tab: UX Redesign | `docs/tasks/complete/TASK-237-agency-ico-engine-tab-ux-redesign.md` |
+| `TASK-238` | `complete` (closed 2026-05-05 — lifecycle drift) | Agency Workspace & Space 360: Data Storytelling UX | `docs/tasks/complete/TASK-238-agency-workspace-data-storytelling-ux.md` |
 | `TASK-239` | `to-do` | Nexa Insights: Prompt Enrichment con Glosario de Métricas y Cadena Causal | `docs/tasks/to-do/TASK-239-nexa-advisory-prompt-enrichment-metric-glossary.md` |
 | `TASK-240` | `complete` | Nexa Insights: Menciones Interactivas de Spaces y Miembros | `docs/tasks/complete/TASK-240-nexa-insights-entity-mentions.md` |
 | `TASK-241` | `complete` | Migrar procesos batch pesados a Cloud Run | `docs/tasks/complete/TASK-241-batch-processes-cloud-run-migration.md` |
@@ -295,7 +295,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-243` | `to-do` | Nexa Insights en Person 360 | `docs/tasks/to-do/TASK-243-nexa-insights-person-360.md` |
 | `TASK-244` | `to-do` | Nexa Insights Widget en Home Dashboard | `docs/tasks/to-do/TASK-244-nexa-insights-home-dashboard.md` |
 | `TASK-245` | `to-do` | Finance Signal Engine | `docs/tasks/to-do/TASK-245-finance-signal-engine.md` |
-| `TASK-246` | `to-do` | Narrativa ejecutiva semanal de Nexa | `docs/tasks/to-do/TASK-246-nexa-weekly-executive-digest.md` |
+| `TASK-246` | `complete` (closed 2026-05-05 — digest engine + email + ops-worker live) | Narrativa ejecutiva semanal de Nexa | `docs/tasks/complete/TASK-246-nexa-weekly-executive-digest.md` |
 | `TASK-247` | `complete` | Identity & Platform Block Hardening | `docs/tasks/complete/TASK-247-identity-platform-block-hardening.md` |
 | `TASK-248` | `complete` | Identity & Access Spec Compliance | `docs/tasks/complete/TASK-248-identity-access-spec-compliance.md` |
 | `TASK-249` | `complete` | Test Observability MVP | `docs/tasks/complete/TASK-249-test-observability-mvp.md` |
@@ -306,7 +306,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-253` | `complete` | Identity Spec Residual Gaps (Approval Snapshot + Audit Events) | `docs/tasks/complete/TASK-253-identity-spec-residual-gaps.md` |
 | `TASK-255` | `complete` | Mi Perfil: fix identity chain so profile never shows "Perfil no disponible" | `docs/tasks/complete/TASK-255-mi-perfil-identity-chain-fix.md` |
 | `TASK-256` | `complete` | Entra Profile Completeness: avatar sync + identity link for all internal users | `docs/tasks/complete/TASK-256-entra-profile-completeness-avatar-identity-link.md` |
-| `TASK-257` | `to-do` | Mi Perfil: enterprise redesign con patron Vuexy User View (sidebar + tabs) | `docs/tasks/to-do/TASK-257-mi-perfil-enterprise-redesign.md` |
+| `TASK-257` | `complete` (closed 2026-05-05 — code shipped en `dd3fe199`, lifecycle drift) | Mi Perfil: enterprise redesign con patron Vuexy User View (sidebar + tabs) | `docs/tasks/complete/TASK-257-mi-perfil-enterprise-redesign.md` |
 | `TASK-258` | `to-do` | Migrar sync-conformed + sync-conformed-recovery a ops-worker | `docs/tasks/to-do/TASK-258-migrate-sync-conformed-to-ops-worker.md` |
 | `TASK-259` | `to-do` | Migrar entra-profile-sync a ops-worker | `docs/tasks/to-do/TASK-259-migrate-entra-profile-sync-to-ops-worker.md` |
 | `TASK-260` | `to-do` | Migrar nubox-sync + ico-member-sync a ops-worker | `docs/tasks/to-do/TASK-260-migrate-nubox-sync-ico-member-sync-to-ops-worker.md` |
@@ -315,15 +315,15 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-263` | `to-do` | Permission Sets: CRUD enterprise para asignacion de vistas por persona y perfil | `docs/tasks/to-do/TASK-263-permission-sets-enterprise-view-access.md` |
 | `TASK-264` | `to-do` | Greenhouse Theme Canonicalization & Kortex Brand Contract | `docs/tasks/to-do/TASK-264-greenhouse-theme-canonicalization-kortex-brand-contract.md` |
 | `TASK-265` | `complete` | Greenhouse Nomenclature, Dictionary & Kortex Copy Contract | `docs/tasks/complete/TASK-265-greenhouse-nomenclature-dictionary-kortex-copy-contract.md` |
-| `TASK-266` | `to-do` | Greenhouse i18n & Globalization Activation | `docs/tasks/to-do/TASK-266-greenhouse-i18n-globalization-activation.md` |
+| `TASK-266` | `complete` | Greenhouse i18n & Globalization Activation | `docs/tasks/complete/TASK-266-greenhouse-i18n-globalization-activation.md` |
 | `TASK-267` | `to-do` | Reenviar email de onboarding desde ficha de usuario | `docs/tasks/to-do/TASK-267-admin-resend-onboarding-email.md` |
 | `TASK-268` | `to-do` | Boton "Revisar acceso" navega al tab Accesos | `docs/tasks/to-do/TASK-268-admin-review-access-button.md` |
 | `TASK-269` | `to-do` | Email Delivery Enterprise Hardening: Context Resolver, i18n, Rate Limit, Bounce Handling | `docs/tasks/to-do/TASK-269-email-delivery-enterprise-hardening.md` |
 | `TASK-270` | `to-do` | Admin Email Template Preview: vista integrada para previsualizar y probar templates | `docs/tasks/to-do/TASK-270-admin-email-template-preview.md` |
 | `TASK-271` | `to-do` | Soporte de permisos de medio dia (periodos parciales) | `docs/tasks/to-do/TASK-271-hr-leave-half-day-periods.md` |
 | `TASK-272` | `to-do` | Mi Perfil: vista rica basada en Vuexy user-profile | `docs/tasks/to-do/TASK-272-my-profile-vuexy-rich-view.md` |
-| `TASK-273` | `to-do` | Person Complete 360: capa de serving federada por facetas | `docs/tasks/to-do/TASK-273-person-complete-360-federated-serving-layer.md` |
-| `TASK-274` | `in-progress` | Account Complete 360: capa de serving federada por facetas | `docs/tasks/in-progress/TASK-274-account-complete-360-federated-serving-layer.md` |
+| `TASK-273` | `complete` (closed 2026-05-05 — Phases A-F shipped) | Person Complete 360: capa de serving federada por facetas | `docs/tasks/complete/TASK-273-person-complete-360-federated-serving-layer.md` |
+| `TASK-274` | `complete` (closed 2026-05-05 — Phases A-F shipped) | Account Complete 360: capa de serving federada por facetas | `docs/tasks/complete/TASK-274-account-complete-360-federated-serving-layer.md` |
 | `TASK-275` | `to-do` | Notification Dispatch Correlation ID | `docs/tasks/to-do/TASK-275-notification-dispatch-correlation-id.md` |
 | `TASK-276` | `to-do` | Upstash Redis: cache distribuido para resolvers 360 | `docs/tasks/to-do/TASK-276-upstash-redis-distributed-cache.md` |
 | `TASK-277` | `to-do` | GraphQL API Layer sobre resolvers 360 | `docs/tasks/to-do/TASK-277-graphql-api-layer.md` |
@@ -475,12 +475,12 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-425` | `to-do` | Finance Metric Dependency DAG Runtime Propagation (v2) | `docs/tasks/to-do/TASK-425-finance-metric-dependency-dag-runtime-propagation.md` |
 | `TASK-426` | `to-do` | Finance Metric Cross-Domain References (v2) | `docs/tasks/to-do/TASK-426-finance-metric-cross-domain-references.md` |
 | `TASK-427` | `to-do` | Finance Metric Registry Sharding (trigger-based) | `docs/tasks/to-do/TASK-427-finance-metric-registry-sharding.md` |
-| `TASK-407` | `to-do` | Copy Migration: Shared Shell + Components (split de TASK-265) | `docs/tasks/to-do/TASK-407-copy-migration-shared-shell-components.md` |
-| `TASK-408` | `to-do` | Copy Migration: Notification Categories + Institutional Emails (split de TASK-265) | `docs/tasks/to-do/TASK-408-copy-migration-notifications-emails.md` |
-| `TASK-428` | `to-do` | i18n Architecture Decision (library + routing + locales) — child de TASK-266 | `docs/tasks/to-do/TASK-428-i18n-architecture-decision.md` |
-| `TASK-429` | `to-do` | Locale-Aware Formatting Utilities — child de TASK-266 | `docs/tasks/to-do/TASK-429-locale-aware-formatting-utilities.md` |
-| `TASK-430` | `to-do` | Dictionary Foundation Activation — child de TASK-266 | `docs/tasks/to-do/TASK-430-dictionary-foundation-activation.md` |
-| `TASK-431` | `to-do` | Tenant + User Locale Persistence Model — child de TASK-266 | `docs/tasks/to-do/TASK-431-tenant-user-locale-persistence.md` |
+| `TASK-407` | `complete` | Copy Migration: Shared Shell + Components (split de TASK-265) | `docs/tasks/complete/TASK-407-copy-migration-shared-shell-components.md` |
+| `TASK-408` | `in-progress` | Copy Migration: Notification Categories + Institutional Emails (split de TASK-265) | `docs/tasks/in-progress/TASK-408-copy-migration-notifications-emails.md` |
+| `TASK-428` | `complete` | i18n Architecture Decision (library + routing + locales) — child de TASK-266 | `docs/tasks/complete/TASK-428-i18n-architecture-decision.md` |
+| `TASK-429` | `complete` | Locale-Aware Formatting Utilities — child de TASK-266 | `docs/tasks/complete/TASK-429-locale-aware-formatting-utilities.md` |
+| `TASK-430` | `complete` | Dictionary Foundation Activation — child de TASK-266 | `docs/tasks/complete/TASK-430-dictionary-foundation-activation.md` |
+| `TASK-431` | `complete` | Tenant + User Locale Persistence Model — child de TASK-266 | `docs/tasks/complete/TASK-431-tenant-user-locale-persistence.md` |
 | `TASK-432` | `to-do` | Client Portal Nexa Pulse (Client-Facing Insights) | `docs/tasks/to-do/TASK-432-client-portal-nexa-pulse.md` |
 | `TASK-433` | `to-do` | Payroll Signal Engine | `docs/tasks/to-do/TASK-433-payroll-signal-engine.md` |
 | `TASK-434` | `to-do` | Staff Augmentation Assignment Economics Signal Engine | `docs/tasks/to-do/TASK-434-staff-augmentation-signal-engine.md` |
@@ -489,7 +489,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-437` | `to-do` | Nexa Cross-Domain Causality Engine | `docs/tasks/to-do/TASK-437-nexa-cross-domain-causality.md` |
 | `TASK-438` | `to-do` | Nexa Contextual Chat Per Domain (Copilot by Surface) | `docs/tasks/to-do/TASK-438-nexa-contextual-chat-per-domain.md` |
 | `TASK-439` | `to-do` | Nexa Daily Role-Based Briefing | `docs/tasks/to-do/TASK-439-nexa-daily-role-based-briefing.md` |
-| `TASK-440` | `in-progress` | Nexa Insights Project Label Resolution | `docs/tasks/in-progress/TASK-440-nexa-project-label-resolution.md` |
+| `TASK-440` | `complete` (closed 2026-05-05 — lifecycle drift) | Nexa Insights Project Label Resolution | `docs/tasks/complete/TASK-440-nexa-project-label-resolution.md` |
 | `TASK-441` | `to-do`       | Nexa Mentions Resolver + Allowlist + Sanitization | `docs/tasks/to-do/TASK-441-nexa-mentions-resolver-allowlist-sanitization.md` |
 | `TASK-442` | `to-do`       | Nexa Mentions Registry + Entity Expansion | `docs/tasks/to-do/TASK-442-nexa-mentions-registry-entity-expansion.md` |
 | `TASK-443` | `to-do`       | Nexa Thread Chat Mention Rendering (Quick Win) | `docs/tasks/to-do/TASK-443-nexa-thread-chat-mention-rendering.md` |
@@ -638,7 +638,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-582` | `to-do` | Monthly Project Provisioning Admin Surface with Preview — EPIC-005 child 6/6 | `docs/tasks/to-do/TASK-582-monthly-project-provisioning-admin-surface.md` |
 | `TASK-583` | `to-do` | HubSpot Quote Native Publish & Tax Finalization | `docs/tasks/to-do/TASK-583-hubspot-quote-native-publish-tax-finalization.md` |
 | `TASK-584` | `in-progress` | PostgreSQL Migration Tooling Hardening | `docs/tasks/in-progress/TASK-584-postgres-migration-tooling-hardening.md` |
-| `TASK-585` | `in-progress` | Notion BQ Sync Cost Efficiency & Invocation Hardening | `docs/tasks/in-progress/TASK-585-notion-bq-sync-cost-efficiency-hardening.md` |
+| `TASK-585` | `to-do` (reverted 2026-05-05 — stalled 30+ días, runtime externo GCP) | Notion BQ Sync Cost Efficiency & Invocation Hardening | `docs/tasks/to-do/TASK-585-notion-bq-sync-cost-efficiency-hardening.md` |
 | `TASK-586` | `to-do` | Notion Sync & Billing Export Observability in Admin Center | `docs/tasks/to-do/TASK-586-notion-sync-billing-observability.md` |
 | `TASK-587` | `complete` | HubSpot Products Full-Fidelity Bidirectional Sync Expansion (umbrella — 5 fases A-E cerradas) | `docs/tasks/complete/TASK-587-hubspot-products-full-fidelity-sync.md` |
 | `TASK-588` | `complete` | Project Title Resolution Hardening en Conformed Sync (fix ICO "Sin nombre") | `docs/tasks/complete/TASK-588-project-title-resolution-conformed-sync-hardening.md` |
@@ -746,7 +746,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-668` | `to-do` | Nubox Ops Replay & Enterprise Promotion | `docs/tasks/to-do/TASK-668-nubox-ops-replay-enterprise-promotion.md` |
 | `TASK-669` | `to-do` | Teams Workflow Notifications Channel | `docs/tasks/to-do/TASK-669-teams-workflow-notifications-channel.md` |
 | `TASK-670` | `to-do` | Brand Icon Library React Adapter | `docs/tasks/to-do/TASK-670-brand-icon-library-react-adapter.md` |
-| `TASK-671` | `in-progress` | Greenhouse Teams Bot Platform (Bot Framework + Graph) — code complete, pending Azure tenant deploy | `docs/tasks/in-progress/TASK-671-greenhouse-teams-bot-platform.md` |
+| `TASK-671` | `complete` (closed 2026-05-05 — Azure deploy + cutover) | Greenhouse Teams Bot Platform (Bot Framework + Graph) | `docs/tasks/complete/TASK-671-greenhouse-teams-bot-platform.md` |
 | `TASK-672` | `to-do` | Platform Health API Contract | `docs/tasks/to-do/TASK-672-platform-health-api-contract.md` |
 | `TASK-673` | `complete` | Mercado Publico Licitaciones Intelligence (POC + Validacion de Matcher) | `docs/tasks/complete/TASK-673-mercadopublico-poc.md` |
 | `TASK-674` | `to-do` | Commercial Public Procurement Architecture Contract | `docs/tasks/to-do/TASK-674-commercial-public-procurement-architecture-contract.md` |
@@ -771,7 +771,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-693` | `to-do` | Notification Hub Bidireccional + UI Preferences + Mentions | `docs/tasks/to-do/TASK-693-notification-hub-bidirectional-ui.md` |
 | `TASK-694` | `complete` | Deep Link Platform Foundation | `docs/tasks/complete/TASK-694-deep-link-platform-foundation.md` |
 | `TASK-695` | `to-do` | Nexa Insights via Notification Hub (Teams + In-App + Email) | `docs/tasks/to-do/TASK-695-nexa-insights-teams-delivery.md` |
-| `TASK-696` | `in-progress` | Smart Home v2 (Enterprise-grade redesign — registry + contract + observability + 7 blocks) | `docs/tasks/in-progress/TASK-696-smart-home-v2-enterprise.md` |
+| `TASK-696` | `complete` (closed 2026-05-05 — Waves 1-7 shipped) | Smart Home v2 (Enterprise-grade redesign — registry + contract + observability + 7 blocks) | `docs/tasks/complete/TASK-696-smart-home-v2-enterprise.md` |
 | `TASK-697` | `complete` | Payment Instrument Admin Workspace Enterprise | `docs/tasks/complete/TASK-697-payment-instrument-admin-workspace-enterprise.md` |
 | `TASK-698` | `to-do` | Nexa Conversation Drawer (cierre del Hero AI Smart Home v2) | `docs/tasks/to-do/TASK-698-nexa-conversation-drawer.md` |
 | `TASK-699` | `complete` | Banco "Resultado cambiario" Canonical FX P&L Pipeline | `docs/tasks/complete/TASK-699-banco-fx-result-canonical-pipeline.md` |
@@ -840,7 +840,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-756` | `to-do` | Auto-generación de Payment Orders desde Payroll exportado (puente operativo faltante) | `docs/tasks/to-do/TASK-756-payroll-orders-auto-generation.md` |
 | `TASK-757` | `to-do` | Payment Processor Execution Sync + Global66 Webhook Adapter V1 | `docs/tasks/to-do/TASK-757-payment-processor-execution-sync-global66-webhook.md` |
 | `TASK-758` | `complete` | Payroll Receipt Render Contract Hardening (4 regímenes: chile_dependent, honorarios, international_deel, international_internal — helper canónico `resolveReceiptRegime` + `buildReceiptPresentation` puro server-safe con exhaustiveness `never`-check; cierra bug raíz `isChile=payRegime==='chile'` que afecta a 3/4 regímenes; RECEIPT_TEMPLATE_VERSION 3→4 lazy regen; ProjectedPayrollView converge al detector canónico; mockup vinculante 5-skills aprobado; F6 PeriodReport+Excel queda en TASK-782) | `docs/tasks/complete/TASK-758-payroll-honorarios-receipt-render-contract-hardening.md` |
-| `TASK-759` | `in-progress` | Payslip Delivery On Payment Paid (split lifecycle) | `docs/tasks/in-progress/TASK-759-payslip-delivery-on-payment-paid.md` |
+| `TASK-759` | `complete` (closed 2026-05-05 — V1 ejecución path shipped) | Payslip Delivery On Payment Paid (split lifecycle) | `docs/tasks/complete/TASK-759-payslip-delivery-on-payment-paid.md` |
 | `TASK-759b` | `to-do` | Payslip Payment Committed Promise (V2 sub-task) | `docs/tasks/to-do/TASK-759b-payslip-payment-committed-promise.md` |
 | `TASK-759c` | `to-do` | Payslip Cancellation & Revision Compensation (V2 sub-task) | `docs/tasks/to-do/TASK-759c-payslip-cancellation-revision-compensation.md` |
 | `TASK-759d` | `to-do` | Payslip UI Timeline + Capability finance.payslip.resend (V2 sub-task) | `docs/tasks/to-do/TASK-759d-payslip-ui-timeline-capability.md` |
@@ -887,7 +887,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-798` | `to-do` | Contractor Reliability + Ops Control Plane (EPIC-013 child 10/10) | `docs/tasks/to-do/TASK-798-contractor-reliability-ops-control-plane.md` |
 | `TASK-799` | `complete` | Payment Order Processor Source + Settlement Policy | `docs/tasks/complete/TASK-799-payment-order-processor-source-settlement-policy.md` |
 | `TASK-800` | `to-do` | Production GCP WIF-Only Auth Posture Hardening | `docs/tasks/to-do/TASK-800-production-gcp-wif-only-auth-posture-hardening.md` |
-| `TASK-801` | `to-do` | Engagement Primitive: services + cost_attribution Extension (EPIC-014 child 1/10) | `docs/tasks/to-do/TASK-801-engagement-primitive-services-extension.md` |
+| `TASK-801` | `complete` | Engagement Primitive: services + cost_attribution Extension (EPIC-014 child 1/10) — implementado 2026-05-06: migration 20260506200742463 aplicada con engagement_kind + commitment_terms_json en services, service_id TEXT FK opt en client_team_assignments con índice partial, attribution_intent en CCA v1 (TABLE) y v2 (CREATE OR REPLACE VIEW con literal 'operational'); 2 desvíos vs spec corregidos pre-implementación (UUID→TEXT, ALTER TABLE→VIEW); arch spec V1.2 actualizada con Delta v1.3; backward compat 100% verificada (30/30 services regular, 9/9 attribution operational); types regenerados, build/lint/test/tsc clean. | `docs/tasks/complete/TASK-801-engagement-primitive-services-extension.md` |
 | `TASK-802` | `to-do` | Engagement Commercial Terms Time-Versioned (EPIC-014 child 2/10) | `docs/tasks/to-do/TASK-802-engagement-commercial-terms-time-versioned.md` |
 | `TASK-803` | `to-do` | Engagement Phases + Outcomes + Lineage (EPIC-014 child 3/10) | `docs/tasks/to-do/TASK-803-engagement-phases-outcomes-lineage.md` |
 | `TASK-804` | `to-do` | Engagement Approvals Workflow + Capacity Warning Soft (EPIC-014 child 4/10) | `docs/tasks/to-do/TASK-804-engagement-approvals-capacity-warning.md` |
@@ -897,4 +897,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-808` | `to-do` | Engagement Audit Log + Outbox Events v1 + Reactive Consumers (EPIC-014 child 8/10) | `docs/tasks/to-do/TASK-808-engagement-audit-log-outbox-events-reactive-consumers.md` |
 | `TASK-809` | `to-do` | Sample Sprints UI + Wizards (EPIC-014 child 9/10) | `docs/tasks/to-do/TASK-809-sample-sprints-ui-wizards.md` |
 | `TASK-810` | `to-do` | Engagement Anti-Zombie CHECK Constraint NOT VALID + VALIDATE (EPIC-014 child 10/10) | `docs/tasks/to-do/TASK-810-engagement-anti-zombie-check-constraint.md` |
+| `TASK-811` | `complete` | Copy Migration: greenhouse-nomenclature.ts Domain Microcopy Trim (originalmente Slice 7 de TASK-407 según Delta 2026-05-02; ID corregido 2026-05-06 — TASK-409 está burned por payroll-reliquidation-program). Cerrada sobre `develop`: nomenclature queda acotado a nav/product naming + tokens visuales transicionales; domain microcopy vive en `src/lib/copy/*`. | `docs/tasks/complete/TASK-811-greenhouse-nomenclature-domain-microcopy-trim.md` |
+| `TASK-812` | `to-do` | Compliance Exports Chile — Planilla Previred TXT + LRE XML Libro de Remuneraciones Electrónico (reemplaza dependencia de Nubox para compliance: tabla seed `previred_institution_codes` AFP+Isapre+FONASA, tabla seed `lre_concept_codes` ~50 conceptos canónicos, generadores puros `chile-previred-planilla.ts` ASCII Latin-1 + `chile-lre-libro.ts` XML validado XSD oficial DT, endpoints `/api/hr/payroll/periods/[id]/export/{previred,lre}`, capabilities granulares, paridad financiera contra `payment_order` social_security TASK-707a/TASK-765, reliability signal `payroll.lre.export_drift`, blocker hard TASK-784 RUT canónico verificado, brief auditoría producido por skill greenhouse-payroll-auditor 2026-05-06). | `docs/tasks/to-do/TASK-812-compliance-exports-chile-previred-planilla-lre-libro.md` |
+| `TASK-813` | `complete` | HubSpot p_services (0-162) Inbound Sync + Legacy Cleanup — implementado 2026-05-06: archive script idempotente archivó 30 filas legacy seed con `engagement_kind='discovery'` + `status='legacy_seed_archived'`; backfill from HubSpot via direct API helper `fetchServicesForCompany` (bypass del bridge Cloud Run que tiene bug `p_services` URLs); webhook inbound `hubspot-services` con signature v3 + reliability signals (sync_lag, organization_unresolved, legacy_residual_reads); 4 services materializados con `hubspot_sync_status='unmapped'` (operador clasifica); 2 spaces auto-creados (Aguas Andinas + Motogas). Slice 5 (Cloud Scheduler cron) y Slice 7 (UI manual queue) diferidos a follow-ups. Hallazgo HubSpot-side: asociaciones cruzadas Aguas Andinas↔ANAM en HubSpot 0-162 — operador comercial debe corregir en HubSpot (Greenhouse refleja fielmente regla "HubSpot SoT"). 3 outbox events v1 nuevos. CLAUDE.md sección p_services webhook + EVENT_CATALOG Delta. | `docs/tasks/complete/TASK-813-hubspot-services-bidirectional-sync-phantom-seed-cleanup.md` |
 | `TASK-694` | `to-do` | Notification Hub V1.5 — Engagement Metrics + Template Schema + Timezone + Ack Idempotent + Failure Matrix (follow-up post Delta v0.2 de TASK-690) | `docs/tasks/to-do/TASK-694-notification-hub-v1-5-engagement-templates-failure-resilience.md` |

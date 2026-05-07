@@ -25,6 +25,9 @@ import PersonEconomyTab from './tabs/PersonEconomyTab'
 import PersonPaymentTab from './tabs/PersonPaymentTab'
 import PersonAiToolsTab from './tabs/PersonAiToolsTab'
 
+const TASK407_ARIA_SECCIONES_DEL_PERFIL_DEL_COLABORADOR = "Secciones del perfil del colaborador"
+
+
 type Props = {
   detail: PersonDetail
   isAdmin?: boolean
@@ -114,7 +117,7 @@ const PersonTabs = ({ detail, isAdmin, membershipReloadKey, onNewMembership, onE
               onChange={handleChange}
               variant='scrollable'
               pill='true'
-              aria-label='Secciones del perfil del colaborador'
+              aria-label={TASK407_ARIA_SECCIONES_DEL_PERFIL_DEL_COLABORADOR}
             >
               {visibleTabs.map(tab => (
                 <Tab

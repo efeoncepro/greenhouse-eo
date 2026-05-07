@@ -36,6 +36,7 @@ import { fuzzyFilter } from '@/components/tableUtils'
 import tableStyles from '@core/styles/table.module.css'
 import CreatePurchaseOrderDrawer from '@views/greenhouse/finance/drawers/CreatePurchaseOrderDrawer'
 import UpdatePurchaseOrderDocumentDrawer from '@views/greenhouse/finance/drawers/UpdatePurchaseOrderDocumentDrawer'
+import { formatCurrency as formatGreenhouseCurrency } from '@/lib/format'
 
 // ── Types ──
 
@@ -76,7 +77,9 @@ const STATUS_OPTIONS = [
 // ── Helpers ──
 
 const formatCLP = (amount: number) =>
-  new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(amount)
+  formatGreenhouseCurrency(amount, 'CLP', {
+  maximumFractionDigits: 0
+}, 'es-CL')
 
 const formatDate = (date: string | null) => {
   if (!date) return '—'

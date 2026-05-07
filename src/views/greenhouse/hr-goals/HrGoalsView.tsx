@@ -30,6 +30,8 @@ import Typography from '@mui/material/Typography'
 import TabContext from '@mui/lab/TabContext'
 import TabPanel from '@mui/lab/TabPanel'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomChip from '@core/components/mui/Chip'
 import CustomTabList from '@core/components/mui/TabList'
 import CustomTextField from '@core/components/mui/TextField'
@@ -44,6 +46,9 @@ import type {
   GoalsResponse,
   CreateGoalCycleInput
 } from '@/types/hr-goals'
+import { formatDate as formatGreenhouseDate } from '@/lib/format'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 // ── Constants ──
 
@@ -94,7 +99,11 @@ const INITIAL_FORM: CreateGoalCycleInput = {
 
 const formatDate = (iso: string) => {
   try {
-    return new Intl.DateTimeFormat('es-CL', { day: '2-digit', month: 'short', year: 'numeric' }).format(new Date(iso))
+    return formatGreenhouseDate(new Date(iso), {
+  day: '2-digit',
+  month: 'short',
+  year: 'numeric'
+}, 'es-CL')
   } catch {
     return iso
   }
@@ -587,9 +596,7 @@ const HrGoalsView = () => {
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDialogOpen(false)} color='secondary'>
-            Cancelar
-          </Button>
+          <Button onClick={() => setDialogOpen(false)} color='secondary'>{GREENHOUSE_COPY.actions.cancel}</Button>
           <Button
             variant='contained'
             onClick={handleCreateCycle}

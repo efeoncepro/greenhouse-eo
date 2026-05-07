@@ -18,6 +18,7 @@ import type { TimelineProps } from '@mui/lab/Timeline'
 
 // Type Imports
 import type { PendingTask } from '@/types/home'
+import { formatDate as formatGreenhouseDate } from '@/lib/format'
 
 // Styled Timeline component
 const Timeline = styled(MuiTimeline)<TimelineProps>({
@@ -74,7 +75,7 @@ const TaskShortlist = ({ tasks }: Props) => {
                   </Typography>
                   {task.dueDate && (
                     <Typography variant='caption' className='text-text-disabled'>
-                      Vence: {new Date(task.dueDate).toLocaleDateString()}
+                      Vence: {formatGreenhouseDate(new Date(task.dueDate))}
                     </Typography>
                   )}
                 </div>

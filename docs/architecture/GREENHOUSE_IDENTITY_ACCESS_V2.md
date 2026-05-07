@@ -894,6 +894,10 @@ interface GreenhouseSession {
   clientScopes?: string[] // for efeonce_account
   featureFlags?: string[] // tenant-level feature flags
   timezone: string
+  preferredLocale: 'es-CL' | 'en-US' | null // identity_profiles.preferred_locale
+  tenantDefaultLocale: 'es-CL' | 'en-US' | null // organization/client default locale
+  legacyLocale: 'es-CL' | 'en-US' | null // compatibility read from client_users.locale
+  effectiveLocale: 'es-CL' | 'en-US' // presentation locale for i18n runtime
   portalHomePath: string // where to redirect after login
 }
 ```
@@ -907,7 +911,10 @@ interface GreenhouseSession {
 5. If `tenant_type = 'efeonce_internal'`, attempt to resolve `member_id` from `members` via `identity_profile_id`
 6. Load scope assignments if applicable roles are present
 7. Load tenant feature flags
-8. Determine `portalHomePath` through the centralized portal-home policy (roles + route groups + legacy alias normalization)
+8. Resolve locale presentation state as user preference → tenant default → legacy user locale → fallback `es-CL`
+9. Determine `portalHomePath` through the centralized portal-home policy (roles + route groups + legacy alias normalization)
+
+Locale fields are not authorization. They do not grant `routeGroups`, `views`, `authorizedViews`, entitlements or startup-policy access. They exist so App Router, API platform sessions, agent sessions and future email renderers can choose presentation language consistently.
 
 #### Auth flow UX states (TASK-130)
 

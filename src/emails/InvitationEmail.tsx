@@ -1,5 +1,8 @@
 import { Heading, Section, Text } from '@react-email/components'
 
+import { getMicrocopy, type InvitationEmailTemplateCopy } from '@/lib/copy'
+import { selectEmailTemplateCopy } from '@/lib/email/template-copy'
+
 import EmailButton from './components/EmailButton'
 import EmailLayout from './components/EmailLayout'
 import { EMAIL_COLORS, EMAIL_FONTS } from './constants'
@@ -12,6 +15,20 @@ interface InvitationEmailProps {
   locale?: 'es' | 'en'
 }
 
+const LEGACY_EN_INVITATION_EMAIL_COPY: InvitationEmailTemplateCopy = {
+  heading: 'You have been invited to Greenhouse',
+  greeting: name => name ? `Hi ${name},` : 'Hi,',
+  bodyPrefix: 'invited you to join',
+  bodySuffix: "'s team on Efeonce Greenhouse\u2122, the management and operations platform.",
+  validityPrefix: 'You just need to create your password to activate your account. The link is valid for ',
+  validityBold: '72 hours',
+  validitySuffix: '.',
+  cta: 'Activate my account',
+  disclaimer: 'If you were not expecting this invitation, you can safely ignore this email.',
+  fallback: 'If the button does not work, copy and paste this address into your browser:',
+  previewText: (inviter, client) => `${inviter} invited you to ${client} on Greenhouse`
+}
+
 export default function InvitationEmail({
   inviteUrl = 'https://greenhouse.efeoncepro.com/auth/accept-invite?token=preview-token',
   inviterName = 'Julio Reyes',
@@ -19,31 +36,7 @@ export default function InvitationEmail({
   userName = 'María González',
   locale = 'es'
 }: InvitationEmailProps) {
-  const t = locale === 'en' ? {
-    heading: 'You have been invited to Greenhouse',
-    greeting: (name?: string) => name ? `Hi ${name},` : 'Hi,',
-    bodyPrefix: 'invited you to join',
-    bodySuffix: "'s team on Efeonce Greenhouse\u2122, the management and operations platform.",
-    validityPrefix: 'You just need to create your password to activate your account. The link is valid for ',
-    validityBold: '72 hours',
-    validitySuffix: '.',
-    cta: 'Activate my account',
-    disclaimer: 'If you were not expecting this invitation, you can safely ignore this email.',
-    fallback: 'If the button does not work, copy and paste this address into your browser:',
-    previewText: (inviter: string, client: string) => `${inviter} invited you to ${client} on Greenhouse`
-  } : {
-    heading: 'Te han invitado a Greenhouse',
-    greeting: (name?: string) => name ? `Hola ${name.split(' ')[0]},` : 'Hola,',
-    bodyPrefix: 'te invitó a unirte al equipo de',
-    bodySuffix: ' en Efeonce Greenhouse\u2122, la plataforma de gestión y operaciones.',
-    validityPrefix: 'Solo necesitas crear tu contraseña para activar tu cuenta. El enlace es válido por ',
-    validityBold: '72 horas',
-    validitySuffix: '.',
-    cta: 'Activar mi cuenta',
-    disclaimer: 'Si no esperabas esta invitación, puedes ignorar este correo de forma segura.',
-    fallback: 'Si el botón no funciona, copia y pega esta dirección en tu navegador:',
-    previewText: (inviter: string, client: string) => `${inviter} te invitó a ${client} en Greenhouse`
-  }
+  const t = selectEmailTemplateCopy(locale, getMicrocopy().emails.auth.invitation, LEGACY_EN_INVITATION_EMAIL_COPY)
 
   return (
     <EmailLayout previewText={t.previewText(inviterName, clientName)} locale={locale}>

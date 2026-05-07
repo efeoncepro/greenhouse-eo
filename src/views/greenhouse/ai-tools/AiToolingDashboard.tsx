@@ -33,6 +33,7 @@ import AiCatalogTab from './tabs/AiCatalogTab'
 import AiLicensesTab from './tabs/AiLicensesTab'
 import AiWalletsTab from './tabs/AiWalletsTab'
 import AiConsumptionTab from './tabs/AiConsumptionTab'
+import { formatNumber as formatGreenhouseNumber } from '@/lib/format'
 
 type AdminTab = 'catalog' | 'licenses' | 'wallets' | 'consumption'
 
@@ -329,7 +330,7 @@ const AiToolingDashboard = () => {
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <HorizontalWithSubtitle
             title='Créditos disponibles'
-            stats={walSummary.totalCreditsAvailable.toLocaleString('es-CL')}
+            stats={formatGreenhouseNumber(walSummary.totalCreditsAvailable, 'es-CL')}
             avatarIcon='tabler-coins'
             avatarColor='success'
             trend='positive'

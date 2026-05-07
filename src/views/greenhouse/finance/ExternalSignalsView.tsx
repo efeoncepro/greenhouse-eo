@@ -30,6 +30,8 @@ import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 import { toast } from 'sonner'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 import CustomAvatar from '@core/components/mui/Avatar'
 import CustomChip from '@core/components/mui/Chip'
@@ -42,6 +44,13 @@ import type {
   ExternalCashSignalResolutionStatus,
   ListSignalsResult
 } from '@/lib/finance/external-cash-signals'
+import { formatCurrency as formatGreenhouseCurrency, formatDate as formatGreenhouseDate, formatNumber as formatGreenhouseNumber } from '@/lib/format'
+
+const TASK407_ARIA_CARGANDO_SENALES = "Cargando señales"
+const TASK407_ARIA_COLA_DE_SENALES_EXTERNAS_DE_CAJA = "Cola de señales externas de caja"
+
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 interface SignalRow extends ExternalCashSignal {
   matchedRuleId: string | null
@@ -98,13 +107,11 @@ const SOURCE_LABEL: Record<string, string> = {
 
 const formatAmount = (amount: number, currency: string) => {
   try {
-    return new Intl.NumberFormat('es-CL', {
-      style: 'currency',
-      currency,
-      maximumFractionDigits: 0
-    }).format(amount)
+    return formatGreenhouseCurrency(amount, currency, {
+  maximumFractionDigits: 0
+}, 'es-CL')
   } catch {
-    return `${currency} ${amount.toLocaleString('es-CL')}`
+    return `${currency} ${formatGreenhouseNumber(amount, 'es-CL')}`
   }
 }
 
@@ -112,7 +119,11 @@ const formatDate = (raw: string) => {
   if (!raw) return '—'
 
   try {
-    return new Date(raw).toLocaleDateString('es-CL', { day: '2-digit', month: 'short', year: 'numeric' })
+    return formatGreenhouseDate(new Date(raw), {
+  day: '2-digit',
+  month: 'short',
+  year: 'numeric'
+}, 'es-CL')
   } catch {
     return raw
   }
@@ -251,7 +262,7 @@ const ExternalSignalsView = ({ initial }: Props) => {
           subheader='Pulse · operación canónica de cash externa'
         />
         <Divider />
-        {loading && <LinearProgress aria-label='Cargando señales' />}
+        {loading && <LinearProgress aria-label={TASK407_ARIA_CARGANDO_SENALES} />}
         <CardContent>
           <Stack direction={{ xs: 'column', md: 'row' }} spacing={3} sx={{ mb: 4 }}>
             <CustomTextField
@@ -325,7 +336,7 @@ const ExternalSignalsView = ({ initial }: Props) => {
             />
           ) : (
             <TableContainer>
-              <Table size='small' aria-label='Cola de señales externas de caja'>
+              <Table size='small' aria-label={TASK407_ARIA_COLA_DE_SENALES_EXTERNAS_DE_CAJA}>
                 <caption style={{ position: 'absolute', left: -9999, top: -9999 }}>
                   Lista de {data.total} señales externas pendientes de resolución
                 </caption>
@@ -597,9 +608,7 @@ const AdoptDialog = ({ signal, onClose, onSuccess }: AdoptDialogProps) => {
         </Stack>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} disabled={submitting}>
-          Cancelar
-        </Button>
+        <Button onClick={onClose} disabled={submitting}>{GREENHOUSE_COPY.actions.cancel}</Button>
         <Button onClick={handleSubmit} variant='contained' disabled={!accountId || submitting} startIcon={<i className='tabler-check' aria-hidden />}>
           {submitting ? 'Adoptando...' : 'Adoptar y crear pago'}
         </Button>
@@ -667,9 +676,7 @@ const DismissDialog = ({ signal, onClose, onSuccess }: DismissDialogProps) => {
         />
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} disabled={submitting}>
-          Cancelar
-        </Button>
+        <Button onClick={onClose} disabled={submitting}>{GREENHOUSE_COPY.actions.cancel}</Button>
         <Button onClick={handleSubmit} variant='contained' color='error' disabled={!reasonValid || submitting}>
           {submitting ? 'Descartando...' : 'Descartar señal'}
         </Button>

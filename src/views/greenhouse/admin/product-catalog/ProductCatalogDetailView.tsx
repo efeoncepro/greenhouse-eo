@@ -24,9 +24,14 @@ import TableRow from '@mui/material/TableRow'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import { DataTableShell } from '@/components/greenhouse/data-table'
 
 import type { ProductCatalogDetailData } from './detail-data'
+import { formatDate as formatGreenhouseDate, formatNumber as formatGreenhouseNumber } from '@/lib/format'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 // ─────────────────────────────────────────────────────────────
 // TASK-605 Fase E — Detail editor (MVP, no tabs — single page
@@ -46,7 +51,7 @@ const formatDate = (iso: string | null): string => {
   if (!iso) return '—'
   const d = new Date(iso)
 
-  return Number.isFinite(d.getTime()) ? d.toLocaleString('es-CL') : '—'
+  return Number.isFinite(d.getTime()) ? formatGreenhouseDate(d, 'es-CL') : '—'
 }
 
 const ProductCatalogDetailView = ({ data }: Props) => {
@@ -495,7 +500,7 @@ return
                         <strong>{code}</strong>
                       </TableCell>
                       <TableCell align='right'>
-                        {existing ? existing.unitPrice.toLocaleString('es-CL') : '—'}
+                        {existing ? formatGreenhouseNumber(existing.unitPrice, 'es-CL') : '—'}
                       </TableCell>
                       <TableCell>
                         {existing ? (
@@ -646,9 +651,7 @@ return
         <Button variant='contained' size='large' onClick={handleSaveDetail} disabled={isPending}>
           Guardar cambios
         </Button>
-        <Button variant='outlined' href='/admin/commercial/product-catalog' disabled={isPending}>
-          Volver
-        </Button>
+        <Button variant='outlined' href='/admin/commercial/product-catalog' disabled={isPending}>{GREENHOUSE_COPY.actions.back}</Button>
       </Stack>
     </Box>
   )

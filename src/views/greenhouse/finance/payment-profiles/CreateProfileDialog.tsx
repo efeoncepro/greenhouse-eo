@@ -22,12 +22,16 @@ import Typography from '@mui/material/Typography'
 
 import { toast } from 'sonner'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomTextField from '@core/components/mui/TextField'
 import type {
   BeneficiaryPaymentProfileBeneficiaryType,
   BeneficiaryPaymentProfileCurrency,
   BeneficiaryPaymentProfilePaymentMethod
 } from '@/types/payment-profiles'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 interface CreateProfileDialogProps {
   open: boolean
@@ -357,9 +361,7 @@ const CreateProfileDialog = ({
         </Stack>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} disabled={submitting}>
-          Cancelar
-        </Button>
+        <Button onClick={onClose} disabled={submitting}>{GREENHOUSE_COPY.actions.cancel}</Button>
         <Button variant='contained' onClick={handleSubmit} disabled={submitting}>
           {submitting ? 'Creando…' : 'Crear perfil'}
         </Button>

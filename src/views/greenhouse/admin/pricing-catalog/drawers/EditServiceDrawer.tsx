@@ -23,10 +23,15 @@ import TextField from '@mui/material/TextField'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 
-import { GH_PRICING } from '@/config/greenhouse-nomenclature'
+import { GH_PRICING } from '@/lib/copy/pricing'
+import { formatCurrency } from '@/lib/format'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 // ── Types ──────────────────────────────────────────────────────────────
 
@@ -169,7 +174,7 @@ const COPY = GH_PRICING.adminServices
 const fmtUsd = (value: number | null | undefined): string => {
   if (value === null || value === undefined || !Number.isFinite(value)) return '—'
 
-  return `$${value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD`
+  return `${formatCurrency(value, 'USD', {}, 'en-US')} USD`
 }
 
 const fmtPct = (value: number | null | undefined): string => {
@@ -743,7 +748,7 @@ const EditServiceDrawer = ({ open, moduleId, onClose, onSuccess }: EditServiceDr
             </Typography>
           ) : null}
         </Box>
-        <IconButton onClick={handleClose} size='small' aria-label='Cerrar'>
+        <IconButton onClick={handleClose} size='small' aria-label={GREENHOUSE_COPY.actions.close}>
           <i className='tabler-x' />
         </IconButton>
       </Box>
@@ -1411,9 +1416,7 @@ const EditServiceDrawer = ({ open, moduleId, onClose, onSuccess }: EditServiceDr
 
       <Divider />
       <Box sx={{ display: 'flex', gap: 2, p: 4 }}>
-        <Button variant='outlined' color='secondary' onClick={handleClose} fullWidth>
-          Cerrar
-        </Button>
+        <Button variant='outlined' color='secondary' onClick={handleClose} fullWidth>{GREENHOUSE_COPY.actions.close}</Button>
       </Box>
     </Drawer>
   )

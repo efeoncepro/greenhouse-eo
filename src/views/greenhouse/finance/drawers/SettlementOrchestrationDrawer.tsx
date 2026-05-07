@@ -27,11 +27,15 @@ import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomTextField from '@core/components/mui/TextField'
 
 import PaymentInstrumentChip from '@/components/greenhouse/PaymentInstrumentChip'
 import type { InstrumentCategory } from '@/config/payment-instruments'
+import { formatCurrency as formatGreenhouseCurrency } from '@/lib/format'
 
+const GREENHOUSE_COPY = getMicrocopy()
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -108,11 +112,9 @@ const formatDate = (dateStr: string | null): string => {
 }
 
 const formatMoney = (amount: number, currency: string) =>
-  new Intl.NumberFormat('es-CL', {
-    style: 'currency',
-    currency,
-    maximumFractionDigits: currency === 'CLP' ? 0 : 2
-  }).format(amount)
+  formatGreenhouseCurrency(amount, currency, {
+  maximumFractionDigits: currency === 'CLP' ? 0 : 2
+}, 'es-CL')
 
 const getPaymentLabel = (paymentType: SettlementPaymentType) =>
   paymentType === 'income' ? 'cobro' : 'pago'
@@ -165,7 +167,7 @@ const DIRECTION_LABELS: Record<'incoming' | 'outgoing', string> = {
 
 const LEG_STATUS_LABELS: Record<string, { label: string; color: 'success' | 'warning' | 'secondary' | 'info' }> = {
   reconciled: { label: 'Conciliado', color: 'success' },
-  pending: { label: 'Pendiente', color: 'warning' },
+  pending: { label: GREENHOUSE_COPY.states.pending, color: 'warning' },
   settled: { label: 'Liquidado', color: 'info' }
 }
 
@@ -360,7 +362,7 @@ const SettlementOrchestrationDrawer = ({ open, paymentType, paymentId, onClose, 
             Revisa la cadena de liquidación y agrega tramos intermedios cuando el pago pase por otro rail.
           </Typography>
         </Box>
-        <IconButton onClick={onClose} size='small' aria-label='Cerrar'>
+        <IconButton onClick={onClose} size='small' aria-label={GREENHOUSE_COPY.actions.close}>
           <i className='tabler-x' />
         </IconButton>
       </Box>
@@ -681,9 +683,7 @@ const SettlementOrchestrationDrawer = ({ open, paymentType, paymentId, onClose, 
                   )}
 
                   <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
-                    <Button variant='outlined' onClick={onClose}>
-                      Cerrar
-                    </Button>
+                    <Button variant='outlined' onClick={onClose}>{GREENHOUSE_COPY.actions.close}</Button>
                     <Button
                       variant='contained'
                       onClick={handleSubmit}

@@ -18,9 +18,13 @@ import Stack from '@mui/material/Stack'
 import Switch from '@mui/material/Switch'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomTextField from '@core/components/mui/TextField'
 
-import { GH_PRICING } from '@/config/greenhouse-nomenclature'
+import { GH_PRICING } from '@/lib/copy/pricing'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 type ServiceUnit = 'project' | 'monthly'
 type CommercialModel = 'on_going' | 'on_demand' | 'hybrid' | 'license_consulting'
@@ -189,7 +193,7 @@ const CreateServiceDrawer = ({ open, onClose, onSuccess }: Props) => {
     >
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 4 }}>
         <Typography variant='h6'>{COPY.createCta}</Typography>
-        <IconButton onClick={handleClose} size='small' aria-label='Cerrar'>
+        <IconButton onClick={handleClose} size='small' aria-label={GREENHOUSE_COPY.actions.close}>
           <i className='tabler-x' />
         </IconButton>
       </Box>
@@ -391,9 +395,7 @@ const CreateServiceDrawer = ({ open, onClose, onSuccess }: Props) => {
 
       <Divider />
       <Box sx={{ display: 'flex', gap: 2, p: 4 }}>
-        <Button variant='outlined' color='secondary' onClick={handleClose} fullWidth>
-          Cancelar
-        </Button>
+        <Button variant='outlined' color='secondary' onClick={handleClose} fullWidth>{GREENHOUSE_COPY.actions.cancel}</Button>
         <Button
           variant='contained'
           color='primary'

@@ -27,6 +27,11 @@ import { motion } from '@/libs/FramerMotion'
 import useReducedMotion from '@/hooks/useReducedMotion'
 
 import type { AiBriefingNarrativeKind, HomeAiBriefingData } from '@/lib/home/contract'
+import { formatTime as formatGreenhouseTime } from '@/lib/format'
+
+const TASK407_ARIA_BRIEFING_DE_HOY = "Briefing de hoy"
+const TASK407_ARIA_BRIEFING_GENERANDOSE_EN_VIVO = "Briefing generándose en vivo"
+
 
 interface HomeAiBriefingProps {
   data: HomeAiBriefingData
@@ -44,7 +49,10 @@ const KIND_META: Record<AiBriefingNarrativeKind, { icon: string; color: ThemeCol
 
 const formatTime = (iso: string): string => {
   try {
-    return new Date(iso).toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' })
+    return formatGreenhouseTime(new Date(iso), {
+  hour: '2-digit',
+  minute: '2-digit'
+}, 'es-CL')
   } catch {
     return ''
   }
@@ -73,7 +81,7 @@ export const HomeAiBriefing = ({ data }: HomeAiBriefingProps) => {
 
   if (data.narratives.length === 0) {
     return (
-      <Card component='section' aria-label='Briefing de hoy'>
+      <Card component='section' aria-label={TASK407_ARIA_BRIEFING_DE_HOY}>
         <CardHeader
           avatar={<CustomAvatar variant='rounded' skin='light' color='primary' size={36}><i className='tabler-sparkles text-[20px]' /></CustomAvatar>}
           title='Briefing de hoy'
@@ -89,7 +97,7 @@ export const HomeAiBriefing = ({ data }: HomeAiBriefingProps) => {
     : `Generado en vivo · ${data.modelLabel}`
 
   return (
-    <Card component='section' aria-label='Briefing de hoy' aria-describedby='briefing-trust-note'>
+    <Card component='section' aria-label={TASK407_ARIA_BRIEFING_DE_HOY} aria-describedby='briefing-trust-note'>
       <CardHeader
         avatar={<CustomAvatar variant='rounded' skin='light' color='primary' size={36}><i className='tabler-sparkles text-[20px]' /></CustomAvatar>}
         title='Briefing de hoy'
@@ -98,7 +106,7 @@ export const HomeAiBriefing = ({ data }: HomeAiBriefingProps) => {
             <Typography variant='caption' color='text.secondary'>{sourceLabel}</Typography>
             {data.source === 'realtime' ? (
               <Box
-                aria-label='Briefing generándose en vivo'
+                aria-label={TASK407_ARIA_BRIEFING_GENERANDOSE_EN_VIVO}
                 sx={{
                   width: 6,
                   height: 6,

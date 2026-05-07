@@ -12,9 +12,13 @@ import DialogTitle from '@mui/material/DialogTitle'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import { isIssueableFinanceQuotationStatus } from '@/lib/finance/quotation-access'
 import type { FxReadiness } from '@/lib/finance/currency-domain'
 import { evaluateQuotationFxReadinessGate } from '@/lib/finance/quotation-fx-readiness-gate'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 interface QuoteSendHealthAlert {
   level: 'error' | 'warning' | 'info'
@@ -233,9 +237,7 @@ const QuoteSendDialog = ({
         </Stack>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose} disabled={submitting}>
-          Cancelar
-        </Button>
+        <Button onClick={handleClose} disabled={submitting}>{GREENHOUSE_COPY.actions.cancel}</Button>
         <Button
           onClick={handleConfirm}
           variant='contained'

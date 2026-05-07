@@ -3,7 +3,13 @@
 import type { Theme } from '@mui/material/styles'
 
 import type { ThemeColor } from '@core/types'
-import { GH_LABELS, GH_MESSAGES } from '@/config/greenhouse-nomenclature'
+import { GH_LABELS, GH_MESSAGES } from '@/lib/copy/client-portal'
+import {
+  formatDate,
+  formatDateTime,
+  formatInteger as formatLocaleInteger,
+  formatNumber
+} from '@/lib/format'
 
 export const getClientStatusColors = (theme: Theme) => ({
   active: theme.palette.info.main,
@@ -12,37 +18,11 @@ export const getClientStatusColors = (theme: Theme) => ({
   completed: theme.palette.success.main
 })
 
-const absoluteDateFormatter = new Intl.DateTimeFormat('es-CL', {
-  day: 'numeric',
-  month: 'short',
-  year: 'numeric',
-  timeZone: 'UTC'
-})
-
-const updatedDateFormatter = new Intl.DateTimeFormat('es-CL', {
-  day: 'numeric',
-  month: 'short',
-  year: 'numeric',
-  hour: 'numeric',
-  minute: '2-digit',
-  hour12: true,
-  timeZone: 'America/Santiago'
-})
-
-const integerFormatter = new Intl.NumberFormat('es-CL', {
-  maximumFractionDigits: 0
-})
-
-const decimalFormatter = new Intl.NumberFormat('es-CL', {
-  minimumFractionDigits: 1,
-  maximumFractionDigits: 1
-})
-
 const getUtcDate = (value: string) => new Date(value.includes('T') ? value : `${value}T00:00:00.000Z`)
 
-export const formatInteger = (value: number) => integerFormatter.format(value)
+export const formatInteger = (value: number) => formatLocaleInteger(value)
 
-export const formatDecimal = (value: number) => decimalFormatter.format(value)
+export const formatDecimal = (value: number) => formatNumber(value, { minimumFractionDigits: 1, maximumFractionDigits: 1 })
 
 export const formatPercent = (value: number | null) => (value === null ? '0%' : `${formatInteger(Math.round(value))}%`)
 
@@ -55,7 +35,7 @@ export const formatAbsoluteDate = (value: string | null) => {
     return 'Sin fecha visible'
   }
 
-  return absoluteDateFormatter.format(getUtcDate(value))
+  return formatDate(getUtcDate(value), { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' })
 }
 
 export const formatRelativeDate = (value: string | null) => {
@@ -83,7 +63,14 @@ export const formatUpdatedAt = (value: string | null) => {
     return 'Datos actualizados: sin sincronizacion registrada'
   }
 
-  return `Datos actualizados: ${updatedDateFormatter.format(new Date(value))}`
+  return `Datos actualizados: ${formatDateTime(value, {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true
+  })}`
 }
 
 export const getRelationshipSummary = (months: number) => {

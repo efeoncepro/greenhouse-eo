@@ -1,7 +1,11 @@
 # Greenhouse EO — UI Platform Architecture V1
 
-> **Version:** 1.4
+> **Version:** 1.8
 > **Created:** 2026-03-30
+> **Updated:** 2026-05-06 — v1.8: TASK-430 activa el runtime `next-intl` sin prefijar el portal privado. `src/i18n/*` resuelve locale con cookie `gh_locale` + `Accept-Language` + fallback `es-CL`, el App Router queda envuelto por `NextIntlClientProvider`, `<html lang>` usa locale efectivo y `en-US` ya cubre shell navigation + namespaces shared serializables. Ver Delta 2026-05-06c abajo.
+> **Updated:** 2026-05-06 — v1.7: TASK-428 publica `GREENHOUSE_I18N_ARCHITECTURE_V1.md`: `next-intl` como librería App Router, portal privado state-only sin locale prefix por defecto, `en-US` como primera activación, `pt-BR` planned, y TASK-431 debe absorber `client_users.locale` legacy. Ver Delta 2026-05-06b abajo.
+> **Updated:** 2026-05-06 — v1.6: TASK-811 recorta `src/config/greenhouse-nomenclature.ts` a navegación/product nomenclature + tokens visuales transicionales. Domain microcopy reutilizable se extrae a módulos type-safe en `src/lib/copy/*` (`agency`, `client-portal`, `admin`, `pricing`, `workforce`, `finance`, `payroll`). Ver Delta 2026-05-06 abajo.
+> **Updated:** 2026-05-05 — v1.5: Quote Builder primitives extraction Sprint 3 (TASK-498). Tres primitives nuevos en `src/components/greenhouse/primitives/` (`EntitySummaryDock`, `CardHeaderWithBadge`, `FormSectionAccordion`) habilitan invoice / PO / contract / finiquito builders sin re-implementar el chasis. `ContextChipStrip` recibe `overflowAfter` con dropdown "+M más" canónico. Quote Builder migrado: `QuoteSummaryDock` queda como adapter thin sobre `EntitySummaryDock`, conservando API histórica. Ver Delta 2026-05-05 abajo.
 > **Updated:** 2026-05-04 — v1.4: Quick Access Shortcuts Platform (TASK-553). Catálogo canónico `src/lib/shortcuts/catalog.ts` + resolver dual-plane (`module` + opcional `viewCode` + opcional `requiredCapability`) compartido entre Home `recommendedShortcuts` y header `<ShortcutsDropdown />`. Persistencia per-usuario en `greenhouse_core.user_shortcut_pins` vía `/api/me/shortcuts`. Ver Delta 2026-05-04 abajo.
 > **Updated:** 2026-04-20 — v1.3: Floating UI (`@floating-ui/react` 0.27) introducido como stack oficial de positioning para popovers (TASK-509). Primer consumer: `TotalsLadder`. TASK-510 backlog migra el resto. Ver Delta 2026-04-20b abajo.
 > **Updated:** 2026-04-20 — v1.2: `TotalsLadder` primitive extiende su API con `addonsSegment?: { count, amount, onClick, ariaExpanded } | null` (TASK-507) para renderizar un segmento interactivo inline dentro de la ladder de ajustes. Pattern: acciones contextuales viven con sus datos, no como chips flotantes separados. Ver Delta 2026-04-20 abajo.
@@ -13,6 +17,215 @@
 ## Overview
 
 Greenhouse EO es un portal Next.js 16 App Router con MUI 7.x envuelto por el starter-kit Vuexy. Este documento es la referencia canónica de la plataforma UI: stack, librerías disponibles, patrones de componentes, convenciones de estado, y reglas de adopción.
+
+## Delta 2026-05-06c — TASK-430 i18n runtime activation
+
+El runtime i18n del App Router ya está activo.
+
+Artefactos canónicos:
+
+- `next.config.ts` compone `next-intl/plugin` con `withSentryConfig`.
+- `src/i18n/request.ts` es el request config de `next-intl`.
+- `src/i18n/resolve-locale.ts` resuelve locale con cookie `gh_locale`, header `Accept-Language` y fallback `es-CL`.
+- `src/i18n/messages.ts` expone messages shared serializables para `NextIntlClientProvider`; no serializa funciones de `emails` ni `time`.
+- `src/components/Providers.tsx` envuelve el portal con `NextIntlClientProvider`.
+- `src/app/layout.tsx` usa el locale efectivo en `<html lang>`.
+- `src/config/greenhouse-navigation-copy.ts` entrega navegación de shell en `es-CL`/`en-US` sin mover product marks ni rutas.
+- `src/lib/copy/dictionaries/en-US/*` contiene traducciones reales para `actions`, `states`, `loading`, `empty`, `months`, `aria`, `errors`, `feedback` y `time`.
+
+Reglas nuevas:
+
+- No crear `middleware.ts` para i18n del portal privado.
+- No agregar locale prefixes a rutas privadas ni APIs.
+- Consumers nuevos que necesiten locale runtime deben usar `next-intl` o helpers bajo `src/i18n/*`; consumers legacy pueden seguir con `getMicrocopy()` hasta su rollout.
+- No pasar `getMicrocopy(locale)` completo como messages al cliente: el dictionary contiene funciones en `emails` y `time`.
+- Emails y background jobs siguen fuera del provider App Router; se mantienen en `src/lib/email/locale-resolver.ts` + dictionaries/core APIs hasta su rollout.
+- `TASK-431` sigue siendo el owner de persistencia user/tenant y de exponer `effectiveLocale` en sesión.
+
+Access model: sin cambios en `routeGroups`, `views`, `entitlements` ni startup policy.
+
+## Delta 2026-05-06b — TASK-428 i18n architecture decision
+
+La arquitectura i18n canónica vive en [`GREENHOUSE_I18N_ARCHITECTURE_V1.md`](./GREENHOUSE_I18N_ARCHITECTURE_V1.md).
+
+Decisiones vigentes:
+
+- `next-intl` es la librería elegida para el runtime App Router.
+- El portal privado mantiene URLs sin prefijo de locale por defecto; el locale se resuelve por sesión/cookie/header y se aplica por provider/layout.
+- Prefixes de locale quedan reservados para rutas públicas, SEO o entrypoints localizados explícitos. No se aplican a `/api/*`, NextAuth callbacks ni staging automation.
+- `es-CL` sigue siendo default; `en-US` es el primer locale de activación; `pt-BR` queda planned first-class detrás de cobertura de dictionary y validación comercial.
+- `src/lib/format/` sigue siendo la primitive canónica para fechas, moneda, números, porcentajes y pluralización visible. i18n no reemplaza TASK-429.
+- React Email y background jobs no dependen del provider App Router; consumen dictionaries/core APIs y el bridge `src/lib/email/locale-resolver.ts`.
+- TASK-431 debe normalizar/absorber `greenhouse_core.client_users.locale` legacy antes de materializar `identity_profiles.preferred_locale` o tenant defaults.
+
+Access model: sin cambios en `routeGroups`, `views`, `entitlements` ni startup policy. Locale es preferencia de presentación, no autorización.
+
+## Delta 2026-05-06 — TASK-811 nomenclature domain microcopy trim
+
+`src/config/greenhouse-nomenclature.ts` deja de ser el contenedor de domain microcopy. Su contrato activo queda acotado a:
+
+- navegación y labels institucionales de shell (`GH_CLIENT_NAV`, `GH_INTERNAL_NAV`, `GH_*_NAV`)
+- product nomenclature estable (`GH_NEXA`, `GH_PIPELINE_COMMERCIAL`)
+- tokens visuales transicionales (`GH_COLORS`, out of scope de TASK-811 hasta su absorción final en theme)
+
+El microcopy reutilizable de dominios vive ahora en módulos type-safe bajo `src/lib/copy/`:
+
+| Módulo | Exports |
+| --- | --- |
+| `src/lib/copy/agency.ts` | `GH_AGENCY` |
+| `src/lib/copy/client-portal.ts` | `GH_LABELS`, `GH_TEAM`, `GH_MESSAGES` |
+| `src/lib/copy/admin.ts` | `GH_INTERNAL_MESSAGES` |
+| `src/lib/copy/pricing.ts` | `GH_PRICING`, `GH_PRICING_GOVERNANCE` |
+| `src/lib/copy/workforce.ts` | `GH_SKILLS_CERTS`, `GH_TALENT_DISCOVERY`, `GH_CLIENT_TALENT` |
+| `src/lib/copy/finance.ts` | `GH_MRR_ARR_DASHBOARD` |
+| `src/lib/copy/payroll.ts` | `GH_PAYROLL_PROJECTED_ARIA` |
+
+Reglas nuevas:
+
+- No agregar nuevo domain microcopy a `greenhouse-nomenclature.ts`.
+- Si una surface necesita copy de dominio reutilizado en varias superficies, crear o extender un módulo domain-specific dentro de `src/lib/copy/`.
+- Si el texto es CTA/estado/loading/empty/aria/mes shared, usar `getMicrocopy()` y sus namespaces existentes.
+- Si el texto es único de una pantalla, puede vivir cerca del dominio, pero no debe duplicar shared copy.
+- `GH_COMPENSATION` fue eliminado por orphan real (0 importers runtime).
+
+## Delta 2026-05-05 — Quote Builder primitives extraction Sprint 3 (TASK-498)
+
+El Quote Builder publicó 4 capacidades nuevas al registry canónico de primitives. Hoy las consume sólo el quote builder; mañana las consumen invoice builder, PO builder, contract builder, finiquito generator y cualquier entity-form que necesite el mismo chasis sticky-bottom + section accordion + card-header-with-badge + chip-strip overflow.
+
+```
+src/components/greenhouse/primitives/
+├── EntitySummaryDock.tsx        # nuevo (TASK-498)
+├── CardHeaderWithBadge.tsx      # nuevo (TASK-498)
+├── FormSectionAccordion.tsx     # nuevo (TASK-498)
+├── ContextChipStrip.tsx         # extendido (TASK-498)  — `overflowAfter` prop
+├── …                            # primitives previos (TASK-487, TASK-505, TASK-507, TASK-509)
+└── index.ts
+```
+
+### `EntitySummaryDock`
+
+Generic sticky-bottom cockpit primitive. Chasis canónico de cualquier builder enterprise (quote, invoice, purchase order, contract, finiquito, statement of work). Layout 3-zona Grid 3/6/3 en md+, single-column en xs.
+
+```tsx
+import {
+  EntitySummaryDock,
+  TotalsLadder,
+  type EntitySummaryDockSaveState
+} from '@/components/greenhouse/primitives'
+
+<EntitySummaryDock
+  ariaLabel='Resumen de la cotización'
+  saveState={{ kind: 'dirty', changeCount: 2 }}
+  marginIndicator={{ classification: 'healthy', marginPct: 0.494, tierRange: null }}
+  centerSlot={
+    <TotalsLadder
+      subtotal={2923500}
+      factor={1.15}
+      ivaAmount={558345}
+      total={3921845}
+      currency='CLP'
+    />
+  }
+  emptyStateMessage='Agrega ítems para ver el total.' /* fallback cuando centerSlot=null */
+  simulationError='Error al simular precios.'        /* opcional, alert top */
+  primaryCta={{
+    label: 'Guardar y emitir',
+    onClick: () => handleSubmit(),
+    iconClassName: 'tabler-file-check',
+    loading: submitting,
+    disabled: notReady,
+    disabledReason: 'Faltan ítems en la cotización.'
+  }}
+  secondaryCta={{ label: 'Guardar borrador', onClick: () => handleDraft() }}
+/>
+```
+
+Props clave:
+
+- `centerSlot: ReactNode` — totales, KPIs, métricas. Cuando `null/undefined` y hay `emptyStateMessage`, se renderiza la leyenda con icono.
+- `saveState`, `marginIndicator`, `leftSlotExtra` — composiciones declarativas de la zona izquierda. Usan los primitives existentes (`SaveStateIndicator`, `MarginHealthChip`).
+- `primaryCta` / `secondaryCta` — objetos canónicos `{ label, onClick, loading?, disabled?, iconClassName?, disabledReason? }`. El primary CTA encapsula el patrón Tooltip-on-disabled + `aria-describedby` + visuallyHidden id.
+- `simulationError: ReactNode | string | null` — Alert inline en la parte superior del dock.
+
+A11y: `<aside role='status' aria-live='polite'>` consolidada en el root. Cuando `disabled && disabledReason`, el primary CTA se envuelve en Tooltip + `<span sx={visuallyHidden} id="${id}-cta-reason">` con la razón completa.
+
+### `CardHeaderWithBadge`
+
+Card header con title + badge inline. Pattern enterprise (Linear / Notion / Stripe Billing): identifica la sección y comunica scale (count) en un solo phrase visual.
+
+```tsx
+import { CardHeaderWithBadge } from '@/components/greenhouse/primitives'
+
+<CardHeaderWithBadge
+  title='Ítems de la cotización'
+  badgeValue={draftLines.length}
+  badgeColor={draftLines.length === 0 ? 'secondary' : 'primary'}
+  subheader='Agrega ítems vendibles desde el catálogo o crea una línea manual.'
+  avatarIcon='tabler-list-details'
+  action={headerAction}
+/>
+```
+
+Props:
+
+- `title: string | ReactNode` — string compone canónicamente `<Stack>{h6}{badge}</Stack>`. ReactNode lo respeta tal cual y omite el badge default.
+- `badgeValue: string | number` — valor stringificado para el chip.
+- `badgeColor` (default `primary`), `badgeVariant` (default `tonal`), `badgeAriaLabel?` — control fino del chip.
+- `subheader`, `avatarIcon`, `avatarIconColor`, `action` — passthrough estándar de `CardHeader`.
+
+Reglas de uso: el consumer decide `badgeColor` semánticamente (no se deriva automáticamente de `count`).
+
+### `FormSectionAccordion`
+
+Accordion canónico para secciones de formulario colapsables. Aplica el patrón Greenhouse: border 1px divider + `customBorderRadius.lg`, suprime `:before` divider, mantiene márgenes consistentes en estado expanded.
+
+```tsx
+import { FormSectionAccordion } from '@/components/greenhouse/primitives'
+
+<FormSectionAccordion
+  id='quote-detail'
+  title='Detalle y notas'
+  iconClassName='tabler-notes'
+  defaultExpanded={description.length > 0}
+  summaryCount={attachments.length || null}
+>
+  <CustomTextField multiline label='Descripción' value={description} onChange={…} />
+</FormSectionAccordion>
+```
+
+Props:
+
+- `title`, `iconClassName?`, `defaultExpanded?`, `summaryCount?`, `summaryCountColor?`
+- `expanded` + `onChange` para modo controlado
+- `id` deriva ARIA bindings (`${id}-header` ↔ `${id}-content`)
+
+### `ContextChipStrip` overflow extension
+
+`ContextChipStrip` gana prop `overflowAfter?: number | null`. Cuando `Children.count(children) > overflowAfter`, renderiza inline solo los primeros N y agrupa el resto en un dropdown menu accionable por chip "+M más" — pattern de overflow de Linear / GitHub repo header / Stripe Billing filtros.
+
+```tsx
+import { ContextChipStrip, ContextChip } from '@/components/greenhouse/primitives'
+
+<ContextChipStrip ariaLabel='Filtros de cotización' overflowAfter={6}>
+  {fields.map(f => <ContextChip key={f.id} {...f} />)}
+</ContextChipStrip>
+```
+
+Props nuevas:
+
+- `overflowAfter?: number | null` — límite. `null/undefined` = comportamiento default (todos inline).
+- `overflowMoreLabel?: string` — copy localizable. Default `'más'`.
+- `overflowMenuAriaLabel?: string` — default `${ariaLabel} — opciones adicionales`.
+
+A11y: el chip overflow tiene `aria-haspopup='menu' aria-expanded` + `aria-controls`. El menu usa `dense` MenuList con cada child en un `MenuItem` (preserva el rendering del child sin ripple).
+
+### Migración Quote Builder (Slice 5)
+
+- `QuoteSummaryDock` → adapter thin sobre `EntitySummaryDock`. Conserva la API pública (subtotal/factor/ivaAmount/total/addons/marginPct/saveState) y mapea a los slots genéricos. Cero cambio para el consumer (`QuoteBuilderShell`).
+- `QuoteLineItemsEditor` (vista editable) → consume `CardHeaderWithBadge` directamente. La vista readonly permanece con `CardHeader` MUI por simplicidad (sin badge).
+- `QuoteBuilderShell` → "Detalle y notas" Accordion inline reemplazado por `<FormSectionAccordion id='quote-detail' …>`.
+
+Reusable platform-wide. Sin domain logic. Tokens canónicos (`customBorderRadius.lg`, `theme.palette.divider`, `theme.zIndex.appBar - 2`). Apto para Quote / Invoice / Purchase Order / Contract / Reconciliation Workbench / HR Profile / Settings.
 
 ## Delta 2026-05-04 — Quick Access Shortcuts Platform (TASK-553)
 
@@ -81,9 +294,14 @@ Toda string visible al usuario en Greenhouse EO vive en una de **dos capas canó
 | Capa | Path | Propósito | Locale-aware |
 |---|---|---|---|
 | **Product nomenclature** | `src/config/greenhouse-nomenclature.ts` | Lenguaje propio del producto: Pulse, Spaces, Ciclos, Mi Greenhouse, Torre de control. Navegación. Labels institucionales del shell. | No (es-CL only por design) |
-| **Functional shared microcopy** | `src/lib/copy/` (TASK-265) | CTAs base, estados operativos, loading/processing, empty states, meses, aria-labels, errores genéricos, feedback toasts, tiempo relativo. | Sí (`es-CL` default, `en-US` stub para TASK-266) |
+| **Functional shared microcopy** | `src/lib/copy/` (TASK-265) | CTAs base, estados operativos, loading/processing, empty states, meses, aria-labels, errores genéricos, feedback toasts, tiempo relativo, copy institucional de emails. | Sí (`es-CL` default, `en-US` stub para TASK-266) |
 
 ### API pública del módulo de microcopy
+
+Documentos operativos:
+
+- Funcional: [`docs/documentation/plataforma/microcopy-shared-dictionary.md`](../documentation/plataforma/microcopy-shared-dictionary.md)
+- Manual operativo: [`docs/manual-de-uso/plataforma/microcopy-shared-dictionary.md`](../manual-de-uso/plataforma/microcopy-shared-dictionary.md)
 
 ```ts
 import { getMicrocopy } from '@/lib/copy'
@@ -119,6 +337,9 @@ const fullMonth = t.months.long[monthIndex]   // 'Enero' .. 'Diciembre'
 // Tiempo relativo (functions)
 <span>{t.time.minutesAgo(5)}</span>          // 'Hace 5 minutos'
 <span>{t.time.minutesAgo(1)}</span>          // 'Hace 1 minuto'
+
+// Emails institucionales (TASK-408 Slice 0)
+const subject = t.emails.subjects.payrollExport('Marzo 2026', 4)
 ```
 
 ### Decision tree (donde escribir copy nuevo)
@@ -127,8 +348,11 @@ const fullMonth = t.months.long[monthIndex]   // 'Enero' .. 'Diciembre'
 ¿Es product nomenclature (Pulse, Spaces, Ciclos, Mi Greenhouse, Torre de control)?
   → src/config/greenhouse-nomenclature.ts
 
-¿Es navegación, label institucional del shell, o categoría de notificación?
-  → src/config/greenhouse-nomenclature.ts (TASK-408 migra notification-categories ahí)
+¿Es navegación o label institucional del shell?
+  → src/config/greenhouse-nomenclature.ts
+
+¿Es subject/footer/copy institucional compartido de email o categoría de notificación?
+  → src/lib/copy/dictionaries/es-CL/emails.ts (TASK-408)
 
 ¿Es microcopy funcional reusada en >3 surfaces (CTAs, estados, loading, empty, aria)?
   → src/lib/copy/dictionaries/es-CL/<namespace>.ts
@@ -200,6 +424,62 @@ Excluidos por scope: `src/components/theme/**`, `src/@core/**`, `src/app/global-
 
 Modo: `warn` durante TASK-265 + sweeps TASK-407/408. Promueve a `error` al cierre TASK-408.
 
+### Delta 2026-05-06 — TASK-407 sweep shared shell/componentes
+
+TASK-407 extendio el gate `greenhouse/no-untokenized-copy` para cubrir arrays de meses y CTAs JSX text, agrego `buildStatusMap()` en `src/lib/copy/` y migro el copy shared de `src/views`, `src/components` y `src/app` fuera de literals inline.
+
+Estado canonico post-sweep:
+
+- 0 warnings `greenhouse/no-untokenized-copy` en `src/views`, `src/components` y `src/app`.
+- 0 disables de `greenhouse/no-untokenized-copy` en `src/`.
+- Meses, CTAs base, aria-labels, empty states, secondary props compartidas y status maps reutilizables consumen `src/lib/copy/`.
+- `TASK-408` mantiene ownership de notifications/emails y promueve la rule a `error` al cierre.
+
+### Delta 2026-05-06 — TASK-408 Slice 0 emails foundation
+
+TASK-408 Slice 0 agrega el namespace `emails` a `src/lib/copy/`, el helper server-side `src/lib/email/locale-resolver.ts` y snapshot baseline de los 17 templates React Email antes de migrar copy.
+
+Reglas canonicas para emails:
+
+- La personalizacion vive en `src/lib/email/tokens.ts` + el merge de `src/lib/email/delivery.ts`. No mover nombres, montos, periodos, cliente, links o unsubscribe al dictionary como valores fijos.
+- El dictionary `emails` solo almacena copy institucional reusable: footer, disclaimers, labels y subject builders que reciben tokens como argumentos.
+- Los callers siguen mandando contexto de negocio (`fullName`, `periodLabel`, `netTotal`, `clientName`, `shareUrl`, etc.). Durante la migracion, los snapshots deben probar que esos tokens siguen presentes.
+- `resolveEmailLocale()` normaliza `es|en|es-CL|en-US` sin cambiar el contrato actual de templates (`locale?: 'es' | 'en'`).
+
+### Delta 2026-05-06 — TASK-408 Slice 1 notification categories
+
+`src/config/notification-categories.ts` mantiene ownership del contrato operativo de notificaciones: `code`, `defaultChannels`, `audience`, `priority` e `icon`. Desde Slice 1, el copy visible (`label`, `description`) vive en `getMicrocopy().emails.notificationCategories`.
+
+Reglas canonicas:
+
+- No cambiar `code` para migraciones de copy. Los codes conectan preferencias, dispatch, logs, projections, webhooks y consumidores downstream.
+- No tocar `NotificationService`, outbox, event types, retries, webhooks ni `sendEmail` para migrar labels/descriptions.
+- Toda categoria nueva debe agregar entrada en `EmailsCopy.notificationCategories`; `src/config/notification-categories.test.ts` valida paridad y metadata estable.
+- Los accesos dinamicos deben pasar por `isNotificationCategoryCode()` antes de indexar el catalogo.
+- `subjectKey` solo debe agregarse cuando exista un consumer activo y testeado. Metadata muerta en el catalogo introduce drift y no protege delivery.
+
+### Delta 2026-05-06 — TASK-408 Slice 2A EmailLayout
+
+`src/emails/components/EmailLayout.tsx` consume `getMicrocopy().emails.layout` para el shell institucional en español: `logoAlt`, `tagline`, `automatedDisclaimer` y `unsubscribe`.
+
+Reglas canonicas:
+
+- El shell puede leer copy institucional compartido, pero no debe resolver ni mutar tokens de personalizacion.
+- `en` conserva fallback legacy mientras `en-US` siga siendo mirror de `es-CL`; no degradar correos internacionales para cumplir una migracion mecanica.
+- `EmailButton` no debe crecer API de copy hasta que exista un consumer activo. Hoy recibe `children`; los CTAs de dominio se migran por template en Slice 3.
+- Cualquier cambio al shell debe correr `src/emails/EmailTemplateBaseline.test.tsx` para proteger los 17 templates.
+
+### Delta 2026-05-06 — TASK-408 Slice 3A template copy selector
+
+`src/lib/email/template-copy.ts` introduce `selectEmailTemplateCopy(locale, platformCopy, legacyEnglishCopy)`.
+
+Reglas canonicas:
+
+- Mientras `en-US` sea mirror de `es-CL`, un template migrado debe usar dictionary para `es` y fallback legacy para `en`.
+- El fallback `en` es temporal y local al template migrado; se retira cuando TASK-266 entregue dictionary `en-US` real.
+- La primitive no toca delivery, subjects, URL generation, tokens ni render context. Solo selecciona copy.
+- Cada template migrado debe mantener snapshot estable y cubrir su output en `EmailTemplateBaseline.test.tsx` o test focal equivalente.
+
 ### Coordinación con i18n (TASK-266)
 
 `src/lib/copy/` está locale-aware desde día uno (`Locale = 'es-CL' | 'en-US'`). Cuando TASK-266 / TASK-430 active i18n real:
@@ -207,6 +487,31 @@ Modo: `warn` durante TASK-265 + sweeps TASK-407/408. Promueve a `error` al cierr
 1. Traducir las claves en `src/lib/copy/dictionaries/en-US/<namespace>.ts` (hoy re-exporta es-CL como semilla)
 2. Conectar `getMicrocopy(locale)` a la fuente de locale (sesión user, persistencia tenant per TASK-431)
 3. La API pública NO cambia → consumers no reescriben nada
+
+### Formatting Locale-Aware (TASK-429)
+
+`src/lib/format/` es la primitive canónica para formateo visible y exportable:
+
+Documentacion relacionada:
+
+- Funcional: [`docs/documentation/plataforma/formateo-locale-aware.md`](../documentation/plataforma/formateo-locale-aware.md)
+- Manual operativo: [`docs/manual-de-uso/plataforma/formateo-locale-aware.md`](../manual-de-uso/plataforma/formateo-locale-aware.md)
+
+- `formatDate`, `formatDateTime`, `formatTime`, `formatISODateKey`
+- `formatCurrency`, `formatAccountingCurrency`
+- `formatNumber`, `formatInteger`, `formatPercent`
+- `formatRelative`, `selectPlural`
+
+Reglas:
+
+- El locale default inicial es `es-CL`; `Locale` se reutiliza desde `src/lib/copy/types.ts` y acepta overrides BCP 47 para transiciones (`pt-BR`, etc.).
+- La timezone operacional sigue siendo `America/Santiago`; no confundir locale de presentación con timezone de payroll/finance.
+- Fechas date-only `YYYY-MM-DD` se formatean desde UTC noon para evitar drift de día.
+- Horas visibles sin fecha deben usar `formatTime`, no `toLocaleTimeString` directo.
+- Keys operacionales `YYYY-MM-DD` deben usar `formatISODateKey`, no `toISOString().slice(...)` ni `Intl.DateTimeFormat('en-CA')` inline.
+- Monedas visibles deben pasar por `formatCurrency`; `formatAccountingCurrency` es opt-in para negative accounting.
+- Los helpers aceptan tanto `formatDate(value, options, locale)` como el atajo `formatDate(value, locale)` cuando no se requieren opciones.
+- No usar `new Intl.*` ni `toLocaleString` / `toLocaleDateString` / `toLocaleTimeString` directo en surfaces visibles. ESLint rule `greenhouse/no-raw-locale-formatting` corre en modo `warn` sobre `src/views`, `src/components` y `src/app`; el baseline del portal queda en 0 warnings desde el sweep 2026-05-06.
 
 ### Coordinación con Kortex (Slice 4 — exploratorio)
 

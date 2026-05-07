@@ -20,7 +20,7 @@ import CustomTabList from '@core/components/mui/TabList'
 import { visuallyHiddenSx } from '@/components/greenhouse/accessibility'
 import EmptyState from '@/components/greenhouse/EmptyState'
 import SectionErrorBoundary from '@/components/greenhouse/SectionErrorBoundary'
-import { GH_AGENCY } from '@/config/greenhouse-nomenclature'
+import { GH_AGENCY } from '@/lib/copy/agency'
 import type {
   AgencyChartStatusItem,
   AgencyChartWeeklyPoint,
@@ -33,6 +33,9 @@ import AgencySpacesView from './AgencySpacesView'
 import AgencyCapacityView from './AgencyCapacityView'
 import AgencyIcoEngineView from './AgencyIcoEngineView'
 import type { AgencyIcoData } from './AgencyIcoEngineView'
+
+const TASK407_ARIA_SECCIONES_DEL_WORKSPACE_DE_AGENCIA = "Secciones del workspace de agencia"
+
 
 type AgencyTab = 'pulse' | 'spaces' | 'capacidad' | 'ico'
 
@@ -235,7 +238,7 @@ const AgencyWorkspace = ({ pulseKpis, pulseSpaces, pulseStatusMix, pulseWeeklyAc
           <CustomTabList
             onChange={handleChange}
             variant='scrollable'
-            aria-label='Secciones del workspace de agencia'
+            aria-label={TASK407_ARIA_SECCIONES_DEL_WORKSPACE_DE_AGENCIA}
           >
             {TAB_CONFIG.map(tab => (
               <Tab

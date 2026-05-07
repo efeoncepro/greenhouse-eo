@@ -18,6 +18,10 @@ import { motion } from '@/libs/FramerMotion'
 import useReducedMotion from '@/hooks/useReducedMotion'
 
 import type { HomePulseStripData, PulseKpiCard } from '@/lib/home/contract'
+import { formatCurrency as formatGreenhouseCurrency, formatNumber as formatGreenhouseNumber } from '@/lib/format'
+
+const TASK407_ARIA_TU_PULSO_DE_HOY = "Tu pulso de hoy"
+
 
 interface HomePulseStripProps {
   data: HomePulseStripData
@@ -53,12 +57,10 @@ const formatStats = (card: PulseKpiCard): string => {
 
   switch (card.unit) {
     case 'currency':
-      return new Intl.NumberFormat('es-CL', {
-        style: 'currency',
-        currency: card.currency ?? 'CLP',
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0
-      }).format(Math.round(card.value))
+      return formatGreenhouseCurrency(Math.round(card.value), card.currency ?? 'CLP', {
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 0
+}, 'es-CL')
     case 'percentage':
       return `${(Math.round(card.value * 10) / 10).toFixed(1)}%`
     case 'days':
@@ -68,7 +70,7 @@ const formatStats = (card: PulseKpiCard): string => {
     case 'count':
     case 'integer':
     default:
-      return new Intl.NumberFormat('es-CL').format(Math.round(card.value))
+      return formatGreenhouseNumber(Math.round(card.value), 'es-CL')
   }
 }
 
@@ -182,7 +184,7 @@ export const HomePulseStrip = ({ data }: HomePulseStripProps) => {
   const md = cardsToRender.length === 4 ? 3 : cardsToRender.length === 3 ? 4 : cardsToRender.length === 2 ? 6 : 12
 
   return (
-    <Grid container spacing={4} component='section' aria-label='Tu pulso de hoy' alignItems='stretch'>
+    <Grid container spacing={4} component='section' aria-label={TASK407_ARIA_TU_PULSO_DE_HOY} alignItems='stretch'>
       {cardsToRender.map((card, index) => (
         <Grid key={card.kpiId} size={{ xs: 12, sm: 6, md }}>
           <PulseCardSlot card={card} index={index} />

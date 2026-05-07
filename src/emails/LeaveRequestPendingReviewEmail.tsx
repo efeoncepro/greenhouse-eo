@@ -1,5 +1,9 @@
 import { Heading, Img, Section, Text } from '@react-email/components'
 
+import { getMicrocopy, type LeaveRequestPendingReviewEmailTemplateCopy } from '@/lib/copy'
+import { selectEmailIntlDateLocale, selectEmailTemplateCopy } from '@/lib/email/template-copy'
+import { formatDate as formatLocaleDate } from '@/lib/format'
+
 import EmailButton from './components/EmailButton'
 import EmailLayout from './components/EmailLayout'
 import { APP_URL, EMAIL_COLORS, EMAIL_FONTS } from './constants'
@@ -19,15 +23,12 @@ interface LeaveRequestPendingReviewEmailProps {
 }
 
 const formatDate = (dateStr: string, locale: 'es' | 'en') => {
-  try {
-    return new Intl.DateTimeFormat(locale === 'en' ? 'en-US' : 'es-CL', {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric'
-    }).format(new Date(dateStr + 'T12:00:00'))
-  } catch {
-    return dateStr
-  }
+  return formatLocaleDate(dateStr, {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+    fallback: dateStr
+  }, selectEmailIntlDateLocale(locale))
 }
 
 const summaryRow = (label: string, value: string, emphasis = false) => (
@@ -62,29 +63,19 @@ const summaryRow = (label: string, value: string, emphasis = false) => (
   </table>
 )
 
-const getTranslations = (locale: 'es' | 'en') => {
-  const isEn = locale === 'en'
-
-  return {
-    heading: isEn ? 'Leave request to review' : 'Solicitud de permiso por revisar',
-    greeting: (name: string) => isEn ? `Hi ${name},` : `Hola ${name},`,
-    body: (member: string, type: string, days: number) => isEn
-      ? `${member} submitted a ${type} request for ${days} ${days === 1 ? 'day' : 'days'} and it needs your review. Please approve or reject it from the leave management panel.`
-      : `${member} envió una solicitud de ${type} por ${days} ${days === 1 ? 'día' : 'días'} y necesita tu revisión. Aprueba o rechaza desde el panel de permisos.`,
-    cardMember: isEn ? 'Team member' : 'Colaborador',
-    cardType: isEn ? 'Type' : 'Tipo',
-    cardPeriod: isEn ? 'Period' : 'Periodo',
-    cardDays: isEn ? 'Days' : 'Días',
-    reasonHeader: isEn ? 'Request reason' : 'Motivo de la solicitud',
-    cta: isEn ? 'Review request' : 'Revisar solicitud',
-    fallback: isEn
-      ? 'If the button does not work, copy and paste this address into your browser:'
-      : 'Si el botón no funciona, copia y pega esta dirección en tu navegador:',
-    disclaimer: isEn
-      ? 'You are receiving this because you are a leave request reviewer in Greenhouse.'
-      : 'Recibes este correo porque eres revisor de solicitudes de permisos en Greenhouse.',
-    daysUnit: (days: number) => isEn ? (days === 1 ? 'day' : 'days') : (days === 1 ? 'día' : 'días')
-  }
+const LEGACY_EN_LEAVE_REQUEST_PENDING_REVIEW_EMAIL_COPY: LeaveRequestPendingReviewEmailTemplateCopy = {
+  heading: 'Leave request to review',
+  greeting: name => `Hi ${name},`,
+  body: (member, type, days) => `${member} submitted a ${type} request for ${days} ${days === 1 ? 'day' : 'days'} and it needs your review. Please approve or reject it from the leave management panel.`,
+  cardMember: 'Team member',
+  cardType: 'Type',
+  cardPeriod: 'Period',
+  cardDays: 'Days',
+  reasonHeader: 'Request reason',
+  cta: 'Review request',
+  fallback: 'If the button does not work, copy and paste this address into your browser:',
+  disclaimer: 'You are receiving this because you are a leave request reviewer in Greenhouse.',
+  daysUnit: days => days === 1 ? 'day' : 'days'
 }
 
 export default function LeaveRequestPendingReviewEmail({
@@ -97,7 +88,12 @@ export default function LeaveRequestPendingReviewEmail({
   reason = 'Debo realizar la sustentación de mi trabajo de fin de master.',
   locale = 'es'
 }: LeaveRequestPendingReviewEmailProps) {
-  const t = getTranslations(locale)
+  const t = selectEmailTemplateCopy(
+    locale,
+    getMicrocopy().emails.leave.requestPendingReview,
+    LEGACY_EN_LEAVE_REQUEST_PENDING_REVIEW_EMAIL_COPY
+  )
+
   const appUrl = `${APP_URL}/hr/leave`
 
   const periodDisplay = `${formatDate(startDate, locale)} – ${formatDate(endDate, locale)}`

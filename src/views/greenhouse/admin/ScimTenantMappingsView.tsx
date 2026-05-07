@@ -23,6 +23,11 @@ import TableRow from '@mui/material/TableRow'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+import { formatDateTime as formatGreenhouseDateTime } from '@/lib/format'
+
+const GREENHOUSE_COPY = getMicrocopy()
+
 type TenantMapping = {
   scim_tenant_mapping_id: string
   microsoft_tenant_id: string
@@ -43,11 +48,11 @@ type Props = {
 const formatDate = (value: string | null) => {
   if (!value) return '—'
 
-  return new Intl.DateTimeFormat('es-CL', {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-    timeZone: 'America/Santiago'
-  }).format(new Date(value))
+  return formatGreenhouseDateTime(new Date(value), {
+  dateStyle: 'medium',
+  timeStyle: 'short',
+  timeZone: 'America/Santiago'
+}, 'es-CL')
 }
 
 export default function ScimTenantMappingsView({ mappings: initialMappings }: Props) {
@@ -257,7 +262,7 @@ export default function ScimTenantMappingsView({ mappings: initialMappings }: Pr
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDialogOpen(false)}>Cancelar</Button>
+          <Button onClick={() => setDialogOpen(false)}>{GREENHOUSE_COPY.actions.cancel}</Button>
           <Button
             variant='contained'
             onClick={handleCreate}

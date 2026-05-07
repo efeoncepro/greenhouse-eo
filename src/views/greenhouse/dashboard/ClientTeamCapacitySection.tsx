@@ -9,7 +9,8 @@ import Typography from '@mui/material/Typography'
 import { alpha } from '@mui/material/styles'
 
 import { EmptyState, ExecutiveCardShell } from '@/components/greenhouse'
-import { GH_COLORS, GH_MESSAGES, GH_TEAM } from '@/config/greenhouse-nomenclature'
+import { GH_COLORS } from '@/config/greenhouse-nomenclature'
+import { GH_MESSAGES, GH_TEAM } from '@/lib/copy/client-portal'
 import type { GreenhouseDashboardData } from '@/types/greenhouse-dashboard'
 import { formatFte, formatHours, formatTeamMemberInitials } from '@views/greenhouse/dashboard/helpers'
 

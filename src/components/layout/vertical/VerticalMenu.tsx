@@ -4,6 +4,7 @@ import { useTheme } from '@mui/material/styles'
 
 import PerfectScrollbar from 'react-perfect-scrollbar'
 import { useSession } from 'next-auth/react'
+import { useLocale } from 'next-intl'
 
 import type { VerticalMenuContextProps } from '@menu/components/vertical-menu/Menu'
 import type { VerticalMenuDataType } from '@/types/menuTypes'
@@ -18,7 +19,7 @@ import menuItemStyles from '@core/styles/vertical/menuItemStyles'
 import menuSectionStyles from '@core/styles/vertical/menuSectionStyles'
 
 import { GenerateVerticalMenu } from '@/components/GenerateMenu'
-import { GH_AGENCY_NAV, GH_CLIENT_NAV, GH_FINANCE_NAV, GH_HR_NAV, GH_INTERNAL_NAV, GH_MY_NAV, GH_PEOPLE_NAV } from '@/config/greenhouse-nomenclature'
+import { getGreenhouseNavigationCopy } from '@/config/greenhouse-navigation-copy'
 import { ROLE_CODES } from '@/config/role-codes'
 import { resolveCapabilityModules } from '@/lib/capabilities/resolve-capabilities'
 
@@ -53,6 +54,7 @@ const NavLabel = ({ label, subtitle, show }: { label: string; subtitle: string; 
 const VerticalMenu = ({ scrollMenu }: Props) => {
   const theme = useTheme()
   const verticalNavOptions = useVerticalNav()
+  const locale = useLocale()
 
   const { isBreakpointReached, transitionDuration, isCollapsed, isHovered } = verticalNavOptions
   const { data: session } = useSession()
@@ -106,6 +108,16 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
 
   const showSub = !(isCollapsed && !isHovered)
   const ScrollWrapper = isBreakpointReached ? 'div' : PerfectScrollbar
+
+  const {
+    agency: GH_AGENCY_NAV,
+    client: GH_CLIENT_NAV,
+    finance: GH_FINANCE_NAV,
+    hr: GH_HR_NAV,
+    internal: GH_INTERNAL_NAV,
+    my: GH_MY_NAV,
+    people: GH_PEOPLE_NAV
+  } = getGreenhouseNavigationCopy(locale)
 
   // Helper to build NavLabel from nomenclature constants
   const nl = (nav: { label: string; subtitle: string }) =>

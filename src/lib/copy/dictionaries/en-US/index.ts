@@ -1,15 +1,26 @@
-/**
- * TASK-265 — en-US dictionary (seed)
- *
- * Stub locale para que TASK-266 (i18n activation) tenga un slot listo
- * sin reescribir la API pública. **NO está traducido**: re-exporta el
- * dictionary es-CL para garantizar paridad de claves type-safe.
- *
- * Cuando TASK-266 / TASK-430 active i18n real, esta carpeta se llena
- * con archivos por namespace traducidos. La importación pública (`getMicrocopy`)
- * no cambia.
- */
+import type { MicrocopyDictionary } from '../../types'
 
-import { esCL } from '../es-CL'
+import { emails as esCLEmails } from '../es-CL/emails'
+import { actions } from './actions'
+import { aria } from './aria'
+import { empty } from './empty'
+import { errors } from './errors'
+import { feedback } from './feedback'
+import { loading } from './loading'
+import { months } from './months'
+import { states } from './states'
+import { time } from './time'
 
-export const enUS = esCL
+export const enUS: MicrocopyDictionary = {
+  actions,
+  states,
+  loading,
+  empty,
+  months,
+  aria,
+  errors,
+  feedback,
+  time,
+  // Email localization is intentionally deferred to the email rollout child task.
+  emails: esCLEmails
+}

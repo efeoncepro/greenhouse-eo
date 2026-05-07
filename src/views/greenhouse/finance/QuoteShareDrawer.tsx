@@ -22,6 +22,11 @@ import {
 } from '@mui/material'
 
 import CustomChip from '@core/components/mui/Chip'
+import { getMicrocopy } from '@/lib/copy'
+import { formatDate as formatGreenhouseDate } from '@/lib/format'
+
+const GREENHOUSE_COPY = getMicrocopy()
+
 
 interface ShareLinkSummary {
   shortCode: string
@@ -78,11 +83,11 @@ const formatRelative = (iso: string | null): string => {
 const formatDate = (iso: string | null): string => {
   if (!iso) return '—'
 
-  return new Date(iso).toLocaleDateString('es-CL', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric'
-  })
+  return formatGreenhouseDate(new Date(iso), {
+  day: '2-digit',
+  month: '2-digit',
+  year: 'numeric'
+}, 'es-CL')
 }
 
 const formatBytes = (bytes: number): string => {
@@ -390,7 +395,7 @@ return
               {quotationNumber}
             </Typography>
           </Box>
-          <IconButton onClick={onClose} size='small' aria-label='Cerrar'>
+          <IconButton onClick={onClose} size='small' aria-label={GREENHOUSE_COPY.actions.close}>
             <i className='tabler-x' />
           </IconButton>
         </Box>

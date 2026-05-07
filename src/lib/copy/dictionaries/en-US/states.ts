@@ -1,0 +1,32 @@
+import type { StatesCopy } from '../../types'
+
+export const states: StatesCopy = {
+  active: 'Active',
+  inactive: 'Inactive',
+  pending: 'Pending',
+  approved: 'Approved',
+  rejected: 'Rejected',
+  draft: 'Draft',
+  inReview: 'In review',
+  completed: 'Completed',
+  cancelled: 'Cancelled',
+  archived: 'Archived',
+  scheduled: 'Scheduled',
+  paused: 'Paused',
+  expired: 'Expired',
+  blocked: 'Blocked',
+  enabled: 'Enabled',
+  disabled: 'Disabled',
+  online: 'Online',
+  offline: 'Offline',
+  available: 'Available',
+  unavailable: 'Unavailable',
+  paid: 'Paid',
+  unpaid: 'Unpaid',
+  partial: 'Partial',
+  overdue: 'Overdue',
+  failed: 'Failed',
+  succeeded: 'Succeeded',
+  inProgress: 'In progress',
+  notStarted: 'Not started'
+}

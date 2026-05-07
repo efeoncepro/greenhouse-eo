@@ -22,12 +22,20 @@ import Typography from '@mui/material/Typography'
 
 import { toast } from 'sonner'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import type {
   BeneficiaryPaymentProfileAuditAction,
   BeneficiaryPaymentProfileAuditEntry,
   BeneficiaryPaymentProfileSafe,
   BeneficiaryPaymentProfileStatus
 } from '@/types/payment-profiles'
+import { formatDate as formatGreenhouseDate, formatDateTime as formatGreenhouseDateTime } from '@/lib/format'
+
+const TASK407_ARIA_CARGANDO_AUDIT_LOG = "Cargando audit log"
+
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 const STATUS_LABEL: Record<BeneficiaryPaymentProfileStatus, string> = {
   draft: 'Borrador',
@@ -56,7 +64,7 @@ const AUDIT_ACTION_META: Record<
   updated: { icon: 'tabler-edit', label: 'Actualizado', color: 'info' },
   approved: { icon: 'tabler-check', label: 'Perfil aprobado', color: 'success' },
   superseded: { icon: 'tabler-replace', label: 'Reemplazado por nueva version', color: 'default' },
-  cancelled: { icon: 'tabler-circle-x', label: 'Cancelado', color: 'error' },
+  cancelled: { icon: 'tabler-circle-x', label: GREENHOUSE_COPY.states.cancelled, color: 'error' },
   revealed_sensitive: {
     icon: 'tabler-eye',
     label: 'Datos sensibles revelados',
@@ -64,7 +72,7 @@ const AUDIT_ACTION_META: Record<
   }
 }
 
-const formatTimestamp = (iso: string) => new Date(iso).toLocaleString('es-CL')
+const formatTimestamp = (iso: string) => formatGreenhouseDateTime(iso, 'es-CL')
 
 interface PaymentProfileCardProps {
   profile: BeneficiaryPaymentProfileSafe
@@ -231,11 +239,11 @@ const PaymentProfileCard = ({ profile, onActionComplete }: PaymentProfileCardPro
   const formatActiveFrom = (date: string | null) => {
     if (!date) return '—'
 
-    return new Date(date + 'T00:00:00').toLocaleDateString('es-CL', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric'
-    })
+    return formatGreenhouseDate(new Date(date + 'T00:00:00'), {
+  day: '2-digit',
+  month: 'short',
+  year: 'numeric'
+}, 'es-CL')
   }
 
   return (
@@ -500,7 +508,7 @@ const PaymentProfileCard = ({ profile, onActionComplete }: PaymentProfileCardPro
 
           {auditLoading ? (
             <Box sx={{ pt: 2 }}>
-              <LinearProgress aria-label='Cargando audit log' />
+              <LinearProgress aria-label={TASK407_ARIA_CARGANDO_AUDIT_LOG} />
             </Box>
           ) : audit.length === 0 ? (
             <Typography variant='body2' color='text.secondary' sx={{ pt: 2 }}>

@@ -23,16 +23,17 @@ import SecurityTab from './my-profile/tabs/SecurityTab'
 import SkillsCertificationsTab from './my-profile/tabs/SkillsCertificationsTab'
 import LegalProfileTab from './my-profile/tabs/LegalProfileTab'
 import MyPaymentProfileView from './MyPaymentProfileView'
+import { formatDate as formatGreenhouseDate } from '@/lib/format'
 
 // ── Helpers ──
 
 const formatDate = (dateStr: string): string => {
   try {
-    return new Date(dateStr).toLocaleDateString('es-CL', {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric'
-    })
+    return formatGreenhouseDate(new Date(dateStr), {
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric'
+}, 'es-CL')
   } catch {
     return dateStr
   }

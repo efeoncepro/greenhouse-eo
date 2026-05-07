@@ -16,10 +16,15 @@ import Stack from '@mui/material/Stack'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomChip from '@core/components/mui/Chip'
 
+import { formatCurrency, formatDateTime } from '@/lib/format'
 import { ADJUSTMENT_REASON_LABELS } from '@/lib/payroll/adjustments/reason-codes'
 import type { PayrollAdjustment, AdjustmentStatus } from '@/types/payroll-adjustments'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 interface Props {
   open: boolean
@@ -33,7 +38,7 @@ const STATUS_CHIP: Record<
   AdjustmentStatus,
   { label: string; color: 'success' | 'warning' | 'secondary' | 'error' }
 > = {
-  active: { label: 'Activo', color: 'success' },
+  active: { label: GREENHOUSE_COPY.states.active, color: 'success' },
   pending_approval: { label: 'Pendiente aprobacion', color: 'warning' },
   reverted: { label: 'Revertido', color: 'error' },
   superseded: { label: 'Reemplazado', color: 'secondary' }
@@ -59,13 +64,13 @@ const formatPayloadSummary = (kind: string, payload: Record<string, unknown>): s
   if (kind === 'fixed_deduction') {
     const a = Number((payload as { amount?: number }).amount)
 
-    return Number.isFinite(a) ? `$${a.toLocaleString('es-CL')}` : '—'
+    return Number.isFinite(a) ? formatCurrency(a, 'CLP') : '—'
   }
 
   if (kind === 'manual_override') {
     const v = Number((payload as { netClp?: number }).netClp)
 
-    return Number.isFinite(v) ? `Neto $${v.toLocaleString('es-CL')}` : '—'
+    return Number.isFinite(v) ? `Neto ${formatCurrency(v, 'CLP')}` : '—'
   }
 
   return ''
@@ -74,11 +79,7 @@ const formatPayloadSummary = (kind: string, payload: Record<string, unknown>): s
 const formatTimestamp = (iso: string | null): string => {
   if (!iso) return '—'
 
-  try {
-    return new Date(iso).toLocaleString('es-CL', { dateStyle: 'medium', timeStyle: 'short' })
-  } catch {
-    return iso
-  }
+  return formatDateTime(iso, { dateStyle: 'medium', timeStyle: 'short', fallback: iso })
 }
 
 const PayrollAdjustmentHistoryDrawer = ({
@@ -189,7 +190,7 @@ const PayrollAdjustmentHistoryDrawer = ({
           </Typography>
         )}
         <Box sx={{ flex: 1 }} />
-        <IconButton onClick={onClose} aria-label='Cerrar'>
+        <IconButton onClick={onClose} aria-label={GREENHOUSE_COPY.actions.close}>
           <i className='tabler-x' />
         </IconButton>
       </Box>

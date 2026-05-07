@@ -8,10 +8,13 @@ import type { ApexOptions } from 'apexcharts'
 
 import ExecutiveCardShell from '@/components/greenhouse/ExecutiveCardShell'
 import EmptyState from '@/components/greenhouse/EmptyState'
-import { GH_AGENCY, GH_COLORS } from '@/config/greenhouse-nomenclature'
+import { GH_COLORS } from '@/config/greenhouse-nomenclature'
+import { GH_AGENCY } from '@/lib/copy/agency'
 import type { SpaceMetricSnapshot, CscDistributionEntry } from '@/lib/ico-engine/read-metrics'
 import { CSC_PHASE_LABELS, type CscPhase } from '@/lib/ico-engine/metric-registry'
+import { getMicrocopy } from '@/lib/copy'
 
+const GREENHOUSE_COPY = getMicrocopy()
 const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'))
 
 // ─── Trend Types ────────────────────────────────────────────────────────────
@@ -43,7 +46,7 @@ const CSC_COLORS: Record<CscPhase, string> = {
 
 const TREND_LINE_COLORS = ['#023c70', '#024c8f', '#633f93', '#0375db', '#ff6500']
 
-const MONTH_SHORT = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
+const MONTH_SHORT = GREENHOUSE_COPY.months.short
 
 // ─── Chart Builders ─────────────────────────────────────────────────────────
 

@@ -15,6 +15,7 @@ import type {
   BillingExportAvailability,
   GcpBillingOverview
 } from '@/types/billing-export'
+import { formatNumber as formatGreenhouseNumber } from '@/lib/format'
 
 interface Props {
   overview: GcpBillingOverview
@@ -42,7 +43,7 @@ const formatCurrency = (value: number, currency: string): string => {
 
   const rounded = value >= 100 ? Math.round(value) : Math.round(value * 100) / 100
 
-  return `${currency} ${rounded.toLocaleString('en-US')}`
+  return `${currency} ${formatGreenhouseNumber(rounded, 'en-US')}`
 }
 
 const formatDate = (iso: string | null): string => {

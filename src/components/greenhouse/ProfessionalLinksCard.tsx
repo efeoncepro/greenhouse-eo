@@ -14,8 +14,15 @@ import Stack from '@mui/material/Stack'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import BrandLogo from '@/components/greenhouse/BrandLogo'
-import { GH_SKILLS_CERTS } from '@/config/greenhouse-nomenclature'
+import { GH_SKILLS_CERTS } from '@/lib/copy/workforce'
+
+const TASK407_ARIA_EDITAR_LINKS_PROFESIONALES = "Editar links profesionales"
+
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 type ProfessionalLinks = {
   linkedinUrl: string | null
@@ -105,9 +112,7 @@ const ProfessionalLinksCard = ({ links, editable, onSave }: ProfessionalLinksCar
           title={GH_SKILLS_CERTS.section_professional_links}
           action={
             <Stack direction='row' spacing={1}>
-              <Button size='small' onClick={handleCancel} disabled={saving}>
-                Cancelar
-              </Button>
+              <Button size='small' onClick={handleCancel} disabled={saving}>{GREENHOUSE_COPY.actions.cancel}</Button>
               <Button size='small' variant='contained' onClick={handleSave} disabled={saving}>
                 {saving ? 'Guardando...' : 'Guardar'}
               </Button>
@@ -150,7 +155,7 @@ const ProfessionalLinksCard = ({ links, editable, onSave }: ProfessionalLinksCar
         title={GH_SKILLS_CERTS.section_professional_links}
         action={
           editable ? (
-            <IconButton size='small' onClick={handleEdit} aria-label='Editar links profesionales'>
+            <IconButton size='small' onClick={handleEdit} aria-label={TASK407_ARIA_EDITAR_LINKS_PROFESIONALES}>
               <i className='tabler-pencil' />
             </IconButton>
           ) : undefined

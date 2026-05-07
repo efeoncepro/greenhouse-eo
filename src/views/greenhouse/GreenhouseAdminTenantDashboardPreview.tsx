@@ -10,7 +10,7 @@ import Chip from '@mui/material/Chip'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
-import { GH_INTERNAL_MESSAGES } from '@/config/greenhouse-nomenclature'
+import { GH_INTERNAL_MESSAGES } from '@/lib/copy/admin'
 import { buildTenantPublicId } from '@/lib/ids/greenhouse-ids'
 import { resolveCapabilityModules } from '@/lib/capabilities/resolve-capabilities'
 import type { GreenhouseDashboardData } from '@/types/greenhouse-dashboard'

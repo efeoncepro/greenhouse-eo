@@ -15,6 +15,13 @@ import OptionMenu from '@core/components/option-menu'
 import type { ThemeColor } from '@core/types'
 
 import type { CalendarEventKind, HomeCalendarEvent, HomeCalendarRailData } from '@/lib/home/contract'
+import { getMicrocopy } from '@/lib/copy'
+import { formatDate as formatGreenhouseDate } from '@/lib/format'
+
+const TASK407_ARIA_PROXIMOS_EVENTOS = "Próximos eventos"
+
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 interface HomeCalendarRailProps {
   data: HomeCalendarRailData
@@ -30,7 +37,7 @@ const KIND_META: Record<CalendarEventKind, { icon: string; color: ThemeColor }> 
   holiday: { icon: 'tabler-confetti', color: 'success' }
 }
 
-const MONTH_SHORT = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
+const MONTH_SHORT = GREENHOUSE_COPY.months.short
 
 const formatDayBlock = (iso: string): { day: string; month: string } => {
   const date = new Date(iso)
@@ -54,7 +61,9 @@ const formatRelative = (iso: string): string => {
   if (diffDays > 1 && diffDays < 7) return `en ${diffDays} días`
   if (diffDays < 0) return `hace ${Math.abs(diffDays)} d`
 
-  return date.toLocaleDateString('es-CL', { dateStyle: 'medium' })
+  return formatGreenhouseDate(date, {
+  dateStyle: 'medium'
+}, 'es-CL')
 }
 
 const EventRow = ({ event }: { event: HomeCalendarEvent }) => {
@@ -129,7 +138,7 @@ export const HomeCalendarRail = ({ data }: HomeCalendarRailProps) => {
   if (!data || data.events.length === 0) return null
 
   return (
-    <Card component='aside' aria-label='Próximos eventos'>
+    <Card component='aside' aria-label={TASK407_ARIA_PROXIMOS_EVENTOS}>
       <CardHeader
         avatar={<i className='tabler-calendar-event text-xl' />}
         title='Próximos eventos'

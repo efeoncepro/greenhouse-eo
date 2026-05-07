@@ -30,11 +30,18 @@ import { useTheme } from '@mui/material/styles'
 
 import type { ApexOptions } from 'apexcharts'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import type { PersonDetail } from '@/types/people'
 import type { PayrollEntry } from '@/types/payroll'
 import { formatCurrency, regimeLabel, formatPeriodIdLabel } from '@views/greenhouse/payroll/helpers'
 import { downloadPayrollReceiptPdf } from '@/lib/payroll/download-payroll-receipt'
 import PersonFinanceTab from './PersonFinanceTab'
+
+const TASK407_ARIA_IR_AL_MODULO_DE_NOMINA = "Ir al modulo de nomina"
+
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'))
 
@@ -173,9 +180,7 @@ const PersonEconomyTab = ({ detail, onEditCompensation }: Props) => {
                       variant='tonal'
                       startIcon={<i className='tabler-edit' />}
                       onClick={onEditCompensation}
-                    >
-                      Editar
-                    </Button>
+                    >{GREENHOUSE_COPY.actions.edit}</Button>
                   )
                 : undefined
             }
@@ -347,7 +352,7 @@ const PersonEconomyTab = ({ detail, onEditCompensation }: Props) => {
                         size='small'
                         color='secondary'
                         startIcon={<i className='tabler-external-link' aria-hidden='true' />}
-                        aria-label='Ir al modulo de nomina'
+                        aria-label={TASK407_ARIA_IR_AL_MODULO_DE_NOMINA}
                       >
                         Ver en modulo de nomina
                       </Button>

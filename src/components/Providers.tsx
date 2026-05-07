@@ -2,6 +2,7 @@
 import type { Session } from 'next-auth'
 
 import { Toaster } from 'sonner'
+import { NextIntlClientProvider } from 'next-intl'
 
 import type { ChildrenType, Direction } from '@core/types'
 
@@ -47,42 +48,44 @@ const Providers = async (props: Props) => {
   }
 
   return (
-    <AuthSessionProvider session={session}>
-      <OperatingEntityProvider operatingEntity={operatingEntity}>
-        <VerticalNavProvider>
-          <SettingsProvider settingsCookie={settingsCookie} mode={mode}>
-            <ThemeProvider direction={direction} systemMode={systemMode}>
-              {/*
-                TASK-513: react-query QueryClientProvider envuelve la
-                aplicacion. Cualquier hook que use useQuery / useMutation
-                pasa por aqui. Devtools cargan solo en development.
-              */}
-              <QueryClientProvider>
-                {children}
-              </QueryClientProvider>
-              {/*
-                TASK-512: sonner Toaster.
-                - position='top-right' preserves the placement convention
-                  used since react-toastify (consumers never override it).
-                - richColors tints success/error/warning/info backgrounds,
-                  matching the semantic palette used across TASK-505 / 615.
-                - closeButton ships the dismiss affordance per spec.
-                - theme='system' lets sonner pick light/dark from the
-                  prefers-color-scheme media query, aligned with the rest
-                  of the portal's CSS variables.
-              */}
-              <Toaster
-                position='top-right'
-                richColors
-                closeButton
-                theme='system'
-                duration={4000}
-              />
-            </ThemeProvider>
-          </SettingsProvider>
-        </VerticalNavProvider>
-      </OperatingEntityProvider>
-    </AuthSessionProvider>
+    <NextIntlClientProvider>
+      <AuthSessionProvider session={session}>
+        <OperatingEntityProvider operatingEntity={operatingEntity}>
+          <VerticalNavProvider>
+            <SettingsProvider settingsCookie={settingsCookie} mode={mode}>
+              <ThemeProvider direction={direction} systemMode={systemMode}>
+                {/*
+                  TASK-513: react-query QueryClientProvider envuelve la
+                  aplicacion. Cualquier hook que use useQuery / useMutation
+                  pasa por aqui. Devtools cargan solo en development.
+                */}
+                <QueryClientProvider>
+                  {children}
+                </QueryClientProvider>
+                {/*
+                  TASK-512: sonner Toaster.
+                  - position='top-right' preserves the placement convention
+                    used since react-toastify (consumers never override it).
+                  - richColors tints success/error/warning/info backgrounds,
+                    matching the semantic palette used across TASK-505 / 615.
+                  - closeButton ships the dismiss affordance per spec.
+                  - theme='system' lets sonner pick light/dark from the
+                    prefers-color-scheme media query, aligned with the rest
+                    of the portal's CSS variables.
+                */}
+                <Toaster
+                  position='top-right'
+                  richColors
+                  closeButton
+                  theme='system'
+                  duration={4000}
+                />
+              </ThemeProvider>
+            </SettingsProvider>
+          </VerticalNavProvider>
+        </OperatingEntityProvider>
+      </AuthSessionProvider>
+    </NextIntlClientProvider>
   )
 }
 

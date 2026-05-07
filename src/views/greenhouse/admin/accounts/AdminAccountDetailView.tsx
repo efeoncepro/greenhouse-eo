@@ -23,11 +23,19 @@ import MenuItem from '@mui/material/MenuItem'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+import { formatDateTime as formatGreenhouseDateTime } from '@/lib/format'
+
 import CustomAvatar from '@core/components/mui/Avatar'
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 
 import type { OrganizationDetailData, OrganizationSpace } from '@/views/greenhouse/organizations/types'
+
+const TASK407_ARIA_NAVEGACION_DE_CUENTA = "Navegacion de cuenta"
+
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 // ── Helpers ──────────────────────────────────────────────────────────────
 
@@ -62,17 +70,11 @@ const SPACE_TYPE_LABEL: Record<string, string> = {
   internal_space: 'Space interno'
 }
 
-const dateFormatter = new Intl.DateTimeFormat('es-CL', {
-  dateStyle: 'medium',
-  timeStyle: 'short',
-  timeZone: 'America/Santiago'
-})
-
 const formatDate = (iso: string | null) => {
   if (!iso) return null
 
   try {
-    return dateFormatter.format(new Date(iso))
+    return formatGreenhouseDateTime(iso, { dateStyle: 'medium', timeStyle: 'short' })
   } catch {
     return '\u2014'
   }
@@ -564,9 +566,7 @@ const AdminAccountDetailView = ({ organizationId }: Props) => {
         </Stack>
       </DialogContent>
       <DialogActions>
-        <Button onClick={() => setCreateDialogOpen(false)} color='secondary'>
-          Cancelar
-        </Button>
+        <Button onClick={() => setCreateDialogOpen(false)} color='secondary'>{GREENHOUSE_COPY.actions.cancel}</Button>
         <Button
           variant='contained'
           onClick={handleCreateSpace}
@@ -586,7 +586,7 @@ const AdminAccountDetailView = ({ organizationId }: Props) => {
       <Grid container spacing={6}>
         {/* Breadcrumbs */}
         <Grid size={{ xs: 12 }}>
-          <Breadcrumbs aria-label='Navegacion de cuenta'>
+          <Breadcrumbs aria-label={TASK407_ARIA_NAVEGACION_DE_CUENTA}>
             <Typography
               component={Link}
               href='/admin'

@@ -1,5 +1,8 @@
 import { Heading, Section, Text } from '@react-email/components'
 
+import { getMicrocopy } from '@/lib/copy'
+import { formatDate } from '@/lib/format'
+
 import EmailButton from './components/EmailButton'
 import EmailLayout from './components/EmailLayout'
 import { APP_URL, EMAIL_COLORS, EMAIL_FONTS } from './constants'
@@ -30,45 +33,15 @@ export interface BeneficiaryPaymentProfileChangedEmailProps {
   requestedByMember: boolean
 }
 
-const KIND_HEADINGS: Record<PaymentProfileEmailKind, string> = {
-  created: 'Solicitud de cambio registrada',
-  approved: 'Tu cuenta de pago fue aprobada',
-  superseded: 'Tu cuenta de pago fue reemplazada',
-  cancelled: 'Tu solicitud de cambio fue cancelada'
-}
-
-const KIND_PREVIEWS: Record<PaymentProfileEmailKind, string> = {
-  created: 'Tu solicitud está en revisión por finance',
-  approved: 'Tu cuenta de pago quedó activa',
-  superseded: 'Tu cuenta activa fue reemplazada por una nueva',
-  cancelled: 'Tu solicitud fue cancelada'
-}
-
-const KIND_INTROS: Record<PaymentProfileEmailKind, (firstName: string, requestedByMember: boolean) => string> = {
-  created: (firstName, requestedByMember) =>
-    requestedByMember
-      ? `Hola ${firstName}, registramos tu solicitud de cambio de cuenta de pago. Finance la revisará en las próximas horas y recibirás otro mail cuando quede activa.`
-      : `Hola ${firstName}, finance registró una nueva cuenta de pago para ti. Verifica que los datos sean correctos. Si no reconoces este cambio, responde este mail al equipo de finance de inmediato.`,
-  approved: (firstName) =>
-    `Hola ${firstName}, tu cuenta de pago quedó activa. Los próximos pagos se ejecutarán a esta cuenta.`,
-  superseded: (firstName) =>
-    `Hola ${firstName}, tu cuenta de pago activa fue reemplazada por una nueva. La cuenta anterior queda fuera de uso.`,
-  cancelled: (firstName) =>
-    `Hola ${firstName}, tu solicitud de cambio de cuenta de pago fue cancelada. Si no fuiste tú, contacta a finance.`
-}
-
 const formatDateLabel = (iso: string | null): string => {
-  if (!iso) return 'Sin fecha registrada'
+  if (!iso) return getMicrocopy().emails.beneficiaryPaymentProfileChanged.missingDate
 
-  try {
-    return new Date(iso).toLocaleDateString('es-CL', {
-      day: '2-digit',
-      month: 'long',
-      year: 'numeric'
-    })
-  } catch {
-    return iso
-  }
+  return formatDate(iso, {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+    fallback: iso
+  })
 }
 
 const summaryRow = (label: string, value: string, emphasis = false) => (
@@ -124,10 +97,11 @@ export default function BeneficiaryPaymentProfileChangedEmail({
   reason = null,
   requestedByMember = false
 }: BeneficiaryPaymentProfileChangedEmailProps) {
-  const heading = KIND_HEADINGS[kind]
-  const preview = KIND_PREVIEWS[kind]
+  const t = getMicrocopy().emails.beneficiaryPaymentProfileChanged
+  const heading = t.heading[kind]
+  const preview = t.previewText[kind]
   const firstName = fullName.split(' ')[0] || fullName
-  const intro = KIND_INTROS[kind](firstName, requestedByMember)
+  const intro = t.intro[kind](firstName, requestedByMember)
   const appUrl = `${APP_URL}/my/payment-profile`
 
   return (
@@ -165,16 +139,16 @@ export default function BeneficiaryPaymentProfileChangedEmail({
           margin: '0 0 24px'
         }}
       >
-        {providerLabel ? summaryRow('Proveedor', providerLabel) : null}
-        {bankName ? summaryRow('Banco', bankName) : null}
-        {summaryRow('Cuenta', accountNumberMasked ?? '—', true)}
-        {summaryRow('Moneda', currency)}
-        {summaryRow(kind === 'cancelled' ? 'Fecha de cancelación' : 'Fecha efectiva', formatDateLabel(effectiveAt))}
-        {reason ? summaryRow('Motivo', reason) : null}
+        {providerLabel ? summaryRow(t.providerLabel, providerLabel) : null}
+        {bankName ? summaryRow(t.bankLabel, bankName) : null}
+        {summaryRow(t.accountLabel, accountNumberMasked ?? t.maskedFallback, true)}
+        {summaryRow(t.currencyLabel, currency)}
+        {summaryRow(kind === 'cancelled' ? t.cancelledDateLabel : t.effectiveDateLabel, formatDateLabel(effectiveAt))}
+        {reason ? summaryRow(t.reasonLabel, reason) : null}
       </Section>
 
       <Section style={{ textAlign: 'center' as const, margin: '0 0 24px' }}>
-        <EmailButton href={appUrl}>Ver mi cuenta de pago</EmailButton>
+        <EmailButton href={appUrl}>{t.cta}</EmailButton>
       </Section>
 
       <Text
@@ -187,7 +161,7 @@ export default function BeneficiaryPaymentProfileChangedEmail({
           paddingTop: '20px'
         }}
       >
-        Por seguridad, NUNCA mostramos el número completo de tu cuenta. Si necesitas verificar el dato, ingresa al portal con tu sesión.
+        {t.securityNotice}
       </Text>
 
       {!requestedByMember && kind !== 'cancelled' && (
@@ -199,7 +173,7 @@ export default function BeneficiaryPaymentProfileChangedEmail({
             margin: '0 0 8px'
           }}
         >
-          Si no reconoces este cambio, responde este mail o contacta a finance de inmediato.
+          {t.unrecognizedChangeNotice}
         </Text>
       )}
 
@@ -211,7 +185,7 @@ export default function BeneficiaryPaymentProfileChangedEmail({
           margin: '0'
         }}
       >
-        Greenhouse by Efeonce Group SpA · Este es un correo automático enviado desde {APP_URL}
+        {t.automatedFooterPrefix}{APP_URL}
       </Text>
     </EmailLayout>
   )

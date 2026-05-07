@@ -26,7 +26,9 @@ import CustomTextField from '@core/components/mui/TextField'
 import tableStyles from '@core/styles/table.module.css'
 import AppRecharts from '@/libs/styles/AppRecharts'
 import { ResponsiveContainer, LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from '@/libs/Recharts'
+import { getMicrocopy } from '@/lib/copy'
 
+const GREENHOUSE_COPY = getMicrocopy()
 // ── Types ──
 
 interface TrendPoint {
@@ -59,7 +61,7 @@ interface AnalyticsData {
 
 // ── Helpers ──
 
-const MONTHS = ['', 'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
+const MONTHS = ['', ...GREENHOUSE_COPY.months.short]
 
 const metricColor = (value: number | null, greenMin: number): 'success' | 'warning' | 'error' => {
   if (value === null) return 'secondary' as unknown as 'error'

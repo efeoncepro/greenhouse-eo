@@ -25,6 +25,8 @@ import TableRow from '@mui/material/TableRow'
 import Tabs from '@mui/material/Tabs'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomChip from '@core/components/mui/Chip'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 
@@ -46,7 +48,9 @@ import {
   canManageFinanceQuotes,
   isEditableFinanceQuotationStatus
 } from '@/lib/finance/quotation-access'
+import { formatCurrency as formatGreenhouseCurrency } from '@/lib/format'
 
+const GREENHOUSE_COPY = getMicrocopy()
 // ── Types ──
 
 interface QuoteDetail {
@@ -121,7 +125,7 @@ interface QuoteViewerContext {
 // ── Config ──
 
 const STATUS_CONFIG: Record<string, { label: string; color: 'success' | 'info' | 'error' | 'primary' | 'secondary' | 'warning' }> = {
-  draft: { label: 'Borrador', color: 'secondary' },
+  draft: { label: GREENHOUSE_COPY.states.draft, color: 'secondary' },
   pending_approval: { label: 'En aprobación', color: 'warning' },
   approval_rejected: { label: 'Revisión requerida', color: 'error' },
   issued: { label: 'Emitida', color: 'info' },
@@ -142,7 +146,9 @@ const SOURCE_CHIP_CONFIG: Record<string, { label: string; color: 'info' | 'warni
 // ── Helpers ──
 
 const formatCLP = (amount: number) =>
-  new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(amount)
+  formatGreenhouseCurrency(amount, 'CLP', {
+  maximumFractionDigits: 0
+}, 'es-CL')
 
 const formatDate = (date: string | null) => {
   if (!date) return '—'
@@ -850,9 +856,7 @@ const QuoteDetailView = () => {
                   /edit instead of cutting.
                 */
                 onClick={() => morphRouter.push(`/finance/quotes/${quoteId}/edit`)}
-              >
-                Editar
-              </Button>
+              >{GREENHOUSE_COPY.actions.edit}</Button>
             )}
             {canManageCurrentQuote && (
               <Button

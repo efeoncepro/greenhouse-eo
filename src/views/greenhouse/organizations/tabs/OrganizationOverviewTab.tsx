@@ -24,6 +24,7 @@ import CustomChip from '@core/components/mui/Chip'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 
 import type { OrganizationDetailData } from '../types'
+import { formatCurrency as formatGreenhouseCurrency } from '@/lib/format'
 
 // ── Types for Snapshot ──
 
@@ -66,7 +67,9 @@ interface ExecutiveSnapshot {
 // ── Helpers ──
 
 const formatCLP = (amount: number): string =>
-  new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(amount)
+  formatGreenhouseCurrency(amount, 'CLP', {
+  maximumFractionDigits: 0
+}, 'es-CL')
 
 const marginColor = (value: number | null): 'success' | 'warning' | 'error' | 'secondary' => {
   if (value == null) return 'secondary'

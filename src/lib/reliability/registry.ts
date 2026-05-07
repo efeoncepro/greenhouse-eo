@@ -357,6 +357,36 @@ export const STATIC_RELIABILITY_REGISTRY: ReliabilityModuleDefinition[] = [
     ],
     expectedSignalKinds: ['incident', 'drift', 'data_quality'],
     incidentDomainTag: 'identity'
+  },
+  {
+    moduleKey: 'commercial',
+    label: 'Commercial',
+    description:
+      'Engagement instance sync (HubSpot p_services 0-162) + cleanup de seed legacy + resolución de huérfanos sin organization. TASK-807 formalizará subsystem rollup completo.',
+    domain: 'commercial',
+    routes: [
+      { path: '/agency/operations', label: 'Operaciones agency' }
+    ],
+    apis: [
+      { path: '/api/webhooks/hubspot-services', label: 'HubSpot services webhook (TASK-813)' }
+    ],
+    dependencies: [
+      'greenhouse_core.services',
+      'greenhouse_core.organizations',
+      'greenhouse_core.spaces',
+      'greenhouse_sync.outbox_events',
+      'HubSpot p_services custom object (0-162)',
+      'services/hubspot_greenhouse_integration (Cloud Run bridge)'
+    ],
+    smokeTests: [],
+    filesOwned: [
+      'src/lib/services/**',
+      'src/lib/webhooks/handlers/hubspot-services.ts',
+      'src/app/api/webhooks/hubspot-services/**',
+      'scripts/services/**'
+    ],
+    expectedSignalKinds: ['drift', 'lag'],
+    incidentDomainTag: 'integrations.hubspot'
   }
 ]
 

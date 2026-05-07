@@ -39,6 +39,9 @@ import type {
   PaymentOrderState,
   PaymentOrderWithLines
 } from '@/types/payment-orders'
+import { formatCurrency as formatGreenhouseCurrency, formatDate as formatGreenhouseDate, formatDateTime as formatGreenhouseDateTime } from '@/lib/format'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 // TASK-765 Slice 1: estados pre-paid donde el operator todavia puede asignar
 // la cuenta origen. Refleja PATCHABLE_STATES del API route.
@@ -66,12 +69,12 @@ const BLOCKED_REASON_BODY: Record<PaymentOrderBlockedReason, string> = {
 
 const formatBlockedAt = (iso: string) => {
   try {
-    return new Date(iso).toLocaleString('es-CL', {
-      day: '2-digit',
-      month: 'short',
-      hour: '2-digit',
-      minute: '2-digit'
-    })
+    return formatGreenhouseDateTime(new Date(iso), {
+  day: '2-digit',
+  month: 'short',
+  hour: '2-digit',
+  minute: '2-digit'
+}, 'es-CL')
   } catch {
     return iso
   }
@@ -133,16 +136,18 @@ const stateColors: Record<PaymentOrderState, 'default' | 'primary' | 'secondary'
 }
 
 const formatAmount = (amount: number, currency: string) =>
-  new Intl.NumberFormat('es-CL', {
-    style: 'currency',
-    currency,
-    maximumFractionDigits: currency === 'USD' ? 2 : 0
-  }).format(amount)
+  formatGreenhouseCurrency(amount, currency, {
+  maximumFractionDigits: currency === 'USD' ? 2 : 0
+}, 'es-CL')
 
 const formatDate = (d: string | null) => {
   if (!d) return '—'
 
-  return new Date(d).toLocaleDateString('es-CL', { day: '2-digit', month: 'short', year: 'numeric' })
+  return formatGreenhouseDate(new Date(d), {
+  day: '2-digit',
+  month: 'short',
+  year: 'numeric'
+}, 'es-CL')
 }
 
 const OrderDetailDrawer = ({ order, loading, onClose, onActionComplete }: OrderDetailDrawerProps) => {
@@ -657,9 +662,7 @@ const OrderDetailDrawer = ({ order, loading, onClose, onActionComplete }: OrderD
                 </Tooltip>
               ) : null}
               {['draft', 'pending_approval', 'approved', 'scheduled'].includes(order.state) ? (
-                <Button variant='outlined' color='error' onClick={handleCancel} disabled={actionInFlight}>
-                  Cancelar
-                </Button>
+                <Button variant='outlined' color='error' onClick={handleCancel} disabled={actionInFlight}>{GREENHOUSE_COPY.actions.cancel}</Button>
               ) : null}
             </Stack>
           </Stack>
@@ -739,9 +742,7 @@ const OrderDetailDrawer = ({ order, loading, onClose, onActionComplete }: OrderD
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setPickerOpen(false)} disabled={actionInFlight}>
-            Cancelar
-          </Button>
+          <Button onClick={() => setPickerOpen(false)} disabled={actionInFlight}>{GREENHOUSE_COPY.actions.cancel}</Button>
           <Button
             variant='contained'
             onClick={handleAssignSourceAccount}
@@ -780,7 +781,7 @@ const TimelineEntry = ({ icon, label, detail, timestamp }: { icon: string; label
         {detail}
       </Typography>
       <Typography variant='caption' color='text.secondary'>
-        {new Date(timestamp).toLocaleString('es-CL')}
+        {formatGreenhouseDateTime(timestamp, 'es-CL')}
       </Typography>
     </Stack>
   </Stack>

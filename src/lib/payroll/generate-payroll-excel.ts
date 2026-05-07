@@ -3,6 +3,7 @@ import 'server-only'
 import ExcelJS from 'exceljs'
 
 import type { PayrollEntry, PayrollPeriod } from '@/types/payroll'
+import { formatCurrency as formatLocaleCurrency } from '@/lib/format'
 
 import { getPayrollEntries } from '@/lib/payroll/get-payroll-entries'
 import { getActiveAdjustmentsForPeriod } from '@/lib/payroll/adjustments/apply-adjustment'
@@ -25,11 +26,12 @@ const MONTH_NAMES = [
 ]
 
 const formatCurrency = (value: number | null, currency: string): string => {
-  if (value === null) return '—'
-
-  return currency === 'CLP'
-    ? `$${Math.round(value).toLocaleString('es-CL')}`
-    : `US$${value.toFixed(2)}`
+  return formatLocaleCurrency(
+    value,
+    currency as 'CLP' | 'USD',
+    currency === 'USD' ? { currencySymbol: 'US$' } : {},
+    currency === 'USD' ? 'en-US' : undefined
+  )
 }
 
 const formatKpiSourceLabel = (source: PayrollEntry['kpiDataSource']) => {
@@ -86,7 +88,7 @@ const buildResumenSheet = (
     ['Período', `${monthName} ${period.year}`],
     ['ID Período', period.periodId],
     ['Estado', period.status],
-    ['UF', period.ufValue != null ? `$${period.ufValue.toLocaleString('es-CL')}` : 'N/A'],
+    ['UF', period.ufValue != null ? formatLocaleCurrency(period.ufValue, 'CLP') : 'N/A'],
     ['Calculado', period.calculatedAt ?? '—'],
     ['Aprobado', period.approvedAt ?? '—'],
     ['Exportado', period.exportedAt ?? '—']

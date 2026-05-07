@@ -9,6 +9,7 @@ import { alpha, useTheme } from '@mui/material/styles'
 
 import { HR_LEGAL_COPY } from './copy'
 import type { AuditEventDto } from './types'
+import { formatDate as formatGreenhouseDate } from '@/lib/format'
 
 interface HrAuditLogProps {
   memberId: string
@@ -50,7 +51,11 @@ const formatRelative = (iso: string): string => {
 
     if (days < 30) return `hace ${days}d`
 
-    return new Date(iso).toLocaleDateString('es-CL', { day: 'numeric', month: 'short', year: 'numeric' })
+    return formatGreenhouseDate(new Date(iso), {
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric'
+}, 'es-CL')
   } catch {
     return ''
   }

@@ -3,6 +3,12 @@
 import { CapacityOverviewCard } from '@/components/greenhouse'
 import type { GreenhouseDashboardData } from '@/types/greenhouse-dashboard'
 
+const TASK407_COPY_PERSONAS_ASIGNADAS = "Personas asignadas"
+const TASK407_COPY_HORAS_MENSUALES = "Horas mensuales"
+const TASK407_COPY_ASIGNACION_PROMEDIO = "Asignacion promedio"
+const TASK407_COPY_COBERTURA_ACTUAL = "Cobertura actual"
+
+
 type AccountTeamSectionProps = {
   data: GreenhouseDashboardData
 }
@@ -26,17 +32,17 @@ const AccountTeamSection = ({ data }: AccountTeamSectionProps) => {
       coverageTone={assignedPeopleCount === 0 ? 'warning' : 'success'}
       summaryItems={[
         {
-          label: 'Personas asignadas',
+          label: TASK407_COPY_PERSONAS_ASIGNADAS,
           value: String(assignedPeopleCount),
           detail: 'Roster visible del space'
         },
         {
-          label: 'Horas mensuales',
+          label: TASK407_COPY_HORAS_MENSUALES,
           value: String(data.accountTeam.totalMonthlyHours),
           detail: 'Capacidad mensual comprometida'
         },
         {
-          label: 'Asignacion promedio',
+          label: TASK407_COPY_ASIGNACION_PROMEDIO,
           value: data.accountTeam.averageAllocationPct !== null ? `${data.accountTeam.averageAllocationPct}%` : 'Pendiente',
           detail: 'Carga media visible del equipo'
         }
@@ -55,22 +61,22 @@ const AccountTeamSection = ({ data }: AccountTeamSectionProps) => {
       insightSubtitle='Resumen ejecutivo del staffing visible mientras madura el modelo formal de assignments y formatos compactos.'
       insightItems={[
         {
-          label: 'Personas asignadas',
+          label: TASK407_COPY_PERSONAS_ASIGNADAS,
           value: String(assignedPeopleCount),
           detail: 'Miembros visibles para la cuenta en el dashboard.'
         },
         {
-          label: 'Horas mensuales',
+          label: TASK407_COPY_HORAS_MENSUALES,
           value: String(data.accountTeam.totalMonthlyHours),
           detail: 'Suma de capacidad mensual hoy visible sobre la cuenta.'
         },
         {
-          label: 'Asignacion promedio',
+          label: TASK407_COPY_ASIGNACION_PROMEDIO,
           value: data.accountTeam.averageAllocationPct !== null ? `${data.accountTeam.averageAllocationPct}%` : 'Pendiente',
           detail: 'Promedio simple de allocation del roster visible.'
         },
         {
-          label: 'Cobertura actual',
+          label: TASK407_COPY_COBERTURA_ACTUAL,
           value: assignedPeopleCount > 0 ? 'Healthy' : 'Pendiente',
           detail: 'Lectura simple mientras madura el modelo formal de assignments.'
         }

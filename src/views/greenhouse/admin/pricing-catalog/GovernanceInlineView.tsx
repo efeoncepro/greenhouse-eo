@@ -27,6 +27,12 @@ import Typography from '@mui/material/Typography'
 
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
+import { formatNumber } from '@/lib/format'
+import { getMicrocopy } from '@/lib/copy'
+
+const GREENHOUSE_COPY = getMicrocopy()
+const TASK407_ARIA_VOLVER_AL_CATALOGO = "Volver al catálogo"
+
 
 // ── Types ──────────────────────────────────────────────────────────────
 
@@ -96,7 +102,7 @@ type GovernanceType =
 // ── Helpers ────────────────────────────────────────────────────────────
 
 const formatPct = (value: number): string =>
-  `${new Intl.NumberFormat('es-CL', { maximumFractionDigits: 1 }).format(value)}%`
+  `${formatNumber(value, { maximumFractionDigits: 1 })}%`
 
 // ── Inline editable cell ───────────────────────────────────────────────
 
@@ -163,7 +169,7 @@ const InlinePctCell = ({ value, onSave, disabled, ariaLabel }: InlinePctCellProp
           sx={{ width: 96 }}
           aria-label={ariaLabel}
         />
-        <IconButton size='small' onClick={() => void commit()} disabled={saving} aria-label='Guardar'>
+        <IconButton size='small' onClick={() => void commit()} disabled={saving} aria-label={GREENHOUSE_COPY.actions.save}>
           {saving ? <CircularProgress size={14} /> : <i className='tabler-check' style={{ fontSize: 16 }} />}
         </IconButton>
         <IconButton
@@ -173,7 +179,7 @@ const InlinePctCell = ({ value, onSave, disabled, ariaLabel }: InlinePctCellProp
             setEditing(false)
           }}
           disabled={saving}
-          aria-label='Cancelar'
+          aria-label={GREENHOUSE_COPY.actions.cancel}
         >
           <i className='tabler-x' style={{ fontSize: 16 }} />
         </IconButton>
@@ -295,7 +301,7 @@ const GovernanceInlineView = () => {
       <Grid size={{ xs: 12 }}>
         <Stack direction='row' spacing={2} alignItems='center' sx={{ mb: 1 }}>
           <Tooltip title='Volver al catálogo'>
-            <IconButton component='a' href='/admin/pricing-catalog' size='small' aria-label='Volver al catálogo'>
+            <IconButton component='a' href='/admin/pricing-catalog' size='small' aria-label={TASK407_ARIA_VOLVER_AL_CATALOGO}>
               <i className='tabler-arrow-left' />
             </IconButton>
           </Tooltip>

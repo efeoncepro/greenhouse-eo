@@ -12,7 +12,12 @@ import type { SxProps, Theme } from '@mui/material/styles'
 import { useTheme } from '@mui/material/styles'
 
 import CustomTextField from '@core/components/mui/TextField'
+import { getMicrocopy } from '@/lib/copy'
 
+const TASK407_ARIA_NAVEGACION_DE_PERIODO = "Navegación de período"
+
+
+const GREENHOUSE_COPY = getMicrocopy()
 // ── Types ──
 
 export interface PeriodValue {
@@ -47,10 +52,7 @@ const MONTHS_SHORT = [
   'jul', 'ago', 'sep', 'oct', 'nov', 'dic'
 ]
 
-const MONTHS_SELECT = [
-  'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-  'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
-]
+const MONTHS_SELECT = GREENHOUSE_COPY.months.long
 
 // ── Helpers ──
 
@@ -175,7 +177,7 @@ const PeriodNavigator = ({
 
   if (variant === 'dropdowns') {
     return (
-      <Box component='nav' aria-label='Navegación de período' sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+      <Box component='nav' aria-label={TASK407_ARIA_NAVEGACION_DE_PERIODO} sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
         <CustomTextField
           select
           size='small'
@@ -221,7 +223,7 @@ const PeriodNavigator = ({
 
   if (variant === 'compact') {
     return (
-      <Box component='nav' aria-label='Navegación de período' sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+      <Box component='nav' aria-label={TASK407_ARIA_NAVEGACION_DE_PERIODO} sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
         <Box sx={{ display: 'inline-flex' }}>
           <Button
             onClick={goToPrev}
@@ -250,7 +252,7 @@ const PeriodNavigator = ({
   // ── Variant: arrows (default — FullCalendar toolbar style) ──
 
   return (
-    <Box component='nav' aria-label='Navegación de período' sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+    <Box component='nav' aria-label={TASK407_ARIA_NAVEGACION_DE_PERIODO} sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
       {/* Navigation group: ‹ › Hoy — mimics fc-button-group */}
       <Box sx={{ display: 'inline-flex' }}>
         <Tooltip title={`Mes anterior: ${formatLong(prevPeriod.month, prevPeriod.year)}`}>

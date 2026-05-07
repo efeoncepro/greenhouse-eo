@@ -20,8 +20,12 @@ import Typography from '@mui/material/Typography'
 import TabContext from '@mui/lab/TabContext'
 import TabPanel from '@mui/lab/TabPanel'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomTabList from '@core/components/mui/TabList'
 import CustomTextField from '@core/components/mui/TextField'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 // ---------------------------------------------------------------------------
 // Types
@@ -187,7 +191,7 @@ const ImportStatementDrawer = ({ open, periodId, onClose, onSuccess }: Props) =>
     >
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 4 }}>
         <Typography variant='h6'>Importar extracto bancario</Typography>
-        <IconButton onClick={onClose} size='small' aria-label='Cerrar'>
+        <IconButton onClick={onClose} size='small' aria-label={GREENHOUSE_COPY.actions.close}>
           <i className='tabler-x' />
         </IconButton>
       </Box>
@@ -355,9 +359,7 @@ const ImportStatementDrawer = ({ open, periodId, onClose, onSuccess }: Props) =>
 
       <Divider />
       <Box sx={{ display: 'flex', gap: 2, p: 4 }}>
-        <Button variant='outlined' color='secondary' onClick={onClose} fullWidth>
-          Cancelar
-        </Button>
+        <Button variant='outlined' color='secondary' onClick={onClose} fullWidth>{GREENHOUSE_COPY.actions.cancel}</Button>
         <Button
           variant='contained'
           color='primary'

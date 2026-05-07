@@ -18,6 +18,7 @@ import EmptyState from '@/components/greenhouse/EmptyState'
 import NexaMentionText from '@/components/greenhouse/NexaMentionText'
 import NexaInsightRootCauseSection from '@/components/greenhouse/NexaInsightRootCauseSection'
 import { GH_NEXA } from '@/config/greenhouse-nomenclature'
+import { formatDate as formatGreenhouseDate, formatISODateKey, formatTime as formatGreenhouseTime } from '@/lib/format'
 import { getMetricById } from '@/lib/ico-engine/metric-registry'
 
 // ─── Types ──────────────────────────────────────────────────────────────────
@@ -52,33 +53,13 @@ const Timeline = styled(MuiTimeline)({
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
-const DAY_FORMATTER = new Intl.DateTimeFormat('es-CL', {
-  timeZone: 'America/Santiago',
-  day: '2-digit',
-  month: 'short',
-  year: 'numeric'
-})
-
-const TIME_FORMATTER = new Intl.DateTimeFormat('es-CL', {
-  timeZone: 'America/Santiago',
-  hour: '2-digit',
-  minute: '2-digit'
-})
-
-const DAY_KEY_FORMATTER = new Intl.DateTimeFormat('en-CA', {
-  timeZone: 'America/Santiago',
-  year: 'numeric',
-  month: '2-digit',
-  day: '2-digit'
-})
-
 const getDayKey = (iso: string) => {
   try {
     const date = new Date(iso)
 
     if (isNaN(date.getTime())) return iso
 
-    return DAY_KEY_FORMATTER.format(date)
+    return formatISODateKey(date)
   } catch {
     return iso
   }
@@ -90,14 +71,14 @@ const getDayLabel = (iso: string, now: Date): string => {
 
     if (isNaN(date.getTime())) return '—'
 
-    const today = DAY_KEY_FORMATTER.format(now)
-    const yesterday = DAY_KEY_FORMATTER.format(new Date(now.getTime() - 24 * 60 * 60 * 1000))
-    const key = DAY_KEY_FORMATTER.format(date)
+    const today = formatISODateKey(now)
+    const yesterday = formatISODateKey(new Date(now.getTime() - 24 * 60 * 60 * 1000))
+    const key = formatISODateKey(date)
 
     if (key === today) return GH_NEXA.insights_timeline_day_today
     if (key === yesterday) return GH_NEXA.insights_timeline_day_yesterday
 
-    return DAY_FORMATTER.format(date)
+    return formatGreenhouseDate(date, { day: '2-digit', month: 'short', year: 'numeric' })
   } catch {
     return '—'
   }
@@ -109,7 +90,7 @@ const getTimeLabel = (iso: string): string => {
 
     if (isNaN(date.getTime())) return ''
 
-    return TIME_FORMATTER.format(date)
+    return formatGreenhouseTime(date)
   } catch {
     return ''
   }

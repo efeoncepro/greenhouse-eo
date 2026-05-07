@@ -1,5 +1,7 @@
 import 'server-only'
 
+import { formatCurrency as formatLocaleCurrency, formatNumber } from '@/lib/format'
+
 export const formatDateDMY = (iso: string | null): string => {
   if (!iso) return '—'
   const value = iso.slice(0, 10)
@@ -12,30 +14,8 @@ export const formatDateDMY = (iso: string | null): string => {
   return `${d}/${m}/${y}`
 }
 
-const getCurrencySymbol = (currency: string): string => {
-  const upper = currency.toUpperCase()
-
-  if (upper === 'CLP' || upper === 'CLF') return '$'
-  if (upper === 'USD') return 'US$'
-
-  return `${upper} `
-}
-
 export const formatCurrency = (value: number, currency: string): string => {
-  const upper = currency.toUpperCase()
-  const symbol = getCurrencySymbol(upper)
-
-  if (upper === 'CLP') {
-    return `${symbol}${new Intl.NumberFormat('es-CL', {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0
-    }).format(Math.round(value))}`
-  }
-
-  return `${symbol}${new Intl.NumberFormat('es-CL', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  }).format(value)}`
+  return formatLocaleCurrency(value, currency.toUpperCase() as 'CLP' | 'USD' | 'CLF' | 'COP' | 'MXN' | 'PEN' | 'BRL')
 }
 
 export const formatQuantity = (value: number): string => {
@@ -43,17 +23,17 @@ export const formatQuantity = (value: number): string => {
 
   if (Number.isInteger(value)) return String(value)
 
-  return new Intl.NumberFormat('es-CL', {
+  return formatNumber(value, {
     minimumFractionDigits: 0,
     maximumFractionDigits: 2
-  }).format(value)
+  })
 }
 
 export const formatRate = (value: number): string =>
-  new Intl.NumberFormat('es-CL', {
+  formatNumber(value, {
     minimumFractionDigits: 2,
     maximumFractionDigits: 6
-  }).format(value)
+  })
 
 export const todayLabel = (): string => {
   const now = new Date()

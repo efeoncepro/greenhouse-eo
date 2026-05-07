@@ -11,7 +11,8 @@ import CustomChip from '@core/components/mui/Chip'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 import EmptyState from '@/components/greenhouse/EmptyState'
 import TeamAvatar from '@/components/greenhouse/TeamAvatar'
-import { GH_AGENCY, GH_COLORS } from '@/config/greenhouse-nomenclature'
+import { GH_COLORS } from '@/config/greenhouse-nomenclature'
+import { GH_AGENCY } from '@/lib/copy/agency'
 
 // ── Types matching /api/agency/team response ──
 

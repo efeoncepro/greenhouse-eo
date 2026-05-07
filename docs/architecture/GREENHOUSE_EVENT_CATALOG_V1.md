@@ -2,6 +2,38 @@
 
 Catalogo canonico de eventos del sistema de outbox de Greenhouse. Cada evento se registra en `greenhouse_sync.outbox_events` y se publica a BigQuery via el consumer `outbox-publish`.
 
+## Delta 2026-05-06 — TASK-813b: HubSpot p_services async intake (1 event v1 nuevo)
+
+Aggregate type: `hubspot_services_batch`.
+
+| Event type | Trigger | Payload | Consumer |
+| --- | --- | --- | --- |
+| `commercial.service_engagement.intake_requested` | Webhook hubspot-services / hubspot-companies recibe events `service.*` / `p_services.*` / `0-162.*` y emite event ASYNC en lugar de fetch sincrono | `{version:1, serviceIds:string[], source:string, enqueuedAt}` | Projection `hubspot_services_intake` (domain=finance) consume vía ops-reactive-finance cron, hace HubSpot fetch + UPSERT canónico fuera del request path |
+
+**Por qué async**: el webhook HubSpot tiene timeout 5s. Si el batch tiene N services, el handler hace 1 batchRead + N association lookups sincronos = N+1 calls HubSpot. Para batches grandes (50+) excede timeout → HubSpot reintenta → loop. Patrón TASK-771/773 (anti-pattern: fetch sincrono dentro del request path).
+
+**Latencia post-refactor**: webhook < 100ms (sólo INSERT outbox). HubSpot fetch + UPSERT corre fuera del request path en cron `ops-reactive-finance` (cada 5 min).
+
+Hard rules:
+
+- NUNCA hacer HubSpot fetch sincrono dentro del webhook handler request path. Toda materialización p_services pasa por el outbox event.
+- NUNCA emitir `intake_requested` con `serviceIds: []`. Validar antes del publishOutboxEvent.
+
+## Delta 2026-05-06 — TASK-813: HubSpot p_services sync + legacy cleanup (3 events v1)
+
+Aggregate types: `service_engagement`, `space`.
+
+| Event type | Trigger | Payload | Consumer |
+| --- | --- | --- | --- |
+| `commercial.service_engagement.materialized` | Projection `hubspot_services_intake` (TASK-813b) + backfill script crea/actualiza fila en `core.services` desde HubSpot 0-162 | `{version:1, action:'created'\|'updated', serviceId, hubspotServiceId, hubspotCompanyId, name, spaceId, clientId, organizationId, syncStatus, materializedAt, source}` | Reactive consumers downstream (P&L, ICO, service_attribution_facts) |
+| `commercial.service_engagement.archived_legacy_seed` | Script `archive-legacy-seed.ts` archiva las 30 filas seedeadas el 2026-03-16 (cross-product `service_modules × clients`) | `{version:1, serviceId, name, previousStatus, previousActive, archivedAt, rationale}` | Audit log; service_attribution_facts respeta filtro `WHERE status != 'legacy_seed_archived'` |
+| `commercial.space.auto_created` | Backfill o webhook auto-crea space para client con hubspot_company_id pero sin space (caso Aguas Andinas + Motogas) | `{version:1, spaceId, clientId, organizationId, clientName, source, createdAt}` | Audit; alerta si auto-creation rate > 5% (TASK-807 follow-up) |
+
+Hard rules:
+
+- NUNCA escribir directamente a `core.services` saltando el outbox event. Toda materialización (webhook, backfill, manual) emite event v1.
+- NUNCA borrar filas legacy archived (audit-preserved). Solo `archive_legacy_seed` event las marca; el `service_attribution_facts` materializer respeta `status != 'legacy_seed_archived'`.
+
 ## Delta 2026-05-05 — TASK-784: Person Legal Profile (12 events v1)
 
 Reglas duras: NUNCA loggear `value_full`, `value_normalized`, `street_line_1`, `presentation_text` en payloads de outbox. Los payloads describen WHICH document/address cambio + el actor + razon, pero no el valor.

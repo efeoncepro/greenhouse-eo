@@ -34,6 +34,7 @@ import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 
 import tableStyles from '@core/styles/table.module.css'
+import { formatDate as formatGreenhouseDate } from '@/lib/format'
 import { getInitials } from '@/utils/getInitials'
 
 // ── Types ──────────────────────────────────────────────────────────────
@@ -92,14 +93,9 @@ const COUNTRY_FLAGS: Record<string, string> = {
 
 const countryFlag = (code: string | null) => (code ? COUNTRY_FLAGS[code.toUpperCase()] ?? '\u{1F310}' : '')
 
-const dateFormatter = new Intl.DateTimeFormat('es-CL', {
-  dateStyle: 'medium',
-  timeZone: 'America/Santiago'
-})
-
 const formatDate = (iso: string) => {
   try {
-    return dateFormatter.format(new Date(iso))
+    return formatGreenhouseDate(iso, { dateStyle: 'medium' })
   } catch {
     return '\u2014'
   }

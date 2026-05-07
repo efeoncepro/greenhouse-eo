@@ -5,10 +5,12 @@ import Typography from '@mui/material/Typography'
 import { useTheme } from '@mui/material/styles'
 
 import AppReactApexCharts from '@/libs/styles/AppReactApexCharts'
-import { GH_AGENCY, GH_COLORS } from '@/config/greenhouse-nomenclature'
+import { GH_COLORS } from '@/config/greenhouse-nomenclature'
+import { GH_AGENCY } from '@/lib/copy/agency'
 import type { AgencyChartStatusItem, AgencyChartWeeklyPoint, AgencySpaceHealth } from '@/lib/agency/agency-queries'
 import ExecutiveCardShell from '@/components/greenhouse/ExecutiveCardShell'
 import EmptyState from '@/components/greenhouse/EmptyState'
+import { formatDate as formatGreenhouseDate } from '@/lib/format'
 
 type Props = {
   spaces: AgencySpaceHealth[]
@@ -76,7 +78,10 @@ const PulseGlobalCharts = ({ spaces, statusMix, weeklyActivity }: Props) => {
     colors: [GH_COLORS.chart.primary],
     xaxis: {
       categories: weeklyActivity.map(w => {
-        try { return new Intl.DateTimeFormat('es-MX', { month: 'short', day: 'numeric' }).format(new Date(w.weekStart)) }
+        try { return formatGreenhouseDate(new Date(w.weekStart), {
+  month: 'short',
+  day: 'numeric'
+}, 'es-MX') }
         catch { return w.weekStart }
       }),
       labels: { style: { colors: theme.palette.text.secondary, fontSize: '11px' } },

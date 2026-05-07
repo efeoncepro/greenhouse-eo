@@ -12,8 +12,12 @@ import IconButton from '@mui/material/IconButton'
 import Slider from '@mui/material/Slider'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomTextField from '@core/components/mui/TextField'
 import CustomChip from '@core/components/mui/Chip'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 // ── Types ──
 
@@ -271,9 +275,7 @@ const AssignMemberDrawer = ({ open, existingMembers, onClose, onSuccess }: Props
       <Divider />
 
       <Box sx={{ p: 4, display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
-        <Button variant='tonal' color='secondary' onClick={onClose} disabled={saving}>
-          Cancelar
-        </Button>
+        <Button variant='tonal' color='secondary' onClick={onClose} disabled={saving}>{GREENHOUSE_COPY.actions.cancel}</Button>
         <Button variant='contained' onClick={handleSave} disabled={saving || !selectedMember || !selectedClient}>
           {saving ? 'Creando…' : 'Asignar'}
         </Button>

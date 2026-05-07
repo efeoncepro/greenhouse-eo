@@ -45,10 +45,17 @@ import CustomTextField from '@core/components/mui/TextField'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 import TablePaginationComponent from '@components/TablePaginationComponent'
 import { fuzzyFilter } from '@/components/tableUtils'
+import { buildStatusMap , getMicrocopy } from '@/lib/copy'
 
 import tableStyles from '@core/styles/table.module.css'
 import CreateIncomeDrawer from '@views/greenhouse/finance/drawers/CreateIncomeDrawer'
+import { formatCurrency as formatGreenhouseCurrency } from '@/lib/format'
 
+const TASK407_ARIA_VER_DTE_EN_PDF = "Ver DTE en PDF"
+const TASK407_ARIA_VER_XML_DEL_DTE = "Ver XML del DTE"
+
+
+const GREENHOUSE_COPY = getMicrocopy()
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -96,25 +103,29 @@ const DOC_TYPE_CHIP: Record<string, { label: string; color: 'primary' | 'error' 
 // ---------------------------------------------------------------------------
 
 const STATUS_CONFIG: Record<string, { label: string; color: 'success' | 'warning' | 'error' | 'info' | 'secondary' }> = {
-  paid: { label: 'Pagado', color: 'success' },
-  partial: { label: 'Parcial', color: 'warning' },
-  pending: { label: 'Pendiente', color: 'info' },
-  overdue: { label: 'Vencido', color: 'error' },
+  ...buildStatusMap({
+    paid: { copyKey: 'paid', color: 'success' },
+    partial: { copyKey: 'partial', color: 'warning' },
+    pending: { copyKey: 'pending', color: 'info' },
+    overdue: { copyKey: 'expired', color: 'error' }
+  }),
   written_off: { label: 'Castigado', color: 'secondary' }
 }
 
 const STATUS_OPTIONS = [
   { value: '', label: 'Todos los estados' },
-  { value: 'pending', label: 'Pendiente' },
-  { value: 'partial', label: 'Parcial' },
-  { value: 'paid', label: 'Pagado' },
-  { value: 'overdue', label: 'Vencido' }
+  { value: 'pending', label: GREENHOUSE_COPY.states.pending },
+  { value: 'partial', label: GREENHOUSE_COPY.states.partial },
+  { value: 'paid', label: GREENHOUSE_COPY.states.paid },
+  { value: 'overdue', label: GREENHOUSE_COPY.states.expired }
 ]
 
 const DTE_STATUS_CONFIG: Record<string, { label: string; color: 'success' | 'warning' | 'error' | 'secondary'; icon: string }> = {
   emitted: { label: 'Emitido', color: 'success', icon: 'tabler-check' },
-  pending: { label: 'Pendiente', color: 'warning', icon: 'tabler-clock' },
-  rejected: { label: 'Rechazado', color: 'error', icon: 'tabler-x' },
+  ...buildStatusMap({
+    pending: { copyKey: 'pending', color: 'warning', icon: 'tabler-clock' },
+    rejected: { copyKey: 'rejected', color: 'error', icon: 'tabler-x' }
+  }),
   annulled: { label: 'Anulado', color: 'secondary', icon: 'tabler-ban' }
 }
 
@@ -134,11 +145,13 @@ const getDteStatusKey = (item: Income): string => {
 // ---------------------------------------------------------------------------
 
 const formatCLP = (amount: number): string =>
-  new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(amount)
+  formatGreenhouseCurrency(amount, 'CLP', {
+  maximumFractionDigits: 0
+}, 'es-CL')
 
 const formatAmount = (amount: number, currency: string): string => {
   if (currency === 'USD') {
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount)
+    return formatGreenhouseCurrency(amount, 'USD', 'en-US')
   }
 
   return formatCLP(amount)
@@ -318,7 +331,7 @@ const IncomeListView = () => {
                 rel='noopener noreferrer'
                 onClick={e => e.stopPropagation()}
                 sx={{ display: 'inline-flex', color: 'error.main', '&:hover': { color: 'error.dark' } }}
-                aria-label='Ver DTE en PDF'
+                aria-label={TASK407_ARIA_VER_DTE_EN_PDF}
               >
                 <i className='tabler-file-type-pdf' style={{ fontSize: 16 }} />
               </Box>
@@ -331,7 +344,7 @@ const IncomeListView = () => {
                 rel='noopener noreferrer'
                 onClick={e => e.stopPropagation()}
                 sx={{ display: 'inline-flex', color: 'info.main', '&:hover': { color: 'info.dark' } }}
-                aria-label='Ver XML del DTE'
+                aria-label={TASK407_ARIA_VER_XML_DEL_DTE}
               >
                 <i className='tabler-code' style={{ fontSize: 14 }} />
               </Box>
@@ -642,9 +655,7 @@ const IncomeListView = () => {
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setBatchDialogOpen(false)} disabled={batchEmitting}>
-            Cancelar
-          </Button>
+          <Button onClick={() => setBatchDialogOpen(false)} disabled={batchEmitting}>{GREENHOUSE_COPY.actions.cancel}</Button>
           <Button
             variant='contained'
             color='primary'

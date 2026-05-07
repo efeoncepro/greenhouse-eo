@@ -7,7 +7,7 @@ import Typography from '@mui/material/Typography'
 
 import CustomChip from '@core/components/mui/Chip'
 
-import { GH_PRICING } from '@/config/greenhouse-nomenclature'
+import { GH_PRICING } from '@/lib/copy/pricing'
 import type { PricingWarning } from '@/lib/finance/pricing/contracts'
 
 export interface QuoteLineWarningProps {

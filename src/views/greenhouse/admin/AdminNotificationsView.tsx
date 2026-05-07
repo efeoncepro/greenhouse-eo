@@ -19,6 +19,7 @@ import Typography from '@mui/material/Typography'
 import { ExecutiveCardShell, ExecutiveMiniStatCard } from '@/components/greenhouse'
 import type { AdminNotificationsOverview } from '@/lib/admin/get-admin-notifications-overview'
 import AdminOpsActionButton from './AdminOpsActionButton'
+import { formatDateTime as formatGreenhouseDateTime } from '@/lib/format'
 
 type Props = {
   data: AdminNotificationsOverview
@@ -50,7 +51,10 @@ const formatDateTime = (value: string | null) => {
   if (!value) return 'Sin registro'
 
   try {
-    return new Date(value).toLocaleString('es-CL', { dateStyle: 'medium', timeStyle: 'short' })
+    return formatGreenhouseDateTime(new Date(value), {
+  dateStyle: 'medium',
+  timeStyle: 'short'
+}, 'es-CL')
   } catch {
     return value
   }

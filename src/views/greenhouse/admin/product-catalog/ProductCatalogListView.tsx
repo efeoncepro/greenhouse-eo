@@ -19,6 +19,7 @@ import TextField from '@mui/material/TextField'
 import MenuItem from '@mui/material/MenuItem'
 
 import type { ProductCatalogListData, ProductCatalogListItem } from './data'
+import { formatCurrency as formatGreenhouseCurrency, formatDate as formatGreenhouseDate } from '@/lib/format'
 
 // ─────────────────────────────────────────────────────────────
 // TASK-605 Fase E — Admin list view for product catalog.
@@ -32,18 +33,16 @@ import type { ProductCatalogListData, ProductCatalogListItem } from './data'
 const formatCurrency = (price: number | null, currency: string): string => {
   if (price === null) return '—'
 
-  return new Intl.NumberFormat('es-CL', {
-    style: 'currency',
-    currency: currency || 'CLP',
-    maximumFractionDigits: 2
-  }).format(price)
+  return formatGreenhouseCurrency(price, currency || 'CLP', {
+  maximumFractionDigits: 2
+}, 'es-CL')
 }
 
 const formatDate = (iso: string | null): string => {
   if (!iso) return '—'
   const d = new Date(iso)
 
-  return Number.isFinite(d.getTime()) ? d.toLocaleDateString('es-CL') : '—'
+  return Number.isFinite(d.getTime()) ? formatGreenhouseDate(d, 'es-CL') : '—'
 }
 
 const ProductCatalogListView = ({ data }: { data: ProductCatalogListData }) => {

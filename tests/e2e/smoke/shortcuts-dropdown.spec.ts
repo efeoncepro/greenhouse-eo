@@ -100,13 +100,41 @@ test.describe('shortcuts dropdown — TASK-553', () => {
 
     expect(apiResponse.ok(), `GET /api/me/shortcuts failed: ${apiResponse.status()}`).toBe(true)
 
-    const shortcuts = (await apiResponse.json()) as ShortcutsPayload
-    const pinnedKeys = new Set(shortcuts.pinned.map(shortcut => shortcut.key))
+    let shortcuts = (await apiResponse.json()) as ShortcutsPayload
+    let pinnedKeys = new Set(shortcuts.pinned.map(shortcut => shortcut.key))
+    let candidateToPin = shortcuts.available.find(shortcut => !pinnedKeys.has(shortcut.key))
+
+    if (!candidateToPin && shortcuts.pinned.length > 0) {
+      const pinToRelease = shortcuts.pinned.at(-1)!
+
+      const unpinResponse = await page.request.delete(
+        `${BASE_URL}/api/me/shortcuts/${encodeURIComponent(pinToRelease.key)}`,
+        {
+          headers: VERCEL_BYPASS ? { 'x-vercel-protection-bypass': VERCEL_BYPASS } : undefined
+        }
+      )
+
+      expect(
+        [200, 204].includes(unpinResponse.status()),
+        `DELETE /api/me/shortcuts/${pinToRelease.key} failed: ${unpinResponse.status()}`
+      ).toBe(true)
+
+      const refreshedResponse = await page.request.get(`${BASE_URL}/api/me/shortcuts`, {
+        headers: VERCEL_BYPASS ? { 'x-vercel-protection-bypass': VERCEL_BYPASS } : undefined
+      })
+
+      expect(refreshedResponse.ok(), `refreshed GET /api/me/shortcuts failed: ${refreshedResponse.status()}`).toBe(true)
+
+      shortcuts = (await refreshedResponse.json()) as ShortcutsPayload
+      pinnedKeys = new Set(shortcuts.pinned.map(shortcut => shortcut.key))
+      candidateToPin = shortcuts.available.find(shortcut => !pinnedKeys.has(shortcut.key))
+    }
+
     const initialVisibleShortcut = shortcuts.pinned[0] ?? shortcuts.recommended[0]
     const initialVisibleLabel = initialVisibleShortcut?.label ?? ''
-    const candidateToPin = shortcuts.available.find(shortcut => !pinnedKeys.has(shortcut.key))
 
     expect(initialVisibleShortcut, 'expected at least one pinned or recommended shortcut').toBeTruthy()
+    expect(candidateToPin, 'expected at least one shortcut available to pin after deterministic setup').toBeTruthy()
 
     // Capture pre-open state
     await page.screenshot({ path: 'tmp/shortcuts-00-home.png', fullPage: false })
@@ -152,24 +180,17 @@ test.describe('shortcuts dropdown — TASK-553', () => {
 
     await page.screenshot({ path: 'tmp/shortcuts-03-add-mode.png', fullPage: false })
 
-    if (!candidateToPin) {
-      console.log('No available shortcut left to pin for this user; add-mode smoke covered.')
-    }
-
     // Click the first server-declared available row to pin it. This keeps the
     // smoke resilient when the shared agent user already has different pins.
-    const availableRow = candidateToPin
-      ? page.getByRole('button').filter({ hasText: candidateToPin.label }).first()
-      : page.getByRole('button').filter({ hasText: 'Cuentas y accesos' }).first()
+    const availableRow = page.getByRole('button').filter({ hasText: candidateToPin!.label }).first()
 
-    if (candidateToPin && (await availableRow.count()) > 0) {
-      await availableRow.click()
+    await expect(availableRow).toBeVisible({ timeout: 3000 })
+    await availableRow.click()
 
-      // Should return to view mode automatically with new pin
-      await expect(page.getByRole('heading', { name: 'Accesos rápidos', level: 6 })).toBeVisible({ timeout: 5000 })
+    // Should return to view mode automatically with new pin
+    await expect(page.getByRole('heading', { name: 'Accesos rápidos', level: 6 })).toBeVisible({ timeout: 5000 })
 
-      await page.screenshot({ path: 'tmp/shortcuts-04-after-pin.png', fullPage: false })
-    }
+    await page.screenshot({ path: 'tmp/shortcuts-04-after-pin.png', fullPage: false })
 
     // Total bound: initial GET + post-pin refresh + maybe one POST + 1 GET more.
     // The infinite loop produced > 50 calls in seconds. < 8 is generous.

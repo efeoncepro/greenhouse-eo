@@ -18,6 +18,7 @@ import BeneficiaryPaymentProfileChangedEmail, {
 } from '@/emails/BeneficiaryPaymentProfileChangedEmail'
 import QuoteSharePromptEmail from '@/emails/QuoteSharePromptEmail'
 import WeeklyExecutiveDigestEmail from '@/emails/WeeklyExecutiveDigestEmail'
+import { getMicrocopy } from '@/lib/copy'
 import VerifyEmail from '@/emails/VerifyEmail'
 import type { WeeklyDigestEmailContext } from '@/lib/nexa/digest'
 
@@ -65,33 +66,37 @@ const buildPayrollExportPlainText = (context: {
   netTotalDisplay: string
   exportedBy?: string | null
   exportedAt?: string | null
-}) => [
-  `NÓMINA — ${context.periodLabel.toUpperCase()}`,
-  '═══════════════════',
-  '',
-  'Nómina cerrada y lista para revisión.',
-  '',
-  `Colaboradores: ${context.entryCount}`,
-  '',
-  ...context.breakdowns.flatMap(b => [
-    `${b.regimeLabel} (${b.currency})`,
-    `  Bruto:  ${b.grossTotal}`,
-    `  Neto:   ${b.netTotal}`,
-    ''
-  ]),
-  '───────────────────',
-  'ADJUNTOS',
-  '• Reporte de nómina (PDF) — resumen por colaborador',
-  '• Detalle de nómina (CSV) — desglose completo para contabilidad',
-  '',
-  context.exportedBy ? `Exportado por ${context.exportedBy}` : 'Exportado por Greenhouse',
-  context.exportedAt ? `Fecha: ${formatShortDateTime(context.exportedAt) ?? context.exportedAt}` : '',
-  '',
-  '→ Ver nómina en Greenhouse:',
-  `  ${process.env.NEXT_PUBLIC_APP_URL || 'https://greenhouse.efeoncepro.com'}/hr/payroll`,
-  '',
-  '— Greenhouse by Efeonce Group'
-].filter(Boolean).join('\n')
+}) => {
+  const t = getMicrocopy().emails.payroll.exportReady
+
+  return [
+    `${t.kickerPrefix.replace(' · ', ' — ')}${context.periodLabel.toUpperCase()}`,
+    t.plainTextSeparator,
+    '',
+    `${t.heading}.`,
+    '',
+    `${t.collaboratorsLabel}: ${context.entryCount}`,
+    '',
+    ...context.breakdowns.flatMap(b => [
+      `${b.regimeLabel} (${b.currency})`,
+      `  ${t.grossLabel}:  ${b.grossTotal}`,
+      `  ${t.netLabel}:   ${b.netTotal}`,
+      ''
+    ]),
+    '───────────────────',
+    t.plainTextAttachments,
+    `• ${t.payrollReportTitle} — ${t.payrollReportPlainTextSubtitle}`,
+    `• ${t.payrollDetailTitle} — ${t.payrollDetailPlainTextSubtitle}`,
+    '',
+    context.exportedBy ? `${t.exportedByPrefix}${context.exportedBy}` : `${t.exportedByPrefix}${t.exportedByFallback}`,
+    context.exportedAt ? `${t.exportedAtLabel}: ${formatShortDateTime(context.exportedAt) ?? context.exportedAt}` : '',
+    '',
+    `→ ${t.plainTextCta}:`,
+    `  ${process.env.NEXT_PUBLIC_APP_URL || 'https://greenhouse.efeoncepro.com'}/hr/payroll`,
+    '',
+    getMicrocopy().emails.common.brandSignature
+  ].filter(Boolean).join('\n')
+}
 
 const buildPayrollReceiptPlainText = (context: {
   fullName: string
@@ -357,7 +362,7 @@ registerTemplate('payroll_export', (context: {
   attachments?: EmailAttachment[]
   unsubscribeUrl?: string
 }) => ({
-  subject: `Nómina cerrada — ${context.periodLabel} · ${context.entryCount} colaboradores`,
+  subject: getMicrocopy().emails.subjects.payrollExport(context.periodLabel, context.entryCount),
   react: PayrollExportReadyEmail({
     periodLabel: context.periodLabel,
     entryCount: context.entryCount,
@@ -433,14 +438,6 @@ registerTemplate('payroll_payment_committed', (context: {
     : `Hi ${context.fullName.split(' ')[0]}, your ${MONTH_NAMES[context.periodMonth - 1]} ${context.periodYear} payment (${formatMoney(context.netTotal, context.entryCurrency)}) has been approved and is scheduled. We will send the receipt once executed.`
 }))
 
-// TASK-753 — Notificación al beneficiario cuando su perfil de pago cambia
-const PROFILE_KIND_SUBJECTS: Record<PaymentProfileEmailKind, string> = {
-  created: 'Solicitud de cambio de cuenta de pago registrada',
-  approved: 'Tu cuenta de pago fue aprobada',
-  superseded: 'Tu cuenta de pago fue reemplazada',
-  cancelled: 'Tu solicitud de cambio fue cancelada'
-}
-
 registerTemplate('beneficiary_payment_profile_changed', (context: {
   fullName: string
   kind: PaymentProfileEmailKind
@@ -451,29 +448,26 @@ registerTemplate('beneficiary_payment_profile_changed', (context: {
   effectiveAt: string | null
   reason: string | null
   requestedByMember: boolean
-}) => ({
-  subject: PROFILE_KIND_SUBJECTS[context.kind],
-  react: BeneficiaryPaymentProfileChangedEmail({
-    fullName: context.fullName,
-    kind: context.kind,
-    providerLabel: context.providerLabel,
-    bankName: context.bankName,
-    accountNumberMasked: context.accountNumberMasked,
-    currency: context.currency,
-    effectiveAt: context.effectiveAt,
-    reason: context.reason,
-    requestedByMember: context.requestedByMember
-  }),
-  text:
-    `Hola ${context.fullName.split(' ')[0]}, ` +
-    (context.kind === 'created'
-      ? 'registramos una solicitud de cambio en tu cuenta de pago. Finance la revisará pronto.'
-      : context.kind === 'approved'
-        ? `tu cuenta de pago (${context.accountNumberMasked ?? '••••'}) quedó activa.`
-        : context.kind === 'superseded'
-          ? `tu cuenta de pago activa fue reemplazada por una nueva (${context.accountNumberMasked ?? '••••'}).`
-          : 'tu solicitud de cambio fue cancelada.')
-}))
+}) => {
+  const t = getMicrocopy().emails.beneficiaryPaymentProfileChanged
+  const firstName = context.fullName.split(' ')[0] || context.fullName
+
+  return {
+    subject: getMicrocopy().emails.subjects.beneficiaryPaymentProfileChanged[context.kind],
+    react: BeneficiaryPaymentProfileChangedEmail({
+      fullName: context.fullName,
+      kind: context.kind,
+      providerLabel: context.providerLabel,
+      bankName: context.bankName,
+      accountNumberMasked: context.accountNumberMasked,
+      currency: context.currency,
+      effectiveAt: context.effectiveAt,
+      reason: context.reason,
+      requestedByMember: context.requestedByMember
+    }),
+    text: t.plainText[context.kind](firstName, context.accountNumberMasked ?? '••••')
+  }
+})
 
 // TASK-759c — Compensación cancelación (sin PDF)
 registerTemplate('payroll_payment_cancelled', (context: {
@@ -831,9 +825,11 @@ registerTemplate('leave_request_pending_review', (context: {
 
 registerTemplate('weekly_executive_digest', (context: WeeklyDigestEmailContext) => {
   const previewPeriodLabel = context.periodLabel || 'Semana del 8 al 14 de abril de 2026'
+  const t = getMicrocopy().emails.weeklyExecutiveDigest
+  const subject = t.subject
 
   return {
-    subject: 'Resumen semanal — Nexa Insights',
+    subject,
     react: WeeklyExecutiveDigestEmail({
       periodLabel: previewPeriodLabel,
       totalInsights: context.totalInsights,
@@ -847,11 +843,11 @@ registerTemplate('weekly_executive_digest', (context: WeeklyDigestEmailContext) 
       unsubscribeUrl: context.unsubscribeUrl
     }),
     text: [
-      'Resumen semanal — Nexa Insights',
+      subject,
       '',
       `Período: ${previewPeriodLabel}`,
       '',
-      'Abre el portal para ver el detalle completo.'
+      t.plainTextOpenPortal
     ].join('\n')
   }
 })
@@ -1000,6 +996,87 @@ registerPreviewMeta('payroll_liquidacion_v2', {
     { key: 'newNetTotal', label: 'Liquido actualizado', type: 'number' },
     { key: 'currency', label: 'Moneda', type: 'select', options: ['CLP', 'USD'] },
     { key: 'receiptUrl', label: 'URL del recibo', type: 'text' }
+  ]
+})
+
+registerPreviewMeta('payroll_payment_committed', {
+  label: 'Pago de nomina programado',
+  description: 'Aviso al colaborador de que su pago fue aprobado y quedo programado',
+  domain: 'payroll',
+  supportsLocale: false,
+  defaultProps: {
+    fullName: 'Maria Gonzalez Rojas',
+    periodYear: 2026,
+    periodMonth: 3,
+    entryCurrency: 'CLP',
+    netTotal: 1480000,
+    payRegime: 'chile',
+    scheduledFor: '2026-04-05T14:00:00.000Z',
+    processorLabel: 'Banco de Chile'
+  },
+  propsSchema: [
+    { key: 'fullName', label: 'Nombre completo', type: 'text' },
+    { key: 'periodYear', label: 'Ano', type: 'number' },
+    { key: 'periodMonth', label: 'Mes (1-12)', type: 'number' },
+    { key: 'entryCurrency', label: 'Moneda', type: 'select', options: ['CLP', 'USD'] },
+    { key: 'netTotal', label: 'Liquido', type: 'number' },
+    { key: 'payRegime', label: 'Regimen', type: 'select', options: ['chile', 'international'] },
+    { key: 'scheduledFor', label: 'Fecha programada', type: 'text' },
+    { key: 'processorLabel', label: 'Procesador', type: 'text' }
+  ]
+})
+
+registerPreviewMeta('payroll_payment_cancelled', {
+  label: 'Pago de nomina cancelado',
+  description: 'Aviso al colaborador cuando un pago programado requiere correccion',
+  domain: 'payroll',
+  supportsLocale: false,
+  defaultProps: {
+    fullName: 'Maria Gonzalez Rojas',
+    periodYear: 2026,
+    periodMonth: 3,
+    entryCurrency: 'CLP',
+    netTotal: 1480000,
+    payRegime: 'chile',
+    cancellationReason: 'Ajuste operacional detectado antes de liberar el pago.'
+  },
+  propsSchema: [
+    { key: 'fullName', label: 'Nombre completo', type: 'text' },
+    { key: 'periodYear', label: 'Ano', type: 'number' },
+    { key: 'periodMonth', label: 'Mes (1-12)', type: 'number' },
+    { key: 'entryCurrency', label: 'Moneda', type: 'select', options: ['CLP', 'USD'] },
+    { key: 'netTotal', label: 'Liquido', type: 'number' },
+    { key: 'payRegime', label: 'Regimen', type: 'select', options: ['chile', 'international'] },
+    { key: 'cancellationReason', label: 'Motivo de cancelacion', type: 'text' }
+  ]
+})
+
+registerPreviewMeta('beneficiary_payment_profile_changed', {
+  label: 'Perfil de pago actualizado',
+  description: 'Aviso al beneficiario cuando cambia su perfil de pago aprobado',
+  domain: 'finance',
+  supportsLocale: false,
+  defaultProps: {
+    fullName: 'Maria Gonzalez Rojas',
+    kind: 'approved',
+    providerLabel: 'Banco de Chile',
+    bankName: 'Banco de Chile',
+    accountNumberMasked: '.... 4321',
+    currency: 'CLP',
+    effectiveAt: '2026-04-05T14:00:00.000Z',
+    reason: 'Actualizacion validada por Finance Ops.',
+    requestedByMember: true
+  },
+  propsSchema: [
+    { key: 'fullName', label: 'Nombre completo', type: 'text' },
+    { key: 'kind', label: 'Tipo de aviso', type: 'select', options: ['approved', 'updated', 'cancelled'] },
+    { key: 'providerLabel', label: 'Proveedor', type: 'text' },
+    { key: 'bankName', label: 'Banco', type: 'text' },
+    { key: 'accountNumberMasked', label: 'Cuenta enmascarada', type: 'text' },
+    { key: 'currency', label: 'Moneda', type: 'select', options: ['CLP', 'USD'] },
+    { key: 'effectiveAt', label: 'Fecha efectiva', type: 'text' },
+    { key: 'reason', label: 'Motivo', type: 'text' },
+    { key: 'requestedByMember', label: 'Solicitado por colaborador', type: 'boolean' }
   ]
 })
 
@@ -1220,13 +1297,14 @@ interface QuoteShareContext extends Record<string, unknown> {
 }
 
 registerTemplate<QuoteShareContext>('quote_share', context => {
+  const t = getMicrocopy().emails.quoteShare
   const greetingName = context.recipientName?.split(' ')[0] ?? null
-  const greeting = greetingName ? `Hola ${greetingName},` : 'Hola,'
+  const greeting = t.greeting(greetingName)
 
   return {
     subject:
       context.subject
-      ?? `Propuesta ${context.quotationNumber} v${context.versionNumber} para ${context.clientName}`,
+      ?? getMicrocopy().emails.subjects.quoteShare(context.quotationNumber, context.versionNumber, context.clientName),
     react: QuoteSharePromptEmail({
       shareUrl: context.shareUrl,
       quotationNumber: context.quotationNumber,
@@ -1243,24 +1321,24 @@ registerTemplate<QuoteShareContext>('quote_share', context => {
       pdfFileName: context.pdfFileName ?? null
     }),
     text: [
-      `PROPUESTA ${context.quotationNumber} v${context.versionNumber}`,
-      `PARA: ${context.clientName}`,
-      '═══════════════════════════════════',
+      t.plainTextHeader(context.quotationNumber, context.versionNumber),
+      `${t.plainTextClientPrefix}${context.clientName}`,
+      t.plainTextSeparator,
       '',
       greeting,
       '',
       context.customMessage ?? '',
       context.customMessage ? '' : null,
-      `Te comparto la propuesta comercial que preparamos para tu equipo en ${context.clientName}.`,
+      t.plainTextBody(context.clientName),
       '',
       context.hasPdfAttached && context.pdfFileName
-        ? `📎 ADJUNTO: ${context.pdfFileName}`
+        ? `${t.plainTextAttachmentPrefix}${context.pdfFileName}`
         : null,
       context.hasPdfAttached ? '' : null,
-      `Inversión total: ${context.totalLabel}`,
-      context.validUntilLabel ? `Válida hasta: ${context.validUntilLabel}` : null,
+      `${t.plainTextTotalPrefix}${context.totalLabel}`,
+      context.validUntilLabel ? `${t.plainTextValidUntilPrefix}${context.validUntilLabel}` : null,
       '',
-      `→ Ver propuesta online (con opción de aceptar):`,
+      `→ ${t.plainTextCta}:`,
       `  ${context.shareUrl}`,
       '',
       `— ${context.senderName}`,
@@ -1270,4 +1348,58 @@ registerTemplate<QuoteShareContext>('quote_share', context => {
       .filter(line => line !== null)
       .join('\n')
   }
+})
+
+registerPreviewMeta('magic_link', {
+  label: 'Acceso por magic link',
+  description: 'Email critico con enlace temporal para iniciar sesion sin contrasena',
+  domain: 'identity',
+  supportsLocale: true,
+  defaultProps: {
+    magicLinkUrl: 'https://greenhouse.efeoncepro.com/auth/magic-link?token=preview-token',
+    userName: 'Maria Gonzalez',
+    expiresInMinutes: 15
+  },
+  propsSchema: [
+    { key: 'userName', label: 'Nombre del destinatario', type: 'text' },
+    { key: 'magicLinkUrl', label: 'URL de acceso', type: 'text' },
+    { key: 'expiresInMinutes', label: 'Minutos de vigencia', type: 'number' }
+  ]
+})
+
+registerPreviewMeta('quote_share', {
+  label: 'Propuesta compartida',
+  description: 'Email comercial con link publico de propuesta y metadata opcional de PDF',
+  domain: 'finance',
+  supportsLocale: false,
+  defaultProps: {
+    shareUrl: 'https://greenhouse.efeoncepro.com/q/preview-token',
+    quotationNumber: 'Q-2026-0042',
+    versionNumber: 3,
+    clientName: 'ACME SpA',
+    recipientName: 'Maria Gonzalez',
+    totalLabel: 'USD 18,500.00',
+    validUntilLabel: '30 de abril de 2026',
+    senderName: 'Julio Reyes',
+    senderRole: 'Finance Ops',
+    senderEmail: 'julio.reyes@efeonce.org',
+    customMessage: 'Te comparto la propuesta actualizada para revision.',
+    hasPdfAttached: true,
+    pdfFileName: 'Q-2026-0042-v3.pdf'
+  },
+  propsSchema: [
+    { key: 'shareUrl', label: 'URL publica', type: 'text' },
+    { key: 'quotationNumber', label: 'Numero de propuesta', type: 'text' },
+    { key: 'versionNumber', label: 'Version', type: 'number' },
+    { key: 'clientName', label: 'Cliente', type: 'text' },
+    { key: 'recipientName', label: 'Destinatario', type: 'text' },
+    { key: 'totalLabel', label: 'Total', type: 'text' },
+    { key: 'validUntilLabel', label: 'Valida hasta', type: 'text' },
+    { key: 'senderName', label: 'Remitente', type: 'text' },
+    { key: 'senderRole', label: 'Cargo del remitente', type: 'text' },
+    { key: 'senderEmail', label: 'Email del remitente', type: 'text' },
+    { key: 'customMessage', label: 'Mensaje custom', type: 'text' },
+    { key: 'hasPdfAttached', label: 'Incluye PDF', type: 'boolean' },
+    { key: 'pdfFileName', label: 'Nombre del PDF', type: 'text' }
+  ]
 })

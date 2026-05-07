@@ -1,4 +1,8 @@
+import { Fragment } from 'react'
+
 import { Heading, Section, Text } from '@react-email/components'
+
+import { getMicrocopy } from '@/lib/copy'
 
 import EmailButton from './components/EmailButton'
 import EmailLayout from './components/EmailLayout'
@@ -111,15 +115,16 @@ export default function PayrollExportReadyEmail({
   exportedAt,
   unsubscribeUrl
 }: PayrollExportReadyEmailProps) {
+  const t = getMicrocopy().emails.payroll.exportReady
   const metaParts: string[] = []
 
-  if (exportedBy) metaParts.push(`Exportado por ${exportedBy}`)
+  if (exportedBy) metaParts.push(`${t.exportedByPrefix}${exportedBy}`)
   if (exportedAt) metaParts.push(exportedAt)
 
   const metaLine = metaParts.join(' · ')
 
   return (
-    <EmailLayout previewText={`Nómina ${periodLabel} cerrada — neto total ${netTotalDisplay}`} lang='es' unsubscribeUrl={unsubscribeUrl}>
+    <EmailLayout previewText={t.previewText(periodLabel, netTotalDisplay)} lang='es' unsubscribeUrl={unsubscribeUrl}>
       {/* Overline */}
       <Text style={{
         fontFamily: EMAIL_FONTS.body,
@@ -131,7 +136,7 @@ export default function PayrollExportReadyEmail({
         margin: '0 0 6px',
         lineHeight: '16px',
       }}>
-        {'NÓMINA · '}{periodLabel.toUpperCase()}
+        {t.kickerPrefix}{periodLabel.toUpperCase()}
       </Text>
 
       <Heading style={{
@@ -142,7 +147,7 @@ export default function PayrollExportReadyEmail({
         margin: '0 0 8px',
         lineHeight: '34px',
       }}>
-        Nómina cerrada y lista para revisión
+        {t.heading}
       </Heading>
 
       <Text style={{
@@ -151,9 +156,8 @@ export default function PayrollExportReadyEmail({
         lineHeight: '24px',
         margin: '0 0 24px',
       }}>
-        El período <strong>{periodLabel}</strong> fue cerrado con{' '}
-        <strong>{entryCount} colaboradores</strong>. Adjuntamos el reporte
-        y el detalle para tu revisión.
+        {t.bodyPrefix}<strong>{periodLabel}</strong>{t.bodyEntryCountPrefix}{' '}
+        <strong>{entryCount}{t.bodyEntryCountStrongSuffix}</strong>{t.bodyEntryCountSuffix}
       </Text>
 
       {/* Summary table */}
@@ -166,13 +170,13 @@ export default function PayrollExportReadyEmail({
       }}>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <tbody>
-            {summaryRow('Colaboradores', String(entryCount))}
+            {summaryRow(t.collaboratorsLabel, String(entryCount))}
             {breakdowns.map((b) => (
-              <>
+              <Fragment key={`${b.regimeLabel}-${b.currency}`}>
                 {regimeHeaderRow(`${b.regimeLabel} (${b.currency})`)}
-                {summaryRow('Bruto', b.grossTotal, true)}
-                {summaryRow('Neto', b.netTotal, true)}
-              </>
+                {summaryRow(t.grossLabel, b.grossTotal, true)}
+                {summaryRow(t.netLabel, b.netTotal, true)}
+              </Fragment>
             ))}
           </tbody>
         </table>
@@ -195,7 +199,7 @@ export default function PayrollExportReadyEmail({
                 fontWeight: 500,
                 verticalAlign: 'bottom',
               }}>
-                Neto total a pagar
+                {t.netTotalLabel}
               </td>
               <td style={{
                 fontFamily: EMAIL_FONTS.heading,
@@ -230,17 +234,17 @@ export default function PayrollExportReadyEmail({
           margin: '0 0 8px',
           lineHeight: '16px',
         }}>
-          Adjuntos incluidos
+          {t.attachmentsHeading}
         </Text>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <tbody>
             {attachmentRow(
-              'Reporte de nómina (PDF)',
-              'Resumen por colaborador en formato imprimible'
+              t.payrollReportTitle,
+              t.payrollReportSubtitle
             )}
             {attachmentRow(
-              'Detalle de nómina (CSV)',
-              'Desglose completo para contabilidad'
+              t.payrollDetailTitle,
+              t.payrollDetailSubtitle
             )}
           </tbody>
         </table>
@@ -261,7 +265,7 @@ export default function PayrollExportReadyEmail({
 
       {/* CTA */}
       <Section style={{ textAlign: 'center' as const, margin: `${metaLine ? '0' : '12px'} 0 24px` }}>
-        <EmailButton href={`${APP_URL}/hr/payroll`}>Ver nómina en Greenhouse</EmailButton>
+        <EmailButton href={`${APP_URL}/hr/payroll`}>{t.cta}</EmailButton>
       </Section>
 
       {/* Brand footer inside card */}
@@ -273,7 +277,7 @@ export default function PayrollExportReadyEmail({
         borderTop: `1px solid ${EMAIL_COLORS.border}`,
         paddingTop: '20px',
       }}>
-        Efeonce Group SpA · efeoncepro.com
+        {t.automatedFooter}
       </Text>
     </EmailLayout>
   )

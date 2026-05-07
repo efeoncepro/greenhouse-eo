@@ -17,9 +17,14 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import type { Theme } from '@mui/material/styles'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomChip from '@core/components/mui/Chip'
 
 import RequestChangeDialog from './payment-profile/RequestChangeDialog'
+import { formatDate as formatGreenhouseDate } from '@/lib/format'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 interface PaymentProfileSafe {
   profileId: string
@@ -48,11 +53,11 @@ interface ApiResponse {
 }
 
 const STATUS_META: Record<string, { label: string; color: 'primary' | 'info' | 'warning' | 'success' | 'error' | 'secondary' }> = {
-  draft: { label: 'Borrador', color: 'secondary' },
-  pending_approval: { label: 'En revisión', color: 'warning' },
-  active: { label: 'Activo', color: 'success' },
+  draft: { label: GREENHOUSE_COPY.states.draft, color: 'secondary' },
+  pending_approval: { label: GREENHOUSE_COPY.states.inReview, color: 'warning' },
+  active: { label: GREENHOUSE_COPY.states.active, color: 'success' },
   superseded: { label: 'Reemplazado', color: 'secondary' },
-  cancelled: { label: 'Cancelado', color: 'error' }
+  cancelled: { label: GREENHOUSE_COPY.states.cancelled, color: 'error' }
 }
 
 const PROVIDER_LABELS: Record<string, string> = {
@@ -75,7 +80,11 @@ const formatDate = (iso: string | null): string => {
   if (!iso) return '—'
 
   try {
-    return new Date(iso).toLocaleDateString('es-CL', { day: '2-digit', month: 'short', year: 'numeric' })
+    return formatGreenhouseDate(new Date(iso), {
+  day: '2-digit',
+  month: 'short',
+  year: 'numeric'
+}, 'es-CL')
   } catch {
     return iso
   }

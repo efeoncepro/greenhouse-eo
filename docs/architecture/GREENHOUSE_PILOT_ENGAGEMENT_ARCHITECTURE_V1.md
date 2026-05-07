@@ -9,6 +9,25 @@
 > **Brand UI**: "Sample Sprint" (paraguas comercial). Schema interno usa `engagement_*` genérico — el rebranding marketing no requiere migrations.
 > **Domain boundary:** Commercial (no Finance — ver `GREENHOUSE_COMMERCIAL_FINANCE_DOMAIN_BOUNDARY_V1.md`)
 
+## Delta v1.3 (2026-05-06) — TASK-801 implementada con 2 ajustes vs spec
+
+TASK-801 (Slice 1 / Capa 1 + 1b) cerrada 2026-05-06 vía migration `20260506200742463_task-801-engagement-primitive-services-extension.sql`. Auditoría pre-implementación detectó dos desvíos vs el repo real, corregidos en la migration sin alterar el intent:
+
+1. **`services.service_id` es `TEXT`, no `UUID`.** §3.2 Capa 1b declaraba el FK como `UUID REFERENCES services(service_id)`. Realidad: el PK de `services` es `text` (creado con la convención `svc-<uuid>` como string), y `client_team_assignments.assignment_id` también es `text`. **Corrección aplicada**: `service_id TEXT REFERENCES greenhouse_core.services(service_id) ON DELETE SET NULL`. Las futuras tablas de §3.2 (Capa 2 `engagement_commercial_terms`, Capa 3 `engagement_phases`/`engagement_outcomes`/`engagement_lineage`, etc.) que referencian `services.service_id` deben usar `TEXT` también — actualizar specs cuando se implementen TASK-802 onwards.
+
+2. **`commercial_cost_attribution_v2` es VIEW, no TABLE.** §3.2 Capa 6.2 (cost intelligence) declaraba `ALTER TABLE commercial_cost_attribution_v2 ADD COLUMN attribution_intent`. Realidad: v2 es VIEW canónica creada en TASK-708 y refinada en TASK-709b (UNION ALL de 3 CTEs). **Corrección aplicada**: `CREATE OR REPLACE VIEW` agregando `'operational'::TEXT AS attribution_intent` literal en cada SELECT del UNION. La columna existe en el shape y consumers downstream pueden filtrarla. Cuando TASK-802 introduzca `engagement_commercial_terms` y TASK-806 derive el intent (filtro `attribution_intent IN ('pilot','trial','poc','discovery')` para `gtm_investment_pnl`), la VIEW se actualiza para reemplazar el literal por la derivación real (JOIN a `services.engagement_kind` + `engagement_commercial_terms.terms_kind`).
+
+**Estado post-implementación verificado**:
+
+- 4 columnas creadas: `services.engagement_kind` text NOT NULL DEFAULT 'regular', `services.commitment_terms_json` jsonb NULL, `client_team_assignments.service_id` text NULL, `commercial_cost_attribution.attribution_intent` text NOT NULL DEFAULT 'operational'.
+- 2 CHECK constraints aplicados: `services_engagement_kind_check` (5 valores), `commercial_cost_attribution_attribution_intent_check` (6 valores).
+- 1 índice partial: `client_team_assignments_service_idx WHERE service_id IS NOT NULL`.
+- VIEW v2 reescrita preservando shape exacto de TASK-709b + nueva columna.
+- Backward compat 100%: 30/30 services preservan `'regular'`, 9/9 CCA rows preservan `'operational'`.
+- Types regenerados en `src/types/db.d.ts`. `pnpm build`/`lint`/`test`/`tsc` clean.
+
+**Hard rule futura**: cualquier task de EPIC-014 que cree FK a `services.service_id` debe usar `TEXT` no `UUID`. Cualquier task que extienda `commercial_cost_attribution_v2` debe usar `CREATE OR REPLACE VIEW`, no `ALTER TABLE`.
+
 ## Delta v1.2 (2026-05-05) — pre-flight check + naming "Sample Sprint"
 
 Aplicando red-team pre-épica con `arch-architect`. Cambios:

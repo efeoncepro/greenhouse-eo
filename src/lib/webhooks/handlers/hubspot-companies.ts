@@ -5,6 +5,7 @@ import { resolveSecret } from '@/lib/webhooks/signing'
 import { syncHubSpotCompanyById } from '@/lib/hubspot/sync-company-by-id'
 import { syncTenantCapabilitiesFromIntegration } from '@/lib/integrations/greenhouse-integration'
 import { captureWithDomain } from '@/lib/observability/capture'
+import { enqueueHubSpotServiceEventsAsync } from './hubspot-services'
 
 /**
  * HubSpot companies webhook handler — TASK-706.
@@ -131,6 +132,35 @@ registerInboundHandler('hubspot-companies', async (inboxEvent, rawBody, parsedPa
 
   if (events.length === 0) {
     return
+  }
+
+  // TASK-813 — HubSpot Developer Platform constraint: 1 webhooks component
+  // por app. Todos los events convergen al mismo target URL. Detectar events
+  // de p_services (object 0-162, name canónico 'service' en platform 2025.2)
+  // y delegar al sub-handler canónico.
+  const serviceEvents = events.filter(e => {
+    const t = String(e.subscriptionType || '')
+
+    
+return t.startsWith('service.') || t.startsWith('p_services.') || t.startsWith('0-162.')
+  })
+
+  if (serviceEvents.length > 0) {
+    try {
+      // TASK-813b — Path canónico async: emite outbox event, retorna inmediato.
+      // La projection hubspot_services_intake hace HubSpot fetch + UPSERT en
+      // ops-reactive-finance cron, fuera del webhook request path. Latencia
+      // del webhook < 100ms (sólo INSERT outbox).
+      await enqueueHubSpotServiceEventsAsync(serviceEvents, 'hubspot-companies-webhook-delegation')
+    } catch (err) {
+      // Si el publishOutboxEvent falla (PG unreachable), capturamos en Sentry
+      // pero NO abortamos el company flow. HubSpot reintenta el webhook completo.
+      captureWithDomain(err, 'integrations.hubspot', {
+        level: 'error',
+        tags: { source: 'hubspot-companies-webhook', step: 'delegate-services-async' },
+        extra: { serviceEventCount: serviceEvents.length }
+      })
+    }
   }
 
   // 3. Extract company IDs to sync.

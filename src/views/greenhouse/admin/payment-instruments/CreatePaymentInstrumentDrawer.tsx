@@ -24,6 +24,8 @@ import ToggleButton from '@mui/material/ToggleButton'
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomAvatar from '@core/components/mui/Avatar'
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
@@ -37,6 +39,12 @@ import {
   getProvidersByCategory,
   type InstrumentCategory
 } from '@/config/payment-instruments'
+
+const TASK407_ARIA_CREANDO_INSTRUMENTO_DE_PAGO = "Creando instrumento de pago"
+const TASK407_ARIA_CERRAR_DRAWER_DE_INSTRUMENTO = "Cerrar drawer de instrumento"
+
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 type Props = {
   open: boolean
@@ -291,7 +299,7 @@ const CreatePaymentInstrumentDrawer = ({ open, onClose, onSuccess }: Props) => {
         onClose={handleClose}
         PaperProps={{ sx: { width: { xs: '100%', sm: 560 }, display: 'flex' } }}
       >
-        {saving ? <LinearProgress aria-label='Creando instrumento de pago' /> : null}
+        {saving ? <LinearProgress aria-label={TASK407_ARIA_CREANDO_INSTRUMENTO_DE_PAGO} /> : null}
 
         <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', p: 4, gap: 3 }}>
           <Box>
@@ -300,7 +308,7 @@ const CreatePaymentInstrumentDrawer = ({ open, onClose, onSuccess }: Props) => {
               Registra solo la identidad operativa necesaria. El detalle sensible se administra con reveal auditado.
             </Typography>
           </Box>
-          <IconButton onClick={handleClose} size='small' aria-label='Cerrar drawer de instrumento'>
+          <IconButton onClick={handleClose} size='small' aria-label={TASK407_ARIA_CERRAR_DRAWER_DE_INSTRUMENTO}>
             <i className='tabler-x' />
           </IconButton>
         </Box>
@@ -582,9 +590,7 @@ const CreatePaymentInstrumentDrawer = ({ open, onClose, onSuccess }: Props) => {
               Cambiar categoria
             </Button>
           ) : null}
-          <Button variant='outlined' color='secondary' onClick={handleClose} fullWidth disabled={saving}>
-            Cancelar
-          </Button>
+          <Button variant='outlined' color='secondary' onClick={handleClose} fullWidth disabled={saving}>{GREENHOUSE_COPY.actions.cancel}</Button>
           {step === 2 ? (
             <Button
               variant='contained'

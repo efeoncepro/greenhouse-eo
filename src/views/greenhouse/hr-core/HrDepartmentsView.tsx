@@ -35,12 +35,16 @@ import Typography from '@mui/material/Typography'
 
 import { toast } from 'sonner'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 
 import { HorizontalWithSubtitle } from '@/components/card-statistics'
 import type { BusinessLineMetadata } from '@/types/business-line'
 import type { HrDepartment, HrDepartmentsResponse, HrMemberOption, HrMemberOptionsResponse } from '@/types/hr-core'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 // ── Form types ──
 
@@ -363,9 +367,7 @@ const HrDepartmentsView = ({ isAdmin }: Props) => {
                     </TableCell>
                     {isAdmin && (
                       <TableCell align='right'>
-                        <Button variant='tonal' size='small' color='secondary' onClick={() => openEdit(dept)}>
-                          Editar
-                        </Button>
+                        <Button variant='tonal' size='small' color='secondary' onClick={() => openEdit(dept)}>{GREENHOUSE_COPY.actions.edit}</Button>
                       </TableCell>
                     )}
                   </TableRow>
@@ -578,9 +580,7 @@ const HrDepartmentsView = ({ isAdmin }: Props) => {
           </form>
         </DialogContent>
         <DialogActions>
-          <Button variant='tonal' color='secondary' onClick={handleClose} disabled={saving}>
-            Cancelar
-          </Button>
+          <Button variant='tonal' color='secondary' onClick={handleClose} disabled={saving}>{GREENHOUSE_COPY.actions.cancel}</Button>
           <Button
             type='submit'
             form='dept-form'

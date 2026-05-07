@@ -27,6 +27,7 @@ import NexaInsightRootCauseSection from '@/components/greenhouse/NexaInsightRoot
 import NexaInsightsTimeline, {
   type NexaTimelineItem
 } from '@/components/greenhouse/NexaInsightsTimeline'
+import { formatDate as formatGreenhouseDate } from '@/lib/format'
 
 // ─── Public Types ──────────────────────────────────────────────────────────
 
@@ -67,13 +68,13 @@ const formatTimestamp = (iso: string | null) => {
 
     if (isNaN(date.getTime())) return '—'
 
-    return date.toLocaleDateString('es-CL', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    })
+    return formatGreenhouseDate(date, {
+  day: '2-digit',
+  month: 'short',
+  year: 'numeric',
+  hour: '2-digit',
+  minute: '2-digit'
+}, 'es-CL')
   } catch {
     return '—'
   }

@@ -19,6 +19,7 @@ import NexaInsightsBlock from '@/components/greenhouse/NexaInsightsBlock'
 import type { ScopeOwnership } from '@/lib/operational-responsibility/readers'
 
 import type { Space360Detail } from '@/lib/agency/space-360'
+import { formatDateTime as formatGreenhouseDateTime } from '@/lib/format'
 
 type Props = {
   detail: Space360Detail
@@ -152,7 +153,7 @@ const OverviewTab = ({ detail }: Props) => {
                       <ListItem key={item.eventId} disableGutters divider>
                         <ListItemText
                           primary={item.title}
-                          secondary={`${item.description} · ${new Date(item.occurredAt).toLocaleString('es-CL')}`}
+                          secondary={`${item.description} · ${formatGreenhouseDateTime(item.occurredAt, 'es-CL')}`}
                         />
                       </ListItem>
                     ))

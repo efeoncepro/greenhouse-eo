@@ -31,6 +31,7 @@ import EmptyState from '@/components/greenhouse/EmptyState'
 import tableStyles from '@core/styles/table.module.css'
 
 import CreatePlacementDialog from './CreatePlacementDialog'
+import { formatCurrency as formatGreenhouseCurrency } from '@/lib/format'
 
 type PlacementListItem = {
   placementId: string
@@ -92,11 +93,9 @@ const BU_LABEL: Record<string, string> = {
 const formatMoney = (amount: number | null, currency: string | null) => {
   if (amount == null) return '—'
 
-  return new Intl.NumberFormat('es-CL', {
-    style: 'currency',
-    currency: currency || 'USD',
-    maximumFractionDigits: 0
-  }).format(amount)
+  return formatGreenhouseCurrency(amount, currency || 'USD', {
+  maximumFractionDigits: 0
+}, 'es-CL')
 }
 
 const columnHelper = createColumnHelper<PlacementListItem>()

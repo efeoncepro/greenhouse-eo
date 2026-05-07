@@ -30,6 +30,7 @@ import CustomTextField from '@core/components/mui/TextField'
 import tableStyles from '@core/styles/table.module.css'
 
 import { GH_INTERNAL_NAV } from '@/config/greenhouse-nomenclature'
+import { formatDateTime as formatGreenhouseDateTime } from '@/lib/format'
 import { getInitials } from '@/utils/getInitials'
 
 import {
@@ -51,16 +52,10 @@ type Props = {
 type SyncFilter = 'all' | 'attention' | 'aligned' | 'unlinked'
 type StageFilter = 'all' | CommercialPartyStage
 
-const dateTimeFormatter = new Intl.DateTimeFormat('es-CL', {
-  dateStyle: 'medium',
-  timeStyle: 'short',
-  timeZone: 'America/Santiago'
-})
-
 const formatDateTime = (value: string | null) => {
   if (!value) return 'Sin registro'
 
-  return dateTimeFormatter.format(new Date(value))
+  return formatGreenhouseDateTime(value, { dateStyle: 'medium', timeStyle: 'short' })
 }
 
 const syncHealthLabel = (party: CommercialPartyListItem) => {

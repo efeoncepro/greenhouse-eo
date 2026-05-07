@@ -22,7 +22,7 @@ import CustomTextField from '@core/components/mui/TextField'
 import TablePaginationComponent from '@components/TablePaginationComponent'
 
 import { BusinessLineBadge } from '@/components/greenhouse'
-import { GH_INTERNAL_MESSAGES } from '@/config/greenhouse-nomenclature'
+import { GH_INTERNAL_MESSAGES } from '@/lib/copy/admin'
 import type { TenantCapabilityRecord } from '@/lib/admin/tenant-capability-types'
 
 import tableStyles from '@core/styles/table.module.css'
@@ -33,6 +33,7 @@ import {
   getCapabilitySourceTone,
   toTitleCase
 } from './helpers'
+import { formatDate as formatGreenhouseDate } from '@/lib/format'
 
 type TenantServiceModulesTableProps = {
   capabilities: TenantCapabilityRecord[]
@@ -127,7 +128,7 @@ const TenantServiceModulesTable = ({ capabilities }: TenantServiceModulesTablePr
         cell: ({ row }) => (
           <Typography variant='body2' color='text.secondary'>
             {row.original.updatedAt
-              ? new Date(row.original.updatedAt).toLocaleDateString('es-CL')
+              ? formatGreenhouseDate(new Date(row.original.updatedAt), 'es-CL')
               : GH_INTERNAL_MESSAGES.admin_tenant_service_modules_no_date}
           </Typography>
         )

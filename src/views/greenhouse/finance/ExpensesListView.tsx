@@ -34,10 +34,16 @@ import CustomTextField from '@core/components/mui/TextField'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 import TablePaginationComponent from '@components/TablePaginationComponent'
 import { fuzzyFilter } from '@/components/tableUtils'
+import { buildStatusMap , getMicrocopy } from '@/lib/copy'
 
 import tableStyles from '@core/styles/table.module.css'
 import CreateExpenseDrawer from '@views/greenhouse/finance/drawers/CreateExpenseDrawer'
+import { formatCurrency as formatGreenhouseCurrency } from '@/lib/format'
 
+const TASK407_ARIA_VER_DTE_EN_PDF = "Ver DTE en PDF"
+
+
+const GREENHOUSE_COPY = getMicrocopy()
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -81,11 +87,13 @@ interface Expense {
 // ---------------------------------------------------------------------------
 
 const STATUS_CONFIG: Record<string, { label: string; color: 'success' | 'warning' | 'error' | 'info' | 'secondary' }> = {
-  paid: { label: 'Pagado', color: 'success' },
-  scheduled: { label: 'Programado', color: 'info' },
-  pending: { label: 'Pendiente', color: 'warning' },
-  overdue: { label: 'Vencido', color: 'error' },
-  cancelled: { label: 'Cancelado', color: 'secondary' }
+  ...buildStatusMap({
+    paid: { copyKey: 'paid', color: 'success' },
+    scheduled: { copyKey: 'scheduled', color: 'info' },
+    pending: { copyKey: 'pending', color: 'warning' },
+    overdue: { copyKey: 'expired', color: 'error' },
+    cancelled: { copyKey: 'cancelled', color: 'secondary' }
+  })
 }
 
 const TYPE_CONFIG: Record<string, { label: string; color: 'primary' | 'info' | 'warning' | 'error' | 'secondary' }> = {
@@ -101,10 +109,10 @@ const TYPE_CONFIG: Record<string, { label: string; color: 'primary' | 'info' | '
 
 const STATUS_OPTIONS = [
   { value: '', label: 'Todos los estados' },
-  { value: 'pending', label: 'Pendiente' },
-  { value: 'scheduled', label: 'Programado' },
-  { value: 'paid', label: 'Pagado' },
-  { value: 'overdue', label: 'Vencido' }
+  { value: 'pending', label: GREENHOUSE_COPY.states.pending },
+  { value: 'scheduled', label: GREENHOUSE_COPY.states.scheduled },
+  { value: 'paid', label: GREENHOUSE_COPY.states.paid },
+  { value: 'overdue', label: GREENHOUSE_COPY.states.expired }
 ]
 
 const TYPE_OPTIONS = [
@@ -122,7 +130,7 @@ const TYPE_OPTIONS = [
 const SII_STATUS_CONFIG: Record<string, { label: string; color: 'success' | 'error' | 'warning' | 'secondary' }> = {
   Aceptado: { label: 'Aceptado', color: 'success' },
   Reclamado: { label: 'Reclamado', color: 'error' },
-  Pendiente: { label: 'Pendiente', color: 'warning' }
+  Pendiente: { label: GREENHOUSE_COPY.states.pending, color: 'warning' }
 }
 
 // ---------------------------------------------------------------------------
@@ -130,11 +138,13 @@ const SII_STATUS_CONFIG: Record<string, { label: string; color: 'success' | 'err
 // ---------------------------------------------------------------------------
 
 const formatCLP = (amount: number): string =>
-  new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(amount)
+  formatGreenhouseCurrency(amount, 'CLP', {
+  maximumFractionDigits: 0
+}, 'es-CL')
 
 const formatAmount = (amount: number, currency: string): string => {
   if (currency === 'USD') {
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount)
+    return formatGreenhouseCurrency(amount, 'USD', 'en-US')
   }
 
   return formatCLP(amount)
@@ -194,7 +204,7 @@ const expColumns: ColumnDef<Expense, any>[] = [
               rel='noopener noreferrer'
               onClick={e => e.stopPropagation()}
               sx={{ display: 'inline-flex', color: 'error.main', '&:hover': { color: 'error.dark' } }}
-              aria-label='Ver DTE en PDF'
+              aria-label={TASK407_ARIA_VER_DTE_EN_PDF}
             >
               <i className='tabler-file-type-pdf' style={{ fontSize: 16 }} />
             </Box>

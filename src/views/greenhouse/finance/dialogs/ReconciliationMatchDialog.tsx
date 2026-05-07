@@ -23,8 +23,16 @@ import Skeleton from '@mui/material/Skeleton'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
+import { formatCurrency as formatGreenhouseCurrency } from '@/lib/format'
+
+const TASK407_EMPTY_NO_SE_ENCONTRARON_CANDIDATOS_PARA_CONCILIAR_AJUSTA_LOS_FIL = "No se encontraron candidatos para conciliar. Ajusta los filtros o verifica que existan registros en el periodo."
+
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 // ---------------------------------------------------------------------------
 // Types
@@ -81,7 +89,9 @@ type Props = {
 // ---------------------------------------------------------------------------
 
 const formatCLP = (amount: number): string =>
-  new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(amount)
+  formatGreenhouseCurrency(amount, 'CLP', {
+  maximumFractionDigits: 0
+}, 'es-CL')
 
 const formatDate = (dateStr: string | null): string => {
   if (!dateStr) return '—'
@@ -298,7 +308,7 @@ const ReconciliationMatchDialog = ({ open, periodId, row, initialCandidateId = n
             {mode === 'unmatch' ? 'Deshacer conciliacion' : mode === 'exclude' ? 'Excluir movimiento' : 'Conciliar movimiento'}
           </Typography>
         </Box>
-        <IconButton onClick={onClose} size='small' aria-label='Cerrar'>
+        <IconButton onClick={onClose} size='small' aria-label={GREENHOUSE_COPY.actions.close}>
           <i className='tabler-x' />
         </IconButton>
       </DialogTitle>
@@ -442,7 +452,7 @@ const ReconciliationMatchDialog = ({ open, periodId, row, initialCandidateId = n
               ) : candidates.length === 0 ? (
                 <Box sx={{ textAlign: 'center', py: 6 }} role='status'>
                   <Typography variant='body2' color='text.secondary'>
-                    No se encontraron candidatos para conciliar. Ajusta los filtros o verifica que existan registros en el periodo.
+                    {TASK407_EMPTY_NO_SE_ENCONTRARON_CANDIDATOS_PARA_CONCILIAR_AJUSTA_LOS_FIL}
                   </Typography>
                 </Box>
               ) : (
@@ -572,9 +582,7 @@ const ReconciliationMatchDialog = ({ open, periodId, row, initialCandidateId = n
 
         {/* Right side: primary actions */}
         <Box sx={{ display: 'flex', gap: 2 }}>
-          <Button variant='outlined' color='secondary' onClick={onClose} disabled={submitting}>
-            Cancelar
-          </Button>
+          <Button variant='outlined' color='secondary' onClick={onClose} disabled={submitting}>{GREENHOUSE_COPY.actions.cancel}</Button>
 
           {mode === 'match' && (
             <Button

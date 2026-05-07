@@ -29,6 +29,7 @@ import { motion } from '@/libs/FramerMotion'
 import useReducedMotion from '@/hooks/useReducedMotion'
 
 import type { HomeRunwayData } from '@/lib/home/contract'
+import { formatCurrency as formatGreenhouseCurrency, formatTime as formatGreenhouseTime } from '@/lib/format'
 
 const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'), { ssr: false })
 
@@ -46,23 +47,19 @@ const STATUS_TONE: Record<NonNullable<HomeRunwayData['status']>, { color: ThemeC
 const formatCash = (amount: number | null, currency: HomeRunwayData['cashCurrency']): string => {
   if (amount == null) return '—'
 
-  return new Intl.NumberFormat('es-CL', {
-    style: 'currency',
-    currency,
-    maximumFractionDigits: 0,
-    notation: amount >= 1_000_000 ? 'compact' : 'standard'
-  }).format(amount)
+  return formatGreenhouseCurrency(amount, currency, {
+  maximumFractionDigits: 0,
+  notation: amount >= 1_000_000 ? 'compact' : 'standard'
+}, 'es-CL')
 }
 
 const formatBurn = (amount: number | null, currency: HomeRunwayData['cashCurrency']): string => {
   if (amount == null) return '—'
 
-  return new Intl.NumberFormat('es-CL', {
-    style: 'currency',
-    currency,
-    maximumFractionDigits: 0,
-    notation: 'compact'
-  }).format(amount)
+  return formatGreenhouseCurrency(amount, currency, {
+  maximumFractionDigits: 0,
+  notation: 'compact'
+}, 'es-CL')
 }
 
 const isCritical = (status: HomeRunwayData['status']): boolean => status === 'critical'
@@ -149,7 +146,10 @@ export const HomeRunwayStrategic = ({ data }: HomeRunwayStrategicProps) => {
   }
 
   const tooltipTitle = data.deltaPct != null
-    ? `${data.deltaPct > 0 ? '+' : ''}${data.deltaPct.toFixed(1)}% vs hace 3 meses · actualizado ${new Date(data.asOf).toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' })}`
+    ? `${data.deltaPct > 0 ? '+' : ''}${data.deltaPct.toFixed(1)}% vs hace 3 meses · actualizado ${formatGreenhouseTime(new Date(data.asOf), {
+  hour: '2-digit',
+  minute: '2-digit'
+}, 'es-CL')}`
     : 'Calculado de income − expenses (rolling 6 meses)'
 
   const isEmpty = data.runwayMonths == null && data.cashCurrent == null && data.monthlyHistory.length === 0

@@ -5,6 +5,7 @@ export async function ensureHandlersRegistered() {
 
   await import('./teams-attendance')
   await import('./hubspot-companies')
+  await import('./hubspot-services')
 
   // Future handlers imported here
   registered = true

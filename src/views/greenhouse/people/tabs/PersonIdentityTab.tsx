@@ -19,6 +19,7 @@ import HorizontalWithAvatar from '@components/card-statistics/HorizontalWithAvat
 import type { PersonAccessContext, PersonIdentityContext } from '@/types/people'
 import type { PersonDeliveryContext } from '@/lib/person-360/get-person-delivery'
 import type { PersonHrContext } from '@/lib/person-360/get-person-hr'
+import { formatDate as formatGreenhouseDate } from '@/lib/format'
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -31,7 +32,11 @@ const formatDate = (iso: string | null): string => {
 
   if (Number.isNaN(date.getTime())) return '—'
 
-  return date.toLocaleDateString('es-CL', { day: 'numeric', month: 'short', year: 'numeric' })
+  return formatGreenhouseDate(date, {
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric'
+}, 'es-CL')
 }
 
 const formatLastLogin = (iso: string | null): { text: string; muted: boolean } => {
@@ -41,7 +46,11 @@ const formatLastLogin = (iso: string | null): { text: string; muted: boolean } =
 
   if (Number.isNaN(date.getTime())) return { text: 'Nunca', muted: true }
 
-  return { text: date.toLocaleDateString('es-CL', { day: 'numeric', month: 'short', year: 'numeric' }), muted: false }
+  return { text: formatGreenhouseDate(date, {
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric'
+}, 'es-CL'), muted: false }
 }
 
 const formatPayRegime = (regime: string | null, currency: string | null): string => {

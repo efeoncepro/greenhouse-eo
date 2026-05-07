@@ -13,6 +13,7 @@ import Grid from '@mui/material/Grid'
 import Typography from '@mui/material/Typography'
 
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
+import { formatNumber as formatGreenhouseNumber } from '@/lib/format'
 
 interface DeliveryData {
   identityProfileId: string
@@ -23,7 +24,7 @@ interface DeliveryData {
   crm: { ownedCompanies: number; ownedDeals: number; openDealsAmount: number }
 }
 
-const fmt = (n: number) => `$${Math.round(n).toLocaleString('es-CL')}`
+const fmt = (n: number) => `$${formatGreenhouseNumber(Math.round(n), 'es-CL')}`
 
 const MyDeliveryView = () => {
   const [data, setData] = useState<DeliveryData | null>(null)

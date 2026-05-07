@@ -21,7 +21,7 @@ import CustomAvatar from '@core/components/mui/Avatar'
 import CustomChip from '@core/components/mui/Chip'
 
 import { BusinessLineBadge, BrandWordmark } from '@/components/greenhouse'
-import { GH_INTERNAL_MESSAGES } from '@/config/greenhouse-nomenclature'
+import { GH_INTERNAL_MESSAGES } from '@/lib/copy/admin'
 import type { AdminTenantDetail } from '@/lib/admin/get-admin-tenant-detail'
 import type { TenantCapabilityRecord } from '@/lib/admin/tenant-capability-types'
 import TenantCapabilityManager, {

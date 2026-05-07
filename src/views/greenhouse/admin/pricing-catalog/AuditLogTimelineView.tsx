@@ -37,7 +37,11 @@ import CustomTextField from '@core/components/mui/TextField'
 
 import AuditDiffViewer from '@/components/greenhouse/pricing/AuditDiffViewer'
 import AuditRevertConfirmDialog from '@/components/greenhouse/pricing/AuditRevertConfirmDialog'
-import { GH_PRICING_GOVERNANCE } from '@/config/greenhouse-nomenclature'
+import { GH_PRICING_GOVERNANCE } from '@/lib/copy/pricing'
+import { formatDateTime as formatLocaleDateTime } from '@/lib/format'
+
+const TASK407_ARIA_VOLVER_AL_CATALOGO = "Volver al catálogo"
+
 
 // ── Types ──────────────────────────────────────────────────────────────
 
@@ -198,13 +202,14 @@ const formatDateTime = (iso: string): string => {
 
   if (Number.isNaN(date.getTime())) return iso
 
-  return new Intl.DateTimeFormat('es-CL', {
+  return formatLocaleDateTime(iso, {
     day: '2-digit',
     month: 'short',
     year: 'numeric',
     hour: '2-digit',
-    minute: '2-digit'
-  }).format(date)
+    minute: '2-digit',
+    fallback: iso
+  })
 }
 
 const hasDetails = (summary: Record<string, unknown>): boolean => {
@@ -313,7 +318,7 @@ const AuditLogTimelineView = ({ canRevert = false }: AuditLogTimelineViewProps) 
               component='a'
               href='/admin/pricing-catalog'
               size='small'
-              aria-label='Volver al catálogo'
+              aria-label={TASK407_ARIA_VOLVER_AL_CATALOGO}
             >
               <i className='tabler-arrow-left' />
             </IconButton>

@@ -30,6 +30,8 @@ import type { ColumnDef, FilterFn } from '@tanstack/react-table'
 import { rankItem } from '@tanstack/match-sorter-utils'
 import classnames from 'classnames'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomAvatar from '@core/components/mui/Avatar'
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
@@ -39,6 +41,11 @@ import type { AiCreditLedgerEntry, AiCreditLedgerResponse, AiToolingAdminMetadat
 import { ledgerEntryTypeConfig, formatTimestamp, formatCost } from '../helpers'
 
 import tableStyles from '@core/styles/table.module.css'
+
+const TASK407_EMPTY_NO_SE_ENCONTRARON_MOVIMIENTOS = "No se encontraron movimientos"
+
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
   const itemRank = rankItem(row.getValue(columnId), value)
@@ -342,7 +349,7 @@ const AiConsumptionTab = ({ meta }: Props) => {
                       <CustomAvatar variant='rounded' skin='light' color='warning' size={48}>
                         <i className='tabler-receipt-off' style={{ fontSize: 24 }} />
                       </CustomAvatar>
-                      <Typography color='text.secondary'>No se encontraron movimientos</Typography>
+                      <Typography color='text.secondary'>{TASK407_EMPTY_NO_SE_ENCONTRARON_MOVIMIENTOS}</Typography>
                       {(filterWallet || filterMember || globalFilter) && (
                         <Button
                           variant='tonal' size='small' color='secondary'
@@ -446,7 +453,7 @@ const AiConsumptionTab = ({ meta }: Props) => {
         </DialogContent>
         <Divider />
         <DialogActions sx={{ px: 4, py: 2.5 }}>
-          <Button variant='tonal' color='secondary' onClick={() => setConsumeOpen(false)} disabled={saving}>Cancelar</Button>
+          <Button variant='tonal' color='secondary' onClick={() => setConsumeOpen(false)} disabled={saving}>{GREENHOUSE_COPY.actions.cancel}</Button>
           <Button variant='contained' onClick={handleConsume} disabled={saving || !formWallet || !formMember || !formAsset || !formAmount}>
             {saving ? 'Registrando...' : 'Registrar consumo'}
           </Button>

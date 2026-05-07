@@ -20,12 +20,17 @@ import {
 } from '@mui/material'
 import { toast } from 'sonner'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import useCreateDeal, { type CreateDealResponse } from '@/hooks/useCreateDeal'
 import useDealCreationContext, {
   type DealCreationContextOption,
   type DealCreationContextPipeline,
   type DealCreationContextStage
 } from '@/hooks/useDealCreationContext'
+import { formatNumber as formatGreenhouseNumber } from '@/lib/format'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 // TASK-539 (initial drawer) + TASK-571 (pipeline/stage governance).
 //
@@ -382,7 +387,7 @@ const CreateDealDrawer = ({
           </Box>
           <IconButton
             onClick={() => (creating ? undefined : onClose())}
-            aria-label='Cerrar'
+            aria-label={GREENHOUSE_COPY.actions.close}
             size='small'
           >
             <i className='tabler-x' />
@@ -579,7 +584,7 @@ const CreateDealDrawer = ({
                 }}
                 helperText={
                   parsedAmountClp !== null && currency !== 'CLP'
-                    ? `≈ CLP ${parsedAmountClp.toLocaleString('es-CL')}`
+                    ? `≈ CLP ${formatGreenhouseNumber(parsedAmountClp, 'es-CL')}`
                     : 'Opcional. Ajustable luego en HubSpot.'
                 }
               />
@@ -646,9 +651,7 @@ const CreateDealDrawer = ({
         <Divider />
 
         <Box sx={{ px: 4, py: 3, display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
-          <Button variant='outlined' color='secondary' disabled={creating} onClick={() => onClose()}>
-            Cancelar
-          </Button>
+          <Button variant='outlined' color='secondary' disabled={creating} onClick={() => onClose()}>{GREENHOUSE_COPY.actions.cancel}</Button>
           <Button
             variant='contained'
             color='primary'

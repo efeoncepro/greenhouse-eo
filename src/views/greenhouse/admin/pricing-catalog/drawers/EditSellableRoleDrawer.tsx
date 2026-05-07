@@ -26,8 +26,11 @@ import Typography from '@mui/material/Typography'
 
 import { TabContext, TabList, TabPanel } from '@mui/lab'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import ImpactPreviewPanel from '@/components/greenhouse/pricing/ImpactPreviewPanel'
-import { GH_PRICING_GOVERNANCE } from '@/config/greenhouse-nomenclature'
+import { GH_PRICING_GOVERNANCE } from '@/lib/copy/pricing'
+import { formatCurrency, formatNumber } from '@/lib/format'
 
 import CustomTextField from '@core/components/mui/TextField'
 
@@ -36,6 +39,11 @@ import {
   PRICING_TIER_LABELS,
   type PricingTierCode
 } from '@/lib/commercial/pricing-governance-types'
+
+const TASK407_ARIA_SECCIONES_DEL_ROL = "Secciones del rol"
+
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 // Inline para evitar importar `sellable-roles-seed.ts` que depende de node:fs/promises.
 // Las 6 monedas están alineadas con `PricingOutputCurrency` del engine v2 (TASK-464d).
@@ -167,7 +175,7 @@ const todayIso = (): string => new Date().toISOString().slice(0, 10)
 const fmtUsd = (value: number | null | undefined): string => {
   if (value === null || value === undefined || !Number.isFinite(value)) return '—'
 
-  return `$${value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+  return formatCurrency(value, 'USD', {}, 'en-US')
 }
 
 const fmtPct = (value: number | null | undefined): string => {
@@ -180,10 +188,10 @@ const fmtPrice = (value: number | null | undefined, currency: string): string =>
   if (value === null || value === undefined || !Number.isFinite(value)) return '—'
   const digits = currency === 'CLP' || currency === 'COP' ? 0 : 2
 
-  return `${currency} ${value.toLocaleString('en-US', {
+  return `${currency} ${formatNumber(value, {
     minimumFractionDigits: digits,
     maximumFractionDigits: digits
-  })}`
+  }, 'en-US')}`
 }
 
 const fmtDate = (value: string): string => {
@@ -1014,7 +1022,7 @@ const EditSellableRoleDrawer = ({ open, roleId, onClose, onSuccess }: EditSellab
             </Typography>
           )}
         </Box>
-        <IconButton onClick={handleClose} size='small' aria-label='Cerrar'>
+        <IconButton onClick={handleClose} size='small' aria-label={GREENHOUSE_COPY.actions.close}>
           <i className='tabler-x' />
         </IconButton>
       </Box>
@@ -1036,7 +1044,7 @@ const EditSellableRoleDrawer = ({ open, roleId, onClose, onSuccess }: EditSellab
               onChange={(_, v: TabValue) => setTab(v)}
               variant='scrollable'
               scrollButtons='auto'
-              aria-label='Secciones del rol'
+              aria-label={TASK407_ARIA_SECCIONES_DEL_ROL}
             >
               <Tab
                 value='info'
@@ -1272,17 +1280,13 @@ const EditSellableRoleDrawer = ({ open, roleId, onClose, onSuccess }: EditSellab
                           setAddCompatOpen(false)
                           setAddCompatValue(null)
                         }}
-                      >
-                        Cancelar
-                      </Button>
+                      >{GREENHOUSE_COPY.actions.cancel}</Button>
                       <Button
                         variant='contained'
                         size='small'
                         onClick={handleAddCompat}
                         disabled={!addCompatValue}
-                      >
-                        Agregar
-                      </Button>
+                      >{GREENHOUSE_COPY.actions.add}</Button>
                     </Box>
                   </Stack>
                 </Paper>
@@ -1669,9 +1673,7 @@ const EditSellableRoleDrawer = ({ open, roleId, onClose, onSuccess }: EditSellab
                           resetCostForm()
                         }}
                         disabled={savingCost}
-                      >
-                        Cancelar
-                      </Button>
+                      >{GREENHOUSE_COPY.actions.cancel}</Button>
                       <Button
                         variant='contained'
                         size='small'
@@ -2135,9 +2137,7 @@ const EditSellableRoleDrawer = ({ open, roleId, onClose, onSuccess }: EditSellab
                           resetPricingForm()
                         }}
                         disabled={savingPricing}
-                      >
-                        Cancelar
-                      </Button>
+                      >{GREENHOUSE_COPY.actions.cancel}</Button>
                       <Button
                         variant='contained'
                         size='small'
@@ -2282,9 +2282,7 @@ const EditSellableRoleDrawer = ({ open, roleId, onClose, onSuccess }: EditSellab
         </Box>
       ) : null}
       <Box sx={{ display: 'flex', justifyContent: 'flex-end', p: 4 }}>
-        <Button variant='outlined' color='secondary' onClick={handleClose}>
-          Cerrar
-        </Button>
+        <Button variant='outlined' color='secondary' onClick={handleClose}>{GREENHOUSE_COPY.actions.close}</Button>
       </Box>
     </Drawer>
   )

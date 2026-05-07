@@ -12,12 +12,16 @@ import MenuItem from '@mui/material/MenuItem'
 import Skeleton from '@mui/material/Skeleton'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomAvatar from '@core/components/mui/Avatar'
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 
 import { NOTIFICATION_CATEGORIES } from '@/config/notification-categories'
 import { CATEGORY_ICONS, timeAgo, getTimeGroup } from '@/config/notification-ui'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 // ── Types ──
 
@@ -288,9 +292,7 @@ const NotificationsPageView = () => {
             disabled={page >= totalPages}
             onClick={() => setPage(p => p + 1)}
             endIcon={<i className='tabler-chevron-right' />}
-          >
-            Siguiente
-          </Button>
+          >{GREENHOUSE_COPY.actions.next}</Button>
         </Box>
       )}
     </Box>

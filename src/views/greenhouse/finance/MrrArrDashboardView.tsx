@@ -30,7 +30,7 @@ import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSu
 
 import CustomChip from '@core/components/mui/Chip'
 
-import { GH_MRR_ARR_DASHBOARD } from '@/config/greenhouse-nomenclature'
+import { GH_MRR_ARR_DASHBOARD } from '@/lib/copy/finance'
 
 import type {
   ContractMrrArrSnapshotRow,
@@ -39,6 +39,7 @@ import type {
   MrrArrPeriodTotals,
   MrrArrSeriesPoint
 } from '@/lib/commercial-intelligence/contracts'
+import { formatCurrency as formatGreenhouseCurrency, formatDate as formatGreenhouseDate } from '@/lib/format'
 
 const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'), { ssr: false })
 
@@ -58,11 +59,9 @@ interface TimelineResponse {
 const formatCLP = (amount: number | null | undefined): string => {
   if (amount === null || amount === undefined || Number.isNaN(amount)) return '—'
 
-  return new Intl.NumberFormat('es-CL', {
-    style: 'currency',
-    currency: 'CLP',
-    maximumFractionDigits: 0
-  }).format(amount)
+  return formatGreenhouseCurrency(amount, 'CLP', {
+  maximumFractionDigits: 0
+}, 'es-CL')
 }
 
 const formatPct = (value: number | null | undefined, digits = 1): string => {
@@ -74,12 +73,19 @@ const formatPct = (value: number | null | undefined, digits = 1): string => {
 const formatMonthShort = (year: number, month: number): string => {
   const d = new Date(year, month - 1, 1)
 
-  return d.toLocaleDateString('es-CL', { month: 'short', year: '2-digit' })
+  return formatGreenhouseDate(d, {
+  month: 'short',
+  year: '2-digit'
+}, 'es-CL')
 }
 
 const formatMonthLong = (year: number, month: number): string => {
   const d = new Date(year, month - 1, 1)
-  const s = d.toLocaleDateString('es-CL', { month: 'long', year: 'numeric' })
+
+  const s = formatGreenhouseDate(d, {
+  month: 'long',
+  year: 'numeric'
+}, 'es-CL')
 
   return s.charAt(0).toUpperCase() + s.slice(1)
 }

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { listRegisteredTemplates, resolveTemplate } from './templates'
+import { getPreviewCatalog, listRegisteredTemplates, resolveTemplate } from './templates'
 
 describe('email templates registry', () => {
   it('registers the core Greenhouse templates', () => {
@@ -13,6 +13,12 @@ describe('email templates registry', () => {
       'payroll_receipt',
       'weekly_executive_digest'
     ]))
+  })
+
+  it('exposes every registered template in the admin preview catalog', () => {
+    const previewTypes = new Set(getPreviewCatalog().map(template => template.emailType))
+
+    expect([...previewTypes].sort()).toEqual([...listRegisteredTemplates()].sort())
   })
 
   it('resolves the notification template with the provided context', () => {

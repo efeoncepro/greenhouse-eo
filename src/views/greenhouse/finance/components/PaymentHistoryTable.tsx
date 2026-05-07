@@ -15,6 +15,7 @@ import Typography from '@mui/material/Typography'
 
 import PaymentInstrumentChip from '@/components/greenhouse/PaymentInstrumentChip'
 import type { InstrumentCategory } from '@/config/payment-instruments'
+import { formatCurrency as formatGreenhouseCurrency } from '@/lib/format'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -54,11 +55,9 @@ const formatDate = (dateStr: string | null): string => {
 }
 
 const formatAmount = (amount: number, currency: string) =>
-  new Intl.NumberFormat('es-CL', {
-    style: 'currency',
-    currency,
-    maximumFractionDigits: currency === 'CLP' ? 0 : 2
-  }).format(amount)
+  formatGreenhouseCurrency(amount, currency, {
+  maximumFractionDigits: currency === 'CLP' ? 0 : 2
+}, 'es-CL')
 
 // ---------------------------------------------------------------------------
 // Component

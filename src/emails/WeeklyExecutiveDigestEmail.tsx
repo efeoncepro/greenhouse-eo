@@ -3,6 +3,8 @@ import type { ReactNode } from 'react'
 
 import { Heading, Link, Section, Text } from '@react-email/components'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import EmailButton from './components/EmailButton'
 import EmailLayout from './components/EmailLayout'
 import { APP_URL, EMAIL_COLORS, EMAIL_FONTS } from './constants'
@@ -41,21 +43,18 @@ interface WeeklyExecutiveDigestEmailProps {
   unsubscribeUrl?: string
 }
 
-const SEVERITY_STYLES: Record<WeeklyDigestSeverity, { label: string; bg: string; border: string; text: string }> = {
+const SEVERITY_STYLES: Record<WeeklyDigestSeverity, { bg: string; border: string; text: string }> = {
   critical: {
-    label: 'Crítico',
     bg: '#FEF3F2',
     border: '#FECDCA',
     text: '#B42318'
   },
   warning: {
-    label: 'Seguimiento',
     bg: '#FFFAEB',
     border: '#FEDF89',
     text: '#B54708'
   },
   info: {
-    label: 'Informativo',
     bg: '#EFF8FF',
     border: '#B2DDFF',
     text: '#175CD3'
@@ -137,17 +136,19 @@ export default function WeeklyExecutiveDigestEmail({
   spacesAffected,
   spaces = [],
   portalUrl = APP_URL,
-  closingNote = 'Resumen automático basado en los insights materializados del período. Abre Greenhouse para ver el detalle completo.',
+  closingNote,
   unsubscribeUrl
 }: WeeklyExecutiveDigestEmailProps) {
+  const t = getMicrocopy().emails.weeklyExecutiveDigest
   const derivedCounts = countInsights(spaces)
   const totalInsightsValue = totalInsights ?? derivedCounts.total
   const criticalValue = criticalCount ?? derivedCounts.critical
   const warningValue = warningCount ?? derivedCounts.warning
   const infoValue = infoCount ?? derivedCounts.info
   const spacesAffectedValue = spacesAffected ?? derivedCounts.spaces
-  const severitySummary = `${criticalValue} críticos · ${warningValue} en seguimiento · ${infoValue} informativos`
-  const previewText = `${periodLabel} · ${totalInsightsValue} insights · ${spacesAffectedValue} espacios`
+  const severitySummary = t.severitySummary(criticalValue, warningValue, infoValue)
+  const previewText = t.previewText(periodLabel, totalInsightsValue, spacesAffectedValue)
+  const closingNoteValue = closingNote ?? t.defaultClosingNote
 
   return (
     <EmailLayout previewText={previewText} lang='es' unsubscribeUrl={unsubscribeUrl}>
@@ -161,7 +162,7 @@ export default function WeeklyExecutiveDigestEmail({
         margin: '0 0 6px',
         lineHeight: '16px',
       }}>
-        {'NEXA INSIGHTS · '}{periodLabel.toUpperCase()}
+        {t.kickerPrefix}{periodLabel.toUpperCase()}
       </Text>
 
       <Heading style={{
@@ -172,7 +173,7 @@ export default function WeeklyExecutiveDigestEmail({
         margin: '0 0 8px',
         lineHeight: '32px',
       }}>
-        Resumen semanal para liderazgo
+        {t.heading}
       </Heading>
 
       <Text style={{
@@ -181,7 +182,7 @@ export default function WeeklyExecutiveDigestEmail({
         lineHeight: '24px',
         margin: '0 0 20px',
       }}>
-        Lo más relevante de la semana, ordenado por impacto y listo para lectura rápida.
+        {t.intro}
       </Text>
 
       <Section style={{
@@ -193,9 +194,9 @@ export default function WeeklyExecutiveDigestEmail({
       }}>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <tbody>
-            {summaryRow('Insights incluidos', String(totalInsightsValue))}
-            {summaryRow('Distribución por severidad', severitySummary)}
-            {summaryRow('Espacios afectados', String(spacesAffectedValue))}
+            {summaryRow(t.includedInsightsLabel, String(totalInsightsValue))}
+            {summaryRow(t.severityDistributionLabel, severitySummary)}
+            {summaryRow(t.affectedSpacesLabel, String(spacesAffectedValue))}
           </tbody>
         </table>
       </Section>
@@ -226,7 +227,7 @@ export default function WeeklyExecutiveDigestEmail({
                       margin: '0 0 4px',
                       lineHeight: '16px',
                     }}>
-                      Espacio
+                      {t.spaceLabel}
                     </Text>
                     <Heading style={{
                       fontFamily: EMAIL_FONTS.heading,
@@ -255,7 +256,7 @@ export default function WeeklyExecutiveDigestEmail({
                     color: EMAIL_COLORS.muted,
                     whiteSpace: 'nowrap' as const,
                   }}>
-                    {space.insights.length} {space.insights.length === 1 ? 'insight' : 'insights'}
+                    {space.insights.length} {t.insightsUnit(space.insights.length)}
                   </td>
                 </tr>
               </tbody>
@@ -268,7 +269,7 @@ export default function WeeklyExecutiveDigestEmail({
                 lineHeight: '22px',
                 margin: '0',
               }}>
-                No hubo insights materializados para este espacio en el período.
+                {t.emptySpaceInsights}
               </Text>
             ) : (
               space.insights.map((insight, index) => {
@@ -299,7 +300,7 @@ export default function WeeklyExecutiveDigestEmail({
                       letterSpacing: '0',
                       textTransform: 'uppercase' as const,
                     }}>
-                      {severity.label}
+                      {t.severityLabels[insight.severity]}
                     </Text>
 
                     <Heading style={{
@@ -342,7 +343,7 @@ export default function WeeklyExecutiveDigestEmail({
                           margin: '0 0 4px',
                           lineHeight: '16px',
                         }}>
-                          Causa probable
+                          {t.rootCauseLabel}
                         </Text>
                         <Text style={{
                           fontSize: '13px',
@@ -370,7 +371,7 @@ export default function WeeklyExecutiveDigestEmail({
                             fontWeight: 600,
                           }}
                         >
-                          {insight.actionLabel || 'Abrir detalle'}
+                          {insight.actionLabel || t.defaultInsightAction}
                         </Link>
                       </Text>
                     )}
@@ -396,7 +397,7 @@ export default function WeeklyExecutiveDigestEmail({
             margin: '0 0 6px',
             lineHeight: '22px',
           }}>
-            Sin insights para mostrar
+            {t.emptyHeading}
           </Heading>
 
           <Text style={{
@@ -405,13 +406,13 @@ export default function WeeklyExecutiveDigestEmail({
             lineHeight: '22px',
             margin: '0',
           }}>
-            No se materializaron insights en este período. Cuando haya novedades, aparecerán aquí con enlaces directos al portal.
+            {t.emptyBody}
           </Text>
         </Section>
       )}
 
       <Section style={{ textAlign: 'center' as const, margin: '0 0 18px' }}>
-        <EmailButton href={portalUrl}>Abrir Greenhouse</EmailButton>
+        <EmailButton href={portalUrl}>{t.cta}</EmailButton>
       </Section>
 
       <Text style={{
@@ -420,7 +421,7 @@ export default function WeeklyExecutiveDigestEmail({
         lineHeight: '20px',
         margin: '0',
       }}>
-        {closingNote}{' '}
+        {closingNoteValue}{' '}
         <Link
           href={portalUrl}
           style={{
@@ -429,7 +430,7 @@ export default function WeeklyExecutiveDigestEmail({
             fontWeight: 600,
           }}
         >
-          Ver en Greenhouse
+          {t.closingLink}
         </Link>
         .
       </Text>

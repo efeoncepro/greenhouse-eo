@@ -15,11 +15,15 @@ import Grid from '@mui/material/Grid'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomChip from '@core/components/mui/Chip'
 
 import type { PayrollEntryExplain } from '@/types/payroll'
 
 import { formatCurrency, formatDecimal, formatFactor, formatPercent, formatPeriodLabel } from './helpers'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 type Props = {
   open: boolean
@@ -301,9 +305,7 @@ const PayrollEntryExplainDialog = ({ open, entryId, memberName, onClose }: Props
         )}
       </DialogContent>
       <DialogActions>
-        <Button variant='tonal' color='secondary' onClick={onClose}>
-          Cerrar
-        </Button>
+        <Button variant='tonal' color='secondary' onClick={onClose}>{GREENHOUSE_COPY.actions.close}</Button>
       </DialogActions>
     </Dialog>
   )

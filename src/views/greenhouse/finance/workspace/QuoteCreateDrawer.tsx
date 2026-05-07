@@ -24,6 +24,8 @@ import ToggleButtonGroup from '@mui/material/ToggleButtonGroup'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 
@@ -41,6 +43,15 @@ import QuoteBuilderActions, {
 } from './QuoteBuilderActions'
 import QuoteTotalsFooter from './QuoteTotalsFooter'
 import AddonSuggestionsPanel from './AddonSuggestionsPanel'
+
+const TASK407_ARIA_MODO_DE_CREACION_DE_LA_COTIZACION = "Modo de creación de la cotización"
+const TASK407_ARIA_CREAR_DESDE_CERO = "Crear desde cero"
+const TASK407_ARIA_CREAR_DESDE_TEMPLATE = "Crear desde template"
+const TASK407_ARIA_TEMPLATE_DE_COTIZACION = "Template de cotización"
+const TASK407_ARIA_ESPACIO_DE_LA_COTIZACION = "Espacio de la cotización"
+
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 type PricingModel = 'staff_aug' | 'retainer' | 'project'
 
@@ -467,7 +478,7 @@ const QuoteCreateDrawer = ({
             Crea una cotización canónica desde cero o partiendo de un template existente.
           </Typography>
         </Box>
-        <IconButton onClick={onClose} size='small' aria-label='Cerrar' disabled={submitting}>
+        <IconButton onClick={onClose} size='small' aria-label={GREENHOUSE_COPY.actions.close} disabled={submitting}>
           <i className='tabler-x' />
         </IconButton>
       </Box>
@@ -486,13 +497,13 @@ const QuoteCreateDrawer = ({
               onChange={handleModeChange}
               fullWidth
               size='small'
-              aria-label='Modo de creación de la cotización'
+              aria-label={TASK407_ARIA_MODO_DE_CREACION_DE_LA_COTIZACION}
             >
-              <ToggleButton value='scratch' aria-label='Crear desde cero'>
+              <ToggleButton value='scratch' aria-label={TASK407_ARIA_CREAR_DESDE_CERO}>
                 <i className='tabler-pencil-plus' style={{ marginInlineEnd: 8 }} />
                 Desde cero
               </ToggleButton>
-              <ToggleButton value='template' aria-label='Crear desde template'>
+              <ToggleButton value='template' aria-label={TASK407_ARIA_CREAR_DESDE_TEMPLATE}>
                 <i className='tabler-template' style={{ marginInlineEnd: 8 }} />
                 Desde template
               </ToggleButton>
@@ -532,7 +543,7 @@ const QuoteCreateDrawer = ({
                   size='small'
                   label='Template'
                   placeholder='Busca un template aprobado'
-                  aria-label='Template de cotización'
+                  aria-label={TASK407_ARIA_TEMPLATE_DE_COTIZACION}
                 />
               )}
             />
@@ -583,7 +594,7 @@ const QuoteCreateDrawer = ({
                 label='Espacio'
                 required
                 placeholder='Busca por nombre'
-                aria-label='Espacio de la cotización'
+                aria-label={TASK407_ARIA_ESPACIO_DE_LA_COTIZACION}
               />
             )}
           />
@@ -786,9 +797,7 @@ const QuoteCreateDrawer = ({
 
       <Divider />
       <Box sx={{ display: 'flex', gap: 2, p: 4 }}>
-        <Button variant='tonal' color='secondary' onClick={onClose} fullWidth disabled={submitting}>
-          Cancelar
-        </Button>
+        <Button variant='tonal' color='secondary' onClick={onClose} fullWidth disabled={submitting}>{GREENHOUSE_COPY.actions.cancel}</Button>
         <Button variant='contained' onClick={handleSubmit} disabled={submitting} fullWidth startIcon={<i className='tabler-device-floppy' />}>
           {submitting ? 'Creando…' : 'Crear cotización'}
         </Button>

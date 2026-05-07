@@ -23,8 +23,13 @@ import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
 
 import { EmptyState, ProjectTeamSection } from '@/components/greenhouse'
-import { GH_CLIENT_NAV, GH_LABELS, GH_MESSAGES } from '@/config/greenhouse-nomenclature'
+import { GH_CLIENT_NAV } from '@/config/greenhouse-nomenclature'
+import { GH_LABELS, GH_MESSAGES } from '@/lib/copy/client-portal'
 import type { GreenhouseProjectDetailData, GreenhouseProjectTasksData } from '@/types/greenhouse-project-detail'
+import { formatDate as formatGreenhouseDate } from '@/lib/format'
+
+const TASK407_ARIA_BREADCRUMBS = "breadcrumbs"
+
 
 interface Props {
   projectId: string
@@ -37,7 +42,7 @@ const formatDateLabel = (value: string | null, options?: Intl.DateTimeFormatOpti
 
   const date = value.includes('T') ? new Date(value) : new Date(`${value}T00:00:00`)
 
-  return date.toLocaleString(undefined, options)
+  return formatGreenhouseDate(date, options)
 }
 
 const formatDateRange = (startDate: string | null, endDate: string | null) => {
@@ -106,7 +111,7 @@ const GreenhouseProjectDetail = ({ projectId }: Props) => {
   return (
     <Stack spacing={6}>
       <Stack spacing={1.5}>
-        <Breadcrumbs aria-label='breadcrumbs'>
+        <Breadcrumbs aria-label={TASK407_ARIA_BREADCRUMBS}>
           <Typography component={Link} href='/home' color='inherit'>
             {GH_CLIENT_NAV.dashboard.label}
           </Typography>

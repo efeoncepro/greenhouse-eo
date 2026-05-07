@@ -25,7 +25,7 @@ import Typography from '@mui/material/Typography'
 import CostConfidenceChip, { type CostConfidenceLabel } from './CostConfidenceChip'
 import CostFreshnessBadge from './CostFreshnessBadge'
 import CostSourceChip, { type CostSourceKind } from './CostSourceChip'
-import { GH_PRICING } from '@/config/greenhouse-nomenclature'
+import { GH_PRICING } from '@/lib/copy/pricing'
 
 export interface CostProvenancePopoverProps {
   sourceKind: CostSourceKind | string | null | undefined

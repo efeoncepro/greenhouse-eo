@@ -6,7 +6,7 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { alpha } from '@mui/material/styles'
 
-import { GH_TEAM } from '@/config/greenhouse-nomenclature'
+import { GH_TEAM } from '@/lib/copy/client-portal'
 import type { TeamMemberResponse } from '@/types/team'
 
 import TeamAvatar, { getTeamRoleTone } from './TeamAvatar'

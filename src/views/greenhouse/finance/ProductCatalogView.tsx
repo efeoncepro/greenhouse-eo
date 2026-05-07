@@ -21,8 +21,13 @@ import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
+import { formatCurrency as formatGreenhouseCurrency } from '@/lib/format'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 // ── Types ──
 
@@ -59,7 +64,9 @@ const SOURCE_CHIP_CONFIG: Record<string, { label: string; color: 'warning' | 'se
 // ── Helpers ──
 
 const formatCLP = (amount: number) =>
-  new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(amount)
+  formatGreenhouseCurrency(amount, 'CLP', {
+  maximumFractionDigits: 0
+}, 'es-CL')
 
 // ── Create Product Drawer ──
 
@@ -152,7 +159,7 @@ const CreateProductDrawer = ({
       <Box sx={{ p: 4 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 4 }}>
           <Typography variant='h6'>Nuevo producto HubSpot</Typography>
-          <IconButton onClick={handleClose} aria-label='Cerrar'>
+          <IconButton onClick={handleClose} aria-label={GREENHOUSE_COPY.actions.close}>
             <i className='tabler-x' />
           </IconButton>
         </Box>
@@ -180,7 +187,7 @@ const CreateProductDrawer = ({
           {error && <Typography variant='body2' color='error' role='alert'>{error}</Typography>}
 
           <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
-            <Button variant='tonal' color='secondary' onClick={handleClose} disabled={submitting}>Cancelar</Button>
+            <Button variant='tonal' color='secondary' onClick={handleClose} disabled={submitting}>{GREENHOUSE_COPY.actions.cancel}</Button>
             <Button variant='contained' onClick={handleSubmit} disabled={submitting}>
               {submitting ? 'Creando...' : 'Crear producto'}
             </Button>

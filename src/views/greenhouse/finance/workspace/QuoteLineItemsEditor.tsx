@@ -37,6 +37,7 @@ import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 
 import EmptyState from '@/components/greenhouse/EmptyState'
+import { CardHeaderWithBadge } from '@/components/greenhouse/primitives'
 import { DataTableShell } from '@/components/greenhouse/data-table'
 import { useListAnimation } from '@/hooks/useListAnimation'
 import type {
@@ -45,7 +46,7 @@ import type {
   PricingV2LineType,
   PricingWarning
 } from '@/lib/finance/pricing/contracts'
-import { GH_PRICING } from '@/config/greenhouse-nomenclature'
+import { GH_PRICING } from '@/lib/copy/pricing'
 
 import type { SellableSelection } from '@/components/greenhouse/pricing/SellableItemPickerDrawer'
 import CostOverrideDialog, {
@@ -54,6 +55,15 @@ import CostOverrideDialog, {
 import QuoteLineWarning from '@/components/greenhouse/pricing/QuoteLineWarning'
 
 import QuoteLineCostStack from './QuoteLineCostStack'
+import { formatCurrency as formatGreenhouseCurrency, formatNumber as formatGreenhouseNumber } from '@/lib/format'
+
+const TASK407_ARIA_EXPANDIR_DETALLE = "Expandir detalle"
+const TASK407_ARIA_ACCIONES = "Acciones"
+const TASK407_ARIA_CALCULANDO_PRECIO_DEL_CATALOGO = "Calculando precio del catálogo"
+const TASK407_ARIA_CALCULANDO_SUBTOTAL = "Calculando subtotal"
+const TASK407_ARIA_SUBTOTAL_SIN_DATOS_SUFICIENTES = "Subtotal sin datos suficientes"
+const TASK407_ARIA_AVISOS_DEL_MOTOR_DE_PRICING = "Avisos del motor de pricing"
+
 
 export type QuoteLineSource = 'catalog' | 'service' | 'template' | 'manual'
 
@@ -202,13 +212,11 @@ const formatCurrency = (amount: number | null, currency: string): string => {
   if (amount === null || Number.isNaN(amount)) return '—'
 
   try {
-    return new Intl.NumberFormat('es-CL', {
-      style: 'currency',
-      currency,
-      maximumFractionDigits: 0
-    }).format(amount)
+    return formatGreenhouseCurrency(amount, currency, {
+  maximumFractionDigits: 0
+}, 'es-CL')
   } catch {
-    return `${currency} ${Math.round(amount).toLocaleString('es-CL')}`
+    return `${currency} ${formatGreenhouseNumber(Math.round(amount), 'es-CL')}`
   }
 }
 
@@ -644,27 +652,12 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
 
   return (
     <Card elevation={0} sx={theme => ({ border: `1px solid ${theme.palette.divider}`, borderRadius: `${theme.shape.customBorderRadius.lg}px` })}>
-      <CardHeader
-        title={
-          <Stack direction='row' spacing={1} alignItems='center'>
-            <Typography variant='h6' sx={{ fontWeight: 600 }}>
-              Ítems de la cotización
-            </Typography>
-            <CustomChip
-              round='true'
-              size='small'
-              variant='tonal'
-              color={draftLines.length === 0 ? 'secondary' : 'primary'}
-              label={String(draftLines.length)}
-            />
-          </Stack>
-        }
+      <CardHeaderWithBadge
+        title='Ítems de la cotización'
+        badgeValue={draftLines.length}
+        badgeColor={draftLines.length === 0 ? 'secondary' : 'primary'}
         subheader={draftLines.length === 0 ? undefined : 'Agrega ítems vendibles desde el catálogo o crea una línea manual.'}
-        avatar={
-          <Avatar variant='rounded' sx={{ bgcolor: 'primary.lightOpacity', width: 40, height: 40 }}>
-            <i className='tabler-list-details' style={{ fontSize: 20, color: 'var(--mui-palette-primary-main)' }} />
-          </Avatar>
-        }
+        avatarIcon='tabler-list-details'
         action={headerAction}
       />
       <Divider />
@@ -819,14 +812,14 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
           <Table size='small'>
             <TableHead>
               <TableRow>
-                <TableCell sx={{ width: 32, minWidth: 32 }} aria-label='Expandir detalle' />
+                <TableCell sx={{ width: 32, minWidth: 32 }} aria-label={TASK407_ARIA_EXPANDIR_DETALLE} />
                 <TableCell sx={{ minWidth: 220 }}>Ítem</TableCell>
                 <TableCell sx={{ minWidth: 160 }}>Tipo</TableCell>
                 <TableCell sx={{ minWidth: 90 }} align='right'>Cantidad</TableCell>
                 <TableCell sx={{ minWidth: 110 }}>Unidad</TableCell>
                 <TableCell sx={{ minWidth: 130 }} align='right'>Precio unitario</TableCell>
                 <TableCell sx={{ minWidth: 110 }} align='right'>Subtotal</TableCell>
-                <TableCell sx={{ minWidth: 100 }} align='right' aria-label='Acciones' />
+                <TableCell sx={{ minWidth: 100 }} align='right' aria-label={TASK407_ARIA_ACCIONES} />
               </TableRow>
             </TableHead>
             <TableBody ref={draftTableBodyRef}>
@@ -1030,7 +1023,7 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
                               precio distinto, crea una línea manual (direct_cost).
                             */
                             simulating && enginePrice === null ? (
-                              <Skeleton variant='text' width={110} height={22} aria-label='Calculando precio del catálogo' />
+                              <Skeleton variant='text' width={110} height={22} aria-label={TASK407_ARIA_CALCULANDO_PRECIO_DEL_CATALOGO} />
                             ) : displayedUnitPrice !== null ? (
                               <Stack spacing={0.25} alignItems='flex-end'>
                                 <Typography
@@ -1081,9 +1074,9 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
                       </TableCell>
                       <TableCell align='right'>
                         {simulating && !hasManualPrice && subtotal === 0 ? (
-                          <Skeleton variant='text' width={90} height={22} sx={{ ml: 'auto' }} aria-label='Calculando subtotal' />
+                          <Skeleton variant='text' width={90} height={22} sx={{ ml: 'auto' }} aria-label={TASK407_ARIA_CALCULANDO_SUBTOTAL} />
                         ) : subtotal === 0 && enginePrice === null && !hasManualPrice ? (
-                          <Typography variant='body2' sx={{ fontVariantNumeric: 'tabular-nums', color: 'text.secondary' }} aria-label='Subtotal sin datos suficientes'>
+                          <Typography variant='body2' sx={{ fontVariantNumeric: 'tabular-nums', color: 'text.secondary' }} aria-label={TASK407_ARIA_SUBTOTAL_SIN_DATOS_SUFICIENTES}>
                             —
                           </Typography>
                         ) : (
@@ -1362,7 +1355,7 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
         }}
       >
         {warningIndex !== null && currentWarnings.length > 0 ? (
-          <Box sx={{ p: 2 }} role='dialog' aria-label='Avisos del motor de pricing'>
+          <Box sx={{ p: 2 }} role='dialog' aria-label={TASK407_ARIA_AVISOS_DEL_MOTOR_DE_PRICING}>
             <QuoteLineWarning warnings={currentWarnings} rowIndex={warningIndex} />
           </Box>
         ) : null}

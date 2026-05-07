@@ -19,8 +19,12 @@ import MenuItem from '@mui/material/MenuItem'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomTextField from '@core/components/mui/TextField'
 import { formatPercent } from './utils'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 type Props = {
   open: boolean
@@ -206,7 +210,7 @@ const CreateShareholderAccountDrawer = ({ open, onClose, onSuccess }: Props) => 
             Registra la cuenta bilateral con la persona canónica del accionista y deja listo el saldo para operar.
           </Typography>
         </Box>
-        <IconButton size='small' onClick={onClose} aria-label='Cerrar'>
+        <IconButton size='small' onClick={onClose} aria-label={GREENHOUSE_COPY.actions.close}>
           <i className='tabler-x' />
         </IconButton>
       </Box>
@@ -353,9 +357,7 @@ const CreateShareholderAccountDrawer = ({ open, onClose, onSuccess }: Props) => 
         />
 
         <Stack direction='row' spacing={3} justifyContent='flex-end'>
-          <Button variant='tonal' color='secondary' onClick={onClose} disabled={saving}>
-            Cancelar
-          </Button>
+          <Button variant='tonal' color='secondary' onClick={onClose} disabled={saving}>{GREENHOUSE_COPY.actions.cancel}</Button>
           <Button variant='contained' onClick={handleSubmit} disabled={saving}>
             {saving ? 'Creando...' : 'Crear cuenta'}
           </Button>

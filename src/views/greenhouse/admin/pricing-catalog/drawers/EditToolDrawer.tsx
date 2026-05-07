@@ -18,9 +18,13 @@ import MenuItem from '@mui/material/MenuItem'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import ImpactPreviewPanel from '@/components/greenhouse/pricing/ImpactPreviewPanel'
 
 import CustomTextField from '@core/components/mui/TextField'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 const COST_MODELS = [
   { value: 'subscription', label: 'Suscripción' },
@@ -270,7 +274,7 @@ const EditToolDrawer = ({ open, toolId, onClose, onSuccess }: Props) => {
             </Typography>
           ) : null}
         </Box>
-        <IconButton onClick={handleClose} size='small' aria-label='Cerrar' disabled={saving}>
+        <IconButton onClick={handleClose} size='small' aria-label={GREENHOUSE_COPY.actions.close} disabled={saving}>
           <i className='tabler-x' />
         </IconButton>
       </Box>
@@ -571,9 +575,7 @@ const EditToolDrawer = ({ open, toolId, onClose, onSuccess }: Props) => {
         </Box>
       ) : null}
       <Box sx={{ display: 'flex', gap: 2, p: 4 }}>
-        <Button variant='outlined' color='secondary' onClick={handleClose} fullWidth disabled={saving}>
-          Cancelar
-        </Button>
+        <Button variant='outlined' color='secondary' onClick={handleClose} fullWidth disabled={saving}>{GREENHOUSE_COPY.actions.cancel}</Button>
         <Button
           variant='contained'
           color='primary'

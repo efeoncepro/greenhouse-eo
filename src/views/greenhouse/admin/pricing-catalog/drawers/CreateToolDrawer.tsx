@@ -16,7 +16,11 @@ import MenuItem from '@mui/material/MenuItem'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomTextField from '@core/components/mui/TextField'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 const COST_MODELS = [
   { value: 'subscription', label: 'Suscripción' },
@@ -159,7 +163,7 @@ const CreateToolDrawer = ({ open, onClose, onSuccess }: Props) => {
     >
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 4 }}>
         <Typography variant='h6'>Nueva herramienta</Typography>
-        <IconButton onClick={handleClose} size='small' aria-label='Cerrar'>
+        <IconButton onClick={handleClose} size='small' aria-label={GREENHOUSE_COPY.actions.close}>
           <i className='tabler-x' />
         </IconButton>
       </Box>
@@ -344,9 +348,7 @@ const CreateToolDrawer = ({ open, onClose, onSuccess }: Props) => {
 
       <Divider />
       <Box sx={{ display: 'flex', gap: 2, p: 4 }}>
-        <Button variant='outlined' color='secondary' onClick={handleClose} fullWidth>
-          Cancelar
-        </Button>
+        <Button variant='outlined' color='secondary' onClick={handleClose} fullWidth>{GREENHOUSE_COPY.actions.cancel}</Button>
         <Button
           variant='contained'
           color='primary'

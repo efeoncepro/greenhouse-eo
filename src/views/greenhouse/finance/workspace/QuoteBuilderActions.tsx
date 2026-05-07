@@ -10,9 +10,12 @@ import CustomTextField from '@core/components/mui/TextField'
 
 import type { CommercialModelCode } from '@/lib/commercial/pricing-governance-types'
 import type { PricingOutputCurrency } from '@/lib/finance/pricing/contracts'
-import { GH_PRICING } from '@/config/greenhouse-nomenclature'
+import { GH_PRICING } from '@/lib/copy/pricing'
 
 import CurrencySwitcher from '@/components/greenhouse/pricing/CurrencySwitcher'
+
+const TASK407_ARIA_CONTEXTO_DE_LA_COTIZACION = "Contexto de la cotización"
+
 
 export interface QuoteBuilderState {
   businessLineCode: string | null
@@ -58,7 +61,7 @@ const QuoteBuilderActions = ({ state, onChange, options, disabled = false }: Quo
   const selectedCountryFactor = options.countryFactors.find(c => c.code === state.countryFactorCode)
 
   return (
-    <Stack spacing={3} component='aside' aria-label='Contexto de la cotización'>
+    <Stack spacing={3} component='aside' aria-label={TASK407_ARIA_CONTEXTO_DE_LA_COTIZACION}>
       <CustomTextField
         select
         fullWidth

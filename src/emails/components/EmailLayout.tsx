@@ -2,6 +2,8 @@ import {
   Body, Container, Head, Hr, Html, Img, Link, Preview, Section, Text
 } from '@react-email/components'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import { APP_URL, EMAIL_COLORS, EMAIL_FONTS, LOGO_URL } from '../constants'
 
 interface EmailLayoutProps {
@@ -12,8 +14,22 @@ interface EmailLayoutProps {
   unsubscribeUrl?: string
 }
 
+const LEGACY_EN_LAYOUT_COPY = {
+  automatedDisclaimer: 'This is an automated email. If you have questions, contact your administrator.',
+  unsubscribe: 'Unsubscribe from these emails'
+}
+
 export default function EmailLayout({ children, previewText, lang, locale = 'es', unsubscribeUrl }: EmailLayoutProps) {
   const effectiveLang = lang ?? locale
+  const layoutCopy = getMicrocopy().emails.layout
+
+  const automatedDisclaimer = effectiveLang === 'en'
+    ? LEGACY_EN_LAYOUT_COPY.automatedDisclaimer
+    : layoutCopy.automatedDisclaimer
+
+  const unsubscribeLabel = effectiveLang === 'en'
+    ? LEGACY_EN_LAYOUT_COPY.unsubscribe
+    : layoutCopy.unsubscribe
 
   return (
     <Html lang={effectiveLang} dir="ltr">
@@ -42,7 +58,7 @@ export default function EmailLayout({ children, previewText, lang, locale = 'es'
           <Link href={APP_URL} style={{ textDecoration: 'none' }}>
             <Img
               src={LOGO_URL}
-              alt="Efeonce Greenhouse — Plataforma de gestión"
+              alt={layoutCopy.logoAlt}
               width={160}
               height={37}
               style={{ margin: '0 auto', display: 'block' }}
@@ -82,7 +98,7 @@ export default function EmailLayout({ children, previewText, lang, locale = 'es'
             lineHeight: '20px',
             margin: '0 0 4px',
           }}>
-            Efeonce Greenhouse™ · Empower your Growth
+            {layoutCopy.tagline}
           </Text>
           <Text style={{
             fontFamily: EMAIL_FONTS.body,
@@ -91,9 +107,7 @@ export default function EmailLayout({ children, previewText, lang, locale = 'es'
             lineHeight: '18px',
             margin: '0',
           }}>
-            {locale === 'en'
-              ? 'This is an automated email. If you have questions, contact your administrator.'
-              : 'Este es un correo automático. Si tienes dudas, contacta a tu administrador.'}
+            {automatedDisclaimer}
           </Text>
           {unsubscribeUrl && (
             <Text style={{
@@ -104,7 +118,7 @@ export default function EmailLayout({ children, previewText, lang, locale = 'es'
               margin: '12px 0 0',
             }}>
               <Link href={unsubscribeUrl} style={{ color: EMAIL_COLORS.muted, textDecoration: 'underline' }}>
-                {locale === 'en' ? 'Unsubscribe from these emails' : 'Dejar de recibir estos correos'}
+                {unsubscribeLabel}
               </Link>
             </Text>
           )}

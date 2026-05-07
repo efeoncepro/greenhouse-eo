@@ -32,7 +32,8 @@ import TablePaginationComponent from '@components/TablePaginationComponent'
 
 import type { AdminAccessOverview, AdminUserRow } from '@/lib/admin/get-admin-access-overview'
 import { ROLE_CODES } from '@/config/role-codes'
-import { GH_INTERNAL_MESSAGES, GH_INTERNAL_NAV } from '@/config/greenhouse-nomenclature'
+import { GH_INTERNAL_NAV } from '@/config/greenhouse-nomenclature'
+import { GH_INTERNAL_MESSAGES } from '@/lib/copy/admin'
 import { getInitials } from '@/utils/getInitials'
 
 import tableStyles from '@core/styles/table.module.css'

@@ -11,6 +11,7 @@ import Box from '@mui/material/Box'
 import type { ThemeColor } from '@core/types'
 
 import CustomAvatar from '@core/components/mui/Avatar'
+import { formatInteger } from '@/lib/format'
 
 export interface PricingCatalogNavCardProps {
 
@@ -37,7 +38,7 @@ const formatCount = (count: number | string | undefined): string => {
   if (count === undefined) return '—'
   if (typeof count === 'string') return count
 
-  return new Intl.NumberFormat('es-CL', { maximumFractionDigits: 0 }).format(count)
+  return formatInteger(count)
 }
 
 const PricingCatalogNavCard = ({

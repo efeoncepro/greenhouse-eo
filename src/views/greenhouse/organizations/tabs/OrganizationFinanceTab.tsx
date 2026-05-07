@@ -24,13 +24,21 @@ import CustomTextField from '@core/components/mui/TextField'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 
 import type { OrganizationDetailData, OrganizationFinanceSummary } from '../types'
+import { getMicrocopy } from '@/lib/copy'
+import { formatCurrency as formatGreenhouseCurrency } from '@/lib/format'
 
+const TASK407_EMPTY_NO_HAY_DATOS_FINANCIEROS_PARA_ESTE_PERIODO = "No hay datos financieros para este período"
+
+
+const GREENHOUSE_COPY = getMicrocopy()
 // ── Helpers ────────────────────────────────────────────────────────────
 
-const MONTH_SHORT = ['', 'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
+const MONTH_SHORT = ['', ...GREENHOUSE_COPY.months.short]
 
 const formatCLP = (amount: number): string =>
-  new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(amount)
+  formatGreenhouseCurrency(amount, 'CLP', {
+  maximumFractionDigits: 0
+}, 'es-CL')
 
 const formatPercent = (value: number | null): string =>
   value != null ? `${(value * 100).toFixed(1)}%` : '—'
@@ -140,7 +148,7 @@ const OrganizationFinanceTab = ({ detail }: Props) => {
           <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
             <CardContent>
               <Box sx={{ textAlign: 'center', py: 4 }} role='status'>
-                <Typography variant='h6' sx={{ mb: 1 }}>No hay datos financieros para este período</Typography>
+                <Typography variant='h6' sx={{ mb: 1 }}>{TASK407_EMPTY_NO_HAY_DATOS_FINANCIEROS_PARA_ESTE_PERIODO}</Typography>
                 <Typography variant='body2' color='text.secondary'>
                   Calcula la rentabilidad de los Spaces de {detail.organizationName} en la sección de Inteligencia Financiera para ver datos aquí.
                 </Typography>

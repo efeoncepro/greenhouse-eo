@@ -16,6 +16,7 @@ import {
   upsertFinanceExchangeRateInPostgres
 } from '@/lib/finance/postgres-store'
 import { isFinanceBigQueryWriteEnabled } from '@/lib/finance/bigquery-write-flag'
+import { formatISODateKey } from '@/lib/format'
 
 const MINDICADOR_BASE_URL = 'https://mindicador.cl/api'
 const OPEN_EXCHANGE_RATE_BASE_URL = 'https://open.er-api.com/v6'
@@ -65,10 +66,7 @@ const formatDateAsMindicador = (date: string) => {
   return `${day}-${month}-${year}`
 }
 
-const getTodayInSantiago = () =>
-  new Intl.DateTimeFormat('en-CA', {
-    timeZone: 'America/Santiago'
-  }).format(new Date())
+const getTodayInSantiago = () => formatISODateKey(new Date())
 
 const fetchMindicadorUsdToClp = async (rateDate?: string | null): Promise<ExchangeRateProviderResult | null> => {
   const path = rateDate

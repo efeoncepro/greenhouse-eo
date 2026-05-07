@@ -22,6 +22,10 @@ import { motion } from '@/libs/FramerMotion'
 import useReducedMotion from '@/hooks/useReducedMotion'
 
 import type { HomeAiInsightCard, HomeAiInsightsBentoData } from '@/lib/home/contract'
+import { formatDateTime as formatGreenhouseDateTime } from '@/lib/format'
+
+const TASK407_ARIA_NEXA_INSIGHTS = "Nexa Insights"
+
 
 interface HomeAiInsightsBentoProps {
   data: HomeAiInsightsBentoData
@@ -136,7 +140,7 @@ export const HomeAiInsightsBento = ({ data }: HomeAiInsightsBentoProps) => {
 
   if (!data || data.cards.length === 0) {
     return (
-      <Card component='section' aria-label='Nexa Insights'>
+      <Card component='section' aria-label={TASK407_ARIA_NEXA_INSIGHTS}>
         <CardHeader
           avatar={<i className='tabler-sparkles text-xl text-primary' />}
           title='Nexa Insights'
@@ -154,13 +158,16 @@ export const HomeAiInsightsBento = ({ data }: HomeAiInsightsBentoProps) => {
   }
 
   return (
-    <Card component='section' aria-label='Nexa Insights'>
+    <Card component='section' aria-label={TASK407_ARIA_NEXA_INSIGHTS}>
       <CardHeader
         avatar={<i className='tabler-sparkles text-xl text-primary' />}
         title='Nexa Insights'
         subheader={
           data.lastAnalysisAt
-            ? `${data.totalAnalyzed} señales · último análisis ${new Date(data.lastAnalysisAt).toLocaleString('es-CL', { dateStyle: 'short', timeStyle: 'short' })}`
+            ? `${data.totalAnalyzed} señales · último análisis ${formatGreenhouseDateTime(new Date(data.lastAnalysisAt), {
+  dateStyle: 'short',
+  timeStyle: 'short'
+}, 'es-CL')}`
             : `${data.totalAnalyzed} señales analizadas`
         }
         titleTypographyProps={{ variant: 'h5' }}

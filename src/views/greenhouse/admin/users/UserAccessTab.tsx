@@ -31,7 +31,7 @@ import Typography from '@mui/material/Typography'
 import type { ThemeColor } from '@core/types'
 
 import { ExecutiveMiniStatCard } from '@/components/greenhouse'
-import { GH_INTERNAL_MESSAGES } from '@/config/greenhouse-nomenclature'
+import { GH_INTERNAL_MESSAGES } from '@/lib/copy/admin'
 import { GOVERNANCE_SECTIONS } from '@/lib/admin/view-access-catalog'
 import type {
   EffectiveEntitlementRecord,
@@ -48,6 +48,11 @@ import type {
 } from '@/types/permission-sets'
 
 import { roleColorFor, roleIconFor, toTitleCase } from './helpers'
+
+const TASK407_ARIA_PERMISOS_EFECTIVOS_DEL_USUARIO = "Permisos efectivos del usuario"
+const TASK407_ARIA_OVERRIDES_DE_ENTITLEMENTS = "Overrides de entitlements"
+const TASK407_ARIA_QUITAR_EXCEPCION = "Quitar excepción"
+
 
 const SECTION_LABEL_MAP = new Map<string, string>(GOVERNANCE_SECTIONS.map(section => [section.key, section.label]))
 
@@ -337,7 +342,7 @@ const EffectiveEntitlementsSection = ({
         </Alert>
       ) : (
         <TableContainer>
-          <Table size='small' aria-label='Permisos efectivos del usuario'>
+          <Table size='small' aria-label={TASK407_ARIA_PERMISOS_EFECTIVOS_DEL_USUARIO}>
             <TableHead>
               <TableRow>
                 <TableCell>Módulo</TableCell>
@@ -498,7 +503,7 @@ const OverridesSection = ({
             </Alert>
           ) : (
             <TableContainer>
-              <Table size='small' aria-label='Overrides de entitlements'>
+              <Table size='small' aria-label={TASK407_ARIA_OVERRIDES_DE_ENTITLEMENTS}>
                 <TableHead>
                   <TableRow>
                     <TableCell>Capability</TableCell>
@@ -526,7 +531,7 @@ const OverridesSection = ({
                       <TableCell>{override.reason}</TableCell>
                       <TableCell>{override.expiresAt ? `Vence ${String(override.expiresAt).slice(0, 10)}` : 'Sin vencimiento'}</TableCell>
                       <TableCell align='right'>
-                        <IconButton aria-label='Quitar excepción' onClick={() => onRemoveOverride(override.overrideId)}>
+                        <IconButton aria-label={TASK407_ARIA_QUITAR_EXCEPCION} onClick={() => onRemoveOverride(override.overrideId)}>
                           <i className='tabler-trash' />
                         </IconButton>
                       </TableCell>

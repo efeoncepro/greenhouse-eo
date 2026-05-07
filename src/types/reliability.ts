@@ -22,6 +22,7 @@ export type ReliabilityModuleKey =
   | 'payroll'
   | 'sync' // TASK-773 — outbox publisher + reactive consumer + projection refreshes
   | 'identity' // TASK-784 — Person legal profile + auth + SCIM
+  | 'commercial' // TASK-813 — engagement instance sync (HubSpot p_services). TASK-807 formaliza subsystem rollup.
 
 export type ReliabilityModuleDomain =
   | 'platform'
@@ -32,6 +33,7 @@ export type ReliabilityModuleDomain =
   | 'hr'
   | 'sync' // TASK-773
   | 'identity' // TASK-784
+  | 'commercial' // TASK-813
 
 export type ReliabilitySignalKind =
   | 'runtime'

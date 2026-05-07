@@ -1,11 +1,23 @@
 'use client'
 
-import { type ReactNode, useEffect, useRef, useState } from 'react'
+import {
+  Children,
+  type ReactNode,
+  isValidElement,
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState
+} from 'react'
 
 import Box from '@mui/material/Box'
+import Menu from '@mui/material/Menu'
+import MenuItem from '@mui/material/MenuItem'
 import Stack from '@mui/material/Stack'
 import { alpha } from '@mui/material/styles'
 
+import CustomChip from '@core/components/mui/Chip'
 import { useListAnimation } from '@/hooks/useListAnimation'
 
 export interface ContextChipStripProps {
@@ -15,18 +27,55 @@ export interface ContextChipStripProps {
   /** Cuando se activa, el strip intercepta scroll horizontal con gradient edges.
    * En desktop la fila siempre wrap'ea a nuevas lineas; en mobile hace scroll-x. */
   scrollMobile?: boolean
+
+  /**
+   * Si se define, renderiza inline solo los primeros N children y agrupa el
+   * resto en un menú "+M más" anchored a un chip overflow trigger. Útil para
+   * builders con 15+ context fields donde wrapping a múltiples filas degrada
+   * la jerarquía. `null` o `undefined` = comportamiento default (todos inline).
+   *
+   * El overflow trigger NO aparece cuando children.length <= overflowAfter.
+   */
+  overflowAfter?: number | null
+
+  /** Label localizado del menu trigger ("+N más"). Default 'más'. */
+  overflowMoreLabel?: string
+
+  /** ARIA label del menu (default `${ariaLabel} — opciones adicionales`). */
+  overflowMenuAriaLabel?: string
 }
 
 /**
  * Horizontal toolbar de ContextChips. En desktop hace wrap a multiples lineas
  * manteniendo spacing consistente. En mobile (< 700px) colapsa a scroll-x
  * horizontal nativo con shadow edges para indicar overflow.
+ *
+ * Cuando `overflowAfter` está activo, los children que excedan el límite se
+ * agrupan en un dropdown menu accionable por chip "+M más" — pattern de
+ * tabbar overflow de Linear / GitHub repo header / Stripe Billing filtros.
  */
-const ContextChipStrip = ({ children, ariaLabel, scrollMobile = true }: ContextChipStripProps) => {
+const ContextChipStrip = ({
+  children,
+  ariaLabel,
+  scrollMobile = true,
+  overflowAfter,
+  overflowMoreLabel = 'más',
+  overflowMenuAriaLabel
+}: ContextChipStripProps) => {
   const scrollRef = useRef<HTMLDivElement | null>(null)
   const [chipsRef] = useListAnimation()
   const [showLeftShadow, setShowLeftShadow] = useState(false)
   const [showRightShadow, setShowRightShadow] = useState(false)
+  const [overflowAnchor, setOverflowAnchor] = useState<HTMLElement | null>(null)
+  const overflowMenuId = useId()
+
+  const allChildren = useMemo(() => Children.toArray(children), [children])
+
+  const hasOverflow =
+    typeof overflowAfter === 'number' && overflowAfter >= 0 && allChildren.length > overflowAfter
+
+  const inlineChildren = hasOverflow ? allChildren.slice(0, overflowAfter as number) : allChildren
+  const overflowChildren = hasOverflow ? allChildren.slice(overflowAfter as number) : []
 
   useEffect(() => {
     const el = scrollRef.current
@@ -124,9 +173,60 @@ const ContextChipStrip = ({ children, ariaLabel, scrollMobile = true }: ContextC
           })}
           useFlexGap
         >
-          {children}
+          {inlineChildren}
+          {hasOverflow ? (
+            <Box sx={{ display: 'inline-flex', alignItems: 'center' }}>
+              <CustomChip
+                round='true'
+                size='small'
+                variant='tonal'
+                color='secondary'
+                label={`+${overflowChildren.length} ${overflowMoreLabel}`}
+                clickable
+                onClick={event => setOverflowAnchor(event.currentTarget)}
+                aria-haspopup='menu'
+                aria-expanded={Boolean(overflowAnchor)}
+                aria-controls={overflowAnchor ? overflowMenuId : undefined}
+              />
+            </Box>
+          ) : null}
         </Stack>
       </Box>
+
+      {hasOverflow ? (
+        <Menu
+          id={overflowMenuId}
+          anchorEl={overflowAnchor}
+          open={Boolean(overflowAnchor)}
+          onClose={() => setOverflowAnchor(null)}
+          MenuListProps={{
+            'aria-label': overflowMenuAriaLabel ?? `${ariaLabel} — opciones adicionales`,
+            dense: true
+          }}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+          transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+          slotProps={{
+            paper: {
+              sx: theme => ({
+                mt: 0.5,
+                minWidth: 220,
+                border: `1px solid ${theme.palette.divider}`,
+                borderRadius: `${theme.shape.customBorderRadius.md}px`
+              })
+            }
+          }}
+        >
+          {overflowChildren.map((child, index) => (
+            <MenuItem
+              key={isValidElement(child) && child.key !== null ? child.key : `overflow-${index}`}
+              disableRipple
+              sx={{ py: 1, px: 1.5 }}
+            >
+              {child}
+            </MenuItem>
+          ))}
+        </Menu>
+      ) : null}
     </Box>
   )
 }

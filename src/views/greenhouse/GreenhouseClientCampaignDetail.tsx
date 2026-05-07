@@ -25,6 +25,7 @@ import TabPanel from '@mui/lab/TabPanel'
 import CustomChip from '@core/components/mui/Chip'
 import CustomTabList from '@core/components/mui/TabList'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
+import { formatDate as formatGreenhouseDate } from '@/lib/format'
 
 // ── Types ──
 
@@ -82,7 +83,11 @@ const TYPE_COLORS: Record<string, 'primary' | 'success' | 'warning' | 'info' | '
 const formatDate = (d: string | null) => {
   if (!d) return '—'
 
-  return new Date(d + 'T12:00:00').toLocaleDateString('es-CL', { day: 'numeric', month: 'short', year: 'numeric' })
+  return formatGreenhouseDate(new Date(d + 'T12:00:00'), {
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric'
+}, 'es-CL')
 }
 
 const pctStr = (v: number | null) => v != null ? `${Math.round(v)}%` : '—'

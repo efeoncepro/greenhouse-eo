@@ -78,7 +78,7 @@ Reglas obligatorias:
 - `docs/tasks/complete/TASK-281-payment-instruments-registry-fx-tracking.md`
 - `docs/tasks/to-do/TASK-397-management-accounting-financial-costs-integration-factoring-fx-fees-treasury.md`
 - `docs/tasks/to-do/TASK-416-finance-metric-registry-foundation.md`
-- `docs/tasks/to-do/TASK-429-locale-aware-formatting-utilities.md`
+- `docs/tasks/complete/TASK-429-locale-aware-formatting-utilities.md`
 - `docs/tasks/to-do/TASK-466-multi-currency-quote-output.md`
 
 ## Dependencies & Impact

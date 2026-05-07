@@ -9,7 +9,7 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
-import { GH_MESSAGES, GH_TEAM } from '@/config/greenhouse-nomenclature'
+import { GH_MESSAGES, GH_TEAM } from '@/lib/copy/client-portal'
 import type { TeamMembersPayload } from '@/types/team'
 
 import BusinessLineBadge from './BusinessLineBadge'

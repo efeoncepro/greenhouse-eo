@@ -14,9 +14,13 @@ import MenuItem from '@mui/material/MenuItem'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomTextField from '@core/components/mui/TextField'
 
 import type { PeriodStatus } from '@/types/payroll'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 // TASK-412 — "Reabrir nómina" dialog
 //
@@ -315,9 +319,7 @@ const ReopenPeriodDialog = ({ open, onClose, periodId, periodLabel, onSuccess }:
         </Stack>
       </DialogContent>
       <DialogActions>
-        <Button variant='tonal' color='secondary' onClick={handleClose} disabled={submitting}>
-          Cancelar
-        </Button>
+        <Button variant='tonal' color='secondary' onClick={handleClose} disabled={submitting}>{GREENHOUSE_COPY.actions.cancel}</Button>
         <Button
           variant='contained'
           color='warning'

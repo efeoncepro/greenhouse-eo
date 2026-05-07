@@ -15,6 +15,10 @@ import Stack from '@mui/material/Stack'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
+const GREENHOUSE_COPY = getMicrocopy()
+
 type Props = {
   handler: string
 }
@@ -115,9 +119,7 @@ return
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpen(false)} disabled={isPending}>
-            Cancelar
-          </Button>
+          <Button onClick={() => setOpen(false)} disabled={isPending}>{GREENHOUSE_COPY.actions.cancel}</Button>
           <Button variant='contained' color='warning' onClick={submit} disabled={isPending}>
             {isPending ? 'Acknowledging...' : 'Acknowledge'}
           </Button>

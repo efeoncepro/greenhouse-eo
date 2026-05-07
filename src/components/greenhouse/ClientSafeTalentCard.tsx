@@ -13,7 +13,8 @@ import CustomAvatar from '@core/components/mui/Avatar'
 
 import BrandLogo from '@/components/greenhouse/BrandLogo'
 import VerifiedByEfeonceBadge from '@/components/greenhouse/VerifiedByEfeonceBadge'
-import { GH_CLIENT_TALENT } from '@/config/greenhouse-nomenclature'
+import { GH_CLIENT_TALENT } from '@/lib/copy/workforce'
+import { formatDate as formatGreenhouseDate } from '@/lib/format'
 
 // ── Types ──
 
@@ -487,10 +488,7 @@ const SectionHeading = ({ icon, label, count }: { icon: string; label: string; c
 
 const formatDate = (dateStr: string) => {
   try {
-    const date = new Date(dateStr)
-    const formatter = new Intl.DateTimeFormat('es-CL', { month: 'short', year: 'numeric' })
-
-    return formatter.format(date)
+    return formatGreenhouseDate(dateStr, { month: 'short', year: 'numeric' })
   } catch {
     return dateStr
   }

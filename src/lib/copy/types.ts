@@ -50,6 +50,7 @@ export type MicrocopyNamespace =
   | 'errors' // Mensajes de error genéricos shared
   | 'feedback' // Toasts, snackbars, confirmaciones genéricas
   | 'time' // Formatos de tiempo relativo: hace X minutos, ayer, etc.
+  | 'emails' // Copy institucional compartido por templates y notification delivery
 
 /**
  * Estructura raíz de un dictionary completo por locale.
@@ -65,6 +66,7 @@ export interface MicrocopyDictionary {
   errors: ErrorsCopy
   feedback: FeedbackCopy
   time: TimeCopy
+  emails: EmailsCopy
 }
 
 /**
@@ -288,6 +290,383 @@ export interface TimeCopy {
   yesterday: string
   today: string
   tomorrow: string
+}
+
+export type NotificationCategoryCopyCode =
+  | 'delivery_update'
+  | 'sprint_milestone'
+  | 'feedback_requested'
+  | 'report_ready'
+  | 'leave_status'
+  | 'leave_review'
+  | 'payroll_ready'
+  | 'assignment_change'
+  | 'ico_alert'
+  | 'capacity_warning'
+  | 'payroll_ops'
+  | 'finance_alert'
+  | 'system_event'
+
+export type NotificationCategoryCopy = Record<
+  NotificationCategoryCopyCode,
+  {
+    label: string
+    description: string
+  }
+>
+
+export interface VerifyEmailTemplateCopy {
+  heading: string
+  greeting: (name?: string) => string
+  body: string
+  validityPrefix: string
+  validityBold: string
+  validitySuffix: string
+  cta: string
+  disclaimer: string
+  fallback: string
+  previewText: string
+}
+
+export interface MagicLinkEmailTemplateCopy {
+  heading: string
+  greeting: (name?: string) => string
+  body: string
+  validityBold: (expiresInMinutes: number) => string
+  cta: string
+  disclaimer: string
+  fallback: string
+  previewText: (expiresInMinutes: number) => string
+}
+
+export type PasswordResetEmailTemplateCopy = VerifyEmailTemplateCopy
+
+export interface InvitationEmailTemplateCopy {
+  heading: string
+  greeting: (name?: string) => string
+  bodyPrefix: string
+  bodySuffix: string
+  validityPrefix: string
+  validityBold: string
+  validitySuffix: string
+  cta: string
+  disclaimer: string
+  fallback: string
+  previewText: (inviter: string, client: string) => string
+}
+
+export interface NotificationEmailTemplateCopy {
+  greeting: (name?: string) => string
+  defaultAction: string
+  fallback: string
+}
+
+export type LeaveEmailStatus = 'approved' | 'rejected' | 'cancelled'
+
+export interface LeaveRequestDecisionEmailTemplateCopy {
+  heading: Record<LeaveEmailStatus, string>
+  greeting: (name: string) => string
+  body: {
+    approved: (actor: string, type: string, days: number) => string
+    rejected: (actor: string, type: string) => string
+    cancelled: (type: string) => string
+  }
+  cardType: string
+  cardFrom: string
+  cardTo: string
+  cardDays: string
+  statusBadge: Record<LeaveEmailStatus, string>
+  notesHeader: string
+  cta: string
+  fallback: string
+  daysUnit: (days: number) => string
+}
+
+export interface LeaveRequestSubmittedEmailTemplateCopy {
+  heading: string
+  greeting: (name: string) => string
+  body: (type: string, days: number) => string
+  cardType: string
+  cardFrom: string
+  cardTo: string
+  cardDays: string
+  cardStatus: string
+  statusPending: string
+  reasonHeader: string
+  cta: string
+  fallback: string
+  daysUnit: (days: number) => string
+}
+
+export interface LeaveRequestPendingReviewEmailTemplateCopy {
+  heading: string
+  greeting: (name: string) => string
+  body: (member: string, type: string, days: number) => string
+  cardMember: string
+  cardType: string
+  cardPeriod: string
+  cardDays: string
+  reasonHeader: string
+  cta: string
+  fallback: string
+  disclaimer: string
+  daysUnit: (days: number) => string
+}
+
+export interface LeaveReviewConfirmationEmailTemplateCopy {
+  heading: Record<LeaveEmailStatus, string>
+  greeting: (name: string) => string
+  body: {
+    approved: (member: string, type: string, days: number) => string
+    rejected: (member: string, type: string) => string
+    cancelled: (member: string, type: string) => string
+  }
+  cardMember: string
+  cardType: string
+  cardPeriod: string
+  cardDays: string
+  cardStatus: string
+  statusBadge: Record<LeaveEmailStatus, string>
+  notesHeader: string
+  reasonHeader: string
+  cta: string
+  fallback: string
+  disclaimer: string
+  daysUnit: (days: number) => string
+}
+
+export interface PayrollReceiptEmailTemplateCopy {
+  previewText: (periodLabel: string) => string
+  heading: string
+  greetingPrefix: string
+  greetingPeriodPrefix: string
+  greetingSuffix: string
+  regimeLabel: string
+  regimeValue: string
+  currencyLabel: string
+  grossLabel: string
+  deductionsLabel: string
+  netLabel: string
+  cta: string
+  pdfHelp: string
+  automatedFooter: (appUrl: string) => string
+}
+
+export interface PayrollExportEmailTemplateCopy {
+  previewText: (periodLabel: string, netTotalDisplay: string) => string
+  kickerPrefix: string
+  heading: string
+  bodyPrefix: string
+  bodyEntryCountPrefix: string
+  bodyEntryCountLabel: string
+  bodyEntryCountStrongSuffix: string
+  bodyEntryCountSuffix: string
+  collaboratorsLabel: string
+  grossLabel: string
+  netLabel: string
+  netTotalLabel: string
+  attachmentsHeading: string
+  payrollReportTitle: string
+  payrollReportSubtitle: string
+  payrollReportPlainTextSubtitle: string
+  payrollDetailTitle: string
+  payrollDetailSubtitle: string
+  payrollDetailPlainTextSubtitle: string
+  exportedByPrefix: string
+  exportedByFallback: string
+  exportedAtLabel: string
+  cta: string
+  automatedFooter: string
+  plainTextSeparator: string
+  plainTextAttachments: string
+  plainTextCta: string
+}
+
+export interface PayrollPaymentCommittedEmailTemplateCopy {
+  previewText: (periodLabel: string) => string
+  heading: string
+  greetingPrefix: string
+  greetingPeriodPrefix: string
+  greetingSuffix: string
+  periodLabel: string
+  scheduledForLabel: string
+  processorLabel: string
+  netLabel: string
+  cta: string
+  informationalNotice: string
+  automatedFooter: (appUrl: string) => string
+  fallbackScheduledFor: string
+}
+
+export interface PayrollPaymentCancelledEmailTemplateCopy {
+  previewText: (periodLabel: string) => string
+  heading: string
+  bodyPrefix: string
+  bodyPeriodPrefix: string
+  bodyAmountPrefix: string
+  bodyAmountSuffix: string
+  reasonLabel: string
+  apology: string
+  cta: string
+  automatedFooter: (appUrl: string) => string
+}
+
+export interface PayrollLiquidacionV2EmailTemplateCopy {
+  previewText: (periodLabel: string) => string
+  heading: string
+  bodyPrefix: string
+  bodyPeriodPrefix: string
+  bodySuffix: string
+  periodLabel: string
+  currencyLabel: string
+  previousNetLabel: string
+  updatedNetLabel: string
+  differenceLabel: string
+  noNetChange: string
+  cta: string
+  supportNote: string
+  automatedFooterPrefix: string
+}
+
+export type BeneficiaryPaymentProfileChangedKind = 'created' | 'approved' | 'superseded' | 'cancelled'
+
+export interface BeneficiaryPaymentProfileChangedEmailTemplateCopy {
+  heading: Record<BeneficiaryPaymentProfileChangedKind, string>
+  previewText: Record<BeneficiaryPaymentProfileChangedKind, string>
+  intro: Record<BeneficiaryPaymentProfileChangedKind, (firstName: string, requestedByMember: boolean) => string>
+  missingDate: string
+  providerLabel: string
+  bankLabel: string
+  accountLabel: string
+  currencyLabel: string
+  cancelledDateLabel: string
+  effectiveDateLabel: string
+  reasonLabel: string
+  maskedFallback: string
+  cta: string
+  securityNotice: string
+  unrecognizedChangeNotice: string
+  automatedFooterPrefix: string
+  automatedFooter: (appUrl: string) => string
+  plainText: Record<BeneficiaryPaymentProfileChangedKind, (firstName: string, accountNumberMasked: string) => string>
+}
+
+export interface QuoteShareEmailTemplateCopy {
+  previewText: (quotationNumber: string, versionNumber: number, clientName: string) => string
+  overline: string
+  greeting: (firstName?: string | null) => string
+  bodyPrefix: string
+  bodyVersionSeparator: string
+  bodyClientPrefix: string
+  bodyWithPdfSuffix: string
+  bodyWithoutPdfSuffix: string
+  totalLabel: string
+  validUntilPrefix: string
+  attachmentPrefix: string
+  cta: string
+  fallback: string
+  closingNote: string
+  plainTextHeader: (quotationNumber: string, versionNumber: number) => string
+  plainTextClientPrefix: string
+  plainTextSeparator: string
+  plainTextBody: (clientName: string) => string
+  plainTextAttachmentPrefix: string
+  plainTextTotalPrefix: string
+  plainTextValidUntilPrefix: string
+  plainTextCta: string
+}
+
+export interface WeeklyExecutiveDigestEmailTemplateCopy {
+  subject: string
+  previewText: (periodLabel: string, totalInsights: number, spacesAffected: number) => string
+  kickerPrefix: string
+  heading: string
+  intro: string
+  includedInsightsLabel: string
+  severityDistributionLabel: string
+  affectedSpacesLabel: string
+  severitySummary: (criticalCount: number, warningCount: number, infoCount: number) => string
+  severityLabels: {
+    critical: string
+    warning: string
+    info: string
+  }
+  spaceLabel: string
+  insightsUnit: (count: number) => string
+  emptySpaceInsights: string
+  rootCauseLabel: string
+  defaultInsightAction: string
+  emptyHeading: string
+  emptyBody: string
+  cta: string
+  closingLink: string
+  defaultClosingNote: string
+  plainTextOpenPortal: string
+}
+
+/**
+ * Copy institucional compartido por emails y notificaciones externas.
+ * TASK-408 lo introduce como namespace foundation antes de migrar templates:
+ * primero snapshot baseline, luego consumo progresivo sin cambios de output.
+ */
+export interface EmailsCopy {
+  layout: {
+    logoAlt: string
+    tagline: string
+    automatedDisclaimer: string
+    unsubscribe: string
+  }
+  common: {
+    brandSignature: string
+    linkLabel: string
+  }
+  auth: {
+    verifyEmail: VerifyEmailTemplateCopy
+    magicLink: MagicLinkEmailTemplateCopy
+    passwordReset: PasswordResetEmailTemplateCopy
+    invitation: InvitationEmailTemplateCopy
+  }
+  genericNotification: NotificationEmailTemplateCopy
+  leave: {
+    requestDecision: LeaveRequestDecisionEmailTemplateCopy
+    requestSubmitted: LeaveRequestSubmittedEmailTemplateCopy
+    requestPendingReview: LeaveRequestPendingReviewEmailTemplateCopy
+    reviewConfirmation: LeaveReviewConfirmationEmailTemplateCopy
+  }
+  payroll: {
+    exportReady: PayrollExportEmailTemplateCopy
+    receipt: PayrollReceiptEmailTemplateCopy
+    paymentCommitted: PayrollPaymentCommittedEmailTemplateCopy
+    paymentCancelled: PayrollPaymentCancelledEmailTemplateCopy
+    liquidacionV2: PayrollLiquidacionV2EmailTemplateCopy
+  }
+  beneficiaryPaymentProfileChanged: BeneficiaryPaymentProfileChangedEmailTemplateCopy
+  quoteShare: QuoteShareEmailTemplateCopy
+  weeklyExecutiveDigest: WeeklyExecutiveDigestEmailTemplateCopy
+  notificationCategories: NotificationCategoryCopy
+  subjects: {
+    passwordReset: string
+    magicLink: (minutes: number) => string
+    invitation: string
+    verifyEmail: string
+    payrollExport: (periodLabel: string, entryCount: number) => string
+    payrollReceipt: (periodLabel: string) => string
+    payrollLiquidacionV2: (periodLabel: string) => string
+    payrollPaymentCommitted: (periodLabel: string) => string
+    payrollPaymentCancelled: (periodLabel: string) => string
+    beneficiaryPaymentProfileChanged: {
+      created: string
+      approved: string
+      superseded: string
+      cancelled: string
+    }
+    weeklyExecutiveDigest: (periodLabel: string) => string
+    leaveRequestDecision: (leaveTypeName: string) => string
+    leaveReviewConfirmation: (leaveTypeName: string) => string
+    leaveRequestSubmitted: (leaveTypeName: string) => string
+    leaveRequestPendingReview: (memberName: string, leaveTypeName: string) => string
+    quoteShare: (quotationNumber: string, versionNumber: number, clientName: string) => string
+  }
 }
 
 /**

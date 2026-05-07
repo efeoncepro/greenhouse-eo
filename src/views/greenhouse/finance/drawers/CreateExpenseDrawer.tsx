@@ -21,6 +21,8 @@ import ToggleButton from '@mui/material/ToggleButton'
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 import {
@@ -38,6 +40,8 @@ import {
 } from '@/lib/finance/expense-taxonomy'
 import PaymentInstrumentChip from '@/components/greenhouse/PaymentInstrumentChip'
 import CreateSupplierDrawer from '@views/greenhouse/finance/drawers/CreateSupplierDrawer'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 type SupplierOption = {
   supplierId: string
@@ -843,9 +847,7 @@ const CreateExpenseDrawer = ({ open, onClose, onSuccess }: Props) => {
             </Card>
 
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
-              <Button color='secondary' variant='tonal' onClick={handleClose} disabled={saving}>
-                Cancelar
-              </Button>
+              <Button color='secondary' variant='tonal' onClick={handleClose} disabled={saving}>{GREENHOUSE_COPY.actions.cancel}</Button>
               <Button variant='contained' onClick={handleSubmit} disabled={saving || loadingMeta}>
                 {saving ? <CircularProgress size={20} color='inherit' /> : 'Guardar egreso'}
               </Button>

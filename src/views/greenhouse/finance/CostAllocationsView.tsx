@@ -45,7 +45,10 @@ import CustomTabList from '@core/components/mui/TabList'
 import CustomTextField from '@core/components/mui/TextField'
 
 import tableStyles from '@core/styles/table.module.css'
+import { getMicrocopy } from '@/lib/copy'
+import { formatCurrency as formatGreenhouseCurrency, formatNumber as formatGreenhouseNumber } from '@/lib/format'
 
+const GREENHOUSE_COPY = getMicrocopy()
 const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'), { ssr: false })
 
 // ---------------------------------------------------------------------------
@@ -136,10 +139,7 @@ interface Allocation {
 // Constants & helpers
 // ---------------------------------------------------------------------------
 
-const MONTHS = [
-  'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-  'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
-]
+const MONTHS = GREENHOUSE_COPY.months.long
 
 const METHOD_LABELS: Record<string, string> = {
   manual: 'Manual',
@@ -149,9 +149,11 @@ const METHOD_LABELS: Record<string, string> = {
 }
 
 const formatClp = (v: number) =>
-  new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(v)
+  formatGreenhouseCurrency(v, 'CLP', {
+  maximumFractionDigits: 0
+}, 'es-CL')
 
-const formatClpShort = (n: number) => `$${Math.round(n).toLocaleString('es-CL')}`
+const formatClpShort = (n: number) => `$${formatGreenhouseNumber(Math.round(n), 'es-CL')}`
 
 // ---------------------------------------------------------------------------
 // Drill-down sub-component
@@ -678,7 +680,7 @@ const CostAllocationsView = () => {
   // Period-over-period deltas for KPI cards
   // ---------------------------------------------------------------------------
 
-  const MONTH_ABBR = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
+  const MONTH_ABBR = GREENHOUSE_COPY.months.short
   const prevLabel = prevHealthData ? MONTH_ABBR[(prevHealthData.periodMonth - 1) % 12] : null
 
   const costDelta = (current: number, previous: number | undefined | null): { pct: number; direction: 'positive' | 'negative' | 'neutral'; label: string } | null => {
@@ -1166,7 +1168,7 @@ const CostAllocationsView = () => {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDialogOpen(false)}>Cancelar</Button>
+          <Button onClick={() => setDialogOpen(false)}>{GREENHOUSE_COPY.actions.cancel}</Button>
           <Button
             variant='contained'
             onClick={handleCreate}

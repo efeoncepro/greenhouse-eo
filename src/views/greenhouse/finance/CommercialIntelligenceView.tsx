@@ -30,6 +30,7 @@ import { GH_PIPELINE_COMMERCIAL } from '@/config/greenhouse-nomenclature'
 import type { UnifiedPipelineResult } from '@/lib/commercial-intelligence/revenue-pipeline-reader'
 
 import PipelineBoardUnified from './workspace/PipelineBoardUnified'
+import { formatCurrency as formatGreenhouseCurrency, formatDate as formatGreenhouseDate } from '@/lib/format'
 
 type SemanticColor = 'success' | 'warning' | 'error' | 'info' | 'primary' | 'secondary'
 
@@ -68,11 +69,9 @@ const DRIFT_META: Record<'aligned' | 'warning' | 'critical', { label: string; co
 const formatCLP = (amount: number | null | undefined): string => {
   if (amount === null || amount === undefined) return '—'
 
-  return new Intl.NumberFormat('es-CL', {
-    style: 'currency',
-    currency: 'CLP',
-    maximumFractionDigits: 0
-  }).format(amount)
+  return formatGreenhouseCurrency(amount, 'CLP', {
+  maximumFractionDigits: 0
+}, 'es-CL')
 }
 
 const formatDate = (iso: string | null | undefined): string => {
@@ -82,7 +81,11 @@ const formatDate = (iso: string | null | undefined): string => {
 
   if (Number.isNaN(d.getTime())) return '—'
 
-  return d.toLocaleDateString('es-CL', { day: '2-digit', month: 'short', year: 'numeric' })
+  return formatGreenhouseDate(d, {
+  day: '2-digit',
+  month: 'short',
+  year: 'numeric'
+}, 'es-CL')
 }
 
 const formatPct = (value: number | null | undefined, digits = 1): string => {

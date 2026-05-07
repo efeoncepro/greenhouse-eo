@@ -522,7 +522,7 @@ class HubSpotClient:
 
     def get_service(self, service_id: str, *, properties: list[str]) -> dict[str, Any]:
         response = self.session.get(
-            f"{HUBSPOT_API}/crm/v3/objects/p_services/{service_id}",
+            f"{HUBSPOT_API}/crm/v3/objects/0-162/{service_id}",
             headers=self._headers(),
             params={"properties": ",".join(properties)},
             timeout=self.timeout_seconds,
@@ -544,7 +544,7 @@ class HubSpotClient:
                 params["after"] = after
 
             response = self.session.get(
-                f"{HUBSPOT_API}/crm/v4/objects/companies/{company_id}/associations/p_services",
+                f"{HUBSPOT_API}/crm/v4/objects/companies/{company_id}/associations/0-162",
                 headers=self._headers(),
                 params=params,
                 timeout=self.timeout_seconds,
@@ -983,7 +983,7 @@ class HubSpotClient:
         for start in range(0, len(service_ids), 100):
             batch_ids = service_ids[start : start + 100]
             response = self.session.post(
-                f"{HUBSPOT_API}/crm/v3/objects/p_services/batch/read",
+                f"{HUBSPOT_API}/crm/v3/objects/0-162/batch/read",
                 headers=self._headers(),
                 json={
                     "properties": properties,

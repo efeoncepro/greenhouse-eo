@@ -1,4 +1,5 @@
-import { GH_MESSAGES, GH_COLORS } from '@/config/greenhouse-nomenclature'
+import { GH_COLORS } from '@/config/greenhouse-nomenclature'
+import { GH_MESSAGES } from '@/lib/copy/client-portal'
 
 export interface ValueCardData {
   icon: 'visibility' | 'data' | 'improvement'

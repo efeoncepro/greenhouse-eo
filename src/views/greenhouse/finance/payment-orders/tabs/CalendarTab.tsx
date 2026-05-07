@@ -16,6 +16,7 @@ import type {
   PaymentCalendarItem,
   PaymentCalendarItemState
 } from '@/lib/finance/payment-calendar/list-calendar-items'
+import { formatCurrency as formatGreenhouseCurrency, formatDate as formatGreenhouseDate } from '@/lib/format'
 
 interface CalendarTabProps {
   items: PaymentCalendarItem[]
@@ -46,16 +47,17 @@ const stateColors: Record<PaymentCalendarItemState, 'default' | 'primary' | 'sec
 }
 
 const formatAmount = (amount: number, currency: string) =>
-  new Intl.NumberFormat('es-CL', {
-    style: 'currency',
-    currency,
-    maximumFractionDigits: currency === 'USD' ? 2 : 0
-  }).format(amount)
+  formatGreenhouseCurrency(amount, currency, {
+  maximumFractionDigits: currency === 'USD' ? 2 : 0
+}, 'es-CL')
 
 const formatDate = (d: string | null) => {
   if (!d) return '—'
 
-  return new Date(d).toLocaleDateString('es-CL', { day: '2-digit', month: 'short' })
+  return formatGreenhouseDate(new Date(d), {
+  day: '2-digit',
+  month: 'short'
+}, 'es-CL')
 }
 
 const CalendarTab = ({ items, loading, onOpenOrder }: CalendarTabProps) => {

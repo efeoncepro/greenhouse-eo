@@ -2,6 +2,7 @@ import 'server-only'
 
 import { randomUUID } from 'node:crypto'
 
+import { formatISODateKey } from '@/lib/format'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
 import type { FinanceCurrency } from '../shared'
@@ -55,8 +56,7 @@ export interface SyncCurrencyPairResult {
   error?: string
 }
 
-const todayIso = () =>
-  new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Santiago' }).format(new Date())
+const todayIso = () => formatISODateKey(new Date())
 
 const findRegistryEntryForPair = (
   from: string,

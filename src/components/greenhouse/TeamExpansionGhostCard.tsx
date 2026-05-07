@@ -5,7 +5,7 @@ import CardActionArea from '@mui/material/CardActionArea'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
-import { GH_TEAM } from '@/config/greenhouse-nomenclature'
+import { GH_TEAM } from '@/lib/copy/client-portal'
 
 type TeamExpansionGhostCardProps = {
   minHeight?: number

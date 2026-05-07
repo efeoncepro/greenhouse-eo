@@ -15,7 +15,14 @@ import Stack from '@mui/material/Stack'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
 import CustomChip from '@core/components/mui/Chip'
+import { formatCurrency as formatGreenhouseCurrency, formatDate as formatGreenhouseDate, formatNumber as formatGreenhouseNumber } from '@/lib/format'
+
+const TASK407_ARIA_CONVERTIR_COTIZACION_A_FACTURA_DIRECTA = "Convertir cotización a factura directa"
+
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 interface DocumentChainPurchaseOrder {
   poId: string
@@ -88,22 +95,18 @@ type SemanticColor = 'success' | 'warning' | 'error' | 'info' | 'primary' | 'sec
 const formatCLP = (amount: number | null): string => {
   if (amount === null) return '—'
 
-  return new Intl.NumberFormat('es-CL', {
-    style: 'currency',
-    currency: 'CLP',
-    maximumFractionDigits: 0
-  }).format(amount)
+  return formatGreenhouseCurrency(amount, 'CLP', {
+  maximumFractionDigits: 0
+}, 'es-CL')
 }
 
 const formatAmount = (amount: number, currency: string): string => {
   try {
-    return new Intl.NumberFormat('es-CL', {
-      style: 'currency',
-      currency,
-      maximumFractionDigits: 0
-    }).format(amount)
+    return formatGreenhouseCurrency(amount, currency, {
+  maximumFractionDigits: 0
+}, 'es-CL')
   } catch {
-    return `${currency} ${Math.round(amount).toLocaleString('es-CL')}`
+    return `${currency} ${formatGreenhouseNumber(Math.round(amount), 'es-CL')}`
   }
 }
 
@@ -114,12 +117,16 @@ const formatDate = (iso: string | null): string => {
 
   if (Number.isNaN(d.getTime())) return '—'
 
-  return d.toLocaleDateString('es-CL', { day: '2-digit', month: 'short', year: 'numeric' })
+  return formatGreenhouseDate(d, {
+  day: '2-digit',
+  month: 'short',
+  year: 'numeric'
+}, 'es-CL')
 }
 
 const QUOTATION_STATUS_META: Record<string, { label: string; color: SemanticColor }> = {
-  draft: { label: 'Borrador', color: 'secondary' },
-  in_review: { label: 'En revisión', color: 'info' },
+  draft: { label: GREENHOUSE_COPY.states.draft, color: 'secondary' },
+  in_review: { label: GREENHOUSE_COPY.states.inReview, color: 'info' },
   pending_approval: { label: 'En aprobación', color: 'warning' },
   approval_rejected: { label: 'Revisión requerida', color: 'error' },
   issued: { label: 'Emitida', color: 'info' },
@@ -139,7 +146,7 @@ const PO_STATUS_META: Record<DocumentChainPurchaseOrder['status'], { label: stri
 }
 
 const HES_STATUS_META: Record<DocumentChainServiceEntry['status'], { label: string; color: SemanticColor }> = {
-  draft: { label: 'Borrador', color: 'info' },
+  draft: { label: GREENHOUSE_COPY.states.draft, color: 'info' },
   submitted: { label: 'Enviada', color: 'warning' },
   approved: { label: 'Aprobada', color: 'success' },
   rejected: { label: 'Rechazada', color: 'error' },
@@ -147,7 +154,7 @@ const HES_STATUS_META: Record<DocumentChainServiceEntry['status'], { label: stri
 }
 
 const INCOME_STATUS_META: Record<DocumentChainIncome['paymentStatus'], { label: string; color: SemanticColor }> = {
-  pending: { label: 'Pendiente', color: 'warning' },
+  pending: { label: GREENHOUSE_COPY.states.pending, color: 'warning' },
   partial: { label: 'Pago parcial', color: 'info' },
   paid: { label: 'Pagada', color: 'success' },
   overdue: { label: 'Vencida', color: 'error' },
@@ -350,7 +357,7 @@ const QuoteDocumentChain = ({
                   disabled={converting}
                   startIcon={<i className='tabler-receipt' aria-hidden='true' />}
                   onClick={onConvertSimple}
-                  aria-label='Convertir cotización a factura directa'
+                  aria-label={TASK407_ARIA_CONVERTIR_COTIZACION_A_FACTURA_DIRECTA}
                 >
                   {converting ? 'Convirtiendo…' : 'Convertir a factura'}
                 </Button>

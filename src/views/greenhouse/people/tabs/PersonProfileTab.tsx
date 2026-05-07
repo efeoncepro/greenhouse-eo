@@ -21,6 +21,8 @@ import Stack from '@mui/material/Stack'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomChip from '@core/components/mui/Chip'
 
 import HorizontalWithAvatar from '@components/card-statistics/HorizontalWithAvatar'
@@ -28,6 +30,14 @@ import HorizontalWithAvatar from '@components/card-statistics/HorizontalWithAvat
 import type { PersonDetail } from '@/types/people'
 
 import PersonLegalProfileSection from './PersonLegalProfileSection'
+import { formatDate as formatGreenhouseDate } from '@/lib/format'
+
+const TASK407_ARIA_DATOS_LABORALES = "Datos laborales"
+const TASK407_ARIA_IDENTIDAD_Y_ACCESO = "Identidad y acceso"
+const TASK407_ARIA_ACTIVIDAD_OPERATIVA = "Actividad operativa"
+
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -43,7 +53,11 @@ const formatDate = (iso: string | null | undefined): string => {
 
   if (Number.isNaN(date.getTime())) return ''
 
-  return date.toLocaleDateString('es-CL', { day: 'numeric', month: 'short', year: 'numeric' })
+  return formatGreenhouseDate(date, {
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric'
+}, 'es-CL')
 }
 
 const formatRelativeDate = (iso: string | null | undefined): { text: string; muted: boolean } => {
@@ -63,7 +77,11 @@ const formatRelativeDate = (iso: string | null | undefined): { text: string; mut
   if (diffDays < 30) return { text: `Hace ${Math.floor(diffDays / 7)} semanas`, muted: false }
 
   return {
-    text: date.toLocaleDateString('es-CL', { day: 'numeric', month: 'short', year: 'numeric' }),
+    text: formatGreenhouseDate(date, {
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric'
+}, 'es-CL'),
     muted: false
   }
 }
@@ -255,7 +273,7 @@ const PersonProfileTab = ({ detail }: Props) => {
       {hasHr && (
         <Grid size={{ xs: 12 }}>
           <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
-            <Accordion defaultExpanded disableGutters elevation={0} aria-label='Datos laborales'>
+            <Accordion defaultExpanded disableGutters elevation={0} aria-label={TASK407_ARIA_DATOS_LABORALES}>
               <AccordionSummary expandIcon={<i className='tabler-chevron-down' />}>
                 <Stack direction='row' spacing={2} alignItems='center'>
                   <Avatar variant='rounded' sx={{ bgcolor: 'warning.lightOpacity' }}>
@@ -300,7 +318,7 @@ const PersonProfileTab = ({ detail }: Props) => {
       {hasIdentityOrAccess && (
         <Grid size={{ xs: 12 }}>
           <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
-            <Accordion defaultExpanded={false} disableGutters elevation={0} aria-label='Identidad y acceso'>
+            <Accordion defaultExpanded={false} disableGutters elevation={0} aria-label={TASK407_ARIA_IDENTIDAD_Y_ACCESO}>
               <AccordionSummary expandIcon={<i className='tabler-chevron-down' />}>
                 <Stack direction='row' spacing={2} alignItems='center'>
                   <Avatar variant='rounded' sx={{ bgcolor: 'info.lightOpacity' }}>
@@ -450,7 +468,7 @@ const PersonProfileTab = ({ detail }: Props) => {
       {hasDelivery && deliveryContext && (
         <Grid size={{ xs: 12 }}>
           <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
-            <Accordion defaultExpanded={false} disableGutters elevation={0} aria-label='Actividad operativa'>
+            <Accordion defaultExpanded={false} disableGutters elevation={0} aria-label={TASK407_ARIA_ACTIVIDAD_OPERATIVA}>
               <AccordionSummary expandIcon={<i className='tabler-chevron-down' />}>
                 <Stack direction='row' spacing={2} alignItems='center'>
                   <Avatar variant='rounded' sx={{ bgcolor: 'success.lightOpacity' }}>
@@ -591,9 +609,7 @@ const PersonProfileTab = ({ detail }: Props) => {
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button variant='tonal' color='secondary' onClick={handleCloseEmploymentDialog} disabled={savingEmployment}>
-            Cancelar
-          </Button>
+          <Button variant='tonal' color='secondary' onClick={handleCloseEmploymentDialog} disabled={savingEmployment}>{GREENHOUSE_COPY.actions.cancel}</Button>
           <Button variant='contained' onClick={handleSaveEmployment} disabled={savingEmployment}>
             {savingEmployment ? 'Guardando...' : 'Guardar'}
           </Button>

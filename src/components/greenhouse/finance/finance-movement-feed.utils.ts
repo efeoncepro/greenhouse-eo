@@ -4,6 +4,7 @@ import type {
   FinanceMovementStatus,
   FinanceMovementVisual
 } from './finance-movement-feed.types'
+import { formatCurrency, formatDate, formatISODateKey } from '@/lib/format'
 
 export const FINANCE_MOVEMENT_STATUS_LABELS: Record<FinanceMovementStatus, string> = {
   pending: 'Pendiente',
@@ -46,26 +47,10 @@ export const FINANCE_MOVEMENT_STATUS_COLORS: Record<FinanceMovementStatus, 'prim
   review: 'error'
 }
 
-const DAY_FORMATTER = new Intl.DateTimeFormat('es-CL', {
-  timeZone: 'America/Santiago',
-  weekday: 'long',
-  day: '2-digit',
-  month: 'long'
-})
-
-const DAY_KEY_FORMATTER = new Intl.DateTimeFormat('en-CA', {
-  timeZone: 'America/Santiago',
-  year: 'numeric',
-  month: '2-digit',
-  day: '2-digit'
-})
-
 export const formatFinanceMovementAmount = (amount: number, currency: string) => {
-  const formatted = new Intl.NumberFormat('es-CL', {
-    style: 'currency',
-    currency,
+  const formatted = formatCurrency(Math.abs(amount), currency, {
     maximumFractionDigits: currency === 'CLP' ? 0 : 2
-  }).format(Math.abs(amount))
+  })
 
   return amount < 0 ? `-${formatted}` : formatted
 }
@@ -77,7 +62,7 @@ export const getFinanceMovementDayKey = (date: string | null): string => {
 
   if (Number.isNaN(parsed.getTime())) return date
 
-  return DAY_KEY_FORMATTER.format(parsed)
+  return formatISODateKey(parsed)
 }
 
 export const getFinanceMovementDayLabel = (date: string | null): string => {
@@ -87,7 +72,12 @@ export const getFinanceMovementDayLabel = (date: string | null): string => {
 
   if (Number.isNaN(parsed.getTime())) return 'Sin fecha'
 
-  const label = DAY_FORMATTER.format(parsed)
+  const label = formatDate(parsed, {
+    weekday: 'long',
+    day: '2-digit',
+    month: 'long',
+    timeZone: 'America/Santiago'
+  })
 
   return label.charAt(0).toUpperCase() + label.slice(1)
 }

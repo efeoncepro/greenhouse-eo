@@ -6,20 +6,19 @@ import Grid from '@mui/material/Grid'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 
 import type { PaymentOrdersKpis } from '@/lib/finance/payment-orders/get-kpis'
+import { formatCurrency as formatGreenhouseCurrency, formatNumber as formatGreenhouseNumber } from '@/lib/format'
 
 interface PaymentOrdersKpiRowProps {
   kpis: PaymentOrdersKpis | null
   loading: boolean
 }
 
-const formatCount = (n: number) => new Intl.NumberFormat('es-CL').format(n)
+const formatCount = (n: number) => formatGreenhouseNumber(n, 'es-CL')
 
 const formatAmount = (n: number) =>
-  new Intl.NumberFormat('es-CL', {
-    style: 'currency',
-    currency: 'CLP',
-    maximumFractionDigits: 0
-  }).format(n)
+  formatGreenhouseCurrency(n, 'CLP', {
+  maximumFractionDigits: 0
+}, 'es-CL')
 
 const KpiSkeleton = () => (
   <Box

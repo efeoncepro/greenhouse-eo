@@ -20,3 +20,19 @@ export type {
 } from './TotalsLadder'
 export { default as InlineNumericEditor } from './InlineNumericEditor'
 export type { InlineNumericEditorProps, InlineNumericEditorCurrency } from './InlineNumericEditor'
+
+// TASK-498 — Sprint 3 primitives extraction (Quote Builder generalization)
+export { default as EntitySummaryDock } from './EntitySummaryDock'
+export type {
+  EntitySummaryDockProps,
+  EntitySummaryDockCta,
+  EntitySummaryDockSaveState
+} from './EntitySummaryDock'
+export { default as CardHeaderWithBadge } from './CardHeaderWithBadge'
+export type {
+  CardHeaderWithBadgeProps,
+  CardHeaderBadgeColor,
+  CardHeaderBadgeVariant
+} from './CardHeaderWithBadge'
+export { default as FormSectionAccordion } from './FormSectionAccordion'
+export type { FormSectionAccordionProps } from './FormSectionAccordion'

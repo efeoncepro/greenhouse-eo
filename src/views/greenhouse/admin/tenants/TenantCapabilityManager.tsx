@@ -18,7 +18,7 @@ import Typography from '@mui/material/Typography'
 import CustomChip from '@core/components/mui/Chip'
 
 import { BrandWordmark, BusinessLineBadge } from '@/components/greenhouse'
-import { GH_INTERNAL_MESSAGES } from '@/config/greenhouse-nomenclature'
+import { GH_INTERNAL_MESSAGES } from '@/lib/copy/admin'
 import type { TenantCapabilityRecord } from '@/lib/admin/tenant-capability-types'
 
 type CapabilityStateResponse = {

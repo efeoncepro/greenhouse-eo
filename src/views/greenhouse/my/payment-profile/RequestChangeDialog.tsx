@@ -19,6 +19,9 @@ import type { Theme } from '@mui/material/styles'
 
 import CustomChip from '@core/components/mui/Chip'
 
+const TASK407_ARIA_IDENTIDAD_LEGAL_VERIFICADA = "Identidad legal verificada"
+
+
 type Regime = 'chile_dependent' | 'honorarios_chile' | 'international' | 'unset'
 
 interface ContextDto {
@@ -389,7 +392,7 @@ const RequestChangeDialog = ({ open, onClose, onSubmit }: Props) => {
     if (!context.legalDocumentMasked) return null
 
     return (
-      <Box sx={cardSx} aria-label='Identidad legal verificada'>
+      <Box sx={cardSx} aria-label={TASK407_ARIA_IDENTIDAD_LEGAL_VERIFICADA}>
         <Stack direction='row' alignItems='center' spacing={1.5}>
           <i className='tabler-id' style={{ fontSize: 20, color: 'var(--mui-palette-text-secondary)' }} aria-hidden />
           <Box sx={{ flexGrow: 1, minWidth: 0 }}>

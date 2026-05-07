@@ -33,6 +33,11 @@ import AdminHandlerAcknowledgeButton from './AdminHandlerAcknowledgeButton'
 import AdminOperationalActionsPanel from './AdminOperationalActionsPanel'
 import AdminOpsActionButton from './AdminOpsActionButton'
 import AdminReactiveProjectionBreakdown from './AdminReactiveProjectionBreakdown'
+import { formatDateTime as formatGreenhouseDateTime, formatNumber as formatGreenhouseNumber } from '@/lib/format'
+
+const TASK407_COPY_REPLAY_REACTIVE = "Replay reactive"
+const TASK407_COPY_RETRY_FAILED_EMAILS = "Retry failed emails"
+
 
 type Props = {
   data: OperationsOverview
@@ -58,11 +63,11 @@ type AuditEvent = {
 const formatDateTime = (value: string | null) => {
   if (!value) return 'Sin registro'
 
-  return new Intl.DateTimeFormat('es-CL', {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-    timeZone: 'America/Santiago'
-  }).format(new Date(value))
+  return formatGreenhouseDateTime(new Date(value), {
+  dateStyle: 'medium',
+  timeStyle: 'short',
+  timeZone: 'America/Santiago'
+}, 'es-CL')
 }
 
 const trimId = (value: string) => (value.length > 18 ? `${value.slice(0, 18)}...` : value)
@@ -649,7 +654,7 @@ const AdminOpsHealthView = ({
                     </Stack>
                     <Typography variant='body2'>
                       {gcpBilling.availability === 'configured'
-                        ? `Total ${gcpBilling.currency} ${Math.round(gcpBilling.totalCost).toLocaleString('en-US')} en ${gcpBilling.period.days} días.`
+                        ? `Total ${gcpBilling.currency} ${formatGreenhouseNumber(Math.round(gcpBilling.totalCost), 'en-US')} en ${gcpBilling.period.days} días.`
                         : (gcpBilling.error ?? gcpBilling.notes[0] ?? 'Billing Export aún no rinde datos.')}
                     </Typography>
                     {gcpBilling.availability === 'configured' &&
@@ -657,7 +662,7 @@ const AdminOpsHealthView = ({
                       gcpBilling.spotlights.notionBqSync.cost > 0 && (
                         <Typography variant='caption' color='text.secondary'>
                           notion-bq-sync: {gcpBilling.currency}{' '}
-                          {Math.round(gcpBilling.spotlights.notionBqSync.cost).toLocaleString('en-US')} ·{' '}
+                          {formatGreenhouseNumber(Math.round(gcpBilling.spotlights.notionBqSync.cost), 'en-US')} ·{' '}
                           {gcpBilling.spotlights.notionBqSync.share}% del total cloud.
                         </Typography>
                       )}
@@ -1236,7 +1241,7 @@ const AdminOpsHealthView = ({
           actions={[
             {
               id: 'replay-reactive',
-              label: 'Replay reactive',
+              label: TASK407_COPY_REPLAY_REACTIVE,
               description:
                 'Ejecuta el consumer reactivo canónico. Úsalo cuando exista backlog oculto o handlers degradados visibles.',
               endpoint: '/api/admin/ops/replay-reactive',
@@ -1247,7 +1252,7 @@ const AdminOpsHealthView = ({
             },
             {
               id: 'retry-email-delivery',
-              label: 'Retry failed emails',
+              label: TASK407_COPY_RETRY_FAILED_EMAILS,
               description: 'Procesa manualmente deliveries fallidas elegibles dentro de la ventana activa de retry.',
               endpoint: '/api/admin/ops/email-delivery-retry',
               confirmTitle: '¿Reintentar correos fallidos?',

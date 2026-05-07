@@ -28,6 +28,11 @@ import {
   OUTBOX_DEAD_LETTER_SIGNAL_ID
 } from './outbox-dead-letter'
 
+import {
+  EMAIL_RENDER_FAILURE_SIGNAL_ID,
+  getEmailRenderFailureSignal
+} from './email-render-failure'
+
 beforeEach(() => {
   queryMock.mockReset()
 })
@@ -97,6 +102,56 @@ describe('getOutboxDeadLetterSignal', () => {
     queryMock.mockRejectedValueOnce(new Error('boom'))
 
     const signal = await getOutboxDeadLetterSignal()
+
+    expect(signal.severity).toBe('unknown')
+    expect(signal.summary).toContain('No fue posible')
+  })
+})
+
+describe('getEmailRenderFailureSignal', () => {
+  it('returns ok when no render/template failures were observed', async () => {
+    queryMock.mockResolvedValueOnce([
+      {
+        total_attempts: 42,
+        delivery_render_failures: 0,
+        reactive_render_failures: 0,
+        total_render_failures: 0
+      }
+    ])
+
+    const signal = await getEmailRenderFailureSignal()
+
+    expect(signal.severity).toBe('ok')
+    expect(signal.kind).toBe('runtime')
+    expect(signal.moduleKey).toBe('sync')
+    expect(signal.signalId).toBe(EMAIL_RENDER_FAILURE_SIGNAL_ID)
+    expect(signal.summary).toContain('Sin fallas')
+    expect(signal.evidence.find(e => e.label === 'delivery_failure_rate_percent')?.value).toBe('0.00')
+  })
+
+  it('returns error when delivery or reactive render failures exist', async () => {
+    queryMock.mockResolvedValueOnce([
+      {
+        total_attempts: 50,
+        delivery_render_failures: 2,
+        reactive_render_failures: 1,
+        total_render_failures: 3
+      }
+    ])
+
+    const signal = await getEmailRenderFailureSignal()
+
+    expect(signal.severity).toBe('error')
+    expect(signal.summary).toContain('3')
+    expect(signal.summary).toContain('render/template')
+    expect(signal.evidence.find(e => e.label === 'total_render_failures')?.value).toBe('3')
+    expect(signal.evidence.find(e => e.label === 'delivery_failure_rate_percent')?.value).toBe('4.00')
+  })
+
+  it('returns unknown when query throws (degraded honestly)', async () => {
+    queryMock.mockRejectedValueOnce(new Error('email audit unavailable'))
+
+    const signal = await getEmailRenderFailureSignal()
 
     expect(signal.severity).toBe('unknown')
     expect(signal.summary).toContain('No fue posible')

@@ -25,7 +25,8 @@ import {
 } from '@/components/greenhouse'
 import ReliabilityAiWatcherCard from '@/components/greenhouse/admin/ReliabilityAiWatcherCard'
 import ReliabilitySyntheticCard from '@/components/greenhouse/admin/ReliabilitySyntheticCard'
-import { GH_INTERNAL_MESSAGES, GH_INTERNAL_NAV } from '@/config/greenhouse-nomenclature'
+import { GH_INTERNAL_NAV } from '@/config/greenhouse-nomenclature'
+import { GH_INTERNAL_MESSAGES } from '@/lib/copy/admin'
 import type { AdminAccessOverview } from '@/lib/admin/get-admin-access-overview'
 import type { AdminTenantsOverview } from '@/lib/admin/get-admin-tenants-overview'
 import type { InternalDashboardOverview } from '@/lib/internal/get-internal-dashboard-overview'
@@ -42,6 +43,7 @@ import {
 import type { DerivedControlTowerTenant } from '../internal/dashboard/helpers'
 
 import AdminCenterSpacesTable from './AdminCenterSpacesTable'
+import { formatNumber as formatGreenhouseNumber } from '@/lib/format'
 
 type StatusFilter = 'all' | 'active' | 'onboarding' | 'attention' | 'inactive'
 
@@ -284,7 +286,7 @@ const buildDomainCards = ({
     points: [
       `${operations.kpis.activeSyncs} fuentes activas de sincronizacion`,
       operations.cloud.cron.secretConfigured ? 'Cron control plane autenticado' : 'CRON_SECRET pendiente',
-      `BigQuery guard: ${operations.cloud.bigquery.maximumBytesBilled.toLocaleString('en-US')} bytes`
+      `BigQuery guard: ${formatGreenhouseNumber(operations.cloud.bigquery.maximumBytesBilled, 'en-US')} bytes`
     ]
   },
   {

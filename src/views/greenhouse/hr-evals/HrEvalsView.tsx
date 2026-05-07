@@ -33,6 +33,8 @@ import Typography from '@mui/material/Typography'
 import TabContext from '@mui/lab/TabContext'
 import TabPanel from '@mui/lab/TabPanel'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import { DataTableShell } from '@/components/greenhouse/data-table'
 
 import CustomChip from '@core/components/mui/Chip'
@@ -53,6 +55,13 @@ import type {
   EvalSummaryWithDetails,
   EvalType
 } from '@/types/hr-evals'
+import { formatDate as formatGreenhouseDate } from '@/lib/format'
+
+const TASK407_ARIA_FILTRAR_POR_TIPO = "Filtrar por tipo"
+const TASK407_ARIA_SECCIONES_DE_EVALUACIONES = "Secciones de evaluaciones"
+
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 // ── Constants ──
 
@@ -128,7 +137,11 @@ const formatDate = (iso: string | null) => {
   if (!iso) return '-'
 
   try {
-    return new Intl.DateTimeFormat('es-CL', { day: '2-digit', month: 'short', year: 'numeric' }).format(new Date(iso))
+    return formatGreenhouseDate(new Date(iso), {
+  day: '2-digit',
+  month: 'short',
+  year: 'numeric'
+}, 'es-CL')
   } catch {
     return iso
   }
@@ -510,7 +523,7 @@ const HrEvalsView = () => {
               value={typeFilter}
               onChange={e => setTypeFilter(e.target.value as EvalType | 'all')}
               sx={{ minWidth: 160 }}
-              aria-label='Filtrar por tipo'
+              aria-label={TASK407_ARIA_FILTRAR_POR_TIPO}
             >
               <MenuItem value='all'>Todos los tipos</MenuItem>
               <MenuItem value='self'>Autoevaluacion</MenuItem>
@@ -734,7 +747,7 @@ const HrEvalsView = () => {
       <Grid size={{ xs: 12 }}>
         <TabContext value={tab}>
           <Card elevation={0} sx={{ border: theme => `1px solid ${theme.palette.divider}` }}>
-            <CustomTabList onChange={(_, v: string) => setTab(v)} aria-label='Secciones de evaluaciones'>
+            <CustomTabList onChange={(_, v: string) => setTab(v)} aria-label={TASK407_ARIA_SECCIONES_DE_EVALUACIONES}>
               <Tab label='Ciclos' value='cycles' icon={<i className='tabler-refresh' />} iconPosition='start' />
               <Tab label='Asignaciones' value='assignments' icon={<i className='tabler-users' />} iconPosition='start' />
               <Tab label='Resultados' value='results' icon={<i className='tabler-chart-bar' />} iconPosition='start' />
@@ -876,7 +889,7 @@ const HrEvalsView = () => {
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDialogOpen(false)} color='secondary'>Cancelar</Button>
+          <Button onClick={() => setDialogOpen(false)} color='secondary'>{GREENHOUSE_COPY.actions.cancel}</Button>
           <Button
             variant='contained'
             onClick={handleCreateCycle}

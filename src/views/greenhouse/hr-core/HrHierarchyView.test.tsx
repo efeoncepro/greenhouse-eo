@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import { screen } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -282,7 +282,6 @@ describe('HrHierarchyView', () => {
   }, 30000)
 
   it('opens the temporary delegation dialog from the audit panel', async () => {
-    const user = userEvent.setup()
     const { default: HrHierarchyView } = await import('./HrHierarchyView')
 
     renderWithTheme(<HrHierarchyView />)
@@ -290,7 +289,7 @@ describe('HrHierarchyView', () => {
     await screen.findAllByText('Ana Perez')
     const delegationButtons = await screen.findAllByRole('button', { name: 'Nueva delegación' })
 
-    await user.click(delegationButtons[0])
+    fireEvent.click(delegationButtons[0])
 
     expect(screen.getByRole('heading', { name: 'Nueva delegación temporal' })).toBeInTheDocument()
     expect(screen.getByRole('combobox', { name: 'Delegado' })).toBeInTheDocument()

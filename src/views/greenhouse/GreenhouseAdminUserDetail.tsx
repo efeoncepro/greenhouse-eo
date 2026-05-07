@@ -21,7 +21,7 @@ import Typography from '@mui/material/Typography'
 
 import CustomTabList from '@core/components/mui/TabList'
 
-import { GH_INTERNAL_MESSAGES } from '@/config/greenhouse-nomenclature'
+import { GH_INTERNAL_MESSAGES } from '@/lib/copy/admin'
 import type { AdminUserDetail } from '@/lib/admin/get-admin-user-detail'
 
 import UserAccessTab from './admin/users/UserAccessTab'

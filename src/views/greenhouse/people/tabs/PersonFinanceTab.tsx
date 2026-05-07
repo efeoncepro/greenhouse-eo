@@ -26,15 +26,24 @@ import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSu
 import CustomChip from '@core/components/mui/Chip'
 
 import type { PersonFinanceOverview } from '@/types/people'
+import { getMicrocopy } from '@/lib/copy'
+import { formatCurrency as formatGreenhouseCurrency } from '@/lib/format'
 
+const TASK407_EMPTY_NO_HAY_REGISTROS_DE_NOMINA_PARA_ESTA_PERSONA = "No hay registros de nómina para esta persona."
+const TASK407_ARIA_IR_AL_MODULO_DE_FINANZAS = "Ir al módulo de finanzas"
+
+
+const GREENHOUSE_COPY = getMicrocopy()
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
-const MONTH_SHORT = ['', 'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
+const MONTH_SHORT = ['', ...GREENHOUSE_COPY.months.short]
 
 const formatCLP = (amount: number): string =>
-  new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(amount)
+  formatGreenhouseCurrency(amount, 'CLP', {
+  maximumFractionDigits: 0
+}, 'es-CL')
 
 const closureColor = (status: string | null, periodClosed: boolean): 'success' | 'warning' | 'info' | 'secondary' => {
   if (status === 'closed' || periodClosed) return 'success'
@@ -324,7 +333,7 @@ const PersonFinanceTab = ({ memberId }: Props) => {
             <CardContent>
               <Box sx={{ textAlign: 'center', py: 4 }} role='status'>
                 <Typography variant='body2' color='text.secondary'>
-                  No hay registros de nómina para esta persona.
+                  {TASK407_EMPTY_NO_HAY_REGISTROS_DE_NOMINA_PARA_ESTA_PERSONA}
                 </Typography>
               </Box>
             </CardContent>
@@ -373,7 +382,7 @@ const PersonFinanceTab = ({ memberId }: Props) => {
             size='small'
             color='secondary'
             startIcon={<i className='tabler-external-link' aria-hidden='true' />}
-            aria-label='Ir al módulo de finanzas'
+            aria-label={TASK407_ARIA_IR_AL_MODULO_DE_FINANZAS}
           >
             Ver en módulo de finanzas
           </Button>

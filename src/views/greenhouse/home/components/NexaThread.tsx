@@ -1,7 +1,6 @@
 'use client'
 
 import '@assistant-ui/react-markdown/styles/dot.css'
-
 import { useCallback, useState } from 'react'
 
 import Box from '@mui/material/Box'
@@ -22,6 +21,8 @@ import {
 } from '@assistant-ui/react'
 import { MarkdownTextPrimitive } from '@assistant-ui/react-markdown'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomAvatar from '@core/components/mui/Avatar'
 import CustomTextField from '@core/components/mui/TextField'
 
@@ -29,6 +30,19 @@ import type { NexaModelId } from '@/config/nexa-models'
 
 import NexaModelSelector from './NexaModelSelector'
 import NexaToolRenderer from './NexaToolRenderers'
+
+const TASK407_ARIA_EDITAR_MENSAJE = "Editar mensaje"
+const TASK407_ARIA_RESPUESTA_UTIL = "Respuesta util"
+const TASK407_ARIA_RESPUESTA_NO_UTIL = "Respuesta no util"
+const TASK407_ARIA_COPIAR_RESPUESTA = "Copiar respuesta"
+const TASK407_ARIA_REGENERAR_RESPUESTA = "Regenerar respuesta"
+const TASK407_ARIA_NEXA_ESTA_PENSANDO = "Nexa esta pensando"
+const TASK407_ARIA_DETENER_GENERACION = "Detener generacion"
+const TASK407_ARIA_HISTORIAL_DE_CONVERSACIONES = "Historial de conversaciones"
+const TASK407_ARIA_IR_AL_FINAL = "Ir al final"
+
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 export interface NexaThreadProps {
   onBack?: () => void
@@ -122,7 +136,7 @@ const UserMessage = () => (
             <ActionBarPrimitive.Edit asChild>
               <IconButton
                 size='small'
-                aria-label='Editar mensaje'
+                aria-label={TASK407_ARIA_EDITAR_MENSAJE}
                 sx={{
                   width: 28,
                   height: 28,
@@ -168,10 +182,10 @@ const UserMessage = () => (
               </ComposerPrimitive.Input>
               <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, p: 1 }}>
                 <ComposerPrimitive.Cancel asChild>
-                  <Button size='small' variant='outlined' color='secondary'>Cancelar</Button>
+                  <Button size='small' variant='outlined' color='secondary'>{GREENHOUSE_COPY.actions.cancel}</Button>
                 </ComposerPrimitive.Cancel>
                 <ComposerPrimitive.Send asChild>
-                  <Button size='small' variant='contained'>Guardar</Button>
+                  <Button size='small' variant='contained'>{GREENHOUSE_COPY.actions.save}</Button>
                 </ComposerPrimitive.Send>
               </Box>
             </Box>
@@ -205,7 +219,7 @@ const FeedbackThumbs = ({ messageId }: { messageId: string }) => {
     <>
       <IconButton
         size='small'
-        aria-label='Respuesta util'
+        aria-label={TASK407_ARIA_RESPUESTA_UTIL}
         aria-pressed={sentiment === 'positive'}
         onClick={() => handleFeedback('positive')}
         sx={{
@@ -220,7 +234,7 @@ const FeedbackThumbs = ({ messageId }: { messageId: string }) => {
       </IconButton>
       <IconButton
         size='small'
-        aria-label='Respuesta no util'
+        aria-label={TASK407_ARIA_RESPUESTA_NO_UTIL}
         aria-pressed={sentiment === 'negative'}
         onClick={() => handleFeedback('negative')}
         sx={{
@@ -313,7 +327,7 @@ const AssistantMessage = () => {
             <ActionBarPrimitive.Copy asChild>
               <IconButton
                 size='small'
-                aria-label='Copiar respuesta'
+                aria-label={TASK407_ARIA_COPIAR_RESPUESTA}
                 sx={{
                   width: 28, height: 28, borderRadius: 1.5,
                   color: 'text.secondary',
@@ -332,7 +346,7 @@ const AssistantMessage = () => {
             <ActionBarPrimitive.Reload asChild>
               <IconButton
                 size='small'
-                aria-label='Regenerar respuesta'
+                aria-label={TASK407_ARIA_REGENERAR_RESPUESTA}
                 sx={{
                   width: 28, height: 28, borderRadius: 1.5,
                   color: 'text.secondary',
@@ -406,7 +420,7 @@ const ThinkingIndicator = () => {
   if (!isRunning) return null
 
   return (
-    <Box sx={{ mb: 4 }} aria-live='polite' aria-label='Nexa esta pensando'>
+    <Box sx={{ mb: 4 }} aria-live='polite' aria-label={TASK407_ARIA_NEXA_ESTA_PENSANDO}>
       <Stack direction='row' spacing={0.75} alignItems='center' sx={{ mb: 1 }}>
         <CustomAvatar skin='light' color='primary' variant='circular' size={24}>
           <i className='tabler-sparkles' style={{ fontSize: '0.75rem' }} />
@@ -477,7 +491,7 @@ const ChatComposer = () => {
                       {isRunning ? (
                         <ComposerPrimitive.Cancel asChild>
                           <IconButton
-                            aria-label='Detener generacion'
+                            aria-label={TASK407_ARIA_DETENER_GENERACION}
                             sx={{
                               bgcolor: 'error.lighterOpacity',
                               color: 'error.main',
@@ -548,7 +562,7 @@ const NexaThread = ({ onBack, selectedModel, onModelChange, compact, suggestions
           {onHistoryToggle ? (
             <IconButton
               size='small'
-              aria-label='Historial de conversaciones'
+              aria-label={TASK407_ARIA_HISTORIAL_DE_CONVERSACIONES}
               onClick={onHistoryToggle}
               sx={{ width: 36, height: 36, color: 'text.secondary', '&:hover': { color: 'text.primary' } }}
             >
@@ -602,7 +616,7 @@ const NexaThread = ({ onBack, selectedModel, onModelChange, compact, suggestions
 
       <ThreadPrimitive.ScrollToBottom asChild>
         <IconButton
-          aria-label='Ir al final'
+          aria-label={TASK407_ARIA_IR_AL_FINAL}
           sx={{
             position: 'absolute',
             bottom: 100,

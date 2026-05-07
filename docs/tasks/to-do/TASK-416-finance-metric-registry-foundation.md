@@ -1,5 +1,71 @@
 # TASK-416 — Finance Metric Registry Foundation
 
+## Delta 2026-05-05 — pre-execution hardening (4-pillar review)
+
+Auditoría arch + finance pre-ejecución detectó 4 gaps que invalidan el contrato semántico si se cierra v1 sin abordarlos. Todos viven en Slice 2 (entradas base) — agrega scope, no agrega slices.
+
+### Gap 1 — 5 métricas faltantes para board reporting / going concern
+
+El set de 18 cubre P&L básico pero le falta cobertura de **treasury / runway** (lo primero que pregunta board y banco) y **FX P&L** (ya canonizado por TASK-699 pero no expuesto). Agregar a Slice 2:
+
+| metricId | Fórmula canónica | Owner | Justificación |
+|---|---|---|---|
+| `cash_runway_months` | `cash_balance_clp / monthly_net_burn_clp` | finance_product | Métrica #1 going concern (IAS 1). Board/banco la piden mensual. Sin ella el dashboard no sirve para decisiones de capital. |
+| `working_capital_clp` | `current_assets_clp - current_liabilities_clp` | finance_product | Operating health — junto con CCC define liquidez. |
+| `gross_burn_clp` | `SUM(operating_expenses_clp)` mensual | finance_product | Total opex — distinción crítica vs net en SaaS/services. |
+| `net_burn_clp` | `gross_burn_clp - revenue_cash_clp` | finance_product | Cash quemado neto — dirige decisiones de fundraising. |
+| `fx_pnl_clp` | VIEW canónica `greenhouse_finance.fx_pnl_breakdown` (TASK-699) | finance_product | Exposición FX ya tiene VIEW + helper canónico; falta exponer como métrica del registry. **Anti-bandaid**: no recomputar inline, usar la VIEW. |
+
+**Total v1 ajustado**: 23 métricas + 4 indicators (vs 18 + 4 declarado originalmente).
+
+### Gap 2 — `labor_cost_clp` y `payroll_to_revenue_ratio` tienen ambigüedad semántica
+
+La spec V1 no declara si el numerador es **gross salary** (sub-reportado ~40-50%) o **loaded cost** (incluye AFP 10% + Salud 7% + Cesantía 0.6% + SIS 1.49% + Mutual ~0.93% + bonos + capacitación + overhead). Bajo IFRS / Chile NIIF, P&L externo requiere **loaded cost absorption**, no gross.
+
+**Decisión canónica** (validar con CFO en Slice 2):
+
+- `labor_cost_clp` = **loaded cost** (1.4-1.7× gross). Documentar fórmula exacta en `description.es-CL`.
+- `payroll_to_revenue_ratio` = `labor_cost_clp / net_revenue_clp` con loaded cost.
+- Si emerge necesidad de gross-only (ej. headcount budget), agregar `labor_cost_gross_clp` separado, NO ambigüar el canónico.
+
+### Gap 3 — Cost metrics no declaran filtro por `economic_category` (TASK-768)
+
+`direct_costs_clp`, `indirect_costs_clp`, `labor_cost_clp` deben declarar explícito el filtro `economic_category` en `servingSource` para alinear con la dimension canónica TASK-768 (separada de `expense_type` fiscal). Sin esto:
+
+- Riesgo de drift entre signal engine (que filtra por `economic_category`) y dashboard (que sumaría por `expense_type`).
+- Reintroduce el anti-pattern raíz del bug Cash-Out 2026-05-03 (TASK-766/768 lo cerraron en lectores).
+
+**Patrón canónico declarativo en `servingSource`**:
+
+```ts
+servingSource: {
+  kind: 'materialized',
+  table: 'expense_payments_normalized', // VIEW canónica TASK-766
+  column: 'payment_amount_clp',
+  filter: {
+    economic_category: ['payroll', 'payroll_benefits', 'payroll_taxes'] // TASK-768 dimension
+  }
+}
+```
+
+Validador build-time (Slice 4) extiende para verificar que `filter.economic_category[]` solo contiene valores del enum canónico TASK-768 (11 valores expense, 8 income).
+
+### Gap 4 — Hereda de TASK-266 y desbloquea i18n finance automáticamente
+
+`LocalizedString` declarado en el contrato (TASK-416) significa que **TASK-266 child finance se cierra automáticamente al popular el shard `en-US` del registry**. Documentar en el spec del registry V1.1 (delta del closing protocol) que esta es la única forma canónica de localizar métricas finance — NO crear una segunda capa en `src/lib/copy/finance.ts`.
+
+### Acceptance criteria recalibrados
+
+- [ ] **23 métricas** + 4 indicators (vs 18 declarado), incluyendo las 5 agregadas
+- [ ] `labor_cost_clp` documenta loaded cost en `description.es-CL` con fórmula explícita
+- [ ] Cost metrics declaran `filter.economic_category[]` en `servingSource`
+- [ ] Validador build-time verifica que valores de `filter.economic_category` están en enum canónico TASK-768
+- [ ] Delta en `GREENHOUSE_FINANCE_METRIC_REGISTRY_V1.md` declara que finance i18n se cierra via `LocalizedString` shard `en-US` (cierra dependency con TASK-266 child)
+
+### Out of scope (resta declarado)
+
+Todo lo demás del scope original se mantiene. Las 5 métricas agregadas no requieren slices nuevas — entran a Slice 2.
+
 ## Status
 
 - Lifecycle: `to-do`

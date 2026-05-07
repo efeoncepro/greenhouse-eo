@@ -19,6 +19,10 @@ import type { ThemeColor } from '@core/types'
 import OptionMenu from '@core/components/option-menu'
 
 import type { HomeRecentItem, HomeRecentsRailData } from '@/lib/home/contract'
+import { formatDate as formatGreenhouseDate } from '@/lib/format'
+
+const TASK407_ARIA_CONTINUA_DONDE_LO_DEJASTE = "Continúa donde lo dejaste"
+
 
 interface HomeRecentsRailProps {
   data: HomeRecentsRailData
@@ -76,7 +80,9 @@ const formatRelativeTime = (iso: string): string => {
 
   if (days < 30) return `hace ${days} d`
 
-  return new Date(iso).toLocaleDateString('es-CL', { dateStyle: 'medium' })
+  return formatGreenhouseDate(new Date(iso), {
+  dateStyle: 'medium'
+}, 'es-CL')
 }
 
 interface RecentTimelineItemProps {
@@ -125,7 +131,7 @@ export const HomeRecentsRail = ({ data }: HomeRecentsRailProps) => {
   if (allItems.length === 0) return null
 
   return (
-    <Card component='aside' aria-label='Continúa donde lo dejaste'>
+    <Card component='aside' aria-label={TASK407_ARIA_CONTINUA_DONDE_LO_DEJASTE}>
       <CardHeader
         avatar={<i className='tabler-history text-xl' />}
         title='Continúa donde lo dejaste'

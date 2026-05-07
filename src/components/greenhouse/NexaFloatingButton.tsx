@@ -27,6 +27,10 @@ import type { NexaResponse } from '@/lib/nexa/nexa-contract'
 
 import NexaThread from '@/views/greenhouse/home/components/NexaThread'
 
+const TASK407_ARIA_CERRAR_NEXA = "Cerrar Nexa"
+const TASK407_ARIA_ABRIR_NEXA_AI = "Abrir Nexa AI"
+
+
 const toJsonValue = (value: unknown): ReadonlyJSONValue => {
   if (value === null || typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') return value
 
@@ -118,7 +122,7 @@ const NexaFloatingButton = () => {
             <i className='tabler-sparkles' style={{ fontSize: '1rem', color: theme.palette.primary.main }} />
             <Typography variant='subtitle2'>Nexa AI</Typography>
           </Stack>
-          <IconButton size='small' onClick={() => setOpen(false)} aria-label='Cerrar Nexa'>
+          <IconButton size='small' onClick={() => setOpen(false)} aria-label={TASK407_ARIA_CERRAR_NEXA}>
             <i className='tabler-x' style={{ fontSize: '1rem' }} />
           </IconButton>
         </Stack>
@@ -141,7 +145,7 @@ const NexaFloatingButton = () => {
       <Fab
         color='primary'
         size='medium'
-        aria-label='Abrir Nexa AI'
+        aria-label={TASK407_ARIA_ABRIR_NEXA_AI}
         aria-expanded={open}
         onClick={() => setOpen(prev => !prev)}
         sx={{

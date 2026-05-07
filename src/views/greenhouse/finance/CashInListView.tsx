@@ -23,6 +23,8 @@ import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import { DataTableShell } from '@/components/greenhouse/data-table'
 
 import CustomChip from '@core/components/mui/Chip'
@@ -30,6 +32,9 @@ import CustomTextField from '@core/components/mui/TextField'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 import PaymentInstrumentChip from '@/components/greenhouse/PaymentInstrumentChip'
 import RegisterCashInDrawer from '@views/greenhouse/finance/drawers/RegisterCashInDrawer'
+import { formatCurrency as formatGreenhouseCurrency } from '@/lib/format'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 // ---------------------------------------------------------------------------
 // Types
@@ -88,7 +93,9 @@ interface CashInResponse {
 // ---------------------------------------------------------------------------
 
 const formatCurrency = (amount: number, currency: string = 'CLP'): string =>
-  new Intl.NumberFormat('es-CL', { style: 'currency', currency, maximumFractionDigits: currency === 'CLP' ? 0 : 2 }).format(amount)
+  formatGreenhouseCurrency(amount, currency, {
+  maximumFractionDigits: currency === 'CLP' ? 0 : 2
+}, 'es-CL')
 
 const formatDate = (date: string | null): string => {
   if (!date) return '—'
@@ -438,9 +445,7 @@ const CashInListView = () => {
                     disabled={page >= totalPages}
                     onClick={() => setPage(prev => Math.min(totalPages, prev + 1))}
                     endIcon={<i className='tabler-chevron-right' />}
-                  >
-                    Siguiente
-                  </Button>
+                  >{GREENHOUSE_COPY.actions.next}</Button>
                 </Stack>
               </Stack>
             </CardContent>

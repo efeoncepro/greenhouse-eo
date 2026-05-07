@@ -14,9 +14,14 @@ import MenuItem from '@mui/material/MenuItem'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomTextField from '@core/components/mui/TextField'
 
 import PaymentInstrumentChip from '@/components/greenhouse/PaymentInstrumentChip'
+import { formatCurrency as formatGreenhouseCurrency, formatNumber as formatGreenhouseNumber } from '@/lib/format'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 // ---------------------------------------------------------------------------
 // Types
@@ -58,11 +63,9 @@ const SETTLEMENT_MODES = [
 ]
 
 const formatAmount = (amount: number, currency = 'CLP'): string =>
-  new Intl.NumberFormat('es-CL', {
-    style: 'currency',
-    currency,
-    maximumFractionDigits: currency === 'CLP' ? 0 : 2
-  }).format(amount)
+  formatGreenhouseCurrency(amount, currency, {
+  maximumFractionDigits: currency === 'CLP' ? 0 : 2
+}, 'es-CL')
 
 // ---------------------------------------------------------------------------
 // Props
@@ -353,7 +356,7 @@ const RegisterCashOutDrawer = ({ open, onClose, onSuccess }: Props) => {
     >
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 4 }}>
         <Typography variant='h6'>Registrar pago</Typography>
-        <IconButton onClick={handleClose} size='small' aria-label='Cerrar'>
+        <IconButton onClick={handleClose} size='small' aria-label={GREENHOUSE_COPY.actions.close}>
           <i className='tabler-x' />
         </IconButton>
       </Box>
@@ -459,7 +462,11 @@ const RegisterCashOutDrawer = ({ open, onClose, onSuccess }: Props) => {
         {selectedExpense?.currency === 'USD' && currentFxRate && (
           <Box sx={{ p: 1.5, bgcolor: 'info.lightOpacity', borderRadius: 1 }}>
             <Typography variant='caption' color='info.main'>
-              Dólar observado: ${new Intl.NumberFormat('es-CL', { maximumFractionDigits: 2 }).format(currentFxRate)} CLP — Equivalente: {new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(Number(amount || 0) * currentFxRate)}
+              Dólar observado: ${formatGreenhouseNumber(currentFxRate, {
+  maximumFractionDigits: 2
+}, 'es-CL')} CLP — Equivalente: {formatGreenhouseCurrency(Number(amount || 0) * currentFxRate, 'CLP', {
+  maximumFractionDigits: 0
+}, 'es-CL')}
             </Typography>
           </Box>
         )}
@@ -616,9 +623,7 @@ const RegisterCashOutDrawer = ({ open, onClose, onSuccess }: Props) => {
 
       <Divider />
       <Box sx={{ display: 'flex', gap: 2, p: 4 }}>
-        <Button variant='outlined' color='secondary' onClick={handleClose} fullWidth>
-          Cancelar
-        </Button>
+        <Button variant='outlined' color='secondary' onClick={handleClose} fullWidth>{GREENHOUSE_COPY.actions.cancel}</Button>
         <Button variant='contained' color='success' onClick={handleSubmit} disabled={saving} fullWidth>
           {saving ? 'Registrando...' : 'Registrar pago'}
         </Button>

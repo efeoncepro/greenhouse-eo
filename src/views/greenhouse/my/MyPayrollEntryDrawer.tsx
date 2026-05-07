@@ -15,8 +15,15 @@ import Typography from '@mui/material/Typography'
 import type { Theme } from '@mui/material/styles'
 
 import CustomChip from '@core/components/mui/Chip'
+import { getMicrocopy } from '@/lib/copy'
+import { formatCurrency as formatGreenhouseCurrency, formatDate as formatGreenhouseDate, formatDateTime as formatGreenhouseDateTime } from '@/lib/format'
 
-const MONTHS = ['', 'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
+const TASK407_ARIA_CERRAR_DETALLE = "Cerrar detalle"
+const TASK407_ARIA_COPIAR_REFERENCIA_EXTERNA = "Copiar referencia externa"
+
+
+const GREENHOUSE_COPY = getMicrocopy()
+const MONTHS = ['', ...GREENHOUSE_COPY.months.short]
 
 const PROCESSOR_LABELS: Record<string, string> = {
   deel: 'Deel',
@@ -40,9 +47,9 @@ const DELIVERY_KIND_LABELS: Record<string, string> = {
 const PAYMENT_STATUS_META: Record<string, { label: string; color: 'primary' | 'info' | 'warning' | 'success' | 'error' | 'secondary' }> = {
   awaiting_order: { label: 'Por programar', color: 'warning' },
   order_pending: { label: 'En aprobación', color: 'warning' },
-  order_approved: { label: 'Programado', color: 'info' },
-  order_paid: { label: 'Pagado', color: 'success' },
-  cancelled: { label: 'Cancelado', color: 'error' }
+  order_approved: { label: GREENHOUSE_COPY.states.scheduled, color: 'info' },
+  order_paid: { label: GREENHOUSE_COPY.states.paid, color: 'success' },
+  cancelled: { label: GREENHOUSE_COPY.states.cancelled, color: 'error' }
 }
 
 interface PayslipDeliveryEvent {
@@ -87,23 +94,21 @@ interface Props {
 }
 
 const fmt = (amount: number, currency: string) =>
-  new Intl.NumberFormat('es-CL', {
-    style: 'currency',
-    currency: currency === 'USD' ? 'USD' : 'CLP',
-    maximumFractionDigits: 0
-  }).format(amount)
+  formatGreenhouseCurrency(amount, currency === 'USD' ? 'USD' : 'CLP', {
+  maximumFractionDigits: 0
+}, 'es-CL')
 
 const formatDateTime = (iso: string | null): string => {
   if (!iso) return '—'
 
   try {
-    return new Date(iso).toLocaleString('es-CL', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    })
+    return formatGreenhouseDateTime(new Date(iso), {
+  day: '2-digit',
+  month: 'short',
+  year: 'numeric',
+  hour: '2-digit',
+  minute: '2-digit'
+}, 'es-CL')
   } catch {
     return iso
   }
@@ -113,7 +118,11 @@ const formatDate = (iso: string | null): string => {
   if (!iso) return '—'
 
   try {
-    return new Date(iso).toLocaleDateString('es-CL', { day: '2-digit', month: 'short', year: 'numeric' })
+    return formatGreenhouseDate(new Date(iso), {
+  day: '2-digit',
+  month: 'short',
+  year: 'numeric'
+}, 'es-CL')
   } catch {
     return iso
   }
@@ -189,7 +198,7 @@ const MyPayrollEntryDrawer = ({ open, onClose, entry, canResend }: Props) => {
           <Typography variant='h6'>{MONTHS[entry.month]} {entry.year}</Typography>
         </Box>
         <CustomChip round='true' size='small' variant='tonal' color={statusMeta.color} label={statusMeta.label} />
-        <IconButton onClick={onClose} aria-label='Cerrar detalle'>
+        <IconButton onClick={onClose} aria-label={TASK407_ARIA_CERRAR_DETALLE}>
           <i className='tabler-x' />
         </IconButton>
       </Box>
@@ -234,7 +243,7 @@ const MyPayrollEntryDrawer = ({ open, onClose, entry, canResend }: Props) => {
                     <IconButton
                       size='small'
                       onClick={() => void handleCopy('Referencia', entry.paymentOrder!.externalReference!)}
-                      aria-label='Copiar referencia externa'
+                      aria-label={TASK407_ARIA_COPIAR_REFERENCIA_EXTERNA}
                     >
                       <i className='tabler-copy' style={{ fontSize: 16 }} />
                     </IconButton>

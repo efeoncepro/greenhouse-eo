@@ -29,6 +29,8 @@ import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomChip from '@core/components/mui/Chip'
 import type {
   IntegrationDataQualityCheckResult,
@@ -39,6 +41,9 @@ import type {
   NotionSyncOrchestrationRunRecord,
   TenantNotionSyncOrchestrationDetail
 } from '@/types/notion-sync-orchestration'
+import { formatDateTime as formatGreenhouseDateTime } from '@/lib/format'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 // ---------------------------------------------------------------------------
 // Types
@@ -141,11 +146,11 @@ const formatDatetime = (iso: string | null) => {
   if (!iso) return '—'
 
   try {
-    return new Intl.DateTimeFormat('es-CL', {
-      dateStyle: 'medium',
-      timeStyle: 'short',
-      timeZone: 'America/Santiago'
-    }).format(new Date(iso))
+    return formatGreenhouseDateTime(new Date(iso), {
+  dateStyle: 'medium',
+  timeStyle: 'short',
+  timeZone: 'America/Santiago'
+}, 'es-CL')
   } catch {
     return iso
   }
@@ -1199,9 +1204,7 @@ const TenantNotionPanel = ({ clientId, clientName }: Props) => {
         }
         action={
           mapping ? (
-            <Button size='small' variant='tonal' color='secondary' onClick={() => { setWizardOpen(false); setWizardStep(0) }}>
-              Cancelar
-            </Button>
+            <Button size='small' variant='tonal' color='secondary' onClick={() => { setWizardOpen(false); setWizardStep(0) }}>{GREENHOUSE_COPY.actions.cancel}</Button>
           ) : null
         }
       />
@@ -1327,9 +1330,7 @@ const TenantNotionPanel = ({ clientId, clientName }: Props) => {
                   variant='contained'
                   disabled={!selectedGroup}
                   onClick={() => setWizardStep(2)}
-                >
-                  Continuar
-                </Button>
+                >{GREENHOUSE_COPY.actions.continue}</Button>
               </Stack>
             </Box>
           )

@@ -1,4 +1,221 @@
+# Sesion 2026-05-06 — TASK-813 cerrada en develop (HubSpot p_services inbound sync + legacy cleanup)
+
+- **Branch:** `develop` por instruccion explicita del usuario.
+- **Skills invocadas:** `arch-architect` (overlay Greenhouse) + `greenhouse-backend`. Fases 1-6 ejecutadas con audit corregido tras feedback de Codex.
+- **Audit pre-implementacion**: detecté 2 errores criticos vs spec original
+  1. Mi audit inicial reporto 3 huerfanos (Loyal/Motogas/Aguas Andinas) — error: solo consulte `core.organizations` + `crm.companies`. Realidad: solo Loyal es huerfano real. Aguas Andinas + Motogas son clients con space faltante (fix automatizable, no queue manual).
+  2. Spec asumia `p_services` URLs en HubSpot API — realidad: HubSpot espera `0-162` objectTypeId. Bridge Cloud Run tiene bug en 3 callsites pero NO esta en scope reparar el bridge ahora.
+- **Mitigacion**: helper directo `src/lib/hubspot/list-services-for-company.ts` (bypass del bridge) usa `HUBSPOT_ACCESS_TOKEN` env o secret `gcp:hubspot-access-token`. Bridge fix queda como follow-up task (3 substituciones triviales). Mantiene blast radius local.
+- **Open Questions resueltas pre-implementacion**:
+  - Q1 (huerfanos reales o errores HubSpot) → no asumir, queue manual via reliability signal.
+  - Q2 (module_id NULL) → patron `hubspot_sync_status='unmapped'` (no inventar default), downstream filtra por flag.
+  - Q3 (orgs mapeo) → 5 directos + 2 sin space + 1 huerfano real (corregido tras audit live).
+  - Q4 (TASK-806 orden) → no bloqueante.
+- **Bug fix critico** en `service-sync.ts:resolveOrgIdForClient`: query SQL referenciaba `clients.organization_id` (columna inexistente) y pg lo resolvía al outer scope retornando primera organization arbitraria de la tabla (EASY RETAIL). Fix: joinear via `hubspot_company_id` compartido.
+- **Slices entregados (en `develop`)**:
+  - **Slice 1**: registry `moduleKey: 'commercial'` agregado a `ReliabilityModuleKey` + 3 readers nuevos (`services-sync-lag`, `services-organization-unresolved`, `services-legacy-residual-reads`) + wire-up en `getReliabilityOverview`. Title hints + priority en incident-mapping.
+  - **Slice 2**: `archive-legacy-seed.ts` idempotente. Archivó las 30 filas con `engagement_kind='discovery'` + `status='legacy_seed_archived'` + 30 outbox events v1. Re-run reporta 0 candidatos (idempotencia OK).
+  - **Slice 3**: `backfill-from-hubspot.ts` via HubSpot direct API. Materializó 4 services HubSpot 0-162 (Aguas Andinas, ANAM, Motogas, Sky Airline) con `hubspot_sync_status='unmapped'`. Auto-creó 2 spaces (Aguas Andinas + Motogas con `numeric_code` 12 y 13). Otros 7 clients tienen 0 services en HubSpot.
+  - **Slice 4**: webhook handler `hubspot-services.ts` con signature v3 + INSERT en `webhook_endpoints` (`endpoint_key='hubspot-services'`, `auth_mode='provider_native'`, `secret_ref='HUBSPOT_APP_CLIENT_SECRET'`).
+  - **Slice 6**: ya cubierto en Slice 1.
+  - **Slice 8**: docs CLAUDE.md sección p_services webhook + EVENT_CATALOG Delta + 3 outbox events v1 documentados.
+- **Slices diferidos**:
+  - **Slice 5** (Cloud Scheduler cron safety-net) — requiere deploy ops-worker, follow-up task.
+  - **Slice 7** (UI admin manual queue) — depende de TASK-555 (commercial routeGroup), follow-up task.
+- **Hallazgo HubSpot-side (no es bug del codigo)**: asociaciones HubSpot company→service estan cruzadas para Aguas Andinas↔ANAM. Greenhouse refleja fielmente lo que HubSpot dice (regla canonica "HubSpot SoT"). Operador comercial debe corregir asociaciones en HubSpot; el siguiente sync rematerializa con dato correcto.
+- **Verificacion runtime**: `pnpm exec tsc --noEmit` clean, `pnpm lint` clean (pre-push hooks pasaron en cada commit), 14 test files / 123 tests reliability verde.
+- **Commits creados** (4 slices + audit deltas):
+  - `e0ea61ff` Slice 1 — reliability registry + 3 signals
+  - `df96ef4e` Slice 2 — archive legacy seed script
+  - `40202bc0` Slice 3 — HubSpot direct API + backfill + auto-space
+  - `a6b3a9a2` Slice 4 — webhook handler hubspot-services
+- **Outbox events v1 nuevos** (3 documentados en EVENT_CATALOG): `commercial.service_engagement.materialized`, `commercial.service_engagement.archived_legacy_seed`, `commercial.space.auto_created`.
+- **Reliability signals nuevos** (3, subsystem `commercial`): sync_lag (lag/warning), organization_unresolved (drift/error >7d), legacy_residual_reads (drift/error). Todos steady state = 0 esperado.
+
+# Sesion 2026-05-06 — TASK-801 cerrada en develop (engagement primitive Slice 1)
+
+- **Branch:** `develop` por instruccion explicita del usuario; no se crea `task/TASK-801-engagement-primitive-services-extension`.
+- **Skill arch-architect invocada** con overlay Greenhouse, fases 1–6 ejecutadas en orden. **Skill greenhouse-backend invocada** antes de escribir la migration.
+- **Discovery (Fase 1) detecto 2 desvios criticos vs spec** (heredados de `GREENHOUSE_PILOT_ENGAGEMENT_ARCHITECTURE_V1.md` §3.2):
+  1. `services.service_id` es `TEXT` no `UUID` — spec declaraba FK como `UUID REFERENCES services(service_id)` pero realidad del repo es `text`. Ajuste mecanico aplicado.
+  2. `commercial_cost_attribution_v2` es **VIEW** no TABLE — creada por TASK-708 y refinada en TASK-709b (UNION ALL de 3 CTEs). `ALTER TABLE` no aplica. Ajuste arquitectural: `CREATE OR REPLACE VIEW` agregando `'operational'::TEXT AS attribution_intent` literal en cada SELECT, preservando shape exacto.
+- **Auditoria (Fase 2)** imprimio reporte canonico identificando los 2 supuestos desactualizados, codigo existente reutilizable (TASK-709b VIEW como template, scripts/migrate.ts), y dependencias faltantes = ninguna. Spec corregida con Delta 2026-05-06 pre-implementacion antes de tocar codigo.
+- **Mapa de conexiones (Fase 3)**: 4 columnas nuevas, 0 eventos emitidos hoy (TASK-808 introduce los 9 outbox events), consumers actuales NO afectados (todos usan SELECT explicito por columnas, no SELECT *), defaults `'regular'` y `'operational'` preservan semantica 100%. Productores futuros: TASK-802/803/808/813. Consumidores futuros: TASK-806 (gtm_investment_pnl filter), TASK-809 (UI sample sprints), TASK-810 (anti-zombie CHECK).
+- **Plan (Fase 4)**: artefacto unico = migration; ningun helper/route/UI/event publisher/consumer en esta task (es DDL puro).
+- **Implementacion (Fase 5)**: migration `20260506200742463_task-801-engagement-primitive-services-extension.sql` creada via `pnpm migrate:create`, aplicada via `pnpm pg:connect:migrate`. Output: `Migrations complete!` + `Types updated in src/types/db.d.ts (368 tablas, 969ms)`.
+- **Verificacion DDL post-migration via `information_schema` y `pg_constraint`** (anti TASK-768 silent failure):
+  - `greenhouse_core.services.engagement_kind` text NOT NULL DEFAULT `'regular'` con CHECK enum {regular,pilot,trial,poc,discovery}.
+  - `greenhouse_core.services.commitment_terms_json` jsonb NULL.
+  - `greenhouse_core.client_team_assignments.service_id` text NULL FK to services con `ON DELETE SET NULL`.
+  - `greenhouse_serving.commercial_cost_attribution.attribution_intent` text NOT NULL DEFAULT `'operational'` con CHECK enum {operational,pilot,trial,poc,discovery,overhead}.
+  - Indice partial `client_team_assignments_service_idx WHERE service_id IS NOT NULL` creado.
+  - VIEW `commercial_cost_attribution_v2` reescrita preservando shape exacto TASK-709b + nueva columna `attribution_intent` literal `'operational'`.
+- **Backward compat 100% verificado**: 30/30 services preservan `engagement_kind='regular'`, 9/9 CCA rows preservan `attribution_intent='operational'`.
+- **Verificacion runtime (Fase 6)**: `pnpm exec tsc --noEmit` clean, `pnpm lint` clean, `pnpm test src/lib/services src/lib/commercial-cost-attribution` 39/39 pass, `pnpm build` clean.
+- **Docs actualizados**: spec arch `GREENHOUSE_PILOT_ENGAGEMENT_ARCHITECTURE_V1.md` con `Delta v1.3 (2026-05-06)` documentando los 2 ajustes vs spec + hard rule futura ("toda FK a `services.service_id` debe ser TEXT no UUID; toda extension de CCA v2 debe ser CREATE OR REPLACE VIEW no ALTER TABLE"); `docs/tasks/README.md` con bullet ✅ TASK-801 cerrada; `docs/tasks/TASK_ID_REGISTRY.md` con lifecycle complete; `Handoff.md` (este entry); `changelog.md`.
+- **Acceptance criteria todos verdes**:
+  - `pnpm migrate:up` aplica sin errores ✅
+  - `pnpm db:generate-types` regenera `db.d.ts` con las 4 columnas tipadas ✅
+  - `\d+ services` muestra `engagement_kind` + `commitment_terms_json` con CHECK ✅
+  - `\d+ client_team_assignments` muestra `service_id` con FK ✅
+  - CCA v1 + v2 muestran `attribution_intent` con CHECK ✅
+  - `pnpm test` verde sin nuevos tests; consumers existentes no rotos ✅
+  - SQL count: 30 regular = total services (backward compat) ✅
+  - SQL count: 9 operational = total CCA (backward compat) ✅
+- **Habilita downstream**: TASK-802 (commercial_terms time-versioned), TASK-803 (phases/outcomes/lineage), TASK-806 (gtm_investment_pnl reclassifier), TASK-813 (HubSpot sync + phantom cleanup, recomendado correr inmediatamente despues de esta).
+- **Sin cambios de access model**: capabilities sin tocar (TASK-555 las introducira en namespace `commercial.*`); routeGroups sin tocar; views/entitlements sin tocar; startup policy sin tocar. Es DDL puro de capa 1, schema-level only.
+
+# Sesion 2026-05-06 — TASK-813 creada + orden de ejecucion EPIC-014/EPIC-002 documentado
+
+- **Branch:** `develop` (planning + spec creation only — no implementation).
+- **Origen:** auditoria de divergencia HubSpot ↔ Greenhouse en el modelo de servicios. Usuario detecto en HubSpot vista CRM 0-162 con 16 servicios y consulto si coinciden con los de Greenhouse. Skill `arch-architect` invocada con overlay Greenhouse.
+- **Hallazgos via API HubSpot + PG live:**
+  - HubSpot custom object `0-162` tiene 16 servicios reales con `ef_organization_id`, `ef_space_id`, `ef_linea_de_servicio`, `ef_servicio_especifico` TODOS NULL — operador comercial nunca los mapeo.
+  - `greenhouse_core.services` tiene 30 filas seedeadas el 2026-03-16 con pattern `svc-<uuid>`, `created_by` vacio, `hubspot_service_id` NULL, `hubspot_sync_status='pending'`, naming `<module> — <client>` (cross-product `service_modules × clients`).
+  - Bridge code (`src/lib/services/service-sync.ts` + `services/hubspot_greenhouse_integration/hubspot_client.py:get_service`) existe pero NUNCA se invoca: ni cron, ni webhook, ni trigger.
+  - 3 huerfanos en HubSpot sin org Greenhouse: Loyal, Motogas, Aguas Andinas.
+  - 12 de 16 services HubSpot tienen nombre quasi-identico a un deal — coincidencia, no causalidad.
+- **Hipotesis del usuario** ("Greenhouse mapeo contra deals"): parcialmente correcta pero incompleta. Realidad: Greenhouse no mapeo contra nada — los 30 son cross-product seed local. Confusion de nomenclatura porque `<linea> × <cliente>` produce labels similares a deals.
+- **Decision arquitectural canonica reafirmada** (de `GREENHOUSE_PILOT_ENGAGEMENT_ARCHITECTURE_V1.md` + EPIC-014): `core.services` se MANTIENE como engagement primitive — NO se renombra ni se paraleliza. Decision raiz: Sample Sprint NO es entidad nueva; es `service` con `engagement_kind != 'regular'`. TASK-813 es complementaria, no competidora.
+- **TASK-813 creada** con scope acotado: activacion de sync HubSpot 0-162 → `core.services` + cleanup idempotente de las 30 filas fantasma con `engagement_kind='discovery'` + `status='legacy_seed_archived'` (NO DELETE). Hard dep TASK-801, soft dep TASK-555. Plan en 8 slices (DDL signals → archive script → backfill from HubSpot → webhook inbound → Cloud Scheduler safety net → reliability readers → manual queue UI → docs).
+- **Cross-impact deltas** registradas via regla CLAUDE.md de impacto cruzado:
+  - TASK-801: post-migration TASK-813 reclasifica las 30 fantasmas.
+  - TASK-802: recomendar correr TASK-813 antes para no declarar terms contra fantasmas.
+  - TASK-555: 3 capabilities nuevas que TASK-813 registra (`commercial.service_engagement.{sync,resolve_orphan,archive_legacy}`).
+  - TASK-557.1: sibling pattern, mismo template audit + 3 categorias.
+  - EPIC-014: TASK-813 incorporada como sibling derivada.
+- **Orden de ejecucion canonico** documentado en EPIC-014 (seccion "Orden de ejecucion canonico (incorporado 2026-05-06)"): 6 fases, ruta critica `TASK-801 → TASK-813 → TASK-803 → TASK-808 → TASK-809 → TASK-810`, recomendacion 5-sprint con paralelizacion explicita.
+- **Reglas duras del orden:**
+  1. TASK-801 antes de cualquier child de EPIC-014.
+  2. TASK-813 inmediatamente despues de TASK-801 y antes de TASK-802 onward (sin esto, terms/phases/outcomes se declaran contra fantasmas).
+  3. TASK-555 antes de TASK-556/557/557.1/813 (capabilities `commercial.*`).
+  4. TASK-807 idealmente antes de TASK-813 (subsystem rollup).
+  5. TASK-810 al final (anti-zombie CHECK requiere flows maduros).
+- **No se ejecuto:** implementacion. TASK-813 queda en `to-do/` esperando agente que la tome (idealmente despues de TASK-801).
+
+# Sesion 2026-05-06 — Postgres runtime CREATE drift cerrado
+
+- **Finding:** `pg:doctor` venia reportando `can_create=true` para runtime en `greenhouse_payroll` y `greenhouse_serving`.
+- **Diagnostico:** el role grupal `greenhouse_runtime` ya estaba correcto (`CREATE=false`); el drift venia de grant directo `greenhouse_app=UC/greenhouse_ops` en ambos schemas.
+- **Fix aplicado:** migracion `20260506184507048_revoke-runtime-schema-create-drift.sql` revoca `CREATE` de `greenhouse_app`, `greenhouse_runtime` y `PUBLIC` en ambos schemas, preservando `USAGE` para runtime y `USAGE, CREATE` para `greenhouse_migrator`/`greenhouse_ops`.
+- **Validacion:** `pnpm pg:connect:migrate` OK; `pnpm pg:doctor` OK con `can_create=false` en todos los schemas runtime; query admin explicita confirma `greenhouse_app=U`, `greenhouse_runtime=U`, `greenhouse_migrator=UC`, `greenhouse_ops=UC` para `greenhouse_payroll` y `greenhouse_serving`.
+- **Access model:** sin cambios de DML por tabla; solo se cierra DDL ad hoc desde runtime.
+
+# Sesion 2026-05-06 — TASK-812 creada (Compliance Exports Chile: Planilla Previred + LRE)
+
+- **Branch:** `develop` (task creation only — no implementation yet).
+- **Origen:** usuario detecto que Nubox vende generacion de archivos Previred + LRE, mientras que Greenhouse ya calcula todas las cotizaciones previsionales Chile correctamente en `payroll_entries`. Gap real: falta la capa de proyeccion a los formatos oficiales que aceptan las autoridades (`previred.cl` + `lre.dt.gob.cl`).
+- **Skill greenhouse-payroll-auditor invocada** y produjo brief de validacion: layout Previred posicional 105 columnas Latin-1 CRLF; schema LRE oficial Decreto N°9 / Res. Ex. 1.110 (2021); honorarios fuera de LRE/Previred (van en DJ 1879 SII anual); edge cases canonizados (licencias medicas con subsidio Isapre, vacaciones proporcionales en finiquito, ingresos/egresos parciales del periodo); riesgos compliance (multa DT 5-20 UTM por LRE incorrecto, AFP rechaza Previred mal declarado).
+- **Skill greenhouse-task-planner invocada** y produjo el archivo canonico `docs/tasks/to-do/TASK-812-compliance-exports-chile-previred-planilla-lre-libro.md` siguiendo `TASK_TEMPLATE.md`.
+- **Alcance ejecutable**:
+  - Slice 1 — Planilla Previred TXT (ASCII Latin-1, layout posicional, tabla seed `previred_institution_codes` con 7 AFPs + 8 isapres + FONASA, generador puro `chile-previred-planilla.ts`, endpoint `GET /api/hr/payroll/periods/[id]/export/previred`, capability `hr.payroll.export_previred`, outbox event `payroll.export.previred_generated` v1, tests paridad financiera contra `payment_order` social_security canonizado por TASK-707a/TASK-765).
+  - Slice 2 — LRE XML DT (XSD oficial DT commiteado, tabla seed `lre_concept_codes` con ~50 conceptos canonicos, mapping declarativo `payroll_entries → concept_code`, generador puro `chile-lre-libro.ts`, validacion XSD pre-emit, endpoint `POST /api/hr/payroll/periods/[id]/export/lre`, reliability signal `payroll.lre.export_drift`, outbox event `payroll.export.lre_generated` v1).
+- **Out of scope explicito**: DJ 1879 SII honorarios anual (follow-up); integracion API directa con previred.cl o DT.cl (no APIs publicas documentadas); rectificacion de periodos ya declarados; calculo de Horas Extras en el motor (Slice 2 emite 0 con warning + abre TASK follow-up explicita).
+- **Dependencies**: TASK-784 (Person Legal Profile + Identity Documents) es **hard blocker** para Slice 1 — sin RUT canonico verificado en `greenhouse_core.person_identity_documents`, no se puede emitir Planilla Previred valida. TASK-707a (Previred Detection + Canonical State Runtime) provee el `payment_order` para test paridad. TASK-765 (Payment Order ↔ Bank Settlement) ya canonizada.
+- **Riesgos anti-parche declarados**: paridad financiera contra `payment_order` social_security NO negociable; validacion XSD pre-emit obligatoria (archivo mal formado es PEOR que no entregarlo, queda fijado en sistema DT y requiere rectificacion formal); honorarios excluidos verificadamente de ambos archivos via tests.
+- **Open questions** registradas en la task: layout Previred 2026 vigente (Discovery requerido bajando PDF oficial); version XSD LRE actual (v3 vs v4); codigo Planvital (29 vs 08 — verificar contra `previred.com`); decision XSD validation library (xmllint shell-out vs pure-JS); subsystem `Payroll Compliance` nuevo vs rolear bajo `Payroll Operations`.
+- **Registry sincronizado**: `docs/tasks/TASK_ID_REGISTRY.md` agrega fila `TASK-812`, `docs/tasks/README.md` agrega bullet 🆕 `TASK-812` y bumpea siguiente ID disponible a `TASK-813`.
+- **Validacion**: archivo creado conforme `TASK_TEMPLATE.md` (Zone 0/1/3/4 completas, Zone 2 vacia para el agente que tome la task), paths reales o marcados con `[verificar]` cuando no se confirmaron en Discovery.
+- **No se ejecuto**: implementacion. La task queda en `to-do/` esperando agente que la tome.
+
+# Sesion 2026-05-06 — TASK-431 cerrada en develop
+
+- **Branch:** `develop` por instruccion explicita del usuario; no se crea `task/TASK-431-tenant-user-locale-persistence`.
+- **Ownership/lifecycle:** no habia PR abierto ni branch local/remota obvia para `TASK-431`; se tomo, implemento y cerro en `docs/tasks/complete/`.
+- **Entrega:** migracion PG `20260506180640149_task-431-tenant-user-locale-persistence.sql` agrega `identity_profiles.preferred_locale`, `organizations.default_locale`, `clients.default_locale`, CHECK `es-CL|en-US`, backfill desde `client_users.locale` y `greenhouse_serving.session_360.effective_locale`.
+- **Runtime:** `TenantAccessRecord`, NextAuth JWT/session, `TenantContext`, agent sessions y API Platform contexts exponen `preferredLocale`, `tenantDefaultLocale`, `legacyLocale` y `effectiveLocale`. Resolver efectivo: user preference -> tenant/account default -> legacy user locale -> cookie -> `Accept-Language` -> `es-CL`.
+- **APIs/UI:** `PATCH /api/me/locale` + Settings personal; `PATCH /api/admin/tenants/[id]/locale` + Admin Tenants Settings. Guards existentes: `requireTenantContext` y `requireAdminTenantContext`.
+- **Access model:** sin cambios en `routeGroups`, `views`, `authorizedViews`, `view_code`, `entitlements` ni startup policy. Locale queda como presentacion, no autorizacion.
+- **Validacion:** `pnpm pg:doctor` OK; `pnpm pg:connect:migrate` OK; SQL live verificado (`session_360.effective_locale = es-CL` para 41 filas); `pnpm exec vitest run src/i18n/resolve-locale.test.ts src/lib/i18n/locale-preferences.test.ts src/lib/auth/sign-agent-session-in-process.test.ts` OK; `pnpm exec tsc --noEmit` OK; `pnpm lint` OK; `pnpm build` OK; `pnpm design:lint` OK 0 errors/0 warnings; `pnpm test` OK (593 files, 3435 passed, 5 skipped).
+
+# Sesion 2026-05-06 — TASK-430 cerrada en develop
+
+- **Branch:** `develop` por instruccion explicita del usuario; no se crea `task/TASK-430-dictionary-foundation-activation`.
+- **Ownership/lifecycle:** no habia PR abierto ni branch local/remota obvia para `TASK-430`; la task se tomo, planifico, implemento y cerro en `docs/tasks/complete/`.
+- **Plan aprobado:** ejecutar foundation `next-intl` sin locale prefix privado, resolver locale via cookie `gh_locale` + `Accept-Language` + fallback `es-CL`, preservar `src/proxy.ts`, y mantener persistencia DB para `TASK-431`.
+- **Entrega:** `next-intl` instalado; `next.config.ts` compone `next-intl/plugin` con Sentry; `src/i18n/*` resuelve locale y messages serializables; `Providers` envuelve con `NextIntlClientProvider`; `src/app/layout.tsx` usa `<html lang>` efectivo; `en-US` tiene shared namespaces reales y shell navigation via `src/config/greenhouse-navigation-copy.ts`.
+- **Frontera intencional:** `src/lib/copy` contiene funciones en `time`/`emails`; no se pasa el dictionary completo como `next-intl` messages. Emails conservan fallback fuera del provider App Router; persistencia user/tenant queda en `TASK-431`.
+- **Validacion:** `pnpm lint` OK; `pnpm exec tsc --noEmit --pretty false` OK; `pnpm design:lint` OK 0 errors/0 warnings; `pnpm pg:doctor` OK con drift conocido `can_create=true` en serving/payroll; `pnpm test` OK (592 files, 3429 passed, 5 skipped); `pnpm build` OK.
+- **Docs:** `GREENHOUSE_I18N_ARCHITECTURE_V1.md`, `GREENHOUSE_UI_PLATFORM_V1.md`, `docs/documentation/plataforma/i18n-runtime.md`, `docs/manual-de-uso/plataforma/i18n-runtime.md`, microcopy docs/manual, `project_context.md`, `changelog.md`, `TASK-431`, `TASK-266`, README/registry de tasks.
+
+# Sesion 2026-05-06 — TASK-428 tomada en develop
+
+- **Branch:** `develop` por instruccion explicita del usuario; no se crea `task/TASK-428-i18n-architecture-decision`.
+- **Ownership:** no habia PR abierto ni branch local/remota obvia para `TASK-428`; se tomo la task y se movio a `docs/tasks/in-progress/`.
+- **Discovery clave:** `TASK-429` ya esta complete, `src/lib/copy/` ya soporta `es-CL` + `en-US` stub, `src/lib/format/` es la primitive canonica de formatting, `src/proxy.ts` ya es el boundary Next.js proxy, y `greenhouse_core.client_users.locale` existe como legacy (`es`/`en`) mientras `tenant.default_locale` / `identity_profiles.preferred_locale` aun no existen.
+- **Decisiones pre-implementacion:** elegir `next-intl` para App Router, mantener portal privado sin locale prefix por defecto, reservar prefixes para public/SEO routes, conservar `/api/*`/auth/staging automation sin prefijo, y resolver emails SSR via dictionaries/core APIs sin depender de provider App Router.
+- **Validacion runtime previa:** `pnpm pg:doctor` OK.
+- **Entrega:** ADR nuevo `docs/architecture/GREENHOUSE_I18N_ARCHITECTURE_V1.md`; `GREENHOUSE_UI_PLATFORM_V1.md` v1.7 linkea el ADR; `TASK-430`/`TASK-431` quedan actualizadas para consumir decisiones cerradas; `TASK-266` se cierra como umbrella formalizada; `TASK_ID_REGISTRY.md` corrige drift de `TASK-408`/`TASK-429`.
+- **Access model:** sin cambios en `routeGroups`, `views`, `entitlements` ni startup policy. Locale queda como preferencia de presentacion, no autorizacion.
+
+# Sesion 2026-05-06 — TASK-811 cerrada en develop
+
+- **Branch:** `develop` por instruccion explicita del usuario; no se crea `task/TASK-811-greenhouse-nomenclature-domain-microcopy-trim`.
+- **Ownership:** no habia PR abierto ni branch local/remota obvia para `TASK-811`; se tomo y cerro en esta sesion. `Lifecycle`, `docs/tasks/README.md` y `docs/tasks/TASK_ID_REGISTRY.md` apuntan al path complete.
+- **Drift administrativo relevante:** `TASK-811` declara bloqueo por `TASK-408` cerrada. Runtime/codigo ya cumplen los prerrequisitos de `TASK-408` para este trim (`greenhouse/no-untokenized-copy` en `error`, 0 imports de nomenclature desde emails, smoke staging/inbox OK), pero `TASK-408` conserva lifecycle `in-progress` por observacion 24h del signal. Se trata como drift no bloqueante para `TASK-811`; no cerrar `TASK-408` desde esta task.
+- **Entrega:** `src/config/greenhouse-nomenclature.ts` baja de 2.747 a 410 lineas. Queda con navegacion/product nomenclature (`GH_*_NAV`, `GH_NEXA`, `GH_PIPELINE_COMMERCIAL`) y `GH_COLORS` transicional out-of-scope. Domain microcopy se mueve a `src/lib/copy/agency.ts`, `client-portal.ts`, `admin.ts`, `pricing.ts`, `workforce.ts`, `finance.ts` y `payroll.ts`.
+- **Orphan eliminado:** `GH_COMPENSATION` se elimino tras confirmar 0 importers runtime (`rg "GH_COMPENSATION" src` = 0).
+- **No se toco:** rutas, access model, DB/schema, workers, outbox/events, notification delivery, email delivery ni strings visibles.
+- **Docs:** `GREENHOUSE_UI_PLATFORM_V1.md` v1.6, `changelog.md`, `docs/tasks/README.md`, `docs/tasks/TASK_ID_REGISTRY.md` y lifecycle de `TASK-811` sincronizados. Task cerrada en `docs/tasks/complete/TASK-811-greenhouse-nomenclature-domain-microcopy-trim.md`.
+- **Validacion:** `pnpm exec tsc --noEmit --pretty false` OK; ESLint focal OK; `pnpm lint` OK; `pnpm build` OK; `pnpm design:lint` OK 0 errors/0 warnings. `pnpm test` completo tuvo 1 flake externo (`src/lib/platform-health/with-source-timeout.test.ts`, 29ms vs >=30ms), y el rerun focal paso 5/5.
+
 # Handoff.md
+
+## Sesion 2026-05-06 — TASK-408 Slice 0 + Slice 1 + Slice 2A + Slice 3A-3E tomada en develop
+
+- **Branch:** `develop` por instruccion explicita del usuario; no se crea `task/TASK-408-copy-migration-notifications-emails`.
+- **Ownership:** no habia PR abierto ni branch local/remota obvia para `TASK-408`; se tomo la task y se movio a `docs/tasks/in-progress/`.
+- **Scope Slice 0:** foundation aditiva para namespace `emails`, helper canonico de locale email y snapshot baseline de templates antes de migrar copy. Entregado con 17 snapshots y assertions explicitas de tokens de personalizacion.
+- **Scope Slice 1:** las 13 categorias reales de `src/config/notification-categories.ts` consumen `getMicrocopy().emails.notificationCategories.<code>.{label,description}` con fallback legacy interno. Se agrego type guard `isNotificationCategoryCode()` para accesos dinamicos seguros desde API/preferences.
+- **Scope Slice 2A:** `EmailLayout` consume `getMicrocopy().emails.layout` para logo alt, tagline, disclaimer y unsubscribe en `es`. Footer `en` conserva fallback legacy mientras `en-US` siga como mirror de `es-CL`, para no romper correos internacionales. `EmailButton` no se toca porque no tiene copy propio.
+- **Scope Slice 3A:** primitive `selectEmailTemplateCopy()` para migrar templates sin degradar `en` mientras `en-US` es mirror; `VerifyEmail`, `MagicLinkEmail`, `PasswordResetEmail` e `InvitationEmail` usan `getMicrocopy().emails.auth.*` para copy `es` y fallback legacy `en`.
+- **Scope Slice 3B:** `NotificationEmail` consume `getMicrocopy().emails.genericNotification` para greeting/default CTA/fallback sin tocar `title`, `body`, `actionUrl`, `actionLabel`, `unsubscribeUrl` ni dispatch de notificaciones.
+- **Scope Slice 3C:** cohorte leave (`LeaveRequestDecisionEmail`, `LeaveRequestSubmittedEmail`, `LeaveRequestPendingReviewEmail`, `LeaveReviewConfirmationEmail`) consume `getMicrocopy().emails.leave.*` para copy por estado, labels, pluralizacion y fallbacks, preservando fechas, rutas, imagenes y valores dinamicos.
+- **Scope Slice 3D:** `selectEmailIntlDateLocale()` centraliza el locale Intl de fechas para emails y elimina los `locale === 'en'` restantes en `src/emails` sin cambiar snapshots.
+- **Scope Slice 3E:** cohorte payroll employee-facing (`PayrollReceiptEmail`, `PayrollPaymentCommittedEmail`, `PayrollPaymentCancelledEmail`, `PayrollLiquidacionV2Email`) consume `getMicrocopy().emails.payroll.*` para copy estatico y fallback legacy `en` donde aplica. Los tokens de personalizacion (`fullName`/`firstName`, `monthName`, `periodYear`, montos formateados, fechas, procesador, motivo de cancelacion, links y adjuntos PDF) siguen siendo props/runtime y no se interpolan dentro del dictionary.
+- **Scope Slice 3F:** `WeeklyExecutiveDigestEmail` (Nexa Insights) consume `getMicrocopy().emails.weeklyExecutiveDigest` solo para copy estructural reusable (subject, headings, labels, severity labels, empty states, CTA y plain text). Las narrativas materializadas, headlines, root-cause narratives, spaces, links y `actionLabel` siguen viniendo de la lane Nexa/digest runtime y no se guardan en el dictionary.
+- **Guardrail:** no tocar `sendEmail`, Resend, `NOTIFICATION_CATEGORIES`, outbox/webhooks, `EmailLayout` ni `EmailButton` hasta tener snapshots baseline verdes.
+- **Tokens de personalizacion:** preservar la capa `src/lib/email/tokens.ts` + merge de `delivery.ts`; snapshots deben cubrir nombre, cliente, montos, periodos, links y unsubscribe para detectar cualquier perdida de contexto.
+- **Delivery/eventos intactos:** Slice 1 no toca `NotificationService.dispatch`, `sendEmail`, event types, outbox, projections, webhooks, retry/idempotency ni categorias `code`; solo cambia la fuente de `label/description`.
+- **Shell email intacto operacionalmente:** Slice 2A no toca `sendEmail`, Resend, templates individuales, subjects, CTA text, outbox, webhooks, delivery headers, unsubscribe token generation ni personalization context.
+- **Templates auth intactos operacionalmente:** Slice 3A no toca delivery auth, tokens, URLs, subject registry ni handlers. Solo cambia la fuente de copy renderizado; snapshot baseline sigue byte-estable.
+- **Template NotificationEmail intacto operacionalmente:** Slice 3B no toca `NotificationService`, `sendEmail`, payloads, preferencias, unsubscribe token, outbox, webhooks ni eventos reactivos. Solo mueve copy fallback del render.
+- **Templates leave intactos operacionalmente:** Slice 3C no toca `createLeaveRequest`, review handlers, approval authority, calendario operativo, balances, rutas `/my/leave`/`/hr/leave`, emails subjects, delivery, outbox, webhooks ni eventos reactivos. Solo mueve copy renderizado y mantiene snapshots byte-estables.
+- **Templates payroll intactos operacionalmente:** Slice 3E no toca `sendEmail`, payroll export/receipt generation, attachment handling, rutas `/my/payroll`, subjects del registry, payment order lifecycle, outbox, webhooks, projections ni eventos reactivos. Solo cambia la fuente de copy renderizado y mantiene snapshots byte-estables.
+- **Template Nexa Insights intacto operacionalmente:** Slice 3F no toca `src/lib/nexa/digest`, ops-worker, materializaciones, generation/advisory lanes, recipients, unsubscribe, delivery, outbox ni contenidos generados. Solo mueve copy estructural y mantiene snapshots byte-estables.
+- **Hardening de tests observado durante verificacion:** el test de delegacion temporal de HR Hierarchy ahora usa `fireEvent.click` para abrir el dialog sin depender del delay async de `userEvent` en una vista pesada. `EmptyState` mueve el fetch de Lottie a `useEffect` con cancelacion por unmount para evitar `setState` despues del teardown de jsdom o de un unmount real.
+- **Validacion:** `pnpm exec vitest run src/lib/email/locale-resolver.test.ts src/emails/EmailTemplateBaseline.test.tsx --reporter=verbose` OK; `pnpm exec vitest run src/emails src/lib/email/locale-resolver.test.ts --reporter=verbose` OK; focal HR Hierarchy OK; focal EmptyState/Space360 OK; `pnpm exec tsc --noEmit --pretty false` OK; `pnpm lint` OK; `pnpm test` OK (585 suites, 3407 tests, 5 skipped); `pnpm build` OK.
+- **Validacion Slice 1 focal:** `src/config/notification-categories.test.ts`, `src/app/api/notifications/preferences/route.test.ts`, `src/lib/notifications/notification-service.test.ts`, `src/lib/sync/projections/notifications.test.ts`, `src/lib/webhooks/consumers/notification-dispatch.test.ts` y `src/emails/EmailTemplateBaseline.test.tsx` OK.
+- **Validacion full post Slice 1:** `pnpm lint` OK; `pnpm exec tsc --noEmit --pretty false` OK; `pnpm test` OK (587 suites, 3411 tests, 5 skipped); `pnpm build` OK.
+- **Validacion Slice 2A focal:** `src/emails/components/EmailLayout.test.tsx`, `src/emails/EmailTemplateBaseline.test.tsx`, `src/emails/PayrollReceiptEmail.test.tsx`, `src/lib/email/templates.test.ts` OK; `pnpm exec tsc --noEmit --pretty false` OK.
+- **Validacion full post Slice 2A:** `pnpm lint` OK; `pnpm exec tsc --noEmit --pretty false` OK; `pnpm test` OK (588 suites, 3413 tests, 5 skipped); `pnpm build` OK.
+- **Validacion Slice 3A focal:** `src/lib/email/template-copy.test.ts`, `src/emails/EmailTemplateBaseline.test.tsx` (incluye `VerifyEmail`, `MagicLinkEmail`, `PasswordResetEmail` e `InvitationEmail`), `src/lib/email/templates.test.ts` OK; `pnpm exec tsc --noEmit --pretty false` OK; ESLint focal OK.
+- **Validacion Slice 3B focal:** `src/lib/email/template-copy.test.ts`, `src/emails/EmailTemplateBaseline.test.tsx` (incluye `NotificationEmail`), `src/lib/email/templates.test.ts` OK; `pnpm exec tsc --noEmit --pretty false` OK; ESLint focal OK.
+- **Validacion Slice 3C focal:** `src/lib/email/template-copy.test.ts`, `src/emails/EmailTemplateBaseline.test.tsx` (incluye los 4 templates leave), `src/lib/email/templates.test.ts` OK; `pnpm exec tsc --noEmit --pretty false` OK; ESLint focal OK.
+- **Validacion Slice 3D focal:** `src/lib/email/template-copy.test.ts` cubre `selectEmailIntlDateLocale()`; `rg "locale === 'en'|const isEn = locale ===|const t = locale ===" src/emails` queda sin resultados; snapshots email OK.
+- **Validacion Slice 3E focal:** `pnpm exec vitest run src/lib/email/template-copy.test.ts src/emails/EmailTemplateBaseline.test.tsx src/lib/email/templates.test.ts src/emails/PayrollReceiptEmail.test.tsx src/emails/PayrollExportReadyEmail.test.tsx --reporter=verbose` OK (28 tests); `pnpm exec tsc --noEmit --pretty false` OK; ESLint focal sobre templates payroll + dictionary/types OK.
+- **Validacion Slice 3F focal:** `pnpm exec vitest run src/lib/email/template-copy.test.ts src/emails/EmailTemplateBaseline.test.tsx src/lib/email/templates.test.ts --reporter=verbose` OK (23 tests); `pnpm exec tsc --noEmit --pretty false` OK; ESLint focal sobre `WeeklyExecutiveDigestEmail`, `templates.ts` y dictionary/types OK.
+- **Validacion full post Slice 3A:** `pnpm lint` OK; `pnpm exec tsc --noEmit --pretty false` OK; `pnpm test` OK (589 suites, 3415 tests, 5 skipped); `pnpm build` OK.
+- **Validacion full post Slice 3E:** `pnpm lint` OK; `pnpm exec tsc --noEmit --pretty false` OK; `pnpm test` OK (589 suites, 3416 tests, 5 skipped); `pnpm build` OK. `rg "locale === 'en'|const isEn = locale ===|const t = locale ===" src/emails` y `rg "from\\s+['\\\"]@/config/greenhouse-nomenclature" src/emails` quedan sin resultados.
+- **Riesgo observado:** spec declaraba 12 categorias, runtime tiene 13 en `src/config/notification-categories.ts`; Slice 1 migro el runtime real (13). `subjectKey` queda diferido hasta no tener un consumer activo seguro, para no tocar subjects/delivery en este slice.
+
+## Sesion 2026-05-06 — TASK-407 tomada en develop
+
+- **Branch:** `develop` por instruccion explicita del usuario; no se crea `task/TASK-407-copy-migration-shared-shell-components`.
+- **Ownership:** no habia PR abierto ni branch local/remota obvia para `TASK-407`; se tomo la task y quedo cerrada en esta sesion.
+- **Lifecycle:** `docs/tasks/to-do/TASK-407-copy-migration-shared-shell-components.md` -> `docs/tasks/in-progress/TASK-407-copy-migration-shared-shell-components.md` -> `docs/tasks/complete/TASK-407-copy-migration-shared-shell-components.md`; `docs/tasks/README.md` y `docs/tasks/TASK_ID_REGISTRY.md` sincronizados.
+- **Discovery inicial:** foundation `src/lib/copy/` existia y la rule `greenhouse/no-untokenized-copy` estaba activa en `warn`; se confirmo que el sweep necesitaba extender primero la deteccion a month arrays + JSX text CTAs.
+- **Resultado:** TASK-407 completa; ver bloque de cierre "TASK-407 Copy Migration: Shared Shell + Components completada" mas abajo para commits y validaciones.
+
+## Sesion 2026-05-06 — TASK-429 cerrada en develop
+
+- **Branch:** `develop` por instruccion explicita del usuario; no se crea `task/TASK-429-locale-aware-formatting-utilities`.
+- **Lifecycle:** `TASK-429` se movio de `docs/tasks/to-do/` a `docs/tasks/complete/`; `docs/tasks/README.md` y `TASK-266` sincronizados.
+- **Entrega:** foundation canonica `src/lib/format/` con currency/date/datetime/ISO date key/number/integer/percent/relative/plural; default `es-CL`, timezone operacional `America/Santiago`, date-only sin drift.
+- **Migracion:** scope critico Finance/Payroll/emails/payroll views/pricing/admin-pricing/dashboard/finance movement feed consume la utility; grep de `new Intl.*`, `toLocaleString`, `toLocaleDateString`, `toLocaleTimeString` en ese scope queda en 0.
+- **Guardrail:** ESLint rule `greenhouse/no-raw-locale-formatting` en `warn` incremental para `src/views`, `src/components`, `src/app`; no bloquea deuda historica ni tests.
+- **Validacion:** `pnpm exec tsc --noEmit --pretty false` OK; vitest focal (`src/lib/format`, finance PDF formatters, finiquito PDF, payroll receipt/export emails) OK 5 files / 24 tests; rule test `node eslint-plugins/greenhouse/rules/__tests__/no-raw-locale-formatting.test.mjs` OK.
+- **Pendiente/riesgo:** `pnpm lint` conserva warnings preexistentes de `greenhouse/no-untokenized-copy`; no son de TASK-429. `pnpm build` queda pendiente post-lint full si se requiere gate completo antes de push final.
 
 ## Sesion 2026-05-05 — Finiquito PDF calculation disclosure
 
@@ -22792,3 +23009,305 @@ Validaciones adicionales:
 - `pnpm exec eslint src/lib/payroll/final-settlement/document-pdf.tsx src/lib/payroll/final-settlement/document-pdf.test.tsx` -> pass.
 - `pnpm exec tsc --noEmit --pretty false` -> pass.
 - `pnpm design:lint` -> 0 errors / 0 warnings.
+
+## Sesion 2026-05-06 — TASK-407 Copy Migration: Shared Shell + Components completada
+
+Contexto:
+
+- El usuario pidió implementar TASK-407 end-to-end y mantenerse en `develop`.
+- Se detectó que la task estaba libre, se movió a `docs/tasks/in-progress/`, y se documentó ownership en esta misma sesión.
+- El usuario remarcó que debía ser una mejora incremental sin romper lo existente; se descartó una pasada automática no committeada que rompía TypeScript y se rehízo el slice final desde el último commit sano.
+
+Cambios aplicados:
+
+- `greenhouse/no-untokenized-copy` ahora cubre arrays de meses y CTAs JSX text, con test unitario.
+- `src/lib/copy/index.ts` agrega `buildStatusMap()` type-safe para status maps y test unitario.
+- Se migraron meses, status maps, CTAs base, aria-labels, empty states y secondary props en `src/components/**` y `src/views/**`.
+- Para copy compartida se reutilizó `getMicrocopy()` (`actions`, `states`, `months`, `empty`, `aria` existentes). Para copy domain-specific de una sola superficie se usaron constantes locales por archivo, preservando texto visible y evitando expandir el dictionary global sin reuso real.
+- No se tocaron login, access model, DB, capabilities, events, migrations ni runtime backend.
+
+Commits en `develop`:
+
+- `fd59e1c3` — `chore: start TASK-407 copy migration gate`
+- `3f11e10f` — `refactor: migrate shared month labels`
+- `49159204` — `refactor: canonicalize shared status labels`
+- `a87c7477` — `style: normalize migrated month copy imports`
+- `7e9f21de` — `refactor: migrate shared CTA labels`
+- `6d2011e0` — `refactor: migrate remaining shared UI copy`
+
+Validaciones:
+
+- `node eslint-plugins/greenhouse/rules/__tests__/no-untokenized-copy.test.mjs` -> pass.
+- `pnpm exec vitest run src/lib/copy/index.test.ts --reporter=verbose` -> pass.
+- `pnpm exec eslint src/views src/components src/app --format json -o /tmp/task407-eslint-postbuild.json` -> 0 errors, 0 warnings `greenhouse/no-untokenized-copy`.
+- `rg "eslint-disable.*no-untokenized-copy" src/ -n | wc -l` -> 0.
+- `pnpm exec tsc --noEmit --pretty false` -> pass.
+- `pnpm test` -> 583 test files passed, 3385 tests passed, 5 skipped. Hubo aviso conocido de jsdom/canvas, no fallo.
+- `pnpm lint` -> pass con 0 errors; quedan 265 warnings heredados de `greenhouse/no-raw-locale-formatting`, fuera de TASK-407.
+- `pnpm build` -> pass.
+
+Cierre / follow-ups:
+
+- TASK-407 queda lista para mover a `complete/`.
+- TASK-408 puede promover `greenhouse/no-untokenized-copy` a `error` cubriendo 6 patterns.
+- `TASK-811` conserva el trim de `greenhouse-nomenclature.ts`, fuera de scope de TASK-407.
+- No se ejecutó smoke visual manual en preview/staging; el cambio fue refactor de strings y quedó cubierto por lint/tsc/test/build. Si se quiere evidencia visual, revisar `/home`, `/finance/cash-out`, `/finance/reconciliation`, `/people` y `/admin/ops-health` en staging.
+
+## Sesion 2026-05-06 — TASK-429 follow-up: baseline `no-raw-locale-formatting` en cero
+
+Contexto:
+
+- Tras cerrar TASK-407, `pnpm lint` quedaba con 0 errores pero 265 warnings heredados de `greenhouse/no-raw-locale-formatting`.
+- El usuario pidió resolver ese remanente de forma robusta, segura, resiliente y escalable, sin tratarlo como fuera de alcance.
+
+Cambios aplicados:
+
+- Se centralizó el formateo visible restante de `src/components/**` y `src/views/**` en `@/lib/format`, eliminando usos directos de `Intl.NumberFormat`, `Intl.DateTimeFormat`, `toLocaleString`, `toLocaleDateString` y `toLocaleTimeString` en superficies UI.
+- `src/lib/format` agrega `formatTime()` para horas sin fecha y acepta locale como segundo argumento en helpers de fecha, hora, número, moneda y porcentaje.
+- `formatDate()` ahora respeta `dateStyle/timeStyle` sin mezclar defaults incompatibles.
+- `formatCurrency()` normaliza `minimumFractionDigits/maximumFractionDigits` cuando un caller pide solo un límite de fracción, evitando `RangeError` en runtime.
+- La regla `greenhouse/no-raw-locale-formatting` actualizó su hint para incluir `formatTime`.
+- Se actualizaron la arquitectura UI, documentación funcional, manual de uso, changelog e índice/task de TASK-429 para reflejar el contrato vivo y el baseline cero.
+
+Validaciones:
+
+- `pnpm exec eslint . --format json -o /tmp/locale-warnings-final-check.json` + conteo JSON -> `{ errors: 0, warnings: 0, rawLocaleFormattingWarnings: 0 }`.
+- `pnpm lint` -> pass, 0 errors / 0 warnings.
+- `pnpm exec tsc --noEmit --pretty false` -> pass.
+- `pnpm exec vitest run src/lib/format/__tests__/format.test.ts --reporter=verbose` -> pass.
+- Suites inicialmente afectadas por el sweep (`HrHierarchyView`, `FinancePeriodClosureDashboardView`, `CreatePlacementDialog`, `PlacementDetailView`, `StaffAugmentationListView`) -> pass tras hardening de helpers.
+- `pnpm test` -> 583 test files passed, 3386 tests passed, 5 skipped. El aviso conocido de jsdom/canvas sigue sin fallo.
+- `pnpm build` -> pass.
+
+Riesgos / notas:
+
+- La limpieza estandariza formatos visibles hacia los defaults canónicos de Greenhouse; puede haber diferencias menores de presentación frente a formatos raw anteriores, pero ahora quedan cubiertas por helpers reutilizables, lint y documentación.
+- No hubo migraciones, capabilities, access model, events ni signals nuevos.
+
+## Sesion 2026-05-06 — Docs follow-up TASK-407/TASK-429
+
+Contexto:
+
+- El usuario pidio confirmar que lo entregado en TASK-407 y TASK-429 estuviera documentado en arquitectura, documentacion funcional y manual de uso.
+
+Cambios:
+
+- TASK-429 ya tenia cobertura en `GREENHOUSE_UI_PLATFORM_V1.md`, `docs/documentation/plataforma/formateo-locale-aware.md` y `docs/manual-de-uso/plataforma/formateo-locale-aware.md`.
+- Se agrego cobertura faltante de TASK-407:
+  - `docs/documentation/plataforma/microcopy-shared-dictionary.md`
+  - `docs/manual-de-uso/plataforma/microcopy-shared-dictionary.md`
+  - indices `docs/documentation/README.md` y `docs/manual-de-uso/README.md`
+  - delta de TASK-407 en `GREENHOUSE_UI_PLATFORM_V1.md`
+- Se corrigio el drift en `Greenhouse_Nomenclatura_Portal_v3.md`: ya no declara que todo microcopy vive en `greenhouse-nomenclature.ts`; ahora distingue nomenclatura de producto vs `src/lib/copy/`.
+
+Validacion:
+
+- `git diff --check` -> pass.
+
+## Sesion 2026-05-06 — TASK-408 Slice 3G: payroll export + beneficiary payment profile
+
+Contexto:
+
+- Tras migrar Nexa Insights, se verifico el catalogo real de 17 emails y quedaban con copy estructural local `PayrollExportReadyEmail`, `BeneficiaryPaymentProfileChangedEmail` y `QuoteSharePromptEmail`.
+- Para avanzar con menor blast radius se tomo primero `payroll_export` + `beneficiary_payment_profile_changed`, preservando tokens runtime y datos sensibles.
+
+Cambios aplicados:
+
+- `PayrollExportReadyEmail` ahora consume `getMicrocopy().emails.payroll.exportReady` para preview, overline, heading, labels, adjuntos, CTA, metadata copy y footer.
+- `BeneficiaryPaymentProfileChangedEmail` ahora consume `getMicrocopy().emails.beneficiaryPaymentProfileChanged` para headings/previews por estado, intros, labels, CTA, avisos de seguridad y plain text del registry.
+- `src/lib/email/templates.ts` reutiliza los subjects existentes del dictionary para `payroll_export` y `beneficiary_payment_profile_changed`, y el plain text de esos templates toma copy estructural del dictionary.
+- Se preserva como runtime: periodo, entry count, montos, breakdowns, adjuntos, exportedBy/exportedAt, proveedor/banco, cuenta enmascarada, moneda, fechas, motivo, masking y links.
+- No se tocaron Resend, `sendEmail`, `email_deliveries`, package documental de payroll export, lifecycle de perfil de pago, outbox, webhooks, projections ni eventos reactivos.
+
+Validacion:
+
+- `pnpm exec tsc --noEmit --pretty false` -> pass.
+- `pnpm exec vitest run src/lib/email/template-copy.test.ts src/lib/email/templates.test.ts src/emails/EmailTemplateBaseline.test.tsx src/emails/PayrollExportReadyEmail.test.tsx --reporter=verbose` -> pass, 4 files / 26 tests.
+- `pnpm exec eslint src/emails/PayrollExportReadyEmail.tsx src/emails/BeneficiaryPaymentProfileChangedEmail.tsx src/lib/email/templates.ts src/lib/copy/types.ts src/lib/copy/index.ts src/lib/copy/dictionaries/es-CL/emails.ts --max-warnings=0` -> pass.
+
+Siguiente paso recomendado:
+
+- Migrar `QuoteSharePromptEmail` + `quote_share` registry/plain-text como siguiente slice, cuidando `customMessage`, PDF attachment metadata, recipient/client/sender fields y share URL como runtime.
+
+## Sesion 2026-05-06 — TASK-408 Slice 3H: quote share
+
+Contexto:
+
+- Tras Slice 3G, el email principal restante con copy estructural local era `QuoteSharePromptEmail` + registry `quote_share`.
+- Este email es comercial y puede incluir mensaje humano custom, PDF y link publico de aceptacion; esos valores se preservan como runtime.
+
+Cambios aplicados:
+
+- `QuoteSharePromptEmail` ahora consume `getMicrocopy().emails.quoteShare` para preview, overline, greeting, body estructural, total label, valid-until label, attachment label, CTA, fallback link y closing note.
+- `src/lib/email/templates.ts` usa `emails.quoteShare` para plain text y `emails.subjects.quoteShare(quotationNumber, versionNumber, clientName)` para el subject default, preservando override via `context.subject`.
+- Se preserva como runtime: `customMessage`, `shareUrl`, `quotationNumber`, `versionNumber`, `clientName`, `recipientName`, `totalLabel`, `validUntilLabel`, `senderName`, `senderRole`, `senderEmail`, `hasPdfAttached` y `pdfFileName`.
+- No se tocaron quote lifecycle, public share route, generacion/attachment PDF, Resend, `sendEmail`, `email_deliveries`, outbox, webhooks, projections ni eventos reactivos.
+
+Validacion focal:
+
+- `pnpm exec tsc --noEmit --pretty false` -> pass.
+- `pnpm exec vitest run src/lib/email/templates.test.ts src/emails/EmailTemplateBaseline.test.tsx --reporter=verbose` -> pass, 2 files / 20 tests.
+- `pnpm exec eslint src/emails/QuoteSharePromptEmail.tsx src/lib/email/templates.ts src/lib/copy/types.ts src/lib/copy/index.ts src/lib/copy/dictionaries/es-CL/emails.ts --max-warnings=0` -> pass.
+
+Siguiente paso recomendado:
+
+- Completar limpieza de registry/plain-text para templates ya migrados que aun tienen ternarios/local copy fuera de `src/emails`, o avanzar con Slice 4 reliability signal `notifications.email.render_failure_rate`.
+
+## Sesion 2026-05-06 — TASK-408 Slice 4: email render reliability signal
+
+Contexto:
+
+- Tras migrar los grupos principales de emails, el siguiente paso mas seguro fue agregar una red de seguridad operacional antes de seguir tocando copy.
+- Drift detectado: la spec de Slice 4 apuntaba a `greenhouse_sync.outbox_events.last_error`, pero el schema/runtime real de TASK-773 usa `last_publish_error` para errores del publisher PG -> BQ. Los errores reales de render/template de emails viven en `greenhouse_notifications.email_deliveries` y, cuando vienen de projections reactivas, en `greenhouse_sync.outbox_reactive_log.last_error`.
+
+Cambios aplicados:
+
+- Nuevo reader `src/lib/reliability/queries/email-render-failure.ts` con signal `notifications.email.render_failure_rate`.
+- Wiring en `getReliabilityOverview` bajo `moduleKey='sync'`, `kind='runtime'`.
+- El signal cuenta ventana rolling 24h y separa evidencia para `delivery_render_failures`, `reactive_render_failures`, `total_render_failures` y `delivery_failure_rate_percent`.
+- Tests unitarios agregados al suite de outbox health para paths `ok`, `error` y `unknown`.
+- Docs actualizadas: task, arquitectura email catalog y documentacion funcional de microcopy/templates.
+
+Riesgos:
+
+- El signal es lectura-only y no cambia delivery, Resend, retry policy, templates, outbox publisher, reactive consumer, webhooks ni eventos.
+
+Validacion:
+
+- `pnpm exec vitest run src/lib/reliability/queries/outbox-health.test.ts --reporter=verbose` -> pass, 9 tests.
+- `pnpm exec eslint src/lib/reliability/queries/email-render-failure.ts src/lib/reliability/queries/outbox-health.test.ts src/lib/reliability/get-reliability-overview.ts --max-warnings=0` -> pass.
+- `git diff --check` -> pass.
+- `pnpm exec tsc --noEmit --pretty false` -> pass.
+- `pnpm pg:doctor` -> pass; runtime profile conectado a `greenhouse-pg-dev`, schemas `greenhouse_notifications` y `greenhouse_sync` con `USAGE`.
+- `pnpm lint` -> pass.
+- `pnpm test` -> pass, 589 suites / 3419 tests / 5 skipped. Aviso conocido de jsdom/canvas sin fallo.
+- `pnpm build` -> pass.
+
+No validado:
+
+- Ejecucion directa del SELECT del reader contra PG via script ad hoc: el intento no se conto como evidencia porque el proxy `pnpm pg:connect` no quedo vivo en este shell. La query queda cubierta por typecheck, unit tests mockeados, `pg:doctor` y build; se recomienda observar el signal en `/admin/operations` tras deploy.
+
+## Sesion 2026-05-06 — TASK-408 Slice 5 guardrail: no-untokenized-copy error mode
+
+Contexto:
+
+- ADC/GCP se reautenticaron correctamente (`gcloud auth login` + `gcloud auth application-default login`) y `pnpm pg:doctor` volvio a pasar contra `greenhouse-pg-dev`.
+- Tras Slice 4, quedaba el cierre mecanico de TASK-408: confirmar baseline y promover `greenhouse/no-untokenized-copy` de `warn` a `error`.
+
+Cambios aplicados:
+
+- `eslint.config.mjs` promueve `greenhouse/no-untokenized-copy` a `error` para `src/views`, `src/components` y `src/app`.
+- Task y docs funcionales actualizadas con baseline:
+  - `rg "locale\\s*===\\s*['\\\"]en['\\\"]" src/emails/ | wc -l` = 0.
+  - `rg "from\\s+['\\\"]@/config/greenhouse-nomenclature" src/emails/ | wc -l` = 0.
+  - `rg "eslint-disable.*no-untokenized-copy" src/ | wc -l` = 0.
+  - ESLint focal pre-promocion sobre `src/views src/components src/app` = 0 mensajes, 0 `no-untokenized-copy`.
+
+Riesgos:
+
+- Cambio de guardrail/CI, no runtime. No toca emails, templates, `sendEmail`, Resend, notification preferences, outbox, reactive consumer, webhooks ni eventos.
+
+## Sesion 2026-05-06 — TASK-408 cierre local: verificacion final e invariantes
+
+Contexto:
+
+- Tras promover `greenhouse/no-untokenized-copy` a `error`, se ejecuto el cierre local de evidencia sin tocar runtime de email/notificaciones/eventos.
+- `TASK-407` esta en `docs/tasks/complete/` y confirma Slice 0: la rule cubre month arrays + JSX text CTAs, por lo que el error mode de TASK-408 cubre los 6 patterns del programa.
+
+Evidencia local:
+
+- `pnpm lint` -> pass.
+- `pnpm exec tsc --noEmit --pretty false` -> pass.
+- `pnpm build` -> pass.
+- `pnpm test` -> pass, 589 files / 3419 tests passed / 5 skipped.
+- Invariantes TASK-408:
+  - `rg "locale\\s*===\\s*['\\\"]en['\\\"]" src/emails/ | wc -l` = 0.
+  - `rg "from\\s+['\\\"]@/config/greenhouse-nomenclature" src/emails/ | wc -l` = 0.
+  - `rg "from\\s+['\\\"]@/lib/copy" src/emails/ | wc -l` = 18 (>=17 esperado).
+  - `rg "eslint-disable.*no-untokenized-copy" src/ | wc -l` = 0.
+
+Docs sincronizadas:
+
+- `TASK-408` marca la verificacion local final, la dependencia TASK-407 y los invariantes como cerrados.
+- `TASK-266` registra que `emails` ya esta listo para poblar `en-US` real: los templates no deben reescribirse; el siguiente paso es activar dictionary + lookup PG-backed en `resolveEmailLocale`.
+
+Pendiente operativo antes de cerrar lifecycle de TASK-408:
+
+- Smoke staging de 5 grupos cohesivos de emails (payroll, leave, auth, finance, digest/Nexa Insights) contra inbox QA y comparacion visual.
+- Observacion 24h post-deploy de `notifications.email.render_failure_rate` en `/admin/operations` con steady=0.
+
+## Sesion 2026-05-06 — TASK-408 smoke enablement: admin preview catalog completo
+
+Contexto:
+
+- Tras push a `develop` (`96490aa5`), Vercel Staging desplego correctamente y `pnpm staging:request` autentico contra `https://greenhouse-rgnqvisgu-efeonce-7670142f.vercel.app`.
+- El endpoint `/api/admin/emails/preview` respondio 200, pero el catalogo admin exponia 12 templates aunque `src/lib/email/templates.ts` registra 17. El gap bloqueaba un smoke seguro de finance porque `quote_share` no estaba disponible via preview/test dispatch.
+
+Cambios aplicados:
+
+- `src/lib/email/templates.ts` agrega `registerPreviewMeta` para los 5 templates faltantes:
+  - `magic_link`
+  - `payroll_payment_committed`
+  - `payroll_payment_cancelled`
+  - `beneficiary_payment_profile_changed`
+  - `quote_share`
+- `src/lib/email/templates.test.ts` ahora exige que `getPreviewCatalog()` cubra todo `listRegisteredTemplates()`.
+
+Rationale:
+
+- Es una mejora de observabilidad/smoke, no cambia templates, `sendEmail`, Resend, delivery retry, outbox, notification preferences, webhooks ni eventos reactivos.
+- Permite ejecutar el smoke de 5 grupos cohesivos desde `/api/admin/emails/preview` con `sourceEntity=email_preview_test`, aislado de flujos reales de negocio.
+
+Validacion focal:
+
+- `pnpm exec vitest run src/lib/email/templates.test.ts src/emails/EmailTemplateBaseline.test.tsx --reporter=verbose` -> pass, 2 files / 21 tests.
+- `pnpm exec eslint src/lib/email/templates.ts src/lib/email/templates.test.ts --max-warnings=0` -> pass.
+- `pnpm exec tsc --noEmit --pretty false` -> pass.
+
+## Sesion 2026-05-06 — TASK-408 staging smoke: 5 cohorts sent
+
+Contexto:
+
+- Commit `945b8ea6` fue empujado a `develop`; pre-push corrio `pnpm lint` + `pnpm tsc --noEmit` y paso.
+- Vercel Staging completo deployment `https://greenhouse-p3vsyz3t4-efeonce-7670142f.vercel.app`.
+- `pnpm staging:request` autentico correctamente via agent session en ese deployment.
+
+Smoke ejecutado:
+
+- Catalogo admin `/api/admin/emails/preview` -> 17 templates disponibles.
+- Se enviaron 5 emails a `agent-qa@efeoncepro.com` via `POST /api/admin/emails/preview`, todos con `sourceEntity=email_preview_test`:
+  - `payroll_export` -> delivery `6e7b33ef-f8b3-4771-826d-f5958f293992`, Resend `a5c1e8f2-72f2-4627-bb2e-a731c949340f`.
+  - `leave_request_pending_review` -> delivery `d0642f9e-94a6-49da-80ea-d256acedf158`, Resend `af7c1393-8239-4a74-a0c0-a5c616c2c96b`.
+  - `invitation` -> delivery `b3f189dd-f5f1-4189-930d-8f0f4f7dd366`, Resend `cc00926c-dca8-4f31-b276-91ea59abc207`.
+  - `quote_share` -> delivery `08f4b29d-d03f-47ec-9322-75343667e196`, Resend `05e52375-5f8f-4f40-9b6c-adb5591ae819`.
+  - `weekly_executive_digest` -> delivery `bbc78c09-19e5-4d62-b224-f2b55f9fbd59`, Resend `dc91e2f8-8a9e-46e3-a768-6d714b5a2b6d`.
+
+Evidencia runtime:
+
+- `/api/admin/email-deliveries?limit=20`: los 5 smoke deliveries aparecen `status=sent`; KPI `failedToday=0`, `deliveryRate=100`.
+- `/api/admin/reliability`: `notifications.email.render_failure_rate` severity `ok`, `total_render_failures=0`, `delivery_render_failures=0`, `reactive_render_failures=0`, `delivery_failure_rate_percent=0.00`.
+
+No validado aun:
+
+- Observacion 24h post-deploy del signal para cerrar lifecycle de TASK-408.
+
+Revalidacion posterior:
+
+- Deployment final de `develop` tras commit documental: `https://greenhouse-dqaqhwmw4-efeonce-7670142f.vercel.app` (`03a90f77`) quedo `Ready`.
+- `GET /api/admin/emails/preview` -> 17/17 templates.
+- `GET /api/admin/email-deliveries?limit=5` -> los 5 smoke deliveries siguen como los ultimos `email_preview_test`; KPI `failedToday=0`, `deliveryRate=100`.
+- `GET /api/admin/reliability` -> `notifications.email.render_failure_rate` severity `ok`, `total_render_failures=0`, `delivery_render_failures=0`, `reactive_render_failures=0`, `delivery_failure_rate_percent=0.00`.
+
+Re-smoke a buzon real:
+
+- Destino confirmado por usuario: `jreyes@efeoncepro.com`.
+- Se reenviaron los 5 templates via `POST /api/admin/emails/preview` en `https://greenhouse-dqaqhwmw4-efeonce-7670142f.vercel.app`.
+- Resultados en `email_deliveries`, todos `status=sent`, `sourceEntity=email_preview_test`:
+  - `payroll_export` -> delivery `6dcb749c-1d3e-47b5-9c63-0af0c0affdce`, Resend `f9f1c0b6-745b-4dce-8e3f-f4a56d4cf6db`.
+  - `leave_request_pending_review` -> delivery `e05b0845-6e9f-47f0-a0ff-5ccfc8f641df`, Resend `7f3d32f0-1052-43a1-82ee-92e12ce1b1f4`.
+  - `invitation` -> delivery `b29c2d6d-5de2-49bd-99ba-9064b420f52e`, Resend `b5e4adf8-fc61-4f12-9b1d-28806df6d5d6`.
+  - `quote_share` -> delivery `cb6c8c74-3c6b-42e4-858d-9a88c49a06ec`, Resend `d8793c81-22b3-42cd-9551-a6877fcddbcf`.
+  - `weekly_executive_digest` -> delivery `5118bc2e-ed7c-4c2a-9ea2-74adc5382694`, Resend `77bbcd25-61a1-41c2-83f5-c2b14d0437ad`.
+- KPI posterior: `sentToday=19`, `failedToday=0`, `pendingRetry=0`, `deliveryRate=100`.
+- Signal posterior: `notifications.email.render_failure_rate` severity `ok`, `total_render_failures=0`, `delivery_render_failures=0`, `reactive_render_failures=0`, `delivery_failure_rate_percent=0.00`.
+- Confirmacion visual humana: usuario reviso el inbox `jreyes@efeoncepro.com` y reporto "Se ven perfectos".

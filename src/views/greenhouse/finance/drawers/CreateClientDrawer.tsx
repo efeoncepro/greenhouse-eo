@@ -17,7 +17,11 @@ import Stack from '@mui/material/Stack'
 import Switch from '@mui/material/Switch'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomTextField from '@core/components/mui/TextField'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 const TAX_ID_TYPES = [
   { value: 'RUT', label: 'RUT' },
@@ -142,7 +146,7 @@ const CreateClientDrawer = ({ open, onClose, onSuccess }: Props) => {
     >
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 4 }}>
         <Typography variant='h6'>Nuevo perfil de cliente</Typography>
-        <IconButton onClick={onClose} size='small' aria-label='Cerrar'>
+        <IconButton onClick={onClose} size='small' aria-label={GREENHOUSE_COPY.actions.close}>
           <i className='tabler-x' />
         </IconButton>
       </Box>
@@ -306,9 +310,7 @@ const CreateClientDrawer = ({ open, onClose, onSuccess }: Props) => {
 
       <Divider />
       <Box sx={{ display: 'flex', gap: 2, p: 4 }}>
-        <Button variant='tonal' color='secondary' onClick={onClose} fullWidth>
-          Cancelar
-        </Button>
+        <Button variant='tonal' color='secondary' onClick={onClose} fullWidth>{GREENHOUSE_COPY.actions.cancel}</Button>
         <Button variant='contained' onClick={handleSubmit} disabled={saving} fullWidth>
           {saving ? 'Guardando...' : 'Guardar'}
         </Button>

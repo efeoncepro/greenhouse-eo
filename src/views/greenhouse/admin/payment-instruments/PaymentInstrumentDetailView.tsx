@@ -27,6 +27,8 @@ import Tab from '@mui/material/Tab'
 import Tabs from '@mui/material/Tabs'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomAvatar from '@core/components/mui/Avatar'
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
@@ -52,6 +54,18 @@ import {
   type ReadinessStatus,
   type SectionHealth
 } from './paymentInstrumentAdminAdapters'
+import {
+  formatCurrency as formatGreenhouseCurrency,
+  formatDate as formatGreenhouseDate,
+  formatDateTime as formatGreenhouseDateTime
+} from '@/lib/format'
+
+const TASK407_ARIA_CARGANDO_WORKSPACE_DEL_INSTRUMENTO_DE_PAGO = "Cargando workspace del instrumento de pago"
+const TASK407_ARIA_ACTUALIZANDO_DETALLE_DEL_INSTRUMENTO = "Actualizando detalle del instrumento"
+const TASK407_ARIA_SECCIONES_DEL_WORKSPACE_DE_INSTRUMENTO_DE_PAGO = "Secciones del workspace de instrumento de pago"
+
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 type Props = {
   accountId: string
@@ -72,22 +86,11 @@ type ResponsibleCandidate = {
   isFinanceRole: boolean
 }
 
-const dateFormatter = new Intl.DateTimeFormat('es-CL', {
-  dateStyle: 'medium',
-  timeZone: 'America/Santiago'
-})
-
-const dateTimeFormatter = new Intl.DateTimeFormat('es-CL', {
-  dateStyle: 'medium',
-  timeStyle: 'short',
-  timeZone: 'America/Santiago'
-})
-
 const formatDate = (value: string | null | undefined) => {
   if (!value) return 'Sin fecha'
 
   try {
-    return dateFormatter.format(new Date(value))
+    return formatGreenhouseDate(value, { dateStyle: 'medium' })
   } catch {
     return 'Fecha no valida'
   }
@@ -97,18 +100,16 @@ const formatDateTime = (value: string | null | undefined) => {
   if (!value) return 'Sin registro'
 
   try {
-    return dateTimeFormatter.format(new Date(value))
+    return formatGreenhouseDateTime(value, { dateStyle: 'medium', timeStyle: 'short' })
   } catch {
     return 'Fecha no valida'
   }
 }
 
 const formatCurrency = (amount: number | null | undefined, currency: string) =>
-  new Intl.NumberFormat('es-CL', {
-    style: 'currency',
-    currency,
-    maximumFractionDigits: currency === 'CLP' ? 0 : 2
-  }).format(Number(amount ?? 0))
+  formatGreenhouseCurrency(Number(amount ?? 0), currency, {
+  maximumFractionDigits: currency === 'CLP' ? 0 : 2
+}, 'es-CL')
 
 const readinessCopy: Record<ReadinessStatus, { label: string; color: 'success' | 'warning' | 'error' | 'secondary'; helper: string }> = {
   ready: {
@@ -127,7 +128,7 @@ const readinessCopy: Record<ReadinessStatus, { label: string; color: 'success' |
     helper: 'Hay dependencias que pueden afectar pagos, cobros o conciliacion.'
   },
   inactive: {
-    label: 'Inactivo',
+    label: GREENHOUSE_COPY.states.inactive,
     color: 'secondary',
     helper: 'No deberia usarse en nuevos flujos hasta reactivarlo.'
   }
@@ -140,8 +141,8 @@ const checkCopy: Record<CheckStatus, { icon: string; color: 'success' | 'warning
 }
 
 const sectionCopy: Record<SectionHealth, { label: string; color: 'success' | 'warning' | 'error' }> = {
-  ok: { label: 'Disponible', color: 'success' },
-  partial: { label: 'Parcial', color: 'warning' },
+  ok: { label: GREENHOUSE_COPY.states.available, color: 'success' },
+  partial: { label: GREENHOUSE_COPY.states.partial, color: 'warning' },
   error: { label: 'Con error', color: 'error' }
 }
 
@@ -465,7 +466,7 @@ const PaymentInstrumentDetailView = ({ accountId }: Props) => {
 
   if (loading) {
     return (
-      <Grid container spacing={5} role='status' aria-live='polite' aria-label='Cargando workspace del instrumento de pago'>
+      <Grid container spacing={5} role='status' aria-live='polite' aria-label={TASK407_ARIA_CARGANDO_WORKSPACE_DEL_INSTRUMENTO_DE_PAGO}>
         <Grid size={{ xs: 12 }}>
           <Stack spacing={1}>
             <Skeleton variant='text' width={280} height={28} />
@@ -534,7 +535,7 @@ const PaymentInstrumentDetailView = ({ accountId }: Props) => {
 
       <Grid size={{ xs: 12 }}>
         <Card elevation={0} sx={{ border: theme => `1px solid ${theme.palette.divider}`, overflow: 'hidden' }}>
-          {refreshing ? <LinearProgress aria-label='Actualizando detalle del instrumento' /> : null}
+          {refreshing ? <LinearProgress aria-label={TASK407_ARIA_ACTUALIZANDO_DETALLE_DEL_INSTRUMENTO} /> : null}
           <CardContent>
             <Stack direction={{ xs: 'column', lg: 'row' }} spacing={5} justifyContent='space-between'>
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={3} alignItems={{ xs: 'flex-start', sm: 'center' }}>
@@ -566,9 +567,7 @@ const PaymentInstrumentDetailView = ({ accountId }: Props) => {
                 <Button variant='tonal' color='secondary' onClick={() => void loadDetail('refresh')} startIcon={<i className='tabler-refresh' />}>
                   Actualizar
                 </Button>
-                <Button component={Link} href='/admin/payment-instruments' variant='outlined' color='secondary' startIcon={<i className='tabler-arrow-left' />}>
-                  Volver
-                </Button>
+                <Button component={Link} href='/admin/payment-instruments' variant='outlined' color='secondary' startIcon={<i className='tabler-arrow-left' />}>{GREENHOUSE_COPY.actions.back}</Button>
               </Stack>
             </Stack>
           </CardContent>
@@ -609,7 +608,7 @@ const PaymentInstrumentDetailView = ({ accountId }: Props) => {
               onChange={(_, value: ActiveTab) => setActiveTab(value)}
               variant='scrollable'
               allowScrollButtonsMobile
-              aria-label='Secciones del workspace de instrumento de pago'
+              aria-label={TASK407_ARIA_SECCIONES_DEL_WORKSPACE_DE_INSTRUMENTO_DE_PAGO}
             >
               <Tab value='configuration' label='Configuracion' icon={<i className='tabler-adjustments' />} iconPosition='start' />
               <Tab value='activity' label='Actividad' icon={<i className='tabler-activity' />} iconPosition='start' />
@@ -1185,9 +1184,7 @@ const PaymentInstrumentDetailView = ({ accountId }: Props) => {
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button color='secondary' onClick={() => setRevealField(null)}>
-            Cancelar
-          </Button>
+          <Button color='secondary' onClick={() => setRevealField(null)}>{GREENHOUSE_COPY.actions.cancel}</Button>
           <Button
             variant='contained'
             disabled={revealing || revealReason.trim().length < 12}

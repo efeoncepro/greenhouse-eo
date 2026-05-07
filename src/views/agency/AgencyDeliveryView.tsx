@@ -35,7 +35,9 @@ import {
 import type { AgencyDeliveryTrendMonth, AgencyPulseKpis, AgencySpaceHealth } from '@/lib/agency/agency-queries'
 
 import tableStyles from '@core/styles/table.module.css'
+import { getMicrocopy } from '@/lib/copy'
 
+const GREENHOUSE_COPY = getMicrocopy()
 const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'))
 
 // ── Types ──
@@ -48,7 +50,7 @@ type TrendMonth = AgencyDeliveryTrendMonth
 
 type SemaphoreColor = 'success' | 'warning' | 'error'
 
-const MONTH_ABBR = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
+const MONTH_ABBR = GREENHOUSE_COPY.months.short
 
 const rpaColor = (v: number | null | undefined): { color: SemaphoreColor; label: string } => {
   if (v == null) return { color: 'secondary' as SemaphoreColor, label: '—' }
@@ -529,7 +531,7 @@ const AgencyDeliveryView = () => {
             {spaces.length > 0 ? (
               <AppReactApexCharts type='donut' height={230} width={230} options={donutOptions} series={donutSeries} />
             ) : (
-              <Typography variant='body2' color='text.secondary'>Sin datos</Typography>
+              <Typography variant='body2' color='text.secondary'>{GREENHOUSE_COPY.empty.noData}</Typography>
             )}
           </CardContent>
           <CardContent sx={{ pt: 0 }}>
@@ -537,7 +539,7 @@ const AgencyDeliveryView = () => {
               { label: 'Óptimo', count: healthDistribution.optimo, color: 'success' as const },
               { label: 'Atención', count: healthDistribution.atencion, color: 'warning' as const },
               { label: 'Crítico', count: healthDistribution.critico, color: 'error' as const },
-              { label: 'Sin datos', count: healthDistribution.sinDatos, color: 'secondary' as const }
+              { label: GREENHOUSE_COPY.empty.noData, count: healthDistribution.sinDatos, color: 'secondary' as const }
             ].filter(d => d.count > 0).map(d => (
               <Box key={d.label} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>

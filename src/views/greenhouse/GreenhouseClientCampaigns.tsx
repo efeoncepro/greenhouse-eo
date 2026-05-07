@@ -14,6 +14,7 @@ import Grid from '@mui/material/Grid'
 import Typography from '@mui/material/Typography'
 
 import CustomChip from '@core/components/mui/Chip'
+import { formatDate as formatGreenhouseDate } from '@/lib/format'
 
 // ── Types ──
 
@@ -49,7 +50,10 @@ const TYPE_COLORS: Record<string, 'primary' | 'success' | 'warning' | 'info' | '
 const formatDate = (d: string | null) => {
   if (!d) return '—'
 
-  return new Date(d + 'T12:00:00').toLocaleDateString('es-CL', { day: 'numeric', month: 'short' })
+  return formatGreenhouseDate(new Date(d + 'T12:00:00'), {
+  day: 'numeric',
+  month: 'short'
+}, 'es-CL')
 }
 
 // ── Component ──

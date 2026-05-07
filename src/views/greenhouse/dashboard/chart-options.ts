@@ -2,7 +2,8 @@ import { alpha } from '@mui/material/styles'
 import type { Theme } from '@mui/material/styles'
 import type { ApexOptions } from 'apexcharts'
 
-import { GH_COLORS, GH_LABELS, GH_MESSAGES } from '@/config/greenhouse-nomenclature'
+import { GH_COLORS } from '@/config/greenhouse-nomenclature'
+import { GH_LABELS, GH_MESSAGES } from '@/lib/copy/client-portal'
 import type { GreenhouseDashboardData } from '@/types/greenhouse-dashboard'
 import { effortColorMap, statusColorMap } from '@views/greenhouse/dashboard/config'
 

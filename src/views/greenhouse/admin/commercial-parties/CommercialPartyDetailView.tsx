@@ -30,6 +30,8 @@ import TimelineSeparator from '@mui/lab/TimelineSeparator'
 import TabContext from '@mui/lab/TabContext'
 import TabPanel from '@mui/lab/TabPanel'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import { ExecutiveCardShell, ExecutiveMiniStatCard } from '@/components/greenhouse'
 
 import CustomChip from '@core/components/mui/Chip'
@@ -37,6 +39,7 @@ import CustomTabList from '@core/components/mui/TabList'
 import CustomTextField from '@core/components/mui/TextField'
 
 import { GH_INTERNAL_NAV } from '@/config/greenhouse-nomenclature'
+import { formatDateTime as formatGreenhouseDateTime } from '@/lib/format'
 
 import {
   COMMERCIAL_PARTY_CONFLICT_RESOLUTION_LABELS,
@@ -49,21 +52,17 @@ import {
   type CommercialPartyDetailData
 } from './types'
 
+const GREENHOUSE_COPY = getMicrocopy()
+
 type Props = {
   data: CommercialPartyDetailData | null
   canOverride: boolean
 }
 
-const dateTimeFormatter = new Intl.DateTimeFormat('es-CL', {
-  dateStyle: 'medium',
-  timeStyle: 'short',
-  timeZone: 'America/Santiago'
-})
-
 const formatDateTime = (value: string | null) => {
   if (!value) return 'Sin registro'
 
-  return dateTimeFormatter.format(new Date(value))
+  return formatGreenhouseDateTime(value, { dateStyle: 'medium', timeStyle: 'short' })
 }
 
 const formatSince = (value: string) => {
@@ -609,9 +608,7 @@ const CommercialPartyDetailView = ({ data, canOverride }: Props) => {
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setTransitionOpen(false)} color='inherit'>
-            Cancelar
-          </Button>
+          <Button onClick={() => setTransitionOpen(false)} color='inherit'>{GREENHOUSE_COPY.actions.cancel}</Button>
           <Button
             onClick={() => void handleOverride()}
             variant='contained'

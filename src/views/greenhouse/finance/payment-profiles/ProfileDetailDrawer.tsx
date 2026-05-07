@@ -19,12 +19,21 @@ import Typography from '@mui/material/Typography'
 
 import { toast } from 'sonner'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import type {
   BeneficiaryPaymentProfileAuditAction,
   BeneficiaryPaymentProfileAuditEntry,
   BeneficiaryPaymentProfileSafe,
   BeneficiaryPaymentProfileStatus
 } from '@/types/payment-profiles'
+import { formatDateTime as formatGreenhouseDateTime } from '@/lib/format'
+
+const TASK407_ARIA_CERRAR_DRAWER = "Cerrar drawer"
+const TASK407_ARIA_CARGANDO_PERFIL_DE_PAGO = "Cargando perfil de pago"
+
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 interface ProfileDetailDrawerProps {
   profileId: string | null
@@ -57,9 +66,9 @@ const AUDIT_ACTION_META: Record<
 > = {
   created: { icon: 'tabler-plus', label: 'Creado', color: 'primary' },
   updated: { icon: 'tabler-edit', label: 'Actualizado', color: 'info' },
-  approved: { icon: 'tabler-check', label: 'Aprobado', color: 'success' },
+  approved: { icon: 'tabler-check', label: GREENHOUSE_COPY.states.approved, color: 'success' },
   superseded: { icon: 'tabler-replace', label: 'Superado', color: 'default' },
-  cancelled: { icon: 'tabler-circle-x', label: 'Cancelado', color: 'error' },
+  cancelled: { icon: 'tabler-circle-x', label: GREENHOUSE_COPY.states.cancelled, color: 'error' },
   revealed_sensitive: {
     icon: 'tabler-eye',
     label: 'Datos sensibles revelados',
@@ -67,7 +76,7 @@ const AUDIT_ACTION_META: Record<
   }
 }
 
-const formatTimestamp = (iso: string) => new Date(iso).toLocaleString('es-CL')
+const formatTimestamp = (iso: string) => formatGreenhouseDateTime(iso, 'es-CL')
 
 const ProfileDetailDrawer = ({ profileId, onClose, onActionComplete }: ProfileDetailDrawerProps) => {
   const [profile, setProfile] = useState<BeneficiaryPaymentProfileSafe | null>(null)
@@ -298,7 +307,7 @@ const ProfileDetailDrawer = ({ profileId, onClose, onActionComplete }: ProfileDe
             </Typography>
           ) : null}
         </Stack>
-        <IconButton onClick={onClose} aria-label='Cerrar drawer'>
+        <IconButton onClick={onClose} aria-label={TASK407_ARIA_CERRAR_DRAWER}>
           <i className='tabler-x' />
         </IconButton>
       </Box>
@@ -306,7 +315,7 @@ const ProfileDetailDrawer = ({ profileId, onClose, onActionComplete }: ProfileDe
 
       {loading || !profile ? (
         <Box sx={{ p: 4 }}>
-          <LinearProgress aria-label='Cargando perfil de pago' />
+          <LinearProgress aria-label={TASK407_ARIA_CARGANDO_PERFIL_DE_PAGO} />
         </Box>
       ) : (
         <Stack spacing={4} sx={{ p: 4 }}>
@@ -506,9 +515,7 @@ const ProfileDetailDrawer = ({ profileId, onClose, onActionComplete }: ProfileDe
                       startIcon={<i className='tabler-circle-x' />}
                       onClick={handleCancel}
                       disabled={actionInFlight}
-                    >
-                      Cancelar
-                    </Button>
+                    >{GREENHOUSE_COPY.actions.cancel}</Button>
                   ) : null}
                 </Stack>
               </Stack>

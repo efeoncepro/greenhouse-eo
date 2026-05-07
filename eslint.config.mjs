@@ -258,14 +258,16 @@ export default [
     rules: {
       'greenhouse/no-raw-table-without-shell': 'error',
       'greenhouse/no-hardcoded-fontfamily': 'error',
-      // TASK-265 Slice 5a — microcopy contract gate.
-      // Modo inicial 'warn' (gate establecido, no bloquea CI mientras
-      // TASK-407 + TASK-408 ejecutan sweep). Cierre TASK-408 promueve
-      // a 'error'. Detecta aria-label literales (caso dominante: 405
-      // instancias), status maps inline (100), loading strings (94),
-      // empty states (31) + cobertura secundaria de label/placeholder/
-      // helperText/title/subtitle.
-      'greenhouse/no-untokenized-copy': 'warn'
+      // TASK-265 Slice 5a + TASK-407/408 — microcopy contract gate.
+      // TASK-408 cierre: promovida a 'error' con baseline 0 warnings.
+      // Detecta aria-labels, status maps, loading strings, empty states,
+      // month arrays, JSX CTA text + cobertura secundaria de secondary props.
+      'greenhouse/no-untokenized-copy': 'error',
+      // TASK-429 — locale-aware formatting utilities.
+      // Modo warn inicial: existe deuda histórica en views/emails. El gate
+      // deja visible cualquier uso nuevo de Intl/toLocale* directo sin romper
+      // el baseline mientras los slices de migración bajan el inventario.
+      'greenhouse/no-raw-locale-formatting': 'warn'
     }
   },
 

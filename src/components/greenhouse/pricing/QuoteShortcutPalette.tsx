@@ -10,6 +10,11 @@ import IconButton from '@mui/material/IconButton'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
+const GREENHOUSE_COPY = getMicrocopy()
+
+
 export interface QuoteShortcutPaletteProps {
   open: boolean
   onClose: () => void
@@ -74,7 +79,7 @@ const QuoteShortcutPalette = ({ open, onClose }: QuoteShortcutPaletteProps) => {
             Atajos de teclado
           </Typography>
         </Stack>
-        <IconButton size='small' onClick={onClose} aria-label='Cerrar'>
+        <IconButton size='small' onClick={onClose} aria-label={GREENHOUSE_COPY.actions.close}>
           <i className='tabler-x' style={{ fontSize: 18 }} />
         </IconButton>
       </DialogTitle>

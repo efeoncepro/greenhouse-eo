@@ -1,0 +1,33 @@
+import type { AriaCopy } from '../../types'
+
+export const aria: AriaCopy = {
+  closeDialog: 'Close dialog',
+  closeDrawer: 'Close panel',
+  closeMenu: 'Close menu',
+  openMenu: 'Open menu',
+  openSettings: 'Open settings',
+  toggleSidebar: 'Toggle sidebar',
+  navigateBack: 'Go back',
+  navigateForward: 'Go forward',
+  selectRow: 'Select row',
+  expandRow: 'Expand row',
+  collapseRow: 'Collapse row',
+  sortAscending: 'Sort ascending',
+  sortDescending: 'Sort descending',
+  searchInput: 'Search field',
+  filterInput: 'Filter field',
+  paginationPrev: 'Previous page',
+  paginationNext: 'Next page',
+  paginationFirst: 'First page',
+  paginationLast: 'Last page',
+  previousMonth: 'Previous month',
+  nextMonth: 'Next month',
+  rowActions: 'Row actions',
+  moreActions: 'More actions',
+  notifications: 'Notifications',
+  userMenu: 'User menu',
+  language: 'Language',
+  theme: 'Theme',
+  paymentOrderTabs: 'Payment order tabs',
+  paymentObligationFilters: 'Payment obligation filters'
+}

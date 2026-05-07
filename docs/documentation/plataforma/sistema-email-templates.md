@@ -1,9 +1,9 @@
 # Sistema de Email — Entrega, Templates y Proteccion
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.3
+> **Version:** 1.4
 > **Creado:** 2026-04-06 por Claude (asistido por Julio Reyes)
-> **Ultima actualizacion:** 2026-04-17 por Codex
+> **Ultima actualizacion:** 2026-05-06 por Codex
 > **Documentacion tecnica:** `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md` (seccion email delivery), `docs/architecture/GREENHOUSE_EMAIL_CATALOG_V1.md`
 
 ## Que es
@@ -61,6 +61,16 @@ Hoy Greenhouse **no** tiene todavía:
 | Notificacion generica | `src/emails/NotificationEmail.tsx` | system | es, en | No |
 | Recibo de nomina | `src/emails/PayrollReceiptEmail.tsx` | payroll | es (chile), en (international) | Si |
 | Exportacion de nomina lista | `src/emails/PayrollExportReadyEmail.tsx` | payroll | es | Si |
+| Pago programado | `src/emails/PayrollPaymentCommittedEmail.tsx` | payroll | es, en por regimen | Si |
+| Pago cancelado / en revision | `src/emails/PayrollPaymentCancelledEmail.tsx` | payroll | es, en por regimen | Si |
+| Liquidacion v2 actualizada | `src/emails/PayrollLiquidacionV2Email.tsx` | payroll | es | Si |
+| Cambio de cuenta de pago | `src/emails/BeneficiaryPaymentProfileChangedEmail.tsx` | finance/payroll | es | Si |
+| Permiso aprobado/rechazado | `src/emails/LeaveRequestDecisionEmail.tsx` | hr | es, en | Si |
+| Confirmacion de revision de permiso | `src/emails/LeaveReviewConfirmationEmail.tsx` | hr | es, en | Si |
+| Solicitud de permiso enviada | `src/emails/LeaveRequestSubmittedEmail.tsx` | hr | es, en | Si |
+| Solicitud de permiso por revisar | `src/emails/LeaveRequestPendingReviewEmail.tsx` | hr | es, en | Si |
+| Magic link | `src/emails/MagicLinkEmail.tsx` | identity | es, en | Si |
+| Propuesta comercial compartida | `src/emails/QuoteSharePromptEmail.tsx` | commercial | es | Si |
 | Resumen ejecutivo semanal Nexa | `src/emails/WeeklyExecutiveDigestEmail.tsx` | delivery | es | Si |
 
 Los 4 templates de identidad (invitacion, reset, verificacion, notificacion) soportan espanol e ingles a traves de la prop `locale`. Los templates de payroll usan su propia logica de idioma basada en `payRegime` (chile = espanol, international = ingles).
@@ -130,6 +140,110 @@ Estos son los datos que el Context Resolver auto-resuelve para cada destinatario
 | `platform.logoUrl` | `string` | URL publica del logo para emails |
 
 > Detalle tecnico: definidos en `src/lib/email/tokens.ts` como interfaces TypeScript (`ResolvedRecipientContext`, `ResolvedClientContext`, `ResolvedPlatformContext`).
+
+## TASK-408 Slice 0: dictionary-ready sin perder personalizacion
+
+TASK-408 comenzo la migracion de copy de emails hacia `src/lib/copy/`, pero la capa de personalizacion se mantiene separada y protegida.
+
+La regla es:
+
+- `src/lib/email/tokens.ts` define el contexto canonico del destinatario, cliente y plataforma.
+- `src/lib/email/delivery.ts` mergea ese contexto con los valores enviados por el caller. El caller mantiene prioridad para datos especificos como montos, periodos, cliente, links, adjuntos y mensajes personalizados.
+- `src/lib/copy/dictionaries/es-CL/emails.ts` guarda copy institucional reusable y builders de subject que reciben tokens como parametros.
+- `src/emails/EmailTemplateBaseline.test.tsx` snapshottea los 17 templates y verifica snippets de tokens personalizados para detectar regresiones antes de tocar delivery real.
+
+Esto evita que la migracion a dictionary convierta emails dinamicos en texto fijo o pierda datos como nombre, monto, periodo, `unsubscribeUrl` o links de accion.
+
+## TASK-408 Slice 2A: shell institucional
+
+`EmailLayout` ahora toma el copy institucional compartido desde `getMicrocopy().emails.layout` para el footer y el alt del logo en espanol. Esto no cambia el contenido de negocio ni los tokens del email.
+
+Frontera operativa:
+
+- `EmailLayout` no genera nombres, montos, periodos, clientes ni enlaces de negocio.
+- `unsubscribeUrl` sigue llegando desde la capa de delivery/tokens; el layout solo renderiza el link si existe.
+- El footer `en` conserva el texto legacy mientras `en-US` sea mirror de `es-CL`, para no convertir correos internacionales a espanol por accidente.
+- `EmailButton` sigue recibiendo `children`; los textos de CTA se migran por template en Slice 3.
+
+## TASK-408 Slice 3A: templates auth incrementales
+
+`VerifyEmail`, `MagicLinkEmail`, `PasswordResetEmail` e `InvitationEmail` son los primeros templates individuales migrados a dictionary. El copy en espanol vive en `getMicrocopy().emails.auth.*`; el copy ingles queda como fallback legacy mientras `en-US` sea mirror de `es-CL`.
+
+`NotificationEmail` usa el mismo selector con `getMicrocopy().emails.genericNotification` para copy fallback del render. El titulo, cuerpo, CTA explicita, URL de accion y unsubscribe siguen siendo payload dinamico del pipeline de notificaciones.
+
+La cohorte leave usa `getMicrocopy().emails.leave.*` para headings por estado, badges, labels de resumen, pluralizacion de dias, disclaimers y fallbacks. Los datos operativos (`memberName`, `leaveTypeName`, fechas, dias, motivo, notas, reviewer/actor) siguen llegando desde el runtime del modulo HR y no se persistieron en el dictionary.
+
+Las fechas de templates email usan `selectEmailIntlDateLocale()` para proyectar `es`/`en` a `es-CL`/`en-US` antes de llamar helpers de formato. Los templates no deben reintroducir ternarios locales para decidir el locale Intl.
+
+## TASK-408 Slice 3E: payroll employee-facing
+
+`PayrollReceiptEmail`, `PayrollPaymentCommittedEmail`, `PayrollPaymentCancelledEmail` y `PayrollLiquidacionV2Email` toman copy estatico desde `getMicrocopy().emails.payroll.*`.
+
+La frontera de personalizacion se mantiene igual:
+
+- `fullName` / `firstName` siguen llegando como props o desde el Context Resolver.
+- `monthName`, `periodYear`, fechas programadas y labels de periodo siguen siendo datos de Payroll.
+- montos y monedas siguen formateandose con `@/lib/format`.
+- `processorLabel`, `cancellationReason`, `receiptUrl`, `/my/payroll` y adjuntos PDF siguen viniendo del runtime/caller.
+- la salida HTML de React Email se mantiene byte-estable en snapshots; no se actualizan snapshots para aceptar cambios accidentales.
+
+Este slice no cambia `sendEmail`, Resend, `email_deliveries`, subjects, payment orders, outbox, webhooks, projections ni eventos reactivos de Payroll. Solo cambia la fuente de copy renderizado.
+
+## TASK-408 Slice 3F: Nexa Insights digest
+
+`WeeklyExecutiveDigestEmail` toma copy estructural desde `getMicrocopy().emails.weeklyExecutiveDigest`.
+
+Por el tipo de contenido de Nexa Insights, la migracion es intencionalmente limitada:
+
+- El dictionary contiene subject, encabezados, labels de resumen, labels de severidad, empty states, CTA, link de cierre y texto plain.
+- `headline`, `narrative`, `rootCauseNarrative`, `space.name`, `space.href`, `actionLabel`, `actionUrl` y `closingNote` enviado por el caller siguen viniendo de `src/lib/nexa/digest` y de la lane materializada.
+- El snapshot HTML se mantiene byte-estable; cualquier cambio visible en un digest Nexa debe tratarse como decision de producto, no como side effect de i18n.
+
+Este slice no cambia ops-worker, generacion/materializacion de insights, recipients, unsubscribe, `sendEmail`, Resend, `email_deliveries`, outbox, webhooks, projections ni eventos reactivos.
+
+## TASK-408 Slice 3G: payroll export y perfil de pago
+
+`PayrollExportReadyEmail` y `BeneficiaryPaymentProfileChangedEmail` toman copy estatico desde `getMicrocopy().emails.payroll.exportReady` y `getMicrocopy().emails.beneficiaryPaymentProfileChanged`.
+
+La frontera de personalizacion se mantiene igual:
+
+- payroll export conserva como runtime `periodLabel`, `entryCount`, `breakdowns`, `netTotalDisplay`, `exportedBy`, `exportedAt`, adjuntos y `unsubscribeUrl`.
+- perfil de pago conserva como runtime `fullName`, `providerLabel`, `bankName`, `accountNumberMasked`, `currency`, `effectiveAt`, `reason` y `requestedByMember`.
+- la cuenta bancaria sigue siempre enmascarada; el dictionary no recibe ni modela numeros completos.
+- los snapshots HTML se mantienen byte-estables para evitar cambios accidentales en clientes de correo.
+
+Este slice no cambia Resend, `sendEmail`, `email_deliveries`, package documental de payroll export, lifecycle de cuenta de pago, masking, outbox, webhooks, projections ni eventos reactivos.
+
+## TASK-408 Slice 3H: quote share
+
+`QuoteSharePromptEmail` y el registry `quote_share` toman copy estatico desde `getMicrocopy().emails.quoteShare`.
+
+La frontera de personalizacion se mantiene igual:
+
+- `quotationNumber`, `versionNumber`, `clientName`, `recipientName`, `totalLabel`, `validUntilLabel`, `senderName`, `senderRole`, `senderEmail` y `shareUrl` siguen viniendo del flujo de cotizaciones.
+- `customMessage` sigue siendo mensaje humano del sender y nunca se reemplaza por copy del dictionary.
+- `hasPdfAttached` y `pdfFileName` siguen viniendo del runtime de PDF/attachment; el dictionary solo contiene labels como "Adjunto" o "Ver propuesta".
+- el subject default conserva el contrato visible `Propuesta <numero> v<version> para <cliente>` y sigue permitiendo override via `context.subject`.
+- el snapshot HTML se mantiene byte-estable.
+
+Este slice no cambia lifecycle de cotizaciones, public share route, generacion/attachment de PDF, Resend, `sendEmail`, `email_deliveries`, outbox, webhooks, projections ni eventos reactivos.
+
+## TASK-408 Slice 4: reliability de render
+
+El sweep de copy queda cubierto por el signal `notifications.email.render_failure_rate` en el Reliability Control Plane.
+
+El signal mira una ventana rolling de 24h y escala a `error` si aparece cualquier falla de render/template. Lee dos fuentes:
+
+- `greenhouse_notifications.email_deliveries`, para fallas del email engine.
+- `greenhouse_sync.outbox_reactive_log`, para fallas `retry` o `dead-letter` en projections que envian emails/notificaciones.
+
+Esto evita depender de reportes manuales si un template migrado rompe render en runtime. No cambia `sendEmail`, Resend, retry policy, outbox publisher, reactive consumer, webhooks ni la composicion de ningun email.
+
+La primitive `selectEmailTemplateCopy()` permite repetir este patron en los siguientes templates sin tocar delivery:
+
+- `es` / `es-CL` / default → dictionary de plataforma.
+- `en` / `en-US` → fallback legacy temporal.
+- No cambia subject registry, URLs, tokens ni contexto del caller.
 
 ## Soporte de idioma (i18n)
 

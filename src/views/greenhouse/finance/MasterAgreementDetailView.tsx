@@ -22,8 +22,13 @@ import TableRow from '@mui/material/TableRow'
 import Tabs from '@mui/material/Tabs'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 import CustomChip from '@core/components/mui/Chip'
+import { formatDate as formatGreenhouseDate } from '@/lib/format'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 type MasterAgreementStatus = 'draft' | 'active' | 'expired' | 'terminated' | 'superseded'
 type DetailTab = 'overview' | 'clauses' | 'linked-contracts'
@@ -88,9 +93,9 @@ interface MasterAgreementDetail {
 }
 
 const STATUS_META: Record<string, { label: string; color: 'success' | 'warning' | 'error' | 'secondary' | 'info' | 'primary' }> = {
-  draft: { label: 'Borrador', color: 'secondary' },
-  active: { label: 'Activo', color: 'success' },
-  expired: { label: 'Vencido', color: 'warning' },
+  draft: { label: GREENHOUSE_COPY.states.draft, color: 'secondary' },
+  active: { label: GREENHOUSE_COPY.states.active, color: 'success' },
+  expired: { label: GREENHOUSE_COPY.states.expired, color: 'warning' },
   terminated: { label: 'Terminado', color: 'error' },
   superseded: { label: 'Sustituido', color: 'info' }
 }
@@ -106,11 +111,11 @@ const CLAUSE_META: Record<string, { label: string; color: 'primary' | 'info' | '
 }
 
 const LINKED_STATUS_META: Record<string, { label: string; color: 'success' | 'warning' | 'error' | 'secondary' | 'info' | 'primary' }> = {
-  draft: { label: 'Borrador', color: 'secondary' },
-  active: { label: 'Activo', color: 'success' },
-  paused: { label: 'Pausado', color: 'warning' },
+  draft: { label: GREENHOUSE_COPY.states.draft, color: 'secondary' },
+  active: { label: GREENHOUSE_COPY.states.active, color: 'success' },
+  paused: { label: GREENHOUSE_COPY.states.paused, color: 'warning' },
   terminated: { label: 'Terminado', color: 'error' },
-  completed: { label: 'Completado', color: 'info' },
+  completed: { label: GREENHOUSE_COPY.states.completed, color: 'info' },
   renewed: { label: 'Renovado', color: 'primary' }
 }
 
@@ -121,11 +126,11 @@ const formatDate = (value: string | null) => {
 
   if (Number.isNaN(date.getTime())) return '—'
 
-  return date.toLocaleDateString('es-CL', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric'
-  })
+  return formatGreenhouseDate(date, {
+  day: '2-digit',
+  month: 'short',
+  year: 'numeric'
+}, 'es-CL')
 }
 
 const toRecord = (value: unknown): Record<string, unknown> =>

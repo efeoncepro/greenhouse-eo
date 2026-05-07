@@ -17,7 +17,11 @@ import Stack from '@mui/material/Stack'
 import Switch from '@mui/material/Switch'
 import Typography from '@mui/material/Typography'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import CustomTextField from '@core/components/mui/TextField'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 const MEMBERSHIP_TYPES = [
   { value: 'team_member', label: 'Equipo Efeonce' },
@@ -158,7 +162,7 @@ const AddPersonMembershipDrawer = ({ open, memberId, memberName, onClose, onSucc
           <Typography variant='h6'>Vincular a organización</Typography>
           <Typography variant='caption' color='text.secondary'>{memberName}</Typography>
         </Box>
-        <IconButton onClick={onClose} size='small' aria-label='Cerrar'>
+        <IconButton onClick={onClose} size='small' aria-label={GREENHOUSE_COPY.actions.close}>
           <i className='tabler-x' />
         </IconButton>
       </Box>
@@ -263,9 +267,7 @@ const AddPersonMembershipDrawer = ({ open, memberId, memberName, onClose, onSucc
 
       <Divider />
       <Box sx={{ display: 'flex', gap: 2, p: 4 }}>
-        <Button variant='tonal' color='secondary' onClick={onClose} fullWidth>
-          Cancelar
-        </Button>
+        <Button variant='tonal' color='secondary' onClick={onClose} fullWidth>{GREENHOUSE_COPY.actions.cancel}</Button>
         <Button variant='contained' onClick={handleSubmit} disabled={saving || !selectedOrg} fullWidth>
           {saving ? 'Guardando...' : 'Vincular'}
         </Button>

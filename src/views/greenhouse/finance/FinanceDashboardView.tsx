@@ -59,7 +59,10 @@ import CreateIncomeDrawer from '@views/greenhouse/finance/drawers/CreateIncomeDr
 import CreateExpenseDrawer from '@views/greenhouse/finance/drawers/CreateExpenseDrawer'
 import VatMonthlyPositionCard from '@views/greenhouse/finance/components/VatMonthlyPositionCard'
 import type { VatMonthlyPositionPayload } from '@views/greenhouse/finance/components/vat-monthly-position-types'
+import { getMicrocopy } from '@/lib/copy'
+import { formatCurrency as formatGreenhouseCurrency, formatDateTime as formatGreenhouseDateTime, formatNumber as formatGreenhouseNumber } from '@/lib/format'
 
+const GREENHOUSE_COPY = getMicrocopy()
 const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'), { ssr: false })
 
 // ---------------------------------------------------------------------------
@@ -225,16 +228,24 @@ interface PnlData {
 // ---------------------------------------------------------------------------
 
 const formatCLP = (amount: number): string => {
-  return new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(amount)
+  return formatGreenhouseCurrency(amount, 'CLP', {
+  maximumFractionDigits: 0
+}, 'es-CL')
 }
 
 const formatRate = (rate: number): string => {
-  return new Intl.NumberFormat('es-CL', { maximumFractionDigits: 2, minimumFractionDigits: 2 }).format(rate)
+  return formatGreenhouseNumber(rate, {
+  maximumFractionDigits: 2,
+  minimumFractionDigits: 2
+}, 'es-CL')
 }
 
 const formatIndicatorValue = (value: number, indicatorCode: string): string => {
   if (indicatorCode === 'IPC') {
-    return `${new Intl.NumberFormat('es-CL', { maximumFractionDigits: 2, minimumFractionDigits: 2 }).format(value)}%`
+    return `${formatGreenhouseNumber(value, {
+  maximumFractionDigits: 2,
+  minimumFractionDigits: 2
+}, 'es-CL')}%`
   }
 
   return `$${formatRate(value)}`
@@ -250,7 +261,7 @@ const formatDate = (date: string | null): string => {
   return `${day}/${month}/${year}`
 }
 
-const MONTH_SHORT = ['', 'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
+const MONTH_SHORT = ['', ...GREENHOUSE_COPY.months.short]
 
 // ---------------------------------------------------------------------------
 // Chart config builders
@@ -1201,7 +1212,10 @@ const FinanceDashboardView = () => {
                 <Typography variant='caption' color='text.secondary'>Último sync</Typography>
                 <Typography variant='body2'>
                   {nuboxSync.lastSync.finishedAt
-                    ? new Date(nuboxSync.lastSync.finishedAt).toLocaleString('es-CL', { dateStyle: 'short', timeStyle: 'short' })
+                    ? formatGreenhouseDateTime(new Date(nuboxSync.lastSync.finishedAt), {
+  dateStyle: 'short',
+  timeStyle: 'short'
+}, 'es-CL')
                     : '—'}
                 </Typography>
               </Grid>

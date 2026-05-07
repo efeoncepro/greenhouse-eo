@@ -36,6 +36,8 @@ import TabPanel from '@mui/lab/TabPanel'
 
 import type { ApexOptions } from 'apexcharts'
 
+import { getMicrocopy } from '@/lib/copy'
+
 import { DataTableShell } from '@/components/greenhouse/data-table'
 
 import CustomChip from '@core/components/mui/Chip'
@@ -46,6 +48,7 @@ import GreenhouseCalendar from '@/components/greenhouse/GreenhouseCalendar'
 import LeaveRequestDialog from '@/components/greenhouse/LeaveRequestDialog'
 import { HorizontalWithSubtitle } from '@/components/card-statistics'
 import { getLeaveReviewCapabilities } from '@/lib/hr-core/leave-review-policy'
+import { formatNumber as formatGreenhouseNumber } from '@/lib/format'
 import type {
   CreateLeaveRequestInput,
   HrApprovalAction,
@@ -65,6 +68,8 @@ import type {
 } from '@/types/hr-core'
 import { getInitials } from '@/utils/getInitials'
 import { leaveStatusConfig, getLeaveTypeConfig, formatDate, formatDateRange, formatTimestamp } from './helpers'
+
+const GREENHOUSE_COPY = getMicrocopy()
 
 const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'))
 
@@ -93,17 +98,12 @@ const emptyRequests: HrLeaveRequest[] = []
 const emptyBalances: HrLeaveBalance[] = []
 const emptyAdjustments: HrLeaveBalanceAdjustmentRecord[] = []
 
-const leaveDaysFormatter = new Intl.NumberFormat('es-CL', {
-  minimumFractionDigits: 0,
-  maximumFractionDigits: 2
-})
-
 const formatLeaveDays = (value: number | null | undefined) => {
   if (value == null || Number.isNaN(value)) {
     return '—'
   }
 
-  return leaveDaysFormatter.format(value)
+  return formatGreenhouseNumber(value, { minimumFractionDigits: 0, maximumFractionDigits: 2 })
 }
 
 const isProportionalVacationAccrualBalance = (balance: HrLeaveBalance) =>
@@ -1851,9 +1851,7 @@ const HrLeaveView = () => {
               </Stack>
             </DialogContent>
             <DialogActions>
-              <Button variant='tonal' color='secondary' onClick={() => setTeamDetailMemberId(null)}>
-                Cerrar
-              </Button>
+              <Button variant='tonal' color='secondary' onClick={() => setTeamDetailMemberId(null)}>{GREENHOUSE_COPY.actions.close}</Button>
             </DialogActions>
           </>
         )}
@@ -1964,9 +1962,7 @@ const HrLeaveView = () => {
           </DialogContent>
         )}
         <DialogActions>
-          <Button variant='tonal' color='secondary' onClick={() => setReviewReq(null)} disabled={reviewSaving}>
-            Cerrar
-          </Button>
+          <Button variant='tonal' color='secondary' onClick={() => setReviewReq(null)} disabled={reviewSaving}>{GREENHOUSE_COPY.actions.close}</Button>
           {reviewCapabilities?.canCancel && (
             <Button
               variant='tonal'
@@ -2092,9 +2088,7 @@ const HrLeaveView = () => {
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button variant='tonal' color='secondary' onClick={() => setBackfillOpen(false)} disabled={backfillSaving}>
-            Cancelar
-          </Button>
+          <Button variant='tonal' color='secondary' onClick={() => setBackfillOpen(false)} disabled={backfillSaving}>{GREENHOUSE_COPY.actions.cancel}</Button>
           <Button
             variant='contained'
             onClick={() => void submitBackfill()}
@@ -2167,9 +2161,7 @@ const HrLeaveView = () => {
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button variant='tonal' color='secondary' onClick={() => setAdjustmentOpen(false)} disabled={adjustmentSaving}>
-            Cancelar
-          </Button>
+          <Button variant='tonal' color='secondary' onClick={() => setAdjustmentOpen(false)} disabled={adjustmentSaving}>{GREENHOUSE_COPY.actions.cancel}</Button>
           <Button
             variant='contained'
             onClick={() => void submitAdjustment()}
@@ -2215,9 +2207,7 @@ const HrLeaveView = () => {
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button variant='tonal' color='secondary' onClick={() => setReverseOpen(false)} disabled={reverseSaving}>
-            Cancelar
-          </Button>
+          <Button variant='tonal' color='secondary' onClick={() => setReverseOpen(false)} disabled={reverseSaving}>{GREENHOUSE_COPY.actions.cancel}</Button>
           <Button
             variant='contained'
             color='warning'

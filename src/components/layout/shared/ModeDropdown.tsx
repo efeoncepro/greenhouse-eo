@@ -20,6 +20,9 @@ import type { Mode } from '@core/types'
 // Hook Imports
 import { useSettings } from '@core/hooks/useSettings'
 
+const TASK407_ARIA_CAMBIAR_TEMA = "Cambiar tema"
+
+
 const ModeDropdown = () => {
   // States
   const [open, setOpen] = useState(false)
@@ -76,7 +79,7 @@ const ModeDropdown = () => {
           ref={anchorRef}
           onClick={handleToggle}
           className='text-textPrimary'
-          aria-label='Cambiar tema'
+          aria-label={TASK407_ARIA_CAMBIAR_TEMA}
           aria-haspopup='menu'
           aria-expanded={open}
         >

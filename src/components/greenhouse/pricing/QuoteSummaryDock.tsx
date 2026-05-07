@@ -1,27 +1,15 @@
 'use client'
 
-import { type ReactNode, useEffect, useRef } from 'react'
-
-import Alert from '@mui/material/Alert'
-import Box from '@mui/material/Box'
-import Button from '@mui/material/Button'
-import CircularProgress from '@mui/material/CircularProgress'
-import Grid from '@mui/material/Grid'
-import Stack from '@mui/material/Stack'
-import Tooltip from '@mui/material/Tooltip'
-import Typography from '@mui/material/Typography'
-import { alpha } from '@mui/material/styles'
-import { visuallyHidden } from '@mui/utils'
+import { type ReactNode } from 'react'
 
 import {
-  MarginHealthChip,
-  SaveStateIndicator,
+  EntitySummaryDock,
   TotalsLadder,
+  type EntitySummaryDockSaveState,
   type MarginClassification,
-  type MarginTierRange,
-  type SaveStateKind
+  type MarginTierRange
 } from '@/components/greenhouse/primitives'
-import { GH_PRICING } from '@/config/greenhouse-nomenclature'
+import { GH_PRICING } from '@/lib/copy/pricing'
 import type { PricingOutputCurrency } from '@/lib/finance/pricing/contracts'
 
 export interface QuoteSummaryDockProps {
@@ -52,7 +40,7 @@ export interface QuoteSummaryDockProps {
   appliedAddonsTotal?: number | null
 
   /** Save state indicator en la parte izquierda del dock. */
-  saveState?: { kind: SaveStateKind; changeCount?: number; lastSavedAt?: Date | null } | null
+  saveState?: EntitySummaryDockSaveState | null
 
   /** Si hay un error del engine v2, se muestra como Alert inline en la parte
    * superior del dock (justo encima del bloque de totales). */
@@ -74,21 +62,13 @@ export interface QuoteSummaryDockProps {
 }
 
 /**
- * QuoteSummaryDock v2 — sticky-bottom cockpit para el Quote Builder.
+ * QuoteSummaryDock — sticky-bottom cockpit del Quote Builder. Hoy actúa como
+ * adapter del primitive canónico `EntitySummaryDock` (TASK-498), conservando
+ * la API histórica del dominio (subtotal/factor/ivaAmount/total + addons +
+ * margen + save state) y mapeando a los slots genéricos del primitive.
  *
- * Jerarquía 3-zonas (Grid 3/6/3 en md+):
- *   [Estado]        [Totals ladder + addons inline]       [Acción terminal]
- *   Save state      Total CLP                              Guardar y emitir
- *   Margen chip     $X — subtotal · addon · factor · IVA
- *
- * Principios:
- * - Total en text.primary. El azul de marca queda exclusivo para la CTA.
- * - Subtotal/Factor/IVA/addons colapsan en caption muted debajo del Total
- *   solo cuando aportan info. El segmento de addons es interactivo y abre
- *   un popover con el detalle — self-contained en el primitive (TASK-509,
- *   via Floating UI).
- * - CTA copy invariante; loading state = disabled + spinner.
- * - Live region a11y consolidada en el root aside.
+ * Cuando emerja un nuevo dock de dominio (invoice, PO, contract), debe
+ * consumir `EntitySummaryDock` directamente desde primitives, no este wrapper.
  */
 const QuoteSummaryDock = ({
   subtotal,
@@ -116,173 +96,65 @@ const QuoteSummaryDock = ({
   emptyStateMessage,
   disabledReason
 }: QuoteSummaryDockProps) => {
-  // Guarda la diferencia clave del "before/after" para re-animar counter sólo cuando el valor cambia material
-  const lastTotalRef = useRef<number | null>(null)
-
-  useEffect(() => {
-    if (total !== null) lastTotalRef.current = total
-  }, [total])
+  const showMarginIndicator = Boolean(
+    marginClassification && marginPct !== null && marginPct !== undefined && !loading
+  )
 
   return (
-    <Box
-      component='aside'
-      role='status'
-      aria-live='polite'
-      aria-label={GH_PRICING.summaryDock.ariaLabel}
-      sx={theme => ({
-        position: 'sticky',
-        bottom: 16,
-        zIndex: theme.zIndex.appBar - 2,
-        marginTop: 3,
-        px: { xs: 2, md: 3 },
-        py: 2,
-        backgroundColor: alpha(theme.palette.background.paper, 0.96),
-        backdropFilter: 'saturate(180%) blur(10px)',
-        WebkitBackdropFilter: 'saturate(180%) blur(10px)',
-        border: `1px solid ${theme.palette.divider}`,
-        borderRadius: `${theme.shape.customBorderRadius.lg}px`,
-        boxShadow: `0 12px 32px -12px ${alpha(theme.palette.common.black, 0.22)}`
-      })}
-    >
-      {simulationError ? (
-        <Alert
-          severity='error'
-          role='alert'
-          icon={<i className='tabler-alert-triangle' aria-hidden='true' />}
-          sx={{ mb: 1.5, py: 0.5 }}
-        >
-          <Typography variant='body2'>{simulationError}</Typography>
-        </Alert>
-      ) : null}
-
-      <Grid container columnSpacing={{ xs: 0, md: 3 }} rowSpacing={{ xs: 1.5, md: 0 }} alignItems='center'>
-        {/* ───────────── ZONA 1: Estado (md=3) ───────────── */}
-        <Grid size={{ xs: 12, md: 3 }}>
-          <Stack spacing={1} alignItems='flex-start'>
-            {saveState ? (
-              <SaveStateIndicator
-                state={saveState.kind}
-                changeCount={saveState.changeCount}
-                lastSavedAt={saveState.lastSavedAt ?? null}
-              />
-            ) : null}
-            {marginClassification && marginPct !== null && marginPct !== undefined && !loading ? (
-              <MarginHealthChip
-                classification={marginClassification}
-                marginPct={marginPct}
-                tierRange={marginTierRange ?? null}
-              />
-            ) : null}
-          </Stack>
-        </Grid>
-
-        {/* ───────────── ZONA 2: Totals ladder (md=6) ───────────── */}
-        <Grid size={{ xs: 12, md: 6 }}>
-          {emptyStateMessage ? (
-            <Stack direction='row' spacing={1.5} alignItems='center' useFlexGap>
-              <Box
-                component='i'
-                className='tabler-info-circle'
-                aria-hidden='true'
-                sx={{ fontSize: 20, color: 'text.secondary' }}
-              />
-              <Typography variant='body2' color='text.secondary' sx={{ fontWeight: 500 }}>
-                {emptyStateMessage}
-              </Typography>
-            </Stack>
-          ) : (
-            <TotalsLadder
-              subtotal={subtotal}
-              factor={factor ?? null}
-              ivaAmount={ivaAmount ?? null}
-              total={total}
-              currency={currency}
-              loading={loading}
-              addonsSegment={
-                addonContent && addonCount > 0
-                  ? {
-                      count: addonCount,
-                      amount: appliedAddonsTotal ?? 0,
-                      content: addonContent
-                    }
-                  : null
-              }
-            />
-          )}
-        </Grid>
-
-        {/* ───────────── ZONA 3: Acciones (md=3) ───────────── */}
-        <Grid size={{ xs: 12, md: 3 }}>
-          <Stack
-            direction='row'
-            spacing={1.5}
-            alignItems='center'
-            justifyContent={{ xs: 'flex-start', md: 'flex-end' }}
-            flexWrap='wrap'
-            useFlexGap
-          >
-            {secondaryCtaLabel && onSecondaryClick ? (
-              <Button
-                variant='tonal'
-                color='secondary'
-                size='medium'
-                onClick={onSecondaryClick}
-                disabled={secondaryCtaDisabled}
-                sx={{ minHeight: 44 }}
-              >
-                {secondaryCtaLabel}
-              </Button>
-            ) : null}
-
-            {(() => {
-              const isDisabled = primaryCtaDisabled || primaryCtaLoading
-              const reasonId = 'quote-summary-dock-cta-reason'
-
-              const button = (
-                <Button
-                  variant='contained'
-                  size='medium'
-                  onClick={onPrimaryClick}
-                  disabled={isDisabled}
-                  aria-describedby={isDisabled && disabledReason ? reasonId : undefined}
-                  startIcon={
-                    primaryCtaLoading ? (
-                      <CircularProgress size={16} color='inherit' aria-label='Cargando' />
-                    ) : primaryCtaIcon ? (
-                      <i className={primaryCtaIcon} aria-hidden='true' />
-                    ) : undefined
+    <EntitySummaryDock
+      id='quote-summary-dock'
+      ariaLabel={GH_PRICING.summaryDock.ariaLabel}
+      saveState={saveState ?? null}
+      marginIndicator={
+        showMarginIndicator
+          ? {
+              classification: marginClassification as MarginClassification,
+              marginPct: marginPct as number,
+              tierRange: marginTierRange ?? null
+            }
+          : null
+      }
+      simulationError={simulationError ?? null}
+      emptyStateMessage={emptyStateMessage ?? null}
+      centerSlot={
+        emptyStateMessage ? null : (
+          <TotalsLadder
+            subtotal={subtotal}
+            factor={factor ?? null}
+            ivaAmount={ivaAmount ?? null}
+            total={total}
+            currency={currency}
+            loading={loading}
+            addonsSegment={
+              addonContent && addonCount > 0
+                ? {
+                    count: addonCount,
+                    amount: appliedAddonsTotal ?? 0,
+                    content: addonContent
                   }
-                  sx={{ minHeight: 44, fontWeight: 600 }}
-                >
-                  {primaryCtaLabel}
-                </Button>
-              )
-
-              if (isDisabled && disabledReason) {
-                return (
-                  <>
-                    {/*
-                      Wrap is required for Tooltip on disabled buttons; sx={{ display: 'inline-flex' }}
-                      respeta el flex layout sin agregar relayout extra.
-                    */}
-                    <Tooltip title={disabledReason} placement='top'>
-                      <Box component='span' sx={{ display: 'inline-flex' }}>
-                        {button}
-                      </Box>
-                    </Tooltip>
-                    <Box component='span' id={reasonId} sx={visuallyHidden}>
-                      {disabledReason}
-                    </Box>
-                  </>
-                )
-              }
-
-              return button
-            })()}
-          </Stack>
-        </Grid>
-      </Grid>
-    </Box>
+                : null
+            }
+          />
+        )
+      }
+      primaryCta={{
+        label: primaryCtaLabel,
+        onClick: onPrimaryClick,
+        loading: primaryCtaLoading,
+        disabled: primaryCtaDisabled,
+        iconClassName: primaryCtaIcon,
+        disabledReason: disabledReason ?? undefined
+      }}
+      secondaryCta={
+        secondaryCtaLabel && onSecondaryClick
+          ? {
+              label: secondaryCtaLabel,
+              onClick: onSecondaryClick,
+              disabled: secondaryCtaDisabled
+            }
+          : null
+      }
+    />
   )
 }
 

@@ -22,6 +22,7 @@ import { motion } from '@/libs/FramerMotion'
 import useReducedMotion from '@/hooks/useReducedMotion'
 
 import type { AtRiskItem, AtRiskKind, HomeAtRiskWatchlistData } from '@/lib/home/contract'
+import { formatTime as formatGreenhouseTime } from '@/lib/format'
 
 interface HomeAtRiskWatchlistProps {
   data: HomeAtRiskWatchlistData
@@ -59,7 +60,10 @@ const AtRiskRow = ({ item, index, active, onActivate }: AtRiskRowProps) => {
       animate={reduced ? undefined : { opacity: 1, y: 0 }}
       transition={reduced ? undefined : { duration: 0.18, delay: 0.06 * index, ease: [0.2, 0, 0, 1] }}
     >
-      <Tooltip title={`Última actualización · ${new Date().toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' })}`} placement='left' arrow disableInteractive enterDelay={500}>
+      <Tooltip title={`Última actualización · ${formatGreenhouseTime(new Date(), {
+  hour: '2-digit',
+  minute: '2-digit'
+}, 'es-CL')}`} placement='left' arrow disableInteractive enterDelay={500}>
         <Box
           component='button'
           type='button'

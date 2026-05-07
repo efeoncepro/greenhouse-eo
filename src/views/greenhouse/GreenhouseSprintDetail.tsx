@@ -8,7 +8,11 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
 import { SprintTeamVelocitySection } from '@/components/greenhouse'
-import { GH_CLIENT_NAV, GH_MESSAGES } from '@/config/greenhouse-nomenclature'
+import { GH_CLIENT_NAV } from '@/config/greenhouse-nomenclature'
+import { GH_MESSAGES } from '@/lib/copy/client-portal'
+
+const TASK407_ARIA_BREADCRUMBS = "breadcrumbs"
+
 
 type GreenhouseSprintDetailProps = {
   sprintId: string
@@ -18,7 +22,7 @@ const GreenhouseSprintDetail = ({ sprintId }: GreenhouseSprintDetailProps) => {
   return (
     <Stack spacing={6}>
       <Stack spacing={1.5}>
-        <Breadcrumbs aria-label='breadcrumbs'>
+        <Breadcrumbs aria-label={TASK407_ARIA_BREADCRUMBS}>
           <Typography component={Link} href='/home' color='inherit'>
             {GH_CLIENT_NAV.dashboard.label}
           </Typography>

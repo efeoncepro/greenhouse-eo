@@ -17,6 +17,9 @@ import type { ThemeColor } from '@core/types'
 
 import type { HomeReliabilityRibbonData, ReliabilityModuleStatus } from '@/lib/home/contract'
 
+const TASK407_ARIA_ESTADO_DE_PLATAFORMA = "Estado de plataforma"
+
+
 interface HomeReliabilityRibbonProps {
   data: HomeReliabilityRibbonData
 }
@@ -51,7 +54,7 @@ export const HomeReliabilityRibbon = ({ data }: HomeReliabilityRibbonProps) => {
   const healthy = data.modules.filter(m => m.status === 'healthy').length
 
   return (
-    <Card component='aside' aria-label='Estado de plataforma'>
+    <Card component='aside' aria-label={TASK407_ARIA_ESTADO_DE_PLATAFORMA}>
       <CardHeader
         avatar={<i className={classnames(rollupTone.icon, 'text-xl', `text-${rollupTone.color}`)} />}
         title='Estado de plataforma'
