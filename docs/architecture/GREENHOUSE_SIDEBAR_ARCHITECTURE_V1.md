@@ -3,7 +3,7 @@
 > **Tipo de documento:** Spec de arquitectura (documento vivo)
 > **Version:** 1.0
 > **Creado:** 2026-04-11 por Claude (auditoria completa del sidebar)
-> **Ultima actualizacion:** 2026-04-11
+> **Ultima actualizacion:** 2026-05-07 — TASK-554 separa `Comercial` como dominio top-level de navegacion manteniendo paths legacy `/finance/...`.
 > **Archivo fuente:** `src/components/layout/vertical/VerticalMenu.tsx`
 > **Documentacion tecnica:** `GREENHOUSE_IDENTITY_ACCESS_V2.md`, `GREENHOUSE_UI_PLATFORM_V1.md`
 
@@ -61,10 +61,11 @@ Resolucion en login:
 | 1 | Home | Item flat | 1 | `isInternalUser` | Standalone |
 | 2 | Gestion | Section + items flat + 1 collapsible | 11 | `isAgencyUser` | Section con `isSection: true` |
 | 3 | Equipo | Section + items flat | 1-10 | 5 variantes condicionales | Section con `isSection: true` |
-| 4 | Finanzas | Collapsible top-level con 3 submenus | 16 | `isFinanceUser \|\| isAdminUser` | Collapsible parent |
-| 5 | Herramientas IA | Item flat | 1 | `isAiToolingUser && !isAdminUser` | Standalone |
-| 6 | Admin Center | Collapsible top-level con 2 submenus | 18 | `isAdminUser` | Collapsible parent |
-| 7 | Mi Ficha | Section + items flat | 7 | `isMyUser` | Section con `isSection: true` |
+| 4 | Comercial | Collapsible top-level | 4 | `isFinanceUser \|\| isAdminUser` | Collapsible parent |
+| 5 | Finanzas | Collapsible top-level con 3 submenus | 13 | `isFinanceUser \|\| isAdminUser` | Collapsible parent |
+| 6 | Herramientas IA | Item flat | 1 | `isAiToolingUser && !isAdminUser` | Standalone |
+| 7 | Admin Center | Collapsible top-level con 2 submenus | 18 | `isAdminUser` | Collapsible parent |
+| 8 | Mi Ficha | Section + items flat | 7 | `isMyUser` | Section con `isSection: true` |
 
 ### 3.2 Usuarios cliente
 
@@ -128,7 +129,18 @@ Resolucion en login:
 **Variante D** — Supervisor sin People: Mi equipo + Aprobaciones + Organigrama.
 **Variante E** — HR sin People: 9 items HR.
 
-### 4.3 Finanzas
+### 4.3 Comercial
+
+TASK-554 crea `Comercial` como dominio top-level de navegación, pero mantiene rutas legacy `/finance/...` y gates legacy `finanzas.*` hasta TASK-555/TASK-556.
+
+| Item | Icon | Route | View code transicional | Nota |
+|------|------|-------|------------------------|------|
+| Cotizaciones | `tabler-file-dollar` | `/finance/quotes` | `finanzas.cotizaciones` | Owner domain comercial; path legacy. |
+| Contratos | `tabler-file-description` | `/finance/contracts` | pendiente TASK-555 | Incluye SOW temporalmente; no existe route SOW propia. |
+| Acuerdos marco | `tabler-file-certificate` | `/finance/master-agreements` | pendiente TASK-555 | MSA comercial sobre path legacy. |
+| Productos | `tabler-packages` | `/finance/products` | pendiente TASK-555 | Page legacy mínima sobre `ProductCatalogView`. |
+
+### 4.4 Finanzas
 
 | Submenu | Item | Icon | Route | View code | Gate especial |
 |---------|------|------|-------|-----------|---------------|
@@ -142,14 +154,13 @@ Resolucion en login:
 | | Banco | — | `/finance/bank` | `finanzas.banco` | `canSeeBankTreasury` |
 | | Cuenta corriente | — | `/finance/shareholder-account` | `finanzas.cuenta_corriente_accionista` | `canSeeBankTreasury` |
 | | Posicion de caja | — | `/finance/cash-position` | `finanzas.resumen` | — |
-| **Documentos** | Cotizaciones | — | `/finance/quotes` | `finanzas.cotizaciones` | — |
-| | Ordenes de compra | — | `/finance/purchase-orders` | `finanzas.ordenes_compra` | — |
+| **Documentos** | Ordenes de compra | — | `/finance/purchase-orders` | `finanzas.ordenes_compra` | — |
 | | HES | — | `/finance/hes` | `finanzas.hes` | — |
 | | Conciliacion | — | `/finance/reconciliation` | `finanzas.conciliacion` | — |
 | **Inteligencia** | Inteligencia | — | `/finance/intelligence` | `finanzas.inteligencia` | — |
 | | Asignaciones de costos | — | `/finance/cost-allocations` | `finanzas.asignaciones_costos` | — |
 
-### 4.4 Admin Center
+### 4.5 Admin Center
 
 | Submenu | Item | Icon override | Route | View code |
 |---------|------|---------------|-------|-----------|
@@ -172,7 +183,7 @@ Resolucion en login:
 | | Cloud & Integraciones | — | `/admin/integrations` | `administracion.cloud_integrations` |
 | | Ops Health | — | `/admin/ops-health` | `administracion.ops_health` |
 
-### 4.5 Mi Ficha (interno y cliente)
+### 4.6 Mi Ficha (interno y cliente)
 
 | Item | Label source | Icon | Route | View code |
 |------|-------------|------|-------|-----------|
@@ -184,7 +195,7 @@ Resolucion en login:
 | Mis permisos | `GH_MY_NAV.leave` | `tabler-calendar-event` | `/my/leave` | `mi_ficha.mis_permisos` |
 | Mi organizacion | `GH_MY_NAV.organization` | `tabler-building` | `/my/organization` | `mi_ficha.mi_organizacion` |
 
-### 4.6 Portal cliente
+### 4.7 Portal cliente
 
 | Item | Label source | Icon | Route | View code |
 |------|-------------|------|-------|-----------|

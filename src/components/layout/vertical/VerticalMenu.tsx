@@ -113,6 +113,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
     agency: GH_AGENCY_NAV,
     client: GH_CLIENT_NAV,
     finance: GH_FINANCE_NAV,
+    commercial: GH_COMMERCIAL_NAV,
     hr: GH_HR_NAV,
     internal: GH_INTERNAL_NAV,
     my: GH_MY_NAV,
@@ -311,6 +312,29 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
       })
     }
 
+    // ── COMERCIAL (top-level commercial domain over legacy /finance paths) ──
+    if (isFinanceUser || isAdminUser) {
+      menuData.push({
+        label: nl(GH_COMMERCIAL_NAV.root),
+        icon: 'tabler-briefcase',
+        children: [
+          { label: nl(GH_COMMERCIAL_NAV.quotes), href: '/finance/quotes', icon: 'tabler-file-dollar' },
+          { label: nl(GH_COMMERCIAL_NAV.contracts), href: '/finance/contracts', icon: 'tabler-file-description' },
+          {
+            label: nl(GH_COMMERCIAL_NAV.masterAgreements),
+            href: '/finance/master-agreements',
+            icon: 'tabler-file-certificate'
+          },
+          { label: nl(GH_COMMERCIAL_NAV.products), href: '/finance/products', icon: 'tabler-packages' }
+        ].filter(item => {
+          if (item.href === '/finance/quotes') return canSeeView('finanzas.cotizaciones', true)
+
+          // TASK-554 transition: granular commercial/contract/product view codes land in TASK-555.
+          return true
+        })
+      })
+    }
+
     // ── FINANZAS (collapsible top-level with nested submenus) ──
     if (isFinanceUser || isAdminUser) {
       menuData.push({
@@ -368,13 +392,10 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
             label: nl(GH_FINANCE_NAV.documents),
             icon: 'tabler-file-check',
             children: [
-              { label: nl(GH_FINANCE_NAV.quotes), href: '/finance/quotes' },
-              { label: nl(GH_FINANCE_NAV.masterAgreements), href: '/finance/master-agreements', icon: 'tabler-file-certificate' },
               { label: nl(GH_FINANCE_NAV.purchaseOrders), href: '/finance/purchase-orders' },
               { label: nl(GH_FINANCE_NAV.hes), href: '/finance/hes' },
               { label: nl(GH_FINANCE_NAV.reconciliation), href: '/finance/reconciliation' }
             ].filter(item => {
-              if (item.href === '/finance/quotes') return canSeeView('finanzas.cotizaciones', true)
               if (item.href === '/finance/purchase-orders') return canSeeView('finanzas.ordenes_compra', true)
               if (item.href === '/finance/hes') return canSeeView('finanzas.hes', true)
               if (item.href === '/finance/reconciliation') return canSeeView('finanzas.conciliacion', true)

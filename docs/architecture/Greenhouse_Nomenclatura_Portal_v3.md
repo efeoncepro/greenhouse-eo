@@ -49,6 +49,17 @@ La metáfora del Greenhouse se aplica en **dos capas con reglas distintas:**
 | `/finance/reconciliation` | **Conciliación** | — |
 | `/finance/intelligence` | **Inteligencia financiera** | — |
 
+### 2.2a Rutas comerciales transicionales (requiere finance/admin hasta TASK-555)
+
+Estas surfaces pertenecen funcionalmente a `Comercial`, pero mantienen paths legacy `/finance/...` en esta etapa para no romper deep links ni guards existentes.
+
+| Ruta técnica | Nombre Greenhouse | Notas |
+|---|---|---|
+| `/finance/quotes` | **Cotizaciones** | Surface comercial; view code legacy `finanzas.cotizaciones` hasta TASK-555. |
+| `/finance/contracts` | **Contratos** | Incluye SOW temporalmente; no existe route SOW propia. |
+| `/finance/master-agreements` | **Acuerdos marco** | MSA comercial sobre path legacy. |
+| `/finance/products` | **Productos** | Catálogo vendible reutilizando Product Catalog runtime existente. |
+
 ### 2.3 Rutas HR (requiere hr route group)
 
 | Ruta técnica | Nombre Greenhouse | Notas |

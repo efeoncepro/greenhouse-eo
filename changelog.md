@@ -2,6 +2,8 @@
 
 ## 2026-05-07
 
+- **TASK-554 — navegación separa Comercial de Finanzas sin mover URLs.** El sidebar interno ahora expone `Comercial` como dominio top-level para Cotizaciones, Contratos, Acuerdos marco y Productos, manteniendo paths legacy `/finance/...` y gates legacy hasta TASK-555. `Finanzas > Documentos` queda limitado a OC, HES y Conciliación. Se materializa `/finance/products` como page legacy mínima reutilizando `ProductCatalogView` para evitar links rotos. Copy de navegación actualizado en `es-CL`/`en-US`; SOW queda agrupado temporalmente bajo `Contratos` porque no existe surface propia.
+
 - **TASK-813 — documentación post-merge alta densidad.** Tras merge a `main` (PR #109, 2026-05-07T00:51:50Z), se eleva la documentación canónica a alto detalle: spec arquitectural nueva `docs/architecture/GREENHOUSE_HUBSPOT_SERVICES_INTAKE_V1.md` (515 líneas, 18 secciones, 4-pillar score 8.75/10) que cubre flow diagrams, helpers SSOT, projection contract, outbox events v1, reliability signals, capabilities, Cloud Scheduler, hard rules anti-regresión y forward rule downstream. Doc funcional `docs/documentation/comercial/servicios-engagement.md` v2.0 (modelo 4-capas con analogía restaurante, regla source-of-truth, 3 caminos convergentes, escenarios de degradación honesta, semántica cross-billing Aguas-Andinas-paga-por-ANAM, glossary, pipeline downstream). Manual operativo `docs/manual-de-uso/comercial/sincronizacion-hubspot-servicios.md` v2.0 (setup inicial paso-a-paso, operaciones diarias, troubleshooting completo, verificación post-deploy, code paths inventory, secrets rotation playbook).
 
 ## 2026-05-06

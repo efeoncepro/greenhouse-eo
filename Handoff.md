@@ -1,3 +1,13 @@
+# Sesion 2026-05-07 — TASK-554 tomada en develop (Commercial Domain Navigation Separation)
+
+- **Branch:** `develop` por instruccion explicita del usuario; no se crea `task/TASK-554-commercial-domain-navigation-separation`.
+- **Ownership:** no habia PR abierto ni branch local/remota obvia para `TASK-554`; se movio la task a `docs/tasks/in-progress/` y se sincronizaron `Lifecycle`, `docs/tasks/README.md` y `docs/tasks/TASK_ID_REGISTRY.md`.
+- **Discovery en curso:** scope confirmado como navegacion/i18n/access projection sin migraciones ni cambio de URLs legacy. Se debe contrastar `VerticalMenu`, `greenhouse-nomenclature`, `greenhouse-navigation-copy`, `VIEW_REGISTRY`, `shortcuts` y docs de dominio antes de implementar.
+- **Implementacion:** `Comercial` agregado como top-level interno para usuarios con `finance`/`admin`, moviendo `Cotizaciones`, `Contratos`, `Acuerdos marco` y `Productos` fuera de `Finanzas > Documentos`. Se mantiene `/finance/...`; `SOW` queda agrupado bajo `Contratos`. Se creo `/finance/products` reutilizando `ProductCatalogView` porque la API/view existian pero la page legacy no.
+- **Access model:** sin cambios en `routeGroups`, `views`, `entitlements` ni startup policy. `comercial.*` y `routeGroup: commercial` siguen en TASK-555; este corte usa compat legacy.
+- **Validacion:** `pnpm test src/config/greenhouse-navigation-copy.test.ts`, `pnpm exec tsc --noEmit --pretty false`, `pnpm design:lint`, `pnpm lint` y `pnpm build` OK. Build confirma `/finance/products` en route table.
+- **Cierre:** task movida a `docs/tasks/complete/`, README/registry/changelog/arquitectura de sidebar/nomenclatura sincronizados.
+
 # Sesion 2026-05-07 — TASK-802 cerrada en develop (Engagement Commercial Terms)
 
 - **Branch:** `develop` por instruccion explicita del usuario; no se crea `task/TASK-802-engagement-commercial-terms-time-versioned`.
