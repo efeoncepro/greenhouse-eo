@@ -26,6 +26,8 @@
 
 Crear la foundation canónica para que el Organization Workspace derive facets, tabs y acciones desde entitlements finos en vez de hardcodes por módulo. Esta task no colapsa rutas ni mezcla Agency/Finance todavía; establece el contrato reusable que permite hacerlo de forma segura y escalable.
 
+**Spec canónico vinculante**: `docs/architecture/GREENHOUSE_ORGANIZATION_WORKSPACE_PROJECTION_V1.md`. Esta task implementa §4 (Modelo) y §5 (Defense-in-depth) y §6 (Reliability signals) del spec.
+
 ## Why This Task Exists
 
 Greenhouse ya tiene las piezas importantes, pero todavía no están alineadas:
@@ -67,19 +69,25 @@ Sin esta foundation, cualquier intento de converger `Organizaciones` y `Clientes
 
 Revisar y respetar:
 
+- `docs/architecture/GREENHOUSE_ORGANIZATION_WORKSPACE_PROJECTION_V1.md` ← **spec canónico vinculante**
 - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
 - `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
 - `docs/architecture/GREENHOUSE_PERSON_ORGANIZATION_MODEL_V1.md`
 - `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md`
 - `docs/architecture/GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md`
+- `docs/architecture/GREENHOUSE_AUTH_RESILIENCE_V1.md` (TASK-742 7-layer template)
+- `docs/architecture/GREENHOUSE_FEATURE_FLAGS_ROLLOUT_PLATFORM_V1.md` (TASK-780 patrón flag)
 
 Reglas obligatorias:
 
 - `organization` sigue siendo la entidad B2B canónica; esta task no debe reintroducir `client_profile` como owner del workspace.
-- `views` / `authorizedViews` siguen existiendo como surfaces de UI; no se reemplazan por entitlements, se derivan desde ellos cuando corresponda.
-- La autorización fina debe expresarse en `module + capability + action + scope`, no en checks sueltos por pathname o tab.
-- La visibilidad final de facets debe respetar tanto entitlements como la relación efectiva del usuario con la organización.
-- No abrir un segundo modelo de facets paralelo al `Account 360`; la proyección debe reutilizar sus contracts.
+- `views` / `authorizedViews` siguen existiendo como surfaces de UI; **NO se retiran en V1**. Coexisten con la projection. Reliability signal `facet_view_drift` es el guardia.
+- La autorización fina se expresa en `module + capability + action + scope`. **El namespace canónico es `organization.<facet>.<action>`** (cierra Open Question — ver §2 del spec V1). Entrypoint NO es dimensión de autorización.
+- La visibilidad final de facets respeta `entitlements + relación + scope` derivados por el resolver canónico (§4.3 spec V1).
+- **NO abrir un segundo modelo de facets paralelo al `Account 360`**; la projection consume `authorizeAccountFacets` existente como input para `fieldRedactions`.
+- **Defense-in-depth obligatorio** (TASK-742 7-layer): DB constraint + app guard + UI affordance + reliability signal + audit log + approval workflow + outbox event. Cada uno wireado per §5 del spec V1.
+- **Cache TTL 30s in-memory** (patrón TASK-780). NO materialización en BQ/PG.
+- **Server-only** el projection helper (`import 'server-only'`).
 
 ## Normative Docs
 
@@ -120,17 +128,22 @@ Reglas obligatorias:
 
 ### Already exists
 
-- `Account 360` ya expone facets como `identity`, `team`, `economics`, `delivery`, `finance`, `crm`, `services` y `staffAug`.
-- `facet-authorization.ts` ya implementa una política inicial de visibilidad por rol/relación.
-- El runtime de entitlements ya es code-versioned y Admin Center ya gobierna defaults/overrides.
+- `Account 360` ya expone 9 facets: `identity | spaces | team | economics | delivery | finance | crm | services | staffAug` (`src/types/account-complete-360.ts`).
+- `facet-authorization.ts` ya implementa `authorizeAccountFacets(ctx) → { allowedFacets, deniedFacets, fieldRedactions }`.
+- `entitlements-catalog.ts` ya tiene 10 modules y union de actions/scopes definidos. `runtime.ts` exporta `getTenantEntitlements`, `hasEntitlement`, `can`.
+- Admin Center ya gobierna grants/overrides (TASK-403/404).
 - `authorizedViews` y `routeGroups` siguen siendo surfaces broad del portal.
+- Patrón `home_rollout_flags` (TASK-780) disponible para reusar.
 
 ### Gap
 
-- no existe capability-level modeling específico para facets de organización
-- no existe un mapper canónico `entitlements -> workspace facets/tabs/actions`
-- Agency y Finance no comparten una proyección común del mismo objeto
-- la semántica de visibilidad sigue repartida entre runtime broad, view codes y checks UI
+- No existe el módulo `organization` en el modules union — debe agregarse como namespace transversal de objeto canónico 360 (mismo patrón que `home`/`my_workspace`).
+- No existen las 11 capabilities `organization.*` declaradas en §4.1 del spec V1.
+- No existe `capabilities_registry` DB-backed con CHECK + FK desde `entitlement_grants` (defense-in-depth capa 1).
+- No existe `relationship-resolver.ts` con las 4 categorías canónicas enumeradas.
+- No existe el projection helper canónico (`resolveOrganizationWorkspaceProjection`).
+- No existe el reliability signal `identity.workspace_projection.facet_view_drift`.
+- Agency y Finance no comparten una proyección común del mismo objeto.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -147,34 +160,67 @@ Reglas obligatorias:
 
 ## Scope
 
-### Slice 1 — Capability model for organization facets
+### Slice 1 — Capability model + TS catalog
 
-- Definir capabilities finas por facet del workspace (`organization.identity`, `organization.finance`, `organization.delivery`, `organization.team`, `organization.crm`, etc.) con acciones y scopes claros.
-- Reconciliar esas capabilities con el runtime actual de `routeGroups` y `authorizedViews` para no romper acceso existente.
-- Registrar el mapeo canónico `view -> facet capabilities` para Agency y Finance.
+- Agregar `organization` al union de modules en `src/config/entitlements-catalog.ts`.
+- Declarar las 11 capabilities canónicas `organization.<facet>.<action>` por §4.1 del spec V1 con `actions` y `defaultScope` por entry.
+- Mapping canónico `OrganizationFacet → capability_key` en `src/lib/organization-workspace/facet-capability-mapping.ts`.
+- Mapping canónico `OrganizationFacet → viewCode` en `src/lib/organization-workspace/facet-view-mapping.ts` (insumo del reliability signal).
 
-### Slice 2 — Workspace projection layer
+### Slice 2 — Capabilities registry DB + FK enforcement
 
-- Crear un helper/shared contract que derive `visibleFacets`, `visibleTabs`, `allowedActions` y `defaultFacet` para una organización dada.
-- Hacer que esta proyección combine:
-  - entitlements runtime
-  - relación efectiva del usuario con la organización
-  - policies ya expresadas en `facet-authorization.ts`
-- Evitar que la UI tenga que reimplementar reglas de visibilidad por módulo.
+- Migration `migrations/<ts>_organization-capabilities-registry.sql`:
+  - `CREATE TABLE greenhouse_core.capabilities_registry` con PK + CHECK + descripción + `introduced_at`/`deprecated_at`.
+  - Seed con todas las capabilities `organization.*` desde el TS catalog.
+  - `ALTER TABLE greenhouse_core.entitlement_grants ADD CONSTRAINT entitlement_grants_capability_key_fk FOREIGN KEY...` con NOT VALID + VALIDATE atomic (patrón TASK-708/728).
+- Verificar DDL aplicado via `information_schema` (anti pre-up-marker bug TASK-768 Slice 1).
+- Test paridad TS↔DB: `entitlementsCatalog.map(e => e.key).sort()` ≡ `SELECT capability_key FROM capabilities_registry WHERE deprecated_at IS NULL`. Romper build si drift.
 
-### Slice 3 — Admin/access governance alignment
+### Slice 3 — Relationship resolver canónico
 
-- Extender la gobernanza documental y runtime para que Admin Center pueda explicar el acceso por facet de organización.
-- Dejar explícito qué parte vive en:
-  - `routeGroups`
-  - `authorizedViews`
-  - `entitlements`
-  - `workspace facet projection`
+- Helper `src/lib/organization-workspace/relationship-resolver.ts` con type union `SubjectOrganizationRelation` (5 variantes per §4.3 spec V1).
+- Single Postgres query con CTEs para resolver `internal_admin | assigned_member | client_portal_user | unrelated_internal | no_relation`.
+- Cross-tenant isolation enforced en WHERE clause (no filtrado en TS).
+- Indexes asegurados: `client_team_assignments(member_user_id, organization_id, active_until)` parcial; `client_users(user_id, organization_id)` UNIQUE.
+- Test matriz personas: 5 relations × proxy organizations × edge cases (assignment expirado, multi-org client_portal_user, etc.).
+- Test cross-tenant isolation: assert que un subject del tenant A no puede leer assignment del tenant B aunque `organizationId` apunte a tenant B.
 
-### Slice 4 — Tests and docs
+### Slice 4 — Projection helper + cache + degraded mode
 
-- Agregar tests unitarios para el resolver de proyección y para combinaciones críticas de access model.
-- Actualizar documentación de arquitectura para que la convergencia no dependa de memoria tribal.
+- Helper `src/lib/organization-workspace/projection.ts`:
+  - `import 'server-only'` mandatorio.
+  - Pure function: `resolveOrganizationWorkspaceProjection({ subject, organizationId, entrypointContext })` → `OrganizationWorkspaceProjection`.
+  - Composición determinística por §4.4 spec V1 (orden de evaluación 1-7).
+  - Absorbe `authorizeAccountFacets` existente como input para `fieldRedactions` (NO lo reemplaza).
+  - Default facet por entrypoint según matriz §4.4.
+- Cache in-memory TTL 30s keyed por `${subjectId}:${organizationId}:${entrypointContext}` (patrón TASK-780).
+- `clearProjectionCacheForSubject(subjectId)` invocable por consumer del outbox event `identity.entitlement.granted/revoked` (TASK-404) → invalidación reactiva.
+- Degraded mode: nunca throw, siempre `{ degradedMode: true, degradedReason: 'relationship_lookup_failed' | 'entitlements_lookup_failed' | 'no_facets_authorized', visibleFacets: [] }`.
+- Tests: matriz personas × 4 entrypoints (5 × 9 facets × 4 = 180 assertions con snapshot table).
+
+### Slice 5 — Reliability signals
+
+- Reader `src/lib/reliability/queries/workspace-projection-drift.ts` con query §6 spec V1.
+- Signal `identity.workspace_projection.facet_view_drift` (kind=`drift`, severity=`warning` si count>0, steady=0).
+- Reader `src/lib/reliability/queries/workspace-projection-unresolved-relations.ts`.
+- Signal `identity.workspace_projection.unresolved_relations` (kind=`data_quality`, severity=`error` si count>0 sostenido > 7d).
+- Wire en `getReliabilityOverview` bajo subsystem `Identity & Access`.
+- Decisión `identity_workspace` módulo dedicado vs extender `identity` → recomendado extender `identity` en V1 (Open Question §14 spec V1).
+
+### Slice 6 — Outbox cache invalidation consumer
+
+- Reactive consumer registrado para `identity.entitlement.granted` v1 + `identity.entitlement.revoked` v1.
+- Consumer invoca `clearProjectionCacheForSubject(subjectId)` per-event.
+- Idempotente.
+- Reliability signal de dead_letter del consumer (mismo patrón TASK-771/773).
+
+### Slice 7 — Lint rule + docs + 4-pillar verification
+
+- Lint rule `greenhouse/no-inline-facet-visibility-check` (modo `error`): detecta patrones tipo `if (user.role === ... && organization.X)` en componentes UI. Override block para `src/lib/organization-workspace/`.
+- Actualizar `docs/architecture/GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md` con Delta `2026-MM-DD — TASK-611` enlazando al spec V1.
+- Actualizar `docs/documentation/identity/sistema-identidad-roles-acceso.md` con sección "Facets de Organization Workspace" en lenguaje simple.
+- Tests E2E: cualquier route que importe `projection.ts` debe pasar test cross-tenant + test degraded mode.
+- 4-pillar score block (cierre formal — sección §11 espejo del spec V1).
 
 ## Out of Scope
 
@@ -185,22 +231,80 @@ Reglas obligatorias:
 
 ## Detailed Spec
 
-El contrato nuevo debe responder, como mínimo:
+**Spec canónico vinculante**: `docs/architecture/GREENHOUSE_ORGANIZATION_WORKSPACE_PROJECTION_V1.md`. Esta task implementa §4 (Modelo) + §5 (Defense-in-depth) + §6 (Reliability signals) del spec.
 
-- `visibleFacets[]`
-- `visibleTabs[]`
-- `defaultFacet`
-- `allowedActions[]`
-- `entrypointContext` (`agency` | `finance` | futuros)
+### Decisiones cerradas (NO re-debatir)
 
-La regla de diseño es:
+1. **Namespace de capabilities**: `organization.<facet>.<action>` transversal. Entrypoint NO es dimensión de auth. (cierra Open Question original)
+2. **`organization` se agrega al modules union** como namespace de objeto canónico 360 (mismo patrón que `home`/`my_workspace`).
+3. **`facet-authorization.ts` se ABSORBE como input** del projection helper (consumido para `fieldRedactions`), NO se reemplaza.
+4. **`authorizedViews` y `routeGroups` coexisten** en V1 — colapso queda como follow-up explícito post-soak ≥6 meses con `facet_view_drift = 0` sostenido.
+5. **Cache TTL 30s in-memory** (patrón TASK-780). NO materialización en BQ/PG.
+6. **Server-only** mandatorio en projection helper.
 
-1. `views` deciden por dónde entras
-2. `entitlements` deciden qué puedes ver/hacer
-3. la proyección del workspace traduce eso a tabs/facets/acciones
-4. el `Account 360` sigue siendo el contrato de datos subyacente
+### Contrato de retorno (canónico)
 
-La task debe evaluar si `facet-authorization.ts` se absorbe dentro de la proyección o si sigue como helper reusable consumido por ella, pero no debe dejar dos fuentes paralelas divergentes.
+```ts
+type OrganizationWorkspaceProjection = {
+  organizationId: string
+  entrypointContext: 'agency' | 'finance' | 'admin' | 'client_portal'
+  relationship: SubjectOrganizationRelation
+  visibleFacets: OrganizationFacet[]
+  visibleTabs: WorkspaceTab[]
+  defaultFacet: OrganizationFacet
+  allowedActions: WorkspaceAction[]
+  fieldRedactions: Partial<Record<OrganizationFacet, string[]>>
+  degradedMode: boolean
+  degradedReason: 'relationship_lookup_failed' | 'entitlements_lookup_failed' | 'no_facets_authorized' | null
+  cacheKey: string
+  computedAt: Date
+}
+```
+
+### Regla de diseño (sigue vigente, ahora con anclaje)
+
+1. `views` deciden por dónde entras (preservadas en V1).
+2. `entitlements` deciden qué puedes ver/hacer (capabilities `organization.<facet>.<action>`).
+3. La projection del workspace traduce eso a tabs/facets/acciones (helper canónico).
+4. El `Account 360` sigue siendo el contrato de datos subyacente.
+
+## 4-Pillar Score
+
+### Safety
+
+- **Authorization granular**: 11 capabilities `organization.<facet>.<action>`, `read_sensitive` separado de `read`.
+- **Cross-tenant isolation**: enforced en query del `relationship-resolver` (WHERE clause filtra por tenant_id derivado del subject), no en TS.
+- **Server-only**: projection helper con `import 'server-only'`. UI recibe sólo facets autorizados.
+- **Blast radius**: degraded mode → `visibleFacets: []`. Cero cross-tenant leak posible.
+- **Verified by**: matriz personas test (180 asserts), capability-FK test, cross-tenant isolation test, lint rule `no-inline-facet-visibility-check`.
+- **Residual risk**: drift `authorizedViews` legacy ↔ projection — cuantificado por signal `facet_view_drift`. Aceptado en V1.
+
+### Robustness
+
+- **Idempotency**: pure function. Cache no afecta corrección.
+- **Atomicity**: registry seed migration en transaction única (`-- Up Migration` marker). Grants atómicos vía TASK-404.
+- **Race protection**: `entitlement_grants` UNIQUE composite, `client_team_assignments` UNIQUE composite, `capabilities_registry` PK + CHECK.
+- **Constraint coverage**: PK + FK + CHECK en registry; UNIQUE composite en assignments; FK enforcement vía NOT VALID + VALIDATE atomic.
+- **Bad input**: `organizationId` inválido → `no_relation` → degraded. NULL/undefined: type-narrowed por TS, runtime guard server-only.
+- **Verified by**: parity test TS↔DB, concurrency test, fuzz test, FK violation test.
+
+### Resilience
+
+- **Retry policy**: read-only path. Cache absorbe ráfagas.
+- **Dead letter**: N/A (read-only). El consumer del outbox para cache invalidation sí tiene dead_letter signal.
+- **Reliability signals**: `identity.workspace_projection.facet_view_drift` + `identity.workspace_projection.unresolved_relations`.
+- **Audit trail**: TASK-404 `entitlement_grant_audit_log` (append-only triggers).
+- **Recovery**: cache corrupto → próximo request recomputa. Resolver falla → degraded honesto. Nunca crash.
+- **Degradación honesta**: UI distingue `loading` / `empty` / `degraded` / `error` con copy en es-CL tuteo (greenhouse-ux-writing).
+
+### Scalability
+
+- **Hot path Big-O**: O(log n) en resolver (composite index), O(1) cache hit, O(9) projection compute.
+- **Index coverage**: `client_team_assignments(member_user_id, organization_id, active_until)` parcial; `client_users(user_id, organization_id)` UNIQUE; `entitlement_grants(subject_id, capability_key)`.
+- **Async paths**: cache invalidation reactiva via outbox events. Sin path blocking en hot path.
+- **Cost at 10x**: linear en usuarios activos. Cache TTL 30s amortiza.
+- **Pagination**: lista (Agency directory) NO ejecuta projection completa per-row. Endpoint summary `accessLevel` para listas.
+- **Verified by**: `EXPLAIN ANALYZE` resolver, load test 10x synthetic, p99 latency < 200ms server-side.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 4 — VERIFICATION & CLOSING
@@ -211,16 +315,28 @@ La task debe evaluar si `facet-authorization.ts` se absorbe dentro de la proyecc
 
 ## Acceptance Criteria
 
-- [ ] Existe un catálogo explícito de capabilities finas para facets del Organization Workspace.
-- [ ] Existe un resolver compartido que derive facets/tabs/acciones del workspace desde entitlements + relación con la organización.
-- [ ] Agency y Finance pueden consumir el mismo contrato de proyección sin reimplementar lógica de visibilidad.
-- [ ] La documentación de access model deja explícito qué vive en `views`, qué vive en `entitlements` y qué vive en la proyección del workspace.
+- [ ] `organization` agregado al modules union en `entitlements-catalog.ts` con las 11 capabilities canónicas.
+- [ ] Tabla `greenhouse_core.capabilities_registry` materializada con seed + FK desde `entitlement_grants`.
+- [ ] Test paridad TS↔DB pasa en CI (drift rompe build).
+- [ ] `relationship-resolver.ts` resuelve las 5 categorías canónicas con cross-tenant isolation enforced en SQL.
+- [ ] Helper `resolveOrganizationWorkspaceProjection` retorna el contrato canónico (incluyendo `degradedMode` honesto).
+- [ ] Cache TTL 30s in-memory + invalidation reactiva via outbox events.
+- [ ] Reliability signals `facet_view_drift` + `unresolved_relations` registrados y visibles en `/admin/operations`.
+- [ ] Lint rule `greenhouse/no-inline-facet-visibility-check` activa en modo `error`.
+- [ ] Tests: matriz personas (180 asserts) + cross-tenant isolation + degraded mode + FK violation.
+- [ ] 4-pillar score block presente en este task file (espejo §11 spec V1).
+- [ ] `GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md` actualizado con Delta enlazando al spec V1.
+- [ ] Doc funcional `docs/documentation/identity/sistema-identidad-roles-acceso.md` actualizado con sección "Facets de Organization Workspace".
 
 ## Verification
 
 - `pnpm lint`
 - `pnpm tsc --noEmit`
 - `pnpm test`
+- `pnpm migrate:up` + verificación DDL via `information_schema` (anti pre-up-marker bug)
+- `pnpm pg:doctor` post-migration
+- Test paridad TS↔DB: nuevo script `pnpm test:capabilities-parity`
+- Reliability signals visibles en `/admin/operations` post-deploy
 
 ## Closing Protocol
 
@@ -238,6 +354,16 @@ La task debe evaluar si `facet-authorization.ts` se absorbe dentro de la proyecc
 - `TASK-612` — shared shell del Organization Workspace
 - `TASK-613` — convergencia de Finance Clients al workspace compartido
 
-## Open Questions
+## Open Questions (cerradas)
 
-- ¿La familia de capabilities debe vivir bajo `organization.*` o bajo un namespace por módulo con facet overlays? La recomendación inicial es `organization.*` como capa transversal.
+### CERRADA — Namespace de capabilities
+
+- **Decisión**: `organization.<facet>.<action>` transversal. `organization` se agrega al modules union como namespace de objeto canónico 360 (mismo patrón que `home`/`my_workspace`).
+- **Rationale**: facets son una dimensión del objeto canónico, NO de un módulo. Mezclar con overlay por módulo (`agency.organization.finance`) introduce dimensiones ortogonales en un solo enum (anti-pattern overlay arch-architect). Entrypoint es presentación, NO autorización.
+- **Anchor**: §2 + §4.1 del spec `GREENHOUSE_ORGANIZATION_WORKSPACE_PROJECTION_V1.md`.
+
+## Open Questions (vivas, deferidas a slice de implementación)
+
+1. **Reliability module dedicado vs extender `identity`**: Slice 5 decide. Recomendación V1: extender `identity` con `expectedSignalKinds` adicional. Promover a `identity_workspace` dedicado solo si emerge surface admin diferenciada.
+2. **Materialized helper view vs runtime computation para reliability signal**: Slice 5 decide con benchmark de cardinalidad real (subjects × organizations). Si runtime JOIN tarda > 500ms, materializar.
+3. **Activación de `entrypointContext='client_portal'`**: V1 declara el type union pero la implementación inicial cubre `agency` + `finance` + `admin`. Globe (Sky, etc.) requiere security review específico — abrir TASK-### derivado cuando se priorice.
