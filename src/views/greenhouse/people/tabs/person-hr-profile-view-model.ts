@@ -34,6 +34,16 @@ export type PersonHrProfileViewModel = {
     offboardingRuleLane: string | null
     effectiveExitDate: string | null
     lastWorkingDay: string | null
+    relationshipTimeline: Array<{
+      relationshipId: string
+      publicId: string
+      label: string
+      statusLabel: string
+      statusTone: 'success' | 'warning' | 'secondary'
+      roleLabel: string | null
+      effectiveFrom: string
+      effectiveTo: string | null
+    }>
   }
   leave: {
     available: number
@@ -110,6 +120,34 @@ const hasPersonalData = (profile: HrMemberProfile | null) => {
       profile.bankName ||
       profile.bankAccountNumberMasked
   )
+}
+
+const relationshipLabel = ({
+  relationshipType,
+  relationshipSubtype,
+  status,
+  effectiveTo
+}: {
+  relationshipType: string
+  relationshipSubtype: string | null
+  status: string
+  effectiveTo: string | null
+}) => {
+  const isClosed = status !== 'active' || Boolean(effectiveTo)
+
+  if (relationshipType === 'employee') {
+    return isClosed ? 'Relación laboral cerrada' : 'Relación laboral activa'
+  }
+
+  if (relationshipType === 'contractor') {
+    if (relationshipSubtype === 'honorarios') {
+      return isClosed ? 'Relación honorarios cerrada' : 'Relación honorarios activa'
+    }
+
+    return isClosed ? 'Relación contractor cerrada' : 'Relación contractor activa'
+  }
+
+  return isClosed ? 'Relación cerrada' : 'Relación activa'
 }
 
 export const buildPersonHrProfileViewModel = ({
@@ -238,7 +276,21 @@ export const buildPersonHrProfileViewModel = ({
     offboardingStatus: hrContext?.offboarding?.status ?? null,
     offboardingRuleLane: hrContext?.offboarding?.ruleLane ?? null,
     effectiveExitDate: hrContext?.offboarding?.effectiveDate ?? null,
-    lastWorkingDay: hrContext?.offboarding?.lastWorkingDay ?? null
+    lastWorkingDay: hrContext?.offboarding?.lastWorkingDay ?? null,
+    relationshipTimeline: (hrContext?.relationshipTimeline ?? []).map(relationship => {
+      const isActive = relationship.status === 'active' && !relationship.effectiveTo
+
+      return {
+        relationshipId: relationship.relationshipId,
+        publicId: relationship.publicId,
+        label: relationshipLabel(relationship),
+        statusLabel: isActive ? 'Activa' : 'Histórica',
+        statusTone: (isActive ? 'success' : relationship.relationshipType === 'employee' ? 'warning' : 'secondary') as 'success' | 'warning' | 'secondary',
+        roleLabel: relationship.roleLabel,
+        effectiveFrom: relationship.effectiveFrom,
+        effectiveTo: relationship.effectiveTo
+      }
+    })
   }
 
   const hasEmploymentData = Boolean(
@@ -255,7 +307,8 @@ export const buildPersonHrProfileViewModel = ({
       employment.contractType ||
       employment.offboardingCaseId ||
       employment.deelContractId ||
-      employment.dailyRequired !== null
+      employment.dailyRequired !== null ||
+      employment.relationshipTimeline.length > 0
   )
 
   const hasOperationalData = Boolean(

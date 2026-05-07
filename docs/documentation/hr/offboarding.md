@@ -1,9 +1,9 @@
 # Offboarding Laboral y Contractual
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-05-04 por Codex
-> **Ultima actualizacion:** 2026-05-04 por Codex
+> **Ultima actualizacion:** 2026-05-07 por Codex
 > **Documentacion tecnica:** [GREENHOUSE_WORKFORCE_OFFBOARDING_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_WORKFORCE_OFFBOARDING_ARCHITECTURE_V1.md)
 
 ---
@@ -61,6 +61,21 @@ TASK-760 crea el caso y la lane. TASK-761 agrega el aggregate de finiquito para 
 El motor de finiquito consume un caso aprobado o agendado con `effective_date`, `last_working_day`, causal y snapshot contractual. No calcula desde `member.active` ni desde `contractEndDate` directo. El documento formal consume el settlement aprobado; no recalcula montos desde datos vivos.
 
 Para V1 solo se soporta renuncia de trabajador dependiente Chile con payroll interno. Honorarios, Deel/EOR, contractors e internacional quedan bloqueados como regimenes no soportados por el engine interno.
+
+## Transicion employee -> contractor/honorarios
+
+Cuando una persona termina una relacion dependiente y luego inicia una etapa contractor u honorarios, Greenhouse no reactiva ni convierte la relacion anterior.
+
+El contrato vigente es:
+
+- el caso de offboarding dependiente debe quedar ejecutado
+- la relacion `employee` queda historica con `effective_to`
+- se abre una nueva relacion `contractor`
+- si la etapa es honorarios, se marca como subtipo `honorarios`
+- no se crea un ajuste de payroll ni una compensacion mensual nueva en esta foundation
+- el pago contractor futuro debe venir desde engagement, evidencia/invoice y Finance, no desde finiquito
+
+People 360 muestra esa historia como `Relacion laboral cerrada` y `Relacion contractor/honorarios activa` para evitar ambiguedad operativa.
 
 ## Acceso
 

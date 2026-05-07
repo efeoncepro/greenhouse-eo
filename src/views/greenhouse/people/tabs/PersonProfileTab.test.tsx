@@ -122,7 +122,8 @@ const detail: PersonDetail = {
       approvedRequestsThisYear: 2,
       totalApprovedDaysThisYear: 4
     },
-    offboarding: null
+    offboarding: null,
+    relationshipTimeline: []
   },
   deliveryContext: null,
   identityContext: null,

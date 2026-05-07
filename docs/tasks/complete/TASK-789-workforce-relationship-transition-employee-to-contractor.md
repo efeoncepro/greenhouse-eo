@@ -2,13 +2,13 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `EPIC-013`
-- Status real: `Diseno`
+- Status real: `Complete`
 - Rank: `TBD`
 - Domain: `hr`
 - Blocked by: `none`
@@ -59,7 +59,7 @@ Reglas obligatorias:
 
 ### Files owned
 
-- `src/lib/person-legal-entity-relationships/**` `[verificar]`
+- `src/lib/person-legal-entity-relationships/**`
 - `src/lib/workforce/offboarding/**`
 - `src/lib/person-360/**`
 - `src/views/greenhouse/people/**`
@@ -75,8 +75,8 @@ Reglas obligatorias:
 
 ### Gap
 
-- No explicit transition primitive employee -> contractor.
-- People 360 does not yet render the contractor relationship timeline as a first-class relation.
+- Cerrado por TASK-789: `src/lib/workforce/relationship-transition/transitionEmployeeToContractor()` cierra la relacion `employee` y abre una relacion `contractor` separada.
+- Cerrado por TASK-789: People 360 renderiza timeline de relaciones con labels separados para historico laboral y contractor/honorarios activo.
 
 ## Scope
 
@@ -104,20 +104,28 @@ Reglas obligatorias:
 
 ## Acceptance Criteria
 
-- [ ] Employee -> contractor transition creates a new relationship and preserves the old relationship unchanged.
-- [ ] Overlapping active employee/contractor relationships are blocked unless an explicit policy allows them.
-- [ ] Dependent payroll does not include the closed employee relation after its effective end.
-- [ ] People 360 distinguishes "relacion laboral cerrada" from "relacion contractor activa".
+- [x] Employee -> contractor transition creates a new relationship and preserves the old relationship unchanged.
+- [x] Overlapping active employee/contractor relationships are blocked unless an explicit policy allows them.
+- [x] Dependent payroll does not include the closed employee relation after its effective end.
+- [x] People 360 distinguishes "relacion laboral cerrada" from "relacion contractor activa".
+
+## Closing Notes
+
+- `honorarios` V1 se representa como `relationship_type='contractor'` + `metadata_json.relationshipSubtype='honorarios'` porque el constraint runtime actual no permite `honorarios` como tipo propio.
+- La command no muta `members.contract_type`, no crea `compensation_versions`, no crea `payroll_adjustments` y no habilita `final_settlements`.
+- No hubo migrations nuevas; se reutilizo `greenhouse_core.person_legal_entity_relationships`.
 
 ## Verification
 
 - `pnpm exec tsc --noEmit --pretty false`
-- `pnpm exec eslint src/lib/person-360 src/lib/workforce/offboarding`
-- Focused tests for transition helper and People 360 projection.
+- `pnpm lint`
+- `pnpm test src/lib/workforce/relationship-transition/employee-to-contractor.test.ts src/views/greenhouse/people/tabs/person-hr-profile-view-model.test.ts src/views/greenhouse/people/tabs/PersonHrProfileTab.test.tsx src/lib/workforce/offboarding/lane.test.ts`
+- `pnpm design:lint`
+- `pnpm build`
 
 ## Closing Protocol
 
-- [ ] Lifecycle and folder synchronized.
-- [ ] `docs/tasks/README.md` synchronized.
-- [ ] `Handoff.md` updated.
-- [ ] Architecture/docs updated if contract changes.
+- [x] Lifecycle and folder synchronized.
+- [x] `docs/tasks/README.md` synchronized.
+- [x] `Handoff.md` updated.
+- [x] Architecture/docs updated if contract changes.

@@ -875,7 +875,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-786` | `to-do` | Person Contact & Professional Presence Governance | `docs/tasks/to-do/TASK-786-person-contact-professional-presence-governance.md` |
 | `TASK-787` | `to-do` | Person Country Reconciliation (Entra ↔ Declared) | `docs/tasks/to-do/TASK-787-person-country-reconciliation-entra-declared.md` |
 | `TASK-788` | `to-do` | Workforce Role Title Effective-Dating + Compensation-Coupled Promotions | `docs/tasks/to-do/TASK-788-workforce-role-title-effective-dating-promotion-flow.md` |
-| `TASK-789` | `to-do` | Workforce Relationship Transition: Employee to Contractor (EPIC-013 child 1/10) | `docs/tasks/to-do/TASK-789-workforce-relationship-transition-employee-to-contractor.md` |
+| `TASK-789` | `complete` | Workforce Relationship Transition: Employee to Contractor (EPIC-013 child 1/10) | `docs/tasks/complete/TASK-789-workforce-relationship-transition-employee-to-contractor.md` |
 | `TASK-790` | `to-do` | Contractor Engagements Runtime + Classification Risk (EPIC-013 child 2/10) | `docs/tasks/to-do/TASK-790-contractor-engagements-runtime-classification-risk.md` |
 | `TASK-791` | `to-do` | Contractor Invoice Assets + Greenhouse Uploader Contexts (EPIC-013 child 3/10) | `docs/tasks/to-do/TASK-791-contractor-invoice-assets-uploader-contexts.md` |
 | `TASK-792` | `to-do` | Contractor Work Submissions + Approval/Dispute Flow (EPIC-013 child 4/10) | `docs/tasks/to-do/TASK-792-contractor-work-submissions-approval-dispute-flow.md` |

@@ -1,3 +1,16 @@
+# Sesion 2026-05-07 — TASK-789 cerrada (Workforce Relationship Transition)
+
+- **Branch:** `task/TASK-789-workforce-relationship-transition`.
+- **Ownership:** no habia PR abierto ni branch local/remota obvia para `TASK-789`; task movida a `docs/tasks/complete/`, `Lifecycle=complete`, README/registry sincronizados.
+- **Objetivo:** implementar la primitive canonica para cerrar una relacion dependiente y abrir una relacion contractor/honorarios bajo la misma persona, sin reactivar payroll/finiquito ni mutar historico.
+- **Guardrail inicial:** task P1 / impacto muy alto / dominio HR-payroll-adjacent; antes de codigo se contrastara spec vs arquitectura, schema/runtime y People 360/payroll/offboarding existentes.
+- **Cierre:** task movida a `docs/tasks/complete/`, `Lifecycle=complete`, README/registry sincronizados.
+- **Entrega:** nueva primitive `src/lib/person-legal-entity-relationships/**` y command `src/lib/workforce/relationship-transition/transitionEmployeeToContractor()`. Exige offboarding case `executed`, bloquea contractor activo solapado, cierra `employee` con `status='ended'` + `effective_to`, abre `contractor` separado y registra evento en el caso. Honorarios V1 se expresa como `relationship_type='contractor'` + `metadata_json.relationshipSubtype='honorarios'`.
+- **Payroll protegido:** no muta `members.contract_type`, no crea `greenhouse_payroll.compensation_versions`, no crea `payroll_adjustments`, no toca formulas Chile y no habilita `final_settlements` para contractor/honorarios. Se reutiliza el cutoff existente post-offboarding ejecutado.
+- **People 360:** `getPersonHrContext()` lee timeline de `person_legal_entity_relationships`; HR tab muestra `Relacion laboral cerrada` y `Relacion contractor/honorarios activa` con rangos efectivos.
+- **Docs:** `project_context.md`, `changelog.md`, arquitectura Person Legal Entity + Contractor Engagements, documentación funcional y manual de offboarding actualizados.
+- **Validacion:** baseline inicial `pnpm exec tsc --noEmit --pretty false` OK y ESLint focal OK. Cierre: `pnpm exec tsc --noEmit --pretty false` OK; `pnpm lint` OK; tests focales OK (4 files / 12 tests); `pnpm design:lint` OK (0 errors / 0 warnings); `pnpm build` OK.
+
 # Sesion 2026-05-07 — TASK-809 wizard contract fix (Sample Sprints pantallas internas)
 
 - **Trigger:** el usuario aclaro que no bastaba con alinear el command center: la experiencia de `Declarar Sprint` y las pantallas internas del mockup aprobado tambien debian implementarse en detalle, no como links a formularios alternos.

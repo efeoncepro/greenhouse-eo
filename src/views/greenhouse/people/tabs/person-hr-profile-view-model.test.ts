@@ -39,7 +39,8 @@ const hrContext: PersonHrContext = {
     approvedRequestsThisYear: 2,
     totalApprovedDaysThisYear: 4
   },
-  offboarding: null
+  offboarding: null,
+  relationshipTimeline: []
 }
 
 const supplementalProfile: HrMemberProfile = {
@@ -153,5 +154,43 @@ describe('buildPersonHrProfileViewModel', () => {
     expect(viewModel.operational.otdPercent).toBe(77)
     expect(viewModel.operational.rpa).toBe(2.4)
     expect(viewModel.personal.hasData).toBe(true)
+  })
+
+  it('labels employee history and active honorarios relationship without mutating payroll copy', () => {
+    const viewModel = buildPersonHrProfileViewModel({
+      hrContext: {
+        ...hrContext,
+        relationshipTimeline: [
+          {
+            relationshipId: 'pler-contractor',
+            publicId: 'EO-PLR-0002',
+            relationshipType: 'contractor',
+            relationshipSubtype: 'honorarios',
+            status: 'active',
+            roleLabel: 'Diseñadora',
+            effectiveFrom: '2026-05-04',
+            effectiveTo: null
+          },
+          {
+            relationshipId: 'pler-employee',
+            publicId: 'EO-PLR-0001',
+            relationshipType: 'employee',
+            relationshipSubtype: null,
+            status: 'ended',
+            roleLabel: 'Diseñadora',
+            effectiveFrom: '2024-01-01',
+            effectiveTo: '2026-04-30'
+          }
+        ]
+      },
+      supplementalProfile: null,
+      icoSnapshot: null,
+      fallbackOperationalMetrics: null
+    })
+
+    expect(viewModel.employment.relationshipTimeline).toMatchObject([
+      { label: 'Relación honorarios activa', statusLabel: 'Activa', statusTone: 'success' },
+      { label: 'Relación laboral cerrada', statusLabel: 'Histórica', statusTone: 'warning' }
+    ])
   })
 })

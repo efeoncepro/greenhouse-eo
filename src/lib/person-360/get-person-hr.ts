@@ -29,6 +29,16 @@ export interface PersonHrContext {
     effectiveDate: string | null
     lastWorkingDay: string | null
   } | null
+  relationshipTimeline: Array<{
+    relationshipId: string
+    publicId: string
+    relationshipType: string
+    relationshipSubtype: string | null
+    status: string
+    roleLabel: string | null
+    effectiveFrom: string
+    effectiveTo: string | null
+  }>
   supervisorMemberId: string | null
   supervisorName: string | null
   compensation: {
@@ -96,6 +106,17 @@ type OffboardingRow = {
   last_working_day: string | null
 }
 
+type RelationshipRow = {
+  relationship_id: string
+  public_id: string
+  relationship_type: string
+  relationship_subtype: string | null
+  status: string
+  role_label: string | null
+  effective_from: string | null
+  effective_to: string | null
+}
+
 // ── Helpers ──
 
 const toNum = (v: unknown): number => {
@@ -150,6 +171,29 @@ export const getPersonHrContext = async (identifier: string): Promise<PersonHrCo
 
   const offboarding = offboardingRows[0] ?? null
 
+  const relationshipRows = await runGreenhousePostgresQuery<RelationshipRow>(
+    `
+      SELECT
+        relationship_id,
+        public_id,
+        relationship_type,
+        metadata_json->>'relationshipSubtype' AS relationship_subtype,
+        status,
+        role_label,
+        effective_from::text,
+        effective_to::text
+      FROM greenhouse_core.person_legal_entity_relationships
+      WHERE profile_id = $1
+        AND relationship_type IN ('employee', 'contractor', 'executive')
+      ORDER BY
+        CASE WHEN status = 'active' AND effective_to IS NULL THEN 0 ELSE 1 END,
+        effective_from DESC,
+        created_at DESC
+      LIMIT 10
+    `,
+    [row.identity_profile_id]
+  )
+
   return {
     identityProfileId: row.identity_profile_id,
     eoId: row.eo_id,
@@ -176,6 +220,16 @@ export const getPersonHrContext = async (identifier: string): Promise<PersonHrCo
           lastWorkingDay: toDateStr(offboarding.last_working_day)
         }
       : null,
+    relationshipTimeline: relationshipRows.map(relationship => ({
+      relationshipId: relationship.relationship_id,
+      publicId: relationship.public_id,
+      relationshipType: relationship.relationship_type,
+      relationshipSubtype: relationship.relationship_subtype,
+      status: relationship.status,
+      roleLabel: relationship.role_label,
+      effectiveFrom: toDateStr(relationship.effective_from) ?? '',
+      effectiveTo: toDateStr(relationship.effective_to)
+    })),
     supervisorMemberId: row.reports_to_member_id,
     supervisorName: row.supervisor_name,
     compensation: {

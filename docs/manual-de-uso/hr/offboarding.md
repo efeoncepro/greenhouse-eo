@@ -1,9 +1,9 @@
 # Offboarding
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-05-04 por Codex
-> **Ultima actualizacion:** 2026-05-04 por Codex
+> **Ultima actualizacion:** 2026-05-07 por Codex
 > **Modulo:** HR / Workforce
 > **Ruta en portal:** `/hr/offboarding`
 > **Documentacion relacionada:** [Offboarding laboral y contractual](../../documentation/hr/offboarding.md), [GREENHOUSE_WORKFORCE_OFFBOARDING_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_WORKFORCE_OFFBOARDING_ARCHITECTURE_V1.md)
@@ -54,8 +54,11 @@ En la ficha HR de una persona, Greenhouse muestra:
 - salida efectiva si hay caso activo
 - ultimo dia trabajado si hay caso activo
 - estado de offboarding
+- historial de relaciones persona ↔ entidad legal cuando existe
 
 Si no hay caso activo, el CTA `Iniciar offboarding` abre la vista con el colaborador preseleccionado.
+
+Si una persona paso de dependiente a contractor/honorarios, People 360 debe mostrar ambas etapas por separado: la relacion laboral cerrada y la relacion contractor u honorarios activa. No uses ese historial como instruccion de pago: los pagos contractor se operan por el flujo contractor/payables futuro, no por finiquito ni por ajuste de nomina.
 
 ## Finiquito
 
