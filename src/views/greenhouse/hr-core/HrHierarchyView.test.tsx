@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
 
-import { fireEvent, screen } from '@testing-library/react'
+import { cleanup, fireEvent, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithTheme } from '@/test/render'
 
@@ -183,18 +183,6 @@ describe('HrHierarchyView', () => {
         return Response.json(baseHistory)
       }
 
-      if (url.startsWith('/api/hr/core/hierarchy/delegations')) {
-        return Response.json(baseDelegations)
-      }
-
-      if (url.startsWith('/api/hr/core/hierarchy/governance')) {
-        return Response.json(baseGovernance)
-      }
-
-      if (url.startsWith('/api/hr/core/hierarchy') && !init?.method) {
-        return Response.json(baseHierarchy)
-      }
-
       if (url === '/api/hr/core/hierarchy/reassign' && init?.method === 'POST') {
         return Response.json({
           memberId: 'member-1',
@@ -217,8 +205,25 @@ describe('HrHierarchyView', () => {
         return Response.json({ responsibilityId: 'resp-1', revoked: true })
       }
 
+      if (url.startsWith('/api/hr/core/hierarchy/delegations') && !init?.method) {
+        return Response.json(baseDelegations)
+      }
+
+      if (url.startsWith('/api/hr/core/hierarchy/governance')) {
+        return Response.json(baseGovernance)
+      }
+
+      if (url.startsWith('/api/hr/core/hierarchy') && !init?.method) {
+        return Response.json(baseHierarchy)
+      }
+
       throw new Error(`Unexpected fetch: ${url}`)
     })
+  })
+
+  afterEach(() => {
+    cleanup()
+    vi.unstubAllGlobals()
   })
 
   it('renders the hierarchy table and audit panel', async () => {
@@ -287,9 +292,10 @@ describe('HrHierarchyView', () => {
     renderWithTheme(<HrHierarchyView />)
 
     await screen.findAllByText('Ana Perez')
-    const delegationButtons = await screen.findAllByRole('button', { name: 'Nueva delegación' })
+    const delegationPanel = await screen.findByRole('region', { name: 'Delegaciones temporales' })
+    const delegationButton = within(delegationPanel).getByRole('button', { name: 'Nueva delegación' })
 
-    fireEvent.click(delegationButtons[0])
+    fireEvent.click(delegationButton)
 
     expect(screen.getByRole('heading', { name: 'Nueva delegación temporal' })).toBeInTheDocument()
     expect(screen.getByRole('combobox', { name: 'Delegado' })).toBeInTheDocument()
