@@ -649,6 +649,27 @@ El consumer ya no usa handlers hardcodeados. Usa el Projection Registry declarat
 | `payroll_receipts_delivery` | notifications | payroll_period.exported | Genera, persiste y envía el batch de recibos del período exportado |
 | `payroll_export_ready_notification` | notifications | payroll_period.exported | Envía el aviso de cierre/exportación a Finance/HR con el resumen operativo del período |
 
+### Sample Sprints / Engagement Platform (TASK-808)
+
+Los eventos de engagement usan `aggregate_type='service'`, `aggregate_id=<service_id>` y versionan contrato con `payload_json.version=1`. No llevan sufijo `_v1` en `event_type`.
+
+| Aggregate Type | Event Type | Publisher | Payload | Consumer reactivo |
+|---|---|---|---|---|
+| `service` | `service.engagement.declared` | `commercial/sample-sprints/engagement-events.ts` desde `declareCommercialTerms()` | `{ version:1, serviceId, actorUserId, termsId, termsKind, effectiveFrom }` | audit/event preview |
+| `service` | `service.engagement.approved` | `approveEngagement()` | `{ version:1, serviceId, actorUserId, approvalId, approvedAt, capacityWarning }` | audit/event preview |
+| `service` | `service.engagement.rejected` | `rejectEngagement()` | `{ version:1, serviceId, actorUserId, approvalId, rejectedAt }` | audit/event preview |
+| `service` | `service.engagement.capacity_overridden` | `approveEngagement()` cuando `capacity_warning_json.hasWarning=true` | `{ version:1, serviceId, actorUserId, approvalId, capacityWarning }` | audit/event preview |
+| `service` | `service.engagement.phase_completed` | `completePhase()` | `{ version:1, serviceId, actorUserId, phaseId, phaseKind, completedAt }` | audit/event preview |
+| `service` | `service.engagement.progress_snapshot_recorded` | `recordProgressSnapshot()` | `{ version:1, serviceId, actorUserId, snapshotId, snapshotDate }` | audit/event preview |
+| `service` | `service.engagement.outcome_recorded` | `recordOutcome()` | `{ version:1, serviceId, actorUserId, outcomeId, outcomeKind, decisionDate, nextServiceId?, nextQuotationId? }` | audit/event preview |
+| `service` | `service.engagement.cancelled` | `recordOutcome()` para `cancelled_by_*` | `{ version:1, serviceId, actorUserId, outcomeId, outcomeKind, cancellationReason }` | `engagement_cancelled_manual_notification` (`notifications`) |
+| `service` | `service.engagement.converted` | `recordOutcome(converted)` y `convertEngagement()` | `{ version:1, serviceId, actorUserId, outcomeId, lineageId?, termsId?, nextServiceId?, nextQuotationId? }` | `engagement_converted_lifecycle` (`cost_intelligence`) llama `promoteParty()` |
+
+Notas:
+- `engagement_converted_lifecycle` no escribe directo en `greenhouse_core.organizations`; usa `promoteParty()` para lifecycle history, campos coordinados, client/profile side-effects y eventos `commercial.party.*`.
+- HubSpot deal creation service→deal queda diferida porque el write path canónico existente es `createDealFromQuoteContext()` para Quote Builder; TASK-808 no llama directo al bridge Cloud Run.
+- `engagement_cancelled_manual_notification` despacha notificación interna `system_event` para follow-up manual y mantiene `automaticClientEmail=false`.
+
 ## Extensibilidad
 
 ### Para agregar un nuevo evento:

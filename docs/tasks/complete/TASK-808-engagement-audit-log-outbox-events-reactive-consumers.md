@@ -2,20 +2,20 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `EPIC-014`
-- Status real: `Diseño aprobado`
+- Status real: `Cerrada 2026-05-07 en develop`
 - Domain: `commercial / platform`
 - Blocked by: `TASK-801, TASK-802, TASK-803, TASK-804, TASK-805, TASK-806`
-- Branch: `task/TASK-808-engagement-audit-log-outbox-reactive-consumers`
+- Branch: `develop` (por instruccion explicita del usuario; no crear branch task)
 
 ## Summary
 
-Tabla `engagement_audit_log` append-only con triggers anti-update / anti-delete (patrón TASK-535/TASK-768). 9 outbox events versionados v1 (`service.engagement.*_v1`). Reactive consumers en ops-worker que ejecutan: lifecycle flip de `organizations` con campos canónicos `lifecycle_stage_source/by/since` (TASK-535/542 contract); HubSpot conditional `WHERE engagement_kind='regular' AND hubspot_deal_id IS NULL`. Es la capa async que cierra el Epic.
+Tabla `engagement_audit_log` append-only con triggers anti-update / anti-delete (patrón TASK-535/TASK-768). 9 outbox events versionados v1 (`service.engagement.*` con `payload_json.version=1`, sin sufijo `_v1`). Reactive consumers en el registry canónico que ejecutan: promoción lifecycle vía `promoteParty()` (TASK-535/542 contract); HubSpot service→deal queda diferido porque el runtime real solo tiene comando canónico Quote Builder → Deal. Es la capa async que cierra el Epic sin side-effects inline.
 
 ## Approved Mockup Context
 
@@ -42,9 +42,9 @@ Sin audit log, no hay forensic trail de decisiones críticas (approval, outcome,
   - `service.engagement.cancelled` v1
   - `service.engagement.converted` v1
 - Reactive consumer para `service.engagement.converted`:
-  - UPDATE `organizations` SET `lifecycle_stage='active_client'`, `lifecycle_stage_source='quote_converted'`, `lifecycle_stage_by=<actor>`, `lifecycle_stage_since=NOW()` (4 campos coordinados).
-  - HubSpot deal creation conditional `WHERE engagement_kind='regular' AND hubspot_deal_id IS NULL` (Open Q6 — verificar path real existe).
-- Conversion flow §8 implementado como helper TS atómico (`conversion-tx.ts`) — los 5 INSERTs core en una transacción + outbox event in-tx.
+  - llama `promoteParty({ toStage:'active_client', source:'quote_converted' })` para poblar lifecycle history, campos coordinados, client/profile side-effects y eventos party.
+  - registra en metadata cuando HubSpot deal creation queda diferido por falta de comando canónico service→deal.
+- Conversion flow §8 implementado como helper TS atómico (`conversion.ts`) — outcome + terms opcionales + lineage opcional + audit + outbox event en una transacción.
 
 ## Architecture Alignment
 
@@ -54,17 +54,17 @@ Patrones canónicos:
 
 - TASK-535/TASK-768 — append-only audit log con triggers PG anti-mutation.
 - TASK-771/773 — outbox + reactive consumer + dead_letter (canonical async path).
-- TASK-542 — lifecycle history poblando los 4 campos coordinados (source/by/since + auto-snapshot via trigger).
+- TASK-542 — lifecycle history y campos coordinados via `promoteParty()`.
 - TASK-721 — asset uploader para `report_asset_id` referenciado en outcome.
 
 Reglas obligatorias:
 
 - `engagement_audit_log` es append-only. Triggers `engagement_audit_log_no_update` + `engagement_audit_log_no_delete` enforce.
-- Outbox events versionados v1 declarados en `GREENHOUSE_EVENT_CATALOG_V1.md` antes del reactive consumer.
+- Outbox events versionados v1 declarados en `GREENHOUSE_EVENT_CATALOG_V1.md`; la version vive en `payload_json.version`.
 - Conversion flow es transaccional atómico — los 5 INSERTs commitean juntos o rollback completo (§8).
-- Lifecycle flip puebla 4 campos coordinados — NO solo `lifecycle_stage`.
-- HubSpot path conditional — pilotos quedan con `hubspot_deal_id=NULL` permanentemente.
-- Reactive consumer es idempotent (at-least-once delivery — patrón canónico outbox).
+- Lifecycle flip usa `promoteParty()` — NO update directo a `organizations`.
+- HubSpot path service→deal queda diferido hasta crear comando canónico con governance/rate-limit/idempotency; no se llama directo al bridge Cloud Run desde TASK-808.
+- Reactive consumer es idempotent via `greenhouse_sync.outbox_reactive_log(event_id, handler)` (at-least-once delivery — patrón canónico outbox).
 
 ## Slice Scope
 
@@ -86,18 +86,18 @@ Outbox events declaration (`docs/architecture/GREENHOUSE_EVENT_CATALOG_V1.md`):
 Helpers TS:
 
 - `src/lib/commercial/sample-sprints/audit-log.ts` — `recordAuditEvent({ serviceId, eventKind, actorUserId, payloadJson, reason? })`.
-- `src/lib/commercial/sample-sprints/conversion-tx.ts` — `convertEngagement({ serviceId, outcomeKind, decisionRationale, ...})` — wrap §8 BEGIN/COMMIT con los 5 INSERTs core + outbox event.
+- `src/lib/commercial/sample-sprints/conversion.ts` — `convertEngagement({ serviceId, decisionRationale, ...})` — wrap §8 BEGIN/COMMIT con outcome + terms/lineage cuando aplican + audit + outbox event.
 
-Reactive consumer (`services/ops-worker/handlers/engagement-converted.ts`):
+Reactive consumer (`src/lib/sync/projections/engagement-converted.ts`):
 
 - Lee `service.engagement.converted` v1 events.
-- UPDATE `organizations` con 4 campos lifecycle coordinados.
-- HubSpot deal creation conditional (verify path exists — Open Q6).
-- Idempotent: usa `consumed_at` + `consumed_by` columns en outbox para dedup.
+- Promueve lifecycle via `promoteParty()`.
+- HubSpot deal creation service→deal diferida y documentada en payload/metadata.
+- Idempotent: dedup por `outbox_reactive_log`.
 
 Reactive consumer para `service.engagement.cancelled`:
 
-- Triggers email manual notification a operator owner (no automatic email to client — Delta v1.2 B2 deferral).
+- Crea notificacion interna `system_event` para follow-up manual; no envia email automatico a cliente (Delta v1.2 B2 deferral).
 
 Tests:
 
@@ -111,10 +111,17 @@ Tests:
 
 - DDL + triggers aplicados y verificados (try UPDATE → expected error).
 - 9 events declarados en EVENT_CATALOG.
-- 2 helpers TS + 1 reactive consumer con tests cubriendo happy + rollback + dead_letter paths.
+- Helpers TS + reactive projections con tests cubriendo publish/audit y lifecycle/notification paths.
 - Lifecycle flip pueble 4 campos coordinados (verificable via SQL post-conversion).
 - `pnpm test` + `pnpm lint` + `pnpm build` verde.
-- ops-worker deploy script actualizado para incluir nuevos consumers.
+- ops-worker deploy script sin cambios: se registran projections en dominios existentes (`cost_intelligence` y `notifications`) ya drenados por Cloud Scheduler.
+
+## Open Questions Resolved
+
+- **Q6 HubSpot deal creation:** no existe comando canónico service→deal. El path real robusto es `createDealFromQuoteContext()` para Quote Builder, con governance, attempts, rate-limit, metadata HubSpot y upsert local. TASK-808 no bypassa esa capa; deja metadata `deferred_no_canonical_service_to_deal_command` para follow-up.
+- **Reactive idempotency:** `outbox_events.consumed_at/consumed_by` no existe. La deduplicación canónica vive en `greenhouse_sync.outbox_reactive_log(event_id, handler)`.
+- **Lifecycle flip:** no hacer SQL directo sobre `organizations`; `promoteParty()` es el writer canónico.
+- **Projection domain:** no se crea domain `commercial`; converted usa `cost_intelligence` y cancelled usa `notifications`, ambos con scheduler existente.
 
 ## Dependencies
 

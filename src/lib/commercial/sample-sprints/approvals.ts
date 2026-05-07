@@ -4,7 +4,10 @@ import type { PoolClient } from 'pg'
 
 import { DEFAULT_MAX_FTE } from '@/lib/team-capacity/units'
 import { query, withTransaction } from '@/lib/db'
+import { EVENT_TYPES } from '@/lib/sync/event-catalog'
+import { recordEngagementAuditEvent } from './audit-log'
 import { assertEngagementServiceEligible, buildEligibleServicePredicate } from './eligibility'
+import { publishEngagementEvent } from './engagement-events'
 import { getMemberCapacityForPeriodUsingClient, type MemberCapacityForPeriod } from './capacity-checker'
 import { isUniqueConstraintError, toDateString, toIsoDateKey, toIsoTimestamp, toTimestampString, trimRequired } from './shared'
 
@@ -475,6 +478,63 @@ export const approveEngagement = async (input: ApproveEngagementInput): Promise<
       [approval.service_id]
     )
 
+    await recordEngagementAuditEvent(
+      {
+        serviceId: approval.service_id,
+        eventKind: 'approved',
+        actorUserId: normalized.approvedBy,
+        payload: {
+          approvalId: approval.approval_id,
+          capacityWarning,
+          capacityOverrideReason: normalized.capacityOverrideReason
+        }
+      },
+      client
+    )
+
+    await publishEngagementEvent(
+      {
+        serviceId: approval.service_id,
+        eventType: EVENT_TYPES.serviceEngagementApproved,
+        actorUserId: normalized.approvedBy,
+        payload: {
+          approvalId: approval.approval_id,
+          approvedAt: normalized.approvedAt,
+          capacityWarning: capacityWarning.hasWarning
+        }
+      },
+      client
+    )
+
+    if (capacityWarning.hasWarning) {
+      await recordEngagementAuditEvent(
+        {
+          serviceId: approval.service_id,
+          eventKind: 'capacity_overridden',
+          actorUserId: normalized.approvedBy,
+          reason: normalized.capacityOverrideReason,
+          payload: {
+            approvalId: approval.approval_id,
+            capacityWarning
+          }
+        },
+        client
+      )
+
+      await publishEngagementEvent(
+        {
+          serviceId: approval.service_id,
+          eventType: EVENT_TYPES.serviceEngagementCapacityOverridden,
+          actorUserId: normalized.approvedBy,
+          payload: {
+            approvalId: approval.approval_id,
+            capacityWarning
+          }
+        },
+        client
+      )
+    }
+
     return normalizeApproval(approval)
   })
 }
@@ -504,6 +564,33 @@ export const rejectEngagement = async (input: RejectEngagementInput): Promise<En
     const approval = result.rows[0]
 
     if (!approval) throw new EngagementApprovalNotFoundError('Pending engagement approval was not found.')
+
+    await recordEngagementAuditEvent(
+      {
+        serviceId: approval.service_id,
+        eventKind: 'rejected',
+        actorUserId: normalized.rejectedBy,
+        reason: normalized.rejectionReason,
+        payload: {
+          approvalId: approval.approval_id,
+          rejectedAt: normalized.rejectedAt
+        }
+      },
+      client
+    )
+
+    await publishEngagementEvent(
+      {
+        serviceId: approval.service_id,
+        eventType: EVENT_TYPES.serviceEngagementRejected,
+        actorUserId: normalized.rejectedBy,
+        payload: {
+          approvalId: approval.approval_id,
+          rejectedAt: normalized.rejectedAt
+        }
+      },
+      client
+    )
 
     return normalizeApproval(approval)
   })

@@ -68,7 +68,12 @@ const approvedApproval = {
 }
 
 const buildClient = (responses: Array<{ rows: unknown[] }>) => {
-  const queryMock = vi.fn(async () => responses.shift() ?? { rows: [] })
+  const queryMock = vi.fn(async (text: string) => {
+    if (responses.length > 0) return responses.shift() ?? { rows: [] }
+    if (text.includes('engagement_audit_log')) return { rows: [{ audit_id: 'engagement-audit-1' }] }
+
+    return { rows: [] }
+  })
 
   return { query: queryMock }
 }
@@ -237,7 +242,7 @@ describe('engagement approval helpers', () => {
 
     expect(approval.status).toBe('approved')
     expect(approval.approvedBy).toBe('admin-1')
-    expect(client.query).toHaveBeenCalledTimes(5)
+    expect(client.query).toHaveBeenCalledTimes(7)
   })
 
   it('requires override reason when projected capacity exceeds 100%', async () => {
@@ -314,6 +319,7 @@ describe('engagement approval helpers', () => {
     expect(warningSnapshot.hasWarning).toBe(true)
     expect(warningSnapshot.members[0].projectedFte).toBe(1.2000000000000002)
     expect(updateApprovalCall[1][4]).toBe('Approved because coverage is temporary.')
+    expect(client.query).toHaveBeenCalledTimes(9)
   })
 
   it('rejects and withdraws pending approvals with actor evidence', async () => {

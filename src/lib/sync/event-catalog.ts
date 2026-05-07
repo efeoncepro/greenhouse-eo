@@ -408,6 +408,17 @@ export const EVENT_TYPES = {
   serviceSkillRequirementUpserted: 'service_skill_requirement.upserted',
   serviceSkillRequirementDeleted: 'service_skill_requirement.deleted',
 
+  // Sample Sprints / Engagement platform (EPIC-014, TASK-808)
+  serviceEngagementDeclared: 'service.engagement.declared',
+  serviceEngagementApproved: 'service.engagement.approved',
+  serviceEngagementRejected: 'service.engagement.rejected',
+  serviceEngagementCapacityOverridden: 'service.engagement.capacity_overridden',
+  serviceEngagementPhaseCompleted: 'service.engagement.phase_completed',
+  serviceEngagementProgressSnapshotRecorded: 'service.engagement.progress_snapshot_recorded',
+  serviceEngagementOutcomeRecorded: 'service.engagement.outcome_recorded',
+  serviceEngagementCancelled: 'service.engagement.cancelled',
+  serviceEngagementConverted: 'service.engagement.converted',
+
   // Person Intelligence
   compensationUpdated: 'compensation.updated',
   icoMaterializationCompleted: 'ico.materialization.completed',
@@ -718,6 +729,8 @@ export const REACTIVE_EVENT_TYPES = [
   EVENT_TYPES.serviceCreated,
   EVENT_TYPES.serviceSkillRequirementUpserted,
   EVENT_TYPES.serviceSkillRequirementDeleted,
+  EVENT_TYPES.serviceEngagementCancelled,
+  EVENT_TYPES.serviceEngagementConverted,
   EVENT_TYPES.reconciliationApproved,
   EVENT_TYPES.dteDiscrepancyFound,
   EVENT_TYPES.profileLinked,

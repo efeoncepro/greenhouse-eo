@@ -3,7 +3,10 @@ import 'server-only'
 import type { PoolClient } from 'pg'
 
 import { query, withTransaction } from '@/lib/db'
+import { EVENT_TYPES } from '@/lib/sync/event-catalog'
+import { recordEngagementAuditEvent } from './audit-log'
 import { assertEngagementServiceEligible, buildEligibleServicePredicate } from './eligibility'
+import { publishEngagementEvent } from './engagement-events'
 import { isUniqueConstraintError, toDateString, toIsoDateKey, toTimestampString, trimRequired } from './shared'
 
 export interface EngagementProgressSnapshot {
@@ -141,6 +144,33 @@ export const recordProgressSnapshot = async (
       const snapshotId = result.rows[0]?.snapshot_id
 
       if (!snapshotId) throw new Error('Failed to record engagement progress snapshot.')
+
+      await recordEngagementAuditEvent(
+        {
+          serviceId: normalized.serviceId,
+          eventKind: 'progress_snapshot_recorded',
+          actorUserId: normalized.recordedBy,
+          payload: {
+            snapshotId,
+            snapshotDate: normalized.snapshotDate,
+            metricsKeys: Object.keys(normalized.metricsJson)
+          }
+        },
+        client
+      )
+
+      await publishEngagementEvent(
+        {
+          serviceId: normalized.serviceId,
+          eventType: EVENT_TYPES.serviceEngagementProgressSnapshotRecorded,
+          actorUserId: normalized.recordedBy,
+          payload: {
+            snapshotId,
+            snapshotDate: normalized.snapshotDate
+          }
+        },
+        client
+      )
 
       return { snapshotId }
     })

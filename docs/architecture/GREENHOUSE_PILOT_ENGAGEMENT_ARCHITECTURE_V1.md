@@ -487,6 +487,8 @@ getMemberCapacityForPeriod(memberId: string, fromDate: Date, toDate: Date): {
 ### 5.4 Outbox events versionados v1
 
 > **Delta v1.2 — naming**: events renombrados de `service.pilot.*` → `service.engagement.*` (genérico). Cuando cambie el marketing label "Sample Sprint", consumers downstream NO se rompen.
+>
+> **Delta v1.10 — TASK-808 runtime alignment**: la version vive en `payload_json.version=1`; el `event_type` no usa sufijo `_v1`. Los eventos se publican en `greenhouse_sync.outbox_events` con `aggregate_type='service'` y `aggregate_id=<service_id>`.
 
 - `service.engagement.declared` v1
 - `service.engagement.approved` v1
@@ -514,7 +516,7 @@ Tabla `greenhouse_commercial.engagement_audit_log` con triggers PG `engagement_a
 - `lineage_added` — relación parent/child entre services registrada
 - `converted` — flow de conversión completo ejecutado
 - `cancelled` — cancelado early (by_client / by_provider)
-- `reverted` — outcome revertido por error (rollback manual con audit explícito)
+- `reverted` — reservado para futuro rollback manual con audit explícito; no materializado en TASK-808 V1.
 
 **Delta v1.2**: tabla renombrada de `pilot_decision_audit_log` → `engagement_audit_log` (alineado con resto del schema). DDL en §3.2 — functions + triggers + index `engagement_audit_service_idx`.
 
@@ -649,8 +651,7 @@ BEGIN;
     next_service_id, next_quotation_id, decided_by, metrics_json
   ) VALUES (...);
 
-  -- 2. Spawn nuevo service regular + commercial_terms committed
-  INSERT INTO greenhouse_core.services (service_id, engagement_kind, ...) VALUES (...);
+  -- 2. Si ya existe child service regular, declarar commercial_terms committed
   INSERT INTO greenhouse_commercial.engagement_commercial_terms (
     service_id, terms_kind, effective_from, monthly_amount_clp, ...
   ) VALUES (..., 'committed', CURRENT_DATE, ...);
@@ -667,22 +668,22 @@ BEGIN;
 
   -- 5. Outbox event v1 (en la misma tx — patrón canónico TASK-771/773)
   INSERT INTO greenhouse_sync.outbox_events (
-    event_type, event_version, aggregate_id, payload
-  ) VALUES ('service.engagement.converted', 1, ..., ...);
+    aggregate_type, aggregate_id, event_type, payload_json, status, occurred_at
+  ) VALUES ('service', ..., 'service.engagement.converted', '{"version":1, ...}', 'pending', now());
 COMMIT;
 ```
 
 **Steps async (post-commit, vía reactive consumer)**:
 
 6. Consumer reactivo lee `service.engagement.converted` v1 y:
-   - UPDATE `greenhouse_core.organizations` SET `lifecycle_stage='active_client'`, `lifecycle_stage_source='quote_converted'`, `lifecycle_stage_by=<actor_user_id>`, `lifecycle_stage_since=NOW()` (todos los campos canónicos del lifecycle history — TASK-535/TASK-542). Trigger `organization_lifecycle_history` ya canonizado escribe el snapshot histórico automáticamente.
-   - Trigger HubSpot bridge: crea deal desde el quotation referenciado (solo si `services.hubspot_deal_id IS NULL`).
+   - Llama `promoteParty({ toStage:'active_client', source:'quote_converted' })` para que el writer canónico inserte `organization_lifecycle_history`, actualice `lifecycle_stage/source/by/since`, instancie `clients`/`client_profiles` cuando corresponda y publique eventos `commercial.party.*`.
+   - No crea HubSpot deals directo desde service en TASK-808. El runtime real solo tiene comando canónico Quote Builder → Deal (`createDealFromQuoteContext`) con governance/idempotency/rate-limit; service→deal queda como follow-up explícito.
 
 > **Delta v1.1 — atomicidad explícita + lifecycle source canónico + HubSpot conditional**:
 >
 > - **Atomicidad**: pasos 1-5 viven en **una sola transacción Postgres**. Si cualquier INSERT falla → ROLLBACK completo. El reactive consumer (paso 6) es at-least-once con consumer idempotente (patrón canónico outbox).
-> - **Lifecycle source canónico**: el flip a `active_client` debe poblar `lifecycle_stage_source='quote_converted'` (valor existente en el enum, verificado en migration `20260421113910459:51`) + `lifecycle_stage_by` + `lifecycle_stage_since`. Sin esto, el lifecycle history queda sin trazabilidad y rompe el contract de TASK-535.
-> - **HubSpot conditional**: la regla "pilotos NO crean deals automáticamente" se implementa en el reactive consumer como `IF service.engagement_kind = 'regular' AND service.hubspot_deal_id IS NULL THEN create_deal(...)`. Pilotos quedan con `hubspot_deal_id=NULL` permanentemente; solo el child_service post-conversión sincroniza.
+> - **Lifecycle source canónico**: el flip a `active_client` debe pasar por `promoteParty()` con `source='quote_converted'`. Sin esto, se omiten lifecycle history, client/profile side-effects y eventos downstream.
+> - **HubSpot conditional**: la versión runtime de TASK-808 no llama HubSpot. El consumer marca metadata `deferred_no_canonical_service_to_deal_command` si detecta que habría correspondido crear deal, hasta que exista un comando service→deal con la misma gobernanza de Quote Builder.
 
 ### 8.1 Rollback contract
 

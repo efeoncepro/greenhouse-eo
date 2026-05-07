@@ -22,7 +22,12 @@ const mockedQuery = query as unknown as ReturnType<typeof vi.fn>
 const mockedWithTransaction = withTransaction as unknown as ReturnType<typeof vi.fn>
 
 const buildClient = (responses: Array<{ rows: unknown[] }>) => {
-  const queryMock = vi.fn(async () => responses.shift() ?? { rows: [] })
+  const queryMock = vi.fn(async (text: string) => {
+    if (responses.length > 0) return responses.shift() ?? { rows: [] }
+    if (text.includes('engagement_audit_log')) return { rows: [{ audit_id: 'engagement-audit-1' }] }
+
+    return { rows: [] }
+  })
 
   return { query: queryMock }
 }
@@ -97,11 +102,13 @@ describe('engagement commercial terms helpers', () => {
     })
 
     expect(result).toEqual({ termsId: 'terms-1' })
-    expect(client.query).toHaveBeenCalledTimes(3)
+    expect(client.query).toHaveBeenCalledTimes(5)
     const calls = client.query.mock.calls as unknown as Array<[string, unknown[]?]>
 
     expect(calls[1][0]).toContain('SET effective_to = $2::date')
     expect(calls[2][0]).toContain('INSERT INTO greenhouse_commercial.engagement_commercial_terms')
+    expect(calls[3][0]).toContain('INSERT INTO greenhouse_commercial.engagement_audit_log')
+    expect(calls[4][0]).toContain('INSERT INTO greenhouse_sync.outbox_events')
   })
 
   it('rejects TASK-813 legacy archived services before writing', async () => {

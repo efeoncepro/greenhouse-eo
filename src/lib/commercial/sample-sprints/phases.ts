@@ -3,7 +3,10 @@ import 'server-only'
 import type { PoolClient } from 'pg'
 
 import { query, withTransaction } from '@/lib/db'
+import { EVENT_TYPES } from '@/lib/sync/event-catalog'
+import { recordEngagementAuditEvent } from './audit-log'
 import { assertEngagementServiceEligible, buildEligibleServicePredicate } from './eligibility'
+import { publishEngagementEvent } from './engagement-events'
 import { isUniqueConstraintError, toDateString, toIsoDateKey, toIsoTimestamp, toTimestampString, trimRequired } from './shared'
 
 export const ENGAGEMENT_PHASE_KINDS = ['kickoff', 'operation', 'reporting', 'decision', 'custom'] as const
@@ -223,6 +226,34 @@ export const completePhase = async (input: CompletePhaseInput): Promise<Engageme
     const row = result.rows[0]
 
     if (!row) throw new EngagementPhaseNotFoundError(`Phase ${normalized.phaseId} does not exist.`)
+
+    await recordEngagementAuditEvent(
+      {
+        serviceId: row.service_id,
+        eventKind: 'phase_completed',
+        actorUserId: normalized.completedBy,
+        payload: {
+          phaseId: row.phase_id,
+          phaseKind: row.phase_kind,
+          completedAt: normalized.completedAt
+        }
+      },
+      client
+    )
+
+    await publishEngagementEvent(
+      {
+        serviceId: row.service_id,
+        eventType: EVENT_TYPES.serviceEngagementPhaseCompleted,
+        actorUserId: normalized.completedBy,
+        payload: {
+          phaseId: row.phase_id,
+          phaseKind: row.phase_kind,
+          completedAt: normalized.completedAt
+        }
+      },
+      client
+    )
 
     return normalizePhase(row)
   })

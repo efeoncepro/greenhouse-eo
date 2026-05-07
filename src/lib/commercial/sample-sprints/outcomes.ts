@@ -1,7 +1,10 @@
 import 'server-only'
 
 import { query, withTransaction } from '@/lib/db'
+import { EVENT_TYPES } from '@/lib/sync/event-catalog'
+import { recordEngagementAuditEvent } from './audit-log'
 import { assertEngagementServiceEligible, buildEligibleServicePredicate } from './eligibility'
+import { publishEngagementEvent } from './engagement-events'
 import { isUniqueConstraintError, toDateString, toIsoDateKey, toTimestampString, trimRequired } from './shared'
 
 export const ENGAGEMENT_OUTCOME_KINDS = [
@@ -179,6 +182,101 @@ export const recordOutcome = async (input: RecordOutcomeInput): Promise<{ outcom
       const outcomeId = result.rows[0]?.outcome_id
 
       if (!outcomeId) throw new Error('Failed to record engagement outcome.')
+
+      await recordEngagementAuditEvent(
+        {
+          serviceId: normalized.serviceId,
+          eventKind: 'outcome_recorded',
+          actorUserId: normalized.decidedBy,
+          reason: normalized.decisionRationale,
+          payload: {
+            outcomeId,
+            outcomeKind: normalized.outcomeKind,
+            decisionDate: normalized.decisionDate,
+            nextServiceId: normalized.nextServiceId,
+            nextQuotationId: normalized.nextQuotationId
+          }
+        },
+        client
+      )
+
+      await publishEngagementEvent(
+        {
+          serviceId: normalized.serviceId,
+          eventType: EVENT_TYPES.serviceEngagementOutcomeRecorded,
+          actorUserId: normalized.decidedBy,
+          payload: {
+            outcomeId,
+            outcomeKind: normalized.outcomeKind,
+            decisionDate: normalized.decisionDate,
+            nextServiceId: normalized.nextServiceId,
+            nextQuotationId: normalized.nextQuotationId
+          }
+        },
+        client
+      )
+
+      if (isCancellationOutcome(normalized.outcomeKind)) {
+        await recordEngagementAuditEvent(
+          {
+            serviceId: normalized.serviceId,
+            eventKind: 'cancelled',
+            actorUserId: normalized.decidedBy,
+            reason: normalized.cancellationReason,
+            payload: {
+              outcomeId,
+              outcomeKind: normalized.outcomeKind,
+              cancellationReason: normalized.cancellationReason
+            }
+          },
+          client
+        )
+
+        await publishEngagementEvent(
+          {
+            serviceId: normalized.serviceId,
+            eventType: EVENT_TYPES.serviceEngagementCancelled,
+            actorUserId: normalized.decidedBy,
+            payload: {
+              outcomeId,
+              outcomeKind: normalized.outcomeKind,
+              cancellationReason: normalized.cancellationReason
+            }
+          },
+          client
+        )
+      }
+
+      if (normalized.outcomeKind === 'converted') {
+        await recordEngagementAuditEvent(
+          {
+            serviceId: normalized.serviceId,
+            eventKind: 'converted',
+            actorUserId: normalized.decidedBy,
+            reason: normalized.decisionRationale,
+            payload: {
+              outcomeId,
+              nextServiceId: normalized.nextServiceId,
+              nextQuotationId: normalized.nextQuotationId
+            }
+          },
+          client
+        )
+
+        await publishEngagementEvent(
+          {
+            serviceId: normalized.serviceId,
+            eventType: EVENT_TYPES.serviceEngagementConverted,
+            actorUserId: normalized.decidedBy,
+            payload: {
+              outcomeId,
+              nextServiceId: normalized.nextServiceId,
+              nextQuotationId: normalized.nextQuotationId
+            }
+          },
+          client
+        )
+      }
 
       return { outcomeId }
     })

@@ -8,6 +8,9 @@ import {
   buildEligibleServicePredicate,
   ServiceNotEligibleForEngagementError
 } from './eligibility'
+import { recordEngagementAuditEvent } from './audit-log'
+import { publishEngagementEvent } from './engagement-events'
+import { EVENT_TYPES } from '@/lib/sync/event-catalog'
 
 export const ENGAGEMENT_COMMERCIAL_TERMS_KINDS = [
   'committed',
@@ -286,6 +289,37 @@ export const declareCommercialTerms = async (
       if (!termsId) {
         throw new Error('Failed to declare commercial terms.')
       }
+
+      await recordEngagementAuditEvent(
+        {
+          serviceId: normalized.serviceId,
+          eventKind: 'declared',
+          actorUserId: normalized.declaredBy,
+          reason: normalized.reason,
+          payload: {
+            termsId,
+            termsKind: normalized.kind,
+            effectiveFrom: normalized.effectiveFrom,
+            monthlyAmountClp: normalized.monthlyAmountClp,
+            hasSuccessCriteria: normalized.successCriteria != null
+          }
+        },
+        client
+      )
+
+      await publishEngagementEvent(
+        {
+          serviceId: normalized.serviceId,
+          eventType: EVENT_TYPES.serviceEngagementDeclared,
+          actorUserId: normalized.declaredBy,
+          payload: {
+            termsId,
+            termsKind: normalized.kind,
+            effectiveFrom: normalized.effectiveFrom
+          }
+        },
+        client
+      )
 
       return { termsId }
     })

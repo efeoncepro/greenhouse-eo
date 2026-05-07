@@ -518,6 +518,22 @@ export interface GreenhouseCommercialEngagementApprovals {
   withdrawn_by: string | null;
 }
 
+export interface GreenhouseCommercialEngagementAuditLog {
+  actor_user_id: string | null;
+  audit_id: Generated<string>;
+  event_kind: string;
+  occurred_at: Generated<Timestamp>;
+  /**
+   * Structured evidence for the audit event. Outbox event versioning is duplicated in payload_json.version where applicable.
+   */
+  payload_json: Generated<Json>;
+  reason: string | null;
+  /**
+   * FK to greenhouse_core.services(service_id). TEXT by TASK-801 contract, not UUID.
+   */
+  service_id: string;
+}
+
 export interface GreenhouseCommercialEngagementCommercialTerms {
   declared_at: Generated<Timestamp>;
   /**
@@ -8611,6 +8627,7 @@ export interface DB {
   "greenhouse_commercial.employment_type_aliases": GreenhouseCommercialEmploymentTypeAliases;
   "greenhouse_commercial.employment_types": GreenhouseCommercialEmploymentTypes;
   "greenhouse_commercial.engagement_approvals": GreenhouseCommercialEngagementApprovals;
+  "greenhouse_commercial.engagement_audit_log": GreenhouseCommercialEngagementAuditLog;
   "greenhouse_commercial.engagement_commercial_terms": GreenhouseCommercialEngagementCommercialTerms;
   "greenhouse_commercial.engagement_lineage": GreenhouseCommercialEngagementLineage;
   "greenhouse_commercial.engagement_outcomes": GreenhouseCommercialEngagementOutcomes;

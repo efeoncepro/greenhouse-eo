@@ -1,3 +1,13 @@
+# Sesion 2026-05-07 — TASK-808 cerrada en develop (Engagement Audit Log + Outbox Events)
+
+- **Branch:** `develop` por instruccion explicita del usuario; no se creo `task/TASK-808-engagement-audit-log-outbox-reactive-consumers`.
+- **Lifecycle/docs:** task movida a `docs/tasks/complete/`, `Lifecycle=complete`; `docs/tasks/README.md`, `docs/tasks/TASK_ID_REGISTRY.md`, `project_context.md`, `changelog.md`, `GREENHOUSE_EVENT_CATALOG_V1.md` y `GREENHOUSE_PILOT_ENGAGEMENT_ARCHITECTURE_V1.md` sincronizados.
+- **Runtime:** migration `20260507173315667_task-808-engagement-audit-log.sql` aplicada via `pnpm pg:connect:migrate`; `src/types/db.d.ts` regenerado. `engagement_audit_log` queda append-only con FKs `TEXT`, indices service/kind/actor y grants runtime/app select+insert.
+- **Codigo:** helpers Sample Sprints escriben audit + outbox dentro de la misma tx; 9 eventos `service.engagement.*` usan `payload_json.version=1`. `convertEngagement()` agrega flujo atomico outcome + terms opcionales + lineage opcional + audit + outbox. Projections nuevas: `engagement_converted_lifecycle` (`cost_intelligence`) llama `promoteParty()`; `engagement_cancelled_manual_notification` (`notifications`) crea follow-up interno y no email automatico a cliente.
+- **Drift resuelto:** no existen `outbox_events.consumed_at/consumed_by`; dedup real vive en `outbox_reactive_log`. No existe comando canónico service→HubSpot deal; TASK-808 no bypassa `createDealFromQuoteContext()`/bridge y deja metadata deferred.
+- **Validacion:** `pnpm lint`, `pnpm exec tsc --noEmit --pretty false`, `pnpm test` (608 files, 3535 pass, 5 skipped), `pnpm build`, `pnpm pg:doctor`, migration apply + SQL smoke append-only (`UPDATE` rechazado dentro de rollback).
+- **Follow-ups:** TASK-809 debe consumir `convertEngagement()`/audit feed en UI real. Crear task futura para comando canónico service→HubSpot deal si el producto requiere automatizar deal creation post-conversion.
+
 # Sesion 2026-05-07 — TASK-807 cerrada en develop (Commercial Health Reliability Subsystem)
 
 - **Branch:** `develop` por instruccion explicita del usuario; no se crea `task/TASK-807-commercial-health-reliability-subsystem`.

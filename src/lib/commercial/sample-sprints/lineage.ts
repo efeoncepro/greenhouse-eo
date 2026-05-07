@@ -1,6 +1,7 @@
 import 'server-only'
 
 import { query, withTransaction } from '@/lib/db'
+import { recordEngagementAuditEvent } from './audit-log'
 import { assertEngagementServiceEligible, buildEligibleServicePredicate } from './eligibility'
 import { isUniqueConstraintError, toDateString, toIsoDateKey, toTimestampString, trimRequired } from './shared'
 
@@ -134,6 +135,23 @@ export const addLineage = async (input: AddLineageInput): Promise<{ lineageId: s
       const lineageId = result.rows[0]?.lineage_id
 
       if (!lineageId) throw new Error('Failed to add engagement lineage.')
+
+      await recordEngagementAuditEvent(
+        {
+          serviceId: normalized.parentServiceId,
+          eventKind: 'lineage_added',
+          actorUserId: normalized.recordedBy,
+          reason: normalized.transitionReason,
+          payload: {
+            lineageId,
+            parentServiceId: normalized.parentServiceId,
+            childServiceId: normalized.childServiceId,
+            relationshipKind: normalized.relationshipKind,
+            transitionDate: normalized.transitionDate
+          }
+        },
+        client
+      )
 
       return { lineageId }
     })

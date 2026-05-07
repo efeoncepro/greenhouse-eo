@@ -48,7 +48,12 @@ const childService = {
 }
 
 const buildClient = (responses: Array<{ rows: unknown[] }>) => {
-  const queryMock = vi.fn(async () => responses.shift() ?? { rows: [] })
+  const queryMock = vi.fn(async (text: string) => {
+    if (responses.length > 0) return responses.shift() ?? { rows: [] }
+    if (text.includes('engagement_audit_log')) return { rows: [{ audit_id: 'engagement-audit-1' }] }
+
+    return { rows: [] }
+  })
 
   return { query: queryMock }
 }
@@ -145,6 +150,8 @@ describe('engagement phases helpers', () => {
     const calls = client.query.mock.calls as unknown as Array<[string, unknown[]?]>
 
     expect(calls[2][0]).toContain("SET status = 'completed'")
+    expect(calls[3][0]).toContain('INSERT INTO greenhouse_commercial.engagement_audit_log')
+    expect(calls[4][0]).toContain('INSERT INTO greenhouse_sync.outbox_events')
   })
 
   it('filters listed phases through TASK-813 service eligibility', async () => {
@@ -202,6 +209,8 @@ describe('engagement outcomes helpers', () => {
     const calls = client.query.mock.calls as unknown as Array<[string, unknown[]?]>
 
     expect(calls[1][0]).toContain('INSERT INTO greenhouse_commercial.engagement_outcomes')
+    expect(calls[2][0]).toContain('INSERT INTO greenhouse_commercial.engagement_audit_log')
+    expect(calls[3][0]).toContain('INSERT INTO greenhouse_sync.outbox_events')
   })
 
   it('requires cancellation reason for cancellation outcomes', async () => {
@@ -248,7 +257,7 @@ describe('engagement outcomes helpers', () => {
       nextServiceId: 'SVC-HS-456'
     })
 
-    expect(client.query).toHaveBeenCalledTimes(3)
+    expect(client.query).toHaveBeenCalledTimes(7)
   })
 
   it('maps duplicate terminal outcomes to conflict', async () => {
@@ -311,7 +320,7 @@ describe('engagement lineage helpers', () => {
       })
     ).resolves.toEqual({ lineageId: 'engagement-lineage-1' })
 
-    expect(client.query).toHaveBeenCalledTimes(3)
+    expect(client.query).toHaveBeenCalledTimes(4)
   })
 
   it('rejects self-lineage before opening a transaction', async () => {

@@ -42,7 +42,12 @@ const snapshotRow = {
 }
 
 const buildClient = (responses: Array<{ rows: unknown[] }>) => {
-  const queryMock = vi.fn(async () => responses.shift() ?? { rows: [] })
+  const queryMock = vi.fn(async (text: string) => {
+    if (responses.length > 0) return responses.shift() ?? { rows: [] }
+    if (text.includes('engagement_audit_log')) return { rows: [{ audit_id: 'engagement-audit-1' }] }
+
+    return { rows: [] }
+  })
 
   return { query: queryMock }
 }
@@ -79,6 +84,8 @@ describe('engagement progress recorder', () => {
     expect(calls[0][0]).toContain('FROM greenhouse_core.services')
     expect(calls[1][0]).toContain('SELECT engagement_kind')
     expect(calls[2][0]).toContain('INSERT INTO greenhouse_commercial.engagement_progress_snapshots')
+    expect(calls[3][0]).toContain('INSERT INTO greenhouse_commercial.engagement_audit_log')
+    expect(calls[4][0]).toContain('INSERT INTO greenhouse_sync.outbox_events')
   })
 
   it('rejects regular services before inserting', async () => {
