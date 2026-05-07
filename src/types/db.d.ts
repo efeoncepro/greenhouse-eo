@@ -4303,6 +4303,27 @@ export interface GreenhouseFinanceExpenses {
   withholding_amount: Numeric | null;
 }
 
+export interface GreenhouseFinanceExpenseServiceAllocations {
+  allocated_amount_clp: Numeric;
+  allocation_id: string;
+  allocation_source: Generated<string>;
+  approved_at: Timestamp | null;
+  approved_by: string | null;
+  client_id: string;
+  created_at: Generated<Timestamp>;
+  created_by: string;
+  evidence_json: Generated<Json>;
+  expense_id: string;
+  period_month: number;
+  period_year: number;
+  rejected_at: Timestamp | null;
+  rejected_by: string | null;
+  rejection_reason: string | null;
+  review_status: Generated<string>;
+  service_id: string;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseFinanceExternalCashSignals {
   /**
    * Estado de resolucion de cuenta canonica Greenhouse. unresolved = sin cuenta. resolved_high_confidence = una sola regla D5 matcheo. resolved_low_confidence = match heuristico (no auto-adopt). adopted = ya creo payment canonico. superseded = reemplazada por otra senal/payment. dismissed = descartada manual.
@@ -8755,6 +8776,7 @@ export interface DB {
   "greenhouse_finance.expense_distribution_resolution": GreenhouseFinanceExpenseDistributionResolution;
   "greenhouse_finance.expense_payments": GreenhouseFinanceExpensePayments;
   "greenhouse_finance.expense_payments_normalized": GreenhouseFinanceExpensePaymentsNormalized;
+  "greenhouse_finance.expense_service_allocations": GreenhouseFinanceExpenseServiceAllocations;
   "greenhouse_finance.expenses": GreenhouseFinanceExpenses;
   "greenhouse_finance.external_cash_signals": GreenhouseFinanceExternalCashSignals;
   "greenhouse_finance.external_signal_auto_adopt_policies": GreenhouseFinanceExternalSignalAutoAdoptPolicies;

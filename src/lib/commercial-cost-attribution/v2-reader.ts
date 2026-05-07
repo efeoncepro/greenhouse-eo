@@ -4,9 +4,10 @@ import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
  * TASK-708 — Commercial Cost Attribution V2 reader.
  *
  * Lee de la VIEW canónica `greenhouse_serving.commercial_cost_attribution_v2`
- * que une 3 dimensiones de costo atribuible a clientes:
+ * que une dimensiones de costo atribuible a clientes:
  *   - labor: costo laboral por staffing % FTE (TASK-536/PreviousArch).
  *   - expense_direct_client: gastos directos a un cliente (TASK-705 rules).
+ *   - expense_direct_service: gastos directos con allocation aprobada a service_id.
  *   - expense_direct_member_via_fte: gastos directos a un miembro
  *     prorrateados a sus clientes vía staffing % FTE.
  *
@@ -18,7 +19,7 @@ import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
  * para que la UI muestre warning explícito en lugar de silent zero.
  */
 
-export type CostDimension = 'labor' | 'expense_direct_client' | 'expense_direct_member_via_fte'
+export type CostDimension = 'labor' | 'expense_direct_client' | 'expense_direct_service' | 'expense_direct_member_via_fte'
 
 interface AttributionRowDb extends Record<string, unknown> {
   period_year: number
@@ -37,6 +38,7 @@ export interface ClientCostAttributionV2 {
   byDimension: {
     labor: number
     expenseDirectClient: number
+    expenseDirectService: number
     expenseDirectMemberViaFte: number
   }
   members: Array<{
@@ -55,6 +57,7 @@ export interface CommercialCostAttributionV2Period {
     grandTotalClp: number
     laborClp: number
     expenseDirectClientClp: number
+    expenseDirectServiceClp: number
     expenseDirectMemberViaFteClp: number
   }
   /**
@@ -64,6 +67,7 @@ export interface CommercialCostAttributionV2Period {
   coverage: {
     hasLaborData: boolean
     hasDirectClientData: boolean
+    hasDirectServiceData: boolean
     hasDirectMemberViaFteData: boolean
   }
 }
@@ -109,6 +113,7 @@ export const readCommercialCostAttributionByClientForPeriodV2 = async (
   const byClient = new Map<string, ClientCostAttributionV2>()
   let laborTotal = 0
   let directClientTotal = 0
+  let directServiceTotal = 0
   let directMemberTotal = 0
 
   for (const row of rows) {
@@ -124,6 +129,7 @@ export const readCommercialCostAttributionByClientForPeriodV2 = async (
         byDimension: {
           labor: 0,
           expenseDirectClient: 0,
+          expenseDirectService: 0,
           expenseDirectMemberViaFte: 0
         },
         members: []
@@ -139,6 +145,9 @@ export const readCommercialCostAttributionByClientForPeriodV2 = async (
     } else if (row.cost_dimension === 'expense_direct_client') {
       entry.byDimension.expenseDirectClient = round(entry.byDimension.expenseDirectClient + amount)
       directClientTotal += amount
+    } else if (row.cost_dimension === 'expense_direct_service') {
+      entry.byDimension.expenseDirectService = round(entry.byDimension.expenseDirectService + amount)
+      directServiceTotal += amount
     } else if (row.cost_dimension === 'expense_direct_member_via_fte') {
       entry.byDimension.expenseDirectMemberViaFte = round(entry.byDimension.expenseDirectMemberViaFte + amount)
       directMemberTotal += amount
@@ -170,14 +179,16 @@ export const readCommercialCostAttributionByClientForPeriodV2 = async (
     periodMonth: month,
     clients: Array.from(byClient.values()).sort((a, b) => b.totalClp - a.totalClp),
     totals: {
-      grandTotalClp: round(laborTotal + directClientTotal + directMemberTotal),
+      grandTotalClp: round(laborTotal + directClientTotal + directServiceTotal + directMemberTotal),
       laborClp: round(laborTotal),
       expenseDirectClientClp: round(directClientTotal),
+      expenseDirectServiceClp: round(directServiceTotal),
       expenseDirectMemberViaFteClp: round(directMemberTotal)
     },
     coverage: {
       hasLaborData: rows.some(r => r.cost_dimension === 'labor'),
       hasDirectClientData: rows.some(r => r.cost_dimension === 'expense_direct_client'),
+      hasDirectServiceData: rows.some(r => r.cost_dimension === 'expense_direct_service'),
       hasDirectMemberViaFteData: rows.some(r => r.cost_dimension === 'expense_direct_member_via_fte')
     }
   }

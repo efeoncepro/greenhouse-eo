@@ -31,11 +31,13 @@ describe('readCommercialCostAttributionByClientForPeriodV2', () => {
       grandTotalClp: 0,
       laborClp: 0,
       expenseDirectClientClp: 0,
+      expenseDirectServiceClp: 0,
       expenseDirectMemberViaFteClp: 0
     })
     expect(result.coverage).toEqual({
       hasLaborData: false,
       hasDirectClientData: false,
+      hasDirectServiceData: false,
       hasDirectMemberViaFteData: false
     })
   })
@@ -54,11 +56,12 @@ describe('readCommercialCostAttributionByClientForPeriodV2', () => {
       clientId: 'cli-sky',
       clientName: 'Sky Airline',
       totalClp: 1500000,
-      byDimension: { labor: 1500000, expenseDirectClient: 0, expenseDirectMemberViaFte: 0 }
+      byDimension: { labor: 1500000, expenseDirectClient: 0, expenseDirectService: 0, expenseDirectMemberViaFte: 0 }
     })
     expect(result.coverage).toEqual({
       hasLaborData: true,
       hasDirectClientData: false,
+      hasDirectServiceData: false,
       hasDirectMemberViaFteData: false
     })
   })
@@ -75,7 +78,7 @@ describe('readCommercialCostAttributionByClientForPeriodV2', () => {
     expect(result.clients[0]).toMatchObject({
       clientName: 'Motogas SpA',
       totalClp: 49815,
-      byDimension: { labor: 0, expenseDirectClient: 49815, expenseDirectMemberViaFte: 0 }
+      byDimension: { labor: 0, expenseDirectClient: 49815, expenseDirectService: 0, expenseDirectMemberViaFte: 0 }
     })
     expect(result.coverage.hasDirectClientData).toBe(true)
     expect(result.coverage.hasLaborData).toBe(false)
@@ -98,6 +101,7 @@ describe('readCommercialCostAttributionByClientForPeriodV2', () => {
     expect(client.byDimension).toEqual({
       labor: 800000,
       expenseDirectClient: 50000,
+      expenseDirectService: 0,
       expenseDirectMemberViaFte: 120000
     })
     expect(client.members).toHaveLength(1)
@@ -110,8 +114,30 @@ describe('readCommercialCostAttributionByClientForPeriodV2', () => {
     expect(result.coverage).toEqual({
       hasLaborData: true,
       hasDirectClientData: true,
+      hasDirectServiceData: false,
       hasDirectMemberViaFteData: true
     })
+  })
+
+  it('aggregates approved expense_direct_service allocations as their own direct-cost lane', async () => {
+    queryMock.mockResolvedValueOnce([
+      { period_year: 2026, period_month: 5, client_id: 'cli-sky', member_id: null, amount_clp: '175000', cost_dimension: 'expense_direct_service', fte_contribution: null }
+    ])
+    stubClientHydration([{ client_id: 'cli-sky', client_name: 'Sky Airline' }])
+
+    const result = await readCommercialCostAttributionByClientForPeriodV2(2026, 5)
+
+    expect(result.totals).toMatchObject({
+      grandTotalClp: 175000,
+      expenseDirectServiceClp: 175000
+    })
+    expect(result.clients[0].byDimension).toEqual({
+      labor: 0,
+      expenseDirectClient: 0,
+      expenseDirectService: 175000,
+      expenseDirectMemberViaFte: 0
+    })
+    expect(result.coverage.hasDirectServiceData).toBe(true)
   })
 
   it('falls back to client_id when client_name is missing in greenhouse_core.clients', async () => {

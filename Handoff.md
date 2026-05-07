@@ -1,3 +1,16 @@
+# Sesion 2026-05-07 — TASK-815 cerrada en develop (Direct Service Expense Allocation Primitive)
+
+- **Branch:** `develop` por instruccion explicita del usuario; se corrigio inmediatamente un intento inicial de crear branch y no se volvio a cambiar de rama.
+- **Trigger:** follow-up de TASK-806: direct-client expenses quedaban `operational` porque no tenian ancla canonica de `service_id`; no se acepto inferencia por cliente/nombre/linea de servicio.
+- **Entrega DB:** migration `20260507164348236_task-815-direct-service-expense-allocation.sql` aplicada en dev crea `greenhouse_finance.expense_service_allocations` con state `draft/approved/rejected`, FKs a `expenses/services/clients`, cap por expense, guard de service activo/no `legacy_seed_archived`/no `unmapped`, y scope V1 solo direct-client expenses (`cost_is_direct=TRUE` + `allocated_client_id`).
+- **Serving:** `greenhouse_serving.commercial_cost_attribution_v2` agrega lane `expense_direct_service` para allocations aprobadas y resta ese monto del residual `expense_direct_client`; `gtm_investment_pnl` puede reclasificar estos costos cuando apliquen terms `no_cost`.
+- **Helpers:** nuevo `src/lib/finance/expense-service-allocations.ts` expone create/approve/reject/list transaccional; `v2-reader.ts` soporta totals/breakdown/coverage `expenseDirectService`.
+- **Service attribution:** `src/lib/service-attribution/materialize.ts` consume allocations aprobadas como `expense_service_allocation` high-confidence y descuenta esos montos del residual de direct-client expenses para evitar doble conteo.
+- **Access model:** sin nuevos `routeGroups`, `views`, `entitlements` ni startup policy. TASK-809 debe montar la UI/wizard sobre esta primitive y TASK-807 puede agregar signal de pendientes.
+- **Runtime verificado:** `pnpm pg:doctor` OK; `pnpm pg:connect:migrate` OK + `src/types/db.d.ts` regenerado; SQL smoke confirma tabla existente, 0 allocations iniciales y 0 rows `expense_direct_service` hasta que existan approvals.
+- **Validacion ejecutada:** focal vitest OK (`expense-service-allocations`, `commercial-cost-attribution/v2-reader`, `service-attribution/materialize`); `pnpm exec tsc --noEmit --pretty false` OK; `pnpm lint` OK; `pnpm test` completo OK (605 files / 3522 passed / 5 skipped); `pnpm build` OK.
+- **Docs sincronizadas:** `TASK-815`, `docs/tasks/README.md`, `TASK_ID_REGISTRY.md`, `GREENHOUSE_COMMERCIAL_COST_ATTRIBUTION_V1.md`, `GREENHOUSE_PILOT_ENGAGEMENT_ARCHITECTURE_V1.md`, `project_context.md` y `changelog.md`.
+
 # Sesion 2026-05-07 — CI fix commercial-cost-worker deploy verde
 
 - **Incidente:** workflow `Commercial Cost Worker Deploy` fallaba en `develop` antes de deploy porque Cloud Build usaba Corepack sin version pin y descargaba `pnpm@11.0.8`; `pnpm install --frozen-lockfile` rechazaba el lockfile por mismatch de overrides.

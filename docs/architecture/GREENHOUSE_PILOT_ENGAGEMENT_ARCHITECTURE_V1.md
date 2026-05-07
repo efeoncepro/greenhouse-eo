@@ -3,7 +3,7 @@
 > **Tipo de documento:** Spec de arquitectura canónica
 > **Versión:** 1.2
 > **Creado:** 2026-05-05 por Claude (Opus 4.7)
-> **Última actualización:** 2026-05-07 por Codex — Delta v1.3 TASK-806 aplicado: `service_id` propagado en cost attribution v2 + `gtm_investment_pnl` real
+> **Última actualización:** 2026-05-07 por Codex — Delta v1.8 TASK-815 aplicado: primitive explícita `expense -> service` para direct-client expenses
 > **Estado:** Implementación por slices EPIC-014
 > **Owner:** Comercial / Agency
 > **Brand UI**: "Sample Sprint" (paraguas comercial). Schema interno usa `engagement_*` genérico — el rebranding marketing no requiere migrations.
@@ -15,7 +15,7 @@ TASK-801 (Slice 1 / Capa 1 + 1b) cerrada 2026-05-06 vía migration `202605062007
 
 1. **`services.service_id` es `TEXT`, no `UUID`.** §3.2 Capa 1b declaraba el FK como `UUID REFERENCES services(service_id)`. Realidad: el PK de `services` es `text` (creado con la convención `svc-<uuid>` como string), y `client_team_assignments.assignment_id` también es `text`. **Corrección aplicada**: `service_id TEXT REFERENCES greenhouse_core.services(service_id) ON DELETE SET NULL`. Las futuras tablas de §3.2 (Capa 2 `engagement_commercial_terms`, Capa 3 `engagement_phases`/`engagement_outcomes`/`engagement_lineage`, etc.) que referencian `services.service_id` deben usar `TEXT` también — actualizar specs cuando se implementen TASK-802 onwards.
 
-2. **`commercial_cost_attribution_v2` es VIEW, no TABLE.** §3.2 Capa 6.2 (cost intelligence) declaraba `ALTER TABLE commercial_cost_attribution_v2 ADD COLUMN attribution_intent`. Realidad: v2 es VIEW canónica creada en TASK-708 y refinada en TASK-709b (UNION ALL de 3 CTEs). **Corrección aplicada:** TASK-801 agregó la columna como literal operacional; TASK-806 reemplazó esa semántica por derivación real para rows service-linked. La VIEW ahora propaga `service_id` desde `client_team_assignments` y solo emite `pilot/trial/poc/discovery` cuando el service está aprobado, activo, no archivado legacy y no unmapped. Direct-client expenses permanecen `operational` hasta que exista ancla canónica de servicio.
+2. **`commercial_cost_attribution_v2` es VIEW, no TABLE.** §3.2 Capa 6.2 (cost intelligence) declaraba `ALTER TABLE commercial_cost_attribution_v2 ADD COLUMN attribution_intent`. Realidad: v2 es VIEW canónica creada en TASK-708 y refinada en TASK-709b (UNION ALL de 3 CTEs). **Corrección aplicada:** TASK-801 agregó la columna como literal operacional; TASK-806 reemplazó esa semántica por derivación real para rows service-linked. La VIEW ahora propaga `service_id` desde `client_team_assignments` y solo emite `pilot/trial/poc/discovery` cuando el service está aprobado, activo, no archivado legacy y no unmapped. TASK-815 agrega la ancla canónica para direct-client expenses mediante allocations aprobadas; sin esa fila explícita siguen `operational`.
 
 **Estado post-implementación verificado**:
 
@@ -71,6 +71,17 @@ TASK-805 (Capa 6 progress snapshots) quedó implementada vía migration `2026050
 6. **Access model:** `commercial.engagement.record_progress` ya existía en catálogo/runtime y queda operator-friendly para `routeGroup=commercial` / admin; approve sigue admin-only. No se agregan `routeGroups`, `views` ni startup policy.
 7. **Reliability:** `src/lib/reliability/queries/engagement-stale-progress.ts` agrega `commercial.engagement.stale_progress` como signal `drift`/`warning` si un engagement activo non-regular no tiene snapshot reciente (>10 días). Se inyecta bajo `moduleKey='commercial'`; TASK-807 conserva el subsystem `Commercial Health` completo.
 8. **Sin API/UI/outbox en este slice:** TASK-809 toma la surface real y TASK-808 toma audit/outbox.
+
+## Delta v1.8 (2026-05-07) — TASK-815 implementada
+
+TASK-815 cierra el follow-up explícito de TASK-806 para gastos directos de cliente sin `service_id`:
+
+1. **Primitive nueva:** `greenhouse_finance.expense_service_allocations` modela una asignación aprobada `expense_id -> service_id` con `allocated_amount_clp`, `allocation_source`, `evidence_json` y state machine `draft | approved | rejected`.
+2. **No heurística:** `commercial_cost_attribution_v2` solo emite `expense_direct_service` cuando existe allocation aprobada; no infiere service desde cliente, nombre, línea de servicio ni scope.
+3. **Residual seguro:** el monto aprobado sale como `expense_direct_service`; el remanente del mismo expense conserva `expense_direct_client` y `attribution_intent='operational'`.
+4. **Guardrails DB:** la trigger acepta solo expenses directos de cliente (`cost_is_direct=TRUE`, `allocated_client_id IS NOT NULL`), no anulados, dentro del cap del expense, y services activos/no archived/no unmapped.
+5. **Service P&L:** `src/lib/service-attribution/materialize.ts` consume allocations aprobadas como direct cost high-confidence (`approved_expense_service_allocation`) y descuenta ese monto del residual para evitar doble conteo.
+6. **Sin access/UI en esta slice:** no se agregan `routeGroups`, `views`, `entitlements` ni startup policy. TASK-809 debe montar la surface aprobada para crear/aprobar allocations; TASK-807 puede agregar health signals sobre expenses pendientes de allocation.
 
 ## Delta v1.2 (2026-05-05) — pre-flight check + naming "Sample Sprint"
 
@@ -579,6 +590,7 @@ COMMENT ON VIEW greenhouse_serving.gtm_investment_pnl IS
 
 > **Delta v1.1**: VIEW corregida para leer de `greenhouse_serving.commercial_cost_attribution_v2` (canónica post TASK-708/709). Patrón explícitamente heredado de TASK-409 (extender `client_economics` con backfill desde `commercial_cost_attribution`) para reducir surface novel y reusar primitiva canonizada.
 > **Delta v1.3 (TASK-806)**: runtime real usa `amount_clp` + `cost_dimension`, no columnas `allocated_labor_clp/direct_overhead/shared_overhead` en v2. La service dimension se propaga desde `client_team_assignments.service_id`; no se reclasifican direct-client expenses sin ancla de servicio. La ventana de términos usa `effective_to > period_start`, alineada al helper canónico `getActiveCommercialTerms`.
+> **Delta v1.8 (TASK-815)**: la ancla explícita para direct-client expenses es `greenhouse_finance.expense_service_allocations`. `commercial_cost_attribution_v2` expone `expense_direct_service` para allocations aprobadas y mantiene el residual como `expense_direct_client`.
 
 El P&L gerencial **resta** `gtm_investment_pnl` del cliente y **suma** a línea separada "GTM Investment". El cliente no aparece como unprofitable; el piloto aparece como inversión deliberada.
 

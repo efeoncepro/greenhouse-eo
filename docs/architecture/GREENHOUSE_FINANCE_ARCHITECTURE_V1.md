@@ -2,7 +2,18 @@
 
 > **Version:** 1.0
 > **Created:** 2026-03-30
-> **Last updated:** 2026-05-05 (TASK-753 Payment Profiles Self-Service + inline drain)
+> **Last updated:** 2026-05-07 (TASK-815 Direct Service Expense Allocation Primitive)
+
+## Delta 2026-05-07 — TASK-815 Direct Service Expense Allocation Primitive
+
+Finance agrega una primitive gerencial explícita para asociar gastos directos de cliente a services sin mutar el documento fiscal ni inferir por heurística:
+
+- Tabla: `greenhouse_finance.expense_service_allocations`.
+- Scope V1: solo `expenses.cost_is_direct=TRUE` con `allocated_client_id` y `is_annulled=FALSE`.
+- Estado: `draft | approved | rejected`; solo `approved` afecta serving.
+- Guardrails DB: service activo, no `legacy_seed_archived`, no `hubspot_sync_status='unmapped'`, cliente consistente y suma no mayor al monto efectivo/total del expense.
+- Consumers: `greenhouse_serving.commercial_cost_attribution_v2` expone lane `expense_direct_service`; `src/lib/service-attribution/materialize.ts` la consume como direct cost high-confidence.
+- Boundary: no cambia pagos, payment obligations, cash-out, impuestos, IVA, settlement ni economic_category. Es management accounting / attribution, no contabilidad legal.
 
 ## Delta 2026-05-05 — TASK-753 Payment Profiles Self-Service (regime-aware + inline drain)
 
