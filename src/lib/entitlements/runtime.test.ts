@@ -109,7 +109,25 @@ describe('getTenantEntitlements', () => {
     expect(can(entitlements, 'commercial.workspace', 'launch', 'tenant')).toBe(true)
     expect(can(entitlements, 'commercial.quotation', 'create', 'tenant')).toBe(true)
     expect(can(entitlements, 'commercial.engagement.declare', 'create', 'tenant')).toBe(true)
+    expect(can(entitlements, 'commercial.engagement.approve', 'approve', 'tenant')).toBe(false)
     expect(can(entitlements, 'finance.status', 'read', 'tenant')).toBe(false)
+  })
+
+  it('keeps engagement approval gated to efeonce admins', () => {
+    const accountLeadEntitlements = getTenantEntitlements(buildSubject({
+      roleCodes: [ROLE_CODES.EFEONCE_ACCOUNT],
+      primaryRoleCode: ROLE_CODES.EFEONCE_ACCOUNT,
+      routeGroups: ['commercial']
+    }))
+
+    const adminEntitlements = getTenantEntitlements(buildSubject({
+      roleCodes: [ROLE_CODES.EFEONCE_ADMIN],
+      primaryRoleCode: ROLE_CODES.EFEONCE_ADMIN,
+      routeGroups: ['admin', 'commercial']
+    }))
+
+    expect(can(accountLeadEntitlements, 'commercial.engagement.approve', 'approve', 'tenant')).toBe(false)
+    expect(can(adminEntitlements, 'commercial.engagement.approve', 'approve', 'tenant')).toBe(true)
   })
 
   it('keeps pure collaborators in my workspace', () => {

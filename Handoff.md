@@ -1,3 +1,14 @@
+# Sesion 2026-05-07 — TASK-804 cerrada en develop (Engagement Approvals + Capacity Warning)
+
+- **Branch:** `develop` por instruccion explicita del usuario; no se creo branch task.
+- **Entrega:** migration `20260507145320864_task-804-engagement-approvals-capacity-warning.sql` aplicada en dev crea `greenhouse_commercial.engagement_approvals` con state machine `pending | approved | rejected | withdrawn`, fila unica por service, checks de shape por estado, actor evidence y `capacity_warning_json`.
+- **Helpers:** nuevos modulos `src/lib/commercial/sample-sprints/{capacity-checker,approvals}.ts`. `capacity-checker` calcula capacidad por periodo desde `client_team_assignments`, excluye asignaciones internas Efeonce y tolera `service_id` nullable. `approvals` expone `requestApproval`, `approveEngagement`, `rejectEngagement`, `withdrawApproval` y `getApprovalForService` con guard TASK-813 + non-regular.
+- **State machine:** `requestApproval` marca non-regular services como `status='pending_approval'`; `approveEngagement` calcula snapshot, exige `capacity_override_reason >= 10` si algun miembro queda sobre 100% FTE y marca el service `active`.
+- **Access model:** sin `routeGroups`, `views` ni startup policy nuevos. `commercial.engagement.approve` ya existia en catalog/runtime y queda EFEONCE_ADMIN-only en V1; se agregaron tests explicitos de gating.
+- **No se toco:** UI real, API routes, outbox events, audit log ni reliability signals. TASK-809 conserva UI y TASK-808 conserva audit/outbox.
+- **Validacion:** `pnpm pg:doctor` OK; `pnpm vitest run src/lib/commercial/sample-sprints` OK; `pnpm vitest run src/lib/commercial/sample-sprints/approvals.test.ts src/lib/entitlements/runtime.test.ts` OK; `pnpm pg:connect:migrate` OK + types regenerados; `pnpm exec tsc --noEmit --pretty false` OK; `pnpm lint` OK; `pnpm build` OK. `pnpm test` completo tuvo un timeout aislado heredado en `src/views/greenhouse/hr-core/HrHierarchyView.test.tsx`; el archivo se re-ejecuto aislado y paso (4/4).
+- **Docs sincronizadas:** task movida a `docs/tasks/complete/`, `docs/tasks/README.md`, `docs/tasks/TASK_ID_REGISTRY.md`, `project_context.md`, `changelog.md` y `GREENHOUSE_PILOT_ENGAGEMENT_ARCHITECTURE_V1.md` actualizados.
+
 # Sesion 2026-05-07 — TASK-803 cerrada en develop (Engagement Phases + Outcomes + Lineage)
 
 - **Branch:** `develop` por instruccion explicita del usuario; no se creo branch task.

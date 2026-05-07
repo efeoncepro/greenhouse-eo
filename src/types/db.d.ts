@@ -483,6 +483,41 @@ export interface GreenhouseCommercialEmploymentTypes {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseCommercialEngagementApprovals {
+  approval_id: Generated<string>;
+  approved_at: Timestamp | null;
+  approved_by: string | null;
+  /**
+   * Required by application helper when any proposed member exceeds 100% FTE after the approval.
+   */
+  capacity_override_reason: string | null;
+  /**
+   * Deterministic capacity warning snapshot evaluated at approval time; persisted even when no override is needed.
+   */
+  capacity_warning_json: Json | null;
+  created_at: Generated<Timestamp>;
+  decision_deadline: Timestamp;
+  expected_duration_days: number;
+  expected_internal_cost_clp: Numeric;
+  rejected_at: Timestamp | null;
+  rejected_by: string | null;
+  rejection_reason: string | null;
+  requested_by: string | null;
+  /**
+   * FK to greenhouse_core.services(service_id). TEXT by TASK-801 contract, not UUID.
+   */
+  service_id: string;
+  status: Generated<string>;
+  /**
+   * Approval-time success criteria snapshot. Object shape is validated by application helpers.
+   */
+  success_criteria_json: Json;
+  updated_at: Generated<Timestamp>;
+  withdrawal_reason: string | null;
+  withdrawn_at: Timestamp | null;
+  withdrawn_by: string | null;
+}
+
 export interface GreenhouseCommercialEngagementCommercialTerms {
   declared_at: Generated<Timestamp>;
   /**
@@ -8513,6 +8548,7 @@ export interface DB {
   "greenhouse_commercial.deals": GreenhouseCommercialDeals;
   "greenhouse_commercial.employment_type_aliases": GreenhouseCommercialEmploymentTypeAliases;
   "greenhouse_commercial.employment_types": GreenhouseCommercialEmploymentTypes;
+  "greenhouse_commercial.engagement_approvals": GreenhouseCommercialEngagementApprovals;
   "greenhouse_commercial.engagement_commercial_terms": GreenhouseCommercialEngagementCommercialTerms;
   "greenhouse_commercial.engagement_lineage": GreenhouseCommercialEngagementLineage;
   "greenhouse_commercial.engagement_outcomes": GreenhouseCommercialEngagementOutcomes;

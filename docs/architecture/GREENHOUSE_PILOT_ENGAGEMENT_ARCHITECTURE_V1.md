@@ -4,7 +4,7 @@
 > **Versión:** 1.2
 > **Creado:** 2026-05-05 por Claude (Opus 4.7)
 > **Última actualización:** 2026-05-05 por Claude (Opus 4.7) — Delta v1.2 aplicado tras pre-flight check + naming sweep "Sample Sprint"
-> **Estado:** Propuesta — no implementada
+> **Estado:** Implementación por slices EPIC-014
 > **Owner:** Comercial / Agency
 > **Brand UI**: "Sample Sprint" (paraguas comercial). Schema interno usa `engagement_*` genérico — el rebranding marketing no requiere migrations.
 > **Domain boundary:** Commercial (no Finance — ver `GREENHOUSE_COMMERCIAL_FINANCE_DOMAIN_BOUNDARY_V1.md`)
@@ -46,6 +46,18 @@ TASK-803 (Capas 3, 4 y 5) quedó implementada vía migration `20260507135645984_
 4. **Runtime real preservado:** todas las FKs a `services`, `assets`, `quotations` y `client_users` usan `TEXT`, no `UUID`.
 5. **TASK-813 hard guard reusable:** `src/lib/commercial/sample-sprints/eligibility.ts` centraliza la exclusión de services inactivos, `legacy_seed_archived` y `hubspot_sync_status='unmapped'`. Lo consumen `commercial-terms`, `phases`, `outcomes` y `lineage`.
 6. **Sin access/UI en este slice:** no se agregan `routeGroups`, `views`, `entitlements`, startup policy, APIs, UI, reliability signals ni outbox events. TASK-808 conserva ownership del audit log/outbox de engagement.
+
+## Delta v1.6 (2026-05-07) — TASK-804 implementada
+
+TASK-804 (Capa 7 approval + capacity warning soft) quedó implementada vía migration `20260507145320864_task-804-engagement-approvals-capacity-warning.sql`:
+
+1. **`engagement_approvals`** modela el state machine `pending | approved | rejected | withdrawn` con fila única por `service_id`, checks de shape por estado, actor evidence (`approved_by`, `rejected_by`, `withdrawn_by`) y `updated_at` automático.
+2. **Runtime real preservado:** `service_id` usa `TEXT` hacia `greenhouse_core.services(service_id)`. Actor FKs apuntan a `greenhouse_core.client_users(user_id)` y son nullable en DB para soportar `ON DELETE SET NULL`; los helpers siguen exigiendo actor input.
+3. **Capacity warning soft:** `src/lib/commercial/sample-sprints/capacity-checker.ts` calcula capacidad por miembro y periodo desde `client_team_assignments`, excluye asignaciones internas Efeonce y retorna `totalFte`, `allocatedFte`, `availableFte` y `conflictingAssignments`.
+4. **Approval helpers:** `approvals.ts` expone `requestApproval`, `approveEngagement`, `rejectEngagement`, `withdrawApproval` y `getApprovalForService`. `approveEngagement` persiste `capacity_warning_json` siempre; si algún miembro queda sobre 100% FTE exige `capacity_override_reason >= 10`.
+5. **Estado de `services`:** `requestApproval` marca non-regular services como `status='pending_approval'`; `approveEngagement` los vuelve `active`. El runtime no tiene CHECK sobre `services.status`, así que este valor es compatible sin DDL adicional.
+6. **Access model:** `commercial.engagement.approve` ya existía en catálogo/runtime y queda EFEONCE_ADMIN-only en V1. TASK-804 agrega test explícito de gating; no crea `routeGroups`, `views` ni startup policy.
+7. **Sin API/UI/outbox en este slice:** TASK-809 toma la surface real y TASK-808 toma audit/outbox; este slice entrega primitives y helpers.
 
 ## Delta v1.2 (2026-05-05) — pre-flight check + naming "Sample Sprint"
 

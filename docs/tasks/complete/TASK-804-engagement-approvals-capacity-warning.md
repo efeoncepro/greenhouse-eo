@@ -2,16 +2,16 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `EPIC-014`
-- Status real: `Diseño aprobado`
+- Status real: `Cerrada 2026-05-07 en develop`
 - Domain: `commercial`
 - Blocked by: `TASK-801, TASK-803`
-- Branch: `task/TASK-804-engagement-approvals-capacity-warning`
+- Branch: `develop` (por instrucción explícita del usuario; no crear branch task)
 
 ## Summary
 
@@ -99,3 +99,33 @@ Tests:
 - Spec: §3.2 Capa 7 + §5.1 + §5.2
 - Patrón: TASK-742 (auth resilience 7-capas)
 - Epic: `docs/epics/to-do/EPIC-014-sample-sprints-engagement-platform.md`
+
+## Implementation Notes
+
+- Migration aplicada: `migrations/20260507145320864_task-804-engagement-approvals-capacity-warning.sql`.
+- Tabla creada: `greenhouse_commercial.engagement_approvals`.
+- Runtime drift resuelto:
+  - `service_id` implementado como `TEXT`, no `UUID`.
+  - actor FKs quedan nullable en DB por `ON DELETE SET NULL`; helpers exigen actor input.
+  - `commercial.engagement.approve` ya existía en catálogo/runtime; se reutilizó y se agregaron tests de gating.
+  - `services.status` no tiene CHECK; `pending_approval` es representable sin DDL adicional.
+- Helpers creados:
+  - `src/lib/commercial/sample-sprints/capacity-checker.ts`
+  - `src/lib/commercial/sample-sprints/approvals.ts`
+- Approval flow:
+  - `requestApproval` valida service elegible TASK-813 + non-regular y marca `services.status='pending_approval'`.
+  - `approveEngagement` calcula capacity snapshot, exige override si capacity >100% y marca el service `active`.
+  - `rejectEngagement` y `withdrawApproval` preservan actor evidence y reason cuando aplica.
+- Sin UI/API/outbox/reliability signals en este slice; TASK-809 y TASK-808 mantienen ownership.
+
+## Verification
+
+- `pnpm pg:doctor` — OK durante discovery.
+- `pnpm vitest run src/lib/commercial/sample-sprints` — OK.
+- `pnpm vitest run src/lib/commercial/sample-sprints/approvals.test.ts src/lib/entitlements/runtime.test.ts` — OK.
+- `pnpm pg:connect:migrate` — OK; types regenerados en `src/types/db.d.ts`.
+- `pnpm exec tsc --noEmit --pretty false` — OK.
+- `pnpm lint` — OK.
+- `pnpm build` — OK.
+- `pnpm test` — 600/601 files OK; timeout aislado heredado en `src/views/greenhouse/hr-core/HrHierarchyView.test.tsx`.
+- `pnpm vitest run src/views/greenhouse/hr-core/HrHierarchyView.test.tsx` — OK (4/4) tras el timeout del full run.
