@@ -206,8 +206,8 @@ const buildRuntimeSignals = (items: SampleSprintItem[]): Signal[] => {
       label: 'Decisiones vencidas',
       severity: 'error',
       count: overdueDecision,
-      runbook: 'Cerrar outcome o ajustar deadline con aprobación',
-      description: 'Engagements sin outcome después del deadline de decisión.'
+      runbook: 'Cerrar resultado o ajustar fecha de decisión con aprobación',
+      description: 'Engagements sin resultado después de la fecha de decisión.'
     },
     {
       code: 'commercial.engagement.pending_approval',
@@ -219,27 +219,27 @@ const buildRuntimeSignals = (items: SampleSprintItem[]): Signal[] => {
     },
     {
       code: 'commercial.engagement.stale_progress',
-      label: 'Progreso stale',
+      label: 'Progreso sin actualización',
       severity: 'warning',
       count: staleProgress,
-      runbook: 'Registrar snapshot semanal con contexto operacional',
-      description: 'Engagement activo sin snapshot reciente.'
+      runbook: 'Registrar actualización semanal con contexto operacional',
+      description: 'Engagement activo sin actualización reciente.'
     },
     {
       code: 'commercial.engagement.unapproved_active',
-      label: 'Activos sin approval',
+      label: 'Activos sin aprobación',
       severity: 'error',
       count: unapprovedActive,
-      runbook: 'Volver a pending_approval o registrar aprobación retroactiva',
-      description: 'Servicios no regulares activos sin aprobación aprobada.'
+      runbook: 'Volver a aprobación pendiente o registrar aprobación retroactiva',
+      description: 'Servicios no regulares activos sin aprobación vigente.'
     },
     {
       code: 'commercial.engagement.conversion_rate_drop',
       label: 'Conversión bajo umbral',
       severity: 'warning',
       count: conversionRate < 0.35 ? 1 : 0,
-      runbook: 'Revisar outcomes trailing 6m y criterios de success',
-      description: 'Conversion rate trailing bajo el threshold configurado.'
+      runbook: 'Revisar resultados de los últimos 6 meses y criterios de éxito',
+      description: 'La conversión de los últimos 6 meses está bajo el umbral configurado.'
     }
   ]
 }

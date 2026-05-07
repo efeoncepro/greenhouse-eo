@@ -202,7 +202,7 @@ export const GH_AGENCY = {
       decisionsTitle: 'Decisiones próximas',
       decisionsSubheader: 'Ordenadas por impacto y fecha.',
       noDecisionsTitle: 'Sin decisiones pendientes',
-      noDecisionsDescription: 'Cuando un Sample Sprint tenga deadline de decisión, aparecerá aquí ordenado por urgencia.',
+      noDecisionsDescription: 'Cuando un Sample Sprint tenga fecha de decisión, aparecerá aquí ordenado por urgencia.',
       filterEmptyTitle: 'Estado vacío diseñado',
       filterEmptyDescription: 'Cambia el tipo o estado para volver a ver engagements operativos.',
       decisionLabel: 'Decisión',
@@ -215,10 +215,10 @@ export const GH_AGENCY = {
       selectDescription: 'El resumen abre cada superficie desde un Sample Sprint real.'
     },
     health: {
-      activeSignalsDescription: 'Señales no steady. El rollup usa severidad máxima: cualquier error vuelve el subsystem rojo.',
-      activeSignalsRuntimeDescription: 'Señales abiertas que requieren revisión antes de considerar el módulo en steady state.',
-      signalsTitle: 'Reliability signals',
-      steadyLabel: 'steady'
+      activeSignalsDescription: 'Señales abiertas. El resumen usa la severidad máxima para orientar la revisión operativa.',
+      activeSignalsRuntimeDescription: 'Señales abiertas que requieren revisión antes de considerar el módulo estable.',
+      signalsTitle: 'Señales operativas',
+      steadyLabel: 'Estable'
     },
     aria: {
       tabs: 'Superficies de Sample Sprints',

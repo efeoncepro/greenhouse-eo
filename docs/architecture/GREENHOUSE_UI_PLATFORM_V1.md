@@ -94,6 +94,24 @@ Guardrail runtime/mockup:
 - Si una experiencia aprobada debe promocionarse a runtime, extraer primero un shell compartido fuera de `/mockup/`; el mockup importa ese shell con datos/copy de mockup y el runtime lo importa con datos/copy productivos.
 - ESLint bloquea regresiones con `greenhouse/no-runtime-mockup-import`.
 
+## Delta 2026-05-07 — Operational UI primitives para dashboards y health surfaces
+
+Las surfaces operativas que combinan KPIs, paneles de salud, señales, riesgos o runbooks deben reutilizar primitives compartidas antes de crear shells locales con `Box` + bordes + chips. La familia canónica vive en `src/components/greenhouse/primitives/`:
+
+| Primitive | Uso |
+| --- | --- |
+| `OperationalPanel` | Secciones operativas con `Card + CardHeader + CardContent`, icon slot, acción y padding/radius del theme. |
+| `MetricSummaryCard` | KPIs operativos con valor honesto, fallback textual para datos nulos, icon slot y badge de estado opcional. |
+| `OperationalStatusBadge` | Badge pequeño para estados reales (`Estable`, `Sin muestra`, `Requiere revisión`); no reemplaza contenedores. |
+| `OperationalSignalList` | Señales/riesgos/runbooks como lista o grid sobrio con padding interno suficiente, código técnico opcional y acción recomendada. |
+
+Reglas:
+
+- No crear mini-cards redondeadas dentro de panels cuando una lista operacional comunica mejor el estado.
+- Full pill (`9999`) queda reservado para chips pequeños; contenedores grandes usan `theme.shape.customBorderRadius.*`.
+- Copy visible de señales debe venir de `src/lib/copy/*` o del reader/adapter canonizado del dominio; no mezclar `steady/stale/outcome/threshold` visibles en runtime es-CL.
+- Estados nulos no se renderizan como `0`, `0%` o `$0` salvo que el cero sea dato real confirmado.
+
 ## Delta 2026-05-05 — Quote Builder primitives extraction Sprint 3 (TASK-498)
 
 El Quote Builder publicó 4 capacidades nuevas al registry canónico de primitives. Hoy las consume sólo el quote builder; mañana las consumen invoice builder, PO builder, contract builder, finiquito generator y cualquier entity-form que necesite el mismo chasis sticky-bottom + section accordion + card-header-with-badge + chip-strip overflow.

@@ -1,3 +1,12 @@
+# Sesion 2026-05-07 — Operational UI primitives para Sample Sprints
+
+- **Trigger:** el usuario pidio resolver de forma robusta/escalable el look forzado de `/agency/sample-sprints`: rectangulos redondeados excesivos, texto pegado a bordes y copy hibrido en señales.
+- **Skills aplicadas:** `greenhouse-ui-orchestrator`, `greenhouse-vuexy-ui-expert`, `greenhouse-ui-review`, `greenhouse-ux-content-accessibility`, `ux-content-accessibility`, `modern-ui-architect`, `ui-product-design-orchestrator` y overlay Greenhouse de modern-ui.
+- **Entrega UI:** nueva familia reusable en `src/components/greenhouse/primitives/`: `OperationalPanel`, `MetricSummaryCard`, `OperationalStatusBadge`, `OperationalSignalList`. Las primitives usan Vuexy/MUI Card semantics, padding/radius tokenizados, badges pequeños para estado real y listas de señales con más aire interno.
+- **Sample Sprints:** `CommandCenter` reemplaza KPI cards locales por `MetricSummaryCard`; `CommercialHealthSurface` reemplaza mini-cards redondeadas por `OperationalPanel` + `OperationalSignalList`. Copy runtime de señales queda en español (`Señales operativas`, `Estable`, `Progreso sin actualización`, etc.) y el workspace ya no alimenta la UI con `steady/stale/outcome/threshold` visibles.
+- **Validacion:** `pnpm exec eslint ...SampleSprintsExperienceView.tsx ...SampleSprintsWorkspace.tsx ...Operational*.tsx ...MetricSummaryCard.tsx --max-warnings=0` OK; `pnpm test src/views/greenhouse/agency/sample-sprints/SampleSprintsExperienceView.test.tsx` OK (3 tests); `pnpm exec tsc --noEmit --pretty false` OK; `pnpm design:lint` OK; `pnpm lint` OK; `pnpm build` OK.
+- **Pendiente:** commit/push a `develop` y smoke visual en staging.
+
 # Sesion 2026-05-07 — Sample Sprints runtime copy guardrail
 
 - **Trigger:** el usuario detecto que `/agency/sample-sprints` en staging filtraba copy de mockup/debug y despues pidio resolver tambien la causa sistemica: un agente habia hardcodeado copy ignorando `src/lib/copy/`.

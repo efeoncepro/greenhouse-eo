@@ -38,11 +38,17 @@ import CustomAvatar from '@core/components/mui/Avatar'
 import CustomChip from '@core/components/mui/Chip'
 import CustomTabList from '@core/components/mui/TabList'
 import CustomTextField from '@core/components/mui/TextField'
-import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 
 import EmptyState from '@/components/greenhouse/EmptyState'
 import GreenhouseFileUploader, { type UploadedFileValue } from '@/components/greenhouse/GreenhouseFileUploader'
-import { CardHeaderWithBadge } from '@/components/greenhouse/primitives'
+import {
+  CardHeaderWithBadge,
+  MetricSummaryCard,
+  OperationalPanel,
+  OperationalSignalList,
+  OperationalStatusBadge,
+  type OperationalSignalItem
+} from '@/components/greenhouse/primitives'
 import useReducedMotion from '@/hooks/useReducedMotion'
 import { GH_AGENCY } from '@/lib/copy/agency'
 import { getMicrocopy } from '@/lib/copy'
@@ -248,12 +254,12 @@ const reliabilitySignals: Signal[] = [
     label: 'Decisiones vencidas',
     severity: 'error',
     count: 1,
-    runbook: 'Cerrar outcome o ajustar deadline con aprobación',
-    description: 'Engagements en reporting cerrados hace más de 14 días sin outcome.'
+    runbook: 'Cerrar resultado o ajustar fecha de decisión con aprobación',
+    description: 'Engagements en reporte cerrados hace más de 14 días sin resultado.'
   },
   {
     code: 'commercial.engagement.budget_overrun',
-    label: 'Budget overrun',
+    label: 'Presupuesto excedido',
     severity: 'warning',
     count: 1,
     runbook: 'Revisar costo real vs presupuesto aprobado',
@@ -261,35 +267,35 @@ const reliabilitySignals: Signal[] = [
   },
   {
     code: 'commercial.engagement.zombie',
-    label: 'Zombies',
+    label: 'Operación extendida',
     severity: 'error',
     count: 0,
-    runbook: 'Registrar outcome antes de extender operación',
+    runbook: 'Registrar resultado antes de extender operación',
     description: 'Sample Sprints activos por más de 90 días sin transición.'
   },
   {
     code: 'commercial.engagement.unapproved_active',
-    label: 'Activos sin approval',
+    label: 'Activos sin aprobación',
     severity: 'error',
     count: 0,
-    runbook: 'Volver a pending_approval o registrar aprobación retroactiva',
-    description: 'Servicios no regulares activos sin approval aprobada.'
+    runbook: 'Volver a aprobación pendiente o registrar aprobación retroactiva',
+    description: 'Servicios no regulares activos sin aprobación vigente.'
   },
   {
     code: 'commercial.engagement.conversion_rate_drop',
     label: 'Conversión bajo umbral',
     severity: 'warning',
     count: 1,
-    runbook: 'Revisar outcomes trailing 6m y criterios de success',
-    description: 'Conversion rate trailing bajo el threshold configurado.'
+    runbook: 'Revisar resultados de los últimos 6 meses y criterios de éxito',
+    description: 'La conversión de los últimos 6 meses está bajo el umbral configurado.'
   },
   {
     code: 'commercial.engagement.stale_progress',
-    label: 'Progreso stale',
+    label: 'Progreso sin actualización',
     severity: 'warning',
     count: 1,
-    runbook: 'Registrar snapshot semanal con contexto operacional',
-    description: 'Engagement activo sin snapshot hace más de 10 días.'
+    runbook: 'Registrar actualización semanal con contexto operacional',
+    description: 'Engagement activo sin actualización hace más de 10 días.'
   }
 ]
 
@@ -595,47 +601,47 @@ const CommandCenter = ({
   return (
     <Grid container spacing={6}>
       <Grid size={{ xs: 12, md: 6, xl: 3 }}>
-        <HorizontalWithSubtitle
+        <MetricSummaryCard
           title={sampleCopy.metrics.totalTitle}
-          stats={hasSample ? String(metrics.total) : sampleCopy.metrics.totalEmpty}
-          avatarIcon='tabler-rocket'
-          avatarColor='primary'
+          value={hasSample ? String(metrics.total) : sampleCopy.metrics.totalEmpty}
+          icon='tabler-rocket'
+          iconColor='primary'
           subtitle={variantCopy.listSubtitle}
-          trend='positive'
-          trendNumber={sampleCopy.metrics.totalTrend(metrics.total)}
+          statusLabel={sampleCopy.metrics.totalTrend(metrics.total)}
+          statusTone={hasSample ? 'primary' : 'success'}
         />
       </Grid>
       <Grid size={{ xs: 12, md: 6, xl: 3 }}>
-        <HorizontalWithSubtitle
+        <MetricSummaryCard
           title={sampleCopy.metrics.conversionTitle}
-          stats={hasConversionSample ? `${metrics.conversionRate}%` : sampleCopy.metrics.conversionEmpty}
-          avatarIcon='tabler-chart-arcs'
-          avatarColor='success'
+          value={hasConversionSample ? `${metrics.conversionRate}%` : sampleCopy.metrics.conversionEmpty}
+          icon='tabler-chart-arcs'
+          iconColor='success'
           subtitle={sampleCopy.metrics.conversionSubtitle}
           statusLabel={hasConversionSample ? sampleCopy.metrics.conversionWithSample : sampleCopy.metrics.conversionWithoutSample}
-          statusColor={metrics.conversionRate > 0 ? 'success' : 'secondary'}
+          statusTone={metrics.conversionRate > 0 ? 'success' : 'secondary'}
           statusIcon={metrics.conversionRate > 0 ? 'tabler-circle-check' : 'tabler-chart-bar-off'}
         />
       </Grid>
       <Grid size={{ xs: 12, md: 6, xl: 3 }}>
-        <HorizontalWithSubtitle
+        <MetricSummaryCard
           title={variantCopy.investmentLabel}
-          stats={variant === 'runtime' && !hasSample ? sampleCopy.metrics.conversionEmpty : formatCurrency(metrics.investment)}
-          avatarIcon='tabler-cash'
-          avatarColor='warning'
+          value={variant === 'runtime' && !hasSample ? sampleCopy.metrics.conversionEmpty : formatCurrency(metrics.investment)}
+          icon='tabler-cash'
+          iconColor='warning'
           subtitle={variantCopy.investmentSubtitle}
-          titleTooltip={variantCopy.investmentTooltip}
+          tooltip={variantCopy.investmentTooltip}
         />
       </Grid>
       <Grid size={{ xs: 12, md: 6, xl: 3 }}>
-        <HorizontalWithSubtitle
+        <MetricSummaryCard
           title={sampleCopy.metrics.risksTitle}
-          stats={metrics.warningCount > 0 ? String(metrics.warningCount) : sampleCopy.metrics.risksEmpty}
-          avatarIcon='tabler-alert-triangle'
-          avatarColor='error'
+          value={metrics.warningCount > 0 ? String(metrics.warningCount) : sampleCopy.metrics.risksEmpty}
+          icon='tabler-alert-triangle'
+          iconColor='error'
           subtitle={sampleCopy.metrics.risksSubtitle}
           statusLabel={metrics.warningCount > 0 ? sampleCopy.metrics.risksReview : sampleCopy.metrics.risksSteady}
-          statusColor={metrics.warningCount > 0 ? 'warning' : 'success'}
+          statusTone={metrics.warningCount > 0 ? 'warning' : 'success'}
           statusIcon={metrics.warningCount > 0 ? 'tabler-bell-ringing' : 'tabler-circle-check'}
         />
       </Grid>
@@ -1803,22 +1809,29 @@ const CommercialHealthSurface = ({
   const healthRatio = signals.length > 0 ? Math.round(((signals.length - activeSignalCount) / signals.length) * 100) : 100
   const variantCopy = variant === 'runtime' ? sampleCopy.runtime : sampleCopy.mockup
 
+  const signalItems: OperationalSignalItem[] = signals.map(signal => ({
+    id: signal.code,
+    title: signal.label,
+    description: signal.description,
+    code: signal.code,
+    action: signal.runbook,
+    statusLabel: signal.count > 0 ? String(signal.count) : sampleCopy.health.steadyLabel,
+    statusTone: signal.count > 0 ? signal.severity : 'success',
+    statusIcon: signal.count > 0 ? 'tabler-alert-circle' : 'tabler-circle-check'
+  }))
+
   return (
   <Grid container spacing={6}>
     <Grid size={{ xs: 12, lg: 4 }}>
-      <Card sx={{ height: '100%' }}>
-        <CardHeader
+      <OperationalPanel
+        fullHeight
+        divided={false}
           title={variantCopy.healthTitle}
           subheader={variantCopy.healthSubtitle}
-          avatar={
-            <CustomAvatar skin='light' color='primary' variant='rounded'>
-              <i className='tabler-activity-heartbeat' />
-            </CustomAvatar>
-          }
-        />
-        <CardContent>
+        icon='tabler-activity-heartbeat'
+      >
           <Stack spacing={4}>
-            <Typography variant='h2' sx={{ fontVariantNumeric: 'tabular-nums' }}>
+            <Typography variant='kpiValue' sx={{ fontVariantNumeric: 'tabular-nums' }}>
               {activeSignalCount}
             </Typography>
             <Typography variant='body2' color='text.secondary'>
@@ -1831,45 +1844,17 @@ const CommercialHealthSurface = ({
               </Button>
             ) : null}
           </Stack>
-        </CardContent>
-      </Card>
+      </OperationalPanel>
     </Grid>
     <Grid size={{ xs: 12, lg: 8 }}>
-      <Card>
-        <CardHeaderWithBadge title={sampleCopy.health.signalsTitle} badgeValue={signals.length} avatarIcon='tabler-radar' />
-        <Divider />
-        <CardContent>
-          <Grid container spacing={3}>
-            {signals.map(signal => (
-              <Grid key={signal.code} size={{ xs: 12, md: 6 }}>
-                <Box sx={{ p: 4, border: theme => `1px solid ${theme.palette.divider}`, borderRadius: theme => theme.shape.customBorderRadius.lg, height: '100%' }}>
-                  <Stack spacing={3}>
-                    <Stack direction='row' justifyContent='space-between' spacing={2}>
-                      <Stack direction='row' spacing={2} alignItems='center'>
-                        <SignalDot severity={signal.count > 0 ? signal.severity : 'success'} />
-                        <Typography variant='subtitle2'>{signal.label}</Typography>
-                      </Stack>
-                      <CustomChip
-                        round='true'
-                        size='small'
-                        color={signal.count > 0 ? signal.severity : 'success'}
-                        variant='tonal'
-                        label={signal.count > 0 ? String(signal.count) : sampleCopy.health.steadyLabel}
-                      />
-                    </Stack>
-                    <Typography variant='body2' color='text.secondary'>{signal.description}</Typography>
-                    <Typography variant='caption' color='text.secondary'>{signal.code}</Typography>
-                    <Divider />
-                    <Typography variant='body2' sx={{ fontWeight: 600 }}>
-                      {signal.runbook}
-                    </Typography>
-                  </Stack>
-                </Box>
-              </Grid>
-            ))}
-          </Grid>
-        </CardContent>
-      </Card>
+      <OperationalPanel
+        title={sampleCopy.health.signalsTitle}
+        icon='tabler-radar'
+        action={<OperationalStatusBadge label={String(signals.length)} tone='primary' ariaLabel={`${sampleCopy.health.signalsTitle}: ${signals.length}`} />}
+        divided={false}
+      >
+        <OperationalSignalList items={signalItems} />
+      </OperationalPanel>
     </Grid>
   </Grid>
   )

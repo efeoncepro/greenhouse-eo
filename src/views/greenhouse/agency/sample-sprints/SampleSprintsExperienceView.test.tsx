@@ -1,11 +1,14 @@
 // @vitest-environment jsdom
 
-import { cleanup, screen } from '@testing-library/react'
+import { cleanup, fireEvent, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithTheme } from '@/test/render'
 
 import SampleSprintsExperienceView from './SampleSprintsExperienceView'
+
+const pendingApprovalLabel = 'Aprobación pendiente'
+const staleProgressLabel = 'Progreso sin actualización'
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({
@@ -45,6 +48,43 @@ describe('SampleSprintsExperienceView copy governance', () => {
     expect(screen.queryByText('Commercial Health')).not.toBeInTheDocument()
     expect(screen.queryByText('0%')).not.toBeInTheDocument()
     expect(screen.queryByText('$0')).not.toBeInTheDocument()
+  })
+
+  it('renders operational health signals with Spanish product copy and system primitives', () => {
+    renderWithTheme(
+      <SampleSprintsExperienceView
+        variant='runtime'
+        sprints={[]}
+        signals={[
+          {
+            code: 'commercial.engagement.pending_approval',
+            label: pendingApprovalLabel,
+            severity: 'warning',
+            count: 1,
+            runbook: 'Revisar capacidad y aprobar o rechazar el Sprint',
+            description: 'Sample Sprints declarados que aún no pasan a operación.'
+          },
+          {
+            code: 'commercial.engagement.stale_progress',
+            label: staleProgressLabel,
+            severity: 'warning',
+            count: 0,
+            runbook: 'Registrar actualización semanal con contexto operacional',
+            description: 'Engagement activo sin actualización reciente.'
+          }
+        ]}
+        runtimeOptions={{ spaces: [], members: [], conversionTargets: [], quotations: [] }}
+      />
+    )
+
+    fireEvent.click(screen.getByRole('tab', { name: /Salud comercial/i }))
+
+    expect(screen.getByText('Señales operativas')).toBeInTheDocument()
+    expect(screen.getByText(staleProgressLabel)).toBeInTheDocument()
+    expect(screen.getByText('Estable')).toBeInTheDocument()
+    expect(screen.queryByText('Reliability signals')).not.toBeInTheDocument()
+    expect(screen.queryByText('steady')).not.toBeInTheDocument()
+    expect(screen.queryByText('Progreso stale')).not.toBeInTheDocument()
   })
 
   it('keeps mockup-specific copy only in mockup variant', () => {
