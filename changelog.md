@@ -8029,6 +8029,10 @@ Validations: tsc 0 errors, lint 0 errors, 427 files / 2225 tests pass / 5 skippe
 - Commercial Cost Attribution: `client_labor_cost_allocation`, `client_labor_cost_allocation_consolidated` y `commercial_cost_attribution_v2` ahora propagan `service_id`; `attribution_intent` se deriva solo para servicios non-regular aprobados y elegibles, dejando direct-client expenses como operacionales cuando no hay ancla canónica de servicio.
 - Sample Sprints: nuevo helper server-side `src/lib/commercial/sample-sprints/cost-reclassifier.ts` expone agregados de inversión GTM, ratio sobre revenue operacional y margen cliente excluyendo GTM para futuros dashboards.
 
+# 2026-05-07
+
+- Agency / Sample Sprints: la experiencia runtime vuelve al mockup aprobado como source of truth. Los CTAs `Declarar Sprint` y `Nuevo Sprint` ahora abren la tab `Declaración` dentro del command center sin navegar fuera del shell, y los deep links `/new`, `/approve`, `/progress` y `/outcome` reutilizan el mismo workspace con la tab correspondiente activa.
+
 ## 2026-04-21
 
 - Admin Center / Commercial: nueva surface `/admin/commercial/product-sync-conflicts` para vigilar drift del catálogo comercial contra HubSpot Products, con lista operativa, detalle por conflicto, diff Greenhouse vs HubSpot y acciones auditables (`adopt`, `archive`, `replay`, `accept remote`, `ignore`).

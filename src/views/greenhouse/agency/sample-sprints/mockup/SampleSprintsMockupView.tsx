@@ -333,6 +333,7 @@ type SampleSprintsMockupViewProps = {
   signals?: Signal[]
   variant?: SampleSprintsExperienceVariant
   initialSelectedSprintId?: string
+  initialActiveSurface?: string
   runtimeOptions?: RuntimeSampleSprintOptions | null
 }
 
@@ -341,11 +342,12 @@ const SampleSprintsMockupView = ({
   signals = reliabilitySignals,
   variant = 'mockup',
   initialSelectedSprintId,
+  initialActiveSurface = 'command',
   runtimeOptions = null
 }: SampleSprintsMockupViewProps = {}) => {
   const theme = useTheme()
   const reducedMotion = useReducedMotion()
-  const [activeSurface, setActiveSurface] = useState('command')
+  const [activeSurface, setActiveSurface] = useState(initialActiveSurface)
   const [selectedSprintId, setSelectedSprintId] = useState(initialSelectedSprintId ?? sprints[0]?.id ?? '')
   const [kindFilter, setKindFilter] = useState<'all' | SprintKind>('all')
   const [statusFilter, setStatusFilter] = useState<'all' | SprintStatus>('all')
@@ -408,15 +410,9 @@ const SampleSprintsMockupView = ({
                   </Typography>
                 </Box>
                 <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-                  {variant === 'runtime' ? (
-                    <Button component={Link} href='/agency/sample-sprints/new' variant='contained' startIcon={<i className='tabler-plus' />}>
-                      Declarar Sprint
-                    </Button>
-                  ) : (
-                    <Button variant='contained' startIcon={<i className='tabler-plus' />} onClick={() => setActiveSurface('declare')}>
-                      Declarar Sprint
-                    </Button>
-                  )}
+                  <Button variant='contained' startIcon={<i className='tabler-plus' />} onClick={() => setActiveSurface('declare')}>
+                    Declarar Sprint
+                  </Button>
                   <Button variant='tonal' color='secondary' startIcon={<i className='tabler-shield-check' />} onClick={() => setActiveSurface('approval')}>
                     Revisar approval
                   </Button>
@@ -502,7 +498,7 @@ const SampleSprintsMockupView = ({
         </TabPanel>
 
         <TabPanel value='detail' sx={{ p: 0, pt: 6 }}>
-          {selectedSprint ? <DetailSurface sprint={selectedSprint} reducedMotion={reducedMotion} variant={variant} /> : <NoSprintSelected variant={variant} />}
+          {selectedSprint ? <DetailSurface sprint={selectedSprint} reducedMotion={reducedMotion} variant={variant} /> : <NoSprintSelected setActiveSurface={setActiveSurface} />}
         </TabPanel>
 
         <TabPanel value='declare' sx={{ p: 0, pt: 6 }}>
@@ -516,7 +512,7 @@ const SampleSprintsMockupView = ({
             ) : (
               <ApprovalWizard sprint={selectedSprint} approvalOverride={approvalOverride} setApprovalOverride={setApprovalOverride} />
             )
-          ) : <NoSprintSelected variant={variant} />}
+          ) : <NoSprintSelected setActiveSurface={setActiveSurface} />}
         </TabPanel>
 
         <TabPanel value='progress' sx={{ p: 0, pt: 6 }}>
@@ -526,11 +522,11 @@ const SampleSprintsMockupView = ({
             ) : (
               <ProgressWizard sprint={selectedSprint} snapshotNotes={snapshotNotes} setSnapshotNotes={setSnapshotNotes} />
             )
-          ) : <NoSprintSelected variant={variant} />}
+          ) : <NoSprintSelected setActiveSurface={setActiveSurface} />}
         </TabPanel>
 
         <TabPanel value='outcome' sx={{ p: 0, pt: 6 }}>
-          {selectedSprint ? (variant === 'runtime' ? <RuntimeOutcomeWizard sprint={selectedSprint} options={runtimeOptions} /> : <OutcomeWizard sprint={selectedSprint} />) : <NoSprintSelected variant={variant} />}
+          {selectedSprint ? (variant === 'runtime' ? <RuntimeOutcomeWizard sprint={selectedSprint} options={runtimeOptions} /> : <OutcomeWizard sprint={selectedSprint} />) : <NoSprintSelected setActiveSurface={setActiveSurface} />}
         </TabPanel>
 
         <TabPanel value='health' sx={{ p: 0, pt: 6 }}>
@@ -646,7 +642,7 @@ const CommandCenter = ({
             subheader='Agrupación operacional para detectar pilotos simultáneos y outcomes pendientes.'
             avatarIcon='tabler-building-community'
             action={
-              <Button component={variant === 'runtime' ? Link : 'button'} href={variant === 'runtime' ? '/agency/sample-sprints/new' : undefined} size='small' variant='contained' startIcon={<i className='tabler-plus' />}>
+              <Button size='small' variant='contained' startIcon={<i className='tabler-plus' />} onClick={() => setActiveSurface('declare')}>
                 Nuevo Sprint
               </Button>
             }
@@ -691,7 +687,7 @@ const CommandCenter = ({
                   title='No hay Sample Sprints con estos filtros'
                   description='Cambia el tipo o estado, o declara un nuevo Sprint para iniciar el flujo aprobado.'
                   action={
-                    <Button component={variant === 'runtime' ? Link : 'button'} href={variant === 'runtime' ? '/agency/sample-sprints/new' : undefined} size='small' variant='contained' startIcon={<i className='tabler-plus' />}>
+                    <Button size='small' variant='contained' startIcon={<i className='tabler-plus' />} onClick={() => setActiveSurface('declare')}>
                       Declarar Sprint
                     </Button>
                   }
@@ -1776,14 +1772,14 @@ const RuntimeOutcomeWizard = ({ sprint, options }: { sprint: Sprint; options: Ru
   )
 }
 
-const NoSprintSelected = ({ variant }: { variant: SampleSprintsExperienceVariant }) => (
+const NoSprintSelected = ({ setActiveSurface }: { setActiveSurface: (surface: string) => void }) => (
   <Card>
     <CardContent>
       <EmptyState
         icon='tabler-pointer-question'
         title='Selecciona un Sample Sprint'
         description='El command center mantiene la jerarquía aprobada y abre cada superficie desde un Sprint real.'
-        action={variant === 'runtime' ? <Button component={Link} href='/agency/sample-sprints/new' variant='contained'>Declarar Sprint</Button> : undefined}
+        action={<Button variant='contained' onClick={() => setActiveSurface('declare')}>Declarar Sprint</Button>}
         minHeight={320}
       />
     </CardContent>

@@ -23498,6 +23498,35 @@ Pendiente operativo antes de cerrar lifecycle de TASK-408:
 - Smoke staging de 5 grupos cohesivos de emails (payroll, leave, auth, finance, digest/Nexa Insights) contra inbox QA y comparacion visual.
 - Observacion 24h post-deploy de `notifications.email.render_failure_rate` en `/admin/operations` con steady=0.
 
+## Sesion 2026-05-07 — Sample Sprints approved shell navigation
+
+Contexto:
+
+- El usuario detecto en staging que los CTAs `Declarar Sprint` / `Nuevo Sprint` no respetaban el mockup aprobado: navegaban a `/agency/sample-sprints/new` y caian en una pantalla/formulario paralelo.
+- Se invocaron skills de UI/UX/microinteracciones repo y globales para corregir el contrato visual y de interacción: `greenhouse-ui-orchestrator`, `greenhouse-ux-content-accessibility`, `greenhouse-microinteractions-auditor`, `ui-product-design-orchestrator`, `ux-content-accessibility`, `microinteractions-auditor`.
+
+Cambios aplicados:
+
+- `SampleSprintsMockupView` acepta `initialActiveSurface` para deep links controlados por tab.
+- Los CTAs internos `Declarar Sprint`, `Nuevo Sprint` y empty-state declaration ya no navegan a `/agency/sample-sprints/new`; activan la tab `Declaración` in-place dentro del shell aprobado.
+- `SampleSprintsWorkspace` ahora usa una sola experiencia runtime aprobada para `list`, `new`, `detail`, `approve`, `progress` y `outcome`, abriendo la tab correspondiente por deep link en vez de mantener formularios legacy paralelos.
+
+Validacion:
+
+- `pnpm exec tsc --noEmit` -> pass.
+- `pnpm design:lint` -> 0 errors / 0 warnings.
+- `pnpm lint` -> pass.
+- `pnpm build` -> pass.
+- Playwright autenticado con `scripts/playwright-auth-setup.mjs`:
+  - `/agency/sample-sprints` inicia en `Command center`.
+  - Click `Declarar Sprint` mantiene URL `/agency/sample-sprints` y activa `Declaración`.
+  - Click `Nuevo Sprint` mantiene URL `/agency/sample-sprints` y activa `Declaración`.
+  - `/agency/sample-sprints/new` abre el mismo shell aprobado con `Declaración` activa.
+
+Riesgos / notas:
+
+- No se tocaron los archivos nuevos no trackeados de client portal (`TASK-822` a `TASK-825` y arquitectura relacionada); quedan fuera de este cambio.
+
 ## Sesion 2026-05-06 — TASK-408 smoke enablement: admin preview catalog completo
 
 Contexto:
