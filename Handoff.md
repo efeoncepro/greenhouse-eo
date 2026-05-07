@@ -1,3 +1,16 @@
+# Sesion 2026-05-07 — TASK-813 documentacion post-merge alta densidad (HubSpot services intake)
+
+- **Branch:** `develop` (docs only, autorizado direct push develop por regla canonica de doc-only).
+- **Contexto:** PR #109 (develop -> main) mergeado 2026-05-07T00:51:50Z. TASK-813 cerrada end-to-end en produccion. Usuario autorizo: "Si, autorizo. Deja todo lo hecho aca documentado con alto nivel de detalle en documentation, arquitectura y manual de uso".
+- **3 documentos elevados a alto detalle:**
+  1. **Spec arquitectural nueva** `docs/architecture/GREENHOUSE_HUBSPOT_SERVICES_INTAKE_V1.md` (515 lineas, 18 secciones): exec summary, conceptual model 4-capas, source-of-truth rules + canonical flow diagram, DDL changes, 5 helpers SSOT documentados, reactive projection contract, outbox events v1, reliability signals, capabilities, HubSpot Developer Platform setup, Cloud Scheduler jobs, hard rules anti-regresion, 4-pillar score (8.75/10), open questions resolved, related tasks, code locations, forward hard rule downstream.
+  2. **Doc funcional v2.0** `docs/documentation/comercial/servicios-engagement.md` (~280 lineas): modelo 4-capas con analogia restaurante extendida, regla source-of-truth, 3 paths convergentes, semantica cross-billing Aguas-Andinas-paga-por-ANAM con caso real, 3 escenarios degradacion honesta (unmapped/orphan/auto-space), 3 reliability signals con tabla severidad+steady, pipeline downstream con diagram ASCII, glossary, followups V1.1.
+  3. **Manual operativo v2.0** `docs/manual-de-uso/comercial/sincronizacion-hubspot-servicios.md` (~340 lineas): permisos requeridos por accion, herramientas locales, smoke test del sistema, setup inicial one-time (4 pasos), operaciones diarias (5 operaciones canonicas), estados/senales completos, lista qué NO hacer (7 reglas), troubleshooting completo (6 escenarios con diagnostico+resolucion), verificacion post-deploy (5 pasos), inventory code paths principales (15 archivos), outbox events v1, tests, migraciones.
+- **Sin cambios codigo:** docs only. No requiere CI ni tests.
+- **Sin cambios memory:** patrones canonicos (TASK-721 SSOT, TASK-771 outbox, TASK-768 honest degradation) reusados — son reglas existentes.
+- **Followups documentados:** TASK-807 (domain commercial en ops-worker), V1.1 back-fill `ef_*` properties con governance review, integracion Member Loaded Cost (TASK-713).
+- **Consistency check:** spec + doc funcional + manual cross-referencian sus paths uno al otro. CLAUDE.md seccion "HubSpot inbound webhook — p_services" sigue vigente. EVENT_CATALOG_V1 delta 2026-05-06 con los 4 outbox events v1.
+
 # Sesion 2026-05-06 — TASK-813 cerrada en develop (HubSpot p_services inbound sync + legacy cleanup)
 
 - **Branch:** `develop` por instruccion explicita del usuario.
