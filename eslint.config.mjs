@@ -263,6 +263,9 @@ export default [
       // Detecta aria-labels, status maps, loading strings, empty states,
       // month arrays, JSX CTA text + cobertura secundaria de secondary props.
       'greenhouse/no-untokenized-copy': 'error',
+      // Runtime surfaces cannot import mockup-only modules. Extract a shared
+      // shell outside /mockup/ so copy/debug/prototype labels do not leak.
+      'greenhouse/no-runtime-mockup-import': 'error',
       // TASK-429 — locale-aware formatting utilities.
       // Modo warn inicial: existe deuda histórica en views/emails. El gate
       // deja visible cualquier uso nuevo de Intl/toLocale* directo sin romper

@@ -125,5 +125,109 @@ export const GH_AGENCY = {
   tooltip_stuck: 'Activos detenidos que requieren atención inmediata',
 
   // Nexa Insights (legacy alias — see GH_NEXA for the canonical namespace)
-  advisory_title: 'Nexa Insights'
+  advisory_title: 'Nexa Insights',
+
+  sampleSprints: {
+    mockup: {
+      primaryChip: 'Mockup navegable',
+      secondaryChip: 'Sin backend conectado',
+      title: 'Sample Sprints command center',
+      subtitle: 'Prototipo 2026 para declarar, gobernar, operar y cerrar Sample Sprints con trazabilidad de outcome, capacidad y señales de salud comercial.',
+      investmentLabel: 'GTM investment',
+      investmentSubtitle: 'Reclasificado fuera del cliente',
+      investmentTooltip: 'Mock de TASK-806 gtm_investment_pnl',
+      listSubtitle: 'Activos e históricos del piloto',
+      filterEmptySubheader: 'Ejemplo para filtros sin resultados.',
+      healthTitle: 'Commercial Health',
+      healthSubtitle: 'Subsystem mock para /admin/operations.'
+    },
+    runtime: {
+      title: 'Sample Sprints comerciales',
+      subtitle: 'Declara pilotos comerciales, revisa aprobaciones y registra decisiones de conversión con trazabilidad.',
+      investmentLabel: 'Budget esperado',
+      investmentSubtitle: 'Costo interno esperado',
+      investmentTooltip: 'Suma de expected_internal_cost_clp desde los servicios reales',
+      listSubtitle: 'Engagements reales del runtime',
+      filterEmptySubheader: 'Estado operacional cuando no hay coincidencias.',
+      healthTitle: 'Salud comercial',
+      healthSubtitle: 'Señales operativas de Sample Sprints activos.'
+    },
+    actions: {
+      declare: 'Declarar Sample Sprint',
+      newSprint: 'Nuevo Sample Sprint',
+      reviewApprovals: 'Revisar aprobaciones',
+      viewHealth: 'Ver salud comercial',
+      clearFilters: 'Limpiar filtros',
+      openOpsHealth: 'Abrir Ops Health'
+    },
+    hero: {
+      executiveRead: 'Lectura ejecutiva',
+      signals: (count: number) => count === 0 ? 'Sin señales' : `${count} señal${count === 1 ? '' : 'es'}`,
+      active: 'Activos',
+      conversion6m: 'Conversión 6m'
+    },
+    tabs: {
+      command: 'Resumen',
+      detail: 'Detalle',
+      declare: 'Declaración',
+      approval: 'Aprobación',
+      progress: 'Progreso',
+      outcome: 'Resultado',
+      health: 'Salud comercial'
+    },
+    metrics: {
+      totalTitle: 'Sample Sprints',
+      totalEmpty: 'Sin registros',
+      totalTrend: (count: number) => count > 0 ? `${count} total` : 'Sin registros',
+      conversionTitle: 'Conversión',
+      conversionEmpty: 'Sin datos',
+      conversionSubtitle: 'Trailing 6 meses',
+      conversionWithSample: 'Con muestra',
+      conversionWithoutSample: 'Sin muestra',
+      risksTitle: 'Señales abiertas',
+      risksEmpty: 'Sin señales',
+      risksSubtitle: 'Salud operativa',
+      risksReview: 'Revisar hoy',
+      risksSteady: 'Sin alertas'
+    },
+    command: {
+      byClientTitle: 'Sprints por cliente',
+      byClientSubheader: 'Agrupación operacional para detectar pilotos simultáneos y resultados pendientes.',
+      typeFilter: 'Tipo',
+      statusFilter: 'Estado',
+      allTypes: 'Todos los tipos',
+      allStatuses: 'Todos los estados',
+      noFilteredTitle: 'No hay Sample Sprints con estos filtros',
+      noFilteredDescription: 'Cambia el tipo o estado, o declara un nuevo Sample Sprint para iniciar el flujo.',
+      decisionsTitle: 'Decisiones próximas',
+      decisionsSubheader: 'Ordenadas por impacto y fecha.',
+      noDecisionsTitle: 'Sin decisiones pendientes',
+      noDecisionsDescription: 'Cuando un Sample Sprint tenga deadline de decisión, aparecerá aquí ordenado por urgencia.',
+      filterEmptyTitle: 'Estado vacío diseñado',
+      filterEmptyDescription: 'Cambia el tipo o estado para volver a ver engagements operativos.',
+      decisionLabel: 'Decisión',
+      budgetUsed: 'Budget usado'
+    },
+    empty: {
+      firstUseTitle: 'Aún no hay Sample Sprints',
+      firstUseDescription: 'Declara el primer piloto comercial para monitorear aprobación, progreso, budget y resultado.',
+      selectTitle: 'Selecciona un Sample Sprint',
+      selectDescription: 'El resumen abre cada superficie desde un Sample Sprint real.'
+    },
+    health: {
+      activeSignalsDescription: 'Señales no steady. El rollup usa severidad máxima: cualquier error vuelve el subsystem rojo.',
+      activeSignalsRuntimeDescription: 'Señales abiertas que requieren revisión antes de considerar el módulo en steady state.',
+      signalsTitle: 'Reliability signals',
+      steadyLabel: 'steady'
+    },
+    aria: {
+      tabs: 'Superficies de Sample Sprints',
+      conversionRate: 'Conversión trailing seis meses',
+      budgetUsed: 'Budget usado',
+      costAgainstBudget: 'Costo acumulado contra presupuesto',
+      capacityByMember: 'Capacity warning por miembro',
+      commercialHealthRatio: 'Ratio de salud comercial',
+      memberAllocation: 'Asignación del miembro'
+    }
+  }
 } as const

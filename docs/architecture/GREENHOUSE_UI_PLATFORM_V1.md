@@ -88,6 +88,12 @@ Reglas nuevas:
 - Si el texto es único de una pantalla, puede vivir cerca del dominio, pero no debe duplicar shared copy.
 - `GH_COMPENSATION` fue eliminado por orphan real (0 importers runtime).
 
+Guardrail runtime/mockup:
+
+- Una ruta o surface runtime no debe importar módulos bajo `/mockup/`.
+- Si una experiencia aprobada debe promocionarse a runtime, extraer primero un shell compartido fuera de `/mockup/`; el mockup importa ese shell con datos/copy de mockup y el runtime lo importa con datos/copy productivos.
+- ESLint bloquea regresiones con `greenhouse/no-runtime-mockup-import`.
+
 ## Delta 2026-05-05 — Quote Builder primitives extraction Sprint 3 (TASK-498)
 
 El Quote Builder publicó 4 capacidades nuevas al registry canónico de primitives. Hoy las consume sólo el quote builder; mañana las consumen invoice builder, PO builder, contract builder, finiquito generator y cualquier entity-form que necesite el mismo chasis sticky-bottom + section accordion + card-header-with-badge + chip-strip overflow.

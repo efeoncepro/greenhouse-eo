@@ -14,7 +14,7 @@ import SampleSprintsMockupView, {
   type SprintKind,
   type SprintStatus,
   type TeamMember
-} from './mockup/SampleSprintsMockupView'
+} from './SampleSprintsExperienceView'
 
 type WorkspaceMode = 'list' | 'declare' | 'detail' | 'approve' | 'progress' | 'outcome'
 
@@ -211,7 +211,7 @@ const buildRuntimeSignals = (items: SampleSprintItem[]): Signal[] => {
     },
     {
       code: 'commercial.engagement.pending_approval',
-      label: 'Approval pendiente',
+      label: 'Aprobación pendiente',
       severity: 'warning',
       count: pendingApproval,
       runbook: 'Revisar capacidad y aprobar o rechazar el Sprint',
@@ -244,6 +244,18 @@ const buildRuntimeSignals = (items: SampleSprintItem[]): Signal[] => {
   ]
 }
 
+const readJsonResponse = async <T,>(response: Response): Promise<T | null> => {
+  const text = await response.text()
+
+  if (!text.trim()) return null
+
+  try {
+    return JSON.parse(text) as T
+  } catch {
+    return null
+  }
+}
+
 const useSampleSprints = (mode: WorkspaceMode, serviceId?: string) => {
   const [items, setItems] = useState<SampleSprintItem[]>([])
   const [detail, setDetail] = useState<SampleSprintDetail | null>(null)
@@ -261,24 +273,25 @@ const useSampleSprints = (mode: WorkspaceMode, serviceId?: string) => {
       try {
         if (mode === 'list' || mode === 'declare') {
           const response = await fetch('/api/agency/sample-sprints?includeOptions=true', { cache: 'no-store' })
-          const payload = await response.json()
+          const payload = await readJsonResponse<{ items?: SampleSprintItem[]; options?: Options; error?: string }>(response)
 
           if (!response.ok) throw new Error(payload?.error || 'No fue posible cargar Sample Sprints.')
           if (!mounted) return
 
-          setItems(payload.items ?? [])
-          setOptions(payload.options ?? null)
+          setItems(payload?.items ?? [])
+          setOptions(payload?.options ?? null)
         } else if (serviceId) {
           const response = await fetch(`/api/agency/sample-sprints/${encodeURIComponent(serviceId)}`, { cache: 'no-store' })
-          const payload = await response.json()
+          const payload = await readJsonResponse<(SampleSprintDetail & { error?: string })>(response)
 
           if (!response.ok) throw new Error(payload?.error || 'No fue posible cargar el Sample Sprint.')
+          if (!payload) throw new Error('La respuesta del Sample Sprint llegó vacía.')
           if (!mounted) return
 
           setDetail(payload)
 
           const optionsResponse = await fetch('/api/agency/sample-sprints?includeOptions=true', { cache: 'no-store' })
-          const optionsPayload = await optionsResponse.json().catch(() => null)
+          const optionsPayload = await readJsonResponse<{ options?: Options }>(optionsResponse)
 
           if (mounted && optionsResponse.ok) {
             setOptions(optionsPayload?.options ?? null)
@@ -286,7 +299,7 @@ const useSampleSprints = (mode: WorkspaceMode, serviceId?: string) => {
         }
       } catch (loadError) {
         if (mounted) {
-          setError(loadError instanceof Error ? loadError.message : 'No fue posible cargar la informacion.')
+          setError(loadError instanceof Error ? loadError.message : 'No fue posible cargar la información.')
         }
       } finally {
         if (mounted) setLoading(false)

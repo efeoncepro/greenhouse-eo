@@ -1,3 +1,12 @@
+# Sesion 2026-05-07 — Sample Sprints runtime copy guardrail
+
+- **Trigger:** el usuario detecto que `/agency/sample-sprints` en staging filtraba copy de mockup/debug y despues pidio resolver tambien la causa sistemica: un agente habia hardcodeado copy ignorando `src/lib/copy/`.
+- **Fix:** `SampleSprintsExperienceView` queda como shell reusable fuera de `/mockup/`; `mockup/SampleSprintsMockupView.tsx` es solo wrapper. `SampleSprintsWorkspace` ya importa el shell runtime, no el mockup.
+- **Copy canonico:** `src/lib/copy/agency.ts` agrega `GH_AGENCY.sampleSprints` para hero, tabs, CTAs, KPIs, empty states, health labels y aria labels. Runtime elimina badges `Experiencia aprobada`/`Backend conectado`, tabs inglesas y KPIs falsos `0%`/`$0` en empty state.
+- **Resiliencia:** `SampleSprintsWorkspace` usa parser JSON defensivo para no romper la pantalla si una respuesta llega vacia/no JSON; el error queda recuperable.
+- **Guardrail:** nueva regla ESLint `greenhouse/no-runtime-mockup-import` bloquea imports/re-exports desde `/mockup/` fuera de archivos mockup. Test de regla agregado.
+- **Validacion focal:** `pnpm exec eslint src/views/greenhouse/agency/sample-sprints eslint-plugins/greenhouse/rules/no-runtime-mockup-import.mjs eslint-plugins/greenhouse/rules/__tests__/no-runtime-mockup-import.test.mjs --max-warnings=0` OK; `pnpm test src/views/greenhouse/agency/sample-sprints/SampleSprintsExperienceView.test.tsx` OK; `node eslint-plugins/greenhouse/rules/__tests__/no-runtime-mockup-import.test.mjs` OK; `pnpm exec tsc --noEmit --pretty false` OK.
+
 # Sesion 2026-05-07 — TASK-789 cerrada (Workforce Relationship Transition)
 
 - **Branch:** `task/TASK-789-workforce-relationship-transition`.
