@@ -8009,6 +8009,12 @@ Validations: tsc 0 errors, lint 0 errors, 427 files / 2225 tests pass / 5 skippe
 - Finance / Data Quality: el check `orphan_expenses` fue reemplazado por semántica más precisa. `direct_cost_without_client` ahora marca drift real; `shared_overhead_unallocated` sigue visible pero ya no infla warnings como si fuera falla.
 - Ops / Reliability: `Finance Data Quality` en `getOperationsOverview()` ya no mezcla `processed/failed` con conceptos incompatibles. El subsistema expone `summary` + `metrics`, `Reliability` consume ese contrato directamente y `AdminOpsHealthView` muestra el detalle semántico sin maquillaje genérico.
 
+# 2026-05-07
+
+- Commercial / Finance: TASK-806 agregó la view gerencial `greenhouse_serving.gtm_investment_pnl` para reclasificar costos de Sample Sprints `no_cost` aprobados como GTM Investment sin borrar la evidencia de consumo en `commercial_cost_attribution_v2`.
+- Commercial Cost Attribution: `client_labor_cost_allocation`, `client_labor_cost_allocation_consolidated` y `commercial_cost_attribution_v2` ahora propagan `service_id`; `attribution_intent` se deriva solo para servicios non-regular aprobados y elegibles, dejando direct-client expenses como operacionales cuando no hay ancla canónica de servicio.
+- Sample Sprints: nuevo helper server-side `src/lib/commercial/sample-sprints/cost-reclassifier.ts` expone agregados de inversión GTM, ratio sobre revenue operacional y margen cliente excluyendo GTM para futuros dashboards.
+
 ## 2026-04-21
 
 - Admin Center / Commercial: nueva surface `/admin/commercial/product-sync-conflicts` para vigilar drift del catálogo comercial contra HubSpot Products, con lista operativa, detalle por conflicto, diff Greenhouse vs HubSpot y acciones auditables (`adopt`, `archive`, `replay`, `accept remote`, `ignore`).

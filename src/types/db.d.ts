@@ -6575,6 +6575,7 @@ export interface GreenhouseServingClientLaborCostAllocation {
   payroll_currency: string | null;
   period_month: number | null;
   period_year: number | null;
+  service_id: string | null;
   total_fte: Numeric | null;
 }
 
@@ -6594,6 +6595,7 @@ export interface GreenhouseServingClientLaborCostAllocationConsolidated {
   payroll_currency: string | null;
   period_month: number | null;
   period_year: number | null;
+  service_id: string | null;
   /**
    * Cuántos payroll_entries underlying se consolidaron en este row. Si > 1, significa que el período tuvo múltiples nóminas posteadas (e.g. nómina mes anterior + mes corriente). Útil para drift detection.
    */
@@ -6637,6 +6639,7 @@ export interface GreenhouseServingCommercialCostAttributionV2 {
   member_id: string | null;
   period_month: number | null;
   period_year: number | null;
+  service_id: string | null;
 }
 
 export interface GreenhouseServingContractMrrArrSnapshots {
@@ -6796,6 +6799,25 @@ export interface GreenhouseServingFinanceAiSignals {
   space_id: string | null;
   synced_at: Generated<Timestamp>;
   z_score: Numeric | null;
+}
+
+export interface GreenhouseServingGtmInvestmentPnl {
+  attribution_intent: string | null;
+  client_id: string | null;
+  client_name: string | null;
+  cost_dimension: string | null;
+  engagement_kind: string | null;
+  fte_contribution: Numeric | null;
+  gtm_investment_clp: Numeric | null;
+  member_id: string | null;
+  member_name: string | null;
+  period_month: number | null;
+  period_year: number | null;
+  service_id: string | null;
+  service_name: string | null;
+  terms_effective_from: Timestamp | null;
+  terms_effective_to: Timestamp | null;
+  terms_kind: string | null;
 }
 
 export interface GreenhouseServingHomeBlockFlags {
@@ -8841,6 +8863,7 @@ export interface DB {
   "greenhouse_serving.finance_ai_enrichment_runs": GreenhouseServingFinanceAiEnrichmentRuns;
   "greenhouse_serving.finance_ai_signal_enrichments": GreenhouseServingFinanceAiSignalEnrichments;
   "greenhouse_serving.finance_ai_signals": GreenhouseServingFinanceAiSignals;
+  "greenhouse_serving.gtm_investment_pnl": GreenhouseServingGtmInvestmentPnl;
   "greenhouse_serving.home_block_flags": GreenhouseServingHomeBlockFlags;
   "greenhouse_serving.home_pulse_snapshots": GreenhouseServingHomePulseSnapshots;
   "greenhouse_serving.home_rollout_flags": GreenhouseServingHomeRolloutFlags;

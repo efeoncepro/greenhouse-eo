@@ -1,3 +1,21 @@
+# Sesion 2026-05-07 — CI fix commercial-cost-worker deploy verde
+
+- **Incidente:** workflow `Commercial Cost Worker Deploy` fallaba en `develop` antes de deploy porque Cloud Build usaba Corepack sin version pin y descargaba `pnpm@11.0.8`; `pnpm install --frozen-lockfile` rechazaba el lockfile por mismatch de overrides.
+- **Fix:** commit `313a0cae` en `develop` fija `ARG PNPM_VERSION=10.32.1` + `corepack prepare` en los Dockerfiles de `commercial-cost-worker`, `ops-worker` e `ico-batch`. Se mantuvo `--frozen-lockfile`; no se relajó el gate.
+- **Validación:** Cloud Build remoto manual `8e84b1f3-09f1-4e46-abed-1485369820e5` SUCCESS para `commercial-cost-worker`; `git push` pasó hooks (`pnpm lint` + `tsc --noEmit`); workflow GitHub `25506769734` terminó verde con deploy + health verification. Warning residual: acciones Node 20 deprecadas cubiertas por TASK-607.
+
+# Sesion 2026-05-07 — TASK-806 tomada en develop (GTM Investment P&L Reclassifier)
+
+- **Branch:** `develop` por instruccion explicita del usuario; no se crea `task/TASK-806-gtm-investment-pnl-view-reclassifier`.
+- **Ownership:** no hay PR abierto ni branch local/remota obvia para `TASK-806`; se movio la task a `docs/tasks/in-progress/` y se sincronizaron `Lifecycle`, `docs/tasks/README.md` y `docs/tasks/TASK_ID_REGISTRY.md`.
+- **Objetivo:** implementar view gerencial `greenhouse_serving.gtm_investment_pnl` + helper TS de reclassificación GTM, contrastando primero spec vs runtime real de `commercial_cost_attribution_v2`, TASK-813 y docs de management accounting.
+- **Guardrails iniciales:** no tocar UI real en esta task; el mockup aprobado `/agency/sample-sprints/mockup` queda como consumidor downstream. No revertir el archivo no relacionado sin trackear `docs/architecture/GREENHOUSE_CLIENT_LIFECYCLE_V1.md`.
+- **Entrega TASK-806:** migration `20260507160533628_task-806-gtm-investment-pnl.sql` actualiza `client_labor_cost_allocation`, `client_labor_cost_allocation_consolidated` y `commercial_cost_attribution_v2` para propagar `service_id`; deriva `attribution_intent` solo para services non-regular aprobados/elegibles y crea `greenhouse_serving.gtm_investment_pnl` como management-accounting view `no_cost`.
+- **Helper:** nuevo `src/lib/commercial/sample-sprints/cost-reclassifier.ts` expone `getGtmInvestmentForPeriod`, `getGtmInvestmentRatio` y `getClientNetMarginExcludingGtm`; usa `query`, `gtm_investment_pnl`, `operational_pl_snapshots` y fallback a `client_economics`.
+- **Runtime verificado:** `pnpm pg:connect:migrate` OK + `src/types/db.d.ts` regenerado; SQL post-migration confirmó `gtm_investment_pnl.count = 0` y `commercial_cost_attribution_v2` con 19 rows `operational`.
+- **Lifecycle:** task movida a `docs/tasks/complete/`, `Lifecycle=complete`, `docs/tasks/README.md` y `TASK_ID_REGISTRY.md` sincronizados.
+- **Validación ejecutada:** `pnpm test src/lib/commercial/sample-sprints/cost-reclassifier.test.ts` OK (7 tests); `pnpm test src/lib/commercial-cost-attribution/v2-reader.test.ts src/lib/commercial-cost-attribution/member-period-attribution.test.ts` OK (16 tests); `pnpm pg:doctor` OK; `pnpm exec tsc --noEmit --pretty false` OK; `pnpm lint` OK; `pnpm test` completo OK (604 files / 3514 passed / 5 skipped); `pnpm build` OK.
+
 # Sesion 2026-05-07 — TASK-805 cerrada en develop (Engagement Progress Snapshots)
 
 - **Branch:** `develop` por instruccion explicita del usuario; no se crea `task/TASK-805-engagement-progress-snapshots`.

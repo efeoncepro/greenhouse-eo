@@ -2,16 +2,16 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `EPIC-014`
-- Status real: `Diseño aprobado`
+- Status real: `Cerrada 2026-05-07 en develop`
 - Domain: `commercial / finance`
 - Blocked by: `TASK-801, TASK-802, TASK-803`
-- Branch: `task/TASK-806-gtm-investment-pnl-view-reclassifier`
+- Branch: `develop` (por instrucción explícita del usuario; no crear branch task)
 
 ## Summary
 
@@ -50,11 +50,21 @@ Reglas obligatorias:
 - VIEW lee de **v2** (`commercial_cost_attribution_v2` — canónica post TASK-708/709 con consolidated labor anti double-counting).
 - Filtro JOIN debe incluir `engagement_commercial_terms` para verificar `terms_kind = 'no_cost'`.
 - COMMENT canónico explicitando uso (gerencial) vs auditoría (lee v2 directo).
-- Gate: cost attribution con `attribution_intent != 'operational'` requiere approval aprobada (enforced en service layer, no en VIEW).
+- Gate: cost attribution con `attribution_intent != 'operational'` requiere approval aprobada; en runtime TASK-806 lo refuerza en `commercial_cost_attribution_v2` y `gtm_investment_pnl` para evitar Sample Sprints fantasma.
+
+## Discovery / Decisions 2026-05-07
+
+- Runtime real: `commercial_cost_attribution_v2` era una VIEW con `amount_clp`, `cost_dimension`, `fte_contribution` y `attribution_intent='operational'`; no tenía `service_id` ni columnas `allocated_labor_clp/direct_overhead/shared_overhead`.
+- Decisión: propagar `service_id` desde `greenhouse_core.client_team_assignments.service_id` por `client_labor_cost_allocation`, `client_labor_cost_allocation_consolidated` y `commercial_cost_attribution_v2`, agregando la columna al final para mantener compatibilidad.
+- Decisión: derivar `attribution_intent` solo para labor y direct-member expenses con service non-regular, approved, activo, no `legacy_seed_archived` y no `hubspot_sync_status='unmapped'`; direct-client expenses quedan `operational` porque no tienen ancla canónica de servicio.
+- Decisión: `gtm_investment_pnl` filtra `terms_kind='no_cost'` con ventana `effective_to > period_start`, alineado a `getActiveCommercialTerms`.
+- Verificación runtime previa: `services` non-regular = 30, eligible non-regular = 0, commercial terms = 0, approvals approved = 0, v2 non-operational = 0; por tanto `gtm_investment_pnl` debe iniciar en 0 filas.
 
 ## Slice Scope
 
 DDL (§6.2.2):
+
+> Nota de implementación 2026-05-07: el snippet original abajo quedó como intención funcional, pero el runtime real usa `amount_clp` + `cost_dimension` en v2. La migración final vive en `migrations/20260507160533628_task-806-gtm-investment-pnl.sql` y reemplaza `>= effective_to` por ventana exclusiva `effective_to > period_start`.
 
 ```sql
 CREATE VIEW greenhouse_serving.gtm_investment_pnl AS

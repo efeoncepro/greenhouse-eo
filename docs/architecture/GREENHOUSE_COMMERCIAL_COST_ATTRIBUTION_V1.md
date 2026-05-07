@@ -174,6 +174,13 @@ Regla:
 
 ## Estrategia de Cutover
 
+### Delta 2026-05-07 — TASK-806 service-aware GTM reclassification
+
+- `greenhouse_serving.commercial_cost_attribution_v2` sigue siendo la primitive canónica de attribution, pero ahora incluye `service_id` al final del shape para rows que vienen desde `client_team_assignments.service_id`.
+- `attribution_intent` ya no es solo literal operacional: labor y direct-member expenses service-linked pueden derivar `pilot/trial/poc/discovery` cuando el service está aprobado, activo, no `legacy_seed_archived` y no `hubspot_sync_status='unmapped'`.
+- Direct-client expenses permanecen `operational` porque no tienen ancla canónica de servicio; reclasificarlas exigiría una primitive explícita futura, no inferencia ad hoc.
+- `greenhouse_serving.gtm_investment_pnl` es una serving view de management accounting que filtra `terms_kind='no_cost'` y approval aprobado; no reemplaza auditoría por cliente ni contabilidad fiscal/legal.
+
 ### Regla general
 
 El cutover no es “todos los consumers leen la nueva tabla directamente”.

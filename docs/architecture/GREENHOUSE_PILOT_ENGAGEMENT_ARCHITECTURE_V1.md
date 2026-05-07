@@ -3,7 +3,7 @@
 > **Tipo de documento:** Spec de arquitectura canónica
 > **Versión:** 1.2
 > **Creado:** 2026-05-05 por Claude (Opus 4.7)
-> **Última actualización:** 2026-05-05 por Claude (Opus 4.7) — Delta v1.2 aplicado tras pre-flight check + naming sweep "Sample Sprint"
+> **Última actualización:** 2026-05-07 por Codex — Delta v1.3 TASK-806 aplicado: `service_id` propagado en cost attribution v2 + `gtm_investment_pnl` real
 > **Estado:** Implementación por slices EPIC-014
 > **Owner:** Comercial / Agency
 > **Brand UI**: "Sample Sprint" (paraguas comercial). Schema interno usa `engagement_*` genérico — el rebranding marketing no requiere migrations.
@@ -15,7 +15,7 @@ TASK-801 (Slice 1 / Capa 1 + 1b) cerrada 2026-05-06 vía migration `202605062007
 
 1. **`services.service_id` es `TEXT`, no `UUID`.** §3.2 Capa 1b declaraba el FK como `UUID REFERENCES services(service_id)`. Realidad: el PK de `services` es `text` (creado con la convención `svc-<uuid>` como string), y `client_team_assignments.assignment_id` también es `text`. **Corrección aplicada**: `service_id TEXT REFERENCES greenhouse_core.services(service_id) ON DELETE SET NULL`. Las futuras tablas de §3.2 (Capa 2 `engagement_commercial_terms`, Capa 3 `engagement_phases`/`engagement_outcomes`/`engagement_lineage`, etc.) que referencian `services.service_id` deben usar `TEXT` también — actualizar specs cuando se implementen TASK-802 onwards.
 
-2. **`commercial_cost_attribution_v2` es VIEW, no TABLE.** §3.2 Capa 6.2 (cost intelligence) declaraba `ALTER TABLE commercial_cost_attribution_v2 ADD COLUMN attribution_intent`. Realidad: v2 es VIEW canónica creada en TASK-708 y refinada en TASK-709b (UNION ALL de 3 CTEs). **Corrección aplicada**: `CREATE OR REPLACE VIEW` agregando `'operational'::TEXT AS attribution_intent` literal en cada SELECT del UNION. La columna existe en el shape y consumers downstream pueden filtrarla. Cuando TASK-802 introduzca `engagement_commercial_terms` y TASK-806 derive el intent (filtro `attribution_intent IN ('pilot','trial','poc','discovery')` para `gtm_investment_pnl`), la VIEW se actualiza para reemplazar el literal por la derivación real (JOIN a `services.engagement_kind` + `engagement_commercial_terms.terms_kind`).
+2. **`commercial_cost_attribution_v2` es VIEW, no TABLE.** §3.2 Capa 6.2 (cost intelligence) declaraba `ALTER TABLE commercial_cost_attribution_v2 ADD COLUMN attribution_intent`. Realidad: v2 es VIEW canónica creada en TASK-708 y refinada en TASK-709b (UNION ALL de 3 CTEs). **Corrección aplicada:** TASK-801 agregó la columna como literal operacional; TASK-806 reemplazó esa semántica por derivación real para rows service-linked. La VIEW ahora propaga `service_id` desde `client_team_assignments` y solo emite `pilot/trial/poc/discovery` cuando el service está aprobado, activo, no archivado legacy y no unmapped. Direct-client expenses permanecen `operational` hasta que exista ancla canónica de servicio.
 
 **Estado post-implementación verificado**:
 
@@ -531,38 +531,54 @@ Eso preserva auditoría: "Sky consumió X horas de Valentina durante el piloto C
 #### 6.2.2 VIEW canónica `gtm_investment_pnl` — reclasificación gerencial
 
 ```sql
--- VIEW canónica gtm_investment_pnl
--- Lee desde v2 (canonical post TASK-708/709 — labor consolidado).
--- Patrón heredado de TASK-409 (extender client_economics con backfill desde
--- commercial_cost_attribution).
-CREATE VIEW greenhouse_serving.gtm_investment_pnl AS
+-- VIEW canónica gtm_investment_pnl (TASK-806).
+-- Lee desde v2 (canonical post TASK-708/709 — labor consolidado) con service_id
+-- propagado desde client_team_assignments.
+CREATE OR REPLACE VIEW greenhouse_serving.gtm_investment_pnl AS
 SELECT
   cca.period_year,
   cca.period_month,
   cca.client_id,
-  cca.member_id,
-  s.service_id,
+  c.client_name,
+  cca.service_id,
+  s.name AS service_name,
   s.engagement_kind,
-  cca.allocated_labor_clp + cca.direct_overhead + cca.shared_overhead AS gtm_investment_clp,
-  cca.attribution_intent
+  cca.member_id,
+  m.display_name AS member_name,
+  cca.cost_dimension,
+  cca.amount_clp::NUMERIC AS gtm_investment_clp,
+  cca.fte_contribution,
+  cca.attribution_intent,
+  sct.terms_kind
 FROM greenhouse_serving.commercial_cost_attribution_v2 cca
 JOIN greenhouse_core.services s ON s.service_id = cca.service_id
 JOIN greenhouse_commercial.engagement_commercial_terms sct
   ON sct.service_id = s.service_id
+  AND sct.terms_kind = 'no_cost'
   AND sct.effective_from <= make_date(cca.period_year, cca.period_month, 1)
-  AND (sct.effective_to IS NULL OR sct.effective_to >= make_date(cca.period_year, cca.period_month, 1))
+  AND (sct.effective_to IS NULL OR sct.effective_to > make_date(cca.period_year, cca.period_month, 1))
+LEFT JOIN greenhouse_core.clients c ON c.client_id = cca.client_id
+LEFT JOIN greenhouse_core.members m ON m.member_id = cca.member_id
 WHERE cca.attribution_intent IN ('pilot','trial','poc','discovery')
-  AND sct.terms_kind = 'no_cost';
+  AND s.engagement_kind IN ('pilot','trial','poc','discovery')
+  AND s.active = TRUE
+  AND s.status != 'legacy_seed_archived'
+  AND s.hubspot_sync_status IS DISTINCT FROM 'unmapped'
+  AND EXISTS (
+    SELECT 1
+    FROM greenhouse_commercial.engagement_approvals ea
+    WHERE ea.service_id = s.service_id
+      AND ea.status = 'approved'
+  );
 
 COMMENT ON VIEW greenhouse_serving.gtm_investment_pnl IS
-  'GTM Investment reclassification — labor cost atribuido a pilotos/trials/poc/discovery '
-  'sin cobro al cliente. P&L gerencial resta del cliente, suma a línea "GTM Investment". '
-  'Lee de commercial_cost_attribution_v2 (TASK-709 consolidated labor). '
-  'NO usar para auditoría por cliente — para eso lee v2 directo. Patrón heredado de TASK-409 '
-  '(extender client_economics con backfill desde commercial_cost_attribution).';
+  'Management-accounting view for approved no-cost Sample Sprint GTM investment. '
+  'Not client-facing audit evidence, not fiscal/legal accounting, and not a replacement '
+  'for source cost attribution records.';
 ```
 
 > **Delta v1.1**: VIEW corregida para leer de `greenhouse_serving.commercial_cost_attribution_v2` (canónica post TASK-708/709). Patrón explícitamente heredado de TASK-409 (extender `client_economics` con backfill desde `commercial_cost_attribution`) para reducir surface novel y reusar primitiva canonizada.
+> **Delta v1.3 (TASK-806)**: runtime real usa `amount_clp` + `cost_dimension`, no columnas `allocated_labor_clp/direct_overhead/shared_overhead` en v2. La service dimension se propaga desde `client_team_assignments.service_id`; no se reclasifican direct-client expenses sin ancla de servicio. La ventana de términos usa `effective_to > period_start`, alineada al helper canónico `getActiveCommercialTerms`.
 
 El P&L gerencial **resta** `gtm_investment_pnl` del cliente y **suma** a línea separada "GTM Investment". El cliente no aparece como unprofitable; el piloto aparece como inversión deliberada.
 
@@ -880,3 +896,4 @@ Si el reactive consumer falla (paso 6):
 | 2026-05-05 | 1.0 | Claude (Opus 4.7) | Spec inicial — propuesta no implementada |
 | 2026-05-05 | 1.1 | Claude (Opus 4.7) — auditoría con `arch-architect` | Delta v1.1: 3 errores materiales corregidos (schema cost attribution, FK actor, cita TASK-728), 4 supuestos verificados (lifecycle enum, source enum, subsystem novel, owner approve), DDL completa de `pilot_decision_audit_log` agregada, índices faltantes (lineage, approvals pending, outcomes decision), boundary transaccional explícito en §8, lifecycle history canónico aplicado en §10.2, patrón TASK-409 + TASK-760/761/762 reusados explícitamente. Score 4-pilar: 6.75/10 → 8.5/10 estimado. |
 | 2026-05-05 | 1.2 | Claude (Opus 4.7) — pre-flight check + naming "Sample Sprint" | Delta v1.2: rebrand UI "Sample Sprint" + sub-tipos (Operations/Extension/Validation/Discovery Sprint); naming sweep de tablas a `engagement_*` (genérico — sobrevive marketing pivots); 5 decisiones de alcance V1 resueltas (B1 naming híbrido, B2 notif diferidas a V2, B3 progress snapshots incluido, B4 capacity warning soft, B5 reporte manual con structured fields); nueva tabla `engagement_progress_snapshots` (Slice 4.5); extensión `client_team_assignments.service_id` FK opcional; outcome enum extendido con `cancelled_by_client/provider` + `cancellation_reason`; `next_quotation_id` para pricing post-conversión; capability `commercial.engagement.record_progress` nueva; signal `commercial.engagement.stale_progress` nueva; 9 outbox events (vs 6 en v1.1); 16 hard rules (vs 11); 16 smoke tests (vs 8); 10 open questions (vs 7). Score 4-pilar: 8.5/10 → 9.0/10 estimado. **Spec lista para `greenhouse-task-planner`**. |
+| 2026-05-07 | 1.3 | Codex — TASK-806 runtime alignment | `commercial_cost_attribution_v2` ahora propaga `service_id` y deriva `attribution_intent` desde services non-regular aprobados con guard TASK-813; `gtm_investment_pnl` real usa `amount_clp`, filtra `terms_kind='no_cost'`, exige approval aprobado vía `EXISTS` y documenta explícitamente que es management accounting, no auditoría cliente/fiscal. |

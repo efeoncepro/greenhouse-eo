@@ -892,7 +892,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-803` | `complete` | Engagement Phases + Outcomes + Lineage (EPIC-014 child 3/10) | `docs/tasks/complete/TASK-803-engagement-phases-outcomes-lineage.md` |
 | `TASK-804` | `complete` | Engagement Approvals Workflow + Capacity Warning Soft (EPIC-014 child 4/10) — implementado 2026-05-07: tabla `greenhouse_commercial.engagement_approvals`, state machine `pending/approved/rejected/withdrawn`, capacity warning soft persistido, helpers `requestApproval`/`approveEngagement`/`rejectEngagement`/`withdrawApproval` y capacity checker por periodo; `commercial.engagement.approve` reutilizado admin-gated. | `docs/tasks/complete/TASK-804-engagement-approvals-capacity-warning.md` |
 | `TASK-805` | `complete` | Engagement Progress Snapshots Weekly Cadence (EPIC-014 child 5/10) | `docs/tasks/complete/TASK-805-engagement-progress-snapshots.md` |
-| `TASK-806` | `to-do` | VIEW gtm_investment_pnl + Reclassifier Helper (EPIC-014 child 6/10) | `docs/tasks/to-do/TASK-806-gtm-investment-pnl-view-reclassifier.md` |
+| `TASK-806` | `complete` | VIEW gtm_investment_pnl + Reclassifier Helper (EPIC-014 child 6/10) | `docs/tasks/complete/TASK-806-gtm-investment-pnl-view-reclassifier.md` |
 | `TASK-807` | `to-do` | Commercial Health Reliability Subsystem NEW (EPIC-014 child 7/10) | `docs/tasks/to-do/TASK-807-commercial-health-reliability-subsystem.md` |
 | `TASK-808` | `to-do` | Engagement Audit Log + Outbox Events v1 + Reactive Consumers (EPIC-014 child 8/10) | `docs/tasks/to-do/TASK-808-engagement-audit-log-outbox-events-reactive-consumers.md` |
 | `TASK-809` | `to-do` | Sample Sprints UI + Wizards (EPIC-014 child 9/10) | `docs/tasks/to-do/TASK-809-sample-sprints-ui-wizards.md` |
