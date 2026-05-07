@@ -2,6 +2,8 @@
 
 ## 2026-05-07
 
+- **TASK-556 — Commercial Surface Adoption over Legacy Finance Paths.** Cotizaciones, contratos/SOW, acuerdos marco y productos quedan adoptados como surfaces comerciales sin mover URLs legacy `/finance/...`. Las APIs legacy de esas surfaces pasan a guard comercial compatible (`commercial` + compat `finance`/admin) y conservan checks finos de costos/admin. Metadata, encabezados, empty states y labels visibles se alinean a framing Comercial; SOW queda documentado bajo Contratos hasta normalizacion futura de URLs.
+
 - **TASK-555 — Commercial Access Model Foundation.** Se formaliza `routeGroup: commercial`, se materializan vistas `comercial.*` en `greenhouse_core.view_registry` y se conectan al catálogo runtime de governance/entitlements. Roles transicionales (`efeonce_admin`, `efeonce_account`, `finance_admin`, `finance_analyst` y `finance_manager` si existe en DB) reciben el carril comercial; `quotation-access` acepta `comercial.cotizaciones` y conserva compat `finanzas.cotizaciones` mientras la ruta siga bajo `/finance/quotes`. TASK-813 queda absorbida por capabilities formales `commercial.service_engagement.*`.
 
 - **TASK-554 — navegación separa Comercial de Finanzas sin mover URLs.** El sidebar interno ahora expone `Comercial` como dominio top-level para Cotizaciones, Contratos, Acuerdos marco y Productos, manteniendo paths legacy `/finance/...` y gates legacy hasta TASK-555. `Finanzas > Documentos` queda limitado a OC, HES y Conciliación. Se materializa `/finance/products` como page legacy mínima reutilizando `ProductCatalogView` para evitar links rotos. Copy de navegación actualizado en `es-CL`/`en-US`; SOW queda agrupado temporalmente bajo `Contratos` porque no existe surface propia.

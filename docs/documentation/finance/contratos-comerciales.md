@@ -5,6 +5,8 @@ Los contratos comerciales son la entidad que representa el acuerdo post-venta qu
 - **Cotización**: propuesta comercial, pricing, aprobación y envío.
 - **Contrato / SOW**: acuerdo operativo vigente que puede vivir más tiempo que una cotización puntual y puede acumular renovaciones o modificaciones.
 
+> **Actualizacion TASK-556 (2026-05-07):** Contratos, SOW y acuerdos marco son surfaces del dominio `Comercial`. Las URLs legacy `/finance/contracts` y `/finance/master-agreements` siguen funcionando por compatibilidad, pero el owner funcional ya no es Finanzas. Finanzas consume estas vistas para rentabilidad, cadena documental y control downstream.
+
 ## Qué resuelve
 
 Antes, Finance y Commercial seguían demasiadas cosas usando solo `quotation_id`. Eso funcionaba para proyectos one-off, pero se quebraba en retainers y renovaciones:
@@ -81,7 +83,7 @@ La versión anterior a nivel quote sigue coexistiendo mientras termina la transi
 
 ## Dónde se ve en el portal
 
-Finance ahora tiene una lane dedicada:
+Comercial ahora tiene una lane dedicada sobre rutas legacy:
 
 - `/finance/contracts` — lista tenant-safe de contratos
 - `/finance/contracts/[id]` — detalle con overview, quotes relacionadas, cadena documental y rentabilidad

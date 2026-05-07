@@ -1,3 +1,13 @@
+# Sesion 2026-05-07 — TASK-556 cerrada en develop (Commercial Surface Adoption)
+
+- **Branch:** `develop` por instruccion explicita del usuario; no se crea `task/TASK-556-commercial-surface-adoption-over-legacy-finance-paths`.
+- **Ownership:** no habia PR abierto ni branch local/remota obvia para `TASK-556`; se movio la task a `docs/tasks/in-progress/` al tomarla y a `docs/tasks/complete/` al cerrar. `Lifecycle`, `docs/tasks/README.md` y `docs/tasks/TASK_ID_REGISTRY.md` quedaron sincronizados.
+- **Entrega:** `/api/finance/{quotes,contracts,master-agreements,products}` pasa de `requireFinanceTenantContext` a `requireCommercialTenantContext` para las surfaces comerciales legacy, preservando compat `finance`/admin y checks finos existentes (`canViewCostStack`, `canOverrideQuoteCost`, `canAdministerPricingCatalog`). Metadata, encabezados, empty states y labels principales de Cotizaciones, Contratos/SOW, Acuerdos marco/MSA y Productos quedan con framing Comercial sin mover URLs.
+- **Access model:** sin routeGroups/views/entitlements nuevos. Se consume la foundation TASK-555 (`commercial`, `comercial.*`, `commercial.*`) y se mantiene startup policy sin cambios.
+- **Docs:** changelog, docs funcionales de cotizador/contratos/pipeline y nueva doc `docs/documentation/comercial/surfaces-comerciales-sobre-rutas-finance.md` documentan que Comercial es owner y `/finance/...` es compat temporal. SOW queda bajo Contratos hasta normalizacion futura de URLs.
+- **Validacion:** `pnpm test src/lib/finance/__tests__/quotation-access.test.ts`, `pnpm exec tsc --noEmit --pretty false`, `pnpm lint`, `pnpm design:lint` y `pnpm build` OK.
+- **Runtime:** `pnpm pg:doctor` se intento y fallo por saturacion de conexiones Cloud SQL (`53300`, reserved connection slots). Esta task no requiere migraciones ni lecturas live de schema; se documenta como condicion runtime observada y se evitara reintentar en loop.
+
 # Sesion 2026-05-07 — TASK-555 cerrada en develop (Commercial Access Model Foundation)
 
 - **Branch:** `develop` por instruccion explicita del usuario; no se crea `task/TASK-555-commercial-access-model-foundation`.

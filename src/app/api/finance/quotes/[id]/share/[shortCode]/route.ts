@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 
 import { revokeQuoteShortLink } from '@/lib/finance/quote-share/short-link'
-import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
+import { requireCommercialTenantContext } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
 
@@ -14,7 +14,7 @@ export async function DELETE(
   request: Request,
   { params }: { params: Promise<{ id: string; shortCode: string }> }
 ) {
-  const { tenant, errorResponse } = await requireFinanceTenantContext()
+  const { tenant, errorResponse } = await requireCommercialTenantContext()
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

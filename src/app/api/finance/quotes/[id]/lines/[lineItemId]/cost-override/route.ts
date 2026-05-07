@@ -5,7 +5,7 @@ import {
   listQuotationLineCostOverrideHistory,
   QuotationLineCostOverrideValidationError
 } from '@/lib/finance/quotation-line-cost-override-store'
-import { canOverrideQuoteCost, requireFinanceTenantContext } from '@/lib/tenant/authorization'
+import { canOverrideQuoteCost, requireCommercialTenantContext } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
 
@@ -33,7 +33,7 @@ export async function POST(
   request: Request,
   { params }: { params: Promise<RouteParams> }
 ) {
-  const { tenant, errorResponse } = await requireFinanceTenantContext()
+  const { tenant, errorResponse } = await requireCommercialTenantContext()
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -111,7 +111,7 @@ export async function GET(
   request: Request,
   { params }: { params: Promise<RouteParams> }
 ) {
-  const { tenant, errorResponse } = await requireFinanceTenantContext()
+  const { tenant, errorResponse } = await requireCommercialTenantContext()
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

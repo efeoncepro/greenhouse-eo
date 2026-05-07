@@ -2,17 +2,17 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `EPIC-002`
-- Status real: `Diseno`
+- Status real: `Completada`
 - Rank: `TBD`
 - Domain: `crm`
 - Blocked by: `TASK-555`
-- Branch: `task/TASK-556-commercial-surface-adoption-over-legacy-finance-paths`
+- Branch: `develop` (instruccion explicita del usuario; no se crea branch task)
 - Legacy ID: `[optional]`
 - GitHub Issue: `[optional]`
 
@@ -50,6 +50,7 @@ Reglas obligatorias:
 - `docs/documentation/finance/cotizador.md`
 - `docs/documentation/finance/contratos-comerciales.md`
 - `docs/documentation/finance/pipeline-comercial.md`
+- `docs/documentation/comercial/surfaces-comerciales-sobre-rutas-finance.md`
 
 ## Dependencies & Impact
 
@@ -114,9 +115,9 @@ La task debe dejar explícito:
 
 ## Acceptance Criteria
 
-- [ ] Quotes, contracts, master agreements y products quedan tratados como surfaces comerciales en su framing principal
-- [ ] Los paths legacy `/finance/...` siguen funcionando
-- [ ] Cualquier gap pendiente de `SOW` queda documentado sin inventar rutas inexistentes
+- [x] Quotes, contracts, master agreements y products quedan tratados como surfaces comerciales en su framing principal
+- [x] Los paths legacy `/finance/...` siguen funcionando
+- [x] Cualquier gap pendiente de `SOW` queda documentado sin inventar rutas inexistentes
 
 ## Verification
 
@@ -124,15 +125,23 @@ La task debe dejar explícito:
 - `pnpm tsc --noEmit`
 - validacion manual de quotes / contracts / master agreements / products en local o preview
 
+Ejecutado 2026-05-07:
+
+- `pnpm test src/lib/finance/__tests__/quotation-access.test.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm lint`
+- `pnpm design:lint`
+- `pnpm build`
+
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
-- [ ] quedaron documentadas las surfaces comerciales que siguen usando paths `/finance/...`
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] quedaron documentadas las surfaces comerciales que siguen usando paths `/finance/...`
 
 ## Follow-ups
 

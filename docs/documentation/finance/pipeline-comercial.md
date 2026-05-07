@@ -3,7 +3,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
 > **Version:** 1.0
 > **Creado:** 2026-04-19 por Claude (TASK-457)
-> **Ultima actualizacion:** 2026-04-19 por Claude
+> **Ultima actualizacion:** 2026-05-07 por Codex (TASK-556 — owner-domain Comercial sobre path legacy `/finance/intelligence`)
 > **Documentacion tecnica:**
 > - Spec: [TASK-457](../../tasks/complete/TASK-457-ui-revenue-pipeline-hybrid.md)
 > - Deal snapshots: [TASK-456](../../tasks/complete/TASK-456-deal-pipeline-snapshots-projection.md)
@@ -13,6 +13,8 @@
 ## Qué es
 
 La vista `/finance/intelligence` → tab **"Pipeline comercial"** → sub-tab **"Pipeline"** muestra todas las oportunidades comerciales activas de Efeonce en un solo lugar, mezclando tres tipos de oportunidad que **antes estaban divorciadas** en la UI:
+
+Aunque el path siga siendo `/finance/intelligence`, el owner funcional de esta lane es **Comercial**. Finanzas la consume para forecast, revenue planning y validacion downstream.
 
 1. **Deals de HubSpot** (net-new sales con pipeline stage)
 2. **Contratos standalone** (quotes sin deal — ej. Nubox recurring, MSA/SOW activo con cliente customer, o deals ya cerrados won que están en ejecución)

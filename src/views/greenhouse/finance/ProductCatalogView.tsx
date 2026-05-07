@@ -8,8 +8,10 @@ import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import CardHeader from '@mui/material/CardHeader'
+import Checkbox from '@mui/material/Checkbox'
 import Divider from '@mui/material/Divider'
 import Drawer from '@mui/material/Drawer'
+import FormControlLabel from '@mui/material/FormControlLabel'
 import IconButton from '@mui/material/IconButton'
 import MenuItem from '@mui/material/MenuItem'
 import Skeleton from '@mui/material/Skeleton'
@@ -158,7 +160,7 @@ const CreateProductDrawer = ({
     <Drawer anchor='right' open={open} onClose={handleClose} sx={{ '& .MuiDrawer-paper': { width: { xs: '100%', sm: 420 } } }}>
       <Box sx={{ p: 4 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 4 }}>
-          <Typography variant='h6'>Nuevo producto HubSpot</Typography>
+          <Typography variant='h6'>Nuevo producto comercial</Typography>
           <IconButton onClick={handleClose} aria-label={GREENHOUSE_COPY.actions.close}>
             <i className='tabler-x' />
           </IconButton>
@@ -167,15 +169,15 @@ const CreateProductDrawer = ({
         <Stack spacing={3}>
           <CustomTextField fullWidth size='small' label='Nombre' value={name} onChange={e => setName(e.target.value)} />
           <CustomTextField fullWidth size='small' label='SKU' value={sku} onChange={e => setSku(e.target.value)} placeholder='ej. SVC-CRM-001' />
-          <CustomTextField fullWidth size='small' label='Descripcion' value={description} onChange={e => setDescription(e.target.value)} multiline rows={2} />
+          <CustomTextField fullWidth size='small' label='Descripción' value={description} onChange={e => setDescription(e.target.value)} multiline rows={2} />
           <Box sx={{ display: 'flex', gap: 2 }}>
             <CustomTextField size='small' label='Precio unitario' type='number' value={unitPrice} onChange={e => setUnitPrice(e.target.value === '' ? '' : Number(e.target.value))} sx={{ flex: 1 }} />
             <CustomTextField size='small' label='Costo (COGS)' type='number' value={costOfGoodsSold} onChange={e => setCostOfGoodsSold(e.target.value === '' ? '' : Number(e.target.value))} sx={{ flex: 1 }} />
           </Box>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <input type='checkbox' id='isRecurring' checked={isRecurring} onChange={e => setIsRecurring(e.target.checked)} />
-            <label htmlFor='isRecurring'><Typography variant='body2'>Producto recurrente</Typography></label>
-          </Box>
+          <FormControlLabel
+            control={<Checkbox checked={isRecurring} onChange={e => setIsRecurring(e.target.checked)} />}
+            label='Producto recurrente'
+          />
           {isRecurring && (
             <CustomTextField select size='small' label='Frecuencia' value={billingFrequency} onChange={e => setBillingFrequency(e.target.value)}>
               <MenuItem value='monthly'>Mensual</MenuItem>
@@ -248,7 +250,7 @@ const ProductCatalogView = () => {
         <Box>
           <Typography variant='h5' sx={{ fontWeight: 500 }}>Productos</Typography>
           <Typography variant='body2' color='text.secondary'>
-            Catalogo de productos y servicios sincronizado con HubSpot
+            Catálogo comercial de productos y servicios vendibles sincronizado con HubSpot.
           </Typography>
         </Box>
         <Button variant='contained' startIcon={<i className='tabler-plus' />} onClick={() => setDrawerOpen(true)}>
@@ -258,7 +260,7 @@ const ProductCatalogView = () => {
 
       <Card variant='outlined'>
         <CardHeader
-          title='Catalogo de productos'
+          title='Catálogo comercial'
           avatar={
             <Avatar variant='rounded' sx={{ bgcolor: 'primary.lightOpacity' }}>
               <i className='tabler-package' style={{ fontSize: 22, color: 'var(--mui-palette-primary-main)' }} />
@@ -297,7 +299,7 @@ const ProductCatalogView = () => {
           <Box sx={{ textAlign: 'center', py: 8 }} role='status'>
             <Typography variant='h6' sx={{ mb: 1 }}>Sin productos</Typography>
             <Typography variant='body2' color='text.secondary'>
-              Los productos aparecen aqui cuando se sincronizan desde HubSpot o se crean manualmente.
+              Los productos aparecerán aquí cuando se sincronicen desde HubSpot o se creen manualmente.
             </Typography>
           </Box>
         ) : (

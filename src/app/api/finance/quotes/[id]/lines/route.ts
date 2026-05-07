@@ -21,7 +21,7 @@ import {
   type QuotationPricingCurrency
 } from '@/lib/finance/pricing'
 import { isUnpricedQuotationLineItemsError } from '@/lib/finance/pricing/quotation-line-input-validation'
-import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
+import { requireCommercialTenantContext } from '@/lib/tenant/authorization'
 import { roundCurrency, toNumber } from '@/lib/finance/shared'
 import type { CommercialModelCode } from '@/lib/commercial/pricing-governance-types'
 
@@ -85,7 +85,7 @@ export async function GET(
   _request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { tenant, errorResponse } = await requireFinanceTenantContext()
+  const { tenant, errorResponse } = await requireCommercialTenantContext()
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -146,7 +146,7 @@ export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { tenant, errorResponse } = await requireFinanceTenantContext()
+  const { tenant, errorResponse } = await requireCommercialTenantContext()
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

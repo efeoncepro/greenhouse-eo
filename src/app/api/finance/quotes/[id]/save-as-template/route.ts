@@ -10,7 +10,7 @@ import { publishTemplateSaved } from '@/lib/commercial/quotation-events'
 import { QUOTATION_PRICING_MODELS } from '@/lib/commercial/governance/contracts'
 import type { QuotationPricingModel } from '@/lib/commercial/governance/contracts'
 import { resolveQuotationIdentity } from '@/lib/finance/pricing'
-import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
+import { requireCommercialTenantContext } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
 
@@ -90,7 +90,7 @@ export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { tenant, errorResponse } = await requireFinanceTenantContext()
+  const { tenant, errorResponse } = await requireCommercialTenantContext()
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

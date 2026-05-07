@@ -33,7 +33,7 @@ import {
   type QuotationLineInput
 } from '@/lib/finance/pricing'
 import { isUnpricedQuotationLineItemsError } from '@/lib/finance/pricing/quotation-line-input-validation'
-import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
+import { requireCommercialTenantContext } from '@/lib/tenant/authorization'
 import { roundCurrency, toNumber, toDateString } from '@/lib/finance/shared'
 import type { CommercialModelCode } from '@/lib/commercial/pricing-governance-types'
 
@@ -119,7 +119,7 @@ const getLegacyQuotes = async ({
 }
 
 export async function GET(request: Request) {
-  const { tenant, errorResponse } = await requireFinanceTenantContext()
+  const { tenant, errorResponse } = await requireCommercialTenantContext()
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -223,7 +223,7 @@ const generateQuotationNumber = () => {
 }
 
 export async function POST(request: Request) {
-  const { tenant, errorResponse } = await requireFinanceTenantContext()
+  const { tenant, errorResponse } = await requireCommercialTenantContext()
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

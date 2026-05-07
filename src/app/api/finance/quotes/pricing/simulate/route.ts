@@ -8,7 +8,7 @@ import type {
   PricingLineOutputV2
 } from '@/lib/finance/pricing/contracts'
 import { buildPricingEngineOutputV2 } from '@/lib/finance/pricing/pricing-engine-v2'
-import { canViewCostStack, requireFinanceTenantContext } from '@/lib/tenant/authorization'
+import { canViewCostStack, requireCommercialTenantContext } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
 
@@ -43,7 +43,7 @@ const isValidInput = (payload: unknown): payload is PricingEngineInputV2 => {
 }
 
 export async function POST(request: Request) {
-  const { tenant, errorResponse } = await requireFinanceTenantContext()
+  const { tenant, errorResponse } = await requireCommercialTenantContext()
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

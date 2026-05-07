@@ -6,7 +6,7 @@ import {
 } from '@/lib/commercial/governance/versions-store'
 import { publishQuotationVersionCreated } from '@/lib/commercial/quotation-events'
 import { resolveQuotationIdentity } from '@/lib/finance/pricing'
-import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
+import { requireCommercialTenantContext } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
 
@@ -14,7 +14,7 @@ export async function GET(
   _request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { tenant, errorResponse } = await requireFinanceTenantContext()
+  const { tenant, errorResponse } = await requireCommercialTenantContext()
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -36,7 +36,7 @@ export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { tenant, errorResponse } = await requireFinanceTenantContext()
+  const { tenant, errorResponse } = await requireCommercialTenantContext()
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

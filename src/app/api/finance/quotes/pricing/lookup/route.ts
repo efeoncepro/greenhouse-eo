@@ -7,7 +7,7 @@ import { listEmploymentTypes, listSellableRoles } from '@/lib/commercial/sellabl
 import { listServiceCatalog } from '@/lib/commercial/service-catalog-store'
 import { listToolCatalog } from '@/lib/commercial/tool-catalog-store'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
-import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
+import { requireCommercialTenantContext } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
 
@@ -215,7 +215,7 @@ const lookupPeople = async (query: string, limit: number): Promise<LookupItem[]>
 }
 
 export async function GET(request: Request) {
-  const { tenant, errorResponse } = await requireFinanceTenantContext()
+  const { tenant, errorResponse } = await requireCommercialTenantContext()
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

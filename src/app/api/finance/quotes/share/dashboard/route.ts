@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 
 import { query } from '@/lib/db'
 import { buildShortQuoteUrl } from '@/lib/finance/quote-share/url-builder'
-import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
+import { requireCommercialTenantContext } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
 
@@ -43,7 +43,7 @@ const toIso = (value: string | Date | null): string | null => {
  *   ?limit=50  (default: 50, max: 200)
  */
 export async function GET(request: Request) {
-  const { tenant, errorResponse } = await requireFinanceTenantContext()
+  const { tenant, errorResponse } = await requireCommercialTenantContext()
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

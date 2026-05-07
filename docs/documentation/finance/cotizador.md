@@ -3,13 +3,20 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
 > **Version:** 3.10
 > **Creado:** 2026-04-18 por Claude (TASK-464e close-out)
-> **Ultima actualizacion:** 2026-04-22 por Codex (v3.10 — hidratacion canonica de contactos HubSpot al seleccionar una org adoptada), Codex (v3.9 — TASK-543 cleanup de flags legacy del selector unificado), Codex (v3.8 — TASK-538 selector unificado de parties en el Quote Builder), Claude (v3.7 — TASK-509 Floating UI en TotalsLadder: anchor self-contained + a11y integral) y Codex (v3.6 — HubSpot deal anchor + contacto obligatorio para sync bidireccional robusta)
+> **Ultima actualizacion:** 2026-05-07 por Codex (v3.11 — TASK-556 adopta cotizaciones como surface Comercial sobre path legacy `/finance/quotes`), 2026-04-22 por Codex (v3.10 — hidratacion canonica de contactos HubSpot al seleccionar una org adoptada), Codex (v3.9 — TASK-543 cleanup de flags legacy del selector unificado), Codex (v3.8 — TASK-538 selector unificado de parties en el Quote Builder), Claude (v3.7 — TASK-509 Floating UI en TotalsLadder: anchor self-contained + a11y integral) y Codex (v3.6 — HubSpot deal anchor + contacto obligatorio para sync bidireccional robusta)
 > **Documentacion tecnica:**
 > - Surfaces full-page: [TASK-473 — Quote Builder Full-Page Surface Migration](../../tasks/complete/TASK-473-quote-builder-full-page-surface-migration.md)
 > - Service composition: [TASK-465 — Service Composition Catalog](../../tasks/complete/TASK-465-service-composition-catalog-ui.md)
 > - FX foundation: [GREENHOUSE_FX_CURRENCY_PLATFORM_V1](../../architecture/GREENHOUSE_FX_CURRENCY_PLATFORM_V1.md)
 > - Engine: [GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md)
 > - Primitives originales: [TASK-464e — Quote Builder UI Exposure](../../tasks/complete/TASK-464e-quote-builder-ui-exposure.md) · [TASK-469 — UI Interface Plan](../../tasks/complete/TASK-469-commercial-pricing-ui-interface-plan.md)
+
+## Cambios v3.11 (2026-05-07 — TASK-556 · Surface Comercial sobre path legacy)
+
+- **Owner funcional:** cotizaciones y quote builder pertenecen a `Comercial`.
+- **Compatibilidad de URL:** las rutas siguen siendo `/finance/quotes`, `/finance/quotes/new` y `/finance/quotes/[id]/edit` hasta una normalizacion futura de URLs.
+- **Acceso:** las APIs legacy de cotizaciones usan guard comercial compatible; `finance` conserva acceso como consumidor para aprobaciones, margen, FX y quote-to-cash.
+- **Framing:** el listado principal habla de propuestas comerciales, pricing y emision documental, no de una lane financiera.
 
 ## Cambios v3.10 (2026-04-22 — Contactos HubSpot read-through)
 

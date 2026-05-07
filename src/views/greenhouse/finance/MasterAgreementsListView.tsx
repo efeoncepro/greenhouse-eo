@@ -250,7 +250,10 @@ const MasterAgreementsListView = () => {
   return (
     <Stack spacing={6}>
       <Box>
-        <Typography variant='h4'>Acuerdos marco</Typography>
+        <Stack direction='row' spacing={2} alignItems='center' flexWrap='wrap'>
+          <Typography variant='h4'>Acuerdos marco</Typography>
+          <CustomChip label='Comercial' color='primary' size='small' variant='tonal' />
+        </Stack>
         <Typography color='text.secondary'>
           MSAs, cláusulas maestras y contratos vinculados por organización.
         </Typography>
@@ -360,7 +363,7 @@ const MasterAgreementsListView = () => {
               No hay acuerdos marco visibles
             </Typography>
             <Typography variant='body2' color='text.secondary'>
-              Ajusta los filtros o espera a que el backend exponga acuerdos marco para este tenant.
+              Ajusta los filtros o registra acuerdos marco comerciales para este tenant.
             </Typography>
           </Box>
         ) : viewMode === 'table' ? (
