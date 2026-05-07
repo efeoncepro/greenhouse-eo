@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState, useTransition } from 'react'
+import { useEffect, useState, useTransition } from 'react'
 
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -23,7 +23,14 @@ import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 
 import GreenhouseFileUploader, { type UploadedFileValue } from '@/components/greenhouse/GreenhouseFileUploader'
-import { formatCurrency } from '@/lib/format/currency'
+import SampleSprintsMockupView, {
+  type HealthSeverity,
+  type Signal,
+  type Sprint,
+  type SprintKind,
+  type SprintStatus,
+  type TeamMember
+} from './mockup/SampleSprintsMockupView'
 
 type WorkspaceMode = 'list' | 'declare' | 'detail' | 'approve' | 'progress' | 'outcome'
 
@@ -122,7 +129,145 @@ const STATUS_TONE: Record<string, 'default' | 'primary' | 'success' | 'warning' 
   closed: 'default'
 }
 
-const formatClp = (value: number | null | undefined) => formatCurrency(value ?? 0, 'CLP', 'es-CL')
+const getClientLabel = (item: SampleSprintItem) => item.organizationName || item.clientName || item.spaceName || 'Cliente sin nombre'
+
+const getSprintStatus = (item: SampleSprintItem): SprintStatus => {
+  if (item.outcomeKind === 'converted') return 'converted'
+  if (['cancelled', 'cancelled_by_client', 'cancelled_by_provider'].includes(item.outcomeKind ?? '')) return 'cancelled'
+  if (item.outcomeKind === 'dropped') return 'dropped'
+  if (item.status === 'pending_approval') return 'pending_approval'
+  if (item.status === 'active' && item.latestSnapshotDate) return 'reporting'
+  if (item.status === 'active') return 'active'
+  if (item.status === 'converted') return 'converted'
+  if (item.status === 'cancelled') return 'cancelled'
+
+  return 'active'
+}
+
+const getPhase = (item: SampleSprintItem): Sprint['phase'] => {
+  if (item.outcomeKind) return 'Decisión'
+  if (item.latestSnapshotDate) return 'Reporte'
+  if (item.status === 'active') return 'Operación'
+
+  return 'Kickoff'
+}
+
+const getDaysSince = (value: string | null) => {
+  if (!value) return 0
+
+  const target = new Date(value)
+
+  if (Number.isNaN(target.getTime())) return 0
+
+  return Math.max(0, Math.floor((Date.now() - target.getTime()) / 86400000))
+}
+
+const getProgressPct = (item: SampleSprintItem) => {
+  if (item.outcomeKind) return 100
+  if (item.latestSnapshotDate) return 72
+  if (item.status === 'active') return 42
+  if (item.status === 'pending_approval') return 8
+
+  return 20
+}
+
+const getSignalSeverity = (item: SampleSprintItem): HealthSeverity => {
+  if (item.status === 'pending_approval') return 'warning'
+  if (getDaysSince(item.latestSnapshotDate) > 10 && item.status === 'active') return 'warning'
+  if (item.outcomeKind === 'cancelled_by_client' || item.outcomeKind === 'cancelled_by_provider') return 'error'
+  if (item.outcomeKind === 'converted') return 'success'
+
+  return 'info'
+}
+
+const initialsFrom = (value: string) => value
+  .split(/\s+/)
+  .filter(Boolean)
+  .slice(0, 2)
+  .map(part => part[0]?.toUpperCase())
+  .join('') || 'SS'
+
+const teamFromItem = (item: SampleSprintItem): TeamMember[] => [{
+  name: getClientLabel(item),
+  role: 'Engagement owner',
+  initials: initialsFrom(getClientLabel(item)),
+  allocation: item.status === 'pending_approval' ? 0.15 : 0.35,
+  availability: item.status === 'pending_approval' ? 0.85 : 0.45
+}]
+
+const toSprint = (item: SampleSprintItem): Sprint => ({
+  id: item.serviceId,
+  client: getClientLabel(item),
+  name: item.name,
+  kind: item.engagementKind as SprintKind,
+  subtype: ENGAGEMENT_KIND_LABEL[item.engagementKind],
+  status: getSprintStatus(item),
+  owner: getClientLabel(item),
+  startDate: item.startDate ?? item.createdAt ?? new Date().toISOString().slice(0, 10),
+  decisionDate: item.decisionDeadline ?? item.targetEndDate ?? item.startDate ?? item.createdAt ?? new Date().toISOString().slice(0, 10),
+  budgetClp: item.expectedInternalCostClp,
+  actualClp: 0,
+  conversionProbability: item.outcomeKind === 'converted' ? 100 : item.status === 'active' ? 55 : 0,
+  progressPct: getProgressPct(item),
+  lastSnapshotDays: getDaysSince(item.latestSnapshotDate),
+  phase: getPhase(item),
+  outcome: item.outcomeKind ?? undefined,
+  signal: getSignalSeverity(item),
+  team: teamFromItem(item)
+})
+
+const buildRuntimeSignals = (items: SampleSprintItem[]): Signal[] => {
+  const overdueDecision = items.filter(item => item.decisionDeadline && new Date(item.decisionDeadline) < new Date() && !item.outcomeKind).length
+  const pendingApproval = items.filter(item => item.status === 'pending_approval').length
+  const staleProgress = items.filter(item => item.status === 'active' && getDaysSince(item.latestSnapshotDate) > 10).length
+  const unapprovedActive = items.filter(item => item.status === 'active' && item.approvalStatus && item.approvalStatus !== 'approved').length
+  const closed = items.filter(item => item.outcomeKind).length
+  const converted = items.filter(item => item.outcomeKind === 'converted').length
+  const conversionRate = closed > 0 ? converted / closed : 1
+
+  return [
+    {
+      code: 'commercial.engagement.overdue_decision',
+      label: 'Decisiones vencidas',
+      severity: 'error',
+      count: overdueDecision,
+      runbook: 'Cerrar outcome o ajustar deadline con aprobación',
+      description: 'Engagements sin outcome después del deadline de decisión.'
+    },
+    {
+      code: 'commercial.engagement.pending_approval',
+      label: 'Approval pendiente',
+      severity: 'warning',
+      count: pendingApproval,
+      runbook: 'Revisar capacidad y aprobar o rechazar el Sprint',
+      description: 'Sample Sprints declarados que aún no pasan a operación.'
+    },
+    {
+      code: 'commercial.engagement.stale_progress',
+      label: 'Progreso stale',
+      severity: 'warning',
+      count: staleProgress,
+      runbook: 'Registrar snapshot semanal con contexto operacional',
+      description: 'Engagement activo sin snapshot reciente.'
+    },
+    {
+      code: 'commercial.engagement.unapproved_active',
+      label: 'Activos sin approval',
+      severity: 'error',
+      count: unapprovedActive,
+      runbook: 'Volver a pending_approval o registrar aprobación retroactiva',
+      description: 'Servicios no regulares activos sin aprobación aprobada.'
+    },
+    {
+      code: 'commercial.engagement.conversion_rate_drop',
+      label: 'Conversión bajo umbral',
+      severity: 'warning',
+      count: conversionRate < 0.35 ? 1 : 0,
+      runbook: 'Revisar outcomes trailing 6m y criterios de success',
+      description: 'Conversion rate trailing bajo el threshold configurado.'
+    }
+  ]
+}
 
 const parseRecord = (value: string, fallback: Record<string, unknown>) => {
   try {
@@ -222,66 +367,14 @@ const useSampleSprints = (mode: WorkspaceMode, serviceId?: string) => {
   return { items, detail, options, loading, error }
 }
 
-const ListView = ({ items }: { items: SampleSprintItem[] }) => {
-  const metrics = useMemo(() => ({
-    total: items.length,
-    pending: items.filter(item => item.status === 'pending_approval').length,
-    active: items.filter(item => item.status === 'active').length,
-    converted: items.filter(item => item.outcomeKind === 'converted').length
-  }), [items])
-
-  return (
-    <Stack spacing={4}>
-      <Grid container spacing={3}>
-        {[
-          ['Total', metrics.total],
-          ['Pending approval', metrics.pending],
-          ['Active', metrics.active],
-          ['Converted', metrics.converted]
-        ].map(([label, value]) => (
-          <Grid key={label} size={{ xs: 12, sm: 6, md: 3 }}>
-            <Card>
-              <CardContent>
-                <Typography variant='overline' color='text.secondary'>{label}</Typography>
-                <Typography variant='h4'>{value}</Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-        ))}
-      </Grid>
-
-      <Stack spacing={2}>
-        {items.length === 0 ? (
-          <Alert severity='info'>No Sample Sprints found yet.</Alert>
-        ) : items.map(item => (
-          <Card key={item.serviceId}>
-            <CardContent>
-              <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} justifyContent='space-between'>
-                <Stack spacing={1}>
-                  <Stack direction='row' spacing={1} flexWrap='wrap' alignItems='center'>
-                    <Typography variant='h6'>{item.name}</Typography>
-                    <Chip size='small' label={ENGAGEMENT_KIND_LABEL[item.engagementKind]} />
-                    <Chip size='small' color={STATUS_TONE[item.status] ?? 'default'} label={item.status} />
-                  </Stack>
-                  <Typography color='text.secondary'>
-                    {item.spaceName} {item.clientName ? `- ${item.clientName}` : ''} - deadline {item.decisionDeadline ?? 'sin fecha'}
-                  </Typography>
-                  <Typography variant='body2'>{formatClp(item.expectedInternalCostClp)} expected internal cost</Typography>
-                </Stack>
-                <Stack direction='row' spacing={1} alignItems='center'>
-                  <Button component={Link} href={`/agency/sample-sprints/${item.serviceId}`} variant='outlined'>Open</Button>
-                  {item.status === 'pending_approval' ? (
-                    <Button component={Link} href={`/agency/sample-sprints/${item.serviceId}/approve`} variant='contained'>Approve</Button>
-                  ) : null}
-                </Stack>
-              </Stack>
-            </CardContent>
-          </Card>
-        ))}
-      </Stack>
-    </Stack>
-  )
-}
+const ListView = ({ items }: { items: SampleSprintItem[] }) => (
+  <SampleSprintsMockupView
+    variant='runtime'
+    sprints={items.map(toSprint)}
+    signals={buildRuntimeSignals(items)}
+    initialSelectedSprintId={items[0]?.serviceId}
+  />
+)
 
 const DeclareView = ({ options }: { options: Options | null }) => {
   const router = useRouter()
@@ -658,7 +751,7 @@ const SampleSprintsWorkspace = ({ mode, serviceId }: Props) => {
 
   return (
     <Stack spacing={4}>
-      <Header mode={mode} />
+      {mode === 'list' ? null : <Header mode={mode} />}
       {loading ? <LinearProgress /> : null}
       {error ? <Alert severity='error'>{error}</Alert> : null}
       {!loading && !error && mode === 'list' ? <ListView items={items} /> : null}

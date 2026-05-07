@@ -2,6 +2,8 @@
 
 import { useMemo, useState } from 'react'
 
+import Link from 'next/link'
+
 import Alert from '@mui/material/Alert'
 import AvatarGroup from '@mui/material/AvatarGroup'
 import Box from '@mui/material/Box'
@@ -43,11 +45,11 @@ import useReducedMotion from '@/hooks/useReducedMotion'
 import { getMicrocopy } from '@/lib/copy'
 import { formatCurrency as formatGreenhouseCurrency, formatDate as formatGreenhouseDate } from '@/lib/format'
 
-type SprintStatus = 'pending_approval' | 'active' | 'reporting' | 'converted' | 'cancelled' | 'dropped'
-type SprintKind = 'pilot' | 'trial' | 'poc' | 'discovery'
-type HealthSeverity = 'primary' | 'success' | 'warning' | 'error' | 'info' | 'secondary'
+export type SprintStatus = 'pending_approval' | 'active' | 'reporting' | 'converted' | 'cancelled' | 'dropped'
+export type SprintKind = 'pilot' | 'trial' | 'poc' | 'discovery'
+export type HealthSeverity = 'primary' | 'success' | 'warning' | 'error' | 'info' | 'secondary'
 
-type TeamMember = {
+export type TeamMember = {
   name: string
   role: string
   initials: string
@@ -55,7 +57,7 @@ type TeamMember = {
   availability: number
 }
 
-type Sprint = {
+export type Sprint = {
   id: string
   client: string
   name: string
@@ -76,7 +78,7 @@ type Sprint = {
   team: TeamMember[]
 }
 
-type Signal = {
+export type Signal = {
   code: string
   label: string
   severity: HealthSeverity
@@ -268,25 +270,39 @@ const getDaysToDecision = (date: string) => {
   return Math.ceil((target.getTime() - now.getTime()) / 86400000)
 }
 
-const SampleSprintsMockupView = () => {
+type SampleSprintsExperienceVariant = 'mockup' | 'runtime'
+
+type SampleSprintsMockupViewProps = {
+  sprints?: Sprint[]
+  signals?: Signal[]
+  variant?: SampleSprintsExperienceVariant
+  initialSelectedSprintId?: string
+}
+
+const SampleSprintsMockupView = ({
+  sprints = mockSprints,
+  signals = reliabilitySignals,
+  variant = 'mockup',
+  initialSelectedSprintId
+}: SampleSprintsMockupViewProps = {}) => {
   const theme = useTheme()
   const reducedMotion = useReducedMotion()
   const [activeSurface, setActiveSurface] = useState('command')
-  const [selectedSprintId, setSelectedSprintId] = useState('SS-1042')
+  const [selectedSprintId, setSelectedSprintId] = useState(initialSelectedSprintId ?? sprints[0]?.id ?? '')
   const [kindFilter, setKindFilter] = useState<'all' | SprintKind>('all')
   const [statusFilter, setStatusFilter] = useState<'all' | SprintStatus>('all')
   const [approvalOverride, setApprovalOverride] = useState('')
   const [snapshotNotes, setSnapshotNotes] = useState('Semana con avance fuerte en playbook de operación. Falta cerrar evidencia de ahorro de tiempo.')
-  const selectedSprint = mockSprints.find(sprint => sprint.id === selectedSprintId) ?? mockSprints[0]
+  const selectedSprint = sprints.find(sprint => sprint.id === selectedSprintId) ?? sprints[0] ?? null
 
   const filteredSprints = useMemo(() => {
-    return mockSprints.filter(sprint => {
+    return sprints.filter(sprint => {
       const matchesKind = kindFilter === 'all' || sprint.kind === kindFilter
       const matchesStatus = statusFilter === 'all' || sprint.status === statusFilter
 
       return matchesKind && matchesStatus
     })
-  }, [kindFilter, statusFilter])
+  }, [kindFilter, sprints, statusFilter])
 
   const groupedByClient = useMemo(() => {
     return filteredSprints.reduce<Record<string, Sprint[]>>((acc, sprint) => {
@@ -297,10 +313,15 @@ const SampleSprintsMockupView = () => {
     }, {})
   }, [filteredSprints])
 
-  const activeCount = mockSprints.filter(sprint => sprint.status === 'active' || sprint.status === 'reporting').length
-  const conversionRate = 64
-  const gtmInvestment = mockSprints.reduce((sum, sprint) => sum + sprint.actualClp, 0)
-  const warningCount = reliabilitySignals.filter(signal => signal.count > 0).length
+  const activeCount = sprints.filter(sprint => sprint.status === 'active' || sprint.status === 'reporting').length
+  const closedCount = sprints.filter(sprint => ['converted', 'cancelled', 'dropped'].includes(sprint.status)).length
+  const convertedCount = sprints.filter(sprint => sprint.status === 'converted').length
+  const conversionRate = variant === 'mockup' ? 64 : closedCount > 0 ? Math.round((convertedCount / closedCount) * 100) : 0
+  const gtmInvestment = sprints.reduce((sum, sprint) => sum + (variant === 'mockup' ? sprint.actualClp : sprint.budgetClp), 0)
+  const warningCount = signals.filter(signal => signal.count > 0).length
+  const heroSecondaryChip = variant === 'mockup' ? 'Sin backend conectado' : 'Backend conectado'
+  const heroPrimaryChip = variant === 'mockup' ? 'Mockup navegable' : 'Experiencia aprobada'
+  const investmentLabel = variant === 'mockup' ? 'GTM investment' : 'Budget esperado'
 
   return (
     <Stack spacing={6}>
@@ -316,8 +337,8 @@ const SampleSprintsMockupView = () => {
             <Grid size={{ xs: 12, lg: 7 }}>
               <Stack spacing={3}>
                 <Stack direction='row' spacing={2} flexWrap='wrap' useFlexGap>
-                  <CustomChip round='true' size='small' color='primary' variant='tonal' icon={<i className='tabler-sparkles' />} label='Mockup navegable' />
-                  <CustomChip round='true' size='small' color='secondary' variant='tonal' icon={<i className='tabler-database-off' />} label='Sin backend conectado' />
+                  <CustomChip round='true' size='small' color='primary' variant='tonal' icon={<i className='tabler-sparkles' />} label={heroPrimaryChip} />
+                  <CustomChip round='true' size='small' color='secondary' variant='tonal' icon={<i className={variant === 'mockup' ? 'tabler-database-off' : 'tabler-database'} />} label={heroSecondaryChip} />
                 </Stack>
                 <Box>
                   <Typography variant='h4' sx={{ mb: 1 }}>
@@ -329,9 +350,15 @@ const SampleSprintsMockupView = () => {
                   </Typography>
                 </Box>
                 <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-                  <Button variant='contained' startIcon={<i className='tabler-plus' />} onClick={() => setActiveSurface('declare')}>
-                    Declarar Sprint
-                  </Button>
+                  {variant === 'runtime' ? (
+                    <Button component={Link} href='/agency/sample-sprints/new' variant='contained' startIcon={<i className='tabler-plus' />}>
+                      Declarar Sprint
+                    </Button>
+                  ) : (
+                    <Button variant='contained' startIcon={<i className='tabler-plus' />} onClick={() => setActiveSurface('declare')}>
+                      Declarar Sprint
+                    </Button>
+                  )}
                   <Button variant='tonal' color='secondary' startIcon={<i className='tabler-shield-check' />} onClick={() => setActiveSurface('approval')}>
                     Revisar approval
                   </Button>
@@ -361,7 +388,7 @@ const SampleSprintsMockupView = () => {
                   <Stack direction='row' spacing={4} flexWrap='wrap' useFlexGap>
                     <HeroMetric label='Activos' value={String(activeCount)} icon='tabler-player-play' />
                     <HeroMetric label='Conversión 6m' value={`${conversionRate}%`} icon='tabler-trending-up' />
-                    <HeroMetric label='GTM investment' value={formatCurrency(gtmInvestment)} icon='tabler-cash-banknote' compact />
+                    <HeroMetric label={investmentLabel} value={formatCurrency(gtmInvestment)} icon='tabler-cash-banknote' compact />
                   </Stack>
                     <LinearProgress
                     variant='determinate'
@@ -406,31 +433,50 @@ const SampleSprintsMockupView = () => {
             setKindFilter={setKindFilter}
             statusFilter={statusFilter}
             setStatusFilter={setStatusFilter}
+            variant={variant}
+            metrics={{
+              total: sprints.length,
+              conversionRate,
+              investment: gtmInvestment,
+              warningCount
+            }}
           />
         </TabPanel>
 
         <TabPanel value='detail' sx={{ p: 0, pt: 6 }}>
-          <DetailSurface sprint={selectedSprint} reducedMotion={reducedMotion} />
+          {selectedSprint ? <DetailSurface sprint={selectedSprint} reducedMotion={reducedMotion} variant={variant} /> : <NoSprintSelected variant={variant} />}
         </TabPanel>
 
         <TabPanel value='declare' sx={{ p: 0, pt: 6 }}>
-          <DeclareWizard />
+          {variant === 'runtime' ? <RuntimeActionPanel kind='declare' /> : <DeclareWizard />}
         </TabPanel>
 
         <TabPanel value='approval' sx={{ p: 0, pt: 6 }}>
-          <ApprovalWizard sprint={selectedSprint} approvalOverride={approvalOverride} setApprovalOverride={setApprovalOverride} />
+          {selectedSprint ? (
+            variant === 'runtime' ? (
+              <RuntimeActionPanel kind='approval' sprint={selectedSprint} />
+            ) : (
+              <ApprovalWizard sprint={selectedSprint} approvalOverride={approvalOverride} setApprovalOverride={setApprovalOverride} />
+            )
+          ) : <NoSprintSelected variant={variant} />}
         </TabPanel>
 
         <TabPanel value='progress' sx={{ p: 0, pt: 6 }}>
-          <ProgressWizard sprint={selectedSprint} snapshotNotes={snapshotNotes} setSnapshotNotes={setSnapshotNotes} />
+          {selectedSprint ? (
+            variant === 'runtime' ? (
+              <RuntimeActionPanel kind='progress' sprint={selectedSprint} />
+            ) : (
+              <ProgressWizard sprint={selectedSprint} snapshotNotes={snapshotNotes} setSnapshotNotes={setSnapshotNotes} />
+            )
+          ) : <NoSprintSelected variant={variant} />}
         </TabPanel>
 
         <TabPanel value='outcome' sx={{ p: 0, pt: 6 }}>
-          <OutcomeWizard sprint={selectedSprint} />
+          {selectedSprint ? (variant === 'runtime' ? <RuntimeActionPanel kind='outcome' sprint={selectedSprint} /> : <OutcomeWizard sprint={selectedSprint} />) : <NoSprintSelected variant={variant} />}
         </TabPanel>
 
         <TabPanel value='health' sx={{ p: 0, pt: 6 }}>
-          <CommercialHealthSurface />
+          <CommercialHealthSurface signals={signals} variant={variant} />
         </TabPanel>
       </TabContext>
     </Stack>
@@ -459,7 +505,9 @@ const CommandCenter = ({
   kindFilter,
   setKindFilter,
   statusFilter,
-  setStatusFilter
+  setStatusFilter,
+  variant,
+  metrics
 }: {
   groupedByClient: Record<string, Sprint[]>
   selectedSprintId: string
@@ -469,52 +517,66 @@ const CommandCenter = ({
   setKindFilter: (kind: 'all' | SprintKind) => void
   statusFilter: 'all' | SprintStatus
   setStatusFilter: (status: 'all' | SprintStatus) => void
+  variant: SampleSprintsExperienceVariant
+  metrics: {
+    total: number
+    conversionRate: number
+    investment: number
+    warningCount: number
+  }
 }) => {
+  const allSprints = Object.values(groupedByClient).flat()
+
+  const nextDecisionSprints = [...allSprints]
+    .filter(sprint => sprint.decisionDate)
+    .sort((a, b) => getDaysToDecision(a.decisionDate) - getDaysToDecision(b.decisionDate))
+    .slice(0, 3)
+
   return (
     <Grid container spacing={6}>
       <Grid size={{ xs: 12, md: 6, xl: 3 }}>
         <HorizontalWithSubtitle
           title='Sample Sprints'
-          stats='4'
+          stats={String(metrics.total)}
           avatarIcon='tabler-rocket'
           avatarColor='primary'
-          subtitle='Activos e históricos del piloto'
+          subtitle={variant === 'mockup' ? 'Activos e históricos del piloto' : 'Engagements reales del runtime'}
           trend='positive'
-          trendNumber='2 este mes'
+          trendNumber={metrics.total > 0 ? `${metrics.total} total` : 'Sin registros'}
         />
       </Grid>
       <Grid size={{ xs: 12, md: 6, xl: 3 }}>
         <HorizontalWithSubtitle
           title='Conversion rate'
-          stats='64%'
+          stats={`${metrics.conversionRate}%`}
           avatarIcon='tabler-chart-arcs'
           avatarColor='success'
           subtitle='Trailing 6 meses'
-          statusLabel='Sobre umbral'
-          statusColor='success'
-          statusIcon='tabler-circle-check'
+          statusLabel={metrics.conversionRate > 0 ? 'Con muestra' : 'Sin muestra'}
+          statusColor={metrics.conversionRate > 0 ? 'success' : 'secondary'}
+          statusIcon={metrics.conversionRate > 0 ? 'tabler-circle-check' : 'tabler-chart-bar-off'}
         />
       </Grid>
       <Grid size={{ xs: 12, md: 6, xl: 3 }}>
         <HorizontalWithSubtitle
-          title='GTM investment'
-          stats='$12,6M'
+          title={variant === 'mockup' ? 'GTM investment' : 'Budget esperado'}
+          stats={formatCurrency(metrics.investment)}
           avatarIcon='tabler-cash'
           avatarColor='warning'
-          subtitle='Reclasificado fuera del cliente'
-          titleTooltip='Mock de TASK-806 gtm_investment_pnl'
+          subtitle={variant === 'mockup' ? 'Reclasificado fuera del cliente' : 'Costo interno esperado'}
+          titleTooltip={variant === 'mockup' ? 'Mock de TASK-806 gtm_investment_pnl' : 'Suma de expected_internal_cost_clp desde los services reales'}
         />
       </Grid>
       <Grid size={{ xs: 12, md: 6, xl: 3 }}>
         <HorizontalWithSubtitle
           title='Riesgos abiertos'
-          stats='3'
+          stats={String(metrics.warningCount)}
           avatarIcon='tabler-alert-triangle'
           avatarColor='error'
           subtitle='Signals no steady'
-          statusLabel='Revisar hoy'
-          statusColor='warning'
-          statusIcon='tabler-bell-ringing'
+          statusLabel={metrics.warningCount > 0 ? 'Revisar hoy' : 'Steady'}
+          statusColor={metrics.warningCount > 0 ? 'warning' : 'success'}
+          statusIcon={metrics.warningCount > 0 ? 'tabler-bell-ringing' : 'tabler-circle-check'}
         />
       </Grid>
 
@@ -526,7 +588,7 @@ const CommandCenter = ({
             subheader='Agrupación operacional para detectar pilotos simultáneos y outcomes pendientes.'
             avatarIcon='tabler-building-community'
             action={
-              <Button size='small' variant='contained' startIcon={<i className='tabler-plus' />}>
+              <Button component={variant === 'runtime' ? Link : 'button'} href={variant === 'runtime' ? '/agency/sample-sprints/new' : undefined} size='small' variant='contained' startIcon={<i className='tabler-plus' />}>
                 Nuevo Sprint
               </Button>
             }
@@ -565,7 +627,19 @@ const CommandCenter = ({
             </Stack>
 
             <Stack spacing={4}>
-              {Object.entries(groupedByClient).map(([client, sprints]) => (
+              {Object.keys(groupedByClient).length === 0 ? (
+                <EmptyState
+                  icon='tabler-rocket-off'
+                  title='No hay Sample Sprints con estos filtros'
+                  description='Cambia el tipo o estado, o declara un nuevo Sprint para iniciar el flujo aprobado.'
+                  action={
+                    <Button component={variant === 'runtime' ? Link : 'button'} href={variant === 'runtime' ? '/agency/sample-sprints/new' : undefined} size='small' variant='contained' startIcon={<i className='tabler-plus' />}>
+                      Declarar Sprint
+                    </Button>
+                  }
+                  minHeight={260}
+                />
+              ) : Object.entries(groupedByClient).map(([client, sprints]) => (
                 <Box key={client}>
                   <Stack direction='row' justifyContent='space-between' alignItems='center' sx={{ mb: 2 }}>
                     <Typography variant='subtitle1'>{client}</Typography>
@@ -608,7 +682,14 @@ const CommandCenter = ({
             <Divider />
             <CardContent>
               <Stack spacing={3}>
-                {mockSprints.slice(0, 3).map(sprint => (
+                {nextDecisionSprints.length === 0 ? (
+                  <EmptyState
+                    icon='tabler-calendar-off'
+                    title='Sin decisiones próximas'
+                    description='Cuando existan deadlines, aparecerán ordenados por fecha e impacto.'
+                    minHeight={220}
+                  />
+                ) : nextDecisionSprints.map(sprint => (
                   <Stack key={sprint.id} direction='row' spacing={3} alignItems='center'>
                     <SignalDot severity={sprint.signal} />
                     <Box sx={{ minWidth: 0, flex: 1 }}>
@@ -629,7 +710,7 @@ const CommandCenter = ({
           <Card>
             <CardHeader
               title='Estado vacío diseñado'
-              subheader='Ejemplo para filtros sin resultados.'
+              subheader={variant === 'mockup' ? 'Ejemplo para filtros sin resultados.' : 'Estado operacional cuando no hay coincidencias.'}
               avatar={
                 <CustomAvatar skin='light' color='secondary' variant='rounded'>
                   <i className='tabler-filter-off' />
@@ -641,7 +722,10 @@ const CommandCenter = ({
                 icon='tabler-search-off'
                 title='No hay Sprints con estos filtros'
                 description='Cambia el tipo o estado para volver a ver engagements operativos.'
-                action={<Button size='small' variant='tonal'>Limpiar filtros</Button>}
+                action={<Button size='small' variant='tonal' onClick={() => {
+                  setKindFilter('all')
+                  setStatusFilter('all')
+                }}>Limpiar filtros</Button>}
                 minHeight={220}
               />
             </CardContent>
@@ -655,7 +739,7 @@ const CommandCenter = ({
 const SprintRow = ({ sprint, selected, onSelect }: { sprint: Sprint; selected: boolean; onSelect: () => void }) => {
   const kind = sprintKinds[sprint.kind]
   const status = statusMeta[sprint.status]
-  const budgetPct = Math.min(100, Math.round((sprint.actualClp / sprint.budgetClp) * 100))
+  const budgetPct = sprint.budgetClp > 0 ? Math.min(100, Math.round((sprint.actualClp / sprint.budgetClp) * 100)) : sprint.progressPct
 
   return (
     <Box
@@ -730,8 +814,9 @@ const SprintRow = ({ sprint, selected, onSelect }: { sprint: Sprint; selected: b
   )
 }
 
-const DetailSurface = ({ sprint, reducedMotion }: { sprint: Sprint; reducedMotion: boolean }) => {
+const DetailSurface = ({ sprint, reducedMotion, variant }: { sprint: Sprint; reducedMotion: boolean; variant: SampleSprintsExperienceVariant }) => {
   const activeStep = phaseSteps.indexOf(sprint.phase)
+  const costProgress = sprint.budgetClp > 0 ? Math.min(100, (sprint.actualClp / sprint.budgetClp) * 100) : sprint.progressPct
 
   return (
     <Grid container spacing={6}>
@@ -790,16 +875,18 @@ const DetailSurface = ({ sprint, reducedMotion }: { sprint: Sprint; reducedMotio
                   <CardContent>
                     <Stack spacing={3}>
                       <Typography variant='h4' sx={{ fontVariantNumeric: 'tabular-nums' }}>
-                        {formatCurrency(sprint.actualClp)}
+                        {formatCurrency(variant === 'mockup' ? sprint.actualClp : sprint.budgetClp)}
                       </Typography>
                       <LinearProgress
-                        value={Math.min(100, (sprint.actualClp / sprint.budgetClp) * 100)}
+                        value={costProgress}
                         variant='determinate'
                         sx={{ height: 8, borderRadius: 9999 }}
                         aria-label={domainAria.costAgainstBudget}
                       />
                       <Typography variant='body2' color='text.secondary'>
-                        Presupuesto aprobado: {formatCurrency(sprint.budgetClp)}. Esta lectura será neutralizada del margen cliente cuando TASK-806 conecte la VIEW.
+                        {variant === 'mockup'
+                          ? `Presupuesto aprobado: ${formatCurrency(sprint.budgetClp)}. Esta lectura será neutralizada del margen cliente cuando TASK-806 conecte la VIEW.`
+                          : `Costo interno esperado: ${formatCurrency(sprint.budgetClp)}. El runtime conserva el monto aprobado en el service.`}
                       </Typography>
                     </Stack>
                   </CardContent>
@@ -817,7 +904,13 @@ const DetailSurface = ({ sprint, reducedMotion }: { sprint: Sprint; reducedMotio
             <CardHeader title='Snapshots' subheader='Cadencia semanal esperada.' />
             <CardContent>
               <Stack spacing={3}>
-                {['Semana 1 · kickoff validado', 'Semana 2 · playbook operacional', 'Semana 3 · evidencia pendiente'].map((item, index) => (
+                {(variant === 'mockup'
+                  ? ['Semana 1 · kickoff validado', 'Semana 2 · playbook operacional', 'Semana 3 · evidencia pendiente']
+                  : [
+                      sprint.lastSnapshotDays > 0 ? `Último snapshot hace ${sprint.lastSnapshotDays} días` : 'Sin snapshot registrado',
+                      `Fase actual · ${sprint.phase}`,
+                      `Progreso operacional · ${sprint.progressPct}%`
+                    ]).map((item, index) => (
                   <Stack key={item} direction='row' spacing={2}>
                     <SignalDot severity={index === 2 ? 'warning' : 'success'} />
                     <Typography variant='body2'>{item}</Typography>
@@ -1185,7 +1278,123 @@ const OutcomeWizard = ({ sprint }: { sprint: Sprint }) => (
   </Grid>
 )
 
-const CommercialHealthSurface = () => (
+const RuntimeActionPanel = ({ kind, sprint }: { kind: 'declare' | 'approval' | 'progress' | 'outcome'; sprint?: Sprint }) => {
+  const meta = {
+    declare: {
+      title: 'Declarar Sample Sprint',
+      subheader: 'Usa el formulario transaccional conectado al backend.',
+      icon: 'tabler-forms',
+      href: '/agency/sample-sprints/new',
+      cta: 'Abrir declaración',
+      color: 'primary' as HealthSeverity,
+      bullets: ['Crea el service no regular.', 'Registra criterios de éxito.', 'Dispara approval cuando corresponde.']
+    },
+    approval: {
+      title: 'Aprobar engagement',
+      subheader: sprint ? `${sprint.client} · ${sprint.name}` : 'Selecciona un Sprint para aprobar.',
+      icon: 'tabler-shield-check',
+      href: sprint ? `/agency/sample-sprints/${sprint.id}/approve` : '/agency/sample-sprints',
+      cta: 'Abrir approval',
+      color: 'warning' as HealthSeverity,
+      bullets: ['Valida capacity warning.', 'Audita overrides.', 'Promueve el Sprint a operación.']
+    },
+    progress: {
+      title: 'Registrar snapshot semanal',
+      subheader: sprint ? `${sprint.client} · último snapshot hace ${sprint.lastSnapshotDays} días` : 'Selecciona un Sprint para registrar progreso.',
+      icon: 'tabler-notes',
+      href: sprint ? `/agency/sample-sprints/${sprint.id}/progress` : '/agency/sample-sprints',
+      cta: 'Abrir progreso',
+      color: 'info' as HealthSeverity,
+      bullets: ['Registra métricas JSON.', 'Adjunta notas cualitativas.', 'Mantiene steady el signal de stale progress.']
+    },
+    outcome: {
+      title: 'Registrar outcome',
+      subheader: sprint ? `${sprint.client} · ${sprint.name}` : 'Selecciona un Sprint para cerrar outcome.',
+      icon: 'tabler-flag-check',
+      href: sprint ? `/agency/sample-sprints/${sprint.id}/outcome` : '/agency/sample-sprints',
+      cta: 'Abrir outcome',
+      color: 'primary' as HealthSeverity,
+      bullets: ['Cierra el outcome.', 'Conecta lineage si convierte.', 'Emite audit log y outbox event.']
+    }
+  }[kind]
+
+  return (
+    <Grid container spacing={6}>
+      <Grid size={{ xs: 12, lg: 8 }}>
+        <Card>
+          <CardHeader
+            title={meta.title}
+            subheader={meta.subheader}
+            avatar={
+              <CustomAvatar skin='light' color={meta.color} variant='rounded'>
+                <i className={meta.icon} />
+              </CustomAvatar>
+            }
+          />
+          <Divider />
+          <CardContent>
+            <Stack spacing={5}>
+              <Stepper activeStep={kind === 'declare' ? 1 : kind === 'approval' ? 2 : kind === 'progress' ? 3 : 4}>
+                {['Cliente', 'Diseño', 'Approval', 'Operación', 'Outcome'].map(step => (
+                  <Step key={step}>
+                    <StepLabel>{step}</StepLabel>
+                  </Step>
+                ))}
+              </Stepper>
+              <Grid container spacing={5}>
+                {meta.bullets.map(item => (
+                  <Grid key={item} size={{ xs: 12, md: 4 }}>
+                    <DecisionTile label='Runtime conectado' value={item} icon='tabler-plug-connected' />
+                  </Grid>
+                ))}
+              </Grid>
+            </Stack>
+          </CardContent>
+          <Divider />
+          <CardContent>
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} justifyContent='flex-end'>
+              <Button component={Link} href='/agency/sample-sprints' variant='tonal' color='secondary'>
+                Volver al board
+              </Button>
+              <Button component={Link} href={meta.href} variant='contained' startIcon={<i className='tabler-external-link' />}>
+                {meta.cta}
+              </Button>
+            </Stack>
+          </CardContent>
+        </Card>
+      </Grid>
+      <Grid size={{ xs: 12, lg: 4 }}>
+        <SideGuidance title='Runtime real' icon='tabler-shield-check' items={meta.bullets} />
+      </Grid>
+    </Grid>
+  )
+}
+
+const NoSprintSelected = ({ variant }: { variant: SampleSprintsExperienceVariant }) => (
+  <Card>
+    <CardContent>
+      <EmptyState
+        icon='tabler-pointer-question'
+        title='Selecciona un Sample Sprint'
+        description='El command center mantiene la jerarquía aprobada y abre cada superficie desde un Sprint real.'
+        action={variant === 'runtime' ? <Button component={Link} href='/agency/sample-sprints/new' variant='contained'>Declarar Sprint</Button> : undefined}
+        minHeight={320}
+      />
+    </CardContent>
+  </Card>
+)
+
+const CommercialHealthSurface = ({
+  signals = reliabilitySignals,
+  variant = 'mockup'
+}: {
+  signals?: Signal[]
+  variant?: SampleSprintsExperienceVariant
+}) => {
+  const activeSignalCount = signals.filter(signal => signal.count > 0).length
+  const healthRatio = signals.length > 0 ? Math.round(((signals.length - activeSignalCount) / signals.length) * 100) : 100
+
+  return (
   <Grid container spacing={6}>
     <Grid size={{ xs: 12, lg: 4 }}>
       <Card sx={{ height: '100%' }}>
@@ -1201,23 +1410,28 @@ const CommercialHealthSurface = () => (
         <CardContent>
           <Stack spacing={4}>
             <Typography variant='h2' sx={{ fontVariantNumeric: 'tabular-nums' }}>
-              3
+              {activeSignalCount}
             </Typography>
             <Typography variant='body2' color='text.secondary'>
               Señales no steady. El rollup usa severidad máxima: cualquier error vuelve el subsystem rojo.
             </Typography>
-            <LinearProgress value={50} variant='determinate' color='warning' sx={{ height: 8, borderRadius: 9999 }} aria-label={domainAria.commercialHealthRatio} />
+            <LinearProgress value={healthRatio} variant='determinate' color={activeSignalCount > 0 ? 'warning' : 'success'} sx={{ height: 8, borderRadius: 9999 }} aria-label={domainAria.commercialHealthRatio} />
+            {variant === 'runtime' ? (
+              <Button component={Link} href='/admin/ops-health' variant='tonal' startIcon={<i className='tabler-activity-heartbeat' />}>
+                Abrir Ops Health
+              </Button>
+            ) : null}
           </Stack>
         </CardContent>
       </Card>
     </Grid>
     <Grid size={{ xs: 12, lg: 8 }}>
       <Card>
-        <CardHeaderWithBadge title='Reliability signals' badgeValue={reliabilitySignals.length} avatarIcon='tabler-radar' />
+        <CardHeaderWithBadge title='Reliability signals' badgeValue={signals.length} avatarIcon='tabler-radar' />
         <Divider />
         <CardContent>
           <Grid container spacing={3}>
-            {reliabilitySignals.map(signal => (
+            {signals.map(signal => (
               <Grid key={signal.code} size={{ xs: 12, md: 6 }}>
                 <Box sx={{ p: 4, border: theme => `1px solid ${theme.palette.divider}`, borderRadius: theme => theme.shape.customBorderRadius.lg, height: '100%' }}>
                   <Stack spacing={3}>
@@ -1249,7 +1463,8 @@ const CommercialHealthSurface = () => (
       </Card>
     </Grid>
   </Grid>
-)
+  )
+}
 
 const MemberLoadRow = ({ member }: { member: TeamMember }) => (
   <Stack spacing={1.5}>
