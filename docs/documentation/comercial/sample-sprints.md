@@ -41,3 +41,4 @@ Sample Sprints es la surface operativa para pilotos, trials, POCs y discovery co
 - No existe tabla `sample_sprints`; el contrato canonico es `services.engagement_kind`.
 - Reportes de cierre usan el uploader privado canonico con contextos `sample_sprint_report_draft` y `sample_sprint_report`.
 - Los audit events y outbox events los emiten los helpers del dominio dentro de la misma transaccion de negocio.
+- Un Sample Sprint activo por más de 120 días sin outcome ni lineage es rechazado por el guard DB `services_engagement_requires_decision_before_120d`. El signal `commercial.engagement.zombie` alerta antes, a los 90 días.

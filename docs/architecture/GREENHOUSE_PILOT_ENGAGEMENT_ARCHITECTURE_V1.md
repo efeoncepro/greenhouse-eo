@@ -3,7 +3,7 @@
 > **Tipo de documento:** Spec de arquitectura canónica
 > **Versión:** 1.2
 > **Creado:** 2026-05-05 por Claude (Opus 4.7)
-> **Última actualización:** 2026-05-07 por Codex — Delta v1.10 TASK-809 aplicado: UI/API real de Sample Sprints
+> **Última actualización:** 2026-05-07 por Codex — Delta v1.11 TASK-810 aplicado: DB guard anti-zombie
 > **Estado:** Implementación por slices EPIC-014
 > **Owner:** Comercial / Agency
 > **Brand UI**: "Sample Sprint" (paraguas comercial). Schema interno usa `engagement_*` genérico — el rebranding marketing no requiere migrations.
@@ -19,6 +19,17 @@ TASK-809 conecta el mockup aprobado a runtime real:
 4. **Reportes:** el uploader privado canonico soporta `sample_sprint_report_draft` y `sample_sprint_report`; `recordOutcome()` y `convertEngagement()` attachan el asset al outcome dentro de la transaccion.
 5. **Access model:** sin nuevos routeGroups ni startup policy. `views` usa `gestion.sample_sprints`; `entitlements` reutiliza `commercial.engagement.{read,declare,record_progress,record_outcome,approve}`.
 6. **Drift documentado:** `schema-snapshot-baseline.sql` sigue desactualizado respecto de `services.engagement_kind`, pero runtime live, migrations TASK-801 y `src/types/db.d.ts` son consistentes. No crear migracion correctiva por este drift documental.
+
+## Delta v1.11 (2026-05-07) — TASK-810 DB guard anti-zombie
+
+TASK-810 cierra el slice final de EPIC-014 con defensa mecanica en DB:
+
+1. **Drift corregido:** el diseño historico de §3.3 proponia un `CHECK` con `EXISTS`. PostgreSQL no permite subqueries dentro de `CHECK` y `CURRENT_DATE` en un CHECK tampoco reevalua filas por paso del tiempo. El mecanismo canonico queda corregido a trigger `BEFORE INSERT OR UPDATE`.
+2. **Guard instalado:** migration `20260507183122498_task-810-engagement-anti-zombie-trigger.sql` crea `greenhouse_core.assert_engagement_requires_decision_before_120d()` y trigger `services_engagement_requires_decision_before_120d` sobre `greenhouse_core.services`.
+3. **Predicado:** bloquea services non-regular activos, elegibles, >120 dias desde `start_date`, sin outcome ni lineage. Excluye `regular`, inactivos, `legacy_seed_archived`, `hubspot_sync_status='unmapped'`, estados no activos y terminales `cancelled|closed`.
+4. **Operacion:** el camino normal de resolucion es registrar outcome en `/agency/sample-sprints/[serviceId]/outcome`; el runbook vive en `docs/operations/runbooks/engagement-zombie-handling.md`.
+5. **Preflight:** `scripts/commercial/preflight-zombie-check.ts` reporta `space_id`/`organization_id` porque `services` no tiene `client_id` en runtime real.
+6. **Reliability:** `commercial.engagement.zombie` sigue detectando el drift a 90 dias; el trigger aplica hard stop a 120 dias.
 
 ## Delta v1.9 (2026-05-07) — TASK-807 Commercial Health implementada
 
@@ -404,25 +415,19 @@ CREATE INDEX engagement_outcomes_next_service_idx
   WHERE next_service_id IS NOT NULL;
 ```
 
-### 3.3 CHECK constraint anti-zombie (defensa en DB)
+### 3.3 DB guard anti-zombie (defensa en DB)
+
+> TASK-810 corrigio este diseño: el mecanismo implementado es trigger, no CHECK,
+> porque el predicado necesita consultar outcomes/lineage.
 
 ```sql
-ALTER TABLE greenhouse_core.services
-  ADD CONSTRAINT services_engagement_requires_decision_before_120d
-  CHECK (
-    engagement_kind = 'regular'
-    OR (engagement_kind <> 'regular' AND (
-      -- engagement activo dentro de ventana razonable
-      (status = 'active' AND start_date >= CURRENT_DATE - INTERVAL '120 days')
-      -- o ya tiene outcome registrado
-      OR EXISTS (SELECT 1 FROM greenhouse_commercial.engagement_outcomes o WHERE o.service_id = services.service_id)
-      -- o explícitamente cancelado
-      OR status IN ('cancelled','closed')
-    ))
-  );
+CREATE TRIGGER services_engagement_requires_decision_before_120d
+  BEFORE INSERT OR UPDATE ON greenhouse_core.services
+  FOR EACH ROW
+  EXECUTE FUNCTION greenhouse_core.assert_engagement_requires_decision_before_120d();
 ```
 
-NOT VALID + VALIDATE atomic patrón TASK-708/766/774 para no bloquear backfill.
+El trigger rechaza `check_violation` cuando un engagement non-regular activo supera 120 dias sin `engagement_outcomes` ni `engagement_lineage`. El preflight equivalente debe estar en cero antes de instalar o endurecer el guard.
 
 ## 4. Lifecycle de organización (interacción con party lifecycle)
 
@@ -786,7 +791,7 @@ Si el reactive consumer falla (paso 6):
 | **6** | 6 reliability signals + subsystem `Commercial Health` registry (NUEVO — mirror TASK-672 `Finance Data Quality`) | Slices 1-5 + Slice 4.5 |
 | **7** | `engagement_audit_log` + outbox events v1 (9 events) + reactive consumers (lifecycle flip + HubSpot conditional) | Slices 1-6 |
 | **8** | UI `/agency/sample-sprints` + wizards declaración/approval/progress/outcome + agrupación per-cliente | Slices 1-7 |
-| **9** | CHECK constraint anti-zombie (NOT VALID + VALIDATE atomic, patrón TASK-708/766/774) | Slices 1-8 (post-cleanup) |
+| **9** | DB guard anti-zombie via trigger `services_engagement_requires_decision_before_120d` | Slices 1-8 (post-cleanup) |
 
 ## 12. Reglas duras (resumen anti-regresión)
 
@@ -796,7 +801,7 @@ Si el reactive consumer falla (paso 6):
 - **NUNCA** flipear `organizations.lifecycle_stage='active_client'` por declarar un Sample Sprint. Solo el child_service post-conversión lo hace, **siempre poblando `lifecycle_stage_source='quote_converted'` + `lifecycle_stage_by` + `lifecycle_stage_since`** (TASK-535/542 contract).
 - **NUNCA** crear HubSpot deal automáticamente al declarar Sample Sprint. Solo el child_service regular post-conversión, conditional `WHERE engagement_kind='regular' AND hubspot_deal_id IS NULL`.
 - **NUNCA** asignar cost attribution sin `engagement_approvals.status='approved'`. La capa de gobierno bloquea.
-- **NUNCA** dejar engagement non-regular activo > 120 días sin outcome. CHECK constraint + reliability signal `commercial.engagement.zombie` lo enforce.
+- **NUNCA** dejar engagement non-regular activo > 120 días sin outcome ni lineage. Trigger DB + reliability signal `commercial.engagement.zombie` lo enforce.
 - **NUNCA** filtrar engagements del `commercial_cost_attribution` para "limpiar" dashboards. Usar VIEW `gtm_investment_pnl` para reclassificación read-time.
 - **NUNCA** modificar `engagement_outcomes` o `engagement_audit_log` (append-only enforced por trigger).
 - **NUNCA** spawn `engagement_lineage` row sin `transition_reason >= 10 chars`.
@@ -827,12 +832,12 @@ Si el reactive consumer falla (paso 6):
 | Time-versioned terms | TASK-700 internal_account_number_registry | `service_commercial_terms` con `effective_from/to` + UNIQUE active partial index |
 | Append-only audit log | TASK-535 (organization_lifecycle_history) / TASK-768 (economic_category_resolution_log) | `pilot_decision_audit_log` con triggers `pilot_audit_no_update/no_delete` |
 | Approval workflow + capability granular | TASK-742 (7 capas) | `engagement_approvals` + `commercial.pilot.approve` |
-| State machine + CHECK constraint | TASK-765 | `engagement_kind` + anti-zombie CHECK 120d |
+| State machine + trigger DB | TASK-765 | `engagement_kind` + anti-zombie trigger 120d |
 | Reliability signal subsystem | TASK-672 (Finance Data Quality precedent) | 5 signals subsystem `Commercial Health` (NUEVO — Slice 6) |
 | VIEW canónica + helper reclassifier | TASK-571/699/766/774 | `gtm_investment_pnl` view + helper TS |
 | Asset uploader canónico | TASK-721 | `service_outcomes.report_asset_id` FK a `greenhouse_core.assets` |
 | Outbox events versionados | GREENHOUSE_EVENT_CATALOG_V1 + TASK-771/773 | 6 events v1 + atomic in-tx insertion + reactive consumer at-least-once |
-| NOT VALID + VALIDATE atomic | TASK-708/766/774 (corregido v1.1 — TASK-728 era cita errónea) | CHECK anti-zombie sin bloquear backfill |
+| NOT VALID + VALIDATE atomic | TASK-708/766/774 (corregido v1.1 — TASK-728 era cita errónea) | Solo para CHECKs row-local; TASK-810 usa trigger por predicado cross-table |
 | Lifecycle history with source/by/since | TASK-535/TASK-542 | flip a `active_client` poblando los 4 campos coordinados |
 | FK actor pattern (TEXT + ON DELETE SET NULL) | TASK-760/761/762 (offboarding case + final settlement) | 6 FKs a `greenhouse_core.client_users(user_id)` |
 | Extender `client_economics` con backfill | TASK-409 (`labor_cost_clp` add + backfill desde commercial_cost_attribution) | VIEW `gtm_investment_pnl` lee de `commercial_cost_attribution_v2` para reclassification gerencial |
@@ -847,7 +852,7 @@ Si el reactive consumer falla (paso 6):
 3. **Adjusted path:** Sample Sprint → outcome=adjusted → nuevo Sample Sprint declarado linkado vía engagement_lineage relationship_kind=adjusted_into.
 4. **Cancellation by client:** Sample Sprint cancelado en semana 2 por Sky → outcome=cancelled_by_client + cancellation_reason ≥ 10 chars → audit log evento `cancelled` → outbox event `service.engagement.cancelled v1`.
 5. **Cancellation by provider:** Efeonce no puede continuar → outcome=cancelled_by_provider + cancellation_reason → mismo path audit/outbox.
-6. **Anti-zombie:** engagement activo 121 días sin outcome → CHECK constraint rechaza UPDATE → reliability signal `commercial.engagement.zombie` emite.
+6. **Anti-zombie:** engagement activo 121 días sin outcome ni lineage → trigger DB rechaza UPDATE → reliability signal `commercial.engagement.zombie` emite.
 7. **Anti-unapproved:** intentar crear cost_attribution para engagement sin approval → bloqueado por gate de approval workflow.
 8. **Budget overrun:** engagement con actual_cost > expected * 1.2 → reliability signal `commercial.engagement.budget_overrun` emite warning.
 9. **Conversion rate drop:** trailing 6m < 30% → signal `commercial.engagement.conversion_rate_drop` emite warning.
@@ -890,7 +895,7 @@ Si el reactive consumer falla (paso 6):
 - **What can go wrong**: pilotos sin gobierno queman recursos, lifecycle se flipea sin trazabilidad, aprobaciones bypaseadas, audit trail corrupto.
 - **Gates**: capability granular `commercial.pilot.{declare,approve,record_outcome,read}`, approval workflow obligatorio (`pilot_approvals.status='approved'` requerido para cost attribution), audit log append-only con triggers PG anti-update/delete.
 - **Blast radius if wrong**: medium — un piloto fantasma cuesta dinero por cliente atribuido pero no contamina cross-tenant; el lifecycle history append-only protege auditoría.
-- **Verified by**: 5 reliability signals (overdue/budget_overrun/zombie/unapproved_active/conversion_rate_drop), CHECK anti-zombie 120d, audit triggers, FK ON DELETE SET NULL para preservar audit cuando un actor deja la empresa.
+- **Verified by**: 5 reliability signals (overdue/budget_overrun/zombie/unapproved_active/conversion_rate_drop), trigger anti-zombie 120d, audit triggers, FK ON DELETE SET NULL para preservar audit cuando un actor deja la empresa.
 - **Residual risk**: el path HubSpot auto-create deals (Open Q6) no está verificado; si no existe, el flow queda con un gap manual hasta que se implemente. Mitigación: en Slice 7 se verifica explícitamente y se difiere si necesario.
 - **Score estimado**: 8.5/10.
 

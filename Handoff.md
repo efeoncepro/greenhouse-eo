@@ -1,3 +1,13 @@
+# Sesion 2026-05-07 — TASK-810 cerrada en develop (Engagement Anti-Zombie DB Guard)
+
+- **Branch:** `develop` por instruccion explicita del usuario; no se crea ni cambia a `task/TASK-810-engagement-anti-zombie-check-constraint`.
+- **Ownership/lifecycle:** no habia PR abierto ni branch local/remota obvia para `TASK-810`; task movida a `docs/tasks/complete/`, `Lifecycle=complete`, README/registry sincronizados.
+- **Discovery clave:** el diseño original `CHECK (...) EXISTS (...)` no es aplicable en PostgreSQL porque los CHECK no admiten subqueries y `CURRENT_DATE` no revalida por paso del tiempo. Se corrige a trigger `BEFORE INSERT OR UPDATE` con `ERRCODE check_violation`, manteniendo el objetivo anti-zombie.
+- **Runtime verificado:** `pnpm pg:doctor` OK; preflight live para active non-regular >120d sin outcome retorno `0` violations. `services` no tiene `client_id`; preflight y docs usan `space_id`/`organization_id`.
+- **Entrega:** migration `20260507183122498_task-810-engagement-anti-zombie-trigger.sql` crea function `greenhouse_core.assert_engagement_requires_decision_before_120d()` y trigger `services_engagement_requires_decision_before_120d` sobre `greenhouse_core.services`. Bloquea non-regular active >120d sin outcome ni lineage, excluyendo regular, inactive, `legacy_seed_archived`, `unmapped`, estados no activos y terminales `cancelled|closed`.
+- **Preflight/runbook:** nuevo `scripts/commercial/preflight-zombie-check.ts` read-only; runbook `docs/operations/runbooks/engagement-zombie-handling.md`.
+- **Validacion:** `pnpm pg:connect:migrate` OK + types regenerados sin diff relevante; preflight script OK (`violationCount=0`); SQL smoke transaccional con rollback OK; focal vitest OK (11 tests); `pnpm exec tsc --noEmit --pretty false` OK; `pnpm pg:doctor` OK; `pnpm lint` OK; `pnpm test` OK (609 files / 3539 passed / 5 skipped); `pnpm build` OK.
+
 # Sesion 2026-05-07 — TASK-809 cerrada en develop (Sample Sprints UI + Wizards)
 
 - **Branch:** `develop` por instruccion explicita del usuario; no se crea ni cambia a `task/TASK-809-sample-sprints-ui-wizards`.

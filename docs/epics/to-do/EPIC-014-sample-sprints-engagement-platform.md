@@ -93,7 +93,7 @@ Reglas obligatorias:
 7. **TASK-807** — 6 reliability signals + subsystem `Commercial Health` registry (NUEVO — mirror TASK-672)
 8. **TASK-808** — `engagement_audit_log` + outbox events v1 (9 events) + reactive consumers (lifecycle flip + HubSpot conditional)
 9. **TASK-809** — UI `/agency/sample-sprints` + wizards declaración / approval / progress / outcome + agrupación per-cliente
-10. **TASK-810** — CHECK constraint anti-zombie (NOT VALID + VALIDATE atomic, patrón TASK-708/766/774)
+10. **TASK-810** — DB guard anti-zombie vía trigger (CHECK con subquery no es válido en PostgreSQL)
 
 ### Children (sibling — incorporada 2026-05-06)
 
@@ -151,7 +151,7 @@ Producido por la skill `arch-architect` aplicando reversibilidad + 4-pilar + dep
                           │  FASE 6 — UI + final gate           │
                           │  TASK-809 (UI sample sprints)       │
                           │       ↓                              │
-                          │  TASK-810 (anti-zombie CHECK)       │
+                          │  TASK-810 (anti-zombie DB guard)    │
                           └────────────────────────────────────┘
 ```
 
@@ -161,7 +161,7 @@ Producido por la skill `arch-architect` aplicando reversibilidad + 4-pilar + dep
 2. **TASK-813 inmediatamente después de TASK-801 y antes de TASK-802 onward.** Si no se respeta, las extensiones (terms/phases/outcomes) se declaran contra los 30 services fantasma del 2026-03-16 → datos basura difíciles de limpiar después.
 3. **TASK-555 antes de TASK-556/557/557.1/813.** Las capabilities `commercial.*` no existen sin la foundation de access model.
 4. **TASK-807 idealmente antes de TASK-813.** Si no, TASK-813 ships con fallback registrando signals sin subsystem-rollup completo.
-5. **TASK-810 al final.** El anti-zombie CHECK solo se valida cuando todos los flows que crean/transicionan engagements están maduros.
+5. **TASK-810 al final.** El anti-zombie DB guard solo se instala cuando todos los flows que crean/transicionan engagements están maduros.
 
 ### Ruta crítica (longest path)
 

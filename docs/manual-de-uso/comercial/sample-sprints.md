@@ -53,3 +53,4 @@ Necesitas acceso a la vista `gestion.sample_sprints` y al menos `commercial.enga
 | Duplicate snapshot | Cambia la fecha o abre el snapshot existente. |
 | Conversion rechazada | `converted` requiere `nextServiceId` o `nextQuotationId`. |
 | Upload rechazado | Usa PDF/JPG/PNG/WebP y respeta el maximo de 25 MB. |
+| Update rechazado por `services_engagement_requires_decision_before_120d` | Registra outcome en `/agency/sample-sprints/[serviceId]/outcome` y reintenta. |

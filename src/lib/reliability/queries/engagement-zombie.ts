@@ -46,7 +46,7 @@ export const getEngagementZombieSignal = async (): Promise<ReliabilitySignal> =>
         {
           kind: 'doc',
           label: 'Runbook',
-          value: 'Registrar outcome o lineage de transición; TASK-810 agregará guard mecánico anti-zombie.'
+          value: 'docs/operations/runbooks/engagement-zombie-handling.md'
         }
       ]
     }
