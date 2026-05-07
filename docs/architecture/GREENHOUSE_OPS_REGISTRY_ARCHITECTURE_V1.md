@@ -5,7 +5,7 @@
 - Owner: `Platform / Operations`
 - Status: `Proposed`
 - Scope: `Greenhouse EO + sister repos adopting the same operational framework`
-- Last updated: `2026-04-21`
+- Last updated: `2026-05-07`
 
 ## Summary
 
@@ -784,3 +784,133 @@ Se amplía la arquitectura para declarar explícitamente que `Ops Registry` no s
 ## Delta 2026-04-21 — Artifact Policy Layer y flows process-aware
 
 Se agrega explícitamente una `Artifact Policy Layer` para que `Ops Registry` respete `TASK_TEMPLATE`, `TASK_PROCESS`, `EPIC_TEMPLATE`, `MINI_TASK_TEMPLATE` y el modelo de issues. El sistema queda definido como template-aware y process-aware, con comandos específicos como `take_task`, `start_plan_mode`, `attach_plan` y `close_task`, en vez de limitarse a crear archivos markdown genéricos.
+
+## Delta 2026-05-07 — Defense-in-depth, capabilities, outbox, reliability, packaging
+
+Se incorpora al V1 la totalidad del **arch-architect overlay contract** (Greenhouse pinned decisions): capabilities granulares, outbox + reactive consumer, reliability signals, defense-in-depth de N capas, atomicidad/idempotencia del write plane, automation gates (pre-commit + CI) y estrategia de packaging progresivo. Estos puntos no son nuevos requisitos sino la formalización del cómo respeta `Ops Registry` los invariantes que ya gobiernan el resto del repo (TASK-571/699/700/703/708/720/721/728/742/758/765/766/768/771/773/774).
+
+### Capabilities granular per command (overlay #7)
+
+`platform.admin` está **prohibido** como catch-all del write plane. Cada comando declara su propia capability con scope `tenant`, formato canónico `ops.<artifact>.<action>`. Lista mínima:
+
+- `ops.task.create:create`, `ops.task.take:update`, `ops.task.start_plan:update`, `ops.task.attach_plan:update`, `ops.task.update:update`, `ops.task.close:approve`
+- `ops.epic.create:create`, `ops.epic.update:update`, `ops.epic.link_task:update`, `ops.epic.close:approve`
+- `ops.mini_task.create:create`, `ops.mini_task.update:update`, `ops.mini_task.close:approve`
+- `ops.issue.create:create`, `ops.issue.update:update`, `ops.issue.resolve:approve`, `ops.issue.promote_to_task:approve`
+- `ops.architecture.create:create`, `ops.architecture.update:update`
+- `ops.handoff.append:create`
+- `ops.registry.read:read`, `ops.registry.sync:update`, `ops.registry.reindex:update`
+
+Enforcement server-side via `can(subject, ...)` antes de cualquier write. La capability viene declarada en el `Artifact Policy Layer` (TASK-558 Slice 4), NO hardcodeada en route handlers.
+
+### Outbox integration (16 schemas v1)
+
+Toda mutación del write plane emite un evento versionado a `greenhouse_sync.outbox_events` en la **misma transacción** que la materialización del archivo. Eventos:
+
+- `ops_registry.task.{created, taken, plan_started, plan_attached, updated, closed}` v1
+- `ops_registry.epic.{created, task_linked, closed}` v1
+- `ops_registry.mini_task.{created, closed}` v1
+- `ops_registry.issue.{created, resolved, promoted_to_task}` v1
+- `ops_registry.architecture.created` v1
+- `ops_registry.handoff.appended` v1
+
+Payload zod-validado al INSERT (no string-blob). Incluye `repoId`, `artifactId`, `actorUserId`, `requestHash`, `changedFiles[]`, `materializedAt`. Schemas registrados en `docs/architecture/GREENHOUSE_EVENT_CATALOG_V1.md` al implementarse TASK-558.
+
+**Consumers V3** (mirror Notion, agregador cross-repo) consumen el outbox de forma reactiva — NUNCA polling sobre los JSON derivados ni side effects síncronos cross-system desde el write plane.
+
+### Reliability signals (overlay #8)
+
+Subsystem nuevo `Ops Registry Health` rolla 6 signals canónicos en `getReliabilityOverview` (visibles en `/admin/operations`):
+
+- `ops.registry.invalid_lifecycle` (drift, error si > 0, steady=0)
+- `ops.registry.broken_links` (drift, error si > 0, steady=0)
+- `ops.registry.stale_artifacts` (drift, warning si > 0)
+- `ops.registry.epic_child_drift` (drift, error si > 0, steady=0)
+- `ops.registry.registry_vs_file_mismatch` (drift, error si > 0, steady=0)
+- `ops.registry.policy_violation` (drift, error si > 0, steady=0)
+
+Cada signal vive en `src/lib/reliability/queries/ops-registry-*.ts` con la firma canónica del control plane. JSON solo (`.generated/ops-registry/validation-report.json`) **no es signal** — debe pasar por `getReliabilityOverview` o se pudre invisible.
+
+### Defense-in-depth (overlay #5, ≥ 5 capas independientes)
+
+Para cada mutación crítica del write plane:
+
+1. **Schema validation** zod al input
+2. **Capability check** server-side (`can(...)`)
+3. **Pre-mutation validate** sobre el estado actual del repo
+4. **Atomic materialization** (temp file + rename, o transactional commit)
+5. **Post-mutation re-validate** sobre el estado final antes de devolver `dry_run=false` exitoso
+6. **Audit log + outbox event** versionado v1 en la misma tx
+7. **Reliability signal** detecta drift residual asincrónicamente
+
+Sin DB tradicional, las "constraints" viven en zod + parser + post-validate, NO en una sola capa. Cualquier mutación que toque N archivos es **todo-o-nada**.
+
+### Atomicidad + idempotencia
+
+- `create_*` y `take_*` aceptan `requestHash` opcional para deduplicar reintentos. Sin él, dos retries queman dos IDs (rule canónica TASK-571 portada al write plane).
+- Una mutación que toca N archivos es atómica: temp file + rename, o staging directory + bulk rename, o transactional commit. Crash a mitad NUNCA debe dejar torn state.
+- `close_task` (toca 5 archivos) es el caso prueba: si falla en archivo 4, los 3 anteriores se rollbackean.
+
+### Automation gates (V1 obligatorias, no opcionales)
+
+- **Pre-commit hook** (husky + lint-staged): cuando un commit toca `docs/architecture/`, `docs/tasks/`, `docs/epics/`, `docs/mini-tasks/`, `docs/issues/`, `Handoff.md`, `project_context.md` o `changelog.md`, corre `pnpm ops:validate --staged`. Errors bloquean commit; warnings no.
+- **CI workflow** `.github/workflows/ops-registry-validate.yml`: corre `pnpm ops:index && pnpm ops:validate --strict` en cada PR. Strict bloquea merge en errors o warnings.
+- **Anti-bypass**: NO usar `--no-verify` salvo emergencia documentada (mismo contrato del resto de los hooks Greenhouse).
+
+### Tests mandatory
+
+Para parser markdown (regex-prone) y file-system mutators (alta blast radius), tests son **obligatorios** en V1, no opcionales:
+
+- Parser: golden fixtures por tipo de artefacto bajo `__fixtures__/`, edge cases (frontmatter inválido, lifecycle drift, relationships rotas)
+- Validators: 1 test por validator con drift detectable inyectado
+- Commands: integration tests sobre filesystem temporal (memfs o tempdir) cubriendo dry_run preview, capability denial, mutación exitosa, error sanitizado, rollback ante crash a mitad
+- MCP tools: snapshot tests de respuestas dry_run
+
+### Sentry domain rollup
+
+Todos los errors del módulo usan `captureWithDomain(err, 'ops_registry', { extra })` de `src/lib/observability/capture.ts`. Subsystem `Ops Registry Health` rolla los incidents Sentry. NUNCA `Sentry.captureException(err)` directo.
+
+### Output redaction
+
+Cualquier error que cruce un boundary HTTP usa `redactErrorForResponse(err)` de `src/lib/observability/redact.ts`. NUNCA raw `error.message` ni `error.stack` en 4xx/5xx.
+
+### Packaging strategy — progressive extraction
+
+**Fase 1 (V1 — TASK-558/559/560)**: el core vive en `src/lib/ops-registry/**` dentro de greenhouse-eo, **arquitecturado como extractable**. Cero `import '@/...'` o paths Greenhouse-specific en el core. Toda especificidad detrás de `ops-registry.config.ts`. Extractability gate enforced por CI grep:
+
+```bash
+grep -rE "@/lib/|@/components/|@/types/" src/lib/ops-registry/
+# debe retornar 0 resultados
+```
+
+**Fase 2 (TASK-561 — federación)**: cuando un segundo repo (Kortex, hubspot-bigquery, sister) lo necesite **de verdad**, extraer:
+
+- bootstrap pnpm workspaces (`pnpm-workspace.yaml` + `packages/`)
+- mover a `packages/ops-registry/` con `name: "@efeonce/ops-registry"` privado
+- greenhouse-eo lo consume vía `workspace:*`
+- publicar a **GitHub Packages npm** (`npm.pkg.github.com/@efeonce`) — reusa WIF + `gh` ya autenticados; cero infra nueva
+- sister repos: `pnpm add -D @efeonce/ops-registry`
+
+**Modos de consumo del paquete** (todos del mismo binario):
+
+- bootstrap: `npx @efeonce/ops-registry init` (genera config + scripts en repo nuevo)
+- daily ops: `pnpm exec ops-registry validate` (pinneado por lockfile, reproducible)
+- library: `import { parseTask } from '@efeonce/ops-registry/parser'`
+- MCP: `~/.claude/mcp_servers.json` apunta al bin
+
+**Por qué progresivo y NO V1**: premature abstraction sin segundo consumidor; overhead pnpm workspaces sin retorno; CI velocity (workspace package activa rebuild de todo el grafo). Cuando hay segundo consumidor real, la extracción es mecánica gracias al gate de Fase 1.
+
+### Rollout V1/V2 — clarificación
+
+V1 explícitamente **NO incluye surface humana** (alineado con la sección Rollout original). La UI `/admin/ops-registry` se mueve a **TASK-814** (V2 rollout). V1 es agent-only: API HTTP interna + MCP server + CLI + outputs JSON. Cualquier task que prometa UI humana en V1 está mal especificada y debe rebajarse a V2.
+
+### Hard rules (anti-regression)
+
+- **NUNCA** reutilizar `platform.admin` como capability del write plane. Granular siempre.
+- **NUNCA** mutar archivos sin emitir el outbox event v1 correspondiente en la misma tx.
+- **NUNCA** dejar un signal del subsystem `Ops Registry Health` solo en JSON sin wirearlo a `getReliabilityOverview`.
+- **NUNCA** introducir `import '@/...'` en `src/lib/ops-registry/**` (rompe extractability gate).
+- **NUNCA** mutación que toque N archivos sin atomicity garantizada (temp + rename, o staging + bulk rename).
+- **NUNCA** raw `Sentry.captureException` ni raw `error.message` en HTTP responses.
+- **NUNCA** prometer surface humana en V1. Va a V2 (TASK-814).
+- **SIEMPRE** golden fixtures para el parser y tests integration para los commands; mandatory, no opcional.
