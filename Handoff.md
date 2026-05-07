@@ -1,3 +1,14 @@
+# Sesion 2026-05-07 — TASK-802 cerrada en develop (Engagement Commercial Terms)
+
+- **Branch:** `develop` por instruccion explicita del usuario; no se crea `task/TASK-802-engagement-commercial-terms-time-versioned`.
+- **Ownership:** no habia PR abierto ni branch local/remota obvia para `TASK-802`; se movio la task a `docs/tasks/in-progress/` y se sincronizaron `Lifecycle`, `docs/tasks/README.md` y `docs/tasks/TASK_ID_REGISTRY.md`.
+- **Estado inicial verificado:** `TASK-801` y `TASK-813` estaban cerradas; `pnpm pg:doctor` OK con runtime sin `CREATE` en schemas.
+- **Drift corregido pre-implementacion:** la spec antigua declaraba `service_id UUID`; runtime real usa `greenhouse_core.services.service_id TEXT`. Tambien declaraba `declared_by TEXT NOT NULL ... ON DELETE SET NULL`, contrato contradictorio; se corrigio a nullable DB + requerido por helper.
+- **Foundation TASK-813 incorporada:** `declareCommercialTerms` y `getActiveCommercialTerms` aplican eligibility guard para no operar sobre services `legacy_seed_archived`, inactivos o `hubspot_sync_status='unmapped'`.
+- **Entrega:** migration `20260507060522006_task-802-engagement-commercial-terms.sql` crea `greenhouse_commercial.engagement_commercial_terms` con enum/checks, unique partial activo por service, timeline indexes, FK a `services` y `client_users`, grants runtime/migrator. Helper canónico `src/lib/commercial/sample-sprints/commercial-terms.ts` expone `getActiveCommercialTerms` + `declareCommercialTerms` transaccional; tests focales cubren lectura, transición, conflict unique, guard TASK-813 y validaciones.
+- **Validacion:** `pnpm pg:connect:migrate` OK y regenero `src/types/db.d.ts` (369 tablas); verificacion live via `information_schema`/`pg_indexes`/`pg_constraint` OK; smoke DB transaccional con `ROLLBACK` confirma `engagement_commercial_terms_active_unique`; `pnpm pg:doctor` OK; focal vitest OK 7/7; `pnpm exec tsc --noEmit --pretty false` OK; `pnpm lint` OK; `pnpm test` OK (596 files, 3455 tests, 5 skipped); `pnpm build` OK.
+- **No se toco:** routeGroups, views, entitlements, startup policy, UI, outbox events o reliability signals nuevos. TASK-808 sigue siendo owner de audit/outbox engagement.
+
 # Sesion 2026-05-07 — TASK-813 documentacion post-merge alta densidad (HubSpot services intake)
 
 - **Branch:** `develop` (docs only, autorizado direct push develop por regla canonica de doc-only).

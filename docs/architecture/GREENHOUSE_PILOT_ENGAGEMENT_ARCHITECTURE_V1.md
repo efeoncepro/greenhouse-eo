@@ -28,6 +28,14 @@ TASK-801 (Slice 1 / Capa 1 + 1b) cerrada 2026-05-06 vía migration `202605062007
 
 **Hard rule futura**: cualquier task de EPIC-014 que cree FK a `services.service_id` debe usar `TEXT` no `UUID`. Cualquier task que extienda `commercial_cost_attribution_v2` debe usar `CREATE OR REPLACE VIEW`, no `ALTER TABLE`.
 
+## Delta v1.4 (2026-05-07) — TASK-802 pre-implementation correction
+
+TASK-802 corrige Capa 2 antes de implementar contra runtime real:
+
+1. **`engagement_commercial_terms.service_id` debe ser `TEXT`, no `UUID`.** Es la aplicación directa de la hard rule de TASK-801: `greenhouse_core.services.service_id` es `text`.
+2. **`declared_by` queda nullable en DB, requerido por helper.** La spec anterior combinaba `TEXT NOT NULL` con `ON DELETE SET NULL`, contrato contradictorio. Se alinea con TASK-760/761/762: el helper exige actor humano al declarar términos, pero la FK puede quedar `NULL` si el usuario se elimina para preservar historial.
+3. **TASK-813 eligibility guard.** Cualquier write path de terms debe validar que el `service` sea engagement real elegible: `active=TRUE`, `status != 'legacy_seed_archived'` y `hubspot_sync_status IS DISTINCT FROM 'unmapped'`. Las filas archivadas por TASK-813 y las materializadas como `unmapped` no deben recibir términos comerciales operativos.
+
 ## Delta v1.2 (2026-05-05) — pre-flight check + naming "Sample Sprint"
 
 Aplicando red-team pre-épica con `arch-architect`. Cambios:
@@ -130,7 +138,7 @@ Las 4 categorías comparten estructura (acotadas en tiempo, deliverable explíci
 | Dimensión | Pregunta que responde | Valores | Persistencia |
 |---|---|---|---|
 | `engagement_kind` | ¿Qué tipo de servicio es? | `regular`, `pilot`, `trial`, `poc`, `discovery` | Columna en `services` |
-| `commercial_terms` | ¿Cómo se cobra? | `committed`, `no_cost`, `success_fee`, `reduced_fee` | Tabla `service_commercial_terms` time-versioned |
+| `commercial_terms` | ¿Cómo se cobra? | `committed`, `no_cost`, `success_fee`, `reduced_fee` | Tabla `engagement_commercial_terms` time-versioned |
 | `lifecycle_phase` | ¿En qué fase operativa está? | declarativo per service | Tabla `service_phases` |
 | `outcome` | ¿Cuál fue la decisión final? | `converted`, `adjusted`, `dropped` | Tabla `service_outcomes` |
 | `lineage` | ¿De qué nació, en qué se transformó? | graph relations | Tabla `service_lineage` |
@@ -160,13 +168,13 @@ CREATE INDEX client_team_assignments_service_idx
 -- Capa 2: términos comerciales time-versioned
 CREATE TABLE greenhouse_commercial.engagement_commercial_terms (
   terms_id            UUID PRIMARY KEY,
-  service_id          UUID NOT NULL REFERENCES greenhouse_core.services(service_id) ON DELETE CASCADE,
+  service_id          TEXT NOT NULL REFERENCES greenhouse_core.services(service_id) ON DELETE CASCADE,
   terms_kind          TEXT NOT NULL CHECK (terms_kind IN ('committed','no_cost','success_fee','reduced_fee')),
   effective_from      DATE NOT NULL,
   effective_to        DATE,
   monthly_amount_clp  NUMERIC(18,2),
   success_criteria    JSONB,
-  declared_by         TEXT NOT NULL REFERENCES greenhouse_core.client_users(user_id) ON DELETE SET NULL,
+  declared_by         TEXT REFERENCES greenhouse_core.client_users(user_id) ON DELETE SET NULL,
   declared_at         TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   reason              TEXT NOT NULL CHECK (length(reason) >= 10),
   CHECK (effective_to IS NULL OR effective_to > effective_from)

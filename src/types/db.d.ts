@@ -483,6 +483,25 @@ export interface GreenhouseCommercialEmploymentTypes {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseCommercialEngagementCommercialTerms {
+  declared_at: Generated<Timestamp>;
+  /**
+   * Actor who declared the terms. Nullable only to support ON DELETE SET NULL; declareCommercialTerms requires declaredBy in input.
+   */
+  declared_by: string | null;
+  effective_from: Timestamp;
+  effective_to: Timestamp | null;
+  monthly_amount_clp: Numeric | null;
+  reason: string;
+  /**
+   * FK to greenhouse_core.services(service_id). TEXT by contract (TASK-801), not UUID.
+   */
+  service_id: string;
+  success_criteria: Json | null;
+  terms_id: Generated<string>;
+  terms_kind: string;
+}
+
 export interface GreenhouseCommercialFteHoursGuide {
   effective_from: Generated<Timestamp>;
   fte_fraction: Numeric;
@@ -8422,6 +8441,7 @@ export interface DB {
   "greenhouse_commercial.deals": GreenhouseCommercialDeals;
   "greenhouse_commercial.employment_type_aliases": GreenhouseCommercialEmploymentTypeAliases;
   "greenhouse_commercial.employment_types": GreenhouseCommercialEmploymentTypes;
+  "greenhouse_commercial.engagement_commercial_terms": GreenhouseCommercialEngagementCommercialTerms;
   "greenhouse_commercial.fte_hours_guide": GreenhouseCommercialFteHoursGuide;
   "greenhouse_commercial.hubspot_deal_pipeline_config": GreenhouseCommercialHubspotDealPipelineConfig;
   "greenhouse_commercial.hubspot_deal_pipeline_defaults": GreenhouseCommercialHubspotDealPipelineDefaults;

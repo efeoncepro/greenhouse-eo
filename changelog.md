@@ -1592,6 +1592,11 @@ Validations: tsc 0 errors, lint 0 errors, 427 files / 2225 tests pass / 5 skippe
   - `project_context.md` + `Handoff.md` alineados al nuevo contrato
 - **Verificación**: `pnpm test` OK (`1813` passing, `2` skipped) · `pnpm lint` OK · `pnpm build` OK.
 
+# 2026-05-07
+
+- Commercial / Engagements: TASK-802 agregó `greenhouse_commercial.engagement_commercial_terms`, una tabla time-versioned para términos comerciales de services con unique active partial index, checks de integridad y FK `service_id TEXT` alineada al runtime real.
+- Commercial / Sample Sprints: nuevo helper canónico `getActiveCommercialTerms` / `declareCommercialTerms` declara términos en una transacción y aplica el guard de TASK-813 para excluir services legacy archivados, inactivos o `hubspot_sync_status='unmapped'`.
+
 ## 2026-04-21
 
 ### 2026-04-21 — TASK-542 cierra la surface administrativa de Party Lifecycle
