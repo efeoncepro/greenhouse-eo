@@ -1114,6 +1114,18 @@ export interface GreenhouseCommercialQuotations {
    * Actor que emitió la versión documental oficial.
    */
   issued_by: string | null;
+  /**
+   * TASK-557.1 operational flag: true when a legacy/limbo quote must be hidden from commercial forecast surfaces while preserved for legacy finance/audit reads.
+   */
+  legacy_excluded: Generated<boolean>;
+  /**
+   * Timestamp when TASK-557.1 or a follow-up remediation marked the quote as excluded from commercial forecast surfaces.
+   */
+  legacy_excluded_at: Timestamp | null;
+  /**
+   * TASK-557.1 machine-readable reason for legacy exclusion, e.g. missing_organization, missing_current_version_row, missing_current_line_items, finance_only_historical.
+   */
+  legacy_excluded_reason: string | null;
   legacy_status: string | null;
   margin_floor_pct: Numeric | null;
   mrr: Numeric | null;

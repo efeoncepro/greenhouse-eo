@@ -1,15 +1,25 @@
 # Pipeline Comercial — Vista Híbrida de Deals + Quotes Standalone
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-04-19 por Claude (TASK-457)
-> **Ultima actualizacion:** 2026-05-07 por Codex (TASK-557 — lane dedicada `/finance/intelligence/pipeline`)
+> **Ultima actualizacion:** 2026-05-07 por Codex (TASK-557.1 — limpieza legacy/limbo)
 > **Documentacion tecnica:**
 > - Spec: [TASK-457](../../tasks/complete/TASK-457-ui-revenue-pipeline-hybrid.md)
 > - Lane dedicada: [TASK-557](../../tasks/complete/TASK-557-commercial-pipeline-lane-extraction.md)
 > - Deal snapshots: [TASK-456](../../tasks/complete/TASK-456-deal-pipeline-snapshots-projection.md)
 > - Quote snapshots: [TASK-351](../../tasks/complete/) (quotation intelligence)
 > - Lifecyclestage sync: [TASK-454](../../tasks/complete/TASK-454-lifecyclestage-sync-company-contact.md)
+> - Legacy cleanup: [TASK-557.1](../../tasks/complete/TASK-557.1-legacy-quotes-cleanup-audit.md)
+
+## Delta 2026-05-07 — TASK-557.1
+
+Pipeline comercial ahora filtra dos señales al leer quotes standalone:
+
+- `COALESCE(legacy_excluded, FALSE) = FALSE`
+- `legacy_status IS NULL`
+
+`legacy_excluded` oculta filas históricas o limbo marcadas por el audit operativo. `legacy_status IS NULL` se conserva para ocultar 19 filas recuperables que requieren normalización humana antes de volver al forecast comercial. Las vistas legacy de Finanzas no aplican este filtro y pueden seguir mostrando la evidencia histórica cuando corresponda.
 
 ## Delta 2026-05-07 — TASK-557
 
@@ -21,7 +31,7 @@ La tab **Pipeline comercial** dentro de `/finance/intelligence` se mantiene como
 - auditoria de deep links externos a `/finance/intelligence?tab=quotations`.
 - al menos 30 dias de convivencia post-deploy.
 
-TASK-557 aplica un filtro defensivo temporal: las quotes con `legacy_status` no participan en la lane nueva. La columna futura `legacy_excluded` sigue siendo scope de TASK-557.1 y no existe aun en runtime.
+TASK-557.1 agregó el flag `legacy_excluded` y ejecutó la limpieza inicial. La lane nueva sigue excluyendo también `legacy_status` para no mostrar recoverables no normalizadas.
 
 ## Qué es
 

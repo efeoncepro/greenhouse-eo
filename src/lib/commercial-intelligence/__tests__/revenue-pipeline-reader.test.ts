@@ -235,4 +235,16 @@ describe('listRevenuePipelineUnified', () => {
     })
     expect(result.totals.byCategory['pre-sales'].count).toBe(1)
   })
+
+  it('filters legacy/excluded quotation rows at the commercial pipeline reader boundary', async () => {
+    mocks.listDealPipelineSnapshots.mockResolvedValue([])
+    wireQueryMock([])
+
+    await listRevenuePipelineUnified({ spaceId: 'space-1' })
+
+    const standaloneQuery = mocks.query.mock.calls.find(([sql]) => String(sql).includes('quotation_pipeline_snapshots'))?.[0]
+
+    expect(String(standaloneQuery)).toContain('COALESCE(q.legacy_excluded, FALSE) = FALSE')
+    expect(String(standaloneQuery)).toContain('q.legacy_status IS NULL')
+  })
 })

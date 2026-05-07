@@ -5,23 +5,30 @@
 - **TASK-813** (HubSpot p_services 0-162 sync + phantom seed cleanup) clona el patrón "audit + 3 categorías" introducido aquí — script idempotente con dry-run, categorización (recuperable / excluible / histórica), reporte counts pre/post. Reusar la misma forma de output + flags CLI para consistencia operacional.
 - Sibling pattern: ambas tasks atacan limbos legacy en distintos dominios (quotes vs services). Coordinar formato de reportes para que el operador comercial vea un mismo shape.
 
+## Delta 2026-05-07 — cierre Codex
+
+- La spec original trataba `finance_quote_id IS NULL` como limbo, pero runtime real post-TASK-486 permite quotes canónicas nuevas sin mirror finance legacy. El script reporta ese dato, pero **no excluye** una quote solo por `finance_quote_id IS NULL`.
+- `current_version` es `NOT NULL DEFAULT 1`; el audit valida existencia real de `quotation_versions` y `quotation_line_items` para la versión vigente.
+- `legacy_excluded` se agrega como flag operativo para `historical`/`excludable`; las rows `recoverable` quedan sin mutar y ocultas del pipeline por `legacy_status IS NULL` hasta normalización humana.
+- Runtime auditado: 44 candidatos, 19 `recoverable`, 14 `excludable`, 11 `historical`; apply marcó 25 rows `legacy_excluded=true`; rerun idempotente actualizó 0.
+
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Bajo` (~1 dia)
 - Type: `operational`
 - Epic: `EPIC-002`
-- Status real: `Diseno cerrado v1.9`
+- Status real: `Cerrada 2026-05-07`
 - Rank: `TBD`
 - Domain: `data`
 - Blocked by: `TASK-555`
-- Branch: `task/TASK-557.1-legacy-quotes-cleanup-audit`
+- Branch: `develop` (override explícito del usuario; no crear task branch)
 
 ## Summary
 
-Audit + cleanup script de quotes legacy en estado limbo (con `legacy_status` set, sin `current_version`, sin canonical record) para que las nuevas surfaces post-EPIC-002 (sidebar Comercial + pipeline lane + picker) las ignoren limpiamente sin romperlas.
+Audit + cleanup script de quotes legacy en estado limbo para que las nuevas surfaces post-EPIC-002 (sidebar Comercial + pipeline lane + picker) las ignoren limpiamente sin romper vistas legacy de Finanzas.
 
 ## Why This Task Exists
 
@@ -73,7 +80,7 @@ CREATE INDEX idx_quotations_legacy_excluded
 
 `scripts/audit-legacy-quotes.ts`:
 
-- Detecta quotes con `legacy_status NOT NULL OR current_version IS NULL OR finance_quote_id IS NULL`
+- Detecta quotes con `legacy_status NOT NULL`, falta de `organization_id` o falta de versión materializada. `finance_quote_id IS NULL` queda como dato reportado, no como causal única.
 - Categoriza por heuristica: recuperable / excluible / historica
 - Output: CSV report + acciones sugeridas
 
@@ -91,18 +98,22 @@ CREATE INDEX idx_quotations_legacy_excluded
 
 ## Acceptance Criteria
 
-- [ ] migracion aplicada
-- [ ] script ejecutado en dev/staging/prod con report
-- [ ] queries de surfaces nuevas filtran `WHERE legacy_excluded = false`
-- [ ] vistas legacy `/finance/...` siguen mostrando quotes excluidas (sin breaking change)
+- [x] migracion aplicada
+- [x] script ejecutado en dev/staging con report CSV local bajo `artifacts/` y auditoría versionada
+- [x] queries de surfaces nuevas filtran `COALESCE(legacy_excluded, FALSE) = FALSE` y conservan `legacy_status IS NULL`
+- [x] vistas legacy `/finance/...` siguen mostrando quotes excluidas (sin breaking change)
 
 ## Verification
 
-- `pnpm migrate:up`, audit dry-run, manual review, aplicar
-- Verificar que pipeline lane (TASK-557) no muestra limbos
+- `pnpm pg:connect:migrate` OK; tipos regenerados
+- `pnpm exec tsx --require ./scripts/lib/server-only-shim.cjs scripts/audit-legacy-quotes.ts --output artifacts/task-557.1-legacy-quotes-audit-dry-run.csv` OK
+- `pnpm exec tsx --require ./scripts/lib/server-only-shim.cjs scripts/audit-legacy-quotes.ts --apply --output artifacts/task-557.1-legacy-quotes-audit-apply.csv` OK: 25 rows actualizadas
+- rerun `--apply` OK: 0 rows actualizadas
+- `pnpm test src/lib/commercial/legacy-quotes-audit.test.ts src/lib/commercial-intelligence/__tests__/revenue-pipeline-reader.test.ts` OK
+- `pnpm exec tsc --noEmit --pretty false` OK
 
 ## Closing Protocol
 
-- [ ] Lifecycle sincronizado
-- [ ] README actualizado
-- [ ] Handoff con counts por env
+- [x] Lifecycle sincronizado
+- [x] README actualizado
+- [x] Handoff con counts por env

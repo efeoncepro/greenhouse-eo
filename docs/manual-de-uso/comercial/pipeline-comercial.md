@@ -1,7 +1,7 @@
 # Pipeline comercial
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-05-07 por Codex
 > **Modulo:** Comercial
 > **Ruta en portal:** `/finance/intelligence/pipeline`
@@ -38,7 +38,7 @@ Usa esa tab solo como compatibilidad. Para trabajo comercial diario, usa Comerci
 - No trates el monto ponderado como revenue reconocido.
 - No compares Pipeline directamente contra caja o facturación mensual sin pasar por cierre financiero.
 - No crees `/commercial/pipeline` ni bookmarks nuevos fuera del path actual hasta que exista una task de normalización de URLs.
-- No fuerces quotes legacy con `legacy_status` al pipeline; TASK-557 las filtra defensivamente hasta que TASK-557.1 cierre la limpieza.
+- No fuerces quotes legacy con `legacy_status` al pipeline. TASK-557.1 ya marcó históricas/limbo con `legacy_excluded`, y las recuperables requieren normalización humana antes de volver al forecast.
 
 ## Problemas comunes
 
@@ -48,7 +48,7 @@ Pide revisar si tienes `comercial.pipeline` o compat `finanzas.inteligencia`. La
 
 ### Veo menos oportunidades de las esperadas
 
-Revisa si la oportunidad viene de una quote legacy. TASK-557 excluye quotes con `legacy_status` para evitar limbos visibles en la lane comercial.
+Revisa si la oportunidad viene de una quote legacy. Pipeline excluye `legacy_excluded=true` y también `legacy_status` para evitar limbos visibles en la lane comercial.
 
 ### El forecast no coincide con Finanzas
 

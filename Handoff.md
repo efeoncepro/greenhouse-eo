@@ -1,3 +1,14 @@
+# Sesion 2026-05-07 — TASK-557.1 cerrada en develop (Legacy Quotes Cleanup & Limbo State Audit)
+
+- **Branch:** `develop` por instruccion explicita del usuario; no se crea `task/TASK-557.1-legacy-quotes-cleanup-audit`.
+- **Ownership/lifecycle:** no habia PR abierto ni branch local/remota obvia para `TASK-557.1`; la task se movio a `docs/tasks/in-progress/` al tomarla y a `docs/tasks/complete/` al cerrar; `Lifecycle`, `docs/tasks/README.md` y `docs/tasks/TASK_ID_REGISTRY.md` quedaron sincronizados.
+- **Drift resuelto:** `finance_quote_id IS NULL` no es limbo por si solo en runtime post-TASK-486; las quotes canónicas nuevas pueden no tener mirror finance legacy. `current_version` tampoco puede ser NULL; el audit valida `quotation_versions` + `quotation_line_items` para la version vigente.
+- **Entrega:** migration `20260507125706498_task-557-1-add-legacy-excluded-flag.sql` agrega `legacy_excluded`, `legacy_excluded_reason`, `legacy_excluded_at` e índice parcial; helper puro `src/lib/commercial/legacy-quotes-audit.ts`; script idempotente `scripts/audit-legacy-quotes.ts`; `revenue-pipeline-reader` filtra `COALESCE(q.legacy_excluded, FALSE) = FALSE` + `q.legacy_status IS NULL`.
+- **Runtime counts:** dry-run: 44 candidatos (`recoverable=19`, `excludable=14`, `historical=11`), 25 rows por marcar. Apply: 25 actualizadas. Idempotency apply: 0 actualizadas. Post-cleanup: `legacy_excluded=true` 25, `legacy_status` 32, recoverables no excluidas 19, pipeline candidates visibles con filtro dual 2.
+- **Docs/audit:** auditoria versionada en `docs/audits/finance/TASK-557.1_LEGACY_QUOTES_AUDIT_2026-05-07.md`; docs/manual de Pipeline actualizados para explicar filtro dual y recoverables.
+- **Validacion:** `pnpm pg:doctor` OK; `pnpm pg:connect:migrate` OK + types regenerated; audit dry-run/apply/idempotency OK; focal vitest OK (2 files / 10 tests); `pnpm exec tsc --noEmit --pretty false` OK.
+- **Pendiente sano:** normalizacion humana futura de 19 recoverables para retirar `legacy_status` sin perder trazabilidad; fuera de scope de esta task.
+
 # Sesion 2026-05-07 — TASK-557 tomada en develop (Commercial Pipeline Lane Extraction)
 
 - **Branch:** `develop` por instruccion explicita del usuario; no se crea `task/TASK-557-commercial-pipeline-lane-extraction`.
@@ -5,7 +16,7 @@
 - **Entrega:** nueva page `/finance/intelligence/pipeline` con guard dual `comercial.pipeline OR finanzas.inteligencia`, header Comercial y render directo de `CommercialIntelligenceView`; sidebar `Comercial` agrega `Pipeline` como primer item; `FinanceIntelligenceView` conserva tab compat con aviso "Vista compartida — owner Comercial" y link a la lane dedicada.
 - **Fix post-screenshot:** el usuario mostro staging sin `Pipeline` en el menu. Causa raiz local: `canSeeAnyView(..., true)` solo usa fallback cuando `authorizedViews` esta vacio; su sesion tenia authorizedViews pero aun no incluia `comercial.pipeline`. Se ajusto sidebar y page dedicada para aceptar fallback por `routeGroup commercial|finance|admin` aun con snapshots viejos, manteniendo compat transicional.
 - **Access model:** `routeGroups`: owner `commercial`, compat `finance`/admin en page dedicada; `views`: `comercial.pipeline` routePath code-versioned y persistido pasa a `/finance/intelligence/pipeline`, compat `finanzas.inteligencia`; `entitlements`: se reutiliza `commercial.pipeline.read`; `startup policy`: sin cambios.
-- **TASK-557.1:** sigue `to-do`; se aplico filtro defensivo `q.legacy_status IS NULL` con tag de retiro en `revenue-pipeline-reader`. No se usa `legacy_excluded` porque la columna no existe aun; queda scope de TASK-557.1.
+- **TASK-557.1:** cerrada despues de TASK-557; `legacy_excluded*` existe y el reader conserva filtro dual (`legacy_excluded=false` + `legacy_status IS NULL`) hasta normalizacion humana de recoverables.
 - **Notifications drift:** no se cambiaron las URLs de `notifications.ts:629/654`; el runtime real contiene eventos financieros (`leave_request.payroll_impact_detected`, `accounting.margin_alert.triggered`), no notificaciones pipeline. Moverlas habria degradado el destino correcto.
 - **Migracion:** `20260507115027833_task-557-commercial-pipeline-route-path.sql` actualiza `greenhouse_core.view_registry.route_path` para `comercial.pipeline`.
 - **Docs:** changelog, client changelog, doc funcional `pipeline-comercial`, doc `surfaces-comerciales-sobre-rutas-finance`, manual `docs/manual-de-uso/comercial/pipeline-comercial.md`, indices y task sincronizados.
