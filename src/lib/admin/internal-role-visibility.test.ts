@@ -30,11 +30,13 @@ const ALL_INTERNAL_VIEW_CODES = VIEW_REGISTRY
   .sort()
 
 const MI_FICHA_VIEW_CODES = VIEW_CODES_BY_SECTION('mi_ficha')
+const COMERCIAL_VIEW_CODES = VIEW_CODES_BY_SECTION('comercial')
 const FINANZAS_VIEW_CODES = VIEW_CODES_BY_SECTION('finanzas')
 const EQUIPO_VIEW_CODES = VIEW_CODES_BY_SECTION('equipo')
 
 /**
- * The visibility matrix seeded by the TASK-727 migration.
+ * The visibility matrix seeded by the TASK-727 migration plus the TASK-555
+ * commercial surface overlay.
  * Solo registramos vistas con grant=true. Para denials explícitos (granted=false),
  * usamos el set DENIED_VIEWS para verificar que la fila existe pero no concede acceso.
  */
@@ -51,6 +53,7 @@ const TASK_727_GRANTS: Record<string, string[]> = {
     'finanzas.banco', 'finanzas.cuenta_corriente_accionista', 'finanzas.clientes',
     'finanzas.proveedores', 'finanzas.inteligencia', 'finanzas.asignaciones_costos',
     'finanzas.cotizaciones', 'finanzas.ordenes_compra', 'finanzas.hes',
+    ...COMERCIAL_VIEW_CODES,
     'ia.herramientas',
     // commercial_parties/product_sync_conflicts/product_catalog viven en VIEW_REGISTRY
     // pero aun NO estan en la DB view_registry; efeonce_admin los ve via is_admin fallback.
@@ -73,6 +76,7 @@ const TASK_727_GRANTS: Record<string, string[]> = {
   efeonce_account: [
     'gestion.agencia', 'gestion.organizaciones', 'gestion.servicios', 'gestion.spaces',
     'gestion.equipo', 'gestion.delivery', 'gestion.campanas',
+    ...COMERCIAL_VIEW_CODES,
     ...MI_FICHA_VIEW_CODES
   ].sort(),
 
@@ -82,18 +86,21 @@ const TASK_727_GRANTS: Record<string, string[]> = {
 
   finance_admin: [
     ...FINANZAS_VIEW_CODES,
+    ...COMERCIAL_VIEW_CODES,
     'gestion.economia', 'gestion.staff_augmentation', 'administracion.instrumentos_pago',
     ...MI_FICHA_VIEW_CODES
   ].sort(),
 
   finance_analyst: [
     ...FINANZAS_VIEW_CODES,
+    ...COMERCIAL_VIEW_CODES,
     'gestion.economia',
     ...MI_FICHA_VIEW_CODES
   ].sort(),
 
   finance_manager: [
     ...FINANZAS_VIEW_CODES,
+    ...COMERCIAL_VIEW_CODES,
     'gestion.economia', 'gestion.staff_augmentation', 'gestion.delivery', 'gestion.capacidad',
     'administracion.instrumentos_pago',
     ...MI_FICHA_VIEW_CODES
@@ -147,6 +154,12 @@ describe('TASK-727: Internal role × view matrix', () => {
 
   it('finanzas has 14 views', () => {
     expect(FINANZAS_VIEW_CODES).toHaveLength(14)
+  })
+
+  it('comercial has 6 transitional commercial-domain views', () => {
+    expect(COMERCIAL_VIEW_CODES).toHaveLength(6)
+    expect(COMERCIAL_VIEW_CODES).toContain('comercial.cotizaciones')
+    expect(COMERCIAL_VIEW_CODES).toContain('comercial.sow')
   })
 
   it('equipo has 12 views (incluye offboarding, onboarding y nomina_proyectada)', () => {
@@ -216,6 +229,17 @@ describe('TASK-727: Internal role × view matrix', () => {
     }
   })
 
+  it('commercial roles see all comercial.* views without granting finanzas.* to account leads', () => {
+    for (const view of COMERCIAL_VIEW_CODES) {
+      expect(TASK_727_GRANTS.efeonce_account).toContain(view)
+      expect(TASK_727_GRANTS.finance_admin).toContain(view)
+      expect(TASK_727_GRANTS.finance_analyst).toContain(view)
+    }
+
+    expect(TASK_727_GRANTS.efeonce_account).not.toContain('finanzas.resumen')
+    expect(TASK_727_GRANTS.efeonce_account).not.toContain('finanzas.conciliacion')
+  })
+
   it('finance_analyst sees gestion.economia (read context)', () => {
     expect(TASK_727_GRANTS.finance_analyst).toContain('gestion.economia')
   })
@@ -253,6 +277,7 @@ describe('TASK-727: Internal role × view matrix', () => {
     }
 
     expect(sections).toContain('gestion')
+    expect(sections).toContain('comercial')
     expect(sections).toContain('equipo')
     expect(sections).toContain('finanzas')
     expect(sections).toContain('ia')
@@ -312,10 +337,13 @@ describe('TASK-727: Internal role × view matrix', () => {
   // Route group invariants
   // ─────────────────────────────────────────────────────────────────────────────
 
-  it('route group scope for internal roles preserved (no role_route mapping changes)', () => {
+  it('route group scope for internal roles includes TASK-555 commercial lane where applicable', () => {
     expect(deriveRouteGroupsForSingleRole(ROLE_CODES.EFEONCE_ADMIN, 'efeonce_internal')).toContain('admin')
+    expect(deriveRouteGroupsForSingleRole(ROLE_CODES.EFEONCE_ADMIN, 'efeonce_internal')).toContain('commercial')
     expect(deriveRouteGroupsForSingleRole(ROLE_CODES.EFEONCE_OPERATIONS, 'efeonce_internal')).toContain('internal')
+    expect(deriveRouteGroupsForSingleRole(ROLE_CODES.EFEONCE_ACCOUNT, 'efeonce_internal')).toContain('commercial')
     expect(deriveRouteGroupsForSingleRole(ROLE_CODES.FINANCE_ADMIN, 'efeonce_internal')).toContain('finance')
+    expect(deriveRouteGroupsForSingleRole(ROLE_CODES.FINANCE_ADMIN, 'efeonce_internal')).toContain('commercial')
     expect(deriveRouteGroupsForSingleRole(ROLE_CODES.HR_PAYROLL, 'efeonce_internal')).toContain('hr')
   })
 

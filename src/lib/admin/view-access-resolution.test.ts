@@ -8,6 +8,7 @@ describe('role-route-mapping', () => {
     const groups = deriveRouteGroupsForSingleRole(ROLE_CODES.EFEONCE_ADMIN, 'efeonce_internal')
 
     expect(groups).toContain('client')
+    expect(groups).toContain('commercial')
     expect(groups).toContain('finance')
     expect(groups).toContain('hr')
     expect(groups).toContain('internal')
@@ -24,6 +25,21 @@ describe('role-route-mapping', () => {
     expect(groups).toContain('hr')
     expect(groups).toContain('people')
     expect(groups).not.toContain('admin')
+  })
+
+  it('derives commercial route groups for account and finance roles', () => {
+    expect(deriveRouteGroupsForSingleRole(ROLE_CODES.EFEONCE_ACCOUNT, 'efeonce_internal')).toEqual([
+      'internal',
+      'commercial'
+    ])
+    expect(deriveRouteGroupsForSingleRole(ROLE_CODES.FINANCE_ADMIN, 'efeonce_internal')).toEqual([
+      'finance',
+      'commercial'
+    ])
+    expect(deriveRouteGroupsForSingleRole(ROLE_CODES.FINANCE_ANALYST, 'efeonce_internal')).toEqual([
+      'finance',
+      'commercial'
+    ])
   })
 
   it('derives correct route groups for client_executive', () => {
@@ -48,6 +64,7 @@ describe('role-route-mapping', () => {
 
     expect(groups).toContain('internal')
     expect(groups).toContain('finance')
+    expect(groups).toContain('commercial')
     expect(groups).toContain('people')
   })
 
@@ -72,6 +89,7 @@ describe('additive view access contract', () => {
 
     // Admin should retain every route group regardless of any persisted view assignments
     expect(adminGroups).toContain('client')
+    expect(adminGroups).toContain('commercial')
     expect(adminGroups).toContain('finance')
     expect(adminGroups).toContain('hr')
     expect(adminGroups).toContain('internal')

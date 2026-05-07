@@ -322,7 +322,7 @@ Visibles en `/admin/operations` con rollup al subsystem `commercial`.
 
 ## 9. Capabilities
 
-Provisional (hasta TASK-555 cierre commercial routeGroup):
+Formalizado por TASK-555:
 
 | Capability | Module | Action | Scope | Allowed source |
 |---|---|---|---|---|
@@ -440,7 +440,7 @@ SIEMPRE:
 | Task | Relación |
 |---|---|
 | TASK-801 | Hard dep — engagement_kind column. Cerrada. |
-| TASK-555 | Soft dep — commercial routeGroup. To-do. Cuando cierre, migrar capabilities `commercial.*` formal. |
+| TASK-555 | Cerrada — formaliza `routeGroup: commercial`, surfaces `comercial.*` y capabilities `commercial.service_engagement.*`. |
 | TASK-706 | Patrón clonado (HubSpot companies webhook). |
 | TASK-771/773 | Patrón canónico async outbox + reactive consumer. |
 | TASK-742 | Defense-in-depth template aplicado al webhook. |

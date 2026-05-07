@@ -24,13 +24,14 @@ describe('getTenantEntitlements', () => {
     const entitlements = getTenantEntitlements(buildSubject({
       roleCodes: [ROLE_CODES.EFEONCE_ADMIN, ROLE_CODES.COLLABORATOR],
       primaryRoleCode: ROLE_CODES.EFEONCE_ADMIN,
-      routeGroups: ['internal', 'admin', 'client', 'finance', 'hr', 'people', 'my', 'ai_tooling']
+      routeGroups: ['internal', 'admin', 'client', 'commercial', 'finance', 'hr', 'people', 'my', 'ai_tooling']
     }))
 
     expect(entitlements.audienceKey).toBe('admin')
     expect(entitlements.startupPolicyKey).toBe('internal_default')
     expect(can(entitlements, 'admin.workspace', 'manage', 'all')).toBe(true)
     expect(can(entitlements, 'agency.workspace', 'launch', 'tenant')).toBe(true)
+    expect(can(entitlements, 'commercial.workspace', 'launch', 'tenant')).toBe(true)
     expect(can(entitlements, 'finance.status', 'read', 'tenant')).toBe(true)
     expect(canSeeModule(entitlements, 'people')).toBe(true)
     expect(canSeeModule(entitlements, 'client_portal')).toBe(true)
@@ -60,7 +61,7 @@ describe('getTenantEntitlements', () => {
     const entitlements = getTenantEntitlements(buildSubject({
       roleCodes: [ROLE_CODES.FINANCE_ANALYST],
       primaryRoleCode: ROLE_CODES.FINANCE_ANALYST,
-      routeGroups: ['finance']
+      routeGroups: ['finance', 'commercial']
     }))
 
     expect(entitlements.audienceKey).toBe('finance')
@@ -69,6 +70,9 @@ describe('getTenantEntitlements', () => {
     expect(can(entitlements, 'finance.status', 'read', 'tenant')).toBe(true)
     expect(can(entitlements, 'finance.payment_instruments.read', 'read', 'tenant')).toBe(true)
     expect(can(entitlements, 'finance.payment_instruments.update', 'update', 'tenant')).toBe(false)
+    expect(can(entitlements, 'commercial.workspace', 'launch', 'tenant')).toBe(true)
+    expect(can(entitlements, 'commercial.quotation', 'update', 'tenant')).toBe(true)
+    expect(can(entitlements, 'commercial.service_engagement.sync', 'sync', 'tenant')).toBe(false)
     expect(canSeeModule(entitlements, 'finance')).toBe(true)
   })
 
@@ -76,19 +80,36 @@ describe('getTenantEntitlements', () => {
     const financeAdminEntitlements = getTenantEntitlements(buildSubject({
       roleCodes: [ROLE_CODES.FINANCE_ADMIN],
       primaryRoleCode: ROLE_CODES.FINANCE_ADMIN,
-      routeGroups: ['finance']
+      routeGroups: ['finance', 'commercial']
     }))
 
     const superadminEntitlements = getTenantEntitlements(buildSubject({
       roleCodes: [ROLE_CODES.EFEONCE_ADMIN],
       primaryRoleCode: ROLE_CODES.EFEONCE_ADMIN,
-      routeGroups: ['admin', 'finance']
+      routeGroups: ['admin', 'commercial', 'finance']
     }))
 
     expect(can(financeAdminEntitlements, 'finance.payment_instruments.update', 'update', 'tenant')).toBe(true)
     expect(can(financeAdminEntitlements, 'finance.payment_instruments.manage_defaults', 'manage', 'tenant')).toBe(true)
     expect(can(financeAdminEntitlements, 'finance.payment_instruments.reveal_sensitive', 'read', 'tenant')).toBe(false)
+    expect(can(financeAdminEntitlements, 'commercial.service_engagement.sync', 'sync', 'tenant')).toBe(true)
+    expect(can(financeAdminEntitlements, 'commercial.service_engagement.resolve_orphan', 'approve', 'tenant')).toBe(true)
+    expect(can(financeAdminEntitlements, 'commercial.service_engagement.archive_legacy', 'delete', 'tenant')).toBe(false)
     expect(can(superadminEntitlements, 'finance.payment_instruments.reveal_sensitive', 'read', 'tenant')).toBe(true)
+    expect(can(superadminEntitlements, 'commercial.service_engagement.archive_legacy', 'delete', 'tenant')).toBe(true)
+  })
+
+  it('grants commercial workspace capabilities to account leads without finance status access', () => {
+    const entitlements = getTenantEntitlements(buildSubject({
+      roleCodes: [ROLE_CODES.EFEONCE_ACCOUNT],
+      primaryRoleCode: ROLE_CODES.EFEONCE_ACCOUNT,
+      routeGroups: ['internal', 'commercial']
+    }))
+
+    expect(can(entitlements, 'commercial.workspace', 'launch', 'tenant')).toBe(true)
+    expect(can(entitlements, 'commercial.quotation', 'create', 'tenant')).toBe(true)
+    expect(can(entitlements, 'commercial.engagement.declare', 'create', 'tenant')).toBe(true)
+    expect(can(entitlements, 'finance.status', 'read', 'tenant')).toBe(false)
   })
 
   it('keeps pure collaborators in my workspace', () => {

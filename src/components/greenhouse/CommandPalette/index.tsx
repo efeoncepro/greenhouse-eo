@@ -60,6 +60,7 @@ export interface CommandPaletteProps {
 const DEFAULT_ICON_FOR_SECTION: Record<GovernanceSection, string> = {
   gestion: 'tabler-building',
   equipo: 'tabler-users-group',
+  comercial: 'tabler-briefcase',
   finanzas: 'tabler-report-money',
   ia: 'tabler-sparkles',
   administracion: 'tabler-shield-lock',

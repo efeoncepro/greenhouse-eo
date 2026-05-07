@@ -3,7 +3,7 @@
 > **Tipo de documento:** Spec de arquitectura (documento vivo)
 > **Version:** 1.0
 > **Creado:** 2026-04-11 por Claude (auditoria completa del sidebar)
-> **Ultima actualizacion:** 2026-05-07 — TASK-554 separa `Comercial` como dominio top-level de navegacion manteniendo paths legacy `/finance/...`.
+> **Ultima actualizacion:** 2026-05-07 — TASK-555 agrega `routeGroup: commercial` y view codes `comercial.*` sobre paths legacy `/finance/...`.
 > **Archivo fuente:** `src/components/layout/vertical/VerticalMenu.tsx`
 > **Documentacion tecnica:** `GREENHOUSE_IDENTITY_ACCESS_V2.md`, `GREENHOUSE_UI_PLATFORM_V1.md`
 
@@ -131,14 +131,14 @@ Resolucion en login:
 
 ### 4.3 Comercial
 
-TASK-554 crea `Comercial` como dominio top-level de navegación, pero mantiene rutas legacy `/finance/...` y gates legacy `finanzas.*` hasta TASK-555/TASK-556.
+TASK-554 crea `Comercial` como dominio top-level de navegación. TASK-555 agrega su access foundation: `routeGroup: commercial`, namespace `comercial.*` y compatibilidad transicional con `finanzas.cotizaciones` mientras quotes siga bajo `/finance/quotes`.
 
 | Item | Icon | Route | View code transicional | Nota |
 |------|------|-------|------------------------|------|
-| Cotizaciones | `tabler-file-dollar` | `/finance/quotes` | `finanzas.cotizaciones` | Owner domain comercial; path legacy. |
-| Contratos | `tabler-file-description` | `/finance/contracts` | pendiente TASK-555 | Incluye SOW temporalmente; no existe route SOW propia. |
-| Acuerdos marco | `tabler-file-certificate` | `/finance/master-agreements` | pendiente TASK-555 | MSA comercial sobre path legacy. |
-| Productos | `tabler-packages` | `/finance/products` | pendiente TASK-555 | Page legacy mínima sobre `ProductCatalogView`. |
+| Cotizaciones | `tabler-file-dollar` | `/finance/quotes` | `comercial.cotizaciones` + compat `finanzas.cotizaciones` | Owner domain comercial; path legacy. |
+| Contratos | `tabler-file-description` | `/finance/contracts` | `comercial.contratos`, `comercial.sow` | Incluye SOW temporalmente; no existe route SOW propia. |
+| Acuerdos marco | `tabler-file-certificate` | `/finance/master-agreements` | `comercial.acuerdos_marco` | MSA comercial sobre path legacy. |
+| Productos | `tabler-packages` | `/finance/products` | `comercial.productos` | Page legacy mínima sobre `ProductCatalogView`. |
 
 ### 4.4 Finanzas
 

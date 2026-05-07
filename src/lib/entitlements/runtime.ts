@@ -799,6 +799,128 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     })
   }
 
+  if (hasRouteGroup(subject, 'commercial') || hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
+    const source: TenantEntitlementSource = hasRouteGroup(subject, 'commercial') ? 'route_group' : 'role'
+
+    addEntitlement(entries, {
+      module: 'commercial',
+      capability: 'commercial.workspace',
+      action: 'read',
+      scope: 'tenant',
+      source
+    })
+
+    addEntitlement(entries, {
+      module: 'commercial',
+      capability: 'commercial.workspace',
+      action: 'launch',
+      scope: 'tenant',
+      source
+    })
+
+    addEntitlement(entries, {
+      module: 'commercial',
+      capability: 'commercial.pipeline',
+      action: 'read',
+      scope: 'tenant',
+      source
+    })
+
+    for (const action of ['read', 'create', 'update', 'approve', 'export'] as const) {
+      addEntitlement(entries, {
+        module: 'commercial',
+        capability: 'commercial.quotation',
+        action,
+        scope: 'tenant',
+        source
+      })
+    }
+
+    for (const capability of ['commercial.contract', 'commercial.sow', 'commercial.master_agreement', 'commercial.product_catalog'] as const) {
+      for (const action of ['read', 'create', 'update'] as const) {
+        addEntitlement(entries, {
+          module: 'commercial',
+          capability,
+          action,
+          scope: 'tenant',
+          source
+        })
+      }
+    }
+
+    addEntitlement(entries, {
+      module: 'commercial',
+      capability: 'commercial.engagement.read',
+      action: 'read',
+      scope: 'tenant',
+      source
+    })
+
+    addEntitlement(entries, {
+      module: 'commercial',
+      capability: 'commercial.engagement.declare',
+      action: 'create',
+      scope: 'tenant',
+      source
+    })
+
+    addEntitlement(entries, {
+      module: 'commercial',
+      capability: 'commercial.engagement.record_progress',
+      action: 'update',
+      scope: 'tenant',
+      source
+    })
+  }
+
+  if (hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
+    addEntitlement(entries, {
+      module: 'commercial',
+      capability: 'commercial.engagement.approve',
+      action: 'approve',
+      scope: 'tenant',
+      source: 'role'
+    })
+
+    addEntitlement(entries, {
+      module: 'commercial',
+      capability: 'commercial.engagement.record_outcome',
+      action: 'update',
+      scope: 'tenant',
+      source: 'role'
+    })
+  }
+
+  if (hasRole(subject, ROLE_CODES.FINANCE_ADMIN) || hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
+    const source: TenantEntitlementSource = 'role'
+
+    addEntitlement(entries, {
+      module: 'commercial',
+      capability: 'commercial.service_engagement.sync',
+      action: 'sync',
+      scope: 'tenant',
+      source
+    })
+
+    addEntitlement(entries, {
+      module: 'commercial',
+      capability: 'commercial.service_engagement.resolve_orphan',
+      action: 'approve',
+      scope: 'tenant',
+      source
+    })
+  }
+
+  if (hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
+    addEntitlement(entries, {
+      module: 'commercial',
+      capability: 'commercial.service_engagement.archive_legacy',
+      action: 'delete',
+      scope: 'tenant',
+      source: 'role'
+    })
+  }
+
   // Commercial Party Lifecycle (TASK-535 §9.1). Sales roles not yet modeled —
   // binding limited to admin and finance_admin for now. When TASK-536+ lands
   // the sales role family, extend this block (and do not remove the admin

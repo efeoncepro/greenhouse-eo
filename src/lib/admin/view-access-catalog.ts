@@ -1,6 +1,7 @@
 export type GovernanceSection =
   | 'gestion'
   | 'equipo'
+  | 'comercial'
   | 'finanzas'
   | 'ia'
   | 'administracion'
@@ -19,6 +20,7 @@ export type GovernanceViewRegistryEntry = {
 export const GOVERNANCE_SECTIONS = [
   { key: 'gestion', label: 'Gestión', description: 'Superficies cross-space y contexto operativo institucional.' },
   { key: 'equipo', label: 'Equipo', description: 'Personas, nómina y operaciones de HR.' },
+  { key: 'comercial', label: 'Comercial', description: 'Pipeline, propuestas, contratos y catálogo vendible.' },
   { key: 'finanzas', label: 'Finanzas', description: 'Resumen financiero, ingresos, egresos y conciliación.' },
   { key: 'ia', label: 'IA', description: 'Gobernanza de herramientas, licencias y créditos.' },
   { key: 'administracion', label: 'Administración', description: 'Admin Center, Spaces, usuarios y gobierno del portal.' },
@@ -206,6 +208,54 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
     description: 'Checklists operativos reutilizables para entradas y salidas.',
     routePath: '/hr/onboarding',
     routeGroup: 'hr'
+  },
+  {
+    viewCode: 'comercial.pipeline',
+    section: 'comercial',
+    label: 'Pipeline comercial',
+    description: 'Forecast, deals y oportunidades comerciales sobre ruta legacy de inteligencia.',
+    routePath: '/finance/intelligence',
+    routeGroup: 'commercial'
+  },
+  {
+    viewCode: 'comercial.cotizaciones',
+    section: 'comercial',
+    label: 'Cotizaciones',
+    description: 'Propuestas comerciales, pricing, aprobaciones y seguimiento quote-to-cash.',
+    routePath: '/finance/quotes',
+    routeGroup: 'commercial'
+  },
+  {
+    viewCode: 'comercial.contratos',
+    section: 'comercial',
+    label: 'Contratos',
+    description: 'Contratos comerciales, SOWs transicionales y renovaciones activas.',
+    routePath: '/finance/contracts',
+    routeGroup: 'commercial'
+  },
+  {
+    viewCode: 'comercial.sow',
+    section: 'comercial',
+    label: 'SOW',
+    description: 'Statements of Work agrupados bajo contratos mientras no exista ruta propia.',
+    routePath: '/finance/contracts',
+    routeGroup: 'commercial'
+  },
+  {
+    viewCode: 'comercial.acuerdos_marco',
+    section: 'comercial',
+    label: 'Acuerdos marco',
+    description: 'MSAs, cláusulas maestras y contratos vinculados.',
+    routePath: '/finance/master-agreements',
+    routeGroup: 'commercial'
+  },
+  {
+    viewCode: 'comercial.productos',
+    section: 'comercial',
+    label: 'Productos',
+    description: 'Catálogo vendible sincronizado con HubSpot Products y fuentes comerciales Greenhouse.',
+    routePath: '/finance/products',
+    routeGroup: 'commercial'
   },
   {
     viewCode: 'finanzas.resumen',

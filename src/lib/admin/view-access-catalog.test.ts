@@ -27,4 +27,23 @@ describe('VIEW_REGISTRY', () => {
     expect(cuentas!.routePath).toBe('/admin/accounts')
     expect(cuentas!.routeGroup).toBe('admin')
   })
+
+  it('includes TASK-555 commercial surfaces over transitional finance paths', () => {
+    const commercialViews = VIEW_REGISTRY.filter(e => e.section === 'comercial')
+
+    expect(commercialViews).toHaveLength(6)
+    expect(commercialViews.map(e => e.viewCode).sort()).toEqual([
+      'comercial.acuerdos_marco',
+      'comercial.contratos',
+      'comercial.cotizaciones',
+      'comercial.pipeline',
+      'comercial.productos',
+      'comercial.sow'
+    ])
+
+    for (const view of commercialViews) {
+      expect(view.routeGroup).toBe('commercial')
+      expect(view.routePath.startsWith('/finance/')).toBe(true)
+    }
+  })
 })

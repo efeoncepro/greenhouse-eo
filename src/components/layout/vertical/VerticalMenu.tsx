@@ -63,9 +63,20 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
   const isAdminUser = session?.user?.routeGroups?.includes('admin') ?? false
   const isHrUser = session?.user?.routeGroups?.includes('hr') ?? false
   const isFinanceUser = session?.user?.routeGroups?.includes('finance') ?? false
+  const isCommercialUser = session?.user?.routeGroups?.includes('commercial') ?? false
   const isPeopleRouteGroup = session?.user?.routeGroups?.includes('people') ?? false
   const isAiToolingUser = session?.user?.routeGroups?.includes('ai_tooling') ?? false
   const isMyUser = session?.user?.routeGroups?.includes('my') ?? false
+
+  const isInternalPortalUser =
+    isInternalUser ||
+    isAdminUser ||
+    isCommercialUser ||
+    isFinanceUser ||
+    isHrUser ||
+    isPeopleRouteGroup ||
+    isAiToolingUser
+
   const isAgencyUser = isInternalUser || isAdminUser
   const roleCodes = session?.user?.roleCodes ?? []
 
@@ -106,6 +117,12 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
     return authorizedViews.includes(viewCode)
   }
 
+  const canSeeAnyView = (viewCodes: string[], fallback: boolean) => {
+    if (authorizedViews.length === 0) return fallback
+
+    return viewCodes.some(viewCode => authorizedViews.includes(viewCode))
+  }
+
   const showSub = !(isCollapsed && !isHovered)
   const ScrollWrapper = isBreakpointReached ? 'div' : PerfectScrollbar
 
@@ -130,7 +147,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
   // INTERNAL USERS
   // ═══════════════════════════════════════════════════════════════════════
 
-  if (isInternalUser) {
+  if (isInternalPortalUser) {
     // ── Home ──
     menuData.push({
       label: nl(GH_INTERNAL_NAV.home),
@@ -313,7 +330,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
     }
 
     // ── COMERCIAL (top-level commercial domain over legacy /finance paths) ──
-    if (isFinanceUser || isAdminUser) {
+    if (isCommercialUser || isFinanceUser || isAdminUser) {
       menuData.push({
         label: nl(GH_COMMERCIAL_NAV.root),
         icon: 'tabler-briefcase',
@@ -327,9 +344,11 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           },
           { label: nl(GH_COMMERCIAL_NAV.products), href: '/finance/products', icon: 'tabler-packages' }
         ].filter(item => {
-          if (item.href === '/finance/quotes') return canSeeView('finanzas.cotizaciones', true)
+          if (item.href === '/finance/quotes') return canSeeAnyView(['comercial.cotizaciones', 'finanzas.cotizaciones'], true)
+          if (item.href === '/finance/contracts') return canSeeAnyView(['comercial.contratos', 'comercial.sow'], true)
+          if (item.href === '/finance/master-agreements') return canSeeView('comercial.acuerdos_marco', true)
+          if (item.href === '/finance/products') return canSeeView('comercial.productos', true)
 
-          // TASK-554 transition: granular commercial/contract/product view codes land in TASK-555.
           return true
         })
       })
@@ -561,7 +580,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
   // CLIENT USERS (external portal)
   // ═══════════════════════════════════════════════════════════════════════
 
-  if (!isInternalUser) {
+  if (!isInternalPortalUser) {
     // Pure collaborator home
     if (isMyUser) {
       menuData.splice(0, 0, {

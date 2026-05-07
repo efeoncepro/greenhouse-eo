@@ -23,7 +23,8 @@ export const ENTITLEMENT_ACTIONS = [
   'export',
   'manage',
   'configure',
-  'launch'
+  'launch',
+  'sync'
 ] as const
 
 export type EntitlementAction = (typeof ENTITLEMENT_ACTIONS)[number]
@@ -412,6 +413,12 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     actions: ['read', 'launch'] as const,
     defaultScope: 'tenant'
   },
+  {
+    key: 'commercial.workspace',
+    module: 'commercial',
+    actions: ['read', 'launch'] as const,
+    defaultScope: 'tenant'
+  },
 
   // Commercial Party Lifecycle (TASK-535 §9.1).
   // Roles `sales` and `sales_lead` are not yet defined in role-codes.ts; the
@@ -458,6 +465,91 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     module: 'commercial',
     actions: ['update'] as const,
     defaultScope: 'all'
+  },
+  // TASK-555 — commercial surface access over legacy /finance paths.
+  {
+    key: 'commercial.pipeline',
+    module: 'commercial',
+    actions: ['read'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'commercial.quotation',
+    module: 'commercial',
+    actions: ['read', 'create', 'update', 'approve', 'export'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'commercial.contract',
+    module: 'commercial',
+    actions: ['read', 'create', 'update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'commercial.sow',
+    module: 'commercial',
+    actions: ['read', 'create', 'update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'commercial.master_agreement',
+    module: 'commercial',
+    actions: ['read', 'create', 'update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'commercial.product_catalog',
+    module: 'commercial',
+    actions: ['read', 'create', 'update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'commercial.engagement.read',
+    module: 'commercial',
+    actions: ['read'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'commercial.engagement.declare',
+    module: 'commercial',
+    actions: ['create'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'commercial.engagement.record_progress',
+    module: 'commercial',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'commercial.engagement.record_outcome',
+    module: 'commercial',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'commercial.engagement.approve',
+    module: 'commercial',
+    actions: ['approve'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'commercial.service_engagement.sync',
+    module: 'commercial',
+    actions: ['sync'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'commercial.service_engagement.resolve_orphan',
+    module: 'commercial',
+    actions: ['approve'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'commercial.service_engagement.archive_legacy',
+    module: 'commercial',
+    actions: ['delete'] as const,
+    defaultScope: 'tenant'
   },
 
   // TASK-672 — Platform Health API contract.

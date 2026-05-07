@@ -8,19 +8,26 @@
   - `commercial.service_engagement.archive_legacy` — script-level capability para el cleanup script de fantasmas.
 - Soft dep: TASK-813 espera tener el routeGroup `commercial` listo para no entrar bajo `finanzas.*` transicional. Si TASK-555 no cierra antes, TASK-813 documenta la transition path y el rebanding posterior.
 
+## Delta 2026-05-07
+
+- `commercial` queda formalizado como route group broad de navegación/surface.
+- Se materializan views `comercial.pipeline`, `comercial.cotizaciones`, `comercial.contratos`, `comercial.sow`, `comercial.acuerdos_marco` y `comercial.productos`.
+- Compatibilidad transicional: quotes acepta `comercial.cotizaciones` y `finanzas.cotizaciones` mientras la ruta siga bajo `/finance/quotes`.
+- No se crea startup policy comercial ni familia de roles `sales`.
+
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `EPIC-002`
-- Status real: `Diseno`
+- Status real: `Implementado`
 - Rank: `TBD`
 - Domain: `identity`
 - Blocked by: `none`
-- Branch: `task/TASK-555-commercial-access-model-foundation`
+- Branch: `develop` (user-requested direct execution; no task branch)
 - Legacy ID: `[optional]`
 - GitHub Issue: `[optional]`
 
@@ -117,26 +124,28 @@ La ausencia de esa separación se considera diseño incompleto.
 
 ## Acceptance Criteria
 
-- [ ] Existe un contrato explícito para `routeGroup: commercial`
-- [ ] Las surfaces comerciales objetivo tienen namespace `comercial.*` documentado y soportado
-- [ ] Los checks legacy necesarios siguen funcionando mientras existan rutas `/finance/...`
+- [x] Existe un contrato explícito para `routeGroup: commercial`
+- [x] Las surfaces comerciales objetivo tienen namespace `comercial.*` documentado y soportado
+- [x] Los checks legacy necesarios siguen funcionando mientras existan rutas `/finance/...`
 
 ## Verification
 
+- `pnpm pg:doctor` -> pass
+- `pnpm pg:connect:migrate` -> pass; migration `20260507065816822_task-555-commercial-access-model-foundation.sql` aplicada y tipos Kysely regenerados
+- `pnpm test src/lib/finance/__tests__/quotation-access.test.ts src/lib/entitlements/runtime.test.ts src/lib/admin/view-access-catalog.test.ts src/lib/admin/view-access-resolution.test.ts src/lib/admin/internal-role-visibility.test.ts` -> pass, 5 files / 56 tests
 - `pnpm lint`
 - `pnpm tsc --noEmit`
-- `pnpm test src/lib/finance/__tests__/quotation-access.test.ts`
 - revisión manual de docs de acceso actualizadas
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
-- [ ] la task deja documentado el mapa transicional `finanzas.* -> comercial.*`
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] la task deja documentado el mapa transicional `finanzas.* -> comercial.*`
 
 ## Follow-ups
 

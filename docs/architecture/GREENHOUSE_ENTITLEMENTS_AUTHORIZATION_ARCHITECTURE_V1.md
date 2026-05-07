@@ -449,6 +449,13 @@ Se mantienen como:
 - agrupación de rutas
 - criterio broad de navegación
 
+Delta TASK-555:
+
+- `commercial` es el route group broad para la navegación/surface de Comercial.
+- Roles transicionales con `commercial`: `efeonce_admin`, `efeonce_account`, `finance_admin`, `finance_analyst` y `finance_manager` si existe en DB.
+- El shell interno debe tratar `commercial` como carril operativo, aunque el usuario no tenga `internal`.
+- `startup policy` no cambia por este route group.
+
 Pero dejan de ser:
 
 - la única fuente de verdad para autorización fina
@@ -468,6 +475,18 @@ Pero dejan de ser:
 La dirección canónica es:
 
 - `authorizedViews` se derivan desde entitlements + surface rules
+
+Delta TASK-555:
+
+- Surfaces comerciales viven en namespace `comercial.*`: `pipeline`, `cotizaciones`, `contratos`, `sow`, `acuerdos_marco`, `productos`.
+- Mientras los paths sigan bajo `/finance/...`, los guards de cotizaciones aceptan `comercial.cotizaciones` y `finanzas.cotizaciones`.
+- El catálogo de bindings proyecta `comercial.*` a capabilities `commercial.*`; el fallback broad de sección usa `commercial.workspace`.
+
+Delta TASK-813/TASK-555:
+
+- `commercial.service_engagement.sync` usa action `sync`, scope `tenant`, module `commercial`, permitido a `finance_admin` y `efeonce_admin`.
+- `commercial.service_engagement.resolve_orphan` usa action `approve`, scope `tenant`, module `commercial`, permitido a `finance_admin` y `efeonce_admin`.
+- `commercial.service_engagement.archive_legacy` usa action `delete`, scope `tenant`, module `commercial`, reservado a `efeonce_admin`.
 
 ---
 

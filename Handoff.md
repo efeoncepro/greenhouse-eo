@@ -1,3 +1,14 @@
+# Sesion 2026-05-07 — TASK-555 cerrada en develop (Commercial Access Model Foundation)
+
+- **Branch:** `develop` por instruccion explicita del usuario; no se crea `task/TASK-555-commercial-access-model-foundation`.
+- **Ownership:** no habia PR abierto ni branch local/remota obvia para `TASK-555`; se movio la task a `docs/tasks/in-progress/` al tomarla y a `docs/tasks/complete/` al cerrar; `Lifecycle`, `docs/tasks/README.md` y `docs/tasks/TASK_ID_REGISTRY.md` quedaron sincronizados.
+- **Entrega:** se formalizo `routeGroup: commercial` en role-route mapping, tenant authorization y DB; se agregaron views `comercial.pipeline`, `comercial.cotizaciones`, `comercial.contratos`, `comercial.sow`, `comercial.acuerdos_marco`, `comercial.productos`; el sidebar usa `commercial` como carril operativo interno sobre paths legacy `/finance/...`; `quotation-access` acepta `comercial.cotizaciones` y compat `finanzas.cotizaciones`.
+- **Entitlements:** catalog/runtime/bindings agregan `commercial.workspace`, surfaces comerciales, `commercial.engagement.*` de EPIC-014 y `commercial.service_engagement.*` de TASK-813. `sync` queda como action formal para service engagement sync.
+- **Startup policy:** sin cambios; no se crea home comercial en este corte.
+- **Runtime verificado:** `pnpm pg:doctor` OK con `greenhouse_app` miembro de `greenhouse_runtime`, sin `CREATE` en schemas. `../Greenhouse_Portal_Spec_v1.md` no existe en el workspace; se trata como dependencia documental faltante no bloqueante porque la arquitectura vigente y runtime local cubren el contrato.
+- **Validacion:** `pnpm pg:connect:migrate` OK, migration `20260507065816822_task-555-commercial-access-model-foundation.sql` aplicada y tipos Kysely regenerados; focal vitest OK (5 files / 56 tests). Validacion final antes de commit/push: `pnpm lint` y `pnpm exec tsc --noEmit --pretty false`.
+- **Docs:** changelog, Identity Access, Entitlements Authorization, Commercial/Finance Boundary, Sidebar Architecture y HubSpot Services Intake actualizados.
+
 # Sesion 2026-05-07 — TASK-554 tomada en develop (Commercial Domain Navigation Separation)
 
 - **Branch:** `develop` por instruccion explicita del usuario; no se crea `task/TASK-554-commercial-domain-navigation-separation`.
