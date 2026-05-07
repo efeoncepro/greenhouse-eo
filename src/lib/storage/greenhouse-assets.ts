@@ -52,13 +52,14 @@ type AssetRow = {
 const PRIVATE_USER_ALLOWED_MIME_TYPES = new Set(['application/pdf', 'image/jpeg', 'image/png', 'image/webp'])
 const SYSTEM_ALLOWED_MIME_TYPES = new Set([...PRIVATE_USER_ALLOWED_MIME_TYPES, 'text/csv', 'text/csv; charset=utf-8'])
 
-const MAX_PRIVATE_UPLOAD_BYTES_BY_CONTEXT: Record<Extract<GreenhouseAssetContext, 'leave_request_draft' | 'purchase_order_draft' | 'master_agreement_draft' | 'certification_draft' | 'evidence_draft' | 'finance_reconciliation_evidence_draft'>, number> = {
+const MAX_PRIVATE_UPLOAD_BYTES_BY_CONTEXT: Record<Extract<GreenhouseAssetContext, 'leave_request_draft' | 'purchase_order_draft' | 'master_agreement_draft' | 'certification_draft' | 'evidence_draft' | 'finance_reconciliation_evidence_draft' | 'sample_sprint_report_draft'>, number> = {
   leave_request_draft: 10 * 1024 * 1024,
   purchase_order_draft: 10 * 1024 * 1024,
   master_agreement_draft: 25 * 1024 * 1024,
   certification_draft: 10 * 1024 * 1024,
   evidence_draft: 10 * 1024 * 1024,
-  finance_reconciliation_evidence_draft: 10 * 1024 * 1024
+  finance_reconciliation_evidence_draft: 10 * 1024 * 1024,
+  sample_sprint_report_draft: 25 * 1024 * 1024
 }
 
 const CONTEXT_RETENTION_CLASS: Record<GreenhouseAssetContext, GreenhouseAssetRetentionClass> = {
@@ -78,7 +79,9 @@ const CONTEXT_RETENTION_CLASS: Record<GreenhouseAssetContext, GreenhouseAssetRet
   evidence: 'hr_evidence',
   quote_pdf: 'document_vault',
   finance_reconciliation_evidence_draft: 'finance_reconciliation_evidence',
-  finance_reconciliation_evidence: 'finance_reconciliation_evidence'
+  finance_reconciliation_evidence: 'finance_reconciliation_evidence',
+  sample_sprint_report_draft: 'commercial_engagement_report',
+  sample_sprint_report: 'commercial_engagement_report'
 }
 
 const CONTEXT_PREFIX: Record<GreenhouseAssetContext, string> = {
@@ -98,7 +101,9 @@ const CONTEXT_PREFIX: Record<GreenhouseAssetContext, string> = {
   evidence: 'evidence',
   quote_pdf: 'quotation-pdfs',
   finance_reconciliation_evidence_draft: 'finance-reconciliation-evidence',
-  finance_reconciliation_evidence: 'finance-reconciliation-evidence'
+  finance_reconciliation_evidence: 'finance-reconciliation-evidence',
+  sample_sprint_report_draft: 'sample-sprint-reports',
+  sample_sprint_report: 'sample-sprint-reports'
 }
 
 const toNumber = (value: number | string | null | undefined) => {
@@ -273,7 +278,7 @@ const assertPrivateAssetUpload = ({
   contentType,
   sizeBytes
 }: {
-  contextType: Extract<GreenhouseAssetContext, 'leave_request_draft' | 'purchase_order_draft' | 'master_agreement_draft' | 'certification_draft' | 'evidence_draft' | 'finance_reconciliation_evidence_draft'>
+  contextType: Extract<GreenhouseAssetContext, 'leave_request_draft' | 'purchase_order_draft' | 'master_agreement_draft' | 'certification_draft' | 'evidence_draft' | 'finance_reconciliation_evidence_draft' | 'sample_sprint_report_draft'>
   contentType: string
   sizeBytes: number
 }) => {
@@ -374,7 +379,7 @@ export const createPrivatePendingAsset = async ({
   ownerMemberId,
   metadata
 }: {
-  contextType: Extract<GreenhouseAssetContext, 'leave_request_draft' | 'purchase_order_draft' | 'master_agreement_draft' | 'certification_draft' | 'evidence_draft' | 'finance_reconciliation_evidence_draft'>
+  contextType: Extract<GreenhouseAssetContext, 'leave_request_draft' | 'purchase_order_draft' | 'master_agreement_draft' | 'certification_draft' | 'evidence_draft' | 'finance_reconciliation_evidence_draft' | 'sample_sprint_report_draft'>
   uploadedByUserId: string
   fileName: string
   contentType: string
@@ -531,7 +536,7 @@ export const attachAssetToAggregate = async ({
   client
 }: {
   assetId: string
-  ownerAggregateType: Exclude<GreenhouseAssetContext, 'leave_request_draft' | 'purchase_order_draft' | 'master_agreement_draft' | 'certification_draft' | 'evidence_draft' | 'finance_reconciliation_evidence_draft'>
+  ownerAggregateType: Exclude<GreenhouseAssetContext, 'leave_request_draft' | 'purchase_order_draft' | 'master_agreement_draft' | 'certification_draft' | 'evidence_draft' | 'finance_reconciliation_evidence_draft' | 'sample_sprint_report_draft'>
   ownerAggregateId: string
   actorUserId: string
   ownerClientId?: string | null
@@ -838,6 +843,12 @@ const canAccessCertificationAsset = (tenant: TenantContext, asset: GreenhouseAss
   return hasRouteGroup(tenant, 'hr') || hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)
 }
 
+const canAccessSampleSprintReportAsset = (tenant: TenantContext) =>
+  hasRouteGroup(tenant, 'commercial') ||
+  hasRouteGroup(tenant, 'internal') ||
+  hasRouteGroup(tenant, 'admin') ||
+  hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)
+
 export const canTenantAccessAsset = ({
   tenant,
   asset
@@ -867,6 +878,9 @@ export const canTenantAccessAsset = ({
     case 'evidence_draft':
     case 'evidence':
       return canAccessCertificationAsset(tenant, asset)
+    case 'sample_sprint_report_draft':
+    case 'sample_sprint_report':
+      return canAccessSampleSprintReportAsset(tenant)
     default:
       return false
   }

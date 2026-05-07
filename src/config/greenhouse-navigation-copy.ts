@@ -97,6 +97,7 @@ const enUS: NavigationCopy = {
     capacity: { label: 'Capacity', subtitle: 'Global team workload' },
     organizations: { label: 'Organizations', subtitle: 'Accounts, relationships and structure' },
     services: { label: 'Services', subtitle: 'Services contracted by Space' },
+    sampleSprints: { label: 'Sample Sprints', subtitle: 'Commercial pilots, trials and discovery' },
     staffAugmentation: { label: 'Staff Augmentation', subtitle: 'Placements, onboarding and assignment economics' },
     economics: { label: 'Economics', subtitle: 'P&L and profitability' },
     team: { label: 'Capacity', subtitle: 'Team workload and allocation' },
@@ -114,6 +115,7 @@ const enUS: NavigationCopy = {
     quotes: { label: 'Quotes', subtitle: 'Commercial proposals and approval' },
     contracts: { label: 'Contracts', subtitle: 'Contracts, SOWs and active renewals' },
     masterAgreements: { label: 'Master agreements', subtitle: 'MSAs and master clauses' },
+    sampleSprints: { label: 'Sample Sprints', subtitle: 'Commercial pilots, trials and discovery' },
     products: { label: 'Products', subtitle: 'Sellable catalog synced with HubSpot' }
   },
   finance: {

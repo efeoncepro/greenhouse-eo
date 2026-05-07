@@ -3,6 +3,7 @@ import 'server-only'
 import type { PoolClient } from 'pg'
 
 import { withTransaction } from '@/lib/db'
+import { attachAssetToAggregate } from '@/lib/storage/greenhouse-assets'
 import { EVENT_TYPES } from '@/lib/sync/event-catalog'
 
 import { recordEngagementAuditEvent } from './audit-log'
@@ -43,6 +44,11 @@ export class EngagementConversionValidationError extends Error {
     super(message)
     this.name = 'EngagementConversionValidationError'
   }
+}
+
+interface ConversionServiceScopeRow extends Record<string, unknown> {
+  space_id: string | null
+  client_id: string | null
 }
 
 const normalizeConversionInput = (input: ConvertEngagementInput) => {
@@ -136,6 +142,44 @@ const insertCommercialTerms = async (
   return result.rows[0]?.terms_id ?? null
 }
 
+const attachReportAssetIfPresent = async ({
+  client,
+  input,
+  outcomeId
+}: {
+  client: PoolClient
+  input: ReturnType<typeof normalizeConversionInput>
+  outcomeId: string
+}) => {
+  if (!input.reportAssetId) return
+
+  const scopeResult = await client.query<ConversionServiceScopeRow>(
+    `SELECT s.space_id, sp.client_id
+     FROM greenhouse_core.services s
+     LEFT JOIN greenhouse_core.spaces sp ON sp.space_id = s.space_id
+     WHERE s.service_id = $1
+     LIMIT 1`,
+    [input.serviceId]
+  )
+
+  await attachAssetToAggregate({
+    assetId: input.reportAssetId,
+    ownerAggregateType: 'sample_sprint_report',
+    ownerAggregateId: outcomeId,
+    actorUserId: input.decidedBy,
+    ownerSpaceId: scopeResult.rows[0]?.space_id ?? null,
+    ownerClientId: scopeResult.rows[0]?.client_id ?? null,
+    metadata: {
+      serviceId: input.serviceId,
+      outcomeKind: 'converted',
+      decisionDate: input.decisionDate,
+      nextServiceId: input.nextServiceId,
+      nextQuotationId: input.nextQuotationId
+    },
+    client
+  })
+}
+
 export const convertEngagement = async (
   input: ConvertEngagementInput
 ): Promise<ConvertEngagementResult> => {
@@ -172,6 +216,8 @@ export const convertEngagement = async (
     const outcomeId = outcomeResult.rows[0]?.outcome_id
 
     if (!outcomeId) throw new Error('Failed to record converted engagement outcome.')
+
+    await attachReportAssetIfPresent({ client, input: normalized, outcomeId })
 
     const termsId = await insertCommercialTerms(client, normalized)
 

@@ -191,12 +191,14 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
               { label: nl(GH_AGENCY_NAV.campaigns), href: '/agency/campaigns' },
               { label: nl(GH_AGENCY_NAV.organizations), href: '/agency/organizations' },
               { label: nl(GH_AGENCY_NAV.services), href: '/agency/services' },
+              { label: nl(GH_AGENCY_NAV.sampleSprints), href: '/agency/sample-sprints', icon: 'tabler-rocket' },
               { label: nl(GH_AGENCY_NAV.operations), href: '/agency/operations' }
             ].filter(item => {
               if (item.href === '/agency/delivery') return canSeeView('gestion.delivery', true)
               if (item.href === '/agency/campaigns') return canSeeView('gestion.campanas', true)
               if (item.href === '/agency/organizations') return canSeeView('gestion.organizaciones', true)
               if (item.href === '/agency/services') return canSeeView('gestion.servicios', true)
+              if (item.href === '/agency/sample-sprints') return canSeeView('gestion.sample_sprints', true)
               if (item.href === '/agency/operations') return canSeeView('gestion.operaciones', true)
 
               return true
@@ -343,6 +345,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
             href: '/finance/master-agreements',
             icon: 'tabler-file-certificate'
           },
+          { label: nl(GH_COMMERCIAL_NAV.sampleSprints), href: '/agency/sample-sprints', icon: 'tabler-rocket' },
           { label: nl(GH_COMMERCIAL_NAV.products), href: '/finance/products', icon: 'tabler-packages' }
         ].filter(item => {
           if (item.href === '/finance/intelligence/pipeline') {
@@ -352,6 +355,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           if (item.href === '/finance/quotes') return canSeeAnyView(['comercial.cotizaciones', 'finanzas.cotizaciones'], true)
           if (item.href === '/finance/contracts') return canSeeAnyView(['comercial.contratos', 'comercial.sow'], true)
           if (item.href === '/finance/master-agreements') return canSeeView('comercial.acuerdos_marco', true)
+          if (item.href === '/agency/sample-sprints') return canSeeView('gestion.sample_sprints', isCommercialUser || isAdminUser)
           if (item.href === '/finance/products') return canSeeView('comercial.productos', true)
 
           return true

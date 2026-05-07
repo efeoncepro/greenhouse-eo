@@ -1,6 +1,9 @@
 import 'server-only'
 
+import type { PoolClient } from 'pg'
+
 import { query, withTransaction } from '@/lib/db'
+import { attachAssetToAggregate } from '@/lib/storage/greenhouse-assets'
 import { EVENT_TYPES } from '@/lib/sync/event-catalog'
 import { recordEngagementAuditEvent } from './audit-log'
 import { assertEngagementServiceEligible, buildEligibleServicePredicate } from './eligibility'
@@ -58,6 +61,11 @@ interface OutcomeRow extends Record<string, unknown> {
   next_quotation_id: string | null
   decided_by: string | null
   decided_at: Date | string
+}
+
+interface OutcomeServiceScopeRow extends Record<string, unknown> {
+  space_id: string | null
+  client_id: string | null
 }
 
 export class EngagementOutcomeValidationError extends Error {
@@ -144,6 +152,42 @@ const assertRecordOutcomeInput = (input: RecordOutcomeInput) => {
   }
 }
 
+const attachReportAssetIfPresent = async ({
+  client,
+  normalized,
+  outcomeId
+}: {
+  client: PoolClient
+  normalized: ReturnType<typeof assertRecordOutcomeInput>
+  outcomeId: string
+}) => {
+  if (!normalized.reportAssetId) return
+
+  const scopeResult = await client.query<OutcomeServiceScopeRow>(
+    `SELECT s.space_id, sp.client_id
+     FROM greenhouse_core.services s
+     LEFT JOIN greenhouse_core.spaces sp ON sp.space_id = s.space_id
+     WHERE s.service_id = $1
+     LIMIT 1`,
+    [normalized.serviceId]
+  )
+
+  await attachAssetToAggregate({
+    assetId: normalized.reportAssetId,
+    ownerAggregateType: 'sample_sprint_report',
+    ownerAggregateId: outcomeId,
+    actorUserId: normalized.decidedBy,
+    ownerSpaceId: scopeResult.rows[0]?.space_id ?? null,
+    ownerClientId: scopeResult.rows[0]?.client_id ?? null,
+    metadata: {
+      serviceId: normalized.serviceId,
+      outcomeKind: normalized.outcomeKind,
+      decisionDate: normalized.decisionDate
+    },
+    client
+  })
+}
+
 export const recordOutcome = async (input: RecordOutcomeInput): Promise<{ outcomeId: string }> => {
   const normalized = assertRecordOutcomeInput(input)
 
@@ -182,6 +226,8 @@ export const recordOutcome = async (input: RecordOutcomeInput): Promise<{ outcom
       const outcomeId = result.rows[0]?.outcome_id
 
       if (!outcomeId) throw new Error('Failed to record engagement outcome.')
+
+      await attachReportAssetIfPresent({ client, normalized, outcomeId })
 
       await recordEngagementAuditEvent(
         {

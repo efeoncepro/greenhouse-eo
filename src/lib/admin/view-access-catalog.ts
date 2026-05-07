@@ -58,6 +58,14 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
     routeGroup: 'internal'
   },
   {
+    viewCode: 'gestion.sample_sprints',
+    section: 'gestion',
+    label: 'Sample Sprints',
+    description: 'Pilotos, trials y discovery comerciales con aprobacion, progreso y outcome.',
+    routePath: '/agency/sample-sprints',
+    routeGroup: 'commercial'
+  },
+  {
     viewCode: 'gestion.staff_augmentation',
     section: 'gestion',
     label: 'Staff Augmentation',

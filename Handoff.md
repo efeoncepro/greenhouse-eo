@@ -1,3 +1,15 @@
+# Sesion 2026-05-07 — TASK-809 cerrada en develop (Sample Sprints UI + Wizards)
+
+- **Branch:** `develop` por instruccion explicita del usuario; no se crea ni cambia a `task/TASK-809-sample-sprints-ui-wizards`.
+- **Runtime aclarado:** `services.engagement_kind` si existe en DB live, `src/types/db.d.ts` y migration TASK-801. `schema-snapshot-baseline.sql` esta stale y se documento como drift no bloqueante.
+- **Entrega:** `/agency/sample-sprints` queda como surface real con lista, detalle y wizards de declaracion, aprobacion, progreso y outcome. El mockup aprobado `/agency/sample-sprints/mockup` queda intacto como referencia.
+- **Backend/API:** nuevo store `src/lib/commercial/sample-sprints/store.ts`; APIs `src/app/api/agency/sample-sprints/*` y `/api/admin/commercial/engagement-approvals` reutilizan approvals/progress/outcomes/conversion TASK-804..808. `declareSampleSprint()` crea service non-regular + approval + audit/outbox en una transaccion.
+- **Assets:** nuevos contextos privados `sample_sprint_report_draft` y `sample_sprint_report`; `recordOutcome()` y `convertEngagement()` attachan reportes al outcome dentro de la transaccion.
+- **Access model:** sin routeGroups nuevos ni startup policy. Nueva view `gestion.sample_sprints`; entitlements reutilizados: `commercial.engagement.{read,declare,record_progress,record_outcome,approve}`. Menu visible en Comercial y Agencia interna/admin.
+- **Docs:** `project_context.md`, `changelog.md`, `GREENHOUSE_PILOT_ENGAGEMENT_ARCHITECTURE_V1.md`, documentacion funcional, manual de uso, task README/registry y task lifecycle sincronizados; task movida a `complete/`.
+- **Validacion:** `pnpm pg:doctor` OK; `pnpm exec tsc --noEmit --pretty false` OK; focal vitest OK (34 tests); `pnpm lint` OK; `pnpm build` OK.
+- **No validado:** E2E Playwright/visual regression completo no ejecutado; queda recomendado como follow-up de baseline visual automatizada si se quiere gate de mockup aprobado.
+
 # Sesion 2026-05-07 — TASK-808 cerrada en develop (Engagement Audit Log + Outbox Events)
 
 - **Branch:** `develop` por instruccion explicita del usuario; no se creo `task/TASK-808-engagement-audit-log-outbox-reactive-consumers`.

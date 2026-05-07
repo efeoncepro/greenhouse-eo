@@ -11,6 +11,7 @@ export type GreenhouseAssetRetentionClass =
   | 'payroll_export'
   | 'final_settlement_document'
   | 'document_vault'
+  | 'commercial_engagement_report'
   | 'expense_report'
   | 'provider_supporting_doc'
   | 'tooling_supporting_doc'
@@ -35,6 +36,8 @@ export type GreenhouseAssetContext =
   | 'quote_pdf'
   | 'finance_reconciliation_evidence_draft'
   | 'finance_reconciliation_evidence'
+  | 'sample_sprint_report_draft'
+  | 'sample_sprint_report'
 
 export interface GreenhouseAssetRecord {
   assetId: string
@@ -80,6 +83,7 @@ export type DraftUploadContext = Extract<
   | 'certification_draft'
   | 'evidence_draft'
   | 'finance_reconciliation_evidence_draft'
+  | 'sample_sprint_report_draft'
 >
 
 export interface UploadPrivateAssetInput {

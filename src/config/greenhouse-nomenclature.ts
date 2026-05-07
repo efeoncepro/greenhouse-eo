@@ -55,6 +55,7 @@ export const GH_AGENCY_NAV = {
   capacity: { label: 'Capacidad', subtitle: 'Carga operativa global del equipo' },
   organizations: { label: 'Organizaciones', subtitle: 'Cuentas, relaciones y estructura' },
   services: { label: 'Servicios', subtitle: 'Servicios contratados por Space' },
+  sampleSprints: { label: 'Sample Sprints', subtitle: 'Pilotos, trials y discovery comerciales' },
   staffAugmentation: { label: 'Staff Augmentation', subtitle: 'Placements, onboarding y economía por assignment' },
   economics: { label: 'Economía', subtitle: 'P&L y rentabilidad' },
   team: { label: 'Capacidad', subtitle: 'Carga operativa y dedicación del equipo' },
@@ -73,6 +74,7 @@ export const GH_COMMERCIAL_NAV = {
   quotes: { label: 'Cotizaciones', subtitle: 'Propuestas comerciales y aprobación' },
   contracts: { label: 'Contratos', subtitle: 'Contratos, SOWs y renovaciones activas' },
   masterAgreements: { label: 'Acuerdos marco', subtitle: 'MSAs y cláusulas maestras' },
+  sampleSprints: { label: 'Sample Sprints', subtitle: 'Pilotos, trials y discovery comerciales' },
   products: { label: 'Productos', subtitle: 'Catálogo vendible sincronizado con HubSpot' }
 } as const
 

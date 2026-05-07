@@ -2,7 +2,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -11,7 +11,7 @@
 - Status real: `Diseño aprobado`
 - Domain: `commercial / ui`
 - Blocked by: `TASK-801, TASK-802, TASK-803, TASK-804, TASK-805, TASK-806, TASK-807, TASK-808`
-- Branch: `task/TASK-809-sample-sprints-ui-wizards`
+- Branch: `develop` (por instruccion explicita del usuario)
 
 ## Summary
 
@@ -107,6 +107,21 @@ Tests:
 - `pnpm build` verde sin warnings de UI.
 - skill `greenhouse-ux-writing` invocada para validar tono es-CL.
 - skill `greenhouse-ui-review` invocada pre-commit (token compliance).
+
+## Implementation Notes — 2026-05-07
+
+- Runtime confirmado: `services.engagement_kind` existe en DB live, `src/types/db.d.ts` y migration TASK-801; `schema-snapshot-baseline.sql` queda como drift documental no bloqueante.
+- Store real: `src/lib/commercial/sample-sprints/store.ts` declara Sample Sprints como services non-regular, crea approval inicial y publica audit/outbox `service.engagement.declared` dentro de la misma transaccion.
+- API real: `src/app/api/agency/sample-sprints/*` cubre list/create/detail/approve/progress/outcome con `commercial.engagement.*`; la cola admin vive en `/api/admin/commercial/engagement-approvals`.
+- UI real: `/agency/sample-sprints`, `/new`, `/:serviceId`, `approve`, `progress` y `outcome` usan `SampleSprintsWorkspace` y consumen endpoints reales. El mockup aprobado queda intacto en `/agency/sample-sprints/mockup`.
+- Asset reports: el uploader privado agrega `sample_sprint_report_draft` y `sample_sprint_report`; `recordOutcome()` y `convertEngagement()` attachan el asset al outcome en transaccion.
+- Access model:
+  - `routeGroups`: no se crean nuevos; se reutilizan `commercial`, `internal`, `admin`.
+  - `views`: nueva `gestion.sample_sprints` en `VIEW_REGISTRY` y navegacion.
+  - `entitlements`: se reutilizan `commercial.engagement.read`, `declare`, `record_progress`, `record_outcome`, `approve`.
+  - `startup policy`: sin cambios.
+- Validacion ejecutada: `pnpm pg:doctor`, `pnpm exec tsc --noEmit --pretty false`, tests focalizados Sample Sprints/assets/view registry, `pnpm lint`, `pnpm build`.
+- No ejecutado: E2E Playwright completo/visual regression por ausencia de spec dedicada y por el tiempo de cierre; queda recomendado como follow-up post-merge si el equipo quiere baseline visual automatizada del mockup aprobado.
 
 ## Dependencies
 

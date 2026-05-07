@@ -3,11 +3,22 @@
 > **Tipo de documento:** Spec de arquitectura canónica
 > **Versión:** 1.2
 > **Creado:** 2026-05-05 por Claude (Opus 4.7)
-> **Última actualización:** 2026-05-07 por Codex — Delta v1.8 TASK-815 aplicado: primitive explícita `expense -> service` para direct-client expenses
+> **Última actualización:** 2026-05-07 por Codex — Delta v1.10 TASK-809 aplicado: UI/API real de Sample Sprints
 > **Estado:** Implementación por slices EPIC-014
 > **Owner:** Comercial / Agency
 > **Brand UI**: "Sample Sprint" (paraguas comercial). Schema interno usa `engagement_*` genérico — el rebranding marketing no requiere migrations.
 > **Domain boundary:** Commercial (no Finance — ver `GREENHOUSE_COMMERCIAL_FINANCE_DOMAIN_BOUNDARY_V1.md`)
+
+## Delta v1.10 (2026-05-07) — TASK-809 UI real + API wizards
+
+TASK-809 conecta el mockup aprobado a runtime real:
+
+1. **Surface real:** `/agency/sample-sprints` queda protegida por view `gestion.sample_sprints` y capability `commercial.engagement.read`. La navegacion muestra la entrada en Comercial y, para usuarios internos/admin, bajo Agencia > Operaciones.
+2. **APIs:** `/api/agency/sample-sprints` lista/declara; `/:serviceId` lee detalle; `approve`, `progress` y `outcome` delegan a helpers canonicos previos. `/api/admin/commercial/engagement-approvals` expone la cola admin de approvals pendientes.
+3. **Store reusable:** `src/lib/commercial/sample-sprints/store.ts` crea Sample Sprints como `services.engagement_kind IN ('pilot','trial','poc','discovery')`, `status='pending_approval'`, `commitment_terms_json` con criteria/deadline/cost/team, y approval inicial en la misma transaccion.
+4. **Reportes:** el uploader privado canonico soporta `sample_sprint_report_draft` y `sample_sprint_report`; `recordOutcome()` y `convertEngagement()` attachan el asset al outcome dentro de la transaccion.
+5. **Access model:** sin nuevos routeGroups ni startup policy. `views` usa `gestion.sample_sprints`; `entitlements` reutiliza `commercial.engagement.{read,declare,record_progress,record_outcome,approve}`.
+6. **Drift documentado:** `schema-snapshot-baseline.sql` sigue desactualizado respecto de `services.engagement_kind`, pero runtime live, migrations TASK-801 y `src/types/db.d.ts` son consistentes. No crear migracion correctiva por este drift documental.
 
 ## Delta v1.9 (2026-05-07) — TASK-807 Commercial Health implementada
 

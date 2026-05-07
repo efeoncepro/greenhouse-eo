@@ -19,6 +19,7 @@ La diferencia con otras capas de documentacion:
 ### Comercial
 
 - [Pipeline comercial](comercial/pipeline-comercial.md) — como usar la lane dedicada de forecast comercial sin confundirla con revenue reconocido ni cierre financiero.
+- [Sample Sprints](comercial/sample-sprints.md) — como declarar, aprobar, registrar progreso y cerrar outcomes de pilotos/trials/POCs/discovery.
 
 ### Identidad y acceso
 
