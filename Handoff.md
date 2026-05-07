@@ -5,7 +5,7 @@
 - **Entrega UI:** nueva familia reusable en `src/components/greenhouse/primitives/`: `OperationalPanel`, `MetricSummaryCard`, `OperationalStatusBadge`, `OperationalSignalList`. Las primitives usan Vuexy/MUI Card semantics, padding/radius tokenizados, badges pequeños para estado real y listas de señales con más aire interno.
 - **Sample Sprints:** `CommandCenter` reemplaza KPI cards locales por `MetricSummaryCard`; `CommercialHealthSurface` reemplaza mini-cards redondeadas por `OperationalPanel` + `OperationalSignalList`. Copy runtime de señales queda en español (`Señales operativas`, `Estable`, `Progreso sin actualización`, etc.) y el workspace ya no alimenta la UI con `steady/stale/outcome/threshold` visibles.
 - **Validacion:** `pnpm exec eslint ...SampleSprintsExperienceView.tsx ...SampleSprintsWorkspace.tsx ...Operational*.tsx ...MetricSummaryCard.tsx --max-warnings=0` OK; `pnpm test src/views/greenhouse/agency/sample-sprints/SampleSprintsExperienceView.test.tsx` OK (3 tests); `pnpm exec tsc --noEmit --pretty false` OK; `pnpm design:lint` OK; `pnpm lint` OK; `pnpm build` OK.
-- **Pendiente:** commit/push a `develop` y smoke visual en staging.
+- **Deploy/smoke:** commit `9bc681ab` pusheado a `develop`; Vercel staging `Ready` en `greenhouse-dyfk14pah-efeonce-7670142f.vercel.app` con alias `dev-greenhouse.efeoncepro.com`; smoke Playwright autenticado en staging OK para `/agency/sample-sprints` + tab `Salud comercial` (`Señales operativas`, `Estable`, sin `Reliability signals`/`steady`/`Progreso stale`). CI y Playwright E2E smoke de GitHub OK.
 
 # Sesion 2026-05-07 — Sample Sprints runtime copy guardrail
 
