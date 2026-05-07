@@ -1,5 +1,30 @@
 # TASK-819 — Client Lifecycle UI — Drawer + Listing Global + Banner
 
+## Delta 2026-05-07 — Bow-tie alignment
+
+Surface UI extendidas para mostrar `client_kind` (Bow-tie stages 8/9/10) y motion property `is_at_risk`. Aligned con `GREENHOUSE_BOWTIE_OPERATIONAL_BRIDGE_V1.md` §4 stage equivalence.
+
+Adiciones obligatorias:
+
+1. **Banner cliente extendido**: en `/admin/clients/[orgId]` agregar:
+   - Chip `client_kind` (`Active Account` / `Self-Serve Customer` / `Project Customer`) con tooltip explicando rationale (e.g., "Active porque tiene MSA activo + 2 SOWs")
+   - Chip `is_at_risk` cuando `clients.is_at_risk=TRUE` con tooltip listando triggers (`at_risk_triggered_by[]`)
+   - Si hay drift detectado (`hubspot.contractual_properties.drift` signal > 0 para esta org) mostrar warning chip "HubSpot fuera de sync"
+   - Microcopy via `client-lifecycle.ts` dictionary (extender)
+
+2. **Drawer de case onboarding completed**: mostrar bloque "Clasificación resultante" con:
+   - `client_kind` asignado + decision_trigger
+   - Botón "Re-clasificar" (capability `client.lifecycle.classify`-gated) → modal con dropdown forced kind + reason field (min 20 chars)
+
+3. **Tile dashboard nuevo en `/admin/operations`**: "MRR breakdown por client_kind" con stacked bar Active/Self-Serve/Project. Lectura desde TASK-833 metrics engine cuando esté listo (V1.0 puede mostrar placeholder + TODO nota).
+
+4. **Acceptance criteria adicional**:
+   - [ ] Banner cliente muestra chip `client_kind` correcto cuando `clients.client_kind` poblado
+   - [ ] Tooltip explica trigger del classifier
+   - [ ] Botón "Re-clasificar" hidden si user no tiene capability
+   - [ ] Drift warning visible cuando reliability signal > 0
+   - [ ] Visual regression cubre 3 estados nuevos: client_kind=active sin risk, active con risk, drift detected
+
 ## Status
 
 - Lifecycle: `to-do`

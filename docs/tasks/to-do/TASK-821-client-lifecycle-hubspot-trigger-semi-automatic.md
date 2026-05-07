@@ -1,5 +1,37 @@
 # TASK-821 — Client Lifecycle HubSpot Semi-Automatic Trigger
 
+## Delta 2026-05-07 — Bow-tie alignment
+
+Extiende el handler para capturar `hubspot_deal_type` (input crítico del classifier Bow-tie §5.2) + escuchar `Company.lifecyclestage` change para drift detection bidireccional. Aligned con `GREENHOUSE_BOWTIE_OPERATIONAL_BRIDGE_V1.md` §10.3 reverse-projection.
+
+Adiciones obligatorias:
+
+1. **Capture obligatorio de `hubspot_deal_type` en metadata**: el handler `hubspot-deals` para event `deal.propertyChange.dealstage='closedwon'` debe:
+   - Fetch deal completo desde HubSpot bridge (incluyendo property `dealtype` o `deal_type`)
+   - Validar que `dealtype` esté presente (Bow-tie usa `deal_type` para classifier)
+   - Si NO presente: emit outbox `client.lifecycle.hubspot_trigger.deal_type_missing.v1` (operador comercial completa en HubSpot, re-trigger via webhook)
+   - Si presente: incluir en `case.metadata_json.hubspot_deal_type` al invocar `provisionClientLifecycle`
+   - Mapping HubSpot deal_type → classifier hint:
+     - `MSA + SOW en New Business` → hint `expected_kind='active'`
+     - `Kortex subscription` o `Verk subscription` → hint `expected_kind='self_serve'`
+     - `Single SOW sin MSA` → hint `expected_kind='project'`
+   - El hint se persiste en metadata pero el classifier real (TASK-817 Delta) decide via state contractual real, no via hint
+
+2. **Subscription nueva HubSpot Developer Portal**: agregar a `webhooks-hsmeta.json`:
+   - `object.propertyChange` → company `[lifecyclestage]` — para detectar manual change en HubSpot
+   - Handler procesa: si `lifecyclestage` HubSpot diverge del expected Greenhouse → emit outbox `client.bowtie_stage.manual_change_detected.v1` (TASK-820 reverse-projection consumer revierte) + notify operador via Teams
+
+3. **Reliability signal nuevo** (extiende los 6 ya declarados):
+   - `client.lifecycle.hubspot_trigger.deal_type_missing` — kind=drift, severity=warning, steady=0. Query: count outbox events `deal_type_missing` últimos 7 días sin resolver
+
+4. **Acceptance criteria adicional**:
+   - [ ] Handler captura `dealtype` desde HubSpot fetch
+   - [ ] Si `dealtype` ausente: outbox event emitted, NO se crea case (deferred hasta operator complete)
+   - [ ] Si `dealtype` presente: persiste en `metadata_json.hubspot_deal_type`
+   - [ ] Webhook subscription `company.propertyChange.lifecyclestage` configurada
+   - [ ] Manual change en HubSpot lifecyclestage detected → outbox event + Teams notification
+   - [ ] Smoke staging: cambiar `dealtype` en HubSpot → verificar metadata persisted
+
 ## Status
 
 - Lifecycle: `to-do`

@@ -1,5 +1,27 @@
 # TASK-818 — Client Lifecycle API Surface + Capabilities
 
+## Delta 2026-05-07 — Bow-tie alignment
+
+Agrega capability + endpoint para classifier override (Bow-tie alignment via `GREENHOUSE_BOWTIE_OPERATIONAL_BRIDGE_V1.md` §5.4).
+
+Adiciones obligatorias:
+
+1. **Capability nueva**:
+   - `client.lifecycle.classify` (action=update, scope=tenant) — permite operador forzar `client_kind` cuando regla automática no aplica
+   - Allowed: commercial_admin, EFEONCE_ADMIN
+   - Reason ≥ 20 chars enforced server-side por el comando `overrideClientKind` (defense in depth)
+
+2. **Endpoint nuevo**:
+   - `POST /api/admin/clients/[organizationId]/classify` — Body `{forcedKind: 'active'|'self_serve'|'project', reason}` → invoca `overrideClientKind`
+   - `GET /api/admin/clients/[organizationId]/classification-history` — devuelve últimos N rows de `client_kind_history` con rationale
+
+3. **Acceptance criteria adicional**:
+   - [ ] Capability `client.lifecycle.classify` declarada
+   - [ ] POST endpoint `/classify` rechaza con 400 si `reason.length < 20`
+   - [ ] POST endpoint `/classify` con `forcedKind` no en enum → 400
+   - [ ] GET `/classification-history` paginado cursor-based
+   - [ ] Tests integration: capability scoping + reason validation
+
 ## Status
 
 - Lifecycle: `to-do`

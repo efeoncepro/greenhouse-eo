@@ -1,5 +1,40 @@
 # TASK-820 — Client Lifecycle Reliability Signals + Cascade Reactive Consumers
 
+## Delta 2026-05-07 — Bow-tie alignment
+
+Extiende el cascade post-completion para projectar `Company.lifecyclestage` HubSpot al stage Bow-tie correcto (Bow-tie §4 equivalence map en `GREENHOUSE_BOWTIE_OPERATIONAL_BRIDGE_V1.md`).
+
+Adiciones obligatorias:
+
+1. **Reactive consumer onboarding completed (extender)**: además de `instantiateClientForParty`, projectar `Company.lifecyclestage` post-classification:
+   - `clients.client_kind='active'` → projecta `lifecyclestage='active_account'`
+   - `clients.client_kind='self_serve'` → projecta `lifecyclestage='self_serve_customer'`
+   - `clients.client_kind='project'` → projecta `lifecyclestage='project_customer'`
+   - Llamada al bridge HubSpot Cloud Run via helper canónico `projectCompanyLifecycleStage(hubspotCompanyId, stage)`
+   - Si HubSpot retorna 4xx persistente → outbox event `client.lifecycle.cascade_dead_letter` (signal existente captura)
+   - Emit outbox `client.bowtie_stage.projected.v1` post-success
+
+2. **Reactive consumer offboarding completed (extender)**: además de archive + revoke + outcomes, projectar `Company.lifecyclestage='former_customer'` + `Company.churn_date=now()`
+
+3. **Reactive consumer reactivation completed (extender)**: projectar `Company.lifecyclestage='onboarding'` durante reactivation case in_progress; al completar → invocar classifier → projectar al stage 8/9/10 que corresponda
+
+4. **Reliability signals nuevos** (subsystem `Bow-tie Sync` extends existing `Commercial Health`):
+   - `client.lifecycle.hubspot_stage_drift` — kind=drift, severity=error, steady=0. Query: read `Company.lifecyclestage` HubSpot (last sync) vs computed expected per spec puente §4 equivalence map. Edad > 5 min para excluir projection latency
+   - `client.classification.override_anomaly_rate` — kind=drift, severity=warning, steady<3. Query: count `client_kind_history.decision_trigger='manual_override'` últimos 30d agrupado por org
+
+5. **Helper canónico nuevo** `projectCompanyLifecycleStage(hubspotCompanyId, stage, options?)` en `src/lib/integrations/hubspot/lifecycle-stage-projection.ts`:
+   - Wrapper sobre HubSpot bridge Cloud Run para PATCH `Company.lifecyclestage`
+   - Idempotente: si el stage ya es el target, no-op
+   - Rate limit handling (429 → exponential backoff)
+
+6. **Acceptance criteria adicional**:
+   - [ ] Cascade onboarding completed projecta `lifecyclestage` correcto según `client_kind` (3 escenarios test)
+   - [ ] Cascade offboarding completed projecta `former_customer` + `churn_date`
+   - [ ] Cascade reactivation completed flujo bidireccional projecta `onboarding` → stage 8/9/10
+   - [ ] Signal `hubspot_stage_drift` reporta count cuando se introduce drift artificialmente en test
+   - [ ] Signal `override_anomaly_rate` warning cuando se simulan 4 overrides en 30d
+   - [ ] `projectCompanyLifecycleStage` idempotente (smoke test re-call no duplica side-effects)
+
 ## Status
 
 - Lifecycle: `to-do`

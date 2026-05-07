@@ -1,5 +1,48 @@
 # TASK-817 — Client Lifecycle Canonical Commands + Outbox Events v1
 
+## Delta 2026-05-07 — Bow-tie alignment
+
+Agrega el classifier canónico + outbox events de classification para alinear con `docs/architecture/GREENHOUSE_BOWTIE_OPERATIONAL_BRIDGE_V1.md` §5 (Client Kind Classifier).
+
+Adiciones obligatorias:
+
+1. **Helper canónico `classifyClientFromContract`** en `src/lib/client-lifecycle/classifier/classify-from-contract.ts`:
+   - Función pura (read-only) que lee `engagement_commercial_terms` activos + `services` con SaaS subs activos
+   - Devuelve `{ clientKind: 'active' | 'self_serve' | 'project' | null, rationale, bowtieStage }`
+   - Decision matrix per spec puente §5.1: MSA activo → `active`; sin MSA pero ≥ 1 SOW → `project`; sin MSA ni SOW pero SaaS → `self_serve`; nada → `null` (no clasificable)
+   - NO escribe state — usado tanto para read paths como para inputs a `reclassifyClientOnContractChange`
+
+2. **Comando atómico `reclassifyClientOnContractChange`** en `src/lib/client-lifecycle/commands/reclassify-client.ts`:
+   - Atomic tx: SELECT FOR UPDATE `clients` → invoke `classifyClientFromContract` → si `clientKind` cambia, UPDATE `clients.client_kind` + INSERT `client_kind_history` + emit outbox `client.classified.v1`
+   - Idempotente: re-correr con mismo input no genera segundo history row (compara contra `clients.client_kind` actual)
+   - Capability gate: invocado por reactive consumer o por comando interno; no expuesto en API directa V1.0
+
+3. **Extender `resolveLifecycleCase`** (Slice 5):
+   - Para `caseKind='onboarding'` completed: ANTES de invocar `instantiateClientForParty`, leer `case.metadata_json.hubspot_deal_type` (capturado por TASK-821) → invocar `classifyClientFromContract` → setear `clients.client_kind` + INSERT `client_kind_history` con `decision_trigger='reactivation'` o trigger derivado
+   - Para `caseKind='reactivation'` completed: same flow, decision_trigger='reactivation'
+   - Para `caseKind='offboarding'` completed: NO clasifica (Former Customer no tiene `client_kind`). Pone `clients.client_kind=NULL` + `clients.status='inactive'` via cascade (TASK-820)
+
+4. **Comando manual `overrideClientKind`** (capability `client.lifecycle.classify`):
+   - Permite operador forzar `client_kind` con reason ≥ 20 chars
+   - Atomic tx: UPDATE `clients.client_kind` + INSERT `client_kind_history` con `decision_trigger='manual_override'` + emit outbox `client.classification.overridden.v1`
+   - Reliability signal `client.classification.override_anomaly_rate` detecta misuse (>3 overrides/30d por org → warning)
+
+5. **2 outbox events nuevos versionados v1** (declarar en `GREENHOUSE_EVENT_CATALOG_V1.md` Delta):
+   - `client.classified.v1` — payload `{organizationId, clientId, fromKind, toKind, decisionTrigger, rationale, caseId?, occurredAt}`
+   - `client.classification.overridden.v1` — payload `{organizationId, clientId, fromKind, toKind, reason, overriddenBy, occurredAt}`
+   - `client.contractual_state.changed.v1` — emitido por commands de `engagement_commercial_terms` (effective_to set, new term created) y por commands de `services` SaaS subscription change. Trigger del consumer reclassify. Payload `{organizationId, changedField, oldValue, newValue, sourceTable, sourceId}`
+
+6. **Acceptance criteria adicional**:
+   - [ ] `classifyClientFromContract` cubre 24 escenarios (3³ MSA × SOW × SaaS combinations + edge cases)
+   - [ ] `reclassifyClientOnContractChange` idempotente (re-correr no duplica history)
+   - [ ] `resolveLifecycleCase(onboarding completed)` invoca classifier antes de `instantiateClientForParty`
+   - [ ] `overrideClientKind` requiere capability + reason ≥ 20
+   - [ ] 3 outbox events nuevos declarados en EVENT_CATALOG con `payload_json.version=1`
+   - [ ] Test: classifier con MSA + SOW activo → `clientKind='active'` + bowtieStage='active_account'
+   - [ ] Test: classifier con solo SaaS Kortex → `clientKind='self_serve'`
+   - [ ] Test: classifier con SOW puntual sin MSA → `clientKind='project'`
+   - [ ] Test: race condition — 2 contract changes concurrentes invocan reclassify → un winner, history coherente
+
 ## Status
 
 - Lifecycle: `to-do`

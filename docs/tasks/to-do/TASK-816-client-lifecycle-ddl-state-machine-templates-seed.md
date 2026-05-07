@@ -1,5 +1,63 @@
 # TASK-816 — Client Lifecycle DDL + State Machine + Templates Seed
 
+## Delta 2026-05-07 — Bow-tie alignment
+
+Cambia el alcance para alinear con `docs/architecture/GREENHOUSE_BOWTIE_OPERATIONAL_BRIDGE_V1.md` (spec puente entre `spec/Arquitectura_BowTie_Efeonce_v1_1.md` y `GREENHOUSE_CLIENT_LIFECYCLE_V1.md`). Razón: las 6 tasks originales no proyectaban a HubSpot ni clasificaban clientes post-onboarding (Active/Self-Serve/Project), bloqueando el sistema de medición Bow-tie (NRR/GRR/Expansion Rate).
+
+Adiciones obligatorias a esta task (Slice 1 DDL):
+
+1. **Extender `greenhouse_core.clients`** con columnas Bow-tie:
+   - `client_kind TEXT CHECK (client_kind IN ('active','self_serve','project'))` — clasificación post-onboarding (Bow-tie §5.1 stages 8/9/10). NULLABLE hasta classifier corre.
+   - `client_kind_changed_at TIMESTAMPTZ` — snapshot del último cambio
+   - `customer_since DATE` — fecha primer Closed-Won (Bow-tie property §8.1)
+   - `last_expansion_date DATE`, `last_renewal_date DATE`
+   - `is_at_risk BOOLEAN DEFAULT FALSE` — snapshot motion property Bow-tie §7.1 (Greenhouse computa, projecta a HubSpot)
+   - `at_risk_triggered_by TEXT[]` — array catalog: `'msa_expiring','mrr_decline','ico_red'`
+   - Migración con `ADD COLUMN ... NULL` (anti-blast). NO toca rows existentes.
+
+2. **Tabla nueva `greenhouse_core.client_kind_history`** (append-only, mismo patrón TASK-535 organization_lifecycle_history):
+
+   ```sql
+   CREATE TABLE greenhouse_core.client_kind_history (
+     history_id            TEXT PRIMARY KEY,                      -- 'ckh-{uuid}'
+     client_id             TEXT NOT NULL REFERENCES greenhouse_core.clients(client_id),
+     organization_id       UUID NOT NULL REFERENCES greenhouse_core.organizations(organization_id),
+     from_kind             TEXT,                                  -- NULL en primera classification
+     to_kind               TEXT NOT NULL CHECK (to_kind IN ('active','self_serve','project')),
+     decision_trigger      TEXT NOT NULL CHECK (decision_trigger IN ('msa_active','sow_only','saas_only','manual_override','reactivation')),
+     rationale_json        JSONB NOT NULL,                        -- {activeMsaId, activeSowCount, saasSubscriptions[], decision_at}
+     case_id               TEXT REFERENCES greenhouse_core.client_lifecycle_cases(case_id),  -- nullable; classifier puede correr fuera de un case
+     actor_user_id         TEXT REFERENCES greenhouse_core.users(user_id),
+     occurred_at           TIMESTAMPTZ NOT NULL DEFAULT now()
+   );
+   CREATE INDEX client_kind_history_client_id ON greenhouse_core.client_kind_history (client_id, occurred_at DESC);
+   CREATE INDEX client_kind_history_organization_id ON greenhouse_core.client_kind_history (organization_id, occurred_at DESC);
+   ```
+
+   Anti-UPDATE/DELETE triggers (mismo patrón `client_lifecycle_case_events_no_update`).
+
+3. **Extender CHECK en `client_lifecycle_cases.metadata_json`** para enforce shape cuando `trigger_source='hubspot_deal'`:
+
+   ```sql
+   ALTER TABLE greenhouse_core.client_lifecycle_cases
+     ADD CONSTRAINT client_lifecycle_cases_hubspot_metadata_required
+     CHECK (
+       trigger_source != 'hubspot_deal'
+       OR (metadata_json ? 'hubspot_deal_id' AND metadata_json ? 'hubspot_deal_type')
+     );
+   ```
+
+   Razón: el classifier (TASK-817 Delta) requiere `hubspot_deal_type` para clasificar (Bow-tie §5.2).
+
+4. **Acceptance criteria adicional**:
+   - [ ] `clients.client_kind`, `client_kind_changed_at`, `customer_since`, `last_expansion_date`, `last_renewal_date`, `is_at_risk`, `at_risk_triggered_by` agregadas (NULL/default-safe)
+   - [ ] `client_kind_history` tabla creada con 2 indexes + 2 triggers anti-UPDATE/DELETE
+   - [ ] CHECK `client_lifecycle_cases_hubspot_metadata_required` aplicada
+   - [ ] `pnpm db:generate-types` regenera tipos sin error
+   - [ ] Smoke SQL: INSERT en `client_kind_history` con `to_kind='unknown'` falla CHECK
+   - [ ] Smoke SQL: UPDATE en `client_kind_history` falla con trigger error
+   - [ ] Smoke SQL: INSERT case con `trigger_source='hubspot_deal'` y metadata sin `hubspot_deal_type` falla CHECK
+
 ## Status
 
 - Lifecycle: `to-do`
