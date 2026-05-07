@@ -17,6 +17,13 @@
 
 Tabla `engagement_approvals` con state machine `pending → approved | rejected | withdrawn`. Capability granular `commercial.engagement.approve` (EFEONCE_ADMIN hoy + COMMERCIAL_LEAD futuro). Helper TS `getMemberCapacityForPeriod` para capacity warning soft (NO hard blocker). Approval con override required: si capacity > 100%, aprobador debe declarar `capacity_override_reason ≥ 10 chars` y el snapshot del warning se persiste en `capacity_warning_json`.
 
+## Approved Mockup Context
+
+- Mockup del programa aprobado por usuario el 2026-05-07.
+- Ruta: `/agency/sample-sprints/mockup`.
+- Artefactos: `src/app/(dashboard)/agency/sample-sprints/mockup/page.tsx` y `src/views/greenhouse/agency/sample-sprints/mockup/SampleSprintsMockupView.tsx`.
+- El approval/capacity warning real debe preservar el flujo aprobado: warning soft, override reason auditado y tabla de capacidad por miembro.
+
 ## Why This Task Exists
 
 Sin approval workflow, cualquier vendedor puede declarar Sample Sprints "sin costo" sin gobierno y quemar capacidad del equipo. Sin capacity warning, los aprobadores aprueban a ciegas (Valentina podría estar al 95% y nadie lo ve). Sin override audit, los hard blockers generan falsos negativos cuando el sistema no conoce vacaciones futuras o transitions.

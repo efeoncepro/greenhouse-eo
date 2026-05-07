@@ -16,6 +16,13 @@
 
 Materializa la primitiva canónica **Sample Sprint** (paraguas comercial UI) sobre `services` con `engagement_kind != 'regular'`. Permite ofrecer pilotos / trials / POCs / discoveries acotados en tiempo, sin compromiso firme, con gobierno explícito de aprobación + capacity warning + audit trail append-only + reclasificación de costo GTM. Reusa toda la plomería canonizada (cost attribution v2, lifecycle history TASK-535/542, outbox + reactive consumer TASK-771/773, asset uploader TASK-721, FK actor TASK-760/761/762).
 
+## Mockup aprobado
+
+- **Aprobado por usuario:** 2026-05-07.
+- **Ruta local:** `/agency/sample-sprints/mockup`.
+- **Artefactos canónicos:** `src/app/(dashboard)/agency/sample-sprints/mockup/page.tsx` y `src/views/greenhouse/agency/sample-sprints/mockup/SampleSprintsMockupView.tsx`.
+- **Regla operativa:** los slices de UI/API/backend de `TASK-803` a `TASK-810` deben preservar la experiencia aprobada y reemplazar mock data por readers/helpers reales sin reinterpretar la dirección visual. Cualquier desviación visual significativa requiere actualizar el mockup y nueva aprobación.
+
 ## Why This Epic Exists
 
 Hoy los Sample Sprints (Sky Content Lead + Paid Social Care, abril-mayo 2026) viven sin schema canónico: sin governance de aprobación, sin reliability signals para detectar zombies, sin reclasificación de costo (Sky aparece como cliente unprofitable durante el Sprint), sin audit trail de decisiones, sin lineage entre Sprint y contrato post-conversión. Cada Sprint nuevo arranca con tracking ad-hoc y deja deuda al cierre. La arquitectura actual de `services` no distingue "servicio facturable" de "servicio en evaluación" — por eso este Epic introduce la dimensión `engagement_kind` ortogonal a `commercial_terms` ortogonal a `lifecycle_phase`.

@@ -17,6 +17,13 @@
 
 Tabla `engagement_audit_log` append-only con triggers anti-update / anti-delete (patrón TASK-535/TASK-768). 9 outbox events versionados v1 (`service.engagement.*_v1`). Reactive consumers en ops-worker que ejecutan: lifecycle flip de `organizations` con campos canónicos `lifecycle_stage_source/by/since` (TASK-535/542 contract); HubSpot conditional `WHERE engagement_kind='regular' AND hubspot_deal_id IS NULL`. Es la capa async que cierra el Epic.
 
+## Approved Mockup Context
+
+- Mockup del programa aprobado por usuario el 2026-05-07.
+- Ruta: `/agency/sample-sprints/mockup`.
+- Artefactos: `src/app/(dashboard)/agency/sample-sprints/mockup/page.tsx` y `src/views/greenhouse/agency/sample-sprints/mockup/SampleSprintsMockupView.tsx`.
+- Audit log, outbox y conversion helpers reales deben alimentar el audit feed/event preview aprobados sin mover side effects inline a la UI.
+
 ## Why This Task Exists
 
 Sin audit log, no hay forensic trail de decisiones críticas (approval, outcome, lineage, conversión). Sin outbox + reactive consumers, los side effects post-conversión (lifecycle flip, HubSpot deal creation) viven inline en el request handler — exactamente el anti-pattern que TASK-771/773 cerró para finance. El path canónico async (Cloud Scheduler + ops-worker) es la única forma resiliente de propagar cambios downstream.

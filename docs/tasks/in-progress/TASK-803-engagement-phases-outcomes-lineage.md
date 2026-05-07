@@ -2,7 +2,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -11,11 +11,18 @@
 - Status real: `Diseño aprobado`
 - Domain: `commercial`
 - Blocked by: `TASK-801`
-- Branch: `task/TASK-803-engagement-phases-outcomes-lineage`
+- Branch: `develop` (por instrucción explícita del usuario; no crear branch task)
 
 ## Summary
 
 3 tablas core del modelo: `engagement_phases` (hitos del Sprint con phase_kind canónico), `engagement_outcomes` (decisión final con 5 valores incluyendo cancellation paths + `next_quotation_id` para pricing post-conversión), `engagement_lineage` (grafo multi-parent/multi-child de transiciones). Helpers TS para CRUD + state machine helpers.
+
+## Approved Mockup Context
+
+- Mockup del programa aprobado por usuario el 2026-05-07.
+- Ruta: `/agency/sample-sprints/mockup`.
+- Artefactos: `src/app/(dashboard)/agency/sample-sprints/mockup/page.tsx` y `src/views/greenhouse/agency/sample-sprints/mockup/SampleSprintsMockupView.tsx`.
+- Esta task no implementa UI, pero sus helpers/contratos deben alimentar la experiencia aprobada sin forzar reinterpretación visual posterior.
 
 ## Why This Task Exists
 

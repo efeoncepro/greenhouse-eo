@@ -105,6 +105,7 @@ Regla: módulos de dominio extienden estos objetos, no crean identidades paralel
 - Convenciones de skills locales:
   - Claude: `.claude/skills/<skill-name>/SKILL.md` (convencion oficial vigente; existen skills legacy en `skill.md` minuscula)
   - Codex: `.codex/skills/<skill-name>/SKILL.md` (mayuscula)
+- Mockups Greenhouse: invocar `greenhouse-mockup-builder` para cualquier mockup/prototipo visual. Por defecto deben ser rutas reales del portal con mock data tipada (`src/app/(dashboard)/.../mockup/page.tsx` + `src/views/greenhouse/.../mockup/*`), usando Vuexy/MUI wrappers y primitives del repo; no HTML/CSS aparte salvo pedido explicito de artefacto estatico.
 
 ## Skill obligatoria: greenhouse-finance-accounting-operator
 

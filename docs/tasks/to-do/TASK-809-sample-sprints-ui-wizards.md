@@ -17,6 +17,13 @@
 
 UI completa del Epic en módulo Agency: `/agency/sample-sprints` (lista con conversion rate trailing + agrupación per-cliente) + 4 wizards (declaración, approval con capacity warning, progress weekly snapshot, outcome con upload reporte). Sub-tipos visibles ("Operations Sprint" / "Extension Sprint" / "Validation Sprint" / "Discovery Sprint"). 6 reliability signals visibles en `/admin/operations` subsystem `Commercial Health`.
 
+## Approved Mockup Context
+
+- Mockup del programa aprobado por usuario el 2026-05-07.
+- Ruta: `/agency/sample-sprints/mockup`.
+- Artefactos: `src/app/(dashboard)/agency/sample-sprints/mockup/page.tsx` y `src/views/greenhouse/agency/sample-sprints/mockup/SampleSprintsMockupView.tsx`.
+- Esta task debe convertir el mockup aprobado en UI real: reemplazar mock data por readers/API/helpers reales, no reinterpretar layout, flujo ni jerarquía visual. Desviaciones significativas requieren update del mockup y re-aprobación.
+
 ## Why This Task Exists
 
 Sin UI, las primitivas de los slices anteriores son inaccesibles para operadores. Este es el último slice antes del CHECK constraint anti-zombie (TASK-810). Operators necesitan: declarar Sample Sprints, ver capacity warning antes de aprobar, registrar snapshots weekly, cerrar con outcome + reporte. La UI cierra el loop end-to-end del Epic.

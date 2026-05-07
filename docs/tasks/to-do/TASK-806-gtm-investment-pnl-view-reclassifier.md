@@ -17,6 +17,13 @@
 
 VIEW canónica `greenhouse_serving.gtm_investment_pnl` que reclassifica read-time el costo de Sample Sprints `terms_kind='no_cost'` desde "costo del cliente" a "GTM Investment". Helper TS `getGtmInvestmentForPeriod` + `getGtmInvestmentRatio`. P&L gerencial **resta** del cliente y **suma** a línea separada — Sky deja de aparecer como cliente unprofitable durante el Sprint.
 
+## Approved Mockup Context
+
+- Mockup del programa aprobado por usuario el 2026-05-07.
+- Ruta: `/agency/sample-sprints/mockup`.
+- Artefactos: `src/app/(dashboard)/agency/sample-sprints/mockup/page.tsx` y `src/views/greenhouse/agency/sample-sprints/mockup/SampleSprintsMockupView.tsx`.
+- La VIEW/helper real debe alimentar los indicadores aprobados de `GTM investment` y costo acumulado sin cambiar la lectura visual aprobada.
+
 ## Why This Task Exists
 
 Sin esta VIEW, un Sample Sprint "sin costo" registra `total_revenue=0` + `labor_cost > 0` para el cliente, contaminando KPIs de profitability. La spec V1.2 establece doble registro: `commercial_cost_attribution` preserva auditoría por cliente (Sky consumió X horas), VIEW reclassifica gerencial (Sky margin neutral, GTM Investment línea visible). Patrón heredado explícitamente de TASK-409 (extender `client_economics` con backfill).

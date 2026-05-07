@@ -17,6 +17,13 @@
 
 Slice 4.5 introducido en Delta v1.2 (B3). Tabla `engagement_progress_snapshots` con UNIQUE `(service_id, snapshot_date)` para tracking semanal. Capability `commercial.engagement.record_progress` (route_group=commercial/agency, no requiere admin). Helper TS canónico para registrar + leer snapshots. Reliability signal `commercial.engagement.stale_progress` (warning si > 10 días sin snapshot durante engagement activo).
 
+## Approved Mockup Context
+
+- Mockup del programa aprobado por usuario el 2026-05-07.
+- Ruta: `/agency/sample-sprints/mockup`.
+- Artefactos: `src/app/(dashboard)/agency/sample-sprints/mockup/page.tsx` y `src/views/greenhouse/agency/sample-sprints/mockup/SampleSprintsMockupView.tsx`.
+- El recorder real debe alimentar el wizard semanal aprobado, incluyendo estado stale progress y error por duplicado `(service_id, snapshot_date)` de forma recuperable.
+
 ## Why This Task Exists
 
 Sin snapshots durante operación, el reporte final del Sample Sprint es trabajo arqueológico al cierre — operador busca en Notion, Slack, emails, recuerda. La spec V1.2 lo identifica como precondición para auto-report V2 + forensic trail si el operador owner del Sprint deja la empresa mid-flight. Cadence semanal es deliberada (no daily — sería ruido; no monthly — pierde granularidad de Sprint de 4 semanas).

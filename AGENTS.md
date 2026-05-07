@@ -116,6 +116,7 @@ Estos CLIs estan autenticados localmente. Cuando una task toca su dominio, **usa
   - correr `pnpm pg:doctor` antes de asumir que el acceso esta sano
 - Si una task del sistema contradice la arquitectura vigente, no implementarla tal cual; corregir primero la task o documentar la nueva decision arquitectonica.
 - Si el cambio es UI, UX o seleccion de componentes, usar como criterio operativo los skills locales vigentes (`greenhouse-agent`, `greenhouse-portal-ui-implementer`, `greenhouse-ui-orchestrator` o `greenhouse-vuexy-ui-expert`), revisar `full-version` junto con la documentacion oficial de Vuexy antes de inventar componentes nuevos y leer `DESIGN.md` en raiz como contrato visual legible por agentes.
+- Si el usuario pide un mockup/prototipo visual de Greenhouse, invocar `greenhouse-mockup-builder`: por defecto el mockup debe construirse como ruta real del portal con mock data tipada (`src/app/(dashboard)/.../mockup/page.tsx` + `src/views/greenhouse/.../mockup/*`), usando Vuexy/MUI wrappers y primitives del repo. No crear HTML/CSS aparte salvo que el usuario pida explicitamente un artefacto estatico fuera de la app.
 - **Regla de reutilizacion**:
   - reutilizar helpers, readers, components, routes, signals y primitives existentes antes de crear nuevos
   - no inventar access paths paralelos si ya existe un path canonico del repo para ese dominio

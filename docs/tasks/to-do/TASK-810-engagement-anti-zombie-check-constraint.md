@@ -17,6 +17,13 @@
 
 CHECK constraint `services_engagement_requires_decision_before_120d` que rechaza UPDATEs que mantengan `engagement_kind != 'regular'` activo > 120 días sin outcome registrado. Aplicado con patrón canónico **NOT VALID + VALIDATE atomic** (TASK-708/766/774) para no bloquear backfill. Es la última línea de defensa anti-zombie — complementa el reliability signal `commercial.engagement.zombie` (que detecta) con prevención mecánica (que rechaza).
 
+## Approved Mockup Context
+
+- Mockup del programa aprobado por usuario el 2026-05-07.
+- Ruta: `/agency/sample-sprints/mockup`.
+- Artefactos: `src/app/(dashboard)/agency/sample-sprints/mockup/page.tsx` y `src/views/greenhouse/agency/sample-sprints/mockup/SampleSprintsMockupView.tsx`.
+- El CHECK anti-zombie debe cerrarse después de que la UI aprobada permita resolver outcomes legítimos; la constraint no debe crear un dead end operativo.
+
 ## Why This Task Exists
 
 Sin este CHECK, un Sample Sprint mal-cerrado puede quedar `status='active'` indefinidamente, contaminando KPIs (active backlog) + drenando capacity warning queries + acumulando deuda silenciosa. El reliability signal `zombie` (TASK-807) detecta el problema pero no lo previene — solo alerta. El CHECK constraint hace que el sistema rechace mecánicamente la situación zombie, forzando al operador a registrar un outcome (converted/adjusted/dropped/cancelled).

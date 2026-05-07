@@ -17,6 +17,13 @@
 
 Crea **subsystem nuevo `Commercial Health`** en el reliability registry — primer subsystem del módulo Commercial (mirror del precedent TASK-672 `Finance Data Quality`). Wirea 6 reliability signals: `overdue_decision`, `budget_overrun`, `zombie`, `unapproved_active`, `conversion_rate_drop`, `stale_progress`. Visible en `/admin/operations`.
 
+## Approved Mockup Context
+
+- Mockup del programa aprobado por usuario el 2026-05-07.
+- Ruta: `/agency/sample-sprints/mockup`.
+- Artefactos: `src/app/(dashboard)/agency/sample-sprints/mockup/page.tsx` y `src/views/greenhouse/agency/sample-sprints/mockup/SampleSprintsMockupView.tsx`.
+- El subsystem real debe preservar la superficie aprobada de `Commercial Health`: rollup con severidad máxima, seis signals, counts steady/non-steady y runbook breve por signal.
+
 ## Why This Task Exists
 
 Sin signals + subsystem rollup, los Sample Sprints derivan en zombies invisibles: pilotos activos sin outcome durante meses, Sprints sin approval que silenciosamente queman costos, Sprints con budget overrun sin alerta, conversion rate trending down sin warning. La spec V1.2 establece 6 signals canónicos. El subsystem `Commercial Health` no existe hoy en `src/lib/reliability/` y debe crearse explícitamente.

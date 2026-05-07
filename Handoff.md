@@ -1,3 +1,38 @@
+# Sesion 2026-05-07 — TASK-803 tomada en develop (Engagement Phases + Outcomes + Lineage)
+
+- **Branch:** `develop` por instruccion explicita del usuario; no se crea `task/TASK-803-engagement-phases-outcomes-lineage`.
+- **Ownership:** no hay PR abierto ni branch local/remota obvia para `TASK-803`; se movio la task a `docs/tasks/in-progress/` y se sincronizaron `Lifecycle`, `docs/tasks/README.md` y `docs/tasks/TASK_ID_REGISTRY.md`.
+- **Objetivo:** implementar DDL + helpers canónicos para `engagement_phases`, `engagement_outcomes` y `engagement_lineage`, contrastando primero task/spec vs arquitectura y runtime real.
+- **Mockup aprobado registrado:** por instruccion del usuario, antes de continuar se agrego en `EPIC-014` y `TASK-803`..`TASK-810` que el mockup navegable aprobado vive en `/agency/sample-sprints/mockup` (`src/app/(dashboard)/agency/sample-sprints/mockup/page.tsx` + `src/views/greenhouse/agency/sample-sprints/mockup/SampleSprintsMockupView.tsx`) y que los slices deben conectarlo sin reinterpretar la dirección visual.
+- **Nota multi-agente:** el worktree ya contiene cambios ajenos/preexistentes en `TASK-611`, `TASK-612`, `TASK-613`, `GREENHOUSE_ORGANIZATION_WORKSPACE_PROJECTION_V1`, mockup aprobado de Sample Sprints y skills de mockup; no revertir ni mezclar scopes.
+
+# Sesion 2026-05-07 — contrato canonical de mockups Greenhouse
+
+- **Decision aprobada por usuario:** futuros mockups/prototipos visuales del portal no deben nacer como HTML/CSS aparte por defecto; deben implementarse como rutas reales Next.js con mock data tipada, Vuexy/MUI wrappers y primitives Greenhouse para evitar drift al conectar backend.
+- **Skills nuevas:** `.codex/skills/greenhouse-mockup-builder/SKILL.md` (+ `agents/openai.yaml`) y `.claude/skills/greenhouse-mockup-builder/SKILL.md`.
+- **Contrato sincronizado:** `AGENTS.md`, `CLAUDE.md`, `project_context.md` y `changelog.md` registran la regla corta. Excepcion permitida: HTML/CSS aparte solo si el usuario pide explicitamente un artefacto estatico externo a la app.
+- **Validacion:** `pnpm exec tsc --noEmit --pretty false` OK; `pnpm lint` OK; `pnpm design:lint` OK (0 errors / 0 warnings).
+- **Nota multi-agente:** se preservan cambios preexistentes no relacionados en `TASK-611`, `TASK-612` y `GREENHOUSE_ORGANIZATION_WORKSPACE_PROJECTION_V1`.
+
+# Sesion 2026-05-07 — Spec V1 + actualizacion TASK-611/612/613 (Organization Workspace Projection, EPIC-008)
+
+- **Branch:** `develop` (cambio doc-only, no codigo runtime). Tasks siguen en `to-do/` listas para tomarse — no se mueven a `in-progress/` aun.
+- **Trigger:** revision arquitectural pedida por el usuario sobre TASK-611/612/613 antes de tomarlas. Skill `arch-architect` invocada con overlay greenhouse-pinned + 4-pillar checklist. Detecté 3 decisiones load-bearing parqueadas o implícitas + ausencia de 4-pillar score en las 3 tasks.
+- **Entrega documental:** `docs/architecture/GREENHOUSE_ORGANIZATION_WORKSPACE_PROJECTION_V1.md` (spec canonico, 14 secciones + 2 apendices). Cierra Open Question del namespace de capabilities (`organization.<facet>.<action>` transversal con scope ∈ {own, tenant, all}). Define modelo: capabilities registry doble fuente TS+DB con FK enforcement, relationship resolver canónico (5 categorías), projection helper cacheado TTL 30s con degraded mode honesto, contrato chrome-vs-content del shell, defense-in-depth 7-layer (TASK-742 plantilla), reliability signals nuevos (`facet_view_drift` + `unresolved_relations`).
+- **Tasks actualizadas (a `to-do/`):**
+  - `TASK-611` → 7 slices con scope concreto (TS catalog + DB registry con FK + parity test, relationship resolver, projection helper, reliability signals, outbox cache invalidation consumer, lint rule). Open Question original cerrada formalmente. 4-pillar score block agregado.
+  - `TASK-612` → 7 slices con contrato chrome-vs-content explícito (shell owns chrome, domain owns facet content via render-prop o registry). FacetContentRouter con `dynamic()` lazy imports per-facet. Rollout flag `organization_workspace_shell_agency` consumiendo patrón TASK-780. 4-pillar score block agregado.
+  - `TASK-613` → 8 slices. Caller inventory completado (Slice 0): bounded set sin callers externos al módulo Finance — sidebar, list row click, back button, search, reliability registry, ACL. Riqueza Finance enumerada como contrato 1:1 (3 KPIs + 4 tabs Facturación/Contactos/Facturas/Deals). Reusa `resolveFinanceClientContext` existente en `src/lib/finance/canonical.ts:142` — no se crea bridge paralelo. Degraded path UI explícito para 2 casos (profile sin org / subject sin acceso). 4-pillar score block agregado.
+- **Decisiones cerradas (NO re-debatir):**
+  1. Namespace capabilities: `organization.<facet>.<action>` transversal. `organization` se agrega al modules union.
+  2. `facet-authorization.ts` se ABSORBE como input del projection helper (NO se reemplaza).
+  3. `authorizedViews` legacy coexisten con projection en V1 — colapso queda como follow-up post-soak ≥6 meses con `facet_view_drift = 0`.
+  4. Cache TTL 30s in-memory (patrón TASK-780). NO materialización en BQ/PG.
+  5. Server-only mandatorio en projection helper (`import 'server-only'`).
+- **Sin cambios runtime:** ninguna migration, ninguna API route, ningún componente UI tocado en esta sesión. Trabajo es 100% documental — habilita ejecución limpia de TASK-611/612/613 sin ambigüedad arquitectural.
+- **Indices sincronizados:** `docs/tasks/README.md` actualizado con descripciones extendidas de TASK-611/612/613 enlazando al spec V1.
+- **Pendiente sano (Open Questions vivas, deferidas a slices de implementación):** (1) module reliability dedicado vs extender `identity`, (2) materialized helper view vs runtime computation para signal `facet_view_drift`, (3) activación `client_portal` entrypoint con security review específico (Globe/Sky).
+
 # Sesion 2026-05-07 — TASK-557.1 cerrada en develop (Legacy Quotes Cleanup & Limbo State Audit)
 
 - **Branch:** `develop` por instruccion explicita del usuario; no se crea `task/TASK-557.1-legacy-quotes-cleanup-audit`.
