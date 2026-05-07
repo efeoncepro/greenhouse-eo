@@ -1,3 +1,9 @@
+# Sesion 2026-05-07 — CI fix post TASK-556 (schema drift quotes)
+
+- **Causa raiz:** CI fallo en `src/app/api/finance/schema-drift-response.test.ts` porque TASK-556 movio `/api/finance/quotes` al guard canonico `requireCommercialTenantContext`, pero el test legacy solo mockeaba `requireFinanceTenantContext`. No se bypassa el guard ni se relaja el test.
+- **Fix:** el test ahora mockea ambos planos de acceso: finance para HES/operational PL legacy y commercial con `comercial.cotizaciones` para quotes. Mantiene la expectativa de degradacion segura `FINANCE_SCHEMA_DRIFT`.
+- **Validacion:** `pnpm test src/app/api/finance/schema-drift-response.test.ts` OK; mini-regresion TASK-556/TASK-813 OK (`quotation-access`, orphan-services, services-sync); `pnpm exec tsc --noEmit --pretty false` OK; `pnpm lint` OK; `pnpm test` completo OK (598 files / 3468 passed / 5 skipped).
+
 # Sesion 2026-05-07 — TASK-813 follow-ups cerrados (cron safety-net + UI manual queue)
 
 - **Branch:** `develop`, por continuidad de los cierres TASK-554/555/556 y pedido explicito del usuario de resolver los follow-ups end-to-end.

@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const mockRequireFinanceTenantContext = vi.fn()
+const mockRequireCommercialTenantContext = vi.fn()
 const mockResolveFinanceDownstreamScope = vi.fn()
 const mockListHes = vi.fn()
 const mockRunGreenhousePostgresQuery = vi.fn()
@@ -9,6 +10,7 @@ const mockListOperationalPlSnapshots = vi.fn()
 const mockGetFinanceCurrentPeriod = vi.fn()
 
 vi.mock('@/lib/tenant/authorization', () => ({
+  requireCommercialTenantContext: (...args: unknown[]) => mockRequireCommercialTenantContext(...args),
   requireFinanceTenantContext: (...args: unknown[]) => mockRequireFinanceTenantContext(...args)
 }))
 
@@ -48,6 +50,16 @@ describe('Finance schema drift responses', () => {
       tenant: {
         tenantType: 'efeonce_internal',
         routeGroups: ['finance'],
+        userId: 'user-1',
+        spaceId: 'space-1'
+      },
+      errorResponse: null
+    })
+    mockRequireCommercialTenantContext.mockResolvedValue({
+      tenant: {
+        tenantType: 'efeonce_internal',
+        routeGroups: ['commercial'],
+        authorizedViews: ['comercial.cotizaciones'],
         userId: 'user-1',
         spaceId: 'space-1'
       },
