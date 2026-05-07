@@ -610,7 +610,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-554` | `complete` | Commercial Domain Navigation Separation | `docs/tasks/complete/TASK-554-commercial-domain-navigation-separation.md` |
 | `TASK-555` | `complete` | Commercial Access Model Foundation | `docs/tasks/complete/TASK-555-commercial-access-model-foundation.md` |
 | `TASK-556` | `complete` | Commercial Surface Adoption over Legacy Finance Paths | `docs/tasks/complete/TASK-556-commercial-surface-adoption-over-legacy-finance-paths.md` |
-| `TASK-557` | `to-do` | Commercial Pipeline Lane Extraction | `docs/tasks/to-do/TASK-557-commercial-pipeline-lane-extraction.md` |
+| `TASK-557` | `complete` | Commercial Pipeline Lane Extraction | `docs/tasks/complete/TASK-557-commercial-pipeline-lane-extraction.md` |
 | `TASK-558` | `to-do` | Ops Registry Schema, Parser & Repo Config Foundation | `docs/tasks/to-do/TASK-558-ops-registry-schema-parser-repo-config-foundation.md` |
 | `TASK-559` | `to-do` | Ops Registry Validation, Query CLI & Generated Outputs | `docs/tasks/to-do/TASK-559-ops-registry-validation-query-cli-generated-outputs.md` |
 | `TASK-560` | `to-do` | Ops Registry Human + Agent Surfaces | `docs/tasks/to-do/TASK-560-ops-registry-human-agent-surfaces.md` |

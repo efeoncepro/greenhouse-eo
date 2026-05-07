@@ -335,6 +335,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
         label: nl(GH_COMMERCIAL_NAV.root),
         icon: 'tabler-briefcase',
         children: [
+          { label: nl(GH_COMMERCIAL_NAV.pipeline), href: '/finance/intelligence/pipeline', icon: 'tabler-stack-2' },
           { label: nl(GH_COMMERCIAL_NAV.quotes), href: '/finance/quotes', icon: 'tabler-file-dollar' },
           { label: nl(GH_COMMERCIAL_NAV.contracts), href: '/finance/contracts', icon: 'tabler-file-description' },
           {
@@ -344,6 +345,10 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           },
           { label: nl(GH_COMMERCIAL_NAV.products), href: '/finance/products', icon: 'tabler-packages' }
         ].filter(item => {
+          if (item.href === '/finance/intelligence/pipeline') {
+            return canSeeAnyView(['comercial.pipeline', 'finanzas.inteligencia'], false) || isCommercialUser || isFinanceUser || isAdminUser
+          }
+
           if (item.href === '/finance/quotes') return canSeeAnyView(['comercial.cotizaciones', 'finanzas.cotizaciones'], true)
           if (item.href === '/finance/contracts') return canSeeAnyView(['comercial.contratos', 'comercial.sow'], true)
           if (item.href === '/finance/master-agreements') return canSeeView('comercial.acuerdos_marco', true)

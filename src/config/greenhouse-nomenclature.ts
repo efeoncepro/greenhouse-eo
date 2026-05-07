@@ -69,6 +69,7 @@ export const GH_AGENCY_NAV = {
 
 export const GH_COMMERCIAL_NAV = {
   root: { label: 'Comercial', subtitle: 'Pipeline, acuerdos y catálogo vendible' },
+  pipeline: { label: 'Pipeline', subtitle: 'Forecast comercial y oportunidades activas' },
   quotes: { label: 'Cotizaciones', subtitle: 'Propuestas comerciales y aprobación' },
   contracts: { label: 'Contratos', subtitle: 'Contratos, SOWs y renovaciones activas' },
   masterAgreements: { label: 'Acuerdos marco', subtitle: 'MSAs y cláusulas maestras' },

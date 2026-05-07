@@ -1,3 +1,17 @@
+# Sesion 2026-05-07 — TASK-557 tomada en develop (Commercial Pipeline Lane Extraction)
+
+- **Branch:** `develop` por instruccion explicita del usuario; no se crea `task/TASK-557-commercial-pipeline-lane-extraction`.
+- **Ownership:** no habia PR abierto ni branch local/remota obvia para `TASK-557`; se movio la task a `docs/tasks/in-progress/` al tomarla y a `docs/tasks/complete/` al cerrar; `Lifecycle`, `docs/tasks/README.md` y `docs/tasks/TASK_ID_REGISTRY.md` quedaron sincronizados.
+- **Entrega:** nueva page `/finance/intelligence/pipeline` con guard dual `comercial.pipeline OR finanzas.inteligencia`, header Comercial y render directo de `CommercialIntelligenceView`; sidebar `Comercial` agrega `Pipeline` como primer item; `FinanceIntelligenceView` conserva tab compat con aviso "Vista compartida — owner Comercial" y link a la lane dedicada.
+- **Fix post-screenshot:** el usuario mostro staging sin `Pipeline` en el menu. Causa raiz local: `canSeeAnyView(..., true)` solo usa fallback cuando `authorizedViews` esta vacio; su sesion tenia authorizedViews pero aun no incluia `comercial.pipeline`. Se ajusto sidebar y page dedicada para aceptar fallback por `routeGroup commercial|finance|admin` aun con snapshots viejos, manteniendo compat transicional.
+- **Access model:** `routeGroups`: owner `commercial`, compat `finance`/admin en page dedicada; `views`: `comercial.pipeline` routePath code-versioned y persistido pasa a `/finance/intelligence/pipeline`, compat `finanzas.inteligencia`; `entitlements`: se reutiliza `commercial.pipeline.read`; `startup policy`: sin cambios.
+- **TASK-557.1:** sigue `to-do`; se aplico filtro defensivo `q.legacy_status IS NULL` con tag de retiro en `revenue-pipeline-reader`. No se usa `legacy_excluded` porque la columna no existe aun; queda scope de TASK-557.1.
+- **Notifications drift:** no se cambiaron las URLs de `notifications.ts:629/654`; el runtime real contiene eventos financieros (`leave_request.payroll_impact_detected`, `accounting.margin_alert.triggered`), no notificaciones pipeline. Moverlas habria degradado el destino correcto.
+- **Migracion:** `20260507115027833_task-557-commercial-pipeline-route-path.sql` actualiza `greenhouse_core.view_registry.route_path` para `comercial.pipeline`.
+- **Docs:** changelog, client changelog, doc funcional `pipeline-comercial`, doc `surfaces-comerciales-sobre-rutas-finance`, manual `docs/manual-de-uso/comercial/pipeline-comercial.md`, indices y task sincronizados.
+- **Runtime:** `pnpm pg:doctor` OK con runtime sin `CREATE` en schemas.
+- **Validacion:** `pnpm pg:connect:migrate` OK; `pnpm exec tsc --noEmit --pretty false` OK; focal tests view-access/navigation OK (35 tests); notifications test OK (5 tests); `pnpm design:lint` OK; `pnpm lint` OK; `pnpm build` OK y route table confirma `/finance/intelligence/pipeline`.
+
 # Sesion 2026-05-07 — CI fix post TASK-556 (schema drift quotes)
 
 - **Causa raiz:** CI fallo en `src/app/api/finance/schema-drift-response.test.ts` porque TASK-556 movio `/api/finance/quotes` al guard canonico `requireCommercialTenantContext`, pero el test legacy solo mockeaba `requireFinanceTenantContext`. No se bypassa el guard ni se relaja el test.

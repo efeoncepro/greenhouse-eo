@@ -213,8 +213,8 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
     viewCode: 'comercial.pipeline',
     section: 'comercial',
     label: 'Pipeline comercial',
-    description: 'Forecast, deals y oportunidades comerciales sobre ruta legacy de inteligencia.',
-    routePath: '/finance/intelligence',
+    description: 'Forecast, deals y oportunidades comerciales sobre lane dedicada en ruta legacy.',
+    routePath: '/finance/intelligence/pipeline',
     routeGroup: 'commercial'
   },
   {

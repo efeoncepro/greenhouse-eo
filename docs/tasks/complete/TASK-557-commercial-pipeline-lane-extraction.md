@@ -7,19 +7,27 @@
 - TASK-557.1 (legacy quotes cleanup) queda promovida a **soft prerequisite**: el reader `revenue-pipeline-reader.ts:199-227` filtra `is_expired` + `pipeline_stage`, pero NO `legacy_status` / `legacy_excluded`. Si TASK-557.1 no cierra antes, esta task debe agregar el filtro defensivo en la query del reader como compat temporal documentada.
 - Frontera contable explícita: pipeline reporta forecast (`amount × probability`), NO revenue reconocido. ASC 606 / IFRS 15 — un quote/deal no es revenue hasta cumplir los 5 steps. Mantener Pipeline lejos del título "Inteligencia financiera" / "Economía operativa" es parte del scope.
 
+## Delta 2026-05-07 — Implementation decisions (Codex)
+
+- Branch operativo: `develop` por instruccion explicita del usuario; no se creo branch `task/TASK-557-commercial-pipeline-lane-extraction`.
+- Drift corregido: `greenhouse_core.view_registry.route_path` tambien persistia `comercial.pipeline -> /finance/intelligence`. Para que Admin Center/governance apunten al entrypoint primario real, se agrego migracion de datos `20260507115027833_task-557-commercial-pipeline-route-path.sql` que actualiza el routePath a `/finance/intelligence/pipeline`.
+- Drift de TASK-557.1: `legacy_excluded` no existe aun en schema/types/migrations. TASK-557 aplica solo el filtro defensivo posible en runtime actual: `q.legacy_status IS NULL`. La columna/flag `legacy_excluded` queda scope de TASK-557.1.
+- Drift de notifications: las dos ocurrencias reales en `src/lib/sync/projections/notifications.ts` son eventos financieros (`leave_request.payroll_impact_detected` y `accounting.margin_alert.triggered`), no eventos de pipeline. No se movieron a `/finance/intelligence/pipeline` para evitar enviar alertas de margen/costo al lane comercial incorrecto.
+- Fix post-screenshot: el sidebar usaba `canSeeAnyView(['comercial.pipeline', 'finanzas.inteligencia'], true)`, pero ese fallback no se aplica cuando `authorizedViews` no esta vacio. Para usuarios con snapshots previos a `comercial.pipeline`, el item se ocultaba aunque tuvieran `routeGroup=commercial|finance|admin`. La page y el sidebar ahora aceptan ese fallback transicional explícitamente.
+
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
-- Effort: `Bajo` (~1 día — 6 slices acotados, sin migration ni nueva API)
+- Effort: `Bajo` (~1 día — 6 slices acotados, con migracion de datos routePath y sin nueva API)
 - Type: `implementation`
 - Epic: `EPIC-002`
-- Status real: `Diseño cerrado v2 — listo para tomar`
+- Status real: `Cerrada`
 - Rank: `TBD`
 - Domain: `crm`
 - Blocked by: `TASK-555` (✅ complete) + `TASK-557.1` (⚠️ soft prerequisite — ver Detailed Spec §6)
-- Branch: `task/TASK-557-commercial-pipeline-lane-extraction`
+- Branch: `develop` (por instruccion explicita del usuario)
 - Legacy ID: `[optional]`
 - GitHub Issue: `[optional]`
 
@@ -358,16 +366,16 @@ Decisión:
 
 ## Acceptance Criteria
 
-- [ ] Existe page comercial nueva en `/finance/intelligence/pipeline` que monta `<CommercialIntelligenceView />` sin wrap financiero
-- [ ] La page nueva usa guard dual `comercial.pipeline OR finanzas.inteligencia` con fallback explícito por routeGroups + EFEONCE_ADMIN
-- [ ] Sidebar `Comercial` tiene entry "Pipeline" como primer item del bloque, apuntando a la page nueva, con `canSeeAnyView(['comercial.pipeline','finanzas.inteligencia'])`
-- [ ] Tab `quotations` en `FinanceIntelligenceView` mantiene compat embed con subtitle "Vista compartida — owner Comercial" + link inline a la lane dedicada
-- [ ] `notifications.ts:629/654` apunta a `/finance/intelligence/pipeline`; tests asociados actualizados
-- [ ] Doc funcional `pipeline-comercial.md` documenta los dos entrypoints (page dedicada + tab compat) y la condición de retiro del embed
-- [ ] Doc funcional declara la frontera contable forecast (FP&A) vs revenue reconocido (ASC 606 / IFRS 15)
-- [ ] Cross-impact con TASK-557.1 documentado: prerequisito cerrado O filtro defensivo agregado con tag de retiro
-- [ ] Deep links existentes (`/finance/intelligence` con tab Pipeline) siguen funcionando sin redirect ni cambio
-- [ ] Microcopy de page nueva, sidebar entry y subtitle del tab compat fueron validados con la skill `greenhouse-ux-writing`
+- [x] Existe page comercial nueva en `/finance/intelligence/pipeline` que monta `<CommercialIntelligenceView />` sin wrap financiero
+- [x] La page nueva usa guard dual `comercial.pipeline OR finanzas.inteligencia` con fallback explícito por routeGroups + EFEONCE_ADMIN
+- [x] Sidebar `Comercial` tiene entry "Pipeline" como primer item del bloque, apuntando a la page nueva, con `canSeeAnyView(['comercial.pipeline','finanzas.inteligencia'])`
+- [x] Tab `quotations` en `FinanceIntelligenceView` mantiene compat embed con subtitle "Vista compartida — owner Comercial" + link inline a la lane dedicada
+- [x] `notifications.ts:629/654` revisado; no se cambió porque el runtime real contiene eventos financieros, no pipeline. Drift documentado.
+- [x] Doc funcional `pipeline-comercial.md` documenta los dos entrypoints (page dedicada + tab compat) y la condición de retiro del embed
+- [x] Doc funcional declara la frontera contable forecast (FP&A) vs revenue reconocido (ASC 606 / IFRS 15)
+- [x] Cross-impact con TASK-557.1 documentado: filtro defensivo agregado con tag de retiro sobre `legacy_status`; `legacy_excluded` queda para TASK-557.1
+- [x] Deep links existentes (`/finance/intelligence`) siguen funcionando sin redirect ni cambio
+- [x] Microcopy de page nueva, sidebar entry y subtitle del tab compat fueron validados con `greenhouse-ux-content-accessibility` (skill disponible equivalente a `greenhouse-ux-writing`)
 
 ## Hard Rules (anti-regression)
 
@@ -396,6 +404,17 @@ Comandos requeridos:
 - `pnpm design:lint`
 - `pnpm build` — confirmar que `/finance/intelligence/pipeline` aparece en route table
 
+Resultado 2026-05-07:
+
+- `pnpm pg:doctor` OK
+- `pnpm pg:connect:migrate` OK; aplicó `20260507115027833_task-557-commercial-pipeline-route-path.sql` y regeneró tipos sin diff pendiente
+- `pnpm exec tsc --noEmit --pretty false` OK
+- `pnpm test src/lib/admin/view-access-catalog.test.ts src/lib/admin/internal-role-visibility.test.ts src/config/greenhouse-navigation-copy.test.ts` OK (3 files / 35 tests)
+- `pnpm test src/lib/sync/projections/notifications.test.ts` OK (1 file / 5 tests)
+- `pnpm design:lint` OK (0 errors / 0 warnings)
+- `pnpm lint` OK
+- `pnpm build` OK; route table incluye `/finance/intelligence/pipeline`
+
 Smoke manual:
 
 - login con usuario `efeonce_admin` → sidebar Comercial muestra entry Pipeline → click abre page comercial dedicada → 3 sub-tabs renderizadas
@@ -406,15 +425,15 @@ Smoke manual:
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown sincronizado con el estado real (`in-progress` al tomar, `complete` al cerrar)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` sincronizado con el cierre
-- [ ] `Handoff.md` actualizado con: page nueva, sidebar entry, decisión sobre TASK-557.1 path 1 vs 2, microcopy validada
-- [ ] `changelog.md` actualizado si cambió comportamiento, estructura o protocolo visible
-- [ ] chequeo de impacto cruzado sobre otras tasks afectadas — especialmente TASK-557.1 y futuras URL normalization
-- [ ] explicitada la compat temporal del tab embed en `FinanceIntelligenceView` con condición de retiro
-- [ ] explicitada la decisión sobre TASK-557.1 (cerrada antes O filtro defensivo aplicado con tag)
-- [ ] microcopy validada por skill `greenhouse-ux-writing`
+- [x] `Lifecycle` del markdown sincronizado con el estado real (`in-progress` al tomar, `complete` al cerrar)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` sincronizado con el cierre
+- [x] `Handoff.md` actualizado con: page nueva, sidebar entry, decisión sobre TASK-557.1 path 1 vs 2, microcopy validada
+- [x] `changelog.md` actualizado si cambió comportamiento, estructura o protocolo visible
+- [x] chequeo de impacto cruzado sobre otras tasks afectadas — especialmente TASK-557.1 y futuras URL normalization
+- [x] explicitada la compat temporal del tab embed en `FinanceIntelligenceView` con condición de retiro
+- [x] explicitada la decisión sobre TASK-557.1 (filtro defensivo aplicado con tag)
+- [x] microcopy validada por skill `greenhouse-ux-content-accessibility`
 
 ## Follow-ups
 

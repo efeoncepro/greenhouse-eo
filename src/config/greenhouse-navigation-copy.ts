@@ -110,6 +110,7 @@ const enUS: NavigationCopy = {
   },
   commercial: {
     root: { label: 'Commercial', subtitle: 'Pipeline, agreements and sellable catalog' },
+    pipeline: { label: 'Pipeline', subtitle: 'Commercial forecast and active opportunities' },
     quotes: { label: 'Quotes', subtitle: 'Commercial proposals and approval' },
     contracts: { label: 'Contracts', subtitle: 'Contracts, SOWs and active renewals' },
     masterAgreements: { label: 'Master agreements', subtitle: 'MSAs and master clauses' },

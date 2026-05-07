@@ -203,6 +203,8 @@ const buildStandaloneWhere = (filters: UnifiedPipelineFilters) => {
   //   3) exclude closed quote statuses
   const conditions: string[] = [
     '(q.hubspot_deal_id IS NULL OR (d.is_closed = TRUE AND d.is_won = TRUE))',
+    // TASK-557 defensive filter — retire when TASK-557.1 closes.
+    'q.legacy_status IS NULL',
     'qps.is_expired = FALSE',
     "qps.pipeline_stage NOT IN ('rejected', 'expired')"
   ]

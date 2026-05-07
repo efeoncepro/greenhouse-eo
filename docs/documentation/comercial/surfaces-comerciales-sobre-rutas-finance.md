@@ -10,6 +10,7 @@
 Greenhouse trata estas vistas como surfaces del dominio **Comercial**, aunque sus URLs sigan usando temporalmente `/finance/...`:
 
 - Cotizaciones: `/finance/quotes`
+- Pipeline comercial: `/finance/intelligence/pipeline`
 - Contratos y SOW: `/finance/contracts`
 - Acuerdos marco / MSA: `/finance/master-agreements`
 - Productos vendibles: `/finance/products`
@@ -21,7 +22,7 @@ La URL legacy se conserva para no romper links, bookmarks, deep links, tests ni 
 El access model se separa en tres planos:
 
 - `routeGroups`: el carril operativo es `commercial`; `finance` sigue compatible durante la transicion.
-- `views`: las surfaces visibles usan `comercial.cotizaciones`, `comercial.contratos`, `comercial.sow`, `comercial.acuerdos_marco` y `comercial.productos`.
+- `views`: las surfaces visibles usan `comercial.pipeline`, `comercial.cotizaciones`, `comercial.contratos`, `comercial.sow`, `comercial.acuerdos_marco` y `comercial.productos`.
 - `entitlements`: las acciones finas usan capabilities `commercial.*`.
 
 Las APIs legacy que sirven estas surfaces usan guard comercial compatible, no guard finance-only. Los permisos finos existentes siguen intactos: costos internos, overrides de costo y administracion de pricing continuan restringidos a roles autorizados.
@@ -31,6 +32,12 @@ Las APIs legacy que sirven estas surfaces usan guard comercial compatible, no gu
 SOW pertenece a Comercial, pero en este corte no tiene una ruta propia. Vive agrupado bajo **Contratos** porque el runtime actual modela el alcance vendido y la cadena documental dentro de `/finance/contracts`.
 
 No se debe inventar `/commercial/sow` ni `/finance/sow` hasta que exista una task de normalizacion de URLs.
+
+## Pipeline comercial
+
+Pipeline comercial ya tiene lane dedicada en `/finance/intelligence/pipeline`. El path sigue siendo legacy, pero el owner funcional es Comercial y el sidebar lo muestra como primer item del bloque Comercial.
+
+La tab embebida dentro de Finanzas > Economía se conserva solo como compatibilidad temporal para deep links y usuarios que aun entren por el wrapper financiero.
 
 ## Que no cambio
 
@@ -42,4 +49,4 @@ No se debe inventar `/commercial/sow` ni `/finance/sow` hasta que exista una tas
 
 ## Regla operativa
 
-Cuando una nueva mejora toque cotizaciones, contratos, SOW, MSA o productos vendibles, debe partir desde el dominio `Comercial` aunque el archivo o path todavia viva bajo `finance`.
+Cuando una nueva mejora toque pipeline, cotizaciones, contratos, SOW, MSA o productos vendibles, debe partir desde el dominio `Comercial` aunque el archivo o path todavia viva bajo `finance`.

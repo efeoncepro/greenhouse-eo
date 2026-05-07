@@ -59,6 +59,7 @@ Documentacion oficial de la plataforma Greenhouse. Cada documento describe como 
 
 ### Comercial
 
+- [Pipeline comercial](finance/pipeline-comercial.md) — forecast comercial de deals, contratos standalone y pre-sales; lane dedicada en `/finance/intelligence/pipeline` con compat temporal desde Finanzas > Economía.
 - [Servicios engagement](comercial/servicios-engagement.md) — sincronizacion HubSpot p_services, materializacion de servicios y degradacion honesta
 - [Surfaces comerciales sobre rutas legacy Finance](comercial/surfaces-comerciales-sobre-rutas-finance.md) — cotizaciones, contratos/SOW, acuerdos marco y productos como owner-domain Comercial mientras conservan URLs `/finance/...`
 
