@@ -4,9 +4,25 @@
 > **Versión:** 1.0
 > **Creado:** 2026-05-07 por arch-architect (skill) — anclado a EPIC-008
 > **Última actualización:** 2026-05-07
-> **Tasks ancla:** TASK-611 (foundation), TASK-612 (shell), TASK-613 (Finance convergence)
+> **Tasks ancla:** TASK-611 (foundation), TASK-612 (shell), TASK-613 (Finance convergence), TASK-614 (Person workspace extension)
 > **Doc funcional asociado:** `docs/documentation/identity/sistema-identidad-roles-acceso.md`
 > **Estado:** Diseño aprobado — pendiente implementación
+
+## Delta 2026-05-07 — TASK-614 person workspace extension
+
+El patrón canonizado en este V1 es **transversal por objeto canónico 360**, no específico de organizations. TASK-614 lo extiende al objeto `Persona`/`Colaborador` con las siguientes especificidades:
+
+- **Namespace transversal**: `person.<facet>.<action>` con `scope ∈ {own, tenant, all}`. `person` se agrega al modules union (mismo patrón que `organization` en este V1).
+- **Infraestructura compartida (NO duplicar)**: misma tabla `greenhouse_core.capabilities_registry`, mismo patrón de relationship resolver (single PG query con CTEs), mismo helper shape (`resolvePersonWorkspaceProjection` mirror de `resolveOrganizationWorkspaceProjection`), mismo cache TTL 30s, mismo defense-in-depth 7-layer.
+- **Diferencias específicas de person**:
+  - **6 relationship kinds** (vs 5 en organization): `self | manager | internal_admin | peer | unrelated_internal | no_relation`. `self` y `manager` son nuevos ejes específicos de persona.
+  - **10 facets canónicos** (vs 9 en organization): `identity | legal_profile | assignments | organizations | compensation | payroll | benefits | delivery | finance_impact | tooling | staff_aug`. `legal_profile` ya canonizado por TASK-784 — preservado tal cual.
+  - **Manager relationship** consume helpers de TASK-731 reporting_hierarchy (`getCurrentReportingLine`, `listReportingSubtree`, `listReportingChain`). Cap explícito: manager solo accede a `compensation`/`payroll` de subordinates en su subtree, nunca cross-chain.
+  - **Self-detection canonizada**: helper `isSelf(subject, memberId)` reemplaza comparaciones inline `accessContext.userId === memberId` repartidas en código.
+  - **`economy` UI tab decomposition**: 4 sub-secciones internas (Compensación / Nómina / Beneficios / Impacto financiero) consumiendo capabilities finas — preserva URL stable.
+- **Reliability signals propios de person**: `identity.person_workspace.facet_view_drift` + `identity.person_workspace.deprecated_reader_usage`. Subsystem rollup compartido `Identity & Access`.
+
+**Hard rule canonizada por este Delta**: cuando emerja un tercer workspace candidate (provider, space) y reuse este patrón, NO escribir un V2 spec sibling — extender este V1 con un nuevo Delta. Si los Delta crecen demasiado, lift a master `GREENHOUSE_CANONICAL_OBJECT_WORKSPACE_PROJECTION_V1.md` con este V1 (organizations) + person + nuevo como aplicaciones específicas. Antes de eso, NO.
 
 ## 1. Propósito
 
