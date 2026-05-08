@@ -17,11 +17,12 @@ import noRawLocaleFormatting from './rules/no-raw-locale-formatting.mjs'
 import noRuntimeMockupImport from './rules/no-runtime-mockup-import.mjs'
 import noUntokenizedFxMath from './rules/no-untokenized-fx-math.mjs'
 import noUntokenizedExpenseTypeForAnalytics from './rules/no-untokenized-expense-type-for-analytics.mjs'
+import noInlineFacetVisibilityCheck from './rules/no-inline-facet-visibility-check.mjs'
 
 const plugin = {
   meta: {
     name: 'eslint-plugin-greenhouse',
-    version: '1.4.0'
+    version: '1.5.0'
   },
   rules: {
     'no-raw-table-without-shell': noRawTableWithoutShell,
@@ -30,7 +31,8 @@ const plugin = {
     'no-raw-locale-formatting': noRawLocaleFormatting,
     'no-runtime-mockup-import': noRuntimeMockupImport,
     'no-untokenized-fx-math': noUntokenizedFxMath,
-    'no-untokenized-expense-type-for-analytics': noUntokenizedExpenseTypeForAnalytics
+    'no-untokenized-expense-type-for-analytics': noUntokenizedExpenseTypeForAnalytics,
+    'no-inline-facet-visibility-check': noInlineFacetVisibilityCheck
   }
 }
 
