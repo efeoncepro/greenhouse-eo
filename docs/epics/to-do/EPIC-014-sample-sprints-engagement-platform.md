@@ -99,6 +99,10 @@ Reglas obligatorias:
 
 - **TASK-813** — HubSpot p_services (0-162) bidirectional sync activation + phantom seed cleanup. Sibling derivada de auditoría arch-architect 2026-05-06: 30 filas fantasma en `core.services` seedeadas como cross-product `service_modules × clients`, 16 services reales en HubSpot 0-162 sin sincronizar, 3 huérfanos sin org Greenhouse. Soft dep TASK-555, hard dep TASK-801 (consume `engagement_kind`). Recomendado correr **inmediatamente después de TASK-801** y **antes de TASK-802 onward** para que las extensiones del engagement primitive no se declaren contra services fantasma.
 
+### Follow-ups post-foundation
+
+- **TASK-835** — Sample Sprints Runtime Projection Hardening. Follow-up creado 2026-05-08 para robustecer la surface real `/agency/sample-sprints`: reemplaza heurísticas client-side de progreso, costo real, equipo/capacidad y health por una proyección server-side canónica conectada a snapshots, `commercial_cost_attribution_v2`, capacity checker y Commercial Health.
+
 ## Orden de ejecución canónico (incorporado 2026-05-06)
 
 Producido por la skill `arch-architect` aplicando reversibilidad + 4-pilar + dependencies cross-EPIC. Combina EPIC-014 children + EPIC-002 (TASK-554/555/556/557/557.1) + TASK-813 sibling.
