@@ -24,6 +24,7 @@ La diferencia con otras capas de documentacion:
 ### Identidad y acceso
 
 - [SCIM con Microsoft Entra](identity/scim-entra-provisioning.md) — como verificar provisioning, usar `provisionOnDemand`, interpretar `countEscrowed` y evitar fixes manuales inseguros sobre usuarios o mappings.
+- [Organization Workspace Projection — operación](identity/organization-workspace-projection.md) — como supervisar las 2 nuevas reliability signals (`facet_view_drift`, `unresolved_relations`), interpretar las 5 relaciones canónicas subject↔organización, las 11 capabilities `organization.*` y la disciplina TS↔DB para agregar capabilities nuevas.
 
 ### Admin Center
 
