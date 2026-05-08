@@ -581,3 +581,153 @@ Mantenido en `src/lib/organization-workspace/facet-view-mapping.ts`. Cualquier c
 ---
 
 **Fin del spec V1.** Cualquier extensión (V1.1, V2) debe agregar sección `## Delta YYYY-MM-DD — TASK-###` al inicio del documento siguiendo el patrón de `GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md`.
+
+## Delta 2026-05-08 — TASK-613 + Receta canónica para facets nuevos / dual-entrypoint
+
+### Cómo agregar un facet nuevo a Organization Workspace
+
+Cuando emerja la necesidad de un facet adicional (e.g. `marketing`, `legal`, `compliance`, `audit_trail`, `support_history`, etc.), seguir esta receta canónica end-to-end. Cero mezcla con plumbing técnico ad-hoc.
+
+#### Paso 1 — Catálogo de facets
+
+- Extender `OrganizationFacet` enum en `src/lib/organization-workspace/facet-capability-mapping.ts` agregando el nuevo key (ej. `'marketing'`).
+- Declarar la capability requerida + label + descripción.
+- Agregar el `viewCode` underlying en `src/lib/organization-workspace/facet-view-mapping.ts` (Apéndice B). Si el facet no tiene un viewCode legacy reutilizable, declarar uno nuevo en el mapping table de `views`.
+
+#### Paso 2 — Capabilities granulares
+
+- Seedear `organization.<facet>:read` (y `:read_sensitive` si aplica) en `capabilities_registry`.
+- Declarar grants iniciales por relationship (ver Apéndice A) en el migration de seed.
+- Documentar la matriz expected `relationship × capability → access` en este spec con un Delta nuevo.
+
+#### Paso 3 — Facet content component (self-contained)
+
+```tsx
+// src/views/greenhouse/organizations/facets/MarketingFacet.tsx
+'use client'
+
+import type { FacetContentProps } from '@/components/greenhouse/organization-workspace/types'
+
+const MarketingFacet = ({ organizationId, entrypointContext, fieldRedactions, projection }: FacetContentProps) => {
+  // Self-fetch propio (no esperar props del shell). Drawers propios. NO renderizar
+  // chrome (header, KPIs, tabs) — el shell ya lo hace.
+
+  if (entrypointContext === 'marketing') {
+    return <MarketingRichContent organizationId={organizationId} />
+  }
+
+  return <MarketingAgencyContent organizationId={organizationId} />
+}
+
+export default MarketingFacet
+```
+
+Reglas:
+
+- El facet decide qué renderizar según `entrypointContext` (single-source dispatch).
+- Self-contained: queries propias, drawers propios, mutations propias.
+- Respetar `fieldRedactions[<facet>]` cuando aplique (e.g. censurar campos sensibles).
+- NUNCA renderizar header, KPI strip, tab navigation — el shell lo hace.
+
+#### Paso 4 — FacetContentRouter registry
+
+Agregar entrada al `FACET_REGISTRY` en `src/components/greenhouse/organization-workspace/FacetContentRouter.tsx`:
+
+```ts
+const FACET_REGISTRY: Record<OrganizationFacet, FacetEntry> = {
+  // ...existing...
+  marketing: {
+    Component: dynamic(() => import('@/views/greenhouse/organizations/facets/MarketingFacet'), {
+      ssr: false,
+      loading: FacetLoadingFallback
+    })
+  }
+}
+```
+
+Lazy-loaded via `dynamic()` para mantener bundle del shell pequeño.
+
+#### Paso 5 — Reliability signal (opcional pero recomendado para facets críticos)
+
+Si el facet depende de un dataset que puede tener drift contra el modelo canónico 360, agregar un signal en `src/lib/reliability/queries/`:
+
+- Reader: `getMarketingFacetSignal(): Promise<ReliabilitySignal>`.
+- Wire en `get-reliability-overview.ts`.
+- Test 4 paths: ok / warning / SQL anti-regresión / degraded.
+
+### Cómo agregar un entrypoint nuevo (page con shell + projection)
+
+Cuando un módulo necesite **renderear el Organization Workspace shell desde su propia ruta** (e.g. `/legal/organizations/[id]`, `/audit/clients/[id]`, `/marketing/accounts/[id]`):
+
+#### Paso 1 — Extender `EntrypointContext`
+
+Agregar el nuevo entrypoint al union type en `src/lib/organization-workspace/projection-types.ts`:
+
+```ts
+export type EntrypointContext = 'agency' | 'finance' | 'admin' | 'client_portal' | 'marketing'
+```
+
+#### Paso 2 — Rollout flag canónico
+
+Agregar key al CHECK constraint de `home_rollout_flags` (migration nueva):
+
+```sql
+ALTER TABLE greenhouse_serving.home_rollout_flags
+  DROP CONSTRAINT home_rollout_flags_key_check;
+
+ALTER TABLE greenhouse_serving.home_rollout_flags
+  ADD CONSTRAINT home_rollout_flags_key_check CHECK (
+    flag_key IN (
+      'home_v2_shell',
+      'organization_workspace_shell_agency',
+      'organization_workspace_shell_finance',
+      'organization_workspace_shell_marketing'
+    )
+  );
+
+INSERT INTO greenhouse_serving.home_rollout_flags
+  (flag_key, scope_type, scope_id, enabled, reason)
+VALUES
+  ('organization_workspace_shell_marketing', 'global', NULL, FALSE, 'TASK-### staged rollout default');
+```
+
+Extender también el `WorkspaceShellScope` union en `src/lib/workspace-rollout/index.ts` y el `HomeRolloutFlagKey` en `src/lib/home/rollout-flags.ts`.
+
+#### Paso 3 — Server page canónico
+
+Mirror exacto del patrón Agency / Finance:
+
+1. `requireServerSession` (prerender-safe).
+2. `isWorkspaceShellEnabledForSubject(subject, '<scope>')` con `try/catch → false`.
+3. Resolver canónico del módulo (Postgres-first + fallback). Devuelve `organizationId`.
+4. Si no hay organizationId → render legacy view (zero-risk fallback).
+5. `resolveOrganizationWorkspaceProjection({ subject, organizationId, entrypointContext: '<scope>' })`.
+6. Render `<XxxOrganizationWorkspaceClient>`.
+
+#### Paso 4 — Client wrapper
+
+Mirror del Agency/Finance wrapper. Mismos slots: `kpis`, `adminActions`, `drawerSlot`, `children` render-prop. Mismo deep-link `?facet=`.
+
+#### Paso 5 — Per-entrypoint facet dispatch (si necesario)
+
+Si el nuevo entrypoint requiere que un facet cambie su contenido (e.g. el facet `services` debe verse distinto desde marketing vs agency), inspeccionar `entrypointContext` adentro del facet (mismo patrón que `FinanceFacet` documentado en TASK-613). NO crear facets paralelos.
+
+### Reglas duras canónicas (organization-by-facets)
+
+- **NUNCA** crear una vista de detalle organization-centric que NO use el Organization Workspace shell. Toda nueva surface organization-centric (clientes, prospects, partners, vendors, etc.) pasa por el shell.
+- **NUNCA** componer la projection en el cliente. Server-side por construcción — el shell consume la projection prebuilt y la pasa down.
+- **NUNCA** branchear `entrypointContext` afuera del facet. Si Finance vs Agency necesitan contenido distinto en la tab Finance, la decisión vive **adentro** del FinanceFacet, no en el page o el router.
+- **NUNCA** modificar `OrganizationView` legacy (`src/views/greenhouse/organizations/OrganizationView.tsx`) sin migrar paralelamente al shell. Mantener legacy intacto durante el rollout.
+- **NUNCA** seedear capabilities `organization.<facet>:*` sin agregar entry al spec table en Apéndice A. La matriz `relationship × capability → access` es contractual.
+- **NUNCA** crear una flag `organization_workspace_shell_*` sin extender el CHECK constraint en `home_rollout_flags` + el `WorkspaceShellScope` union + el `HomeRolloutFlagKey`. Drift entre los 3 = falsos positivos en runtime.
+- **NUNCA** mezclar dimensiones (e.g. "qué facet" + "qué entrypoint") en un solo enum. Son dos dimensiones ortogonales: `OrganizationFacet × EntrypointContext`.
+- **NUNCA** computar la decisión `legacy fallback vs shell` en runtime sin envolver en `try/catch + captureWithDomain(...)`. Resilient defaults: en duda, legacy.
+- **SIEMPRE** declarar `incidentDomainTag` en el module registry cuando un facet tiene dataset propio que puede generar incidents Sentry.
+- **SIEMPRE** que un nuevo facet emerja con dataset que pueda quedar unlinked al canonical 360, agregar reliability signal análogo a `finance.client_profile.unlinked_organizations` (TASK-613).
+
+### Patrón canónico de evolución (forward-compat)
+
+1. **V1**: nuevo facet/entrypoint OFF por default. Solo pilot users.
+2. **V1.1**: ramp-up por `roleCodes` o `tenant_type`.
+3. **V2**: flip global cuando reliability signals estén en steady state ≥ 30 días.
+4. **V3**: cleanup del legacy view (si existe) post 90 días sin reverts.

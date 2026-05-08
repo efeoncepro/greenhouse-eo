@@ -948,6 +948,61 @@ Toda tabla operativa con celdas editables inline o > 8 columnas vive bajo un con
 - **NUNCA** duplicar `BonusInput` u otra primitiva legacy. Migrar consumers a `<InlineNumericEditor>`. `BonusInput.tsx` queda como re-export deprecado hasta que el ultimo consumer migre.
 - **NUNCA** desactivar el visual regression test de `/hr/payroll` para forzar un merge. Si falla por overflow, la solucion es respetar el contrato, no bypass.
 
+### Organization-by-facets — receta canónica (TASK-611/612/613, 2026-05-08)
+
+Toda surface organization-centric (clientes finanzas, agency organizations, prospects, partners, vendors, futuras vistas legales/marketing/compliance/audit) **debe** renderearse a través del **Organization Workspace shell canónico** (TASK-612). Cero composición ad-hoc.
+
+#### Composición canónica
+
+- **`OrganizationFacet`** × **`EntrypointContext`** son dos dimensiones ortogonales. NO mezclar en un solo enum.
+- 9 facets canónicos: `identity | spaces | team | economics | delivery | finance | crm | services | staffAug`.
+- 4 entrypoints canónicos: `agency | finance | admin | client_portal` (extensible — receta abajo).
+- 5 relationships canónicas: `internal_admin | assigned_member | client_portal_user | unrelated_internal | no_relation`.
+
+#### Para agregar un facet nuevo
+
+1. Extender `OrganizationFacet` enum + `viewCode` mapping (`src/lib/organization-workspace/facet-{capability,view}-mapping.ts`).
+2. Seedear capability `organization.<facet>:read` en `capabilities_registry` con migration. Documentar matriz `relationship × capability → access` en spec V1.
+3. Crear `<NameFacet>.tsx` self-contained en `src/views/greenhouse/organizations/facets/`. NO renderiza chrome — el shell ya lo hace.
+4. Registrar en `FACET_REGISTRY` (`FacetContentRouter.tsx`) con `dynamic()` lazy load.
+5. Reliability signal recomendado: clonar patrón TASK-613 `finance-client-profile-unlinked.ts`.
+
+#### Para agregar un entrypoint nuevo
+
+1. Extender `EntrypointContext` union (`src/lib/organization-workspace/projection-types.ts`).
+2. Migration que extienda CHECK constraint `home_rollout_flags_key_check` con `organization_workspace_shell_<scope>` + INSERT global `enabled=FALSE`. Extender también `WorkspaceShellScope` (`src/lib/workspace-rollout/index.ts`) y `HomeRolloutFlagKey` (`src/lib/home/rollout-flags.ts`) — drift entre los 3 = falsos positivos.
+3. Server page mirror del patrón Agency/Finance: `requireServerSession` → `isWorkspaceShellEnabledForSubject` → resolver canónico → `resolveOrganizationWorkspaceProjection` → render wrapper. Errores degradan a legacy con `captureWithDomain('<domain>', ...)`.
+4. Client wrapper mirror del Agency/Finance con slots canónicos: `kpis`, `adminActions`, `drawerSlot`, `children` render-prop, deep-link `?facet=`.
+5. Si un facet existente debe cambiar contenido per-entrypoint, inspeccionar `entrypointContext` adentro del facet (patrón canónico `FinanceFacet` desde TASK-613). NO crear facets paralelos.
+
+#### Patrón canónico per-entrypoint dispatch en facet
+
+```tsx
+const FinanceFacet = ({ organizationId, entrypointContext }: FacetContentProps) => {
+  if (entrypointContext === 'finance') {
+    return <FinanceClientsContent lookupId={organizationId} />
+  }
+
+  return <FinanceFacetAgencyContent organizationId={organizationId} />
+}
+```
+
+#### ⚠️ Reglas duras
+
+- **NUNCA** crear una vista de detalle organization-centric que NO use el Organization Workspace shell.
+- **NUNCA** componer la projection en el cliente. Server-only por construcción.
+- **NUNCA** branchear `entrypointContext` afuera del facet. La decisión vive **adentro** del facet, no en el page o el router.
+- **NUNCA** modificar `OrganizationView` legacy (`src/views/greenhouse/organizations/OrganizationView.tsx`) sin migrar paralelamente al shell. Mantener legacy intacto durante el rollout.
+- **NUNCA** seedear capabilities `organization.<facet>:*` sin agregar entry al spec table en `GREENHOUSE_ORGANIZATION_WORKSPACE_PROJECTION_V1.md` Apéndice A.
+- **NUNCA** crear una flag `organization_workspace_shell_*` sin extender los 3 lugares (CHECK constraint + `WorkspaceShellScope` + `HomeRolloutFlagKey`).
+- **NUNCA** mezclar dimensiones (e.g. "qué facet" + "qué entrypoint") en un solo enum.
+- **NUNCA** computar la decisión `legacy fallback vs shell` en runtime sin envolver en `try/catch + captureWithDomain(...)`.
+- **NUNCA** modificar la flag directamente vía SQL. Toda mutación pasa por el admin endpoint `POST /api/admin/home/rollout-flags`.
+- **SIEMPRE** declarar `incidentDomainTag` en el module registry cuando el facet tiene dataset propio que puede generar incidents Sentry.
+- **SIEMPRE** seguir el rollout staged: V1 OFF default → V1.1 pilot users → V2 flip global con steady-state ≥30 días → V3 cleanup legacy ≥90 días sin reverts.
+
+**Spec canónica**: `docs/architecture/GREENHOUSE_ORGANIZATION_WORKSPACE_PROJECTION_V1.md` Delta 2026-05-08 (receta paso a paso). Tasks de referencia: TASK-611 (foundation), TASK-612 (shell + Agency entrypoint), TASK-613 (Finance entrypoint + dual-dispatch pattern).
+
 ## Task Lifecycle Protocol
 
 ### Regla general

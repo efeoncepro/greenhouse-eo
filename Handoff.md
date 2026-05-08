@@ -1,3 +1,23 @@
+# Sesion 2026-05-08 (madrugada) — TASK-613 cerrada (Finance Clients Detail → Organization Workspace convergence)
+
+- **Trigger:** ejecutar TASK-613 (P1 / EPIC-008 child) — `/finance/clients/[id]` adopta el Organization Workspace shell (TASK-612) preservando 1:1 las 4 sub-tabs (Facturación/Contactos/Facturas/Deals) + 3 KPIs (Por cobrar/Vencidas/Condiciones). Trabajado **directo en `develop`** por instrucción explícita del usuario.
+- **7 slices entregados** con commits incrementales:
+  - Slice 1: `FinanceFacet` con dual-entrypoint dispatch (`finance` → `FinanceClientsContent` rich legacy / otros → wrap legacy `OrganizationFinanceTab`) + nuevo `FinanceClientsContent.tsx` self-contained (600+ líneas, 1:1 legacy `ClientDetailView`).
+  - Slice 2: `page.tsx` server-side gate canónico (mirror Agency Slice 5) + `FinanceClientsOrganizationWorkspaceClient` wrapper (mirror Agency wrapper).
+  - Slice 3: reliability signal canónico `finance.client_profile.unlinked_organizations` (kind=data_quality, warning si count>0) + 5/5 tests.
+  - Slice 4: rollout flag `organization_workspace_shell_finance` ya seedeado por TASK-612 Slice 4 (verificación).
+  - Slice 5: compat hardening — deep-link de `ClientsListView` con `clientProfileId` resuelve correctamente (resolver canónico OR-matching los 4 shapes).
+  - Slice 6: 4/4 component tests del FinanceFacet dispatch verdes.
+  - Slice 7: Delta `GREENHOUSE_FINANCE_ARCHITECTURE_V1.md` 2026-05-08 + doc funcional `finance/clientes-finanzas.md` + manual de uso `finance/clientes-finanzas-vista-detalle.md`.
+- **Final phase (instrucción mid-task del usuario)**: receta canónica `organization-by-facets` documentada en 3 lugares:
+  - `CLAUDE.md` nueva sección "Organization-by-facets — receta canónica para extender (TASK-613)" con 5 pasos para facet nuevo + 5 pasos para entrypoint nuevo + 11 reglas duras + patrón canónico per-entrypoint dispatch.
+  - `AGENTS.md` nueva sección "Organization-by-facets — receta canónica" con shape compacto para agentes en general.
+  - `GREENHOUSE_ORGANIZATION_WORKSPACE_PROJECTION_V1.md` Delta 2026-05-08 con receta detallada (snippets código + migration template + reglas duras + roadmap rollout).
+- **Verify final**: pnpm tsc clean / 9/9 tests nuevos verdes (5 signal + 4 facet dispatch) / lint clean.
+- **Lifecycle**: `complete`. Movido a `docs/tasks/complete/`. README sync.
+- **Cero pérdida funcional**: legacy `<ClientDetailView>` preservado intacto detrás del flag (default disabled). Cutover staged user→role→global.
+- **Sin PR ceremony**: trabajado directo en develop por instrucción del usuario.
+
 # Sesion 2026-05-08 (noche) — TASK-612 cerrada (Organization Workspace Shell convergence)
 
 - **Trigger:** ejecutar TASK-612 (P1 / EPIC-008 child) — extracción del shell compartido organization-first + FacetContentRouter lazy + adopción Agency. Branch `task/TASK-612-shared-organization-workspace-shell-convergence` desde develop limpio.

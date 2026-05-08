@@ -5,6 +5,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithTheme } from '@/test/render'
 
+import type { FacetContentProps } from '@/components/greenhouse/organization-workspace/types'
+
 import FinanceFacet from './FinanceFacet'
 
 /**
@@ -46,9 +48,9 @@ const fakeProjection = {
   resolvedAtISO: '2026-05-08T00:00:00.000Z'
 } as never
 
-const baseProps = {
+const baseProps: Omit<FacetContentProps, 'entrypointContext'> = {
   organizationId: 'org-001',
-  relationship: 'internal_admin' as const,
+  relationship: { kind: 'internal_admin', subjectUserId: 'user-001', organizationId: 'org-001' },
   fieldRedactions: [],
   projection: fakeProjection
 }
