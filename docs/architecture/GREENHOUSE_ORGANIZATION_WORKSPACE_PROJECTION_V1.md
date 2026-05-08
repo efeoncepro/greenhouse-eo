@@ -1,12 +1,44 @@
 # GREENHOUSE ORGANIZATION WORKSPACE PROJECTION V1
 
 > **Tipo de documento:** Spec de arquitectura canónica
-> **Versión:** 1.0
+> **Versión:** 1.1
 > **Creado:** 2026-05-07 por arch-architect (skill) — anclado a EPIC-008
-> **Última actualización:** 2026-05-07
+> **Última actualización:** 2026-05-08 (recalibración pre-execution TASK-611)
 > **Tasks ancla:** TASK-611 (foundation), TASK-612 (shell), TASK-613 (Finance convergence), TASK-614 (Person workspace extension)
 > **Doc funcional asociado:** `docs/documentation/identity/sistema-identidad-roles-acceso.md`
-> **Estado:** Diseño aprobado — pendiente implementación
+> **Estado:** Diseño aprobado — implementación TASK-611 en curso
+
+## Delta 2026-05-08 — Recalibración pre-execution TASK-611 (V1.1)
+
+Discovery contra el repo en `task/TASK-611-...` reveló cinco divergencias entre el diseño V1 y el estado real del código/PG. La intención canónica se mantiene; los detalles se ajustan a la realidad sin debilitar defense-in-depth.
+
+1. **`greenhouse_core.entitlement_grants` NO existe**. El runtime de Greenhouse compone capabilities como pure function desde `(roleCodes, routeGroups, authorizedViews, ...)` en `src/lib/entitlements/runtime.ts:83-1042` — no persiste grants. Por lo tanto:
+   - **`capabilities_registry` se crea como tabla declarativa SIN FK a `entitlement_grants`** en V1.1. La parity TS↔DB (test runtime) es el guardia primario. Cuando emerja persistencia de grants (cleanup de TASK-404 o nueva task derivada), se agregará FK en migración separada.
+   - Spec §4.2 mantiene la intención de doble fuente; la sección "ALTER TABLE … entitlement_grants ADD CONSTRAINT … FK" se difiere a una task futura cuando exista la tabla.
+
+2. **Eventos `identity.entitlement.granted` / `identity.entitlement.revoked` v1 NO existen**. Los eventos canónicos relevantes que sí existen y se usan para la cache invalidation reactiva (Slice 6) son:
+   - `access.entitlement_role_default_changed` (TASK-404, declarado en `src/lib/sync/event-catalog.ts:272`)
+   - `access.entitlement_user_override_changed` (TASK-404, `src/lib/sync/event-catalog.ts:273`)
+   - `role.assigned` + `role.revoked` (ya en `REACTIVE_EVENT_TYPES`, líneas 780-781)
+   - `user.deactivated` (ya en `REACTIVE_EVENT_TYPES`, línea 790)
+   Spec §5 layer 7 + §10 hard rule "SIEMPRE invalidar cache via clearProjectionCacheForSubject" se preservan; los event keys cambian. Los dos primeros se agregan a `REACTIVE_EVENT_TYPES` en TASK-611 Slice 6.
+
+3. **Columnas reales del relationship resolver** (Slice 3 query bridges via `greenhouse_core.spaces`):
+   - `client_team_assignments`: `member_id` (NO `member_user_id`), `client_id` (NO `organization_id`), `start_date`/`end_date` (NO `active_until`), `role_title_override` (NO `role_in_account`).
+   - `client_users`: `user_id` + `client_id` (NO `organization_id` directo) + `member_id` opcional para bridge a `members`.
+   - `user_role_assignments` (NO `role_assignments`): `user_id`, `role_code`, `scope_level`, `client_id|project_id|campaign_id` opcional.
+   - **Puente canónico user ↔ organization**: `client_team_assignments.client_id` ⇄ `greenhouse_core.spaces.client_id` ⇄ `spaces.organization_id`. La tabla `clients` NO tiene `organization_id` — el puente es `spaces`.
+   - El query del Apéndice del spec se reescribe en TASK-611 Slice 3 con estos joins reales, conservando la intención (single roundtrip + cross-tenant isolation enforced en WHERE).
+
+4. **5 categorías canónicas** (no 4). El TL;DR §2 dice "4" pero §4.3 enumera 5: `internal_admin | assigned_member | client_portal_user | unrelated_internal | no_relation`. Se canoniza **5** (la quinta es la rama base). Apéndice A documenta las 5.
+
+5. **Layer 5 audit log (TASK-404 entitlement_governance_audit_log)** está bloqueado por un pre-up-marker bug en la migración `20260417044741101_task-404-entitlements-governance.sql` (CREATE TABLE bajo `-- Down Migration` en lugar de bajo `-- Up Migration`). Las tablas governance NUNCA fueron creadas en PG — confirmado vía `kysely-codegen` output (no aparecen en `src/types/db.d.ts`). TASK-611 NO arregla TASK-404; la projection helper es read-only y NO requiere audit log propio. El cleanup queda capturado en `ISSUE-###` separado (a crear durante Slice 7).
+
+**Consecuencias prácticas para implementadores futuros**:
+
+- `capabilities_registry` se entrega sin FK enforcement de runtime; la TS↔DB parity test es el contrato. NO esto debilita el defense-in-depth (Layer 1 sigue siendo PK + CHECK + parity test); difiere la Layer 1 enforcement contra grants persistidos hasta que existan.
+- Cualquier sucesor que cree `entitlement_grants` o reanime las tables de TASK-404 DEBE agregar FK contra `capabilities_registry.capability_key`.
+- Slice 6 cache invalidation consumer cubre los 5 events canónicos enumerados arriba; cuando emerjan eventos nuevos que invaliden capability bag (ej. `access.permission_set_assigned/revoked`), se extiende el `triggerEvents` del consumer.
 
 ## Delta 2026-05-07 — TASK-614 person workspace extension
 

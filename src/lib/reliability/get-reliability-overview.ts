@@ -50,6 +50,8 @@ import {
   getRoleTitleUnresolvedDriftOverdueSignal
 } from './queries/role-title-drift'
 import { getShortcutsInvalidPinsSignal } from './queries/shortcuts-invalid-pins'
+import { getWorkspaceProjectionFacetViewDriftSignal } from './queries/workspace-projection-drift'
+import { getWorkspaceProjectionUnresolvedRelationsSignal } from './queries/workspace-projection-unresolved-relations'
 import { getOutboxUnpublishedLagSignal } from './queries/outbox-unpublished-lag'
 import { getOutboxDeadLetterSignal } from './queries/outbox-dead-letter'
 import { getEmailRenderFailureSignal } from './queries/email-render-failure'
@@ -392,6 +394,14 @@ interface ReliabilityOverviewSources {
   workforceRoleTitle?: ReliabilitySignal[] | null
 
   /**
+   * TASK-611 Slice 5 — Organization Workspace projection signals (2):
+   *   - identity.workspace_projection.facet_view_drift (drift, warning)
+   *   - identity.workspace_projection.unresolved_relations (data_quality, error)
+   * Roll up bajo moduleKey 'identity'.
+   */
+  workspaceProjection?: ReliabilitySignal[] | null
+
+  /**
    * TASK-813 Slice 6 — Commercial engagement instance (HubSpot p_services 0-162) signals (3):
    *   - commercial.service_engagement.sync_lag (lag, warning)
    *   - commercial.service_engagement.organization_unresolved (drift, error)
@@ -467,6 +477,8 @@ export const buildReliabilityOverview = (
     ...(sources.identityLegalProfile ?? []),
     // TASK-785 Slice 7 — Workforce role title governance signals (2).
     ...(sources.workforceRoleTitle ?? []),
+    // TASK-611 Slice 5 — Organization Workspace projection signals (2).
+    ...(sources.workspaceProjection ?? []),
     // TASK-813 Slice 6 — Commercial engagement instance signals (3).
     ...(sources.servicesEngagement ?? []),
     // TASK-807 — Commercial Health signals (six Sample Sprints health gates).
@@ -738,6 +750,19 @@ export const getReliabilityOverview = async (
           .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
           .catch(() => null)
 
+  // TASK-611 Slice 5 — Organization Workspace projection signals (2 readers en
+  // paralelo). Cada uno degrada honestamente a `unknown` si su query/cómputo falla.
+  // Roll up bajo moduleKey 'identity'.
+  const workspaceProjection =
+    preloadedSources.workspaceProjection !== undefined
+      ? preloadedSources.workspaceProjection
+      : await Promise.all([
+          getWorkspaceProjectionFacetViewDriftSignal().catch(() => null),
+          getWorkspaceProjectionUnresolvedRelationsSignal().catch(() => null)
+        ])
+          .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
+          .catch(() => null)
+
   // TASK-813 Slice 6 — Commercial engagement instance signals (3 readers en
   // paralelo). Cada uno degrada honestamente a `unknown` si su query falla.
   // Roll up bajo moduleKey 'commercial'. TASK-807 formaliza el subsystem.
@@ -787,6 +812,7 @@ export const getReliabilityOverview = async (
     shortcutsInvalidPins,
     identityLegalProfile,
     workforceRoleTitle,
+    workspaceProjection,
     servicesEngagement,
     commercialHealth
   })

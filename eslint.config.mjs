@@ -290,7 +290,8 @@ export default [
     },
     rules: {
       'greenhouse/no-untokenized-fx-math': 'error',
-      'greenhouse/no-untokenized-expense-type-for-analytics': 'error'
+      'greenhouse/no-untokenized-expense-type-for-analytics': 'error',
+      'greenhouse/no-inline-facet-visibility-check': 'error'
     }
   },
   {
@@ -363,6 +364,23 @@ export default [
     ],
     rules: {
       'greenhouse/no-untokenized-expense-type-for-analytics': 'off'
+    }
+  },
+
+  // TASK-611 Slice 7 — la lint rule no-inline-facet-visibility-check se desactiva
+  // SOLO en los helpers/readers canónicos del Organization Workspace (donde el
+  // patrón es legítimo) y en tests del rule mismo. Cualquier otro file UI que
+  // mencione capabilities organization.* dispara error.
+  {
+    files: [
+      'src/lib/organization-workspace/**',
+      'src/lib/capabilities-registry/**',
+      'src/lib/entitlements/**',
+      'eslint-plugins/greenhouse/rules/no-inline-facet-visibility-check.mjs',
+      'eslint-plugins/greenhouse/rules/__tests__/no-inline-facet-visibility-check.test.mjs'
+    ],
+    rules: {
+      'greenhouse/no-inline-facet-visibility-check': 'off'
     }
   },
 

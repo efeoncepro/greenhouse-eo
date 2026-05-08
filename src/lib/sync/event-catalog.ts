@@ -794,6 +794,13 @@ export const REACTIVE_EVENT_TYPES = [
   EVENT_TYPES.viewAccessSetAssigned,
   EVENT_TYPES.viewAccessSetRevoked,
 
+  // Entitlements governance — drives Organization Workspace projection cache
+  // invalidation (TASK-611 Slice 6). NO-OP cuando los grants persistidos no
+  // existan todavía (TASK-404 governance tables bloqueadas por pre-up-marker
+  // bug); el consumer responde a estos events tan pronto como emerjan.
+  EVENT_TYPES.entitlementRoleDefaultChanged,
+  EVENT_TYPES.entitlementUserOverrideChanged,
+
   // Sister Platforms (TASK-375)
   EVENT_TYPES.sisterPlatformBindingCreated,
   EVENT_TYPES.sisterPlatformBindingUpdated,

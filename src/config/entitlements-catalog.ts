@@ -8,7 +8,10 @@ export const ENTITLEMENT_MODULES = [
   'client_portal',
   'my_workspace',
   'ai_tooling',
-  'commercial'
+  'commercial',
+  // TASK-611 — namespace transversal del objeto canonico 360 organization (mismo patron que `home` y `my_workspace`).
+  // Las 11 capabilities organization.<facet>.<action> son la API granular del Organization Workspace projection.
+  'organization'
 ] as const
 
 export type GreenhouseEntitlementModule = (typeof ENTITLEMENT_MODULES)[number]
@@ -691,6 +694,75 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     key: 'workforce.assignment_role_override',
     module: 'hr',
     actions: ['create', 'update'] as const,
+    defaultScope: 'tenant'
+  },
+  // TASK-611 — Organization Workspace facet capabilities. Namespace transversal `organization.<facet>.<action>`.
+  // 11 capabilities mapean 1:1 a los 9 facets de Account 360 + 2 sensitivos (identity_sensitive, finance_sensitive).
+  // Spec canonico: docs/architecture/GREENHOUSE_ORGANIZATION_WORKSPACE_PROJECTION_V1.md §4.1.
+  {
+    key: 'organization.identity',
+    module: 'organization',
+    actions: ['read'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'organization.identity_sensitive',
+    module: 'organization',
+    actions: ['read', 'update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'organization.spaces',
+    module: 'organization',
+    actions: ['read'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'organization.team',
+    module: 'organization',
+    actions: ['read'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'organization.economics',
+    module: 'organization',
+    actions: ['read'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'organization.delivery',
+    module: 'organization',
+    actions: ['read'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'organization.finance',
+    module: 'organization',
+    actions: ['read'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'organization.finance_sensitive',
+    module: 'organization',
+    actions: ['read', 'export', 'approve'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'organization.crm',
+    module: 'organization',
+    actions: ['read'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'organization.services',
+    module: 'organization',
+    actions: ['read', 'update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'organization.staff_aug',
+    module: 'organization',
+    actions: ['read', 'update'] as const,
     defaultScope: 'tenant'
   }
 ] as const

@@ -57,6 +57,7 @@ import { hubspotServicesIntakeProjection } from './hubspot-services-intake'
 import { paymentProfileNotificationsProjection } from './payment-profile-notifications'
 import { engagementConvertedProjection } from './engagement-converted'
 import { engagementCancelledProjection } from './engagement-cancelled'
+import { organizationWorkspaceCacheInvalidationProjection } from './organization-workspace-cache-invalidation'
 
 // DEPRECATED: personOperationalProjection removed — replaced by personIntelligenceProjection
 // DEPRECATED: icoMemberProjection kept for backward compat (BQ → Postgres sync) but person_intelligence
@@ -124,4 +125,5 @@ export const ensureProjectionsRegistered = () => {
   registerProjection(paymentProfileNotificationsProjection) // TASK-753 — notify beneficiary on profile lifecycle events
   registerProjection(engagementConvertedProjection)
   registerProjection(engagementCancelledProjection)
+  registerProjection(organizationWorkspaceCacheInvalidationProjection) // TASK-611 Slice 6 — drops projection cache on grant/role/lifecycle events
 }
