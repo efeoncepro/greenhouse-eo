@@ -17,6 +17,7 @@
 - Domain: `identity`
 - Blocked by: `none` (TASK-838 cerrada — infraestructura DB + observability + CI gate listas)
 - Branch: `task/TASK-839-issue-068-fase-5-admin-center-governance-wire-up`
+- **NO bloquea**: `TASK-612` ni `TASK-613`. La projection canónica (TASK-611 Slice 4) ya tiene los grants base wireados desde `roleCodes`/`routeGroups`/`tenantType` en `runtime.ts`. TASK-612/613 son consumers read-only de la projection — no necesitan capacidades de write a governance tables. TASK-839 agrega control fino per-usuario vía Admin Center (override personal, defaults configurables por rol), que es ortogonal a la convergencia visual del workspace shell.
 - Legacy ID: `—`
 - GitHub Issue: `—`
 

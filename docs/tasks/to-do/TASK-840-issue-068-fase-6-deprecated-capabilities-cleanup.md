@@ -17,6 +17,7 @@
 - Domain: `identity`
 - Blocked by: `TASK-839` (necesita writes activos para que emerjan candidates a deprecar)
 - Branch: `task/TASK-840-issue-068-fase-6-deprecated-capabilities-cleanup`
+- **NO bloquea**: `TASK-612` ni `TASK-613`. Esta task es housekeeping del registry; no toca la projection ni los grants base que TASK-611 Slice 4 ya wireó en `runtime.ts`. TASK-612/613 son consumers read-only — pueden ejecutarse y mergearse sin que TASK-840 corra.
 - Legacy ID: `—`
 - GitHub Issue: `—`
 
