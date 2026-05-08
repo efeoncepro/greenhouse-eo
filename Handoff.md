@@ -1,3 +1,17 @@
+# Sesion 2026-05-08 — TASK-611 en ejecucion (Organization Workspace Projection foundation)
+
+- **Trigger:** ejecutar TASK-611 (P1 / EPIC-008) — foundation canonica para Organization Workspace facet projection. Branch `task/TASK-611-organization-workspace-facet-projection-entitlements-foundation` creado desde `develop` limpio.
+- **Discovery (FASE 1):** mapeo del entitlements catalog (10 modules + actions/scopes), runtime puro `getTenantEntitlements`, `authorizeAccountFacets` (sync, server-only), reliability registry con modulo `identity` (kinds `incident|drift|data_quality`), patron `ProjectionDefinition` para reactive consumers, `captureWithDomain('identity', ...)`, `redactErrorForResponse`. Verificacion live de schema PG via `src/types/db.d.ts`.
+- **Audit (FASE 2) — recalibracion pre-execution V1.1:** discovery encontro 5 divergencias spec V1 vs realidad:
+  1. `greenhouse_core.entitlement_grants` NO existe; el runtime es 100% pure-function. **Decision:** `capabilities_registry` se entrega SIN FK desde grants en V1; la TS↔DB parity test es el guardia primario.
+  2. Eventos `identity.entitlement.granted/revoked` v1 NO existen; **decision:** Slice 6 consume los 5 events canonicos existentes (`access.entitlement_role_default_changed`, `access.entitlement_user_override_changed`, `role.assigned`, `role.revoked`, `user.deactivated`).
+  3. Columnas reales del relationship resolver difieren del spec; bridge canonico via `greenhouse_core.spaces` (que tiene `client_id` + `organization_id`).
+  4. **5 categorias canonicas** (no 4) — la 5a es la rama base `no_relation`.
+  5. TASK-404 governance tables (`role_entitlement_defaults`, `user_entitlement_overrides`, `entitlement_governance_audit_log`) NUNCA fueron creadas en PG por pre-up-marker bug en migracion `20260417044741101`. Fuera de scope de TASK-611; se documenta en ISSUE separado en Slice 7.
+- **Spec V1 → V1.1:** `GREENHOUSE_ORGANIZATION_WORKSPACE_PROJECTION_V1.md` actualizado con Delta 2026-05-08 capturando los 5 ajustes. Task spec actualizado con Delta correspondiente.
+- **Estado:** discovery + audit + recalibracion completados. Pendiente: connection map + plan slice-by-slice + ejecucion 7 slices.
+- **Multi-agente:** branch dedicado, develop limpio. Sin cross-impacts conocidos.
+
 # Sesion 2026-05-07 — Operational UI primitives para Sample Sprints
 
 - **Trigger:** el usuario pidio resolver de forma robusta/escalable el look forzado de `/agency/sample-sprints`: rectangulos redondeados excesivos, texto pegado a bordes y copy hibrido en señales.

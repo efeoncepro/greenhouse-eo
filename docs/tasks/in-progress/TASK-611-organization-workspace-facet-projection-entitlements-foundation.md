@@ -8,13 +8,13 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `EPIC-008`
-- Status real: `Diseno`
+- Status real: `En ejecucion (recalibrado pre-execution 2026-05-08)`
 - Rank: `TBD`
 - Domain: `identity`
 - Blocked by: `none`
@@ -26,7 +26,17 @@
 
 Crear la foundation canónica para que el Organization Workspace derive facets, tabs y acciones desde entitlements finos en vez de hardcodes por módulo. Esta task no colapsa rutas ni mezcla Agency/Finance todavía; establece el contrato reusable que permite hacerlo de forma segura y escalable.
 
-**Spec canónico vinculante**: `docs/architecture/GREENHOUSE_ORGANIZATION_WORKSPACE_PROJECTION_V1.md`. Esta task implementa §4 (Modelo) y §5 (Defense-in-depth) y §6 (Reliability signals) del spec.
+**Spec canónico vinculante**: `docs/architecture/GREENHOUSE_ORGANIZATION_WORKSPACE_PROJECTION_V1.md` (V1.1 con Delta 2026-05-08). Esta task implementa §4 (Modelo) y §5 (Defense-in-depth) y §6 (Reliability signals) del spec.
+
+## Delta 2026-05-08 — Recalibración pre-execution
+
+Discovery contra el repo reveló cinco divergencias entre el spec V1 y el estado real del código/PG. Detalle completo en `GREENHOUSE_ORGANIZATION_WORKSPACE_PROJECTION_V1.md` Delta 2026-05-08. Ajustes a esta task:
+
+1. **`entitlement_grants` NO existe** → `capabilities_registry` se entrega SIN FK desde grants en V1; la TS↔DB parity test es el guardia.
+2. **Eventos `identity.entitlement.granted/revoked` NO existen** → Slice 6 consume los 5 events canónicos: `access.entitlement_role_default_changed`, `access.entitlement_user_override_changed`, `role.assigned`, `role.revoked`, `user.deactivated`. Los dos primeros se agregan a `REACTIVE_EVENT_TYPES` aquí.
+3. **Columnas reales del relationship resolver** difieren del spec — Slice 3 query bridges via `greenhouse_core.spaces` (que tiene `client_id` + `organization_id`).
+4. **5 categorías canónicas**, no 4 (la 5a es la rama base `no_relation`).
+5. **Layer 5 audit log de TASK-404 está bloqueado por pre-up-marker bug** — fuera de scope de TASK-611. Se documenta en ISSUE separado en Slice 7.
 
 ## Why This Task Exists
 
