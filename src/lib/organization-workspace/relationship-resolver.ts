@@ -73,8 +73,14 @@ type ResolverRow = {
 }
 
 const QUERY_SQL = `
+  -- ISSUE-071 fix — SELECT TRUE AS is_admin (boolean) en lugar de SELECT 1
+  -- (integer). El COALESCE de abajo combina con FALSE (boolean), por lo que
+  -- el CTE debe emitir el mismo tipo. PG rechaza con "COALESCE types integer
+  -- and boolean cannot be matched". Detectado al activar TASK-613 V1.1 cuando
+  -- el resolver corrió por primera vez contra PG real (los unit tests usaban
+  -- mocks, no exercise SQL real).
   WITH subject_admin AS (
-    SELECT 1 AS is_admin
+    SELECT TRUE AS is_admin
     FROM greenhouse_core.user_role_assignments
     WHERE user_id = $1
       AND role_code = 'efeonce_admin'

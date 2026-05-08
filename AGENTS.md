@@ -935,6 +935,21 @@ DROP TABLE IF EXISTS schema.table;
 
 **Si descubres que una migration aplicada anteriormente tenía este bug** (sección Up vacía, DDL bajo Down): NO la edites. Crea una migration nueva forward-fix con el SQL correcto, idempotente, y abre un ISSUE-### documentando el hallazgo (ejemplo: ISSUE-068).
 
+### SQL embebido — type alignment + live testing (ISSUE-071)
+
+Cualquier query SQL embebido en TS que use **uniones de tipos** (COALESCE de subqueries, CASE WHEN, NULL coalescing entre tipos heterogéneos) debe **ejercitarse contra PG real ANTES de mergear**, no solo via mocks Vitest.
+
+**Bug class detectado** (2026-05-08, ISSUE-071): el CTE `subject_admin` del relationship resolver de TASK-611 hacía `SELECT 1 AS is_admin` (integer) pero el `COALESCE((SELECT is_admin FROM subject_admin), FALSE)` combinaba con boolean. PG rechaza con `COALESCE types integer and boolean cannot be matched`. El catch silencioso convertía el throw a `degradedMode=true` y el banner "Workspace en modo degradado" se mostraba al usuario. Bug latente desde el merge de TASK-611, descubierto solo cuando un usuario real ejerció el path post TASK-613 V1.1.
+
+**Reglas duras**:
+
+- **NUNCA** mergear queries con CTEs + COALESCE/CASE/NULL handling sin un live test contra PG (vía `pg:connect` proxy + `pnpm tsx`, o `*.live.test.ts`).
+- **NUNCA** confiar SOLO en unit tests con mocks para validar type alignment SQL. Los mocks ejercitan la lógica TS, NO el SQL crudo.
+- **SIEMPRE** que `COALESCE((SELECT ... FROM cte), default)`, verificar que el tipo del SELECT del CTE matchee el tipo del `default`. PG hace casting implícito en algunos casos (e.g. INT → NUMERIC) pero NO entre INT y BOOL.
+- **SIEMPRE** que un read path tenga catch + degraded mode honesto (correcto desde safety perspective), confirmar que `captureWithDomain` está emitiendo a Sentry — sino el bug class queda completamente oculto al equipo y aparece solo cuando un usuario real reporta el síntoma.
+
+**Defense-in-depth recomendado**: cuando una query nueva emerja, agregar un script `scripts/<dominio>/_sanity-<query-name>.ts` (gitignored o committed según necesidad) que la ejecute contra el proxy local. Después del primer ejercicio exitoso, ese script es opcional pero útil como debugging aid futuro.
+
 ### Charts — política canónica (decisión 2026-04-26 — prioridad: impacto visual)
 
 **Stack visual de Greenhouse prioriza wow factor y enganche** sobre bundle/a11y. Los dashboards (MRR/ARR, Finance Intelligence, Pulse, ICO, Portfolio Health) son la cara del portal a stakeholders y clientes Globe.
