@@ -2442,3 +2442,57 @@ Endpoint `/api/finance/bank/[accountId]`:
 - **NUNCA** crear drawer/dashboard nuevo de finance sin declarar `temporalDefaults` en su `InstrumentDetailProfile`.
 - **NUNCA** hardcodear el `mode` en componente UI. Default viene del profile.
 - Nuevos modos (e.g. `quarter`, `ytd`) → agregar al enum + extender helper. NO branchear en consumers.
+
+## Delta 2026-05-08 — TASK-613: Finance Clients ↔ Organization Workspace convergence
+
+### Convergencia Finance + Organization Workspace
+
+`/finance/clients/[id]` ahora se renderiza **a través del Organization Workspace shell canónico** (TASK-612) cuando el flag `organization_workspace_shell_finance` está activo, preservando 1:1 la riqueza del legacy `<ClientDetailView>` (4 sub-tabs Facturación/Contactos/Facturas/Deals + 3 KPIs Por cobrar/Vencidas/Condiciones + AddMembershipDrawer). Cuando el flag está disabled o la organización canónica no es resoluble → cae al legacy `<ClientDetailView>` sin cambios funcionales (zero-risk cutover).
+
+### Patrón canónico: dual-entrypoint dispatch en un facet
+
+Un único componente `<FinanceFacet>` decide qué renderizar inspeccionando `entrypointContext`:
+
+```tsx
+const FinanceFacet = ({ organizationId, entrypointContext }: FacetContentProps) => {
+  if (entrypointContext === 'finance') {
+    return <FinanceClientsContent lookupId={organizationId} />
+  }
+
+  return <FinanceFacetAgencyContent organizationId={organizationId} />
+}
+```
+
+- `entrypointContext === 'finance'` → contenido rico legacy del Finance Clients detail.
+- `entrypointContext === 'agency' | 'admin' | 'client_portal'` → wrapping Agency-flavored del legacy `OrganizationFinanceTab`.
+
+El facet sigue siendo **self-contained**: queries propias, drawers propios. NO renderiza chrome — el shell ya lo hace. Es el patrón de referencia para cuando otro facet necesite divergir per-entrypoint sin fragmentar el FACET_REGISTRY.
+
+### Server-side gate canónico
+
+El page server component es responsable de:
+
+1. `requireServerSession` — prerender-safe, NUNCA `try/catch + getServerAuthSession()` ad hoc.
+2. `isWorkspaceShellEnabledForSubject(subject, 'finance')` — flag-gated rollout via `organization_workspace_shell_finance` (TASK-780 platform).
+3. `resolveFinanceClientContext({clientProfileId, organizationId, clientId, hubspotCompanyId})` — la URL `[id]` puede ser cualquiera de los 4 shapes; el resolver hace OR-matching internamente. Postgres-first + BigQuery fallback ya está en la primitiva canónica.
+4. `resolveOrganizationWorkspaceProjection({subject, organizationId, entrypointContext: 'finance'})` cuando el shell está enabled.
+5. Caer a legacy `<ClientDetailView />` si: flag disabled OR resolver throws OR `organizationId === null`. Errores capturados via `captureWithDomain('finance', ...)`.
+
+### Reliability signal canónico
+
+- **`finance.client_profile.unlinked_organizations`** (kind=`data_quality`, severity=`warning` si count>0). Cuenta `client_profiles` activas con `organization_id IS NULL`. Cuando >0, `/finance/clients/[id]` cae a legacy detail view (degradación honesta). Steady state = 0. Reader: `src/lib/reliability/queries/finance-client-profile-unlinked.ts`. Roll up bajo moduleKey `finance`.
+
+### Reglas duras (TASK-613)
+
+- **NUNCA** ramificar render de un facet por `entrypointContext` afuera del facet mismo. La decisión vive en el facet (self-contained), NO en el page o en el FacetContentRouter.
+- **NUNCA** componer la projection en el cliente ni branchear `entrypointContext` desde un client component. Server-side por construcción.
+- **NUNCA** llamar `resolveFinanceClientContext` con un solo shape cuando el caller tiene la URL `[id]` (cualquier callsite debe pasar los 4 shapes vía OR-matching).
+- **NUNCA** modificar la flag `organization_workspace_shell_finance` directamente vía SQL. Toda mutación pasa por el admin endpoint `POST /api/admin/home/rollout-flags` (TASK-780).
+- **NUNCA** crear un nuevo entrypoint Finance (e.g. `/finance/clients/admin/[id]`) que duplique el shell legacy. Extender la projection con un nuevo `entrypointContext` o el dispatch del FinanceFacet.
+
+### Roadmap operativo (rollout)
+
+1. V1 default OFF (flag global `enabled=FALSE` desde migration `20260508132302091`).
+2. Activar para pilot users (efeonce admins) via `POST /api/admin/home/rollout-flags` con `scope_type='user'`.
+3. Validar en staging E2E, luego flip global cuando reliability signals estén en steady state.
+4. Cleanup de `<ClientDetailView />` legacy queda como follow-up post 100% rollout (>= 90 días sin reverts).
