@@ -36,16 +36,12 @@ La causa raiz esta en `src/lib/services/upsert-service-from-hubspot.ts`: el UPSE
 
 La decision de producto revisada es que un Sample Sprint tambien es un `service`: no es un servicio regular contratado, pero si un servicio no-regular (`engagement_kind IN ('trial','pilot','poc','discovery')`). Por eso el Service Pipeline de HubSpot necesita una etapa previa a `Onboarding` que represente validacion/Sample Sprint, mientras Greenhouse conserva el lifecycle detallado de approval, progreso y outcome.
 
-Decision adicional del 2026-05-08: todo Sample Sprint debe nacer vinculado a un HubSpot Deal abierto seleccionado en el wizard. Ese Deal no puede estar ganado ni perdido. Al crear el Sample Sprint, Greenhouse debe crear/proyectar el registro correspondiente en HubSpot `p_services` en la etapa inicial `Validacion / Sample Sprint`, asociarlo al Deal seleccionado y heredar desde el Deal la empresa y los contactos asociados.
-
 ## Goal
 
 - Preservar la etapa real del Service Pipeline de HubSpot al materializar `greenhouse_core.services`.
 - Agregar una etapa `Validacion / Sample Sprint` antes de `Onboarding` en HubSpot Service Pipeline.
 - Mantener un unico mapper canonico `HubSpot p_services stage -> Greenhouse service lifecycle`.
 - Representar Sample Sprints como servicios no-regulares, no como entidad paralela ni como servicio regular.
-- Hacer obligatoria la seleccion de un Deal abierto en el wizard de Sample Sprint y usarlo como origen comercial de la proyeccion `p_services`.
-- Crear/proyectar el `p_services` de HubSpot al crear el Sample Sprint, asociandolo al Deal, a la company del Deal y a sus contactos asociados.
 - Definir la regla de conversion: Sample Sprint convertido -> servicio regular en `Onboarding` con lineage.
 - Evitar defaults silenciosos a `active` cuando HubSpot agregue o cambie etapas.
 - Re-sincronizar servicios existentes de forma idempotente y auditable.
@@ -75,8 +71,6 @@ Reglas obligatorias:
 - HubSpot `p_services` (`objectTypeId 0-162`) refleja service/engagement instances; Greenhouse conserva la semantica fina mediante `engagement_kind` y lifecycle interno.
 - No confundir Service Pipeline con Deal Pipeline. Deals gobiernan oportunidad comercial; `p_services` gobierna delivery/engagement contratado.
 - No confundir servicios regulares `engagement_kind='regular'` con Sample Sprints (`engagement_kind IN ('pilot','trial','poc','discovery')`). Ambos son `services`; cambian su tipo y reglas operativas.
-- Un Sample Sprint no debe crearse sin Deal comercial asociado. El Deal debe estar abierto: no `won`, no `lost`, no terminal cerrado. La validacion debe hacerse server-side usando stage IDs/configuracion sincronizada, no confiando en labels ni en el cliente.
-- El `p_services` creado para un Sample Sprint debe asociarse al Deal seleccionado y copiar sus asociaciones de company y contacto(s). No se permite crear un servicio huerfano si el Deal no tiene company/contacto suficientes para trazabilidad comercial.
 - La etapa HubSpot `Validacion / Sample Sprint` no reemplaza approvals/progress/outcome de Greenhouse; solo proyecta el estado macro del servicio no-regular hacia HubSpot.
 - No crear tabla paralela de services ni path de sync alternativo; corregir el helper canonico `upsertServiceFromHubSpot`.
 - No hacer updates manuales ad hoc sobre `greenhouse_core.services` salvo como parte de un backfill idempotente versionado/operable.
@@ -98,8 +92,6 @@ Reglas obligatorias:
 - `TASK-813` completada: inbound sync + legacy cleanup de HubSpot `p_services`.
 - `TASK-801` a `TASK-810` completadas: primitive Sample Sprints sobre `greenhouse_core.services.engagement_kind`.
 - `greenhouse_core.services` con columnas `pipeline_stage`, `status`, `active`, `hubspot_sync_status`, `hubspot_service_id`, `engagement_kind`.
-- `greenhouse_commercial.hubspot_deal_pipeline_config` o fuente equivalente para identificar stages abiertos sin hardcodear labels.
-- Mirror o reader HubSpot de Deals que exponga stage, company association y contact associations para el wizard.
 - HubSpot portal `48713323` con Service Pipeline actual en `0-162`.
 - `src/lib/services/upsert-service-from-hubspot.ts`
 - `src/lib/hubspot/list-services-for-company.ts`
@@ -108,9 +100,6 @@ Reglas obligatorias:
 - `src/lib/webhooks/handlers/hubspot-services.ts`
 - `src/lib/commercial/sample-sprints/lineage.ts`
 - `src/lib/commercial/sample-sprints/outcomes.ts`
-- `src/lib/commercial/sample-sprints/store.ts`
-- `src/app/api/agency/sample-sprints/route.ts`
-- `src/views/greenhouse/agency/sample-sprints/SampleSprintsExperienceView.tsx`
 
 ### Blocks / Impacts
 
@@ -133,10 +122,6 @@ Reglas obligatorias:
 - `src/lib/services/upsert-service-from-hubspot.test.ts` (nuevo o existente si se crea)
 - `src/lib/commercial/sample-sprints/conversion.ts`
 - `src/lib/commercial/sample-sprints/lineage.ts`
-- `src/lib/commercial/sample-sprints/store.ts`
-- `src/app/api/agency/sample-sprints/route.ts`
-- `src/views/greenhouse/agency/sample-sprints/SampleSprintsExperienceView.tsx`
-- HubSpot service creation/projection helper, nuevo o existente, con ownership acotado a `p_services` Sample Sprint projection.
 - `scripts/services/backfill-from-hubspot.ts`
 - `src/lib/hubspot/list-services-for-company.ts`
 - `src/lib/sync/projections/hubspot-services-intake.ts`
@@ -176,7 +161,6 @@ Reglas obligatorias:
 - HubSpot tiene 17 services en `0-162`; Greenhouse solo tiene 6 `regular` materializados y todos aparecen `active`.
 - Servicios cerrados o en renovacion pueden contaminar P&L/ICO/attribution por leerse como activos.
 - Si se agrega `Validacion / Sample Sprint`, el schema/runtime debe decidir si `pipeline_stage='validation'` se incorpora al CHECK historico o si se reutiliza otra etapa canonica con metadata. Recomendacion: agregar `validation` como valor canonico explicito.
-- El wizard actual de Sample Sprints no declara el Deal abierto como input obligatorio ni garantiza, desde el server, que el Sample Sprint quede asociado a un `p_services` HubSpot con Deal, company y contactos heredados.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -241,14 +225,11 @@ Reglas obligatorias:
 
 - Definir el flujo canonico:
   - Sample Sprint nace en Greenhouse como `service` no-regular.
-  - El wizard obliga a seleccionar un HubSpot Deal abierto, excluyendo Deals ganados/perdidos o cerrados.
-  - El server revalida el Deal seleccionado antes de crear el Sample Sprint.
-  - Se asocia a un HubSpot Deal en etapa abierta, idealmente `Sample Sprint / Validacion` cuando el pipeline comercial ya lo represente.
-  - Se crea/proyecta como HubSpot `p_services` en stage `Validacion / Sample Sprint`.
-  - El `p_services` se asocia al Deal seleccionado, a la company asociada al Deal y al contacto o contactos asociados al Deal.
+  - Se asocia a un HubSpot Deal en etapa `Sample Sprint / Validacion`.
+  - Se proyecta o refleja como HubSpot `p_services` en stage `Validacion / Sample Sprint` cuando el producto lo habilite.
   - Si convierte, se crea o vincula un child service `regular` en `Onboarding` y se registra lineage.
   - Si no convierte, el Sample Sprint y su proyeccion `p_services` pasan a `Closed` o terminal equivalente.
-- Implementar el comando de creacion/proyeccion `p_services` para Sample Sprints de forma idempotente. Si HubSpot falla despues de crear el service local, debe quedar un estado `pending`/retryable visible y auditado, no un exito silencioso parcial.
+- Confirmar si esta task implementa solo el mapping/proyeccion o tambien el comando de creacion/actualizacion `p_services` para Sample Sprints. El flujo deal-bound de wizard + creacion outbound queda en `TASK-837`.
 - Asegurar que la etapa HubSpot no sustituye approvals/progress/outcomes internos de Greenhouse.
 
 ### Slice 6 — Backfill / Re-sync Idempotente
@@ -288,6 +269,7 @@ Reglas obligatorias:
 - No resolver asociaciones faltantes de company para los 17 services salvo reporting/dry-run.
 - No tocar Deal Pipeline ni la etapa `Sample Sprint / Validacion`.
 - No reemplazar el lifecycle interno de Sample Sprints con la etapa HubSpot `Validacion / Sample Sprint`.
+- No implementar el wizard deal-bound ni el comando outbound completo de creacion `p_services`; ese alcance vive en `TASK-837`.
 - No rediseñar UI de servicios contratados; esta task es sync/runtime/data contract.
 - No activar write-back Greenhouse -> HubSpot `p_services` para todos los campos; si se requiere proyeccion de Sample Sprints, debe quedar acotada a los campos aprobados y auditada.
 
@@ -341,7 +323,7 @@ Decision de producto:
 
 - Sample Sprint es `greenhouse_core.services`, no entidad paralela.
 - Sample Sprint no es `regular`: usa `engagement_kind IN ('trial','pilot','poc','discovery')`.
-- HubSpot Deal asociado refleja la oportunidad comercial y debe estar abierto. No se aceptan Deals `won`, `lost` o terminales cerrados.
+- HubSpot Deal asociado refleja la oportunidad comercial y puede estar en Deal Stage `Sample Sprint / Validacion`.
 - HubSpot `p_services` refleja el servicio/engagement macro y, para Sample Sprints, usa Service Stage `Validacion / Sample Sprint`.
 - Greenhouse sigue siendo la autoridad del detalle operativo: approval, capacity warning, progress snapshots, outcome, audit y lineage.
 
@@ -360,41 +342,6 @@ HubSpot p_services: Validacion / Sample Sprint
         |
         +-- outcome cancelled/dropped --> p_services Closed
 ```
-
-### Deal-bound creation contract
-
-El flujo de declaracion del Sample Sprint debe ser deal-bound end-to-end:
-
-1. El wizard carga Deals elegibles desde una fuente server-side. Elegible significa Deal abierto: `is_closed=FALSE` o equivalente en la configuracion sincronizada de HubSpot Deal Pipeline. No filtrar por labels visibles.
-2. El usuario selecciona un Deal. La UI puede mostrar company, contactos, monto y stage para contexto, pero no decide elegibilidad final.
-3. El API de creacion revalida el Deal contra HubSpot/local registry antes de mutar:
-   - stage no ganado;
-   - stage no perdido;
-   - Deal no cerrado;
-   - company asociada presente;
-   - al menos un contacto asociado presente.
-4. El comando crea el Sample Sprint como `greenhouse_core.services` no-regular y registra el `hubspot_deal_id`/lineage comercial que corresponda.
-5. El comando crea o proyecta un registro HubSpot `p_services` (`0-162`) en stage `Validacion / Sample Sprint`.
-6. El `p_services` queda asociado en HubSpot al Deal seleccionado, a la company asociada al Deal y al contacto o contactos asociados al Deal.
-7. Greenhouse persiste el `hubspot_service_id` resultante y un estado de sync auditable.
-
-La creacion debe ser idempotente. Reintentar el mismo comando no debe duplicar `p_services`; debe reconciliar por idempotency key/lineage (`service_id`, `sample_sprint_id` o metadata equivalente). Como HubSpot y Postgres no comparten transaccion, el flujo debe usar una estrategia de saga/outbox o compensacion explicita:
-
-- si Greenhouse crea el service local pero HubSpot falla, el service queda `hubspot_sync_status='pending'` o equivalente retryable, con audit trail y signal de reliability;
-- si HubSpot crea `p_services` pero falla una asociacion, el retry debe completar asociaciones faltantes sin duplicar el objeto;
-- si el Deal deja de estar abierto entre la carga del wizard y el submit, el server rechaza la creacion con error recuperable.
-
-### HubSpot associations required
-
-Para cada Sample Sprint proyectado a `p_services`, el read-back de HubSpot debe poder probar:
-
-| Association | Fuente | Requisito |
-| --- | --- | --- |
-| `p_services` -> Deal | Deal seleccionado en wizard | Obligatoria |
-| `p_services` -> Company | Company asociada al Deal | Obligatoria |
-| `p_services` -> Contact(s) | Contactos asociados al Deal | Obligatoria, uno o mas |
-
-Si HubSpot permite multiples companies en el Deal, Discovery debe definir una politica deterministica antes de implementar: usar association label primaria si existe; si no hay primaria, bloquear y pedir resolucion operativa en vez de elegir una company al azar.
 
 ### Schema note for `validation`
 
@@ -455,12 +402,6 @@ ORDER BY 1,2,3,4;
 - [ ] Servicios `Closed` en HubSpot no quedan `active=TRUE` en Greenhouse.
 - [ ] Servicios `En renovacion` quedan distinguibles de `active` generico mediante `pipeline_stage='renewal_pending'`.
 - [ ] La conversion de Sample Sprint hacia servicio regular queda definida como lineage + child service regular en `Onboarding`.
-- [ ] El wizard de Sample Sprint exige seleccionar un HubSpot Deal abierto y no muestra/acepta Deals ganados, perdidos o cerrados.
-- [ ] El API de creacion revalida server-side que el Deal seleccionado sigue abierto y tiene company + contacto(s) asociados.
-- [ ] Al crear un Sample Sprint se crea/proyecta un HubSpot `p_services` en stage `Validacion / Sample Sprint` con `ef_engagement_kind` no-regular.
-- [ ] El `p_services` queda asociado al Deal seleccionado, a la company heredada desde el Deal y al contacto o contactos heredados desde el Deal.
-- [ ] La creacion/proyeccion es idempotente y no duplica `p_services` ante retry.
-- [ ] Fallas parciales HubSpot quedan en estado retryable/auditable, no como exito silencioso.
 - [ ] Unknown stage no se degrada silenciosamente a `active`.
 - [ ] Backfill/re-sync aplicado de forma idempotente y verificado contra HubSpot `0-162`.
 - [ ] Docs explican el contrato Deal Pipeline vs Service Pipeline vs Sample Sprint.
@@ -471,13 +412,11 @@ ORDER BY 1,2,3,4;
 - `pnpm test src/lib/sync/projections/hubspot-services-intake.test.ts`
 - `pnpm test src/lib/webhooks/handlers/hubspot-services.test.ts`
 - tests focales de Sample Sprints si se toca conversion/lineage: `pnpm test src/lib/commercial/sample-sprints`
-- tests focales de wizard/API Sample Sprints para Deal abierto, Deal cerrado, company faltante, contactos faltantes e idempotency/retry.
 - `pnpm exec tsc --noEmit --pretty false`
 - `pnpm lint`
 - `pnpm pg:doctor`
 - HubSpot API read-back de Service Pipeline `0-162` para confirmar etapa `Validacion / Sample Sprint`
 - HubSpot API read-back de property `ef_engagement_kind` en `0-162` para confirmar label visible, internal name y options
-- HubSpot API read-back de un Sample Sprint creado en sandbox/preview para confirmar asociaciones `p_services` -> Deal, Company y Contact(s).
 - `pnpm tsx --require ./scripts/lib/server-only-shim.cjs scripts/services/backfill-from-hubspot.ts`
 - `pnpm tsx --require ./scripts/lib/server-only-shim.cjs scripts/services/backfill-from-hubspot.ts --apply --create-missing-spaces` solo tras dry-run aprobado por el agente ejecutor y con evidencia previa.
 - SQL smoke contra `greenhouse_core.services` para distribucion de `pipeline_stage/status/active`.
@@ -502,9 +441,10 @@ Cerrar una task es obligatorio y forma parte de Definition of Done. Si la implem
 - Registry DB `greenhouse_core.hubspot_service_pipeline_stage_config` si se quiere V2 admin-gobernable similar a `hubspot_deal_pipeline_config`.
 - Signal dedicado `commercial.service_engagement.lifecycle_stage_drift` si Slice 4 no puede cerrarlo en V1.
 - UI manual queue para services no materializables si la deuda de asociaciones HubSpot se mantiene.
+- `TASK-837` implementa el flujo deal-bound de wizard + creacion/proyeccion outbound `p_services` para Sample Sprints.
 
 ## Open Questions
 
 - ¿`Pausado` debe ser `active=FALSE` para excluir de P&L/ICO operativo o `active=TRUE` con `pipeline_stage='paused'` para mantener obligaciones operativas visibles? Recomendacion inicial: `active=FALSE`, pero Discovery debe confirmar consumidores.
 - ¿Unknown stage debe usar `hubspot_sync_status='unmapped'` o agregar un estado nuevo `failed_stage_mapping`? Requiere revisar CHECK/consumers reales antes de implementar.
-- ¿Si un Deal tiene multiples companies asociadas, HubSpot expone una primary association confiable para seleccionar la company heredada? Si no, el wizard/API debe bloquear hasta resolucion operativa.
+- ¿La proyeccion de Sample Sprints hacia HubSpot `p_services` se activa en esta task o queda como follow-up despues de crear la etapa y el mapper? Recomendacion: dejar el flujo outbound completo para `TASK-837`.
