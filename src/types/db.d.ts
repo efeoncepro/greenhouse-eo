@@ -1938,6 +1938,28 @@ export interface GreenhouseCoreCampaigns {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseCoreCapabilitiesRegistry {
+  /**
+   * Array de acciones canónicas permitidas para esta capability (read, create, update, delete, approve, etc). Tomado del catalog TS.
+   */
+  allowed_actions: string[];
+  /**
+   * Scopes válidos para esta capability (own, team, space, organization, tenant, all). El defaultScope del catalog TS se incluye aquí + los scopes adicionales que el catalog permite.
+   */
+  allowed_scopes: string[];
+  /**
+   * snake_case key tal como aparece en EntitlementCapabilityKey TS. PK estable.
+   */
+  capability_key: string;
+  /**
+   * Cuando se setea, la capability deja de exportarse al catálogo TS pero queda registrada para auditoría histórica de grants/overrides previos. Parity test ignora rows con deprecated_at IS NOT NULL.
+   */
+  deprecated_at: Timestamp | null;
+  description: string;
+  introduced_at: Generated<Timestamp>;
+  module: string;
+}
+
 export interface GreenhouseCoreClientFeatureFlags {
   client_id: string;
   created_at: Generated<Timestamp>;
@@ -8691,6 +8713,7 @@ export interface DB {
   "greenhouse_core.business_line_metadata": GreenhouseCoreBusinessLineMetadata;
   "greenhouse_core.campaign_project_links": GreenhouseCoreCampaignProjectLinks;
   "greenhouse_core.campaigns": GreenhouseCoreCampaigns;
+  "greenhouse_core.capabilities_registry": GreenhouseCoreCapabilitiesRegistry;
   "greenhouse_core.client_feature_flags": GreenhouseCoreClientFeatureFlags;
   "greenhouse_core.client_service_modules": GreenhouseCoreClientServiceModules;
   "greenhouse_core.client_team_assignments": GreenhouseCoreClientTeamAssignments;
