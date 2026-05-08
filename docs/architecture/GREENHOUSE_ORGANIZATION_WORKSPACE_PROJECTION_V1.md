@@ -732,6 +732,54 @@ Si el nuevo entrypoint requiere que un facet cambie su contenido (e.g. el facet 
 3. **V2**: flip global cuando reliability signals estén en steady state ≥ 30 días.
 4. **V3**: cleanup del legacy view (si existe) post 90 días sin reverts.
 
+## Delta 2026-05-08 — TASK-612 + TASK-613 V1.1 fases activas (ambos entrypoints + E2E perm coverage)
+
+### Estado actual del rollout (ambos entrypoints simultáneos)
+
+`organization_workspace_shell_agency` y `organization_workspace_shell_finance` están en **fase V1.1 (pilot + agente sintético E2E)** desde 2026-05-08.
+
+| Flag | Scope | Enabled | Activado | Razón |
+|---|---|---|---|---|
+| `organization_workspace_shell_agency` | global | `false` | 2026-05-08 13:23 UTC | V1 default. |
+| `organization_workspace_shell_agency` | `user:user-efeonce-admin-julio-reyes` | `true` | 2026-05-08 22:45 UTC | V1.1 pilot — Julio valida shell desde Agency entrypoint. |
+| `organization_workspace_shell_agency` | `user:user-agent-e2e-001` | `true` | 2026-05-08 22:45 UTC | V1.1 agente E2E — Playwright permanent coverage. |
+| `organization_workspace_shell_finance` | global | `false` | 2026-05-08 13:23 UTC | V1 default. |
+| `organization_workspace_shell_finance` | `user:user-efeonce-admin-julio-reyes` | `true` | 2026-05-08 21:30 UTC | V1.1 pilot — Julio valida shell desde Finance entrypoint. |
+| `organization_workspace_shell_finance` | `user:user-agent-e2e-001` | `true` | 2026-05-08 22:15 UTC | V1.1 agente E2E — Playwright permanent coverage. |
+
+### Por qué ambas activaciones (pilot + agente sintético) — 4-pillar score
+
+**Decisión canónica**: cada V1.1 phase activa tanto un user real (validación humana) como el agente sintético (E2E coverage). Las dos cubren dimensiones complementarias:
+
+| Pillar | Pilot user (Julio) | Agente sintético (E2E) |
+|---|---|---|
+| **Safety** | Detecta regresiones visuales/UX que tests automated no captan. | Detecta regresiones funcionales en CI antes del merge. |
+| **Robustness** | Un human validator cubre "se ve raro" / "esto no era así". | Tests deterministic cubren ausencia de banner degraded + tabs por facets + KPIs canónicos. |
+| **Resilience** | Rollback es 1 SQL UPDATE (< 30s, cache TTL 30s propaga). | Mismo rollback. Si Playwright detecta regresión, CI rojo bloquea merge. |
+| **Scalability** | Agregar más pilots = N filas user-scope (cero código). | Agregar más assertions = extender el spec (mismo patrón). |
+
+**Reglas operativas activas**:
+
+- **NO promover V1.1 → V2 sin que ambas dimensiones estén verdes ≥7 días**: pilot user sin reportes de regresión + Playwright smoke verde consecutivo.
+- **NO desactivar el agente E2E al promover V2**: queda como anti-regresión permanente. El agente NO bloquea el rollout staged — coexiste con cualquier scope global futuro.
+- **SIEMPRE** que un nuevo entrypoint emerja (Marketing, Legal, etc.), seguir el mismo patrón: pilot user + agente sintético en V1.1, ambos via canonical `POST /api/admin/home/rollout-flags`.
+
+### Anti-regresión permanente — Playwright suite
+
+Tests canónicos creados en TASK-612/613 V1.1:
+
+- [`tests/e2e/smoke/finance-clients-v2-shell-validation.spec.ts`](tests/e2e/smoke/finance-clients-v2-shell-validation.spec.ts) — 2 tests: V2 shell rendering + anti-legacy.
+- [`tests/e2e/smoke/agency-organizations-v2-shell-validation.spec.ts`](tests/e2e/smoke/agency-organizations-v2-shell-validation.spec.ts) — 2 tests: V2 shell rendering + anti-legacy 4-tab.
+
+Los 2 tests verifican:
+
+1. **NO degraded banner** — anti-regresión ISSUE-071 (resolver SQL type alignment).
+2. **9 facets tabs visible** — anti-regresión legacy: el legacy `<OrganizationView>` tiene 4 tabs (Operaciones/Finanzas/Equipo/Configuración), el shell V2 tiene 9 (Identidad/Spaces/Equipo/Economía/Entrega/Finanzas/CRM/Servicios/Staff Aug).
+3. **KPIs canónicos** — Revenue + Margen bruto distinguen V2 de cualquier vista alternativa.
+4. **Default facet correcto per entrypointContext**: 'finance' → Finanzas tab, 'agency' → Identidad tab.
+
+Total: 4 tests anti-regresión que corren en cada CI run. Si el shell V2 vuelve a romperse para CUALQUIER user, smoke falla y el merge se bloquea.
+
 ## Delta 2026-05-08 — TASK-613 V1.1 fase activa (Finance entrypoint pilot)
 
 ### Estado actual del rollout
