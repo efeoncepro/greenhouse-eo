@@ -858,12 +858,61 @@ Contrato versionado `platform-health.v1`. Permite a agentes (MCP, Teams bot, CI,
   - Si necesitas que una migración corra antes que otra pendiente, la solución es reordenar el contenido dentro de un solo archivo, no manipular timestamps.
 - Flujo obligatorio al modificar schema:
   1. `pnpm migrate:create <nombre>` — crea archivo SQL con timestamp UTC correcto
-  2. Editar el archivo con el DDL necesario
+  2. Editar el archivo con el DDL necesario **bajo `-- Up Migration`** (ver Markers abajo)
   3. `pnpm migrate:up` — aplica contra la base de datos (auto-regenera tipos Kysely)
   4. Commit migración + `db.d.ts` actualizado **juntos** en el mismo commit
   5. `pnpm build` para verificar que los tipos son consistentes
 - Conexión local: requiere Cloud SQL Auth Proxy corriendo en `127.0.0.1:15432`. El script tiene guardia fail-fast que aborta si detecta IP pública como host — no esperar timeout, leer el mensaje de error.
 - Spec completa: `docs/architecture/GREENHOUSE_DATABASE_TOOLING_V1.md`
+
+### Database Migration Markers — anti pre-up-marker bug
+
+Patrón canonico que TODA migration debe seguir. La estructura del archivo `.sql` parseada por `node-pg-migrate` es:
+
+```sql
+-- Up Migration
+
+-- 1. DDL: CREATE TABLE / ALTER TABLE / CREATE INDEX / CREATE FUNCTION / INSERT seed.
+CREATE TABLE IF NOT EXISTS schema.table (...);
+
+-- 2. Bloque DO con RAISE EXCEPTION (anti pre-up-marker bug).
+--    Verifica que el DDL realmente quedó aplicado en information_schema.
+DO $$
+DECLARE expected_exists boolean;
+BEGIN
+  SELECT EXISTS (
+    SELECT 1 FROM information_schema.tables
+    WHERE table_schema = 'schema' AND table_name = 'table'
+  ) INTO expected_exists;
+  IF NOT expected_exists THEN
+    RAISE EXCEPTION 'TASK-XXX: schema.table was NOT created. Markers may be inverted.';
+  END IF;
+END
+$$;
+
+-- 3. GRANTs (read/write a runtime, ownership a ops).
+GRANT SELECT, INSERT, UPDATE, DELETE ON schema.table TO greenhouse_runtime;
+
+-- Down Migration
+
+-- SOLO undo (DROP / ALTER ... DROP). NUNCA CREATE TABLE aquí.
+DROP TABLE IF EXISTS schema.table;
+```
+
+**Por qué importa**: si el DDL termina bajo `-- Down Migration` por error, `node-pg-migrate` parsea la sección Up vacía, registra la migration como aplicada en `pgmigrations` y **NO ejecuta el SQL**. Silent failure. Detectado en TASK-768 Slice 1 y repetido por TASK-404 (3 governance tables nunca creadas → ISSUE-068).
+
+**Reglas duras**:
+
+- **NUNCA** pongas `CREATE TABLE`, `ALTER TABLE ADD COLUMN`, `CREATE INDEX`, `CREATE FUNCTION` o `INSERT` debajo de `-- Down Migration`. Ese marker es **solo para undo** (DROP / ALTER ... DROP). Si te encuentras escribiendo CREATE en Down, tienes los markers invertidos — para y mueve a Up.
+- **NUNCA** edites una migration ya aplicada (registrada en `pgmigrations`). Si tiene bug, **forward fix con migration nueva idempotente** (`IF NOT EXISTS` + bloque DO de verificación). Editar la legacy rompe environments fresh.
+- **NUNCA** asumas que `pnpm migrate:up` aplicó porque devolvió "Migrations complete!" — verifica con `psql` / `pnpm pg:connect:shell` / `pnpm pg:connect:status`, o agrega el bloque DO con RAISE EXCEPTION dentro de la propia migration.
+- **SIEMPRE** que la migration cree tablas críticas para runtime, escribe el bloque DO de verificación post-DDL en la misma migration. Patrón fuente: `migrations/20260508104217939_task-611-capabilities-registry.sql`.
+- **SIEMPRE** que la down sea destructiva (DROP TABLE, DROP CONSTRAINT), declara explícitamente con `IF EXISTS` para que sea idempotente.
+- **SIEMPRE** que un agente "vea raro" el output de `pnpm migrate:up` (sin errors pero la tabla no aparece en queries), correr `psql -c "SELECT * FROM information_schema.tables WHERE table_schema = 'schema_X';"` antes de continuar.
+
+**Defense in depth (en construcción — Fase 2 de ISSUE-068)**: `scripts/ci/migration-marker-gate.mjs` detectará migrations con sección Up vacía + sección Down con DDL keywords. Modo blocking en PRs. Hasta que aplique, la regla es enforcement humano + code review.
+
+**Si descubres que una migration aplicada anteriormente tenía este bug** (sección Up vacía, DDL bajo Down): NO la edites. Crea una migration nueva forward-fix con el SQL correcto, idempotente, y abre un ISSUE-### documentando el hallazgo (ejemplo: ISSUE-068).
 
 ### Charts — política canónica (decisión 2026-04-26 — prioridad: impacto visual)
 
