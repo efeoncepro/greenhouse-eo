@@ -731,3 +731,61 @@ Si el nuevo entrypoint requiere que un facet cambie su contenido (e.g. el facet 
 2. **V1.1**: ramp-up por `roleCodes` o `tenant_type`.
 3. **V2**: flip global cuando reliability signals estén en steady state ≥ 30 días.
 4. **V3**: cleanup del legacy view (si existe) post 90 días sin reverts.
+
+## Delta 2026-05-08 — TASK-613 V1.1 fase activa (Finance entrypoint pilot)
+
+### Estado actual del rollout
+
+`organization_workspace_shell_finance` está en **fase V1.1 (pilot)** desde 2026-05-08 21:30 UTC.
+
+| Scope | Enabled | Activado | Razón |
+|---|---|---|---|
+| `global` | `false` | 2026-05-08 13:23 UTC | V1 default: staged rollout zero-risk cutover. |
+| `user:user-efeonce-admin-julio-reyes` | `true` | 2026-05-08 21:30 UTC | V1.1 pilot — validar shell con 1 user antes de promover a role/global. |
+
+Activación canónica via `POST /api/admin/home/rollout-flags` (TASK-780 platform). NO se activó vía SQL directo. La trazabilidad queda en `home_rollout_flags.reason` + audit log.
+
+### Acceptance gates V1.1 → V2 (objetivos, no opinables)
+
+Para promover a V2 (`scope_type='role', scope_id='efeonce_admin'`), TODAS las señales deben estar verdes durante **≥ 7 días consecutivos**:
+
+| Gate | Signal / fuente | Steady state |
+|---|---|---|
+| 1 | `finance.client_profile.unlinked_organizations` | severity=ok, count=0 |
+| 2 | `identity.workspace_projection.facet_view_drift` | severity=ok, count=0 |
+| 3 | `identity.workspace_projection.unresolved_relations` | severity=ok, count=0 |
+| 4 | `home.rollout.drift` | severity=ok |
+| 5 | Sentry `domain=finance` con tag `source: 'finance_clients_detail_page'` | sin nuevos incidents |
+| 6 | Playwright smoke (`finance-account-balances-fx-drift.spec.ts` y vecinos) | verde ≥ 48h |
+| 7 | Pilot user feedback (Julio) | sin reportes de regresión funcional vs legacy `<ClientDetailView>` |
+
+Si CUALQUIER gate falla → no se promueve. Se investiga la causa, se documenta en ISSUE, se fixea, se reinicia el contador de steady state.
+
+### Acceptance gates V2 → V3 (global flip)
+
+Mismas 7 gates verdes durante **≥ 30 días consecutivos** desde V2 activado. Esto garantiza que el role-scope (que cubre todos los `efeonce_admin`s, no solo el pilot) no expone bugs nuevos.
+
+### Acceptance gates V3 → V4 (cleanup legacy `<ClientDetailView>`)
+
+Mismas 7 gates verdes durante **≥ 90 días desde V3** sin reverts ni rollbacks. V4 elimina el componente legacy + el fallback path en `page.tsx`. La eliminación es irreversible — por eso el período mínimo es 3x V2→V3.
+
+### Procedimiento de rollback (resilient < 30s)
+
+Si emerge cualquier bug en cualquier fase, **1 UPDATE SQL revierte la fase**. El cache del resolver es TTL 30s in-memory → propaga automáticamente.
+
+```sql
+UPDATE greenhouse_serving.home_rollout_flags
+SET enabled = FALSE, updated_at = NOW(),
+    reason = 'Rollback V1.1 pilot: <descripción del issue>'
+WHERE flag_key = 'organization_workspace_shell_finance'
+  AND scope_type = 'user' AND scope_id = 'user-efeonce-admin-julio-reyes';
+```
+
+NO requiere deploy, NO requiere rebuild, NO requiere coordinación. Patrón canónico per TASK-780.
+
+### Reglas operativas durante el rollout
+
+- **NUNCA** modificar la flag directamente vía SQL en producción para activar (siempre usar el endpoint canónico). El endpoint persiste audit + emite outbox event que invalida el cache distribuido. SQL directo bypasea el audit.
+- **SIEMPRE** declarar `reason` con prefix `TASK-613 V<fase> — <propósito>` para trazabilidad cross-phase.
+- **NUNCA** promover a la siguiente fase si Playwright smoke está rojo, aunque la causa "no parezca relacionada" (caso real: ISSUE-069 estuvo rojo 14h por bug de cron, no por TASK-613, pero promover sin verde escondería regresiones reales).
+- **SIEMPRE** que un agente o operador ejecute una fase, registrar en `Handoff.md` la transición + fecha + scope + reason.

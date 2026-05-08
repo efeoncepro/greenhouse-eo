@@ -53,7 +53,7 @@ describe('getFinanceClientProfileUnlinkedSignal — TASK-613', () => {
     expect(signal.evidence.find(e => e.label === 'count')?.value).toBe('3')
   })
 
-  it('SQL filtra active = TRUE y organization_id IS NULL (anti-regresión)', async () => {
+  it('SQL filtra organization_id IS NULL y NO usa columna inexistente "active" (anti-regresión)', async () => {
     queryMock.mockResolvedValueOnce([{ n: 0 }])
 
     await getFinanceClientProfileUnlinkedSignal()
@@ -62,7 +62,10 @@ describe('getFinanceClientProfileUnlinkedSignal — TASK-613', () => {
 
     expect(sql).toContain('greenhouse_finance.client_profiles')
     expect(sql).toContain('organization_id IS NULL')
-    expect(sql).toContain('active = TRUE')
+    // client_profiles no tiene columna `active` — el reader original (TASK-613
+    // Slice 3 V1) hacía `WHERE active = TRUE` y throw-eaba en runtime con
+    // severity=unknown silencioso. Anti-regresión.
+    expect(sql).not.toMatch(/\bactive\s*=\s*TRUE/i)
   })
 
   it('returns unknown severity when the query throws (degraded honestamente)', async () => {

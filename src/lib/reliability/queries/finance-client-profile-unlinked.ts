@@ -32,11 +32,14 @@ import type { ReliabilitySignal } from '@/types/reliability'
 export const FINANCE_CLIENT_PROFILE_UNLINKED_SIGNAL_ID =
   'finance.client_profile.unlinked_organizations'
 
+// `client_profiles` no tiene columna `active` — la tabla es append-only y
+// el linkeo canónico al modelo 360 es la única dimensión relevante para este
+// signal. Si emerge necesidad de filtrar por estado de cliente, el JOIN
+// canónico es contra `greenhouse_core.clients` (no contra `client_profiles`).
 const QUERY_SQL = `
   SELECT COUNT(*)::int AS n
   FROM greenhouse_finance.client_profiles
   WHERE organization_id IS NULL
-    AND active = TRUE
 `
 
 export const getFinanceClientProfileUnlinkedSignal = async (): Promise<ReliabilitySignal> => {

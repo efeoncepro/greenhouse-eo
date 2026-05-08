@@ -1,3 +1,11 @@
+# Sesion 2026-05-08 (tarde) — TASK-613 V1.1 pilot rollout activado + ISSUE-069 resuelto
+
+- **TASK-613 fase V1.1 activa** desde 2026-05-08 21:30 UTC. Flag `organization_workspace_shell_finance` activado solo para `user-efeonce-admin-julio-reyes` (scope=user) via `POST /api/admin/home/rollout-flags` canónico. Global sigue `enabled=false`.
+- **Acceptance gates V1.1 → V2** documentados en `GREENHOUSE_ORGANIZATION_WORKSPACE_PROJECTION_V1.md` Delta 2026-05-08: 7 señales objetivas (`finance.client_profile.unlinked_organizations`, 2 workspace projection signals, `home.rollout.drift`, Sentry `domain=finance`, Playwright smoke 48h, pilot user feedback). Período mínimo: ≥7 días verdes consecutivos.
+- **Bug-fix follow-up** — al verificar gates post-activación detecté que `finance.client_profile.unlinked_organizations` reportaba `severity=unknown`: el reader de TASK-613 Slice 3 hacía `WHERE active = TRUE` pero `client_profiles` no tiene esa columna. Throw silencioso. Fixeado: query simplificado a `WHERE organization_id IS NULL` + test anti-regresión que usa `not.toMatch(/active = TRUE/)`. 5/5 tests verdes.
+- **ISSUE-069 cerrado** en la misma sesión (cron rematerialize-balances seed-day blind spot). Fix raíz: helper canónico `computeRematerializeSeedDate(today, lookbackDays)` resta `lookbackDays + 1` para que los últimos `lookbackDays` días COMPLETOS se materialicen. 7 tests anti-regresión + santander-clp 2026-05-01 rematerializado (69 días, closing $1.212.492). Reliability signal `finance.account_balances.fx_drift` vuelve a steady state (count=0). Playwright smoke verde. Regla canónica documentada en CLAUDE.md + AGENTS.md.
+- **Procedimiento de rollback documentado**: 1 UPDATE SQL revierte la fase, cache TTL 30s propaga automáticamente, sin deploy ni rebuild.
+
 # Sesion 2026-05-08 (madrugada) — TASK-613 cerrada (Finance Clients Detail → Organization Workspace convergence)
 
 - **Trigger:** ejecutar TASK-613 (P1 / EPIC-008 child) — `/finance/clients/[id]` adopta el Organization Workspace shell (TASK-612) preservando 1:1 las 4 sub-tabs (Facturación/Contactos/Facturas/Deals) + 3 KPIs (Por cobrar/Vencidas/Condiciones). Trabajado **directo en `develop`** por instrucción explícita del usuario.
