@@ -426,6 +426,81 @@ export const resolveFinanceClientContext = async ({
   }
 }
 
+/**
+ * ISSUE-070 fix — lookup helper canónico, prefix-aware, no-throw, para
+ * surfaces que reciben un `[id]` de URL sin saber qué shape canónico es
+ * (clientProfileId / organizationId / clientId / hubspotCompanyId).
+ *
+ * **Por qué existe**: `resolveFinanceClientContext` valida estrictamente cada
+ * shape pasada — si pasás 4 shapes con el mismo valor, falla validación
+ * porque `hubspotCompanyId="hubspot-company-X"` no matchea `hubspot_company_id`
+ * crudo (sin prefix). El page.tsx de TASK-613 hacía exactamente eso →
+ * `FinanceValidationError` → catch → legacy fallback silencioso.
+ *
+ * **Por qué prefix-aware**: las URLs convencionalmente usan prefijos:
+ * - `org-...` → organizationId
+ * - `hubspot-company-...` → clientProfileId (también equivale a clientId)
+ * - `client-profile-...` → clientProfileId
+ * - default (sin prefix) → intentar como clientProfileId primero
+ *
+ * **Por qué no-throw**: este helper se invoca desde paths de READ-only
+ * (server pages que renderean detalles). NO debe propagar
+ * `FinanceValidationError` — debe degradar honestamente a `null` para que el
+ * caller decida (legacy fallback, 404, etc).
+ *
+ * **Pattern reference**: same shape as `resolveFinanceMemberContext` (read
+ * lookup helpers in canonical store) — single source of truth, reusable
+ * across all read paths.
+ *
+ * @returns ResolvedFinanceClientContext si el lookupId resuelve a una org
+ *          canónica; null si no matchea ningún shape o si la organización
+ *          canónica no existe (cliente legacy sin TASK-535 backfill).
+ */
+export const findFinanceClientContextByLookupId = async (
+  lookupId: string
+): Promise<ResolvedFinanceClientContext | null> => {
+  const trimmed = normalizeString(lookupId)
+
+  if (!trimmed) return null
+
+  // Build shape attempts by prefix. Each attempt is one shape — el resolver
+  // valida solo ese shape, no los otros 3.
+  const attempts: Array<Parameters<typeof resolveFinanceClientContext>[0]> = []
+
+  if (trimmed.startsWith('org-')) {
+    attempts.push({ organizationId: trimmed })
+  } else if (trimmed.startsWith('hubspot-company-') || trimmed.startsWith('client-profile-')) {
+    attempts.push({ clientProfileId: trimmed })
+  } else {
+    // Sin prefix conocido: intentar shapes en orden de preferencia. La
+    // prioridad refleja qué shapes son más probables de ser URLs:
+    // clientProfileId > organizationId > clientId.
+    attempts.push({ clientProfileId: trimmed })
+    attempts.push({ organizationId: trimmed })
+    attempts.push({ clientId: trimmed })
+  }
+
+  for (const shape of attempts) {
+    try {
+      const result = await resolveFinanceClientContext(shape)
+
+      if (result.organizationId) return result
+    } catch (error) {
+      if (error instanceof FinanceValidationError) {
+        // Validation throw = ese shape específico no existe en DB. Probar
+        // siguiente. NO propagar — el caller usa null para decidir fallback.
+        continue
+      }
+
+      // Errores no-validación (e.g. PG caído) sí deben propagarse — el
+      // caller los captura con captureWithDomain y degrada a legacy.
+      throw error
+    }
+  }
+
+  return null
+}
+
 export const resolveFinanceDownstreamScope = async ({
   organizationId,
   clientId,

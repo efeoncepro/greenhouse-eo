@@ -30,7 +30,11 @@ vi.mock('@/lib/postgres/client', () => ({
   runGreenhousePostgresQuery: (...args: unknown[]) => mockRunGreenhousePostgresQuery(...args)
 }))
 
-import { resolveFinanceClientContext, resolveFinanceDownstreamScope } from '@/lib/finance/canonical'
+import {
+  findFinanceClientContextByLookupId,
+  resolveFinanceClientContext,
+  resolveFinanceDownstreamScope
+} from '@/lib/finance/canonical'
 
 describe('resolveFinanceClientContext', () => {
   beforeEach(() => {
@@ -248,5 +252,151 @@ describe('resolveFinanceClientContext', () => {
         requireLegacyClientBridge: true
       })
     ).rejects.toThrow('legacy clientId bridge')
+  })
+})
+
+/**
+ * ISSUE-070 — `findFinanceClientContextByLookupId` es el helper canónico para
+ * READ paths que reciben URL `[id]` sin saber qué shape canónico es. Tests
+ * cubren los 4 prefijos conocidos + sin prefix + miss + propagación de errores
+ * no-validation.
+ */
+describe('findFinanceClientContextByLookupId — ISSUE-070 fix', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockRunFinanceQuery.mockReset()
+    mockGetFinanceProjectId.mockReset()
+    mockResolveOrganizationForClient.mockReset()
+    mockShouldFallbackFromFinancePostgres.mockReset()
+    mockRunGreenhousePostgresQuery.mockReset()
+    mockGetFinanceProjectId.mockReturnValue('test-project')
+    mockResolveOrganizationForClient.mockResolvedValue('org-1')
+    mockShouldFallbackFromFinancePostgres.mockReturnValue(false)
+  })
+
+  // Mock canónico que pattern-matchea por contenido de SQL — el resolver
+  // hace múltiples queries (organizations join + client_profiles + clients
+  // + spaces) en orden distinto según prefijo. El mock debe responder con
+  // datos consistentes para cada SQL signature.
+  const installSuccessfulMock = (
+    organizationId: string,
+    clientProfileId: string,
+    hubspotCompanyId = '27776076692'
+  ) => {
+    mockRunGreenhousePostgresQuery.mockImplementation((sql: string) => {
+      const s = String(sql ?? '')
+
+      if (s.includes('FROM greenhouse_core.organizations o')) {
+        return Promise.resolve([
+          {
+            organization_id: organizationId,
+            organization_name: 'ANAM',
+            legal_name: 'ANAM',
+            hubspot_company_id: hubspotCompanyId,
+            client_id: clientProfileId,
+            space_id: 'spc-1'
+          }
+        ])
+      }
+
+      if (s.includes('FROM greenhouse_finance.client_profiles cp')) {
+        return Promise.resolve([
+          {
+            client_profile_id: clientProfileId,
+            client_id: clientProfileId,
+            organization_id: organizationId,
+            hubspot_company_id: hubspotCompanyId,
+            legal_name: 'ANAM'
+          }
+        ])
+      }
+
+      if (s.includes('FROM greenhouse_core.clients c')) {
+        return Promise.resolve([
+          {
+            client_id: clientProfileId,
+            client_name: 'ANAM',
+            hubspot_company_id: hubspotCompanyId
+          }
+        ])
+      }
+
+      // spaces lookup, etc → empty (resolver tolera)
+      return Promise.resolve([])
+    })
+  }
+
+  it('resuelve prefix `hubspot-company-` como clientProfileId', async () => {
+    installSuccessfulMock('org-1', 'hubspot-company-27776076692')
+
+    const result = await findFinanceClientContextByLookupId('hubspot-company-27776076692')
+
+    expect(result).not.toBeNull()
+    expect(result!.organizationId).toBe('org-1')
+    expect(result!.clientName).toBe('ANAM')
+  })
+
+  it('resuelve prefix `org-` como organizationId', async () => {
+    installSuccessfulMock('org-f6aa4e20', 'hubspot-company-27776076692')
+
+    const result = await findFinanceClientContextByLookupId('org-f6aa4e20')
+
+    expect(result).not.toBeNull()
+    expect(result!.organizationId).toBe('org-f6aa4e20')
+  })
+
+  it('resuelve prefix `client-profile-` como clientProfileId', async () => {
+    installSuccessfulMock('org-1', 'client-profile-test-001')
+
+    const result = await findFinanceClientContextByLookupId('client-profile-test-001')
+
+    expect(result).not.toBeNull()
+    expect(result!.clientProfileId).toBe('client-profile-test-001')
+  })
+
+  it('intenta múltiples shapes para IDs sin prefix conocido', async () => {
+    installSuccessfulMock('org-1', 'legacy-id-without-prefix')
+
+    const result = await findFinanceClientContextByLookupId('legacy-id-without-prefix')
+
+    expect(result).not.toBeNull()
+  })
+
+  it('devuelve null cuando ningún shape matchea (sin throw)', async () => {
+    // Todas las PG queries devuelven empty
+    mockRunGreenhousePostgresQuery.mockResolvedValue([])
+
+    const result = await findFinanceClientContextByLookupId('nonexistent-id')
+
+    expect(result).toBeNull()
+  })
+
+  it('devuelve null para input vacío sin tocar PG', async () => {
+    const result = await findFinanceClientContextByLookupId('')
+
+    expect(result).toBeNull()
+    expect(mockRunGreenhousePostgresQuery).not.toHaveBeenCalled()
+  })
+
+  it('NO propaga FinanceValidationError (degradación honesta para read paths)', async () => {
+    // PG devuelve empty para hubspot-company prefix → resolver throws
+    // FinanceValidationError → helper debe catch y devolver null.
+    mockRunGreenhousePostgresQuery.mockResolvedValue([])
+
+    // No debería throw
+    await expect(
+      findFinanceClientContextByLookupId('hubspot-company-nonexistent')
+    ).resolves.toBeNull()
+  })
+
+  it('SÍ propaga errores no-validation (PG caído)', async () => {
+    const pgError = new Error('connection refused')
+
+    mockRunGreenhousePostgresQuery.mockRejectedValueOnce(pgError)
+    mockShouldFallbackFromFinancePostgres.mockReturnValue(false)
+
+    await expect(
+      findFinanceClientContextByLookupId('org-test')
+    ).rejects.toThrow()
   })
 })

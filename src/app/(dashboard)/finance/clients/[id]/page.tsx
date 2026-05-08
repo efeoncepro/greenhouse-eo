@@ -4,7 +4,7 @@ import ClientDetailView from '@views/greenhouse/finance/ClientDetailView'
 import FinanceClientsOrganizationWorkspaceClient from '@views/greenhouse/finance/FinanceClientsOrganizationWorkspaceClient'
 
 import { requireServerSession } from '@/lib/auth/require-server-session'
-import { resolveFinanceClientContext } from '@/lib/finance/canonical'
+import { findFinanceClientContextByLookupId } from '@/lib/finance/canonical'
 import { isWorkspaceShellEnabledForSubject } from '@/lib/workspace-rollout'
 import { resolveOrganizationWorkspaceProjection } from '@/lib/organization-workspace/projection'
 import { captureWithDomain } from '@/lib/observability/capture'
@@ -23,17 +23,18 @@ export const metadata: Metadata = {
  *  1. requireServerSession (canonical, prerender-safe)
  *  2. isWorkspaceShellEnabledForSubject(subject, 'finance') — flag-gated rollout
  *     vía `organization_workspace_shell_finance` (TASK-780 platform).
- *  3. resolveFinanceClientContext({clientProfileId, organizationId, clientId,
- *     hubspotCompanyId}) — la URL `[id]` puede ser cualquiera de los 4 shapes;
- *     el resolver hace OR-matching internamente. Postgres-first + BigQuery
- *     fallback ya está en la primitiva canónica.
+ *  3. findFinanceClientContextByLookupId(id) — helper canónico de READ-path
+ *     (ISSUE-070 fix): prefix-aware, lenient validation, no-throw. Si la URL
+ *     `[id]` resuelve a una org canónica devuelve el contexto, si no devuelve
+ *     null. NUNCA pasar el `id` como múltiples shapes a
+ *     `resolveFinanceClientContext` (validación estricta para WRITE paths).
  *  4. Si flag disabled OR organizationId no resoluble → render legacy
  *     `<ClientDetailView />` sin cambios funcionales (zero-risk cutover).
  *  5. Si flag enabled AND organizationId resuelto → render el workspace shell
  *     con projection server-side y entrypointContext='finance'.
  *
- * Resilient defaults: cualquier error en flag resolution o context resolution
- * cae a legacy. Sentry captures via `captureWithDomain('finance', ...)`.
+ * Resilient defaults: cualquier error en flag resolution o lookup cae a
+ * legacy. Sentry captures via `captureWithDomain('finance', ...)`.
  */
 
 const ClientDetailPage = async ({ params }: { params: Promise<{ id: string }> }) => {
@@ -61,16 +62,13 @@ const ClientDetailPage = async ({ params }: { params: Promise<{ id: string }> })
     return <ClientDetailView />
   }
 
-  // La URL [id] puede ser clientProfileId | organizationId | clientId | hubspotCompanyId.
-  // El resolver canónico hace OR-matching y devuelve el primero que matchea.
-  const finance = await resolveFinanceClientContext({
-    clientProfileId: id,
-    organizationId: id,
-    clientId: id,
-    hubspotCompanyId: id
-  }).catch(error => {
+  // ISSUE-070 fix — lookup canónico prefix-aware no-throw. La URL `[id]`
+  // puede ser `org-...`, `hubspot-company-...`, `client-profile-...`, o
+  // un ID legacy sin prefix. El helper prueba shapes en orden de
+  // prioridad y devuelve null si ninguno matchea.
+  const finance = await findFinanceClientContextByLookupId(id).catch(error => {
     captureWithDomain(error, 'finance', {
-      tags: { source: 'finance_clients_detail_page', stage: 'finance_client_context' },
+      tags: { source: 'finance_clients_detail_page', stage: 'finance_client_lookup' },
       extra: { lookupId: id }
     })
 
