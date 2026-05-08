@@ -32,6 +32,7 @@ import {
   getExpenseDistributionUnresolvedSignal
 } from './queries/expense-distribution'
 import { getExpensePaymentsClpDriftSignal } from './queries/expense-payments-clp-drift'
+import { getFinanceClientProfileUnlinkedSignal } from './queries/finance-client-profile-unlinked'
 import { getIdentityLegalProfileEvidenceOrphanSignal } from './queries/identity-legal-profile-evidence-orphan'
 import { getIdentityLegalProfilePayrollBlockingSignal } from './queries/identity-legal-profile-payroll-blocking'
 import { getIdentityLegalProfilePendingOverdueSignal } from './queries/identity-legal-profile-pending-overdue'
@@ -403,6 +404,14 @@ interface ReliabilityOverviewSources {
   workspaceProjection?: ReliabilitySignal[] | null
 
   /**
+   * TASK-613 Slice 3 — Finance Clients ↔ Organization canonical link signal:
+   *   - finance.client_profile.unlinked_organizations (data_quality, warning)
+   * Roll up bajo moduleKey 'finance'. Steady state = 0. Cuando > 0,
+   * /finance/clients/[id] cae al legacy detail view (degradación honesta).
+   */
+  financeClientProfileUnlinked?: ReliabilitySignal | null
+
+  /**
    * TASK-838 Fase 3 — Runtime guard: critical tables missing in PG.
    *   - infrastructure.critical_tables.missing (drift, error si > 0)
    * Roll up bajo moduleKey 'cloud'.
@@ -487,6 +496,8 @@ export const buildReliabilityOverview = (
     ...(sources.workforceRoleTitle ?? []),
     // TASK-611 Slice 5 — Organization Workspace projection signals (2).
     ...(sources.workspaceProjection ?? []),
+    // TASK-613 Slice 3 — Finance Clients ↔ Organization canonical link signal.
+    ...(sources.financeClientProfileUnlinked ? [sources.financeClientProfileUnlinked] : []),
     // TASK-838 Fase 3 — Runtime guard: critical tables missing in PG.
     ...(sources.criticalTablesMissing ? [sources.criticalTablesMissing] : []),
     // TASK-813 Slice 6 — Commercial engagement instance signals (3).
@@ -773,6 +784,13 @@ export const getReliabilityOverview = async (
           .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
           .catch(() => null)
 
+  // TASK-613 Slice 3 — Finance Clients ↔ Organization canonical link signal.
+  // Single reader; degrada honestamente a `unknown` si la query falla.
+  const financeClientProfileUnlinked =
+    preloadedSources.financeClientProfileUnlinked !== undefined
+      ? preloadedSources.financeClientProfileUnlinked
+      : await getFinanceClientProfileUnlinkedSignal().catch(() => null)
+
   // TASK-838 Fase 3 — Runtime guard: critical tables missing in PG. Single
   // reader; degrada honestamente a `unknown` si la query falla.
   const criticalTablesMissing =
@@ -830,6 +848,7 @@ export const getReliabilityOverview = async (
     identityLegalProfile,
     workforceRoleTitle,
     workspaceProjection,
+    financeClientProfileUnlinked,
     criticalTablesMissing,
     servicesEngagement,
     commercialHealth

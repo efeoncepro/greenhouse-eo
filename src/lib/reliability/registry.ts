@@ -62,7 +62,9 @@ export const STATIC_RELIABILITY_REGISTRY: ReliabilityModuleDefinition[] = [
     // payment_order ↔ bank settlement (3 readers en
     // src/lib/reliability/queries/). Quedan rolleados al subsystem `Finance
     // Data Quality` vía buildReliabilityOverview, que ya rutea por moduleKey.
-    expectedSignalKinds: ['subsystem', 'incident', 'test_lane', 'drift', 'dead_letter', 'lag'],
+    // TASK-613 Slice 3 — `data_quality` añadido para
+    // `finance.client_profile.unlinked_organizations`.
+    expectedSignalKinds: ['subsystem', 'incident', 'test_lane', 'drift', 'dead_letter', 'lag', 'data_quality'],
     incidentDomainTag: 'finance'
   },
   {
