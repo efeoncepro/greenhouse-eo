@@ -2095,6 +2095,23 @@ export interface GreenhouseCoreDepartments {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseCoreEntitlementGovernanceAuditLog {
+  action: string | null;
+  audit_id: string;
+  capability: string | null;
+  change_type: string;
+  configured_path: string | null;
+  created_at: Generated<Timestamp>;
+  effect: string | null;
+  performed_by: string;
+  policy_key: string | null;
+  reason: string | null;
+  scope: string | null;
+  space_id: string;
+  target_role: string | null;
+  target_user: string | null;
+}
+
 export interface GreenhouseCoreEntitySourceLinks {
   active: Generated<boolean>;
   created_at: Generated<Timestamp>;
@@ -2732,6 +2749,21 @@ export interface GreenhouseCoreReportingLines {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseCoreRoleEntitlementDefaults {
+  action: string;
+  capability: string;
+  created_at: Generated<Timestamp>;
+  created_by: string;
+  default_id: string;
+  effect: string;
+  reason: string | null;
+  role_code: string;
+  scope: string;
+  space_id: string;
+  updated_at: Generated<Timestamp>;
+  updated_by: string;
+}
+
 export interface GreenhouseCoreRoles {
   created_at: Generated<Timestamp>;
   description: string | null;
@@ -3166,6 +3198,21 @@ export interface GreenhouseCoreUserClientScopes {
   client_id: string;
   created_at: Generated<Timestamp>;
   scope_id: string;
+  user_id: string;
+}
+
+export interface GreenhouseCoreUserEntitlementOverrides {
+  action: string;
+  capability: string;
+  created_at: Generated<Timestamp>;
+  effect: string;
+  expires_at: Timestamp | null;
+  granted_by: string;
+  override_id: string;
+  reason: string;
+  scope: string;
+  space_id: string;
+  updated_at: Generated<Timestamp>;
   user_id: string;
 }
 
@@ -8720,6 +8767,7 @@ export interface DB {
   "greenhouse_core.client_users": GreenhouseCoreClientUsers;
   "greenhouse_core.clients": GreenhouseCoreClients;
   "greenhouse_core.departments": GreenhouseCoreDepartments;
+  "greenhouse_core.entitlement_governance_audit_log": GreenhouseCoreEntitlementGovernanceAuditLog;
   "greenhouse_core.entity_source_links": GreenhouseCoreEntitySourceLinks;
   "greenhouse_core.first_party_app_sessions": GreenhouseCoreFirstPartyAppSessions;
   "greenhouse_core.identity_profile_source_links": GreenhouseCoreIdentityProfileSourceLinks;
@@ -8748,6 +8796,7 @@ export interface DB {
   "greenhouse_core.reliability_module_overrides": GreenhouseCoreReliabilityModuleOverrides;
   "greenhouse_core.reliability_module_registry": GreenhouseCoreReliabilityModuleRegistry;
   "greenhouse_core.reporting_lines": GreenhouseCoreReportingLines;
+  "greenhouse_core.role_entitlement_defaults": GreenhouseCoreRoleEntitlementDefaults;
   "greenhouse_core.role_view_assignments": GreenhouseCoreRoleViewAssignments;
   "greenhouse_core.roles": GreenhouseCoreRoles;
   "greenhouse_core.scim_group_memberships": GreenhouseCoreScimGroupMemberships;
@@ -8772,6 +8821,7 @@ export interface DB {
   "greenhouse_core.tool_catalog": GreenhouseCoreToolCatalog;
   "greenhouse_core.user_campaign_scopes": GreenhouseCoreUserCampaignScopes;
   "greenhouse_core.user_client_scopes": GreenhouseCoreUserClientScopes;
+  "greenhouse_core.user_entitlement_overrides": GreenhouseCoreUserEntitlementOverrides;
   "greenhouse_core.user_permission_set_assignments": GreenhouseCoreUserPermissionSetAssignments;
   "greenhouse_core.user_project_scopes": GreenhouseCoreUserProjectScopes;
   "greenhouse_core.user_role_assignments": GreenhouseCoreUserRoleAssignments;
