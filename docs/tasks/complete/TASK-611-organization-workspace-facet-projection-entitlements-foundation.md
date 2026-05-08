@@ -8,13 +8,13 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `EPIC-008`
-- Status real: `En ejecucion (recalibrado pre-execution 2026-05-08)`
+- Status real: `Cerrada 2026-05-08 (V1.1 — 7 slices entregados, 3588/3588 tests verdes)`
 - Rank: `TBD`
 - Domain: `identity`
 - Blocked by: `none`

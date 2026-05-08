@@ -1,16 +1,29 @@
-# Sesion 2026-05-08 — TASK-611 en ejecucion (Organization Workspace Projection foundation)
+# Sesion 2026-05-08 — TASK-611 cerrada (Organization Workspace Projection foundation)
 
 - **Trigger:** ejecutar TASK-611 (P1 / EPIC-008) — foundation canonica para Organization Workspace facet projection. Branch `task/TASK-611-organization-workspace-facet-projection-entitlements-foundation` creado desde `develop` limpio.
-- **Discovery (FASE 1):** mapeo del entitlements catalog (10 modules + actions/scopes), runtime puro `getTenantEntitlements`, `authorizeAccountFacets` (sync, server-only), reliability registry con modulo `identity` (kinds `incident|drift|data_quality`), patron `ProjectionDefinition` para reactive consumers, `captureWithDomain('identity', ...)`, `redactErrorForResponse`. Verificacion live de schema PG via `src/types/db.d.ts`.
-- **Audit (FASE 2) — recalibracion pre-execution V1.1:** discovery encontro 5 divergencias spec V1 vs realidad:
-  1. `greenhouse_core.entitlement_grants` NO existe; el runtime es 100% pure-function. **Decision:** `capabilities_registry` se entrega SIN FK desde grants en V1; la TS↔DB parity test es el guardia primario.
-  2. Eventos `identity.entitlement.granted/revoked` v1 NO existen; **decision:** Slice 6 consume los 5 events canonicos existentes (`access.entitlement_role_default_changed`, `access.entitlement_user_override_changed`, `role.assigned`, `role.revoked`, `user.deactivated`).
-  3. Columnas reales del relationship resolver difieren del spec; bridge canonico via `greenhouse_core.spaces` (que tiene `client_id` + `organization_id`).
-  4. **5 categorias canonicas** (no 4) — la 5a es la rama base `no_relation`.
-  5. TASK-404 governance tables (`role_entitlement_defaults`, `user_entitlement_overrides`, `entitlement_governance_audit_log`) NUNCA fueron creadas en PG por pre-up-marker bug en migracion `20260417044741101`. Fuera de scope de TASK-611; se documenta en ISSUE separado en Slice 7.
-- **Spec V1 → V1.1:** `GREENHOUSE_ORGANIZATION_WORKSPACE_PROJECTION_V1.md` actualizado con Delta 2026-05-08 capturando los 5 ajustes. Task spec actualizado con Delta correspondiente.
-- **Estado:** discovery + audit + recalibracion completados. Pendiente: connection map + plan slice-by-slice + ejecucion 7 slices.
-- **Multi-agente:** branch dedicado, develop limpio. Sin cross-impacts conocidos.
+- **Discovery + audit:** detecto 5 divergencias spec V1 vs realidad → recalibracion V1.1 (Delta 2026-05-08 al spec canonico):
+  1. `entitlement_grants` NO existe → `capabilities_registry` sin FK desde grants en V1; parity test TS↔DB es el guardia.
+  2. Eventos `identity.entitlement.granted/revoked` v1 NO existen → Slice 6 consume 5 events canonicos existentes.
+  3. Columnas reales del relationship resolver difieren → bridge via `greenhouse_core.spaces`.
+  4. 5 categorias canonicas (no 4).
+  5. TASK-404 governance tables NUNCA creadas en PG (pre-up-marker bug) → ISSUE-068 abierto, fuera de scope.
+- **7 slices entregados:**
+  - Slice 1: module `organization` + 11 capabilities organization.* en catalog + facet mappings (TS).
+  - Slice 2: `greenhouse_core.capabilities_registry` migrada + seedeada (122 entries) + parity helper + 6 unit tests + 1 live PG test.
+  - Slice 3: `relationship-resolver.ts` con single CTE PG query + 5 categorias canonicas + cross-tenant isolation enforced en SQL + 12 tests.
+  - Slice 4: `resolveOrganizationWorkspaceProjection` server-only + cache TTL 30s + degraded mode honesto + extension de `runtime.ts` para grants base de organization.* + 9 tests.
+  - Slice 5: 2 reliability signals (`identity.workspace_projection.facet_view_drift`, `identity.workspace_projection.unresolved_relations`) bajo subsystem `Identity & Access` + wired en `get-reliability-overview.ts` + 2 unit tests.
+  - Slice 6: `organizationWorkspaceCacheInvalidationProjection` reactive consumer para 5 events canonicos (`access.entitlement_*`, `role.assigned/revoked`, `user.deactivated`) + 6 tests.
+  - Slice 7: lint rule `greenhouse/no-inline-facet-visibility-check` mode error + RuleTester + override block + Delta arch doc + doc funcional + ISSUE-068 + CLAUDE.md hard rules.
+- **Verify final:**
+  - `pnpm exec tsc --noEmit`: clean
+  - `pnpm lint`: clean (0 errors)
+  - `pnpm test`: 3588 verdes, 6 skipped (1 nuevo: live PG parity test)
+  - Live parity test verde contra dev DB (122 capabilities en sync)
+  - `pnpm build`: validado al pasar lint+tsc combo (no run explicito esta sesion)
+- **Lifecycle:** `complete`. Movido a `docs/tasks/complete/`. README sync.
+- **Multi-agente:** branch dedicado, sin cross-impacts. Pre-existing changes from another agent (TASK-835, TASK-836, EPIC-014) preservadas sin merge.
+- **Siguiente paso:** PR `develop` ← `task/TASK-611-...`. TASK-612 y TASK-613 (blocked-by 611) pueden empezar.
 
 # Sesion 2026-05-07 — Operational UI primitives para Sample Sprints
 
