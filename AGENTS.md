@@ -37,6 +37,7 @@ Este bloque es el resumen obligatorio antes de ejecutar cualquier cambio. Las se
 
 - Primero orientarse: leer `project_context.md`, `Handoff.md`, la task/spec aplicable y la arquitectura del dominio antes de escribir.
 - Protocolo TASK-###: usar `docs/tasks/TASK_PROCESS.md` como proceso canonico y `docs/operations/CODEX_EXECUTION_PROMPT_V1.md` como prompt operativo robusto para ejecucion con Codex.
+- ADRs: decisiones arquitectonicas viven bajo `docs/operations/ARCHITECTURE_DECISION_RECORD_OPERATING_MODEL_V1.md` y el indice `docs/architecture/DECISIONS_INDEX.md`. Si una task cambia source of truth, schema, access, auth, finance/payroll/accounting semantics, events/outbox/webhooks, APIs externas, cloud/deploy/secrets, UI platform o runtime projections compartidas, debe identificar o proponer ADR antes de implementar.
 - Contexto y auditoria: `docs/operations/CONTEXT_HANDOFF_OPERATING_MODEL_V1.md` gobierna como usar `project_context.md`, `Handoff.md` y `Handoff.archive.md` sin perder memoria historica.
 - Source of truth: si task/spec, arquitectura y runtime real discrepan, prevalecen arquitectura vigente + codigo/schema/runtime verificados. Corregir la spec antes de implementar si el drift cambia contrato o bloquea.
 - Calidad de solucion: no entregar parches fragiles si el problema pide causa raiz. Aplicar `docs/operations/SOLUTION_QUALITY_OPERATING_MODEL_V1.md`; cualquier workaround debe ser temporal, reversible, documentado y con owner/retirada.
@@ -116,6 +117,7 @@ Estos CLIs estan autenticados localmente. Cuando una task toca su dominio, **usa
   - revisar `docs/architecture/GREENHOUSE_POSTGRES_CANONICAL_360_V1.md`
   - correr `pnpm pg:doctor` antes de asumir que el acceso esta sano
 - Si una task del sistema contradice la arquitectura vigente, no implementarla tal cual; corregir primero la task o documentar la nueva decision arquitectonica.
+- Si una task cambia un contrato arquitectonico compartido, revisar `docs/architecture/DECISIONS_INDEX.md` y aplicar `docs/operations/ARCHITECTURE_DECISION_RECORD_OPERATING_MODEL_V1.md` antes de escribir codigo. La decision puede vivir embebida en una spec `GREENHOUSE_*_V1.md` o como doc dedicado en `docs/architecture/`, pero debe quedar indexada.
 - Si el cambio es UI, UX o seleccion de componentes, usar como criterio operativo los skills locales vigentes (`greenhouse-agent`, `greenhouse-portal-ui-implementer`, `greenhouse-ui-orchestrator` o `greenhouse-vuexy-ui-expert`), revisar `full-version` junto con la documentacion oficial de Vuexy antes de inventar componentes nuevos y leer `DESIGN.md` en raiz como contrato visual legible por agentes.
 - Si el cambio toca copy visible al usuario:
   - invocar la skill de UX writing/content aplicable antes de fijar tono o wording final
@@ -209,6 +211,7 @@ Estos CLIs estan autenticados localmente. Cuando una task toca su dominio, **usa
 - La convencion canonica de Git tags para releases (`platform/`, `<module>/`, `api/<slug>/`) vive en ese mismo documento; no improvisar tags globales ambiguos como `v1.1.0` para el portal completo.
 - Tres capas de documentacion, cada una con su proposito:
   - `docs/architecture/` — contratos tecnicos para agentes y desarrolladores (schemas, APIs, decisiones de diseno)
+  - `docs/architecture/DECISIONS_INDEX.md` — indice maestro de ADRs y decisiones aceptadas; no duplica specs, enlaza el contrato canonico.
   - `docs/documentation/` — explicaciones funcionales en lenguaje simple (roles, flujos, reglas de negocio). Cada documento enlaza a su spec tecnica
   - `docs/manual-de-uso/` — guias operativas paso a paso para usuarios del portal (como usar, permisos, cuidados, troubleshooting)
   - `docs/audits/` — auditorias tecnicas y operativas reutilizables, fechadas y acotadas por scope. Se consumen frecuentemente como contexto para decisiones, pero siempre deben revalidarse contra el estado actual antes de tratarlas como vigentes.

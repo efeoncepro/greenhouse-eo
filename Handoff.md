@@ -1,3 +1,18 @@
+# Sesion 2026-05-08 — ADR operating model Greenhouse-wide
+
+- **Trigger:** el usuario pidio aplicar la recomendacion Greenhouse-wide para Architecture Decision Records end-to-end, con commit y push.
+- **Entrega:** nuevo modelo canonico `docs/operations/ARCHITECTURE_DECISION_RECORD_OPERATING_MODEL_V1.md`, indice maestro `docs/architecture/DECISIONS_INDEX.md`, y wiring en `docs/tasks/TASK_PROCESS.md`, `docs/operations/DOCUMENTATION_OPERATING_MODEL_V1.md`, `docs/README.md`, `AGENTS.md`, `CLAUDE.md`, `project_context.md` y `changelog.md`.
+- **Decision:** Greenhouse usa ADRs distribuidos: embebidos en specs `GREENHOUSE_*_V1.md` para dominios claros, o docs dedicados en `docs/architecture/` para decisiones cross-domain. El indice `DECISIONS_INDEX.md` queda como punto de busqueda obligatorio.
+- **Validacion:** cambio documental; se verifico con `pnpm lint` y `pnpm exec tsc --noEmit` via hooks pre-push. No se ejecuto build porque no hubo runtime/UI.
+- **Nota multi-agente:** se preservaron cambios preexistentes no relacionados en `docs/tasks/to-do/TASK-836-hubspot-services-lifecycle-stage-sync-hardening.md`; no fueron parte del commit ADR.
+
+# Sesion 2026-05-08 — Codex skill Software Architect 2026 instalada
+
+- **Trigger:** el usuario entrego `/Users/jreye/Downloads/software-architect-2026.zip` y pidio adaptar la skill de Claude para que Codex pueda invocarla.
+- **Entrega:** nueva skill local Codex en `.codex/skills/software-architect-2026/` con `SKILL.md`, `references/`, `checklists/`, `templates/`, `efeonce-overlay/` y metadata `agents/openai.yaml`.
+- **Adaptacion:** el `SKILL.md` principal ahora habla de Codex, conserva el workflow de arquitectura 2026 y aclara que, dentro de Greenhouse, `AGENTS.md`/task/runtime vigente prevalecen ante drift del overlay.
+- **Validacion:** estructura inspeccionada; frontmatter y metadata presentes. No se ejecuto build/lint porque el cambio es documental/skill-only.
+
 # Sesion 2026-05-08 (tarde) — TASK-613 V1.1 pilot rollout activado + ISSUE-069 resuelto
 
 - **TASK-613 fase V1.1 activa** desde 2026-05-08 21:30 UTC. Flag `organization_workspace_shell_finance` activado solo para `user-efeonce-admin-julio-reyes` (scope=user) via `POST /api/admin/home/rollout-flags` canónico. Global sigue `enabled=false`.

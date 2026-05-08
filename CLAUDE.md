@@ -94,6 +94,8 @@ Regla: módulos de dominio extienden estos objetos, no crean identidades paralel
 - `docs/manual-de-uso/` — manuales prácticos por dominio para usar capacidades concretas del portal paso a paso, con permisos, cuidados y troubleshooting
 - `docs/audits/` — auditorías técnicas y operativas reutilizables. Úsalas frecuentemente cuando trabajes una zona auditada, pero antes de confiar en ellas verifica si sus hallazgos siguen vigentes o si el sistema requiere una auditoría nueva/refresh.
 - `docs/operations/` — modelos operativos (documentación, GitHub Project, data model, repo ecosystem)
+- `docs/operations/ARCHITECTURE_DECISION_RECORD_OPERATING_MODEL_V1.md` — politica canonica de ADRs: cuando una decision requiere ADR, donde vive, lifecycle append-only y gate para tasks.
+- `docs/architecture/DECISIONS_INDEX.md` — indice maestro de decisiones arquitectonicas aceptadas; buscar aqui antes de proponer o cambiar contratos compartidos.
 - Fuente canónica para higiene y rotación segura de secretos:
   - `docs/operations/GREENHOUSE_CLOUD_GOVERNANCE_OPERATING_MODEL_V1.md`
   - `docs/architecture/GREENHOUSE_CLOUD_SECURITY_POSTURE_V1.md`
@@ -135,6 +137,7 @@ Regla: módulos de dominio extienden estos objetos, no crean identidades paralel
 
 ### Architecture Docs (los más críticos)
 
+- `DECISIONS_INDEX.md` — indice maestro de ADRs y decisiones aceptadas
 - `GREENHOUSE_ARCHITECTURE_V1.md` — documento maestro de arquitectura
 - `GREENHOUSE_360_OBJECT_MODEL_V1.md` — modelo canónico 360
 - `GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md` — contrato completo de Payroll
