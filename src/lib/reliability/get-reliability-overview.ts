@@ -52,6 +52,7 @@ import {
 import { getShortcutsInvalidPinsSignal } from './queries/shortcuts-invalid-pins'
 import { getWorkspaceProjectionFacetViewDriftSignal } from './queries/workspace-projection-drift'
 import { getWorkspaceProjectionUnresolvedRelationsSignal } from './queries/workspace-projection-unresolved-relations'
+import { getCriticalTablesMissingSignal } from './queries/critical-tables-missing'
 import { getOutboxUnpublishedLagSignal } from './queries/outbox-unpublished-lag'
 import { getOutboxDeadLetterSignal } from './queries/outbox-dead-letter'
 import { getEmailRenderFailureSignal } from './queries/email-render-failure'
@@ -402,6 +403,13 @@ interface ReliabilityOverviewSources {
   workspaceProjection?: ReliabilitySignal[] | null
 
   /**
+   * TASK-838 Fase 3 — Runtime guard: critical tables missing in PG.
+   *   - infrastructure.critical_tables.missing (drift, error si > 0)
+   * Roll up bajo moduleKey 'cloud'.
+   */
+  criticalTablesMissing?: ReliabilitySignal | null
+
+  /**
    * TASK-813 Slice 6 — Commercial engagement instance (HubSpot p_services 0-162) signals (3):
    *   - commercial.service_engagement.sync_lag (lag, warning)
    *   - commercial.service_engagement.organization_unresolved (drift, error)
@@ -479,6 +487,8 @@ export const buildReliabilityOverview = (
     ...(sources.workforceRoleTitle ?? []),
     // TASK-611 Slice 5 — Organization Workspace projection signals (2).
     ...(sources.workspaceProjection ?? []),
+    // TASK-838 Fase 3 — Runtime guard: critical tables missing in PG.
+    ...(sources.criticalTablesMissing ? [sources.criticalTablesMissing] : []),
     // TASK-813 Slice 6 — Commercial engagement instance signals (3).
     ...(sources.servicesEngagement ?? []),
     // TASK-807 — Commercial Health signals (six Sample Sprints health gates).
@@ -763,6 +773,13 @@ export const getReliabilityOverview = async (
           .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
           .catch(() => null)
 
+  // TASK-838 Fase 3 — Runtime guard: critical tables missing in PG. Single
+  // reader; degrada honestamente a `unknown` si la query falla.
+  const criticalTablesMissing =
+    preloadedSources.criticalTablesMissing !== undefined
+      ? preloadedSources.criticalTablesMissing
+      : await getCriticalTablesMissingSignal().catch(() => null)
+
   // TASK-813 Slice 6 — Commercial engagement instance signals (3 readers en
   // paralelo). Cada uno degrada honestamente a `unknown` si su query falla.
   // Roll up bajo moduleKey 'commercial'. TASK-807 formaliza el subsystem.
@@ -813,6 +830,7 @@ export const getReliabilityOverview = async (
     identityLegalProfile,
     workforceRoleTitle,
     workspaceProjection,
+    criticalTablesMissing,
     servicesEngagement,
     commercialHealth
   })
