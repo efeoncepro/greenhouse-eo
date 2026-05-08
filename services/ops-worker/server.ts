@@ -97,6 +97,7 @@ import { buildWeeklyDigest, resolveWeeklyDigestRecipients, WEEKLY_DIGEST_DEFAULT
 import { getCurrentAuthReadiness } from '@/lib/auth-secrets'
 import { probeNextAuthSecretRoundTrip } from '@/lib/auth/readiness'
 
+import { computeRematerializeSeedDate } from './finance-rematerialize-seed'
 import { getReactiveQueueDepth, InvalidDomainError } from './reactive-queue-depth'
 import { runProductCatalogDriftDetectJob } from './product-catalog-drift-detect'
 import { runProductCatalogReconcileV2Job } from './product-catalog-reconcile-v2'
@@ -960,7 +961,7 @@ const handleFinanceRematerializeBalances = async (req: IncomingMessage, res: Ser
     )
 
     const today = new Date()
-    const seedDate = new Date(today.getTime() - lookbackDays * 86_400_000).toISOString().slice(0, 10)
+    const seedDate = computeRematerializeSeedDate(today, lookbackDays)
     const endDate = today.toISOString().slice(0, 10)
 
     const results: Array<{ accountId: string; days: number; closing: number }> = []
