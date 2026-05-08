@@ -942,6 +942,39 @@ Toda lectura de `expense_payments` o `income_payments` que necesite saldos en CL
 
 **Spec canónica**: `docs/tasks/complete/TASK-774-account-balance-clp-native-reader-contract.md`. Patrón aplicado al path account_balances después de TASK-766 que cubrió cash-out.
 
+### Finance — Cron rematerialize-balances seed contract (ISSUE-069, 2026-05-08)
+
+Todo cron que invoque `rematerializeAccountBalanceRange` (o cualquier primitiva canónica con seed-row contract) **debe** calcular `seedDate = today − (lookbackDays + 1)`, NO `today − lookbackDays`.
+
+**Por qué**: el contrato canónico de `rematerializeAccountBalanceRange` ([src/lib/finance/account-balances-rematerialize.ts:258](src/lib/finance/account-balances-rematerialize.ts#L258)) **NO materializa el día seed** — itera desde `seedDate + 1`. El día seed se inserta como ancla muda (`period_inflows=0, period_outflows=0`) para preservar reconciliation snapshots TASK-721 y respetar el OTB anchor TASK-703.
+
+**Bug class** (ISSUE-069): si el caller usa `seedDate = today − lookbackDays`, el día `today − lookbackDays` queda como ancla muda. Cualquier `settlement_leg` / `expense_payment` / `income_payment` con `transaction_date` exactamente en ese día (típicamente registros retroactivos creados horas/días después) NO se contabiliza. Como la ventana del cron rota cada día, el "día ciego" se mueve diariamente — bug determinístico que afecta TODAS las cuentas.
+
+**Fix canónico** (1 línea): restar 1 día adicional para que los últimos `lookbackDays` días COMPLETOS se materialicen, incluyendo lo que antes era el "día ciego".
+
+```ts
+// services/ops-worker/finance-rematerialize-seed.ts
+export const computeRematerializeSeedDate = (today: Date, lookbackDays: number): string => {
+  const seedMs = today.getTime() - (lookbackDays + 1) * 86_400_000
+
+  return new Date(seedMs).toISOString().slice(0, 10)
+}
+```
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** llamar `rematerializeAccountBalanceRange` con `seedDate = today − lookbackDays` cuando el objetivo es materializar los últimos `lookbackDays` días completos. Usar siempre `today − (lookbackDays + 1)` o el helper canónico `computeRematerializeSeedDate`.
+- **NUNCA** modificar el contrato de `rematerializeAccountBalanceRange` (seed no se materializa) — es intencional para preservar reconciliation snapshots y OTB. El contrato es load-bearing.
+- **NUNCA** calcular el seed inline en un nuevo handler de cron sin pasar por el helper canónico. Si emerge un nuevo cron similar (e.g. `rematerialize-monthly-balances`), agregar un helper análogo en el mismo archivo y testearlo con el mismo shape de tests.
+- **NUNCA** correr backfill manual con `--from-date` que coincida con el día que necesitas reparar. Usar `seedMode='active_otb'` (default del backfill script) que toma el OTB genesis como seed real, no `--from-date`. El `--from-date` es etiqueta documental.
+- **SIEMPRE** que un nuevo cron emerja consumiendo la primitiva canónica con seed-row contract, agregar test de regresión (`*.test.ts`) que pin-ee `seed = today − (lookbackDays + 1)` con casos edge (lookback=1, 30, cross-month, cross-year).
+
+**Helper canónico**: [services/ops-worker/finance-rematerialize-seed.ts](services/ops-worker/finance-rematerialize-seed.ts).
+**Tests anti-regresión**: [services/ops-worker/finance-rematerialize-seed.test.ts](services/ops-worker/finance-rematerialize-seed.test.ts) (7 tests).
+**Diagnostic operator tool**: [scripts/finance/diagnose-fx-drift.ts](scripts/finance/diagnose-fx-drift.ts) — lista detalle por (account, fecha) con drift activo, mismo SQL que el reader del signal `finance.account_balances.fx_drift` pero retorna detalle en lugar de COUNT. Útil ANTES de invocar el backfill para saber qué cuentas necesitan recovery.
+
+**Spec canónica**: `docs/issues/open/ISSUE-069-finance-cron-rematerialize-seed-day-blind-spot.md` (en proceso de resolución).
+
 ### Finance — Account drawer temporal modes contract (TASK-776)
 
 Todo drawer/dashboard de finance que muestre agregaciones temporales DEBE declarar `temporalMode: 'snapshot' | 'period' | 'audit'` (declarado en `instrument-presentation.ts` per categoría) y resolver su ventana via helper canónico `resolveTemporalWindow`. NUNCA calcular `fromDate`/`toDate` inline en consumers.

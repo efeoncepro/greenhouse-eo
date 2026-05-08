@@ -602,6 +602,27 @@ Toda decisión "dónde vive un cron" pasa por las **3 categorías canónicas** d
 **CI gate**: `scripts/ci/vercel-cron-async-critical-gate.mjs`.
 **Orchestrators canónicos**: `src/lib/cron-orchestrators/index.ts` (11 orchestrators puros) + `src/lib/email/deliverability-monitor.ts` + `src/lib/nubox/sync-nubox-orchestrator.ts` + `src/lib/nubox/sync-nubox-balances.ts`.
 
+### Cron rematerialize-balances seed contract (ISSUE-069, 2026-05-08)
+
+Todo cron que invoque `rematerializeAccountBalanceRange` (o cualquier primitiva canónica con seed-row contract) DEBE calcular `seedDate = today − (lookbackDays + 1)`, NO `today − lookbackDays`.
+
+**Por qué**: el contrato canónico de `rematerializeAccountBalanceRange` (`src/lib/finance/account-balances-rematerialize.ts:258`) NO materializa el día seed — itera desde `seedDate + 1`. El día seed se inserta como ancla muda (`period_inflows=0, period_outflows=0`) para preservar reconciliation snapshots TASK-721 + OTB anchor TASK-703.
+
+**Bug class** (ISSUE-069): si el caller usa `seedDate = today − lookbackDays`, ese día queda como ancla muda. Cualquier `settlement_leg` / `expense_payment` / `income_payment` con `transaction_date` exactamente en ese día (típicamente registros retroactivos creados horas/días después) NO se contabiliza. La ventana del cron rota cada día → "día ciego" se mueve diariamente → bug determinístico que afecta TODAS las cuentas. Detección: reliability signal `finance.account_balances.fx_drift` (TASK-774).
+
+**Fix canónico**: helper `computeRematerializeSeedDate(today, lookbackDays)` en `services/ops-worker/finance-rematerialize-seed.ts`. Resta 1 día adicional para que los últimos `lookbackDays` días COMPLETOS se materialicen.
+
+**Reglas duras**:
+
+- **NUNCA** calcular el seed inline en un nuevo handler de cron. Usar el helper canónico `computeRematerializeSeedDate`.
+- **NUNCA** modificar el contrato de `rematerializeAccountBalanceRange` (seed no se materializa). Es load-bearing para reconciliation snapshots y OTB.
+- **NUNCA** correr backfill manual con `--from-date` igual al día a reparar. El backfill usa `seedMode='active_otb'` que toma el OTB genesis como seed real — el `--from-date` es etiqueta documental.
+- **SIEMPRE** que un nuevo cron emerja consumiendo la primitiva, agregar test de regresión que pin-ee `seed = today − (lookbackDays + 1)` con casos edge (lookback=1, 30, cross-month, cross-year).
+
+**Diagnostic operator tool**: `pnpm tsx --require ./scripts/lib/server-only-shim.cjs scripts/finance/diagnose-fx-drift.ts` lista detalle por (account, fecha) con drift activo. Útil ANTES de invocar el backfill.
+
+**Spec canónica**: `docs/issues/open/ISSUE-069-finance-cron-rematerialize-seed-day-blind-spot.md`.
+
 ### Reliability dashboard hygiene — orphan archive, channel readiness, smoke lane bus, domain incidents (2026-04-26)
 
 Cuatro patrones canónicos que evitan re-introducir falsos positivos o `awaiting_data` perpetuos. Cualquier cambio que toque `projection_refresh_queue`, `teams_notification_channels`, smoke lane readers o Sentry capture debe respetarlos.

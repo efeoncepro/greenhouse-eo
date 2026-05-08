@@ -125,16 +125,24 @@ pnpm tsx --require ./scripts/lib/server-only-shim.cjs \
 
 ## Verificación
 
-1. Tests Vitest del orchestrator pasan localmente.
-2. Push a `develop` → ops-worker auto-deploy via `.github/workflows/ops-worker-deploy.yml`.
-3. Backfill recovery de `santander-clp 2026-05-01` aplicado.
-4. Reliability signal `finance.account_balances.fx_drift` vuelve a `severity='ok', count=0`.
-5. Próximo Playwright smoke en verde.
-6. Auditoría retrospectiva: scan de los últimos 30 días contra el reader del signal — confirmar que no hay otros account_balances con drift residual del bug.
+1. ✅ Tests Vitest pasan: 7/7 en `services/ops-worker/finance-rematerialize-seed.test.ts` (commit 7483efa2).
+2. ✅ ops-worker auto-deployed: workflow `ops-worker-deploy.yml` run para commit `7483efa2`, status `success` (2026-05-08 14:49 UTC).
+3. ✅ Backfill recovery aplicado: `santander-clp` rematerializado desde OTB genesis (2026-02-28), 69 días materializados, closing balance final $1,212,492.07. Duración 77.2s.
+4. ✅ Reliability signal en steady state: `finance.account_balances.fx_drift` reporta `severity=ok, count=0` post-backfill (verificado via `pnpm staging:request /api/admin/reliability` 2026-05-08 15:02 UTC).
+5. ⏳ Próximo Playwright smoke debería pasar (a verificar).
+6. ✅ Auditoría retrospectiva: `scripts/finance/diagnose-fx-drift.ts` confirma 0 cuentas con drift en los últimos 90 días post-backfill.
+
+## Resolución
+
+- **Causa raíz fixeada**: helper canónico `computeRematerializeSeedDate(today, lookbackDays)` en `services/ops-worker/finance-rematerialize-seed.ts` resta `lookbackDays + 1` para que los últimos `lookbackDays` días COMPLETOS se materialicen (incluyendo lo que antes era el "día ciego"). El handler `handleFinanceRematerializeBalances` consume el helper canónico.
+- **Anti-regresión**: 7 tests pin-ean el contrato (steady state, edge cases lookback=1/30, cross month/year, ISO format guard, día crítico SE materializa).
+- **Recovery**: santander-clp 2026-05-01 rematerializado.
+- **Defense-in-depth**: regla canónica documentada en `CLAUDE.md` + `AGENTS.md` para que ningún cron futuro re-introduzca el bug.
+- **Diagnostic tool**: `scripts/finance/diagnose-fx-drift.ts` queda como herramienta operativa reusable.
 
 ## Estado
 
-open
+resolved (2026-05-08)
 
 ## Relacionado
 
