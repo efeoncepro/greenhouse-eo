@@ -43,6 +43,8 @@
     "catalog:check": "tsx scripts/catalog/check-drift.ts",
     "finance:e2e-gate": "node scripts/ci/finance-e2e-gate.mjs",
     "vercel-cron-gate": "node scripts/ci/vercel-cron-async-critical-gate.mjs",
+    "migration-marker-gate": "node scripts/ci/migration-marker-gate.mjs",
+    "migration-marker-gate:test": "node scripts/ci/__tests__/migration-marker-gate.test.mjs",
     "finance:rematerialize-balances": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/finance/rematerialize-account-balances.ts",
     "finance:conciliate-mar-apr": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/finance/conciliate-march-april-2026.ts",
     "finance:fix-factoring": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/finance/fix-factoring-inflows-mar-apr.ts",
