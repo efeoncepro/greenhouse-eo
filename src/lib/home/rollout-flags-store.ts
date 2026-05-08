@@ -15,8 +15,17 @@ import { __clearHomeRolloutFlagCache } from './rollout-flags'
  * triple `(flag_key, scope_type, scope_id)` and are a no-op when missing.
  */
 
-export type HomeRolloutFlagKey = 'home_v2_shell'
+export type HomeRolloutFlagKey =
+  | 'home_v2_shell'
+  | 'organization_workspace_shell_agency'
+  | 'organization_workspace_shell_finance'
 export type HomeRolloutScopeType = 'global' | 'tenant' | 'role' | 'user'
+
+const VALID_FLAG_KEYS: ReadonlySet<HomeRolloutFlagKey> = new Set([
+  'home_v2_shell',
+  'organization_workspace_shell_agency',
+  'organization_workspace_shell_finance'
+])
 
 export interface HomeRolloutFlagRow {
   id: number
@@ -67,7 +76,7 @@ export class HomeRolloutFlagValidationError extends Error {
 }
 
 const validate = (input: UpsertHomeRolloutFlagInput): void => {
-  if (input.flagKey !== 'home_v2_shell') {
+  if (!VALID_FLAG_KEYS.has(input.flagKey)) {
     throw new HomeRolloutFlagValidationError(
       `Unknown flag_key: ${String(input.flagKey)}. Extend the CHECK constraint before adding new flags.`
     )
