@@ -1,3 +1,26 @@
+# Sesion 2026-05-08 (noche) — TASK-612 cerrada (Organization Workspace Shell convergence)
+
+- **Trigger:** ejecutar TASK-612 (P1 / EPIC-008 child) — extracción del shell compartido organization-first + FacetContentRouter lazy + adopción Agency. Branch `task/TASK-612-shared-organization-workspace-shell-convergence` desde develop limpio.
+- **Discovery + audit:** detectó 5 supuestos a recalibrar:
+  1. Spec asumía 9 facets ya existentes — REALIDAD: 4 tabs consolidados (ico/finance/people/integrations). Mapping a 9 facets canónicos vía wrapping.
+  2. page.tsx no tenía requireServerSession — agregado en Slice 5.
+  3. Migration TASK-780 whitelisted solo `home_v2_shell` — extendida con CHECK.
+  4. KPI strip canónico = 4 KPIs hard-coded (Revenue/Margen/Equipo/Spaces) — preservado.
+  5. Facets sin contenido (crm, services, staffAug) → empty state honesto en lugar de blank.
+- **5 Open Questions resueltas pre-execution**: feature_rollout_flags vs extender home_rollout_flags (extender en V1), nuevo shell vs refactor in-place (NUEVO), wrapping vs absorption (WRAPPING en V1), 9 facets vs solo activos (9 siempre, empty state honesto), bundle gate vs report-only (REPORT-ONLY V1).
+- **7 slices entregados** con commits incrementales:
+  - Slice 1: `OrganizationWorkspaceShell` (chrome only) + GH_ORGANIZATION_WORKSPACE copy + 11 unit tests.
+  - Slice 2+3 (atómico por dependency): `FacetContentRouter` lazy registry + 9 facet content components + 10 router tests + useOrganizationDetail hook.
+  - Slice 4: migration `home_rollout_flags` CHECK extendida + 2 seed rows + helper canónico `isWorkspaceShellEnabledForSubject` + 4 tests.
+  - Slice 5: Agency `/agency/organizations/[id]/page.tsx` reescrito server-side + `AgencyOrganizationWorkspaceClient` wrapper.
+  - Slice 6: design-lint + 3617/3617 tests + build verdes.
+  - Slice 7: Delta UI Platform V1.9, doc funcional `agency/organizaciones-workspace.md`, manual de uso `plataforma/organizaciones-workspace-rollout.md`.
+- **Verify final**: pnpm lint clean / tsc clean / 3617 tests verdes (+25 vs 3592 pre-TASK-612) / build OK / migration aplicada.
+- **Lifecycle**: `complete`. Movido a `docs/tasks/complete/`. README + TASK_ID_REGISTRY sync.
+- **Desbloquea**: TASK-613 (Finance convergence — el flag `organization_workspace_shell_finance` ya seedeado por Slice 4) + futuros entrypoints organization-first.
+- **Cero pérdida funcional**: legacy `OrganizationView` + tabs preservados intactos detrás del flag (default disabled). Cutover staged user→role→global per manual de rollout.
+- **Multi-agente:** branch dedicado, sin cross-impacts con foreign agent work pre-existente.
+
 # Sesion 2026-05-08 (tarde) — TASK-838 cerrada (ISSUE-068 Fases 1-4 end-to-end)
 
 - **Trigger:** resolver ISSUE-068 end-to-end de forma robusta, segura, resiliente y escalable. ISSUE detectado en discovery TASK-611: TASK-404 governance tables nunca creadas en PG por pre-up-marker bug en migration `20260417044741101` (3 CREATE TABLE bajo `-- Down Migration` en lugar de Up).

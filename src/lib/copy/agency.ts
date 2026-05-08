@@ -231,3 +231,96 @@ export const GH_AGENCY = {
     }
   }
 } as const
+
+/**
+ * TASK-612 — Organization Workspace shell + facets microcopy.
+ *
+ * Used by:
+ *   - src/components/greenhouse/organization-workspace/OrganizationWorkspaceShell.tsx
+ *   - src/components/greenhouse/organization-workspace/FacetContentRouter.tsx
+ *   - src/views/greenhouse/organizations/facets/*.tsx
+ *
+ * Tono es-CL tuteo. NO duplicar etiquetas que ya viven en greenhouse-nomenclature
+ * (Pulse, Spaces, Ciclos), ni copy financial canónico (GH_AGENCY arriba).
+ */
+export const GH_ORGANIZATION_WORKSPACE = {
+  shell: {
+    breadcrumb: 'Organizaciones',
+    actions: {
+      syncHubspot: 'Sincronizar con HubSpot',
+      syncing: 'Sincronizando…',
+      edit: 'Editar organización'
+    },
+    kpis: {
+      revenue: {
+        title: 'Revenue',
+        subtitle: 'Ingresos del período'
+      },
+      grossMargin: {
+        title: 'Margen bruto',
+        subtitleEmpty: 'Sin datos'
+      },
+      team: {
+        title: 'Equipo',
+        subtitle: 'Personas asignadas',
+        unitFte: 'FTE'
+      },
+      spaces: {
+        title: 'Spaces',
+        membershipsLabel: (n: number) => `${n} membresía${n !== 1 ? 's' : ''}`
+      }
+    },
+    status: {
+      active: 'Activa',
+      inactive: 'Inactiva',
+      prospect: 'Prospecto',
+      churned: 'Churned',
+      unknown: 'Sin estado'
+    },
+    degraded: {
+      title: 'Workspace en modo degradado',
+      reasons: {
+        relationship_lookup_failed: 'No pudimos resolver tu relación con esta organización. Volvé a intentar en unos segundos.',
+        entitlements_lookup_failed: 'No pudimos cargar tus permisos para esta organización. Volvé a intentar en unos segundos.',
+        no_facets_authorized: 'No tenés acceso a ninguna sección de esta organización. Hablá con un admin si necesitás acceso.',
+        unknown: 'No pudimos cargar el detalle de esta organización. Volvé a intentar en unos segundos.'
+      }
+    },
+    tabs: {
+      empty: 'Sin secciones disponibles',
+      ariaLabel: 'Secciones de la organización'
+    }
+  },
+  facets: {
+    labels: {
+      identity: 'Identidad',
+      spaces: 'Spaces',
+      team: 'Equipo',
+      economics: 'Economía',
+      delivery: 'Entrega',
+      finance: 'Finanzas',
+      crm: 'CRM',
+      services: 'Servicios',
+      staffAug: 'Staff Aug'
+    },
+    empty: {
+      crm: {
+        title: 'Sin datos CRM aún',
+        description: 'Cuando esta organización se sincronice con HubSpot vas a ver pipeline, deals y contactos acá.'
+      },
+      services: {
+        title: 'Catálogo de servicios en construcción',
+        description: 'Esta sección va a mostrar los engagements activos y el catálogo de p_services cuando se conecte.'
+      },
+      staffAug: {
+        title: 'Staff Augmentation próximamente',
+        description: 'Esta sección va a mostrar los arrangements de staff augmentation activos cuando emerja la primera asignación.'
+      },
+      spaces: {
+        title: 'Sin Spaces asociados',
+        description: 'Cuando esta organización tenga Spaces operativos vas a ver el detalle acá.'
+      }
+    },
+    loading: 'Cargando sección…'
+  }
+} as const

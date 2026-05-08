@@ -50,6 +50,7 @@ _Pendiente._
 - [Usar microcopy shared](plataforma/microcopy-shared-dictionary.md) — como usar `getMicrocopy` y `buildStatusMap` para botones, estados, meses, empty states y aria-labels sin duplicar strings ni romper el futuro i18n.
 - [Verificar idioma del portal](plataforma/i18n-runtime.md) — como forzar `gh_locale=en-US`/`es-CL` para QA del runtime i18n sin cambiar URLs privadas ni APIs.
 - [Formatear fechas, montos y numeros](plataforma/formateo-locale-aware.md) — como usar `@/lib/format` para UI, PDFs, Excel y emails sin reintroducir `Intl.*` o `toLocale*` directo; incluye caso Brasil.
+- [Organization Workspace — rollout y operación](plataforma/organizaciones-workspace-rollout.md) — cómo activar progresivamente el nuevo workspace de organizaciones (TASK-612) en `/agency/organizations/[id]` por usuario → rol → global, supervisar las 2 reliability signals, revertir instantáneo per-user, y diagnosticar issues comunes.
 
 ## Plantilla recomendada
 

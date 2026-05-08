@@ -33,7 +33,10 @@ import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
  * NEVER call this from a client component. Server-only by construction.
  */
 
-export type HomeRolloutFlagKey = 'home_v2_shell'
+export type HomeRolloutFlagKey =
+  | 'home_v2_shell'
+  | 'organization_workspace_shell_agency'
+  | 'organization_workspace_shell_finance'
 
 export interface HomeRolloutSubject {
   userId: string
