@@ -123,13 +123,26 @@ Reglas obligatorias:
 - `greenhouse_core.services` ya tiene `hubspot_deal_id` y `hubspot_service_id` documentados para integración HubSpot.
 - `src/lib/commercial/deals-store.ts` sincroniza deals y mantiene metadata de pipeline/stages.
 - TASK-813 ya materializa inbound HubSpot `p_services` hacia `greenhouse_core.services`.
+- HubSpot API live, portal `48713323`, objeto `0-162`, verificado el 2026-05-08: existen 87 properties activas y ya existen estas properties Greenhouse/Efeonce custom:
+  - `ef_deal_id` (`HubSpot Deal ID`)
+  - `ef_space_id` (`Greenhouse Space ID`)
+  - `ef_organization_id` (`Greenhouse Organization ID`)
+  - `ef_pipeline_stage` (`Pipeline Stage (Greenhouse)`)
+  - `ef_linea_de_servicio`, `ef_servicio_especifico`
+  - `ef_modalidad`, `ef_billing_frequency`, `ef_country`, `ef_currency`
+  - `ef_start_date`, `ef_target_end_date`
+  - `ef_total_cost`, `ef_amount_paid`
+  - `ef_notion_project_id`
+- HubSpot tambien expone standard properties utiles `hs_name`, `hs_pipeline`, `hs_pipeline_stage`, `hubspot_owner_id` y `hs_unique_creation_key`.
 
 ### Gap
 
 - El wizard no exige seleccionar HubSpot Deal abierto.
 - El API de creacion no revalida que el Deal siga abierto ni que tenga company/contactos.
 - No existe comando canonico Greenhouse -> HubSpot `p_services` para Sample Sprints.
-- No hay idempotency key/metadata outbound para evitar duplicados de `p_services`.
+- No existe aun `ef_engagement_kind` en HubSpot `p_services`; `TASK-836` debe crearla como property minima para distinguir `regular|pilot|trial|poc|discovery`.
+- `ef_pipeline_stage` existe pero no contiene `validation`; la stage canonica de HubSpot debe venir de `hs_pipeline_stage`, y `ef_pipeline_stage` solo debe setearse si `TASK-836` decide extenderla con `validation`.
+- Falta verificar si `hs_unique_creation_key` puede usarse como idempotency key writable para creates outbound. Si no es usable, crear una property minima `ef_greenhouse_service_id`.
 - No hay read-back/reliability especifico para Sample Sprint creado sin Deal, sin `p_services` o sin asociaciones company/contact.
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -173,18 +186,22 @@ Reglas obligatorias:
 ### Slice 4 — HubSpot `p_services` Outbound Projection
 
 - Crear helper canonico para crear/proyectar HubSpot `p_services` de Sample Sprint.
-- Setear stage `Validacion / Sample Sprint`, `ef_engagement_kind` y propiedades internas aprobadas, por ejemplo:
-  - `ef_greenhouse_service_id`
-  - `ef_source_deal_id`
-  - `ef_engagement_origin`
-  - `ef_organization_id`
-  - `ef_space_id`
+- Reutilizar propiedades existentes antes de proponer properties nuevas:
+  - `ef_deal_id` para el Deal seleccionado; no crear `ef_source_deal_id`.
+  - `ef_organization_id` y `ef_space_id` para anchors Greenhouse existentes.
+  - `ef_start_date`, `ef_target_end_date`, `ef_total_cost`, `ef_amount_paid`, `ef_currency`, `ef_modalidad`, `ef_billing_frequency`, `ef_country`, `ef_linea_de_servicio`, `ef_servicio_especifico` cuando el comando tenga esos valores.
+- Setear la stage real del Service Pipeline con `hs_pipeline` + `hs_pipeline_stage = Validacion / Sample Sprint`; no usar `ef_pipeline_stage` como source of truth de HubSpot stage.
+- Setear `ef_engagement_kind` creada por `TASK-836` con valores internos `pilot|trial|poc|discovery`.
+- Verificar si `hs_unique_creation_key` es writable y suficiente para idempotent create con `service_id`. Si lo es, usarlo como key primaria de idempotencia outbound.
+- Crear `ef_greenhouse_service_id` solo si `hs_unique_creation_key` no es writable/consultable de forma confiable o si se requiere una referencia humana/API visible para reconciliacion.
+- No crear `ef_engagement_origin` en V1 salvo que Discovery demuestre que `ef_engagement_kind` + `ef_deal_id` + idempotency key no cubren auditoria/reconciliacion.
 - Asociar `p_services` -> Deal, Company y Contact(s).
 - Guardar `hubspot_service_id` local al completar la proyeccion.
 
 ### Slice 5 — Idempotency, Retry and Partial Failures
 
-- Definir idempotency key estable basada en `service_id` o metadata HubSpot equivalente.
+- Definir idempotency key estable basada en `service_id`.
+- Preferir `hs_unique_creation_key` si HubSpot permite escribirla/leerla en `0-162`; fallback: `ef_greenhouse_service_id`.
 - Reintentos no deben duplicar `p_services`.
 - Si el service local existe y HubSpot falla, dejar estado `pending`/retryable con audit trail.
 - Si `p_services` existe pero faltan asociaciones, retry completa asociaciones faltantes.
@@ -233,6 +250,26 @@ Reglas obligatorias:
 6. El `p_services` queda asociado al Deal seleccionado, a la company asociada al Deal y a todos los contactos asociados al Deal.
 7. Greenhouse persiste `hubspot_deal_id`, `hubspot_service_id` y estado de sync auditable.
 
+### HubSpot property policy
+
+La task no debe crear properties duplicadas cuando ya existe una equivalente en `0-162`.
+
+| Necesidad | Propiedad a usar | Estado |
+| --- | --- | --- |
+| Deal asociado | `ef_deal_id` | Ya existe |
+| Organization Greenhouse | `ef_organization_id` | Ya existe |
+| Space Greenhouse | `ef_space_id` | Ya existe |
+| Tipo de servicio | `ef_engagement_kind` | Falta; owner `TASK-836` |
+| Stage real HubSpot | `hs_pipeline_stage` | Ya existe; source of truth |
+| Stage shadow Greenhouse | `ef_pipeline_stage` | Ya existe; no tiene `validation` hoy |
+| Idempotencia create | `hs_unique_creation_key` | Existe; verificar si writable |
+| Fallback idempotencia/reconciliacion | `ef_greenhouse_service_id` | Crear solo si `hs_unique_creation_key` no sirve |
+
+No crear en V1:
+
+- `ef_source_deal_id`: usar `ef_deal_id`.
+- `ef_engagement_origin`: usar `ef_engagement_kind` y asociaciones; crearla solo si Discovery prueba un gap real.
+
 ### Association policy
 
 | Association | Fuente | Requisito |
@@ -264,6 +301,9 @@ Si HubSpot permite multiples companies en el Deal, Discovery debe definir una po
 - [ ] El API revalida server-side stage, company y contactos antes de crear.
 - [ ] `declareSampleSprint()` persiste `hubspot_deal_id` y mantiene audit/outbox transaccional.
 - [ ] Al crear Sample Sprint se crea/proyecta un HubSpot `p_services` en `Validacion / Sample Sprint`.
+- [ ] La proyeccion reutiliza `ef_deal_id`, `ef_organization_id`, `ef_space_id` y las properties existentes; no crea duplicados como `ef_source_deal_id`.
+- [ ] `ef_engagement_kind` existe y se setea con value interno no-regular.
+- [ ] La idempotencia usa `hs_unique_creation_key` si es writable; si no, usa fallback documentado `ef_greenhouse_service_id`.
 - [ ] El `p_services` queda asociado al Deal, company y contacto(s) heredados.
 - [ ] La proyeccion es idempotente y no duplica `p_services` ante retry.
 - [ ] Fallas parciales quedan retryable/auditables.
@@ -279,6 +319,7 @@ Si HubSpot permite multiples companies en el Deal, Discovery debe definir una po
 - `pnpm lint`
 - `pnpm pg:doctor`
 - HubSpot API read-back de un Sample Sprint creado en sandbox/preview para confirmar `p_services` -> Deal, Company y Contact(s).
+- HubSpot API read-back de properties usadas: `ef_deal_id`, `ef_engagement_kind`, `ef_organization_id`, `ef_space_id`, `hs_pipeline`, `hs_pipeline_stage`, `hs_unique_creation_key` o `ef_greenhouse_service_id`.
 - Prueba manual o Playwright autenticado de `/agency/sample-sprints` declarando un Sample Sprint con Deal elegible controlado.
 
 ## Closing Protocol
@@ -303,3 +344,5 @@ Cerrar una task es obligatorio y forma parte de Definition of Done. Si la implem
 
 - ¿Contactos faltantes deben bloquear siempre o permitir override admin temporal? Recomendacion inicial: bloquear.
 - ¿Existe association label primaria confiable para company en Deals con multiples companies? Si no, bloquear y pedir resolucion operativa.
+- ¿`hs_unique_creation_key` es writable en custom object `0-162` para creates API? Si no, crear `ef_greenhouse_service_id` como fallback minimo.
+- ¿`ef_pipeline_stage` debe extenderse con `validation` o quedar como shadow legacy mientras `hs_pipeline_stage` gobierna la etapa real de HubSpot? Recomendacion inicial: `hs_pipeline_stage` manda; no sobrecargar `ef_pipeline_stage`.
