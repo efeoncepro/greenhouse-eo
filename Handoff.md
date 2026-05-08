@@ -1,3 +1,18 @@
+# Sesion 2026-05-08 (tarde) — TASK-838 cerrada (ISSUE-068 Fases 1-4 end-to-end)
+
+- **Trigger:** resolver ISSUE-068 end-to-end de forma robusta, segura, resiliente y escalable. ISSUE detectado en discovery TASK-611: TASK-404 governance tables nunca creadas en PG por pre-up-marker bug en migration `20260417044741101` (3 CREATE TABLE bajo `-- Down Migration` en lugar de Up).
+- **Branch:** `task/TASK-838-issue-068-task-404-governance-tables-resolution`.
+- **4 fases entregadas en una sola PR:**
+  - Fase 1: forward-fix migration `20260508114738704_task-838-fix-task-404-governance-tables-pre-up-marker.sql` — crea las 3 tablas con triggers append-only + DO block RAISE EXCEPTION post-DDL (anti-recurrencia). 381 tablas vs 378 pre-fix.
+  - Fase 2: CI gate `scripts/ci/migration-marker-gate.mjs` mode strict en `.github/workflows/ci.yml` — detecta el patrón "Up vacía + DDL en Down" en cualquier migration nueva + 7 self-tests verdes. Whitelist explícita para TASK-404 legacy ya forward-fixed.
+  - Fase 3: reliability signal `infrastructure.critical_tables.missing` (drift, error si > 0) bajo subsystem `Cloud Platform`. Lista declarativa de 16 tablas críticas + reader que consulta information_schema. Live PG verde (16/16 presentes).
+  - Fase 4: FK enforcement migration `20260508115742046_task-838-fk-grants-to-capabilities-registry.sql` — NOT VALID + VALIDATE atomic + DO block guard post-DDL. Live FK test verde: insert con `organization.zombie_inexistente` rechazado por DB; insert con `organization.identity` válida success. Cierra defense-in-depth Layer 1 que TASK-611 V1 dejó deferred.
+- **Verify final:** pnpm lint clean / tsc clean / 3592/3592 tests verdes (+4 vs 3588 pre-TASK-838).
+- **ISSUE-068:** movido a `docs/issues/resolved/`. README de issues actualizado.
+- **Fase 5 (wire Admin Center mutation paths):** deferida a TASK-839 (1-2 días, UX-heavy). No bloqueante: la infraestructura DB + observability + CI gate ya están en su lugar.
+- **Fase 6 (cleanup deprecated capabilities):** oportunista, no abre TASK propia.
+- **Multi-agente:** branch dedicado, sin cross-impacts. Pre-existing changes from another agent (EPIC-014, TASK-835/836/837) preservadas sin merge.
+
 # Sesion 2026-05-08 — TASK-611 cerrada (Organization Workspace Projection foundation)
 
 - **Trigger:** ejecutar TASK-611 (P1 / EPIC-008) — foundation canonica para Organization Workspace facet projection. Branch `task/TASK-611-organization-workspace-facet-projection-entitlements-foundation` creado desde `develop` limpio.

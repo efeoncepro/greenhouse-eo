@@ -2,13 +2,13 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `bugfix + hardening`
 - Epic: `—` (cierra ISSUE-068)
-- Status real: `En ejecución 2026-05-08`
+- Status real: `Cerrada 2026-05-08 — 4 fases entregadas, 3592/3592 tests verdes, ISSUE-068 movido a resolved/`
 - Domain: `identity` + `cloud` (CI + runtime guards)
 - Blocked by: `none`
 - Branch: `task/TASK-838-issue-068-task-404-governance-tables-resolution`
