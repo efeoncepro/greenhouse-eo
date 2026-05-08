@@ -19,11 +19,11 @@ import type { OrganizationFacet } from './facet-capability-mapping'
 export const FACET_TO_VIEW_CODE: Record<OrganizationFacet, string> = {
   identity: 'gestion.organizaciones',
   spaces: 'gestion.spaces',
-  team: 'gestion.organizaciones',
-  delivery: 'gestion.agencia',
-  finance: 'finance.clients',
-  economics: 'finance.clients',
-  crm: 'commercial.contacts',
+  team: 'gestion.equipo',
+  delivery: 'gestion.delivery',
+  finance: 'finanzas.clientes',
+  economics: 'gestion.economia',
+  crm: 'comercial.pipeline',
   services: 'gestion.servicios',
   staffAug: 'gestion.staff_augmentation'
 } as const
