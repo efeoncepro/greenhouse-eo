@@ -2,7 +2,18 @@
 
 ## Estado
 
-Open
+Resolved (Fases 1-4 entregadas 2026-05-08 vía TASK-838; Fase 5 derivada en TASK-839).
+
+## Resolución aplicada (2026-05-08)
+
+- **Fase 1 ✅** — Forward fix migration `20260508114738704_task-838-fix-task-404-governance-tables-pre-up-marker.sql`. Las 3 governance tables existen en PG dev (381 tablas vs 378 pre-fix). Bloque DO con RAISE EXCEPTION verifica information_schema post-DDL. Append-only audit log enforced también via triggers PG.
+- **Fase 2 ✅** — CI gate `scripts/ci/migration-marker-gate.mjs` modo strict en `.github/workflows/ci.yml`. Bloquea PRs con patrón "Up vacía + DDL en Down". 7 self-tests verdes. 295 migrations scanned (1 INFO whitelisted: el legacy de TASK-404 ya forward-fixed).
+- **Fase 3 ✅** — Reliability signal `infrastructure.critical_tables.missing` (drift, error si > 0). Lista declarativa de 16 tablas críticas + reader que consulta information_schema. Wireado en `get-reliability-overview.ts` bajo moduleKey 'cloud'. Live PG verde (16/16 presentes).
+- **Fase 4 ✅** — FK enforcement migration `20260508115742046_task-838-fk-grants-to-capabilities-registry.sql`. Patrón NOT VALID + VALIDATE atomic + DO block guard post-DDL. Live FK test verde: insert con capability inexistente → FK violation rechazado por DB; insert con capability válida → success. `pg_constraint` confirma `role_entitlement_defaults_capability_fk` + `user_entitlement_overrides_capability_fk` con `convalidated=TRUE`.
+- **Fase 5 (deferred)** — Wire Admin Center mutation paths. Movida a **TASK-839** (1-2 días, UX-heavy). No bloqueante: la infraestructura DB + observability + CI gate ya están en su lugar.
+- **Fase 6 (oportunista)** — Cleanup capabilities deprecated. No abre TASK propia.
+
+3592/3592 tests verdes. CLAUDE.md + AGENTS.md ya documentan las hard rules canonizadas (commit `a514dec5`). Patrón forward-fix sin tocar legacy preservado.
 
 ## Ambiente
 
