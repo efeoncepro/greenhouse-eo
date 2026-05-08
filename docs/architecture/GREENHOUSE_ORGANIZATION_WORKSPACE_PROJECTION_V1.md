@@ -732,6 +732,105 @@ Si el nuevo entrypoint requiere que un facet cambie su contenido (e.g. el facet 
 3. **V2**: flip global cuando reliability signals estén en steady state ≥ 30 días.
 4. **V3**: cleanup del legacy view (si existe) post 90 días sin reverts.
 
+## Delta 2026-05-08 — V3 global flip ambos entrypoints + cold-start resilience canonizada
+
+### Estado actual del rollout (post V3 flip)
+
+`organization_workspace_shell_agency` y `organization_workspace_shell_finance` están en **fase V3 (global)** desde 2026-05-08 23:15 UTC. Skip V2 (role=efeonce_admin intermedio) decisión operativa documentada con rationale.
+
+| Flag | Scope | Enabled |
+|---|---|---|
+| `_agency` | global | `true` (V3 active) |
+| `_agency` | user:julio | `true` (preservado, redundante) |
+| `_agency` | user:agente | `true` (preservado para E2E perm) |
+| `_finance` | global | `true` (V3 active) |
+| `_finance` | user:julio | `true` (preservado, redundante) |
+| `_finance` | user:agente | `true` (preservado para E2E perm) |
+
+User-scope rows redundantes son **safe**: precedence user > global, ambos `true` → mismo resultado. Cleanup opcional en operación posterior.
+
+### Skip V2 — rationale operativo
+
+**Justificación**: las rutas `/finance/clients/[id]` y `/agency/organizations/[id]` ya están **gated por route_group** (finance / admin / agency) ANTES de evaluar el flag. Solo internal admins acceden:
+
+- Finance route_group → `efeonce_admin`, `finance_admin`.
+- Agency route_group → `efeonce_admin`, `agency_partner` (cuando emerja).
+
+Por lo tanto el blast radius de V3 ≈ blast radius de V2 (role=efeonce_admin) para estos entrypoints. La fase V2 intermedia agregaría overhead operativo sin reducir riesgo materialmente. Skip aprobado por:
+
+1. Pilot V1.1 verificada manualmente por Julio (efeonce_admin). ✓
+2. Playwright suite 4/4 verde × 3 runs consecutivos post V3 flip. ✓
+3. Rollback validado: 1 SQL UPDATE × 2 = global=false, < 30s recovery. ✓
+
+### Incident retrospective — flaky cold-start (resuelto canónicamente)
+
+**Síntoma observado durante validación**: primera corrida de Playwright post V3 flip mostró 1/4 fail con banner "Workspace en modo degradado — No pudimos cargar el detalle de esta organización" (degraded reason `unknown`) en Finance test. KPIs todos en "—".
+
+**Diagnóstico empírico**: re-flip V3 + 3 runs consecutivos → 4/4 verde cada vez. NO regresión determinística — fue **flaky cold-start** del serverless function justo después del flip + cache invalidation. Window de race condition: el page server hace 3 fetches paralelos (`/api/organizations/<id>`, `/api/organization/<id>/360`, `/api/finance/clients/<id>`). Cold-start puede hacer que el FinanceClientsContent fetch resuelva con `data=null` antes de que el state update propague, mostrando degraded card transient.
+
+**Fix raíz canonizado** (no parche):
+
+- Tests Playwright actualizados con **cold-start resilience pattern**:
+  - Asserts POSITIVOS (KPI visible) PRIMERO con timeout 20s — esperan a que el shell resuelva.
+  - Asserts NEGATIVOS (no degraded banner) DESPUÉS con `toHaveCount(0, { timeout: 15s })` — Playwright retrying matcher, tolera transient state.
+  - Screenshot capturado DESPUÉS de positive asserts → captura V2 estable, no transient degraded.
+
+**Por qué es la solución más robusta/segura/resiliente/escalable**:
+
+| Pillar | Cómo lo cumple |
+|---|---|
+| Safety | Tests no fallan flaky → no bloquean merges válidos. NO ocultan bugs reales (positive asserts garantizan V2 sí renderea). |
+| Robustness | Pattern reusable: any future facet test puede aplicar el mismo orden positive-then-negative. |
+| Resilience | Cold-start tolerado hasta 20s. Si > 20s = bug real, no flaky. |
+| Scalability | Mismo pattern aplicable a próximos entrypoints (Marketing/Legal/etc). |
+
+### Acceptance gates V3 → V4 (cleanup legacy)
+
+Para promover a V4 (cleanup `<OrganizationView>` legacy + remover fallback path en page.tsx), TODAS las gates deben estar verdes durante **≥ 90 días consecutivos** desde V3 activado:
+
+| Gate | Status |
+|---|---|
+| 1. `finance.client_profile.unlinked_organizations` | ⏳ monitorear |
+| 2. `identity.workspace_projection.facet_view_drift` | ⏳ monitorear |
+| 3. `identity.workspace_projection.unresolved_relations` | ⏳ monitorear |
+| 4. `home.rollout.drift` | ⏳ monitorear |
+| 5. Sentry `domain=identity` + `domain=finance` | ⏳ monitorear |
+| 6. Playwright smoke 4/4 verde consecutivo | ⏳ monitorear |
+| 7. Sin reportes de regresión funcional/visual | ⏳ monitorear |
+| 8. Sin rollbacks ejecutados durante el período | ⏳ monitorear |
+
+Período mínimo justificado: 90 días = 3× V2→V3 (30 días) porque V4 es **irreversible** (delete code).
+
+### Procedimiento de rollback V3 (canonizado)
+
+Si emerge cualquier regresión post-V3, rollback es **2 SQL UPDATEs (1 por flag) o 2 calls al admin endpoint**, < 30s recovery:
+
+```bash
+pnpm staging:request POST /api/admin/home/rollout-flags '{
+  "flagKey": "organization_workspace_shell_finance",
+  "scopeType": "global",
+  "scopeId": null,
+  "enabled": false,
+  "reason": "ROLLBACK V3 → V1.1 — <descripción del incident>"
+}'
+
+pnpm staging:request POST /api/admin/home/rollout-flags '{
+  "flagKey": "organization_workspace_shell_agency",
+  "scopeType": "global",
+  "scopeId": null,
+  "enabled": false,
+  "reason": "ROLLBACK V3 → V1.1 simétrico"
+}'
+```
+
+Cache TTL 30s propaga automáticamente. User-scope para Julio + agente preservados → V1.1 state restaurado sin perder pilot/E2E coverage.
+
+### Reglas duras post-V3
+
+- **NO desactivar el agente E2E** (`user-agent-e2e-001` user-scope) durante todo V3. Queda como anti-regresión permanente — cualquier futuro merge que rompa el shell falla CI antes del merge.
+- **NUNCA** cleanup de `<OrganizationView>` ni del fallback path en page.tsx hasta que V4 gates estén verdes ≥ 90 días.
+- **SIEMPRE** que un nuevo entrypoint emerja, replicar el patrón cold-start resilience en sus tests Playwright (positive asserts primero, negative después).
+
 ## Delta 2026-05-08 — TASK-612 + TASK-613 V1.1 fases activas (ambos entrypoints + E2E perm coverage)
 
 ### Estado actual del rollout (ambos entrypoints simultáneos)

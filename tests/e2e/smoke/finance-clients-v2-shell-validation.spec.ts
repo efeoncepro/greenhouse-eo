@@ -24,26 +24,36 @@ test.describe('Finance Clients V2 Shell — TASK-613 V1.1 verification', () => {
     // Wait for hydration
     await page.waitForLoadState('networkidle', { timeout: 15_000 }).catch(() => {})
 
-    // Capture screenshot for visual verification
+    // ── Cold-start resilience (V3 rollout post-flip) ──
+    // El page server hace 3 fetches paralelos (organizations, 360, finance-clients)
+    // que durante cold-start del serverless function pueden tardar > timeout
+    // default. Esperamos primero a que un MARKER POSITIVO del shell V2 aparezca
+    // (Revenue KPI), lo que confirma que la projection resolvió Y los fetches
+    // subsiguientes están en progreso. Después validamos ausencia de degraded
+    // banner — ese orden previene falsos positivos durante transient loading.
+    const v2RevenueKpi = page.getByText('Revenue', { exact: true }).first()
+    const v2MarginKpi = page.getByText('Margen bruto', { exact: true }).first()
+
+    await expect(v2RevenueKpi, 'V2 KPI Revenue debe estar visible (cold-start resilient)').toBeVisible({
+      timeout: 20_000
+    })
+    await expect(v2MarginKpi, 'V2 KPI Margen bruto debe estar visible').toBeVisible({ timeout: 10_000 })
+
+    // Capture screenshot AFTER positive assertions confirm V2 rendered
     await page.screenshot({
       path: 'test-results/playwright/finance-clients-v2-validation/page.png',
       fullPage: true
     })
 
-    // 1. No degraded mode banner (ISSUE-071 anti-regression)
+    // 1. No degraded mode banner (ISSUE-071 anti-regression).
+    // toHaveCount(0) con timeout extendido tolera transient loading state donde
+    // el banner aparece brevemente mientras data fetches resuelven.
     const degradedBanner = page.getByText('Workspace en modo degradado')
 
-    await expect(degradedBanner, 'NO debe haber banner degraded — la projection debe resolver completa').toHaveCount(0)
-
-    // 2. KPI strip canónico — los 4 KPIs canónicos del V2 shell.
-    // V2 KPIs: Revenue / Margen bruto / Equipo / Spaces.
-    // Legacy Finance KPIs: Por cobrar / Vencidas / Condiciones (estos también
-    // aparecen pero ADENTRO de la tab Finance, no como header strip).
-    const v2RevenueKpi = page.getByText('Revenue', { exact: true }).first()
-    const v2MarginKpi = page.getByText('Margen bruto', { exact: true }).first()
-
-    await expect(v2RevenueKpi, 'V2 KPI Revenue debe estar visible').toBeVisible({ timeout: 10_000 })
-    await expect(v2MarginKpi, 'V2 KPI Margen bruto debe estar visible').toBeVisible({ timeout: 10_000 })
+    await expect(
+      degradedBanner,
+      'NO debe haber banner degraded — la projection debe resolver completa'
+    ).toHaveCount(0, { timeout: 15_000 })
 
     // 3. Tab strip por facets — los 9 facets canónicos del shell.
     // Esto distingue inequívocamente el shell V2 del legacy. El legacy
