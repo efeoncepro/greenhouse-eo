@@ -3,11 +3,20 @@
 import { useEffect, useState } from 'react'
 
 import Alert from '@mui/material/Alert'
+import AlertTitle from '@mui/material/AlertTitle'
 import LinearProgress from '@mui/material/LinearProgress'
 import Stack from '@mui/material/Stack'
+import Typography from '@mui/material/Typography'
+
+import { GH_AGENCY } from '@/lib/copy/agency'
+import type {
+  SampleSprintProjectionDegradedReason,
+  SampleSprintRuntimeItem,
+  SampleSprintRuntimeProjection,
+  SampleSprintRuntimeSignal
+} from '@/lib/commercial/sample-sprints/runtime-projection-types'
 
 import SampleSprintsMockupView, {
-  type HealthSeverity,
   type RuntimeSampleSprintOptions,
   type Signal,
   type Sprint,
@@ -137,23 +146,11 @@ const getDaysSince = (value: string | null) => {
   return Math.max(0, Math.floor((Date.now() - target.getTime()) / 86400000))
 }
 
-const getProgressPct = (item: SampleSprintItem) => {
-  if (item.outcomeKind) return 100
-  if (item.latestSnapshotDate) return 72
-  if (item.status === 'active') return 42
-  if (item.status === 'pending_approval') return 8
-
-  return 20
-}
-
-const getSignalSeverity = (item: SampleSprintItem): HealthSeverity => {
-  if (item.status === 'pending_approval') return 'warning'
-  if (getDaysSince(item.latestSnapshotDate) > 10 && item.status === 'active') return 'warning'
-  if (item.outcomeKind === 'cancelled_by_client' || item.outcomeKind === 'cancelled_by_provider') return 'error'
-  if (item.outcomeKind === 'converted') return 'success'
-
-  return 'info'
-}
+/**
+ * TASK-835 — toda derivación de progressPct, actualClp, team y signals
+ * vive server-side en `src/lib/commercial/sample-sprints/runtime-projection.ts`.
+ * El Workspace consume el `runtime` field del payload — ya no deriva localmente.
+ */
 
 const initialsFrom = (value: string) => value
   .split(/\s+/)
@@ -162,15 +159,27 @@ const initialsFrom = (value: string) => value
   .map(part => part[0]?.toUpperCase())
   .join('') || 'SS'
 
-const teamFromItem = (item: SampleSprintItem): TeamMember[] => [{
-  name: getClientLabel(item),
-  role: 'Engagement owner',
-  initials: initialsFrom(getClientLabel(item)),
-  allocation: item.status === 'pending_approval' ? 0.15 : 0.35,
-  availability: item.status === 'pending_approval' ? 0.85 : 0.45
-}]
+const teamFromRuntimeDetail = (
+  runtimeTeam: SampleSprintRuntimeProjection['selected'] extends infer S
+    ? S extends { team: infer T } ? T : never
+    : never
+): TeamMember[] => {
+  if (!Array.isArray(runtimeTeam) || runtimeTeam.length === 0) return []
 
-const toSprint = (item: SampleSprintItem): Sprint => ({
+  return runtimeTeam.map(member => {
+    const displayName = member.displayName ?? member.memberId
+
+    return {
+      name: displayName,
+      role: member.roleTitle ?? member.commitmentRole ?? 'Sin rol declarado',
+      initials: initialsFrom(displayName),
+      allocation: Number.isFinite(member.proposedFte) ? member.proposedFte : 0,
+      availability: 0
+    }
+  })
+}
+
+const toSprint = (item: SampleSprintItem, runtimeItem?: SampleSprintRuntimeItem): Sprint => ({
   id: item.serviceId,
   client: getClientLabel(item),
   name: item.name,
@@ -181,67 +190,33 @@ const toSprint = (item: SampleSprintItem): Sprint => ({
   startDate: item.startDate ?? item.createdAt ?? new Date().toISOString().slice(0, 10),
   decisionDate: item.decisionDeadline ?? item.targetEndDate ?? item.startDate ?? item.createdAt ?? new Date().toISOString().slice(0, 10),
   budgetClp: item.expectedInternalCostClp,
-  actualClp: 0,
+  actualClp: runtimeItem?.actualClp ?? null,
   conversionProbability: item.outcomeKind === 'converted' ? 100 : item.status === 'active' ? 55 : 0,
-  progressPct: getProgressPct(item),
-  lastSnapshotDays: getDaysSince(item.latestSnapshotDate),
+  progressPct: runtimeItem?.progressPct ?? null,
+  lastSnapshotDays: runtimeItem?.daysSinceLastSnapshot ?? getDaysSince(item.latestSnapshotDate),
   phase: getPhase(item),
   outcome: item.outcomeKind ?? undefined,
-  signal: getSignalSeverity(item),
-  team: teamFromItem(item)
+  signal: runtimeItem?.signalSeverity ?? 'info',
+  team: []
 })
 
-const buildRuntimeSignals = (items: SampleSprintItem[]): Signal[] => {
-  const overdueDecision = items.filter(item => item.decisionDeadline && new Date(item.decisionDeadline) < new Date() && !item.outcomeKind).length
-  const pendingApproval = items.filter(item => item.status === 'pending_approval').length
-  const staleProgress = items.filter(item => item.status === 'active' && getDaysSince(item.latestSnapshotDate) > 10).length
-  const unapprovedActive = items.filter(item => item.status === 'active' && item.approvalStatus && item.approvalStatus !== 'approved').length
-  const closed = items.filter(item => item.outcomeKind).length
-  const converted = items.filter(item => item.outcomeKind === 'converted').length
-  const conversionRate = closed > 0 ? converted / closed : 1
+const mapRuntimeSignals = (runtimeSignals: readonly SampleSprintRuntimeSignal[] | undefined): Signal[] => {
+  if (!Array.isArray(runtimeSignals)) return []
 
-  return [
-    {
-      code: 'commercial.engagement.overdue_decision',
-      label: 'Decisiones vencidas',
-      severity: 'error',
-      count: overdueDecision,
-      runbook: 'Cerrar resultado o ajustar fecha de decisión con aprobación',
-      description: 'Engagements sin resultado después de la fecha de decisión.'
-    },
-    {
-      code: 'commercial.engagement.pending_approval',
-      label: 'Aprobación pendiente',
-      severity: 'warning',
-      count: pendingApproval,
-      runbook: 'Revisar capacidad y aprobar o rechazar el Sprint',
-      description: 'Sample Sprints declarados que aún no pasan a operación.'
-    },
-    {
-      code: 'commercial.engagement.stale_progress',
-      label: 'Progreso sin actualización',
-      severity: 'warning',
-      count: staleProgress,
-      runbook: 'Registrar actualización semanal con contexto operacional',
-      description: 'Engagement activo sin actualización reciente.'
-    },
-    {
-      code: 'commercial.engagement.unapproved_active',
-      label: 'Activos sin aprobación',
-      severity: 'error',
-      count: unapprovedActive,
-      runbook: 'Volver a aprobación pendiente o registrar aprobación retroactiva',
-      description: 'Servicios no regulares activos sin aprobación vigente.'
-    },
-    {
-      code: 'commercial.engagement.conversion_rate_drop',
-      label: 'Conversión bajo umbral',
-      severity: 'warning',
-      count: conversionRate < 0.35 ? 1 : 0,
-      runbook: 'Revisar resultados de los últimos 6 meses y criterios de éxito',
-      description: 'La conversión de los últimos 6 meses está bajo el umbral configurado.'
-    }
-  ]
+  return runtimeSignals.map(signal => ({
+    code: `commercial.engagement.${signal.kind.replace(/-/g, '_')}`,
+    label: signal.label,
+    severity: signal.severity === 'success' ? 'info' : signal.severity,
+    count: signal.count,
+    runbook: signal.runbook,
+    description: signal.description
+  }))
+}
+
+const getDegradedCopy = (code: SampleSprintProjectionDegradedReason['code']) => {
+  const dict = GH_AGENCY.sampleSprints.degraded
+
+  return dict[code]
 }
 
 const readJsonResponse = async <T,>(response: Response): Promise<T | null> => {
@@ -260,6 +235,7 @@ const useSampleSprints = (mode: WorkspaceMode, serviceId?: string) => {
   const [items, setItems] = useState<SampleSprintItem[]>([])
   const [detail, setDetail] = useState<SampleSprintDetail | null>(null)
   const [options, setOptions] = useState<Options | null>(null)
+  const [runtime, setRuntime] = useState<SampleSprintRuntimeProjection | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -273,22 +249,34 @@ const useSampleSprints = (mode: WorkspaceMode, serviceId?: string) => {
       try {
         if (mode === 'list' || mode === 'declare') {
           const response = await fetch('/api/agency/sample-sprints?includeOptions=true', { cache: 'no-store' })
-          const payload = await readJsonResponse<{ items?: SampleSprintItem[]; options?: Options; error?: string }>(response)
+
+          const payload = await readJsonResponse<{
+            items?: SampleSprintItem[]
+            options?: Options
+            runtime?: SampleSprintRuntimeProjection
+            error?: string
+          }>(response)
 
           if (!response.ok) throw new Error(payload?.error || 'No fue posible cargar Sample Sprints.')
           if (!mounted) return
 
           setItems(payload?.items ?? [])
           setOptions(payload?.options ?? null)
+          setRuntime(payload?.runtime ?? null)
         } else if (serviceId) {
           const response = await fetch(`/api/agency/sample-sprints/${encodeURIComponent(serviceId)}`, { cache: 'no-store' })
-          const payload = await readJsonResponse<(SampleSprintDetail & { error?: string })>(response)
+
+          const payload = await readJsonResponse<(SampleSprintDetail & {
+            runtime?: SampleSprintRuntimeProjection
+            error?: string
+          })>(response)
 
           if (!response.ok) throw new Error(payload?.error || 'No fue posible cargar el Sample Sprint.')
           if (!payload) throw new Error('La respuesta del Sample Sprint llegó vacía.')
           if (!mounted) return
 
           setDetail(payload)
+          setRuntime(payload.runtime ?? null)
 
           const optionsResponse = await fetch('/api/agency/sample-sprints?includeOptions=true', { cache: 'no-store' })
           const optionsPayload = await readJsonResponse<{ options?: Options }>(optionsResponse)
@@ -313,7 +301,7 @@ const useSampleSprints = (mode: WorkspaceMode, serviceId?: string) => {
     }
   }, [mode, serviceId])
 
-  return { items, detail, options, loading, error }
+  return { items, detail, options, runtime, loading, error }
 }
 
 const surfaceByMode: Record<WorkspaceMode, 'command' | 'declare' | 'detail' | 'approval' | 'progress' | 'outcome'> = {
@@ -325,24 +313,74 @@ const surfaceByMode: Record<WorkspaceMode, 'command' | 'declare' | 'detail' | 'a
   outcome: 'outcome'
 }
 
+const DegradedBanner = ({ degraded }: { degraded: SampleSprintProjectionDegradedReason[] }) => {
+  if (degraded.length === 0) return null
+
+  return (
+    <Alert
+      severity='warning'
+      variant='outlined'
+      role='status'
+      aria-live='polite'
+      aria-label={GH_AGENCY.sampleSprints.aria.degradedBanner}
+    >
+      <AlertTitle>{GH_AGENCY.sampleSprints.degraded.bannerTitle}</AlertTitle>
+      <Typography variant='body2' color='text.secondary' sx={{ mb: 1 }}>
+        {GH_AGENCY.sampleSprints.degraded.bannerHint}
+      </Typography>
+      <Stack component='ul' spacing={0.5} sx={{ pl: 2.5, m: 0 }}>
+        {degraded.map((reason, idx) => {
+          const copy = getDegradedCopy(reason.code)
+
+          return (
+            <Typography component='li' variant='body2' key={`${reason.code}-${idx}`}>
+              <strong>{copy.title}.</strong> {copy.description}
+            </Typography>
+          )
+        })}
+      </Stack>
+    </Alert>
+  )
+}
+
 const RuntimeWorkspaceView = ({
   items,
   detail,
   options,
+  runtime,
   mode
 }: {
   items: SampleSprintItem[]
   detail: SampleSprintDetail | null
   options: RuntimeSampleSprintOptions | null
+  runtime: SampleSprintRuntimeProjection | null
   mode: WorkspaceMode
 }) => {
   const runtimeItems = detail ? [detail] : items
 
+  // Index runtime items by serviceId — ya viene desde server-side, evitamos doble lookup.
+  const runtimeIndex = new Map<string, SampleSprintRuntimeItem>()
+
+  for (const ri of runtime?.items ?? []) runtimeIndex.set(ri.serviceId, ri)
+
+  const sprints = runtimeItems.map(item => {
+    const sprint = toSprint(item, runtimeIndex.get(item.serviceId))
+
+    // Inyectar team enriquecido server-side para el sprint seleccionado.
+    if (detail && item.serviceId === detail.serviceId && runtime?.selected?.serviceId === detail.serviceId) {
+      return { ...sprint, team: teamFromRuntimeDetail(runtime.selected.team) }
+    }
+
+    return sprint
+  })
+
+  const signals = mapRuntimeSignals(runtime?.signals)
+
   return (
     <SampleSprintsMockupView
       variant='runtime'
-      sprints={runtimeItems.map(toSprint)}
-      signals={buildRuntimeSignals(runtimeItems)}
+      sprints={sprints}
+      signals={signals}
       initialSelectedSprintId={detail?.serviceId ?? runtimeItems[0]?.serviceId}
       initialActiveSurface={surfaceByMode[mode]}
       runtimeOptions={options}
@@ -351,13 +389,18 @@ const RuntimeWorkspaceView = ({
 }
 
 const SampleSprintsWorkspace = ({ mode, serviceId }: Props) => {
-  const { items, detail, options, loading, error } = useSampleSprints(mode, serviceId)
+  const { items, detail, options, runtime, loading, error } = useSampleSprints(mode, serviceId)
 
   return (
     <Stack spacing={4}>
       {loading ? <LinearProgress /> : null}
       {error ? <Alert severity='error'>{error}</Alert> : null}
-      {!loading && !error ? <RuntimeWorkspaceView items={items} detail={detail} options={options} mode={mode} /> : null}
+      {!loading && !error && runtime?.degraded?.length ? (
+        <DegradedBanner degraded={runtime.degraded} />
+      ) : null}
+      {!loading && !error ? (
+        <RuntimeWorkspaceView items={items} detail={detail} options={options} runtime={runtime} mode={mode} />
+      ) : null}
     </Stack>
   )
 }

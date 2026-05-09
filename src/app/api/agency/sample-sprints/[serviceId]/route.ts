@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 
-import { getSampleSprintDetail } from '@/lib/commercial/sample-sprints/store'
+import { resolveSampleSprintRuntimeProjection } from '@/lib/commercial/sample-sprints/runtime-projection'
+import { getSampleSprintDetail, listSampleSprints } from '@/lib/commercial/sample-sprints/store'
 
 import { requireSampleSprintEntitlement } from '../access'
 
@@ -21,5 +22,16 @@ export async function GET(
     return NextResponse.json({ error: 'Sample Sprint not found.' }, { status: 404 })
   }
 
-  return NextResponse.json(detail)
+  // TASK-835 Slice 5 — Runtime projection adjunta al detail. Reusa el detail
+  // ya fetcheado para enriquecer team + capacity sin doble fetch.
+  const items = await listSampleSprints({ tenant })
+
+  const runtime = await resolveSampleSprintRuntimeProjection({
+    tenant,
+    selectedServiceId: serviceId,
+    prefetchedItems: items,
+    prefetchedDetail: detail
+  })
+
+  return NextResponse.json({ ...detail, runtime })
 }

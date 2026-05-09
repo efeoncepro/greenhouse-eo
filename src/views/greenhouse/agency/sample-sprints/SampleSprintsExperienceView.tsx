@@ -77,9 +77,11 @@ export type Sprint = {
   startDate: string
   decisionDate: string
   budgetClp: number
-  actualClp: number
+  /** TASK-835: null cuando no hay datos de cost attribution para el período. NUNCA usar `0` placeholder. */
+  actualClp: number | null
   conversionProbability: number
-  progressPct: number
+  /** TASK-835: null cuando el último snapshot no incluye `metrics.deliveryProgressPct`. NUNCA usar `0` placeholder. */
+  progressPct: number | null
   lastSnapshotDays: number
   phase: 'Kickoff' | 'Operación' | 'Reporte' | 'Decisión'
   outcome?: string
@@ -385,7 +387,13 @@ const SampleSprintsMockupView = ({
   const closedCount = sprints.filter(sprint => ['converted', 'cancelled', 'dropped'].includes(sprint.status)).length
   const convertedCount = sprints.filter(sprint => sprint.status === 'converted').length
   const conversionRate = variant === 'mockup' ? 64 : closedCount > 0 ? Math.round((convertedCount / closedCount) * 100) : 0
-  const gtmInvestment = sprints.reduce((sum, sprint) => sum + (variant === 'mockup' ? sprint.actualClp : sprint.budgetClp), 0)
+
+  const gtmInvestment = sprints.reduce((sum, sprint) => {
+    if (variant === 'mockup') return sum + (sprint.actualClp ?? 0)
+
+    return sum + sprint.budgetClp
+  }, 0)
+
   const warningCount = signals.filter(signal => signal.count > 0).length
   const isRuntime = variant === 'runtime'
   const variantCopy = isRuntime ? sampleCopy.runtime : sampleCopy.mockup
@@ -805,7 +813,11 @@ const CommandCenter = ({
 const SprintRow = ({ sprint, selected, onSelect }: { sprint: Sprint; selected: boolean; onSelect: () => void }) => {
   const kind = sprintKinds[sprint.kind]
   const status = statusMeta[sprint.status]
-  const budgetPct = sprint.budgetClp > 0 ? Math.min(100, Math.round((sprint.actualClp / sprint.budgetClp) * 100)) : sprint.progressPct
+
+  const budgetPct =
+    sprint.budgetClp > 0 && sprint.actualClp !== null
+      ? Math.min(100, Math.round((sprint.actualClp / sprint.budgetClp) * 100))
+      : sprint.progressPct ?? 0
 
   return (
     <Box
@@ -882,7 +894,11 @@ const SprintRow = ({ sprint, selected, onSelect }: { sprint: Sprint; selected: b
 
 const DetailSurface = ({ sprint, reducedMotion, variant }: { sprint: Sprint; reducedMotion: boolean; variant: SampleSprintsExperienceVariant }) => {
   const activeStep = phaseSteps.indexOf(sprint.phase)
-  const costProgress = sprint.budgetClp > 0 ? Math.min(100, (sprint.actualClp / sprint.budgetClp) * 100) : sprint.progressPct
+
+  const costProgress =
+    sprint.budgetClp > 0 && sprint.actualClp !== null
+      ? Math.min(100, (sprint.actualClp / sprint.budgetClp) * 100)
+      : sprint.progressPct ?? 0
 
   return (
     <Grid container spacing={6}>
@@ -941,8 +957,17 @@ const DetailSurface = ({ sprint, reducedMotion, variant }: { sprint: Sprint; red
                   <CardContent>
                     <Stack spacing={3}>
                       <Typography variant='h4' sx={{ fontVariantNumeric: 'tabular-nums' }}>
-                        {formatCurrency(variant === 'mockup' ? sprint.actualClp : sprint.budgetClp)}
+                        {variant === 'mockup'
+                          ? formatCurrency(sprint.actualClp ?? 0)
+                          : sprint.actualClp !== null
+                            ? formatCurrency(sprint.actualClp)
+                            : sampleCopy.runtimeMetrics.noCostValue}
                       </Typography>
+                      {variant !== 'mockup' && sprint.actualClp === null ? (
+                        <Typography variant='caption' color='text.secondary'>
+                          {sampleCopy.runtimeMetrics.noCostHint}
+                        </Typography>
+                      ) : null}
                       <LinearProgress
                         value={costProgress}
                         variant='determinate'
@@ -975,7 +1000,9 @@ const DetailSurface = ({ sprint, reducedMotion, variant }: { sprint: Sprint; red
                   : [
                       sprint.lastSnapshotDays > 0 ? `Último snapshot hace ${sprint.lastSnapshotDays} días` : 'Sin snapshot registrado',
                       `Fase actual · ${sprint.phase}`,
-                      `Progreso operacional · ${sprint.progressPct}%`
+                      sprint.progressPct === null
+                        ? `Progreso operacional · ${sampleCopy.runtimeMetrics.noProgressValue}`
+                        : `Progreso operacional · ${sprint.progressPct}%`
                     ]).map((item, index) => (
                   <Stack key={item} direction='row' spacing={2}>
                     <SignalDot severity={index === 2 ? 'warning' : 'success'} />
@@ -1236,7 +1263,12 @@ const ProgressWizard = ({
               </CustomTextField>
             </Grid>
             <Grid size={{ xs: 12, md: 4 }}>
-              <CustomTextField label='Avance estimado' defaultValue={`${sprint.progressPct}%`} fullWidth />
+              <CustomTextField
+                label='Avance estimado'
+                defaultValue={sprint.progressPct === null ? '' : `${sprint.progressPct}%`}
+                placeholder={sprint.progressPct === null ? sampleCopy.runtimeMetrics.noProgressValue : undefined}
+                fullWidth
+              />
             </Grid>
             <Grid size={{ xs: 12 }}>
               <CustomTextField
@@ -1595,7 +1627,7 @@ const RuntimeProgressWizard = ({ sprint }: { sprint: Sprint }) => {
   const [feedback, setFeedback] = useState<{ severity: 'success' | 'error'; message: string } | null>(null)
   const [snapshotDate, setSnapshotDate] = useState(new Date().toISOString().slice(0, 10))
   const [state, setState] = useState('on_track')
-  const [progressPct, setProgressPct] = useState(sprint.progressPct)
+  const [progressPct, setProgressPct] = useState<number>(sprint.progressPct ?? 0)
   const [snapshotNotes, setSnapshotNotes] = useState('Semana con avance fuerte en playbook de operación. Falta cerrar evidencia de ahorro de tiempo.')
 
   const submit = () => {

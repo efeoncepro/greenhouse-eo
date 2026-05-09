@@ -227,7 +227,41 @@ export const GH_AGENCY = {
       costAgainstBudget: 'Costo acumulado contra presupuesto',
       capacityByMember: 'Capacity warning por miembro',
       commercialHealthRatio: 'Ratio de salud comercial',
-      memberAllocation: 'Asignación del miembro'
+      memberAllocation: 'Asignación del miembro',
+      degradedBanner: 'Algunas señales del workspace están en revisión',
+      noProgressRegistered: 'Sin progreso registrado para este sprint',
+      noCostInPeriod: 'Sin costo registrado para el período actual'
+    },
+    runtimeMetrics: {
+      noCostValue: '—',
+      noCostHint: 'Sin costo registrado para el período actual.',
+      noProgressValue: 'Sin progreso',
+      noProgressHint: 'El último snapshot no incluye porcentaje de avance medible.',
+      teamUnresolvedHint: 'Algunos miembros propuestos no resolvieron en el directorio activo.'
+    },
+    degraded: {
+      bannerTitle: 'Datos parciales en este momento',
+      bannerHint: 'El workspace muestra lo disponible. Las señales en revisión se listan abajo.',
+      cost_attribution_unavailable: {
+        title: 'Costos en revisión',
+        description: 'No pudimos cargar el costo real por sprint. Mostramos los presupuestos comprometidos hasta que se restablezca la fuente.'
+      },
+      commercial_health_unavailable: {
+        title: 'Señales comerciales en revisión',
+        description: 'Las señales operativas no están disponibles ahora. Verifica /admin/operations o reintenta en unos minutos.'
+      },
+      capacity_unresolvable: {
+        title: 'Capacidad no evaluable',
+        description: 'No pudimos evaluar la disponibilidad del equipo. Faltan fechas operativas o el lookup falló.'
+      },
+      progress_snapshot_missing: {
+        title: 'Progreso sin snapshot',
+        description: 'El último snapshot del sprint no incluye porcentaje de avance medible. Registra una actualización para visibilizar el progreso.'
+      },
+      team_enrichment_failed: {
+        title: 'Equipo parcialmente resuelto',
+        description: 'Algunos miembros propuestos no resolvieron en el directorio activo. Verifica si fueron archivados.'
+      }
     }
   }
 } as const

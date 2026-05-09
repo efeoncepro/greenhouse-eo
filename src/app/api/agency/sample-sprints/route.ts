@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 
+import { resolveSampleSprintRuntimeProjection } from '@/lib/commercial/sample-sprints/runtime-projection'
 import {
   declareSampleSprint,
   listSampleSprintOptions,
@@ -25,7 +26,14 @@ export async function GET(request: Request) {
     includeOptions ? listSampleSprintOptions(tenant) : Promise.resolve(null)
   ])
 
-  return NextResponse.json({ items, count: items.length, options })
+  // TASK-835 Slice 5 — Runtime projection canónica adjunta al payload existente
+  // (Checkpoint C). Backward compat: clients legacy ignoran el field.
+  const runtime = await resolveSampleSprintRuntimeProjection({
+    tenant,
+    prefetchedItems: items
+  })
+
+  return NextResponse.json({ items, count: items.length, options, runtime })
 }
 
 export async function POST(request: Request) {
