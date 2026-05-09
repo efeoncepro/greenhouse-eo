@@ -78,6 +78,8 @@ Tasks, docs de arquitectura, o commits relacionados.
 | `ISSUE-055` | [Quote builder no puede cotizar `ECG-004` por gap canónico en cost basis del rol](open/ISSUE-055-quote-builder-role-sku-missing-cost-basis.md) | staging | 2026-04-19 | open |
 | `ISSUE-058` | [Teams Finance Alerts webhook not provisioned in GCP Secret Manager](open/ISSUE-058-teams-finance-alerts-webhook-not-provisioned.md) | staging + production | 2026-04-26 | open (mitigated via `pending_setup`, awaiting Azure Logic App deploy from TASK-669) |
 | `ISSUE-067` | [Vitest jsdom warning por Lottie en `ServicesListView` empty state](open/ISSUE-067-jsdom-canvas-warning-lottie-empty-state-fetch-mock.md) | local test suite + CI logs | 2026-05-07 | open |
+| `ISSUE-074` | [ops-worker missing `@sentry/nextjs` bundle bloquea reactive projections](open/ISSUE-074-ops-worker-missing-sentry-bundle-blocks-projections.md) | production (Cloud Run ops-worker) | 2026-05-09 | open — bloquea TASK-813b end-to-end webhook → PG sync. Detectado durante smoke test post-merge PR #113. |
+
 ## Resolved
 
 | ID          | Título                                                                                                                                                            | Ambiente                       | Detectado  | Resuelto   | Causa                                                                                                                    |
