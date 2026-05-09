@@ -195,6 +195,173 @@ Estos checkpoints son obligatorios antes de iniciar Plan/Discovery. Cada uno pro
 - **Checkpoint C — Rate limits posture**: confirmar que el bridge `hubspot-greenhouse-integration` (Cloud Run) maneja el outbound projection (no Vercel route inline). El bridge ya tiene rate limiter compartido y backoff exponencial. Si por alguna razon Discovery decide usar otro path, documentar la politica de rate limiting equivalente antes de Slice 4.
 - **Checkpoint D — `ef_pipeline_stage` deprecation**: confirmar con stakeholders comerciales que `ef_pipeline_stage` queda deprecated para Sample Sprints (`hs_pipeline_stage` es source of truth). Si aun se usa en reportes HubSpot ad-hoc, planear migracion de esos reportes.
 
+#### Slice 0 — Resultados ejecutados 2026-05-09 (HubSpot portal 48713323, agente Claude Opus)
+
+##### Checkpoint A — `hs_unique_creation_key` writability → **NO writable. Path fallback obligatorio.**
+
+Evidencia ejecutada contra `POST https://api.hubapi.com/crm/v3/objects/0-162`:
+
+- Primer intento (sin stage): HubSpot rechaza con `VALIDATION_ERROR` por `hs_pipeline_stage` requerido — confirma que stage es mandatory at create time.
+- Segundo intento con `hs_pipeline_stage=1357763256` (validation) y `hs_unique_creation_key=task837-cpa-<uuid>` devolvió:
+
+```json
+{
+  "status": "error",
+  "category": "VALIDATION_ERROR",
+  "errors": [{
+    "message": "\"hs_unique_creation_key\" is a read only property; its value cannot be set.",
+    "code": "READ_ONLY_VALUE",
+    "context": {"propertyName": ["hs_unique_creation_key"]}
+  }]
+}
+```
+
+- `GET /crm/v3/properties/0-162/ef_greenhouse_service_id` → `404 OBJECT_NOT_FOUND` (property aún no existe).
+
+**Decision binaria**: `hs_unique_creation_key` es **READ-ONLY** at create time en custom object `0-162`. La idempotency key writable canónica para Slice 4 es **`ef_greenhouse_service_id`**.
+
+**Action items derivados (bloqueantes pre-Slice 4)**:
+
+- Crear property HubSpot `ef_greenhouse_service_id` en `0-162` con shape:
+  - `name`: `ef_greenhouse_service_id`
+  - `label`: `Greenhouse Service ID`
+  - `type`: `string`, `fieldType`: `text`, single-line
+  - `groupName`: `service_information`
+  - `description`: `UUID del service en Greenhouse. Idempotency key para outbound projection (TASK-837).`
+  - `hasUniqueValue`: `true` si HubSpot lo soporta para custom objects (verificar al crear).
+- Extender `services/hubspot_greenhouse_integration/contract.py` `SERVICE_PROPERTIES` para incluir `ef_greenhouse_service_id` en el read contract.
+- Slice 4 idempotency primaria: usar `ef_greenhouse_service_id = service_id` (UUID Greenhouse). Pre-create `GET /search` filterGroups por este property antes de POST.
+- **NO crear** `hs_unique_creation_key` ni intentar setearlo en outbound payloads — HubSpot lo rechaza con `READ_ONLY_VALUE`.
+
+##### Checkpoint B — Multi-company primary association label → **No-op en V1. Manual queue NO requerido.**
+
+Evidencia ejecutada contra `GET /crm/v3/objects/deals?associations=companies&limit=50` (3 páginas, 150 deals scanned):
+
+- Distinct `toObjectId` count per deal: **100% de deals tienen exactly 1 company asociada** (0 deals con multi-company real).
+- Inspección v4 (`GET /crm/v4/objects/deals/{id}/associations/companies`) en 3 sample deals (`32425565567`, `33028841864`, `34020586807`) devolvió:
+
+```json
+{
+  "results": [{
+    "toObjectId": "<single_id>",
+    "associationTypes": [
+      {"category": "HUBSPOT_DEFINED", "typeId": 5, "label": "Primary"},
+      {"category": "HUBSPOT_DEFINED", "typeId": 341, "label": null}
+    ]
+  }]
+}
+```
+
+- El "deal_to_company_unlabeled" (typeId 341) que aparecía en v3 list NO es una segunda company — es un duplicate associationType sobre la misma `toObjectId`. Falso positivo del v3 endpoint.
+
+**Decision binaria**: en el portal Greenhouse 48713323, el patrón empírico es **1 deal → 1 company** con label `Primary` (typeId 5 HUBSPOT_DEFINED) consistentemente presente. **Manual queue UI para multi-company NO es requerido en V1.**
+
+**Action items derivados**:
+
+- Slice 4 resolve company así:
+
+```ts
+const primary = associations.results.find(r =>
+  r.associationTypes.some(t => t.category === 'HUBSPOT_DEFINED' && t.typeId === 5)
+) ?? associations.results[0]
+```
+
+- Defensive fallback (cinturón + tirantes): si en futuro emerge un deal con `len(distinct toObjectIds) > 1`, preferir el que tiene `typeId=5 (Primary)`. Si ninguno tiene Primary label, **bloquear** el wizard con error explicit `multi_company_unresolved` y crear reliability signal `commercial.sample_sprint.multi_company_unresolved` (kind=drift, severity=warning, steady=0). Materializar manual queue UI **solo si** el signal sale > 0 en runtime.
+- NO implementar manual queue UI especulativamente. Aplicar YAGNI con cobertura defensiva.
+
+##### Checkpoint C — Bridge rate limit posture → **Detección OK. Endpoints CRUD `0-162` AUSENTES.**
+
+Inspección [services/hubspot_greenhouse_integration/hubspot_client.py](services/hubspot_greenhouse_integration/hubspot_client.py) + [app.py](services/hubspot_greenhouse_integration/app.py):
+
+| Capacidad | Estado | Línea(s) |
+| --- | --- | --- |
+| Detección HTTP 429 → `HUBSPOT_RATE_LIMIT` | ✅ | `hubspot_client.py:54-55` |
+| Captura `Retry-After` header | ✅ | `hubspot_client.py:21,26,66,956` |
+| Bridge response 429 al caller con `Retry-After` | ✅ | `app.py:635-638` |
+| Retry/backoff INTERNO en bridge | ❌ (intencional) | stateless — backoff vive en consumer-side |
+| Endpoint **POST `/0-162`** (create service) | ❌ MISSING | — |
+| Endpoint **PATCH `/0-162/{id}`** (update service) | ❌ MISSING | — |
+| Endpoint **POST search** filtered por `ef_greenhouse_service_id` | ❌ MISSING | — |
+| Helpers `create_association` / `create_default_association` (genéricos, reusables para `0-162 → companies/contacts/deals`) | ✅ | `hubspot_client.py:929,944` |
+| Helper `find_deal_by_idempotency_key` (pattern fuente para `find_service_by_idempotency_key`) | ✅ (mirror disponible) | `hubspot_client.py:264` |
+| Helper `get_services_by_ids` (batch_read) | ✅ | `hubspot_client.py:973-998` |
+
+**Decision binaria**: el bridge está arquitectónicamente correcto para rate limiting (stateless + propagate Retry-After + consumer-side exponential backoff via outbox state machine TASK-773). **NO requiere cambios al modelo de rate limiting**. Sí requiere agregar 3 endpoints CRUD para `0-162`.
+
+**Action items derivados (bloqueantes pre-Slice 4)**:
+
+Agregar a [hubspot_client.py](services/hubspot_greenhouse_integration/hubspot_client.py) (mirror de patterns existentes):
+
+```python
+def create_service(self, properties: dict[str, Any]) -> dict[str, Any]:
+    # POST /crm/v3/objects/0-162 — mirror de create_deal (línea 206)
+    response = self.session.post(
+        f"{HUBSPOT_API}/crm/v3/objects/0-162",
+        headers=self._headers(),
+        json={"properties": properties},
+        timeout=self.timeout_seconds,
+    )
+    if response.status_code >= 400:
+        _raise_hubspot_error(response)
+    return response.json()
+
+def update_service(self, service_id: str, properties: dict[str, Any]) -> dict[str, Any]:
+    # PATCH /crm/v3/objects/0-162/{id} — mirror de update_quote (línea 959)
+    ...
+
+def find_service_by_idempotency_key(self, key: str) -> dict[str, Any] | None:
+    # POST /crm/v3/objects/0-162/search — mirror de find_deal_by_idempotency_key (línea 264)
+    # filterGroups: [{filters: [{propertyName: 'ef_greenhouse_service_id', operator: 'EQ', value: key}]}]
+    ...
+```
+
+Agregar Flask routes en [app.py](services/hubspot_greenhouse_integration/app.py): `POST /api/integrations/hubspot/services/create`, `PATCH /api/integrations/hubspot/services/{id}`, `GET /api/integrations/hubspot/services/by-idempotency-key/{key}`.
+
+El reactive consumer `sample-sprint-hubspot-outbound` consume estos endpoints. Cuando recibe 429, respeta `Retry-After` del header del bridge response y schedulea reintento via outbox state machine (`failed → pending`, retry_count++).
+
+##### Checkpoint D — `ef_pipeline_stage` deprecation → **Property activa hoy. Codebase coupling: 3 callsites. Stakeholder confirmation pending.**
+
+Evidencia:
+
+1. **HubSpot property metadata** (`GET /crm/v3/properties/0-162/ef_pipeline_stage`):
+   - Created 2026-03-16 por user `75788512`
+   - `type=enumeration`, `fieldType=select`, **6 valores**: `onboarding | active | renewal_pending | renewed | closed | paused`
+   - **NO incluye `validation`** — incompatible con Sample Sprint stage canónico (`Validacion / Sample Sprint`, stage_id `1357763256`)
+   - `archived: false` (vigente)
+   - `groupName: service_information`
+   - `readOnlyValue: false` (writable)
+
+2. **Codebase coupling** (3 callsites):
+   - [src/lib/hubspot/custom-properties.ts:341](src/lib/hubspot/custom-properties.ts#L341) — declaración legacy de la property (seed scripting)
+   - [services/hubspot_greenhouse_integration/models.py:461](services/hubspot_greenhouse_integration/models.py#L461) — bridge MAPPING expone `ef_pipeline_stage` como `pipelineStage` en payload normalizado
+   - [services/hubspot_greenhouse_integration/contract.py:341](services/hubspot_greenhouse_integration/contract.py#L341) — bridge CONTRACT incluye `ef_pipeline_stage` en read properties
+
+3. **HubSpot reports/views/dashboards consumiendo `ef_pipeline_stage`**: NO determinable programáticamente (HubSpot reports API no expone listing público de filters). **Stakeholder confirmation requerida** con equipo comercial / HubSpot ops.
+
+**Decision binaria parcial (técnica)**: `ef_pipeline_stage` queda **deprecated para Sample Sprints**. Outbound TASK-837 NO escribe esta property; usar SOLO `hs_pipeline_stage` (stage ID `1357763256`). El mapper inbound TASK-836 (`upsertServiceFromHubSpot`) ya consume solo `hs_pipeline_stage` per CLAUDE.md, así que el coupling es residual.
+
+**Action items derivados (NO bloqueantes para Slice 1-6, pero sí para cleanup posterior)**:
+- Stakeholder TODO: confirmar con `Cesar Henry / Daniel Ramirez / equipo comercial` si existen HubSpot saved views, dashboards, workflows o reports que filtren/agrupen por `ef_pipeline_stage`. Esta confirmación NO bloquea TASK-837 implementation, pero condiciona la cleanup follow-up.
+- Crear follow-up task derivada `TASK-XXX-ef-pipeline-stage-deprecation-cleanup` (V1.1, post TASK-837 merge) que:
+  1. Audite HubSpot reports/views/workflows (manualmente desde HubSpot UI o via support ticket) que dependan de `ef_pipeline_stage`.
+  2. Migre cada uno a `hs_pipeline_stage`.
+  3. Remueva el coupling en `models.py:461` y `contract.py:341` (eliminar `ef_pipeline_stage` del mapping + property list).
+  4. Archive property en HubSpot vía `PATCH /crm/v3/properties/0-162/ef_pipeline_stage` con `archived: true`.
+  5. Remueva la declaración legacy en `src/lib/hubspot/custom-properties.ts:341`.
+- Hard rule canonizada en CLAUDE.md (Hard Rules section de TASK-837 ya incluye la regla #14 "NUNCA depender de `ef_pipeline_stage` como source of truth de HubSpot stage. Solo `hs_pipeline_stage`."). Confirmado vigente.
+- Outbound projection (Slice 4) **NO debe** setear `ef_pipeline_stage` en el payload. Si por error se setea, el reliability signal `commercial.sample_sprint.legacy_pipeline_stage_written` (kind=drift, severity=warning) lo flag-ea (signal nuevo a considerar en Slice 6 si emerge regression).
+
+#### Resumen de decisiones binarias post-checkpoints
+
+| Checkpoint | Decision | Bloqueante para Slice 4? | Action items pre-Slice 4 |
+|---|---|---|---|
+| A — writability | `hs_unique_creation_key` READ-ONLY → fallback `ef_greenhouse_service_id` | **SÍ** | Crear property `ef_greenhouse_service_id` en HubSpot + extender bridge contract |
+| B — multi-company | 0 deals multi-company en sample 150 → no-op V1 + defensive fallback | **NO** | Implementar resolver `find primary` + defensive `multi_company_unresolved` reliability signal |
+| C — rate limits | Bridge OK; falta CRUD `0-162` | **SÍ** | Agregar `create_service`, `update_service`, `find_service_by_idempotency_key` al bridge + Flask routes |
+| D — `ef_pipeline_stage` | Deprecated técnicamente; stakeholder confirmation pending para cleanup | **NO** (V1) / **SÍ** (cleanup follow-up) | Outbound NO escribe property; abrir follow-up task post-merge |
+
+**Bloqueantes pre-Slice 4 (resumen)**: 2 items (Checkpoint A property creation + Checkpoint C bridge endpoints). Todo lo demás puede planificarse con certeza.
+
 ### Slice 1 — Eligible Deal Source
 
 - Crear o extender reader server-side para listar Deals elegibles para Sample Sprint.
