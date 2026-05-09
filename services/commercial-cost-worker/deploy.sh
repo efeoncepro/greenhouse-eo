@@ -172,6 +172,18 @@ SECRETS="${SECRETS},GREENHOUSE_POSTGRES_PASSWORD=$(normalize_secret_ref_for_clou
 ensure_secret_accessor_binding "${NEXTAUTH_SECRET_REF}"
 ensure_secret_accessor_binding "${PG_PASSWORD_REF}"
 
+# TASK-844 — SENTRY_DSN for cross-runtime observability (optional).
+# Mismo patrón que ops-worker. Sin DSN, captureWithDomain degrada graceful no-op.
+SENTRY_DSN_SECRET_NAME="${SENTRY_DSN_SECRET_NAME:-greenhouse-sentry-dsn}"
+
+if gcloud secrets describe "${SENTRY_DSN_SECRET_NAME}" --project="${PROJECT_ID}" >/dev/null 2>&1; then
+  SECRETS="${SECRETS},SENTRY_DSN=${SENTRY_DSN_SECRET_NAME}:latest"
+  ensure_secret_accessor_binding "${SENTRY_DSN_SECRET_NAME}:latest"
+  echo "  Sentry DSN: mounted from secret '${SENTRY_DSN_SECRET_NAME}'"
+else
+  echo "  Sentry DSN: secret '${SENTRY_DSN_SECRET_NAME}' not found — observability degraded."
+fi
+
 echo "=== Deploying ${SERVICE_NAME} to Cloud Run (${REGION}) ==="
 
 gcloud run deploy "${SERVICE_NAME}" \
