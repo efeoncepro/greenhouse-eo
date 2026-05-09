@@ -1,3 +1,10 @@
+# Sesion 2026-05-09 — TASK-841 Nubox ops-worker config/freshness en progreso
+
+- **Trigger:** el usuario pidio implementar `TASK-841` directo en `develop` sin cambiar de rama.
+- **Ownership:** task movida a `docs/tasks/in-progress/TASK-841-nubox-ops-worker-config-freshness-hardening.md`; lifecycle sincronizado a `in-progress`. No se creo branch por instruccion explicita del usuario.
+- **Guardrail multi-agente:** el workspace ya tenia cambios staged/preexistentes de `TASK-835`; deben preservarse y no mezclarse con commits de `TASK-841`.
+- **Estado actual:** en Discovery/Audit; no hay implementacion funcional aplicada todavia.
+
 # Sesion 2026-05-09 — TASK-812 compliance exports corregida
 
 - **Trigger:** el usuario pidio corregir TASK-812 tras la revision con skill de arquitectura/payroll, luego commit y push.
