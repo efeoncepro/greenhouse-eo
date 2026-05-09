@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { expect, gotoWithTransientRetries, test } from '../fixtures/auth'
 
 /**
  * TASK-753 — E2E discoverability del rediseño self-service.
@@ -75,14 +75,14 @@ test.describe('TASK-753 discoverability — menu + tab cross-link', () => {
   })
 
   test('/my/payment-profile route still renders (no 5xx)', async ({ page }) => {
-    const response = await page.goto('/my/payment-profile', { waitUntil: 'domcontentloaded' })
+    const response = await gotoWithTransientRetries(page, '/my/payment-profile')
     const status = response?.status() ?? 200
 
     expect(status).toBeLessThan(500)
   })
 
   test('/my/profile route still renders (no 5xx)', async ({ page }) => {
-    const response = await page.goto('/my/profile', { waitUntil: 'domcontentloaded' })
+    const response = await gotoWithTransientRetries(page, '/my/profile')
     const status = response?.status() ?? 200
 
     expect(status).toBeLessThan(500)

@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { expect, gotoWithTransientRetries, test } from '../fixtures/auth'
 
 /**
  * TASK-753 — E2E del rediseño self-service `/my/payment-profile`.
@@ -83,7 +83,7 @@ test.describe('TASK-753 /my/payment-profile self-service contract', () => {
   })
 
   test('page route /my/payment-profile renders or redirects (auth works)', async ({ page }) => {
-    const response = await page.goto('/my/payment-profile', { waitUntil: 'domcontentloaded' })
+    const response = await gotoWithTransientRetries(page, '/my/payment-profile')
 
     // If member linked: page renders with dialog CTA visible.
     // If admin-only (agent): redirect to portalHomePath, NOT 5xx.

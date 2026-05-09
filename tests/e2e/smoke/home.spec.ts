@@ -1,4 +1,4 @@
-import { test, expect, gotoAuthenticated } from '../fixtures/auth'
+import { expect, gotoAuthenticated, gotoWithTransientRetries, test } from '../fixtures/auth'
 
 test.describe('portal home', () => {
   test('GET /home renders the authenticated shell', async ({ page }) => {
@@ -14,7 +14,7 @@ test.describe('portal home', () => {
   })
 
   test('portalHomePath redirect from / lands on a valid route', async ({ page }) => {
-    await page.goto('/', { waitUntil: 'domcontentloaded' })
+    await gotoWithTransientRetries(page, '/')
 
     const { pathname } = new URL(page.url())
 
