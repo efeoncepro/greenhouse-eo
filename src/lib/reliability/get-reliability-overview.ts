@@ -58,6 +58,7 @@ import { getShortcutsInvalidPinsSignal } from './queries/shortcuts-invalid-pins'
 import { getWorkspaceProjectionFacetViewDriftSignal } from './queries/workspace-projection-drift'
 import { getWorkspaceProjectionUnresolvedRelationsSignal } from './queries/workspace-projection-unresolved-relations'
 import { getCloudRunSilentObservabilitySignal } from './queries/cloud-run-silent-observability'
+import { getPostgresConnectionSaturationSignal } from './queries/postgres-connection-saturation'
 import { getCriticalTablesMissingSignal } from './queries/critical-tables-missing'
 import { getOutboxUnpublishedLagSignal } from './queries/outbox-unpublished-lag'
 import { getOutboxDeadLetterSignal } from './queries/outbox-dead-letter'
@@ -439,6 +440,14 @@ interface ReliabilityOverviewSources {
   cloudRunSilentObservability?: ReliabilitySignal | null
 
   /**
+   * TASK-845 Slice 6 — PostgreSQL connection saturation data-driven trigger.
+   *   - runtime.postgres.connection_saturation (runtime, warning > 60%, error > 80%)
+   * Es la señal data-driven que dispara V2 deployment del PgBouncer multiplexer
+   * (TASK-846 contingente). Roll up bajo moduleKey 'cloud'.
+   */
+  postgresConnectionSaturation?: ReliabilitySignal | null
+
+  /**
    * TASK-813 Slice 6 — Commercial engagement instance (HubSpot p_services 0-162) signals (3):
    *   - commercial.service_engagement.sync_lag (lag, warning)
    *   - commercial.service_engagement.organization_unresolved (drift, error)
@@ -524,6 +533,8 @@ export const buildReliabilityOverview = (
     ...(sources.criticalTablesMissing ? [sources.criticalTablesMissing] : []),
     // TASK-844 Slice 5 — Cross-runtime observability anti-regresión.
     ...(sources.cloudRunSilentObservability ? [sources.cloudRunSilentObservability] : []),
+    // TASK-845 Slice 6 — PG connection saturation (data-driven V2 trigger).
+    ...(sources.postgresConnectionSaturation ? [sources.postgresConnectionSaturation] : []),
     // TASK-813 Slice 6 — Commercial engagement instance signals (3).
     ...(sources.servicesEngagement ?? []),
     // TASK-807 — Commercial Health signals (six Sample Sprints health gates).
@@ -836,6 +847,14 @@ export const getReliabilityOverview = async (
       ? preloadedSources.cloudRunSilentObservability
       : await getCloudRunSilentObservabilitySignal().catch(() => null)
 
+  // TASK-845 Slice 6 — PG connection saturation (data-driven trigger para V2
+  // PgBouncer multiplexer deployment). Steady < 60%; sustained > 60% justifica
+  // TASK-846. Degrada `unknown` si la query falla.
+  const postgresConnectionSaturation =
+    preloadedSources.postgresConnectionSaturation !== undefined
+      ? preloadedSources.postgresConnectionSaturation
+      : await getPostgresConnectionSaturationSignal().catch(() => null)
+
   // TASK-813 Slice 6 + TASK-836 Slice 7 — Commercial engagement instance signals.
   // 3 readers TASK-813 + 4 readers TASK-836 en paralelo. Cada uno degrada
   // honestamente a `unknown` si su query falla. Roll up bajo moduleKey 'commercial'.
@@ -906,6 +925,7 @@ export const getReliabilityOverview = async (
     nuboxSourceFreshness,
     criticalTablesMissing,
     cloudRunSilentObservability,
+    postgresConnectionSaturation,
     servicesEngagement,
     commercialHealth
   })

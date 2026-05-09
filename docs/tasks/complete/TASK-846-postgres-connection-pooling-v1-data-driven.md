@@ -1,23 +1,30 @@
-# TASK-845 — PostgreSQL Connection Pooling: PgBouncer Cloud Run Multiplexer
+# TASK-846 — PostgreSQL Connection Pooling V1: Data-Driven Deployment
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P0` (PG saturation 103% live; Sentry NEW issue 7 errors weekly)
-- Impact: `Crítico` — site down cuando saturation > 100%, currently happening
-- Effort: `Alto` — 8 slices, ~1-2 días trabajo end-to-end
+- Impact: `Crítico` — saturation 103% antes de Slice 1 hotfix
+- Effort: `Medio` — 6 slices V1 (V2 PgBouncer multiplexer queda en TASK-846 contingente)
 - Type: `infrastructure-hardening`
 - Domain: `platform` / `database` / `infrastructure`
 - Blocked by: `none`
 - Branch: `develop` (instrucción del usuario)
 - ADR: `docs/architecture/GREENHOUSE_POSTGRES_CONNECTION_POOLING_V1.md`
-- Closes: Sentry issue "remaining connection slots are reserved for rol..." (NEW + Ongoing)
+- Closes: Sentry issue "remaining connection slots are reserved for rol..." (NEW 7 + Ongoing 3)
 
 ## Summary
 
-Implementa la decisión arquitectónica del ADR `GREENHOUSE_POSTGRES_CONNECTION_POOLING_V1` (PgBouncer Cloud Run como multiplexer canónico de conexiones cross-runtime). Cierra el bug de saturación PG observado live (103/100 conexiones, 96 idle, 1 conexión idle por 611s).
+Implementa V1 del ADR `GREENHOUSE_POSTGRES_CONNECTION_POOLING_V1`: defense-in-depth de 3 capas (ALTER ROLE idle_session_timeout + runtime-aware pool sizing + reliability signal data-driven trigger). NO incluye PgBouncer multiplexer en V1 — queda como TASK-846 contingente cuando el reliability signal alerte > 60% sustained.
 
-8 slices: hotfix inmediato (Capa 1), refactor pool (Capa 2), PgBouncer deploy (Capa 3), cutover progresivo (Capa 4), reliability signal (Capa 5), lint rule + Hard Rule (Capa 6), close + smoke test live (Capa 7-8).
+**Pivot crítico durante implementación**: descubrí que **Cloud Run no soporta TCP raw** (solo HTTP/1.1, HTTP/2, gRPC, WebSocket). Mi propuesta original "PgBouncer en Cloud Run $5-15/mes" era arquitectónicamente inválida. Las opciones reales eran GKE Autopilot ($75-85/mes) o GCE VM ($7-15/mes sin HA). Combinado con el hecho de que post-Slice 1 ALTER ROLE la saturación bajó 103% → 66% sin tocar nada más, **la evidencia dice que el problema fundamental era leak de idle connections, no demanda > capacidad**. Pivotamos a deployment data-driven: V1 = 3 capas defense-in-depth + signal + Hard Rules; V2 = PgBouncer GKE Autopilot solo si signal lo justifica.
+
+6 slices V1: Slice 1 hotfix ALTER ROLE (✅ aplicado live), Slice 3 runtime-aware pool (✅ commiteado), Slice 6 reliability signal (pending), Slice 7 lint rule + CLAUDE.md hard rule (pending), Slice 8 close + smoke 7 días (pending), TASK-846 placeholder V2 contingente (pending).
+
+**Slices removidos del scope V1** (movidos a TASK-846 contingente):
+- Slice 2 Cloud SQL flag persistencia → `ALTER ROLE` ya es persistente cross-restart vía `pg_roles.rolconfig`. Innecesario.
+- Slice 4 PgBouncer Cloud Run deploy → arquitectónicamente inválido (Cloud Run no soporta TCP raw).
+- Slice 5 Cutover Vercel + Cloud Run → no aplica sin V2 deploy.
 
 ## Architectural decision (referenced)
 

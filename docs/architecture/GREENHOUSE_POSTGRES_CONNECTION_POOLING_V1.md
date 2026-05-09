@@ -2,7 +2,7 @@
 
 > **Tipo de documento:** Arquitectura canónica + ADR embebido
 > **Versión:** 1.0
-> **Creado:** 2026-05-09 por Claude (TASK-845)
+> **Creado:** 2026-05-09 por Claude (TASK-846)
 > **Status:** Accepted
 > **Supersedes:** ningún ADR previo (decisión nueva)
 > **Trigger:** PG saturation 103% live + Sentry weekly report 7 errors `remaining connection slots are reserved for rol...` (NEW issue)
@@ -39,31 +39,60 @@ Sintoma user-facing: `FATAL 53300: remaining connection slots are reserved for n
 
 ## Decisión
 
-Greenhouse adopta **PgBouncer en Cloud Run como connection multiplexer canónico** entre todos los runtimes y la instancia Cloud SQL. Cada runtime mantiene su `Pool` de `pg-node` local pero apunta a PgBouncer en lugar de Cloud SQL directo.
+Greenhouse adopta una **arquitectura de connection management de 4 capas con deployment data-driven** del componente multiplexer.
 
-Topología canónica:
+### V1 (deployed 2026-05-09, TASK-846)
 
 ```text
 ┌──────────────────────┐
-│ Vercel functions × N │  pool max=3, idleTimeoutMillis=10s
+│ Vercel functions × N │  pool max=3, idleTimeoutMillis=10s    (TASK-846 Slice 3)
 ├──────────────────────┤
-│ ops-worker           │  pool max=15
-├──────────────────────┤  ──→ PgBouncer Cloud Run ──→ Cloud SQL
-│ commercial-cost-w    │      (1000+ client conns)    (100 server conns)
-├──────────────────────┤      transaction pooling
-│ ico-batch            │      single source of truth
-└──────────────────────┘      del budget de conexiones
+│ ops-worker           │  pool max=15, idleTimeoutMillis=30s
+├──────────────────────┤  ──→ Cloud SQL (100 server conns)
+│ commercial-cost-w    │      idle_session_timeout=5min        (TASK-846 Slice 1, ALTER ROLE)
+├──────────────────────┤      idle_in_transaction_timeout=5min
+│ ico-batch            │
+└──────────────────────┘
+                                ┌─ Reliability signal ─┐
+                                │ runtime.postgres.    │
+                                │ connection_saturation│        (TASK-846 Slice 6)
+                                │ steady < 60%         │
+                                │ alert > 60% sustained│
+                                └──────────────────────┘
 ```
 
-PgBouncer corre como **Cloud Run service stateless** (`min_instances=1`, `max_instances=3`) con autoscale por concurrent connections, configurado en `transaction` pooling mode. Cloud SQL Auth Proxy embebido en el container.
+V1 NO incluye multiplexer dedicado. Razón: post-Slice 1 ALTER ROLE la saturación bajó de 103% → 66%. Post-Slice 3 runtime-aware pool sizing proyecta utilización 25-35% al volumen actual. **No hay evidencia de que demanda > capacidad PG**, solo había leak de idle connections.
+
+### V2 (futuro, contingente — TASK-847)
+
+Si reliability signal `runtime.postgres.connection_saturation` alerta sustained > 60% utilización (señal real de demanda creciendo), Greenhouse despliega **PgBouncer en GKE Autopilot** (no Cloud Run — ver caveat abajo) como multiplexer canónico:
+
+```text
+┌──────────────────────┐
+│ Vercel + Cloud Run   │  ──→ PgBouncer GKE Autopilot ──→ Cloud SQL
+│ runtimes             │      transaction pooling          (100 server conns)
+└──────────────────────┘      max_client_conn=1000         multiplexa 40×
+```
+
+### Caveat crítico: PgBouncer NO va en Cloud Run
+
+**Cloud Run no soporta tráfico TCP raw como ingress** — solo HTTP/1.1, HTTP/2, gRPC, WebSocket. PostgreSQL wire protocol es TCP plano con conexiones long-lived multiplexadas. **Incompatible con Cloud Run.**
+
+Opciones reales para PgBouncer en GCP cuando se justifique:
+
+| Hosting | Costo/mes | HA | Auto-scale | Recomendación V2 |
+|---|---|---|---|---|
+| **GKE Autopilot** (LoadBalancer service TCP) | ~$75-85 | ✅ multi-zone | ✅ HPA | ✅ canónico |
+| **GCE VM e2-micro** (Container-Optimized OS) | ~$7 (free tier eligible) | 🟡 single zone | ❌ manual | Alternativa low-cost solo si HA no es requirement |
+| **AlloyDB con pooler nativo** | ~$200-400 (compute primary 24/7) | ✅ | ✅ | Solo si migración compute-heavy se justifica por otros features |
 
 ## Alternativas rechazadas
 
-### Opción A — Tunear pool existente sin pooler (band-aid)
+### Opción A — Tunear pool existente sin pooler (band-aid puro)
 
-Reducir `max=15` → `max=3` por function, agregar `idle_session_timeout=300s` en PG.
+Reducir `max=15` → `max=3` por function, agregar `idle_session_timeout=300s` en PG **sin reliability signal ni Hard Rule**.
 
-**Razón rechazo**: gana ~30% headroom temporal (~6 meses). NO escala con Vercel auto-scaling. Cada function instance sigue decidiendo sola cuántas oficinas pide. Cero coordinación cross-runtime. Es **parche**, viola Solution Quality Contract de CLAUDE.md.
+**Razón rechazo de la versión "puro"**: en aislamiento sería parche. **Pero combinado con reliability signal V2-trigger explícito + Hard Rule + roadmap V2 GKE-Autopilot canonizado**, deja de ser parche y se convierte en **deployment data-driven**: la solución arquitectónica completa (PgBouncer multiplexer) está diseñada y documentada; el deployment se difiere hasta que hay evidencia empírica de que Slice 1+3 NO es suficiente. Esto es el patrón canónico Greenhouse `VIEW canónica + helper + reliability signal` aplicado a infrastructure.
 
 ### Opción B — Tier upgrade Cloud SQL (`db-custom-2-7680`)
 
@@ -79,16 +108,25 @@ Bases serverless-native con pooler integrado.
 
 ### Opción D — DataLoader / GraphQL / read-only replicas
 
-Resuelven N+1 (Issue #3 separado, ver TASK-846) pero NO resuelven el bottleneck de conexiones globales.
+Resuelven N+1 (Issue #3 separado, ver TASK-848) pero NO resuelven el bottleneck de conexiones globales.
 
-## Score 4-pilar de la decisión adoptada
+## Score 4-pilar de la decisión adoptada V1 (data-driven deferred multiplexer)
 
-| Pilar | Eval |
+| Pilar | Eval V1 (sin multiplexer) |
 |---|---|
-| **Safety** | ✅ PgBouncer es battle-tested 18+ años, usado por Heroku/Supabase/Neon/Aurora. Cloud Run isolation. Reversible: bypass via env var. |
-| **Robustness** | ✅ Single source of truth para budget conexiones. Burst absorption (1000+ client conns sobre 100 server conns). Transaction pooling preserva ACID. |
-| **Resilience** | ✅ Si un runtime tiene leak, NO afecta a otros (multiplexing aísla). PgBouncer reconnect automático. Cloud Run autoscale. |
-| **Scalability** | ✅ Soporta 10×+ Vercel scaling sin tier upgrade Cloud SQL. Bottleneck pasa a "throughput real de queries" (métrica sana) no "número de conexiones" (métrica artificial). |
+| **Safety** | ✅ Slice 1 ALTER ROLE aplicado live, persistente en `pg_roles.rolconfig`. Slice 3 runtime-aware pool elimina overcommit Vercel. Reversible al instante (`ALTER ROLE RESET` o env override). |
+| **Robustness** | ✅ Idle leakers reciclados automáticamente. Vercel pool max=3 vs 15 reduce overcommit 5×. |
+| **Resilience** | ✅ Reliability signal `runtime.postgres.connection_saturation` alerta data-driven cuando demanda real cruza threshold. V2 (GKE PgBouncer) ya diseñado, listo para deployment cuando signal lo justifique. |
+| **Scalability** | 🟡 V1 escala 3-5× volumen actual antes de saturar. Signal alerta antes de regression. V2 escala 30×+. **Trade-off honesto**: ahorra $75-85/mes infra costs hasta que data justifique deployment. |
+
+### Score 4-pilar V2 (PgBouncer GKE Autopilot — futuro contingente)
+
+| Pilar | Eval V2 |
+|---|---|
+| **Safety** | ✅ PgBouncer battle-tested 18+ años. GKE Autopilot multi-zone. Reversible: env var bypass. |
+| **Robustness** | ✅ Single source of truth para budget conexiones. Burst absorption (1000+ client conns sobre 100 server conns). |
+| **Resilience** | ✅ GKE Autopilot HPA + multi-zone. Si pod falla, otro zone lo absorbe < 30s. |
+| **Scalability** | ✅ Soporta 10×+ Vercel scaling sin tier upgrade Cloud SQL. |
 
 ## Caveats conocidos del modo `transaction pooling`
 
@@ -99,52 +137,69 @@ PgBouncer transaction pooling NO soporta:
 - **Cursors abiertos cross-transaction** (Greenhouse no usa hoy)
 - **Advisory locks session-scoped** (verificar callsites — ver Slice 4 spec)
 
-`pg-node` con `node-postgres` NO usa server-side prepared statements por default. Verificar via TASK-845 Slice 4 antes de cutover.
+`pg-node` con `node-postgres` NO usa server-side prepared statements por default. Verificar via TASK-847 Slice 1 antes de cutover.
 
 Si emerge necesidad futura de session pooling (ej. PG advisory locks heavy), agregar pool secundario PgBouncer en modo `session` paralelo a `transaction` (mismo container, port distinto).
 
 ## Hard rules canonizadas
 
 ```text
-NUNCA crear Pool de pg-node nuevo apuntando directo a Cloud SQL Auth Proxy o IP Cloud SQL.
-Todo runtime apunta a PgBouncer (env var GREENHOUSE_POSTGRES_HOST=pgbouncer-url).
+NUNCA configurar pg-node Pool con max > 15 en Vercel function. Default canónico:
+max=3 (Vercel), max=15 (Cloud Run). Override via GREENHOUSE_POSTGRES_MAX_CONNECTIONS
+solo con justificación documentada.
 
-NUNCA configurar pg-node Pool con max > 15 en Vercel function. PgBouncer multiplexa
-sobre 100 server conns; pool max=15 × N functions ya es overcommit safe.
-Recomendado: max=3 (Vercel), max=15 (Cloud Run).
-
-NUNCA usar prepared statements server-side (Postgres `PREPARE`) sin verificar PgBouncer
-mode session-pooling explícito para esa conexión.
+NUNCA configurar idle_session_timeout=0 en greenhouse_app o greenhouse_ops roles.
+ALTER ROLE canónico: greenhouse_app=5min, greenhouse_ops=15min.
 
 NUNCA hacer LISTEN/NOTIFY desde aplicación. Usar outbox pattern canónico (TASK-773).
+Garantiza compatibilidad cuando V2 PgBouncer transaction pooling se deploya.
 
-NUNCA bypass-ear PgBouncer en producción "para debugging". Usar admin proxy via
-gcloud sql instances con auth IAM directo.
+NUNCA usar prepared statements server-side (Postgres `PREPARE`) sin verificar
+PgBouncer mode (cuando V2 active) session-pooling explícito.
 
-SIEMPRE configurar Cloud SQL flag `idle_session_timeout=300000` (5 min) como
-defense-in-depth contra leaks PgBouncer-side.
+NUNCA bypass-ear los gates de connection management para "performance hacks". Si
+emerge necesidad legítima session-scoped, abrir task derivada para evaluar.
+
+NUNCA dejar el reliability signal `runtime.postgres.connection_saturation` en
+estado `unknown` por más de 24h. Es la señal data-driven que dispara V2 deployment.
+
+SIEMPRE que emerja un nuevo runtime que necesite Postgres, usar el helper canónico
+`getGreenhousePostgresConfig()` que detecta runtime y aplica defaults correctos.
+Lint rule mecánica (TASK-846 Slice 7) bloquea Pool nuevos sin pasar por helper.
 
 SIEMPRE incluir reliability signal `runtime.postgres.connection_saturation` con
-threshold warning > 60%, error > 80% del max_connections.
-
-SIEMPRE que emerja un nuevo Cloud Run service o runtime que necesite Postgres,
-apuntarlo a PgBouncer URL canónico, no a Cloud SQL directo. Lint rule mecánica
-(TASK-845 Slice 7) bloquea la regresión.
+threshold warning > 60%, error > 80%. Steady < 30% indicates V1 sigue suficiente;
+sustained > 60% justifica V2 GKE PgBouncer deployment (TASK-847).
 ```
 
-## Defense-in-depth (4 capas)
+## Defense-in-depth V1 (3 capas)
 
-1. **Cloud SQL flag `idle_session_timeout`**: PG corta connections idle > 5min server-side. Catch-all si PgBouncer se cae.
-2. **PgBouncer transaction pooling**: multiplexa client conns sobre server conns. Primary mechanism.
-3. **pg-node Pool tuning per-runtime**: max conservador (3 Vercel, 15 Cloud Run). Backpressure local.
-4. **Reliability signal**: `runtime.postgres.connection_saturation` detecta regresión global.
+1. **PG-side `idle_session_timeout` por role** (ALTER ROLE): PG corta connections idle > 5min server-side. Persistente cross-restart vía `pg_roles.rolconfig`. Catch-all contra leaks.
+2. **pg-node Pool tuning per-runtime**: max=3 Vercel / max=15 Cloud Run. `idleTimeoutMillis=10s` Vercel / `30s` Cloud Run. Backpressure local.
+3. **Reliability signal `runtime.postgres.connection_saturation`**: detecta regresión global. Steady < 30%, alert > 60%, error > 80%. **Es la señal que dispara V2 deployment data-driven.**
 
-## Operational invariants
+## Defense-in-depth V2 (4 capas, contingente)
 
-- **Costo**: ~$5-15/mes adicional (Cloud Run instance min=1, autoscale max=3 con concurrency=100). Total Greenhouse PG infra: $55-115/mes vs $50-100 actual.
-- **Latencia**: +1-3ms per query (intra-region GCP roundtrip). Aceptable.
-- **Failover**: Cloud Run multi-zone HA. Si PgBouncer instance falla, Cloud Run respinea < 10s. Vercel pool reintenta.
-- **Observability**: PgBouncer admin DB expone `SHOW POOLS`, `SHOW CLIENTS`, `SHOW SERVERS`. Reliability signal lee de Cloud SQL `pg_stat_activity` (no requiere admin PgBouncer).
+Cuando reliability signal alerta sustained > 60%:
+
+1. Capas 1-3 V1 mantienen.
+2. **PgBouncer GKE Autopilot transaction pooling**: multiplexa client conns sobre server conns. Primary mechanism cuando V2 deploy.
+
+## Operational invariants V1
+
+- **Costo**: $0 incremental (solo configuración existente). Total Greenhouse PG infra: $50-100/mes (sin cambio).
+- **Latencia**: $0 overhead. Queries van directo a Cloud SQL como hoy.
+- **Capacidad**: 3-5× volumen actual antes de saturation. Reliability signal detecta antes.
+- **Reversibilidad**: ALTER ROLE RESET + revert env override = vuelta al estado anterior < 5min.
+- **Observability**: `pg_stat_activity` + signal canónico expuestos en `/admin/operations`.
+
+## Operational invariants V2 (cuando se deploye)
+
+- **Costo**: ~$75-85/mes adicional (GKE Autopilot control plane + workload). Total: $125-185/mes vs $50-100 V1.
+- **Latencia**: +1-3ms per query (intra-region GCP roundtrip).
+- **Capacidad**: 30×+ volumen actual antes de saturation real.
+- **Failover**: GKE Autopilot multi-zone HA.
+- **Observability**: PgBouncer `SHOW POOLS/CLIENTS/SERVERS` + signal canónico continuado.
 
 ## Spec relacionada
 
@@ -155,4 +210,6 @@ apuntarlo a PgBouncer URL canónico, no a Cloud SQL directo. Lint rule mecánica
 
 ## Lifecycle history
 
-- **2026-05-09**: ADR creado (Accepted). Trigger: PG saturation 103% live + Sentry weekly report. Implementación TASK-845.
+- **2026-05-09**: ADR creado (Accepted). Trigger: PG saturation 103% live + Sentry weekly report 7 errors NEW.
+- **2026-05-09**: V1 implementación (TASK-845): Slice 1 (ALTER ROLE) aplicado live, saturation 103% → 66%. Slice 3 (runtime-aware pool) commiteado. Defense-in-depth 3 capas activa.
+- **2026-05-09**: Pivot V1 vs V2 documentado. Cloud Run NO soporta PgBouncer (TCP raw incompatible). V2 contingente queda diseñado para GKE Autopilot deployment cuando reliability signal lo justifique. TASK-847 placeholder creada.
