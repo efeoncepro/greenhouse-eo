@@ -36,6 +36,12 @@
 2. Reliability signal `observability.cloud_run.silent_failure_rate` cuenta `outbox_reactive_log.last_error LIKE '%captureException is not a function%'` últimas 24h. Steady=0.
 3. Cloud Logging stderr fallback siempre disponible.
 
+**DSN provisioning completado 2026-05-09 19:42:23Z**:
+- Secret `greenhouse-sentry-dsn` creado en GCP Secret Manager con DSN canónico (proyecto `efeonce-group`, replication=automatic, version 1).
+- ops-worker re-deployed (revision `00175-dxr` 19:47:26Z) con `SENTRY_DSN` env mounted desde Secret Manager.
+- Verificación: `/health` responde 200, startup logs NO emiten warn `[sentry-init] ops-worker: SENTRY_DSN not configured` → Sentry init real corriendo con DSN, no graceful no-op.
+- Cualquier `captureWithDomain(err, '<domain>', ...)` invocado desde reactive consumer ahora reporta incidents a Sentry con tag `domain` canónico → signals per-module del reliability dashboard reciben datos del runtime Cloud Run.
+
 **Spec canónica**: `docs/tasks/complete/TASK-844-cross-runtime-observability-sentry-init.md` (movida post Slice 8).
 
 ---

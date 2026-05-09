@@ -18,7 +18,11 @@
   1. Lint rule `greenhouse/cloud-run-services-must-init-sentry` modo `error` bloquea commits que crean `services/<svc>/server.ts` con import `@/lib/**` sin init.
   2. Reliability signal `observability.cloud_run.silent_failure_rate` cuenta `outbox_reactive_log.last_error LIKE '%captureException is not a function%'` últimas 24h. Steady=0; > 0 indica regresión.
   3. Cloud Logging stderr fallback siempre disponible.
-- **DSN provisioning queda como follow-up explícito:** secret `greenhouse-sentry-dsn` no existe aún en GCP Secret Manager. Sin DSN, Sentry hub queda no-op (graceful degradation por design — el fix de ISSUE-074 NO depende de la provisión). Cuando el secret se cree, deploy.sh lo monta automáticamente y los 3 Cloud Run services empiezan a reportar incidents per-domain.
+- **DSN provisioning completado** (autorizado por usuario 19:42:23Z):
+  - Secret `greenhouse-sentry-dsn` creado en GCP Secret Manager (`efeonce-group`, replication=automatic, version 1) con DSN canónico copiado desde Vercel production env.
+  - ops-worker re-deployed (revision `00175-dxr` 19:47:26Z) con `SENTRY_DSN` env mounted.
+  - Verificación: `/health` responde 200, startup logs NO emiten warn `SENTRY_DSN not configured` → Sentry init real corriendo, no graceful no-op.
+  - Cualquier `captureWithDomain` invocado desde reactive consumer ahora reporta incidents a Sentry con tag `domain` canónico → signals per-module del reliability dashboard reciben datos del runtime Cloud Run.
 - **ISSUE-074** movido a `resolved/`. **TASK-844** movido a `complete/`. README + TASK_ID_REGISTRY sincronizados.
 
 ---
