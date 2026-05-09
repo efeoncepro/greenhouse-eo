@@ -273,6 +273,26 @@ if [ -n "${RESEND_API_KEY_SECRET_REF}" ]; then
   SECRETS="${SECRETS},RESEND_API_KEY=$(normalize_secret_ref_for_cloud_run "${RESEND_API_KEY_SECRET_REF}")"
 fi
 
+# TASK-844 — SENTRY_DSN for cross-runtime observability.
+# Optional: if the secret `greenhouse-sentry-dsn` exists in Secret Manager, mount
+# it. If not, the canonical helper `initSentryForService` (services/_shared/
+# sentry-init.ts) degrades gracefully — captureWithDomain becomes no-op and
+# emits a startup warn. ISSUE-074 fix doesn't depend on this — the underlying
+# crash was @sentry/nextjs shape mismatch in Cloud Run runtime, fixed by Slice 1
+# (use @sentry/node directly). DSN provisioning enables real per-domain incident
+# capture in Sentry; without it, errors still hit Cloud Logging stderr.
+SENTRY_DSN_SECRET_NAME="${SENTRY_DSN_SECRET_NAME:-greenhouse-sentry-dsn}"
+
+if gcloud secrets describe "${SENTRY_DSN_SECRET_NAME}" --project="${PROJECT_ID}" >/dev/null 2>&1; then
+  SECRETS="${SECRETS},SENTRY_DSN=${SENTRY_DSN_SECRET_NAME}:latest"
+  ensure_secret_accessor_binding "${SENTRY_DSN_SECRET_NAME}:latest"
+  echo "  Sentry DSN: mounted from secret '${SENTRY_DSN_SECRET_NAME}'"
+else
+  echo "  Sentry DSN: secret '${SENTRY_DSN_SECRET_NAME}' not found — observability degraded (captureWithDomain no-op)."
+  echo "  Fix: gcloud secrets create ${SENTRY_DSN_SECRET_NAME} --project=${PROJECT_ID} --replication-policy=automatic"
+  echo "       echo -n '<DSN_VALUE>' | gcloud secrets versions add ${SENTRY_DSN_SECRET_NAME} --project=${PROJECT_ID} --data-file=-"
+fi
+
 ensure_secret_accessor_binding "${NEXTAUTH_SECRET_REF}"
 ensure_secret_accessor_binding "${PG_PASSWORD_REF}"
 

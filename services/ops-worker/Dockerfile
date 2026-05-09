@@ -26,6 +26,11 @@ COPY src/ ./src/
 # available to esbuild. This avoids Cloud Build regressions whenever ops-worker
 # grows a new local helper/import.
 COPY services/ops-worker/ ./services/ops-worker/
+# TASK-844 — Shared canonical helpers for Cloud Run Node services (e.g.
+# sentry-init for cross-runtime observability). Required because server.ts
+# imports `../_shared/sentry-init` BEFORE any @/lib/** import to initialize
+# Sentry's Node hub for the canonical captureWithDomain wrapper.
+COPY services/_shared/ ./services/_shared/
 
 # Bundle: resolves @/ path aliases + TypeScript at build time.
 # server-only shimmed to empty module (Next.js convention).
