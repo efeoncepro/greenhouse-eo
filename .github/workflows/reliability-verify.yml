@@ -127,7 +127,7 @@ jobs:
 
       - name: Upload HTML report
         if: always() && env.skip_run != 'true'
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: reliability-verify-report-${{ github.run_id }}
           if-no-files-found: warn
@@ -136,7 +136,7 @@ jobs:
 
       - name: Upload results JSON + traces
         if: always() && env.skip_run != 'true'
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: reliability-verify-artifacts-${{ github.run_id }}
           if-no-files-found: warn

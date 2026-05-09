@@ -136,7 +136,7 @@ Tags target verificados con GitHub API el 2026-05-09:
 
 - `actions/checkout@v5`
 - `actions/setup-node@v5`
-- `actions/upload-artifact@v5`
+- `actions/upload-artifact@v7`
 - `pnpm/action-setup@v6`
 - `google-github-actions/auth@v3`
 - `google-github-actions/setup-gcloud@v3`
@@ -240,7 +240,7 @@ git checkout -b chore/TASK-607-github-actions-nodejs-24
 sed -i '' \
   -e 's|actions/checkout@v4|actions/checkout@v5|g' \
   -e 's|actions/setup-node@v4|actions/setup-node@v5|g' \
-  -e 's|actions/upload-artifact@v4|actions/upload-artifact@v5|g' \
+  -e 's|actions/upload-artifact@v4|actions/upload-artifact@v7|g' \
   -e 's|pnpm/action-setup@v4|pnpm/action-setup@v6|g' \
   -e 's|google-github-actions/auth@v2|google-github-actions/auth@v3|g' \
   -e 's|google-github-actions/setup-gcloud@v2|google-github-actions/setup-gcloud@v3|g' \
@@ -257,7 +257,7 @@ git diff .github/workflows/
 ## Acceptance Criteria
 
 - [x] Workflows target usan `actions/checkout@v5`
-- [x] Workflows Node/pnpm/artifacts usan `actions/setup-node@v5`, `actions/upload-artifact@v5`, `pnpm/action-setup@v6`
+- [x] Workflows Node/pnpm/artifacts usan `actions/setup-node@v5`, `actions/upload-artifact@v7`, `pnpm/action-setup@v6`
 - [x] Workflows GCP usan `google-github-actions/auth@v3` + `google-github-actions/setup-gcloud@v3`
 - [x] Grep de actions target antiguas en `.github/workflows/` retorna `0` matches
 - [x] `package.json` sigue sin `packageManager`; no se requiere `package-manager-cache: false`

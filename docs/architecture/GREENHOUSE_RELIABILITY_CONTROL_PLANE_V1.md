@@ -21,7 +21,7 @@ Contrato vigente:
 - `status='failed'` solo si existe al menos una falla final; si no hay fallas finales y hay flaky specs, `status='flaky'`.
 - El log esperado incluye `flaky=<n>`: `[smoke-lane-publish] lane=<lane> status=<passed|failed|flaky> total=<n> passed=<n> failed=<n> flaky=<n> skipped=<n>`.
 - Las navegaciones E2E autenticadas deben usar `gotoAuthenticated()` o `gotoWithTransientRetries()` para absorber cold-start/red transitoria con retries acotados. HTTP 4xx/5xx, redirects de auth y asserts funcionales siguen fallando loud.
-- Los workflows GitHub usan actions compatibles con runtime Node.js 24: `actions/checkout@v5`, `actions/setup-node@v5`, `actions/upload-artifact@v5`, `pnpm/action-setup@v6`, `google-github-actions/auth@v3`, `google-github-actions/setup-gcloud@v3`.
+- Los workflows GitHub usan actions compatibles con runtime Node.js 24: `actions/checkout@v5`, `actions/setup-node@v5`, `actions/upload-artifact@v7`, `pnpm/action-setup@v6`, `google-github-actions/auth@v3`, `google-github-actions/setup-gcloud@v3`.
 
 Steady state esperado:
 
