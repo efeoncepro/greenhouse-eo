@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -628,3 +628,68 @@ Task endurecida antes de iniciar implementacion para alinearla con los patrones 
 10. **Acceptance Criteria + Verification + Closing Protocol + Files owned** sincronizados con los puntos anteriores.
 
 Razon: aplicar el 4-pillar contract (safety / robustness / resilience / scalability) elevo el score de la task de 7/10 promedio a 9/10 antes de implementacion. Sin estos ajustes, la implementacion abriria probabilisticamente un ISSUE-### post-rollout por race en `engagement_kind`, drift en attribution post-backfill, services en `renewed` invisibles a queries operativas, o lineage chain invalida creada por path manual no protegido.
+
+## Delta 2026-05-09 — Implementacion completa + apply ejecutado
+
+Task implementada end-to-end en `develop` (sin checkout a branch nueva, por instruccion explicita del usuario). 8 slices commiteados incrementalmente + apply ejecutado en producción con autorización explícita del usuario.
+
+### Slices commiteados
+
+- **Slice 2** (`ab20cad6`) — Migration `20260509125228920` aplicada (PG real verificado): CHECK pipeline_stage extendido + status/sync_status CHECKs + columna `unmapped_reason` + columna `parent_service_id` FK self + trigger `services_lineage_protection_trigger` + bloque DO post-DDL anti pre-up-marker bug. Live SQL probes 7/7 OK.
+- **Slice 1** (`c0b78c2e`) — Runbook canónico + extender `SERVICE_PROPERTIES` con `ef_engagement_kind`.
+- **Slice 3** (`f97648ef`) — Mapper canónico (7 stage IDs) + cascade engagement_kind (6 casos). 42/42 tests verdes.
+- **Slice 4** (`7cc29aee`) — UPSERT canónico consume mapper + cascade + emite `commercial.service_engagement.lifecycle_changed v1` SOLO en transiciones reales. 12 tests adicionales. 59/59 services tests verdes.
+- **Slice 7** (`9c682cc1`) — 4 reliability signals nuevos + wire en `getReliabilityOverview`. 15 tests verdes.
+- **Slice 6** (`72480df1`) — Pre-backfill snapshot documentado.
+- **Slice 5 + 8 + Apply** (`980c944c`) — Config HubSpot ejecutada via API (stage `Validación / Sample Sprint` ID `1357763256` + property `ef_engagement_kind`); Apply backfill ejecutado con éxito; post-snapshot verificado; Hard Rules canonizadas en CLAUDE.md; 4 docs arquitectura actualizados.
+
+### Apply ejecutado 2026-05-09T13:41:48Z (produccion)
+
+- 12 clientes procesados, 6 services HubSpot, 0 unmapped, 0 errors.
+- 2 outbox `lifecycle_changed v1` emitidos (Loyal: active→closed/false; ANAM Nuevas Licencias: active→renewal_pending).
+- 4 services sin diff: NO emiten lifecycle_changed (idempotencia respetada).
+- 4 reliability signals nuevos en steady=0 verificados live.
+
+### Bug raíz corregido en producción
+
+- "Loyal" estaba contaminando P&L como `active=TRUE` aunque está cerrado en HubSpot. Ahora `active=FALSE`. Service no contribuirá a fact tables del período actual ni futuros.
+- "ANAM - Nuevas Licencias" ahora distinguible (`renewal_pending`) del active genérico — consumers que filtran solo `pipeline_stage='active'` lo verían fuera; consumers que filtran `WHERE active=TRUE` lo siguen incluyendo (correcto, sigue operativo).
+
+### Decisiones de pre-execution documentadas
+
+- **Q3 (revisada por audit)**: `unmapped_reason` columna dedicada con CHECK enum (`unknown_pipeline_stage|missing_classification`) en lugar de `metadata_json.unmapped_reason`. Razón: services no tenía columna `metadata_json` y agregar JSONB sólo para 2 valores enumerados era overengineering. Boring tech preference (preferred per arch overlay).
+- **HubSpot displayOrder**: API HubSpot Pipelines mantuvo orden de creación (Validación quedó en `displayOrder=1`, después de Onboarding). Mapper canónico opera por stage ID, no por orden visual; RevOps puede reordenar manualmente desde HubSpot UI si lo prefieren. NO bloqueante.
+
+### Files owned (estado final)
+
+- ✅ `migrations/20260509125228920_task-836-services-lifecycle-validation-stage-and-lineage-protection.sql`
+- ✅ `src/lib/services/service-lifecycle-mapper.ts` + tests (18/18)
+- ✅ `src/lib/services/engagement-kind-cascade.ts` + tests (24)
+- ✅ `src/lib/services/upsert-service-from-hubspot.ts` (refactor) + tests (12)
+- ✅ `src/lib/hubspot/list-services-for-company.ts` (extender SERVICE_PROPERTIES)
+- ✅ `src/lib/reliability/queries/service-engagement-{lifecycle-stage-unknown,engagement-kind-unmapped,renewed-stuck,lineage-orphan}.ts` + tests (15)
+- ✅ `src/lib/reliability/get-reliability-overview.ts` (extender wire 7 readers commercial)
+- ✅ `docs/operations/runbooks/hubspot-service-pipeline-config.md` (NUEVO con bitácora ejecutada)
+- ✅ `docs/architecture/Greenhouse_Services_Architecture_v1.md` Delta 2026-05-09
+- ✅ `docs/architecture/GREENHOUSE_HUBSPOT_SERVICES_INTAKE_V1.md` Delta 2026-05-09
+- ✅ `docs/architecture/GREENHOUSE_EVENT_CATALOG_V1.md` Delta 2026-05-09 (`lifecycle_changed v1`)
+- ✅ `CLAUDE.md` sección nueva con 14 Hard Rules
+- ✅ `docs/tasks/in-progress/TASK-836-pre-backfill-snapshot.md` con post-apply diff documentado
+
+### Verificación final
+
+- Tests: 59/59 services + 24 cascade + 18 mapper + 12 UPSERT + 15 reliability = **128/128 verdes**.
+- Schema PG real verificado vivo: 32 columnas, 8 CHECKs, 2 triggers (anti-zombie 120d + lineage protection).
+- 7 stage IDs canónicos en mapper (incluida `validation` ID `1357763256` creada via API).
+- Property `ef_engagement_kind` creada en HubSpot con label `Tipo de servicio` + 5 options.
+- Apply backfill ejecutado sin errores, bug raíz "Loyal" corregido, ANAM Nuevas Licencias distinguible en `renewal_pending`.
+- 4 reliability signals nuevos en steady=0.
+- 0 regresiones en backward compat.
+
+### Follow-ups
+
+- TASK-837 (deal-bound Sample Sprint wizard outbound) puede empezar — la foundation `parent_service_id` + trigger lineage está lista.
+- Si emerge stage HubSpot nueva, agregar al mapper + tests + docs antes de aprobar más operación. Reliability signal `lifecycle_stage_unknown` flagueará drift.
+- Monitor reliability dashboard `/admin/operations` próximas 7 días — validar steady=0 sostenido para los 4 signals nuevos.
+
+Cero modificación a archivos owned por TASK-841 (nubox/ops-worker) durante la sesión.

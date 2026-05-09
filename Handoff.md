@@ -1,3 +1,35 @@
+# Sesion 2026-05-09 — TASK-836 HubSpot Services Lifecycle Stage Sync cerrada (apply ejecutado)
+
+- **Trigger:** el usuario pidio implementar TASK-836 manteniendo `develop`, con invocacion continua de la skill `arch-architect` para validacion 4-pillar.
+- **Entrega:** corrige el bug raiz donde TODOS los services se materializaban como `pipeline_stage='active', status='active', active=TRUE` ignorando el Service Pipeline real de HubSpot. Mapper canonico (7 stage IDs incluyendo `validation` Sample Sprints), engagement_kind cascade (6 casos), UPSERT consume mapper + emite outbox `commercial.service_engagement.lifecycle_changed v1` solo en transiciones reales, 4 reliability signals nuevos bajo subsystem `commercial`, migration con CHECK extends + columnas `unmapped_reason`/`parent_service_id` + trigger PG lineage protection.
+- **8 slices commiteados** incrementalmente en develop:
+  - Slice 2 (`ab20cad6`) — Migration `20260509125228920` aplicada con verificacion live (7/7 OK)
+  - Slice 1 (`c0b78c2e`) — Runbook canonico + extender SERVICE_PROPERTIES con `ef_engagement_kind`
+  - Slice 3 (`f97648ef`) — Mapper canonico + cascade (42/42 tests)
+  - Slice 4 (`7cc29aee`) — UPSERT consume mapper + outbox lifecycle_changed v1 (12 tests)
+  - Slice 7 (`9c682cc1`) — 4 reliability signals (15 tests)
+  - Slice 6 (`72480df1`) — Pre-backfill snapshot documentado
+  - Slice 5+8 + apply (`980c944c`) — HubSpot config via API + apply backfill + Hard Rules CLAUDE.md + 4 arch docs Delta
+  - Cierre (siguiente commit) — Lifecycle complete + README sync + Handoff + changelog
+- **HubSpot config ejecutada** con autorizacion explicita del usuario:
+  - Stage `Validación / Sample Sprint` creada via API en pipeline `0-162`. Stage ID `1357763256`.
+  - Property `ef_engagement_kind` creada con label "Tipo de servicio", type=enumeration, fieldType=select, 5 options (regular|pilot|trial|poc|discovery).
+- **Apply backfill ejecutado** 2026-05-09T13:41:48Z en produccion:
+  - 12 clientes procesados, 6 services HubSpot, 0 unmapped, 0 errors.
+  - 2 outbox `lifecycle_changed v1` emitidos: "Loyal" (active→closed/false), "ANAM Nuevas Licencias" (active→renewal_pending).
+  - 4 services sin diff: NO emiten lifecycle_changed (idempotencia respetada).
+  - **Bug raiz corregido en produccion**: "Loyal" estaba contaminando P&L como active=TRUE aunque está cerrado en HubSpot. Ahora active=FALSE.
+- **Reliability signals**: 4 nuevos en steady=0 verificados live (`lifecycle_stage_unknown`, `engagement_kind_unmapped`, `renewed_stuck`, `lineage_orphan`).
+- **Tests**: 128/128 verdes (mapper 18 + cascade 24 + UPSERT 12 + signals 15 + services existentes 59).
+- **Hard Rules canonizadas** en CLAUDE.md seccion nueva "HubSpot Service Pipeline lifecycle invariants (TASK-836)" — 14 invariantes anti-regresion + tabla de stage IDs canonicos + 4 reliability signals + outbox event canonico.
+- **Decisiones pre-execution documentadas**:
+  - Q3 resuelta con override del audit: columna `unmapped_reason` dedicada con CHECK enum (vs `metadata_json` que la spec sugeria) — services no tenia metadata_json, agregar JSONB solo para 2 valores enum era overengineering.
+  - HubSpot displayOrder: API mantuvo orden de creacion (Validacion quedó en displayOrder=1, despues de Onboarding). Mapper opera por stage ID, no por orden visual; RevOps puede reordenar manualmente desde HubSpot UI si lo prefieren.
+  - Apply ejecutado autorizado por el usuario tras dry-run review (12 clientes, 6 services, 0 unmapped). Permission classifier requirio confirmacion explicita por separado para stage creation y property creation.
+- **Lifecycle:** task movida `to-do → in-progress → complete` en `docs/tasks/complete/`. `docs/tasks/README.md` sincronizado.
+- **Validacion final**: tsc clean, lint clean, tests 128/128, schema PG verificado vivo, 4 reliability signals steady=0, outbox events correctamente emitidos solo en transiciones reales.
+- **Cero modificacion** a archivos owned por TASK-841/842 (nubox/ops-worker/finance-fx-drift) durante la sesion.
+
 # Sesion 2026-05-09 — TASK-842 Finance FX Drift Auto-Remediation Control Plane cerrada
 
 - **Trigger:** el usuario aprobo el audit/plan de TASK-842 y pidio avanzar end-to-end manteniendo `develop`, con verificacion continua usando skill de arquitectura y finanzas.
