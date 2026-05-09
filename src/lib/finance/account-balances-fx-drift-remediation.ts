@@ -106,7 +106,7 @@ const ymd = (date: Date) => date.toISOString().slice(0, 10)
 const todayYmd = () => ymd(new Date())
 
 const clampInteger = (value: number | undefined, fallback: number, min: number, max: number) => {
-  if (!Number.isFinite(value)) return fallback
+  if (typeof value !== 'number' || !Number.isFinite(value)) return fallback
 
   return Math.min(Math.max(Math.trunc(value), min), max)
 }
