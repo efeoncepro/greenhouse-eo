@@ -2,7 +2,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P0` (bloquea TASK-813b webhook→PG sync end-to-end)
 - Impact: `Alto` — 207 callsites de `captureWithDomain` en `src/lib/` operan ciegas en 3 Cloud Run services hoy
 - Effort: `Medio` — 8 slices, ~5-7h trabajo end-to-end

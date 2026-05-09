@@ -1,9 +1,46 @@
 # ISSUE-074 — ops-worker missing `@sentry/nextjs` bundle bloquea reactive projections
 
-> **Estado:** Open
+> **Estado:** Resolved
 > **Detectado:** 2026-05-09 durante smoke test post-merge PR #113 (TASK-836 follow-up)
+> **Resuelto:** 2026-05-09 19:30:04Z (verified live end-to-end)
 > **Severidad:** Alta — bloquea sync end-to-end de webhooks HubSpot services + cualquier projection que invoque `captureWithDomain`
 > **Detectado por:** Claude (smoke test verification)
+> **Resolución canónica:** TASK-844 (Cross-Runtime Observability: Sentry Init Canónico para Cloud Run Services)
+
+## Resolución (TASK-844, 2026-05-09)
+
+**Decisión arquitectónica adoptada**: Reemplazar `@sentry/nextjs` por `@sentry/node` en wrapper canónico + helper `initSentryForService` invocado por cada Cloud Run service.
+
+**8 slices completados end-to-end en develop**:
+- Slice 1: switch wrapper a `@sentry/node` (runtime-portable)
+- Slice 2: helper canónico `services/_shared/sentry-init.ts` (8 tests verdes)
+- Slice 3: ops-worker init + Dockerfile COPY + deploy.sh secret mount opcional
+- Slice 3b: HUBSPOT_ACCESS_TOKEN secret mount (gap descubierto en smoke)
+- Slice 4: mirror commercial-cost-worker + ico-batch
+- Slice 5: reliability signal `observability.cloud_run.silent_failure_rate` (9 tests verdes)
+- Slice 6: lint rule `greenhouse/cloud-run-services-must-init-sentry` (10 tests verdes, modo `error`)
+- Slice 7: CLAUDE.md Hard Rule canonizada (8 reglas + 3 capas defense-in-depth)
+- Slice 8: spec + close (este).
+
+**Smoke test verificación live (2026-05-09 19:30:04Z)**:
+- PATCH HubSpot service `551522263821` `ef_engagement_kind`: regular→trial
+- Webhook arrived 19:26:27 (~1s post-PATCH)
+- Outbox event `outbox-131d128c-...` published 19:28:03 (cron */2min)
+- Reactive consumer `hubspot_services_intake` materialized=1/1 failures=0 a 19:30:04
+- `greenhouse_core.services.engagement_kind` = 'trial' (matches PATCH) ✅
+- `hubspot_last_synced_at` actualizado 52s post-materialization ✅
+- Revert `engagement_kind` regular completado
+
+**Anti-regresión activa**:
+1. Lint rule `greenhouse/cloud-run-services-must-init-sentry` modo `error` bloquea commits que crean `services/<svc>/server.ts` con import `@/lib/**` sin init.
+2. Reliability signal `observability.cloud_run.silent_failure_rate` cuenta `outbox_reactive_log.last_error LIKE '%captureException is not a function%'` últimas 24h. Steady=0.
+3. Cloud Logging stderr fallback siempre disponible.
+
+**Spec canónica**: `docs/tasks/complete/TASK-844-cross-runtime-observability-sentry-init.md` (movida post Slice 8).
+
+---
+
+## Histórico — descripción original
 
 ## Síntoma
 

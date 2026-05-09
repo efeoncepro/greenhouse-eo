@@ -1,3 +1,28 @@
+# Sesion 2026-05-09 — TASK-844 Cross-Runtime Observability Sentry Init (cierra ISSUE-074)
+
+- **Trigger:** smoke test post-merge PR #113 (TASK-836 follow-up dual-format webhook) reveló que `hubspot_services_intake` reactive consumer en ops-worker fallaba con `Sentry.captureException is not a function`. Causa raíz arquitectónica: `src/lib/observability/capture.ts` importaba `@sentry/nextjs` (Next.js-específico) cuyo shape variaba en runtime Cloud Run.
+- **Implicancia descubierta:** TASK-813b nunca funcionó end-to-end en producción — el bug del dual-format webhook (TASK-836 follow-up) era el upstream que dropeaba todos los events 2025.2 antes; al cerrarlo, expuso este segundo root cause. Latente desde despliegue de hubspot_services_intake projection.
+- **Decisión arquitectónica adoptada (skill arch-architect 4-pillar contract):** Reemplazar `@sentry/nextjs` por `@sentry/node` en wrapper canónico + helper `initSentryForService` invocado por cada Cloud Run service. `@sentry/node` es el SDK underlying que `@sentry/nextjs` envuelve — runtime-portable. Sentry hub es global singleton: ambos runtimes acceden al mismo hub.
+- **Alternativas rechazadas:** shim no-op (sacrifica observabilidad), agregar `@sentry/nextjs` real (SDK incorrecto para generic Node), dynamic import async (rompe 207 callsites), per-service Sentry projects (operacionalmente caro).
+- **8 slices completos commiteados incrementalmente en `develop`:**
+  - Slice 1 (`d5738329`) — switch wrapper a @sentry/node + 7 tests Vitest
+  - Slice 2 (`<commit>`) — helper canónico `services/_shared/sentry-init.ts` + 8 tests
+  - Slice 3 (`3180123e`) — ops-worker init + Dockerfile COPY + deploy.sh secret mount opcional
+  - Slice 3b (`de1a8651`) — HUBSPOT_ACCESS_TOKEN secret mount (gap descubierto en smoke)
+  - Slice 4 (`55ccd644`) — mirror commercial-cost-worker + ico-batch
+  - Slice 5 (`16663add`) — reliability signal `observability.cloud_run.silent_failure_rate` + 9 tests
+  - Slice 6 (`3b999d31`) — lint rule `greenhouse/cloud-run-services-must-init-sentry` modo `error` + 13 tests
+  - Slice 7 (`9ea6feb5`) — CLAUDE.md Hard Rule "Cross-runtime observability — Sentry init invariant" (8 reglas + 3 capas defense-in-depth)
+- **Smoke test verificación live (2026-05-09 19:30:04Z):** PATCH HubSpot service `551522263821` `ef_engagement_kind` regular→trial → webhook arrived 19:26:27 (~1s) → outbox event `outbox-131d128c-...` published 19:28:03 (cron */2min) → reactive consumer `hubspot_services_intake` materialized=1/1 failures=0 a 19:30:04 → `greenhouse_core.services.engagement_kind='trial'` (matches PATCH) ✅. Cycle completo ~3.5min. Revert a regular completado.
+- **Anti-regresión activa (defense-in-depth 3 capas):**
+  1. Lint rule `greenhouse/cloud-run-services-must-init-sentry` modo `error` bloquea commits que crean `services/<svc>/server.ts` con import `@/lib/**` sin init.
+  2. Reliability signal `observability.cloud_run.silent_failure_rate` cuenta `outbox_reactive_log.last_error LIKE '%captureException is not a function%'` últimas 24h. Steady=0; > 0 indica regresión.
+  3. Cloud Logging stderr fallback siempre disponible.
+- **DSN provisioning queda como follow-up explícito:** secret `greenhouse-sentry-dsn` no existe aún en GCP Secret Manager. Sin DSN, Sentry hub queda no-op (graceful degradation por design — el fix de ISSUE-074 NO depende de la provisión). Cuando el secret se cree, deploy.sh lo monta automáticamente y los 3 Cloud Run services empiezan a reportar incidents per-domain.
+- **ISSUE-074** movido a `resolved/`. **TASK-844** movido a `complete/`. README + TASK_ID_REGISTRY sincronizados.
+
+---
+
 # Sesion 2026-05-09 — TASK-607 / ISSUE-073 Actions Node 24 + smoke-lane flaky semantics
 
 - **Trigger:** el usuario pidio resolver end-to-end los warnings/fixes pendientes sin parches, con skill de arquitectura. Se reviso TASK-607 y el run Playwright `25606031281`.
