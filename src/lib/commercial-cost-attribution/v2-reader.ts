@@ -193,3 +193,89 @@ export const readCommercialCostAttributionByClientForPeriodV2 = async (
     }
   }
 }
+
+/**
+ * TASK-835 — Sibling reader: agrega costo por `service_id` para una ventana
+ * de períodos (year-month range). Comparte VIEW canónica con el reader
+ * byClient — single source of truth, cero SQL duplicado.
+ *
+ * Solo agrega filas cuyo `service_id` está en el set provisto. Filtra opcional
+ * por `attributionIntents` (default: 4 lanes engagement non-regular). Las
+ * filas sin `service_id` quedan excluidas silenciosamente — son agregaciones
+ * client-level legacy que no aplican al modelo Sample Sprint.
+ *
+ * Devuelve mapa `Map<serviceId, totalClp>` agregado para todos los meses
+ * del rango. La projection llama con la ventana corriente (mes actual y
+ * mes anterior por defecto, configurable).
+ */
+
+export interface ReadCommercialCostAttributionByServiceForPeriodInput {
+  serviceIds: string[]
+  /** Inclusive start { year, month }. */
+  fromPeriod: { year: number; month: number }
+  /** Inclusive end { year, month }. */
+  toPeriod: { year: number; month: number }
+  /** Default: ['pilot','trial','poc','discovery']. Cuando vacío, no aplica filtro. */
+  attributionIntents?: string[] | null
+}
+
+const DEFAULT_ATTRIBUTION_INTENTS = ['pilot', 'trial', 'poc', 'discovery']
+
+interface ServiceAttributionRowDb extends Record<string, unknown> {
+  service_id: string
+  amount_clp: string
+}
+
+export const readCommercialCostAttributionByServiceForPeriodV2 = async (
+  input: ReadCommercialCostAttributionByServiceForPeriodInput
+): Promise<Map<string, number>> => {
+  const result = new Map<string, number>()
+
+  if (!Array.isArray(input.serviceIds) || input.serviceIds.length === 0) return result
+
+  const dedupedIds = Array.from(new Set(input.serviceIds.filter(id => typeof id === 'string' && id.trim().length > 0)))
+
+  if (dedupedIds.length === 0) return result
+
+  const fromYear = Math.trunc(input.fromPeriod.year)
+  const fromMonth = Math.trunc(input.fromPeriod.month)
+  const toYear = Math.trunc(input.toPeriod.year)
+  const toMonth = Math.trunc(input.toPeriod.month)
+
+  if (!Number.isFinite(fromYear) || !Number.isFinite(fromMonth) || !Number.isFinite(toYear) || !Number.isFinite(toMonth)) {
+    return result
+  }
+
+  const intents = input.attributionIntents === undefined ? DEFAULT_ATTRIBUTION_INTENTS : input.attributionIntents
+
+  const intentClause = Array.isArray(intents) && intents.length > 0
+    ? 'AND attribution_intent = ANY($4::text[])'
+    : ''
+
+  const params: unknown[] = [
+    dedupedIds,
+    fromYear * 100 + fromMonth,
+    toYear * 100 + toMonth
+  ]
+
+  if (intentClause) params.push(intents)
+
+  const rows = await runGreenhousePostgresQuery<ServiceAttributionRowDb>(
+    `SELECT service_id, SUM(amount_clp)::text AS amount_clp
+     FROM greenhouse_serving.commercial_cost_attribution_v2
+     WHERE service_id = ANY($1::text[])
+       AND (period_year * 100 + period_month) >= $2
+       AND (period_year * 100 + period_month) <= $3
+       ${intentClause}
+     GROUP BY service_id`,
+    params
+  )
+
+  for (const row of rows) {
+    const amount = num(row.amount_clp)
+
+    if (amount > 0) result.set(row.service_id, round(amount))
+  }
+
+  return result
+}

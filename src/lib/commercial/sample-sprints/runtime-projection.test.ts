@@ -6,6 +6,10 @@ vi.mock('@/lib/observability/capture', () => ({
   captureWithDomain: vi.fn()
 }))
 
+vi.mock('@/lib/commercial-cost-attribution/v2-reader', () => ({
+  readCommercialCostAttributionByServiceForPeriodV2: vi.fn()
+}))
+
 vi.mock('./store', () => ({
   listSampleSprints: vi.fn(),
   getSampleSprintDetail: vi.fn()
@@ -21,6 +25,8 @@ vi.mock('./health', () => ({
   resolveCommercialEngagementConversionRateThreshold: vi.fn(() => 0.35)
 }))
 
+import { readCommercialCostAttributionByServiceForPeriodV2 } from '@/lib/commercial-cost-attribution/v2-reader'
+
 import { getSampleSprintDetail, listSampleSprints } from './store'
 
 import {
@@ -35,6 +41,9 @@ import {
 
 const mockedListSampleSprints = listSampleSprints as unknown as ReturnType<typeof vi.fn>
 const mockedGetSampleSprintDetail = getSampleSprintDetail as unknown as ReturnType<typeof vi.fn>
+
+const mockedReadCostAttribution =
+  readCommercialCostAttributionByServiceForPeriodV2 as unknown as ReturnType<typeof vi.fn>
 
 import type { TenantContext } from '@/lib/tenant/get-tenant-context'
 
@@ -93,6 +102,7 @@ describe('runtime-projection — Slice 1 skeleton', () => {
     __clearAllProjectionCache()
     __resetDegradationCounterForTests()
     vi.clearAllMocks()
+    mockedReadCostAttribution.mockResolvedValue(new Map<string, number>())
   })
 
   it('proyecta items con shape canónico cuando todas las fuentes resuelven OK', async () => {
@@ -103,11 +113,34 @@ describe('runtime-projection — Slice 1 skeleton', () => {
     expect(projection.contractVersion).toBe('sample-sprint-runtime.v1')
     expect(projection.items).toHaveLength(2)
     expect(projection.items[0]!.serviceId).toBe('svc-A')
-    expect(projection.items[0]!.actualClp).toBeNull() // Slice 1: cost source not wired yet
+    expect(projection.items[0]!.actualClp).toBeNull() // sin coste real para el período
     expect(projection.items[0]!.progressPct).toBeNull() // listItem sin metrics_json → null honest
     expect(projection.items[0]!.budgetUsagePct).toBeNull() // null cuando actualClp=null
     expect(projection.degraded).toEqual([]) // no errors with passthrough resolvers
     expect(projection.selected).toBeNull()
+  })
+
+  it('popula actualClp y budgetUsagePct cuando el reader cost attribution devuelve valor', async () => {
+    mockedListSampleSprints.mockResolvedValue([
+      buildItem({ serviceId: 'svc-A', expectedInternalCostClp: 4_000_000 })
+    ])
+    mockedReadCostAttribution.mockResolvedValue(new Map([['svc-A', 1_200_000]]))
+
+    const projection = await resolveSampleSprintRuntimeProjection({ tenant: buildTenant() })
+
+    expect(projection.items[0]!.actualClp).toBe(1_200_000)
+    expect(projection.items[0]!.budgetUsagePct).toBe(30) // 1.2M / 4M * 100 = 30%
+  })
+
+  it('marca degraded cost_attribution_unavailable cuando el reader falla', async () => {
+    mockedListSampleSprints.mockResolvedValue([buildItem()])
+    mockedReadCostAttribution.mockRejectedValue(new Error('PG view down'))
+
+    const projection = await resolveSampleSprintRuntimeProjection({ tenant: buildTenant() })
+
+    expect(projection.items[0]!.actualClp).toBeNull()
+    expect(projection.degraded.some(reason => reason.code === 'cost_attribution_unavailable')).toBe(true)
+    expect(getRecentProjectionDegradationCount()).toBeGreaterThan(0)
   })
 
   it('marca progressPct=100 cuando outcomeKind terminal en el listItem', async () => {

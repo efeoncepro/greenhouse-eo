@@ -1,5 +1,6 @@
 import 'server-only'
 
+import { readCommercialCostAttributionByServiceForPeriodV2 } from '@/lib/commercial-cost-attribution/v2-reader'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { isSourceDegraded, withSourceTimeout } from '@/lib/platform-health/with-source-timeout'
 import type { TenantContext } from '@/lib/tenant/get-tenant-context'
@@ -310,9 +311,22 @@ export const resolveSampleSprintRuntimeProjection = async (
   const costByServiceId = new Map<string, number>()
 
   if (items.length > 0) {
-    // Slice 2 wires `readCommercialCostAttributionByServiceForPeriodV2`. Slice 1 retorna mapa vacío.
+    const today = new Date()
+    const currentYear = today.getUTCFullYear()
+    const currentMonth = today.getUTCMonth() + 1
+    // Ventana de 6 meses hacia atrás — suficiente para cubrir Sample Sprints
+    // típicos (1-3 meses) sin agregar costo histórico irrelevante.
+    const fromMs = Date.UTC(currentYear, currentMonth - 1 - 5, 1)
+    const fromDate = new Date(fromMs)
+    const fromYear = fromDate.getUTCFullYear()
+    const fromMonth = fromDate.getUTCMonth() + 1
+
     const costResult = await withSourceTimeout(
-      async () => new Map<string, number>(),
+      async () => readCommercialCostAttributionByServiceForPeriodV2({
+        serviceIds: items.map(item => item.serviceId),
+        fromPeriod: { year: fromYear, month: fromMonth },
+        toPeriod: { year: currentYear, month: currentMonth }
+      }),
       { source: 'sample-sprints.cost-attribution.by-service', timeoutMs: SOURCE_TIMEOUT_MS }
     )
 

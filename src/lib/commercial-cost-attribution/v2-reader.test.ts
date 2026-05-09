@@ -7,7 +7,10 @@ vi.mock('@/lib/postgres/client', () => ({
 }))
 
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
-import { readCommercialCostAttributionByClientForPeriodV2 } from './v2-reader'
+import {
+  readCommercialCostAttributionByClientForPeriodV2,
+  readCommercialCostAttributionByServiceForPeriodV2
+} from './v2-reader'
 
 const queryMock = runGreenhousePostgresQuery as unknown as ReturnType<typeof vi.fn>
 
@@ -166,5 +169,90 @@ describe('readCommercialCostAttributionByClientForPeriodV2', () => {
     const result = await readCommercialCostAttributionByClientForPeriodV2(2026, 3)
 
     expect(result.clients.map(c => c.clientId)).toEqual(['cli-b', 'cli-c', 'cli-a'])
+  })
+})
+
+describe('readCommercialCostAttributionByServiceForPeriodV2 (TASK-835)', () => {
+  it('retorna mapa vacío sin consultar PG cuando serviceIds está vacío', async () => {
+    const result = await readCommercialCostAttributionByServiceForPeriodV2({
+      serviceIds: [],
+      fromPeriod: { year: 2026, month: 4 },
+      toPeriod: { year: 2026, month: 5 }
+    })
+
+    expect(result.size).toBe(0)
+    expect(queryMock).not.toHaveBeenCalled()
+  })
+
+  it('agrega amount_clp por service_id en el rango de períodos', async () => {
+    queryMock.mockResolvedValueOnce([
+      { service_id: 'svc-A', amount_clp: '1500000' },
+      { service_id: 'svc-B', amount_clp: '750000' }
+    ])
+
+    const result = await readCommercialCostAttributionByServiceForPeriodV2({
+      serviceIds: ['svc-A', 'svc-B'],
+      fromPeriod: { year: 2026, month: 4 },
+      toPeriod: { year: 2026, month: 5 }
+    })
+
+    expect(result.get('svc-A')).toBe(1500000)
+    expect(result.get('svc-B')).toBe(750000)
+    expect(queryMock).toHaveBeenCalledTimes(1)
+
+    const [sql, params] = queryMock.mock.calls[0]!
+
+    expect(sql).toContain('service_id = ANY($1::text[])')
+    expect(sql).toContain('attribution_intent = ANY($4::text[])')
+    expect(params[0]).toEqual(['svc-A', 'svc-B'])
+    expect(params[1]).toBe(202604)
+    expect(params[2]).toBe(202605)
+    expect(params[3]).toEqual(['pilot', 'trial', 'poc', 'discovery'])
+  })
+
+  it('omite el filtro de attribution_intent cuando se pasa lista vacía o null', async () => {
+    queryMock.mockResolvedValueOnce([])
+
+    await readCommercialCostAttributionByServiceForPeriodV2({
+      serviceIds: ['svc-X'],
+      fromPeriod: { year: 2026, month: 1 },
+      toPeriod: { year: 2026, month: 12 },
+      attributionIntents: null
+    })
+
+    const [sql, params] = queryMock.mock.calls[0]!
+
+    expect(sql).not.toContain('attribution_intent')
+    expect(params).toHaveLength(3)
+  })
+
+  it('deduplica serviceIds duplicados antes de consultar', async () => {
+    queryMock.mockResolvedValueOnce([])
+
+    await readCommercialCostAttributionByServiceForPeriodV2({
+      serviceIds: ['svc-A', 'svc-A', 'svc-B', '   ', ''],
+      fromPeriod: { year: 2026, month: 4 },
+      toPeriod: { year: 2026, month: 4 }
+    })
+
+    const [, params] = queryMock.mock.calls[0]!
+
+    expect(params[0]).toEqual(['svc-A', 'svc-B'])
+  })
+
+  it('omite filas con amount_clp <= 0 del mapa resultado', async () => {
+    queryMock.mockResolvedValueOnce([
+      { service_id: 'svc-A', amount_clp: '0' },
+      { service_id: 'svc-B', amount_clp: '500' }
+    ])
+
+    const result = await readCommercialCostAttributionByServiceForPeriodV2({
+      serviceIds: ['svc-A', 'svc-B'],
+      fromPeriod: { year: 2026, month: 4 },
+      toPeriod: { year: 2026, month: 4 }
+    })
+
+    expect(result.has('svc-A')).toBe(false)
+    expect(result.get('svc-B')).toBe(500)
   })
 })
