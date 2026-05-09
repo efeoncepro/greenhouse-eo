@@ -6,7 +6,7 @@
 - **Fix smoke-lane semantics:** nuevo parser reusable `scripts/lib/smoke-lane-report.ts`; `publish-smoke-lane-run.ts` usa el ultimo intento Playwright. `failed -> passed` ahora es `flaky`, no `failed_tests`; el log incluye `flaky=<n>`. Artifact real de Playwright `25606031281` confirmo 3 casos flaky por retry.
 - **Fix navegación E2E:** `tests/e2e/fixtures/auth.ts` agrega `gotoWithTransientRetries` y `gotoAuthenticated` lo reutiliza. Retries acotados solo para `page.goto` timeout/red transitoria; HTTP/auth/asserts siguen fallando loud. `login-session.spec.ts` deja de usar `page.goto` crudo en las rutas que flakearon.
 - **Docs:** ISSUE-073 creado en resolved; `GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1`, docs funcionales de reliability/test observability, `DECISIONS_INDEX`, `changelog`, `docs/tasks/README.md` y `TASK_ID_REGISTRY` sincronizados. TASK-607 movida a `complete/`.
-- **Validación pendiente de esta sesión:** antes de push correr tests focalizados, lint, tsc y luego monitorear CI/Playwright post-push para confirmar que desaparecen los warnings Node.js 20 de actions y que el publisher no vuelve a contar flaky como failed.
+- **Validación:** `pnpm test scripts/lib/smoke-lane-report.test.ts` 3/3; artifact real Playwright `25606031281` parseado como `total=36 passed=33 failed=0 flaky=3`; `pnpm exec tsc --noEmit --pretty false`, `pnpm lint`, `git diff --check` OK; Playwright focalizado staging (`login-session` + `cron-staging-parity`) 3/3. Post-push final: `CI` run `25609178479` success sin warning `Node.js 20 actions`; `Playwright E2E smoke` run `25609178482` success y publisher registro `finance.web`, `delivery.web`, `identity.web` como `status=passed total=36 passed=36 failed=0 flaky=0`.
 
 ---
 

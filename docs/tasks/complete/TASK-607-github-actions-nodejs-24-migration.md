@@ -263,8 +263,8 @@ git diff .github/workflows/
 - [x] `package.json` sigue sin `packageManager`; no se requiere `package-manager-cache: false`
 - [x] Parser smoke-lane distingue `failed` final vs `flaky`
 - [x] Navegación autenticada E2E usa retry transitorio acotado
-- [ ] CI + Playwright post-push verdes
-- [ ] Sin deprecation warnings de Node.js 20 por actions en los summaries post-push
+- [x] CI + Playwright post-push verdes (`CI` run `25609178479`, `Playwright E2E smoke` run `25609178482`)
+- [x] Sin deprecation warnings de Node.js 20 por actions en los summaries post-push (`upload-artifact@v7` elimina el warning que `@v5` aún emitía)
 
 ## Verification
 
