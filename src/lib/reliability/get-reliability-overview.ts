@@ -42,6 +42,10 @@ import { getPaymentOrdersDeadLetterSignal } from './queries/payment-orders-dead-
 import { getPaidOrdersWithoutExpensePaymentSignal } from './queries/payment-orders-paid-without-expense-payment'
 import { getPayrollExpenseMaterializationLagSignal } from './queries/payroll-expense-materialization-lag'
 import { getProviderBqSyncDeadLetterSignal } from './queries/provider-bq-sync-dead-letter'
+import { getServiceEngagementEngagementKindUnmappedSignal } from './queries/service-engagement-engagement-kind-unmapped'
+import { getServiceEngagementLifecycleStageUnknownSignal } from './queries/service-engagement-lifecycle-stage-unknown'
+import { getServiceEngagementLineageOrphanSignal } from './queries/service-engagement-lineage-orphan'
+import { getServiceEngagementRenewedStuckSignal } from './queries/service-engagement-renewed-stuck'
 import { getServicesLegacyResidualReadsSignal } from './queries/services-legacy-residual-reads'
 import { getServicesOrganizationUnresolvedSignal } from './queries/services-organization-unresolved'
 import { getServicesSyncLagSignal } from './queries/services-sync-lag'
@@ -813,16 +817,22 @@ export const getReliabilityOverview = async (
       ? preloadedSources.criticalTablesMissing
       : await getCriticalTablesMissingSignal().catch(() => null)
 
-  // TASK-813 Slice 6 — Commercial engagement instance signals (3 readers en
-  // paralelo). Cada uno degrada honestamente a `unknown` si su query falla.
-  // Roll up bajo moduleKey 'commercial'. TASK-807 formaliza el subsystem.
+  // TASK-813 Slice 6 + TASK-836 Slice 7 — Commercial engagement instance signals.
+  // 3 readers TASK-813 + 4 readers TASK-836 en paralelo. Cada uno degrada
+  // honestamente a `unknown` si su query falla. Roll up bajo moduleKey 'commercial'.
+  // TASK-807 formaliza el subsystem.
   const servicesEngagement =
     preloadedSources.servicesEngagement !== undefined
       ? preloadedSources.servicesEngagement
       : await Promise.all([
           getServicesSyncLagSignal().catch(() => null),
           getServicesOrganizationUnresolvedSignal().catch(() => null),
-          getServicesLegacyResidualReadsSignal().catch(() => null)
+          getServicesLegacyResidualReadsSignal().catch(() => null),
+          // TASK-836 — 4 reliability signals nuevos
+          getServiceEngagementLifecycleStageUnknownSignal().catch(() => null),
+          getServiceEngagementEngagementKindUnmappedSignal().catch(() => null),
+          getServiceEngagementRenewedStuckSignal().catch(() => null),
+          getServiceEngagementLineageOrphanSignal().catch(() => null)
         ])
           .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
           .catch(() => null)
