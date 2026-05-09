@@ -731,6 +731,112 @@ export const getHubSpotGreenhouseCompanyServices = async (hubspotCompanyId: stri
 export const getHubSpotGreenhouseService = async (serviceId: string) =>
   fetchJson<HubSpotGreenhouseServiceProfile>(`/services/${serviceId}`)
 
+// TASK-837 Slice 4 — outbound CRUD client methods for Sample Sprint projection.
+// These call the bridge endpoints added in Slice 0.5b (POST /services,
+// PATCH /services/<id>, GET /services/by-idempotency-key/<key>).
+//
+// V1 scope: POST /services creates the p_services record + associates with
+// Deal + Company + Contacts in a single bridge call. The bridge orchestrates
+// sequential idempotent associations; if any association fails the consumer
+// receives a partial response and can retry only the missing pieces.
+
+export interface HubSpotGreenhouseServiceCreateAssociations {
+  dealId?: string | null
+  companyId?: string | null
+  contactIds?: string[]
+}
+
+export interface HubSpotGreenhouseServiceCreateRequest {
+  properties: Record<string, string | number | null | undefined>
+  associations?: HubSpotGreenhouseServiceCreateAssociations
+}
+
+export interface HubSpotGreenhouseServiceAssociationStatus {
+  deal: 'ok' | 'failed' | 'skipped'
+  company: 'ok' | 'failed' | 'skipped'
+  contacts: Array<{ contactId: string; status: 'ok' | 'failed' }>
+}
+
+export interface HubSpotGreenhouseServiceCreateResponse {
+  ok: boolean
+  hubspotServiceId: string
+  properties: Record<string, string | null>
+  associationStatus?: HubSpotGreenhouseServiceAssociationStatus
+}
+
+export interface HubSpotGreenhouseServiceUpdateResponse {
+  ok: boolean
+  hubspotServiceId: string
+  properties: Record<string, string | null>
+}
+
+export interface HubSpotGreenhouseServiceByIdempotencyKeyResponse {
+  ok: boolean
+  hubspotServiceId: string | null
+  properties: Record<string, string | null> | null
+}
+
+export const findHubSpotGreenhouseServiceByIdempotencyKey = async (
+  idempotencyKey: string
+): Promise<HubSpotGreenhouseServiceByIdempotencyKeyResponse> =>
+  fetchJson<HubSpotGreenhouseServiceByIdempotencyKeyResponse>(
+    `/services/by-idempotency-key/${encodeURIComponent(idempotencyKey)}`
+  )
+
+export const createHubSpotGreenhouseService = async (
+  payload: HubSpotGreenhouseServiceCreateRequest
+): Promise<HubSpotGreenhouseServiceCreateResponse> => {
+  const { baseUrl, timeoutMs } = getServiceConfig()
+
+  const response = await fetch(`${baseUrl}/services`, {
+    method: 'POST',
+    headers: await buildWriteServiceHeaders({ 'Content-Type': 'application/json' }),
+    body: JSON.stringify(payload),
+    cache: 'no-store',
+    next: { revalidate: 0 },
+    signal: AbortSignal.timeout(timeoutMs)
+  })
+
+  if (!response.ok) {
+    const body = await response.text()
+
+    throw new Error(
+      `HubSpot integration service returned ${response.status} for POST /services: ${body || response.statusText}`
+    )
+  }
+
+  return (await response.json()) as HubSpotGreenhouseServiceCreateResponse
+}
+
+export const updateHubSpotGreenhouseService = async (
+  hubspotServiceId: string,
+  properties: Record<string, string | number | null | undefined>
+): Promise<HubSpotGreenhouseServiceUpdateResponse> => {
+  const { baseUrl, timeoutMs } = getServiceConfig()
+
+  const response = await fetch(
+    `${baseUrl}/services/${encodeURIComponent(hubspotServiceId)}`,
+    {
+      method: 'PATCH',
+      headers: await buildWriteServiceHeaders({ 'Content-Type': 'application/json' }),
+      body: JSON.stringify({ properties }),
+      cache: 'no-store',
+      next: { revalidate: 0 },
+      signal: AbortSignal.timeout(timeoutMs)
+    }
+  )
+
+  if (!response.ok) {
+    const body = await response.text()
+
+    throw new Error(
+      `HubSpot integration service returned ${response.status} for PATCH /services/${hubspotServiceId}: ${body || response.statusText}`
+    )
+  }
+
+  return (await response.json()) as HubSpotGreenhouseServiceUpdateResponse
+}
+
 export const getHubSpotGreenhouseCompanyContacts = async (hubspotCompanyId: string) =>
   {
     const response = await fetchJson<HubSpotGreenhouseCompanyContactsResponse>(`/companies/${hubspotCompanyId}/contacts`)

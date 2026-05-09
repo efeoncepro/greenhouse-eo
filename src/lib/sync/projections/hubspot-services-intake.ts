@@ -151,6 +151,7 @@ export const hubspotServicesIntakeProjection: ProjectionDefinition = {
 
     const failures: string[] = []
     let materialized = 0
+    let outboundEchoLinked = 0
 
     // Memoize company lookups dentro del batch — si N services del mismo
     // company llegan, hacer N calls a HubSpot es desperdicio. Anti N+1.
@@ -158,6 +159,41 @@ export const hubspotServicesIntakeProjection: ProjectionDefinition = {
 
     for (const svc of serviceObjects) {
       try {
+        // TASK-837 Slice 4 — webhook eco lookup cascade.
+        // Si el HubSpot service viene con `ef_greenhouse_service_id` poblado,
+        // significa que fue creado por el outbound projection (sample-sprint-
+        // hubspot-outbound). El handler debe matchear el service local
+        // existente por idempotency_key y solo linkear el hubspot_service_id
+        // — NUNCA crear una segunda fila services. Esto previene la race
+        // condition entre el outbound UPDATE atomic y el webhook eco entrante.
+        const ghIdempotencyKey =
+          typeof svc.properties.ef_greenhouse_service_id === 'string'
+            ? svc.properties.ef_greenhouse_service_id.trim()
+            : ''
+
+        if (ghIdempotencyKey) {
+          const linked = await runGreenhousePostgresQuery<{ service_id: string }>(
+            `UPDATE greenhouse_core.services
+                SET hubspot_service_id = $1,
+                    hubspot_last_synced_at = CURRENT_TIMESTAMP,
+                    hubspot_sync_status = 'ready',
+                    updated_at = CURRENT_TIMESTAMP
+              WHERE idempotency_key = $2
+                AND (hubspot_service_id IS NULL OR hubspot_service_id = $1)
+              RETURNING service_id`,
+            [svc.id, ghIdempotencyKey]
+          )
+
+          if (linked.length > 0) {
+            // Outbound eco: linked the local service via idempotency key.
+            // Skip the regular UPSERT path entirely (no risk of duplicate row,
+            // no need to UPSERT when the service was created by us already).
+            outboundEchoLinked++
+            continue
+          }
+        }
+
+        // Fallback path: regular TASK-813b intake (HubSpot-originated service).
         let hubspotCompanyId: string | null
 
         if (companyCache.has(svc.id)) {
@@ -218,7 +254,7 @@ export const hubspotServicesIntakeProjection: ProjectionDefinition = {
       }
     }
 
-    const summary = `hubspot_services_intake: materialized=${materialized}/${serviceObjects.length} failures=${failures.length} source=${source}`
+    const summary = `hubspot_services_intake: materialized=${materialized}/${serviceObjects.length} outbound_echo_linked=${outboundEchoLinked} failures=${failures.length} source=${source}`
 
     if (failures.length === serviceObjects.length && failures.length > 0) {
       // Si TODOS fallaron, el reactive consumer enruta a retry. Si todos

@@ -960,13 +960,71 @@ def create_app() -> Flask:
                     400,
                 )
 
-            created = _client().create_service(properties)
+            client = _client()
+            created = client.create_service(properties)
+            hubspot_service_id = str(created.get("id") or "")
+
+            # TASK-837 Slice 4 — orchestrate associations inside the same call.
+            # Each association is idempotent (HubSpot tolerates duplicates).
+            # We catch per-association failures so the response carries a
+            # partial status instead of failing the whole request — caller
+            # marks `partial_associations` and retries only the failed ones.
+            associations = body.get("associations") or {}
+            association_status: dict[str, Any] = {
+                "deal": "skipped",
+                "company": "skipped",
+                "contacts": [],
+            }
+
+            if hubspot_service_id and isinstance(associations, dict):
+                deal_id = associations.get("dealId")
+                if deal_id:
+                    try:
+                        client.create_default_association(
+                            "0-162", hubspot_service_id, "deals", str(deal_id)
+                        )
+                        association_status["deal"] = "ok"
+                    except HubSpotIntegrationError:
+                        association_status["deal"] = "failed"
+
+                company_id = associations.get("companyId")
+                if company_id:
+                    try:
+                        client.create_default_association(
+                            "0-162", hubspot_service_id, "companies", str(company_id)
+                        )
+                        association_status["company"] = "ok"
+                    except HubSpotIntegrationError:
+                        association_status["company"] = "failed"
+
+                contact_ids = associations.get("contactIds") or []
+                if isinstance(contact_ids, list):
+                    for contact_id in contact_ids:
+                        if not contact_id:
+                            continue
+                        contact_id_str = str(contact_id)
+                        try:
+                            client.create_default_association(
+                                "0-162",
+                                hubspot_service_id,
+                                "contacts",
+                                contact_id_str,
+                            )
+                            association_status["contacts"].append(
+                                {"contactId": contact_id_str, "status": "ok"}
+                            )
+                        except HubSpotIntegrationError:
+                            association_status["contacts"].append(
+                                {"contactId": contact_id_str, "status": "failed"}
+                            )
+
             return (
                 jsonify(
                     {
                         "ok": True,
-                        "hubspotServiceId": str(created.get("id") or ""),
+                        "hubspotServiceId": hubspot_service_id,
                         "properties": created.get("properties") or {},
+                        "associationStatus": association_status,
                     }
                 ),
                 201,

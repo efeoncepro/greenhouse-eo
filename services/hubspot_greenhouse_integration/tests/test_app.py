@@ -2264,7 +2264,116 @@ class HubSpotGreenhouseIntegrationAppTests(unittest.TestCase):
         self.assertTrue(body["ok"])
         self.assertEqual(body["hubspotServiceId"], "551522263821")
         self.assertEqual(body["properties"]["ef_greenhouse_service_id"], "uuid-test")
+        # When no associations are sent, all 3 should be 'skipped'.
+        self.assertEqual(body["associationStatus"]["deal"], "skipped")
+        self.assertEqual(body["associationStatus"]["company"], "skipped")
+        self.assertEqual(body["associationStatus"]["contacts"], [])
         fake_hubspot.create_service.assert_called_once()
+        fake_hubspot.create_default_association.assert_not_called()
+
+    def test_create_service_route_orchestrates_full_association_set(self):
+        try:
+            from services.hubspot_greenhouse_integration.app import create_app
+        except ImportError as exc:
+            self.skipTest(f"Flask runtime not installed in local test environment: {exc}")
+
+        app = create_app()
+        app.config.update(
+            {
+                "hubspot_access_token": "hubspot-token",
+                "timeout_seconds": 30,
+                "greenhouse_integration_api_token": "ghi-token",
+            }
+        )
+        client = app.test_client()
+
+        fake_hubspot = MagicMock()
+        fake_hubspot.create_service.return_value = {"id": "svc-1", "properties": {}}
+        # All associations succeed.
+        fake_hubspot.create_default_association.return_value = {}
+
+        with patch(
+            "services.hubspot_greenhouse_integration.app.HubSpotClient",
+            return_value=fake_hubspot,
+        ):
+            response = client.post(
+                "/services",
+                json={
+                    "properties": {"hs_name": "x", "hs_pipeline_stage": "1357763256"},
+                    "associations": {
+                        "dealId": "deal-1",
+                        "companyId": "co-1",
+                        "contactIds": ["ct-1", "ct-2"],
+                    },
+                },
+                headers={"Authorization": "Bearer ghi-token"},
+            )
+
+        self.assertEqual(response.status_code, 201)
+        body = response.get_json()
+        self.assertEqual(body["associationStatus"]["deal"], "ok")
+        self.assertEqual(body["associationStatus"]["company"], "ok")
+        self.assertEqual(
+            body["associationStatus"]["contacts"],
+            [{"contactId": "ct-1", "status": "ok"}, {"contactId": "ct-2", "status": "ok"}],
+        )
+        # 1 call for deal + 1 for company + 2 for contacts = 4 association calls.
+        self.assertEqual(fake_hubspot.create_default_association.call_count, 4)
+
+    def test_create_service_route_returns_partial_status_on_association_failure(self):
+        try:
+            from services.hubspot_greenhouse_integration.app import create_app
+        except ImportError as exc:
+            self.skipTest(f"Flask runtime not installed in local test environment: {exc}")
+
+        app = create_app()
+        app.config.update(
+            {
+                "hubspot_access_token": "hubspot-token",
+                "timeout_seconds": 30,
+                "greenhouse_integration_api_token": "ghi-token",
+            }
+        )
+        client = app.test_client()
+
+        fake_hubspot = MagicMock()
+        fake_hubspot.create_service.return_value = {"id": "svc-1", "properties": {}}
+
+        # Deal + company succeed, contact fails.
+        def association_side_effect(from_type, from_id, to_type, to_id):
+            if to_type == "contacts":
+                raise HubSpotIntegrationError("contact assoc fail", status_code=400)
+            return {}
+
+        fake_hubspot.create_default_association.side_effect = association_side_effect
+
+        with patch(
+            "services.hubspot_greenhouse_integration.app.HubSpotClient",
+            return_value=fake_hubspot,
+        ):
+            response = client.post(
+                "/services",
+                json={
+                    "properties": {"hs_name": "x", "hs_pipeline_stage": "1357763256"},
+                    "associations": {
+                        "dealId": "deal-1",
+                        "companyId": "co-1",
+                        "contactIds": ["ct-1"],
+                    },
+                },
+                headers={"Authorization": "Bearer ghi-token"},
+            )
+
+        # Service was created — response is 201 even though an association failed.
+        # Caller (Slice 4 reactive consumer) marks 'partial_associations' and retries.
+        self.assertEqual(response.status_code, 201)
+        body = response.get_json()
+        self.assertEqual(body["associationStatus"]["deal"], "ok")
+        self.assertEqual(body["associationStatus"]["company"], "ok")
+        self.assertEqual(
+            body["associationStatus"]["contacts"],
+            [{"contactId": "ct-1", "status": "failed"}],
+        )
 
     def test_create_service_route_propagates_validation_error(self):
         try:
