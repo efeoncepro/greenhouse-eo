@@ -12,6 +12,9 @@ Standalone HTTP service that runs reactive projection consumers and projection-r
 | POST   | `/reactive/recover`        | Recover orphaned projection queue items          | `api/cron/projection-recovery`   |
 | POST   | `/reliability-ai-watch`    | Reliability AI Observer (TASK-638, Gemini)       | — (no Vercel equivalent)         |
 | POST   | `/cloud-cost-ai-watch`     | Cloud Cost Intelligence alerts + FinOps AI (TASK-769) | — (no Vercel equivalent)    |
+| POST   | `/nubox/sync`              | Nubox raw → conformed → PostgreSQL daily lane    | `api/cron/nubox-sync`            |
+| POST   | `/nubox/quotes-hot-sync`   | Nubox quotes hot lane                            | `api/cron/nubox-quotes-hot-sync` |
+| POST   | `/nubox/balance-sync`      | Nubox balance reconciliation lane                | —                                |
 
 ## Request Bodies
 
@@ -94,6 +97,48 @@ notifications or persist fingerprints.
 | `ops-reactive-recover`          | `*/15 * * * *`   | `/reactive/recover`        |
 | `ops-reliability-ai-watch`      | `0 */1 * * *`    | `/reliability-ai-watch`    |
 | `ops-cloud-cost-ai-watch`       | `15 */6 * * *`   | `/cloud-cost-ai-watch`     |
+| `ops-nubox-sync`                | `30 7 * * *`     | `/nubox/sync`              |
+| `ops-nubox-quotes-hot-sync`     | `*/15 * * * *`   | `/nubox/quotes-hot-sync`   |
+| `ops-nubox-balance-sync`        | `0 */4 * * *`    | `/nubox/balance-sync`      |
+
+## Nubox Runtime Contract
+
+`ops-worker` is the canonical runtime owner for Nubox crons. The deploy script uses
+`--set-env-vars`, so every required Nubox variable must be declared by
+`services/ops-worker/deploy.sh`; otherwise a later deploy can silently remove it.
+
+Required non-secret env:
+
+- `NUBOX_API_BASE_URL`
+
+Required secret refs:
+
+- `NUBOX_BEARER_TOKEN_SECRET_REF`
+- `NUBOX_X_API_KEY_SECRET_REF`
+
+Default refs are environment-scoped:
+
+| Environment | Bearer token ref | X API key ref |
+| --- | --- | --- |
+| `staging` | `greenhouse-nubox-bearer-token-staging` | `greenhouse-nubox-x-api-key-staging` |
+| `production` | `greenhouse-nubox-bearer-token-production` | `greenhouse-nubox-x-api-key-production` |
+
+`deploy.sh` fails fast when any required Nubox value is empty and grants the
+Cloud Run runtime service account `roles/secretmanager.secretAccessor` on both
+secret refs. Do not mount raw Nubox tokens as plain env vars in Cloud Run.
+
+Operational replay:
+
+```bash
+gcloud scheduler jobs run ops-nubox-sync --project=efeonce-group --location=us-east4
+gcloud scheduler jobs run ops-nubox-quotes-hot-sync --project=efeonce-group --location=us-east4
+gcloud scheduler jobs run ops-nubox-balance-sync --project=efeonce-group --location=us-east4
+```
+
+Steady state is verified in `greenhouse_sync.source_sync_runs`: `raw_sync`,
+`conformed_sync`, `postgres_projection`, `quotes_hot_sync`, and `balance_sync`
+must each report their own latest status. `conformed_sync` or
+`postgres_projection` freshness never compensates for stale raw evidence.
 
 ## Run Tracking
 

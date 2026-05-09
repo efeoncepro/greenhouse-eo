@@ -1181,6 +1181,30 @@ Tiempo total: <5 min. No hay datos en riesgo — WIF es puramente attribute-base
 | `scripts/setup-github-actions-wif.sh` | Provisioning idempotente de WIF pool, provider, SA, roles |
 | `services/ops-worker/deploy.sh` | Script de deploy ejecutado por el workflow |
 
+### 11.12 Nubox ops-worker env/secrets contract
+
+`ops-worker` owns Nubox scheduler endpoints:
+
+- `/nubox/sync`
+- `/nubox/quotes-hot-sync`
+- `/nubox/balance-sync`
+
+Because `services/ops-worker/deploy.sh` deploys Cloud Run with
+`--set-env-vars`, Nubox env vars are part of the declarative deploy contract.
+Required values:
+
+- `NUBOX_API_BASE_URL` as non-secret environment config.
+- `NUBOX_BEARER_TOKEN_SECRET_REF` as a Secret Manager ref.
+- `NUBOX_X_API_KEY_SECRET_REF` as a Secret Manager ref.
+
+The deploy script sets environment-scoped defaults and grants the runtime
+service account `roles/secretmanager.secretAccessor` on those refs. Raw Nubox
+token values must not be mounted as plain Cloud Run env vars or logged.
+
+Runtime freshness is verified via `greenhouse_sync.source_sync_runs`, not Cloud
+Scheduler status alone. A Scheduler 2xx/Cloud Run 200 can still be degraded if
+`raw_sync` failed and downstream phases reprocessed stale raw snapshots.
+
 ---
 
 _End of document._

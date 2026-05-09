@@ -16,7 +16,12 @@ vi.mock('@/lib/finance/quotation-canonical-store', () => ({
   syncCanonicalFinanceQuote
 }))
 
-import { upsertNuboxQuoteFromSale, type NuboxProjectionSale } from '@/lib/nubox/sync-nubox-to-postgres'
+import {
+  resolveNuboxPurchaseProjectionAmounts,
+  upsertNuboxQuoteFromSale,
+  type NuboxProjectionPurchase,
+  type NuboxProjectionSale
+} from '@/lib/nubox/sync-nubox-to-postgres'
 
 const makeProjectionSale = (overrides: Partial<NuboxProjectionSale> = {}): NuboxProjectionSale => ({
   nubox_sale_id: '28186300',
@@ -92,5 +97,77 @@ describe('upsertNuboxQuoteFromSale', () => {
     expect(insertSql).toContain("'nubox'")
     expect(insertSql).toContain("source_system = 'nubox'")
     expect(syncCanonicalFinanceQuote).toHaveBeenCalledWith({ quoteId: 'QUO-NB-28186300' })
+  })
+})
+
+const makeProjectionPurchase = (overrides: Partial<NuboxProjectionPurchase> = {}): NuboxProjectionPurchase => ({
+  nubox_purchase_id: '36671467',
+  folio: '13',
+  dte_type_code: 'BHE',
+  dte_type_abbreviation: 'BHE',
+  dte_type_name: 'Boleta de honorarios electronica',
+  net_amount: 175000,
+  exempt_amount: 0,
+  tax_vat_amount: 0,
+  total_amount: 148312,
+  total_other_taxes_amount: 0,
+  total_withholding_amount: 26688,
+  balance: 148312,
+  emission_date: '2026-05-09',
+  due_date: '2026-05-09',
+  period_year: 2026,
+  period_month: 5,
+  receipt_date: '2026-05-09',
+  purchase_type_code: 'honorarios',
+  purchase_type_name: 'Honorarios',
+  document_status_id: 1,
+  document_status_name: 'Emitido',
+  is_annulled: false,
+  origin_name: 'Nubox',
+  supplier_rut: '11111111-1',
+  supplier_trade_name: 'LUIS EDUARDO REYES RANGEL',
+  pdf_url: null,
+  supplier_id: null,
+  organization_id: null,
+  expense_id: null,
+  vat_unrecoverable_amount: null,
+  vat_fixed_assets_amount: null,
+  vat_common_use_amount: null,
+  payload_hash: 'hash',
+  sync_run_id: 'nubox-test',
+  synced_at: '2026-05-09T12:16:51.000Z',
+  source_last_ingested_at: '2026-05-09T12:16:50.000Z',
+  ...overrides
+})
+
+describe('resolveNuboxPurchaseProjectionAmounts', () => {
+  it('keeps BHE withholding as payable total while validating against gross fiscal cost', () => {
+    const result = resolveNuboxPurchaseProjectionAmounts(makeProjectionPurchase())
+
+    expect(result).toEqual({
+      taxSubtotal: 175000,
+      taxValidationTotalAmount: 175000,
+      payableTotalAmount: 148312,
+      grossFiscalTotalAmount: 175000,
+      withholdingAmount: 26688
+    })
+  })
+
+  it('keeps standard VAT invoices on the source payable total path', () => {
+    const result = resolveNuboxPurchaseProjectionAmounts(makeProjectionPurchase({
+      dte_type_code: '33',
+      net_amount: 100000,
+      tax_vat_amount: 19000,
+      total_amount: 119000,
+      total_withholding_amount: 0
+    }))
+
+    expect(result).toMatchObject({
+      taxSubtotal: 100000,
+      taxValidationTotalAmount: 119000,
+      payableTotalAmount: 119000,
+      grossFiscalTotalAmount: 119000,
+      withholdingAmount: 0
+    })
   })
 })

@@ -719,6 +719,27 @@ En `greenhouse_finance.expenses`:
 
 La migración `20260421192902964_task-532-purchase-vat-recoverability.sql` backfillea el histórico usando `tax_amount`, `dte_type_code`, `exempt_amount`, `vat_unrecoverable_amount` y `vat_common_use_amount`, y deja `effective_cost_amount` listo para consumers existentes sin recalcular inline.
 
+### Delta 2026-05-09 — Nubox BHE / honorarios con retención
+
+Las compras Nubox tipo `BHE` (boleta de honorarios electrónica) pueden traer
+un `total_amount` pagable neto de retención, por ejemplo:
+`net_amount=175000`, `total_withholding_amount=26688`,
+`total_amount=148312`.
+
+Contrato canónico en PostgreSQL:
+
+- `expenses.total_amount` conserva el monto pagable/conciliable contra banco.
+- `expenses.withholding_amount` conserva la retención informada por Nubox.
+- `expenses.effective_cost_amount` y `tax_snapshot_json.totalAmount`
+  representan el costo bruto fiscal/operativo antes de retención.
+- `sync-nubox-to-postgres` valida el snapshot contra el bruto fiscal
+  (`total_amount + withholding_amount`) cuando la retención explica la
+  diferencia, sin relajar las validaciones globales de IVA.
+
+Rationale: pagos/conciliación necesitan el neto pagable; P&L y costo operativo
+necesitan el bruto antes de retención. Mezclar ambas semánticas en un solo total
+rompe conciliación bancaria o margen, según el lado que consuma el dato.
+
 ### Archivos clave
 
 - `src/lib/finance/expense-tax-snapshot.ts`

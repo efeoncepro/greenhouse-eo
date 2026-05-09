@@ -8,17 +8,17 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `optional`
-- Status real: `Diseno`
+- Status real: `Complete`
 - Rank: `TBD`
 - Domain: `finance / ops / data`
 - Blocked by: `none`
-- Branch: `task/TASK-841-nubox-ops-worker-config-freshness-hardening`
+- Branch: `develop` (por instrucción explícita del usuario; no cambiar rama)
 - Legacy ID: `none`
 - GitHub Issue: `optional`
 
@@ -293,15 +293,15 @@ Estado sano minimo:
 
 ## Acceptance Criteria
 
-- [ ] `ops-worker` Cloud Run tiene contrato Nubox completo sin secretos planos en git.
-- [ ] `ops-nubox-sync` ejecuta con raw, conformed y postgres projection sin errores `NUBOX_* is not configured`.
-- [ ] `ops-nubox-quotes-hot-sync` ejecuta 2xx y registra `quotes_hot_sync` exitoso o partial explicito por datos, no por config faltante.
-- [ ] `ops-nubox-balance-sync` sigue ejecutando 2xx despues del cambio.
-- [ ] BigQuery raw Nubox muestra timestamps frescos post replay.
-- [ ] PostgreSQL `source_sync_runs` distingue correctamente raw/conformed/projection/hot lane.
-- [ ] Existe signal o guard que alerta si raw esta stale aunque conformed/projection parezcan recientes.
-- [ ] No se introdujo ningun write directo desde Nubox a `income_payments` / `expense_payments`.
-- [ ] La documentacion operativa refleja que `ops-worker` es owner de Nubox crons y de sus secretos runtime.
+- [x] `ops-worker` Cloud Run tiene contrato Nubox completo sin secretos planos en git.
+- [x] `ops-nubox-sync` ejecuta con raw, conformed y postgres projection sin errores `NUBOX_* is not configured`.
+- [x] `ops-nubox-quotes-hot-sync` ejecuta 2xx y registra `quotes_hot_sync` exitoso o partial explicito por datos, no por config faltante.
+- [x] `ops-nubox-balance-sync` sigue ejecutando 2xx despues del cambio.
+- [x] BigQuery raw Nubox muestra timestamps frescos post replay.
+- [x] PostgreSQL `source_sync_runs` distingue correctamente raw/conformed/projection/hot lane.
+- [x] Existe signal o guard que alerta si raw esta stale aunque conformed/projection parezcan recientes.
+- [x] No se introdujo ningun write directo desde Nubox a `income_payments` / `expense_payments`.
+- [x] La documentacion operativa refleja que `ops-worker` es owner de Nubox crons y de sus secretos runtime.
 
 ## Verification
 
@@ -322,13 +322,13 @@ Estado sano minimo:
 
 Cerrar una task es obligatorio y forma parte de Definition of Done. Si la implementacion termino pero estos items no se ejecutaron, la task sigue abierta.
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado con evidencia de Cloud Run, Cloud Scheduler, BigQuery y PostgreSQL
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre TASK-640, TASK-668 y tasks Nubox V2 relacionadas
-- [ ] docs de arquitectura/runbook quedan sincronizadas si cambia el contrato operativo de Nubox en `ops-worker`
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado con evidencia de Cloud Run, Cloud Scheduler, BigQuery y PostgreSQL
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [x] se ejecuto chequeo de impacto cruzado sobre TASK-640, TASK-668 y tasks Nubox V2 relacionadas
+- [x] docs de arquitectura/runbook quedan sincronizadas si cambia el contrato operativo de Nubox en `ops-worker`
 
 ## Follow-ups
 
@@ -338,6 +338,30 @@ Cerrar una task es obligatorio y forma parte de Definition of Done. Si la implem
 
 ## Open Questions
 
-- Confirmar durante Discovery si `NUBOX_API_BASE_URL` debe permanecer como env no secreto o moverse tambien a Secret Manager por consistencia operacional.
-- Confirmar si `ops-worker` debe recibir `NUBOX_BEARER_TOKEN_SECRET_REF`/`NUBOX_X_API_KEY_SECRET_REF` o montar `NUBOX_BEARER_TOKEN`/`NUBOX_X_API_KEY` directamente desde Secret Manager.
-- Confirmar si `balance_sync` debe registrar su propia fila en `greenhouse_sync.source_sync_runs` o si basta Cloud Logging + scheduler status.
+- `NUBOX_API_BASE_URL` permanece como env no secreto: no contiene material sensible y el deploy declarativo evita drift.
+- `ops-worker` recibe `NUBOX_BEARER_TOKEN_SECRET_REF`/`NUBOX_X_API_KEY_SECRET_REF`; no se montan tokens planos.
+- `balance_sync` registra su propia fila en `greenhouse_sync.source_sync_runs` para que freshness no dependa solo de Cloud Logging/Scheduler.
+
+## Closing Notes 2026-05-09
+
+- `services/ops-worker/deploy.sh` declara `NUBOX_API_BASE_URL`,
+  `NUBOX_BEARER_TOKEN_SECRET_REF` y `NUBOX_X_API_KEY_SECRET_REF`; falla rápido
+  si faltan y concede `secretAccessor` a la service account runtime.
+- Cloud Run staging fue remediado con env refs y Secret Manager IAM; replay de
+  Scheduler dejó `raw_sync` y `quotes_hot_sync` exitosos sin errores
+  `NUBOX_* is not configured`.
+- `balance_sync` ahora tiene tracking propio en
+  `greenhouse_sync.source_sync_runs`.
+- `runNuboxSyncOrchestration()` expone `partial` cuando alguna fase queda
+  degradada aunque downstream procese best-effort.
+- `finance.nubox.source_freshness` alerta raw/hot/balance stale y falsa salud
+  `conformed/postgres` sobre raw viejo.
+- `postgres_projection` ahora registra fallas por documento en
+  `source_sync_failures` y puede terminar `partial` sin abortar todo el lote.
+- Se corrigió la causa raíz fiscal observada en runtime: Nubox `BHE` con
+  retención conserva `expenses.total_amount` como neto pagable y
+  `effective_cost_amount` como bruto fiscal/operativo.
+- Validación live Postgres posterior al fix:
+  `nubox-pg-c5593626-9573-407a-8475-8f86dea37252` terminó `succeeded`,
+  `records_read=231`, `records_projected_postgres=214`,
+  `projectionFailures=0`.

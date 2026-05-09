@@ -34,8 +34,8 @@ export interface NuboxSyncOrchestratorResult {
   postgres?: unknown
   phaseStatuses?: {
     raw: 'succeeded' | 'partial' | 'failed' | 'unknown'
-    conformed: 'succeeded' | 'failed' | 'unknown'
-    postgres: 'succeeded' | 'failed' | 'unknown'
+    conformed: 'succeeded' | 'partial' | 'failed' | 'unknown'
+    postgres: 'succeeded' | 'partial' | 'failed' | 'unknown'
   }
 }
 
@@ -67,8 +67,9 @@ const getRawPhaseStatus = (value: unknown): NuboxRawPhaseStatus => {
   return status === 'succeeded' || status === 'partial' || status === 'failed' ? status : hasErrorShape(value) ? 'failed' : 'succeeded'
 }
 
-const getSimplePhaseStatus = (value: unknown): 'succeeded' | 'failed' | 'unknown' => {
+const getSimplePhaseStatus = (value: unknown): 'succeeded' | 'partial' | 'failed' | 'unknown' => {
   if (value === undefined) return 'unknown'
+  if (value && typeof value === 'object' && (value as Record<string, unknown>).status === 'partial') return 'partial'
 
   return hasErrorShape(value) ? 'failed' : 'succeeded'
 }
