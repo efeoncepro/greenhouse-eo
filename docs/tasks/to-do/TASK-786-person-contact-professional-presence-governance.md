@@ -13,10 +13,10 @@
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
-- Epic: `EPIC-010`
+- Epic: `optional`
 - Status real: `Diseno`
 - Rank: `TBD`
-- Domain: `hr`
+- Domain: `hr / people / identity`
 - Blocked by: `none`
 - Branch: `task/TASK-786-person-contact-professional-presence-governance`
 - Legacy ID: `none`
@@ -59,6 +59,8 @@ Revisar y respetar:
 - `docs/architecture/GREENHOUSE_DEEP_LINK_PLATFORM_V1.md`
 - `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md`
 - `docs/architecture/GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md`
+- `docs/architecture/DECISIONS_INDEX.md`
+- `docs/operations/ARCHITECTURE_DECISION_RECORD_OPERATING_MODEL_V1.md`
 - `docs/operations/SOLUTION_QUALITY_OPERATING_MODEL_V1.md`
 - `docs/operations/DOCUMENTATION_OPERATING_MODEL_V1.md`
 
@@ -74,12 +76,13 @@ Reglas obligatorias:
 - Preferencias de contacto no son autorizacion ni availability contractual.
 - Los datos de presencia profesional no deben alimentar payroll, finiquito ni clasificacion legal.
 - Access model debe distinguir view visible, self-service update, HR/admin update, client-safe read y contact-action resolve.
+- ADR vigente: `Professional Presence is a governed Person 360 facet, not legal identity or role title`, embebido en `GREENHOUSE_PERSON_COMPLETE_360_V1.md` e indexado en `DECISIONS_INDEX.md`. Discovery debe validar que la implementacion no contradiga ese contrato.
 
 ## Normative Docs
 
-- `docs/tasks/to-do/TASK-784-person-legal-profile-identity-documents-foundation.md`
-- `docs/tasks/to-do/TASK-785-workforce-role-title-source-of-truth-governance.md`
-- `docs/tasks/to-do/TASK-611-organization-workspace-facet-projection-entitlements-foundation.md`
+- `docs/tasks/complete/TASK-784-person-legal-profile-identity-documents-foundation.md`
+- `docs/tasks/complete/TASK-785-workforce-role-title-source-of-truth-governance.md`
+- `docs/tasks/complete/TASK-611-organization-workspace-facet-projection-entitlements-foundation.md`
 - `docs/documentation/plataforma/deep-link-platform.md`
 - `docs/manual-de-uso/plataforma/accesos-rapidos.md`
 
@@ -183,6 +186,7 @@ Reglas obligatorias:
   - client-safe
   - integration-derived collaboration
 - Crear helper/policy para resolver si un campo es visible por contexto.
+- La policy debe vivir como primitive compartida, por ejemplo `src/lib/person-presence/visibility-policy.ts`, y ser consumida por APIs, Person 360, client-safe profile y deep links. No crear checks de visibilidad inline en React.
 
 ### Slice 2 — Link normalization and validation
 
@@ -202,6 +206,7 @@ Reglas obligatorias:
 - Permitir self-service de links profesionales, headline/about y preferencias de contacto.
 - En HR/People profile, mostrar vista consolidada con origen/self-service y visibilidad.
 - No incluir RUT/direccion legal ni cargo laboral en esta UI salvo links cruzados a TASK-784/TASK-785 surfaces.
+- Mostrar origen/visibilidad de cada campo cuando ayude a evitar confusion, pero sin convertir la UI en editor de permisos. La autorizacion sigue viviendo en entitlements/capabilities.
 
 ### Slice 4 — Collaboration deep links
 
@@ -215,6 +220,7 @@ Reglas obligatorias:
 - Ajustar `src/lib/team/client-safe-profile.ts` para consumir policy/resolver y no exponer campos fuera de client-safe.
 - Definir que links profesionales son elegibles para cliente por defecto y cuales requieren opt-in/verification si aplica.
 - Alinear assigned team/talent discovery/proposals con el mismo resolver.
+- Mantener `phone`, `contact_channel` y `contact_handle` como internal-only por defecto. Cualquier exposicion client-safe requiere opt-in/policy explicita, no inferencia por rol o assignment.
 
 ### Slice 6 — Observability, completeness and docs
 
@@ -247,6 +253,7 @@ Reglas obligatorias:
 - `views`: existing My Profile and People/HR profile; no new route expected.
 - `entitlements`: separate `person.presence.read_client_safe`, `person.presence.read_internal`, `person.presence.self_update`, `person.presence.hr_update`, `person.presence.resolve_contact_action` or runtime-aligned equivalents.
 - `startup policy`: no changes.
+- ADR: la task materializa una faceta de presencia profesional dentro de Person 360. Si Discovery demuestra que conviene otro namespace, debe actualizar primero el ADR y `DECISIONS_INDEX.md`.
 
 ### What else to consider
 

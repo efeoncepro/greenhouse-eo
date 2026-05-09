@@ -1,3 +1,11 @@
+# Sesion 2026-05-09 — TASK-786 arquitectura refrescada
+
+- **Trigger:** el usuario pidio aplicar los ajustes recomendados tras revisar TASK-786 con la skill de arquitectura, luego commit y push.
+- **Entrega:** TASK-786 queda desacoplada de EPIC-010 (`Epic: optional`), cambia dominio a `hr / people / identity`, referencia TASK-784/TASK-785 en `complete/`, agrega ADR check obligatorio y explicita que la policy debe ser primitive compartida (`person-presence`) consumida por APIs, Person 360, client-safe profile y deep links.
+- **ADR aceptado:** `GREENHOUSE_PERSON_COMPLETE_360_V1.md` agrega `Architecture Decision 2026-05-09 -- Professional Presence as a Governed Person 360 Facet`; `DECISIONS_INDEX.md` queda sincronizado. Regla clave: phone/contact_channel/contact_handle internal-only por defecto; Teams/Slack desde IDs de integracion/deep links, no URLs manuales.
+- **Validacion:** cambio documental; `pnpm lint` y `pnpm exec tsc --noEmit` OK. No se ejecuto build porque no hubo runtime/UI.
+- **Nota multi-agente:** se preservaron cambios preexistentes no relacionados en TASK-836 y TASK-837; no son parte de este commit.
+
 # Sesion 2026-05-08 — ADR operating model Greenhouse-wide
 
 - **Trigger:** el usuario pidio aplicar la recomendacion Greenhouse-wide para Architecture Decision Records end-to-end, con commit y push.

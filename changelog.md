@@ -1,5 +1,9 @@
 # changelog.md
 
+## 2026-05-09
+
+- **TASK-786 architecture refresh — Professional Presence como faceta gobernada de Person 360.** Se acepta ADR embebido en `GREENHOUSE_PERSON_COMPLETE_360_V1.md` e indexado en `DECISIONS_INDEX.md`: links profesionales/contacto/preferencias y acciones Teams/Slack no son identidad legal ni cargo laboral; `greenhouse_core.members` sigue como source V1, `phone/contact_channel/contact_handle` quedan internal-only por defecto y la exposicion client-safe debe pasar por policy compartida. TASK-786 corrige referencias a TASK-784/TASK-785 completas, deja de colgar de EPIC-010 y exige resolver visibilidad via primitive compartida antes de implementar UI/API.
+
 ## 2026-05-08
 
 - **ADR Operating Model Greenhouse-wide.** Se formaliza la politica canonica de Architecture Decision Records en `docs/operations/ARCHITECTURE_DECISION_RECORD_OPERATING_MODEL_V1.md` y el indice maestro `docs/architecture/DECISIONS_INDEX.md`. El flujo TASK ahora exige ADR check cuando una task cambia source of truth, schema, access model, auth/session, finance/payroll/accounting semantics, events/outbox/webhooks, APIs externas, cloud/deploy/secrets, UI platform o runtime projections compartidas. `AGENTS.md`, `CLAUDE.md`, `docs/README.md`, `DOCUMENTATION_OPERATING_MODEL_V1.md` y `project_context.md` quedan alineados.
