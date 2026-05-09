@@ -25,6 +25,13 @@
   - Cualquier `captureWithDomain` invocado desde reactive consumer ahora reporta incidents a Sentry con tag `domain` canónico → signals per-module del reliability dashboard reciben datos del runtime Cloud Run.
 - **ISSUE-074** movido a `resolved/`. **TASK-844** movido a `complete/`. README + TASK_ID_REGISTRY sincronizados.
 
+**Verificación trazada del scope real (post-cierre)**: trace recursivo de imports transitivos confirmó:
+- ops-worker: 599 archivos en bundle, **20 invocan `captureWithDomain`** (hubspot-services-intake, outbox-consumer, payslip-on-payment-paid, finance-expense-reactive-intake, record-expense-payment-from-order, provider-bq-sync, ledger-health, email/delivery, auth/readiness, etc.) → init **CRÍTICO**.
+- commercial-cost-worker: 112 archivos, **0 invocan `captureWithDomain`** → init es **defense-in-depth preventivo** (lint rule garantiza que se mantenga si emerge callsite futuro).
+- ico-batch: 39 archivos, **0 invocan `captureWithDomain`** → mismo rationale defense-in-depth.
+
+Esta evidencia trazada reemplaza la afirmación previa "no tienen reactive consumers" (correcta operacionalmente, pero apoyada en asunción no verificación). El init en commercial-cost-worker e ico-batch sigue siendo correcto arquitectónicamente: cubre crecimiento futuro + mantiene coherencia del contract canónico + reliability signal cubriría regresión inmediatamente.
+
 ---
 
 # Sesion 2026-05-09 — TASK-607 / ISSUE-073 Actions Node 24 + smoke-lane flaky semantics
