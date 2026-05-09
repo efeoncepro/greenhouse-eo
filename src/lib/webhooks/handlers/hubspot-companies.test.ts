@@ -212,4 +212,123 @@ describe('hubspot-companies webhook handler', () => {
 
     await expect(handler(buildInboxEvent(headers), rawBody, events)).rejects.toThrow(/All 2 company syncs failed/)
   })
+
+  // TASK-836 follow-up — dual-format event classification (legacy + Developer Platform 2025.2)
+  describe('classifyHubSpotEvent dual-format (TASK-836 follow-up)', () => {
+    beforeEach(() => {
+      // Reset cualquier mockRejectedValue del describe padre
+      syncMock.mockReset()
+      syncMock.mockResolvedValue({
+        hubspotCompanyId: '27778972424',
+        companyRecordId: 'crm-company-test',
+        companyUpserted: true,
+        contactsUpserted: 1,
+        promotedSummary: null,
+        capabilities: { businessLines: [], serviceModules: [] }
+      })
+    })
+
+    it('procesa company event en formato Developer Platform 2025.2 (object.creation + objectTypeId=0-2)', async () => {
+      const handler = handlersByCode['hubspot-companies']
+
+      const events = [
+        {
+          subscriptionType: 'object.creation',
+          objectTypeId: '0-2',
+          objectId: 27778972424
+        }
+      ]
+
+      const rawBody = JSON.stringify(events)
+      const ts = String(Date.now())
+      const sig = buildHubSpotSignature(rawBody, ts, 'test-secret')
+
+      const headers = {
+        'x-hubspot-signature-v3': sig,
+        'x-hubspot-request-timestamp': ts,
+        'x-forwarded-uri': TARGET_URI
+      }
+
+      await handler(buildInboxEvent(headers), rawBody, events)
+
+      expect(syncMock).toHaveBeenCalledTimes(1)
+      expect(syncMock).toHaveBeenCalledWith('27778972424', expect.objectContaining({ promote: true }))
+    })
+
+    it('procesa contact event 2025.2 (object.propertyChange + objectTypeId=0-1) con associatedObjectId', async () => {
+      const handler = handlersByCode['hubspot-companies']
+
+      const events = [
+        {
+          subscriptionType: 'object.propertyChange',
+          objectTypeId: '0-1',
+          objectId: 87940966978,
+          associatedObjectId: 27778972424,
+          propertyName: 'lifecyclestage'
+        }
+      ]
+
+      const rawBody = JSON.stringify(events)
+      const ts = String(Date.now())
+      const sig = buildHubSpotSignature(rawBody, ts, 'test-secret')
+
+      const headers = {
+        'x-hubspot-signature-v3': sig,
+        'x-hubspot-request-timestamp': ts,
+        'x-forwarded-uri': TARGET_URI
+      }
+
+      await handler(buildInboxEvent(headers), rawBody, events)
+
+      expect(syncMock).toHaveBeenCalledTimes(1)
+      expect(syncMock).toHaveBeenCalledWith('27778972424', expect.anything())
+    })
+
+    it('mezcla formato legacy y 2025.2 — ambos resuelven al mismo company', async () => {
+      const handler = handlersByCode['hubspot-companies']
+
+      const events = [
+        { subscriptionType: 'company.creation', objectId: 27778972424 },                          // legacy
+        { subscriptionType: 'object.propertyChange', objectTypeId: '0-2', objectId: 27778972424, propertyName: 'name' },  // 2025.2
+        { subscriptionType: 'object.creation', objectType: 'company', objectId: 27778972424 }     // 2025.2 con objectType
+      ]
+
+      const rawBody = JSON.stringify(events)
+      const ts = String(Date.now())
+      const sig = buildHubSpotSignature(rawBody, ts, 'test-secret')
+
+      const headers = {
+        'x-hubspot-signature-v3': sig,
+        'x-hubspot-request-timestamp': ts,
+        'x-forwarded-uri': TARGET_URI
+      }
+
+      await handler(buildInboxEvent(headers), rawBody, events)
+
+      // Dedup: 3 events del mismo company → 1 sync call
+      expect(syncMock).toHaveBeenCalledTimes(1)
+    })
+
+    it('ignora events con objectTypeId desconocido (NO crashea)', async () => {
+      const handler = handlersByCode['hubspot-companies']
+
+      const events = [
+        { subscriptionType: 'object.propertyChange', objectTypeId: '0-999', objectId: 12345 }
+      ]
+
+      const rawBody = JSON.stringify(events)
+      const ts = String(Date.now())
+      const sig = buildHubSpotSignature(rawBody, ts, 'test-secret')
+
+      const headers = {
+        'x-hubspot-signature-v3': sig,
+        'x-hubspot-request-timestamp': ts,
+        'x-forwarded-uri': TARGET_URI
+      }
+
+      await handler(buildInboxEvent(headers), rawBody, events)
+
+      expect(syncMock).not.toHaveBeenCalled()
+    })
+  })
 })

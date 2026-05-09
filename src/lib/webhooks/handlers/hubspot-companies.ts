@@ -49,6 +49,64 @@ interface HubSpotEvent {
   associatedObjectId?: number | string
   propertyName?: string
   propertyValue?: string
+  /** TASK-836 follow-up: HubSpot Developer Platform 2025.2 envía objectTypeId separado
+   *  cuando subscriptionType es genérico `object.*`. Legacy apps OAuth lo embebían en
+   *  `subscriptionType` (ej. `service.creation`). Ambos formatos coexisten. */
+  objectTypeId?: string
+  objectType?: string
+}
+
+/**
+ * TASK-836 follow-up — clasificador canónico de events HubSpot.
+ *
+ * Greenhouse soporta DOS formatos de webhook coexistentes:
+ *
+ * 1. Legacy (apps OAuth tradicionales):
+ *    - `subscriptionType` = `company.creation`, `contact.propertyChange`, `service.creation`,
+ *      `p_services.creation`, `0-162.creation`
+ *    - Single field encapsula objeto + acción
+ *
+ * 2. Developer Platform 2025.2 (NUEVO, deployed Build #24+):
+ *    - `subscriptionType` = `object.creation` o `object.propertyChange` (genérico)
+ *    - `objectTypeId` = `0-1` (contact), `0-2` (company), `0-162` (service)
+ *    - O `objectType` = `contact|company|service` en algunos payloads
+ *
+ * Pre-fix: el handler filtraba solo formato legacy. Build #24 (deployed 2026-05-06)
+ * cambió subscriptions a formato nuevo silenciosamente — los webhooks llegaban
+ * pero todos los `object.propertyChange` y `object.creation` eran ignorados
+ * (status=processed pero sin sincronización). Causa raíz Berel + 96+32 events
+ * silently dropped en últimos 30 días.
+ *
+ * Pattern fuente: defense-in-depth + boring tech preference (no breaking change
+ * a apps legacy aunque migren después).
+ */
+type HubSpotEventCategory = 'company' | 'contact' | 'service' | 'unknown'
+
+const classifyHubSpotEvent = (event: HubSpotEvent): HubSpotEventCategory => {
+  const subscriptionType = String(event.subscriptionType || '')
+  const objectTypeId = String(event.objectTypeId || '')
+  const objectType = String(event.objectType || '')
+
+  // Legacy format (single field encapsulates object + action)
+  if (subscriptionType.startsWith('company.')) return 'company'
+  if (subscriptionType.startsWith('contact.')) return 'contact'
+
+  if (
+    subscriptionType.startsWith('service.')
+    || subscriptionType.startsWith('p_services.')
+    || subscriptionType.startsWith('0-162.')
+  ) {
+    return 'service'
+  }
+
+  // Developer Platform 2025.2 format (subscriptionType genérico + objectTypeId/objectType separado)
+  if (subscriptionType.startsWith('object.')) {
+    if (objectTypeId === '0-2' || objectType === 'company') return 'company'
+    if (objectTypeId === '0-1' || objectType === 'contact') return 'contact'
+    if (objectTypeId === '0-162' || objectType === 'service' || objectType === 'p_services') return 'service'
+  }
+
+  return 'unknown'
 }
 
 const validateHubSpotSignature = async (
@@ -85,13 +143,13 @@ const extractCompanyIdsFromEvents = (events: HubSpotEvent[]): string[] => {
   const ids = new Set<string>()
 
   for (const event of events) {
-    const subscriptionType = String(event.subscriptionType || '')
-    const objectId = String(event.objectId)
+    const category = classifyHubSpotEvent(event)
+    const objectId = event.objectId ? String(event.objectId) : ''
     const associatedId = event.associatedObjectId ? String(event.associatedObjectId) : null
 
-    if (subscriptionType.startsWith('company.')) {
-      if (objectId) ids.add(objectId)
-    } else if (subscriptionType.startsWith('contact.') && associatedId) {
+    if (category === 'company' && objectId) {
+      ids.add(objectId)
+    } else if (category === 'contact' && associatedId) {
       // Para events de contact, sincronizamos su primary company
       ids.add(associatedId)
     }
@@ -138,12 +196,9 @@ registerInboundHandler('hubspot-companies', async (inboxEvent, rawBody, parsedPa
   // por app. Todos los events convergen al mismo target URL. Detectar events
   // de p_services (object 0-162, name canónico 'service' en platform 2025.2)
   // y delegar al sub-handler canónico.
-  const serviceEvents = events.filter(e => {
-    const t = String(e.subscriptionType || '')
-
-    
-return t.startsWith('service.') || t.startsWith('p_services.') || t.startsWith('0-162.')
-  })
+  // TASK-836 follow-up — usa classifyHubSpotEvent que soporta dual-format
+  // (legacy `service.*` y nuevo Developer Platform 2025.2 `object.*` + objectTypeId).
+  const serviceEvents = events.filter(e => classifyHubSpotEvent(e) === 'service')
 
   if (serviceEvents.length > 0) {
     try {
