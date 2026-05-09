@@ -1,9 +1,9 @@
 # Sesion 2026-05-09 — CI smoke-lane publisher hardening
 
 - **Trigger:** el usuario pidio resolver solo el warning `sync:smoke-lane ... failed (non-blocking)` de forma robusta y escalable; el warning Node.js 20 queda cubierto por TASK-607.
-- **Causa raiz:** `pnpm sync:smoke-lane` ejecutaba `tsx scripts/publish-smoke-lane-run.ts` sin el shim canonico. Al importar `src/lib/postgres/client` -> secrets -> `import 'server-only'`, el CLI explotaba antes de publicar a `greenhouse_sync.smoke_lane_runs`.
-- **Fix:** `package.json` actualiza la primitive compartida `sync:smoke-lane` para usar `tsx --require ./scripts/lib/server-only-shim.cjs ...`. No se parchea `.github/workflows/playwright.yml`; cualquier lane futura hereda el contrato.
-- **Validacion local:** `pnpm sync:smoke-lane finance.web --report=/tmp/greenhouse-missing-playwright-report.json` falla por `ERROR: cannot read report ... ENOENT`, no por `server-only`. Validacion CI/Playwright pendiente tras push.
+- **Causas raiz:** (1) `pnpm sync:smoke-lane` ejecutaba `tsx scripts/publish-smoke-lane-run.ts` sin el shim canonico, por lo que el import `server-only` desde secrets fallaba fuera de Next. (2) El workflow Playwright enviaba `GREENHOUSE_POSTGRES_PASSWORD_SECRET_REF=greenhouse-pg-dev-app-password:latest`; el resolver canonico acepta nombre de secreto o ruta Secret Manager completa, no `secret:version`, y construia una ruta invalida.
+- **Fix:** `package.json` actualiza la primitive compartida `sync:smoke-lane` para usar `tsx --require ./scripts/lib/server-only-shim.cjs ...`; `.github/workflows/playwright.yml` usa el nombre canonico `greenhouse-pg-dev-app-password` para que `src/lib/secrets/secret-manager.ts` resuelva `projects/.../versions/latest`.
+- **Validacion local:** `pnpm sync:smoke-lane finance.web --report=/tmp/greenhouse-missing-playwright-report.json` falla por `ERROR: cannot read report ... ENOENT`, no por `server-only`. Primer push dejo CI y Commercial Cost Worker Deploy en verde; Playwright expuso la segunda causa raiz de Secret Manager. Validacion final Playwright pendiente tras push del secret ref canonico.
 
 ---
 

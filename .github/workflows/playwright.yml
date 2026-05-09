@@ -113,7 +113,7 @@ jobs:
           GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME: efeonce-group:us-east4:greenhouse-pg-dev
           GREENHOUSE_POSTGRES_DATABASE: greenhouse_app
           GREENHOUSE_POSTGRES_USER: greenhouse_app
-          GREENHOUSE_POSTGRES_PASSWORD_SECRET_REF: greenhouse-pg-dev-app-password:latest
+          GREENHOUSE_POSTGRES_PASSWORD_SECRET_REF: greenhouse-pg-dev-app-password
           GREENHOUSE_POSTGRES_IP_TYPE: PUBLIC
         run: |
           set -e
