@@ -1,3 +1,16 @@
+# Sesion 2026-05-09 — TASK-837 Deal-Bound Sample Sprint HubSpot Service Projection (en progreso)
+
+- **Trigger:** usuario pide implementar TASK-837 directo en `develop` con auto mode, sinergia ecosystem + Open Questions resolution + skills UI cuando toque (`greenhouse-dev`, `greenhouse-ux`, `greenhouse-microinteractions-auditor`, `modern-ui` global, `microinteractions-auditor` global, `greenhouse-ux-writing`).
+- **Estado:** task movida `to-do/` → `in-progress/`. Lifecycle = `in-progress`. Sin branch nuevo (commit directo en develop por autorización explicita). README + Handoff sincronizados. Pre-checks (gh pr / git branch) limpios.
+- **Pre-trabajo realizado en sesión previa de hoy:**
+  - Slice 0 checkpoints A/B/C/D ejecutados con evidencia HubSpot live (commit `fe6dd987`).
+  - Slice 0.5 agregado al spec con 3 sub-slices atómicos (commit `c7c5060c`): 0.5a property HubSpot, 0.5b bridge endpoints, 0.5c migration PG.
+- **Open Questions status:** 4 de 5 resueltas pre-execution (Q4-Q5 vía checkpoints A/B; Q1 ef_pipeline_stage deprecation técnica; Q2 capability separation natural via outbox). Q3 (contactos faltantes bloquear vs override) preserva recomendación canónica = bloquear (alineado con ICP Globe enterprise marketing teams: no-comm-channel rompe assumption commercial). Open Questions formalmente cerradas en Pre-FASE 1 documentation.
+- **Plan de slices vigente (TASK-837 spec):** 0.5a → 0.5c → 0.5b → 1 (Eligible Deal Source) → 3 (Server-Side Creation Contract) → 4 (Outbound Projection Cloud Run) → 2 (Wizard UI, requiere skills UI completas) → 5 (Dead-Letter UX, requiere skills UI) → 6 (7 Reliability Signals) → 7 (Docs + Runbook).
+- **Próximo paso:** FASE 1 Discovery (lectura arch docs `GREENHOUSE_PILOT_ENGAGEMENT_ARCHITECTURE_V1`, `GREENHOUSE_HUBSPOT_SERVICES_INTAKE_V1`, `GREENHOUSE_EVENT_CATALOG_V1`) + verificación schema PG real (`pnpm pg:connect:status` + columns shape vs spec).
+
+---
+
 # Sesion 2026-05-09 — TASK-844 Cross-Runtime Observability Sentry Init (cierra ISSUE-074)
 
 - **Trigger:** smoke test post-merge PR #113 (TASK-836 follow-up dual-format webhook) reveló que `hubspot_services_intake` reactive consumer en ops-worker fallaba con `Sentry.captureException is not a function`. Causa raíz arquitectónica: `src/lib/observability/capture.ts` importaba `@sentry/nextjs` (Next.js-específico) cuyo shape variaba en runtime Cloud Run.

@@ -8,19 +8,20 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `EPIC-014`
-- Status real: `Diseno`
+- Status real: `Implementacion`
 - Rank: `TBD`
 - Domain: `crm / delivery / agency`
-- Blocked by: `TASK-836`
-- Branch: `task/TASK-837-deal-bound-sample-sprint-service-projection`
+- Blocked by: `TASK-836` (closed 2026-05-09)
+- Branch: `develop` (commit directo per autorizacion explicita 2026-05-09)
 - Legacy ID: `none`
 - GitHub Issue: `optional`
+- Started: `2026-05-09` (Claude Opus, agent autonomo en auto mode)
 
 ## Summary
 
