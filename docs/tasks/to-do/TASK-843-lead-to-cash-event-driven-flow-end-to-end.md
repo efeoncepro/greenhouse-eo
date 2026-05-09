@@ -265,9 +265,31 @@ Wire en `getReliabilityOverview` bajo subsystem `commercial`.
 
 ### Slice 8 — HubSpot Developer App config + runbook
 
-- Verificar/crear suscripción `0-3.creation` + `0-3.propertyChange.dealstage` en HubSpot Developer App `33235280`.
-- Documentar en `docs/operations/runbooks/hubspot-deal-pipeline-config.md` con curl + bitácora.
-- Smoke test: crear test deal en HubSpot, verificar que llega webhook + crea org + client en Greenhouse en <10s.
+**Fuente de verdad para subscriptions** (verificado 2026-05-09):
+`services/hubspot_greenhouse_integration/hubspot-app/hubspot-bigquery/src/app/webhooks/webhooks-hsmeta.json`. Project ID `102794532`, App ID `33235280`, último deploy Build #24 (2026-05-06).
+
+**Subscriptions actuales (Build #24)**:
+
+| objectType | subscriptions |
+|---|---|
+| company | `object.creation` + 7 `object.propertyChange` |
+| contact | `object.creation` + 5 `object.propertyChange` |
+| service | `object.creation` + 9 `object.propertyChange` |
+| **deal** | **❌ CERO subscriptions** |
+
+**Cambios obligatorios**:
+
+1. Agregar a `webhooks-hsmeta.json`:
+   - `objectType: deal` + `subscriptionType: object.creation`
+   - `objectType: deal` + `subscriptionType: object.propertyChange` para `dealstage`, `pipeline`, `amount`, `closedate`
+2. **Follow-up TASK-836 detectado**: agregar también las properties que TASK-836 creó pero no están en subscriptions:
+   - `service` + `propertyChange` para `ef_engagement_kind` (creada 2026-05-09 vía API)
+   - `service` + `propertyChange` para `hs_pipeline_stage` (canónica para mapper TASK-836)
+3. Deploy: `hs project upload --account=48713323` + `hs project deploy --account=48713323 --build-id=<N>`.
+4. Documentar en `docs/operations/runbooks/hubspot-deal-pipeline-config.md` con bitácora YAML del deploy.
+5. Smoke test: crear test deal en HubSpot → verificar webhook llega + crea org + client en Greenhouse en <10s.
+
+**Single endpoint pattern**: el `targetUrl` de la app es UNO solo (`https://greenhouse.efeoncepro.com/api/webhooks/hubspot-companies`). El handler en Greenhouse filtra por `subscriptionType`. El endpoint registrado en PG `webhook-hubspot-services` queda sin tráfico — auditar si retirarlo (separate cleanup decision, fuera de scope V1).
 
 ### Slice 9 — Backfill organizaciones missing
 
