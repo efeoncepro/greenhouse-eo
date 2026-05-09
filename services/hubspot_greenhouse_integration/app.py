@@ -938,6 +938,89 @@ def create_app() -> Flask:
                 exc.status_code or 502
             )
 
+    # TASK-837 Slice 0.5b — outbound CRUD for p_services (Sample Sprint projection).
+    # Reactive consumer (Slice 4) calls these endpoints; idempotency uses
+    # ef_greenhouse_service_id (Slice 0.5a property) since hs_unique_creation_key
+    # is READ-ONLY on 0-162.
+    # All HubSpot errors propagate via _hubspot_error_response (canonical):
+    # 401 for auth, 422 for validation, 429 with Retry-After for rate limit,
+    # 502 for generic upstream.
+    @app.post("/services")
+    def create_service_endpoint():
+        auth_error = _require_integration_write_auth()
+        if auth_error:
+            return auth_error
+
+        try:
+            body = request.get_json(force=True) or {}
+            properties = body.get("properties")
+            if not isinstance(properties, dict) or not properties:
+                return (
+                    jsonify({"error": "properties object is required"}),
+                    400,
+                )
+
+            created = _client().create_service(properties)
+            return (
+                jsonify(
+                    {
+                        "ok": True,
+                        "hubspotServiceId": str(created.get("id") or ""),
+                        "properties": created.get("properties") or {},
+                    }
+                ),
+                201,
+            )
+        except HubSpotIntegrationError as exc:
+            return _hubspot_error_response(exc)
+
+    @app.patch("/services/<service_id>")
+    def update_service_endpoint(service_id: str):
+        auth_error = _require_integration_write_auth()
+        if auth_error:
+            return auth_error
+
+        try:
+            body = request.get_json(force=True) or {}
+            properties = body.get("properties")
+            if not isinstance(properties, dict) or not properties:
+                return (
+                    jsonify({"error": "properties object is required"}),
+                    400,
+                )
+
+            updated = _client().update_service(service_id, properties)
+            return jsonify(
+                {
+                    "ok": True,
+                    "hubspotServiceId": str(updated.get("id") or service_id),
+                    "properties": updated.get("properties") or {},
+                }
+            )
+        except HubSpotIntegrationError as exc:
+            return _hubspot_error_response(exc)
+
+    @app.get("/services/by-idempotency-key/<idempotency_key>")
+    def find_service_by_idempotency_key_endpoint(idempotency_key: str):
+        try:
+            contract = build_contract(app.config)
+            properties = contract["sourceFields"]["services"]
+            match = _client().find_service_by_idempotency_key(
+                idempotency_key,
+                properties=properties,
+            )
+            if match is None:
+                return jsonify({"ok": True, "hubspotServiceId": None, "properties": None})
+            return jsonify(
+                {
+                    "ok": True,
+                    "hubspotServiceId": str(match.get("id") or ""),
+                    "properties": match.get("properties") or {},
+                }
+            )
+        except HubSpotIntegrationError as exc:
+            return _hubspot_error_response(exc)
+
     @app.patch("/companies/<company_id>/lifecycle")
     def update_company_lifecycle(company_id: str):
         auth_error = _require_integration_write_auth()

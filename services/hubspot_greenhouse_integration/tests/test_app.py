@@ -2190,6 +2190,266 @@ class HubSpotGreenhouseIntegrationAppTests(unittest.TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.get_json()["error"], "Invalid cursor")
 
+    # TASK-837 Slice 0.5b — outbound CRUD for p_services (Sample Sprint projection)
+    # Tests cover: create happy path, validation error, rate limit propagation,
+    # find by idempotency key (match + no-match), update happy path, auth gate.
+
+    def test_create_service_route_requires_integration_token(self):
+        try:
+            from services.hubspot_greenhouse_integration.app import create_app
+        except ImportError as exc:
+            self.skipTest(f"Flask runtime not installed in local test environment: {exc}")
+
+        app = create_app()
+        app.config.update(
+            {
+                "hubspot_access_token": "hubspot-token",
+                "timeout_seconds": 30,
+                "greenhouse_integration_api_token": "ghi-token",
+            }
+        )
+        client = app.test_client()
+
+        response = client.post(
+            "/services",
+            json={"properties": {"hs_name": "test", "hs_pipeline_stage": "1357763256"}},
+        )
+
+        self.assertEqual(response.status_code, 401)
+
+    def test_create_service_route_creates_and_returns_id(self):
+        try:
+            from services.hubspot_greenhouse_integration.app import create_app
+        except ImportError as exc:
+            self.skipTest(f"Flask runtime not installed in local test environment: {exc}")
+
+        app = create_app()
+        app.config.update(
+            {
+                "hubspot_access_token": "hubspot-token",
+                "timeout_seconds": 30,
+                "greenhouse_integration_api_token": "ghi-token",
+            }
+        )
+        client = app.test_client()
+
+        fake_hubspot = MagicMock()
+        fake_hubspot.create_service.return_value = {
+            "id": "551522263821",
+            "properties": {
+                "hs_name": "Sample Sprint Smoke",
+                "hs_pipeline_stage": "1357763256",
+                "ef_greenhouse_service_id": "uuid-test",
+            },
+        }
+
+        with patch(
+            "services.hubspot_greenhouse_integration.app.HubSpotClient",
+            return_value=fake_hubspot,
+        ):
+            response = client.post(
+                "/services",
+                json={
+                    "properties": {
+                        "hs_name": "Sample Sprint Smoke",
+                        "hs_pipeline_stage": "1357763256",
+                        "ef_greenhouse_service_id": "uuid-test",
+                    }
+                },
+                headers={"Authorization": "Bearer ghi-token"},
+            )
+
+        self.assertEqual(response.status_code, 201)
+        body = response.get_json()
+        self.assertTrue(body["ok"])
+        self.assertEqual(body["hubspotServiceId"], "551522263821")
+        self.assertEqual(body["properties"]["ef_greenhouse_service_id"], "uuid-test")
+        fake_hubspot.create_service.assert_called_once()
+
+    def test_create_service_route_propagates_validation_error(self):
+        try:
+            from services.hubspot_greenhouse_integration.app import create_app
+        except ImportError as exc:
+            self.skipTest(f"Flask runtime not installed in local test environment: {exc}")
+
+        app = create_app()
+        app.config.update(
+            {
+                "hubspot_access_token": "hubspot-token",
+                "timeout_seconds": 30,
+                "greenhouse_integration_api_token": "ghi-token",
+            }
+        )
+        client = app.test_client()
+
+        fake_hubspot = MagicMock()
+        fake_hubspot.create_service.side_effect = HubSpotIntegrationError(
+            "Property values were not valid",
+            status_code=400,
+            error_code="HUBSPOT_VALIDATION",
+        )
+
+        with patch(
+            "services.hubspot_greenhouse_integration.app.HubSpotClient",
+            return_value=fake_hubspot,
+        ):
+            response = client.post(
+                "/services",
+                json={"properties": {"hs_name": "Bad", "hs_pipeline_stage": "1357763256"}},
+                headers={"Authorization": "Bearer ghi-token"},
+            )
+
+        # _hubspot_error_response maps HUBSPOT_VALIDATION → 422 (canonical bridge contract).
+        self.assertEqual(response.status_code, 422)
+        body = response.get_json()
+        self.assertIn("Property values", body["error"])
+        self.assertEqual(body["code"], "HUBSPOT_VALIDATION")
+
+    def test_create_service_route_propagates_rate_limit_with_retry_after(self):
+        try:
+            from services.hubspot_greenhouse_integration.app import create_app
+        except ImportError as exc:
+            self.skipTest(f"Flask runtime not installed in local test environment: {exc}")
+
+        app = create_app()
+        app.config.update(
+            {
+                "hubspot_access_token": "hubspot-token",
+                "timeout_seconds": 30,
+                "greenhouse_integration_api_token": "ghi-token",
+            }
+        )
+        client = app.test_client()
+
+        fake_hubspot = MagicMock()
+        fake_hubspot.create_service.side_effect = HubSpotIntegrationError(
+            "rate limit",
+            status_code=429,
+            error_code="HUBSPOT_RATE_LIMIT",
+            retry_after="10",
+        )
+
+        with patch(
+            "services.hubspot_greenhouse_integration.app.HubSpotClient",
+            return_value=fake_hubspot,
+        ):
+            response = client.post(
+                "/services",
+                json={"properties": {"hs_name": "Sample", "hs_pipeline_stage": "1357763256"}},
+                headers={"Authorization": "Bearer ghi-token"},
+            )
+
+        self.assertEqual(response.status_code, 429)
+        self.assertEqual(response.headers.get("Retry-After"), "10")
+
+    def test_find_service_by_idempotency_key_route_returns_match(self):
+        try:
+            from services.hubspot_greenhouse_integration.app import create_app
+        except ImportError as exc:
+            self.skipTest(f"Flask runtime not installed in local test environment: {exc}")
+
+        app = create_app()
+        app.config.update(
+            {
+                "hubspot_access_token": "hubspot-token",
+                "timeout_seconds": 30,
+            }
+        )
+        client = app.test_client()
+
+        fake_hubspot = MagicMock()
+        fake_hubspot.find_service_by_idempotency_key.return_value = {
+            "id": "551522263821",
+            "properties": {"ef_greenhouse_service_id": "uuid-test"},
+        }
+
+        with patch(
+            "services.hubspot_greenhouse_integration.app.HubSpotClient",
+            return_value=fake_hubspot,
+        ):
+            response = client.get("/services/by-idempotency-key/uuid-test")
+
+        self.assertEqual(response.status_code, 200)
+        body = response.get_json()
+        self.assertTrue(body["ok"])
+        self.assertEqual(body["hubspotServiceId"], "551522263821")
+        fake_hubspot.find_service_by_idempotency_key.assert_called_once_with(
+            "uuid-test",
+            properties=fake_hubspot.find_service_by_idempotency_key.call_args.kwargs["properties"],
+        )
+
+    def test_find_service_by_idempotency_key_route_returns_null_when_no_match(self):
+        try:
+            from services.hubspot_greenhouse_integration.app import create_app
+        except ImportError as exc:
+            self.skipTest(f"Flask runtime not installed in local test environment: {exc}")
+
+        app = create_app()
+        app.config.update(
+            {
+                "hubspot_access_token": "hubspot-token",
+                "timeout_seconds": 30,
+            }
+        )
+        client = app.test_client()
+
+        fake_hubspot = MagicMock()
+        fake_hubspot.find_service_by_idempotency_key.return_value = None
+
+        with patch(
+            "services.hubspot_greenhouse_integration.app.HubSpotClient",
+            return_value=fake_hubspot,
+        ):
+            response = client.get("/services/by-idempotency-key/uuid-missing")
+
+        self.assertEqual(response.status_code, 200)
+        body = response.get_json()
+        self.assertTrue(body["ok"])
+        self.assertIsNone(body["hubspotServiceId"])
+        self.assertIsNone(body["properties"])
+
+    def test_update_service_route_updates_and_returns_properties(self):
+        try:
+            from services.hubspot_greenhouse_integration.app import create_app
+        except ImportError as exc:
+            self.skipTest(f"Flask runtime not installed in local test environment: {exc}")
+
+        app = create_app()
+        app.config.update(
+            {
+                "hubspot_access_token": "hubspot-token",
+                "timeout_seconds": 30,
+                "greenhouse_integration_api_token": "ghi-token",
+            }
+        )
+        client = app.test_client()
+
+        fake_hubspot = MagicMock()
+        fake_hubspot.update_service.return_value = {
+            "id": "551522263821",
+            "properties": {"ef_engagement_kind": "trial"},
+        }
+
+        with patch(
+            "services.hubspot_greenhouse_integration.app.HubSpotClient",
+            return_value=fake_hubspot,
+        ):
+            response = client.patch(
+                "/services/551522263821",
+                json={"properties": {"ef_engagement_kind": "trial"}},
+                headers={"Authorization": "Bearer ghi-token"},
+            )
+
+        self.assertEqual(response.status_code, 200)
+        body = response.get_json()
+        self.assertTrue(body["ok"])
+        self.assertEqual(body["hubspotServiceId"], "551522263821")
+        self.assertEqual(body["properties"]["ef_engagement_kind"], "trial")
+        fake_hubspot.update_service.assert_called_once_with(
+            "551522263821",
+            {"ef_engagement_kind": "trial"},
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
