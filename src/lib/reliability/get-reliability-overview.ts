@@ -61,6 +61,7 @@ import { getNuboxSourceFreshnessSignal } from './queries/nubox-source-freshness'
 import { getEngagementBudgetOverrunSignal } from './queries/engagement-budget-overrun'
 import { getEngagementConversionRateDropSignal } from './queries/engagement-conversion-rate-drop'
 import { getEngagementOverdueDecisionSignal } from './queries/engagement-overdue-decision'
+import { getSampleSprintProjectionDegradedSignal } from './queries/sample-sprint-projection-degraded'
 import { getCronStagingDriftSignal } from './queries/cron-staging-drift'
 import { getEngagementStaleProgressSignal } from './queries/engagement-stale-progress'
 import { getEngagementUnapprovedActiveSignal } from './queries/engagement-unapproved-active'
@@ -832,14 +833,24 @@ export const getReliabilityOverview = async (
   const commercialHealth =
     preloadedSources.commercialHealth !== undefined
       ? preloadedSources.commercialHealth
-      : await buildCommercialHealthSignals({
-          overdueDecision: getEngagementOverdueDecisionSignal,
-          budgetOverrun: getEngagementBudgetOverrunSignal,
-          zombie: getEngagementZombieSignal,
-          unapprovedActive: getEngagementUnapprovedActiveSignal,
-          conversionRateDrop: getEngagementConversionRateDropSignal,
-          staleProgress: getEngagementStaleProgressSignal
-        }).catch(() => null)
+      : await Promise.all([
+          buildCommercialHealthSignals({
+            overdueDecision: getEngagementOverdueDecisionSignal,
+            budgetOverrun: getEngagementBudgetOverrunSignal,
+            zombie: getEngagementZombieSignal,
+            unapprovedActive: getEngagementUnapprovedActiveSignal,
+            conversionRateDrop: getEngagementConversionRateDropSignal,
+            staleProgress: getEngagementStaleProgressSignal
+          }).catch(() => null),
+          // TASK-835 Slice 6 — Sample Sprints Runtime Projection degraded signal
+          getSampleSprintProjectionDegradedSignal().catch(() => null)
+        ])
+          .then(([healthSignals, projectionSignal]) => {
+            const collected = healthSignals ?? []
+
+            return projectionSignal ? [...collected, projectionSignal] : collected
+          })
+          .catch(() => null)
 
   return buildReliabilityOverview(operations, {
     billing,
