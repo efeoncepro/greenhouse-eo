@@ -483,6 +483,16 @@ const HUBSPOT_CUSTOM_PROPERTY_TEMPLATES: Record<
       fieldType: 'text',
       formField: false,
       displayOrder: -1
+    },
+    {
+      name: 'ef_greenhouse_service_id',
+      label: 'Greenhouse Service ID',
+      description:
+        'UUID del service en Greenhouse (greenhouse_core.services.service_id). Idempotency key para outbound projection (TASK-837). NO editar manualmente.',
+      type: 'string',
+      fieldType: 'text',
+      formField: false,
+      displayOrder: -1
     }
   ]
 }
