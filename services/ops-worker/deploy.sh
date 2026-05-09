@@ -293,6 +293,24 @@ else
   echo "       echo -n '<DSN_VALUE>' | gcloud secrets versions add ${SENTRY_DSN_SECRET_NAME} --project=${PROJECT_ID} --data-file=-"
 fi
 
+# TASK-844 — HUBSPOT_ACCESS_TOKEN for hubspot_services_intake reactive consumer.
+# Required by `src/lib/hubspot/list-services-for-company.ts` (canonical helper
+# que evita el bridge bug TASK-813) cuando el reactive consumer corre en
+# ops-worker y necesita batch read de service properties desde HubSpot API
+# directamente. Sin este secret, la projection falla con "HubSpot access token
+# not found" — no es un crash sino un retry hasta dead_letter, pero bloquea el
+# sync end-to-end webhook → PG core.services. Detectado durante smoke test live
+# del cierre ISSUE-074 (commit 3180123e).
+HUBSPOT_ACCESS_TOKEN_SECRET_NAME="${HUBSPOT_ACCESS_TOKEN_SECRET_NAME:-hubspot-access-token}"
+
+if gcloud secrets describe "${HUBSPOT_ACCESS_TOKEN_SECRET_NAME}" --project="${PROJECT_ID}" >/dev/null 2>&1; then
+  SECRETS="${SECRETS},HUBSPOT_ACCESS_TOKEN=${HUBSPOT_ACCESS_TOKEN_SECRET_NAME}:latest"
+  ensure_secret_accessor_binding "${HUBSPOT_ACCESS_TOKEN_SECRET_NAME}:latest"
+  echo "  HubSpot access token: mounted from secret '${HUBSPOT_ACCESS_TOKEN_SECRET_NAME}'"
+else
+  echo "  HubSpot access token: secret '${HUBSPOT_ACCESS_TOKEN_SECRET_NAME}' not found — hubspot_services_intake projection will fail."
+fi
+
 ensure_secret_accessor_binding "${NEXTAUTH_SECRET_REF}"
 ensure_secret_accessor_binding "${PG_PASSWORD_REF}"
 
