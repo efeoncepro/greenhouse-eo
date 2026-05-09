@@ -22,6 +22,7 @@ import CustomAvatar from '@core/components/mui/Avatar'
 import CustomTextField from '@core/components/mui/TextField'
 
 import { GH_AGENCY } from '@/lib/copy/agency'
+import { formatCurrency } from '@/lib/format'
 
 /**
  * TASK-837 Slice 2 — Wizard Deal Selection field for Sample Sprints declare.
@@ -109,14 +110,7 @@ const eligibilityCopy = (reason: 'closed' | 'deleted' | 'missing_company' | 'mis
 const formatAmount = (amount: number | null, currency: string): string => {
   if (amount === null) return '—'
 
-  const fmt = new Intl.NumberFormat('es-CL', {
-    style: 'currency',
-    currency,
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0
-  })
-
-  return fmt.format(amount)
+  return formatCurrency(amount, currency as 'CLP', { locale: 'es-CL' })
 }
 
 const DealSelectionField = ({ value, onChange, spaceId, organizationId, required }: Props) => {

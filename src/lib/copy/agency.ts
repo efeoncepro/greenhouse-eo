@@ -333,7 +333,11 @@ export const GH_AGENCY = {
         title: 'Todo en orden',
         description: 'Sin Sample Sprints en dead-letter. La proyección async funciona correctamente.'
       },
-      missingCapability: 'No tienes permisos para recover_outbound. Contacta a un admin Finance o EO.'
+      missingCapability: 'No tienes permisos para recover_outbound. Contacta a un admin Finance o EO.',
+      ariaLoadingList: 'Cargando lista de dead-letter',
+      filterEmpty: 'Sin services que coincidan con el filtro.',
+      reasonTooShort: 'La razón debe tener al menos 5 caracteres.',
+      genericLoadError: 'No fue posible cargar la lista.'
     }
   }
 } as const

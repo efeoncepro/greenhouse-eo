@@ -12,7 +12,12 @@ export const ENGAGEMENT_AUDIT_EVENT_KINDS = [
   'outcome_recorded',
   'lineage_added',
   'converted',
-  'cancelled'
+  'cancelled',
+  // TASK-837 Slice 5 — outbound projection lifecycle events.
+  'outbound_failed',
+  'outbound_retry_attempted',
+  'outbound_dead_lettered',
+  'outbound_skipped'
 ] as const
 
 export type EngagementAuditEventKind = typeof ENGAGEMENT_AUDIT_EVENT_KINDS[number]

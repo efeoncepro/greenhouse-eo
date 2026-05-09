@@ -554,6 +554,15 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     actions: ['delete'] as const,
     defaultScope: 'tenant'
   },
+  // TASK-837 Slice 5 — Sample Sprint outbound dead-letter recovery.
+  // Reservada FINANCE_ADMIN + EFEONCE_ADMIN solo para reintentos / skip
+  // explícito de proyecciones HubSpot que agotaron retries automáticos.
+  {
+    key: 'commercial.engagement.recover_outbound',
+    module: 'commercial',
+    actions: ['approve', 'update'] as const,
+    defaultScope: 'tenant'
+  },
 
   // TASK-672 — Platform Health API contract.
   // Declarative catalog entries for the agent/MCP preflight contract.
