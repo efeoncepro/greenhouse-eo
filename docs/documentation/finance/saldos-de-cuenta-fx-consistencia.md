@@ -6,7 +6,7 @@
 > **Ultima actualizacion:** 2026-05-09
 > **Documentacion tecnica:**
 > - Spec arquitectonica: [GREENHOUSE_FINANCE_ARCHITECTURE_V1 — Delta TASK-774](../../architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md#delta-2026-05-03--task-774-account-balances-fx-consistency-extiende-task-766)
-> - Tasks: [TASK-774 — Account Balance CLP-Native Reader Contract](../../tasks/complete/TASK-774-account-balance-clp-native-reader-contract.md) · [TASK-842 — Finance FX Drift Auto-Remediation Control Plane](../../tasks/in-progress/TASK-842-finance-fx-drift-auto-remediation-control-plane.md) · [TASK-766 — Finance CLP Currency Reader](../../tasks/complete/TASK-766-finance-clp-currency-reader-contract.md)
+> - Tasks: [TASK-774 — Account Balance CLP-Native Reader Contract](../../tasks/complete/TASK-774-account-balance-clp-native-reader-contract.md) · [TASK-842 — Finance FX Drift Auto-Remediation Control Plane](../../tasks/complete/TASK-842-finance-fx-drift-auto-remediation-control-plane.md) · [TASK-766 — Finance CLP Currency Reader](../../tasks/complete/TASK-766-finance-clp-currency-reader-contract.md)
 > - Documentacion relacionada: [Monedas y Tipos de Cambio](monedas-y-tipos-de-cambio.md) · [Conciliacion bancaria](conciliacion-bancaria.md)
 
 ## Para que sirve

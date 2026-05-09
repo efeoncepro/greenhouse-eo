@@ -1,9 +1,11 @@
-# Sesion 2026-05-09 — TASK-842 Finance FX Drift Auto-Remediation Control Plane en progreso
+# Sesion 2026-05-09 — TASK-842 Finance FX Drift Auto-Remediation Control Plane cerrada
 
 - **Trigger:** el usuario aprobo el audit/plan de TASK-842 y pidio avanzar end-to-end manteniendo `develop`, con verificacion continua usando skill de arquitectura y finanzas.
-- **Ownership:** task movida a `docs/tasks/in-progress/TASK-842-finance-fx-drift-auto-remediation-control-plane.md`; `docs/tasks/README.md` y `TASK_ID_REGISTRY.md` sincronizados a `in-progress`.
+- **Entrega:** reader detallado reusable para `finance.account_balances.fx_drift`; planner/executor `src/lib/finance/account-balances-fx-drift-remediation.ts`; run tracking en `source_sync_runs/source_sync_failures`; endpoint interno `POST /finance/account-balances/fx-drift/remediate`; scheduler `ops-finance-fx-drift-remediate` a las 05:15 America/Santiago; CLI wrappers canónicos.
+- **Lifecycle:** task movida a `docs/tasks/complete/TASK-842-finance-fx-drift-auto-remediation-control-plane.md`; `docs/tasks/README.md` y `TASK_ID_REGISTRY.md` sincronizados a `complete`.
+- **Validacion:** `pnpm test src/lib/reliability/queries/account-balances-fx-drift.test.ts src/lib/finance/account-balances-fx-drift-remediation.test.ts services/ops-worker/deploy-contract.test.ts` -> 16/16; `pnpm pg:doctor` OK; `scripts/finance/diagnose-fx-drift.ts` -> steady state; `pnpm exec tsc --noEmit` OK; `pnpm lint` OK.
 - **Decision operativa:** se trabaja directo en `develop` por instruccion explicita del usuario; no se crea branch `task/TASK-842...`.
-- **Guardrail multi-agente:** existen cambios no relacionados en `docs/architecture/GREENHOUSE_EVENT_CATALOG_V1.md` y `docs/architecture/GREENHOUSE_HUBSPOT_SERVICES_INTAKE_V1.md`; no pertenecen a TASK-842 y no deben stagearse ni revertirse.
+- **Guardrail multi-agente:** existen cambios no relacionados en `docs/architecture/GREENHOUSE_EVENT_CATALOG_V1.md`, `docs/architecture/GREENHOUSE_HUBSPOT_SERVICES_INTAKE_V1.md`, `docs/operations/runbooks/hubspot-service-pipeline-config.md` y `src/lib/services/service-lifecycle-mapper*`; no pertenecen a TASK-842 y no deben stagearse ni revertirse.
 
 # Sesion 2026-05-09 — TASK-842 Finance FX Drift Auto-Remediation Control Plane creada
 
