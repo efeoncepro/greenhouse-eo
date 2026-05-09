@@ -1,8 +1,8 @@
-import { test, expect, expectAuthenticated } from '../fixtures/auth'
+import { test, expect, expectAuthenticated, gotoAuthenticated, gotoWithTransientRetries } from '../fixtures/auth'
 
 test.describe('auth / session', () => {
   test('agent storageState produces an authenticated session', async ({ page }) => {
-    const response = await page.goto('/', { waitUntil: 'domcontentloaded' })
+    const response = await gotoWithTransientRetries(page, '/')
 
     expect(response, 'GET / should return a response').not.toBeNull()
     expect(response!.status(), 'root should not 5xx').toBeLessThan(500)
@@ -23,10 +23,7 @@ test.describe('auth / session', () => {
   })
 
   test('session persists across a second navigation', async ({ page }) => {
-    await page.goto('/home', { waitUntil: 'domcontentloaded' })
-    await expectAuthenticated(page)
-
-    await page.goto('/people', { waitUntil: 'domcontentloaded' })
-    await expectAuthenticated(page)
+    await gotoAuthenticated(page, '/home')
+    await gotoAuthenticated(page, '/people')
   })
 })

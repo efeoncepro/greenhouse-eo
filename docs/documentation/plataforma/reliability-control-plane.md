@@ -73,11 +73,12 @@ Los smoke lanes Playwright son una fuente `test_lane`: validan flujos críticos 
 La regla operativa es:
 
 - si una prueba falla, el lane puede quedar `failed`; eso es una señal funcional válida
+- si una prueba falla en un intento pero pasa en retry, el lane puede quedar `flaky`; eso es deuda de estabilidad, no falla final
 - el publisher no debe fallar por tooling, permisos, secretos o saturación transitoria
-- el log esperado en CI es `[smoke-lane-publish] lane=<lane> status=<passed|failed|flaky>`
+- el log esperado en CI es `[smoke-lane-publish] lane=<lane> status=<passed|failed|flaky> ... flaky=<n>`
 - si aparece `sync:smoke-lane <lane> failed (non-blocking)`, se trata como incidente de plataforma, no como ruido normal
 
-Desde ISSUE-072, el publisher usa el carril canónico: WIF, Cloud SQL Connector, Secret Manager, pool `1` y retry/backoff en la primitive Postgres compartida.
+Desde ISSUE-072/ISSUE-073, el publisher usa el carril canónico: WIF, Cloud SQL Connector, Secret Manager, pool `1`, retry/backoff en la primitive Postgres compartida y parser reusable `scripts/lib/smoke-lane-report.ts` para que `flaky` no incremente `failed_tests`.
 
 ### Severidades
 

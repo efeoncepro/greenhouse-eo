@@ -35,6 +35,7 @@ Regla canonica: `docs/operations/ARCHITECTURE_DECISION_RECORD_OPERATING_MODEL_V1
 | Direct service expense allocation requiere ancla explicita expense -> service | Accepted | Finance / Commercial cost attribution | [GREENHOUSE_COMMERCIAL_COST_ATTRIBUTION_V1.md](GREENHOUSE_COMMERCIAL_COST_ATTRIBUTION_V1.md) | TASK-815; no inferir por cliente/nombre/linea. |
 | Governance tables de capabilities tienen FK a registry + CI migration marker gate | Accepted | Identity / Access / DB migrations / CI | [Handoff.md](../../Handoff.md) | TASK-838/ISSUE-068; runtime guard + CI gate anti pre-up-marker bug. |
 | Smoke-lane publisher usa WIF + Cloud SQL Connector + Postgres primitive resiliente | Accepted | CI / Reliability / PostgreSQL / GCP IAM | [GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1.md](GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1.md#delta-2026-05-09--issue-072-smoke-lane-publisher-reliability) | ISSUE-072; no silenciar warnings `sync:smoke-lane failed`, corregir shim/secrets/IAM/pool/backoff. |
+| Smoke-lane flaky no es failed final | Accepted | CI / Reliability / Playwright E2E | [GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1.md](GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1.md#delta-2026-05-09--issue-073--task-607-flaky-semantics--github-actions-runtime) | ISSUE-073/TASK-607; parser canónico usa último intento, `failed -> passed` queda `flaky`, no incrementa `failed_tests`. |
 
 ## Pendientes de formalizacion retroactiva
 

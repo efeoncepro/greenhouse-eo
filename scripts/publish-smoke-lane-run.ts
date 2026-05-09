@@ -25,6 +25,7 @@ import { randomUUID } from 'node:crypto'
 import { closeGreenhousePostgres, runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
 import { applyGreenhousePostgresProfile, loadGreenhouseToolEnv } from './lib/load-greenhouse-tool-env'
+import { flattenPlaywrightReport, summarizeSmokeLaneSpecs, type PlaywrightReport } from './lib/smoke-lane-report'
 
 loadGreenhouseToolEnv()
 applyGreenhousePostgresProfile('runtime')
@@ -35,32 +36,6 @@ interface CliArgs {
   commitSha: string
   branch: string | null
   workflowRunUrl: string | null
-}
-
-interface PlaywrightTestResult {
-  status?: string
-  duration?: number
-}
-
-interface PlaywrightTest {
-  results?: PlaywrightTestResult[]
-}
-
-interface PlaywrightSpec {
-  title?: string
-  file?: string
-  tests?: PlaywrightTest[]
-}
-
-interface PlaywrightSuite {
-  title?: string
-  specs?: PlaywrightSpec[]
-  suites?: PlaywrightSuite[]
-}
-
-interface PlaywrightReport {
-  suites?: PlaywrightSuite[]
-  stats?: { startTime?: string; duration?: number }
 }
 
 const parseArgs = (): CliArgs => {
@@ -92,8 +67,7 @@ const parseArgs = (): CliArgs => {
   const runId = process.env.GITHUB_RUN_ID ?? ''
 
   const workflowRunUrl =
-    flags.workflowRunUrl ||
-    (repo && runId ? `https://github.com/${repo}/actions/runs/${runId}` : null)
+    flags.workflowRunUrl || (repo && runId ? `https://github.com/${repo}/actions/runs/${runId}` : null)
 
   return {
     laneKey,
@@ -101,40 +75,6 @@ const parseArgs = (): CliArgs => {
     commitSha: flags.commit ?? process.env.GITHUB_SHA ?? 'unknown',
     branch: flags.branch ?? process.env.GITHUB_REF_NAME ?? null,
     workflowRunUrl
-  }
-}
-
-interface FlattenedSpec {
-  title: string
-  file: string
-  status: 'passed' | 'failed' | 'flaky' | 'skipped'
-  durationMs: number
-}
-
-const collectSpecs = (suite: PlaywrightSuite, file: string | undefined, out: FlattenedSpec[]) => {
-  const currentFile = suite.title?.endsWith('.spec.ts') ? suite.title : file ?? ''
-
-  for (const spec of suite.specs ?? []) {
-    const test = spec.tests?.[0]
-    const result = test?.results?.[0]
-    const rawStatus = result?.status ?? 'skipped'
-
-    let status: FlattenedSpec['status'] = 'skipped'
-
-    if (rawStatus === 'passed') status = 'passed'
-    else if (rawStatus === 'failed' || rawStatus === 'timedOut' || rawStatus === 'interrupted') status = 'failed'
-    else if (rawStatus === 'flaky') status = 'flaky'
-
-    out.push({
-      title: spec.title ?? '(untitled)',
-      file: spec.file ?? currentFile,
-      status,
-      durationMs: Math.max(0, Math.trunc(result?.duration ?? 0))
-    })
-  }
-
-  for (const child of suite.suites ?? []) {
-    collectSpecs(child, currentFile, out)
   }
 }
 
@@ -160,22 +100,10 @@ const main = async () => {
     process.exit(1)
   }
 
-  const flattened: FlattenedSpec[] = []
+  const flattened = flattenPlaywrightReport(report)
+  const totals = summarizeSmokeLaneSpecs(flattened)
 
-  for (const suite of report.suites ?? []) {
-    collectSpecs(suite, undefined, flattened)
-  }
-
-  const totals = {
-    total: flattened.length,
-    passed: flattened.filter(s => s.status === 'passed').length,
-    failed: flattened.filter(s => s.status === 'failed').length,
-    skipped: flattened.filter(s => s.status === 'skipped').length,
-    flaky: flattened.filter(s => s.status === 'flaky').length
-  }
-
-  const status: 'passed' | 'failed' | 'flaky' =
-    totals.failed > 0 ? 'failed' : totals.flaky > 0 ? 'flaky' : 'passed'
+  const status: 'passed' | 'failed' | 'flaky' = totals.failed > 0 ? 'failed' : totals.flaky > 0 ? 'flaky' : 'passed'
 
   const startedAt = report.stats?.startTime ?? new Date().toISOString()
 
@@ -224,8 +152,8 @@ const main = async () => {
 
   console.log(
     `[smoke-lane-publish] lane=${args.laneKey} status=${status} ` +
-    `total=${totals.total} passed=${totals.passed} failed=${totals.failed} skipped=${totals.skipped} ` +
-    `commit=${args.commitSha.slice(0, 7)} runId=${runId}`
+      `total=${totals.total} passed=${totals.passed} failed=${totals.failed} flaky=${totals.flaky} skipped=${totals.skipped} ` +
+      `commit=${args.commitSha.slice(0, 7)} runId=${runId}`
   )
 
   await closeGreenhousePostgres()

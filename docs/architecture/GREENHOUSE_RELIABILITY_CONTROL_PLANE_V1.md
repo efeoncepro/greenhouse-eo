@@ -2,12 +2,32 @@
 
 > Spec canónica del `Reliability Control Plane` de Greenhouse EO. Define el registry por módulo, el modelo unificado de señales, el contrato de evidencia y cómo `Admin Center`, `Ops Health` y `Cloud & Integrations` consumen la lectura consolidada sin duplicar fuentes.
 >
-> Versión: `1.5`
+> Versión: `1.6`
 > Estado: `vigente`
 > Creada: `2026-04-25` por TASK-600
-> Última actualización: `2026-05-09` por ISSUE-072 (smoke-lane publisher hardening)
+> Última actualización: `2026-05-09` por ISSUE-073 / TASK-607 (smoke-lane flaky semantics + Actions Node 24)
 
 ---
+
+## Delta 2026-05-09 — ISSUE-073 / TASK-607 flaky semantics + GitHub Actions runtime
+
+El resultado canónico de un smoke lane Playwright se deriva del outcome final de cada spec, no del primer intento. Playwright puede reportar `flaky` cuando un intento falla y un retry pasa; ese estado no debe contarse como `failed_tests` porque el lane terminó recuperado y el workflow sigue siendo verde.
+
+Contrato vigente:
+
+- `scripts/lib/smoke-lane-report.ts` es el parser canónico reusable para reportes Playwright publicados por CI.
+- `failed_tests` cuenta solo specs cuyo último intento terminó en `failed | timedOut | interrupted`.
+- `summary_json.flakyCount` cuenta specs con intento fallido previo y último intento `passed`.
+- `status='failed'` solo si existe al menos una falla final; si no hay fallas finales y hay flaky specs, `status='flaky'`.
+- El log esperado incluye `flaky=<n>`: `[smoke-lane-publish] lane=<lane> status=<passed|failed|flaky> total=<n> passed=<n> failed=<n> flaky=<n> skipped=<n>`.
+- Las navegaciones E2E autenticadas deben usar `gotoAuthenticated()` o `gotoWithTransientRetries()` para absorber cold-start/red transitoria con retries acotados. HTTP 4xx/5xx, redirects de auth y asserts funcionales siguen fallando loud.
+- Los workflows GitHub usan actions compatibles con runtime Node.js 24: `actions/checkout@v5`, `actions/setup-node@v5`, `actions/upload-artifact@v5`, `pnpm/action-setup@v6`, `google-github-actions/auth@v3`, `google-github-actions/setup-gcloud@v3`.
+
+Steady state esperado:
+
+- Una suite Playwright con `33 passed, 3 flaky` publica `failed_tests=0`, `summary_json.flakyCount=3` y `status='flaky'`.
+- No quedan referencias a las actions target antiguas (`checkout/setup-node/upload-artifact@v4`, `pnpm/action-setup@v4`, `google-github-actions/auth/setup-gcloud@v2`) en `.github/workflows/`.
+- Los warnings de GitHub Actions por Node.js 20 de actions desaparecen; `node-version: 20` de los jobs se mantiene separado y solo controla el runtime de app/tests.
 
 ## Delta 2026-05-09 — ISSUE-072 smoke-lane publisher reliability
 

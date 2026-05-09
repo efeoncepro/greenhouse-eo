@@ -1,3 +1,15 @@
+# Sesion 2026-05-09 — TASK-607 / ISSUE-073 Actions Node 24 + smoke-lane flaky semantics
+
+- **Trigger:** el usuario pidio resolver end-to-end los warnings/fixes pendientes sin parches, con skill de arquitectura. Se reviso TASK-607 y el run Playwright `25606031281`.
+- **Drift de spec:** TASK-607 decia "5 workflows restantes", pero `rg` encontro referencias target antiguas tambien en `design-contract.yml`, `reliability-verify.yml`, `azure-teams-deploy.yml` y `azure-teams-bot-deploy.yml`. Decision arquitectonica: migrar repo-wide todas las actions target antiguas, no solo la tabla stale.
+- **Fix Actions:** `.github/workflows/*` queda sin matches para `actions/(checkout|setup-node|upload-artifact)@v4`, `pnpm/action-setup@v4` ni `google-github-actions/(auth|setup-gcloud)@v2`. Targets verificados con GitHub API: checkout/setup-node/upload-artifact `@v5`, pnpm `@v6`, google auth/setup-gcloud `@v3`. `node-version: 20` se mantiene porque controla app/tests, no runtime interno de actions.
+- **Fix smoke-lane semantics:** nuevo parser reusable `scripts/lib/smoke-lane-report.ts`; `publish-smoke-lane-run.ts` usa el ultimo intento Playwright. `failed -> passed` ahora es `flaky`, no `failed_tests`; el log incluye `flaky=<n>`. Artifact real de Playwright `25606031281` confirmo 3 casos flaky por retry.
+- **Fix navegación E2E:** `tests/e2e/fixtures/auth.ts` agrega `gotoWithTransientRetries` y `gotoAuthenticated` lo reutiliza. Retries acotados solo para `page.goto` timeout/red transitoria; HTTP/auth/asserts siguen fallando loud. `login-session.spec.ts` deja de usar `page.goto` crudo en las rutas que flakearon.
+- **Docs:** ISSUE-073 creado en resolved; `GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1`, docs funcionales de reliability/test observability, `DECISIONS_INDEX`, `changelog`, `docs/tasks/README.md` y `TASK_ID_REGISTRY` sincronizados. TASK-607 movida a `complete/`.
+- **Validación pendiente de esta sesión:** antes de push correr tests focalizados, lint, tsc y luego monitorear CI/Playwright post-push para confirmar que desaparecen los warnings Node.js 20 de actions y que el publisher no vuelve a contar flaky como failed.
+
+---
+
 # Sesion 2026-05-09 — CI smoke-lane publisher hardening
 
 - **Trigger:** el usuario pidio resolver solo el warning `sync:smoke-lane ... failed (non-blocking)` de forma robusta y escalable; el warning Node.js 20 queda cubierto por TASK-607.

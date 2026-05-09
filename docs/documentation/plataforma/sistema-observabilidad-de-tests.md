@@ -111,6 +111,7 @@ Lectura rápida:
 
 - `status=passed` significa que el lane pasó y fue publicado.
 - `status=failed` significa que el lane detectó un fallo funcional y fue publicado correctamente.
+- `status=flaky` significa que el lane quedó sin fallas finales, pero al menos un spec necesitó retry (`failed -> passed`). No incrementa `failed_tests`.
 - `sync:smoke-lane <lane> failed (non-blocking)` no es un estado funcional del producto; indica que el publisher falló y debe diagnosticarse como plataforma.
 
 Contrato operativo vigente desde ISSUE-072:
@@ -121,6 +122,8 @@ Contrato operativo vigente desde ISSUE-072:
 - el secret ref es `greenhouse-pg-dev-app-password`, no `secret:version`
 - el pool del publisher se limita a `GREENHOUSE_POSTGRES_MAX_CONNECTIONS=1`
 - la primitive Postgres compartida reintenta con backoff errores transitorios como `53300`
+- el parser canónico `scripts/lib/smoke-lane-report.ts` usa el último intento de Playwright para distinguir `failed` de `flaky`
+- las navegaciones autenticadas de smoke tests deben usar `gotoAuthenticated()` o `gotoWithTransientRetries()` para cold-starts/timeouts transitorios sin ocultar errores HTTP o de sesión
 
 ---
 
