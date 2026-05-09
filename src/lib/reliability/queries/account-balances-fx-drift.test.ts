@@ -19,7 +19,11 @@ vi.mock('@/lib/observability/capture', () => ({
   captureWithDomain: vi.fn()
 }))
 
-import { getAccountBalancesFxDriftSignal } from './account-balances-fx-drift'
+import {
+  countAccountBalancesFxDriftRows,
+  getAccountBalancesFxDriftSignal,
+  listAccountBalancesFxDriftRows
+} from './account-balances-fx-drift'
 
 beforeEach(() => {
   queryMock.mockReset()
@@ -72,8 +76,9 @@ describe('getAccountBalancesFxDriftSignal — TASK-774', () => {
     expect(sql).toContain('superseded_at IS NULL')
     expect(sql).toContain('superseded_by_otb_id IS NULL')
 
-    // Tolerancia $1 CLP anti FP-noise
-    expect(sql).toContain('> 1')
+    // Tolerancia parametrizada anti FP-noise
+    expect(sql).toContain('> $2::numeric')
+    expect(queryMock.mock.calls[0]?.[1]).toEqual([90, 1])
   })
 
   it('returns unknown when the query throws (degraded honestamente)', async () => {
@@ -93,5 +98,75 @@ describe('getAccountBalancesFxDriftSignal — TASK-774', () => {
 
     expect(signal.evidence.find(e => e.label === 'window_days')?.value).toBe('90')
     expect(signal.evidence.find(e => e.label === 'tolerance_clp')?.value).toBe('1')
+  })
+
+  it('returns detailed drift rows ordered by severity/date/account for remediation consumers', async () => {
+    queryMock.mockResolvedValueOnce([
+      {
+        account_id: 'santander-clp',
+        account_name: 'Santander CLP',
+        currency: 'CLP',
+        balance_date: '2026-05-01',
+        is_period_closed: false,
+        transaction_count: 0,
+        persisted_inflows_clp: '0.00',
+        persisted_outflows_clp: '0.00',
+        persisted_closing_balance_clp: '1615054.57',
+        expected_inflows_clp: '0',
+        expected_outflows_clp: '402562.50',
+        expected_closing_balance_clp: '1212492.07',
+        drift_clp: '-402562.50',
+        abs_drift_clp: '402562.50',
+        settlement_leg_count: 2,
+        income_payment_count: 0,
+        expense_payment_count: 0,
+        detected_at: '2026-05-09T12:00:00.000Z'
+      }
+    ])
+
+    const rows = await listAccountBalancesFxDriftRows({ accountId: 'santander-clp', fromDate: '2026-05-01' })
+
+    expect(rows).toEqual([
+      {
+        accountId: 'santander-clp',
+        accountName: 'Santander CLP',
+        currency: 'CLP',
+        balanceDate: '2026-05-01',
+        isPeriodClosed: false,
+        transactionCount: 0,
+        persistedInflowsClp: '0.00',
+        persistedOutflowsClp: '0.00',
+        persistedClosingBalanceClp: '1615054.57',
+        expectedInflowsClp: '0',
+        expectedOutflowsClp: '402562.50',
+        expectedClosingBalanceClp: '1212492.07',
+        driftClp: '-402562.50',
+        absDriftClp: '402562.50',
+        evidenceRefs: {
+          settlementLegs: 2,
+          incomePayments: 0,
+          expensePayments: 0
+        },
+        detectedAt: '2026-05-09T12:00:00.000Z'
+      }
+    ])
+
+    const sql = String(queryMock.mock.calls[0]?.[0] ?? '')
+
+    expect(sql).toContain('ORDER BY abs_drift_clp DESC, balance_date DESC, account_id ASC')
+    expect(sql).toContain('LIMIT 100')
+    expect(queryMock.mock.calls[0]?.[1]).toEqual(['2026-05-01', 'santander-clp', 1])
+  })
+
+  it('supports exact count without applying row limit', async () => {
+    queryMock.mockResolvedValueOnce([{ n: 7 }])
+
+    await expect(countAccountBalancesFxDriftRows({ windowDays: 30, toleranceClp: 0.5 })).resolves.toBe(7)
+
+    const sql = String(queryMock.mock.calls[0]?.[0] ?? '')
+
+    expect(sql).toContain('SELECT COUNT(*)::int AS n FROM drift_rows')
+    expect(sql).not.toContain('LIMIT')
+    expect(queryMock.mock.calls[0]?.[1]).toEqual([30, 0.5])
   })
 })

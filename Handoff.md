@@ -1,3 +1,10 @@
+# Sesion 2026-05-09 — TASK-842 Finance FX Drift Auto-Remediation Control Plane en progreso
+
+- **Trigger:** el usuario aprobo el audit/plan de TASK-842 y pidio avanzar end-to-end manteniendo `develop`, con verificacion continua usando skill de arquitectura y finanzas.
+- **Ownership:** task movida a `docs/tasks/in-progress/TASK-842-finance-fx-drift-auto-remediation-control-plane.md`; `docs/tasks/README.md` y `TASK_ID_REGISTRY.md` sincronizados a `in-progress`.
+- **Decision operativa:** se trabaja directo en `develop` por instruccion explicita del usuario; no se crea branch `task/TASK-842...`.
+- **Guardrail multi-agente:** existen cambios no relacionados en `docs/architecture/GREENHOUSE_EVENT_CATALOG_V1.md` y `docs/architecture/GREENHOUSE_HUBSPOT_SERVICES_INTAKE_V1.md`; no pertenecen a TASK-842 y no deben stagearse ni revertirse.
+
 # Sesion 2026-05-09 — TASK-842 Finance FX Drift Auto-Remediation Control Plane creada
 
 - **Trigger:** el usuario pidio dejar de "tapar goteras" por el fallo recurrente de Playwright `finance.account_balances.fx_drift — TASK-774`, usando criterio de finanzas y arquitectura.
