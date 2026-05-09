@@ -2,6 +2,8 @@
 
 ## 2026-05-09
 
+- **TASK-812 architecture correction — Compliance Exports Chile como proyecciones versionadas.** Se corrige la task antes de implementacion: Greenhouse no asumira Previred TXT posicional ni LRE XML/XSD sin evidencia oficial vigente. Nueva ADR embebida en `GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md` e indexada en `DECISIONS_INDEX.md`: los exports Previred/LRE son proyecciones read-only sobre payroll cerrado, con Slice 0 obligatorio de discovery oficial, fuentes versionadas, mapping declarativo, registry de artefactos con hashes/totales/validation result y reliability drift. `TASK-707a` pasa a blocker hard para paridad completa contra `payment_order`; `TASK-784` queda como dependency resuelta para RUT canonico.
+
 - **TASK-786 architecture refresh — Professional Presence como faceta gobernada de Person 360.** Se acepta ADR embebido en `GREENHOUSE_PERSON_COMPLETE_360_V1.md` e indexado en `DECISIONS_INDEX.md`: links profesionales/contacto/preferencias y acciones Teams/Slack no son identidad legal ni cargo laboral; `greenhouse_core.members` sigue como source V1, `phone/contact_channel/contact_handle` quedan internal-only por defecto y la exposicion client-safe debe pasar por policy compartida. TASK-786 corrige referencias a TASK-784/TASK-785 completas, deja de colgar de EPIC-010 y exige resolver visibilidad via primitive compartida antes de implementar UI/API.
 
 ## 2026-05-08

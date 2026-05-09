@@ -1,3 +1,12 @@
+# Sesion 2026-05-09 — TASK-812 compliance exports corregida
+
+- **Trigger:** el usuario pidio corregir TASK-812 tras la revision con skill de arquitectura/payroll, luego commit y push.
+- **Entrega:** TASK-812 queda reescrita como contrato evidence-first: Slice 0 obligatorio congela fuentes oficiales Previred/LRE vigentes antes de implementar generadores; se elimina el supuesto operativo de Previred posicional y LRE XML/XSD; se agrega registry de artefactos compliance con `specVersion`, `sourceSnapshotHash`, `sha256`, totales y validation result.
+- **ADR aceptado:** `GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md` agrega `Architecture Decision 2026-05-09 -- Chile Compliance Exports as Versioned Payroll Projections`; `DECISIONS_INDEX.md` queda sincronizado. Regla clave: exports Previred/LRE son proyecciones read-only sobre payroll cerrado, no source of truth ni calculo paralelo.
+- **Dependencias corregidas:** `TASK-707a` pasa a hard blocker para paridad completa contra `payment_order` social_security; `TASK-784` queda como dependency resuelta para RUT canonico verificado.
+- **Validacion:** cambio documental/arquitectonico; `git diff --check` OK. No se ejecuto build porque no hubo runtime/UI.
+- **Nota multi-agente:** se preservo cambio preexistente no relacionado en `docs/tasks/to-do/TASK-835-sample-sprints-runtime-projection-hardening.md`; no es parte de este commit.
+
 # Sesion 2026-05-09 — TASK-786 arquitectura refrescada
 
 - **Trigger:** el usuario pidio aplicar los ajustes recomendados tras revisar TASK-786 con la skill de arquitectura, luego commit y push.
