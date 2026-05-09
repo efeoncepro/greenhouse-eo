@@ -126,8 +126,12 @@ Reglas obligatorias:
 - `src/app/api/admin/integrations/hubspot/sample-sprint-dead-letter/[serviceId]/retry/route.ts` (nuevo)
 - `src/app/api/admin/integrations/hubspot/sample-sprint-dead-letter/[serviceId]/skip/route.ts` (nuevo)
 - `src/config/entitlements-catalog.ts` (agregar `commercial.engagement.recover_outbound`)
-- `services/hubspot_greenhouse_integration/` (extender con endpoints outbound `p_services` create + asociaciones, si aplica)
-- `migrations/<timestamp>_task-837-services-idempotency-key-and-sync-status-states.sql` (nuevo, agregar `idempotency_key TEXT NULL` + extender `hubspot_sync_status` enum si no acepta los nuevos values)
+- `services/hubspot_greenhouse_integration/hubspot_client.py` (Slice 0.5b — agregar `create_service`, `update_service`, `find_service_by_idempotency_key`)
+- `services/hubspot_greenhouse_integration/app.py` (Slice 0.5b — agregar 3 Flask routes: `POST /services`, `PATCH /services/<id>`, `GET /services/by-idempotency-key/<key>`)
+- `services/hubspot_greenhouse_integration/tests/test_hubspot_services_outbound.py` (Slice 0.5b — nuevo, 6 tests pytest)
+- `scripts/create-hubspot-service-custom-properties.ts` (Slice 0.5a — extender con property `ef_greenhouse_service_id` idempotente)
+- `migrations/<timestamp>_task-837-services-idempotency-key-and-sync-status-states.sql` (Slice 0.5c — nuevo, agregar `idempotency_key TEXT NULL` + UNIQUE INDEX partial + extender CHECK `hubspot_sync_status` con 5 valores nuevos del outbound state machine)
+- `src/types/db.d.ts` (Slice 0.5c — regen via `pnpm db:generate-types` post-migrate)
 - `docs/architecture/GREENHOUSE_PILOT_ENGAGEMENT_ARCHITECTURE_V1.md`
 - `docs/architecture/GREENHOUSE_HUBSPOT_SERVICES_INTAKE_V1.md`
 - `docs/architecture/GREENHOUSE_EVENT_CATALOG_V1.md` (registrar 2 events nuevos)
@@ -360,7 +364,172 @@ Evidencia:
 | C — rate limits | Bridge OK; falta CRUD `0-162` | **SÍ** | Agregar `create_service`, `update_service`, `find_service_by_idempotency_key` al bridge + Flask routes |
 | D — `ef_pipeline_stage` | Deprecated técnicamente; stakeholder confirmation pending para cleanup | **NO** (V1) / **SÍ** (cleanup follow-up) | Outbound NO escribe property; abrir follow-up task post-merge |
 
-**Bloqueantes pre-Slice 4 (resumen)**: 2 items (Checkpoint A property creation + Checkpoint C bridge endpoints). Todo lo demás puede planificarse con certeza.
+**Bloqueantes pre-Slice 4 (resumen)**: 2 items (Checkpoint A property creation + Checkpoint C bridge endpoints). Ambos consolidados en Slice 0.5 abajo. Todo lo demás puede planificarse con certeza.
+
+### Slice 0.5 — Pre-implementation infra setup (derivado de Slice 0 checkpoints)
+
+Slice de **infra setup** que land los 2 bloqueantes binarios identificados en Slice 0 (Checkpoint A property + Checkpoint C bridge endpoints). **Este slice debe completar antes de Slice 4.** Puede correr en paralelo con Slice 1-3 (UI/wizard + persistencia local) porque no hay dependencia de runtime entre ellos.
+
+Razón de existir como slice separado: aislar las mutaciones cross-system (HubSpot property + bridge deploy) del resto de la implementación. Un PR atómico por dominio de cambio reduce blast radius en revert y simplifica review.
+
+#### Sub-slice 0.5a — HubSpot property `ef_greenhouse_service_id`
+
+Owner del cambio: extender [scripts/create-hubspot-service-custom-properties.ts](scripts/create-hubspot-service-custom-properties.ts) (script canónico de properties `0-162`). NO crear script paralelo.
+
+Property shape definitivo:
+
+```ts
+{
+  name: 'ef_greenhouse_service_id',
+  label: 'Greenhouse Service ID',
+  type: 'string',
+  fieldType: 'text',
+  groupName: 'service_information',
+  description: 'UUID del service en Greenhouse (greenhouse_core.services.service_id). Idempotency key para outbound projection (TASK-837). NO editar manualmente.',
+  hasUniqueValue: true,
+  formField: false
+}
+```
+
+Idempotencia: el script DEBE hacer `GET /crm/v3/properties/0-162/ef_greenhouse_service_id` antes de POST. Si retorna 200 → skip (logging "ya existe"). Si retorna 404 → POST. Si retorna 5xx → throw + Sentry. Patrón fuente: el resto del script ya hace esto para las otras properties.
+
+Verificación post-deploy:
+
+- `GET /crm/v3/properties/0-162/ef_greenhouse_service_id` → 200 con shape correcto.
+- Crear un service de test con `ef_greenhouse_service_id=<uuid>` → verificar persiste en GET (esto sí es write+cleanup test, queda como verification step manual o Playwright integration).
+- Confirmar `hasUniqueValue: true` se aplicó (HubSpot lo soporta para custom objects pero ocasionalmente lo silently ignora — verificar via metadata GET).
+
+Rollback: `PATCH /crm/v3/properties/0-162/ef_greenhouse_service_id` con `{archived: true}`. La property archivada no afecta records existentes; queda recoverable via unarchive.
+
+#### Sub-slice 0.5b — Bridge endpoints CRUD `0-162`
+
+Owner del cambio: [services/hubspot_greenhouse_integration/hubspot_client.py](services/hubspot_greenhouse_integration/hubspot_client.py) + [app.py](services/hubspot_greenhouse_integration/app.py).
+
+Helpers nuevos en `hubspot_client.py`:
+
+- `create_service(properties: dict[str, Any]) -> dict[str, Any]` — POST `/crm/v3/objects/0-162`. Mirror de `create_deal` (línea 206). Properties mínimas requeridas por HubSpot: `hs_name`, `hs_pipeline_stage`. Resto opcional (incluye `ef_greenhouse_service_id` para idempotency).
+- `update_service(service_id: str, properties: dict[str, Any]) -> dict[str, Any]` — PATCH `/crm/v3/objects/0-162/{service_id}`. Mirror de `update_quote` (línea 959). Para asignar `hubspot_service_id` post-create cuando outbound necesite parchear.
+- `find_service_by_idempotency_key(key: str) -> dict[str, Any] | None` — POST `/crm/v3/objects/0-162/search`. Mirror de `find_deal_by_idempotency_key` (línea 264). FilterGroups: `[{filters: [{propertyName: 'ef_greenhouse_service_id', operator: 'EQ', value: key}]}]`. Devuelve `None` si search no matchea (no throw).
+
+Routes nuevas en `app.py` (mirror del shape `/services/<id>` ya existente en línea 896):
+
+- `POST /services` — body: `{properties: {...}}` → llama `create_service` → response `{ok, hubspotServiceId, properties}`.
+- `PATCH /services/<service_id>` — body: `{properties: {...}}` → llama `update_service` → response `{ok, properties}`.
+- `GET /services/by-idempotency-key/<key>` → llama `find_service_by_idempotency_key` → response `{ok, hubspotServiceId | null, properties | null}`.
+
+Auth: las 3 routes nuevas siguen el patrón existente del bridge (Bearer `GREENHOUSE_INTEGRATION_API_TOKEN`). NO bypass.
+
+Tests Python (pytest, en `services/hubspot_greenhouse_integration/tests/`):
+
+- `test_create_service_happy_path` — mock HubSpot 200 + valid response.
+- `test_create_service_validation_error_propagates` — mock HubSpot 400 → bridge raises `HubSpotIntegrationError(status_code=400, error_code='HUBSPOT_VALIDATION')`.
+- `test_create_service_rate_limit_propagates_retry_after` — mock HubSpot 429 + Retry-After header → bridge raises con `retry_after` populated.
+- `test_find_service_by_key_no_match_returns_none` — mock search results empty → returns None (no throw).
+- `test_find_service_by_key_match_returns_record` — mock 1 result → returns dict.
+- `test_update_service_happy_path` — mock 200.
+
+Deploy: via GitHub Actions workflow `hubspot-greenhouse-integration-deploy.yml` (auto-trigger on push a `develop` que toque `services/hubspot_greenhouse_integration/**`). Verificar `gh run list --workflow=hubspot-greenhouse-integration-deploy.yml --limit 1` → status `success` antes de marcar slice complete.
+
+Smoke verification post-deploy:
+
+- `curl https://hubspot-greenhouse-integration-y6egnifl6a-uc.a.run.app/health` → 200.
+- `curl GET .../services/by-idempotency-key/<random-uuid>` con auth → 200 + `{ok: true, hubspotServiceId: null}` (no match esperado para uuid random).
+
+Rollback: `gh run rerun` del workflow del commit anterior, O `gcloud run services update-traffic hubspot-greenhouse-integration --to-revisions=PREVIOUS=100 --region=us-central1`.
+
+#### Sub-slice 0.5c — Migration PG `idempotency_key` + extender `hubspot_sync_status` enum
+
+Owner del cambio: nueva migration en [migrations/](migrations/) generada via `pnpm migrate:create task-837-services-idempotency-key-and-sync-status-states`.
+
+Cambios DDL:
+
+```sql
+-- Up Migration
+
+-- 1. Agregar columna idempotency_key a services
+ALTER TABLE greenhouse_core.services
+  ADD COLUMN IF NOT EXISTS idempotency_key TEXT NULL;
+
+CREATE UNIQUE INDEX IF NOT EXISTS services_idempotency_key_unique
+  ON greenhouse_core.services (idempotency_key)
+  WHERE idempotency_key IS NOT NULL;
+
+-- 2. Extender CHECK constraint hubspot_sync_status con los 5 valores nuevos del outbound state machine
+--    Valores actuales (TASK-813/836): pending | synced | unmapped
+--    Valores nuevos (TASK-837): outbound_pending | outbound_in_progress | ready | partial_associations | outbound_dead_letter
+ALTER TABLE greenhouse_core.services
+  DROP CONSTRAINT IF EXISTS services_hubspot_sync_status_check;
+
+ALTER TABLE greenhouse_core.services
+  ADD CONSTRAINT services_hubspot_sync_status_check
+  CHECK (hubspot_sync_status IS NULL OR hubspot_sync_status IN (
+    'pending',
+    'synced',
+    'unmapped',
+    'outbound_pending',
+    'outbound_in_progress',
+    'ready',
+    'partial_associations',
+    'outbound_dead_letter'
+  ));
+
+-- 3. Anti pre-up-marker bug guard
+DO $$
+DECLARE col_exists boolean;
+BEGIN
+  SELECT EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema = 'greenhouse_core'
+      AND table_name = 'services'
+      AND column_name = 'idempotency_key'
+  ) INTO col_exists;
+
+  IF NOT col_exists THEN
+    RAISE EXCEPTION 'TASK-837 anti pre-up-marker check: services.idempotency_key was NOT created. Migration markers may be inverted.';
+  END IF;
+END
+$$;
+
+-- Down Migration
+
+DROP INDEX IF EXISTS greenhouse_core.services_idempotency_key_unique;
+ALTER TABLE greenhouse_core.services DROP COLUMN IF EXISTS idempotency_key;
+ALTER TABLE greenhouse_core.services
+  DROP CONSTRAINT IF EXISTS services_hubspot_sync_status_check;
+ALTER TABLE greenhouse_core.services
+  ADD CONSTRAINT services_hubspot_sync_status_check
+  CHECK (hubspot_sync_status IS NULL OR hubspot_sync_status IN ('pending', 'synced', 'unmapped'));
+```
+
+Post-migrate: `pnpm db:generate-types` para regenerar `src/types/db.d.ts` con los nuevos valores del enum + columna. Commit el regen junto con la migration.
+
+Verificación post-apply:
+
+- `pnpm migrate:status` → migration listada como applied.
+- `psql ... -c "SELECT column_name, data_type FROM information_schema.columns WHERE table_schema='greenhouse_core' AND table_name='services' AND column_name='idempotency_key'"` → 1 row.
+- `psql ... -c "SELECT pg_get_constraintdef(oid) FROM pg_constraint WHERE conname='services_hubspot_sync_status_check'"` → CHECK con los 8 valores.
+- `pnpm pg:doctor` → green.
+
+Rollback: `pnpm migrate:down` ejecuta el Down marker que revierte CHECK + DROP COLUMN. Cero data loss porque `idempotency_key` no se ha poblado todavía.
+
+#### Slice 0.5 — Acceptance Criteria
+
+- [ ] Property `ef_greenhouse_service_id` existe en HubSpot `0-162` con shape correcto (verificado via GET metadata).
+- [ ] `scripts/create-hubspot-service-custom-properties.ts` extendido con la property; idempotente (skipea si ya existe).
+- [ ] Bridge endpoints `POST /services`, `PATCH /services/<id>`, `GET /services/by-idempotency-key/<key>` desplegados y respondiendo correctamente al smoke (verificado en Cloud Run logs + curl test).
+- [ ] Pytest suite del bridge pasa con los 6 tests nuevos (`pnpm test` en bridge dir o `pytest services/hubspot_greenhouse_integration/tests/`).
+- [ ] Migration PG aplicada en staging y prod; `idempotency_key` columna presente; CHECK constraint con 8 valores.
+- [ ] `src/types/db.d.ts` regenerado y commiteado (`pnpm db:generate-types`).
+- [ ] `pnpm pg:doctor` green post-migrate.
+- [ ] GitHub Actions workflow `hubspot-greenhouse-integration-deploy.yml` corrió exitosamente para el commit del slice.
+- [ ] Plan de rollback documentado en PR description (property archive + Cloud Run revision rollback + `pnpm migrate:down`).
+
+#### Slice 0.5 — Out of Scope
+
+- NO implementar el reactive consumer outbound (eso es Slice 4).
+- NO implementar el wizard Deal selection (eso es Slice 2).
+- NO escribir lógica de outbox emit en `declareSampleSprint()` (eso es Slice 3).
+- NO setear `idempotency_key` en INSERTs existentes (queda NULL para todos los registros pre-Slice 3; sólo nuevos services post-Slice 3 lo tendrán populated).
 
 ### Slice 1 — Eligible Deal Source
 
