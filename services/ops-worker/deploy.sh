@@ -682,6 +682,13 @@ upsert_scheduler_job \
 echo "  -> ops-finance-rematerialize-balances: 0 5 * * * America/Santiago (daily 05:00, last 7 days, TASK-702)"
 
 upsert_scheduler_job \
+  "ops-finance-fx-drift-remediate" \
+  "15 5 * * *" \
+  "/finance/account-balances/fx-drift/remediate" \
+  '{"triggeredBy":"cloud_scheduler","dryRun":false,"policy":"known_bug_class_restatement","windowDays":90,"maxRows":25,"maxAccounts":10,"maxAbsDriftClp":"5000000"}'
+echo "  -> ops-finance-fx-drift-remediate: 15 5 * * * America/Santiago (daily 05:15, bounded account_balances FX drift remediation, TASK-842)"
+
+upsert_scheduler_job \
   "ops-finance-ledger-health" \
   "30 5 * * *" \
   "/finance/ledger-health-check" \

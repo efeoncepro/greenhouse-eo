@@ -27,3 +27,20 @@ describe('ops-worker deploy Nubox contract', () => {
     expect(script).not.toContain('NUBOX_X_API_KEY=$(normalize_secret_ref_for_cloud_run')
   })
 })
+
+describe('ops-worker deploy finance FX drift remediation contract', () => {
+  it('schedules bounded remediation after daily rematerialization and before ledger health', () => {
+    const script = deployScript()
+    const rematerializeIndex = script.indexOf('ops-finance-rematerialize-balances')
+    const fxDriftIndex = script.indexOf('ops-finance-fx-drift-remediate')
+    const ledgerHealthIndex = script.indexOf('ops-finance-ledger-health')
+
+    expect(fxDriftIndex).toBeGreaterThan(rematerializeIndex)
+    expect(fxDriftIndex).toBeLessThan(ledgerHealthIndex)
+    expect(script).toContain('/finance/account-balances/fx-drift/remediate')
+    expect(script).toContain('"policy":"known_bug_class_restatement"')
+    expect(script).toContain('"maxRows":25')
+    expect(script).toContain('"maxAccounts":10')
+    expect(script).toContain('"maxAbsDriftClp":"5000000"')
+  })
+})
