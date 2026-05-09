@@ -21,6 +21,18 @@
 - Preview/Staging/Production vigentes deben seguir lo declarado en `AGENTS.md` y `RELEASE_CHANNELS_OPERATING_MODEL_V1.md`; si un delta antiguo de Vercel contradice esos contratos, tratarlo como historia y revalidar con Vercel CLI/runtime.
 - **Software Architect 2026 skill:** Codex ahora tiene la skill local invocable `software-architect-2026` en `.codex/skills/software-architect-2026/`. Se adapto desde el paquete Claude entregado por el usuario y conserva referencias, checklists, templates y overlay Efeonce. Uso esperado: decisiones de arquitectura, ADRs, C4, stack picks, auditorias, migraciones, threat models, cost estimates y handoff a TASK docs. En Greenhouse, `AGENTS.md`, `project_context.md`, `Handoff.md` y la task vigente prevalecen si alguna referencia del overlay queda stale.
 
+## Delta 2026-05-09 ISSUE-072 smoke-lane publisher hardening
+
+- Los warnings `sync:smoke-lane <lane> failed (non-blocking)` en Playwright eran un incidente de plataforma, no ruido aceptable. Causas reales encadenadas: script sin `server-only` shim, secret ref `secret:version` inválido, WIF deployer sin `roles/cloudsql.client` y saturación transitoria Cloud SQL/Postgres (`53300`).
+- Contrato vigente:
+  - `pnpm sync:smoke-lane` carga `scripts/lib/server-only-shim.cjs`.
+  - Playwright usa `GREENHOUSE_POSTGRES_PASSWORD_SECRET_REF=greenhouse-pg-dev-app-password`, no `greenhouse-pg-dev-app-password:latest`.
+  - `github-actions-deployer@efeonce-group.iam.gserviceaccount.com` tiene `roles/cloudsql.client`, versionado en `scripts/setup-github-actions-wif.sh`.
+  - publishers CI livianos usan `GREENHOUSE_POSTGRES_MAX_CONNECTIONS=1`.
+  - `src/lib/postgres/client.ts` reintenta con backoff acotado errores transitorios de conexión (`53300`, `080xx`, `57P0x`, TLS/reset/too many connections) y sigue fallando loud si persisten.
+- Verificación final: Playwright run `25605103310` publicó `finance.web`, `delivery.web` e `identity.web` con `36/36 passed`; CI run `25605103305` pasó lint, tests, coverage y build.
+- Issue formal: `docs/issues/resolved/ISSUE-072-ci-smoke-lane-publisher-failed-non-blocking.md`.
+
 ## Delta 2026-05-03 TASK-777 expense distribution close gate
 
 - Finance management accounting ya no debe consumir `expenses.economic_category` directo como decisión final de P&L. La primitive canónica es `greenhouse_finance.expense_distribution_resolution`.

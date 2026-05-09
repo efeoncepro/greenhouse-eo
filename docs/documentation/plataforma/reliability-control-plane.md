@@ -3,7 +3,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
 > **Version:** 1.0
 > **Creado:** 2026-04-25 por agente (TASK-638)
-> **Ultima actualizacion:** 2026-04-25
+> **Ultima actualizacion:** 2026-05-09
 > **Documentacion tecnica:** [GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1.md](../../architecture/GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1.md)
 
 ---
@@ -65,6 +65,19 @@ Una señal es la unidad atomica del RCP. Cada señal tiene severidad, fuente, ev
 | `ai_summary` | Resumen narrativo generado por Gemini Flash sobre el estado del modulo |
 
 En particular, las señales `subsystem` no siempre usan el mismo tipo de contador. Algunas vienen de runs homogéneos (`procesados` / `fallidos`), pero otras necesitan resumen semántico propio. Ejemplo: `Finance Data Quality` separa drift real, costos directos sin cliente y cartera vencida de overhead compartido permitido; el summary que ves en RCP debe venir del dominio Finance, no de una frase genérica armada aguas abajo.
+
+### Smoke lanes Playwright
+
+Los smoke lanes Playwright son una fuente `test_lane`: validan flujos críticos del portal y luego publican el resultado a Postgres con `pnpm sync:smoke-lane <lane-key>`.
+
+La regla operativa es:
+
+- si una prueba falla, el lane puede quedar `failed`; eso es una señal funcional válida
+- el publisher no debe fallar por tooling, permisos, secretos o saturación transitoria
+- el log esperado en CI es `[smoke-lane-publish] lane=<lane> status=<passed|failed|flaky>`
+- si aparece `sync:smoke-lane <lane> failed (non-blocking)`, se trata como incidente de plataforma, no como ruido normal
+
+Desde ISSUE-072, el publisher usa el carril canónico: WIF, Cloud SQL Connector, Secret Manager, pool `1` y retry/backoff en la primitive Postgres compartida.
 
 ### Severidades
 

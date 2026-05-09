@@ -34,6 +34,7 @@ Regla canonica: `docs/operations/ARCHITECTURE_DECISION_RECORD_OPERATING_MODEL_V1
 | Compliance exports Chile son proyecciones payroll versionadas, no source of truth ni calculo paralelo | Accepted | Payroll / HR compliance / Previred / LRE | [GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md](GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md) | TASK-812; exige discovery oficial antes de generadores y corrige supuestos Previred/LRE stale. |
 | Direct service expense allocation requiere ancla explicita expense -> service | Accepted | Finance / Commercial cost attribution | [GREENHOUSE_COMMERCIAL_COST_ATTRIBUTION_V1.md](GREENHOUSE_COMMERCIAL_COST_ATTRIBUTION_V1.md) | TASK-815; no inferir por cliente/nombre/linea. |
 | Governance tables de capabilities tienen FK a registry + CI migration marker gate | Accepted | Identity / Access / DB migrations / CI | [Handoff.md](../../Handoff.md) | TASK-838/ISSUE-068; runtime guard + CI gate anti pre-up-marker bug. |
+| Smoke-lane publisher usa WIF + Cloud SQL Connector + Postgres primitive resiliente | Accepted | CI / Reliability / PostgreSQL / GCP IAM | [GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1.md](GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1.md#delta-2026-05-09--issue-072-smoke-lane-publisher-reliability) | ISSUE-072; no silenciar warnings `sync:smoke-lane failed`, corregir shim/secrets/IAM/pool/backoff. |
 
 ## Pendientes de formalizacion retroactiva
 

@@ -27,6 +27,7 @@
 #        roles/secretmanager.admin             (bind secret accessors)
 #        roles/storage.admin                   (Cloud Build GCS staging)
 #        roles/artifactregistry.writer         (push built images)
+#        roles/cloudsql.client                 (Cloud SQL Connector for CI publishers)
 #        roles/iam.serviceAccountUser on
 #            greenhouse-portal@efeonce-group   (use as runtime SA)
 #
@@ -101,6 +102,7 @@ PROJECT_ROLES=(
   "roles/secretmanager.admin"
   "roles/storage.admin"
   "roles/artifactregistry.writer"
+  "roles/cloudsql.client"
   # Required so `gcloud builds submit` can stream Cloud Build logs back to
   # the workflow output. Without it the submit succeeds but gcloud errors
   # on log-stream retrieval, masking an otherwise-green build as a failure.

@@ -5,9 +5,29 @@
 > Versión: `1.5`
 > Estado: `vigente`
 > Creada: `2026-04-25` por TASK-600
-> Última actualización: `2026-05-03` por TASK-768 (2 signals nuevos para `economic_category_unresolved`)
+> Última actualización: `2026-05-09` por ISSUE-072 (smoke-lane publisher hardening)
 
 ---
+
+## Delta 2026-05-09 — ISSUE-072 smoke-lane publisher reliability
+
+Los smoke lanes Playwright publican su resultado en `greenhouse_sync.smoke_lane_runs` mediante `pnpm sync:smoke-lane <lane-key>`. Esa publicación es best-effort respecto del resultado E2E, pero no debe fallar de forma cotidiana ni generar ruido permanente en GitHub Actions.
+
+Contrato vigente:
+
+- `pnpm sync:smoke-lane` carga `scripts/lib/server-only-shim.cjs` porque importa primitives server-side (`src/lib/postgres/client.ts`, Secret Manager).
+- El workflow Playwright autentica con WIF y usa `github-actions-deployer@efeonce-group.iam.gserviceaccount.com`.
+- El service account GitHub debe tener `roles/cloudsql.client` para Cloud SQL Connector.
+- `GREENHOUSE_POSTGRES_PASSWORD_SECRET_REF` debe ser nombre canónico de Secret Manager o ruta completa; no `secret:version`.
+- El publisher usa `GREENHOUSE_POSTGRES_MAX_CONNECTIONS=1`.
+- La primitive Postgres compartida reintenta con backoff acotado errores transitorios de conexión (`53300`, `080xx`, `57P0x`, TLS/reset/too many connections).
+
+Steady state esperado en CI:
+
+- Playwright puede pasar o fallar por razones funcionales del producto.
+- El paso `Publish smoke-lane results to PG` debe terminar OK y registrar logs `[smoke-lane-publish] lane=<lane> status=<passed|failed|flaky>`.
+- No deben aparecer annotations `sync:smoke-lane <lane> failed (non-blocking)`.
+- Si reaparecen, se debe tratar como incidente operacional nuevo y revisar en este orden: server-only shim, secret ref, WIF/IAM, Cloud SQL saturation, schema/grants.
 
 ## Delta 2026-05-03 — TASK-768 subsystem `Finance Data Quality` (2 signals nuevos para economic_category)
 

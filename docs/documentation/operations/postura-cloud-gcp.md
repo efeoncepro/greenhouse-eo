@@ -62,6 +62,18 @@ En otras palabras:
 - el costo idle artificial ya bajo
 - la postura de seguridad / identidad del servicio todavia no esta cerrada
 
+## Delta 2026-05-09 — GitHub Actions y Cloud SQL para publishers CI
+
+El service account `github-actions-deployer@efeonce-group.iam.gserviceaccount.com` ya tiene `roles/cloudsql.client`. Esto permite que workflows CI que publican evidencia operativa, como Playwright smoke lanes, usen Cloud SQL Connector sin claves JSON ni credenciales manuales.
+
+Regla práctica:
+
+- mantener WIF como único carril de autenticación GitHub Actions -> GCP
+- resolver password Postgres via Secret Manager
+- usar el cliente Postgres canónico del repo
+- limitar publishers livianos a 1 conexión
+- tratar un fallo del publisher como incidente de plataforma, aunque la suite E2E sea best-effort
+
 ## Que Significa Operativamente
 
 Greenhouse ya tiene una base moderna sobre la cual crecer, pero todavia no tiene una postura cloud homogenea.

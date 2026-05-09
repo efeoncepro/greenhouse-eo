@@ -1,5 +1,19 @@
 # Greenhouse PostgreSQL Access Model V1
 
+## Delta 2026-05-09 — CI smoke-lane publisher usa WIF + Cloud SQL Client + pool acotado
+
+- El publisher `pnpm sync:smoke-lane` en GitHub Actions escribe resultados Playwright en `greenhouse_sync.smoke_lane_runs` usando el mismo carril que runtime Node.js:
+  - WIF con `github-actions-deployer@efeonce-group.iam.gserviceaccount.com`
+  - Cloud SQL Connector
+  - Secret Manager via `GREENHOUSE_POSTGRES_PASSWORD_SECRET_REF`
+  - login Postgres runtime `greenhouse_app`
+- La identidad GitHub requiere `roles/cloudsql.client` para que el Connector pueda leer metadata de `greenhouse-pg-dev`; este rol queda versionado en `scripts/setup-github-actions-wif.sh`.
+- Los workflows deben pasar el nombre canónico del secreto (`greenhouse-pg-dev-app-password`) o una ruta completa `projects/.../secrets/.../versions/...`; el formato `secret:version` no es contrato válido.
+- Los publishers CI livianos deben usar `GREENHOUSE_POSTGRES_MAX_CONNECTIONS=1` para no aportar presión innecesaria a la instancia compartida.
+- Errores transitorios de conexión como `53300 remaining connection slots are reserved`, `080xx` y `57P0x` se absorben en `src/lib/postgres/client.ts` con backoff acotado y reset de pool. Errores persistentes siguen fallando loud.
+
+Issue cerrado: `ISSUE-072`.
+
 ## Delta 2026-05-06 — Runtime schema CREATE drift remediated
 
 - Se cerró el drift operativo documentado el 2026-04-23: `greenhouse_app` ya no tiene `CREATE` directo en:

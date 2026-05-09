@@ -3,7 +3,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
 > **Version:** 1.0
 > **Creado:** 2026-04-05 por GitHub Copilot (TASK-249)
-> **Ultima actualizacion:** 2026-04-05 por GitHub Copilot (TASK-249)
+> **Ultima actualizacion:** 2026-05-09 por Codex (ISSUE-072)
 > **Documentacion tecnica:** [12-testing-development.md](../../architecture/12-testing-development.md)
 
 ---
@@ -102,6 +102,25 @@ La lectura recomendada en CI es:
 3. solo si sigue habiendo dudas, abrir el log completo
 
 > **Detalle tecnico:** El workflow actual vive en [../../.github/workflows/ci.yml](../../.github/workflows/ci.yml).
+
+### Playwright smoke lanes
+
+El workflow Playwright usa el mismo principio de observabilidad, pero para E2E. Al terminar la suite, publica una fila por lane lógico en `greenhouse_sync.smoke_lane_runs` mediante `pnpm sync:smoke-lane`.
+
+Lectura rápida:
+
+- `status=passed` significa que el lane pasó y fue publicado.
+- `status=failed` significa que el lane detectó un fallo funcional y fue publicado correctamente.
+- `sync:smoke-lane <lane> failed (non-blocking)` no es un estado funcional del producto; indica que el publisher falló y debe diagnosticarse como plataforma.
+
+Contrato operativo vigente desde ISSUE-072:
+
+- el script carga `scripts/lib/server-only-shim.cjs`
+- GitHub Actions autentica con WIF
+- el deployer `github-actions-deployer@efeonce-group.iam.gserviceaccount.com` tiene `roles/cloudsql.client`
+- el secret ref es `greenhouse-pg-dev-app-password`, no `secret:version`
+- el pool del publisher se limita a `GREENHOUSE_POSTGRES_MAX_CONNECTIONS=1`
+- la primitive Postgres compartida reintenta con backoff errores transitorios como `53300`
 
 ---
 

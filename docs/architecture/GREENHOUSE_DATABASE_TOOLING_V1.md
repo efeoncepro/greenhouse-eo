@@ -22,6 +22,7 @@ Greenhouse operates 9+ PostgreSQL schemas on Cloud SQL (`greenhouse-pg-dev`, Pos
 - **SQL-first migrations.** Migrations are plain `.sql` files, not JavaScript DSL. Agents and operators can read and write them without framework knowledge.
 - **Forward-only Kysely.** Existing modules continue using `runGreenhousePostgresQuery()`. New modules should use Kysely for type safety. No retroactive migration.
 - **Profile-based credentials.** Migrations reuse the existing three-profile system (`runtime`, `migrator`, `admin`) from `scripts/lib/load-greenhouse-tool-env.ts`.
+- **Bounded resilience, not silent masking.** Transient Cloud SQL/Postgres connection failures are retried in the shared primitive with short backoff and pool reset. Persistent failures still bubble loudly to the caller.
 
 ---
 
@@ -256,6 +257,30 @@ These are two different mechanisms for the same database. The Connector is embed
 
 Uses Cloud SQL Connector + Secret Manager. No changes needed. Connection is managed by `src/lib/postgres/client.ts`.
 
+### CI and smoke-lane publishers
+
+GitHub Actions workflows that publish operational results to Postgres must use the same runtime posture:
+
+- authenticate to GCP via WIF as `github-actions-deployer@efeonce-group.iam.gserviceaccount.com`
+- require `roles/cloudsql.client` on that service account
+- resolve database password via `GREENHOUSE_POSTGRES_PASSWORD_SECRET_REF`
+- pass the secret **name** (for example `greenhouse-pg-dev-app-password`) or a full Secret Manager version path; do not use `secret:version`
+- cap lightweight publishers at `GREENHOUSE_POSTGRES_MAX_CONNECTIONS=1`
+- invoke existing package scripts that load `scripts/lib/server-only-shim.cjs` when the script imports server-only runtime modules
+
+For Playwright smoke-lane publishing, the canonical contract is:
+
+```yaml
+GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME: efeonce-group:us-east4:greenhouse-pg-dev
+GREENHOUSE_POSTGRES_DATABASE: greenhouse_app
+GREENHOUSE_POSTGRES_USER: greenhouse_app
+GREENHOUSE_POSTGRES_PASSWORD_SECRET_REF: greenhouse-pg-dev-app-password
+GREENHOUSE_POSTGRES_IP_TYPE: PUBLIC
+GREENHOUSE_POSTGRES_MAX_CONNECTIONS: '1'
+```
+
+If the publisher sees `53300` / "remaining connection slots are reserved", the shared Postgres client treats it as retryable with bounded backoff. Do not solve this by swallowing the warning in workflow YAML or adding ad hoc `new Pool()` logic.
+
 ### CLI tools (migrations, setup, codegen)
 
 Use Cloud SQL Connector automatically when `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME` is set. No proxy needed.
@@ -303,6 +328,7 @@ GREENHOUSE_SKIP_PREFLIGHT=true pnpm pg:connect:migrate
 | `[ADC] no se pudo renovar ADC` | Browser flow falló o sin acceso a GCP | `gcloud auth application-default login` manual |
 | `[SQL] password authentication failed` | Credenciales mal o perfil equivocado | Verificar perfil en `.env.local` vs Secret Manager |
 | `[SQL] permission denied for table X` | Object owned by different user | Usar perfil `greenhouse_ops` (canonical owner) |
+| `[SQL] remaining connection slots are reserved` / `53300` | Cloud SQL/Postgres está bajo presión transitoria de conexiones | Usar la primitive canónica `src/lib/postgres/client.ts`, limitar publishers a `GREENHOUSE_POSTGRES_MAX_CONNECTIONS=1`, y revisar saturación si persiste |
 | `ECONNREFUSED 127.0.0.1:15432` (sin prefijo) | Proxy no está corriendo y se invocó `pnpm migrate:up` directo | Usar `pnpm pg:connect:migrate` |
 | `SSL SYSCALL error` | SSL encima del túnel del proxy | `GREENHOUSE_POSTGRES_SSL=false` (el proxy ya cifra) |
 
