@@ -57,6 +57,7 @@ import {
 import { getShortcutsInvalidPinsSignal } from './queries/shortcuts-invalid-pins'
 import { getWorkspaceProjectionFacetViewDriftSignal } from './queries/workspace-projection-drift'
 import { getWorkspaceProjectionUnresolvedRelationsSignal } from './queries/workspace-projection-unresolved-relations'
+import { getCloudRunSilentObservabilitySignal } from './queries/cloud-run-silent-observability'
 import { getCriticalTablesMissingSignal } from './queries/critical-tables-missing'
 import { getOutboxUnpublishedLagSignal } from './queries/outbox-unpublished-lag'
 import { getOutboxDeadLetterSignal } from './queries/outbox-dead-letter'
@@ -431,6 +432,13 @@ interface ReliabilityOverviewSources {
   criticalTablesMissing?: ReliabilitySignal | null
 
   /**
+   * TASK-844 Slice 5 — Cross-runtime observability anti-regresión.
+   *   - observability.cloud_run.silent_failure_rate (drift, error si > 0)
+   * Detecta Sentry init regression en Cloud Run services. Roll up bajo moduleKey 'cloud'.
+   */
+  cloudRunSilentObservability?: ReliabilitySignal | null
+
+  /**
    * TASK-813 Slice 6 — Commercial engagement instance (HubSpot p_services 0-162) signals (3):
    *   - commercial.service_engagement.sync_lag (lag, warning)
    *   - commercial.service_engagement.organization_unresolved (drift, error)
@@ -514,6 +522,8 @@ export const buildReliabilityOverview = (
     ...(sources.nuboxSourceFreshness ? [sources.nuboxSourceFreshness] : []),
     // TASK-838 Fase 3 — Runtime guard: critical tables missing in PG.
     ...(sources.criticalTablesMissing ? [sources.criticalTablesMissing] : []),
+    // TASK-844 Slice 5 — Cross-runtime observability anti-regresión.
+    ...(sources.cloudRunSilentObservability ? [sources.cloudRunSilentObservability] : []),
     // TASK-813 Slice 6 — Commercial engagement instance signals (3).
     ...(sources.servicesEngagement ?? []),
     // TASK-807 — Commercial Health signals (six Sample Sprints health gates).
@@ -817,6 +827,15 @@ export const getReliabilityOverview = async (
       ? preloadedSources.criticalTablesMissing
       : await getCriticalTablesMissingSignal().catch(() => null)
 
+  // TASK-844 Slice 5 — Cross-runtime observability anti-regresión. Detecta
+  // Cloud Run services con Sentry init regresado o secret missing (ISSUE-074
+  // class). Steady=0; cualquier > 0 indica observabilidad rota en algún
+  // service. Degrada `unknown` si la query falla.
+  const cloudRunSilentObservability =
+    preloadedSources.cloudRunSilentObservability !== undefined
+      ? preloadedSources.cloudRunSilentObservability
+      : await getCloudRunSilentObservabilitySignal().catch(() => null)
+
   // TASK-813 Slice 6 + TASK-836 Slice 7 — Commercial engagement instance signals.
   // 3 readers TASK-813 + 4 readers TASK-836 en paralelo. Cada uno degrada
   // honestamente a `unknown` si su query falla. Roll up bajo moduleKey 'commercial'.
@@ -886,6 +905,7 @@ export const getReliabilityOverview = async (
     financeClientProfileUnlinked,
     nuboxSourceFreshness,
     criticalTablesMissing,
+    cloudRunSilentObservability,
     servicesEngagement,
     commercialHealth
   })
