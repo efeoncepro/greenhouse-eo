@@ -118,28 +118,39 @@ executed_by: 'jreysgo@gmail.com (via Claude Code agent)'
 
 pipeline:
   pipeline_id: 'ba9cdbd6-e220-45b2-a5a2-d67ebdcbade6'
+  # Orden final post-correccion del usuario 2026-05-09 (HubSpot UI drag manual):
+  # Validacion → Onboarding → Activo → En renovacion → Renovado → Closed → Pausado
+  # Mi POST inicial creo Validacion en displayOrder=1; usuario la movio a displayOrder=0
+  # via UI ademas de cambiar su estado de "undefined" a "Abierto" (isClosed=false).
   stages:
-    - label: 'Onboarding'
-      id: '8e2b21d0-7a90-4968-8f8c-a8525cc49c70'
-      display_order: 0
     - label: 'Validación / Sample Sprint'
       id: '1357763256'
-      display_order: 1  # HubSpot API ignoró PATCH a displayOrder=0 (mantiene orden de creación). Mapper opera por stage ID, no por orden visual; RevOps puede arrastrar stage en HubSpot UI si lo prefiere.
+      display_order: 0  # corregido por usuario via UI
+      hs_state: 'Abierto'  # corregido por usuario de undefined → Abierto (isClosed=false)
+    - label: 'Onboarding'
+      id: '8e2b21d0-7a90-4968-8f8c-a8525cc49c70'
+      display_order: 1
+      hs_state: 'Abierto'
     - label: 'Activo'
       id: '600b692d-a3fe-4052-9cd7-278b134d7941'
       display_order: 2
+      hs_state: 'Abierto'
     - label: 'En renovación'
       id: 'de53e7d9-6b57-4701-b576-92de01c9ed65'
       display_order: 3
+      hs_state: 'Abierto'
     - label: 'Renovado'
       id: '1324827222'
       display_order: 4
+      hs_state: 'Abierto'
     - label: 'Closed'
       id: '1324827223'
       display_order: 5
+      hs_state: 'Cerrado'  # unico stage con isClosed=true
     - label: 'Pausado'
       id: '1324827224'
       display_order: 6
+      hs_state: 'Abierto'  # OJO: HubSpot Abierto, Greenhouse active=FALSE (decision Q1 spec — pausado no contribuye a P&L del periodo)
 
 property:
   internal_name: 'ef_engagement_kind'
