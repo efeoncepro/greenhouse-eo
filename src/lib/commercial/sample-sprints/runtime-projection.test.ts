@@ -10,6 +10,14 @@ vi.mock('@/lib/commercial-cost-attribution/v2-reader', () => ({
   readCommercialCostAttributionByServiceForPeriodV2: vi.fn()
 }))
 
+vi.mock('./team-enrichment', () => ({
+  enrichProposedTeam: vi.fn()
+}))
+
+vi.mock('./capacity-risk', () => ({
+  resolveCapacityRiskForSprint: vi.fn()
+}))
+
 vi.mock('./store', () => ({
   listSampleSprints: vi.fn(),
   getSampleSprintDetail: vi.fn()
@@ -27,7 +35,9 @@ vi.mock('./health', () => ({
 
 import { readCommercialCostAttributionByServiceForPeriodV2 } from '@/lib/commercial-cost-attribution/v2-reader'
 
+import { resolveCapacityRiskForSprint } from './capacity-risk'
 import { getSampleSprintDetail, listSampleSprints } from './store'
+import { enrichProposedTeam } from './team-enrichment'
 
 import {
   __clearAllProjectionCache,
@@ -44,6 +54,9 @@ const mockedGetSampleSprintDetail = getSampleSprintDetail as unknown as ReturnTy
 
 const mockedReadCostAttribution =
   readCommercialCostAttributionByServiceForPeriodV2 as unknown as ReturnType<typeof vi.fn>
+
+const mockedEnrichProposedTeam = enrichProposedTeam as unknown as ReturnType<typeof vi.fn>
+const mockedResolveCapacityRisk = resolveCapacityRiskForSprint as unknown as ReturnType<typeof vi.fn>
 
 import type { TenantContext } from '@/lib/tenant/get-tenant-context'
 
@@ -103,6 +116,8 @@ describe('runtime-projection — Slice 1 skeleton', () => {
     __resetDegradationCounterForTests()
     vi.clearAllMocks()
     mockedReadCostAttribution.mockResolvedValue(new Map<string, number>())
+    mockedEnrichProposedTeam.mockResolvedValue({ team: [], hasUnresolvedMembers: false })
+    mockedResolveCapacityRisk.mockResolvedValue({ capacityRisk: null, allLookupsFailed: false })
   })
 
   it('proyecta items con shape canónico cuando todas las fuentes resuelven OK', async () => {
@@ -235,7 +250,7 @@ describe('runtime-projection — Slice 1 skeleton', () => {
     expect(getRecentProjectionDegradationCount()).toBe(1)
   })
 
-  it('cuando hay selectedServiceId, fetchea detalle y popula selected', async () => {
+  it('cuando hay selectedServiceId, fetchea detalle y popula selected con team enrichment', async () => {
     mockedListSampleSprints.mockResolvedValue([buildItem({ serviceId: 'svc-001' })])
     mockedGetSampleSprintDetail.mockResolvedValue({
       ...buildItem({ serviceId: 'svc-001' }),
@@ -246,6 +261,17 @@ describe('runtime-projection — Slice 1 skeleton', () => {
       outcome: null,
       auditEvents: []
     })
+    mockedEnrichProposedTeam.mockResolvedValue({
+      team: [{
+        memberId: 'mem-1',
+        displayName: 'Daniela España',
+        roleTitle: 'Tech Lead',
+        proposedFte: 0.5,
+        commitmentRole: 'Lead',
+        unresolved: false
+      }],
+      hasUnresolvedMembers: false
+    })
 
     const projection = await resolveSampleSprintRuntimeProjection({
       tenant: buildTenant(),
@@ -255,10 +281,82 @@ describe('runtime-projection — Slice 1 skeleton', () => {
     expect(projection.selected).not.toBeNull()
     expect(projection.selected!.serviceId).toBe('svc-001')
     expect(projection.selected!.team).toHaveLength(1)
-    expect(projection.selected!.team[0]!.memberId).toBe('mem-1')
-    expect(projection.selected!.team[0]!.unresolved).toBe(true) // Slice 1: enrichment placeholder
+    expect(projection.selected!.team[0]!.displayName).toBe('Daniela España')
+    expect(projection.selected!.team[0]!.unresolved).toBe(false)
     // Sin snapshots ni outcome → degraded progress_snapshot_missing
     expect(projection.degraded.some(reason => reason.code === 'progress_snapshot_missing')).toBe(true)
+  })
+
+  it('eleva degraded team_enrichment_failed cuando hay miembros unresolved', async () => {
+    mockedListSampleSprints.mockResolvedValue([buildItem({ serviceId: 'svc-001' })])
+    mockedGetSampleSprintDetail.mockResolvedValue({
+      ...buildItem({ serviceId: 'svc-001' }),
+      successCriteria: {},
+      proposedTeam: [{ memberId: 'mem-stale', proposedFte: 0.5, role: null }],
+      approval: null,
+      latestSnapshots: [],
+      outcome: null,
+      auditEvents: []
+    })
+    mockedEnrichProposedTeam.mockResolvedValue({
+      team: [{
+        memberId: 'mem-stale',
+        displayName: null,
+        roleTitle: null,
+        proposedFte: 0.5,
+        commitmentRole: null,
+        unresolved: true
+      }],
+      hasUnresolvedMembers: true
+    })
+
+    const projection = await resolveSampleSprintRuntimeProjection({
+      tenant: buildTenant(),
+      selectedServiceId: 'svc-001'
+    })
+
+    expect(projection.degraded.some(reason => reason.code === 'team_enrichment_failed')).toBe(true)
+    expect(projection.degraded.find(reason => reason.code === 'team_enrichment_failed')?.severity).toBe('warning')
+  })
+
+  it('popula capacityRisk en selected cuando el evaluator devuelve datos', async () => {
+    mockedListSampleSprints.mockResolvedValue([buildItem({ serviceId: 'svc-001' })])
+    mockedGetSampleSprintDetail.mockResolvedValue({
+      ...buildItem({ serviceId: 'svc-001' }),
+      successCriteria: {},
+      proposedTeam: [{ memberId: 'mem-1', proposedFte: 0.6, role: null }],
+      approval: null,
+      latestSnapshots: [],
+      outcome: null,
+      auditEvents: []
+    })
+    mockedEnrichProposedTeam.mockResolvedValue({
+      team: [{
+        memberId: 'mem-1',
+        displayName: 'A',
+        roleTitle: null,
+        proposedFte: 0.6,
+        commitmentRole: null,
+        unresolved: false
+      }],
+      hasUnresolvedMembers: false
+    })
+    mockedResolveCapacityRisk.mockResolvedValue({
+      capacityRisk: {
+        severity: 'critical',
+        overcommittedMemberIds: ['mem-1'],
+        summary: '1 miembro sobre asignado'
+      },
+      allLookupsFailed: false
+    })
+
+    const projection = await resolveSampleSprintRuntimeProjection({
+      tenant: buildTenant(),
+      selectedServiceId: 'svc-001'
+    })
+
+    expect(projection.selected!.capacityRisk?.severity).toBe('critical')
+    expect(projection.selected!.hasCapacityRisk).toBe(true)
   })
 })
 

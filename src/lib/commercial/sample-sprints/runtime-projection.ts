@@ -5,6 +5,9 @@ import { captureWithDomain } from '@/lib/observability/capture'
 import { isSourceDegraded, withSourceTimeout } from '@/lib/platform-health/with-source-timeout'
 import type { TenantContext } from '@/lib/tenant/get-tenant-context'
 
+import { resolveCapacityRiskForSprint } from './capacity-risk'
+import { enrichProposedTeam } from './team-enrichment'
+
 import {
   __getProjectionCacheSize,
   buildProjectionCacheKey,
@@ -417,23 +420,85 @@ export const resolveSampleSprintRuntimeProjection = async (
         }
       }
 
-      // Slice 3 enriquece con LEFT JOIN members + capacity. Slice 1: passthrough con unresolved=true.
-      const team: SampleSprintRuntimeTeamMember[] = detail.proposedTeam.map((member: SampleSprintTeamMemberInput) => ({
-        memberId: member.memberId,
-        displayName: null,
-        roleTitle: null,
-        proposedFte: member.proposedFte,
-        commitmentRole: member.role ?? null,
-        unresolved: true
-      }))
+      // Slice 3 — enriquecimiento canónico de team + capacity risk.
+      const teamResult = await withSourceTimeout(
+        async () => enrichProposedTeam(detail.proposedTeam),
+        { source: 'sample-sprints.team-enrichment', timeoutMs: SOURCE_TIMEOUT_MS }
+      )
 
-      const capacityRisk: SampleSprintRuntimeCapacityRisk | null = null
+      let team: SampleSprintRuntimeTeamMember[] = []
+
+      if (isSourceDegraded(teamResult)) {
+        captureWithDomain(new Error(teamResult.error ?? 'team enrichment source degraded'), 'commercial', {
+          tags: { source: 'sample_sprints_runtime_projection', stage: 'team_enrichment', serviceId: detail.serviceId }
+        })
+        recordDegraded(buildDegradedReason(
+          'team_enrichment_failed',
+          'team',
+          'warning',
+          'No se pudieron resolver los miembros propuestos del sprint.'
+        ))
+        // Fallback honest — team queda con unresolved=true para todos.
+        team = detail.proposedTeam.map((member: SampleSprintTeamMemberInput) => ({
+          memberId: member.memberId,
+          displayName: null,
+          roleTitle: null,
+          proposedFte: member.proposedFte,
+          commitmentRole: member.role ?? null,
+          unresolved: true
+        }))
+      } else {
+        team = teamResult.value?.team ?? []
+
+        if (teamResult.value?.hasUnresolvedMembers) {
+          recordDegraded(buildDegradedReason(
+            'team_enrichment_failed',
+            'team',
+            'warning',
+            'Algunos miembros propuestos no resolvieron en el directorio activo.'
+          ))
+        }
+      }
+
+      const capacityResult = await withSourceTimeout(
+        async () => resolveCapacityRiskForSprint({
+          team,
+          startDate: detail.startDate,
+          targetEndDate: detail.targetEndDate
+        }),
+        { source: 'sample-sprints.capacity-risk', timeoutMs: SOURCE_TIMEOUT_MS }
+      )
+
+      let capacityRisk: SampleSprintRuntimeCapacityRisk | null = null
+
+      if (isSourceDegraded(capacityResult)) {
+        captureWithDomain(new Error(capacityResult.error ?? 'capacity risk source degraded'), 'commercial', {
+          tags: { source: 'sample_sprints_runtime_projection', stage: 'capacity', serviceId: detail.serviceId }
+        })
+        recordDegraded(buildDegradedReason(
+          'capacity_unresolvable',
+          'capacity',
+          'warning',
+          'No se pudo evaluar disponibilidad del equipo en este momento.'
+        ))
+      } else {
+        capacityRisk = capacityResult.value?.capacityRisk ?? null
+
+        if (capacityResult.value?.allLookupsFailed) {
+          recordDegraded(buildDegradedReason(
+            'capacity_unresolvable',
+            'capacity',
+            'warning',
+            'Lookups de capacidad fallaron para todos los miembros propuestos.'
+          ))
+        }
+      }
 
       selected = {
         serviceId: detail.serviceId,
         team,
         capacityRisk,
-        hasCapacityRisk: capacityRisk === null ? null : false
+        hasCapacityRisk: capacityRisk === null ? null : capacityRisk.severity === 'critical'
       }
 
       // Replace progress en items proyectados — el detalle es source of truth
