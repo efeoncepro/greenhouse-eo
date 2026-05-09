@@ -817,6 +817,49 @@ HubSpot Developer Platform 2025.2 cambió el shape del payload de webhooks. **Am
 
 **Spec canónica**: `docs/tasks/in-progress/TASK-836-hubspot-services-lifecycle-stage-sync-hardening.md`. Runbook config HubSpot: `docs/operations/runbooks/hubspot-service-pipeline-config.md`.
 
+### Cross-runtime observability — Sentry init invariant (TASK-844)
+
+`src/lib/**` corre en **5 runtimes distintos** y todos consumen el wrapper canónico `captureWithDomain` (207 callsites) para emitir incidents a Sentry con tag `domain` para roll-up por módulo en el reliability dashboard.
+
+| Runtime | Sentry init path | Status |
+|---|---|---|
+| **Vercel** (Next.js 16 App Router) | Auto vía `src/instrumentation.ts` → `sentry.server.config.ts` → `next.config.ts withSentryConfig` | ✅ canónico desde día 1 |
+| **ops-worker** Cloud Run (generic Node ESM) | `services/ops-worker/server.ts` línea de init invocando `initSentryForService('ops-worker')` desde `services/_shared/sentry-init.ts` | ✅ TASK-844 Slice 3 |
+| **commercial-cost-worker** Cloud Run | mismo patrón ops-worker | ✅ TASK-844 Slice 4 |
+| **ico-batch** Cloud Run | mismo patrón ops-worker | ✅ TASK-844 Slice 4 |
+| **hubspot_greenhouse_integration** Cloud Run (Python) | Out of scope (Python services tienen su propio SDK Sentry si emerge necesidad) | N/A |
+
+**Helper canónico**: `services/_shared/sentry-init.ts` (`initSentryForService(serviceName, options?)`).
+
+- DSN missing → `console.warn` once + return (graceful degradation, captureWithDomain hace no-op via Sentry SDK builtin fallback).
+- DSN present → `Sentry.init({ dsn, environment, serverName, release, tracesSampleRate })` + `Sentry.setTag('service', serviceName)`.
+- Idempotente — singleton flag previene doble init + warn spam.
+- Secret canónico GCP: `greenhouse-sentry-dsn` (Secret Manager). Si no existe, deploy.sh continúa con warn.
+
+**Wrapper canónico**: `src/lib/observability/capture.ts` importa `@sentry/node` (NO `@sentry/nextjs`). `@sentry/node` es el SDK underlying que `@sentry/nextjs` envuelve — runtime-portable. Sentry hub es global singleton: ambos runtimes acceden al mismo hub.
+
+**Contexto root cause** (ISSUE-074): TASK-813b (async intake p_services HubSpot via webhook → outbox → reactive consumer) nunca funcionó end-to-end en producción porque el wrapper importaba `@sentry/nextjs` cuyo shape variaba en runtime Cloud Run, causando `Sentry.captureException is not a function`. Detectado durante smoke test post-merge PR #113 (TASK-836 follow-up). Cerrado live 2026-05-09 19:30:04 con cycle PATCH→materialized verificado.
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** importar `@sentry/nextjs` directamente en código bajo `src/lib/`. Usar `captureWithDomain(err, '<domain>', { extra })` desde `src/lib/observability/capture.ts` que abstrae `@sentry/node` runtime-portable.
+- **NUNCA** crear nuevo Cloud Run Node service sin `initSentryForService(name)` como primera línea ejecutable de `server.ts`, después de imports y antes de `createServer`. Lint rule `greenhouse/cloud-run-services-must-init-sentry` (modo `error`) bloquea el commit.
+- **NUNCA** invocar `Sentry.captureException()` directo en code path con dominio claro. Usar `captureWithDomain(err, '<domain>', { extra })`. Sin tag `domain`, el incident no aparece en signals per-module del reliability dashboard.
+- **NUNCA** modificar `services/_shared/sentry-init.ts` para cambiar el contract de degradation. DSN missing DEBE no-op silenciosamente; observabilidad nunca bloquea path principal.
+- **NUNCA** mover el call `initSentryForService(...)` después del primer createServer/listen en `server.ts`. Tiene que correr antes de cualquier handler HTTP que pueda invocar funciones de `@/lib/**`.
+- **NUNCA** importar el helper desde `@/lib/...` o re-exportarlo desde `src/`. Vive intencionalmente en `services/_shared/` para preservar el boundary runtime (Vercel runtime usa init Next.js auto; Cloud Run runtime usa este helper explícito).
+- **NUNCA** crashear el helper si DSN tiene formato inválido — Sentry SDK valida internamente y degrada graceful.
+- **SIEMPRE** que emerja un Cloud Run Node service nuevo, agregar `initSentryForService('<nombre>')` + `COPY services/_shared/ ./services/_shared/` en Dockerfile + opcionalmente SENTRY_DSN secret mount en deploy.sh.
+- **SIEMPRE** que un nuevo runtime aparezca (ej. Cloudflare Workers, AWS Lambda, generic Bun service), validar que `@sentry/node` corre allí o adaptar el wrapper sin cambiar la superficie de import.
+
+**Defense-in-depth (3 capas)**:
+
+1. **Lint rule** `greenhouse/cloud-run-services-must-init-sentry` (modo `error`, TASK-844 Slice 6): bloquea commits que crean `services/<svc>/server.ts` con import de `@/lib/**` sin `initSentryForService` import + call.
+2. **Reliability signal** `observability.cloud_run.silent_failure_rate` (TASK-844 Slice 5): cuenta filas en `outbox_reactive_log` con `last_error LIKE '%captureException is not a function%'` últimas 24h. Steady=0; cualquier > 0 indica regresión runtime.
+3. **Cloud Logging stderr fallback**: si Sentry no está configurado, errores siguen visibles en Cloud Logging via `console.error`/`console.warn`. Helper escribe warn al startup cuando DSN missing.
+
+**Spec canónica**: `docs/tasks/in-progress/TASK-844-cross-runtime-observability-sentry-init.md`. ISSUE relacionado: `docs/issues/resolved/ISSUE-074-ops-worker-missing-sentry-bundle-blocks-projections.md` (post Slice 8).
+
 ### HubSpot inbound webhook — companies + contacts auto-sync (TASK-706)
 
 Cuando alguien crea o actualiza una company/contact en HubSpot, **NO requerir sync manual ni esperar al cron diario**. La app HubSpot Developer envía webhooks v3 a Greenhouse y el portal sincroniza automáticamente.
