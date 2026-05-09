@@ -1,3 +1,12 @@
+# Sesion 2026-05-09 — TASK-842 Finance FX Drift Auto-Remediation Control Plane creada
+
+- **Trigger:** el usuario pidio dejar de "tapar goteras" por el fallo recurrente de Playwright `finance.account_balances.fx_drift — TASK-774`, usando criterio de finanzas y arquitectura.
+- **Diagnostico runtime previo:** `scripts/finance/diagnose-fx-drift.ts` detecto 1 drift vivo en `santander-clp` / `2026-05-01`: persisted `inflows/outflows=0/0`, expected `inflows/outflows=0/402562.50`, drift `-402562.50`. El fallo de CI no venia de TASK-841; ya existia en runs previos.
+- **Recovery puntual ejecutado:** `scripts/finance/backfill-account-balances-fx-fix.ts --account-id=santander-clp --from-date=2026-05-01 --evidence-guard=warn_only` aplicado con env/profile PG cargado; resultado `daysMaterialized=70`, `finalClosingBalance=1212492.07`. Diagnostico posterior: `Sin drift detectado. Steady state.`
+- **Decision arquitectonica:** el recovery manual no cierra la causa sistemica. Se creo `docs/tasks/to-do/TASK-842-finance-fx-drift-auto-remediation-control-plane.md` para convertir el detector en control plane autocorrectivo: reader detallado, planner con politica financiera segura, rematerializacion canonica via `rematerializeAccountBalanceRange`, endpoint/scheduler en `ops-worker`, run tracking/auditoria y regression del caso `santander-clp`.
+- **Docs sincronizadas:** `docs/tasks/README.md` ahora marca siguiente ID `TASK-843` y registra TASK-842; `docs/tasks/TASK_ID_REGISTRY.md` reserva TASK-842.
+- **Guardrail multi-agente:** hay archivos no relacionados de TASK-836/servicios en el worktree; no fueron modificados ni stageados para esta task documental.
+
 # Sesion 2026-05-09 — TASK-835 Sample Sprints Runtime Projection Hardening cerrada
 
 - **Trigger:** el usuario pidio implementar `TASK-835` end-to-end manteniendo `develop` como rama de trabajo (sin checkout a branch nueva).
