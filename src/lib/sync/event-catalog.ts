@@ -418,6 +418,13 @@ export const EVENT_TYPES = {
   serviceEngagementOutcomeRecorded: 'service.engagement.outcome_recorded',
   serviceEngagementCancelled: 'service.engagement.cancelled',
   serviceEngagementConverted: 'service.engagement.converted',
+  // TASK-837 Slice 3 — Sample Sprint deal-bound outbound projection trigger.
+  // Separación de concerns vs `service.engagement.declared` (TASK-808): el
+  // declared event ya tiene consumers (cache invalidation TASK-835); este
+  // event es exclusivo para trigger del reactive consumer outbound HubSpot.
+  serviceEngagementOutboundRequested: 'service.engagement.outbound_requested',
+  // TASK-837 Slice 5 — operator-skip path desde dead-letter UX (audit-only).
+  serviceEngagementOutboundSkipped: 'service.engagement.outbound_skipped',
 
   // Person Intelligence
   compensationUpdated: 'compensation.updated',
