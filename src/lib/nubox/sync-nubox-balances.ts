@@ -37,16 +37,57 @@ interface IncomeUpdateResult extends Record<string, unknown> {
 }
 
 export interface NuboxBalanceSyncResult {
+  syncRunId: string
   incomeUpdated: number
   expenseUpdated: number
   divergences: number
   durationMs: number
 }
 
+const writeBalanceSyncRun = async ({
+  runId,
+  status,
+  recordsRead = 0,
+  recordsProjectedPostgres = 0,
+  notes
+}: {
+  runId: string
+  status: 'running' | 'succeeded' | 'failed'
+  recordsRead?: number
+  recordsProjectedPostgres?: number
+  notes?: string | null
+}) => {
+  await runGreenhousePostgresQuery(
+    `INSERT INTO greenhouse_sync.source_sync_runs (
+      sync_run_id, source_system, source_object_type, sync_mode,
+      status, records_read, records_projected_postgres, triggered_by, notes, finished_at
+    )
+    VALUES ($1, 'nubox', 'balance_sync', 'incremental',
+      $2, $3, $4, 'nubox_balance_sync', $5,
+      CASE WHEN $2 = 'running' THEN NULL ELSE CURRENT_TIMESTAMP END)
+    ON CONFLICT (sync_run_id) DO UPDATE SET
+      status = EXCLUDED.status,
+      records_read = EXCLUDED.records_read,
+      records_projected_postgres = EXCLUDED.records_projected_postgres,
+      notes = EXCLUDED.notes,
+      finished_at = EXCLUDED.finished_at`,
+    [runId, status, recordsRead, recordsProjectedPostgres, notes || null]
+  )
+}
+
 export const runNuboxBalanceSync = async (): Promise<NuboxBalanceSyncResult> => {
   const startMs = Date.now()
+  const syncRunId = `nubox-balance-${randomUUID()}`
   const projectId = getBigQueryProjectId()
   const bq = getBigQueryClient()
+
+  await writeBalanceSyncRun({
+    runId: syncRunId,
+    status: 'running',
+    notes: 'Nubox conformed balances -> PostgreSQL income/expenses'
+  })
+
+  try {
 
   const [saleRows] = await bq.query({
     query: `
@@ -137,10 +178,33 @@ export const runNuboxBalanceSync = async (): Promise<NuboxBalanceSyncResult> => 
     if (result.length > 0) expenseUpdated++
   }
 
-  return {
-    incomeUpdated,
-    expenseUpdated,
-    divergences,
-    durationMs: Date.now() - startMs
+    const recordsRead = saleRows.length + purchaseRows.length
+    const recordsProjectedPostgres = incomeUpdated + expenseUpdated
+
+    await writeBalanceSyncRun({
+      runId: syncRunId,
+      status: 'succeeded',
+      recordsRead,
+      recordsProjectedPostgres,
+      notes: `incomeUpdated=${incomeUpdated}; expenseUpdated=${expenseUpdated}; divergences=${divergences}`
+    })
+
+    return {
+      syncRunId,
+      incomeUpdated,
+      expenseUpdated,
+      divergences,
+      durationMs: Date.now() - startMs
+    }
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error)
+
+    await writeBalanceSyncRun({
+      runId: syncRunId,
+      status: 'failed',
+      notes: message.slice(0, 500)
+    }).catch(() => {})
+
+    throw error
   }
 }

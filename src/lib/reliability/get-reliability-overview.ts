@@ -57,6 +57,7 @@ import { getCriticalTablesMissingSignal } from './queries/critical-tables-missin
 import { getOutboxUnpublishedLagSignal } from './queries/outbox-unpublished-lag'
 import { getOutboxDeadLetterSignal } from './queries/outbox-dead-letter'
 import { getEmailRenderFailureSignal } from './queries/email-render-failure'
+import { getNuboxSourceFreshnessSignal } from './queries/nubox-source-freshness'
 import { getEngagementBudgetOverrunSignal } from './queries/engagement-budget-overrun'
 import { getEngagementConversionRateDropSignal } from './queries/engagement-conversion-rate-drop'
 import { getEngagementOverdueDecisionSignal } from './queries/engagement-overdue-decision'
@@ -412,6 +413,12 @@ interface ReliabilityOverviewSources {
   financeClientProfileUnlinked?: ReliabilitySignal | null
 
   /**
+   * TASK-841 — Nubox source freshness. Detecta raw stale aunque conformed
+   * y Postgres projection parezcan frescos por reprocesar snapshots viejos.
+   */
+  nuboxSourceFreshness?: ReliabilitySignal | null
+
+  /**
    * TASK-838 Fase 3 — Runtime guard: critical tables missing in PG.
    *   - infrastructure.critical_tables.missing (drift, error si > 0)
    * Roll up bajo moduleKey 'cloud'.
@@ -498,6 +505,8 @@ export const buildReliabilityOverview = (
     ...(sources.workspaceProjection ?? []),
     // TASK-613 Slice 3 — Finance Clients ↔ Organization canonical link signal.
     ...(sources.financeClientProfileUnlinked ? [sources.financeClientProfileUnlinked] : []),
+    // TASK-841 — Nubox raw/conformed/projection freshness.
+    ...(sources.nuboxSourceFreshness ? [sources.nuboxSourceFreshness] : []),
     // TASK-838 Fase 3 — Runtime guard: critical tables missing in PG.
     ...(sources.criticalTablesMissing ? [sources.criticalTablesMissing] : []),
     // TASK-813 Slice 6 — Commercial engagement instance signals (3).
@@ -791,6 +800,11 @@ export const getReliabilityOverview = async (
       ? preloadedSources.financeClientProfileUnlinked
       : await getFinanceClientProfileUnlinkedSignal().catch(() => null)
 
+  const nuboxSourceFreshness =
+    preloadedSources.nuboxSourceFreshness !== undefined
+      ? preloadedSources.nuboxSourceFreshness
+      : await getNuboxSourceFreshnessSignal().catch(() => null)
+
   // TASK-838 Fase 3 — Runtime guard: critical tables missing in PG. Single
   // reader; degrada honestamente a `unknown` si la query falla.
   const criticalTablesMissing =
@@ -849,6 +863,7 @@ export const getReliabilityOverview = async (
     workforceRoleTitle,
     workspaceProjection,
     financeClientProfileUnlinked,
+    nuboxSourceFreshness,
     criticalTablesMissing,
     servicesEngagement,
     commercialHealth

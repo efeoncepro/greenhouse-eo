@@ -26,11 +26,51 @@ import { syncNuboxQuotesHot } from './sync-nubox-quotes-hot'
  */
 
 export interface NuboxSyncOrchestratorResult {
+  status: 'succeeded' | 'partial' | 'failed' | 'skipped'
   skipped?: boolean
   reason?: string
   raw?: unknown
   conformed?: unknown
   postgres?: unknown
+  phaseStatuses?: {
+    raw: 'succeeded' | 'partial' | 'failed' | 'unknown'
+    conformed: 'succeeded' | 'failed' | 'unknown'
+    postgres: 'succeeded' | 'failed' | 'unknown'
+  }
+}
+
+type NuboxRawPhaseStatus = NonNullable<NuboxSyncOrchestratorResult['phaseStatuses']>['raw']
+
+const hasErrorShape = (value: unknown): boolean => {
+  if (!value || typeof value !== 'object') {
+    return false
+  }
+
+  const record = value as Record<string, unknown>
+
+  if (typeof record.error === 'string' && record.error.length > 0) {
+    return true
+  }
+
+  if (Array.isArray(record.errors) && record.errors.length > 0) {
+    return true
+  }
+
+  return record.status === 'failed' || record.status === 'partial'
+}
+
+const getRawPhaseStatus = (value: unknown): NuboxRawPhaseStatus => {
+  if (!value || typeof value !== 'object') return 'unknown'
+
+  const status = (value as Record<string, unknown>).status
+
+  return status === 'succeeded' || status === 'partial' || status === 'failed' ? status : hasErrorShape(value) ? 'failed' : 'succeeded'
+}
+
+const getSimplePhaseStatus = (value: unknown): 'succeeded' | 'failed' | 'unknown' => {
+  if (value === undefined) return 'unknown'
+
+  return hasErrorShape(value) ? 'failed' : 'succeeded'
 }
 
 export const runNuboxSyncOrchestration = async (): Promise<NuboxSyncOrchestratorResult> => {
@@ -40,13 +80,13 @@ export const runNuboxSyncOrchestration = async (): Promise<NuboxSyncOrchestrator
     if (!readiness.ready) {
       console.log(`[nubox-sync] Skipped: Nubox upstream not ready — ${readiness.reason}`)
 
-      return { skipped: true, reason: readiness.reason }
+      return { status: 'skipped', skipped: true, reason: readiness.reason }
     }
   } catch (error) {
     console.warn('[nubox-sync] Readiness check failed, proceeding anyway:', error)
   }
 
-  const results: NuboxSyncOrchestratorResult = {}
+  const results: NuboxSyncOrchestratorResult = { status: 'failed' }
 
   try {
     results.raw = await syncNuboxToRaw()
@@ -76,6 +116,25 @@ export const runNuboxSyncOrchestration = async (): Promise<NuboxSyncOrchestrator
     console.error('Nubox postgres projection failed:', error)
     await alertCronFailure('nubox-sync/postgres', error)
     results.postgres = { error: message }
+  }
+
+  const phaseStatuses = {
+    raw: getRawPhaseStatus(results.raw),
+    conformed: getSimplePhaseStatus(results.conformed),
+    postgres: getSimplePhaseStatus(results.postgres)
+  }
+
+  const failedCount = Object.values(phaseStatuses).filter(status => status === 'failed').length
+  const unknownCount = Object.values(phaseStatuses).filter(status => status === 'unknown').length
+
+  results.phaseStatuses = phaseStatuses
+
+  if (failedCount === 0 && unknownCount === 0 && phaseStatuses.raw === 'succeeded') {
+    results.status = 'succeeded'
+  } else if (failedCount === 3 || (phaseStatuses.raw === 'failed' && phaseStatuses.conformed === 'failed' && phaseStatuses.postgres === 'failed')) {
+    results.status = 'failed'
+  } else {
+    results.status = 'partial'
   }
 
   return results

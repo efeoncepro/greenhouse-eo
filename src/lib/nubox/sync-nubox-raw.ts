@@ -24,6 +24,7 @@ import type { NuboxRawSnapshotRow } from '@/lib/nubox/types'
 
 export type SyncNuboxRawResult = {
   syncRunId: string
+  status: 'succeeded' | 'partial' | 'failed'
   periods: string[]
   hotPeriods: string[]
   historicalPeriods: string[]
@@ -265,6 +266,7 @@ export const syncNuboxToRaw = async (options?: {
 
   return {
     syncRunId,
+    status: finalStatus,
     periods,
     hotPeriods: plan.hotPeriods,
     historicalPeriods: plan.historicalPeriods,

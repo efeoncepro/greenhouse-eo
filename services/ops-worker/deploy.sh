@@ -81,6 +81,8 @@ if [ "${ENV}" = "production" ]; then
   DEFAULT_PG_INSTANCE="efeonce-group:us-east4:greenhouse-pg-dev"
   DEFAULT_RESEND_API_KEY_SECRET_REF="greenhouse-resend-api-key-production"
   DEFAULT_GREENHOUSE_INTEGRATION_API_TOKEN_SECRET_REF="greenhouse-integration-api-token"
+  DEFAULT_NUBOX_BEARER_TOKEN_SECRET_REF="greenhouse-nubox-bearer-token-production"
+  DEFAULT_NUBOX_X_API_KEY_SECRET_REF="greenhouse-nubox-x-api-key-production"
   echo "=== PRODUCTION deployment ==="
 else
   DEFAULT_NEXTAUTH_SECRET_REF="greenhouse-nextauth-secret-staging:latest"
@@ -88,6 +90,8 @@ else
   DEFAULT_PG_INSTANCE="efeonce-group:us-east4:greenhouse-pg-dev"
   DEFAULT_RESEND_API_KEY_SECRET_REF="greenhouse-resend-api-key-staging"
   DEFAULT_GREENHOUSE_INTEGRATION_API_TOKEN_SECRET_REF="greenhouse-integration-api-token"
+  DEFAULT_NUBOX_BEARER_TOKEN_SECRET_REF="greenhouse-nubox-bearer-token-staging"
+  DEFAULT_NUBOX_X_API_KEY_SECRET_REF="greenhouse-nubox-x-api-key-staging"
   echo "=== STAGING deployment ==="
 fi
 
@@ -96,8 +100,25 @@ PG_PASSWORD_REF="${PG_PASSWORD_REF:-${DEFAULT_PG_PASSWORD_REF}}"
 PG_INSTANCE="${PG_INSTANCE:-${DEFAULT_PG_INSTANCE}}"
 RESEND_API_KEY_SECRET_REF="${RESEND_API_KEY_SECRET_REF:-${DEFAULT_RESEND_API_KEY_SECRET_REF}}"
 GREENHOUSE_INTEGRATION_API_TOKEN_SECRET_REF="${GREENHOUSE_INTEGRATION_API_TOKEN_SECRET_REF:-${DEFAULT_GREENHOUSE_INTEGRATION_API_TOKEN_SECRET_REF}}"
+NUBOX_API_BASE_URL="${NUBOX_API_BASE_URL:-https://api.pyme.nubox.com/nbxpymapi-environment-pyme/v1}"
+NUBOX_BEARER_TOKEN_SECRET_REF="${NUBOX_BEARER_TOKEN_SECRET_REF:-${DEFAULT_NUBOX_BEARER_TOKEN_SECRET_REF}}"
+NUBOX_X_API_KEY_SECRET_REF="${NUBOX_X_API_KEY_SECRET_REF:-${DEFAULT_NUBOX_X_API_KEY_SECRET_REF}}"
 EMAIL_FROM="${EMAIL_FROM:-${DEFAULT_EMAIL_FROM}}"
 HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL="${HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL:-$(gcloud run services describe "${HUBSPOT_SERVICE_NAME}" --project="${PROJECT_ID}" --region="${HUBSPOT_SERVICE_REGION}" --format='value(status.url)')}"
+
+require_non_empty() {
+  local name="$1"
+  local value="$2"
+
+  if [ -z "${value}" ]; then
+    echo "ERROR: ${name} must be set for ops-worker deploy."
+    exit 1
+  fi
+}
+
+require_non_empty "NUBOX_API_BASE_URL" "${NUBOX_API_BASE_URL}"
+require_non_empty "NUBOX_BEARER_TOKEN_SECRET_REF" "${NUBOX_BEARER_TOKEN_SECRET_REF}"
+require_non_empty "NUBOX_X_API_KEY_SECRET_REF" "${NUBOX_X_API_KEY_SECRET_REF}"
 
 # ─── Secret access helpers ───────────────────────────────────────────────────
 
@@ -220,6 +241,9 @@ ENV_VARS="${ENV_VARS},REACTIVE_BATCH_SIZE=${REACTIVE_BATCH_SIZE}"
 ENV_VARS="${ENV_VARS},EMAIL_FROM=${EMAIL_FROM}"
 ENV_VARS="${ENV_VARS},GREENHOUSE_INTEGRATION_API_TOKEN_SECRET_REF=${GREENHOUSE_INTEGRATION_API_TOKEN_SECRET_REF}"
 ENV_VARS="${ENV_VARS},HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL=${HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL}"
+ENV_VARS="${ENV_VARS},NUBOX_API_BASE_URL=${NUBOX_API_BASE_URL}"
+ENV_VARS="${ENV_VARS},NUBOX_BEARER_TOKEN_SECRET_REF=${NUBOX_BEARER_TOKEN_SECRET_REF}"
+ENV_VARS="${ENV_VARS},NUBOX_X_API_KEY_SECRET_REF=${NUBOX_X_API_KEY_SECRET_REF}"
 
 # TASK-638 — Reliability AI Observer kill-switch.
 # Declarativo en deploy.sh para que `--set-env-vars` (destructivo) NO lo
@@ -257,6 +281,8 @@ if [ -n "${RESEND_API_KEY_SECRET_REF}" ]; then
 fi
 
 ensure_secret_accessor_binding "${GREENHOUSE_INTEGRATION_API_TOKEN_SECRET_REF}"
+ensure_secret_accessor_binding "${NUBOX_BEARER_TOKEN_SECRET_REF}"
+ensure_secret_accessor_binding "${NUBOX_X_API_KEY_SECRET_REF}"
 
 gcloud run deploy "${SERVICE_NAME}" \
   --project="${PROJECT_ID}" \

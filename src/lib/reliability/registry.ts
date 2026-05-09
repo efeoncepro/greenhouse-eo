@@ -64,7 +64,7 @@ export const STATIC_RELIABILITY_REGISTRY: ReliabilityModuleDefinition[] = [
     // Data Quality` vía buildReliabilityOverview, que ya rutea por moduleKey.
     // TASK-613 Slice 3 — `data_quality` añadido para
     // `finance.client_profile.unlinked_organizations`.
-    expectedSignalKinds: ['subsystem', 'incident', 'test_lane', 'drift', 'dead_letter', 'lag', 'data_quality'],
+    expectedSignalKinds: ['subsystem', 'incident', 'test_lane', 'drift', 'dead_letter', 'lag', 'data_quality', 'freshness'],
     incidentDomainTag: 'finance'
   },
   {
