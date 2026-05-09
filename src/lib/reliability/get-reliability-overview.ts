@@ -68,6 +68,16 @@ import { getEngagementBudgetOverrunSignal } from './queries/engagement-budget-ov
 import { getEngagementConversionRateDropSignal } from './queries/engagement-conversion-rate-drop'
 import { getEngagementOverdueDecisionSignal } from './queries/engagement-overdue-decision'
 import { getSampleSprintProjectionDegradedSignal } from './queries/sample-sprint-projection-degraded'
+// TASK-837 Slice 6 — 7 reliability signals for Sample Sprint outbound projection.
+import {
+  getSampleSprintDealAssociationsDriftSignal,
+  getSampleSprintDealClosedButActiveSignal,
+  getSampleSprintLegacyWithoutDealSignal,
+  getSampleSprintOutboundDeadLetterSignal,
+  getSampleSprintOutboundPendingOverdueSignal,
+  getSampleSprintOutcomeTerminalPservicesOpenSignal,
+  getSampleSprintPartialAssociationsSignal
+} from './queries/sample-sprint-outbound-signals'
 import { getCronStagingDriftSignal } from './queries/cron-staging-drift'
 import { getEngagementStaleProgressSignal } from './queries/engagement-stale-progress'
 import { getEngagementUnapprovedActiveSignal } from './queries/engagement-unapproved-active'
@@ -891,12 +901,29 @@ export const getReliabilityOverview = async (
             staleProgress: getEngagementStaleProgressSignal
           }).catch(() => null),
           // TASK-835 Slice 6 — Sample Sprints Runtime Projection degraded signal
-          getSampleSprintProjectionDegradedSignal().catch(() => null)
+          getSampleSprintProjectionDegradedSignal().catch(() => null),
+          // TASK-837 Slice 6 — 7 Sample Sprint outbound projection signals.
+          // All roll up under subsystem `commercial`. Steady=0 for all.
+          getSampleSprintOutboundPendingOverdueSignal().catch(() => null),
+          getSampleSprintOutboundDeadLetterSignal().catch(() => null),
+          getSampleSprintPartialAssociationsSignal().catch(() => null),
+          getSampleSprintDealClosedButActiveSignal().catch(() => null),
+          getSampleSprintDealAssociationsDriftSignal().catch(() => null),
+          getSampleSprintOutcomeTerminalPservicesOpenSignal().catch(() => null),
+          getSampleSprintLegacyWithoutDealSignal().catch(() => null)
         ])
-          .then(([healthSignals, projectionSignal]) => {
+          .then(([healthSignals, projectionSignal, ...outboundSignals]) => {
             const collected = healthSignals ?? []
 
-            return projectionSignal ? [...collected, projectionSignal] : collected
+            const withProjection = projectionSignal
+              ? [...collected, projectionSignal]
+              : collected
+
+            const validOutbound = outboundSignals.filter(
+              (s): s is NonNullable<typeof s> => s !== null
+            )
+
+            return [...withProjection, ...validOutbound]
           })
           .catch(() => null)
 
