@@ -365,3 +365,8 @@ Cerrar una task es obligatorio y forma parte de Definition of Done. Si la implem
   `nubox-pg-c5593626-9573-407a-8475-8f86dea37252` terminó `succeeded`,
   `records_read=231`, `records_projected_postgres=214`,
   `projectionFailures=0`.
+- Push a `develop` disparó `Ops Worker Deploy` exitoso y Cloud Run quedó
+  sirviendo `ops-worker-00171-mwj` al 100%.
+- Replay post-deploy en la revisión nueva: `quotes_hot_sync` y `balance_sync`
+  terminaron `succeeded` a las `2026-05-09T12:43Z`; `balance_sync` dejó fila
+  propia en `greenhouse_sync.source_sync_runs`.
