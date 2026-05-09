@@ -147,6 +147,7 @@ resolved (2026-05-08)
 ## Relacionado
 
 - TASK-774 (Account balance CLP-native reader contract) — introdujo el reliability signal que expuso el bug.
+- TASK-842 (Finance FX Drift Auto-Remediation Control Plane) — agrega control plane `ops-finance-fx-drift-remediate` para que drift residual elegible se planifique, rematerialice, audite y revalide desde `ops-worker`, en vez de depender de Playwright o backfill humano.
 - TASK-766 (CLP currency reader contract) — VIEWs canónicas que el reader consume.
 - TASK-703 / TASK-703b (OTB cascade-supersede) — contrato del seed que el rematerializer respeta.
 - TASK-721 (Evidence canonical uploader) — reconciliation snapshots que protegen el seed row.

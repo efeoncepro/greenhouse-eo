@@ -15,6 +15,7 @@ Standalone HTTP service that runs reactive projection consumers and projection-r
 | POST   | `/nubox/sync`              | Nubox raw → conformed → PostgreSQL daily lane    | `api/cron/nubox-sync`            |
 | POST   | `/nubox/quotes-hot-sync`   | Nubox quotes hot lane                            | `api/cron/nubox-quotes-hot-sync` |
 | POST   | `/nubox/balance-sync`      | Nubox balance reconciliation lane                | —                                |
+| POST   | `/finance/account-balances/fx-drift/remediate` | Bounded account_balances FX drift remediation | — |
 
 ## Request Bodies
 
@@ -100,6 +101,33 @@ notifications or persist fingerprints.
 | `ops-nubox-sync`                | `30 7 * * *`     | `/nubox/sync`              |
 | `ops-nubox-quotes-hot-sync`     | `*/15 * * * *`   | `/nubox/quotes-hot-sync`   |
 | `ops-nubox-balance-sync`        | `0 */4 * * *`    | `/nubox/balance-sync`      |
+| `ops-finance-fx-drift-remediate` | `15 5 * * *`    | `/finance/account-balances/fx-drift/remediate` |
+
+## Finance FX Drift Remediation
+
+`POST /finance/account-balances/fx-drift/remediate` runs the TASK-842 control plane:
+
+1. Reads the canonical `finance.account_balances.fx_drift` detailed detector.
+2. Classifies rows under an explicit policy (`detect_only`, `auto_open_periods`, `known_bug_class_restatement`, `strict_no_restatement`).
+3. Rematerializes only eligible accounts via `rematerializeAccountBalanceRange`.
+4. Refreshes touched monthly snapshots via `refreshMonthlyBatch`.
+5. Re-runs the detector and writes the run to `greenhouse_sync.source_sync_runs`.
+
+Scheduler payload is bounded:
+
+```json
+{
+  "triggeredBy": "cloud_scheduler",
+  "dryRun": false,
+  "policy": "known_bug_class_restatement",
+  "windowDays": 90,
+  "maxRows": 25,
+  "maxAccounts": 10,
+  "maxAbsDriftClp": "5000000"
+}
+```
+
+The worker never writes ad hoc SQL updates to `greenhouse_finance.account_balances`; blocked or unknown drift remains visible in the reliability signal.
 
 ## Nubox Runtime Contract
 

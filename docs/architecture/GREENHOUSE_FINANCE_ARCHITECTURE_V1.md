@@ -2403,7 +2403,36 @@ Toda agregación SUM se hace sobre el alias resultante del subselect (`SUM(amoun
 ### Backfill defensivo
 
 - Cron diario `ops-finance-rematerialize-balances` (Cloud Scheduler) rematerializa últimos 7 días automáticamente — el fix se propaga sin script para casos recientes.
-- Para histórico > 7 días: `pnpm tsx --require ./scripts/lib/server-only-shim.cjs scripts/finance/backfill-account-balances-fx-fix.ts --account-id=<id> --from-date=<YYYY-MM-DD>` (idempotente, dry-run mode, anchor OTB canónico TASK-703).
+- TASK-842 agrega `ops-finance-fx-drift-remediate` (Cloud Scheduler 05:15 America/Santiago), que corre después del rematerialize rolling y antes de `ops-finance-ledger-health`.
+- El endpoint interno `POST /finance/account-balances/fx-drift/remediate` vive en `ops-worker`, protegido por Cloud Run IAM + `CRON_SECRET`, y usa `src/lib/finance/account-balances-fx-drift-remediation.ts`.
+- El script manual `scripts/finance/backfill-account-balances-fx-fix.ts` queda como wrapper thin del mismo command canónico; live mode requiere `--apply`.
+
+### TASK-842 — FX Drift Remediation Control Plane
+
+El control plane consume el reader detallado de `finance.account_balances.fx_drift`, clasifica cada fila y ejecuta solo remediación elegible via `rematerializeAccountBalanceRange`. **Nunca** hace `UPDATE` ad hoc sobre `account_balances`.
+
+Policy contract:
+
+| Policy | Mutación | Uso |
+|---|---:|---|
+| `detect_only` | No | Diagnóstico/CLI/plan sin escrituras. |
+| `auto_open_periods` | Sí, acotada | Drift con fuente canónica y sin periodo cerrado ni snapshot aceptado/reconciliado. |
+| `known_bug_class_restatement` | Sí, acotada | Permite cruzar evidencia protegida solo si matchea bug class conocido (`ISSUE-069` seed blind spot: `transaction_count=0`, persisted `in/out=0`, expected movement canónico presente). Usa evidence guard `warn_only` con auditoría. |
+| `strict_no_restatement` | Sí, solo open-period | Bloquea cualquier fila protegida aunque matchee bug conocido. |
+
+Guardrails:
+
+- Defaults scheduler: `windowDays=90`, `maxRows=25`, `maxAccounts=10`, `maxAbsDriftClp=5000000`.
+- Cualquier overflow de filas/cuentas bloquea el run (`blocked_out_of_policy`), no ejecuta rematerialización parcial a ciegas.
+- Periodos cerrados o snapshots `accepted/reconciled` quedan bloqueados salvo policy explícita `known_bug_class_restatement` + evidencia de bug conocido.
+- Post-rematerialización se re-ejecuta el detector y se registra `residualDriftCount`.
+- `account_balances_monthly` se refresca con `refreshMonthlyBatch` para los meses tocados.
+
+Audit/run tracking:
+
+- `greenhouse_sync.source_sync_runs` con `source_system='finance'`, `source_object_type='account_balances_fx_drift_remediation'`, `sync_mode='repair'`.
+- `records_read` = drift rows vistos; `records_written_raw` = rows bloqueados; `records_written_conformed` = rows remediados; `records_projected_postgres` = cuentas rematerializadas.
+- Errores se persisten en `greenhouse_sync.source_sync_failures` con `error_code='FX_DRIFT_REMEDIATION_FAILED'`.
 
 ### Reglas duras (sumadas a TASK-766)
 
