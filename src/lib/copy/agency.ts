@@ -262,6 +262,78 @@ export const GH_AGENCY = {
         title: 'Equipo parcialmente resuelto',
         description: 'Algunos miembros propuestos no resolvieron en el directorio activo. Verifica si fueron archivados.'
       }
+    },
+    // TASK-837 Slice 2 — Wizard Deal Selection step.
+    dealSelection: {
+      sectionTitle: 'Deal HubSpot',
+      sectionSubtitle: 'El Sample Sprint queda anclado a esta oportunidad comercial.',
+      searchLabel: 'Selecciona el deal',
+      searchPlaceholder: 'Busca por nombre del deal',
+      eligibleSummary: (count: number) => count === 1 ? '1 deal elegible' : `${count} deals elegibles`,
+      eligibility: {
+        eligible: 'Elegible',
+        closed: 'Cerrado',
+        deleted: 'Eliminado',
+        missing_company: 'Sin company asociada',
+        missing_contacts: 'Sin contactos asociados'
+      },
+      empty: {
+        noResults: 'Sin deals que coincidan. Revisa la búsqueda.',
+        noEligible: 'No hay deals abiertos disponibles ahora. Crea uno en HubSpot primero.'
+      },
+      selected: {
+        heading: 'Contexto heredado del deal',
+        companyLabel: 'Empresa',
+        contactsLabel: 'Contactos asociados',
+        amountLabel: 'Monto',
+        stageLabel: 'Etapa'
+      },
+      submit: {
+        blockedTooltip: 'Selecciona un deal para continuar',
+        revalidationFailed: 'Este deal cambió de estado. Selecciona otro.'
+      },
+      loading: 'Cargando deals elegibles...'
+    },
+    deadLetter: {
+      pageTitle: 'Sample Sprints en dead-letter',
+      pageSubtitle: 'Reintenta la proyección a HubSpot o marca como skip explícito.',
+      counterAria: (count: number) => count === 1
+        ? '1 Sample Sprint requiere acción'
+        : `${count} Sample Sprints requieren acción`,
+      filterPlaceholder: 'Filtrar por nombre del service',
+      attemptsLabel: (count: number, since: string) => `${count} ${count === 1 ? 'intento fallido' : 'intentos fallidos'} · ${since}`,
+      lastErrorLabel: 'Último error',
+      historyToggle: 'Ver historial completo',
+      actions: {
+        retry: 'Reintentar',
+        skip: 'Marcar como skip',
+        viewRunbook: 'Ver runbook'
+      },
+      retryConfirm: {
+        title: '¿Reintentar proyección a HubSpot?',
+        body: 'Re-emite el outbox event. El reactive consumer lo toma en menos de 5 minutos.',
+        primary: 'Reintentar',
+        secondary: 'Cancelar'
+      },
+      skipConfirm: {
+        title: '¿Marcar como skip permanente?',
+        body: 'El service queda solo en Greenhouse. No se proyectará a HubSpot. Esta acción se audita.',
+        primary: 'Marcar como skip',
+        secondary: 'Cancelar',
+        reasonLabel: 'Razón (mínimo 5 caracteres)',
+        reasonPlaceholder: 'Ej. Deal interno EOM testing'
+      },
+      toast: {
+        retrySuccess: 'Reintento programado. El service vuelve a outbound_pending.',
+        retryError: 'No fue posible programar el reintento. Revisa los logs.',
+        skipSuccess: 'Marcado como skip. Auditado.',
+        skipError: 'No fue posible marcar como skip. Revisa los logs.'
+      },
+      empty: {
+        title: 'Todo en orden',
+        description: 'Sin Sample Sprints en dead-letter. La proyección async funciona correctamente.'
+      },
+      missingCapability: 'No tienes permisos para recover_outbound. Contacta a un admin Finance o EO.'
     }
   }
 } as const

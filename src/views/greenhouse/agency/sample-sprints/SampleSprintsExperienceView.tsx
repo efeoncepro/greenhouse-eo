@@ -41,6 +41,7 @@ import CustomTextField from '@core/components/mui/TextField'
 
 import EmptyState from '@/components/greenhouse/EmptyState'
 import GreenhouseFileUploader, { type UploadedFileValue } from '@/components/greenhouse/GreenhouseFileUploader'
+import DealSelectionField, { type DealSelectionFieldValue } from './wizards/DealSelectionField'
 import {
   CardHeaderWithBadge,
   MetricSummaryCard,
@@ -1394,6 +1395,14 @@ const RuntimeDeclareWizard = ({ options }: { options: RuntimeSampleSprintOptions
     successCriteria: ''
   })
 
+  // TASK-837 Slice 2 — Deal selection state. Server revalidates at submit time
+  // via getEligibleDealForRevalidation; this captures the inheritance snapshot.
+  const [dealSelection, setDealSelection] = useState<DealSelectionFieldValue>({
+    hubspotDealId: null,
+    companyHubspotId: null,
+    contactHubspotIds: []
+  })
+
   useEffect(() => {
     if (!form.spaceId && options?.spaces[0]?.spaceId) {
       setForm(current => ({ ...current, spaceId: options.spaces[0].spaceId }))
@@ -1401,7 +1410,13 @@ const RuntimeDeclareWizard = ({ options }: { options: RuntimeSampleSprintOptions
   }, [form.spaceId, options?.spaces])
 
   const selectedSpace = options?.spaces.find(space => space.spaceId === form.spaceId)
-  const canSubmit = Boolean(form.name.trim() && form.spaceId && form.successCriteria.trim())
+
+  const canSubmit = Boolean(
+    form.name.trim() &&
+      form.spaceId &&
+      form.successCriteria.trim() &&
+      dealSelection.hubspotDealId
+  )
 
   const saveDraft = () => {
     window.localStorage.setItem('greenhouse.sample-sprints.declare-draft', JSON.stringify({ ...form, memberId, proposedFte }))
@@ -1410,7 +1425,12 @@ const RuntimeDeclareWizard = ({ options }: { options: RuntimeSampleSprintOptions
 
   const submit = () => {
     if (!canSubmit) {
-      setFeedback({ severity: 'error', message: 'Completa nombre, cliente y criterios de éxito antes de solicitar aprobación.' })
+      setFeedback({
+        severity: 'error',
+        message: dealSelection.hubspotDealId
+          ? 'Completa nombre, cliente y criterios de éxito antes de solicitar aprobación.'
+          : 'Selecciona un Deal HubSpot abierto antes de continuar.'
+      })
 
       return
     }
@@ -1422,6 +1442,8 @@ const RuntimeDeclareWizard = ({ options }: { options: RuntimeSampleSprintOptions
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...form,
+          // TASK-837 Slice 3 — server revalidates the deal eligibility.
+          hubspotDealId: dealSelection.hubspotDealId,
           organizationId: selectedSpace?.organizationId ?? null,
           successCriteria: buildCriteria(form.successCriteria),
           proposedTeam: memberId ? [{ memberId, proposedFte }] : []
@@ -1455,6 +1477,16 @@ const RuntimeDeclareWizard = ({ options }: { options: RuntimeSampleSprintOptions
               {['Cliente', 'Diseño', 'Equipo', 'Confirmación'].map(step => <Step key={step}><StepLabel>{step}</StepLabel></Step>)}
             </Stepper>
             {feedback ? <Alert severity={feedback.severity} sx={{ mb: 5 }}>{feedback.message}</Alert> : null}
+            {/* TASK-837 Slice 2 — Deal selection (required, server revalidates at submit). */}
+            <Box sx={{ mb: 6 }}>
+              <DealSelectionField
+                value={dealSelection}
+                onChange={setDealSelection}
+                spaceId={form.spaceId || null}
+                organizationId={selectedSpace?.organizationId ?? null}
+                required
+              />
+            </Box>
             <Grid container spacing={5}>
               <Grid size={{ xs: 12, md: 6 }}>
                 <CustomTextField label='Nombre del Sprint' value={form.name} onChange={event => setForm({ ...form, name: event.target.value })} fullWidth required />
