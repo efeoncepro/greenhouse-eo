@@ -1,4 +1,4 @@
-import * as Sentry from '@sentry/nextjs'
+import * as Sentry from '@sentry/node'
 
 /**
  * Canonical Sentry capture wrapper that attaches a `domain` tag.
@@ -14,6 +14,23 @@ import * as Sentry from '@sentry/nextjs'
  * Use this wrapper instead of `Sentry.captureException()` directly anywhere
  * the failure has a clear domain. Without the tag, the exception still lands
  * in Sentry but won't show up in any per-module incident signal.
+ *
+ * ## Runtime polymorphism (TASK-844)
+ *
+ * This wrapper imports `@sentry/node` (NOT `@sentry/nextjs`). `@sentry/node` is
+ * the underlying Node SDK that `@sentry/nextjs` wraps. By importing the lower
+ * layer, the same wrapper works in:
+ *   - **Vercel/Next.js**: `@sentry/nextjs` initializes the global Sentry hub
+ *     via `withSentryConfig` + `instrumentation.ts` + `sentry.server.config.ts`.
+ *     `@sentry/node` accesses the same hub.
+ *   - **Cloud Run generic Node services** (ops-worker, commercial-cost-worker,
+ *     ico-batch): each service calls `initSentryForService(name)` from
+ *     `services/_shared/sentry-init.ts` as the first line of `server.ts`,
+ *     which directly initializes `@sentry/node`.
+ *
+ * Sentry's hub is a global singleton — both runtimes share the same hub once
+ * any init path runs. If no init runs (DSN missing), the SDK falls back to
+ * graceful no-op (captureException is still callable but does nothing).
  *
  * Example:
  *   import { captureWithDomain } from '@/lib/observability/capture'
