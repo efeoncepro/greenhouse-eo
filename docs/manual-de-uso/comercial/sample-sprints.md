@@ -1,8 +1,9 @@
 # Usar Sample Sprints
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-05-07
+> **Ultima actualizacion:** 2026-05-09 por Claude (TASK-835 — troubleshooting de degraded states + convencion canonica de progreso)
 > **Modulo:** Comercial / Agencia
 > **Ruta en portal:** `/agency/sample-sprints`
 > **Documentacion relacionada:** `docs/documentation/comercial/sample-sprints.md`
@@ -54,3 +55,8 @@ Necesitas acceso a la vista `gestion.sample_sprints` y al menos `commercial.enga
 | Conversion rechazada | `converted` requiere `nextServiceId` o `nextQuotationId`. |
 | Upload rechazado | Usa PDF/JPG/PNG/WebP y respeta el maximo de 25 MB. |
 | Update rechazado por `services_engagement_requires_decision_before_120d` | Registra outcome en `/agency/sample-sprints/[serviceId]/outcome` y reintenta. |
+| Costo del sprint aparece como `—` en lugar de un valor | El reader de cost attribution no encontro datos del periodo o esta degradado. Revisar el banner amarillo en la portada y la senal `commercial.sample_sprint.projection_degraded` en `/admin/operations`. |
+| Progreso aparece como "Sin progreso" para un sprint activo | Registra un snapshot semanal en `/agency/sample-sprints/[serviceId]/progress` con `Avance estimado` (la convencion canonica es `metrics_json.deliveryProgressPct`, el wizard ya lo escribe). |
+| El equipo del sprint muestra `mem-...` en vez del nombre | Algun miembro propuesto fue archivado o el ID no resuelve en el directorio activo. Edita el sprint o archiva el sprint si ya no aplica. El banner de degraded confirma "Equipo parcialmente resuelto". |
+| Banner amarillo "Datos parciales en este momento" | Una o mas fuentes downstream (cost attribution, salud comercial, capacidad) estan caidas. La operacion sigue funcionando. Revisa cada razon listada y `/admin/operations` para diagnostico. |
+| Acabo de aprobar un sprint pero la portada todavia muestra `pending` | Refresca la pagina; el cache server-side de 30 segundos se invalida en cuanto entra el evento outbox de aprobacion. Si persiste mas de 1 minuto, revisar la senal `sync.outbox.unpublished_lag`. |

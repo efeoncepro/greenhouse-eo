@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -479,3 +479,41 @@ Razon: aplicar el 4-pillar contract llevo el score de la task de 7.5/10 promedio
 - Mostrar datos stale 30s post-mutacion sin invalidacion reactiva
 - Fragmentar el shape `degraded[]` con codes ad-hoc por caller
 - Inventar `kind` de signals nuevos en la projection en lugar de mapear a Commercial Health canonico
+
+## Delta 2026-05-09 — Implementacion completa
+
+Task implementada end-to-end en `develop` (sin checkout a branch nueva, por instruccion explicita del usuario). 6 slices commiteados incrementalmente:
+
+- **Slice 1** (commit `67145f94`) — Projection skeleton + cache + tipos. 11 tests verdes.
+- **Slice 2** (commit `46702635`) — Sibling reader `readCommercialCostAttributionByServiceForPeriodV2` + projection wiring. +5 reader tests + 2 projection tests.
+- **Slice 3** (commit `25374c5f`) — `enrichProposedTeam` + `resolveCapacityRiskForSprint` helpers. +12 tests + 2 projection wiring.
+- **Slice 4** (commit `9eed3164`) — 6 health helpers extendidos con `tenantContext` opcional + signals mapping 1:1. +11 scope tests + 4 projection wiring. Backward compat 100% verificado contra `engagement-commercial-health.test.ts` (5) + `engagement-stale-progress.test.ts` (6).
+- **Slice 5** (commit `c8b99414`) — UI consume runtime projection. Eliminadas 4 derivativas client-side. `Sprint.actualClp/progressPct: number | null` honest. Banner `Alert role='status'` con copy desde `GH_AGENCY.sampleSprints.degraded.<code>`. API endpoints adjuntan `runtime` field. Skills `greenhouse-ux + greenhouse-microinteractions-auditor + greenhouse-ux-writing` invocadas ANTES de tocar JSX (instruccion del usuario).
+- **Slice 6** (commit `47b33a2d`) — Reactive consumer `sampleSprintRuntimeCacheInvalidationProjection` + reliability signal `commercial.sample_sprint.projection_degraded`. 11 tests verdes.
+
+Decisiones de Slice 0 documentadas en commits + audit report:
+
+- **Checkpoint A**: sibling reader (no extension del byClient) — single source of truth via SQL builder compartido contra la VIEW canonica.
+- **Checkpoint B**: parametro opcional `{tenantContext?}` con default `undefined` — backward compat 100% para `/admin/ops-health`.
+- **Checkpoint C**: payload existente extendido con `runtime` field (NO endpoint nuevo) — single consumer demostrado.
+- **Q4 (no en spec original)**: 6 outbox events reales `service.engagement.{declared, approved, rejected, capacity_overridden, progress_snapshot_recorded, outcome_recorded}`. La spec original mencionaba nombres conceptuales que no matcheaban event_type real.
+- **Q5 (no en spec original)**: convencion canonica `metrics_json.deliveryProgressPct: number ∈ [0,100]` documentada en CLAUDE.md + manual de uso. El wizard `RuntimeProgressWizard` ya escribe esa key.
+
+Verificacion final:
+
+- Tests: 86/86 verdes en sample-sprints + shell (Slices 1-5) + 11/11 en Slice 6 (consumer + signal). Backward compat verificado en 11 tests pre-existentes de health helpers.
+- `npx tsc --noEmit` clean en todos los archivos TASK-835.
+- `eslint` clean (incluye `greenhouse/no-untokenized-copy`).
+- Lint rule `no-untokenized-copy` no genera nuevos warnings — toda copy reusable vive en `GH_AGENCY.sampleSprints.degraded.*`.
+
+Cierre lifecycle:
+
+- Hard Rules canonizadas en CLAUDE.md seccion nueva "Sample Sprints Runtime Projection invariants (TASK-835)" (13 reglas duras + convencion `metrics.deliveryProgressPct`).
+- Doc funcional `docs/documentation/comercial/sample-sprints.md` v1.1 (seccion "Runtime projection" agregada).
+- Manual de uso `docs/manual-de-uso/comercial/sample-sprints.md` v1.1 (6 nuevas filas en troubleshooting).
+- `Handoff.md` con cierre completo.
+- `changelog.md` 2026-05-09 con entrada visible.
+
+DataTableShell (TASK-743): no aplica — el SampleSprintsWorkspace usa Stack/Card layout con sub-listas, no `<Table>` MUI con > 8 columnas. Verificado.
+
+Cero modificacion a archivos owned por TASK-841 (nubox/ops-worker) — preservados intactos en el workspace durante la sesion paralela.

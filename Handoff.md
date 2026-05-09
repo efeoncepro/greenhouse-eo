@@ -1,9 +1,29 @@
-# Sesion 2026-05-09 — TASK-841 Nubox ops-worker config/freshness en progreso
+# Sesion 2026-05-09 — TASK-835 Sample Sprints Runtime Projection Hardening cerrada
 
-- **Trigger:** el usuario pidio implementar `TASK-841` directo en `develop` sin cambiar de rama.
-- **Ownership:** task movida a `docs/tasks/in-progress/TASK-841-nubox-ops-worker-config-freshness-hardening.md`; lifecycle sincronizado a `in-progress`. No se creo branch por instruccion explicita del usuario.
-- **Guardrail multi-agente:** el workspace ya tenia cambios staged/preexistentes de `TASK-835`; deben preservarse y no mezclarse con commits de `TASK-841`.
-- **Estado actual:** en Discovery/Audit; no hay implementacion funcional aplicada todavia.
+- **Trigger:** el usuario pidio implementar `TASK-835` end-to-end manteniendo `develop` como rama de trabajo (sin checkout a branch nueva).
+- **Entrega:** projection canónica server-side `src/lib/commercial/sample-sprints/runtime-projection.ts` reemplaza 4 derivativas client-side de `SampleSprintsWorkspace.tsx` (líneas 140-245 eliminadas: `getProgressPct`, `getSignalSeverity`, `teamFromItem`, `buildRuntimeSignals`). Pattern fuente TASK-611: `import 'server-only'` + cache TTL 30s in-memory por (subjectId, tenantId) + composer `withSourceTimeout` + degraded enum cerrado de 5 codes. **6 slices commiteados incrementalmente** en develop:
+  - Slice 1: skeleton + cache + tipos (11 tests)
+  - Slice 2: sibling reader `readCommercialCostAttributionByServiceForPeriodV2` en `v2-reader.ts` (Checkpoint A); +5 reader tests, +2 projection tests
+  - Slice 3: helpers `enrichProposedTeam` + `resolveCapacityRiskForSprint` (12 nuevos tests, +2 projection)
+  - Slice 4: 6 health helpers extendidos con `tenantContext` opcional (Checkpoint B); 11 tests scope + 4 projection wiring; backward compat 100%
+  - Slice 5: API endpoints adjuntan `runtime` field (Checkpoint C); UI consume payload, `Sprint.actualClp/progressPct: number | null` honest "—"; banner `Alert role='status'` cuando degraded; copy hygiene `GH_AGENCY.sampleSprints.degraded.<code>` en `src/lib/copy/agency.ts`. Skills `greenhouse-ux + greenhouse-microinteractions-auditor + greenhouse-ux-writing` invocadas ANTES de tocar JSX según instrucción del usuario
+  - Slice 6: reactive consumer `sampleSprintRuntimeCacheInvalidationProjection` registrado en `projections/index.ts` (escucha 6 outbox `service.engagement.*`); reliability signal `commercial.sample_sprint.projection_degraded` wired bajo subsystem `commercial`
+- **Hard Rules canonizadas** en `CLAUDE.md` sección nueva "Sample Sprints Runtime Projection invariants (TASK-835)": 13 reglas duras (NUNCA derivar progressPct/actualClp/team/signals client-side, NUNCA importar projection desde cliente, NUNCA inventar kinds nuevos, etc.) + convención canónica `metrics.deliveryProgressPct: number ∈ [0,100]`.
+- **Tests verdes:** 86/86 en sample-sprints + shell pre-Slice 6, +11 nuevos en Slice 6 (consumer + signal). Tsc clean en archivos TASK-835. Lint clean (incluye `greenhouse/no-untokenized-copy`). Backward compat verificado en `engagement-commercial-health.test.ts` (5 tests) y `engagement-stale-progress.test.ts` (6 tests) — `/admin/operations` sin cambio.
+- **Guardrail multi-agente:** se preservaron cambios preexistentes de `TASK-841` (nubox/ops-worker) intactos en el workspace; commits de TASK-835 NUNCA tocaron archivos `src/lib/nubox/*` ni `services/ops-worker/deploy.sh`.
+- **Validacion:** `pnpm test src/lib/commercial/sample-sprints/ src/views/greenhouse/agency/sample-sprints/` 86/86. `pnpm test src/lib/sync/projections/sample-sprint-runtime-cache-invalidation.test.ts src/lib/reliability/queries/sample-sprint-projection-degraded.test.ts` 11/11. `npx tsc --noEmit` clean en archivos TASK-835. Lint --fix sin warnings residuales.
+- **Lifecycle:** task movida `to-do/` → `in-progress/` al inicio + sincronizado a `in-progress`; al cierre se moverá a `complete/` y README sync. **Sin PR ceremony** — trabajado directo en `develop` por instrucción explícita del usuario (mismo patrón que TASK-613 anteriormente).
+
+# Sesion 2026-05-09 — TASK-841 Nubox ops-worker config/freshness cerrada
+
+- **Trigger:** el usuario pidio implementar `TASK-841` directo en `develop` sin cambiar de rama, con criterio robusto/seguro/escalable y usando arquitectura cuando hiciera falta.
+- **Cloud remediation:** `ops-worker` staging quedo con `NUBOX_API_BASE_URL`, `NUBOX_BEARER_TOKEN_SECRET_REF=greenhouse-nubox-bearer-token-staging` y `NUBOX_X_API_KEY_SECRET_REF=greenhouse-nubox-x-api-key-staging`; service account `greenhouse-portal@efeonce-group.iam.gserviceaccount.com` tiene `secretAccessor` sobre ambos secretos. Revision runtime tras `gcloud run services update`: `ops-worker-00170-9bd`.
+- **Replay Cloud Scheduler:** ejecutados `ops-nubox-sync`, `ops-nubox-quotes-hot-sync` y `ops-nubox-balance-sync`. Post-fix logs: quotes hot sync `sales=3 quoteSales=1 created=0 updated=1`, balance sync done, full sync raw/conformed corriendo sin `NUBOX_* is not configured`.
+- **Runtime evidence:** `raw_sync` 2026-05-09 12:16:12→12:16:50 UTC `succeeded` (`records_read=30`, `records_written_raw=30`); `conformed_sync` 12:16:50→12:16:52 `succeeded` (`records_read=322`); `quotes_hot_sync` 12:16:12→12:16:21 `succeeded`; posterior corrida local de `postgres_projection` con codigo corregido `nubox-pg-c5593626-9573-407a-8475-8f86dea37252` `succeeded`, `records_read=231`, `records_projected_postgres=214`, `projectionFailures=0`.
+- **Fix raiz fiscal:** el fallo vivo era una compra Nubox `BHE` (`nubox_purchase_id=36671467`) con `net=175000`, `withholding=26688`, `total=148312`. Se modelo correctamente: `expenses.total_amount=148312` neto pagable, `withholding_amount=26688`, `effective_cost_amount=175000` bruto operativo. No se relajo el validator global de IVA.
+- **Code hardening:** `deploy.sh` declara contrato Nubox y Secret Manager IAM; orquestador propaga `partial`; `balance_sync` escribe `source_sync_runs`; `finance.nubox.source_freshness` detecta falsa salud raw stale; `postgres_projection` registra fallas por documento en `source_sync_failures` y termina `partial` solo cuando corresponda.
+- **Docs:** task movida a `docs/tasks/complete/TASK-841-nubox-ops-worker-config-freshness-hardening.md`; `docs/tasks/README.md`, `TASK_ID_REGISTRY`, `services/ops-worker/README.md`, `GREENHOUSE_SOURCE_SYNC_PIPELINES_V1`, `GREENHOUSE_CLOUD_INFRASTRUCTURE_V1`, `GREENHOUSE_FINANCE_ARCHITECTURE_V1` y `changelog.md` sincronizados.
+- **Guardrail multi-agente:** quedan dirty changes no relacionados de `TASK-835` en sample-sprints; no pertenecen a TASK-841 y no se deben revertir ni mezclar.
 
 # Sesion 2026-05-09 — TASK-812 compliance exports corregida
 
