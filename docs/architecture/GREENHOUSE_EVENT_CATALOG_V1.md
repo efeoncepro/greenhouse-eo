@@ -684,11 +684,14 @@ Los eventos de engagement usan `aggregate_type='service'`, `aggregate_id=<servic
 | `service` | `service.engagement.outcome_recorded` | `recordOutcome()` | `{ version:1, serviceId, actorUserId, outcomeId, outcomeKind, decisionDate, nextServiceId?, nextQuotationId? }` | audit/event preview |
 | `service` | `service.engagement.cancelled` | `recordOutcome()` para `cancelled_by_*` | `{ version:1, serviceId, actorUserId, outcomeId, outcomeKind, cancellationReason }` | `engagement_cancelled_manual_notification` (`notifications`) |
 | `service` | `service.engagement.converted` | `recordOutcome(converted)` y `convertEngagement()` | `{ version:1, serviceId, actorUserId, outcomeId, lineageId?, termsId?, nextServiceId?, nextQuotationId? }` | `engagement_converted_lifecycle` (`cost_intelligence`) llama `promoteParty()` |
+| `service` | `service.engagement.outbound_requested` | `declareSampleSprint()` desde `commercial/sample-sprints/store.ts` (TASK-837 Slice 3) | `{ version:1, serviceId, actorUserId, hubspotDealId, hubspotCompanyId, contactHubspotIds[], idempotencyKey, engagementKind, requestedAt }` | `sample_sprint_hubspot_outbound` (`finance` domain) — projecta a HubSpot p_services con idempotency |
+| `service` | `service.engagement.outbound_skipped` | Dead-letter UX cuando operador declara skip explícito (TASK-837 Slice 5, pendiente) | `{ version:1, serviceId, actorUserId, reason, skippedAt }` | audit-only (no consumer downstream) |
 
 Notas:
 - `engagement_converted_lifecycle` no escribe directo en `greenhouse_core.organizations`; usa `promoteParty()` para lifecycle history, campos coordinados, client/profile side-effects y eventos `commercial.party.*`.
 - HubSpot deal creation service→deal queda diferida porque el write path canónico existente es `createDealFromQuoteContext()` para Quote Builder; TASK-808 no llama directo al bridge Cloud Run.
 - `engagement_cancelled_manual_notification` despacha notificación interna `system_event` para follow-up manual y mantiene `automaticClientEmail=false`.
+- **TASK-837 Delta 2026-05-09**: `service.engagement.outbound_requested` es el primer write path canónico Greenhouse → HubSpot custom object `0-162`, scoped a Sample Sprints (engagement_kind != 'regular'). Convive con `service.engagement.declared` (TASK-808) que tiene cache invalidation consumer (TASK-835); separación de concerns explícita: `declared` = local lifecycle, `outbound_requested` = HubSpot projection trigger.
 
 ## Extensibilidad
 

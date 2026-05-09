@@ -826,6 +826,84 @@ HubSpot Developer Platform 2025.2 cambió el shape del payload de webhooks. **Am
 
 **Spec canónica**: `docs/tasks/in-progress/TASK-836-hubspot-services-lifecycle-stage-sync-hardening.md`. Runbook config HubSpot: `docs/operations/runbooks/hubspot-service-pipeline-config.md`.
 
+### Sample Sprint outbound projection invariants (TASK-837)
+
+Cuando alguien declara un **Sample Sprint** (`engagement_kind IN ('pilot','trial','poc','discovery')`) vía wizard `/agency/sample-sprints`, Greenhouse:
+
+1. **Exige un HubSpot Deal abierto** — el wizard requiere selección de Deal; el server revalida server-side antes de mutar.
+2. **Persiste el service localmente** con `hubspot_deal_id`, `idempotency_key = service_id`, `hubspot_sync_status='outbound_pending'` en una sola tx PG + outbox event `service.engagement.outbound_requested v1`.
+3. **Async outbound projection** consume el event y proyecta a HubSpot `p_services` (custom object 0-162) en stage `Validación / Sample Sprint` (ID `1357763256`) con asociaciones Deal+Company+Contacts atómicas.
+4. **Reliability**: 7 signals bajo subsystem `commercial` cubren todos los failure modes (overdue, dead_letter, partial_associations, deal_closed, drift, outcome_terminal, legacy).
+
+**Pipeline canónico end-to-end**:
+
+```text
+Wizard submit (Vercel route handler /api/agency/sample-sprints)
+  ├─> validateDealEligibility (getEligibleDealForRevalidation, NEVER trust client)
+  ├─> declareSampleSprint() en tx PG:
+  │   ├─ INSERT services (hubspot_deal_id, idempotency_key, hubspot_sync_status='outbound_pending')
+  │   ├─ INSERT engagement_approvals + audit_log
+  │   ├─ publishOutboxEvent('service.engagement.declared')      (TASK-808 path, cache invalidation TASK-835)
+  │   └─ publishOutboxEvent('service.engagement.outbound_requested')  (TASK-837 trigger Slice 4)
+  ├─> respond 201 con {serviceId, status:'outbound_pending', idempotencyKey}
+  │
+  ┊  (async, decoupled — Cloud Scheduler ops-reactive-finance */5 min)
+  │
+Reactive consumer 'sample_sprint_hubspot_outbound':
+  ├─ re-read service desde PG (NO confiar payload)
+  ├─ idempotency check: GET /services/by-idempotency-key/<idempotency_key>
+  ├─ si match: skip POST + UPDATE local (hubspot_service_id, status='ready')
+  ├─ si no match: POST /services con properties + associations (Deal+Company+Contacts)
+  ├─ UPDATE atomic local: hubspot_service_id, hubspot_last_synced_at, status='ready'|'partial_associations'
+  └─ on bridge fail: rollback in_progress → outbound_pending + retry exponencial (maxRetries=3) → outbound_dead_letter
+```
+
+**Webhook eco cascade** (anti-duplicate row): cuando HubSpot dispara webhook `service.creation` post-outbound, el handler `hubspotServicesIntakeProjection` aplica lookup cascade ANTES del UPSERT TASK-813b:
+
+1. Si `properties.ef_greenhouse_service_id` matches `services.idempotency_key` local → UPDATE atomic linkando `hubspot_service_id` y skip UPSERT (evita segunda fila).
+2. Fallback: UPSERT canónico TASK-813b (path inbound puro).
+
+**Hard rules (18 invariantes anti-regresión)**:
+
+- **NUNCA** ejecutar POST/PATCH/DELETE a HubSpot inline en un route handler Vercel para Sample Sprints. Toda mutación outbound pasa por outbox event + reactive consumer en `ops-worker` Cloud Run (anti-pattern TASK-771).
+- **NUNCA** responder 5xx al cliente cuando PG commiteó y solo HubSpot falló. El cliente recibe 201 con `outbound_pending`; el reactive consumer reintenta async.
+- **NUNCA** declarar Sample Sprint sin `hubspotDealId` validado server-side contra Deal abierto. La UI nunca decide elegibilidad final — la revalidación corre en `declareSampleSprint` vía `getEligibleDealForRevalidation` (cache bypass).
+- **NUNCA** filtrar Deals elegibles por label visible HubSpot. Solo `is_closed`/`is_won`/stage IDs sincronizados desde `hubspot_deal_pipeline_config`.
+- **NUNCA** crear `p_services` HubSpot sin idempotency key. `ef_greenhouse_service_id` (creada en TASK-837 Slice 0.5a) es la property writable canónica — `hs_unique_creation_key` es READ-ONLY en `0-162` (verificado en Checkpoint A 2026-05-09).
+- **NUNCA** crear property HubSpot `ef_source_deal_id` ni `ef_engagement_origin`. Reusar `ef_deal_id` y `ef_engagement_kind` (las dimensiones ortogonales "tipo" vs "Deal" ya existen).
+- **NUNCA** persistir `hubspot_service_id` sin `idempotency_key` previamente persistido. La idempotency key vive en `services.idempotency_key` desde el INSERT local, ANTES del POST HubSpot.
+- **NUNCA** invocar `Sentry.captureException()` directo en code paths del outbound projection. Usar `captureWithDomain(err, 'integrations.hubspot', { tags: { source: 'sample_sprint_outbound', stage: '...' } })`.
+- **NUNCA** loggear payload completo del bridge response (puede contener PII de contactos). Usar `redactErrorForResponse` y `redactSensitive` antes de persistir o loggear.
+- **NUNCA** crear segunda fila `services` cuando webhook eco entra para un service ya creado por outbound. El handler inbound aplica lookup cascade por `idempotency_key` (TASK-837 Slice 4 patch a `hubspot-services-intake.ts`).
+- **NUNCA** mover `p_services` HubSpot a Closed automáticamente cuando outcome Greenhouse es terminal (V1 manual). Reliability signal `outcome_terminal_pservices_open` lo escala operativamente. Automatizar es task derivada V1.1.
+- **NUNCA** inventar Deal retroactivamente para Sample Sprint legacy sin Deal. Operador comercial decide via manual queue: vincular existente, declarar legacy o cerrar.
+- **NUNCA** depender de `ef_pipeline_stage` como source of truth de HubSpot stage. Solo `hs_pipeline_stage`. La property `ef_pipeline_stage` quedó deprecated para Sample Sprints (Checkpoint D resuelto).
+- **NUNCA** modificar el CHECK constraint `services_hubspot_sync_status_check` sin extender ambos sets de valores: inbound (`pending|synced|unmapped` TASK-813/836) + outbound (`outbound_pending|outbound_in_progress|ready|partial_associations|outbound_dead_letter` TASK-837).
+- **SIEMPRE** que un Sample Sprint se declare via wizard, emitir outbox event `service.engagement.outbound_requested v1` en la misma tx PG. NO confundir con `service.engagement.declared v1` (TASK-808) que tiene cache invalidation consumer (TASK-835).
+- **SIEMPRE** revalidar elegibilidad del Deal server-side al submit (stage abierto + company + ≥1 contacto). El cache del reader tiene TTL 60s; la revalidación es fresh (NEVER cache).
+- **SIEMPRE** que outbound projection reciba 429 de HubSpot, respetar `Retry-After` header del bridge response. Backoff exponencial automatico via outbox state machine TASK-773.
+- **SIEMPRE** que un service entre en `outbound_dead_letter`, requiere humano via dead-letter UX (`commercial.engagement.recover_outbound` capability, FINANCE_ADMIN o EFEONCE_ADMIN solo).
+
+**Helpers canónicos**:
+
+- `getEligibleDealForRevalidation(hubspotDealId)` — `src/lib/commercial/eligible-deals-reader.ts`, fresh PG read.
+- `listEligibleDealsForSampleSprint({...})` — wizard reader con cache TTL 60s per subject.
+- `declareSampleSprint(input)` — `src/lib/commercial/sample-sprints/store.ts`, atomic tx + 2 outbox events.
+- `sampleSprintHubSpotOutboundProjection` — `src/lib/sync/projections/sample-sprint-hubspot-outbound.ts`, reactive consumer.
+- `createHubSpotGreenhouseService` / `findHubSpotGreenhouseServiceByIdempotencyKey` / `updateHubSpotGreenhouseService` — `src/lib/integrations/hubspot-greenhouse-service.ts`, bridge clients.
+
+**Reliability signals (subsystem `commercial`, steady=0)**:
+
+- `commercial.sample_sprint.outbound_pending_overdue` (lag/warning)
+- `commercial.sample_sprint.outbound_dead_letter` (dead_letter/error)
+- `commercial.sample_sprint.partial_associations` (drift/warning)
+- `commercial.sample_sprint.deal_closed_but_active` (drift/warning)
+- `commercial.sample_sprint.deal_associations_drift` (drift/warning)
+- `commercial.sample_sprint.outcome_terminal_pservices_open` (drift/warning)
+- `commercial.sample_sprint.legacy_without_deal` (data_quality/warning)
+
+**Spec canónica**: `docs/tasks/in-progress/TASK-837-deal-bound-sample-sprint-service-projection.md`. Runbook recovery: `docs/operations/runbooks/sample-sprint-outbound-recovery.md`. Bridge endpoints: `services/hubspot_greenhouse_integration/app.py` (POST `/services`, PATCH `/services/<id>`, GET `/services/by-idempotency-key/<key>`).
+
 ### Cross-runtime observability — Sentry init invariant (TASK-844)
 
 `src/lib/**` corre en **5 runtimes distintos** y todos consumen el wrapper canónico `captureWithDomain` (207 callsites) para emitir incidents a Sentry con tag `domain` para roll-up por módulo en el reliability dashboard.
