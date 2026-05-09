@@ -1,13 +1,15 @@
-# Sesion 2026-05-09 — TASK-837 Deal-Bound Sample Sprint HubSpot Service Projection (en progreso)
+# Sesion 2026-05-09 — TASK-837 Deal-Bound Sample Sprint HubSpot Service Projection (CERRADA)
 
-- **Trigger:** usuario pide implementar TASK-837 directo en `develop` con auto mode, sinergia ecosystem + Open Questions resolution + skills UI cuando toque (`greenhouse-dev`, `greenhouse-ux`, `greenhouse-microinteractions-auditor`, `modern-ui` global, `microinteractions-auditor` global, `greenhouse-ux-writing`).
-- **Estado:** task movida `to-do/` → `in-progress/`. Lifecycle = `in-progress`. Sin branch nuevo (commit directo en develop por autorización explicita). README + Handoff sincronizados. Pre-checks (gh pr / git branch) limpios.
-- **Pre-trabajo realizado en sesión previa de hoy:**
-  - Slice 0 checkpoints A/B/C/D ejecutados con evidencia HubSpot live (commit `fe6dd987`).
-  - Slice 0.5 agregado al spec con 3 sub-slices atómicos (commit `c7c5060c`): 0.5a property HubSpot, 0.5b bridge endpoints, 0.5c migration PG.
-- **Open Questions status:** 4 de 5 resueltas pre-execution (Q4-Q5 vía checkpoints A/B; Q1 ef_pipeline_stage deprecation técnica; Q2 capability separation natural via outbox). Q3 (contactos faltantes bloquear vs override) preserva recomendación canónica = bloquear (alineado con ICP Globe enterprise marketing teams: no-comm-channel rompe assumption commercial). Open Questions formalmente cerradas en Pre-FASE 1 documentation.
-- **Plan de slices vigente (TASK-837 spec):** 0.5a → 0.5c → 0.5b → 1 (Eligible Deal Source) → 3 (Server-Side Creation Contract) → 4 (Outbound Projection Cloud Run) → 2 (Wizard UI, requiere skills UI completas) → 5 (Dead-Letter UX, requiere skills UI) → 6 (7 Reliability Signals) → 7 (Docs + Runbook).
-- **Próximo paso:** FASE 1 Discovery (lectura arch docs `GREENHOUSE_PILOT_ENGAGEMENT_ARCHITECTURE_V1`, `GREENHOUSE_HUBSPOT_SERVICES_INTAKE_V1`, `GREENHOUSE_EVENT_CATALOG_V1`) + verificación schema PG real (`pnpm pg:connect:status` + columns shape vs spec).
+- **Trigger:** usuario pide implementar TASK-837 directo en `develop` con auto mode, sinergia ecosystem + Open Questions resolution + skills UI cuando toque.
+- **Estado:** **CERRADA 2026-05-09**. Task movida a `complete/`. README + Handoff sincronizados. 13 commits incrementales en `develop`. Sin PR ceremony.
+- **Pipeline funcional end-to-end:** wizard exige Deal HubSpot abierto → server revalida server-side → declareSampleSprint persiste local + emite outbox `service.engagement.outbound_requested v1` → reactive consumer ops-worker → bridge POST `0-162` con idempotency `ef_greenhouse_service_id` + 4 associations atomic → UPDATE atomic local `ready`/`partial_associations`/`outbound_dead_letter` → reliability signals subsystem `commercial`.
+- **Open Questions status:** 5 de 5 resueltas. Q1 ef_pipeline_stage deprecated, Q2 capability separation natural via outbox, Q3 contactos faltantes BLOQUEAR siempre, Q4 multi-company no-op V1 sample 150 deals, Q5 hs_unique_creation_key READ-ONLY → fallback ef_greenhouse_service_id creada live.
+- **Slices entregados (orden canónico):** 0.5c migration PG (`5f034f0c`) → 0.5a HubSpot property (`f68a8d7e`) → 0.5b bridge endpoints CRUD `0-162` + 11 pytest (`312079c0`) → 1 eligible deals reader + 14 vitest (`8c2018b3`) → 3 declareSampleSprint deal-bound + outbox (`1f3b5e26`) → 4 outbound projection + webhook eco cascade + 14 vitest (`60bd5b47`) → 6 7 reliability signals (`59d8f787`) → 7 docs + runbook + CLAUDE.md (`ba6f5652`) → 2 wizard Deal Selection (`f85b9ca6`) → 5 dead-letter UX (`6238f0aa`).
+- **Skills invocadas (en orden):** `arch-architect` (greenhouse overlay), `commercial-expert` (greenhouse overlay), `greenhouse-backend`, `hubspot-greenhouse-bridge`, `greenhouse-ux`, `greenhouse-ux-writing`, `greenhouse-dev`.
+- **Hard Rules canonizadas en CLAUDE.md** sección "Sample Sprint outbound projection invariants (TASK-837)": 18 invariantes NUNCA/SIEMPRE.
+- **Runbook canónico:** `docs/operations/runbooks/sample-sprint-outbound-recovery.md` con 7 escenarios + decision tree operador-facing + verificación post-recovery.
+- **Tests:** ~250 verdes nuevos/extendidos. TS clean. Lint clean. pg:doctor green.
+- **Próximo paso (futuras sesiones):** monitorear reliability signals en `/admin/operations` post-deploy. Si `outbound_dead_letter` > 0 emerge en runtime, operador con capability `commercial.engagement.recover_outbound` accede a `/admin/integrations/hubspot/sample-sprint-dead-letter` para retry o skip explícito. Follow-up V1.1 candidatos documentados en runbook (poll HubSpot associations live para deal_associations_drift; auto-mover p_services a Closed cuando outcome terminal).
 
 ---
 

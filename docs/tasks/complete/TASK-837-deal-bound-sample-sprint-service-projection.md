@@ -8,13 +8,13 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `EPIC-014`
-- Status real: `Implementacion`
+- Status real: `Cerrada 2026-05-09 directo en develop`
 - Rank: `TBD`
 - Domain: `crm / delivery / agency`
 - Blocked by: `TASK-836` (closed 2026-05-09)
@@ -22,6 +22,7 @@
 - Legacy ID: `none`
 - GitHub Issue: `optional`
 - Started: `2026-05-09` (Claude Opus, agent autonomo en auto mode)
+- Completed: `2026-05-09` — 9 commits incrementales en develop
 
 ## Summary
 
@@ -877,11 +878,18 @@ Cerrar una task es obligatorio y forma parte de Definition of Done. Si la implem
 
 ## Open Questions
 
+**Estado al 2026-05-09 pre-FASE 1**: las 5 preguntas están RESUELTAS. La task entra a Discovery con cero ambigüedad.
+
 - **RESUELTA (2026-05-08)** `ef_pipeline_stage` queda **deprecated** para Sample Sprints. `hs_pipeline_stage` es source of truth de HubSpot stage. Outbound NO actualiza `ef_pipeline_stage`. Reportes ad-hoc dependientes deben migrarse (Checkpoint D). Ver `Detailed Spec > ef_pipeline_stage deprecation policy`.
 - **RESUELTA (2026-05-08)** Capability separation declare-vs-project resuelta naturalmente con outbox pattern: la projection es disparada por outbox consumer, NO por accion directa del usuario. Solo se agrega capability granular `commercial.engagement.recover_outbound` (FINANCE_ADMIN + EFEONCE_ADMIN solo) para dead-letter UX. Ver `Detailed Spec > Access model`.
-- ¿Contactos faltantes deben bloquear siempre o permitir override admin temporal? **Recomendacion canonica: bloquear**. Override temporal abre superficie de Sample Sprints sin contacto identificable, lo cual rompe assumption commercial (no se puede comunicar con quien). Si emerge caso legitimo (ej. Deal interno EOM testing), abrir task derivada con flag explicito + audit.
-- ¿Existe association label primaria confiable para company en Deals con multiples companies? **Resolver en Checkpoint B (Slice 0)**. Si no existe, manual queue UI antes de habilitar el wizard a operadores. Si existe primaria confiable, usar como source of truth automatico.
-- ¿`hs_unique_creation_key` es writable en custom object `0-162` para creates API? **Resolver en Checkpoint A (Slice 0)**. Si NO writable, crear `ef_greenhouse_service_id` como fallback minimo ANTES de Slice 4. Decision documentada en PR description.
+- **RESUELTA (2026-05-09 pre-FASE 1)** Contactos faltantes → **bloquear** (no admitir override admin temporal). **Rationale**:
+  - **Safety**: override temporal en producción puede normalizar Sample Sprints huérfanos de contacto identificable, rompiendo la assumption commercial _"hay alguien con quien hablar"_. ICP Globe = enterprise marketing teams; si no hay contacto en HubSpot, el comercial no tiene canal para coordinar el piloto.
+  - **Robustness**: bloquear duro es estado simple (binary fail-closed). Override agrega path branching que se vuelve fuente de bugs (caching del flag, race conditions, audit trail incompleta).
+  - **Resilience**: si emerge caso legítimo extraordinario (ej. Deal interno EOM con stakeholder único, Sample Sprint pre-onboarding sin commercial counterpart aún), se abre task derivada con flag explícito + capability granular + audit log + reliability signal — proceso formal, no override silente.
+  - **Scalability**: regla simple escala con team size. Override "admin temporal" se vuelve hábito y degrada en regla muerta.
+  - **Implementación**: server-side guard en `validateDealEligibility()` (Slice 3) → 400 con error explicit `deal_missing_contacts` y copy es-CL "Este deal no tiene contactos asociados. Antes de declarar el Sample Sprint, asocia al menos un contacto en HubSpot."
+- **RESUELTA (Checkpoint B, 2026-05-09)** No-op en V1. Sample 150 deals: 0 multi-company real. HubSpot sí provee `Primary` label (typeId 5 HUBSPOT_DEFINED) cuando aplica. Manual queue UI **NO requerido en V1**; defensive fallback con reliability signal `commercial.sample_sprint.multi_company_unresolved` (kind=drift, severity=warning, steady=0) materializa manual queue solo si emerge en runtime. Ver `Slice 0 — Resultados ejecutados > Checkpoint B`.
+- **RESUELTA (Checkpoint A, 2026-05-09)** `hs_unique_creation_key` es **READ-ONLY** at create time en custom object `0-162` (HubSpot rechaza con `READ_ONLY_VALUE`). Path canónico = property writable `ef_greenhouse_service_id` creada en Slice 0.5a. Ver `Slice 0 — Resultados ejecutados > Checkpoint A`.
 
 ## Delta 2026-05-08 — Hardening pre-implementation
 
