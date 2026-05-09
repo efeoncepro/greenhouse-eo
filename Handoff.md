@@ -1,3 +1,21 @@
+# Sesion 2026-05-09 — TASK-836 follow-up: webhook handler dual-format + nuevas subscriptions
+
+- **Trigger:** smoke test post-TASK-836 (PATCH `ef_engagement_kind` en service Aguas Andinas) revelo que el webhook llegaba a `webhook_inbox_events` (status=processed) pero NO actualizaba `hubspot_last_synced_at` — handler ignoraba el event silente.
+- **Causa raiz descubierta:** HubSpot Developer Platform 2025.2 (Build #24 deployed 2026-05-06) cambio el shape del payload:
+  - Legacy: `subscriptionType="company.creation"` (single field)
+  - 2025.2: `subscriptionType="object.creation"` + `objectTypeId="0-2"` (separados)
+  - Handlers `hubspot-companies.ts` y `hubspot-services.ts` filtraban con `startsWith('company.')` / `startsWith('p_services.')` — ningun event 2025.2 matcheaba.
+- **Impacto silente ultimos 30 dias:** 96+ propertyChange + 32 creation events drop-eados (status=processed sin sync). Causa raiz del caso Berel (deal cerrado, service materializado en HubSpot, webhook arrived, NO sync a Greenhouse).
+- **Fix entregado** (commit `f3331af8`):
+  - HubSpot Developer App: 2 nuevas subscriptions (`ef_engagement_kind`, `hs_pipeline_stage`) — Build #25 SUCCESS deployed 2026-05-09 10:52:36 via `hs project upload --account=48713323`. Total 25 → 27 subscriptions.
+  - `classifyHubSpotEvent` canonical helper en `hubspot-companies.ts` + `isHubSpotServiceEvent` mirror en `hubspot-services.ts` — soportan legacy + 2025.2 simultaneamente, backward compat 100%.
+  - 4 tests anti-regresion en `hubspot-companies.test.ts` cubren: object.creation+objectTypeId=0-2 → company sync; object.propertyChange+objectTypeId=0-1+associatedObjectId → contact resuelve a company; mix legacy+2025.2 → dedup; objectTypeId=0-999 unknown → ignored sin crash.
+  - 10/10 tests passing, lint clean, tsc clean.
+- **CLAUDE.md** actualizado con seccion nueva "HubSpot webhook events — dual-format invariant (TASK-836 follow-up)" — tabla legacy vs 2025.2 + 5 hard rules anti-regresion + helper canonico documentado.
+- **Pendiente:** merge `develop → main` para que el handler corregido llegue a produccion (`greenhouse.efeoncepro.com`). Smoke test post-merge: re-PATCH `ef_engagement_kind` y verificar `hubspot_last_synced_at` actualiza < 30s.
+
+---
+
 # Sesion 2026-05-09 — TASK-836 HubSpot Services Lifecycle Stage Sync cerrada (apply ejecutado)
 
 - **Trigger:** el usuario pidio implementar TASK-836 manteniendo `develop`, con invocacion continua de la skill `arch-architect` para validacion 4-pillar.
