@@ -479,6 +479,15 @@ AGENT_AUTH_SECRET=<secret> node scripts/playwright-auth-setup.mjs
 - Setup Playwright: `scripts/playwright-auth-setup.mjs`
 - Spec técnica: `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md` (sección Agent Auth)
 
+### Playwright smoke navigation contract
+
+- En `tests/e2e/smoke/*.spec.ts`, **NUNCA** usar `page.goto(...)` directo.
+- Usar `gotoWithTransientRetries()` desde `tests/e2e/fixtures/auth.ts` para rutas que solo deben probar "no 5xx" o render/redirect tolerante.
+- Usar `gotoAuthenticated()` cuando la ruta debe preservar sesion valida y fallar si cae en `/login`, `/signin`, `/auth/signin` o `/auth/access-denied`.
+- No reemplazar este contrato con timeouts locales por spec. Los retries solo cubren errores transitorios de navegacion; HTTP `4xx/5xx`, redirects de auth indebidos y asserts funcionales deben fallar loud.
+- Mantener verde `pnpm test scripts/lib/e2e-smoke-navigation-contract.test.ts`. Esa prueba existe para que otro agente no reintroduzca `page.goto` crudo en smoke specs.
+- ADR canonico: `docs/architecture/GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1.md#delta-2026-05-09--issue-073-follow-up-smoke-navigation-contract`.
+
 ### Staging requests programáticas (agentes y CI)
 
 - Staging tiene **Vercel SSO Protection** activa — todo request sin bypass es redirigido a la SSO wall.
@@ -816,6 +825,171 @@ HubSpot Developer Platform 2025.2 cambió el shape del payload de webhooks. **Am
 **Tests anti-regresión**: `src/lib/webhooks/handlers/hubspot-companies.test.ts` describe block `classifyHubSpotEvent dual-format (TASK-836 follow-up)` — 4 tests cubren formato 2025.2 puro, mixed legacy+2025.2 dedup, contact event con `associatedObjectId`, y `objectTypeId` desconocido ignorado.
 
 **Spec canónica**: `docs/tasks/in-progress/TASK-836-hubspot-services-lifecycle-stage-sync-hardening.md`. Runbook config HubSpot: `docs/operations/runbooks/hubspot-service-pipeline-config.md`.
+
+### Sample Sprint outbound projection invariants (TASK-837)
+
+Cuando alguien declara un **Sample Sprint** (`engagement_kind IN ('pilot','trial','poc','discovery')`) vía wizard `/agency/sample-sprints`, Greenhouse:
+
+1. **Exige un HubSpot Deal abierto** — el wizard requiere selección de Deal; el server revalida server-side antes de mutar.
+2. **Persiste el service localmente** con `hubspot_deal_id`, `idempotency_key = service_id`, `hubspot_sync_status='outbound_pending'` en una sola tx PG + outbox event `service.engagement.outbound_requested v1`.
+3. **Async outbound projection** consume el event y proyecta a HubSpot `p_services` (custom object 0-162) en stage `Validación / Sample Sprint` (ID `1357763256`) con asociaciones Deal+Company+Contacts atómicas.
+4. **Reliability**: 7 signals bajo subsystem `commercial` cubren todos los failure modes (overdue, dead_letter, partial_associations, deal_closed, drift, outcome_terminal, legacy).
+
+**Pipeline canónico end-to-end**:
+
+```text
+Wizard submit (Vercel route handler /api/agency/sample-sprints)
+  ├─> validateDealEligibility (getEligibleDealForRevalidation, NEVER trust client)
+  ├─> declareSampleSprint() en tx PG:
+  │   ├─ INSERT services (hubspot_deal_id, idempotency_key, hubspot_sync_status='outbound_pending')
+  │   ├─ INSERT engagement_approvals + audit_log
+  │   ├─ publishOutboxEvent('service.engagement.declared')      (TASK-808 path, cache invalidation TASK-835)
+  │   └─ publishOutboxEvent('service.engagement.outbound_requested')  (TASK-837 trigger Slice 4)
+  ├─> respond 201 con {serviceId, status:'outbound_pending', idempotencyKey}
+  │
+  ┊  (async, decoupled — Cloud Scheduler ops-reactive-finance */5 min)
+  │
+Reactive consumer 'sample_sprint_hubspot_outbound':
+  ├─ re-read service desde PG (NO confiar payload)
+  ├─ idempotency check: GET /services/by-idempotency-key/<idempotency_key>
+  ├─ si match: skip POST + UPDATE local (hubspot_service_id, status='ready')
+  ├─ si no match: POST /services con properties + associations (Deal+Company+Contacts)
+  ├─ UPDATE atomic local: hubspot_service_id, hubspot_last_synced_at, status='ready'|'partial_associations'
+  └─ on bridge fail: rollback in_progress → outbound_pending + retry exponencial (maxRetries=3) → outbound_dead_letter
+```
+
+**Webhook eco cascade** (anti-duplicate row): cuando HubSpot dispara webhook `service.creation` post-outbound, el handler `hubspotServicesIntakeProjection` aplica lookup cascade ANTES del UPSERT TASK-813b:
+
+1. Si `properties.ef_greenhouse_service_id` matches `services.idempotency_key` local → UPDATE atomic linkando `hubspot_service_id` y skip UPSERT (evita segunda fila).
+2. Fallback: UPSERT canónico TASK-813b (path inbound puro).
+
+**Hard rules (18 invariantes anti-regresión)**:
+
+- **NUNCA** ejecutar POST/PATCH/DELETE a HubSpot inline en un route handler Vercel para Sample Sprints. Toda mutación outbound pasa por outbox event + reactive consumer en `ops-worker` Cloud Run (anti-pattern TASK-771).
+- **NUNCA** responder 5xx al cliente cuando PG commiteó y solo HubSpot falló. El cliente recibe 201 con `outbound_pending`; el reactive consumer reintenta async.
+- **NUNCA** declarar Sample Sprint sin `hubspotDealId` validado server-side contra Deal abierto. La UI nunca decide elegibilidad final — la revalidación corre en `declareSampleSprint` vía `getEligibleDealForRevalidation` (cache bypass).
+- **NUNCA** filtrar Deals elegibles por label visible HubSpot. Solo `is_closed`/`is_won`/stage IDs sincronizados desde `hubspot_deal_pipeline_config`.
+- **NUNCA** crear `p_services` HubSpot sin idempotency key. `ef_greenhouse_service_id` (creada en TASK-837 Slice 0.5a) es la property writable canónica — `hs_unique_creation_key` es READ-ONLY en `0-162` (verificado en Checkpoint A 2026-05-09).
+- **NUNCA** crear property HubSpot `ef_source_deal_id` ni `ef_engagement_origin`. Reusar `ef_deal_id` y `ef_engagement_kind` (las dimensiones ortogonales "tipo" vs "Deal" ya existen).
+- **NUNCA** persistir `hubspot_service_id` sin `idempotency_key` previamente persistido. La idempotency key vive en `services.idempotency_key` desde el INSERT local, ANTES del POST HubSpot.
+- **NUNCA** invocar `Sentry.captureException()` directo en code paths del outbound projection. Usar `captureWithDomain(err, 'integrations.hubspot', { tags: { source: 'sample_sprint_outbound', stage: '...' } })`.
+- **NUNCA** loggear payload completo del bridge response (puede contener PII de contactos). Usar `redactErrorForResponse` y `redactSensitive` antes de persistir o loggear.
+- **NUNCA** crear segunda fila `services` cuando webhook eco entra para un service ya creado por outbound. El handler inbound aplica lookup cascade por `idempotency_key` (TASK-837 Slice 4 patch a `hubspot-services-intake.ts`).
+- **NUNCA** mover `p_services` HubSpot a Closed automáticamente cuando outcome Greenhouse es terminal (V1 manual). Reliability signal `outcome_terminal_pservices_open` lo escala operativamente. Automatizar es task derivada V1.1.
+- **NUNCA** inventar Deal retroactivamente para Sample Sprint legacy sin Deal. Operador comercial decide via manual queue: vincular existente, declarar legacy o cerrar.
+- **NUNCA** depender de `ef_pipeline_stage` como source of truth de HubSpot stage. Solo `hs_pipeline_stage`. La property `ef_pipeline_stage` quedó deprecated para Sample Sprints (Checkpoint D resuelto).
+- **NUNCA** modificar el CHECK constraint `services_hubspot_sync_status_check` sin extender ambos sets de valores: inbound (`pending|synced|unmapped` TASK-813/836) + outbound (`outbound_pending|outbound_in_progress|ready|partial_associations|outbound_dead_letter` TASK-837).
+- **SIEMPRE** que un Sample Sprint se declare via wizard, emitir outbox event `service.engagement.outbound_requested v1` en la misma tx PG. NO confundir con `service.engagement.declared v1` (TASK-808) que tiene cache invalidation consumer (TASK-835).
+- **SIEMPRE** revalidar elegibilidad del Deal server-side al submit (stage abierto + company + ≥1 contacto). El cache del reader tiene TTL 60s; la revalidación es fresh (NEVER cache).
+- **SIEMPRE** que outbound projection reciba 429 de HubSpot, respetar `Retry-After` header del bridge response. Backoff exponencial automatico via outbox state machine TASK-773.
+- **SIEMPRE** que un service entre en `outbound_dead_letter`, requiere humano via dead-letter UX (`commercial.engagement.recover_outbound` capability, FINANCE_ADMIN o EFEONCE_ADMIN solo).
+
+**Helpers canónicos**:
+
+- `getEligibleDealForRevalidation(hubspotDealId)` — `src/lib/commercial/eligible-deals-reader.ts`, fresh PG read.
+- `listEligibleDealsForSampleSprint({...})` — wizard reader con cache TTL 60s per subject.
+- `declareSampleSprint(input)` — `src/lib/commercial/sample-sprints/store.ts`, atomic tx + 2 outbox events.
+- `sampleSprintHubSpotOutboundProjection` — `src/lib/sync/projections/sample-sprint-hubspot-outbound.ts`, reactive consumer.
+- `createHubSpotGreenhouseService` / `findHubSpotGreenhouseServiceByIdempotencyKey` / `updateHubSpotGreenhouseService` — `src/lib/integrations/hubspot-greenhouse-service.ts`, bridge clients.
+
+**Reliability signals (subsystem `commercial`, steady=0)**:
+
+- `commercial.sample_sprint.outbound_pending_overdue` (lag/warning)
+- `commercial.sample_sprint.outbound_dead_letter` (dead_letter/error)
+- `commercial.sample_sprint.partial_associations` (drift/warning)
+- `commercial.sample_sprint.deal_closed_but_active` (drift/warning)
+- `commercial.sample_sprint.deal_associations_drift` (drift/warning)
+- `commercial.sample_sprint.outcome_terminal_pservices_open` (drift/warning)
+- `commercial.sample_sprint.legacy_without_deal` (data_quality/warning)
+
+**Spec canónica**: `docs/tasks/in-progress/TASK-837-deal-bound-sample-sprint-service-projection.md`. Runbook recovery: `docs/operations/runbooks/sample-sprint-outbound-recovery.md`. Bridge endpoints: `services/hubspot_greenhouse_integration/app.py` (POST `/services`, PATCH `/services/<id>`, GET `/services/by-idempotency-key/<key>`).
+
+### Cross-runtime observability — Sentry init invariant (TASK-844)
+
+`src/lib/**` corre en **5 runtimes distintos** y todos consumen el wrapper canónico `captureWithDomain` (207 callsites) para emitir incidents a Sentry con tag `domain` para roll-up por módulo en el reliability dashboard.
+
+| Runtime | Sentry init path | Status |
+|---|---|---|
+| **Vercel** (Next.js 16 App Router) | Auto vía `src/instrumentation.ts` → `sentry.server.config.ts` → `next.config.ts withSentryConfig` | ✅ canónico desde día 1 |
+| **ops-worker** Cloud Run (generic Node ESM) | `services/ops-worker/server.ts` línea de init invocando `initSentryForService('ops-worker')` desde `services/_shared/sentry-init.ts` | ✅ TASK-844 Slice 3 |
+| **commercial-cost-worker** Cloud Run | mismo patrón ops-worker | ✅ TASK-844 Slice 4 |
+| **ico-batch** Cloud Run | mismo patrón ops-worker | ✅ TASK-844 Slice 4 |
+| **hubspot_greenhouse_integration** Cloud Run (Python) | Out of scope (Python services tienen su propio SDK Sentry si emerge necesidad) | N/A |
+
+**Helper canónico**: `services/_shared/sentry-init.ts` (`initSentryForService(serviceName, options?)`).
+
+- DSN missing → `console.warn` once + return (graceful degradation, captureWithDomain hace no-op via Sentry SDK builtin fallback).
+- DSN present → `Sentry.init({ dsn, environment, serverName, release, tracesSampleRate })` + `Sentry.setTag('service', serviceName)`.
+- Idempotente — singleton flag previene doble init + warn spam.
+- Secret canónico GCP: `greenhouse-sentry-dsn` (Secret Manager). Si no existe, deploy.sh continúa con warn.
+
+**Wrapper canónico**: `src/lib/observability/capture.ts` importa `@sentry/node` (NO `@sentry/nextjs`). `@sentry/node` es el SDK underlying que `@sentry/nextjs` envuelve — runtime-portable. Sentry hub es global singleton: ambos runtimes acceden al mismo hub.
+
+**Contexto root cause** (ISSUE-074): TASK-813b (async intake p_services HubSpot via webhook → outbox → reactive consumer) nunca funcionó end-to-end en producción porque el wrapper importaba `@sentry/nextjs` cuyo shape variaba en runtime Cloud Run, causando `Sentry.captureException is not a function`. Detectado durante smoke test post-merge PR #113 (TASK-836 follow-up). Cerrado live 2026-05-09 19:30:04 con cycle PATCH→materialized verificado.
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** importar `@sentry/nextjs` directamente en código bajo `src/lib/`. Usar `captureWithDomain(err, '<domain>', { extra })` desde `src/lib/observability/capture.ts` que abstrae `@sentry/node` runtime-portable.
+- **NUNCA** crear nuevo Cloud Run Node service sin `initSentryForService(name)` como primera línea ejecutable de `server.ts`, después de imports y antes de `createServer`. Lint rule `greenhouse/cloud-run-services-must-init-sentry` (modo `error`) bloquea el commit.
+- **NUNCA** invocar `Sentry.captureException()` directo en code path con dominio claro. Usar `captureWithDomain(err, '<domain>', { extra })`. Sin tag `domain`, el incident no aparece en signals per-module del reliability dashboard.
+- **NUNCA** modificar `services/_shared/sentry-init.ts` para cambiar el contract de degradation. DSN missing DEBE no-op silenciosamente; observabilidad nunca bloquea path principal.
+- **NUNCA** mover el call `initSentryForService(...)` después del primer createServer/listen en `server.ts`. Tiene que correr antes de cualquier handler HTTP que pueda invocar funciones de `@/lib/**`.
+- **NUNCA** importar el helper desde `@/lib/...` o re-exportarlo desde `src/`. Vive intencionalmente en `services/_shared/` para preservar el boundary runtime (Vercel runtime usa init Next.js auto; Cloud Run runtime usa este helper explícito).
+- **NUNCA** crashear el helper si DSN tiene formato inválido — Sentry SDK valida internamente y degrada graceful.
+- **SIEMPRE** que emerja un Cloud Run Node service nuevo, agregar `initSentryForService('<nombre>')` + `COPY services/_shared/ ./services/_shared/` en Dockerfile + opcionalmente SENTRY_DSN secret mount en deploy.sh.
+- **SIEMPRE** que un nuevo runtime aparezca (ej. Cloudflare Workers, AWS Lambda, generic Bun service), validar que `@sentry/node` corre allí o adaptar el wrapper sin cambiar la superficie de import.
+
+**Defense-in-depth (3 capas)**:
+
+1. **Lint rule** `greenhouse/cloud-run-services-must-init-sentry` (modo `error`, TASK-844 Slice 6): bloquea commits que crean `services/<svc>/server.ts` con import de `@/lib/**` sin `initSentryForService` import + call.
+2. **Reliability signal** `observability.cloud_run.silent_failure_rate` (TASK-844 Slice 5): cuenta filas en `outbox_reactive_log` con `last_error LIKE '%captureException is not a function%'` últimas 24h. Steady=0; cualquier > 0 indica regresión runtime.
+3. **Cloud Logging stderr fallback**: si Sentry no está configurado, errores siguen visibles en Cloud Logging via `console.error`/`console.warn`. Helper escribe warn al startup cuando DSN missing.
+
+**Spec canónica**: `docs/tasks/in-progress/TASK-844-cross-runtime-observability-sentry-init.md`. ISSUE relacionado: `docs/issues/resolved/ISSUE-074-ops-worker-missing-sentry-bundle-blocks-projections.md` (post Slice 8).
+
+### PostgreSQL connection management — runtime invariants (TASK-846)
+
+Greenhouse comparte una única instancia Cloud SQL PostgreSQL 16 entre 5 runtimes (Vercel + 3 Cloud Run Node services + hubspot Python). Cada runtime tiene su propio pool de `pg-node` independiente. Sin coordinación cross-runtime explícita, cualquier runtime puede saturar el budget global de 100 conexiones (ISSUE detectado 2026-05-09: 103% saturation live + Sentry NEW issue 7 errors `remaining connection slots are reserved`).
+
+**Architectural decision V1 deployed (TASK-846)**: defense-in-depth de 3 capas, deployment data-driven del multiplexer. NO se deploya PgBouncer en V1 — la evidencia post-Slice 1 ALTER ROLE (saturation 103% → 66%) indica que el problema fundamental era leak de idle connections, no demanda > capacidad.
+
+**Topología V1 canónica**:
+
+```text
+Vercel functions × N    pool max=3, idleTimeoutMillis=10s    ──→ Cloud SQL
+ops-worker              pool max=15, idleTimeoutMillis=30s        max_connections=100
+commercial-cost-worker  (TASK-846 Slice 3)                        ALTER ROLE idle_session_timeout=5min
+ico-batch                                                          (TASK-846 Slice 1)
+                            ┌─ Reliability signal ─┐
+                            │ runtime.postgres.    │
+                            │ connection_saturation│   ← V2 trigger data-driven
+                            │ ok < 60%             │
+                            │ warning > 60%        │
+                            │ error > 80%          │
+                            └──────────────────────┘
+```
+
+**V2 contingente (TASK-846)**: si reliability signal alerta sustained > 60%, deploy PgBouncer en GKE Autopilot (~$75-85/mes). Cloud Run NO soporta TCP raw → PgBouncer NO va en Cloud Run.
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** crear `Pool` de `pg-node` directo sin pasar por `getGreenhousePostgresConfig()` desde `src/lib/postgres/client.ts`. El helper aplica runtime detection (Vercel max=3, Cloud Run max=15) automáticamente. Lint rule `greenhouse/no-direct-pg-pool` (TASK-846 Slice 7) bloquea regresión.
+- **NUNCA** configurar `max > 15` en Vercel function. La VLA ya satura PG con 5-10 functions concurrentes. Override solo con justificación documentada en task spec.
+- **NUNCA** removeer `ALTER ROLE greenhouse_app SET idle_session_timeout = '5min'` ni `greenhouse_ops SET idle_session_timeout = '15min'`. Settings persistidos en `pg_roles.rolconfig` cross-restart. Verificación: `SELECT rolname, rolconfig FROM pg_roles WHERE rolname IN ('greenhouse_app', 'greenhouse_ops')` debe devolver el timeout configurado.
+- **NUNCA** usar `LISTEN/NOTIFY` desde aplicación. Greenhouse usa outbox pattern canónico (TASK-773). Garantiza compatibilidad con V2 PgBouncer transaction pooling cuando se deploye.
+- **NUNCA** usar prepared statements server-side (`PREPARE ... EXECUTE`). `pg-node` por default usa simple Query — preserva compatibilidad transaction pooling.
+- **NUNCA** ignorar el reliability signal `runtime.postgres.connection_saturation` en estado `unknown` por > 24h. Es la señal data-driven que dispara V2 deployment.
+- **NUNCA** invocar `Sentry.captureException` directo en code path `src/lib/postgres/`. Usar `captureWithDomain(err, 'cloud', ...)`.
+- **SIEMPRE** que emerja un nuevo runtime que necesite Postgres, usar `getGreenhousePostgresConfig()` que detecta runtime automáticamente. Override via env vars `GREENHOUSE_POSTGRES_MAX_CONNECTIONS` / `GREENHOUSE_POSTGRES_IDLE_TIMEOUT_MS` solo con razón documentada.
+- **SIEMPRE** monitorear `runtime.postgres.connection_saturation` en `/admin/operations`. Steady < 30% (V1 funcional). Sustained > 60% → escalar a TASK-847 V2 deployment.
+
+**Defense-in-depth V1 (3 capas)**:
+
+1. **PG-side `idle_session_timeout` por role** (ALTER ROLE): PG corta connections idle > 5min server-side. Persistente cross-restart.
+2. **pg-node Pool tuning per-runtime**: max conservador, idleTimeoutMillis agresivo. Backpressure local.
+3. **Reliability signal `runtime.postgres.connection_saturation`**: detecta regresión global. Trigger V2 deployment data-driven.
+
+**Spec canónica**: `docs/architecture/GREENHOUSE_POSTGRES_CONNECTION_POOLING_V1.md`. Task implementación V1: `docs/tasks/in-progress/TASK-846-postgres-connection-pooling-v1-data-driven.md`. Task contingencia V2: `docs/tasks/to-do/TASK-847-postgres-pgbouncer-gke-v2-deployment.md`.
 
 ### HubSpot inbound webhook — companies + contacts auto-sync (TASK-706)
 

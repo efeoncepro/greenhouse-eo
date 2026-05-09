@@ -180,6 +180,7 @@ Estos CLIs estan autenticados localmente. Cuando una task toca su dominio, **usa
   - `pnpm lint` (ESLint 9 flat config; configuracion canonica en `eslint.config.mjs`)
   - `pnpm test`
   - prueba manual local o en preview de Vercel
+- **Contrato Playwright smoke**: en `tests/e2e/smoke/*.spec.ts` no usar `page.goto(...)` directo. Toda navegacion debe pasar por `gotoWithTransientRetries()` o `gotoAuthenticated()` desde `tests/e2e/fixtures/auth.ts`. La regresion `scripts/lib/e2e-smoke-navigation-contract.test.ts` debe quedar verde y bloquea reintroducir navegacion cruda. HTTP `4xx/5xx`, redirects indebidos a login y asserts funcionales siguen fallando loud; no subir timeouts ad hoc por spec como parche.
 - Baseline vigente de unit tests:
   - `Vitest` es el framework canonico para tests unitarios del repo.
   - Para tests de componentes React, usar `Vitest + Testing Library + jsdom`, no introducir otro runner sin una razon fuerte.

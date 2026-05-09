@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test'
+import { expect, gotoWithTransientRetries, test } from '../fixtures/auth'
 
 const AGENT_SECRET = process.env.AGENT_AUTH_SECRET || ''
 const AGENT_EMAIL = process.env.AGENT_AUTH_EMAIL || 'agent@greenhouse.efeonce.org'
@@ -89,7 +89,7 @@ test.describe('shortcuts dropdown — TASK-553', () => {
       }
     })
 
-    await page.goto(`${BASE_URL}/home`, { waitUntil: 'domcontentloaded' })
+    await gotoWithTransientRetries(page, `${BASE_URL}/home`)
 
     // Make sure we're authenticated (not bounced to /login)
     await expect(page).not.toHaveURL(/\/login/, { timeout: 5000 })

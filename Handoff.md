@@ -1,3 +1,66 @@
+# Sesion 2026-05-09 — TASK-837 Deal-Bound Sample Sprint HubSpot Service Projection (CERRADA)
+
+- **Trigger:** usuario pide implementar TASK-837 directo en `develop` con auto mode, sinergia ecosystem + Open Questions resolution + skills UI cuando toque.
+- **Estado:** **CERRADA 2026-05-09**. Task movida a `complete/`. README + Handoff sincronizados. 13 commits incrementales en `develop`. Sin PR ceremony.
+- **Pipeline funcional end-to-end:** wizard exige Deal HubSpot abierto → server revalida server-side → declareSampleSprint persiste local + emite outbox `service.engagement.outbound_requested v1` → reactive consumer ops-worker → bridge POST `0-162` con idempotency `ef_greenhouse_service_id` + 4 associations atomic → UPDATE atomic local `ready`/`partial_associations`/`outbound_dead_letter` → reliability signals subsystem `commercial`.
+- **Open Questions status:** 5 de 5 resueltas. Q1 ef_pipeline_stage deprecated, Q2 capability separation natural via outbox, Q3 contactos faltantes BLOQUEAR siempre, Q4 multi-company no-op V1 sample 150 deals, Q5 hs_unique_creation_key READ-ONLY → fallback ef_greenhouse_service_id creada live.
+- **Slices entregados (orden canónico):** 0.5c migration PG (`5f034f0c`) → 0.5a HubSpot property (`f68a8d7e`) → 0.5b bridge endpoints CRUD `0-162` + 11 pytest (`312079c0`) → 1 eligible deals reader + 14 vitest (`8c2018b3`) → 3 declareSampleSprint deal-bound + outbox (`1f3b5e26`) → 4 outbound projection + webhook eco cascade + 14 vitest (`60bd5b47`) → 6 7 reliability signals (`59d8f787`) → 7 docs + runbook + CLAUDE.md (`ba6f5652`) → 2 wizard Deal Selection (`f85b9ca6`) → 5 dead-letter UX (`6238f0aa`).
+- **Skills invocadas (en orden):** `arch-architect` (greenhouse overlay), `commercial-expert` (greenhouse overlay), `greenhouse-backend`, `hubspot-greenhouse-bridge`, `greenhouse-ux`, `greenhouse-ux-writing`, `greenhouse-dev`.
+- **Hard Rules canonizadas en CLAUDE.md** sección "Sample Sprint outbound projection invariants (TASK-837)": 18 invariantes NUNCA/SIEMPRE.
+- **Runbook canónico:** `docs/operations/runbooks/sample-sprint-outbound-recovery.md` con 7 escenarios + decision tree operador-facing + verificación post-recovery.
+- **Tests:** ~250 verdes nuevos/extendidos. TS clean. Lint clean. pg:doctor green.
+- **Próximo paso (futuras sesiones):** monitorear reliability signals en `/admin/operations` post-deploy. Si `outbound_dead_letter` > 0 emerge en runtime, operador con capability `commercial.engagement.recover_outbound` accede a `/admin/integrations/hubspot/sample-sprint-dead-letter` para retry o skip explícito. Follow-up V1.1 candidatos documentados en runbook (poll HubSpot associations live para deal_associations_drift; auto-mover p_services a Closed cuando outcome terminal).
+
+---
+
+# Sesion 2026-05-09 — TASK-844 Cross-Runtime Observability Sentry Init (cierra ISSUE-074)
+
+- **Trigger:** smoke test post-merge PR #113 (TASK-836 follow-up dual-format webhook) reveló que `hubspot_services_intake` reactive consumer en ops-worker fallaba con `Sentry.captureException is not a function`. Causa raíz arquitectónica: `src/lib/observability/capture.ts` importaba `@sentry/nextjs` (Next.js-específico) cuyo shape variaba en runtime Cloud Run.
+- **Implicancia descubierta:** TASK-813b nunca funcionó end-to-end en producción — el bug del dual-format webhook (TASK-836 follow-up) era el upstream que dropeaba todos los events 2025.2 antes; al cerrarlo, expuso este segundo root cause. Latente desde despliegue de hubspot_services_intake projection.
+- **Decisión arquitectónica adoptada (skill arch-architect 4-pillar contract):** Reemplazar `@sentry/nextjs` por `@sentry/node` en wrapper canónico + helper `initSentryForService` invocado por cada Cloud Run service. `@sentry/node` es el SDK underlying que `@sentry/nextjs` envuelve — runtime-portable. Sentry hub es global singleton: ambos runtimes acceden al mismo hub.
+- **Alternativas rechazadas:** shim no-op (sacrifica observabilidad), agregar `@sentry/nextjs` real (SDK incorrecto para generic Node), dynamic import async (rompe 207 callsites), per-service Sentry projects (operacionalmente caro).
+- **8 slices completos commiteados incrementalmente en `develop`:**
+  - Slice 1 (`d5738329`) — switch wrapper a @sentry/node + 7 tests Vitest
+  - Slice 2 (`<commit>`) — helper canónico `services/_shared/sentry-init.ts` + 8 tests
+  - Slice 3 (`3180123e`) — ops-worker init + Dockerfile COPY + deploy.sh secret mount opcional
+  - Slice 3b (`de1a8651`) — HUBSPOT_ACCESS_TOKEN secret mount (gap descubierto en smoke)
+  - Slice 4 (`55ccd644`) — mirror commercial-cost-worker + ico-batch
+  - Slice 5 (`16663add`) — reliability signal `observability.cloud_run.silent_failure_rate` + 9 tests
+  - Slice 6 (`3b999d31`) — lint rule `greenhouse/cloud-run-services-must-init-sentry` modo `error` + 13 tests
+  - Slice 7 (`9ea6feb5`) — CLAUDE.md Hard Rule "Cross-runtime observability — Sentry init invariant" (8 reglas + 3 capas defense-in-depth)
+- **Smoke test verificación live (2026-05-09 19:30:04Z):** PATCH HubSpot service `551522263821` `ef_engagement_kind` regular→trial → webhook arrived 19:26:27 (~1s) → outbox event `outbox-131d128c-...` published 19:28:03 (cron */2min) → reactive consumer `hubspot_services_intake` materialized=1/1 failures=0 a 19:30:04 → `greenhouse_core.services.engagement_kind='trial'` (matches PATCH) ✅. Cycle completo ~3.5min. Revert a regular completado.
+- **Anti-regresión activa (defense-in-depth 3 capas):**
+  1. Lint rule `greenhouse/cloud-run-services-must-init-sentry` modo `error` bloquea commits que crean `services/<svc>/server.ts` con import `@/lib/**` sin init.
+  2. Reliability signal `observability.cloud_run.silent_failure_rate` cuenta `outbox_reactive_log.last_error LIKE '%captureException is not a function%'` últimas 24h. Steady=0; > 0 indica regresión.
+  3. Cloud Logging stderr fallback siempre disponible.
+- **DSN provisioning completado** (autorizado por usuario 19:42:23Z):
+  - Secret `greenhouse-sentry-dsn` creado en GCP Secret Manager (`efeonce-group`, replication=automatic, version 1) con DSN canónico copiado desde Vercel production env.
+  - ops-worker re-deployed (revision `00175-dxr` 19:47:26Z) con `SENTRY_DSN` env mounted.
+  - Verificación: `/health` responde 200, startup logs NO emiten warn `SENTRY_DSN not configured` → Sentry init real corriendo, no graceful no-op.
+  - Cualquier `captureWithDomain` invocado desde reactive consumer ahora reporta incidents a Sentry con tag `domain` canónico → signals per-module del reliability dashboard reciben datos del runtime Cloud Run.
+- **ISSUE-074** movido a `resolved/`. **TASK-844** movido a `complete/`. README + TASK_ID_REGISTRY sincronizados.
+
+**Verificación trazada del scope real (post-cierre)**: trace recursivo de imports transitivos confirmó:
+- ops-worker: 599 archivos en bundle, **20 invocan `captureWithDomain`** (hubspot-services-intake, outbox-consumer, payslip-on-payment-paid, finance-expense-reactive-intake, record-expense-payment-from-order, provider-bq-sync, ledger-health, email/delivery, auth/readiness, etc.) → init **CRÍTICO**.
+- commercial-cost-worker: 112 archivos, **0 invocan `captureWithDomain`** → init es **defense-in-depth preventivo** (lint rule garantiza que se mantenga si emerge callsite futuro).
+- ico-batch: 39 archivos, **0 invocan `captureWithDomain`** → mismo rationale defense-in-depth.
+
+Esta evidencia trazada reemplaza la afirmación previa "no tienen reactive consumers" (correcta operacionalmente, pero apoyada en asunción no verificación). El init en commercial-cost-worker e ico-batch sigue siendo correcto arquitectónicamente: cubre crecimiento futuro + mantiene coherencia del contract canónico + reliability signal cubriría regresión inmediatamente.
+
+---
+
+# Sesion 2026-05-09 — TASK-607 / ISSUE-073 Actions Node 24 + smoke-lane flaky semantics
+
+- **Trigger:** el usuario pidio resolver end-to-end los warnings/fixes pendientes sin parches, con skill de arquitectura. Se reviso TASK-607 y el run Playwright `25606031281`.
+- **Drift de spec:** TASK-607 decia "5 workflows restantes", pero `rg` encontro referencias target antiguas tambien en `design-contract.yml`, `reliability-verify.yml`, `azure-teams-deploy.yml` y `azure-teams-bot-deploy.yml`. Decision arquitectonica: migrar repo-wide todas las actions target antiguas, no solo la tabla stale.
+- **Fix Actions:** `.github/workflows/*` queda sin matches para `actions/(checkout|setup-node|upload-artifact)@v4`, `pnpm/action-setup@v4` ni `google-github-actions/(auth|setup-gcloud)@v2`. Targets verificados con GitHub API: checkout/setup-node/upload-artifact `@v5`, pnpm `@v6`, google auth/setup-gcloud `@v3`. `node-version: 20` se mantiene porque controla app/tests, no runtime interno de actions.
+- **Fix smoke-lane semantics:** nuevo parser reusable `scripts/lib/smoke-lane-report.ts`; `publish-smoke-lane-run.ts` usa el ultimo intento Playwright. `failed -> passed` ahora es `flaky`, no `failed_tests`; el log incluye `flaky=<n>`. Artifact real de Playwright `25606031281` confirmo 3 casos flaky por retry.
+- **Fix navegación E2E:** `tests/e2e/fixtures/auth.ts` agrega `gotoWithTransientRetries` y `gotoAuthenticated` lo reutiliza. Retries acotados solo para `page.goto` timeout/red transitoria; HTTP/auth/asserts siguen fallando loud. `login-session.spec.ts` deja de usar `page.goto` crudo en las rutas que flakearon.
+- **Docs:** ISSUE-073 creado en resolved; `GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1`, docs funcionales de reliability/test observability, `DECISIONS_INDEX`, `changelog`, `docs/tasks/README.md` y `TASK_ID_REGISTRY` sincronizados. TASK-607 movida a `complete/`.
+- **Validación:** `pnpm test scripts/lib/smoke-lane-report.test.ts` 3/3; artifact real Playwright `25606031281` parseado como `total=36 passed=33 failed=0 flaky=3`; `pnpm exec tsc --noEmit --pretty false`, `pnpm lint`, `git diff --check` OK; Playwright focalizado staging (`login-session` + `cron-staging-parity`) 3/3. Post-push final: `CI` run `25609178479` success sin warning `Node.js 20 actions`; `Playwright E2E smoke` run `25609178482` success y publisher registro `finance.web`, `delivery.web`, `identity.web` como `status=passed total=36 passed=36 failed=0 flaky=0`.
+
+---
+
 # Sesion 2026-05-09 — CI smoke-lane publisher hardening
 
 - **Trigger:** el usuario pidio resolver solo el warning `sync:smoke-lane ... failed (non-blocking)` de forma robusta y escalable; el warning Node.js 20 queda cubierto por TASK-607.

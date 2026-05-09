@@ -57,6 +57,8 @@ import {
 import { getShortcutsInvalidPinsSignal } from './queries/shortcuts-invalid-pins'
 import { getWorkspaceProjectionFacetViewDriftSignal } from './queries/workspace-projection-drift'
 import { getWorkspaceProjectionUnresolvedRelationsSignal } from './queries/workspace-projection-unresolved-relations'
+import { getCloudRunSilentObservabilitySignal } from './queries/cloud-run-silent-observability'
+import { getPostgresConnectionSaturationSignal } from './queries/postgres-connection-saturation'
 import { getCriticalTablesMissingSignal } from './queries/critical-tables-missing'
 import { getOutboxUnpublishedLagSignal } from './queries/outbox-unpublished-lag'
 import { getOutboxDeadLetterSignal } from './queries/outbox-dead-letter'
@@ -66,6 +68,16 @@ import { getEngagementBudgetOverrunSignal } from './queries/engagement-budget-ov
 import { getEngagementConversionRateDropSignal } from './queries/engagement-conversion-rate-drop'
 import { getEngagementOverdueDecisionSignal } from './queries/engagement-overdue-decision'
 import { getSampleSprintProjectionDegradedSignal } from './queries/sample-sprint-projection-degraded'
+// TASK-837 Slice 6 — 7 reliability signals for Sample Sprint outbound projection.
+import {
+  getSampleSprintDealAssociationsDriftSignal,
+  getSampleSprintDealClosedButActiveSignal,
+  getSampleSprintLegacyWithoutDealSignal,
+  getSampleSprintOutboundDeadLetterSignal,
+  getSampleSprintOutboundPendingOverdueSignal,
+  getSampleSprintOutcomeTerminalPservicesOpenSignal,
+  getSampleSprintPartialAssociationsSignal
+} from './queries/sample-sprint-outbound-signals'
 import { getCronStagingDriftSignal } from './queries/cron-staging-drift'
 import { getEngagementStaleProgressSignal } from './queries/engagement-stale-progress'
 import { getEngagementUnapprovedActiveSignal } from './queries/engagement-unapproved-active'
@@ -431,6 +443,21 @@ interface ReliabilityOverviewSources {
   criticalTablesMissing?: ReliabilitySignal | null
 
   /**
+   * TASK-844 Slice 5 — Cross-runtime observability anti-regresión.
+   *   - observability.cloud_run.silent_failure_rate (drift, error si > 0)
+   * Detecta Sentry init regression en Cloud Run services. Roll up bajo moduleKey 'cloud'.
+   */
+  cloudRunSilentObservability?: ReliabilitySignal | null
+
+  /**
+   * TASK-845 Slice 6 — PostgreSQL connection saturation data-driven trigger.
+   *   - runtime.postgres.connection_saturation (runtime, warning > 60%, error > 80%)
+   * Es la señal data-driven que dispara V2 deployment del PgBouncer multiplexer
+   * (TASK-846 contingente). Roll up bajo moduleKey 'cloud'.
+   */
+  postgresConnectionSaturation?: ReliabilitySignal | null
+
+  /**
    * TASK-813 Slice 6 — Commercial engagement instance (HubSpot p_services 0-162) signals (3):
    *   - commercial.service_engagement.sync_lag (lag, warning)
    *   - commercial.service_engagement.organization_unresolved (drift, error)
@@ -514,6 +541,10 @@ export const buildReliabilityOverview = (
     ...(sources.nuboxSourceFreshness ? [sources.nuboxSourceFreshness] : []),
     // TASK-838 Fase 3 — Runtime guard: critical tables missing in PG.
     ...(sources.criticalTablesMissing ? [sources.criticalTablesMissing] : []),
+    // TASK-844 Slice 5 — Cross-runtime observability anti-regresión.
+    ...(sources.cloudRunSilentObservability ? [sources.cloudRunSilentObservability] : []),
+    // TASK-845 Slice 6 — PG connection saturation (data-driven V2 trigger).
+    ...(sources.postgresConnectionSaturation ? [sources.postgresConnectionSaturation] : []),
     // TASK-813 Slice 6 — Commercial engagement instance signals (3).
     ...(sources.servicesEngagement ?? []),
     // TASK-807 — Commercial Health signals (six Sample Sprints health gates).
@@ -817,6 +848,23 @@ export const getReliabilityOverview = async (
       ? preloadedSources.criticalTablesMissing
       : await getCriticalTablesMissingSignal().catch(() => null)
 
+  // TASK-844 Slice 5 — Cross-runtime observability anti-regresión. Detecta
+  // Cloud Run services con Sentry init regresado o secret missing (ISSUE-074
+  // class). Steady=0; cualquier > 0 indica observabilidad rota en algún
+  // service. Degrada `unknown` si la query falla.
+  const cloudRunSilentObservability =
+    preloadedSources.cloudRunSilentObservability !== undefined
+      ? preloadedSources.cloudRunSilentObservability
+      : await getCloudRunSilentObservabilitySignal().catch(() => null)
+
+  // TASK-845 Slice 6 — PG connection saturation (data-driven trigger para V2
+  // PgBouncer multiplexer deployment). Steady < 60%; sustained > 60% justifica
+  // TASK-846. Degrada `unknown` si la query falla.
+  const postgresConnectionSaturation =
+    preloadedSources.postgresConnectionSaturation !== undefined
+      ? preloadedSources.postgresConnectionSaturation
+      : await getPostgresConnectionSaturationSignal().catch(() => null)
+
   // TASK-813 Slice 6 + TASK-836 Slice 7 — Commercial engagement instance signals.
   // 3 readers TASK-813 + 4 readers TASK-836 en paralelo. Cada uno degrada
   // honestamente a `unknown` si su query falla. Roll up bajo moduleKey 'commercial'.
@@ -853,12 +901,29 @@ export const getReliabilityOverview = async (
             staleProgress: getEngagementStaleProgressSignal
           }).catch(() => null),
           // TASK-835 Slice 6 — Sample Sprints Runtime Projection degraded signal
-          getSampleSprintProjectionDegradedSignal().catch(() => null)
+          getSampleSprintProjectionDegradedSignal().catch(() => null),
+          // TASK-837 Slice 6 — 7 Sample Sprint outbound projection signals.
+          // All roll up under subsystem `commercial`. Steady=0 for all.
+          getSampleSprintOutboundPendingOverdueSignal().catch(() => null),
+          getSampleSprintOutboundDeadLetterSignal().catch(() => null),
+          getSampleSprintPartialAssociationsSignal().catch(() => null),
+          getSampleSprintDealClosedButActiveSignal().catch(() => null),
+          getSampleSprintDealAssociationsDriftSignal().catch(() => null),
+          getSampleSprintOutcomeTerminalPservicesOpenSignal().catch(() => null),
+          getSampleSprintLegacyWithoutDealSignal().catch(() => null)
         ])
-          .then(([healthSignals, projectionSignal]) => {
+          .then(([healthSignals, projectionSignal, ...outboundSignals]) => {
             const collected = healthSignals ?? []
 
-            return projectionSignal ? [...collected, projectionSignal] : collected
+            const withProjection = projectionSignal
+              ? [...collected, projectionSignal]
+              : collected
+
+            const validOutbound = outboundSignals.filter(
+              (s): s is NonNullable<typeof s> => s !== null
+            )
+
+            return [...withProjection, ...validOutbound]
           })
           .catch(() => null)
 
@@ -886,6 +951,8 @@ export const getReliabilityOverview = async (
     financeClientProfileUnlinked,
     nuboxSourceFreshness,
     criticalTablesMissing,
+    cloudRunSilentObservability,
+    postgresConnectionSaturation,
     servicesEngagement,
     commercialHealth
   })

@@ -291,7 +291,8 @@ export default [
     rules: {
       'greenhouse/no-untokenized-fx-math': 'error',
       'greenhouse/no-untokenized-expense-type-for-analytics': 'error',
-      'greenhouse/no-inline-facet-visibility-check': 'error'
+      'greenhouse/no-inline-facet-visibility-check': 'error',
+      'greenhouse/cloud-run-services-must-init-sentry': 'error'
     }
   },
   {

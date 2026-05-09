@@ -3,6 +3,7 @@ import 'server-only'
 import type { PoolClient } from 'pg'
 
 import { generateServiceId, nextPublicId } from '@/lib/account-360/id-generation'
+import { getEligibleDealForRevalidation } from '@/lib/commercial/eligible-deals-reader'
 import { query, withTransaction } from '@/lib/db'
 import { EVENT_TYPES } from '@/lib/sync/event-catalog'
 import type { TenantContext } from '@/lib/tenant/get-tenant-context'
@@ -35,12 +36,38 @@ export interface DeclareSampleSprintInput {
   successCriteria: Record<string, unknown>
   proposedTeam?: SampleSprintTeamMemberInput[]
   requestedBy: string
+  /**
+   * TASK-837 Slice 3 — required HubSpot Deal anchor for the Sample Sprint.
+   *
+   * Server-side revalidation runs at declare-time (NEVER trust client) via
+   * `getEligibleDealForRevalidation`. The deal must be:
+   * - present in the local mirror (greenhouse_commercial.deals)
+   * - not closed, not deleted
+   * - have at least one company associated
+   * - have at least one contact associated
+   *
+   * If any of these fail, declareSampleSprint throws SampleSprintValidationError
+   * with a code-stable error name (operator-friendly via mapSampleSprintError).
+   */
+  hubspotDealId: string
 }
 
 export interface DeclareSampleSprintResult {
   serviceId: string
   publicId: string | null
   approvalId: string
+  /**
+   * TASK-837 Slice 3 — HubSpot outbound projection state at declare time.
+   * Always 'outbound_pending' on success; the reactive consumer (Slice 4)
+   * progresses it to 'ready' / 'partial_associations' / 'outbound_dead_letter'.
+   */
+  hubspotSyncStatus: 'outbound_pending'
+  /**
+   * TASK-837 Slice 3 — idempotency key persisted in services.idempotency_key
+   * (= service_id by construction). Reactive consumer (Slice 4) uses this as
+   * the value of `ef_greenhouse_service_id` when calling HubSpot.
+   */
+  idempotencyKey: string
 }
 
 export interface SampleSprintListItem {
@@ -237,6 +264,7 @@ const assertDeclareInput = (input: DeclareSampleSprintInput) => {
   const spaceId = trimRequired(input.spaceId, 'spaceId')
   const requestedBy = trimRequired(input.requestedBy, 'requestedBy')
   const decisionDeadline = trimRequired(input.decisionDeadline, 'decisionDeadline')
+  const hubspotDealId = trimRequired(input.hubspotDealId, 'hubspotDealId')
   const startDate = input.startDate?.trim() || null
   const organizationId = input.organizationId?.trim() || null
   const proposedTeam = normalizeProposedTeam(input.proposedTeam)
@@ -276,7 +304,8 @@ const assertDeclareInput = (input: DeclareSampleSprintInput) => {
     expectedInternalCostClp: input.expectedInternalCostClp,
     successCriteria: input.successCriteria,
     proposedTeam,
-    requestedBy
+    requestedBy,
+    hubspotDealId
   }
 }
 
@@ -336,8 +365,46 @@ export const declareSampleSprint = async (
   input: DeclareSampleSprintInput
 ): Promise<DeclareSampleSprintResult> => {
   const normalized = assertDeclareInput(input)
+
+  // TASK-837 Slice 3 — server-side Deal eligibility revalidation.
+  // NEVER trust client-supplied hubspotDealId; always read fresh from PG mirror.
+  // Cache in eligible-deals-reader is bypassed by getEligibleDealForRevalidation.
+  //
+  // Pre-fetch the selected space's client_id as hint for company resolution.
+  // Live audit 2026-05-09: deal.client_id is NULL in 73% of synced deals; the
+  // canonical anchor is space → client_id → companies.client_id.
+  const spaceClientHint = await query<{ client_id: string | null }>(
+    `SELECT client_id FROM greenhouse_core.spaces WHERE space_id = $1 LIMIT 1`,
+    [normalized.spaceId]
+  )
+
+  const clientIdHint = spaceClientHint[0]?.client_id ?? undefined
+
+  const eligibleDeal = await getEligibleDealForRevalidation(normalized.hubspotDealId, {
+    clientIdHint
+  })
+
+  if (!eligibleDeal) {
+    throw new SampleSprintValidationError(
+      `HubSpot Deal ${normalized.hubspotDealId} no está sincronizado en Greenhouse o no existe.`
+    )
+  }
+
+  if (!eligibleDeal.isEligible) {
+    const reasonsLabel = eligibleDeal.ineligibilityReasons.join(', ')
+
+    throw new SampleSprintValidationError(
+      `HubSpot Deal ${normalized.hubspotDealId} no es elegible para Sample Sprint (${reasonsLabel}).`
+    )
+  }
+
   const serviceId = generateServiceId()
   const publicId = await nextPublicId('EO-SVC')
+  // TASK-837 Slice 3 — idempotency_key = service_id (UUID Greenhouse).
+  // Slice 4 reactive consumer escribe esto a HubSpot como ef_greenhouse_service_id
+  // para idempotency search-before-create. Pre-Checkpoint A había alternativa
+  // hs_unique_creation_key, pero esa property es READ-ONLY en 0-162.
+  const idempotencyKey = serviceId
 
   return withTransaction(async client => {
     const space = await findSpaceContextForUpdate(client, normalized.spaceId)
@@ -350,7 +417,14 @@ export const declareSampleSprint = async (
       decisionDeadline: normalized.decisionDeadline,
       expectedInternalCostClp: normalized.expectedInternalCostClp,
       expectedDurationDays: normalized.expectedDurationDays,
-      proposedTeam: normalized.proposedTeam
+      proposedTeam: normalized.proposedTeam,
+      // TASK-837 Slice 3 — preserve Deal context for projection consumer + audit.
+      hubspotDealContext: {
+        hubspotDealId: eligibleDeal.hubspotDealId,
+        hubspotCompanyId: eligibleDeal.company?.hubspotCompanyId ?? null,
+        contactHubspotIds: eligibleDeal.contacts.map(c => c.hubspotContactId),
+        dealNameSnapshotAtDeclare: eligibleDeal.dealName
+      }
     }
 
     await client.query(
@@ -359,13 +433,15 @@ export const declareSampleSprint = async (
          pipeline_stage, start_date, target_end_date, total_cost, currency,
          linea_de_servicio, servicio_especifico, modalidad, billing_frequency,
          active, status, engagement_kind, commitment_terms_json,
-         hubspot_sync_status, created_by, created_at, updated_at
+         hubspot_deal_id, idempotency_key, hubspot_sync_status,
+         created_by, created_at, updated_at
        ) VALUES (
          $1, $2, $3, $4, $5,
          'onboarding', $6::date, $7::date, $8, 'CLP',
          'crm_solutions', 'sample_sprint', 'sprint', 'project',
          TRUE, 'pending_approval', $9, $10::jsonb,
-         'pending', $11, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+         $11, $12, 'outbound_pending',
+         $13, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
        )`,
       [
         serviceId,
@@ -378,6 +454,8 @@ export const declareSampleSprint = async (
         normalized.expectedInternalCostClp,
         normalized.engagementKind,
         JSON.stringify(terms),
+        eligibleDeal.hubspotDealId,
+        idempotencyKey,
         normalized.requestedBy
       ]
     )
@@ -424,7 +502,12 @@ export const declareSampleSprint = async (
           clientId: space.client_id,
           expectedInternalCostClp: normalized.expectedInternalCostClp,
           decisionDeadline: normalized.decisionDeadline,
-          proposedTeamCount: normalized.proposedTeam.length
+          proposedTeamCount: normalized.proposedTeam.length,
+          // TASK-837 Slice 3 — Deal anchor for audit trail.
+          hubspotDealId: eligibleDeal.hubspotDealId,
+          hubspotCompanyId: eligibleDeal.company?.hubspotCompanyId ?? null,
+          contactCount: eligibleDeal.contacts.length,
+          idempotencyKey
         }
       },
       client
@@ -448,7 +531,35 @@ export const declareSampleSprint = async (
       client
     )
 
-    return { serviceId, publicId, approvalId }
+    // TASK-837 Slice 3 — second outbox event: trigger Slice 4 reactive consumer
+    // to project this Sample Sprint to HubSpot p_services. Separate from
+    // service.engagement.declared (which has TASK-835 cache invalidation
+    // consumer) by design — keeps separation of concerns: declare is local,
+    // outbound_requested is HubSpot projection trigger.
+    await publishEngagementEvent(
+      {
+        serviceId,
+        eventType: EVENT_TYPES.serviceEngagementOutboundRequested,
+        actorUserId: normalized.requestedBy,
+        payload: {
+          hubspotDealId: eligibleDeal.hubspotDealId,
+          hubspotCompanyId: eligibleDeal.company?.hubspotCompanyId ?? null,
+          contactHubspotIds: eligibleDeal.contacts.map(c => c.hubspotContactId),
+          idempotencyKey,
+          engagementKind: normalized.engagementKind,
+          requestedAt: new Date().toISOString()
+        }
+      },
+      client
+    )
+
+    return {
+      serviceId,
+      publicId,
+      approvalId,
+      hubspotSyncStatus: 'outbound_pending' as const,
+      idempotencyKey
+    }
   })
 }
 

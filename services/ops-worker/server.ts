@@ -45,6 +45,14 @@
 
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http'
 
+// TASK-844 — Sentry init must run BEFORE any function from @/lib/** is invoked
+// so the canonical `captureWithDomain` wrapper has a live Sentry hub. ESM
+// hoisting guarantees all imports complete first, then this executable line
+// runs before createServer (below) starts handling HTTP traffic — which is when
+// the lib functions actually fire and call captureWithDomain. See ISSUE-074 +
+// docs/tasks/in-progress/TASK-844-cross-runtime-observability-sentry-init.md.
+import { initSentryForService } from '../_shared/sentry-init'
+
 import { processReactiveEvents, ensureReactiveSchema, sweepAuditOnlyEvents } from '@/lib/sync/reactive-consumer'
 import { publishPendingOutboxEvents, OUTBOX_MAX_PUBLISH_ATTEMPTS } from '@/lib/sync/outbox-consumer'
 import { claimOrphanedRefreshItems, markRefreshCompleted, markRefreshFailed } from '@/lib/sync/refresh-queue'
@@ -107,6 +115,15 @@ import { getReactiveQueueDepth, InvalidDomainError } from './reactive-queue-dept
 import { runProductCatalogDriftDetectJob } from './product-catalog-drift-detect'
 import { runProductCatalogReconcileV2Job } from './product-catalog-reconcile-v2'
 import { wrapCronHandler } from './cron-handler-wrapper'
+
+// ─── Sentry init (TASK-844) ─────────────────────────────────────────────────
+//
+// Initialize the @sentry/node hub BEFORE the HTTP server starts accepting
+// traffic. ESM hoisted all imports above; this is the first executable
+// statement and runs before createServer (below). Without this, any reactive
+// projection (or other lib function) that calls captureWithDomain in
+// production would silently no-op or crash — see ISSUE-074.
+initSentryForService('ops-worker')
 
 // ─── Config ─────────────────────────────────────────────────────────────────
 

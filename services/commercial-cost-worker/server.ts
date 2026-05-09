@@ -32,7 +32,19 @@ import {
 import { runCommercialCostBasisMaterialization } from '@/lib/commercial-cost-worker/materialize'
 import { runQuoteRepriceBulk } from '@/lib/commercial-cost-worker/quote-reprice-bulk'
 
+// TASK-844 — Sentry init must run BEFORE any function from @/lib/** is invoked
+// so the canonical `captureWithDomain` wrapper has a live Sentry hub. See
+// ISSUE-074 + docs/tasks/in-progress/TASK-844-cross-runtime-observability-sentry-init.md.
+import { initSentryForService } from '../_shared/sentry-init'
+
 import { checkAuthorization } from './auth'
+
+// ─── Sentry init (TASK-844) ─────────────────────────────────────────────────
+//
+// First executable statement after imports. ESM hoisting completes all imports
+// first; this runs before createServer accepts traffic — ensuring captureWithDomain
+// has a live Sentry hub when lib functions execute.
+initSentryForService('commercial-cost-worker')
 
 const PORT = Number(process.env.PORT) || 8080
 const CRON_SECRET = process.env.CRON_SECRET?.trim() || ''

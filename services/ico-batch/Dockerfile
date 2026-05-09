@@ -25,6 +25,10 @@ COPY src/lib/ ./src/lib/
 COPY src/config/ ./src/config/
 COPY src/types/ ./src/types/
 COPY services/ico-batch/server.ts ./services/ico-batch/server.ts
+# TASK-844 — Shared canonical helpers for Cloud Run Node services
+# (sentry-init for cross-runtime observability). server.ts imports
+# `../_shared/sentry-init` BEFORE any @/lib/** import.
+COPY services/_shared/ ./services/_shared/
 
 # Bundle: resolves @/ path aliases + TypeScript at build time.
 # server-only shimmed to empty module (Next.js convention).

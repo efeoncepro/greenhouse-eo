@@ -9,6 +9,7 @@
 //   - no-runtime-mockup-import                      (runtime must not import mockup-only modules)
 //   - no-untokenized-fx-math                        (TASK-766) — finance CLP currency reader gate
 //   - no-untokenized-expense-type-for-analytics     (TASK-768) — expense_type/income_type only for fiscal/SII; analytics use economic_category
+//   - cloud-run-services-must-init-sentry           (TASK-844) — Cloud Run Node service entrypoints must invoke initSentryForService
 
 import noRawTableWithoutShell from './rules/no-raw-table-without-shell.mjs'
 import noHardcodedFontfamily from './rules/no-hardcoded-fontfamily.mjs'
@@ -18,6 +19,7 @@ import noRuntimeMockupImport from './rules/no-runtime-mockup-import.mjs'
 import noUntokenizedFxMath from './rules/no-untokenized-fx-math.mjs'
 import noUntokenizedExpenseTypeForAnalytics from './rules/no-untokenized-expense-type-for-analytics.mjs'
 import noInlineFacetVisibilityCheck from './rules/no-inline-facet-visibility-check.mjs'
+import cloudRunServicesMustInitSentry from './rules/cloud-run-services-must-init-sentry.mjs'
 
 const plugin = {
   meta: {
@@ -32,7 +34,8 @@ const plugin = {
     'no-runtime-mockup-import': noRuntimeMockupImport,
     'no-untokenized-fx-math': noUntokenizedFxMath,
     'no-untokenized-expense-type-for-analytics': noUntokenizedExpenseTypeForAnalytics,
-    'no-inline-facet-visibility-check': noInlineFacetVisibilityCheck
+    'no-inline-facet-visibility-check': noInlineFacetVisibilityCheck,
+    'cloud-run-services-must-init-sentry': cloudRunServicesMustInitSentry
   }
 }
 

@@ -20,6 +20,10 @@ RUN pnpm install --frozen-lockfile --ignore-scripts
 COPY tsconfig.json ./
 COPY src/ ./src/
 COPY services/commercial-cost-worker/server.ts services/commercial-cost-worker/auth.ts ./services/commercial-cost-worker/
+# TASK-844 — Shared canonical helpers for Cloud Run Node services
+# (sentry-init for cross-runtime observability). server.ts imports
+# `../_shared/sentry-init` BEFORE any @/lib/** import.
+COPY services/_shared/ ./services/_shared/
 
 RUN echo "" > /app/server-only-shim.js && \
     echo "export class NextResponse { static json(d,o){return{body:d,...o}} }" > /app/next-server-shim.js && \

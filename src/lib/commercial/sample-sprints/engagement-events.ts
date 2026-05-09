@@ -14,7 +14,10 @@ export const ENGAGEMENT_EVENT_TYPES = [
   EVENT_TYPES.serviceEngagementProgressSnapshotRecorded,
   EVENT_TYPES.serviceEngagementOutcomeRecorded,
   EVENT_TYPES.serviceEngagementCancelled,
-  EVENT_TYPES.serviceEngagementConverted
+  EVENT_TYPES.serviceEngagementConverted,
+  // TASK-837 Slice 3 + 5 — Sample Sprint outbound projection events.
+  EVENT_TYPES.serviceEngagementOutboundRequested,
+  EVENT_TYPES.serviceEngagementOutboundSkipped
 ] as const
 
 export type EngagementEventType = typeof ENGAGEMENT_EVENT_TYPES[number]

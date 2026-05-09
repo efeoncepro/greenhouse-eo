@@ -938,6 +938,147 @@ def create_app() -> Flask:
                 exc.status_code or 502
             )
 
+    # TASK-837 Slice 0.5b — outbound CRUD for p_services (Sample Sprint projection).
+    # Reactive consumer (Slice 4) calls these endpoints; idempotency uses
+    # ef_greenhouse_service_id (Slice 0.5a property) since hs_unique_creation_key
+    # is READ-ONLY on 0-162.
+    # All HubSpot errors propagate via _hubspot_error_response (canonical):
+    # 401 for auth, 422 for validation, 429 with Retry-After for rate limit,
+    # 502 for generic upstream.
+    @app.post("/services")
+    def create_service_endpoint():
+        auth_error = _require_integration_write_auth()
+        if auth_error:
+            return auth_error
+
+        try:
+            body = request.get_json(force=True) or {}
+            properties = body.get("properties")
+            if not isinstance(properties, dict) or not properties:
+                return (
+                    jsonify({"error": "properties object is required"}),
+                    400,
+                )
+
+            client = _client()
+            created = client.create_service(properties)
+            hubspot_service_id = str(created.get("id") or "")
+
+            # TASK-837 Slice 4 — orchestrate associations inside the same call.
+            # Each association is idempotent (HubSpot tolerates duplicates).
+            # We catch per-association failures so the response carries a
+            # partial status instead of failing the whole request — caller
+            # marks `partial_associations` and retries only the failed ones.
+            associations = body.get("associations") or {}
+            association_status: dict[str, Any] = {
+                "deal": "skipped",
+                "company": "skipped",
+                "contacts": [],
+            }
+
+            if hubspot_service_id and isinstance(associations, dict):
+                deal_id = associations.get("dealId")
+                if deal_id:
+                    try:
+                        client.create_default_association(
+                            "0-162", hubspot_service_id, "deals", str(deal_id)
+                        )
+                        association_status["deal"] = "ok"
+                    except HubSpotIntegrationError:
+                        association_status["deal"] = "failed"
+
+                company_id = associations.get("companyId")
+                if company_id:
+                    try:
+                        client.create_default_association(
+                            "0-162", hubspot_service_id, "companies", str(company_id)
+                        )
+                        association_status["company"] = "ok"
+                    except HubSpotIntegrationError:
+                        association_status["company"] = "failed"
+
+                contact_ids = associations.get("contactIds") or []
+                if isinstance(contact_ids, list):
+                    for contact_id in contact_ids:
+                        if not contact_id:
+                            continue
+                        contact_id_str = str(contact_id)
+                        try:
+                            client.create_default_association(
+                                "0-162",
+                                hubspot_service_id,
+                                "contacts",
+                                contact_id_str,
+                            )
+                            association_status["contacts"].append(
+                                {"contactId": contact_id_str, "status": "ok"}
+                            )
+                        except HubSpotIntegrationError:
+                            association_status["contacts"].append(
+                                {"contactId": contact_id_str, "status": "failed"}
+                            )
+
+            return (
+                jsonify(
+                    {
+                        "ok": True,
+                        "hubspotServiceId": hubspot_service_id,
+                        "properties": created.get("properties") or {},
+                        "associationStatus": association_status,
+                    }
+                ),
+                201,
+            )
+        except HubSpotIntegrationError as exc:
+            return _hubspot_error_response(exc)
+
+    @app.patch("/services/<service_id>")
+    def update_service_endpoint(service_id: str):
+        auth_error = _require_integration_write_auth()
+        if auth_error:
+            return auth_error
+
+        try:
+            body = request.get_json(force=True) or {}
+            properties = body.get("properties")
+            if not isinstance(properties, dict) or not properties:
+                return (
+                    jsonify({"error": "properties object is required"}),
+                    400,
+                )
+
+            updated = _client().update_service(service_id, properties)
+            return jsonify(
+                {
+                    "ok": True,
+                    "hubspotServiceId": str(updated.get("id") or service_id),
+                    "properties": updated.get("properties") or {},
+                }
+            )
+        except HubSpotIntegrationError as exc:
+            return _hubspot_error_response(exc)
+
+    @app.get("/services/by-idempotency-key/<idempotency_key>")
+    def find_service_by_idempotency_key_endpoint(idempotency_key: str):
+        try:
+            contract = build_contract(app.config)
+            properties = contract["sourceFields"]["services"]
+            match = _client().find_service_by_idempotency_key(
+                idempotency_key,
+                properties=properties,
+            )
+            if match is None:
+                return jsonify({"ok": True, "hubspotServiceId": None, "properties": None})
+            return jsonify(
+                {
+                    "ok": True,
+                    "hubspotServiceId": str(match.get("id") or ""),
+                    "properties": match.get("properties") or {},
+                }
+            )
+        except HubSpotIntegrationError as exc:
+            return _hubspot_error_response(exc)
+
     @app.patch("/companies/<company_id>/lifecycle")
     def update_company_lifecycle(company_id: str):
         auth_error = _require_integration_write_auth()

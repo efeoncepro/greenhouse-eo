@@ -24,6 +24,18 @@ import { materializeAiLlmEnrichments } from '@/lib/ico-engine/ai/llm-enrichment-
 import { materializeFinanceSignals } from '@/lib/finance/ai/materialize-finance-signals'
 import { materializeFinanceAiLlmEnrichments } from '@/lib/finance/ai/llm-enrichment-worker'
 
+// TASK-844 — Sentry init must run BEFORE any function from @/lib/** is invoked
+// so the canonical `captureWithDomain` wrapper has a live Sentry hub. See
+// ISSUE-074 + docs/tasks/in-progress/TASK-844-cross-runtime-observability-sentry-init.md.
+import { initSentryForService } from '../_shared/sentry-init'
+
+// ─── Sentry init (TASK-844) ─────────────────────────────────────────────────
+//
+// First executable statement after imports. ESM hoisting completes all imports
+// first; this runs before createServer accepts traffic — ensuring captureWithDomain
+// has a live Sentry hub when lib functions execute.
+initSentryForService('ico-batch')
+
 // ─── Config ─────────────────────────────────────────────────────────────────
 
 const PORT = Number(process.env.PORT) || 8080

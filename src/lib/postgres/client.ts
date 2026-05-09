@@ -14,6 +14,8 @@ type GreenhousePostgresConfig = {
   password: string | null
   passwordSecretRef: string | null
   maxConnections: number
+  /** TASK-845 — Pool idle timeout in ms. Vercel default 10s, Cloud Run default 30s. */
+  idleTimeoutMillis: number
   sslEnabled: boolean
 }
 
@@ -107,6 +109,35 @@ const notifyGreenhousePostgresReset = (reason: GreenhousePostgresResetReason) =>
   }
 }
 
+/**
+ * TASK-845 Slice 3 — Runtime-aware pool sizing.
+ *
+ * Vercel serverless functions y Cloud Run services tienen patterns de uso de
+ * conexiones muy distintos:
+ *
+ *   - **Vercel** (serverless): cada function instance recibe burst de requests,
+ *     idle entre invocaciones, container puede vivir 5-15 min antes de reciclar.
+ *     Pool grande (max=15) × N instances satura PG rápido. Recomendado: max=3,
+ *     idleTimeoutMillis=10s (libera connection rápido entre requests).
+ *
+ *   - **Cloud Run** (long-running): instance vive horas/días, queries paralelas,
+ *     workload constante. Pool más grande tolera burst sin reconnect overhead.
+ *     Recomendado: max=15, idleTimeoutMillis=30s.
+ *
+ * Detección runtime: `process.env.VERCEL === '1'` es seteado automáticamente
+ * por Vercel build/runtime. Cualquier otro env (Cloud Run, local dev, CI) cae
+ * en branch Cloud Run defaults.
+ *
+ * Override: `GREENHOUSE_POSTGRES_MAX_CONNECTIONS` y
+ * `GREENHOUSE_POSTGRES_IDLE_TIMEOUT_MS` permiten tunear sin redeploy.
+ *
+ * Spec: docs/architecture/GREENHOUSE_POSTGRES_CONNECTION_POOLING_V1.md
+ */
+const isVercelRuntime = (): boolean => process.env.VERCEL === '1'
+
+const getDefaultMaxConnections = (): number => (isVercelRuntime() ? 3 : 15)
+const getDefaultIdleTimeoutMs = (): number => (isVercelRuntime() ? 10_000 : 30_000)
+
 export const getGreenhousePostgresConfig = (): GreenhousePostgresConfig => ({
   instanceConnectionName: process.env.GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME?.trim() || null,
   ipType: toIpType(process.env.GREENHOUSE_POSTGRES_IP_TYPE),
@@ -116,7 +147,8 @@ export const getGreenhousePostgresConfig = (): GreenhousePostgresConfig => ({
   user: process.env.GREENHOUSE_POSTGRES_USER?.trim() || null,
   password: process.env.GREENHOUSE_POSTGRES_PASSWORD || null,
   passwordSecretRef: process.env.GREENHOUSE_POSTGRES_PASSWORD_SECRET_REF?.trim() || null,
-  maxConnections: normalizeNumber(process.env.GREENHOUSE_POSTGRES_MAX_CONNECTIONS, 15),
+  maxConnections: normalizeNumber(process.env.GREENHOUSE_POSTGRES_MAX_CONNECTIONS, getDefaultMaxConnections()),
+  idleTimeoutMillis: normalizeNumber(process.env.GREENHOUSE_POSTGRES_IDLE_TIMEOUT_MS, getDefaultIdleTimeoutMs()),
   sslEnabled: normalizeBoolean(process.env.GREENHOUSE_POSTGRES_SSL)
 })
 
@@ -168,7 +200,7 @@ const buildPool = async () => {
     database: config.database,
     max: config.maxConnections,
     connectionTimeoutMillis: 15_000,
-    idleTimeoutMillis: 30_000
+    idleTimeoutMillis: config.idleTimeoutMillis
   }
 
   if (config.instanceConnectionName) {

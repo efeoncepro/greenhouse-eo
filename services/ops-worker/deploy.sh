@@ -273,6 +273,44 @@ if [ -n "${RESEND_API_KEY_SECRET_REF}" ]; then
   SECRETS="${SECRETS},RESEND_API_KEY=$(normalize_secret_ref_for_cloud_run "${RESEND_API_KEY_SECRET_REF}")"
 fi
 
+# TASK-844 — SENTRY_DSN for cross-runtime observability.
+# Optional: if the secret `greenhouse-sentry-dsn` exists in Secret Manager, mount
+# it. If not, the canonical helper `initSentryForService` (services/_shared/
+# sentry-init.ts) degrades gracefully — captureWithDomain becomes no-op and
+# emits a startup warn. ISSUE-074 fix doesn't depend on this — the underlying
+# crash was @sentry/nextjs shape mismatch in Cloud Run runtime, fixed by Slice 1
+# (use @sentry/node directly). DSN provisioning enables real per-domain incident
+# capture in Sentry; without it, errors still hit Cloud Logging stderr.
+SENTRY_DSN_SECRET_NAME="${SENTRY_DSN_SECRET_NAME:-greenhouse-sentry-dsn}"
+
+if gcloud secrets describe "${SENTRY_DSN_SECRET_NAME}" --project="${PROJECT_ID}" >/dev/null 2>&1; then
+  SECRETS="${SECRETS},SENTRY_DSN=${SENTRY_DSN_SECRET_NAME}:latest"
+  ensure_secret_accessor_binding "${SENTRY_DSN_SECRET_NAME}:latest"
+  echo "  Sentry DSN: mounted from secret '${SENTRY_DSN_SECRET_NAME}'"
+else
+  echo "  Sentry DSN: secret '${SENTRY_DSN_SECRET_NAME}' not found — observability degraded (captureWithDomain no-op)."
+  echo "  Fix: gcloud secrets create ${SENTRY_DSN_SECRET_NAME} --project=${PROJECT_ID} --replication-policy=automatic"
+  echo "       echo -n '<DSN_VALUE>' | gcloud secrets versions add ${SENTRY_DSN_SECRET_NAME} --project=${PROJECT_ID} --data-file=-"
+fi
+
+# TASK-844 — HUBSPOT_ACCESS_TOKEN for hubspot_services_intake reactive consumer.
+# Required by `src/lib/hubspot/list-services-for-company.ts` (canonical helper
+# que evita el bridge bug TASK-813) cuando el reactive consumer corre en
+# ops-worker y necesita batch read de service properties desde HubSpot API
+# directamente. Sin este secret, la projection falla con "HubSpot access token
+# not found" — no es un crash sino un retry hasta dead_letter, pero bloquea el
+# sync end-to-end webhook → PG core.services. Detectado durante smoke test live
+# del cierre ISSUE-074 (commit 3180123e).
+HUBSPOT_ACCESS_TOKEN_SECRET_NAME="${HUBSPOT_ACCESS_TOKEN_SECRET_NAME:-hubspot-access-token}"
+
+if gcloud secrets describe "${HUBSPOT_ACCESS_TOKEN_SECRET_NAME}" --project="${PROJECT_ID}" >/dev/null 2>&1; then
+  SECRETS="${SECRETS},HUBSPOT_ACCESS_TOKEN=${HUBSPOT_ACCESS_TOKEN_SECRET_NAME}:latest"
+  ensure_secret_accessor_binding "${HUBSPOT_ACCESS_TOKEN_SECRET_NAME}:latest"
+  echo "  HubSpot access token: mounted from secret '${HUBSPOT_ACCESS_TOKEN_SECRET_NAME}'"
+else
+  echo "  HubSpot access token: secret '${HUBSPOT_ACCESS_TOKEN_SECRET_NAME}' not found — hubspot_services_intake projection will fail."
+fi
+
 ensure_secret_accessor_binding "${NEXTAUTH_SECRET_REF}"
 ensure_secret_accessor_binding "${PG_PASSWORD_REF}"
 

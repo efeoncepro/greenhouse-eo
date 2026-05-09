@@ -2885,6 +2885,7 @@ export interface GreenhouseCoreServices {
   hubspot_last_synced_at: Timestamp | null;
   hubspot_service_id: string | null;
   hubspot_sync_status: Generated<string | null>;
+  idempotency_key: string | null;
   linea_de_servicio: string;
   modalidad: Generated<string | null>;
   name: string;

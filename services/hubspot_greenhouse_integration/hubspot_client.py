@@ -576,6 +576,98 @@ class HubSpotClient:
             deduped_service_ids.append(service_id)
         return deduped_service_ids
 
+    # TASK-837 Slice 0.5b — outbound CRUD for p_services (custom object 0-162).
+    # Used by Sample Sprint reactive consumer (TASK-837 Slice 4) to project
+    # internal services to HubSpot with idempotency via ef_greenhouse_service_id.
+
+    def search_services(
+        self,
+        *,
+        property_name: str,
+        property_value: str,
+        properties: list[str] | None = None,
+        limit: int = 1,
+    ) -> list[dict[str, Any]]:
+        normalized_name = property_name.strip()
+        normalized_value = property_value.strip()
+        if not normalized_name or not normalized_value:
+            return []
+
+        body: dict[str, Any] = {
+            "filterGroups": [
+                {
+                    "filters": [
+                        {
+                            "propertyName": normalized_name,
+                            "operator": "EQ",
+                            "value": normalized_value,
+                        }
+                    ]
+                }
+            ],
+            "limit": max(1, min(limit, 10)),
+        }
+        if properties:
+            body["properties"] = self._unique_properties(properties)
+
+        response = self.session.post(
+            f"{HUBSPOT_API}/crm/v3/objects/0-162/search",
+            headers=self._headers(),
+            json=body,
+            timeout=self.timeout_seconds,
+        )
+        if response.status_code >= 400:
+            _raise_hubspot_error(response)
+        return (response.json() or {}).get("results") or []
+
+    def find_service_by_idempotency_key(
+        self,
+        idempotency_key: str,
+        *,
+        properties: list[str] | None = None,
+    ) -> dict[str, Any] | None:
+        normalized_key = idempotency_key.strip()
+        if not normalized_key:
+            return None
+
+        matches = self.search_services(
+            property_name="ef_greenhouse_service_id",
+            property_value=normalized_key,
+            properties=properties,
+            limit=1,
+        )
+        return matches[0] if matches else None
+
+    def create_service(self, properties: dict[str, Any]) -> dict[str, Any]:
+        response = self.session.post(
+            f"{HUBSPOT_API}/crm/v3/objects/0-162",
+            headers=self._headers(),
+            json={"properties": properties},
+            timeout=self.timeout_seconds,
+        )
+        if response.status_code >= 400:
+            _raise_hubspot_error(response)
+        return response.json()
+
+    def update_service(
+        self,
+        service_id: str,
+        properties: dict[str, Any],
+    ) -> dict[str, Any]:
+        normalized_id = service_id.strip()
+        if not normalized_id:
+            raise ValueError("service_id is required")
+
+        response = self.session.patch(
+            f"{HUBSPOT_API}/crm/v3/objects/0-162/{normalized_id}",
+            headers=self._headers(),
+            json={"properties": properties},
+            timeout=self.timeout_seconds,
+        )
+        if response.status_code >= 400:
+            _raise_hubspot_error(response)
+        return response.json()
+
     # ------------------------------------------------------------------
     # Products (catalog)
     # ------------------------------------------------------------------

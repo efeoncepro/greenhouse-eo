@@ -9,6 +9,7 @@ vi.mock('@/lib/secrets/secret-manager', () => ({
 }))
 
 import {
+  getGreenhousePostgresConfig,
   getGreenhousePostgresMissingConfig,
   isGreenhousePostgresRetryableConnectionError,
   isGreenhousePostgresConfigured,
@@ -68,6 +69,53 @@ describe('postgres secret-manager config', () => {
       )
     ).toBe(true)
     expect(isGreenhousePostgresRetryableConnectionError(new Error('syntax error at or near "FROM"'))).toBe(false)
+  })
+
+  describe('runtime-aware pool sizing (TASK-845 Slice 3)', () => {
+    it('defaults to Cloud Run sizing (max=15, idleTimeoutMillis=30s) when VERCEL is unset', () => {
+      vi.unstubAllEnvs()
+      vi.stubEnv('VERCEL', '')
+
+      const config = getGreenhousePostgresConfig()
+
+      expect(config.maxConnections).toBe(15)
+      expect(config.idleTimeoutMillis).toBe(30_000)
+    })
+
+    it('switches to Vercel sizing (max=3, idleTimeoutMillis=10s) when VERCEL=1', () => {
+      vi.stubEnv('VERCEL', '1')
+
+      const config = getGreenhousePostgresConfig()
+
+      expect(config.maxConnections).toBe(3)
+      expect(config.idleTimeoutMillis).toBe(10_000)
+    })
+
+    it('honors GREENHOUSE_POSTGRES_MAX_CONNECTIONS override regardless of runtime', () => {
+      vi.stubEnv('VERCEL', '1')
+      vi.stubEnv('GREENHOUSE_POSTGRES_MAX_CONNECTIONS', '7')
+
+      const config = getGreenhousePostgresConfig()
+
+      expect(config.maxConnections).toBe(7)
+    })
+
+    it('honors GREENHOUSE_POSTGRES_IDLE_TIMEOUT_MS override regardless of runtime', () => {
+      vi.stubEnv('VERCEL', '')
+      vi.stubEnv('GREENHOUSE_POSTGRES_IDLE_TIMEOUT_MS', '5000')
+
+      const config = getGreenhousePostgresConfig()
+
+      expect(config.idleTimeoutMillis).toBe(5_000)
+    })
+
+    it('treats VERCEL=true as non-Vercel (only literal "1" matches per Vercel docs)', () => {
+      vi.stubEnv('VERCEL', 'true')
+
+      const config = getGreenhousePostgresConfig()
+
+      expect(config.maxConnections).toBe(15)
+    })
   })
 
   it('lets consumers subscribe and unsubscribe from Postgres reset events', () => {
