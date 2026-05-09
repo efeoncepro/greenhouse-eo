@@ -24,12 +24,16 @@ vi.mock('./store', () => ({
 }))
 
 vi.mock('./health', () => ({
-  countCommercialEngagementBudgetOverrun: vi.fn(),
-  countCommercialEngagementOverdueDecision: vi.fn(),
-  countCommercialEngagementStaleProgress: vi.fn(),
-  countCommercialEngagementUnapprovedActive: vi.fn(),
-  countCommercialEngagementZombie: vi.fn(),
-  getCommercialEngagementConversionRateSnapshot: vi.fn(),
+  countCommercialEngagementBudgetOverrun: vi.fn(async () => 0),
+  countCommercialEngagementOverdueDecision: vi.fn(async () => 0),
+  countCommercialEngagementStaleProgress: vi.fn(async () => 0),
+  countCommercialEngagementUnapprovedActive: vi.fn(async () => 0),
+  countCommercialEngagementZombie: vi.fn(async () => 0),
+  getCommercialEngagementConversionRateSnapshot: vi.fn(async () => ({
+    totalOutcomes: 0,
+    convertedOutcomes: 0,
+    conversionRate: 1
+  })),
   resolveCommercialEngagementConversionRateThreshold: vi.fn(() => 0.35)
 }))
 
@@ -357,6 +361,105 @@ describe('runtime-projection — Slice 1 skeleton', () => {
 
     expect(projection.selected!.capacityRisk?.severity).toBe('critical')
     expect(projection.selected!.hasCapacityRisk).toBe(true)
+  })
+})
+
+describe('runtime-projection — Slice 4 signals + conversion mapping', () => {
+  beforeEach(async () => {
+    __clearAllProjectionCache()
+    __resetDegradationCounterForTests()
+    vi.clearAllMocks()
+    mockedReadCostAttribution.mockResolvedValue(new Map<string, number>())
+    mockedEnrichProposedTeam.mockResolvedValue({ team: [], hasUnresolvedMembers: false })
+    mockedResolveCapacityRisk.mockResolvedValue({ capacityRisk: null, allLookupsFailed: false })
+
+    // Reset health mocks a defaults — clearAllMocks no toca implementations (#vitest)
+    const health = await import('./health')
+
+    ;(health.countCommercialEngagementOverdueDecision as ReturnType<typeof vi.fn>).mockResolvedValue(0)
+    ;(health.countCommercialEngagementBudgetOverrun as ReturnType<typeof vi.fn>).mockResolvedValue(0)
+    ;(health.countCommercialEngagementZombie as ReturnType<typeof vi.fn>).mockResolvedValue(0)
+    ;(health.countCommercialEngagementUnapprovedActive as ReturnType<typeof vi.fn>).mockResolvedValue(0)
+    ;(health.countCommercialEngagementStaleProgress as ReturnType<typeof vi.fn>).mockResolvedValue(0)
+    ;(health.getCommercialEngagementConversionRateSnapshot as ReturnType<typeof vi.fn>).mockResolvedValue({
+      totalOutcomes: 0, convertedOutcomes: 0, conversionRate: 1
+    })
+  })
+
+  it('mapea los 6 kinds canónicos en el array de signals con counts reales', async () => {
+    mockedListSampleSprints.mockResolvedValue([buildItem()])
+
+    const health = await import('./health')
+
+    ;(health.countCommercialEngagementOverdueDecision as ReturnType<typeof vi.fn>).mockResolvedValue(2)
+    ;(health.countCommercialEngagementBudgetOverrun as ReturnType<typeof vi.fn>).mockResolvedValue(1)
+    ;(health.countCommercialEngagementZombie as ReturnType<typeof vi.fn>).mockResolvedValue(0)
+    ;(health.countCommercialEngagementUnapprovedActive as ReturnType<typeof vi.fn>).mockResolvedValue(3)
+    ;(health.countCommercialEngagementStaleProgress as ReturnType<typeof vi.fn>).mockResolvedValue(4)
+    ;(health.getCommercialEngagementConversionRateSnapshot as ReturnType<typeof vi.fn>).mockResolvedValue({
+      totalOutcomes: 10,
+      convertedOutcomes: 4,
+      conversionRate: 0.4
+    })
+
+    const projection = await resolveSampleSprintRuntimeProjection({ tenant: buildTenant() })
+
+    expect(projection.signals).toHaveLength(6)
+    const kinds = projection.signals.map(s => s.kind).sort()
+
+    expect(kinds).toEqual(
+      ['budget-overrun', 'conversion-rate-drop', 'overdue-decision', 'stale-progress', 'unapproved-active', 'zombie']
+    )
+
+    const counts = Object.fromEntries(projection.signals.map(s => [s.kind, s.count]))
+
+    expect(counts['overdue-decision']).toBe(2)
+    expect(counts['budget-overrun']).toBe(1)
+    expect(counts.zombie).toBe(0)
+    expect(counts['unapproved-active']).toBe(3)
+    expect(counts['stale-progress']).toBe(4)
+    expect(counts['conversion-rate-drop']).toBe(0) // 0.4 > threshold 0.35 → no drop
+  })
+
+  it('marca conversion-rate-drop count=1 cuando rate < threshold', async () => {
+    mockedListSampleSprints.mockResolvedValue([buildItem()])
+
+    const health = await import('./health')
+
+    ;(health.getCommercialEngagementConversionRateSnapshot as ReturnType<typeof vi.fn>).mockResolvedValue({
+      totalOutcomes: 5,
+      convertedOutcomes: 1,
+      conversionRate: 0.2
+    })
+
+    const projection = await resolveSampleSprintRuntimeProjection({ tenant: buildTenant() })
+
+    expect(projection.signals.find(s => s.kind === 'conversion-rate-drop')?.count).toBe(1)
+    expect(projection.conversionRate?.rate).toBeCloseTo(0.2)
+    expect(projection.conversionRate?.threshold).toBe(0.35)
+  })
+
+  it('emite degraded commercial_health_unavailable cuando los helpers fallan', async () => {
+    mockedListSampleSprints.mockResolvedValue([buildItem()])
+
+    const health = await import('./health')
+
+    ;(health.countCommercialEngagementOverdueDecision as ReturnType<typeof vi.fn>).mockRejectedValue(new Error('PG down'))
+
+    const projection = await resolveSampleSprintRuntimeProjection({ tenant: buildTenant() })
+
+    expect(projection.signals).toEqual([])
+    expect(projection.conversionRate).toBeNull()
+    expect(projection.degraded.some(reason => reason.code === 'commercial_health_unavailable')).toBe(true)
+  })
+
+  it('conversionRate.rate=null cuando totalOutcomes=0 (sin muestra)', async () => {
+    mockedListSampleSprints.mockResolvedValue([buildItem()])
+
+    const projection = await resolveSampleSprintRuntimeProjection({ tenant: buildTenant() })
+
+    expect(projection.conversionRate?.rate).toBeNull()
+    expect(projection.conversionRate?.totalOutcomes).toBe(0)
   })
 })
 

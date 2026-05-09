@@ -6,6 +6,16 @@ import { isSourceDegraded, withSourceTimeout } from '@/lib/platform-health/with-
 import type { TenantContext } from '@/lib/tenant/get-tenant-context'
 
 import { resolveCapacityRiskForSprint } from './capacity-risk'
+import {
+  countCommercialEngagementBudgetOverrun,
+  countCommercialEngagementOverdueDecision,
+  countCommercialEngagementStaleProgress,
+  countCommercialEngagementUnapprovedActive,
+  countCommercialEngagementZombie,
+  getCommercialEngagementConversionRateSnapshot,
+  resolveCommercialEngagementConversionRateThreshold,
+  type CommercialHealthScopeOptions
+} from './health'
 import { enrichProposedTeam } from './team-enrichment'
 
 import {
@@ -350,12 +360,62 @@ export const resolveSampleSprintRuntimeProjection = async (
     }
   }
 
-  // ── Source 3: signals + conversion (Slice 4 wires los 6 helpers tenant-scoped) ─
+  // ── Source 3: signals + conversion — los 6 helpers canónicos tenant-scoped ──
   const healthResult = await withSourceTimeout(
-    async (): Promise<{ signals: SampleSprintRuntimeSignal[]; conversionRate: SampleSprintRuntimeConversionRate | null }> => ({
-      signals: [],
-      conversionRate: null
-    }),
+    async (): Promise<{ signals: SampleSprintRuntimeSignal[]; conversionRate: SampleSprintRuntimeConversionRate | null }> => {
+      const scopeOptions: CommercialHealthScopeOptions = { tenantContext: tenant }
+
+      const [overdueDecision, budgetOverrun, zombie, unapprovedActive, staleProgress, conversionSnap] = await Promise.all([
+        countCommercialEngagementOverdueDecision(scopeOptions),
+        countCommercialEngagementBudgetOverrun(scopeOptions),
+        countCommercialEngagementZombie(scopeOptions),
+        countCommercialEngagementUnapprovedActive(scopeOptions),
+        countCommercialEngagementStaleProgress(scopeOptions),
+        getCommercialEngagementConversionRateSnapshot(scopeOptions)
+      ])
+
+      const threshold = resolveCommercialEngagementConversionRateThreshold()
+      const conversionDrop = conversionSnap.totalOutcomes > 0 && conversionSnap.conversionRate < threshold ? 1 : 0
+
+      const sig = (
+        kind: SampleSprintRuntimeSignal['kind'],
+        label: string,
+        severity: SampleSprintSignalSeverity,
+        count: number,
+        runbook: string,
+        description: string
+      ): SampleSprintRuntimeSignal => ({ kind, label, severity, count, runbook, description })
+
+      const signalsList: SampleSprintRuntimeSignal[] = [
+        sig('overdue-decision', 'Decisiones vencidas', 'error', overdueDecision,
+          'Cerrar resultado o ajustar fecha de decisión con aprobación.',
+          'Engagements sin resultado registrado después de la fecha de decisión.'),
+        sig('budget-overrun', 'Sobre presupuesto', 'error', budgetOverrun,
+          'Revisar atribución de costos y conversar el desvío con stakeholders.',
+          'Engagements aprobados con costo real > 1.2× el presupuesto comprometido.'),
+        sig('zombie', 'Sample Sprints zombie', 'error', zombie,
+          'Cerrar el sprint con outcome o convertirlo en proyecto activo.',
+          'Engagements activos > 90 días sin outcome ni conversión registrada.'),
+        sig('unapproved-active', 'Activos sin aprobación', 'error', unapprovedActive,
+          'Volver a aprobación pendiente o registrar aprobación retroactiva.',
+          'Servicios no regulares activos sin aprobación vigente.'),
+        sig('stale-progress', 'Progreso sin actualización', 'warning', staleProgress,
+          'Registrar actualización semanal con contexto operacional.',
+          'Engagements activos sin snapshot reciente.'),
+        sig('conversion-rate-drop', 'Conversión bajo umbral', 'warning', conversionDrop,
+          'Revisar resultados de los últimos 6 meses y criterios de éxito.',
+          `Conversión 6M (${Math.round(conversionSnap.conversionRate * 100)}%) bajo el umbral configurado.`)
+      ]
+
+      const conversionRate: SampleSprintRuntimeConversionRate = {
+        totalOutcomes: conversionSnap.totalOutcomes,
+        convertedOutcomes: conversionSnap.convertedOutcomes,
+        rate: conversionSnap.totalOutcomes > 0 ? conversionSnap.conversionRate : null,
+        threshold
+      }
+
+      return { signals: signalsList, conversionRate }
+    },
     { source: 'sample-sprints.commercial-health', timeoutMs: SOURCE_TIMEOUT_MS }
   )
 
