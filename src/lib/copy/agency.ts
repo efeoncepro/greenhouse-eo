@@ -286,7 +286,16 @@ export const GH_AGENCY = {
         companyLabel: 'Empresa',
         contactsLabel: 'Contactos asociados',
         amountLabel: 'Monto',
-        stageLabel: 'Etapa'
+        stageLabel: 'Etapa',
+        contactsSummary: (count: number) => count === 1
+          ? '1 contacto heredado'
+          : `${count} contactos heredados`,
+        contactsAriaStatus: (count: number) => count === 1
+          ? '1 contacto será asociado al Sample Sprint'
+          : `${count} contactos serán asociados al Sample Sprint`,
+        contactsExpand: (remaining: number) => `Ver los ${remaining} restantes`,
+        contactsCollapse: 'Ocultar lista',
+        contactsAriaList: (count: number) => `Lista completa de ${count} contactos heredados`
       },
       submit: {
         blockedTooltip: 'Selecciona un deal para continuar',

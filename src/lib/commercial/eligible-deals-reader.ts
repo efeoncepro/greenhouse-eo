@@ -72,8 +72,23 @@ export interface EligibleDeal {
 }
 
 export interface ListEligibleDealsParams {
+  /**
+   * Optional space filter. NOT used as a hard filter — only `space_id` populated
+   * deals are rare (~27% of open deals). Use `clientId` or `organizationId` instead.
+   * Kept for backwards compat / future use when deals consistently carry space_id.
+   */
   spaceId?: string
+  /**
+   * Canonical filter — deals are at organization level (canonical 360). 100% of
+   * synced deals carry organization_id. PREFER this filter over spaceId.
+   */
   organizationId?: string
+  /**
+   * Canonical company resolver — passed from the SELECTED space's client_id
+   * (always populated). The reader uses this to look up the matching crm.company
+   * + contacts because deals.client_id is rarely populated (~27%).
+   */
+  clientId?: string
   search?: string
   limit?: number
   /**
@@ -208,14 +223,20 @@ const fetchEligibleDealsFresh = async (
   const filters: string[] = ['is_closed = FALSE', 'is_deleted = FALSE']
   const args: unknown[] = []
 
-  if (params.spaceId) {
-    args.push(params.spaceId)
-    filters.push(`space_id = $${args.length}`)
-  }
-
+  // PRIMARY filter: organization_id (canonical 360, 100% populated). Live audit
+  // 2026-05-09: 11/11 open deals carry organization_id, only 3/11 carry space_id
+  // and 3/11 carry client_id. Filtering by space_id excludes 73% of valid deals.
   if (params.organizationId) {
     args.push(params.organizationId)
     filters.push(`organization_id = $${args.length}`)
+  }
+
+  // SECONDARY filter: spaceId only when explicitly populated — deals at space
+  // level are rare. We DO NOT skip deals where space_id IS NULL because the
+  // organization filter is the canonical anchor.
+  if (params.spaceId) {
+    args.push(params.spaceId)
+    filters.push(`(space_id IS NULL OR space_id = $${args.length})`)
   }
 
   if (params.search) {
@@ -239,29 +260,36 @@ const fetchEligibleDealsFresh = async (
 
   if (dealRows.length === 0) return []
 
-  // Resolve company per deal via deal.client_id ↔ companies.client_id.
-  // This relies on the canonical 1-deal-1-company invariant verified in
-  // Checkpoint B 2026-05-09 (0/150 deals had multi-company in HubSpot).
-  const clientIds = Array.from(
-    new Set(dealRows.map(d => d.client_id).filter((v): v is string => Boolean(v)))
-  )
+  // Resolve company via the SELECTED space's client_id (always populated when
+  // the wizard provides it). Falls back to deal.client_id only when caller did
+  // not pass clientId (e.g., admin global listing).
+  // Live audit 2026-05-09: deals.client_id is populated in only 27% of rows;
+  // relying solely on deal.client_id breaks 8/11 lookups for Aguas Andinas.
+  const clientIdsToLookup = new Set<string>()
+
+  if (params.clientId) {
+    clientIdsToLookup.add(params.clientId)
+  }
+
+  for (const deal of dealRows) {
+    if (deal.client_id) clientIdsToLookup.add(deal.client_id)
+  }
 
   const companyByClientId = new Map<string, CompanyRow>()
 
-  if (clientIds.length > 0) {
+  if (clientIdsToLookup.size > 0) {
     const companyRows = await query<CompanyRow>(
       `SELECT company_record_id, client_id, hubspot_company_id, company_name, legal_name
          FROM greenhouse_crm.companies
         WHERE client_id = ANY($1::text[])
           AND active = TRUE
           AND is_deleted = FALSE`,
-      [clientIds]
+      [Array.from(clientIdsToLookup)]
     )
 
     for (const row of companyRows) {
-      // First-write wins; if a tenant has multiple companies for one client_id
-      // we take the first active one. The reliability signal
-      // commercial.sample_sprint.multi_company_unresolved (Slice 6) flags this.
+      // First-write wins; multi-company per client_id flagged by the reliability
+      // signal `commercial.sample_sprint.multi_company_unresolved` (Slice 6).
       if (!companyByClientId.has(row.client_id)) {
         companyByClientId.set(row.client_id, row)
       }
@@ -295,7 +323,10 @@ const fetchEligibleDealsFresh = async (
   }
 
   return dealRows.map(row => {
-    const companyRow = row.client_id ? companyByClientId.get(row.client_id) : null
+    // Prefer the wizard-supplied clientId (space anchor, always populated)
+    // over deal.client_id (may be NULL, only 27% of deals carry it).
+    const resolveClientId = params.clientId ?? row.client_id
+    const companyRow = resolveClientId ? companyByClientId.get(resolveClientId) : null
 
     const company: EligibleDealCompany | null = companyRow
       ? {
@@ -387,7 +418,8 @@ export const listEligibleDealsForSampleSprint = async (
  * on `isEligible`).
  */
 export const getEligibleDealForRevalidation = async (
-  hubspotDealId: string
+  hubspotDealId: string,
+  options: { clientIdHint?: string } = {}
 ): Promise<EligibleDeal | null> => {
   const trimmed = hubspotDealId.trim()
 
@@ -407,17 +439,21 @@ export const getEligibleDealForRevalidation = async (
 
   const dealRow = dealRows[0]
 
-  // Resolve company + contacts targeted to the single client_id.
+  // Resolve company + contacts. Prefer the wizard-supplied clientId hint
+  // (always populated when caller has space context) over deal.client_id
+  // (NULL in 73% of synced deals — see live audit 2026-05-09).
+  const resolveClientId = options.clientIdHint?.trim() || dealRow.client_id || null
+
   let company: EligibleDealCompany | null = null
   let contacts: EligibleDealContact[] = []
 
-  if (dealRow.client_id) {
+  if (resolveClientId) {
     const companyRows = await query<CompanyRow>(
       `SELECT company_record_id, client_id, hubspot_company_id, company_name, legal_name
          FROM greenhouse_crm.companies
         WHERE client_id = $1 AND active = TRUE AND is_deleted = FALSE
         LIMIT 1`,
-      [dealRow.client_id]
+      [resolveClientId]
     )
 
     if (companyRows.length > 0) {

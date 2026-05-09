@@ -36,6 +36,7 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
   const spaceId = searchParams.get('spaceId')?.trim() || undefined
   const organizationId = searchParams.get('organizationId')?.trim() || undefined
+  const clientId = searchParams.get('clientId')?.trim() || undefined
   const search = searchParams.get('search')?.trim() || undefined
   const limitParam = searchParams.get('limit')
   const limit = limitParam ? Math.min(Math.max(parseInt(limitParam, 10) || 50, 1), 200) : 50
@@ -43,6 +44,7 @@ export async function GET(request: Request) {
   const items = await listEligibleDealsForSampleSprint({
     spaceId,
     organizationId,
+    clientId,
     search,
     limit,
     cacheKey: tenant.userId

@@ -4,11 +4,15 @@ import { useEffect, useMemo, useState } from 'react'
 
 import Alert from '@mui/material/Alert'
 import Avatar from '@mui/material/Avatar'
+import AvatarGroup from '@mui/material/AvatarGroup'
 import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import CardHeader from '@mui/material/CardHeader'
 import Chip from '@mui/material/Chip'
+import Collapse from '@mui/material/Collapse'
+import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
 import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
@@ -16,6 +20,7 @@ import ListItemAvatar from '@mui/material/ListItemAvatar'
 import ListItemText from '@mui/material/ListItemText'
 import MenuItem from '@mui/material/MenuItem'
 import Skeleton from '@mui/material/Skeleton'
+import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 
 import CustomAvatar from '@core/components/mui/Avatar'
@@ -23,6 +28,10 @@ import CustomTextField from '@core/components/mui/TextField'
 
 import { GH_AGENCY } from '@/lib/copy/agency'
 import { formatCurrency } from '@/lib/format'
+
+const COMPACT_AVATAR_LIMIT = 4
+const COLLAPSE_THRESHOLD = 4
+const EXPANDED_LIST_MAX_HEIGHT = 320
 
 /**
  * TASK-837 Slice 2 — Wizard Deal Selection field for Sample Sprints declare.
@@ -91,6 +100,14 @@ interface Props {
   onChange: (value: DealSelectionFieldValue) => void
   spaceId?: string | null
   organizationId?: string | null
+  /**
+   * Canonical anchor para resolver company del deal vía crm.companies.client_id.
+   * Pasado desde el space seleccionado (siempre populated). Sin esto, el
+   * reader cae al deal.client_id que está NULL en 73% de deals (live audit
+   * 2026-05-09 — bug que dejaba "No hay deals abiertos disponibles" para
+   * Aguas Andinas y otros tenants).
+   */
+  clientId?: string | null
   required?: boolean
 }
 
@@ -113,7 +130,183 @@ const formatAmount = (amount: number | null, currency: string): string => {
   return formatCurrency(amount, currency as 'CLP', { locale: 'es-CL' })
 }
 
-const DealSelectionField = ({ value, onChange, spaceId, organizationId, required }: Props) => {
+/**
+ * Compact + progressive disclosure render of the inherited Deal context.
+ *
+ * Patrón canónico (greenhouse-microinteractions-auditor + greenhouse-ux):
+ * - Company stays visible siempre (1 línea + legalName opcional)
+ * - Summary chip con count + role='status' (anuncia al SR cuando cambia el deal)
+ * - AvatarGroup max=4 + tooltip por avatar para visualizar contactos sin sabana
+ * - Collapse expandable con scroll cap 320px cuando N > umbral
+ * - Toggle button con aria-expanded/aria-controls
+ * - Heights bounded para preservar el balance 7/5 del wizard split
+ */
+const SelectedDealContext = ({ deal }: { deal: EligibleDealApiItem }) => {
+  const [expanded, setExpanded] = useState(false)
+  const contacts = deal.contacts
+  const totalContacts = contacts.length
+  const visiblePreview = contacts.slice(0, COMPACT_AVATAR_LIMIT)
+  const hiddenCount = Math.max(totalContacts - COMPACT_AVATAR_LIMIT, 0)
+  const shouldOfferCollapse = totalContacts > COLLAPSE_THRESHOLD
+  const expandedListId = `selected-deal-contacts-${deal.hubspotDealId}`
+
+  return (
+    <Box
+      role='region'
+      aria-label={COPY.selected.heading}
+      sx={{
+        border: theme => `1px solid ${theme.palette.divider}`,
+        borderRadius: theme => `${theme.shape.customBorderRadius?.md ?? 6}px`,
+        p: 4,
+        // Cap visual height para preservar balance con la columna form (7/5).
+        // Cuando expanded crezca, el inner scroll absorbe el overflow.
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 3
+      }}
+    >
+      <Typography variant='subtitle2' color='text.secondary'>
+        {COPY.selected.heading}
+      </Typography>
+
+      {deal.company ? (
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <CustomAvatar skin='light' color='primary' size={32}>
+            <i className='tabler-building' aria-hidden='true' />
+          </CustomAvatar>
+          <Box sx={{ minWidth: 0 }}>
+            <Typography variant='body2' noWrap>
+              {deal.company.name}
+            </Typography>
+            {deal.company.legalName ? (
+              <Typography variant='caption' color='text.secondary' noWrap>
+                {deal.company.legalName}
+              </Typography>
+            ) : null}
+          </Box>
+        </Box>
+      ) : null}
+
+      {totalContacts > 0 ? (
+        <>
+          <Divider />
+          <Box>
+            {/* role='status' anuncia al SR cuando cambia la selección de deal. */}
+            <Box
+              role='status'
+              aria-live='polite'
+              sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}
+            >
+              <i
+                className='tabler-users'
+                aria-hidden='true'
+                style={{ color: 'var(--mui-palette-text-secondary)', fontSize: 18 }}
+              />
+              <Typography variant='body2' color='text.secondary'>
+                {COPY.selected.contactsSummary(totalContacts)}
+              </Typography>
+            </Box>
+
+            <AvatarGroup
+              max={COMPACT_AVATAR_LIMIT + 1}
+              spacing='small'
+              sx={{
+                justifyContent: 'flex-start',
+                '& .MuiAvatar-root': { width: 32, height: 32, fontSize: '0.8rem' }
+              }}
+            >
+              {visiblePreview.map(contact => (
+                <Tooltip
+                  key={contact.contactRecordId}
+                  title={
+                    <Box>
+                      <Typography variant='caption' sx={{ display: 'block', fontWeight: 600 }}>
+                        {contact.displayName}
+                      </Typography>
+                      {contact.jobTitle ? (
+                        <Typography variant='caption' sx={{ display: 'block' }}>
+                          {contact.jobTitle}
+                        </Typography>
+                      ) : null}
+                      {contact.email ? (
+                        <Typography variant='caption' sx={{ display: 'block', opacity: 0.8 }}>
+                          {contact.email}
+                        </Typography>
+                      ) : null}
+                    </Box>
+                  }
+                  arrow
+                >
+                  <Avatar>{contact.displayName.charAt(0).toUpperCase()}</Avatar>
+                </Tooltip>
+              ))}
+            </AvatarGroup>
+
+            {shouldOfferCollapse ? (
+              <>
+                <Box sx={{ mt: 2 }}>
+                  <Button
+                    size='small'
+                    variant='text'
+                    onClick={() => setExpanded(prev => !prev)}
+                    aria-expanded={expanded}
+                    aria-controls={expandedListId}
+                    startIcon={
+                      <i
+                        className={expanded ? 'tabler-chevron-up' : 'tabler-chevron-down'}
+                        aria-hidden='true'
+                      />
+                    }
+                  >
+                    {expanded ? COPY.selected.contactsCollapse : COPY.selected.contactsExpand(hiddenCount)}
+                  </Button>
+                </Box>
+                <Collapse in={expanded} unmountOnExit>
+                  <Box
+                    id={expandedListId}
+                    aria-label={COPY.selected.contactsAriaList(totalContacts)}
+                    sx={{
+                      mt: 2,
+                      maxHeight: EXPANDED_LIST_MAX_HEIGHT,
+                      overflowY: 'auto',
+                      border: theme => `1px solid ${theme.palette.divider}`,
+                      borderRadius: theme => `${theme.shape.customBorderRadius?.sm ?? 4}px`
+                    }}
+                  >
+                    <List dense disablePadding role='list'>
+                      {contacts.map(contact => (
+                        <ListItem
+                          key={contact.contactRecordId}
+                          disableGutters
+                          role='listitem'
+                          sx={{ px: 2 }}
+                        >
+                          <ListItemAvatar sx={{ minWidth: 36 }}>
+                            <Avatar sx={{ width: 28, height: 28, fontSize: '0.75rem' }}>
+                              {contact.displayName.charAt(0).toUpperCase()}
+                            </Avatar>
+                          </ListItemAvatar>
+                          <ListItemText
+                            primary={contact.displayName}
+                            secondary={contact.jobTitle ?? contact.email ?? null}
+                            primaryTypographyProps={{ variant: 'body2', noWrap: true }}
+                            secondaryTypographyProps={{ variant: 'caption', noWrap: true }}
+                          />
+                        </ListItem>
+                      ))}
+                    </List>
+                  </Box>
+                </Collapse>
+              </>
+            ) : null}
+          </Box>
+        </>
+      ) : null}
+    </Box>
+  )
+}
+
+const DealSelectionField = ({ value, onChange, spaceId, organizationId, clientId, required }: Props) => {
   const [items, setItems] = useState<EligibleDealApiItem[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -131,6 +324,7 @@ const DealSelectionField = ({ value, onChange, spaceId, organizationId, required
 
         if (spaceId) url.searchParams.set('spaceId', spaceId)
         if (organizationId) url.searchParams.set('organizationId', organizationId)
+        if (clientId) url.searchParams.set('clientId', clientId)
 
         const response = await fetch(url.toString(), {
           credentials: 'same-origin',
@@ -164,7 +358,7 @@ const DealSelectionField = ({ value, onChange, spaceId, organizationId, required
     return () => {
       cancelled = true
     }
-  }, [spaceId, organizationId])
+  }, [spaceId, organizationId, clientId])
 
   const eligibleCount = useMemo(() => items.filter(d => d.isEligible).length, [items])
 
@@ -278,56 +472,7 @@ const DealSelectionField = ({ value, onChange, spaceId, organizationId, required
           </Grid>
           <Grid size={{ xs: 12, md: 5 }}>
             {selectedDeal ? (
-              <Box
-                role='region'
-                aria-label={COPY.selected.heading}
-                sx={{
-                  border: theme => `1px solid ${theme.palette.divider}`,
-                  borderRadius: theme => `${theme.shape.customBorderRadius?.md ?? 6}px`,
-                  p: 4
-                }}
-              >
-                <Typography variant='subtitle2' color='text.secondary' sx={{ mb: 2 }}>
-                  {COPY.selected.heading}
-                </Typography>
-                {selectedDeal.company ? (
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
-                    <CustomAvatar skin='light' color='primary' size={32}>
-                      <i className='tabler-building' aria-hidden='true' />
-                    </CustomAvatar>
-                    <Box sx={{ minWidth: 0 }}>
-                      <Typography variant='body2' noWrap>
-                        {selectedDeal.company.name}
-                      </Typography>
-                      {selectedDeal.company.legalName ? (
-                        <Typography variant='caption' color='text.secondary' noWrap>
-                          {selectedDeal.company.legalName}
-                        </Typography>
-                      ) : null}
-                    </Box>
-                  </Box>
-                ) : null}
-                <Typography variant='caption' color='text.secondary'>
-                  {COPY.selected.contactsLabel}
-                </Typography>
-                <List dense disablePadding role='list'>
-                  {selectedDeal.contacts.map(contact => (
-                    <ListItem key={contact.contactRecordId} disableGutters role='listitem'>
-                      <ListItemAvatar sx={{ minWidth: 36 }}>
-                        <Avatar sx={{ width: 28, height: 28, fontSize: '0.75rem' }}>
-                          {contact.displayName.charAt(0).toUpperCase()}
-                        </Avatar>
-                      </ListItemAvatar>
-                      <ListItemText
-                        primary={contact.displayName}
-                        secondary={contact.jobTitle ?? contact.email ?? null}
-                        primaryTypographyProps={{ variant: 'body2' }}
-                        secondaryTypographyProps={{ variant: 'caption' }}
-                      />
-                    </ListItem>
-                  ))}
-                </List>
-              </Box>
+              <SelectedDealContext deal={selectedDeal} />
             ) : null}
           </Grid>
         </Grid>

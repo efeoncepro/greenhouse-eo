@@ -103,6 +103,9 @@ export type RuntimeSampleSprintOptions = {
   spaces: Array<{
     spaceId: string
     spaceName: string
+    // TASK-837 follow-up — clientId required para resolver company del Deal
+    // vía crm.companies.client_id (deal.client_id es NULL en 73% de deals).
+    clientId: string | null
     clientName: string | null
     organizationId: string | null
     organizationName: string | null
@@ -1484,6 +1487,7 @@ const RuntimeDeclareWizard = ({ options }: { options: RuntimeSampleSprintOptions
                 onChange={setDealSelection}
                 spaceId={form.spaceId || null}
                 organizationId={selectedSpace?.organizationId ?? null}
+                clientId={selectedSpace?.clientId ?? null}
                 required
               />
             </Box>

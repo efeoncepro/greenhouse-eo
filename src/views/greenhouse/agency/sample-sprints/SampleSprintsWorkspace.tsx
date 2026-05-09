@@ -77,6 +77,9 @@ type Options = {
   spaces: Array<{
     spaceId: string
     spaceName: string
+    // TASK-837 follow-up — clientId required para resolver company del Deal
+    // vía crm.companies.client_id. Source of truth: store.SampleSprintOptions.
+    clientId: string | null
     clientName: string | null
     organizationId: string | null
     organizationName: string | null

@@ -369,7 +369,20 @@ export const declareSampleSprint = async (
   // TASK-837 Slice 3 — server-side Deal eligibility revalidation.
   // NEVER trust client-supplied hubspotDealId; always read fresh from PG mirror.
   // Cache in eligible-deals-reader is bypassed by getEligibleDealForRevalidation.
-  const eligibleDeal = await getEligibleDealForRevalidation(normalized.hubspotDealId)
+  //
+  // Pre-fetch the selected space's client_id as hint for company resolution.
+  // Live audit 2026-05-09: deal.client_id is NULL in 73% of synced deals; the
+  // canonical anchor is space → client_id → companies.client_id.
+  const spaceClientHint = await query<{ client_id: string | null }>(
+    `SELECT client_id FROM greenhouse_core.spaces WHERE space_id = $1 LIMIT 1`,
+    [normalized.spaceId]
+  )
+
+  const clientIdHint = spaceClientHint[0]?.client_id ?? undefined
+
+  const eligibleDeal = await getEligibleDealForRevalidation(normalized.hubspotDealId, {
+    clientIdHint
+  })
 
   if (!eligibleDeal) {
     throw new SampleSprintValidationError(
