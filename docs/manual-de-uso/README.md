@@ -14,11 +14,18 @@ La diferencia con otras capas de documentacion:
 
 - [Distribucion de costos para P&L operativo](finance/distribucion-costos-pnl.md) — como revisar, materializar y cerrar períodos sin inflar overhead de clientes con payroll, regulatorio, financiero o treasury transit.
 - [Sugerencias asistidas de conciliacion](finance/sugerencias-asistidas-conciliacion.md) — como generar, revisar, aceptar o descartar sugerencias AI sin alterar saldos automaticamente.
+- [Saldos bancarios FX drift](finance/saldos-bancarios-fx-drift-remediation.md) — como diagnosticar, auditar y remediar drift FX de saldos bancarios usando el control plane canonico sin SQL/backfills ad hoc.
 - [Finance Movement Feed](../documentation/finance/finance-movement-feed.md) — contrato reusable para mostrar movimientos financieros sin duplicar tablas, hardcodes de logos ni calculos de saldo en UI.
+
+### Comercial
+
+- [Pipeline comercial](comercial/pipeline-comercial.md) — como usar la lane dedicada de forecast comercial sin confundirla con revenue reconocido ni cierre financiero.
+- [Sample Sprints](comercial/sample-sprints.md) — como declarar, aprobar, registrar progreso y cerrar outcomes de pilotos/trials/POCs/discovery.
 
 ### Identidad y acceso
 
 - [SCIM con Microsoft Entra](identity/scim-entra-provisioning.md) — como verificar provisioning, usar `provisionOnDemand`, interpretar `countEscrowed` y evitar fixes manuales inseguros sobre usuarios o mappings.
+- [Organization Workspace Projection — operación](identity/organization-workspace-projection.md) — como supervisar las 2 nuevas reliability signals (`facet_view_drift`, `unresolved_relations`), interpretar las 5 relaciones canónicas subject↔organización, las 11 capabilities `organization.*` y la disciplina TS↔DB para agregar capabilities nuevas.
 
 ### Admin Center
 
@@ -44,6 +51,7 @@ _Pendiente._
 - [Usar microcopy shared](plataforma/microcopy-shared-dictionary.md) — como usar `getMicrocopy` y `buildStatusMap` para botones, estados, meses, empty states y aria-labels sin duplicar strings ni romper el futuro i18n.
 - [Verificar idioma del portal](plataforma/i18n-runtime.md) — como forzar `gh_locale=en-US`/`es-CL` para QA del runtime i18n sin cambiar URLs privadas ni APIs.
 - [Formatear fechas, montos y numeros](plataforma/formateo-locale-aware.md) — como usar `@/lib/format` para UI, PDFs, Excel y emails sin reintroducir `Intl.*` o `toLocale*` directo; incluye caso Brasil.
+- [Organization Workspace — rollout y operación](plataforma/organizaciones-workspace-rollout.md) — cómo activar progresivamente el nuevo workspace de organizaciones (TASK-612) en `/agency/organizations/[id]` por usuario → rol → global, supervisar las 2 reliability signals, revertir instantáneo per-user, y diagnosticar issues comunes.
 
 ## Plantilla recomendada
 

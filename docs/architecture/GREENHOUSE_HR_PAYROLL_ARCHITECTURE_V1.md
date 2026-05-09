@@ -1,5 +1,57 @@
 # GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md
 
+## Architecture Decision 2026-05-09 -- Chile Compliance Exports as Versioned Payroll Projections
+
+- Status: Accepted
+- Owner: Payroll / HR Compliance
+- Scope: Payroll Chile dependent exports for Previred and Direccion del Trabajo LRE, payroll export APIs, compliance artifact storage, reliability drift signals.
+- Reversibility: two-way-but-slow
+- Confidence: high for the projection boundary; medium for exact external field mappings until each official spec is frozen during implementation.
+- Validated as of: 2026-05-09
+
+### Context
+
+Greenhouse calcula payroll Chile dependiente y materializa columnas previsionales canonicas en `payroll_entries`, pero los artefactos que un operador carga en sistemas externos aun no son source-controlled ni auditables dentro del portal.
+
+La task `TASK-812` habia asumido inicialmente que Previred debia generarse como TXT posicional y que LRE debia generarse como XML validado contra XSD. La revision arquitectonica y payroll detecto drift: las fuentes publicas vigentes indican que Previred publica formato de largo variable por separador y que la Direccion del Trabajo describe LRE por carga masiva como CSV/TXT delimitado por punto y coma. Codificar desde el supuesto anterior produciria compliance falso.
+
+### Decision
+
+Los exports compliance Chile se modelan como **proyecciones versionadas read-only** sobre payroll cerrado, no como un nuevo source of truth ni como un motor paralelo de calculo.
+
+Cada formato soportado debe nacer de una evidencia externa versionada: manual/spec oficial, fecha de validacion, variante elegida, mapping declarativo y fixtures. Los generadores solo pueden implementarse despues de congelar esa evidencia en `docs/compliance/previred/` o `docs/compliance/dt/`.
+
+Los artefactos emitidos deben persistir metadata de auditoria: periodo, space, export kind, spec version, source URL, `sourceSnapshotHash`, `artifact_sha256`, record count, totales, estado de validacion, actor y timestamp. Si se almacena el archivo, debe ser asset privado o storage reference con retention class de compliance HR.
+
+### Alternatives Considered
+
+- Implementar el diseño anterior tal cual: rechazado porque codifica formatos externos aparentemente incorrectos.
+- Seguir exportando Excel/CSV internos y depender de Nubox/operador: rechazado porque mantiene drift y compliance trail fragmentado.
+- Recalcular cotizaciones dentro del export: rechazado porque rompe el boundary de payroll y duplica formulas sensibles.
+- Integrar upload programatico Previred/DT en V1: rechazado hasta existir convenio/API documentada y contrato de errores oficial.
+
+### Consequences
+
+- TASK-812 debe iniciar con Slice 0 de discovery oficial y no puede implementar generadores hasta cerrar formato/variante.
+- LRE no debe asumirse XML/XSD. Si una fuente oficial demuestra una variante XML para un flujo especifico, esa variante se documenta separada de carga masiva CSV/TXT.
+- Previred no debe asumirse posicional fijo. La variante V1 se elige desde manual oficial vigente.
+- `TASK-707a` bloquea la paridad completa contra `payment_order` social_security. Antes de eso solo puede validarse paridad contra payroll entries y `calculatePreviredEntryBreakdown`.
+- Horas Extras u otros conceptos no modelados no pueden emitirse como cero silencioso si el formato exige evidencia.
+
+### Runtime Contract
+
+- Payroll sigue siendo owner de calculo y lifecycle del periodo.
+- Finance/Tesoreria sigue siendo owner de payment orders y pagos.
+- Compliance exports consumen `payroll_entries`, Person Legal Profile/RUT verificado, mappings declarativos y payment order cuando exista.
+- Capabilities finas gobiernan generar/descargar exports; views/menu solo gobiernan surface visible.
+- Reliability debe detectar drift entre artefacto emitido y las fuentes canonicas del periodo.
+
+### Revisit When
+
+- Previred o DT publiquen formato/API nuevo que cambie carga manual por integracion programatica.
+- Greenhouse agregue rectification/void formal de artefactos declarados.
+- Payroll incorpore nuevos conceptos estatutarios que requieran ampliar mappings LRE/Previred.
+
 ## Delta 2026-05-05 — Contractor engagements no son finiquito ni payroll dependiente
 
 Se agrega arquitectura complementaria para contractor/freelance/profesional independiente:

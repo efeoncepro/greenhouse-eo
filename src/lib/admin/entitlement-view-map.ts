@@ -65,11 +65,30 @@ const resolveBindingsForView = (view: GovernanceViewRegistryEntry): ViewEntitlem
     case 'finanzas.inteligencia':
       return [toBinding(view, 'finance.status', ['read'])]
 
+    case 'comercial.pipeline':
+      return [toBinding(view, 'commercial.pipeline', ['read'])]
+
+    case 'comercial.cotizaciones':
+      return [toBinding(view, 'commercial.quotation', ['read', 'create', 'update', 'approve', 'export'])]
+
+    case 'comercial.contratos':
+      return [toBinding(view, 'commercial.contract', ['read', 'create', 'update'])]
+
+    case 'comercial.sow':
+      return [toBinding(view, 'commercial.sow', ['read', 'create', 'update'])]
+
+    case 'comercial.acuerdos_marco':
+      return [toBinding(view, 'commercial.master_agreement', ['read', 'create', 'update'])]
+
+    case 'comercial.productos':
+      return [toBinding(view, 'commercial.product_catalog', ['read', 'create', 'update'])]
+
     default:
       break
   }
 
   if (view.routeGroup === 'internal') return [toBinding(view, 'agency.workspace', ['read', 'launch'])]
+  if (view.routeGroup === 'commercial') return [toBinding(view, 'commercial.workspace', ['read', 'launch'])]
   if (view.routeGroup === 'people') return [toBinding(view, 'people.directory', ['read', 'launch'])]
   if (view.routeGroup === 'hr') return [toBinding(view, 'hr.workspace', ['read', 'launch'])]
   if (view.routeGroup === 'finance') return [toBinding(view, 'finance.workspace', ['read', 'launch'])]

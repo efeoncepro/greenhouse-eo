@@ -154,6 +154,18 @@
           "objectType": "service",
           "propertyName": "ef_currency",
           "active": true
+        },
+        {
+          "subscriptionType": "object.propertyChange",
+          "objectType": "service",
+          "propertyName": "ef_engagement_kind",
+          "active": true
+        },
+        {
+          "subscriptionType": "object.propertyChange",
+          "objectType": "service",
+          "propertyName": "hs_pipeline_stage",
+          "active": true
         }
       ]
     }

@@ -2,10 +2,26 @@
 
 > **Version:** 1.0
 > **Created:** 2026-03-28
-> **Last updated:** 2026-04-23
+> **Last updated:** 2026-05-09
 > **Audience:** Platform engineers, security reviewers, on-call operators
 > **Companion doc:** `GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md` (resource inventory)
 > **Task track:** TASK-096, TASK-098 through TASK-103 (Cloud Posture Hardening 1–7)
+
+---
+
+## Delta 2026-05-09 — GitHub Actions CI publishers usan Cloud SQL Client via WIF
+
+ISSUE-072 confirmó que los publishers CI que escriben evidence operacional a Cloud SQL no pueden depender solo de `roles/secretmanager.secretAccessor`.
+
+Postura vigente para GitHub Actions:
+
+- La service account federada `github-actions-deployer@efeonce-group.iam.gserviceaccount.com` mantiene `roles/cloudsql.client` como permiso mínimo de transporte para Cloud SQL Connector.
+- El acceso sigue pasando por Workload Identity Federation; no se introducen service account keys ni secretos JSON en GitHub.
+- La contraseña PostgreSQL se resuelve desde Secret Manager usando preferentemente el secret name canónico `greenhouse-pg-dev-app-password`; una ruta completa `projects/.../secrets/.../versions/...` también es válida, pero `secret:version` no es contrato aceptado.
+- Los publishers CI deben usar el cliente PostgreSQL canónico del repo, pool acotado (`GREENHOUSE_POSTGRES_MAX_CONNECTIONS=1`) y retry/backoff bounded para presión transitoria de Cloud SQL.
+- Este permiso no convierte a GitHub Actions en runtime productivo general; su scope aceptado es publicar evidence CI/QA como smoke-lane runs.
+
+La postura evita drift manual: `scripts/setup-github-actions-wif.sh` declara `roles/cloudsql.client` dentro de los roles esperados para la service account federada.
 
 ---
 

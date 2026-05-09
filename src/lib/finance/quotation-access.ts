@@ -19,7 +19,8 @@ export type FinanceQuotationStatus =
   | 'converted'
   | string
 
-const QUOTES_VIEW_CODE = 'finanzas.cotizaciones'
+export const COMMERCIAL_QUOTES_VIEW_CODE = 'comercial.cotizaciones'
+export const LEGACY_FINANCE_QUOTES_VIEW_CODE = 'finanzas.cotizaciones'
 
 const normalize = (values?: readonly string[] | null): string[] =>
   Array.isArray(values) ? values.filter(Boolean) : []
@@ -30,21 +31,22 @@ const hasRole = (subject: FinanceQuotationAccessSubject, roleCode: string) =>
 const hasRouteGroup = (subject: FinanceQuotationAccessSubject, routeGroup: string) =>
   normalize(subject.routeGroups).includes(routeGroup)
 
-const hasAuthorizedView = (subject: FinanceQuotationAccessSubject, viewCode: string) => {
+const hasAuthorizedView = (subject: FinanceQuotationAccessSubject, viewCodes: readonly string[]) => {
   const authorizedViews = normalize(subject.authorizedViews)
 
   if (authorizedViews.length === 0) {
     return null
   }
 
-  return authorizedViews.includes(viewCode)
+  return viewCodes.some(viewCode => authorizedViews.includes(viewCode))
 }
 
 const financeSurfaceFallback = (subject: FinanceQuotationAccessSubject) =>
-  hasRouteGroup(subject, 'finance') || hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)
+  hasRouteGroup(subject, 'commercial') || hasRouteGroup(subject, 'finance') || hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)
 
 export const canAccessFinanceQuotes = (subject: FinanceQuotationAccessSubject) =>
-  hasAuthorizedView(subject, QUOTES_VIEW_CODE) ?? financeSurfaceFallback(subject)
+  hasAuthorizedView(subject, [COMMERCIAL_QUOTES_VIEW_CODE, LEGACY_FINANCE_QUOTES_VIEW_CODE]) ??
+  financeSurfaceFallback(subject)
 
 export const canManageFinanceQuotes = (subject: FinanceQuotationAccessSubject) =>
   canAccessFinanceQuotes(subject)

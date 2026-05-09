@@ -36,8 +36,9 @@ import type {
   NotionSyncOrchestrationStatus
 } from '@/types/notion-sync-orchestration'
 import type { IntegrationHealth, IntegrationReadiness, IntegrationType, IntegrationWithHealth } from '@/types/integrations'
-import AdminOpsActionButton from './AdminOpsActionButton'
 import { formatDateTime as formatGreenhouseDateTime } from '@/lib/format'
+import AdminOpsActionButton from './AdminOpsActionButton'
+import HubSpotServicesManualQueueCard from './HubSpotServicesManualQueueCard'
 
 const TASK407_EMPTY_NO_SE_ENCONTRARON_INTEGRACIONES_EN_EL_REGISTRY_LA_TABLA = "No se encontraron integraciones en el registry. La tabla"
 
@@ -312,6 +313,8 @@ const AdminIntegrationGovernanceView = ({
 
       {/* GCP cost spotlight desde Billing Export (TASK-586) */}
       {gcpBilling && <GcpBillingCard overview={gcpBilling} />}
+
+      <HubSpotServicesManualQueueCard />
 
       <ExecutiveCardShell
         title='Sister Platform Bindings'

@@ -174,6 +174,22 @@ Regla:
 
 ## Estrategia de Cutover
 
+### Delta 2026-05-07 — TASK-806 service-aware GTM reclassification
+
+- `greenhouse_serving.commercial_cost_attribution_v2` sigue siendo la primitive canónica de attribution, pero ahora incluye `service_id` al final del shape para rows que vienen desde `client_team_assignments.service_id`.
+- `attribution_intent` ya no es solo literal operacional: labor y direct-member expenses service-linked pueden derivar `pilot/trial/poc/discovery` cuando el service está aprobado, activo, no `legacy_seed_archived` y no `hubspot_sync_status='unmapped'`.
+- Direct-client expenses sin allocation explícita permanecen `operational`; no se infiere `service_id` por cliente/nombre/línea de servicio.
+- `greenhouse_serving.gtm_investment_pnl` es una serving view de management accounting que filtra `terms_kind='no_cost'` y approval aprobado; no reemplaza auditoría por cliente ni contabilidad fiscal/legal.
+
+### Delta 2026-05-07 — TASK-815 direct-service expense allocations
+
+- `greenhouse_finance.expense_service_allocations` es la primitive aprobada para anclar un expense directo de cliente a un `service_id`.
+- Solo filas `review_status='approved'` afectan attribution; drafts y rejected no cambian P&L ni service facts.
+- DB valida que el expense sea `cost_is_direct=TRUE`, tenga `allocated_client_id`, no esté anulado, no exceda el monto efectivo/total y apunte a un service activo, no `legacy_seed_archived` y no `hubspot_sync_status='unmapped'`.
+- `commercial_cost_attribution_v2` agrega `cost_dimension='expense_direct_service'` para el monto aprobado y resta ese monto del residual `expense_direct_client`.
+- `service_attribution_facts` consume esta primitive como `source_type='expense_service_allocation'`, `attribution_method='approved_expense_service_allocation'`, `confidence='high'`.
+- Regla anti-duplicación: V1 no acepta allocations sobre expenses de miembro/direct overhead porque esa lane ya se distribuye vía FTE como `expense_direct_member_via_fte`.
+
 ### Regla general
 
 El cutover no es “todos los consumers leen la nueva tabla directamente”.

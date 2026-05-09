@@ -1,5 +1,42 @@
 # Greenhouse Entitlements & Authorization Architecture V1
 
+## Delta 2026-05-08 — TASK-611 introduce el module `organization` y la projection canónica del Organization Workspace
+
+- `ENTITLEMENT_MODULES` ahora incluye `organization` como **namespace transversal del objeto canónico 360** (mismo patrón que `home` y `my_workspace`, que tampoco son bounded contexts). El catálogo gana 11 capabilities `organization.<facet>.<action>`:
+  - `organization.identity` (read; own/tenant/all)
+  - `organization.identity_sensitive` (read, update; tenant/all) — PII + identidad legal
+  - `organization.spaces` (read; tenant/all)
+  - `organization.team` (read; own/tenant/all)
+  - `organization.economics` (read; tenant/all)
+  - `organization.delivery` (read; own/tenant/all)
+  - `organization.finance` (read; tenant/all)
+  - `organization.finance_sensitive` (read, export, approve; tenant/all)
+  - `organization.crm` (read; tenant/all)
+  - `organization.services` (read, update; tenant/all)
+  - `organization.staff_aug` (read, update; tenant/all)
+- **Capabilities registry DB** materializado: `greenhouse_core.capabilities_registry` (PK `capability_key`, `module`, `allowed_actions[]`, `allowed_scopes[]`, `description`, `introduced_at`, `deprecated_at`). Seedeado para las 11 organization.* + las 95 capabilities ya en TS catalog. **No tiene FK desde grants persistidos en V1** porque la tabla canónica `entitlement_grants` no existe (TASK-404 governance tables bloqueadas por pre-up-marker bug — ver `docs/issues/open/ISSUE-068-...`). El guardia primario es la TS↔DB parity test runtime (`src/lib/capabilities-registry/parity.ts`).
+- **Projection helper canónico** `resolveOrganizationWorkspaceProjection` en `src/lib/organization-workspace/projection.ts`. Pure function (cache-memoized TTL 30s) que compone:
+  1. Relación subject↔organization vía `relationship-resolver.ts` (5 categorías canónicas: `internal_admin | assigned_member | client_portal_user | unrelated_internal | no_relation`).
+  2. `getTenantEntitlements(subject)` puro.
+  3. Per-facet: `hasEntitlement(entitlements, FACET_TO_CAPABILITY_KEY[facet], 'read', requiredScopeForRelation(relation))`.
+  4. `authorizeAccountFacets(ctx)` como input adicional para `fieldRedactions` (NO se reemplaza — se absorbe).
+  5. Tabs por entrypoint con copy es-CL tuteo + default facet por matriz spec §4.4.
+  6. Allowed actions per facet desde la sensitive capability check.
+- **Relationship resolver** bridges via `greenhouse_core.spaces` (única tabla con `client_id` Y `organization_id`). `client_team_assignments` se filtra por `member_id` + `client_id`; `client_users` por `user_id` + `client_id` + `tenant_type='client'`. Cross-tenant isolation enforced en SQL.
+- **Runtime extension**: `runtime.ts` ahora compone organization.* capabilities desde roleCodes:
+  - `efeonce_admin` → 11 organization.* @ scope=`all` (incluyendo *_sensitive).
+  - `route_group=internal` (no admin) → 7 facets non-sensitive @ scope=`tenant`.
+  - `route_group=finance` (no admin) → economics + finance @ scope=`tenant`.
+  - `tenant_type=client` → 4 facets (identity, team, delivery, services) @ scope=`own`.
+  - Sensitive capabilities NO se auto-otorgan a non-admin (requieren grant explícito).
+- **Reliability signals** nuevos bajo `moduleKey='identity'`:
+  - `identity.workspace_projection.facet_view_drift` (drift, warning) — detecta drift estructural FACET_TO_VIEW_CODE × VIEW_REGISTRY.
+  - `identity.workspace_projection.unresolved_relations` (data_quality, error) — cuenta client_users sin organization resoluble vía spaces.
+- **Outbox cache invalidation consumer** (`organizationWorkspaceCacheInvalidationProjection`) responde a 5 events canónicos: `access.entitlement_role_default_changed`, `access.entitlement_user_override_changed`, `role.assigned`, `role.revoked`, `user.deactivated`. Drops el cache scoped al subject. Idempotente.
+- **Lint rule** `greenhouse/no-inline-facet-visibility-check` (modo `error`) prohibe checks inline de capabilities `organization.*` en componentes UI. Override block para `src/lib/organization-workspace/`, `src/lib/capabilities-registry/`, `src/lib/entitlements/`.
+- Spec canónico: `docs/architecture/GREENHOUSE_ORGANIZATION_WORKSPACE_PROJECTION_V1.md` V1.1 (Delta 2026-05-08 con 5 recalibraciones pre-execution).
+- Hard rule añadida: cuando emerja una capability nueva en TS catalog, **debe** acompañarse de una migration que la seedee en `capabilities_registry`. La parity test rompe el build si hay drift.
+
 ## Delta 2026-04-17 — TASK-404 conecta la gobernanza operativa de entitlements al Admin Center
 
 - El catálogo de capabilities **sigue siendo code-versioned**; el source of truth canónico continúa en:
@@ -449,6 +486,13 @@ Se mantienen como:
 - agrupación de rutas
 - criterio broad de navegación
 
+Delta TASK-555:
+
+- `commercial` es el route group broad para la navegación/surface de Comercial.
+- Roles transicionales con `commercial`: `efeonce_admin`, `efeonce_account`, `finance_admin`, `finance_analyst` y `finance_manager` si existe en DB.
+- El shell interno debe tratar `commercial` como carril operativo, aunque el usuario no tenga `internal`.
+- `startup policy` no cambia por este route group.
+
 Pero dejan de ser:
 
 - la única fuente de verdad para autorización fina
@@ -468,6 +512,18 @@ Pero dejan de ser:
 La dirección canónica es:
 
 - `authorizedViews` se derivan desde entitlements + surface rules
+
+Delta TASK-555:
+
+- Surfaces comerciales viven en namespace `comercial.*`: `pipeline`, `cotizaciones`, `contratos`, `sow`, `acuerdos_marco`, `productos`.
+- Mientras los paths sigan bajo `/finance/...`, los guards de cotizaciones aceptan `comercial.cotizaciones` y `finanzas.cotizaciones`.
+- El catálogo de bindings proyecta `comercial.*` a capabilities `commercial.*`; el fallback broad de sección usa `commercial.workspace`.
+
+Delta TASK-813/TASK-555:
+
+- `commercial.service_engagement.sync` usa action `sync`, scope `tenant`, module `commercial`, permitido a `finance_admin` y `efeonce_admin`.
+- `commercial.service_engagement.resolve_orphan` usa action `approve`, scope `tenant`, module `commercial`, permitido a `finance_admin` y `efeonce_admin`.
+- `commercial.service_engagement.archive_legacy` usa action `delete`, scope `tenant`, module `commercial`, reservado a `efeonce_admin`.
 
 ---
 

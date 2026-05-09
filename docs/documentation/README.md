@@ -57,6 +57,13 @@ Documentacion oficial de la plataforma Greenhouse. Cada documento describe como 
 - [Distribución de costos para P&L operativo](finance/distribucion-costos-pnl.md) — contrato funcional TASK-777 para separar labor/provider payroll, regulatorio, financiero y overhead operacional antes de materializar márgenes por cliente
 - [Finance Movement Feed](finance/finance-movement-feed.md) — primitive reusable para mostrar movimientos financieros con identidad visual, instrumento, estado, subtotales y virtualizacion sin mezclar UI con calculos de saldo
 
+### Comercial
+
+- [Pipeline comercial](finance/pipeline-comercial.md) — forecast comercial de deals, contratos standalone y pre-sales; lane dedicada en `/finance/intelligence/pipeline` con compat temporal desde Finanzas > Economía.
+- [Sample Sprints comerciales](comercial/sample-sprints.md) — pilotos, trials, POCs y discovery sobre `services.engagement_kind`, con approval, progreso, outcome, reportes y audit/outbox.
+- [Servicios engagement](comercial/servicios-engagement.md) — sincronizacion HubSpot p_services, materializacion de servicios y degradacion honesta
+- [Surfaces comerciales sobre rutas legacy Finance](comercial/surfaces-comerciales-sobre-rutas-finance.md) — cotizaciones, contratos/SOW, acuerdos marco y productos como owner-domain Comercial mientras conservan URLs `/finance/...`
+
 ### HR y Nomina
 
 - [Sistema de Permisos y Licencias](hr/sistema-permisos-leave.md) — tipos de permiso, medio dia (AM/PM), calculo de dias habiles, flujo de aprobacion, saldo y acumulacion

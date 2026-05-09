@@ -22,7 +22,7 @@ export type NuboxProjectionSale = NuboxConformedSale & {
   source_last_ingested_at: string | null
 }
 
-type NuboxProjectionPurchase = NuboxConformedPurchase & {
+export type NuboxProjectionPurchase = NuboxConformedPurchase & {
   source_last_ingested_at: string | null
 }
 
@@ -38,6 +38,35 @@ const safeNum = (v: unknown): number | null => {
   const n = Number(s)
 
   return Number.isFinite(n) ? n : null
+}
+
+const roundAmount = (value: number): number => Math.round((value + Number.EPSILON) * 100) / 100
+
+export const resolveNuboxPurchaseProjectionAmounts = (purchase: NuboxProjectionPurchase) => {
+  const netAmount = safeNum(purchase.net_amount) ?? 0
+  const exemptAmount = safeNum(purchase.exempt_amount) ?? 0
+  const vatAmount = safeNum(purchase.tax_vat_amount) ?? 0
+  const sourceTotalAmount = safeNum(purchase.total_amount) ?? 0
+  const withholdingAmount = safeNum(purchase.total_withholding_amount) ?? 0
+
+  const taxSubtotal =
+    (purchase.dte_type_code === '34' || exemptAmount > 0) && netAmount === 0
+      ? exemptAmount
+      : netAmount
+
+  const grossFiscalTotalAmount = roundAmount(taxSubtotal + vatAmount)
+  const sourceTotalPlusWithholding = roundAmount(sourceTotalAmount + withholdingAmount)
+
+  const hasWithheldPayableTotal =
+    withholdingAmount > 0 && Math.abs(sourceTotalPlusWithholding - grossFiscalTotalAmount) <= 1
+
+  return {
+    taxSubtotal,
+    taxValidationTotalAmount: hasWithheldPayableTotal ? grossFiscalTotalAmount : sourceTotalAmount,
+    payableTotalAmount: hasWithheldPayableTotal ? sourceTotalAmount : grossFiscalTotalAmount,
+    grossFiscalTotalAmount,
+    withholdingAmount
+  }
 }
 
 const resolveNuboxIncomeTaxCode = (sale: NuboxProjectionSale): 'cl_vat_19' | 'cl_vat_exempt' | 'cl_vat_non_billable' => {
@@ -74,6 +103,7 @@ const applySignToIncomeTaxSnapshot = (
 // ─── Types ──────────────────────────────────────────────────────────────────
 
 export type SyncNuboxToPostgresResult = {
+  status: 'succeeded' | 'partial' | 'failed'
   syncRunId: string
   incomesCreated: number
   incomesUpdated: number
@@ -86,6 +116,7 @@ export type SyncNuboxToPostgresResult = {
   expensesReconciled: number
   incomesReconciled: number
   signalsRecorded: number
+  projectionFailures: number
   durationMs: number
 }
 
@@ -482,11 +513,13 @@ const upsertExpenseFromPurchase = async (
   const isExpenseAnnulled = purchase.is_annulled === true
   const exchangeRateToClp = 1
 
+  const projectionAmounts = resolveNuboxPurchaseProjectionAmounts(purchase)
+
   const taxWriteFields = await buildExpenseTaxWriteFields({
-    subtotal: safeNum(purchase.net_amount) ?? 0,
+    subtotal: projectionAmounts.taxSubtotal,
     exchangeRateToClp,
     taxAmount: safeNum(purchase.tax_vat_amount) ?? 0,
-    totalAmount: safeNum(purchase.total_amount) ?? 0,
+    totalAmount: projectionAmounts.taxValidationTotalAmount,
     dteTypeCode: purchase.dte_type_code,
     exemptAmount: safeNum(purchase.exempt_amount),
     vatUnrecoverableAmount: safeNum(purchase.vat_unrecoverable_amount),
@@ -536,7 +569,7 @@ const upsertExpenseFromPurchase = async (
       [
         expenseId,
         `${purchase.dte_type_name || 'Factura'} — ${purchase.supplier_trade_name || 'Unknown'}`,
-        safeNum(purchase.net_amount) ?? 0,
+        projectionAmounts.taxSubtotal,
         taxWriteFields.taxRate,
         taxWriteFields.taxAmount,
         taxWriteFields.taxCode,
@@ -552,7 +585,7 @@ const upsertExpenseFromPurchase = async (
         taxWriteFields.nonRecoverableTaxAmountClp,
         taxWriteFields.effectiveCostAmount,
         taxWriteFields.effectiveCostAmountClp,
-        taxWriteFields.totalAmount,
+        projectionAmounts.payableTotalAmount,
         isExpenseAnnulled ? 'written_off' : ((safeNum(purchase.balance) ?? -1) === 0 ? 'paid' : 'pending'),
         purchase.folio,
         purchase.emission_date,
@@ -578,7 +611,7 @@ const upsertExpenseFromPurchase = async (
         purchase.folio,
         safeNum(purchase.exempt_amount),
         safeNum(purchase.total_other_taxes_amount),
-        safeNum(purchase.total_withholding_amount),
+        projectionAmounts.withholdingAmount,
         purchase.period_year,
         purchase.period_month
       ]
@@ -595,7 +628,9 @@ const upsertExpenseFromPurchase = async (
           expense_id: expenseId,
           source: 'nubox_sync',
           nubox_purchase_id: purchase.nubox_purchase_id,
-          total_amount: purchase.total_amount
+          total_amount: projectionAmounts.payableTotalAmount,
+          gross_fiscal_total_amount: projectionAmounts.grossFiscalTotalAmount,
+          withholding_amount: projectionAmounts.withholdingAmount
         })
       ]
     )
@@ -889,26 +924,57 @@ const writeSyncRun = async ({
   runId,
   status,
   recordsRead = 0,
+  recordsProjectedPostgres = 0,
   notes
 }: {
   runId: string
-  status: 'running' | 'succeeded' | 'failed'
+  status: 'running' | 'succeeded' | 'failed' | 'partial'
   recordsRead?: number
+  recordsProjectedPostgres?: number
   notes?: string | null
 }) => {
   await runGreenhousePostgresQuery(
     `INSERT INTO greenhouse_sync.source_sync_runs (
       sync_run_id, source_system, source_object_type, sync_mode,
-      status, records_read, triggered_by, notes, finished_at
+      status, records_read, records_projected_postgres, triggered_by, notes, finished_at
     )
-    VALUES ($1, 'nubox', 'postgres_projection', 'incremental', $2, $3, 'nubox_sync', $4,
+    VALUES ($1, 'nubox', 'postgres_projection', 'incremental', $2, $3, $4, 'nubox_sync', $5,
       CASE WHEN $2 = 'running' THEN NULL ELSE CURRENT_TIMESTAMP END)
     ON CONFLICT (sync_run_id) DO UPDATE SET
       status = EXCLUDED.status,
       records_read = EXCLUDED.records_read,
+      records_projected_postgres = EXCLUDED.records_projected_postgres,
       notes = EXCLUDED.notes,
       finished_at = EXCLUDED.finished_at`,
-    [runId, status, recordsRead, notes || null]
+    [runId, status, recordsRead, recordsProjectedPostgres, notes || null]
+  )
+}
+
+const writeSyncFailure = async ({
+  runId,
+  sourceObjectId,
+  errorMessage,
+  payload
+}: {
+  runId: string
+  sourceObjectId: string
+  errorMessage: string
+  payload?: Record<string, unknown>
+}) => {
+  await runGreenhousePostgresQuery(
+    `INSERT INTO greenhouse_sync.source_sync_failures (
+      sync_failure_id, sync_run_id, source_system, source_object_type,
+      source_object_id, error_code, error_message, payload_json, retryable
+    )
+    VALUES ($1, $2, 'nubox', 'postgres_projection',
+      $3, 'nubox_postgres_projection_failed', $4, $5::jsonb, TRUE)`,
+    [
+      `fail-${randomUUID()}`,
+      runId,
+      sourceObjectId,
+      errorMessage.slice(0, 2000),
+      JSON.stringify(payload || {})
+    ]
   )
 }
 
@@ -935,20 +1001,42 @@ export const syncNuboxToPostgres = async (): Promise<SyncNuboxToPostgresResult> 
     let quotesUpdated = 0
     let orphanedRecords = 0
 
+    let projectionFailures = 0
+
     for (const sale of conformedSales) {
-      if (sale.dte_type_code === '52' || sale.dte_type_code === 'COT') {
-        // Cotizaciones go to quotes table, not income
-        const result = await upsertNuboxQuoteFromSale(sale)
+      try {
+        if (sale.dte_type_code === '52' || sale.dte_type_code === 'COT') {
+          // Cotizaciones go to quotes table, not income
+          const result = await upsertNuboxQuoteFromSale(sale)
 
-        if (result === 'created') quotesCreated++
-        else if (result === 'updated') quotesUpdated++
-        else if (result === 'skipped') orphanedRecords++
-      } else {
-        const result = await upsertIncomeFromSale(sale)
+          if (result === 'created') quotesCreated++
+          else if (result === 'updated') quotesUpdated++
+          else if (result === 'skipped') orphanedRecords++
+        } else {
+          const result = await upsertIncomeFromSale(sale)
 
-        if (result === 'created') incomesCreated++
-        else if (result === 'updated') incomesUpdated++
-        else if (result === 'skipped') orphanedRecords++
+          if (result === 'created') incomesCreated++
+          else if (result === 'updated') incomesUpdated++
+          else if (result === 'skipped') orphanedRecords++
+        }
+      } catch (error) {
+        projectionFailures++
+
+        const message = error instanceof Error ? error.message : String(error)
+
+        console.error(`[nubox-postgres-projection] sale ${sale.nubox_sale_id} failed:`, error)
+        await writeSyncFailure({
+          runId: syncRunId,
+          sourceObjectId: `sale:${sale.nubox_sale_id ?? 'unknown'}`,
+          errorMessage: message,
+          payload: {
+            phase: sale.dte_type_code === '52' || sale.dte_type_code === 'COT' ? 'quote' : 'income',
+            nuboxSaleId: sale.nubox_sale_id,
+            dteTypeCode: sale.dte_type_code,
+            folio: sale.folio,
+            clientRut: sale.client_rut
+          }
+        }).catch(() => {})
       }
     }
 
@@ -958,13 +1046,39 @@ export const syncNuboxToPostgres = async (): Promise<SyncNuboxToPostgresResult> 
     let suppliersAutoProvisioned = 0
 
     for (const purchase of conformedPurchases) {
-      const result = await upsertExpenseFromPurchase(purchase)
+      try {
+        const result = await upsertExpenseFromPurchase(purchase)
 
-      if (result.action === 'created') expensesCreated++
-      else if (result.action === 'updated') expensesUpdated++
-      else if (result.action === 'skipped') orphanedRecords++
+        if (result.action === 'created') expensesCreated++
+        else if (result.action === 'updated') expensesUpdated++
+        else if (result.action === 'skipped') orphanedRecords++
 
-      if (result.autoProvisioned) suppliersAutoProvisioned++
+        if (result.autoProvisioned) suppliersAutoProvisioned++
+      } catch (error) {
+        projectionFailures++
+
+        const message = error instanceof Error ? error.message : String(error)
+
+        console.error(`[nubox-postgres-projection] purchase ${purchase.nubox_purchase_id} failed:`, error)
+        await writeSyncFailure({
+          runId: syncRunId,
+          sourceObjectId: `purchase:${purchase.nubox_purchase_id ?? 'unknown'}`,
+          errorMessage: message,
+          payload: {
+            phase: 'expense',
+            nuboxPurchaseId: purchase.nubox_purchase_id,
+            dteTypeCode: purchase.dte_type_code,
+            folio: purchase.folio,
+            supplierRut: purchase.supplier_rut,
+            netAmount: safeNum(purchase.net_amount),
+            taxVatAmount: safeNum(purchase.tax_vat_amount),
+            totalAmount: safeNum(purchase.total_amount),
+            exemptAmount: safeNum(purchase.exempt_amount),
+            totalOtherTaxesAmount: safeNum(purchase.total_other_taxes_amount),
+            totalWithholdingAmount: safeNum(purchase.total_withholding_amount)
+          }
+        }).catch(() => {})
+      }
     }
 
     // 4. Record bank movements as external_cash_signals (TASK-708 Slice 1).
@@ -996,14 +1110,22 @@ export const syncNuboxToPostgres = async (): Promise<SyncNuboxToPostgresResult> 
 
     const totalRead = conformedSales.length + conformedPurchases.length
 
+    const recordsProjectedPostgres =
+      incomesCreated + incomesUpdated + quotesCreated + quotesUpdated + expensesCreated + expensesUpdated
+
+    const finalStatus: SyncNuboxToPostgresResult['status'] =
+      projectionFailures === 0 ? 'succeeded' : recordsProjectedPostgres > 0 ? 'partial' : 'failed'
+
     await writeSyncRun({
       runId: syncRunId,
-      status: 'succeeded',
+      status: finalStatus,
       recordsRead: totalRead,
-      notes: `Income: ${incomesCreated} created, ${incomesUpdated} updated. Expenses: ${expensesCreated} created, ${expensesUpdated} updated. Suppliers auto-provisioned: ${suppliersAutoProvisioned}. Signals recorded (Nubox bank movements): ${signalsRecorded}. Orphaned: ${orphanedRecords}`
+      recordsProjectedPostgres,
+      notes: `Income: ${incomesCreated} created, ${incomesUpdated} updated. Quotes: ${quotesCreated} created, ${quotesUpdated} updated. Expenses: ${expensesCreated} created, ${expensesUpdated} updated. Suppliers auto-provisioned: ${suppliersAutoProvisioned}. Signals recorded (Nubox bank movements): ${signalsRecorded}. Orphaned: ${orphanedRecords}. Projection failures: ${projectionFailures}`
     })
 
     return {
+      status: finalStatus,
       syncRunId,
       incomesCreated,
       incomesUpdated,
@@ -1016,6 +1138,7 @@ export const syncNuboxToPostgres = async (): Promise<SyncNuboxToPostgresResult> 
       expensesReconciled,
       incomesReconciled,
       signalsRecorded,
+      projectionFailures,
       durationMs: Date.now() - startMs
     }
   } catch (error) {

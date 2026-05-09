@@ -11,6 +11,11 @@ import { getCloudPostgresPosture } from '@/lib/cloud/postgres'
 import { readAiLlmOperationsSnapshot } from '@/lib/ico-engine/ai/llm-enrichment-reader'
 import { getNotionDeliveryDataQualityOverview } from '@/lib/integrations/notion-delivery-data-quality'
 import { getEffectiveLatestNotionSyncAt } from '@/lib/integrations/notion-sync-freshness'
+import {
+  COMMERCIAL_HEALTH_CONVERSION_WINDOW_MONTHS,
+  getCommercialHealthCounts,
+  resolveCommercialEngagementConversionRateThreshold
+} from '@/lib/commercial/sample-sprints/health'
 import { countIncomesWithSettlementDrift } from '@/lib/finance/income-settlement'
 import { getFinanceLedgerHealth } from '@/lib/finance/ledger-health'
 import {
@@ -306,6 +311,140 @@ const PLATFORM_INTEGRITY_METRIC_KEYS = new Set<string>([
 
 const isPlatformIntegrityMetric = (key: string): boolean =>
   PLATFORM_INTEGRITY_METRIC_KEYS.has(key)
+
+const describeCommercialMetric = (metric: OperationsSubsystemMetric) => {
+  switch (metric.key) {
+    case 'engagement_overdue_decision':
+      return pluralize(metric.value, 'decision vencida', 'decisiones vencidas')
+    case 'engagement_budget_overrun':
+      return pluralize(metric.value, 'budget overrun', 'budget overruns')
+    case 'engagement_zombie':
+      return pluralize(metric.value, 'engagement zombie', 'engagements zombie')
+    case 'engagement_unapproved_active':
+      return pluralize(metric.value, 'engagement activo sin approval', 'engagements activos sin approval')
+    case 'engagement_stale_progress':
+      return pluralize(metric.value, 'snapshot vencido', 'snapshots vencidos')
+    case 'engagement_conversion_rate_drop':
+      return metric.value === 0 ? 'conversion rate sobre threshold' : 'conversion rate bajo threshold'
+    default:
+      return `${metric.value} ${metric.label}`
+  }
+}
+
+const buildCommercialHealthSummary = (metrics: OperationsSubsystemMetric[]) => {
+  const issueMetrics = metrics.filter(metric => metric.status === 'warning' || metric.status === 'error')
+
+  if (issueMetrics.length === 0) {
+    return 'Commercial Health sano: sin Sample Sprints zombie, sin approvals faltantes y cadencia de progreso al día.'
+  }
+
+  return `${issueMetrics.length} señal${issueMetrics.length === 1 ? '' : 'es'} Commercial Health con issue activo: ${issueMetrics.map(describeCommercialMetric).join(', ')}.`
+}
+
+export const buildCommercialHealthSubsystem = async (): Promise<OperationsSubsystem> => {
+  try {
+    const [hasServices, hasApprovals, hasPhases, hasOutcomes, hasProgress] = await Promise.all([
+      tableExists('greenhouse_core', 'services'),
+      tableExists('greenhouse_commercial', 'engagement_approvals'),
+      tableExists('greenhouse_commercial', 'engagement_phases'),
+      tableExists('greenhouse_commercial', 'engagement_outcomes'),
+      tableExists('greenhouse_commercial', 'engagement_progress_snapshots')
+    ])
+
+    if (!hasServices || !hasApprovals || !hasPhases || !hasOutcomes || !hasProgress) {
+      return {
+        name: 'Commercial Health',
+        status: 'not_configured',
+        processed: 0,
+        failed: 0,
+        lastRun: null,
+        summary: 'Commercial Health requiere services + tablas engagement_* de EPIC-014.',
+        metrics: []
+      }
+    }
+
+    const counts = await getCommercialHealthCounts()
+    const threshold = resolveCommercialEngagementConversionRateThreshold()
+
+    const conversionBelowThreshold =
+      counts.conversion.totalOutcomes > 0 && counts.conversion.conversionRate < threshold
+
+    const metrics: OperationsSubsystemMetric[] = [
+      {
+        key: 'engagement_overdue_decision',
+        label: 'Decision vencida',
+        value: counts.overdueDecision,
+        status: counts.overdueDecision === 0 ? 'ok' : 'error'
+      },
+      {
+        key: 'engagement_budget_overrun',
+        label: 'Budget overrun',
+        value: counts.budgetOverrun,
+        status: counts.budgetOverrun === 0 ? 'ok' : 'warning'
+      },
+      {
+        key: 'engagement_zombie',
+        label: 'Zombie',
+        value: counts.zombie,
+        status: counts.zombie === 0 ? 'ok' : 'error'
+      },
+      {
+        key: 'engagement_unapproved_active',
+        label: 'Activo sin approval',
+        value: counts.unapprovedActive,
+        status: counts.unapprovedActive === 0 ? 'ok' : 'error'
+      },
+      {
+        key: 'engagement_conversion_rate_drop',
+        label: `Conversion trailing ${COMMERCIAL_HEALTH_CONVERSION_WINDOW_MONTHS}m`,
+        value: conversionBelowThreshold ? 1 : 0,
+        status: conversionBelowThreshold ? 'warning' : 'ok'
+      },
+      {
+        key: 'engagement_stale_progress',
+        label: 'Progress stale',
+        value: counts.staleProgress,
+        status: counts.staleProgress === 0 ? 'ok' : 'warning'
+      }
+    ]
+
+    const issueMetrics = metrics.filter(metric => metric.status === 'warning' || metric.status === 'error')
+
+    return {
+      name: 'Commercial Health',
+      status: issueMetrics.length === 0 ? 'healthy' : 'degraded',
+      processed: metrics.length,
+      failed: issueMetrics.length,
+      lastRun: new Date().toISOString(),
+      summary: buildCommercialHealthSummary(metrics),
+      metrics: [
+        ...metrics,
+        {
+          key: 'engagement_conversion_rate',
+          label: 'Conversion rate',
+          value: Math.round(counts.conversion.conversionRate * 1000) / 10,
+          status: 'info'
+        },
+        {
+          key: 'engagement_conversion_outcomes',
+          label: 'Outcomes trailing',
+          value: counts.conversion.totalOutcomes,
+          status: 'info'
+        }
+      ]
+    }
+  } catch {
+    return {
+      name: 'Commercial Health',
+      status: 'idle',
+      processed: 0,
+      failed: 0,
+      lastRun: null,
+      summary: 'No se pudo construir el resumen de Commercial Health.',
+      metrics: []
+    }
+  }
+}
 
 export const buildFinanceDataQualitySubsystem = async (): Promise<OperationsSubsystem> => {
   try {
@@ -1029,6 +1168,7 @@ export const getOperationsOverview = async (): Promise<OperationsOverview> => {
       lastRun: icoAiSignalsLastSync
     },
     await buildFinanceDataQualitySubsystem(),
+    await buildCommercialHealthSubsystem(),
     await buildPayrollDataQualitySubsystem(),
     buildNotionDeliveryDataQualitySubsystem(notionDeliveryDataQuality)
   ]

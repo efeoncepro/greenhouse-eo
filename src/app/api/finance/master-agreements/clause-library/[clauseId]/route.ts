@@ -8,7 +8,7 @@ import {
 import type { MasterAgreementClauseCategory } from '@/lib/commercial/master-agreements-types'
 import {
   canAdministerPricingCatalog,
-  requireFinanceTenantContext
+  requireCommercialTenantContext
 } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
@@ -28,7 +28,7 @@ export async function PUT(
   request: Request,
   { params }: { params: Promise<{ clauseId: string }> }
 ) {
-  const { tenant, errorResponse } = await requireFinanceTenantContext()
+  const { tenant, errorResponse } = await requireCommercialTenantContext()
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -84,7 +84,7 @@ export async function DELETE(
   _request: Request,
   { params }: { params: Promise<{ clauseId: string }> }
 ) {
-  const { tenant, errorResponse } = await requireFinanceTenantContext()
+  const { tenant, errorResponse } = await requireCommercialTenantContext()
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

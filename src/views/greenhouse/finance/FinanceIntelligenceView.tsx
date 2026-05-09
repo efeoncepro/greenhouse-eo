@@ -2,8 +2,12 @@
 
 import { useState } from 'react'
 
+import Link from 'next/link'
+
+import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
+import LinkMui from '@mui/material/Link'
 import Stack from '@mui/material/Stack'
 import Tab from '@mui/material/Tab'
 import Typography from '@mui/material/Typography'
@@ -67,7 +71,23 @@ const FinanceIntelligenceView = ({ canManageClosure, canReopen }: Props) => {
           </TabPanel>
 
           <TabPanel value='quotations' sx={{ p: 0 }}>
-            <CommercialIntelligenceView />
+            <Stack spacing={3}>
+              <Alert
+                severity='info'
+                icon={<i className='tabler-info-circle' aria-hidden='true' />}
+                sx={{ mx: { xs: 2, sm: 3, md: 4 }, mt: { xs: 2, sm: 3, md: 4 } }}
+              >
+                <Typography component='span' variant='body2'>
+                  Vista compartida — owner Comercial. Para revisar forecast, deals y pre-sales sin el marco de
+                  Economía operativa, abre la{' '}
+                  <LinkMui component={Link} href='/finance/intelligence/pipeline' underline='hover'>
+                    lane dedicada
+                  </LinkMui>
+                  .
+                </Typography>
+              </Alert>
+              <CommercialIntelligenceView />
+            </Stack>
           </TabPanel>
 
           <TabPanel value='mrrArr' sx={{ p: 0 }}>

@@ -368,9 +368,9 @@ const MasterAgreementDetailView = () => {
         }}
       >
         <HorizontalWithSubtitle
-          title='Contratos'
+          title='Contratos comerciales'
           stats={String(agreement.contractCount)}
-          subtitle='Contratos vinculados al acuerdo'
+          subtitle='Contratos vinculados al acuerdo marco'
           avatarIcon='tabler-link'
           avatarColor='primary'
         />

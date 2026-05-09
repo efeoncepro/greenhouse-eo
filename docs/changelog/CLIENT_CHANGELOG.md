@@ -42,6 +42,25 @@ No reemplaza `changelog.md` del repo, que sigue siendo el registro interno técn
 
 ---
 
+## 2026.05-beta.7
+
+**Canal:** Beta
+**Fecha:** 2026-05-07
+**Disponible para:** internal
+**Módulos:** Comercial / Finanzas
+
+### Novedades
+
+- Pipeline comercial ahora tiene entrada propia en Comercial > Pipeline, manteniendo la URL legacy `/finance/intelligence/pipeline`.
+
+### Mejoras
+
+- Pipeline comercial oculta ahora cotizaciones legacy/históricas que no deben participar del forecast operativo.
+
+### Notas
+
+- La vista de Finanzas > Economía conserva el tab de Pipeline como compatibilidad temporal, pero el forecast comercial no debe leerse como revenue reconocido.
+
 ## 2026.04-beta.29
 
 **Canal:** Beta

@@ -8,7 +8,7 @@ import { getOrCreateQuotePdfBuffer } from '@/lib/finance/quote-share/quote-pdf-a
 import { resolveQuoteShortLink } from '@/lib/finance/quote-share/short-link'
 import { buildShortQuoteUrl } from '@/lib/finance/quote-share/url-builder'
 import { IdempotencyKeyError, withIdempotency } from '@/lib/idempotency/idempotency-key'
-import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
+import { requireCommercialTenantContext } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
 
@@ -85,7 +85,7 @@ export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string; shortCode: string }> }
 ) {
-  const { tenant, errorResponse: authError } = await requireFinanceTenantContext()
+  const { tenant, errorResponse: authError } = await requireCommercialTenantContext()
 
   if (!tenant) {
     return authError || errorResponse({ code: 'unauthorized', message: 'Unauthorized' })

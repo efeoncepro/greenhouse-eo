@@ -84,6 +84,8 @@ exists, stay on one.
 | `roles/secretmanager.admin` | Grant `roles/secretmanager.secretAccessor` on individual secrets to runtime SAs |
 | `roles/storage.admin` | Read/write the Cloud Build staging bucket + private assets bucket |
 | `roles/artifactregistry.writer` | Push built container images |
+| `roles/cloudsql.client` | Use Cloud SQL Connector from CI publishers such as Playwright smoke-lane result sync |
+| `roles/logging.viewer` | Stream Cloud Build logs back to workflow output |
 
 And the following **resource-level** binding:
 
@@ -122,6 +124,12 @@ auditable via Cloud Build + Cloud Run revision history).
    ```
 
    The script is idempotent, so re-runs only add the new binding.
+
+   Existing Cloud SQL/PG publishers must use the existing deployer plus
+   `roles/cloudsql.client`; do not add service-account JSON keys or manual
+   database secrets to GitHub. The workflow should authenticate with WIF,
+   resolve the password via Secret Manager, and connect through the canonical
+   Postgres client.
 
 3. Do NOT create a new service account, WIF pool, or provider unless
    the workflow genuinely needs isolation from other workflows (very

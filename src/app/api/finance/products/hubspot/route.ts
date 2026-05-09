@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server'
 
-import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
+import { requireCommercialTenantContext } from '@/lib/tenant/authorization'
 import { createHubSpotProduct } from '@/lib/hubspot/create-hubspot-product'
 
 export const dynamic = 'force-dynamic'
 
 export async function POST(request: Request) {
-  const { tenant, errorResponse } = await requireFinanceTenantContext()
+  const { tenant, errorResponse } = await requireCommercialTenantContext()
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

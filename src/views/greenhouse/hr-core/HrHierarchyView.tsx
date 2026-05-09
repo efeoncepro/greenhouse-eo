@@ -225,15 +225,18 @@ const SectionTitle = ({
   icon,
   title,
   subtitle,
-  action
+  action,
+  titleId
 }: {
   icon: string
   title: string
   subtitle: string
   action?: ReactNode
+  titleId?: string
 }) => (
   <CardHeader
     title={title}
+    titleTypographyProps={titleId ? { id: titleId } : undefined}
     subheader={subtitle}
     avatar={
       <Avatar variant='rounded' sx={{ bgcolor: 'primary.lightOpacity' }}>
@@ -1904,9 +1907,15 @@ const HrHierarchyView = () => {
               </CardContent>
             </Card>
 
-            <Card elevation={0} sx={{ border: theme => `1px solid ${theme.palette.divider}` }}>
+            <Card
+              elevation={0}
+              role='region'
+              aria-labelledby='hr-hierarchy-delegations-title'
+              sx={{ border: theme => `1px solid ${theme.palette.divider}` }}
+            >
               <SectionTitle
                 icon='tabler-shield-check'
+                titleId='hr-hierarchy-delegations-title'
                 title='Delegaciones temporales'
                 subtitle='Historial completo de delegaciones. Solo una delegación primaria puede quedar activa por supervisor.'
                 action={

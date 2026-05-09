@@ -209,6 +209,12 @@ El namespace objetivo para surfaces comerciales es:
 - `comercial.acuerdos_marco`
 - `comercial.productos`
 
+Estado TASK-555:
+
+- El namespace anterior ya existe en `greenhouse_core.view_registry` y en el catálogo runtime `VIEW_REGISTRY`.
+- Todas esas vistas usan `route_group = commercial`.
+- Las rutas siguen siendo legacy `/finance/...` para evitar romper deep links: `pipeline` usa `/finance/intelligence`, `cotizaciones` usa `/finance/quotes`, `contratos` y `sow` usan `/finance/contracts`, `acuerdos_marco` usa `/finance/master-agreements` y `productos` usa `/finance/products`.
+
 ### 7.2 Transition rule
 
 Durante la migracion:
@@ -250,6 +256,13 @@ Primera etapa de acceso:
 - `finance_admin` mantiene acceso transicional a surfaces comerciales
 - `efeonce_account` debe poder operar el dominio comercial
 - `finance_analyst` puede mantener lectura selectiva donde Finance consume artefactos comerciales
+
+Estado TASK-555:
+
+- `role-route-mapping.ts` y `greenhouse_core.roles.route_group_scope` agregan `commercial` para `efeonce_admin`, `efeonce_account`, `finance_admin` y `finance_analyst`.
+- La migración también intenta `finance_manager` de forma condicional para alinear DB histórica donde ese rol exista aunque no esté en `ROLE_CODES`.
+- No se crean roles `sales`, `sales_lead` ni `commercial_admin`.
+- No se crea startup policy comercial.
 
 ### 8.3 Future role family
 

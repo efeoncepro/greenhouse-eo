@@ -1,7 +1,8 @@
 # Greenhouse EO — UI Platform Architecture V1
 
-> **Version:** 1.8
+> **Version:** 1.9
 > **Created:** 2026-03-30
+> **Updated:** 2026-05-08 — v1.9: TASK-612 entrega Organization Workspace Shell (chrome) + FacetContentRouter + 9 facet content components, gated por flag `organization_workspace_shell_agency` (extensión de `home_rollout_flags` per V1.1). Patron canónico shell-vs-content (§4.5 spec V1) materializado: shell owns chrome, domain owns facet content via render-prop + lazy registry. Ver Delta 2026-05-08 abajo.
 > **Updated:** 2026-05-06 — v1.8: TASK-430 activa el runtime `next-intl` sin prefijar el portal privado. `src/i18n/*` resuelve locale con cookie `gh_locale` + `Accept-Language` + fallback `es-CL`, el App Router queda envuelto por `NextIntlClientProvider`, `<html lang>` usa locale efectivo y `en-US` ya cubre shell navigation + namespaces shared serializables. Ver Delta 2026-05-06c abajo.
 > **Updated:** 2026-05-06 — v1.7: TASK-428 publica `GREENHOUSE_I18N_ARCHITECTURE_V1.md`: `next-intl` como librería App Router, portal privado state-only sin locale prefix por defecto, `en-US` como primera activación, `pt-BR` planned, y TASK-431 debe absorber `client_users.locale` legacy. Ver Delta 2026-05-06b abajo.
 > **Updated:** 2026-05-06 — v1.6: TASK-811 recorta `src/config/greenhouse-nomenclature.ts` a navegación/product nomenclature + tokens visuales transicionales. Domain microcopy reutilizable se extrae a módulos type-safe en `src/lib/copy/*` (`agency`, `client-portal`, `admin`, `pricing`, `workforce`, `finance`, `payroll`). Ver Delta 2026-05-06 abajo.
@@ -17,6 +18,97 @@
 ## Overview
 
 Greenhouse EO es un portal Next.js 16 App Router con MUI 7.x envuelto por el starter-kit Vuexy. Este documento es la referencia canónica de la plataforma UI: stack, librerías disponibles, patrones de componentes, convenciones de estado, y reglas de adopción.
+
+## Delta 2026-05-08 — Organization Workspace Shell (TASK-612)
+
+Materializa el contrato canónico shell-vs-content (§4.5 spec
+`GREENHOUSE_ORGANIZATION_WORKSPACE_PROJECTION_V1.md`) que TASK-611 dejó como
+foundation. Patrón reusable por múltiples entrypoints organization-first
+(Agency hoy, Finance via TASK-613, futuros entrypoints).
+
+**Componentes nuevos** (`src/components/greenhouse/organization-workspace/`):
+
+- `OrganizationWorkspaceShell.tsx` — chrome-only client component. Renderiza
+  header (logo + name + status chip + breadcrumb + admin actions slot), KPI
+  strip 4 cards (Revenue / Margen bruto / Equipo / Spaces), tab container
+  (consume `projection.visibleTabs` + `activeFacet` controlled), drawer slot.
+  Render-prop API: `<OrganizationWorkspaceShell {...} >{(facet, ctx) => ...}</...>`.
+  **NO renderiza facet content** — ese es responsabilidad del children.
+  Degraded mode honest cuando `projection.degradedMode=true`: 3 reasons
+  enumerados con copy es-CL tuteo, sin tabs ni acciones.
+- `FacetContentRouter.tsx` — registry lazy-loaded de los 9 facets canónicos
+  via `dynamic(() => import('@/views/greenhouse/organizations/facets/<Name>Facet'),
+  { ssr: false })`. Suspense fallback con label es-CL. Defense-in-depth guard
+  contra facets desconocidos.
+- `types.ts` — `FacetContentProps` (organizationId, entrypointContext,
+  relationship, fieldRedactions[facet], projection completa read-only),
+  `OrganizationWorkspaceHeader`, `OrganizationWorkspaceKpis`. Re-exports de
+  TASK-611 projection types.
+
+**Facet content components** (`src/views/greenhouse/organizations/facets/`):
+
+6 wrapping facets que consumen `useOrganizationDetail` hook + delegan a tabs
+legacy intactos (cero modificación a los tabs originales):
+
+- `IdentityFacet` → wraps `OrganizationIntegrationsTab`
+- `SpacesFacet` → tabla de `OrganizationSpace[]`
+- `TeamFacet` → wraps `OrganizationPeopleTab + OrganizationProjectsTab`
+- `EconomicsFacet` → wraps `OrganizationEconomicsTab`
+- `DeliveryFacet` → wraps `OrganizationIcoTab + OrganizationOverviewTab`
+- `FinanceFacet` → wraps `OrganizationFinanceTab`
+
+3 honest empty-state facets (V2 wireará vista dedicada):
+
+- `CrmFacet`, `ServicesFacet`, `StaffAugFacet` — cada uno renderiza
+  `<FacetEmptyState>` con icon + título + descripción es-CL via
+  `GH_ORGANIZATION_WORKSPACE.facets.empty.*`.
+
+**Rollout flag platform extension** (TASK-612 Slice 4):
+
+- Migration `20260508132302091_task-612-extend-home-rollout-flag-keys-workspace-shell.sql`:
+  extiende `home_rollout_flags_key_check` para incluir
+  `organization_workspace_shell_agency` + `organization_workspace_shell_finance`.
+  Seed inicial global=FALSE (staged rollout).
+- Helper canónico `src/lib/workspace-rollout/index.ts`:
+  `isWorkspaceShellEnabledForSubject(subject, scope: 'agency' | 'finance')`.
+  Wrappea `resolveHomeRolloutFlag` con el flag_key correspondiente. Server-only.
+  Cache TTL 30s + scope precedence heredados de TASK-780.
+
+**Decisión arquitectónica V1**: extender `home_rollout_flags` CHECK en lugar
+de generalizar a `feature_rollout_flags` separada. Cuando emerja una 4a flag
+fuera del scope home/workspace, evaluar como follow-up TASK derivada. Patrón
+source: TASK-611 V1.1 que difiere generalizaciones hasta que duela.
+
+**Agency adoption (Slice 5)**:
+
+- `src/app/(dashboard)/agency/organizations/[id]/page.tsx` reescrito
+  server-side: requireServerSession + isWorkspaceShellEnabledForSubject deciden
+  V2 vs legacy. Si V2 → resolveOrganizationWorkspaceProjection (TASK-611) +
+  render `<AgencyOrganizationWorkspaceClient>`. Si V1 → render legacy
+  `<OrganizationView>`. Resilient default: flag falla → fallback legacy.
+- `AgencyOrganizationWorkspaceClient.tsx` ('use client'): wrapper que monta
+  shell + FacetContentRouter, sync URL `?facet=` deep-link, fetch detail/KPIs
+  mirror legacy pattern, AdminActions wireados (HubSpot sync + Edit), drawer
+  slot wired.
+
+**Hard rules canonizadas**:
+
+- **NUNCA** renderizar contenido específico de facet dentro del shell. Render-prop
+  o registry — siempre.
+- **NUNCA** consumir `projection.degradedMode` en consumers downstream sin honest
+  copy. La projection ya distingue 3 reasons enumerados; el shell mismo trae el
+  copy es-CL tuteo via `GH_ORGANIZATION_WORKSPACE.shell.degraded.reasons`.
+- **NUNCA** computar visibility de facet en cliente. La projection es server-only
+  (TASK-611) y se pasa al shell ya resuelto.
+- **NUNCA** branchear UI por `projection.relationship.kind` inline. La projection
+  ya filtró — el shell solo lee `visibleFacets` / `allowedActions`.
+- **NUNCA** asumir que un facet siempre tendrá vista dedicada. Cuando emerja un
+  facet sin contenido aún, render `<FacetEmptyState>` honest, NO blank.
+- **SIEMPRE** que un nuevo entrypoint organization-first emerja, reusar el shell
+  junto con `FacetContentRouter` via `entrypointContext`. Cero composición ad-hoc.
+
+**Spec canónica**: `docs/architecture/GREENHOUSE_ORGANIZATION_WORKSPACE_PROJECTION_V1.md`
+V1.1 (Delta 2026-05-08 recalibración pre-execution).
 
 ## Delta 2026-05-06c — TASK-430 i18n runtime activation
 
@@ -87,6 +179,30 @@ Reglas nuevas:
 - Si el texto es CTA/estado/loading/empty/aria/mes shared, usar `getMicrocopy()` y sus namespaces existentes.
 - Si el texto es único de una pantalla, puede vivir cerca del dominio, pero no debe duplicar shared copy.
 - `GH_COMPENSATION` fue eliminado por orphan real (0 importers runtime).
+
+Guardrail runtime/mockup:
+
+- Una ruta o surface runtime no debe importar módulos bajo `/mockup/`.
+- Si una experiencia aprobada debe promocionarse a runtime, extraer primero un shell compartido fuera de `/mockup/`; el mockup importa ese shell con datos/copy de mockup y el runtime lo importa con datos/copy productivos.
+- ESLint bloquea regresiones con `greenhouse/no-runtime-mockup-import`.
+
+## Delta 2026-05-07 — Operational UI primitives para dashboards y health surfaces
+
+Las surfaces operativas que combinan KPIs, paneles de salud, señales, riesgos o runbooks deben reutilizar primitives compartidas antes de crear shells locales con `Box` + bordes + chips. La familia canónica vive en `src/components/greenhouse/primitives/`:
+
+| Primitive | Uso |
+| --- | --- |
+| `OperationalPanel` | Secciones operativas con `Card + CardHeader + CardContent`, icon slot, acción y padding/radius del theme. |
+| `MetricSummaryCard` | KPIs operativos con valor honesto, fallback textual para datos nulos, icon slot y badge de estado opcional. |
+| `OperationalStatusBadge` | Badge pequeño para estados reales (`Estable`, `Sin muestra`, `Requiere revisión`); no reemplaza contenedores. |
+| `OperationalSignalList` | Señales/riesgos/runbooks como lista o grid sobrio con padding interno suficiente, código técnico opcional y acción recomendada. |
+
+Reglas:
+
+- No crear mini-cards redondeadas dentro de panels cuando una lista operacional comunica mejor el estado.
+- Full pill (`9999`) queda reservado para chips pequeños; contenedores grandes usan `theme.shape.customBorderRadius.*`.
+- Copy visible de señales debe venir de `src/lib/copy/*` o del reader/adapter canonizado del dominio; no mezclar `steady/stale/outcome/threshold` visibles en runtime es-CL.
+- Estados nulos no se renderizan como `0`, `0%` o `$0` salvo que el cero sea dato real confirmado.
 
 ## Delta 2026-05-05 — Quote Builder primitives extraction Sprint 3 (TASK-498)
 

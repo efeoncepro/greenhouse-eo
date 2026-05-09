@@ -8,7 +8,7 @@ import {
 import type { MasterAgreementStatus } from '@/lib/commercial/master-agreements-types'
 import {
   canAdministerPricingCatalog,
-  requireFinanceTenantContext
+  requireCommercialTenantContext
 } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
@@ -55,7 +55,7 @@ interface CreateMasterAgreementBody {
 }
 
 export async function GET(request: Request) {
-  const { tenant, errorResponse } = await requireFinanceTenantContext()
+  const { tenant, errorResponse } = await requireCommercialTenantContext()
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -75,7 +75,7 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const { tenant, errorResponse } = await requireFinanceTenantContext()
+  const { tenant, errorResponse } = await requireCommercialTenantContext()
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

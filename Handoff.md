@@ -1,3 +1,531 @@
+# Sesion 2026-05-09 — CI smoke-lane publisher hardening
+
+- **Trigger:** el usuario pidio resolver solo el warning `sync:smoke-lane ... failed (non-blocking)` de forma robusta y escalable; el warning Node.js 20 queda cubierto por TASK-607.
+- **Causas raiz:** (1) `pnpm sync:smoke-lane` ejecutaba `tsx scripts/publish-smoke-lane-run.ts` sin el shim canonico, por lo que el import `server-only` desde secrets fallaba fuera de Next. (2) El workflow Playwright enviaba `GREENHOUSE_POSTGRES_PASSWORD_SECRET_REF=greenhouse-pg-dev-app-password:latest`; el resolver canonico acepta nombre de secreto o ruta Secret Manager completa, no `secret:version`, y construia una ruta invalida. (3) La identidad WIF `github-actions-deployer@efeonce-group.iam.gserviceaccount.com` no tenia `roles/cloudsql.client`; al corregirlo, el siguiente fallo revelo saturacion transitoria de conexiones Postgres (`53300 remaining connection slots are reserved`).
+- **Fix:** `package.json` actualiza la primitive compartida `sync:smoke-lane` para usar `tsx --require ./scripts/lib/server-only-shim.cjs ...`; `.github/workflows/playwright.yml` usa el nombre canonico `greenhouse-pg-dev-app-password` y limita el publisher a `GREENHOUSE_POSTGRES_MAX_CONNECTIONS=1`; `src/lib/postgres/client.ts` trata errores transitorios Postgres/Cloud SQL (`53300`, `080xx`, `57P0x`, TLS/reset/too many connections) como retryable con backoff acotado y reset de pool. En GCP se agrego `roles/cloudsql.client` al service account de GitHub.
+- **Validacion:** `pnpm sync:smoke-lane finance.web --report=/tmp/greenhouse-missing-playwright-report.json` falla por `ERROR: cannot read report ... ENOENT`, no por `server-only`. `pnpm pg:doctor` OK con perfil runtime. `pnpm vitest run src/lib/postgres/client.test.ts`, `pnpm exec tsc --noEmit --pretty false`, `pnpm lint` y `git diff --check` OK. Push `02f58cc2`: Playwright run `25605024855` OK; logs confirman publicaciones `[smoke-lane-publish]` para `finance.web`, `delivery.web` e `identity.web` sin annotations `sync:smoke-lane failed`. Queda solo warning Node.js 20, cubierto por TASK-607.
+- **Documentacion:** `ISSUE-072` queda creado en `docs/issues/resolved/`; `docs/issues/README.md` avanza a `ISSUE-073`; se sincronizan arquitectura, docs funcionales, `.github/DEPLOY.md`, `project_context.md` y `scripts/setup-github-actions-wif.sh` para que el rol `cloudsql.client` no quede como drift manual.
+- **Follow-up E2E:** Playwright posterior a `b754e230` publico correctamente las lanes, pero `agency-organizations-v2-shell-validation` reporto 1 fallo funcional (`hasV2Identidad=0, hasLegacyConfig=0`). Causa: anti-regression test medía antes del montaje estable del shell V2, no legacy real. Fix: helper reusable `tests/e2e/fixtures/organization-workspace.ts` (`expectOrganizationWorkspaceShellReady`) espera markers positivos, ausencia de degraded mode y tabs requeridas antes de asserts. Agency y Finance lo consumen. Validado contra staging con `PLAYWRIGHT_BASE_URL=https://dev-greenhouse.efeoncepro.com pnpm exec playwright test tests/e2e/smoke/agency-organizations-v2-shell-validation.spec.ts tests/e2e/smoke/finance-clients-v2-shell-validation.spec.ts --project=chromium --workers=1` → 4/4 passed.
+
+---
+
+# Sesion 2026-05-09 — TASK-836 follow-up: webhook handler dual-format + nuevas subscriptions
+
+- **Trigger:** smoke test post-TASK-836 (PATCH `ef_engagement_kind` en service Aguas Andinas) revelo que el webhook llegaba a `webhook_inbox_events` (status=processed) pero NO actualizaba `hubspot_last_synced_at` — handler ignoraba el event silente.
+- **Causa raiz descubierta:** HubSpot Developer Platform 2025.2 (Build #24 deployed 2026-05-06) cambio el shape del payload:
+  - Legacy: `subscriptionType="company.creation"` (single field)
+  - 2025.2: `subscriptionType="object.creation"` + `objectTypeId="0-2"` (separados)
+  - Handlers `hubspot-companies.ts` y `hubspot-services.ts` filtraban con `startsWith('company.')` / `startsWith('p_services.')` — ningun event 2025.2 matcheaba.
+- **Impacto silente ultimos 30 dias:** 96+ propertyChange + 32 creation events drop-eados (status=processed sin sync). Causa raiz del caso Berel (deal cerrado, service materializado en HubSpot, webhook arrived, NO sync a Greenhouse).
+- **Fix entregado** (commit `f3331af8`):
+  - HubSpot Developer App: 2 nuevas subscriptions (`ef_engagement_kind`, `hs_pipeline_stage`) — Build #25 SUCCESS deployed 2026-05-09 10:52:36 via `hs project upload --account=48713323`. Total 25 → 27 subscriptions.
+  - `classifyHubSpotEvent` canonical helper en `hubspot-companies.ts` + `isHubSpotServiceEvent` mirror en `hubspot-services.ts` — soportan legacy + 2025.2 simultaneamente, backward compat 100%.
+  - 4 tests anti-regresion en `hubspot-companies.test.ts` cubren: object.creation+objectTypeId=0-2 → company sync; object.propertyChange+objectTypeId=0-1+associatedObjectId → contact resuelve a company; mix legacy+2025.2 → dedup; objectTypeId=0-999 unknown → ignored sin crash.
+  - 10/10 tests passing, lint clean, tsc clean.
+- **CLAUDE.md** actualizado con seccion nueva "HubSpot webhook events — dual-format invariant (TASK-836 follow-up)" — tabla legacy vs 2025.2 + 5 hard rules anti-regresion + helper canonico documentado.
+- **Pendiente:** merge `develop → main` para que el handler corregido llegue a produccion (`greenhouse.efeoncepro.com`). Smoke test post-merge: re-PATCH `ef_engagement_kind` y verificar `hubspot_last_synced_at` actualiza < 30s.
+
+---
+
+# Sesion 2026-05-09 — TASK-836 HubSpot Services Lifecycle Stage Sync cerrada (apply ejecutado)
+
+- **Trigger:** el usuario pidio implementar TASK-836 manteniendo `develop`, con invocacion continua de la skill `arch-architect` para validacion 4-pillar.
+- **Entrega:** corrige el bug raiz donde TODOS los services se materializaban como `pipeline_stage='active', status='active', active=TRUE` ignorando el Service Pipeline real de HubSpot. Mapper canonico (7 stage IDs incluyendo `validation` Sample Sprints), engagement_kind cascade (6 casos), UPSERT consume mapper + emite outbox `commercial.service_engagement.lifecycle_changed v1` solo en transiciones reales, 4 reliability signals nuevos bajo subsystem `commercial`, migration con CHECK extends + columnas `unmapped_reason`/`parent_service_id` + trigger PG lineage protection.
+- **8 slices commiteados** incrementalmente en develop:
+  - Slice 2 (`ab20cad6`) — Migration `20260509125228920` aplicada con verificacion live (7/7 OK)
+  - Slice 1 (`c0b78c2e`) — Runbook canonico + extender SERVICE_PROPERTIES con `ef_engagement_kind`
+  - Slice 3 (`f97648ef`) — Mapper canonico + cascade (42/42 tests)
+  - Slice 4 (`7cc29aee`) — UPSERT consume mapper + outbox lifecycle_changed v1 (12 tests)
+  - Slice 7 (`9c682cc1`) — 4 reliability signals (15 tests)
+  - Slice 6 (`72480df1`) — Pre-backfill snapshot documentado
+  - Slice 5+8 + apply (`980c944c`) — HubSpot config via API + apply backfill + Hard Rules CLAUDE.md + 4 arch docs Delta
+  - Cierre (siguiente commit) — Lifecycle complete + README sync + Handoff + changelog
+- **HubSpot config ejecutada** con autorizacion explicita del usuario:
+  - Stage `Validación / Sample Sprint` creada via API en pipeline `0-162`. Stage ID `1357763256`.
+  - Property `ef_engagement_kind` creada con label "Tipo de servicio", type=enumeration, fieldType=select, 5 options (regular|pilot|trial|poc|discovery).
+- **Apply backfill ejecutado** 2026-05-09T13:41:48Z en produccion:
+  - 12 clientes procesados, 6 services HubSpot, 0 unmapped, 0 errors.
+  - 2 outbox `lifecycle_changed v1` emitidos: "Loyal" (active→closed/false), "ANAM Nuevas Licencias" (active→renewal_pending).
+  - 4 services sin diff: NO emiten lifecycle_changed (idempotencia respetada).
+  - **Bug raiz corregido en produccion**: "Loyal" estaba contaminando P&L como active=TRUE aunque está cerrado en HubSpot. Ahora active=FALSE.
+- **Reliability signals**: 4 nuevos en steady=0 verificados live (`lifecycle_stage_unknown`, `engagement_kind_unmapped`, `renewed_stuck`, `lineage_orphan`).
+- **Tests**: 128/128 verdes (mapper 18 + cascade 24 + UPSERT 12 + signals 15 + services existentes 59).
+- **Hard Rules canonizadas** en CLAUDE.md seccion nueva "HubSpot Service Pipeline lifecycle invariants (TASK-836)" — 14 invariantes anti-regresion + tabla de stage IDs canonicos + 4 reliability signals + outbox event canonico.
+- **Decisiones pre-execution documentadas**:
+  - Q3 resuelta con override del audit: columna `unmapped_reason` dedicada con CHECK enum (vs `metadata_json` que la spec sugeria) — services no tenia metadata_json, agregar JSONB solo para 2 valores enum era overengineering.
+  - HubSpot displayOrder: API mantuvo orden de creacion (Validacion quedó en displayOrder=1, despues de Onboarding). Mapper opera por stage ID, no por orden visual; RevOps puede reordenar manualmente desde HubSpot UI si lo prefieren.
+  - Apply ejecutado autorizado por el usuario tras dry-run review (12 clientes, 6 services, 0 unmapped). Permission classifier requirio confirmacion explicita por separado para stage creation y property creation.
+- **Lifecycle:** task movida `to-do → in-progress → complete` en `docs/tasks/complete/`. `docs/tasks/README.md` sincronizado.
+- **Validacion final**: tsc clean, lint clean, tests 128/128, schema PG verificado vivo, 4 reliability signals steady=0, outbox events correctamente emitidos solo en transiciones reales.
+- **Cero modificacion** a archivos owned por TASK-841/842 (nubox/ops-worker/finance-fx-drift) durante la sesion.
+
+# Sesion 2026-05-09 — TASK-842 Finance FX Drift Auto-Remediation Control Plane cerrada
+
+- **Trigger:** el usuario aprobo el audit/plan de TASK-842 y pidio avanzar end-to-end manteniendo `develop`, con verificacion continua usando skill de arquitectura y finanzas.
+- **Entrega:** reader detallado reusable para `finance.account_balances.fx_drift`; planner/executor `src/lib/finance/account-balances-fx-drift-remediation.ts`; run tracking en `source_sync_runs/source_sync_failures`; endpoint interno `POST /finance/account-balances/fx-drift/remediate`; scheduler `ops-finance-fx-drift-remediate` a las 05:15 America/Santiago; CLI wrappers canónicos.
+- **Cierre documental complementario:** decision indexada en `docs/architecture/DECISIONS_INDEX.md` como ADR distribuido aceptado y manual operativo agregado en `docs/manual-de-uso/finance/saldos-bancarios-fx-drift-remediation.md` + indice `docs/manual-de-uso/README.md`.
+- **Lifecycle:** task movida a `docs/tasks/complete/TASK-842-finance-fx-drift-auto-remediation-control-plane.md`; `docs/tasks/README.md` y `TASK_ID_REGISTRY.md` sincronizados a `complete`.
+- **Validacion:** `pnpm test src/lib/reliability/queries/account-balances-fx-drift.test.ts src/lib/finance/account-balances-fx-drift-remediation.test.ts services/ops-worker/deploy-contract.test.ts` -> 16/16; `pnpm pg:doctor` OK; `scripts/finance/diagnose-fx-drift.ts` -> steady state; `pnpm exec tsc --noEmit` OK; `pnpm lint` OK; `pnpm build` OK.
+- **Post-push/deploy:** `develop` pusheado hasta `007656be`; GitHub CI `25602600425` success; Playwright smoke `25602600445` success; Ops Worker Deploy `25602600438` success; Commercial Cost Worker Deploy `25602600439` success. Cloud Run quedó en revision `ops-worker-00172-bxl`.
+- **Scheduler real:** `ops-finance-fx-drift-remediate` existe ENABLED en `us-east4`, schedule `15 5 * * *`, payload bounded `policy=known_bug_class_restatement`, `windowDays=90`, `maxRows=25`, `maxAccounts=10`, `maxAbsDriftClp=5000000`.
+- **Replay manual post-deploy:** `gcloud scheduler jobs run ops-finance-fx-drift-remediate` ejecutado 2026-05-09 13:51:39 UTC; `source_sync_runs` registro `finance-fx-drift-f4298b0e-b582-402e-be52-771bb9d9f69c`, `status=succeeded`, `seen=0`, `remediated=0`, `blocked=0`, `residual=0`. Diagnostico posterior sigue steady state.
+- **Decision operativa:** se trabaja directo en `develop` por instruccion explicita del usuario; no se crea branch `task/TASK-842...`.
+- **Guardrail multi-agente:** existen cambios no relacionados en `docs/architecture/GREENHOUSE_EVENT_CATALOG_V1.md`, `docs/architecture/GREENHOUSE_HUBSPOT_SERVICES_INTAKE_V1.md`, `docs/operations/runbooks/hubspot-service-pipeline-config.md` y `src/lib/services/service-lifecycle-mapper*`; no pertenecen a TASK-842 y no deben stagearse ni revertirse.
+
+# Sesion 2026-05-09 — TASK-842 Finance FX Drift Auto-Remediation Control Plane creada
+
+- **Trigger:** el usuario pidio dejar de "tapar goteras" por el fallo recurrente de Playwright `finance.account_balances.fx_drift — TASK-774`, usando criterio de finanzas y arquitectura.
+- **Diagnostico runtime previo:** `scripts/finance/diagnose-fx-drift.ts` detecto 1 drift vivo en `santander-clp` / `2026-05-01`: persisted `inflows/outflows=0/0`, expected `inflows/outflows=0/402562.50`, drift `-402562.50`. El fallo de CI no venia de TASK-841; ya existia en runs previos.
+- **Recovery puntual ejecutado:** `scripts/finance/backfill-account-balances-fx-fix.ts --account-id=santander-clp --from-date=2026-05-01 --evidence-guard=warn_only` aplicado con env/profile PG cargado; resultado `daysMaterialized=70`, `finalClosingBalance=1212492.07`. Diagnostico posterior: `Sin drift detectado. Steady state.`
+- **Decision arquitectonica:** el recovery manual no cierra la causa sistemica. Se creo `docs/tasks/to-do/TASK-842-finance-fx-drift-auto-remediation-control-plane.md` para convertir el detector en control plane autocorrectivo: reader detallado, planner con politica financiera segura, rematerializacion canonica via `rematerializeAccountBalanceRange`, endpoint/scheduler en `ops-worker`, run tracking/auditoria y regression del caso `santander-clp`.
+- **Docs sincronizadas:** `docs/tasks/README.md` ahora marca siguiente ID `TASK-843` y registra TASK-842; `docs/tasks/TASK_ID_REGISTRY.md` reserva TASK-842.
+- **Guardrail multi-agente:** hay archivos no relacionados de TASK-836/servicios en el worktree; no fueron modificados ni stageados para esta task documental.
+
+# Sesion 2026-05-09 — TASK-835 Sample Sprints Runtime Projection Hardening cerrada
+
+- **Trigger:** el usuario pidio implementar `TASK-835` end-to-end manteniendo `develop` como rama de trabajo (sin checkout a branch nueva).
+- **Entrega:** projection canónica server-side `src/lib/commercial/sample-sprints/runtime-projection.ts` reemplaza 4 derivativas client-side de `SampleSprintsWorkspace.tsx` (líneas 140-245 eliminadas: `getProgressPct`, `getSignalSeverity`, `teamFromItem`, `buildRuntimeSignals`). Pattern fuente TASK-611: `import 'server-only'` + cache TTL 30s in-memory por (subjectId, tenantId) + composer `withSourceTimeout` + degraded enum cerrado de 5 codes. **6 slices commiteados incrementalmente** en develop:
+  - Slice 1: skeleton + cache + tipos (11 tests)
+  - Slice 2: sibling reader `readCommercialCostAttributionByServiceForPeriodV2` en `v2-reader.ts` (Checkpoint A); +5 reader tests, +2 projection tests
+  - Slice 3: helpers `enrichProposedTeam` + `resolveCapacityRiskForSprint` (12 nuevos tests, +2 projection)
+  - Slice 4: 6 health helpers extendidos con `tenantContext` opcional (Checkpoint B); 11 tests scope + 4 projection wiring; backward compat 100%
+  - Slice 5: API endpoints adjuntan `runtime` field (Checkpoint C); UI consume payload, `Sprint.actualClp/progressPct: number | null` honest "—"; banner `Alert role='status'` cuando degraded; copy hygiene `GH_AGENCY.sampleSprints.degraded.<code>` en `src/lib/copy/agency.ts`. Skills `greenhouse-ux + greenhouse-microinteractions-auditor + greenhouse-ux-writing` invocadas ANTES de tocar JSX según instrucción del usuario
+  - Slice 6: reactive consumer `sampleSprintRuntimeCacheInvalidationProjection` registrado en `projections/index.ts` (escucha 6 outbox `service.engagement.*`); reliability signal `commercial.sample_sprint.projection_degraded` wired bajo subsystem `commercial`
+- **Hard Rules canonizadas** en `CLAUDE.md` sección nueva "Sample Sprints Runtime Projection invariants (TASK-835)": 13 reglas duras (NUNCA derivar progressPct/actualClp/team/signals client-side, NUNCA importar projection desde cliente, NUNCA inventar kinds nuevos, etc.) + convención canónica `metrics.deliveryProgressPct: number ∈ [0,100]`.
+- **Tests verdes:** 86/86 en sample-sprints + shell pre-Slice 6, +11 nuevos en Slice 6 (consumer + signal). Tsc clean en archivos TASK-835. Lint clean (incluye `greenhouse/no-untokenized-copy`). Backward compat verificado en `engagement-commercial-health.test.ts` (5 tests) y `engagement-stale-progress.test.ts` (6 tests) — `/admin/operations` sin cambio.
+- **Guardrail multi-agente:** se preservaron cambios preexistentes de `TASK-841` (nubox/ops-worker) intactos en el workspace; commits de TASK-835 NUNCA tocaron archivos `src/lib/nubox/*` ni `services/ops-worker/deploy.sh`.
+- **Validacion:** `pnpm test src/lib/commercial/sample-sprints/ src/views/greenhouse/agency/sample-sprints/` 86/86. `pnpm test src/lib/sync/projections/sample-sprint-runtime-cache-invalidation.test.ts src/lib/reliability/queries/sample-sprint-projection-degraded.test.ts` 11/11. `npx tsc --noEmit` clean en archivos TASK-835. Lint --fix sin warnings residuales.
+- **Lifecycle:** task movida `to-do/` → `in-progress/` al inicio + sincronizado a `in-progress`; al cierre se moverá a `complete/` y README sync. **Sin PR ceremony** — trabajado directo en `develop` por instrucción explícita del usuario (mismo patrón que TASK-613 anteriormente).
+
+# Sesion 2026-05-09 — TASK-841 Nubox ops-worker config/freshness cerrada
+
+- **Trigger:** el usuario pidio implementar `TASK-841` directo en `develop` sin cambiar de rama, con criterio robusto/seguro/escalable y usando arquitectura cuando hiciera falta.
+- **Cloud remediation + deploy:** `ops-worker` staging quedo con `NUBOX_API_BASE_URL`, `NUBOX_BEARER_TOKEN_SECRET_REF=greenhouse-nubox-bearer-token-staging` y `NUBOX_X_API_KEY_SECRET_REF=greenhouse-nubox-x-api-key-staging`; service account `greenhouse-portal@efeonce-group.iam.gserviceaccount.com` tiene `secretAccessor` sobre ambos secretos. Push a `develop` completo y workflow `Ops Worker Deploy` success; Cloud Run sirve `ops-worker-00171-mwj` al 100%.
+- **Replay Cloud Scheduler:** ejecutados `ops-nubox-sync`, `ops-nubox-quotes-hot-sync` y `ops-nubox-balance-sync`. Post-fix logs: quotes hot sync `sales=3 quoteSales=1 created=0 updated=1`, balance sync done, full sync raw/conformed corriendo sin `NUBOX_* is not configured`.
+- **Runtime evidence:** `raw_sync` 2026-05-09 12:16:12→12:16:50 UTC `succeeded` (`records_read=30`, `records_written_raw=30`); `conformed_sync` 12:16:50→12:16:52 `succeeded` (`records_read=322`); posterior corrida local de `postgres_projection` con codigo corregido `nubox-pg-c5593626-9573-407a-8475-8f86dea37252` `succeeded`, `records_read=231`, `records_projected_postgres=214`, `projectionFailures=0`. Post-deploy replay en `ops-worker-00171-mwj`: `quotes_hot_sync` 12:43:02→12:43:04 `succeeded` (`records_read=3`, `records_written_raw=1`, `records_written_conformed=1`, `records_projected_postgres=1`) y `balance_sync` 12:43:02→12:43:04 `succeeded` (`records_read=231`, notes `incomeUpdated=0; expenseUpdated=0; divergences=0`).
+- **Fix raiz fiscal:** el fallo vivo era una compra Nubox `BHE` (`nubox_purchase_id=36671467`) con `net=175000`, `withholding=26688`, `total=148312`. Se modelo correctamente: `expenses.total_amount=148312` neto pagable, `withholding_amount=26688`, `effective_cost_amount=175000` bruto operativo. No se relajo el validator global de IVA.
+- **Code hardening:** `deploy.sh` declara contrato Nubox y Secret Manager IAM; orquestador propaga `partial`; `balance_sync` escribe `source_sync_runs`; `finance.nubox.source_freshness` detecta falsa salud raw stale; `postgres_projection` registra fallas por documento en `source_sync_failures` y termina `partial` solo cuando corresponda.
+- **Docs:** task movida a `docs/tasks/complete/TASK-841-nubox-ops-worker-config-freshness-hardening.md`; `docs/tasks/README.md`, `TASK_ID_REGISTRY`, `services/ops-worker/README.md`, `GREENHOUSE_SOURCE_SYNC_PIPELINES_V1`, `GREENHOUSE_CLOUD_INFRASTRUCTURE_V1`, `GREENHOUSE_FINANCE_ARCHITECTURE_V1` y `changelog.md` sincronizados.
+- **Guardrail multi-agente:** quedan dirty changes no relacionados de `TASK-835` en sample-sprints; no pertenecen a TASK-841 y no se deben revertir ni mezclar.
+
+# Sesion 2026-05-09 — TASK-812 compliance exports corregida
+
+- **Trigger:** el usuario pidio corregir TASK-812 tras la revision con skill de arquitectura/payroll, luego commit y push.
+- **Entrega:** TASK-812 queda reescrita como contrato evidence-first: Slice 0 obligatorio congela fuentes oficiales Previred/LRE vigentes antes de implementar generadores; se elimina el supuesto operativo de Previred posicional y LRE XML/XSD; se agrega registry de artefactos compliance con `specVersion`, `sourceSnapshotHash`, `sha256`, totales y validation result.
+- **ADR aceptado:** `GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md` agrega `Architecture Decision 2026-05-09 -- Chile Compliance Exports as Versioned Payroll Projections`; `DECISIONS_INDEX.md` queda sincronizado. Regla clave: exports Previred/LRE son proyecciones read-only sobre payroll cerrado, no source of truth ni calculo paralelo.
+- **Dependencias corregidas:** `TASK-707a` pasa a hard blocker para paridad completa contra `payment_order` social_security; `TASK-784` queda como dependency resuelta para RUT canonico verificado.
+- **Validacion:** cambio documental/arquitectonico; `git diff --check` OK. No se ejecuto build porque no hubo runtime/UI.
+- **Nota multi-agente:** se preservo cambio preexistente no relacionado en `docs/tasks/to-do/TASK-835-sample-sprints-runtime-projection-hardening.md`; no es parte de este commit.
+
+# Sesion 2026-05-09 — TASK-786 arquitectura refrescada
+
+- **Trigger:** el usuario pidio aplicar los ajustes recomendados tras revisar TASK-786 con la skill de arquitectura, luego commit y push.
+- **Entrega:** TASK-786 queda desacoplada de EPIC-010 (`Epic: optional`), cambia dominio a `hr / people / identity`, referencia TASK-784/TASK-785 en `complete/`, agrega ADR check obligatorio y explicita que la policy debe ser primitive compartida (`person-presence`) consumida por APIs, Person 360, client-safe profile y deep links.
+- **ADR aceptado:** `GREENHOUSE_PERSON_COMPLETE_360_V1.md` agrega `Architecture Decision 2026-05-09 -- Professional Presence as a Governed Person 360 Facet`; `DECISIONS_INDEX.md` queda sincronizado. Regla clave: phone/contact_channel/contact_handle internal-only por defecto; Teams/Slack desde IDs de integracion/deep links, no URLs manuales.
+- **Validacion:** cambio documental; `pnpm lint` y `pnpm exec tsc --noEmit` OK. No se ejecuto build porque no hubo runtime/UI.
+- **Nota multi-agente:** se preservaron cambios preexistentes no relacionados en TASK-836 y TASK-837; no son parte de este commit.
+
+# Sesion 2026-05-08 — ADR operating model Greenhouse-wide
+
+- **Trigger:** el usuario pidio aplicar la recomendacion Greenhouse-wide para Architecture Decision Records end-to-end, con commit y push.
+- **Entrega:** nuevo modelo canonico `docs/operations/ARCHITECTURE_DECISION_RECORD_OPERATING_MODEL_V1.md`, indice maestro `docs/architecture/DECISIONS_INDEX.md`, y wiring en `docs/tasks/TASK_PROCESS.md`, `docs/operations/DOCUMENTATION_OPERATING_MODEL_V1.md`, `docs/README.md`, `AGENTS.md`, `CLAUDE.md`, `project_context.md` y `changelog.md`.
+- **Decision:** Greenhouse usa ADRs distribuidos: embebidos en specs `GREENHOUSE_*_V1.md` para dominios claros, o docs dedicados en `docs/architecture/` para decisiones cross-domain. El indice `DECISIONS_INDEX.md` queda como punto de busqueda obligatorio.
+- **Validacion:** cambio documental; se verifico con `pnpm lint` y `pnpm exec tsc --noEmit` via hooks pre-push. No se ejecuto build porque no hubo runtime/UI.
+- **Nota multi-agente:** se preservaron cambios preexistentes no relacionados en `docs/tasks/to-do/TASK-836-hubspot-services-lifecycle-stage-sync-hardening.md`; no fueron parte del commit ADR.
+
+# Sesion 2026-05-08 — Codex skill Software Architect 2026 instalada
+
+- **Trigger:** el usuario entrego `/Users/jreye/Downloads/software-architect-2026.zip` y pidio adaptar la skill de Claude para que Codex pueda invocarla.
+- **Entrega:** nueva skill local Codex en `.codex/skills/software-architect-2026/` con `SKILL.md`, `references/`, `checklists/`, `templates/`, `efeonce-overlay/` y metadata `agents/openai.yaml`.
+- **Adaptacion:** el `SKILL.md` principal ahora habla de Codex, conserva el workflow de arquitectura 2026 y aclara que, dentro de Greenhouse, `AGENTS.md`/task/runtime vigente prevalecen ante drift del overlay.
+- **Validacion:** estructura inspeccionada; frontmatter y metadata presentes. No se ejecuto build/lint porque el cambio es documental/skill-only.
+
+# Sesion 2026-05-08 (tarde) — TASK-613 V1.1 pilot rollout activado + ISSUE-069 resuelto
+
+- **TASK-613 fase V1.1 activa** desde 2026-05-08 21:30 UTC. Flag `organization_workspace_shell_finance` activado solo para `user-efeonce-admin-julio-reyes` (scope=user) via `POST /api/admin/home/rollout-flags` canónico. Global sigue `enabled=false`.
+- **Acceptance gates V1.1 → V2** documentados en `GREENHOUSE_ORGANIZATION_WORKSPACE_PROJECTION_V1.md` Delta 2026-05-08: 7 señales objetivas (`finance.client_profile.unlinked_organizations`, 2 workspace projection signals, `home.rollout.drift`, Sentry `domain=finance`, Playwright smoke 48h, pilot user feedback). Período mínimo: ≥7 días verdes consecutivos.
+- **Bug-fix follow-up** — al verificar gates post-activación detecté que `finance.client_profile.unlinked_organizations` reportaba `severity=unknown`: el reader de TASK-613 Slice 3 hacía `WHERE active = TRUE` pero `client_profiles` no tiene esa columna. Throw silencioso. Fixeado: query simplificado a `WHERE organization_id IS NULL` + test anti-regresión que usa `not.toMatch(/active = TRUE/)`. 5/5 tests verdes.
+- **ISSUE-069 cerrado** en la misma sesión (cron rematerialize-balances seed-day blind spot). Fix raíz: helper canónico `computeRematerializeSeedDate(today, lookbackDays)` resta `lookbackDays + 1` para que los últimos `lookbackDays` días COMPLETOS se materialicen. 7 tests anti-regresión + santander-clp 2026-05-01 rematerializado (69 días, closing $1.212.492). Reliability signal `finance.account_balances.fx_drift` vuelve a steady state (count=0). Playwright smoke verde. Regla canónica documentada en CLAUDE.md + AGENTS.md.
+- **Procedimiento de rollback documentado**: 1 UPDATE SQL revierte la fase, cache TTL 30s propaga automáticamente, sin deploy ni rebuild.
+
+# Sesion 2026-05-08 (madrugada) — TASK-613 cerrada (Finance Clients Detail → Organization Workspace convergence)
+
+- **Trigger:** ejecutar TASK-613 (P1 / EPIC-008 child) — `/finance/clients/[id]` adopta el Organization Workspace shell (TASK-612) preservando 1:1 las 4 sub-tabs (Facturación/Contactos/Facturas/Deals) + 3 KPIs (Por cobrar/Vencidas/Condiciones). Trabajado **directo en `develop`** por instrucción explícita del usuario.
+- **7 slices entregados** con commits incrementales:
+  - Slice 1: `FinanceFacet` con dual-entrypoint dispatch (`finance` → `FinanceClientsContent` rich legacy / otros → wrap legacy `OrganizationFinanceTab`) + nuevo `FinanceClientsContent.tsx` self-contained (600+ líneas, 1:1 legacy `ClientDetailView`).
+  - Slice 2: `page.tsx` server-side gate canónico (mirror Agency Slice 5) + `FinanceClientsOrganizationWorkspaceClient` wrapper (mirror Agency wrapper).
+  - Slice 3: reliability signal canónico `finance.client_profile.unlinked_organizations` (kind=data_quality, warning si count>0) + 5/5 tests.
+  - Slice 4: rollout flag `organization_workspace_shell_finance` ya seedeado por TASK-612 Slice 4 (verificación).
+  - Slice 5: compat hardening — deep-link de `ClientsListView` con `clientProfileId` resuelve correctamente (resolver canónico OR-matching los 4 shapes).
+  - Slice 6: 4/4 component tests del FinanceFacet dispatch verdes.
+  - Slice 7: Delta `GREENHOUSE_FINANCE_ARCHITECTURE_V1.md` 2026-05-08 + doc funcional `finance/clientes-finanzas.md` + manual de uso `finance/clientes-finanzas-vista-detalle.md`.
+- **Final phase (instrucción mid-task del usuario)**: receta canónica `organization-by-facets` documentada en 3 lugares:
+  - `CLAUDE.md` nueva sección "Organization-by-facets — receta canónica para extender (TASK-613)" con 5 pasos para facet nuevo + 5 pasos para entrypoint nuevo + 11 reglas duras + patrón canónico per-entrypoint dispatch.
+  - `AGENTS.md` nueva sección "Organization-by-facets — receta canónica" con shape compacto para agentes en general.
+  - `GREENHOUSE_ORGANIZATION_WORKSPACE_PROJECTION_V1.md` Delta 2026-05-08 con receta detallada (snippets código + migration template + reglas duras + roadmap rollout).
+- **Verify final**: pnpm tsc clean / 9/9 tests nuevos verdes (5 signal + 4 facet dispatch) / lint clean.
+- **Lifecycle**: `complete`. Movido a `docs/tasks/complete/`. README sync.
+- **Cero pérdida funcional**: legacy `<ClientDetailView>` preservado intacto detrás del flag (default disabled). Cutover staged user→role→global.
+- **Sin PR ceremony**: trabajado directo en develop por instrucción del usuario.
+
+# Sesion 2026-05-08 (noche) — TASK-612 cerrada (Organization Workspace Shell convergence)
+
+- **Trigger:** ejecutar TASK-612 (P1 / EPIC-008 child) — extracción del shell compartido organization-first + FacetContentRouter lazy + adopción Agency. Branch `task/TASK-612-shared-organization-workspace-shell-convergence` desde develop limpio.
+- **Discovery + audit:** detectó 5 supuestos a recalibrar:
+  1. Spec asumía 9 facets ya existentes — REALIDAD: 4 tabs consolidados (ico/finance/people/integrations). Mapping a 9 facets canónicos vía wrapping.
+  2. page.tsx no tenía requireServerSession — agregado en Slice 5.
+  3. Migration TASK-780 whitelisted solo `home_v2_shell` — extendida con CHECK.
+  4. KPI strip canónico = 4 KPIs hard-coded (Revenue/Margen/Equipo/Spaces) — preservado.
+  5. Facets sin contenido (crm, services, staffAug) → empty state honesto en lugar de blank.
+- **5 Open Questions resueltas pre-execution**: feature_rollout_flags vs extender home_rollout_flags (extender en V1), nuevo shell vs refactor in-place (NUEVO), wrapping vs absorption (WRAPPING en V1), 9 facets vs solo activos (9 siempre, empty state honesto), bundle gate vs report-only (REPORT-ONLY V1).
+- **7 slices entregados** con commits incrementales:
+  - Slice 1: `OrganizationWorkspaceShell` (chrome only) + GH_ORGANIZATION_WORKSPACE copy + 11 unit tests.
+  - Slice 2+3 (atómico por dependency): `FacetContentRouter` lazy registry + 9 facet content components + 10 router tests + useOrganizationDetail hook.
+  - Slice 4: migration `home_rollout_flags` CHECK extendida + 2 seed rows + helper canónico `isWorkspaceShellEnabledForSubject` + 4 tests.
+  - Slice 5: Agency `/agency/organizations/[id]/page.tsx` reescrito server-side + `AgencyOrganizationWorkspaceClient` wrapper.
+  - Slice 6: design-lint + 3617/3617 tests + build verdes.
+  - Slice 7: Delta UI Platform V1.9, doc funcional `agency/organizaciones-workspace.md`, manual de uso `plataforma/organizaciones-workspace-rollout.md`.
+- **Verify final**: pnpm lint clean / tsc clean / 3617 tests verdes (+25 vs 3592 pre-TASK-612) / build OK / migration aplicada.
+- **Lifecycle**: `complete`. Movido a `docs/tasks/complete/`. README + TASK_ID_REGISTRY sync.
+- **Desbloquea**: TASK-613 (Finance convergence — el flag `organization_workspace_shell_finance` ya seedeado por Slice 4) + futuros entrypoints organization-first.
+- **Cero pérdida funcional**: legacy `OrganizationView` + tabs preservados intactos detrás del flag (default disabled). Cutover staged user→role→global per manual de rollout.
+- **Multi-agente:** branch dedicado, sin cross-impacts con foreign agent work pre-existente.
+
+# Sesion 2026-05-08 (tarde) — TASK-838 cerrada (ISSUE-068 Fases 1-4 end-to-end)
+
+- **Trigger:** resolver ISSUE-068 end-to-end de forma robusta, segura, resiliente y escalable. ISSUE detectado en discovery TASK-611: TASK-404 governance tables nunca creadas en PG por pre-up-marker bug en migration `20260417044741101` (3 CREATE TABLE bajo `-- Down Migration` en lugar de Up).
+- **Branch:** `task/TASK-838-issue-068-task-404-governance-tables-resolution`.
+- **4 fases entregadas en una sola PR:**
+  - Fase 1: forward-fix migration `20260508114738704_task-838-fix-task-404-governance-tables-pre-up-marker.sql` — crea las 3 tablas con triggers append-only + DO block RAISE EXCEPTION post-DDL (anti-recurrencia). 381 tablas vs 378 pre-fix.
+  - Fase 2: CI gate `scripts/ci/migration-marker-gate.mjs` mode strict en `.github/workflows/ci.yml` — detecta el patrón "Up vacía + DDL en Down" en cualquier migration nueva + 7 self-tests verdes. Whitelist explícita para TASK-404 legacy ya forward-fixed.
+  - Fase 3: reliability signal `infrastructure.critical_tables.missing` (drift, error si > 0) bajo subsystem `Cloud Platform`. Lista declarativa de 16 tablas críticas + reader que consulta information_schema. Live PG verde (16/16 presentes).
+  - Fase 4: FK enforcement migration `20260508115742046_task-838-fk-grants-to-capabilities-registry.sql` — NOT VALID + VALIDATE atomic + DO block guard post-DDL. Live FK test verde: insert con `organization.zombie_inexistente` rechazado por DB; insert con `organization.identity` válida success. Cierra defense-in-depth Layer 1 que TASK-611 V1 dejó deferred.
+- **Verify final:** pnpm lint clean / tsc clean / 3592/3592 tests verdes (+4 vs 3588 pre-TASK-838).
+- **ISSUE-068:** movido a `docs/issues/resolved/`. README de issues actualizado.
+- **Fase 5 (wire Admin Center mutation paths):** deferida a TASK-839 (1-2 días, UX-heavy). No bloqueante: la infraestructura DB + observability + CI gate ya están en su lugar.
+- **Fase 6 (cleanup deprecated capabilities):** oportunista, no abre TASK propia.
+- **Multi-agente:** branch dedicado, sin cross-impacts. Pre-existing changes from another agent (EPIC-014, TASK-835/836/837) preservadas sin merge.
+
+# Sesion 2026-05-08 — TASK-611 cerrada (Organization Workspace Projection foundation)
+
+- **Trigger:** ejecutar TASK-611 (P1 / EPIC-008) — foundation canonica para Organization Workspace facet projection. Branch `task/TASK-611-organization-workspace-facet-projection-entitlements-foundation` creado desde `develop` limpio.
+- **Discovery + audit:** detecto 5 divergencias spec V1 vs realidad → recalibracion V1.1 (Delta 2026-05-08 al spec canonico):
+  1. `entitlement_grants` NO existe → `capabilities_registry` sin FK desde grants en V1; parity test TS↔DB es el guardia.
+  2. Eventos `identity.entitlement.granted/revoked` v1 NO existen → Slice 6 consume 5 events canonicos existentes.
+  3. Columnas reales del relationship resolver difieren → bridge via `greenhouse_core.spaces`.
+  4. 5 categorias canonicas (no 4).
+  5. TASK-404 governance tables NUNCA creadas en PG (pre-up-marker bug) → ISSUE-068 abierto, fuera de scope.
+- **7 slices entregados:**
+  - Slice 1: module `organization` + 11 capabilities organization.* en catalog + facet mappings (TS).
+  - Slice 2: `greenhouse_core.capabilities_registry` migrada + seedeada (122 entries) + parity helper + 6 unit tests + 1 live PG test.
+  - Slice 3: `relationship-resolver.ts` con single CTE PG query + 5 categorias canonicas + cross-tenant isolation enforced en SQL + 12 tests.
+  - Slice 4: `resolveOrganizationWorkspaceProjection` server-only + cache TTL 30s + degraded mode honesto + extension de `runtime.ts` para grants base de organization.* + 9 tests.
+  - Slice 5: 2 reliability signals (`identity.workspace_projection.facet_view_drift`, `identity.workspace_projection.unresolved_relations`) bajo subsystem `Identity & Access` + wired en `get-reliability-overview.ts` + 2 unit tests.
+  - Slice 6: `organizationWorkspaceCacheInvalidationProjection` reactive consumer para 5 events canonicos (`access.entitlement_*`, `role.assigned/revoked`, `user.deactivated`) + 6 tests.
+  - Slice 7: lint rule `greenhouse/no-inline-facet-visibility-check` mode error + RuleTester + override block + Delta arch doc + doc funcional + ISSUE-068 + CLAUDE.md hard rules.
+- **Verify final:**
+  - `pnpm exec tsc --noEmit`: clean
+  - `pnpm lint`: clean (0 errors)
+  - `pnpm test`: 3588 verdes, 6 skipped (1 nuevo: live PG parity test)
+  - Live parity test verde contra dev DB (122 capabilities en sync)
+  - `pnpm build`: validado al pasar lint+tsc combo (no run explicito esta sesion)
+- **Lifecycle:** `complete`. Movido a `docs/tasks/complete/`. README sync.
+- **Multi-agente:** branch dedicado, sin cross-impacts. Pre-existing changes from another agent (TASK-835, TASK-836, EPIC-014) preservadas sin merge.
+- **Siguiente paso:** PR `develop` ← `task/TASK-611-...`. TASK-612 y TASK-613 (blocked-by 611) pueden empezar.
+
+# Sesion 2026-05-07 — Operational UI primitives para Sample Sprints
+
+- **Trigger:** el usuario pidio resolver de forma robusta/escalable el look forzado de `/agency/sample-sprints`: rectangulos redondeados excesivos, texto pegado a bordes y copy hibrido en señales.
+- **Skills aplicadas:** `greenhouse-ui-orchestrator`, `greenhouse-vuexy-ui-expert`, `greenhouse-ui-review`, `greenhouse-ux-content-accessibility`, `ux-content-accessibility`, `modern-ui-architect`, `ui-product-design-orchestrator` y overlay Greenhouse de modern-ui.
+- **Entrega UI:** nueva familia reusable en `src/components/greenhouse/primitives/`: `OperationalPanel`, `MetricSummaryCard`, `OperationalStatusBadge`, `OperationalSignalList`. Las primitives usan Vuexy/MUI Card semantics, padding/radius tokenizados, badges pequeños para estado real y listas de señales con más aire interno.
+- **Sample Sprints:** `CommandCenter` reemplaza KPI cards locales por `MetricSummaryCard`; `CommercialHealthSurface` reemplaza mini-cards redondeadas por `OperationalPanel` + `OperationalSignalList`. Copy runtime de señales queda en español (`Señales operativas`, `Estable`, `Progreso sin actualización`, etc.) y el workspace ya no alimenta la UI con `steady/stale/outcome/threshold` visibles.
+- **Validacion:** `pnpm exec eslint ...SampleSprintsExperienceView.tsx ...SampleSprintsWorkspace.tsx ...Operational*.tsx ...MetricSummaryCard.tsx --max-warnings=0` OK; `pnpm test src/views/greenhouse/agency/sample-sprints/SampleSprintsExperienceView.test.tsx` OK (3 tests); `pnpm exec tsc --noEmit --pretty false` OK; `pnpm design:lint` OK; `pnpm lint` OK; `pnpm build` OK.
+- **Deploy/smoke:** commit `9bc681ab` pusheado a `develop`; Vercel staging `Ready` en `greenhouse-dyfk14pah-efeonce-7670142f.vercel.app` con alias `dev-greenhouse.efeoncepro.com`; smoke Playwright autenticado en staging OK para `/agency/sample-sprints` + tab `Salud comercial` (`Señales operativas`, `Estable`, sin `Reliability signals`/`steady`/`Progreso stale`). CI y Playwright E2E smoke de GitHub OK.
+
+# Sesion 2026-05-07 — Sample Sprints runtime copy guardrail
+
+- **Trigger:** el usuario detecto que `/agency/sample-sprints` en staging filtraba copy de mockup/debug y despues pidio resolver tambien la causa sistemica: un agente habia hardcodeado copy ignorando `src/lib/copy/`.
+- **Fix:** `SampleSprintsExperienceView` queda como shell reusable fuera de `/mockup/`; `mockup/SampleSprintsMockupView.tsx` es solo wrapper. `SampleSprintsWorkspace` ya importa el shell runtime, no el mockup.
+- **Copy canonico:** `src/lib/copy/agency.ts` agrega `GH_AGENCY.sampleSprints` para hero, tabs, CTAs, KPIs, empty states, health labels y aria labels. Runtime elimina badges `Experiencia aprobada`/`Backend conectado`, tabs inglesas y KPIs falsos `0%`/`$0` en empty state.
+- **Resiliencia:** `SampleSprintsWorkspace` usa parser JSON defensivo para no romper la pantalla si una respuesta llega vacia/no JSON; el error queda recuperable.
+- **Guardrail:** nueva regla ESLint `greenhouse/no-runtime-mockup-import` bloquea imports/re-exports desde `/mockup/` fuera de archivos mockup. Test de regla agregado.
+- **Validacion focal:** `pnpm exec eslint src/views/greenhouse/agency/sample-sprints eslint-plugins/greenhouse/rules/no-runtime-mockup-import.mjs eslint-plugins/greenhouse/rules/__tests__/no-runtime-mockup-import.test.mjs --max-warnings=0` OK; `pnpm test src/views/greenhouse/agency/sample-sprints/SampleSprintsExperienceView.test.tsx` OK; `node eslint-plugins/greenhouse/rules/__tests__/no-runtime-mockup-import.test.mjs` OK; `pnpm exec tsc --noEmit --pretty false` OK.
+
+# Sesion 2026-05-07 — TASK-789 cerrada (Workforce Relationship Transition)
+
+- **Branch:** `task/TASK-789-workforce-relationship-transition`.
+- **Ownership:** no habia PR abierto ni branch local/remota obvia para `TASK-789`; task movida a `docs/tasks/complete/`, `Lifecycle=complete`, README/registry sincronizados.
+- **Objetivo:** implementar la primitive canonica para cerrar una relacion dependiente y abrir una relacion contractor/honorarios bajo la misma persona, sin reactivar payroll/finiquito ni mutar historico.
+- **Guardrail inicial:** task P1 / impacto muy alto / dominio HR-payroll-adjacent; antes de codigo se contrastara spec vs arquitectura, schema/runtime y People 360/payroll/offboarding existentes.
+- **Cierre:** task movida a `docs/tasks/complete/`, `Lifecycle=complete`, README/registry sincronizados.
+- **Entrega:** nueva primitive `src/lib/person-legal-entity-relationships/**` y command `src/lib/workforce/relationship-transition/transitionEmployeeToContractor()`. Exige offboarding case `executed`, bloquea contractor activo solapado, cierra `employee` con `status='ended'` + `effective_to`, abre `contractor` separado y registra evento en el caso. Honorarios V1 se expresa como `relationship_type='contractor'` + `metadata_json.relationshipSubtype='honorarios'`.
+- **Payroll protegido:** no muta `members.contract_type`, no crea `greenhouse_payroll.compensation_versions`, no crea `payroll_adjustments`, no toca formulas Chile y no habilita `final_settlements` para contractor/honorarios. Se reutiliza el cutoff existente post-offboarding ejecutado.
+- **People 360:** `getPersonHrContext()` lee timeline de `person_legal_entity_relationships`; HR tab muestra `Relacion laboral cerrada` y `Relacion contractor/honorarios activa` con rangos efectivos.
+- **Docs:** `project_context.md`, `changelog.md`, arquitectura Person Legal Entity + Contractor Engagements, documentación funcional y manual de offboarding actualizados.
+- **Validacion:** baseline inicial `pnpm exec tsc --noEmit --pretty false` OK y ESLint focal OK. Cierre: `pnpm exec tsc --noEmit --pretty false` OK; `pnpm lint` OK; tests focales OK (4 files / 12 tests); `pnpm design:lint` OK (0 errors / 0 warnings); `pnpm build` OK.
+
+# Sesion 2026-05-07 — TASK-809 wizard contract fix (Sample Sprints pantallas internas)
+
+- **Trigger:** el usuario aclaro que no bastaba con alinear el command center: la experiencia de `Declarar Sprint` y las pantallas internas del mockup aprobado tambien debian implementarse en detalle, no como links a formularios alternos.
+- **Skills aplicadas:** `greenhouse-ui-orchestrator` para conservar la composicion Vuexy/MUI aprobada; `greenhouse-ux-content-accessibility` para copy honesto, CTAs verb-led, estados de error/success y campos requeridos; `greenhouse-microinteractions-auditor` para feedback de acciones, disabled states, borradores y smoke de tabs/acciones.
+- **Fix robusto:** el modo runtime de `SampleSprintsMockupView` ahora renderiza wizards in-place con la misma jerarquia del mockup aprobado:
+  - `Declaracion`: Stepper Cliente/Diseño/Equipo/Confirmacion, campos reales de space, tipo, fechas, costo, FTE, miembro propuesto y criterios de exito; `Guardar borrador` persiste draft local y `Solicitar aprobacion` hace POST real a `/api/agency/sample-sprints`.
+  - `Approval`: tabla de capacidad, razon de override/rechazo, approve POST real y reject POST real.
+  - `Progreso`: snapshot semanal con fecha, estado, avance, notas, borrador local y POST real a `/progress`.
+  - `Outcome`: outcome, decision date, lineage opcional por service/quotation, rationale, cancellation reason, metricas JSON, uploader canonico y POST real a `/outcome`.
+  - `Commercial Health`: conserva surface aprobada y link operativo a `/admin/ops-health`.
+- **Backend/API:** nuevo endpoint runtime `POST /api/agency/sample-sprints/[serviceId]/reject` reutiliza helper canonico `rejectEngagement()` y entitlement `commercial.engagement.approve`; no se crea write path paralelo.
+- **Validacion:** `pnpm exec tsc --noEmit` OK; `pnpm lint` OK; `pnpm build` OK; `pnpm design:lint` OK. Playwright autenticado con usuario agente dedicado verifico ruta real y pantallas internas: Declaracion muestra campos/Stepper del mockup y habilita `Solicitar aprobacion` al completar required fields; Approval/Progreso/Outcome renderizan su surface o empty state seguro si no hay Sprint; Commercial Health linkea a Ops Health; sin console errors.
+- **Riesgo/follow-up:** con dataset vacio, Approval/Progreso/Outcome muestran empty state de seleccion; para validar mutaciones destructivas/creacion real con datos seed controlados conviene agregar un E2E fixture dedicado que cree y limpie un Sample Sprint de prueba.
+
+# Sesion 2026-05-07 — TASK-809 visual contract fix (Sample Sprints mockup aprobado)
+
+- **Trigger:** el usuario detecto correctamente que `/agency/sample-sprints` no seguia el mockup aprobado y se habia implementado una UI plana distinta. La fuente aprobada confirmada es `/agency/sample-sprints/mockup` (`src/app/(dashboard)/agency/sample-sprints/mockup/page.tsx` + `src/views/greenhouse/agency/sample-sprints/mockup/SampleSprintsMockupView.tsx`), documentada en EPIC-014/TASK-809.
+- **Fix robusto:** el mockup aprobado deja de ser una isla estatica: `SampleSprintsMockupView` ahora acepta `sprints`, `signals`, `variant` e `initialSelectedSprintId`. La ruta real `/agency/sample-sprints` reutiliza ese mismo shell visual en modo `runtime`, alimentado por datos reales del API/readers de TASK-809.
+- **No-parche:** se elimina el board alternativo plano de la ruta real. Todas las superficies del mockup aprobado quedan presentes en la experiencia real: hero ejecutivo, tabs `Command center/Detalle/Declaración/Approval/Progreso/Outcome/Commercial Health`, KPI cards, agrupacion por cliente, decisiones proximas, empty states diseñados y panels de accion conectados a rutas reales.
+- **Runtime mapping:** `SampleSprintItem` se adapta a `Sprint` tipado del shell aprobado; statuses/outcomes derivan fase, signal, progreso, deadline, budget esperado y team placeholder minimo sin inventar filas DB. Commercial Health runtime deriva signals deterministicas desde los items reales.
+- **Validacion:** `pnpm exec tsc --noEmit` OK; `pnpm lint` OK; `pnpm build` OK; `pnpm design:lint` OK (0 errors/0 warnings). Playwright autenticado con usuario agente dedicado (`scripts/playwright-auth-setup.mjs`) verifico `/agency/sample-sprints`: URL real, `Sample Sprints command center`, chips `Experiencia aprobada` + `Backend conectado`, todas las tabs del mockup, sin `No Sample Sprints found yet.`; smoke de clicks OK para `Revisar approval`, `Ver Commercial Health`, todas las tabs, `Abrir declaración`, `Abrir Ops Health` y `Limpiar filtros`; screenshot local `.playwright-mcp/sample-sprints-runtime.png` no versionado.
+- **Riesgo/follow-up:** los tabs de declaracion/approval/progreso/outcome en modo runtime preservan la superficie visual aprobada y redirigen a los formularios transaccionales existentes. Si se quiere full in-place wizard runtime dentro del tab, abrir slice separado para fusionar esos formularios con el shell aprobado sin duplicar write paths.
+
+# Sesion 2026-05-07 — TASK-810 cerrada en develop (Engagement Anti-Zombie DB Guard)
+
+- **Branch:** `develop` por instruccion explicita del usuario; no se crea ni cambia a `task/TASK-810-engagement-anti-zombie-check-constraint`.
+- **Ownership/lifecycle:** no habia PR abierto ni branch local/remota obvia para `TASK-810`; task movida a `docs/tasks/complete/`, `Lifecycle=complete`, README/registry sincronizados.
+- **Discovery clave:** el diseño original `CHECK (...) EXISTS (...)` no es aplicable en PostgreSQL porque los CHECK no admiten subqueries y `CURRENT_DATE` no revalida por paso del tiempo. Se corrige a trigger `BEFORE INSERT OR UPDATE` con `ERRCODE check_violation`, manteniendo el objetivo anti-zombie.
+- **Runtime verificado:** `pnpm pg:doctor` OK; preflight live para active non-regular >120d sin outcome retorno `0` violations. `services` no tiene `client_id`; preflight y docs usan `space_id`/`organization_id`.
+- **Entrega:** migration `20260507183122498_task-810-engagement-anti-zombie-trigger.sql` crea function `greenhouse_core.assert_engagement_requires_decision_before_120d()` y trigger `services_engagement_requires_decision_before_120d` sobre `greenhouse_core.services`. Bloquea non-regular active >120d sin outcome ni lineage, excluyendo regular, inactive, `legacy_seed_archived`, `unmapped`, estados no activos y terminales `cancelled|closed`.
+- **Preflight/runbook:** nuevo `scripts/commercial/preflight-zombie-check.ts` read-only; runbook `docs/operations/runbooks/engagement-zombie-handling.md`.
+- **Validacion:** `pnpm pg:connect:migrate` OK + types regenerados sin diff relevante; preflight script OK (`violationCount=0`); SQL smoke transaccional con rollback OK; focal vitest OK (11 tests); `pnpm exec tsc --noEmit --pretty false` OK; `pnpm pg:doctor` OK; `pnpm lint` OK; `pnpm test` OK (609 files / 3539 passed / 5 skipped); `pnpm build` OK.
+
+# Sesion 2026-05-07 — TASK-809 cerrada en develop (Sample Sprints UI + Wizards)
+
+- **Branch:** `develop` por instruccion explicita del usuario; no se crea ni cambia a `task/TASK-809-sample-sprints-ui-wizards`.
+- **Runtime aclarado:** `services.engagement_kind` si existe en DB live, `src/types/db.d.ts` y migration TASK-801. `schema-snapshot-baseline.sql` esta stale y se documento como drift no bloqueante.
+- **Entrega:** `/agency/sample-sprints` queda como surface real con lista, detalle y wizards de declaracion, aprobacion, progreso y outcome. El mockup aprobado `/agency/sample-sprints/mockup` queda intacto como referencia.
+- **Backend/API:** nuevo store `src/lib/commercial/sample-sprints/store.ts`; APIs `src/app/api/agency/sample-sprints/*` y `/api/admin/commercial/engagement-approvals` reutilizan approvals/progress/outcomes/conversion TASK-804..808. `declareSampleSprint()` crea service non-regular + approval + audit/outbox en una transaccion.
+- **Assets:** nuevos contextos privados `sample_sprint_report_draft` y `sample_sprint_report`; `recordOutcome()` y `convertEngagement()` attachan reportes al outcome dentro de la transaccion.
+- **Access model:** sin routeGroups nuevos ni startup policy. Nueva view `gestion.sample_sprints`; entitlements reutilizados: `commercial.engagement.{read,declare,record_progress,record_outcome,approve}`. Menu visible en Comercial y Agencia interna/admin.
+- **Docs:** `project_context.md`, `changelog.md`, `GREENHOUSE_PILOT_ENGAGEMENT_ARCHITECTURE_V1.md`, documentacion funcional, manual de uso, task README/registry y task lifecycle sincronizados; task movida a `complete/`.
+- **Validacion:** `pnpm pg:doctor` OK; `pnpm exec tsc --noEmit --pretty false` OK; focal vitest OK (34 tests); `pnpm lint` OK; `pnpm build` OK.
+- **No validado:** E2E Playwright/visual regression completo no ejecutado; queda recomendado como follow-up de baseline visual automatizada si se quiere gate de mockup aprobado.
+
+# Sesion 2026-05-07 — TASK-808 cerrada en develop (Engagement Audit Log + Outbox Events)
+
+- **Branch:** `develop` por instruccion explicita del usuario; no se creo `task/TASK-808-engagement-audit-log-outbox-reactive-consumers`.
+- **Lifecycle/docs:** task movida a `docs/tasks/complete/`, `Lifecycle=complete`; `docs/tasks/README.md`, `docs/tasks/TASK_ID_REGISTRY.md`, `project_context.md`, `changelog.md`, `GREENHOUSE_EVENT_CATALOG_V1.md` y `GREENHOUSE_PILOT_ENGAGEMENT_ARCHITECTURE_V1.md` sincronizados.
+- **Runtime:** migration `20260507173315667_task-808-engagement-audit-log.sql` aplicada via `pnpm pg:connect:migrate`; `src/types/db.d.ts` regenerado. `engagement_audit_log` queda append-only con FKs `TEXT`, indices service/kind/actor y grants runtime/app select+insert.
+- **Codigo:** helpers Sample Sprints escriben audit + outbox dentro de la misma tx; 9 eventos `service.engagement.*` usan `payload_json.version=1`. `convertEngagement()` agrega flujo atomico outcome + terms opcionales + lineage opcional + audit + outbox. Projections nuevas: `engagement_converted_lifecycle` (`cost_intelligence`) llama `promoteParty()`; `engagement_cancelled_manual_notification` (`notifications`) crea follow-up interno y no email automatico a cliente.
+- **Drift resuelto:** no existen `outbox_events.consumed_at/consumed_by`; dedup real vive en `outbox_reactive_log`. No existe comando canónico service→HubSpot deal; TASK-808 no bypassa `createDealFromQuoteContext()`/bridge y deja metadata deferred.
+- **Validacion:** `pnpm lint`, `pnpm exec tsc --noEmit --pretty false`, `pnpm test` (608 files, 3535 pass, 5 skipped), `pnpm build`, `pnpm pg:doctor`, migration apply + SQL smoke append-only (`UPDATE` rechazado dentro de rollback).
+- **Follow-ups:** TASK-809 debe consumir `convertEngagement()`/audit feed en UI real. Crear task futura para comando canónico service→HubSpot deal si el producto requiere automatizar deal creation post-conversion.
+
+# Sesion 2026-05-07 — TASK-807 cerrada en develop (Commercial Health Reliability Subsystem)
+
+- **Branch:** `develop` por instruccion explicita del usuario; no se crea `task/TASK-807-commercial-health-reliability-subsystem`.
+- **Ownership:** no habia PR abierto ni branch local/remota obvia para `TASK-807`; se ejecuto en `develop` por instruccion explicita del usuario.
+- **Entrega:** `Commercial Health` queda formalizado como subsystem operativo en `/admin/ops-health` y como fuente de signals en `getReliabilityOverview()`. Se agregan seis signals `commercial.engagement.{overdue_decision,budget_overrun,zombie,unapproved_active,conversion_rate_drop,stale_progress}` bajo moduleKey `commercial`.
+- **Primitive reusable:** nuevo `src/lib/commercial/sample-sprints/health.ts` centraliza conteos read-only, threshold de conversion y criterios de elegibilidad. `stale_progress` de TASK-805 fue conservado y conectado a esta primitive.
+- **Drift resuelto:** `transition_event` no existe; `zombie` usa ausencia de `engagement_outcomes` + `engagement_lineage`. `budget_overrun` usa `greenhouse_serving.commercial_cost_attribution_v2`, no `gtm_investment_pnl`, porque esa view es solo `no_cost`.
+- **Access model:** sin nuevos `routeGroups`, `views`, `entitlements` ni startup policy. No hubo migrations ni outbox/events nuevos.
+- **Validacion:** `pnpm pg:doctor` OK; focal tests Commercial Health OK (18 tests); `pnpm exec tsc --noEmit --pretty false` OK; `pnpm lint` OK; `pnpm test` completo OK (606 files / 3531 passed / 5 skipped); `pnpm design:lint` OK (0 errors / 0 warnings); `pnpm build` OK.
+- **Lifecycle/docs:** task movida a `docs/tasks/complete/`, `Lifecycle=complete`, `docs/tasks/README.md`, `docs/tasks/TASK_ID_REGISTRY.md`, `GREENHOUSE_PILOT_ENGAGEMENT_ARCHITECTURE_V1.md`, `project_context.md` y `changelog.md` sincronizados.
+- **Follow-ups:** TASK-808 mantiene ownership de audit/outbox engagement; TASK-809 consume estas signals en la UI real/wizards; TASK-810 agrega prevención DB anti-zombie. Runbooks completos quedan para V2, con stubs operativos en summaries/details.
+
+# Sesion 2026-05-07 — TASK-815 cerrada en develop (Direct Service Expense Allocation Primitive)
+
+- **Branch:** `develop` por instruccion explicita del usuario; se corrigio inmediatamente un intento inicial de crear branch y no se volvio a cambiar de rama.
+- **Trigger:** follow-up de TASK-806: direct-client expenses quedaban `operational` porque no tenian ancla canonica de `service_id`; no se acepto inferencia por cliente/nombre/linea de servicio.
+- **Entrega DB:** migration `20260507164348236_task-815-direct-service-expense-allocation.sql` aplicada en dev crea `greenhouse_finance.expense_service_allocations` con state `draft/approved/rejected`, FKs a `expenses/services/clients`, cap por expense, guard de service activo/no `legacy_seed_archived`/no `unmapped`, y scope V1 solo direct-client expenses (`cost_is_direct=TRUE` + `allocated_client_id`).
+- **Serving:** `greenhouse_serving.commercial_cost_attribution_v2` agrega lane `expense_direct_service` para allocations aprobadas y resta ese monto del residual `expense_direct_client`; `gtm_investment_pnl` puede reclasificar estos costos cuando apliquen terms `no_cost`.
+- **Helpers:** nuevo `src/lib/finance/expense-service-allocations.ts` expone create/approve/reject/list transaccional; `v2-reader.ts` soporta totals/breakdown/coverage `expenseDirectService`.
+- **Service attribution:** `src/lib/service-attribution/materialize.ts` consume allocations aprobadas como `expense_service_allocation` high-confidence y descuenta esos montos del residual de direct-client expenses para evitar doble conteo.
+- **Access model:** sin nuevos `routeGroups`, `views`, `entitlements` ni startup policy. TASK-809 debe montar la UI/wizard sobre esta primitive y TASK-807 puede agregar signal de pendientes.
+- **Runtime verificado:** `pnpm pg:doctor` OK; `pnpm pg:connect:migrate` OK + `src/types/db.d.ts` regenerado; SQL smoke confirma tabla existente, 0 allocations iniciales y 0 rows `expense_direct_service` hasta que existan approvals.
+- **Validacion ejecutada:** focal vitest OK (`expense-service-allocations`, `commercial-cost-attribution/v2-reader`, `service-attribution/materialize`); `pnpm exec tsc --noEmit --pretty false` OK; `pnpm lint` OK; `pnpm test` completo OK (605 files / 3522 passed / 5 skipped); `pnpm build` OK.
+- **Docs sincronizadas:** `TASK-815`, `docs/tasks/README.md`, `TASK_ID_REGISTRY.md`, `GREENHOUSE_COMMERCIAL_COST_ATTRIBUTION_V1.md`, `GREENHOUSE_PILOT_ENGAGEMENT_ARCHITECTURE_V1.md`, `project_context.md` y `changelog.md`.
+
+# Sesion 2026-05-07 — CI fix commercial-cost-worker deploy verde
+
+- **Incidente:** workflow `Commercial Cost Worker Deploy` fallaba en `develop` antes de deploy porque Cloud Build usaba Corepack sin version pin y descargaba `pnpm@11.0.8`; `pnpm install --frozen-lockfile` rechazaba el lockfile por mismatch de overrides.
+- **Fix:** commit `313a0cae` en `develop` fija `ARG PNPM_VERSION=10.32.1` + `corepack prepare` en los Dockerfiles de `commercial-cost-worker`, `ops-worker` e `ico-batch`. Se mantuvo `--frozen-lockfile`; no se relajó el gate.
+- **Validación:** Cloud Build remoto manual `8e84b1f3-09f1-4e46-abed-1485369820e5` SUCCESS para `commercial-cost-worker`; `git push` pasó hooks (`pnpm lint` + `tsc --noEmit`); workflow GitHub `25506769734` terminó verde con deploy + health verification. Warning residual: acciones Node 20 deprecadas cubiertas por TASK-607.
+
+# Sesion 2026-05-07 — TASK-806 tomada en develop (GTM Investment P&L Reclassifier)
+
+- **Branch:** `develop` por instruccion explicita del usuario; no se crea `task/TASK-806-gtm-investment-pnl-view-reclassifier`.
+- **Ownership:** no hay PR abierto ni branch local/remota obvia para `TASK-806`; se movio la task a `docs/tasks/in-progress/` y se sincronizaron `Lifecycle`, `docs/tasks/README.md` y `docs/tasks/TASK_ID_REGISTRY.md`.
+- **Objetivo:** implementar view gerencial `greenhouse_serving.gtm_investment_pnl` + helper TS de reclassificación GTM, contrastando primero spec vs runtime real de `commercial_cost_attribution_v2`, TASK-813 y docs de management accounting.
+- **Guardrails iniciales:** no tocar UI real en esta task; el mockup aprobado `/agency/sample-sprints/mockup` queda como consumidor downstream. No revertir el archivo no relacionado sin trackear `docs/architecture/GREENHOUSE_CLIENT_LIFECYCLE_V1.md`.
+- **Entrega TASK-806:** migration `20260507160533628_task-806-gtm-investment-pnl.sql` actualiza `client_labor_cost_allocation`, `client_labor_cost_allocation_consolidated` y `commercial_cost_attribution_v2` para propagar `service_id`; deriva `attribution_intent` solo para services non-regular aprobados/elegibles y crea `greenhouse_serving.gtm_investment_pnl` como management-accounting view `no_cost`.
+- **Helper:** nuevo `src/lib/commercial/sample-sprints/cost-reclassifier.ts` expone `getGtmInvestmentForPeriod`, `getGtmInvestmentRatio` y `getClientNetMarginExcludingGtm`; usa `query`, `gtm_investment_pnl`, `operational_pl_snapshots` y fallback a `client_economics`.
+- **Runtime verificado:** `pnpm pg:connect:migrate` OK + `src/types/db.d.ts` regenerado; SQL post-migration confirmó `gtm_investment_pnl.count = 0` y `commercial_cost_attribution_v2` con 19 rows `operational`.
+- **Lifecycle:** task movida a `docs/tasks/complete/`, `Lifecycle=complete`, `docs/tasks/README.md` y `TASK_ID_REGISTRY.md` sincronizados.
+- **Validación ejecutada:** `pnpm test src/lib/commercial/sample-sprints/cost-reclassifier.test.ts` OK (7 tests); `pnpm test src/lib/commercial-cost-attribution/v2-reader.test.ts src/lib/commercial-cost-attribution/member-period-attribution.test.ts` OK (16 tests); `pnpm pg:doctor` OK; `pnpm exec tsc --noEmit --pretty false` OK; `pnpm lint` OK; `pnpm test` completo OK (604 files / 3514 passed / 5 skipped); `pnpm build` OK.
+
+# Sesion 2026-05-07 — TASK-805 cerrada en develop (Engagement Progress Snapshots)
+
+- **Branch:** `develop` por instruccion explicita del usuario; no se crea `task/TASK-805-engagement-progress-snapshots`.
+- **Entrega:** migration `20260507152450308_task-805-engagement-progress-snapshots.sql` aplicada en dev crea `greenhouse_commercial.engagement_progress_snapshots` con `service_id TEXT`, `recorded_by TEXT`, UNIQUE `(service_id, snapshot_date)`, index `(service_id, snapshot_date DESC)`, `metrics_json` objeto no vacio y triggers append-only.
+- **Helpers:** nuevo `src/lib/commercial/sample-sprints/progress-recorder.ts` expone `recordProgressSnapshot`, `listSnapshotsForService` y `getLatestSnapshot`; reutiliza guard TASK-813, exige actor, mapea duplicado por service/date a error recuperable y rechaza services `regular`.
+- **Reliability:** nuevo reader `commercial.engagement.stale_progress` (`src/lib/reliability/queries/engagement-stale-progress.ts`) se inyecta bajo moduleKey `commercial` y emite warning si un engagement activo non-regular no tiene snapshot reciente (>10 dias). TASK-807 conserva el subsystem `Commercial Health` completo.
+- **Access model:** sin nuevos `routeGroups`, `views` ni startup policy. `commercial.engagement.record_progress` ya existia en catalog/runtime y queda testeado como operator-friendly; `commercial.engagement.approve` sigue admin-only.
+- **No se toco:** UI real, API routes, outbox/audit events ni jobs. TASK-809 conserva la surface real sobre el mockup aprobado `/agency/sample-sprints/mockup`; TASK-808 conserva audit/outbox.
+- **Validacion:** `pnpm pg:connect:migrate` OK + types regenerados; `pnpm pg:doctor` OK; `pnpm test src/lib/commercial/sample-sprints src/lib/reliability/queries/engagement-stale-progress.test.ts src/lib/entitlements/runtime.test.ts` OK (49 tests); `pnpm exec tsc --noEmit --pretty false` OK; `pnpm lint` OK; `pnpm test` completo OK (603 files / 3507 passed / 5 skipped); `pnpm build` OK.
+- **Docs sincronizadas:** task movida a `docs/tasks/complete/`, `docs/tasks/README.md`, `docs/tasks/TASK_ID_REGISTRY.md`, `project_context.md`, `changelog.md` y `GREENHOUSE_PILOT_ENGAGEMENT_ARCHITECTURE_V1.md` actualizados.
+
+# Sesion 2026-05-07 — TASK-804 cerrada en develop (Engagement Approvals + Capacity Warning)
+
+- **Branch:** `develop` por instruccion explicita del usuario; no se creo branch task.
+- **Entrega:** migration `20260507145320864_task-804-engagement-approvals-capacity-warning.sql` aplicada en dev crea `greenhouse_commercial.engagement_approvals` con state machine `pending | approved | rejected | withdrawn`, fila unica por service, checks de shape por estado, actor evidence y `capacity_warning_json`.
+- **Helpers:** nuevos modulos `src/lib/commercial/sample-sprints/{capacity-checker,approvals}.ts`. `capacity-checker` calcula capacidad por periodo desde `client_team_assignments`, excluye asignaciones internas Efeonce y tolera `service_id` nullable. `approvals` expone `requestApproval`, `approveEngagement`, `rejectEngagement`, `withdrawApproval` y `getApprovalForService` con guard TASK-813 + non-regular.
+- **State machine:** `requestApproval` marca non-regular services como `status='pending_approval'`; `approveEngagement` calcula snapshot, exige `capacity_override_reason >= 10` si algun miembro queda sobre 100% FTE y marca el service `active`.
+- **Access model:** sin `routeGroups`, `views` ni startup policy nuevos. `commercial.engagement.approve` ya existia en catalog/runtime y queda EFEONCE_ADMIN-only en V1; se agregaron tests explicitos de gating.
+- **No se toco:** UI real, API routes, outbox events, audit log ni reliability signals. TASK-809 conserva UI y TASK-808 conserva audit/outbox.
+- **Validacion:** `pnpm pg:doctor` OK; `pnpm vitest run src/lib/commercial/sample-sprints` OK; `pnpm vitest run src/lib/commercial/sample-sprints/approvals.test.ts src/lib/entitlements/runtime.test.ts` OK; `pnpm pg:connect:migrate` OK + types regenerados; `pnpm exec tsc --noEmit --pretty false` OK; `pnpm lint` OK; `pnpm build` OK. `pnpm test` completo tuvo un timeout aislado heredado en `src/views/greenhouse/hr-core/HrHierarchyView.test.tsx`; el archivo se re-ejecuto aislado y paso (4/4).
+- **Docs sincronizadas:** task movida a `docs/tasks/complete/`, `docs/tasks/README.md`, `docs/tasks/TASK_ID_REGISTRY.md`, `project_context.md`, `changelog.md` y `GREENHOUSE_PILOT_ENGAGEMENT_ARCHITECTURE_V1.md` actualizados.
+
+# Sesion 2026-05-07 — TASK-803 cerrada en develop (Engagement Phases + Outcomes + Lineage)
+
+- **Branch:** `develop` por instruccion explicita del usuario; no se creo branch task.
+- **Entrega:** migration `20260507135645984_task-803-engagement-phases-outcomes-lineage.sql` aplicada en dev crea `greenhouse_commercial.engagement_phases`, `engagement_outcomes` y `engagement_lineage`. Todas las FKs usan `TEXT`, alineadas al runtime real (`services`, `assets`, `quotations`, `client_users`).
+- **Helpers:** nuevos modulos `src/lib/commercial/sample-sprints/{eligibility,shared,phases,outcomes,lineage}.ts`; `commercial-terms.ts` reutiliza el guard compartido sin romper su error publico historico. TASK-813 queda incorporada como hard guard: no operar sobre services inactivos, `legacy_seed_archived` ni `hubspot_sync_status='unmapped'`.
+- **Contratos DB:** `engagement_outcomes` es append-only por triggers DB; outcome terminal unico por service; cancellation exige reason; conversion exige `next_service_id` o `next_quotation_id`; lineage bloquea parent=child y duplicados parent/child/kind.
+- **No se toco:** routeGroups, views, entitlements, startup policy, UI, API routes, reliability signals ni outbox events. TASK-808 sigue como owner de audit log/outbox engagement.
+- **Validacion:** `pnpm pg:connect:migrate` OK + types regenerados; schema live verificado via `information_schema`/`pg_catalog`; smoke DB transaccional con `ROLLBACK` OK; `pnpm test src/lib/commercial/sample-sprints` OK; `pnpm exec tsc --noEmit --pretty false` OK; `pnpm lint` OK; `pnpm build` OK; `pnpm pg:doctor` OK.
+- **Nota test completo:** `pnpm test` completo tuvo un timeout aislado no relacionado en `src/views/greenhouse/hr-core/HrHierarchyView.test.tsx`; el archivo HR se re-ejecuto aislado y paso. Sin cambios HR/UI en esta task.
+- **Docs sincronizadas:** task movida a `docs/tasks/complete/`, `docs/tasks/README.md`, `changelog.md` y `GREENHOUSE_PILOT_ENGAGEMENT_ARCHITECTURE_V1.md` actualizados.
+
+# Sesion 2026-05-07 — TASK-803 tomada en develop (Engagement Phases + Outcomes + Lineage)
+
+- **Branch:** `develop` por instruccion explicita del usuario; no se crea `task/TASK-803-engagement-phases-outcomes-lineage`.
+- **Ownership:** no hay PR abierto ni branch local/remota obvia para `TASK-803`; se movio la task a `docs/tasks/in-progress/` y se sincronizaron `Lifecycle`, `docs/tasks/README.md` y `docs/tasks/TASK_ID_REGISTRY.md`.
+- **Objetivo:** implementar DDL + helpers canónicos para `engagement_phases`, `engagement_outcomes` y `engagement_lineage`, contrastando primero task/spec vs arquitectura y runtime real.
+- **Mockup aprobado registrado:** por instruccion del usuario, antes de continuar se agrego en `EPIC-014` y `TASK-803`..`TASK-810` que el mockup navegable aprobado vive en `/agency/sample-sprints/mockup` (`src/app/(dashboard)/agency/sample-sprints/mockup/page.tsx` + `src/views/greenhouse/agency/sample-sprints/mockup/SampleSprintsMockupView.tsx`) y que los slices deben conectarlo sin reinterpretar la dirección visual.
+- **Nota multi-agente:** el worktree ya contiene cambios ajenos/preexistentes en `TASK-611`, `TASK-612`, `TASK-613`, `GREENHOUSE_ORGANIZATION_WORKSPACE_PROJECTION_V1`, mockup aprobado de Sample Sprints y skills de mockup; no revertir ni mezclar scopes.
+
+# Sesion 2026-05-07 — contrato canonical de mockups Greenhouse
+
+- **Decision aprobada por usuario:** futuros mockups/prototipos visuales del portal no deben nacer como HTML/CSS aparte por defecto; deben implementarse como rutas reales Next.js con mock data tipada, Vuexy/MUI wrappers y primitives Greenhouse para evitar drift al conectar backend.
+- **Skills nuevas:** `.codex/skills/greenhouse-mockup-builder/SKILL.md` (+ `agents/openai.yaml`) y `.claude/skills/greenhouse-mockup-builder/SKILL.md`.
+- **Contrato sincronizado:** `AGENTS.md`, `CLAUDE.md`, `project_context.md` y `changelog.md` registran la regla corta. Excepcion permitida: HTML/CSS aparte solo si el usuario pide explicitamente un artefacto estatico externo a la app.
+- **Validacion:** `pnpm exec tsc --noEmit --pretty false` OK; `pnpm lint` OK; `pnpm design:lint` OK (0 errors / 0 warnings).
+- **Nota multi-agente:** se preservan cambios preexistentes no relacionados en `TASK-611`, `TASK-612` y `GREENHOUSE_ORGANIZATION_WORKSPACE_PROJECTION_V1`.
+
+# Sesion 2026-05-07 — Spec V1 + actualizacion TASK-611/612/613 (Organization Workspace Projection, EPIC-008)
+
+- **Branch:** `develop` (cambio doc-only, no codigo runtime). Tasks siguen en `to-do/` listas para tomarse — no se mueven a `in-progress/` aun.
+- **Trigger:** revision arquitectural pedida por el usuario sobre TASK-611/612/613 antes de tomarlas. Skill `arch-architect` invocada con overlay greenhouse-pinned + 4-pillar checklist. Detecté 3 decisiones load-bearing parqueadas o implícitas + ausencia de 4-pillar score en las 3 tasks.
+- **Entrega documental:** `docs/architecture/GREENHOUSE_ORGANIZATION_WORKSPACE_PROJECTION_V1.md` (spec canonico, 14 secciones + 2 apendices). Cierra Open Question del namespace de capabilities (`organization.<facet>.<action>` transversal con scope ∈ {own, tenant, all}). Define modelo: capabilities registry doble fuente TS+DB con FK enforcement, relationship resolver canónico (5 categorías), projection helper cacheado TTL 30s con degraded mode honesto, contrato chrome-vs-content del shell, defense-in-depth 7-layer (TASK-742 plantilla), reliability signals nuevos (`facet_view_drift` + `unresolved_relations`).
+- **Tasks actualizadas (a `to-do/`):**
+  - `TASK-611` → 7 slices con scope concreto (TS catalog + DB registry con FK + parity test, relationship resolver, projection helper, reliability signals, outbox cache invalidation consumer, lint rule). Open Question original cerrada formalmente. 4-pillar score block agregado.
+  - `TASK-612` → 7 slices con contrato chrome-vs-content explícito (shell owns chrome, domain owns facet content via render-prop o registry). FacetContentRouter con `dynamic()` lazy imports per-facet. Rollout flag `organization_workspace_shell_agency` consumiendo patrón TASK-780. 4-pillar score block agregado.
+  - `TASK-613` → 8 slices. Caller inventory completado (Slice 0): bounded set sin callers externos al módulo Finance — sidebar, list row click, back button, search, reliability registry, ACL. Riqueza Finance enumerada como contrato 1:1 (3 KPIs + 4 tabs Facturación/Contactos/Facturas/Deals). Reusa `resolveFinanceClientContext` existente en `src/lib/finance/canonical.ts:142` — no se crea bridge paralelo. Degraded path UI explícito para 2 casos (profile sin org / subject sin acceso). 4-pillar score block agregado.
+- **Decisiones cerradas (NO re-debatir):**
+  1. Namespace capabilities: `organization.<facet>.<action>` transversal. `organization` se agrega al modules union.
+  2. `facet-authorization.ts` se ABSORBE como input del projection helper (NO se reemplaza).
+  3. `authorizedViews` legacy coexisten con projection en V1 — colapso queda como follow-up post-soak ≥6 meses con `facet_view_drift = 0`.
+  4. Cache TTL 30s in-memory (patrón TASK-780). NO materialización en BQ/PG.
+  5. Server-only mandatorio en projection helper (`import 'server-only'`).
+- **Sin cambios runtime:** ninguna migration, ninguna API route, ningún componente UI tocado en esta sesión. Trabajo es 100% documental — habilita ejecución limpia de TASK-611/612/613 sin ambigüedad arquitectural.
+- **Indices sincronizados:** `docs/tasks/README.md` actualizado con descripciones extendidas de TASK-611/612/613 enlazando al spec V1.
+- **Pendiente sano (Open Questions vivas, deferidas a slices de implementación):** (1) module reliability dedicado vs extender `identity`, (2) materialized helper view vs runtime computation para signal `facet_view_drift`, (3) activación `client_portal` entrypoint con security review específico (Globe/Sky).
+
+# Sesion 2026-05-07 — TASK-557.1 cerrada en develop (Legacy Quotes Cleanup & Limbo State Audit)
+
+- **Branch:** `develop` por instruccion explicita del usuario; no se crea `task/TASK-557.1-legacy-quotes-cleanup-audit`.
+- **Ownership/lifecycle:** no habia PR abierto ni branch local/remota obvia para `TASK-557.1`; la task se movio a `docs/tasks/in-progress/` al tomarla y a `docs/tasks/complete/` al cerrar; `Lifecycle`, `docs/tasks/README.md` y `docs/tasks/TASK_ID_REGISTRY.md` quedaron sincronizados.
+- **Drift resuelto:** `finance_quote_id IS NULL` no es limbo por si solo en runtime post-TASK-486; las quotes canónicas nuevas pueden no tener mirror finance legacy. `current_version` tampoco puede ser NULL; el audit valida `quotation_versions` + `quotation_line_items` para la version vigente.
+- **Entrega:** migration `20260507125706498_task-557-1-add-legacy-excluded-flag.sql` agrega `legacy_excluded`, `legacy_excluded_reason`, `legacy_excluded_at` e índice parcial; helper puro `src/lib/commercial/legacy-quotes-audit.ts`; script idempotente `scripts/audit-legacy-quotes.ts`; `revenue-pipeline-reader` filtra `COALESCE(q.legacy_excluded, FALSE) = FALSE` + `q.legacy_status IS NULL`.
+- **Runtime counts:** dry-run: 44 candidatos (`recoverable=19`, `excludable=14`, `historical=11`), 25 rows por marcar. Apply: 25 actualizadas. Idempotency apply: 0 actualizadas. Post-cleanup: `legacy_excluded=true` 25, `legacy_status` 32, recoverables no excluidas 19, pipeline candidates visibles con filtro dual 2.
+- **Docs/audit:** auditoria versionada en `docs/audits/finance/TASK-557.1_LEGACY_QUOTES_AUDIT_2026-05-07.md`; docs/manual de Pipeline actualizados para explicar filtro dual y recoverables.
+- **Validacion:** `pnpm pg:doctor` OK; `pnpm pg:connect:migrate` OK + types regenerated; audit dry-run/apply/idempotency OK; focal vitest OK (2 files / 10 tests); `pnpm exec tsc --noEmit --pretty false` OK.
+- **Pendiente sano:** normalizacion humana futura de 19 recoverables para retirar `legacy_status` sin perder trazabilidad; fuera de scope de esta task.
+
+# Sesion 2026-05-07 — TASK-557 tomada en develop (Commercial Pipeline Lane Extraction)
+
+- **Branch:** `develop` por instruccion explicita del usuario; no se crea `task/TASK-557-commercial-pipeline-lane-extraction`.
+- **Ownership:** no habia PR abierto ni branch local/remota obvia para `TASK-557`; se movio la task a `docs/tasks/in-progress/` al tomarla y a `docs/tasks/complete/` al cerrar; `Lifecycle`, `docs/tasks/README.md` y `docs/tasks/TASK_ID_REGISTRY.md` quedaron sincronizados.
+- **Entrega:** nueva page `/finance/intelligence/pipeline` con guard dual `comercial.pipeline OR finanzas.inteligencia`, header Comercial y render directo de `CommercialIntelligenceView`; sidebar `Comercial` agrega `Pipeline` como primer item; `FinanceIntelligenceView` conserva tab compat con aviso "Vista compartida — owner Comercial" y link a la lane dedicada.
+- **Fix post-screenshot:** el usuario mostro staging sin `Pipeline` en el menu. Causa raiz local: `canSeeAnyView(..., true)` solo usa fallback cuando `authorizedViews` esta vacio; su sesion tenia authorizedViews pero aun no incluia `comercial.pipeline`. Se ajusto sidebar y page dedicada para aceptar fallback por `routeGroup commercial|finance|admin` aun con snapshots viejos, manteniendo compat transicional.
+- **Access model:** `routeGroups`: owner `commercial`, compat `finance`/admin en page dedicada; `views`: `comercial.pipeline` routePath code-versioned y persistido pasa a `/finance/intelligence/pipeline`, compat `finanzas.inteligencia`; `entitlements`: se reutiliza `commercial.pipeline.read`; `startup policy`: sin cambios.
+- **TASK-557.1:** cerrada despues de TASK-557; `legacy_excluded*` existe y el reader conserva filtro dual (`legacy_excluded=false` + `legacy_status IS NULL`) hasta normalizacion humana de recoverables.
+- **Notifications drift:** no se cambiaron las URLs de `notifications.ts:629/654`; el runtime real contiene eventos financieros (`leave_request.payroll_impact_detected`, `accounting.margin_alert.triggered`), no notificaciones pipeline. Moverlas habria degradado el destino correcto.
+- **Migracion:** `20260507115027833_task-557-commercial-pipeline-route-path.sql` actualiza `greenhouse_core.view_registry.route_path` para `comercial.pipeline`.
+- **Docs:** changelog, client changelog, doc funcional `pipeline-comercial`, doc `surfaces-comerciales-sobre-rutas-finance`, manual `docs/manual-de-uso/comercial/pipeline-comercial.md`, indices y task sincronizados.
+- **Runtime:** `pnpm pg:doctor` OK con runtime sin `CREATE` en schemas.
+- **Validacion:** `pnpm pg:connect:migrate` OK; `pnpm exec tsc --noEmit --pretty false` OK; focal tests view-access/navigation OK (35 tests); notifications test OK (5 tests); `pnpm design:lint` OK; `pnpm lint` OK; `pnpm build` OK y route table confirma `/finance/intelligence/pipeline`.
+
+# Sesion 2026-05-07 — CI fix post TASK-556 (schema drift quotes)
+
+- **Causa raiz:** CI fallo en `src/app/api/finance/schema-drift-response.test.ts` porque TASK-556 movio `/api/finance/quotes` al guard canonico `requireCommercialTenantContext`, pero el test legacy solo mockeaba `requireFinanceTenantContext`. No se bypassa el guard ni se relaja el test.
+- **Fix:** el test ahora mockea ambos planos de acceso: finance para HES/operational PL legacy y commercial con `comercial.cotizaciones` para quotes. Mantiene la expectativa de degradacion segura `FINANCE_SCHEMA_DRIFT`.
+- **Validacion:** `pnpm test src/app/api/finance/schema-drift-response.test.ts` OK; mini-regresion TASK-556/TASK-813 OK (`quotation-access`, orphan-services, services-sync); `pnpm exec tsc --noEmit --pretty false` OK; `pnpm lint` OK; `pnpm test` completo OK (598 files / 3468 passed / 5 skipped).
+
+# Sesion 2026-05-07 — TASK-813 follow-ups cerrados (cron safety-net + UI manual queue)
+
+- **Branch:** `develop`, por continuidad de los cierres TASK-554/555/556 y pedido explicito del usuario de resolver los follow-ups end-to-end.
+- **GCloud auth:** ejecutado `gcloud auth login` + `gcloud auth application-default login`; CLI y ADC quedaron alineados en `julio.reyes@efeonce.org` / project `efeonce-group`.
+- **Scheduler live verificado:** `ops-hubspot-services-sync` existe en GCP Cloud Scheduler, `state=ENABLED`, schedule `0 6 * * *`, timezone `America/Santiago`, target `https://ops-worker-y6egnifl6a-uk.a.run.app/hubspot/services-sync`, OIDC service account `greenhouse-portal@efeonce-group.iam.gserviceaccount.com`.
+- **Entrega codigo:** `GET/POST /api/admin/integrations/hubspot/orphan-services` queda gated por `commercial.service_engagement.resolve_orphan` y permite reintentar una company via `syncServicesForCompany(..., {createMissingSpace:true})`; `POST /api/admin/ops/services-sync` queda gated por `commercial.service_engagement.sync` y ejecuta safety-net global con errores redactados/capturados. El cron `runHubspotServicesSync` se alinea al mismo contrato robusto (`createMissingSpace:true`, source `ops-worker:hubspot-services-sync`). Admin > Integraciones renderiza `HubSpotServicesManualQueueCard` con resumen de pendientes, stale >7d, links HubSpot y acciones `Actualizar`, `Reintentar`, `Ejecutar safety-net`.
+- **Access model:** sin `routeGroups`, `views` ni startup policy nuevos. Se reutiliza vista admin existente `/admin/integrations`; autorizacion fina vive en entitlements TASK-555 (`commercial.service_engagement.resolve_orphan` accion `approve`; `commercial.service_engagement.sync` accion `sync`).
+- **Docs:** changelog, spec `GREENHOUSE_HUBSPOT_SERVICES_INTAKE_V1`, doc funcional `servicios-engagement` y manual operativo `sincronizacion-hubspot-servicios` actualizados para reflejar UI manual queue y scheduler real.
+- **Validacion:** `pnpm test src/app/api/admin/integrations/hubspot/orphan-services/route.test.ts src/app/api/admin/ops/services-sync/route.test.ts` OK (2 files / 6 tests), `pnpm exec tsc --noEmit --pretty false` OK, `pnpm design:lint` OK (0 errors / 0 warnings), `pnpm lint` OK, `pnpm build` OK.
+
+# Sesion 2026-05-07 — TASK-556 cerrada en develop (Commercial Surface Adoption)
+
+- **Branch:** `develop` por instruccion explicita del usuario; no se crea `task/TASK-556-commercial-surface-adoption-over-legacy-finance-paths`.
+- **Ownership:** no habia PR abierto ni branch local/remota obvia para `TASK-556`; se movio la task a `docs/tasks/in-progress/` al tomarla y a `docs/tasks/complete/` al cerrar. `Lifecycle`, `docs/tasks/README.md` y `docs/tasks/TASK_ID_REGISTRY.md` quedaron sincronizados.
+- **Entrega:** `/api/finance/{quotes,contracts,master-agreements,products}` pasa de `requireFinanceTenantContext` a `requireCommercialTenantContext` para las surfaces comerciales legacy, preservando compat `finance`/admin y checks finos existentes (`canViewCostStack`, `canOverrideQuoteCost`, `canAdministerPricingCatalog`). Metadata, encabezados, empty states y labels principales de Cotizaciones, Contratos/SOW, Acuerdos marco/MSA y Productos quedan con framing Comercial sin mover URLs.
+- **Access model:** sin routeGroups/views/entitlements nuevos. Se consume la foundation TASK-555 (`commercial`, `comercial.*`, `commercial.*`) y se mantiene startup policy sin cambios.
+- **Docs:** changelog, docs funcionales de cotizador/contratos/pipeline y nueva doc `docs/documentation/comercial/surfaces-comerciales-sobre-rutas-finance.md` documentan que Comercial es owner y `/finance/...` es compat temporal. SOW queda bajo Contratos hasta normalizacion futura de URLs.
+- **Validacion:** `pnpm test src/lib/finance/__tests__/quotation-access.test.ts`, `pnpm exec tsc --noEmit --pretty false`, `pnpm lint`, `pnpm design:lint` y `pnpm build` OK.
+- **Runtime:** `pnpm pg:doctor` se intento y fallo por saturacion de conexiones Cloud SQL (`53300`, reserved connection slots). Esta task no requiere migraciones ni lecturas live de schema; se documenta como condicion runtime observada y se evitara reintentar en loop.
+
+# Sesion 2026-05-07 — TASK-555 cerrada en develop (Commercial Access Model Foundation)
+
+- **Branch:** `develop` por instruccion explicita del usuario; no se crea `task/TASK-555-commercial-access-model-foundation`.
+- **Ownership:** no habia PR abierto ni branch local/remota obvia para `TASK-555`; se movio la task a `docs/tasks/in-progress/` al tomarla y a `docs/tasks/complete/` al cerrar; `Lifecycle`, `docs/tasks/README.md` y `docs/tasks/TASK_ID_REGISTRY.md` quedaron sincronizados.
+- **Entrega:** se formalizo `routeGroup: commercial` en role-route mapping, tenant authorization y DB; se agregaron views `comercial.pipeline`, `comercial.cotizaciones`, `comercial.contratos`, `comercial.sow`, `comercial.acuerdos_marco`, `comercial.productos`; el sidebar usa `commercial` como carril operativo interno sobre paths legacy `/finance/...`; `quotation-access` acepta `comercial.cotizaciones` y compat `finanzas.cotizaciones`.
+- **Entitlements:** catalog/runtime/bindings agregan `commercial.workspace`, surfaces comerciales, `commercial.engagement.*` de EPIC-014 y `commercial.service_engagement.*` de TASK-813. `sync` queda como action formal para service engagement sync.
+- **Startup policy:** sin cambios; no se crea home comercial en este corte.
+- **Runtime verificado:** `pnpm pg:doctor` OK con `greenhouse_app` miembro de `greenhouse_runtime`, sin `CREATE` en schemas. `../Greenhouse_Portal_Spec_v1.md` no existe en el workspace; se trata como dependencia documental faltante no bloqueante porque la arquitectura vigente y runtime local cubren el contrato.
+- **Validacion:** `pnpm pg:connect:migrate` OK, migration `20260507065816822_task-555-commercial-access-model-foundation.sql` aplicada y tipos Kysely regenerados; focal vitest OK (5 files / 56 tests). Validacion final antes de commit/push: `pnpm lint` y `pnpm exec tsc --noEmit --pretty false`.
+- **Docs:** changelog, Identity Access, Entitlements Authorization, Commercial/Finance Boundary, Sidebar Architecture y HubSpot Services Intake actualizados.
+
+# Sesion 2026-05-07 — TASK-554 tomada en develop (Commercial Domain Navigation Separation)
+
+- **Branch:** `develop` por instruccion explicita del usuario; no se crea `task/TASK-554-commercial-domain-navigation-separation`.
+- **Ownership:** no habia PR abierto ni branch local/remota obvia para `TASK-554`; se movio la task a `docs/tasks/in-progress/` y se sincronizaron `Lifecycle`, `docs/tasks/README.md` y `docs/tasks/TASK_ID_REGISTRY.md`.
+- **Discovery en curso:** scope confirmado como navegacion/i18n/access projection sin migraciones ni cambio de URLs legacy. Se debe contrastar `VerticalMenu`, `greenhouse-nomenclature`, `greenhouse-navigation-copy`, `VIEW_REGISTRY`, `shortcuts` y docs de dominio antes de implementar.
+- **Implementacion:** `Comercial` agregado como top-level interno para usuarios con `finance`/`admin`, moviendo `Cotizaciones`, `Contratos`, `Acuerdos marco` y `Productos` fuera de `Finanzas > Documentos`. Se mantiene `/finance/...`; `SOW` queda agrupado bajo `Contratos`. Se creo `/finance/products` reutilizando `ProductCatalogView` porque la API/view existian pero la page legacy no.
+- **Access model:** sin cambios en `routeGroups`, `views`, `entitlements` ni startup policy. `comercial.*` y `routeGroup: commercial` siguen en TASK-555; este corte usa compat legacy.
+- **Validacion:** `pnpm test src/config/greenhouse-navigation-copy.test.ts`, `pnpm exec tsc --noEmit --pretty false`, `pnpm design:lint`, `pnpm lint` y `pnpm build` OK. Build confirma `/finance/products` en route table.
+- **Cierre:** task movida a `docs/tasks/complete/`, README/registry/changelog/arquitectura de sidebar/nomenclatura sincronizados.
+
+# Sesion 2026-05-07 — TASK-802 cerrada en develop (Engagement Commercial Terms)
+
+- **Branch:** `develop` por instruccion explicita del usuario; no se crea `task/TASK-802-engagement-commercial-terms-time-versioned`.
+- **Ownership:** no habia PR abierto ni branch local/remota obvia para `TASK-802`; se movio la task a `docs/tasks/in-progress/` y se sincronizaron `Lifecycle`, `docs/tasks/README.md` y `docs/tasks/TASK_ID_REGISTRY.md`.
+- **Estado inicial verificado:** `TASK-801` y `TASK-813` estaban cerradas; `pnpm pg:doctor` OK con runtime sin `CREATE` en schemas.
+- **Drift corregido pre-implementacion:** la spec antigua declaraba `service_id UUID`; runtime real usa `greenhouse_core.services.service_id TEXT`. Tambien declaraba `declared_by TEXT NOT NULL ... ON DELETE SET NULL`, contrato contradictorio; se corrigio a nullable DB + requerido por helper.
+- **Foundation TASK-813 incorporada:** `declareCommercialTerms` y `getActiveCommercialTerms` aplican eligibility guard para no operar sobre services `legacy_seed_archived`, inactivos o `hubspot_sync_status='unmapped'`.
+- **Entrega:** migration `20260507060522006_task-802-engagement-commercial-terms.sql` crea `greenhouse_commercial.engagement_commercial_terms` con enum/checks, unique partial activo por service, timeline indexes, FK a `services` y `client_users`, grants runtime/migrator. Helper canónico `src/lib/commercial/sample-sprints/commercial-terms.ts` expone `getActiveCommercialTerms` + `declareCommercialTerms` transaccional; tests focales cubren lectura, transición, conflict unique, guard TASK-813 y validaciones.
+- **Validacion:** `pnpm pg:connect:migrate` OK y regenero `src/types/db.d.ts` (369 tablas); verificacion live via `information_schema`/`pg_indexes`/`pg_constraint` OK; smoke DB transaccional con `ROLLBACK` confirma `engagement_commercial_terms_active_unique`; `pnpm pg:doctor` OK; focal vitest OK 7/7; `pnpm exec tsc --noEmit --pretty false` OK; `pnpm lint` OK; `pnpm test` OK (596 files, 3455 tests, 5 skipped); `pnpm build` OK.
+- **No se toco:** routeGroups, views, entitlements, startup policy, UI, outbox events o reliability signals nuevos. TASK-808 sigue siendo owner de audit/outbox engagement.
+
+# Sesion 2026-05-07 — TASK-813 documentacion post-merge alta densidad (HubSpot services intake)
+
+- **Branch:** `develop` (docs only, autorizado direct push develop por regla canonica de doc-only).
+- **Contexto:** PR #109 (develop -> main) mergeado 2026-05-07T00:51:50Z. TASK-813 cerrada end-to-end en produccion. Usuario autorizo: "Si, autorizo. Deja todo lo hecho aca documentado con alto nivel de detalle en documentation, arquitectura y manual de uso".
+- **3 documentos elevados a alto detalle:**
+  1. **Spec arquitectural nueva** `docs/architecture/GREENHOUSE_HUBSPOT_SERVICES_INTAKE_V1.md` (515 lineas, 18 secciones): exec summary, conceptual model 4-capas, source-of-truth rules + canonical flow diagram, DDL changes, 5 helpers SSOT documentados, reactive projection contract, outbox events v1, reliability signals, capabilities, HubSpot Developer Platform setup, Cloud Scheduler jobs, hard rules anti-regresion, 4-pillar score (8.75/10), open questions resolved, related tasks, code locations, forward hard rule downstream.
+  2. **Doc funcional v2.0** `docs/documentation/comercial/servicios-engagement.md` (~280 lineas): modelo 4-capas con analogia restaurante extendida, regla source-of-truth, 3 paths convergentes, semantica cross-billing Aguas-Andinas-paga-por-ANAM con caso real, 3 escenarios degradacion honesta (unmapped/orphan/auto-space), 3 reliability signals con tabla severidad+steady, pipeline downstream con diagram ASCII, glossary, followups V1.1.
+  3. **Manual operativo v2.0** `docs/manual-de-uso/comercial/sincronizacion-hubspot-servicios.md` (~340 lineas): permisos requeridos por accion, herramientas locales, smoke test del sistema, setup inicial one-time (4 pasos), operaciones diarias (5 operaciones canonicas), estados/senales completos, lista qué NO hacer (7 reglas), troubleshooting completo (6 escenarios con diagnostico+resolucion), verificacion post-deploy (5 pasos), inventory code paths principales (15 archivos), outbox events v1, tests, migraciones.
+- **Sin cambios codigo:** docs only. No requiere CI ni tests.
+- **Sin cambios memory:** patrones canonicos (TASK-721 SSOT, TASK-771 outbox, TASK-768 honest degradation) reusados — son reglas existentes.
+- **Followups documentados:** TASK-807 (domain commercial en ops-worker), V1.1 back-fill `ef_*` properties con governance review, integracion Member Loaded Cost (TASK-713).
+- **Consistency check:** spec + doc funcional + manual cross-referencian sus paths uno al otro. CLAUDE.md seccion "HubSpot inbound webhook — p_services" sigue vigente. EVENT_CATALOG_V1 delta 2026-05-06 con los 4 outbox events v1.
+
 # Sesion 2026-05-06 — TASK-813 cerrada en develop (HubSpot p_services inbound sync + legacy cleanup)
 
 - **Branch:** `develop` por instruccion explicita del usuario.
@@ -23235,6 +23763,35 @@ Pendiente operativo antes de cerrar lifecycle de TASK-408:
 
 - Smoke staging de 5 grupos cohesivos de emails (payroll, leave, auth, finance, digest/Nexa Insights) contra inbox QA y comparacion visual.
 - Observacion 24h post-deploy de `notifications.email.render_failure_rate` en `/admin/operations` con steady=0.
+
+## Sesion 2026-05-07 — Sample Sprints approved shell navigation
+
+Contexto:
+
+- El usuario detecto en staging que los CTAs `Declarar Sprint` / `Nuevo Sprint` no respetaban el mockup aprobado: navegaban a `/agency/sample-sprints/new` y caian en una pantalla/formulario paralelo.
+- Se invocaron skills de UI/UX/microinteracciones repo y globales para corregir el contrato visual y de interacción: `greenhouse-ui-orchestrator`, `greenhouse-ux-content-accessibility`, `greenhouse-microinteractions-auditor`, `ui-product-design-orchestrator`, `ux-content-accessibility`, `microinteractions-auditor`.
+
+Cambios aplicados:
+
+- `SampleSprintsMockupView` acepta `initialActiveSurface` para deep links controlados por tab.
+- Los CTAs internos `Declarar Sprint`, `Nuevo Sprint` y empty-state declaration ya no navegan a `/agency/sample-sprints/new`; activan la tab `Declaración` in-place dentro del shell aprobado.
+- `SampleSprintsWorkspace` ahora usa una sola experiencia runtime aprobada para `list`, `new`, `detail`, `approve`, `progress` y `outcome`, abriendo la tab correspondiente por deep link en vez de mantener formularios legacy paralelos.
+
+Validacion:
+
+- `pnpm exec tsc --noEmit` -> pass.
+- `pnpm design:lint` -> 0 errors / 0 warnings.
+- `pnpm lint` -> pass.
+- `pnpm build` -> pass.
+- Playwright autenticado con `scripts/playwright-auth-setup.mjs`:
+  - `/agency/sample-sprints` inicia en `Command center`.
+  - Click `Declarar Sprint` mantiene URL `/agency/sample-sprints` y activa `Declaración`.
+  - Click `Nuevo Sprint` mantiene URL `/agency/sample-sprints` y activa `Declaración`.
+  - `/agency/sample-sprints/new` abre el mismo shell aprobado con `Declaración` activa.
+
+Riesgos / notas:
+
+- No se tocaron los archivos nuevos no trackeados de client portal (`TASK-822` a `TASK-825` y arquitectura relacionada); quedan fuera de este cambio.
 
 ## Sesion 2026-05-06 — TASK-408 smoke enablement: admin preview catalog completo
 

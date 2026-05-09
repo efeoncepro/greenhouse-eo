@@ -799,6 +799,128 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     })
   }
 
+  if (hasRouteGroup(subject, 'commercial') || hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
+    const source: TenantEntitlementSource = hasRouteGroup(subject, 'commercial') ? 'route_group' : 'role'
+
+    addEntitlement(entries, {
+      module: 'commercial',
+      capability: 'commercial.workspace',
+      action: 'read',
+      scope: 'tenant',
+      source
+    })
+
+    addEntitlement(entries, {
+      module: 'commercial',
+      capability: 'commercial.workspace',
+      action: 'launch',
+      scope: 'tenant',
+      source
+    })
+
+    addEntitlement(entries, {
+      module: 'commercial',
+      capability: 'commercial.pipeline',
+      action: 'read',
+      scope: 'tenant',
+      source
+    })
+
+    for (const action of ['read', 'create', 'update', 'approve', 'export'] as const) {
+      addEntitlement(entries, {
+        module: 'commercial',
+        capability: 'commercial.quotation',
+        action,
+        scope: 'tenant',
+        source
+      })
+    }
+
+    for (const capability of ['commercial.contract', 'commercial.sow', 'commercial.master_agreement', 'commercial.product_catalog'] as const) {
+      for (const action of ['read', 'create', 'update'] as const) {
+        addEntitlement(entries, {
+          module: 'commercial',
+          capability,
+          action,
+          scope: 'tenant',
+          source
+        })
+      }
+    }
+
+    addEntitlement(entries, {
+      module: 'commercial',
+      capability: 'commercial.engagement.read',
+      action: 'read',
+      scope: 'tenant',
+      source
+    })
+
+    addEntitlement(entries, {
+      module: 'commercial',
+      capability: 'commercial.engagement.declare',
+      action: 'create',
+      scope: 'tenant',
+      source
+    })
+
+    addEntitlement(entries, {
+      module: 'commercial',
+      capability: 'commercial.engagement.record_progress',
+      action: 'update',
+      scope: 'tenant',
+      source
+    })
+  }
+
+  if (hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
+    addEntitlement(entries, {
+      module: 'commercial',
+      capability: 'commercial.engagement.approve',
+      action: 'approve',
+      scope: 'tenant',
+      source: 'role'
+    })
+
+    addEntitlement(entries, {
+      module: 'commercial',
+      capability: 'commercial.engagement.record_outcome',
+      action: 'update',
+      scope: 'tenant',
+      source: 'role'
+    })
+  }
+
+  if (hasRole(subject, ROLE_CODES.FINANCE_ADMIN) || hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
+    const source: TenantEntitlementSource = 'role'
+
+    addEntitlement(entries, {
+      module: 'commercial',
+      capability: 'commercial.service_engagement.sync',
+      action: 'sync',
+      scope: 'tenant',
+      source
+    })
+
+    addEntitlement(entries, {
+      module: 'commercial',
+      capability: 'commercial.service_engagement.resolve_orphan',
+      action: 'approve',
+      scope: 'tenant',
+      source
+    })
+  }
+
+  if (hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
+    addEntitlement(entries, {
+      module: 'commercial',
+      capability: 'commercial.service_engagement.archive_legacy',
+      action: 'delete',
+      scope: 'tenant',
+      source: 'role'
+    })
+  }
+
   // Commercial Party Lifecycle (TASK-535 §9.1). Sales roles not yet modeled —
   // binding limited to admin and finance_admin for now. When TASK-536+ lands
   // the sales role family, extend this block (and do not remove the admin
@@ -859,6 +981,109 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     hasRole(subject, ROLE_CODES.EFEONCE_ACCOUNT)
   ) {
     addEntitlement(entries, { module: 'agency', capability: 'home.atrisk.projects', action: 'read', scope: 'team', source: 'role' })
+  }
+
+  // TASK-611 — Organization Workspace facet capabilities.
+  // Spec V1 §4.1 + Apéndice A: matriz capability × relationship × entrypoint.
+  // Estos son los grants BASE derivados de roleCodes/routeGroups; Admin Center
+  // (TASK-404) puede añadir overrides finos cuando la persistencia de grants
+  // emerja (hoy bloqueada por pre-up-marker bug ISSUE separado).
+  //
+  // efeonce_admin → todas las 11 organization.* capabilities con scope 'all'
+  // (incluyendo *_sensitive). Pattern source: spec Apéndice A col internal_admin.
+  if (hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
+    const adminOrgCapabilities: Array<{ capability: EntitlementCapabilityKey; actions: EntitlementAction[] }> = [
+      { capability: 'organization.identity', actions: ['read'] },
+      { capability: 'organization.identity_sensitive', actions: ['read', 'update'] },
+      { capability: 'organization.spaces', actions: ['read'] },
+      { capability: 'organization.team', actions: ['read'] },
+      { capability: 'organization.economics', actions: ['read'] },
+      { capability: 'organization.delivery', actions: ['read'] },
+      { capability: 'organization.finance', actions: ['read'] },
+      { capability: 'organization.finance_sensitive', actions: ['read', 'export', 'approve'] },
+      { capability: 'organization.crm', actions: ['read'] },
+      { capability: 'organization.services', actions: ['read', 'update'] },
+      { capability: 'organization.staff_aug', actions: ['read', 'update'] }
+    ]
+
+    for (const { capability, actions } of adminOrgCapabilities) {
+      for (const action of actions) {
+        addEntitlement(entries, {
+          module: 'organization',
+          capability,
+          action,
+          scope: 'all',
+          source: 'role'
+        })
+      }
+    }
+  }
+
+  // Internal team members (route_group=internal) que NO son admin reciben acceso
+  // baseline a facets no-sensitivos a scope 'tenant'. Excluye economics/finance
+  // (sensitive perimeter) y _sensitive variants (requieren grant explícito).
+  if (hasRouteGroup(subject, 'internal') && !hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
+    const internalBaselineFacets: EntitlementCapabilityKey[] = [
+      'organization.identity',
+      'organization.spaces',
+      'organization.team',
+      'organization.delivery',
+      'organization.crm',
+      'organization.services',
+      'organization.staff_aug'
+    ]
+
+    for (const capability of internalBaselineFacets) {
+      addEntitlement(entries, {
+        module: 'organization',
+        capability,
+        action: 'read',
+        scope: 'tenant',
+        source: 'route_group'
+      })
+    }
+  }
+
+  // Finance team (route_group=finance) gana economics + finance read en organization
+  // workspace. NO finance_sensitive (separado para approval workflow del Admin Center).
+  if (hasRouteGroup(subject, 'finance') && !hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
+    addEntitlement(entries, {
+      module: 'organization',
+      capability: 'organization.economics',
+      action: 'read',
+      scope: 'tenant',
+      source: 'route_group'
+    })
+
+    addEntitlement(entries, {
+      module: 'organization',
+      capability: 'organization.finance',
+      action: 'read',
+      scope: 'tenant',
+      source: 'route_group'
+    })
+  }
+
+  // Client portal users (tenant_type=client) reciben grants 'own' a facets que
+  // tienen sentido en el portal cliente: identity, team, delivery, services.
+  // El relationship resolver garantiza que solo afecta a la org del propio cliente.
+  if (subject.tenantType === 'client') {
+    const clientPortalFacets: EntitlementCapabilityKey[] = [
+      'organization.identity',
+      'organization.team',
+      'organization.delivery',
+      'organization.services'
+    ]
+
+    for (const capability of clientPortalFacets) {
+      addEntitlement(entries, {
+        module: 'organization',
+        capability,
+        action: 'read',
+        scope: 'own',
+        source: 'role'
+      })
+    }
   }
 
   const resolvedEntries = Array.from(entries.values())

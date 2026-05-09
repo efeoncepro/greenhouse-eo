@@ -1,0 +1,7 @@
+interface:
+  display_name: "Software Architect 2026"
+  short_description: "Design, audit, migrate, and document modern software architecture decisions."
+  default_prompt: "Use $software-architect-2026 to evaluate this architecture decision, validate current assumptions, surface risks, and produce ADRs or implementation-ready specs."
+
+policy:
+  allow_implicit_invocation: true

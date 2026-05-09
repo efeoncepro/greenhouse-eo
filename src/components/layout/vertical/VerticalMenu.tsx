@@ -63,9 +63,20 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
   const isAdminUser = session?.user?.routeGroups?.includes('admin') ?? false
   const isHrUser = session?.user?.routeGroups?.includes('hr') ?? false
   const isFinanceUser = session?.user?.routeGroups?.includes('finance') ?? false
+  const isCommercialUser = session?.user?.routeGroups?.includes('commercial') ?? false
   const isPeopleRouteGroup = session?.user?.routeGroups?.includes('people') ?? false
   const isAiToolingUser = session?.user?.routeGroups?.includes('ai_tooling') ?? false
   const isMyUser = session?.user?.routeGroups?.includes('my') ?? false
+
+  const isInternalPortalUser =
+    isInternalUser ||
+    isAdminUser ||
+    isCommercialUser ||
+    isFinanceUser ||
+    isHrUser ||
+    isPeopleRouteGroup ||
+    isAiToolingUser
+
   const isAgencyUser = isInternalUser || isAdminUser
   const roleCodes = session?.user?.roleCodes ?? []
 
@@ -106,6 +117,12 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
     return authorizedViews.includes(viewCode)
   }
 
+  const canSeeAnyView = (viewCodes: string[], fallback: boolean) => {
+    if (authorizedViews.length === 0) return fallback
+
+    return viewCodes.some(viewCode => authorizedViews.includes(viewCode))
+  }
+
   const showSub = !(isCollapsed && !isHovered)
   const ScrollWrapper = isBreakpointReached ? 'div' : PerfectScrollbar
 
@@ -113,6 +130,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
     agency: GH_AGENCY_NAV,
     client: GH_CLIENT_NAV,
     finance: GH_FINANCE_NAV,
+    commercial: GH_COMMERCIAL_NAV,
     hr: GH_HR_NAV,
     internal: GH_INTERNAL_NAV,
     my: GH_MY_NAV,
@@ -129,7 +147,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
   // INTERNAL USERS
   // ═══════════════════════════════════════════════════════════════════════
 
-  if (isInternalUser) {
+  if (isInternalPortalUser) {
     // ── Home ──
     menuData.push({
       label: nl(GH_INTERNAL_NAV.home),
@@ -173,12 +191,14 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
               { label: nl(GH_AGENCY_NAV.campaigns), href: '/agency/campaigns' },
               { label: nl(GH_AGENCY_NAV.organizations), href: '/agency/organizations' },
               { label: nl(GH_AGENCY_NAV.services), href: '/agency/services' },
+              { label: nl(GH_AGENCY_NAV.sampleSprints), href: '/agency/sample-sprints', icon: 'tabler-rocket' },
               { label: nl(GH_AGENCY_NAV.operations), href: '/agency/operations' }
             ].filter(item => {
               if (item.href === '/agency/delivery') return canSeeView('gestion.delivery', true)
               if (item.href === '/agency/campaigns') return canSeeView('gestion.campanas', true)
               if (item.href === '/agency/organizations') return canSeeView('gestion.organizaciones', true)
               if (item.href === '/agency/services') return canSeeView('gestion.servicios', true)
+              if (item.href === '/agency/sample-sprints') return canSeeView('gestion.sample_sprints', true)
               if (item.href === '/agency/operations') return canSeeView('gestion.operaciones', true)
 
               return true
@@ -311,6 +331,38 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
       })
     }
 
+    // ── COMERCIAL (top-level commercial domain over legacy /finance paths) ──
+    if (isCommercialUser || isFinanceUser || isAdminUser) {
+      menuData.push({
+        label: nl(GH_COMMERCIAL_NAV.root),
+        icon: 'tabler-briefcase',
+        children: [
+          { label: nl(GH_COMMERCIAL_NAV.pipeline), href: '/finance/intelligence/pipeline', icon: 'tabler-stack-2' },
+          { label: nl(GH_COMMERCIAL_NAV.quotes), href: '/finance/quotes', icon: 'tabler-file-dollar' },
+          { label: nl(GH_COMMERCIAL_NAV.contracts), href: '/finance/contracts', icon: 'tabler-file-description' },
+          {
+            label: nl(GH_COMMERCIAL_NAV.masterAgreements),
+            href: '/finance/master-agreements',
+            icon: 'tabler-file-certificate'
+          },
+          { label: nl(GH_COMMERCIAL_NAV.sampleSprints), href: '/agency/sample-sprints', icon: 'tabler-rocket' },
+          { label: nl(GH_COMMERCIAL_NAV.products), href: '/finance/products', icon: 'tabler-packages' }
+        ].filter(item => {
+          if (item.href === '/finance/intelligence/pipeline') {
+            return canSeeAnyView(['comercial.pipeline', 'finanzas.inteligencia'], false) || isCommercialUser || isFinanceUser || isAdminUser
+          }
+
+          if (item.href === '/finance/quotes') return canSeeAnyView(['comercial.cotizaciones', 'finanzas.cotizaciones'], true)
+          if (item.href === '/finance/contracts') return canSeeAnyView(['comercial.contratos', 'comercial.sow'], true)
+          if (item.href === '/finance/master-agreements') return canSeeView('comercial.acuerdos_marco', true)
+          if (item.href === '/agency/sample-sprints') return canSeeView('gestion.sample_sprints', isCommercialUser || isAdminUser)
+          if (item.href === '/finance/products') return canSeeView('comercial.productos', true)
+
+          return true
+        })
+      })
+    }
+
     // ── FINANZAS (collapsible top-level with nested submenus) ──
     if (isFinanceUser || isAdminUser) {
       menuData.push({
@@ -368,13 +420,10 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
             label: nl(GH_FINANCE_NAV.documents),
             icon: 'tabler-file-check',
             children: [
-              { label: nl(GH_FINANCE_NAV.quotes), href: '/finance/quotes' },
-              { label: nl(GH_FINANCE_NAV.masterAgreements), href: '/finance/master-agreements', icon: 'tabler-file-certificate' },
               { label: nl(GH_FINANCE_NAV.purchaseOrders), href: '/finance/purchase-orders' },
               { label: nl(GH_FINANCE_NAV.hes), href: '/finance/hes' },
               { label: nl(GH_FINANCE_NAV.reconciliation), href: '/finance/reconciliation' }
             ].filter(item => {
-              if (item.href === '/finance/quotes') return canSeeView('finanzas.cotizaciones', true)
               if (item.href === '/finance/purchase-orders') return canSeeView('finanzas.ordenes_compra', true)
               if (item.href === '/finance/hes') return canSeeView('finanzas.hes', true)
               if (item.href === '/finance/reconciliation') return canSeeView('finanzas.conciliacion', true)
@@ -540,7 +589,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
   // CLIENT USERS (external portal)
   // ═══════════════════════════════════════════════════════════════════════
 
-  if (!isInternalUser) {
+  if (!isInternalPortalUser) {
     // Pure collaborator home
     if (isMyUser) {
       menuData.splice(0, 0, {

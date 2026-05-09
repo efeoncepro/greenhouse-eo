@@ -334,7 +334,7 @@ const ContractDetailView = () => {
         </Box>
 
         <Link href='/finance/contracts' style={{ textDecoration: 'none' }}>
-          <Typography color='primary'>Volver a contratos</Typography>
+          <Typography color='primary'>Volver a contratos comerciales</Typography>
         </Link>
       </Stack>
 
@@ -381,7 +381,7 @@ const ContractDetailView = () => {
       <Card>
         <Tabs value={tab} onChange={(_event, value) => setTab(value)} sx={{ px: 4, pt: 2 }}>
           <Tab label='Resumen' value='overview' />
-          <Tab label='Quotes' value='quotes' />
+          <Tab label='Cotizaciones' value='quotes' />
           <Tab label='Cadena documental' value='chain' />
           <Tab label='Rentabilidad' value='profitability' />
         </Tabs>
@@ -406,7 +406,7 @@ const ContractDetailView = () => {
                       <Typography><strong>Modelo comercial:</strong> {contract.commercialModel ?? '—'}</Typography>
                       <Typography><strong>Staffing model:</strong> {contract.staffingModel ?? '—'}</Typography>
                       <Typography><strong>MSA asociado:</strong> {contract.msaNumber ? `MSA ${contract.msaNumber}` : '—'}</Typography>
-                      <Typography><strong>Quote originadora:</strong> {contract.originatorQuoteNumber ?? '—'}</Typography>
+                      <Typography><strong>Cotización originadora:</strong> {contract.originatorQuoteNumber ?? '—'}</Typography>
                       <Typography><strong>Firmado:</strong> {formatDate(contract.signedAt)}</Typography>
                       <Typography><strong>Renovado:</strong> {formatDate(contract.renewedAt)}</Typography>
                       <Typography><strong>Terminado:</strong> {formatDate(contract.terminatedAt)}</Typography>
@@ -437,7 +437,7 @@ const ContractDetailView = () => {
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell>Quote</TableCell>
+                    <TableCell>Cotización</TableCell>
                     <TableCell>Relación</TableCell>
                     <TableCell>Estado</TableCell>
                     <TableCell>Vigencia</TableCell>

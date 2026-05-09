@@ -2,7 +2,18 @@
 
 > **Version:** 1.0
 > **Created:** 2026-03-30
-> **Last updated:** 2026-05-05 (TASK-753 Payment Profiles Self-Service + inline drain)
+> **Last updated:** 2026-05-07 (TASK-815 Direct Service Expense Allocation Primitive)
+
+## Delta 2026-05-07 — TASK-815 Direct Service Expense Allocation Primitive
+
+Finance agrega una primitive gerencial explícita para asociar gastos directos de cliente a services sin mutar el documento fiscal ni inferir por heurística:
+
+- Tabla: `greenhouse_finance.expense_service_allocations`.
+- Scope V1: solo `expenses.cost_is_direct=TRUE` con `allocated_client_id` y `is_annulled=FALSE`.
+- Estado: `draft | approved | rejected`; solo `approved` afecta serving.
+- Guardrails DB: service activo, no `legacy_seed_archived`, no `hubspot_sync_status='unmapped'`, cliente consistente y suma no mayor al monto efectivo/total del expense.
+- Consumers: `greenhouse_serving.commercial_cost_attribution_v2` expone lane `expense_direct_service`; `src/lib/service-attribution/materialize.ts` la consume como direct cost high-confidence.
+- Boundary: no cambia pagos, payment obligations, cash-out, impuestos, IVA, settlement ni economic_category. Es management accounting / attribution, no contabilidad legal.
 
 ## Delta 2026-05-05 — TASK-753 Payment Profiles Self-Service (regime-aware + inline drain)
 
@@ -707,6 +718,27 @@ En `greenhouse_finance.expenses`:
 ### Backfill
 
 La migración `20260421192902964_task-532-purchase-vat-recoverability.sql` backfillea el histórico usando `tax_amount`, `dte_type_code`, `exempt_amount`, `vat_unrecoverable_amount` y `vat_common_use_amount`, y deja `effective_cost_amount` listo para consumers existentes sin recalcular inline.
+
+### Delta 2026-05-09 — Nubox BHE / honorarios con retención
+
+Las compras Nubox tipo `BHE` (boleta de honorarios electrónica) pueden traer
+un `total_amount` pagable neto de retención, por ejemplo:
+`net_amount=175000`, `total_withholding_amount=26688`,
+`total_amount=148312`.
+
+Contrato canónico en PostgreSQL:
+
+- `expenses.total_amount` conserva el monto pagable/conciliable contra banco.
+- `expenses.withholding_amount` conserva la retención informada por Nubox.
+- `expenses.effective_cost_amount` y `tax_snapshot_json.totalAmount`
+  representan el costo bruto fiscal/operativo antes de retención.
+- `sync-nubox-to-postgres` valida el snapshot contra el bruto fiscal
+  (`total_amount + withholding_amount`) cuando la retención explica la
+  diferencia, sin relajar las validaciones globales de IVA.
+
+Rationale: pagos/conciliación necesitan el neto pagable; P&L y costo operativo
+necesitan el bruto antes de retención. Mezclar ambas semánticas en un solo total
+rompe conciliación bancaria o margen, según el lado que consuma el dato.
 
 ### Archivos clave
 
@@ -2371,7 +2403,36 @@ Toda agregación SUM se hace sobre el alias resultante del subselect (`SUM(amoun
 ### Backfill defensivo
 
 - Cron diario `ops-finance-rematerialize-balances` (Cloud Scheduler) rematerializa últimos 7 días automáticamente — el fix se propaga sin script para casos recientes.
-- Para histórico > 7 días: `pnpm tsx --require ./scripts/lib/server-only-shim.cjs scripts/finance/backfill-account-balances-fx-fix.ts --account-id=<id> --from-date=<YYYY-MM-DD>` (idempotente, dry-run mode, anchor OTB canónico TASK-703).
+- TASK-842 agrega `ops-finance-fx-drift-remediate` (Cloud Scheduler 05:15 America/Santiago), que corre después del rematerialize rolling y antes de `ops-finance-ledger-health`.
+- El endpoint interno `POST /finance/account-balances/fx-drift/remediate` vive en `ops-worker`, protegido por Cloud Run IAM + `CRON_SECRET`, y usa `src/lib/finance/account-balances-fx-drift-remediation.ts`.
+- El script manual `scripts/finance/backfill-account-balances-fx-fix.ts` queda como wrapper thin del mismo command canónico; live mode requiere `--apply`.
+
+### TASK-842 — FX Drift Remediation Control Plane
+
+El control plane consume el reader detallado de `finance.account_balances.fx_drift`, clasifica cada fila y ejecuta solo remediación elegible via `rematerializeAccountBalanceRange`. **Nunca** hace `UPDATE` ad hoc sobre `account_balances`.
+
+Policy contract:
+
+| Policy | Mutación | Uso |
+|---|---:|---|
+| `detect_only` | No | Diagnóstico/CLI/plan sin escrituras. |
+| `auto_open_periods` | Sí, acotada | Drift con fuente canónica y sin periodo cerrado ni snapshot aceptado/reconciliado. |
+| `known_bug_class_restatement` | Sí, acotada | Permite cruzar evidencia protegida solo si matchea bug class conocido (`ISSUE-069` seed blind spot: `transaction_count=0`, persisted `in/out=0`, expected movement canónico presente). Usa evidence guard `warn_only` con auditoría. |
+| `strict_no_restatement` | Sí, solo open-period | Bloquea cualquier fila protegida aunque matchee bug conocido. |
+
+Guardrails:
+
+- Defaults scheduler: `windowDays=90`, `maxRows=25`, `maxAccounts=10`, `maxAbsDriftClp=5000000`.
+- Cualquier overflow de filas/cuentas bloquea el run (`blocked_out_of_policy`), no ejecuta rematerialización parcial a ciegas.
+- Periodos cerrados o snapshots `accepted/reconciled` quedan bloqueados salvo policy explícita `known_bug_class_restatement` + evidencia de bug conocido.
+- Post-rematerialización se re-ejecuta el detector y se registra `residualDriftCount`.
+- `account_balances_monthly` se refresca con `refreshMonthlyBatch` para los meses tocados.
+
+Audit/run tracking:
+
+- `greenhouse_sync.source_sync_runs` con `source_system='finance'`, `source_object_type='account_balances_fx_drift_remediation'`, `sync_mode='repair'`.
+- `records_read` = drift rows vistos; `records_written_raw` = rows bloqueados; `records_written_conformed` = rows remediados; `records_projected_postgres` = cuentas rematerializadas.
+- Errores se persisten en `greenhouse_sync.source_sync_failures` con `error_code='FX_DRIFT_REMEDIATION_FAILED'`.
 
 ### Reglas duras (sumadas a TASK-766)
 
@@ -2431,3 +2492,57 @@ Endpoint `/api/finance/bank/[accountId]`:
 - **NUNCA** crear drawer/dashboard nuevo de finance sin declarar `temporalDefaults` en su `InstrumentDetailProfile`.
 - **NUNCA** hardcodear el `mode` en componente UI. Default viene del profile.
 - Nuevos modos (e.g. `quarter`, `ytd`) → agregar al enum + extender helper. NO branchear en consumers.
+
+## Delta 2026-05-08 — TASK-613: Finance Clients ↔ Organization Workspace convergence
+
+### Convergencia Finance + Organization Workspace
+
+`/finance/clients/[id]` ahora se renderiza **a través del Organization Workspace shell canónico** (TASK-612) cuando el flag `organization_workspace_shell_finance` está activo, preservando 1:1 la riqueza del legacy `<ClientDetailView>` (4 sub-tabs Facturación/Contactos/Facturas/Deals + 3 KPIs Por cobrar/Vencidas/Condiciones + AddMembershipDrawer). Cuando el flag está disabled o la organización canónica no es resoluble → cae al legacy `<ClientDetailView>` sin cambios funcionales (zero-risk cutover).
+
+### Patrón canónico: dual-entrypoint dispatch en un facet
+
+Un único componente `<FinanceFacet>` decide qué renderizar inspeccionando `entrypointContext`:
+
+```tsx
+const FinanceFacet = ({ organizationId, entrypointContext }: FacetContentProps) => {
+  if (entrypointContext === 'finance') {
+    return <FinanceClientsContent lookupId={organizationId} />
+  }
+
+  return <FinanceFacetAgencyContent organizationId={organizationId} />
+}
+```
+
+- `entrypointContext === 'finance'` → contenido rico legacy del Finance Clients detail.
+- `entrypointContext === 'agency' | 'admin' | 'client_portal'` → wrapping Agency-flavored del legacy `OrganizationFinanceTab`.
+
+El facet sigue siendo **self-contained**: queries propias, drawers propios. NO renderiza chrome — el shell ya lo hace. Es el patrón de referencia para cuando otro facet necesite divergir per-entrypoint sin fragmentar el FACET_REGISTRY.
+
+### Server-side gate canónico
+
+El page server component es responsable de:
+
+1. `requireServerSession` — prerender-safe, NUNCA `try/catch + getServerAuthSession()` ad hoc.
+2. `isWorkspaceShellEnabledForSubject(subject, 'finance')` — flag-gated rollout via `organization_workspace_shell_finance` (TASK-780 platform).
+3. `resolveFinanceClientContext({clientProfileId, organizationId, clientId, hubspotCompanyId})` — la URL `[id]` puede ser cualquiera de los 4 shapes; el resolver hace OR-matching internamente. Postgres-first + BigQuery fallback ya está en la primitiva canónica.
+4. `resolveOrganizationWorkspaceProjection({subject, organizationId, entrypointContext: 'finance'})` cuando el shell está enabled.
+5. Caer a legacy `<ClientDetailView />` si: flag disabled OR resolver throws OR `organizationId === null`. Errores capturados via `captureWithDomain('finance', ...)`.
+
+### Reliability signal canónico
+
+- **`finance.client_profile.unlinked_organizations`** (kind=`data_quality`, severity=`warning` si count>0). Cuenta `client_profiles` activas con `organization_id IS NULL`. Cuando >0, `/finance/clients/[id]` cae a legacy detail view (degradación honesta). Steady state = 0. Reader: `src/lib/reliability/queries/finance-client-profile-unlinked.ts`. Roll up bajo moduleKey `finance`.
+
+### Reglas duras (TASK-613)
+
+- **NUNCA** ramificar render de un facet por `entrypointContext` afuera del facet mismo. La decisión vive en el facet (self-contained), NO en el page o en el FacetContentRouter.
+- **NUNCA** componer la projection en el cliente ni branchear `entrypointContext` desde un client component. Server-side por construcción.
+- **NUNCA** llamar `resolveFinanceClientContext` con un solo shape cuando el caller tiene la URL `[id]` (cualquier callsite debe pasar los 4 shapes vía OR-matching).
+- **NUNCA** modificar la flag `organization_workspace_shell_finance` directamente vía SQL. Toda mutación pasa por el admin endpoint `POST /api/admin/home/rollout-flags` (TASK-780).
+- **NUNCA** crear un nuevo entrypoint Finance (e.g. `/finance/clients/admin/[id]`) que duplique el shell legacy. Extender la projection con un nuevo `entrypointContext` o el dispatch del FinanceFacet.
+
+### Roadmap operativo (rollout)
+
+1. V1 default OFF (flag global `enabled=FALSE` desde migration `20260508132302091`).
+2. Activar para pilot users (efeonce admins) via `POST /api/admin/home/rollout-flags` con `scope_type='user'`.
+3. Validar en staging E2E, luego flip global cuando reliability signals estén en steady state.
+4. Cleanup de `<ClientDetailView />` legacy queda como follow-up post 100% rollout (>= 90 días sin reverts).

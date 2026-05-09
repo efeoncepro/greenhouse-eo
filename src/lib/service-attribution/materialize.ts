@@ -169,6 +169,20 @@ type AllocationSourceRow = {
   effective_date: string | null
 }
 
+type ServiceAllocationSourceRow = {
+  allocation_id: string
+  expense_id: string
+  service_id: string
+  client_id: string | null
+  period_year: number
+  period_month: number
+  allocated_amount_clp: number | string | null
+  allocation_source: string
+  expense_currency: string | null
+  expense_total_amount: number | string | null
+  effective_date: string | null
+}
+
 type CommercialCostRow = {
   member_id: string
   client_id: string
@@ -638,7 +652,7 @@ const loadPeriodContext = async (year: number, month: number) => {
   const db = await getDb()
   const { periodStart, periodEnd } = getMonthDateRange(year, month)
 
-  const [servicesResult, quotesResult, contractsResult, poResult, hesResult, incomeResult, expenseResult, allocationResult, costResult] =
+  const [servicesResult, quotesResult, contractsResult, poResult, hesResult, incomeResult, expenseResult, allocationResult, serviceAllocationResult, costResult] =
     await Promise.all([
       sql<ServiceContextRow>`
         SELECT
@@ -750,6 +764,28 @@ const loadPeriodContext = async (year: number, month: number) => {
           AND ca.period_month = ${month}
           AND e.payroll_entry_id IS NULL
       `.execute(db),
+      sql<ServiceAllocationSourceRow>`
+        SELECT
+          esa.allocation_id,
+          esa.expense_id,
+          esa.service_id,
+          esa.client_id,
+          esa.period_year,
+          esa.period_month,
+          esa.allocated_amount_clp,
+          esa.allocation_source,
+          e.currency AS expense_currency,
+          COALESCE(e.effective_cost_amount, e.total_amount) AS expense_total_amount,
+          COALESCE(e.document_date, e.payment_date)::text AS effective_date
+        FROM greenhouse_finance.expense_service_allocations esa
+        INNER JOIN greenhouse_finance.expenses e
+          ON e.expense_id = esa.expense_id
+        WHERE esa.period_year = ${year}
+          AND esa.period_month = ${month}
+          AND esa.review_status = 'approved'
+          AND e.payroll_entry_id IS NULL
+          AND COALESCE(e.is_annulled, FALSE) = FALSE
+      `.execute(db),
       sql<CommercialCostRow>`
         SELECT
           member_id,
@@ -796,6 +832,7 @@ const loadPeriodContext = async (year: number, month: number) => {
     incomes: incomeResult.rows,
     expenses: expenseResult.rows,
     allocations: allocationResult.rows,
+    serviceAllocations: serviceAllocationResult.rows,
     commercialCosts: costResult.rows
   }
 }
@@ -814,6 +851,7 @@ export const materializeServiceAttributionForPeriod = async (
     incomes,
     expenses,
     allocations,
+    serviceAllocations,
     commercialCosts
   } = await loadPeriodContext(year, month)
 
@@ -822,6 +860,7 @@ export const materializeServiceAttributionForPeriod = async (
   const incomeFactsByIncomeId = new Map<string, ServiceAttributionFact[]>()
 
   const serviceById = indexes.byId
+  const serviceAllocationTotalsByExpense = new Map<string, number>()
 
   for (const income of incomes) {
     const grossRevenueClp = round2(
@@ -955,8 +994,76 @@ export const materializeServiceAttributionForPeriod = async (
     return true
   }
 
+  for (const allocation of serviceAllocations) {
+    const amountClp = round2(toNumber(allocation.allocated_amount_clp))
+
+    if (amountClp <= 0) continue
+
+    const service = serviceById.get(allocation.service_id)
+
+    serviceAllocationTotalsByExpense.set(
+      allocation.expense_id,
+      round2((serviceAllocationTotalsByExpense.get(allocation.expense_id) || 0) + amountClp)
+    )
+
+    if (!service) {
+      unresolved.push(buildUnresolved({
+        periodYear: year,
+        periodMonth: month,
+        spaceId: null,
+        organizationId: null,
+        clientId: normalizeNullableString(allocation.client_id),
+        sourceDomain: 'finance_direct_cost',
+        sourceType: 'expense_service_allocation',
+        sourceId: allocation.allocation_id,
+        amountKind: 'direct_cost',
+        sourceCurrency: normalizeNullableString(allocation.expense_currency),
+        sourceAmount: round2(toNumber(allocation.expense_total_amount)),
+        amountClp,
+        attemptedMethod: 'approved_expense_service_allocation',
+        reasonCode: 'service_not_in_period_context',
+        confidenceLabel: 'low',
+        confidenceScore: SERVICE_ATTRIBUTION_CONFIDENCE.low,
+        candidateServiceIds: [allocation.service_id],
+        candidateSpaceIds: [],
+        evidenceJson: {
+          allocationId: allocation.allocation_id,
+          expenseId: allocation.expense_id,
+          allocationSource: allocation.allocation_source,
+          effectiveDate: allocation.effective_date
+        },
+        materializationReason: reason
+      }))
+      continue
+    }
+
+    facts.push(buildResolvedFact({
+      service,
+      periodYear: year,
+      periodMonth: month,
+      sourceDomain: 'finance_direct_cost',
+      sourceType: 'expense_service_allocation',
+      sourceId: allocation.allocation_id,
+      amountKind: 'direct_cost',
+      sourceCurrency: normalizeNullableString(allocation.expense_currency),
+      sourceAmount: round2(toNumber(allocation.expense_total_amount)),
+      amountClp,
+      attributionMethod: 'approved_expense_service_allocation',
+      confidenceLabel: 'high',
+      confidenceScore: SERVICE_ATTRIBUTION_CONFIDENCE.high,
+      evidenceJson: {
+        allocationId: allocation.allocation_id,
+        expenseId: allocation.expense_id,
+        allocationSource: allocation.allocation_source,
+        effectiveDate: allocation.effective_date
+      },
+      materializationReason: reason
+    }))
+  }
+
   for (const expense of expenses) {
-    const amountClp = round2(toNumber(expense.total_amount_clp))
+    const approvedServiceAllocationClp = serviceAllocationTotalsByExpense.get(expense.expense_id) || 0
+    const amountClp = round2(toNumber(expense.total_amount_clp) - approvedServiceAllocationClp)
 
     if (amountClp <= 0) continue
 
@@ -968,7 +1075,7 @@ export const materializeServiceAttributionForPeriod = async (
       expense.expense_id,
       normalizeNullableString(expense.currency),
       round2(toNumber(expense.total_amount)),
-      { expenseId: expense.expense_id, effectiveDate: expense.effective_date }
+      { expenseId: expense.expense_id, effectiveDate: expense.effective_date, approvedServiceAllocationClp }
     )
 
     if (bridged) continue
@@ -1008,7 +1115,8 @@ export const materializeServiceAttributionForPeriod = async (
         evidenceJson: {
           ...resolution.evidence,
           expenseId: expense.expense_id,
-          effectiveDate: expense.effective_date
+          effectiveDate: expense.effective_date,
+          approvedServiceAllocationClp
         },
         materializationReason: reason
       }))
@@ -1035,7 +1143,8 @@ export const materializeServiceAttributionForPeriod = async (
         evidenceJson: {
           ...resolution.evidence,
           expenseId: expense.expense_id,
-          effectiveDate: expense.effective_date
+          effectiveDate: expense.effective_date,
+          approvedServiceAllocationClp
         },
         materializationReason: reason
       }))

@@ -1,0 +1,3 @@
+display_name: Greenhouse Mockup Builder
+short_description: Build mockups as real Greenhouse portal routes with mock data and repo primitives.
+default_prompt: Build this Greenhouse mockup as a real Next.js route with typed mock data, Vuexy/MUI wrappers, Greenhouse primitives, and validation.

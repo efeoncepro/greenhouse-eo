@@ -40,19 +40,158 @@ import type { ReliabilitySignal } from '@/types/reliability'
 export const ACCOUNT_BALANCES_FX_DRIFT_SIGNAL_ID =
   'finance.account_balances.fx_drift'
 
-const QUERY_SQL = `
+const DEFAULT_WINDOW_DAYS = 90
+const DEFAULT_TOLERANCE_CLP = 1
+const DEFAULT_LIMIT = 100
+const MAX_LIMIT = 500
+
+export type AccountBalancesFxDriftRow = {
+  accountId: string
+  accountName: string
+  currency: string
+  balanceDate: string
+  isPeriodClosed: boolean
+  transactionCount: number
+  persistedInflowsClp: string
+  persistedOutflowsClp: string
+  persistedClosingBalanceClp: string | null
+  expectedInflowsClp: string
+  expectedOutflowsClp: string
+  expectedClosingBalanceClp: string | null
+  driftClp: string
+  absDriftClp: string
+  evidenceRefs: {
+    settlementLegs: number
+    incomePayments: number
+    expensePayments: number
+  }
+  detectedAt: string
+}
+
+export type AccountBalancesFxDriftQueryOptions = {
+  windowDays?: number
+  toleranceClp?: number
+  limit?: number
+  accountId?: string
+  fromDate?: string
+  toDate?: string
+}
+
+type AccountBalancesFxDriftSqlRow = {
+  account_id: string
+  account_name: string
+  currency: string
+  balance_date: string
+  is_period_closed: boolean
+  transaction_count: number | null
+  persisted_inflows_clp: string
+  persisted_outflows_clp: string
+  persisted_closing_balance_clp: string | null
+  expected_inflows_clp: string
+  expected_outflows_clp: string
+  expected_closing_balance_clp: string | null
+  drift_clp: string
+  abs_drift_clp: string
+  settlement_leg_count: number | string | null
+  income_payment_count: number | string | null
+  expense_payment_count: number | string | null
+  detected_at: string
+}
+
+const clampInteger = (value: number | undefined, fallback: number, min: number, max: number) => {
+  if (typeof value !== 'number' || !Number.isFinite(value)) return fallback
+
+  return Math.min(Math.max(Math.trunc(value), min), max)
+}
+
+const normalizeDate = (value: string | undefined) =>
+  value && /^\d{4}-\d{2}-\d{2}$/.test(value) ? value : undefined
+
+const buildAccountBalancesFxDriftSql = (
+  options: AccountBalancesFxDriftQueryOptions = {},
+  mode: 'count' | 'rows'
+) => {
+  const params: Array<string | number> = []
+  const filters: string[] = []
+  const windowDays = clampInteger(options.windowDays, DEFAULT_WINDOW_DAYS, 1, 365)
+
+  const toleranceClp = Number.isFinite(options.toleranceClp)
+    ? Math.max(Number(options.toleranceClp), 0)
+    : DEFAULT_TOLERANCE_CLP
+
+  const fromDate = normalizeDate(options.fromDate)
+  const toDate = normalizeDate(options.toDate)
+  const accountId = options.accountId?.trim()
+
+  if (fromDate) {
+    params.push(fromDate)
+    filters.push(`ab.balance_date >= $${params.length}::date`)
+  } else {
+    params.push(windowDays)
+    filters.push(`ab.balance_date >= CURRENT_DATE - ($${params.length}::int * INTERVAL '1 day')`)
+  }
+
+  if (toDate) {
+    params.push(toDate)
+    filters.push(`ab.balance_date <= $${params.length}::date`)
+  }
+
+  if (accountId) {
+    params.push(accountId)
+    filters.push(`ab.account_id = $${params.length}`)
+  }
+
+  params.push(toleranceClp)
+  const toleranceParam = `$${params.length}::numeric`
+
+  const limit = clampInteger(options.limit, DEFAULT_LIMIT, 1, MAX_LIMIT)
+  const limitClause = mode === 'rows' ? `LIMIT ${limit}` : ''
+
+  const selectClause =
+    mode === 'count'
+      ? 'SELECT COUNT(*)::int AS n FROM drift_rows'
+      : `SELECT
+          account_id,
+          account_name,
+          currency,
+          balance_date::text AS balance_date,
+          is_period_closed,
+          transaction_count,
+          persisted_inflows_clp::text,
+          persisted_outflows_clp::text,
+          persisted_closing_balance_clp::text,
+          expected_inflows_clp::text,
+          expected_outflows_clp::text,
+          expected_closing_balance_clp::text,
+          drift_clp::text,
+          abs_drift_clp::text,
+          settlement_leg_count,
+          income_payment_count,
+          expense_payment_count,
+          detected_at::text
+        FROM drift_rows
+        ORDER BY abs_drift_clp DESC, balance_date DESC, account_id ASC
+        ${limitClause}`
+
+  const sql = `
   WITH expected_per_day AS (
     SELECT
       ab.account_id,
+      a.account_name,
+      a.currency,
       ab.balance_date,
       ab.period_inflows,
       ab.period_outflows,
+      ab.closing_balance_clp,
+      ab.is_period_closed,
+      ab.transaction_count,
       COALESCE(SUM(CASE WHEN sl.direction = 'incoming'
         THEN COALESCE(sl.amount_clp, CASE WHEN sl.currency = 'CLP' THEN sl.amount END)
         ELSE 0 END), 0) AS expected_settlement_in,
       COALESCE(SUM(CASE WHEN sl.direction = 'outgoing'
         THEN COALESCE(sl.amount_clp, CASE WHEN sl.currency = 'CLP' THEN sl.amount END)
-        ELSE 0 END), 0) AS expected_settlement_out
+        ELSE 0 END), 0) AS expected_settlement_out,
+      COUNT(sl.settlement_leg_id)::int AS settlement_leg_count
     FROM greenhouse_finance.account_balances ab
     INNER JOIN greenhouse_finance.accounts a ON a.account_id = ab.account_id
     LEFT JOIN greenhouse_finance.settlement_legs sl
@@ -60,21 +199,36 @@ const QUERY_SQL = `
       AND sl.transaction_date = ab.balance_date
       AND sl.superseded_at IS NULL
       AND sl.superseded_by_otb_id IS NULL
-    WHERE ab.balance_date >= CURRENT_DATE - INTERVAL '90 days'
+    WHERE ${filters.join('\n      AND ')}
       -- TASK-774 Slice 7b: solo comparar cuentas CLP nativas. Cuentas USD/EUR
       -- nativas tienen period_inflows/outflows en moneda nativa (NO en CLP)
       -- y compararlas contra payment_amount_clp generaria falsos positivos.
       AND a.currency = 'CLP'
-    GROUP BY ab.account_id, ab.balance_date, ab.period_inflows, ab.period_outflows
+    GROUP BY
+      ab.account_id,
+      a.account_name,
+      a.currency,
+      ab.balance_date,
+      ab.period_inflows,
+      ab.period_outflows,
+      ab.closing_balance_clp,
+      ab.is_period_closed,
+      ab.transaction_count
   ),
   expected_payments AS (
     SELECT
       epd.account_id,
+      epd.account_name,
+      epd.currency,
       epd.balance_date,
       epd.period_inflows,
       epd.period_outflows,
+      epd.closing_balance_clp,
+      epd.is_period_closed,
+      epd.transaction_count,
       epd.expected_settlement_in,
       epd.expected_settlement_out,
+      epd.settlement_leg_count,
       COALESCE((
         SELECT SUM(ipn.payment_amount_clp)
         FROM greenhouse_finance.income_payments_normalized ipn
@@ -90,6 +244,20 @@ const QUERY_SQL = `
           )
       ), 0) AS expected_payment_in,
       COALESCE((
+        SELECT COUNT(*)::int
+        FROM greenhouse_finance.income_payments_normalized ipn
+        WHERE ipn.payment_account_id = epd.account_id
+          AND ipn.payment_date = epd.balance_date
+          AND NOT EXISTS (
+            SELECT 1 FROM greenhouse_finance.settlement_legs sl2
+            WHERE sl2.linked_payment_type = 'income_payment'
+              AND sl2.linked_payment_id = ipn.payment_id
+              AND sl2.instrument_id = epd.account_id
+              AND sl2.superseded_at IS NULL
+              AND sl2.superseded_by_otb_id IS NULL
+          )
+      ), 0)::int AS income_payment_count,
+      COALESCE((
         SELECT SUM(epn.payment_amount_clp)
         FROM greenhouse_finance.expense_payments_normalized epn
         WHERE epn.payment_account_id = epd.account_id
@@ -102,24 +270,117 @@ const QUERY_SQL = `
               AND sl3.superseded_at IS NULL
               AND sl3.superseded_by_otb_id IS NULL
           )
-      ), 0) AS expected_payment_out
+      ), 0) AS expected_payment_out,
+      COALESCE((
+        SELECT COUNT(*)::int
+        FROM greenhouse_finance.expense_payments_normalized epn
+        WHERE epn.payment_account_id = epd.account_id
+          AND epn.payment_date = epd.balance_date
+          AND NOT EXISTS (
+            SELECT 1 FROM greenhouse_finance.settlement_legs sl3
+            WHERE sl3.linked_payment_type = 'expense_payment'
+              AND sl3.linked_payment_id = epn.payment_id
+              AND sl3.instrument_id = epd.account_id
+              AND sl3.superseded_at IS NULL
+              AND sl3.superseded_by_otb_id IS NULL
+          )
+      ), 0)::int AS expense_payment_count
     FROM expected_per_day epd
+  ),
+  drift_rows AS (
+    SELECT
+      ep.account_id,
+      ep.account_name,
+      ep.currency,
+      ep.balance_date,
+      ep.is_period_closed,
+      ep.transaction_count,
+      ep.period_inflows AS persisted_inflows_clp,
+      ep.period_outflows AS persisted_outflows_clp,
+      ep.closing_balance_clp AS persisted_closing_balance_clp,
+      (ep.expected_settlement_in + ep.expected_payment_in) AS expected_inflows_clp,
+      (ep.expected_settlement_out + ep.expected_payment_out) AS expected_outflows_clp,
+      CASE
+        WHEN ep.closing_balance_clp IS NULL THEN NULL
+        ELSE ep.closing_balance_clp + (
+          (ep.expected_settlement_in + ep.expected_payment_in)
+          - (ep.expected_settlement_out + ep.expected_payment_out)
+          - (ep.period_inflows - ep.period_outflows)
+        )
+      END AS expected_closing_balance_clp,
+      (
+        (ep.expected_settlement_in + ep.expected_payment_in)
+        - (ep.expected_settlement_out + ep.expected_payment_out)
+        - (ep.period_inflows - ep.period_outflows)
+      ) AS drift_clp,
+      ABS(
+        (ep.expected_settlement_in + ep.expected_payment_in)
+        - (ep.expected_settlement_out + ep.expected_payment_out)
+        - (ep.period_inflows - ep.period_outflows)
+      ) AS abs_drift_clp,
+      ep.settlement_leg_count,
+      ep.income_payment_count,
+      ep.expense_payment_count,
+      NOW() AS detected_at
+    FROM expected_payments ep
+    WHERE ABS(
+      (ep.expected_settlement_in + ep.expected_payment_in)
+      - (ep.expected_settlement_out + ep.expected_payment_out)
+      - (ep.period_inflows - ep.period_outflows)
+    ) > ${toleranceParam}
   )
-  SELECT COUNT(*)::int AS n
-  FROM expected_payments ep
-  WHERE ABS(
-    (ep.expected_settlement_in + ep.expected_payment_in)
-    - (ep.expected_settlement_out + ep.expected_payment_out)
-    - (ep.period_inflows - ep.period_outflows)
-  ) > 1
-`
+  ${selectClause}
+  `
+
+  return { sql, params, windowDays, toleranceClp }
+}
+
+const mapFxDriftRow = (row: AccountBalancesFxDriftSqlRow): AccountBalancesFxDriftRow => ({
+  accountId: row.account_id,
+  accountName: row.account_name,
+  currency: row.currency,
+  balanceDate: row.balance_date,
+  isPeriodClosed: row.is_period_closed,
+  transactionCount: Number(row.transaction_count ?? 0),
+  persistedInflowsClp: row.persisted_inflows_clp,
+  persistedOutflowsClp: row.persisted_outflows_clp,
+  persistedClosingBalanceClp: row.persisted_closing_balance_clp,
+  expectedInflowsClp: row.expected_inflows_clp,
+  expectedOutflowsClp: row.expected_outflows_clp,
+  expectedClosingBalanceClp: row.expected_closing_balance_clp,
+  driftClp: row.drift_clp,
+  absDriftClp: row.abs_drift_clp,
+  evidenceRefs: {
+    settlementLegs: Number(row.settlement_leg_count ?? 0),
+    incomePayments: Number(row.income_payment_count ?? 0),
+    expensePayments: Number(row.expense_payment_count ?? 0)
+  },
+  detectedAt: row.detected_at
+})
+
+export const listAccountBalancesFxDriftRows = async (
+  options: AccountBalancesFxDriftQueryOptions = {}
+): Promise<AccountBalancesFxDriftRow[]> => {
+  const { sql, params } = buildAccountBalancesFxDriftSql(options, 'rows')
+  const rows = await query<AccountBalancesFxDriftSqlRow>(sql, params)
+
+  return rows.map(mapFxDriftRow)
+}
+
+export const countAccountBalancesFxDriftRows = async (
+  options: Omit<AccountBalancesFxDriftQueryOptions, 'limit'> = {}
+): Promise<number> => {
+  const { sql, params } = buildAccountBalancesFxDriftSql(options, 'count')
+  const rows = await query<{ n: number }>(sql, params)
+
+  return Number(rows[0]?.n ?? 0)
+}
 
 export const getAccountBalancesFxDriftSignal = async (): Promise<ReliabilitySignal> => {
   const observedAt = new Date().toISOString()
 
   try {
-    const rows = await query<{ n: number }>(QUERY_SQL)
-    const count = Number(rows[0]?.n ?? 0)
+    const count = await countAccountBalancesFxDriftRows()
 
     return {
       signalId: ACCOUNT_BALANCES_FX_DRIFT_SIGNAL_ID,
@@ -147,17 +408,17 @@ export const getAccountBalancesFxDriftSignal = async (): Promise<ReliabilitySign
         {
           kind: 'metric',
           label: 'window_days',
-          value: '90'
+          value: String(DEFAULT_WINDOW_DAYS)
         },
         {
           kind: 'metric',
           label: 'tolerance_clp',
-          value: '1'
+          value: String(DEFAULT_TOLERANCE_CLP)
         },
         {
           kind: 'doc',
           label: 'Spec',
-          value: 'docs/tasks/in-progress/TASK-774-account-balance-clp-native-reader-contract.md (slice 4)'
+          value: 'docs/tasks/complete/TASK-774-account-balance-clp-native-reader-contract.md + docs/tasks/in-progress/TASK-842-finance-fx-drift-auto-remediation-control-plane.md'
         }
       ]
     }

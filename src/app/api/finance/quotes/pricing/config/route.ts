@@ -22,7 +22,7 @@ import {
   type QuotationPricingCurrency,
   type RoleRateSeniorityLevel
 } from '@/lib/finance/pricing'
-import { hasRoleCode, requireFinanceTenantContext } from '@/lib/tenant/authorization'
+import { hasRoleCode, requireCommercialTenantContext } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
 
@@ -32,7 +32,7 @@ const canEditPricingConfig = (tenant: Parameters<typeof hasRoleCode>[0]) =>
   FINANCE_ADMIN_ROLES.some(role => hasRoleCode(tenant, role))
 
 export async function GET() {
-  const { tenant, errorResponse } = await requireFinanceTenantContext()
+  const { tenant, errorResponse } = await requireCommercialTenantContext()
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -117,7 +117,7 @@ interface UpsertPricingConfigPayload {
 }
 
 export async function PUT(request: Request) {
-  const { tenant, errorResponse } = await requireFinanceTenantContext()
+  const { tenant, errorResponse } = await requireCommercialTenantContext()
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

@@ -4,7 +4,7 @@ import type { ContractStatus } from '@/lib/commercial-intelligence/contracts'
 import { ensureContractForQuotation } from '@/lib/commercial/contract-lifecycle'
 import { listFinanceContracts } from '@/lib/commercial/contracts-store'
 import { resolveQuotationIdentity } from '@/lib/finance/pricing'
-import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
+import { requireCommercialTenantContext } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
 
@@ -24,7 +24,7 @@ interface CreateContractBody {
 }
 
 export async function GET(request: Request) {
-  const { tenant, errorResponse } = await requireFinanceTenantContext()
+  const { tenant, errorResponse } = await requireCommercialTenantContext()
 
   if (!tenant) return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
@@ -46,7 +46,7 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const { tenant, errorResponse } = await requireFinanceTenantContext()
+  const { tenant, errorResponse } = await requireCommercialTenantContext()
 
   if (!tenant) return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 

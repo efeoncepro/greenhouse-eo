@@ -1,6 +1,7 @@
 import {
   GH_AGENCY_NAV,
   GH_CLIENT_NAV,
+  GH_COMMERCIAL_NAV,
   GH_FINANCE_NAV,
   GH_HR_NAV,
   GH_INTERNAL_NAV,
@@ -26,6 +27,7 @@ type NavigationCopy = {
   internal: WidenNavigation<typeof GH_INTERNAL_NAV>
   people: WidenNavigation<typeof GH_PEOPLE_NAV>
   agency: WidenNavigation<typeof GH_AGENCY_NAV>
+  commercial: WidenNavigation<typeof GH_COMMERCIAL_NAV>
   finance: WidenNavigation<typeof GH_FINANCE_NAV>
   hr: WidenNavigation<typeof GH_HR_NAV>
   my: WidenNavigation<typeof GH_MY_NAV>
@@ -36,6 +38,7 @@ const esCL: NavigationCopy = {
   internal: GH_INTERNAL_NAV,
   people: GH_PEOPLE_NAV,
   agency: GH_AGENCY_NAV,
+  commercial: GH_COMMERCIAL_NAV,
   finance: GH_FINANCE_NAV,
   hr: GH_HR_NAV,
   my: GH_MY_NAV
@@ -94,6 +97,7 @@ const enUS: NavigationCopy = {
     capacity: { label: 'Capacity', subtitle: 'Global team workload' },
     organizations: { label: 'Organizations', subtitle: 'Accounts, relationships and structure' },
     services: { label: 'Services', subtitle: 'Services contracted by Space' },
+    sampleSprints: { label: 'Sample Sprints', subtitle: 'Commercial pilots, trials and discovery' },
     staffAugmentation: { label: 'Staff Augmentation', subtitle: 'Placements, onboarding and assignment economics' },
     economics: { label: 'Economics', subtitle: 'P&L and profitability' },
     team: { label: 'Capacity', subtitle: 'Team workload and allocation' },
@@ -105,6 +109,15 @@ const enUS: NavigationCopy = {
     teamAndTalent: { label: 'Team and talent', subtitle: 'Capacity, discovery and staffing' },
     operationsGroup: { label: 'Operations', subtitle: 'Delivery, campaigns and structure' }
   },
+  commercial: {
+    root: { label: 'Commercial', subtitle: 'Pipeline, agreements and sellable catalog' },
+    pipeline: { label: 'Pipeline', subtitle: 'Commercial forecast and active opportunities' },
+    quotes: { label: 'Quotes', subtitle: 'Commercial proposals and approval' },
+    contracts: { label: 'Contracts', subtitle: 'Contracts, SOWs and active renewals' },
+    masterAgreements: { label: 'Master agreements', subtitle: 'MSAs and master clauses' },
+    sampleSprints: { label: 'Sample Sprints', subtitle: 'Commercial pilots, trials and discovery' },
+    products: { label: 'Products', subtitle: 'Sellable catalog synced with HubSpot' }
+  },
   finance: {
     dashboard: { label: 'Summary', subtitle: 'Consolidated view' },
     income: { label: 'Sales', subtitle: 'Sales documents, accrual and collections' },
@@ -114,10 +127,6 @@ const enUS: NavigationCopy = {
     paymentOrders: { label: 'Payment orders', subtitle: 'Obligations, orders and payment calendar' },
     paymentProfiles: { label: 'Payment profiles', subtitle: 'Approval queue and cross-entity drift' },
     intelligence: { label: 'Economics', subtitle: 'Period close and operational P&L' },
-    quotes: { label: 'Quotes', subtitle: 'Nubox and HubSpot quotes in one place' },
-    contracts: { label: 'Contracts', subtitle: 'SOWs, renewals and active commercial execution' },
-    masterAgreements: { label: 'Master agreements', subtitle: 'MSAs, master clauses and linked contracts' },
-    products: { label: 'Products', subtitle: 'Product and service catalog synced with HubSpot' },
     purchaseOrders: { label: 'Purchase orders', subtitle: 'Client POs, balances and consumption' },
     hes: { label: 'HES', subtitle: 'Service entry sheets' },
     clients: { label: 'Clients', subtitle: 'Client master data and coverage' },
@@ -128,7 +137,7 @@ const enUS: NavigationCopy = {
     bank: { label: 'Banking', subtitle: 'Treasury by account, fintech and instruments' },
     shareholderAccount: { label: 'Shareholder account', subtitle: 'Company-shareholder balance' },
     cashPosition: { label: 'Cash position', subtitle: 'Real balance, receivables and payables' },
-    documents: { label: 'Documents', subtitle: 'Quotes, POs, HES and reconciliation' },
+    documents: { label: 'Documents', subtitle: 'POs, HES and reconciliation' },
     analytics: { label: 'Intelligence', subtitle: 'Economics and cost allocations' },
     treasury: { label: 'Treasury', subtitle: 'Collections, payments, banking and cash position' }
   },

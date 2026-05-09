@@ -19,7 +19,7 @@ import { useDropzone } from 'react-dropzone'
 import AppReactDropzone from '@/libs/styles/AppReactDropzone'
 import type { GreenhouseAssetRecord, GreenhouseAssetContext, PrivateAssetUploadResponse } from '@/types/assets'
 
-type DraftUploadContext = Extract<GreenhouseAssetContext, 'leave_request_draft' | 'purchase_order_draft' | 'master_agreement_draft' | 'certification_draft' | 'evidence_draft' | 'finance_reconciliation_evidence_draft'>
+type DraftUploadContext = Extract<GreenhouseAssetContext, 'leave_request_draft' | 'purchase_order_draft' | 'master_agreement_draft' | 'certification_draft' | 'evidence_draft' | 'finance_reconciliation_evidence_draft' | 'sample_sprint_report_draft'>
 
 export type UploadedFileValue = {
   assetId: string

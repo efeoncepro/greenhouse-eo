@@ -4,9 +4,10 @@ import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
  * TASK-708 — Commercial Cost Attribution V2 reader.
  *
  * Lee de la VIEW canónica `greenhouse_serving.commercial_cost_attribution_v2`
- * que une 3 dimensiones de costo atribuible a clientes:
+ * que une dimensiones de costo atribuible a clientes:
  *   - labor: costo laboral por staffing % FTE (TASK-536/PreviousArch).
  *   - expense_direct_client: gastos directos a un cliente (TASK-705 rules).
+ *   - expense_direct_service: gastos directos con allocation aprobada a service_id.
  *   - expense_direct_member_via_fte: gastos directos a un miembro
  *     prorrateados a sus clientes vía staffing % FTE.
  *
@@ -18,7 +19,7 @@ import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
  * para que la UI muestre warning explícito en lugar de silent zero.
  */
 
-export type CostDimension = 'labor' | 'expense_direct_client' | 'expense_direct_member_via_fte'
+export type CostDimension = 'labor' | 'expense_direct_client' | 'expense_direct_service' | 'expense_direct_member_via_fte'
 
 interface AttributionRowDb extends Record<string, unknown> {
   period_year: number
@@ -37,6 +38,7 @@ export interface ClientCostAttributionV2 {
   byDimension: {
     labor: number
     expenseDirectClient: number
+    expenseDirectService: number
     expenseDirectMemberViaFte: number
   }
   members: Array<{
@@ -55,6 +57,7 @@ export interface CommercialCostAttributionV2Period {
     grandTotalClp: number
     laborClp: number
     expenseDirectClientClp: number
+    expenseDirectServiceClp: number
     expenseDirectMemberViaFteClp: number
   }
   /**
@@ -64,6 +67,7 @@ export interface CommercialCostAttributionV2Period {
   coverage: {
     hasLaborData: boolean
     hasDirectClientData: boolean
+    hasDirectServiceData: boolean
     hasDirectMemberViaFteData: boolean
   }
 }
@@ -109,6 +113,7 @@ export const readCommercialCostAttributionByClientForPeriodV2 = async (
   const byClient = new Map<string, ClientCostAttributionV2>()
   let laborTotal = 0
   let directClientTotal = 0
+  let directServiceTotal = 0
   let directMemberTotal = 0
 
   for (const row of rows) {
@@ -124,6 +129,7 @@ export const readCommercialCostAttributionByClientForPeriodV2 = async (
         byDimension: {
           labor: 0,
           expenseDirectClient: 0,
+          expenseDirectService: 0,
           expenseDirectMemberViaFte: 0
         },
         members: []
@@ -139,6 +145,9 @@ export const readCommercialCostAttributionByClientForPeriodV2 = async (
     } else if (row.cost_dimension === 'expense_direct_client') {
       entry.byDimension.expenseDirectClient = round(entry.byDimension.expenseDirectClient + amount)
       directClientTotal += amount
+    } else if (row.cost_dimension === 'expense_direct_service') {
+      entry.byDimension.expenseDirectService = round(entry.byDimension.expenseDirectService + amount)
+      directServiceTotal += amount
     } else if (row.cost_dimension === 'expense_direct_member_via_fte') {
       entry.byDimension.expenseDirectMemberViaFte = round(entry.byDimension.expenseDirectMemberViaFte + amount)
       directMemberTotal += amount
@@ -170,15 +179,103 @@ export const readCommercialCostAttributionByClientForPeriodV2 = async (
     periodMonth: month,
     clients: Array.from(byClient.values()).sort((a, b) => b.totalClp - a.totalClp),
     totals: {
-      grandTotalClp: round(laborTotal + directClientTotal + directMemberTotal),
+      grandTotalClp: round(laborTotal + directClientTotal + directServiceTotal + directMemberTotal),
       laborClp: round(laborTotal),
       expenseDirectClientClp: round(directClientTotal),
+      expenseDirectServiceClp: round(directServiceTotal),
       expenseDirectMemberViaFteClp: round(directMemberTotal)
     },
     coverage: {
       hasLaborData: rows.some(r => r.cost_dimension === 'labor'),
       hasDirectClientData: rows.some(r => r.cost_dimension === 'expense_direct_client'),
+      hasDirectServiceData: rows.some(r => r.cost_dimension === 'expense_direct_service'),
       hasDirectMemberViaFteData: rows.some(r => r.cost_dimension === 'expense_direct_member_via_fte')
     }
   }
+}
+
+/**
+ * TASK-835 — Sibling reader: agrega costo por `service_id` para una ventana
+ * de períodos (year-month range). Comparte VIEW canónica con el reader
+ * byClient — single source of truth, cero SQL duplicado.
+ *
+ * Solo agrega filas cuyo `service_id` está en el set provisto. Filtra opcional
+ * por `attributionIntents` (default: 4 lanes engagement non-regular). Las
+ * filas sin `service_id` quedan excluidas silenciosamente — son agregaciones
+ * client-level legacy que no aplican al modelo Sample Sprint.
+ *
+ * Devuelve mapa `Map<serviceId, totalClp>` agregado para todos los meses
+ * del rango. La projection llama con la ventana corriente (mes actual y
+ * mes anterior por defecto, configurable).
+ */
+
+export interface ReadCommercialCostAttributionByServiceForPeriodInput {
+  serviceIds: string[]
+  /** Inclusive start { year, month }. */
+  fromPeriod: { year: number; month: number }
+  /** Inclusive end { year, month }. */
+  toPeriod: { year: number; month: number }
+  /** Default: ['pilot','trial','poc','discovery']. Cuando vacío, no aplica filtro. */
+  attributionIntents?: string[] | null
+}
+
+const DEFAULT_ATTRIBUTION_INTENTS = ['pilot', 'trial', 'poc', 'discovery']
+
+interface ServiceAttributionRowDb extends Record<string, unknown> {
+  service_id: string
+  amount_clp: string
+}
+
+export const readCommercialCostAttributionByServiceForPeriodV2 = async (
+  input: ReadCommercialCostAttributionByServiceForPeriodInput
+): Promise<Map<string, number>> => {
+  const result = new Map<string, number>()
+
+  if (!Array.isArray(input.serviceIds) || input.serviceIds.length === 0) return result
+
+  const dedupedIds = Array.from(new Set(input.serviceIds.filter(id => typeof id === 'string' && id.trim().length > 0)))
+
+  if (dedupedIds.length === 0) return result
+
+  const fromYear = Math.trunc(input.fromPeriod.year)
+  const fromMonth = Math.trunc(input.fromPeriod.month)
+  const toYear = Math.trunc(input.toPeriod.year)
+  const toMonth = Math.trunc(input.toPeriod.month)
+
+  if (!Number.isFinite(fromYear) || !Number.isFinite(fromMonth) || !Number.isFinite(toYear) || !Number.isFinite(toMonth)) {
+    return result
+  }
+
+  const intents = input.attributionIntents === undefined ? DEFAULT_ATTRIBUTION_INTENTS : input.attributionIntents
+
+  const intentClause = Array.isArray(intents) && intents.length > 0
+    ? 'AND attribution_intent = ANY($4::text[])'
+    : ''
+
+  const params: unknown[] = [
+    dedupedIds,
+    fromYear * 100 + fromMonth,
+    toYear * 100 + toMonth
+  ]
+
+  if (intentClause) params.push(intents)
+
+  const rows = await runGreenhousePostgresQuery<ServiceAttributionRowDb>(
+    `SELECT service_id, SUM(amount_clp)::text AS amount_clp
+     FROM greenhouse_serving.commercial_cost_attribution_v2
+     WHERE service_id = ANY($1::text[])
+       AND (period_year * 100 + period_month) >= $2
+       AND (period_year * 100 + period_month) <= $3
+       ${intentClause}
+     GROUP BY service_id`,
+    params
+  )
+
+  for (const row of rows) {
+    const amount = num(row.amount_clp)
+
+    if (amount > 0) result.set(row.service_id, round(amount))
+  }
+
+  return result
 }

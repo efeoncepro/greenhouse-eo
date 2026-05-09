@@ -55,6 +55,7 @@ export const GH_AGENCY_NAV = {
   capacity: { label: 'Capacidad', subtitle: 'Carga operativa global del equipo' },
   organizations: { label: 'Organizaciones', subtitle: 'Cuentas, relaciones y estructura' },
   services: { label: 'Servicios', subtitle: 'Servicios contratados por Space' },
+  sampleSprints: { label: 'Sample Sprints', subtitle: 'Pilotos, trials y discovery comerciales' },
   staffAugmentation: { label: 'Staff Augmentation', subtitle: 'Placements, onboarding y economía por assignment' },
   economics: { label: 'Economía', subtitle: 'P&L y rentabilidad' },
   team: { label: 'Capacidad', subtitle: 'Carga operativa y dedicación del equipo' },
@@ -67,6 +68,16 @@ export const GH_AGENCY_NAV = {
   operationsGroup: { label: 'Operaciones', subtitle: 'Delivery, campañas y estructura' }
 } as const
 
+export const GH_COMMERCIAL_NAV = {
+  root: { label: 'Comercial', subtitle: 'Pipeline, acuerdos y catálogo vendible' },
+  pipeline: { label: 'Pipeline', subtitle: 'Forecast comercial y oportunidades activas' },
+  quotes: { label: 'Cotizaciones', subtitle: 'Propuestas comerciales y aprobación' },
+  contracts: { label: 'Contratos', subtitle: 'Contratos, SOWs y renovaciones activas' },
+  masterAgreements: { label: 'Acuerdos marco', subtitle: 'MSAs y cláusulas maestras' },
+  sampleSprints: { label: 'Sample Sprints', subtitle: 'Pilotos, trials y discovery comerciales' },
+  products: { label: 'Productos', subtitle: 'Catálogo vendible sincronizado con HubSpot' }
+} as const
+
 export const GH_FINANCE_NAV = {
   dashboard: { label: 'Resumen', subtitle: 'Vista consolidada' },
   income: { label: 'Ventas', subtitle: 'Documentos de venta, devengo y cobros' },
@@ -76,10 +87,6 @@ export const GH_FINANCE_NAV = {
   paymentOrders: { label: 'Órdenes de pago', subtitle: 'Obligaciones, ordenes y calendario de pagos' },
   paymentProfiles: { label: 'Perfiles de pago', subtitle: 'Cola de aprobación y drift cross-entity' },
   intelligence: { label: 'Economía', subtitle: 'Cierre de período y P&L operativo' },
-  quotes: { label: 'Cotizaciones', subtitle: 'Cotizaciones de Nubox y HubSpot en un solo lugar' },
-  contracts: { label: 'Contratos', subtitle: 'SOWs, renovaciones y ejecución comercial activa' },
-  masterAgreements: { label: 'Acuerdos marco', subtitle: 'MSAs, cláusulas maestras y contratos vinculados' },
-  products: { label: 'Productos', subtitle: 'Catalogo de productos y servicios sincronizado con HubSpot' },
   purchaseOrders: { label: 'Órdenes de compra', subtitle: 'OC de clientes, saldos y consumo' },
   hes: { label: 'HES', subtitle: 'Hojas de entrada de servicio' },
   clients: { label: 'Clientes', subtitle: 'Maestro de clientes y coberturas' },
@@ -90,7 +97,7 @@ export const GH_FINANCE_NAV = {
   bank: { label: 'Banco', subtitle: 'Tesorería por cuenta, fintech e instrumentos' },
   shareholderAccount: { label: 'Cuenta accionista', subtitle: 'Saldo empresa ↔ accionista' },
   cashPosition: { label: 'Posición de caja', subtitle: 'Saldo real, cuentas por cobrar y por pagar' },
-  documents: { label: 'Documentos', subtitle: 'Cotizaciones, OC, HES y conciliación' },
+  documents: { label: 'Documentos', subtitle: 'OC, HES y conciliación' },
   analytics: { label: 'Inteligencia', subtitle: 'Economía y asignaciones de costos' },
   treasury: { label: 'Tesorería', subtitle: 'Cobros, pagos, banco y posición de caja' }
 } as const

@@ -7,7 +7,7 @@ import {
   tenantCanAccessQuotationIdentity
 } from '@/lib/finance/pricing/quotation-tenant-access'
 import { extractQuotationFxSnapshot } from '@/lib/finance/quotation-fx-snapshot'
-import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
+import { requireCommercialTenantContext } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
 
@@ -43,7 +43,7 @@ export async function GET(
   _request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { tenant, errorResponse } = await requireFinanceTenantContext()
+  const { tenant, errorResponse } = await requireCommercialTenantContext()
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

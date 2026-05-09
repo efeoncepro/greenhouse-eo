@@ -483,6 +483,155 @@ export interface GreenhouseCommercialEmploymentTypes {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseCommercialEngagementApprovals {
+  approval_id: Generated<string>;
+  approved_at: Timestamp | null;
+  approved_by: string | null;
+  /**
+   * Required by application helper when any proposed member exceeds 100% FTE after the approval.
+   */
+  capacity_override_reason: string | null;
+  /**
+   * Deterministic capacity warning snapshot evaluated at approval time; persisted even when no override is needed.
+   */
+  capacity_warning_json: Json | null;
+  created_at: Generated<Timestamp>;
+  decision_deadline: Timestamp;
+  expected_duration_days: number;
+  expected_internal_cost_clp: Numeric;
+  rejected_at: Timestamp | null;
+  rejected_by: string | null;
+  rejection_reason: string | null;
+  requested_by: string | null;
+  /**
+   * FK to greenhouse_core.services(service_id). TEXT by TASK-801 contract, not UUID.
+   */
+  service_id: string;
+  status: Generated<string>;
+  /**
+   * Approval-time success criteria snapshot. Object shape is validated by application helpers.
+   */
+  success_criteria_json: Json;
+  updated_at: Generated<Timestamp>;
+  withdrawal_reason: string | null;
+  withdrawn_at: Timestamp | null;
+  withdrawn_by: string | null;
+}
+
+export interface GreenhouseCommercialEngagementAuditLog {
+  actor_user_id: string | null;
+  audit_id: Generated<string>;
+  event_kind: string;
+  occurred_at: Generated<Timestamp>;
+  /**
+   * Structured evidence for the audit event. Outbox event versioning is duplicated in payload_json.version where applicable.
+   */
+  payload_json: Generated<Json>;
+  reason: string | null;
+  /**
+   * FK to greenhouse_core.services(service_id). TEXT by TASK-801 contract, not UUID.
+   */
+  service_id: string;
+}
+
+export interface GreenhouseCommercialEngagementCommercialTerms {
+  declared_at: Generated<Timestamp>;
+  /**
+   * Actor who declared the terms. Nullable only to support ON DELETE SET NULL; declareCommercialTerms requires declaredBy in input.
+   */
+  declared_by: string | null;
+  effective_from: Timestamp;
+  effective_to: Timestamp | null;
+  monthly_amount_clp: Numeric | null;
+  reason: string;
+  /**
+   * FK to greenhouse_core.services(service_id). TEXT by contract (TASK-801), not UUID.
+   */
+  service_id: string;
+  success_criteria: Json | null;
+  terms_id: Generated<string>;
+  terms_kind: string;
+}
+
+export interface GreenhouseCommercialEngagementLineage {
+  /**
+   * Child service in the engagement lineage graph. TEXT by services.service_id contract.
+   */
+  child_service_id: string;
+  lineage_id: Generated<string>;
+  /**
+   * Parent service in the engagement lineage graph. TEXT by services.service_id contract.
+   */
+  parent_service_id: string;
+  recorded_at: Generated<Timestamp>;
+  recorded_by: string | null;
+  relationship_kind: string;
+  transition_date: Timestamp;
+  transition_reason: string;
+}
+
+export interface GreenhouseCommercialEngagementOutcomes {
+  cancellation_reason: string | null;
+  decided_at: Generated<Timestamp>;
+  decided_by: string | null;
+  decision_date: Timestamp;
+  decision_rationale: string;
+  metrics_json: Json | null;
+  /**
+   * Optional FK to the canonical quotation that prices the post-conversion service. TEXT by runtime contract.
+   */
+  next_quotation_id: string | null;
+  next_service_id: string | null;
+  outcome_id: Generated<string>;
+  outcome_kind: string;
+  /**
+   * Optional FK to canonical asset registry (greenhouse_core.assets.asset_id). TEXT by runtime contract.
+   */
+  report_asset_id: string | null;
+  /**
+   * FK to greenhouse_core.services(service_id). TEXT by contract (TASK-801), not UUID.
+   */
+  service_id: string;
+}
+
+export interface GreenhouseCommercialEngagementPhases {
+  completed_at: Timestamp | null;
+  completed_by: string | null;
+  created_at: Generated<Timestamp>;
+  deliverables_json: Json | null;
+  end_date: Timestamp | null;
+  phase_id: Generated<string>;
+  phase_kind: string;
+  phase_name: string;
+  phase_order: number;
+  /**
+   * FK to greenhouse_core.services(service_id). TEXT by contract (TASK-801), not UUID.
+   */
+  service_id: string;
+  start_date: Timestamp;
+  status: Generated<string>;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseCommercialEngagementProgressSnapshots {
+  /**
+   * Schema-flexible V1 progress metrics. Must be a non-empty JSON object; templates by engagement_kind are V2.
+   */
+  metrics_json: Json;
+  qualitative_notes: string | null;
+  recorded_at: Generated<Timestamp>;
+  /**
+   * Actor who recorded the snapshot. Nullable at DB level to preserve history if client_users row is deleted; helper requires input.
+   */
+  recorded_by: string | null;
+  /**
+   * FK to greenhouse_core.services(service_id). TEXT by TASK-801 contract, not UUID.
+   */
+  service_id: string;
+  snapshot_date: Timestamp;
+  snapshot_id: Generated<string>;
+}
+
 export interface GreenhouseCommercialFteHoursGuide {
   effective_from: Generated<Timestamp>;
   fte_fraction: Numeric;
@@ -1095,6 +1244,18 @@ export interface GreenhouseCommercialQuotations {
    * Actor que emitió la versión documental oficial.
    */
   issued_by: string | null;
+  /**
+   * TASK-557.1 operational flag: true when a legacy/limbo quote must be hidden from commercial forecast surfaces while preserved for legacy finance/audit reads.
+   */
+  legacy_excluded: Generated<boolean>;
+  /**
+   * Timestamp when TASK-557.1 or a follow-up remediation marked the quote as excluded from commercial forecast surfaces.
+   */
+  legacy_excluded_at: Timestamp | null;
+  /**
+   * TASK-557.1 machine-readable reason for legacy exclusion, e.g. missing_organization, missing_current_version_row, missing_current_line_items, finance_only_historical.
+   */
+  legacy_excluded_reason: string | null;
   legacy_status: string | null;
   margin_floor_pct: Numeric | null;
   mrr: Numeric | null;
@@ -1777,6 +1938,28 @@ export interface GreenhouseCoreCampaigns {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseCoreCapabilitiesRegistry {
+  /**
+   * Array de acciones canónicas permitidas para esta capability (read, create, update, delete, approve, etc). Tomado del catalog TS.
+   */
+  allowed_actions: string[];
+  /**
+   * Scopes válidos para esta capability (own, team, space, organization, tenant, all). El defaultScope del catalog TS se incluye aquí + los scopes adicionales que el catalog permite.
+   */
+  allowed_scopes: string[];
+  /**
+   * snake_case key tal como aparece en EntitlementCapabilityKey TS. PK estable.
+   */
+  capability_key: string;
+  /**
+   * Cuando se setea, la capability deja de exportarse al catálogo TS pero queda registrada para auditoría histórica de grants/overrides previos. Parity test ignora rows con deprecated_at IS NOT NULL.
+   */
+  deprecated_at: Timestamp | null;
+  description: string;
+  introduced_at: Generated<Timestamp>;
+  module: string;
+}
+
 export interface GreenhouseCoreClientFeatureFlags {
   client_id: string;
   created_at: Generated<Timestamp>;
@@ -1910,6 +2093,23 @@ export interface GreenhouseCoreDepartments {
   parent_department_id: string | null;
   sort_order: Generated<number>;
   updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseCoreEntitlementGovernanceAuditLog {
+  action: string | null;
+  audit_id: string;
+  capability: string | null;
+  change_type: string;
+  configured_path: string | null;
+  created_at: Generated<Timestamp>;
+  effect: string | null;
+  performed_by: string;
+  policy_key: string | null;
+  reason: string | null;
+  scope: string | null;
+  space_id: string;
+  target_role: string | null;
+  target_user: string | null;
 }
 
 export interface GreenhouseCoreEntitySourceLinks {
@@ -2549,6 +2749,21 @@ export interface GreenhouseCoreReportingLines {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseCoreRoleEntitlementDefaults {
+  action: string;
+  capability: string;
+  created_at: Generated<Timestamp>;
+  created_by: string;
+  default_id: string;
+  effect: string;
+  reason: string | null;
+  role_code: string;
+  scope: string;
+  space_id: string;
+  updated_at: Generated<Timestamp>;
+  updated_by: string;
+}
+
 export interface GreenhouseCoreRoles {
   created_at: Generated<Timestamp>;
   description: string | null;
@@ -2675,6 +2890,7 @@ export interface GreenhouseCoreServices {
   name: string;
   notion_project_id: string | null;
   organization_id: string | null;
+  parent_service_id: string | null;
   pipeline_stage: Generated<string>;
   public_id: string | null;
   service_id: string;
@@ -2684,6 +2900,7 @@ export interface GreenhouseCoreServices {
   status: Generated<string>;
   target_end_date: Timestamp | null;
   total_cost: Numeric | null;
+  unmapped_reason: string | null;
   updated_at: Generated<Timestamp>;
   updated_by: string | null;
 }
@@ -2983,6 +3200,21 @@ export interface GreenhouseCoreUserClientScopes {
   client_id: string;
   created_at: Generated<Timestamp>;
   scope_id: string;
+  user_id: string;
+}
+
+export interface GreenhouseCoreUserEntitlementOverrides {
+  action: string;
+  capability: string;
+  created_at: Generated<Timestamp>;
+  effect: string;
+  expires_at: Timestamp | null;
+  granted_by: string;
+  override_id: string;
+  reason: string;
+  scope: string;
+  space_id: string;
+  updated_at: Generated<Timestamp>;
   user_id: string;
 }
 
@@ -4156,6 +4388,27 @@ export interface GreenhouseFinanceExpenses {
   vat_fixed_assets_amount: Numeric | null;
   vat_unrecoverable_amount: Numeric | null;
   withholding_amount: Numeric | null;
+}
+
+export interface GreenhouseFinanceExpenseServiceAllocations {
+  allocated_amount_clp: Numeric;
+  allocation_id: string;
+  allocation_source: Generated<string>;
+  approved_at: Timestamp | null;
+  approved_by: string | null;
+  client_id: string;
+  created_at: Generated<Timestamp>;
+  created_by: string;
+  evidence_json: Generated<Json>;
+  expense_id: string;
+  period_month: number;
+  period_year: number;
+  rejected_at: Timestamp | null;
+  rejected_by: string | null;
+  rejection_reason: string | null;
+  review_status: Generated<string>;
+  service_id: string;
+  updated_at: Generated<Timestamp>;
 }
 
 export interface GreenhouseFinanceExternalCashSignals {
@@ -6430,6 +6683,7 @@ export interface GreenhouseServingClientLaborCostAllocation {
   payroll_currency: string | null;
   period_month: number | null;
   period_year: number | null;
+  service_id: string | null;
   total_fte: Numeric | null;
 }
 
@@ -6449,6 +6703,7 @@ export interface GreenhouseServingClientLaborCostAllocationConsolidated {
   payroll_currency: string | null;
   period_month: number | null;
   period_year: number | null;
+  service_id: string | null;
   /**
    * Cuántos payroll_entries underlying se consolidaron en este row. Si > 1, significa que el período tuvo múltiples nóminas posteadas (e.g. nómina mes anterior + mes corriente). Útil para drift detection.
    */
@@ -6492,6 +6747,7 @@ export interface GreenhouseServingCommercialCostAttributionV2 {
   member_id: string | null;
   period_month: number | null;
   period_year: number | null;
+  service_id: string | null;
 }
 
 export interface GreenhouseServingContractMrrArrSnapshots {
@@ -6651,6 +6907,25 @@ export interface GreenhouseServingFinanceAiSignals {
   space_id: string | null;
   synced_at: Generated<Timestamp>;
   z_score: Numeric | null;
+}
+
+export interface GreenhouseServingGtmInvestmentPnl {
+  attribution_intent: string | null;
+  client_id: string | null;
+  client_name: string | null;
+  cost_dimension: string | null;
+  engagement_kind: string | null;
+  fte_contribution: Numeric | null;
+  gtm_investment_clp: Numeric | null;
+  member_id: string | null;
+  member_name: string | null;
+  period_month: number | null;
+  period_year: number | null;
+  service_id: string | null;
+  service_name: string | null;
+  terms_effective_from: Timestamp | null;
+  terms_effective_to: Timestamp | null;
+  terms_kind: string | null;
 }
 
 export interface GreenhouseServingHomeBlockFlags {
@@ -8422,6 +8697,13 @@ export interface DB {
   "greenhouse_commercial.deals": GreenhouseCommercialDeals;
   "greenhouse_commercial.employment_type_aliases": GreenhouseCommercialEmploymentTypeAliases;
   "greenhouse_commercial.employment_types": GreenhouseCommercialEmploymentTypes;
+  "greenhouse_commercial.engagement_approvals": GreenhouseCommercialEngagementApprovals;
+  "greenhouse_commercial.engagement_audit_log": GreenhouseCommercialEngagementAuditLog;
+  "greenhouse_commercial.engagement_commercial_terms": GreenhouseCommercialEngagementCommercialTerms;
+  "greenhouse_commercial.engagement_lineage": GreenhouseCommercialEngagementLineage;
+  "greenhouse_commercial.engagement_outcomes": GreenhouseCommercialEngagementOutcomes;
+  "greenhouse_commercial.engagement_phases": GreenhouseCommercialEngagementPhases;
+  "greenhouse_commercial.engagement_progress_snapshots": GreenhouseCommercialEngagementProgressSnapshots;
   "greenhouse_commercial.fte_hours_guide": GreenhouseCommercialFteHoursGuide;
   "greenhouse_commercial.hubspot_deal_pipeline_config": GreenhouseCommercialHubspotDealPipelineConfig;
   "greenhouse_commercial.hubspot_deal_pipeline_defaults": GreenhouseCommercialHubspotDealPipelineDefaults;
@@ -8480,12 +8762,14 @@ export interface DB {
   "greenhouse_core.business_line_metadata": GreenhouseCoreBusinessLineMetadata;
   "greenhouse_core.campaign_project_links": GreenhouseCoreCampaignProjectLinks;
   "greenhouse_core.campaigns": GreenhouseCoreCampaigns;
+  "greenhouse_core.capabilities_registry": GreenhouseCoreCapabilitiesRegistry;
   "greenhouse_core.client_feature_flags": GreenhouseCoreClientFeatureFlags;
   "greenhouse_core.client_service_modules": GreenhouseCoreClientServiceModules;
   "greenhouse_core.client_team_assignments": GreenhouseCoreClientTeamAssignments;
   "greenhouse_core.client_users": GreenhouseCoreClientUsers;
   "greenhouse_core.clients": GreenhouseCoreClients;
   "greenhouse_core.departments": GreenhouseCoreDepartments;
+  "greenhouse_core.entitlement_governance_audit_log": GreenhouseCoreEntitlementGovernanceAuditLog;
   "greenhouse_core.entity_source_links": GreenhouseCoreEntitySourceLinks;
   "greenhouse_core.first_party_app_sessions": GreenhouseCoreFirstPartyAppSessions;
   "greenhouse_core.identity_profile_source_links": GreenhouseCoreIdentityProfileSourceLinks;
@@ -8514,6 +8798,7 @@ export interface DB {
   "greenhouse_core.reliability_module_overrides": GreenhouseCoreReliabilityModuleOverrides;
   "greenhouse_core.reliability_module_registry": GreenhouseCoreReliabilityModuleRegistry;
   "greenhouse_core.reporting_lines": GreenhouseCoreReportingLines;
+  "greenhouse_core.role_entitlement_defaults": GreenhouseCoreRoleEntitlementDefaults;
   "greenhouse_core.role_view_assignments": GreenhouseCoreRoleViewAssignments;
   "greenhouse_core.roles": GreenhouseCoreRoles;
   "greenhouse_core.scim_group_memberships": GreenhouseCoreScimGroupMemberships;
@@ -8538,6 +8823,7 @@ export interface DB {
   "greenhouse_core.tool_catalog": GreenhouseCoreToolCatalog;
   "greenhouse_core.user_campaign_scopes": GreenhouseCoreUserCampaignScopes;
   "greenhouse_core.user_client_scopes": GreenhouseCoreUserClientScopes;
+  "greenhouse_core.user_entitlement_overrides": GreenhouseCoreUserEntitlementOverrides;
   "greenhouse_core.user_permission_set_assignments": GreenhouseCoreUserPermissionSetAssignments;
   "greenhouse_core.user_project_scopes": GreenhouseCoreUserProjectScopes;
   "greenhouse_core.user_role_assignments": GreenhouseCoreUserRoleAssignments;
@@ -8582,6 +8868,7 @@ export interface DB {
   "greenhouse_finance.expense_distribution_resolution": GreenhouseFinanceExpenseDistributionResolution;
   "greenhouse_finance.expense_payments": GreenhouseFinanceExpensePayments;
   "greenhouse_finance.expense_payments_normalized": GreenhouseFinanceExpensePaymentsNormalized;
+  "greenhouse_finance.expense_service_allocations": GreenhouseFinanceExpenseServiceAllocations;
   "greenhouse_finance.expenses": GreenhouseFinanceExpenses;
   "greenhouse_finance.external_cash_signals": GreenhouseFinanceExternalCashSignals;
   "greenhouse_finance.external_signal_auto_adopt_policies": GreenhouseFinanceExternalSignalAutoAdoptPolicies;
@@ -8690,6 +8977,7 @@ export interface DB {
   "greenhouse_serving.finance_ai_enrichment_runs": GreenhouseServingFinanceAiEnrichmentRuns;
   "greenhouse_serving.finance_ai_signal_enrichments": GreenhouseServingFinanceAiSignalEnrichments;
   "greenhouse_serving.finance_ai_signals": GreenhouseServingFinanceAiSignals;
+  "greenhouse_serving.gtm_investment_pnl": GreenhouseServingGtmInvestmentPnl;
   "greenhouse_serving.home_block_flags": GreenhouseServingHomeBlockFlags;
   "greenhouse_serving.home_pulse_snapshots": GreenhouseServingHomePulseSnapshots;
   "greenhouse_serving.home_rollout_flags": GreenhouseServingHomeRolloutFlags;

@@ -5,7 +5,7 @@ import MasterAgreementDetailView from '@/views/greenhouse/finance/MasterAgreemen
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'Detalle de acuerdo marco - Finance'
+  title: 'Detalle de acuerdo marco — Comercial'
 }
 
 export default function MasterAgreementDetailPage() {

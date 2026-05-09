@@ -19,6 +19,7 @@
  *   POST /nexa/weekly-digest           → Send the weekly Nexa executive digest via email
  *   POST /reliability-ai-watch         → Reliability AI Observer (TASK-638): Gemini watcher over RCP overview
  *   POST /cloud-cost-ai-watch          → Cloud cost FinOps AI + deterministic alert sweep (TASK-769)
+ *   POST /finance/account-balances/fx-drift/remediate → Bounded FX drift remediation (TASK-842)
  *   POST /notion-conformed/sync        → Notion BQ raw → conformed → PG cycle (replaces Vercel /api/cron/sync-conformed)
  *   POST /outbox/publish-batch         → Outbox PG → BQ raw publisher with state machine (TASK-773, replaces Vercel /api/cron/outbox-publish)
  *   POST /email-deliverability-monitor → Bounce/complaint rate monitor (TASK-775, replaces Vercel /api/cron/email-deliverability-monitor)
@@ -66,6 +67,10 @@ import { syncBqConformedToPostgres } from '@/lib/sync/sync-bq-conformed-to-postg
 import { computeClientEconomicsSnapshots } from '@/lib/finance/postgres-store-intelligence'
 import { materializeAllAvailableVatPeriods, materializeVatLedgerForPeriod } from '@/lib/finance/vat-ledger'
 import { rematerializeAccountBalanceRange } from '@/lib/finance/account-balances-rematerialize'
+import {
+  remediateAccountBalancesFxDrift,
+  type FxDriftRemediationPolicy
+} from '@/lib/finance/account-balances-fx-drift-remediation'
 import { getFinanceLedgerHealth } from '@/lib/finance/ledger-health'
 import { captureMessageWithDomain } from '@/lib/observability/capture'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
@@ -97,6 +102,7 @@ import { buildWeeklyDigest, resolveWeeklyDigestRecipients, WEEKLY_DIGEST_DEFAULT
 import { getCurrentAuthReadiness } from '@/lib/auth-secrets'
 import { probeNextAuthSecretRoundTrip } from '@/lib/auth/readiness'
 
+import { computeRematerializeSeedDate } from './finance-rematerialize-seed'
 import { getReactiveQueueDepth, InvalidDomainError } from './reactive-queue-depth'
 import { runProductCatalogDriftDetectJob } from './product-catalog-drift-detect'
 import { runProductCatalogReconcileV2Job } from './product-catalog-reconcile-v2'
@@ -139,6 +145,31 @@ const json = (res: ServerResponse, status: number, data: unknown) => {
 }
 
 const now = () => new Date().toISOString()
+
+const parseOptionalPositiveInt = (value: unknown, max: number) => {
+  if (typeof value !== 'number' || !Number.isFinite(value) || value <= 0) return undefined
+
+  return Math.min(Math.trunc(value), max)
+}
+
+const parseOptionalDate = (value: unknown) =>
+  typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value) ? value : undefined
+
+const parseOptionalString = (value: unknown) =>
+  typeof value === 'string' && value.trim() ? value.trim() : undefined
+
+const parseFxDriftPolicy = (value: unknown): FxDriftRemediationPolicy | undefined => {
+  if (
+    value === 'detect_only' ||
+    value === 'auto_open_periods' ||
+    value === 'known_bug_class_restatement' ||
+    value === 'strict_no_restatement'
+  ) {
+    return value
+  }
+
+  return undefined
+}
 
 // ─── Route Handlers ─────────────────────────────────────────────────────────
 
@@ -960,7 +991,7 @@ const handleFinanceRematerializeBalances = async (req: IncomingMessage, res: Ser
     )
 
     const today = new Date()
-    const seedDate = new Date(today.getTime() - lookbackDays * 86_400_000).toISOString().slice(0, 10)
+    const seedDate = computeRematerializeSeedDate(today, lookbackDays)
     const endDate = today.toISOString().slice(0, 10)
 
     const results: Array<{ accountId: string; days: number; closing: number }> = []
@@ -1102,6 +1133,42 @@ const handleFinanceRematerializeBalances = async (req: IncomingMessage, res: Ser
     console.error('[ops-worker] /finance/rematerialize-balances failed:', message)
     json(res, 500, { error: message })
   }
+}
+
+/**
+ * POST /finance/account-balances/fx-drift/remediate (TASK-842).
+ *
+ * Consumes the canonical reliability detector and remediates only bounded,
+ * policy-eligible drift via rematerializeAccountBalanceRange. It never patches
+ * account_balances directly and every attempt is tracked in source_sync_runs.
+ */
+const handleFinanceFxDriftRemediation = async (req: IncomingMessage, res: ServerResponse) => {
+  const body = await readBody(req)
+  const startMs = Date.now()
+  const policy = parseFxDriftPolicy(body.policy) ?? 'detect_only'
+
+  console.log(`[ops-worker] POST /finance/account-balances/fx-drift/remediate policy=${policy}`)
+
+  const result = await remediateAccountBalancesFxDrift({
+    policy,
+    dryRun: typeof body.dryRun === 'boolean' ? body.dryRun : policy === 'detect_only',
+    windowDays: parseOptionalPositiveInt(body.windowDays, 365),
+    maxRows: parseOptionalPositiveInt(body.maxRows, 500),
+    maxAccounts: parseOptionalPositiveInt(body.maxAccounts, 100),
+    maxAbsDriftClp: parseOptionalString(body.maxAbsDriftClp),
+    accountId: parseOptionalString(body.accountId),
+    fromDate: parseOptionalDate(body.fromDate),
+    toDate: parseOptionalDate(body.toDate),
+    triggeredBy: parseOptionalString(body.triggeredBy) ?? 'ops_worker'
+  })
+
+  const durationMs = Date.now() - startMs
+
+  console.log(
+    `[ops-worker] /finance/account-balances/fx-drift/remediate done — status=${result.status} seen=${result.driftRowsSeen} remediated=${result.driftRowsRemediated} blocked=${result.driftRowsBlocked} residual=${result.residualDriftCount} durationMs=${durationMs}`
+  )
+
+  json(res, result.status === 'failed' ? 502 : 200, { ...result, durationMs })
 }
 
 /**
@@ -1939,6 +2006,12 @@ const server = createServer(async (req, res) => {
 
     if (method === 'POST' && path === '/finance/rematerialize-balances') {
       await handleFinanceRematerializeBalances(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/finance/account-balances/fx-drift/remediate') {
+      await handleFinanceFxDriftRemediation(req, res)
 
       return
     }

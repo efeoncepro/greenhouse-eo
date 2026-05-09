@@ -436,6 +436,39 @@ Este usuario fue creado via migracion de base de datos (`20260405151705425_provi
 
 ---
 
+## Facets de Organization Workspace (TASK-611)
+
+Cuando entras al detalle de una organización (cliente B2B) desde Agency, Finance o Admin, el sistema decide **automáticamente qué pestañas y acciones ves**. Esa decisión la toma una capa canónica que combina tres preguntas:
+
+1. **¿Qué relación tienes con esta organización?** El sistema te clasifica en una de estas 5 categorías:
+   - **Admin Greenhouse** (`internal_admin`) — eres `efeonce_admin`. Ves todo, en cualquier organización.
+   - **Asignado a la cuenta** (`assigned_member`) — estás en `client_team_assignments` para esta organización. Ves lo que tu rol permite a nivel `tenant`.
+   - **Contacto del cliente** (`client_portal_user`) — eres del portal cliente y tu cuenta mapea a esta organización vía `spaces`. Ves lo que tu rol permite a nivel `own`.
+   - **Interno sin relación** (`unrelated_internal`) — eres del equipo Efeonce pero no estás asignado. **No ves nada de esta organización**.
+   - **Sin relación** (`no_relation`) — no estás vinculado en absoluto. No ves nada.
+
+2. **¿Qué facets puedes leer?** Hay 9 facets canónicos del Account 360: identidad, spaces, equipo, economía, entrega, finanzas, CRM, servicios y staff augmentation. Para cada uno, el sistema chequea si tienes la capability `organization.<facet>` con el alcance que corresponde a tu relación.
+
+3. **¿En qué entrypoint estás?** Tres surfaces hoy: `agency` (default tab = identidad), `finance` (default tab = finanzas), `admin` (default tab = identidad). El portal cliente queda declarado pero su activación es follow-up.
+
+**Casos típicos**:
+
+| Eres | Ves en una organización |
+|---|---|
+| Admin Greenhouse | Las 9 pestañas + acciones sensibles (ver detalle PII, exportar, aprobar finanzas) |
+| Equipo interno (sin admin) | 7 pestañas non-sensitive: identidad, spaces, equipo, entrega, CRM, servicios, staff aug |
+| Equipo finance (sin admin) | Idem internos + economía + finanzas (no sensitive) |
+| Contacto del cliente | 4 pestañas: identidad, equipo, entrega, servicios (solo de tu propia organización) |
+| Interno sin asignación | Nada — el workspace queda vacío con mensaje |
+
+**Datos sensibles** (PII, identidad legal, documentos fiscales, OTB) requieren capability separada (`organization.identity_sensitive`, `organization.finance_sensitive`). Solo el rol `efeonce_admin` los recibe automáticamente — los demás necesitan grant explícito desde Admin Center.
+
+**Cambios de permisos en tiempo real**: si te asignan/quitan un rol o un grant, el portal refresca tu workspace automáticamente en pocos segundos (cache TTL 30s + invalidación reactiva).
+
+> **Detalle tecnico:** El helper canonico es `resolveOrganizationWorkspaceProjection` en `src/lib/organization-workspace/projection.ts`. Spec completa: [`GREENHOUSE_ORGANIZATION_WORKSPACE_PROJECTION_V1.md`](../../architecture/GREENHOUSE_ORGANIZATION_WORKSPACE_PROJECTION_V1.md). El registro DB de capabilities vive en `greenhouse_core.capabilities_registry`.
+
+---
+
 ## En resumen
 
 El sistema funciona como un edificio con tarjetas de acceso:
@@ -444,5 +477,6 @@ El sistema funciona como un edificio con tarjetas de acceso:
 - Tu **supervisor** es a quien le pides permiso para ausentarte
 - Tu **departamento** es en que oficina te sientas
 - Tu **responsabilidad operativa** es de que proyectos o clientes eres dueno
+- Tu **relación con cada organización cliente** decide qué facets del workspace ves cuando entras a su detalle
 
-Son cuatro cosas distintas que se gestionan por separado. Cambiar una no afecta a las otras.
+Son cinco cosas distintas que se gestionan por separado. Cambiar una no afecta a las otras.

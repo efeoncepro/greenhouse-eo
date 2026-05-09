@@ -68,10 +68,12 @@ Valentina Hoyos conserva el mismo `identity_profile`. La relacion `employee/inde
 
 El nuevo contrato debe crear o reutilizar una relacion separada:
 
-- `relationship_type='contractor'` o `relationship_type='honorarios'`
+- V1 runtime TASK-789: `relationship_type='contractor'` y, para honorarios, `metadata_json.relationshipSubtype='honorarios'`
 - `effective_from='2026-05-04'`
 - `effective_to=NULL` mientras este activa
-- `source_of_truth='manual_hr' | 'contractor_engagement'`
+- `source_of_truth='workforce_relationship_transition' | 'manual_hr' | 'contractor_engagement'`
+
+Regla anti-regresion TASK-789: la apertura de esta relacion no debe actualizar `members.contract_type`, no debe crear `compensation_versions`, no debe crear `payroll_adjustments` y no debe habilitar `final_settlements`. El pago contractor nace en tareas posteriores desde `ContractorEngagement -> WorkSubmission/Invoice -> ContractorPayable -> Finance`.
 
 ### 2. Contractor payment no es payroll adjustment
 

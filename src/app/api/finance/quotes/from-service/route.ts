@@ -8,7 +8,7 @@ import {
   type ServiceLineOverride
 } from '@/lib/commercial/service-catalog-expand'
 import type { PricingOutputCurrency } from '@/lib/finance/pricing/contracts'
-import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
+import { requireCommercialTenantContext } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
 
@@ -53,7 +53,7 @@ const parseOverrides = (value: unknown): { roles?: ServiceLineOverride[]; tools?
 }
 
 export async function POST(request: Request) {
-  const { tenant, errorResponse } = await requireFinanceTenantContext()
+  const { tenant, errorResponse } = await requireCommercialTenantContext()
 
   if (!tenant) {
     return errorResponse ?? NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

@@ -248,7 +248,7 @@ export const runHubspotServicesSync = async (): Promise<Record<string, unknown>>
   const { syncAllOrganizationServices } = await import('@/lib/services/service-sync')
 
   const result = await syncAllOrganizationServices({
-    createMissingSpace: false,
+    createMissingSpace: true,
     createdBySource: 'ops-worker:hubspot-services-sync'
   })
 

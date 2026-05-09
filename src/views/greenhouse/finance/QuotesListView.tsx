@@ -157,7 +157,7 @@ const QuotesListView = () => {
         <Box>
           <Typography variant='h5' sx={{ fontWeight: 500 }}>Cotizaciones</Typography>
           <Typography variant='body2' color='text.secondary'>
-            Cotizaciones sincronizadas desde Nubox y HubSpot
+            Propuestas comerciales, pricing y emisión documental para el ciclo de venta.
           </Typography>
         </Box>
         <Stack direction='row' spacing={1}>
@@ -173,7 +173,7 @@ const QuotesListView = () => {
 
       <Card variant='outlined'>
         <CardHeader
-          title='Registro de cotizaciones'
+          title='Pipeline de cotizaciones'
           avatar={
             <Avatar variant='rounded' sx={{ bgcolor: 'info.lightOpacity' }}>
               <i className='tabler-file-description' style={{ fontSize: 22, color: 'var(--mui-palette-info-main)' }} />
@@ -216,11 +216,11 @@ const QuotesListView = () => {
           <Box sx={{ textAlign: 'center', py: 8 }} role='status'>
             <Typography variant='h6' sx={{ mb: 1 }}>Sin cotizaciones</Typography>
             <Typography variant='body2' color='text.secondary'>
-              Las cotizaciones aparecen aqui cuando se sincronizan desde Nubox o HubSpot.
+              Las cotizaciones aparecerán aquí cuando se creen en Comercial o se sincronicen desde HubSpot.
             </Typography>
           </Box>
         ) : (
-          <DataTableShell identifier='finance-quotes-list' ariaLabel='Listado de cotizaciones'>
+          <DataTableShell identifier='finance-quotes-list' ariaLabel='Listado comercial de cotizaciones'>
             <Table size='small'>
               <TableHead>
                 <TableRow>

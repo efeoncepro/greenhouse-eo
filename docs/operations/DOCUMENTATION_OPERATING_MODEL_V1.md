@@ -76,6 +76,21 @@ La calidad de solucion no debe duplicarse en cada spec. La fuente canonica trans
 - Otros documentos deben enlazar esta fuente cuando necesiten reforzar el criterio, no copiar definiciones largas.
 - Si un dominio necesita criterios adicionales, debe extender esta regla con constraints especificos sin rebajar el baseline.
 
+### 5.0.bis. Architecture Decision Records
+- `docs/operations/ARCHITECTURE_DECISION_RECORD_OPERATING_MODEL_V1.md`
+- Aqui vive la politica canonica de ADRs para Greenhouse.
+- `docs/architecture/DECISIONS_INDEX.md` es el indice maestro de decisiones aceptadas.
+- Los ADRs no reemplazan specs, tasks, auditorias ni handoffs:
+  - specs guardan el contrato tecnico vigente
+  - ADRs guardan la decision, alternativas y consecuencias
+  - tasks ejecutan
+  - auditorias observan estado en una fecha
+  - handoff registra continuidad corta
+- Modelo preferido:
+  - ADR embebido en la spec `GREENHOUSE_*_V1.md` cuando la decision pertenece a un dominio claro
+  - ADR dedicado en `docs/architecture/` cuando la decision cruza dominios o crea una primitive transversal
+- Si una task cambia source of truth, schema, access model, auth/session, finance/payroll/accounting semantics, events/outbox/webhooks, APIs externas, cloud/deploy/secrets, UI platform o runtime projections compartidas, debe identificar o crear/proponer ADR antes de implementar.
+
 ### 5.1. Auditorias tecnicas y operativas
 - `docs/audits/`
 - Aqui viven auditorias reutilizables, fechadas y versionadas sobre sistemas, pipelines, contracts o runtime slices.
@@ -107,6 +122,7 @@ La calidad de solucion no debe duplicarse en cada spec. La fuente canonica trans
 Cuando un cambio toque varios documentos:
 - escribir el detalle completo una sola vez en el documento canonico correcto
 - en los otros documentos dejar solo el delta y una referencia al documento canonico
+- si el cambio es una decision arquitectonica, el detalle de decision vive en el ADR o seccion ADR y los demas documentos enlazan ese contrato
 
 ## Plantilla minima por cambio
 
@@ -118,11 +134,13 @@ Cuando un cambio toque varios documentos:
 - que tecnologia o libreria se activo
 - donde vive
 - para que se usara
+- que decision arquitectonica nueva cambia el contrato operativo vigente, con link al ADR o indice
 
 ### Handoff
 - que se hizo
 - que se valido
 - que queda pendiente
+- que ADR se acepto, supersedio o quedo pendiente, si aplica
 
 ### changelog
 - una linea de impacto

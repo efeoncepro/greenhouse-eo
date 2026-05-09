@@ -176,7 +176,10 @@ const ContractsListView = () => {
   return (
     <Stack spacing={6}>
       <Box>
-        <Typography variant='h4'>Contratos</Typography>
+        <Stack direction='row' spacing={2} alignItems='center' flexWrap='wrap'>
+          <Typography variant='h4'>Contratos</Typography>
+          <CustomChip label='Comercial' color='primary' size='small' variant='tonal' />
+        </Stack>
         <Typography color='text.secondary'>
           SOWs, renovaciones y ejecución comercial activa por contrato.
         </Typography>
@@ -254,7 +257,7 @@ const ContractsListView = () => {
               </Stack>
             ) : items.length === 0 ? (
               <Alert severity='info'>
-                No hay contratos para este scope todavía. Cuando una cotización se promueva a contrato aparecerá aquí.
+                No hay contratos comerciales visibles todavía. Cuando una cotización se promueva a contrato aparecerá aquí.
               </Alert>
             ) : (
               <Box sx={{ overflowX: 'auto' }}>
@@ -336,9 +339,9 @@ const ContractsListView = () => {
                           </TableCell>
                           <TableCell>{formatCLP(item.mrrClp)}</TableCell>
                           <TableCell>
-                            <Typography>{item.quotesCount} quote(s)</Typography>
+                            <Typography>{item.quotesCount} cotización{item.quotesCount === 1 ? '' : 'es'}</Typography>
                             <Typography variant='body2' color='text.secondary'>
-                              {item.linkedDocumentCount} documento(s)
+                              {item.linkedDocumentCount} documento{item.linkedDocumentCount === 1 ? '' : 's'}
                             </Typography>
                           </TableCell>
                         </TableRow>

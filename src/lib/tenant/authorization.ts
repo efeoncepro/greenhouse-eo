@@ -7,7 +7,17 @@ import { getSupervisorScopeForTenant } from '@/lib/reporting-hierarchy/access'
 import type { SupervisorScopeRecord } from '@/lib/reporting-hierarchy/types'
 import { getTenantContext, type TenantContext } from '@/lib/tenant/get-tenant-context'
 
-export type TenantRouteGroup = 'client' | 'internal' | 'admin' | 'agency' | 'hr' | 'finance' | 'my' | 'people' | 'ai_tooling'
+export type TenantRouteGroup =
+  | 'client'
+  | 'internal'
+  | 'admin'
+  | 'agency'
+  | 'commercial'
+  | 'hr'
+  | 'finance'
+  | 'my'
+  | 'people'
+  | 'ai_tooling'
 
 export type DerivedAccessMode = 'broad' | 'supervisor'
 
@@ -58,6 +68,11 @@ export const canAccessProject = (tenant: TenantContext, projectId: string) => te
 
 export const canReadCostIntelligence = (tenant: TenantContext) =>
   hasRouteGroup(tenant, 'finance') || hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)
+
+export const canAccessCommercialModule = (tenant: TenantContext) =>
+  hasRouteGroup(tenant, 'commercial') ||
+  hasRouteGroup(tenant, 'finance') ||
+  hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)
 
 export const canCloseCostIntelligencePeriod = (tenant: TenantContext) =>
   hasRoleCode(tenant, ROLE_CODES.FINANCE_ADMIN) || hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)
@@ -440,6 +455,29 @@ export const requireFinanceTenantContext = async () => {
   }
 
   if (!hasRouteGroup(tenant, 'finance') && !hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)) {
+    return {
+      tenant: null,
+      errorResponse: NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+  }
+
+  return {
+    tenant,
+    errorResponse: null
+  }
+}
+
+export const requireCommercialTenantContext = async () => {
+  const { tenant, unauthorizedResponse } = await requireTenantContext()
+
+  if (!tenant) {
+    return {
+      tenant: null,
+      errorResponse: unauthorizedResponse
+    }
+  }
+
+  if (!canAccessCommercialModule(tenant)) {
     return {
       tenant: null,
       errorResponse: NextResponse.json({ error: 'Forbidden' }, { status: 403 })

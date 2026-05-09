@@ -55,6 +55,10 @@ import { providerBqSyncProjection } from './provider-bq-sync'
 import { hrOnboardingAutoCreateProjection } from './hr-onboarding-auto-create'
 import { hubspotServicesIntakeProjection } from './hubspot-services-intake'
 import { paymentProfileNotificationsProjection } from './payment-profile-notifications'
+import { engagementConvertedProjection } from './engagement-converted'
+import { engagementCancelledProjection } from './engagement-cancelled'
+import { organizationWorkspaceCacheInvalidationProjection } from './organization-workspace-cache-invalidation'
+import { sampleSprintRuntimeCacheInvalidationProjection } from './sample-sprint-runtime-cache-invalidation'
 
 // DEPRECATED: personOperationalProjection removed — replaced by personIntelligenceProjection
 // DEPRECATED: icoMemberProjection kept for backward compat (BQ → Postgres sync) but person_intelligence
@@ -120,4 +124,8 @@ export const ensureProjectionsRegistered = () => {
   registerProjection(hubspotServicesIntakeProjection) // TASK-813b — async intake p_services HubSpot via outbox event
   registerProjection(hrOnboardingAutoCreateProjection)
   registerProjection(paymentProfileNotificationsProjection) // TASK-753 — notify beneficiary on profile lifecycle events
+  registerProjection(engagementConvertedProjection)
+  registerProjection(engagementCancelledProjection)
+  registerProjection(organizationWorkspaceCacheInvalidationProjection) // TASK-611 Slice 6 — drops projection cache on grant/role/lifecycle events
+  registerProjection(sampleSprintRuntimeCacheInvalidationProjection) // TASK-835 Slice 6 — drops Sample Sprints runtime projection cache on engagement events
 }

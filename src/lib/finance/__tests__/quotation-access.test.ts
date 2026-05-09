@@ -36,10 +36,34 @@ describe('quotation-access', () => {
     expect(canDecideFinanceQuotationApproval(subject)).toBe(false)
   })
 
+  it('accepts the commercial quotes view during the finance path transition', () => {
+    const subject = {
+      roleCodes: [ROLE_CODES.COLLABORATOR],
+      routeGroups: ['my'],
+      authorizedViews: ['comercial.cotizaciones']
+    }
+
+    expect(canAccessFinanceQuotes(subject)).toBe(true)
+    expect(canManageFinanceQuotes(subject)).toBe(true)
+    expect(canDecideFinanceQuotationApproval(subject)).toBe(false)
+  })
+
   it('lets finance route-group members access and manage quotes', () => {
     const subject = {
       roleCodes: [ROLE_CODES.FINANCE_ANALYST],
       routeGroups: ['finance'],
+      authorizedViews: []
+    }
+
+    expect(canAccessFinanceQuotes(subject)).toBe(true)
+    expect(canManageFinanceQuotes(subject)).toBe(true)
+    expect(canDecideFinanceQuotationApproval(subject)).toBe(false)
+  })
+
+  it('lets commercial route-group members access and manage quotes on legacy finance paths', () => {
+    const subject = {
+      roleCodes: [ROLE_CODES.EFEONCE_ACCOUNT],
+      routeGroups: ['commercial'],
       authorizedViews: []
     }
 

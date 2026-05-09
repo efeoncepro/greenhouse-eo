@@ -31,6 +31,57 @@ Antes de este resolver, cada vista del portal (Mi Perfil, Admin User Detail, Peo
   - un futuro tab `Estructura` requiere un reader propio sobre jerarquía/departamentos
   - `Colegas` como lista plana org-wide no es una lectura canónica suficiente del objeto persona
 
+## Architecture Decision 2026-05-09 -- Professional Presence as a Governed Person 360 Facet
+
+- Status: `Accepted`
+- Owner: `People / HR / Identity`
+- Scope: `members` professional links/contact fields, Person 360, My Profile, HR professional profile, assigned team/client-safe profiles, collaboration deep links.
+- Reversibility: `two-way-but-slow`
+- Confidence: `medium`
+- Validated as of: `2026-05-09`
+
+### Context
+
+Greenhouse ya persiste presencia profesional en `greenhouse_core.members`: `headline`, `about_me`, professional links, contacto basico y IDs de integracion como `teams_user_id` / `slack_user_id`. Tambien existen rutas self-service y HR para editar/leer parte de esos datos, y `client-safe-profile` ya expone un subconjunto a clientes.
+
+El problema es que esos datos no son una sola categoria. `RUT`, direccion legal e identidad sensible viven bajo Person Legal Profile; cargo laboral y cargo por contexto viven bajo Workforce Role Title governance. Presencia profesional y contacto necesitan policy propia para evitar que telefono, handles personales o links externos se filtren a clientes por accidente, sin duplicar el modelo de identidad legal ni el de cargo.
+
+### Decision
+
+Greenhouse modela `Professional Presence` como una faceta gobernada de Person 360. La faceta resuelve presencia por contexto (`self`, `hr_internal`, `internal_collaboration`, `client_safe`, `public_share`) mediante una policy compartida.
+
+La fuente de datos V1 sigue siendo `greenhouse_core.members` para campos existentes. No se crea tabla paralela salvo que una task futura demuestre necesidad de metadata versionada, opt-in por link o audit granular que no quepa en el modelo actual.
+
+### Alternatives Considered
+
+- Tratar todos los links profesionales como publicos por defecto. Rechazado: mezcla self-service con exposicion cliente y puede filtrar informacion externa no revisada.
+- Meter contacto y presencia dentro de Person Legal Profile. Rechazado: contaminaría datos legales privados y surfaces de payroll/finiquito.
+- Usar Workforce Role Title governance como owner de presencia. Rechazado: cargo laboral no equivale a perfil profesional, portafolio ni preferencia de contacto.
+- Crear una tabla nueva de `person_presence` desde el inicio. Diferido: podria ser correcto si se requiere opt-in/audit por campo, pero V1 debe reutilizar columnas existentes y agregar policy primero.
+
+### Consequences
+
+- APIs y UI no deben decidir visibilidad inline; deben consumir una primitive compartida de presence policy/resolver.
+- `phone`, `contact_channel` y `contact_handle` son internal-only por defecto.
+- Client-safe presence solo puede exponer campos elegibles por policy.
+- Teams/Slack actions se derivan desde IDs de integracion y deep link/action resolver; no se guardan URLs manuales.
+- Completeness/readiness de presencia profesional no implica verificacion externa ni aptitud legal/laboral.
+
+### Runtime Contract
+
+- Datos V1: `greenhouse_core.members` professional/contact/integration fields.
+- Consumer canonico esperado: `src/lib/person-presence/*` o equivalente, server-side/shared.
+- Client-safe convergence: `src/lib/team/client-safe-profile.ts` debe consumir la policy.
+- Deep links: `src/lib/navigation/deep-links/**` debe resolver acciones de colaboracion por referencia semantica.
+- Access: capabilities `person.presence.*` o runtime-aligned equivalents deben distinguir read internal, read client-safe, self update, HR update y resolve contact action.
+
+### Revisit When
+
+- Se requiera opt-in por link/campo con historial/audit.
+- Se lance public talent profile/share page fuera del portal.
+- Se necesite verificar externamente portfolios/certificaciones antes de exposicion cliente.
+- Contact preferences evolucionen a disponibilidad contractual/calendario real.
+
 ## Core Thesis
 
 **Una persona, un resolver, N facetas.** El consumidor pide exactamente las facetas que necesita. El resolver resuelve identidad una sola vez, ejecuta facetas en paralelo, aplica autorizacion, cache, y retorna `_meta` con timing, errores, y estado de cache por faceta.

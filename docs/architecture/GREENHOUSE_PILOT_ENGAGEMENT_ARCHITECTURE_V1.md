@@ -3,11 +3,45 @@
 > **Tipo de documento:** Spec de arquitectura canónica
 > **Versión:** 1.2
 > **Creado:** 2026-05-05 por Claude (Opus 4.7)
-> **Última actualización:** 2026-05-05 por Claude (Opus 4.7) — Delta v1.2 aplicado tras pre-flight check + naming sweep "Sample Sprint"
-> **Estado:** Propuesta — no implementada
+> **Última actualización:** 2026-05-07 por Codex — Delta v1.11 TASK-810 aplicado: DB guard anti-zombie
+> **Estado:** Implementación por slices EPIC-014
 > **Owner:** Comercial / Agency
 > **Brand UI**: "Sample Sprint" (paraguas comercial). Schema interno usa `engagement_*` genérico — el rebranding marketing no requiere migrations.
 > **Domain boundary:** Commercial (no Finance — ver `GREENHOUSE_COMMERCIAL_FINANCE_DOMAIN_BOUNDARY_V1.md`)
+
+## Delta v1.10 (2026-05-07) — TASK-809 UI real + API wizards
+
+TASK-809 conecta el mockup aprobado a runtime real:
+
+1. **Surface real:** `/agency/sample-sprints` queda protegida por view `gestion.sample_sprints` y capability `commercial.engagement.read`. La navegacion muestra la entrada en Comercial y, para usuarios internos/admin, bajo Agencia > Operaciones.
+2. **APIs:** `/api/agency/sample-sprints` lista/declara; `/:serviceId` lee detalle; `approve`, `progress` y `outcome` delegan a helpers canonicos previos. `/api/admin/commercial/engagement-approvals` expone la cola admin de approvals pendientes.
+3. **Store reusable:** `src/lib/commercial/sample-sprints/store.ts` crea Sample Sprints como `services.engagement_kind IN ('pilot','trial','poc','discovery')`, `status='pending_approval'`, `commitment_terms_json` con criteria/deadline/cost/team, y approval inicial en la misma transaccion.
+4. **Reportes:** el uploader privado canonico soporta `sample_sprint_report_draft` y `sample_sprint_report`; `recordOutcome()` y `convertEngagement()` attachan el asset al outcome dentro de la transaccion.
+5. **Access model:** sin nuevos routeGroups ni startup policy. `views` usa `gestion.sample_sprints`; `entitlements` reutiliza `commercial.engagement.{read,declare,record_progress,record_outcome,approve}`.
+6. **Drift documentado:** `schema-snapshot-baseline.sql` sigue desactualizado respecto de `services.engagement_kind`, pero runtime live, migrations TASK-801 y `src/types/db.d.ts` son consistentes. No crear migracion correctiva por este drift documental.
+
+## Delta v1.11 (2026-05-07) — TASK-810 DB guard anti-zombie
+
+TASK-810 cierra el slice final de EPIC-014 con defensa mecanica en DB:
+
+1. **Drift corregido:** el diseño historico de §3.3 proponia un `CHECK` con `EXISTS`. PostgreSQL no permite subqueries dentro de `CHECK` y `CURRENT_DATE` en un CHECK tampoco reevalua filas por paso del tiempo. El mecanismo canonico queda corregido a trigger `BEFORE INSERT OR UPDATE`.
+2. **Guard instalado:** migration `20260507183122498_task-810-engagement-anti-zombie-trigger.sql` crea `greenhouse_core.assert_engagement_requires_decision_before_120d()` y trigger `services_engagement_requires_decision_before_120d` sobre `greenhouse_core.services`.
+3. **Predicado:** bloquea services non-regular activos, elegibles, >120 dias desde `start_date`, sin outcome ni lineage. Excluye `regular`, inactivos, `legacy_seed_archived`, `hubspot_sync_status='unmapped'`, estados no activos y terminales `cancelled|closed`.
+4. **Operacion:** el camino normal de resolucion es registrar outcome en `/agency/sample-sprints/[serviceId]/outcome`; el runbook vive en `docs/operations/runbooks/engagement-zombie-handling.md`.
+5. **Preflight:** `scripts/commercial/preflight-zombie-check.ts` reporta `space_id`/`organization_id` porque `services` no tiene `client_id` en runtime real.
+6. **Reliability:** `commercial.engagement.zombie` sigue detectando el drift a 90 dias; el trigger aplica hard stop a 120 dias.
+
+## Delta v1.9 (2026-05-07) — TASK-807 Commercial Health implementada
+
+TASK-807 formaliza `Commercial Health` como subsystem operativo del módulo reliability `commercial`:
+
+1. **Módulo existente, subsystem nuevo:** `commercial` ya existía en `STATIC_RELIABILITY_REGISTRY` por TASK-813; TASK-807 no crea un módulo paralelo, agrega `Commercial Health` como `OperationsSubsystem` y lo mapea a `moduleKey='commercial'`.
+2. **Primitive compartida:** `src/lib/commercial/sample-sprints/health.ts` centraliza los conteos read-only de health para evitar duplicar SQL entre `/admin/ops-health` y `getReliabilityOverview()`.
+3. **Seis signals:** cinco readers nuevos (`overdue_decision`, `budget_overrun`, `zombie`, `unapproved_active`, `conversion_rate_drop`) más `stale_progress` de TASK-805 reutilizado. Todos degradan a `unknown` ante error y no mutan estado.
+4. **Drift resuelto — `transition_event`:** esa columna/tabla no existe en runtime. `zombie` se define como service non-regular elegible, activo por >90 días, sin `engagement_outcomes` y sin `engagement_lineage` como parent/child.
+5. **Budget real:** `budget_overrun` compara `engagement_approvals.expected_internal_cost_clp` contra actuals agrupados por `service_id` desde `greenhouse_serving.commercial_cost_attribution_v2`; no usa solo `gtm_investment_pnl` porque esa view filtra `terms_kind='no_cost'`.
+6. **Conversion threshold:** default `30%`, configurable vía `GREENHOUSE_COMMERCIAL_ENGAGEMENT_CONVERSION_RATE_THRESHOLD` (`0.3` o `30`). Sin outcomes trailing 6m el signal queda `ok` por falta de denominador evaluable.
+7. **Surface real:** el subsystem queda visible en `/admin/ops-health`; referencias históricas a `/admin/operations` deben tratarse como legacy naming del Ops Health dashboard.
 
 ## Delta v1.3 (2026-05-06) — TASK-801 implementada con 2 ajustes vs spec
 
@@ -15,7 +49,7 @@ TASK-801 (Slice 1 / Capa 1 + 1b) cerrada 2026-05-06 vía migration `202605062007
 
 1. **`services.service_id` es `TEXT`, no `UUID`.** §3.2 Capa 1b declaraba el FK como `UUID REFERENCES services(service_id)`. Realidad: el PK de `services` es `text` (creado con la convención `svc-<uuid>` como string), y `client_team_assignments.assignment_id` también es `text`. **Corrección aplicada**: `service_id TEXT REFERENCES greenhouse_core.services(service_id) ON DELETE SET NULL`. Las futuras tablas de §3.2 (Capa 2 `engagement_commercial_terms`, Capa 3 `engagement_phases`/`engagement_outcomes`/`engagement_lineage`, etc.) que referencian `services.service_id` deben usar `TEXT` también — actualizar specs cuando se implementen TASK-802 onwards.
 
-2. **`commercial_cost_attribution_v2` es VIEW, no TABLE.** §3.2 Capa 6.2 (cost intelligence) declaraba `ALTER TABLE commercial_cost_attribution_v2 ADD COLUMN attribution_intent`. Realidad: v2 es VIEW canónica creada en TASK-708 y refinada en TASK-709b (UNION ALL de 3 CTEs). **Corrección aplicada**: `CREATE OR REPLACE VIEW` agregando `'operational'::TEXT AS attribution_intent` literal en cada SELECT del UNION. La columna existe en el shape y consumers downstream pueden filtrarla. Cuando TASK-802 introduzca `engagement_commercial_terms` y TASK-806 derive el intent (filtro `attribution_intent IN ('pilot','trial','poc','discovery')` para `gtm_investment_pnl`), la VIEW se actualiza para reemplazar el literal por la derivación real (JOIN a `services.engagement_kind` + `engagement_commercial_terms.terms_kind`).
+2. **`commercial_cost_attribution_v2` es VIEW, no TABLE.** §3.2 Capa 6.2 (cost intelligence) declaraba `ALTER TABLE commercial_cost_attribution_v2 ADD COLUMN attribution_intent`. Realidad: v2 es VIEW canónica creada en TASK-708 y refinada en TASK-709b (UNION ALL de 3 CTEs). **Corrección aplicada:** TASK-801 agregó la columna como literal operacional; TASK-806 reemplazó esa semántica por derivación real para rows service-linked. La VIEW ahora propaga `service_id` desde `client_team_assignments` y solo emite `pilot/trial/poc/discovery` cuando el service está aprobado, activo, no archivado legacy y no unmapped. TASK-815 agrega la ancla canónica para direct-client expenses mediante allocations aprobadas; sin esa fila explícita siguen `operational`.
 
 **Estado post-implementación verificado**:
 
@@ -27,6 +61,61 @@ TASK-801 (Slice 1 / Capa 1 + 1b) cerrada 2026-05-06 vía migration `202605062007
 - Types regenerados en `src/types/db.d.ts`. `pnpm build`/`lint`/`test`/`tsc` clean.
 
 **Hard rule futura**: cualquier task de EPIC-014 que cree FK a `services.service_id` debe usar `TEXT` no `UUID`. Cualquier task que extienda `commercial_cost_attribution_v2` debe usar `CREATE OR REPLACE VIEW`, no `ALTER TABLE`.
+
+## Delta v1.4 (2026-05-07) — TASK-802 pre-implementation correction
+
+TASK-802 corrige Capa 2 antes de implementar contra runtime real:
+
+1. **`engagement_commercial_terms.service_id` debe ser `TEXT`, no `UUID`.** Es la aplicación directa de la hard rule de TASK-801: `greenhouse_core.services.service_id` es `text`.
+2. **`declared_by` queda nullable en DB, requerido por helper.** La spec anterior combinaba `TEXT NOT NULL` con `ON DELETE SET NULL`, contrato contradictorio. Se alinea con TASK-760/761/762: el helper exige actor humano al declarar términos, pero la FK puede quedar `NULL` si el usuario se elimina para preservar historial.
+3. **TASK-813 eligibility guard.** Cualquier write path de terms debe validar que el `service` sea engagement real elegible: `active=TRUE`, `status != 'legacy_seed_archived'` y `hubspot_sync_status IS DISTINCT FROM 'unmapped'`. Las filas archivadas por TASK-813 y las materializadas como `unmapped` no deben recibir términos comerciales operativos.
+
+## Delta v1.5 (2026-05-07) — TASK-803 implementada
+
+TASK-803 (Capas 3, 4 y 5) quedó implementada vía migration `20260507135645984_task-803-engagement-phases-outcomes-lineage.sql`:
+
+1. **`engagement_phases`** modela hitos operativos del engagement con `phase_kind`, `phase_order`, ventana planificada, estado y actor de cierre. `UNIQUE (service_id, phase_order)` evita timeline ambiguo.
+2. **`engagement_outcomes`** modela la decisión terminal con `outcome_kind`, rationale, métricas, asset de reporte y links opcionales a `next_service_id` o `next_quotation_id`. La tabla es append-only por triggers DB: cualquier corrección posterior debe ir por TASK-808 audit/outbox, no por mutación destructiva.
+3. **`engagement_lineage`** modela transiciones parent/child multi-graph con `relationship_kind`, `transition_reason`, `recorded_by` y `UNIQUE (parent_service_id, child_service_id, relationship_kind)`.
+4. **Runtime real preservado:** todas las FKs a `services`, `assets`, `quotations` y `client_users` usan `TEXT`, no `UUID`.
+5. **TASK-813 hard guard reusable:** `src/lib/commercial/sample-sprints/eligibility.ts` centraliza la exclusión de services inactivos, `legacy_seed_archived` y `hubspot_sync_status='unmapped'`. Lo consumen `commercial-terms`, `phases`, `outcomes` y `lineage`.
+6. **Sin access/UI en este slice:** no se agregan `routeGroups`, `views`, `entitlements`, startup policy, APIs, UI, reliability signals ni outbox events. TASK-808 conserva ownership del audit log/outbox de engagement.
+
+## Delta v1.6 (2026-05-07) — TASK-804 implementada
+
+TASK-804 (Capa 7 approval + capacity warning soft) quedó implementada vía migration `20260507145320864_task-804-engagement-approvals-capacity-warning.sql`:
+
+1. **`engagement_approvals`** modela el state machine `pending | approved | rejected | withdrawn` con fila única por `service_id`, checks de shape por estado, actor evidence (`approved_by`, `rejected_by`, `withdrawn_by`) y `updated_at` automático.
+2. **Runtime real preservado:** `service_id` usa `TEXT` hacia `greenhouse_core.services(service_id)`. Actor FKs apuntan a `greenhouse_core.client_users(user_id)` y son nullable en DB para soportar `ON DELETE SET NULL`; los helpers siguen exigiendo actor input.
+3. **Capacity warning soft:** `src/lib/commercial/sample-sprints/capacity-checker.ts` calcula capacidad por miembro y periodo desde `client_team_assignments`, excluye asignaciones internas Efeonce y retorna `totalFte`, `allocatedFte`, `availableFte` y `conflictingAssignments`.
+4. **Approval helpers:** `approvals.ts` expone `requestApproval`, `approveEngagement`, `rejectEngagement`, `withdrawApproval` y `getApprovalForService`. `approveEngagement` persiste `capacity_warning_json` siempre; si algún miembro queda sobre 100% FTE exige `capacity_override_reason >= 10`.
+5. **Estado de `services`:** `requestApproval` marca non-regular services como `status='pending_approval'`; `approveEngagement` los vuelve `active`. El runtime no tiene CHECK sobre `services.status`, así que este valor es compatible sin DDL adicional.
+6. **Access model:** `commercial.engagement.approve` ya existía en catálogo/runtime y queda EFEONCE_ADMIN-only en V1. TASK-804 agrega test explícito de gating; no crea `routeGroups`, `views` ni startup policy.
+7. **Sin API/UI/outbox en este slice:** TASK-809 toma la surface real y TASK-808 toma audit/outbox; este slice entrega primitives y helpers.
+
+## Delta v1.7 (2026-05-07) — TASK-805 implementada
+
+TASK-805 (Capa 6 progress snapshots) quedó implementada vía migration `20260507152450308_task-805-engagement-progress-snapshots.sql`:
+
+1. **`engagement_progress_snapshots`** persiste snapshots semanales por `service_id + snapshot_date` con `UNIQUE (service_id, snapshot_date)` e índice `(service_id, snapshot_date DESC)` para listados/latest.
+2. **Runtime real preservado:** `service_id` usa `TEXT` hacia `greenhouse_core.services(service_id)` y `recorded_by` usa `TEXT` hacia `greenhouse_core.client_users(user_id)` nullable en DB por `ON DELETE SET NULL`; el helper exige actor input.
+3. **Append-only:** triggers DB bloquean `UPDATE`/`DELETE`. Correcciones futuras deben registrarse como otro snapshot fechado o vía audit/outbox de TASK-808.
+4. **Metrics V1:** `metrics_json` sigue schema-flexible, pero DB y helper exigen objeto JSON no vacío. Templates por `engagement_kind` quedan como V2.
+5. **Helper canónico:** `src/lib/commercial/sample-sprints/progress-recorder.ts` expone `recordProgressSnapshot`, `listSnapshotsForService` y `getLatestSnapshot`; aplica guard TASK-813 y rechaza `services.engagement_kind='regular'`.
+6. **Access model:** `commercial.engagement.record_progress` ya existía en catálogo/runtime y queda operator-friendly para `routeGroup=commercial` / admin; approve sigue admin-only. No se agregan `routeGroups`, `views` ni startup policy.
+7. **Reliability:** `src/lib/reliability/queries/engagement-stale-progress.ts` agrega `commercial.engagement.stale_progress` como signal `drift`/`warning` si un engagement activo non-regular no tiene snapshot reciente (>10 días). Se inyecta bajo `moduleKey='commercial'`; TASK-807 conserva el subsystem `Commercial Health` completo.
+8. **Sin API/UI/outbox en este slice:** TASK-809 toma la surface real y TASK-808 toma audit/outbox.
+
+## Delta v1.8 (2026-05-07) — TASK-815 implementada
+
+TASK-815 cierra el follow-up explícito de TASK-806 para gastos directos de cliente sin `service_id`:
+
+1. **Primitive nueva:** `greenhouse_finance.expense_service_allocations` modela una asignación aprobada `expense_id -> service_id` con `allocated_amount_clp`, `allocation_source`, `evidence_json` y state machine `draft | approved | rejected`.
+2. **No heurística:** `commercial_cost_attribution_v2` solo emite `expense_direct_service` cuando existe allocation aprobada; no infiere service desde cliente, nombre, línea de servicio ni scope.
+3. **Residual seguro:** el monto aprobado sale como `expense_direct_service`; el remanente del mismo expense conserva `expense_direct_client` y `attribution_intent='operational'`.
+4. **Guardrails DB:** la trigger acepta solo expenses directos de cliente (`cost_is_direct=TRUE`, `allocated_client_id IS NOT NULL`), no anulados, dentro del cap del expense, y services activos/no archived/no unmapped.
+5. **Service P&L:** `src/lib/service-attribution/materialize.ts` consume allocations aprobadas como direct cost high-confidence (`approved_expense_service_allocation`) y descuenta ese monto del residual para evitar doble conteo.
+6. **Sin access/UI en esta slice:** no se agregan `routeGroups`, `views`, `entitlements` ni startup policy. TASK-809 debe montar la surface aprobada para crear/aprobar allocations; TASK-807 puede agregar health signals sobre expenses pendientes de allocation.
 
 ## Delta v1.2 (2026-05-05) — pre-flight check + naming "Sample Sprint"
 
@@ -130,7 +219,7 @@ Las 4 categorías comparten estructura (acotadas en tiempo, deliverable explíci
 | Dimensión | Pregunta que responde | Valores | Persistencia |
 |---|---|---|---|
 | `engagement_kind` | ¿Qué tipo de servicio es? | `regular`, `pilot`, `trial`, `poc`, `discovery` | Columna en `services` |
-| `commercial_terms` | ¿Cómo se cobra? | `committed`, `no_cost`, `success_fee`, `reduced_fee` | Tabla `service_commercial_terms` time-versioned |
+| `commercial_terms` | ¿Cómo se cobra? | `committed`, `no_cost`, `success_fee`, `reduced_fee` | Tabla `engagement_commercial_terms` time-versioned |
 | `lifecycle_phase` | ¿En qué fase operativa está? | declarativo per service | Tabla `service_phases` |
 | `outcome` | ¿Cuál fue la decisión final? | `converted`, `adjusted`, `dropped` | Tabla `service_outcomes` |
 | `lineage` | ¿De qué nació, en qué se transformó? | graph relations | Tabla `service_lineage` |
@@ -160,13 +249,13 @@ CREATE INDEX client_team_assignments_service_idx
 -- Capa 2: términos comerciales time-versioned
 CREATE TABLE greenhouse_commercial.engagement_commercial_terms (
   terms_id            UUID PRIMARY KEY,
-  service_id          UUID NOT NULL REFERENCES greenhouse_core.services(service_id) ON DELETE CASCADE,
+  service_id          TEXT NOT NULL REFERENCES greenhouse_core.services(service_id) ON DELETE CASCADE,
   terms_kind          TEXT NOT NULL CHECK (terms_kind IN ('committed','no_cost','success_fee','reduced_fee')),
   effective_from      DATE NOT NULL,
   effective_to        DATE,
   monthly_amount_clp  NUMERIC(18,2),
   success_criteria    JSONB,
-  declared_by         TEXT NOT NULL REFERENCES greenhouse_core.client_users(user_id) ON DELETE SET NULL,
+  declared_by         TEXT REFERENCES greenhouse_core.client_users(user_id) ON DELETE SET NULL,
   declared_at         TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   reason              TEXT NOT NULL CHECK (length(reason) >= 10),
   CHECK (effective_to IS NULL OR effective_to > effective_from)
@@ -326,25 +415,19 @@ CREATE INDEX engagement_outcomes_next_service_idx
   WHERE next_service_id IS NOT NULL;
 ```
 
-### 3.3 CHECK constraint anti-zombie (defensa en DB)
+### 3.3 DB guard anti-zombie (defensa en DB)
+
+> TASK-810 corrigio este diseño: el mecanismo implementado es trigger, no CHECK,
+> porque el predicado necesita consultar outcomes/lineage.
 
 ```sql
-ALTER TABLE greenhouse_core.services
-  ADD CONSTRAINT services_engagement_requires_decision_before_120d
-  CHECK (
-    engagement_kind = 'regular'
-    OR (engagement_kind <> 'regular' AND (
-      -- engagement activo dentro de ventana razonable
-      (status = 'active' AND start_date >= CURRENT_DATE - INTERVAL '120 days')
-      -- o ya tiene outcome registrado
-      OR EXISTS (SELECT 1 FROM greenhouse_commercial.engagement_outcomes o WHERE o.service_id = services.service_id)
-      -- o explícitamente cancelado
-      OR status IN ('cancelled','closed')
-    ))
-  );
+CREATE TRIGGER services_engagement_requires_decision_before_120d
+  BEFORE INSERT OR UPDATE ON greenhouse_core.services
+  FOR EACH ROW
+  EXECUTE FUNCTION greenhouse_core.assert_engagement_requires_decision_before_120d();
 ```
 
-NOT VALID + VALIDATE atomic patrón TASK-708/766/774 para no bloquear backfill.
+El trigger rechaza `check_violation` cuando un engagement non-regular activo supera 120 dias sin `engagement_outcomes` ni `engagement_lineage`. El preflight equivalente debe estar en cero antes de instalar o endurecer el guard.
 
 ## 4. Lifecycle de organización (interacción con party lifecycle)
 
@@ -420,6 +503,8 @@ getMemberCapacityForPeriod(memberId: string, fromDate: Date, toDate: Date): {
 ### 5.4 Outbox events versionados v1
 
 > **Delta v1.2 — naming**: events renombrados de `service.pilot.*` → `service.engagement.*` (genérico). Cuando cambie el marketing label "Sample Sprint", consumers downstream NO se rompen.
+>
+> **Delta v1.10 — TASK-808 runtime alignment**: la version vive en `payload_json.version=1`; el `event_type` no usa sufijo `_v1`. Los eventos se publican en `greenhouse_sync.outbox_events` con `aggregate_type='service'` y `aggregate_id=<service_id>`.
 
 - `service.engagement.declared` v1
 - `service.engagement.approved` v1
@@ -447,7 +532,7 @@ Tabla `greenhouse_commercial.engagement_audit_log` con triggers PG `engagement_a
 - `lineage_added` — relación parent/child entre services registrada
 - `converted` — flow de conversión completo ejecutado
 - `cancelled` — cancelado early (by_client / by_provider)
-- `reverted` — outcome revertido por error (rollback manual con audit explícito)
+- `reverted` — reservado para futuro rollback manual con audit explícito; no materializado en TASK-808 V1.
 
 **Delta v1.2**: tabla renombrada de `pilot_decision_audit_log` → `engagement_audit_log` (alineado con resto del schema). DDL en §3.2 — functions + triggers + index `engagement_audit_service_idx`.
 
@@ -487,38 +572,55 @@ Eso preserva auditoría: "Sky consumió X horas de Valentina durante el piloto C
 #### 6.2.2 VIEW canónica `gtm_investment_pnl` — reclasificación gerencial
 
 ```sql
--- VIEW canónica gtm_investment_pnl
--- Lee desde v2 (canonical post TASK-708/709 — labor consolidado).
--- Patrón heredado de TASK-409 (extender client_economics con backfill desde
--- commercial_cost_attribution).
-CREATE VIEW greenhouse_serving.gtm_investment_pnl AS
+-- VIEW canónica gtm_investment_pnl (TASK-806).
+-- Lee desde v2 (canonical post TASK-708/709 — labor consolidado) con service_id
+-- propagado desde client_team_assignments.
+CREATE OR REPLACE VIEW greenhouse_serving.gtm_investment_pnl AS
 SELECT
   cca.period_year,
   cca.period_month,
   cca.client_id,
-  cca.member_id,
-  s.service_id,
+  c.client_name,
+  cca.service_id,
+  s.name AS service_name,
   s.engagement_kind,
-  cca.allocated_labor_clp + cca.direct_overhead + cca.shared_overhead AS gtm_investment_clp,
-  cca.attribution_intent
+  cca.member_id,
+  m.display_name AS member_name,
+  cca.cost_dimension,
+  cca.amount_clp::NUMERIC AS gtm_investment_clp,
+  cca.fte_contribution,
+  cca.attribution_intent,
+  sct.terms_kind
 FROM greenhouse_serving.commercial_cost_attribution_v2 cca
 JOIN greenhouse_core.services s ON s.service_id = cca.service_id
 JOIN greenhouse_commercial.engagement_commercial_terms sct
   ON sct.service_id = s.service_id
+  AND sct.terms_kind = 'no_cost'
   AND sct.effective_from <= make_date(cca.period_year, cca.period_month, 1)
-  AND (sct.effective_to IS NULL OR sct.effective_to >= make_date(cca.period_year, cca.period_month, 1))
+  AND (sct.effective_to IS NULL OR sct.effective_to > make_date(cca.period_year, cca.period_month, 1))
+LEFT JOIN greenhouse_core.clients c ON c.client_id = cca.client_id
+LEFT JOIN greenhouse_core.members m ON m.member_id = cca.member_id
 WHERE cca.attribution_intent IN ('pilot','trial','poc','discovery')
-  AND sct.terms_kind = 'no_cost';
+  AND s.engagement_kind IN ('pilot','trial','poc','discovery')
+  AND s.active = TRUE
+  AND s.status != 'legacy_seed_archived'
+  AND s.hubspot_sync_status IS DISTINCT FROM 'unmapped'
+  AND EXISTS (
+    SELECT 1
+    FROM greenhouse_commercial.engagement_approvals ea
+    WHERE ea.service_id = s.service_id
+      AND ea.status = 'approved'
+  );
 
 COMMENT ON VIEW greenhouse_serving.gtm_investment_pnl IS
-  'GTM Investment reclassification — labor cost atribuido a pilotos/trials/poc/discovery '
-  'sin cobro al cliente. P&L gerencial resta del cliente, suma a línea "GTM Investment". '
-  'Lee de commercial_cost_attribution_v2 (TASK-709 consolidated labor). '
-  'NO usar para auditoría por cliente — para eso lee v2 directo. Patrón heredado de TASK-409 '
-  '(extender client_economics con backfill desde commercial_cost_attribution).';
+  'Management-accounting view for approved no-cost Sample Sprint GTM investment. '
+  'Not client-facing audit evidence, not fiscal/legal accounting, and not a replacement '
+  'for source cost attribution records.';
 ```
 
 > **Delta v1.1**: VIEW corregida para leer de `greenhouse_serving.commercial_cost_attribution_v2` (canónica post TASK-708/709). Patrón explícitamente heredado de TASK-409 (extender `client_economics` con backfill desde `commercial_cost_attribution`) para reducir surface novel y reusar primitiva canonizada.
+> **Delta v1.3 (TASK-806)**: runtime real usa `amount_clp` + `cost_dimension`, no columnas `allocated_labor_clp/direct_overhead/shared_overhead` en v2. La service dimension se propaga desde `client_team_assignments.service_id`; no se reclasifican direct-client expenses sin ancla de servicio. La ventana de términos usa `effective_to > period_start`, alineada al helper canónico `getActiveCommercialTerms`.
+> **Delta v1.8 (TASK-815)**: la ancla explícita para direct-client expenses es `greenhouse_finance.expense_service_allocations`. `commercial_cost_attribution_v2` expone `expense_direct_service` para allocations aprobadas y mantiene el residual como `expense_direct_client`.
 
 El P&L gerencial **resta** `gtm_investment_pnl` del cliente y **suma** a línea separada "GTM Investment". El cliente no aparece como unprofitable; el piloto aparece como inversión deliberada.
 
@@ -565,8 +667,7 @@ BEGIN;
     next_service_id, next_quotation_id, decided_by, metrics_json
   ) VALUES (...);
 
-  -- 2. Spawn nuevo service regular + commercial_terms committed
-  INSERT INTO greenhouse_core.services (service_id, engagement_kind, ...) VALUES (...);
+  -- 2. Si ya existe child service regular, declarar commercial_terms committed
   INSERT INTO greenhouse_commercial.engagement_commercial_terms (
     service_id, terms_kind, effective_from, monthly_amount_clp, ...
   ) VALUES (..., 'committed', CURRENT_DATE, ...);
@@ -583,22 +684,22 @@ BEGIN;
 
   -- 5. Outbox event v1 (en la misma tx — patrón canónico TASK-771/773)
   INSERT INTO greenhouse_sync.outbox_events (
-    event_type, event_version, aggregate_id, payload
-  ) VALUES ('service.engagement.converted', 1, ..., ...);
+    aggregate_type, aggregate_id, event_type, payload_json, status, occurred_at
+  ) VALUES ('service', ..., 'service.engagement.converted', '{"version":1, ...}', 'pending', now());
 COMMIT;
 ```
 
 **Steps async (post-commit, vía reactive consumer)**:
 
 6. Consumer reactivo lee `service.engagement.converted` v1 y:
-   - UPDATE `greenhouse_core.organizations` SET `lifecycle_stage='active_client'`, `lifecycle_stage_source='quote_converted'`, `lifecycle_stage_by=<actor_user_id>`, `lifecycle_stage_since=NOW()` (todos los campos canónicos del lifecycle history — TASK-535/TASK-542). Trigger `organization_lifecycle_history` ya canonizado escribe el snapshot histórico automáticamente.
-   - Trigger HubSpot bridge: crea deal desde el quotation referenciado (solo si `services.hubspot_deal_id IS NULL`).
+   - Llama `promoteParty({ toStage:'active_client', source:'quote_converted' })` para que el writer canónico inserte `organization_lifecycle_history`, actualice `lifecycle_stage/source/by/since`, instancie `clients`/`client_profiles` cuando corresponda y publique eventos `commercial.party.*`.
+   - No crea HubSpot deals directo desde service en TASK-808. El runtime real solo tiene comando canónico Quote Builder → Deal (`createDealFromQuoteContext`) con governance/idempotency/rate-limit; service→deal queda como follow-up explícito.
 
 > **Delta v1.1 — atomicidad explícita + lifecycle source canónico + HubSpot conditional**:
 >
 > - **Atomicidad**: pasos 1-5 viven en **una sola transacción Postgres**. Si cualquier INSERT falla → ROLLBACK completo. El reactive consumer (paso 6) es at-least-once con consumer idempotente (patrón canónico outbox).
-> - **Lifecycle source canónico**: el flip a `active_client` debe poblar `lifecycle_stage_source='quote_converted'` (valor existente en el enum, verificado en migration `20260421113910459:51`) + `lifecycle_stage_by` + `lifecycle_stage_since`. Sin esto, el lifecycle history queda sin trazabilidad y rompe el contract de TASK-535.
-> - **HubSpot conditional**: la regla "pilotos NO crean deals automáticamente" se implementa en el reactive consumer como `IF service.engagement_kind = 'regular' AND service.hubspot_deal_id IS NULL THEN create_deal(...)`. Pilotos quedan con `hubspot_deal_id=NULL` permanentemente; solo el child_service post-conversión sincroniza.
+> - **Lifecycle source canónico**: el flip a `active_client` debe pasar por `promoteParty()` con `source='quote_converted'`. Sin esto, se omiten lifecycle history, client/profile side-effects y eventos downstream.
+> - **HubSpot conditional**: la versión runtime de TASK-808 no llama HubSpot. El consumer marca metadata `deferred_no_canonical_service_to_deal_command` si detecta que habría correspondido crear deal, hasta que exista un comando service→deal con la misma gobernanza de Quote Builder.
 
 ### 8.1 Rollback contract
 
@@ -690,7 +791,7 @@ Si el reactive consumer falla (paso 6):
 | **6** | 6 reliability signals + subsystem `Commercial Health` registry (NUEVO — mirror TASK-672 `Finance Data Quality`) | Slices 1-5 + Slice 4.5 |
 | **7** | `engagement_audit_log` + outbox events v1 (9 events) + reactive consumers (lifecycle flip + HubSpot conditional) | Slices 1-6 |
 | **8** | UI `/agency/sample-sprints` + wizards declaración/approval/progress/outcome + agrupación per-cliente | Slices 1-7 |
-| **9** | CHECK constraint anti-zombie (NOT VALID + VALIDATE atomic, patrón TASK-708/766/774) | Slices 1-8 (post-cleanup) |
+| **9** | DB guard anti-zombie via trigger `services_engagement_requires_decision_before_120d` | Slices 1-8 (post-cleanup) |
 
 ## 12. Reglas duras (resumen anti-regresión)
 
@@ -700,7 +801,7 @@ Si el reactive consumer falla (paso 6):
 - **NUNCA** flipear `organizations.lifecycle_stage='active_client'` por declarar un Sample Sprint. Solo el child_service post-conversión lo hace, **siempre poblando `lifecycle_stage_source='quote_converted'` + `lifecycle_stage_by` + `lifecycle_stage_since`** (TASK-535/542 contract).
 - **NUNCA** crear HubSpot deal automáticamente al declarar Sample Sprint. Solo el child_service regular post-conversión, conditional `WHERE engagement_kind='regular' AND hubspot_deal_id IS NULL`.
 - **NUNCA** asignar cost attribution sin `engagement_approvals.status='approved'`. La capa de gobierno bloquea.
-- **NUNCA** dejar engagement non-regular activo > 120 días sin outcome. CHECK constraint + reliability signal `commercial.engagement.zombie` lo enforce.
+- **NUNCA** dejar engagement non-regular activo > 120 días sin outcome ni lineage. Trigger DB + reliability signal `commercial.engagement.zombie` lo enforce.
 - **NUNCA** filtrar engagements del `commercial_cost_attribution` para "limpiar" dashboards. Usar VIEW `gtm_investment_pnl` para reclassificación read-time.
 - **NUNCA** modificar `engagement_outcomes` o `engagement_audit_log` (append-only enforced por trigger).
 - **NUNCA** spawn `engagement_lineage` row sin `transition_reason >= 10 chars`.
@@ -731,12 +832,12 @@ Si el reactive consumer falla (paso 6):
 | Time-versioned terms | TASK-700 internal_account_number_registry | `service_commercial_terms` con `effective_from/to` + UNIQUE active partial index |
 | Append-only audit log | TASK-535 (organization_lifecycle_history) / TASK-768 (economic_category_resolution_log) | `pilot_decision_audit_log` con triggers `pilot_audit_no_update/no_delete` |
 | Approval workflow + capability granular | TASK-742 (7 capas) | `engagement_approvals` + `commercial.pilot.approve` |
-| State machine + CHECK constraint | TASK-765 | `engagement_kind` + anti-zombie CHECK 120d |
+| State machine + trigger DB | TASK-765 | `engagement_kind` + anti-zombie trigger 120d |
 | Reliability signal subsystem | TASK-672 (Finance Data Quality precedent) | 5 signals subsystem `Commercial Health` (NUEVO — Slice 6) |
 | VIEW canónica + helper reclassifier | TASK-571/699/766/774 | `gtm_investment_pnl` view + helper TS |
 | Asset uploader canónico | TASK-721 | `service_outcomes.report_asset_id` FK a `greenhouse_core.assets` |
 | Outbox events versionados | GREENHOUSE_EVENT_CATALOG_V1 + TASK-771/773 | 6 events v1 + atomic in-tx insertion + reactive consumer at-least-once |
-| NOT VALID + VALIDATE atomic | TASK-708/766/774 (corregido v1.1 — TASK-728 era cita errónea) | CHECK anti-zombie sin bloquear backfill |
+| NOT VALID + VALIDATE atomic | TASK-708/766/774 (corregido v1.1 — TASK-728 era cita errónea) | Solo para CHECKs row-local; TASK-810 usa trigger por predicado cross-table |
 | Lifecycle history with source/by/since | TASK-535/TASK-542 | flip a `active_client` poblando los 4 campos coordinados |
 | FK actor pattern (TEXT + ON DELETE SET NULL) | TASK-760/761/762 (offboarding case + final settlement) | 6 FKs a `greenhouse_core.client_users(user_id)` |
 | Extender `client_economics` con backfill | TASK-409 (`labor_cost_clp` add + backfill desde commercial_cost_attribution) | VIEW `gtm_investment_pnl` lee de `commercial_cost_attribution_v2` para reclassification gerencial |
@@ -751,7 +852,7 @@ Si el reactive consumer falla (paso 6):
 3. **Adjusted path:** Sample Sprint → outcome=adjusted → nuevo Sample Sprint declarado linkado vía engagement_lineage relationship_kind=adjusted_into.
 4. **Cancellation by client:** Sample Sprint cancelado en semana 2 por Sky → outcome=cancelled_by_client + cancellation_reason ≥ 10 chars → audit log evento `cancelled` → outbox event `service.engagement.cancelled v1`.
 5. **Cancellation by provider:** Efeonce no puede continuar → outcome=cancelled_by_provider + cancellation_reason → mismo path audit/outbox.
-6. **Anti-zombie:** engagement activo 121 días sin outcome → CHECK constraint rechaza UPDATE → reliability signal `commercial.engagement.zombie` emite.
+6. **Anti-zombie:** engagement activo 121 días sin outcome ni lineage → trigger DB rechaza UPDATE → reliability signal `commercial.engagement.zombie` emite.
 7. **Anti-unapproved:** intentar crear cost_attribution para engagement sin approval → bloqueado por gate de approval workflow.
 8. **Budget overrun:** engagement con actual_cost > expected * 1.2 → reliability signal `commercial.engagement.budget_overrun` emite warning.
 9. **Conversion rate drop:** trailing 6m < 30% → signal `commercial.engagement.conversion_rate_drop` emite warning.
@@ -794,7 +895,7 @@ Si el reactive consumer falla (paso 6):
 - **What can go wrong**: pilotos sin gobierno queman recursos, lifecycle se flipea sin trazabilidad, aprobaciones bypaseadas, audit trail corrupto.
 - **Gates**: capability granular `commercial.pilot.{declare,approve,record_outcome,read}`, approval workflow obligatorio (`pilot_approvals.status='approved'` requerido para cost attribution), audit log append-only con triggers PG anti-update/delete.
 - **Blast radius if wrong**: medium — un piloto fantasma cuesta dinero por cliente atribuido pero no contamina cross-tenant; el lifecycle history append-only protege auditoría.
-- **Verified by**: 5 reliability signals (overdue/budget_overrun/zombie/unapproved_active/conversion_rate_drop), CHECK anti-zombie 120d, audit triggers, FK ON DELETE SET NULL para preservar audit cuando un actor deja la empresa.
+- **Verified by**: 5 reliability signals (overdue/budget_overrun/zombie/unapproved_active/conversion_rate_drop), trigger anti-zombie 120d, audit triggers, FK ON DELETE SET NULL para preservar audit cuando un actor deja la empresa.
 - **Residual risk**: el path HubSpot auto-create deals (Open Q6) no está verificado; si no existe, el flow queda con un gap manual hasta que se implemente. Mitigación: en Slice 7 se verifica explícitamente y se difiere si necesario.
 - **Score estimado**: 8.5/10.
 
@@ -836,3 +937,4 @@ Si el reactive consumer falla (paso 6):
 | 2026-05-05 | 1.0 | Claude (Opus 4.7) | Spec inicial — propuesta no implementada |
 | 2026-05-05 | 1.1 | Claude (Opus 4.7) — auditoría con `arch-architect` | Delta v1.1: 3 errores materiales corregidos (schema cost attribution, FK actor, cita TASK-728), 4 supuestos verificados (lifecycle enum, source enum, subsystem novel, owner approve), DDL completa de `pilot_decision_audit_log` agregada, índices faltantes (lineage, approvals pending, outcomes decision), boundary transaccional explícito en §8, lifecycle history canónico aplicado en §10.2, patrón TASK-409 + TASK-760/761/762 reusados explícitamente. Score 4-pilar: 6.75/10 → 8.5/10 estimado. |
 | 2026-05-05 | 1.2 | Claude (Opus 4.7) — pre-flight check + naming "Sample Sprint" | Delta v1.2: rebrand UI "Sample Sprint" + sub-tipos (Operations/Extension/Validation/Discovery Sprint); naming sweep de tablas a `engagement_*` (genérico — sobrevive marketing pivots); 5 decisiones de alcance V1 resueltas (B1 naming híbrido, B2 notif diferidas a V2, B3 progress snapshots incluido, B4 capacity warning soft, B5 reporte manual con structured fields); nueva tabla `engagement_progress_snapshots` (Slice 4.5); extensión `client_team_assignments.service_id` FK opcional; outcome enum extendido con `cancelled_by_client/provider` + `cancellation_reason`; `next_quotation_id` para pricing post-conversión; capability `commercial.engagement.record_progress` nueva; signal `commercial.engagement.stale_progress` nueva; 9 outbox events (vs 6 en v1.1); 16 hard rules (vs 11); 16 smoke tests (vs 8); 10 open questions (vs 7). Score 4-pilar: 8.5/10 → 9.0/10 estimado. **Spec lista para `greenhouse-task-planner`**. |
+| 2026-05-07 | 1.3 | Codex — TASK-806 runtime alignment | `commercial_cost_attribution_v2` ahora propaga `service_id` y deriva `attribution_intent` desde services non-regular aprobados con guard TASK-813; `gtm_investment_pnl` real usa `amount_clp`, filtra `terms_kind='no_cost'`, exige approval aprobado vía `EXISTS` y documenta explícitamente que es management accounting, no auditoría cliente/fiscal. |

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 
-import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
+import { requireCommercialTenantContext } from '@/lib/tenant/authorization'
 import { resolveQuotationIdentity } from '@/lib/finance/pricing'
 import { readQuotationDocumentChain } from '@/lib/finance/quote-to-cash/document-chain-reader'
 
@@ -19,7 +19,7 @@ export async function GET(
   _request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { tenant, errorResponse } = await requireFinanceTenantContext()
+  const { tenant, errorResponse } = await requireCommercialTenantContext()
 
   if (!tenant) return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 

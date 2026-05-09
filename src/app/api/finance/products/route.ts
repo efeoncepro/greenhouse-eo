@@ -7,7 +7,7 @@ import {
   logFinanceSchemaDrift
 } from '@/lib/finance/schema-drift'
 import { listCommercialProductCatalog } from '@/lib/commercial/product-catalog-store'
-import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
+import { requireCommercialTenantContext } from '@/lib/tenant/authorization'
 import { roundCurrency, toNumber, toDateString } from '@/lib/finance/shared'
 
 export const dynamic = 'force-dynamic'
@@ -31,7 +31,7 @@ interface ProductRow extends Record<string, unknown> {
 }
 
 export async function GET(request: Request) {
-  const { tenant, errorResponse } = await requireFinanceTenantContext()
+  const { tenant, errorResponse } = await requireCommercialTenantContext()
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

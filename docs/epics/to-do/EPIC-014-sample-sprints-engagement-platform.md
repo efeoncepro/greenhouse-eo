@@ -16,6 +16,13 @@
 
 Materializa la primitiva canónica **Sample Sprint** (paraguas comercial UI) sobre `services` con `engagement_kind != 'regular'`. Permite ofrecer pilotos / trials / POCs / discoveries acotados en tiempo, sin compromiso firme, con gobierno explícito de aprobación + capacity warning + audit trail append-only + reclasificación de costo GTM. Reusa toda la plomería canonizada (cost attribution v2, lifecycle history TASK-535/542, outbox + reactive consumer TASK-771/773, asset uploader TASK-721, FK actor TASK-760/761/762).
 
+## Mockup aprobado
+
+- **Aprobado por usuario:** 2026-05-07.
+- **Ruta local:** `/agency/sample-sprints/mockup`.
+- **Artefactos canónicos:** `src/app/(dashboard)/agency/sample-sprints/mockup/page.tsx` y `src/views/greenhouse/agency/sample-sprints/mockup/SampleSprintsMockupView.tsx`.
+- **Regla operativa:** los slices de UI/API/backend de `TASK-803` a `TASK-810` deben preservar la experiencia aprobada y reemplazar mock data por readers/helpers reales sin reinterpretar la dirección visual. Cualquier desviación visual significativa requiere actualizar el mockup y nueva aprobación.
+
 ## Why This Epic Exists
 
 Hoy los Sample Sprints (Sky Content Lead + Paid Social Care, abril-mayo 2026) viven sin schema canónico: sin governance de aprobación, sin reliability signals para detectar zombies, sin reclasificación de costo (Sky aparece como cliente unprofitable durante el Sprint), sin audit trail de decisiones, sin lineage entre Sprint y contrato post-conversión. Cada Sprint nuevo arranca con tracking ad-hoc y deja deuda al cierre. La arquitectura actual de `services` no distingue "servicio facturable" de "servicio en evaluación" — por eso este Epic introduce la dimensión `engagement_kind` ortogonal a `commercial_terms` ortogonal a `lifecycle_phase`.
@@ -86,11 +93,15 @@ Reglas obligatorias:
 7. **TASK-807** — 6 reliability signals + subsystem `Commercial Health` registry (NUEVO — mirror TASK-672)
 8. **TASK-808** — `engagement_audit_log` + outbox events v1 (9 events) + reactive consumers (lifecycle flip + HubSpot conditional)
 9. **TASK-809** — UI `/agency/sample-sprints` + wizards declaración / approval / progress / outcome + agrupación per-cliente
-10. **TASK-810** — CHECK constraint anti-zombie (NOT VALID + VALIDATE atomic, patrón TASK-708/766/774)
+10. **TASK-810** — DB guard anti-zombie vía trigger (CHECK con subquery no es válido en PostgreSQL)
 
 ### Children (sibling — incorporada 2026-05-06)
 
 - **TASK-813** — HubSpot p_services (0-162) bidirectional sync activation + phantom seed cleanup. Sibling derivada de auditoría arch-architect 2026-05-06: 30 filas fantasma en `core.services` seedeadas como cross-product `service_modules × clients`, 16 services reales en HubSpot 0-162 sin sincronizar, 3 huérfanos sin org Greenhouse. Soft dep TASK-555, hard dep TASK-801 (consume `engagement_kind`). Recomendado correr **inmediatamente después de TASK-801** y **antes de TASK-802 onward** para que las extensiones del engagement primitive no se declaren contra services fantasma.
+
+### Follow-ups post-foundation
+
+- **TASK-835** — Sample Sprints Runtime Projection Hardening. Follow-up creado 2026-05-08 para robustecer la surface real `/agency/sample-sprints`: reemplaza heurísticas client-side de progreso, costo real, equipo/capacidad y health por una proyección server-side canónica conectada a snapshots, `commercial_cost_attribution_v2`, capacity checker y Commercial Health.
 
 ## Orden de ejecución canónico (incorporado 2026-05-06)
 
@@ -144,7 +155,7 @@ Producido por la skill `arch-architect` aplicando reversibilidad + 4-pilar + dep
                           │  FASE 6 — UI + final gate           │
                           │  TASK-809 (UI sample sprints)       │
                           │       ↓                              │
-                          │  TASK-810 (anti-zombie CHECK)       │
+                          │  TASK-810 (anti-zombie DB guard)    │
                           └────────────────────────────────────┘
 ```
 
@@ -154,7 +165,7 @@ Producido por la skill `arch-architect` aplicando reversibilidad + 4-pilar + dep
 2. **TASK-813 inmediatamente después de TASK-801 y antes de TASK-802 onward.** Si no se respeta, las extensiones (terms/phases/outcomes) se declaran contra los 30 services fantasma del 2026-03-16 → datos basura difíciles de limpiar después.
 3. **TASK-555 antes de TASK-556/557/557.1/813.** Las capabilities `commercial.*` no existen sin la foundation de access model.
 4. **TASK-807 idealmente antes de TASK-813.** Si no, TASK-813 ships con fallback registrando signals sin subsystem-rollup completo.
-5. **TASK-810 al final.** El anti-zombie CHECK solo se valida cuando todos los flows que crean/transicionan engagements están maduros.
+5. **TASK-810 al final.** El anti-zombie DB guard solo se instala cuando todos los flows que crean/transicionan engagements están maduros.
 
 ### Ruta crítica (longest path)
 

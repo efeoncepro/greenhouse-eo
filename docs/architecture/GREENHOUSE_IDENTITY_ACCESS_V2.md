@@ -653,7 +653,7 @@ Roles for Efeonce team members with cross-tenant operational visibility.
 
 | role_code            | role_name       | Description                                                                                                      | Route Groups |
 | -------------------- | --------------- | ---------------------------------------------------------------------------------------------------------------- | ------------ |
-| `efeonce_account`    | Líder de Cuenta | Responde por relaciones con clientes, salud de cuentas y contexto operativo/comercial de sus clientes asignados. | `internal`   |
+| `efeonce_account`    | Líder de Cuenta | Responde por relaciones con clientes, salud de cuentas y contexto operativo/comercial de sus clientes asignados. | `internal`, `commercial` |
 | `efeonce_operations` | Operaciones     | Visibilidad operativa cross-tenant: capacidad, bloqueos, utilización y backlog de revisión.                      | `internal`   |
 
 #### Family: Domain Operators
@@ -664,8 +664,8 @@ Roles for Efeonce team members managing specific internal domains.
 | ------------------ | -------------------------------- | -------------------------------------------------------------------------------------------- | ------------ |
 | `hr_manager`       | Gestión HR                       | Administra personas, permisos, asistencia, estructura organizacional y catálogos HR.         | `hr`         |
 | `hr_payroll`       | Nómina                           | Procesa períodos, entradas y compensaciones de payroll.                                      | `hr`         |
-| `finance_analyst`  | Analista de Finanzas             | Opera ingresos, egresos, conciliación y suppliers; lectura ampliada sobre finanzas.          | `finance`    |
-| `finance_admin`    | Administrador de Finanzas        | Acceso completo de escritura financiera, incluyendo cuentas, tipos de cambio y conciliación. | `finance`    |
+| `finance_analyst`  | Analista de Finanzas             | Opera ingresos, egresos, conciliación y suppliers; lectura ampliada sobre finanzas y artefactos comerciales consumidos por finance. | `finance`, `commercial` |
+| `finance_admin`    | Administrador de Finanzas        | Acceso completo de escritura financiera, incluyendo cuentas, tipos de cambio, conciliación y operaciones comerciales transicionales. | `finance`, `commercial` |
 | `people_viewer`    | Lectura de Personas              | Acceso de lectura a perfiles de colaboradores, assignments y capacidad.                      | `people`     |
 | `ai_tooling_admin` | Administrador de Herramientas AI | Gestiona catálogo de herramientas, licencias, wallets y créditos.                            | `ai_tooling` |
 
@@ -710,6 +710,7 @@ Route groups are the enforcement boundary. Each route group maps to a set of URL
 | `client`     | `/home`, `/dashboard`, `/proyectos`, `/sprints`, `/campanas`, `/equipo`, `/settings`                                              | `client_executive`, `client_manager`, `client_specialist`, `efeonce_account`, `efeonce_operations`, `efeonce_admin` | Active tenant         |
 | `my`         | `/my/leave`, `/my/attendance`, `/my/expenses`, `/my/tools`, `/my/payroll`, `/my/profile`                                          | `collaborator`, `efeonce_admin`                                                                                     | Home tenant (efeonce) |
 | `internal`   | `/home`, `/admin`, `/internal/dashboard`, `/internal/clientes`, `/internal/capacidad`, `/internal/riesgos`, `/internal/kpis`    | `efeonce_account`, `efeonce_operations`, `efeonce_admin`                                                            | Cross-tenant          |
+| `commercial` | `/finance/quotes`, `/finance/contracts`, `/finance/master-agreements`, `/finance/products`, `/finance/intelligence`             | `efeonce_account`, `finance_analyst`, `finance_admin`, `efeonce_admin`                                             | Efeonce tenant        |
 | `hr`         | `/hr/leave`, `/hr/attendance`, `/hr/org-chart`, `/hr/payroll`, `/hr/approvals`, `/hr/hierarchy`, `/hr/departments`                | `hr_manager`, `hr_payroll`, `efeonce_admin`                                                                         | Efeonce tenant        |
 | `finance`    | `/finance`, `/finance/income`, `/finance/expenses`, `/finance/suppliers`, `/finance/reconciliation`, `/finance/clients`          | `finance_analyst`, `finance_admin`, `efeonce_admin`                                                                 | Efeonce tenant        |
 | `people`     | `/people`, `/people/[memberId]`                                                                                                   | `people_viewer`, `hr_manager`, `efeonce_operations`, `efeonce_admin`                                                | Efeonce tenant        |
@@ -719,6 +720,7 @@ Route groups are the enforcement boundary. Each route group maps to a set of URL
 Notes:
 
 - `hr` remains the broad HR route group. It must not be used as a proxy for “has direct reports”.
+- `commercial` is a broad navigation/surface lane, not a fine-grained approval model. TASK-555 binds it to existing transitional roles and keeps legacy `/finance/...` URLs until the commercial route migration is intentionally scheduled.
 - Supervisor-limited access is derived at reader/page level from reporting hierarchy and active delegation, not from a dedicated route group or role code.
 - `/hr/approvals`, `/hr/team` y `/hr/org-chart` ya existen como surfaces runtime para supervisoría limitada; `HR > Jerarquía` sigue siendo broad HR/admin.
 
@@ -958,6 +960,8 @@ Los valores legacy persistidos se reescriben por compatibilidad antes de produci
 ## Sidebar Composition
 
 The sidebar is built dynamically from the session's `routeGroups`.
+
+TASK-555 detail: the internal portal shell is selected for operational route groups (`commercial`, `finance`, `hr`, `people`, `ai_tooling`, `admin`, `internal`) so a pure domain role is not rendered as a client portal user. `startup policy` remains unchanged; `commercial` does not introduce a new home policy in this cut.
 
 ### Sidebar sections
 

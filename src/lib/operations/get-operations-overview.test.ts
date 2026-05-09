@@ -1,6 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const mockRunGreenhousePostgresQuery = vi.fn()
+const mockQuery = vi.fn()
+
+vi.mock('@/lib/db', () => ({
+  query: (...args: unknown[]) => mockQuery(...args)
+}))
 
 vi.mock('@/lib/postgres/client', () => ({
   onGreenhousePostgresReset: () => () => {},
@@ -69,7 +74,10 @@ vi.mock('@/lib/finance/ledger-health', () => ({
   getFinanceLedgerHealth: (...args: unknown[]) => mockGetFinanceLedgerHealth(...args)
 }))
 
-import { buildFinanceDataQualitySubsystem } from '@/lib/operations/get-operations-overview'
+import {
+  buildCommercialHealthSubsystem,
+  buildFinanceDataQualitySubsystem
+} from '@/lib/operations/get-operations-overview'
 
 const cleanT708 = {
   paymentsPendingAccountResolutionRuntime: 0,
@@ -86,6 +94,7 @@ describe('buildFinanceDataQualitySubsystem', () => {
 
     mockCountIncomesWithSettlementDrift.mockResolvedValue(1)
     mockGetFinanceLedgerHealth.mockResolvedValue({ task708: cleanT708 })
+    mockQuery.mockReset()
 
     mockRunGreenhousePostgresQuery.mockImplementation(async (sql: string) => {
       if (sql.includes('information_schema.tables')) {
@@ -189,5 +198,48 @@ describe('buildFinanceDataQualitySubsystem', () => {
     const runtimeMetric = (subsystem.metrics ?? []).find(m => m.key === 'task708_payments_pending_account_runtime')
 
     expect(runtimeMetric).toMatchObject({ value: 1, status: 'error' })
+  })
+})
+
+describe('buildCommercialHealthSubsystem', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockQuery.mockReset()
+
+    mockRunGreenhousePostgresQuery.mockImplementation(async (sql: string) => {
+      if (sql.includes('information_schema.tables')) return [{ exists: true }]
+      throw new Error(`Unexpected SQL in test:\n${sql}`)
+    })
+  })
+
+  it('rolls up Commercial Health metrics and escalates warning/error counts', async () => {
+    mockRunGreenhousePostgresQuery.mockReset()
+    mockRunGreenhousePostgresQuery.mockImplementation(async (sql: string) => {
+      if (sql.includes('information_schema.tables')) return [{ exists: true }]
+      throw new Error(`Unexpected SQL in test:\n${sql}`)
+    })
+
+    mockQuery
+      .mockResolvedValueOnce([{ n: 1 }])
+      .mockResolvedValueOnce([{ n: 0 }])
+      .mockResolvedValueOnce([{ n: 0 }])
+      .mockResolvedValueOnce([{ n: 2 }])
+      .mockResolvedValueOnce([{ n: 0 }])
+      .mockResolvedValueOnce([{ total_outcomes: 10, converted_outcomes: 4 }])
+
+    const subsystem = await buildCommercialHealthSubsystem()
+
+    expect(subsystem).toMatchObject({
+      name: 'Commercial Health',
+      status: 'degraded',
+      processed: 6,
+      failed: 2
+    })
+
+    const metricsByKey = new Map((subsystem.metrics ?? []).map(m => [m.key, m]))
+
+    expect(metricsByKey.get('engagement_overdue_decision')).toMatchObject({ value: 1, status: 'error' })
+    expect(metricsByKey.get('engagement_unapproved_active')).toMatchObject({ value: 2, status: 'error' })
+    expect(metricsByKey.get('engagement_conversion_rate')).toMatchObject({ value: 40, status: 'info' })
   })
 })

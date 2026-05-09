@@ -16,6 +16,7 @@ Indice maestro de la documentacion no operativa del repo.
 
 ### Architecture
 
+- [Architecture Decisions Index](architecture/DECISIONS_INDEX.md)
 - [GREENHOUSE_ARCHITECTURE_V1.md](architecture/GREENHOUSE_ARCHITECTURE_V1.md)
 - [MULTITENANT_ARCHITECTURE.md](architecture/MULTITENANT_ARCHITECTURE.md)
 - [GREENHOUSE_IDENTITY_ACCESS_V1.md](architecture/GREENHOUSE_IDENTITY_ACCESS_V1.md)
@@ -121,6 +122,7 @@ Indice maestro de la documentacion no operativa del repo.
 
 - [Issue Tracker](issues/README.md)
 - [SOLUTION_QUALITY_OPERATING_MODEL_V1.md](operations/SOLUTION_QUALITY_OPERATING_MODEL_V1.md)
+- [ARCHITECTURE_DECISION_RECORD_OPERATING_MODEL_V1.md](operations/ARCHITECTURE_DECISION_RECORD_OPERATING_MODEL_V1.md)
 - [MULTI_AGENT_WORKTREE_OPERATING_MODEL_V1.md](operations/MULTI_AGENT_WORKTREE_OPERATING_MODEL_V1.md)
 - [Mini Task Operating Model](operations/MINI_TASK_OPERATING_MODEL_V1.md)
 - [DOCUMENTATION_OPERATING_MODEL_V1.md](operations/DOCUMENTATION_OPERATING_MODEL_V1.md)

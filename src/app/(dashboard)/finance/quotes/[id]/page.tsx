@@ -5,7 +5,7 @@ import QuoteDetailView from '@views/greenhouse/finance/QuoteDetailView'
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'Cotizacion — Greenhouse'
+  title: 'Cotización — Comercial'
 }
 
 const QuoteDetailPage = () => {

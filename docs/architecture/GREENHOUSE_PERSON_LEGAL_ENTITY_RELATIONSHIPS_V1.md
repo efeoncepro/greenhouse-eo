@@ -42,6 +42,15 @@ Delta 2026-05-05:
 - Las relaciones contractor alimentan `ContractorEngagement`, no `FinalSettlement`.
 - Caso motivador: Valentina Hoyos conserva su `identity_profile`; la relacion dependiente terminada queda historica y la nueva relacion desde `2026-05-04` debe modelarse como contractor/honorarios separada.
 
+Delta 2026-05-07 — TASK-789:
+
+- Existe primitive runtime en `src/lib/person-legal-entity-relationships/**` para leer, cerrar y crear relaciones persona ↔ entidad legal sin SQL ad hoc en callers.
+- Existe command canonico `transitionEmployeeToContractor()` en `src/lib/workforce/relationship-transition/**`.
+- V1 no muta la relacion `employee`: la cierra con `status='ended'` + `effective_to`.
+- V1 no muta `members.contract_type` ni crea `greenhouse_payroll.compensation_versions`; esto evita reactivar payroll dependiente o crear payroll contractor por accidente.
+- `honorarios` se representa temporalmente como `relationship_type='contractor'` + `metadata_json.relationshipSubtype='honorarios'`, porque el check constraint actual de `person_legal_entity_relationships` no incluye `honorarios` como tipo propio. TASK-790/TASK-794 conservan ownership de un subtipo runtime mas rico.
+- People 360 consume la timeline de relaciones y debe mostrar historico laboral y relacion contractor/honorarios activa como conceptos separados.
+
 ## Core Thesis
 
 Greenhouse no debe modelar a una persona “especial” mediante campos extra en `user`, `member` o `shareholder_account`.

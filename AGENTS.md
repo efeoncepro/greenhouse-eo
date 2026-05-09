@@ -37,9 +37,11 @@ Este bloque es el resumen obligatorio antes de ejecutar cualquier cambio. Las se
 
 - Primero orientarse: leer `project_context.md`, `Handoff.md`, la task/spec aplicable y la arquitectura del dominio antes de escribir.
 - Protocolo TASK-###: usar `docs/tasks/TASK_PROCESS.md` como proceso canonico y `docs/operations/CODEX_EXECUTION_PROMPT_V1.md` como prompt operativo robusto para ejecucion con Codex.
+- ADRs: decisiones arquitectonicas viven bajo `docs/operations/ARCHITECTURE_DECISION_RECORD_OPERATING_MODEL_V1.md` y el indice `docs/architecture/DECISIONS_INDEX.md`. Si una task cambia source of truth, schema, access, auth, finance/payroll/accounting semantics, events/outbox/webhooks, APIs externas, cloud/deploy/secrets, UI platform o runtime projections compartidas, debe identificar o proponer ADR antes de implementar.
 - Contexto y auditoria: `docs/operations/CONTEXT_HANDOFF_OPERATING_MODEL_V1.md` gobierna como usar `project_context.md`, `Handoff.md` y `Handoff.archive.md` sin perder memoria historica.
 - Source of truth: si task/spec, arquitectura y runtime real discrepan, prevalecen arquitectura vigente + codigo/schema/runtime verificados. Corregir la spec antes de implementar si el drift cambia contrato o bloquea.
 - Calidad de solucion: no entregar parches fragiles si el problema pide causa raiz. Aplicar `docs/operations/SOLUTION_QUALITY_OPERATING_MODEL_V1.md`; cualquier workaround debe ser temporal, reversible, documentado y con owner/retirada.
+- Copy visible: antes de escribir labels, CTAs, empty states, alerts, tooltips, aria-labels o mensajes, buscar/crear la entrada en la capa canonica. `src/lib/copy/*` guarda microcopy funcional y copy reutilizable por dominio; `src/config/greenhouse-nomenclature.ts` guarda solo nomenclatura de producto, navegacion y labels institucionales. No hardcodear copy reusable en JSX.
 - Proporcionalidad: discovery breve para cambios locales; protocolo completo para cambios cross-domain, auth, billing, finance, data, cloud, migraciones, observabilidad o UI visible.
 - Reutilizar antes de crear: buscar helpers, readers, components, routes, signals, capabilities y docs existentes antes de introducir piezas nuevas.
 - Aislamiento multi-agente: no cambiar la rama de un checkout donde otra persona/agente trabaja; usar `git worktree` y documentar coordinacion en `Handoff.md`.
@@ -115,7 +117,15 @@ Estos CLIs estan autenticados localmente. Cuando una task toca su dominio, **usa
   - revisar `docs/architecture/GREENHOUSE_POSTGRES_CANONICAL_360_V1.md`
   - correr `pnpm pg:doctor` antes de asumir que el acceso esta sano
 - Si una task del sistema contradice la arquitectura vigente, no implementarla tal cual; corregir primero la task o documentar la nueva decision arquitectonica.
+- Si una task cambia un contrato arquitectonico compartido, revisar `docs/architecture/DECISIONS_INDEX.md` y aplicar `docs/operations/ARCHITECTURE_DECISION_RECORD_OPERATING_MODEL_V1.md` antes de escribir codigo. La decision puede vivir embebida en una spec `GREENHOUSE_*_V1.md` o como doc dedicado en `docs/architecture/`, pero debe quedar indexada.
 - Si el cambio es UI, UX o seleccion de componentes, usar como criterio operativo los skills locales vigentes (`greenhouse-agent`, `greenhouse-portal-ui-implementer`, `greenhouse-ui-orchestrator` o `greenhouse-vuexy-ui-expert`), revisar `full-version` junto con la documentacion oficial de Vuexy antes de inventar componentes nuevos y leer `DESIGN.md` en raiz como contrato visual legible por agentes.
+- Si el cambio toca copy visible al usuario:
+  - invocar la skill de UX writing/content aplicable antes de fijar tono o wording final
+  - usar `src/lib/copy/` para microcopy funcional shared (`actions`, `states`, `loading`, `empty`, `aria`, `errors`, `feedback`, `time`) y para copy reutilizable por dominio (`src/lib/copy/<domain>.ts`, por ejemplo `agency.ts`, `finance.ts`, `payroll.ts`)
+  - usar `src/config/greenhouse-nomenclature.ts` solo para nomenclatura estable de producto, navegacion, shell y labels institucionales
+  - mantener JSX/componentes libres de strings reutilizables; un literal inline solo es aceptable si es texto unico, no compartido, no de estado/CTA/error/empty/aria y queda justificado por bajo reuse
+  - no promover pantallas desde `/mockup/` a runtime sin extraer primero el shell runtime y migrar el copy productivo a la capa canonica
+- Si el usuario pide un mockup/prototipo visual de Greenhouse, invocar `greenhouse-mockup-builder`: por defecto el mockup debe construirse como ruta real del portal con mock data tipada (`src/app/(dashboard)/.../mockup/page.tsx` + `src/views/greenhouse/.../mockup/*`), usando Vuexy/MUI wrappers y primitives del repo. No crear HTML/CSS aparte salvo que el usuario pida explicitamente un artefacto estatico fuera de la app.
 - **Regla de reutilizacion**:
   - reutilizar helpers, readers, components, routes, signals y primitives existentes antes de crear nuevos
   - no inventar access paths paralelos si ya existe un path canonico del repo para ese dominio
@@ -201,6 +211,7 @@ Estos CLIs estan autenticados localmente. Cuando una task toca su dominio, **usa
 - La convencion canonica de Git tags para releases (`platform/`, `<module>/`, `api/<slug>/`) vive en ese mismo documento; no improvisar tags globales ambiguos como `v1.1.0` para el portal completo.
 - Tres capas de documentacion, cada una con su proposito:
   - `docs/architecture/` — contratos tecnicos para agentes y desarrolladores (schemas, APIs, decisiones de diseno)
+  - `docs/architecture/DECISIONS_INDEX.md` — indice maestro de ADRs y decisiones aceptadas; no duplica specs, enlaza el contrato canonico.
   - `docs/documentation/` — explicaciones funcionales en lenguaje simple (roles, flujos, reglas de negocio). Cada documento enlaza a su spec tecnica
   - `docs/manual-de-uso/` — guias operativas paso a paso para usuarios del portal (como usar, permisos, cuidados, troubleshooting)
   - `docs/audits/` — auditorias tecnicas y operativas reutilizables, fechadas y acotadas por scope. Se consumen frecuentemente como contexto para decisiones, pero siempre deben revalidarse contra el estado actual antes de tratarlas como vigentes.
@@ -594,6 +605,27 @@ Toda decisión "dónde vive un cron" pasa por las **3 categorías canónicas** d
 **CI gate**: `scripts/ci/vercel-cron-async-critical-gate.mjs`.
 **Orchestrators canónicos**: `src/lib/cron-orchestrators/index.ts` (11 orchestrators puros) + `src/lib/email/deliverability-monitor.ts` + `src/lib/nubox/sync-nubox-orchestrator.ts` + `src/lib/nubox/sync-nubox-balances.ts`.
 
+### Cron rematerialize-balances seed contract (ISSUE-069, 2026-05-08)
+
+Todo cron que invoque `rematerializeAccountBalanceRange` (o cualquier primitiva canónica con seed-row contract) DEBE calcular `seedDate = today − (lookbackDays + 1)`, NO `today − lookbackDays`.
+
+**Por qué**: el contrato canónico de `rematerializeAccountBalanceRange` (`src/lib/finance/account-balances-rematerialize.ts:258`) NO materializa el día seed — itera desde `seedDate + 1`. El día seed se inserta como ancla muda (`period_inflows=0, period_outflows=0`) para preservar reconciliation snapshots TASK-721 + OTB anchor TASK-703.
+
+**Bug class** (ISSUE-069): si el caller usa `seedDate = today − lookbackDays`, ese día queda como ancla muda. Cualquier `settlement_leg` / `expense_payment` / `income_payment` con `transaction_date` exactamente en ese día (típicamente registros retroactivos creados horas/días después) NO se contabiliza. La ventana del cron rota cada día → "día ciego" se mueve diariamente → bug determinístico que afecta TODAS las cuentas. Detección: reliability signal `finance.account_balances.fx_drift` (TASK-774).
+
+**Fix canónico**: helper `computeRematerializeSeedDate(today, lookbackDays)` en `services/ops-worker/finance-rematerialize-seed.ts`. Resta 1 día adicional para que los últimos `lookbackDays` días COMPLETOS se materialicen.
+
+**Reglas duras**:
+
+- **NUNCA** calcular el seed inline en un nuevo handler de cron. Usar el helper canónico `computeRematerializeSeedDate`.
+- **NUNCA** modificar el contrato de `rematerializeAccountBalanceRange` (seed no se materializa). Es load-bearing para reconciliation snapshots y OTB.
+- **NUNCA** correr backfill manual con `--from-date` igual al día a reparar. El backfill usa `seedMode='active_otb'` que toma el OTB genesis como seed real — el `--from-date` es etiqueta documental.
+- **SIEMPRE** que un nuevo cron emerja consumiendo la primitiva, agregar test de regresión que pin-ee `seed = today − (lookbackDays + 1)` con casos edge (lookback=1, 30, cross-month, cross-year).
+
+**Diagnostic operator tool**: `pnpm tsx --require ./scripts/lib/server-only-shim.cjs scripts/finance/diagnose-fx-drift.ts` lista detalle por (account, fecha) con drift activo. Útil ANTES de invocar el backfill.
+
+**Spec canónica**: `docs/issues/open/ISSUE-069-finance-cron-rematerialize-seed-day-blind-spot.md`.
+
 ### Reliability dashboard hygiene — orphan archive, channel readiness, smoke lane bus, domain incidents (2026-04-26)
 
 Cuatro patrones canónicos que evitan re-introducir falsos positivos o `awaiting_data` perpetuos. Cualquier cambio que toque `projection_refresh_queue`, `teams_notification_channels`, smoke lane readers o Sentry capture debe respetarlos.
@@ -850,12 +882,76 @@ Contrato versionado `platform-health.v1`. Permite a agentes (MCP, Teams bot, CI,
   - Si necesitas que una migración corra antes que otra pendiente, la solución es reordenar el contenido dentro de un solo archivo, no manipular timestamps.
 - Flujo obligatorio al modificar schema:
   1. `pnpm migrate:create <nombre>` — crea archivo SQL con timestamp UTC correcto
-  2. Editar el archivo con el DDL necesario
+  2. Editar el archivo con el DDL necesario **bajo `-- Up Migration`** (ver Markers abajo)
   3. `pnpm migrate:up` — aplica contra la base de datos (auto-regenera tipos Kysely)
   4. Commit migración + `db.d.ts` actualizado **juntos** en el mismo commit
   5. `pnpm build` para verificar que los tipos son consistentes
 - Conexión local: requiere Cloud SQL Auth Proxy corriendo en `127.0.0.1:15432`. El script tiene guardia fail-fast que aborta si detecta IP pública como host — no esperar timeout, leer el mensaje de error.
 - Spec completa: `docs/architecture/GREENHOUSE_DATABASE_TOOLING_V1.md`
+
+### Database Migration Markers — anti pre-up-marker bug
+
+Patrón canonico que TODA migration debe seguir. La estructura del archivo `.sql` parseada por `node-pg-migrate` es:
+
+```sql
+-- Up Migration
+
+-- 1. DDL: CREATE TABLE / ALTER TABLE / CREATE INDEX / CREATE FUNCTION / INSERT seed.
+CREATE TABLE IF NOT EXISTS schema.table (...);
+
+-- 2. Bloque DO con RAISE EXCEPTION (anti pre-up-marker bug).
+--    Verifica que el DDL realmente quedó aplicado en information_schema.
+DO $$
+DECLARE expected_exists boolean;
+BEGIN
+  SELECT EXISTS (
+    SELECT 1 FROM information_schema.tables
+    WHERE table_schema = 'schema' AND table_name = 'table'
+  ) INTO expected_exists;
+  IF NOT expected_exists THEN
+    RAISE EXCEPTION 'TASK-XXX: schema.table was NOT created. Markers may be inverted.';
+  END IF;
+END
+$$;
+
+-- 3. GRANTs (read/write a runtime, ownership a ops).
+GRANT SELECT, INSERT, UPDATE, DELETE ON schema.table TO greenhouse_runtime;
+
+-- Down Migration
+
+-- SOLO undo (DROP / ALTER ... DROP). NUNCA CREATE TABLE aquí.
+DROP TABLE IF EXISTS schema.table;
+```
+
+**Por qué importa**: si el DDL termina bajo `-- Down Migration` por error, `node-pg-migrate` parsea la sección Up vacía, registra la migration como aplicada en `pgmigrations` y **NO ejecuta el SQL**. Silent failure. Detectado en TASK-768 Slice 1 y repetido por TASK-404 (3 governance tables nunca creadas → ISSUE-068).
+
+**Reglas duras**:
+
+- **NUNCA** pongas `CREATE TABLE`, `ALTER TABLE ADD COLUMN`, `CREATE INDEX`, `CREATE FUNCTION` o `INSERT` debajo de `-- Down Migration`. Ese marker es **solo para undo** (DROP / ALTER ... DROP). Si te encuentras escribiendo CREATE en Down, tienes los markers invertidos — para y mueve a Up.
+- **NUNCA** edites una migration ya aplicada (registrada en `pgmigrations`). Si tiene bug, **forward fix con migration nueva idempotente** (`IF NOT EXISTS` + bloque DO de verificación). Editar la legacy rompe environments fresh.
+- **NUNCA** asumas que `pnpm migrate:up` aplicó porque devolvió "Migrations complete!" — verifica con `psql` / `pnpm pg:connect:shell` / `pnpm pg:connect:status`, o agrega el bloque DO con RAISE EXCEPTION dentro de la propia migration.
+- **SIEMPRE** que la migration cree tablas críticas para runtime, escribe el bloque DO de verificación post-DDL en la misma migration. Patrón fuente: `migrations/20260508104217939_task-611-capabilities-registry.sql`.
+- **SIEMPRE** que la down sea destructiva (DROP TABLE, DROP CONSTRAINT), declara explícitamente con `IF EXISTS` para que sea idempotente.
+- **SIEMPRE** que un agente "vea raro" el output de `pnpm migrate:up` (sin errors pero la tabla no aparece en queries), correr `psql -c "SELECT * FROM information_schema.tables WHERE table_schema = 'schema_X';"` antes de continuar.
+
+**Defense in depth (en construcción — Fase 2 de ISSUE-068)**: `scripts/ci/migration-marker-gate.mjs` detectará migrations con sección Up vacía + sección Down con DDL keywords. Modo blocking en PRs. Hasta que aplique, la regla es enforcement humano + code review.
+
+**Si descubres que una migration aplicada anteriormente tenía este bug** (sección Up vacía, DDL bajo Down): NO la edites. Crea una migration nueva forward-fix con el SQL correcto, idempotente, y abre un ISSUE-### documentando el hallazgo (ejemplo: ISSUE-068).
+
+### SQL embebido — type alignment + live testing (ISSUE-071)
+
+Cualquier query SQL embebido en TS que use **uniones de tipos** (COALESCE de subqueries, CASE WHEN, NULL coalescing entre tipos heterogéneos) debe **ejercitarse contra PG real ANTES de mergear**, no solo via mocks Vitest.
+
+**Bug class detectado** (2026-05-08, ISSUE-071): el CTE `subject_admin` del relationship resolver de TASK-611 hacía `SELECT 1 AS is_admin` (integer) pero el `COALESCE((SELECT is_admin FROM subject_admin), FALSE)` combinaba con boolean. PG rechaza con `COALESCE types integer and boolean cannot be matched`. El catch silencioso convertía el throw a `degradedMode=true` y el banner "Workspace en modo degradado" se mostraba al usuario. Bug latente desde el merge de TASK-611, descubierto solo cuando un usuario real ejerció el path post TASK-613 V1.1.
+
+**Reglas duras**:
+
+- **NUNCA** mergear queries con CTEs + COALESCE/CASE/NULL handling sin un live test contra PG (vía `pg:connect` proxy + `pnpm tsx`, o `*.live.test.ts`).
+- **NUNCA** confiar SOLO en unit tests con mocks para validar type alignment SQL. Los mocks ejercitan la lógica TS, NO el SQL crudo.
+- **SIEMPRE** que `COALESCE((SELECT ... FROM cte), default)`, verificar que el tipo del SELECT del CTE matchee el tipo del `default`. PG hace casting implícito en algunos casos (e.g. INT → NUMERIC) pero NO entre INT y BOOL.
+- **SIEMPRE** que un read path tenga catch + degraded mode honesto (correcto desde safety perspective), confirmar que `captureWithDomain` está emitiendo a Sentry — sino el bug class queda completamente oculto al equipo y aparece solo cuando un usuario real reporta el síntoma.
+
+**Defense-in-depth recomendado**: cuando una query nueva emerja, agregar un script `scripts/<dominio>/_sanity-<query-name>.ts` (gitignored o committed según necesidad) que la ejecute contra el proxy local. Después del primer ejercicio exitoso, ese script es opcional pero útil como debugging aid futuro.
 
 ### Charts — política canónica (decisión 2026-04-26 — prioridad: impacto visual)
 
@@ -890,6 +986,61 @@ Toda tabla operativa con celdas editables inline o > 8 columnas vive bajo un con
 - **NUNCA** mover `compactContentWidth` a `wide` para resolver overflow de una tabla. Resolver siempre con el contrato (densidad + sticky + scroll fade).
 - **NUNCA** duplicar `BonusInput` u otra primitiva legacy. Migrar consumers a `<InlineNumericEditor>`. `BonusInput.tsx` queda como re-export deprecado hasta que el ultimo consumer migre.
 - **NUNCA** desactivar el visual regression test de `/hr/payroll` para forzar un merge. Si falla por overflow, la solucion es respetar el contrato, no bypass.
+
+### Organization-by-facets — receta canónica (TASK-611/612/613, 2026-05-08)
+
+Toda surface organization-centric (clientes finanzas, agency organizations, prospects, partners, vendors, futuras vistas legales/marketing/compliance/audit) **debe** renderearse a través del **Organization Workspace shell canónico** (TASK-612). Cero composición ad-hoc.
+
+#### Composición canónica
+
+- **`OrganizationFacet`** × **`EntrypointContext`** son dos dimensiones ortogonales. NO mezclar en un solo enum.
+- 9 facets canónicos: `identity | spaces | team | economics | delivery | finance | crm | services | staffAug`.
+- 4 entrypoints canónicos: `agency | finance | admin | client_portal` (extensible — receta abajo).
+- 5 relationships canónicas: `internal_admin | assigned_member | client_portal_user | unrelated_internal | no_relation`.
+
+#### Para agregar un facet nuevo
+
+1. Extender `OrganizationFacet` enum + `viewCode` mapping (`src/lib/organization-workspace/facet-{capability,view}-mapping.ts`).
+2. Seedear capability `organization.<facet>:read` en `capabilities_registry` con migration. Documentar matriz `relationship × capability → access` en spec V1.
+3. Crear `<NameFacet>.tsx` self-contained en `src/views/greenhouse/organizations/facets/`. NO renderiza chrome — el shell ya lo hace.
+4. Registrar en `FACET_REGISTRY` (`FacetContentRouter.tsx`) con `dynamic()` lazy load.
+5. Reliability signal recomendado: clonar patrón TASK-613 `finance-client-profile-unlinked.ts`.
+
+#### Para agregar un entrypoint nuevo
+
+1. Extender `EntrypointContext` union (`src/lib/organization-workspace/projection-types.ts`).
+2. Migration que extienda CHECK constraint `home_rollout_flags_key_check` con `organization_workspace_shell_<scope>` + INSERT global `enabled=FALSE`. Extender también `WorkspaceShellScope` (`src/lib/workspace-rollout/index.ts`) y `HomeRolloutFlagKey` (`src/lib/home/rollout-flags.ts`) — drift entre los 3 = falsos positivos.
+3. Server page mirror del patrón Agency/Finance: `requireServerSession` → `isWorkspaceShellEnabledForSubject` → resolver canónico → `resolveOrganizationWorkspaceProjection` → render wrapper. Errores degradan a legacy con `captureWithDomain('<domain>', ...)`.
+4. Client wrapper mirror del Agency/Finance con slots canónicos: `kpis`, `adminActions`, `drawerSlot`, `children` render-prop, deep-link `?facet=`.
+5. Si un facet existente debe cambiar contenido per-entrypoint, inspeccionar `entrypointContext` adentro del facet (patrón canónico `FinanceFacet` desde TASK-613). NO crear facets paralelos.
+
+#### Patrón canónico per-entrypoint dispatch en facet
+
+```tsx
+const FinanceFacet = ({ organizationId, entrypointContext }: FacetContentProps) => {
+  if (entrypointContext === 'finance') {
+    return <FinanceClientsContent lookupId={organizationId} />
+  }
+
+  return <FinanceFacetAgencyContent organizationId={organizationId} />
+}
+```
+
+#### ⚠️ Reglas duras
+
+- **NUNCA** crear una vista de detalle organization-centric que NO use el Organization Workspace shell.
+- **NUNCA** componer la projection en el cliente. Server-only por construcción.
+- **NUNCA** branchear `entrypointContext` afuera del facet. La decisión vive **adentro** del facet, no en el page o el router.
+- **NUNCA** modificar `OrganizationView` legacy (`src/views/greenhouse/organizations/OrganizationView.tsx`) sin migrar paralelamente al shell. Mantener legacy intacto durante el rollout.
+- **NUNCA** seedear capabilities `organization.<facet>:*` sin agregar entry al spec table en `GREENHOUSE_ORGANIZATION_WORKSPACE_PROJECTION_V1.md` Apéndice A.
+- **NUNCA** crear una flag `organization_workspace_shell_*` sin extender los 3 lugares (CHECK constraint + `WorkspaceShellScope` + `HomeRolloutFlagKey`).
+- **NUNCA** mezclar dimensiones (e.g. "qué facet" + "qué entrypoint") en un solo enum.
+- **NUNCA** computar la decisión `legacy fallback vs shell` en runtime sin envolver en `try/catch + captureWithDomain(...)`.
+- **NUNCA** modificar la flag directamente vía SQL. Toda mutación pasa por el admin endpoint `POST /api/admin/home/rollout-flags`.
+- **SIEMPRE** declarar `incidentDomainTag` en el module registry cuando el facet tiene dataset propio que puede generar incidents Sentry.
+- **SIEMPRE** seguir el rollout staged: V1 OFF default → V1.1 pilot users → V2 flip global con steady-state ≥30 días → V3 cleanup legacy ≥90 días sin reverts.
+
+**Spec canónica**: `docs/architecture/GREENHOUSE_ORGANIZATION_WORKSPACE_PROJECTION_V1.md` Delta 2026-05-08 (receta paso a paso). Tasks de referencia: TASK-611 (foundation), TASK-612 (shell + Agency entrypoint), TASK-613 (Finance entrypoint + dual-dispatch pattern).
 
 ## Task Lifecycle Protocol
 

@@ -4,7 +4,7 @@ import { recordAudit } from '@/lib/commercial/governance/audit-log'
 import { resolveQuotationIdentity } from '@/lib/finance/pricing'
 import { getFinanceQuoteDetailFromCanonical } from '@/lib/finance/quotation-canonical-store'
 import { getOrCreateQuotePdfBuffer } from '@/lib/finance/quote-share/quote-pdf-asset'
-import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
+import { requireCommercialTenantContext } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
 
@@ -26,7 +26,7 @@ export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { tenant, errorResponse } = await requireFinanceTenantContext()
+  const { tenant, errorResponse } = await requireCommercialTenantContext()
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

@@ -5,3 +5,4 @@ Auditorias tecnicas y operativas versionadas del dominio Finance, incluyendo caj
 ## Auditorias
 
 - [FINANCE_DOMAIN_AUDIT_2026-05-03](FINANCE_DOMAIN_AUDIT_2026-05-03.md)
+- [TASK-557.1_LEGACY_QUOTES_AUDIT_2026-05-07](TASK-557.1_LEGACY_QUOTES_AUDIT_2026-05-07.md)

@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server'
 import { query } from '@/lib/db'
 import { errorResponse } from '@/lib/email/error-envelope'
 import { resolveQuotationIdentity } from '@/lib/finance/pricing'
-import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
+import { requireCommercialTenantContext } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
 
@@ -35,7 +35,7 @@ export async function GET(
   _request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { tenant, errorResponse: authError } = await requireFinanceTenantContext()
+  const { tenant, errorResponse: authError } = await requireCommercialTenantContext()
 
   if (!tenant) {
     return (

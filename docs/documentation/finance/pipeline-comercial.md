@@ -1,18 +1,43 @@
 # Pipeline Comercial — Vista Híbrida de Deals + Quotes Standalone
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.2
 > **Creado:** 2026-04-19 por Claude (TASK-457)
-> **Ultima actualizacion:** 2026-04-19 por Claude
+> **Ultima actualizacion:** 2026-05-07 por Codex (TASK-557.1 — limpieza legacy/limbo)
 > **Documentacion tecnica:**
 > - Spec: [TASK-457](../../tasks/complete/TASK-457-ui-revenue-pipeline-hybrid.md)
+> - Lane dedicada: [TASK-557](../../tasks/complete/TASK-557-commercial-pipeline-lane-extraction.md)
 > - Deal snapshots: [TASK-456](../../tasks/complete/TASK-456-deal-pipeline-snapshots-projection.md)
 > - Quote snapshots: [TASK-351](../../tasks/complete/) (quotation intelligence)
 > - Lifecyclestage sync: [TASK-454](../../tasks/complete/TASK-454-lifecyclestage-sync-company-contact.md)
+> - Legacy cleanup: [TASK-557.1](../../tasks/complete/TASK-557.1-legacy-quotes-cleanup-audit.md)
+
+## Delta 2026-05-07 — TASK-557.1
+
+Pipeline comercial ahora filtra dos señales al leer quotes standalone:
+
+- `COALESCE(legacy_excluded, FALSE) = FALSE`
+- `legacy_status IS NULL`
+
+`legacy_excluded` oculta filas históricas o limbo marcadas por el audit operativo. `legacy_status IS NULL` se conserva para ocultar 19 filas recuperables que requieren normalización humana antes de volver al forecast comercial. Las vistas legacy de Finanzas no aplican este filtro y pueden seguir mostrando la evidencia histórica cuando corresponda.
+
+## Delta 2026-05-07 — TASK-557
+
+Pipeline comercial ahora tiene una lane dedicada en `/finance/intelligence/pipeline`. La URL sigue bajo `/finance/...` por compatibilidad, pero el entrypoint primario vive en el dominio **Comercial** y aparece como primer item del bloque Comercial del sidebar.
+
+La tab **Pipeline comercial** dentro de `/finance/intelligence` se mantiene como embed compatible durante la ventana de coexistencia. Su retiro queda condicionado a:
+
+- `comercial.pipeline` y los links internos apuntando al path dedicado.
+- auditoria de deep links externos a `/finance/intelligence?tab=quotations`.
+- al menos 30 dias de convivencia post-deploy.
+
+TASK-557.1 agregó el flag `legacy_excluded` y ejecutó la limpieza inicial. La lane nueva sigue excluyendo también `legacy_status` para no mostrar recoverables no normalizadas.
 
 ## Qué es
 
-La vista `/finance/intelligence` → tab **"Pipeline comercial"** → sub-tab **"Pipeline"** muestra todas las oportunidades comerciales activas de Efeonce en un solo lugar, mezclando tres tipos de oportunidad que **antes estaban divorciadas** en la UI:
+La vista canonica `/finance/intelligence/pipeline` muestra todas las oportunidades comerciales activas de Efeonce en un solo lugar, mezclando tres tipos de oportunidad que **antes estaban divorciadas** en la UI:
+
+Aunque el path siga usando el prefijo legacy `/finance`, el owner funcional de esta lane es **Comercial**. Finanzas la consume para forecast, revenue planning y validacion downstream.
 
 1. **Deals de HubSpot** (net-new sales con pipeline stage)
 2. **Contratos standalone** (quotes sin deal — ej. Nubox recurring, MSA/SOW activo con cliente customer, o deals ya cerrados won que están en ejecución)
@@ -61,11 +86,25 @@ El classifier decide a qué categoría va cada oportunidad. Reglas explícitas:
 | **Ganado (mes)** | Sum de `amount_clp` de deals cerrados **won** con `close_date` en el mes actual | Victoria del mes, útil para comparar contra quota |
 | **Perdido (mes)** | Sum de `amount_clp` de deals cerrados **lost** del mes | Lost del mes, útil para pipeline health |
 
+## Frontera contable: forecast no es revenue reconocido
+
+El Pipeline reporta **forecast comercial**: deals y quotes en negociación ponderados por probabilidad. No es revenue contable ni reemplaza el cierre financiero.
+
+Bajo ASC 606 / IFRS 15, un quote o deal no constituye revenue hasta cumplir los 5 pasos: contrato enforceable, obligaciones de desempeño identificadas, transaction price determinado, allocation a obligaciones y recognition cuando o como se satisfacen esas obligaciones.
+
+Por eso `amount × probability` es una técnica de FP&A y planificación comercial. El revenue reconocido vive en Economía operativa, cierre de período y P&L materializado.
+
+## Como se accede
+
+- **Entrypoint canonico:** `Comercial > Pipeline` abre `/finance/intelligence/pipeline`.
+- **Compat temporal:** `Finanzas > Economía > Pipeline comercial` sigue disponible como embed compartido para usuarios que aun entran por el wrapper financiero.
+- **Deep links legacy:** `/finance/intelligence` no redirige ni se rompe en este corte.
+
 ## Cómo se usa
 
 ### Flujo típico del Account Lead
 
-1. Entra a `/finance/intelligence`, tab "Pipeline comercial"
+1. Entra a `Comercial > Pipeline`
 2. Vista default muestra todas las oportunidades activas
 3. Aplica filtros:
    - **Categoría**: ver solo deals (para review con sales manager) o solo pre-sales (para priorizar outreach)
@@ -76,7 +115,7 @@ El classifier decide a qué categoría va cada oportunidad. Reglas explícitas:
 
 ### Flujo típico de Finance
 
-1. Entra y mira los KPIs: "¿cuánto tengo en pipeline ponderado este mes?"
+1. Entra desde `Comercial > Pipeline` o, durante la convivencia, desde `Finanzas > Economía > Pipeline comercial`.
 2. Valida que el total de "Contratos" cuadre con lo que está facturado/en ejecución
 3. Review de deals "cerrados won" que se movieron automáticamente a categoría "contract"
 4. Filtro por BU para reportería por unidad

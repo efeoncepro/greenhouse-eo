@@ -79,6 +79,16 @@ jobs:
         # a 0); promueve a strict (sin --warn) después de cierre.
         run: pnpm vercel-cron-gate --warn
 
+      - name: Migration marker gate (TASK-838 / ISSUE-068)
+        # Bloquea PRs con migrations que tengan el patrón "Up Migration vacía +
+        # DDL bajo Down Migration" — la clase de bug que causó ISSUE-068
+        # (TASK-404 governance tables nunca creadas en PG). Modo strict.
+        run: pnpm migration-marker-gate
+
+      - name: Migration marker gate self-tests
+        # Verifica que el parser del gate sigue funcionando (7 cases).
+        run: pnpm migration-marker-gate:test
+
       - name: Test inventory
         run: pnpm test:inventory
 

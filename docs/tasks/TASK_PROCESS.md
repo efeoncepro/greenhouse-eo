@@ -165,8 +165,13 @@ El agente DEBE hacer estas acciones antes de producir un plan:
    - `entitlements` / `module + capability + action + scope`
    - `startup policy`
    Registrar en Discovery si la solución afecta uno o varios planos. No asumir que `views` son la única capa de acceso.
-7. **Skill scan** — consultar skills disponibles en el entorno del agente a nivel global o de repo. Leer cada skill relevante antes de escribir codigo que la necesite. Registrar en Discovery summary que skills se usaran y para que slice.
-8. **Subagent assessment** — evaluar si la task se beneficia de delegacion a subagentes (ver protocolo abajo). Registrar la decision en el plan: ejecucion secuencial por el agente principal, o fork con coordinacion.
+7. **ADR check** — revisar `docs/operations/ARCHITECTURE_DECISION_RECORD_OPERATING_MODEL_V1.md` y `docs/architecture/DECISIONS_INDEX.md` cuando la task cambie un contrato compartido. Registrar:
+   - ADR existente que gobierna el cambio, o
+   - ADR nuevo/propuesto requerido antes de implementar, o
+   - razon por la que no aplica ADR.
+   Si la task cambia source of truth, schema compartido, access model, auth/session, finance/payroll/accounting semantics, events/outbox/webhooks, APIs externas, cloud/deploy/secrets, UI platform o runtime projections compartidas, el ADR check es obligatorio.
+8. **Skill scan** — consultar skills disponibles en el entorno del agente a nivel global o de repo. Leer cada skill relevante antes de escribir codigo que la necesite. Registrar en Discovery summary que skills se usaran y para que slice.
+9. **Subagent assessment** — evaluar si la task se beneficia de delegacion a subagentes (ver protocolo abajo). Registrar la decision en el plan: ejecucion secuencial por el agente principal, o fork con coordinacion.
 
 **Output de Discovery:** un bloque de texto (o seccion en `plan.md`) que lista:
 - Archivos encontrados vs. esperados
@@ -175,6 +180,7 @@ El agente DEBE hacer estas acciones antes de producir un plan:
 - Cualquier contradiccion detectada entre la task y la arquitectura
 - **Solution quality assessment** — causa raiz identificada, primitive canonica a reutilizar/crear y por que no se hara un parche local
 - **Access model resolution** — si el cambio toca acceso, dejar explicito si impacta `views`, `entitlements`, `startup policy`, `routeGroups` o una combinacion
+- **ADR resolution** — ADR existente, ADR nuevo/propuesto o razon explicita para no requerir ADR
 - **Skills identificadas** — cuales se usaran y para que slice
 - **Subagent decision** — secuencial o fork, y justificacion
 
@@ -195,6 +201,13 @@ Con el output de Discovery, el agente produce un `plan.md` que incluye:
 - `entitlements`: ...
 - `startup policy`: ...
 - Decision de diseño: ...
+
+## Architecture decision
+[Si aplica: ADR existente o nuevo/propuesto]
+- ADR existente:
+- ADR nuevo/propuesto:
+- Status requerido antes de implementar:
+- Razon si no aplica:
 
 ## Skills
 [Que skills se usan y en que slice]

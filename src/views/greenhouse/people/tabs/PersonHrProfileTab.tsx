@@ -476,6 +476,42 @@ const PersonHrProfileTab = ({ memberId, hrContext = null, defaultOperationalMetr
                 <Alert severity='success'>No hay salida laboral programada para este colaborador.</Alert>
               )}
             </Box>
+
+            {viewModel.employment.relationshipTimeline.length > 0 && (
+              <Stack spacing={2} sx={{ mt: 4 }}>
+                <Typography variant='subtitle2'>Historial de relaciones</Typography>
+                {viewModel.employment.relationshipTimeline.map(relationship => (
+                  <Box
+                    key={relationship.relationshipId}
+                    sx={{
+                      display: 'flex',
+                      alignItems: { xs: 'flex-start', sm: 'center' },
+                      justifyContent: 'space-between',
+                      flexDirection: { xs: 'column', sm: 'row' },
+                      gap: 2,
+                      border: theme => `1px solid ${theme.palette.divider}`,
+                      borderRadius: 1,
+                      p: 2
+                    }}
+                  >
+                    <Box>
+                      <Typography variant='body2' fontWeight={700}>{relationship.label}</Typography>
+                      <Typography variant='caption' color='text.secondary'>
+                        {formatDate(relationship.effectiveFrom)} — {relationship.effectiveTo ? formatDate(relationship.effectiveTo) : 'vigente'}
+                        {relationship.roleLabel ? ` · ${relationship.roleLabel}` : ''}
+                      </Typography>
+                    </Box>
+                    <CustomChip
+                      round='true'
+                      size='small'
+                      variant='tonal'
+                      color={relationship.statusTone}
+                      label={relationship.statusLabel}
+                    />
+                  </Box>
+                ))}
+              </Stack>
+            )}
           </CardContent>
         </Card>
       </Grid>

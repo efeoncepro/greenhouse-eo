@@ -62,7 +62,9 @@ export const STATIC_RELIABILITY_REGISTRY: ReliabilityModuleDefinition[] = [
     // payment_order ↔ bank settlement (3 readers en
     // src/lib/reliability/queries/). Quedan rolleados al subsystem `Finance
     // Data Quality` vía buildReliabilityOverview, que ya rutea por moduleKey.
-    expectedSignalKinds: ['subsystem', 'incident', 'test_lane', 'drift', 'dead_letter', 'lag'],
+    // TASK-613 Slice 3 — `data_quality` añadido para
+    // `finance.client_profile.unlinked_organizations`.
+    expectedSignalKinds: ['subsystem', 'incident', 'test_lane', 'drift', 'dead_letter', 'lag', 'data_quality', 'freshness'],
     incidentDomainTag: 'finance'
   },
   {
@@ -362,10 +364,11 @@ export const STATIC_RELIABILITY_REGISTRY: ReliabilityModuleDefinition[] = [
     moduleKey: 'commercial',
     label: 'Commercial',
     description:
-      'Engagement instance sync (HubSpot p_services 0-162) + cleanup de seed legacy + resolución de huérfanos sin organization. TASK-807 formalizará subsystem rollup completo.',
+      'Commercial Health para Sample Sprints + engagement instance sync (HubSpot p_services 0-162), cleanup de seed legacy y resolución de huérfanos sin organization.',
     domain: 'commercial',
     routes: [
-      { path: '/agency/operations', label: 'Operaciones agency' }
+      { path: '/agency/operations', label: 'Operaciones agency' },
+      { path: '/admin/ops-health', label: 'Ops Health' }
     ],
     apis: [
       { path: '/api/webhooks/hubspot-services', label: 'HubSpot services webhook (TASK-813)' }
@@ -374,6 +377,11 @@ export const STATIC_RELIABILITY_REGISTRY: ReliabilityModuleDefinition[] = [
       'greenhouse_core.services',
       'greenhouse_core.organizations',
       'greenhouse_core.spaces',
+      'greenhouse_commercial.engagement_approvals',
+      'greenhouse_commercial.engagement_phases',
+      'greenhouse_commercial.engagement_outcomes',
+      'greenhouse_commercial.engagement_progress_snapshots',
+      'greenhouse_serving.commercial_cost_attribution_v2',
       'greenhouse_sync.outbox_events',
       'HubSpot p_services custom object (0-162)',
       'services/hubspot_greenhouse_integration (Cloud Run bridge)'
@@ -381,11 +389,13 @@ export const STATIC_RELIABILITY_REGISTRY: ReliabilityModuleDefinition[] = [
     smokeTests: [],
     filesOwned: [
       'src/lib/services/**',
+      'src/lib/commercial/sample-sprints/**',
+      'src/lib/reliability/queries/engagement-*.ts',
       'src/lib/webhooks/handlers/hubspot-services.ts',
       'src/app/api/webhooks/hubspot-services/**',
       'scripts/services/**'
     ],
-    expectedSignalKinds: ['drift', 'lag'],
+    expectedSignalKinds: ['subsystem', 'drift', 'lag'],
     incidentDomainTag: 'integrations.hubspot'
   }
 ]

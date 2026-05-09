@@ -1243,6 +1243,32 @@ When payroll or person-level `ICO` metrics show missing KPI despite real complet
 
 This remediation is safe to rerun and is the canonical recovery path for attribution-driven KPI gaps.
 
+## Delta 2026-05-09 — Nubox ops-worker freshness contract
+
+Nubox crons live in Cloud Run `ops-worker`, not in Vercel. The source-sync
+health contract now treats each lane independently:
+
+- `raw_sync`: first durable evidence from Nubox API into BigQuery raw.
+- `conformed_sync`: transformation over raw snapshots; freshness alone is not
+  sufficient if raw evidence is stale.
+- `postgres_projection`: operational projection into `income`, `expenses`,
+  `quotes` and `external_cash_signals`.
+- `quotes_hot_sync`: hot lane for quote/COT freshness.
+- `balance_sync`: balance reconciliation lane, tracked in
+  `greenhouse_sync.source_sync_runs`.
+
+`finance.nubox.source_freshness` is the deterministic reliability signal for
+this contract. It reports `error` when raw or hot quotes are stale/failed, and
+also when conformed/projection look fresh while raw evidence is stale. Balance
+staleness is warning-level unless combined with a raw/hot failure.
+
+Projection resiliency rule: `postgres_projection` records per-document failures
+in `greenhouse_sync.source_sync_failures` with
+`error_code='nubox_postgres_projection_failed'` and finishes `partial` when at
+least one document projected successfully. Valid source semantics, such as
+Nubox `BHE` honorarios where `total_amount` is net of withholding, must be
+modeled in the adapter before emitting failures.
+
 ---
 
 ## Immediate Next Step

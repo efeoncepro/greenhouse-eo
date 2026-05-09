@@ -57,6 +57,40 @@ interface HubSpotEvent {
   associatedObjectId?: number | string
   propertyName?: string
   propertyValue?: string
+  /** TASK-836 follow-up: Developer Platform 2025.2 envía objectTypeId separado
+   *  cuando subscriptionType es `object.*` genérico. */
+  objectTypeId?: string
+  objectType?: string
+}
+
+/**
+ * TASK-836 follow-up — clasificador dual-format alineado con hubspot-companies.ts.
+ * Soporta ambos shapes:
+ *   - Legacy: subscriptionType = `service.creation`, `p_services.*`, `0-162.*`
+ *   - Developer Platform 2025.2: subscriptionType = `object.creation`/`object.propertyChange`
+ *     + objectTypeId = `0-162` o objectType = `service`/`p_services`
+ *
+ * Pre-fix (Build #24+ deployed 2026-05-06): el handler filtraba solo legacy y
+ * silently dropeaba todos los `object.*` events. Causa raíz Berel.
+ */
+const isHubSpotServiceEvent = (event: HubSpotEvent): boolean => {
+  const subscriptionType = String(event.subscriptionType || '')
+  const objectTypeId = String(event.objectTypeId || '')
+  const objectType = String(event.objectType || '')
+
+  if (
+    subscriptionType.startsWith('service.')
+    || subscriptionType.startsWith('p_services.')
+    || subscriptionType.startsWith('0-162.')
+  ) {
+    return true
+  }
+
+  if (subscriptionType.startsWith('object.')) {
+    return objectTypeId === '0-162' || objectType === 'service' || objectType === 'p_services'
+  }
+
+  return false
 }
 
 interface SpaceLookup extends Record<string, unknown> {
@@ -98,23 +132,11 @@ const extractServiceIdsFromEvents = (events: HubSpotEvent[]): string[] => {
   const ids = new Set<string>()
 
   for (const event of events) {
-    const subscriptionType = String(event.subscriptionType || '')
-    const objectId = String(event.objectId)
+    if (!isHubSpotServiceEvent(event)) continue
 
-    // HubSpot puede enviar el subscriptionType en distintos formatos según
-    // platform version y fuente de la suscripción:
-    //   - `service.creation` / `service.propertyChange` (HubSpot platform 2025.2 — name canónico del custom object 0-162)
-    //   - `p_services.creation` / `p_services.propertyChange` (legacy/alias)
-    //   - `0-162.creation` / `0-162.propertyChange` (objectTypeId-based)
-    // Aceptar todos para resiliencia contra refactors HubSpot-side.
-    const isServiceEvent =
-      subscriptionType.startsWith('service.') ||
-      subscriptionType.startsWith('p_services.') ||
-      subscriptionType.startsWith('0-162.')
+    const objectId = event.objectId ? String(event.objectId) : ''
 
-    if (isServiceEvent && objectId) {
-      ids.add(objectId)
-    }
+    if (objectId) ids.add(objectId)
   }
 
   return Array.from(ids)

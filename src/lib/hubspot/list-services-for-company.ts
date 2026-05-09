@@ -42,6 +42,8 @@ interface ServiceObject {
     ef_country?: string
     ef_notion_project_id?: string
     ef_deal_id?: string
+    /** TASK-836 — internal name de la property HubSpot "Tipo de servicio". Values: regular|pilot|trial|poc|discovery. Cuando NULL, ver cascade canónica en runtime-projection. */
+    ef_engagement_kind?: string
     [key: string]: string | undefined
   }
 }
@@ -67,7 +69,9 @@ const SERVICE_PROPERTIES = [
   'ef_billing_frequency',
   'ef_country',
   'ef_notion_project_id',
-  'ef_deal_id'
+  'ef_deal_id',
+  // TASK-836 — Tipo de servicio (regular|pilot|trial|poc|discovery). Internal name canonico.
+  'ef_engagement_kind'
 ]
 
 const fetchToken = async (): Promise<string> => {

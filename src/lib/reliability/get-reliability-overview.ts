@@ -32,6 +32,7 @@ import {
   getExpenseDistributionUnresolvedSignal
 } from './queries/expense-distribution'
 import { getExpensePaymentsClpDriftSignal } from './queries/expense-payments-clp-drift'
+import { getFinanceClientProfileUnlinkedSignal } from './queries/finance-client-profile-unlinked'
 import { getIdentityLegalProfileEvidenceOrphanSignal } from './queries/identity-legal-profile-evidence-orphan'
 import { getIdentityLegalProfilePayrollBlockingSignal } from './queries/identity-legal-profile-payroll-blocking'
 import { getIdentityLegalProfilePendingOverdueSignal } from './queries/identity-legal-profile-pending-overdue'
@@ -41,6 +42,10 @@ import { getPaymentOrdersDeadLetterSignal } from './queries/payment-orders-dead-
 import { getPaidOrdersWithoutExpensePaymentSignal } from './queries/payment-orders-paid-without-expense-payment'
 import { getPayrollExpenseMaterializationLagSignal } from './queries/payroll-expense-materialization-lag'
 import { getProviderBqSyncDeadLetterSignal } from './queries/provider-bq-sync-dead-letter'
+import { getServiceEngagementEngagementKindUnmappedSignal } from './queries/service-engagement-engagement-kind-unmapped'
+import { getServiceEngagementLifecycleStageUnknownSignal } from './queries/service-engagement-lifecycle-stage-unknown'
+import { getServiceEngagementLineageOrphanSignal } from './queries/service-engagement-lineage-orphan'
+import { getServiceEngagementRenewedStuckSignal } from './queries/service-engagement-renewed-stuck'
 import { getServicesLegacyResidualReadsSignal } from './queries/services-legacy-residual-reads'
 import { getServicesOrganizationUnresolvedSignal } from './queries/services-organization-unresolved'
 import { getServicesSyncLagSignal } from './queries/services-sync-lag'
@@ -50,10 +55,21 @@ import {
   getRoleTitleUnresolvedDriftOverdueSignal
 } from './queries/role-title-drift'
 import { getShortcutsInvalidPinsSignal } from './queries/shortcuts-invalid-pins'
+import { getWorkspaceProjectionFacetViewDriftSignal } from './queries/workspace-projection-drift'
+import { getWorkspaceProjectionUnresolvedRelationsSignal } from './queries/workspace-projection-unresolved-relations'
+import { getCriticalTablesMissingSignal } from './queries/critical-tables-missing'
 import { getOutboxUnpublishedLagSignal } from './queries/outbox-unpublished-lag'
 import { getOutboxDeadLetterSignal } from './queries/outbox-dead-letter'
 import { getEmailRenderFailureSignal } from './queries/email-render-failure'
+import { getNuboxSourceFreshnessSignal } from './queries/nubox-source-freshness'
+import { getEngagementBudgetOverrunSignal } from './queries/engagement-budget-overrun'
+import { getEngagementConversionRateDropSignal } from './queries/engagement-conversion-rate-drop'
+import { getEngagementOverdueDecisionSignal } from './queries/engagement-overdue-decision'
+import { getSampleSprintProjectionDegradedSignal } from './queries/sample-sprint-projection-degraded'
 import { getCronStagingDriftSignal } from './queries/cron-staging-drift'
+import { getEngagementStaleProgressSignal } from './queries/engagement-stale-progress'
+import { getEngagementUnapprovedActiveSignal } from './queries/engagement-unapproved-active'
+import { getEngagementZombieSignal } from './queries/engagement-zombie'
 import { RELIABILITY_REGISTRY } from './registry'
 import { getReliabilityRegistry } from './registry-store'
 import {
@@ -70,6 +86,7 @@ import {
   buildNotionFreshnessSignal,
   buildObservabilityPostureSignal,
   buildFinanceClpDriftSignals,
+  buildCommercialHealthSignals,
   buildExpenseDistributionSignals,
   buildPaymentOrderSettlementSignals,
   buildSentryIncidentSignals,
@@ -385,6 +402,35 @@ interface ReliabilityOverviewSources {
   workforceRoleTitle?: ReliabilitySignal[] | null
 
   /**
+   * TASK-611 Slice 5 — Organization Workspace projection signals (2):
+   *   - identity.workspace_projection.facet_view_drift (drift, warning)
+   *   - identity.workspace_projection.unresolved_relations (data_quality, error)
+   * Roll up bajo moduleKey 'identity'.
+   */
+  workspaceProjection?: ReliabilitySignal[] | null
+
+  /**
+   * TASK-613 Slice 3 — Finance Clients ↔ Organization canonical link signal:
+   *   - finance.client_profile.unlinked_organizations (data_quality, warning)
+   * Roll up bajo moduleKey 'finance'. Steady state = 0. Cuando > 0,
+   * /finance/clients/[id] cae al legacy detail view (degradación honesta).
+   */
+  financeClientProfileUnlinked?: ReliabilitySignal | null
+
+  /**
+   * TASK-841 — Nubox source freshness. Detecta raw stale aunque conformed
+   * y Postgres projection parezcan frescos por reprocesar snapshots viejos.
+   */
+  nuboxSourceFreshness?: ReliabilitySignal | null
+
+  /**
+   * TASK-838 Fase 3 — Runtime guard: critical tables missing in PG.
+   *   - infrastructure.critical_tables.missing (drift, error si > 0)
+   * Roll up bajo moduleKey 'cloud'.
+   */
+  criticalTablesMissing?: ReliabilitySignal | null
+
+  /**
    * TASK-813 Slice 6 — Commercial engagement instance (HubSpot p_services 0-162) signals (3):
    *   - commercial.service_engagement.sync_lag (lag, warning)
    *   - commercial.service_engagement.organization_unresolved (drift, error)
@@ -392,6 +438,18 @@ interface ReliabilityOverviewSources {
    * Roll up bajo moduleKey 'commercial'. TASK-807 formaliza el subsystem.
    */
   servicesEngagement?: ReliabilitySignal[] | null
+
+  /**
+   * TASK-807 — Commercial Health signals (6):
+   *   - commercial.engagement.overdue_decision
+   *   - commercial.engagement.budget_overrun
+   *   - commercial.engagement.zombie
+   *   - commercial.engagement.unapproved_active
+   *   - commercial.engagement.conversion_rate_drop
+   *   - commercial.engagement.stale_progress (delivered in TASK-805, reused)
+   * Roll up bajo moduleKey 'commercial'.
+   */
+  commercialHealth?: ReliabilitySignal[] | null
 }
 
 export const buildReliabilityOverview = (
@@ -448,8 +506,18 @@ export const buildReliabilityOverview = (
     ...(sources.identityLegalProfile ?? []),
     // TASK-785 Slice 7 — Workforce role title governance signals (2).
     ...(sources.workforceRoleTitle ?? []),
+    // TASK-611 Slice 5 — Organization Workspace projection signals (2).
+    ...(sources.workspaceProjection ?? []),
+    // TASK-613 Slice 3 — Finance Clients ↔ Organization canonical link signal.
+    ...(sources.financeClientProfileUnlinked ? [sources.financeClientProfileUnlinked] : []),
+    // TASK-841 — Nubox raw/conformed/projection freshness.
+    ...(sources.nuboxSourceFreshness ? [sources.nuboxSourceFreshness] : []),
+    // TASK-838 Fase 3 — Runtime guard: critical tables missing in PG.
+    ...(sources.criticalTablesMissing ? [sources.criticalTablesMissing] : []),
     // TASK-813 Slice 6 — Commercial engagement instance signals (3).
-    ...(sources.servicesEngagement ?? [])
+    ...(sources.servicesEngagement ?? []),
+    // TASK-807 — Commercial Health signals (six Sample Sprints health gates).
+    ...(sources.commercialHealth ?? [])
   ]
 
   const signalsByModule = new Map<string, ReliabilitySignal[]>()
@@ -717,18 +785,81 @@ export const getReliabilityOverview = async (
           .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
           .catch(() => null)
 
-  // TASK-813 Slice 6 — Commercial engagement instance signals (3 readers en
-  // paralelo). Cada uno degrada honestamente a `unknown` si su query falla.
-  // Roll up bajo moduleKey 'commercial'. TASK-807 formaliza el subsystem.
+  // TASK-611 Slice 5 — Organization Workspace projection signals (2 readers en
+  // paralelo). Cada uno degrada honestamente a `unknown` si su query/cómputo falla.
+  // Roll up bajo moduleKey 'identity'.
+  const workspaceProjection =
+    preloadedSources.workspaceProjection !== undefined
+      ? preloadedSources.workspaceProjection
+      : await Promise.all([
+          getWorkspaceProjectionFacetViewDriftSignal().catch(() => null),
+          getWorkspaceProjectionUnresolvedRelationsSignal().catch(() => null)
+        ])
+          .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
+          .catch(() => null)
+
+  // TASK-613 Slice 3 — Finance Clients ↔ Organization canonical link signal.
+  // Single reader; degrada honestamente a `unknown` si la query falla.
+  const financeClientProfileUnlinked =
+    preloadedSources.financeClientProfileUnlinked !== undefined
+      ? preloadedSources.financeClientProfileUnlinked
+      : await getFinanceClientProfileUnlinkedSignal().catch(() => null)
+
+  const nuboxSourceFreshness =
+    preloadedSources.nuboxSourceFreshness !== undefined
+      ? preloadedSources.nuboxSourceFreshness
+      : await getNuboxSourceFreshnessSignal().catch(() => null)
+
+  // TASK-838 Fase 3 — Runtime guard: critical tables missing in PG. Single
+  // reader; degrada honestamente a `unknown` si la query falla.
+  const criticalTablesMissing =
+    preloadedSources.criticalTablesMissing !== undefined
+      ? preloadedSources.criticalTablesMissing
+      : await getCriticalTablesMissingSignal().catch(() => null)
+
+  // TASK-813 Slice 6 + TASK-836 Slice 7 — Commercial engagement instance signals.
+  // 3 readers TASK-813 + 4 readers TASK-836 en paralelo. Cada uno degrada
+  // honestamente a `unknown` si su query falla. Roll up bajo moduleKey 'commercial'.
+  // TASK-807 formaliza el subsystem.
   const servicesEngagement =
     preloadedSources.servicesEngagement !== undefined
       ? preloadedSources.servicesEngagement
       : await Promise.all([
           getServicesSyncLagSignal().catch(() => null),
           getServicesOrganizationUnresolvedSignal().catch(() => null),
-          getServicesLegacyResidualReadsSignal().catch(() => null)
+          getServicesLegacyResidualReadsSignal().catch(() => null),
+          // TASK-836 — 4 reliability signals nuevos
+          getServiceEngagementLifecycleStageUnknownSignal().catch(() => null),
+          getServiceEngagementEngagementKindUnmappedSignal().catch(() => null),
+          getServiceEngagementRenewedStuckSignal().catch(() => null),
+          getServiceEngagementLineageOrphanSignal().catch(() => null)
         ])
           .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
+          .catch(() => null)
+
+  // TASK-807 — Commercial Health readers (6). Cada reader degrada
+  // honestamente a `unknown` si su query falla. Incluye stale_progress de
+  // TASK-805 como primitive reutilizada, no recreada.
+  const commercialHealth =
+    preloadedSources.commercialHealth !== undefined
+      ? preloadedSources.commercialHealth
+      : await Promise.all([
+          buildCommercialHealthSignals({
+            overdueDecision: getEngagementOverdueDecisionSignal,
+            budgetOverrun: getEngagementBudgetOverrunSignal,
+            zombie: getEngagementZombieSignal,
+            unapprovedActive: getEngagementUnapprovedActiveSignal,
+            conversionRateDrop: getEngagementConversionRateDropSignal,
+            staleProgress: getEngagementStaleProgressSignal
+          }).catch(() => null),
+          // TASK-835 Slice 6 — Sample Sprints Runtime Projection degraded signal
+          getSampleSprintProjectionDegradedSignal().catch(() => null)
+        ])
+          .then(([healthSignals, projectionSignal]) => {
+            const collected = healthSignals ?? []
+
+            return projectionSignal ? [...collected, projectionSignal] : collected
+          })
           .catch(() => null)
 
   return buildReliabilityOverview(operations, {
@@ -751,7 +882,12 @@ export const getReliabilityOverview = async (
     shortcutsInvalidPins,
     identityLegalProfile,
     workforceRoleTitle,
-    servicesEngagement
+    workspaceProjection,
+    financeClientProfileUnlinked,
+    nuboxSourceFreshness,
+    criticalTablesMissing,
+    servicesEngagement,
+    commercialHealth
   })
 }
 

@@ -11,7 +11,9 @@
 
 FROM node:22-slim AS builder
 
-RUN corepack enable && npm install -g esbuild
+ARG PNPM_VERSION=10.32.1
+
+RUN corepack enable && corepack prepare "pnpm@${PNPM_VERSION}" --activate && npm install -g esbuild
 
 WORKDIR /app
 
@@ -62,7 +64,9 @@ RUN echo "" > /app/server-only-shim.js && \
 
 FROM node:22-slim AS runner
 
-RUN corepack enable
+ARG PNPM_VERSION=10.32.1
+
+RUN corepack enable && corepack prepare "pnpm@${PNPM_VERSION}" --activate
 
 WORKDIR /app
 
