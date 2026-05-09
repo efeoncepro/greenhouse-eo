@@ -2890,6 +2890,7 @@ export interface GreenhouseCoreServices {
   name: string;
   notion_project_id: string | null;
   organization_id: string | null;
+  parent_service_id: string | null;
   pipeline_stage: Generated<string>;
   public_id: string | null;
   service_id: string;
@@ -2899,6 +2900,7 @@ export interface GreenhouseCoreServices {
   status: Generated<string>;
   target_end_date: Timestamp | null;
   total_cost: Numeric | null;
+  unmapped_reason: string | null;
   updated_at: Generated<Timestamp>;
   updated_by: string | null;
 }
