@@ -1,4 +1,5 @@
 import { test, expect, gotoAuthenticated } from '../fixtures/auth'
+import { expectOrganizationWorkspaceShellReady } from '../fixtures/organization-workspace'
 
 /**
  * TASK-613 V1.1 + ISSUE-070 + ISSUE-071 — verificación end-to-end del shell V2
@@ -24,20 +25,9 @@ test.describe('Finance Clients V2 Shell — TASK-613 V1.1 verification', () => {
     // Wait for hydration
     await page.waitForLoadState('networkidle', { timeout: 15_000 }).catch(() => {})
 
-    // ── Cold-start resilience (V3 rollout post-flip) ──
-    // El page server hace 3 fetches paralelos (organizations, 360, finance-clients)
-    // que durante cold-start del serverless function pueden tardar > timeout
-    // default. Esperamos primero a que un MARKER POSITIVO del shell V2 aparezca
-    // (Revenue KPI), lo que confirma que la projection resolvió Y los fetches
-    // subsiguientes están en progreso. Después validamos ausencia de degraded
-    // banner — ese orden previene falsos positivos durante transient loading.
-    const v2RevenueKpi = page.getByText('Revenue', { exact: true }).first()
-    const v2MarginKpi = page.getByText('Margen bruto', { exact: true }).first()
-
-    await expect(v2RevenueKpi, 'V2 KPI Revenue debe estar visible (cold-start resilient)').toBeVisible({
-      timeout: 20_000
+    await expectOrganizationWorkspaceShellReady(page, {
+      requiredTabs: ['Identidad', 'Finanzas', 'CRM']
     })
-    await expect(v2MarginKpi, 'V2 KPI Margen bruto debe estar visible').toBeVisible({ timeout: 10_000 })
 
     // Capture screenshot AFTER positive assertions confirm V2 rendered
     await page.screenshot({
@@ -45,26 +35,8 @@ test.describe('Finance Clients V2 Shell — TASK-613 V1.1 verification', () => {
       fullPage: true
     })
 
-    // 1. No degraded mode banner (ISSUE-071 anti-regression).
-    // toHaveCount(0) con timeout extendido tolera transient loading state donde
-    // el banner aparece brevemente mientras data fetches resuelven.
-    const degradedBanner = page.getByText('Workspace en modo degradado')
-
-    await expect(
-      degradedBanner,
-      'NO debe haber banner degraded — la projection debe resolver completa'
-    ).toHaveCount(0, { timeout: 15_000 })
-
-    // 3. Tab strip por facets — los 9 facets canónicos del shell.
-    // Esto distingue inequívocamente el shell V2 del legacy. El legacy
-    // <ClientDetailView /> NO tiene tab strip de facets — solo las 4 sub-tabs
-    // Facturación/Contactos/Facturas/Deals.
-    //
-    // Marker canónico: "Identidad" tab (primer facet en el registry, no existe
-    // en legacy).
-    await expect(page.getByRole('tab', { name: 'Identidad' })).toBeVisible({ timeout: 10_000 })
-    await expect(page.getByRole('tab', { name: 'Finanzas' })).toBeVisible({ timeout: 10_000 })
-    await expect(page.getByRole('tab', { name: 'CRM' })).toBeVisible({ timeout: 10_000 })
+    // 1 + 3 already validated by the canonical readiness helper:
+    // no degraded banner and canonical V2 tabs visible.
 
     // 4. Finanzas tab debe estar seleccionada por default (entrypointContext='finance')
     const financeTab = page.getByRole('tab', { name: 'Finanzas' })
@@ -86,6 +58,9 @@ test.describe('Finance Clients V2 Shell — TASK-613 V1.1 verification', () => {
     await gotoAuthenticated(page, '/finance/clients/hubspot-company-27776076692')
 
     await page.waitForLoadState('networkidle', { timeout: 15_000 }).catch(() => {})
+    await expectOrganizationWorkspaceShellReady(page, {
+      requiredTabs: ['Identidad', 'Finanzas']
+    })
 
     // Legacy view shows "ID: hubspot-company-..." as visible subheader text.
     // V2 shell does NOT show this — uses chips instead.

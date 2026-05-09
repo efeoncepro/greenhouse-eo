@@ -1,4 +1,5 @@
-import { test, expect, gotoAuthenticated } from '../fixtures/auth'
+import { test, gotoAuthenticated } from '../fixtures/auth'
+import { expectOrganizationWorkspaceShellReady } from '../fixtures/organization-workspace'
 
 /**
  * TASK-612 V1.1 — verificación end-to-end del shell V2 de Agency Organizations
@@ -30,38 +31,17 @@ test.describe('Agency Organizations V2 Shell — TASK-612 V1.1 verification', ()
 
     await page.waitForLoadState('networkidle', { timeout: 15_000 }).catch(() => {})
 
-    // ── Cold-start resilience (V3 rollout post-flip) ──
-    // Esperamos primero a un marker positivo (Revenue KPI) antes de asserts
-    // negativos. Cold-start del serverless puede tardar mientras los fetches
-    // paralelos resuelven; el banner degraded puede aparecer brevemente.
-    const v2RevenueKpi = page.getByText('Revenue', { exact: true }).first()
-    const v2MarginKpi = page.getByText('Margen bruto', { exact: true }).first()
-
-    await expect(v2RevenueKpi, 'V2 KPI Revenue debe estar visible (cold-start resilient)').toBeVisible({
-      timeout: 20_000
+    await expectOrganizationWorkspaceShellReady(page, {
+      requiredTabs: ['Identidad', 'CRM', 'Servicios']
     })
-    await expect(v2MarginKpi, 'V2 KPI Margen bruto debe estar visible').toBeVisible({ timeout: 10_000 })
 
     await page.screenshot({
       path: 'test-results/playwright/agency-organizations-v2-validation/page.png',
       fullPage: true
     })
 
-    // 1. NO degraded mode banner — extended timeout tolera transient loading.
-    const degradedBanner = page.getByText('Workspace en modo degradado')
-
-    await expect(
-      degradedBanner,
-      'NO debe haber banner degraded — projection debe resolver completa para Agency entrypoint'
-    ).toHaveCount(0, { timeout: 15_000 })
-
-    // 2. Tab strip por facets — los 9 facets canónicos del shell V2.
-    // Marker canónico: "Identidad" + "CRM" tabs distinguen V2 del legacy
-    // OrganizationView (que tiene solo 4 tabs: Operaciones / Finanzas /
-    // Equipo / Configuración).
-    await expect(page.getByRole('tab', { name: 'Identidad' })).toBeVisible({ timeout: 10_000 })
-    await expect(page.getByRole('tab', { name: 'CRM' })).toBeVisible({ timeout: 10_000 })
-    await expect(page.getByRole('tab', { name: 'Servicios' })).toBeVisible({ timeout: 10_000 })
+    // 1 + 2 already validated by the canonical readiness helper:
+    // no degraded banner and canonical V2 tabs visible.
   })
 
   test('does NOT render legacy OrganizationView 4-tab structure (anti-regression)', async ({ page }) => {
@@ -69,21 +49,9 @@ test.describe('Agency Organizations V2 Shell — TASK-612 V1.1 verification', ()
 
     await page.waitForLoadState('networkidle', { timeout: 15_000 }).catch(() => {})
 
-    // Legacy OrganizationView tiene tab "Configuración" como una de las 4 fijas.
-    // El shell V2 NO tiene esa tab — sus 9 facets son
-    // Identidad/Spaces/Equipo/Economía/Entrega/Finanzas/CRM/Servicios/Staff Aug.
-    //
-    // Si "Configuración" tab existe Y "Identidad" tab NO existe → estamos en
-    // legacy. La aserción inversa garantiza la detección anti-regresión.
-    const legacyConfigTab = page.getByRole('tab', { name: 'Configuración' })
-    const v2IdentidadTab = page.getByRole('tab', { name: 'Identidad' })
-
-    const hasLegacyConfig = await legacyConfigTab.count()
-    const hasV2Identidad = await v2IdentidadTab.count()
-
-    expect(
-      hasV2Identidad > 0 && hasLegacyConfig === 0,
-      `Debe ser shell V2 (Identidad tab presente, Configuración legacy ausente). hasV2Identidad=${hasV2Identidad}, hasLegacyConfig=${hasLegacyConfig}`
-    ).toBe(true)
+    await expectOrganizationWorkspaceShellReady(page, {
+      requiredTabs: ['Identidad'],
+      forbiddenTabs: ['Configuración']
+    })
   })
 })
