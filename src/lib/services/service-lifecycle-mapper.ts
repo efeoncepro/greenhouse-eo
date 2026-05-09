@@ -56,12 +56,12 @@ export const HUBSPOT_STAGE_ID_TO_GREENHOUSE: Readonly<Record<string, {
   'de53e7d9-6b57-4701-b576-92de01c9ed65': { stage: 'renewal_pending', status: 'active', active: true },
   '1324827222': { stage: 'renewed', status: 'active', active: true },
   '1324827223': { stage: 'closed', status: 'closed', active: false },
-  '1324827224': { stage: 'paused', status: 'paused', active: false }
-  // Stage `validation` se agrega aqui cuando el operador ejecute el runbook
-  // y registre el nuevo stage ID. Agregarlo al mapper como:
-  //   '<NEW UUID>': { stage: 'validation', status: 'active', active: true }
-  // El status 'active' aqui significa "operativo en validation" — la
-  // semantica fina (approval, progress, outcome) la gobierna Greenhouse interno.
+  '1324827224': { stage: 'paused', status: 'paused', active: false },
+  // TASK-836 — stage 'Validación / Sample Sprint' creada 2026-05-09 via API
+  // (runbook docs/operations/runbooks/hubspot-service-pipeline-config.md).
+  // Status 'active' aquí significa "operativo en validation" — la semántica
+  // fina (approval, progress, outcome) la gobierna Greenhouse interno.
+  '1357763256': { stage: 'validation', status: 'active', active: true }
 })
 
 /**

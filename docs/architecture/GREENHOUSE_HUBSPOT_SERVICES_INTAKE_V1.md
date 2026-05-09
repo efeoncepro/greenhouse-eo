@@ -521,3 +521,46 @@ migrations/
 3. NO crear spaces ad-hoc — consumir `allocateSpaceNumericCode` helper canónico.
 4. Emitir outbox events v1 documentados en `EVENT_CATALOG`.
 5. Si emerge un nuevo path de entrada (e.g. CSV import, manual UI), debe converger en el helper canónico.
+
+## Delta 2026-05-09 — TASK-836: Lifecycle stage sync + Sample Sprint validation stage
+
+### Cambios canonizados
+
+1. **Mapper canónico stage HubSpot → Greenhouse lifecycle** (`src/lib/services/service-lifecycle-mapper.ts`):
+   - 6 stage IDs canónicos del Service Pipeline `0-162` mapeados verificados pre-TASK-836:
+     - `8e2b21d0-7a90-4968-8f8c-a8525cc49c70` → `onboarding` (active=TRUE)
+     - `600b692d-a3fe-4052-9cd7-278b134d7941` → `active` (active=TRUE)
+     - `de53e7d9-6b57-4701-b576-92de01c9ed65` → `renewal_pending` (active=TRUE)
+     - `1324827222` (Renovado) → `renewed` (active=TRUE, transitorio)
+     - `1324827223` (Closed) → `closed` (active=FALSE)
+     - `1324827224` (Pausado) → `paused` (active=FALSE)
+   - Stage `validation` (Sample Sprints) se agrega cuando el operador ejecute el runbook `docs/operations/runbooks/hubspot-service-pipeline-config.md` y registre el nuevo stage ID en el mapper.
+   - Unknown stage degrada honest a `paused/paused/false` con `unmapped_reason='unknown_pipeline_stage'`. NUNCA default silente a `active`.
+
+2. **Engagement kind cascade** (`src/lib/services/engagement-kind-cascade.ts`): 6 casos canónicos para resolver `engagement_kind` ante webhook inbound HubSpot. Preserva PG cuando HubSpot devuelve NULL para filas existentes (evita race condition Sample Sprint local pisado por sync).
+
+3. **UPSERT consume mapper + cascade** (`src/lib/services/upsert-service-from-hubspot.ts`):
+   - Reemplaza hardcode `pipeline_stage='active', status='active', active=TRUE` por consumo del mapper.
+   - SELECT pre-UPSERT detecta diff antes de emit outbox.
+   - Emite `commercial.service_engagement.lifecycle_changed v1` (NUEVO TASK-836) SOLO en transiciones reales.
+
+4. **Property `ef_engagement_kind` + stage `Validación / Sample Sprint`** se configuran via runbook `docs/operations/runbooks/hubspot-service-pipeline-config.md` (operación humana 1 sola vez por entorno HubSpot).
+
+### 4 reliability signals nuevos bajo subsystem `commercial`
+
+| Signal | Kind | Severity | Steady | Reader |
+|---|---|---|---|---|
+| `commercial.service_engagement.lifecycle_stage_unknown` | drift | error si > 0 | 0 | service-engagement-lifecycle-stage-unknown.ts |
+| `commercial.service_engagement.engagement_kind_unmapped` | drift | warning si > 0 | 0 | service-engagement-engagement-kind-unmapped.ts |
+| `commercial.service_engagement.renewed_stuck` | drift | warning si > 60 días | 0 | service-engagement-renewed-stuck.ts |
+| `commercial.service_engagement.lineage_orphan` | data_quality | error si > 0 | 0 | service-engagement-lineage-orphan.ts |
+
+### Schema delta (migration `20260509125228920`)
+
+- CHECK `pipeline_stage` extendido con `'validation'`.
+- CHECK structural a `status` (`active|closed|paused|legacy_seed_archived`).
+- CHECK structural a `hubspot_sync_status` (`pending|synced|unmapped`).
+- Columna `unmapped_reason TEXT NULL` con CHECK enum cerrado (`unknown_pipeline_stage|missing_classification`).
+- Columna `parent_service_id TEXT NULL` FK self con `ON DELETE RESTRICT`.
+- Trigger `services_lineage_protection_trigger` (BEFORE INSERT OR UPDATE) bloquea: chain regular→regular, auto-referencia, parent missing, parent legacy_seed_archived.
+- Bloque DO post-DDL anti pre-up-marker bug (verifica los 6 cambios).

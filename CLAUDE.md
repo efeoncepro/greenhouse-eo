@@ -735,6 +735,64 @@ Idempotente: re-correr es safe, UPSERT por `hubspot_service_id` UNIQUE.
 - **NUNCA** invocar `Sentry.captureException` directo en code path commercial. Usar `captureWithDomain(err, 'integrations.hubspot', ...)`.
 - **SIEMPRE** que un consumer Finance/Delivery necesite "el servicio del cliente X período Y", filtrar `WHERE active=TRUE AND status != 'legacy_seed_archived' AND hubspot_sync_status != 'unmapped'`.
 
+### HubSpot Service Pipeline lifecycle invariants (TASK-836)
+
+`upsertServiceFromHubSpot()` consume el mapper canónico `service-lifecycle-mapper.ts` y la cascade canónica `engagement-kind-cascade.ts` para resolver `pipeline_stage|status|active|engagement_kind` desde HubSpot. Reemplaza el hardcode que tratba a TODOS los services como `active`.
+
+**HubSpot Service Pipeline (`0-162`) stage IDs canónicos** (verificados 2026-05-09 + stage validation creada):
+
+| Greenhouse pipeline_stage | HubSpot label | HubSpot stage ID | Active | Status |
+|---|---|---|---|---|
+| `validation` | Validación / Sample Sprint | `1357763256` | TRUE | active |
+| `onboarding` | Onboarding | `8e2b21d0-7a90-4968-8f8c-a8525cc49c70` | TRUE | active |
+| `active` | Activo | `600b692d-a3fe-4052-9cd7-278b134d7941` | TRUE | active |
+| `renewal_pending` | En renovación | `de53e7d9-6b57-4701-b576-92de01c9ed65` | TRUE | active |
+| `renewed` | Renovado | `1324827222` | TRUE | active (transitorio) |
+| `closed` | Closed | `1324827223` | FALSE | closed |
+| `paused` | Pausado | `1324827224` | FALSE | paused |
+
+**Property HubSpot canónica** (creada 2026-05-09 vía API):
+- internal name: `ef_engagement_kind` (label visible: `Tipo de servicio`)
+- type: `enumeration` / fieldType: `select`
+- options: `regular|pilot|trial|poc|discovery` (labels: Contratado/Piloto/Trial/POC/Discovery)
+
+**Outbox event canónico granular**:
+- `commercial.service_engagement.lifecycle_changed v1` emitido SOLO cuando hay diff real en `pipeline_stage|active|status|engagement_kind`. Refresh idempotente sin diff NO emite.
+- `commercial.service_engagement.materialized v1` (TASK-813) sigue emitiéndose en cada UPSERT — son complementarios.
+
+**4 reliability signals nuevos bajo subsystem `commercial`**:
+- `commercial.service_engagement.lifecycle_stage_unknown` (kind=drift, severity=error si > 0).
+- `commercial.service_engagement.engagement_kind_unmapped` (kind=drift, severity=warning).
+- `commercial.service_engagement.renewed_stuck` (kind=drift, severity=warning si > 60 días).
+- `commercial.service_engagement.lineage_orphan` (kind=data_quality, severity=error).
+
+**Schema delta** (migration `20260509125228920`):
+- CHECK `pipeline_stage` extendido con `'validation'`.
+- CHECK structural a `status` (`active|closed|paused|legacy_seed_archived`).
+- CHECK structural a `hubspot_sync_status` (`pending|synced|unmapped`).
+- Columna `unmapped_reason TEXT NULL` con CHECK enum cerrado (`unknown_pipeline_stage|missing_classification`).
+- Columna `parent_service_id TEXT NULL` FK self con `ON DELETE RESTRICT`.
+- Trigger `services_lineage_protection_trigger` (BEFORE INSERT OR UPDATE).
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** hardcodear `pipeline_stage='active'`, `status='active'` ni `active=TRUE` en INSERT/UPDATE de `services` cuando la fuente es HubSpot. Toda mutación pasa por el mapper canónico.
+- **NUNCA** depender del label visible HubSpot (`Tipo de servicio`, `Activo`, `Closed`, etc.) en código. Solo internal names + stage IDs. Labels son traducibles y mutables.
+- **NUNCA** sobrescribir `engagement_kind` con NULL desde un UPSERT inbound. La cascade canónica preserva PG cuando HubSpot devuelve NULL (casos 3-4 de la cascade).
+- **NUNCA** asumir un default de `engagement_kind` para services nuevos en stage `validation`. Sin clasificación explícita, queda `unmapped` y reliability signal alerta.
+- **NUNCA** crear servicio con `engagement_kind='regular'` AND `parent_service_id IS NOT NULL` cuyo parent tenga `engagement_kind='regular'`. Trigger PG lo bloquea; signal `lineage_orphan` lo detecta defense-in-depth.
+- **NUNCA** mutar `pipeline_stage`, `status` o `active` directo via SQL en producción. Toda mutación pasa por `upsertServiceFromHubSpot()` o revert canónico via outbox.
+- **NUNCA** filtrar "servicios operativos del periodo" con `WHERE pipeline_stage = 'active'` solo. `renewed` y `renewal_pending` también son operativos. Usar `WHERE active=TRUE` o whitelist explícita.
+- **NUNCA** promover unilateralmente desde Greenhouse `pipeline_stage='renewed'` a `'active'`. HubSpot es source of truth de stage; signal `renewed_stuck` escala drift.
+- **NUNCA** agregar stage HubSpot nuevo sin extender el mapper + agregar tests + actualizar `docs/architecture/GREENHOUSE_HUBSPOT_SERVICES_INTAKE_V1.md`. Default unknown stage al fail-safe `unmapped`, NUNCA a `active`.
+- **NUNCA** ejecutar backfill sin pre/post snapshot documentado y plan de revert via outbox `lifecycle_changed`.
+- **NUNCA** invocar `Sentry.captureException` directo en este path. Usar `captureWithDomain(err, 'commercial', ...)`.
+- **SIEMPRE** que ocurra una transición de `pipeline_stage`, `active`, `status` o `engagement_kind`, emitir `commercial.service_engagement.lifecycle_changed v1` en la misma transacción. Refresh idempotente sin diff NO emite.
+- **SIEMPRE** validar `engagement_kind` contra el enum cerrado `regular|pilot|trial|poc|discovery`. Valores fuera del enum → `hubspot_sync_status='unmapped'` + `unmapped_reason='missing_classification'`, NUNCA cast silencioso.
+- **SIEMPRE** que un Sample Sprint convierta a service regular, el child hereda `parent_service_id` apuntando al Sample Sprint padre. Trigger enforce; signal `lineage_orphan` defense-in-depth.
+
+**Spec canónica**: `docs/tasks/in-progress/TASK-836-hubspot-services-lifecycle-stage-sync-hardening.md`. Runbook config HubSpot: `docs/operations/runbooks/hubspot-service-pipeline-config.md`.
+
 ### HubSpot inbound webhook — companies + contacts auto-sync (TASK-706)
 
 Cuando alguien crea o actualiza una company/contact en HubSpot, **NO requerir sync manual ni esperar al cron diario**. La app HubSpot Developer envía webhooks v3 a Greenhouse y el portal sincroniza automáticamente.

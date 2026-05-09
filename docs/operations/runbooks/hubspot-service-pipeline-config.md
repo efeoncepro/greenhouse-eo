@@ -107,29 +107,28 @@ pnpm tsx --require ./scripts/lib/server-only-shim.cjs \
 
 El output del dry-run debe mostrar `ef_engagement_kind` poblado para los services que el operador ya configuró en HubSpot. Si está vacío, completarlo manualmente en HubSpot UI antes del apply.
 
-### Paso 4 — Bitacora de la ejecucion (completar al ejecutar)
+### Paso 4 — Bitacora de la ejecucion
 
-Persistir aqui el output de los pasos 1 y 2 para audit trail:
+Ejecucion confirmada 2026-05-09 via Claude Code agent con autorización explícita del usuario:
 
 ```yaml
-# Completar al ejecutar:
 hubspot_portal: '48713323'
-executed_at: 'YYYY-MM-DDTHH:MM:SSZ'
-executed_by: '<email>'
+executed_at: '2026-05-09T13:13:00Z'
+executed_by: 'jreysgo@gmail.com (via Claude Code agent)'
 
 pipeline:
-  pipeline_id: '<from paso 1>'
+  pipeline_id: 'ba9cdbd6-e220-45b2-a5a2-d67ebdcbade6'
   stages:
-    - label: 'Validación / Sample Sprint'
-      id: '<NEW UUID>'
-      display_order: 0
     - label: 'Onboarding'
       id: '8e2b21d0-7a90-4968-8f8c-a8525cc49c70'
-      display_order: 1
+      display_order: 0
+    - label: 'Validación / Sample Sprint'
+      id: '1357763256'
+      display_order: 1  # HubSpot API ignoró PATCH a displayOrder=0 (mantiene orden de creación). Mapper opera por stage ID, no por orden visual; RevOps puede arrastrar stage en HubSpot UI si lo prefiere.
     - label: 'Activo'
       id: '600b692d-a3fe-4052-9cd7-278b134d7941'
       display_order: 2
-    - label: 'En renovacion'
+    - label: 'En renovación'
       id: 'de53e7d9-6b57-4701-b576-92de01c9ed65'
       display_order: 3
     - label: 'Renovado'
@@ -147,8 +146,12 @@ property:
   label_visible: 'Tipo de servicio'
   type: 'enumeration'
   field_type: 'select'
+  group_name: 'service_information'
   options: ['regular', 'pilot', 'trial', 'poc', 'discovery']
+  options_labels: ['Contratado', 'Piloto', 'Trial', 'POC', 'Discovery']
 ```
+
+Mapper TS actualizado en `src/lib/services/service-lifecycle-mapper.ts` con stage ID `1357763256` agregado. Tests anti-regression: 18/18 verdes.
 
 ## Que no hacer
 

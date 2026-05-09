@@ -1040,5 +1040,56 @@ main.py                   # EXTENDER: +services en _CORE_PROPS y SYNC_OBJECTS
 
 ---
 
+## Delta 2026-05-09 — TASK-836: Lifecycle stage canónico HubSpot → Greenhouse
+
+### Cambios al lifecycle de `pipeline_stage`
+
+El CHECK constraint de `greenhouse_core.services.pipeline_stage` se extendió con el valor `'validation'` (Sample Sprints). Lifecycle canónico actualizado:
+
+| Greenhouse pipeline_stage | HubSpot stage label | HubSpot stage ID | Active | Status |
+|---|---|---|---|---|
+| `validation` | Validación / Sample Sprint | `1357763256` | TRUE | active |
+| `onboarding` | Onboarding | `8e2b21d0-7a90-4968-8f8c-a8525cc49c70` | TRUE | active |
+| `active` | Activo | `600b692d-a3fe-4052-9cd7-278b134d7941` | TRUE | active |
+| `renewal_pending` | En renovación | `de53e7d9-6b57-4701-b576-92de01c9ed65` | TRUE | active |
+| `renewed` | Renovado | `1324827222` | TRUE | active (transitorio) |
+| `closed` | Closed | `1324827223` | FALSE | closed |
+| `paused` | Pausado | `1324827224` | FALSE | paused |
+
+### Política `Pausado` (resuelta)
+
+`active=FALSE` (decisión canónica). Un service pausado no participa en P&L/ICO/attribution operativo del período en curso.
+
+### Política `Renovado` (resuelta)
+
+Etapa **transitoria** (active=TRUE). HubSpot promueve a `Activo` cuando inicia nuevo billing cycle. Greenhouse NUNCA promueve unilateralmente. Reliability signal `commercial.service_engagement.renewed_stuck` flag-ea > 60 días.
+
+### Política `unknown stage`
+
+Si HubSpot agrega stage no reconocido por el mapper canónico: degraded honest a `pipeline_stage='paused', status='paused', active=FALSE` con `unmapped_reason='unknown_pipeline_stage'`. NUNCA default silente a `active`. Reliability signal `commercial.service_engagement.lifecycle_stage_unknown` lo flag-ea (steady=0).
+
+### Sample Sprint = service no-regular
+
+Decisión: Sample Sprints son `services` no-regulares (`engagement_kind IN ('pilot','trial','poc','discovery')`) — NO entidad paralela. Pueden proyectarse a HubSpot `p_services` en stage `validation` cuando emerja TASK-837 (deal-bound wizard outbound).
+
+### Lineage (foundation)
+
+Columna `parent_service_id TEXT NULL` FK self con `ON DELETE RESTRICT` agregada. Trigger PG `services_lineage_protection_trigger` bloquea: chain regular→regular, auto-referencia, parent missing, parent legacy_seed_archived. Defense estructural pre-TASK-837 (conversion Sample Sprint → child service regular).
+
+### Helpers canónicos nuevos
+
+- `src/lib/services/service-lifecycle-mapper.ts` — mapper puro stage HubSpot → Greenhouse triple `(pipelineStage, status, active)`.
+- `src/lib/services/engagement-kind-cascade.ts` — 6 casos canónicos cascade NULL/poblado × PG existing/new × stage operativa/validation.
+
+### Outbox event v1 nuevo
+
+`commercial.service_engagement.lifecycle_changed v1` emitido por `upsertServiceFromHubSpot` SOLO cuando hay diff real en `pipeline_stage|active|status|engagement_kind`. Ver `GREENHOUSE_EVENT_CATALOG_V1.md` Delta 2026-05-09.
+
+### 4 reliability signals nuevos bajo subsystem `commercial`
+
+`lifecycle_stage_unknown`, `engagement_kind_unmapped`, `renewed_stuck`, `lineage_orphan`. Spec en `GREENHOUSE_HUBSPOT_SERVICES_INTAKE_V1.md` Delta 2026-05-09.
+
+---
+
 *Efeonce Greenhouse™ • Efeonce Group • Marzo 2026*
 *Documento técnico interno. Su reproducción o distribución sin autorización escrita está prohibida.*

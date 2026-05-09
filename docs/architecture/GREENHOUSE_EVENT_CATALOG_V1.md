@@ -2,6 +2,26 @@
 
 Catalogo canonico de eventos del sistema de outbox de Greenhouse. Cada evento se registra en `greenhouse_sync.outbox_events` y se publica a BigQuery via el consumer `outbox-publish`.
 
+## Delta 2026-05-09 — TASK-836: Service lifecycle granular (1 event v1 nuevo)
+
+Aggregate type: `service_engagement`.
+
+| Event Type | Disparado por | Payload v1 contract | Consumers |
+|---|---|---|---|
+| `commercial.service_engagement.lifecycle_changed` | `upsertServiceFromHubSpot()` cuando hay diff real en `pipeline_stage`, `active`, `status` o `engagement_kind` | `{version:1, serviceId, hubspotServiceId, previousPipelineStage, nextPipelineStage, previousActive, nextActive, previousStatus, nextStatus, previousEngagementKind, nextEngagementKind, triggeredBy:'hubspot-services-webhook'\|'backfill-from-hubspot.ts'\|'manual_command'\|'cron-safety-net', occurredAt}` | Reactive consumers downstream (P&L, ICO, attribution, organization workspace, audit) reaccionan selectivamente a transiciones reales sin reprocesar el service en cada UPSERT idempotente |
+
+Reglas de emisión:
+
+- Disparar solo cuando uno o más de `pipeline_stage`, `active`, `status`, `engagement_kind` cambian. Refresh idempotente sin diff NO emite.
+- Idempotencia: `subject_id + previous* + next*` es la idempotency key implícita.
+- Compat: el evento generico `commercial.service_engagement.materialized v1` (TASK-813) sigue emitiéndose en cada UPSERT (consumers existentes); `lifecycle_changed` lo complementa con granularidad.
+
+Reglas duras (anti-regresión):
+
+- NUNCA emitir `lifecycle_changed v1` cuando `previous == next` para los 4 campos de transición. El SELECT pre-UPSERT detecta diff antes de emit.
+- NUNCA bypass del UPSERT canónico para mutar `services` directo en producción. Toda transición pasa por `upsertServiceFromHubSpot()`.
+- NUNCA inventar nuevos `triggeredBy` sin agregar al enum del payload contract.
+
 ## Delta 2026-05-06 — TASK-813b: HubSpot p_services async intake (1 event v1 nuevo)
 
 Aggregate type: `hubspot_services_batch`.

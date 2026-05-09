@@ -205,16 +205,29 @@ describe('mapHubSpotStageToLifecycle (TASK-836 Slice 3)', () => {
   })
 
   describe('contract invariants', () => {
-    it('expone los 6 stage IDs canonicos verificados pre-TASK-836', () => {
-      // TASK-836 entrega los 6 IDs verificados 2026-05-08. La stage `validation`
-      // se agrega cuando el operador ejecute el runbook.
-      expect(KNOWN_HUBSPOT_STAGE_IDS).toHaveLength(6)
+    it('expone los 7 stage IDs canonicos (6 originales + validation creada 2026-05-09)', () => {
+      expect(KNOWN_HUBSPOT_STAGE_IDS).toHaveLength(7)
       expect(KNOWN_HUBSPOT_STAGE_IDS).toContain('8e2b21d0-7a90-4968-8f8c-a8525cc49c70')
       expect(KNOWN_HUBSPOT_STAGE_IDS).toContain('600b692d-a3fe-4052-9cd7-278b134d7941')
       expect(KNOWN_HUBSPOT_STAGE_IDS).toContain('de53e7d9-6b57-4701-b576-92de01c9ed65')
       expect(KNOWN_HUBSPOT_STAGE_IDS).toContain('1324827222')
       expect(KNOWN_HUBSPOT_STAGE_IDS).toContain('1324827223')
       expect(KNOWN_HUBSPOT_STAGE_IDS).toContain('1324827224')
+      // Stage validation creada via API 2026-05-09 (TASK-836 Slice 1)
+      expect(KNOWN_HUBSPOT_STAGE_IDS).toContain('1357763256')
+    })
+
+    it('mapea Validación / Sample Sprint stage ID 1357763256 -> validation', () => {
+      const result = mapHubSpotStageToLifecycle({
+        hsPipelineStageId: '1357763256'
+      })
+
+      expect(result).toEqual({
+        resolved: true,
+        pipelineStage: 'validation',
+        status: 'active',
+        active: true
+      })
     })
 
     it('NUNCA defaultea silenciosamente a active=TRUE', () => {
