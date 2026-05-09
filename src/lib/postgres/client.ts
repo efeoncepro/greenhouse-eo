@@ -56,12 +56,21 @@ const normalizeNumber = (value: string | undefined, fallback: number) => {
   return Number.isFinite(parsed) ? parsed : fallback
 }
 
+const GREENHOUSE_POSTGRES_RETRY_DELAYS_MS = [1_000, 3_000, 7_000] as const
+
+const sleep = (delayMs: number) => new Promise(resolve => setTimeout(resolve, delayMs))
+
 export const isGreenhousePostgresRetryableConnectionError = (error: unknown) => {
   if (!(error instanceof Error)) {
     return false
   }
 
+  const code = 'code' in error && typeof error.code === 'string' ? error.code : null
   const message = error.message.toLowerCase()
+
+  if (code && ['08000', '08003', '08006', '53300', '57P01', '57P02', '57P03'].includes(code)) {
+    return true
+  }
 
   return [
     'ssl alert bad certificate',
@@ -72,7 +81,10 @@ export const isGreenhousePostgresRetryableConnectionError = (error: unknown) => 
     'connection ended unexpectedly',
     'read etimedout',
     'read econnreset',
-    'write epipe'
+    'write epipe',
+    'remaining connection slots are reserved',
+    'sorry, too many clients already',
+    'too many connections'
   ].some(fragment => message.includes(fragment))
 }
 
@@ -215,24 +227,33 @@ export const getGreenhousePostgresPool = async () => {
 }
 
 export const runGreenhousePostgresQuery = async <T extends Record<string, unknown>>(text: string, values: unknown[] = []) => {
-  try {
-    const pool = await getGreenhousePostgresPool()
-    const result = await pool.query<T>(text, values)
+  for (let attempt = 0; attempt <= GREENHOUSE_POSTGRES_RETRY_DELAYS_MS.length; attempt += 1) {
+    try {
+      const pool = await getGreenhousePostgresPool()
+      const result = await pool.query<T>(text, values)
 
-    return result.rows
-  } catch (error) {
-    if (!isGreenhousePostgresRetryableConnectionError(error)) {
-      throw error
+      return result.rows
+    } catch (error) {
+      if (
+        attempt >= GREENHOUSE_POSTGRES_RETRY_DELAYS_MS.length ||
+        !isGreenhousePostgresRetryableConnectionError(error)
+      ) {
+        throw error
+      }
+
+      const delayMs = GREENHOUSE_POSTGRES_RETRY_DELAYS_MS[attempt]
+
+      console.warn(
+        `Retrying Greenhouse Postgres query after retryable connection failure ` +
+        `(attempt ${attempt + 1}/${GREENHOUSE_POSTGRES_RETRY_DELAYS_MS.length}, delay ${delayMs}ms).`,
+        error
+      )
+      await closeGreenhousePostgres({ source: 'retryable_error', error }).catch(() => undefined)
+      await sleep(delayMs)
     }
-
-    console.warn('Retrying Greenhouse Postgres query after retryable connection failure.', error)
-    await closeGreenhousePostgres({ source: 'retryable_error', error }).catch(() => undefined)
-
-    const pool = await getGreenhousePostgresPool()
-    const result = await pool.query<T>(text, values)
-
-    return result.rows
   }
+
+  throw new Error('Greenhouse Postgres query retry loop exhausted unexpectedly.')
 }
 
 const acquireGreenhouseTransactionClient = async (attempt = 0): Promise<PoolClient> => {

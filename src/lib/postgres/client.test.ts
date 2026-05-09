@@ -57,8 +57,16 @@ describe('postgres secret-manager config', () => {
     })
   })
 
-  it('classifies Cloud SQL TLS bad certificate as retryable', () => {
+  it('classifies transient Postgres connection failures as retryable', () => {
     expect(isGreenhousePostgresRetryableConnectionError(new Error('ssl/tls alert bad certificate'))).toBe(true)
+    expect(
+      isGreenhousePostgresRetryableConnectionError(
+        Object.assign(
+          new Error('remaining connection slots are reserved for roles with privileges of the "pg_use_reserved_connections" role'),
+          { code: '53300' }
+        )
+      )
+    ).toBe(true)
     expect(isGreenhousePostgresRetryableConnectionError(new Error('syntax error at or near "FROM"'))).toBe(false)
   })
 

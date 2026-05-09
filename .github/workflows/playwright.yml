@@ -115,6 +115,7 @@ jobs:
           GREENHOUSE_POSTGRES_USER: greenhouse_app
           GREENHOUSE_POSTGRES_PASSWORD_SECRET_REF: greenhouse-pg-dev-app-password
           GREENHOUSE_POSTGRES_IP_TYPE: PUBLIC
+          GREENHOUSE_POSTGRES_MAX_CONNECTIONS: '1'
         run: |
           set -e
           if [ ! -f artifacts/playwright/results.json ]; then
