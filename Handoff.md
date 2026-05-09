@@ -1,3 +1,12 @@
+# Sesion 2026-05-09 — CI smoke-lane publisher hardening
+
+- **Trigger:** el usuario pidio resolver solo el warning `sync:smoke-lane ... failed (non-blocking)` de forma robusta y escalable; el warning Node.js 20 queda cubierto por TASK-607.
+- **Causa raiz:** `pnpm sync:smoke-lane` ejecutaba `tsx scripts/publish-smoke-lane-run.ts` sin el shim canonico. Al importar `src/lib/postgres/client` -> secrets -> `import 'server-only'`, el CLI explotaba antes de publicar a `greenhouse_sync.smoke_lane_runs`.
+- **Fix:** `package.json` actualiza la primitive compartida `sync:smoke-lane` para usar `tsx --require ./scripts/lib/server-only-shim.cjs ...`. No se parchea `.github/workflows/playwright.yml`; cualquier lane futura hereda el contrato.
+- **Validacion local:** `pnpm sync:smoke-lane finance.web --report=/tmp/greenhouse-missing-playwright-report.json` falla por `ERROR: cannot read report ... ENOENT`, no por `server-only`. Validacion CI/Playwright pendiente tras push.
+
+---
+
 # Sesion 2026-05-09 — TASK-836 follow-up: webhook handler dual-format + nuevas subscriptions
 
 - **Trigger:** smoke test post-TASK-836 (PATCH `ef_engagement_kind` en service Aguas Andinas) revelo que el webhook llegaba a `webhook_inbox_events` (status=processed) pero NO actualizaba `hubspot_last_synced_at` — handler ignoraba el event silente.

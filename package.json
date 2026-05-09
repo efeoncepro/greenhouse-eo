@@ -95,7 +95,7 @@
     "smoke:cost-intelligence:period-closure": "tsx scripts/smoke-cost-intelligence-period-closure.ts",
     "smoke:cost-intelligence:operational-pl": "tsx scripts/smoke-cost-intelligence-operational-pl.ts",
     "sync:source-runtime-projections": "tsx scripts/sync-source-runtime-projections.ts",
-    "sync:smoke-lane": "tsx scripts/publish-smoke-lane-run.ts",
+    "sync:smoke-lane": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/publish-smoke-lane-run.ts",
     "secrets:audit": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/secrets/audit.ts",
     "secrets:rotate": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/secrets/rotate.ts",
     "auth:audit-azure-app": "tsx scripts/auth/audit-azure-app.ts",
