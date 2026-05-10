@@ -1,3 +1,16 @@
+# Sesion 2026-05-10 — TASK-857 creada + watchdog main diagnosticado
+
+- **Trigger:** usuario reporta correo GitHub Actions: `Production Release Watchdog - main (6155cde)` fallando y pide crear task para webhooks + ayudar a resolver el incidente.
+- **Branch:** `develop`.
+- **Skill usada:** `greenhouse-task-planner` para crear task canónica.
+- **Task nueva:** `TASK-857 — GitHub Webhooks Release Event Ingestion` creada en `docs/tasks/to-do/TASK-857-github-webhooks-release-event-ingestion.md`; README + `TASK_ID_REGISTRY.md` sincronizados, siguiente ID `TASK-858`.
+- **Diagnóstico del fallo:** run scheduled `25638572756` falló por `platform.release.worker_revision_drift`. Causa raíz del ruido: `.github/workflows/production-release-watchdog.yml` autenticaba GCP pero no entregaba `GREENHOUSE_POSTGRES_*` al step `Run watchdog`; en GitHub Actions el reader caía al fallback GitHub API y comparaba workers contra workflows directos antiguos en lugar del SSoT `greenhouse_sync.release_manifests`.
+- **Fix aplicado:** agregar env vars PostgreSQL/Secret Manager al step `Run watchdog` para que `worker_revision_drift` lea `release_manifests` como SSoT también dentro del workflow scheduled.
+- **Verificación ejecutada:** `pnpm test -- src/lib/release/workflow-allowlist.test.ts src/lib/release/watchdog-aggregation.test.ts` terminó ejecutando suite completa Vitest: 4064 passed / 11 skipped. `pnpm pg:doctor` verde; `pnpm pg:connect --shell` verificó manifests vivos (`90d29dfa...` latest `degraded`). `gh run view` confirmó fallo original y `gh run watch 25638821888` confirmó que el workflow manual corre hasta completar.
+- **Estado operacional pendiente:** el fix necesita push/merge a `main` para afectar el cron scheduled. Además, los workers deben quedar alineados por release/orchestrator o workflow dispatch; sin el fix remoto, el watchdog sigue usando fallback y reporta 3 drifts falsos contra `85d03e...`.
+
+---
+
 # Sesion 2026-05-10 — TASK-854 Release Observability Completion SHIPPED (control plane V1.1 COMPLETO)
 
 - **Trigger:** post TASK-853 SHIPPED, usuario instruyó continuar con TASK-854 (última pendiente del control plane V1.1) directo en `develop` sin cambiar rama. Auto mode activo + per instrucción explícita "Si vas a tocar UI, invoca las skills de UI de UX y de microinteraccion globales y del repo y diseña un plan antes de ejecutar y luego ejecutalo".
