@@ -1,4 +1,4 @@
-# Sesion 2026-05-10 — TASK-857 creada + watchdog main diagnosticado
+# Sesion 2026-05-10 — TASK-857 creada + watchdog main resuelto
 
 - **Trigger:** usuario reporta correo GitHub Actions: `Production Release Watchdog - main (6155cde)` fallando y pide crear task para webhooks + ayudar a resolver el incidente.
 - **Branch:** `develop`.
@@ -6,8 +6,10 @@
 - **Task nueva:** `TASK-857 — GitHub Webhooks Release Event Ingestion` creada en `docs/tasks/to-do/TASK-857-github-webhooks-release-event-ingestion.md`; README + `TASK_ID_REGISTRY.md` sincronizados, siguiente ID `TASK-858`.
 - **Diagnóstico del fallo:** run scheduled `25638572756` falló por `platform.release.worker_revision_drift`. Causa raíz del ruido: `.github/workflows/production-release-watchdog.yml` autenticaba GCP pero no entregaba `GREENHOUSE_POSTGRES_*` al step `Run watchdog`; en GitHub Actions el reader caía al fallback GitHub API y comparaba workers contra workflows directos antiguos en lugar del SSoT `greenhouse_sync.release_manifests`.
 - **Fix aplicado:** agregar env vars PostgreSQL/Secret Manager al step `Run watchdog` para que `worker_revision_drift` lea `release_manifests` como SSoT también dentro del workflow scheduled.
-- **Verificación ejecutada:** `pnpm test -- src/lib/release/workflow-allowlist.test.ts src/lib/release/watchdog-aggregation.test.ts` terminó ejecutando suite completa Vitest: 4064 passed / 11 skipped. `pnpm pg:doctor` verde; `pnpm pg:connect --shell` verificó manifests vivos (`90d29dfa...` latest `degraded`). `gh run view` confirmó fallo original y `gh run watch 25638821888` confirmó que el workflow manual corre hasta completar.
-- **Estado operacional pendiente:** el fix necesita push/merge a `main` para afectar el cron scheduled. Además, los workers deben quedar alineados por release/orchestrator o workflow dispatch; sin el fix remoto, el watchdog sigue usando fallback y reporta 3 drifts falsos contra `85d03e...`.
+- **Merge/deploy:** commit `a5342dbb` pusheado a `develop`, PR #115 mergeado por squash a `main` como `390ac14e3dca3f44f4e9285b73956138ca707655`. El orquestador production release run `25639651940` fue aprobado por CLI y completó `success`: preflight, manifest, Vercel READY, Azure health checks, 4 workers Cloud Run, post-release health y transición `release_manifests -> released`.
+- **Verificación ejecutada:** `pnpm test -- src/lib/release/workflow-allowlist.test.ts src/lib/release/watchdog-aggregation.test.ts` terminó ejecutando suite completa Vitest: 4064 passed / 11 skipped. `pnpm pg:doctor` verde; `pnpm pg:connect --shell` verificó manifests vivos. Pre-push hooks: `pnpm lint` + `pnpm exec tsc --noEmit` verdes. CI develop run `25638953404` verde; PR CI run `25639287696` verde; main CI run `25639595937` verde.
+- **Verificación live post-release:** watchdog manual run `25640114327` en `main` con `fail_on_error=true` completó `success`; log confirma `GREENHOUSE_POSTGRES_*` presentes y `platform.release.worker_revision_drift` severity `ok`, summary `4/4 workers synced`. Cloud Run latest revisions exponen `GIT_SHA=390ac14e3dca3f44f4e9285b73956138ca707655` para `ops-worker`, `commercial-cost-worker`, `ico-batch-worker` y `hubspot-greenhouse-integration`.
+- **Estado operacional:** incidente resuelto. Queda solo warning no bloqueante de GitHub Actions sobre actions corriendo internamente en Node.js 20 (`upload-artifact`/`download-artifact`), observable en los runs pero no relacionado con el watchdog drift.
 
 ---
 
