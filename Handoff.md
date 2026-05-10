@@ -1,3 +1,17 @@
+# Sesion 2026-05-10 — TASK-850 Production Preflight CLI Complete (in-progress)
+
+- **Trigger:** post-merge `develop → main` de TASK-849 (PR #114), 3 worker deploys completos, watchdog cron `*/30` registrado en main. Usuario indico continuar con TASK-850..854 secuencial. Mantener en `develop`, no cambiar de rama.
+- **Branch:** `develop` (sin rama nueva por instruccion del usuario).
+- **Decisiones foundational pre-execution (4-pillar validadas inline)**:
+  1. **Composer pattern** (`src/lib/release/preflight/composer.ts`) sobre TASK-672 canonical para reusabilidad CLI + TASK-851 orchestrator + TASK-855 dashboard.
+  2. **Code constants** (`src/lib/release/batch-policy/rules.ts`) para release_batch_policy heuristic — YAGNI hasta que change frequency justifique PG table.
+  3. **3 sub-capabilities granulares**: `platform.release.preflight.{execute,read_results,override_batch_policy}` (override solo EFEONCE_ADMIN).
+  4. **Degraded mode honest** per TASK-672 precedent. Sentry + gcloud strict (failure=error). Vercel + az degraded (failure=warning con `degradedSources[]`).
+- **Skills invocadas:** `arch-architect` (validacion 4-pillar inline) + `greenhouse-backend` (proximo turno para implementacion).
+- **Proximo paso:** FASE 1 Discovery (paralelo Explore subagentes).
+
+---
+
 # Sesion 2026-05-10 — TASK-849 V1.1 GitHub App SHIPPED LIVE end-to-end + docs canonizadas
 
 - **Trigger:** usuario decidio implementar GH App canonical token strategy en lugar de fine-grained PAT (mi recomendacion conservadora) para evitar deuda tecnica V1→V1.1. Pidio que ejecute end-to-end + documente todo en CLAUDE.md, AGENTS.md, arch docs, ADR, manual de uso.
