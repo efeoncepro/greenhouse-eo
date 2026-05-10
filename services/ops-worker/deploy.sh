@@ -322,6 +322,16 @@ ensure_secret_accessor_binding "${GREENHOUSE_INTEGRATION_API_TOKEN_SECRET_REF}"
 ensure_secret_accessor_binding "${NUBOX_BEARER_TOKEN_SECRET_REF}"
 ensure_secret_accessor_binding "${NUBOX_X_API_KEY_SECRET_REF}"
 
+# TASK-849 — GIT_SHA env var for production-release-watchdog drift detection.
+# El watchdog (scripts/release/production-release-watchdog.ts) compara este SHA
+# vs el ultimo workflow run success per worker; mismatch = critical (revision
+# Cloud Run no es la del ultimo deploy verde).
+# Resolucion en orden: $GITHUB_SHA (auto en GitHub Actions runner) → git rev-parse
+# (fallback local). Si no hay git context, queda 'unknown' y el watchdog lo
+# reporta como degraded honestamente.
+GIT_SHA="${GITHUB_SHA:-$(git rev-parse HEAD 2>/dev/null || echo 'unknown')}"
+ENV_VARS="${ENV_VARS},GIT_SHA=${GIT_SHA}"
+
 gcloud run deploy "${SERVICE_NAME}" \
   --project="${PROJECT_ID}" \
   --region="${REGION}" \

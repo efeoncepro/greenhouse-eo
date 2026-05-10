@@ -184,6 +184,11 @@ else
   echo "  Sentry DSN: secret '${SENTRY_DSN_SECRET_NAME}' not found — observability degraded."
 fi
 
+# TASK-849 — GIT_SHA env var for production-release-watchdog drift detection.
+# Ver ops-worker/deploy.sh para contexto completo.
+GIT_SHA="${GITHUB_SHA:-$(git rev-parse HEAD 2>/dev/null || echo 'unknown')}"
+ENV_VARS="${ENV_VARS},GIT_SHA=${GIT_SHA}"
+
 echo "=== Deploying ${SERVICE_NAME} to Cloud Run (${REGION}) ==="
 
 gcloud run deploy "${SERVICE_NAME}" \
