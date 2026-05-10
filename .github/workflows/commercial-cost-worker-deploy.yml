@@ -41,6 +41,25 @@ on:
         options:
           - staging
           - production
+      expected_sha:
+        description: 'Expected git SHA (default: github.sha). TASK-851 — orchestrator passes target_sha.'
+        type: string
+        required: false
+        default: ''
+  # TASK-851 — workflow_call interface for production-release.yml orchestrator.
+  workflow_call:
+    inputs:
+      environment:
+        description: 'Target environment (staging | production)'
+        type: string
+        required: true
+      expected_sha:
+        description: 'Target git SHA the orchestrator wants deployed'
+        type: string
+        required: true
+    secrets:
+      GCP_WORKLOAD_IDENTITY_PROVIDER:
+        required: true
 
 # TASK-848 Slice 3 (Opcion A) — concurrency fix canonica para production.
 # Ver ops-worker-deploy.yml para contexto. Spec:
@@ -61,17 +80,29 @@ jobs:
 
     environment: >-
       ${{
-        github.event_name == 'workflow_dispatch'
-          && github.event.inputs.environment
-          || (github.ref == 'refs/heads/main' && 'production' || 'staging')
+        github.event_name == 'workflow_call'
+          && inputs.environment
+          || (github.event_name == 'workflow_dispatch'
+              && github.event.inputs.environment
+              || (github.ref == 'refs/heads/main' && 'production' || 'staging'))
       }}
 
     env:
       ENV: >-
         ${{
-          github.event_name == 'workflow_dispatch'
-            && github.event.inputs.environment
-            || (github.ref == 'refs/heads/main' && 'production' || 'staging')
+          github.event_name == 'workflow_call'
+            && inputs.environment
+            || (github.event_name == 'workflow_dispatch'
+                && github.event.inputs.environment
+                || (github.ref == 'refs/heads/main' && 'production' || 'staging'))
+        }}
+      EXPECTED_SHA: >-
+        ${{
+          github.event_name == 'workflow_call'
+            && inputs.expected_sha
+            || (github.event_name == 'workflow_dispatch'
+                && github.event.inputs.expected_sha
+                || github.sha)
         }}
       GCP_PROJECT_ID: efeonce-group
       GCP_REGION: us-east4
@@ -104,6 +135,7 @@ jobs:
           bash services/commercial-cost-worker/deploy.sh
         env:
           ENV: ${{ env.ENV }}
+          EXPECTED_SHA: ${{ env.EXPECTED_SHA }}
 
       - name: Verify deployment health
         run: |
@@ -122,8 +154,26 @@ jobs:
           fi
           echo "✓ commercial-cost-worker deploy verified (revision ${REVISION})"
 
+      # TASK-851 — bounded Ready=True poll for orchestrator gate.
+      - name: Poll Ready=True bounded
+        run: |
+          DEADLINE=$((SECONDS + 300))
+          while [ ${SECONDS} -lt ${DEADLINE} ]; do
+            READY="$(gcloud run services describe commercial-cost-worker \
+              --project=${GCP_PROJECT_ID} \
+              --region=${GCP_REGION} \
+              --format='value(status.conditions[0].status)')"
+            if [ "${READY}" = "True" ]; then
+              echo "✓ Service Ready=True at $((SECONDS))s"
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "ERROR: Service did not reach Ready=True within 300s"
+          exit 1
+
       - name: Record deployment commit
         run: |
-          echo "Deployed commit: ${{ github.sha }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "Deployed commit: ${{ env.EXPECTED_SHA }}" >> "$GITHUB_STEP_SUMMARY"
           echo "Environment: ${{ env.ENV }}" >> "$GITHUB_STEP_SUMMARY"
           echo "Triggered by: ${{ github.event_name }}" >> "$GITHUB_STEP_SUMMARY"

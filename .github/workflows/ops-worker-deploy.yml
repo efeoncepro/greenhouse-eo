@@ -42,6 +42,26 @@ on:
         options:
           - staging
           - production
+      expected_sha:
+        description: 'Expected git SHA (default: github.sha). TASK-851 — orchestrator passes target_sha.'
+        type: string
+        required: false
+        default: ''
+  # TASK-851 — workflow_call interface for production-release.yml orchestrator.
+  # Preserves push and workflow_dispatch entrypoints unchanged.
+  workflow_call:
+    inputs:
+      environment:
+        description: 'Target environment (staging | production)'
+        type: string
+        required: true
+      expected_sha:
+        description: 'Target git SHA the orchestrator wants deployed'
+        type: string
+        required: true
+    secrets:
+      GCP_WORKLOAD_IDENTITY_PROVIDER:
+        required: true
 
 # TASK-848 Slice 3 (Opcion A) — concurrency fix canonica para production.
 #
@@ -70,19 +90,35 @@ jobs:
     timeout-minutes: 25
 
     # Route pushes by branch, fall back to manual dispatch input.
+    # TASK-851 — workflow_call uses inputs.environment directly.
     environment: >-
       ${{
-        github.event_name == 'workflow_dispatch'
-          && github.event.inputs.environment
-          || (github.ref == 'refs/heads/main' && 'production' || 'staging')
+        github.event_name == 'workflow_call'
+          && inputs.environment
+          || (github.event_name == 'workflow_dispatch'
+              && github.event.inputs.environment
+              || (github.ref == 'refs/heads/main' && 'production' || 'staging'))
       }}
 
     env:
       ENV: >-
         ${{
-          github.event_name == 'workflow_dispatch'
-            && github.event.inputs.environment
-            || (github.ref == 'refs/heads/main' && 'production' || 'staging')
+          github.event_name == 'workflow_call'
+            && inputs.environment
+            || (github.event_name == 'workflow_dispatch'
+                && github.event.inputs.environment
+                || (github.ref == 'refs/heads/main' && 'production' || 'staging'))
+        }}
+      # TASK-851 — pass EXPECTED_SHA to deploy.sh. Orchestrator (workflow_call)
+      # passes its target_sha; workflow_dispatch optionally accepts override;
+      # push events fall back to github.sha automatically (deploy.sh handles).
+      EXPECTED_SHA: >-
+        ${{
+          github.event_name == 'workflow_call'
+            && inputs.expected_sha
+            || (github.event_name == 'workflow_dispatch'
+                && github.event.inputs.expected_sha
+                || github.sha)
         }}
       GCP_PROJECT_ID: efeonce-group
       GCP_REGION: us-east4
@@ -121,6 +157,7 @@ jobs:
           bash services/ops-worker/deploy.sh
         env:
           ENV: ${{ env.ENV }}
+          EXPECTED_SHA: ${{ env.EXPECTED_SHA }}
 
       - name: Verify deployment health
         run: |
@@ -143,8 +180,30 @@ jobs:
           fi
           echo "✓ ops-worker deploy verified (revision ${REVISION})"
 
+      # TASK-851 — explicit poll Ready=True with bounded timeout (300s).
+      # deploy.sh already verifies GIT_SHA matches EXPECTED_SHA, but this
+      # workflow-level step gives the orchestrator (production-release.yml)
+      # a single named step it can wait on for `success()` outcome.
+      - name: Poll Ready=True bounded
+        run: |
+          DEADLINE=$((SECONDS + 300))
+          while [ ${SECONDS} -lt ${DEADLINE} ]; do
+            READY="$(gcloud run services describe ops-worker \
+              --project=${GCP_PROJECT_ID} \
+              --region=${GCP_REGION} \
+              --format='value(status.conditions[0].status)')"
+            if [ "${READY}" = "True" ]; then
+              echo "✓ Service Ready=True at $((SECONDS))s"
+              exit 0
+            fi
+            echo "  waiting Ready=True (current=${READY}, elapsed=${SECONDS}s)"
+            sleep 10
+          done
+          echo "ERROR: Service did not reach Ready=True within 300s"
+          exit 1
+
       - name: Record deployment commit
         run: |
-          echo "Deployed commit: ${{ github.sha }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "Deployed commit: ${{ env.EXPECTED_SHA }}" >> "$GITHUB_STEP_SUMMARY"
           echo "Environment: ${{ env.ENV }}" >> "$GITHUB_STEP_SUMMARY"
           echo "Triggered by: ${{ github.event_name }}" >> "$GITHUB_STEP_SUMMARY"

@@ -33,6 +33,30 @@ on:
         type: boolean
         required: false
         default: false
+      expected_sha:
+        description: 'Expected git SHA (default: github.sha). TASK-851 — orchestrator passes target_sha.'
+        type: string
+        required: false
+        default: ''
+  # TASK-851 — workflow_call interface for production-release.yml orchestrator.
+  workflow_call:
+    inputs:
+      environment:
+        description: 'Target environment (staging | production)'
+        type: string
+        required: true
+      expected_sha:
+        description: 'Target git SHA the orchestrator wants deployed'
+        type: string
+        required: true
+      skip_tests:
+        description: 'Skip pytest (orchestrator already verified preflight)'
+        type: boolean
+        required: false
+        default: false
+    secrets:
+      GCP_WORKLOAD_IDENTITY_PROVIDER:
+        required: true
 
 concurrency:
   group: hubspot-greenhouse-integration-deploy-${{ github.ref }}
@@ -52,8 +76,9 @@ jobs:
     timeout-minutes: 10
     if: >-
       ${{
-        github.event_name != 'workflow_dispatch'
-          || github.event.inputs.skip_tests != 'true'
+        (github.event_name == 'workflow_call' && inputs.skip_tests != true)
+          || (github.event_name == 'workflow_dispatch' && github.event.inputs.skip_tests != 'true')
+          || (github.event_name != 'workflow_call' && github.event_name != 'workflow_dispatch')
       }}
 
     steps:
@@ -87,17 +112,29 @@ jobs:
 
     environment: >-
       ${{
-        github.event_name == 'workflow_dispatch'
-          && github.event.inputs.environment
-          || (github.ref == 'refs/heads/main' && 'production' || 'staging')
+        github.event_name == 'workflow_call'
+          && inputs.environment
+          || (github.event_name == 'workflow_dispatch'
+              && github.event.inputs.environment
+              || (github.ref == 'refs/heads/main' && 'production' || 'staging'))
       }}
 
     env:
+      EXPECTED_SHA: >-
+        ${{
+          github.event_name == 'workflow_call'
+            && inputs.expected_sha
+            || (github.event_name == 'workflow_dispatch'
+                && github.event.inputs.expected_sha
+                || github.sha)
+        }}
       ENV: >-
         ${{
-          github.event_name == 'workflow_dispatch'
-            && github.event.inputs.environment
-            || (github.ref == 'refs/heads/main' && 'production' || 'staging')
+          github.event_name == 'workflow_call'
+            && inputs.environment
+            || (github.event_name == 'workflow_dispatch'
+                && github.event.inputs.environment
+                || (github.ref == 'refs/heads/main' && 'production' || 'staging'))
         }}
       GCP_PROJECT_ID: efeonce-group
       # Region LOCKED to us-central1 to preserve the public URL used by
@@ -134,6 +171,7 @@ jobs:
           bash services/hubspot_greenhouse_integration/deploy.sh
         env:
           ENV: ${{ env.ENV }}
+          EXPECTED_SHA: ${{ env.EXPECTED_SHA }}
 
       - name: Verify deployment + smoke
         run: |
