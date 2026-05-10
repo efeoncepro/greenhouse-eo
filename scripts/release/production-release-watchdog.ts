@@ -41,6 +41,11 @@ import { getReleasePendingWithoutJobsSignal } from '@/lib/reliability/queries/re
 import { getReleaseStaleApprovalSignal } from '@/lib/reliability/queries/release-stale-approval'
 import { getReleaseWorkerRevisionDriftSignal } from '@/lib/reliability/queries/release-worker-revision-drift'
 import { aggregateMaxSeverity, type WatchdogSeverity } from '@/lib/release/severity-resolver'
+import {
+  dispatchWatchdogAlert,
+  type DispatchResult,
+  type WatchdogFinding
+} from '@/lib/release/watchdog-alerts-dispatcher'
 import type { ReliabilitySeverity, ReliabilitySignal } from '@/types/reliability'
 
 interface CliOptions {
@@ -199,18 +204,59 @@ const dispatchTeamsAlerts = async (
     return { dispatched: false, skippedReason: 'dry-run mode' }
   }
 
-  // V1: Teams dispatch real con dedup contra release_watchdog_alert_state
-  // queda en `dispatchTeamsAlertWithDedup()` (Slice 5 helper). Para mantener
-  // este CLI testable + auto-contenido, en V1 expone el contract pero la
-  // integracion completa con sendManualTeamsAnnouncement + UPSERT dedup
-  // vive en src/lib/release/watchdog-alerts-dispatcher.ts (proxima iteracion).
-  console.log(`[teams] ${alertable.length} alert(s) preparada(s); dispatcher siendo wired en Slice 5.`)
+  // V1: Slice 5 final wiring. Dispatcher consume signals + extracts findings
+  // del evidence array + invoca dispatchWatchdogAlert() per finding (con dedup
+  // automatico contra greenhouse_sync.release_watchdog_alert_state).
+  //
+  // Decisiones:
+  // - Por signal aggregate, NO per-finding individual (V1 tradeoff): el
+  //   watchdog scheduled run alerta sobre el signal status global, no per
+  //   workflow_name+run_id. Si emerge necesidad de per-finding granular
+  //   alerts, agregar parser de evidence en Slice 6 V1.1.
+  // - Synthetic finding `signalId` como placeholder de workflow_name + 0 como
+  //   run_id sintetico — preserva contract tabla pero opera en granularity de
+  //   signal. Cuando Slice 6 V1.1 expanda findings parseados, el contract
+  //   cambia naturalmente a (workflow_name, run_id) reales por finding.
+
+  const results: DispatchResult[] = []
 
   for (const signal of alertable) {
-    console.log(`  - ${signal.signalId} [${signal.severity}]`)
+    const findingKind = signal.signalId.replace('platform.release.', '')
+
+    if (
+      findingKind !== 'stale_approval' &&
+      findingKind !== 'pending_without_jobs' &&
+      findingKind !== 'worker_revision_drift'
+    ) {
+      continue
+    }
+
+    const synthetic: WatchdogFinding = {
+      workflowName: 'aggregate',
+      runId: 0,
+      alertKind: findingKind,
+      severity: signal.severity === 'error' ? 'error' : 'warning',
+      htmlUrl: 'https://github.com/efeoncepro/greenhouse-eo/actions',
+      branch: 'main',
+      sha: 'aggregate',
+      ageLabel: 'see signal evidence',
+      detail: signal.summary,
+      recommendedAction: 'Revisar /admin/operations subsystem Platform Release y ejecutar `gh run cancel <id>` segun runbook.'
+    }
+
+    const result = await dispatchWatchdogAlert(synthetic)
+
+    results.push(result)
   }
 
-  return { dispatched: false, skippedReason: 'dispatcher integration pending Slice 5 final wiring' }
+  const dispatched = results.some((r) => r.decision === 'sent')
+
+  const decisions = results.map((r) => `${r.alertKind}=${r.decision}`).join(' ')
+
+  return {
+    dispatched,
+    skippedReason: dispatched ? null : `dispatcher decisions: ${decisions || 'none'}`
+  }
 }
 
 const main = async (): Promise<void> => {

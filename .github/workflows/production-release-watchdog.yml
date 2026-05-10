@@ -1,0 +1,134 @@
+name: Production Release Watchdog
+
+# TASK-849 — Watchdog scheduled que detecta y alerta temprano approvals
+# obsoletos de Production, runs productivos sin jobs y drift de deploy de
+# workers. Garantiza que un bloqueo de release no vuelva a permanecer 14-22
+# dias invisible (incidente 2026-04-26 → 2026-05-09).
+#
+# **Hosting decision** (TASK-849 §Slice 2): GitHub Actions schedule, NO
+# Vercel cron, NO Cloud Scheduler. Razon:
+# - Detector consume primariamente GitHub API → execute dentro de GH Actions
+#   evita roundtrips cross-cloud y usa GITHUB_TOKEN auto-provisto.
+# - Tooling/monitoring read-only, NOT async-critical (clasificacion `tooling`
+#   per `GREENHOUSE_VERCEL_CRON_CLASSIFICATION_V1.md`).
+#
+# **Residual risk conocido**: GH Actions schedule puede tener delays >30min
+# en horarios pico GitHub. Para warning threshold 2h es OK; si emerge
+# unreliability sostenida, fallback es Vercel cron `/api/cron/release-watchdog`
+# (categoria `tooling`).
+
+on:
+  schedule:
+    # Cada 30 min — granularity adecuada para warning threshold 2h.
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+    inputs:
+      enable_teams:
+        description: 'Enviar alerts Teams (default false en dispatch manual para testing)'
+        type: boolean
+        default: false
+      fail_on_error:
+        description: 'Exit 1 si severity in {error, critical} (default true scheduled)'
+        type: boolean
+        default: true
+
+# Concurrency: cancel-in-progress=true. Si llega run nuevo, cancela el
+# anterior — la ultima foto siempre tiene el state mas fresh de GitHub +
+# Cloud Run. NO genera deadlock como los workers (que sufrian
+# cancel-in-progress=false antes de TASK-848).
+concurrency:
+  group: production-release-watchdog
+  cancel-in-progress: true
+
+permissions:
+  contents: read       # checkout
+  actions: read        # query workflow runs + jobs + pending_deployments
+  id-token: write      # WIF para gcloud (Cloud Run revisions describe)
+
+jobs:
+  watchdog:
+    name: Run watchdog detector
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Node 20
+        uses: actions/setup-node@v5
+        with:
+          node-version: '20'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Authenticate to Google Cloud (for Cloud Run revisions)
+        id: auth
+        uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: github-actions-deployer@efeonce-group.iam.gserviceaccount.com
+
+      - name: Setup gcloud CLI
+        uses: google-github-actions/setup-gcloud@v3
+        with:
+          project_id: efeonce-group
+
+      - name: Run watchdog
+        id: watchdog
+        env:
+          # GITHUB_TOKEN auto-provisto por GH Actions runner; el reader lo lee
+          # via resolveGithubToken().
+          GITHUB_TOKEN: ${{ github.token }}
+          # Activacion de Teams dispatch:
+          # - schedule: ENABLE_TEAMS_DISPATCH=true (alertas reales en cada cron run)
+          # - workflow_dispatch manual: solo si input enable_teams=true (testing)
+          ENABLE_TEAMS_DISPATCH: >-
+            ${{
+              github.event_name == 'schedule' && 'true'
+              || (github.event.inputs.enable_teams == 'true' && 'true' || 'false')
+            }}
+        run: |
+          set +e
+          pnpm tsx --require ./scripts/lib/server-only-shim.cjs \
+            scripts/release/production-release-watchdog.ts \
+            --json \
+            $([ "${{ inputs.fail_on_error }}" != "false" ] && echo "--fail-on-error") \
+            > watchdog-output.json
+          WATCHDOG_EXIT=$?
+          set -e
+
+          echo "exit_code=${WATCHDOG_EXIT}" >> "$GITHUB_OUTPUT"
+
+          # Pretty-print JSON to job summary for operator visibility.
+          {
+            echo "## Production Release Watchdog Summary"
+            echo ""
+            echo "- Run: ${{ github.run_id }}"
+            echo "- Trigger: ${{ github.event_name }}"
+            echo "- Exit code: ${WATCHDOG_EXIT}"
+            echo ""
+            echo "### Findings"
+            echo ""
+            echo '```json'
+            cat watchdog-output.json
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          # Re-emit findings to logs for human review.
+          cat watchdog-output.json
+
+          # Forward exit code to overall job status.
+          exit ${WATCHDOG_EXIT}
+
+      - name: Upload watchdog report
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: watchdog-report-${{ github.run_id }}
+          path: watchdog-output.json
+          retention-days: 30
