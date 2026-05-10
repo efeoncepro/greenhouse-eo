@@ -1,5 +1,3 @@
-import { calculatePreviredEntryBreakdown } from '@/lib/finance/payment-obligations/calculate-previred-total'
-
 import {
   buildComplianceFilename,
   hashText,
@@ -14,6 +12,12 @@ import type { ChileComplianceArtifact, ChileCompliancePeriodSnapshot, ChilePayro
 const PREVIRED_FIELD_COUNT = 105
 const PREVIRED_SEX_CODES = new Set(['M', 'F'])
 const PREVIRED_NATIONALITY_CODES = new Set(['0', '1'])
+const PREVIRED_HEALTH_OBLIGATORY_RATE = 0.07
+const PREVIRED_LIFE_EXPECTANCY_RATE = 0.009
+const PREVIRED_UNEMPLOYMENT_INDEFINIDO_EMPLOYEE_RATE = 0.006
+const PREVIRED_UNEMPLOYMENT_INDEFINIDO_EMPLOYER_RATE = 0.024
+const PREVIRED_UNEMPLOYMENT_FIXED_TERM_EMPLOYEE_RATE = 0
+const PREVIRED_UNEMPLOYMENT_FIXED_TERM_EMPLOYER_RATE = 0.03
 
 const AFP_CODES: Record<string, string> = {
   capital: '33',
@@ -63,7 +67,77 @@ const assign = (fields: string[], oneBasedIndex: number, value: unknown) => {
   fields[oneBasedIndex - 1] = sanitizeDelimitedCell(value)
 }
 
+const roundCurrency = (value: number) => Math.round(Number.isFinite(value) ? value : 0)
+
 const formatPreviredPeriod = (year: number, month: number): string => `${String(month).padStart(2, '0')}${year}`
+
+const resolvePreviredJornadaCode = (entry: ChilePayrollComplianceEntry): '1' | '2' | null => {
+  if (entry.employmentType === 'full_time') return '1'
+  if (entry.employmentType === 'part_time') return '2'
+
+  return null
+}
+
+const resolveUnemploymentRates = (entry: ChilePayrollComplianceEntry) => {
+  if (entry.contractTypeSnapshot === 'plazo_fijo') {
+    return {
+      employeeRate: PREVIRED_UNEMPLOYMENT_FIXED_TERM_EMPLOYEE_RATE,
+      employerRate: PREVIRED_UNEMPLOYMENT_FIXED_TERM_EMPLOYER_RATE
+    }
+  }
+
+  return {
+    employeeRate: PREVIRED_UNEMPLOYMENT_INDEFINIDO_EMPLOYEE_RATE,
+    employerRate: PREVIRED_UNEMPLOYMENT_INDEFINIDO_EMPLOYER_RATE
+  }
+}
+
+type PreviredRegulatoryProjection = {
+  afpEmployee: number
+  healthEmployee: number
+  healthObligatory: number
+  healthVoluntary: number
+  unemploymentEmployee: number
+  apvEmployee: number
+  sisEmployer: number
+  cesantiaEmployer: number
+  islEmployer: number
+  mutualEmployer: number
+  lifeExpectancy: number
+  total: number
+}
+
+export const buildPreviredRegulatoryProjection = (
+  entry: ChilePayrollComplianceEntry
+): PreviredRegulatoryProjection => {
+  const taxableBase = roundCurrency(entry.chileTaxableBase)
+  const afpRate = entry.previredAfpTotalRate ?? 0
+  const sisRate = entry.previredSisRate ?? 0
+  const { employeeRate, employerRate } = resolveUnemploymentRates(entry)
+  const healthObligatory = roundCurrency(taxableBase * PREVIRED_HEALTH_OBLIGATORY_RATE)
+  const healthEmployee = roundCurrency(entry.chileHealthAmount)
+  const afpEmployee = roundCurrency(taxableBase * afpRate)
+  const sisEmployer = roundCurrency(taxableBase * sisRate)
+  const unemploymentEmployee = roundCurrency(taxableBase * employeeRate)
+  const cesantiaEmployer = roundCurrency(taxableBase * employerRate)
+  const islEmployer = roundCurrency(entry.chileEmployerMutualAmount)
+  const lifeExpectancy = roundCurrency(taxableBase * PREVIRED_LIFE_EXPECTANCY_RATE)
+
+  return {
+    afpEmployee,
+    healthEmployee,
+    healthObligatory,
+    healthVoluntary: Math.max(0, healthEmployee - healthObligatory),
+    unemploymentEmployee,
+    apvEmployee: roundCurrency(entry.chileApvAmount),
+    sisEmployer,
+    cesantiaEmployer,
+    islEmployer,
+    mutualEmployer: 0,
+    lifeExpectancy,
+    total: afpEmployee + healthEmployee + unemploymentEmployee + roundCurrency(entry.chileApvAmount) + sisEmployer + cesantiaEmployer + islEmployer + lifeExpectancy
+  }
+}
 
 const splitPreviredWorkerName = (entry: ChilePayrollComplianceEntry) => {
   const explicitFirstName = sanitizeDelimitedCell(entry.memberFirstName)
@@ -115,6 +189,7 @@ const validatePreviredEntries = (entries: ChilePayrollComplianceEntry[]) => {
     const nationalityCode = sanitizeDelimitedCell(entry.previredNationalityCode)
     const healthCode = resolveEntryHealthCode(entry)
     const hasHealthContribution = entry.chileHealthAmount > 0 || entry.chileHealthObligatoriaAmount > 0
+    const hasAfpContribution = entry.chileAfpAmount > 0 || entry.chileTaxableBase > 0
 
     if (!workerName.paternalLastName || !workerName.names) {
       errors.push(`Entry ${entry.entryId} is missing Previred worker name parts.`)
@@ -134,6 +209,18 @@ const validatePreviredEntries = (entries: ChilePayrollComplianceEntry[]) => {
 
     if (entry.chileAfpAmount > 0 && resolvePreviredAfpCode(entry.chileAfpName) === '00') {
       errors.push(`Entry ${entry.entryId} has AFP amounts but no supported Previred AFP code.`)
+    }
+
+    if (hasAfpContribution && (entry.previredAfpTotalRate == null || entry.previredAfpTotalRate <= 0)) {
+      errors.push(`Entry ${entry.entryId} is missing periodized Previred AFP rate.`)
+    }
+
+    if (entry.chileTaxableBase > 0 && (entry.previredSisRate == null || entry.previredSisRate < 0)) {
+      errors.push(`Entry ${entry.entryId} is missing periodized Previred SIS rate.`)
+    }
+
+    if (!resolvePreviredJornadaCode(entry)) {
+      errors.push(`Entry ${entry.entryId} is missing explicit employment_type for Previred jornada.`)
     }
 
     if (hasHealthContribution && healthCode === '00') {
@@ -157,16 +244,8 @@ export const buildPreviredRow = (
   const healthCode = resolveEntryHealthCode(entry)
   const isFonasa = healthCode === '07'
   const isIsapre = healthCode !== '00' && !isFonasa
-
-  const breakdown = calculatePreviredEntryBreakdown({
-    chile_afp_amount: entry.chileAfpAmount,
-    chile_health_amount: entry.chileHealthAmount,
-    chile_unemployment_amount: entry.chileUnemploymentAmount,
-    chile_apv_amount: entry.chileApvAmount,
-    chile_employer_cesantia_amount: entry.chileEmployerCesantiaAmount,
-    chile_employer_mutual_amount: entry.chileEmployerMutualAmount,
-    chile_employer_sis_amount: entry.chileEmployerSisAmount
-  })
+  const projection = buildPreviredRegulatoryProjection(entry)
+  const jornadaCode = resolvePreviredJornadaCode(entry)
 
   const fields = Array.from({ length: PREVIRED_FIELD_COUNT }, () => '')
 
@@ -198,24 +277,27 @@ export const buildPreviredRow = (
   // under PREVIRED_PLANILLA_SPEC; zero/blank fields remain explicit separators.
   assign(fields, 26, resolvePreviredAfpCode(entry.chileAfpName))
   assign(fields, 27, entry.chileTaxableBase)
-  assign(fields, 28, breakdown.afpEmployee)
-  assign(fields, 29, breakdown.sisEmployer)
+  assign(fields, 28, projection.afpEmployee)
+  assign(fields, 29, projection.sisEmployer)
   assign(fields, 30, '0')
   assign(fields, 55, '0')
-  assign(fields, 70, isFonasa ? breakdown.healthEmployee : 0)
-  assign(fields, 71, '0')
+  assign(fields, 64, projection.islEmployer > 0 ? entry.chileTaxableBase : 0)
+  assign(fields, 70, isFonasa ? projection.healthObligatory : 0)
+  assign(fields, 71, projection.islEmployer)
   assign(fields, 75, healthCode)
   assign(fields, 77, isIsapre ? entry.chileTaxableBase : 0)
   assign(fields, 78, isIsapre ? '1' : 0)
-  assign(fields, 79, isIsapre ? entry.chileHealthAmount : 0)
-  assign(fields, 80, isIsapre ? entry.chileHealthObligatoriaAmount : 0)
-  assign(fields, 81, isIsapre ? entry.chileHealthVoluntariaAmount : 0)
+  assign(fields, 79, isIsapre ? projection.healthEmployee : 0)
+  assign(fields, 80, isIsapre ? projection.healthObligatory : 0)
+  assign(fields, 81, isIsapre ? projection.healthVoluntary : 0)
+  assign(fields, 93, jornadaCode ?? '0')
+  assign(fields, 94, projection.lifeExpectancy)
   assign(fields, 96, '0')
-  assign(fields, 97, entry.chileTaxableBase)
-  assign(fields, 98, breakdown.mutualEmployer)
+  assign(fields, 97, '0')
+  assign(fields, 98, projection.mutualEmployer)
   assign(fields, 100, entry.chileTaxableBase)
-  assign(fields, 101, breakdown.unemploymentEmployee)
-  assign(fields, 102, breakdown.cesantiaEmployer)
+  assign(fields, 101, projection.unemploymentEmployee)
+  assign(fields, 102, projection.cesantiaEmployer)
 
   return fields.join(PREVIRED_PLANILLA_SPEC.delimiter)
 }
@@ -232,14 +314,34 @@ export const buildPreviredPlanillaArtifact = (
   const text = `${rows.join('\r\n')}${rows.length ? '\r\n' : ''}`
   const totals = sumEntries(snapshot.entries)
 
-  const previredTotal =
-    totals.afpEmployee +
-    totals.healthEmployee +
-    totals.unemploymentEmployee +
-    totals.apvEmployee +
-    totals.sisEmployer +
-    totals.cesantiaEmployer +
-    totals.mutualEmployer
+  const projectedTotals = snapshot.entries
+    .map(buildPreviredRegulatoryProjection)
+    .reduce(
+      (acc, projection) => ({
+        afpEmployee: acc.afpEmployee + projection.afpEmployee,
+        healthEmployee: acc.healthEmployee + projection.healthEmployee,
+        unemploymentEmployee: acc.unemploymentEmployee + projection.unemploymentEmployee,
+        apvEmployee: acc.apvEmployee + projection.apvEmployee,
+        sisEmployer: acc.sisEmployer + projection.sisEmployer,
+        cesantiaEmployer: acc.cesantiaEmployer + projection.cesantiaEmployer,
+        mutualEmployer: acc.mutualEmployer + projection.mutualEmployer,
+        islEmployer: acc.islEmployer + projection.islEmployer,
+        lifeExpectancy: acc.lifeExpectancy + projection.lifeExpectancy,
+        previredTotal: acc.previredTotal + projection.total
+      }),
+      {
+        afpEmployee: 0,
+        healthEmployee: 0,
+        unemploymentEmployee: 0,
+        apvEmployee: 0,
+        sisEmployer: 0,
+        cesantiaEmployer: 0,
+        mutualEmployer: 0,
+        islEmployer: 0,
+        lifeExpectancy: 0,
+        previredTotal: 0
+      }
+    )
 
   const artifactSha256 = hashText(text)
 
@@ -254,7 +356,16 @@ export const buildPreviredPlanillaArtifact = (
     recordCount: rows.length,
     totals: {
       ...totals,
-      previredTotal,
+      generatedAfpEmployee: projectedTotals.afpEmployee,
+      generatedHealthEmployee: projectedTotals.healthEmployee,
+      generatedUnemploymentEmployee: projectedTotals.unemploymentEmployee,
+      generatedApvEmployee: projectedTotals.apvEmployee,
+      generatedSisEmployer: projectedTotals.sisEmployer,
+      generatedCesantiaEmployer: projectedTotals.cesantiaEmployer,
+      generatedMutualEmployer: projectedTotals.mutualEmployer,
+      generatedIslEmployer: projectedTotals.islEmployer,
+      generatedLifeExpectancy: projectedTotals.lifeExpectancy,
+      previredTotal: projectedTotals.previredTotal,
       sourceSnapshotHash: snapshot.sourceSnapshotHash
     },
     validation

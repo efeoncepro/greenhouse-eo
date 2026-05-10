@@ -36,9 +36,12 @@ interface EntryRow {
   member_legal_name: string | null
   primary_email: string | null
   identity_profile_id: string | null
+  employment_type: string | null
   previred_sex_code: string | null
   previred_nationality_code: string | null
   previred_health_institution_code: string | null
+  previred_afp_total_rate: number | string | null
+  previred_sis_rate: number | string | null
   contract_type_snapshot: string | null
   pay_regime: string
   payroll_via: string | null
@@ -70,6 +73,12 @@ interface EntryRow {
 }
 
 const CLOSED_PAYROLL_PERIOD_STATUSES = new Set(['approved', 'exported'])
+
+const toRate = (value: unknown): number | null => {
+  const parsed = typeof value === 'number' ? value : typeof value === 'string' ? Number(value) : null
+
+  return parsed != null && Number.isFinite(parsed) ? parsed : null
+}
 
 const loadClosedPeriod = async (client: PoolClient, periodId: string): Promise<PeriodRow> => {
   const result = await client.query<PeriodRow>(
@@ -111,9 +120,12 @@ const loadChileDependentEntryRows = async (client: PoolClient, periodId: string)
         m.legal_name AS member_legal_name,
         m.primary_email,
         m.identity_profile_id,
+        m.employment_type,
         pwp.sex_code AS previred_sex_code,
         pwp.nationality_code AS previred_nationality_code,
         pwp.health_institution_code AS previred_health_institution_code,
+        car.total_rate AS previred_afp_total_rate,
+        cpi.sis_rate AS previred_sis_rate,
         e.contract_type_snapshot,
         e.pay_regime,
         e.payroll_via,
@@ -145,6 +157,16 @@ const loadChileDependentEntryRows = async (client: PoolClient, periodId: string)
       FROM greenhouse_payroll.payroll_entries e
       LEFT JOIN greenhouse_core.members m ON m.member_id = e.member_id
       LEFT JOIN greenhouse_payroll.chile_previred_worker_profiles pwp ON pwp.profile_id = m.identity_profile_id
+      LEFT JOIN greenhouse_payroll.payroll_periods pp ON pp.period_id = e.period_id
+      LEFT JOIN greenhouse_payroll.chile_previred_indicators cpi
+        ON cpi.period_year = pp.year
+       AND cpi.period_month = pp.month
+      LEFT JOIN greenhouse_payroll.chile_afp_rates car
+        ON car.period_year = pp.year
+       AND car.period_month = pp.month
+       AND car.is_active = TRUE
+       AND lower(regexp_replace(car.afp_name, '\\s+', '', 'g')) =
+           lower(regexp_replace(COALESCE(e.chile_afp_name, ''), '\\s+', '', 'g'))
       WHERE e.period_id = $1
         AND e.is_active = TRUE
         AND e.pay_regime = 'chile'
@@ -193,9 +215,12 @@ const mapEntryRow = async (
     memberLegalName: row.member_legal_name,
     memberEmail: row.primary_email,
     identityProfileId: row.identity_profile_id || '',
+    employmentType: row.employment_type,
     previredSexCode: row.previred_sex_code,
     previredNationalityCode: row.previred_nationality_code,
     previredHealthInstitutionCode: row.previred_health_institution_code,
+    previredAfpTotalRate: toRate(row.previred_afp_total_rate),
+    previredSisRate: toRate(row.previred_sis_rate),
     rutNormalized,
     contractTypeSnapshot: row.contract_type_snapshot,
     payRegime: row.pay_regime,
@@ -255,7 +280,9 @@ export const loadChileCompliancePeriodSnapshot = async (
         chileApvAmount: entry.chileApvAmount,
         chileEmployerSisAmount: entry.chileEmployerSisAmount,
         chileEmployerCesantiaAmount: entry.chileEmployerCesantiaAmount,
-        chileEmployerMutualAmount: entry.chileEmployerMutualAmount
+        chileEmployerMutualAmount: entry.chileEmployerMutualAmount,
+        previredAfpTotalRate: entry.previredAfpTotalRate,
+        previredSisRate: entry.previredSisRate
       }
     }))
   })

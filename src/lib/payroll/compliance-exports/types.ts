@@ -25,9 +25,12 @@ export interface ChilePayrollComplianceEntry {
   memberLegalName: string | null
   memberEmail: string | null
   identityProfileId: string
+  employmentType: string | null
   previredSexCode: string | null
   previredNationalityCode: string | null
   previredHealthInstitutionCode: string | null
+  previredAfpTotalRate: number | null
+  previredSisRate: number | null
   rutNormalized: string
   contractTypeSnapshot: string | null
   payRegime: string

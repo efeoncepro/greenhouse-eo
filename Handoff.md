@@ -1,3 +1,16 @@
+# Sesion 2026-05-10 — TASK-812 Previred regulatory projection hardening
+
+- **Trigger:** usuario subio nuevos CSV de error/adverencia de Previred para abril 2026 y pidio invocar `greenhouse-payroll-auditor` + arquitectura constantemente, sin parches ni mutar/borrar datos de Valentina.
+- **Decision Payroll + arquitectura:** separar recibo/liquidacion persistida de planilla regulatoria Previred. El exportador queda como proyeccion auditada sobre entries cerradas + snapshots oficiales del periodo, no como copia ciega de montos historicos del entry.
+- **Causa raiz:** al corregir campos estructurales previos, Previred empezo a validar formulas del periodo. Para Valentina `2026-04` el entry tenia montos persistidos desalineados contra el snapshot actual: AFP/SIS/Isapre obligatoria/AFC/mutual y campos nuevos de jornada/expectativa de vida.
+- **Runtime verificado:** Valentina sigue anclada a `identity-hubspot-crm-owner-82653513`, `employment_type='full_time'`, AFP Uno `0.1056`, SIS `0.0162`, Isapre Colmena `04`, sexo `F`, nacionalidad `0`. No se modifico ni borro su perfil.
+- **Cambio implementado:** `src/lib/payroll/compliance-exports/store.ts` carga `employment_type`, tasa AFP y tasa SIS periodizadas; `previred.ts` agrega `buildPreviredRegulatoryProjection()` y falla cerrado si faltan tasa AFP, tasa SIS o jornada. Campos corregidos: AFP, SIS, salud obligatoria/adicional Isapre, ISL, jornada, expectativa de vida, AFC empleado/empleador y mutual en cero sin codigo soportado.
+- **Validacion:** `pnpm vitest run src/lib/payroll/compliance-exports/previred.test.ts src/lib/payroll/compliance-exports/lre.test.ts` OK; `pnpm exec eslint ...compliance-exports...` OK; `pnpm exec tsc --noEmit --pretty false` OK. `pnpm pg:connect --shell` confirmo rates/jornada live.
+- **Docs:** actualizado `docs/documentation/hr/payroll-compliance-exports-chile.md` y `changelog.md`.
+- **Pendiente:** commit/push/deploy y smoke contra staging para descargar nuevamente `payroll-previred-2026-04.txt`; luego subir a Previred para confirmar cero errores.
+
+---
+
 # Sesion 2026-05-10 — TASK-848 Production Release Control Plane V1.0 SHIPPED
 
 - **Trigger:** usuario pidio implementar TASK-848 (P0, Effort Alto, Impact Muy alto) directo en `develop` invocando `arch-architect` constantemente para validar/decidir acciones.

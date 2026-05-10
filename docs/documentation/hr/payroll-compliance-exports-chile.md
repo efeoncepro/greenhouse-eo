@@ -5,7 +5,21 @@ Greenhouse can generate audited Chile compliance exports for closed payroll peri
 - Previred planilla (`/api/hr/payroll/periods/:periodId/export/previred`)
 - LRE CSV (`/api/hr/payroll/periods/:periodId/export/lre`)
 
-Both exports are read-only projections over `greenhouse_payroll.payroll_entries`. They never recalculate payroll and never mutate entries, periods, payment orders or settlements.
+Both exports are read-only projections over `greenhouse_payroll.payroll_entries`. They never mutate entries,
+periods, payment orders or settlements.
+
+Previred is a regulatory projection, not a receipt clone. It keeps worker identity, closed entry context and
+taxable bases from payroll, but resolves period-sensitive statutory fields from the canonical payroll snapshots:
+
+- AFP rate: `greenhouse_payroll.chile_afp_rates`
+- SIS rate: `greenhouse_payroll.chile_previred_indicators`
+- Employment schedule/jornada: `greenhouse_core.members.employment_type`
+- Isapre obligatory amount: 7% of taxable base; the difference against the pactada amount is emitted as additional.
+- AFC employee/employer split: derived from `contract_type_snapshot`.
+- ISL/accident contribution: emitted in the ISL fields unless a future profile explicitly models a supported mutual code.
+
+This preserves auditability without overwriting the payroll receipt amounts. If a required periodized rate or
+jornada is missing, Previred export fails closed instead of inventing a value.
 
 Required state:
 
@@ -22,5 +36,5 @@ Audit trail:
 
 Known V1 boundary:
 
-`TASK-707a` is still required for full parity with the canonical `payment_order` social_security runtime. Until then, Previred parity is enforced against `calculatePreviredEntryBreakdown` and closed payroll entries.
-
+`TASK-707a` is still required for full parity with the canonical `payment_order` social_security runtime. Until then,
+Previred parity is enforced against the generated compliance projection and closed payroll entries.

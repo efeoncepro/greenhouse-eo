@@ -13,9 +13,12 @@ const baseEntry = (overrides: Partial<ChilePayrollComplianceEntry> = {}): ChileP
   memberLegalName: 'Ada Lovelace Byron',
   memberEmail: 'ada@example.com',
   identityProfileId: 'profile-1',
+  employmentType: 'full_time',
   previredSexCode: 'F',
   previredNationalityCode: '0',
   previredHealthInstitutionCode: '07',
+  previredAfpTotalRate: 0.1137,
+  previredSisRate: 0.0162,
   rutNormalized: '123456785',
   contractTypeSnapshot: 'indefinido',
   payRegime: 'chile',
@@ -87,16 +90,19 @@ describe('Previred compliance export', () => {
     expect(fields[24]).toBe('N')
     expect(fields[25]).toBe('05')
     expect(fields[26]).toBe('1200000')
-    expect(fields[27]).toBe('120000')
-    expect(fields[28]).toBe('18000')
+    expect(fields[27]).toBe('136440')
+    expect(fields[28]).toBe('19440')
     expect(fields[54]).toBe('0')
+    expect(fields[63]).toBe('1200000')
     expect(fields[69]).toBe('84000')
-    expect(fields[70]).toBe('0')
+    expect(fields[70]).toBe('11280')
     expect(fields[74]).toBe('07')
     expect(fields[76]).toBe('0')
     expect(fields[79]).toBe('0')
-    expect(fields[96]).toBe('1200000')
-    expect(fields[97]).toBe('11280')
+    expect(fields[92]).toBe('1')
+    expect(fields[93]).toBe('10800')
+    expect(fields[96]).toBe('0')
+    expect(fields[97]).toBe('0')
     expect(fields[99]).toBe('1200000')
     expect(fields[100]).toBe('7200')
     expect(fields[101]).toBe('28800')
@@ -115,16 +121,46 @@ describe('Previred compliance export', () => {
     expect(fields[76]).toBe('1200000')
     expect(fields[77]).toBe('1')
     expect(fields[78]).toBe('162475')
-    expect(fields[79]).toBe('47220')
-    expect(fields[80]).toBe('115255')
+    expect(fields[79]).toBe('84000')
+    expect(fields[80]).toBe('78475')
   })
 
-  it('keeps Previred totals aligned with the canonical seven-component helper', () => {
+  it('projects Previred official rates for April 2026 validator fields', () => {
+    const fields = buildPreviredRow(snapshot(), baseEntry({
+      memberDisplayName: 'Valentina Hoyos',
+      memberFirstName: 'Valentina',
+      memberLastName: 'Hoyos',
+      chileAfpName: 'Uno',
+      previredAfpTotalRate: 0.1056,
+      chileTaxableBase: 436815.43,
+      chileHealthSystem: 'isapre',
+      chileHealthAmount: 162474.77,
+      chileEmployerMutualAmount: 6273.52,
+      previredHealthInstitutionCode: '04',
+      workingDaysInPeriod: 22
+    })).split(';')
+
+    expect(fields[25]).toBe('35')
+    expect(fields[27]).toBe('46128')
+    expect(fields[28]).toBe('7076')
+    expect(fields[63]).toBe('436815.43')
+    expect(fields[70]).toBe('6274')
+    expect(fields[79]).toBe('30577')
+    expect(fields[80]).toBe('131898')
+    expect(fields[92]).toBe('1')
+    expect(fields[93]).toBe('3931')
+    expect(fields[96]).toBe('0')
+    expect(fields[97]).toBe('0')
+    expect(fields[100]).toBe('2621')
+    expect(fields[101]).toBe('10484')
+  })
+
+  it('keeps Previred totals aligned with the generated regulatory projection', () => {
     const artifact = buildPreviredPlanillaArtifact(snapshot())
 
     expect(artifact.validation.status).toBe('passed')
     expect(artifact.recordCount).toBe(1)
-    expect(artifact.totals.previredTotal).toBe(279280)
+    expect(artifact.totals.previredTotal).toBe(307960)
   })
 
   it('fails closed when a Chile dependent entry has no verified RUT snapshot', () => {
@@ -148,5 +184,20 @@ describe('Previred compliance export', () => {
     expect(artifact.validation.errors.join(' ')).toContain('explicit Previred sex code')
     expect(artifact.validation.errors.join(' ')).toContain('explicit Previred nationality code')
     expect(artifact.validation.errors.join(' ')).toContain('health institution code')
+  })
+
+  it('fails closed when periodized Previred rates or jornada are missing', () => {
+    const artifact = buildPreviredPlanillaArtifact(snapshot([
+      baseEntry({
+        employmentType: null,
+        previredAfpTotalRate: null,
+        previredSisRate: null
+      })
+    ]))
+
+    expect(artifact.validation.status).toBe('failed')
+    expect(artifact.validation.errors.join(' ')).toContain('periodized Previred AFP rate')
+    expect(artifact.validation.errors.join(' ')).toContain('periodized Previred SIS rate')
+    expect(artifact.validation.errors.join(' ')).toContain('employment_type')
   })
 })
