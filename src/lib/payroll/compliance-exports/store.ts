@@ -31,8 +31,14 @@ interface EntryRow {
   period_id: string
   member_id: string
   member_display_name: string | null
+  member_first_name: string | null
+  member_last_name: string | null
+  member_legal_name: string | null
   primary_email: string | null
   identity_profile_id: string | null
+  previred_sex_code: string | null
+  previred_nationality_code: string | null
+  previred_health_institution_code: string | null
   contract_type_snapshot: string | null
   pay_regime: string
   payroll_via: string | null
@@ -100,8 +106,14 @@ const loadChileDependentEntryRows = async (client: PoolClient, periodId: string)
         e.period_id,
         e.member_id,
         e.member_display_name,
+        m.first_name AS member_first_name,
+        m.last_name AS member_last_name,
+        m.legal_name AS member_legal_name,
         m.primary_email,
         m.identity_profile_id,
+        pwp.sex_code AS previred_sex_code,
+        pwp.nationality_code AS previred_nationality_code,
+        pwp.health_institution_code AS previred_health_institution_code,
         e.contract_type_snapshot,
         e.pay_regime,
         e.payroll_via,
@@ -132,6 +144,7 @@ const loadChileDependentEntryRows = async (client: PoolClient, periodId: string)
         e.updated_at
       FROM greenhouse_payroll.payroll_entries e
       LEFT JOIN greenhouse_core.members m ON m.member_id = e.member_id
+      LEFT JOIN greenhouse_payroll.chile_previred_worker_profiles pwp ON pwp.profile_id = m.identity_profile_id
       WHERE e.period_id = $1
         AND e.is_active = TRUE
         AND e.pay_regime = 'chile'
@@ -175,8 +188,14 @@ const mapEntryRow = async (
     periodId: row.period_id,
     memberId: row.member_id,
     memberDisplayName: row.member_display_name || row.member_id,
+    memberFirstName: row.member_first_name,
+    memberLastName: row.member_last_name,
+    memberLegalName: row.member_legal_name,
     memberEmail: row.primary_email,
     identityProfileId: row.identity_profile_id || '',
+    previredSexCode: row.previred_sex_code,
+    previredNationalityCode: row.previred_nationality_code,
+    previredHealthInstitutionCode: row.previred_health_institution_code,
     rutNormalized,
     contractTypeSnapshot: row.contract_type_snapshot,
     payRegime: row.pay_regime,

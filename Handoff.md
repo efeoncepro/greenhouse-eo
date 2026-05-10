@@ -23877,6 +23877,35 @@ Riesgos / notas:
 
 - No se tocaron los archivos nuevos no trackeados de client portal (`TASK-822` a `TASK-825` y arquitectura relacionada); quedan fuera de este cambio.
 
+## Sesion 2026-05-10 — TASK-812 Previred upload correction
+
+Contexto:
+
+- Usuario subio `payroll-previred-2026-04.txt` a Previred con formato `Estandar por Separador 105 campos`; Previred rechazo la linea 1 por campos corridos/invalidos (`Sexo`, `Nacionalidad`, `Regimen Previsional`, `Dias Trabajados`, `Codigo Isapre`).
+- Skill usada: `greenhouse-payroll-auditor`; decision reforzada con `software-architect-2026`.
+- `pnpm pg:doctor` no pudo validar runtime por `invalid_grant / invalid_rapt` de ADC Google; requiere reauth local (`gcloud auth login` + `gcloud auth application-default login`) antes de aplicar/verificar migracion en Cloud SQL.
+
+Cambios aplicados:
+
+- `src/lib/payroll/compliance-exports/previred.ts` corrige posiciones oficiales Previred: periodo `MMAAAA`, regimen `AFP/SIP`, dias trabajados campo 13, Fonasa/Isapre campo 75+, Mutual 96-98, Cesantia 100-102.
+- Se elimina inferencia/default de sexo y nacionalidad. El export Previred ahora falla cerrado si faltan codigos explicitos.
+- `migrations/20260510111506127_task-812-previred-worker-profiles.sql` agrega `greenhouse_payroll.chile_previred_worker_profiles` para `sex_code`, `nationality_code` y `health_institution_code` anclados a `identity_profile_id`.
+- `src/lib/payroll/compliance-exports/store.ts` lee nombres legales de `members` y el perfil Previred por persona.
+- Docs actualizadas: `docs/compliance/previred/README.md`, manual de nomina y spec TASK-812.
+
+Validacion:
+
+- `pnpm vitest run src/lib/payroll/compliance-exports/previred.test.ts src/lib/payroll/compliance-exports/lre.test.ts` -> pass, 8 tests.
+- `pnpm vitest run src/lib/payroll` -> pass, 51 files / 367 tests.
+- `pnpm exec eslint src/lib/payroll/compliance-exports/previred.ts src/lib/payroll/compliance-exports/store.ts src/lib/payroll/compliance-exports/previred.test.ts src/lib/payroll/compliance-exports/lre.test.ts` -> pass.
+- `pnpm exec tsc --noEmit --pretty false` -> pass.
+
+Pendiente operativo:
+
+- Aplicar migracion y poblar perfiles Previred reales. Para Valentina: `sex_code='F'`, `nationality_code='0'`; `health_institution_code` debe ser `07` si Fonasa o el codigo exacto de la Isapre segun Tabla N°16.
+- Reautenticar GCP local antes de `pnpm pg:doctor` / migracion.
+- Regenerar y subir nuevamente `payroll-previred-2026-04.txt` despues de poblar perfiles.
+
 ## Sesion 2026-05-06 — TASK-408 smoke enablement: admin preview catalog completo
 
 Contexto:

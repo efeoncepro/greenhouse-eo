@@ -8156,6 +8156,10 @@ Comando operativo:
 - Platform / Microcopy: `greenhouse/no-untokenized-copy` quedó promovida a `error` con baseline 0 warnings y 0 disables, bloqueando nuevas regresiones de copy compartido hardcodeado en CI.
 - Admin / Email Preview: TASK-408 completo el catalogo de preview para los 17 templates registrados y agrego un test que impide registrar emails sin metadata de preview, desbloqueando smoke staging seguro por cohortes.
 
+# 2026-05-10
+
+- HR / Payroll Compliance: el export Previred de TASK-812 ahora usa posiciones oficiales del formato `Estandar por Separador 105 campos` para identidad, periodo, regimen previsional, salud, mutual y seguro de cesantia. Se agrego el perfil auditable `greenhouse_payroll.chile_previred_worker_profiles` para sexo, nacionalidad y codigo de salud; el export bloquea si faltan esos datos en vez de inventarlos.
+
 # 2026-05-04
 
 - Identity / SCIM: se corrigió el contrato de tenant mapping interno Efeonce. `client_id=NULL` ahora es semántica canónica para provisioning interno, los mappings externos quedan protegidos por FK a `greenhouse_core.clients`, y SCIM ya no intenta crear usuarios con el pseudo-client legacy `efeonce-admin`.

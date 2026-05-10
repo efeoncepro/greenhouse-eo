@@ -15,5 +15,18 @@ Runtime contract:
 - Separator is semicolon (`;`); V1 emits plain ASCII-compatible text.
 - Greenhouse V1 includes Chile dependent internal employees only.
 - Previred totals must match `calculatePreviredEntryBreakdown` over the seven canonical payroll columns.
+- Worker legal codes that Previred requires but payroll does not calculate live in
+  `greenhouse_payroll.chile_previred_worker_profiles`, keyed by Person 360
+  `identity_profile_id`.
+- The generator must fail closed when `sex_code`, `nationality_code` or a required
+  health institution code is missing. It must never infer sex from names nor infer
+  nationality from `CL_RUT`.
 - `TASK-707a` remains required before claiming full parity with `payment_order` social_security.
 
+Mandatory worker profile fields:
+
+| Field | Previred source | Allowed values | Notes |
+| --- | --- | --- | --- |
+| `sex_code` | Tabla N°1 | `M`, `F` | Explicit HR/legal declaration only. |
+| `nationality_code` | Tabla N°2 | `0`, `1` | `0` Chileno, `1` Extranjero. |
+| `health_institution_code` | Tabla N°16 | `00`, `01`, `02`, `03`, `04`, `05`, `07`, `10`, `11`, `12`, `25` | `07` Fonasa; `00` only when there is no Isapre contribution. |

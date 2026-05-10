@@ -22,6 +22,7 @@ Necesitas:
 - Acceso a `HR > Nomina mensual` (rol `hr_payroll` o `efeonce_admin`).
 - Un periodo en estado `Aprobado` o `Exportado`. Los periodos en `Borrador` o `Calculado` NO permiten descargar reporte ni Excel oficiales.
 - Si vas a reconciliar contra Previred/F29, necesitas tu cuenta de operador en esos sistemas (no se hace dentro de Greenhouse).
+- Para descargar la planilla Previred oficial, cada trabajador Chile dependiente debe tener su perfil Previred validado: sexo (`M`/`F`), nacionalidad (`0` chileno, `1` extranjero) y codigo de institucion de salud cuando corresponde. Si falta uno de esos datos, Greenhouse bloquea la descarga para evitar subir un archivo invalido.
 
 ## Paso a paso — Descargar el recibo de un colaborador
 
@@ -91,6 +92,18 @@ Previred recibe las cotizaciones previsionales reales: AFP (cotizacion + comisio
 | Excel hoja `Chile` Seccion 1 | Fila `Total descuentos previsionales` |
 
 Ese numero debe coincidir 1:1 con el archivo que sube Previred. Si difieren, escala a HR + Finanzas — el motor o la integracion Previred tienen un drift.
+
+### Carga de nomina electronica en Previred
+
+Cuando uses el archivo `payroll-previred-AAAA-MM.txt` descargado desde Greenhouse:
+
+1. En Previred entra a `Nomina de Trabajadores` -> `Ingreso de Trabajadores`.
+2. En `Nombre Nomina`, usa el mes operativo, por ejemplo `Abril 2026`.
+3. En `Tipo de Nomina`, selecciona `Remuneraciones`.
+4. En `Tipo de Formato`, selecciona `Estandar por Separador 105 campos`.
+5. Adjunta el archivo `payroll-previred-AAAA-MM.txt`.
+
+Si Previred devuelve errores de formato para `Sexo`, `Nacionalidad`, `Regimen Previsional`, `Dias Trabajados` o `Codigo Isapre`, no edites el TXT a mano. Corrige primero el perfil Previred del trabajador o el dato de payroll en Greenhouse y vuelve a descargar el archivo.
 
 ### Reconciliacion mensual con F29 retenciones honorarios
 

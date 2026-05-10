@@ -8,8 +8,14 @@ const baseEntry = (overrides: Partial<ChilePayrollComplianceEntry> = {}): ChileP
   periodId: '2026-04',
   memberId: 'member-1',
   memberDisplayName: 'Ada Lovelace',
+  memberFirstName: 'Ada',
+  memberLastName: 'Lovelace Byron',
+  memberLegalName: 'Ada Lovelace Byron',
   memberEmail: 'ada@example.com',
   identityProfileId: 'profile-1',
+  previredSexCode: 'F',
+  previredNationalityCode: '0',
+  previredHealthInstitutionCode: '07',
   rutNormalized: '123456785',
   contractTypeSnapshot: 'indefinido',
   payRegime: 'chile',
@@ -65,6 +71,36 @@ describe('Previred compliance export', () => {
     expect(row.split(';')).toHaveLength(105)
   })
 
+  it('maps official Previred positions for worker identity, period, pension, health, mutual and unemployment', () => {
+    const fields = buildPreviredRow(snapshot(), baseEntry()).split(';')
+
+    expect(fields[2]).toBe('Lovelace')
+    expect(fields[3]).toBe('Byron')
+    expect(fields[4]).toBe('Ada')
+    expect(fields[5]).toBe('F')
+    expect(fields[6]).toBe('0')
+    expect(fields[8]).toBe('042026')
+    expect(fields[9]).toBe('042026')
+    expect(fields[10]).toBe('AFP')
+    expect(fields[12]).toBe('30')
+    expect(fields[17]).toBe('D')
+    expect(fields[24]).toBe('N')
+    expect(fields[25]).toBe('05')
+    expect(fields[26]).toBe('1200000')
+    expect(fields[27]).toBe('120000')
+    expect(fields[28]).toBe('18000')
+    expect(fields[69]).toBe('84000')
+    expect(fields[70]).toBe('0')
+    expect(fields[74]).toBe('07')
+    expect(fields[76]).toBe('0')
+    expect(fields[79]).toBe('0')
+    expect(fields[96]).toBe('1200000')
+    expect(fields[97]).toBe('11280')
+    expect(fields[99]).toBe('1200000')
+    expect(fields[100]).toBe('7200')
+    expect(fields[101]).toBe('28800')
+  })
+
   it('keeps Previred totals aligned with the canonical seven-component helper', () => {
     const artifact = buildPreviredPlanillaArtifact(snapshot())
 
@@ -78,5 +114,21 @@ describe('Previred compliance export', () => {
 
     expect(artifact.validation.status).toBe('failed')
     expect(artifact.validation.errors.join(' ')).toContain('verified CL_RUT')
+  })
+
+  it('fails closed when required Previred legal codes are missing instead of inventing them', () => {
+    const artifact = buildPreviredPlanillaArtifact(snapshot([
+      baseEntry({
+        previredSexCode: null,
+        previredNationalityCode: null,
+        previredHealthInstitutionCode: null,
+        chileHealthSystem: 'isapre'
+      })
+    ]))
+
+    expect(artifact.validation.status).toBe('failed')
+    expect(artifact.validation.errors.join(' ')).toContain('explicit Previred sex code')
+    expect(artifact.validation.errors.join(' ')).toContain('explicit Previred nationality code')
+    expect(artifact.validation.errors.join(' ')).toContain('health institution code')
   })
 })

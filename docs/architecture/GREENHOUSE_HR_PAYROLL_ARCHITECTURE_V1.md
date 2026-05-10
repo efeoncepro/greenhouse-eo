@@ -51,6 +51,10 @@ Los artefactos emitidos deben persistir metadata de auditoria: periodo, space, e
 TASK-812 V1 materializa el contrato con:
 
 - `greenhouse_payroll.compliance_export_artifacts` como registry de metadata auditable.
+- `greenhouse_payroll.chile_previred_worker_profiles` como perfil declarativo
+  auditable para codigos Previred por persona (`sex_code`,
+  `nationality_code`, `health_institution_code`). Estos datos no se infieren
+  desde nombres, RUT ni `payroll_entries`; si faltan, el export bloquea.
 - `src/lib/payroll/compliance-exports/*` como generadores read-only Previred/LRE.
 - APIs `GET /api/hr/payroll/periods/:periodId/export/previred` y `/lre`.
 - Capabilities `hr.payroll.export_previred` y `hr.payroll.export_lre`.

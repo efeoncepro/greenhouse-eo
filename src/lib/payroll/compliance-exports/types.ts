@@ -20,8 +20,14 @@ export interface ChilePayrollComplianceEntry {
   periodId: string
   memberId: string
   memberDisplayName: string
+  memberFirstName: string | null
+  memberLastName: string | null
+  memberLegalName: string | null
   memberEmail: string | null
   identityProfileId: string
+  previredSexCode: string | null
+  previredNationalityCode: string | null
+  previredHealthInstitutionCode: string | null
   rutNormalized: string
   contractTypeSnapshot: string | null
   payRegime: string

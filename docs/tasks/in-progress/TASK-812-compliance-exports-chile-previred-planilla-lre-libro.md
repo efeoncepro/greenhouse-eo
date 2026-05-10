@@ -153,6 +153,23 @@ Reglas obligatorias:
 - No existen capabilities granulares de export compliance.
 - No existe reliability signal para drift de compliance exports.
 
+### Runtime correction 2026-05-10 — Previred worker legal profile
+
+Validacion real contra Previred detecto que el generador V1 no podia depender solo
+de `payroll_entries`: Previred exige campos legales por trabajador que payroll no
+calcula (`Sexo`, `Nacionalidad`, codigo exacto de salud/Isapre). La decision
+canonica es agregar `greenhouse_payroll.chile_previred_worker_profiles`,
+anclada a `identity_profile_id`, y bloquear el export cuando falten esos datos.
+
+Rationale:
+
+- No inferir sexo desde nombre visible.
+- No inferir nacionalidad desde `CL_RUT`.
+- No serializar strings operativos como `isapre` donde Previred exige codigos
+  oficiales de Tabla N°16.
+- Mantener Payroll como source of truth de montos y el perfil Previred como
+  source of truth de codigos declarativos requeridos por el archivo externo.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE (no llenar al crear la task)
      ═══════════════════════════════════════════════════════════ -->
