@@ -63,6 +63,8 @@ import { getPostgresConnectionSaturationSignal } from './queries/postgres-connec
 import { getCriticalTablesMissingSignal } from './queries/critical-tables-missing'
 import { getOutboxUnpublishedLagSignal } from './queries/outbox-unpublished-lag'
 import { getOutboxDeadLetterSignal } from './queries/outbox-dead-letter'
+import { getReleasePendingWithoutJobsSignal } from './queries/release-pending-without-jobs'
+import { getReleaseStaleApprovalSignal } from './queries/release-stale-approval'
 import { getEmailRenderFailureSignal } from './queries/email-render-failure'
 import { getNuboxSourceFreshnessSignal } from './queries/nubox-source-freshness'
 import { getEngagementBudgetOverrunSignal } from './queries/engagement-budget-overrun'
@@ -484,6 +486,15 @@ interface ReliabilityOverviewSources {
    * Roll up bajo moduleKey 'commercial'.
    */
   commercialHealth?: ReliabilitySignal[] | null
+
+  /**
+   * TASK-848 Slice 7 — Production Release Control Plane signals (V1, 2 of 4):
+   *   - platform.release.stale_approval (drift)
+   *   - platform.release.pending_without_jobs (drift)
+   * Roll up bajo moduleKey 'platform'. V1.1 agregara deploy_duration_p95 + last_status
+   * cuando exista release_manifests data populated.
+   */
+  productionRelease?: ReliabilitySignal[] | null
 }
 
 export const buildReliabilityOverview = (
@@ -557,7 +568,9 @@ export const buildReliabilityOverview = (
     // TASK-813 Slice 6 — Commercial engagement instance signals (3).
     ...(sources.servicesEngagement ?? []),
     // TASK-807 — Commercial Health signals (six Sample Sprints health gates).
-    ...(sources.commercialHealth ?? [])
+    ...(sources.commercialHealth ?? []),
+    // TASK-848 Slice 7 — Production Release Control Plane signals (2 of 4 V1).
+    ...(sources.productionRelease ?? [])
   ]
 
   const signalsByModule = new Map<string, ReliabilitySignal[]>()
@@ -899,6 +912,20 @@ export const getReliabilityOverview = async (
           .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
           .catch(() => null)
 
+  // TASK-848 Slice 7 — Production Release Control Plane signals (V1, 2 of 4).
+  // 2 readers en paralelo. Cada uno degrada a `severity=unknown` si no hay
+  // GITHUB_RELEASE_OBSERVER_TOKEN o GH API falla. NO bloquea el dashboard.
+  // V1.1 agregara deploy_duration_p95 + last_status (necesitan release_manifests data).
+  const productionRelease =
+    preloadedSources.productionRelease !== undefined
+      ? preloadedSources.productionRelease
+      : await Promise.all([
+          getReleaseStaleApprovalSignal().catch(() => null),
+          getReleasePendingWithoutJobsSignal().catch(() => null)
+        ])
+          .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
+          .catch(() => null)
+
   // TASK-807 — Commercial Health readers (6). Cada reader degrada
   // honestamente a `unknown` si su query falla. Incluye stale_progress de
   // TASK-805 como primitive reutilizada, no recreada.
@@ -969,7 +996,8 @@ export const getReliabilityOverview = async (
     cloudRunSilentObservability,
     postgresConnectionSaturation,
     servicesEngagement,
-    commercialHealth
+    commercialHealth,
+    productionRelease
   })
 }
 

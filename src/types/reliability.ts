@@ -23,6 +23,7 @@ export type ReliabilityModuleKey =
   | 'sync' // TASK-773 — outbox publisher + reactive consumer + projection refreshes
   | 'identity' // TASK-784 — Person legal profile + auth + SCIM
   | 'commercial' // TASK-813 — engagement instance sync (HubSpot p_services). TASK-807 formaliza subsystem rollup.
+  | 'platform' // TASK-848 — production release control plane (release_manifests, GH workflow blockers, WIF subjects, deploy duration p95)
 
 export type ReliabilityModuleDomain =
   | 'platform'
@@ -34,6 +35,7 @@ export type ReliabilityModuleDomain =
   | 'sync' // TASK-773
   | 'identity' // TASK-784
   | 'commercial' // TASK-813
+  | 'release' // TASK-848 — sub-domain de platform para release control plane
 
 export type ReliabilitySignalKind =
   | 'runtime'

@@ -397,6 +397,47 @@ export const STATIC_RELIABILITY_REGISTRY: ReliabilityModuleDefinition[] = [
     ],
     expectedSignalKinds: ['subsystem', 'drift', 'lag'],
     incidentDomainTag: 'integrations.hubspot'
+  },
+  {
+    // TASK-848 — Production Release Control Plane.
+    // Subsystem `Platform Release` cubre la promocion `develop -> main`:
+    //   - Detectores de blockers historicos (stale approvals + pending sin jobs)
+    //   - Manifest persistido per release attempt
+    //   - Workers Cloud Run revision verification (V1.1)
+    //   - Rollback observability
+    moduleKey: 'platform',
+    label: 'Platform Release',
+    description:
+      'Production release control plane (TASK-848): preflight, manifest persistido, deploy coordinado, deteccion de blockers GH Actions y rollback first-class. Visibilidad temprana de stale approvals + pending sin jobs.',
+    domain: 'release',
+    routes: [
+      { path: '/admin/operations', label: 'Ops Health' }
+    ],
+    apis: [
+      { path: '/api/admin/releases', label: 'Release manifests (V1.1)' }
+    ],
+    dependencies: [
+      'greenhouse_sync.release_manifests',
+      'greenhouse_sync.release_state_transitions',
+      'GitHub Actions API (waiting approvals + pending without jobs)',
+      'GCP Workload Identity Federation (subjects ref + environment)',
+      'Azure App Registration federated credentials',
+      'Vercel Production deployments + alias',
+      'Cloud Run worker revisions (ops-worker, commercial-cost-worker, ico-batch)'
+    ],
+    smokeTests: [],
+    filesOwned: [
+      'src/lib/release/**',
+      'src/lib/reliability/queries/release-*.ts',
+      'scripts/release/**',
+      '.github/workflows/production-release.yml',
+      '.github/workflows/ops-worker-deploy.yml',
+      '.github/workflows/commercial-cost-worker-deploy.yml',
+      '.github/workflows/ico-batch-deploy.yml',
+      'docs/architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md'
+    ],
+    expectedSignalKinds: ['drift', 'lag'],
+    incidentDomainTag: 'cloud'
   }
 ]
 
