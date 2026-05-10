@@ -243,6 +243,28 @@ Ningun evento dispara side effect automatico sobre cloud (Vercel/Cloud Run/Azure
 - **OQ2 — Reliability signal thresholds**: usar baselines del spec; tune data-driven post-30d steady-state.
 - **OQ3 — Dashboard `/admin/releases`**: defer a TASK-855 V1.1; V1 cubre operator visibility via signals + psql contra release_manifests.
 
+## Delta 2026-05-10 — TASK-849 Production Release Watchdog Alerts CERRADA
+
+Cierra el bucle del control plane production: detección activa + alertas Teams. Convierte los 2 signals pasivos de V1.0 (TASK-848) en alertas Teams automáticas via scheduled GH Actions cron.
+
+- **Helpers canonicos extraidos** (Slice 0): `src/lib/release/{github-helpers,workflow-allowlist,severity-resolver}.ts`. Single source of truth para todas las queries GitHub API + workflow allowlist + severity ladder. V1.0 readers refactorizados para reusar.
+- **3er reliability signal** (Slice 2): `platform.release.worker_revision_drift` (kind=drift, severity error si drift confirmado, warning si data_missing). Subsystem `Platform Release` ahora con 3 of 4 signals. Compara Cloud Run latest revision SHA vs ultimo workflow run success SHA via gcloud execFile + GH API.
+- **Worker GIT_SHA env var injection** (Slice 1): pre-requisito para reader 3. Cada worker (`ops-worker`, `commercial-cost-worker`, `ico-batch-worker`) emite `GIT_SHA` env var con commit SHA del deploy. Resolution `$GITHUB_SHA → git rev-parse HEAD → 'unknown'`.
+- **Tabla dedup minima** (Slice 3): `greenhouse_sync.release_watchdog_alert_state` (PK compuesta `(workflow_name, run_id, alert_kind)` + CHECK enum + indexes). NO audit append-only — YAGNI per spec Out of Scope. Audit deriva de GH Actions + Cloud Run history.
+- **Capability granular** `platform.release.watchdog.read` (least-privilege, NO reusa execute).
+- **Detector CLI** `scripts/release/production-release-watchdog.ts` (Slice 4) con flags `--json|--fail-on-error|--enable-teams|--dry-run`. Output machine-readable consumible por preflight CLI futuro (TASK-850). Exit codes: 0 ok/warning, 1 error/critical (con `--fail-on-error`).
+- **Scheduled GH workflow** `production-release-watchdog.yml` (Slice 5) — `*/30 * * * *` + workflow_dispatch + `cancel-in-progress: true` (la última foto siempre gana). WIF GCP para gcloud queries Cloud Run. Auto-emit summary a `$GITHUB_STEP_SUMMARY` + artifact 30d retention.
+- **Teams alerts dispatcher canónico** (Slice 5): `src/lib/release/watchdog-alerts-dispatcher.ts` con `dispatchWatchdogAlert()` + `dispatchWatchdogRecovery()`. Dedup logic: alerta SOLO cuando (a) blocker nuevo, (b) escalation severity, (c) ultimo alert > 24h. At-least-once delivery: dedup state se actualiza SOLO si Teams send tuvo éxito.
+- **Teams destination** `production-release-alerts` registrada en `src/config/manual-teams-announcements.ts` (V1 placeholder al chat EO Team).
+- **Runbook canónico** `docs/operations/runbooks/production-release-watchdog.md` (13 secciones: detección, ejecución, severities, recovery procedures, dedup state ops, configuración, decision tree alert vs incident, hard rules, V1.1 follow-ups).
+- **Hard Rules** canonizadas en CLAUDE.md sección "Production Release Watchdog invariants (TASK-849)".
+
+**Score 4-pilar (TASK-849)**: Safety 9/10 (read-only + capability granular + redaction), Robustness 9/10 (idempotent UPSERT dedup + at-least-once delivery), Resilience 8/10 (degradacion honesta + recovery alerts + reliability signal), Scalability 10/10 (O(W*R) trivial; 6 workflows × 5 runs).
+
+**Hosting decision**: GitHub Actions schedule (NO Vercel cron, NO Cloud Scheduler) — tooling/monitoring read-only NOT async-critical. GH Actions runner usa `github.token` auto-provisto evitando roundtrips cross-cloud para auth.
+
+V1.1 follow-ups (TASK derivada conditional): per-finding alerts (vs aggregate signal alerts) cuando emerja necesidad operativa de saber QUE workflow + QUE run_id en cada alert; CI gate workflow allowlist; GH Actions schedule reliability monitor si delays >30min sostenidos; migración a Cloud Scheduler + ops-worker si infrastructure-critical.
+
 ## Delta 2026-05-10 — V1.0 shipped (TASK-848)
 
 V1 partial entregado directo en `develop`:

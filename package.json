@@ -101,6 +101,7 @@
     "secrets:rotate": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/secrets/rotate.ts",
     "auth:audit-azure-app": "tsx scripts/auth/audit-azure-app.ts",
     "release:rollback": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/release/production-rollback.ts",
+    "release:watchdog": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/release/production-release-watchdog.ts",
     "setup:bigquery:outbox": "tsx scripts/setup-bigquery-outbox.ts",
     "setup:bigquery:outbox-marts": "tsx scripts/setup-bigquery-outbox-marts.ts",
     "setup:bigquery:source-sync": "tsx scripts/setup-bigquery-source-sync.ts",

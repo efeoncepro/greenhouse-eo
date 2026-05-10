@@ -1,3 +1,33 @@
+# Sesion 2026-05-10 — TASK-849 Production Release Watchdog Alerts CERRADA
+
+- **Trigger:** usuario pidio implementar TASK-849 (P0, Effort Medio, Impact Muy alto) directo en `develop` invocando `arch-architect` constantemente. Scope reducido ~50% post TASK-848 V1.0 (helpers + 2 readers ya existian).
+- **Estado:** **CERRADA 2026-05-10** directo en `develop`. 6 commits incrementales sin PR ceremony. Cierra el bucle del control plane production: detección activa + alertas Teams.
+- **Open Questions resueltas pre-FASE 1 (arch-architect):**
+  - **OQ1** destination Teams `production-release-alerts` → CREAR placeholder apuntando al chat EO Team mismo. Operador puede crear chat dedicado y actualizar `recipientChatId` via PR cuando emerja necesidad.
+  - **OQ2** timing TASK-848 vs TASK-849 → TASK-848 V1.0 ya shipped, scope reducido ~50%. Refactor V1.0 readers para reusar helpers extraídos en Slice 0.
+- **Decisiones arch-architect (overrides vs spec original):**
+  - Helpers en `src/lib/release/` (NO `src/lib/release-watchdog/`) — extender modulo existente, NO parallel namespace.
+  - Schema `greenhouse_sync` (NO `greenhouse_ops` que es ROLE) — mismo override que TASK-848.
+  - GIT_SHA injection: append a ENV_VARS string del deploy.sh existente (per-worker pattern preservado: ops-worker/commercial-cost-worker usan `--set-env-vars`, ico-batch usa `--update-env-vars`).
+  - Capability `platform.release.watchdog.read` granular (NO reusar `platform.release.execute` — semantica distinta: leer estado vs disparar release).
+  - Tabla minima 8 columnas (NO audit append-only complejo) — YAGNI per spec Out of Scope. Audit deriva de GH Actions + Cloud Run history (append-only por design platform).
+  - PK compuesta `(workflow_name, run_id, alert_kind)` — permite mismo run con kinds distintos por escalation.
+- **6 commits incrementales:**
+  - **Slice 0** (`cf70ea15`) — Extract canonical helpers + refactor V1.0 readers. `github-helpers.ts`, `workflow-allowlist.ts`, `severity-resolver.ts` + 33 tests anti-regresion. V1.0 readers refactorizados para reusar (~80 lineas duplicadas eliminadas).
+  - **Slice 1** (`f4783828`) — Worker GIT_SHA env var en 3 deploy.sh. Single-line append per worker. Pre-requisito para reader 3.
+  - **Slice 2** (`6624891f`) — 3rd reader `worker_revision_drift` + wire-up + 7 tests. Subsystem `Platform Release` ahora con 3 of 4 signals.
+  - **Slice 3** (`b9489daa`) — Migration `greenhouse_sync.release_watchdog_alert_state` (PK compuesta + CHECK enum + indexes + GRANTs) + capability `platform.release.watchdog.read` granular least-privilege.
+  - **Slice 4** (`0c2c5004`) — Detector CLI `scripts/release/production-release-watchdog.ts` + Teams destination `production-release-alerts` + 5 tests aggregation.
+  - **Slice 5** (`f4c5a484`) — Scheduled GH workflow `production-release-watchdog.yml` (`*/30 * * * *`) + Teams alerts dispatcher con dedup canonico (`dispatchWatchdogAlert` + `dispatchWatchdogRecovery`).
+- **Slice 6 closing** (este commit) — `pnpm release:watchdog` script + runbook canónico `docs/operations/runbooks/production-release-watchdog.md` (decision tree + recovery procedures + dedup state ops + 13 secciones) + CLAUDE.md Hard Rules + Delta arch doc.
+- **Score 4-pilar:** Safety 9/10 (read-only + capability granular + redaction), Robustness 9/10 (idempotent UPSERT + at-least-once delivery), Resilience 8/10 (degradacion honesta + recovery alerts + reliability signal), Scalability 10/10 (O(W*R) trivial).
+- **Hard Rules canonizadas en CLAUDE.md** sección "Production Release Watchdog invariants (TASK-849)".
+- **Tests/build:** tsc clean. Lint clean. 62/62 verdes nuevos/extendidos. Migration aplicada en dev (386 tablas PG).
+- **Skills invocadas:** `arch-architect` (constante per instrucción usuario) + `greenhouse-backend` para implementación.
+- **Próximo paso:** configurar `GITHUB_RELEASE_OBSERVER_TOKEN` en Vercel env vars production para activar dashboards reliability automaticamente. Cron scheduled YA esta activo en GH Actions runner (usa `github.token` auto-provisto). Operador puede ejecutar manualmente `pnpm release:watchdog --json` para validar local. Post-merge a `main` el watchdog corre cada 30 min y emite alertas Teams a `production-release-alerts` cuando detecte blockers.
+
+---
+
 # Sesion 2026-05-10 — TASK-812 Previred regulatory projection hardening
 
 - **Trigger:** usuario subio nuevos CSV de error/adverencia de Previred para abril 2026 y pidio invocar `greenhouse-payroll-auditor` + arquitectura constantemente, sin parches ni mutar/borrar datos de Valentina.
