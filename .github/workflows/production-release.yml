@@ -89,9 +89,10 @@ jobs:
           fetch-depth: 0
 
       - name: Set up pnpm
+        # No `version:` here — heredamos del `packageManager` field en
+        # package.json (Corepack canonical source of truth). Single source
+        # of truth = un solo lugar para bumpear pnpm version.
         uses: pnpm/action-setup@v6
-        with:
-          version: 10
 
       - name: Set up Node 24
         uses: actions/setup-node@v5
@@ -168,9 +169,10 @@ jobs:
           ref: ${{ inputs.target_sha }}
 
       - name: Set up pnpm
+        # No `version:` here — heredamos del `packageManager` field en
+        # package.json (Corepack canonical source of truth). Single source
+        # of truth = un solo lugar para bumpear pnpm version.
         uses: pnpm/action-setup@v6
-        with:
-          version: 10
 
       - name: Set up Node 24
         uses: actions/setup-node@v5
@@ -404,9 +406,10 @@ jobs:
           ref: ${{ inputs.target_sha }}
 
       - name: Set up pnpm
+        # No `version:` here — heredamos del `packageManager` field en
+        # package.json (Corepack canonical source of truth). Single source
+        # of truth = un solo lugar para bumpear pnpm version.
         uses: pnpm/action-setup@v6
-        with:
-          version: 10
 
       - name: Set up Node 24
         uses: actions/setup-node@v5
