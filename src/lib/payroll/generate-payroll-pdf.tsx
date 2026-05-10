@@ -1,5 +1,6 @@
 import 'server-only'
 
+import fs from 'fs'
 import path from 'path'
 
 import { Fragment } from 'react'
@@ -30,6 +31,25 @@ import {
 } from '@/lib/payroll/receipt-presenter'
 
 const LOGO_PATH = path.join(process.cwd(), 'public/branding/logo-full.png')
+let cachedLogoDataUri: string | null | undefined
+
+const getLogoDataUri = (): string | null => {
+  if (cachedLogoDataUri !== undefined) return cachedLogoDataUri
+
+  try {
+    const logoBytes = fs.readFileSync(LOGO_PATH)
+
+    cachedLogoDataUri = `data:image/png;base64,${logoBytes.toString('base64')}`
+  } catch (error) {
+    console.warn('[payroll-pdf] Logo asset unavailable; rendering text fallback.', {
+      logoPath: LOGO_PATH,
+      error: error instanceof Error ? error.message : String(error)
+    })
+    cachedLogoDataUri = null
+  }
+
+  return cachedLogoDataUri
+}
 
 /**
  * Bump this constant whenever the receipt/report PDF template changes
@@ -374,11 +394,18 @@ const PdfHeader = ({ operatingEntity, monthName, year, docType, periodId }: {
   year: number
   docType: string
   periodId: string
-}) => (
-  <>
-    <View style={s.header}>
-      <View>
-        <Image src={LOGO_PATH} style={{ width: 120, height: 28 }} />
+}) => {
+  const logoSrc = getLogoDataUri()
+
+  return (
+    <>
+      <View style={s.header}>
+        <View>
+          {logoSrc ? (
+            <Image src={logoSrc} style={{ width: 120, height: 28 }} />
+          ) : (
+            <Text style={s.companyText}>Efeonce Greenhouse</Text>
+          )}
         <View style={s.companyBlock}>
           <Text style={s.companyText}>{operatingEntity?.legalName ?? 'Efeonce Group SpA'}</Text>
           {operatingEntity?.taxId && <Text style={s.companyText}>{`RUT ${operatingEntity.taxId}`}</Text>}
@@ -391,9 +418,10 @@ const PdfHeader = ({ operatingEntity, monthName, year, docType, periodId }: {
         <Text style={s.periodSub}>{periodId}</Text>
       </View>
     </View>
-    <View style={s.headerAccent} />
-  </>
-)
+      <View style={s.headerAccent} />
+    </>
+  )
+}
 
 const PdfFooter = ({ operatingEntity, monthName, year, generatedAt }: {
   operatingEntity: OperatingEntityIdentity | null
