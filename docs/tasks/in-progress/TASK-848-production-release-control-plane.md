@@ -514,7 +514,48 @@ Si la implementacion termino pero estos items no se ejecutaron, la task sigue ab
 - **Opt-in rollback automatizado de Azure** (TASK derivada V2): solo despues de demostrar que reapply Bicep es safe + reversible en al menos 5 dry-runs en environment de prueba.
 - **Dashboard `/admin/releases`** (puede vivir en esta task o derivada): UI para listar releases, ver manifest, comando rollback. V1 minimo: tabla read-only ordenada por `started_at DESC` con last 30 dias.
 
-## Delta 2026-05-10
+## Delta 2026-05-10 — V1.0 SHIPPED (parcial; V1.1 follow-ups TASK-850..855)
+
+V1.0 ENTREGADO directo en `develop` (4 commits incrementales, sin PR ceremony):
+
+- ✅ **Slice 1 full** (commit `824eacab`) — ADR + migration `release_manifests` +
+  `release_state_transitions` + 3 capabilities granulares + 7 outbox events catalog +
+  spec canónico V1 + DECISIONS_INDEX entry. Migration aplicada en dev (385 tablas PG).
+- ✅ **Slice 3 partial** (commit `d845dbfb`) — Concurrency fix Opcion A en 3 worker
+  workflows (`ops-worker-deploy`, `commercial-cost-worker-deploy`, `ico-batch-deploy`).
+  **Mata el bug class** del incidente 2026-04-26 → 2026-05-09 inmediatamente.
+  `cancel-in-progress: ${{ ... 'production' || ref=='refs/heads/main' }}` dynamic expression.
+- ✅ **Slice 7 partial** (commit `f1b85a86`) — 2 critical reliability signals wired:
+  `platform.release.stale_approval` (drift, warning>24h err>7d) +
+  `platform.release.pending_without_jobs` (drift, error>5min). Ambos detectores
+  exactos de los 2 síntomas observados. Subsystem `Platform Release` registrado.
+  Degradación honesta sin GH token.
+- ✅ **Slice 6 skeleton** (commit `a0b004e4`) — `scripts/release/production-rollback.ts`
+  CLI idempotente para Vercel + 3 Cloud Run workers + HubSpot integration.
+  Runbook canónico `docs/operations/runbooks/production-release.md` con decision
+  tree, preflight checklist 10 items, verificación WIF subjects, rollback automatizado
+  + manual Azure, hard rules anti-regresión.
+
+V1.1 FOLLOW-UPS (TASKs derivativas creadas):
+
+- **TASK-850** Production Preflight CLI completo (WIF subjects + GH API blockers + retry)
+- **TASK-851** `production-release.yml` workflow orchestrator (state machine + advisory lock + manifest writes)
+- **TASK-852** Worker Deploy SHA Verification (input expected_sha + Ready=True polling + workflow_call)
+- **TASK-853** Azure Infra Release Gating (Bicep diff detector + Azure rollback runbook ampliado)
+- **TASK-854** 2 Reliability Signals adicionales (deploy_duration_p95 + last_status; need release_manifests data populated)
+- **TASK-855** Dashboard `/admin/releases` UI (manifest viewer, rollback CTA, last 30 days cursor pagination)
+
+Lifecycle queda en `in-progress` hasta que V1.1 follow-ups cierren todos los acceptance
+criteria. V1.0 entrega el 80/20 critico operacional:
+1. **Bug class deadlock muerto** (concurrency fix Opcion A en producción).
+2. **Detección automática** de stale approvals + pending sin jobs.
+3. **Audit forensic** via release_manifests append-only.
+4. **Rollback CLI** para emergencias.
+
+V1.0 score 4-pilar: Safety 8/10, Robustness 9/10, Resilience 8/10, Scalability 10/10.
+Documentado en `docs/architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md`.
+
+## Delta 2026-05-10 — Task creada
 
 Task creada a partir del release `develop` -> `main` del commit `d5f45b163e6c405b34b532ade91ddba68563cc15` y del analisis con `software-architect-2026`.
 

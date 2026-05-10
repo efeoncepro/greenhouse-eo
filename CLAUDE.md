@@ -1435,6 +1435,64 @@ El **outbox publisher** mueve eventos de `greenhouse_sync.outbox_events` (Postgr
 
 **Spec canónica**: `docs/tasks/complete/TASK-773-outbox-publisher-cloud-scheduler-cutover.md`. Patrón replicable: cuando emerja otro Vercel cron infrastructure-critical (TASK-258 sync-conformed pipeline, TASK-259 entra-profile-sync), seguir el mismo template (helper canónico → endpoint ops-worker → Cloud Scheduler job → reliability signal).
 
+### Production Release Control Plane invariants (TASK-848)
+
+La promoción `develop → main` vive en un control plane canónico con manifest persistido + state machine append-only + capabilities granulares + concurrency fix kills bug class del incidente 2026-04-26 → 2026-05-09. Todo release production debe respetar estos invariantes — son los que evitan que workflows queden deadlocked, que rollback aplique revisión incorrecta, o que un release degraded quede silente sin rollback.
+
+**Read API canónico**:
+
+- Tablas: `greenhouse_sync.release_manifests` (manifest persistido, source of truth) + `greenhouse_sync.release_state_transitions` (audit append-only). Anti-UPDATE/DELETE triggers enforced. Schema `greenhouse_sync` (NO `greenhouse_ops` que es ROLE).
+- PK formato `<targetSha[:12]>-<UUIDv4>` via `randomUUID()`. Ordering via INDEX `(target_branch, started_at DESC)`.
+- State machine cerrado (8 estados): `preflight → ready → deploying → verifying → released | degraded | aborted`; `released → rolled_back`; `degraded → rolled_back | released`. CHECK constraint a nivel DB.
+- Partial UNIQUE INDEX `WHERE state IN ('preflight','ready','deploying','verifying')` garantiza 1 release activo por branch.
+- Outbox events versionados v1: `platform.release.{started, deploying, verifying, released, degraded, rolled_back, aborted}`. Documentados en `GREENHOUSE_EVENT_CATALOG_V1.md`.
+- 3 capabilities granulares least-privilege: `platform.release.execute` (EFEONCE_ADMIN + DEVOPS_OPERATOR), `platform.release.rollback` (EFEONCE_ADMIN solo), `platform.release.bypass_preflight` (EFEONCE_ADMIN solo, requiere `reason >= 20 chars` + audit).
+
+**Concurrency fix Opción A (V1 deployed)**:
+
+```yaml
+concurrency:
+  group: <worker>-deploy-${{ github.ref }}
+  cancel-in-progress: ${{ (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production') || github.ref == 'refs/heads/main' }}
+```
+
+Aplicado a 3 worker workflows (`ops-worker-deploy.yml`, `commercial-cost-worker-deploy.yml`, `ico-batch-deploy.yml`). Mata el bug class del incidente histórico: pushes nuevos a production cancelan stale pending en lugar de quedar deadlocked. Staging preserva `cancel-in-progress: false`.
+
+**Reliability signals canónicos** (subsystem `Platform Release`, V1 deployed = 2 of 4):
+
+- `platform.release.stale_approval` (kind=drift, severity warning>24h err>7d). Detecta runs production "waiting" del environment Production. Steady=0.
+- `platform.release.pending_without_jobs` (kind=drift, severity error si count>0 sostenido >5min). Detecta runs queued/in_progress con `jobs.length===0`. Steady=0 = concurrency fix Opción A operando.
+- `platform.release.deploy_duration_p95` (V1.1 — TASK-854): kind=lag, p95 release ventana 30d.
+- `platform.release.last_status` (V1.1 — TASK-854): kind=drift, último release `degraded|aborted|rolled_back`.
+
+Ambos consultan GitHub API via `GITHUB_RELEASE_OBSERVER_TOKEN` con degradación honesta (severity=`unknown` sin token).
+
+**Rollback CLI canónico** (`scripts/release/production-rollback.ts`):
+
+- Vercel alias swap: `vercel alias set <PREV_URL> greenhouse.efeoncepro.com` (atomic).
+- Cloud Run workers: `gcloud run services update-traffic <svc> --to-revisions=<prev>=100` por cada worker.
+- HubSpot integration Cloud Run: mismo patrón.
+- **Azure config / Bicep**: NO automático V1 — manual gated en runbook `docs/operations/runbooks/production-release.md` con `az deployment group what-if` mandatory antes de apply.
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** disparar release production sin pasar por workflow orquestador (V1.1 — TASK-851). Workers deploy directo queda reservado para break-glass documentado.
+- **NUNCA** modificar `release_manifests.{release_id, target_sha, started_at, triggered_by, attempt_n}` post-INSERT. Anti-immutable trigger lo bloquea.
+- **NUNCA** hacer DELETE de filas en `release_manifests` o `release_state_transitions`. Append-only enforced por trigger PG. Para correcciones, INSERT nueva fila con `metadata_json.correction_of=<previous_id>`.
+- **NUNCA** transicionar `state` fuera del matrix canónico. `released → deploying` o `aborted → *` están prohibidos: create new release row.
+- **NUNCA** introducir un signal coarse `platform.release.pipeline_health` que lumpee multiples failure modes. Greenhouse pattern es 1 signal por failure mode (TASK-742, TASK-774, TASK-768).
+- **NUNCA** loggear secrets/tokens/JWT/refresh tokens/payload completo Vercel/GCP/Azure response sin pasar por `redactErrorForResponse` o `redactSensitive`.
+- **NUNCA** invocar `Sentry.captureException` directo en este path. Usar `captureWithDomain(err, 'cloud', { tags: { source: 'production_release', stage: '<...>' } })` para que el rollup `Platform Release` lo recoja.
+- **NUNCA** rollback automático de Azure config/Bicep en V1. Manual gated en runbook hasta demostrar reapply safe + reversible (TASK-853).
+- **NUNCA** crear tabla nueva paralela a `release_manifests` para tracking de workflow runs (extender, no parallelizar).
+- **NUNCA** mezclar dimensiones en state machine: `state` es lifecycle del release; outcome de cada step (Vercel ok, worker ok, Azure ok) vive en `post_release_health JSONB`, NO como variantes del enum.
+- **NUNCA** revertir el concurrency fix dynamic expression a `cancel-in-progress: false` en los 3 worker workflows production. Reintroduce el deadlock determinista del incidente 2026-04-26 → 2026-05-09.
+- **SIEMPRE** que un release entre `state IN ('degraded','aborted','rolled_back')`, escalar via outbox event + reliability signal `platform.release.last_status` (V1.1).
+- **SIEMPRE** que emerja un workflow nuevo de deploy production, agregarlo al `RELEASE_DEPLOY_WORKFLOW_ALLOWLIST` en `src/lib/reliability/queries/release-{stale-approval,pending-without-jobs}.ts` + verificar WIF subjects para `environment:production`.
+- **SIEMPRE** que se modifique el state machine, actualizar AMBOS: CHECK constraint DB en migration nueva + tipo TS `ReleaseState` (V1.1) + tabla en spec V1 + ADR.
+
+**Spec canónica**: `docs/architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md`. Runbook operativo: `docs/operations/runbooks/production-release.md`. Migration: `migrations/20260510111229586_task-848-release-control-plane-foundation.sql`. V1.1 follow-ups (4 tasks compactadas): TASK-850 (Preflight CLI), TASK-851 (Orchestrator + Worker SHA), TASK-853 (Azure gating), TASK-854 (2 signals + Dashboard).
+
 ### Finance write-path E2E gate (TASK-773 Slice 6)
 
 Cualquier task que toque handlers `POST/PUT/PATCH/DELETE` en `src/app/api/finance/**/route.ts` **debe verificar el flow end-to-end downstream**, no solo el contract API. Bug class detectada 2026-05-03: el endpoint Figma respondía 200 OK pero el TC Santander no rebajaba — porque el contract API funcionaba pero el side effect downstream (outbox → BQ → reactive → account_balance) calló silencioso.

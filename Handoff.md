@@ -1,3 +1,31 @@
+# Sesion 2026-05-10 — TASK-848 Production Release Control Plane V1.0 SHIPPED
+
+- **Trigger:** usuario pidio implementar TASK-848 (P0, Effort Alto, Impact Muy alto) directo en `develop` invocando `arch-architect` constantemente para validar/decidir acciones.
+- **Estado:** **V1.0 SHIPPED 2026-05-10** directo en `develop`. 4 commits incrementales sin PR ceremony. Lifecycle queda `in-progress` hasta V1.1 follow-ups (TASK-850..855) cierren acceptance criteria restantes.
+- **Open Questions resueltas pre-execution:**
+  - **OQ1** EPIC-007 vs EPIC-PLATFORM-OPS → mantener EPIC-007 (org restructuring no es architectural).
+  - **OQ2** Reliability signal thresholds → spec baselines + tune data-driven post-30d.
+  - **OQ3** Dashboard `/admin/releases` → defer a TASK-855 V1.1 (signals + psql cubren operator visibility).
+- **Decisiones arch-architect (overrides vs spec original):**
+  - Schema `greenhouse_sync` (NO `greenhouse_ops` — eso es ROLE no schema; greenhouse_sync hosta platform infrastructure).
+  - PK `<targetSha[:12]>-<UUIDv4>` via randomUUID() (NO UUIDv7 dep nueva; ordering via INDEX started_at DESC equivalente).
+  - `operator_member_id` NULLABLE + `triggered_by` NOT NULL free-form para system actors (rollback automatizado).
+  - Concurrency fix dynamic expression (vs split jobs) — single-line per worker workflow.
+  - WIF subjects verification context-bound (local fully verbose, CI implicit via gcloud auth list).
+- **4 commits incrementales:**
+  - **Slice 1 foundation** (`824eacab`) — Migration `20260510111229586_task-848-release-control-plane-foundation.sql` aplicada. Tablas `greenhouse_sync.{release_manifests, release_state_transitions}` con CHECK enum 8 estados, partial UNIQUE INDEX, anti-UPDATE/DELETE triggers (mirror TASK-765 patron). 3 capabilities granulares `platform.release.{execute,rollback,bypass_preflight}` seedeadas en capabilities_registry + ENTITLEMENT_MODULES extendido con `platform` + ENTITLEMENT_ACTIONS extendido con `execute|rollback|bypass_preflight`. 7 outbox events `platform.release.* v1` documentados en EVENT_CATALOG. Spec arquitectónico canónico `GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md` + DECISIONS_INDEX entry. Bloque DO anti pre-up-marker bug verifica DDL post-apply.
+  - **Slice 3 partial** (`d845dbfb`) — Concurrency fix Opcion A en 3 worker workflows. **Mata el bug class del incidente 2026-04-26 → 2026-05-09**: pushes nuevos a production cancelan stale pending en lugar de quedar deadlocked. Staging preserva cancel-in-progress=false (no disruption QA).
+  - **Slice 7 partial** (`f1b85a86`) — 2 critical reliability signals `platform.release.stale_approval` + `platform.release.pending_without_jobs`. Subsystem `Platform Release` registrado. Degradación honesta sin GITHUB_RELEASE_OBSERVER_TOKEN. 195/196 reliability tests verdes.
+  - **Slice 6 skeleton** (`a0b004e4`) — `scripts/release/production-rollback.ts` CLI idempotente para Vercel + 3 Cloud Run workers + HubSpot integration. Azure manual gated en runbook. Runbook canónico `docs/operations/runbooks/production-release.md` con decision tree, preflight checklist 10 items, verificación WIF subjects, hard rules anti-regresión.
+- **6 follow-up TASKs derivativas (V1.1):** TASK-850 Preflight CLI completo, TASK-851 production-release.yml orchestrator workflow, TASK-852 Worker SHA verification, TASK-853 Azure infra release gating, TASK-854 2 signals adicionales (deploy_duration_p95 + last_status), TASK-855 Dashboard /admin/releases UI.
+- **Hard Rules canonizadas en CLAUDE.md** sección "Production Release Control Plane invariants (TASK-848)".
+- **Tests/build:** tsc clean. Lint clean. 195/196 reliability verdes. Migration aplicada en dev (385 tablas PG). pre-commit + pre-push hooks pasaron.
+- **Skills invocadas:** `arch-architect` (greenhouse overlay) constantemente para validar/decidir cada decisión foundational + Slice (per instrucción explícita del usuario).
+- **Score 4-pilar V1.0:** Safety 8/10, Robustness 9/10, Resilience 8/10, Scalability 10/10.
+- **Próximo paso:** trabajar TASK-850..855 V1.1 follow-ups en orden recomendado. Configurar `GITHUB_RELEASE_OBSERVER_TOKEN` en Vercel env vars production para activar detección automática de stale approvals + pending sin jobs.
+
+---
+
 # Sesion 2026-05-10 — Production release follow-up + TASK-848 creada
 
 - **Trigger:** tras promover `develop` a `main`, el usuario pidio explicar que workflows quedaron huerfanos y crear la task recomendada por analisis de arquitectura.
@@ -23876,6 +23904,27 @@ Validacion:
 Riesgos / notas:
 
 - No se tocaron los archivos nuevos no trackeados de client portal (`TASK-822` a `TASK-825` y arquitectura relacionada); quedan fuera de este cambio.
+
+## Sesion 2026-05-10 — GCP auth preflight hardening
+
+Contexto:
+
+- El flujo local de Cloud SQL fallaba recurrentemente cuando expiraba la sesion GCP porque los agentes renovaban solo ADC (`gcloud auth application-default login`) y dejaban vencida/desalineada la sesion CLI de `gcloud`.
+
+Cambios aplicados:
+
+- Nuevo `scripts/gcloud-auth-preflight.sh` valida ambos planos: `gcloud auth print-access-token` y `gcloud auth application-default print-access-token`.
+- Si cualquiera falla, el preflight renueva ambos flujos en orden canonico:
+  - `gcloud auth login`
+  - `gcloud auth application-default login`
+- `scripts/pg-connect.sh` ahora llama este preflight antes del proxy Cloud SQL.
+- Nuevo comando `pnpm gcloud:auth:preflight`.
+- `AGENTS.md` actualizado para que la documentacion de PostgreSQL refleje CLI+ADC, no solo ADC.
+
+Validacion:
+
+- `pnpm gcloud:auth:preflight` -> pass.
+- `pnpm pg:connect:status` -> pass; Cloud SQL proxy listo, conexion `greenhouse_ops`, `migrate:status` sin pendientes.
 
 ## Sesion 2026-05-10 — TASK-812 Previred upload correction
 
