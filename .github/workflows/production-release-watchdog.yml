@@ -55,13 +55,22 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
 
-      - name: Setup Node 20
+      # Patron canonico: pnpm SETUP primero, Node DESPUES con cache:pnpm.
+      # Mismo orden que production-release.yml + ci.yml + design-contract.yml.
+      # Order inverso (Node antes que pnpm) hace que setup-node@v5 falle con
+      # "Unable to locate executable file: pnpm" (detectado live 2026-05-10
+      # runs 25632589166 / 25634395735 / 25635607342 — 3 fallos consecutivos
+      # del watchdog scheduled antes de detectar el mis-ordering).
+      - name: Setup pnpm
+        # No `version:` here — heredamos del `packageManager` field en
+        # package.json (Corepack canonical source of truth).
+        uses: pnpm/action-setup@v6
+
+      - name: Setup Node 24
         uses: actions/setup-node@v5
         with:
-          node-version: '20'
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v6
+          node-version: '24'
+          cache: 'pnpm'
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
