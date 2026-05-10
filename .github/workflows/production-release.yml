@@ -104,6 +104,8 @@ jobs:
         id: preflight
         env:
           GITHUB_RELEASE_OBSERVER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TARGET_SHA: ${{ inputs.target_sha }}
+          BYPASS_REASON: ${{ inputs.bypass_preflight_reason }}
         run: |
           # Determine override flag: bypass_preflight_reason >= 20 chars triggers
           # --override-batch-policy. Audit row will be persisted via the
@@ -138,9 +140,6 @@ jobs:
             cat preflight-result.json | jq '.checks[] | select(.severity != "ok")'
             exit ${EXIT_CODE}
           fi
-        env:
-          TARGET_SHA: ${{ inputs.target_sha }}
-          BYPASS_REASON: ${{ inputs.bypass_preflight_reason }}
 
       - name: Upload preflight result
         uses: actions/upload-artifact@v4
@@ -277,6 +276,35 @@ jobs:
     secrets:
       GCP_WORKLOAD_IDENTITY_PROVIDER: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
 
+  # TASK-853 — Azure infra release gating.
+  # Health check Azure corre SIEMPRE (preflight-style); Bicep apply real
+  # gated por diff infra/azure/<sub>/** o force_infra_deploy=true input.
+  # Logic Apps stack (teams-notifications) y Bot Service stack (teams-bot)
+  # corren en paralelo para acortar critical path total del release.
+  deploy-azure-teams-notifications:
+    name: Deploy Azure Teams Notifications (gated)
+    needs: [approval-gate]
+    uses: ./.github/workflows/azure-teams-deploy.yml
+    with:
+      environment: production
+      target_sha: ${{ inputs.target_sha }}
+      force_infra_deploy: ${{ inputs.force_infra_deploy }}
+    # AZURE_* secrets viven en environment-scope (production), NO repo-level.
+    # secrets: inherit es el patron canonico GH Actions para que el callee
+    # los resuelva en su propio environment scope (declarado en cada job).
+    # GCP_WORKLOAD_IDENTITY_PROVIDER (repo-level) tambien fluye via inherit.
+    secrets: inherit
+
+  deploy-azure-teams-bot:
+    name: Deploy Azure Teams Bot (gated)
+    needs: [approval-gate]
+    uses: ./.github/workflows/azure-teams-bot-deploy.yml
+    with:
+      environment: production
+      target_sha: ${{ inputs.target_sha }}
+      force_infra_deploy: ${{ inputs.force_infra_deploy }}
+    secrets: inherit
+
   # ─────────────────────────────────────────────────────────────────────────
   # Job 5: Wait for Vercel production deploy to be READY
   # ─────────────────────────────────────────────────────────────────────────
@@ -334,6 +362,8 @@ jobs:
       - deploy-commercial-cost-worker
       - deploy-ico-batch
       - deploy-hubspot-integration
+      - deploy-azure-teams-notifications
+      - deploy-azure-teams-bot
       - wait-vercel
     timeout-minutes: 5
     steps:
@@ -449,6 +479,8 @@ jobs:
       - deploy-commercial-cost-worker
       - deploy-ico-batch
       - deploy-hubspot-integration
+      - deploy-azure-teams-notifications
+      - deploy-azure-teams-bot
       - wait-vercel
       - post-release-health
       - transition-released
@@ -476,6 +508,8 @@ jobs:
             echo "| commercial-cost-worker | ${{ needs.deploy-commercial-cost-worker.result }} |"
             echo "| ico-batch-worker | ${{ needs.deploy-ico-batch.result }} |"
             echo "| hubspot-integration | ${{ needs.deploy-hubspot-integration.result }} |"
+            echo "| azure-teams-notifications (gated) | ${{ needs.deploy-azure-teams-notifications.result }} |"
+            echo "| azure-teams-bot (gated) | ${{ needs.deploy-azure-teams-bot.result }} |"
             echo "| Vercel ready | ${{ needs.wait-vercel.result }} |"
             echo "| Post-release health | ${{ needs.post-release-health.result }} |"
             echo "| Transition released | ${{ needs.transition-released.result }} |"
