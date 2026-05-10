@@ -261,6 +261,85 @@ tocados, dominios sensibles, migraciones, irreversibilidad, rollback complexity 
 - **OQ2 — Reliability signal thresholds**: usar baselines del spec; tune data-driven post-30d steady-state.
 - **OQ3 — Dashboard `/admin/releases`**: defer a TASK-855 V1.1; V1 cubre operator visibility via signals + psql contra release_manifests.
 
+## Delta 2026-05-10 — TASK-853 Azure Infra Release Gating SHIPPED
+
+Los 2 workflows Azure (`azure-teams-deploy.yml` Logic Apps + `azure-teams-bot-deploy.yml` Bot Service) refactoreados con gating canónico de Bicep apply. Health check Azure (preflight-style) corre SIEMPRE; Bicep apply real corre solo si `force_infra_deploy=true` o diff detectado en `infra/azure/<sub>/**`. Orquestador TASK-851 wires los 2 jobs Azure en paralelo con workers Cloud Run.
+
+### 4 decisiones foundational (4-pillar validadas)
+
+1. **Diff detection live via git** (NO desde manifest histórico) — `git diff --name-only origin/main~1...target_sha -- 'infra/azure/<sub>/**'`. Simple, sin PG round-trip, directo en el workflow runner.
+2. **Annotation explícita ::notice:: + GITHUB_STEP_SUMMARY** (NO skip silencioso) — operator visibility de la razón del skip (`force_infra_deploy=true` | `push_path_filter_matched` | `infra_diff_detected` | `no_infra_diff`).
+3. **Mantener 2 workflows separados** (NO consolidate) — RG + parameters + dominios distintos; merger sería refactor mayor out of scope. Compartir el patrón canónico (5 jobs) es suficiente.
+4. **Health check siempre incluso si Bicep skip** — preflight-style: valida WIF + providers + RG vivos. Si Azure infra está rota, fallar loud antes de continuar el release.
+
+### Componentes shipped
+
+| Componente | Path | Proposito |
+|---|---|---|
+| azure-teams-deploy.yml | `.github/workflows/azure-teams-deploy.yml` | Logic Apps Bicep deploy con 5 jobs canónicos + workflow_call interface |
+| azure-teams-bot-deploy.yml | `.github/workflows/azure-teams-bot-deploy.yml` | Bot Service Bicep deploy con mismo patrón canónico |
+| Orchestrator wiring | `.github/workflows/production-release.yml` | 2 jobs nuevos `deploy-azure-{teams-notifications, teams-bot}` con `secrets: inherit` |
+| Tests anti-regresion | `src/lib/release/concurrency-fix-verification.test.ts` | 11 tests nuevos cubren contracts workflow_call + push trigger preserved + 5 jobs canónicos + orchestrator wiring |
+| Runbook ampliado | `docs/operations/runbooks/production-release.md` | §6.1 gating + §6.2 WIF subjects + §6.3 rollback V2 contingente |
+| Manual operador | `docs/manual-de-uso/plataforma/azure-infra-gating.md` | Modo automático + orchestrator + force; troubleshooting |
+
+### 5 jobs canónicos per workflow Azure (mirror exacto)
+
+1. **health-check** (siempre): Azure login WIF + provider register (`Microsoft.Logic+Web` | `Microsoft.BotService`) + RG ensure idempotent. Outputs `env_label`, `rg_name`, `params_file` para downstream.
+2. **validate**: `az bicep build --file <main.bicep>` lint check.
+3. **diff-detection**: decide `should_deploy: true|false`:
+   - `force_infra_deploy=true` → `true` (force flag short-circuit)
+   - Push event → `true` (path filter implícito ya filtró)
+   - workflow_call/dispatch sin force → `git diff` sobre `infra/azure/<sub>/**`
+4. **deploy** (`if: should_deploy=='true'`): `az deployment group create`.
+5. **skip-deploy-summary** (`if: should_deploy=='false'`): annotation `::notice::` + entry en `GITHUB_STEP_SUMMARY`.
+
+### workflow_call contract canónico
+
+- `inputs.environment` (string, required)
+- `inputs.target_sha` (string, required) — para `git diff origin/main~1...target_sha`
+- `inputs.force_infra_deploy` (boolean, optional default false)
+- `secrets.{AZURE_CLIENT_ID, AZURE_TENANT_ID, AZURE_SUBSCRIPTION_ID}` (required, environment-scoped)
+
+### Patrón canónico GH Actions: secrets: inherit
+
+El orquestador invoca los 2 Azure workflows con `secrets: inherit` (NO explicit pass-through). Razón: los AZURE_* viven en environment scope (production), no repo-level. `inherit` es el patrón GH Actions canónico — el callee resuelve los secrets en su propio environment declarado en cada job. GCP_WORKLOAD_IDENTITY_PROVIDER (repo-level) también fluye via `inherit`.
+
+### WIF subjects canónicos Azure
+
+Federated credential del Azure AD App Registration (tenant `a80bf6c1-7c45-4d70-b043-51389622a0e4`):
+
+- `repo:efeoncepro/greenhouse-eo:ref:refs/heads/main` (deploys auto via push:main)
+- `repo:efeoncepro/greenhouse-eo:ref:refs/heads/develop` (staging)
+- `repo:efeoncepro/greenhouse-eo:environment:production` (workflow_call con `environment: production`)
+
+### Tests anti-regresion (21/21 verdes)
+
+- 10 originales TASK-851 (concurrency fix Opcion A + worker workflow_call contracts)
+- 11 nuevos TASK-853:
+  - 2 tests workflow_call contracts (inputs + secrets canónicos) por workflow Azure
+  - 2 tests push trigger preserved (back-compat)
+  - 2 tests workflow_dispatch.force_infra_deploy override
+  - 2 tests 5 jobs canónicos (health-check, validate, diff-detection, deploy, skip-deploy-summary)
+  - 1 test orchestrator declara los 2 jobs Azure
+  - 1 test post-release-health.needs incluye los 2 Azure jobs
+  - 1 test Azure jobs use `secrets: inherit`
+
+### Rollback automatizado Azure NO en V1
+
+Reapply de Bicep templates puede ser destructivo:
+- `delete-on-deletion` semantics
+- Federated credential rotation (workflows quedarían sin acceso)
+- App Service config reset (webhooks externos rotos)
+
+V2 contingente queda documentado en runbook §6.3 con `az deployment group what-if` mandatory antes de cualquier apply.
+
+### Pendiente para TASK-854
+
+- TASK-854 Release Observability Completion: 2 reliability signals nuevos (`platform.release.deploy_duration_p95`, `platform.release.last_status`) + dashboard UI consume manifest histórico. Visualiza también el gating Azure (deploy vs skip) per release histórico.
+
+---
+
 ## Delta 2026-05-10 — TASK-851 Production Release Orchestrator SHIPPED
 
 Workflow canonico `.github/workflows/production-release.yml` que coordina la promocion `develop → main` end-to-end. Compactacion arch-architect de TASK-851 + TASK-852 originales — orquestador y SHA verification son arquitecturalmente acoplados.

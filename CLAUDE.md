@@ -1728,6 +1728,66 @@ Workflow GitHub Actions canonico `production-release.yml` que coordina la promoc
 
 **Spec canonica**: `docs/tasks/in-progress/TASK-851-production-release-orchestrator-workflow.md`. Workflow: `.github/workflows/production-release.yml`. CLI: `pnpm release:orchestrator-{record-started,transition-state}`. Tests: `concurrency-fix-verification.test.ts` + `state-machine.test.ts` + `state-machine.live.test.ts`.
 
+### Azure Infra Release Gating invariants (TASK-853)
+
+Los 2 workflows Azure (`azure-teams-deploy.yml` Logic Apps + `azure-teams-bot-deploy.yml` Bot Service) operan con gating canonico cuando se invocan desde el orquestador (TASK-851) — Bicep apply real solo corre si hay diff `infra/azure/<sub>/**` o `force_infra_deploy=true`. Health check Azure (preflight-style) corre SIEMPRE.
+
+**Trigger paths canonicos** (los 3 coexisten):
+- `push:main` con path filter `infra/azure/<sub>/**` (auto-deploy cuando alguien pushea cambio Bicep)
+- `workflow_dispatch` con `force_infra_deploy` boolean input (operator manual)
+- `workflow_call` desde `production-release.yml` orquestador (gated por diff entre `origin/main~1` y `inputs.target_sha`)
+
+**5 jobs canonicos** (idénticos en ambos workflows):
+
+1. `health-check` — preflight-style. Azure login WIF + provider register (`Microsoft.Logic+Web` para teams-notifications, `Microsoft.BotService` para teams-bot) + RG ensure idempotent. Outputs `env_label`, `rg_name`, `params_file` para downstream jobs. **Corre SIEMPRE** independiente del diff.
+2. `validate` — `az bicep build --file <main.bicep>` lint check.
+3. `diff-detection` — decide `should_deploy: true|false`:
+   - `force_infra_deploy=true` → `true` (force flag short-circuit)
+   - Push event → `true` (path filter implícito ya filtró)
+   - workflow_call/dispatch sin force → `git diff --name-only origin/main~1...target_sha -- 'infra/azure/<sub>/**'` → `true` si cambios, `false` si no
+4. `deploy` — `if: ${{ needs.diff-detection.outputs.should_deploy == 'true' }}` → `az deployment group create`.
+5. `skip-deploy-summary` — `if: ${{ needs.diff-detection.outputs.should_deploy == 'false' }}` → annotation `::notice::` + `GITHUB_STEP_SUMMARY` con razón explícita del skip.
+
+**workflow_call interface canonico**:
+
+- `inputs.environment` (string, required) — `staging` | `production`
+- `inputs.target_sha` (string, required) — para diff detection vs `origin/main~1`
+- `inputs.force_infra_deploy` (boolean, optional default false) — operator override
+- `secrets.{AZURE_CLIENT_ID, AZURE_TENANT_ID, AZURE_SUBSCRIPTION_ID}` (required) — environment-scoped secrets
+
+**Patron canonico para secrets en orchestrator**: `secrets: inherit` (NO `secrets: AZURE_*: ${{ secrets.AZURE_* }}` explicito). Los AZURE_* viven en environment scope (production), no repo-level. `inherit` es el patron GH Actions canonico — el callee resuelve los secrets en su propio environment declarado en cada job. GCP_WORKLOAD_IDENTITY_PROVIDER (repo-level) tambien fluye via `inherit`.
+
+**WIF subjects canonicos Azure** (federated credential del Azure AD App Registration en tenant `a80bf6c1-7c45-4d70-b043-51389622a0e4`):
+
+- `repo:efeoncepro/greenhouse-eo:ref:refs/heads/main` (deploys auto via push:main)
+- `repo:efeoncepro/greenhouse-eo:ref:refs/heads/develop` (staging)
+- `repo:efeoncepro/greenhouse-eo:environment:production` (cuando workflow declara `environment: production`)
+
+Verificación: `az ad app federated-credential list --id <AZURE_CLIENT_ID> -o table`. Adicion: `az ad app federated-credential create --id <AZURE_CLIENT_ID> --parameters <json>`.
+
+**Critical path en orchestrator**: los 2 jobs Azure corren en paralelo con los 4 workers Cloud Run para acortar duración total del release. `post-release-health.needs` espera por ambos antes de pingear `/api/auth/health`.
+
+**Reliability signals**: 0 nuevos en TASK-853. Los signals existentes del subsystem `Platform Release` cubren el flow.
+
+**Outbox events**: 0 nuevos. Reusa los 7 existentes via manifest-store helpers (TASK-848 V1.0).
+
+**Capabilities**: 0 nuevas. `force_infra_deploy=true` reusa `platform.release.execute` (TASK-848 V1.0).
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** modificar el shape de `inputs.{environment, target_sha, force_infra_deploy}` ni `secrets.AZURE_*` en los 2 Azure workflow_call. TASK-851 orquestador depende de la estabilidad. Adding optional inputs OK; renaming requires bumpear contract version.
+- **NUNCA** colapsar el `health-check` job en `deploy` job. Health check corre SIEMPRE como preflight-style — su valor es detectar WIF roto o RG borrado ANTES de tocar Bicep, incluso cuando el deploy real skip por no-diff.
+- **NUNCA** convertir `secrets: inherit` a explicit pass-through en orchestrator (e.g. `secrets: AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}`). Los AZURE_* son environment-scoped — explicit pass-through devuelve null porque el caller orchestrator no tiene environment declarado en el job que invoca workflow_call. `inherit` es el patron canonico.
+- **NUNCA** declarar `environment: production` directamente en el job orchestrator que invoca el workflow_call (`deploy-azure-*`). GH Actions no permite combinar `uses:` con `environment:` en el mismo job. El callee declara environment en sus propios jobs y resuelve secrets ahi.
+- **NUNCA** skipear el `health-check` job cuando `should_deploy=false`. La idea de health-check es preflight independiente del Bicep apply.
+- **NUNCA** modificar el `git diff --name-only origin/main~1...target_sha` para usar `HEAD~1` o `HEAD~N`. `origin/main~1` apunta al "previo deployado en main" cuando se invoca via orchestrator post-merge a main. Si el target_sha no es descendiente de origin/main~1, la diff puede dar falso positivo.
+- **NUNCA** automatizar Azure rollback en V1. Reapply de Bicep templates puede ser destructivo (`delete-on-deletion`, federated credential rotation, App Service config reset). V2 contingente con `what-if` mandatory.
+- **NUNCA** invocar `Sentry.captureException` directo en code paths del orchestrator wiring. Use `captureWithDomain(err, 'cloud', { tags: { source: 'production_release', stage: 'azure_deploy' } })`.
+- **SIEMPRE** que emerja un nuevo Bicep stack (e.g. `infra/azure/<new-stack>`), aplicar el mismo patron canonico: refactor a workflow_call con los 5 jobs + agregar al orquestador como job nuevo `deploy-azure-<stack>` con `secrets: inherit` + extender `post-release-health.needs` y `summary.needs`.
+- **SIEMPRE** que se modifique un Azure workflow, correr `concurrency-fix-verification.test.ts` para verificar que los 5 jobs canonicos siguen presentes + workflow_call contracts intactos.
+
+**Spec canonica**: `docs/tasks/in-progress/TASK-853-azure-infra-release-gating.md`. Workflows: `.github/workflows/azure-{teams,teams-bot}-deploy.yml`. Tests: `concurrency-fix-verification.test.ts` (sección TASK-853). Runbook: `docs/operations/runbooks/production-release.md` §6.1, §6.2, §6.3.
+
 ### Finance write-path E2E gate (TASK-773 Slice 6)
 
 Cualquier task que toque handlers `POST/PUT/PATCH/DELETE` en `src/app/api/finance/**/route.ts` **debe verificar el flow end-to-end downstream**, no solo el contract API. Bug class detectada 2026-05-03: el endpoint Figma respondía 200 OK pero el TC Santander no rebajaba — porque el contract API funcionaba pero el side effect downstream (outbox → BQ → reactive → account_balance) calló silencioso.

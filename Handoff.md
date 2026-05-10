@@ -1,3 +1,36 @@
+# Sesion 2026-05-10 — TASK-853 Azure Infra Release Gating SHIPPED
+
+- **Trigger:** post TASK-851 SHIPPED, usuario instruyó continuar con TASK-853 directo en `develop` sin cambiar rama. Auto mode activo.
+- **Branch:** `develop` (sin rama nueva).
+- **Decisiones foundational pre-execution (4-pillar validadas inline)**:
+  1. **Diff detection live via git** (NO desde manifest histórico) — `git diff --name-only origin/main~1...target_sha -- 'infra/azure/<sub>/**'`. Simple, sin PG round-trip.
+  2. **Annotation explícita ::notice:: + GITHUB_STEP_SUMMARY** (NO skip silencioso) — operator visibility de la razón del skip.
+  3. **Mantener 2 workflows separados** (NO consolidate) — RG + parameters + dominios distintos; merger sería refactor mayor out of scope.
+  4. **Health check siempre incluso si Bicep skip** — preflight-style: valida WIF + providers + RG vivos. Si Azure infra está rota, fallar loud antes de continuar.
+- **Slices commiteados (4 commits incrementales)**:
+  - `8b041228` Slice 0 — 2 Azure workflows refactor a 5 jobs canónicos (health-check + validate + diff-detection + deploy + skip-deploy-summary) + workflow_call interface
+  - `c8f9c235` Slice 1 — production-release.yml 2 jobs nuevos `deploy-azure-{teams-notifications, teams-bot}` con `secrets: inherit`
+  - `d4845438` Slice 2 — 11 tests anti-regresion + runbook §6.1 gating + §6.2 WIF subjects + §6.3 rollback V2 contingente
+  - (este commit) Slice 3 — Docs canónicas + cierre
+  - **Total: 21/21 tests verdes** (10 originales TASK-851 + 11 nuevos TASK-853)
+- **Defensa-in-depth verificada**:
+  - Health check Azure SIEMPRE corre (preflight-style)
+  - Bicep apply gated por 3 caminos: force flag | push event | git diff
+  - `secrets: inherit` resuelve AZURE_* en environment scope automáticamente
+  - Test anti-regresion verifica los 5 jobs canónicos por workflow + orchestrator wiring
+- **Docs canonizadas (Slice 3)**:
+  - `CLAUDE.md` nueva sección "Azure Infra Release Gating invariants (TASK-853)" con 5 jobs + workflow_call contract + WIF subjects + 11 reglas duras
+  - `AGENTS.md` nueva sección "Azure Infra Release Gating (TASK-853, 2026-05-10)" para discovery rápido
+  - `docs/architecture/DECISIONS_INDEX.md` entry "Azure infra release gating: health-check siempre + Bicep apply gated"
+  - `docs/architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md` Delta TASK-853 SHIPPED con 4 decisiones validadas + componentes shipped + tests + V1 vs V2
+  - `docs/manual-de-uso/plataforma/azure-infra-gating.md` NUEVO manual operador-facing con modos automático/orchestrator/force + troubleshooting
+  - `docs/documentation/plataforma/azure-infra-gating.md` NUEVO doc funcional con detalle técnico + costos + roadmap
+  - `docs/operations/runbooks/production-release.md` extendido §6.1 (gating auto) + §6.2 (WIF subjects + comandos `az ad app federated-credential`) + §6.3 (rollback V2 contingente)
+- **Skills invocadas:** `arch-architect` (validacion 4-pillar inline pre-execution constante) + `greenhouse-backend` (implementación).
+- **Próximo paso:** TASK-854 (Release Observability Completion) — última pendiente del control plane V1.1.
+
+---
+
 # Sesion 2026-05-10 — TASK-851 Production Release Orchestrator + Worker SHA Verification SHIPPED
 
 - **Trigger:** post TASK-850 SHIPPED, usuario instruyó continuar con TASK-851 directo en `develop` sin cambiar rama. Auto mode activo + arch-architect inline 4-pillar validacion.

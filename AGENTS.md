@@ -818,6 +818,23 @@ Contrato versionado `platform-health.v1`. Permite a agentes (MCP, Teams bot, CI,
 - **Cero capabilities nuevas**: reusa `platform.release.execute` + `platform.release.preflight.execute` + `platform.release.bypass_preflight`.
 - **Spec canonica**: `docs/tasks/in-progress/TASK-851-production-release-orchestrator-workflow.md`. Workflow: `.github/workflows/production-release.yml`. CLAUDE.md sección "Production Release Orchestrator invariants (TASK-851)". Manual operador: `docs/manual-de-uso/plataforma/release-orchestrator.md`. Doc funcional: `docs/documentation/plataforma/release-orchestrator.md`.
 
+### Azure Infra Release Gating (TASK-853, 2026-05-10)
+
+- **Que hace**: extiende los 2 workflows Azure (`azure-teams-deploy.yml` Logic Apps + `azure-teams-bot-deploy.yml` Bot Service) con gating canonico de Bicep apply. Health check Azure (preflight-style: WIF + providers + RG) corre SIEMPRE. Bicep apply real corre solo si `force_infra_deploy=true` o diff detectado en `infra/azure/<sub>/**`.
+- **5 jobs canonicos** per workflow: health-check (siempre) → validate (Bicep lint) → diff-detection (decide should_deploy) → deploy (condicional) | skip-deploy-summary (annotation + GITHUB_STEP_SUMMARY).
+- **3 entrypoints coexisten**: push:main + workflow_dispatch (operator) + workflow_call (orquestador TASK-851).
+- **workflow_call contract canonico**: inputs.{environment, target_sha, force_infra_deploy} + secrets.{AZURE_CLIENT_ID, AZURE_TENANT_ID, AZURE_SUBSCRIPTION_ID}.
+- **Orquestador wiring**: `production-release.yml` invoca los 2 Azure workflows en paralelo con los 4 workers Cloud Run via `secrets: inherit` (patron canonico GH Actions para environment-scoped secrets — los AZURE_* viven en environment production scope, no repo-level).
+- **WIF subjects canonicos** (Azure AD App Registration tenant `a80bf6c1-7c45-4d70-b043-51389622a0e4`):
+  - `repo:efeoncepro/greenhouse-eo:ref:refs/heads/main` (push:main auto-deploy)
+  - `repo:efeoncepro/greenhouse-eo:ref:refs/heads/develop` (staging)
+  - `repo:efeoncepro/greenhouse-eo:environment:production` (workflow declara `environment: production`)
+- **Si emerge un nuevo Bicep stack**: aplicar el mismo patron canonico — refactor workflow a 5 jobs + agregar al orquestador con `secrets: inherit` + extender `post-release-health.needs` + `summary.needs`.
+- **Tests anti-regresion**: `concurrency-fix-verification.test.ts` (sección TASK-853) verifica los 6 contratos workflow_call + push trigger preserved + workflow_dispatch.force_infra_deploy + 5 jobs canonicos + orchestrator wiring.
+- **Cero outbox events nuevos**, cero capabilities nuevas, cero reliability signals nuevos.
+- **Rollback Azure NO automatizado V1**: reapply destructivo (delete-on-deletion, federated credential rotation, App Service config reset). V2 contingente con `what-if` mandatory.
+- **Spec canonica**: `docs/tasks/in-progress/TASK-853-azure-infra-release-gating.md`. CLAUDE.md sección "Azure Infra Release Gating invariants (TASK-853)". Runbook: `docs/operations/runbooks/production-release.md` §6.1 (gating), §6.2 (WIF subjects), §6.3 (rollback V2 contingente).
+
 ### Cloud Run hubspot-greenhouse-integration (HubSpot write bridge + webhooks) — TASK-574 (2026-04-24)
 
 - Servicio Cloud Run Python/Flask ubicado en `us-central1` (region bloqueada — NO migrar a `us-east4` porque la URL pública contiene `-uc.` y romperia el webhook del portal HubSpot).
