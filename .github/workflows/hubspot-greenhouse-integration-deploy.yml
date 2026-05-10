@@ -60,7 +60,13 @@ on:
 
 concurrency:
   group: hubspot-greenhouse-integration-deploy-${{ github.ref }}
-  cancel-in-progress: false
+  # Patron canonico replicado de ops-worker / commercial-cost-worker / ico-batch
+  # workflows: cancela runs viejos cuando hay push a main O cuando workflow_dispatch
+  # apunta a production. Evita queue stuck cuando approval gate del environment
+  # production no se firma a tiempo (caso real 2026-05-10 run 25634020354 stuck
+  # 2h+ bloqueando todos los runs subsiguientes via concurrency:false). Staging
+  # preserva cancel-in-progress=false para no perder runs concurrentes en testing.
+  cancel-in-progress: ${{ (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production') || github.ref == 'refs/heads/main' }}
 
 permissions:
   contents: read
