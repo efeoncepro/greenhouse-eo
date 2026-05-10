@@ -8530,6 +8530,26 @@ export interface GreenhouseSyncReleaseStateTransitions {
   transitioned_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseSyncReleaseWatchdogAlertState {
+  /**
+   * Total de alerts enviadas para este (workflow, run, kind). Incrementa con cada escalation o daily reminder.
+   */
+  alert_count: Generated<number>;
+  /**
+   * Tipo de finding: stale_approval | pending_without_jobs | worker_revision_drift. Mismo run puede tener N rows con kinds distintos.
+   */
+  alert_kind: string;
+  first_observed_at: Generated<Timestamp>;
+  last_alerted_at: Generated<Timestamp>;
+  /**
+   * Severity ultima alerta enviada. Usado para detectar escalation (warning → error → critical) y trigger re-alert.
+   */
+  last_alerted_severity: string;
+  metadata_json: Generated<Json>;
+  run_id: Int8;
+  workflow_name: string;
+}
+
 export interface GreenhouseSyncReliabilitySyntheticRuns {
   created_at: Generated<Timestamp>;
   error_message: string | null;
@@ -9144,6 +9164,7 @@ export interface DB {
   "greenhouse_sync.projection_refresh_queue": GreenhouseSyncProjectionRefreshQueue;
   "greenhouse_sync.release_manifests": GreenhouseSyncReleaseManifests;
   "greenhouse_sync.release_state_transitions": GreenhouseSyncReleaseStateTransitions;
+  "greenhouse_sync.release_watchdog_alert_state": GreenhouseSyncReleaseWatchdogAlertState;
   "greenhouse_sync.reliability_synthetic_runs": GreenhouseSyncReliabilitySyntheticRuns;
   "greenhouse_sync.reporting_hierarchy_drift_proposals": GreenhouseSyncReportingHierarchyDriftProposals;
   "greenhouse_sync.schema_migrations": GreenhouseSyncSchemaMigrations;

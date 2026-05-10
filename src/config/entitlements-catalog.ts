@@ -818,6 +818,17 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     module: 'platform',
     actions: ['bypass_preflight'] as const,
     defaultScope: 'all'
+  },
+  // TASK-849 — Production Release Watchdog: read-only access para query del
+  // CLI desde admin endpoints futuros (admin dashboard /admin/operations
+  // ya consume los signals automaticamente via reliability registry).
+  // Granular least-privilege: NO reusar `platform.release.execute` (semantica
+  // distinta: leer estado vs disparar release).
+  {
+    key: 'platform.release.watchdog.read',
+    module: 'platform',
+    actions: ['read'] as const,
+    defaultScope: 'all'
   }
 ] as const
 
