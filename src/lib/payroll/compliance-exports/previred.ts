@@ -1,3 +1,5 @@
+import { CHILE_ACCIDENT_INSURANCE_ISL_RATE } from '@/lib/payroll/chile-statutory-rates'
+
 import {
   buildComplianceFilename,
   hashText,
@@ -71,6 +73,8 @@ const roundCurrency = (value: number) => Math.round(Number.isFinite(value) ? val
 
 const formatPreviredPeriod = (year: number, month: number): string => `${String(month).padStart(2, '0')}${year}`
 
+const resolvePreviredWorkedDays = (): number => 30
+
 const resolvePreviredJornadaCode = (entry: ChilePayrollComplianceEntry): '1' | '2' | null => {
   if (entry.employmentType === 'full_time') return '1'
   if (entry.employmentType === 'part_time') return '2'
@@ -120,7 +124,7 @@ export const buildPreviredRegulatoryProjection = (
   const sisEmployer = roundCurrency(taxableBase * sisRate)
   const unemploymentEmployee = roundCurrency(taxableBase * employeeRate)
   const cesantiaEmployer = roundCurrency(taxableBase * employerRate)
-  const islEmployer = roundCurrency(entry.chileEmployerMutualAmount)
+  const islEmployer = roundCurrency(taxableBase * CHILE_ACCIDENT_INSURANCE_ISL_RATE)
   const lifeExpectancy = roundCurrency(taxableBase * PREVIRED_LIFE_EXPECTANCY_RATE)
 
   return {
@@ -203,7 +207,9 @@ const validatePreviredEntries = (entries: ChilePayrollComplianceEntry[]) => {
       errors.push(`Entry ${entry.entryId} is missing explicit Previred nationality code (0/1).`)
     }
 
-    if ((entry.workingDaysInPeriod ?? 30) < 0 || (entry.workingDaysInPeriod ?? 30) > 30) {
+    const previredWorkedDays = resolvePreviredWorkedDays()
+
+    if (previredWorkedDays < 0 || previredWorkedDays > 30) {
       errors.push(`Entry ${entry.entryId} has Previred working days outside 0..30.`)
     }
 
@@ -261,7 +267,7 @@ export const buildPreviredRow = (
   assign(fields, 10, previredPeriod)
   assign(fields, 11, resolvePreviredAfpCode(entry.chileAfpName) === '00' ? 'SIP' : 'AFP')
   assign(fields, 12, '0')
-  assign(fields, 13, entry.workingDaysInPeriod ?? 30)
+  assign(fields, 13, resolvePreviredWorkedDays())
   assign(fields, 14, '00')
   assign(fields, 15, '0')
   assign(fields, 18, 'D')

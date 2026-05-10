@@ -16,7 +16,10 @@ taxable bases from payroll, but resolves period-sensitive statutory fields from 
 - Employment schedule/jornada: `greenhouse_core.members.employment_type`
 - Isapre obligatory amount: 7% of taxable base; the difference against the pactada amount is emitted as additional.
 - AFC employee/employer split: derived from `contract_type_snapshot`.
-- ISL/accident contribution: emitted in the ISL fields unless a future profile explicitly models a supported mutual code.
+- Previred worked days: emitted as 30 in V1 unless a future movement-of-personnel profile explicitly declares a
+  supported movement for the period; attendance working days remain in payroll receipts/LRE.
+- ISL/accident contribution: calculated with the canonical Chile accident insurance rate and emitted in the ISL
+  fields unless a future profile explicitly models a supported mutual code.
 
 This preserves auditability without overwriting the payroll receipt amounts. If a required periodized rate or
 jornada is missing, Previred export fails closed instead of inventing a value.

@@ -95,7 +95,7 @@ describe('Previred compliance export', () => {
     expect(fields[54]).toBe('0')
     expect(fields[63]).toBe('1200000')
     expect(fields[69]).toBe('84000')
-    expect(fields[70]).toBe('11280')
+    expect(fields[70]).toBe('11160')
     expect(fields[74]).toBe('07')
     expect(fields[76]).toBe('0')
     expect(fields[79]).toBe('0')
@@ -140,11 +140,12 @@ describe('Previred compliance export', () => {
       workingDaysInPeriod: 22
     })).split(';')
 
+    expect(fields[12]).toBe('30')
     expect(fields[25]).toBe('35')
     expect(fields[27]).toBe('46128')
     expect(fields[28]).toBe('7076')
     expect(fields[63]).toBe('436815.43')
-    expect(fields[70]).toBe('6274')
+    expect(fields[70]).toBe('4062')
     expect(fields[79]).toBe('30577')
     expect(fields[80]).toBe('131898')
     expect(fields[92]).toBe('1')
@@ -160,7 +161,7 @@ describe('Previred compliance export', () => {
 
     expect(artifact.validation.status).toBe('passed')
     expect(artifact.recordCount).toBe(1)
-    expect(artifact.totals.previredTotal).toBe(307960)
+    expect(artifact.totals.previredTotal).toBe(307840)
   })
 
   it('fails closed when a Chile dependent entry has no verified RUT snapshot', () => {
