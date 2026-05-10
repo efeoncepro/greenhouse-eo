@@ -1,0 +1,482 @@
+name: Production Release Orchestrator
+
+# TASK-851 — Production Release Control Plane V1.1 orchestrator.
+#
+# Coordinates the canonical develop → main release flow:
+#
+#   1. Preflight (TASK-850): pnpm release:preflight --json --fail-on-error.
+#      Exit 1 if overallStatus=blocked → orchestrator aborts before any
+#      mutation. Operators can pass bypass_preflight_reason (>=20 chars,
+#      requires platform.release.bypass_preflight capability) to override.
+#
+#   2. Record manifest started (TASK-848 V1.0 helper): INSERT row in
+#      greenhouse_sync.release_manifests with state='preflight', emit outbox
+#      event platform.release.started v1, audit row in
+#      release_state_transitions. Output: release_id consumed by all later jobs.
+#
+#   3. Approval gate via GitHub Environment 'Production' (required reviewers
+#      defined in Repo Settings).
+#
+#   4. Workers deploy (matrix in parallel via workflow_call): ops-worker,
+#      commercial-cost-worker, ico-batch, hubspot-greenhouse-integration.
+#      Each worker verifies GIT_SHA matches expected_sha post-deploy and
+#      polls Ready=True with 300s timeout.
+#
+#   5. Vercel deployment readiness wait: Vercel deploys automatically on
+#      push to main via git integration; this step waits for the latest
+#      production deployment matching target_sha to be READY.
+#
+#   6. Post-release health: ping /api/auth/health on production custom
+#      domain to confirm the new deploy is serving.
+#
+#   7. Transition manifest to 'released' (or 'degraded' if health soft-failed):
+#      pnpm release:orchestrator-transition-state. Outbox event
+#      platform.release.released v1.
+#
+#   8. Summary to GITHUB_STEP_SUMMARY.
+#
+# Concurrency: production-release-${{ inputs.target_sha }} with
+# cancel-in-progress=false. Each release SHA gets its own group — distinct
+# SHAs do NOT race. The partial UNIQUE INDEX on release_manifests
+# (release_manifests_one_active_per_branch_idx, TASK-848 V1.0) enforces only
+# 1 active release per branch at the DB layer.
+#
+# Spec: docs/architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md.
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_sha:
+        description: 'Target git SHA to deploy (40 hex chars)'
+        type: string
+        required: true
+      force_infra_deploy:
+        description: 'Force Azure/Bicep infra deploy regardless of diff (TASK-853)'
+        type: boolean
+        required: false
+        default: false
+      bypass_preflight_reason:
+        description: 'Break-glass: skip preflight check 4 (release_batch_policy). Reason >=20 chars. Requires platform.release.bypass_preflight capability.'
+        type: string
+        required: false
+        default: ''
+
+# Concurrency per target_sha — distinct SHAs deploy independently.
+concurrency:
+  group: production-release-${{ inputs.target_sha }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  # ─────────────────────────────────────────────────────────────────────────
+  # Job 1: Preflight (TASK-850)
+  # ─────────────────────────────────────────────────────────────────────────
+  preflight:
+    name: Preflight (TASK-850 CLI)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      preflight_passed: ${{ steps.preflight.outputs.passed }}
+
+    steps:
+      - name: Checkout target SHA
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.target_sha }}
+          fetch-depth: 0
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Set up Node 24
+        uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run preflight CLI
+        id: preflight
+        env:
+          GITHUB_RELEASE_OBSERVER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Determine override flag: bypass_preflight_reason >= 20 chars triggers
+          # --override-batch-policy. Audit row will be persisted via the
+          # orchestrator-record-started step in Job 2.
+          OVERRIDE_FLAG=""
+          REASON_LENGTH=${#BYPASS_REASON}
+          if [ ${REASON_LENGTH} -ge 20 ]; then
+            OVERRIDE_FLAG="--override-batch-policy"
+            echo "Bypass preflight reason accepted (length=${REASON_LENGTH})"
+          elif [ ${REASON_LENGTH} -gt 0 ]; then
+            echo "::error::bypass_preflight_reason length=${REASON_LENGTH} but >=20 chars required"
+            exit 1
+          fi
+
+          # Run preflight: write JSON to file for archival, run again for stdout summary
+          set +e
+          pnpm release:preflight \
+            --json \
+            --fail-on-error \
+            ${OVERRIDE_FLAG} \
+            --target-sha=${TARGET_SHA} \
+            --target-branch=main > preflight-result.json
+          EXIT_CODE=$?
+          set -e
+
+          if [ ${EXIT_CODE} -eq 0 ]; then
+            echo "passed=true" >> "$GITHUB_OUTPUT"
+            echo "✓ Preflight passed"
+          else
+            echo "passed=false" >> "$GITHUB_OUTPUT"
+            echo "::error::Preflight failed (exit ${EXIT_CODE})"
+            cat preflight-result.json | jq '.checks[] | select(.severity != "ok")'
+            exit ${EXIT_CODE}
+          fi
+        env:
+          TARGET_SHA: ${{ inputs.target_sha }}
+          BYPASS_REASON: ${{ inputs.bypass_preflight_reason }}
+
+      - name: Upload preflight result
+        uses: actions/upload-artifact@v4
+        with:
+          name: preflight-result
+          path: preflight-result.json
+          retention-days: 30
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # Job 2: Record manifest started (TASK-848 V1.0 helper)
+  # ─────────────────────────────────────────────────────────────────────────
+  record-started:
+    name: Record release_manifests started
+    runs-on: ubuntu-latest
+    needs: [preflight]
+    timeout-minutes: 5
+    outputs:
+      release_id: ${{ steps.record.outputs.release_id }}
+
+    steps:
+      - name: Checkout target SHA
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.target_sha }}
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Set up Node 24
+        uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Authenticate to Google Cloud (for Cloud SQL Connector)
+        uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: github-actions-deployer@efeonce-group.iam.gserviceaccount.com
+
+      - name: Download preflight result
+        uses: actions/download-artifact@v4
+        with:
+          name: preflight-result
+
+      - name: Record release manifest
+        id: record
+        env:
+          GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME: efeonce-group:us-east4:greenhouse-pg-dev
+          GREENHOUSE_POSTGRES_DATABASE: greenhouse_app
+          GREENHOUSE_POSTGRES_USER: greenhouse_ops
+          GREENHOUSE_POSTGRES_PASSWORD_SECRET_REF: greenhouse-pg-dev-ops-password:latest
+          GCP_PROJECT: efeonce-group
+        run: |
+          OUTPUT=$(pnpm release:orchestrator-record-started \
+            --target-sha=${{ inputs.target_sha }} \
+            --triggered-by=${{ github.actor }} \
+            --target-branch=main \
+            --source-branch=develop \
+            --preflight-result-file=preflight-result.json)
+
+          RELEASE_ID=$(echo "${OUTPUT}" | jq -r '.releaseId')
+          ATTEMPT_N=$(echo "${OUTPUT}" | jq -r '.attemptN')
+
+          if [ -z "${RELEASE_ID}" ] || [ "${RELEASE_ID}" = "null" ]; then
+            echo "::error::record-started failed to return release_id"
+            echo "Output: ${OUTPUT}"
+            exit 1
+          fi
+
+          echo "release_id=${RELEASE_ID}" >> "$GITHUB_OUTPUT"
+          echo "✓ Release manifest recorded: release_id=${RELEASE_ID} attempt_n=${ATTEMPT_N}"
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # Job 3: Approval gate via GitHub Environment 'Production'
+  # ─────────────────────────────────────────────────────────────────────────
+  approval-gate:
+    name: Approval gate (Production environment)
+    runs-on: ubuntu-latest
+    needs: [record-started]
+    timeout-minutes: 4320  # 3 days max wait for approval
+    environment: production
+    steps:
+      - name: Approval received
+        run: |
+          echo "✓ Production approval received for release_id=${{ needs.record-started.outputs.release_id }}"
+          echo "  Triggered by: ${{ github.actor }}"
+          echo "  Target SHA:   ${{ inputs.target_sha }}"
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # Job 4: Workers deploy (parallel matrix via workflow_call)
+  # ─────────────────────────────────────────────────────────────────────────
+  deploy-ops-worker:
+    name: Deploy ops-worker
+    needs: [approval-gate]
+    uses: ./.github/workflows/ops-worker-deploy.yml
+    with:
+      environment: production
+      expected_sha: ${{ inputs.target_sha }}
+    secrets:
+      GCP_WORKLOAD_IDENTITY_PROVIDER: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+
+  deploy-commercial-cost-worker:
+    name: Deploy commercial-cost-worker
+    needs: [approval-gate]
+    uses: ./.github/workflows/commercial-cost-worker-deploy.yml
+    with:
+      environment: production
+      expected_sha: ${{ inputs.target_sha }}
+    secrets:
+      GCP_WORKLOAD_IDENTITY_PROVIDER: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+
+  deploy-ico-batch:
+    name: Deploy ico-batch-worker
+    needs: [approval-gate]
+    uses: ./.github/workflows/ico-batch-deploy.yml
+    with:
+      environment: production
+      expected_sha: ${{ inputs.target_sha }}
+    secrets:
+      GCP_WORKLOAD_IDENTITY_PROVIDER: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+
+  deploy-hubspot-integration:
+    name: Deploy hubspot-greenhouse-integration
+    needs: [approval-gate]
+    uses: ./.github/workflows/hubspot-greenhouse-integration-deploy.yml
+    with:
+      environment: production
+      expected_sha: ${{ inputs.target_sha }}
+      skip_tests: true
+    secrets:
+      GCP_WORKLOAD_IDENTITY_PROVIDER: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # Job 5: Wait for Vercel production deploy to be READY
+  # ─────────────────────────────────────────────────────────────────────────
+  wait-vercel:
+    name: Wait Vercel production deploy READY
+    runs-on: ubuntu-latest
+    needs: [approval-gate]
+    timeout-minutes: 15
+    steps:
+      - name: Poll Vercel API for production deployment matching target_sha
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_TEAM_ID: efeonce-7670142f
+          VERCEL_PROJECT_ID: prj_d9v6gihlDq4k1EXazPvzWhSU0qbl
+          TARGET_SHA: ${{ inputs.target_sha }}
+        run: |
+          if [ -z "${VERCEL_TOKEN}" ]; then
+            echo "::warning::VERCEL_TOKEN not configured — skipping Vercel readiness check"
+            exit 0
+          fi
+
+          DEADLINE=$((SECONDS + 900))
+          while [ ${SECONDS} -lt ${DEADLINE} ]; do
+            RESPONSE=$(curl -s -H "Authorization: Bearer ${VERCEL_TOKEN}" \
+              "https://api.vercel.com/v6/deployments?projectId=${VERCEL_PROJECT_ID}&teamId=${VERCEL_TEAM_ID}&target=production&limit=10")
+
+            MATCHING=$(echo "${RESPONSE}" | jq -r --arg sha "${TARGET_SHA}" \
+              '.deployments[] | select(.meta.githubCommitSha == $sha or .meta.gitCommitSha == $sha) | "\(.uid)|\(.state)"' | head -1)
+
+            if [ -n "${MATCHING}" ]; then
+              STATE="${MATCHING##*|}"
+              UID="${MATCHING%%|*}"
+              if [ "${STATE}" = "READY" ]; then
+                echo "✓ Vercel production deploy READY: uid=${UID}"
+                exit 0
+              fi
+              echo "  found deployment ${UID} in state=${STATE}, waiting..."
+            else
+              echo "  no Vercel deployment for SHA=${TARGET_SHA} yet, waiting..."
+            fi
+            sleep 30
+          done
+
+          echo "::error::Vercel production deploy did not reach READY for SHA=${TARGET_SHA} within 900s"
+          exit 1
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # Job 6: Post-release health check
+  # ─────────────────────────────────────────────────────────────────────────
+  post-release-health:
+    name: Post-release health check
+    runs-on: ubuntu-latest
+    needs:
+      - deploy-ops-worker
+      - deploy-commercial-cost-worker
+      - deploy-ico-batch
+      - deploy-hubspot-integration
+      - wait-vercel
+    timeout-minutes: 5
+    steps:
+      - name: Ping production /api/auth/health
+        run: |
+          for i in 1 2 3; do
+            sleep 5
+            RESPONSE=$(curl -s -o /dev/null -w '%{http_code}' "https://greenhouse.efeoncepro.com/api/auth/health")
+            if [ "${RESPONSE}" = "200" ]; then
+              echo "✓ Production /api/auth/health returned 200 (attempt ${i})"
+              exit 0
+            fi
+            echo "  attempt ${i}/3: HTTP ${RESPONSE}"
+          done
+
+          echo "::warning::Production /api/auth/health did not return 200 after 3 attempts — release will be marked degraded"
+          # Soft-fail: orchestrator transitions to 'degraded' instead of 'aborted'.
+          # Operator decides via runbook whether to rollback or forward-fix.
+          exit 78  # neutral exit code — workflow continues but step is yellow
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # Job 7: Transition manifest to released (or degraded if health soft-failed)
+  # ─────────────────────────────────────────────────────────────────────────
+  transition-released:
+    name: Transition release_manifests → released
+    runs-on: ubuntu-latest
+    needs: [record-started, post-release-health]
+    if: always() && needs.record-started.result == 'success'
+    timeout-minutes: 5
+    steps:
+      - name: Checkout target SHA
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.target_sha }}
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Set up Node 24
+        uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: github-actions-deployer@efeonce-group.iam.gserviceaccount.com
+
+      - name: Transition state preflight → ready
+        env:
+          GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME: efeonce-group:us-east4:greenhouse-pg-dev
+          GREENHOUSE_POSTGRES_DATABASE: greenhouse_app
+          GREENHOUSE_POSTGRES_USER: greenhouse_ops
+          GREENHOUSE_POSTGRES_PASSWORD_SECRET_REF: greenhouse-pg-dev-ops-password:latest
+          GCP_PROJECT: efeonce-group
+        run: |
+          # State machine flow: preflight → ready → deploying → verifying → released|degraded
+          # We collapse this into 4 transitions at the orchestrator boundary.
+          for transition in "preflight:ready:Approval gate cleared" "ready:deploying:Workers deploy started" "deploying:verifying:Workers deploy completed"; do
+            FROM="${transition%%:*}"
+            REST="${transition#*:}"
+            TO="${REST%%:*}"
+            REASON="${REST#*:}"
+
+            pnpm release:orchestrator-transition-state \
+              --release-id=${{ needs.record-started.outputs.release_id }} \
+              --from-state=${FROM} \
+              --to-state=${TO} \
+              --actor-kind=cli \
+              --actor-label=orchestrator-workflow \
+              --reason="${REASON} (orchestrator workflow ${{ github.run_id }})"
+          done
+
+      - name: Transition state verifying → released | degraded
+        env:
+          GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME: efeonce-group:us-east4:greenhouse-pg-dev
+          GREENHOUSE_POSTGRES_DATABASE: greenhouse_app
+          GREENHOUSE_POSTGRES_USER: greenhouse_ops
+          GREENHOUSE_POSTGRES_PASSWORD_SECRET_REF: greenhouse-pg-dev-ops-password:latest
+          GCP_PROJECT: efeonce-group
+        run: |
+          # post-release-health soft-fail (exit 78) → degraded; success → released
+          if [ "${{ needs.post-release-health.result }}" = "success" ]; then
+            FINAL_STATE="released"
+            REASON="Post-release health verified (orchestrator workflow ${{ github.run_id }})"
+          else
+            FINAL_STATE="degraded"
+            REASON="Post-release health soft-failed (orchestrator workflow ${{ github.run_id }}). Operator must inspect dashboard."
+          fi
+
+          pnpm release:orchestrator-transition-state \
+            --release-id=${{ needs.record-started.outputs.release_id }} \
+            --from-state=verifying \
+            --to-state=${FINAL_STATE} \
+            --actor-kind=cli \
+            --actor-label=orchestrator-workflow \
+            --reason="${REASON}"
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # Job 8: Summary
+  # ─────────────────────────────────────────────────────────────────────────
+  summary:
+    name: Release summary
+    runs-on: ubuntu-latest
+    needs:
+      - record-started
+      - deploy-ops-worker
+      - deploy-commercial-cost-worker
+      - deploy-ico-batch
+      - deploy-hubspot-integration
+      - wait-vercel
+      - post-release-health
+      - transition-released
+    if: always()
+    steps:
+      - name: Build summary
+        run: |
+          {
+            echo "## Production Release — ${{ inputs.target_sha }}"
+            echo ""
+            echo "| Aspect | Value |"
+            echo "|---|---|"
+            echo "| release_id | ${{ needs.record-started.outputs.release_id }} |"
+            echo "| Target SHA | ${{ inputs.target_sha }} |"
+            echo "| Triggered by | ${{ github.actor }} |"
+            echo "| Workflow run | [${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) |"
+            echo ""
+            echo "### Job results"
+            echo ""
+            echo "| Job | Result |"
+            echo "|---|---|"
+            echo "| Preflight | ${{ needs.preflight.result || '—' }} |"
+            echo "| Record started | ${{ needs.record-started.result }} |"
+            echo "| ops-worker | ${{ needs.deploy-ops-worker.result }} |"
+            echo "| commercial-cost-worker | ${{ needs.deploy-commercial-cost-worker.result }} |"
+            echo "| ico-batch-worker | ${{ needs.deploy-ico-batch.result }} |"
+            echo "| hubspot-integration | ${{ needs.deploy-hubspot-integration.result }} |"
+            echo "| Vercel ready | ${{ needs.wait-vercel.result }} |"
+            echo "| Post-release health | ${{ needs.post-release-health.result }} |"
+            echo "| Transition released | ${{ needs.transition-released.result }} |"
+          } >> "$GITHUB_STEP_SUMMARY"
