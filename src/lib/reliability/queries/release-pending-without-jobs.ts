@@ -2,6 +2,13 @@ import 'server-only'
 
 import { captureWithDomain } from '@/lib/observability/capture'
 import { redactErrorForResponse } from '@/lib/observability/redact'
+import {
+  buildGithubAuthHeaders,
+  fetchGithubWithTimeout,
+  githubRepoCoords,
+  resolveGithubToken
+} from '@/lib/release/github-helpers'
+import { RELEASE_DEPLOY_WORKFLOW_NAMES } from '@/lib/release/workflow-allowlist'
 import type { ReliabilitySignal, ReliabilitySeverity } from '@/types/reliability'
 
 /**
@@ -34,20 +41,7 @@ import type { ReliabilitySignal, ReliabilitySeverity } from '@/types/reliability
 export const RELEASE_PENDING_WITHOUT_JOBS_SIGNAL_ID =
   'platform.release.pending_without_jobs'
 
-const RELEASE_DEPLOY_WORKFLOW_ALLOWLIST = new Set<string>([
-  'Ops Worker Deploy',
-  'Commercial Cost Worker Deploy',
-  'ICO Batch Worker Deploy',
-  'HubSpot Greenhouse Integration Deploy',
-  'Azure Teams Deploy',
-  'Azure Teams Bot Deploy'
-])
-
 const PENDING_WITHOUT_JOBS_THRESHOLD_MS = 5 * 60 * 1000 // 5 min
-const GH_API_TIMEOUT_MS = 10_000
-
-const REPO_OWNER = process.env.GITHUB_REPOSITORY_OWNER ?? 'efeoncepro'
-const REPO_NAME = process.env.GITHUB_REPOSITORY_NAME ?? 'greenhouse-eo'
 
 interface GithubWorkflowRun {
   id: number
@@ -77,27 +71,6 @@ interface PendingWithoutJobsRecord {
   sha: string
 }
 
-const fetchWithTimeout = async (url: string, init: RequestInit): Promise<Response> => {
-  const controller = new AbortController()
-  const timeout = setTimeout(() => controller.abort(), GH_API_TIMEOUT_MS)
-
-  try {
-    return await fetch(url, { ...init, signal: controller.signal })
-  } finally {
-    clearTimeout(timeout)
-  }
-}
-
-const resolveGithubToken = (): string | null =>
-  process.env.GITHUB_RELEASE_OBSERVER_TOKEN ?? process.env.GITHUB_TOKEN ?? null
-
-const buildAuthHeaders = (token: string): Record<string, string> => ({
-  Accept: 'application/vnd.github+json',
-  'X-GitHub-Api-Version': '2022-11-28',
-  Authorization: `Bearer ${token}`,
-  'User-Agent': 'greenhouse-release-observer'
-})
-
 const RELEVANT_STATUSES = new Set(['queued', 'pending', 'in_progress'])
 
 const listPendingRuns = async (
@@ -105,6 +78,7 @@ const listPendingRuns = async (
 ): Promise<PendingWithoutJobsRecord[]> => {
   const records: PendingWithoutJobsRecord[] = []
   const now = Date.now()
+  const { owner, repo } = githubRepoCoords()
 
   // Fetch un batch reciente que cubre los 3 estados relevantes.
   // GH API filter por status acepta valores individuales — paralelizamos.
@@ -112,9 +86,9 @@ const listPendingRuns = async (
 
   const responses = await Promise.all(
     statuses.map((status) =>
-      fetchWithTimeout(
-        `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/actions/runs?status=${status}&per_page=50`,
-        { headers: buildAuthHeaders(token) }
+      fetchGithubWithTimeout(
+        `https://api.github.com/repos/${owner}/${repo}/actions/runs?status=${status}&per_page=50`,
+        { headers: buildGithubAuthHeaders(token) }
       )
     )
   )
@@ -140,7 +114,7 @@ const listPendingRuns = async (
       if (seenRunIds.has(run.id)) continue
       seenRunIds.add(run.id)
 
-      if (!RELEASE_DEPLOY_WORKFLOW_ALLOWLIST.has(run.name)) continue
+      if (!RELEASE_DEPLOY_WORKFLOW_NAMES.has(run.name)) continue
       if (!RELEVANT_STATUSES.has(run.status)) continue
 
       const ageMs = now - new Date(run.created_at).getTime()
@@ -148,8 +122,8 @@ const listPendingRuns = async (
       if (ageMs <= PENDING_WITHOUT_JOBS_THRESHOLD_MS) continue
 
       // Verificar jobs.length === 0 — esa es la firma del deadlock.
-      const jobsResponse = await fetchWithTimeout(run.jobs_url, {
-        headers: buildAuthHeaders(token)
+      const jobsResponse = await fetchGithubWithTimeout(run.jobs_url, {
+        headers: buildGithubAuthHeaders(token)
       })
 
       if (!jobsResponse.ok) {

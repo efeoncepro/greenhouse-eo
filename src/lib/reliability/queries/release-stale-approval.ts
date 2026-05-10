@@ -2,6 +2,13 @@ import 'server-only'
 
 import { captureWithDomain } from '@/lib/observability/capture'
 import { redactErrorForResponse } from '@/lib/observability/redact'
+import {
+  buildGithubAuthHeaders,
+  fetchGithubWithTimeout,
+  githubRepoCoords,
+  resolveGithubToken
+} from '@/lib/release/github-helpers'
+import { RELEASE_DEPLOY_WORKFLOW_NAMES } from '@/lib/release/workflow-allowlist'
 import type { ReliabilitySignal, ReliabilitySeverity } from '@/types/reliability'
 
 /**
@@ -37,26 +44,8 @@ import type { ReliabilitySignal, ReliabilitySeverity } from '@/types/reliability
  */
 export const RELEASE_STALE_APPROVAL_SIGNAL_ID = 'platform.release.stale_approval'
 
-/**
- * Allowlist de workflows que despliegan a production y aceptan environment
- * approval. Si emerge workflow nuevo, agregarlo aca + verificar WIF subjects
- * para `environment:production` (TASK-848 §Hard Rules).
- */
-const RELEASE_DEPLOY_WORKFLOW_ALLOWLIST = new Set<string>([
-  'Ops Worker Deploy',
-  'Commercial Cost Worker Deploy',
-  'ICO Batch Worker Deploy',
-  'HubSpot Greenhouse Integration Deploy',
-  'Azure Teams Deploy',
-  'Azure Teams Bot Deploy'
-])
-
 const STALE_APPROVAL_WARNING_THRESHOLD_MS = 24 * 60 * 60 * 1000 // 24h
 const STALE_APPROVAL_ERROR_THRESHOLD_MS = 7 * 24 * 60 * 60 * 1000 // 7d
-const GH_API_TIMEOUT_MS = 10_000
-
-const REPO_OWNER = process.env.GITHUB_REPOSITORY_OWNER ?? 'efeoncepro'
-const REPO_NAME = process.env.GITHUB_REPOSITORY_NAME ?? 'greenhouse-eo'
 
 interface GithubWorkflowRun {
   id: number
@@ -85,35 +74,12 @@ interface StaleApprovalRecord {
   sha: string
 }
 
-const fetchWithTimeout = async (url: string, init: RequestInit): Promise<Response> => {
-  const controller = new AbortController()
-  const timeout = setTimeout(() => controller.abort(), GH_API_TIMEOUT_MS)
-
-  try {
-    return await fetch(url, { ...init, signal: controller.signal })
-  } finally {
-    clearTimeout(timeout)
-  }
-}
-
-const resolveGithubToken = (): string | null => {
-  // Vercel runtime: GITHUB_TOKEN no se inyecta automaticamente; debe venir
-  // como secret rotado. Local CLI: usa `gh auth token` previo (env var).
-  return process.env.GITHUB_RELEASE_OBSERVER_TOKEN ?? process.env.GITHUB_TOKEN ?? null
-}
-
-const buildAuthHeaders = (token: string): Record<string, string> => ({
-  Accept: 'application/vnd.github+json',
-  'X-GitHub-Api-Version': '2022-11-28',
-  Authorization: `Bearer ${token}`,
-  'User-Agent': 'greenhouse-release-observer'
-})
-
 const listWaitingProductionRuns = async (
   token: string
 ): Promise<StaleApprovalRecord[]> => {
-  const url = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/actions/runs?status=waiting&per_page=50`
-  const response = await fetchWithTimeout(url, { headers: buildAuthHeaders(token) })
+  const { owner, repo } = githubRepoCoords()
+  const url = `https://api.github.com/repos/${owner}/${repo}/actions/runs?status=waiting&per_page=50`
+  const response = await fetchGithubWithTimeout(url, { headers: buildGithubAuthHeaders(token) })
 
   if (!response.ok) {
     throw new Error(
@@ -126,13 +92,13 @@ const listWaitingProductionRuns = async (
   const now = Date.now()
 
   for (const run of payload.workflow_runs ?? []) {
-    if (!RELEASE_DEPLOY_WORKFLOW_ALLOWLIST.has(run.name)) continue
+    if (!RELEASE_DEPLOY_WORKFLOW_NAMES.has(run.name)) continue
 
     // Verificar que el run tiene pending deployment para Production specifically.
-    const pendingUrl = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/actions/runs/${run.id}/pending_deployments`
+    const pendingUrl = `https://api.github.com/repos/${owner}/${repo}/actions/runs/${run.id}/pending_deployments`
 
-    const pendingResponse = await fetchWithTimeout(pendingUrl, {
-      headers: buildAuthHeaders(token)
+    const pendingResponse = await fetchGithubWithTimeout(pendingUrl, {
+      headers: buildGithubAuthHeaders(token)
     })
 
     if (!pendingResponse.ok) {
