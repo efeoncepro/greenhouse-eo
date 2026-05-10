@@ -93,6 +93,16 @@ jobs:
           # GITHUB_TOKEN auto-provisto por GH Actions runner; el reader lo lee
           # via resolveGithubToken().
           GITHUB_TOKEN: ${{ github.token }}
+          # TASK-849 follow-up 2026-05-10 — el reader worker_revision_drift
+          # debe leer `greenhouse_sync.release_manifests` como SSoT tambien
+          # dentro de GitHub Actions. Sin estas env vars cae al fallback GitHub
+          # API y puede comparar contra workflows directos antiguos en vez del
+          # ultimo manifest released/degraded canonico.
+          GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME: efeonce-group:us-east4:greenhouse-pg-dev
+          GREENHOUSE_POSTGRES_DATABASE: greenhouse_app
+          GREENHOUSE_POSTGRES_USER: greenhouse_ops
+          GREENHOUSE_POSTGRES_PASSWORD_SECRET_REF: greenhouse-pg-dev-ops-password
+          GCP_PROJECT: efeonce-group
           # Activacion de Teams dispatch:
           # - schedule: ENABLE_TEAMS_DISPATCH=true (alertas reales en cada cron run)
           # - workflow_dispatch manual: solo si input enable_teams=true (testing)
