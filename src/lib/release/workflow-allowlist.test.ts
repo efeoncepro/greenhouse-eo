@@ -7,8 +7,8 @@ import {
   findWorkflow
 } from './workflow-allowlist'
 
-describe('workflow-allowlist — canonical 6 workflows', () => {
-  it('contains exactly the 6 production deploy workflows', () => {
+describe('workflow-allowlist — canonical 7 workflows (6 deploy workers + orchestrator)', () => {
+  it('contains exactly the 7 production deploy workflows', () => {
     expect(RELEASE_DEPLOY_WORKFLOWS.map((w) => w.workflowName).sort()).toEqual(
       [
         'Azure Teams Bot Deploy',
@@ -16,7 +16,8 @@ describe('workflow-allowlist — canonical 6 workflows', () => {
         'Commercial Cost Worker Deploy',
         'HubSpot Greenhouse Integration Deploy',
         'ICO Batch Worker Deploy',
-        'Ops Worker Deploy'
+        'Ops Worker Deploy',
+        'Production Release Orchestrator'
       ]
     )
   })
@@ -27,7 +28,24 @@ describe('workflow-allowlist — canonical 6 workflows', () => {
   })
 
   it('Set is read-only (preserve canonical immutability)', () => {
-    expect(RELEASE_DEPLOY_WORKFLOW_NAMES.size).toBe(6)
+    expect(RELEASE_DEPLOY_WORKFLOW_NAMES.size).toBe(7)
+  })
+
+  // Anti-regression: el orchestrator DEBE estar en el allowlist para que
+  // ci_green check (TASK-850) NO cuente runs previos del propio orchestrator
+  // como CI failures. Sin esto: self-reference loop — cada attempt fallido
+  // bloquea el siguiente (detectado live 2026-05-10 run 25635058162).
+  it('includes Production Release Orchestrator (closes ci_green self-reference loop)', () => {
+    expect(RELEASE_DEPLOY_WORKFLOW_NAMES.has('Production Release Orchestrator')).toBe(true)
+  })
+
+  // El orchestrator NO tiene Cloud Run mapping (no participa en revision drift
+  // detection — los workers que despliega via workflow_call sí tienen).
+  it('Production Release Orchestrator has NO Cloud Run mapping', () => {
+    const orchestrator = findWorkflow('Production Release Orchestrator')
+
+    expect(orchestrator).not.toBeNull()
+    expect(orchestrator?.cloudRunService).toBeUndefined()
   })
 })
 

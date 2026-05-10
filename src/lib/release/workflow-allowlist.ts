@@ -54,6 +54,22 @@ export const RELEASE_DEPLOY_WORKFLOWS: readonly ReleaseDeployWorkflow[] = [
   },
   {
     workflowName: 'Azure Teams Bot Deploy'
+  },
+  {
+    // El orquestador production despliega via los workflows worker_call. Esta
+    // entry lo agrega al allowlist canonico para que el preflight check ci_green
+    // (TASK-850) NO cuente runs previos del propio orchestrator como CI failures
+    // — sin esto, cada attempt fallido bloquea el siguiente (self-reference loop
+    // detectado live 2026-05-10 run 25635058162).
+    //
+    // El orchestrator NO tiene Cloud Run mapping (no participa en revision drift
+    // detection — los workers que despliega via workflow_call si tienen, y el
+    // watchdog los chequea via WORKFLOWS_WITH_CLOUD_RUN_DRIFT_DETECTION).
+    //
+    // Stale-approval + pending-without-jobs readers (TASK-848) si lo cuentan,
+    // que es semánticamente correcto: si el orchestrator queda waiting >24h
+    // por la approval-gate, eso ES un blocker production legitimo.
+    workflowName: 'Production Release Orchestrator'
   }
 ] as const
 
