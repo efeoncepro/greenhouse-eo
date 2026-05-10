@@ -65,6 +65,7 @@ import { getOutboxUnpublishedLagSignal } from './queries/outbox-unpublished-lag'
 import { getOutboxDeadLetterSignal } from './queries/outbox-dead-letter'
 import { getReleasePendingWithoutJobsSignal } from './queries/release-pending-without-jobs'
 import { getReleaseStaleApprovalSignal } from './queries/release-stale-approval'
+import { getReleaseWorkerRevisionDriftSignal } from './queries/release-worker-revision-drift'
 import { getEmailRenderFailureSignal } from './queries/email-render-failure'
 import { getNuboxSourceFreshnessSignal } from './queries/nubox-source-freshness'
 import { getEngagementBudgetOverrunSignal } from './queries/engagement-budget-overrun'
@@ -912,16 +913,18 @@ export const getReliabilityOverview = async (
           .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
           .catch(() => null)
 
-  // TASK-848 Slice 7 — Production Release Control Plane signals (V1, 2 of 4).
-  // 2 readers en paralelo. Cada uno degrada a `severity=unknown` si no hay
-  // GITHUB_RELEASE_OBSERVER_TOKEN o GH API falla. NO bloquea el dashboard.
-  // V1.1 agregara deploy_duration_p95 + last_status (necesitan release_manifests data).
+  // TASK-848 Slice 7 + TASK-849 Slice 2 — Production Release Control Plane
+  // signals (V1, 3 of 4). 3 readers en paralelo. Cada uno degrada a
+  // `severity=unknown` si no hay GITHUB_RELEASE_OBSERVER_TOKEN o GH API falla.
+  // NO bloquea el dashboard. V1.1 agregara deploy_duration_p95 + last_status
+  // (necesitan release_manifests data populated).
   const productionRelease =
     preloadedSources.productionRelease !== undefined
       ? preloadedSources.productionRelease
       : await Promise.all([
           getReleaseStaleApprovalSignal().catch(() => null),
-          getReleasePendingWithoutJobsSignal().catch(() => null)
+          getReleasePendingWithoutJobsSignal().catch(() => null),
+          getReleaseWorkerRevisionDriftSignal().catch(() => null)
         ])
           .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
           .catch(() => null)
