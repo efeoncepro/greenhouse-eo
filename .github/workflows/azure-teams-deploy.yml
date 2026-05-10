@@ -1,12 +1,14 @@
 name: Azure Teams Notifications Deploy
 
 # TASK-669 — Provision Azure Logic Apps Consumption per Teams channel.
+# TASK-853 — workflow_call interface canonico para production-release.yml
+# orquestador (TASK-851). Bicep deploy gated por diff paths o force flag.
 #
 # Uses Workload Identity Federation (WIF) so we don't store an Azure client
 # secret in GitHub. The federated credential is registered against the
 # Greenhouse Azure AD tenant (a80bf6c1-7c45-4d70-b043-51389622a0e4) and
 # scopes the GH Action to `repo:efeoncepro/greenhouse-eo:ref:refs/heads/main`
-# (and `refs/heads/develop` for the staging environment).
+# AND `repo:efeoncepro/greenhouse-eo:environment:production` (TASK-853).
 #
 # Required GitHub repo secrets:
 #   AZURE_CLIENT_ID         — App registration client id (federated to GH)
@@ -24,42 +26,79 @@ on:
         options:
           - staging
           - production
+      force_infra_deploy:
+        description: 'Force Bicep deploy regardless of diff (TASK-853)'
+        type: boolean
+        required: false
+        default: false
   push:
     branches:
       - main
     paths:
       - 'infra/azure/teams-notifications/**'
       - '.github/workflows/azure-teams-deploy.yml'
+  # TASK-853 — workflow_call interface for production-release.yml orchestrator.
+  # Preserves push and workflow_dispatch entrypoints unchanged.
+  workflow_call:
+    inputs:
+      environment:
+        description: 'Target environment (staging | production)'
+        type: string
+        required: true
+      target_sha:
+        description: 'Target git SHA (for diff detection vs origin/main)'
+        type: string
+        required: true
+      force_infra_deploy:
+        description: 'Force Bicep deploy regardless of diff'
+        type: boolean
+        required: false
+        default: false
+    secrets:
+      AZURE_CLIENT_ID:
+        required: true
+      AZURE_TENANT_ID:
+        required: true
+      AZURE_SUBSCRIPTION_ID:
+        required: true
 
 permissions:
   id-token: write
   contents: read
 
 jobs:
-  validate:
-    name: Validate Bicep template
+  # TASK-853 — Health check Azure (preflight-style). Corre SIEMPRE incluso
+  # cuando Bicep deploy skip por no-diff. Valida que WIF login funciona +
+  # providers registrados + RG existe. Si falla, abortamos antes de tocar
+  # nada.
+  health-check:
+    name: Health check Azure (preflight-style)
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-
-      - name: Install Azure CLI Bicep
-        run: az bicep install
-
-      - name: Bicep build (lint)
-        run: az bicep build --file infra/azure/teams-notifications/main.bicep
-
-  deploy:
-    name: Deploy Teams notifications stack
-    needs: validate
-    runs-on: ubuntu-latest
-    environment: ${{ github.event.inputs.environment || 'production' }}
+    environment: >-
+      ${{
+        github.event_name == 'workflow_call'
+          && inputs.environment
+          || (github.event_name == 'workflow_dispatch'
+              && github.event.inputs.environment
+              || 'production')
+      }}
+    outputs:
+      env_label: ${{ steps.env.outputs.env_label }}
+      rg_name: ${{ steps.env.outputs.rg_name }}
+      params_file: ${{ steps.env.outputs.params_file }}
     steps:
       - uses: actions/checkout@v5
 
       - name: Resolve environment label
         id: env
         run: |
-          ENV_INPUT="${{ github.event.inputs.environment }}"
+          if [ "${{ github.event_name }}" = "workflow_call" ]; then
+            ENV_INPUT="${{ inputs.environment }}"
+          elif [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            ENV_INPUT="${{ github.event.inputs.environment }}"
+          else
+            ENV_INPUT="production"
+          fi
           if [ -z "$ENV_INPUT" ]; then
             ENV_INPUT="production"
           fi
@@ -80,38 +119,159 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Ensure providers are registered
+      - name: Verify providers registered (idempotent)
         run: |
+          echo "Validating providers Microsoft.Logic + Microsoft.Web are registered..."
           az provider register --namespace Microsoft.Logic --wait
           az provider register --namespace Microsoft.Web --wait
+          echo "✓ Providers Microsoft.Logic + Microsoft.Web registered"
 
-      - name: Ensure resource group exists
+      - name: Verify resource group exists or create it
         run: |
           az group create \
             --name "${{ steps.env.outputs.rg_name }}" \
             --location eastus \
             --tags greenhouse:component=teams-notification greenhouse:environment=${{ steps.env.outputs.env_label }}
+          echo "✓ Resource group ${{ steps.env.outputs.rg_name }} ready"
+
+  validate:
+    name: Validate Bicep template
+    runs-on: ubuntu-latest
+    needs: [health-check]
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install Azure CLI Bicep
+        run: az bicep install
+
+      - name: Bicep build (lint)
+        run: az bicep build --file infra/azure/teams-notifications/main.bicep
+
+  # TASK-853 — Diff detection: skip Bicep apply if no infra/azure/teams-notifications/**
+  # changes since previous main, unless force_infra_deploy=true.
+  diff-detection:
+    name: Detect Bicep diff vs origin/main
+    runs-on: ubuntu-latest
+    needs: [health-check, validate]
+    outputs:
+      should_deploy: ${{ steps.diff.outputs.should_deploy }}
+      reason: ${{ steps.diff.outputs.reason }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Compute should_deploy
+        id: diff
+        env:
+          FORCE_FLAG: >-
+            ${{
+              (github.event_name == 'workflow_call' && inputs.force_infra_deploy)
+                || (github.event_name == 'workflow_dispatch' && github.event.inputs.force_infra_deploy == 'true')
+            }}
+          TARGET_SHA: >-
+            ${{
+              github.event_name == 'workflow_call'
+                && inputs.target_sha
+                || github.sha
+            }}
+        run: |
+          # Force flag short-circuits diff detection.
+          if [ "${FORCE_FLAG}" = "true" ]; then
+            echo "should_deploy=true" >> "$GITHUB_OUTPUT"
+            echo "reason=force_infra_deploy=true" >> "$GITHUB_OUTPUT"
+            echo "::notice::force_infra_deploy=true → Bicep apply will run"
+            exit 0
+          fi
+
+          # Push trigger already has path filter — if we got here via push,
+          # the diff is implicit (workflow only triggered because paths matched).
+          if [ "${{ github.event_name }}" = "push" ]; then
+            echo "should_deploy=true" >> "$GITHUB_OUTPUT"
+            echo "reason=push_path_filter_matched" >> "$GITHUB_OUTPUT"
+            echo "::notice::Push trigger with path filter match → Bicep apply will run"
+            exit 0
+          fi
+
+          # workflow_call or workflow_dispatch: explicit diff check.
+          # Compare TARGET_SHA against origin/main HEAD~1 (the previously deployed commit).
+          # If infra/azure/teams-notifications/** changed → deploy; else skip.
+          DIFF_OUTPUT=$(git diff --name-only origin/main~1...${TARGET_SHA} -- 'infra/azure/teams-notifications/**' || true)
+
+          if [ -n "${DIFF_OUTPUT}" ]; then
+            echo "should_deploy=true" >> "$GITHUB_OUTPUT"
+            echo "reason=infra_diff_detected" >> "$GITHUB_OUTPUT"
+            echo "::notice::Infra diff detected in infra/azure/teams-notifications/**:"
+            echo "${DIFF_OUTPUT}"
+          else
+            echo "should_deploy=false" >> "$GITHUB_OUTPUT"
+            echo "reason=no_infra_diff" >> "$GITHUB_OUTPUT"
+            echo "::notice::No diff in infra/azure/teams-notifications/** since last main → Bicep apply skipped (idempotent re-apply prevented)"
+          fi
+
+  deploy:
+    name: Deploy Teams notifications stack
+    needs: [health-check, validate, diff-detection]
+    if: ${{ needs.diff-detection.outputs.should_deploy == 'true' }}
+    runs-on: ubuntu-latest
+    environment: >-
+      ${{
+        github.event_name == 'workflow_call'
+          && inputs.environment
+          || (github.event_name == 'workflow_dispatch'
+              && github.event.inputs.environment
+              || 'production')
+      }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Azure login (Workload Identity Federation)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       - name: Deploy Bicep template
         id: deploy
+        env:
+          RG_NAME: ${{ needs.health-check.outputs.rg_name }}
+          PARAMS_FILE: ${{ needs.health-check.outputs.params_file }}
         run: |
           DEPLOY_NAME="gh-teams-$(date +%Y%m%d-%H%M%S)"
           az deployment group create \
-            --resource-group "${{ steps.env.outputs.rg_name }}" \
+            --resource-group "${RG_NAME}" \
             --name "$DEPLOY_NAME" \
             --template-file infra/azure/teams-notifications/main.bicep \
-            --parameters "${{ steps.env.outputs.params_file }}"
+            --parameters "${PARAMS_FILE}"
 
           echo "Deployment '$DEPLOY_NAME' completed."
           az deployment group show \
-            --resource-group "${{ steps.env.outputs.rg_name }}" \
+            --resource-group "${RG_NAME}" \
             --name "$DEPLOY_NAME" \
             --query properties.outputs
 
       - name: Reminder — manual steps after first deploy
         run: |
           echo "::notice::Logic Apps deployed. Manual follow-ups:"
-          echo "::notice::1) Authorize the Teams API connection 'gh-teams-${{ steps.env.outputs.env_label }}' in Azure Portal."
+          echo "::notice::1) Authorize the Teams API connection 'gh-teams-${{ needs.health-check.outputs.env_label }}' in Azure Portal."
           echo "::notice::2) Recover each Logic App's HTTP-trigger callback URL via 'az rest --method post --url <listCallbackUrl>'."
           echo "::notice::3) Publish each URL to GCP Secret Manager: 'printf %s \"\$URL\" | gcloud secrets versions add greenhouse-teams-<code>-webhook --data-file=-'."
           echo "::notice::4) UPDATE greenhouse_core.teams_notification_channels SET logic_app_resource_id = ... for traceability."
+
+  skip-deploy-summary:
+    name: Skip Bicep deploy (no diff)
+    needs: [health-check, validate, diff-detection]
+    if: ${{ needs.diff-detection.outputs.should_deploy == 'false' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Annotate skip reason
+        run: |
+          echo "## Azure Teams Notifications — Bicep skip" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "Skip reason: \`${{ needs.diff-detection.outputs.reason }}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "Health check Azure passed (WIF login + providers + RG ready)." >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "Override: dispatch with \`force_infra_deploy=true\` to apply Bicep regardless of diff." >> "$GITHUB_STEP_SUMMARY"
+          echo "::notice::Bicep apply skipped: ${{ needs.diff-detection.outputs.reason }}"
