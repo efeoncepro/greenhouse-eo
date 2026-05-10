@@ -67,10 +67,13 @@ Revisar y respetar:
 Reglas obligatorias:
 
 - Esta task no reemplaza TASK-848; entrega deteccion/alerting temprano y puede ser absorbida por TASK-848 si se implementa primero el control plane completo.
+- **TASK-849 es el primer implementador** de los 3 readers compartidos `release-stale-approval.ts`, `release-pending-without-jobs.ts`, `release-worker-revision-drift.ts`. TASK-848 (Slice 7) **debe reusarlos**, no reimplementarlos. Si TASK-848 se ejecuta antes que TASK-849, los 3 readers se crean alli y TASK-849 solo agrega el cron + alerting.
 - No usar un signal coarse unico. Usar failure modes separados: stale approval, pending-without-jobs, worker revision drift.
 - No imprimir tokens ni secrets en logs, summaries o alertas.
 - No cancelar ni aprobar deploys productivos automaticamente en V1; el watchdog recomienda accion y falla gates, pero no ejecuta acciones destructivas/externamente visibles sin operador.
 - Cualquier workflow nuevo de deploy productivo debe agregarse a la allowlist del watchdog.
+- El cron del watchdog vive en GitHub Actions schedule (NO Vercel cron, NO Cloud Scheduler). Justificacion en Detailed Spec.
+- Canal de alerta canonico es Teams via `pnpm teams:announce` o equivalente Bot Framework Connector documentado en CLAUDE.md (NO Slack — Greenhouse opera en Teams).
 
 ## Normative Docs
 
@@ -107,11 +110,18 @@ Reglas obligatorias:
 - `.github/workflows/production-release-watchdog.yml`
 - `scripts/release/production-release-watchdog.ts`
 - `scripts/release/production-release-watchdog.test.ts`
-- `src/lib/reliability/queries/release-stale-approval.ts`
-- `src/lib/reliability/queries/release-pending-without-jobs.ts`
-- `src/lib/reliability/queries/release-worker-revision-drift.ts`
+- `src/lib/reliability/queries/release-stale-approval.ts` (compartido con TASK-848 Slice 7)
+- `src/lib/reliability/queries/release-pending-without-jobs.ts` (compartido con TASK-848 Slice 7)
+- `src/lib/reliability/queries/release-worker-revision-drift.ts` (V1 unico-849; TASK-848 puede consumirlo en V2)
+- `src/lib/release-watchdog/github-api.ts` (helper compartido con TASK-848 preflight)
+- `src/lib/release-watchdog/severity-resolver.ts` (helper canonico de severity ladder)
+- `src/lib/release-watchdog/alert-dedup.ts` (helper canonico de dedup state)
 - `docs/operations/runbooks/production-release-watchdog.md`
 - `docs/tasks/to-do/TASK-849-production-release-watchdog-alerts.md`
+
+### Tabla PG opcional V1 (declarar decision al tomar la task)
+
+- `greenhouse_ops.release_watchdog_alert_state(workflow_name TEXT, run_id BIGINT, last_alerted_severity TEXT, last_alerted_at TIMESTAMPTZ, PRIMARY KEY (workflow_name, run_id))` — UPSERT por `(workflow_name, run_id)`. Sin esta tabla, el watchdog re-alerta cada 30min hasta resolucion (annoying pero correcto). Recomendacion arquitectonica V1: **incluir la tabla** (cost trivial, evita spam Teams).
 
 ## Current Repo State
 
