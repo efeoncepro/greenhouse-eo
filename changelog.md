@@ -8160,7 +8160,6 @@ Comando operativo:
 # 2026-05-10
 
 - HR / Payroll Compliance: el export Previred de TASK-812 ahora usa posiciones oficiales del formato `Estandar por Separador 105 campos` para identidad, periodo, regimen previsional, salud, mutual y seguro de cesantia. Se agrego el perfil auditable `greenhouse_payroll.chile_previred_worker_profiles` para sexo, nacionalidad y codigo de salud; el export bloquea si faltan esos datos en vez de inventarlos.
-- Platform / Ops: `pg-connect.sh` ahora valida y renueva juntos `gcloud auth login` y `gcloud auth application-default login` mediante `pnpm gcloud:auth:preflight`, evitando sesiones CLI/ADC desalineadas al verificar Cloud SQL.
 
 # 2026-05-04
 

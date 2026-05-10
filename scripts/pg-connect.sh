@@ -10,14 +10,14 @@
 #
 # Resuelve automáticamente:
 #   1. Preflight de red (ping DF-1200 a Cloud SQL) — detecta PMTUD blackhole antes de colgar 30s
-#   2. Verifica que gcloud ADC estén vigentes, si no las renueva
+#   2. Verifica que gcloud CLI auth + ADC estén vigentes, si no renueva ambos
 #   3. Mata cualquier proxy anterior en el puerto
 #   4. Levanta Cloud SQL Proxy y ESPERA el mensaje "ready for new connections"
 #   5. Conecta con el usuario que corresponde según la operación
 #   6. Si cualquier paso falla, un trap limpia el proxy que el script spawn
 #
 # Taxonomía de errores (prefijos en stderr):
-#   [ADC]     credenciales GCP expiradas o ausentes
+#   [GCLOUD_AUTH] credenciales GCP CLI/ADC expiradas o ausentes
 #   [PROXY]   cloud-sql-proxy binary missing, no arrancó o murió
 #   [NETWORK] TCP llega pero handshake TLS falla (típico PMTUD en redes corporativas)
 #   [SQL]     conexión + TLS OK pero auth/query PostgreSQL falló
@@ -54,7 +54,7 @@ print_proxy_tail() {
   tail -20 "$PROXY_LOG" >&2
 }
 
-die_adc()     { red "[ADC] $*" >&2; exit 1; }
+die_gcloud_auth() { red "[GCLOUD_AUTH] $*" >&2; exit 1; }
 die_proxy()   { red "[PROXY] $*" >&2; print_proxy_tail; exit 1; }
 die_network() { red "[NETWORK] $*" >&2; exit 1; }
 die_sql()     { red "[SQL] $*" >&2; print_proxy_tail; exit 1; }
@@ -146,17 +146,9 @@ Si tu red bloquea ICMP pero TCP funciona, salta este check con:
   fi
 }
 
-# ── Step 1: Verify GCP ADC ─────────────────────────────────
-verify_adc() {
-  blue "Verificando credenciales GCP..."
-
-  if ! gcloud auth application-default print-access-token &>/dev/null; then
-    red "ADC expiradas. Renovando..."
-    gcloud auth application-default login --quiet 2>&1 || die_adc "No se pudo renovar ADC. Ejecuta manualmente: gcloud auth application-default login"
-    green "ADC renovadas."
-  else
-    dim "ADC vigentes."
-  fi
+# ── Step 1: Verify GCP CLI auth + ADC ──────────────────────
+verify_gcloud_auth() {
+  bash "$SCRIPT_DIR/gcloud-auth-preflight.sh" || die_gcloud_auth "No se pudo alinear gcloud CLI auth + ADC."
 }
 
 # ── Step 2: Start Cloud SQL Proxy ──────────────────────────
@@ -283,7 +275,7 @@ main() {
   echo ""
 
   network_preflight
-  verify_adc
+  verify_gcloud_auth
   start_proxy
   test_connection "$op"
   execute_operation "$op"

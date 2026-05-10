@@ -182,7 +182,10 @@ export const AGGREGATE_TYPES = {
 
   // Person Legal Profile (TASK-784)
   personIdentityDocument: 'person_identity_document',
-  personAddress: 'person_address'
+  personAddress: 'person_address',
+
+  // Platform Release Control Plane (TASK-848)
+  platformRelease: 'platform.release'
 } as const
 
 export type AggregateType = (typeof AGGREGATE_TYPES)[keyof typeof AGGREGATE_TYPES]
@@ -679,7 +682,16 @@ export const EVENT_TYPES = {
   // TASK-785 — Workforce role title governance
   memberRoleTitleChanged: 'member.role_title.changed',
   memberRoleTitleDriftProposed: 'member.role_title.drift_proposed',
-  memberRoleTitleDriftResolved: 'member.role_title.drift_resolved'
+  memberRoleTitleDriftResolved: 'member.role_title.drift_resolved',
+
+  // TASK-848 — Production Release Control Plane (7 events versionados v1)
+  platformReleaseStarted: 'platform.release.started',
+  platformReleaseDeploying: 'platform.release.deploying',
+  platformReleaseVerifying: 'platform.release.verifying',
+  platformReleaseReleased: 'platform.release.released',
+  platformReleaseDegraded: 'platform.release.degraded',
+  platformReleaseRolledBack: 'platform.release.rolled_back',
+  platformReleaseAborted: 'platform.release.aborted'
 } as const
 
 export type EventType = (typeof EVENT_TYPES)[keyof typeof EVENT_TYPES]

@@ -23905,27 +23905,6 @@ Riesgos / notas:
 
 - No se tocaron los archivos nuevos no trackeados de client portal (`TASK-822` a `TASK-825` y arquitectura relacionada); quedan fuera de este cambio.
 
-## Sesion 2026-05-10 — GCP auth preflight hardening
-
-Contexto:
-
-- El flujo local de Cloud SQL fallaba recurrentemente cuando expiraba la sesion GCP porque los agentes renovaban solo ADC (`gcloud auth application-default login`) y dejaban vencida/desalineada la sesion CLI de `gcloud`.
-
-Cambios aplicados:
-
-- Nuevo `scripts/gcloud-auth-preflight.sh` valida ambos planos: `gcloud auth print-access-token` y `gcloud auth application-default print-access-token`.
-- Si cualquiera falla, el preflight renueva ambos flujos en orden canonico:
-  - `gcloud auth login`
-  - `gcloud auth application-default login`
-- `scripts/pg-connect.sh` ahora llama este preflight antes del proxy Cloud SQL.
-- Nuevo comando `pnpm gcloud:auth:preflight`.
-- `AGENTS.md` actualizado para que la documentacion de PostgreSQL refleje CLI+ADC, no solo ADC.
-
-Validacion:
-
-- `pnpm gcloud:auth:preflight` -> pass.
-- `pnpm pg:connect:status` -> pass; Cloud SQL proxy listo, conexion `greenhouse_ops`, `migrate:status` sin pendientes.
-
 ## Sesion 2026-05-10 — TASK-812 Previred upload correction
 
 Contexto:

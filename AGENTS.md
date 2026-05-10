@@ -770,13 +770,13 @@ Contrato versionado `platform-health.v1`. Permite a agentes (MCP, Teams bot, CI,
 
 - **Paso 1 — Usar `pg-connect.sh`** (recomendado para cualquier operación manual o interactiva):
   ```bash
-  pnpm pg:connect              # Verifica ADC + levanta proxy + test conexión
+  pnpm pg:connect              # Verifica gcloud CLI + ADC + levanta proxy + test conexión
   pnpm pg:connect:migrate      # Lo anterior + ejecuta migraciones pendientes
   pnpm pg:connect:status       # Lo anterior + muestra estado de migraciones
   pnpm pg:connect:shell        # Lo anterior + abre shell SQL interactivo (como admin)
   ```
   El script `scripts/pg-connect.sh` resuelve automáticamente:
-  1. Verifica que las credenciales GCP ADC estén vigentes; si no, ejecuta `gcloud auth application-default login`
+  1. Verifica que credenciales GCP CLI y ADC estén vigentes; si una falla, ejecuta ambos flujos: `gcloud auth login` y `gcloud auth application-default login`
   2. Mata cualquier proxy anterior en el puerto 15432
   3. Levanta Cloud SQL Auth Proxy en `127.0.0.1:15432`
   4. Selecciona el usuario correcto: `ops` (connect/migrate/status) o `admin` (shell)
@@ -787,7 +787,7 @@ Contrato versionado `platform-health.v1`. Permite a agentes (MCP, Teams bot, CI,
 - **Método preferido (runtime en todos los entornos)**: Cloud SQL Connector vía `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME`. Conecta sin TCP directo — negocia un túnel seguro por la Cloud SQL Admin API. Funciona en Vercel (WIF + OIDC), local, y agentes AI.
 - **La IP pública de Cloud SQL (`34.86.135.144`) NO es accesible por TCP directo** — no hay authorized networks configuradas. Intentar conectar da `ETIMEDOUT`.
 - **Prioridad en `src/lib/postgres/client.ts`**: si `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME` está definida, el Connector toma prioridad sobre `GREENHOUSE_POSTGRES_HOST`. Ambas pueden coexistir en `.env.local`.
-- **Prerequisito (sin pg-connect.sh)**: credenciales GCP válidas — `GOOGLE_APPLICATION_CREDENTIALS_JSON` en env, o ADC local (`gcloud auth application-default login`), o WIF (Vercel). El service account necesita `roles/cloudsql.client`.
+- **Prerequisito (sin pg-connect.sh)**: credenciales GCP válidas y alineadas — `GOOGLE_APPLICATION_CREDENTIALS_JSON` en env, o CLI+ADC local (`gcloud auth login` + `gcloud auth application-default login`), o WIF (Vercel). El service account necesita `roles/cloudsql.client`.
 - **Scripts Node.js de runtime** (`pnpm pg:doctor`, `pnpm setup:postgres:*`, scripts de backfill) usan el Connector automáticamente cuando `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME` está definida.
 - **Migraciones y binarios standalone** (`pnpm migrate:up`, `pnpm migrate:down`, `pnpm db:generate-types`, `pg_dump`, `psql`) requieren **Cloud SQL Auth Proxy** corriendo como tunnel local. Usar `pnpm pg:connect` para levantarlo automáticamente, o manualmente:
   ```bash
@@ -836,7 +836,8 @@ Contrato versionado `platform-health.v1`. Permite a agentes (MCP, Teams bot, CI,
   - no hacer DDL con el usuario runtime salvo que exista una razon excepcional y quede documentada
   - no crear objetos con users distintos a `greenhouse_ops` — si una migración corre como `migrator`, los DEFAULT PRIVILEGES otorgan acceso automáticamente
 - Comandos canonicos:
-  - `pnpm pg:connect` — verificar ADC + levantar proxy + test conexión (usar PRIMERO)
+  - `pnpm gcloud:auth:preflight` — verificar/renovar gcloud CLI auth + ADC juntos
+  - `pnpm pg:connect` — verificar gcloud CLI auth + ADC + levantar proxy + test conexión (usar PRIMERO)
   - `pnpm pg:connect:migrate` — lo anterior + ejecutar migraciones
   - `pnpm pg:connect:status` — lo anterior + mostrar estado de migraciones
   - `pnpm pg:connect:shell` — lo anterior + abrir shell SQL interactivo
