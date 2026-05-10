@@ -1,5 +1,20 @@
 # GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md
 
+## Delta 2026-05-10 — GitHub release webhooks as provider-native release evidence (TASK-857)
+
+`TASK-857` agrega una excepción acotada al scope original: los **GitHub repository webhooks usados por el Release Control Plane** sí entran a Greenhouse, pero solo como evidencia firmada para `release_manifests`.
+
+- Endpoint: `POST /api/webhooks/github/release-events`.
+- Endpoint key: `github-release-events`, seeded en `greenhouse_sync.webhook_endpoints`.
+- Auth: `X-Hub-Signature-256` (`sha256=` HMAC sobre raw body) con `GITHUB_RELEASE_WEBHOOK_SECRET`. La firma se valida antes de parsear JSON o persistir payload confiable.
+- Dedupe: `X-GitHub-Delivery` como `idempotency_key = github:<delivery_id>` sobre `webhook_inbox_events`.
+- Eventos allowlisted: `workflow_run`, `workflow_job`, `deployment_status`, `check_suite`, `check_run`.
+- Payload: el raw body completo no se retiene en esta ruta; se persiste metadata redacted en `webhook_inbox_events.payload_json` y `greenhouse_sync.github_release_webhook_events.redacted_payload_json`.
+- Reconciliación: `src/lib/release/github-webhook-reconciler.ts` matchea por `target_sha` y fallback por `workflow_run_id` contra `greenhouse_sync.release_manifests`.
+- Observabilidad: `platform.release.github_webhook_unmatched` alerta cuando hay eventos `unmatched` o `failed` en las últimas 24h.
+
+El webhook no reemplaza el dispatcher genérico ni el watchdog. Es un adapter provider-native que reutiliza el inbox y agrega un ledger normalizado para el dominio release.
+
 ## Delta 2026-04-26 — Event Control Plane sobre API Platform (TASK-617.3)
 
 El runtime de webhooks queda separado explícitamente en dos planos:
@@ -46,7 +61,7 @@ Use together with:
 This document is about application-level webhooks for Greenhouse.
 
 It is not about:
-- GitHub repository webhooks
+- GitHub repository webhooks, salvo la excepción release-control-plane de `TASK-857`
 - replacing every external sync worker already living in sibling repos
 - building a full event streaming platform
 
