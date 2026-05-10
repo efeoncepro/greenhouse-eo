@@ -167,10 +167,16 @@ Reglas obligatorias:
   - `--json`
   - `--fail-on-error`
 - Detectar:
-  - stale `waiting` approvals: `status=waiting`, `pending_deployments[].environment.name == "Production"`, workflow en allowlist.
-  - pending-without-jobs: `status in queued|pending|in_progress`, `jobs.length == 0`, mismo workflow/ref con waiting blocker.
-  - worker revision drift: Cloud Run latest ready revision no corresponde al SHA esperado cuando exista manifest/preflight target.
-- Output JSON estable con `severity`, `workflowName`, `runId`, `branch`, `sha`, `ageHours`, `pendingEnvironment`, `recommendedAction`.
+  - **stale `waiting` approvals**: `status=waiting`, `pending_deployments[].environment.name == "Production"`, workflow en allowlist.
+  - **pending-without-jobs**: `status in queued|pending|in_progress`, `jobs.length == 0` despues de threshold (default 5 min), mismo workflow/ref con waiting blocker o sin el.
+  - **worker revision drift**: Cloud Run latest ready revision no corresponde al SHA del ultimo run `success` del workflow correspondiente. Baseline canonica V1 = **ultimo successful workflow run SHA por worker** (NO main HEAD, NO TASK-848 manifest porque aun no existe). Lookup:
+    - GitHub: `gh run list --workflow="Ops Worker Deploy" --status=success --limit=1 --json headSha`
+    - Cloud Run: `gcloud run revisions describe <latest-ready-revision> --region=us-east4 --format="value(spec.containers[0].env[?name=='GIT_SHA'].value)"` o equivalente label `commit_sha`.
+    - Drift = SHAs distintos = severity `critical` (revision Cloud Run no es la del ultimo deploy verde — significa que el deploy mas reciente fallo o que alguien deployo manualmente sin pasar por workflow).
+    - Pre-requisito: que cada worker incluya `GIT_SHA` env var o label `commit_sha=<sha>` en su Dockerfile/deploy.sh. Si no existe, agregar como sub-task implementacion (cost trivial, 1 linea por worker).
+- Output JSON estable con `severity`, `workflowName`, `runId`, `branch`, `sha`, `ageHours`, `pendingEnvironment`, `recommendedAction`, `kind` (`stale_approval | pending_without_jobs | worker_revision_drift`).
+- Helper `severity-resolver.ts` canonico: aplica el ladder de Detailed Spec a cada finding, retorna severity unificado.
+- API rate limit budget: ~50 GitHub API req/run + 6 Cloud Run req/run = ~50-60 req/run, trivial vs 5000 req/h limit.
 
 ### Slice 2 — Scheduled GitHub workflow
 
@@ -182,19 +188,24 @@ Reglas obligatorias:
 - Fallar el workflow si existe severity `error` o `critical`.
 - Publicar summary con run IDs y comandos exactos sugeridos (`gh run cancel <id>`), sin ejecutar cancel automaticamente.
 
-### Slice 3 — Alerting Slack/Teams
+### Slice 3 — Alerting Teams (canal canonico)
 
-- Integrar con el canal ops existente si hay secret disponible (`SLACK_ALERTS_WEBHOOK_URL` o canal Teams canonico ya documentado).
-- Enviar alerta solo cuando haya nuevos blockers o cambio de severidad para evitar spam.
-- Payload minimo:
-  - titulo `Production release blocked`
+- Integrar con Teams via `pnpm teams:announce` o equivalente Bot Framework Connector documentado en CLAUDE.md (NO Slack — Greenhouse opera en Teams).
+- Destinatario canonico: chat de ops (definir en `src/config/manual-teams-announcements.ts` un nuevo destination key `production-release-alerts` apuntando al chat ops).
+- Dedup state via tabla `greenhouse_ops.release_watchdog_alert_state(workflow_name, run_id, last_alerted_severity, last_alerted_at)`:
+  - UPSERT por `(workflow_name, run_id)`.
+  - Alertar SOLO cuando: (a) blocker nuevo (no existe row), (b) escalation de severity (warning -> error -> critical), o (c) ultimo alert fue hace mas de 24h y blocker sigue activo (re-recordatorio diario).
+  - Cuando blocker se resuelve (run completa, cancela o aprueba), enviar alert `severity=ok` y borrar row dedup state.
+- Payload Teams minimo:
+  - titulo `Production release blocked` o `Production release recovered`
   - severity
   - workflow
   - run ID + URL
   - edad
   - branch/SHA
-  - accion recomendada.
-- Redactar cualquier token/secret.
+  - accion recomendada
+- Aplicar `redactSensitive` y `redactErrorForResponse` (`src/lib/observability/redact.ts`) antes de enviar payload Teams o loggear.
+- Si el secret de Teams Bot no esta disponible en el runner GitHub Actions (escenario probable hasta provisioning), degradar a fallback `console.log` + summary del workflow (operator ve la alerta al revisar el run); NO crashear el workflow por ausencia de secret.
 
 ### Slice 4 — Reliability signals + Ops Health
 
