@@ -243,6 +243,59 @@ Ningun evento dispara side effect automatico sobre cloud (Vercel/Cloud Run/Azure
 - **OQ2 — Reliability signal thresholds**: usar baselines del spec; tune data-driven post-30d steady-state.
 - **OQ3 — Dashboard `/admin/releases`**: defer a TASK-855 V1.1; V1 cubre operator visibility via signals + psql contra release_manifests.
 
+## Delta 2026-05-10 — V1.1 GitHub App SHIPPED LIVE
+
+GitHub App `Greenhouse Release Watchdog` creado, instalado, configurado y validado live end-to-end. Cierra el bucle de auth canonico del control plane production.
+
+### Live state
+
+| Componente | Valor canonico |
+|---|---|
+| GitHub App | `Greenhouse Release Watchdog` (slug `greenhouse-release-watchdog`, App ID `3665723`) |
+| App URL | https://github.com/apps/greenhouse-release-watchdog |
+| Installation | ID `131127026` en `efeoncepro` org, scope `All repositories` |
+| Permissions | `Actions: Read-only`, `Deployments: Read-only`, `Metadata: Read-only` |
+| GCP Secret | `greenhouse-github-app-private-key` (project `efeonce-group`, replication automatic, version 1) |
+| Vercel env vars production | `GITHUB_APP_ID=3665723`, `GITHUB_APP_INSTALLATION_ID=131127026`, `GREENHOUSE_GITHUB_APP_PRIVATE_KEY_SECRET_REF=greenhouse-github-app-private-key` |
+| Vercel deploy | `greenhouse-7duh0301r-efeonce-7670142f.vercel.app` Ready |
+
+### Decisiones arquitectonicas validadas live
+
+- **GitHub Apps creation requiere browser interaction** — no API publica para `POST /apps`. El flow canonico es: manifest creation form (browser POST + manifest JSON pre-filled) → user clicks "Create App" → GitHub redirects con `code` → POST `/app-manifests/<code>/conversions` retorna App ID + private key PEM + client secret.
+- **Manifest debe omitir `hook_attributes`** — GitHub valida `hook_attributes.url` cuando el campo existe aunque `active=false`. Como el watchdog es read-only puro (no necesita webhooks), omitirlo previene falso error "url wasn't supplied".
+- **Private key viene en PKCS#1, no PKCS#8** — `-----BEGIN RSA PRIVATE KEY-----` (PKCS#1) vs `-----BEGIN PRIVATE KEY-----` (PKCS#8). jose's `importPKCS8` rechaza PKCS#1. Usar `crypto.createPrivateKey(pem)` que auto-detecta ambos formatos y devuelve KeyObject compatible con jose's `SignJWT.sign(KeyLike)`.
+- **Vercel deploy con > 15K archivos require `--archive=tgz`** — el repo greenhouse-eo tiene 16107 archivos. El default de Vercel CLI rechaza con error "files should NOT have more than 15000 items". `--archive=tgz` empaqueta como tarball single sin el limite.
+
+### Scripts canonicos shipped
+
+- **`scripts/release/setup-github-app.ts`** + `pnpm release:setup-github-app` — orquestador end-to-end (~5 min, 2 clicks browser + 3 confirmaciones CLI). Levanta server local, abre browser a manifest creation, recibe credenciales en memoria, instala App, mintea JWT con private key recien recibido para resolver installation_id, sube private key a GCP, configura Vercel env vars, trigger redeploy.
+- **`scripts/release/complete-github-app-setup.ts`** + `pnpm release:complete-github-app-setup --app-id=<N> --installation-id=<N> --pem-file=<path>` — recovery script si setup-github-app crashea mid-flow. Reusa App + Installation existentes, solo necesita private key nuevo via UI.
+- **`src/lib/release/github-app-token-resolver.ts`** + `resolveGithubAppInstallationToken()` — runtime canonico. Mintea JWT firmado con private key (auto-detect PKCS#1/#8), exchange por installation token (cache 1h), degradacion honesta a PAT si GH App no configurado.
+- **`src/lib/release/github-helpers.ts`** `resolveGithubToken()` ahora ASYNC, prefiere GH App, fallback a PAT. `resolveGithubTokenSync()` (PAT-only) preservado como back-compat layer V1.0.
+
+### Validacion live ejecutada 2026-05-10
+
+```bash
+GCP_PROJECT=efeonce-group GITHUB_APP_ID=3665723 \
+  GITHUB_APP_INSTALLATION_ID=131127026 \
+  GREENHOUSE_GITHUB_APP_PRIVATE_KEY_SECRET_REF=greenhouse-github-app-private-key \
+  pnpm release:watchdog --json
+```
+
+Resultado:
+
+| Signal | Severity live | Estado |
+|---|---|---|
+| `platform.release.stale_approval` | `ok` | 4 stale approvals del incidente cancelados (ICO Batch 22d, Ops Worker 14d, Commercial Cost 14d, Azure Teams Bot 14d) — cancelados durante setup |
+| `platform.release.pending_without_jobs` | `ok` | concurrency fix Opcion A (TASK-848 V1.0) operando |
+| `platform.release.worker_revision_drift` | `warning` | data_missing — esperado pre-merge develop→main porque workers todavia no tienen GIT_SHA env var deployado |
+
+### Pendiente para activacion total (post merge develop → main)
+
+1. Workers se re-deployan con `GIT_SHA` env var (TASK-849 Slice 1) → `worker_revision_drift` retorna `ok` para los 4 workers
+2. Workflow scheduled `production-release-watchdog.yml` se registra en GH Actions (cron `*/30 * * * *` activa)
+3. Cron emite alertas Teams a `production-release-alerts` cuando detecte blockers (con dedup canonico)
+
 ## Delta 2026-05-10 — TASK-849 Production Release Watchdog Alerts CERRADA
 
 Cierra el bucle del control plane production: detección activa + alertas Teams. Convierte los 2 signals pasivos de V1.0 (TASK-848) en alertas Teams automáticas via scheduled GH Actions cron.

@@ -1550,6 +1550,39 @@ Watchdog scheduled GH Actions `*/30 * * * *` que detecta los 3 sintomas del inci
 
 **Spec canónica**: TASK-849 → `docs/tasks/complete/TASK-849-production-release-watchdog-alerts.md`. Runbook operativo: `docs/operations/runbooks/production-release-watchdog.md`. Migration: `migrations/20260510122723670_task-849-watchdog-alert-state.sql`. CLI: `pnpm release:watchdog [--json|--fail-on-error|--enable-teams|--dry-run]`.
 
+**Setup completado live (2026-05-10)**:
+
+| Componente | Valor canonico |
+|---|---|
+| GitHub App | `Greenhouse Release Watchdog` (slug `greenhouse-release-watchdog`, App ID `3665723`) — https://github.com/apps/greenhouse-release-watchdog |
+| Installation | ID `131127026` en `efeoncepro` org, scope `All repositories` |
+| Permissions | `Actions: Read-only`, `Deployments: Read-only`, `Metadata: Read-only` |
+| GCP Secret | `greenhouse-github-app-private-key` (Secret Manager, project `efeonce-group`, replication automatic, version 1) |
+| Vercel env vars production | `GITHUB_APP_ID=3665723`, `GITHUB_APP_INSTALLATION_ID=131127026`, `GREENHOUSE_GITHUB_APP_PRIVATE_KEY_SECRET_REF=greenhouse-github-app-private-key` |
+
+**Setup scripts canonicos**:
+
+- `pnpm release:setup-github-app` — flow completo end-to-end (manifest creation + install + GCP upload + Vercel config + redeploy). 2 clicks browser + 3 confirmaciones CLI. Bugs corregidos en commit `655e653d`: race condition `/start` ↔ `/callback`, `hook_attributes` validation, PKCS#1 vs PKCS#8.
+- `pnpm release:complete-github-app-setup --app-id=<N> --installation-id=<N> --pem-file=<path>` — recovery script si setup-github-app crashea mid-flow. Reusa App ya creado, solo necesita private key nuevo via UI.
+
+**Verificacion live ejecutada 2026-05-10**: GH App resolver path validado end-to-end. Mintea JWT con private key (PKCS#1 o PKCS#8), exchange por installation token (cache 1h), readers retornan severity real:
+
+```bash
+GCP_PROJECT=efeonce-group GITHUB_APP_ID=3665723 \
+  GITHUB_APP_INSTALLATION_ID=131127026 \
+  GREENHOUSE_GITHUB_APP_PRIVATE_KEY_SECRET_REF=greenhouse-github-app-private-key \
+  pnpm release:watchdog --json
+# stale_approval: ok ✓
+# pending_without_jobs: ok ✓
+# worker_revision_drift: warning (data_missing — esperado pre-merge develop→main)
+```
+
+**Pendiente para activacion total** (post merge develop → main):
+
+1. Workers se re-deployan con `GIT_SHA` env var (TASK-849 Slice 1) → `worker_revision_drift` retorna `ok` para los 4 workers
+2. Workflow scheduled `production-release-watchdog.yml` se registra en GH Actions (cron `*/30` activa)
+3. Cron emite alertas Teams a `production-release-alerts` cuando detecte blockers (con dedup canonico)
+
 ### Finance write-path E2E gate (TASK-773 Slice 6)
 
 Cualquier task que toque handlers `POST/PUT/PATCH/DELETE` en `src/app/api/finance/**/route.ts` **debe verificar el flow end-to-end downstream**, no solo el contract API. Bug class detectada 2026-05-03: el endpoint Figma respondía 200 OK pero el TC Santander no rebajaba — porque el contract API funcionaba pero el side effect downstream (outbox → BQ → reactive → account_balance) calló silencioso.

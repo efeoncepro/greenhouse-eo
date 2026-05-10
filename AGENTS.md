@@ -754,6 +754,22 @@ Contrato versionado `platform-health.v1`. Permite a agentes (MCP, Teams bot, CI,
 
 **Spec arquitectónica completa**: `docs/architecture/GREENHOUSE_NOTION_DELIVERY_SYNC_V1.md`.
 
+### Production Release Watchdog (TASK-848 + TASK-849, 2026-05-10)
+
+- **Que hace**: scheduled GH Actions cron `*/30 * * * *` que detecta los 3 sintomas del incidente 2026-04-26 → 2026-05-09 (stale Production approvals, pending sin jobs, worker revision drift) y emite alertas Teams a `production-release-alerts` con dedup canonico via `greenhouse_sync.release_watchdog_alert_state`.
+- **Workflow**: `.github/workflows/production-release-watchdog.yml`. Cron solo activa cuando esta en `main` (default branch). Manual dispatch: `gh workflow run production-release-watchdog.yml --ref main`.
+- **CLI local canonico**: `pnpm release:watchdog [--json|--fail-on-error|--enable-teams|--dry-run]`. Si vas a correrlo desde fuera de Vercel runtime, set `GCP_PROJECT=efeonce-group` + las 3 GH App env vars (App ID `3665723`, Installation ID `131127026`, secret ref `greenhouse-github-app-private-key`).
+- **GitHub auth strategy canonica**: GitHub App `Greenhouse Release Watchdog` (App ID `3665723`) instalada en `efeoncepro` org con permissions `Actions:read + Deployments:read + Metadata:read`. Private key vive en GCP Secret Manager `greenhouse-github-app-private-key` (project `efeonce-group`). Resolver `src/lib/release/github-app-token-resolver.ts` mintea installation token con cache 1h. Fallback a PAT (`GITHUB_RELEASE_OBSERVER_TOKEN`/`GITHUB_TOKEN`) solo si GH App no esta configurado. Beneficios: token NO ligado a usuario, rate limit 15K req/h vs 5K, auditoria per-installation.
+- **Setup scripts canonicos**:
+  - `pnpm release:setup-github-app` — flow completo end-to-end (manifest creation + install + GCP upload + Vercel config + redeploy). 2 clicks browser + 3 confirmaciones CLI.
+  - `pnpm release:complete-github-app-setup --app-id=<N> --installation-id=<N> --pem-file=<path>` — recovery script si setup-github-app crashea mid-flow. Reusa App ya creado.
+- **Rollback canonico**: `pnpm release:rollback` (TASK-848 V1.0). Vercel alias swap + Cloud Run workers traffic split + HubSpot integration. Azure manual gated en runbook.
+- **3 reliability signals canonicos** (subsystem `Platform Release`, steady=0): `platform.release.stale_approval`, `platform.release.pending_without_jobs`, `platform.release.worker_revision_drift`. Visibles en `/admin/operations`.
+- **Helpers canonicos** (single source of truth): `src/lib/release/{github-helpers, workflow-allowlist, severity-resolver, github-app-token-resolver, watchdog-alerts-dispatcher, manifest-store, state-machine}.ts`. Cualquier code path nuevo debe reusar estos.
+- **Si emerge un workflow nuevo de deploy production**: agregarlo a `RELEASE_DEPLOY_WORKFLOWS` en `src/lib/release/workflow-allowlist.ts` ANTES del primer deploy. Sin esto el watchdog NO lo detecta.
+- **Si tienes que generar un PAT fallback** (degraded mode V1.0): scopes minimos `Actions:read + Deployments:read + Metadata:read`, NUNCA mas amplio.
+- **Spec canonica**: `docs/architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md`. Runbooks: `docs/operations/runbooks/production-release.md` (release operativo), `docs/operations/runbooks/production-release-watchdog.md` (watchdog ops). Manuales: `docs/manual-de-uso/plataforma/release-watchdog.md` (operador), `docs/documentation/plataforma/release-watchdog.md` (funcional).
+
 ### Cloud Run hubspot-greenhouse-integration (HubSpot write bridge + webhooks) — TASK-574 (2026-04-24)
 
 - Servicio Cloud Run Python/Flask ubicado en `us-central1` (region bloqueada — NO migrar a `us-east4` porque la URL pública contiene `-uc.` y romperia el webhook del portal HubSpot).

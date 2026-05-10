@@ -1,3 +1,39 @@
+# Sesion 2026-05-10 — TASK-849 V1.1 GitHub App SHIPPED LIVE end-to-end + docs canonizadas
+
+- **Trigger:** usuario decidio implementar GH App canonical token strategy en lugar de fine-grained PAT (mi recomendacion conservadora) para evitar deuda tecnica V1→V1.1. Pidio que ejecute end-to-end + documente todo en CLAUDE.md, AGENTS.md, arch docs, ADR, manual de uso.
+- **Estado:** **GH App SHIPPED LIVE 2026-05-10** end-to-end con docs comprehensive sincronizadas. Cron `*/30 * * * *` y workers GIT_SHA pendientes de merge `develop → main` para activacion total.
+- **Live state validado:**
+  - GitHub App `Greenhouse Release Watchdog` (App ID `3665723`) creado, instalado en `efeoncepro` org (Installation ID `131127026`), All repositories scope, permissions Actions/Deployments/Metadata read-only.
+  - GCP Secret Manager `greenhouse-github-app-private-key` v1 (project `efeonce-group`).
+  - Vercel env vars production: `GITHUB_APP_ID=3665723`, `GITHUB_APP_INSTALLATION_ID=131127026`, `GREENHOUSE_GITHUB_APP_PRIVATE_KEY_SECRET_REF=greenhouse-github-app-private-key`.
+  - Vercel production deploy `greenhouse-7duh0301r-efeonce-7670142f.vercel.app` Ready.
+  - GH App resolver path validado live: `pnpm release:watchdog --json` retorna severity real (`stale_approval=ok`, `pending_without_jobs=ok`, `worker_revision_drift=warning(data_missing)`).
+  - 4 stale approvals historicos del incidente (ICO Batch 22d, Ops Worker 14d, Commercial Cost 14d, Azure Teams Bot 14d) cancelados durante setup.
+  - PEM local borrado post-upload (no leak).
+- **3 bugs descubiertos durante setup live + fixes commiteados** (`655e653d`):
+  - Race condition `/start` ↔ `/callback` (cerraba server temprano) → single server canonico que maneja AMBOS paths.
+  - `hook_attributes: { active: false }` rompia validation GitHub ("url wasn't supplied") → omitir `hook_attributes` por completo del manifest.
+  - `importPKCS8` rechazaba PKCS#1 (formato que GitHub Apps emiten) → `crypto.createPrivateKey` auto-detect ambos formatos.
+- **Recovery script nuevo** `pnpm release:complete-github-app-setup --app-id=<N> --installation-id=<N> --pem-file=<path>` para casos donde setup-github-app crashea mid-flow.
+- **Setup script canonical** `pnpm release:setup-github-app` orquesta end-to-end: ~5 min con 2 clicks browser + 3 confirmaciones CLI (no manipular .pem files manualmente).
+- **Docs canonizadas (este commit):**
+  - `CLAUDE.md` seccion "Production Release Watchdog invariants (TASK-849)" extendida con tabla live state + setup scripts canonicos + verificacion live ejecutada + pendiente para activacion total.
+  - `AGENTS.md` nueva seccion "Production Release Watchdog (TASK-848 + TASK-849)" para que cualquier agente futuro la encuentre rapido.
+  - `docs/architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md` Delta nuevo "V1.1 GitHub App SHIPPED LIVE" con live state + decisiones arquitectonicas validadas + scripts canonicos shipped + pendientes activacion.
+  - `docs/architecture/DECISIONS_INDEX.md` entry nuevo "Production release watchdog usa GitHub App installation token canonico, NO PAT personal" (Accepted 2026-05-10).
+  - `docs/manual-de-uso/plataforma/release-watchdog.md` NUEVO manual operador-facing paso-a-paso con 3 estados explicados, severity ladder, troubleshooting de problemas comunes.
+  - `docs/documentation/plataforma/release-watchdog.md` NUEVO doc funcional con detalle tecnico embedded para profundizar.
+  - `Handoff.md` (este entry) + `changelog.md` actualizado.
+- **Pendiente para activacion total** (post merge develop → main):
+  1. Workers se re-deployan con `GIT_SHA` env var (TASK-849 Slice 1) → `worker_revision_drift` retorna `ok` para los 4 workers.
+  2. Workflow scheduled `production-release-watchdog.yml` se registra en GH Actions (cron `*/30 * * * *` activa).
+  3. Cron emite alertas Teams a `production-release-alerts` cuando detecte blockers (con dedup canonico).
+- **Costo total:** $0 GitHub side (Apps gratis) + ~$0.72/anio GCP Secret Manager. Effort one-time setup: ~5 min via script automatizado.
+- **Skills invocadas:** `arch-architect` (constante per instrucción del usuario, validacion 4-pillar continua) + `greenhouse-backend` (codigo).
+- **Proximo paso:** confirmar con usuario sobre merge develop → main (29 commits ahead, blast radius alto, requiere autorizacion explicita).
+
+---
+
 # Sesion 2026-05-10 — Previred accepted + aprendizaje canonizado
 
 - **Trigger:** usuario confirmo que Previred ya acepto/calculo la planilla abril 2026 y pidio documentar el aprendizaje y enriquecer la skill de payroll.
