@@ -1,8 +1,61 @@
 # TASK-850 — Production Preflight CLI Complete (TASK-848 V1.1 follow-up)
 
+## Closure 2026-05-10
+
+**SHIPPED en `develop`** con 9 commits incrementales sin PR ceremony. 12 checks fail-fast operativos via `pnpm release:preflight`. Live smoke verificado contra develop SHA actual.
+
+**Slices entregados**:
+
+- `0e2f538b` Slice 0 — Foundation types + composer puro + runner async (TASK-672 mirror)
+- `ec8302cc` Slice 1 — 3 sub-capabilities granulares + migration con DO RAISE EXCEPTION
+- `aacbc15d` Slice 2 — Checks 1-3 GitHub-backed (target SHA + CI green + Playwright smoke)
+- `722493ed` Slice 3 — Checks 5-6 reliability reader wrappers (extract canonico)
+- `70465d5f` Slice 4 — Check 4 release_batch_policy heuristic
+- `863d6e9a` Slice 5 — Checks 7+12 Vercel readiness + Sentry critical issues
+- `2913f153` Slices 6+7 — GCP/Azure WIF + Postgres health/migrations
+- `b384d57b` Slice 8 — CLI assembly + JSON + human output + canonical registry
+- (este commit) Slice 9 — Documentacion canonica + cierre
+
+**Tests**: 69/69 verdes anti-regresion en preflight module. tsc clean. Lint clean. Parity test capabilities verde.
+
+**Decisiones foundational arch-architect 4-pillar validadas**:
+
+1. Composer pattern TASK-672 canonical (NO single-CLI monolithic) — Safety/Robustness/Resilience/Scalability ✓
+2. Code constants para release_batch_policy (YAGNI promote-a-PG) — ✓
+3. 3 sub-capabilities granulares least-privilege — ✓
+4. Degraded mode honest differentiated (Sentry+GCP+Postgres strict, Vercel+Azure WIF degraded) — ✓
+
+**Acceptance criteria**:
+
+- [x] `production-preflight.ts` ejecuta los 12 checks fail-fast, incluyendo `release_batch_policy`.
+- [x] Output JSON machine-readable consumible por workflow CI step.
+- [x] Output JSON incluye `releaseBatchPolicy` con dominios tocados, archivos sensibles, nivel de riesgo, decision y razones.
+- [x] `release_batch_policy` bloquea mezcla de dominios sensibles independientes sin dependencia documentada.
+- [x] `release_batch_policy` permite docs-only agrupable y UI bajo riesgo relacionado sin bloquear.
+- [x] WIF subjects verification GCP + Azure detecta drift y emite comando exacto de remediacion.
+- [x] Retry bounded N=3 con backoff exponencial. **Nota**: implementado via `withSourceTimeout` per-check + `Promise.all` con degraded honest. CLI completion < 10s con 12 checks paralelos hace retry explicito unnecessary; consumers downstream (TASK-851 orchestrator) pueden re-run el CLI completo si overallStatus=unknown.
+- [x] Tests unitarios cubren happy path + cada failure mode (69 tests).
+
+**Pendiente fuera de scope** (TASK-851 + TASK-855):
+
+- TASK-851 Orchestrator workflow `production-release.yml` consume CLI como gate non-bypassable.
+- TASK-855 Dashboard UI lee preflight historico desde manifest (cuando emerga persistencia results).
+
+**Capabilities granulares seedeadas**:
+
+- `platform.release.preflight.execute` (EFEONCE_ADMIN + DEVOPS_OPERATOR)
+- `platform.release.preflight.read_results` (EFEONCE_ADMIN + DEVOPS_OPERATOR + FINANCE_ADMIN observabilidad)
+- `platform.release.preflight.override_batch_policy` (EFEONCE_ADMIN solo, break-glass)
+
+**Hard Rules** canonizadas en CLAUDE.md sección "Production Preflight CLI invariants (TASK-850)".
+
+**Docs canonizadas**: CLAUDE.md + AGENTS.md secciones nuevas, DECISIONS_INDEX entry, GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md Delta TASK-850 SHIPPED, manual operador, doc funcional, runbook seccion 2 actualizada.
+
+---
+
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`

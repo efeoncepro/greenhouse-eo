@@ -261,6 +261,63 @@ tocados, dominios sensibles, migraciones, irreversibilidad, rollback complexity 
 - **OQ2 — Reliability signal thresholds**: usar baselines del spec; tune data-driven post-30d steady-state.
 - **OQ3 — Dashboard `/admin/releases`**: defer a TASK-855 V1.1; V1 cubre operator visibility via signals + psql contra release_manifests.
 
+## Delta 2026-05-10 — TASK-850 Production Preflight CLI SHIPPED
+
+CLI canonico `pnpm release:preflight` shipped con los 12 checks fail-fast que TASK-848 V1.1 spec demando. Composer pattern (TASK-672 mirror) con timeout independiente por check y output JSON machine-readable + humano. Es el gate canonico que TASK-851 orchestrator workflow + TASK-855 dashboard consumiran.
+
+### 4 decisiones foundational validadas (4-pillar)
+
+1. **Composer pattern** sobre TASK-672 canonico. Pure `composeFromCheckResults` + async `runPreflight` con `Promise.all` + `withSourceTimeout`. Reusable CLI + workflow + dashboard. Single source of truth.
+2. **Code constants** para `release_batch_policy` heuristic (`src/lib/release/preflight/batch-policy/{domains,classifier}.ts`). YAGNI promote-a-PG hasta que rule-edit frequency justifique editar sin deploy.
+3. **3 sub-capabilities granulares** (least-privilege): `platform.release.preflight.{execute,read_results,override_batch_policy}`. Override solo EFEONCE_ADMIN con audit row reason >= 20 chars.
+4. **Degraded mode honest** per check (TASK-672 precedent). Sentry + GCP + Postgres + git/CI strict (failure → error). Vercel + Azure WIF degraded (failure → warning).
+
+### Componentes shipped
+
+| Componente | Path | Proposito |
+|---|---|---|
+| CLI | `scripts/release/production-preflight.ts` | Entry point operator-facing |
+| Composer puro | `src/lib/release/preflight/composer.ts` | composeFromCheckResults deterministico |
+| Runner async | `src/lib/release/preflight/runner.ts` | Promise.all + withSourceTimeout per-check |
+| Registry canonico | `src/lib/release/preflight/registry.ts` | PREFLIGHT_CHECK_REGISTRY single source of truth |
+| Types contract | `src/lib/release/preflight/types.ts` | ProductionPreflightV1 versionado v1 |
+| Batch policy domains | `src/lib/release/preflight/batch-policy/domains.ts` | DOMAIN_PATTERNS + IRREVERSIBLE_DOMAINS + INDEPENDENT_DOMAIN_PAIRS |
+| Batch policy classifier | `src/lib/release/preflight/batch-policy/classifier.ts` | classifyReleaseBatch + decisionToSeverity puros |
+| Output formatters | `src/lib/release/preflight/output-formatters.ts` | JSON + human es-CL |
+| 12 checks | `src/lib/release/preflight/checks/*.ts` | 1 file per check |
+| Migration capabilities | `migrations/20260510144012098_task-850-preflight-capabilities.sql` | 3 sub-caps + DO RAISE EXCEPTION guard |
+| Catalog TS | `src/config/entitlements-catalog.ts` | 3 entries nuevas (TASK-611 SSOT pattern) |
+
+### Reuso canonico (cero duplicacion)
+
+- `src/lib/release/github-helpers.ts` (TASK-849) → resolveGithubToken, githubFetchJson, fetchGithubWithTimeout, githubRepoCoords
+- `src/lib/release/workflow-allowlist.ts` (TASK-849) → RELEASE_DEPLOY_WORKFLOW_NAMES filtra ci_green check
+- `src/lib/reliability/queries/release-stale-approval.ts` (TASK-848 V1.0) → `listWaitingProductionRuns` extracted como public export
+- `src/lib/reliability/queries/release-pending-without-jobs.ts` (TASK-848 V1.0) → `listPendingRuns` extracted
+- `src/lib/platform-health/with-source-timeout.ts` (TASK-672) → withSourceTimeout consume directo
+- `src/lib/observability/{capture,redact}.ts` → captureWithDomain('cloud', { tags: { source: 'preflight', stage } }) + redactErrorForResponse
+
+### Tests anti-regresion
+
+- 69/69 verdes en preflight module total
+- composer.test.ts: 9 tests (rollup matrix, confidence, ordering, missing checks, clock skew)
+- 1 test file por check (15 tests GitHub-backed + 9 reliability wrappers + 6 batch policy + 5 Vercel + 6 Sentry + 6 postgres parser + 3 output formatter)
+
+### Live smoke test verificado (2026-05-10)
+
+```bash
+pnpm release:preflight --target-branch=develop --target-sha=$(git rev-parse HEAD)
+```
+
+12 checks ejecutaron en paralelo en ~8s. Detecta correctamente split_batch (auth_access + cloud_release sin coupling marker) en commits TASK-850 mezclados con scripts/release/. Vercel READY ok. pg:doctor verde. Sin GH App + Vercel + Sentry + Azure tokens en local → 7 unknowns degraded (esperado y honesto). `contractVersion: 'production-preflight.v1'` confirmed en JSON output.
+
+### Pendiente para TASK-851 + TASK-855
+
+- TASK-851 Orchestrator workflow `production-release.yml` consume `pnpm release:preflight --json --fail-on-error` como step gate ANTES de disparar deploys.
+- TASK-855 Dashboard UI lee preflight historico desde manifest (cuando emerga persistencia de results).
+
+---
+
 ## Delta 2026-05-10 — V1.1 GitHub App SHIPPED LIVE
 
 GitHub App `Greenhouse Release Watchdog` creado, instalado, configurado y validado live end-to-end. Cierra el bucle de auth canonico del control plane production.

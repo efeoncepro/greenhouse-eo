@@ -1583,6 +1583,86 @@ GCP_PROJECT=efeonce-group GITHUB_APP_ID=3665723 \
 2. Workflow scheduled `production-release-watchdog.yml` se registra en GH Actions (cron `*/30` activa)
 3. Cron emite alertas Teams a `production-release-alerts` cuando detecte blockers (con dedup canonico)
 
+### Production Preflight CLI invariants (TASK-850)
+
+CLI `pnpm release:preflight` que ejecuta los **12 checks fail-fast** ANTES de promover `develop → main`. Composer pattern (TASK-672 mirror) con timeout independiente por check, output JSON machine-readable + humano, y `readyToDeploy` boolean conservador. Es el gate canonico que TASK-851 orchestrator workflow + TASK-855 dashboard van a consumir.
+
+**Read API canonico**:
+
+- Composer puro: `composeFromCheckResults(input)` en `src/lib/release/preflight/composer.ts` — worst-of-N rollup (any error → blocked, any warning → degraded, all ok → healthy, else unknown). `readyToDeploy = healthy AND zero degraded sources` (conservador).
+- Runner async: `runPreflight({audience, input, checks})` en `src/lib/release/preflight/runner.ts` — Promise.all + `withSourceTimeout` per-check (default 6s, override per registry entry). Defensive composer-level catch produces all-placeholders payload sin throw.
+- Registry canonico: `PREFLIGHT_CHECK_REGISTRY` en `src/lib/release/preflight/registry.ts` — single source of truth de los 12 check definitions. Adding/reordering requires extending `PreflightCheckId` union + `PREFLIGHT_CHECK_ORDER` array.
+- Contract versionado: `PRODUCTION_PREFLIGHT_CONTRACT_VERSION = 'production-preflight.v1'`. Breaking shape changes bumpean v2; new optional fields no requieren bump.
+- Helper canonico para integraciones GitHub: reusa `src/lib/release/github-helpers.ts` (TASK-849), `RELEASE_DEPLOY_WORKFLOW_NAMES` (workflow-allowlist), `listWaitingProductionRuns` (TASK-848 V1.0 reader extracted), `listPendingRuns` (TASK-848 V1.0 reader extracted).
+
+**12 checks canonicos** (orden estable):
+
+| # | checkId | Severity strict/degraded | Source |
+|---|---|---|---|
+| 1 | target_sha_exists | strict (404 → error) | GitHub API |
+| 2 | ci_green | strict (any failure → error) | GitHub API |
+| 3 | playwright_smoke | strict (failure → error, missing → warning) | GitHub API |
+| 4 | release_batch_policy | strict (split_batch \| requires_break_glass → error) | git diff local |
+| 5 | stale_approvals | strict (>=7d → error, >24h → warning) | GitHub API |
+| 6 | pending_without_jobs | strict (any → error, sintoma deadlock) | GitHub API |
+| 7 | vercel_readiness | degraded (Vercel outage no bloquea hard) | Vercel API |
+| 8 | postgres_health | strict (pg:doctor fail → error) | subprocess pnpm |
+| 9 | postgres_migrations | strict (pending → error) | subprocess pnpm |
+| 10 | gcp_wif_subject | strict (drift → error) | gcloud CLI |
+| 11 | azure_wif_subject | degraded (Azure menos critico runtime) | az CLI |
+| 12 | sentry_critical_issues | strict (>=10 → error, 1-9 → warning, API down → unknown bloquea) | Sentry API |
+
+**Check #4 release_batch_policy** (mas novel): clasifica diff `origin/main...target_sha` por dominio (`payroll`, `finance`, `auth_access`, `cloud_release`, `db_migrations`, `ui`, `docs`, `tests`, `config`, `unclassified`), detecta sensitive paths, computa irreversibility flags. Decision tree:
+- Empty → `ship`
+- INDEPENDENT sensitive mix sin marker `[release-coupled: <razon>]` en commit body → `split_batch` (error)
+- Cualquier IRREVERSIBLE domain (db_migrations, auth_access, payroll, finance, cloud_release) → `requires_break_glass` (error a menos que `--override-batch-policy` flag con capability)
+- Solo dominios reversibles → `ship`
+
+**3 capabilities granulares least-privilege** (migration `20260510144012098_task-850-preflight-capabilities.sql`):
+
+- `platform.release.preflight.execute` — disparar CLI / orchestrator. EFEONCE_ADMIN + DEVOPS_OPERATOR.
+- `platform.release.preflight.read_results` — leer JSON output desde dashboards futuros (TASK-855). EFEONCE_ADMIN + DEVOPS_OPERATOR + FINANCE_ADMIN (observabilidad).
+- `platform.release.preflight.override_batch_policy` — break-glass override del check release_batch_policy. **EFEONCE_ADMIN solo**. Requires reason >= 20 chars + audit row.
+
+**CLI usage canonico**:
+
+```bash
+# Local exploratory (todas exits 0 unless --fail-on-error)
+pnpm release:preflight                       # human output contra git HEAD vs main
+pnpm release:preflight --json                # JSON only, machine-readable
+pnpm release:preflight --target-sha=<sha>    # explicit SHA
+pnpm release:preflight --target-branch=develop
+
+# CI gate canonico (TASK-851 orchestrator)
+pnpm release:preflight --json --fail-on-error
+# exit 1 si overallStatus=blocked → workflow gate falla loud
+
+# Break-glass operator
+pnpm release:preflight --override-batch-policy --fail-on-error
+# Downgrade release_batch_policy errors a warnings (requiere capability + audit)
+```
+
+**Reliability signals**: 0 nuevos en V1.0. Reusa los 3 existentes (`platform.release.{stale_approval, pending_without_jobs, worker_revision_drift}`) embebidos como checks #5, #6.
+
+**Outbox events**: 0 nuevos en V1.0. TASK-851 orchestrator (futuro) emitira `platform.release.preflight_executed v1` cuando consuma este CLI.
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** modificar el shape de `ProductionPreflightV1` sin bumpear `contractVersion` a v2. TASK-851 orchestrator + TASK-855 dashboard dependen de la estabilidad. New optional fields OK sin bump.
+- **NUNCA** invocar checks individuales fuera del registry canonico. Si emerge necesidad de un nuevo callsite (e.g. dashboard que solo quiere ver Vercel readiness), ejecutar `runPreflight({checks: [PREFLIGHT_CHECK_REGISTRY[6]]})` con subset filtrado, no clonar la logica.
+- **NUNCA** componer la decision `readyToDeploy` en cliente. Lee `payload.readyToDeploy` directo. La derivacion vive en el composer puro.
+- **NUNCA** agregar un check nuevo sin extender `PreflightCheckId` union + `PREFLIGHT_CHECK_ORDER` array + registry + tests anti-regresion. Composer rechaza checks fuera del orden canonico.
+- **NUNCA** mostrar "ship" en CLI human output cuando hay degraded sources. El composer baja `confidence` y operador debe ver el detail. `readyToDeploy=false` es la senal canonica.
+- **NUNCA** reducir el timeout default 6s sin justificacion. La paralelizacion via `Promise.all` ya es agresiva; reducir mas significa que checks slow legitimos (gh API rate limit, subprocess slow) van a degradar a timeout silente.
+- **NUNCA** invocar `Sentry.captureException` directo en este path. Use `captureWithDomain(err, 'cloud', { tags: { source: 'preflight', stage: '<check_id>' } })`.
+- **NUNCA** loggear stack trace o payload completo del check en stderr/stdout. Use `redactErrorForResponse` antes.
+- **NUNCA** modificar `IRREVERSIBLE_DOMAINS` o `INDEPENDENT_DOMAIN_PAIRS` sin tests anti-regresion + documentar el porque del cambio en commit body.
+- **NUNCA** flagear `override_batch_policy` como default. Es opt-in explicito que requiere capability + audit row.
+- **SIEMPRE** que emerja un nuevo workflow production deploy, agregarlo a `RELEASE_DEPLOY_WORKFLOWS` ANTES del primer deploy (mismo invariant que TASK-849 watchdog) — ci_green check lo filtra automaticamente del set CI relevante.
+- **SIEMPRE** que se cambie copy es-CL en el output formatter, mantener consistencia con `getMicrocopy()` patterns aunque CLI no use el helper directamente (es operator-facing).
+
+**Spec canonica**: `docs/tasks/in-progress/TASK-850-production-preflight-cli-complete.md`. Migration: `migrations/20260510144012098_task-850-preflight-capabilities.sql`. CLI: `pnpm release:preflight [--json|--fail-on-error|--override-batch-policy|--target-sha=<sha>|--target-branch=<name>]`.
+
 ### Finance write-path E2E gate (TASK-773 Slice 6)
 
 Cualquier task que toque handlers `POST/PUT/PATCH/DELETE` en `src/app/api/finance/**/route.ts` **debe verificar el flow end-to-end downstream**, no solo el contract API. Bug class detectada 2026-05-03: el endpoint Figma respondía 200 OK pero el TC Santander no rebajaba — porque el contract API funcionaba pero el side effect downstream (outbox → BQ → reactive → account_balance) calló silencioso.

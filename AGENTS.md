@@ -770,6 +770,37 @@ Contrato versionado `platform-health.v1`. Permite a agentes (MCP, Teams bot, CI,
 - **Si tienes que generar un PAT fallback** (degraded mode V1.0): scopes minimos `Actions:read + Deployments:read + Metadata:read`, NUNCA mas amplio.
 - **Spec canonica**: `docs/architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md`. Runbooks: `docs/operations/runbooks/production-release.md` (release operativo), `docs/operations/runbooks/production-release-watchdog.md` (watchdog ops). Manuales: `docs/manual-de-uso/plataforma/release-watchdog.md` (operador), `docs/documentation/plataforma/release-watchdog.md` (funcional).
 
+### Production Preflight CLI (TASK-850, 2026-05-10)
+
+- **Que hace**: CLI `pnpm release:preflight` que ejecuta los 12 checks fail-fast ANTES de promover `develop → main`. Composer pattern (TASK-672 mirror) con timeout independiente por check via `withSourceTimeout`. Output JSON machine-readable + humano. `readyToDeploy` boolean conservador (`healthy AND zero degraded sources`).
+- **CLI canonico**:
+  - `pnpm release:preflight` → human output, exit 0 always
+  - `pnpm release:preflight --json` → JSON only (machine-readable, contractVersion='production-preflight.v1')
+  - `pnpm release:preflight --fail-on-error` → exit 1 si overallStatus=blocked (CI gate canonico)
+  - `pnpm release:preflight --override-batch-policy` → downgrade release_batch_policy errors a warnings (requiere `platform.release.preflight.override_batch_policy` capability + audit row reason >= 20 chars)
+  - `pnpm release:preflight --target-sha=<sha>` → SHA explicito (default git HEAD)
+  - `pnpm release:preflight --target-branch=<branch>` → branch a promover (default main)
+- **12 checks canonicos** (orden estable): target_sha_exists, ci_green, playwright_smoke, release_batch_policy, stale_approvals, pending_without_jobs, vercel_readiness, postgres_health, postgres_migrations, gcp_wif_subject, azure_wif_subject, sentry_critical_issues.
+- **Check #4 release_batch_policy** (mas novel): clasifica diff `origin/main...target_sha` por dominio (`payroll`, `finance`, `auth_access`, `cloud_release`, `db_migrations`, `ui`, `docs`, `tests`, `config`, `unclassified`) + decide ship | split_batch | requires_break_glass. Code constants en `src/lib/release/preflight/batch-policy/{domains,classifier}.ts` (YAGNI promote-a-PG hasta que rule-edit frequency >1x/mes).
+- **Severity rules** per check:
+  - STRICT (Sentry, GCP WIF, Postgres health/migrations, target_sha, ci, playwright, batch_policy, stale_approvals, pending_without_jobs): failure → error/block
+  - DEGRADED (Vercel, Azure WIF): failure → warning, degradedSources entry
+- **3 capabilities granulares least-privilege** (migration `20260510144012098_task-850-preflight-capabilities.sql`):
+  - `platform.release.preflight.execute` (EFEONCE_ADMIN + DEVOPS_OPERATOR)
+  - `platform.release.preflight.read_results` (EFEONCE_ADMIN + DEVOPS_OPERATOR + FINANCE_ADMIN observabilidad)
+  - `platform.release.preflight.override_batch_policy` (EFEONCE_ADMIN solo, break-glass)
+- **Helpers canonicos** (single source of truth, reusables):
+  - `src/lib/release/preflight/composer.ts` (composeFromCheckResults puro)
+  - `src/lib/release/preflight/runner.ts` (runPreflight async + Promise.all + withSourceTimeout)
+  - `src/lib/release/preflight/registry.ts` (PREFLIGHT_CHECK_REGISTRY canonico)
+  - `src/lib/release/preflight/types.ts` (ProductionPreflightV1 contract versionado)
+  - `src/lib/release/preflight/batch-policy/{domains,classifier}.ts` (release_batch_policy heuristic)
+  - `src/lib/release/preflight/output-formatters.ts` (JSON + human es-CL)
+- **Reusos de helpers existentes** (cero duplicacion): `src/lib/release/github-helpers.ts` (TASK-849), `RELEASE_DEPLOY_WORKFLOW_NAMES` (workflow-allowlist), `listWaitingProductionRuns` + `listPendingRuns` (TASK-848 V1.0 readers extracted to public exports), `withSourceTimeout` (TASK-672 platform-health), `captureWithDomain` + `redactErrorForResponse` (observability).
+- **Si emerge un check nuevo**: extender `PreflightCheckId` union + `PREFLIGHT_CHECK_ORDER` array + registry + tests. Composer rechaza checks fuera del orden canonico.
+- **Si emerge un nuevo dominio sensible** (e.g. `compliance`, `legal`): extender `DOMAIN_PATTERNS` + `IRREVERSIBLE_DOMAINS` + tests anti-regresion. Code constants → no requires migration, solo PR review.
+- **Spec canonica**: `docs/tasks/in-progress/TASK-850-production-preflight-cli-complete.md`. Runbook: `docs/operations/runbooks/production-release.md` (check #11). Manual operador: `docs/manual-de-uso/plataforma/release-preflight.md`. Doc funcional: `docs/documentation/plataforma/release-preflight.md`.
+
 ### Cloud Run hubspot-greenhouse-integration (HubSpot write bridge + webhooks) — TASK-574 (2026-04-24)
 
 - Servicio Cloud Run Python/Flask ubicado en `us-central1` (region bloqueada — NO migrar a `us-east4` porque la URL pública contiene `-uc.` y romperia el webhook del portal HubSpot).

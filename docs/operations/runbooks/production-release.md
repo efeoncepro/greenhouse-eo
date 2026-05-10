@@ -50,9 +50,31 @@ Este runbook es el contrato operativo para promover `develop` → `main` y para 
               └──────────────────────────────┘
 ```
 
-## 2. Preflight checklist (V1 manual)
+## 2. Preflight checklist (V1 manual + TASK-850 CLI canonico)
 
-Antes de crear PR `develop → main`, ejecutar estos checks. **Cualquier check rojo bloquea el release.**
+**TASK-850 SHIPPED 2026-05-10** — la tabla manual de abajo queda como referencia conceptual. Ejecutar **siempre** `pnpm release:preflight` que automatiza los 11 checks + agrega `release_batch_policy` (#4 nuevo) en una sola llamada con output JSON machine-readable.
+
+```bash
+# Pre-PR (operador local)
+pnpm release:preflight                       # human output, todos los 12 checks
+pnpm release:preflight --json                # JSON machine-readable
+
+# CI gate (TASK-851 orchestrator workflow)
+pnpm release:preflight --json --fail-on-error   # exit 1 si overallStatus=blocked
+
+# Break-glass (EFEONCE_ADMIN solo, requiere capability + audit)
+pnpm release:preflight --override-batch-policy --fail-on-error
+```
+
+Flags:
+
+- `--target-sha=<sha>` (default git HEAD)
+- `--target-branch=<branch>` (default main)
+- `--json`, `--fail-on-error`, `--override-batch-policy`
+
+Output canonico: `ProductionPreflightV1` (versionado `contractVersion='production-preflight.v1'`). Operator decide en base a `readyToDeploy: SI | NO`.
+
+Si por algun motivo el CLI no esta disponible (e.g. local sin checkout, o auth expirada), la tabla manual abajo sirve como fallback documental. **Cualquier check rojo bloquea el release.**
 
 | # | Check | Cómo verificar | Bloqueante |
 |---|---|---|---|

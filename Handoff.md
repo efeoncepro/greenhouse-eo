@@ -1,14 +1,33 @@
-# Sesion 2026-05-10 — TASK-850 Production Preflight CLI Complete (in-progress)
+# Sesion 2026-05-10 — TASK-850 Production Preflight CLI Complete SHIPPED
 
 - **Trigger:** post-merge `develop → main` de TASK-849 (PR #114), 3 worker deploys completos, watchdog cron `*/30` registrado en main. Usuario indico continuar con TASK-850..854 secuencial. Mantener en `develop`, no cambiar de rama.
 - **Branch:** `develop` (sin rama nueva por instruccion del usuario).
 - **Decisiones foundational pre-execution (4-pillar validadas inline)**:
-  1. **Composer pattern** (`src/lib/release/preflight/composer.ts`) sobre TASK-672 canonical para reusabilidad CLI + TASK-851 orchestrator + TASK-855 dashboard.
-  2. **Code constants** (`src/lib/release/batch-policy/rules.ts`) para release_batch_policy heuristic — YAGNI hasta que change frequency justifique PG table.
+  1. **Composer pattern** sobre TASK-672 canonical para reusabilidad CLI + TASK-851 orchestrator + TASK-855 dashboard.
+  2. **Code constants** para release_batch_policy heuristic — YAGNI hasta que change frequency justifique PG table.
   3. **3 sub-capabilities granulares**: `platform.release.preflight.{execute,read_results,override_batch_policy}` (override solo EFEONCE_ADMIN).
-  4. **Degraded mode honest** per TASK-672 precedent. Sentry + gcloud strict (failure=error). Vercel + az degraded (failure=warning con `degradedSources[]`).
-- **Skills invocadas:** `arch-architect` (validacion 4-pillar inline) + `greenhouse-backend` (proximo turno para implementacion).
-- **Proximo paso:** FASE 1 Discovery (paralelo Explore subagentes).
+  4. **Degraded mode honest** per TASK-672 precedent. Sentry + GCP + Postgres strict (failure=error). Vercel + Azure WIF degraded (failure=warning con `degradedSources[]`).
+- **Slices commiteados (9 commits incrementales)**:
+  - `0e2f538b` Slice 0 — Foundation: types + composer + runner (9 tests)
+  - `ec8302cc` Slice 1 — 3 capabilities seeded (migration con DO RAISE EXCEPTION ISSUE-068 lesson + entitlements-catalog.ts + parity test verde)
+  - `aacbc15d` Slice 2 — Checks 1-3 GitHub-backed (target SHA + CI green + Playwright smoke, 15 tests)
+  - `722493ed` Slice 3 — Checks 5-6 reliability reader wrappers (stale_approvals + pending_without_jobs, 9 tests)
+  - `70465d5f` Slice 4 — Check 4 release_batch_policy (10 dominios, IRREVERSIBLE_DOMAINS, INDEPENDENT_DOMAIN_PAIRS, 14 tests)
+  - `863d6e9a` Slice 5 — Checks 7+12 Vercel readiness + Sentry critical issues (11 tests)
+  - `2913f153` Slices 6+7 — Checks 10-11 GCP+Azure WIF + Checks 8-9 Postgres health+migrations (6 tests parser puro)
+  - `b384d57b` Slice 8 — CLI assembly + JSON + human output + canonical registry (3 formatter tests)
+  - **Total: 69/69 tests verdes**
+- **Live smoke test verificado**: `pnpm release:preflight --target-branch=develop --target-sha=$(git rev-parse HEAD)` → 12 checks en paralelo en ~8s, detecta correctamente split_batch (auth_access + cloud_release sin coupling marker), Vercel READY, pg:doctor verde, contractVersion='production-preflight.v1' en JSON output confirmed.
+- **Docs canonizadas (Slice 9, este turno)**:
+  - `CLAUDE.md` nueva seccion "Production Preflight CLI invariants (TASK-850)" con 12-check matrix + capabilities + reglas duras
+  - `AGENTS.md` nueva seccion "Production Preflight CLI (TASK-850, 2026-05-10)" con CLI usage + helpers canonicos
+  - `docs/architecture/DECISIONS_INDEX.md` entry "Production preflight CLI usa composer pattern TASK-672, NO single-CLI monolithic"
+  - `docs/architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md` nuevo Delta "TASK-850 Production Preflight CLI SHIPPED" con 4 decisiones + componentes shipped + reusos + tests + smoke verificado
+  - `docs/manual-de-uso/plataforma/release-preflight.md` NUEVO manual operador-facing paso-a-paso
+  - `docs/documentation/plataforma/release-preflight.md` NUEVO doc funcional
+  - `docs/operations/runbooks/production-release.md` seccion 2 actualizada para citar el CLI canonico
+- **Skills invocadas:** `arch-architect` (validacion 4-pillar inline pre-execution) + `greenhouse-backend` (implementacion).
+- **Proximo paso:** Slice 10 (PR + cierre TASK + Lifecycle complete + README sync). Despues TASK-851 Orchestrator Workflow.
 
 ---
 
