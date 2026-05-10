@@ -102,6 +102,7 @@
     "auth:audit-azure-app": "tsx scripts/auth/audit-azure-app.ts",
     "release:rollback": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/release/production-rollback.ts",
     "release:watchdog": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/release/production-release-watchdog.ts",
+    "release:preflight": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/release/production-preflight.ts",
     "release:setup-github-app": "tsx scripts/release/setup-github-app.ts",
     "release:complete-github-app-setup": "tsx scripts/release/complete-github-app-setup.ts",
     "setup:bigquery:outbox": "tsx scripts/setup-bigquery-outbox.ts",
