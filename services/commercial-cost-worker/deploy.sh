@@ -185,8 +185,10 @@ else
 fi
 
 # TASK-849 — GIT_SHA env var for production-release-watchdog drift detection.
+# TASK-851 — EXPECTED_SHA del orchestrator workflow para release controlado.
 # Ver ops-worker/deploy.sh para contexto completo.
-GIT_SHA="${GITHUB_SHA:-$(git rev-parse HEAD 2>/dev/null || echo 'unknown')}"
+EXPECTED_SHA="${EXPECTED_SHA:-${GITHUB_SHA:-$(git rev-parse HEAD 2>/dev/null || echo 'unknown')}}"
+GIT_SHA="${EXPECTED_SHA}"
 ENV_VARS="${ENV_VARS},GIT_SHA=${GIT_SHA}"
 
 echo "=== Deploying ${SERVICE_NAME} to Cloud Run (${REGION}) ==="
@@ -211,6 +213,39 @@ SERVICE_URL=$(gcloud run services describe "${SERVICE_NAME}" \
   --project="${PROJECT_ID}" \
   --region="${REGION}" \
   --format="value(status.url)")
+
+# TASK-851 — Verify GIT_SHA on deployed revision matches EXPECTED_SHA.
+# Ver ops-worker/deploy.sh para contexto completo + rationale.
+if [ "${EXPECTED_SHA}" != "unknown" ]; then
+  echo "=== Verifying revision GIT_SHA matches EXPECTED_SHA=${EXPECTED_SHA} ==="
+
+  REVISION_NAME="$(gcloud run services describe "${SERVICE_NAME}" \
+    --project="${PROJECT_ID}" \
+    --region="${REGION}" \
+    --format='value(status.latestReadyRevisionName)')"
+
+  REVISION_GIT_SHA="$(gcloud run revisions describe "${REVISION_NAME}" \
+    --project="${PROJECT_ID}" \
+    --region="${REGION}" \
+    --format=json | python3 -c "
+import json, sys
+data = json.load(sys.stdin)
+containers = (data.get('spec', {}) or {}).get('containers', []) or (data.get('spec', {}).get('template', {}) or {}).get('spec', {}).get('containers', [])
+for c in containers:
+    for env in (c.get('env') or []):
+        if env.get('name') == 'GIT_SHA':
+            print(env.get('value', ''))
+            sys.exit(0)
+print('')
+" 2>/dev/null || echo "")"
+
+  if [ -z "${REVISION_GIT_SHA}" ] || [ "${REVISION_GIT_SHA}" != "${EXPECTED_SHA}" ]; then
+    echo "ERROR: GIT_SHA mismatch — esperado=${EXPECTED_SHA}, revision=${REVISION_GIT_SHA:-<empty>}."
+    exit 1
+  fi
+
+  echo "✓ GIT_SHA verified: revision ${REVISION_NAME} expone GIT_SHA=${EXPECTED_SHA}"
+fi
 
 echo "=== Service deployed at: ${SERVICE_URL} ==="
 

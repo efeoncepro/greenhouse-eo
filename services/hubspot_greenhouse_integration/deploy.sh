@@ -193,11 +193,11 @@ ENV_VARS="${ENV_VARS},HUBSPOT_GREENHOUSE_INTEGRATION_TIMEOUT_SECONDS=${HUBSPOT_T
 ENV_VARS="${ENV_VARS},HUBSPOT_GREENHOUSE_WEBHOOK_MAX_AGE_MS=${HUBSPOT_WEBHOOK_MAX_AGE_MS}"
 
 # TASK-849 Slice 1 follow-up — GIT_SHA env var for production-release-watchdog
-# revision drift detection. Mismo patron que ops-worker / commercial-cost-worker
-# / ico-batch deploy.sh. El watchdog (scripts/release/production-release-watchdog.ts)
-# compara este SHA vs el ultimo workflow run success per worker; mismatch =
-# critical (revision Cloud Run no es la del ultimo deploy verde).
-GIT_SHA="${GITHUB_SHA:-$(git rev-parse HEAD 2>/dev/null || echo 'unknown')}"
+# revision drift detection.
+# TASK-851 — EXPECTED_SHA del orchestrator workflow para release controlado.
+# Mismo patron que ops-worker / commercial-cost-worker / ico-batch deploy.sh.
+EXPECTED_SHA="${EXPECTED_SHA:-${GITHUB_SHA:-$(git rev-parse HEAD 2>/dev/null || echo 'unknown')}}"
+GIT_SHA="${EXPECTED_SHA}"
 ENV_VARS="${ENV_VARS},GIT_SHA=${GIT_SHA}"
 
 SECRETS="HUBSPOT_ACCESS_TOKEN=$(normalize_secret_ref_for_cloud_run "${HUBSPOT_ACCESS_TOKEN_SECRET_NAME}")"
@@ -234,6 +234,38 @@ SERVICE_URL=$(gcloud run services describe "${SERVICE_NAME}" \
   --format="value(status.url)")
 
 echo "=== Service deployed at: ${SERVICE_URL} ==="
+
+# TASK-851 — Verify GIT_SHA on deployed revision matches EXPECTED_SHA.
+if [ "${EXPECTED_SHA}" != "unknown" ]; then
+  echo "=== Verifying revision GIT_SHA matches EXPECTED_SHA=${EXPECTED_SHA} ==="
+
+  REVISION_NAME="$(gcloud run services describe "${SERVICE_NAME}" \
+    --project="${PROJECT_ID}" \
+    --region="${REGION}" \
+    --format='value(status.latestReadyRevisionName)')"
+
+  REVISION_GIT_SHA="$(gcloud run revisions describe "${REVISION_NAME}" \
+    --project="${PROJECT_ID}" \
+    --region="${REGION}" \
+    --format=json | python3 -c "
+import json, sys
+data = json.load(sys.stdin)
+containers = (data.get('spec', {}) or {}).get('containers', []) or (data.get('spec', {}).get('template', {}) or {}).get('spec', {}).get('containers', [])
+for c in containers:
+    for env in (c.get('env') or []):
+        if env.get('name') == 'GIT_SHA':
+            print(env.get('value', ''))
+            sys.exit(0)
+print('')
+" 2>/dev/null || echo "")"
+
+  if [ -z "${REVISION_GIT_SHA}" ] || [ "${REVISION_GIT_SHA}" != "${EXPECTED_SHA}" ]; then
+    echo "ERROR: GIT_SHA mismatch — esperado=${EXPECTED_SHA}, revision=${REVISION_GIT_SHA:-<empty>}."
+    exit 1
+  fi
+
+  echo "✓ GIT_SHA verified: revision ${REVISION_NAME} expone GIT_SHA=${EXPECTED_SHA}"
+fi
 
 READY="$(gcloud run services describe "${SERVICE_NAME}" \
   --project="${PROJECT_ID}" \

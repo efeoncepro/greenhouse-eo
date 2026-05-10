@@ -323,13 +323,18 @@ ensure_secret_accessor_binding "${NUBOX_BEARER_TOKEN_SECRET_REF}"
 ensure_secret_accessor_binding "${NUBOX_X_API_KEY_SECRET_REF}"
 
 # TASK-849 — GIT_SHA env var for production-release-watchdog drift detection.
-# El watchdog (scripts/release/production-release-watchdog.ts) compara este SHA
-# vs el ultimo workflow run success per worker; mismatch = critical (revision
-# Cloud Run no es la del ultimo deploy verde).
-# Resolucion en orden: $GITHUB_SHA (auto en GitHub Actions runner) → git rev-parse
-# (fallback local). Si no hay git context, queda 'unknown' y el watchdog lo
-# reporta como degraded honestamente.
-GIT_SHA="${GITHUB_SHA:-$(git rev-parse HEAD 2>/dev/null || echo 'unknown')}"
+# TASK-851 — Aceptar EXPECTED_SHA env var del orchestrator workflow para
+# release controlado: el orchestrator pasa el SHA target a deployar y
+# post-deploy verificamos que la revision Cloud Run efectivamente recibio
+# ese SHA (mismatch = bug en Cloud Build cache, deploy transient o tag drift).
+#
+# Resolucion en orden:
+#   1. $EXPECTED_SHA (orchestrator workflow TASK-851)
+#   2. $GITHUB_SHA (auto en GitHub Actions runner para push/dispatch directo)
+#   3. git rev-parse HEAD (fallback local)
+#   4. 'unknown' (sin git context — watchdog reporta degraded honestamente)
+EXPECTED_SHA="${EXPECTED_SHA:-${GITHUB_SHA:-$(git rev-parse HEAD 2>/dev/null || echo 'unknown')}}"
+GIT_SHA="${EXPECTED_SHA}"
 ENV_VARS="${ENV_VARS},GIT_SHA=${GIT_SHA}"
 
 gcloud run deploy "${SERVICE_NAME}" \
@@ -354,6 +359,49 @@ SERVICE_URL=$(gcloud run services describe "${SERVICE_NAME}" \
   --format="value(status.url)")
 
 echo "=== Service deployed at: ${SERVICE_URL} ==="
+
+# TASK-851 — Verify GIT_SHA env var matches EXPECTED_SHA on deployed revision.
+# Defensa-in-depth contra Cloud Build cache mismatch, transient deploy issues o
+# tag drift entre workflow trigger y revision serving. Mismatch = exit 1 fail-loud.
+# Skipea cuando EXPECTED_SHA='unknown' (no git context).
+if [ "${EXPECTED_SHA}" != "unknown" ]; then
+  echo "=== Verifying revision GIT_SHA matches EXPECTED_SHA=${EXPECTED_SHA} ==="
+
+  REVISION_NAME="$(gcloud run services describe "${SERVICE_NAME}" \
+    --project="${PROJECT_ID}" \
+    --region="${REGION}" \
+    --format='value(status.latestReadyRevisionName)')"
+
+  REVISION_GIT_SHA="$(gcloud run revisions describe "${REVISION_NAME}" \
+    --project="${PROJECT_ID}" \
+    --region="${REGION}" \
+    --format=json | python3 -c "
+import json, sys
+data = json.load(sys.stdin)
+containers = (data.get('spec', {}) or {}).get('containers', []) or (data.get('spec', {}).get('template', {}) or {}).get('spec', {}).get('containers', [])
+for c in containers:
+    for env in (c.get('env') or []):
+        if env.get('name') == 'GIT_SHA':
+            print(env.get('value', ''))
+            sys.exit(0)
+print('')
+" 2>/dev/null || echo "")"
+
+  if [ -z "${REVISION_GIT_SHA}" ]; then
+    echo "ERROR: revision ${REVISION_NAME} no expone GIT_SHA env var. Verify deploy applied --set-env-vars correctamente."
+    exit 1
+  fi
+
+  if [ "${REVISION_GIT_SHA}" != "${EXPECTED_SHA}" ]; then
+    echo "ERROR: GIT_SHA mismatch — esperado=${EXPECTED_SHA}, revision serving=${REVISION_GIT_SHA}."
+    echo "       Causas comunes: Cloud Build cache stale, tag drift, deploy aborted mid-flight."
+    echo "       Re-run el workflow con cache invalidation o investigar Cloud Build logs:"
+    echo "       https://console.cloud.google.com/cloud-build/builds?project=${PROJECT_ID}"
+    exit 1
+  fi
+
+  echo "✓ GIT_SHA verified: revision ${REVISION_NAME} expone GIT_SHA=${EXPECTED_SHA}"
+fi
 
 # ─── IAM: Grant Invoker role to SA (idempotent) ─────────────────────────────
 
