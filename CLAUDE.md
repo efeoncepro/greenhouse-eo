@@ -1788,9 +1788,9 @@ Los 2 workflows Azure (`azure-teams-deploy.yml` Logic Apps + `azure-teams-bot-de
 - `inputs.environment` (string, required) — `staging` | `production`
 - `inputs.target_sha` (string, required) — para diff detection vs `origin/main~1`
 - `inputs.force_infra_deploy` (boolean, optional default false) — operator override
-- `secrets.{AZURE_CLIENT_ID, AZURE_TENANT_ID, AZURE_SUBSCRIPTION_ID}` (required) — environment-scoped secrets
+- `secrets.{AZURE_CLIENT_ID, AZURE_TENANT_ID, AZURE_SUBSCRIPTION_ID}` (required) — repo-level secrets
 
-**Patron canonico para secrets en orchestrator**: `secrets: inherit` (NO `secrets: AZURE_*: ${{ secrets.AZURE_* }}` explicito). Los AZURE_* viven en environment scope (production), no repo-level. `inherit` es el patron GH Actions canonico — el callee resuelve los secrets en su propio environment declarado en cada job. GCP_WORKLOAD_IDENTITY_PROVIDER (repo-level) tambien fluye via `inherit`.
+**Patron canonico para secrets en orchestrator** (corregido 2026-05-10 post arch-architect verdict): `secrets: inherit` para callee workflow_call que requiere AZURE_*. AZURE_* DEBEN ser **repo-level**, NO environment-scoped. Razon: GitHub Actions NO permite combinar `uses: workflow_call` con `environment:` en el mismo job (limitacion documentada). Por lo tanto el caller orchestrator NO ve environment-scoped secrets cuando invoca el callee, y `secrets: inherit` falla con `Secret X is required, but not provided while calling`. AZURE_CLIENT_ID/TENANT_ID/SUBSCRIPTION_ID son **identifiers no-sensitives** (NO credentials) — la auth real corre via WIF subjects (`repo:efeoncepro/greenhouse-eo:environment:production` + `:ref:refs/heads/main`) que YA estan registradas en el Azure AD App Registration. Mover los identifiers a repo-level NO pierde security; isolation real esta en WIF subjects, no en secret scope. Caso real 2026-05-10 run 25635535801: 2 jobs Azure Bicep validate fallaron en 2 segundos sin runner por este bug class, validado arch-architect 4-pillar, fix consolidado en mismo commit.
 
 **WIF subjects canonicos Azure** (federated credential del Azure AD App Registration en tenant `a80bf6c1-7c45-4d70-b043-51389622a0e4`):
 

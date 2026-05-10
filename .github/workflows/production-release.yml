@@ -335,10 +335,14 @@ jobs:
       environment: production
       target_sha: ${{ inputs.target_sha }}
       force_infra_deploy: ${{ inputs.force_infra_deploy }}
-    # AZURE_* secrets viven en environment-scope (production), NO repo-level.
-    # secrets: inherit es el patron canonico GH Actions para que el callee
-    # los resuelva en su propio environment scope (declarado en cada job).
-    # GCP_WORKLOAD_IDENTITY_PROVIDER (repo-level) tambien fluye via inherit.
+    # AZURE_* secrets son REPO-LEVEL (corregido 2026-05-10 post detectar bug
+    # live run 25635535801). NO pueden ser environment-scoped porque GitHub
+    # Actions NO permite combinar `uses: workflow_call` con `environment:` en
+    # el mismo job — el caller orchestrator no ve environment-scoped secrets
+    # y `secrets: inherit` falla con "Secret X required, not provided while calling".
+    # AZURE_CLIENT_ID/TENANT_ID/SUBSCRIPTION_ID son identifiers no-sensitives;
+    # auth real corre via WIF subjects registradas en Azure AD App. Ver
+    # CLAUDE.md "Azure Infra Release Gating invariants (TASK-853)" para detalle.
     secrets: inherit
 
   deploy-azure-teams-bot:
