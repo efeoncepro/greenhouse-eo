@@ -123,9 +123,15 @@ jobs:
             exit 1
           fi
 
-          # Run preflight: write JSON to file for archival, run again for stdout summary
+          # Run preflight: write JSON to file for archival.
+          # `pnpm --silent` suprime el banner `> vuexy-mui... > tsx ...` que
+          # pnpm imprime por default al stdout — sin --silent ese prefix
+          # contamina preflight-result.json y rompe el `jq` posterior.
+          # Regla canonica: cualquier `pnpm <script> --json` que se redirija
+          # con `>` debe usar `--silent`. Documentado en CLAUDE.md
+          # "Production Preflight CLI invariants (TASK-850)".
           set +e
-          pnpm release:preflight \
+          pnpm --silent release:preflight \
             --json \
             --fail-on-error \
             ${OVERRIDE_FLAG} \
