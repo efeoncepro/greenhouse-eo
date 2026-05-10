@@ -6071,6 +6071,29 @@ export interface GreenhousePayrollChilePreviredIndicators {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhousePayrollChilePreviredWorkerProfiles {
+  created_at: Generated<Timestamp>;
+  /**
+   * Previred Tabla N°16. 00 Sin Isapre, 07 Fonasa, otherwise exact Isapre code.
+   */
+  health_institution_code: Generated<string>;
+  /**
+   * Previred Tabla N°2: 0 Chileno, 1 Extranjero. Required; CL_RUT alone is not treated as proof of nationality.
+   */
+  nationality_code: string;
+  notes: string | null;
+  profile_id: string;
+  /**
+   * Previred Tabla N°1: M/F. Required; never inferred from names.
+   */
+  sex_code: string;
+  source_kind: Generated<string>;
+  source_ref: string | null;
+  updated_at: Generated<Timestamp>;
+  verified_at: Generated<Timestamp>;
+  verified_by: string | null;
+}
+
 export interface GreenhousePayrollChileTaxBrackets {
   bracket_id: string;
   bracket_order: number;
@@ -8455,6 +8478,58 @@ export interface GreenhouseSyncProjectionRefreshQueue {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseSyncReleaseManifests {
+  attempt_n: Generated<number>;
+  completed_at: Timestamp | null;
+  /**
+   * FK a greenhouse_core.members cuando triggered_by es un member humano. NULL aceptado para release automatizado por system actor (rollback automático post-health-check).
+   */
+  operator_member_id: string | null;
+  post_release_health: Generated<Json>;
+  preflight_result: Generated<Json>;
+  previous_vercel_deployment_url: string | null;
+  previous_worker_revisions: Generated<Json>;
+  /**
+   * PK formato `<targetSha[:12]>-<UUIDv4>`. UUIDv4 + index por started_at DESC = ordering equivalente a UUIDv7 sin dep npm nueva.
+   */
+  release_id: string;
+  rollback_plan: Generated<Json>;
+  source_branch: Generated<string>;
+  started_at: Generated<Timestamp>;
+  /**
+   * Estado actual del release. Enum cerrado vía CHECK constraint. Transiciones permitidas: preflight→ready→deploying→verifying→released|degraded|aborted; released→rolled_back; degraded→rolled_back|released. Mirror canónico del enum TS ReleaseState.
+   */
+  state: Generated<string>;
+  target_branch: Generated<string>;
+  target_sha: string;
+  /**
+   * Free-form audit del actor que disparó el release. Convención: `member:<member_id>` cuando humano, `system:<actor>` cuando automatizado (e.g. system:health-check-rollback), `cli:<gh-login>` cuando CLI local.
+   */
+  triggered_by: string;
+  vercel_deployment_url: string | null;
+  worker_revisions: Generated<Json>;
+  workflow_runs: Generated<Json>;
+}
+
+export interface GreenhouseSyncReleaseStateTransitions {
+  /**
+   * Categoria del actor: member (humano via UI/workflow_dispatch), system (automatización interna), cli (script local invocado por humano via gh CLI).
+   */
+  actor_kind: string;
+  actor_label: string;
+  actor_member_id: string | null;
+  from_state: string;
+  metadata_json: Generated<Json>;
+  /**
+   * Razón legible de la transición. >= 5 chars enforced. Para break-glass bypass_preflight requerirá reason >=20 chars adicional vía application guard.
+   */
+  reason: string;
+  release_id: string;
+  to_state: string;
+  transition_id: Generated<string>;
+  transitioned_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseSyncReliabilitySyntheticRuns {
   created_at: Generated<Timestamp>;
   error_message: string | null;
@@ -8971,6 +9046,7 @@ export interface DB {
   "greenhouse_payroll.attendance_monthly_snapshot": GreenhousePayrollAttendanceMonthlySnapshot;
   "greenhouse_payroll.chile_afp_rates": GreenhousePayrollChileAfpRates;
   "greenhouse_payroll.chile_previred_indicators": GreenhousePayrollChilePreviredIndicators;
+  "greenhouse_payroll.chile_previred_worker_profiles": GreenhousePayrollChilePreviredWorkerProfiles;
   "greenhouse_payroll.chile_tax_brackets": GreenhousePayrollChileTaxBrackets;
   "greenhouse_payroll.compensation_versions": GreenhousePayrollCompensationVersions;
   "greenhouse_payroll.compliance_export_artifacts": GreenhousePayrollComplianceExportArtifacts;
@@ -9066,6 +9142,8 @@ export interface DB {
   "greenhouse_sync.outbox_reactive_log": GreenhouseSyncOutboxReactiveLog;
   "greenhouse_sync.projection_circuit_state": GreenhouseSyncProjectionCircuitState;
   "greenhouse_sync.projection_refresh_queue": GreenhouseSyncProjectionRefreshQueue;
+  "greenhouse_sync.release_manifests": GreenhouseSyncReleaseManifests;
+  "greenhouse_sync.release_state_transitions": GreenhouseSyncReleaseStateTransitions;
   "greenhouse_sync.reliability_synthetic_runs": GreenhouseSyncReliabilitySyntheticRuns;
   "greenhouse_sync.reporting_hierarchy_drift_proposals": GreenhouseSyncReportingHierarchyDriftProposals;
   "greenhouse_sync.schema_migrations": GreenhouseSyncSchemaMigrations;
