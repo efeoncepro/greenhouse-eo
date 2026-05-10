@@ -1,3 +1,12 @@
+# Sesion 2026-05-10 — Production release follow-up + TASK-848 creada
+
+- **Trigger:** tras promover `develop` a `main`, el usuario pidio explicar que workflows quedaron huerfanos y crear la task recomendada por analisis de arquitectura.
+- **Workflows bloqueados confirmados:** `Ops Worker Deploy`, `Commercial Cost Worker Deploy` e `ICO Batch Worker Deploy` quedaron con runs nuevos sin jobs (`jobs: []`) porque no tomaron el slot de `concurrency`; afecto push runs `25614899662`, `25614899674`, `25614899686` y manual dispatch runs `25615587227`, `25615587234`, `25615587237` sobre SHA `d5f45b163e6c405b34b532ade91ddba68563cc15`. Todos terminaron cancelados.
+- **Diagnostico refinado:** no fue fallo dentro de `services/*/deploy.sh` ni causa directa del bump TASK-607 (`auth@v3/setup-gcloud@v3` funciono en `develop` post-`7f3de12e`). La causa raiz operativa fue `concurrency.group: <worker>-deploy-${{ github.ref }}` + `cancel-in-progress: false` bloqueado por runs antiguos de `main` esperando approval de environment `Production`: `ops-worker` run `24970337613` (2026-04-26), `commercial-cost-worker` run `24970337616` (2026-04-26), `ico-batch-worker` run `24594085240` (2026-04-18). Los pushes nuevos reemplazaron el pending anterior, pero no avanzaron mientras esos waiting approvals siguieran vivos.
+- **Task creada:** `TASK-848 Production Release Control Plane` en `docs/tasks/to-do/TASK-848-production-release-control-plane.md`. Registry y README sincronizados; `TASK-849` se reservo despues para el watchdog.
+- **Task adicional creada:** `TASK-849 Production Release Watchdog Alerts` en `docs/tasks/to-do/TASK-849-production-release-watchdog-alerts.md`. Objetivo: scheduled watchdog cada 30min + alertas Slack/Teams + signals para stale approvals/pending-without-jobs/worker drift, para que un bloqueo productivo no vuelva a pasar 14-22 dias invisible. Registry y README sincronizados; siguiente ID disponible `TASK-850`.
+- **Nota operacional:** Azure Teams Bot/Notifications quedaron exitosos despues de crear App Registration/WIF/secrets de Production en vivo. TASK-848 debe codificar ese contrato como preflight para que no vuelva a descubrirse tarde durante deploy.
+
 # Sesion 2026-05-09 — TASK-837 Deal-Bound Sample Sprint HubSpot Service Projection (CERRADA)
 
 - **Trigger:** usuario pide implementar TASK-837 directo en `develop` con auto mode, sinergia ecosystem + Open Questions resolution + skills UI cuando toque.
