@@ -132,18 +132,118 @@ psql -c "DELETE FROM greenhouse_sync.release_watchdog_alert_state"
 
 ## 8. Configuración requerida
 
-### 8.1. GitHub token para los readers (opcional pero recomendado)
+### 8.1. GitHub App canonical (recomendado V1.1) — token strategy robusta
 
-Sin token, los 3 readers degradan a `severity='unknown'` con summary explicativo. NO crashean. Pero el operador NO ve los blockers automaticamente.
+El watchdog soporta 2 strategies de auth para GitHub API:
+
+| Strategy | Cuándo usarla | Tradeoff |
+|---|---|---|
+| **GitHub App installation token** (canonical V1.1) | Siempre que sea posible | Setup ~2-3h one-time + $0.72/año GCP secret. Token NO ligado a usuario, rate limit 15K req/h, auditoría per-installation |
+| **PAT fallback** (degraded V1.0) | Solo si GH App no esta configurado | 5 min setup. Token ligado al user creator, rate limit 5K req/h, expira con el user |
+
+**Resolution order canónico** (`src/lib/release/github-helpers.ts`):
+
+1. Si las 3 env vars `GITHUB_APP_ID` + `GITHUB_APP_INSTALLATION_ID` + `GREENHOUSE_GITHUB_APP_PRIVATE_KEY_SECRET_REF` están configuradas → mint installation token via JWT (cache 1h)
+2. Sino, fallback a `GITHUB_RELEASE_OBSERVER_TOKEN` PAT (Vercel) o `GITHUB_TOKEN` (GH Actions auto-provisto)
+3. Sin nada → `severity='unknown'` (degraded honest)
+
+#### Setup GitHub App (one-time, ~30 min UI + 15 min CLI)
+
+**Paso 1: Crear GitHub App en `efeoncepro` org**
+
+1. Ir a `https://github.com/organizations/efeoncepro/settings/apps/new`
+2. Llenar:
+   - **Name**: `Greenhouse Release Watchdog`
+   - **Homepage URL**: `https://greenhouse.efeoncepro.com`
+   - **Webhook**: deshabilitar checkbox "Active" (read-only watchdog no recibe webhooks)
+   - **Permissions** (Repository):
+     - `Actions`: **Read-only**
+     - `Deployments`: **Read-only**
+     - `Metadata`: **Read-only** (mandatory baseline)
+   - **Where can this GitHub App be installed?**: Only on this account
+3. Click **Create GitHub App**
+4. Anotar el **App ID** (numero, ej: 1234567) — necesario para env var
+
+**Paso 2: Generar private key**
+
+1. En la página del App recién creado: scroll a "Private keys" → **Generate a private key**
+2. Descargar el `.pem` file (NUNCA committearlo al repo)
+
+**Paso 3: Instalar el App en `greenhouse-eo` repo**
+
+1. En la página del App: sidebar **Install App** → **efeoncepro org** → **Install**
+2. Seleccionar **Only select repositories** → `greenhouse-eo`
+3. Click **Install**
+4. Anotar el **Installation ID** del URL post-install:
+   `https://github.com/organizations/efeoncepro/settings/installations/<INSTALLATION_ID>`
+
+**Paso 4: Subir private key a GCP Secret Manager**
 
 ```bash
-# Crear PAT con scopes: actions:read, deployments:read
-# Agregar a Vercel env vars production:
-gh auth token | vercel env add GITHUB_RELEASE_OBSERVER_TOKEN production
+# Crear el secret (si no existe)
+gcloud secrets create greenhouse-github-app-private-key \
+  --replication-policy=automatic \
+  --project=efeonce-group
 
-# El watchdog scheduled usa GITHUB_TOKEN auto-provisto (no requiere PAT extra
-# en GH Actions runner). Solo Vercel runtime necesita el PAT manual.
+# Subir el .pem (path al file descargado en paso 2)
+cat /path/to/greenhouse-release-watchdog.private-key.pem | \
+  gcloud secrets versions add greenhouse-github-app-private-key \
+  --data-file=- \
+  --project=efeonce-group
+
+# Borrar el .pem local DESPUES de subir (NUNCA committear)
+shred -u /path/to/greenhouse-release-watchdog.private-key.pem
 ```
+
+**Paso 5: Configurar Vercel env vars (production)**
+
+```bash
+# 3 env vars requeridas:
+echo "<APP_ID_NUMERO>" | vercel env add GITHUB_APP_ID production
+echo "<INSTALLATION_ID_NUMERO>" | vercel env add GITHUB_APP_INSTALLATION_ID production
+echo "greenhouse-github-app-private-key" | vercel env add GREENHOUSE_GITHUB_APP_PRIVATE_KEY_SECRET_REF production
+
+# Trigger redeploy para que las env vars apliquen
+vercel deploy --prod
+```
+
+**Paso 6: Verificar end-to-end**
+
+```bash
+# Smoke test post-setup
+curl -s https://greenhouse.efeoncepro.com/admin/operations | grep -i "platform.release"
+# Debe mostrar 3 signals con severity != 'unknown'
+
+# Local CLI con GH App env vars (opcional, requires gcloud auth)
+GITHUB_APP_ID=<id> \
+GITHUB_APP_INSTALLATION_ID=<id> \
+GREENHOUSE_GITHUB_APP_PRIVATE_KEY_SECRET_REF=greenhouse-github-app-private-key \
+pnpm release:watchdog --json
+```
+
+#### Mantenimiento ongoing
+
+| Item | Frecuencia | Comando |
+|---|---|---|
+| Rotar private key | Anual (best practice) | Generate nueva en App → upload nueva version a Secret Manager → delete old version |
+| Verificar installation activa | Mensual (después de org changes) | `https://github.com/organizations/efeoncepro/settings/installations/<id>` |
+| Revisar permissions | Semestral | App page → **Permissions & events** → confirmar Actions/Deployments/Metadata read-only |
+
+#### Fallback a PAT (V1.0 degraded mode)
+
+Si necesitas activar el watchdog antes de completar setup GH App:
+
+```bash
+# Crear fine-grained PAT con scopes minimos:
+# https://github.com/settings/personal-access-tokens/new
+#   - Repository access: Only `efeoncepro/greenhouse-eo`
+#   - Permissions: Actions (read), Deployments (read), Metadata (read)
+
+# Agregar a Vercel:
+gh auth token | vercel env add GITHUB_RELEASE_OBSERVER_TOKEN production
+```
+
+⚠️ Tradeoff: token ligado al user creador (expira si user sale). Documentar como deuda técnica V1 hasta migrar a GH App.
 
 ### 8.2. Teams destination
 

@@ -1499,7 +1499,8 @@ Watchdog scheduled GH Actions `*/30 * * * *` que detecta los 3 sintomas del inci
 
 **Helpers canonicos** (V1.0 + V1.1 obligatorios al tocar release watchdog):
 
-- `src/lib/release/github-helpers.ts` — `resolveGithubToken`, `buildGithubAuthHeaders`, `fetchGithubWithTimeout`, `githubRepoCoords`, `assertGithubResponseOk`, `githubFetchJson`. Single source of truth para todas las queries GitHub API observer-only.
+- `src/lib/release/github-helpers.ts` — `resolveGithubToken` (async, GH App primary → PAT fallback), `resolveGithubTokenSync` (back-compat PAT-only), `buildGithubAuthHeaders`, `fetchGithubWithTimeout`, `githubRepoCoords`, `assertGithubResponseOk`, `githubFetchJson`. Single source of truth para todas las queries GitHub API observer-only.
+- `src/lib/release/github-app-token-resolver.ts` — `resolveGithubAppInstallationToken()` async con cache + JWT mint. Mint flow: cache hit → JWT firmado RS256 con private key → POST `/app/installations/<id>/access_tokens` → cache 1h con renovacion 5min antes expiry. Degradacion canonica: si GH App config faltante o JWT mint falla, retorna null y caller fallback a PAT.
 - `src/lib/release/workflow-allowlist.ts` — `RELEASE_DEPLOY_WORKFLOWS` canonical array (6 workflows + Cloud Run service mapping para drift detection). `RELEASE_DEPLOY_WORKFLOW_NAMES` set O(1) lookup. `WORKFLOWS_WITH_CLOUD_RUN_DRIFT_DETECTION` filtered subset (4 workflows). `findWorkflow()` lookup.
 - `src/lib/release/severity-resolver.ts` — `WatchdogSeverity` superset (`ok|warning|error|critical`), `WATCHDOG_THRESHOLDS` frozen, 3 resolvers per detector, `aggregateMaxSeverity`, `severityRank`, `isSeverityEscalation`, `watchdogSeverityToReliabilitySeverity` (collapse critical→error).
 - `src/lib/release/watchdog-alerts-dispatcher.ts` — `dispatchWatchdogAlert()` + `dispatchWatchdogRecovery()` con dedup atomic + at-least-once Teams delivery + `clearDedupRow()`.
@@ -1518,6 +1519,8 @@ Watchdog scheduled GH Actions `*/30 * * * *` que detecta los 3 sintomas del inci
 - Indexes: `(first_observed_at)` para recovery sweep, `(workflow_name, alert_kind, last_alerted_at DESC)` para drilldown
 
 **Capability granular**: `platform.release.watchdog.read` (scope=all, EFEONCE_ADMIN + DEVOPS_OPERATOR). NO reusa `platform.release.execute` — semantica distinta (leer estado vs disparar release).
+
+**GitHub auth strategy canonica (V1.1)**: GitHub App installation token primary, PAT fallback. Setup one-time documented en runbook §8.1 (App ID + Installation ID + private key en GCP Secret Manager `greenhouse-github-app-private-key`). Vercel env vars: `GITHUB_APP_ID`, `GITHUB_APP_INSTALLATION_ID`, `GREENHOUSE_GITHUB_APP_PRIVATE_KEY_SECRET_REF`. Costo: $0 GitHub side, ~$0.72/anio GCP secret. Beneficios sobre PAT: token NO ligado a usuario, rate limit 15K req/h vs 5K, auditoria per-installation.
 
 **Worker GIT_SHA env var** (TASK-849 Slice 1): pre-requisito para `worker_revision_drift` reader. Cada worker emite `GIT_SHA` env var con commit SHA del deploy. Resolution: `$GITHUB_SHA → git rev-parse HEAD → 'unknown'`. Workers sin GIT_SHA aun deployado producen `data_missing` (NO falso drift).
 
@@ -1539,6 +1542,9 @@ Watchdog scheduled GH Actions `*/30 * * * *` que detecta los 3 sintomas del inci
 - **NUNCA** modificar el contract JSON output del CLI sin bumpear version + actualizar consumer en preflight CLI futuro (TASK-850).
 - **NUNCA** duplicar los helpers canonicos del watchdog en otros code paths del control plane. Single source of truth en `src/lib/release/`.
 - **NUNCA** persistir `last_alerted_severity='ok'` en la tabla dedup. CHECK constraint lo bloquea — recovery se maneja via DELETE row.
+- **NUNCA** committear el GitHub App private key (`.pem`) al repo. Solo via GCP Secret Manager. Borrar el `.pem` local con `shred -u` despues de subir.
+- **NUNCA** crear PAT con scopes mas amplios que `Actions:read + Deployments:read + Metadata:read`. Si emerge necesidad de mas permisos, evaluar primero si GH App lo cubre (preferred).
+- **NUNCA** usar `resolveGithubTokenSync` en code paths nuevos. Es back-compat layer V1.0; nuevos consumers usan `resolveGithubToken` async para preferir GH App.
 - **SIEMPRE** que emerja un workflow nuevo de deploy production, agregarlo a `RELEASE_DEPLOY_WORKFLOWS` en `src/lib/release/workflow-allowlist.ts` ANTES del primer deploy. Sin esto el watchdog NO lo detecta.
 - **SIEMPRE** que el dispatcher Teams falle, mantener at-least-once delivery: NO actualizar dedup state si Teams send failed. Aceptable: alert duplicado en re-try vs alert perdido.
 
