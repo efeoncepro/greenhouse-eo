@@ -1,3 +1,14 @@
+# Sesion 2026-05-10 — TASK-857 en implementación directa en develop
+
+- **Trigger:** usuario pidió implementar `TASK-857 — GitHub Webhooks Release Event Ingestion` end-to-end, manteniéndose explícitamente en `develop` y sin cambiar de rama.
+- **Branch:** `develop` por instrucción explícita del usuario; se omitió la creación de branch `task/TASK-857-*` aunque el flujo default de tasks lo sugiere.
+- **Estado:** task movida a `docs/tasks/in-progress/TASK-857-github-webhooks-release-event-ingestion.md`, Lifecycle actualizado a `in-progress`, plan canónico creado en `docs/tasks/plans/TASK-857-plan.md`.
+- **Discovery/Audit/Plan:** completados contra arquitectura vigente, schema snapshot, tipos DB, runtime release control plane, webhook inbox existente, `pnpm pg:doctor` verde y Handoff previo. No hay ownership activo ni PR/branch TASK-857.
+- **Decisiones:** endpoint dedicado `/api/webhooks/github/release-events` con HMAC GitHub antes de parse/persist; dedupe por `X-GitHub-Delivery`; normalización en tabla `greenhouse_sync.github_release_webhook_events`; reconciliación contra `release_manifests`; watchdog TASK-849 se mantiene como backstop; sin outbox events V1 por no existir consumidores.
+- **Riesgo controlado:** no toca UI ni access model visible; blast radius en webhook ingestion, release manifests y reliability signals. Cualquier transición release se limita por la state machine existente.
+
+---
+
 # Sesion 2026-05-10 — TASK-857 creada + watchdog main resuelto
 
 - **Trigger:** usuario reporta correo GitHub Actions: `Production Release Watchdog - main (6155cde)` fallando y pide crear task para webhooks + ayudar a resolver el incidente.
