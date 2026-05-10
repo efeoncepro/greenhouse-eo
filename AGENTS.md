@@ -835,6 +835,34 @@ Contrato versionado `platform-health.v1`. Permite a agentes (MCP, Teams bot, CI,
 - **Rollback Azure NO automatizado V1**: reapply destructivo (delete-on-deletion, federated credential rotation, App Service config reset). V2 contingente con `what-if` mandatory.
 - **Spec canonica**: `docs/tasks/in-progress/TASK-853-azure-infra-release-gating.md`. CLAUDE.md sección "Azure Infra Release Gating invariants (TASK-853)". Runbook: `docs/operations/runbooks/production-release.md` §6.1 (gating), §6.2 (WIF subjects), §6.3 (rollback V2 contingente).
 
+### Release Observability Completion (TASK-854, 2026-05-10)
+
+- **Que hace**: cierra el subsystem `Platform Release` con 5 of 5 reliability signals canonicos (los 2 nuevos requieren `release_manifests` populated por TASK-851 orquestador) + dashboard read-only `/admin/releases` para EFEONCE_ADMIN + DEVOPS_OPERATOR.
+- **2 signals nuevos**:
+  - `platform.release.deploy_duration_p95` (kind=lag): p95 de `completed_at - started_at` para releases en estado `released`, ventana 30d. Severity: ok <30min, warning 30-60min, error >=60min, unknown sin samples.
+  - `platform.release.last_status` (kind=drift): ultimo release de main. ok si `released`, error si `degraded|aborted|rolled_back` <24h, warning 24h-7d, ok >7d (resolved historicamente), unknown si in-flight o sin releases.
+- **Wire-up canonico**: `getReliabilityOverview.productionRelease[]` invoca 5 readers en paralelo via Promise.all.
+- **Dashboard `/admin/releases`** (V1 read-only):
+  - Server page con `requireServerSession` + capability `platform.release.execute` (read-equivalent V1)
+  - Cursor pagination keyset on `started_at DESC` (no offset, no slow queries deep pages)
+  - Tabla TanStack con 6 columnas (SHA short + Estado chip + Inicio + Duracion + Operador + Intento)
+  - Drawer manifest viewer anchor='right' 480px desktop / 100% mobile con metadata + comando rollback copy-to-clipboard
+  - Banner Alert condicional si `lastStatusSignal.severity in {error, warning}`
+  - Empty state canonico cuando 0 releases
+- **Skills invocadas pre-implementacion** (per instruccion del usuario): `greenhouse-ux` (layout + Vuexy components + tokens) + `greenhouse-microinteractions-auditor` (hover/focus/loading/empty + reduced motion + roles) + `greenhouse-ux-writing` (copy es-CL operator-facing + tone map + decision tree domain copy). Plan UX explicito impreso ANTES de escribir codigo.
+- **Microcopy canonical**: `src/lib/copy/release-admin.ts` (`GH_RELEASE_ADMIN`) — domain copy module mismo patron `GH_AGENCY`/`GH_FINANCE`. Operator-facing es-CL, tuteo, sentence case.
+- **Tokens visuales** estado chip (greenhouse-ux skill canonical):
+  - released → success (#6ec207) tabler-circle-check
+  - degraded → warning (#ff6500) tabler-alert-triangle
+  - aborted/rolled_back → error (#bb1954) tabler-x / tabler-arrow-back
+  - in-flight (preflight/ready/deploying/verifying) → info (#00BAD1) tabler-loader-2
+- **Helpers canonicos**:
+  - `src/lib/release/list-recent-releases-paginated.ts` cursor pagination keyset
+  - `src/app/api/admin/releases/route.ts` GET endpoint con misma capability check
+  - `src/views/greenhouse/admin/releases/{AdminReleasesView, ReleaseDrawer, columns}.tsx` view canonico
+- **Cero outbox events nuevos**, cero capabilities nuevas, cero migrations.
+- **Spec canonica**: `docs/tasks/in-progress/TASK-854-release-deploy-duration-last-status-signals.md`. CLAUDE.md sección "Release Observability Completion invariants (TASK-854)". Manual operador: `docs/manual-de-uso/plataforma/release-dashboard.md`. Doc funcional: `docs/documentation/plataforma/release-dashboard.md`.
+
 ### Cloud Run hubspot-greenhouse-integration (HubSpot write bridge + webhooks) — TASK-574 (2026-04-24)
 
 - Servicio Cloud Run Python/Flask ubicado en `us-central1` (region bloqueada — NO migrar a `us-east4` porque la URL pública contiene `-uc.` y romperia el webhook del portal HubSpot).

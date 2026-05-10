@@ -1,3 +1,66 @@
+# Sesion 2026-05-10 — TASK-854 Release Observability Completion SHIPPED (control plane V1.1 COMPLETO)
+
+- **Trigger:** post TASK-853 SHIPPED, usuario instruyó continuar con TASK-854 (última pendiente del control plane V1.1) directo en `develop` sin cambiar rama. Auto mode activo + per instrucción explícita "Si vas a tocar UI, invoca las skills de UI de UX y de microinteraccion globales y del repo y diseña un plan antes de ejecutar y luego ejecutalo".
+- **Branch:** `develop` (sin rama nueva).
+- **Skills invocadas pre-implementacion** (per instrucción del usuario):
+  - `greenhouse-ux` — layout blueprint + Vuexy components + GH_COLORS tokens + visual hierarchy
+  - `greenhouse-microinteractions-auditor` — hover/focus/loading/empty + reduced motion + roles ARIA
+  - `greenhouse-ux-writing` — copy es-CL operator-facing + tone map + decision tree domain copy module
+  - **Plan UX explícito impreso ANTES de escribir código** (layout blueprint + component manifest + visual hierarchy + tokens + microinteracciones + responsive + microcopy + accessibility + auth + files canónicos)
+- **Decisiones foundational pre-execution (4-pillar validadas)**:
+  1. Filter `state === 'released'` en p95 (NO incluir degraded/aborted) — outliers contaminarían métrica
+  2. Ventana 30d para p95 + 24h/7d para last_status — alineado con SLO operativo
+  3. Cursor pagination keyset (NO offset) — consistent O(log N) en deep pages
+  4. Initial fetch SSR + cursor pagination client (NO full-client SPA) — initial paint rápido
+  5. Capability `platform.release.execute` read-equivalent V1 (NO nueva capability) — V1.2 emergerá granular si el dashboard expone superficies adicionales
+- **Slices commiteados (3 commits incrementales)**:
+  - `232238b6` Slice 0 — 2 reliability signals (`platform.release.deploy_duration_p95` + `platform.release.last_status`) + wire-up en `getReliabilityOverview` (5 of 5 signals canonicos del subsystem `Platform Release`) + 16 tests anti-regresion
+  - `bf65ceda` Slice 1 — Dashboard `/admin/releases` (server page + API route cursor pagination + view client + drawer + columns + microcopy es-CL `GH_RELEASE_ADMIN`)
+  - (este commit) Slice 2 — Tests + docs canónicas + cierre
+- **Componentes shipped**:
+  - 2 readers reliability (deploy_duration_p95 + last_status) wired al overview
+  - Helper canonical `listRecentReleasesPaginated` cursor pagination keyset
+  - Page server `/admin/releases` con capability check + Promise.all initial fetch
+  - API route GET `/api/admin/releases` cursor pagination
+  - View client TanStack tabla + Card outlined + Alert banner condicional + EmptyState
+  - Drawer manifest viewer anchor='right' 480px + comando rollback copy-to-clipboard via sonner toast
+  - Microcopy module canonical `src/lib/copy/release-admin.ts` (`GH_RELEASE_ADMIN`)
+  - 16/16 tests verdes anti-regresion
+- **Tokens visuales canonicos** (greenhouse-ux skill):
+  - released → success (#6ec207) tabler-circle-check
+  - degraded → warning (#ff6500) tabler-alert-triangle
+  - aborted/rolled_back → error (#bb1954) tabler-x / tabler-arrow-back
+  - in-flight → info (#00BAD1) tabler-loader-2
+- **Microinteracciones canonicas** (greenhouse-microinteractions-auditor skill):
+  - Row hover + click + Enter/Space → drawer abre 200ms ease-out
+  - Loading "Cargar más": spinner inline en botón (no full skeleton)
+  - Empty state canonical EmptyState (no animación en error states)
+  - Copy clipboard: sonner toast 3s auto-dismiss
+  - Reduced motion: respetado nativamente por MUI Drawer
+- **Accessibility canonical**:
+  - Tabla: caption sr-only + scope='col' + tabIndex=0 + onKeyDown rows
+  - Banner: role='alert' implícito MUI Alert
+  - Drawer: role='dialog' + aria-modal + aria-labelledby + Escape close + focus trap
+  - Estado chip: color + icon + text label (no color-only — WCAG 2.2 AA)
+- **Docs canonizadas (Slice 2)**:
+  - `CLAUDE.md` nueva sección "Release Observability Completion invariants (TASK-854)" con 12 reglas duras
+  - `AGENTS.md` nueva sección "Release Observability Completion (TASK-854, 2026-05-10)" para discovery rápido
+  - `docs/architecture/DECISIONS_INDEX.md` entry "Release observability completion: 2 signals + dashboard"
+  - `docs/architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md` Delta TASK-854 SHIPPED con 5 decisiones validadas + componentes + skills + V1.2 roadmap
+  - `docs/manual-de-uso/plataforma/release-dashboard.md` NUEVO manual operador-facing
+  - `docs/documentation/plataforma/release-dashboard.md` NUEVO doc funcional
+- **Cero outbox events nuevos, cero capabilities nuevas, cero migrations** — reusa todo el control plane V1.0/V1.1.
+- **Hito: control plane release V1.1 COMPLETO end-to-end**:
+  - TASK-848 V1.0 (foundation) ✅
+  - TASK-849 (watchdog) ✅
+  - TASK-850 (preflight CLI) ✅
+  - TASK-851 (orchestrator + worker SHA) ✅
+  - TASK-853 (Azure gating) ✅
+  - TASK-854 (dashboard + signals últimos) ✅
+- **Próximo paso:** TASK-848 V1.0 puede ahora cerrarse (mover a complete/) — todos sus V1.1 follow-ups SHIPPED. V1.2 follow-ups quedan documentados en spec V1 §Pendiente para V1.2.
+
+---
+
 # Sesion 2026-05-10 — TASK-853 Azure Infra Release Gating SHIPPED
 
 - **Trigger:** post TASK-851 SHIPPED, usuario instruyó continuar con TASK-853 directo en `develop` sin cambiar rama. Auto mode activo.

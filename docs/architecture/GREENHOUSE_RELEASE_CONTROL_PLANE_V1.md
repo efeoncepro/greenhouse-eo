@@ -261,6 +261,86 @@ tocados, dominios sensibles, migraciones, irreversibilidad, rollback complexity 
 - **OQ2 — Reliability signal thresholds**: usar baselines del spec; tune data-driven post-30d steady-state.
 - **OQ3 — Dashboard `/admin/releases`**: defer a TASK-855 V1.1; V1 cubre operator visibility via signals + psql contra release_manifests.
 
+## Delta 2026-05-10 — TASK-854 Release Observability Completion SHIPPED
+
+Cierra el subsystem `Platform Release` con 5 of 5 reliability signals canonicos + dashboard operator-facing read-only `/admin/releases`. Los 2 signals nuevos requieren `release_manifests` populated por TASK-851 orquestador (data emerge tras primer release exitoso).
+
+### 2 signals nuevos (5 of 5 canonicos completos)
+
+| Signal ID | Kind | Severity rule | Steady |
+|---|---|---|---|
+| `platform.release.stale_approval` | drift | warning >24h, error >7d (TASK-848 V1.0) | 0 |
+| `platform.release.pending_without_jobs` | drift | error si count > 0 sostenido >5min (TASK-848 V1.0) | 0 |
+| `platform.release.worker_revision_drift` | drift | error si drift confirmado (TASK-849 V1.0) | 0 |
+| **`platform.release.deploy_duration_p95`** | **lag** | **warning >=30min, error >=60min (TASK-854)** | **ok <30min** |
+| **`platform.release.last_status`** | **drift** | **error si degraded/aborted/rolled_back <24h (TASK-854)** | **ok=released** |
+
+### Componentes shipped
+
+| Componente | Path | Proposito |
+|---|---|---|
+| Reader deploy_duration | `src/lib/reliability/queries/release-deploy-duration.ts` | p95 sobre releases en estado `released` filtrados, ventana 30d |
+| Reader last_status | `src/lib/reliability/queries/release-last-status.ts` | Ultimo release main + age window thresholds |
+| Helper paginated | `src/lib/release/list-recent-releases-paginated.ts` | Cursor pagination keyset on started_at DESC |
+| Microcopy module | `src/lib/copy/release-admin.ts` | `GH_RELEASE_ADMIN` operator-facing es-CL |
+| Server page | `src/app/(dashboard)/admin/releases/page.tsx` | requireServerSession + capability check + initial fetch |
+| API route | `src/app/api/admin/releases/route.ts` | GET cursor pagination con misma auth |
+| View client | `src/views/greenhouse/admin/releases/AdminReleasesView.tsx` | Tabla TanStack + Card outlined + Alert banner + EmptyState |
+| Drawer | `src/views/greenhouse/admin/releases/ReleaseDrawer.tsx` | anchor='right' 480px + metadata + rollback copy-to-clipboard |
+| Tabla columns | `src/views/greenhouse/admin/releases/columns.tsx` | TanStack columns con CustomChip por estado + tabular-nums |
+| Tests | `src/lib/reliability/queries/release-{deploy-duration,last-status}.test.ts` | 16/16 verdes anti-regresion |
+
+### Decisiones foundational (4-pillar validadas)
+
+1. **Filter `state === 'released'` en p95** (NO incluir degraded/aborted) — outliers de aborts (typically <1 min) o degradeds (typically >2x normal) contaminarian la metrica de "tiempo de releases EXITOSOS".
+2. **Ventana 30d para p95 + ventana 24h/7d para last_status** — alineado con SLO operativo (30d = mensual snapshot; 24h = same-day incident; 7d = weekly forensic).
+3. **Cursor pagination keyset** (NO offset) — consistent O(log N) en deep pages; offset es O(N).
+4. **Initial fetch SSR + cursor pagination client** (NO full-client SPA) — initial paint rapido + pagination on-demand evita carga full data.
+5. **Capability `platform.release.execute` read-equivalent V1** (NO nueva capability) — V1.2 emergera `platform.release.read_results` granular si el dashboard expone superficies adicionales (FINANCE_ADMIN observabilidad).
+
+### Skills invocadas pre-implementacion (per instruccion del usuario)
+
+- `greenhouse-ux` — layout blueprint + Vuexy components selection + GH_COLORS tokens + visual hierarchy
+- `greenhouse-microinteractions-auditor` — hover/focus/loading/empty states + reduced motion + role=alert/dialog patterns
+- `greenhouse-ux-writing` — copy es-CL operator-facing + tone map + decision tree domain copy module
+
+Plan UX explicito impreso ANTES de escribir codigo: layout blueprint + component manifest + visual hierarchy + color & tone + microinteracciones + responsive + microcopy + accessibility + auth + files canonicos.
+
+### Tokens visuales canonicos
+
+| Estado | Chip color | Tabler icon |
+|---|---|---|
+| released | success (#6ec207) | tabler-circle-check |
+| degraded | warning (#ff6500) | tabler-alert-triangle |
+| aborted | error (#bb1954) | tabler-x |
+| rolled_back | error (#bb1954) | tabler-arrow-back |
+| preflight/ready/deploying/verifying | info (#00BAD1) | tabler-loader-2 |
+
+### Microinteracciones canonicas
+
+- Row hover: `theme.palette.action.hover` background, cursor pointer
+- Row click + Enter/Space → drawer abre 200ms ease-out (MUI Drawer default)
+- Loading "Cargar mas": spinner inline en boton (no full skeleton — wait localizado)
+- Empty state: `EmptyState` canonico (no animacion en error states)
+- Copy clipboard: `sonner` toast 3s auto-dismiss, no persistente
+- Reduced motion: respetado nativamente por MUI Drawer
+
+### Accessibility canonical
+
+- Tabla: `<caption className='sr-only'>` + `scope='col'` + `tabIndex={0}` + `onKeyDown` Enter/Space rows
+- Banner: `role='alert'` implicito en MUI Alert
+- Drawer: `role='dialog'` + `aria-modal='true'` + `aria-labelledby` + Escape close + focus trap (todos por MUI default)
+- Estado chip: color + icon + text label (no color-only — WCAG 2.2 AA)
+
+### Pendiente para V1.2 (out of scope TASK-854)
+
+- Capability `platform.release.read_results` granular para FINANCE_ADMIN observabilidad sin escalar a EFEONCE_ADMIN/DEVOPS_OPERATOR
+- Add release CTA desde dashboard (workflow_dispatch trigger) — V1 deja operator usar `gh workflow run`
+- Audit log full transitions visible en drawer (V1 solo mostra link a manifest detail)
+- Tune thresholds (30min warning, 60min error) post 30d steady-state observados
+
+---
+
 ## Delta 2026-05-10 — TASK-853 Azure Infra Release Gating SHIPPED
 
 Los 2 workflows Azure (`azure-teams-deploy.yml` Logic Apps + `azure-teams-bot-deploy.yml` Bot Service) refactoreados con gating canónico de Bicep apply. Health check Azure (preflight-style) corre SIEMPRE; Bicep apply real corre solo si `force_infra_deploy=true` o diff detectado en `infra/azure/<sub>/**`. Orquestador TASK-851 wires los 2 jobs Azure en paralelo con workers Cloud Run.

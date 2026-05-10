@@ -1788,6 +1788,83 @@ Verificación: `az ad app federated-credential list --id <AZURE_CLIENT_ID> -o ta
 
 **Spec canonica**: `docs/tasks/in-progress/TASK-853-azure-infra-release-gating.md`. Workflows: `.github/workflows/azure-{teams,teams-bot}-deploy.yml`. Tests: `concurrency-fix-verification.test.ts` (sección TASK-853). Runbook: `docs/operations/runbooks/production-release.md` §6.1, §6.2, §6.3.
 
+### Release Observability Completion invariants (TASK-854)
+
+Cierra el subsystem `Platform Release` con 5 of 5 reliability signals canonicos + dashboard operator-facing `/admin/releases`. Los 2 signals nuevos dependen de `release_manifests` populated por TASK-851 orquestador (data emerge tras primer release exitoso).
+
+**2 signals nuevos (5 of 5 ahora completos)**:
+
+- `platform.release.deploy_duration_p95` (kind=lag): lee `listRecentReleases` ventana 30d, computa p95 de `completed_at - started_at` SOLO para releases en estado `released` (filtra degraded/aborted/rolled_back/in-flight). Severity: ok (<30min), warning (30-60min), error (>=60min), unknown (sin samples). Steady esperado: ok (orchestrator P95 teorico ~5-15 min).
+- `platform.release.last_status` (kind=drift): lee ultimo release de main (started_at DESC limit 1). Severity per estado:
+  - `released` → ok (steady)
+  - `degraded|aborted|rolled_back` <24h → error (incident reciente)
+  - `degraded|aborted|rolled_back` 24h-7d → warning
+  - `degraded|aborted|rolled_back` >7d → ok (resolved historicamente)
+  - `preflight|ready|deploying|verifying` → unknown (in-flight)
+  - sin releases → unknown (pipeline no usado)
+
+Wire-up canonico: `getReliabilityOverview` source `productionRelease[]` ahora invoca 5 readers en paralelo via Promise.all (vs 3 anteriores). Cada uno con `catch(()=>null)` → degradacion honesta sin bloquear dashboard.
+
+**Dashboard `/admin/releases` (V1 read-only)**:
+
+- Server page `src/app/(dashboard)/admin/releases/page.tsx` con `requireServerSession` + capability `platform.release.execute` (read-equivalent V1; emergera `platform.release.read_results` granular si V1.2 expone superficies adicionales)
+- Initial fetch + `lastStatusSignal` en paralelo via Promise.all
+- Cursor pagination canonica (keyset on `started_at DESC`, no offset → no slow queries en deep pagination); helper `listRecentReleasesPaginated` fetcha `pageSize+1` para detectar `hasMore` sin COUNT separate
+- API route `GET /api/admin/releases?cursor=&pageSize=` reusa misma capability check
+- View client `AdminReleasesView` con tabla TanStack + Card outlined + Alert banner condicional (cuando `lastStatusSignal.severity = error|warning`) + `EmptyState` canonico cuando 0 releases + footer "Cargar mas" con CircularProgress inline
+- Drawer `ReleaseDrawer` anchor='right' width 480px desktop / 100% mobile con metadata rows + comando rollback con copy-to-clipboard via `sonner` toast
+- Microcopy es-CL en `src/lib/copy/release-admin.ts` (`GH_RELEASE_ADMIN`) — domain copy module per CLAUDE.md decision tree (mismo patron `GH_AGENCY`/`GH_FINANCE`)
+
+**Tokens visuales canonicos** (greenhouse-ux skill):
+
+| Estado release | Chip color | Tabler icon |
+|---|---|---|
+| `released` | success (#6ec207) | tabler-circle-check |
+| `degraded` | warning (#ff6500) | tabler-alert-triangle |
+| `aborted` / `rolled_back` | error (#bb1954) | tabler-x / tabler-arrow-back |
+| `preflight` / `ready` / `deploying` / `verifying` | info (#00BAD1) | tabler-loader-2 |
+
+**Microinteracciones canonicas** (greenhouse-microinteractions-auditor skill):
+
+- Row hover: `theme.palette.action.hover` background, cursor pointer
+- Row click + Enter/Space → drawer abre 200ms ease-out (MUI Drawer default)
+- Loading "Cargar mas": spinner inline en boton (no full skeleton — wait localizado)
+- Empty state: `EmptyState` canonico (no animacion en error states)
+- Copy clipboard: `sonner` toast 3s auto-dismiss, no persistente
+- Reduced motion: respetado nativamente por MUI Drawer
+
+**Accessibility canonical**:
+
+- Tabla: `<caption className='sr-only'>` + `scope='col'` + `tabIndex={0}` + `onKeyDown` Enter/Space rows
+- Banner: `role='alert'` implicito en MUI Alert
+- Drawer: `role='dialog'` + `aria-modal='true'` + `aria-labelledby` + Escape close + focus trap (todos por MUI default)
+- Estado chip: color + icon + text label (no color-only — WCAG 2.2 AA)
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** modificar el filter `state === 'released'` en `release-deploy-duration.ts` para incluir degraded/aborted. P95 mide tiempo de releases EXITOSOS — incluir failures contamina la metrica con outliers de aborts (typically <1 min) o degradeds (typically >2x normal).
+- **NUNCA** cambiar la ventana 30d sin coordinar con `last_status` ventana threshold. Si el operador necesita p95 7d como vista alternativa, agregar nuevo signal `deploy_duration_p95_7d`, no mutar el existente.
+- **NUNCA** ajustar thresholds (30min warning, 60min error) sin observar 30 dias de steady state real. La spec V1 marca explicitly "tune post-30d steady-state observados".
+- **NUNCA** expandir `last_status` a leer ultimos N releases. La semantica del signal es "el ultimo" — para tendencias usar el dashboard `/admin/releases` o el deploy_duration_p95.
+- **NUNCA** computar duration o severity en cliente. La server-side se encarga via reader → wire-up → `productionRelease[]` source. Cliente solo renderiza.
+- **NUNCA** mostrar el dashboard a roles distintos de EFEONCE_ADMIN + DEVOPS_OPERATOR. Capability `platform.release.execute` es read-equivalent V1; para audiencias distintas (FINANCE_ADMIN observabilidad), V1.2 introducira `platform.release.read_results` granular.
+- **NUNCA** disparar release desde el dashboard. V1 es read-only por design — operator dispara via `gh workflow run production-release.yml` o GitHub UI. Add release CTA queda como follow-up V1.2 con capability separada.
+- **NUNCA** invocar `Sentry.captureException` directo en este path. Use `captureWithDomain(err, 'cloud', { tags: { source: 'admin_releases_*', stage: '<step>' } })`.
+- **NUNCA** componer la decision banner show/hide en cliente. La server-side calcula `lastStatusSignal.severity`, cliente solo renderiza si severity in {error, warning}.
+- **NUNCA** cachear el dashboard data > 30s sin invalidacion. release_manifests cambia mid-release; stale data confunde al operador.
+- **NUNCA** convertir el cursor pagination a offset-based sin justificacion documentada. Keyset es O(log N) consistent en deep pages; offset es O(N) que escala mal.
+- **SIEMPRE** que emerja un signal nuevo para `productionRelease[]` source, agregarlo a la lista del wire-up + extender el dashboard banner trigger si severity != ok deberia bannear.
+- **SIEMPRE** que se modifique el shape del manifest (tablas TASK-848 V1.0), regenerar tipos via `pnpm migrate:up` + actualizar `rowToManifest` helper en `list-recent-releases-paginated.ts`.
+
+**Spec canonica**: `docs/tasks/in-progress/TASK-854-release-deploy-duration-last-status-signals.md`. Files canonicos:
+- `src/lib/reliability/queries/release-deploy-duration.ts` + tests
+- `src/lib/reliability/queries/release-last-status.ts` + tests
+- `src/lib/release/list-recent-releases-paginated.ts`
+- `src/lib/copy/release-admin.ts`
+- `src/app/(dashboard)/admin/releases/page.tsx`
+- `src/app/api/admin/releases/route.ts`
+- `src/views/greenhouse/admin/releases/{AdminReleasesView,ReleaseDrawer,columns}.tsx`
+
 ### Finance write-path E2E gate (TASK-773 Slice 6)
 
 Cualquier task que toque handlers `POST/PUT/PATCH/DELETE` en `src/app/api/finance/**/route.ts` **debe verificar el flow end-to-end downstream**, no solo el contract API. Bug class detectada 2026-05-03: el endpoint Figma respondía 200 OK pero el TC Santander no rebajaba — porque el contract API funcionaba pero el side effect downstream (outbox → BQ → reactive → account_balance) calló silencioso.
