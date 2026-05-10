@@ -89,6 +89,7 @@ describe('Previred compliance export', () => {
     expect(fields[26]).toBe('1200000')
     expect(fields[27]).toBe('120000')
     expect(fields[28]).toBe('18000')
+    expect(fields[54]).toBe('0')
     expect(fields[69]).toBe('84000')
     expect(fields[70]).toBe('0')
     expect(fields[74]).toBe('07')

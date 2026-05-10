@@ -201,6 +201,7 @@ export const buildPreviredRow = (
   assign(fields, 28, breakdown.afpEmployee)
   assign(fields, 29, breakdown.sisEmployer)
   assign(fields, 30, '0')
+  assign(fields, 55, '0')
   assign(fields, 70, isFonasa ? breakdown.healthEmployee : 0)
   assign(fields, 71, '0')
   assign(fields, 75, healthCode)
