@@ -39,6 +39,7 @@
 - **Docs:** actualizado `docs/documentation/hr/payroll-compliance-exports-chile.md` y `changelog.md`.
 - **Pendiente:** commit/push/deploy y smoke contra staging para descargar nuevamente `payroll-previred-2026-04.txt`; luego subir a Previred para confirmar cero errores.
 - **Follow-up advertencias Previred:** nuevo CSV `ADV-Ultimas-Resultado1778415899713.csv` reporto solo 2 advertencias para Valentina: dias trabajados `22` vs esperado `30`, e ISL `6274` vs esperado `4062`. Decision Payroll+arquitectura: campo 13 de Previred declara dias previsionales `30` en V1 si no existe movimiento formal; asistencia laboral/workingDays sigue en recibo/LRE. Campo 71 ISL se calcula desde tasa canonica 0,93% (`CHILE_ACCIDENT_INSURANCE_ISL_RATE`) compartida con `chile-previsional-helpers`, no desde monto persistido antiguo. Validado focal: 3 files / 16 tests OK, eslint focal OK, `pnpm exec tsc --noEmit --pretty false` OK. No pusheado aun por checkout local `develop` ahead de origin con 4 commits TASK-849.
+- **Follow-up renta mínima imponible:** CSV `ULTIMA-Adv-Resultado1778416895988.csv` reporto campo 27 AFP `436815` vs mínimo imponible `539000`. Decision Payroll+arquitectura: cargar `imm_clp` desde `chile_previred_indicators` y usar base regulatoria `max(chileTaxableBase, IMM)` para full-time en campos/cotizaciones Previred; recibos/LRE siguen leyendo el entry cerrado. Tests focales `previred/lre` OK; eslint focal OK. Pendiente `tsc`, commit/push/deploy.
 
 ---
 

@@ -31,6 +31,7 @@ export interface ChilePayrollComplianceEntry {
   previredHealthInstitutionCode: string | null
   previredAfpTotalRate: number | null
   previredSisRate: number | null
+  previredMinimumTaxableIncome: number | null
   rutNormalized: string
   contractTypeSnapshot: string | null
   payRegime: string

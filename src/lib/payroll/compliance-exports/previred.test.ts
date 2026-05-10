@@ -19,6 +19,7 @@ const baseEntry = (overrides: Partial<ChilePayrollComplianceEntry> = {}): ChileP
   previredHealthInstitutionCode: '07',
   previredAfpTotalRate: 0.1137,
   previredSisRate: 0.0162,
+  previredMinimumTaxableIncome: 539000,
   rutNormalized: '123456785',
   contractTypeSnapshot: 'indefinido',
   payRegime: 'chile',
@@ -142,18 +143,21 @@ describe('Previred compliance export', () => {
 
     expect(fields[12]).toBe('30')
     expect(fields[25]).toBe('35')
-    expect(fields[27]).toBe('46128')
-    expect(fields[28]).toBe('7076')
-    expect(fields[63]).toBe('436815.43')
-    expect(fields[70]).toBe('4062')
-    expect(fields[79]).toBe('30577')
-    expect(fields[80]).toBe('131898')
+    expect(fields[26]).toBe('539000')
+    expect(fields[27]).toBe('56918')
+    expect(fields[28]).toBe('8732')
+    expect(fields[63]).toBe('539000')
+    expect(fields[70]).toBe('5013')
+    expect(fields[76]).toBe('539000')
+    expect(fields[79]).toBe('37730')
+    expect(fields[80]).toBe('124745')
     expect(fields[92]).toBe('1')
-    expect(fields[93]).toBe('3931')
+    expect(fields[93]).toBe('4851')
     expect(fields[96]).toBe('0')
     expect(fields[97]).toBe('0')
-    expect(fields[100]).toBe('2621')
-    expect(fields[101]).toBe('10484')
+    expect(fields[99]).toBe('539000')
+    expect(fields[100]).toBe('3234')
+    expect(fields[101]).toBe('12936')
   })
 
   it('keeps Previred totals aligned with the generated regulatory projection', () => {
@@ -200,5 +204,16 @@ describe('Previred compliance export', () => {
     expect(artifact.validation.errors.join(' ')).toContain('periodized Previred AFP rate')
     expect(artifact.validation.errors.join(' ')).toContain('periodized Previred SIS rate')
     expect(artifact.validation.errors.join(' ')).toContain('employment_type')
+  })
+
+  it('fails closed when a full-time entry has no periodized minimum taxable income', () => {
+    const artifact = buildPreviredPlanillaArtifact(snapshot([
+      baseEntry({
+        previredMinimumTaxableIncome: null
+      })
+    ]))
+
+    expect(artifact.validation.status).toBe('failed')
+    expect(artifact.validation.errors.join(' ')).toContain('minimum taxable income')
   })
 })

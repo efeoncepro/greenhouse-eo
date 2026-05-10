@@ -42,6 +42,7 @@ interface EntryRow {
   previred_health_institution_code: string | null
   previred_afp_total_rate: number | string | null
   previred_sis_rate: number | string | null
+  previred_minimum_taxable_income: number | string | null
   contract_type_snapshot: string | null
   pay_regime: string
   payroll_via: string | null
@@ -126,6 +127,7 @@ const loadChileDependentEntryRows = async (client: PoolClient, periodId: string)
         pwp.health_institution_code AS previred_health_institution_code,
         car.total_rate AS previred_afp_total_rate,
         cpi.sis_rate AS previred_sis_rate,
+        cpi.imm_clp AS previred_minimum_taxable_income,
         e.contract_type_snapshot,
         e.pay_regime,
         e.payroll_via,
@@ -221,6 +223,7 @@ const mapEntryRow = async (
     previredHealthInstitutionCode: row.previred_health_institution_code,
     previredAfpTotalRate: toRate(row.previred_afp_total_rate),
     previredSisRate: toRate(row.previred_sis_rate),
+    previredMinimumTaxableIncome: toMoney(row.previred_minimum_taxable_income),
     rutNormalized,
     contractTypeSnapshot: row.contract_type_snapshot,
     payRegime: row.pay_regime,
@@ -282,7 +285,8 @@ export const loadChileCompliancePeriodSnapshot = async (
         chileEmployerCesantiaAmount: entry.chileEmployerCesantiaAmount,
         chileEmployerMutualAmount: entry.chileEmployerMutualAmount,
         previredAfpTotalRate: entry.previredAfpTotalRate,
-        previredSisRate: entry.previredSisRate
+        previredSisRate: entry.previredSisRate,
+        previredMinimumTaxableIncome: entry.previredMinimumTaxableIncome
       }
     }))
   })

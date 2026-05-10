@@ -75,6 +75,17 @@ const formatPreviredPeriod = (year: number, month: number): string => `${String(
 
 const resolvePreviredWorkedDays = (): number => 30
 
+const resolvePreviredTaxableBase = (entry: ChilePayrollComplianceEntry): number => {
+  const taxableBase = roundCurrency(entry.chileTaxableBase)
+  const minimumTaxableIncome = roundCurrency(entry.previredMinimumTaxableIncome ?? 0)
+
+  if (entry.employmentType !== 'full_time' || minimumTaxableIncome <= 0) {
+    return taxableBase
+  }
+
+  return Math.max(taxableBase, minimumTaxableIncome)
+}
+
 const resolvePreviredJornadaCode = (entry: ChilePayrollComplianceEntry): '1' | '2' | null => {
   if (entry.employmentType === 'full_time') return '1'
   if (entry.employmentType === 'part_time') return '2'
@@ -114,18 +125,18 @@ type PreviredRegulatoryProjection = {
 export const buildPreviredRegulatoryProjection = (
   entry: ChilePayrollComplianceEntry
 ): PreviredRegulatoryProjection => {
-  const taxableBase = roundCurrency(entry.chileTaxableBase)
+  const previredTaxableBase = resolvePreviredTaxableBase(entry)
   const afpRate = entry.previredAfpTotalRate ?? 0
   const sisRate = entry.previredSisRate ?? 0
   const { employeeRate, employerRate } = resolveUnemploymentRates(entry)
-  const healthObligatory = roundCurrency(taxableBase * PREVIRED_HEALTH_OBLIGATORY_RATE)
+  const healthObligatory = roundCurrency(previredTaxableBase * PREVIRED_HEALTH_OBLIGATORY_RATE)
   const healthEmployee = roundCurrency(entry.chileHealthAmount)
-  const afpEmployee = roundCurrency(taxableBase * afpRate)
-  const sisEmployer = roundCurrency(taxableBase * sisRate)
-  const unemploymentEmployee = roundCurrency(taxableBase * employeeRate)
-  const cesantiaEmployer = roundCurrency(taxableBase * employerRate)
-  const islEmployer = roundCurrency(taxableBase * CHILE_ACCIDENT_INSURANCE_ISL_RATE)
-  const lifeExpectancy = roundCurrency(taxableBase * PREVIRED_LIFE_EXPECTANCY_RATE)
+  const afpEmployee = roundCurrency(previredTaxableBase * afpRate)
+  const sisEmployer = roundCurrency(previredTaxableBase * sisRate)
+  const unemploymentEmployee = roundCurrency(previredTaxableBase * employeeRate)
+  const cesantiaEmployer = roundCurrency(previredTaxableBase * employerRate)
+  const islEmployer = roundCurrency(previredTaxableBase * CHILE_ACCIDENT_INSURANCE_ISL_RATE)
+  const lifeExpectancy = roundCurrency(previredTaxableBase * PREVIRED_LIFE_EXPECTANCY_RATE)
 
   return {
     afpEmployee,
@@ -225,6 +236,10 @@ const validatePreviredEntries = (entries: ChilePayrollComplianceEntry[]) => {
       errors.push(`Entry ${entry.entryId} is missing periodized Previred SIS rate.`)
     }
 
+    if (entry.employmentType === 'full_time' && entry.chileTaxableBase > 0 && !entry.previredMinimumTaxableIncome) {
+      errors.push(`Entry ${entry.entryId} is missing periodized Previred minimum taxable income.`)
+    }
+
     if (!resolvePreviredJornadaCode(entry)) {
       errors.push(`Entry ${entry.entryId} is missing explicit employment_type for Previred jornada.`)
     }
@@ -282,16 +297,16 @@ export const buildPreviredRow = (
   // Cotizaciones previsionales. Positions are kept declarative and versioned
   // under PREVIRED_PLANILLA_SPEC; zero/blank fields remain explicit separators.
   assign(fields, 26, resolvePreviredAfpCode(entry.chileAfpName))
-  assign(fields, 27, entry.chileTaxableBase)
+  assign(fields, 27, resolvePreviredTaxableBase(entry))
   assign(fields, 28, projection.afpEmployee)
   assign(fields, 29, projection.sisEmployer)
   assign(fields, 30, '0')
   assign(fields, 55, '0')
-  assign(fields, 64, projection.islEmployer > 0 ? entry.chileTaxableBase : 0)
+  assign(fields, 64, projection.islEmployer > 0 ? resolvePreviredTaxableBase(entry) : 0)
   assign(fields, 70, isFonasa ? projection.healthObligatory : 0)
   assign(fields, 71, projection.islEmployer)
   assign(fields, 75, healthCode)
-  assign(fields, 77, isIsapre ? entry.chileTaxableBase : 0)
+  assign(fields, 77, isIsapre ? resolvePreviredTaxableBase(entry) : 0)
   assign(fields, 78, isIsapre ? '1' : 0)
   assign(fields, 79, isIsapre ? projection.healthEmployee : 0)
   assign(fields, 80, isIsapre ? projection.healthObligatory : 0)
@@ -301,7 +316,7 @@ export const buildPreviredRow = (
   assign(fields, 96, '0')
   assign(fields, 97, '0')
   assign(fields, 98, projection.mutualEmployer)
-  assign(fields, 100, entry.chileTaxableBase)
+  assign(fields, 100, resolvePreviredTaxableBase(entry))
   assign(fields, 101, projection.unemploymentEmployee)
   assign(fields, 102, projection.cesantiaEmployer)
 

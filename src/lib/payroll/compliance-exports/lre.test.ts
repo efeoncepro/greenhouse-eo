@@ -19,6 +19,7 @@ const entry = (): ChilePayrollComplianceEntry => ({
   previredHealthInstitutionCode: '07',
   previredAfpTotalRate: 0.1137,
   previredSisRate: 0.0162,
+  previredMinimumTaxableIncome: 539000,
   rutNormalized: '123456785',
   contractTypeSnapshot: 'indefinido',
   payRegime: 'chile',
