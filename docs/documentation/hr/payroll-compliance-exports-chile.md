@@ -43,3 +43,34 @@ Known V1 boundary:
 
 `TASK-707a` is still required for full parity with the canonical `payment_order` social_security runtime. Until then,
 Previred parity is enforced against the generated compliance projection and closed payroll entries.
+
+## Previred Upload Runbook
+
+When Previred returns errors or warnings, treat the CSV as validator evidence and classify the issue before changing
+code or data:
+
+- **Identity fields**: names, RUT, sex, nationality and health institution must come from Person 360 and
+  `chile_previred_worker_profiles`.
+- **Periodized rates**: AFP, SIS and IMM must come from `chile_afp_rates` and `chile_previred_indicators`.
+- **Receipt-vs-regulatory drift**: do not patch `payroll_entries` just to satisfy Previred. If the entry is closed,
+  add or fix the compliance projection.
+- **Attendance-vs-Previred days**: attendance working days are not field 13. Use `30` unless a formal movement of
+  personnel is modeled for the period.
+- **ISL vs mutual**: emit ISL fields by default. Mutual fields require an explicit supported mutual code model.
+- **Minimum taxable base**: full-time statutory bases must use at least the period IMM.
+
+Accepted-state smoke for `2026-04` Valentina:
+
+- field 13: `30`
+- field 27: `539000`
+- field 28: `56918`
+- field 29: `8732`
+- field 71: `5013`
+- field 79: `162475`
+- field 80: `37730`
+- field 81: `124745`
+- field 93: `1`
+- field 94: `4851`
+- field 101/102: `3234` / `12936`
+
+Related audit: `docs/audits/payroll/PREVIRED_VALIDATOR_CASCADE_AUDIT_2026-05-10.md`.

@@ -1,3 +1,14 @@
+# Sesion 2026-05-10 — Previred accepted + aprendizaje canonizado
+
+- **Trigger:** usuario confirmo que Previred ya acepto/calculo la planilla abril 2026 y pidio documentar el aprendizaje y enriquecer la skill de payroll.
+- **Decision Payroll:** el aprendizaje canonico queda como contrato operativo: Previred planilla es una proyeccion regulatoria de 105 campos sobre entries cerradas + snapshots periodizados, no una copia del recibo ni un lugar para mutar `payroll_entries`.
+- **Docs agregadas:** `docs/audits/payroll/PREVIRED_VALIDATOR_CASCADE_AUDIT_2026-05-10.md` captura la cascada real del validador Previred, evidencia final aceptada, causas raiz y follow-ups estructurales.
+- **Docs actualizadas:** `docs/audits/payroll/README.md` indexa la auditoria; `docs/documentation/hr/payroll-compliance-exports-chile.md` suma runbook de upload Previred y smoke accepted-state para Valentina `2026-04`.
+- **Skill enriquecida:** `.codex/skills/greenhouse-payroll-auditor/SKILL.md` ahora incluye `Previred Planilla Audit Checklist` con orden de diagnostico, campos criticos y referencias canonicas.
+- **No runtime change:** este slice no cambia codigo productivo; solo documentacion viva + skill local para evitar repetir ciclos de ensayo/error ante nuevos CSV de Previred.
+
+---
+
 # Sesion 2026-05-10 — TASK-849 Production Release Watchdog Alerts CERRADA
 
 - **Trigger:** usuario pidio implementar TASK-849 (P0, Effort Medio, Impact Muy alto) directo en `develop` invocando `arch-architect` constantemente. Scope reducido ~50% post TASK-848 V1.0 (helpers + 2 readers ya existian).
