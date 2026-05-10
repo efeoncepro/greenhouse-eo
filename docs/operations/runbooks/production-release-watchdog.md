@@ -147,7 +147,30 @@ El watchdog soporta 2 strategies de auth para GitHub API:
 2. Sino, fallback a `GITHUB_RELEASE_OBSERVER_TOKEN` PAT (Vercel) o `GITHUB_TOKEN` (GH Actions auto-provisto)
 3. Sin nada → `severity='unknown'` (degraded honest)
 
-#### Setup GitHub App (one-time, ~30 min UI + 15 min CLI)
+#### Setup GitHub App AUTOMATIZADO (recomendado, ~5 min)
+
+```bash
+pnpm release:setup-github-app
+```
+
+Este comando orquesta TODO end-to-end:
+
+1. Levanta server local en `localhost:9999`
+2. Abre browser a GitHub Manifest creation con manifest pre-configurado (App name + permissions + callback)
+3. Tu apruebas en 1 click → recibe automaticamente App ID + Installation ID + private key PEM en memoria (NUNCA en disco)
+4. Abre browser a install URL → tu apruebas install en `greenhouse-eo` (1 click)
+5. Auto-resuelve installation_id via API
+6. Confirma contigo ANTES de cada side effect:
+   - Subir private key a GCP Secret Manager `greenhouse-github-app-private-key`
+   - Configurar 3 Vercel env vars production
+   - Trigger Vercel redeploy
+7. Imprime resumen final con valores para tu records
+
+**Total interaccion: 2 clicks browser + ~3 confirmaciones CLI. Sin manipular .pem files manualmente.**
+
+#### Setup GitHub App MANUAL (fallback, ~30 min UI + 15 min CLI)
+
+Si el script automatizado falla (ej. browser no abre, callback bloqueado), seguir este flow:
 
 **Paso 1: Crear GitHub App en `efeoncepro` org**
 
