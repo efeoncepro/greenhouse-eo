@@ -801,6 +801,23 @@ Contrato versionado `platform-health.v1`. Permite a agentes (MCP, Teams bot, CI,
 - **Si emerge un nuevo dominio sensible** (e.g. `compliance`, `legal`): extender `DOMAIN_PATTERNS` + `IRREVERSIBLE_DOMAINS` + tests anti-regresion. Code constants → no requires migration, solo PR review.
 - **Spec canonica**: `docs/tasks/in-progress/TASK-850-production-preflight-cli-complete.md`. Runbook: `docs/operations/runbooks/production-release.md` (check #11). Manual operador: `docs/manual-de-uso/plataforma/release-preflight.md`. Doc funcional: `docs/documentation/plataforma/release-preflight.md`.
 
+### Production Release Orchestrator (TASK-851, 2026-05-10)
+
+- **Que hace**: workflow GH Actions canonico `.github/workflows/production-release.yml` que coordina la promocion `develop → main` end-to-end. Compactacion arch-architect de TASK-851 + TASK-852 originales (orquestador y SHA verification son arquitecturalmente acoplados).
+- **Trigger**: `workflow_dispatch` con inputs `target_sha` (req), `force_infra_deploy`, `bypass_preflight_reason` (>=20 chars + capability `platform.release.bypass_preflight`).
+- **8 jobs canonicos**: preflight (CLI TASK-850) → record-started (CLI Slice 0) → approval-gate (environment Production) → 4 workers parallel (workflow_call) → wait-vercel (poll Vercel API) → post-release-health (ping /api/auth/health) → transition-released (state machine final) → summary.
+- **Concurrency**: `production-release-${{ inputs.target_sha }}` cancel-in-progress=false. Distinct SHAs deploy independientemente. Partial UNIQUE INDEX TASK-848 V1.0 enforce 1 release activo per branch a nivel DB.
+- **Worker workflow contract**: 4 workers (ops, commercial-cost, ico-batch, hubspot-integration) aceptan `workflow_call` con `inputs.environment` + `inputs.expected_sha` + `secrets.GCP_WORKLOAD_IDENTITY_PROVIDER`. Preserva paths `push:` + `workflow_dispatch:` existentes.
+- **Worker deploy.sh contract**: aceptan env var `EXPECTED_SHA` + post-deploy verify `gcloud run revisions describe` matchea `GIT_SHA=EXPECTED_SHA`. Mismatch → exit 1. Skipea cuando EXPECTED_SHA='unknown'.
+- **CLI scripts canonicos**:
+  - `pnpm release:orchestrator-record-started --target-sha=<sha> --triggered-by=<actor>` → INSERT manifest atomic + outbox event + audit. Returns release_id JSON stdout.
+  - `pnpm release:orchestrator-transition-state --release-id=<id> --from-state=<state> --to-state=<state> --actor-label=<actor>` → UPDATE atomic + audit + outbox.
+- **State machine canonica** (TASK-848 V1.0): 8 estados (`preflight, ready, deploying, verifying, released, degraded, rolled_back, aborted`) con transition matrix V1 §2.3. Live parity test TS↔SQL en `state-machine.live.test.ts` rompe build si emerge drift.
+- **Tests anti-regresion**: `concurrency-fix-verification.test.ts` (10 tests) parsea YAML real de los 4 worker workflows + production-release.yml. Verifica que el cancel-in-progress expression production-only se preserva (defensa contra regresion del incidente 2026-04-26 → 2026-05-09) + workflow_call contracts presentes.
+- **Cero outbox events nuevos**: reusa los 7 existentes (`platform.release.* v1` TASK-848 V1.0).
+- **Cero capabilities nuevas**: reusa `platform.release.execute` + `platform.release.preflight.execute` + `platform.release.bypass_preflight`.
+- **Spec canonica**: `docs/tasks/in-progress/TASK-851-production-release-orchestrator-workflow.md`. Workflow: `.github/workflows/production-release.yml`. CLAUDE.md sección "Production Release Orchestrator invariants (TASK-851)". Manual operador: `docs/manual-de-uso/plataforma/release-orchestrator.md`. Doc funcional: `docs/documentation/plataforma/release-orchestrator.md`.
+
 ### Cloud Run hubspot-greenhouse-integration (HubSpot write bridge + webhooks) — TASK-574 (2026-04-24)
 
 - Servicio Cloud Run Python/Flask ubicado en `us-central1` (region bloqueada — NO migrar a `us-east4` porque la URL pública contiene `-uc.` y romperia el webhook del portal HubSpot).

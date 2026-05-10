@@ -99,7 +99,7 @@ const parseArgs = (args: readonly string[]): CliOptions => {
     exit(2)
   }
 
-  return partial as CliOptions
+  return partial as unknown as CliOptions
 }
 
 const main = async (): Promise<void> => {

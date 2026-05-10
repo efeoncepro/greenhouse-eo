@@ -261,6 +261,54 @@ tocados, dominios sensibles, migraciones, irreversibilidad, rollback complexity 
 - **OQ2 — Reliability signal thresholds**: usar baselines del spec; tune data-driven post-30d steady-state.
 - **OQ3 — Dashboard `/admin/releases`**: defer a TASK-855 V1.1; V1 cubre operator visibility via signals + psql contra release_manifests.
 
+## Delta 2026-05-10 — TASK-851 Production Release Orchestrator SHIPPED
+
+Workflow canonico `.github/workflows/production-release.yml` que coordina la promocion `develop → main` end-to-end. Compactacion arch-architect de TASK-851 + TASK-852 originales — orquestador y SHA verification son arquitecturalmente acoplados.
+
+### Componentes shipped
+
+| Componente | Path | Proposito |
+|---|---|---|
+| Workflow orquestador | `.github/workflows/production-release.yml` | 8 jobs end-to-end (preflight → record → approval → workers → vercel → health → transition → summary) |
+| CLI record-started | `scripts/release/orchestrator-record-started.ts` | Wrapper sobre `recordReleaseStarted` (TASK-848 V1.0) invocable desde workflow YAML |
+| CLI transition-state | `scripts/release/orchestrator-transition-state.ts` | Wrapper sobre `transitionReleaseState` con state machine guard |
+| State machine parity test live | `src/lib/release/state-machine.live.test.ts` | Verifica TS↔SQL CHECK constraint matchea, skipea sin DB |
+| Worker deploy.sh × 4 | `services/{ops-worker, commercial-cost-worker, ico-batch, hubspot_greenhouse_integration}/deploy.sh` | Aceptan EXPECTED_SHA + post-deploy verify GIT_SHA matches |
+| Worker workflows × 4 | `.github/workflows/{ops-worker, commercial-cost-worker, ico-batch, hubspot-greenhouse-integration}-deploy.yml` | workflow_call interface (environment + expected_sha + GCP_WIF secret) preservando push/dispatch existentes |
+| Tests anti-regresion concurrency | `src/lib/release/concurrency-fix-verification.test.ts` | 10 tests verifican cancel-in-progress production-only expression preserved + workflow_call contracts presentes |
+
+### 5 decisiones foundational (4-pillar validadas)
+
+1. **Compactacion TASK-851 + TASK-852** (arch-architect spec) — Orquestador y SHA verification arquitecturalmente acoplados. Reduce overhead sin afectar implementacion.
+2. **CLI scripts TS para invocar helpers desde workflow YAML** (NO API admin endpoints) — Mismo patron TASK-849 watchdog. Workflow YAML invoca `pnpm release:orchestrator-{record-started,transition-state}` con WIF auth.
+3. **Solo partial UNIQUE INDEX, NO advisory lock aplicativo** — DB constraint TASK-848 V1.0 (`release_manifests_one_active_per_branch_idx`) enforce 1 release activo per branch. Advisory lock duplica complejidad sin agregar safety.
+4. **Vercel deploy automatico (NO triggered desde orquestador)** — Vercel deploys en push:main via git integration. Orquestador WAIT for READY via Vercel API poll, no triggers deploy.
+5. **workflow_call para los 4 workers (HubSpot incluido)** — Uniformidad orchestrator. HubSpot Python tambien expone workflow_call con `skip_tests` flag para que orchestrator pase preflight ya verificado.
+
+### Reuso canonico (cero duplicacion)
+
+- `recordReleaseStarted` + `transitionReleaseState` (TASK-848 V1.0 manifest-store) — atomic UPDATE + audit + outbox emit
+- `assertValidReleaseStateTransition` + `RELEASE_STATES` (TASK-848 V1.0 state-machine) — application guard
+- `runPreflight` + `composeFromCheckResults` (TASK-850) — invocable via `pnpm release:preflight --json --fail-on-error`
+- `RELEASE_DEPLOY_WORKFLOWS` (TASK-849 workflow-allowlist) — single source of truth de workflows production
+- `withSourceTimeout` (TASK-672) reusable indirectamente via runPreflight
+- `captureWithDomain` + `redactErrorForResponse` (observability)
+
+### Tests anti-regresion
+
+- 10/10 verdes en `concurrency-fix-verification.test.ts`:
+  - 6 tests verifican cancel-in-progress expression preserved en 3 worker workflows production
+  - 1 test verifica orchestrator usa cancel-in-progress=false (distinct SHAs no race)
+  - 3 tests verifican workflow_call contracts (environment + expected_sha + GCP_WIF secret) en los 3 workers
+- Live parity test `state-machine.live.test.ts` skipea sin DB; verificada manual via shell que CHECK constraint matchea exactamente los 8 estados canonicos del enum TS
+
+### Pendiente para TASK-853 + TASK-854
+
+- TASK-853 Azure Infra Release Gating: extender orchestrator con job condicional `deploy-azure-bicep` gated por `inputs.force_infra_deploy` o diff path filter `infra/azure/**`.
+- TASK-854 Release Observability Completion: 2 nuevos reliability signals (`platform.release.deploy_duration_p95`, `platform.release.last_status`) + dashboard UI consume manifests historicos.
+
+---
+
 ## Delta 2026-05-10 — TASK-850 Production Preflight CLI SHIPPED
 
 CLI canonico `pnpm release:preflight` shipped con los 12 checks fail-fast que TASK-848 V1.1 spec demando. Composer pattern (TASK-672 mirror) con timeout independiente por check y output JSON machine-readable + humano. Es el gate canonico que TASK-851 orchestrator workflow + TASK-855 dashboard consumiran.

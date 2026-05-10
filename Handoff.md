@@ -1,3 +1,33 @@
+# Sesion 2026-05-10 — TASK-851 Production Release Orchestrator + Worker SHA Verification SHIPPED
+
+- **Trigger:** post TASK-850 SHIPPED, usuario instruyó continuar con TASK-851 directo en `develop` sin cambiar rama. Auto mode activo + arch-architect inline 4-pillar validacion.
+- **Branch:** `develop` (sin rama nueva).
+- **Decisiones foundational pre-execution (4-pillar validadas inline)**:
+  1. **Compactación TASK-851 + TASK-852** (arch-architect spec) — Orquestador y SHA verification arquitecturalmente acoplados. Reduce overhead sin afectar implementación.
+  2. **CLI scripts TS para invocar helpers desde workflow YAML** (NO API admin endpoints) — Mismo patrón TASK-849 watchdog. Workflow YAML invoca `pnpm release:orchestrator-{record-started,transition-state}` con WIF auth.
+  3. **Solo partial UNIQUE INDEX, NO advisory lock aplicativo** — DB constraint TASK-848 V1.0 enforce 1 release activo per branch. Advisory lock duplica complejidad sin agregar safety.
+  4. **Vercel deploy automático (NO triggered desde orquestador)** — Vercel deploys en push:main via git integration. Orquestador WAIT for READY via Vercel API poll.
+  5. **workflow_call para los 4 workers (HubSpot incluido)** — Uniformidad orchestrator. HubSpot Python tambien expone workflow_call con `skip_tests` flag.
+- **Slices commiteados (5 commits incrementales)**:
+  - `9050bbcb` Slice 0 — CLI orchestrator-record-started + orchestrator-transition-state + state-machine.live.test parity TS↔SQL
+  - `0d3e1d12` Slice 1 — 4 worker deploy.sh aceptan EXPECTED_SHA + post-deploy verify gcloud run revisions describe matches GIT_SHA
+  - `880c8fe7` Slice 2 — 4 worker workflows con `workflow_call` + Ready=True poll 300s + EXPECTED_SHA env propagation
+  - `e14865c1` Slice 3 — production-release.yml orquestador con 8 jobs canónicos
+  - (este commit) Slice 4 — Tests anti-regresion + docs canónicas + cierre
+  - **Total: 137/137 tests existentes verdes + 10/10 nuevos en concurrency-fix-verification**
+- **Live verificación parity TS↔SQL** ejecutada via shell directo: CHECK constraint `release_manifests_state_canonical_check` matchea exactamente los 8 estados canónicos del enum TS (`preflight, ready, deploying, verifying, released, degraded, rolled_back, aborted`).
+- **Docs canonizadas (Slice 9)**:
+  - `CLAUDE.md` nueva sección "Production Release Orchestrator invariants (TASK-851)" con state machine + worker contracts + reglas duras
+  - `AGENTS.md` nueva sección "Production Release Orchestrator (TASK-851, 2026-05-10)" para discovery rapido
+  - `docs/architecture/DECISIONS_INDEX.md` entry "TASK-851 + TASK-852 compactados, orquestador y SHA verification acoplados"
+  - `docs/architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md` Delta TASK-851 SHIPPED con 5 decisiones validadas + componentes + reusos + tests
+  - `docs/manual-de-uso/plataforma/release-orchestrator.md` NUEVO manual operador-facing paso-a-paso
+  - `docs/documentation/plataforma/release-orchestrator.md` NUEVO doc funcional con detalle técnico
+- **Skills invocadas:** `arch-architect` (validacion 4-pillar inline pre-execution per instrucción usuario constante) + `greenhouse-backend` (implementación).
+- **Próximo paso:** TASK-853 (Azure Infra Release Gating) o TASK-854 (Release Observability Completion). Ambas bloqueadas por TASK-851 ya cerrada → ahora desbloqueadas.
+
+---
+
 # Sesion 2026-05-10 — TASK-850 Production Preflight CLI Complete SHIPPED
 
 - **Trigger:** post-merge `develop → main` de TASK-849 (PR #114), 3 worker deploys completos, watchdog cron `*/30` registrado en main. Usuario indico continuar con TASK-850..854 secuencial. Mantener en `develop`, no cambiar de rama.

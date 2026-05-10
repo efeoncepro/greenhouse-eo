@@ -1663,6 +1663,71 @@ pnpm release:preflight --override-batch-policy --fail-on-error
 
 **Spec canonica**: `docs/tasks/in-progress/TASK-850-production-preflight-cli-complete.md`. Migration: `migrations/20260510144012098_task-850-preflight-capabilities.sql`. CLI: `pnpm release:preflight [--json|--fail-on-error|--override-batch-policy|--target-sha=<sha>|--target-branch=<name>]`.
 
+### Production Release Orchestrator invariants (TASK-851)
+
+Workflow GitHub Actions canonico `production-release.yml` que coordina la promocion `develop → main` end-to-end consumiendo el CLI preflight (TASK-850), helpers manifest-store (TASK-848 V1.0), y los 4 worker workflows refactoreados a `workflow_call` con `expected_sha` input + post-deploy GIT_SHA verification.
+
+**Triggers**: `workflow_dispatch` solo. Inputs: `target_sha` (required, 40 hex), `force_infra_deploy` (default false, gated TASK-853), `bypass_preflight_reason` (>=20 chars + capability `platform.release.bypass_preflight`).
+
+**8 jobs canonicos**:
+
+1. `preflight` — `pnpm release:preflight --json --fail-on-error`. `bypass_preflight_reason >=20 chars` → `--override-batch-policy` flag pass-through. Artifact `preflight-result.json` para audit.
+2. `record-started` — `pnpm release:orchestrator-record-started` (CLI Slice 0) → `release_id` stdout. Auth WIF + Cloud SQL Connector. Emite outbox `platform.release.started v1` + audit row en misma tx.
+3. `approval-gate` — `environment: production` (required reviewers en repo settings). Timeout 3 dias.
+4. `deploy-{ops-worker, commercial-cost-worker, ico-batch, hubspot-integration}` — parallel matrix `uses: ./.github/workflows/<worker>-deploy.yml@<sha>` con `expected_sha` + `environment` inputs.
+5. `wait-vercel` — poll Vercel API `/v6/deployments?target=production` hasta encontrar deployment con `meta.githubCommitSha === target_sha` y `state=READY`. Timeout 900s.
+6. `post-release-health` — ping `https://greenhouse.efeoncepro.com/api/auth/health`. Soft-fail (exit 78) → release `degraded` en lugar de `aborted`.
+7. `transition-released` — 4 state machine transitions (`preflight→ready→deploying→verifying→released|degraded`) via CLI Slice 0. Si post-release-health success → `released`, sino → `degraded`.
+8. `summary` — `GITHUB_STEP_SUMMARY` tabla con results + `release_id` + workflow run link.
+
+**Concurrency**: `production-release-${{ inputs.target_sha }}` con `cancel-in-progress: false`. Distinct SHAs deploy independientemente. Partial UNIQUE INDEX TASK-848 V1.0 enforce 1 release activo per branch a nivel DB.
+
+**Worker workflow contract canonico** (TASK-851 Slice 2):
+
+- Trigger paths: `push:main/develop` (auto), `workflow_dispatch` (operator), `workflow_call` (orquestador).
+- `workflow_call` inputs canonicos: `environment` (string, req), `expected_sha` (string, req).
+- `workflow_call` secrets canonicos: `GCP_WORKLOAD_IDENTITY_PROVIDER` (req).
+- ENV var `EXPECTED_SHA` resuelve `workflow_call.inputs.expected_sha > workflow_dispatch.inputs.expected_sha > github.sha`.
+- Step "Poll Ready=True bounded" timeout 300s para que el orquestador tenga step nombrado al cual `await success()`.
+
+**Worker deploy.sh contract canonico** (TASK-851 Slice 1):
+
+- Aceptan env var `EXPECTED_SHA` (orchestrator passes; fallback chain `EXPECTED_SHA > GITHUB_SHA > git rev-parse HEAD > 'unknown'`).
+- `GIT_SHA` env var en Cloud Run revision = `EXPECTED_SHA`.
+- Post-deploy verify: `gcloud run revisions describe <latest>` + Python JSON parse de `containers[].env` + match `GIT_SHA` vs `EXPECTED_SHA`. Mismatch → `exit 1` fail-loud.
+- Skipea verify cuando `EXPECTED_SHA='unknown'` (no git context, e.g. dev local).
+
+**State machine canonica** (TS↔SQL parity):
+
+- `RELEASE_STATES = ['preflight','ready','deploying','verifying','released','degraded','rolled_back','aborted']` (8 estados, TS enum).
+- DB CHECK constraint `release_manifests_state_canonical_check` mirror exacto. Live parity test `state-machine.live.test.ts` rompe build si emerge drift (skipea cuando `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME` no esta seteada).
+- Transition matrix V1 §2.3: `preflight → ready|aborted`, `ready → deploying|aborted`, `deploying → verifying|aborted`, `verifying → released|degraded|aborted`, `released → rolled_back`, `degraded → released|rolled_back`. `rolled_back` y `aborted` terminales sin recovery (re-INSERT con `attempt_n + 1`).
+- Application guard `assertValidReleaseStateTransition` enforce ANTES de tocar DB (defense in depth).
+
+**CLI scripts canonicos**:
+
+- `pnpm release:orchestrator-record-started --target-sha=<sha> --triggered-by=<actor> [--target-branch=main] [--source-branch=develop] [--preflight-result-file=<path>]`
+- `pnpm release:orchestrator-transition-state --release-id=<id> --from-state=<state> --to-state=<state> --actor-label=<actor> [--actor-kind=member|system|cli] [--reason=<text>] [--metadata-json=<json>]`
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** modificar `RELEASE_STATES` enum sin actualizar paralelamente la DB CHECK constraint via migration. Live parity test rompe build si drift emerge.
+- **NUNCA** transitar `state` fuera de la matrix canonica V1 §2.3. `assertValidReleaseStateTransition` lo throw fail-loud antes de tocar DB.
+- **NUNCA** convertir `cancel-in-progress: ${{ <production-only expression> }}` a literal `false` en los 3 worker workflows production. Reintroduce el deadlock 2026-04-26 → 2026-05-09. Test `concurrency-fix-verification.test.ts` rompe build si emerge regression.
+- **NUNCA** flagear `--override-batch-policy` en el orquestador sin `bypass_preflight_reason >=20 chars` + capability `platform.release.bypass_preflight`. Audit row en `release_state_transitions.metadata_json` registra reason.
+- **NUNCA** llamar `recordReleaseStarted` directo desde un workflow YAML — usar siempre el CLI `pnpm release:orchestrator-record-started`. Mismo para `transitionReleaseState` → `pnpm release:orchestrator-transition-state`. Garantiza atomicidad (UPDATE + audit + outbox en misma tx).
+- **NUNCA** modificar `release_manifests` directamente via SQL. Anti-immutable trigger (TASK-848 V1.0) bloquea cambios a campos identity. Para correcciones, INSERT nueva fila con `metadata_json.correction_of=<previous_id>`.
+- **NUNCA** convertir el partial UNIQUE INDEX `release_manifests_one_active_per_branch_idx` a UNIQUE INDEX completo. El partial garantiza solo 1 release activo por branch — el INDEX completo bloquearia re-attempts terminados.
+- **NUNCA** introducir advisory lock PG aplicativo en el orquestador. El partial UNIQUE INDEX en DB es sufficient.
+- **NUNCA** modificar shape de `inputs.environment` ni `inputs.expected_sha` en workflow_call de los workers. TASK-851 orquestador depende de la estabilidad. Adding optional inputs OK; renaming requires bumpear contract version.
+- **NUNCA** disparar el orquestador sin tener `target_sha` ya pusheado a `main`. Vercel deploy es automatico via push (git integration); el orquestador WAIT for READY, no triggers deploy.
+- **NUNCA** flagear release `released` cuando post-release-health soft-failed. La transition canonica es `verifying → degraded` y operador decide via runbook si rollback o forward-fix.
+- **NUNCA** invocar `Sentry.captureException` directo en orchestrator code path. Use `captureWithDomain(err, 'cloud', { tags: { source: 'production_release', stage: '<step>' } })`.
+- **SIEMPRE** que emerja un nuevo worker workflow production deploy, agregarlo a `RELEASE_DEPLOY_WORKFLOWS` (TASK-849 workflow-allowlist) Y al matrix de jobs en `production-release.yml` ANTES del primer deploy via orquestador.
+- **SIEMPRE** que se modifique la transition matrix, actualizar AMBOS: `RELEASE_TRANSITION_MATRIX` TS + spec V1 §2.3 + arch doc Delta. Live parity test no cubre matrix (solo enum).
+
+**Spec canonica**: `docs/tasks/in-progress/TASK-851-production-release-orchestrator-workflow.md`. Workflow: `.github/workflows/production-release.yml`. CLI: `pnpm release:orchestrator-{record-started,transition-state}`. Tests: `concurrency-fix-verification.test.ts` + `state-machine.test.ts` + `state-machine.live.test.ts`.
+
 ### Finance write-path E2E gate (TASK-773 Slice 6)
 
 Cualquier task que toque handlers `POST/PUT/PATCH/DELETE` en `src/app/api/finance/**/route.ts` **debe verificar el flow end-to-end downstream**, no solo el contract API. Bug class detectada 2026-05-03: el endpoint Figma respondía 200 OK pero el TC Santander no rebajaba — porque el contract API funcionaba pero el side effect downstream (outbox → BQ → reactive → account_balance) calló silencioso.
