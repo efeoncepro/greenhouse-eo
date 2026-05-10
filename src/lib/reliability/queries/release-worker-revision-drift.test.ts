@@ -1,4 +1,25 @@
+import type * as ChildProcess from 'node:child_process'
+
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
+// Mock execFile (resolveCloudRunRevisionSha) ANTES del import del reader.
+// Garantiza que tests son deterministas independiente del estado real de
+// gcloud / Cloud Run en la maquina del runner. Sin este mock, los tests
+// fallaban en runtimes con gcloud configurado contra producción real
+// (descubierto live 2026-05-10 post merge cuando workers ya tenian GIT_SHA
+// real, rompiendo expectativa de `data_missing`).
+vi.mock('node:child_process', async () => {
+  const actual = await vi.importActual<typeof ChildProcess>('node:child_process')
+
+  return {
+    ...actual,
+    execFile: vi.fn((_cmd, _args, _opts, callback) => {
+      // Default: gcloud "absent" — pasa null/error al callback. Tests que
+      // necesiten respuesta especifica deben usar vi.spyOn() en su propio scope.
+      if (callback) callback(new Error('gcloud not available in test'), '', '')
+    })
+  }
+})
 
 import {
   RELEASE_WORKER_REVISION_DRIFT_SIGNAL_ID,

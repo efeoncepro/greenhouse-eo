@@ -18,11 +18,13 @@
 
 ## Summary
 
-Implementar `scripts/release/production-preflight.ts` completo segun TASK-848 Slice 2. CLI fail-fast que valida branch/SHA, develop verde, main merge target, Vercel staging/production readiness, Postgres health, GitHub Actions blockers (stale approvals + pending sin jobs), GCP WIF subjects, Azure WIF subjects, secrets y Sentry critical issues. Salida JSON machine-readable + resumen humano. Retry bounded N=3.
+Implementar `scripts/release/production-preflight.ts` completo segun TASK-848 Slice 2. CLI fail-fast que valida branch/SHA, develop verde, main merge target, release batch size policy, Vercel staging/production readiness, Postgres health, GitHub Actions blockers (stale approvals + pending sin jobs), GCP WIF subjects, Azure WIF subjects, secrets y Sentry critical issues. Salida JSON machine-readable + resumen humano. Retry bounded N=3.
 
 ## Why
 
 TASK-848 V1.0 entrega 2 reliability signals que detectan stale approvals + pending sin jobs en runtime, pero NO hay CLI fail-fast pre-deploy que un operador o el orquestador V1.1 pueda invocar como gate non-bypassable. Sin esta task, el operador depende de inspeccion manual del dashboard y/o de leer logs.
+
+Delta 2026-05-10: el preflight tambien debe automatizar la policy de batch size definida en el runbook de production release. Greenhouse no debe promover batches grandes por accidente: la unidad de release es un bloque funcional coherente, medido por blast radius, reversibilidad y evidencia de validacion, no por numero de commits.
 
 ## Architecture Alignment
 
@@ -35,6 +37,12 @@ TASK-848 V1.0 entrega 2 reliability signals que detectan stale approvals + pendi
   - Validacion target_sha existe en git history
   - CI verde en commit (gh API)
   - Playwright smoke verde (gh API)
+  - Release batch size policy:
+    - diff `origin/main...target_sha` clasificado por dominio (`payroll`, `finance`, `auth/access`, `cloud/release`, `db/migrations`, `ui`, `docs`)
+    - deteccion de archivos sensibles (`migrations/`, `src/lib/db`, `src/lib/payroll`, `src/lib/finance`, `src/lib/auth`, `src/lib/entitlements`, `.github/workflows`, `services/*/deploy.sh`, `vercel.json`, env/secrets docs)
+    - heuristica de irreversibilidad: migraciones, schema/runtime shared, access model, cloud deploy infra, payment/payroll/accounting semantics
+    - resultado `ok|warning|error` con razones y recomendacion `ship|split_batch|requires_break_glass`
+    - error si mezcla dominios sensibles independientes sin dependencia documentada
   - Detector stale approvals (reusar logica de `release-stale-approval.ts`)
   - Detector pending sin jobs (reusar logica de `release-pending-without-jobs.ts`)
   - Vercel staging/production readiness (Vercel API)
@@ -53,8 +61,11 @@ TASK-848 V1.0 entrega 2 reliability signals que detectan stale approvals + pendi
 
 ## Acceptance Criteria
 
-- [ ] `production-preflight.ts` ejecuta los 11 checks fail-fast.
+- [ ] `production-preflight.ts` ejecuta los 12 checks fail-fast, incluyendo `release_batch_policy`.
 - [ ] Output JSON machine-readable consumible por workflow CI step.
+- [ ] Output JSON incluye `releaseBatchPolicy` con dominios tocados, archivos sensibles, nivel de riesgo, decision y razones.
+- [ ] `release_batch_policy` bloquea mezcla de dominios sensibles independientes sin dependencia documentada.
+- [ ] `release_batch_policy` permite docs-only agrupable y UI bajo riesgo relacionado sin bloquear.
 - [ ] WIF subjects verification GCP + Azure detecta drift y emite comando exacto de remediacion.
 - [ ] Retry bounded N=3 con backoff exponencial.
 - [ ] Tests unitarios cubren happy path + cada failure mode.

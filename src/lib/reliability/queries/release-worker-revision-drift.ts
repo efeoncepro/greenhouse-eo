@@ -162,6 +162,11 @@ const resolveCloudRunRevisionSha = async (
   }
 
   try {
+    // Verificado live 2026-05-10: gcloud rechaza el syntax inline
+    // `.filter('name','GIT_SHA').extract('value')` con
+    // `TransformFilter() takes 2 positional arguments but 3 were given`.
+    // Solucion canonica: dump JSON + parse client-side. Robusto cross-version
+    // de gcloud y mas legible.
     const { stdout } = await execFileAsync(
       'gcloud',
       [
@@ -171,13 +176,25 @@ const resolveCloudRunRevisionSha = async (
         service,
         `--region=${region}`,
         '--project=efeonce-group',
-        // Get GIT_SHA env from latest ready revision spec.
-        "--format=value(spec.template.spec.containers[0].env.filter('name','GIT_SHA').extract('value'))"
+        '--format=json'
       ],
       { timeout: 10_000 }
     )
 
-    return normalizeSha(stdout.trim())
+    const parsed = JSON.parse(stdout) as {
+      spec?: {
+        template?: {
+          spec?: {
+            containers?: Array<{ env?: Array<{ name: string; value?: string }> }>
+          }
+        }
+      }
+    }
+
+    const envEntries = parsed.spec?.template?.spec?.containers?.[0]?.env ?? []
+    const gitShaEntry = envEntries.find((e) => e.name === 'GIT_SHA')
+
+    return normalizeSha(gitShaEntry?.value ?? null)
   } catch {
     // gcloud absent (Vercel runtime), or query failure. Caller treats as
     // data_missing, not drift. Silenced because runtime context is the

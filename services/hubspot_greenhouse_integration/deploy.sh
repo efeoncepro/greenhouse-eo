@@ -192,6 +192,14 @@ ENV_VARS="${ENV_VARS},HUBSPOT_GREENHOUSE_SERVICE_MODULE_PROP=${HUBSPOT_SERVICE_M
 ENV_VARS="${ENV_VARS},HUBSPOT_GREENHOUSE_INTEGRATION_TIMEOUT_SECONDS=${HUBSPOT_TIMEOUT_SECONDS}"
 ENV_VARS="${ENV_VARS},HUBSPOT_GREENHOUSE_WEBHOOK_MAX_AGE_MS=${HUBSPOT_WEBHOOK_MAX_AGE_MS}"
 
+# TASK-849 Slice 1 follow-up — GIT_SHA env var for production-release-watchdog
+# revision drift detection. Mismo patron que ops-worker / commercial-cost-worker
+# / ico-batch deploy.sh. El watchdog (scripts/release/production-release-watchdog.ts)
+# compara este SHA vs el ultimo workflow run success per worker; mismatch =
+# critical (revision Cloud Run no es la del ultimo deploy verde).
+GIT_SHA="${GITHUB_SHA:-$(git rev-parse HEAD 2>/dev/null || echo 'unknown')}"
+ENV_VARS="${ENV_VARS},GIT_SHA=${GIT_SHA}"
+
 SECRETS="HUBSPOT_ACCESS_TOKEN=$(normalize_secret_ref_for_cloud_run "${HUBSPOT_ACCESS_TOKEN_SECRET_NAME}")"
 SECRETS="${SECRETS},GREENHOUSE_INTEGRATION_API_TOKEN=$(normalize_secret_ref_for_cloud_run "${GREENHOUSE_INTEGRATION_API_TOKEN_SECRET_NAME}")"
 SECRETS="${SECRETS},HUBSPOT_APP_CLIENT_SECRET=$(normalize_secret_ref_for_cloud_run "${HUBSPOT_APP_CLIENT_SECRET_SECRET_NAME}")"

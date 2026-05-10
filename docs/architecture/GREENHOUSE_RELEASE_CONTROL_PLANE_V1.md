@@ -203,6 +203,7 @@ Ningun evento dispara side effect automatico sobre cloud (Vercel/Cloud Run/Azure
 ## 6. Hard Rules (anti-regresion)
 
 - **NUNCA** disparar release production sin pasar por `production-release.yml` (V1.1). Disparos directos quedan reservados para break-glass documentado.
+- **NUNCA** promover a production un batch que mezcle dominios sensibles independientes (`payroll`, `finance`, `auth/access`, `cloud/release infra`, migraciones) sin dependencia directa documentada y rollback comun.
 - **NUNCA** modificar `release_manifests.{release_id, target_sha, started_at, triggered_by, attempt_n}` post-INSERT. Anti-immutable trigger lo bloquea.
 - **NUNCA** hacer DELETE de filas en `release_manifests` o `release_state_transitions`. Append-only.
 - **NUNCA** transicionar `state` fuera del matrix canonico. Allowed: `preflight -> ready -> deploying -> verifying -> released | degraded | aborted`; `released -> rolled_back`; `degraded -> rolled_back | released`.
@@ -214,6 +215,23 @@ Ningun evento dispara side effect automatico sobre cloud (Vercel/Cloud Run/Azure
 - **NUNCA** mezclar dimensiones en state machine: `state` = lifecycle del release; outcome de cada step (Vercel ok, worker ok, Azure ok) vive en `post_release_health JSONB`.
 - **SIEMPRE** que un release entre `state IN ('degraded','aborted','rolled_back')`, escalar via outbox event + reliability signal `platform.release.last_status` (V1.1).
 - **SIEMPRE** que emerja un workflow nuevo de deploy production, agregarlo al `releaseDeployWorkflowAllowlist` del detector (V1.1) + verificacion WIF subject + gating del orquestador.
+
+### Production release batch size policy
+
+La unidad de release production es un **bloque funcional coherente**, no un numero de commits. El gate canonico
+evalua blast radius, reversibilidad y evidencia de validacion.
+
+Reglas:
+
+- Docs-only/task specs pueden agruparse si no cambian runtime.
+- UI bajo riesgo puede agrupar 2-3 cambios relacionados si comparten validacion y rollback.
+- Payroll/Previred/compliance, finance/billing/accounting, auth/access, cloud/release infra y migraciones deben ir
+  como release aislado o acoplados solo a su consumer directo.
+- Hotfix production contiene una sola causa raiz minima; cualquier mejora oportunista espera otro release.
+- Si un release necesita explicarse como "tambien incluye...", el batch es sospechoso y debe dividirse o justificarse.
+
+TASK-850 automatiza esta politica en `production-preflight.ts` como `release_batch_policy`: clasifica archivos
+tocados, dominios sensibles, migraciones, irreversibilidad, rollback complexity y emite `ok|warning|error`.
 
 ## 7. V1 partial deliverable + V1.1 follow-up tasks
 

@@ -66,6 +66,7 @@ Antes de crear PR `develop → main`, ejecutar estos checks. **Cualquier check r
 | 8 | Sentry sin incidents critical 24h | Vercel/Sentry UI o `/admin/operations` Cloud subsystem | Sí |
 | 9 | Reliability dashboard `/admin/operations` sin signals `error` | Inspeccionar UI | Sí |
 | 10 | WIF subjects GCP + Azure correctos | Sec 2.1 abajo | Sí (después de cualquier cambio infra) |
+| 11 | Batch size policy OK | Sec 2.2 abajo; V1.1 lo automatiza en TASK-850 | Sí |
 
 ### 2.1. Verificación WIF subjects (manual hoy, automatizado en V1.1)
 
@@ -94,6 +95,46 @@ Debe incluir AMBOS:
 - `repo:efeoncepro/greenhouse-eo:environment:production`
 
 **Si falta**: agregar via `az ad app federated-credential create --id <CLIENT_ID> --parameters '{...}'` ANTES del release.
+
+### 2.2. Production release batch size policy
+
+Greenhouse promueve a producción en lotes pequeños, coherentes y reversibles. La unidad de decisión no es el
+número de commits: es **blast radius + reversibilidad + evidencia de validación**.
+
+Regla base:
+
+- Un release normal debe contener **un bloque funcional coherente**.
+- Ese bloque puede tener varios commits si todos pertenecen al mismo objetivo y comparten rollback.
+- No mezclar dominios sensibles salvo dependencia directa documentada.
+
+Matriz operativa:
+
+| Tipo de cambio | Política de batch | Bloquea si se mezcla con |
+|---|---|---|
+| Docs-only / task specs | Agrupable si no cambia runtime | Nada, salvo que oculte cambio runtime |
+| UI bajo riesgo | Hasta 2-3 cambios relacionados | DB/auth/payroll/finance/infra no relacionados |
+| Payroll / Previred / compliance | 1 causa raíz por release | Finance/auth/cloud/migrations no requeridas |
+| Finance / billing / accounting | 1 causa raíz por release | Payroll/auth/cloud/migrations no requeridas |
+| Auth / access / entitlements | 1 causa raíz por release | Payroll/finance/cloud no requeridas |
+| Cloud / deploy / release infra | 1 slice por release | Cambios funcionales no requeridos |
+| DB migration | Release dedicado o acoplado solo a su consumer directo | Refactors/UI no requeridos |
+| Hotfix | 1 cambio mínimo y reversible | Cualquier mejora oportunista |
+
+Bloqueantes:
+
+- más de un cambio irreversible en el mismo release;
+- más de un dominio sensible sin dependencia declarada;
+- rollback no explicable en una frase;
+- staging no valida el flujo afectado;
+- signals `error` en `/admin/operations`;
+- stale approvals o pending runs sin jobs;
+- el release se describe naturalmente con "también incluye...".
+
+Excepción break-glass:
+
+- solo para incidente productivo activo;
+- requiere razón escrita, owner humano, rollback explícito y actualización de `Handoff.md`;
+- no permite agregar mejoras no relacionadas.
 
 ## 3. Approval del environment Production
 
