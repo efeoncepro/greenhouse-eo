@@ -288,6 +288,72 @@ Procedimiento:
 
 5. **Verificar funcionalidad post-apply**: smoke test del Teams Bot + Logic Apps + Notifications.
 
+### 6.1. Azure infra release gating (TASK-853, automatizado en orquestador)
+
+A partir de TASK-853 SHIPPED 2026-05-10, los 2 Azure workflows (`azure-teams-deploy.yml` + `azure-teams-bot-deploy.yml`) operan en gating mode automatico cuando se invocan desde el orquestador `production-release.yml`:
+
+- **Health check Azure (preflight-style)** corre SIEMPRE: WIF login + provider register + RG ensure. Si WIF roto o providers no registrados, el job falla loud antes de tocar Bicep.
+- **Bicep apply real** corre solo cuando:
+  - `force_infra_deploy=true` en el dispatch del orquestador (operator override explicito), O
+  - Diff detectado en `infra/azure/<sub>/**` entre `origin/main~1` y el `target_sha` del release (auto detection)
+- **Skip silencioso NO**: el workflow agrega annotation `::notice::` + entry en `GITHUB_STEP_SUMMARY` con la razon del skip (`force_infra_deploy=true` | `push_path_filter_matched` | `infra_diff_detected` | `no_infra_diff`).
+
+Ejemplo de invocacion via orquestador:
+
+```bash
+gh workflow run production-release.yml \
+  -f target_sha=<sha> \
+  -f force_infra_deploy=false   # default; Bicep solo si diff detectado
+```
+
+Force apply (e.g. cuando un Bicep template cambio sin diff de paths trivial):
+
+```bash
+gh workflow run production-release.yml \
+  -f target_sha=<sha> \
+  -f force_infra_deploy=true
+```
+
+### 6.2. WIF subjects canonicos Azure
+
+Federated credential del Azure AD App Registration (tenant `a80bf6c1-7c45-4d70-b043-51389622a0e4`) acepta los siguientes subjects desde el repo `efeoncepro/greenhouse-eo`:
+
+- `repo:efeoncepro/greenhouse-eo:ref:refs/heads/main` (deploys auto via push:main)
+- `repo:efeoncepro/greenhouse-eo:ref:refs/heads/develop` (staging)
+- `repo:efeoncepro/greenhouse-eo:environment:production` (cuando workflow declara `environment: production`)
+
+Verificar via:
+
+```bash
+az ad app federated-credential list --id <AZURE_CLIENT_ID> -o table
+```
+
+Si emerge un subject nuevo (e.g. nuevo workflow, nuevo branch), agregar via:
+
+```bash
+az ad app federated-credential create --id <AZURE_CLIENT_ID> --parameters '{
+  "name": "gh-actions-<descriptor>",
+  "issuer": "https://token.actions.githubusercontent.com",
+  "subject": "repo:efeoncepro/greenhouse-eo:<subject>",
+  "audiences": ["api://AzureADTokenExchange"]
+}'
+```
+
+### 6.3. Rollback automatizado Azure (V2 contingente)
+
+Azure NO tiene rollback automatico V1 porque:
+
+- Bicep templates pueden contener `delete-on-deletion` semantics
+- Federated credentials rotation puede dejar el WIF sin acceso temporalmente
+- App Service config reset puede invalidar webhooks externos
+
+V2 contingente (cuando emerja necesidad):
+
+- `az deployment group what-if` mandatory antes de cualquier apply
+- Restoration desde Bicep template del commit previo (`git show <prev>:infra/azure/<sub>/main.bicep`)
+- Smoke test obligatorio post-restore (Teams Bot + Logic Apps healthy)
+- Out of scope para TASK-853; queda como follow-up cuando el orquestador acumule incident data suficiente para justificarlo.
+
 ## 7. Decision tree: rollback vs forward-fix vs incident mode bypass
 
 ```text

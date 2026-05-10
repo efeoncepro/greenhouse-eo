@@ -101,3 +101,104 @@ describe('TASK-851 workflow_call contracts', () => {
     })
   }
 })
+
+const AZURE_WORKFLOWS = [
+  '.github/workflows/azure-teams-deploy.yml',
+  '.github/workflows/azure-teams-bot-deploy.yml'
+] as const
+
+describe('TASK-853 Azure workflow_call contracts + Bicep diff gating', () => {
+  for (const path of AZURE_WORKFLOWS) {
+    it(`${path} exposes workflow_call with environment + target_sha + force_infra_deploy inputs`, () => {
+      const doc = loadWorkflow(path)
+      const onClause = doc.on as Record<string, unknown>
+
+      const workflowCall = onClause?.workflow_call as
+        | { inputs?: Record<string, unknown>; secrets?: Record<string, unknown> }
+        | undefined
+
+      expect(workflowCall, `${path} missing workflow_call interface`).toBeDefined()
+
+      const inputs = workflowCall?.inputs ?? {}
+
+      expect(inputs.environment).toBeDefined()
+      expect(inputs.target_sha).toBeDefined()
+      expect(inputs.force_infra_deploy).toBeDefined()
+
+      const secrets = workflowCall?.secrets ?? {}
+
+      expect(secrets.AZURE_CLIENT_ID).toBeDefined()
+      expect(secrets.AZURE_TENANT_ID).toBeDefined()
+      expect(secrets.AZURE_SUBSCRIPTION_ID).toBeDefined()
+    })
+
+    it(`${path} preserves push trigger + path filter (back-compat)`, () => {
+      const doc = loadWorkflow(path)
+      const onClause = doc.on as Record<string, unknown>
+
+      const pushTrigger = onClause?.push as
+        | { branches?: readonly string[]; paths?: readonly string[] }
+        | undefined
+
+      expect(pushTrigger, `${path} missing push trigger`).toBeDefined()
+      expect(pushTrigger?.branches).toContain('main')
+      expect(pushTrigger?.paths?.length ?? 0).toBeGreaterThan(0)
+    })
+
+    it(`${path} workflow_dispatch accepts force_infra_deploy override`, () => {
+      const doc = loadWorkflow(path)
+      const onClause = doc.on as Record<string, unknown>
+
+      const dispatchTrigger = onClause?.workflow_dispatch as
+        | { inputs?: Record<string, unknown> }
+        | undefined
+
+      const inputs = dispatchTrigger?.inputs ?? {}
+
+      expect(inputs.force_infra_deploy, `${path} workflow_dispatch missing force_infra_deploy input`).toBeDefined()
+    })
+
+    it(`${path} declares 5 canonical jobs (health-check, validate, diff-detection, deploy, skip-deploy-summary)`, () => {
+      const doc = loadWorkflow(path) as { jobs?: Record<string, unknown> }
+      const jobs = doc.jobs ?? {}
+      const expectedJobs = ['health-check', 'validate', 'diff-detection', 'deploy', 'skip-deploy-summary']
+
+      for (const jobName of expectedJobs) {
+        expect(jobs[jobName], `${path} missing job '${jobName}'`).toBeDefined()
+      }
+    })
+  }
+})
+
+describe('TASK-853 production-release.yml orchestrator wires Azure jobs', () => {
+  it('production-release.yml has 2 deploy-azure-* jobs after deploy-hubspot-integration', () => {
+    const doc = loadWorkflow('.github/workflows/production-release.yml') as {
+      jobs?: Record<string, unknown>
+    }
+
+    const jobs = doc.jobs ?? {}
+
+    expect(jobs['deploy-azure-teams-notifications']).toBeDefined()
+    expect(jobs['deploy-azure-teams-bot']).toBeDefined()
+  })
+
+  it('post-release-health needs both Azure deploy jobs (waits for them before pinging)', () => {
+    const doc = loadWorkflow('.github/workflows/production-release.yml') as {
+      jobs?: Record<string, { needs?: readonly string[] }>
+    }
+
+    const needs = doc.jobs?.['post-release-health']?.needs ?? []
+
+    expect(needs).toContain('deploy-azure-teams-notifications')
+    expect(needs).toContain('deploy-azure-teams-bot')
+  })
+
+  it('Azure jobs use secrets: inherit (canonical pattern for environment-scoped secrets)', () => {
+    const doc = loadWorkflow('.github/workflows/production-release.yml') as {
+      jobs?: Record<string, { secrets?: string | Record<string, unknown> }>
+    }
+
+    expect(doc.jobs?.['deploy-azure-teams-notifications']?.secrets).toBe('inherit')
+    expect(doc.jobs?.['deploy-azure-teams-bot']?.secrets).toBe('inherit')
+  })
+})
