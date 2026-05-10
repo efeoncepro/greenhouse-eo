@@ -8084,6 +8084,45 @@ export interface GreenhouseServingUserRecentItems {
   visit_count: Generated<number>;
 }
 
+export interface GreenhouseSyncGithubReleaseWebhookEvents {
+  action: string | null;
+  check_run_id: Int8 | null;
+  check_suite_id: Int8 | null;
+  /**
+   * X-GitHub-Delivery UUID. Unique idempotency key for GitHub webhook retries.
+   */
+  delivery_id: string;
+  deployment_id: Int8 | null;
+  error_code: string | null;
+  error_message: string | null;
+  event_name: string;
+  evidence_json: Generated<Json>;
+  github_conclusion: string | null;
+  github_release_webhook_event_id: string;
+  github_status: string | null;
+  matched_by: string | null;
+  processed_at: Timestamp | null;
+  /**
+   * received | ignored | matched | reconciled | matched_no_transition | unmatched | failed. unmatched/failed feed reliability signal; ignored covers non-release allowlisted events.
+   */
+  processing_status: Generated<string>;
+  received_at: Generated<Timestamp>;
+  /**
+   * Explicitly redacted provider metadata only. Full raw GitHub payload is intentionally not retained for this endpoint after HMAC verification.
+   */
+  redacted_payload_json: Generated<Json>;
+  release_id: string | null;
+  repository_full_name: string | null;
+  target_sha: string | null;
+  transition_applied: Generated<boolean>;
+  transition_from_state: string | null;
+  transition_to_state: string | null;
+  webhook_inbox_event_id: string;
+  workflow_job_id: Int8 | null;
+  workflow_name: string | null;
+  workflow_run_id: Int8 | null;
+}
+
 export interface GreenhouseSyncHandlerHealth {
   consecutive_failures: Generated<number>;
   consecutive_successes: Generated<number>;
@@ -8509,36 +8548,6 @@ export interface GreenhouseSyncReleaseManifests {
   vercel_deployment_url: string | null;
   worker_revisions: Generated<Json>;
   workflow_runs: Generated<Json>;
-}
-
-export interface GreenhouseSyncGithubReleaseWebhookEvents {
-  action: string | null;
-  check_run_id: number | null;
-  check_suite_id: number | null;
-  delivery_id: string;
-  deployment_id: number | null;
-  error_code: string | null;
-  error_message: string | null;
-  event_name: string;
-  evidence_json: Generated<Json>;
-  github_conclusion: string | null;
-  github_release_webhook_event_id: string;
-  github_status: string | null;
-  matched_by: string | null;
-  processed_at: Timestamp | null;
-  processing_status: Generated<string>;
-  received_at: Generated<Timestamp>;
-  redacted_payload_json: Generated<Json>;
-  release_id: string | null;
-  repository_full_name: string | null;
-  target_sha: string | null;
-  transition_applied: Generated<boolean>;
-  transition_from_state: string | null;
-  transition_to_state: string | null;
-  webhook_inbox_event_id: string;
-  workflow_job_id: number | null;
-  workflow_name: string | null;
-  workflow_run_id: number | null;
 }
 
 export interface GreenhouseSyncReleaseStateTransitions {
@@ -9172,6 +9181,7 @@ export interface DB {
   "greenhouse_serving.staff_aug_placement_snapshots": GreenhouseServingStaffAugPlacementSnapshots;
   "greenhouse_serving.user_360": GreenhouseServingUser360;
   "greenhouse_serving.user_recent_items": GreenhouseServingUserRecentItems;
+  "greenhouse_sync.github_release_webhook_events": GreenhouseSyncGithubReleaseWebhookEvents;
   "greenhouse_sync.handler_health": GreenhouseSyncHandlerHealth;
   "greenhouse_sync.handler_health_transitions": GreenhouseSyncHandlerHealthTransitions;
   "greenhouse_sync.identity_profile_merge_log": GreenhouseSyncIdentityProfileMergeLog;
@@ -9192,7 +9202,6 @@ export interface DB {
   "greenhouse_sync.outbox_reactive_log": GreenhouseSyncOutboxReactiveLog;
   "greenhouse_sync.projection_circuit_state": GreenhouseSyncProjectionCircuitState;
   "greenhouse_sync.projection_refresh_queue": GreenhouseSyncProjectionRefreshQueue;
-  "greenhouse_sync.github_release_webhook_events": GreenhouseSyncGithubReleaseWebhookEvents;
   "greenhouse_sync.release_manifests": GreenhouseSyncReleaseManifests;
   "greenhouse_sync.release_state_transitions": GreenhouseSyncReleaseStateTransitions;
   "greenhouse_sync.release_watchdog_alert_state": GreenhouseSyncReleaseWatchdogAlertState;

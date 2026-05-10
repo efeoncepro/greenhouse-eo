@@ -1,11 +1,14 @@
-# Sesion 2026-05-10 — TASK-857 en implementación directa en develop
+# Sesion 2026-05-10 — TASK-857 GitHub release webhooks cerrada
 
 - **Trigger:** usuario pidió implementar `TASK-857 — GitHub Webhooks Release Event Ingestion` end-to-end, manteniéndose explícitamente en `develop` y sin cambiar de rama.
 - **Branch:** `develop` por instrucción explícita del usuario; se omitió la creación de branch `task/TASK-857-*` aunque el flujo default de tasks lo sugiere.
-- **Estado:** task movida a `docs/tasks/in-progress/TASK-857-github-webhooks-release-event-ingestion.md`, Lifecycle actualizado a `in-progress`, plan canónico creado en `docs/tasks/plans/TASK-857-plan.md`.
+- **Estado:** task movida a `docs/tasks/complete/TASK-857-github-webhooks-release-event-ingestion.md`, Lifecycle `complete`, plan canónico en `docs/tasks/plans/TASK-857-plan.md`.
 - **Discovery/Audit/Plan:** completados contra arquitectura vigente, schema snapshot, tipos DB, runtime release control plane, webhook inbox existente, `pnpm pg:doctor` verde y Handoff previo. No hay ownership activo ni PR/branch TASK-857.
-- **Decisiones:** endpoint dedicado `/api/webhooks/github/release-events` con HMAC GitHub antes de parse/persist; dedupe por `X-GitHub-Delivery`; normalización en tabla `greenhouse_sync.github_release_webhook_events`; reconciliación contra `release_manifests`; watchdog TASK-849 se mantiene como backstop; sin outbox events V1 por no existir consumidores.
-- **Riesgo controlado:** no toca UI ni access model visible; blast radius en webhook ingestion, release manifests y reliability signals. Cualquier transición release se limita por la state machine existente.
+- **Implementación:** endpoint dedicado `/api/webhooks/github/release-events` con HMAC GitHub antes de parse/persist; dedupe por `X-GitHub-Delivery`; tabla `greenhouse_sync.github_release_webhook_events`; reconciler contra `release_manifests`; signal `platform.release.github_webhook_unmatched`; watchdog TASK-849 queda como backstop; sin outbox events nuevos V1 por no existir consumidores.
+- **Migración:** `20260510215923791_task-857-github-release-webhooks.sql` aplicada con `pnpm pg:connect:migrate`; `src/types/db.d.ts` regenerado desde DB viva.
+- **Webhook probado:** servidor local Next en `localhost:3000` + Cloud SQL Proxy + secret local `GITHUB_RELEASE_WEBHOOK_SECRET=local-task857-secret`. POST firmado real `workflow_run` success para target SHA `390ac14e3dca3f44f4e9285b73956138ca707655` devolvió `202 accepted`, `processingStatus=matched`, `releaseId=390ac14e3dca-2894a371-0f0e-4c7b-8903-ad47052d9673`, `transitionApplied=false`. Reintento con el mismo `X-GitHub-Delivery` devolvió `202 duplicate_delivery` con el mismo inbox id. Firma inválida devolvió `401 invalid_signature`; verificado en DB que no insertó inbox. El evento sintético matched fue borrado después de validar para no contaminar el ledger live.
+- **Validación:** `pnpm test -- src/lib/release/github-webhook-handler.test.ts src/lib/release/github-webhook-ingestion.test.ts src/lib/release/github-webhook-reconciler.test.ts` ejecutó suite completa: 4076 passed / 11 skipped. `pnpm exec tsc --noEmit` verde. Pre-commit hooks verdes en commits `8c21296d` y `096535e4`.
+- **Pendiente externo:** configurar el repository webhook real en GitHub con URL production y `GITHUB_RELEASE_WEBHOOK_SECRET` en Vercel/Secret Manager después del deploy.
 
 ---
 
