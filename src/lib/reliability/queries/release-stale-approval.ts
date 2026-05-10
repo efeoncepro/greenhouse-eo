@@ -157,7 +157,7 @@ return 'warning'
 
 export const getReleaseStaleApprovalSignal = async (): Promise<ReliabilitySignal> => {
   const observedAt = new Date().toISOString()
-  const token = resolveGithubToken()
+  const token = await resolveGithubToken()
 
   if (!token) {
     return {

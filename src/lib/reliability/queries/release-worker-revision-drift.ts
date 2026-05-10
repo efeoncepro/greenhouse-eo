@@ -256,7 +256,7 @@ const buildSummary = (records: WorkerDriftRecord[]): string => {
 
 export const getReleaseWorkerRevisionDriftSignal = async (): Promise<ReliabilitySignal> => {
   const observedAt = new Date().toISOString()
-  const token = resolveGithubToken()
+  const token = await resolveGithubToken()
 
   if (!token) {
     return {

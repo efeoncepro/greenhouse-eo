@@ -40,16 +40,39 @@ export const githubRepoCoords = (): { owner: string; repo: string } => ({
 /**
  * Resuelve token GitHub para queries observer-only.
  *
- * Orden de fallback:
- *   1. `GITHUB_RELEASE_OBSERVER_TOKEN` (recomendado, secret rotado dedicado)
- *   2. `GITHUB_TOKEN` (auto-provisto en GitHub Actions runner; en Vercel
- *      runtime debe venir como secret)
- *   3. `null` → caller decide si degrada o falla
+ * Orden de fallback (TASK-849 V1.1 — GH App primary, PAT fallback):
+ *   1. **GitHub App installation token** (canonical, ROBUST):
+ *      Si las 3 env vars `GITHUB_APP_ID` + `GITHUB_APP_INSTALLATION_ID` +
+ *      `GREENHOUSE_GITHUB_APP_PRIVATE_KEY_SECRET_REF` estan configuradas,
+ *      mintea installation token (1h TTL) via JWT firmado con private key.
+ *      Token NO ligado a usuario individual + rate limit 15K req/h vs 5K
+ *      per-user. Cache in-process con renovacion 5min antes de expiry.
+ *   2. `GITHUB_RELEASE_OBSERVER_TOKEN` PAT dedicado (V1 fallback)
+ *   3. `GITHUB_TOKEN` (auto-provisto en GH Actions runner)
+ *   4. `null` → caller decide si degrada (`severity='unknown'`) o falla
  *
- * Vercel runtime: GITHUB_TOKEN no se inyecta automaticamente; debe venir
- * como secret rotado. Local CLI: usa `gh auth token` previo (env var).
+ * **Async**: por GH App JWT mint asincrono. Caller pre-existente sincronos
+ * (V1.0 readers) usan `resolveGithubTokenSync()` que solo cubre PAT path.
+ *
+ * Vercel runtime: PAT GITHUB_TOKEN no se inyecta automaticamente. GH App
+ * recomendado (vive el lifecycle del Vercel function instance).
  */
-export const resolveGithubToken = (): string | null => {
+export const resolveGithubToken = async (): Promise<string | null> => {
+  const { resolveGithubAppInstallationToken } = await import('./github-app-token-resolver')
+  const appToken = await resolveGithubAppInstallationToken()
+
+  if (appToken) return appToken
+
+  return resolveGithubTokenSync()
+}
+
+/**
+ * Sincronos PAT-only resolver. Mantiene back-compat con V1.0 readers que
+ * todavia llaman `resolveGithubToken()` esperando string|null sin promise.
+ * Una vez que todos los callers migren a `resolveGithubToken` async, este
+ * helper deja de ser necesario.
+ */
+export const resolveGithubTokenSync = (): string | null => {
   return process.env.GITHUB_RELEASE_OBSERVER_TOKEN ?? process.env.GITHUB_TOKEN ?? null
 }
 
