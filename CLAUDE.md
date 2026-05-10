@@ -1658,10 +1658,11 @@ pnpm release:preflight --override-batch-policy --fail-on-error
 - **NUNCA** loggear stack trace o payload completo del check en stderr/stdout. Use `redactErrorForResponse` antes.
 - **NUNCA** modificar `IRREVERSIBLE_DOMAINS` o `INDEPENDENT_DOMAIN_PAIRS` sin tests anti-regresion + documentar el porque del cambio en commit body.
 - **NUNCA** flagear `override_batch_policy` como default. Es opt-in explicito que requiere capability + audit row.
+- **NUNCA** capturar el JSON output del CLI redirigiendo stdout con `>` (ej. `pnpm release:preflight --json > result.json`). pnpm/tsx imprimen banners al stdout antes que el script TS arranque, y esos prefixes contaminan el archivo y rompen `jq` downstream con "Invalid numeric literal at line 2 column 2". Patron canonico: usar la flag `--output-file=<path>` que el CLI escribe atomicamente desde dentro del proceso TS (inmune a banners de wrappers). Live discovery durante primer release real (run 25634157306).
 - **SIEMPRE** que emerja un nuevo workflow production deploy, agregarlo a `RELEASE_DEPLOY_WORKFLOWS` ANTES del primer deploy (mismo invariant que TASK-849 watchdog) — ci_green check lo filtra automaticamente del set CI relevante.
 - **SIEMPRE** que se cambie copy es-CL en el output formatter, mantener consistencia con `getMicrocopy()` patterns aunque CLI no use el helper directamente (es operator-facing).
 
-**Spec canonica**: `docs/tasks/in-progress/TASK-850-production-preflight-cli-complete.md`. Migration: `migrations/20260510144012098_task-850-preflight-capabilities.sql`. CLI: `pnpm release:preflight [--json|--fail-on-error|--override-batch-policy|--target-sha=<sha>|--target-branch=<name>]`.
+**Spec canonica**: `docs/tasks/in-progress/TASK-850-production-preflight-cli-complete.md`. Migration: `migrations/20260510144012098_task-850-preflight-capabilities.sql`. CLI: `pnpm release:preflight [--json|--output-file=<path>|--fail-on-error|--override-batch-policy|--target-sha=<sha>|--target-branch=<name>]`.
 
 ### Production Release Orchestrator invariants (TASK-851)
 

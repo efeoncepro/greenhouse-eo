@@ -20,6 +20,7 @@
  */
 
 import { execFile } from 'node:child_process'
+import { writeFile } from 'node:fs/promises'
 import { argv, exit, stderr, stdout } from 'node:process'
 import { promisify } from 'node:util'
 
@@ -36,6 +37,7 @@ interface CliOptions {
   overrideBatchPolicy: boolean
   targetSha: string | null
   targetBranch: string
+  outputFile: string | null
 }
 
 const parseArgs = (args: readonly string[]): CliOptions => {
@@ -44,7 +46,8 @@ const parseArgs = (args: readonly string[]): CliOptions => {
     failOnError: false,
     overrideBatchPolicy: false,
     targetSha: null,
-    targetBranch: 'main'
+    targetBranch: 'main',
+    outputFile: null
   }
 
   for (const arg of args) {
@@ -53,6 +56,7 @@ const parseArgs = (args: readonly string[]): CliOptions => {
     else if (arg === '--override-batch-policy') options.overrideBatchPolicy = true
     else if (arg.startsWith('--target-sha=')) options.targetSha = arg.slice('--target-sha='.length)
     else if (arg.startsWith('--target-branch=')) options.targetBranch = arg.slice('--target-branch='.length)
+    else if (arg.startsWith('--output-file=')) options.outputFile = arg.slice('--output-file='.length)
     else if (arg === '--help' || arg === '-h') {
       stdout.write(
         [
@@ -61,7 +65,12 @@ const parseArgs = (args: readonly string[]): CliOptions => {
           'Usage: pnpm release:preflight [flags]',
           '',
           'Flags:',
-          '  --json                       Output JSON only (machine-readable)',
+          '  --json                       Output JSON only to stdout (machine-readable)',
+          '  --output-file=<path>         Write JSON payload to <path> atomically.',
+          '                               Solo escribe ahi; stdout queda libre para banners',
+          '                               de pnpm/tsx + human summary opcional. Recomendado',
+          '                               para CI workflows que NO pueden usar `pnpm --silent`',
+          '                               ni redirection `>` (banner pollution rompe `jq`).',
           '  --fail-on-error              Exit 1 if overallStatus=blocked',
           '  --override-batch-policy      Downgrade release_batch_policy errors to warnings',
           '                               (requires platform.release.preflight.override_batch_policy + audit)',
@@ -129,9 +138,35 @@ const main = async (): Promise<void> => {
     checks: PREFLIGHT_CHECK_REGISTRY
   })
 
-  if (options.json) {
-    stdout.write(formatPreflightAsJson(payload) + '\n')
-  } else {
+  // Output routing canonical:
+  //   --output-file=<path>: escribe JSON al path (controlado por el CLI,
+  //     inmune al banner de pnpm/tsx que contamina stdout). Stdout queda
+  //     libre para human summary opcional.
+  //   --json: escribe JSON al stdout (caller debe usar `pnpm --silent`
+  //     si redirige con `>`).
+  //   default: human summary al stdout.
+  //
+  // Cuando --output-file + --json estan ambos: archivo recibe JSON,
+  // stdout NO recibe nada extra (queda solo el banner pnpm si aplica).
+  // Sin --output-file ni --json: human summary al stdout.
+
+  const jsonPayload = formatPreflightAsJson(payload) + '\n'
+
+  if (options.outputFile) {
+    try {
+      await writeFile(options.outputFile, jsonPayload, 'utf8')
+    } catch (error) {
+      stderr.write(
+        `production-preflight: no se pudo escribir --output-file=${options.outputFile}. ` +
+          `Error: ${error instanceof Error ? error.message : String(error)}\n`
+      )
+      exit(2)
+    }
+  }
+
+  if (options.json && !options.outputFile) {
+    stdout.write(jsonPayload)
+  } else if (!options.outputFile) {
     stdout.write(formatPreflightAsHuman(payload) + '\n')
   }
 
