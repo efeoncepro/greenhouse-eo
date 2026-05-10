@@ -98,7 +98,16 @@ const normalizeSecretRef = (ref: string, env: NodeJS.ProcessEnv) => {
     return `${trimmed}/versions/latest`
   }
 
+  // Soporta shorthand `<secret-name>:<version>` (formato Vercel env display +
+  // gcloud convention). Convierte a path canonico `/versions/<version>`.
+  // Sin shorthand, default a 'latest'. Grammar Google secret names:
+  // letters/digits/dash/underscore.
   const projectId = getGoogleProjectId(env)
+  const colonMatch = trimmed.match(/^([A-Za-z0-9_-]+):([A-Za-z0-9_-]+)$/)
+
+  if (colonMatch) {
+    return `projects/${projectId}/secrets/${colonMatch[1]}/versions/${colonMatch[2]}`
+  }
 
   return `projects/${projectId}/secrets/${trimmed}/versions/latest`
 }

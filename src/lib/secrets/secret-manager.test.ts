@@ -134,6 +134,81 @@ describe('resolveSecret', () => {
     })
   })
 
+  // Anti-regression cases for the colon-shorthand normalization (canonical
+  // fix from arch-architect 4-pillar review 2026-05-10).
+  // Bug class: env var `<name>:latest` shorthand (Vercel display + gcloud
+  // convention) was naively wrapped as `projects/.../secrets/<name>:latest/versions/latest`,
+  // producing INVALID_ARGUMENT from Secret Manager. The canonical normalizer
+  // now strips `:VERSION` suffix and routes it to `/versions/<version>`.
+  it('normalizes colon-shorthand `<name>:latest` to canonical /versions/latest path', async () => {
+    vi.stubEnv('GCP_PROJECT', 'efeonce-group')
+    vi.stubEnv('NUBOX_BEARER_TOKEN_SECRET_REF', 'nubox-bearer-token:latest')
+    accessSecretVersion.mockResolvedValue([
+      { payload: { data: Buffer.from('secret-from-manager') } }
+    ])
+
+    const { resolveSecret } = await import('@/lib/secrets/secret-manager')
+
+    const resolution = await resolveSecret({ envVarName: 'NUBOX_BEARER_TOKEN' })
+
+    expect(resolution.source).toBe('secret_manager')
+    expect(resolution.secretRef).toBe('projects/efeonce-group/secrets/nubox-bearer-token/versions/latest')
+    expect(accessSecretVersion).toHaveBeenCalledWith({
+      name: 'projects/efeonce-group/secrets/nubox-bearer-token/versions/latest'
+    })
+  })
+
+  it('normalizes colon-shorthand `<name>:5` to canonical /versions/5 path', async () => {
+    vi.stubEnv('GCP_PROJECT', 'efeonce-group')
+    vi.stubEnv('NUBOX_BEARER_TOKEN_SECRET_REF', 'nubox-bearer-token:5')
+    accessSecretVersion.mockResolvedValue([
+      { payload: { data: Buffer.from('secret-from-manager-v5') } }
+    ])
+
+    const { resolveSecret } = await import('@/lib/secrets/secret-manager')
+
+    const resolution = await resolveSecret({ envVarName: 'NUBOX_BEARER_TOKEN' })
+
+    expect(resolution.secretRef).toBe('projects/efeonce-group/secrets/nubox-bearer-token/versions/5')
+    expect(accessSecretVersion).toHaveBeenCalledWith({
+      name: 'projects/efeonce-group/secrets/nubox-bearer-token/versions/5'
+    })
+  })
+
+  it('passes full path `projects/.../versions/...` through unchanged', async () => {
+    vi.stubEnv('GCP_PROJECT', 'efeonce-group')
+    vi.stubEnv('NUBOX_BEARER_TOKEN_SECRET_REF', 'projects/efeonce-group/secrets/nubox-bearer-token/versions/3')
+    accessSecretVersion.mockResolvedValue([
+      { payload: { data: Buffer.from('secret-from-manager-v3') } }
+    ])
+
+    const { resolveSecret } = await import('@/lib/secrets/secret-manager')
+
+    const resolution = await resolveSecret({ envVarName: 'NUBOX_BEARER_TOKEN' })
+
+    expect(resolution.secretRef).toBe('projects/efeonce-group/secrets/nubox-bearer-token/versions/3')
+    expect(accessSecretVersion).toHaveBeenCalledWith({
+      name: 'projects/efeonce-group/secrets/nubox-bearer-token/versions/3'
+    })
+  })
+
+  it('appends /versions/latest when full path lacks version suffix', async () => {
+    vi.stubEnv('GCP_PROJECT', 'efeonce-group')
+    vi.stubEnv('NUBOX_BEARER_TOKEN_SECRET_REF', 'projects/efeonce-group/secrets/nubox-bearer-token')
+    accessSecretVersion.mockResolvedValue([
+      { payload: { data: Buffer.from('secret-from-manager') } }
+    ])
+
+    const { resolveSecret } = await import('@/lib/secrets/secret-manager')
+
+    const resolution = await resolveSecret({ envVarName: 'NUBOX_BEARER_TOKEN' })
+
+    expect(resolution.secretRef).toBe('projects/efeonce-group/secrets/nubox-bearer-token/versions/latest')
+    expect(accessSecretVersion).toHaveBeenCalledWith({
+      name: 'projects/efeonce-group/secrets/nubox-bearer-token/versions/latest'
+    })
+  })
+
   it('reports unconfigured when neither Secret Manager nor env vars are available', async () => {
     const { resolveSecret } = await import('@/lib/secrets/secret-manager')
 

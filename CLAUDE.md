@@ -79,6 +79,16 @@ Regla: módulos de dominio extienden estos objetos, no crean identidades paralel
   - PostgreSQL: `pnpm pg:doctor` o conexión real
 - Rotar `NEXTAUTH_SECRET` puede invalidar sesiones activas y forzar re-login.
 
+**⚠️ Reglas duras (canonical secret resolution, arch-architect verdict 2026-05-10)**:
+
+- **NUNCA** componer `projects/{id}/secrets/{name}/versions/{ver}` inline en TS/JS. Toda resolución pasa por `resolveSecret()` / `resolveSecretByRef()` / `getCachedResolvedSecret()` en `src/lib/secrets/secret-manager.ts`. Inline composition es la causa raíz del bug class detectado en run 25634673015 (path inválido `<name>:latest/versions/latest` por doble suffix).
+- **NUNCA** duplicar `normalizeSecretRef` ni `normalizeSecretRefValue` en scripts. `scripts/` puede importar directo del canónico — el archivo canónico NO tiene `import 'server-only'`, sin shim. Mirror duplicado se desincroniza inevitablemente (caso real: `scripts/pg-doctor.ts` consolidado a canónico 2026-05-10 después de detectar bug por mirror divergente).
+- **SIEMPRE** soportar tres formas de `*_SECRET_REF` en consumers (el normalizador canónico las acepta):
+  - `<name>` (bare, default `latest`)
+  - `<name>:<version>` (shorthand Vercel display + gcloud convention)
+  - `projects/.../versions/<version>` (full path)
+- **PREFERIR** la forma bare `<name>` en workflows YAML committeados. La shorthand `<name>:latest` es para humanos copiando del UI Vercel/gcloud — no para configuración estática (defense-in-depth: no normalizar garbage si no hace falta).
+
 ## Key Docs
 
 - `AGENTS.md` — reglas operativas completas, branching, deploy, coordinación, PostgreSQL access

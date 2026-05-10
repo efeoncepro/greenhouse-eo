@@ -1,10 +1,10 @@
 import process from 'node:process'
 
 import { Connector, IpAddressTypes } from '@google-cloud/cloud-sql-connector'
-import { SecretManagerServiceClient } from '@google-cloud/secret-manager'
 import { Client } from 'pg'
 
-import { createGoogleAuth, getGoogleProjectId } from '@/lib/google-credentials'
+import { createGoogleAuth } from '@/lib/google-credentials'
+import { resolveSecretByRef } from '@/lib/secrets/secret-manager'
 import { applyGreenhousePostgresProfile, loadGreenhouseToolEnv, type PostgresProfile } from './lib/load-greenhouse-tool-env'
 
 const parseProfile = (): PostgresProfile => {
@@ -50,30 +50,12 @@ const normalizeSecretValue = (value: string | undefined) => {
   return withoutLiteralLineEndings ? withoutLiteralLineEndings : null
 }
 
-const normalizeSecretRefValue = (value: string | undefined) => {
-  if (!value) {
-    return null
-  }
-
-  const sanitized = value.replace(/\\r/g, '').replace(/\\n/g, '').trim()
-
-  return sanitized ? sanitized : null
-}
-
-const normalizeSecretRef = (ref: string) => {
-  const trimmed = ref.trim()
-
-  if (trimmed.includes('/versions/')) {
-    return trimmed
-  }
-
-  if (trimmed.startsWith('projects/')) {
-    return `${trimmed}/versions/latest`
-  }
-
-  return `projects/${getGoogleProjectId()}/secrets/${trimmed}/versions/latest`
-}
-
+// Password resolution canonica: env-first → Secret Manager via resolver
+// canonico (src/lib/secrets/secret-manager.ts). El resolver maneja
+// normalizacion (incluyendo shorthand `<name>:<version>`), caching,
+// auth via createGoogleAuth + scopes correctos, y sanitization.
+// Anti-mirror: NO duplicar normalizeSecretRef aqui (arch-architect verdict
+// 2026-05-10, ver CLAUDE.md "Secret Manager Hygiene").
 const resolvePassword = async () => {
   const envPassword = normalizeSecretValue(process.env.GREENHOUSE_POSTGRES_PASSWORD)
 
@@ -81,28 +63,18 @@ const resolvePassword = async () => {
     return { value: envPassword, source: 'env' as const, secretRef: null as string | null }
   }
 
-  const secretRef = normalizeSecretRefValue(process.env.GREENHOUSE_POSTGRES_PASSWORD_SECRET_REF)
+  const rawSecretRef = process.env.GREENHOUSE_POSTGRES_PASSWORD_SECRET_REF?.trim()
 
-  if (!secretRef) {
+  if (!rawSecretRef) {
     return { value: null, source: 'unconfigured' as const, secretRef: null as string | null }
   }
 
-  const normalizedSecretRef = normalizeSecretRef(secretRef)
-
-  const client = new SecretManagerServiceClient({
-    auth: createGoogleAuth({
-      scopes: ['https://www.googleapis.com/auth/cloud-platform']
-    })
-  })
-
-  const [version] = await client.accessSecretVersion({
-    name: normalizedSecretRef
-  })
+  const value = await resolveSecretByRef(rawSecretRef)
 
   return {
-    value: normalizeSecretValue(version.payload?.data?.toString('utf8')),
+    value: normalizeSecretValue(value ?? undefined),
     source: 'secret_manager' as const,
-    secretRef: normalizedSecretRef
+    secretRef: rawSecretRef
   }
 }
 

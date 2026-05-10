@@ -133,7 +133,7 @@ jobs:
           GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME: efeonce-group:us-east4:greenhouse-pg-dev
           GREENHOUSE_POSTGRES_DATABASE: greenhouse_app
           GREENHOUSE_POSTGRES_USER: greenhouse_ops
-          GREENHOUSE_POSTGRES_PASSWORD_SECRET_REF: greenhouse-pg-dev-ops-password:latest
+          GREENHOUSE_POSTGRES_PASSWORD_SECRET_REF: greenhouse-pg-dev-ops-password
           GCP_PROJECT: efeonce-group
           # gcloud-auth-preflight.sh requiere skip de interactive renewal en CI
           # (creds vienen de google-github-actions/auth WIF, no de `gcloud auth login`).
@@ -233,7 +233,7 @@ jobs:
           GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME: efeonce-group:us-east4:greenhouse-pg-dev
           GREENHOUSE_POSTGRES_DATABASE: greenhouse_app
           GREENHOUSE_POSTGRES_USER: greenhouse_ops
-          GREENHOUSE_POSTGRES_PASSWORD_SECRET_REF: greenhouse-pg-dev-ops-password:latest
+          GREENHOUSE_POSTGRES_PASSWORD_SECRET_REF: greenhouse-pg-dev-ops-password
           GCP_PROJECT: efeonce-group
         run: |
           OUTPUT=$(pnpm release:orchestrator-record-started \
@@ -464,7 +464,7 @@ jobs:
           GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME: efeonce-group:us-east4:greenhouse-pg-dev
           GREENHOUSE_POSTGRES_DATABASE: greenhouse_app
           GREENHOUSE_POSTGRES_USER: greenhouse_ops
-          GREENHOUSE_POSTGRES_PASSWORD_SECRET_REF: greenhouse-pg-dev-ops-password:latest
+          GREENHOUSE_POSTGRES_PASSWORD_SECRET_REF: greenhouse-pg-dev-ops-password
           GCP_PROJECT: efeonce-group
         run: |
           # State machine flow: preflight → ready → deploying → verifying → released|degraded
@@ -489,7 +489,7 @@ jobs:
           GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME: efeonce-group:us-east4:greenhouse-pg-dev
           GREENHOUSE_POSTGRES_DATABASE: greenhouse_app
           GREENHOUSE_POSTGRES_USER: greenhouse_ops
-          GREENHOUSE_POSTGRES_PASSWORD_SECRET_REF: greenhouse-pg-dev-ops-password:latest
+          GREENHOUSE_POSTGRES_PASSWORD_SECRET_REF: greenhouse-pg-dev-ops-password
           GCP_PROJECT: efeonce-group
         run: |
           # post-release-health soft-fail (exit 78) → degraded; success → released
