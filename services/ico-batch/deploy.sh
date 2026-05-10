@@ -97,6 +97,11 @@ echo "=== Build ${BUILD_ID} succeeded ==="
 
 echo "=== Deploying ${SERVICE_NAME} to Cloud Run (${REGION}) ==="
 
+# TASK-849 — GIT_SHA env var for production-release-watchdog drift detection.
+# Use --update-env-vars (non-destructive) en lugar de --set-env-vars para
+# preservar el comportamiento original de ico-batch (no rebuilds env state).
+GIT_SHA="${GITHUB_SHA:-$(git rev-parse HEAD 2>/dev/null || echo 'unknown')}"
+
 gcloud run deploy "${SERVICE_NAME}" \
   --project="${PROJECT_ID}" \
   --region="${REGION}" \
@@ -108,6 +113,7 @@ gcloud run deploy "${SERVICE_NAME}" \
   --max-instances="${MAX_INSTANCES}" \
   --concurrency="${CONCURRENCY}" \
   --no-allow-unauthenticated \
+  --update-env-vars="GIT_SHA=${GIT_SHA}" \
   --quiet
 
 SERVICE_URL=$(gcloud run services describe "${SERVICE_NAME}" \

@@ -98,6 +98,69 @@ For `contractType in ('indefinido', 'plazo_fijo')` and `payRegime = 'chile'`:
 - Gratificacion legal under article 50 is 25 percent of eligible monthly remuneration capped by 4.75 IMM annually, usually handled monthly as `min(base * 25%, 4.75 * IMM / 12)` when the monthly mode applies.
 - Colacion/movilizacion are non-imponible only when reasonable and compensatory.
 
+## Previred Planilla Audit Checklist
+
+Use this when a user uploads a Previred error/warning CSV or asks whether the Previred file is accepted.
+
+Operational lesson from Greenhouse TASK-812 / 2026-04 upload: Previred validator reveals issues in a cascade. Do
+not patch one warning at a time by mutating payroll entries. Treat Previred as a regulatory projection over closed
+payroll entries plus periodized Previred snapshots.
+
+Audit order:
+
+1. Parse the Previred CSV first. Separate `Errores` from `Advertencias`; blockers require a new file, warnings may
+   allow `Continuar sin modificar` but should still be classified.
+2. Classify the worker before formulas:
+   - `contract_type_snapshot`
+   - `pay_regime`
+   - `payroll_via`
+   - `currency`
+   - `employment_type`
+   - Person 360 `identity_profile_id`
+3. Verify identity/legal profile:
+   - CL_RUT from Person Legal Snapshot, not a HubSpot-only field.
+   - `chile_previred_worker_profiles.profile_id = members.identity_profile_id`.
+   - explicit Previred `sex_code`, `nationality_code`, `health_institution_code`.
+4. Verify periodized references:
+   - `greenhouse_payroll.chile_afp_rates.total_rate`
+   - `greenhouse_payroll.chile_previred_indicators.sis_rate`
+   - `greenhouse_payroll.chile_previred_indicators.imm_clp`
+5. Keep receipt and planilla semantics separate:
+   - Payroll receipt/LRE can reflect closed entry amounts and attendance working days.
+   - Previred fields use statutory/regulatory bases expected by the validator.
+   - Never rewrite `payroll_entries` just to silence Previred unless the payroll calculation itself is wrong and the period is being formally recalculated/reopened.
+6. Validate known Previred fields:
+   - Field 13: statutory days, usually `30` unless a formal movement-of-personnel record is explicitly modeled. Do not use attendance working days.
+   - Field 27 and related bases: full-time entries use at least the period IMM (`max(chileTaxableBase, imm_clp)`).
+   - Field 28: AFP contribution from Previred AFP total rate and regulatory base.
+   - Field 29: SIS from period SIS rate and regulatory base.
+   - Fields 79/80/81: Isapre pactada, 7 percent obligatoria, and additional difference.
+   - Field 71: ISL/accident contribution from canonical accident insurance rate and regulatory base unless a supported mutual code is explicitly modeled.
+   - Fields 93/94: jornada (`1` full-time, `2` part-time) and expectativa de vida.
+   - Fields 101/102: AFC employee/employer split by contract type and regulatory base.
+
+Accepted-state evidence for Valentina Hoyos `2026-04` after TASK-812 hardening:
+
+- field 13 = `30`
+- field 27 = `539000`
+- field 28 = `56918`
+- field 29 = `8732`
+- field 71 = `5013`
+- field 79 = `162475`
+- field 80 = `37730`
+- field 81 = `124745`
+- field 93 = `1`
+- field 94 = `4851`
+- field 101/102 = `3234` / `12936`
+
+Canonical repo references:
+
+- `src/lib/payroll/compliance-exports/previred.ts`
+- `src/lib/payroll/compliance-exports/store.ts`
+- `src/lib/payroll/chile-statutory-rates.ts`
+- `docs/documentation/hr/payroll-compliance-exports-chile.md`
+- `docs/audits/payroll/PREVIRED_VALIDATOR_CASCADE_AUDIT_2026-05-10.md`
+
 ## Honorarios Checklist
 
 For `contractType = 'honorarios'`:

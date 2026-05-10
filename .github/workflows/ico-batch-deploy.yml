@@ -37,9 +37,12 @@ on:
           - staging
           - production
 
+# TASK-848 Slice 3 (Opcion A) — concurrency fix canonica para production.
+# Ver ops-worker-deploy.yml para contexto. Spec:
+# docs/architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md §2.7
 concurrency:
   group: ico-batch-deploy-${{ github.ref }}
-  cancel-in-progress: false
+  cancel-in-progress: ${{ (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production') || github.ref == 'refs/heads/main' }}
 
 permissions:
   contents: read

@@ -1,3 +1,123 @@
+# Sesion 2026-05-10 — TASK-849 V1.1 GitHub App SHIPPED LIVE end-to-end + docs canonizadas
+
+- **Trigger:** usuario decidio implementar GH App canonical token strategy en lugar de fine-grained PAT (mi recomendacion conservadora) para evitar deuda tecnica V1→V1.1. Pidio que ejecute end-to-end + documente todo en CLAUDE.md, AGENTS.md, arch docs, ADR, manual de uso.
+- **Estado:** **GH App SHIPPED LIVE 2026-05-10** end-to-end con docs comprehensive sincronizadas. Cron `*/30 * * * *` y workers GIT_SHA pendientes de merge `develop → main` para activacion total.
+- **Live state validado:**
+  - GitHub App `Greenhouse Release Watchdog` (App ID `3665723`) creado, instalado en `efeoncepro` org (Installation ID `131127026`), All repositories scope, permissions Actions/Deployments/Metadata read-only.
+  - GCP Secret Manager `greenhouse-github-app-private-key` v1 (project `efeonce-group`).
+  - Vercel env vars production: `GITHUB_APP_ID=3665723`, `GITHUB_APP_INSTALLATION_ID=131127026`, `GREENHOUSE_GITHUB_APP_PRIVATE_KEY_SECRET_REF=greenhouse-github-app-private-key`.
+  - Vercel production deploy `greenhouse-7duh0301r-efeonce-7670142f.vercel.app` Ready.
+  - GH App resolver path validado live: `pnpm release:watchdog --json` retorna severity real (`stale_approval=ok`, `pending_without_jobs=ok`, `worker_revision_drift=warning(data_missing)`).
+  - 4 stale approvals historicos del incidente (ICO Batch 22d, Ops Worker 14d, Commercial Cost 14d, Azure Teams Bot 14d) cancelados durante setup.
+  - PEM local borrado post-upload (no leak).
+- **3 bugs descubiertos durante setup live + fixes commiteados** (`655e653d`):
+  - Race condition `/start` ↔ `/callback` (cerraba server temprano) → single server canonico que maneja AMBOS paths.
+  - `hook_attributes: { active: false }` rompia validation GitHub ("url wasn't supplied") → omitir `hook_attributes` por completo del manifest.
+  - `importPKCS8` rechazaba PKCS#1 (formato que GitHub Apps emiten) → `crypto.createPrivateKey` auto-detect ambos formatos.
+- **Recovery script nuevo** `pnpm release:complete-github-app-setup --app-id=<N> --installation-id=<N> --pem-file=<path>` para casos donde setup-github-app crashea mid-flow.
+- **Setup script canonical** `pnpm release:setup-github-app` orquesta end-to-end: ~5 min con 2 clicks browser + 3 confirmaciones CLI (no manipular .pem files manualmente).
+- **Docs canonizadas (este commit):**
+  - `CLAUDE.md` seccion "Production Release Watchdog invariants (TASK-849)" extendida con tabla live state + setup scripts canonicos + verificacion live ejecutada + pendiente para activacion total.
+  - `AGENTS.md` nueva seccion "Production Release Watchdog (TASK-848 + TASK-849)" para que cualquier agente futuro la encuentre rapido.
+  - `docs/architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md` Delta nuevo "V1.1 GitHub App SHIPPED LIVE" con live state + decisiones arquitectonicas validadas + scripts canonicos shipped + pendientes activacion.
+  - `docs/architecture/DECISIONS_INDEX.md` entry nuevo "Production release watchdog usa GitHub App installation token canonico, NO PAT personal" (Accepted 2026-05-10).
+  - `docs/manual-de-uso/plataforma/release-watchdog.md` NUEVO manual operador-facing paso-a-paso con 3 estados explicados, severity ladder, troubleshooting de problemas comunes.
+  - `docs/documentation/plataforma/release-watchdog.md` NUEVO doc funcional con detalle tecnico embedded para profundizar.
+  - `Handoff.md` (este entry) + `changelog.md` actualizado.
+- **Pendiente para activacion total** (post merge develop → main):
+  1. Workers se re-deployan con `GIT_SHA` env var (TASK-849 Slice 1) → `worker_revision_drift` retorna `ok` para los 4 workers.
+  2. Workflow scheduled `production-release-watchdog.yml` se registra en GH Actions (cron `*/30 * * * *` activa).
+  3. Cron emite alertas Teams a `production-release-alerts` cuando detecte blockers (con dedup canonico).
+- **Costo total:** $0 GitHub side (Apps gratis) + ~$0.72/anio GCP Secret Manager. Effort one-time setup: ~5 min via script automatizado.
+- **Skills invocadas:** `arch-architect` (constante per instrucción del usuario, validacion 4-pillar continua) + `greenhouse-backend` (codigo).
+- **Proximo paso:** confirmar con usuario sobre merge develop → main (29 commits ahead, blast radius alto, requiere autorizacion explicita).
+
+---
+
+# Sesion 2026-05-10 — Previred accepted + aprendizaje canonizado
+
+- **Trigger:** usuario confirmo que Previred ya acepto/calculo la planilla abril 2026 y pidio documentar el aprendizaje y enriquecer la skill de payroll.
+- **Decision Payroll:** el aprendizaje canonico queda como contrato operativo: Previred planilla es una proyeccion regulatoria de 105 campos sobre entries cerradas + snapshots periodizados, no una copia del recibo ni un lugar para mutar `payroll_entries`.
+- **Docs agregadas:** `docs/audits/payroll/PREVIRED_VALIDATOR_CASCADE_AUDIT_2026-05-10.md` captura la cascada real del validador Previred, evidencia final aceptada, causas raiz y follow-ups estructurales.
+- **Docs actualizadas:** `docs/audits/payroll/README.md` indexa la auditoria; `docs/documentation/hr/payroll-compliance-exports-chile.md` suma runbook de upload Previred y smoke accepted-state para Valentina `2026-04`.
+- **Skill enriquecida:** `.codex/skills/greenhouse-payroll-auditor/SKILL.md` ahora incluye `Previred Planilla Audit Checklist` con orden de diagnostico, campos criticos y referencias canonicas.
+- **No runtime change:** este slice no cambia codigo productivo; solo documentacion viva + skill local para evitar repetir ciclos de ensayo/error ante nuevos CSV de Previred.
+
+---
+
+# Sesion 2026-05-10 — TASK-849 Production Release Watchdog Alerts CERRADA
+
+- **Trigger:** usuario pidio implementar TASK-849 (P0, Effort Medio, Impact Muy alto) directo en `develop` invocando `arch-architect` constantemente. Scope reducido ~50% post TASK-848 V1.0 (helpers + 2 readers ya existian).
+- **Estado:** **CERRADA 2026-05-10** directo en `develop`. 6 commits incrementales sin PR ceremony. Cierra el bucle del control plane production: detección activa + alertas Teams.
+- **Open Questions resueltas pre-FASE 1 (arch-architect):**
+  - **OQ1** destination Teams `production-release-alerts` → CREAR placeholder apuntando al chat EO Team mismo. Operador puede crear chat dedicado y actualizar `recipientChatId` via PR cuando emerja necesidad.
+  - **OQ2** timing TASK-848 vs TASK-849 → TASK-848 V1.0 ya shipped, scope reducido ~50%. Refactor V1.0 readers para reusar helpers extraídos en Slice 0.
+- **Decisiones arch-architect (overrides vs spec original):**
+  - Helpers en `src/lib/release/` (NO `src/lib/release-watchdog/`) — extender modulo existente, NO parallel namespace.
+  - Schema `greenhouse_sync` (NO `greenhouse_ops` que es ROLE) — mismo override que TASK-848.
+  - GIT_SHA injection: append a ENV_VARS string del deploy.sh existente (per-worker pattern preservado: ops-worker/commercial-cost-worker usan `--set-env-vars`, ico-batch usa `--update-env-vars`).
+  - Capability `platform.release.watchdog.read` granular (NO reusar `platform.release.execute` — semantica distinta: leer estado vs disparar release).
+  - Tabla minima 8 columnas (NO audit append-only complejo) — YAGNI per spec Out of Scope. Audit deriva de GH Actions + Cloud Run history (append-only por design platform).
+  - PK compuesta `(workflow_name, run_id, alert_kind)` — permite mismo run con kinds distintos por escalation.
+- **6 commits incrementales:**
+  - **Slice 0** (`cf70ea15`) — Extract canonical helpers + refactor V1.0 readers. `github-helpers.ts`, `workflow-allowlist.ts`, `severity-resolver.ts` + 33 tests anti-regresion. V1.0 readers refactorizados para reusar (~80 lineas duplicadas eliminadas).
+  - **Slice 1** (`f4783828`) — Worker GIT_SHA env var en 3 deploy.sh. Single-line append per worker. Pre-requisito para reader 3.
+  - **Slice 2** (`6624891f`) — 3rd reader `worker_revision_drift` + wire-up + 7 tests. Subsystem `Platform Release` ahora con 3 of 4 signals.
+  - **Slice 3** (`b9489daa`) — Migration `greenhouse_sync.release_watchdog_alert_state` (PK compuesta + CHECK enum + indexes + GRANTs) + capability `platform.release.watchdog.read` granular least-privilege.
+  - **Slice 4** (`0c2c5004`) — Detector CLI `scripts/release/production-release-watchdog.ts` + Teams destination `production-release-alerts` + 5 tests aggregation.
+  - **Slice 5** (`f4c5a484`) — Scheduled GH workflow `production-release-watchdog.yml` (`*/30 * * * *`) + Teams alerts dispatcher con dedup canonico (`dispatchWatchdogAlert` + `dispatchWatchdogRecovery`).
+- **Slice 6 closing** (este commit) — `pnpm release:watchdog` script + runbook canónico `docs/operations/runbooks/production-release-watchdog.md` (decision tree + recovery procedures + dedup state ops + 13 secciones) + CLAUDE.md Hard Rules + Delta arch doc.
+- **Score 4-pilar:** Safety 9/10 (read-only + capability granular + redaction), Robustness 9/10 (idempotent UPSERT + at-least-once delivery), Resilience 8/10 (degradacion honesta + recovery alerts + reliability signal), Scalability 10/10 (O(W*R) trivial).
+- **Hard Rules canonizadas en CLAUDE.md** sección "Production Release Watchdog invariants (TASK-849)".
+- **Tests/build:** tsc clean. Lint clean. 62/62 verdes nuevos/extendidos. Migration aplicada en dev (386 tablas PG).
+- **Skills invocadas:** `arch-architect` (constante per instrucción usuario) + `greenhouse-backend` para implementación.
+- **Próximo paso:** configurar `GITHUB_RELEASE_OBSERVER_TOKEN` en Vercel env vars production para activar dashboards reliability automaticamente. Cron scheduled YA esta activo en GH Actions runner (usa `github.token` auto-provisto). Operador puede ejecutar manualmente `pnpm release:watchdog --json` para validar local. Post-merge a `main` el watchdog corre cada 30 min y emite alertas Teams a `production-release-alerts` cuando detecte blockers.
+
+---
+
+# Sesion 2026-05-10 — TASK-812 Previred regulatory projection hardening
+
+- **Trigger:** usuario subio nuevos CSV de error/adverencia de Previred para abril 2026 y pidio invocar `greenhouse-payroll-auditor` + arquitectura constantemente, sin parches ni mutar/borrar datos de Valentina.
+- **Decision Payroll + arquitectura:** separar recibo/liquidacion persistida de planilla regulatoria Previred. El exportador queda como proyeccion auditada sobre entries cerradas + snapshots oficiales del periodo, no como copia ciega de montos historicos del entry.
+- **Causa raiz:** al corregir campos estructurales previos, Previred empezo a validar formulas del periodo. Para Valentina `2026-04` el entry tenia montos persistidos desalineados contra el snapshot actual: AFP/SIS/Isapre obligatoria/AFC/mutual y campos nuevos de jornada/expectativa de vida.
+- **Runtime verificado:** Valentina sigue anclada a `identity-hubspot-crm-owner-82653513`, `employment_type='full_time'`, AFP Uno `0.1056`, SIS `0.0162`, Isapre Colmena `04`, sexo `F`, nacionalidad `0`. No se modifico ni borro su perfil.
+- **Cambio implementado:** `src/lib/payroll/compliance-exports/store.ts` carga `employment_type`, tasa AFP y tasa SIS periodizadas; `previred.ts` agrega `buildPreviredRegulatoryProjection()` y falla cerrado si faltan tasa AFP, tasa SIS o jornada. Campos corregidos: AFP, SIS, salud obligatoria/adicional Isapre, ISL, jornada, expectativa de vida, AFC empleado/empleador y mutual en cero sin codigo soportado.
+- **Validacion:** `pnpm vitest run src/lib/payroll/compliance-exports/previred.test.ts src/lib/payroll/compliance-exports/lre.test.ts` OK; `pnpm exec eslint ...compliance-exports...` OK; `pnpm exec tsc --noEmit --pretty false` OK. `pnpm pg:connect --shell` confirmo rates/jornada live.
+- **Docs:** actualizado `docs/documentation/hr/payroll-compliance-exports-chile.md` y `changelog.md`.
+- **Pendiente:** commit/push/deploy y smoke contra staging para descargar nuevamente `payroll-previred-2026-04.txt`; luego subir a Previred para confirmar cero errores.
+- **Follow-up advertencias Previred:** nuevo CSV `ADV-Ultimas-Resultado1778415899713.csv` reporto solo 2 advertencias para Valentina: dias trabajados `22` vs esperado `30`, e ISL `6274` vs esperado `4062`. Decision Payroll+arquitectura: campo 13 de Previred declara dias previsionales `30` en V1 si no existe movimiento formal; asistencia laboral/workingDays sigue en recibo/LRE. Campo 71 ISL se calcula desde tasa canonica 0,93% (`CHILE_ACCIDENT_INSURANCE_ISL_RATE`) compartida con `chile-previsional-helpers`, no desde monto persistido antiguo. Validado focal: 3 files / 16 tests OK, eslint focal OK, `pnpm exec tsc --noEmit --pretty false` OK. No pusheado aun por checkout local `develop` ahead de origin con 4 commits TASK-849.
+- **Follow-up renta mínima imponible:** CSV `ULTIMA-Adv-Resultado1778416895988.csv` reporto campo 27 AFP `436815` vs mínimo imponible `539000`. Decision Payroll+arquitectura: cargar `imm_clp` desde `chile_previred_indicators` y usar base regulatoria `max(chileTaxableBase, IMM)` para full-time en campos/cotizaciones Previred; recibos/LRE siguen leyendo el entry cerrado. Tests focales `previred/lre` OK; eslint focal OK. Pendiente `tsc`, commit/push/deploy.
+
+---
+
+# Sesion 2026-05-10 — TASK-848 Production Release Control Plane V1.0 SHIPPED
+
+- **Trigger:** usuario pidio implementar TASK-848 (P0, Effort Alto, Impact Muy alto) directo en `develop` invocando `arch-architect` constantemente para validar/decidir acciones.
+- **Estado:** **V1.0 SHIPPED 2026-05-10** directo en `develop`. 4 commits incrementales sin PR ceremony. Lifecycle queda `in-progress` hasta V1.1 follow-ups (TASK-850..855) cierren acceptance criteria restantes.
+- **Open Questions resueltas pre-execution:**
+  - **OQ1** EPIC-007 vs EPIC-PLATFORM-OPS → mantener EPIC-007 (org restructuring no es architectural).
+  - **OQ2** Reliability signal thresholds → spec baselines + tune data-driven post-30d.
+  - **OQ3** Dashboard `/admin/releases` → defer a TASK-855 V1.1 (signals + psql cubren operator visibility).
+- **Decisiones arch-architect (overrides vs spec original):**
+  - Schema `greenhouse_sync` (NO `greenhouse_ops` — eso es ROLE no schema; greenhouse_sync hosta platform infrastructure).
+  - PK `<targetSha[:12]>-<UUIDv4>` via randomUUID() (NO UUIDv7 dep nueva; ordering via INDEX started_at DESC equivalente).
+  - `operator_member_id` NULLABLE + `triggered_by` NOT NULL free-form para system actors (rollback automatizado).
+  - Concurrency fix dynamic expression (vs split jobs) — single-line per worker workflow.
+  - WIF subjects verification context-bound (local fully verbose, CI implicit via gcloud auth list).
+- **4 commits incrementales:**
+  - **Slice 1 foundation** (`824eacab`) — Migration `20260510111229586_task-848-release-control-plane-foundation.sql` aplicada. Tablas `greenhouse_sync.{release_manifests, release_state_transitions}` con CHECK enum 8 estados, partial UNIQUE INDEX, anti-UPDATE/DELETE triggers (mirror TASK-765 patron). 3 capabilities granulares `platform.release.{execute,rollback,bypass_preflight}` seedeadas en capabilities_registry + ENTITLEMENT_MODULES extendido con `platform` + ENTITLEMENT_ACTIONS extendido con `execute|rollback|bypass_preflight`. 7 outbox events `platform.release.* v1` documentados en EVENT_CATALOG. Spec arquitectónico canónico `GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md` + DECISIONS_INDEX entry. Bloque DO anti pre-up-marker bug verifica DDL post-apply.
+  - **Slice 3 partial** (`d845dbfb`) — Concurrency fix Opcion A en 3 worker workflows. **Mata el bug class del incidente 2026-04-26 → 2026-05-09**: pushes nuevos a production cancelan stale pending en lugar de quedar deadlocked. Staging preserva cancel-in-progress=false (no disruption QA).
+  - **Slice 7 partial** (`f1b85a86`) — 2 critical reliability signals `platform.release.stale_approval` + `platform.release.pending_without_jobs`. Subsystem `Platform Release` registrado. Degradación honesta sin GITHUB_RELEASE_OBSERVER_TOKEN. 195/196 reliability tests verdes.
+  - **Slice 6 skeleton** (`a0b004e4`) — `scripts/release/production-rollback.ts` CLI idempotente para Vercel + 3 Cloud Run workers + HubSpot integration. Azure manual gated en runbook. Runbook canónico `docs/operations/runbooks/production-release.md` con decision tree, preflight checklist 10 items, verificación WIF subjects, hard rules anti-regresión.
+- **6 follow-up TASKs derivativas (V1.1):** TASK-850 Preflight CLI completo, TASK-851 production-release.yml orchestrator workflow, TASK-852 Worker SHA verification, TASK-853 Azure infra release gating, TASK-854 2 signals adicionales (deploy_duration_p95 + last_status), TASK-855 Dashboard /admin/releases UI.
+- **Hard Rules canonizadas en CLAUDE.md** sección "Production Release Control Plane invariants (TASK-848)".
+- **Tests/build:** tsc clean. Lint clean. 195/196 reliability verdes. Migration aplicada en dev (385 tablas PG). pre-commit + pre-push hooks pasaron.
+- **Skills invocadas:** `arch-architect` (greenhouse overlay) constantemente para validar/decidir cada decisión foundational + Slice (per instrucción explícita del usuario).
+- **Score 4-pilar V1.0:** Safety 8/10, Robustness 9/10, Resilience 8/10, Scalability 10/10.
+- **Próximo paso:** trabajar TASK-850..855 V1.1 follow-ups en orden recomendado. Configurar `GITHUB_RELEASE_OBSERVER_TOKEN` en Vercel env vars production para activar detección automática de stale approvals + pending sin jobs.
+
+---
+
 # Sesion 2026-05-10 — Production release follow-up + TASK-848 creada
 
 - **Trigger:** tras promover `develop` a `main`, el usuario pidio explicar que workflows quedaron huerfanos y crear la task recomendada por analisis de arquitectura.
@@ -179,6 +299,18 @@ Esta evidencia trazada reemplaza la afirmación previa "no tienen reactive consu
 - **Code hardening:** `deploy.sh` declara contrato Nubox y Secret Manager IAM; orquestador propaga `partial`; `balance_sync` escribe `source_sync_runs`; `finance.nubox.source_freshness` detecta falsa salud raw stale; `postgres_projection` registra fallas por documento en `source_sync_failures` y termina `partial` solo cuando corresponda.
 - **Docs:** task movida a `docs/tasks/complete/TASK-841-nubox-ops-worker-config-freshness-hardening.md`; `docs/tasks/README.md`, `TASK_ID_REGISTRY`, `services/ops-worker/README.md`, `GREENHOUSE_SOURCE_SYNC_PIPELINES_V1`, `GREENHOUSE_CLOUD_INFRASTRUCTURE_V1`, `GREENHOUSE_FINANCE_ARCHITECTURE_V1` y `changelog.md` sincronizados.
 - **Guardrail multi-agente:** quedan dirty changes no relacionados de `TASK-835` en sample-sprints; no pertenecen a TASK-841 y no se deben revertir ni mezclar.
+
+# Sesion 2026-05-10 — TASK-812 compliance exports V1 en progreso
+
+- **Trigger:** usuario pidio implementar end-to-end TASK-812 manteniendose en `develop` y sin afectar negativamente Payroll.
+- **Skills usados:** `software-architect-2026`, `greenhouse-payroll-auditor`, `greenhouse-task-planner`, `greenhouse-agent`, `greenhouse-ux-content-accessibility`.
+- **Decision clave:** V1 es read-only sobre `greenhouse_payroll.payroll_entries` cerradas (`approved|exported`) y usa RUT verificado de Person Legal Profile. No recalcula payroll, no muta periods/entries/payment orders y falla cerrado si falta `CL_RUT` verificado.
+- **Scope entregado:** migraciones `20260510020952559_task-812-compliance-export-registry.sql` + `20260510022245692_task-812-compliance-artifact-hash-index.sql`; registry `greenhouse_payroll.compliance_export_artifacts`; capabilities `hr.payroll.export_previred`/`hr.payroll.export_lre`; generadores `src/lib/payroll/compliance-exports/*`; endpoints `/api/hr/payroll/periods/[periodId]/export/previred` y `/lre`; botones Payroll; eventos `payroll.export.previred_generated`/`payroll.export.lre_generated`; signal `payroll.compliance_exports.artifact_drift`.
+- **Fuentes oficiales congeladas:** Previred formato largo variable por separador v58 (PDF SHA-256 `32cdb7416793b83129b4f2888acfd4f1c3384423587a1aaa4942ff31cfc61a0b`) y DT LRE carga masiva (PDF SHA-256 `3f55043371ed0faab2b48e486f1d18c4417088c3116e54fb4ed22a8d79a35b22`).
+- **Boundary importante:** `TASK-707a` sigue bloqueando paridad completa contra `payment_order` social_security. V1 valida Previred contra `calculatePreviredEntryBreakdown` + payroll entries cerradas.
+- **Validacion parcial:** `pnpm vitest run src/lib/payroll/compliance-exports/previred.test.ts src/lib/payroll/compliance-exports/lre.test.ts` verde; `pnpm exec tsc --noEmit --pretty false` verde; `pnpm pg:connect:migrate` aplico migraciones y regenero `src/types/db.d.ts`. `pnpm migrate:up` directo fallo primero por Cloud SQL Proxy no corriendo (`ECONNREFUSED 127.0.0.1:15432`), luego se uso el flujo canonico `pg:connect:migrate`.
+- **Docs actualizadas:** task movida a `docs/tasks/in-progress/`, `docs/tasks/README.md`, `docs/tasks/TASK_ID_REGISTRY.md`, `docs/compliance/{previred,dt}/README.md`, documentacion funcional/manual HR, `changelog.md`.
+- **Pendiente antes de cierre:** correr `pnpm lint`, `pnpm test` o suite focal adicional si el tiempo lo permite, `pnpm pg:doctor`, revisar `git status`, y decidir si mover TASK-812 a `complete/` solo si el equipo acepta V1 con boundary TASK-707a abierto.
 
 # Sesion 2026-05-09 — TASK-812 compliance exports corregida
 
@@ -23864,6 +23996,35 @@ Validacion:
 Riesgos / notas:
 
 - No se tocaron los archivos nuevos no trackeados de client portal (`TASK-822` a `TASK-825` y arquitectura relacionada); quedan fuera de este cambio.
+
+## Sesion 2026-05-10 — TASK-812 Previred upload correction
+
+Contexto:
+
+- Usuario subio `payroll-previred-2026-04.txt` a Previred con formato `Estandar por Separador 105 campos`; Previred rechazo la linea 1 por campos corridos/invalidos (`Sexo`, `Nacionalidad`, `Regimen Previsional`, `Dias Trabajados`, `Codigo Isapre`).
+- Skill usada: `greenhouse-payroll-auditor`; decision reforzada con `software-architect-2026`.
+- `pnpm pg:doctor` no pudo validar runtime por `invalid_grant / invalid_rapt` de ADC Google; requiere reauth local (`gcloud auth login` + `gcloud auth application-default login`) antes de aplicar/verificar migracion en Cloud SQL.
+
+Cambios aplicados:
+
+- `src/lib/payroll/compliance-exports/previred.ts` corrige posiciones oficiales Previred: periodo `MMAAAA`, regimen `AFP/SIP`, dias trabajados campo 13, Fonasa/Isapre campo 75+, Mutual 96-98, Cesantia 100-102.
+- Se elimina inferencia/default de sexo y nacionalidad. El export Previred ahora falla cerrado si faltan codigos explicitos.
+- `migrations/20260510111506127_task-812-previred-worker-profiles.sql` agrega `greenhouse_payroll.chile_previred_worker_profiles` para `sex_code`, `nationality_code` y `health_institution_code` anclados a `identity_profile_id`.
+- `src/lib/payroll/compliance-exports/store.ts` lee nombres legales de `members` y el perfil Previred por persona.
+- Docs actualizadas: `docs/compliance/previred/README.md`, manual de nomina y spec TASK-812.
+
+Validacion:
+
+- `pnpm vitest run src/lib/payroll/compliance-exports/previred.test.ts src/lib/payroll/compliance-exports/lre.test.ts` -> pass, 8 tests.
+- `pnpm vitest run src/lib/payroll` -> pass, 51 files / 367 tests.
+- `pnpm exec eslint src/lib/payroll/compliance-exports/previred.ts src/lib/payroll/compliance-exports/store.ts src/lib/payroll/compliance-exports/previred.test.ts src/lib/payroll/compliance-exports/lre.test.ts` -> pass.
+- `pnpm exec tsc --noEmit --pretty false` -> pass.
+
+Pendiente operativo:
+
+- Aplicar migracion y poblar perfiles Previred reales. Para Valentina: `sex_code='F'`, `nationality_code='0'`; `health_institution_code` debe ser `07` si Fonasa o el codigo exacto de la Isapre segun Tabla N°16.
+- Reautenticar GCP local antes de `pnpm pg:doctor` / migracion.
+- Regenerar y subir nuevamente `payroll-previred-2026-04.txt` despues de poblar perfiles.
 
 ## Sesion 2026-05-06 — TASK-408 smoke enablement: admin preview catalog completo
 

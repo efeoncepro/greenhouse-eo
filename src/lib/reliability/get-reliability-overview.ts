@@ -40,6 +40,7 @@ import { getIdentityLegalProfileRevealAnomalySignal } from './queries/identity-l
 import { getIncomePaymentsClpDriftSignal } from './queries/income-payments-clp-drift'
 import { getPaymentOrdersDeadLetterSignal } from './queries/payment-orders-dead-letter'
 import { getPaidOrdersWithoutExpensePaymentSignal } from './queries/payment-orders-paid-without-expense-payment'
+import { getPayrollComplianceExportDriftSignal } from './queries/payroll-compliance-export-drift'
 import { getPayrollExpenseMaterializationLagSignal } from './queries/payroll-expense-materialization-lag'
 import { getProviderBqSyncDeadLetterSignal } from './queries/provider-bq-sync-dead-letter'
 import { getServiceEngagementEngagementKindUnmappedSignal } from './queries/service-engagement-engagement-kind-unmapped'
@@ -62,6 +63,9 @@ import { getPostgresConnectionSaturationSignal } from './queries/postgres-connec
 import { getCriticalTablesMissingSignal } from './queries/critical-tables-missing'
 import { getOutboxUnpublishedLagSignal } from './queries/outbox-unpublished-lag'
 import { getOutboxDeadLetterSignal } from './queries/outbox-dead-letter'
+import { getReleasePendingWithoutJobsSignal } from './queries/release-pending-without-jobs'
+import { getReleaseStaleApprovalSignal } from './queries/release-stale-approval'
+import { getReleaseWorkerRevisionDriftSignal } from './queries/release-worker-revision-drift'
 import { getEmailRenderFailureSignal } from './queries/email-render-failure'
 import { getNuboxSourceFreshnessSignal } from './queries/nubox-source-freshness'
 import { getEngagementBudgetOverrunSignal } from './queries/engagement-budget-overrun'
@@ -311,6 +315,12 @@ interface ReliabilityOverviewSources {
   paymentOrderSettlement?: ReliabilitySignal[] | null
 
   /**
+   * TASK-812 — Previred/LRE compliance export artifact drift. Steady state = 0
+   * latest artifacts with failed validation or entries newer than artifact.
+   */
+  payrollComplianceExportDrift?: ReliabilitySignal | null
+
+  /**
    * TASK-766 Slice 2 — Finance CLP currency drift signals. 2 readers que
    * cuentan expense_payments / income_payments con currency!='CLP' y
    * amount_clp IS NULL (drift detectado por la VIEW *_normalized via flag
@@ -477,6 +487,15 @@ interface ReliabilityOverviewSources {
    * Roll up bajo moduleKey 'commercial'.
    */
   commercialHealth?: ReliabilitySignal[] | null
+
+  /**
+   * TASK-848 Slice 7 — Production Release Control Plane signals (V1, 2 of 4):
+   *   - platform.release.stale_approval (drift)
+   *   - platform.release.pending_without_jobs (drift)
+   * Roll up bajo moduleKey 'platform'. V1.1 agregara deploy_duration_p95 + last_status
+   * cuando exista release_manifests data populated.
+   */
+  productionRelease?: ReliabilitySignal[] | null
 }
 
 export const buildReliabilityOverview = (
@@ -511,6 +530,8 @@ export const buildReliabilityOverview = (
     // dead_letter / lag). Inyectadas pre-fetched desde getReliabilityOverview
     // para mantener buildReliabilityOverview sincrónico.
     ...(sources.paymentOrderSettlement ?? []),
+    // TASK-812 — Previred/LRE artifact registry drift.
+    ...(sources.payrollComplianceExportDrift ? [sources.payrollComplianceExportDrift] : []),
     // TASK-766 Slice 2 — Finance CLP currency drift signals (expense + income).
     ...(sources.financeClpDrift ?? []),
     // TASK-771 Slice 4 — Provider BQ sync dead-letter signal (drift PG↔BQ).
@@ -548,7 +569,9 @@ export const buildReliabilityOverview = (
     // TASK-813 Slice 6 — Commercial engagement instance signals (3).
     ...(sources.servicesEngagement ?? []),
     // TASK-807 — Commercial Health signals (six Sample Sprints health gates).
-    ...(sources.commercialHealth ?? [])
+    ...(sources.commercialHealth ?? []),
+    // TASK-848 Slice 7 — Production Release Control Plane signals (2 of 4 V1).
+    ...(sources.productionRelease ?? [])
   ]
 
   const signalsByModule = new Map<string, ReliabilitySignal[]>()
@@ -709,6 +732,11 @@ export const getReliabilityOverview = async (
           deadLetter: getPaymentOrdersDeadLetterSignal,
           materializationLag: getPayrollExpenseMaterializationLagSignal
         }).catch(() => null)
+
+  const payrollComplianceExportDrift =
+    preloadedSources.payrollComplianceExportDrift !== undefined
+      ? preloadedSources.payrollComplianceExportDrift
+      : await getPayrollComplianceExportDriftSignal().catch(() => null)
 
   // TASK-766 Slice 2 — Finance CLP currency drift signals (expense + income).
   const financeClpDrift =
@@ -885,6 +913,22 @@ export const getReliabilityOverview = async (
           .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
           .catch(() => null)
 
+  // TASK-848 Slice 7 + TASK-849 Slice 2 — Production Release Control Plane
+  // signals (V1, 3 of 4). 3 readers en paralelo. Cada uno degrada a
+  // `severity=unknown` si no hay GITHUB_RELEASE_OBSERVER_TOKEN o GH API falla.
+  // NO bloquea el dashboard. V1.1 agregara deploy_duration_p95 + last_status
+  // (necesitan release_manifests data populated).
+  const productionRelease =
+    preloadedSources.productionRelease !== undefined
+      ? preloadedSources.productionRelease
+      : await Promise.all([
+          getReleaseStaleApprovalSignal().catch(() => null),
+          getReleasePendingWithoutJobsSignal().catch(() => null),
+          getReleaseWorkerRevisionDriftSignal().catch(() => null)
+        ])
+          .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
+          .catch(() => null)
+
   // TASK-807 — Commercial Health readers (6). Cada reader degrada
   // honestamente a `unknown` si su query falla. Incluye stale_progress de
   // TASK-805 como primitive reutilizada, no recreada.
@@ -936,6 +980,7 @@ export const getReliabilityOverview = async (
     aiObservations,
     domainIncidents,
     paymentOrderSettlement,
+    payrollComplianceExportDrift,
     financeClpDrift,
     providerBqSyncDeadLetter,
     outboxHealth,
@@ -954,7 +999,8 @@ export const getReliabilityOverview = async (
     cloudRunSilentObservability,
     postgresConnectionSaturation,
     servicesEngagement,
-    commercialHealth
+    commercialHealth,
+    productionRelease
   })
 }
 

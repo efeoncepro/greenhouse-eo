@@ -53,6 +53,7 @@ export const AGGREGATE_TYPES = {
   payrollPrevisionalSnapshot: 'payroll_previsional_snapshot',
   payrollFinalSettlement: 'payroll_final_settlement',
   payrollFinalSettlementDocument: 'payroll_final_settlement_document',
+  payrollComplianceExportArtifact: 'payroll_compliance_export_artifact',
 
   // AI Tools
   aiTool: 'ai_tool',
@@ -181,7 +182,10 @@ export const AGGREGATE_TYPES = {
 
   // Person Legal Profile (TASK-784)
   personIdentityDocument: 'person_identity_document',
-  personAddress: 'person_address'
+  personAddress: 'person_address',
+
+  // Platform Release Control Plane (TASK-848)
+  platformRelease: 'platform.release'
 } as const
 
 export type AggregateType = (typeof AGGREGATE_TYPES)[keyof typeof AGGREGATE_TYPES]
@@ -344,6 +348,8 @@ export const EVENT_TYPES = {
   payrollPeriodExported: 'payroll_period.exported',
   payrollEntryUpserted: 'payroll_entry.upserted',
   payrollEntryReliquidated: 'payroll_entry.reliquidated',
+  payrollExportPreviredGenerated: 'payroll.export.previred_generated',
+  payrollExportLreGenerated: 'payroll.export.lre_generated',
   payrollAdjustmentCreated: 'payroll.adjustment.created',
   payrollAdjustmentApproved: 'payroll.adjustment.approved',
   payrollAdjustmentReverted: 'payroll.adjustment.reverted',
@@ -676,7 +682,16 @@ export const EVENT_TYPES = {
   // TASK-785 — Workforce role title governance
   memberRoleTitleChanged: 'member.role_title.changed',
   memberRoleTitleDriftProposed: 'member.role_title.drift_proposed',
-  memberRoleTitleDriftResolved: 'member.role_title.drift_resolved'
+  memberRoleTitleDriftResolved: 'member.role_title.drift_resolved',
+
+  // TASK-848 — Production Release Control Plane (7 events versionados v1)
+  platformReleaseStarted: 'platform.release.started',
+  platformReleaseDeploying: 'platform.release.deploying',
+  platformReleaseVerifying: 'platform.release.verifying',
+  platformReleaseReleased: 'platform.release.released',
+  platformReleaseDegraded: 'platform.release.degraded',
+  platformReleaseRolledBack: 'platform.release.rolled_back',
+  platformReleaseAborted: 'platform.release.aborted'
 } as const
 
 export type EventType = (typeof EVENT_TYPES)[keyof typeof EVENT_TYPES]
@@ -721,6 +736,8 @@ export const REACTIVE_EVENT_TYPES = [
   EVENT_TYPES.payrollPeriodExported,
   EVENT_TYPES.payrollEntryUpserted,
   EVENT_TYPES.payrollEntryReliquidated,
+  EVENT_TYPES.payrollExportPreviredGenerated,
+  EVENT_TYPES.payrollExportLreGenerated,
   // TASK-751: order.paid dispara recordExpensePaymentFromOrderProjection
   EVENT_TYPES.financePaymentOrderPaid,
   EVENT_TYPES.leaveRequestCreated,

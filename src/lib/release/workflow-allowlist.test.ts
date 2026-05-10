@@ -1,0 +1,71 @@
+import { describe, expect, it } from 'vitest'
+
+import {
+  RELEASE_DEPLOY_WORKFLOWS,
+  RELEASE_DEPLOY_WORKFLOW_NAMES,
+  WORKFLOWS_WITH_CLOUD_RUN_DRIFT_DETECTION,
+  findWorkflow
+} from './workflow-allowlist'
+
+describe('workflow-allowlist — canonical 6 workflows', () => {
+  it('contains exactly the 6 production deploy workflows', () => {
+    expect(RELEASE_DEPLOY_WORKFLOWS.map((w) => w.workflowName).sort()).toEqual(
+      [
+        'Azure Teams Bot Deploy',
+        'Azure Teams Deploy',
+        'Commercial Cost Worker Deploy',
+        'HubSpot Greenhouse Integration Deploy',
+        'ICO Batch Worker Deploy',
+        'Ops Worker Deploy'
+      ]
+    )
+  })
+
+  it('exposes O(1) Set lookup via RELEASE_DEPLOY_WORKFLOW_NAMES', () => {
+    expect(RELEASE_DEPLOY_WORKFLOW_NAMES.has('Ops Worker Deploy')).toBe(true)
+    expect(RELEASE_DEPLOY_WORKFLOW_NAMES.has('NonExistent Workflow')).toBe(false)
+  })
+
+  it('Set is read-only (preserve canonical immutability)', () => {
+    expect(RELEASE_DEPLOY_WORKFLOW_NAMES.size).toBe(6)
+  })
+})
+
+describe('workflow-allowlist — Cloud Run drift detection mapping', () => {
+  it('maps 4 workflows to Cloud Run services', () => {
+    expect(WORKFLOWS_WITH_CLOUD_RUN_DRIFT_DETECTION).toHaveLength(4)
+  })
+
+  it('maps Ops Worker Deploy to ops-worker us-east4', () => {
+    const w = findWorkflow('Ops Worker Deploy')
+
+    expect(w?.cloudRunService).toBe('ops-worker')
+    expect(w?.cloudRunRegion).toBe('us-east4')
+  })
+
+  it('maps HubSpot Greenhouse Integration Deploy to us-central1 (NOT us-east4)', () => {
+    // HubSpot bridge corre en us-central1 per CLAUDE.md preserve URL public.
+    const w = findWorkflow('HubSpot Greenhouse Integration Deploy')
+
+    expect(w?.cloudRunService).toBe('hubspot-greenhouse-integration')
+    expect(w?.cloudRunRegion).toBe('us-central1')
+  })
+
+  it('Azure workflows have NO Cloud Run mapping (drift not applicable)', () => {
+    const azureTeams = findWorkflow('Azure Teams Deploy')
+    const azureBot = findWorkflow('Azure Teams Bot Deploy')
+
+    expect(azureTeams?.cloudRunService).toBeUndefined()
+    expect(azureBot?.cloudRunService).toBeUndefined()
+  })
+})
+
+describe('workflow-allowlist — findWorkflow', () => {
+  it('returns null for unknown workflow', () => {
+    expect(findWorkflow('Unknown Workflow Name')).toBeNull()
+  })
+
+  it('returns the entry for known workflow', () => {
+    expect(findWorkflow('ICO Batch Worker Deploy')?.cloudRunService).toBe('ico-batch-worker')
+  })
+})

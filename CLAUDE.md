@@ -1435,6 +1435,154 @@ El **outbox publisher** mueve eventos de `greenhouse_sync.outbox_events` (Postgr
 
 **Spec canónica**: `docs/tasks/complete/TASK-773-outbox-publisher-cloud-scheduler-cutover.md`. Patrón replicable: cuando emerja otro Vercel cron infrastructure-critical (TASK-258 sync-conformed pipeline, TASK-259 entra-profile-sync), seguir el mismo template (helper canónico → endpoint ops-worker → Cloud Scheduler job → reliability signal).
 
+### Production Release Control Plane invariants (TASK-848)
+
+La promoción `develop → main` vive en un control plane canónico con manifest persistido + state machine append-only + capabilities granulares + concurrency fix kills bug class del incidente 2026-04-26 → 2026-05-09. Todo release production debe respetar estos invariantes — son los que evitan que workflows queden deadlocked, que rollback aplique revisión incorrecta, o que un release degraded quede silente sin rollback.
+
+**Read API canónico**:
+
+- Tablas: `greenhouse_sync.release_manifests` (manifest persistido, source of truth) + `greenhouse_sync.release_state_transitions` (audit append-only). Anti-UPDATE/DELETE triggers enforced. Schema `greenhouse_sync` (NO `greenhouse_ops` que es ROLE).
+- PK formato `<targetSha[:12]>-<UUIDv4>` via `randomUUID()`. Ordering via INDEX `(target_branch, started_at DESC)`.
+- State machine cerrado (8 estados): `preflight → ready → deploying → verifying → released | degraded | aborted`; `released → rolled_back`; `degraded → rolled_back | released`. CHECK constraint a nivel DB.
+- Partial UNIQUE INDEX `WHERE state IN ('preflight','ready','deploying','verifying')` garantiza 1 release activo por branch.
+- Outbox events versionados v1: `platform.release.{started, deploying, verifying, released, degraded, rolled_back, aborted}`. Documentados en `GREENHOUSE_EVENT_CATALOG_V1.md`.
+- 3 capabilities granulares least-privilege: `platform.release.execute` (EFEONCE_ADMIN + DEVOPS_OPERATOR), `platform.release.rollback` (EFEONCE_ADMIN solo), `platform.release.bypass_preflight` (EFEONCE_ADMIN solo, requiere `reason >= 20 chars` + audit).
+
+**Concurrency fix Opción A (V1 deployed)**:
+
+```yaml
+concurrency:
+  group: <worker>-deploy-${{ github.ref }}
+  cancel-in-progress: ${{ (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production') || github.ref == 'refs/heads/main' }}
+```
+
+Aplicado a 3 worker workflows (`ops-worker-deploy.yml`, `commercial-cost-worker-deploy.yml`, `ico-batch-deploy.yml`). Mata el bug class del incidente histórico: pushes nuevos a production cancelan stale pending en lugar de quedar deadlocked. Staging preserva `cancel-in-progress: false`.
+
+**Reliability signals canónicos** (subsystem `Platform Release`, V1 deployed = 2 of 4):
+
+- `platform.release.stale_approval` (kind=drift, severity warning>24h err>7d). Detecta runs production "waiting" del environment Production. Steady=0.
+- `platform.release.pending_without_jobs` (kind=drift, severity error si count>0 sostenido >5min). Detecta runs queued/in_progress con `jobs.length===0`. Steady=0 = concurrency fix Opción A operando.
+- `platform.release.deploy_duration_p95` (V1.1 — TASK-854): kind=lag, p95 release ventana 30d.
+- `platform.release.last_status` (V1.1 — TASK-854): kind=drift, último release `degraded|aborted|rolled_back`.
+
+Ambos consultan GitHub API via `GITHUB_RELEASE_OBSERVER_TOKEN` con degradación honesta (severity=`unknown` sin token).
+
+**Rollback CLI canónico** (`scripts/release/production-rollback.ts`):
+
+- Vercel alias swap: `vercel alias set <PREV_URL> greenhouse.efeoncepro.com` (atomic).
+- Cloud Run workers: `gcloud run services update-traffic <svc> --to-revisions=<prev>=100` por cada worker.
+- HubSpot integration Cloud Run: mismo patrón.
+- **Azure config / Bicep**: NO automático V1 — manual gated en runbook `docs/operations/runbooks/production-release.md` con `az deployment group what-if` mandatory antes de apply.
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** disparar release production sin pasar por workflow orquestador (V1.1 — TASK-851). Workers deploy directo queda reservado para break-glass documentado.
+- **NUNCA** modificar `release_manifests.{release_id, target_sha, started_at, triggered_by, attempt_n}` post-INSERT. Anti-immutable trigger lo bloquea.
+- **NUNCA** hacer DELETE de filas en `release_manifests` o `release_state_transitions`. Append-only enforced por trigger PG. Para correcciones, INSERT nueva fila con `metadata_json.correction_of=<previous_id>`.
+- **NUNCA** transicionar `state` fuera del matrix canónico. `released → deploying` o `aborted → *` están prohibidos: create new release row.
+- **NUNCA** introducir un signal coarse `platform.release.pipeline_health` que lumpee multiples failure modes. Greenhouse pattern es 1 signal por failure mode (TASK-742, TASK-774, TASK-768).
+- **NUNCA** loggear secrets/tokens/JWT/refresh tokens/payload completo Vercel/GCP/Azure response sin pasar por `redactErrorForResponse` o `redactSensitive`.
+- **NUNCA** invocar `Sentry.captureException` directo en este path. Usar `captureWithDomain(err, 'cloud', { tags: { source: 'production_release', stage: '<...>' } })` para que el rollup `Platform Release` lo recoja.
+- **NUNCA** rollback automático de Azure config/Bicep en V1. Manual gated en runbook hasta demostrar reapply safe + reversible (TASK-853).
+- **NUNCA** crear tabla nueva paralela a `release_manifests` para tracking de workflow runs (extender, no parallelizar).
+- **NUNCA** mezclar dimensiones en state machine: `state` es lifecycle del release; outcome de cada step (Vercel ok, worker ok, Azure ok) vive en `post_release_health JSONB`, NO como variantes del enum.
+- **NUNCA** revertir el concurrency fix dynamic expression a `cancel-in-progress: false` en los 3 worker workflows production. Reintroduce el deadlock determinista del incidente 2026-04-26 → 2026-05-09.
+- **SIEMPRE** que un release entre `state IN ('degraded','aborted','rolled_back')`, escalar via outbox event + reliability signal `platform.release.last_status` (V1.1).
+- **SIEMPRE** que emerja un workflow nuevo de deploy production, agregarlo al `RELEASE_DEPLOY_WORKFLOWS` canonico en `src/lib/release/workflow-allowlist.ts` (TASK-849 Slice 0 — single source of truth) + verificar WIF subjects para `environment:production`.
+- **SIEMPRE** que se modifique el state machine, actualizar AMBOS: CHECK constraint DB en migration nueva + tipo TS `ReleaseState` (V1.1) + tabla en spec V1 + ADR.
+
+**Spec canónica**: `docs/architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md`. Runbook operativo: `docs/operations/runbooks/production-release.md`. Migration: `migrations/20260510111229586_task-848-release-control-plane-foundation.sql`. V1.1 follow-ups (4 tasks compactadas): TASK-850 (Preflight CLI), TASK-851 (Orchestrator + Worker SHA), TASK-853 (Azure gating), TASK-854 (2 signals + Dashboard).
+
+### Production Release Watchdog invariants (TASK-849)
+
+Watchdog scheduled GH Actions `*/30 * * * *` que detecta los 3 sintomas del incidente 2026-04-26 → 2026-05-09 (stale approvals + pending sin jobs + worker revision drift) y emite alertas Teams a `production-release-alerts` con dedup canonico. **Convierte los 2 signals pasivos de TASK-848 V1.0 en alertas activas**.
+
+**Helpers canonicos** (V1.0 + V1.1 obligatorios al tocar release watchdog):
+
+- `src/lib/release/github-helpers.ts` — `resolveGithubToken` (async, GH App primary → PAT fallback), `resolveGithubTokenSync` (back-compat PAT-only), `buildGithubAuthHeaders`, `fetchGithubWithTimeout`, `githubRepoCoords`, `assertGithubResponseOk`, `githubFetchJson`. Single source of truth para todas las queries GitHub API observer-only.
+- `src/lib/release/github-app-token-resolver.ts` — `resolveGithubAppInstallationToken()` async con cache + JWT mint. Mint flow: cache hit → JWT firmado RS256 con private key → POST `/app/installations/<id>/access_tokens` → cache 1h con renovacion 5min antes expiry. Degradacion canonica: si GH App config faltante o JWT mint falla, retorna null y caller fallback a PAT.
+- `src/lib/release/workflow-allowlist.ts` — `RELEASE_DEPLOY_WORKFLOWS` canonical array (6 workflows + Cloud Run service mapping para drift detection). `RELEASE_DEPLOY_WORKFLOW_NAMES` set O(1) lookup. `WORKFLOWS_WITH_CLOUD_RUN_DRIFT_DETECTION` filtered subset (4 workflows). `findWorkflow()` lookup.
+- `src/lib/release/severity-resolver.ts` — `WatchdogSeverity` superset (`ok|warning|error|critical`), `WATCHDOG_THRESHOLDS` frozen, 3 resolvers per detector, `aggregateMaxSeverity`, `severityRank`, `isSeverityEscalation`, `watchdogSeverityToReliabilitySeverity` (collapse critical→error).
+- `src/lib/release/watchdog-alerts-dispatcher.ts` — `dispatchWatchdogAlert()` + `dispatchWatchdogRecovery()` con dedup atomic + at-least-once Teams delivery + `clearDedupRow()`.
+
+**3 reliability signals canónicos** (subsystem `Platform Release`, steady=0):
+
+- `platform.release.stale_approval` (TASK-848 V1.0) — runs `waiting` con Production approval. warning>24h, error>7d (reader); warning>2h, error>24h, critical>7d (watchdog).
+- `platform.release.pending_without_jobs` (TASK-848 V1.0) — runs queued/in_progress con `jobs.length === 0`. error>5min (reader); warning>5min, error>30min (watchdog).
+- `platform.release.worker_revision_drift` (TASK-849 V1.0) — Cloud Run latest revision SHA != ultimo workflow run success SHA. error si drift confirmado, warning si data_missing (NO falso positivo).
+
+**Tabla dedup** `greenhouse_sync.release_watchdog_alert_state`:
+
+- PK compuesta `(workflow_name, run_id, alert_kind)` permite mismo run con kinds distintos por escalation
+- CHECK enum cerrado sobre `alert_kind` y `last_alerted_severity`
+- Owner `greenhouse_ops`, GRANT SELECT/INSERT/UPDATE/DELETE a `greenhouse_runtime` (NO triggers anti-DELETE — cuando blocker se resuelve, row se borra)
+- Indexes: `(first_observed_at)` para recovery sweep, `(workflow_name, alert_kind, last_alerted_at DESC)` para drilldown
+
+**Capability granular**: `platform.release.watchdog.read` (scope=all, EFEONCE_ADMIN + DEVOPS_OPERATOR). NO reusa `platform.release.execute` — semantica distinta (leer estado vs disparar release).
+
+**GitHub auth strategy canonica (V1.1)**: GitHub App installation token primary, PAT fallback. Setup one-time documented en runbook §8.1 (App ID + Installation ID + private key en GCP Secret Manager `greenhouse-github-app-private-key`). Vercel env vars: `GITHUB_APP_ID`, `GITHUB_APP_INSTALLATION_ID`, `GREENHOUSE_GITHUB_APP_PRIVATE_KEY_SECRET_REF`. Costo: $0 GitHub side, ~$0.72/anio GCP secret. Beneficios sobre PAT: token NO ligado a usuario, rate limit 15K req/h vs 5K, auditoria per-installation.
+
+**Worker GIT_SHA env var** (TASK-849 Slice 1): pre-requisito para `worker_revision_drift` reader. Cada worker emite `GIT_SHA` env var con commit SHA del deploy. Resolution: `$GITHUB_SHA → git rev-parse HEAD → 'unknown'`. Workers sin GIT_SHA aun deployado producen `data_missing` (NO falso drift).
+
+**Hosting decision**: GitHub Actions schedule (NO Vercel cron, NO Cloud Scheduler). Razon: detector consume primariamente GH API → execute dentro de GH Actions evita roundtrips cross-cloud + usa `github.token` auto-provisto. Tooling/monitoring read-only, NOT async-critical (clasificacion `tooling` per `GREENHOUSE_VERCEL_CRON_CLASSIFICATION_V1.md`).
+
+**Concurrency**: `cancel-in-progress: true` en watchdog workflow. La ultima foto siempre gana — NO causa deadlock como los workers pre-TASK-848 porque watchdog NO tiene environment approval gate.
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** ejecutar `gh run cancel` o `gh run approve` automaticamente desde el watchdog. El watchdog SOLO recomienda; humano decide.
+- **NUNCA** desactivar el watchdog por más de 7 días sin justificación documentada. Es la única detección activa del bug class del incidente.
+- **NUNCA** introducir un signal coarse `platform.release.watchdog.health` que lumpee los 3 failure modes. Greenhouse pattern (TASK-742, TASK-774, TASK-768) es 1 signal por failure mode.
+- **NUNCA** loggear payload completo de respuesta GitHub/Cloud Run sin pasar por `redactSensitive`/`redactErrorForResponse`. GitHub responses pueden incluir email del actor que dispara el run.
+- **NUNCA** invocar `Sentry.captureException` directo en este path. Usar `captureWithDomain(err, 'cloud', { tags: { source: 'production_release_watchdog', stage: '<...>' } })`.
+- **NUNCA** crear endpoint admin `/api/admin/release-watchdog/*` en V1. Out of scope; el watchdog corre solo en GitHub Actions + CLI local.
+- **NUNCA** persistir history de findings en PG en V1. YAGNI hasta que TASK-851 orchestrator manifest exista. La derivacion on-demand del estado GH Actions + Cloud Run es suficiente para forensic.
+- **NUNCA** alertar Slack ni cualquier canal que no sea Teams via helper canonico `sendManualTeamsAnnouncement`. Greenhouse opera en Teams.
+- **NUNCA** comparar worker revision drift contra `main` HEAD (ruido — main HEAD puede tener commits que no tocaron worker paths). Comparar contra ultimo workflow run `success`.
+- **NUNCA** modificar el contract JSON output del CLI sin bumpear version + actualizar consumer en preflight CLI futuro (TASK-850).
+- **NUNCA** duplicar los helpers canonicos del watchdog en otros code paths del control plane. Single source of truth en `src/lib/release/`.
+- **NUNCA** persistir `last_alerted_severity='ok'` en la tabla dedup. CHECK constraint lo bloquea — recovery se maneja via DELETE row.
+- **NUNCA** committear el GitHub App private key (`.pem`) al repo. Solo via GCP Secret Manager. Borrar el `.pem` local con `shred -u` despues de subir.
+- **NUNCA** crear PAT con scopes mas amplios que `Actions:read + Deployments:read + Metadata:read`. Si emerge necesidad de mas permisos, evaluar primero si GH App lo cubre (preferred).
+- **NUNCA** usar `resolveGithubTokenSync` en code paths nuevos. Es back-compat layer V1.0; nuevos consumers usan `resolveGithubToken` async para preferir GH App.
+- **SIEMPRE** que emerja un workflow nuevo de deploy production, agregarlo a `RELEASE_DEPLOY_WORKFLOWS` en `src/lib/release/workflow-allowlist.ts` ANTES del primer deploy. Sin esto el watchdog NO lo detecta.
+- **SIEMPRE** que el dispatcher Teams falle, mantener at-least-once delivery: NO actualizar dedup state si Teams send failed. Aceptable: alert duplicado en re-try vs alert perdido.
+
+**Spec canónica**: TASK-849 → `docs/tasks/complete/TASK-849-production-release-watchdog-alerts.md`. Runbook operativo: `docs/operations/runbooks/production-release-watchdog.md`. Migration: `migrations/20260510122723670_task-849-watchdog-alert-state.sql`. CLI: `pnpm release:watchdog [--json|--fail-on-error|--enable-teams|--dry-run]`.
+
+**Setup completado live (2026-05-10)**:
+
+| Componente | Valor canonico |
+|---|---|
+| GitHub App | `Greenhouse Release Watchdog` (slug `greenhouse-release-watchdog`, App ID `3665723`) — https://github.com/apps/greenhouse-release-watchdog |
+| Installation | ID `131127026` en `efeoncepro` org, scope `All repositories` |
+| Permissions | `Actions: Read-only`, `Deployments: Read-only`, `Metadata: Read-only` |
+| GCP Secret | `greenhouse-github-app-private-key` (Secret Manager, project `efeonce-group`, replication automatic, version 1) |
+| Vercel env vars production | `GITHUB_APP_ID=3665723`, `GITHUB_APP_INSTALLATION_ID=131127026`, `GREENHOUSE_GITHUB_APP_PRIVATE_KEY_SECRET_REF=greenhouse-github-app-private-key` |
+
+**Setup scripts canonicos**:
+
+- `pnpm release:setup-github-app` — flow completo end-to-end (manifest creation + install + GCP upload + Vercel config + redeploy). 2 clicks browser + 3 confirmaciones CLI. Bugs corregidos en commit `655e653d`: race condition `/start` ↔ `/callback`, `hook_attributes` validation, PKCS#1 vs PKCS#8.
+- `pnpm release:complete-github-app-setup --app-id=<N> --installation-id=<N> --pem-file=<path>` — recovery script si setup-github-app crashea mid-flow. Reusa App ya creado, solo necesita private key nuevo via UI.
+
+**Verificacion live ejecutada 2026-05-10**: GH App resolver path validado end-to-end. Mintea JWT con private key (PKCS#1 o PKCS#8), exchange por installation token (cache 1h), readers retornan severity real:
+
+```bash
+GCP_PROJECT=efeonce-group GITHUB_APP_ID=3665723 \
+  GITHUB_APP_INSTALLATION_ID=131127026 \
+  GREENHOUSE_GITHUB_APP_PRIVATE_KEY_SECRET_REF=greenhouse-github-app-private-key \
+  pnpm release:watchdog --json
+# stale_approval: ok ✓
+# pending_without_jobs: ok ✓
+# worker_revision_drift: warning (data_missing — esperado pre-merge develop→main)
+```
+
+**Pendiente para activacion total** (post merge develop → main):
+
+1. Workers se re-deployan con `GIT_SHA` env var (TASK-849 Slice 1) → `worker_revision_drift` retorna `ok` para los 4 workers
+2. Workflow scheduled `production-release-watchdog.yml` se registra en GH Actions (cron `*/30` activa)
+3. Cron emite alertas Teams a `production-release-alerts` cuando detecte blockers (con dedup canonico)
+
 ### Finance write-path E2E gate (TASK-773 Slice 6)
 
 Cualquier task que toque handlers `POST/PUT/PATCH/DELETE` en `src/app/api/finance/**/route.ts` **debe verificar el flow end-to-end downstream**, no solo el contract API. Bug class detectada 2026-05-03: el endpoint Figma respondía 200 OK pero el TC Santander no rebajaba — porque el contract API funcionaba pero el side effect downstream (outbox → BQ → reactive → account_balance) calló silencioso.

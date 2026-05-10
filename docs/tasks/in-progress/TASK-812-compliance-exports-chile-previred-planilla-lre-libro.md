@@ -6,21 +6,20 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `optional`
-- Status real: `Diseno corregido`
+- Status real: `Implementacion V1 en curso`
 - Rank: `TBD`
 - Domain: `hr / payroll / compliance`
 - Blocked by:
-  - `TASK-707a` — hard blocker para paridad contra `payment_order` social_security canonico.
-  - Discovery oficial Slice 0 — hard blocker para codificar formatos externos.
+  - `TASK-707a` — hard blocker para paridad completa contra `payment_order` social_security canonico. V1 degrada explicitamente a paridad contra `payroll_entries` cerradas + `calculatePreviredEntryBreakdown`.
 - Resolved dependency:
   - `TASK-784` — `complete`; provee Person Legal Profile + RUT canonico verificado.
-- Branch: `task/TASK-812-compliance-exports-chile-previred-lre`
+- Branch: `develop` (excepcion solicitada por usuario: "mantente en develop")
 - Legacy ID: `none`
 - GitHub Issue: `optional`
 
@@ -153,6 +152,23 @@ Reglas obligatorias:
 - No existe persistencia de `specVersion`, `sourceSnapshotHash`, `sha256`, validation result y totals.
 - No existen capabilities granulares de export compliance.
 - No existe reliability signal para drift de compliance exports.
+
+### Runtime correction 2026-05-10 — Previred worker legal profile
+
+Validacion real contra Previred detecto que el generador V1 no podia depender solo
+de `payroll_entries`: Previred exige campos legales por trabajador que payroll no
+calcula (`Sexo`, `Nacionalidad`, codigo exacto de salud/Isapre). La decision
+canonica es agregar `greenhouse_payroll.chile_previred_worker_profiles`,
+anclada a `identity_profile_id`, y bloquear el export cuando falten esos datos.
+
+Rationale:
+
+- No inferir sexo desde nombre visible.
+- No inferir nacionalidad desde `CL_RUT`.
+- No serializar strings operativos como `isapre` donde Previred exige codigos
+  oficiales de Tabla N°16.
+- Mantener Payroll como source of truth de montos y el perfil Previred como
+  source of truth de codigos declarativos requeridos por el archivo externo.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE (no llenar al crear la task)

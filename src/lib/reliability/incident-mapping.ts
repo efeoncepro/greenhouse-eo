@@ -91,6 +91,19 @@ const MODULE_TITLE_HINTS: Record<ReliabilityModuleKey, string[]> = {
     'hubspot-services',
     'service sync',
     'commercial.service'
+  ],
+  // TASK-848 — production release control plane (release_manifests, GH workflow blockers).
+  // Hints conservadores; la mayoria de incidents de release caen al subsystem
+  // 'cloud' por defecto. Estos hints disparan cuando el incident es claramente
+  // del control plane production.
+  platform: [
+    'release_manifest',
+    'production release',
+    'production-release',
+    'release control plane',
+    'platform.release',
+    'workflow stale approval',
+    'concurrency deadlock'
   ]
 }
 
@@ -121,6 +134,11 @@ const MODULE_PRIORITY: Record<ReliabilityModuleKey, number> = {
   // commercial y cloud, commercial gana (es el dueño del side effect).
   // Más bajo que finance porque emergencias finance dominan operacionalmente.
   commercial: 18,
+  // TASK-848 — platform release: prioridad mas alta que cloud para que un
+  // incident con pattern `release_manifest`/`production-release` ruteee al
+  // subsystem Platform Release y NO al fallback cloud genérico. Por debajo
+  // de finance/payroll/identity para no robar incidents de dominios duros.
+  platform: 8,
   cloud: 1
 }
 

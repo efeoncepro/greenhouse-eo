@@ -2,6 +2,21 @@
 
 Catalogo canonico de eventos del sistema de outbox de Greenhouse. Cada evento se registra en `greenhouse_sync.outbox_events` y se publica a BigQuery via el consumer `outbox-publish`.
 
+## Delta 2026-05-10 — TASK-812: Payroll compliance export artifacts (2 events v1)
+
+Aggregate type: `payroll_compliance_export_artifact`.
+
+| Event Type | Disparado por | Payload v1 contract | Consumers |
+|---|---|---|---|
+| `payroll.export.previred_generated` | `GET /api/hr/payroll/periods/:periodId/export/previred` cuando el artefacto pasa validacion y se registra en `greenhouse_payroll.compliance_export_artifacts` | `{schemaVersion:1, artifactId, periodId, exportKind:'previred', specVersion, sourceSnapshotHash, artifactSha256, recordCount, validationStatus}` | Auditoria, Reliability drift, futuros workflows de upload/rectification |
+| `payroll.export.lre_generated` | `GET /api/hr/payroll/periods/:periodId/export/lre` cuando el artefacto pasa validacion y se registra en `greenhouse_payroll.compliance_export_artifacts` | `{schemaVersion:1, artifactId, periodId, exportKind:'lre', specVersion, sourceSnapshotHash, artifactSha256, recordCount, validationStatus}` | Auditoria, Reliability drift, futuros workflows de upload/rectification |
+
+Reglas duras:
+
+- Los eventos se emiten solo despues de insertar metadata del artefacto en la misma transaccion.
+- Los payloads no incluyen RUT ni contenido del archivo. RUT se accede via snapshot auditado de Person Legal Profile.
+- V1 no marca upload externo ni rectificacion; esos estados viven como follow-up sobre `declared_status`.
+
 ## Delta 2026-05-09 — TASK-836: Service lifecycle granular (1 event v1 nuevo)
 
 Aggregate type: `service_engagement`.
@@ -692,6 +707,26 @@ Notas:
 - HubSpot deal creation service→deal queda diferida porque el write path canónico existente es `createDealFromQuoteContext()` para Quote Builder; TASK-808 no llama directo al bridge Cloud Run.
 - `engagement_cancelled_manual_notification` despacha notificación interna `system_event` para follow-up manual y mantiene `automaticClientEmail=false`.
 - **TASK-837 Delta 2026-05-09**: `service.engagement.outbound_requested` es el primer write path canónico Greenhouse → HubSpot custom object `0-162`, scoped a Sample Sprints (engagement_kind != 'regular'). Convive con `service.engagement.declared` (TASK-808) que tiene cache invalidation consumer (TASK-835); separación de concerns explícita: `declared` = local lifecycle, `outbound_requested` = HubSpot projection trigger.
+
+### Platform Release Control Plane (TASK-848)
+
+Los eventos de release usan `aggregate_type='platform.release'`, `aggregate_id=<release_id>` y versionan contrato con `payload_json.version=1`. El `release_id` formato `<targetSha[:12]>-<UUIDv4>` garantiza idempotencia cross-attempt y trazabilidad.
+
+| Aggregate Type | Event Type | Publisher | Payload | Consumer reactivo |
+|---|---|---|---|---|
+| `platform.release` | `platform.release.started` | `recordReleaseStarted()` desde `src/lib/release/manifest-store.ts` | `{ version:1, releaseId, targetSha, sourceBranch, targetBranch, attemptN, triggeredBy, operatorMemberId, startedAt, preflightResult }` | audit-only (Teams notification follow-up V1.1) |
+| `platform.release` | `platform.release.deploying` | transición `ready → deploying` | `{ version:1, releaseId, targetSha, deployingPhase (vercel/workers/integrations), plannedRevisions }` | audit-only |
+| `platform.release` | `platform.release.verifying` | transición `deploying → verifying` | `{ version:1, releaseId, vercelDeploymentUrl, workerRevisions, verifyingAt }` | post-release-health probe |
+| `platform.release` | `platform.release.released` | transición `verifying → released` | `{ version:1, releaseId, targetSha, vercelDeploymentUrl, workerRevisions, completedAt, postReleaseHealth }` | downstream notifications + reliability dashboard refresh |
+| `platform.release` | `platform.release.degraded` | transición `verifying → degraded` (post-release health failure) | `{ version:1, releaseId, failureReason, failureSignals[], degradedAt, recommendedAction }` | Teams notification escalation (follow-up V1.1) |
+| `platform.release` | `platform.release.rolled_back` | `production-rollback.ts` desde transición `released|degraded → rolled_back` | `{ version:1, releaseId, rolledFromSha, rolledToSha, rolledAt, rollbackReason, rollbackTargets }` | downstream notifications + audit forensic |
+| `platform.release` | `platform.release.aborted` | transición `* → aborted` (operator cancel) | `{ version:1, releaseId, abortedBy, abortReason, abortedAt }` | audit-only |
+
+Notas:
+- Los 7 eventos son **audit + downstream notification primarios**. NO disparan side-effects automáticos sobre cloud (Vercel/Cloud Run/Azure) — esas mutaciones viven en el orquestador `production-release.yml` y `production-rollback.ts`.
+- **State machine canónico**: `preflight → ready → deploying → verifying → released | degraded | aborted`; `released → rolled_back`; `degraded → rolled_back | released`. Enforced en DB via CHECK constraint `release_manifests_state_canonical_check` + audit row append-only por transición en `release_state_transitions`.
+- **Operador member**: `operatorMemberId` puede ser NULL cuando el actor es system (e.g. rollback automatizado por health-check post-release). El audit primario vive en `triggered_by TEXT NOT NULL` con convención `member:<id>`, `system:<actor>`, `cli:<gh-login>`.
+- **No emitir `released` antes de health verification**: el orquestador escribe `verifying` después del deploy y solo transiciona a `released` cuando los smoke tests pasan. Si fallan, transiciona a `degraded`.
 
 ## Extensibilidad
 

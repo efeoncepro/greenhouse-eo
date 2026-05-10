@@ -11,7 +11,10 @@ export const ENTITLEMENT_MODULES = [
   'commercial',
   // TASK-611 — namespace transversal del objeto canonico 360 organization (mismo patron que `home` y `my_workspace`).
   // Las 11 capabilities organization.<facet>.<action> son la API granular del Organization Workspace projection.
-  'organization'
+  'organization',
+  // TASK-848 — namespace de control plane production (release / rollback / preflight bypass).
+  // Capabilities granulares least-privilege, NO platform.admin catch-all.
+  'platform'
 ] as const
 
 export type GreenhouseEntitlementModule = (typeof ENTITLEMENT_MODULES)[number]
@@ -27,7 +30,13 @@ export const ENTITLEMENT_ACTIONS = [
   'manage',
   'configure',
   'launch',
-  'sync'
+  'sync',
+  // TASK-848 — verbs explícitos del control plane production (NO conflated con manage).
+  // Mismo patrón que TASK-742/768/784 que extendieron actions per-dominio en lugar
+  // de reusar manage/launch.
+  'execute',
+  'rollback',
+  'bypass_preflight'
 ] as const
 
 export type EntitlementAction = (typeof ENTITLEMENT_ACTIONS)[number]
@@ -164,6 +173,20 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     key: 'hr.payroll_adjustments_approval',
     module: 'hr',
     actions: ['approve'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    // TASK-812 — generar artefacto Previred auditado desde payroll cerrado.
+    key: 'hr.payroll.export_previred',
+    module: 'hr',
+    actions: ['export'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    // TASK-812 — generar artefacto LRE auditado desde payroll cerrado.
+    key: 'hr.payroll.export_lre',
+    module: 'hr',
+    actions: ['export'] as const,
     defaultScope: 'tenant'
   },
   {
@@ -773,6 +796,39 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     module: 'organization',
     actions: ['read', 'update'] as const,
     defaultScope: 'tenant'
+  },
+  // TASK-848 — Production Release Control Plane.
+  // 3 capabilities granulares least-privilege. NO platform.admin catch-all.
+  // Mismo patron que TASK-742 (auth resilience), TASK-765 (payment orders),
+  // TASK-784 (legal profile). Verbo explicito sobre reuso de manage/launch.
+  {
+    key: 'platform.release.execute',
+    module: 'platform',
+    actions: ['execute'] as const,
+    defaultScope: 'all'
+  },
+  {
+    key: 'platform.release.rollback',
+    module: 'platform',
+    actions: ['rollback'] as const,
+    defaultScope: 'all'
+  },
+  {
+    key: 'platform.release.bypass_preflight',
+    module: 'platform',
+    actions: ['bypass_preflight'] as const,
+    defaultScope: 'all'
+  },
+  // TASK-849 — Production Release Watchdog: read-only access para query del
+  // CLI desde admin endpoints futuros (admin dashboard /admin/operations
+  // ya consume los signals automaticamente via reliability registry).
+  // Granular least-privilege: NO reusar `platform.release.execute` (semantica
+  // distinta: leer estado vs disparar release).
+  {
+    key: 'platform.release.watchdog.read',
+    module: 'platform',
+    actions: ['read'] as const,
+    defaultScope: 'all'
   }
 ] as const
 

@@ -35,6 +35,7 @@ import {
   canEditPayrollPeriodMetadata,
   doesPayrollPeriodUpdateRequireReset
 } from '@/lib/payroll/period-lifecycle'
+import { GH_PAYROLL_COMPLIANCE_EXPORTS } from '@/lib/copy/payroll'
 import PayrollEntryTable from './PayrollEntryTable'
 import PayrollPaymentStatusCard from './PayrollPaymentStatusCard'
 import ReopenPeriodDialog from './ReopenPeriodDialog'
@@ -313,6 +314,18 @@ const PayrollPeriodTab = ({
     a.download = `nomina_${period.periodId}.csv`
     a.click()
     URL.revokeObjectURL(url)
+  }, [period])
+
+  const handleDownloadPrevired = useCallback(() => {
+    if (!period) return
+
+    window.open(`/api/hr/payroll/periods/${period.periodId}/export/previred`, '_blank')
+  }, [period])
+
+  const handleDownloadLre = useCallback(() => {
+    if (!period) return
+
+    window.open(`/api/hr/payroll/periods/${period.periodId}/export/lre`, '_blank')
   }, [period])
 
   const handleDownloadPdf = useCallback(async () => {
@@ -720,6 +733,28 @@ const PayrollPeriodTab = ({
                     >
                       Descargar CSV
                     </Button>
+                    <Button
+                      variant='tonal'
+                      size='small'
+                      color='warning'
+                      startIcon={<i className='tabler-file-invoice' />}
+                      onClick={handleDownloadPrevired}
+                      disabled={isPending}
+                      aria-label={GH_PAYROLL_COMPLIANCE_EXPORTS.previredAria(formatPeriodLabel(period.year, period.month))}
+                    >
+                      {GH_PAYROLL_COMPLIANCE_EXPORTS.previredLabel}
+                    </Button>
+                    <Button
+                      variant='tonal'
+                      size='small'
+                      color='warning'
+                      startIcon={<i className='tabler-file-description' />}
+                      onClick={handleDownloadLre}
+                      disabled={isPending}
+                      aria-label={GH_PAYROLL_COMPLIANCE_EXPORTS.lreAria(formatPeriodLabel(period.year, period.month))}
+                    >
+                      {GH_PAYROLL_COMPLIANCE_EXPORTS.lreLabel}
+                    </Button>
                 </>
               )}
               {period.status === 'exported' && (
@@ -755,6 +790,28 @@ const PayrollPeriodTab = ({
                     aria-label={`Descargar CSV del período ${formatPeriodLabel(period.year, period.month)}`}
                   >
                     Descargar CSV
+                  </Button>
+                  <Button
+                    variant='tonal'
+                    size='small'
+                    color='warning'
+                    startIcon={<i className='tabler-file-invoice' />}
+                    onClick={handleDownloadPrevired}
+                    disabled={isPending}
+                    aria-label={GH_PAYROLL_COMPLIANCE_EXPORTS.previredAria(formatPeriodLabel(period.year, period.month))}
+                  >
+                    {GH_PAYROLL_COMPLIANCE_EXPORTS.previredLabel}
+                  </Button>
+                  <Button
+                    variant='tonal'
+                    size='small'
+                    color='warning'
+                    startIcon={<i className='tabler-file-description' />}
+                    onClick={handleDownloadLre}
+                    disabled={isPending}
+                    aria-label={GH_PAYROLL_COMPLIANCE_EXPORTS.lreAria(formatPeriodLabel(period.year, period.month))}
+                  >
+                    {GH_PAYROLL_COMPLIANCE_EXPORTS.lreLabel}
                   </Button>
                   <Button
                     variant='contained'

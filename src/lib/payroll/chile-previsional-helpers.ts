@@ -4,6 +4,7 @@ import { getHistoricalEconomicIndicatorForPeriod } from '@/lib/finance/economic-
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { isPayrollPostgresEnabled } from '@/lib/payroll/postgres-store'
 import { normalizeString, toNumber } from '@/lib/payroll/shared'
+import { CHILE_ACCIDENT_INSURANCE_ISL_RATE } from '@/lib/payroll/chile-statutory-rates'
 
 export type ChileAfpSplitRates = {
   cotizacionRate: number
@@ -125,7 +126,7 @@ export const resolveChileEmployerCostAmounts = async ({
   const safeCesantiaBase = Math.max(0, cesantiaBase ?? imponibleBase)
   const sisRate = await getSisRate(periodDate)
   const { employerRate: cesantiaRate } = await getChileUnemploymentRatesForPeriod(periodDate, contractType)
-  const mutualRate = 0.0093
+  const mutualRate = CHILE_ACCIDENT_INSURANCE_ISL_RATE
 
   const sisAmount = roundCurrency(safeBase * sisRate)
   const cesantiaAmount = roundCurrency(safeCesantiaBase * cesantiaRate)

@@ -754,6 +754,22 @@ Contrato versionado `platform-health.v1`. Permite a agentes (MCP, Teams bot, CI,
 
 **Spec arquitectónica completa**: `docs/architecture/GREENHOUSE_NOTION_DELIVERY_SYNC_V1.md`.
 
+### Production Release Watchdog (TASK-848 + TASK-849, 2026-05-10)
+
+- **Que hace**: scheduled GH Actions cron `*/30 * * * *` que detecta los 3 sintomas del incidente 2026-04-26 → 2026-05-09 (stale Production approvals, pending sin jobs, worker revision drift) y emite alertas Teams a `production-release-alerts` con dedup canonico via `greenhouse_sync.release_watchdog_alert_state`.
+- **Workflow**: `.github/workflows/production-release-watchdog.yml`. Cron solo activa cuando esta en `main` (default branch). Manual dispatch: `gh workflow run production-release-watchdog.yml --ref main`.
+- **CLI local canonico**: `pnpm release:watchdog [--json|--fail-on-error|--enable-teams|--dry-run]`. Si vas a correrlo desde fuera de Vercel runtime, set `GCP_PROJECT=efeonce-group` + las 3 GH App env vars (App ID `3665723`, Installation ID `131127026`, secret ref `greenhouse-github-app-private-key`).
+- **GitHub auth strategy canonica**: GitHub App `Greenhouse Release Watchdog` (App ID `3665723`) instalada en `efeoncepro` org con permissions `Actions:read + Deployments:read + Metadata:read`. Private key vive en GCP Secret Manager `greenhouse-github-app-private-key` (project `efeonce-group`). Resolver `src/lib/release/github-app-token-resolver.ts` mintea installation token con cache 1h. Fallback a PAT (`GITHUB_RELEASE_OBSERVER_TOKEN`/`GITHUB_TOKEN`) solo si GH App no esta configurado. Beneficios: token NO ligado a usuario, rate limit 15K req/h vs 5K, auditoria per-installation.
+- **Setup scripts canonicos**:
+  - `pnpm release:setup-github-app` — flow completo end-to-end (manifest creation + install + GCP upload + Vercel config + redeploy). 2 clicks browser + 3 confirmaciones CLI.
+  - `pnpm release:complete-github-app-setup --app-id=<N> --installation-id=<N> --pem-file=<path>` — recovery script si setup-github-app crashea mid-flow. Reusa App ya creado.
+- **Rollback canonico**: `pnpm release:rollback` (TASK-848 V1.0). Vercel alias swap + Cloud Run workers traffic split + HubSpot integration. Azure manual gated en runbook.
+- **3 reliability signals canonicos** (subsystem `Platform Release`, steady=0): `platform.release.stale_approval`, `platform.release.pending_without_jobs`, `platform.release.worker_revision_drift`. Visibles en `/admin/operations`.
+- **Helpers canonicos** (single source of truth): `src/lib/release/{github-helpers, workflow-allowlist, severity-resolver, github-app-token-resolver, watchdog-alerts-dispatcher, manifest-store, state-machine}.ts`. Cualquier code path nuevo debe reusar estos.
+- **Si emerge un workflow nuevo de deploy production**: agregarlo a `RELEASE_DEPLOY_WORKFLOWS` en `src/lib/release/workflow-allowlist.ts` ANTES del primer deploy. Sin esto el watchdog NO lo detecta.
+- **Si tienes que generar un PAT fallback** (degraded mode V1.0): scopes minimos `Actions:read + Deployments:read + Metadata:read`, NUNCA mas amplio.
+- **Spec canonica**: `docs/architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md`. Runbooks: `docs/operations/runbooks/production-release.md` (release operativo), `docs/operations/runbooks/production-release-watchdog.md` (watchdog ops). Manuales: `docs/manual-de-uso/plataforma/release-watchdog.md` (operador), `docs/documentation/plataforma/release-watchdog.md` (funcional).
+
 ### Cloud Run hubspot-greenhouse-integration (HubSpot write bridge + webhooks) — TASK-574 (2026-04-24)
 
 - Servicio Cloud Run Python/Flask ubicado en `us-central1` (region bloqueada — NO migrar a `us-east4` porque la URL pública contiene `-uc.` y romperia el webhook del portal HubSpot).
@@ -770,13 +786,13 @@ Contrato versionado `platform-health.v1`. Permite a agentes (MCP, Teams bot, CI,
 
 - **Paso 1 — Usar `pg-connect.sh`** (recomendado para cualquier operación manual o interactiva):
   ```bash
-  pnpm pg:connect              # Verifica ADC + levanta proxy + test conexión
+  pnpm pg:connect              # Verifica gcloud CLI + ADC + levanta proxy + test conexión
   pnpm pg:connect:migrate      # Lo anterior + ejecuta migraciones pendientes
   pnpm pg:connect:status       # Lo anterior + muestra estado de migraciones
   pnpm pg:connect:shell        # Lo anterior + abre shell SQL interactivo (como admin)
   ```
   El script `scripts/pg-connect.sh` resuelve automáticamente:
-  1. Verifica que las credenciales GCP ADC estén vigentes; si no, ejecuta `gcloud auth application-default login`
+  1. Verifica que credenciales GCP CLI y ADC estén vigentes; si una falla, ejecuta ambos flujos: `gcloud auth login` y `gcloud auth application-default login`
   2. Mata cualquier proxy anterior en el puerto 15432
   3. Levanta Cloud SQL Auth Proxy en `127.0.0.1:15432`
   4. Selecciona el usuario correcto: `ops` (connect/migrate/status) o `admin` (shell)
@@ -787,7 +803,7 @@ Contrato versionado `platform-health.v1`. Permite a agentes (MCP, Teams bot, CI,
 - **Método preferido (runtime en todos los entornos)**: Cloud SQL Connector vía `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME`. Conecta sin TCP directo — negocia un túnel seguro por la Cloud SQL Admin API. Funciona en Vercel (WIF + OIDC), local, y agentes AI.
 - **La IP pública de Cloud SQL (`34.86.135.144`) NO es accesible por TCP directo** — no hay authorized networks configuradas. Intentar conectar da `ETIMEDOUT`.
 - **Prioridad en `src/lib/postgres/client.ts`**: si `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME` está definida, el Connector toma prioridad sobre `GREENHOUSE_POSTGRES_HOST`. Ambas pueden coexistir en `.env.local`.
-- **Prerequisito (sin pg-connect.sh)**: credenciales GCP válidas — `GOOGLE_APPLICATION_CREDENTIALS_JSON` en env, o ADC local (`gcloud auth application-default login`), o WIF (Vercel). El service account necesita `roles/cloudsql.client`.
+- **Prerequisito (sin pg-connect.sh)**: credenciales GCP válidas y alineadas — `GOOGLE_APPLICATION_CREDENTIALS_JSON` en env, o CLI+ADC local (`gcloud auth login` + `gcloud auth application-default login`), o WIF (Vercel). El service account necesita `roles/cloudsql.client`.
 - **Scripts Node.js de runtime** (`pnpm pg:doctor`, `pnpm setup:postgres:*`, scripts de backfill) usan el Connector automáticamente cuando `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME` está definida.
 - **Migraciones y binarios standalone** (`pnpm migrate:up`, `pnpm migrate:down`, `pnpm db:generate-types`, `pg_dump`, `psql`) requieren **Cloud SQL Auth Proxy** corriendo como tunnel local. Usar `pnpm pg:connect` para levantarlo automáticamente, o manualmente:
   ```bash
@@ -836,7 +852,8 @@ Contrato versionado `platform-health.v1`. Permite a agentes (MCP, Teams bot, CI,
   - no hacer DDL con el usuario runtime salvo que exista una razon excepcional y quede documentada
   - no crear objetos con users distintos a `greenhouse_ops` — si una migración corre como `migrator`, los DEFAULT PRIVILEGES otorgan acceso automáticamente
 - Comandos canonicos:
-  - `pnpm pg:connect` — verificar ADC + levantar proxy + test conexión (usar PRIMERO)
+  - `pnpm gcloud:auth:preflight` — verificar/renovar gcloud CLI auth + ADC juntos
+  - `pnpm pg:connect` — verificar gcloud CLI auth + ADC + levantar proxy + test conexión (usar PRIMERO)
   - `pnpm pg:connect:migrate` — lo anterior + ejecutar migraciones
   - `pnpm pg:connect:status` — lo anterior + mostrar estado de migraciones
   - `pnpm pg:connect:shell` — lo anterior + abrir shell SQL interactivo
