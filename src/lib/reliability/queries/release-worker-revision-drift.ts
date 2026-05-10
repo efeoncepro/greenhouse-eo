@@ -5,6 +5,7 @@ import { promisify } from 'node:util'
 
 import { captureWithDomain } from '@/lib/observability/capture'
 import { redactErrorForResponse } from '@/lib/observability/redact'
+import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import {
   buildGithubAuthHeaders,
   fetchGithubWithTimeout,
@@ -24,11 +25,24 @@ import type { ReliabilitySignal, ReliabilitySeverity } from '@/types/reliability
  * SHA del ultimo workflow run `success` correspondiente. Drift = deploy mas
  * reciente fallo silente o alguien deployo manualmente sin pasar por workflow.
  *
- * **Detector logic** (mirror del spec TASK-849 §Slice 1 §worker_revision_drift):
+ * **Detector logic** (canonical post-fix 2026-05-10):
  *   for each worker in WORKFLOWS_WITH_CLOUD_RUN_DRIFT_DETECTION:
- *     ghSha   = ultimo workflow run success → headSha
+ *     ghSha   = ultimo release manifest released|degraded.target_sha (PG SSoT
+ *               canonica TASK-848 V1.0). Fallback a workflow run success de
+ *               'Production Release Orchestrator' o del workflow individual
+ *               del worker (combinacion del mas reciente por updated_at).
  *     runSha  = Cloud Run latest ready revision env GIT_SHA
  *     drift   = ghSha !== runSha (case-insensitive 12-char prefix compare)
+ *
+ * **Por que manifest_store es SSoT y NO el workflow run conclusion**:
+ *   Caso real 2026-05-10 run 25636508367: orchestrator termino con
+ *   conclusion='cancelled' porque el job hubspot pytest fue cancelado, pero
+ *   el manifest transito state='degraded' (released con observabilidad de
+ *   issues). Workers Cloud Run SI fueron actualizados al SHA correcto. El
+ *   reader anterior (workflow run conclusion='success' filter) ignoraba el
+ *   release exitoso y reportaba falso positivo permanente. Manifest store
+ *   per TASK-848 V1.0 es la single source of truth canonica del estado del
+ *   release; workflow conclusion es derivativo y puede divergir.
  *
  * **Kind**: `drift`. Steady state esperado = 0.
  * **Severidad**: `error` cuando count > 0 (drift confirmado en >=1 worker).
@@ -85,16 +99,82 @@ const normalizeSha = (sha: string | null | undefined): string | null => {
 }
 
 /**
- * Resuelve el ultimo successful workflow run SHA via GitHub API.
- * Usa filter `branch=main` + `status=success` para limitar a deploys
- * production validados.
+ * Resuelve el SHA del ultimo release verde (released | degraded) desde el
+ * manifest store canonico TASK-848 V1.0. SSoT del estado del release —
+ * NO depende de workflow run conclusion (que puede divergir, caso real
+ * 2026-05-10 run 25636508367: orchestrator conclusion=cancelled pero
+ * manifest state=degraded por hubspot pytest cancelled downstream).
+ *
+ * Returns null si:
+ *   - PG no disponible (CLI local sin proxy o connector down) → caller
+ *     fallback a resolveLastSuccessShaFromGithub honest degradation
+ *   - Tabla vacia (no hay releases nunca) → no es drift, es initial state
  */
-const resolveLastSuccessSha = async (
+const resolveLastReleasedShaFromManifest = async (): Promise<string | null> => {
+  try {
+    const rows = await runGreenhousePostgresQuery<{ target_sha: string | null }>(`
+      SELECT target_sha
+      FROM greenhouse_sync.release_manifests
+      WHERE target_branch = 'main'
+        AND state IN ('released', 'degraded')
+      ORDER BY started_at DESC
+      LIMIT 1
+    `)
+
+    return normalizeSha(rows[0]?.target_sha ?? null)
+  } catch (error) {
+    // PG unavailable. Caller fallback to GitHub API path. NO crash.
+    captureWithDomain(error, 'cloud', {
+      tags: { source: 'worker_revision_drift', stage: 'manifest_read' },
+      extra: { error: redactErrorForResponse(error) }
+    })
+
+    return null
+  }
+}
+
+/**
+ * Fallback honest cuando PG no disponible: resuelve `ghSha` combinando dos
+ * sources de workflow runs (ambos en GitHub API, sin PG dependency):
+ *   1. Ultimo workflow run success del workflow individual del worker (push
+ *      directo a paths del worker)
+ *   2. Ultimo workflow run success del orchestrator (deploys via workflow_call)
+ *
+ * Toma el mas reciente por `updated_at`. Eso captura ambos paths canonicos
+ * de deploy (manual via push individual o coordinado via orchestrator).
+ *
+ * NOTA: Acepta tambien `conclusion='cancelled'` del orchestrator porque el
+ * caso real 2026-05-10 demostro que orchestrator puede terminar cancelled
+ * con manifest state=released/degraded (deploy real fue exitoso). El reader
+ * de manifest store es la SSoT canonica; este fallback es best-effort
+ * cuando PG down.
+ */
+const ORCHESTRATOR_WORKFLOW_NAME = 'Production Release Orchestrator'
+
+const resolveLastSuccessShaFromGithub = async (
   token: string,
   workflowName: string
 ): Promise<string | null> => {
+  const candidates = await Promise.all([
+    fetchLastSuccessRun(token, workflowName).catch(() => null),
+    fetchLastSuccessRun(token, ORCHESTRATOR_WORKFLOW_NAME).catch(() => null)
+  ])
+
+  const valid = candidates.filter((r): r is { headSha: string; updatedAt: string } => r !== null)
+
+  if (valid.length === 0) return null
+
+  // Most recent by updated_at (ISO8601 string compare safe).
+  const mostRecent = valid.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))[0]
+
+  return normalizeSha(mostRecent.headSha)
+}
+
+const fetchLastSuccessRun = async (
+  token: string,
+  workflowName: string
+): Promise<{ headSha: string; updatedAt: string } | null> => {
   const { owner, repo } = githubRepoCoords()
-  // Workflow name puede contener espacios; URL-encode necesario.
   const encodedWorkflow = encodeURIComponent(workflowName)
   const url = `https://api.github.com/repos/${owner}/${repo}/actions/workflows/${encodedWorkflow}/runs?status=success&branch=main&per_page=1`
 
@@ -103,28 +183,21 @@ const resolveLastSuccessSha = async (
   })
 
   if (response.status === 404) {
-    // Workflow no encontrado por nombre exacto. GitHub API requiere el
-    // workflow ID o el path del archivo (.github/workflows/<file>.yml).
-    // Fallback: query global runs filtrando por nombre client-side.
-    return resolveLastSuccessShaFallback(token, workflowName)
+    return fetchLastSuccessRunFallback(token, workflowName)
   }
 
-  if (!response.ok) {
-    throw new Error(
-      `GitHub API workflows/${workflowName}/runs returned ${response.status} ${response.statusText}`
-    )
-  }
+  if (!response.ok) return null
 
   const payload = (await response.json()) as GithubWorkflowRunSuccessResponse
   const lastRun = payload.workflow_runs?.[0]
 
-  return normalizeSha(lastRun?.head_sha)
+  return lastRun ? { headSha: lastRun.head_sha, updatedAt: lastRun.updated_at } : null
 }
 
-const resolveLastSuccessShaFallback = async (
+const fetchLastSuccessRunFallback = async (
   token: string,
   workflowName: string
-): Promise<string | null> => {
+): Promise<{ headSha: string; updatedAt: string } | null> => {
   const { owner, repo } = githubRepoCoords()
   const url = `https://api.github.com/repos/${owner}/${repo}/actions/runs?status=success&branch=main&per_page=50`
 
@@ -135,12 +208,40 @@ const resolveLastSuccessShaFallback = async (
   if (!response.ok) return null
 
   const payload = (await response.json()) as {
-    workflow_runs: Array<{ name: string; head_sha: string }>
+    workflow_runs: Array<{ name: string; head_sha: string; updated_at: string }>
   }
 
   const matching = payload.workflow_runs?.find((r) => r.name === workflowName)
 
-  return normalizeSha(matching?.head_sha)
+  return matching ? { headSha: matching.head_sha, updatedAt: matching.updated_at } : null
+}
+
+/**
+ * Resolver canonico end-to-end para `ghSha`:
+ *   1. PG manifest store (SSoT TASK-848 V1.0) — preferred
+ *   2. GitHub API workflow runs (fallback honest cuando PG down)
+ *
+ * Compartido per-call entre los N workers (manifest SHA es global per release,
+ * no per worker). Cache local-call para evitar N queries PG identicas.
+ */
+let manifestShaCache: { value: string | null; cached: boolean } = { value: null, cached: false }
+
+const resolveCanonicalReleaseSha = async (token: string, workflowName: string): Promise<string | null> => {
+  if (!manifestShaCache.cached) {
+    manifestShaCache = {
+      value: await resolveLastReleasedShaFromManifest(),
+      cached: true
+    }
+  }
+
+  if (manifestShaCache.value) return manifestShaCache.value
+
+  // Fallback honest a GitHub API (PG indisponible o tabla vacia).
+  return resolveLastSuccessShaFromGithub(token, workflowName)
+}
+
+const resetManifestShaCache = () => {
+  manifestShaCache = { value: null, cached: false }
 }
 
 /**
@@ -211,7 +312,7 @@ const checkWorker = async (
   const cloudRunRegion = workflow.cloudRunRegion ?? 'us-east4'
 
   const [ghSha, runSha] = await Promise.all([
-    resolveLastSuccessSha(token, workflow.workflowName).catch(() => null),
+    resolveCanonicalReleaseSha(token, workflow.workflowName).catch(() => null),
     resolveCloudRunRevisionSha(cloudRunService, cloudRunRegion)
   ])
 
@@ -272,6 +373,11 @@ const buildSummary = (records: WorkerDriftRecord[]): string => {
 }
 
 export const getReleaseWorkerRevisionDriftSignal = async (): Promise<ReliabilitySignal> => {
+  // Reset cache per-invocation. Manifest store puede haber cambiado entre
+  // ejecuciones del signal (releases concurrentes). Cache vive solo dentro
+  // de una invocacion para evitar N queries PG identicas (1 por worker).
+  resetManifestShaCache()
+
   const observedAt = new Date().toISOString()
   const token = await resolveGithubToken()
 
