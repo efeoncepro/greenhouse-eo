@@ -359,16 +359,96 @@ Si la implementacion termino pero estos items no se ejecutaron, la task sigue ab
 - [ ] se ejecuto chequeo de impacto cruzado sobre TASK-848
 - [ ] se registro evidencia de un run scheduled/manual del watchdog y su resultado
 
+## Defense-in-depth (read-only watchdog — 7-layer template adaptado)
+
+| Capa | Implementacion | Slice |
+| --- | --- | --- |
+| DB constraint | N/A para watchdog read-only. Unica tabla persistida es `release_watchdog_alert_state` (dedup), CHECK enum sobre `last_alerted_severity IN ('warning','error','critical')`. | 3 |
+| Application guard | Capability `platform.release.watchdog.read` granular para futuros admin endpoints. CLI corre con `GITHUB_TOKEN` (read-only) y SA Cloud Run viewer. | 1 |
+| UI affordance | Reusar `/admin/operations` que renderiza el reliability registry automaticamente. NO crear UI propia. | 4 |
+| Reliability signal | 3 signals separados bajo subsystem `Platform Release` (steady=0): `stale_approval`, `pending_without_jobs`, `worker_revision_drift`. | 4 |
+| Audit log | History derivable on-demand del estado GitHub Actions (append-only por default) + Cloud Run revisions (immutable). NO persistir history en V1 (YAGNI). | — |
+| Approval workflow | N/A (read-only). El watchdog recomienda accion via summary + alert; humano decide cancel/approve. | — |
+| Outbox event | NO en V1 (read-only). TASK-848 es quien emite `platform.release.* v1` en transiciones reales de release. | — |
+
+## 4-Pillar Score
+
+### Safety
+
+- **What can go wrong**: alert spam por bug en dedup; alert silencioso por bug en detector (peor — falsa sensacion de seguridad); secret leak en logs.
+- **Gates**: capability `platform.release.watchdog.read` granular; `GITHUB_TOKEN` auto-scoped (read-only por default); WIF Cloud Run con role `roles/run.viewer` (read-only); `redactSensitive` en alert payload.
+- **Blast radius si falla**: alert spam (annoying, no destructivo); alert silencioso (peor — vuelve a dejar plataforma operator-blind como el incidente original).
+- **Verified by**: tests con fixture de los 3 run IDs reales del incidente; test de dedup state (assert no spam ante misma severity); CI verifica que cada workflow nuevo de deploy productivo aparece en allowlist.
+- **Residual risk**: GitHub Actions schedule puede tener delays >30min en horarios pico GitHub. Para warning threshold 2h es OK; documentado como follow-up si emerge unreliability sostenida. **Mitigacion**: `last_alerted_at` permite detectar "deberia haber corrido hace 2h y no lo hizo" via Health endpoint dedicado en V2.
+
+### Robustness
+
+- **Idempotency**: re-correr el watchdog produce el mismo resultado. Detector es deterministico sobre estado GitHub + Cloud Run. Dedup state idempotente por `(workflow_name, run_id)`.
+- **Atomicity**: cada finding es independiente; un fallo en un finding no aborta los demas. UPSERT a `release_watchdog_alert_state` atomic per-row.
+- **Race protection**: concurrency `cancel-in-progress: true` (la ultima foto siempre gana). Sin locks PG porque cada UPSERT es por row distinto.
+- **Constraint coverage**: CHECK sobre `last_alerted_severity` enum cerrado. PK `(workflow_name, run_id)` previene duplicados.
+- **Verified by**: test fixtures con escenarios edge (misma severity = no re-alert; escalation = alert; recovery = ok alert + dedup row delete).
+
+### Resilience
+
+- **Retry policy**: detector retry bounded N=3 con backoff exponencial sobre flake GitHub/Cloud Run API. Despues de N, fail loud y publica summary indicando que el run necesita re-ejecucion.
+- **Dead letter**: N/A (no hay async queue). Findings que no logran enviarse a Teams se loggean a workflow summary y sobreviven en el run history GitHub.
+- **Reliability signal**: 3 signals separados (Slice 4).
+- **Audit trail**: GitHub Actions run history (append-only) + Cloud Run revision history (immutable) son source of truth. `release_watchdog_alert_state` es solo dedup, no audit.
+- **Recovery procedure**: runbook `production-release-watchdog.md` con decision tree por severity.
+
+### Scalability
+
+- **Hot path Big-O**: O(W × R) donde W=6 workflows en allowlist y R=runs activos por workflow (~5). Trivial.
+- **Index coverage**: PK `(workflow_name, run_id)` cubre el UPSERT path. Sin queries paginadas.
+- **Async paths**: N/A (read-only watchdog corre en su propio scheduled run).
+- **Cost at 10x**: 10x workflows (60) en allowlist sigue trivial. 10x runs activos sigue dentro de rate limit GitHub. No re-design needed.
+- **Pagination**: N/A.
+
+## Hard Rules (anti-regresion)
+
+- **NUNCA** ejecutar `gh run cancel` o `gh run approve` automaticamente en V1. El watchdog recomienda accion en alert + summary; humano decide.
+- **NUNCA** introducir signal coarse `platform.release.health` que lumpee los 3 failure modes. Greenhouse pattern (TASK-742, TASK-774, TASK-768) es 1 signal por failure mode.
+- **NUNCA** loggear payload completo de respuesta GitHub/Cloud Run sin pasar por `redactSensitive`. GitHub responses pueden incluir email del actor que dispara.
+- **NUNCA** invocar `Sentry.captureException` directo. Usar `captureWithDomain(err, 'cloud', { tags: { source: 'release_watchdog', stage: '<...>' } })`.
+- **NUNCA** crear endpoint admin `/api/admin/release-watchdog/*` en V1. Out of scope; el watchdog corre solo en GitHub Actions + CLI local.
+- **NUNCA** persistir history de findings en PG en V1. YAGNI hasta que TASK-848 manifest exista. La derivacion on-demand es suficiente para forensic.
+- **NUNCA** alertar Slack ni cualquier canal que no sea Teams via helper canonico. Greenhouse opera en Teams.
+- **NUNCA** reimplementar los 3 readers shared en TASK-848 si TASK-849 ya los creo. Reuse explicito en TASK-848 Slice 7.
+- **NUNCA** comparar worker revision drift contra `main` HEAD (ruido — main HEAD puede tener commits que no tocaron worker paths). Comparar contra ultimo workflow run `success`.
+- **SIEMPRE** que emerja un workflow nuevo de deploy productivo, agregarlo a `releaseDeployWorkflowAllowlist` ANTES del primer deploy. CI gate (TASK derivada V2) puede automatizar este check.
+- **SIEMPRE** que el detector cambie su contract JSON output, bumpear version + actualizar consumer en TASK-848 preflight.
+- **SIEMPRE** documentar en runbook el comando exacto de remediacion para cada severity. Operator no debe improvisar bajo presion.
+
 ## Follow-ups
 
-- TASK-848 debe reutilizar este detector como preflight y puede absorber el workflow scheduled si consolida el release control plane.
-- Si hay falsos positivos por rate limit o GitHub API flake, crear task de signal tuning; no relajar el umbral sin evidencia.
+- **TASK-848 Slice 7 reuse explicito** (mandatory): TASK-848 debe reusar los 3 readers de `src/lib/reliability/queries/release-*.ts` sin reimplementar. Si TASK-848 inicia antes que TASK-849, los 3 readers se crean alli y TASK-849 solo agrega cron + alerting.
+- **CI gate workflow allowlist** (TASK derivada V2): cuando emerja un workflow nuevo en `.github/workflows/*-deploy.yml` con `environment: production`, CI verifica que aparezca en `releaseDeployWorkflowAllowlist`. Sin esto, un workflow nuevo queda invisible al watchdog.
+- **GitHub Actions schedule reliability monitor** (TASK derivada conditional): si el watchdog se salta runs por delay >30min sostenido, agregar Health endpoint que expone `time_since_last_run` desde un row PG `release_watchdog_health_pulse`. Activacion: 5+ skipped runs en 7 dias observados.
+- **Migracion a Cloud Scheduler + ops-worker** (TASK derivada conditional): si GitHub Actions reliability resulta inadecuada y el caso se vuelve infrastructure-critical, migrar el detector a Cloud Scheduler invocando endpoint en ops-worker (patron canonico Cloud Run). NO hacer en V1.
+- **Signal tuning** (TASK derivada conditional): si los 3 signals producen falsos positivos por rate limit o flake API, crear task de tuning. NO relajar el umbral sin evidencia.
+- **Absorption por TASK-848** (deliberada): si TASK-848 se materializa V2, el cron scheduled de TASK-849 se puede absorber dentro del control plane (mismo runtime, mismo ops-worker). El CLI sigue util como pre-release check local. Decidir en cierre de TASK-848 V2.
 
 ## Delta 2026-05-10
 
 Task creada a partir del hallazgo de que el canal productivo de deploy de workers llevaba 14-22 dias bloqueado sin alerta visible.
 
+## Delta 2026-05-09 — Refinamiento arquitectonico (arch-architect)
+
+Aplicado contra el spec original:
+
+- **Architecture Alignment**: declaradas relaciones cross-task con TASK-848 (TASK-849 first implementer de los 3 readers shared); declarado canal canonico Teams (NO Slack); declarado hosting GitHub Actions schedule (NO Vercel cron, NO Cloud Scheduler) con justificacion.
+- **Slice 1**: cerrada Open Question worker_revision_drift baseline → ultimo workflow run `success` SHA por worker (NO main HEAD, NO TASK-848 manifest). Sub-task implementacion: cada worker emite `GIT_SHA` env var. Helper canonico `severity-resolver.ts`. Rate budget documentado.
+- **Slice 2**: justificado hosting (`tooling` cron classification, NO async-critical); declarado residual risk de GitHub Actions schedule reliability con fallback path.
+- **Slice 3**: cerrada Open Question canal alerta → Teams via `pnpm teams:announce` o equivalente Bot Framework Connector. Dedup state via tabla `greenhouse_ops.release_watchdog_alert_state`. Degradacion graceful si secret no disponible.
+- **Files owned**: separados los 3 readers shared con TASK-848; agregados helpers canonicos `github-api.ts`, `severity-resolver.ts`, `alert-dedup.ts` para evitar reimplementacion.
+- **Out of Scope** ampliado: NO outbox V1, NO UI nueva, NO PG history V1, NO Slack, NO endpoint admin V1.
+- **Acceptance Criteria** reorganizado en 7 secciones tematicas con criterio explicito de no-reproducibilidad del incidente 14-22 dias.
+- Agregadas secciones **Defense-in-depth (7-layer adaptado read-only)**, **4-Pillar Score**, **Hard Rules**.
+- Cerradas las 2 Open Questions originales.
+- Agregados 6 follow-ups conditional con criterios de activacion.
+
 ## Open Questions
 
-- Definir canal final de alerta: Slack, Teams, o ambos. Si ambos existen, Slack/ops-alerts primero y Teams como follow-up.
-- Confirmar si `worker_revision_drift` V1 debe comparar contra `main` HEAD, ultimo manifest de TASK-848 o ultimo successful worker deploy hasta que exista manifest canonico.
+- Confirmar si el destination `production-release-alerts` en `src/config/manual-teams-announcements.ts` apunta a un chat ops existente o requiere provisionar uno nuevo en Teams (decision operativa, no arquitectonica).
+- Confirmar timing relativo TASK-848 vs TASK-849: si TASK-848 inicia primero, TASK-849 reduce scope a solo cron + alerting (los 3 readers se crean en TASK-848). Si TASK-849 inicia primero, los 3 readers viven aqui y TASK-848 los reusa. La decision es operativa, no arquitectonica.
