@@ -61,7 +61,7 @@ interface GithubJobsResponse {
   jobs: Array<{ id: number; status: string }>
 }
 
-interface PendingWithoutJobsRecord {
+export interface PendingWithoutJobsRecord {
   runId: number
   workflowName: string
   status: string
@@ -73,7 +73,12 @@ interface PendingWithoutJobsRecord {
 
 const RELEVANT_STATUSES = new Set(['queued', 'pending', 'in_progress'])
 
-const listPendingRuns = async (
+/**
+ * Lista runs en estados queued/in_progress con `jobs.length === 0` y edad
+ * superior a 5 min. Helper publico desde TASK-850 Slice 3 — el preflight CLI
+ * lo consume directo en lugar de re-implementar la query.
+ */
+export const listPendingRuns = async (
   token: string
 ): Promise<PendingWithoutJobsRecord[]> => {
   const records: PendingWithoutJobsRecord[] = []

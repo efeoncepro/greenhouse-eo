@@ -65,7 +65,7 @@ interface GithubPendingDeployment {
   reviewers: Array<{ type: string; reviewer: { login?: string; name?: string } }>
 }
 
-interface StaleApprovalRecord {
+export interface StaleApprovalRecord {
   runId: number
   workflowName: string
   ageMs: number
@@ -74,7 +74,13 @@ interface StaleApprovalRecord {
   sha: string
 }
 
-const listWaitingProductionRuns = async (
+/**
+ * Lista runs con `status=waiting` para Production environment cuya edad
+ * exceda el threshold de warning (24h). Helper publico desde TASK-850
+ * Slice 3 — el preflight CLI lo consume directo en lugar de re-implementar
+ * la query.
+ */
+export const listWaitingProductionRuns = async (
   token: string
 ): Promise<StaleApprovalRecord[]> => {
   const { owner, repo } = githubRepoCoords()
