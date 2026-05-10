@@ -43,9 +43,21 @@ on:
           - staging
           - production
 
+# TASK-848 Slice 3 (Opcion A) — concurrency fix canonica para production.
+#
+# Bug class historico (incidente 2026-04-26 -> 2026-05-09): runs antiguos de
+# `main` esperando approval del environment `Production` quedaron `waiting`
+# durante 14-22 dias. Pushes nuevos al mismo concurrency group quedaron
+# `pending` con `jobs: []` y se cancelaron en cascada.
+#
+# Fix: cancel-in-progress=TRUE solo para production path (push:main o
+# workflow_dispatch con environment=production). Staging preserva
+# cancel-in-progress=false para no disrumpir in-flight QA.
+#
+# Spec: docs/architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md §2.7
 concurrency:
   group: ops-worker-deploy-${{ github.ref }}
-  cancel-in-progress: false
+  cancel-in-progress: ${{ (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production') || github.ref == 'refs/heads/main' }}
 
 permissions:
   contents: read
