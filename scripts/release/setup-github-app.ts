@@ -45,12 +45,16 @@ const GCP_PROJECT_ID = 'efeonce-group'
 const GCP_SECRET_NAME = 'greenhouse-github-app-private-key'
 const VERCEL_ENV_TARGET = 'production'
 
+/**
+ * NOTE: omitir `hook_attributes` por completo (NO `{active: false}`).
+ * GitHub valida `hook_attributes.url` si el campo `hook_attributes` esta
+ * presente, aunque `active=false`. Sin `hook_attributes`, el App se crea
+ * sin webhook y sin requerir url. Watchdog es read-only puro, no necesita
+ * webhooks.
+ */
 const APP_MANIFEST = {
   name: APP_NAME,
   url: 'https://greenhouse.efeoncepro.com',
-  hook_attributes: {
-    active: false
-  },
   redirect_url: CALLBACK_URL,
   callback_urls: [CALLBACK_URL],
   public: false,
@@ -87,43 +91,59 @@ const openBrowser = async (url: string): Promise<void> => {
   })
 }
 
-const captureCallback = (): Promise<string> =>
+/**
+ * Single HTTP server que maneja AMBOS:
+ *   - GET /start    → sirve manifest form HTML que auto-POST a GitHub
+ *   - GET /callback → recibe el `?code=` de GitHub post-approval
+ *
+ * Race condition fix: NO cerrar el server entre /start y /callback.
+ * Single server, single lifecycle.
+ */
+const startCallbackServer = (manifestForm: string): Promise<string> =>
   new Promise((resolve, reject) => {
     const server = createServer((req: IncomingMessage, res: ServerResponse) => {
       try {
         const url = new URL(req.url ?? '', `http://localhost:${CALLBACK_PORT}`)
 
-        if (url.pathname !== '/callback') {
-          res.writeHead(404).end('Not Found')
+        if (url.pathname === '/start') {
+          res
+            .writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' })
+            .end(manifestForm)
 
           return
         }
 
-        const code = url.searchParams.get('code')
+        if (url.pathname === '/callback') {
+          const code = url.searchParams.get('code')
 
-        if (!code) {
-          res.writeHead(400).end('Missing ?code parameter')
+          if (!code) {
+            res.writeHead(400).end('Missing ?code parameter')
+
+            return
+          }
+
+          res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' }).end(`
+            <!DOCTYPE html>
+            <html><body style="font-family: system-ui; padding: 40px; max-width: 600px">
+              <h1>✅ GitHub App created</h1>
+              <p>Code received. Returning to CLI...</p>
+              <p style="color: #666">You can close this tab.</p>
+            </body></html>
+          `)
+
+          server.close(() => resolve(code))
 
           return
         }
 
-        res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' }).end(`
-          <!DOCTYPE html>
-          <html><body style="font-family: system-ui; padding: 40px; max-width: 600px">
-            <h1>✅ GitHub App created</h1>
-            <p>Code received. Returning to CLI...</p>
-            <p style="color: #666">You can close this tab.</p>
-          </body></html>
-        `)
-
-        server.close(() => resolve(code))
+        res.writeHead(404).end('Not Found')
       } catch (error) {
         reject(error)
       }
     })
 
     server.listen(CALLBACK_PORT, () => {
-      console.log(`[callback-server] Listening on http://localhost:${CALLBACK_PORT}/callback`)
+      console.log(`[server] Listening on http://localhost:${CALLBACK_PORT} (paths: /start, /callback)`)
     })
 
     server.on('error', reject)
@@ -233,30 +253,19 @@ const main = async (): Promise<void> => {
     </html>
   `
 
-  // Spin up local HTTP server to serve the manifest form (GitHub requires POST)
-  const manifestServer = createServer((req, res) => {
-    if (req.url === '/start') {
-      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' }).end(manifestForm)
+  // Single server canonico — handles AMBOS /start (form) y /callback (code).
+  // NO race conditions cerrando/abriendo servers entre paths.
+  const codePromise = startCallbackServer(manifestForm)
 
-      return
-    }
+  // Espera ~500ms para que el server este listo antes de abrir browser.
+  await new Promise<void>((resolve) => setTimeout(resolve, 500))
 
-    res.writeHead(404).end()
-  })
-
-  await new Promise<void>((resolve) => manifestServer.listen(CALLBACK_PORT, resolve))
-
-  // Open the manifest form in browser
   await openBrowser(`http://localhost:${CALLBACK_PORT}/start`)
 
   console.log('\n⏳ Waiting for you to approve manifest in browser (timeout 10min)...')
   console.log('   Click "Create GitHub App for efeoncepro" in the browser tab.')
 
-  // Wait a moment then close manifest server, switch to callback server.
-  // Actually we can reuse — let's restart with callback handler.
-  await new Promise<void>((resolve) => manifestServer.close(() => resolve()))
-
-  const code = await captureCallback()
+  const code = await codePromise
 
   console.log(`\n[callback] Got code: ${code.slice(0, 12)}...`)
 
@@ -289,9 +298,13 @@ const main = async (): Promise<void> => {
   console.log('\n=== Step 4: Resolve installation_id ===')
   console.log('Listing installations of the new app...')
 
-  // Mint JWT to query as the app
-  const { SignJWT, importPKCS8 } = await import('jose')
-  const privateKey = await importPKCS8(conversion.pem, 'RS256')
+  // Mint JWT to query as the app.
+  // GitHub returns PKCS#1 PEM (-----BEGIN RSA PRIVATE KEY-----), not PKCS#8.
+  // crypto.createPrivateKey auto-detecta ambos formatos y devuelve KeyObject
+  // compatible con jose's SignJWT.sign(KeyLike).
+  const { SignJWT } = await import('jose')
+  const { createPrivateKey } = await import('node:crypto')
+  const privateKey = createPrivateKey(conversion.pem)
   const nowSec = Math.floor(Date.now() / 1000)
 
   const appJwt = await new SignJWT({})

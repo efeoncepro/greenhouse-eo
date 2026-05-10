@@ -1,6 +1,8 @@
 import 'server-only'
 
-import { SignJWT, importPKCS8 } from 'jose'
+import { createPrivateKey } from 'node:crypto'
+
+import { SignJWT } from 'jose'
 
 import { captureWithDomain } from '@/lib/observability/capture'
 import { resolveSecretByRef } from '@/lib/secrets/secret-manager'
@@ -75,10 +77,11 @@ export const isGithubAppConfigured = (): boolean => {
  * JWT vive solo 9 minutos (max permitido por GitHub: 10 min). Despues
  * lo usamos para mintar el installation token (1h).
  *
- * Algoritmo: RS256 con private key PEM (PKCS8) del App.
+ * Algoritmo: RS256 con private key PEM (PKCS#1 o PKCS#8 — GitHub Apps
+ * emiten PKCS#1 por default; `crypto.createPrivateKey` auto-detecta).
  */
 const mintAppJwt = async (appId: string, privateKeyPem: string): Promise<string> => {
-  const privateKey = await importPKCS8(privateKeyPem, 'RS256')
+  const privateKey = createPrivateKey(privateKeyPem)
   const nowSec = Math.floor(Date.now() / 1000)
 
   // GitHub recomienda iat 60s en el pasado para clock skew tolerance.
