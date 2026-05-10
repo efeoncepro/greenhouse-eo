@@ -829,6 +829,28 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     module: 'platform',
     actions: ['read'] as const,
     defaultScope: 'all'
+  },
+  // TASK-850 — Production Preflight CLI: 3 sub-capabilities granulares.
+  // Mismo patron least-privilege que TASK-848 — NO reusar `platform.release.execute`
+  // (preflight es validation read-mostly; execute es write-mostly de release).
+  // Override es break-glass: EFEONCE_ADMIN solo, requiere reason audit.
+  {
+    key: 'platform.release.preflight.execute',
+    module: 'platform',
+    actions: ['execute'] as const,
+    defaultScope: 'all'
+  },
+  {
+    key: 'platform.release.preflight.read_results',
+    module: 'platform',
+    actions: ['read'] as const,
+    defaultScope: 'all'
+  },
+  {
+    key: 'platform.release.preflight.override_batch_policy',
+    module: 'platform',
+    actions: ['update'] as const,
+    defaultScope: 'all'
   }
 ] as const
 
