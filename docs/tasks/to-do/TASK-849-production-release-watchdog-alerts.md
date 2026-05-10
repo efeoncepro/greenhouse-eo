@@ -182,11 +182,18 @@ Reglas obligatorias:
 
 - Crear `.github/workflows/production-release-watchdog.yml`.
 - Trigger:
-  - `schedule` cada 30 minutos.
+  - `schedule: '*/30 * * * *'` (cada 30 min — granularity acceptable para warning threshold de 2h).
   - `workflow_dispatch`.
-- Ejecutar detector con `GITHUB_TOKEN`.
+- Ejecutar detector con `GITHUB_TOKEN` auto-provisto + WIF a GCP para query Cloud Run revisions (read-only, capability `roles/run.viewer`).
 - Fallar el workflow si existe severity `error` o `critical`.
-- Publicar summary con run IDs y comandos exactos sugeridos (`gh run cancel <id>`), sin ejecutar cancel automaticamente.
+- Publicar summary con run IDs y comandos exactos sugeridos (`gh run cancel <id>`, `gh run view <id> --web`), sin ejecutar cancel automaticamente.
+- Concurrency: `group: production-release-watchdog`, `cancel-in-progress: true` (si llega un run nuevo, cancela el anterior — el ultimo siempre tiene la foto fresh).
+- Permissions minimas: `contents: read`, `actions: read`, `id-token: write` (para WIF GCP).
+- **Justificacion del hosting GitHub Actions schedule** (NO Vercel cron, NO Cloud Scheduler):
+  - El detector consume **GitHub Actions API** principalmente. Ejecutar dentro de GitHub Actions evita roundtrips cross-cloud para auth (GITHUB_TOKEN auto-provisto).
+  - Es **tooling/monitoring read-only**, no async-critical (clasificacion `tooling` segun `GREENHOUSE_VERCEL_CRON_CLASSIFICATION_V1.md`). NO necesita Cloud Scheduler.
+  - Vercel cron tampoco aplica: necesita acceso a GitHub API + Cloud Run API, ambos tienen mejor auth desde GitHub Actions runner.
+  - **Residual risk conocido**: GitHub Actions schedule puede tener delays de hasta 1h, especialmente en horarios pico GitHub. Para threshold warning 2h es OK; si emerge unreliability sostenida, fallback es cron Vercel `/api/cron/release-watchdog` (categoria `tooling`) o Cloud Scheduler invocando un endpoint Cloud Run. Documentado en Follow-ups.
 
 ### Slice 3 — Alerting Teams (canal canonico)
 
@@ -242,6 +249,12 @@ Reglas obligatorias:
 - No aprobar ni cancelar deploys productivos automaticamente en V1.
 - No crear dashboard `/admin/releases`; eso vive en TASK-848 o task derivada.
 - No modificar Cloud Run services salvo verificacion read-only.
+- No emitir outbox events (`platform.release.*`) en V1 — es read-only watchdog. Outbox events viven en TASK-848 que mutea estado de release real.
+- No persistir history de observations watchdog en PG en V1 (YAGNI). Solo se persiste el `release_watchdog_alert_state` minimo para dedup. History queda derivable on-demand del estado GitHub Actions + Cloud Run hasta que TASK-848 manifest exista.
+- No crear UI propia. Reusar `/admin/operations` existente que renderiza el reliability registry automaticamente.
+- No agregar Slack ni cualquier otro canal de alerta. Teams es canonico (CLAUDE.md).
+- No modificar el modelo de `concurrency` ni `cancel-in-progress` de los workflows de workers; eso es scope de TASK-848 Slice 3.
+- No introducir secret nuevo si el del Teams Bot ya esta provisionado para uso por GitHub Actions runner. Si no esta, degradar a `console.log` + workflow summary; NO crashear.
 
 ## Detailed Spec
 
@@ -280,14 +293,49 @@ Tests deben cubrir los tres blockers reales:
 
 ## Acceptance Criteria
 
-- [ ] Existe CLI reusable que detecta stale approvals de `Production`.
-- [ ] Existe workflow scheduled cada 30 minutos + manual dispatch.
+### Detector + workflow
+
+- [ ] Existe CLI reusable `scripts/release/production-release-watchdog.ts` que detecta stale approvals de `Production`, pending-without-jobs y worker revision drift.
+- [ ] Existe `production-release-watchdog.yml` con `schedule: '*/30 * * * *'` + `workflow_dispatch`, concurrency `cancel-in-progress: true`.
 - [ ] El workflow falla en severity `error` o `critical`.
-- [ ] Las alertas Slack/Teams incluyen run ID, workflow, branch/SHA, edad y accion recomendada.
-- [ ] Ops Health/Reliability expone `platform.release.stale_approval`, `platform.release.pending_without_jobs` y `platform.release.worker_revision_drift`.
-- [ ] El caso real de 14-22 dias queda cubierto por tests con fixtures.
-- [ ] El check puede ejecutarse localmente antes de release y como gate reutilizable por TASK-848.
-- [ ] Runbook operativo versionado explica como remediar sin improvisar.
+- [ ] Detector consulta GitHub API + Cloud Run revisions; rate budget < 100 req/run.
+- [ ] **El escenario observado 2026-04-26 → 2026-05-09 (3 runs `waiting` por 14-22 dias sin alerta) NO puede volver a ocurrir sin que el watchdog emita alerta dentro de 30 min de cruzar el threshold critical.** Test fixture cubre los 3 run IDs reales.
+
+### Reliability signals
+
+- [ ] Ops Health/Reliability expone los 3 signals separados: `platform.release.stale_approval`, `platform.release.pending_without_jobs`, `platform.release.worker_revision_drift`.
+- [ ] Steady state = 0 para los 3.
+- [ ] Subsystem rollup `Platform Release` (compartido con TASK-848 Slice 7).
+- [ ] Los 3 readers viven en `src/lib/reliability/queries/` y son consumibles por TASK-848 sin modificacion.
+
+### Worker revision drift baseline
+
+- [ ] Cada worker (`ops-worker`, `commercial-cost-worker`, `ico-batch`) emite `GIT_SHA` env var o label `commit_sha=<sha>` en su revision Cloud Run (sub-task implementacion incluida en Slice 1).
+- [ ] Detector compara contra ultimo workflow run `success` SHA (NO main HEAD, NO TASK-848 manifest).
+
+### Alerting
+
+- [ ] Alertas Teams incluyen run ID, URL, workflow, branch/SHA, edad, severity, accion recomendada, kind.
+- [ ] Dedup state via `greenhouse_ops.release_watchdog_alert_state` impide spam: solo alerta por escalation o daily reminder.
+- [ ] Cuando blocker se resuelve, se envia alert `severity=ok` y se borra row dedup.
+- [ ] Si secret Teams Bot no esta disponible, degrada a console + summary sin crashear.
+
+### Reusabilidad por TASK-848
+
+- [ ] `pnpm release:watchdog` ejecutable localmente como pre-release check.
+- [ ] CLI documenta su contract JSON estable (consumible por preflight de TASK-848).
+- [ ] Helpers `severity-resolver.ts`, `github-api.ts`, `alert-dedup.ts` viven en `src/lib/release-watchdog/` y NO se duplican en TASK-848.
+
+### Docs + closeout
+
+- [ ] Runbook `docs/operations/runbooks/production-release-watchdog.md` con interpretacion de severities, comandos remediacion, escalation.
+- [ ] `Handoff.md` + `changelog.md` + `docs/tasks/README.md` + `TASK_ID_REGISTRY.md` actualizados.
+- [ ] Chequeo de impacto cruzado sobre TASK-848 ejecutado: confirmar que los 3 readers shared estan en path canonico, que TASK-848 Slice 7 declara reuse explicito.
+
+### Seguridad
+
+- [ ] No se imprimen tokens, secrets ni payload sensible en logs/summaries/alertas. `redactSensitive` aplicado.
+- [ ] Capability `platform.release.watchdog.read` granular (NO reusar `platform.admin`) para query del CLI desde admin endpoints futuros.
 
 ## Verification
 
