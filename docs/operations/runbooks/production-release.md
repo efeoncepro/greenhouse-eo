@@ -399,6 +399,7 @@ Visitar [`/admin/operations`](https://greenhouse.efeoncepro.com/admin/operations
 | `platform.release.pending_without_jobs` | 0 | Runs en queued/in_progress > 5min con jobs:[] |
 | `platform.release.deploy_duration_p95` (V1.1) | <30min | p95 release > 30min sostenido |
 | `platform.release.last_status` (V1.1) | `released` | Último release `degraded\|aborted\|rolled_back` |
+| `platform.release.github_webhook_unmatched` (V1.2) | 0 | Webhooks GitHub release `unmatched`/`failed` en 24h |
 
 Si **stale_approval** o **pending_without_jobs** > 0:
 1. `gh run list --status waiting --status queued` para identificar runs
@@ -422,6 +423,24 @@ Si no se configura, los signals quedan en `severity='unknown'` con summary expli
 
 Verificar y documentar en Sec 2.1.
 
+### 9.3. GitHub release webhook
+
+Configurar un repository webhook en `efeoncepro/greenhouse-eo`:
+
+- Payload URL: `https://greenhouse.efeoncepro.com/api/webhooks/github/release-events`
+- Content type: `application/json`
+- Secret: mismo valor que `GITHUB_RELEASE_WEBHOOK_SECRET` en Vercel/Secret Manager.
+- Events: `workflow_run`, `workflow_job`, `deployment_status`, `check_suite`, `check_run`.
+- Active: enabled.
+
+Validación operativa:
+
+```bash
+pnpm pg:connect -- -c "SELECT processing_status, count(*) FROM greenhouse_sync.github_release_webhook_events WHERE received_at >= now() - interval '24 hours' GROUP BY 1"
+```
+
+Regla: `unmatched` debe investigarse, pero no muta releases. `failed` sí es incidente de ingestion/reconciliation porque GitHub va a reintentar y puede bloquear evidencia near-real-time.
+
 ## 10. Hard rules (anti-regresión)
 
 - **NUNCA** aprobar runs production "waiting" > 24h. Cancelar primero.
@@ -436,6 +455,7 @@ Verificar y documentar en Sec 2.1.
 - Spec: [GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md](../../architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md)
 - Tabla: `greenhouse_sync.release_manifests` (manifest persistido)
 - Tabla: `greenhouse_sync.release_state_transitions` (audit append-only)
+- Tabla: `greenhouse_sync.github_release_webhook_events` (ledger GitHub release webhooks redacted)
 - CLI: [scripts/release/production-rollback.ts](../../../scripts/release/production-rollback.ts)
 - Reliability: [src/lib/reliability/queries/release-stale-approval.ts](../../../src/lib/reliability/queries/release-stale-approval.ts), [release-pending-without-jobs.ts](../../../src/lib/reliability/queries/release-pending-without-jobs.ts)
 - Workflows fix Opcion A: `.github/workflows/{ops-worker,commercial-cost-worker,ico-batch}-deploy.yml`

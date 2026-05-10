@@ -4,7 +4,22 @@
 > **Owners:** Platform / DevOps
 > **Source task:** TASK-848
 > **Replaces:** N/A (no formal release contract pre-2026-05-10; lived as tribal knowledge in `Handoff.md`)
-> **Related:** TASK-849 (Production Release Watchdog Alerts), TASK-742 (Auth Resilience 7-layer), TASK-765 (payment_orders state machine), TASK-773 (outbox publisher cutover)
+> **Related:** TASK-849 (Production Release Watchdog Alerts), TASK-857 (GitHub Webhooks Release Event Ingestion), TASK-742 (Auth Resilience 7-layer), TASK-765 (payment_orders state machine), TASK-773 (outbox publisher cutover)
+
+## Delta 2026-05-10 — GitHub webhook ingestion V1.2 (TASK-857)
+
+`TASK-857` agrega near-real-time evidence desde GitHub sin cambiar el source of truth del release:
+
+- **Source of truth sigue siendo Postgres**: `greenhouse_sync.release_manifests` y `release_state_transitions` gobiernan lifecycle, audit y rollback.
+- **GitHub webhook es evidencia firmada, no estado primario**: `POST /api/webhooks/github/release-events` valida `X-Hub-Signature-256` antes de parsear/persistir.
+- **Dedupe canónico**: `X-GitHub-Delivery` se guarda como `github:<delivery_id>` en `webhook_inbox_events`.
+- **Ledger normalizado**: `greenhouse_sync.github_release_webhook_events` guarda delivery/event/workflow/sha/status/conclusion redacted, match result, transition result y evidence JSON.
+- **Reconciliación segura**: match primario por `target_sha`; fallback por `workflow_run_id` en `workflow_runs`. Si no hay match verificable, queda `unmatched` y no crea ni muta manifests.
+- **Transiciones acotadas**: solo eventos de falla de workflows allowlisted pueden mover estado, y únicamente si `assertValidReleaseStateTransition` lo permite (`ready|deploying -> aborted`, `verifying -> degraded`). Eventos exitosos se registran como `matched`; no declaran `released`.
+- **Watchdog permanece activo**: TASK-849 sigue siendo backstop scheduled. El webhook reduce latencia, no reemplaza la verificación periódica.
+- **Sin outbox nuevo en V1.2**: las transiciones siguen emitiendo los 7 `platform.release.*` existentes. Los eventos GitHub recibidos no emiten outbox propio hasta que exista un consumer real.
+
+Steady state: `platform.release.github_webhook_unmatched = ok` con `0 unmatched / 0 failed` en 24h.
 
 ## 1. Why this exists
 
@@ -133,7 +148,7 @@ Staging preserva `cancel-in-progress: false` (no disruption a in-flight QA).
 
 **Why Azure manual V1**: Bicep templates pueden incluir destructive operations (e.g. `delete-on-deletion`, federated credential rotation, App Service config reset). Automatizar reapply sin demostrar idempotencia es safety violation. Queda como follow-up V2 condicional con dry-run validation.
 
-### 2.9. 4 reliability signals separados (NO single coarse)
+### 2.9. 5 reliability signals separados (NO single coarse)
 
 Greenhouse pattern (TASK-742, TASK-774, TASK-768): 1 signal por failure mode, steady=0, severity diferenciada. Reemplaza el single coarse `platform.release.pipeline_health`.
 
@@ -143,8 +158,9 @@ Greenhouse pattern (TASK-742, TASK-774, TASK-768): 1 signal por failure mode, st
 | `platform.release.pending_without_jobs` | `drift` | error si count >0 sostenido >5min | 0 | `release-pending-without-jobs.ts` |
 | `platform.release.deploy_duration_p95` | `lag` | warning si p95 >30min, error si >60min | variable | `release-deploy-duration.ts` (V1.1) |
 | `platform.release.last_status` | `drift` | error si ultimo release `degraded\|aborted\|rolled_back` <24h, warning 24h-7d | `released` | `release-last-status.ts` (V1.1) |
+| `platform.release.github_webhook_unmatched` | `drift` | error si `failed > 0`, warning si `unmatched > 0` en 24h | 0 | `release-github-webhook-unmatched.ts` (V1.2) |
 
-V1 ship: stale_approval + pending_without_jobs (los 2 detectores del incidente historico). deploy_duration_p95 + last_status defer a V1.1 cuando exista release_manifests data populated (chicken/egg).
+V1 ship: stale_approval + pending_without_jobs (los 2 detectores del incidente historico). V1.1 completo: deploy_duration_p95 + last_status. V1.2: github_webhook_unmatched para evidencia near-real-time.
 
 ## 3. Outbox events versionados v1
 
@@ -212,6 +228,8 @@ Ningun evento dispara side effect automatico sobre cloud (Vercel/Cloud Run/Azure
 - **NUNCA** invocar `Sentry.captureException` directo. Usar `captureWithDomain(err, 'cloud', { tags: { source: 'production_release' }})`.
 - **NUNCA** rollback automatizado de Azure config/Bicep en V1. Manual gated en runbook.
 - **NUNCA** crear tabla nueva paralela a `release_manifests` (extender, no parallelizar).
+- **NUNCA** usar GitHub webhook como source of truth del release. Solo puede reconciliar contra `release_manifests` existente.
+- **NUNCA** persistir raw GitHub payload completo en esta ruta; guardar metadata redacted + evidence suficiente.
 - **NUNCA** mezclar dimensiones en state machine: `state` = lifecycle del release; outcome de cada step (Vercel ok, worker ok, Azure ok) vive en `post_release_health JSONB`.
 - **SIEMPRE** que un release entre `state IN ('degraded','aborted','rolled_back')`, escalar via outbox event + reliability signal `platform.release.last_status` (V1.1).
 - **SIEMPRE** que emerja un workflow nuevo de deploy production, agregarlo al `releaseDeployWorkflowAllowlist` del detector (V1.1) + verificacion WIF subject + gating del orquestador.
