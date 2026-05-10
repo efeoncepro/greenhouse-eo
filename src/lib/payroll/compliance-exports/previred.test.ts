@@ -101,6 +101,23 @@ describe('Previred compliance export', () => {
     expect(fields[101]).toBe('28800')
   })
 
+  it('splits Isapre pactada, obligatoria and adicional into the official health fields', () => {
+    const fields = buildPreviredRow(snapshot(), baseEntry({
+      chileHealthSystem: 'isapre',
+      chileHealthAmount: 162475,
+      chileHealthObligatoriaAmount: 47220,
+      chileHealthVoluntariaAmount: 115255,
+      previredHealthInstitutionCode: '04'
+    })).split(';')
+
+    expect(fields[74]).toBe('04')
+    expect(fields[76]).toBe('1200000')
+    expect(fields[77]).toBe('1')
+    expect(fields[78]).toBe('162475')
+    expect(fields[79]).toBe('47220')
+    expect(fields[80]).toBe('115255')
+  })
+
   it('keeps Previred totals aligned with the canonical seven-component helper', () => {
     const artifact = buildPreviredPlanillaArtifact(snapshot())
 
