@@ -2,6 +2,21 @@
 
 Catalogo canonico de eventos del sistema de outbox de Greenhouse. Cada evento se registra en `greenhouse_sync.outbox_events` y se publica a BigQuery via el consumer `outbox-publish`.
 
+## Delta 2026-05-10 — TASK-812: Payroll compliance export artifacts (2 events v1)
+
+Aggregate type: `payroll_compliance_export_artifact`.
+
+| Event Type | Disparado por | Payload v1 contract | Consumers |
+|---|---|---|---|
+| `payroll.export.previred_generated` | `GET /api/hr/payroll/periods/:periodId/export/previred` cuando el artefacto pasa validacion y se registra en `greenhouse_payroll.compliance_export_artifacts` | `{schemaVersion:1, artifactId, periodId, exportKind:'previred', specVersion, sourceSnapshotHash, artifactSha256, recordCount, validationStatus}` | Auditoria, Reliability drift, futuros workflows de upload/rectification |
+| `payroll.export.lre_generated` | `GET /api/hr/payroll/periods/:periodId/export/lre` cuando el artefacto pasa validacion y se registra en `greenhouse_payroll.compliance_export_artifacts` | `{schemaVersion:1, artifactId, periodId, exportKind:'lre', specVersion, sourceSnapshotHash, artifactSha256, recordCount, validationStatus}` | Auditoria, Reliability drift, futuros workflows de upload/rectification |
+
+Reglas duras:
+
+- Los eventos se emiten solo despues de insertar metadata del artefacto en la misma transaccion.
+- Los payloads no incluyen RUT ni contenido del archivo. RUT se accede via snapshot auditado de Person Legal Profile.
+- V1 no marca upload externo ni rectificacion; esos estados viven como follow-up sobre `declared_status`.
+
 ## Delta 2026-05-09 — TASK-836: Service lifecycle granular (1 event v1 nuevo)
 
 Aggregate type: `service_engagement`.

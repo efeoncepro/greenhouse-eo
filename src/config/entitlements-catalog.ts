@@ -167,6 +167,20 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     defaultScope: 'tenant'
   },
   {
+    // TASK-812 — generar artefacto Previred auditado desde payroll cerrado.
+    key: 'hr.payroll.export_previred',
+    module: 'hr',
+    actions: ['export'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    // TASK-812 — generar artefacto LRE auditado desde payroll cerrado.
+    key: 'hr.payroll.export_lre',
+    module: 'hr',
+    actions: ['export'] as const,
+    defaultScope: 'tenant'
+  },
+  {
     key: 'finance.workspace',
     module: 'finance',
     actions: ['read', 'launch'] as const,

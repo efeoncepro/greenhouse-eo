@@ -226,6 +226,22 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       source
     })
 
+    addEntitlement(entries, {
+      module: 'hr',
+      capability: 'hr.payroll.export_previred',
+      action: 'export',
+      scope: 'tenant',
+      source
+    })
+
+    addEntitlement(entries, {
+      module: 'hr',
+      capability: 'hr.payroll.export_lre',
+      action: 'export',
+      scope: 'tenant',
+      source
+    })
+
     // TASK-785 — workforce role title governance
     addEntitlement(entries, {
       module: 'hr',

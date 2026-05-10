@@ -13,4 +13,13 @@ export const GH_PAYROLL_PROJECTED_ARIA = {
       : `Crear borrador oficial para ${monthLabel} ${year}`
 } as const
 
+export const GH_PAYROLL_COMPLIANCE_EXPORTS = {
+  previredLabel: 'Previred',
+  lreLabel: 'LRE',
+  previredDownloadError: 'No pudimos generar Previred. Revisa que el periodo este cerrado y que todos tengan RUT verificado.',
+  lreDownloadError: 'No pudimos generar LRE. Revisa que el periodo este cerrado y que todos tengan RUT verificado.',
+  previredAria: (periodLabel: string) => `Descargar Previred del periodo ${periodLabel}`,
+  lreAria: (periodLabel: string) => `Descargar LRE del periodo ${periodLabel}`
+} as const
+
 // ─── Nexa Insights Namespace ──────────────────────────────────────────────

@@ -6120,6 +6120,31 @@ export interface GreenhousePayrollCompensationVersions {
   version_id: string;
 }
 
+export interface GreenhousePayrollComplianceExportArtifacts {
+  artifact_id: string;
+  artifact_sha256: string;
+  asset_id: string | null;
+  content_type: string;
+  created_at: Generated<Timestamp>;
+  declared_status: Generated<string>;
+  encoding: string;
+  export_kind: string;
+  filename: string;
+  generated_at: Generated<Timestamp>;
+  generated_by: string | null;
+  period_id: string;
+  record_count: number;
+  source_snapshot_hash: string;
+  space_id: string | null;
+  spec_source_url: string;
+  spec_version: string;
+  storage_reference: string | null;
+  totals_json: Generated<Json>;
+  updated_at: Generated<Timestamp>;
+  validation_errors_json: Generated<Json>;
+  validation_status: string;
+}
+
 export interface GreenhousePayrollFinalSettlementDocumentEvents {
   actor_user_id: string | null;
   created_at: Generated<Timestamp>;
@@ -8948,6 +8973,7 @@ export interface DB {
   "greenhouse_payroll.chile_previred_indicators": GreenhousePayrollChilePreviredIndicators;
   "greenhouse_payroll.chile_tax_brackets": GreenhousePayrollChileTaxBrackets;
   "greenhouse_payroll.compensation_versions": GreenhousePayrollCompensationVersions;
+  "greenhouse_payroll.compliance_export_artifacts": GreenhousePayrollComplianceExportArtifacts;
   "greenhouse_payroll.final_settlement_document_events": GreenhousePayrollFinalSettlementDocumentEvents;
   "greenhouse_payroll.final_settlement_documents": GreenhousePayrollFinalSettlementDocuments;
   "greenhouse_payroll.final_settlement_events": GreenhousePayrollFinalSettlementEvents;

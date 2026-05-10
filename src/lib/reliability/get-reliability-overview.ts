@@ -40,6 +40,7 @@ import { getIdentityLegalProfileRevealAnomalySignal } from './queries/identity-l
 import { getIncomePaymentsClpDriftSignal } from './queries/income-payments-clp-drift'
 import { getPaymentOrdersDeadLetterSignal } from './queries/payment-orders-dead-letter'
 import { getPaidOrdersWithoutExpensePaymentSignal } from './queries/payment-orders-paid-without-expense-payment'
+import { getPayrollComplianceExportDriftSignal } from './queries/payroll-compliance-export-drift'
 import { getPayrollExpenseMaterializationLagSignal } from './queries/payroll-expense-materialization-lag'
 import { getProviderBqSyncDeadLetterSignal } from './queries/provider-bq-sync-dead-letter'
 import { getServiceEngagementEngagementKindUnmappedSignal } from './queries/service-engagement-engagement-kind-unmapped'
@@ -311,6 +312,12 @@ interface ReliabilityOverviewSources {
   paymentOrderSettlement?: ReliabilitySignal[] | null
 
   /**
+   * TASK-812 — Previred/LRE compliance export artifact drift. Steady state = 0
+   * latest artifacts with failed validation or entries newer than artifact.
+   */
+  payrollComplianceExportDrift?: ReliabilitySignal | null
+
+  /**
    * TASK-766 Slice 2 — Finance CLP currency drift signals. 2 readers que
    * cuentan expense_payments / income_payments con currency!='CLP' y
    * amount_clp IS NULL (drift detectado por la VIEW *_normalized via flag
@@ -511,6 +518,8 @@ export const buildReliabilityOverview = (
     // dead_letter / lag). Inyectadas pre-fetched desde getReliabilityOverview
     // para mantener buildReliabilityOverview sincrónico.
     ...(sources.paymentOrderSettlement ?? []),
+    // TASK-812 — Previred/LRE artifact registry drift.
+    ...(sources.payrollComplianceExportDrift ? [sources.payrollComplianceExportDrift] : []),
     // TASK-766 Slice 2 — Finance CLP currency drift signals (expense + income).
     ...(sources.financeClpDrift ?? []),
     // TASK-771 Slice 4 — Provider BQ sync dead-letter signal (drift PG↔BQ).
@@ -709,6 +718,11 @@ export const getReliabilityOverview = async (
           deadLetter: getPaymentOrdersDeadLetterSignal,
           materializationLag: getPayrollExpenseMaterializationLagSignal
         }).catch(() => null)
+
+  const payrollComplianceExportDrift =
+    preloadedSources.payrollComplianceExportDrift !== undefined
+      ? preloadedSources.payrollComplianceExportDrift
+      : await getPayrollComplianceExportDriftSignal().catch(() => null)
 
   // TASK-766 Slice 2 — Finance CLP currency drift signals (expense + income).
   const financeClpDrift =
@@ -936,6 +950,7 @@ export const getReliabilityOverview = async (
     aiObservations,
     domainIncidents,
     paymentOrderSettlement,
+    payrollComplianceExportDrift,
     financeClpDrift,
     providerBqSyncDeadLetter,
     outboxHealth,

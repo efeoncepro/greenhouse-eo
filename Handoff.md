@@ -180,6 +180,18 @@ Esta evidencia trazada reemplaza la afirmación previa "no tienen reactive consu
 - **Docs:** task movida a `docs/tasks/complete/TASK-841-nubox-ops-worker-config-freshness-hardening.md`; `docs/tasks/README.md`, `TASK_ID_REGISTRY`, `services/ops-worker/README.md`, `GREENHOUSE_SOURCE_SYNC_PIPELINES_V1`, `GREENHOUSE_CLOUD_INFRASTRUCTURE_V1`, `GREENHOUSE_FINANCE_ARCHITECTURE_V1` y `changelog.md` sincronizados.
 - **Guardrail multi-agente:** quedan dirty changes no relacionados de `TASK-835` en sample-sprints; no pertenecen a TASK-841 y no se deben revertir ni mezclar.
 
+# Sesion 2026-05-10 — TASK-812 compliance exports V1 en progreso
+
+- **Trigger:** usuario pidio implementar end-to-end TASK-812 manteniendose en `develop` y sin afectar negativamente Payroll.
+- **Skills usados:** `software-architect-2026`, `greenhouse-payroll-auditor`, `greenhouse-task-planner`, `greenhouse-agent`, `greenhouse-ux-content-accessibility`.
+- **Decision clave:** V1 es read-only sobre `greenhouse_payroll.payroll_entries` cerradas (`approved|exported`) y usa RUT verificado de Person Legal Profile. No recalcula payroll, no muta periods/entries/payment orders y falla cerrado si falta `CL_RUT` verificado.
+- **Scope entregado:** migraciones `20260510020952559_task-812-compliance-export-registry.sql` + `20260510022245692_task-812-compliance-artifact-hash-index.sql`; registry `greenhouse_payroll.compliance_export_artifacts`; capabilities `hr.payroll.export_previred`/`hr.payroll.export_lre`; generadores `src/lib/payroll/compliance-exports/*`; endpoints `/api/hr/payroll/periods/[periodId]/export/previred` y `/lre`; botones Payroll; eventos `payroll.export.previred_generated`/`payroll.export.lre_generated`; signal `payroll.compliance_exports.artifact_drift`.
+- **Fuentes oficiales congeladas:** Previred formato largo variable por separador v58 (PDF SHA-256 `32cdb7416793b83129b4f2888acfd4f1c3384423587a1aaa4942ff31cfc61a0b`) y DT LRE carga masiva (PDF SHA-256 `3f55043371ed0faab2b48e486f1d18c4417088c3116e54fb4ed22a8d79a35b22`).
+- **Boundary importante:** `TASK-707a` sigue bloqueando paridad completa contra `payment_order` social_security. V1 valida Previred contra `calculatePreviredEntryBreakdown` + payroll entries cerradas.
+- **Validacion parcial:** `pnpm vitest run src/lib/payroll/compliance-exports/previred.test.ts src/lib/payroll/compliance-exports/lre.test.ts` verde; `pnpm exec tsc --noEmit --pretty false` verde; `pnpm pg:connect:migrate` aplico migraciones y regenero `src/types/db.d.ts`. `pnpm migrate:up` directo fallo primero por Cloud SQL Proxy no corriendo (`ECONNREFUSED 127.0.0.1:15432`), luego se uso el flujo canonico `pg:connect:migrate`.
+- **Docs actualizadas:** task movida a `docs/tasks/in-progress/`, `docs/tasks/README.md`, `docs/tasks/TASK_ID_REGISTRY.md`, `docs/compliance/{previred,dt}/README.md`, documentacion funcional/manual HR, `changelog.md`.
+- **Pendiente antes de cierre:** correr `pnpm lint`, `pnpm test` o suite focal adicional si el tiempo lo permite, `pnpm pg:doctor`, revisar `git status`, y decidir si mover TASK-812 a `complete/` solo si el equipo acepta V1 con boundary TASK-707a abierto.
+
 # Sesion 2026-05-09 — TASK-812 compliance exports corregida
 
 - **Trigger:** el usuario pidio corregir TASK-812 tras la revision con skill de arquitectura/payroll, luego commit y push.

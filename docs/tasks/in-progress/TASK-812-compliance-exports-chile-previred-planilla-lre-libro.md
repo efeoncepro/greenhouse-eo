@@ -6,21 +6,20 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `optional`
-- Status real: `Diseno corregido`
+- Status real: `Implementacion V1 en curso`
 - Rank: `TBD`
 - Domain: `hr / payroll / compliance`
 - Blocked by:
-  - `TASK-707a` — hard blocker para paridad contra `payment_order` social_security canonico.
-  - Discovery oficial Slice 0 — hard blocker para codificar formatos externos.
+  - `TASK-707a` — hard blocker para paridad completa contra `payment_order` social_security canonico. V1 degrada explicitamente a paridad contra `payroll_entries` cerradas + `calculatePreviredEntryBreakdown`.
 - Resolved dependency:
   - `TASK-784` — `complete`; provee Person Legal Profile + RUT canonico verificado.
-- Branch: `task/TASK-812-compliance-exports-chile-previred-lre`
+- Branch: `develop` (excepcion solicitada por usuario: "mantente en develop")
 - Legacy ID: `none`
 - GitHub Issue: `optional`
 

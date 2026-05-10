@@ -53,6 +53,7 @@ export const AGGREGATE_TYPES = {
   payrollPrevisionalSnapshot: 'payroll_previsional_snapshot',
   payrollFinalSettlement: 'payroll_final_settlement',
   payrollFinalSettlementDocument: 'payroll_final_settlement_document',
+  payrollComplianceExportArtifact: 'payroll_compliance_export_artifact',
 
   // AI Tools
   aiTool: 'ai_tool',
@@ -344,6 +345,8 @@ export const EVENT_TYPES = {
   payrollPeriodExported: 'payroll_period.exported',
   payrollEntryUpserted: 'payroll_entry.upserted',
   payrollEntryReliquidated: 'payroll_entry.reliquidated',
+  payrollExportPreviredGenerated: 'payroll.export.previred_generated',
+  payrollExportLreGenerated: 'payroll.export.lre_generated',
   payrollAdjustmentCreated: 'payroll.adjustment.created',
   payrollAdjustmentApproved: 'payroll.adjustment.approved',
   payrollAdjustmentReverted: 'payroll.adjustment.reverted',
@@ -721,6 +724,8 @@ export const REACTIVE_EVENT_TYPES = [
   EVENT_TYPES.payrollPeriodExported,
   EVENT_TYPES.payrollEntryUpserted,
   EVENT_TYPES.payrollEntryReliquidated,
+  EVENT_TYPES.payrollExportPreviredGenerated,
+  EVENT_TYPES.payrollExportLreGenerated,
   // TASK-751: order.paid dispara recordExpensePaymentFromOrderProjection
   EVENT_TYPES.financePaymentOrderPaid,
   EVENT_TYPES.leaveRequestCreated,
