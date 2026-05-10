@@ -4310,6 +4310,47 @@ CREATE TABLE greenhouse_sync.webhook_inbox_events (
 
 
 --
+-- Name: github_release_webhook_events; Type: TABLE; Schema: greenhouse_sync; Owner: -
+--
+
+CREATE TABLE greenhouse_sync.github_release_webhook_events (
+    github_release_webhook_event_id text NOT NULL,
+    webhook_inbox_event_id text NOT NULL,
+    delivery_id text NOT NULL,
+    event_name text NOT NULL,
+    action text,
+    repository_full_name text,
+    workflow_name text,
+    workflow_run_id bigint,
+    workflow_job_id bigint,
+    check_suite_id bigint,
+    check_run_id bigint,
+    deployment_id bigint,
+    target_sha text,
+    github_status text,
+    github_conclusion text,
+    processing_status text DEFAULT 'received'::text NOT NULL,
+    release_id text,
+    matched_by text,
+    transition_applied boolean DEFAULT false NOT NULL,
+    transition_from_state text,
+    transition_to_state text,
+    error_code text,
+    error_message text,
+    redacted_payload_json jsonb DEFAULT '{}'::jsonb NOT NULL,
+    evidence_json jsonb DEFAULT '{}'::jsonb NOT NULL,
+    received_at timestamp with time zone DEFAULT now() NOT NULL,
+    processed_at timestamp with time zone,
+    CONSTRAINT github_release_webhook_delivery_nonempty_check CHECK ((length(btrim(delivery_id)) > 0)),
+    CONSTRAINT github_release_webhook_event_name_check CHECK ((event_name = ANY (ARRAY['workflow_run'::text, 'workflow_job'::text, 'deployment_status'::text, 'check_suite'::text, 'check_run'::text]))),
+    CONSTRAINT github_release_webhook_processing_status_check CHECK ((processing_status = ANY (ARRAY['received'::text, 'ignored'::text, 'matched'::text, 'reconciled'::text, 'matched_no_transition'::text, 'unmatched'::text, 'failed'::text]))),
+    CONSTRAINT github_release_webhook_target_sha_format_check CHECK (((target_sha IS NULL) OR ((length(target_sha) >= 7) AND (target_sha ~ '^[0-9a-f]+$'::text)))),
+    CONSTRAINT github_release_webhook_redacted_payload_object_check CHECK ((jsonb_typeof(redacted_payload_json) = 'object'::text)),
+    CONSTRAINT github_release_webhook_evidence_object_check CHECK ((jsonb_typeof(evidence_json) = 'object'::text))
+);
+
+
+--
 -- Name: webhook_subscriptions; Type: TABLE; Schema: greenhouse_sync; Owner: -
 --
 

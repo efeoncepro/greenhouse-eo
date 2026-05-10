@@ -64,6 +64,7 @@ import { getCriticalTablesMissingSignal } from './queries/critical-tables-missin
 import { getOutboxUnpublishedLagSignal } from './queries/outbox-unpublished-lag'
 import { getOutboxDeadLetterSignal } from './queries/outbox-dead-letter'
 import { getReleaseDeployDurationSignal } from './queries/release-deploy-duration'
+import { getReleaseGithubWebhookUnmatchedSignal } from './queries/release-github-webhook-unmatched'
 import { getReleaseLastStatusSignal } from './queries/release-last-status'
 import { getReleasePendingWithoutJobsSignal } from './queries/release-pending-without-jobs'
 import { getReleaseStaleApprovalSignal } from './queries/release-stale-approval'
@@ -915,8 +916,8 @@ export const getReliabilityOverview = async (
           .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
           .catch(() => null)
 
-  // TASK-848 Slice 7 + TASK-849 Slice 2 + TASK-854 Slice 0 — Production Release
-  // Control Plane signals (V1.1 complete, 5 of 5). 5 readers en paralelo. Cada
+  // TASK-848 Slice 7 + TASK-849 Slice 2 + TASK-854 Slice 0 + TASK-857 —
+  // Production Release Control Plane signals. 6 readers en paralelo. Cada
   // uno degrada a `severity=unknown` si no hay GITHUB_RELEASE_OBSERVER_TOKEN /
   // gcloud / release_manifests data o si GH API/PG falla. NO bloquea el dashboard.
   const productionRelease =
@@ -927,7 +928,8 @@ export const getReliabilityOverview = async (
           getReleasePendingWithoutJobsSignal().catch(() => null),
           getReleaseWorkerRevisionDriftSignal().catch(() => null),
           getReleaseDeployDurationSignal().catch(() => null),
-          getReleaseLastStatusSignal().catch(() => null)
+          getReleaseLastStatusSignal().catch(() => null),
+          getReleaseGithubWebhookUnmatchedSignal().catch(() => null)
         ])
           .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
           .catch(() => null)

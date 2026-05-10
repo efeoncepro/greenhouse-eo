@@ -8511,6 +8511,36 @@ export interface GreenhouseSyncReleaseManifests {
   workflow_runs: Generated<Json>;
 }
 
+export interface GreenhouseSyncGithubReleaseWebhookEvents {
+  action: string | null;
+  check_run_id: number | null;
+  check_suite_id: number | null;
+  delivery_id: string;
+  deployment_id: number | null;
+  error_code: string | null;
+  error_message: string | null;
+  event_name: string;
+  evidence_json: Generated<Json>;
+  github_conclusion: string | null;
+  github_release_webhook_event_id: string;
+  github_status: string | null;
+  matched_by: string | null;
+  processed_at: Timestamp | null;
+  processing_status: Generated<string>;
+  received_at: Generated<Timestamp>;
+  redacted_payload_json: Generated<Json>;
+  release_id: string | null;
+  repository_full_name: string | null;
+  target_sha: string | null;
+  transition_applied: Generated<boolean>;
+  transition_from_state: string | null;
+  transition_to_state: string | null;
+  webhook_inbox_event_id: string;
+  workflow_job_id: number | null;
+  workflow_name: string | null;
+  workflow_run_id: number | null;
+}
+
 export interface GreenhouseSyncReleaseStateTransitions {
   /**
    * Categoria del actor: member (humano via UI/workflow_dispatch), system (automatización interna), cli (script local invocado por humano via gh CLI).
@@ -9162,6 +9192,7 @@ export interface DB {
   "greenhouse_sync.outbox_reactive_log": GreenhouseSyncOutboxReactiveLog;
   "greenhouse_sync.projection_circuit_state": GreenhouseSyncProjectionCircuitState;
   "greenhouse_sync.projection_refresh_queue": GreenhouseSyncProjectionRefreshQueue;
+  "greenhouse_sync.github_release_webhook_events": GreenhouseSyncGithubReleaseWebhookEvents;
   "greenhouse_sync.release_manifests": GreenhouseSyncReleaseManifests;
   "greenhouse_sync.release_state_transitions": GreenhouseSyncReleaseStateTransitions;
   "greenhouse_sync.release_watchdog_alert_state": GreenhouseSyncReleaseWatchdogAlertState;
