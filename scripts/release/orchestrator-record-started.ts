@@ -24,7 +24,7 @@
  */
 
 import { argv, exit, stderr, stdout } from 'node:process'
-import { readFile } from 'node:fs/promises'
+import { readFile, writeFile } from 'node:fs/promises'
 
 import { recordReleaseStarted } from '@/lib/release/manifest-store'
 
@@ -34,13 +34,15 @@ interface CliOptions {
   targetBranch: string
   sourceBranch: string
   preflightResultFile: string | null
+  outputFile: string | null
 }
 
 const parseArgs = (args: readonly string[]): CliOptions => {
   const options: Partial<CliOptions> = {
     targetBranch: 'main',
     sourceBranch: 'develop',
-    preflightResultFile: null
+    preflightResultFile: null,
+    outputFile: null
   }
 
   for (const arg of args) {
@@ -50,6 +52,8 @@ const parseArgs = (args: readonly string[]): CliOptions => {
     else if (arg.startsWith('--source-branch=')) options.sourceBranch = arg.slice('--source-branch='.length)
     else if (arg.startsWith('--preflight-result-file=')) {
       options.preflightResultFile = arg.slice('--preflight-result-file='.length)
+    } else if (arg.startsWith('--output-file=')) {
+      options.outputFile = arg.slice('--output-file='.length)
     } else if (arg === '--help' || arg === '-h') {
       stdout.write(
         [
@@ -63,6 +67,10 @@ const parseArgs = (args: readonly string[]): CliOptions => {
           '  --target-branch=<branch>       Default main',
           '  --source-branch=<branch>       Default develop',
           '  --preflight-result-file=<path> Path to preflight JSON output for audit',
+          '  --output-file=<path>           Write JSON payload to <path> atomically.',
+          '                                 Stdout queda libre para banners pnpm/tsx — sin',
+          '                                 banner pollution rompiendo `jq` downstream.',
+          '                                 Patron canonico (mirror TASK-850 preflight CLI).',
           ''
         ].join('\n')
       )
@@ -110,16 +118,33 @@ const main = async (): Promise<void> => {
       preflightResult
     })
 
-    stdout.write(
-      JSON.stringify({
-        releaseId: manifest.releaseId,
-        attemptN: manifest.attemptN,
-        targetSha: manifest.targetSha,
-        targetBranch: manifest.targetBranch,
-        state: manifest.state,
-        startedAt: manifest.startedAt
-      }) + '\n'
-    )
+    const jsonPayload = JSON.stringify({
+      releaseId: manifest.releaseId,
+      attemptN: manifest.attemptN,
+      targetSha: manifest.targetSha,
+      targetBranch: manifest.targetBranch,
+      state: manifest.state,
+      startedAt: manifest.startedAt
+    }) + '\n'
+
+    // Output routing canonico (mirror TASK-850 preflight CLI):
+    //   --output-file=<path>: escribe JSON al path (controlado por el CLI,
+    //     inmune al banner de pnpm/tsx que contamina stdout). Stdout queda
+    //     libre para banners. Recomendado para CI workflows que NO pueden
+    //     usar `pnpm --silent` ni redirection `>` (banner pollution rompe `jq`).
+    //   default: JSON al stdout.
+    if (options.outputFile) {
+      try {
+        await writeFile(options.outputFile, jsonPayload, 'utf8')
+      } catch (error) {
+        stderr.write(
+          `orchestrator-record-started: failed to write --output-file=${options.outputFile}: ${error instanceof Error ? error.message : String(error)}\n`
+        )
+        exit(2)
+      }
+    } else {
+      stdout.write(jsonPayload)
+    }
 
     exit(0)
   } catch (error) {

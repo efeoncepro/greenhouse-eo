@@ -236,19 +236,26 @@ jobs:
           GREENHOUSE_POSTGRES_PASSWORD_SECRET_REF: greenhouse-pg-dev-ops-password
           GCP_PROJECT: efeonce-group
         run: |
-          OUTPUT=$(pnpm release:orchestrator-record-started \
+          # CLI escribe JSON al archivo via flag --output-file (control canonico,
+          # inmune a banner pollution de pnpm/tsx que rompe `jq` cuando se captura
+          # via $(...) o redirection `>`). Mismo patron canonico TASK-850 preflight CLI
+          # — detectado live 2026-05-10 run 25635317717 cuando `OUTPUT=$(pnpm ...)`
+          # capturo el banner pnpm prefix y `jq` rompio con "Invalid numeric literal".
+          pnpm release:orchestrator-record-started \
             --target-sha=${{ inputs.target_sha }} \
             --triggered-by=${{ github.actor }} \
             --target-branch=main \
             --source-branch=develop \
-            --preflight-result-file=preflight-result.json)
+            --preflight-result-file=preflight-result.json \
+            --output-file=record-started-result.json
 
-          RELEASE_ID=$(echo "${OUTPUT}" | jq -r '.releaseId')
-          ATTEMPT_N=$(echo "${OUTPUT}" | jq -r '.attemptN')
+          RELEASE_ID=$(jq -r '.releaseId' record-started-result.json)
+          ATTEMPT_N=$(jq -r '.attemptN' record-started-result.json)
 
           if [ -z "${RELEASE_ID}" ] || [ "${RELEASE_ID}" = "null" ]; then
             echo "::error::record-started failed to return release_id"
-            echo "Output: ${OUTPUT}"
+            echo "Result file contents:"
+            cat record-started-result.json
             exit 1
           fi
 
