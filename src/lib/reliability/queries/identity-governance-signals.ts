@@ -68,7 +68,7 @@ export const getIdentityGovernanceAuditLogWriteFailuresSignal = async (): Promis
         {
           kind: 'doc',
           label: 'Spec',
-          value: 'docs/tasks/in-progress/TASK-839-issue-068-fase-5-admin-center-governance-wire-up.md'
+          value: 'docs/tasks/complete/TASK-839-issue-068-fase-5-admin-center-governance-wire-up.md'
         }
       ]
     }
@@ -126,7 +126,7 @@ export const getIdentityGovernancePendingApprovalOverdueSignal = async (): Promi
         {
           kind: 'doc',
           label: 'Spec',
-          value: 'docs/tasks/in-progress/TASK-839-issue-068-fase-5-admin-center-governance-wire-up.md'
+          value: 'docs/tasks/complete/TASK-839-issue-068-fase-5-admin-center-governance-wire-up.md'
         }
       ]
     }

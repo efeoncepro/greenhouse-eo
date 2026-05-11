@@ -78,7 +78,7 @@ Nunca renderiza una vista en blanco ni crashea. El error queda capturado en Sent
 Esta task entrega la **foundation visual** del workspace. Las siguientes piezas:
 
 - **TASK-613** — Convergencia Finance: `/finance/clients/[id]` adopta el mismo shell con `entrypointContext='finance'` (default tab Finanzas).
-- **TASK-839** — Wire Admin Center governance: cuando emerja, los admins pueden otorgar permisos finos por usuario (ej. dar acceso a `organization.finance_sensitive` solo a Valentina para Sky), y el cache del workspace se invalida automáticamente vía outbox.
+- **TASK-839** — Wire Admin Center governance: los admins pueden otorgar permisos finos por usuario desde Admin Center. Los grants sensibles quedan pendientes de segunda firma y el cache del workspace se invalida automáticamente vía outbox.
 - **TASK-836/837** — Service pipeline: la pestaña Servicios pasa de empty state honest a la vista real de engagements.
 
 > **Detalle tecnico:** Componentes canonicos en [`src/components/greenhouse/organization-workspace/`](../../../src/components/greenhouse/organization-workspace/). Facets en [`src/views/greenhouse/organizations/facets/`](../../../src/views/greenhouse/organizations/facets/). Page server-side en [`src/app/(dashboard)/agency/organizations/[id]/page.tsx`](../../../src/app/(dashboard)/agency/organizations/[id]/page.tsx). Helper rollout en [`src/lib/workspace-rollout/index.ts`](../../../src/lib/workspace-rollout/index.ts). Spec canonica: [`GREENHOUSE_ORGANIZATION_WORKSPACE_PROJECTION_V1.md`](../../architecture/GREENHOUSE_ORGANIZATION_WORKSPACE_PROJECTION_V1.md).

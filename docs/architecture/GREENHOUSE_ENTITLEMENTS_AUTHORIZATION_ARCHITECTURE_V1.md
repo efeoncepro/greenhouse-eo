@@ -1,5 +1,27 @@
 # Greenhouse Entitlements & Authorization Architecture V1
 
+## Delta 2026-05-11 — TASK-839 wirea Admin Center governance contra runtime real
+
+- La surface canónica para operar governance de entitlements es la existente:
+  - UI global: `/admin/views` (`EntitlementsGovernanceTab`)
+  - UI por usuario: `Admin Center > Usuarios > [usuario] > Acceso`
+  - API: `/api/admin/entitlements/**`
+- No se crean rutas paralelas `/api/admin/governance/access/**`; TASK-839 corrigió la spec contra runtime real y reforzó las primitives existentes.
+- El catálogo suma 7 capabilities `access.governance.*` seedeadas en `greenhouse_core.capabilities_registry`:
+  - `access.governance.role_defaults.read`
+  - `access.governance.role_defaults.update`
+  - `access.governance.user_overrides.read`
+  - `access.governance.user_overrides.create`
+  - `access.governance.user_overrides.approve`
+  - `access.governance.startup_policy.update`
+  - `access.governance.audit_log.read`
+- `efeonce_admin` recibe estas capabilities desde `src/lib/entitlements/runtime.ts`; los endpoints siguen pasando primero por `requireAdminTenantContext` y luego por `can(tenant, access.governance.*, action, tenant)` para least privilege explícito.
+- Grants sensibles (`*_sensitive`, `.reveal_sensitive`, `.export_snapshot`) no se aplican inmediatamente cuando se crean como override usuario: quedan `approval_status='pending_approval'` en `greenhouse_core.user_entitlement_overrides` y requieren segunda firma vía endpoint de approval.
+- Los eventos `access.entitlement_role_default_changed` y `access.entitlement_user_override_changed` incluyen `schemaVersion: 1` y `affectedUserIds`; el reactive consumer soporta `extractScopes` opcional para invalidar cache por cada subject afectado.
+- Reliability signals nuevos bajo `moduleKey='identity'`:
+  - `identity.governance.audit_log_write_failures` (drift, error si > 0)
+  - `identity.governance.pending_approval_overdue` (drift, warning si > 7 días)
+
 ## Delta 2026-05-08 — TASK-611 introduce el module `organization` y la projection canónica del Organization Workspace
 
 - `ENTITLEMENT_MODULES` ahora incluye `organization` como **namespace transversal del objeto canónico 360** (mismo patrón que `home` y `my_workspace`, que tampoco son bounded contexts). El catálogo gana 11 capabilities `organization.<facet>.<action>`:
@@ -14,7 +36,7 @@
   - `organization.crm` (read; tenant/all)
   - `organization.services` (read, update; tenant/all)
   - `organization.staff_aug` (read, update; tenant/all)
-- **Capabilities registry DB** materializado: `greenhouse_core.capabilities_registry` (PK `capability_key`, `module`, `allowed_actions[]`, `allowed_scopes[]`, `description`, `introduced_at`, `deprecated_at`). Seedeado para las 11 organization.* + las 95 capabilities ya en TS catalog. **No tiene FK desde grants persistidos en V1** porque la tabla canónica `entitlement_grants` no existe (TASK-404 governance tables bloqueadas por pre-up-marker bug — ver `docs/issues/open/ISSUE-068-...`). El guardia primario es la TS↔DB parity test runtime (`src/lib/capabilities-registry/parity.ts`).
+- **Capabilities registry DB** materializado: `greenhouse_core.capabilities_registry` (PK `capability_key`, `module`, `allowed_actions[]`, `allowed_scopes[]`, `description`, `introduced_at`, `deprecated_at`). Seedeado para las 11 organization.* + el catálogo TS vigente. Desde TASK-838/TASK-839, `role_entitlement_defaults.capability` y `user_entitlement_overrides.capability` tienen FK al registry, y los writers validan `deprecated_at IS NULL` antes de persistir.
 - **Projection helper canónico** `resolveOrganizationWorkspaceProjection` en `src/lib/organization-workspace/projection.ts`. Pure function (cache-memoized TTL 30s) que compone:
   1. Relación subject↔organization vía `relationship-resolver.ts` (5 categorías canónicas: `internal_admin | assigned_member | client_portal_user | unrelated_internal | no_relation`).
   2. `getTenantEntitlements(subject)` puro.

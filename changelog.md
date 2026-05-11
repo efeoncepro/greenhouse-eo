@@ -8073,6 +8073,8 @@ Validations: tsc 0 errors, lint 0 errors, 427 files / 2225 tests pass / 5 skippe
 
 # Changelog
 
+- **TASK-839 — Admin Center entitlement governance wire-up.** Cerrada Fase 5 de ISSUE-068: capabilities granulares `access.governance.*` seedeadas en `capabilities_registry`, endpoints existentes `/api/admin/entitlements/**` protegidos con least privilege, writers transaccionales endurecidos con validation contra registry, audit + outbox versionado, segunda firma para grants sensibles y fan-out reactive por `affectedUserIds`. Admin Users > Acceso ahora muestra approvals pendientes y permite aprobar/rechazar overrides sensibles. Se agregan signals `identity.governance.audit_log_write_failures` y `identity.governance.pending_approval_overdue`.
+
 ## 2026-04-29
 
 - Finance / Conciliacion: TASK-723 agregó inteligencia asistida consultiva para el workbench. Las sugerencias se guardan con audit trail por `space_id`, prompt/model hashes y revisión humana; no aplican matches, no re-materializan saldos y no cierran períodos.

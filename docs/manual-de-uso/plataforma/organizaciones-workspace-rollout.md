@@ -19,7 +19,7 @@ El workspace nuevo (TASK-612) reemplaza la vista legacy con un shell compartido 
 Necesitas:
 
 - Acceso admin a Greenhouse (`efeonce_admin`).
-- Acceso al endpoint canónico de flags: `/api/admin/home/rollout-flags` (TASK-780). Mientras Admin Center > Gobernanza > Flags no exponga el formulario para los flags nuevos del workspace, podés usar el endpoint directo (curl o Postman) o esperar a que TASK-839 conecte el form.
+- Acceso al endpoint canónico de flags: `/api/admin/home/rollout-flags` (TASK-780). Los overrides finos de entitlements ya viven en Admin Center vía `/admin/views` y la ficha de usuario; los rollout flags siguen usando este endpoint hasta que exista formulario dedicado.
 - Identificar al menos 2 usuarios admin (incluido vos) para el dogfood inicial.
 
 ## Operación 1 — Activar para vos primero (dogfood)
@@ -163,7 +163,7 @@ Esperado — los 9 facets son `dynamic()` lazy-loaded, el primer click descarga 
 
 ### "Quiero darle acceso a una persona específica a la pestaña Finance"
 
-Hoy no se puede granularmente. El shell muestra Finanzas a usuarios con role `route_group=finance` o `efeonce_admin`. Cuando TASK-839 (Admin Center governance wire-up) cierre, vas a poder otorgar `organization.finance` como override personal a un usuario específico.
+Sí: desde Admin Center puedes abrir la ficha del usuario y usar la pestaña **Acceso** para agregar un override personal. Si el grant es sensible, queda pendiente de segunda firma antes de aplicarse al acceso efectivo.
 
 > **Detalle tecnico:** Helper canónico [`isWorkspaceShellEnabledForSubject`](../../../src/lib/workspace-rollout/index.ts). Page server-side [`page.tsx`](../../../src/app/(dashboard)/agency/organizations/[id]/page.tsx). Migration que extiende CHECK del flag: `migrations/20260508132302091_task-612-extend-home-rollout-flag-keys-workspace-shell.sql`. Cache invalidation reactiva consumer [`organization-workspace-cache-invalidation.ts`](../../../src/lib/sync/projections/organization-workspace-cache-invalidation.ts) (TASK-611 Slice 6).
 

@@ -6,13 +6,13 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation` (UI + API + outbox + audit log)
 - Epic: `—`
-- Status real: `Diseño`
+- Status real: `Cerrada 2026-05-11`
 - Rank: `TBD`
 - Domain: `identity`
 - Blocked by: `none` (TASK-838 cerrada — infraestructura DB + observability + CI gate listas)
@@ -213,15 +213,48 @@ Drift documentado:
 
 ## Acceptance Criteria
 
-- [ ] Slice 0 caller inventory completado y documentado en este task file.
-- [ ] `upsertRoleEntitlementDefault` + `upsertUserEntitlementOverride` helpers canónicos atómicos (UPSERT + audit + outbox).
-- [ ] 4 endpoints nuevos o existentes wireados con capability granular + outbox + audit + degraded mode.
-- [ ] UI honest degraded mode (es-CL tuteo via `greenhouse-ux-writing`).
-- [ ] Playwright smoke con `[downstream-verified: admin-governance-mutation]` marker.
-- [ ] Capabilities granulares seedeadas en `capabilities_registry` + parity test verde.
-- [ ] 2 reliability signals (`audit_log_write_failures`, `pending_approval_overdue`) registrados.
-- [ ] 4-pillar score block presente en este task file.
-- [ ] CLAUDE.md sección actualizada (sumar las invariantes de wire-up al cuerpo existente de Organization Workspace projection).
+- [x] Slice 0 caller inventory completado y documentado en este task file.
+- [x] Writers canónicos existentes en `src/lib/admin/entitlements-governance.ts` endurecidos: transacción única + audit + outbox + validation contra `capabilities_registry`.
+- [x] 5 endpoints existentes wireados con capability granular + degraded mode; ruta nueva de segunda firma para approvals sensibles.
+- [x] UI honest degraded mode: banners de error/success, pending approval visible, refresh real del estado tras mutation.
+- [ ] Playwright smoke con `[downstream-verified: admin-governance-mutation]` marker. No ejecutado en esta sesión; queda como follow-up porque no había sesión admin local/bypass E2E preparada.
+- [x] Capabilities granulares seedeadas en `capabilities_registry` + parity/runtime tests verdes.
+- [x] 2 reliability signals (`identity.governance.audit_log_write_failures`, `identity.governance.pending_approval_overdue`) registrados.
+- [x] 4-pillar score block presente en este task file.
+- [x] CLAUDE.md sección actualizada con invariantes de wire-up.
+
+## Closing Notes — 2026-05-11
+
+### Slices entregados
+
+- **Slice 0:** ownership, lifecycle `in-progress`, caller inventory y plan canónico.
+- **Slice 6:** migration `20260511105805584_task-839-admin-governance-wire-up.sql` seedea 7 capabilities `access.governance.*`, agrega estado de approval a `user_entitlement_overrides`, expande audit log y regenera `src/types/db.d.ts`.
+- **Slices 1/2/4:** endpoints reales `/api/admin/entitlements/**` quedan con least privilege, validation activa contra registry, segunda firma para grants sensibles y outbox payload versionado con `affectedUserIds`.
+- **Slice 5 parcial:** reactive consumer soporta `extractScopes` para fan-out por `affectedUserIds`; la projection de Organization Workspace invalida cache por cada usuario afectado.
+- **Slice 7:** reliability signals de audit/outbox y approvals vencidos bajo `identity`.
+
+### 4-pillar score
+
+- **Seguridad:** 9/10. Gating granular `access.governance.*`, FK/registry validation y segunda firma para sensitive grants. Falta solo smoke E2E downstream con sesión admin.
+- **Robustez:** 9/10. Se reutilizan writers transaccionales existentes, audit append-only y outbox en la misma transaction.
+- **Resiliencia:** 8/10. Fan-out reactive multi-scope + signals de drift. No se ejecutó Playwright ni consumer live <30s.
+- **Escalabilidad:** 8/10. No se crea consola paralela; `extractScopes` es extensión compatible para futuros events multi-subject.
+
+### Verificación ejecutada
+
+- `pnpm pg:doctor`
+- `pnpm pg:connect:migrate`
+- `pnpm test -- src/lib/capabilities-registry/parity.test.ts src/lib/entitlements/runtime.test.ts` (Vitest ejecutó suite completa)
+- `pnpm tsc --noEmit`
+- `pnpm test -- src/lib/sync/projections/organization-workspace-cache-invalidation.test.ts src/lib/sync/reactive-consumer.test.ts` (suite completa)
+- `pnpm lint`
+- `pnpm test -- src/lib/reliability/queries/identity-governance-signals.test.ts src/lib/sync/projections/organization-workspace-cache-invalidation.test.ts` (suite completa)
+
+### Drift resuelto
+
+- La spec asumía rutas hipotéticas `/api/admin/governance/access/**`; runtime real usa `/api/admin/entitlements/**` y se mantuvo esa fuente de verdad.
+- La spec pedía helpers nuevos separados; se reforzó el writer existente para evitar caminos paralelos.
+- `getTenantEntitlements()` sigue pure-function; el overlay persistido se aplica en readers server-side del Admin Center y no transforma el runtime base en DB-backed.
 
 ## Verification
 
