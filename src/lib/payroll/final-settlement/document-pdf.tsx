@@ -95,10 +95,14 @@ const styles = StyleSheet.create({
     width: 335
   },
   title: {
+    // TASK-863 V1.5 — Title del acto jurídico DOMINA visualmente (B-5).
+    // Antes: 18pt competía con KPI 16pt (ratio 1.125x, marketing pattern).
+    // Ahora: 20pt vs 14pt KPI (ratio 1.43x) restablece jerarquía legal canónica
+    // — notarios y abogados leen primero el acto, después el monto.
     fontFamily: 'Poppins Bold',
-    fontSize: 18,
+    fontSize: 20,
     lineHeight: 1.18,
-    marginBottom: 9,
+    marginBottom: 10,
     color: '#102A43'
   },
   subtitle: {
@@ -107,22 +111,27 @@ const styles = StyleSheet.create({
     lineHeight: 1.45
   },
   netBox: {
+    // TASK-863 V1.5 — KPI card sutil: padding reducido + amount no-Bold.
+    // Marketing pattern → legal pattern.
     width: 150,
-    padding: 12,
-    border: '1.4 solid #0375DB',
+    padding: 10,
+    border: '1.2 solid #0375DB',
     backgroundColor: '#F5FBFF',
-    borderRadius: 8
+    borderRadius: 6
   },
   netLabel: {
     color: '#526173',
-    fontSize: 7,
+    fontSize: 6.5,
     textTransform: 'uppercase',
+    letterSpacing: 0.6,
     marginBottom: 4
   },
   netAmount: {
-    fontFamily: 'Poppins Bold',
+    // TASK-863 V1.5 — Poppins SemiBold (no Bold) + 14pt (no 16pt) restablece
+    // jerarquía: title >> kpi. Notarios leen primero el acto, después el monto.
+    fontFamily: 'Poppins',
     color: '#023C70',
-    fontSize: 16,
+    fontSize: 14,
     lineHeight: 1.15,
     marginBottom: 8
   },
@@ -292,13 +301,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4
   },
   signatureColumn: {
-    // TASK-863 V1.2 — 3 columnas equilibradas con space-between (empleador / trabajador / ministro de fe).
-    // TASK-863 V1.4 — position relative para que signatureImageEmployer (absolute) ancle a este column.
+    // TASK-863 V1.2 — 3 columnas equilibradas con space-between.
+    // TASK-863 V1.4 — position relative para anclar signatureImageEmployer absolute.
+    // TASK-863 V1.5 — paddingTop: 36 reserva ESPACIO SIMÉTRICO arriba de la línea
+    // en las 3 columnas. Esto resuelve la asimetría visual reportada en audit:
+    // empleador tiene firma renderizada en ese espacio, trabajador y ministro
+    // dejan el espacio vacío para firma física presencial en notaría. Las 3
+    // líneas caen al mismo Y absoluto → balance enterprise.
     width: '30%',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    position: 'relative'
+    position: 'relative',
+    paddingTop: 36
   },
   signatureRule: {
     // Linea explicita via View con height + backgroundColor. Antes: borderTop en el contenedor
@@ -308,15 +323,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#475467',
     marginBottom: 8
   },
-  // TASK-863 V1.4 — Imagen de firma del representante empleador, anclada para
-  // cruzar la signatureRule como firma manual real, SIN tapar el texto debajo.
-  // Solo `width` fijo (sin height) preserva el aspect ratio real del PNG.
-  // `top: -22` sobresale ARRIBA del column para que el centro vertical de la
-  // firma quede sobre la línea (signatureRule está a ~8pt del top del column).
+  // TASK-863 V1.5 — Imagen de firma del representante empleador, anclada en el
+  // espacio reservado ARRIBA de la línea (paddingTop: 36 del signatureColumn).
+  // top: 0 ancla al top del column (dentro del padding); height auto preserva
+  // aspect ratio. La firma cruza la línea suavemente desde arriba sin tapar el
+  // nombre debajo.
   signatureImageEmployer: {
     position: 'absolute',
     width: 105,
-    top: -22,
+    top: 0,
     left: '50%',
     marginLeft: -52, // centrado horizontal (width/2)
     objectFit: 'contain'
@@ -908,13 +923,25 @@ const FinalSettlementPdfDocument = ({
   // resuelve `src/assets/signatures/efeonce-group-spa.png`. Null cuando archivo no existe.
   const employerSignaturePath = resolveLegalRepresentativeSignaturePath(snapshot.employer.legalRepresentativeSignaturePath)
 
-  // TASK-862 Slice D — Clausulas narrativas params canonicos (GH_FINIQUITO).
+  // TASK-862 Slice D + TASK-863 V1.5 — Clausulas narrativas params canonicos.
   const hireDateLong = formatDateLongSpanish(snapshot.finalSettlement.hireDateSnapshot)
   const lastWorkingDayLong = formatDateLongSpanish(snapshot.finalSettlement.lastWorkingDay)
-  // Resignation letter ratification date: si tenemos el asset, usamos createdAt-like
-  // fallback al lastWorkingDay (no tenemos columna dedicada en V1; el upload del asset
-  // tiene timestamp pero el render del PDF no la lee hoy).
-  const resignationNoticeRatifiedLong = formatDateLongSpanish(snapshot.finalSettlement.lastWorkingDay)
+  // TASK-863 V1.5 — Separar 2 fechas legales de la carta de renuncia (B-1):
+  // - signedAt: fecha en que el trabajador firma la carta (fallback al lastWorkingDay
+  //   cuando no tenemos columna dedicada todavia en el snapshot V1).
+  // - ratifiedAt: fecha de ratificacion ante ministro de fe (post-art. 177); null
+  //   pre-ratificacion (snapshot.ratification es null) → la clausula PRIMERO omite
+  //   el tramo de ratificacion.
+  const resignationNoticeSignedLong = formatDateLongSpanish(snapshot.finalSettlement.lastWorkingDay)
+
+  const resignationNoticeRatifiedLong = snapshot.ratification?.ratifiedAt
+    ? formatDateLongSpanish(snapshot.ratification.ratifiedAt)
+    : null
+
+  // TASK-863 V1.5 — `isRatified` controla verbo performativo de clausula SEGUNDO (B-2):
+  // pre-ratificacion → "declara que recibirá, al momento de la ratificación..."
+  // post-ratificacion → "declara haber recibido en este acto..."
+  const isRatified = Boolean(snapshot.ratification)
   const employerLegalName = snapshot.employer.legalName
   const workerTaxIdDisplay = snapshot.collaborator.taxId ?? 'pendiente'
   const netPayableFormatted = formatCurrency(snapshot.finalSettlement.netPayable).replace(/^\$\s*/, '')
@@ -1011,6 +1038,7 @@ const FinalSettlementPdfDocument = ({
             employerLegalName,
             hireDate: hireDateLong,
             lastWorkingDay: lastWorkingDayLong,
+            resignationNoticeSignedAt: resignationNoticeSignedLong,
             resignationNoticeRatifiedAt: resignationNoticeRatifiedLong
           })} />
 
@@ -1020,10 +1048,12 @@ const FinalSettlementPdfDocument = ({
             employerLegalName,
             hireDate: hireDateLong,
             lastWorkingDay: lastWorkingDayLong,
+            resignationNoticeSignedAt: resignationNoticeSignedLong,
             resignationNoticeRatifiedAt: resignationNoticeRatifiedLong,
             netPayableFormatted,
             netPayableInWords: netInWords ?? formatClpInWords(0),
-            paymentMethod: 'transferencia bancaria'
+            paymentMethod: 'transferencia bancaria',
+            isRatified
           })} />
 
           <Clause text={GH_FINIQUITO.resignation.clauses.tercero({
@@ -1032,6 +1062,7 @@ const FinalSettlementPdfDocument = ({
             employerLegalName,
             hireDate: hireDateLong,
             lastWorkingDay: lastWorkingDayLong,
+            resignationNoticeSignedAt: resignationNoticeSignedLong,
             resignationNoticeRatifiedAt: resignationNoticeRatifiedLong
           })} />
 

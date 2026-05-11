@@ -31,8 +31,18 @@ export interface FiniquitoClauseParams {
   hireDate: string
   /** Last working day in DD-MM-YYYY form (Chile canonical). */
   lastWorkingDay: string
-  /** Resignation letter ratification date in DD-MM-YYYY form. */
-  resignationNoticeRatifiedAt: string
+  /**
+   * TASK-863 V1.5 — Fecha en que el trabajador SUSCRIBIÓ la carta de renuncia
+   * (firma del trabajador). DD-MM-YYYY. Legalmente distinta de la fecha de
+   * ratificación notarial art. 177 CT.
+   */
+  resignationNoticeSignedAt: string
+  /**
+   * Fecha en que la carta de renuncia fue RATIFICADA ante ministro de fe
+   * (art. 177 CT). DD-MM-YYYY. Null cuando aún no se ratificó — la cláusula
+   * PRIMERO omite el tramo de ratificación en ese caso.
+   */
+  resignationNoticeRatifiedAt: string | null
 }
 
 export interface FiniquitoClauseSegundoParams extends FiniquitoClauseParams {
@@ -42,6 +52,15 @@ export interface FiniquitoClauseSegundoParams extends FiniquitoClauseParams {
   netPayableInWords: string
   /** Payment method label e.g. "transferencia bancaria". */
   paymentMethod: string
+  /**
+   * TASK-863 V1.5 — `true` cuando el documento ya está ratificado ante ministro
+   * de fe (documentStatus = signed_or_ratified). Cambia el verbo performativo
+   * de la cláusula SEGUNDO de "declara que recibirá" (futuro condicional) a
+   * "declara haber recibido" (perfecto consumado). Evita vicio de consentimiento
+   * en documentos draft (rendered/in_review/approved/issued) que aún no fueron
+   * ratificados pero ya declaran "recibe en este acto".
+   */
+  isRatified: boolean
 }
 
 export type FiniquitoClauseTerceroParams = FiniquitoClauseParams
@@ -64,20 +83,41 @@ export interface FiniquitoMaintenanceObligationParams {
 export const GH_FINIQUITO = {
   resignation: {
     clauses: {
-      primero: ({ workerName, workerTaxId, employerLegalName, hireDate, lastWorkingDay, resignationNoticeRatifiedAt }: FiniquitoClauseParams) =>
-        `PRIMERO: Don(ña) ${workerName}, RUT ${workerTaxId}, declara haber prestado servicios como trabajador(a) dependiente de ${employerLegalName} desde el ${hireDate} hasta el ${lastWorkingDay}, fecha en la cual se hace efectivo el término de su contrato de trabajo por aplicación de la causal del ARTÍCULO 159 N°2 DEL CÓDIGO DEL TRABAJO — RENUNCIA VOLUNTARIA DEL TRABAJADOR, formalizada mediante carta de renuncia ratificada con fecha ${resignationNoticeRatifiedAt}, suscrita con las formalidades del artículo 177 del mismo cuerpo legal.`,
+      // TASK-863 V1.5 — separar 2 fechas legales distintas de la carta de renuncia
+      // (firma del trabajador vs ratificación notarial art. 177 CT). Antes la cláusula
+      // mezclaba ambas, lo que podía invalidarla en demanda.
+      primero: ({ workerName, workerTaxId, employerLegalName, hireDate, lastWorkingDay, resignationNoticeSignedAt, resignationNoticeRatifiedAt }: FiniquitoClauseParams) => {
+        const ratificationTail = resignationNoticeRatifiedAt
+          ? `, ratificada ante ministro de fe el ${resignationNoticeRatifiedAt} conforme al artículo 177 del Código del Trabajo`
+          : ', cuya ratificación ante ministro de fe se efectuará conforme al artículo 177 del Código del Trabajo'
 
-      segundo: ({ workerName, netPayableFormatted, netPayableInWords, paymentMethod }: FiniquitoClauseSegundoParams) =>
-        `SEGUNDO: Don(ña) ${workerName} declara recibir en este acto, a su entera satisfacción, mediante ${paymentMethod}, la cantidad de $ ${netPayableFormatted}.- (${netPayableInWords}), por los conceptos que se detallan en la cláusula quinta del presente instrumento.`,
+        return `PRIMERO: Don(ña) ${workerName}, RUT ${workerTaxId}, declara haber prestado servicios como trabajador(a) dependiente de ${employerLegalName} desde el ${hireDate} hasta el ${lastWorkingDay}, fecha en la cual se hace efectivo el término de su contrato de trabajo por aplicación de la causal del ARTÍCULO 159 N°2 DEL CÓDIGO DEL TRABAJO — RENUNCIA VOLUNTARIA DEL TRABAJADOR, formalizada mediante carta de renuncia suscrita por el(la) trabajador(a) con fecha ${resignationNoticeSignedAt}${ratificationTail}.`
+      },
+
+      // TASK-863 V1.5 — Verbo performativo state-conditional. Pre-ratificación
+      // (rendered/in_review/approved/issued) usa futuro condicional "declara que
+      // recibirá, al momento de la ratificación...". Post-ratificación
+      // (signed_or_ratified) usa perfecto consumado "declara haber recibido en
+      // este acto...". Evita vicio de consentimiento en documentos draft.
+      segundo: ({ workerName, netPayableFormatted, netPayableInWords, paymentMethod, isRatified }: FiniquitoClauseSegundoParams) => {
+        const verbPhrase = isRatified
+          ? 'declara haber recibido en este acto, a su entera satisfacción'
+          : 'declara que recibirá, al momento de la ratificación ante ministro de fe, a su entera satisfacción'
+
+        return `SEGUNDO: Don(ña) ${workerName} ${verbPhrase}, mediante ${paymentMethod}, la cantidad de $ ${netPayableFormatted}.- (${netPayableInWords}), por los conceptos que se detallan en la cláusula quinta del presente instrumento.`
+      },
 
       tercero: ({ workerName, employerLegalName, hireDate }: FiniquitoClauseTerceroParams) =>
         `TERCERO: Por el presente instrumento las partes declaran terminado el contrato de trabajo de fecha ${hireDate}, otorgando don(ña) ${workerName} amplio, total y definitivo finiquito a su empleador, ${employerLegalName}, expresando que no tiene cargo ni reclamo alguno que formular en su contra, y que nada se le adeuda por ningún concepto, ya que todas sus remuneraciones, prestaciones y regalías a que tiene derecho por disposición de la ley y de su contrato individual de trabajo le han sido pagadas total y oportunamente. Las cotizaciones previsionales le fueron pagadas oportunamente durante toda la duración del contrato, y las correspondientes a los días trabajados en el mes en curso se enterarán dentro del plazo legal establecido en el artículo 19 del DL N° 3.500 y el artículo 162 inciso 5° del Código del Trabajo.`,
 
+      // TASK-863 V1.5 — Cita legal precisa: art. 13 de la Ley 14.908 es el
+      // operativo (obligación del empleador en finiquito); Ley 21.389 es solo
+      // la modificatoria de 2021. Antes citaba solo la modificatoria.
       cuartoAltA: ({ declaredAt }: FiniquitoMaintenanceObligationParams) =>
-        `CUARTO ALTERNATIVA A: Las partes comparecientes declaran expresamente que el(la) trabajador(a) NO se encuentra afecto a retención por pensión de alimentos de acuerdo con lo establecido en la Ley N° 14.908, modificada por la Ley N° 21.389 de 2021. Declaración efectuada con fecha ${declaredAt} y registrada con sello digital en sistema Greenhouse.`,
+        `CUARTO ALTERNATIVA A: Las partes comparecientes declaran expresamente que el(la) trabajador(a) NO se encuentra afecto a retención por pensión de alimentos de acuerdo con lo establecido en el artículo 13 de la Ley N° 14.908 sobre Abandono de Familia y Pago de Pensiones Alimenticias, en su texto modificado por la Ley N° 21.389 de 2021. Declaración efectuada con fecha ${declaredAt} y registrada con sello digital en sistema Greenhouse.`,
 
       cuartoAltB: ({ amount, beneficiary, declaredAt }: FiniquitoMaintenanceObligationParams) =>
-        `CUARTO ALTERNATIVA B: Las partes comparecientes declaran expresamente que el(la) trabajador(a) SÍ se encuentra afecto a retención por pensión de alimentos de acuerdo con lo establecido en la Ley N° 14.908, modificada por la Ley N° 21.389 de 2021, por un monto mensual de $ ${amount ?? 0} a favor de ${beneficiary ?? '(beneficiario pendiente de declarar)'}. Declaración efectuada con fecha ${declaredAt} y registrada con sello digital en sistema Greenhouse.`,
+        `CUARTO ALTERNATIVA B: Las partes comparecientes declaran expresamente que el(la) trabajador(a) SÍ se encuentra afecto a retención por pensión de alimentos de acuerdo con lo establecido en el artículo 13 de la Ley N° 14.908 sobre Abandono de Familia y Pago de Pensiones Alimenticias, en su texto modificado por la Ley N° 21.389 de 2021, por un monto mensual de $ ${amount ?? 0} a favor de ${beneficiary ?? '(beneficiario pendiente de declarar)'}. Declaración efectuada con fecha ${declaredAt} y registrada con sello digital en sistema Greenhouse.`,
 
       quintoPrefacio: 'QUINTO: El detalle de los conceptos pagados al trabajador es el siguiente:'
     },
