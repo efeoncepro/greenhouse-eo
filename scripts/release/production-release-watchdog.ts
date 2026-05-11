@@ -176,6 +176,18 @@ const computeExitCode = (
   return 0
 }
 
+const evidenceValue = (signal: ReliabilitySignal, label: string): string | null => {
+  return signal.evidence?.find((entry) => entry.label === label)?.value ?? null
+}
+
+const defaultRecommendedAction = (findingKind: string): string => {
+  if (findingKind === 'worker_revision_drift') {
+    return 'Revisar evidence.detail y runbook de production release; re-deployar solo el service drifted con expected_sha del release canonico, luego correr watchdog.'
+  }
+
+  return 'Revisar /admin/operations subsystem Platform Release y ejecutar `gh run cancel <id>` segun runbook.'
+}
+
 const dispatchTeamsAlerts = async (
   signals: ReliabilitySignal[],
   options: CliOptions
@@ -241,7 +253,8 @@ const dispatchTeamsAlerts = async (
       sha: 'aggregate',
       ageLabel: 'see signal evidence',
       detail: signal.summary,
-      recommendedAction: 'Revisar /admin/operations subsystem Platform Release y ejecutar `gh run cancel <id>` segun runbook.'
+      recommendedAction:
+        evidenceValue(signal, 'recommended_action') ?? defaultRecommendedAction(findingKind)
     }
 
     const result = await dispatchWatchdogAlert(synthetic)

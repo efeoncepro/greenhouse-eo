@@ -110,8 +110,18 @@ Cuando recibes alerta `[ERROR] Worker revision drift — <workflow>`:
    ```
 
 2. **Si difieren**: deploy reciente falló silente o alguien deployó manualmente sin pasar por workflow.
-   - Re-trigger workflow normal: `gh workflow run "Ops Worker Deploy" --ref main`
-   - Verificar que el deploy completa con `gh run watch <run_id>`
+   - Re-trigger workflow normal del servicio drifted con el SHA canonico del release.
+   - Para `hubspot-greenhouse-integration`:
+     ```bash
+     gh workflow run hubspot-greenhouse-integration-deploy.yml \
+       --ref main \
+       -f environment=production \
+       -f expected_sha=<release target_sha> \
+       -f skip_tests=false
+     ```
+   - Verificar que el deploy completa con `gh run watch <run_id>`.
+   - Verificar `curl /health`, `curl /contract` y `pnpm release:watchdog --json` con `drift_count=0`.
+   - No editar `greenhouse_sync.release_manifests` por SQL para corregir drift.
 
 3. **Si Cloud Run muestra `unknown`**: worker fue deployado antes de TASK-849 Slice 1 (GIT_SHA injection). Re-deploy el worker via workflow normal — el GIT_SHA se poblará en la nueva revision.
 

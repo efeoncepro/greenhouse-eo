@@ -121,13 +121,14 @@ Ejecutar desde la raíz del monorepo (requirement: imports absolutos `services.h
 python -m pytest services/hubspot_greenhouse_integration/tests/ -v
 ```
 
-**Known issues pre-existentes (heredados del sibling, ajenos a la mudanza):**
+Estado vigente: la suite debe estar verde antes de desplegar. El workflow
+`.github/workflows/hubspot-greenhouse-integration-deploy.yml` ejecuta pytest
+por defecto y no declara success si los tests fallan. `skip_tests=true` queda
+reservado para break-glass documentado.
 
-- `test_deal_create_maps_hubspot_rate_limit_to_retryable_response` — rate limit mapping
-- `test_deal_metadata_tolerates_missing_optional_property` — missing optional property
-- `test_product_reconcile_returns_page_and_next_cursor` — MagicMock spec incompatibility con `HubSpotClient.RECONCILE_PRODUCT_PROPERTIES`
-
-37/40 tests pasan post-migración. Los 3 failures son pre-cutover (reproducen en sibling) y quedan como follow-up task de hardening.
+Nota historica: durante el cutover desde el sibling existio un estado temporal
+`37/40` por failures heredados. Ese estado ya no debe usarse como referencia
+operativa para evaluar deployability del bridge.
 
 ## Deploy
 
@@ -155,6 +156,21 @@ Triggers:
 - Push a `develop` con cambios a `services/hubspot_greenhouse_integration/**` → deploy staging
 - Push a `main` con cambios → deploy production
 - `workflow_dispatch` manual con input `environment`
+- `workflow_call` desde `production-release.yml` con `expected_sha=<target_sha>`
+
+Recovery de drift productivo:
+
+```bash
+gh workflow run hubspot-greenhouse-integration-deploy.yml \
+  --ref main \
+  -f environment=production \
+  -f expected_sha=<release target_sha> \
+  -f skip_tests=false
+```
+
+Despues verificar `/health`, `/contract` y `pnpm release:watchdog --json`.
+No editar `greenhouse_sync.release_manifests` por SQL para corregir drift; el
+manifest es source of truth append-only del release.
 
 Auth: **Workload Identity Federation** (cero SA-key JSON en GitHub Secrets).
 - Provider: `projects/183008134038/locations/global/workloadIdentityPools/vercel/providers/greenhouse-eo`

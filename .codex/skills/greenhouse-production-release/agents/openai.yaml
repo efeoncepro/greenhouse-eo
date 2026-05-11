@@ -1,0 +1,7 @@
+interface:
+  display_name: "Greenhouse Production Release"
+  short_description: "Canonical Greenhouse production release, preflight, orchestrator, watchdog, rollback, and drift recovery guidance."
+  default_prompt: "Use $greenhouse-production-release before any Greenhouse production promotion, release preflight, orchestrator dispatch, production approval, rollback, or watchdog drift recovery."
+
+policy:
+  allow_implicit_invocation: true

@@ -3,56 +3,58 @@
 > **Audience:** EFEONCE_ADMIN + DEVOPS_OPERATOR
 > **Spec canónico:** [GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md](../../architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md)
 > **Source task:** TASK-848 V1 (parcial; V1.1 follow-ups en TASK-850..855)
-> **Last updated:** 2026-05-10
+> **Last updated:** 2026-05-11
 
 Este runbook es el contrato operativo para promover `develop` → `main` y para ejecutar rollback de emergencia.
 
-## 1. Decision tree (flujo normal)
+## 1. Decision tree (flujo normal canonico)
 
 ```text
                                     ┌─────────────────────────────────┐
                                     │  develop está verde (CI + Smoke)│
                                     └───────────────┬─────────────────┘
                                                     │
-                              ┌─────────────────────┴──────────────────────┐
-                              │                                            │
-                              ▼                                            ▼
-                  ┌──────────────────────┐                ┌────────────────────────┐
-                  │   PROCEDIMIENTO V1   │                │  PROCEDIMIENTO V1.1    │
-                  │   (manual hoy)       │                │  (cuando exista        │
-                  │                      │                │   production-release.yml)│
-                  └──────────┬───────────┘                └────────────────────────┘
-                             │
-                             ▼
               ┌──────────────────────────────┐
-              │ 1. Preflight checks manuales │
-              │    (sec. 2 abajo)             │
+              │ 1. Promover el SHA a main    │
+              │    via PR/merge controlado   │
               └──────────────┬───────────────┘
                              ▼
               ┌──────────────────────────────┐
-              │ 2. PR develop → main         │
-              │    revisar diff + approve    │
+              │ 2. Disparar orquestador      │
+              │    production-release.yml    │
               └──────────────┬───────────────┘
                              ▼
               ┌──────────────────────────────┐
-              │ 3. Merge a main              │
+              │ 3. Preflight TASK-850        │
+              │    bloquea antes de deploy   │
               └──────────────┬───────────────┘
                              ▼
               ┌──────────────────────────────┐
-              │ 4. Workflows automáticos     │
-              │    aprobar gate Production   │
-              │    en GitHub UI per workflow │
+              │ 4. Aprobar gate Production   │
+              │    del orquestador           │
               └──────────────┬───────────────┘
                              ▼
               ┌──────────────────────────────┐
-              │ 5. Post-deploy verification  │
-              │    (sec. 4 abajo)            │
+              │ 5. Orquestador despliega     │
+              │    workers + espera Vercel   │
+              └──────────────┬───────────────┘
+                             ▼
+              ┌──────────────────────────────┐
+              │ 6. Health + manifest         │
+              │    released/degraded         │
               └──────────────────────────────┘
 ```
 
+`production-release.yml` es el brazo activo canonico del release a
+produccion. Los workflows individuales de workers conservan `push` y
+`workflow_dispatch` por compatibilidad, staging y break-glass documentado, pero
+el flujo normal NO consiste en aprobar workers sueltos uno por uno. El
+orquestador invoca los workers via `workflow_call`, pasa `expected_sha`, espera
+Vercel production READY y transiciona `greenhouse_sync.release_manifests`.
+
 ## 2. Preflight checklist (V1 manual + TASK-850 CLI canonico)
 
-**TASK-850 SHIPPED 2026-05-10** — la tabla manual de abajo queda como referencia conceptual. Ejecutar **siempre** `pnpm release:preflight` que automatiza los 11 checks + agrega `release_batch_policy` (#4 nuevo) en una sola llamada con output JSON machine-readable.
+**TASK-850 SHIPPED 2026-05-10** — la tabla manual de abajo queda como referencia conceptual. Ejecutar **siempre** `pnpm release:preflight` que automatiza los 12 checks, incluido `release_batch_policy`, en una sola llamada con output JSON machine-readable.
 
 ```bash
 # Pre-PR (operador local)
@@ -90,7 +92,7 @@ Si por algun motivo el CLI no esta disponible (e.g. local sin checkout, o auth e
 | 10 | WIF subjects GCP + Azure correctos | Sec 2.1 abajo | Sí (después de cualquier cambio infra) |
 | 11 | Batch size policy OK | Sec 2.2 abajo; V1.1 lo automatiza en TASK-850 | Sí |
 
-### 2.1. Verificación WIF subjects (manual hoy, automatizado en V1.1)
+### 2.1. Verificación WIF subjects (fallback manual)
 
 **GCP**:
 
@@ -160,6 +162,11 @@ Excepción break-glass:
 
 ## 3. Approval del environment Production
 
+En el flujo canonico se aprueba el job `approval-gate` del workflow
+`Production Release Orchestrator`. Despues de esa aprobacion, el orquestador
+coordina en paralelo los deploys que corresponden y registra el estado en
+`greenhouse_sync.release_manifests`.
+
 **Workflows que requieren approval del environment `Production`** (allowlist canónica):
 
 - `Ops Worker Deploy`
@@ -169,7 +176,13 @@ Excepción break-glass:
 - `Azure Teams Deploy`
 - `Azure Teams Bot Deploy`
 
-Cuando merges `develop → main`, cada workflow trigger es bloqueado en `waiting` hasta que un EFEONCE_ADMIN apruebe el environment via GitHub UI:
+Estos workflows individuales siguen protegidos porque tambien pueden ejecutarse
+por `push` o `workflow_dispatch` en escenarios legacy/break-glass. Si aparecen
+runs individuales esperando approval tras un push a `main`, NO asumir que eso
+reemplaza el orquestador. Validar primero si hay un run
+`Production Release Orchestrator` activo para el mismo `target_sha`.
+
+Approval desde GitHub UI:
 
 ```
 Repo → Actions → <Workflow> → <Run> → Review pending deployments → Approve & deploy
@@ -193,6 +206,38 @@ Reason: el concurrency fix Opcion A (TASK-848 Slice 3) cancela pending nuevos cu
 | 3 | Sentry sin nuevos errors | Sentry UI filter `release:<sha>` últimos 30min |
 | 4 | Smoke flows críticos | Browser real: login, `/finance/cash-out`, `/agency/operations`, `/admin/operations` |
 | 5 | Reliability signals OK | `/admin/operations` subsystem `Platform Release` debe estar OK |
+
+### 4.1. HubSpot drift recovery
+
+Si `platform.release.worker_revision_drift` reporta solo
+`hubspot-greenhouse-integration` drifted y el `target_sha` del ultimo release en
+`greenhouse_sync.release_manifests` ya fue verificado, usar forward-fix con el
+workflow canonico del bridge:
+
+```bash
+gh workflow run hubspot-greenhouse-integration-deploy.yml \
+  --ref main \
+  -f environment=production \
+  -f expected_sha=<release target_sha> \
+  -f skip_tests=false
+```
+
+Luego verificar:
+
+```bash
+curl https://hubspot-greenhouse-integration-y6egnifl6a-uc.a.run.app/health
+curl https://hubspot-greenhouse-integration-y6egnifl6a-uc.a.run.app/contract
+GITHUB_RELEASE_OBSERVER_TOKEN="$(gh auth token)" pnpm release:watchdog --json
+```
+
+Steady state esperado: `drift_count=0` y `4/4 workers synced`.
+
+Hard rules:
+
+- No editar `greenhouse_sync.release_manifests` por SQL para "arreglar" drift.
+- No cambiar `push:main` ni path filters como hotfix dentro de esta remediation.
+- No usar `skip_tests=true` salvo break-glass aprobado y documentado en `Handoff.md`.
+- No tocar rutas, payloads, webhooks ni secretos del bridge si el problema es solo revision drift.
 
 ## 5. Rollback automatizado (Vercel + Cloud Run)
 
@@ -461,13 +506,13 @@ Regla: `unmatched` debe investigarse, pero no muta releases. `failed` sí es inc
 - Workflows fix Opcion A: `.github/workflows/{ops-worker,commercial-cost-worker,ico-batch}-deploy.yml`
 - Capabilities: `platform.release.execute`, `platform.release.rollback`, `platform.release.bypass_preflight`
 
-## V1 limitations & V1.1 roadmap
+## Release control plane shipped scope
 
-V1 entrega foundation + concurrency fix + 2 signals + rollback CLI skeleton. V1.1 (TASKs derivativas):
+V1 entrego foundation + concurrency fix + rollback CLI. V1.1 completo el camino
+canonico de release:
 
-- **TASK-850** Production Preflight CLI completo (automatiza sec. 2 + WIF subjects + GH API blockers)
-- **TASK-851** `production-release.yml` workflow orchestrator (state machine + advisory lock + manifest writes automáticos)
-- **TASK-852** Worker SHA verification (input `expected_sha` + Ready=True polling)
-- **TASK-853** Azure infra release gating (Bicep diff detector + manual rollback runbook ampliado)
-- **TASK-854** 2 signals adicionales (deploy_duration_p95 + last_status)
-- **TASK-855** Dashboard `/admin/releases` (manifest viewer + rollback CTA)
+- **TASK-850 SHIPPED** Production Preflight CLI completo (12 checks, WIF subjects + GH API blockers + batch policy).
+- **TASK-851 SHIPPED** `production-release.yml` workflow orchestrator (state machine + manifest writes automaticos).
+- **TASK-852 compactado en TASK-851** Worker SHA verification (`expected_sha` + Ready=True polling).
+- **TASK-853 SHIPPED** Azure infra release gating (Bicep diff detector + manual rollback runbook ampliado).
+- **TASK-854 SHIPPED** 2 signals adicionales (`deploy_duration_p95` + `last_status`) + dashboard `/admin/releases`.

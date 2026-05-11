@@ -85,7 +85,7 @@ Bug en vivo que requiere atencion. Casos comunes:
 
 - **stale_approval `error` (>24h)**: deploy esperando approval >1 dia. Cancelar el run viejo (esta superseded por commits mas recientes).
 - **pending_without_jobs `error` (>5min)**: el bug class del incidente historico se reprodujo. Investigar.
-- **worker_revision_drift `error`**: la revision Cloud Run no matchea el ultimo deploy verde. Re-deployar el worker via workflow normal.
+- **worker_revision_drift `error`**: la revision Cloud Run no matchea el ultimo deploy verde. Si el worker drifted es `hubspot-greenhouse-integration`, ejecutar el recovery del runbook con `hubspot-greenhouse-integration-deploy.yml`, `environment=production`, `expected_sha=<release target_sha>` y `skip_tests=false`; luego verificar `/health`, `/contract` y watchdog `drift_count=0`.
 
 ### 🟠 `critical` — INCIDENT MODE
 

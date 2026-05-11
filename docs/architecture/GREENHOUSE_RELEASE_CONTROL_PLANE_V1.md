@@ -6,6 +6,26 @@
 > **Replaces:** N/A (no formal release contract pre-2026-05-10; lived as tribal knowledge in `Handoff.md`)
 > **Related:** TASK-849 (Production Release Watchdog Alerts), TASK-857 (GitHub Webhooks Release Event Ingestion), TASK-742 (Auth Resilience 7-layer), TASK-765 (payment_orders state machine), TASK-773 (outbox publisher cutover)
 
+## Delta 2026-05-11 — TASK-861 HubSpot drift recovery hardening
+
+`TASK-861` no cambia el comportamiento runtime del bridge HubSpot ni el flujo
+global de produccion. Refuerza el contrato operativo alrededor de un caso real
+de drift:
+
+- HubSpot queda cubierto por los mismos tests anti-regresion de worker workflow
+  contract que `ops-worker`, `commercial-cost-worker` e `ico-batch-worker`.
+- `platform.release.worker_revision_drift` conserva severity `error` para drift
+  confirmado, pero agrega evidencia accionable cuando el servicio drifted es
+  `hubspot-greenhouse-integration`.
+- Remediation canonica para ese caso: ejecutar
+  `hubspot-greenhouse-integration-deploy.yml` con `environment=production`,
+  `expected_sha=<release target_sha>` y `skip_tests=false`; luego verificar
+  `/health`, `/contract` y watchdog `drift_count=0`.
+- `greenhouse_sync.release_manifests` sigue siendo SSoT append-only. No se
+  corrige drift por SQL.
+- `push:main` y path filters de workers no cambian en esta task. Cualquier
+  cambio a orchestrator-only deploy requiere ADR/task separada.
+
 ## Delta 2026-05-10 — GitHub webhook ingestion V1.2 (TASK-857)
 
 `TASK-857` agrega near-real-time evidence desde GitHub sin cambiar el source of truth del release:

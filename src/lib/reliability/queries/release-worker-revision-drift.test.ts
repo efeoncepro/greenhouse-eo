@@ -2,6 +2,10 @@ import type * as ChildProcess from 'node:child_process'
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+const childProcessMock = vi.hoisted(() => ({
+  execFile: vi.fn()
+}))
+
 // Mock execFile (resolveCloudRunRevisionSha) ANTES del import del reader.
 // Garantiza que tests son deterministas independiente del estado real de
 // gcloud / Cloud Run en la maquina del runner. Sin este mock, los tests
@@ -13,13 +17,23 @@ vi.mock('node:child_process', async () => {
 
   return {
     ...actual,
-    execFile: vi.fn((_cmd, _args, _opts, callback) => {
+    execFile: childProcessMock.execFile.mockImplementation((_cmd, _args, _opts, callback) => {
+      const cb = typeof _opts === 'function' ? _opts : callback
+
       // Default: gcloud "absent" — pasa null/error al callback. Tests que
       // necesiten respuesta especifica deben usar vi.spyOn() en su propio scope.
-      if (callback) callback(new Error('gcloud not available in test'), '', '')
+      if (cb) cb(new Error('gcloud not available in test'), '', '')
     })
   }
 })
+
+const postgresMock = vi.hoisted(() => ({
+  runGreenhousePostgresQuery: vi.fn()
+}))
+
+vi.mock('@/lib/postgres/client', () => ({
+  runGreenhousePostgresQuery: postgresMock.runGreenhousePostgresQuery
+}))
 
 import {
   RELEASE_WORKER_REVISION_DRIFT_SIGNAL_ID,
@@ -47,12 +61,20 @@ describe('release-worker-revision-drift signal', () => {
     delete process.env.GITHUB_RELEASE_OBSERVER_TOKEN
     delete process.env.GITHUB_TOKEN
     global.fetch = vi.fn()
+    postgresMock.runGreenhousePostgresQuery.mockRejectedValue(new Error('pg not available in test'))
   })
 
   afterEach(() => {
     if (originalToken !== undefined) process.env.GITHUB_RELEASE_OBSERVER_TOKEN = originalToken
     if (originalGithubToken !== undefined) process.env.GITHUB_TOKEN = originalGithubToken
     global.fetch = originalFetch
+    postgresMock.runGreenhousePostgresQuery.mockReset()
+    childProcessMock.execFile.mockReset()
+    childProcessMock.execFile.mockImplementation((_cmd, _args, _opts, callback) => {
+      const cb = typeof _opts === 'function' ? _opts : callback
+
+      if (cb) cb(new Error('gcloud not available in test'), '', '')
+    })
   })
 
   it('exposes canonical signal ID', () => {
@@ -145,6 +167,59 @@ describe('release-worker-revision-drift signal', () => {
     const workersChecked = signal.evidence?.find((e) => e.label === 'workers_checked')
 
     expect(workersChecked?.value).toBe('4')
+  })
+
+  it('adds actionable HubSpot remediation when only HubSpot drifts against the canonical manifest', async () => {
+    process.env.GITHUB_RELEASE_OBSERVER_TOKEN = 'fake-token'
+
+    const targetSha = '4591bd8b28c8a18eb0aa15cfc8e092eeec814467'
+    const oldHubspotSha = '6507e92d1234567890abcdef1234567890abcdef'
+
+    postgresMock.runGreenhousePostgresQuery.mockResolvedValue([{ target_sha: targetSha }])
+
+    childProcessMock.execFile.mockImplementation((_cmd, args, _opts, callback) => {
+      const cb = typeof _opts === 'function' ? _opts : callback
+      const service = Array.isArray(args) ? String(args[3]) : ''
+      const value = service === 'hubspot-greenhouse-integration' ? oldHubspotSha : targetSha
+
+      const stdout = JSON.stringify({
+        spec: {
+          template: {
+            spec: {
+              containers: [
+                {
+                  env: [{ name: 'GIT_SHA', value }]
+                }
+              ]
+            }
+          }
+        }
+      })
+
+      if (cb) cb(null, { stdout, stderr: '' }, '')
+    })
+
+    const signal = await getReleaseWorkerRevisionDriftSignal()
+
+    expect(signal.severity).toBe('error')
+    expect(signal.summary).toContain('hubspot-greenhouse-integration')
+    expect(signal.evidence?.find((e) => e.label === 'drift_count')?.value).toBe('1')
+
+    const detail = signal.evidence?.find((e) => e.label === 'detail')?.value ?? ''
+
+    const recommendedAction =
+      signal.evidence?.find((e) => e.label === 'recommended_action')?.value ?? ''
+
+    expect(detail).toContain('hubspot-greenhouse-integration')
+    expect(detail).toContain('gh=4591bd8b28c8 != run=6507e92d1234')
+    expect(recommendedAction).toContain('gh workflow run hubspot-greenhouse-integration-deploy.yml')
+    expect(recommendedAction).toContain('-f environment=production')
+    expect(recommendedAction).toContain(`-f expected_sha=${targetSha}`)
+    expect(recommendedAction).toContain('-f skip_tests=false')
+    expect(recommendedAction).toContain('/health')
+    expect(recommendedAction).toContain('/contract')
+    expect(recommendedAction).toContain('drift_count=0')
+    expect(recommendedAction).toContain('Do not edit greenhouse_sync.release_manifests by SQL')
   })
 
   it('signal kind is drift (matches subsystem Platform Release contract)', async () => {

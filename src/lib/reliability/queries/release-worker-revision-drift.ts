@@ -82,10 +82,17 @@ interface WorkerDriftRecord {
   cloudRunService: string
   cloudRunRegion: string
   ghSha: string | null
+  targetSha: string | null
   runSha: string | null
   hasDrift: boolean
   dataMissing: boolean
   detail: string
+  recommendedAction: string | null
+}
+
+interface CanonicalReleaseSha {
+  compareSha: string
+  fullSha: string
 }
 
 const normalizeSha = (sha: string | null | undefined): string | null => {
@@ -96,6 +103,25 @@ const normalizeSha = (sha: string | null | undefined): string | null => {
   if (!/^[0-9a-f]+$/.test(trimmed)) return null
 
   return trimmed.slice(0, SHA_COMPARE_LENGTH)
+}
+
+const normalizeFullSha = (sha: string | null | undefined): string | null => {
+  if (!sha) return null
+  const trimmed = sha.trim().toLowerCase()
+
+  if (!trimmed || trimmed === 'unknown') return null
+  if (!/^[0-9a-f]+$/.test(trimmed)) return null
+
+  return trimmed
+}
+
+const toCanonicalReleaseSha = (sha: string | null | undefined): CanonicalReleaseSha | null => {
+  const compareSha = normalizeSha(sha)
+  const fullSha = normalizeFullSha(sha)
+
+  if (!compareSha || !fullSha) return null
+
+  return { compareSha, fullSha }
 }
 
 /**
@@ -110,7 +136,7 @@ const normalizeSha = (sha: string | null | undefined): string | null => {
  *     fallback a resolveLastSuccessShaFromGithub honest degradation
  *   - Tabla vacia (no hay releases nunca) → no es drift, es initial state
  */
-const resolveLastReleasedShaFromManifest = async (): Promise<string | null> => {
+const resolveLastReleasedShaFromManifest = async (): Promise<CanonicalReleaseSha | null> => {
   try {
     const rows = await runGreenhousePostgresQuery<{ target_sha: string | null }>(`
       SELECT target_sha
@@ -121,7 +147,7 @@ const resolveLastReleasedShaFromManifest = async (): Promise<string | null> => {
       LIMIT 1
     `)
 
-    return normalizeSha(rows[0]?.target_sha ?? null)
+    return toCanonicalReleaseSha(rows[0]?.target_sha ?? null)
   } catch (error) {
     // PG unavailable. Caller fallback to GitHub API path. NO crash.
     captureWithDomain(error, 'cloud', {
@@ -154,7 +180,7 @@ const ORCHESTRATOR_WORKFLOW_NAME = 'Production Release Orchestrator'
 const resolveLastSuccessShaFromGithub = async (
   token: string,
   workflowName: string
-): Promise<string | null> => {
+): Promise<CanonicalReleaseSha | null> => {
   const candidates = await Promise.all([
     fetchLastSuccessRun(token, workflowName).catch(() => null),
     fetchLastSuccessRun(token, ORCHESTRATOR_WORKFLOW_NAME).catch(() => null)
@@ -167,7 +193,7 @@ const resolveLastSuccessShaFromGithub = async (
   // Most recent by updated_at (ISO8601 string compare safe).
   const mostRecent = valid.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))[0]
 
-  return normalizeSha(mostRecent.headSha)
+  return toCanonicalReleaseSha(mostRecent.headSha)
 }
 
 const fetchLastSuccessRun = async (
@@ -224,9 +250,15 @@ const fetchLastSuccessRunFallback = async (
  * Compartido per-call entre los N workers (manifest SHA es global per release,
  * no per worker). Cache local-call para evitar N queries PG identicas.
  */
-let manifestShaCache: { value: string | null; cached: boolean } = { value: null, cached: false }
+let manifestShaCache: { value: CanonicalReleaseSha | null; cached: boolean } = {
+  value: null,
+  cached: false
+}
 
-const resolveCanonicalReleaseSha = async (token: string, workflowName: string): Promise<string | null> => {
+const resolveCanonicalReleaseSha = async (
+  token: string,
+  workflowName: string
+): Promise<CanonicalReleaseSha | null> => {
   if (!manifestShaCache.cached) {
     manifestShaCache = {
       value: await resolveLastReleasedShaFromManifest(),
@@ -242,6 +274,26 @@ const resolveCanonicalReleaseSha = async (token: string, workflowName: string): 
 
 const resetManifestShaCache = () => {
   manifestShaCache = { value: null, cached: false }
+}
+
+const HUBSPOT_CLOUD_RUN_SERVICE = 'hubspot-greenhouse-integration'
+const HUBSPOT_WORKFLOW_FILE = 'hubspot-greenhouse-integration-deploy.yml'
+const HUBSPOT_PUBLIC_URL = 'https://hubspot-greenhouse-integration-y6egnifl6a-uc.a.run.app'
+
+const buildRecommendedAction = (record: {
+  cloudRunService: string
+  targetSha: string | null
+}): string | null => {
+  if (record.cloudRunService !== HUBSPOT_CLOUD_RUN_SERVICE) return null
+
+  const expectedSha = record.targetSha ?? '<release target_sha>'
+
+  return [
+    `Run: gh workflow run ${HUBSPOT_WORKFLOW_FILE} --ref main -f environment=production -f expected_sha=${expectedSha} -f skip_tests=false`,
+    `Verify: curl ${HUBSPOT_PUBLIC_URL}/health && curl ${HUBSPOT_PUBLIC_URL}/contract`,
+    'Then rerun: GITHUB_RELEASE_OBSERVER_TOKEN="$(gh auth token)" pnpm release:watchdog --json and confirm drift_count=0',
+    'Do not edit greenhouse_sync.release_manifests by SQL'
+  ].join(' ; ')
 }
 
 /**
@@ -311,11 +363,13 @@ const checkWorker = async (
   const cloudRunService = workflow.cloudRunService!
   const cloudRunRegion = workflow.cloudRunRegion ?? 'us-east4'
 
-  const [ghSha, runSha] = await Promise.all([
+  const [canonicalSha, runSha] = await Promise.all([
     resolveCanonicalReleaseSha(token, workflow.workflowName).catch(() => null),
     resolveCloudRunRevisionSha(cloudRunService, cloudRunRegion)
   ])
 
+  const ghSha = canonicalSha?.compareSha ?? null
+  const targetSha = canonicalSha?.fullSha ?? null
   const dataMissing = ghSha === null || runSha === null
   const hasDrift = !dataMissing && ghSha !== runSha
 
@@ -329,15 +383,21 @@ const checkWorker = async (
     detail = `${cloudRunService}: gh=${ghSha} == run=${runSha} (synced)`
   }
 
+  const recommendedAction = hasDrift
+    ? buildRecommendedAction({ cloudRunService, targetSha })
+    : null
+
   return {
     workflowName: workflow.workflowName,
     cloudRunService,
     cloudRunRegion,
     ghSha,
+    targetSha,
     runSha,
     hasDrift,
     dataMissing,
-    detail
+    detail,
+    recommendedAction
   }
 }
 
@@ -411,6 +471,10 @@ export const getReleaseWorkerRevisionDriftSignal = async (): Promise<Reliability
     const summary = buildSummary(records)
     const detailLines = records.map((r) => r.detail).join(' | ')
 
+    const recommendedActions = records
+      .map((r) => r.recommendedAction)
+      .filter((action): action is string => Boolean(action))
+
     return {
       signalId: RELEASE_WORKER_REVISION_DRIFT_SIGNAL_ID,
       moduleKey: 'platform',
@@ -441,6 +505,17 @@ export const getReleaseWorkerRevisionDriftSignal = async (): Promise<Reliability
           label: 'detail',
           value: detailLines
         },
+        ...(
+          recommendedActions.length > 0
+            ? [
+                {
+                  kind: 'metric' as const,
+                  label: 'recommended_action',
+                  value: recommendedActions.join(' | ')
+                }
+              ]
+            : []
+        ),
         {
           kind: 'doc',
           label: 'Spec',
