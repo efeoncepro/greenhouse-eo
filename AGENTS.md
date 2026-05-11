@@ -1102,6 +1102,64 @@ Toda tabla operativa con celdas editables inline o > 8 columnas vive bajo un con
 - **NUNCA** duplicar `BonusInput` u otra primitiva legacy. Migrar consumers a `<InlineNumericEditor>`. `BonusInput.tsx` queda como re-export deprecado hasta que el ultimo consumer migre.
 - **NUNCA** desactivar el visual regression test de `/hr/payroll` para forzar un merge. Si falla por overflow, la solucion es respetar el contrato, no bypass.
 
+### Semantic Column Invariants — frontend / PDFs / emails / documentos legales (TASK-863 V1.5.1, 2026-05-11)
+
+Cuando una surface renderiza datos en un layout de N columnas donde cada columna **representa una entidad distinta** (empleador vs trabajador, deudor vs acreedor, sender vs receiver, payer vs payee, parte A vs parte B en un contrato), la asignación de cada dato a su columna NO es un detalle visual — es un **invariante semántico de integridad de datos**. Romperlo produce documentos legalmente defendibles como vicio (caso real: PDF de finiquito con "Cargo" del trabajador en col empleador detectado en primer emisión real Valentina Hoyos 2026-05-11).
+
+**Por qué emerge el bug class**: un grid 2-cols con `flexWrap` (PDFs `@react-pdf/renderer`, CSS flexbox/grid, MUI `Grid container`, HTML emails con tables) deja el flujo natural de wrap decidir dónde aterriza cada cell. Si una dimensión existe solo para una parte (e.g. `jobTitle` solo para personas naturales, `taxId` solo para entidades comerciales, `birthDate` solo para personas naturales), su cell impar/par natural cae en la **columna equivocada** y mezcla semánticamente datos de las dos partes.
+
+**⚠️ Reglas duras canónicas** (frontend / PDF / email / documentos legales):
+
+- **NUNCA** dejar que el flujo natural de `flexWrap`, `grid-auto-flow` o `column-wrap` decida la columna semántica de un dato. Si una columna representa una entidad (empleador, trabajador, ministro de fe, payer, receiver, parte A, parte B), TODOS los datos de esa entidad deben aterrizar explícitamente en su columna — NUNCA por accidente del wrap.
+- **NUNCA** intercalar campos de entidades distintas en el mismo grid 2-cols cuando una entidad tenga más dimensiones que la otra. Si los datos no son simétricos (e.g. trabajador tiene `jobTitle` pero la organización empleadora no), inserta **spacer vacío canónico** (`<View style={styles.field} />` en react-pdf, `<td>&nbsp;</td>` en email HTML, `<Grid item />` empty en MUI) en la columna que no aplica para preservar la invariante.
+- **NUNCA** "rellenar" la columna vacía con contenido falso o derivado (e.g. poner "N/A", "—", "No aplica", `displayName` del otro lado, repetir un dato ya mostrado) para "balancear" visualmente. Eso mezcla semántica y confunde al lector.
+- **NUNCA** asumir que un audit pre-emisión cubrió este bug class. El layout-by-wrap se ve correcto en el preview visual cuando todas las dimensiones son simétricas; el bug emerge cuando aparece un campo que solo aplica a una entidad. **Validar con caso real** del dominio, no con fixture sintético.
+- **NUNCA** acoplar `label` del campo a la entidad mediante posicionamiento (e.g. "Cargo" sin prefix asumiendo que la posición lo deja claro). El label debe ser auto-explicativo (`Cargo del trabajador`, `Domicilio empleador`, `RUT empleador`) por si la columna se rompe por regression.
+- **SIEMPRE** que emerja un nuevo campo asimétrico en un layout 2-cols (e.g. agregar `dateOfBirth` que solo aplica a trabajador, `legalEntityType` que solo aplica a empleador), insertar spacer vacío en la otra columna en el mismo commit. Tests visuales/snapshot deben capturar la asimetría.
+- **SIEMPRE** que un documento legal/regulatorio (finiquito, contrato, addenda, certificado, factura, boleta, recibo, carta formal) tenga partes comparecientes, las columnas DEBEN preservar la invariante: parte A en col 1, parte B en col 2, parte C (ministro de fe, testigo, garante) en col 3. Sin excepción.
+- **SIEMPRE** que un email transaccional tenga sender + receiver visibles (e.g. confirmación de pago, notificación de cambio de contrato), preservar el contrato visual de columnas. Templates en `src/views/emails/` que tengan party grids deben seguir esta regla.
+
+**Pattern fuente** (canonizado live 2026-05-11 vía TASK-863 V1.5.1):
+
+```tsx
+// src/lib/payroll/final-settlement/document-pdf.tsx — fix canónico V1.5.1
+<View style={styles.partyGrid}>
+  <Field label='Empleador' value={employer.legalName} />       {/* col 1 */}
+  <Field label='Trabajador/a' value={collaborator.legalName} /> {/* col 2 */}
+  <Field label='RUT empleador' value={employer.taxId} />        {/* col 1 */}
+  <Field label='RUT trabajador/a' value={collaborator.taxId} /> {/* col 2 */}
+  <Field label='Domicilio empleador' value={employer.address} />{/* col 1 */}
+  <Field label='Domicilio trabajador/a' value={worker.address}/>{/* col 2 */}
+  <View style={styles.field} />                                  {/* col 1 — spacer canónico: empleador no tiene cargo */}
+  <Field label='Cargo' value={collaborator.jobTitle} />          {/* col 2 — trabajador */}
+</View>
+```
+
+**Aplicabilidad cross-surface**: la regla aplica a TODAS las surfaces de Greenhouse donde se renderizan datos en columnas semánticamente diferenciadas:
+
+| Surface | Stack | Ejemplos |
+| --- | --- | --- |
+| PDFs operativos | `@react-pdf/renderer` | Finiquitos, contratos, addenda, certificados, boletas, recibos, cartas formales |
+| Emails transaccionales | React Email + MJML/HTML tables | Confirmación pago, notificaciones cambio contrato, recordatorios firma |
+| Tablas operativas MUI | DataTableShell (TASK-743) | Conciliación bancaria (movimiento vs match), payment orders (origen vs destino), payroll (haberes vs descuentos) |
+| Layouts de detalle | MUI Grid container | Drawers de cliente vs proveedor, perfiles persona vs organización |
+| Comparativos visuales | CSS Grid / Flexbox | Before/after, plan A vs plan B, propuesta vs contrato firmado |
+
+**Cuándo invocar audit comprehensive 3-skills** (aprendizaje canonizado del loop V1.1→V1.5):
+
+Para cualquier documento legal/regulatorio nuevo o cambio mayor que vaya a ser firmado/notarizado/auditado externamente, el pre-emisión audit técnico (typecheck + lint + visual review) NO es suficiente. El **pattern canónico post-2026-05-11** es:
+
+1. Implementar V1 con fixtures sintéticos + audit técnico.
+2. **Emitir 1 caso real** del dominio (con datos reales del cliente/colaborador/proveedor).
+3. Invocar comprehensive audit 3-skills sobre el documento real emitido:
+   - **Skill de dominio** (e.g. `greenhouse-payroll-auditor` para nómina/finiquitos, `greenhouse-finance-accounting-operator` para finance, `greenhouse-ux-writing` con foco es-CL formal-legal para textos jurídicos).
+   - **Skill UX writing** apropiada al registro (operativo / formal / legal / técnico).
+   - **Skill `modern-ui`** o equivalente visual para jerarquía/tipografía/spacing/balance.
+4. Iterar fixes hasta cerrar bloqueantes.
+5. **Canonizar** aprendizajes en AGENTS.md + CLAUDE.md + spec arquitectónica + doc funcional + ADR si toca contratos compartidos.
+
+Sin paso 3 (audit comprehensive post-real-emit), bugs como B-1/B-2/B-3 (cláusulas legales con vicio defendible) o V1.5.1 (cargo del trabajador en col empleador) quedan latentes y se manifiestan recién cuando un cliente, abogado, contralor o auditor externo lo detecta — costo mucho mayor.
+
 ### Organization-by-facets — receta canónica (TASK-611/612/613, 2026-05-08)
 
 Toda surface organization-centric (clientes finanzas, agency organizations, prospects, partners, vendors, futuras vistas legales/marketing/compliance/audit) **debe** renderearse a través del **Organization Workspace shell canónico** (TASK-612). Cero composición ad-hoc.
