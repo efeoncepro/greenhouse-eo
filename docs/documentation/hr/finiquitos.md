@@ -15,7 +15,7 @@ V1 del finiquito de renuncia voluntaria se cerro como documento legalmente ratif
 - **Pre-requisitos enforced** por buildDocumentReadiness: carta de renuncia ratificada subida como asset (blocker) + declaracion Ley 21.389 (blocker) + domicilio del trabajador resuelto desde TASK-784 (warning).
 - **HrOffboardingView sign-or-ratify dialog real**: captura datos canonicos del ministro de fe (notario / inspector / sindicato / Registro Civil) + reserva de derechos del trabajador con transcripcion manuscrita. Reemplaza el placeholder `external_process_placeholder`.
 - **Tipografia migrada** a Geist + Poppins (DESIGN.md canon; DM Sans deprecated).
-- **Flag de produccion** `final_settlement_resignation_production_enabled` queda `FALSE` por default hasta revision legal externa por abogado laboralista chileno.
+- **Activacion en produccion**: V1 esta activa sin flag de gating. La revision por abogado laboralista chileno es recomendada (no bloqueante); el operador HR decide cuando solicitarla.
 
 ## Que es el settlement final
 

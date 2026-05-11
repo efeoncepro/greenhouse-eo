@@ -12,7 +12,7 @@
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `none`
-- Status real: `Complete — Slices A-F shipped 2026-05-11 directo en develop; Slice G (revisión legal externa) queda fuera de repo + flag final_settlement_resignation_production_enabled=FALSE hasta que el abogado laboralista firme el spec`
+- Status real: `Complete — Slices A-F shipped 2026-05-11 directo en develop. Activa en produccion sin flag de gating; revision legal externa por abogado laboralista es recomendada (no bloqueante) per decision del usuario 2026-05-11.`
 - Rank: `TBD`
 - Domain: `hr`
 - Blocked by: `none` (TASK-784 enriquece pero no bloquea)
@@ -509,3 +509,16 @@ Ver mockup canónico `docs/mockups/task-862-finiquito-renuncia-v1-legal.html` pa
 - El PR de Slice D **debe incluir screenshots** del PDF generado en los 5 estados canónicos lado-a-lado con el mockup correspondiente. Sin esto, reviewer bloquea el merge.
 - ¿La Ley Bustos requiere también certificado de cotizaciones al día adjunto, o basta la declaración en cláusula tercera? Verificar con abogado durante Slice G.
 - ¿`offboarding_cases.resignation_letter_asset_id` ya existe en la tabla? Si no, decidir si agregarla en migration TASK-862 o en task separada.
+
+
+## Delta 2026-05-11 — Gate removido por decision del usuario
+
+Decision operacional del usuario post-cierre: el flag `final_settlement_resignation_production_enabled` y el gate `legalReviewStatus: pending → approved` **NO se aplican como bloqueo**. V1 queda activa en produccion para uso real:
+
+- No existe toggle de feature flag asociado en `home_rollout_flags` u otra tabla; las referencias en este spec eran aspiracionales doc-only.
+- La revision por abogado laboralista chileno queda como **practica recomendada (no bloqueante)**. Si emergen observaciones legales durante uso real, se incorporan como Delta en `GREENHOUSE_FINAL_SETTLEMENT_V1_SPEC.md` + commits subsiguientes.
+- El operador HR es responsable de validar cada finiquito antes de presentarlo al ministro de fe; Greenhouse genera el PDF, el sello fisico del notario le da validez legal.
+
+Cualquier item de Closing Protocol o Open Question que referencie el flag o `legalReviewStatus` queda **resuelto como N/A**.
+
+Follow-up canonico: **TASK-863** abre el wiring UI para los 2 pre-requisitos (subir carta renuncia + declarar pension alimentos) que hoy viven solo como endpoints sin botones dedicados en HrOffboardingView.

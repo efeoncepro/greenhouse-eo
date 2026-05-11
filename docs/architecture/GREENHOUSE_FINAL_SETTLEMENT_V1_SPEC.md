@@ -3,7 +3,7 @@
 > **Tipo:** Spec arquitectonica canonica (TASK-862)
 > **Version:** V1.0
 > **Fecha:** 2026-05-11
-> **Estado:** `legalReviewStatus: pending` — requiere revision por abogado laboralista chileno antes de flippear `final_settlement_resignation_production_enabled` a `TRUE`.
+> **Estado:** Activa en produccion. La revision por abogado laboralista chileno es **recomendada** (no bloqueante); el operador HR decide cuando solicitarla. Greenhouse genera el PDF; la validez legal final la da el sello fisico del ministro de fe.
 > **Causal soportada:** art. 159 N°2 CT — renuncia voluntaria del trabajador.
 > **Out of scope V1:** otras 8 causales (art. 159 N°1/4/5, art. 160, art. 161 incs. 1/2, art. 161 bis, art. 163 bis), honorarios closure, contractors, Deel/EOR, internacional.
 
@@ -140,18 +140,21 @@ Los 11 events ya declarados en `EVENT_TYPES` (TASK-862 Slice C aclara: no agrega
 
 `calculator.test.ts` strict equality actualizada para 5 componentes default + tests nuevos para escenarios edge (anual_proporcional, carryover>0, usedAdvancedDays>0, overlap covered).
 
-## 10. Flag de produccion + rollout
+## 10. Activacion en produccion
 
-`final_settlement_resignation_production_enabled` (boolean, default `FALSE`). Mientras `FALSE`:
+V1 esta activa en produccion sin flag de gating. El operador HR puede usar el modulo
+directamente desde `/hr/offboarding` para cualquier caso de renuncia voluntaria Chile
+dependiente con payroll interno.
 
-- Solo staging + cuentas Efeonce internas pueden emitir finiquitos.
-- HR produccion sigue calculando + emitiendo PDFs como hoy (V1.0 actual sin clausulas) hasta flip.
+**Revision legal externa**: recomendada pero no bloqueante. Si emergen observaciones
+de un abogado laboralista chileno durante uso real, se incorporan como Delta en este
+spec + commits subsiguientes. No existe un toggle binario "habilitar/deshabilitar";
+el operador es responsable de validar cada finiquito antes de presentarlo al ministro
+de fe.
 
-Flip a `TRUE` requiere:
-
-1. `legalReviewStatus: 'approved'` en este documento (Delta firmado por abogado laboralista chileno).
-2. CLAUDE.md hard rules consolidadas.
-3. Smoke test E2E: carta renuncia → caso aprobado → calculo → readiness ready → issue → ratify dialog → signed_or_ratified.
+**Practica recomendada**: ejecutar el smoke E2E (carta renuncia → caso aprobado →
+calculo → readiness ready → issue → ratify dialog → signed_or_ratified) sobre un caso
+de prueba interno Efeonce antes del primer caso real con cliente Globe.
 
 ## 11. Out of scope (followups)
 
