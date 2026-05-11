@@ -19,6 +19,17 @@
 
 ---
 
+# Sesion 2026-05-11 — TASK-867 abierta (Offboarding Work Queue Projection + UX Modernization)
+
+- **Trigger:** usuario pidió consolidar en una task la revisión multi-skill de `/hr/offboarding`, luego commit + push.
+- **Skills invocadas en el análisis previo:** `greenhouse-ui-orchestrator`, `greenhouse-ux-content-accessibility`, `greenhouse-microinteractions-auditor`, `ui-product-design-orchestrator`, `microinteractions-auditor`, `software-architect-2026`, `greenhouse-task-planner`.
+- **Task creada:** `docs/tasks/to-do/TASK-867-offboarding-work-queue-projection-ux-modernization.md`.
+- **Decisión de diseño capturada:** no tratar la mejora como maquillaje visual. Primero crear proyección read-only `OffboardingWorkQueue` que componga caso + último cálculo + último documento + prerequisitos + próximo paso, para eliminar N+1 fetch y sacar reglas de workflow del JSX; después modernizar la UI como cola operacional.
+- **Índices actualizados:** `docs/tasks/TASK_ID_REGISTRY.md` + `docs/tasks/README.md`; siguiente ID disponible ahora `TASK-868`.
+- **No tocado:** implementación runtime, endpoints TASK-862/TASK-863, ni el cambio local ajeno en `src/lib/payroll/final-settlement/document-store.ts`/reliability.
+
+---
+
 # Sesion 2026-05-11 — TASK-863 V1.1-V1.5.1 hardening + Legal Signatures Platform canónica
 
 - **Trigger:** primer emisión real del finiquito de Valentina Hoyos detectó múltiples hallazgos visuales y legales. Loop iterativo cerró 5 rondas de fixes (V1.1 → V1.5) + comprehensive audit enterprise por 3 skills (payroll-auditor + UX writing es-CL formal-legal + modern-ui), seguido de hotfix UI V1.5.1 sobre invariante de columnas Partes.
