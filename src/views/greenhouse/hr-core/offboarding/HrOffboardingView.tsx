@@ -16,12 +16,14 @@ import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
 import FormControl from '@mui/material/FormControl'
+import FormControlLabel from '@mui/material/FormControlLabel'
 import Grid from '@mui/material/Grid'
 import InputLabel from '@mui/material/InputLabel'
 import MenuItem from '@mui/material/MenuItem'
 import Select from '@mui/material/Select'
 import Skeleton from '@mui/material/Skeleton'
 import Stack from '@mui/material/Stack'
+import Switch from '@mui/material/Switch'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
@@ -32,6 +34,7 @@ import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 
 import { getMicrocopy } from '@/lib/copy'
+import { GH_FINIQUITO } from '@/lib/copy/finiquito'
 
 import CustomChip from '@core/components/mui/Chip'
 
@@ -237,6 +240,26 @@ const HrOffboardingView = () => {
   const [documentsByCaseId, setDocumentsByCaseId] = useState<Record<string, FinalSettlementDocument | null>>({})
   const [reissueTarget, setReissueTarget] = useState<OffboardingCase | null>(null)
   const [reissueReason, setReissueReason] = useState('')
+  // TASK-862 Slice E — sign-or-ratify dialog (captura ministro de fe + worker reservation).
+  const [signRatifyTarget, setSignRatifyTarget] = useState<OffboardingCase | null>(null)
+
+  const [signRatifyForm, setSignRatifyForm] = useState<{
+    ministerKind: 'notary' | 'labor_inspector' | 'union_president' | 'civil_registry'
+    ministerName: string
+    ministerTaxId: string
+    notaria: string
+    ratifiedAt: string
+    workerReservationOfRights: boolean
+    workerReservationNotes: string
+  }>({
+    ministerKind: 'notary',
+    ministerName: '',
+    ministerTaxId: '',
+    notaria: '',
+    ratifiedAt: new Date().toISOString().slice(0, 10),
+    workerReservationOfRights: false,
+    workerReservationNotes: ''
+  })
 
   const activeCases = useMemo(
     () => cases.filter(item => activeStatuses.has(item.status)),
@@ -409,8 +432,18 @@ const HrOffboardingView = () => {
   const runDocumentAction = async (
     item: OffboardingCase,
     action: 'render' | 'submit-review' | 'approve' | 'issue' | 'sign-or-ratify' | 'reissue',
-    options?: { reason?: string }
+    options?: { reason?: string; signRatifyPayload?: Record<string, unknown> }
   ) => {
+    // TASK-862 Slice E — sign-or-ratify ya NO usa placeholder hardcodeado.
+    // El handler del boton "Registrar ratificación" abre signRatifyTarget dialog;
+    // el dialog submitter llama esta funcion con options.signRatifyPayload poblado.
+    // Si action='sign-or-ratify' pero NO hay payload → abrir dialog en lugar de POST.
+    if (action === 'sign-or-ratify' && !options?.signRatifyPayload) {
+      setSignRatifyTarget(item)
+
+      return
+    }
+
     setDocumentSavingCaseId(item.offboardingCaseId)
     setError(null)
     setScanMessage(null)
@@ -427,13 +460,7 @@ const HrOffboardingView = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(
           action === 'sign-or-ratify'
-            ? {
-            signatureEvidenceRef: {
-              source: 'external_process_placeholder',
-              recordedFrom: 'offboarding_surface',
-              recordedAt: new Date().toISOString()
-            }
-          }
+            ? options?.signRatifyPayload ?? {}
             : action === 'reissue'
               ? { reason: options?.reason }
               : {}
@@ -535,6 +562,72 @@ const HrOffboardingView = () => {
     setReissueReason('')
   }
 
+  // TASK-862 Slice E — sign-or-ratify dialog submit. Reemplaza el placeholder
+  // `external_process_placeholder` por payload canonico con metadata real del
+  // ministro de fe + worker reservation. Backend persiste signatureEvidenceRef
+  // como JSONB y mantiene shape forward-compatible para futuros campos.
+  const submitSignRatify = async () => {
+    if (!signRatifyTarget) return
+
+    const ministerName = signRatifyForm.ministerName.trim()
+    const ministerTaxId = signRatifyForm.ministerTaxId.trim()
+    const ratifiedAt = signRatifyForm.ratifiedAt
+    const notaria = signRatifyForm.notaria.trim() || null
+    const notes = signRatifyForm.workerReservationNotes.trim() || null
+
+    if (!ministerName) {
+      setError('Indica el nombre del ministro de fe que ratificó el documento.')
+
+      return
+    }
+
+    if (!ministerTaxId) {
+      setError('Indica el RUT/identificación del ministro de fe.')
+
+      return
+    }
+
+    if (!ratifiedAt) {
+      setError('Indica la fecha en que se ratificó el documento.')
+
+      return
+    }
+
+    if (signRatifyForm.workerReservationOfRights && !notes) {
+      setError('Cuando el trabajador consigna reserva, transcribe el texto manuscrito.')
+
+      return
+    }
+
+    await runDocumentAction(signRatifyTarget, 'sign-or-ratify', {
+      signRatifyPayload: {
+        signatureEvidenceAssetId: null,
+        signatureEvidenceRef: {
+          ministerKind: signRatifyForm.ministerKind,
+          ministerName,
+          ministerTaxId,
+          notaria,
+          ratifiedAt,
+          source: 'hr_dashboard',
+          recordedAt: new Date().toISOString()
+        },
+        workerReservationOfRights: signRatifyForm.workerReservationOfRights,
+        workerReservationNotes: notes
+      }
+    })
+
+    setSignRatifyTarget(null)
+    setSignRatifyForm({
+      ministerKind: 'notary',
+      ministerName: '',
+      ministerTaxId: '',
+      notaria: '',
+      ratifiedAt: new Date().toISOString().slice(0, 10),
+      workerReservationOfRights: false,
+      workerReservationNotes: ''
+    })
+  }
+
   if (loading) {
     return (
       <Stack spacing={6}>
@@ -614,6 +707,112 @@ const HrOffboardingView = () => {
             onClick={submitReissue}
           >
             {documentSavingCaseId ? 'Reemitiendo' : 'Reemitir'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* TASK-862 Slice E — Sign-or-ratify dialog: captura datos del ministro de fe y reserva de derechos
+          del trabajador post-ratificación física. Reemplaza el placeholder external_process_placeholder. */}
+      <Dialog
+        open={Boolean(signRatifyTarget)}
+        onClose={() => {
+          if (documentSavingCaseId) return
+
+          setSignRatifyTarget(null)
+        }}
+        fullWidth
+        maxWidth='sm'
+      >
+        <DialogTitle>Registrar ratificación del finiquito</DialogTitle>
+        <DialogContent>
+          <Stack spacing={3} sx={{ pt: 1 }}>
+            <Alert severity='info'>
+              Completa los datos del ministro de fe que ratificó el documento (notario, inspector del trabajo, presidente del
+              sindicato u oficial del Registro Civil). Si el trabajador consignó reserva de derechos, transcríbela tal como la
+              escribió.
+            </Alert>
+            <FormControl fullWidth required>
+              <InputLabel id='minister-kind-label'>Ministro de fe</InputLabel>
+              <Select
+                labelId='minister-kind-label'
+                label='Ministro de fe'
+                value={signRatifyForm.ministerKind}
+                onChange={event => setSignRatifyForm(prev => ({ ...prev, ministerKind: event.target.value as typeof prev.ministerKind }))}
+              >
+                <MenuItem value='notary'>{GH_FINIQUITO.resignation.ministro.kindLabel.notary}</MenuItem>
+                <MenuItem value='labor_inspector'>{GH_FINIQUITO.resignation.ministro.kindLabel.labor_inspector}</MenuItem>
+                <MenuItem value='union_president'>{GH_FINIQUITO.resignation.ministro.kindLabel.union_president}</MenuItem>
+                <MenuItem value='civil_registry'>{GH_FINIQUITO.resignation.ministro.kindLabel.civil_registry}</MenuItem>
+              </Select>
+            </FormControl>
+            <TextField
+              label='Nombre completo'
+              value={signRatifyForm.ministerName}
+              onChange={event => setSignRatifyForm(prev => ({ ...prev, ministerName: event.target.value }))}
+              fullWidth
+              required
+            />
+            <TextField
+              label='RUT / Identificación'
+              value={signRatifyForm.ministerTaxId}
+              onChange={event => setSignRatifyForm(prev => ({ ...prev, ministerTaxId: event.target.value }))}
+              fullWidth
+              required
+              helperText='Formato RUT chileno (ej. 12.345.678-9). Para inspectores del trabajo u oficiales del Registro Civil, indica su identificación oficial.'
+            />
+            <TextField
+              label='Notaría / Oficina (opcional)'
+              value={signRatifyForm.notaria}
+              onChange={event => setSignRatifyForm(prev => ({ ...prev, notaria: event.target.value }))}
+              fullWidth
+              helperText='Ej.: 25° Notaría de Santiago, Inspección Provincial de Santiago Centro.'
+            />
+            <TextField
+              label='Fecha de ratificación'
+              type='date'
+              value={signRatifyForm.ratifiedAt}
+              onChange={event => setSignRatifyForm(prev => ({ ...prev, ratifiedAt: event.target.value }))}
+              fullWidth
+              required
+              InputLabelProps={{ shrink: true }}
+            />
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={signRatifyForm.workerReservationOfRights}
+                  onChange={event => setSignRatifyForm(prev => ({ ...prev, workerReservationOfRights: event.target.checked }))}
+                />
+              }
+              label='El trabajador consignó reserva de derechos'
+            />
+            {signRatifyForm.workerReservationOfRights && (
+              <TextField
+                label='Texto de la reserva consignada'
+                value={signRatifyForm.workerReservationNotes}
+                onChange={event => setSignRatifyForm(prev => ({ ...prev, workerReservationNotes: event.target.value }))}
+                multiline
+                minRows={3}
+                fullWidth
+                required
+                helperText='Transcribe literalmente lo que el trabajador escribió de su puño y letra en el espacio de reserva.'
+              />
+            )}
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            variant='text'
+            disabled={Boolean(documentSavingCaseId)}
+            onClick={() => setSignRatifyTarget(null)}
+          >
+            {GREENHOUSE_COPY.actions.cancel}
+          </Button>
+          <Button
+            variant='contained'
+            disabled={Boolean(documentSavingCaseId) || !signRatifyForm.ministerName.trim() || !signRatifyForm.ministerTaxId.trim() || !signRatifyForm.ratifiedAt}
+            onClick={submitSignRatify}
+          >
+            {documentSavingCaseId ? 'Registrando' : 'Registrar ratificación'}
           </Button>
         </DialogActions>
       </Dialog>
