@@ -18,6 +18,159 @@
 
 ---
 
+## Delta 2026-05-11 V2.1 — `document_kind` ortogonal (`native` vs `linked`) — incluye finiquito como type V1
+
+Pregunta del usuario revelaba un gap: el finiquito (TASK-862/863) tiene state machine de 9 estados propio en `greenhouse_payroll.final_settlement_documents`. ¿Debe ser un `document_type` del registry o queda fuera?
+
+**Decisión canónica V2.1**: introducir dimensión ortogonal `documents.kind ENUM ('native' | 'linked')`:
+
+- **`kind = 'native'`** — SSOT vive en `documents` + `document_versions`. State machine propio del registry (5 estados). Caso V1: contratos, NDAs, licencias, identity_scan.
+- **`kind = 'linked'`** — SSOT vive en otro aggregate. `documents` row es **proxy/surface/index** para listings + audit + retention; el state real refleja el del aggregate dueño via reactive consumer del outbox event del dueño. Caso V1: finiquito (`final_settlement_documents`); futuras: `person_identity_documents`, `member_certifications`, `member_evidence`.
+
+**Beneficios canónicos**:
+
+1. **Mental model uniforme**: `/my/documents` lista TODO (contratos + finiquitos + identity_scans) sin lógica especial UI-side; el reader hace JOIN+UNION ya canonizado en el registry.
+2. **SSOT preservado**: el aggregate dueño (TASK-863 final_settlement_documents) NO se migra ni pierde verticalidad. Registry es **surface layer**, NO authoritative store.
+3. **Reactive sync**: outbox event del aggregate dueño dispara update del proxy row (no double-write inline).
+4. **Late binding extensible**: V2 puede agregar `member_certifications` + `member_evidence` + `person_identity_documents` como linked types sin schema migration adicional (solo seed entries + consumers).
+5. **Retention + capability uniformes**: el registry centraliza retention policy + capabilities granulares; el aggregate dueño hereda automáticamente sin re-implementar.
+
+**Implicaciones de schema** (refinement sobre el DDL skeleton V2):
+
+```sql
+ALTER TABLE greenhouse_core.documents
+  ADD COLUMN kind TEXT NOT NULL DEFAULT 'native',
+  ADD COLUMN linked_aggregate_table TEXT,
+  ADD COLUMN linked_aggregate_id TEXT,
+  ADD CONSTRAINT documents_kind_check
+    CHECK (kind IN ('native', 'linked')),
+  ADD CONSTRAINT documents_linked_invariant
+    CHECK ((kind = 'native' AND linked_aggregate_table IS NULL AND linked_aggregate_id IS NULL)
+        OR (kind = 'linked' AND linked_aggregate_table IS NOT NULL AND linked_aggregate_id IS NOT NULL));
+
+-- For linked docs, current_version_id puede ser NULL (no version propio).
+-- El proxy refleja el último estado del aggregate dueño.
+ALTER TABLE greenhouse_core.documents
+  DROP CONSTRAINT documents_current_version_fk;
+
+ALTER TABLE greenhouse_core.documents
+  ADD CONSTRAINT documents_current_version_fk
+  FOREIGN KEY (current_version_id) REFERENCES greenhouse_core.document_versions(document_version_id)
+  DEFERRABLE INITIALLY DEFERRED;
+
+-- linked_aggregate_table es enum cerrado para evitar polymorphic FK loose.
+ALTER TABLE greenhouse_core.documents
+  ADD CONSTRAINT documents_linked_aggregate_table_check
+  CHECK (linked_aggregate_table IS NULL OR linked_aggregate_table IN (
+    'greenhouse_payroll.final_settlement_documents',
+    'greenhouse_core.person_identity_documents',
+    'greenhouse_core.member_certifications',
+    'greenhouse_core.member_evidence'
+  ));
+
+-- Bridge dedicado para finiquitos (V1 incluye este, mantiene FK strict):
+CREATE TABLE greenhouse_core.document_final_settlement_link (
+  document_id                   TEXT PRIMARY KEY REFERENCES greenhouse_core.documents(document_id) ON DELETE RESTRICT,
+  final_settlement_document_id  TEXT NOT NULL UNIQUE REFERENCES greenhouse_payroll.final_settlement_documents(final_settlement_document_id) ON DELETE RESTRICT,
+  created_at                    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  created_by_user_id            TEXT NOT NULL
+);
+```
+
+**document_type V1 set actualizado (6 native + 1 linked = 7 types)**:
+
+```sql
+-- 6 native types (kind='native' en el INSERT del documents row):
+INSERT INTO greenhouse_core.document_type_catalog VALUES
+  ('labor_contract',     'Contrato de trabajo',            ...),
+  ('labor_addendum',     'Anexo de contrato',              ...),
+  ('nda',                'Acuerdo de confidencialidad',    ...),
+  ('medical_certificate','Licencia médica',                ...),
+  ('identity_scan',      'Documento de identidad escaneado',...),
+  ('compliance_other',   'Documento de compliance (otro)', ...);
+
+-- 1 linked type V1 (kind='linked' al crear row, apunta a aggregate dueño):
+INSERT INTO greenhouse_core.document_type_catalog VALUES
+  ('final_settlement', 'Finiquito laboral', 'Final settlement (severance)',
+   'hr', 'labor_contract', 5, 'reveal_required', FALSE, FALSE,
+   'documents.read_masked', NULL);
+```
+
+`final_settlement` hereda retention `labor_contract` (5 años post-término) + `reveal_required` (confidencial por contener montos + datos sensibles) + `versionable=FALSE` (cada finiquito es único per case; supersedes via TASK-863 reissue, NO via registry versions) + `self_service_allowed=FALSE` (el operador HR es quien lo emite, NO el colaborador).
+
+**Reactive sync canónico**: outbox event `payroll.final_settlement_document.lifecycle_changed` (TASK-863) dispara reactive consumer `documentRegistryLinkedDocumentSyncProjection`:
+
+```ts
+// src/lib/sync/projections/document-registry-linked-sync.ts
+const documentRegistryLinkedDocumentSyncProjection: ProjectionDefinition = {
+  name: 'document_registry_linked_sync',
+  triggerEvents: [
+    'payroll.final_settlement_document.created.v1',
+    'payroll.final_settlement_document.lifecycle_changed.v1',
+    'payroll.final_settlement_document.superseded.v1'
+  ],
+  extractScope: (event) => ({ finalSettlementDocumentId: event.payload.documentId }),
+  refresh: async ({finalSettlementDocumentId}) => {
+    // 1. Re-read final_settlement_document de PG
+    // 2. UPSERT documents row (kind='linked', linked_aggregate_table='greenhouse_payroll.final_settlement_documents', linked_aggregate_id=finalSettlementDocumentId)
+    // 3. UPSERT bridge document_final_settlement_link
+    // 4. UPSERT bridge document_member_link (member_id desde finiquito)
+    // 5. Map TASK-863 state → registry verification_status (rendered/in_review/approved → pending_review, issued/signed_or_ratified → verified, voided/rejected/superseded → archived/superseded)
+    // 6. INSERT INTO document_verification_audit_log (proxy sync trace)
+  },
+  maxRetries: 5
+}
+```
+
+**Helper canónico nuevo**:
+
+```ts
+// src/lib/documents/link-aggregate.ts
+export const linkAggregateDocument = async (input: {
+  kind: 'final_settlement_document' | 'person_identity_document' | 'member_certification' | 'member_evidence'
+  aggregateId: string
+  documentType: DocumentTypeKey  // e.g. 'final_settlement'
+  tenantKind: 'efeonce_internal' | 'client'
+  tenantSpaceId?: string
+  title: string
+  memberId?: string  // for member-linked aggregates
+  expiresAt?: string
+  initialVerificationStatus: DocumentVerificationStatus
+  createdByUserId: string
+}, client?: PoolClient): Promise<Document>
+```
+
+**Status state mapping (linked aggregates → registry)**:
+
+| Aggregate state (final_settlement) | Registry verification_status |
+| --- | --- |
+| `rendered`, `in_review`, `approved` | `pending_review` |
+| `issued`, `signed_or_ratified` | `verified` |
+| `rejected`, `voided` | `archived` (with reason) |
+| `superseded` | `superseded` |
+
+El registry NO duplica el state machine completo del aggregate; abstrae 5 estados canonical que sirven al consumer cross-domain (operador HR ve "verificado" = doc usable; "archivado" = doc terminal; "pendiente" = doc en proceso).
+
+**Hard rules actualizadas**:
+
+- **NUNCA** mutar `documents.verification_status` para `kind='linked'` rows directamente. La mutation viene SOLO del reactive consumer cuando el aggregate dueño cambia. Bypass = drift + audit log incompleto.
+- **NUNCA** crear `documents` row con `kind='linked'` sin pasar por `linkAggregateDocument` helper. El helper enforce el invariant CHECK + persiste bridge + idempotent re-call.
+- **NUNCA** crear `document_versions` para `kind='linked'` docs. Las versions viven en el aggregate dueño (`final_settlement_documents.pdf_asset_id` con auto-regen TASK-863).
+- **NUNCA** referenciar `linked_aggregate_id` sin verificar que existe en `linked_aggregate_table`. CHECK constraint del enum cerrado + reactive consumer detecta orphans.
+- **SIEMPRE** que un aggregate nuevo emerja como candidato a linked, agregarlo a: (a) `linked_aggregate_table` CHECK enum, (b) `document_<aggregate>_link` bridge dedicado con UNIQUE constraint, (c) reactive consumer en `link-aggregate-sync.ts`, (d) seed entry en `document_type_catalog`.
+
+**Total tables V2.1**: 9 tables (era 8 en V2: agregamos `document_final_settlement_link` como bridge dedicado V1).
+
+**Total document_types V1**: 7 (6 native + 1 linked).
+
+**Total bridges V1**: 4 (member_link, organization_link, client_link, final_settlement_link).
+
+**Total reliability signals**: 6 (era 5; agregamos `documents.linked_aggregate_sync_lag` para detectar drift entre aggregate dueño y proxy registry).
+
+**Scope impact**: Slice 0 (architecture spec) + Slice 1 (migration) + Slice 3 (reactive consumer + 6th signal) reciben este refinement. Slice 2 (helpers) agrega `linkAggregateDocument`. Effort estimate sube de ~17-24h total a ~22-30h.
+
+---
+
 ## Delta 2026-05-11 V2 — Full hardening (all open questions resolved + DDL skeleton + 4-pillar score)
 
 Skill `arch-architect` (Greenhouse overlay) consolidó el Delta 2026-05-11 V1 (8 gaps identificados) en un spec completamente implementable. **6 open questions resueltas explícitamente** (ver sección "Decisions Resolved"). DDL skeleton inline + helper signatures TS + state machine + outbox events v1 + reliability signals + capabilities granulares + 4-pillar score requirement.
