@@ -1,11 +1,14 @@
-# Sesion 2026-05-11 — TASK-840 Deprecated capabilities cleanup tomada
+# Sesion 2026-05-11 — TASK-840 Deprecated capabilities cleanup cerrada
 
-- **Trigger:** usuario pidió implementar `TASK-840 — ISSUE-068 Fase 6: Deprecated capabilities cleanup`, manteniéndose explícitamente en `develop` y sin cambiar de rama.
-- **Branch:** `develop` por instrucción explícita del usuario; se omite la rama `task/TASK-840-*` del flujo default y se documenta como override operativo.
-- **Ownership:** task movida a `docs/tasks/in-progress/TASK-840-issue-068-fase-6-deprecated-capabilities-cleanup.md`, Lifecycle `in-progress`, README sincronizado. No hay PR/branch TASK-840 activo.
-- **Discovery inicial:** TASK-839 ya cerrada, por lo tanto el bloqueo quedó resuelto. El trabajo toca identity/access, registry DB, audit log, outbox y endpoint App Router; requiere migration y validación contra `capabilities_registry` + grants activos.
-- **Skills:** `greenhouse-agent`, `greenhouse-task-planner` y `vercel:nextjs` cargadas para task lifecycle, backend Greenhouse y App Router.
-- **Siguiente paso inmediato:** completar discovery técnico, presentar AUDIT + mapa + plan y luego implementar slice por slice.
+- **Branch:** `develop` por instrucción explícita del usuario; no se cambió de rama.
+- **Estado:** task movida a `docs/tasks/complete/TASK-840-issue-068-fase-6-deprecated-capabilities-cleanup.md`, Lifecycle `complete`.
+- **Commits:** `5b31a88a` ownership/lifecycle in-progress, `51abc58b` helper + endpoint + migration + reporter + docs, cierre documental en commit posterior.
+- **Implementación:** helper canónico `markCapabilityDeprecated()` bloquea TS catalog activo, grants activos, actualiza `deprecated_at`, escribe `entitlement_governance_audit_log.change_type='capability_deprecated'`, publica `access.capability.deprecated` v1 y limpia cache de registry.
+- **API / access model:** endpoint canónico `/api/admin/entitlements/capabilities/[capabilityKey]/deprecate` con `requireAdminTenantContext` + capability `access.governance.capability.deprecate` (`manage`, `tenant`). `routeGroups`, `views` y startup policy no cambian.
+- **DB:** migration `20260511112736683_task-840-deprecated-capabilities-cleanup.sql` aplicada con `pnpm pg:connect:migrate`; extiende CHECK de audit log y siembra la capability nueva. También repara drift live inverso detectado durante discovery: `commercial.engagement.recover_outbound` y `platform.release.watchdog.read` existían en TS catalog pero faltaban en registry activo.
+- **Operación:** reporter read-only `scripts/governance/find-deprecated-candidates.ts` emite CSV; live output actual solo header (0 candidates).
+- **Validación:** targeted Vitest 24/24, `pnpm test` 4087 passed / 11 skipped, `pnpm lint`, `pnpm exec tsc --noEmit --pretty false`, `pnpm build`, `pnpm pg:doctor`, parity live `inSync=true`, smoke live de rechazo a capability TS activa → `CapabilityDeprecationError` 409.
+- **No validado:** no se ejecutó live success de deprecación porque no hay candidates stale y crear/deprecar una row artificial ensuciaría el registry histórico. Cubierto por unit test happy path.
 
 # Sesion 2026-05-11 — TASK-839 Admin Center governance wire-up cerrada
 

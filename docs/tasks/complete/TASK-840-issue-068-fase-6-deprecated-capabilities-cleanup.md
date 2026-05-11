@@ -6,13 +6,13 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P3`
 - Impact: `Bajo`
 - Effort: `Bajo`
 - Type: `housekeeping`
 - Epic: `—`
-- Status real: `En curso 2026-05-11`
+- Status real: `Cerrada 2026-05-11`
 - Rank: `TBD`
 - Domain: `identity`
 - Blocked by: `none` (TASK-839 cerrada 2026-05-11)
@@ -147,3 +147,11 @@ Estándar.
 ## Follow-ups
 
 - Ninguno. Esta task cierra el plan multi-fase de ISSUE-068 al 100%.
+
+## Closing Notes — 2026-05-11
+
+- Implementado `markCapabilityDeprecated()` como helper canónico transaccional con guard contra TS catalog activo, pre-check de grants activos, update de `deprecated_at`, audit log `capability_deprecated`, outbox `access.capability.deprecated` v1 y cache clear.
+- Endpoint canónico agregado en `/api/admin/entitlements/capabilities/[capabilityKey]/deprecate`, no en `/api/admin/governance/access/**`, alineado con TASK-839.
+- Script read-only `scripts/governance/find-deprecated-candidates.ts` emite CSV de candidates y counts; no auto-mutates.
+- Migration `20260511112736683_task-840-deprecated-capabilities-cleanup.sql` aplicada en Cloud SQL dev; además reparó drift live inverso detectado durante discovery (`commercial.engagement.recover_outbound`, `platform.release.watchdog.read` faltaban en registry activo).
+- Validación: targeted Vitest 24/24, suite completa 4087/4087, `pnpm lint`, `pnpm exec tsc --noEmit --pretty false`, `pnpm build`, `pnpm pg:doctor`, reporter CSV live sin candidates y parity live `inSync=true`.
