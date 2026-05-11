@@ -1,3 +1,36 @@
+# Sesion 2026-05-11 — TASK-863 V1.1-V1.5.1 hardening + Legal Signatures Platform canónica
+
+- **Trigger:** primer emisión real del finiquito de Valentina Hoyos detectó múltiples hallazgos visuales y legales. Loop iterativo cerró 5 rondas de fixes (V1.1 → V1.5) + comprehensive audit enterprise por 3 skills (payroll-auditor + UX writing es-CL formal-legal + modern-ui), seguido de hotfix UI V1.5.1 sobre invariante de columnas Partes.
+- **Branch:** `develop` directo por instrucción explícita; sin PRs.
+- **6 commits post-cierre original TASK-863:**
+  - `c3c061b4` hotfix FK violation `/api/assets/private` + endpoint observability hardening (captureWithDomain + PG error translation).
+  - `7fbd8a7c` V1.1 watermark canónico + ligature fi (Geist GSUB strip) + user-id technical removido del texto legal + auto-regeneración PDF al transicionar estado (`regenerateDocumentPdfForStatus`).
+  - `65824cea` V1.2 polish post first-emit review (footer en banda única, jerarquía title/KPI, grid Partes simétrica con cargo en su propia fila).
+  - `88f2f6f9` V1.2.1 badge PDF refleja `documentStatus` canónico (no readiness).
+  - `b5ebb91f` V1.3 polish round 3 (footer overlap, page break `wrap={false}` para CUARTO, signature slot reservado simétrico).
+  - `2950b9fe` V1.4 Legal Signatures canonical helper `src/lib/legal-signatures/` + firma Julio Reyes embedded como `src/assets/signatures/77357182-1.png`.
+  - `593ff731` V1.5 — 5 bloqueantes legales/UI post comprehensive audit (cláusula PRIMERO separa hitos, cláusula SEGUNDO verbo state-conditional, cláusula CUARTO cita art. 13 Ley 14.908, simetría firmas 3 cols, jerarquía title > KPI).
+- **Hotfix V1.5.1 en esta sesión — invariante de columnas Partes comparecientes:**
+  - **Bug detectado por el usuario** en el PDF real emitido: "el recuadro de cargo está quedando del lado del empleador y el cargo es del trabajador".
+  - **Root cause:** `partyGrid` es 2-cols (50% width per cell + flexWrap). Orden previo {employer, worker, employerTaxId, workerTaxId, employerAddress, workerAddress, workerJobTitle} hacía que workerJobTitle aterrizara como 7º cell → col 1 (empleador) por flex-wrap natural.
+  - **Fix canónico:** insertar `<View style={styles.field} />` (spacer vacío sin label/value) como 7º cell, empujando workerJobTitle a col 2 (trabajador). Preserva simetría visual del grid 2-cols sin inducir contenido falso en col empleador (las organizaciones no tienen cargo — primitive correcto).
+  - **Invariante canonizada:** todos los datos del trabajador (legalName, taxId, address, jobTitle) viven en col 2; todos los del empleador (legalName, taxId, address) viven en col 1. Cuando una dimensión existe solo para una de las partes (e.g. cargo), spacer vacío en la otra preserva la invariante.
+  - **Tests:** `pnpm test src/lib/payroll/final-settlement/document-pdf.test.tsx` 2/2 verde. `pnpm test src/lib/legal-signatures` 11/11 verde.
+- **Documentación canonizada en esta sesión:**
+  - **Nueva spec:** `docs/architecture/GREENHOUSE_LEGAL_SIGNATURES_PLATFORM_V1.md` (118 líneas) — convención de filename {taxId_normalizado}.png, API pública del helper, path-safe protection (4 checks), consumers actuales + forward-compat V2 (asset privado canónico + FK desde organizations). Reusable por contratos, addenda, cartas formales, certificados de servicio.
+  - **ADR registrado:** 3 entries nuevas en `docs/architecture/DECISIONS_INDEX.md`:
+    1. "Firmas digitales de representantes legales viven como recurso canónico reutilizable, NO ad-hoc por flow" → spec V1.
+    2. "Cláusulas legales del finiquito separan hitos temporales distintos y usan verbo performativo state-conditional" → spec finiquito Delta V1.5.
+    3. "PDF de documentos legales regenera automáticamente al transicionar a issued/signed_or_ratified" → spec finiquito Delta V1.1.
+  - **Spec actualizada:** `GREENHOUSE_FINAL_SETTLEMENT_V1_SPEC.md` +105 líneas con Delta V1.1 (auto-regen) + Delta V1.5 (5 bloqueantes legales cerrados).
+  - **Documentación funcional:** `docs/documentation/hr/finiquitos.md` v1.2→v1.3 con resumen V1.1-V1.5 (auto-regen + watermark canónico + tipografía + footer + firma reusable + 5 bloqueantes).
+  - **Manual de uso:** `docs/manual-de-uso/hr/finiquitos.md` v1.2→v1.3 con sección nueva "Cómo subir la firma del representante legal del empleador" (5 pasos + caso multi-organización Globe + restricción explícita de no subir firmas de trabajadores/ministros de fe por art. 177 CT).
+  - **CLAUDE.md:** +80 líneas con sección "Legal Signatures Platform invariants" + sección "Finiquito V1.5 — Cláusulas legales state-conditional + auto-regeneración PDF" (reglas duras + matriz de watermark + helpers canónicos + tests anti-regresión).
+- **Verdict final TASK-863:** documento V1.5.1 listo para uso productivo con clientes reales. Recomendación pre-uso recurrente: 1 sesión con abogado laboralista chileno (~1h) para validar las 3 interpretaciones legales (B-1/B-2/B-3 del audit).
+- **Aprendizaje canonizado:** loop iterativo post-emisión real reveló 5 rondas de fixes que un audit pre-emisión no había detectado. El comprehensive audit por 3 skills (payroll-auditor + UX writing formal-legal + modern-ui) **después** del primer doc real cerró 5 bloqueantes legales que ningún audit técnico pre-emisión había detectado. Pattern reusable para futuros documentos legales: emitir 1 caso real → audit comprehensive 3-skills → cerrar bloqueantes → canonizar.
+
+---
+
 # Sesion 2026-05-11 — TASK-863 cerrada (finiquito prerequisitos UI directo en develop)
 
 - **Trigger:** usuario invocó "Vas a implementar la task [TASK-863] pero mantente en develop, no cambies de rama" en auto mode (continuación inmediata del cierre TASK-862 + push develop).

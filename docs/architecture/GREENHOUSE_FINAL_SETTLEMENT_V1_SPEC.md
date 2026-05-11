@@ -1,7 +1,7 @@
 # Greenhouse Final Settlement V1 — Canonical Spec (Renuncia Voluntaria)
 
-> **Tipo:** Spec arquitectonica canonica (TASK-862)
-> **Version:** V1.0
+> **Tipo:** Spec arquitectonica canonica (TASK-862 + TASK-863 V1.1-V1.5)
+> **Version:** V1.5
 > **Fecha:** 2026-05-11
 > **Estado:** Activa en produccion. La revision por abogado laboralista chileno es **recomendada** (no bloqueante); el operador HR decide cuando solicitarla. Greenhouse genera el PDF; la validez legal final la da el sello fisico del ministro de fe.
 > **Causal soportada:** art. 159 N°2 CT — renuncia voluntaria del trabajador.
@@ -171,5 +171,104 @@ de prueba interno Efeonce antes del primer caso real con cliente Globe.
 - Codigo del Trabajo de Chile: art. 159 N°2 (renuncia), art. 162 inc. 5 (Ley Bustos), art. 177 (ratificacion), art. 178 (tratamiento ingreso no renta), art. 50 (gratificacion legal), art. 73 (feriado proporcional).
 - DT (Direccion del Trabajo): `https://dt.gob.cl/portal/1628/w3-article-60200.html`, `https://www.dt.gob.cl/portal/1626/w3-article-117245.html`, `https://www.dt.gob.cl/portal/1628/w3-article-60573.html`, `https://www.dt.gob.cl/portal/1628/w3-article-60613.html`.
 - SII: `https://www.sii.cl/preguntas_frecuentes/declaracion_renta/001_140_5683.htm` (ingresos no renta por vacaciones indemnizadas).
-- Ley 14.908 mod. Ley 21.389/2021 (pension de alimentos — declaracion obligatoria en finiquito).
+- Ley 14.908 mod. Ley 21.389/2021 (pension de alimentos — declaracion obligatoria en finiquito). Texto operativo: **art. 13 de la Ley 14.908** (obligacion del empleador en finiquito).
 - DL 3.500 art. 19 (cotizaciones previsionales).
+
+## Delta 2026-05-11 V1.1 — Auto-regeneracion canonica al transicionar
+
+**Decisión**: el PDF persistido como asset privado se regenera AUTOMATICAMENTE cuando el documento transita a `issued` o `signed_or_ratified`. Helper privado `regenerateDocumentPdfForStatus` en `src/lib/payroll/final-settlement/document-store.ts` reemplaza el `pdf_asset_id` del MISMO documento (sin bump versión, sin alterar state machine, sin reissue).
+
+**Por qué**: antes el PDF se renderizaba UNA SOLA VEZ en `documentStatus='rendered'` con watermark "PROYECTO". Cuando el operador transitaba a `issued` y descargaba el PDF para llevar al notario, salía con watermark — incorrecto per la matriz canónica (issued → CLEAN). "Reemitir" crea v+1 y obliga a recorrer el flow completo de nuevo. UX rota.
+
+**Matriz canónica de watermark**:
+
+| documentStatus | Watermark | Severity |
+|---|---|---|
+| `rendered` | "PROYECTO" | warning |
+| `in_review` | "PROYECTO" | warning |
+| `approved` | "PROYECTO" | warning |
+| `issued` | **CLEAN** | — |
+| `signed_or_ratified` | **CLEAN** | — |
+| `blocked` | "BLOQUEADO" | error |
+| `rejected` | "RECHAZADO" | error |
+| `voided` | "ANULADO" | error |
+| `superseded` | "REEMPLAZADO" | neutral |
+
+`renderFinalSettlementDocumentPdf(snapshot, options?: { documentStatus?: string | null })` acepta documentStatus explícito. Backward-compat: callsites sin documentStatus caen al patrón inferido por `ratification + readiness`.
+
+**Idempotente**: si el render falla, la transición ya commiteo (UPDATE document_status). El operador puede usar Reemitir para recovery. El asset PDF viejo NO se borra; `pdf_asset_id` apunta al nuevo asset (audit trail completo).
+
+## Delta 2026-05-11 V1.4 — Helper canonico Legal Signatures
+
+**Decisión**: las firmas digitalizadas del representante legal del empleador viven como recurso canónico reutilizable en `@/lib/legal-signatures` (NO ad-hoc por flow).
+
+**Spec dedicada**: [GREENHOUSE_LEGAL_SIGNATURES_PLATFORM_V1.md](GREENHOUSE_LEGAL_SIGNATURES_PLATFORM_V1.md).
+
+**Snapshot extension**: `snapshot.employer.legalRepresentativeSignaturePath` (string | null). Cargado en `getEmployerSnapshot` via `buildSignatureFilenameForTaxId(taxId)` canonical. Render del PDF resuelve con `resolveLegalRepresentativeSignaturePath()`.
+
+**Forward-compat V2**: migrar storage a asset privado canónico (`greenhouse_core.assets` retention class `legal_signature` + FK en `organizations.legal_representative_signature_asset_id`). Misma signature pública del helper.
+
+## Delta 2026-05-11 V1.5 — 5 bloqueantes legales cerrados
+
+Comprehensive audit por skills `greenhouse-payroll-auditor` + UX writing es-CL formal-legal + modern-ui detectó 5 bloqueantes pre-emision real. V1.5 los cierra:
+
+### B-1 Cláusula PRIMERO separa hitos legales distintos
+
+Antes: "carta de renuncia ratificada con fecha {X}" mezclaba fecha de suscripción (firma trabajador) con fecha de ratificación notarial art. 177 CT. **Vicio legalmente defendible** en demanda.
+
+Ahora: `FiniquitoClauseParams` expone 2 campos separados:
+
+- `resignationNoticeSignedAt`: fecha de suscripción del trabajador (DD-MM-YYYY, obligatorio).
+- `resignationNoticeRatifiedAt`: fecha de ratificación notarial (DD-MM-YYYY, null hasta ratificación).
+
+Copy state-conditional:
+
+- Pre-ratificación → "suscrita por el(la) trabajador(a) con fecha {signedAt}, **cuya ratificación ante ministro de fe se efectuará** conforme al artículo 177 del Código del Trabajo."
+- Post-ratificación → "suscrita por el(la) trabajador(a) con fecha {signedAt}, **ratificada ante ministro de fe el {ratifiedAt}** conforme al artículo 177 del Código del Trabajo."
+
+### B-2 Cláusula SEGUNDO verbo performativo state-conditional
+
+Antes: "declara recibir en este acto, a su entera satisfacción..." aunque el documento estuviera en `rendered`/`in_review`/`approved`/`issued` (no ratificado). El verbo performativo presume acto consumado → **vicio de consentimiento** defendible.
+
+Ahora: `FiniquitoClauseSegundoParams` expone `isRatified: boolean`. Render condicional:
+
+- Pre-ratificación → "declara que **recibirá**, al momento de la ratificación ante ministro de fe, a su entera satisfacción..." (futuro condicional).
+- Post-ratificación → "declara **haber recibido** en este acto, a su entera satisfacción..." (perfecto consumado).
+
+### B-3 Cláusula CUARTO cita artículo operativo Ley 14.908
+
+Antes: "Ley N° 14.908, modificada por la Ley N° 21.389 de 2021" citaba solo la modificatoria sin el artículo operativo → jurídicamente débil.
+
+Ahora: "**artículo 13 de la Ley N° 14.908 sobre Abandono de Familia y Pago de Pensiones Alimenticias**, en su texto modificado por la Ley N° 21.389 de 2021."
+
+### B-4 Simetría visual 3 columnas firma enterprise
+
+Antes: empleador (firma renderizada cruzando línea) + trabajador/ministro (líneas vacías más abajo) producía asimetría visual que rompía formalismo legal.
+
+Ahora: `signatureColumn` con `paddingTop: 36` reserva ESPACIO SIMÉTRICO arriba de la línea en las 3 columnas. `signatureImageEmployer` absoluta en `top: 0` ancla al espacio reservado. **Líneas de las 3 columnas caen al MISMO Y absoluto** → balance enterprise. Trabajador y ministro tienen el espacio en blanco esperando firma física presencial en notaría.
+
+### B-5 Title legal DOMINA visualmente vs KPI monto
+
+Antes: title "Finiquito de contrato de trabajo" 18pt vs KPI $121.963 16pt (ratio 1.125x, marketing pattern). El KPI competía con el acto jurídico.
+
+Ahora: title 20pt Poppins Bold + KPI 14pt Poppins SemiBold (ratio 1.43x). Notarios/abogados leen primero el ACTO, después el monto — patrón legal canónico (cf. Stripe Invoice template / Banco Chile finiquitos).
+
+### Audit trace
+
+Comprehensive audit enterprise ejecutado live 2026-05-11:
+
+- `greenhouse-payroll-auditor`: verdict `pass_with_warnings` sobre cálculo de Valentina Hoyos ($121.963 = feriado proporcional 6.78 días corridos × $17.988,6 base diaria). Componentes correctos para renuncia voluntaria.
+- UX writing es-CL formal-legal: 3 bloqueantes legales detectados (B-1, B-2, B-3) + 5 importantes + 3 polish.
+- modern-ui + DESIGN.md: 2 bloqueantes visuales (B-4, B-5) + 8 importantes + 5 polish.
+
+Restantes 12 importantes + 6 polish quedan como follow-up V1.6 no bloqueante.
+
+### Verificación V1.5 end-to-end
+
+PDF V1.5 emitido en staging (Valentina Hoyos, settlement v2 d12, asset `asset-ecf491dc-...`). Verificado via `pdftotext` + crop visual:
+
+- ✅ PRIMERO copy state-conditional (issued: "cuya ratificación... se efectuará"; ratified: "ratificada... el {ratifiedAt}").
+- ✅ SEGUNDO verbo state-conditional (issued: "declara que recibirá"; ratified: "declara haber recibido").
+- ✅ CUARTO cita art. 13 Ley 14.908.
+- ✅ Las 3 líneas de firma alineadas al mismo Y absoluto.
+- ✅ Title 20pt domina; KPI 14pt sutil.

@@ -2646,6 +2646,86 @@ Toda surface que renderice recibos individuales de Payroll **debe** consumir el 
 
 **Spec canónica**: `docs/architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md` §25.c. Mockup vinculante: `docs/mockups/task-782-period-report-excel-honorarios-disaggregation.html`. Tests: `src/lib/payroll/generate-payroll-pdf.test.ts` + `generate-payroll-excel.test.ts` (12 tests anti-regression).
 
+### Legal Signatures Platform invariants (TASK-863 V1.4, desde 2026-05-11)
+
+Toda surface que renderice un documento legal firmado por el **representante legal del empleador** (finiquitos hoy; contratos, addenda, cartas formales mañana) **debe** consumir el helper canónico `@/lib/legal-signatures` para resolver la firma digitalizada. NUNCA reimplementar el resolver inline en otro flow.
+
+**Convención de filename**: `src/assets/signatures/{taxId_normalizado}.png`. `taxId_normalizado` = `taxId` con puntos + espacios removidos (guion preservado). Efeonce SpA RUT 77.357.182-1 → `77357182-1.png`.
+
+**API canónica** (`src/lib/legal-signatures/index.ts`):
+
+```typescript
+import {
+  buildSignatureFilenameForTaxId,
+  resolveLegalRepresentativeSignaturePath,
+  getLegalRepresentativeSignatureAbsolutePath,
+  LEGAL_SIGNATURE_BASE_DIR
+} from '@/lib/legal-signatures'
+```
+
+**Path-safe protection** (4 checks defensivos):
+
+1. Empty/null → `null` (graceful fallback)
+2. `..` (path traversal) → `null`
+3. Path absoluto (`/`) → `null`
+4. Extensión NO en `{png, jpg, jpeg}` → `null`
+5. `existsSync` falla → `null`
+
+Si cualquier check falla, el consumer renderea la **línea de firma vacía** para firma manual presencial.
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** reimplementar el resolver inline. Consumir `@/lib/legal-signatures`.
+- **NUNCA** componer paths absolutos hardcoded. Siempre via `buildSignatureFilenameForTaxId(taxId)` + `resolveLegalRepresentativeSignaturePath`.
+- **NUNCA** confiar en path strings provenientes de usuario sin pasarlos por el resolver.
+- **NUNCA** usar este helper para firmas de personas naturales (trabajadores). Las firmas de trabajadores son SIEMPRE físicas presenciales (art. 177 CT).
+- **SIEMPRE** dejar graceful fallback en el render si el path resuelve a `null`.
+- **SIEMPRE** preservar PNG transparente con aspect ratio ~2.2-2.4:1 (recomendado 1718×734).
+
+**Forward-compat V2**: migrar storage a asset privado canónico (`greenhouse_core.assets` con `retention_class='legal_signature'` + FK desde `organizations.legal_representative_signature_asset_id`). Misma signature pública del helper → backwards-compatible.
+
+**Spec canónica**: `docs/architecture/GREENHOUSE_LEGAL_SIGNATURES_PLATFORM_V1.md`. Tests: `src/lib/legal-signatures/index.test.ts` (11 tests anti-regresión).
+
+### Finiquito V1.5 — Cláusulas legales state-conditional + auto-regeneración PDF (TASK-863, desde 2026-05-11)
+
+Comprehensive audit enterprise por skills `greenhouse-payroll-auditor` + UX writing es-CL formal-legal + `modern-ui` cerró 5 bloqueantes legales/UI del PDF de finiquito de renuncia voluntaria post primer caso real (Valentina Hoyos):
+
+**B-1 Cláusula PRIMERO separa hitos legales distintos** — `FiniquitoClauseParams` expone `resignationNoticeSignedAt` (firma trabajador, obligatorio) + `resignationNoticeRatifiedAt` (ratificación notarial art. 177 CT, null hasta ratificación). Copy state-conditional pre/post ratificación. Antes mezclarlas era vicio defendible en demanda chilena.
+
+**B-2 Cláusula SEGUNDO verbo performativo state-conditional** — `FiniquitoClauseSegundoParams` expone `isRatified: boolean`. Pre-ratificación → "declara que recibirá, al momento de la ratificación..." (futuro). Post-ratificación → "declara haber recibido en este acto..." (perfecto consumado). Antes "declara recibir en este acto" sobre doc no ratificado era vicio de consentimiento.
+
+**B-3 Cláusula CUARTO cita artículo operativo Ley 14.908** — Texto canónico: "artículo 13 de la Ley N° 14.908 sobre Abandono de Familia y Pago de Pensiones Alimenticias, en su texto modificado por la Ley N° 21.389 de 2021". Antes citaba solo la modificatoria sin operativo → jurídicamente débil.
+
+**B-4 Simetría visual 3 columnas firma** — `signatureColumn` con `paddingTop: 36` reserva espacio simétrico arriba de la línea en las 3 columnas (empleador + trabajador + ministro de fe). `signatureImageEmployer` absoluta en `top: 0`. Las 3 líneas caen al mismo Y absoluto → balance enterprise.
+
+**B-5 Title legal DOMINA visualmente vs KPI monto** — Title 20pt Poppins Bold + KPI 14pt Poppins SemiBold (ratio 1.43x). Antes 18pt vs 16pt era marketing pattern, no legal pattern. Notarios/abogados leen primero el ACTO, después el monto.
+
+**Auto-regeneración canónica del PDF al transicionar** (TASK-863 V1.1): el helper privado `regenerateDocumentPdfForStatus` reemplaza `pdf_asset_id` del MISMO documento cuando transita a `issued` o `signed_or_ratified` (sin bump versión, sin reissue). Wire en `issueFinalSettlementDocumentForCase` + `markFinalSettlementDocumentSignedOrRatifiedForCase`. Idempotente: si falla render, transition ya commiteo y operador puede usar reissue.
+
+**Matriz canónica de watermark per `documentStatus`**:
+
+| documentStatus | Watermark |
+|---|---|
+| rendered / in_review / approved | "PROYECTO" warning |
+| **issued / signed_or_ratified** | **CLEAN** |
+| blocked | "BLOQUEADO" error |
+| rejected | "RECHAZADO" error |
+| voided | "ANULADO" error |
+| superseded | "REEMPLAZADO" neutral |
+
+`renderFinalSettlementDocumentPdf(snapshot, options?: { documentStatus?: string | null })` acepta documentStatus explícito. Backward-compat: callsites sin documentStatus caen al patrón inferido por `ratification + readiness`.
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** mezclar fecha de firma del trabajador con fecha de ratificación notarial en la cláusula PRIMERO. Son 2 hitos legales distintos.
+- **NUNCA** renderizar el verbo "declara recibir en este acto" cuando `documentStatus != 'signed_or_ratified'`. Usa `isRatified` para state-condicional.
+- **NUNCA** citar Ley 21.389 sin el artículo operativo Ley 14.908. Citar solo la modificatoria es jurídicamente débil.
+- **NUNCA** renderear la firma del empleador rompiendo simetría con las otras 2 columnas (trabajador + ministro). `paddingTop: 36` en `signatureColumn` reserva espacio simétrico.
+- **NUNCA** componer KPI monto con peso visual superior al title del acto jurídico. El acto legal domina.
+- **NUNCA** dejar el `pdf_asset_id` apuntando a un asset con watermark cuando `documentStatus IN ('issued', 'signed_or_ratified')`. El auto-regen lo refresca; si falla, reissue recovery.
+
+**Spec canónica**: `docs/architecture/GREENHOUSE_FINAL_SETTLEMENT_V1_SPEC.md` (Delta 2026-05-11 V1.1 + V1.4 + V1.5). Doc funcional + manual de uso: `docs/documentation/hr/finiquitos.md` + `docs/manual-de-uso/hr/finiquitos.md` (v1.3).
+
 ### Person Legal Profile invariants (TASK-784, desde 2026-05-05)
 
 Toda surface que muestre o consuma identidad legal de una persona natural (RUT, documento de identidad, direccion legal/residencia) **debe** pasar por el modulo canonico `src/lib/person-legal-profile/`. Reemplaza el patron legacy donde `final_settlement_documents` hardcodea `taxId: null` y BigQuery `member_profiles.identity_document_*` era la unica fuente.

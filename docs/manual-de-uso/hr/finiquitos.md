@@ -1,12 +1,49 @@
 # Finiquitos Chile
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-05-04 por Codex
-> **Ultima actualizacion:** 2026-05-11 por Claude (TASK-863 — UI completa para pre-requisitos)
+> **Ultima actualizacion:** 2026-05-11 por Claude (TASK-863 V1.5 — comprehensive audit + firma representante legal reusable)
 > **Modulo:** HR / Payroll
 > **Ruta en portal:** `/hr/offboarding`
-> **Documentacion relacionada:** [Finiquitos Chile](../../documentation/hr/finiquitos.md), [GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md), [GREENHOUSE_FINAL_SETTLEMENT_V1_SPEC.md](../../architecture/GREENHOUSE_FINAL_SETTLEMENT_V1_SPEC.md)
+> **Documentacion relacionada:** [Finiquitos Chile](../../documentation/hr/finiquitos.md), [GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md), [GREENHOUSE_FINAL_SETTLEMENT_V1_SPEC.md](../../architecture/GREENHOUSE_FINAL_SETTLEMENT_V1_SPEC.md), [GREENHOUSE_LEGAL_SIGNATURES_PLATFORM_V1.md](../../architecture/GREENHOUSE_LEGAL_SIGNATURES_PLATFORM_V1.md)
+
+## Cómo subir la firma del representante legal del empleador
+
+La firma digital del representante legal del empleador se pre-imprime en el bloque "Representante empleador" del PDF de finiquito (y de cualquier documento legal futuro: contratos, addenda, cartas).
+
+### Paso a paso
+
+1. Solicita al representante legal una imagen de su firma manuscrita.
+2. Digitalízala como **PNG con fondo transparente** (~1718 × 734 px recomendado, trazo oscuro).
+3. Renombra el archivo siguiendo la convención:
+
+   ```
+   {RUT_sin_puntos_ni_espacios}.png
+   ```
+
+   Ejemplo Efeonce SpA (RUT 77.357.182-1): `77357182-1.png`.
+
+4. Copia el archivo a la carpeta canónica del repo:
+
+   ```
+   src/assets/signatures/77357182-1.png
+   ```
+
+5. Commit + push. La próxima vez que se emita o reemita un documento legal del empleador, la firma se embebe automáticamente sobre la línea "Representante empleador".
+
+### Importante
+
+- **NO subas la firma del trabajador ni del ministro de fe**. Las firmas de personas naturales (trabajador) y ministros de fe son siempre **físicas presenciales** (art. 177 del Código del Trabajo exige ratificación ante ministro de fe).
+- Solo se permite **una firma por organización** (por RUT). Si el representante legal cambia, reemplaza el archivo manteniendo el mismo filename canónico.
+- Si el archivo no existe en `src/assets/signatures/`, la línea queda vacía para firma manual post-impresión (no falla el render).
+
+### Soporte multi-organización (caso Globe)
+
+Cuando un cliente Globe contrata representación de su entidad legal en Greenhouse, sube su firma con su propio RUT siguiendo la misma convención. El render del PDF resolverá automáticamente la firma correspondiente per documento según el `taxId` del `employer` declarado en el snapshot.
+
+> **Spec técnica completa:** [GREENHOUSE_LEGAL_SIGNATURES_PLATFORM_V1.md](../../architecture/GREENHOUSE_LEGAL_SIGNATURES_PLATFORM_V1.md).
+> **V2 forward-path:** migrar storage a asset privado canónico con UI admin para upload + rotation + revocación. Por ahora V1.4 usa filesystem hardcoded para no requerir DDL.
 
 ## Delta TASK-863 (2026-05-11) — UI completa para pre-requisitos
 

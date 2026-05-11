@@ -1002,9 +1002,10 @@ const FinalSettlementPdfDocument = ({
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{GH_FINIQUITO.resignation.partiesLabels.sectionTitle}</Text>
-          {/* TASK-863 V1.2 — Grid Partes simétrica: ambas direcciones en la misma fila,
-              cargo del trabajador en su propia fila al final. Antes el cargo se intercalaba
-              entre domicilio empleador y domicilio trabajador, dejando el del trabajador huérfano. */}
+          {/* TASK-863 V1.5.1 — Grid Partes con invariante de columna: empleador siempre col 1,
+              trabajador siempre col 2. El "Cargo" pertenece al trabajador (las organizaciones no
+              tienen cargo), por eso va en col 2. Spacer vacío en col 1 mantiene la simetría visual
+              del grid 2-cols sin inducir contenido falso en la columna del empleador. */}
           <View style={styles.partyGrid}>
             <Field label={GH_FINIQUITO.resignation.partiesLabels.employer} value={snapshot.employer.legalName} />
             <Field label={GH_FINIQUITO.resignation.partiesLabels.worker} value={snapshot.collaborator.legalName || snapshot.collaborator.displayName} />
@@ -1012,6 +1013,7 @@ const FinalSettlementPdfDocument = ({
             <Field label={GH_FINIQUITO.resignation.partiesLabels.workerTaxId} value={snapshot.collaborator.taxId} />
             <Field label={GH_FINIQUITO.resignation.partiesLabels.employerAddress} value={snapshot.employer.legalAddress} />
             <Field label={GH_FINIQUITO.resignation.partiesLabels.workerAddress} value={workerAddressDisplay} />
+            <View style={styles.field} />
             <Field label={GH_FINIQUITO.resignation.partiesLabels.workerJobTitle} value={snapshot.collaborator.jobTitle} />
           </View>
         </View>
