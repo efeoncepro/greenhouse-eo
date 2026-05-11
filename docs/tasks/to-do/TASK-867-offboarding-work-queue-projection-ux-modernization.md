@@ -14,7 +14,7 @@
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `optional`
-- Status real: `Diseno`
+- Status real: `Mockup aprobado`
 - Rank: `TBD`
 - Domain: `hr`
 - Blocked by: `none`
@@ -82,6 +82,7 @@ Reglas obligatorias:
 - UI visible debe usar copy canonica en `src/lib/copy/*`; no hardcodear CTAs/estados reutilizables en JSX.
 - Toda tabla operacional nueva o refactorizada debe usar `DataTableShell` cuando aplique.
 - Cualquier motion/microinteraccion debe respetar reduced-motion y no cargar significado solo en color o hover.
+- UI implementation lock: el mockup aprobado en `/hr/offboarding/mockup` es el contrato visual/UX para esta task. El agente implementador no debe rediseñar, simplificar, reemplazar ni crear una UI alternativa fuera de ese mockup. Puede adaptar el mockup solo para conectarlo a datos reales, estados runtime, permisos, tests, responsive fixes y copy canonica; cualquier cambio visual/UX material requiere aprobacion explicita del usuario y debe documentarse como delta en esta task.
 
 ## Normative Docs
 
@@ -378,6 +379,16 @@ export interface OffboardingWorkQueueItem {
 
 Patron principal: `summary strip + operational work queue + row detail/drawer optional`.
 
+Mockup aprobado por usuario el 2026-05-11:
+
+- Ruta local: `/hr/offboarding/mockup`
+- Route file: `src/app/(dashboard)/hr/offboarding/mockup/page.tsx`
+- View mockup: `src/views/greenhouse/hr-core/offboarding/mockup/OffboardingWorkQueueMockupView.tsx`
+- Mock data tipada: `src/views/greenhouse/hr-core/offboarding/mockup/mockData.ts`
+- Decision aprobada: summary strip + tabs/filtros + tabla operacional `DataTableShell` + accion primaria por fila + drawer lateral con checklist/progreso/acciones secundarias.
+- Esta aprobacion valida la direccion visual/UX. La implementacion runtime todavia debe reemplazar mock data por `OffboardingWorkQueue` server-side y mantener los write paths existentes.
+- Regla de implementacion UI: construir la UI runtime desde este mockup aprobado. No implementar otra interfaz "parecida", no volver a la tabla anterior como base visual y no dejar decisiones de layout/jerarquia a criterio del agente implementador salvo para ajustes tecnicos menores.
+
 Evitar:
 
 - hero marketing;
@@ -439,7 +450,19 @@ Evitar:
 
 Task creada desde review multi-skill de la vista `/hr/offboarding`: UI product design global, microinteractions global, `greenhouse-ui-orchestrator`, `greenhouse-ux-content-accessibility`, `greenhouse-microinteractions-auditor` y `software-architect-2026`. La conclusion canonica fue que la mejora debe partir por una proyeccion read-only de cola operacional antes de refactor visual.
 
+## Delta 2026-05-11 — Mockup aprobado
+
+Se creo mockup real del rediseño en `/hr/offboarding/mockup` usando `greenhouse-mockup-builder`, `greenhouse-ui-orchestrator`, `greenhouse-ux-content-accessibility` y `greenhouse-microinteractions-auditor`. El usuario aprobo la direccion visual/UX como base para implementar TASK-867.
+
+Validaciones ejecutadas sobre el mockup:
+
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm lint`
+- `pnpm design:lint`
+
+Al implementar runtime, no copiar el mock data como fuente de verdad: debe conectarse a la proyeccion read-only `OffboardingWorkQueue` definida en esta task.
+
 ## Open Questions
 
 - Confirmar durante Discovery si `OffboardingWorkQueue` debe vivir solo en `src/lib/workforce/offboarding/` o si conviene exponer un submodulo `src/lib/workforce/offboarding/work-queue/` con files separados para types/queries/derivation.
-- Confirmar si la UI V1 incluye drawer de detalle o si basta con tabla operacional + dialogs existentes.
+- Resuelto por aprobacion del mockup: la UI V1 debe incluir drawer de detalle para checklist/progreso/acciones secundarias, salvo que el plan de implementacion detecte un bloqueo tecnico relevante.
