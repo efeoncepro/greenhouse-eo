@@ -134,9 +134,12 @@ const styles = StyleSheet.create({
     marginBottom: 8
   },
   sectionTitle: {
-    fontFamily: 'Poppins',
-    fontSize: 11,
-    marginBottom: 7,
+    // TASK-863 V1.2 — Poppins Bold para que los títulos de sección legales
+    // (Partes, Relación, Cláusulas, Detalle, Constancia) tengan peso enterprise.
+    // Antes: Poppins (SemiBold 600) que se veía débil en context formal.
+    fontFamily: 'Poppins Bold',
+    fontSize: 12,
+    marginBottom: 8,
     color: '#102A43'
   },
   partyGrid: {
@@ -283,14 +286,24 @@ const styles = StyleSheet.create({
   signatures: {
     display: 'flex',
     flexDirection: 'row',
-    marginTop: 20
+    justifyContent: 'space-between',
+    marginTop: 28,
+    paddingHorizontal: 4
   },
-  signatureLine: {
-    width: '30%', // TASK-862 Slice D — Era 47% para 2 columnas; ahora 30% para 3 (empleador / trabajador / ministro de fe)
-    borderTop: '1 solid #667085',
-    paddingTop: 6,
-    textAlign: 'center',
-    marginRight: 12
+  signatureColumn: {
+    // TASK-863 V1.2 — 3 columnas equilibradas con space-between (empleador / trabajador / ministro de fe).
+    width: '30%',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center'
+  },
+  signatureRule: {
+    // Linea explicita via View con height + backgroundColor. Antes: borderTop en el contenedor
+    // del texto producia lineas visualmente cortas porque el text alignment center afectaba el render.
+    width: '100%',
+    height: 1.2,
+    backgroundColor: '#475467',
+    marginBottom: 8
   },
   // TASK-862 Slice D — Watermark layer (diagonal "PROYECTO" / "BLOQUEADO" / "RECHAZADO").
   watermarkLayer: {
@@ -570,6 +583,25 @@ const resolveWatermark = ({ snapshot, documentStatus }: WatermarkInput): { text:
   }
 
   return { text: GH_FINIQUITO.resignation.watermark.proyecto, severity: 'warning' }
+}
+
+// TASK-863 V1.2 — Helper render para clausulas narrativas: el prefijo legal
+// (PRIMERO/SEGUNDO/TERCERO/QUINTO + ":") sale en Geist Bold para que la
+// jerarquia visual de la clausula sea inmediata, como en un contrato chileno
+// canonico. El resto del body queda en Geist regular.
+const Clause = ({ text }: { text: string }) => {
+  const colonIdx = text.indexOf(':')
+
+  if (colonIdx === -1) {
+    return <Text style={styles.clause}>{text}</Text>
+  }
+
+  return (
+    <Text style={styles.clause}>
+      <Text style={{ fontFamily: 'Geist Bold' }}>{text.slice(0, colonIdx + 1)}</Text>
+      {text.slice(colonIdx + 1)}
+    </Text>
+  )
 }
 
 const Field = ({ label, value }: { label: string; value: string | number | null | undefined }) => (
@@ -863,14 +895,17 @@ const FinalSettlementPdfDocument = ({
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{GH_FINIQUITO.resignation.partiesLabels.sectionTitle}</Text>
+          {/* TASK-863 V1.2 — Grid Partes simétrica: ambas direcciones en la misma fila,
+              cargo del trabajador en su propia fila al final. Antes el cargo se intercalaba
+              entre domicilio empleador y domicilio trabajador, dejando el del trabajador huérfano. */}
           <View style={styles.partyGrid}>
             <Field label={GH_FINIQUITO.resignation.partiesLabels.employer} value={snapshot.employer.legalName} />
             <Field label={GH_FINIQUITO.resignation.partiesLabels.worker} value={snapshot.collaborator.legalName || snapshot.collaborator.displayName} />
             <Field label={GH_FINIQUITO.resignation.partiesLabels.employerTaxId} value={snapshot.employer.taxId} />
             <Field label={GH_FINIQUITO.resignation.partiesLabels.workerTaxId} value={snapshot.collaborator.taxId} />
             <Field label={GH_FINIQUITO.resignation.partiesLabels.employerAddress} value={snapshot.employer.legalAddress} />
-            <Field label={GH_FINIQUITO.resignation.partiesLabels.workerJobTitle} value={snapshot.collaborator.jobTitle} />
             <Field label={GH_FINIQUITO.resignation.partiesLabels.workerAddress} value={workerAddressDisplay} />
+            <Field label={GH_FINIQUITO.resignation.partiesLabels.workerJobTitle} value={snapshot.collaborator.jobTitle} />
           </View>
         </View>
 
@@ -890,41 +925,35 @@ const FinalSettlementPdfDocument = ({
         <View style={styles.clausesSection}>
           <Text style={styles.sectionTitle}>{GH_FINIQUITO.resignation.clausesSectionTitle}</Text>
 
-          <Text style={styles.clause}>
-            {GH_FINIQUITO.resignation.clauses.primero({
-              workerName: collaboratorName,
-              workerTaxId: workerTaxIdDisplay,
-              employerLegalName,
-              hireDate: hireDateLong,
-              lastWorkingDay: lastWorkingDayLong,
-              resignationNoticeRatifiedAt: resignationNoticeRatifiedLong
-            })}
-          </Text>
+          <Clause text={GH_FINIQUITO.resignation.clauses.primero({
+            workerName: collaboratorName,
+            workerTaxId: workerTaxIdDisplay,
+            employerLegalName,
+            hireDate: hireDateLong,
+            lastWorkingDay: lastWorkingDayLong,
+            resignationNoticeRatifiedAt: resignationNoticeRatifiedLong
+          })} />
 
-          <Text style={styles.clause}>
-            {GH_FINIQUITO.resignation.clauses.segundo({
-              workerName: collaboratorName,
-              workerTaxId: workerTaxIdDisplay,
-              employerLegalName,
-              hireDate: hireDateLong,
-              lastWorkingDay: lastWorkingDayLong,
-              resignationNoticeRatifiedAt: resignationNoticeRatifiedLong,
-              netPayableFormatted,
-              netPayableInWords: netInWords ?? formatClpInWords(0),
-              paymentMethod: 'transferencia bancaria'
-            })}
-          </Text>
+          <Clause text={GH_FINIQUITO.resignation.clauses.segundo({
+            workerName: collaboratorName,
+            workerTaxId: workerTaxIdDisplay,
+            employerLegalName,
+            hireDate: hireDateLong,
+            lastWorkingDay: lastWorkingDayLong,
+            resignationNoticeRatifiedAt: resignationNoticeRatifiedLong,
+            netPayableFormatted,
+            netPayableInWords: netInWords ?? formatClpInWords(0),
+            paymentMethod: 'transferencia bancaria'
+          })} />
 
-          <Text style={styles.clause}>
-            {GH_FINIQUITO.resignation.clauses.tercero({
-              workerName: collaboratorName,
-              workerTaxId: workerTaxIdDisplay,
-              employerLegalName,
-              hireDate: hireDateLong,
-              lastWorkingDay: lastWorkingDayLong,
-              resignationNoticeRatifiedAt: resignationNoticeRatifiedLong
-            })}
-          </Text>
+          <Clause text={GH_FINIQUITO.resignation.clauses.tercero({
+            workerName: collaboratorName,
+            workerTaxId: workerTaxIdDisplay,
+            employerLegalName,
+            hireDate: hireDateLong,
+            lastWorkingDay: lastWorkingDayLong,
+            resignationNoticeRatifiedAt: resignationNoticeRatifiedLong
+          })} />
 
           {/* CUARTO — Ley 21.389 banner (Alt A no_subject / Alt B subject). Renderizado
               SOLO cuando snapshot.maintenanceObligation existe (gating bloquea calculo
@@ -954,7 +983,7 @@ const FinalSettlementPdfDocument = ({
             </View>
           ) : null}
 
-          <Text style={styles.clause}>{GH_FINIQUITO.resignation.clauses.quintoPrefacio}</Text>
+          <Clause text={GH_FINIQUITO.resignation.clauses.quintoPrefacio} />
         </View>
 
         <View style={styles.section}>
@@ -1052,30 +1081,32 @@ const FinalSettlementPdfDocument = ({
           <View style={styles.reservaLines} />
         </View>
 
-        {/* TASK-862 Slice D — 3 columnas de firma: empleador, trabajador (+ huella), ministro de fe. */}
+        {/* TASK-862 Slice D + TASK-863 V1.2 — 3 columnas de firma: empleador, trabajador (+ huella), ministro de fe.
+            Linea de firma via View explicito (signatureRule) en lugar de borderTop del contenedor, garantiza
+            ancho real visible. Container con justify-content space-between + signatureColumn centra cada bloque. */}
         <View style={styles.signatures}>
-          <View style={{ width: '30%', marginRight: 12, textAlign: 'center' }}>
-            <View style={styles.signatureLine} />
-            <Text>{`Representante empleador\n${snapshot.employer.legalName}`}</Text>
+          <View style={styles.signatureColumn}>
+            <View style={styles.signatureRule} />
+            <Text style={{ textAlign: 'center' }}>{`Representante empleador\n${snapshot.employer.legalName}`}</Text>
           </View>
 
-          <View style={{ width: '30%', marginRight: 12, textAlign: 'center' }}>
-            <View style={styles.signatureLine} />
-            <Text>{`Trabajador/a\n${collaboratorName}`}</Text>
+          <View style={styles.signatureColumn}>
+            <View style={styles.signatureRule} />
+            <Text style={{ textAlign: 'center' }}>{`Trabajador/a\n${collaboratorName}`}</Text>
             {/* Caja huella 40x40 mm para impresion de huella dactilar fisica. */}
             <View style={styles.huellaBox}>
               <Text style={styles.huellaText}>Huella{'\n'}dactilar</Text>
             </View>
           </View>
 
-          <View style={{ width: '30%', textAlign: 'center' }}>
-            <View style={styles.signatureLine} />
+          <View style={styles.signatureColumn}>
+            <View style={styles.signatureRule} />
             {snapshot.ratification ? (
-              <Text>
+              <Text style={{ textAlign: 'center' }}>
                 {`Ministro de fe\n${snapshot.ratification.ministerName}\nRUT ${snapshot.ratification.ministerTaxId}\n${snapshot.ratification.notaria ?? ''}\n${formatDate(snapshot.ratification.ratifiedAt)}`}
               </Text>
             ) : (
-              <Text>
+              <Text style={{ textAlign: 'center' }}>
                 <Text>{'Ministro de fe\n'}</Text>
                 <Text style={styles.ministroEmpty}>{GH_FINIQUITO.resignation.ministro.pending}</Text>
                 <Text>{`\n${GH_FINIQUITO.resignation.ministro.pendingSubtitle}\n${GH_FINIQUITO.resignation.ministro.pendingFootnote}`}</Text>
