@@ -3206,6 +3206,11 @@ export interface GreenhouseCoreUserClientScopes {
 
 export interface GreenhouseCoreUserEntitlementOverrides {
   action: string;
+  approval_reason: string | null;
+  approval_requested_by: string | null;
+  approval_status: Generated<string>;
+  approved_at: Timestamp | null;
+  approved_by: string | null;
   capability: string;
   created_at: Generated<Timestamp>;
   effect: string;
