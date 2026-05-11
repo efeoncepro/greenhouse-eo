@@ -1,3 +1,13 @@
+# Sesion 2026-05-11 — TASK-839 Admin Center governance wire-up tomada
+
+- **Trigger:** usuario pidió implementar `TASK-839 — ISSUE-068 Fase 5: Wire Admin Center governance mutation paths`, manteniéndose explícitamente en `develop` y sin cambiar de rama.
+- **Branch:** `develop` por instrucción explícita del usuario; se omite la rama `task/TASK-839-*` del flujo default y se documenta como override operativo.
+- **Ownership:** task movida a `docs/tasks/in-progress/TASK-839-issue-068-fase-5-admin-center-governance-wire-up.md`, Lifecycle `in-progress`, README sincronizado.
+- **Discovery inicial:** no hay PR abierto ni branch `TASK-839`; `pg:doctor` verde tras renovar GCP CLI + ADC. El repo ya tiene rutas `/api/admin/entitlements/**`, UI en `/admin/views` y writer `src/lib/admin/entitlements-governance.ts` con transacción + audit + outbox. Drift principal: la spec asumía endpoints inexistentes/no-op, pero el runtime real ya avanzó desde TASK-404/TASK-838.
+- **Skills:** `greenhouse-agent`, `greenhouse-ui-orchestrator`, `greenhouse-ux-content-accessibility` y `vercel:nextjs` cargadas para guiar backend/UI/copy/App Router.
+- **Subagentes:** 2 explorers read-only completaron inventario backend/schema/events y UI/access/docs; no editaron archivos.
+- **Siguiente paso inmediato:** presentar AUDIT + mapa de conexiones + plan; luego implementar sobre primitives existentes, sin crear rutas paralelas salvo compatibilidad intencional si el plan lo justifica.
+
 # Sesion 2026-05-10 — TASK-857 GitHub release webhooks cerrada
 
 - **Trigger:** usuario pidió implementar `TASK-857 — GitHub Webhooks Release Event Ingestion` end-to-end, manteniéndose explícitamente en `develop` y sin cambiar de rama.

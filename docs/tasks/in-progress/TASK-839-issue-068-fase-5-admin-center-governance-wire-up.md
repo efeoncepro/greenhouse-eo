@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -16,7 +16,7 @@
 - Rank: `TBD`
 - Domain: `identity`
 - Blocked by: `none` (TASK-838 cerrada — infraestructura DB + observability + CI gate listas)
-- Branch: `task/TASK-839-issue-068-fase-5-admin-center-governance-wire-up`
+- Branch: `develop` (override explícito del usuario; no cambiar de rama)
 - **NO bloquea**: `TASK-612` ni `TASK-613`. La projection canónica (TASK-611 Slice 4) ya tiene los grants base wireados desde `roleCodes`/`routeGroups`/`tenantType` en `runtime.ts`. TASK-612/613 son consumers read-only de la projection — no necesitan capacidades de write a governance tables. TASK-839 agrega control fino per-usuario vía Admin Center (override personal, defaults configurables por rol), que es ortogonal a la convergencia visual del workspace shell.
 - Legacy ID: `—`
 - GitHub Issue: `—`
@@ -113,6 +113,27 @@ Reglas obligatorias:
 - Audit log probablemente no se escribe (mismo motivo).
 - Outbox events probablemente no se publican (mismo motivo).
 - UI: probablemente no distingue success real de silent failure — necesita degraded mode honesto + banners.
+
+### Slice 0 Caller Inventory — verificado 2026-05-11
+
+Discovery contra `develop` mostró que la spec estaba parcialmente stale: TASK-404 dejó más runtime del que ISSUE-068 asumía, y TASK-838 desbloqueó esas rutas al crear las tablas.
+
+| Surface / route | Estado real | Qué hace hoy | Acción TASK-839 |
+| --- | --- | --- | --- |
+| `GET /api/admin/entitlements/governance` | Existe | Lee overview global desde `getEntitlementsGovernanceOverview()`; incluye catálogo, role defaults, view map, home policies y audit log embebido limitado. | Mantener; agregar gate granular read y soportar audit reader paginado/export si aplica. |
+| `POST /api/admin/entitlements/roles` | Existe | Bulk replace de defaults por rol: `DELETE` role rows + `INSERT` rows + audit rows + outbox `access.entitlement_role_default_changed` dentro de transacción. | Refactorizar a primitive canónica interna; agregar capability `access.governance.role_defaults.update`; publicar usuarios afectados para invalidación. |
+| `GET /api/admin/entitlements/users/[userId]` | Existe | Lee acceso efectivo para Admin display; compone runtime puro + role defaults + user overrides solo para explicación UI. | Mantener; alinear con overlay resolver compartido y gate granular read. |
+| `POST /api/admin/entitlements/users/[userId]/overrides` | Existe | Bulk replace de overrides por usuario: `DELETE` user rows + `INSERT` rows + audit rows + outbox `access.entitlement_user_override_changed` dentro de transacción. | Agregar approval workflow para grants sensibles; gate `access.governance.user_overrides.create`; no aplicar pending grants. |
+| `PATCH /api/admin/entitlements/users/[userId]/startup-policy` | Existe | Actualiza `client_users.default_portal_home_path`, audit row y outbox `access.startup_policy_changed` dentro de transacción. | Gate `access.governance.startup_policy.update`; mantener resolver canónico de Home. |
+| `/admin/views` + tab `EntitlementsGovernanceTab` | Existe | UI global de Gobernanza de acceso dentro de Admin Center; no existe `/admin/governance/access`. | Reutilizar esta surface; no crear consola paralela. |
+| `Admin Users > [usuario] > Acceso` | Existe | UI por usuario con roles, vistas, entitlements efectivos, overrides y startup policy. | Endurecer degraded/success states y pending approval. |
+
+Drift documentado:
+
+- Las rutas canónicas reales son `/api/admin/entitlements/**`, no `/api/admin/governance/access/**`.
+- `src/lib/admin/entitlements-governance.ts` ya escribe en PG con transacción + audit + outbox; el gap no es “no hay write”, sino granularidad, approval, invalidación y aplicación efectiva del overlay.
+- `getTenantEntitlements()` sigue siendo pure-function; los overlays persistidos no deben convertirlo en DB-backed. TASK-839 implementa un resolver async separado para consumers server-side que necesiten el bag efectivo gobernado.
+- `schema-snapshot-baseline.sql` no refleja las tablas TASK-611/TASK-838; el runtime vivo y `src/types/db.d.ts` prevalecen.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 3 — EXECUTION SPEC
