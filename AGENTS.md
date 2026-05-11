@@ -1102,6 +1102,78 @@ Toda tabla operativa con celdas editables inline o > 8 columnas vive bajo un con
 - **NUNCA** duplicar `BonusInput` u otra primitiva legacy. Migrar consumers a `<InlineNumericEditor>`. `BonusInput.tsx` queda como re-export deprecado hasta que el ultimo consumer migre.
 - **NUNCA** desactivar el visual regression test de `/hr/payroll` para forzar un merge. Si falla por overflow, la solucion es respetar el contrato, no bypass.
 
+### Real-Artifact Iterative Verification Loop — metodología canónica para features visuales (TASK-863 V1.1→V1.5.1, 2026-05-11)
+
+Para cualquier feature que **emita o renderice un artefacto consumido por humanos fuera del agente** — PDFs operativos, documentos legales, emails transaccionales, layouts de detalle complejos, dashboards ejecutivos, exports Excel, recibos, certificados, contratos, addenda — el contrato técnico (`tsc --noEmit` + `pnpm lint` + tests unitarios + fixtures sintéticos) **NO es suficiente** para production-readiness. Live 2026-05-11, TASK-863 (finiquito Valentina Hoyos): 5 rondas iterativas V1.1→V1.5 + hotfix V1.5.1 cerraron 12 hallazgos visuales + 5 bloqueantes legales **invisibles** al audit pre-emisión; emergieron solo al **emitir un caso real, capturarlo, y re-auditarlo con skills sobre el artefacto real**.
+
+**Metodología canónica de 7 pasos** (reusable cross-feature):
+
+1. **Implementar V1** con audit pre-emisión normal (skills de dominio consultadas pre-implementation, `tsc --noEmit`, `pnpm lint`, tests unitarios, fixtures sintéticos, lint rules, type checks).
+2. **Acuerdo explícito con el usuario** para entrar al loop de verificación visual con caso real. El usuario aporta datos productivos (cliente/colaborador/proveedor real con datos reales — nombre, RUT, dirección, cargo, monto). El agente NO inventa datos; opera sobre el caso que el usuario aprueba.
+3. **Sesión Playwright + Chromium con agent auth** (NO mocks):
+    - Setup: `AGENT_AUTH_SECRET=<secret> node scripts/playwright-auth-setup.mjs` genera `.auth/storageState.json` con sesión NextAuth válida del usuario `agent@greenhouse.efeonce.org`.
+    - Navegar al portal real (dev local `http://localhost:3000`, staging `dev-greenhouse.efeoncepro.com` via bypass, o producción cuando aplica — coordinar con el usuario).
+    - Trigger la acción que emite el artefacto (click "Emitir", "Calcular", "Enviar", "Generar PDF", etc.) usando la UI exacta del operador.
+4. **Capturar el artefacto real**:
+    - **PDFs**: descargar el asset emitido (`/api/assets/private/[id]` con sesión válida), abrir con macOS Preview / pdf viewer y screenshot de cada página.
+    - **Emails**: invocar el preview endpoint canónico (`/api/emails/preview/[template]`), screenshot del render Chromium o exportar HTML.
+    - **UI**: screenshot del browser Chromium con la página completa rendereada (Playwright `page.screenshot({ fullPage: true })` o equivalente manual).
+    - **Excel**: descargar el archivo y abrirlo con Numbers/Excel para inspección visual + verificar agregaciones.
+    - **Compartir captura con el agente** en el chat (drag & drop / paste image / file path) para que el agente la consuma visualmente.
+5. **Re-audit comprehensive con 3 skills sobre el artefacto real** (no fixture sintético):
+    - **Skill de dominio** del feature (e.g. `greenhouse-payroll-auditor` para nómina/finiquitos, `greenhouse-finance-accounting-operator` para finance, `commercial-expert` para GTM/sales, etc.).
+    - **Skill UX writing del registro** correspondiente (`greenhouse-ux-writing` en modo `es-CL formal-legal` para textos jurídicos, `es-CL operativo` para docs operacionales, `es-CL técnico` para integraciones, `en-US` para audiencias internacionales).
+    - **Skill visual** apropiada (`modern-ui` para jerarquía/tipografía/spacing/balance, `greenhouse-ux` para layout/component selection, `greenhouse-microinteractions-auditor` cuando hay motion/feedback).
+    - Las 3 skills miran la **misma evidencia visual** (el screenshot/PDF/email real) y reportan independientemente; sus hallazgos se consolidan.
+6. **Iterar fixes hasta limpieza total**:
+    - Aplicar fixes al código.
+    - Re-emitir el artefacto (paso 3 + 4 nuevamente).
+    - Re-auditar (paso 5 nuevamente).
+    - Cerrar bloqueantes uno a uno; cada round produce un commit V1.x.
+    - El loop termina cuando las 3 skills reportan zero blockers Y el usuario aprueba visualmente el resultado.
+7. **Canonizar el resultado** en:
+    - Spec arquitectónica (`docs/architecture/<DOMAIN>_V1_SPEC.md` con Delta del round).
+    - Doc funcional (`docs/documentation/<domain>/<feature>.md` con bump de versión).
+    - Manual de uso (`docs/manual-de-uso/<domain>/<feature>.md`) si aplica al operador.
+    - ADR en `DECISIONS_INDEX.md` si la decisión es contractual cross-domain.
+    - CLAUDE.md + AGENTS.md con invariantes duros si emergen reglas reusables (caso real: Semantic Column Invariants).
+    - Task delta con resumen de los rounds + aprendizaje canonizado.
+
+**Aprendizaje meta canonizado** (TASK-863 evidencia):
+
+Sin paso 3-5 (loop real con artefacto + 3-skill audit), bugs como:
+
+- B-1 cláusula PRIMERO mezclando hitos legales distintos (vicio defendible en demanda)
+- B-2 cláusula SEGUNDO con verbo performativo incorrecto (vicio de consentimiento)
+- B-3 cláusula CUARTO citando solo modificatoria (jurídicamente débil)
+- V1.5.1 cargo del trabajador en col empleador (mezcla semántica de partes)
+- Ligature "fi" rota produciendo "frma" / "defnitivo" / "ratifcada" (typography drift)
+- Footer overlap visual / page break partiendo cláusulas (layout drift)
+
+**quedan latentes** hasta que un cliente, abogado, contralor o auditor externo los detecte — momento en que el costo de remediación (relación con cliente, retraso operativo, riesgo legal/financiero) es **órdenes de magnitud mayor** al costo del loop.
+
+**Cuándo aplicar el loop (decision tree)**:
+
+- ¿El feature emite un artefacto que un humano externo al equipo va a leer/firmar/auditar? → SÍ, aplicar loop completo (pasos 1-7).
+- ¿El feature es solo backend (endpoint, sync, cron) sin render visual? → NO, audit técnico es suficiente.
+- ¿El feature es UI interna del agente (admin tools, debug surfaces)? → Loop simplificado (pasos 1-3 + visual review, sin 3-skill audit).
+- ¿El feature es UI de operador interno (HR, Finance, Agency)? → Loop completo si el resultado de la UI afecta decisiones operativas con blast radius (e.g. cálculo de finiquito, conciliación bancaria, cierre mensual). Audit simplificado si es read-only.
+
+**Herramientas canónicas del loop**:
+
+| Capa | Herramienta canónica | Comando / archivo |
+| --- | --- | --- |
+| Agent auth | NextAuth headless | `POST /api/auth/agent-session` con `AGENT_AUTH_SECRET` |
+| Playwright setup | Storage state generation | `node scripts/playwright-auth-setup.mjs` |
+| Staging request bypass SSO | `staging-request.mjs` | `pnpm staging:request <path>` |
+| PDF capture | Asset download + macOS Preview screenshot | `/api/assets/private/[id]` + `cmd+shift+5` |
+| Email preview | Template render endpoint | `/api/emails/preview/[template]` |
+| UI screenshot | Playwright full-page | `await page.screenshot({ fullPage: true })` |
+| Excel inspection | Numbers / Excel macOS | descarga + apertura manual |
+| Skill re-audit | Agent invocation con artefacto | drag-drop screenshot al chat + invocar skills |
+
+**Pattern fuente** (canonizado live 2026-05-11): TASK-863 V1.1→V1.5.1 cerró 5 rondas iterativas en `docs/tasks/complete/TASK-863-finiquito-prerequisites-ui.md` (sección Delta V1.1-V1.5.1). Es el caso reusable: cuando alguien implemente el próximo doc legal (contrato de trabajo, addenda, certificado de servicio, finiquito de otras causales), seguir esta receta verbatim.
+
 ### Semantic Column Invariants — frontend / PDFs / emails / documentos legales (TASK-863 V1.5.1, 2026-05-11)
 
 Cuando una surface renderiza datos en un layout de N columnas donde cada columna **representa una entidad distinta** (empleador vs trabajador, deudor vs acreedor, sender vs receiver, payer vs payee, parte A vs parte B en un contrato), la asignación de cada dato a su columna NO es un detalle visual — es un **invariante semántico de integridad de datos**. Romperlo produce documentos legalmente defendibles como vicio (caso real: PDF de finiquito con "Cargo" del trabajador en col empleador detectado en primer emisión real Valentina Hoyos 2026-05-11).
