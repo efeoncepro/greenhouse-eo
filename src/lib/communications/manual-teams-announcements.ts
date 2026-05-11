@@ -87,15 +87,15 @@ const buildChannelRecord = (destination: ManualTeamsAnnouncementDestination): Te
   secret_ref: destination.secretRef,
   logic_app_resource_id: null,
   bot_app_id: destination.botAppId,
-  team_id: null,
-  channel_id: null,
+  team_id: destination.recipientKind === 'channel' ? destination.teamId : null,
+  channel_id: destination.recipientKind === 'channel' ? destination.channelId : null,
   azure_tenant_id: destination.azureTenantId,
   azure_subscription_id: null,
   azure_resource_group: null,
   disabled_at: null,
   recipient_kind: destination.recipientKind,
   recipient_user_id: null,
-  recipient_chat_id: destination.recipientChatId,
+  recipient_chat_id: destination.recipientKind === 'chat_group' ? destination.recipientChatId : null,
   recipient_routing_rule_json: null
 })
 

@@ -270,11 +270,15 @@ gh auth token | vercel env add GITHUB_RELEASE_OBSERVER_TOKEN production
 
 ### 8.2. Teams destination
 
-`production-release-alerts` ya está registrado en `src/config/manual-teams-announcements.ts`. V1 placeholder apunta al chat EO Team. Para cambiar:
+`production-release-alerts` está registrado en `src/config/manual-teams-announcements.ts` apuntando al canal **"EO - Admin"** del Equipo Efeonce en Teams (`recipientKind: 'channel'`, `teamId: aae47836-...`, `channelId: 19:19Ug...@thread.tacv2`). Mismo canal físico que `ops-alerts` en `greenhouse_core.teams_notification_channels` — los `channelCode` se separan para audit trazable del origen (watchdog vs ops-alerts generales).
 
-1. Crear chat dedicado en Teams (sugerido: `Production Releases`)
-2. Obtener `recipientChatId` via Teams Admin API o Bot Framework helpers
-3. PR actualizando `recipientChatId` en `src/config/manual-teams-announcements.ts`
+Para cambiar el destino:
+
+1. Confirmar destino (chat grupal vs canal):
+   - **Chat grupal**: variant `recipientKind: 'chat_group'` con `recipientChatId: '19:xxx@thread.v2'`
+   - **Canal del Team**: variant `recipientKind: 'channel'` con `teamId: '<GUID>'` y `channelId: '19:xxx@thread.tacv2'`
+2. Para canales del Team, el bot debe estar instalado en el Team (verificar via `teams_notification_channels.provisioning_status='ready'` o probando un send manual)
+3. PR actualizando la entry en `src/config/manual-teams-announcements.ts`
 
 ### 8.3. WIF para gcloud (drift detection)
 

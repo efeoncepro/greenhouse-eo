@@ -37,6 +37,22 @@ describe('manual-teams-announcements', () => {
     expect(preview.fingerprint).toHaveLength(24)
   })
 
+  it('maps channel-kind destinations (EO - Admin) to team_id + channel_id correctly', () => {
+    const preview = previewManualTeamsAnnouncement({
+      destinationKey: 'production-release-alerts',
+      title: 'Worker revision drift',
+      paragraphs: ['1 worker con revision drift confirmado.'],
+      ctaUrl: 'https://github.com/efeoncepro/greenhouse-eo/actions/runs/123',
+      ctaLabel: 'Ver run en GitHub'
+    })
+
+    expect(preview.channel.recipient_kind).toBe('channel')
+    expect(preview.channel.team_id).toBe('aae47836-8e59-4d9a-bce5-37d12978a1ad')
+    expect(preview.channel.channel_id).toBe('19:19UgRoht3Vmw0qgzfC71rKlOpHtfEI4Qz1jVdWMGqXE1@thread.tacv2')
+    expect(preview.channel.recipient_chat_id).toBeNull()
+    expect(preview.channel.bot_app_id).toBe('a1397477-4aae-4f16-a0a2-a213cb1b00b2')
+  })
+
   it('rejects non-https links', () => {
     expect(() =>
       previewManualTeamsAnnouncement({
