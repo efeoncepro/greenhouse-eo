@@ -141,6 +141,11 @@ export interface FinalSettlementDocumentSnapshot {
     // TASK-862 Slice C — logo del empleador (assets FK). Fallback a logo Greenhouse
     // hardcoded en document-pdf.tsx cuando null.
     logoAssetId?: string | null
+    // TASK-863 V1.3 — firma digitalizada del representante legal del empleador.
+    // Path relativo a `src/assets/signatures/` (preferente: organization slug). Si null o
+    // archivo no existe, el render omite la imagen y deja solo la línea para firma manual.
+    // V1.4 follow-up: migrar a FK asset privado en greenhouse_core.organizations.
+    legalRepresentativeSignaturePath?: string | null
   }
   sourceSnapshot: FinalSettlementSourceSnapshot
   breakdown: FinalSettlementBreakdownLine[]

@@ -99,9 +99,10 @@ export const GH_FINIQUITO = {
         civil_registry: 'Oficial del Registro Civil'
       } as const,
       // Status when ratification is pending (PDF render, document-facing — formal)
+      // TASK-863 V1.3 — copy más claro: explica QUÉ falta completar al momento de la firma.
       pending: 'Pendiente de ratificación',
-      pendingSubtitle: 'Notario público · Inspector del Trabajo · Presidente del sindicato · Oficial del Registro Civil',
-      pendingFootnote: 'Art. 177 CT',
+      pendingSubtitle: 'Indicar al ratificar: notario público, inspector del Trabajo, presidente del sindicato u oficial del Registro Civil',
+      pendingFootnote: 'Conforme al art. 177 del Código del Trabajo',
       // Label for ratification row when persisted (formal register)
       ratifiedLabel: (kindLabel: string, notariaOrLocation: string | null) =>
         notariaOrLocation ? `${kindLabel} · ${notariaOrLocation}` : kindLabel,

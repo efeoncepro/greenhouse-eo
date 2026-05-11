@@ -1,6 +1,7 @@
 import 'server-only'
 
 import { createHash } from 'node:crypto'
+import { existsSync as fsExistsSync } from 'node:fs'
 
 import { createElement } from 'react'
 
@@ -305,6 +306,18 @@ const styles = StyleSheet.create({
     backgroundColor: '#475467',
     marginBottom: 8
   },
+  // TASK-863 V1.3 — Imagen de firma del representante empleador, anclada sobre la línea de
+  // firma. Posicionada de modo que el trazo cruce ligeramente la línea, simulando firma manual
+  // post-impresión. Fixed dimensions ensure render consistency entre snapshots.
+  signatureImageEmployer: {
+    position: 'absolute',
+    width: 110,
+    height: 44,
+    bottom: 28, // 8 (marginBottom signatureRule) + offset arriba de la línea (~20)
+    left: '50%',
+    marginLeft: -55, // centrado horizontal (width/2)
+    objectFit: 'contain'
+  },
   // TASK-862 Slice D — Watermark layer (diagonal "PROYECTO" / "BLOQUEADO" / "RECHAZADO").
   watermarkLayer: {
     position: 'absolute',
@@ -444,22 +457,60 @@ const styles = StyleSheet.create({
     lineHeight: 1.4,
     marginTop: 4
   },
+  // TASK-863 V1.3 — Footer consolidado en UNA sola banda con 2 rows internos
+  // (top: confidencial + paginación) (bottom: metadata técnica + brand).
+  // Antes V1.2 había 2 <View fixed> con bottom distinto (18 + 14) que se
+  // solapaban visualmente. Ahora 1 View con flexDirection='column'.
   footer: {
     position: 'absolute',
-    bottom: 18,
+    bottom: 14,
     left: 32,
     right: 32,
-    fontSize: 7,
     color: '#667085',
     borderTop: '1 solid #D7E2EA',
-    paddingTop: 7,
+    paddingTop: 6,
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 3
+  },
+  footerRowMain: {
     display: 'flex',
     flexDirection: 'row',
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
+    fontSize: 7
+  },
+  footerRowAudit: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'baseline',
+    gap: 8
   }
 })
 
 const logoPath = `${process.cwd()}/public/branding/logo-full.png`
+
+// TASK-863 V1.3 — Resolver de firma digital del representante legal del empleador.
+// Pre-impresa sobre la línea de firma del empleador en el PDF emitido. Convención:
+// archivo PNG transparente en `src/assets/signatures/{snake_case_path}.png`. Si el
+// archivo no existe, el render omite la imagen (línea queda vacía para firma manual).
+// V1.4 follow-up: migrar lookup a FK asset privado FROM greenhouse_core.organizations.
+const resolveEmployerSignaturePath = (relativePath: string | null | undefined): string | null => {
+  if (!relativePath) return null
+
+  // Sanitiza path: solo permite alfanum + dash + underscore + dot + slash relativo.
+  // Bloquea `..` (path traversal) y absolutos.
+  if (relativePath.includes('..') || relativePath.startsWith('/')) return null
+  if (!/^[a-zA-Z0-9._\-/]+\.(png|jpg|jpeg)$/.test(relativePath)) return null
+
+  const absolutePath = `${process.cwd()}/src/assets/signatures/${relativePath}`
+
+  try {
+    return fsExistsSync(absolutePath) ? absolutePath : null
+  } catch {
+    return null
+  }
+}
 
 const formatCurrency = (amount: number) => formatLocaleCurrency(amount, 'CLP')
 
@@ -866,6 +917,11 @@ const FinalSettlementPdfDocument = ({
   // real del asset binario via /api/assets/private (necesita Vercel function adapter).
   const headerLogoSrc = logoPath
 
+  // TASK-863 V1.3 — Firma digital del representante legal del empleador (PNG transparente).
+  // Convención: snapshot.employer.legalRepresentativeSignaturePath = "efeonce-group-spa.png"
+  // resuelve `src/assets/signatures/efeonce-group-spa.png`. Null cuando archivo no existe.
+  const employerSignaturePath = resolveEmployerSignaturePath(snapshot.employer.legalRepresentativeSignaturePath)
+
   // TASK-862 Slice D — Clausulas narrativas params canonicos (GH_FINIQUITO).
   const hireDateLong = formatDateLongSpanish(snapshot.finalSettlement.hireDateSnapshot)
   const lastWorkingDayLong = formatDateLongSpanish(snapshot.finalSettlement.lastWorkingDay)
@@ -997,7 +1053,10 @@ const FinalSettlementPdfDocument = ({
               SOLO cuando snapshot.maintenanceObligation existe (gating bloquea calculo
               cuando faltaba; defense-in-depth aqui). */}
           {snapshot.maintenanceObligation ? (
-            <View style={styles.maintenanceBanner}>
+            // TASK-863 V1.3 — wrap={false} fuerza al banner CUARTO entero a saltar a la
+            // siguiente página si no cabe en la actual. Antes el title quedaba al final de
+            // página 1 y el body se iba a página 2, partiendo visualmente la cláusula legal.
+            <View style={styles.maintenanceBanner} wrap={false}>
               <Text style={styles.maintenanceBannerTitle}>
                 {snapshot.maintenanceObligation.variant === 'not_subject'
                   ? 'CUARTO — Pensión de alimentos (Alt A: no afecto)'
@@ -1121,9 +1180,13 @@ const FinalSettlementPdfDocument = ({
 
         {/* TASK-862 Slice D + TASK-863 V1.2 — 3 columnas de firma: empleador, trabajador (+ huella), ministro de fe.
             Linea de firma via View explicito (signatureRule) en lugar de borderTop del contenedor, garantiza
-            ancho real visible. Container con justify-content space-between + signatureColumn centra cada bloque. */}
+            ancho real visible. Container con justify-content space-between + signatureColumn centra cada bloque.
+            TASK-863 V1.3 — signatureColumn empleador admite firma digital pre-impresa (Image absoluta sobre línea). */}
         <View style={styles.signatures}>
           <View style={styles.signatureColumn}>
+            {employerSignaturePath ? (
+              <Image src={employerSignaturePath} style={styles.signatureImageEmployer} />
+            ) : null}
             <View style={styles.signatureRule} />
             <Text style={{ textAlign: 'center' }}>{`Representante empleador\n${snapshot.employer.legalName}`}</Text>
           </View>
@@ -1153,23 +1216,22 @@ const FinalSettlementPdfDocument = ({
           </View>
         </View>
 
-        {/* TASK-863 V1.1 — Footer consolidado: auditoría técnica + paginación + Greenhouse brand
-            en una sola banda. Antes había 2 bandas; ahora 1. Metadata técnica (documentNumber,
-            snapshot version, hash, timestamp) movida desde el header top al footer auditoría. */}
+        {/* TASK-863 V1.3 — Footer en UNA sola banda fixed: 2 rows internos
+            (row 1: confidencial + paginación; row 2: auditoría técnica + brand).
+            Antes V1.2 tenía 2 <View fixed> independientes que se solapaban visualmente. */}
         <View style={styles.footer} fixed>
-          <Text>Documento confidencial · {snapshot.employer.legalName} · RUT {snapshot.employer.taxId ?? 'Pendiente'}</Text>
-          <Text render={({ pageNumber, totalPages }) => (
-            `Página ${pageNumber} de ${totalPages}`
-          )} />
-        </View>
-        <View
-          style={[styles.footer, { bottom: 14, borderTop: 'none', paddingTop: 0 }]}
-          fixed
-        >
-          <Text style={styles.footerGhBrand}>
-            {documentNumber} · Snapshot fs-v{snapshot.finalSettlement.settlementVersion} · Hash {fingerprint} · Generado {formatDateTime(snapshot.generatedAt)} · Template {snapshot.documentTemplateCode} {snapshot.documentTemplateVersion}
-          </Text>
-          <Text style={styles.footerGhBrand}>Greenhouse · greenhouse.efeoncepro.com</Text>
+          <View style={styles.footerRowMain}>
+            <Text>Documento confidencial · {snapshot.employer.legalName} · RUT {snapshot.employer.taxId ?? 'Pendiente'}</Text>
+            <Text render={({ pageNumber, totalPages }) => (
+              `Página ${pageNumber} de ${totalPages}`
+            )} />
+          </View>
+          <View style={styles.footerRowAudit}>
+            <Text style={[styles.footerGhBrand, { flex: 1 }]}>
+              {documentNumber} · Snapshot fs-v{snapshot.finalSettlement.settlementVersion} · Hash {fingerprint} · Generado {formatDateTime(snapshot.generatedAt)} · Template {snapshot.documentTemplateCode} {snapshot.documentTemplateVersion}
+            </Text>
+            <Text style={styles.footerGhBrand}>Greenhouse · greenhouse.efeoncepro.com</Text>
+          </View>
         </View>
       </Page>
     </Document>
