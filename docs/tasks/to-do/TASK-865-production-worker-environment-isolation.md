@@ -14,7 +14,7 @@
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `none`
-- Status real: `Incidente diagnosticado`
+- Status real: `Incidente diagnosticado + decisión V1 híbrida`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none`
@@ -31,9 +31,15 @@ workers deben quedar aislados del flujo de staging/develop y solo cambiar via
 
 Decision operativa clave: `develop` sigue siendo una rama rápida para iterar y
 desarrollar. Esta task **no** debe convertir cada push a `develop` en un deploy
-completo y costoso de los cuatro workers. El V1 preferido es bloquear cualquier
-mutación accidental de producción desde `develop` y dejar Cloud Run staging como
-opt-in/on-demand o follow-up con recursos separados.
+completo y costoso de los cuatro workers. El contrato V1 es híbrido:
+
+- `develop` ejecuta build/test/contract checks de workers.
+- `develop` no muta servicios Cloud Run productivos.
+- Cloud Run staging es opt-in/on-demand y solo puede existir sobre servicios
+  `*-staging` explícitos, baratos de operar y con `min-instances=0` salvo
+  justificación documentada.
+- Si no hay servicio staging aislado para un worker, el workflow queda en
+  validate-only/summary y falla loud si alguien intenta apuntarlo a producción.
 
 ## Why This Task Exists
 
@@ -60,11 +66,9 @@ después de releases sanos.
 - Hacer imposible que un `push:develop` modifique los servicios Cloud Run de
   producción.
 - Mantener `develop` liviano: test/build/contract checks sí; deploy automático
-  de workers a Cloud Run solo si existe un servicio staging separado, explícito
-  y barato de operar.
-- Definir de forma explícita si staging usa servicios Cloud Run separados,
-  manual/on-demand, nightly, o si los deploys automáticos de staging quedan
-  deshabilitados hasta que existan.
+  de workers a Cloud Run no es obligatorio ni default.
+- Definir un contrato de staging on-demand: solo deploya si existe un servicio
+  staging separado, explícito y barato de operar; si no existe, validate-only.
 - Mantener production deploys orchestrator-only vía `workflow_call`.
 - Actualizar tests anti-regresión para que no vuelvan a aceptar `push:develop`
   apuntando al servicio productivo.
@@ -98,8 +102,34 @@ Reglas obligatorias:
 - Si staging sigue existiendo, debe apuntar a recursos Cloud Run staging
   explícitos, o el workflow debe hacer validate-only/skip loud antes de mutar
   producción.
+- No crear servicios `*-staging` para los cuatro workers por reflejo. Crear o
+  habilitar staging vivo solo donde el diagnóstico demuestre que aporta valor
+  operacional inmediato, empezando por HubSpot si se confirma que necesita
+  pruebas reales frecuentes.
 - No cambiar comportamiento funcional de los workers; el cambio es de
   aislamiento de release/deploy.
+
+## Decision V1 — Hybrid Worker Environments
+
+La decisión para esta task es un modelo híbrido, no una duplicación completa de
+ambientes:
+
+| Rama / camino | Qué puede hacer | Qué no puede hacer |
+| --- | --- | --- |
+| `push:develop` | Build/test/contract check; summary de impacto; validate-only si no hay staging aislado | Mutar servicios Cloud Run productivos |
+| `workflow_dispatch environment=staging` | Deploy on-demand a `*-staging` cuando el servicio exista explícitamente | Reusar el nombre productivo como "staging" |
+| `production-release.yml` | Deploy normal de production vía `workflow_call` y `expected_sha` | Ser reemplazado por approvals de workers sueltos |
+| `workflow_dispatch environment=production` | Break-glass auditado | Camino normal de release |
+
+Rationale:
+
+- Safety: production deja de cambiar fuera del orquestador.
+- Robustez: el watchdog no vuelve a fallar por pushes normales a `develop`.
+- Resiliencia: sigue existiendo break-glass y staging on-demand para pruebas
+  reales cuando hagan falta.
+- Escalabilidad/costo: no se paga ni se opera un staging vivo para todos los
+  workers si el equipo no lo necesita; `min-instances=0` es obligatorio para
+  staging salvo excepción documentada.
 
 ## Current Evidence
 
@@ -181,14 +211,16 @@ Reglas obligatorias:
 ### Slice 1 — Environment-to-Service Contract
 
 - Auditar si existen servicios staging reales para los cuatro workers.
-- Si no existen, elegir la ruta menos costosa para `develop`:
-  - V1 recomendado: `push:develop` ejecuta validate-only/summary y **no** hace
-    `gcloud run deploy`.
-  - Manual/on-demand staging deploy solo por `workflow_dispatch environment=staging`
-    cuando el operador realmente lo necesite.
+- Aplicar el contrato V1 híbrido:
+  - `push:develop` ejecuta validate-only/summary y **no** hace `gcloud run deploy`
+    si el worker no tiene staging aislado.
+  - `workflow_dispatch environment=staging` puede deployar on-demand solo al
+    servicio `*-staging` correspondiente.
   - Crear servicios `*-staging` explícitos solo si Discovery demuestra que el
     costo/latencia/operación son aceptables y no convierten cada iteración en
     release-like.
+  - Si se crea/habilita staging vivo, configurar `min-instances=0` salvo
+    excepción documentada.
 - Documentar la decisión en arquitectura/runbook.
 
 ### Slice 2 — Workflow Guardrails
@@ -198,6 +230,8 @@ Reglas obligatorias:
 - Mantener `workflow_dispatch environment=production` solo break-glass.
 - Agregar summary/notice claro cuando `push:develop` sea validate-only o cuando
   un deploy staging sea omitido por falta de servicio staging explícito.
+- Mantener `develop` rápido: los workflows no deben esperar deploys Cloud Run
+  staging si el cambio solo necesita validación estática/contractual.
 
 ### Slice 3 — Deploy Script Safety
 
@@ -205,6 +239,8 @@ Reglas obligatorias:
 - Si `ENV=staging` resuelve al mismo `SERVICE_NAME` productivo, fallar loud
   antes de `gcloud builds submit` o `gcloud run deploy`.
 - Preservar nombres productivos para `ENV=production`.
+- Para staging, exigir nombre distinto (`*-staging`) y permitir ausencia de
+  staging como validate-only, no como error de producción.
 
 ### Slice 4 — Tests Anti-Regresión
 
@@ -234,6 +270,9 @@ Reglas obligatorias:
       Cloud Run productivos.
 - [ ] Un push a `develop` no queda obligado a desplegar los cuatro workers; el
       default V1 es rápido y no muta Cloud Run si no hay staging aislado.
+- [ ] Un worker puede seguir iterándose desde `develop` mediante build/test/
+      contract checks, y mediante `workflow_dispatch environment=staging` si
+      existe servicio `*-staging` aislado.
 - [ ] Production workers solo cambian por `production-release.yml` o por
       break-glass explícito `workflow_dispatch environment=production`.
 - [ ] Tests fallan si un workflow vuelve a permitir staging/develop sobre
@@ -281,11 +320,14 @@ por deploys de workers desde `develop` hacia los mismos servicios Cloud Run
 que production. Separada de TASK-864 porque TASK-864 arregla el doctor/preflight
 del control plane, mientras esta task corrige aislamiento de runtime deploy.
 
-## Open Questions
+## Open Questions Resolved
 
 - ¿Staging debe tener servicios Cloud Run separados ahora, o se deshabilita
   `push:develop` para workers hasta diseñar staging Cloud Run V1?
-  - Recomendación inicial: crear guard loud inmediato y, si no existen servicios
-    staging, no desplegar staging sobre producción. La creación de `*-staging`
-    puede ser Slice 1 si Discovery confirma que secrets/schedulers/URLs están
-    listos sin scope creep.
+  - Resolución: V1 híbrido. `push:develop` queda validate-only/summary cuando
+    no hay servicio staging aislado. `workflow_dispatch environment=staging`
+    puede deployar on-demand únicamente a servicios `*-staging` explícitos.
+    No se duplica todo el ambiente por defecto.
+  - Rationale: reduce costo y latencia, conserva iteración rápida, y elimina la
+    causa raíz del drift: mutación accidental de production Cloud Run desde
+    `develop`.

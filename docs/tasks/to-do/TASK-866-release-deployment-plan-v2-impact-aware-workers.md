@@ -101,7 +101,9 @@ Reglas obligatorias:
   dependencia, la decisión default es conservadora: deploy del worker afectado
   o `force_all_workers`.
 - TASK-865 debe cerrarse primero o estar suficientemente implementada para que
-  `develop` no pueda pisar production Cloud Run.
+  `develop` no pueda pisar production Cloud Run. No requiere staging vivo para
+  todos los workers; basta con que production esté aislado y que `develop`
+  use validate-only o servicios `*-staging` on-demand cuando existan.
 
 ## Current Repo State
 
@@ -131,7 +133,9 @@ Reglas obligatorias:
 
 ### Depends on
 
-- `TASK-865` para aislar staging/develop de production workers.
+- `TASK-865` para aislar staging/develop de production workers. Dependencia
+  concreta: production Cloud Run no puede ser mutado por `push:develop`; esta
+  task no depende de duplicar todos los workers en staging.
 - `TASK-864` no bloquea esta task, pero puede mejorar la observabilidad del
   control plane antes de ejecutar el planner.
 
@@ -276,9 +280,23 @@ cloud_run.GIT_SHA == deploymentPlan.surfaces[worker].expectedSha
   - watchdog per-surface expectedSha;
   - summary de skipped workers.
 
+## Relationship With TASK-865
+
+TASK-866 optimiza **qué workers productivos despliega el orquestador**. No
+resuelve la separación de ambientes de desarrollo. Por eso requiere que
+TASK-865 haya eliminado primero el riesgo de drift externo:
+
+- Si un worker no impactado se salta en TASK-866, su `expectedSha` anterior debe
+  seguir siendo estable.
+- Esa estabilidad solo es verdadera si `develop` ya no puede pisar el servicio
+  productivo.
+- Staging on-demand (`*-staging`) es útil para iterar, pero no es prerequisito
+  para el deployment plan V2.
+
 ## Out of Scope
 
 - No implementar staging Cloud Run separado; eso vive en TASK-865/follow-up.
+- No exigir staging vivo para que el planner V2 funcione.
 - No cambiar lógica funcional de workers.
 - No cambiar runtime HubSpot ni APIs del bridge.
 - No hacer deploy a producción.
