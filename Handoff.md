@@ -22,6 +22,15 @@
 - **NO toca backend** (endpoints TASK-862 Slice C ya canonizados) ni emite outbox events nuevos (los endpoints ya escriben audit events `resignation_letter_linked` + `maintenance_obligation_declared`).
 - **Followup V1.1 conocido:** `linkResignationLetterAsset` NO llama `attachAssetToAggregate` (TASK-721 pattern). El asset queda status `pending` con FK al case. Para promover a `attached` con owner_aggregate_id=caseId sería una migración menor en TASK-862 follow-up V1.1.
 
+# Sesion 2026-05-11 — TASK-866 abierta (impact-aware worker deploys V2)
+
+- **Trigger:** usuario cuestionó si tenía sentido desplegar todos los workers en cada paso a producción aunque no se hubieran tocado.
+- **Skills invocadas:** `software-architect-2026`, `greenhouse-production-release`, `greenhouse-task-planner`.
+- **Decisión arquitectónica:** el modelo actual deploy-all es seguro por simplicidad, pero no es eficiente ni escalable. V2 debe usar un `DeploymentPlanV2` por surface: workers impactados se despliegan a `target_sha`; workers no impactados se saltan y conservan su `expectedSha` actual auditado.
+- **Task creada:** `TASK-866 — Release Deployment Plan V2: Impact-Aware Worker Deploys` en `docs/tasks/to-do/TASK-866-release-deployment-plan-v2-impact-aware-workers.md`.
+- **Relación con tareas vivas:** `TASK-865` sigue siendo primero para evitar que `develop` pise Cloud Run production. `TASK-866` es evolución posterior del orquestador/manifest/watchdog para reducir costo y blast radius de production releases.
+- **Estado actual production release verificado read-only:** últimos orchestrator runs en `main` fallaron (`25687062359`, `25680697352`, `25678058713`) y el watchdog local sigue en `aggregateSeverity=error` por `worker_revision_drift=4`. `stale_approval` y `pending_without_jobs` están OK. Conclusión: el workflow existe y puede correr, pero el estado production actual no está sano hasta cerrar drift o ejecutar un release canónico exitoso que lo deje synced.
+
 # Sesion 2026-05-11 — TASK-864/TASK-865 abiertas + watchdog drift diagnosticado
 
 - **Trigger:** usuario pidio crear la task para hacer que el preflight/release quede siempre bien y luego reporto email de GitHub: `Production Release Watchdog - main` fallando en run `25687679157`.
