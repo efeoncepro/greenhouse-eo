@@ -4,7 +4,7 @@ import { randomUUID } from 'crypto'
 
 import { sql } from 'kysely'
 
-import { getDb, withTransaction } from '@/lib/db'
+import { getDb, query, withTransaction } from '@/lib/db'
 import {
   ENTITLEMENT_CAPABILITY_CATALOG,
   ENTITLEMENT_CAPABILITY_MAP,
@@ -29,6 +29,7 @@ import {
 
 type EntitlementEffect = 'grant' | 'revoke'
 type GovernanceOriginType = 'runtime_base' | 'role_default' | 'user_override'
+type GovernanceApprovalStatus = 'approved' | 'pending_approval' | 'rejected'
 
 type RoleDefaultRow = {
   default_id: string
@@ -50,6 +51,11 @@ type UserOverrideRow = {
   effect: EntitlementEffect
   reason: string
   expires_at: string | null
+  approval_status: GovernanceApprovalStatus
+  approval_requested_by: string | null
+  approved_by: string | null
+  approved_at: string | null
+  approval_reason: string | null
   updated_at: string
 }
 
@@ -67,6 +73,19 @@ type AuditRow = {
   performed_by: string
   reason: string | null
   created_at: string
+}
+
+type PendingUserOverrideApprovalRow = {
+  override_id: string
+  space_id: string
+  user_id: string
+  capability: string
+  action: string
+  scope: string
+  effect: EntitlementEffect
+  reason: string
+  approval_status: GovernanceApprovalStatus
+  granted_by: string
 }
 
 const PLATFORM_SPACE_ID = '__platform__'
@@ -112,6 +131,11 @@ export type UserEntitlementOverrideInput = {
   expiresAt: string | null
 }
 
+export type ApproveUserEntitlementOverrideInput = {
+  decision: 'approve' | 'reject'
+  approvalReason: string
+}
+
 export type EntitlementCapabilitySummary = EntitlementCatalogEntry & {
   linkedViews: number
   roleDefaults: number
@@ -141,6 +165,12 @@ export type UserEntitlementOverrideRecord = {
   effect: EntitlementEffect
   reason: string
   expiresAt: string | null
+  approvalStatus: GovernanceApprovalStatus
+  approvalRequestedBy: string | null
+  approvedBy: string | null
+  approvedAt: string | null
+  approvalReason: string | null
+  isSensitive: boolean
   updatedAt: string
 }
 
@@ -226,6 +256,11 @@ const normalizeSpaceId = (spaceId?: string | null) => {
 
 const buildGovernanceRecordId = (prefix: 'ERD' | 'EOV' | 'EAL') => `EO-${prefix}-${randomUUID().slice(0, 8).toUpperCase()}`
 
+const isSensitiveCapability = (capability: string) =>
+  capability.includes('_sensitive') ||
+  capability.includes('.reveal_sensitive') ||
+  capability.includes('.export_snapshot')
+
 const entitlementKey = ({
   capability,
   action,
@@ -274,6 +309,29 @@ const assertKnownEntitlement = (
   }
 }
 
+const assertActiveCapabilities = async (capabilities: readonly EntitlementCapabilityKey[]) => {
+  const uniqueCapabilities = Array.from(new Set(capabilities))
+
+  if (uniqueCapabilities.length === 0) return
+
+  const rows = await query<{ capability_key: string }>(
+    `
+      SELECT capability_key
+      FROM greenhouse_core.capabilities_registry
+      WHERE capability_key = ANY($1::text[])
+        AND deprecated_at IS NULL
+    `,
+    [uniqueCapabilities]
+  )
+
+  const activeCapabilities = new Set(rows.map(row => row.capability_key))
+  const missing = uniqueCapabilities.filter(capability => !activeCapabilities.has(capability))
+
+  if (missing.length > 0) {
+    throw new Error(`Capability no activa en registry: ${missing.join(', ')}`)
+  }
+}
+
 const listRoleDefaultRows = async (spaceId: string) => {
   const db = await getDb()
 
@@ -312,11 +370,17 @@ const listUserOverrideRows = async (spaceId: string, userId?: string) => {
       effect,
       reason,
       expires_at::text AS expires_at,
+      approval_status,
+      approval_requested_by,
+      approved_by,
+      approved_at::text AS approved_at,
+      approval_reason,
       updated_at::text AS updated_at
     FROM greenhouse_core.user_entitlement_overrides
     WHERE space_id = ${spaceId}
       AND ${userCondition}
       AND (expires_at IS NULL OR expires_at > NOW())
+      AND approval_status <> 'rejected'
     ORDER BY user_id ASC, capability ASC, action ASC, scope ASC
   `.execute(db)
 
@@ -383,6 +447,12 @@ const toUserOverrideRecord = (row: UserOverrideRow): UserEntitlementOverrideReco
     effect: row.effect,
     reason: row.reason,
     expiresAt: row.expires_at,
+    approvalStatus: row.approval_status,
+    approvalRequestedBy: row.approval_requested_by,
+    approvedBy: row.approved_by,
+    approvedAt: row.approved_at,
+    approvalReason: row.approval_reason,
+    isSensitive: isSensitiveCapability(row.capability),
     updatedAt: row.updated_at
   }
 }
@@ -542,7 +612,7 @@ const buildEffectiveEntitlements = ({
     }
   }
 
-  for (const row of userOverrides) {
+  for (const row of userOverrides.filter(override => override.approvalStatus === 'approved')) {
     const key = entitlementKey(row)
 
     if (row.effect === 'grant') {
@@ -711,6 +781,14 @@ export const saveRoleEntitlementDefaults = async ({
     ).values()
   )
 
+  await assertActiveCapabilities(sanitizedDefaults.map(defaultRow => defaultRow.capability))
+
+  const access = await getAdminAccessOverview()
+
+  const affectedUserIds = access.users
+    .filter(user => user.roleCodes.includes(roleCode))
+    .map(user => user.userId)
+
   await withTransaction(async client => {
     await client.query(
       `
@@ -805,9 +883,11 @@ export const saveRoleEntitlementDefaults = async ({
         aggregateId: `${effectiveSpaceId}:${roleCode}`,
         eventType: EVENT_TYPES.entitlementRoleDefaultChanged,
         payload: {
+          schemaVersion: 1,
           spaceId: effectiveSpaceId,
           roleCode,
           changedByUserId: actorUserId,
+          affectedUserIds,
           defaults: sanitizedDefaults
         }
       },
@@ -815,7 +895,7 @@ export const saveRoleEntitlementDefaults = async ({
     )
   })
 
-  return { savedDefaults: sanitizedDefaults.length }
+  return { savedDefaults: sanitizedDefaults.length, affectedUsers: affectedUserIds.length }
 }
 
 export const saveUserEntitlementOverrides = async ({
@@ -836,18 +916,24 @@ export const saveUserEntitlementOverrides = async ({
       overrides.map(override => {
         const normalized = assertKnownEntitlement(override.capability, override.action, override.scope)
 
+        const approvalStatus =
+          override.effect === 'grant' && isSensitiveCapability(normalized.capability) ? 'pending_approval' : 'approved'
+
         return [
           entitlementKey(normalized),
           {
             ...normalized,
             effect: override.effect,
             reason: override.reason.trim(),
-            expiresAt: override.expiresAt?.trim() || null
+            expiresAt: override.expiresAt?.trim() || null,
+            approvalStatus
           }
         ]
       })
     ).values()
   )
+
+  await assertActiveCapabilities(sanitizedOverrides.map(override => override.capability))
 
   await withTransaction(async client => {
     await client.query(
@@ -869,12 +955,16 @@ export const saveUserEntitlementOverrides = async ({
             capability,
             action,
             scope,
-            effect,
-            reason,
-            expires_at,
-            granted_by
-          )
-          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+          effect,
+          reason,
+          expires_at,
+          granted_by,
+          approval_status,
+          approval_requested_by,
+          approved_by,
+          approved_at
+        )
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, CASE WHEN $11 = 'approved' THEN NOW() ELSE NULL END)
         `,
         [
           buildGovernanceRecordId('EOV'),
@@ -886,9 +976,19 @@ export const saveUserEntitlementOverrides = async ({
           override.effect,
           override.reason,
           override.expiresAt,
-          actorUserId
+          actorUserId,
+          override.approvalStatus,
+          actorUserId,
+          override.approvalStatus === 'approved' ? actorUserId : null
         ]
       )
+
+      const auditChangeType =
+        override.approvalStatus === 'pending_approval'
+          ? 'user_override_approval_requested'
+          : override.effect === 'grant'
+            ? 'user_override_grant'
+            : 'user_override_revoke'
 
       await client.query(
         `
@@ -909,7 +1009,7 @@ export const saveUserEntitlementOverrides = async ({
         [
           buildGovernanceRecordId('EAL'),
           effectiveSpaceId,
-          override.effect === 'grant' ? 'user_override_grant' : 'user_override_revoke',
+          auditChangeType,
           userId,
           override.capability,
           override.action,
@@ -944,8 +1044,10 @@ export const saveUserEntitlementOverrides = async ({
         aggregateId: `${effectiveSpaceId}:${userId}`,
         eventType: EVENT_TYPES.entitlementUserOverrideChanged,
         payload: {
+          schemaVersion: 1,
           spaceId: effectiveSpaceId,
           userId,
+          affectedUserIds: [userId],
           changedByUserId: actorUserId,
           overrides: sanitizedOverrides
         }
@@ -954,7 +1056,145 @@ export const saveUserEntitlementOverrides = async ({
     )
   })
 
-  return { savedOverrides: sanitizedOverrides.length }
+  return {
+    savedOverrides: sanitizedOverrides.length,
+    pendingApproval: sanitizedOverrides.filter(override => override.approvalStatus === 'pending_approval').length
+  }
+}
+
+export const approveUserEntitlementOverride = async ({
+  userId,
+  overrideId,
+  actorUserId,
+  spaceId,
+  decision,
+  approvalReason
+}: {
+  userId: string
+  overrideId: string
+  actorUserId: string
+  spaceId?: string | null
+} & ApproveUserEntitlementOverrideInput) => {
+  const effectiveSpaceId = normalizeSpaceId(spaceId)
+  const normalizedReason = approvalReason.trim()
+
+  if (normalizedReason.length < 5) {
+    throw new Error('approvalReason debe explicar la decisión con al menos 5 caracteres.')
+  }
+
+  const approvalStatus = decision === 'approve' ? 'approved' : 'rejected'
+  let approvedCapability: string | null = null
+
+  await withTransaction(async client => {
+    const pendingResult = await client.query<PendingUserOverrideApprovalRow>(
+      `
+        SELECT
+          override_id,
+          space_id,
+          user_id,
+          capability,
+          action,
+          scope,
+          effect,
+          reason,
+          approval_status,
+          granted_by
+        FROM greenhouse_core.user_entitlement_overrides
+        WHERE space_id = $1
+          AND user_id = $2
+          AND override_id = $3
+        FOR UPDATE
+      `,
+      [effectiveSpaceId, userId, overrideId]
+    )
+
+    const pending = pendingResult.rows[0]
+
+    if (!pending) {
+      throw new Error('Override no encontrado.')
+    }
+
+    if (pending.approval_status !== 'pending_approval') {
+      throw new Error('El override no está pendiente de aprobación.')
+    }
+
+    if (pending.granted_by === actorUserId) {
+      throw new Error('La aprobación requiere segunda firma de una persona distinta.')
+    }
+
+    await client.query(
+      `
+        UPDATE greenhouse_core.user_entitlement_overrides
+        SET
+          approval_status = $4,
+          approved_by = $5,
+          approved_at = NOW(),
+          approval_reason = $6,
+          updated_at = NOW()
+        WHERE space_id = $1
+          AND user_id = $2
+          AND override_id = $3
+      `,
+      [effectiveSpaceId, userId, overrideId, approvalStatus, actorUserId, normalizedReason]
+    )
+
+    await client.query(
+      `
+        INSERT INTO greenhouse_core.entitlement_governance_audit_log (
+          audit_id,
+          space_id,
+          change_type,
+          target_user,
+          capability,
+          action,
+          scope,
+          effect,
+          performed_by,
+          reason
+        )
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+      `,
+      [
+        buildGovernanceRecordId('EAL'),
+        effectiveSpaceId,
+        decision === 'approve' ? 'user_override_approved' : 'user_override_rejected',
+        userId,
+        pending.capability,
+        pending.action,
+        pending.scope,
+        pending.effect,
+        actorUserId,
+        normalizedReason
+      ]
+    )
+
+    await publishOutboxEvent(
+      {
+        aggregateType: AGGREGATE_TYPES.entitlementGovernance,
+        aggregateId: `${effectiveSpaceId}:${userId}:${overrideId}`,
+        eventType: EVENT_TYPES.entitlementUserOverrideChanged,
+        payload: {
+          schemaVersion: 1,
+          spaceId: effectiveSpaceId,
+          userId,
+          affectedUserIds: [userId],
+          overrideId,
+          approvalStatus,
+          changedByUserId: actorUserId
+        }
+      },
+      client
+    )
+
+    approvedCapability = pending.capability
+  })
+
+  return {
+    overrideId,
+    userId,
+    approvalStatus,
+    capability: approvedCapability
+  }
 }
 
 export const updateUserStartupPolicy = async ({

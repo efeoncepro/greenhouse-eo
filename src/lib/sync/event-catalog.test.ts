@@ -77,6 +77,11 @@ describe('event catalog', () => {
     expect(REACTIVE_EVENT_TYPES).not.toContain('commercial.party.sync_conflict')
   })
 
+  it('includes capability deprecation as a non-reactive governance event', () => {
+    expect(EVENT_TYPES.capabilityDeprecated).toBe('access.capability.deprecated')
+    expect(REACTIVE_EVENT_TYPES).not.toContain('access.capability.deprecated')
+  })
+
   it('includes ICO AI LLM enrichment events in the catalog and reactive trigger list', () => {
     expect(EVENT_TYPES.icoAiLlmEnrichmentsMaterialized).toBe('ico.ai_llm_enrichments.materialized')
     expect(REACTIVE_EVENT_TYPES).toContain('ico.ai_llm_enrichments.materialized')

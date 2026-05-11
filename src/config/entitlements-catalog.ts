@@ -797,6 +797,59 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     actions: ['read', 'update'] as const,
     defaultScope: 'tenant'
   },
+  // TASK-839 — Admin Center access governance mutation paths.
+  // These capabilities gate the Admin Center overlay that writes role defaults,
+  // user overrides, startup policy exceptions and audit log reads. They are
+  // separate from `views`: views expose the surface, entitlements authorize the
+  // fine-grained mutation/read.
+  {
+    key: 'access.governance.role_defaults.read',
+    module: 'admin',
+    actions: ['read'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'access.governance.role_defaults.update',
+    module: 'admin',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'access.governance.user_overrides.read',
+    module: 'admin',
+    actions: ['read'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'access.governance.user_overrides.create',
+    module: 'admin',
+    actions: ['create'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'access.governance.user_overrides.approve',
+    module: 'admin',
+    actions: ['approve'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'access.governance.startup_policy.update',
+    module: 'admin',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'access.governance.audit_log.read',
+    module: 'admin',
+    actions: ['read'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'access.governance.capability.deprecate',
+    module: 'admin',
+    actions: ['manage'] as const,
+    defaultScope: 'tenant'
+  },
   // TASK-848 — Production Release Control Plane.
   // 3 capabilities granulares least-privilege. NO platform.admin catch-all.
   // Mismo patron que TASK-742 (auth resilience), TASK-765 (payment orders),

@@ -1,3 +1,37 @@
+# Sesion 2026-05-11 — TASK-840 Deprecated capabilities cleanup cerrada
+
+- **Branch:** `develop` por instrucción explícita del usuario; no se cambió de rama.
+- **Estado:** task movida a `docs/tasks/complete/TASK-840-issue-068-fase-6-deprecated-capabilities-cleanup.md`, Lifecycle `complete`.
+- **Commits:** `5b31a88a` ownership/lifecycle in-progress, `51abc58b` helper + endpoint + migration + reporter + docs, cierre documental en commit posterior.
+- **Implementación:** helper canónico `markCapabilityDeprecated()` bloquea TS catalog activo, grants activos, actualiza `deprecated_at`, escribe `entitlement_governance_audit_log.change_type='capability_deprecated'`, publica `access.capability.deprecated` v1 y limpia cache de registry.
+- **API / access model:** endpoint canónico `/api/admin/entitlements/capabilities/[capabilityKey]/deprecate` con `requireAdminTenantContext` + capability `access.governance.capability.deprecate` (`manage`, `tenant`). `routeGroups`, `views` y startup policy no cambian.
+- **DB:** migration `20260511112736683_task-840-deprecated-capabilities-cleanup.sql` aplicada con `pnpm pg:connect:migrate`; extiende CHECK de audit log y siembra la capability nueva. También repara drift live inverso detectado durante discovery: `commercial.engagement.recover_outbound` y `platform.release.watchdog.read` existían en TS catalog pero faltaban en registry activo.
+- **Operación:** reporter read-only `scripts/governance/find-deprecated-candidates.ts` emite CSV; live output actual solo header (0 candidates).
+- **Validación:** targeted Vitest 24/24, `pnpm test` 4087 passed / 11 skipped, `pnpm lint`, `pnpm exec tsc --noEmit --pretty false`, `pnpm build`, `pnpm pg:doctor`, parity live `inSync=true`, smoke live de rechazo a capability TS activa → `CapabilityDeprecationError` 409.
+- **No validado:** no se ejecutó live success de deprecación porque no hay candidates stale y crear/deprecar una row artificial ensuciaría el registry histórico. Cubierto por unit test happy path.
+
+# Sesion 2026-05-11 — TASK-839 Admin Center governance wire-up cerrada
+
+- **Branch:** `develop` por instrucción explícita del usuario; no se cambió de rama.
+- **Estado:** task movida a `docs/tasks/complete/TASK-839-issue-068-fase-5-admin-center-governance-wire-up.md`, Lifecycle `complete`.
+- **Commits:** `7b4b7d69` ownership/discovery, `2118c5bd` capabilities + migration, `78d518a0` runtime/API/UI, `f1c117aa` reliability signals, docs cierre en commit posterior, follow-up smoke `[downstream-verified: admin-governance-mutation]` en commit posterior.
+- **Implementación:** se reutilizaron rutas reales `/api/admin/entitlements/**` y writer `src/lib/admin/entitlements-governance.ts`; no se crearon rutas paralelas `/api/admin/governance/access/**`.
+- **DB:** migration `20260511105805584_task-839-admin-governance-wire-up.sql` aplicada con `pnpm pg:connect:migrate`; `src/types/db.d.ts` regenerado.
+- **Access model:** `routeGroups`/rol admin siguen siendo entrada broad vía `requireAdminTenantContext`; `views` siguen exponiendo `/admin/views` y Admin Users > Acceso; `entitlements` ahora gobiernan cada endpoint con `access.governance.*`; startup policy mantiene contrato separado.
+- **Observabilidad:** `identity.governance.audit_log_write_failures` y `identity.governance.pending_approval_overdue` registrados bajo reliability overview.
+- **Validación:** `pnpm pg:doctor`, `pnpm pg:connect:migrate`, `pnpm tsc --noEmit`, `pnpm lint`, suites Vitest focalizadas/completas y Playwright follow-up con usuario agente dedicado. Smoke nuevo `tests/e2e/smoke/admin-entitlements-governance.spec.ts` pasó 3/3: `/admin/views`, tab Accesos de `user-agent-e2e-001`, mutation real de startup policy con restore.
+- **Nota auth E2E:** `scripts/playwright-auth-setup.mjs` ahora marca cookies `__Secure-*` como `secure=true` también en localhost; Chromium rechazaba storageState con `__Secure-` + `secure=false`.
+
+# Sesion 2026-05-11 — TASK-839 Admin Center governance wire-up tomada
+
+- **Trigger:** usuario pidió implementar `TASK-839 — ISSUE-068 Fase 5: Wire Admin Center governance mutation paths`, manteniéndose explícitamente en `develop` y sin cambiar de rama.
+- **Branch:** `develop` por instrucción explícita del usuario; se omite la rama `task/TASK-839-*` del flujo default y se documenta como override operativo.
+- **Ownership:** task movida a `docs/tasks/in-progress/TASK-839-issue-068-fase-5-admin-center-governance-wire-up.md`, Lifecycle `in-progress`, README sincronizado.
+- **Discovery inicial:** no hay PR abierto ni branch `TASK-839`; `pg:doctor` verde tras renovar GCP CLI + ADC. El repo ya tiene rutas `/api/admin/entitlements/**`, UI en `/admin/views` y writer `src/lib/admin/entitlements-governance.ts` con transacción + audit + outbox. Drift principal: la spec asumía endpoints inexistentes/no-op, pero el runtime real ya avanzó desde TASK-404/TASK-838.
+- **Skills:** `greenhouse-agent`, `greenhouse-ui-orchestrator`, `greenhouse-ux-content-accessibility` y `vercel:nextjs` cargadas para guiar backend/UI/copy/App Router.
+- **Subagentes:** 2 explorers read-only completaron inventario backend/schema/events y UI/access/docs; no editaron archivos.
+- **Siguiente paso inmediato:** presentar AUDIT + mapa de conexiones + plan; luego implementar sobre primitives existentes, sin crear rutas paralelas salvo compatibilidad intencional si el plan lo justifica.
+
 # Sesion 2026-05-10 — TASK-857 GitHub release webhooks cerrada
 
 - **Trigger:** usuario pidió implementar `TASK-857 — GitHub Webhooks Release Event Ingestion` end-to-end, manteniéndose explícitamente en `develop` y sin cambiar de rama.

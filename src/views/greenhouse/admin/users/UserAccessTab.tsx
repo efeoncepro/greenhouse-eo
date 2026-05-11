@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -52,6 +52,8 @@ import { roleColorFor, roleIconFor, toTitleCase } from './helpers'
 const TASK407_ARIA_PERMISOS_EFECTIVOS_DEL_USUARIO = "Permisos efectivos del usuario"
 const TASK407_ARIA_OVERRIDES_DE_ENTITLEMENTS = "Overrides de entitlements"
 const TASK407_ARIA_QUITAR_EXCEPCION = "Quitar excepción"
+const TASK839_ARIA_APROBAR_EXCEPCION = "Aprobar excepción"
+const TASK839_ARIA_RECHAZAR_EXCEPCION = "Rechazar excepción"
 
 
 const SECTION_LABEL_MAP = new Map<string, string>(GOVERNANCE_SECTIONS.map(section => [section.key, section.label]))
@@ -399,6 +401,7 @@ const OverridesSection = ({
   onExpiresAtChange,
   onAddOverride,
   onRemoveOverride,
+  onApproveOverride,
   onSave
 }: {
   catalog: EntitlementCatalogEntry[]
@@ -421,6 +424,7 @@ const OverridesSection = ({
   onExpiresAtChange: (value: string) => void
   onAddOverride: () => void
   onRemoveOverride: (overrideId: string) => void
+  onApproveOverride: (overrideId: string, decision: 'approve' | 'reject') => void
   onSave: () => void
 }) => {
   const selectedDefinition = catalog.find(item => item.capability === selectedCapability) ?? null
@@ -510,6 +514,7 @@ const OverridesSection = ({
                     <TableCell>Acción</TableCell>
                     <TableCell>Scope</TableCell>
                     <TableCell>Efecto</TableCell>
+                    <TableCell>Estado</TableCell>
                     <TableCell>Motivo</TableCell>
                     <TableCell>Vigencia</TableCell>
                     <TableCell align='right'>Acción</TableCell>
@@ -528,12 +533,35 @@ const OverridesSection = ({
                       <TableCell>
                         <Chip size='small' variant='tonal' color={override.effect === 'grant' ? 'success' : 'warning'} label={override.effect === 'grant' ? 'Grant' : 'Revoke'} />
                       </TableCell>
+                      <TableCell>
+                        <Stack direction='row' spacing={1} flexWrap='wrap'>
+                          <Chip
+                            size='small'
+                            variant='tonal'
+                            color={override.approvalStatus === 'pending_approval' ? 'warning' : 'success'}
+                            label={override.approvalStatus === 'pending_approval' ? 'Pendiente' : 'Aprobado'}
+                          />
+                          {override.isSensitive ? <Chip size='small' variant='outlined' color='error' label='Sensible' /> : null}
+                        </Stack>
+                      </TableCell>
                       <TableCell>{override.reason}</TableCell>
                       <TableCell>{override.expiresAt ? `Vence ${String(override.expiresAt).slice(0, 10)}` : 'Sin vencimiento'}</TableCell>
                       <TableCell align='right'>
-                        <IconButton aria-label={TASK407_ARIA_QUITAR_EXCEPCION} onClick={() => onRemoveOverride(override.overrideId)}>
-                          <i className='tabler-trash' />
-                        </IconButton>
+                        <Stack direction='row' spacing={1} justifyContent='flex-end'>
+                          {override.approvalStatus === 'pending_approval' ? (
+                            <>
+                              <IconButton aria-label={TASK839_ARIA_APROBAR_EXCEPCION} onClick={() => onApproveOverride(override.overrideId, 'approve')}>
+                                <i className='tabler-check' />
+                              </IconButton>
+                              <IconButton aria-label={TASK839_ARIA_RECHAZAR_EXCEPCION} onClick={() => onApproveOverride(override.overrideId, 'reject')}>
+                                <i className='tabler-x' />
+                              </IconButton>
+                            </>
+                          ) : null}
+                          <IconButton aria-label={TASK407_ARIA_QUITAR_EXCEPCION} onClick={() => onRemoveOverride(override.overrideId)}>
+                            <i className='tabler-trash' />
+                          </IconButton>
+                        </Stack>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -661,11 +689,37 @@ const UserAccessTab = ({ userId }: Props) => {
   const [overrideSaveError, setOverrideSaveError] = useState<string | null>(null)
   const [overrideSaveSuccess, setOverrideSaveSuccess] = useState<string | null>(null)
   const [savingOverrides, setSavingOverrides] = useState(false)
+  const [approvingOverride, setApprovingOverride] = useState(false)
   const [startupPath, setStartupPath] = useState('')
   const [startupReason, setStartupReason] = useState('')
   const [startupSaveError, setStartupSaveError] = useState<string | null>(null)
   const [startupSaveSuccess, setStartupSaveSuccess] = useState<string | null>(null)
   const [savingStartupPolicy, setSavingStartupPolicy] = useState(false)
+
+  const fetchEntitlements = useCallback(async () => {
+    setLoadingEntitlements(true)
+
+    try {
+      const response = await fetch(`/api/admin/entitlements/users/${userId}`)
+
+      if (!response.ok) {
+        const payload = (await response.json().catch(() => null)) as { error?: string } | null
+
+        throw new Error(payload?.error || 'No se pudo cargar el acceso efectivo.')
+      }
+
+      const data: UserEntitlementsResponse = await response.json()
+
+      setEntitlements(data)
+      setOverrideDrafts(data.overrides)
+      setStartupPath(data.startupPolicy.configuredPath || '')
+      setEntitlementsError(null)
+    } catch (error) {
+      setEntitlementsError(error instanceof Error ? error.message : 'No se pudo cargar el acceso efectivo.')
+    } finally {
+      setLoadingEntitlements(false)
+    }
+  }, [userId])
 
   useEffect(() => {
     const fetchRoles = async () => {
@@ -735,32 +789,10 @@ const UserAccessTab = ({ userId }: Props) => {
       }
     }
 
-    const fetchEntitlements = async () => {
-      try {
-        const response = await fetch(`/api/admin/entitlements/users/${userId}`)
-
-        if (!response.ok) {
-          const payload = (await response.json().catch(() => null)) as { error?: string } | null
-
-          throw new Error(payload?.error || 'No se pudo cargar el acceso efectivo.')
-        }
-
-        const data: UserEntitlementsResponse = await response.json()
-
-        setEntitlements(data)
-        setOverrideDrafts(data.overrides)
-        setStartupPath(data.startupPolicy.configuredPath || '')
-      } catch (error) {
-        setEntitlementsError(error instanceof Error ? error.message : 'No se pudo cargar el acceso efectivo.')
-      } finally {
-        setLoadingEntitlements(false)
-      }
-    }
-
     fetchRoles()
     fetchViews()
     fetchEntitlements()
-  }, [userId])
+  }, [fetchEntitlements, userId])
 
   useEffect(() => {
     const firstCapability = entitlements?.catalog[0]
@@ -816,6 +848,12 @@ const UserAccessTab = ({ userId }: Props) => {
       effect: overrideEffect,
       reason: overrideReason.trim(),
       expiresAt: overrideExpiresAt || null,
+      approvalStatus: 'approved',
+      approvalRequestedBy: null,
+      approvedBy: null,
+      approvedAt: null,
+      approvalReason: null,
+      isSensitive: false,
       updatedAt: new Date().toISOString()
     }
 
@@ -860,18 +898,64 @@ const UserAccessTab = ({ userId }: Props) => {
         })
       })
 
-      const payload = (await response.json().catch(() => null)) as { error?: string } | null
+      const payload = (await response.json().catch(() => null)) as { error?: string; pendingApproval?: number } | null
 
       if (!response.ok) {
         throw new Error(payload?.error || 'No se pudieron guardar las excepciones.')
       }
 
-      setOverrideSaveSuccess('Las excepciones quedaron guardadas.')
+      const pendingApproval = typeof payload?.pendingApproval === 'number' ? payload.pendingApproval : 0
+
+      setOverrideSaveSuccess(
+        pendingApproval > 0
+          ? `${pendingApproval} excepción sensible quedó pendiente de segunda firma.`
+          : 'Las excepciones quedaron guardadas.'
+      )
+      await fetchEntitlements()
       router.refresh()
     } catch (error) {
       setOverrideSaveError(error instanceof Error ? error.message : 'No se pudieron guardar las excepciones.')
     } finally {
       setSavingOverrides(false)
+    }
+  }
+
+  const handleApproveOverride = async (overrideId: string, decision: 'approve' | 'reject') => {
+    const approvalReason = window.prompt(
+      decision === 'approve' ? 'Motivo de aprobación' : 'Motivo de rechazo'
+    )?.trim()
+
+    if (!approvalReason) return
+
+    setApprovingOverride(true)
+    setOverrideSaveError(null)
+    setOverrideSaveSuccess(null)
+
+    try {
+      const response = await fetch(`/api/admin/entitlements/users/${userId}/overrides/${overrideId}/approval`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          decision,
+          approvalReason
+        })
+      })
+
+      const payload = (await response.json().catch(() => null)) as { error?: string } | null
+
+      if (!response.ok) {
+        throw new Error(payload?.error || 'No se pudo registrar la segunda firma.')
+      }
+
+      setOverrideSaveSuccess(decision === 'approve' ? 'La excepción quedó aprobada.' : 'La excepción quedó rechazada.')
+      await fetchEntitlements()
+      router.refresh()
+    } catch (error) {
+      setOverrideSaveError(error instanceof Error ? error.message : 'No se pudo registrar la segunda firma.')
+    } finally {
+      setApprovingOverride(false)
     }
   }
 
@@ -966,7 +1050,7 @@ const UserAccessTab = ({ userId }: Props) => {
           loading={loadingEntitlements}
           saveError={overrideSaveError}
           saveSuccess={overrideSaveSuccess}
-          saving={savingOverrides}
+          saving={savingOverrides || approvingOverride}
           selectedCapability={overrideCapability}
           onCapabilityChange={setOverrideCapability}
           selectedAction={overrideAction}
@@ -981,6 +1065,7 @@ const UserAccessTab = ({ userId }: Props) => {
           onExpiresAtChange={setOverrideExpiresAt}
           onAddOverride={handleAddOverride}
           onRemoveOverride={handleRemoveOverride}
+          onApproveOverride={handleApproveOverride}
           onSave={handleSaveOverrides}
         />
       </Grid>

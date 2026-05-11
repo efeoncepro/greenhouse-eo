@@ -1035,6 +1035,33 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     }
   }
 
+  // TASK-839 — Admin Center governance overlay. Route/view access opens the
+  // surface; these capabilities gate mutations and audit reads.
+  if (hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
+    const accessGovernanceCapabilities: Array<{ capability: EntitlementCapabilityKey; actions: EntitlementAction[] }> = [
+      { capability: 'access.governance.role_defaults.read', actions: ['read'] },
+      { capability: 'access.governance.role_defaults.update', actions: ['update'] },
+      { capability: 'access.governance.user_overrides.read', actions: ['read'] },
+      { capability: 'access.governance.user_overrides.create', actions: ['create'] },
+      { capability: 'access.governance.user_overrides.approve', actions: ['approve'] },
+      { capability: 'access.governance.startup_policy.update', actions: ['update'] },
+      { capability: 'access.governance.audit_log.read', actions: ['read'] },
+      { capability: 'access.governance.capability.deprecate', actions: ['manage'] }
+    ]
+
+    for (const { capability, actions } of accessGovernanceCapabilities) {
+      for (const action of actions) {
+        addEntitlement(entries, {
+          module: 'admin',
+          capability,
+          action,
+          scope: 'tenant',
+          source: 'role'
+        })
+      }
+    }
+  }
+
   // Internal team members (route_group=internal) que NO son admin reciben acceso
   // baseline a facets no-sensitivos a scope 'tenant'. Excluye economics/finance
   // (sensitive perimeter) y _sensitive variants (requieren grant explícito).

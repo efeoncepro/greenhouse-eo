@@ -139,13 +139,17 @@ const EntitlementsGovernanceTab = ({ data }: Props) => {
         })
       })
 
-      const payload = (await response.json().catch(() => null)) as { error?: string } | null
+      const payload = (await response.json().catch(() => null)) as { error?: string; affectedUsers?: number } | null
 
       if (!response.ok) {
         throw new Error(payload?.error || 'No se pudo guardar la política por rol.')
       }
 
-      setSaveSuccess('Los defaults por rol quedaron guardados.')
+      setSaveSuccess(
+        typeof payload?.affectedUsers === 'number'
+          ? `Política por rol guardada. ${payload.affectedUsers} usuario(s) quedan en la cola de invalidación.`
+          : 'Política por rol guardada.'
+      )
       router.refresh()
     } catch (error) {
       setSaveError(error instanceof Error ? error.message : 'No se pudo guardar la política por rol.')

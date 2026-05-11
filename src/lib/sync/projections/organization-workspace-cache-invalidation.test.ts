@@ -72,6 +72,17 @@ describe('TASK-611 Slice 6 — organization workspace cache invalidation project
     expect(projection.extractScope({})).toBeNull()
   })
 
+  it('extracts every affected user id when role-default governance events fan out', () => {
+    expect(
+      projection.extractScopes?.({
+        affectedUserIds: ['user-a', ' user-b ', 'user-a', '', 123]
+      })
+    ).toEqual([
+      { entityType: 'workspace_projection_cache', entityId: 'user-a' },
+      { entityType: 'workspace_projection_cache', entityId: 'user-b' }
+    ])
+  })
+
   it('refresh calls clearProjectionCacheForSubject with the scoped id and returns a summary string', async () => {
     clearMock.mockReturnValueOnce(3)
 

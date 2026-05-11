@@ -1,5 +1,11 @@
 # changelog.md
 
+## 2026-05-11
+
+- **TASK-839 follow-up — Admin governance Playwright smoke con usuario agente.** Se agrega `tests/e2e/smoke/admin-entitlements-governance.spec.ts` para validar `/admin/views`, la tab Accesos del usuario `agent@greenhouse.efeonce.org` y una mutation real de startup policy con restore. Además se corrige `scripts/playwright-auth-setup.mjs` para generar storageState válido en localhost con cookies `__Secure-*`.
+
+- **TASK-840 — Deprecated capabilities cleanup.** Se agrega disciplina canónica para retirar capabilities del TS catalog sin borrar historia del registry: helper transaccional `markCapabilityDeprecated()`, endpoint admin `/api/admin/entitlements/capabilities/[capabilityKey]/deprecate` con capability granular `access.governance.capability.deprecate`, audit log `capability_deprecated`, outbox event `access.capability.deprecated` v1 y reporter CSV read-only `scripts/governance/find-deprecated-candidates.ts`. La migration también repara drift live inverso detectado durante discovery (`commercial.engagement.recover_outbound`, `platform.release.watchdog.read` faltaban en registry activo).
+
 ## 2026-05-10
 
 - **TASK-857 — GitHub Webhooks Release Event Ingestion implementada en `develop`.** Se agrega endpoint server-to-server `POST /api/webhooks/github/release-events` con validación GitHub `X-Hub-Signature-256` antes de parse/persist, dedupe por `X-GitHub-Delivery`, seed `webhook_endpoints` y tabla normalizada `greenhouse_sync.github_release_webhook_events` para metadata redacted + match/reconcile evidence. El reconciler matchea contra `release_manifests` por `target_sha` y fallback `workflow_run_id`; eventos sin match quedan `unmatched` y no crean manifests. Solo fallas de workflows allowlisted pueden transicionar por la state machine existente (`ready|deploying -> aborted`, `verifying -> degraded`); eventos exitosos quedan como evidencia y no declaran `released`. Se agrega signal `platform.release.github_webhook_unmatched`; el watchdog TASK-849 sigue activo como backstop. Tests/validación: suite Vitest completa por filtro local `4073 passed / 11 skipped` y `pnpm exec tsc --noEmit` verde.
@@ -8072,6 +8078,8 @@ Validations: tsc 0 errors, lint 0 errors, 427 files / 2225 tests pass / 5 skippe
 - La validación funcional quedó cubierta con `dryRun` real para `Marzo 2026`, resolviendo el target page existente sin sobrescribir el contenido histórico durante la verificación.
 
 # Changelog
+
+- **TASK-839 — Admin Center entitlement governance wire-up.** Cerrada Fase 5 de ISSUE-068: capabilities granulares `access.governance.*` seedeadas en `capabilities_registry`, endpoints existentes `/api/admin/entitlements/**` protegidos con least privilege, writers transaccionales endurecidos con validation contra registry, audit + outbox versionado, segunda firma para grants sensibles y fan-out reactive por `affectedUserIds`. Admin Users > Acceso ahora muestra approvals pendientes y permite aprobar/rechazar overrides sensibles. Se agregan signals `identity.governance.audit_log_write_failures` y `identity.governance.pending_approval_overdue`.
 
 ## 2026-04-29
 

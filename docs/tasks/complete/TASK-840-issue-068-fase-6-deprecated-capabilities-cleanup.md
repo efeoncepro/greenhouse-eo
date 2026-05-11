@@ -6,17 +6,17 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P3`
 - Impact: `Bajo`
 - Effort: `Bajo`
 - Type: `housekeeping`
 - Epic: `—`
-- Status real: `Backlog oportunista`
+- Status real: `Cerrada 2026-05-11`
 - Rank: `TBD`
 - Domain: `identity`
-- Blocked by: `TASK-839` (necesita writes activos para que emerjan candidates a deprecar)
-- Branch: `task/TASK-840-issue-068-fase-6-deprecated-capabilities-cleanup`
+- Blocked by: `none` (TASK-839 cerrada 2026-05-11)
+- Branch: `develop` (override explícito del usuario; no cambiar de rama)
 - **NO bloquea**: `TASK-612` ni `TASK-613`. Esta task es housekeeping del registry; no toca la projection ni los grants base que TASK-611 Slice 4 ya wireó en `runtime.ts`. TASK-612/613 son consumers read-only — pueden ejecutarse y mergearse sin que TASK-840 corra.
 - Legacy ID: `—`
 - GitHub Issue: `—`
@@ -147,3 +147,11 @@ Estándar.
 ## Follow-ups
 
 - Ninguno. Esta task cierra el plan multi-fase de ISSUE-068 al 100%.
+
+## Closing Notes — 2026-05-11
+
+- Implementado `markCapabilityDeprecated()` como helper canónico transaccional con guard contra TS catalog activo, pre-check de grants activos, update de `deprecated_at`, audit log `capability_deprecated`, outbox `access.capability.deprecated` v1 y cache clear.
+- Endpoint canónico agregado en `/api/admin/entitlements/capabilities/[capabilityKey]/deprecate`, no en `/api/admin/governance/access/**`, alineado con TASK-839.
+- Script read-only `scripts/governance/find-deprecated-candidates.ts` emite CSV de candidates y counts; no auto-mutates.
+- Migration `20260511112736683_task-840-deprecated-capabilities-cleanup.sql` aplicada en Cloud SQL dev; además reparó drift live inverso detectado durante discovery (`commercial.engagement.recover_outbound`, `platform.release.watchdog.read` faltaban en registry activo).
+- Validación: targeted Vitest 24/24, suite completa 4087/4087, `pnpm lint`, `pnpm exec tsc --noEmit --pretty false`, `pnpm build`, `pnpm pg:doctor`, reporter CSV live sin candidates y parity live `inSync=true`.

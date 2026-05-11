@@ -55,6 +55,21 @@ const extractSubjectUserId = (payload: Record<string, unknown>): string | null =
   return null
 }
 
+const extractAffectedUserIds = (payload: Record<string, unknown>): string[] => {
+  const value = payload.affectedUserIds
+
+  if (!Array.isArray(value)) return []
+
+  return Array.from(
+    new Set(
+      value
+        .filter((entry): entry is string => typeof entry === 'string')
+        .map(entry => entry.trim())
+        .filter(Boolean)
+    )
+  )
+}
+
 export const organizationWorkspaceCacheInvalidationProjection: ProjectionDefinition = {
   name: 'organization_workspace_cache_invalidation',
   description:
@@ -68,6 +83,19 @@ export const organizationWorkspaceCacheInvalidationProjection: ProjectionDefinit
     if (!userId) return null
 
     return { entityType: 'workspace_projection_cache', entityId: userId }
+  },
+
+  extractScopes: payload => {
+    const userId = extractSubjectUserId(payload)
+
+    if (userId) {
+      return [{ entityType: 'workspace_projection_cache', entityId: userId }]
+    }
+
+    return extractAffectedUserIds(payload).map(entityId => ({
+      entityType: 'workspace_projection_cache',
+      entityId
+    }))
   },
 
   refresh: async scope => {

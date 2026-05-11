@@ -101,6 +101,8 @@ Estos CLIs estan autenticados localmente. Cuando una task toca su dominio, **usa
     - `entitlements` / `capabilities` / `module + capability + action + scope` como autorizacion fina y direccion canonica
   - no diseñar arquitectura o tasks nuevas asumiendo que `views` son la unica capa de acceso; tampoco saltarse las `views` cuando la feature requiere surface visible, menu, tabs, page guards o entrypoints
   - `routeGroups` siguen resolviendo acceso broad y navegacion; `startup policy` sigue siendo un contrato separado de permisos
+  - si una capability se retira de `src/config/entitlements-catalog.ts`, crear una migracion que marque `greenhouse_core.capabilities_registry.deprecated_at`; nunca borrar rows del registry ni deprecar una capability que todavia exista en el catalog TS
+  - para deprecar capabilities, usar `markCapabilityDeprecated()` o `/api/admin/entitlements/capabilities/[capabilityKey]/deprecate`, con pre-check de grants activos y audit/outbox; `scripts/governance/find-deprecated-candidates.ts` solo reporta candidates
 - Si el trabajo toca el calendario operativo de Payroll, revisar `docs/architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md`, `src/lib/calendar/operational-calendar.ts` y `src/lib/calendar/nager-date-holidays.ts`; la timezone canónica es IANA (`America/Santiago`) y los feriados nacionales se hidratan desde `Nager.Date` con overrides locales persistidos.
 - Si el cambio toca modelado de datos, sync, fuentes externas, PostgreSQL o BigQuery:
   - revisar `docs/architecture/GREENHOUSE_DATA_MODEL_MASTER_V1.md`

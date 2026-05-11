@@ -83,6 +83,7 @@ async function authViaApi() {
   const { cookieName, cookieValue, portalHomePath } = data
 
   const isSecure = BASE_URL.startsWith('https')
+  const requiresSecureCookie = isSecure || cookieName.startsWith('__Secure-') || cookieName.startsWith('__Host-')
   const domain = new URL(BASE_URL).hostname
 
   const storageState = {
@@ -93,8 +94,8 @@ async function authViaApi() {
         domain,
         path: '/',
         httpOnly: true,
-        secure: isSecure,
-        sameSite: isSecure ? 'Lax' : 'None',
+        secure: requiresSecureCookie,
+        sameSite: 'Lax',
         expires: Math.floor(Date.now() / 1000) + 86400 // 24h
       }
     ],
