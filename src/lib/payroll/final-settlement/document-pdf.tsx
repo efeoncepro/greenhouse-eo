@@ -1,7 +1,6 @@
 import 'server-only'
 
 import { createHash } from 'node:crypto'
-import { existsSync as fsExistsSync } from 'node:fs'
 
 import { createElement } from 'react'
 
@@ -10,6 +9,7 @@ import { Document, Image, Page, StyleSheet, Text, View, renderToBuffer } from '@
 import { GH_FINIQUITO } from '@/lib/copy/finiquito'
 import { ensurePdfFontsRegistered } from '@/lib/finance/pdf/register-fonts'
 import { formatCurrency as formatLocaleCurrency, formatDate as formatLocaleDate, formatDateTime as formatLocaleDateTime, formatNumber } from '@/lib/format'
+import { resolveLegalRepresentativeSignaturePath } from '@/lib/legal-signatures'
 import { formatClpInWords } from '@/lib/payroll/number-to-spanish-words'
 
 import type { FinalSettlementDocumentSnapshot } from './document-types'
@@ -293,10 +293,12 @@ const styles = StyleSheet.create({
   },
   signatureColumn: {
     // TASK-863 V1.2 — 3 columnas equilibradas con space-between (empleador / trabajador / ministro de fe).
+    // TASK-863 V1.4 — position relative para que signatureImageEmployer (absolute) ancle a este column.
     width: '30%',
     display: 'flex',
     flexDirection: 'column',
-    alignItems: 'center'
+    alignItems: 'center',
+    position: 'relative'
   },
   signatureRule: {
     // Linea explicita via View con height + backgroundColor. Antes: borderTop en el contenedor
@@ -306,16 +308,17 @@ const styles = StyleSheet.create({
     backgroundColor: '#475467',
     marginBottom: 8
   },
-  // TASK-863 V1.3 — Imagen de firma del representante empleador, anclada sobre la línea de
-  // firma. Posicionada de modo que el trazo cruce ligeramente la línea, simulando firma manual
-  // post-impresión. Fixed dimensions ensure render consistency entre snapshots.
+  // TASK-863 V1.4 — Imagen de firma del representante empleador, anclada para
+  // cruzar la signatureRule como firma manual real, SIN tapar el texto debajo.
+  // Solo `width` fijo (sin height) preserva el aspect ratio real del PNG.
+  // `top: -22` sobresale ARRIBA del column para que el centro vertical de la
+  // firma quede sobre la línea (signatureRule está a ~8pt del top del column).
   signatureImageEmployer: {
     position: 'absolute',
-    width: 110,
-    height: 44,
-    bottom: 28, // 8 (marginBottom signatureRule) + offset arriba de la línea (~20)
+    width: 105,
+    top: -22,
     left: '50%',
-    marginLeft: -55, // centrado horizontal (width/2)
+    marginLeft: -52, // centrado horizontal (width/2)
     objectFit: 'contain'
   },
   // TASK-862 Slice D — Watermark layer (diagonal "PROYECTO" / "BLOQUEADO" / "RECHAZADO").
@@ -490,28 +493,11 @@ const styles = StyleSheet.create({
 
 const logoPath = `${process.cwd()}/public/branding/logo-full.png`
 
-// TASK-863 V1.3 — Resolver de firma digital del representante legal del empleador.
-// Pre-impresa sobre la línea de firma del empleador en el PDF emitido. Convención:
-// archivo PNG transparente en `src/assets/signatures/{snake_case_path}.png`. Si el
-// archivo no existe, el render omite la imagen (línea queda vacía para firma manual).
-// V1.4 follow-up: migrar lookup a FK asset privado FROM greenhouse_core.organizations.
-const resolveEmployerSignaturePath = (relativePath: string | null | undefined): string | null => {
-  if (!relativePath) return null
-
-  // Sanitiza path: solo permite alfanum + dash + underscore + dot + slash relativo.
-  // Bloquea `..` (path traversal) y absolutos.
-  if (relativePath.includes('..') || relativePath.startsWith('/')) return null
-  if (!/^[a-zA-Z0-9._\-/]+\.(png|jpg|jpeg)$/.test(relativePath)) return null
-
-  const absolutePath = `${process.cwd()}/src/assets/signatures/${relativePath}`
-
-  try {
-    return fsExistsSync(absolutePath) ? absolutePath : null
-  } catch {
-    return null
-  }
-}
-
+// TASK-863 V1.4 — Resolver de firma del representante legal extraído al modulo
+// canonico `@/lib/legal-signatures`. Reusable desde cualquier flow que renderice
+// documentos firmados por el representante legal de una organizacion (finiquitos,
+// contratos, addenda, cartas formales). NO duplicar la logica aqui — extender
+// el modulo central.
 const formatCurrency = (amount: number) => formatLocaleCurrency(amount, 'CLP')
 
 const formatDecimal = (amount: number) =>
@@ -920,7 +906,7 @@ const FinalSettlementPdfDocument = ({
   // TASK-863 V1.3 — Firma digital del representante legal del empleador (PNG transparente).
   // Convención: snapshot.employer.legalRepresentativeSignaturePath = "efeonce-group-spa.png"
   // resuelve `src/assets/signatures/efeonce-group-spa.png`. Null cuando archivo no existe.
-  const employerSignaturePath = resolveEmployerSignaturePath(snapshot.employer.legalRepresentativeSignaturePath)
+  const employerSignaturePath = resolveLegalRepresentativeSignaturePath(snapshot.employer.legalRepresentativeSignaturePath)
 
   // TASK-862 Slice D — Clausulas narrativas params canonicos (GH_FINIQUITO).
   const hireDateLong = formatDateLongSpanish(snapshot.finalSettlement.hireDateSnapshot)

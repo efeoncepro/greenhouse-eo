@@ -5,6 +5,7 @@ import { randomUUID } from 'node:crypto'
 import type { PoolClient } from 'pg'
 
 import { getOperatingEntityIdentity } from '@/lib/account-360/organization-identity'
+import { buildSignatureFilenameForTaxId } from '@/lib/legal-signatures'
 import { resolveInitialApprovalAuthority } from '@/lib/approval-authority/resolver'
 import {
   getWorkflowApprovalSnapshotForStage,
@@ -278,13 +279,10 @@ const getEmployerSnapshot = async (
         country: row.country ?? 'CL',
         source: 'settlement_legal_entity',
         logoAssetId: row.logo_asset_id, // TASK-862 Slice C
-        // TASK-863 V1.3 — firma digital del representante legal: convención de filename
-        // por RUT del empleador, normalizado sin puntos. Operador HR sube el PNG
-        // transparente a `src/assets/signatures/{rut-no-puntos}.png`. V1.4 follow-up
-        // migrará a FK asset privado en greenhouse_core.organizations.
-        legalRepresentativeSignaturePath: row.tax_id
-          ? `${String(row.tax_id).replace(/[.\s]/g, '')}.png`
-          : null
+        // TASK-863 V1.4 — firma del representante legal via helper canónico
+        // `@/lib/legal-signatures`. Convención de filename = `{taxId-cleaned}.png`.
+        // Reusable por cualquier flow legal (contratos, addenda, cartas).
+        legalRepresentativeSignaturePath: buildSignatureFilenameForTaxId(row.tax_id)
       }
     }
   }
@@ -304,10 +302,8 @@ const getEmployerSnapshot = async (
     country: operatingEntity.country,
     source: 'operating_entity_fallback',
     logoAssetId: null, // TASK-862 Slice C — fallback no expone logo; PDF cae a Greenhouse default
-    // TASK-863 V1.3 — fallback path por taxId; null cuando operating entity sin RUT.
-    legalRepresentativeSignaturePath: operatingEntity.taxId
-      ? `${String(operatingEntity.taxId).replace(/[.\s]/g, '')}.png`
-      : null
+    // TASK-863 V1.4 — fallback path por taxId via helper canónico.
+    legalRepresentativeSignaturePath: buildSignatureFilenameForTaxId(operatingEntity.taxId)
   }
 }
 
