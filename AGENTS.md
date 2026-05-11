@@ -805,6 +805,8 @@ Contrato versionado `platform-health.v1`. Permite a agentes (MCP, Teams bot, CI,
 
 ### Production Release Orchestrator (TASK-851, 2026-05-10)
 
+- **Skill obligatoria para agentes:** antes de cualquier promocion, preflight, approval, rollback, watchdog drift recovery o cambio del control plane de produccion, invocar `greenhouse-production-release`. Paths canonicos: `.codex/skills/greenhouse-production-release/SKILL.md` y `.claude/skills/greenhouse-production-release/SKILL.md`.
+- **Mantenimiento de skill:** si cambia el flujo critico (orquestador, worker `workflow_call`, mappings Cloud Run, state machine, Vercel readiness, watchdog, Azure gating o rollback), actualizar ambas skills en el mismo cambio junto con arquitectura/runbooks/docs vivas aplicables.
 - **Que hace**: workflow GH Actions canonico `.github/workflows/production-release.yml` que coordina la promocion `develop → main` end-to-end. Compactacion arch-architect de TASK-851 + TASK-852 originales (orquestador y SHA verification son arquitecturalmente acoplados).
 - **Trigger**: `workflow_dispatch` con inputs `target_sha` (req), `force_infra_deploy`, `bypass_preflight_reason` (>=20 chars + capability `platform.release.bypass_preflight`).
 - **8 jobs canonicos**: preflight (CLI TASK-850) → record-started (CLI Slice 0) → approval-gate (environment Production) → 4 workers parallel (workflow_call) → wait-vercel (poll Vercel API) → post-release-health (ping /api/auth/health) → transition-released (state machine final) → summary.

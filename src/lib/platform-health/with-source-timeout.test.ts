@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import { withSourceTimeout } from './with-source-timeout'
 
@@ -54,13 +54,23 @@ describe('withSourceTimeout', () => {
   })
 
   it('records duration in milliseconds', async () => {
-    const result = await withSourceTimeout(
-      () => new Promise<number>(resolve => setTimeout(() => resolve(42), 30)),
-      { source: 'measured_source' }
-    )
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date('2026-01-01T00:00:00.000Z'))
 
-    expect(result.status).toBe('ok')
-    expect(result.durationMs).toBeGreaterThanOrEqual(30)
-    expect(result.durationMs).toBeLessThan(2_000)
+    try {
+      const pending = withSourceTimeout(
+        () => new Promise<number>(resolve => setTimeout(() => resolve(42), 30)),
+        { source: 'measured_source' }
+      )
+
+      await vi.advanceTimersByTimeAsync(30)
+
+      const result = await pending
+
+      expect(result.status).toBe('ok')
+      expect(result.durationMs).toBe(30)
+    } finally {
+      vi.useRealTimers()
+    }
   })
 })

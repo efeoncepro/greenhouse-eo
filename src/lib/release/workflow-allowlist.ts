@@ -14,8 +14,10 @@
  *
  * **Mapping production deploy worker workflow → Cloud Run service** (TASK-849):
  * Cuando un workflow tiene un `cloudRunService` mapeado, el watchdog corre la
- * detection de revision drift contra ese servicio. Workflows sin mapping
- * (Azure, HubSpot bridge) no participan en revision drift.
+ * detection de revision drift contra ese servicio. HubSpot Greenhouse
+ * Integration SI participa en drift detection porque es Cloud Run y forma
+ * parte del release orchestrator. Workflows sin mapping (Azure) no participan
+ * en revision drift.
  */
 
 export interface ReleaseDeployWorkflow {

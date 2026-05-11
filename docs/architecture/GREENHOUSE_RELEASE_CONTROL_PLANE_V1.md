@@ -6,6 +6,26 @@
 > **Replaces:** N/A (no formal release contract pre-2026-05-10; lived as tribal knowledge in `Handoff.md`)
 > **Related:** TASK-849 (Production Release Watchdog Alerts), TASK-857 (GitHub Webhooks Release Event Ingestion), TASK-742 (Auth Resilience 7-layer), TASK-765 (payment_orders state machine), TASK-773 (outbox publisher cutover)
 
+## Delta 2026-05-11 — TASK-861 HubSpot drift recovery hardening
+
+`TASK-861` no cambia el comportamiento runtime del bridge HubSpot ni el flujo
+global de produccion. Refuerza el contrato operativo alrededor de un caso real
+de drift:
+
+- HubSpot queda cubierto por los mismos tests anti-regresion de worker workflow
+  contract que `ops-worker`, `commercial-cost-worker` e `ico-batch-worker`.
+- `platform.release.worker_revision_drift` conserva severity `error` para drift
+  confirmado, pero agrega evidencia accionable cuando el servicio drifted es
+  `hubspot-greenhouse-integration`.
+- Remediation canonica para ese caso: ejecutar
+  `hubspot-greenhouse-integration-deploy.yml` con `environment=production`,
+  `expected_sha=<release target_sha>` y `skip_tests=false`; luego verificar
+  `/health`, `/contract` y watchdog `drift_count=0`.
+- `greenhouse_sync.release_manifests` sigue siendo SSoT append-only. No se
+  corrige drift por SQL.
+- `push:main` y path filters de workers no cambian en esta task. Cualquier
+  cambio a orchestrator-only deploy requiere ADR/task separada.
+
 ## Delta 2026-05-10 — GitHub webhook ingestion V1.2 (TASK-857)
 
 `TASK-857` agrega near-real-time evidence desde GitHub sin cambiar el source of truth del release:
@@ -608,7 +628,7 @@ Cierra el bucle del control plane production: detección activa + alertas Teams.
 - **Detector CLI** `scripts/release/production-release-watchdog.ts` (Slice 4) con flags `--json|--fail-on-error|--enable-teams|--dry-run`. Output machine-readable consumible por preflight CLI futuro (TASK-850). Exit codes: 0 ok/warning, 1 error/critical (con `--fail-on-error`).
 - **Scheduled GH workflow** `production-release-watchdog.yml` (Slice 5) — `*/30 * * * *` + workflow_dispatch + `cancel-in-progress: true` (la última foto siempre gana). WIF GCP para gcloud queries Cloud Run. Auto-emit summary a `$GITHUB_STEP_SUMMARY` + artifact 30d retention.
 - **Teams alerts dispatcher canónico** (Slice 5): `src/lib/release/watchdog-alerts-dispatcher.ts` con `dispatchWatchdogAlert()` + `dispatchWatchdogRecovery()`. Dedup logic: alerta SOLO cuando (a) blocker nuevo, (b) escalation severity, (c) ultimo alert > 24h. At-least-once delivery: dedup state se actualiza SOLO si Teams send tuvo éxito.
-- **Teams destination** `production-release-alerts` registrada en `src/config/manual-teams-announcements.ts` (V1 placeholder al chat EO Team).
+- **Teams destination** `production-release-alerts` registrada en `src/config/manual-teams-announcements.ts` apuntando al canal **"EO - Admin"** del Equipo Efeonce (`recipientKind: 'channel'`, `teamId: aae47836-...`, `channelId: 19:19Ug...@thread.tacv2`). Mismo canal físico que `ops-alerts` en `teams_notification_channels`; channelCode separado para audit trazable del origen.
 - **Runbook canónico** `docs/operations/runbooks/production-release-watchdog.md` (13 secciones: detección, ejecución, severities, recovery procedures, dedup state ops, configuración, decision tree alert vs incident, hard rules, V1.1 follow-ups).
 - **Hard Rules** canonizadas en CLAUDE.md sección "Production Release Watchdog invariants (TASK-849)".
 

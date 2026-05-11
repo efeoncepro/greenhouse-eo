@@ -1720,6 +1720,17 @@ pnpm release:preflight --override-batch-policy --fail-on-error
 
 Workflow GitHub Actions canonico `production-release.yml` que coordina la promocion `develop → main` end-to-end consumiendo el CLI preflight (TASK-850), helpers manifest-store (TASK-848 V1.0), y los 4 worker workflows refactoreados a `workflow_call` con `expected_sha` input + post-deploy GIT_SHA verification.
 
+**Skill obligatoria para agentes**: antes de cualquier promocion, preflight,
+approval, rollback, watchdog drift recovery o cambio del control plane de
+produccion, invocar `greenhouse-production-release`. Paths canonicos:
+`.claude/skills/greenhouse-production-release/SKILL.md` y
+`.codex/skills/greenhouse-production-release/SKILL.md`.
+
+**Mantenimiento de skill**: si cambia el flujo critico (orquestador, worker
+`workflow_call`, mappings Cloud Run, state machine, Vercel readiness, watchdog,
+Azure gating o rollback), actualizar ambas skills en el mismo cambio junto con
+arquitectura/runbooks/docs vivas aplicables.
+
 **Triggers**: `workflow_dispatch` solo. Inputs: `target_sha` (required, 40 hex), `force_infra_deploy` (default false, gated TASK-853), `bypass_preflight_reason` (>=20 chars + capability `platform.release.bypass_preflight`).
 
 **8 jobs canonicos**:

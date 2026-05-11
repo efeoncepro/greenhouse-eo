@@ -1,3 +1,51 @@
+# Sesion 2026-05-11 — TASK-861 HubSpot release drift hardening cerrada
+
+- **Branch:** `develop` por instruccion explicita del usuario; no se cambio de rama.
+- **Estado:** task movida a `docs/tasks/complete/TASK-861-hubspot-production-release-drift-hardening.md`, Lifecycle `complete`.
+- **Implementacion:** `src/lib/release/concurrency-fix-verification.test.ts` ahora cubre HubSpot junto a ops/commercial/ICO y agrega assertions de `workflow_dispatch`, `workflow_call.skip_tests` y wiring `production-release.yml -> deploy-hubspot-integration` con `expected_sha=${{ inputs.target_sha }}`.
+- **Reliability/watchdog:** `src/lib/reliability/queries/release-worker-revision-drift.ts` conserva severity `error` para drift confirmado y agrega evidence `recommended_action` solo cuando el drift es `hubspot-greenhouse-integration`; `scripts/release/production-release-watchdog.ts` usa esa evidence para Teams antes del fallback generico.
+- **Docs/skills:** actualizado README del bridge, runbooks production release/watchdog, manual watchdog, `GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md`, skills Codex/Claude `greenhouse-production-release`, changelog, task registry y README.
+- **No tocado:** runtime del bridge HubSpot (`app.py`, handlers, models, webhook validation, deploy.sh, secretos, region/URL, cliente TS) queda intacto. Tampoco se removio `push:main` ni se redisenio Vercel/orquestador.
+- **Validacion:** `pnpm vitest run src/lib/release/concurrency-fix-verification.test.ts src/lib/release/workflow-allowlist.test.ts src/lib/reliability/queries/release-worker-revision-drift.test.ts --reporter=verbose` → 45/45; `pnpm exec tsc --noEmit --pretty false` verde; `pnpm lint` verde; `GITHUB_RELEASE_OBSERVER_TOKEN="$(gh auth token)" pnpm release:watchdog --json` → `aggregateSeverity=ok`, `4/4 workers synced`, `drift_count=0`; `/health` y `/contract` HubSpot responden.
+- **Nota de validacion:** `pnpm test -- src/lib/reliability/queries/release-worker-revision-drift.test.ts` ejecuta la suite completa por configuracion del repo y una corrida fallo por flake ajeno en `src/lib/platform-health/with-source-timeout.test.ts` (`29ms` vs `>=30ms`). La suite focalizada directa con `pnpm vitest run` quedo verde.
+- **Follow-up recomendado:** ADR/task separada si el equipo decide mover todos los workers productivos a orchestrator-only y retirar `push:main`; TASK-861 solo mejora deteccion/recovery del drift HubSpot.
+
+# Sesion 2026-05-11 — TASK-861 tomada en develop
+
+- **Trigger:** usuario pidio implementar `TASK-861 — HubSpot Production Release Drift Hardening`, manteniendose explicitamente en `develop` y sin cambiar de rama.
+- **Branch:** `develop` por instruccion explicita del usuario; se omite la rama `task/TASK-861-hubspot-production-release-drift-hardening` del flujo default y se documenta como override operativo.
+- **Ownership:** no hay PR abierto ni branch TASK-861/hubspot-production-release-drift existente. Task movida a `docs/tasks/in-progress/TASK-861-hubspot-production-release-drift-hardening.md`, Lifecycle `in-progress`, README + registry sincronizados.
+- **Discovery live inicial:** `pnpm pg:doctor` verde; HubSpot workflow run `25672532306` success en `4591bd8b28c8a18eb0aa15cfc8e092eeec814467`; Cloud Run `hubspot-greenhouse-integration-00057-np9` Ready con `GIT_SHA=4591bd8b28c8a18eb0aa15cfc8e092eeec814467`; `/health` + `/contract` responden; watchdog con `GITHUB_RELEASE_OBSERVER_TOKEN="$(gh auth token)"` retorna `aggregateSeverity=ok`, `4/4 workers synced`.
+- **Siguiente paso:** presentar AUDIT + mapa de conexiones + plan. Por P1/Medium, detener al final del plan para checkpoint humano antes de implementar.
+
+# Sesion 2026-05-11 — TASK-861 HubSpot release drift hardening abierta
+
+- **Trigger:** despues del forward-fix HubSpot drift, el usuario pidio seguir con diagnostico y abrir una task acotada, sin tocar todavia workflows/runtime.
+- **Skills invocadas:** `hubspot-greenhouse-bridge`, `software-architect-2026`, `greenhouse-task-planner`.
+- **Diagnostico resumido:** HubSpot no falla al desplegar; cuando se invoca con `expected_sha`, pytest/deploy/smoke pasan. El gap es que su `push` trigger tiene path filters estrechos, por lo que un release global puede cambiar el SHA canonico sin tocar `services/hubspot_greenhouse_integration/**`. El watchdog ya detecta drift contra `release_manifests`, pero el contrato anti-regresion de worker workflows no cubre HubSpot.
+- **Task creada:** `TASK-861 — HubSpot Production Release Drift Hardening` en `docs/tasks/to-do/TASK-861-hubspot-production-release-drift-hardening.md`.
+- **Scope:** incluir HubSpot en tests de workflow contract, hacer accionable el remediation path de `worker_revision_drift`, actualizar runbook/skills/README y dejar explicito que no se cambia `push:main` ni se rediseña produccion global.
+- **Indices actualizados:** `docs/tasks/TASK_ID_REGISTRY.md` + `docs/tasks/README.md`; siguiente ID disponible `TASK-862`.
+
+# Sesion 2026-05-11 — Reparacion forward-fix production HubSpot drift
+
+- **Contexto:** durante una promocion previa a production se empujo `4591bd8b28c8a18eb0aa15cfc8e092eeec814467` a `main` y se aprobaron workers sueltos, sin pasar por `Production Release Orchestrator`. Eso dejo el manifest `released` en `4591bd8b` y 3/4 workers sincronizados, pero `hubspot-greenhouse-integration` seguia sirviendo `6507e92d`.
+- **Skills invocadas:** `greenhouse-production-release` + `software-architect-2026`.
+- **Decision:** forward-fix acotado, no rollback y no mutacion manual de `release_manifests`. Rationale: Vercel production estaba `Ready`, `/api/auth/health` devolvia `ready`, manifest latest era `released` para `4591bd8b`, y el unico drift confirmado era HubSpot Cloud Run.
+- **Accion ejecutada con aprobacion del usuario:** `gh workflow run hubspot-greenhouse-integration-deploy.yml --ref main -f environment=production -f expected_sha=4591bd8b28c8a18eb0aa15cfc8e092eeec814467 -f skip_tests=false`.
+- **Run HubSpot:** `25672532306` completado `success`; pytest paso, deploy Cloud Run paso, smoke `/health` + `/contract` paso. Gate `Production` aprobado solo para este run/SHA con comentario de forward-fix.
+- **Estado Cloud Run:** `hubspot-greenhouse-integration-00057-np9` expone `GIT_SHA=4591bd8b28c8a18eb0aa15cfc8e092eeec814467`.
+- **Watchdog:** run `25672721055` completado `success`; `aggregateSeverity=ok`, `drift_count=0`, `data_missing_count=0`, summary `4/4 workers synced. Cloud Run revision matchea ultimo workflow run success.`
+- **Nota:** no se repitio el orquestador ni se altero DB; la reparacion uso el workflow existente del servicio drifted y cerro el estado mixto.
+
+# Sesion 2026-05-11 — Production release skill Claude + Codex
+
+- **Cambio:** creada skill invocable `greenhouse-production-release` para Codex y Claude.
+- **Paths:** `.codex/skills/greenhouse-production-release/SKILL.md`, `.codex/skills/greenhouse-production-release/agents/openai.yaml`, `.claude/skills/greenhouse-production-release/SKILL.md`.
+- **Contrato:** cualquier promocion a produccion, preflight, approval, rollback, watchdog drift recovery o cambio del release control plane debe invocar la skill antes de actuar.
+- **Mantenimiento:** si cambia el flujo critico (orquestador, worker `workflow_call`, mappings Cloud Run, state machine, Vercel readiness, watchdog, Azure gating o rollback), actualizar ambas skills junto con arquitectura/runbooks/docs vivas aplicables.
+- **Nota:** no se ejecutaron deploys, workflows, approvals ni mutaciones DB para este cambio; solo docs/skills.
+
 # Sesion 2026-05-11 — TASK-840 Deprecated capabilities cleanup cerrada
 
 - **Branch:** `develop` por instrucción explícita del usuario; no se cambió de rama.

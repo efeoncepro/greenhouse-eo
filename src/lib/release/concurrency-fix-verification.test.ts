@@ -27,7 +27,8 @@ const REPO_ROOT = join(import.meta.dirname, '..', '..', '..')
 const WORKER_WORKFLOWS = [
   '.github/workflows/ops-worker-deploy.yml',
   '.github/workflows/commercial-cost-worker-deploy.yml',
-  '.github/workflows/ico-batch-deploy.yml'
+  '.github/workflows/ico-batch-deploy.yml',
+  '.github/workflows/hubspot-greenhouse-integration-deploy.yml'
 ] as const
 
 interface WorkflowDoc {
@@ -100,6 +101,42 @@ describe('TASK-851 workflow_call contracts', () => {
       expect(secrets.GCP_WORKLOAD_IDENTITY_PROVIDER).toBeDefined()
     })
   }
+})
+
+describe('TASK-861 HubSpot release workflow contract', () => {
+  it('hubspot workflow preserves dispatch + call inputs required for drift recovery', () => {
+    const doc = loadWorkflow('.github/workflows/hubspot-greenhouse-integration-deploy.yml')
+    const onClause = doc.on as Record<string, unknown>
+
+    const workflowCall = onClause?.workflow_call as
+      | { inputs?: Record<string, unknown>; secrets?: Record<string, unknown> }
+      | undefined
+
+    const workflowDispatch = onClause?.workflow_dispatch as
+      | { inputs?: Record<string, unknown> }
+      | undefined
+
+    expect(workflowCall?.inputs?.environment).toBeDefined()
+    expect(workflowCall?.inputs?.expected_sha).toBeDefined()
+    expect(workflowCall?.inputs?.skip_tests).toBeDefined()
+    expect(workflowCall?.secrets?.GCP_WORKLOAD_IDENTITY_PROVIDER).toBeDefined()
+
+    expect(workflowDispatch?.inputs?.environment).toBeDefined()
+    expect(workflowDispatch?.inputs?.expected_sha).toBeDefined()
+    expect(workflowDispatch?.inputs?.skip_tests).toBeDefined()
+  })
+
+  it('production-release.yml invokes HubSpot with the release target SHA', () => {
+    const doc = loadWorkflow('.github/workflows/production-release.yml') as {
+      jobs?: Record<string, { uses?: string; with?: Record<string, unknown> }>
+    }
+
+    const hubspotJob = doc.jobs?.['deploy-hubspot-integration']
+
+    expect(hubspotJob?.uses).toBe('./.github/workflows/hubspot-greenhouse-integration-deploy.yml')
+    expect(hubspotJob?.with?.environment).toBe('production')
+    expect(hubspotJob?.with?.expected_sha).toBe('${{ inputs.target_sha }}')
+  })
 })
 
 const AZURE_WORKFLOWS = [
