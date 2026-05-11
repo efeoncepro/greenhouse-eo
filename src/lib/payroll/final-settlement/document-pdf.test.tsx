@@ -139,7 +139,11 @@ describe('renderFinalSettlementDocumentPdf', () => {
 
     const { text, numpages } = await pdfParse(buffer)
 
-    expect(numpages).toBe(1)
+    // TASK-862 Slice D — pre-Slice asseraba numpages===1; ahora el documento puede
+    // ocupar 1-2 paginas por las clausulas narrativas PRIMERO-QUINTO + Ley 21.389 banner
+    // + reserva de derechos + 3-col signatures. Relajamos a >=1 preservando el spirit
+    // del check ("el render produce un PDF parseable", no "exactamente 1 pagina").
+    expect(numpages).toBeGreaterThanOrEqual(1)
     expect(text.replace(/\s+/g, ' ')).toContain('Finiquito de contrato de trabajo')
     expect(text).toContain('Listo para firma')
     expect(text).not.toContain('Requiere revisión')
@@ -172,6 +176,17 @@ describe('renderFinalSettlementDocumentPdf', () => {
     expect(text).not.toContain('Monto líquido calculado en esta versión')
     expect(text).toContain('Documento confidencial')
     expect(text.toLocaleLowerCase('es-CL')).toContain('líquido / pago neto')
+
+    // TASK-862 Slice D — nuevas assertions: clausulas narrativas + Ley 21.389 + ministro de fe.
+    expect(normalizedText).toContain('ARTÍCULO 159 N°2 DEL CÓDIGO DEL TRABAJO')
+    expect(normalizedText).toContain('amplio, total y definitivo finiquito')
+    expect(normalizedText).toContain('artículo 162 inciso 5°')
+    expect(text).toContain('Ministro de fe')
+    expect(text).toContain('Pendiente de ratificación')
+    // Huella renderiza dentro de la caja huellaBox; pdf-parse no siempre captura
+    // strings dentro de boxes pequenos. El text "Huella\ndactilar" puede no aparecer
+    // textual; basta confirmar la columna ministro + Greenhouse footer.
+    expect(text).toContain('Documento generado con Greenhouse')
   })
 
   it('uses document readiness instead of settlement warnings for the visible issuance state', async () => {
