@@ -1,7 +1,7 @@
 > **Tipo de documento:** Manual de uso (operador)
 > **Version:** 1.0
 > **Creado:** 2026-05-10 por Claude
-> **Ultima actualizacion:** 2026-05-10 por Claude
+> **Ultima actualizacion:** 2026-05-11 por Codex
 > **Documentacion tecnica:** [CLAUDE.md §Production Preflight CLI invariants (TASK-850)](../../../CLAUDE.md), [Spec TASK-850](../../tasks/in-progress/TASK-850-production-preflight-cli-complete.md), [Runbook production-release.md §11](../../operations/runbooks/production-release.md)
 
 # Production Preflight CLI
@@ -20,9 +20,9 @@ Es el complemento del watchdog (TASK-849): el watchdog detecta blockers en runti
   - **GitHub App** instalada (App ID `3665723`, Installation ID `131127026`) — recomendado canonico
   - **`gcloud`** auth + ADC (`gcloud auth login` + `gcloud auth application-default login`)
   - **`az login`** si tienes acceso al Azure tenant
-  - Vars de entorno opcionales en `.env.local`: `VERCEL_TOKEN`, `SENTRY_AUTH_TOKEN`, `AZURE_GITHUB_ACTIONS_APP_ID`
+  - Vars de entorno opcionales en `.env.local`: `VERCEL_TOKEN`, `SENTRY_INCIDENTS_AUTH_TOKEN_SECRET_REF` o `SENTRY_AUTH_TOKEN`, `AZURE_GITHUB_ACTIONS_APP_ID`
 
-Si una CLI/token falta, el check correspondiente reporta `severity=unknown`/`status=not_configured`. NO bloquea el preflight completo, solo baja la `confidence`.
+Si una CLI/token falta, el check correspondiente reporta `severity=unknown`/`status=not_configured`, baja la `confidence` y deja `readyToDeploy: NO`. En el orquestador, eso bloquea production hasta recuperar visibilidad.
 
 ## Paso a paso
 
@@ -53,7 +53,7 @@ pnpm release:preflight --json --fail-on-error
 ```
 
 - `--json` → output machine-readable (ProductionPreflightV1 v1)
-- `--fail-on-error` → exit 1 si overallStatus=blocked → workflow gate falla loud
+- `--fail-on-error` → exit 1 si `readyToDeploy=false` → `DEGRADED`, `UNKNOWN` y `BLOCKED` frenan production
 
 ### 3) Run apuntando a otro SHA o branch
 
@@ -78,16 +78,16 @@ Solo cuando el check `release_batch_policy` reporta `requires_break_glass` (e.g.
 | Status | Significa | Que hacer |
 |---|---|---|
 | ✓ READY | Todos los 12 checks ok, sin degraded sources | Avanzar con el release |
-| ⚠ DEGRADED | Algun check warning, ningun error | Revisar warnings y decidir |
+| ⚠ DEGRADED | Algun check warning, ningun error | NO avanzar production; resolver o justificar via break-glass documentado |
 | ✗ BLOCKED | Al menos un check con error | NO avanzar; resolver el error y re-run |
 | ? UNKNOWN | Sin check ok suficientes para decidir | Configurar tokens faltantes y re-run |
 
 ### Severity por check
 
 - **`ok`**: el check paso. Verde.
-- **`warning`**: hay una observacion (e.g. CI corriendo, smoke aun pending, Vercel staging not READY). NO bloquea pero requiere atencion.
+- **`warning`**: hay una observacion (e.g. CI corriendo, smoke aun pending, Vercel staging not READY). En production normal bloquea porque `readyToDeploy=false`.
 - **`error`**: hay un blocker (e.g. CI failure, pending sin jobs, Sentry critical >=10, migrations pendientes). Bloquea.
-- **`unknown`**: no se pudo verificar (e.g. no token, API down). Baja confidence pero no bloquea hard.
+- **`unknown`**: no se pudo verificar (e.g. no token, API down). Baja confidence y bloquea production normal hasta recuperar evidencia.
 
 ### Decisions del check release_batch_policy
 

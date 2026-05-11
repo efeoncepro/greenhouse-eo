@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
 > **Version:** 1.0
 > **Creado:** 2026-05-10 por Claude
-> **Ultima actualizacion:** 2026-05-10 por Claude
+> **Ultima actualizacion:** 2026-05-11 por Codex
 > **Documentacion tecnica:** [TASK-850](../../tasks/in-progress/TASK-850-production-preflight-cli-complete.md), [CLAUDE.md §Production Preflight CLI invariants](../../../CLAUDE.md), [GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md](../../architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md)
 
 # Preflight de Release a Produccion
@@ -45,6 +45,8 @@ Cada check produce una **severity**: `ok | warning | error | unknown`. El compos
 - Mezcla con `unknown` (sin error/warning) → `UNKNOWN` → `readyToDeploy: NO`
 
 Adicionalmente cada check baja la `confidence` global cuando degrada (timeout, error, sin token). Confidence es informativa — no es un gate distinto, ayuda al operador a decidir.
+
+En modo CI/orquestador, `pnpm release:preflight --fail-on-error` falla con cualquier `readyToDeploy: NO`. Esto significa que `DEGRADED` y `UNKNOWN` tambien frenan production normal; no se promueve algo que el preflight no pudo verificar completamente.
 
 > Detalle tecnico: el composer puro vive en [src/lib/release/preflight/composer.ts](../../../src/lib/release/preflight/composer.ts) y reusa el patron canonico TASK-672 platform-health (Promise.all + withSourceTimeout per source).
 

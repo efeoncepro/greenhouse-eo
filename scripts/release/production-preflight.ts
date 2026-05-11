@@ -9,7 +9,7 @@
  * Usage:
  *   pnpm release:preflight                    # human output, exit 0 always
  *   pnpm release:preflight --json             # JSON only, exit 0 always
- *   pnpm release:preflight --fail-on-error    # exit 1 si overallStatus=blocked
+ *   pnpm release:preflight --fail-on-error    # exit 1 si readyToDeploy=false
  *   pnpm release:preflight --override-batch-policy  # downgrade batch policy errors a warnings (requires audit)
  *   pnpm release:preflight --target-sha=<sha> # default HEAD del local checkout
  *   pnpm release:preflight --target-branch=main
@@ -25,6 +25,7 @@ import { argv, exit, stderr, stdout } from 'node:process'
 import { promisify } from 'node:util'
 
 import { githubRepoCoords } from '@/lib/release/github-helpers'
+import { shouldFailPreflightCommand } from '@/lib/release/preflight/exit-policy'
 import { formatPreflightAsHuman, formatPreflightAsJson } from '@/lib/release/preflight/output-formatters'
 import { PREFLIGHT_CHECK_REGISTRY } from '@/lib/release/preflight/registry'
 import { runPreflight } from '@/lib/release/preflight/runner'
@@ -71,7 +72,7 @@ const parseArgs = (args: readonly string[]): CliOptions => {
           '                               de pnpm/tsx + human summary opcional. Recomendado',
           '                               para CI workflows que NO pueden usar `pnpm --silent`',
           '                               ni redirection `>` (banner pollution rompe `jq`).',
-          '  --fail-on-error              Exit 1 if overallStatus=blocked',
+          '  --fail-on-error              Exit 1 if readyToDeploy=false',
           '  --override-batch-policy      Downgrade release_batch_policy errors to warnings',
           '                               (requires platform.release.preflight.override_batch_policy + audit)',
           '  --target-sha=<sha>           SHA to validate (default: git HEAD)',
@@ -170,7 +171,7 @@ const main = async (): Promise<void> => {
     stdout.write(formatPreflightAsHuman(payload) + '\n')
   }
 
-  if (options.failOnError && payload.overallStatus === 'blocked') {
+  if (shouldFailPreflightCommand(payload, options.failOnError)) {
     exit(1)
   }
 

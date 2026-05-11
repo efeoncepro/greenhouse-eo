@@ -94,6 +94,24 @@ describe('TASK-848 concurrency fix Opcion A — anti-regression', () => {
     expect(cancel).toBe(false)
     expect(String(doc.concurrency?.group)).toContain('${{ inputs.target_sha }}')
   })
+
+  it('production-release.yml preflight fails unless the canonical readyToDeploy gate is true', () => {
+    const raw = readFileSync(join(REPO_ROOT, '.github/workflows/production-release.yml'), 'utf8')
+
+    expect(raw).toContain('Exit 1 if readyToDeploy=false')
+    expect(raw).toContain('--fail-on-error')
+  })
+
+  it('production-release.yml preflight wires Azure and Sentry evidence sources', () => {
+    const raw = readFileSync(join(REPO_ROOT, '.github/workflows/production-release.yml'), 'utf8')
+
+    expect(raw).toContain('Azure login (preflight WIF)')
+    expect(raw).toContain('GCP_WIF_POOL: github-actions')
+    expect(raw).toContain('GCP_WIF_PROVIDER: efeoncepro-greenhouse-eo')
+    expect(raw).toContain('AZURE_GITHUB_ACTIONS_APP_ID')
+    expect(raw).toContain('SENTRY_INCIDENTS_AUTH_TOKEN_SECRET_REF')
+    expect(raw).toContain('greenhouse-sentry-incidents-auth-token')
+  })
 })
 
 describe('TASK-851 workflow_call contracts', () => {

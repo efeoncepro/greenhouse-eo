@@ -33,7 +33,9 @@ const runExecFile = (
 }
 
 const PENDING_REGEX = /(\d+)\s+migration[s]?\s+pending/i
-const NO_PENDING_REGEX = /(no\s+pending|todas\s+aplicadas|all\s+applied|0\s+pending)/i
+
+const NO_PENDING_REGEX =
+  /(no\s+pending|no\s+migrations\s+to\s+run|migrations\s+complete|todas\s+aplicadas|all\s+applied|0\s+pending)/i
 
 export interface ParsedPgConnectStatus {
   readonly verdict: 'ok' | 'pending' | 'unparsed'

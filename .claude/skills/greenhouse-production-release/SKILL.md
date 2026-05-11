@@ -59,6 +59,8 @@ The normal release path is:
 3. Run or inspect release preflight:
    - local exploratory: `pnpm release:preflight --target-sha=<sha> --target-branch=main`
    - CI/orchestrator gate: `pnpm release:preflight --json --fail-on-error --output-file=<path> --target-sha=<sha> --target-branch=main`
+   - `--fail-on-error` must fail on any `readyToDeploy=false` payload; do
+     not promote a degraded or unknown preflight.
 4. Promote the intended SHA to `main` through the repo-approved merge/push path.
    - The orchestrator expects `target_sha` to already exist on `main`.
    - Vercel production deploy is triggered by Git integration on push to `main`; the orchestrator waits for that deployment to be READY.

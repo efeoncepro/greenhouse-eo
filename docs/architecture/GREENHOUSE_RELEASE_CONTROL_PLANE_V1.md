@@ -566,7 +566,7 @@ pnpm release:preflight --target-branch=develop --target-sha=$(git rev-parse HEAD
 
 ### Pendiente para TASK-851 + TASK-855
 
-- TASK-851 Orchestrator workflow `production-release.yml` consume `pnpm release:preflight --json --fail-on-error` como step gate ANTES de disparar deploys.
+- TASK-851 Orchestrator workflow `production-release.yml` consume `pnpm release:preflight --json --fail-on-error` como step gate ANTES de disparar deploys. Desde el hardening TASK-861 follow-up, `--fail-on-error` falla con cualquier `readyToDeploy=false`; `degraded`/`unknown` no pueden avanzar production.
 - TASK-855 Dashboard UI lee preflight historico desde manifest (cuando emerga persistencia de results).
 
 ---

@@ -5,7 +5,7 @@ name: Production Release Orchestrator
 # Coordinates the canonical develop → main release flow:
 #
 #   1. Preflight (TASK-850): pnpm release:preflight --json --fail-on-error.
-#      Exit 1 if overallStatus=blocked → orchestrator aborts before any
+#      Exit 1 if readyToDeploy=false → orchestrator aborts before any
 #      mutation. Operators can pass bypass_preflight_reason (>=20 chars,
 #      requires platform.release.bypass_preflight capability) to override.
 #
@@ -121,6 +121,13 @@ jobs:
         with:
           project_id: efeonce-group
 
+      - name: Azure login (preflight WIF)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
       - name: Run preflight CLI
         id: preflight
         env:
@@ -135,6 +142,12 @@ jobs:
           GREENHOUSE_POSTGRES_USER: greenhouse_ops
           GREENHOUSE_POSTGRES_PASSWORD_SECRET_REF: greenhouse-pg-dev-ops-password
           GCP_PROJECT: efeonce-group
+          GCP_WIF_POOL: github-actions
+          GCP_WIF_PROVIDER: efeoncepro-greenhouse-eo
+          AZURE_GITHUB_ACTIONS_APP_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          SENTRY_INCIDENTS_AUTH_TOKEN_SECRET_REF: greenhouse-sentry-incidents-auth-token
+          SENTRY_ORG_SLUG: efeonce-group-spa
+          SENTRY_PROJECT_SLUG: javascript-nextjs
           # gcloud-auth-preflight.sh requiere skip de interactive renewal en CI
           # (creds vienen de google-github-actions/auth WIF, no de `gcloud auth login`).
           GREENHOUSE_GCLOUD_AUTH_NONINTERACTIVE: 'true'

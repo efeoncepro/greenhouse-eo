@@ -25,23 +25,50 @@ const buildIssue = (overrides: Record<string, unknown>) => ({
 
 describe('checkSentryCriticalIssues', () => {
   const originalToken = process.env.SENTRY_AUTH_TOKEN
+  const originalIncidentsToken = process.env.SENTRY_INCIDENTS_AUTH_TOKEN
+  const originalIncidentsTokenRef = process.env.SENTRY_INCIDENTS_AUTH_TOKEN_SECRET_REF
   const originalFetch = global.fetch
 
   beforeEach(() => {
     delete process.env.SENTRY_AUTH_TOKEN
+    delete process.env.SENTRY_INCIDENTS_AUTH_TOKEN
+    delete process.env.SENTRY_INCIDENTS_AUTH_TOKEN_SECRET_REF
     global.fetch = vi.fn()
   })
 
   afterEach(() => {
     if (originalToken !== undefined) process.env.SENTRY_AUTH_TOKEN = originalToken
+    else delete process.env.SENTRY_AUTH_TOKEN
+    if (originalIncidentsToken !== undefined) process.env.SENTRY_INCIDENTS_AUTH_TOKEN = originalIncidentsToken
+    else delete process.env.SENTRY_INCIDENTS_AUTH_TOKEN
+    if (originalIncidentsTokenRef !== undefined) process.env.SENTRY_INCIDENTS_AUTH_TOKEN_SECRET_REF = originalIncidentsTokenRef
+    else delete process.env.SENTRY_INCIDENTS_AUTH_TOKEN_SECRET_REF
     global.fetch = originalFetch
   })
 
-  it('severity unknown when SENTRY_AUTH_TOKEN missing', async () => {
+  it('severity unknown when SENTRY_INCIDENTS_AUTH_TOKEN/SENTRY_AUTH_TOKEN missing', async () => {
     const result = await checkSentryCriticalIssues(buildInput())
 
     expect(result.severity).toBe('unknown')
     expect(result.status).toBe('not_configured')
+  })
+
+  it('uses SENTRY_INCIDENTS_AUTH_TOKEN before build-time SENTRY_AUTH_TOKEN', async () => {
+    process.env.SENTRY_INCIDENTS_AUTH_TOKEN = 'incidents-token'
+    process.env.SENTRY_AUTH_TOKEN = 'build-token'
+
+    global.fetch = vi.fn(async () => ({
+      ok: true,
+      status: 200,
+      json: async () => []
+    })) as never
+
+    await checkSentryCriticalIssues(buildInput())
+
+    const [, init] = vi.mocked(global.fetch).mock.calls[0] ?? []
+    const headers = init?.headers as Record<string, string>
+
+    expect(headers.Authorization).toBe('Bearer incidents-token')
   })
 
   it('severity ok when 0 critical issues', async () => {
@@ -55,6 +82,10 @@ describe('checkSentryCriticalIssues', () => {
     const result = await checkSentryCriticalIssues(buildInput())
 
     expect(result.severity).toBe('ok')
+
+    const [url] = vi.mocked(global.fetch).mock.calls[0] ?? []
+
+    expect(String(url)).toContain('lastSeen%3A-24h')
   })
 
   it('severity warning when 1-9 critical issues', async () => {
