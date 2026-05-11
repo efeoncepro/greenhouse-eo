@@ -14,13 +14,13 @@
 
 - **Branch:** `develop` por instrucción explícita del usuario; no se cambió de rama.
 - **Estado:** task movida a `docs/tasks/complete/TASK-839-issue-068-fase-5-admin-center-governance-wire-up.md`, Lifecycle `complete`.
-- **Commits:** `7b4b7d69` ownership/discovery, `2118c5bd` capabilities + migration, `78d518a0` runtime/API/UI, `f1c117aa` reliability signals, docs cierre en commit posterior.
+- **Commits:** `7b4b7d69` ownership/discovery, `2118c5bd` capabilities + migration, `78d518a0` runtime/API/UI, `f1c117aa` reliability signals, docs cierre en commit posterior, follow-up smoke `[downstream-verified: admin-governance-mutation]` en commit posterior.
 - **Implementación:** se reutilizaron rutas reales `/api/admin/entitlements/**` y writer `src/lib/admin/entitlements-governance.ts`; no se crearon rutas paralelas `/api/admin/governance/access/**`.
 - **DB:** migration `20260511105805584_task-839-admin-governance-wire-up.sql` aplicada con `pnpm pg:connect:migrate`; `src/types/db.d.ts` regenerado.
 - **Access model:** `routeGroups`/rol admin siguen siendo entrada broad vía `requireAdminTenantContext`; `views` siguen exponiendo `/admin/views` y Admin Users > Acceso; `entitlements` ahora gobiernan cada endpoint con `access.governance.*`; startup policy mantiene contrato separado.
 - **Observabilidad:** `identity.governance.audit_log_write_failures` y `identity.governance.pending_approval_overdue` registrados bajo reliability overview.
-- **Validación:** `pnpm pg:doctor`, `pnpm pg:connect:migrate`, `pnpm tsc --noEmit`, `pnpm lint`, y suites Vitest focalizadas ejecutaron suite completa varias veces (última: 4082 passed / 11 skipped).
-- **No validado:** Playwright smoke downstream con marker `[downstream-verified: admin-governance-mutation]` no se ejecutó por falta de sesión admin/bypass local preparada; queda follow-up antes de cualquier promoción crítica.
+- **Validación:** `pnpm pg:doctor`, `pnpm pg:connect:migrate`, `pnpm tsc --noEmit`, `pnpm lint`, suites Vitest focalizadas/completas y Playwright follow-up con usuario agente dedicado. Smoke nuevo `tests/e2e/smoke/admin-entitlements-governance.spec.ts` pasó 3/3: `/admin/views`, tab Accesos de `user-agent-e2e-001`, mutation real de startup policy con restore.
+- **Nota auth E2E:** `scripts/playwright-auth-setup.mjs` ahora marca cookies `__Secure-*` como `secure=true` también en localhost; Chromium rechazaba storageState con `__Secure-` + `secure=false`.
 
 # Sesion 2026-05-11 — TASK-839 Admin Center governance wire-up tomada
 

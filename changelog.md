@@ -2,6 +2,8 @@
 
 ## 2026-05-11
 
+- **TASK-839 follow-up — Admin governance Playwright smoke con usuario agente.** Se agrega `tests/e2e/smoke/admin-entitlements-governance.spec.ts` para validar `/admin/views`, la tab Accesos del usuario `agent@greenhouse.efeonce.org` y una mutation real de startup policy con restore. Además se corrige `scripts/playwright-auth-setup.mjs` para generar storageState válido en localhost con cookies `__Secure-*`.
+
 - **TASK-840 — Deprecated capabilities cleanup.** Se agrega disciplina canónica para retirar capabilities del TS catalog sin borrar historia del registry: helper transaccional `markCapabilityDeprecated()`, endpoint admin `/api/admin/entitlements/capabilities/[capabilityKey]/deprecate` con capability granular `access.governance.capability.deprecate`, audit log `capability_deprecated`, outbox event `access.capability.deprecated` v1 y reporter CSV read-only `scripts/governance/find-deprecated-candidates.ts`. La migration también repara drift live inverso detectado durante discovery (`commercial.engagement.recover_outbound`, `platform.release.watchdog.read` faltaban en registry activo).
 
 ## 2026-05-10

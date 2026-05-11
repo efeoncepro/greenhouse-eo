@@ -217,7 +217,7 @@ Drift documentado:
 - [x] Writers canónicos existentes en `src/lib/admin/entitlements-governance.ts` endurecidos: transacción única + audit + outbox + validation contra `capabilities_registry`.
 - [x] 5 endpoints existentes wireados con capability granular + degraded mode; ruta nueva de segunda firma para approvals sensibles.
 - [x] UI honest degraded mode: banners de error/success, pending approval visible, refresh real del estado tras mutation.
-- [ ] Playwright smoke con `[downstream-verified: admin-governance-mutation]` marker. No ejecutado en esta sesión; queda como follow-up porque no había sesión admin local/bypass E2E preparada.
+- [x] Playwright smoke con `[downstream-verified: admin-governance-mutation]` marker. Ejecutado 2026-05-11 con usuario agente dedicado (`agent@greenhouse.efeonce.org`) en `tests/e2e/smoke/admin-entitlements-governance.spec.ts`: UI global `/admin/views`, tab Accesos del usuario agente y mutation real de startup policy con restore en `finally`.
 - [x] Capabilities granulares seedeadas en `capabilities_registry` + parity/runtime tests verdes.
 - [x] 2 reliability signals (`identity.governance.audit_log_write_failures`, `identity.governance.pending_approval_overdue`) registrados.
 - [x] 4-pillar score block presente en este task file.
@@ -235,9 +235,9 @@ Drift documentado:
 
 ### 4-pillar score
 
-- **Seguridad:** 9/10. Gating granular `access.governance.*`, FK/registry validation y segunda firma para sensitive grants. Falta solo smoke E2E downstream con sesión admin.
+- **Seguridad:** 9/10. Gating granular `access.governance.*`, FK/registry validation y segunda firma para sensitive grants. Smoke E2E downstream completado con usuario agente.
 - **Robustez:** 9/10. Se reutilizan writers transaccionales existentes, audit append-only y outbox en la misma transaction.
-- **Resiliencia:** 8/10. Fan-out reactive multi-scope + signals de drift. No se ejecutó Playwright ni consumer live <30s.
+- **Resiliencia:** 8/10. Fan-out reactive multi-scope + signals de drift. Playwright downstream ejecutado; consumer live <30s no se ejecutó como verificación separada.
 - **Escalabilidad:** 8/10. No se crea consola paralela; `extractScopes` es extensión compatible para futuros events multi-subject.
 
 ### Verificación ejecutada
@@ -249,6 +249,7 @@ Drift documentado:
 - `pnpm test -- src/lib/sync/projections/organization-workspace-cache-invalidation.test.ts src/lib/sync/reactive-consumer.test.ts` (suite completa)
 - `pnpm lint`
 - `pnpm test -- src/lib/reliability/queries/identity-governance-signals.test.ts src/lib/sync/projections/organization-workspace-cache-invalidation.test.ts` (suite completa)
+- `PLAYWRIGHT_SKIP_AUTH_SETUP=true pnpm exec playwright test tests/e2e/smoke/admin-entitlements-governance.spec.ts --project=chromium --workers=1` → 3/3 passed; incluye mutation real de startup policy y restore.
 
 ### Drift resuelto
 
