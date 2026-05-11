@@ -169,6 +169,54 @@ export const GH_FINIQUITO = {
       resignationLetterMissing: 'Sube la carta de renuncia ratificada antes de calcular el finiquito.',
       maintenanceObligationMissing: 'Declara la pensión de alimentos (Alt A o Alt B) antes de calcular el finiquito.',
       workerAddressMissing: 'El domicilio del trabajador no está registrado. El finiquito puede emitirse pero queda como advertencia.'
+    },
+    // TASK-863 — copy operativo de los 2 pre-requisitos en HrOffboardingView (tuteo es-CL).
+    prerequisites: {
+      chips: {
+        resignationLetterAttached: 'Carta subida',
+        resignationLetterMissing: 'Carta faltante',
+        maintenanceNotSubject: 'Pensión: No afecto',
+        maintenanceSubject: 'Pensión: Afecto',
+        maintenanceMissing: 'Pensión pendiente'
+      },
+      buttons: {
+        uploadResignationLetter: 'Subir carta de renuncia',
+        replaceResignationLetter: 'Reemplazar carta',
+        declareMaintenance: 'Declarar pensión alimentos',
+        editMaintenance: 'Editar pensión alimentos'
+      },
+      calculateBlockedTooltip:
+        'Sube la carta de renuncia y declara la pensión de alimentos antes de calcular.',
+      resignationLetterDialog: {
+        title: 'Subir carta de renuncia ratificada',
+        description:
+          'Adjunta el PDF (o escaneo) de la carta de renuncia firmada por el trabajador. Quedará vinculada al caso y disponible en el legajo del finiquito.',
+        uploaderTitle: 'Carta de renuncia',
+        uploaderHelper: 'PDF o imagen (JPG/PNG/WEBP), máximo 10 MB.',
+        cta: 'Vincular al caso',
+        savingCta: 'Guardando…',
+        cancel: 'Cancelar'
+      },
+      maintenanceDialog: {
+        title: 'Declarar pensión de alimentos (Ley 21.389)',
+        description:
+          'La Ley 21.389 obliga a verificar si el trabajador está afecto a retención por pensión de alimentos antes de pagar el finiquito.',
+        variantLabel: 'Estado del trabajador',
+        variantNotSubject: 'No afecto a retención (Alt A)',
+        variantSubject: 'Afecto a retención (Alt B)',
+        amountLabel: 'Monto mensual a retener (CLP)',
+        amountHelper: 'Monto bruto declarado en la resolución judicial o convenio.',
+        beneficiaryLabel: 'Beneficiario/a',
+        beneficiaryHelper: 'Nombre completo de la persona beneficiaria.',
+        evidenceTitle: 'Resolución o certificado (opcional)',
+        evidenceHelper:
+          'Certificado RNDA, resolución judicial u otro respaldo. Opcional pero recomendado.',
+        cta: 'Declarar pensión',
+        savingCta: 'Guardando…',
+        cancel: 'Cancelar',
+        validationAmount: 'Ingresa un monto mayor a 0.',
+        validationBeneficiary: 'Ingresa el nombre del beneficiario.'
+      }
     }
   }
 } as const

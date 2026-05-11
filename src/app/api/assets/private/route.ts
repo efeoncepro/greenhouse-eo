@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 
-import type { GreenhouseAssetContext, PrivateAssetUploadResponse } from '@/types/assets'
+import type { DraftUploadContext, PrivateAssetUploadResponse } from '@/types/assets'
 import { resolveCurrentHrMemberId } from '@/lib/hr-core/service'
 import { createPrivatePendingAsset } from '@/lib/storage/greenhouse-assets'
 import { hasRoleCode, hasRouteGroup, requireTenantContext } from '@/lib/tenant/authorization'
@@ -8,14 +8,25 @@ import { ROLE_CODES } from '@/config/role-codes'
 
 export const dynamic = 'force-dynamic'
 
-const isDraftContext = (value: string): value is Extract<GreenhouseAssetContext, 'leave_request_draft' | 'purchase_order_draft' | 'master_agreement_draft' | 'certification_draft' | 'evidence_draft' | 'finance_reconciliation_evidence_draft' | 'sample_sprint_report_draft'> =>
-  value === 'leave_request_draft' || value === 'purchase_order_draft' || value === 'master_agreement_draft' || value === 'certification_draft' || value === 'evidence_draft' || value === 'finance_reconciliation_evidence_draft' || value === 'sample_sprint_report_draft'
+const DRAFT_CONTEXT_VALUES = new Set<DraftUploadContext>([
+  'leave_request_draft',
+  'purchase_order_draft',
+  'master_agreement_draft',
+  'certification_draft',
+  'evidence_draft',
+  'finance_reconciliation_evidence_draft',
+  'sample_sprint_report_draft',
+  'resignation_letter_ratified_draft'
+])
+
+const isDraftContext = (value: string): value is DraftUploadContext =>
+  DRAFT_CONTEXT_VALUES.has(value as DraftUploadContext)
 
 const canUploadForContext = ({
   contextType,
   tenant
 }: {
-  contextType: Extract<GreenhouseAssetContext, 'leave_request_draft' | 'purchase_order_draft' | 'master_agreement_draft' | 'certification_draft' | 'evidence_draft' | 'finance_reconciliation_evidence_draft' | 'sample_sprint_report_draft'>
+  contextType: DraftUploadContext
   tenant: Awaited<ReturnType<typeof requireTenantContext>>['tenant']
 }) => {
   if (!tenant) {
@@ -38,6 +49,12 @@ const canUploadForContext = ({
 
   if (contextType === 'sample_sprint_report_draft') {
     return hasRouteGroup(tenant, 'commercial') || hasRouteGroup(tenant, 'internal') || hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)
+  }
+
+  // TASK-863 — resignation_letter_ratified_draft: HR route group + EFEONCE_ADMIN.
+  // Mismo grupo de retencion legal que final_settlement_document; NO member-only.
+  if (contextType === 'resignation_letter_ratified_draft') {
+    return hasRouteGroup(tenant, 'hr') || hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)
   }
 
   return hasRouteGroup(tenant, 'finance') || hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)

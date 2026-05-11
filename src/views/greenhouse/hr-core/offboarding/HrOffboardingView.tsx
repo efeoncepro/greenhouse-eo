@@ -20,6 +20,8 @@ import FormControlLabel from '@mui/material/FormControlLabel'
 import Grid from '@mui/material/Grid'
 import InputLabel from '@mui/material/InputLabel'
 import MenuItem from '@mui/material/MenuItem'
+import Radio from '@mui/material/Radio'
+import RadioGroup from '@mui/material/RadioGroup'
 import Select from '@mui/material/Select'
 import Skeleton from '@mui/material/Skeleton'
 import Stack from '@mui/material/Stack'
@@ -31,12 +33,15 @@ import TableContainer from '@mui/material/TableContainer'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import TextField from '@mui/material/TextField'
+import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 
 import { getMicrocopy } from '@/lib/copy'
 import { GH_FINIQUITO } from '@/lib/copy/finiquito'
 
 import CustomChip from '@core/components/mui/Chip'
+
+import GreenhouseFileUploader, { type UploadedFileValue } from '@/components/greenhouse/GreenhouseFileUploader'
 
 import type { HrMemberOption } from '@/types/hr-core'
 import type { OffboardingCase, OffboardingCaseStatus, OffboardingSeparationType } from '@/lib/workforce/offboarding'
@@ -260,6 +265,29 @@ const HrOffboardingView = () => {
     workerReservationOfRights: false,
     workerReservationNotes: ''
   })
+
+  // TASK-863 Slice B — Dialog "Subir carta de renuncia".
+  const [resignationLetterTarget, setResignationLetterTarget] = useState<OffboardingCase | null>(null)
+  const [resignationLetterFile, setResignationLetterFile] = useState<UploadedFileValue | null>(null)
+  const [resignationLetterSaving, setResignationLetterSaving] = useState(false)
+
+  // TASK-863 Slice C — Dialog "Declarar pension de alimentos (Ley 21.389)".
+  const [maintenanceTarget, setMaintenanceTarget] = useState<OffboardingCase | null>(null)
+
+  const [maintenanceForm, setMaintenanceForm] = useState<{
+    variant: 'not_subject' | 'subject'
+    amount: string
+    beneficiary: string
+    evidence: UploadedFileValue | null
+  }>({
+    variant: 'not_subject',
+    amount: '',
+    beneficiary: '',
+    evidence: null
+  })
+
+  const [maintenanceSaving, setMaintenanceSaving] = useState(false)
+  const [maintenanceFormError, setMaintenanceFormError] = useState<string | null>(null)
 
   const activeCases = useMemo(
     () => cases.filter(item => activeStatuses.has(item.status)),
@@ -628,6 +656,99 @@ const HrOffboardingView = () => {
     })
   }
 
+  // TASK-863 Slice B — vincular asset subido al caso de offboarding (endpoint canonico TASK-862 Slice C).
+  const submitResignationLetterLink = async () => {
+    if (!resignationLetterTarget || !resignationLetterFile) return
+
+    setResignationLetterSaving(true)
+    setError(null)
+
+    try {
+      const res = await fetch(
+        `/api/hr/offboarding/cases/${resignationLetterTarget.offboardingCaseId}/resignation-letter`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ assetId: resignationLetterFile.assetId })
+        }
+      )
+
+      if (!res.ok) {
+        const payload = await res.json().catch(() => ({}))
+
+        throw new Error(payload.error || 'No se pudo vincular la carta de renuncia.')
+      }
+
+      await loadData()
+      setResignationLetterTarget(null)
+      setResignationLetterFile(null)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error al vincular la carta de renuncia.')
+    } finally {
+      setResignationLetterSaving(false)
+    }
+  }
+
+  // TASK-863 Slice C — declarar pension de alimentos. Alt A (not_subject) o Alt B (subject + amount + beneficiary + evidence opcional).
+  const submitMaintenanceDeclaration = async () => {
+    if (!maintenanceTarget) return
+
+    setMaintenanceFormError(null)
+
+    if (maintenanceForm.variant === 'subject') {
+      const amountValue = Number(maintenanceForm.amount)
+
+      if (!Number.isFinite(amountValue) || amountValue <= 0) {
+        setMaintenanceFormError(GH_FINIQUITO.resignation.prerequisites.maintenanceDialog.validationAmount)
+
+        return
+      }
+
+      if (!maintenanceForm.beneficiary.trim()) {
+        setMaintenanceFormError(GH_FINIQUITO.resignation.prerequisites.maintenanceDialog.validationBeneficiary)
+
+        return
+      }
+    }
+
+    setMaintenanceSaving(true)
+    setError(null)
+
+    try {
+      const body = maintenanceForm.variant === 'not_subject'
+        ? { variant: 'not_subject' as const }
+        : {
+            variant: 'subject' as const,
+            amount: Number(maintenanceForm.amount),
+            beneficiary: maintenanceForm.beneficiary.trim(),
+            evidenceAssetId: maintenanceForm.evidence?.assetId ?? null
+          }
+
+      const res = await fetch(
+        `/api/hr/offboarding/cases/${maintenanceTarget.offboardingCaseId}/maintenance-obligation`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        }
+      )
+
+      if (!res.ok) {
+        const payload = await res.json().catch(() => ({}))
+
+        throw new Error(payload.error || 'No se pudo declarar la pensión de alimentos.')
+      }
+
+      await loadData()
+      setMaintenanceTarget(null)
+      setMaintenanceForm({ variant: 'not_subject', amount: '', beneficiary: '', evidence: null })
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error al declarar la pensión de alimentos.')
+    } finally {
+      setMaintenanceSaving(false)
+    }
+  }
+
   if (loading) {
     return (
       <Stack spacing={6}>
@@ -817,6 +938,168 @@ const HrOffboardingView = () => {
         </DialogActions>
       </Dialog>
 
+      {/* TASK-863 Slice B — Subir carta de renuncia ratificada */}
+      <Dialog
+        open={Boolean(resignationLetterTarget)}
+        onClose={() => {
+          if (resignationLetterSaving) return
+
+          setResignationLetterTarget(null)
+          setResignationLetterFile(null)
+        }}
+        fullWidth
+        maxWidth='sm'
+      >
+        <DialogTitle>{GH_FINIQUITO.resignation.prerequisites.resignationLetterDialog.title}</DialogTitle>
+        <DialogContent>
+          <Stack spacing={3} sx={{ pt: 1 }}>
+            <Typography variant='body2' color='text.secondary'>
+              {GH_FINIQUITO.resignation.prerequisites.resignationLetterDialog.description}
+            </Typography>
+            <GreenhouseFileUploader
+              contextType='resignation_letter_ratified_draft'
+              value={resignationLetterFile}
+              onChange={value => setResignationLetterFile(value)}
+              title={GH_FINIQUITO.resignation.prerequisites.resignationLetterDialog.uploaderTitle}
+              helperText={GH_FINIQUITO.resignation.prerequisites.resignationLetterDialog.uploaderHelper}
+              ownerMemberId={resignationLetterTarget?.memberId ?? null}
+              ownerClientId={resignationLetterTarget?.organizationId ?? null}
+              metadataLabel={resignationLetterTarget?.publicId ?? null}
+              disabled={resignationLetterSaving}
+            />
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            color='secondary'
+            variant='tonal'
+            disabled={resignationLetterSaving}
+            onClick={() => {
+              setResignationLetterTarget(null)
+              setResignationLetterFile(null)
+            }}
+          >
+            {GH_FINIQUITO.resignation.prerequisites.resignationLetterDialog.cancel}
+          </Button>
+          <Button
+            variant='contained'
+            disabled={resignationLetterSaving || !resignationLetterFile}
+            onClick={submitResignationLetterLink}
+          >
+            {resignationLetterSaving
+              ? GH_FINIQUITO.resignation.prerequisites.resignationLetterDialog.savingCta
+              : GH_FINIQUITO.resignation.prerequisites.resignationLetterDialog.cta}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* TASK-863 Slice C — Declarar pension de alimentos (Ley 21.389) */}
+      <Dialog
+        open={Boolean(maintenanceTarget)}
+        onClose={() => {
+          if (maintenanceSaving) return
+
+          setMaintenanceTarget(null)
+          setMaintenanceForm({ variant: 'not_subject', amount: '', beneficiary: '', evidence: null })
+          setMaintenanceFormError(null)
+        }}
+        fullWidth
+        maxWidth='sm'
+      >
+        <DialogTitle>{GH_FINIQUITO.resignation.prerequisites.maintenanceDialog.title}</DialogTitle>
+        <DialogContent>
+          <Stack spacing={3} sx={{ pt: 1 }}>
+            <Typography variant='body2' color='text.secondary'>
+              {GH_FINIQUITO.resignation.prerequisites.maintenanceDialog.description}
+            </Typography>
+            <FormControl>
+              <Typography variant='caption' color='text.secondary' sx={{ mb: 1 }}>
+                {GH_FINIQUITO.resignation.prerequisites.maintenanceDialog.variantLabel}
+              </Typography>
+              <RadioGroup
+                value={maintenanceForm.variant}
+                onChange={event =>
+                  setMaintenanceForm(prev => ({
+                    ...prev,
+                    variant: event.target.value === 'subject' ? 'subject' : 'not_subject'
+                  }))
+                }
+              >
+                <FormControlLabel
+                  value='not_subject'
+                  control={<Radio />}
+                  label={GH_FINIQUITO.resignation.prerequisites.maintenanceDialog.variantNotSubject}
+                />
+                <FormControlLabel
+                  value='subject'
+                  control={<Radio />}
+                  label={GH_FINIQUITO.resignation.prerequisites.maintenanceDialog.variantSubject}
+                />
+              </RadioGroup>
+            </FormControl>
+            {maintenanceForm.variant === 'subject' && (
+              <Stack spacing={3}>
+                <TextField
+                  label={GH_FINIQUITO.resignation.prerequisites.maintenanceDialog.amountLabel}
+                  helperText={GH_FINIQUITO.resignation.prerequisites.maintenanceDialog.amountHelper}
+                  type='number'
+                  value={maintenanceForm.amount}
+                  onChange={event => setMaintenanceForm(prev => ({ ...prev, amount: event.target.value }))}
+                  inputProps={{ min: 1, step: 1 }}
+                  disabled={maintenanceSaving}
+                />
+                <TextField
+                  label={GH_FINIQUITO.resignation.prerequisites.maintenanceDialog.beneficiaryLabel}
+                  helperText={GH_FINIQUITO.resignation.prerequisites.maintenanceDialog.beneficiaryHelper}
+                  value={maintenanceForm.beneficiary}
+                  onChange={event => setMaintenanceForm(prev => ({ ...prev, beneficiary: event.target.value }))}
+                  disabled={maintenanceSaving}
+                />
+                <GreenhouseFileUploader
+                  contextType='evidence_draft'
+                  value={maintenanceForm.evidence}
+                  onChange={value => setMaintenanceForm(prev => ({ ...prev, evidence: value }))}
+                  title={GH_FINIQUITO.resignation.prerequisites.maintenanceDialog.evidenceTitle}
+                  helperText={GH_FINIQUITO.resignation.prerequisites.maintenanceDialog.evidenceHelper}
+                  ownerMemberId={maintenanceTarget?.memberId ?? null}
+                  ownerClientId={maintenanceTarget?.organizationId ?? null}
+                  metadataLabel={`${maintenanceTarget?.publicId ?? ''} · pensión alimentos`}
+                  disabled={maintenanceSaving}
+                />
+              </Stack>
+            )}
+            {maintenanceFormError && (
+              <Alert severity='error' onClose={() => setMaintenanceFormError(null)}>
+                {maintenanceFormError}
+              </Alert>
+            )}
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            color='secondary'
+            variant='tonal'
+            disabled={maintenanceSaving}
+            onClick={() => {
+              setMaintenanceTarget(null)
+              setMaintenanceForm({ variant: 'not_subject', amount: '', beneficiary: '', evidence: null })
+              setMaintenanceFormError(null)
+            }}
+          >
+            {GH_FINIQUITO.resignation.prerequisites.maintenanceDialog.cancel}
+          </Button>
+          <Button
+            variant='contained'
+            disabled={maintenanceSaving}
+            onClick={submitMaintenanceDeclaration}
+          >
+            {maintenanceSaving
+              ? GH_FINIQUITO.resignation.prerequisites.maintenanceDialog.savingCta
+              : GH_FINIQUITO.resignation.prerequisites.maintenanceDialog.cta}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
       <Card elevation={0} sx={{ border: theme => `1px solid ${theme.palette.divider}` }}>
         <CardHeader
           title='Abrir caso manual'
@@ -930,6 +1213,18 @@ const HrOffboardingView = () => {
                   const documentBusy = documentSavingCaseId === item.offboardingCaseId
                   const downloadUrl = document?.pdfAssetId ? `/api/assets/private/${encodeURIComponent(document.pdfAssetId)}` : null
 
+                  // TASK-863 Slice A — pre-requisitos del finiquito (renuncia voluntaria).
+                  // Solo aplica cuando el caso es resignation Y lane permite finiquito laboral
+                  // (chile_dependent / honorarios no aplican porque honorarios cierra contractualmente).
+                  const prerequisitesRequired = closureLane.allowsFinalSettlement && item.separationType === 'resignation'
+                  const hasResignationLetter = Boolean(item.resignationLetterAssetId)
+                  const hasMaintenanceObligation = Boolean(item.maintenanceObligationJson)
+                  const prerequisitesReady = hasResignationLetter && hasMaintenanceObligation
+                  const prerequisitesBlocking = prerequisitesRequired && !prerequisitesReady
+                  const calculateBlocked = prerequisitesBlocking && settlementAction?.action === 'calculate'
+                  const maintenanceVariant = item.maintenanceObligationJson?.variant ?? null
+                  const maintenanceAmount = item.maintenanceObligationJson?.amount ?? null
+
                   return (
                     <TableRow key={item.offboardingCaseId} hover>
                       <TableCell>
@@ -979,16 +1274,94 @@ const HrOffboardingView = () => {
                               {closureLane.helpText}
                             </Typography>
                           )}
-                          <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
-                            {settlementAction && (
+                          {prerequisitesRequired && (
+                            <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap alignItems='center'>
+                              <CustomChip
+                                round='true'
+                                size='small'
+                                color={hasResignationLetter ? 'success' : 'error'}
+                                label={hasResignationLetter
+                                  ? GH_FINIQUITO.resignation.prerequisites.chips.resignationLetterAttached
+                                  : GH_FINIQUITO.resignation.prerequisites.chips.resignationLetterMissing}
+                              />
+                              <CustomChip
+                                round='true'
+                                size='small'
+                                color={!hasMaintenanceObligation
+                                  ? 'error'
+                                  : maintenanceVariant === 'not_subject'
+                                    ? 'success'
+                                    : 'warning'}
+                                label={!hasMaintenanceObligation
+                                  ? GH_FINIQUITO.resignation.prerequisites.chips.maintenanceMissing
+                                  : maintenanceVariant === 'not_subject'
+                                    ? GH_FINIQUITO.resignation.prerequisites.chips.maintenanceNotSubject
+                                    : `${GH_FINIQUITO.resignation.prerequisites.chips.maintenanceSubject}${
+                                        typeof maintenanceAmount === 'number'
+                                          ? ` (${formatGreenhouseCurrency(maintenanceAmount, 'CLP', { maximumFractionDigits: 0 }, 'es-CL')})`
+                                          : ''
+                                      }`}
+                              />
+                            </Stack>
+                          )}
+                          {prerequisitesRequired && (
+                            <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
                               <Button
                                 size='small'
-                                variant='tonal'
-                                disabled={settlementBusy || saving}
-                                onClick={() => runSettlementAction(item, settlementAction.action)}
+                                variant={hasResignationLetter ? 'text' : 'outlined'}
+                                disabled={saving}
+                                onClick={() => {
+                                  setError(null)
+                                  setResignationLetterFile(null)
+                                  setResignationLetterTarget(item)
+                                }}
                               >
-                                {settlementBusy ? 'Procesando' : settlementAction.label}
+                                {hasResignationLetter
+                                  ? GH_FINIQUITO.resignation.prerequisites.buttons.replaceResignationLetter
+                                  : GH_FINIQUITO.resignation.prerequisites.buttons.uploadResignationLetter}
                               </Button>
+                              <Button
+                                size='small'
+                                variant={hasMaintenanceObligation ? 'text' : 'outlined'}
+                                disabled={saving}
+                                onClick={() => {
+                                  setError(null)
+                                  setMaintenanceFormError(null)
+                                  setMaintenanceForm({
+                                    variant: item.maintenanceObligationJson?.variant ?? 'not_subject',
+                                    amount: item.maintenanceObligationJson?.amount != null
+                                      ? String(item.maintenanceObligationJson.amount)
+                                      : '',
+                                    beneficiary: item.maintenanceObligationJson?.beneficiary ?? '',
+                                    evidence: null
+                                  })
+                                  setMaintenanceTarget(item)
+                                }}
+                              >
+                                {hasMaintenanceObligation
+                                  ? GH_FINIQUITO.resignation.prerequisites.buttons.editMaintenance
+                                  : GH_FINIQUITO.resignation.prerequisites.buttons.declareMaintenance}
+                              </Button>
+                            </Stack>
+                          )}
+                          <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
+                            {settlementAction && (
+                              <Tooltip
+                                title={calculateBlocked ? GH_FINIQUITO.resignation.prerequisites.calculateBlockedTooltip : ''}
+                                disableHoverListener={!calculateBlocked}
+                                disableFocusListener={!calculateBlocked}
+                              >
+                                <span>
+                                  <Button
+                                    size='small'
+                                    variant='tonal'
+                                    disabled={settlementBusy || saving || calculateBlocked}
+                                    onClick={() => runSettlementAction(item, settlementAction.action)}
+                                  >
+                                    {settlementBusy ? 'Procesando' : settlementAction.label}
+                                  </Button>
+                                </span>
+                              </Tooltip>
                             )}
                             {!closureLane.allowsFinalSettlement && item.ruleLane === 'non_payroll' && (
                               <Button size='small' variant='tonal' href='/hr/payroll'>

@@ -38,6 +38,8 @@ export type GreenhouseAssetContext =
   | 'finance_reconciliation_evidence'
   | 'sample_sprint_report_draft'
   | 'sample_sprint_report'
+  | 'resignation_letter_ratified_draft'
+  | 'resignation_letter_ratified'
 
 export interface GreenhouseAssetRecord {
   assetId: string
@@ -84,6 +86,7 @@ export type DraftUploadContext = Extract<
   | 'evidence_draft'
   | 'finance_reconciliation_evidence_draft'
   | 'sample_sprint_report_draft'
+  | 'resignation_letter_ratified_draft'
 >
 
 export interface UploadPrivateAssetInput {

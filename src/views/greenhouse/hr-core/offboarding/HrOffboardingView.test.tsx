@@ -12,6 +12,9 @@ vi.mock('next/navigation', () => ({
   useSearchParams: () => new URLSearchParams()
 }))
 
+// TASK-863 — caso resignation con AMBOS pre-requisitos satisfechos.
+// Tests anti-regresion del gating "Calcular finiquito" usan variantes sin/con
+// pre-requisitos para validar disabled state + chips visibles.
 const executedCase = {
   offboardingCaseId: 'offboarding-case-valentina',
   publicId: 'EO-OFF-2026-VAL',
@@ -56,10 +59,24 @@ const executedCase = {
   legacyChecklistRef: {},
   sourceRef: {},
   metadata: {},
+  resignationLetterAssetId: 'asset-resignation-letter-valentina',
+  maintenanceObligationJson: {
+    variant: 'not_subject' as const,
+    declaredAt: '2026-05-04T23:28:27.096Z',
+    declaredByUserId: 'user-admin'
+  },
   createdByUserId: 'user-admin',
   updatedByUserId: 'user-admin',
   createdAt: '2026-05-04T23:28:27.096Z',
   updatedAt: '2026-05-04T23:28:27.096Z'
+}
+
+const caseWithoutPrerequisites = {
+  ...executedCase,
+  offboardingCaseId: 'offboarding-case-prereqs-missing',
+  publicId: 'EO-OFF-2026-PRE',
+  resignationLetterAssetId: null,
+  maintenanceObligationJson: null
 }
 
 const membersPayload = {
@@ -332,6 +349,116 @@ describe('HrOffboardingView', () => {
           method: 'POST',
           body: JSON.stringify({})
         })
+      )
+    })
+  })
+
+  // TASK-863 Slice D — pre-requisitos del finiquito de renuncia.
+  describe('TASK-863 prerequisites UI', () => {
+    const mockEmptyCase = (caseFixture: Record<string, unknown>) => {
+      fetchMock.mockImplementation(async (input: RequestInfo | URL, init?: RequestInit) => {
+        const url = String(input)
+
+        if (url === '/api/hr/offboarding/cases?limit=200') {
+          return Response.json({ cases: [caseFixture] })
+        }
+
+        if (url === '/api/hr/core/members/options') {
+          return Response.json(membersPayload)
+        }
+
+        if (url.endsWith('/final-settlement') && !init?.method) {
+          return Response.json({ settlement: null })
+        }
+
+        if (url.endsWith('/final-settlement/document') && !init?.method) {
+          return Response.json({ document: null })
+        }
+
+        if (url.endsWith('/resignation-letter') && init?.method === 'POST') {
+          return Response.json({ linked: true }, { status: 201 })
+        }
+
+        if (url.endsWith('/maintenance-obligation') && init?.method === 'POST') {
+          return Response.json({ declared: true }, { status: 201 })
+        }
+
+        throw new Error(`Unexpected fetch: ${url}`)
+      })
+    }
+
+    it('shows missing prerequisites chips and disables Calcular when both are absent', async () => {
+      mockEmptyCase(caseWithoutPrerequisites)
+      const { default: HrOffboardingView } = await import('./HrOffboardingView')
+
+      renderWithTheme(<HrOffboardingView />)
+
+      expect(await screen.findByText('EO-OFF-2026-PRE')).toBeInTheDocument()
+      expect(screen.getByText('Carta faltante')).toBeInTheDocument()
+      expect(screen.getByText('Pensión pendiente')).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'Subir carta de renuncia' })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'Declarar pensión alimentos' })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'Calcular' })).toBeDisabled()
+    })
+
+    it('shows ready chips and enables Calcular when both prerequisites are satisfied', async () => {
+      mockEmptyCase(executedCase)
+      const { default: HrOffboardingView } = await import('./HrOffboardingView')
+
+      renderWithTheme(<HrOffboardingView />)
+
+      expect(await screen.findByText('EO-OFF-2026-VAL')).toBeInTheDocument()
+      expect(screen.getByText('Carta subida')).toBeInTheDocument()
+      expect(screen.getByText('Pensión: No afecto')).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'Reemplazar carta' })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'Editar pensión alimentos' })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'Calcular' })).not.toBeDisabled()
+    })
+
+    it('submits maintenance declaration Alt A (not_subject) with the canonical body', async () => {
+      const user = userEvent.setup()
+
+      mockEmptyCase(caseWithoutPrerequisites)
+      const { default: HrOffboardingView } = await import('./HrOffboardingView')
+
+      renderWithTheme(<HrOffboardingView />)
+
+      await user.click(await screen.findByRole('button', { name: 'Declarar pensión alimentos' }))
+      await screen.findByRole('heading', { name: 'Declarar pensión de alimentos (Ley 21.389)' })
+
+      // Default radio = not_subject (Alt A); submit directly.
+      await user.click(screen.getByRole('button', { name: 'Declarar pensión' }))
+
+      await waitFor(() => {
+        expect(fetchMock).toHaveBeenCalledWith(
+          '/api/hr/offboarding/cases/offboarding-case-prereqs-missing/maintenance-obligation',
+          expect.objectContaining({
+            method: 'POST',
+            body: JSON.stringify({ variant: 'not_subject' })
+          })
+        )
+      })
+    })
+
+    it('validates Alt B (subject) requires amount > 0 and beneficiary before POST', async () => {
+      const user = userEvent.setup()
+
+      mockEmptyCase(caseWithoutPrerequisites)
+      const { default: HrOffboardingView } = await import('./HrOffboardingView')
+
+      renderWithTheme(<HrOffboardingView />)
+
+      await user.click(await screen.findByRole('button', { name: 'Declarar pensión alimentos' }))
+      await screen.findByRole('heading', { name: 'Declarar pensión de alimentos (Ley 21.389)' })
+
+      await user.click(screen.getByRole('radio', { name: /Afecto a retención/ }))
+      await user.click(screen.getByRole('button', { name: 'Declarar pensión' }))
+
+      // Validation error visible; no fetch al endpoint.
+      expect(await screen.findByText('Ingresa un monto mayor a 0.')).toBeInTheDocument()
+      expect(fetchMock).not.toHaveBeenCalledWith(
+        expect.stringContaining('/maintenance-obligation'),
+        expect.objectContaining({ method: 'POST' })
       )
     })
   })
