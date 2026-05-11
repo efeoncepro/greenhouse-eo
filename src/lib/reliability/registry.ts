@@ -419,6 +419,7 @@ export const STATIC_RELIABILITY_REGISTRY: ReliabilityModuleDefinition[] = [
     dependencies: [
       'greenhouse_sync.release_manifests',
       'greenhouse_sync.release_state_transitions',
+      'greenhouse_sync.github_release_webhook_events',
       'GitHub Actions API (waiting approvals + pending without jobs)',
       'GCP Workload Identity Federation (subjects ref + environment)',
       'Azure App Registration federated credentials',

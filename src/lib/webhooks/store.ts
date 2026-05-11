@@ -66,15 +66,28 @@ export const insertInboxEvent = async (event: {
 }): Promise<{ id: string; isDuplicate: boolean }> => {
   const id = `wh-inbox-${randomUUID()}`
 
-  const result = await runGreenhousePostgresQuery<{ webhook_inbox_event_id: string }>(
-    `INSERT INTO greenhouse_sync.webhook_inbox_events (
-       webhook_inbox_event_id, webhook_endpoint_id, provider_code,
-       source_event_id, idempotency_key,
-       headers_json, payload_json, raw_body_text,
-       signature_verified, status
-     ) VALUES ($1, $2, $3, $4, $5, $6::jsonb, $7::jsonb, $8, $9, 'received')
-     ON CONFLICT (webhook_endpoint_id, idempotency_key) DO NOTHING
-     RETURNING webhook_inbox_event_id`,
+  const result = await runGreenhousePostgresQuery<{
+    webhook_inbox_event_id: string
+    is_duplicate: boolean
+  }>(
+    `WITH inserted AS (
+       INSERT INTO greenhouse_sync.webhook_inbox_events (
+         webhook_inbox_event_id, webhook_endpoint_id, provider_code,
+         source_event_id, idempotency_key,
+         headers_json, payload_json, raw_body_text,
+         signature_verified, status
+       ) VALUES ($1, $2, $3, $4, $5, $6::jsonb, $7::jsonb, $8, $9, 'received')
+       ON CONFLICT (webhook_endpoint_id, idempotency_key) DO NOTHING
+       RETURNING webhook_inbox_event_id, false AS is_duplicate
+     )
+     SELECT webhook_inbox_event_id, is_duplicate FROM inserted
+     UNION ALL
+     SELECT webhook_inbox_event_id, true AS is_duplicate
+       FROM greenhouse_sync.webhook_inbox_events
+      WHERE webhook_endpoint_id = $2
+        AND idempotency_key = $5
+        AND NOT EXISTS (SELECT 1 FROM inserted)
+     LIMIT 1`,
     [
       id, event.endpointId, event.providerCode,
       event.sourceEventId, event.idempotencyKey,
@@ -83,7 +96,10 @@ export const insertInboxEvent = async (event: {
     ]
   )
 
-  return { id: result[0]?.webhook_inbox_event_id || id, isDuplicate: result.length === 0 }
+  return {
+    id: result[0]?.webhook_inbox_event_id || id,
+    isDuplicate: result[0]?.is_duplicate ?? true
+  }
 }
 
 export const updateInboxEventStatus = async (

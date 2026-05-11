@@ -1,4 +1,18 @@
-# Sesion 2026-05-10 — TASK-857 creada + watchdog main diagnosticado
+# Sesion 2026-05-10 — TASK-857 GitHub release webhooks cerrada
+
+- **Trigger:** usuario pidió implementar `TASK-857 — GitHub Webhooks Release Event Ingestion` end-to-end, manteniéndose explícitamente en `develop` y sin cambiar de rama.
+- **Branch:** `develop` por instrucción explícita del usuario; se omitió la creación de branch `task/TASK-857-*` aunque el flujo default de tasks lo sugiere.
+- **Estado:** task movida a `docs/tasks/complete/TASK-857-github-webhooks-release-event-ingestion.md`, Lifecycle `complete`, plan canónico en `docs/tasks/plans/TASK-857-plan.md`.
+- **Discovery/Audit/Plan:** completados contra arquitectura vigente, schema snapshot, tipos DB, runtime release control plane, webhook inbox existente, `pnpm pg:doctor` verde y Handoff previo. No hay ownership activo ni PR/branch TASK-857.
+- **Implementación:** endpoint dedicado `/api/webhooks/github/release-events` con HMAC GitHub antes de parse/persist; dedupe por `X-GitHub-Delivery`; tabla `greenhouse_sync.github_release_webhook_events`; reconciler contra `release_manifests`; signal `platform.release.github_webhook_unmatched`; watchdog TASK-849 queda como backstop; sin outbox events nuevos V1 por no existir consumidores.
+- **Migración:** `20260510215923791_task-857-github-release-webhooks.sql` aplicada con `pnpm pg:connect:migrate`; `src/types/db.d.ts` regenerado desde DB viva.
+- **Webhook probado:** servidor local Next en `localhost:3000` + Cloud SQL Proxy + secret local `GITHUB_RELEASE_WEBHOOK_SECRET=local-task857-secret`. POST firmado real `workflow_run` success para target SHA `390ac14e3dca3f44f4e9285b73956138ca707655` devolvió `202 accepted`, `processingStatus=matched`, `releaseId=390ac14e3dca-2894a371-0f0e-4c7b-8903-ad47052d9673`, `transitionApplied=false`. Reintento con el mismo `X-GitHub-Delivery` devolvió `202 duplicate_delivery` con el mismo inbox id. Firma inválida devolvió `401 invalid_signature`; verificado en DB que no insertó inbox. El evento sintético matched fue borrado después de validar para no contaminar el ledger live.
+- **Validación:** `pnpm test -- src/lib/release/github-webhook-handler.test.ts src/lib/release/github-webhook-ingestion.test.ts src/lib/release/github-webhook-reconciler.test.ts` ejecutó suite completa: 4076 passed / 11 skipped. `pnpm exec tsc --noEmit` verde. Pre-commit hooks verdes en commits `8c21296d` y `096535e4`.
+- **Pendiente externo:** configurar el repository webhook real en GitHub con URL production y `GITHUB_RELEASE_WEBHOOK_SECRET` en Vercel/Secret Manager después del deploy.
+
+---
+
+# Sesion 2026-05-10 — TASK-857 creada + watchdog main resuelto
 
 - **Trigger:** usuario reporta correo GitHub Actions: `Production Release Watchdog - main (6155cde)` fallando y pide crear task para webhooks + ayudar a resolver el incidente.
 - **Branch:** `develop`.
@@ -6,8 +20,10 @@
 - **Task nueva:** `TASK-857 — GitHub Webhooks Release Event Ingestion` creada en `docs/tasks/to-do/TASK-857-github-webhooks-release-event-ingestion.md`; README + `TASK_ID_REGISTRY.md` sincronizados, siguiente ID `TASK-858`.
 - **Diagnóstico del fallo:** run scheduled `25638572756` falló por `platform.release.worker_revision_drift`. Causa raíz del ruido: `.github/workflows/production-release-watchdog.yml` autenticaba GCP pero no entregaba `GREENHOUSE_POSTGRES_*` al step `Run watchdog`; en GitHub Actions el reader caía al fallback GitHub API y comparaba workers contra workflows directos antiguos en lugar del SSoT `greenhouse_sync.release_manifests`.
 - **Fix aplicado:** agregar env vars PostgreSQL/Secret Manager al step `Run watchdog` para que `worker_revision_drift` lea `release_manifests` como SSoT también dentro del workflow scheduled.
-- **Verificación ejecutada:** `pnpm test -- src/lib/release/workflow-allowlist.test.ts src/lib/release/watchdog-aggregation.test.ts` terminó ejecutando suite completa Vitest: 4064 passed / 11 skipped. `pnpm pg:doctor` verde; `pnpm pg:connect --shell` verificó manifests vivos (`90d29dfa...` latest `degraded`). `gh run view` confirmó fallo original y `gh run watch 25638821888` confirmó que el workflow manual corre hasta completar.
-- **Estado operacional pendiente:** el fix necesita push/merge a `main` para afectar el cron scheduled. Además, los workers deben quedar alineados por release/orchestrator o workflow dispatch; sin el fix remoto, el watchdog sigue usando fallback y reporta 3 drifts falsos contra `85d03e...`.
+- **Merge/deploy:** commit `a5342dbb` pusheado a `develop`, PR #115 mergeado por squash a `main` como `390ac14e3dca3f44f4e9285b73956138ca707655`. El orquestador production release run `25639651940` fue aprobado por CLI y completó `success`: preflight, manifest, Vercel READY, Azure health checks, 4 workers Cloud Run, post-release health y transición `release_manifests -> released`.
+- **Verificación ejecutada:** `pnpm test -- src/lib/release/workflow-allowlist.test.ts src/lib/release/watchdog-aggregation.test.ts` terminó ejecutando suite completa Vitest: 4064 passed / 11 skipped. `pnpm pg:doctor` verde; `pnpm pg:connect --shell` verificó manifests vivos. Pre-push hooks: `pnpm lint` + `pnpm exec tsc --noEmit` verdes. CI develop run `25638953404` verde; PR CI run `25639287696` verde; main CI run `25639595937` verde.
+- **Verificación live post-release:** watchdog manual run `25640114327` en `main` con `fail_on_error=true` completó `success`; log confirma `GREENHOUSE_POSTGRES_*` presentes y `platform.release.worker_revision_drift` severity `ok`, summary `4/4 workers synced`. Cloud Run latest revisions exponen `GIT_SHA=390ac14e3dca3f44f4e9285b73956138ca707655` para `ops-worker`, `commercial-cost-worker`, `ico-batch-worker` y `hubspot-greenhouse-integration`.
+- **Estado operacional:** incidente resuelto. Queda solo warning no bloqueante de GitHub Actions sobre actions corriendo internamente en Node.js 20 (`upload-artifact`/`download-artifact`), observable en los runs pero no relacionado con el watchdog drift.
 
 ---
 
