@@ -20,12 +20,14 @@ export interface FinalSettlementReadiness {
   checks: FinalSettlementReadinessCheck[]
 }
 
-export type FinalSettlementComponentKind = 'earning' | 'deduction' | 'employer_cost'
+export type FinalSettlementComponentKind = 'earning' | 'deduction' | 'employer_cost' | 'informational'
 export type FinalSettlementComponentCode =
   | 'pending_salary'
   | 'pending_fixed_allowances'
   | 'monthly_gratification_due'
   | 'proportional_vacation'
+  | 'pending_vacation_carryover'
+  | 'proportional_vacation_current_period'
   | 'used_or_advanced_vacation_adjustment'
   | 'statutory_deductions'
   | 'authorized_deduction'
