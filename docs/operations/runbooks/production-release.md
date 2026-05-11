@@ -46,11 +46,11 @@ Este runbook es el contrato operativo para promover `develop` → `main` y para 
 ```
 
 `production-release.yml` es el brazo activo canonico del release a
-produccion. Los workflows individuales de workers conservan `push` y
-`workflow_dispatch` por compatibilidad, staging y break-glass documentado, pero
-el flujo normal NO consiste en aprobar workers sueltos uno por uno. El
-orquestador invoca los workers via `workflow_call`, pasa `expected_sha`, espera
-Vercel production READY y transiciona `greenhouse_sync.release_manifests`.
+produccion. Los workflows individuales de workers conservan `push:develop`
+para staging y `workflow_dispatch` para break-glass documentado, pero
+production normal NO se despliega por `push:main` ni aprobando workers sueltos.
+El orquestador invoca los workers via `workflow_call`, pasa `expected_sha`,
+espera Vercel production READY y transiciona `greenhouse_sync.release_manifests`.
 
 ## 2. Preflight checklist (V1 manual + TASK-850 CLI canonico)
 
@@ -176,11 +176,12 @@ coordina en paralelo los deploys que corresponden y registra el estado en
 - `Azure Teams Deploy`
 - `Azure Teams Bot Deploy`
 
-Estos workflows individuales siguen protegidos porque tambien pueden ejecutarse
-por `push` o `workflow_dispatch` en escenarios legacy/break-glass. Si aparecen
-runs individuales esperando approval tras un push a `main`, NO asumir que eso
-reemplaza el orquestador. Validar primero si hay un run
-`Production Release Orchestrator` activo para el mismo `target_sha`.
+Estos workflows individuales siguen protegidos porque pueden ejecutarse por
+`workflow_dispatch` en escenarios break-glass y por `workflow_call` desde el
+orquestador. Si aparece un run individual esperando approval para production,
+tratarlo como break-glass o drift operacional: NO asumir que reemplaza el
+orquestador. Validar primero si hay un run `Production Release Orchestrator`
+activo para el mismo `target_sha`.
 
 Approval desde GitHub UI:
 
@@ -211,8 +212,9 @@ Reason: el concurrency fix Opcion A (TASK-848 Slice 3) cancela pending nuevos cu
 
 Si `platform.release.worker_revision_drift` reporta solo
 `hubspot-greenhouse-integration` drifted y el `target_sha` del ultimo release en
-`greenhouse_sync.release_manifests` ya fue verificado, usar forward-fix con el
-workflow canonico del bridge:
+`greenhouse_sync.release_manifests` ya fue verificado, primero preferir un
+rerun de `production-release.yml` para ese SHA. Usar el workflow individual del
+bridge solo como break-glass aprobado si el orquestador esta bloqueado:
 
 ```bash
 gh workflow run hubspot-greenhouse-integration-deploy.yml \
@@ -235,7 +237,7 @@ Steady state esperado: `drift_count=0` y `4/4 workers synced`.
 Hard rules:
 
 - No editar `greenhouse_sync.release_manifests` por SQL para "arreglar" drift.
-- No cambiar `push:main` ni path filters como hotfix dentro de esta remediation.
+- No reintroducir production deploy por `push:main` en workers.
 - No usar `skip_tests=true` salvo break-glass aprobado y documentado en `Handoff.md`.
 - No tocar rutas, payloads, webhooks ni secretos del bridge si el problema es solo revision drift.
 

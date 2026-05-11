@@ -1748,7 +1748,7 @@ arquitectura/runbooks/docs vivas aplicables.
 
 **Worker workflow contract canonico** (TASK-851 Slice 2):
 
-- Trigger paths: `push:main/develop` (auto), `workflow_dispatch` (operator), `workflow_call` (orquestador).
+- Trigger paths: `push:develop` (staging auto), `workflow_dispatch` (break-glass operator), `workflow_call` (orquestador production).
 - `workflow_call` inputs canonicos: `environment` (string, req), `expected_sha` (string, req).
 - `workflow_call` secrets canonicos: `GCP_WORKLOAD_IDENTITY_PROVIDER` (req).
 - ENV var `EXPECTED_SHA` resuelve `workflow_call.inputs.expected_sha > workflow_dispatch.inputs.expected_sha > github.sha`.
@@ -1778,6 +1778,7 @@ arquitectura/runbooks/docs vivas aplicables.
 - **NUNCA** modificar `RELEASE_STATES` enum sin actualizar paralelamente la DB CHECK constraint via migration. Live parity test rompe build si drift emerge.
 - **NUNCA** transitar `state` fuera de la matrix canonica V1 §2.3. `assertValidReleaseStateTransition` lo throw fail-loud antes de tocar DB.
 - **NUNCA** convertir `cancel-in-progress: ${{ <production-only expression> }}` a literal `false` en los 3 worker workflows production. Reintroduce el deadlock 2026-04-26 → 2026-05-09. Test `concurrency-fix-verification.test.ts` rompe build si emerge regression.
+- **NUNCA** reintroducir `push:main` como production deploy automatico para workers Cloud Run. El incidente 2026-05-11 mostro que un run directo de HubSpot cancelado puede abortar el manifest canónico via webhook.
 - **NUNCA** flagear `--override-batch-policy` en el orquestador sin `bypass_preflight_reason >=20 chars` + capability `platform.release.bypass_preflight`. Audit row en `release_state_transitions.metadata_json` registra reason.
 - **NUNCA** llamar `recordReleaseStarted` directo desde un workflow YAML — usar siempre el CLI `pnpm release:orchestrator-record-started`. Mismo para `transitionReleaseState` → `pnpm release:orchestrator-transition-state`. Garantiza atomicidad (UPDATE + audit + outbox en misma tx).
 - **NUNCA** modificar `release_manifests` directamente via SQL. Anti-immutable trigger (TASK-848 V1.0) bloquea cambios a campos identity. Para correcciones, INSERT nueva fila con `metadata_json.correction_of=<previous_id>`.

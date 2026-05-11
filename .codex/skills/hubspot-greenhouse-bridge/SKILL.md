@@ -81,7 +81,7 @@ After adding the property, update:
 
 ### 4. Deploy
 
-**Automated (post-cutover):** push to `develop` or `main` with changes to `services/hubspot_greenhouse_integration/**` triggers `hubspot-greenhouse-integration-deploy.yml`. Workflow runs pytest → Cloud Build → Cloud Run deploy → smoke (`/health` + `/contract`).
+**Automated (post-cutover):** push to `develop` with changes to `services/hubspot_greenhouse_integration/**` triggers staging deploy. Production deploy is owned by `production-release.yml` via `workflow_call`; `workflow_dispatch` is break-glass only. Workflow runs pytest → Cloud Build → Cloud Run deploy → smoke (`/health` + `/contract`).
 
 **Manual:**
 ```bash

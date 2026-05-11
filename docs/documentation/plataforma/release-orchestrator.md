@@ -68,6 +68,11 @@ El orquestador toma decisiones binarias claras en cada job:
 - **Vercel timeout 900s** → abortar
 - **Health soft-fail (exit 78)** → release `degraded` (operador decide rollback o forward-fix), NO aborta el orquestador
 
+Desde el hardening 2026-05-11, los workers Cloud Run no hacen production deploy
+automatico por `push:main`. `push:develop` sigue actualizando staging; production
+normal se ejecuta via `workflow_call` dentro de `production-release.yml`.
+`workflow_dispatch` queda reservado para break-glass auditado.
+
 ## Como integra con el ecosystem
 
 ```text
