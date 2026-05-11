@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 
 import type { RoleEntitlementDefaultInput } from '@/lib/admin/entitlements-governance'
 import { saveRoleEntitlementDefaults } from '@/lib/admin/entitlements-governance'
+import { can } from '@/lib/entitlements/runtime'
 import { requireAdminTenantContext } from '@/lib/tenant/authorization'
 
 type SaveRoleDefaultsBody = {
@@ -20,6 +21,10 @@ export async function POST(request: Request) {
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  if (!can(tenant, 'access.governance.role_defaults.update', 'update', 'tenant')) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
   try {
@@ -61,4 +66,3 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: error instanceof Error ? error.message : 'No se pudo guardar la política por rol.' }, { status: 500 })
   }
 }
-

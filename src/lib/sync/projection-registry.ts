@@ -57,6 +57,9 @@ export interface ProjectionDefinition {
   /** Extract entity scope from event payload. Returns null to skip. */
   extractScope: (payload: Record<string, unknown>) => { entityType: string; entityId: string } | null
 
+  /** Extract multiple entity scopes from one event payload. Falls back to extractScope when omitted. */
+  extractScopes?: (payload: Record<string, unknown>) => Array<{ entityType: string; entityId: string }>
+
   /** Idempotent refresh function. Receives the scoped entity. */
   refresh: (scope: { entityType: string; entityId: string }, payload: Record<string, unknown>) => Promise<string | null>
 

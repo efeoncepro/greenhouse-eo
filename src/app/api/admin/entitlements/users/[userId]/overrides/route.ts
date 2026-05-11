@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 
 import type { UserEntitlementOverrideInput } from '@/lib/admin/entitlements-governance'
 import { saveUserEntitlementOverrides } from '@/lib/admin/entitlements-governance'
+import { can } from '@/lib/entitlements/runtime'
 import { requireAdminTenantContext } from '@/lib/tenant/authorization'
 
 type SaveOverridesBody = {
@@ -20,6 +21,10 @@ export async function POST(request: Request, { params }: { params: Promise<{ use
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  if (!can(tenant, 'access.governance.user_overrides.create', 'create', 'tenant')) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
   const { userId } = await params

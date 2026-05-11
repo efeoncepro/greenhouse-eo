@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 
 import { getEntitlementsGovernanceOverview } from '@/lib/admin/entitlements-governance'
+import { can } from '@/lib/entitlements/runtime'
 import { requireAdminTenantContext } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
@@ -10,6 +11,10 @@ export async function GET() {
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  if (!can(tenant, 'access.governance.role_defaults.read', 'read', 'tenant')) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
   try {
@@ -22,4 +27,3 @@ export async function GET() {
     return NextResponse.json({ error: 'No se pudo cargar la gobernanza de entitlements.' }, { status: 500 })
   }
 }
-

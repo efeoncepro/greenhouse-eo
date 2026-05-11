@@ -557,10 +557,16 @@ export const processReactiveEvents = async (options?: {
     for (const projection of projections) {
       const handlerKey = buildReactiveHandlerKey(projection.name, event.event_type)
 
-      let scope: { entityType: string; entityId: string } | null = null
+      let scopes: Array<{ entityType: string; entityId: string }> = []
 
       try {
-        scope = projection.extractScope(payload)
+        if (projection.extractScopes) {
+          scopes = projection.extractScopes(payload)
+        } else {
+          const scope = projection.extractScope(payload)
+
+          scopes = scope ? [scope] : []
+        }
       } catch (error) {
         // extractScope is supposed to be pure but if it throws we treat it
         // like a null scope to keep the queue moving.
@@ -574,7 +580,7 @@ export const processReactiveEvents = async (options?: {
         continue
       }
 
-      if (!scope) {
+      if (scopes.length === 0) {
         noOpAcks.push({
           eventId: event.event_id,
           handler: handlerKey,
@@ -585,22 +591,24 @@ export const processReactiveEvents = async (options?: {
         continue
       }
 
-      const groupKey = `${projection.name}:${scope.entityType}:${scope.entityId}`
-      const existing = scopeGroups.get(groupKey)
+      for (const scope of scopes) {
+        const groupKey = `${projection.name}:${scope.entityType}:${scope.entityId}`
+        const existing = scopeGroups.get(groupKey)
 
-      if (existing) {
-        existing.events.push(event)
+        if (existing) {
+          existing.events.push(event)
 
-        // Always keep the most recent payload as representative — tie-broken
-        // by occurred_at order which is already ASC.
-        existing.representativePayload = payload
-      } else {
-        scopeGroups.set(groupKey, {
-          projection,
-          scope,
-          events: [event],
-          representativePayload: payload
-        })
+          // Always keep the most recent payload as representative — tie-broken
+          // by occurred_at order which is already ASC.
+          existing.representativePayload = payload
+        } else {
+          scopeGroups.set(groupKey, {
+            projection,
+            scope,
+            events: [event],
+            representativePayload: payload
+          })
+        }
       }
     }
   }
