@@ -37,6 +37,10 @@ import { getIdentityLegalProfileEvidenceOrphanSignal } from './queries/identity-
 import { getIdentityLegalProfilePayrollBlockingSignal } from './queries/identity-legal-profile-payroll-blocking'
 import { getIdentityLegalProfilePendingOverdueSignal } from './queries/identity-legal-profile-pending-overdue'
 import { getIdentityLegalProfileRevealAnomalySignal } from './queries/identity-legal-profile-reveal-anomaly'
+import {
+  getIdentityGovernanceAuditLogWriteFailuresSignal,
+  getIdentityGovernancePendingApprovalOverdueSignal
+} from './queries/identity-governance-signals'
 import { getIncomePaymentsClpDriftSignal } from './queries/income-payments-clp-drift'
 import { getPaymentOrdersDeadLetterSignal } from './queries/payment-orders-dead-letter'
 import { getPaidOrdersWithoutExpensePaymentSignal } from './queries/payment-orders-paid-without-expense-payment'
@@ -427,6 +431,14 @@ interface ReliabilityOverviewSources {
   workforceRoleTitle?: ReliabilitySignal[] | null
 
   /**
+   * TASK-839 — Admin Center entitlement governance signals (2):
+   *   - identity.governance.audit_log_write_failures (drift, error)
+   *   - identity.governance.pending_approval_overdue (drift, warning)
+   * Roll up bajo moduleKey 'identity'.
+   */
+  identityGovernance?: ReliabilitySignal[] | null
+
+  /**
    * TASK-611 Slice 5 — Organization Workspace projection signals (2):
    *   - identity.workspace_projection.facet_view_drift (drift, warning)
    *   - identity.workspace_projection.unresolved_relations (data_quality, error)
@@ -557,6 +569,8 @@ export const buildReliabilityOverview = (
     ...(sources.identityLegalProfile ?? []),
     // TASK-785 Slice 7 — Workforce role title governance signals (2).
     ...(sources.workforceRoleTitle ?? []),
+    // TASK-839 — Admin Center entitlement governance signals (2).
+    ...(sources.identityGovernance ?? []),
     // TASK-611 Slice 5 — Organization Workspace projection signals (2).
     ...(sources.workspaceProjection ?? []),
     // TASK-613 Slice 3 — Finance Clients ↔ Organization canonical link signal.
@@ -847,6 +861,19 @@ export const getReliabilityOverview = async (
           .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
           .catch(() => null)
 
+  // TASK-839 — Admin Center entitlement governance signals (2 readers en
+  // paralelo). Protegen el contrato transaccional audit+outbox y el SLA de
+  // segunda firma para grants sensibles.
+  const identityGovernance =
+    preloadedSources.identityGovernance !== undefined
+      ? preloadedSources.identityGovernance
+      : await Promise.all([
+          getIdentityGovernanceAuditLogWriteFailuresSignal().catch(() => null),
+          getIdentityGovernancePendingApprovalOverdueSignal().catch(() => null)
+        ])
+          .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
+          .catch(() => null)
+
   // TASK-611 Slice 5 — Organization Workspace projection signals (2 readers en
   // paralelo). Cada uno degrada honestamente a `unknown` si su query/cómputo falla.
   // Roll up bajo moduleKey 'identity'.
@@ -997,6 +1024,7 @@ export const getReliabilityOverview = async (
     shortcutsInvalidPins,
     identityLegalProfile,
     workforceRoleTitle,
+    identityGovernance,
     workspaceProjection,
     financeClientProfileUnlinked,
     nuboxSourceFreshness,
