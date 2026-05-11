@@ -2507,6 +2507,10 @@ export interface GreenhouseCoreOrganizations {
    * Which command/pipeline drove the most recent transition (bootstrap, hubspot_sync, manual, …).
    */
   lifecycle_stage_source: Generated<string>;
+  /**
+   * TASK-862 — Logo del empleador (legal entity) renderizado en el header de documentos legales (finiquito, contrato, anexo). Resuelto desde greenhouse_core.assets via /api/assets/private/<id>. Fallback a logo Greenhouse hardcoded cuando null.
+   */
+  logo_asset_id: string | null;
   notes: string | null;
   organization_id: string;
   organization_name: string;
@@ -5875,6 +5879,10 @@ export interface GreenhouseHrWorkRelationshipOffboardingCases {
    */
   legacy_checklist_ref: Generated<Json>;
   legal_entity_organization_id: string | null;
+  /**
+   * TASK-862 — Declaracion Ley 21.389 (Ley 14.908 mod. 2021) pension de alimentos. Shape: { variant: "not_subject" | "subject", amount?: number, beneficiary?: string, evidenceAssetId?: string, declaredAt: ISO-8601, declaredByUserId: string }. Validacion en endpoint POST /maintenance-obligation.
+   */
+  maintenance_obligation_json: Json | null;
   member_id: string | null;
   metadata_json: Generated<Json>;
   notes: string | null;
@@ -5894,6 +5902,10 @@ export interface GreenhouseHrWorkRelationshipOffboardingCases {
   requires_hr_documents: Generated<boolean>;
   requires_leave_reconciliation: Generated<boolean>;
   requires_payroll_closure: Generated<boolean>;
+  /**
+   * TASK-862 — Carta de renuncia ratificada del trabajador (asset_type=resignation_letter_ratified). Pre-requisito de buildDocumentReadiness check resignation_letter_uploaded. Aplica SOLO cuando separation_type=resignation.
+   */
+  resignation_letter_asset_id: string | null;
   rule_lane: string;
   scheduled_at: Timestamp | null;
   separation_type: string;

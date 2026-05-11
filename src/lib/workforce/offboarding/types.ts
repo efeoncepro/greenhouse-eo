@@ -112,6 +112,20 @@ export interface OffboardingCase {
   updatedByUserId: string | null
   createdAt: string
   updatedAt: string
+  // TASK-862 Slice C — pre-requisitos del finiquito de renuncia voluntaria.
+  // Ambos opcionales en el type para no romper consumers existentes; los endpoints
+  // POST .../resignation-letter y POST .../maintenance-obligation los poblan.
+  // El readiness check de buildDocumentReadiness los gating como blocker cuando
+  // separation_type='resignation' y son null.
+  resignationLetterAssetId?: string | null
+  maintenanceObligationJson?: {
+    variant: 'not_subject' | 'subject'
+    amount?: number
+    beneficiary?: string
+    evidenceAssetId?: string
+    declaredAt: string
+    declaredByUserId: string
+  } | null
 }
 
 export interface CreateOffboardingCaseInput {

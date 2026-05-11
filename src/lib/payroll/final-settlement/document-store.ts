@@ -26,6 +26,8 @@ import {
   type FinalSettlementDocument,
   type FinalSettlementDocumentReadiness,
   type FinalSettlementDocumentSnapshot,
+  type FinalSettlementMaintenanceObligation,
+  type FinalSettlementRatification,
   type RenderFinalSettlementDocumentInput
 } from './document-types'
 import { getLatestFinalSettlementForCase } from './store'
@@ -50,6 +52,14 @@ type CollaboratorRow = {
   job_title: string | null
 }
 
+// TASK-862 Slice C — Worker address (TASK-784 person_addresses).
+type WorkerAddressRow = {
+  street_line_1: string | null
+  city: string | null
+  region: string | null
+  presentation_text: string | null
+}
+
 type OrganizationRow = {
   organization_id: string
   legal_name: string | null
@@ -58,6 +68,7 @@ type OrganizationRow = {
   tax_id_type: string | null
   legal_address: string | null
   country: string | null
+  logo_asset_id: string | null
 }
 
 const toTimestampString = (value: unknown): string | null => {
@@ -185,6 +196,46 @@ const getCollaboratorSnapshot = async (memberId: string, profileId: string): Pro
     taxId = null
   }
 
+  // TASK-862 Slice C — Worker address from TASK-784 person_addresses.
+  // Preferimos residence verified; fallback a residence pending (degraded, no blocker).
+  // Cualquier error -> address fields null + readiness check worker_address_resolved
+  // dispara warning (no blocker, no rompe emision).
+  let addressLine1: string | null = null
+  let city: string | null = null
+  let region: string | null = null
+  let addressPresentation: string | null = null
+
+  try {
+    const addressRows = await queryRows<WorkerAddressRow>(
+      `
+        SELECT street_line_1, city, region, presentation_text
+        FROM greenhouse_core.person_addresses
+        WHERE profile_id = $1
+          AND address_type = 'residence'
+          AND archived_at IS NULL
+          AND rejected_at IS NULL
+        ORDER BY
+          CASE verification_status WHEN 'verified' THEN 0 WHEN 'pending_review' THEN 1 ELSE 2 END,
+          updated_at DESC
+        LIMIT 1
+      `,
+      [row.profile_id]
+    )
+
+    if (addressRows[0]) {
+      addressLine1 = addressRows[0].street_line_1
+      city = addressRows[0].city
+      region = addressRows[0].region
+      addressPresentation = addressRows[0].presentation_text
+    }
+  } catch {
+    // Defensive: address gap is non-blocking; readiness check surfaces it.
+    addressLine1 = null
+    city = null
+    region = null
+    addressPresentation = null
+  }
+
   return {
     memberId: row.member_id,
     profileId: row.profile_id,
@@ -192,7 +243,11 @@ const getCollaboratorSnapshot = async (memberId: string, profileId: string): Pro
     legalName: row.legal_name ?? row.full_name,
     primaryEmail: row.primary_email ?? row.canonical_email,
     taxId,
-    jobTitle: row.job_title
+    jobTitle: row.job_title,
+    addressLine1,
+    city,
+    region,
+    addressPresentation
   }
 }
 
@@ -202,7 +257,7 @@ const getEmployerSnapshot = async (
   if (legalEntityOrganizationId) {
     const rows = await queryRows<OrganizationRow>(
       `
-        SELECT organization_id, legal_name, organization_name, tax_id, tax_id_type, legal_address, country
+        SELECT organization_id, legal_name, organization_name, tax_id, tax_id_type, legal_address, country, logo_asset_id
         FROM greenhouse_core.organizations
         WHERE organization_id = $1
           AND active = TRUE
@@ -221,7 +276,8 @@ const getEmployerSnapshot = async (
         taxIdType: row.tax_id_type,
         legalAddress: row.legal_address,
         country: row.country ?? 'CL',
-        source: 'settlement_legal_entity'
+        source: 'settlement_legal_entity',
+        logoAssetId: row.logo_asset_id // TASK-862 Slice C
       }
     }
   }
@@ -239,15 +295,22 @@ const getEmployerSnapshot = async (
     taxIdType: operatingEntity.taxIdType,
     legalAddress: operatingEntity.legalAddress,
     country: operatingEntity.country,
-    source: 'operating_entity_fallback'
+    source: 'operating_entity_fallback',
+    logoAssetId: null // TASK-862 Slice C — fallback no expone logo; PDF cae a Greenhouse default
   }
 }
 
 const buildDocumentReadiness = (
   settlement: FinalSettlement,
   employer: FinalSettlementDocumentSnapshot['employer'],
-  collaborator: FinalSettlementDocumentSnapshot['collaborator']
+  collaborator: FinalSettlementDocumentSnapshot['collaborator'],
+  // TASK-862 Slice C — pre-requisitos del finiquito de renuncia voluntaria.
+  resignationLetterAssetId: string | null,
+  maintenanceObligation: FinalSettlementMaintenanceObligation | null
 ): FinalSettlementDocumentReadiness => {
+  const isResignation = settlement.separationType === 'resignation'
+  const workerHasAddress = Boolean(collaborator.addressLine1 || collaborator.addressPresentation)
+
   const checks: FinalSettlementDocumentReadiness['checks'] = [
     {
       code: 'settlement_approved',
@@ -296,6 +359,28 @@ const buildDocumentReadiness = (
         : 'blocked',
       severity: 'blocker',
       message: 'Cada linea del documento debe traer policy, tratamiento y evidencia suficiente.'
+    },
+    // TASK-862 Slice C — 3 readiness checks nuevos. Aplican SOLO cuando separation_type=resignation
+    // (V1 scope). Otras causales heredan los 7 checks anteriores sin extension.
+    {
+      code: 'resignation_letter_uploaded',
+      status: !isResignation || resignationLetterAssetId ? 'passed' : 'blocked',
+      severity: 'blocker',
+      message: 'La carta de renuncia ratificada debe subirse antes de calcular y emitir el finiquito.',
+      evidence: { isResignation, resignationLetterAssetId }
+    },
+    {
+      code: 'maintenance_obligation_declared',
+      status: !isResignation || maintenanceObligation ? 'passed' : 'blocked',
+      severity: 'blocker',
+      message: 'La declaracion de pension de alimentos (Ley 21.389) debe registrarse antes de emitir el finiquito.',
+      evidence: { isResignation, declared: Boolean(maintenanceObligation) }
+    },
+    {
+      code: 'worker_address_resolved',
+      status: workerHasAddress ? 'passed' : 'warning',
+      severity: 'warning',
+      message: 'El domicilio del trabajador no esta registrado. El finiquito puede emitirse pero queda como advertencia para revision HR.'
     }
   ]
 
@@ -309,16 +394,58 @@ const buildDocumentReadiness = (
   }
 }
 
-const buildDocumentSnapshot = async (settlement: FinalSettlement): Promise<{
+// TASK-862 Slice C — Read finiquito pre-reqs from the offboarding case.
+// Tolera fallos defensively: si el case no tiene las columnas todavia (migration
+// no aplicada en algun env), retorna nulls y los readiness checks bloquean.
+const getOffboardingCasePreReqs = async (offboardingCaseId: string): Promise<{
+  resignationLetterAssetId: string | null
+  maintenanceObligation: FinalSettlementMaintenanceObligation | null
+}> => {
+  type CasePreReqRow = {
+    resignation_letter_asset_id: string | null
+    maintenance_obligation_json: FinalSettlementMaintenanceObligation | null
+  }
+
+  try {
+    const rows = await queryRows<CasePreReqRow>(
+      `
+        SELECT resignation_letter_asset_id, maintenance_obligation_json
+        FROM greenhouse_hr.work_relationship_offboarding_cases
+        WHERE offboarding_case_id = $1
+        LIMIT 1
+      `,
+      [offboardingCaseId]
+    )
+
+    const row = rows[0]
+
+    return {
+      resignationLetterAssetId: row?.resignation_letter_asset_id ?? null,
+      maintenanceObligation: row?.maintenance_obligation_json ?? null
+    }
+  } catch {
+    return { resignationLetterAssetId: null, maintenanceObligation: null }
+  }
+}
+
+const buildDocumentSnapshot = async (settlement: FinalSettlement, ratification?: FinalSettlementRatification | null): Promise<{
   snapshot: FinalSettlementDocumentSnapshot
   readiness: FinalSettlementDocumentReadiness
 }> => {
-  const [collaborator, employer] = await Promise.all([
+  const [collaborator, employer, preReqs] = await Promise.all([
     getCollaboratorSnapshot(settlement.memberId, settlement.profileId),
-    getEmployerSnapshot(settlement.legalEntityOrganizationId)
+    getEmployerSnapshot(settlement.legalEntityOrganizationId),
+    getOffboardingCasePreReqs(settlement.offboardingCaseId)
   ])
 
-  const readiness = buildDocumentReadiness(settlement, employer, collaborator)
+  const readiness = buildDocumentReadiness(
+    settlement,
+    employer,
+    collaborator,
+    preReqs.resignationLetterAssetId,
+    preReqs.maintenanceObligation
+  )
+
   const generatedAt = new Date().toISOString()
 
   return {
@@ -383,7 +510,13 @@ const buildDocumentSnapshot = async (settlement: FinalSettlement): Promise<{
       breakdown: settlement.breakdown,
       explanation: settlement.explanation,
       readiness: settlement.readiness,
-      documentReadiness: readiness
+      documentReadiness: readiness,
+      // TASK-862 Slice C — pre-requisitos y datos extendidos en top-level del snapshot.
+      // Slice D los consume para renderizar Ley 21.389 banner, reserva de derechos
+      // bloque + watermark logic + logo empleador.
+      maintenanceObligation: preReqs.maintenanceObligation,
+      resignationLetterAssetId: preReqs.resignationLetterAssetId,
+      ratification: ratification ?? null
     },
     readiness
   }

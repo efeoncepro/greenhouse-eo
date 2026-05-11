@@ -20,7 +20,7 @@ const snapshot: FinalSettlementDocumentSnapshot = {
   schemaVersion: 1,
   generatedAt: '2026-05-05T10:00:00.000Z',
   documentTemplateCode: 'cl_final_settlement_resignation_v1',
-  documentTemplateVersion: '2026-05-04.v1',
+  documentTemplateVersion: '2026-05-11.v2',
   officialReferences: [],
   finalSettlement: {
     finalSettlementId: 'final-settlement-test',
