@@ -25,6 +25,7 @@ export const GITHUB_RELEASE_PROVIDER_CODE = 'github'
 export const GITHUB_RELEASE_WEBHOOK_MAX_BYTES = 2_000_000
 
 export const GITHUB_RELEASE_WEBHOOK_EVENTS = [
+  'ping',
   'workflow_run',
   'workflow_job',
   'deployment_status',
@@ -33,6 +34,7 @@ export const GITHUB_RELEASE_WEBHOOK_EVENTS = [
 ] as const
 
 type GithubReleaseWebhookEventName = (typeof GITHUB_RELEASE_WEBHOOK_EVENTS)[number]
+type GithubReleaseReconcilerEventName = Exclude<GithubReleaseWebhookEventName, 'ping'>
 
 export interface GithubReleaseWebhookResponse {
   status: number
@@ -88,6 +90,13 @@ export const handleGithubReleaseWebhookRequest = async (
     payload = parsed as Record<string, unknown>
   } catch {
     return response(400, 'invalid_json')
+  }
+
+  if (eventName === 'ping') {
+    return response(202, 'ping_accepted', {
+      deliveryId,
+      repositoryFullName: stringValue(asRecord(payload.repository)?.full_name)
+    })
   }
 
   await ensureWebhookSchema()
@@ -173,7 +182,7 @@ export const buildGithubDeliveryIdempotencyKey = (deliveryId: string): string =>
 
 export const normalizeGithubReleaseWebhook = (params: {
   deliveryId: string
-  eventName: GithubReleaseWebhookEventName
+  eventName: GithubReleaseReconcilerEventName
   payload: Record<string, unknown>
 }): Omit<NormalizedGithubReleaseWebhookEvent, 'inboxEventId'> => {
   const payload = params.payload

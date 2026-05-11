@@ -110,6 +110,32 @@ describe('github release webhook handler', () => {
     expect(mocks.query).not.toHaveBeenCalled()
   })
 
+  it('accepts signed GitHub ping deliveries without release persistence', async () => {
+    const rawBody = JSON.stringify({
+      zen: 'Design for failure.',
+      repository: { full_name: 'efeoncepro/greenhouse-eo' }
+    })
+
+    const result = await handleGithubReleaseWebhookRequest(
+      buildWebhookRequest({
+        rawBody,
+        eventName: 'ping'
+      })
+    )
+
+    expect(result.status).toBe(202)
+    expect(result.body).toMatchObject({
+      ok: true,
+      code: 'ping_accepted',
+      deliveryId: 'delivery-123',
+      repositoryFullName: 'efeoncepro/greenhouse-eo'
+    })
+    expect(mocks.ensureWebhookSchema).not.toHaveBeenCalled()
+    expect(mocks.insertInboxEvent).not.toHaveBeenCalled()
+    expect(mocks.query).not.toHaveBeenCalled()
+    expect(mocks.reconcileGithubReleaseWebhookEvent).not.toHaveBeenCalled()
+  })
+
   it('persists a signed delivery, reconciles it and returns accepted', async () => {
     const rawBody = JSON.stringify({
       action: 'completed',
