@@ -13,7 +13,7 @@ import { parse as parseYaml } from 'yaml'
  *
  * which evaluates to:
  *   - true  → workflow_dispatch with environment=production
- *   - true  → push:main (production by branch ref)
+ *   - true  → workflow_call with environment=production
  *   - false → workflow_dispatch with environment=staging
  *   - false → push:develop
  *
@@ -55,9 +55,10 @@ describe('TASK-848 concurrency fix Opcion A — anti-regression', () => {
 
       expect(exprStr).toContain('${{')
       expect(exprStr).toContain('}}')
+      expect(exprStr).toContain('workflow_call')
       expect(exprStr).toContain('workflow_dispatch')
       expect(exprStr).toContain('production')
-      expect(exprStr).toContain('refs/heads/main')
+      expect(exprStr).not.toContain('refs/heads/main')
     })
 
     it(`${path} concurrency group is keyed by github.ref (per-branch isolation)`, () => {
@@ -66,6 +67,22 @@ describe('TASK-848 concurrency fix Opcion A — anti-regression', () => {
 
       expect(group).toBeDefined()
       expect(String(group)).toContain('${{ github.ref }}')
+    })
+  }
+
+  for (const path of WORKER_WORKFLOWS) {
+    it(`${path} does not deploy production automatically on push:main`, () => {
+      const doc = loadWorkflow(path)
+      const onClause = doc.on as Record<string, unknown>
+
+      const pushTrigger = onClause?.push as
+        | { branches?: readonly string[]; paths?: readonly string[] }
+        | undefined
+
+      expect(pushTrigger, `${path} missing push trigger`).toBeDefined()
+      expect(pushTrigger?.branches).toContain('develop')
+      expect(pushTrigger?.branches).not.toContain('main')
+      expect(pushTrigger?.paths?.length ?? 0).toBeGreaterThan(0)
     })
   }
 

@@ -49,6 +49,10 @@ Los jobs `deploy-{ops-worker, commercial-cost-worker, ico-batch, hubspot-integra
 
 En paralelo `wait-vercel` polea Vercel API hasta encontrar deployment production con `meta.githubCommitSha === target_sha` y `state=READY`. Timeout 900s.
 
+Production de workers no se despliega automaticamente por `push:main`. Los
+pushes de worker siguen sirviendo staging (`develop`); production normal vive
+en este orquestador y `workflow_dispatch` queda solo como break-glass auditado.
+
 ### 5) Health check post-release
 
 `post-release-health` pinga `https://greenhouse.efeoncepro.com/api/auth/health`. Si devuelve 200 → release `released`. Si soft-fails (exit 78) → release `degraded`. **Degraded NO aborta** — quedó deployado pero requiere inspección operativa antes de marcar verde.
@@ -98,6 +102,7 @@ Cada transition: UPDATE atomic en `release_manifests` + audit row en `release_st
 | `wait-vercel` timeout 900s | Vercel deploy lento o no triggered | Verificar `vercel ls greenhouse-eo --target=production`; si no hay deployment, push manual a main |
 | `post-release-health` soft-fail (release `degraded`) | `/api/auth/health` no devolvió 200 en 3 attempts | Inspeccionar `/admin/operations` dashboard; decidir rollback (`pnpm release:rollback`) o forward-fix |
 | `transition-released` falla con "race con otro actor" | Otro proceso ya transicionó el state | Investigar `release_state_transitions` audit log para ver qué pasó |
+| Worker directo aparece esperando approval | Break-glass/manual o drift de control plane | No aprobar como release normal; validar si pertenece al orchestrator activo |
 
 ## Referencias técnicas
 

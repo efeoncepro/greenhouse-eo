@@ -1,3 +1,12 @@
+# Sesion 2026-05-11 — Release recovery + orchestrator-only worker production hardening
+
+- **Trigger:** usuario pidio avanzar end-to-end tras detectar que HubSpot se frenaba distinto a los demas workers durante production release.
+- **Recovery production:** se disparo un nuevo `Production Release Orchestrator` para el SHA `42805d3e3dfd9c1278ae85c1c69b6b1651097ee0` (run `25680697352`) con `bypass_preflight_reason` documentado. No se edito `release_manifests` por SQL. Se aprobo el gate del orchestrator y los gates subordinados de workers dentro del mismo run. El run anterior `25678058713` habia fallado porque un run directo `HubSpot Greenhouse Integration Deploy` por `push` (`25678058298`) fue cancelado y el webhook reconciler aborto el manifest.
+- **Causa raiz confirmada:** no era runtime HubSpot; el bridge respondia `/health` y `/contract`, y Cloud Run exponia `GIT_SHA=42805d3e...`. El problema era doble ownership de production deploy (`push:main` worker directo + orchestrator) y reconciliacion demasiado amplia por `target_sha`. Un segundo recovery (`25680697352`) desplego workers OK, pero el reconciliador viejo aborto el manifest por un `check_suite` failure sin workflow owner antes del cierre.
+- **Hardening implementado en develop:** los 4 worker workflows Cloud Run ya no tienen `push:main`; `push:develop` queda para staging, `workflow_call` para production normal desde `production-release.yml`, y `workflow_dispatch` como break-glass. `github-webhook-reconciler` solo aplica transiciones de falla si el evento viene del `Production Release Orchestrator` o de un worker `workflow_call`; runs directos `push`/`workflow_dispatch` y `check_suite`/deployment events sin owner canónico quedan `matched_no_transition`.
+- **Docs/skills actualizadas:** `GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md`, production runbook/manual/doc funcional, skills Codex/Claude `greenhouse-production-release`, skills HubSpot Codex/Claude, `AGENTS.md`, `CLAUDE.md`, `project_context.md`, `changelog.md`.
+- **Cuidado multi-agente:** hay cambios no relacionados del usuario/TASK-862 en el worktree (`docs/tasks/README.md`, `docs/tasks/TASK_ID_REGISTRY.md`, `docs/mockups/task-862-finiquito-renuncia-v1-legal.html`, `docs/tasks/to-do/TASK-862-final-settlement-resignation-v1-closing.md`). No stagear ni revertir esos archivos al commitear este hardening.
+
 # Sesion 2026-05-11 — TASK-861 HubSpot release drift hardening cerrada
 
 - **Branch:** `develop` por instruccion explicita del usuario; no se cambio de rama.

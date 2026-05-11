@@ -26,6 +26,7 @@ export interface NormalizedGithubReleaseWebhookEvent {
   action: string | null
   repositoryFullName: string | null
   workflowName: string | null
+  workflowRunEvent: string | null
   workflowRunId: number | null
   workflowJobId: number | null
   checkSuiteId: number | null
@@ -130,6 +131,26 @@ export const reconcileGithubReleaseWebhookEvent = async (
     }
   }
 
+  if (!isCanonicalReleaseFailureSource(event)) {
+    return {
+      processingStatus: 'matched_no_transition',
+      releaseId: match.release.releaseId,
+      matchedBy: match.matchedBy,
+      transitionApplied: false,
+      transitionFromState: match.release.state,
+      transitionToState: desiredTransition,
+      errorCode: 'non_canonical_release_failure_event',
+      errorMessage: null,
+      evidence: {
+        ...event.evidence,
+        releaseState: match.release.state,
+        desiredTransition,
+        transitionReason: 'failure_event_not_owned_by_production_orchestrator',
+        workflowRunEvent: event.workflowRunEvent
+      }
+    }
+  }
+
   if (!isValidReleaseStateTransition(match.release.state, desiredTransition)) {
     return {
       processingStatus: 'matched_no_transition',
@@ -161,6 +182,7 @@ export const reconcileGithubReleaseWebhookEvent = async (
       eventName: event.eventName,
       repositoryFullName: event.repositoryFullName,
       workflowName: event.workflowName,
+      workflowRunEvent: event.workflowRunEvent,
       workflowRunId: event.workflowRunId,
       workflowJobId: event.workflowJobId,
       deploymentId: event.deploymentId,
@@ -300,6 +322,15 @@ const isFailureEvent = (event: NormalizedGithubReleaseWebhookEvent): boolean => 
     (conclusion && FAILURE_CONCLUSIONS.has(conclusion)) ||
     (event.eventName === 'deployment_status' && status && FAILURE_STATUSES.has(status))
   )
+}
+
+const isCanonicalReleaseFailureSource = (
+  event: NormalizedGithubReleaseWebhookEvent
+): boolean => {
+  if (event.workflowName === 'Production Release Orchestrator') return true
+  if (event.workflowRunEvent === 'workflow_call') return true
+
+  return false
 }
 
 const buildTransitionReason = (event: NormalizedGithubReleaseWebhookEvent): string => {

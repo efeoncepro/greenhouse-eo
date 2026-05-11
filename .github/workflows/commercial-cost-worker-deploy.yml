@@ -13,7 +13,6 @@ on:
   push:
     branches:
       - develop
-      - main
     paths:
       - '.github/workflows/commercial-cost-worker-deploy.yml'
       - 'services/commercial-cost-worker/**'
@@ -66,7 +65,7 @@ on:
 # docs/architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md §2.7
 concurrency:
   group: commercial-cost-worker-deploy-${{ github.ref }}
-  cancel-in-progress: ${{ (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production') || github.ref == 'refs/heads/main' }}
+  cancel-in-progress: ${{ (github.event_name == 'workflow_call' && inputs.environment == 'production') || (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production') }}
 
 permissions:
   contents: read
@@ -84,7 +83,7 @@ jobs:
           && inputs.environment
           || (github.event_name == 'workflow_dispatch'
               && github.event.inputs.environment
-              || (github.ref == 'refs/heads/main' && 'production' || 'staging'))
+              || 'staging')
       }}
 
     env:
@@ -94,7 +93,7 @@ jobs:
             && inputs.environment
             || (github.event_name == 'workflow_dispatch'
                 && github.event.inputs.environment
-                || (github.ref == 'refs/heads/main' && 'production' || 'staging'))
+                || 'staging')
         }}
       EXPECTED_SHA: >-
         ${{

@@ -26,6 +26,7 @@ const baseEvent: NormalizedGithubReleaseWebhookEvent = {
   action: 'completed',
   repositoryFullName: 'efeoncepro/greenhouse-eo',
   workflowName: 'Production Release Orchestrator',
+  workflowRunEvent: 'workflow_dispatch',
   workflowRunId: 123,
   workflowJobId: null,
   checkSuiteId: null,
@@ -122,20 +123,80 @@ describe('github release webhook reconciler', () => {
     )
   })
 
-  it('degrades verification when a matched deployment_status fails', async () => {
-    mocks.query.mockResolvedValueOnce([releaseRow('verifying')])
+  it('does not abort a release from a direct push-triggered worker failure', async () => {
+    mocks.query.mockResolvedValueOnce([releaseRow('preflight')])
+
+    const result = await reconcileGithubReleaseWebhookEvent({
+      ...baseEvent,
+      workflowName: 'HubSpot Greenhouse Integration Deploy',
+      workflowRunEvent: 'push',
+      workflowRunId: 456,
+      githubConclusion: 'cancelled'
+    })
+
+    expect(result.processingStatus).toBe('matched_no_transition')
+    expect(result.transitionApplied).toBe(false)
+    expect(result.transitionFromState).toBe('preflight')
+    expect(result.transitionToState).toBe('aborted')
+    expect(result.errorCode).toBe('non_canonical_release_failure_event')
+    expect(mocks.transitionReleaseState).not.toHaveBeenCalled()
+  })
+
+  it('aborts an active deployment when a workflow_call worker fails inside the orchestrator', async () => {
+    mocks.query.mockResolvedValueOnce([releaseRow('deploying')])
     mocks.transitionReleaseState.mockResolvedValueOnce(undefined)
+
+    const result = await reconcileGithubReleaseWebhookEvent({
+      ...baseEvent,
+      workflowName: 'HubSpot Greenhouse Integration Deploy',
+      workflowRunEvent: 'workflow_call',
+      workflowRunId: 789,
+      githubConclusion: 'failure'
+    })
+
+    expect(result.processingStatus).toBe('reconciled')
+    expect(result.transitionApplied).toBe(true)
+    expect(result.transitionFromState).toBe('deploying')
+    expect(result.transitionToState).toBe('aborted')
+  })
+
+  it('does not degrade verification from an unowned deployment_status failure', async () => {
+    mocks.query.mockResolvedValueOnce([releaseRow('verifying')])
 
     const result = await reconcileGithubReleaseWebhookEvent({
       ...baseEvent,
       eventName: 'deployment_status',
       workflowName: null,
+      workflowRunEvent: null,
       githubStatus: 'failure',
       githubConclusion: null
     })
 
-    expect(result.processingStatus).toBe('reconciled')
+    expect(result.processingStatus).toBe('matched_no_transition')
     expect(result.transitionFromState).toBe('verifying')
     expect(result.transitionToState).toBe('degraded')
+    expect(result.errorCode).toBe('non_canonical_release_failure_event')
+    expect(mocks.transitionReleaseState).not.toHaveBeenCalled()
+  })
+
+  it('does not abort a release from an unowned check_suite failure for the target SHA', async () => {
+    mocks.query.mockResolvedValueOnce([releaseRow('preflight')])
+
+    const result = await reconcileGithubReleaseWebhookEvent({
+      ...baseEvent,
+      eventName: 'check_suite',
+      workflowName: null,
+      workflowRunEvent: null,
+      workflowRunId: null,
+      githubStatus: 'completed',
+      githubConclusion: 'failure'
+    })
+
+    expect(result.processingStatus).toBe('matched_no_transition')
+    expect(result.transitionApplied).toBe(false)
+    expect(result.transitionFromState).toBe('preflight')
+    expect(result.transitionToState).toBe('aborted')
+    expect(result.errorCode).toBe('non_canonical_release_failure_event')
+    expect(mocks.transitionReleaseState).not.toHaveBeenCalled()
   })
 })

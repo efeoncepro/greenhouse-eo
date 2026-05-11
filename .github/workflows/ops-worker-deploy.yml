@@ -12,14 +12,13 @@ name: Ops Worker Deploy
 #
 # This workflow watches the subset of source paths that affect ops-worker
 # behavior and triggers a staging deploy automatically on every push to
-# `develop`. Production deploys on `main` are gated behind an environment
-# with required reviewers so they cannot roll out silently.
+# `develop`. Production deploys are owned by `production-release.yml` via
+# workflow_call; workflow_dispatch remains available for audited break-glass.
 
 on:
   push:
     branches:
       - develop
-      - main
     paths:
       - 'services/ops-worker/**'
       - 'src/lib/sync/**'
@@ -70,14 +69,14 @@ on:
 # durante 14-22 dias. Pushes nuevos al mismo concurrency group quedaron
 # `pending` con `jobs: []` y se cancelaron en cascada.
 #
-# Fix: cancel-in-progress=TRUE solo para production path (push:main o
+# Fix: cancel-in-progress=TRUE solo para production path (workflow_call o
 # workflow_dispatch con environment=production). Staging preserva
 # cancel-in-progress=false para no disrumpir in-flight QA.
 #
 # Spec: docs/architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md §2.7
 concurrency:
   group: ops-worker-deploy-${{ github.ref }}
-  cancel-in-progress: ${{ (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production') || github.ref == 'refs/heads/main' }}
+  cancel-in-progress: ${{ (github.event_name == 'workflow_call' && inputs.environment == 'production') || (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production') }}
 
 permissions:
   contents: read
@@ -89,15 +88,15 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 25
 
-    # Route pushes by branch, fall back to manual dispatch input.
-    # TASK-851 — workflow_call uses inputs.environment directly.
+    # Route pushes to staging, production via orchestrator workflow_call,
+    # or manual dispatch input for break-glass.
     environment: >-
       ${{
         github.event_name == 'workflow_call'
           && inputs.environment
           || (github.event_name == 'workflow_dispatch'
               && github.event.inputs.environment
-              || (github.ref == 'refs/heads/main' && 'production' || 'staging'))
+              || 'staging')
       }}
 
     env:
@@ -107,7 +106,7 @@ jobs:
             && inputs.environment
             || (github.event_name == 'workflow_dispatch'
                 && github.event.inputs.environment
-                || (github.ref == 'refs/heads/main' && 'production' || 'staging'))
+                || 'staging')
         }}
       # TASK-851 — pass EXPECTED_SHA to deploy.sh. Orchestrator (workflow_call)
       # passes its target_sha; workflow_dispatch optionally accepts override;

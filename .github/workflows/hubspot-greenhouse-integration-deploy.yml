@@ -14,7 +14,6 @@ on:
   push:
     branches:
       - develop
-      - main
     paths:
       - '.github/workflows/hubspot-greenhouse-integration-deploy.yml'
       - 'services/hubspot_greenhouse_integration/**'
@@ -60,13 +59,10 @@ on:
 
 concurrency:
   group: hubspot-greenhouse-integration-deploy-${{ github.ref }}
-  # Patron canonico replicado de ops-worker / commercial-cost-worker / ico-batch
-  # workflows: cancela runs viejos cuando hay push a main O cuando workflow_dispatch
-  # apunta a production. Evita queue stuck cuando approval gate del environment
-  # production no se firma a tiempo (caso real 2026-05-10 run 25634020354 stuck
-  # 2h+ bloqueando todos los runs subsiguientes via concurrency:false). Staging
-  # preserva cancel-in-progress=false para no perder runs concurrentes en testing.
-  cancel-in-progress: ${{ (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production') || github.ref == 'refs/heads/main' }}
+  # Production deploys are orchestrator-owned via workflow_call. Direct manual
+  # production dispatch remains break-glass and cancels stale production attempts.
+  # Staging preserves cancel-in-progress=false for in-flight QA.
+  cancel-in-progress: ${{ (github.event_name == 'workflow_call' && inputs.environment == 'production') || (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production') }}
 
 permissions:
   contents: read
@@ -122,7 +118,7 @@ jobs:
           && inputs.environment
           || (github.event_name == 'workflow_dispatch'
               && github.event.inputs.environment
-              || (github.ref == 'refs/heads/main' && 'production' || 'staging'))
+              || 'staging')
       }}
 
     env:
@@ -140,7 +136,7 @@ jobs:
             && inputs.environment
             || (github.event_name == 'workflow_dispatch'
                 && github.event.inputs.environment
-                || (github.ref == 'refs/heads/main' && 'production' || 'staging'))
+                || 'staging')
         }}
       GCP_PROJECT_ID: efeonce-group
       # Region LOCKED to us-central1 to preserve the public URL used by

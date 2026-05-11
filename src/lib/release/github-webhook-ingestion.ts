@@ -210,6 +210,8 @@ export const normalizeGithubReleaseWebhook = (params: {
     stringValue(checkRun?.name) ??
     null
 
+  const workflowRunEvent = stringValue(workflowRun?.event)
+
   const githubStatus =
     stringValue(workflowRun?.status) ??
     stringValue(workflowJob?.status) ??
@@ -232,6 +234,7 @@ export const normalizeGithubReleaseWebhook = (params: {
     action: stringValue(payload.action),
     repositoryFullName: stringValue(repository?.full_name),
     workflowName,
+    workflowRunEvent,
     workflowRunId:
       numberValue(workflowRun?.id) ??
       numberValue(workflowJob?.run_id) ??
@@ -254,6 +257,7 @@ export const normalizeGithubReleaseWebhook = (params: {
       action: stringValue(payload.action),
       repositoryFullName: stringValue(repository?.full_name),
       workflowName,
+      workflowRunEvent,
       targetSha,
       githubStatus,
       githubConclusion

@@ -12,13 +12,13 @@ name: ICO Batch Worker Deploy
 #
 # This workflow watches the paths that affect ico-batch-worker behavior
 # and deploys automatically on every push to `develop`. Production deploys
-# on `main` are gated behind an environment with required reviewers.
+# are owned by `production-release.yml` via workflow_call; workflow_dispatch
+# remains available for audited break-glass.
 
 on:
   push:
     branches:
       - develop
-      - main
     paths:
       - 'services/ico-batch/**'
       - 'src/lib/ico-engine/**'
@@ -61,7 +61,7 @@ on:
 # docs/architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md §2.7
 concurrency:
   group: ico-batch-deploy-${{ github.ref }}
-  cancel-in-progress: ${{ (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production') || github.ref == 'refs/heads/main' }}
+  cancel-in-progress: ${{ (github.event_name == 'workflow_call' && inputs.environment == 'production') || (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production') }}
 
 permissions:
   contents: read
@@ -80,7 +80,7 @@ jobs:
           && inputs.environment
           || (github.event_name == 'workflow_dispatch'
               && github.event.inputs.environment
-              || (github.ref == 'refs/heads/main' && 'production' || 'staging'))
+              || 'staging')
       }}
 
     env:
@@ -90,7 +90,7 @@ jobs:
             && inputs.environment
             || (github.event_name == 'workflow_dispatch'
                 && github.event.inputs.environment
-                || (github.ref == 'refs/heads/main' && 'production' || 'staging'))
+                || 'staging')
         }}
       EXPECTED_SHA: >-
         ${{

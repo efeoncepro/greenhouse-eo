@@ -23,8 +23,13 @@ de drift:
   `/health`, `/contract` y watchdog `drift_count=0`.
 - `greenhouse_sync.release_manifests` sigue siendo SSoT append-only. No se
   corrige drift por SQL.
-- `push:main` y path filters de workers no cambian en esta task. Cualquier
-  cambio a orchestrator-only deploy requiere ADR/task separada.
+- **Delta posterior aprobado 2026-05-11:** el incidente de recovery
+  `42805d3e` demostró que los worker workflows por `push:main` competían con
+  `production-release.yml` y que un run directo de HubSpot cancelado podía
+  abortar el manifest canónico vía webhook. Desde este delta, production de
+  workers Cloud Run es **orchestrator-owned**: `push` queda solo para `develop`,
+  `workflow_call` es el camino normal de production y `workflow_dispatch`
+  queda como break-glass auditado.
 
 ## Delta 2026-05-10 — GitHub webhook ingestion V1.2 (TASK-857)
 
@@ -153,7 +158,10 @@ concurrency:
 
 Staging preserva `cancel-in-progress: false` (no disruption a in-flight QA).
 
-**V2 (follow-up conditional, TASK derivada)**: refactor a `workflow_call` orchestrator pattern. Workers conservan concurrency actual para path `push:develop`; orquestador `production-release.yml` invoca workers con concurrency group dedicado por release.
+**V2 (aceptado 2026-05-11)**: production worker deploys son
+orchestrator-only via `workflow_call`. Workers conservan `push:develop` para
+staging y `workflow_dispatch` para break-glass auditado; no despliegan
+production automaticamente por `push:main`.
 
 **Why kill bug class V1 + decouple V2**: GitHub Actions concurrency es black-box. Opcion A mata el deadlock determinista en su origen; Opcion B desacopla orchestrated path del directo. Son complementarios, no excluyentes.
 
@@ -471,7 +479,7 @@ Workflow canonico `.github/workflows/production-release.yml` que coordina la pro
 | CLI transition-state | `scripts/release/orchestrator-transition-state.ts` | Wrapper sobre `transitionReleaseState` con state machine guard |
 | State machine parity test live | `src/lib/release/state-machine.live.test.ts` | Verifica TS↔SQL CHECK constraint matchea, skipea sin DB |
 | Worker deploy.sh × 4 | `services/{ops-worker, commercial-cost-worker, ico-batch, hubspot_greenhouse_integration}/deploy.sh` | Aceptan EXPECTED_SHA + post-deploy verify GIT_SHA matches |
-| Worker workflows × 4 | `.github/workflows/{ops-worker, commercial-cost-worker, ico-batch, hubspot-greenhouse-integration}-deploy.yml` | workflow_call interface (environment + expected_sha + GCP_WIF secret) preservando push/dispatch existentes |
+| Worker workflows × 4 | `.github/workflows/{ops-worker, commercial-cost-worker, ico-batch, hubspot-greenhouse-integration}-deploy.yml` | workflow_call interface (environment + expected_sha + GCP_WIF secret); `push:develop` para staging; `workflow_dispatch` break-glass |
 | Tests anti-regresion concurrency | `src/lib/release/concurrency-fix-verification.test.ts` | 10 tests verifican cancel-in-progress production-only expression preserved + workflow_call contracts presentes |
 
 ### 5 decisiones foundational (4-pillar validadas)

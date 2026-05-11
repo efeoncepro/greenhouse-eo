@@ -40,6 +40,9 @@ If rollback, watchdog, Azure, Vercel, or HubSpot is involved, also read:
 
 - Never treat a push to `main` as a completed production release.
 - Never approve individual worker production gates as the normal path.
+- Never reintroduce worker production deploys on `push:main`; workers deploy to
+  production through the orchestrator `workflow_call` path, with
+  `workflow_dispatch` reserved for documented break-glass.
 - Never dispatch production without the canonical orchestrator unless the user explicitly declares break-glass and the reason is documented.
 - Never mutate `greenhouse_sync.release_manifests` by raw SQL. Use the canonical CLIs/helpers.
 - Never mark a release as `released` when post-release health soft-failed. It must be `degraded`.
@@ -59,6 +62,7 @@ The normal release path is:
 4. Promote the intended SHA to `main` through the repo-approved merge/push path.
    - The orchestrator expects `target_sha` to already exist on `main`.
    - Vercel production deploy is triggered by Git integration on push to `main`; the orchestrator waits for that deployment to be READY.
+   - Worker Cloud Run production deploys are not triggered by `push:main`; the orchestrator owns them through `workflow_call`.
 5. Immediately dispatch the canonical orchestrator for that exact SHA:
 
 ```bash
@@ -136,9 +140,9 @@ LIMIT 5;
    - push-triggered partial deploy
    - stale manifest
    - Cloud Run deployment failure
-4. Prefer forward-fix with the existing workflow for the single drifted service
-   only when the release SHA is already verified and the user approves the
-   external mutation.
+4. Prefer a fresh orchestrator attempt for the verified target SHA. Use a
+   single worker workflow dispatch only as break-glass when the orchestrator is
+   blocked and the user approves the external mutation.
    - For `hubspot-greenhouse-integration`, use:
 
 ```bash
