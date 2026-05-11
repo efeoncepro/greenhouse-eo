@@ -1657,11 +1657,11 @@ CLI `pnpm release:preflight` que ejecuta los **12 checks fail-fast** ANTES de pr
 | 4 | release_batch_policy | strict (split_batch \| requires_break_glass → error) | git diff local |
 | 5 | stale_approvals | strict (>=7d → error, >24h → warning) | GitHub API |
 | 6 | pending_without_jobs | strict (any → error, sintoma deadlock) | GitHub API |
-| 7 | vercel_readiness | degraded (Vercel outage no bloquea hard) | Vercel API |
+| 7 | vercel_readiness | degraded (warning; bloquea production normal via `readyToDeploy=false`) | Vercel API |
 | 8 | postgres_health | strict (pg:doctor fail → error) | subprocess pnpm |
 | 9 | postgres_migrations | strict (pending → error) | subprocess pnpm |
 | 10 | gcp_wif_subject | strict (drift → error) | gcloud CLI |
-| 11 | azure_wif_subject | degraded (Azure menos critico runtime) | az CLI |
+| 11 | azure_wif_subject | degraded (warning; bloquea production normal via `readyToDeploy=false`) | az CLI |
 | 12 | sentry_critical_issues | strict (>=10 → error, 1-9 → warning, API down → unknown bloquea) | Sentry API |
 
 **Check #4 release_batch_policy** (mas novel): clasifica diff `origin/main...target_sha` por dominio (`payroll`, `finance`, `auth_access`, `cloud_release`, `db_migrations`, `ui`, `docs`, `tests`, `config`, `unclassified`), detecta sensitive paths, computa irreversibility flags. Decision tree:
@@ -1687,7 +1687,7 @@ pnpm release:preflight --target-branch=develop
 
 # CI gate canonico (TASK-851 orchestrator)
 pnpm release:preflight --json --fail-on-error
-# exit 1 si overallStatus=blocked → workflow gate falla loud
+# exit 1 si readyToDeploy=false → degraded/unknown tambien frenan production
 
 # Break-glass operator
 pnpm release:preflight --override-batch-policy --fail-on-error

@@ -62,7 +62,7 @@ pnpm release:preflight                       # human output, todos los 12 checks
 pnpm release:preflight --json                # JSON machine-readable
 
 # CI gate (TASK-851 orchestrator workflow)
-pnpm release:preflight --json --fail-on-error   # exit 1 si overallStatus=blocked
+pnpm release:preflight --json --fail-on-error   # exit 1 si readyToDeploy=false
 
 # Break-glass (EFEONCE_ADMIN solo, requiere capability + audit)
 pnpm release:preflight --override-batch-policy --fail-on-error
@@ -74,7 +74,7 @@ Flags:
 - `--target-branch=<branch>` (default main)
 - `--json`, `--fail-on-error`, `--override-batch-policy`
 
-Output canonico: `ProductionPreflightV1` (versionado `contractVersion='production-preflight.v1'`). Operator decide en base a `readyToDeploy: SI | NO`.
+Output canonico: `ProductionPreflightV1` (versionado `contractVersion='production-preflight.v1'`). Operator decide en base a `readyToDeploy: SI | NO`; en modo `--fail-on-error`, cualquier `readyToDeploy=false` debe fallar el gate.
 
 Si por algun motivo el CLI no esta disponible (e.g. local sin checkout, o auth expirada), la tabla manual abajo sirve como fallback documental. **Cualquier check rojo bloquea el release.**
 

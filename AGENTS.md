@@ -778,7 +778,7 @@ Contrato versionado `platform-health.v1`. Permite a agentes (MCP, Teams bot, CI,
 - **CLI canonico**:
   - `pnpm release:preflight` → human output, exit 0 always
   - `pnpm release:preflight --json` → JSON only (machine-readable, contractVersion='production-preflight.v1')
-  - `pnpm release:preflight --fail-on-error` → exit 1 si overallStatus=blocked (CI gate canonico)
+  - `pnpm release:preflight --fail-on-error` → exit 1 si `readyToDeploy=false` (CI/orchestrator gate canonico; degraded/unknown no promueve)
   - `pnpm release:preflight --override-batch-policy` → downgrade release_batch_policy errors a warnings (requiere `platform.release.preflight.override_batch_policy` capability + audit row reason >= 20 chars)
   - `pnpm release:preflight --target-sha=<sha>` → SHA explicito (default git HEAD)
   - `pnpm release:preflight --target-branch=<branch>` → branch a promover (default main)

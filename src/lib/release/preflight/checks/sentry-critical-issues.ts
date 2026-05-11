@@ -1,8 +1,8 @@
 /**
  * TASK-850 — Preflight check #12: Sentry unresolved critical issues (24h).
  *
- * Queries Sentry API for unresolved level=error issues in the project
- * within the last 24h. Threshold ladder:
+ * Queries Sentry API for unresolved level=error issues in the project whose
+ * last occurrence happened within the last 24h. Threshold ladder:
  *   - 0 issues → ok
  *   - 1-9 issues → warning (visible to operator, doesn't block)
  *   - 10+ issues → error (block — production already in fire mode)
@@ -16,6 +16,7 @@ import 'server-only'
 
 import { captureWithDomain } from '@/lib/observability/capture'
 import { redactErrorForResponse } from '@/lib/observability/redact'
+import { resolveSecret } from '@/lib/secrets/secret-manager'
 
 import type { PreflightCheckResult } from '../types'
 import type { PreflightInput } from '../runner'
@@ -41,7 +42,7 @@ const fetchSentryIssues = async (
   orgSlug: string,
   projectSlug: string
 ): Promise<readonly SentryIssue[]> => {
-  const query = encodeURIComponent('is:unresolved level:[error,fatal]')
+  const query = encodeURIComponent('is:unresolved level:[error,fatal] lastSeen:-24h')
   const url = `${SENTRY_API_BASE}/api/0/projects/${encodeURIComponent(orgSlug)}/${encodeURIComponent(projectSlug)}/issues/?query=${query}&statsPeriod=24h&limit=100`
 
   const controller = new AbortController()
@@ -70,9 +71,17 @@ export const checkSentryCriticalIssues = async (
   const observedAtStart = Date.now()
   const observedAt = new Date().toISOString()
 
-  const token = process.env.SENTRY_AUTH_TOKEN ?? null
-  const orgSlug = process.env.SENTRY_ORG_SLUG ?? 'efeonce'
-  const projectSlug = process.env.SENTRY_PROJECT_SLUG ?? 'greenhouse-eo'
+  const incidentsTokenResolution = await resolveSecret({
+    envVarName: 'SENTRY_INCIDENTS_AUTH_TOKEN'
+  })
+
+  const token =
+    incidentsTokenResolution.value?.trim() ||
+    process.env.SENTRY_AUTH_TOKEN?.trim() ||
+    null
+
+  const orgSlug = process.env.SENTRY_ORG_SLUG ?? process.env.SENTRY_ORG ?? 'efeonce'
+  const projectSlug = process.env.SENTRY_PROJECT_SLUG ?? process.env.SENTRY_PROJECT ?? 'greenhouse-eo'
 
   if (!token) {
     return {
@@ -81,10 +90,11 @@ export const checkSentryCriticalIssues = async (
       status: 'not_configured',
       observedAt,
       durationMs: Date.now() - observedAtStart,
-      summary: 'SENTRY_AUTH_TOKEN no configurado',
+      summary: 'SENTRY_INCIDENTS_AUTH_TOKEN/SENTRY_AUTH_TOKEN no configurado',
       error: null,
       evidence: { orgSlug, projectSlug },
-      recommendation: 'Configurar SENTRY_AUTH_TOKEN local o en CI runner.'
+      recommendation:
+        'Configurar SENTRY_INCIDENTS_AUTH_TOKEN_SECRET_REF o SENTRY_AUTH_TOKEN local/CI antes de promover.'
     }
   }
 

@@ -24,7 +24,12 @@ import type { PreflightInput } from '../runner'
 const execFileAsync = promisify(execFile)
 const AZ_TIMEOUT_MS = 10_000
 
-const AZ_APP_ID = process.env.AZURE_GITHUB_ACTIONS_APP_ID ?? null
+const AZ_APP_ID =
+  process.env.AZURE_GITHUB_ACTIONS_APP_ID ??
+  process.env.AZURE_CLIENT_ID ??
+  process.env.AZURE_AD_CLIENT_ID ??
+  null
+
 const REPO_PATH = 'efeoncepro/greenhouse-eo'
 
 interface AzFederatedCredential {

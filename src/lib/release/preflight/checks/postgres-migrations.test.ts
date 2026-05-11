@@ -17,6 +17,13 @@ describe('parsePgConnectStatusOutput', () => {
     })
   })
 
+  it('verdict ok con output real de node-pg-migrate dry-run sin pendientes', () => {
+    expect(parsePgConnectStatusOutput('dry run\nNo migrations to run!\nMigrations complete!\n')).toEqual({
+      verdict: 'ok',
+      pendingCount: 0
+    })
+  })
+
   it('verdict pending cuando hay N pending', () => {
     expect(parsePgConnectStatusOutput('3 migrations pending. Run pnpm pg:connect:migrate.')).toEqual(
       { verdict: 'pending', pendingCount: 3 }
