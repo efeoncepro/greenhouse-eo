@@ -1,10 +1,29 @@
 # Finiquitos Chile
 
 > **Tipo de documento:** Documentacion funcional
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-05-04 por Codex
-> **Ultima actualizacion:** 2026-05-11 por Claude (TASK-862 — V1 closing)
+> **Ultima actualizacion:** 2026-05-11 por Claude (TASK-863 — UI completa para pre-requisitos)
 > **Documentacion tecnica:** [GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md) · [GREENHOUSE_FINAL_SETTLEMENT_V1_SPEC.md](../../architecture/GREENHOUSE_FINAL_SETTLEMENT_V1_SPEC.md)
+
+## Delta TASK-863 (2026-05-11) — UI completa para pre-requisitos
+
+Los 2 pre-requisitos del finiquito de renuncia (`resignation_letter_uploaded` + `maintenance_obligation_declared`) ahora viven canonicamente en la UI de `HrOffboardingView`. Antes eran solo endpoints HTTP — el operador HR debia llamarlos via DevTools. Cierra el contrato "UI runtime cubre los happy paths del modulo".
+
+Surfaces nuevas en la columna **Finiquito laboral** de la tabla de casos (`/hr/offboarding`):
+
+- 2 chips de estado por caso `resignation`: carta de renuncia (verde/rojo) + pension alimentos (verde Alt A / ambar Alt B con monto / rojo si pendiente).
+- 2 botones que abren dialogs modales:
+  - **Subir carta de renuncia** — `GreenhouseFileUploader` (PDF/JPG/PNG/WEBP max 10 MB) → POST `/api/hr/offboarding/cases/[caseId]/resignation-letter` con `{ assetId }`.
+  - **Declarar pension alimentos** — RadioGroup Alt A/B + validation cliente Alt B (amount > 0 + beneficiary required) + evidence asset opcional → POST `/api/hr/offboarding/cases/[caseId]/maintenance-obligation` con shape canonico.
+- Boton **Calcular** gated client-side: `disabled` con `Tooltip` explicativo cuando algun pre-requisito falta. Backend sigue rechazando con 409 readiness blocked (defense in depth).
+
+Asset catalog extendido (TASK-863 Slice 0):
+
+- Nuevos contexts: `resignation_letter_ratified_draft` (uploader-visible) + `resignation_letter_ratified` (attached state). Retention class `final_settlement_document`. Bucket prefix `resignation-letters`. `canUploadForContext`: HR route_group + EFEONCE_ADMIN (no member-only).
+- Reuso de `evidence_draft` para evidencia opcional RNDA en maintenance obligation.
+
+NO se tocaron endpoints backend (TASK-862 Slice C ya los canonizaba). NO se agregaron outbox events (los 2 endpoints ya escriben `resignation_letter_linked` + `maintenance_obligation_declared` en `work_relationship_offboarding_case_events`).
 
 ## Delta TASK-862 (2026-05-11) — V1 closing
 

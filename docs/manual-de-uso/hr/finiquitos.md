@@ -1,12 +1,28 @@
 # Finiquitos Chile
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-05-04 por Codex
-> **Ultima actualizacion:** 2026-05-11 por Claude (TASK-862 — V1 closing)
+> **Ultima actualizacion:** 2026-05-11 por Claude (TASK-863 — UI completa para pre-requisitos)
 > **Modulo:** HR / Payroll
 > **Ruta en portal:** `/hr/offboarding`
 > **Documentacion relacionada:** [Finiquitos Chile](../../documentation/hr/finiquitos.md), [GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md), [GREENHOUSE_FINAL_SETTLEMENT_V1_SPEC.md](../../architecture/GREENHOUSE_FINAL_SETTLEMENT_V1_SPEC.md)
+
+## Delta TASK-863 (2026-05-11) — UI completa para pre-requisitos
+
+Los 2 pre-requisitos del finiquito de renuncia ahora tienen UI dedicada en la fila del caso — ya **no** necesitas usar DevTools ni scripts auxiliares.
+
+En la columna **Finiquito laboral**, cada caso `resignation` muestra:
+
+- **2 chips de estado** en tiempo real:
+  - Carta de renuncia: chip verde `Carta subida` cuando esta vinculada, chip rojo `Carta faltante` cuando no.
+  - Pension de alimentos: chip verde `Pension: No afecto` (Alt A), chip ambar `Pension: Afecto $X.XXX` (Alt B con monto), o chip rojo `Pension pendiente`.
+- **2 botones** que abren dialogs modales:
+  - **Subir carta de renuncia** / **Reemplazar carta** — abre un dialog con uploader de PDF/JPG/PNG/WEBP (max 10 MB). Al guardar, el asset queda vinculado al caso y el chip pasa a verde.
+  - **Declarar pension alimentos** / **Editar pension alimentos** — abre un dialog con radio Alt A/B. Alt B exige monto > 0 + beneficiario obligatorios; evidencia (certificado RNDA u otro respaldo) es opcional.
+- **Boton "Calcular" gated**: queda deshabilitado con tooltip `Sube la carta de renuncia y declara la pension de alimentos antes de calcular.` mientras falte algun pre-requisito. Defense in depth: el backend tambien bloquea con `readiness blocked` si llamas el endpoint directo.
+
+Idempotencia preservada (TASK-862 Slice C): subir una carta distinta o reeditar la pension sobreescribe y queda registrado en audit log.
 
 ## Delta TASK-862 (2026-05-11) — flujo nuevo end-to-end
 
@@ -43,16 +59,19 @@ El motor de finiquitos calcula y guarda el cierre final de una renuncia Chile de
 
 1. Abre el caso en `HR > Offboarding`.
 2. Confirma causal `resignation`, fecha efectiva y ultimo dia trabajado.
-3. Ejecuta el calculo de final settlement.
-4. Revisa el breakdown de haberes, vacaciones, descuentos y neto.
-5. Revisa readiness: blockers detienen el flujo; warnings requieren criterio HR/legal.
-6. Si esta correcto, aprueba el settlement.
-7. En el carril `Finiquito`, renderiza el documento.
-8. Abre el PDF y valida que cada monto relevante tenga respaldo suficiente. En `Feriado proporcional`, confirma que aparezcan dias habiles a indemnizar, dias corridos compensados, base diaria y formula del monto.
-9. Envia el documento a revision.
-10. Aprueba el documento.
-11. Emite el documento y descarga el PDF privado.
-12. Cuando exista evidencia externa, registra firma/ratificacion. Si la persona firma con reserva de derechos, marca la reserva y deja nota.
+3. **Sube la carta de renuncia ratificada**: click en `Subir carta de renuncia` en la columna Finiquito laboral. Adjunta el PDF/escaneo y confirma.
+4. **Declara la pension de alimentos**: click en `Declarar pension alimentos`. Selecciona Alt A (no afecto) o Alt B (afecto + monto + beneficiario obligatorios). Adjunta certificado RNDA opcional.
+5. Verifica que ambos chips de pre-requisitos esten en verde antes de continuar.
+6. Ejecuta el calculo de final settlement.
+7. Revisa el breakdown de haberes, vacaciones, descuentos y neto.
+8. Revisa readiness: blockers detienen el flujo; warnings requieren criterio HR/legal.
+9. Si esta correcto, aprueba el settlement.
+10. En el carril `Finiquito`, renderiza el documento.
+11. Abre el PDF y valida que cada monto relevante tenga respaldo suficiente. En `Feriado proporcional`, confirma que aparezcan dias habiles a indemnizar, dias corridos compensados, base diaria y formula del monto.
+12. Envia el documento a revision.
+13. Aprueba el documento.
+14. Emite el documento y descarga el PDF privado.
+15. Cuando exista evidencia externa, registra firma/ratificacion. Si la persona firma con reserva de derechos, marca la reserva y deja nota.
 
 Si un caso ya aparece como `Ejecutado` pero no tiene finiquito, no desaparece de `/hr/offboarding`: usa `Calcular` en el carril `Finiquito` para recuperar el settlement desde las fechas canonicas del caso. Esta recuperacion existe para corregir cierres incompletos; el flujo normal debe aprobar settlement y emitir documento antes de ejecutar la salida.
 
