@@ -1,5 +1,33 @@
 # TASK-863 — Finiquito Prerequisites UI: Carta Renuncia Uploader + Ley 21.389 Form en HrOffboardingView
 
+## Delta 2026-05-11 V1.5.2 — Lifecycle PDF defense-in-depth (regen canónico en TODAS las transiciones)
+
+**Trigger:** usuario detectó en re-emisión real (Valentina Hoyos settlement v2 d15) que el PDF aprobado seguía mostrando "Borrador HR" + watermark "PROYECTO". Diagnóstico: solo `issued` + `signed_or_ratified` regeneraban el PDF; las 5 transitions restantes (`in_review`, `approved`, `voided`, `rejected`, `superseded`) dejaban el PDF stale vs DB.
+
+**Decisión arquitectónica:** rechazar parche puntual y aplicar solución defense-in-depth de 5 capas siguiendo patterns canónicos del repo (TASK-774 reliability signal + TASK-742 captureWithDomain + TASK-863 V1.1 helper).
+
+**5 capas implementadas:**
+
+1. **Helper canónico extendido:** `regenerateDocumentPdfForStatus` con type union cerrado `DocumentStatusForRegen = 'in_review' | 'approved' | 'issued' | 'signed_or_ratified' | 'voided' | 'rejected' | 'superseded'`. Las 7 transiciones del state machine ahora lo invocan en la misma tx PG que el UPDATE.
+2. **Asset metadata canónica:** cada regen persiste `metadata_json.documentStatusAtRender = newStatus` en `greenhouse_core.assets`. Initial draft creation también persiste con `'rendered'`.
+3. **Observability:** `captureWithDomain('payroll', err, { tags: { source: 'final_settlement_pdf_regen', stage }, extra })` reemplaza `console.warn` raw.
+4. **Reliability signal nuevo:** `payroll.final_settlement_document.pdf_status_drift` ([src/lib/reliability/queries/final-settlement-pdf-status-drift.ts](../../../src/lib/reliability/queries/final-settlement-pdf-status-drift.ts)). Detecta drift entre DB y asset metadata. Kind=drift, warning si count>0, error si drift>24h. Wireup en `getReliabilityOverview.finalSettlementPdfStatusDrift`. Steady=0.
+5. **Test anti-regresión:** `document-status-regen-invariant.test.ts` parsea source y enforce que TODA `SET document_status = 'X'` (excepto `rendered`) tiene call matchedo a helper. 9/9 verde. Rompe build si emerge transition nueva sin regen.
+
+**Failure mode canónico (degradación honesta):** si render falla, transition de DB ya commiteó (estado legal source of truth, NO bloquea por render) + Sentry alerta via captureWithDomain + reliability signal detecta drift hasta reissue (path explícito de recovery).
+
+**Hard rules canonizadas:** sección nueva "Final Settlement Document Lifecycle invariants" en CLAUDE.md con matriz canónica watermark/badge per status + 7 reglas duras.
+
+**ADR registrado:** "Finiquito PDF lifecycle invariant: regen canónico en TODAS las transiciones + defense-in-depth" en `DECISIONS_INDEX.md`.
+
+**Tests verde:** 12/12 en `src/lib/payroll/final-settlement` (3 archivos: document-pdf 2, calculator 1, regen-invariant 9). `pnpm tsc --noEmit` clean.
+
+**Aprendizaje meta:** el bug emergió EXACTAMENTE en el paso 4-5 del Real-Artifact Iterative Verification Loop V1 canonizado hoy (operador descargó artefacto real → screenshot al agente → análisis de bug class). Demuestra ROI inmediato de la metodología.
+
+**Recovery histórico:** docs pre-V1.5.2 con `metadata.documentStatusAtRender` NULL aparecen en el signal hasta que operador haga reissue (idempotente, audit trail preserved). NO requiere backfill masivo.
+
+---
+
 ## Delta 2026-05-11 V1.1-V1.5.1 — Hardening enterprise post-primer emisión real
 
 Primer emisión real del finiquito (Valentina Hoyos, `EO-OFF-2026-45EC8688`) detectó múltiples hallazgos visuales y legales. 5 rondas iterativas de fixes cerraron 12 hallazgos visuales + 5 bloqueantes legales detectados por comprehensive audit enterprise (3 skills: `greenhouse-payroll-auditor` + UX writing es-CL formal-legal + `modern-ui`). Hotfix V1.5.1 cerró invariante de columnas en Partes comparecientes.

@@ -1,3 +1,24 @@
+# Sesion 2026-05-11 — TASK-863 V1.5.2 — Lifecycle PDF defense-in-depth (regen canónico en TODAS las transiciones)
+
+- **Trigger:** usuario detectó en re-emisión real (Valentina Hoyos settlement v2 d15) que el PDF aprobado seguía mostrando "Borrador HR" + watermark "PROYECTO". Diagnóstico: solo `issued` + `signed_or_ratified` regeneraban; las 5 transitions restantes (`in_review`, `approved`, `voided`, `rejected`, `superseded`) dejaban el PDF stale respecto al `document_status` actual de DB. Bug class más amplio que el síntoma puntual.
+- **Decisión arquitectónica:** rechazar parche puntual; aplicar solución defense-in-depth de 5 capas siguiendo patterns canónicos del repo (TASK-774 reliability signal pattern + TASK-742 `captureWithDomain` + TASK-863 V1.1 helper).
+- **Branch:** `develop` directo (instrucción permanente del usuario).
+- **5 capas implementadas:**
+  1. **Helper canónico extendido:** `regenerateDocumentPdfForStatus` ahora acepta set cerrado `DocumentStatusForRegen = 'in_review' | 'approved' | 'issued' | 'signed_or_ratified' | 'voided' | 'rejected' | 'superseded'`. Las 7 transiciones del state machine lo invocan en la misma tx PG que el UPDATE.
+  2. **Asset metadata canónica:** cada regen persiste `metadata_json.documentStatusAtRender = newStatus` en `greenhouse_core.assets`. Initial draft creation también persiste con `'rendered'`.
+  3. **Observability:** `captureWithDomain('payroll', err, { tags: { source: 'final_settlement_pdf_regen', stage: newStatus }, extra: {...} })` reemplaza `console.warn` raw en path de regen failure.
+  4. **Reliability signal nuevo:** `payroll.final_settlement_document.pdf_status_drift` en `src/lib/reliability/queries/final-settlement-pdf-status-drift.ts`. Detecta `document_status != asset.metadata_json->>'documentStatusAtRender'`. Kind drift, warning si count>0, error si drift>24h. Wireup en `getReliabilityOverview.finalSettlementPdfStatusDrift` (preloaded sources type + builder).
+  5. **Test anti-regresión:** `document-status-regen-invariant.test.ts` parsea el source y enforce que TODA `SET document_status = 'X'` (excepto `rendered`) tiene call matchedo a helper. 9/9 tests verde. Rompe build si un agente futuro agrega transition sin regen.
+- **Failure mode canónico (degradación honesta):** si el render falla (e.g. RAM exhausted, fuente caída), la transition de DB ya commiteó (estado legal = source of truth, NO se bloquea por render). Error reportado a Sentry. Reliability signal alerta drift hasta que operador haga reissue (path explícito de recovery).
+- **Hard rules canonizadas en CLAUDE.md** sección "Final Settlement Document Lifecycle invariants (TASK-863 V1.5.2)": matriz watermark/badge per status, 7 reglas duras + helpers canónicos + spec asociada.
+- **ADR registrado:** "Finiquito PDF lifecycle invariant: regen canónico en TODAS las transiciones + defense-in-depth" en `DECISIONS_INDEX.md`.
+- **Spec Delta V1.5.2:** `docs/architecture/GREENHOUSE_FINAL_SETTLEMENT_V1_SPEC.md` con detalle de 5 capas + verificación end-to-end + recovery path para drift histórico.
+- **Validación:** `pnpm tsc --noEmit` clean. `pnpm test src/lib/payroll/final-settlement src/lib/reliability/queries/final-settlement-pdf-status-drift` → 12/12 verde + 9 nuevos del invariante.
+- **Aplicación del Real-Artifact Verification Loop V1 (metodología canonizada hoy):** el bug emergió EXACTAMENTE en el paso 4-5 del loop (operador descargó artefacto real → screenshot mostrado al agente → análisis de bug class). Demuestra ROI inmediato de la metodología.
+- **Recovery para drift histórico:** docs pre-V1.5.2 con `metadata.documentStatusAtRender` NULL aparecen en el signal hasta que operador haga reissue. NO requiere backfill masivo.
+
+---
+
 # Sesion 2026-05-11 — TASK-863 V1.1-V1.5.1 hardening + Legal Signatures Platform canónica
 
 - **Trigger:** primer emisión real del finiquito de Valentina Hoyos detectó múltiples hallazgos visuales y legales. Loop iterativo cerró 5 rondas de fixes (V1.1 → V1.5) + comprehensive audit enterprise por 3 skills (payroll-auditor + UX writing es-CL formal-legal + modern-ui), seguido de hotfix UI V1.5.1 sobre invariante de columnas Partes.

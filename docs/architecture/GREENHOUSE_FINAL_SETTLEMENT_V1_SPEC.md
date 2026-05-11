@@ -272,3 +272,41 @@ PDF V1.5 emitido en staging (Valentina Hoyos, settlement v2 d12, asset `asset-ec
 - ✅ CUARTO cita art. 13 Ley 14.908.
 - ✅ Las 3 líneas de firma alineadas al mismo Y absoluto.
 - ✅ Title 20pt domina; KPI 14pt sutil.
+
+## Delta 2026-05-11 V1.5.2 — Lifecycle PDF defense-in-depth (regen canónico en TODAS las transiciones)
+
+**Trigger**: bug detectado por usuario en re-emisión real (Valentina Hoyos, settlement v2 d15) — operador aprobó el documento pero al descargar el asset persistido seguía mostrando "Borrador HR" + watermark "PROYECTO". Root cause: `regenerateDocumentPdfForStatus` solo se invocaba en transitions `issued` y `signed_or_ratified`; las 5 restantes (`in_review`, `approved`, `voided`, `rejected`, `superseded`) dejaban el PDF stale respecto al estado actual de DB.
+
+**Bug class más amplio** que el síntoma puntual: source-of-truth divergence entre `final_settlement_documents.document_status` (DB) y el render baked-in del asset (`metadata_json.documentStatusAtRender`). Sin invariante explícito, cualquier transición nueva agregada al state machine sin recordar llamar al helper reintroduce el bug.
+
+**Solución defense-in-depth (5 capas)**:
+
+1. **Helper canónico extendido** — `regenerateDocumentPdfForStatus` ahora acepta el set canónico cerrado `'in_review' | 'approved' | 'issued' | 'signed_or_ratified' | 'voided' | 'rejected' | 'superseded'`. Las 7 transiciones del state machine ahora lo invocan dentro de la misma tx PG que el UPDATE.
+2. **Asset metadata canónica** — cada regen persiste `metadata_json.documentStatusAtRender = newStatus` en `greenhouse_core.assets`. Initial draft creation también persiste con `'rendered'`.
+3. **Observability vía `captureWithDomain('payroll', ...)`** — reemplaza `console.warn` raw del path de regen failure. Tags `source: 'final_settlement_pdf_regen'` + `stage: newStatus` para Sentry rollup canónico bajo subsystem `Payroll`.
+4. **Reliability signal nuevo** — `payroll.final_settlement_document.pdf_status_drift` ([src/lib/reliability/queries/final-settlement-pdf-status-drift.ts](../../../src/lib/reliability/queries/final-settlement-pdf-status-drift.ts)) detecta `document_status != asset.metadata_json->>'documentStatusAtRender'`. Kind `drift`, severity warning si count>0, error si drift>24h. Wire-up en `getReliabilityOverview` source `finalSettlementPdfStatusDrift`. Steady=0.
+5. **Test anti-regresión** — `document-status-regen-invariant.test.ts` parsea el source y verifica que TODA `SET document_status = 'X'` (excepto `rendered`) tiene un call matchedo a `regenerateDocumentPdfForStatus(client, ..., 'X', ...)`. 9 tests verde. Rompe build si un agente futuro agrega transition sin regen.
+
+**Failure mode canónico (degradación honesta)**:
+
+Si el render del PDF falla (e.g. RAM exhausted, fuente externa caída, snapshot corrupto), la transition de estado en DB **ya commiteó** — el estado legal es source of truth y NO se bloquea por un fallo de render. El error se reporta a Sentry via `captureWithDomain` con tags suficientes para diagnóstico. El reliability signal alertará drift hasta que el operador haga reissue (path explícito de recovery) o un reactive consumer regenere async (futuro V1.5.3 si emerge necesidad).
+
+**Hard rules canonizadas** en [CLAUDE.md](../../../CLAUDE.md#final-settlement-document-lifecycle-invariants-task-863-v152):
+
+- NUNCA UPDATE document_status sin call al helper en la misma tx.
+- NUNCA Sentry.captureException directo en regen path (usar captureWithDomain).
+- NUNCA persistir PDF sin metadata.documentStatusAtRender.
+- NUNCA bloquear transition si render falla.
+- NUNCA agregar transition nueva al state machine sin extender (a) type union, (b) helper call, (c) matriz watermark/badge, (d) test anti-regresión.
+- NUNCA modificar la key `documentStatusAtRender` sin actualizar paralelamente reader del signal + test.
+- SIEMPRE preservar `pdf_asset_id` previo cuando regen retorna null (pattern `regenerated ? {...document, pdfAssetId, contentHash} : document`).
+
+**Verificación V1.5.2 end-to-end**:
+
+- ✅ 12 tests verde en `src/lib/payroll/final-settlement` (incluye 9 nuevos del invariante).
+- ✅ `pnpm tsc --noEmit` clean.
+- ✅ Helper canónico invocado en las 7 transiciones del state machine (verified via grep + test anti-regresión).
+- ✅ Reliability signal wirea bajo `getReliabilityOverview.finalSettlementPdfStatusDrift`.
+- ✅ Operador re-aprueba el doc → próximo download muestra badge "Aprobado · pendiente de emisión" (no más "Borrador HR").
+
+**Recovery path para drift histórico**: documentos pre-V1.5.2 con `metadata.documentStatusAtRender` NULL aparecen en el reliability signal hasta que el operador haga reissue. NO se requiere backfill masivo — el reissue manual es suficiente y preserva audit trail.
