@@ -1,3 +1,17 @@
+# Sesion 2026-05-11 — TASK-864/TASK-865 abiertas + watchdog drift diagnosticado
+
+- **Trigger:** usuario pidio crear la task para hacer que el preflight/release quede siempre bien y luego reporto email de GitHub: `Production Release Watchdog - main` fallando en run `25687679157`.
+- **Skills invocadas:** `greenhouse-task-planner`, `greenhouse-production-release`, `software-architect-2026`.
+- **Tasks creadas:**
+  - `TASK-864 — Production Readiness Control Plane Contract`: separa `release:doctor` (salud del control plane: GitHub/Vercel/GCP/Azure/Sentry/Postgres) de `release:preflight` (salud del SHA producto). Objetivo: que produccion no dependa de tokens locales, reruns manuales o observabilidad parcial.
+  - `TASK-865 — Production Worker Environment Isolation`: causa raiz del watchdog actual. Los workflows de workers por `push:develop` dicen desplegar staging, pero los deploy scripts usan los mismos Cloud Run service names productivos (`ops-worker`, `commercial-cost-worker`, `ico-batch-worker`, `hubspot-greenhouse-integration`). Eso puede pisar `GIT_SHA` de production sin pasar por `production-release.yml` ni actualizar `release_manifests`.
+- **Watchdog run investigado:** `25687679157` (`schedule`, `main`, head `644120d455c04a103c465993fdb1bc571cc30df3`) fallo solo por `platform.release.worker_revision_drift`. `stale_approval=ok`, `pending_without_jobs=ok`, `teamsDispatched=false` por dedup.
+- **Manifest SSoT verificado:** ultimo `released` en `greenhouse_sync.release_manifests` es `4591bd8b28c8a18eb0aa15cfc8e092eeec814467` (`release_id=4591bd8b28c8-59a904d6-a13c-4769-ab0f-f64813ecff27`, `started_at=2026-05-11T12:46:25.525Z`, `completed_at=2026-05-11T12:47:05.697Z`). Los intentos posteriores para `42805d3e...` quedaron `aborted`. El orquestador para `644120d...` (`25687062359`) fallo en preflight antes de mutar manifests/deploys.
+- **Cloud Run observado:** `ops-worker` y `commercial-cost-worker` servian `GIT_SHA=0f003e5971c7...` (commit `docs(TASK-862): remove production flag gate + open TASK-863 prerequisites UI`, push a `develop`); `ico-batch-worker` servia `42805d3e...`; `hubspot-greenhouse-integration` servia `df15cccb1d60...`.
+- **Causa raiz:** no es runtime HubSpot ni lógica de negocio. Es aislamiento de deploy: staging/develop workflows pueden mutar production Cloud Run services porque no existen service names staging separados o guard loud que lo impida.
+- **Cuidado:** no se ejecutaron deploys, approvals, rollback ni mutaciones DB para reparar. Solo lectura GitHub/Cloud Run/Postgres + tareas/documentación.
+- **Siguiente paso recomendado:** implementar TASK-865 antes de intentar otro release productivo; luego TASK-864 para separar doctor/preflight y reducir ambigüedad operativa. No hacer dispatch manual de un worker aislado como solución normal; si hay urgencia, break-glass debe ser explícito y probablemente coordinar los 4 workers contra el mismo `target_sha`, no solo HubSpot.
+
 # Sesion 2026-05-11 — TASK-862 gate removido + TASK-863 abierta (prerequisites UI follow-up)
 
 - **Trigger:** usuario invocó "No no lo necesito en false, déjalo todo listo y ok y haz la task para los pre-requisitos" tras consultar dónde generar el finiquito de Valentina Hoyos y detectar que los 2 pre-requisitos (carta renuncia + Ley 21.389) viven sólo como endpoints sin UI dedicada.
