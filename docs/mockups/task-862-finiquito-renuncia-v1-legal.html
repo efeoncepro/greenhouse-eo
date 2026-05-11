@@ -1,0 +1,1520 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="UTF-8">
+<title>TASK-862 — Mockup finiquito renuncia voluntaria V1 (v2 strict-expansion)</title>
+<!--
+  v2 — 2026-05-11 — Re-baselined como STRICT EXPANSION del document-pdf.tsx actual.
+  Cambios vs v1:
+    - Restauradas 4 regresiones: facts grid "Relación y causal", Totals 3-column box,
+      Warnings condicional, Constancia statement.
+    - Fix blocker: removido font-family:monospace en doc-number user-facing (ahora tabular-nums).
+    - Fix watermark color: warning tonal (no error red).
+    - Fix status pill semantic: "Pendiente de ratificación" mientras ratification=null.
+    - Huella reducida 56→40 mm.
+    - Multi-estado: 4 estados canónicos visibles (bloqueado / revisión / pendiente / ratificado).
+    - Typography: Geist (body) + Poppins (display) — canon DESIGN.md líneas 380+384.
+      DM Sans está deprecated. El document-pdf.tsx actual aún usa DM Sans (drift);
+      Slice D lo migra a Geist como parte del rewrite.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;700&family=Poppins:wght@500;600;700&family=Caveat:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* ───── Tokens (1:1 con document-pdf.tsx) ───── */
+  :root {
+    --brand-blue: #023C70;
+    --brand-blue-soft: #102A43;
+    --brand-blue-deep: #035A9E;
+    --brand-border: #D7E2EA;
+    --border-light: #E3E8EF;
+    --border-mid: #C9D6E2;
+    --text-primary: #1A1A2E;
+    --text-strong: #233142;
+    --text-secondary: #344054;
+    --text-muted: #526173;
+    --text-faint: #667085;
+    --neutral-bg: #F8FAFC;
+
+    --info-bg: #EAF4FF;
+    --info-border: #0375DB;
+    --info-text: #035A9E;
+    --info-soft: #F5FBFF;
+
+    --success-bg: #EAF7EF;
+    --success-border: #B8E6C9;
+    --success-text: #137A45;
+
+    --warning-bg: #FFF7E8;
+    --warning-border: #F79009;
+    --warning-text: #9A5A00;
+    --warning-soft: #FFFBEA;
+
+    --error-bg: #FFF2F2;
+    --error-border: #F1B8B8;
+    --error-text: #A32929;
+
+    /* Watermark tonals (no error red) */
+    --watermark-warning: rgba(247, 144, 9, 0.10);
+    --watermark-error: rgba(187, 25, 84, 0.10);
+    --watermark-neutral: rgba(102, 112, 133, 0.08);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    padding: 32px 16px 64px;
+    font-family: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #eef1f5;
+    color: var(--text-primary);
+    line-height: 1.45;
+    font-size: 14px;
+  }
+
+  /* ───── Legend (capa de documentación del mockup) ───── */
+  .legend {
+    max-width: 1200px;
+    margin: 0 auto 24px;
+    padding: 20px 28px;
+    background: #fff;
+    border-radius: 10px;
+    border: 1px solid var(--border-light);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+  }
+
+  .legend h1 {
+    margin: 0 0 6px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 20px;
+    color: var(--brand-blue);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  .legend .lead {
+    margin: 0 0 14px;
+    color: var(--text-secondary);
+    font-size: 14px;
+  }
+
+  .legend dl {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 6px 16px;
+    margin: 0 0 14px;
+    font-size: 13px;
+  }
+
+  .legend dt { color: var(--text-faint); font-weight: 500; }
+  .legend dd { margin: 0; color: var(--text-secondary); }
+
+  .legend code {
+    /* Capa de documentación del mockup — monospace permitido aquí, NO en el documento mismo */
+    background: #f1f4f8;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+    color: var(--brand-blue);
+  }
+
+  /* ───── State matrix strip (4 estados canónicos) ───── */
+  .state-matrix {
+    max-width: 1200px;
+    margin: 0 auto 32px;
+    background: #fff;
+    border-radius: 10px;
+    border: 1px solid var(--border-light);
+    overflow: hidden;
+  }
+
+  .state-matrix h3 {
+    margin: 0;
+    padding: 16px 24px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--brand-blue);
+    border-bottom: 1px solid var(--border-light);
+    background: var(--neutral-bg);
+  }
+
+  .state-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0;
+  }
+
+  .state-card {
+    padding: 18px 20px;
+    border-right: 1px solid var(--border-light);
+    position: relative;
+    min-height: 200px;
+    overflow: hidden;
+  }
+
+  .state-card:last-child { border-right: none; }
+
+  .state-card .state-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-faint);
+    margin-bottom: 8px;
+  }
+
+  .state-card .state-pill {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+
+  .state-card .state-mini-doc {
+    border: 1px solid var(--border-light);
+    border-radius: 4px;
+    padding: 14px 12px;
+    background: #fff;
+    position: relative;
+    overflow: hidden;
+    min-height: 84px;
+  }
+
+  .state-card .state-mini-doc .mini-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--brand-blue-soft);
+    margin-bottom: 4px;
+  }
+
+  .state-card .state-mini-doc .mini-line {
+    height: 4px;
+    background: var(--border-light);
+    border-radius: 2px;
+    margin-bottom: 4px;
+  }
+
+  .state-card .state-mini-doc .mini-line.s { width: 60%; }
+  .state-card .state-mini-doc .mini-line.m { width: 85%; }
+  .state-card .state-mini-doc .mini-line.l { width: 100%; }
+
+  .state-card .state-mini-watermark {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%) rotate(-22deg);
+    font-family: 'Poppins', sans-serif;
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+
+  .state-card .state-note {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 10px;
+    line-height: 1.45;
+  }
+
+  .pill-error    { background: var(--error-bg);   color: var(--error-text);   border: 1px solid var(--error-border); }
+  .pill-warning  { background: var(--warning-bg); color: var(--warning-text); border: 1px solid #F3D19B; }
+  .pill-info     { background: var(--info-bg);    color: var(--info-text);    border: 1px solid #BBD9F5; }
+  .pill-success  { background: var(--success-bg); color: var(--success-text); border: 1px solid var(--success-border); }
+
+  .wm-error   { color: var(--watermark-error); }
+  .wm-warning { color: var(--watermark-warning); }
+  .wm-neutral { color: var(--watermark-neutral); }
+
+  /* ───── Page shell (simula Letter portrait) ───── */
+  .page-shell {
+    max-width: 920px;
+    margin: 0 auto;
+    background: #fff;
+    border: 1px solid var(--border-light);
+    border-radius: 4px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08), 0 2px 6px rgba(0,0,0,0.04);
+    padding: 44px 56px;
+    position: relative;
+    overflow: hidden;
+    font-size: 9.4px; /* aproxima el 8pt del PDF a 1.17× para legibilidad en pantalla */
+    line-height: 1.42;
+    color: var(--text-primary);
+  }
+
+  .page-shell + .page-shell {
+    margin-top: 32px;
+  }
+
+  .page-shell.is-state-label::before {
+    content: attr(data-state);
+    position: absolute;
+    top: 12px;
+    right: -38px;
+    transform: rotate(45deg);
+    background: var(--brand-blue);
+    color: #fff;
+    padding: 4px 48px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    z-index: 3;
+  }
+
+  /* Watermark grande */
+  .watermark-main {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-30deg);
+    font-family: 'Poppins', sans-serif;
+    font-size: 96px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    pointer-events: none;
+    user-select: none;
+    white-space: nowrap;
+    z-index: 1;
+    text-align: center;
+    line-height: 1;
+  }
+
+  .watermark-main .wm-sub {
+    display: block;
+    font-size: 22px;
+    letter-spacing: 0.18em;
+    margin-top: 8px;
+    font-weight: 700;
+  }
+
+  .page-shell > * {
+    position: relative;
+    z-index: 2;
+  }
+
+  /* ───── Header del documento ───── */
+  .doc-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding-bottom: 13px;
+    border-bottom: 1.4px solid var(--brand-border);
+    margin-bottom: 14px;
+  }
+
+  .doc-header .employer {
+    max-width: 60%;
+  }
+
+  .employer-logo {
+    display: inline-block;
+    margin-bottom: 8px;
+    line-height: 0;
+  }
+
+  .employer-logo svg {
+    width: 150px;
+    height: 36px;
+    object-fit: contain;
+    display: block;
+  }
+
+  .employer-name {
+    font-family: 'Geist', sans-serif;
+    font-weight: 700;
+    font-size: 9.5px;
+    color: var(--brand-blue-soft);
+    margin-bottom: 3px;
+  }
+
+  .employer-meta {
+    color: var(--text-muted);
+    font-size: 8.6px;
+    line-height: 1.42;
+  }
+
+  .doc-meta {
+    text-align: right;
+    color: var(--text-faint);
+    font-size: 8.2px;
+    line-height: 1.45;
+    /* tabular-nums sobre Geist para IDs técnicos — NO monospace */
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.02em;
+  }
+
+  .doc-meta .status-pill {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 8.5px;
+    font-weight: 700;
+    margin-bottom: 7px;
+    letter-spacing: 0.02em;
+    /* No monospace */
+    font-variant-numeric: normal;
+  }
+
+  /* ───── Título + Net box ───── */
+  .title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 14px;
+    gap: 22px;
+  }
+
+  .title-row .title-copy {
+    max-width: 335px;
+  }
+
+  .title-row h2 {
+    margin: 0 0 9px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 21px;
+    font-weight: 700;
+    line-height: 1.18;
+    color: var(--brand-blue-soft);
+    letter-spacing: -0.01em;
+  }
+
+  .title-row .subtitle {
+    color: var(--text-muted);
+    font-size: 9.4px;
+    line-height: 1.45;
+  }
+
+  .net-box {
+    width: 170px;
+    flex-shrink: 0;
+    padding: 12px;
+    border: 1.4px solid var(--info-border);
+    background: var(--info-soft);
+    border-radius: 8px;
+  }
+
+  .net-box .net-label {
+    color: var(--text-muted);
+    font-size: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 5px;
+    font-weight: 600;
+  }
+
+  .net-box .net-amount {
+    font-family: 'Poppins', sans-serif;
+    color: var(--brand-blue);
+    font-size: 19px;
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    font-variant-numeric: tabular-nums;
+    margin-bottom: 6px;
+  }
+
+  .net-box .net-words {
+    color: var(--text-faint);
+    font-size: 8.2px;
+    line-height: 1.4;
+    font-style: italic;
+  }
+
+  .net-box .net-help {
+    color: var(--text-faint);
+    font-size: 8px;
+    line-height: 1.35;
+    margin-top: 6px;
+    padding-top: 5px;
+    border-top: 1px dashed var(--border-light);
+  }
+
+  /* ───── Section common ───── */
+  .section {
+    margin-bottom: 10px;
+  }
+
+  .section-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--brand-blue-soft);
+    margin: 0 0 8px;
+  }
+
+  /* ───── Facts grid (Partes + Relación y causal) ───── */
+  .facts-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border-top: 1px solid var(--border-light);
+    border-left: 1px solid var(--border-light);
+  }
+
+  .facts-grid .field {
+    padding: 7px 10px;
+    min-height: 38px;
+    border-right: 1px solid var(--border-light);
+    border-bottom: 1px solid var(--border-light);
+  }
+
+  .facts-grid .field-label {
+    font-size: 8px;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    letter-spacing: 0.06em;
+    margin-bottom: 3px;
+    font-weight: 600;
+  }
+
+  .facts-grid .field-value {
+    font-family: 'Geist', sans-serif;
+    font-weight: 500;
+    font-size: 9.7px;
+    color: var(--text-strong);
+  }
+
+  /* ───── Clauses narrativas ───── */
+  .clause {
+    margin-bottom: 11px;
+    font-size: 9.6px;
+    color: var(--text-secondary);
+    line-height: 1.55;
+    text-align: justify;
+  }
+
+  .clause .clause-label {
+    font-weight: 700;
+    color: var(--brand-blue-soft);
+  }
+
+  .clause strong.field {
+    font-weight: 600;
+    color: var(--text-primary);
+    background: var(--neutral-bg);
+    padding: 0 4px;
+    border-radius: 3px;
+    border-bottom: 1px dotted var(--border-mid);
+  }
+
+  .clause-banner-info {
+    margin: 11px 0;
+    padding: 9px 13px;
+    background: var(--info-bg);
+    border-left: 3px solid var(--info-border);
+    font-size: 9.3px;
+    color: var(--info-text);
+    border-radius: 0 4px 4px 0;
+    line-height: 1.5;
+  }
+
+  .clause-banner-info strong.banner-title {
+    display: block;
+    margin-bottom: 3px;
+    font-weight: 700;
+  }
+
+  /* ───── Tabla de breakdown ───── */
+  .breakdown-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 8px 0;
+    font-size: 9px;
+  }
+
+  .breakdown-table thead th {
+    background: var(--neutral-bg);
+    border-top: 1.2px solid var(--border-mid);
+    border-bottom: 1.2px solid var(--border-mid);
+    padding: 7px 8px;
+    text-align: left;
+    color: var(--text-muted);
+    font-weight: 700;
+    font-size: 8.4px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .breakdown-table thead th:last-child { text-align: right; }
+
+  .breakdown-table tbody td {
+    padding: 7px 8px;
+    border-bottom: 1px solid var(--border-light);
+    vertical-align: top;
+    line-height: 1.4;
+  }
+
+  .breakdown-table tbody tr.new-row td { background: #fffbe6; }
+  .breakdown-table tbody tr.split-row td { background: #f3f7fb; }
+  .breakdown-table tbody tr.deduction td { color: var(--error-text); }
+  .breakdown-table tbody tr.informational td { color: var(--text-faint); font-style: italic; }
+
+  .breakdown-table .concept-cell strong {
+    display: block;
+    font-weight: 700;
+    color: var(--text-primary);
+    font-style: normal;
+    margin-bottom: 2px;
+    font-size: 9.4px;
+  }
+
+  .breakdown-table .concept-cell .formula {
+    font-size: 8px;
+    color: var(--text-faint);
+    line-height: 1.42;
+  }
+
+  .breakdown-table .amount-cell {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    font-weight: 500;
+    white-space: nowrap;
+    font-family: 'Geist', sans-serif;
+  }
+
+  .breakdown-table .tag {
+    display: inline-block;
+    padding: 1px 5px;
+    border-radius: 999px;
+    margin-right: 3px;
+    margin-bottom: 2px;
+    font-size: 7.6px;
+    font-weight: 700;
+    border: 1px solid;
+    letter-spacing: 0.02em;
+  }
+
+  .tag-info     { background: var(--info-bg);    color: var(--info-text);    border-color: #BBD9F5; }
+  .tag-success  { background: var(--success-bg); color: var(--success-text); border-color: var(--success-border); }
+  .tag-warning  { background: var(--warning-bg); color: var(--warning-text); border-color: #F3D19B; }
+  .tag-neutral  { background: #f1f4f8;           color: var(--text-muted);   border-color: var(--border-light); }
+
+  .new-badge {
+    display: inline-block;
+    margin-left: 5px;
+    font-size: 7px;
+    background: #fff1c5;
+    color: #8a6500;
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    vertical-align: middle;
+  }
+
+  /* ───── Totals box (PRESERVADO de document-pdf.tsx) ───── */
+  .totals-box {
+    border: 1.2px solid var(--brand-border);
+    border-radius: 8px;
+    padding: 9px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 10px 0;
+    gap: 16px;
+  }
+
+  .totals-box .total-item {
+    flex: 1;
+  }
+
+  .totals-box .total-item .label {
+    font-size: 8px;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    letter-spacing: 0.06em;
+    font-weight: 600;
+    margin-bottom: 3px;
+  }
+
+  .totals-box .total-item .value {
+    font-family: 'Geist', sans-serif;
+    font-weight: 500;
+    font-size: 11px;
+    color: var(--text-strong);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .totals-box .total-item.net .value {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--brand-blue);
+  }
+
+  /* ───── Warnings (PRESERVADO de document-pdf.tsx, condicional) ───── */
+  .warning-block {
+    margin: 12px 0;
+    padding: 10px 12px;
+    border: 1px solid var(--warning-border);
+    background: var(--warning-soft);
+    border-radius: 6px;
+  }
+
+  .warning-block .section-title {
+    color: var(--warning-text);
+    margin-bottom: 5px;
+    font-size: 10.5px;
+  }
+
+  .warning-block ul {
+    margin: 0;
+    padding-left: 18px;
+    color: var(--warning-text);
+    font-size: 9px;
+    line-height: 1.5;
+  }
+
+  /* ───── Constancia statement (PRESERVADO de document-pdf.tsx) ───── */
+  .constancia {
+    margin: 14px 0 8px;
+    font-size: 9.2px;
+    color: var(--text-secondary);
+    line-height: 1.55;
+    text-align: justify;
+  }
+
+  /* ───── Reserva de derechos ───── */
+  .reserva-block {
+    margin: 16px 0 18px;
+    padding: 11px 14px;
+    border: 1.2px dashed var(--border-mid);
+    border-radius: 6px;
+    background: #fafbfd;
+  }
+
+  .reserva-block h4 {
+    margin: 0 0 6px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .reserva-block p {
+    margin: 0 0 8px;
+    font-size: 9px;
+    color: var(--text-faint);
+    line-height: 1.5;
+  }
+
+  .reserva-lines {
+    height: 56px;
+    background-image: repeating-linear-gradient(0deg, transparent, transparent 19px, var(--border-light) 19px, var(--border-light) 20px);
+  }
+
+  .reserva-lines.with-handwriting {
+    background: none;
+    padding: 0;
+    height: auto;
+  }
+
+  .reserva-lines.with-handwriting .handwriting {
+    font-family: 'Caveat', 'Brush Script MT', cursive;
+    color: #1a3a6c;
+    font-size: 13px;
+    line-height: 1.5;
+    transform: rotate(-1.5deg);
+    display: block;
+    padding: 4px 8px;
+  }
+
+  /* ───── Signatures + ministro de fe ───── */
+  .signatures-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 22px;
+    margin-top: 24px;
+  }
+
+  .signature-block {
+    text-align: center;
+    position: relative;
+  }
+
+  .signature-line {
+    border-top: 1px solid var(--text-muted);
+    margin-top: 58px;
+    margin-bottom: 6px;
+  }
+
+  .signature-line.signed {
+    border-top-color: var(--brand-blue);
+  }
+
+  .signature-block .signed-scribble {
+    position: absolute;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%) rotate(-4deg);
+    font-family: 'Caveat', 'Brush Script MT', cursive;
+    color: #1a3a6c;
+    font-size: 22px;
+    pointer-events: none;
+  }
+
+  .signature-block .role {
+    font-size: 8.4px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-secondary);
+    margin-bottom: 2px;
+  }
+
+  .signature-block .name {
+    font-size: 9.4px;
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+
+  .signature-block .name.empty {
+    color: var(--text-faint);
+    font-style: italic;
+    font-weight: 400;
+  }
+
+  .signature-block .meta {
+    font-size: 8.4px;
+    color: var(--text-muted);
+    margin-top: 2px;
+    line-height: 1.45;
+  }
+
+  /* Huella box — reducida a 40×40 (era 56×56 en v1) */
+  .huella-box {
+    width: 40px;
+    height: 40px;
+    border: 1px dashed var(--text-faint);
+    border-radius: 4px;
+    background: #fafbfd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 7px;
+    color: var(--text-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin: 8px auto 0;
+    text-align: center;
+    line-height: 1.1;
+  }
+
+  .huella-box.filled {
+    background: radial-gradient(ellipse at 35% 40%,
+      transparent 0%, transparent 18%,
+      rgba(40, 60, 100, 0.18) 22%, rgba(40, 60, 100, 0.18) 24%,
+      transparent 28%, transparent 32%,
+      rgba(40, 60, 100, 0.22) 38%, rgba(40, 60, 100, 0.22) 41%,
+      transparent 46%, transparent 52%,
+      rgba(40, 60, 100, 0.18) 58%, rgba(40, 60, 100, 0.18) 61%,
+      transparent 66%);
+    color: transparent;
+  }
+
+  /* ───── Footer ───── */
+  .doc-footer {
+    margin-top: 28px;
+    padding-top: 9px;
+    border-top: 1px solid var(--brand-border);
+    display: flex;
+    justify-content: space-between;
+    font-size: 7.8px;
+    color: var(--text-faint);
+    line-height: 1.4;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .doc-footer .gh-utility {
+    font-weight: 500;
+    color: var(--text-muted);
+  }
+
+  /* ───── Callouts ───── */
+  .callout-grid {
+    max-width: 1200px;
+    margin: 36px auto 0;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+
+  .callout {
+    padding: 14px 18px;
+    background: #fff;
+    border-radius: 8px;
+    border: 1px solid var(--border-light);
+    font-size: 13px;
+  }
+
+  .callout h5 {
+    margin: 0 0 6px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--brand-blue);
+  }
+
+  .callout p {
+    margin: 0;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+
+  .callout .delta-tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 6px;
+  }
+
+  .delta-tag.preserved { background: var(--success-bg); color: var(--success-text); }
+  .delta-tag.added     { background: #fff1c5; color: #8a6500; }
+  .delta-tag.fixed     { background: var(--info-bg); color: var(--info-text); }
+  .delta-tag.evolved   { background: #ede7f6; color: #4527a0; }
+
+  .callout code {
+    font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+    font-size: 11px;
+    background: #f1f4f8;
+    padding: 1px 5px;
+    border-radius: 3px;
+    color: var(--brand-blue);
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════
+     LEGEND
+     ═══════════════════════════════════════════════════════════ -->
+<div class="legend">
+  <h1>TASK-862 — Finiquito Renuncia Voluntaria V1 (mockup v2 — strict expansion)</h1>
+  <p class="lead">
+    Mockup vinculante para Slice D. Versión v2 corrige las 4 regresiones detectadas en v1 y mantiene
+    <strong>paridad estricta</strong> con la estructura del PDF actual (<code>src/lib/payroll/final-settlement/document-pdf.tsx</code>),
+    expandiendo sólo donde TASK-862 lo exige (cláusulas narrativas, Ley 21.389, watermark, ministro de fe,
+    huella, logo empleador, monto en letras, breakdown extendido).
+  </p>
+  <dl>
+    <dt>Audience</dt><dd><code>signature_copy</code> — versión que va a ministro de fe.</dd>
+    <dt>Causal</dt><dd><strong>Art. 159 N°2 CT</strong> — renuncia voluntaria.</dd>
+    <dt>Engine</dt><dd><code>cl-final-settlement-resignation-v1</code> (post Slice A — 9 componentes).</dd>
+    <dt>Typography stack</dt><dd><strong>Poppins (display) + Geist (body)</strong> — canon DESIGN.md (líneas 380+384). DM Sans está <strong>deprecated</strong>; el <code>document-pdf.tsx</code> actual aún lo usa (drift contra el contrato) y Slice D lo migra a Geist como parte del rewrite.</dd>
+    <dt>Estados renderizados</dt><dd>Strip de 4 estados canónicos + 2 hojas completas (Pendiente / Ratificado).</dd>
+  </dl>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     STATE MATRIX (5 estados canónicos por documentStatus)
+     El watermark es señal INTERNA de Greenhouse, NO marca legal.
+     ═══════════════════════════════════════════════════════════ -->
+<div class="state-matrix">
+  <h3>Estados canónicos del documento — cuándo aparece el watermark y cuándo no</h3>
+  <div class="state-grid">
+
+    <!-- Estado 1: in_review (interno HR) -->
+    <div class="state-card">
+      <div class="state-label">documentStatus = <code>in_review</code></div>
+      <span class="state-pill pill-warning">Revisión interna requerida</span>
+      <div class="state-mini-doc">
+        <div class="mini-title">Finiquito de trabajo</div>
+        <div class="mini-line l"></div>
+        <div class="mini-line m"></div>
+        <div class="mini-line s"></div>
+        <span class="state-mini-watermark wm-warning">PROYECTO</span>
+      </div>
+      <div class="state-note">
+        <strong>Sólo HR lo ve.</strong> Watermark "PROYECTO" para que nadie confunda un draft
+        con un documento final. NO se imprime ni se entrega al trabajador en este estado.
+      </div>
+    </div>
+
+    <!-- Estado 2: approved (interno HR, listo para imprimir) -->
+    <div class="state-card">
+      <div class="state-label">documentStatus = <code>approved</code></div>
+      <span class="state-pill pill-success">Listo para firma</span>
+      <div class="state-mini-doc">
+        <div class="mini-title">Finiquito de trabajo</div>
+        <div class="mini-line l"></div>
+        <div class="mini-line m"></div>
+        <div class="mini-line s"></div>
+        <span class="state-mini-watermark wm-warning">PROYECTO</span>
+      </div>
+      <div class="state-note">
+        HR aprobó, todavía interno. Watermark sigue. Operador HR puede imprimir el draft para
+        revisión final o pasar a <code>issue</code> para entregar al trabajador.
+      </div>
+    </div>
+
+    <!-- Estado 3: issued (al trabajador → al notario) — CLEAN -->
+    <div class="state-card">
+      <div class="state-label">documentStatus = <code>issued</code></div>
+      <span class="state-pill pill-success">Listo para firma</span>
+      <div class="state-mini-doc">
+        <div class="mini-title">Finiquito de trabajo</div>
+        <div class="mini-line l"></div>
+        <div class="mini-line m"></div>
+        <div class="mini-line s"></div>
+      </div>
+      <div class="state-note">
+        <strong>SIN WATERMARK.</strong> Este es el PDF que el trabajador imprime y lleva al notario.
+        Documento limpio para que el sello físico + firmas + huella lo conviertan en legalmente
+        válido. Esta es la <strong>hoja A</strong> abajo.
+      </div>
+    </div>
+
+    <!-- Estado 4: signed_or_ratified -->
+    <div class="state-card">
+      <div class="state-label">documentStatus = <code>signed_or_ratified</code></div>
+      <span class="state-pill pill-success">Listo para firma</span>
+      <div class="state-mini-doc">
+        <div class="mini-title">Finiquito de trabajo</div>
+        <div class="mini-line l"></div>
+        <div class="mini-line m"></div>
+        <div class="mini-line s"></div>
+      </div>
+      <div class="state-note">
+        <strong>SIN WATERMARK.</strong> Sistema regenera el PDF con datos de ministro de fe embebidos
+        (nombre / RUT / notaría / fecha) y muestra reserva de derechos si el trabajador la consignó.
+        Esta es la <strong>hoja B</strong> abajo.
+      </div>
+    </div>
+
+    <!-- Estado 5: rejected / voided -->
+    <div class="state-card">
+      <div class="state-label">documentStatus = <code>rejected</code> / <code>voided</code></div>
+      <span class="state-pill pill-error">Rechazado / Anulado</span>
+      <div class="state-mini-doc">
+        <div class="mini-title">Finiquito de trabajo</div>
+        <div class="mini-line l"></div>
+        <div class="mini-line m"></div>
+        <div class="mini-line s"></div>
+        <span class="state-mini-watermark wm-error">ANULADO</span>
+      </div>
+      <div class="state-note">
+        Estados terminales adversos. Watermark error rojo para que nadie use accidentalmente un
+        documento inválido. Razón registrada en <code>rejected_by_worker_reason</code> o <code>void_reason</code>.
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     HOJA A — documentStatus = issued (CLEAN, va al notario)
+     SIN WATERMARK — el sello físico + firmas + huella le dan legalidad.
+     ═══════════════════════════════════════════════════════════ -->
+<div class="page-shell is-state-label" data-state="HOJA A — EMITIDO (PARA NOTARIO)">
+
+  <!-- Header — PRESERVADO de document-pdf.tsx (logo del EMPLEADOR ahora) -->
+  <div class="doc-header">
+    <div class="employer">
+      <div class="employer-logo">
+        <svg viewBox="0 0 837.07 196.68" xmlns="http://www.w3.org/2000/svg" aria-label="Efeonce">
+          <g fill="#023c70">
+            <path d="M56.83,48.7c20.87-.2,44.73,5.17,44.13,30.42-.99,51.88-54.47,41.94-61.82,38.96-1.39,9.14,2.58,10.54,16.7,10.54,9.14,0,28.23-1.79,37.97-3.78l-4.77,27.04c-15.31,4.97-32.8,8.15-59.44,5.77-25.25-2.19-34.39-26.04-27.23-64.61,6.16-32.4,15.7-43.93,54.47-44.33ZM61.2,86.08c1.19-6.36-1.59-8.95-7.36-8.75-8.35.4-10.34,7.16-11.73,16.1,0,0,16.7,5.37,19.08-7.35Z"/>
+            <path d="M106.72,54.07l14.71-3.38,3.18-19.68C128.39,6.96,142.3,0,166.16,0c9.74,0,17.69.79,24.85,4.77l-3.58,22.07c-.2,0-14.51-.2-14.51-.2-9.94-.2-9.74,3.98-11.73,16.3l-1.19,7.75h19.48l-4.17,26.64h-19.48l-12.52,78.92h-38.57l12.52-78.92h-14.31l3.78-23.26Z"/>
+            <path d="M235.73,48.7c20.87-.2,44.73,5.17,44.13,30.42-.99,51.88-54.47,41.94-61.82,38.96-1.39,9.14,2.58,10.54,16.7,10.54,9.14,0,28.23-1.79,37.97-3.78l-4.77,27.04c-15.31,4.97-32.8,8.15-59.44,5.77-25.25-2.19-34.39-26.04-27.23-64.61,6.16-32.4,15.7-43.93,54.47-44.33ZM240.11,86.08c1.19-6.36-1.59-8.95-7.36-8.75-8.35.4-10.34,7.16-11.73,16.1,0,0,16.7,5.37,19.08-7.35Z"/>
+            <path d="M544.25,50.69h32.2l4.77,10.34c7.55-6.16,14.91-12.13,31.01-12.13,27.43,0,27.83,17.49,24.25,39.76l-10.73,67.59h-38.57l10.73-68.38c1.39-8.35-.4-10.34-4.77-10.34-7.36,0-12.52,1.99-15.71,7.36l-11.33,71.37h-38.57l16.7-105.56Z"/>
+            <path d="M688.17,48.7c10.34,0,34.79.99,50.29,7.16l-3.58,22.66s-11.73-1.19-29.42-1.19c-13.52,0-17.89.6-22.07,26.44-3.78,24.25-.4,24.85,13.92,24.85,18.29,0,31.41-1.59,31.41-1.59l-3.58,22.66c-14.51,6.56-27.63,7.95-53.87,7.55-19.68-.2-32.8-18.49-26.24-59.84,6.56-41.35,22.86-48.7,43.14-48.7Z"/>
+            <path d="M792.93,48.7c20.87-.2,44.73,5.17,44.13,30.42-.99,51.88-54.47,41.94-61.82,38.96-1.39,9.14,2.58,10.54,16.7,10.54,9.14,0,28.23-1.79,37.97-3.78l-4.77,27.04c-15.31,4.97-32.8,8.15-59.44,5.77-25.25-2.19-34.39-26.04-27.23-64.61,6.16-32.4,15.7-43.93,54.47-44.33ZM797.3,86.08c1.19-6.36-1.59-8.95-7.35-8.75-8.35.4-10.34,7.16-11.73,16.1,0,0,16.7,5.37,19.08-7.35Z"/>
+            <path d="M295.76,101.14c0-25.43,35.88-46.73,84.03-52.26-.5-1.99-.76-4.07-.76-6.21,0-.15,0-.29.01-.44-55.19,5.79-96.6,29.96-96.6,58.91,0,19.69,19.16,37.17,48.78,48.16,1.54-2.09,2.69-4.49,3.37-7.08-23.73-9.84-38.82-24.59-38.82-41.08Z"/>
+            <path d="M430.09,42.23c0,.15.01.29.01.44,0,2.14-.27,4.22-.76,6.21,48.16,5.53,84.03,26.83,84.03,52.26,0,6.73-2.52,13.16-7.1,19.09,3.21,2.61,5.55,5.39,7.02,8.36,8.56-8.23,13.41-17.56,13.41-27.45,0-28.95-41.41-53.12-96.6-58.91Z"/>
+            <circle cx="404.57" cy="44.13" r="20.76"/>
+            <path d="M457.51,165.97l.6-.11h0s1.03-.21,1.03-.21c42.7-8.45,51.67-20.54,51.67-29.2v-.14c-.02-1.6-.33-3.12-.9-4.58-21.25,17.75-60.42,29.66-105.24,29.66-.78,0-1.55-.01-2.32-.02-24.73-.23-47.67-4.07-66.71-10.52-3.91,5.93-10.23,10.13-17.57,11.2-1.46.21-2.4,1.68-2,3.1,3.47,12.48,9.17,23.13,16.32,30.76.53.56,1.29.84,2.06.75,9.22-1.03,18.03-3.26,25.93-6.61,10.27-4.36,18.57-10.39,24.15-17.54,4.92-.04,9.78-.16,14.59-.35,10.52-.4,20.77-1.11,30.63-2.16,1.05-.11,2.1-.23,3.14-.35,6.35-.73,12.49-1.59,18.32-2.57l6.31-1.12Z"/>
+            <path d="M451.21,105.81c-5.83-.98-11.97-1.85-18.32-2.57-1.04-.12-2.08-.23-3.14-.35-9.95-1.06-20.31-1.78-30.94-2.17-4.93-.18-9.91-.3-14.94-.34-5.69-6.93-13.97-12.77-24.11-16.97-7.74-3.21-16.34-5.35-25.32-6.35-.76-.09-1.53.19-2.06.75-7.15,7.63-12.85,18.28-16.32,30.76-.4,1.43.56,2.89,2.02,3.1,12.3,1.8,21.74,12.39,21.74,25.19,0,2.44-.35,4.8-.99,7.03,18.03,6.77,40.47,10.82,64.83,10.93.34,0,.67,0,1.01,0,43.83,0,81.6-12.78,98.84-31.2-9.89-8-28.19-13.17-44.36-16.37l-1.03-.2h0s-.6-.12-.6-.12l-6.31-1.12ZM397.41,138.17c-4.79.6-8.82-3.43-8.22-8.22.41-3.27,3.05-5.9,6.32-6.32,4.79-.6,8.82,3.43,8.22,8.22-.41,3.27-3.05,5.9-6.32,6.31ZM420.16,138.17c-4.79.6-8.83-3.43-8.22-8.22.41-3.27,3.05-5.9,6.32-6.31,4.79-.6,8.82,3.43,8.22,8.22-.41,3.27-3.05,5.9-6.31,6.32ZM442.91,138.17c-4.79.6-8.83-3.43-8.22-8.22.41-3.27,3.05-5.9,6.32-6.31,4.79-.6,8.82,3.43,8.22,8.22-.41,3.27-3.05,5.9-6.31,6.32Z"/>
+          </g>
+        </svg>
+      </div>
+      <div class="employer-name">Efeonce Group SpA</div>
+      <div class="employer-meta">
+        RUT 76.452.890-1<br>
+        Av. Apoquindo 3846, oficina 1203, Las Condes, Santiago, Chile
+      </div>
+    </div>
+    <div class="doc-meta">
+      <span class="status-pill pill-success">Listo para firma</span>
+      <div>Documento GH-FIN-2026-3a7c91b2</div>
+      <div>Snapshot fs-v3 · Hash 8b3d9f2a</div>
+      <div>Generado 11-05-2026 11:42 · America/Santiago</div>
+    </div>
+  </div>
+
+  <!-- Título + Net box — PRESERVADO, expandido con net-words -->
+  <div class="title-row">
+    <div class="title-copy">
+      <h2>Finiquito de contrato de trabajo</h2>
+      <div class="subtitle">
+        Documento legal de término de relación laboral dependiente, causal art. 159 N°2 del Código del Trabajo
+        (renuncia voluntaria). Producirá efecto liberatorio una vez ratificado ante ministro de fe conforme
+        al artículo 177 del Código del Trabajo.
+      </div>
+    </div>
+    <div class="net-box">
+      <div class="net-label">Líquido a pagar</div>
+      <div class="net-amount">$ 3.055.000</div>
+      <div class="net-words">Tres millones cincuenta y cinco mil pesos chilenos</div>
+      <div class="net-help">Incluye descuentos legales detallados en la cláusula quinta.</div>
+    </div>
+  </div>
+
+  <!-- Section Partes — PRESERVADO, expandido a 8 fields -->
+  <div class="section">
+    <h3 class="section-title">Partes comparecientes</h3>
+    <div class="facts-grid">
+      <div class="field"><div class="field-label">Empleador</div><div class="field-value">Efeonce Group SpA</div></div>
+      <div class="field"><div class="field-label">Trabajador/a</div><div class="field-value">Juan Pérez González</div></div>
+      <div class="field"><div class="field-label">RUT empleador</div><div class="field-value">76.452.890-1</div></div>
+      <div class="field"><div class="field-label">RUT trabajador/a</div><div class="field-value">18.234.567-8</div></div>
+      <div class="field"><div class="field-label">Representante empleador</div><div class="field-value">María José Cisternas Rojas · RUT 15.876.234-K</div></div>
+      <div class="field"><div class="field-label">Cargo</div><div class="field-value">Senior Software Engineer</div></div>
+      <div class="field"><div class="field-label">Domicilio empleador</div><div class="field-value">Av. Apoquindo 3846, of. 1203, Las Condes</div></div>
+      <div class="field"><div class="field-label">Domicilio trabajador/a <span style="color: var(--info-text); font-weight: 500;">· TASK-784</span></div><div class="field-value">Pasaje Los Alerces 234, Ñuñoa</div></div>
+    </div>
+  </div>
+
+  <!-- Section Relación y causal — RESTAURADO (era regresión en v1) -->
+  <div class="section">
+    <h3 class="section-title">Relación y causal</h3>
+    <div class="facts-grid">
+      <div class="field"><div class="field-label">Fecha ingreso</div><div class="field-value">15-08-2023</div></div>
+      <div class="field"><div class="field-label">Último día trabajado</div><div class="field-value">30-05-2026</div></div>
+      <div class="field"><div class="field-label">Fecha término</div><div class="field-value">30-05-2026</div></div>
+      <div class="field"><div class="field-label">Causal</div><div class="field-value">Renuncia voluntaria — Art. 159 N°2 CT</div></div>
+      <div class="field"><div class="field-label">Régimen</div><div class="field-value">Chile dependiente · nómina interna</div></div>
+      <div class="field"><div class="field-label">Carta renuncia ratificada</div><div class="field-value">30-04-2026 · asset-3f9d2a · ✓ verificada</div></div>
+    </div>
+  </div>
+
+  <!-- Cláusulas narrativas — NUEVAS -->
+  <div class="section">
+    <h3 class="section-title">Cláusulas</h3>
+
+    <p class="clause">
+      <span class="clause-label">PRIMERO:</span> Don <strong class="field">Juan Pérez González</strong>,
+      RUT <strong class="field">18.234.567-8</strong>, declara haber prestado servicios como trabajador dependiente
+      de <strong class="field">Efeonce Group SpA</strong> desde el <strong class="field">15 de agosto de 2023</strong>
+      hasta el <strong class="field">30 de mayo de 2026</strong>, fecha en la cual se hace efectivo el término de su
+      contrato de trabajo por aplicación de la causal del
+      <strong class="field">ARTÍCULO 159 N°2 DEL CÓDIGO DEL TRABAJO — RENUNCIA VOLUNTARIA DEL TRABAJADOR</strong>,
+      formalizada mediante carta de renuncia ratificada con fecha <strong class="field">30 de abril de 2026</strong>,
+      suscrita con las formalidades del artículo 177 del mismo cuerpo legal.
+    </p>
+
+    <p class="clause">
+      <span class="clause-label">SEGUNDO:</span> Don <strong class="field">Juan Pérez González</strong> declara recibir
+      en este acto, a su entera satisfacción, mediante <strong class="field">transferencia bancaria</strong> a su
+      cuenta corriente personal, la cantidad de <strong class="field">$ 3.055.000.-</strong>
+      (<strong class="field">tres millones cincuenta y cinco mil pesos chilenos</strong>), por los conceptos que se
+      detallan en la cláusula quinta del presente instrumento.
+    </p>
+
+    <p class="clause">
+      <span class="clause-label">TERCERO:</span> Por el presente instrumento las partes declaran terminado el contrato
+      de trabajo de fecha <strong class="field">15 de agosto de 2023</strong>, otorgando don
+      <strong class="field">Juan Pérez González</strong> amplio, total y definitivo finiquito a su empleador,
+      <strong class="field">Efeonce Group SpA</strong>, expresando que no tiene cargo ni reclamo alguno que formular
+      en su contra, y que nada se le adeuda por ningún concepto, ya que todas sus remuneraciones, prestaciones y
+      regalías a que tiene derecho por disposición de la ley y de su contrato individual de trabajo le han sido
+      pagadas total y oportunamente. <strong>Las cotizaciones previsionales le fueron pagadas oportunamente durante
+      toda la duración del contrato</strong>, y las correspondientes a los días trabajados en el mes en curso se
+      enterarán dentro del plazo legal establecido en el artículo 19 del DL N° 3.500 y el artículo 162 inciso 5° del
+      Código del Trabajo (Ley Bustos).
+    </p>
+
+    <div class="clause-banner-info">
+      <strong class="banner-title">CUARTO — Alternativa A (declarada por el trabajador):</strong>
+      Las partes comparecientes declaran expresamente que el trabajador <strong>NO</strong> se encuentra afecto
+      a retención por pensión de alimentos de acuerdo con lo establecido en la Ley N° 14.908, modificada por la
+      Ley N° 21.389 de 2021. Declaración efectuada con fecha 10-05-2026, registrada en sistema Greenhouse por
+      operador HR <em>Camila Fuentes — RUT 16.234.567-1</em>.
+    </div>
+
+    <p class="clause">
+      <span class="clause-label">QUINTO:</span> El detalle de los conceptos pagados al trabajador es el siguiente:
+    </p>
+  </div>
+
+  <!-- Tabla breakdown — EVOLUCIONADA con 8 componentes -->
+  <table class="breakdown-table">
+    <thead>
+      <tr>
+        <th style="width: 38%;">Concepto</th>
+        <th style="width: 22%;">Tratamiento</th>
+        <th style="width: 25%;">Respaldo</th>
+        <th style="width: 15%;">Monto CLP</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="concept-cell"><strong>Remuneración pendiente</strong><span class="formula">30/30 días · base mensual $ 1.800.000</span></td>
+        <td><span class="tag tag-info">Imponible</span><span class="tag tag-info">Tributable</span></td>
+        <td style="font-size: 8px; color: var(--text-muted);">Remuneración mensual conciliada · overlap ledger</td>
+        <td class="amount-cell">$ 1.800.000</td>
+      </tr>
+      <tr>
+        <td class="concept-cell"><strong>Haberes fijos proporcionales</strong><span class="formula">Colación $ 100.000 + movilización $ 80.000</span></td>
+        <td><span class="tag tag-success">No imponible</span></td>
+        <td style="font-size: 8px; color: var(--text-muted);">Snapshot compensation v12</td>
+        <td class="amount-cell">$ 180.000</td>
+      </tr>
+      <tr class="new-row">
+        <td class="concept-cell"><strong>Gratificación legal proporcional <span class="new-badge">Slice A</span></strong><span class="formula">Modo anual_proporcional · 5 meses devengados 2026 · tope 4,75 IMM/12</span></td>
+        <td><span class="tag tag-info">Imponible</span><span class="tag tag-info">Tributable</span></td>
+        <td style="font-size: 8px; color: var(--text-muted);">Art. 50 CT · IMM 2026 $ 510.636</td>
+        <td class="amount-cell">$ 1.000.000</td>
+      </tr>
+      <tr class="split-row">
+        <td class="concept-cell"><strong>Feriado pendiente — años anteriores <span class="new-badge">Split A</span></strong><span class="formula">5 días hábiles carryover · base diaria $ 60.000 → 7 días corridos (DT art. 73)</span></td>
+        <td><span class="tag tag-success">No renta</span><span class="tag tag-success">No imponible</span></td>
+        <td style="font-size: 8px; color: var(--text-muted);">Leave balance lb-2026-04-jpg</td>
+        <td class="amount-cell">$ 420.000</td>
+      </tr>
+      <tr class="split-row">
+        <td class="concept-cell"><strong>Feriado proporcional — año en curso <span class="new-badge">Split A</span></strong><span class="formula">6,25 días hábiles · base diaria $ 60.000 → 9 días corridos compensados</span></td>
+        <td><span class="tag tag-success">No renta</span><span class="tag tag-success">No imponible</span></td>
+        <td style="font-size: 8px; color: var(--text-muted);">DT art. 73 + balance lb-2026-04-jpg</td>
+        <td class="amount-cell">$ 540.000</td>
+      </tr>
+      <tr class="informational">
+        <td class="concept-cell"><strong>Ajuste vacaciones adelantadas <span class="new-badge">Slice A</span></strong><span class="formula">No aplica — balance neto positivo</span></td>
+        <td><span class="tag tag-neutral">Informativo</span></td>
+        <td style="font-size: 8px;">Sin descuento</td>
+        <td class="amount-cell">$ 0</td>
+      </tr>
+      <tr class="deduction">
+        <td class="concept-cell"><strong>Descuentos legales (delta-only)</strong><span class="formula">AFP $ 300.290 · Salud $ 208.600 · Cesantía 0,6 % $ 19.080 · IUSC $ 97.030</span></td>
+        <td><span class="tag tag-warning">Descuento legal</span></td>
+        <td style="font-size: 8px; color: var(--text-muted);">Tax table v2026-01 · UF $ 39.612,57</td>
+        <td class="amount-cell">− $ 625.000</td>
+      </tr>
+      <tr class="informational new-row">
+        <td class="concept-cell"><strong>Ajuste superposición nómina mensual <span class="new-badge">Slice A</span></strong><span class="formula">Período mayo 2026 NO cubierto por nómina mensual aún</span></td>
+        <td><span class="tag tag-neutral">Informativo</span></td>
+        <td style="font-size: 8px;">Overlap ledger</td>
+        <td class="amount-cell">$ 0</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Totals — RESTAURADO 3-column box (era regresión en v1) -->
+  <div class="totals-box">
+    <div class="total-item">
+      <div class="label">Total haberes</div>
+      <div class="value">$ 3.940.000</div>
+    </div>
+    <div class="total-item">
+      <div class="label">Total descuentos</div>
+      <div class="value">$ 625.000</div>
+    </div>
+    <div class="total-item net">
+      <div class="label">Líquido a pagar</div>
+      <div class="value">$ 3.055.000</div>
+    </div>
+  </div>
+
+  <!-- Constancia statement — RESTAURADO (era regresión en v1) -->
+  <div class="section">
+    <h3 class="section-title">Constancia para firma y ratificación</h3>
+    <p class="constancia">
+      Este documento resume los haberes, descuentos y pagos asociados al término de la relación laboral. La firma
+      o ratificación debe realizarse ante ministro de fe cuando corresponda (notario público, inspector del trabajo,
+      presidente del sindicato o oficial del Registro Civil), conforme al artículo 177 del Código del Trabajo. La
+      persona trabajadora puede formular reserva de derechos al momento de firmar, escribiéndola de su puño y letra
+      en el espacio destinado al efecto.
+    </p>
+  </div>
+
+  <!-- Reserva de derechos -->
+  <div class="reserva-block">
+    <h4>Reserva de derechos del trabajador (espacio para escritura manual)</h4>
+    <p>
+      Si el trabajador desea formular reserva, debe hacerlo en este espacio antes de firmar. La firma sin reserva
+      manuscrita implica renuncia a las acciones señaladas en la cláusula tercera.
+    </p>
+    <div class="reserva-lines"></div>
+  </div>
+
+  <!-- Firmas + ministro de fe -->
+  <div class="signatures-grid">
+    <div class="signature-block">
+      <div class="signature-line"></div>
+      <div class="role">Empleador</div>
+      <div class="name">María José Cisternas Rojas</div>
+      <div class="meta">P.P. Efeonce Group SpA<br>RUT 15.876.234-K</div>
+    </div>
+
+    <div class="signature-block">
+      <div class="signature-line"></div>
+      <div class="role">Trabajador/a</div>
+      <div class="name">Juan Pérez González</div>
+      <div class="meta">RUT 18.234.567-8</div>
+      <div class="huella-box">Huella<br>dactilar</div>
+    </div>
+
+    <div class="signature-block">
+      <div class="signature-line"></div>
+      <div class="role">Ministro de fe</div>
+      <div class="name empty">— Pendiente de ratificación —</div>
+      <div class="meta">Notario · Inspector del Trabajo · Presidente sindicato<br>(Art. 177 CT)</div>
+    </div>
+  </div>
+
+  <!-- Footer — PRESERVADO con Greenhouse al pie -->
+  <div class="doc-footer">
+    <span>Documento confidencial · Efeonce Group SpA · RUT 76.452.890-1</span>
+    <span>Página 1 de 1 · Template cl-final-settlement-resignation-v1 · v3</span>
+  </div>
+  <div class="doc-footer" style="border-top: none; padding-top: 4px; margin-top: 4px;">
+    <span class="gh-utility">Documento generado con Greenhouse · greenhouse.efeoncepro.com</span>
+    <span></span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     HOJA B — Estado 4: Ratificado (sin watermark)
+     ═══════════════════════════════════════════════════════════ -->
+<div class="page-shell is-state-label" data-state="HOJA B — RATIFICADO">
+  <!-- Sin watermark -->
+
+  <!-- Header -->
+  <div class="doc-header">
+    <div class="employer">
+      <div class="employer-logo">
+        <svg viewBox="0 0 837.07 196.68" xmlns="http://www.w3.org/2000/svg" aria-label="Efeonce">
+          <g fill="#023c70">
+            <path d="M56.83,48.7c20.87-.2,44.73,5.17,44.13,30.42-.99,51.88-54.47,41.94-61.82,38.96-1.39,9.14,2.58,10.54,16.7,10.54,9.14,0,28.23-1.79,37.97-3.78l-4.77,27.04c-15.31,4.97-32.8,8.15-59.44,5.77-25.25-2.19-34.39-26.04-27.23-64.61,6.16-32.4,15.7-43.93,54.47-44.33ZM61.2,86.08c1.19-6.36-1.59-8.95-7.36-8.75-8.35.4-10.34,7.16-11.73,16.1,0,0,16.7,5.37,19.08-7.35Z"/>
+            <path d="M106.72,54.07l14.71-3.38,3.18-19.68C128.39,6.96,142.3,0,166.16,0c9.74,0,17.69.79,24.85,4.77l-3.58,22.07c-.2,0-14.51-.2-14.51-.2-9.94-.2-9.74,3.98-11.73,16.3l-1.19,7.75h19.48l-4.17,26.64h-19.48l-12.52,78.92h-38.57l12.52-78.92h-14.31l3.78-23.26Z"/>
+            <path d="M235.73,48.7c20.87-.2,44.73,5.17,44.13,30.42-.99,51.88-54.47,41.94-61.82,38.96-1.39,9.14,2.58,10.54,16.7,10.54,9.14,0,28.23-1.79,37.97-3.78l-4.77,27.04c-15.31,4.97-32.8,8.15-59.44,5.77-25.25-2.19-34.39-26.04-27.23-64.61,6.16-32.4,15.7-43.93,54.47-44.33ZM240.11,86.08c1.19-6.36-1.59-8.95-7.36-8.75-8.35.4-10.34,7.16-11.73,16.1,0,0,16.7,5.37,19.08-7.35Z"/>
+            <path d="M544.25,50.69h32.2l4.77,10.34c7.55-6.16,14.91-12.13,31.01-12.13,27.43,0,27.83,17.49,24.25,39.76l-10.73,67.59h-38.57l10.73-68.38c1.39-8.35-.4-10.34-4.77-10.34-7.36,0-12.52,1.99-15.71,7.36l-11.33,71.37h-38.57l16.7-105.56Z"/>
+            <path d="M688.17,48.7c10.34,0,34.79.99,50.29,7.16l-3.58,22.66s-11.73-1.19-29.42-1.19c-13.52,0-17.89.6-22.07,26.44-3.78,24.25-.4,24.85,13.92,24.85,18.29,0,31.41-1.59,31.41-1.59l-3.58,22.66c-14.51,6.56-27.63,7.95-53.87,7.55-19.68-.2-32.8-18.49-26.24-59.84,6.56-41.35,22.86-48.7,43.14-48.7Z"/>
+            <path d="M792.93,48.7c20.87-.2,44.73,5.17,44.13,30.42-.99,51.88-54.47,41.94-61.82,38.96-1.39,9.14,2.58,10.54,16.7,10.54,9.14,0,28.23-1.79,37.97-3.78l-4.77,27.04c-15.31,4.97-32.8,8.15-59.44,5.77-25.25-2.19-34.39-26.04-27.23-64.61,6.16-32.4,15.7-43.93,54.47-44.33ZM797.3,86.08c1.19-6.36-1.59-8.95-7.35-8.75-8.35.4-10.34,7.16-11.73,16.1,0,0,16.7,5.37,19.08-7.35Z"/>
+            <path d="M295.76,101.14c0-25.43,35.88-46.73,84.03-52.26-.5-1.99-.76-4.07-.76-6.21,0-.15,0-.29.01-.44-55.19,5.79-96.6,29.96-96.6,58.91,0,19.69,19.16,37.17,48.78,48.16,1.54-2.09,2.69-4.49,3.37-7.08-23.73-9.84-38.82-24.59-38.82-41.08Z"/>
+            <path d="M430.09,42.23c0,.15.01.29.01.44,0,2.14-.27,4.22-.76,6.21,48.16,5.53,84.03,26.83,84.03,52.26,0,6.73-2.52,13.16-7.1,19.09,3.21,2.61,5.55,5.39,7.02,8.36,8.56-8.23,13.41-17.56,13.41-27.45,0-28.95-41.41-53.12-96.6-58.91Z"/>
+            <circle cx="404.57" cy="44.13" r="20.76"/>
+            <path d="M457.51,165.97l.6-.11h0s1.03-.21,1.03-.21c42.7-8.45,51.67-20.54,51.67-29.2v-.14c-.02-1.6-.33-3.12-.9-4.58-21.25,17.75-60.42,29.66-105.24,29.66-.78,0-1.55-.01-2.32-.02-24.73-.23-47.67-4.07-66.71-10.52-3.91,5.93-10.23,10.13-17.57,11.2-1.46.21-2.4,1.68-2,3.1,3.47,12.48,9.17,23.13,16.32,30.76.53.56,1.29.84,2.06.75,9.22-1.03,18.03-3.26,25.93-6.61,10.27-4.36,18.57-10.39,24.15-17.54,4.92-.04,9.78-.16,14.59-.35,10.52-.4,20.77-1.11,30.63-2.16,1.05-.11,2.1-.23,3.14-.35,6.35-.73,12.49-1.59,18.32-2.57l6.31-1.12Z"/>
+            <path d="M451.21,105.81c-5.83-.98-11.97-1.85-18.32-2.57-1.04-.12-2.08-.23-3.14-.35-9.95-1.06-20.31-1.78-30.94-2.17-4.93-.18-9.91-.3-14.94-.34-5.69-6.93-13.97-12.77-24.11-16.97-7.74-3.21-16.34-5.35-25.32-6.35-.76-.09-1.53.19-2.06.75-7.15,7.63-12.85,18.28-16.32,30.76-.4,1.43.56,2.89,2.02,3.1,12.3,1.8,21.74,12.39,21.74,25.19,0,2.44-.35,4.8-.99,7.03,18.03,6.77,40.47,10.82,64.83,10.93.34,0,.67,0,1.01,0,43.83,0,81.6-12.78,98.84-31.2-9.89-8-28.19-13.17-44.36-16.37l-1.03-.2h0s-.6-.12-.6-.12l-6.31-1.12ZM397.41,138.17c-4.79.6-8.82-3.43-8.22-8.22.41-3.27,3.05-5.9,6.32-6.32,4.79-.6,8.82,3.43,8.22,8.22-.41,3.27-3.05,5.9-6.32,6.31ZM420.16,138.17c-4.79.6-8.83-3.43-8.22-8.22.41-3.27,3.05-5.9,6.32-6.31,4.79-.6,8.82,3.43,8.22,8.22-.41,3.27-3.05,5.9-6.31,6.32ZM442.91,138.17c-4.79.6-8.83-3.43-8.22-8.22.41-3.27,3.05-5.9,6.32-6.31,4.79-.6,8.82,3.43,8.22,8.22-.41,3.27-3.05,5.9-6.31,6.32Z"/>
+          </g>
+        </svg>
+      </div>
+      <div class="employer-name">Efeonce Group SpA</div>
+      <div class="employer-meta">
+        RUT 76.452.890-1<br>
+        Av. Apoquindo 3846, oficina 1203, Las Condes, Santiago, Chile
+      </div>
+    </div>
+    <div class="doc-meta">
+      <span class="status-pill pill-success">Ratificado</span>
+      <div>Documento GH-FIN-2026-3a7c91b2</div>
+      <div>Snapshot fs-v3 · Hash 8b3d9f2a</div>
+      <div>Ratificado 14-05-2026 16:08 · America/Santiago</div>
+    </div>
+  </div>
+
+  <div class="title-row">
+    <div class="title-copy">
+      <h2>Finiquito de contrato de trabajo</h2>
+      <div class="subtitle">
+        Documento ratificado ante notario público con fecha 14 de mayo de 2026. Produce el efecto liberatorio
+        previsto en el artículo 177 del Código del Trabajo, sin perjuicio de la reserva de derechos consignada
+        por el trabajador.
+      </div>
+    </div>
+    <div class="net-box">
+      <div class="net-label">Líquido pagado</div>
+      <div class="net-amount">$ 3.055.000</div>
+      <div class="net-words">Tres millones cincuenta y cinco mil pesos chilenos</div>
+      <div class="net-help">Transferido el 14-05-2026 a cuenta corriente del trabajador.</div>
+    </div>
+  </div>
+
+  <!-- Compactamos secciones repetidas para foco en cambios post-ratificación -->
+  <div class="section">
+    <h3 class="section-title">Partes, relación y cláusulas</h3>
+    <p class="constancia" style="margin: 0;">
+      <em>Idéntico a hoja A. Render completo de Partes, Relación y causal, Cláusulas PRIMERO–QUINTO y Tabla
+      de detalle se preserva.</em>
+    </p>
+  </div>
+
+  <!-- Reserva de derechos — con escritura manuscrita visible -->
+  <div class="reserva-block">
+    <h4>Reserva de derechos del trabajador</h4>
+    <p>Consignada de puño y letra por el trabajador al momento de firmar:</p>
+    <div class="reserva-lines with-handwriting">
+      <span class="handwriting">
+        Me reservo el derecho a reclamar el pago de la gratificación legal proporcional<br>
+        correspondiente al período enero–mayo 2026, así como cualquier otra prestación<br>
+        que en derecho proceda. — JP
+      </span>
+    </div>
+  </div>
+
+  <!-- Firmas — TODAS COMPLETAS -->
+  <div class="signatures-grid">
+    <div class="signature-block">
+      <span class="signed-scribble">M. Cisternas</span>
+      <div class="signature-line signed"></div>
+      <div class="role">Empleador</div>
+      <div class="name">María José Cisternas Rojas</div>
+      <div class="meta">P.P. Efeonce Group SpA<br>RUT 15.876.234-K</div>
+    </div>
+
+    <div class="signature-block">
+      <span class="signed-scribble">J. Pérez</span>
+      <div class="signature-line signed"></div>
+      <div class="role">Trabajador/a</div>
+      <div class="name">Juan Pérez González</div>
+      <div class="meta">RUT 18.234.567-8</div>
+      <div class="huella-box filled" aria-label="Huella dactilar registrada"></div>
+    </div>
+
+    <div class="signature-block">
+      <span class="signed-scribble">H. Quezada</span>
+      <div class="signature-line signed"></div>
+      <div class="role">Ministro de fe</div>
+      <div class="name">Humberto Quezada Moreno</div>
+      <div class="meta">
+        Notario Público Titular · 25° Notaría de Santiago<br>
+        RUT 7.123.456-9 · Ratificado 14-05-2026
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="doc-footer">
+    <span>Documento confidencial · Efeonce Group SpA · RUT 76.452.890-1</span>
+    <span>Página 1 de 1 · Template cl-final-settlement-resignation-v1 · v3 · Ratificado</span>
+  </div>
+  <div class="doc-footer" style="border-top: none; padding-top: 4px; margin-top: 4px;">
+    <span class="gh-utility">Documento generado con Greenhouse · greenhouse.efeoncepro.com</span>
+    <span></span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     CALLOUTS — delta inventory v2
+     ═══════════════════════════════════════════════════════════ -->
+<div class="callout-grid">
+
+  <div class="callout">
+    <span class="delta-tag preserved">Preservado</span>
+    <h5>Estructura del PDF actual intacta</h5>
+    <p>Header, Partes grid, <strong>Relación y causal grid</strong>, breakdown table, <strong>Totals box
+    3-column</strong>, Warnings condicional, <strong>Constancia statement</strong>, Signatures, Footer:
+    todas las secciones de <code>document-pdf.tsx</code> se mantienen. v2 corrige las 4 regresiones de v1.</p>
+  </div>
+
+  <div class="callout">
+    <span class="delta-tag fixed">Fix · blocker UI</span>
+    <h5>Removido font-family monospace del documento</h5>
+    <p>v1 usaba monospace para <code>doc-number</code> y footer (regla TASK-758 receipt presenter prohíbe).
+    v2 usa <code>font-variant-numeric: tabular-nums</code> + <code>letter-spacing: 0.02em</code> sobre Geist.
+    Monospace queda sólo en legend/callouts (capa de documentación del mockup, no del documento).</p>
+  </div>
+
+  <div class="callout">
+    <span class="delta-tag fixed">Fix · watermark scope</span>
+    <h5>Watermark SÓLO en estados internos de HR</h5>
+    <p>El watermark "PROYECTO" es una <strong>señal interna de Greenhouse</strong> para distinguir un draft
+    de un documento listo para entregar. Aplica únicamente a <code>documentStatus IN ('rendered', 'in_review', 'approved')</code>.
+    Desde <code>issued</code> en adelante el PDF es CLEAN — es el documento que el trabajador imprime y lleva
+    al notario; el sello físico + firmas + huella le dan validez legal. Práctica chilena estándar: finiquitos reales
+    (caso BICE) no llevan watermark.</p>
+  </div>
+
+  <div class="callout">
+    <span class="delta-tag preserved">Preservado · test landmark</span>
+    <h5>Status pill conserva "Listo para firma" (readiness operacional)</h5>
+    <p>El test <code>document-pdf.test.tsx:144</code> asserta literalmente <code>'Listo para firma'</code>
+    cuando <code>documentReadiness=ready</code>. <strong>Status pill habla de readiness operacional HR</strong>
+    (¿se puede emitir?), <strong>NO de ratificación legal</strong>. El estado legal lo comunica el
+    <strong>watermark "PROYECTO"</strong> en paralelo, que sí desaparece cuando <code>documentStatus='signed_or_ratified'</code>.
+    Dos capas, dos audiencias: pill para HR ops, watermark para notario/trabajador.</p>
+  </div>
+
+  <div class="callout">
+    <span class="delta-tag added">Nuevo · legal</span>
+    <h5>Cláusulas PRIMERO–QUINTO narrativas</h5>
+    <p>Texto canónico parametrizado vive en <code>src/lib/copy/finiquito.ts</code>.
+    Cita expresa <strong>art. 159 N°2 CT</strong>, declaración Ley Bustos (art. 162 inc. 5),
+    monto en letras (helper <code>numberToSpanishWords</code>). Las cláusulas COMPLEMENTAN los grids
+    "Partes" y "Relación y causal", no los reemplazan.</p>
+  </div>
+
+  <div class="callout">
+    <span class="delta-tag added">Nuevo · obligatoria 2021+</span>
+    <h5>Cláusula CUARTO — Ley 21.389 pensión alimentos</h5>
+    <p>Banner info con variant Alt A (no afecto) o Alt B (afecto + monto + beneficiario + evidencia).
+    Default <strong>NO existe</strong>: requiere declaración humana explícita con
+    <code>actorUserId</code> + <code>declaredAt</code>. Sin declaración, readiness=blocked.</p>
+  </div>
+
+  <div class="callout">
+    <span class="delta-tag evolved">Evolucionado</span>
+    <h5>Logo empleador · Greenhouse en footer</h5>
+    <p>Logo del empleador desde <code>legal_entity_organizations.logo_asset_id</code> reemplaza el logo
+    Greenhouse en header. Greenhouse pasa a footer utility ("Documento generado con Greenhouse").
+    El finiquito legalmente es del empleador, no del SaaS que lo generó.</p>
+  </div>
+
+  <div class="callout">
+    <span class="delta-tag evolved">Evolucionado</span>
+    <h5>Partes grid 8 fields · Signatures 3 columnas</h5>
+    <p>Partes agrega <strong>Representante empleador</strong> + <strong>Domicilio trabajador/a</strong>
+    (de <code>person_addresses</code> TASK-784). Signatures pasa de 2 columnas a 3 (+Ministro de fe).
+    Huella reducida a 40×40 mm para no competir con la firma.</p>
+  </div>
+
+  <div class="callout">
+    <span class="delta-tag added">Nuevo · multi-state</span>
+    <h5>4 estados canónicos renderizados</h5>
+    <p>State matrix arriba muestra los 4 estados (bloqueado, revisión, pendiente, ratificado) con sus
+    variantes de watermark + status pill + warnings. Cubre el row 7 del modern-ui floor checklist
+    ("all states designed"). Hojas A y B son los 2 estados de producción más relevantes.</p>
+  </div>
+
+  <div class="callout">
+    <span class="delta-tag added">Nuevo · informativo</span>
+    <h5>3 componentes nuevos del engine (Slice A)</h5>
+    <p><code>monthly_gratification_due</code>, <code>used_or_advanced_vacation_adjustment</code>,
+    <code>payroll_overlap_adjustment</code>. Estaban en policy registry pero no se emitían. v2 muestra
+    los 3 visibles en la tabla con la badge <strong>Slice A</strong>. Líneas informativas con $0
+    se renderizan en gris/itálica para audit.</p>
+  </div>
+
+  <div class="callout">
+    <span class="delta-tag added">Nuevo · split</span>
+    <h5>Feriado partido en dos líneas</h5>
+    <p>V1 actual muestra <code>proportional_vacation</code> como una línea agregada. Slice A separa:
+    <code>pending_vacation_carryover</code> (años anteriores) + <code>proportional_vacation_current_period</code>
+    (año en curso). Tratamiento idéntico (<code>non_income</code>, art. 178 CT). Audit operativo mejorado;
+    suma matemáticamente idéntica.</p>
+  </div>
+
+  <div class="callout">
+    <span class="delta-tag fixed">Fix · typography canon</span>
+    <h5>Poppins (display) + Geist (body) · DM Sans deprecated</h5>
+    <p>DESIGN.md líneas 380+384 fijan canon: máximo 2 familias (<strong>Poppins + Geist</strong>),
+    DM Sans <strong>explícitamente prohibido</strong>. El <code>document-pdf.tsx</code> actual aún usa
+    DM Sans (drift contra el contrato) — <strong>Slice D corrige el drift</strong> migrando los 8
+    callsites de <code>fontFamily: 'DM Sans*'</code> a Geist + Poppins, alineando el PDF con el portal.</p>
+  </div>
+
+</div>
+
+</body>
+</html>
