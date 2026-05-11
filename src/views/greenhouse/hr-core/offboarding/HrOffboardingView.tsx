@@ -963,7 +963,6 @@ const HrOffboardingView = () => {
               title={GH_FINIQUITO.resignation.prerequisites.resignationLetterDialog.uploaderTitle}
               helperText={GH_FINIQUITO.resignation.prerequisites.resignationLetterDialog.uploaderHelper}
               ownerMemberId={resignationLetterTarget?.memberId ?? null}
-              ownerClientId={resignationLetterTarget?.organizationId ?? null}
               metadataLabel={resignationLetterTarget?.publicId ?? null}
               disabled={resignationLetterSaving}
             />
@@ -1062,7 +1061,6 @@ const HrOffboardingView = () => {
                   title={GH_FINIQUITO.resignation.prerequisites.maintenanceDialog.evidenceTitle}
                   helperText={GH_FINIQUITO.resignation.prerequisites.maintenanceDialog.evidenceHelper}
                   ownerMemberId={maintenanceTarget?.memberId ?? null}
-                  ownerClientId={maintenanceTarget?.organizationId ?? null}
                   metadataLabel={`${maintenanceTarget?.publicId ?? ''} · pensión alimentos`}
                   disabled={maintenanceSaving}
                 />

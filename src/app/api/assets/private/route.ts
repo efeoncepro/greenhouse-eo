@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 
 import type { DraftUploadContext, PrivateAssetUploadResponse } from '@/types/assets'
 import { resolveCurrentHrMemberId } from '@/lib/hr-core/service'
+import { captureWithDomain } from '@/lib/observability/capture'
 import { createPrivatePendingAsset } from '@/lib/storage/greenhouse-assets'
 import { hasRoleCode, hasRouteGroup, requireTenantContext } from '@/lib/tenant/authorization'
 import { ROLE_CODES } from '@/config/role-codes'
@@ -141,7 +142,65 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'El archivo supera el tamaño permitido.' }, { status: 400 })
     }
 
-    console.error('POST /api/assets/private failed:', error)
+    // TASK-863 hardening: translate PG constraint violations to specific 4xx
+    // responses (was: opaque 500 hid the FK violation root cause).
+    // 23503 = foreign_key_violation, 23505 = unique_violation, 23514 = check_violation.
+    const pgCode = (error as { code?: string })?.code
+    const constraint = (error as { constraint?: string })?.constraint
+
+    if (pgCode === '23503') {
+      captureWithDomain(error, 'identity', {
+        tags: { source: 'assets_private_upload', stage: 'fk_violation' },
+        extra: { constraint }
+      })
+
+      return NextResponse.json(
+        {
+          error: 'Referencia inválida en el asset (FK violation).',
+          detail: constraint ? `constraint=${constraint}` : undefined
+        },
+        { status: 400 }
+      )
+    }
+
+    if (pgCode === '23505') {
+      captureWithDomain(error, 'identity', {
+        tags: { source: 'assets_private_upload', stage: 'unique_violation' },
+        extra: { constraint }
+      })
+
+      return NextResponse.json(
+        { error: 'El asset ya existe (conflicto de unicidad).' },
+        { status: 409 }
+      )
+    }
+
+    if (pgCode === '23514') {
+      captureWithDomain(error, 'identity', {
+        tags: { source: 'assets_private_upload', stage: 'check_violation' },
+        extra: { constraint }
+      })
+
+      return NextResponse.json(
+        { error: 'Valor del asset no cumple las validaciones del catálogo.' },
+        { status: 400 }
+      )
+    }
+
+    if (message.startsWith('upload_failed:')) {
+      captureWithDomain(error, 'identity', {
+        tags: { source: 'assets_private_upload', stage: 'gcs_upload_failed' }
+      })
+
+      return NextResponse.json(
+        { error: 'No se pudo escribir el archivo en el bucket.' },
+        { status: 502 }
+      )
+    }
+
+    captureWithDomain(error, 'identity', {
+      tags: { source: 'assets_private_upload', stage: 'unknown' }
+    })
 
     return NextResponse.json({ error: 'Unable to upload private asset.' }, { status: 500 })
   }
