@@ -76,6 +76,14 @@ Regla: módulos de dominio extienden estos objetos, no crean identidades paralel
 - Outbox governance debe incluir `schemaVersion: 1` y `affectedUserIds` cuando el cambio impacte usuarios; `organizationWorkspaceCacheInvalidationProjection` soporta fan-out vía `extractScopes`.
 - Signals canónicos: `identity.governance.audit_log_write_failures` y `identity.governance.pending_approval_overdue`. Steady state esperado: 0.
 
+### Deprecated Capabilities Discipline (TASK-840, desde 2026-05-11)
+
+- Cuando una capability se remueve del TS catalog (`src/config/entitlements-catalog.ts`), acompañar el cambio con una migration que marque `greenhouse_core.capabilities_registry.deprecated_at`; nunca borrar rows del registry.
+- No deprecar una capability que todavía existe en el TS catalog. Eso es drift inverso y se corrige seedeando/actualizando `capabilities_registry`.
+- Usar `markCapabilityDeprecated()` o el endpoint canónico `/api/admin/entitlements/capabilities/[capabilityKey]/deprecate`; no escribir `deprecated_at` a mano desde rutas nuevas.
+- Antes de deprecar, verificar grants activos en `role_entitlement_defaults` y `user_entitlement_overrides`. Si existen, migrar/documentar esos grants primero.
+- El reporter one-shot `scripts/governance/find-deprecated-candidates.ts` lista candidates en CSV; no auto-depreca ni reemplaza revisión de operador.
+
 ### Secret Manager Hygiene
 
 - Secretos consumidos por `*_SECRET_REF` deben publicarse como scalar crudo: sin comillas envolventes, sin `\n`/`\r` literal y sin whitespace residual.

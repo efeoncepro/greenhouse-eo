@@ -1045,7 +1045,8 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       { capability: 'access.governance.user_overrides.create', actions: ['create'] },
       { capability: 'access.governance.user_overrides.approve', actions: ['approve'] },
       { capability: 'access.governance.startup_policy.update', actions: ['update'] },
-      { capability: 'access.governance.audit_log.read', actions: ['read'] }
+      { capability: 'access.governance.audit_log.read', actions: ['read'] },
+      { capability: 'access.governance.capability.deprecate', actions: ['manage'] }
     ]
 
     for (const { capability, actions } of accessGovernanceCapabilities) {

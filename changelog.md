@@ -1,5 +1,9 @@
 # changelog.md
 
+## 2026-05-11
+
+- **TASK-840 — Deprecated capabilities cleanup.** Se agrega disciplina canónica para retirar capabilities del TS catalog sin borrar historia del registry: helper transaccional `markCapabilityDeprecated()`, endpoint admin `/api/admin/entitlements/capabilities/[capabilityKey]/deprecate` con capability granular `access.governance.capability.deprecate`, audit log `capability_deprecated`, outbox event `access.capability.deprecated` v1 y reporter CSV read-only `scripts/governance/find-deprecated-candidates.ts`. La migration también repara drift live inverso detectado durante discovery (`commercial.engagement.recover_outbound`, `platform.release.watchdog.read` faltaban en registry activo).
+
 ## 2026-05-10
 
 - **TASK-857 — GitHub Webhooks Release Event Ingestion implementada en `develop`.** Se agrega endpoint server-to-server `POST /api/webhooks/github/release-events` con validación GitHub `X-Hub-Signature-256` antes de parse/persist, dedupe por `X-GitHub-Delivery`, seed `webhook_endpoints` y tabla normalizada `greenhouse_sync.github_release_webhook_events` para metadata redacted + match/reconcile evidence. El reconciler matchea contra `release_manifests` por `target_sha` y fallback `workflow_run_id`; eventos sin match quedan `unmatched` y no crean manifests. Solo fallas de workflows allowlisted pueden transicionar por la state machine existente (`ready|deploying -> aborted`, `verifying -> degraded`); eventos exitosos quedan como evidencia y no declaran `released`. Se agrega signal `platform.release.github_webhook_unmatched`; el watchdog TASK-849 sigue activo como backstop. Tests/validación: suite Vitest completa por filtro local `4073 passed / 11 skipped` y `pnpm exec tsc --noEmit` verde.

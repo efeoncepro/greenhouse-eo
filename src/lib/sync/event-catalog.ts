@@ -276,6 +276,7 @@ export const EVENT_TYPES = {
   entitlementRoleDefaultChanged: 'access.entitlement_role_default_changed',
   entitlementUserOverrideChanged: 'access.entitlement_user_override_changed',
   startupPolicyChanged: 'access.startup_policy_changed',
+  capabilityDeprecated: 'access.capability.deprecated',
 
   // DTE Reconciliation
   dteAutoMatched: 'finance.dte.auto_matched',

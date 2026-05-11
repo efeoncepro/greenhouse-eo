@@ -844,6 +844,12 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     actions: ['read'] as const,
     defaultScope: 'tenant'
   },
+  {
+    key: 'access.governance.capability.deprecate',
+    module: 'admin',
+    actions: ['manage'] as const,
+    defaultScope: 'tenant'
+  },
   // TASK-848 — Production Release Control Plane.
   // 3 capabilities granulares least-privilege. NO platform.admin catch-all.
   // Mismo patron que TASK-742 (auth resilience), TASK-765 (payment orders),

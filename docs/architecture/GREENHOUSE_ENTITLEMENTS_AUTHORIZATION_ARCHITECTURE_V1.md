@@ -1,5 +1,13 @@
 # Greenhouse Entitlements & Authorization Architecture V1
 
+## Delta 2026-05-11 — TASK-840 deprecated capabilities cleanup
+
+- El registry mantiene historia append-only operacional: cuando una capability sale del TS catalog, la migration debe marcar `greenhouse_core.capabilities_registry.deprecated_at`; no se eliminan rows porque grants históricos y FKs dependen de `capability_key`.
+- El helper canónico para mutación es `markCapabilityDeprecated()` en `src/lib/capabilities-registry/deprecate.ts`: rechaza capabilities aún presentes en TS, bloquea si existen grants activos, actualiza `deprecated_at`, inserta `entitlement_governance_audit_log.change_type='capability_deprecated'` y emite outbox `access.capability.deprecated` v1 en la misma transacción.
+- La API canónica es `/api/admin/entitlements/capabilities/[capabilityKey]/deprecate`; no se crean rutas paralelas `/api/admin/governance/access/**`.
+- Access model: `routeGroups` y `views` no cambian; la mutación fina vive en la capability `access.governance.capability.deprecate` (`manage`, `tenant`) otorgada por runtime a `efeonce_admin`. `startup policy` no participa.
+- `scripts/governance/find-deprecated-candidates.ts` es reporter one-shot read-only en CSV. La deprecación sigue siendo operador-driven, no cron auto-mutating.
+
 ## Delta 2026-05-11 — TASK-839 wirea Admin Center governance contra runtime real
 
 - La surface canónica para operar governance de entitlements es la existente:
