@@ -6,13 +6,13 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `none`
-- Status real: `Implementación — Slice A iniciado 2026-05-11`
+- Status real: `Complete — Slices A-F shipped 2026-05-11 directo en develop; Slice G (revisión legal externa) queda fuera de repo + flag final_settlement_resignation_production_enabled=FALSE hasta que el abogado laboralista firme el spec`
 - Rank: `TBD`
 - Domain: `hr`
 - Blocked by: `none` (TASK-784 enriquece pero no bloquea)
