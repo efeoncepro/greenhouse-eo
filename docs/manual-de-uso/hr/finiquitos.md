@@ -1,12 +1,29 @@
 # Finiquitos Chile
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-05-04 por Codex
-> **Ultima actualizacion:** 2026-05-05 por Codex
+> **Ultima actualizacion:** 2026-05-11 por Claude (TASK-862 — V1 closing)
 > **Modulo:** HR / Payroll
 > **Ruta en portal:** `/hr/offboarding`
-> **Documentacion relacionada:** [Finiquitos Chile](../../documentation/hr/finiquitos.md), [GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md)
+> **Documentacion relacionada:** [Finiquitos Chile](../../documentation/hr/finiquitos.md), [GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md), [GREENHOUSE_FINAL_SETTLEMENT_V1_SPEC.md](../../architecture/GREENHOUSE_FINAL_SETTLEMENT_V1_SPEC.md)
+
+## Delta TASK-862 (2026-05-11) — flujo nuevo end-to-end
+
+Antes de calcular el finiquito ahora **debes** completar 2 pre-requisitos. Sin ellos, el calculo se bloquea con un mensaje claro:
+
+1. **Subir la carta de renuncia ratificada** del trabajador como asset al caso de offboarding (`POST /api/hr/offboarding/cases/[caseId]/resignation-letter`). El sistema valida que el asset exista en `greenhouse_core.assets` antes de linkearlo. Idempotente: subir un assetId distinto sobreescribe (queda registrado en audit log).
+2. **Declarar la pension de alimentos (Ley 21.389)**: para cada renuncia, declara explicitamente si el trabajador **NO** esta afecto a retencion (Alternativa A) o **SI** esta afecto (Alternativa B con monto + beneficiario obligatorios, evidencia opcional). Endpoint `POST /api/hr/offboarding/cases/[caseId]/maintenance-obligation`.
+
+Despues del calculo + emision, llevas el PDF al notario (limpio, sin watermark "PROYECTO"). El notario lo firma + estampa. El trabajador imprime su huella y, opcionalmente, escribe su reserva de derechos. Vuelves al portal y haces clic en **"Registrar ratificación"** — se abre un dialog donde capturas:
+
+- Tipo de ministro de fe: notario / inspector del trabajo / presidente de sindicato / oficial del Registro Civil.
+- Nombre completo + RUT.
+- Notaria u oficina (opcional).
+- Fecha de ratificacion.
+- Si el trabajador consigno reserva de derechos (toggle + transcripcion del texto manuscrito).
+
+Greenhouse marca `documentStatus='signed_or_ratified'` y el PDF regenera SIN watermark con los datos del ministro de fe embebidos como sistema de registro.
 
 ## Para que sirve
 

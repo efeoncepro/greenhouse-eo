@@ -1,10 +1,21 @@
 # Finiquitos Chile
 
 > **Tipo de documento:** Documentacion funcional
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-05-04 por Codex
-> **Ultima actualizacion:** 2026-05-05 por Codex
-> **Documentacion tecnica:** [GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md)
+> **Ultima actualizacion:** 2026-05-11 por Claude (TASK-862 — V1 closing)
+> **Documentacion tecnica:** [GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md) · [GREENHOUSE_FINAL_SETTLEMENT_V1_SPEC.md](../../architecture/GREENHOUSE_FINAL_SETTLEMENT_V1_SPEC.md)
+
+## Delta TASK-862 (2026-05-11) — V1 closing
+
+V1 del finiquito de renuncia voluntaria se cerro como documento legalmente ratificable ante ministro de fe:
+
+- **Engine emite 9 componentes** (antes 4): se agregan `monthly_gratification_due` (modo anual_proporcional, tope art. 50 CT 4,75 IMM/12), `used_or_advanced_vacation_adjustment` (vacaciones tomadas por adelantado) y `payroll_overlap_adjustment` (linea informativa). El feriado se separa en `pending_vacation_carryover` (anios anteriores) + `proportional_vacation_current_period` (anio en curso).
+- **PDF legal completo**: clausulas narrativas PRIMERO-QUINTO + Ley Bustos (art. 162 inc. 5 CT) + banner Ley 21.389 pension de alimentos (Alt A no afecto / Alt B afecto) + reserva de derechos block + 3 firmas (empleador / trabajador + huella / ministro de fe) + watermark "PROYECTO" interno (CLEAN cuando se imprime para el notario) + logo del empleador + monto en letras + Greenhouse en footer utility.
+- **Pre-requisitos enforced** por buildDocumentReadiness: carta de renuncia ratificada subida como asset (blocker) + declaracion Ley 21.389 (blocker) + domicilio del trabajador resuelto desde TASK-784 (warning).
+- **HrOffboardingView sign-or-ratify dialog real**: captura datos canonicos del ministro de fe (notario / inspector / sindicato / Registro Civil) + reserva de derechos del trabajador con transcripcion manuscrita. Reemplaza el placeholder `external_process_placeholder`.
+- **Tipografia migrada** a Geist + Poppins (DESIGN.md canon; DM Sans deprecated).
+- **Flag de produccion** `final_settlement_resignation_production_enabled` queda `FALSE` por default hasta revision legal externa por abogado laboralista chileno.
 
 ## Que es el settlement final
 
