@@ -16,6 +16,41 @@
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
+## Delta 2026-05-11 — Arch hardening pre-implementación (6 gaps canónicos)
+
+Skill `arch-architect` (Greenhouse overlay) revisó la spec aplicando patrones canonizados después de la creación de esta task (TASK-611/784/863/743/265). 6 gaps que se deben cerrar **antes de empezar Slice 1**:
+
+1. **Capabilities granulares enumeradas + reflejadas en `capabilities_registry` (TASK-611 Slice 2).** Draft dice "access model V2" sin enumerar. Patrón canónico TASK-784 declara 6 capabilities per módulo. Mínimos para document manager:
+    - `documents.read_masked` — list/view docs con sensitive fields enmascarados (member: scope=own, HR: scope=tenant, EFEONCE_ADMIN: scope=all).
+    - `documents.upload` — self-service upload (member: scope=own only; HR: scope=tenant para terceros).
+    - `documents.verify` — HR aprueba/rechaza (route_group=hr / EFEONCE_ADMIN, scope=tenant).
+    - `documents.reveal_sensitive` — desenmascarar campos confidenciales con reason >= 20 chars + audit + outbox (EFEONCE_ADMIN solo + FINANCE_ADMIN para algunos; NUNCA member scope).
+    - `documents.export_snapshot` — generador de PDF/zip para auditor externo (HR + EFEONCE_ADMIN, scope=tenant).
+    - `documents.archive` — soft-tombstone via state machine TASK-489 (HR + EFEONCE_ADMIN).
+    Cada una declarada en `src/config/entitlements-catalog.ts` + seedeada vía migration en `greenhouse_core.capabilities_registry` con parity test runtime↔DB (pattern TASK-611 `parity.live.test.ts`).
+2. **DataTableShell canonical wrapper (TASK-743).** Draft menciona "table/list, filters" sin nombrar wrapper. Cualquier tabla > 8 columnas o con celdas editables inline (verify action, expiry chip editable) DEBE envolverse en `<DataTableShell>` con `useTableDensity()`. Lint rule `greenhouse/no-raw-table-without-shell` bloquea regression.
+3. **Microcopy via `src/lib/copy/documents.ts` (TASK-265/407/408).** Draft NO menciona shared copy module. Patrón canónico: extender `src/lib/copy/` con namespace `GH_DOCUMENTS` per dominio (states: pendiente/verificado/rechazado/archivado/vencido, CTAs: subir/verificar/rechazar/archivar/descargar/desenmascarar, aria-labels, error messages, empty states). NUNCA literals JSX. Lint rule `greenhouse/no-untokenized-copy` enforce.
+4. **Reveal pattern canonical (TASK-784).** Draft menciona "confidencialidad" sin pattern. Para fields/docs sensibles: server-only resolver `revealDocument({docId, reason: string >= 20, actorUserId})` con capability check + audit log row en `document_reveal_audit` + outbox event `document.revealed_sensitive.v1`. Anomaly rate signal `documents.reveal_anomaly_rate` (>=3 reveals/24h por actor → warning). Cliente NUNCA decide visibilidad — recibe payload pre-redacted.
+5. **Organization Workspace shell facets (TASK-611/612/613).** Draft menciona "patterns shared" pero NO declara que el document manager debe vivir como **facet del Organization Workspace shell** cuando emerja desde entrypoints organization-centric (`/agency/organizations/[id]?facet=documents`, `/finance/clients/[id]?facet=documents`). El gestor "global" `/admin/documents` puede ser standalone, pero los gestores per-org consumen `FACET_REGISTRY` con lazy `dynamic()` import. Patrón fuente: FinanceFacet con per-entrypoint dispatch (TASK-613).
+6. **Person 360 facet alignment.** Draft dice "People 360" sin clarificar canonical 360 object. Decisión: docs LABORALES viven facet del **Colaborador** (`team_members`), docs de IDENTIDAD LEGAL personal viven en facet de **Persona** (`identity_profiles`) — TASK-784 ya los modela como `person_identity_documents`. Para tab `/people/[memberId]?tab=documents`, mostrar docs laborales filtrados por `member_id` via bridge `document_member_link`. Pattern canónico TASK-784 reveal-on-demand.
+
+**4-pillar score requerido al cerrar Slice 1**:
+
+- **Safety**: 6 capabilities granulares + capabilities_registry parity + reveal con reason+audit. Residual: client-side filter solo, server enforce siempre.
+- **Robustness**: DataTableShell con useTableDensity defense, copy via canonical module impide literals drift.
+- **Resilience**: signal `documents.reveal_anomaly_rate` + `documents.list_p95_lag` (read perf).
+- **Scalability**: cursor pagination (keyset on `created_at DESC`) NO offset; lazy `dynamic()` per facet evita bundle bloat.
+
+**Patrones canónicos fuente para replicar**:
+
+- TASK-743 `<DataTableShell>` + `<InlineNumericEditor>`.
+- TASK-784 6 capabilities + reveal helper + audit + outbox.
+- TASK-611/612/613 Organization Workspace shell + FACET_REGISTRY.
+- TASK-265/407/408 copy modules + lint rule.
+- TASK-854 `/admin/releases` dashboard pattern (cursor pagination + drawer + EmptyState + sonner toast).
+
+---
+
 ## Summary
 
 Construir el primer gestor documental visible del portal: surfaces, componentes y access model V2 para listar, filtrar, descargar, cargar y revisar documentos desde una base shared, sin obligar a cada módulo a inventar su propia UI.

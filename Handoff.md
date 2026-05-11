@@ -1,3 +1,25 @@
+# Sesion 2026-05-11 — Arch hardening del chain documental EPIC-001 (TASK-027/489/492/494)
+
+- **Trigger:** usuario pidió invocar `arch-architect` (Greenhouse overlay) para revisar el chain documental EPIC-001 con focus en alineación canónica vs patterns canonizados después de la creación de las tasks: TASK-611/612/613 (Organization Workspace shell + capabilities_registry), TASK-742 (7-layer defense), TASK-771/773 (outbox + reactive consumer), TASK-780 (rollout flag platform), TASK-784 (Person Legal Profile reveal pattern), TASK-863 V1.1→V1.5.2 (final settlement lifecycle + Real-Artifact Verification Loop + Semantic Column Invariants).
+- **Análisis ejecutado:** lectura de 4 tasks (TASK-027 legacy, TASK-489 foundation, TASK-492 UI/access, TASK-494 HR convergence) + EPIC-001. Aplicación de 4-pillar checklist + Greenhouse overlay pinned decisions.
+- **17 gaps detectados** distribuidos en:
+  - TASK-489 (8 gaps): polymorphic FK anti-pattern, frontera TASK-784, state machine sin CHECK+audit, outbox incompleto+sin v1, retention classes, reliability signals, tenant-safety pattern explícito, multi-version supersede pattern.
+  - TASK-492 (6 gaps): capabilities granulares sin enumerar+sin capabilities_registry, DataTableShell wrapper, microcopy via copy module, reveal pattern, Organization Workspace shell facets, Person 360 alignment.
+  - TASK-494 (7 gaps): frontera final_settlement_documents, frontera person_identity_documents, Colaborador Workspace shell, reveal pattern NOT boolean, document_type retention class, Real-Artifact Verification Loop, capabilities granulares heredadas.
+  - TASK-027 (3 gaps): legacy status explícito, certifications boundary resuelta, People 360 tab pattern resuelto.
+  - EPIC-001 (5 patterns referenciados): TASK-742/611/771/773/784/863 deltas.
+- **Deltas aplicados** a 5 archivos:
+  - `docs/tasks/to-do/TASK-489-document-registry-versioning-foundation.md`
+  - `docs/tasks/to-do/TASK-492-document-manager-access-model-ui-foundation.md`
+  - `docs/tasks/to-do/TASK-494-hr-document-vault-convergence.md`
+  - `docs/tasks/to-do/TASK-027-hris-document-vault.md`
+  - `docs/epics/to-do/EPIC-001-document-vault-signature-orchestration-platform.md`
+- **Aprendizaje meta:** las 4 tasks eran sólidas en intención original (2026-04-13 → 2026-04-19) pero quedaron desalineadas en 3 semanas de canonización rápida (TASK-611 a TASK-863). El gap class no es "tasks mal diseñadas" — es "tasks correctas en su época que necesitan refresh canónico antes de empezar". **Pattern reusable**: cuando una task `to-do` lleva >30 días sin moverse, ejecutar `arch-architect` review con focus en patrones canonizados desde su creación.
+- **Out of scope deliberado:** NO se modificó código ni schema (las tasks siguen en `to-do/`). NO se reordenaron prioridades del backlog. NO se creó task nueva.
+- **4-pillar score del hardening mismo**: Safety bajo (cambios documentales reversible vía git revert) · Robustness alto (cierra 17 gaps que habrían emergido during implementation) · Resilience alto (defense pre-implementation previene re-trabajo) · Scalability alto (deltas siguen template canónico, reusable para futuras task reviews).
+
+---
+
 # Sesion 2026-05-11 — TASK-863 V1.5.2 — Lifecycle PDF defense-in-depth (regen canónico en TODAS las transiciones)
 
 - **Trigger:** usuario detectó en re-emisión real (Valentina Hoyos settlement v2 d15) que el PDF aprobado seguía mostrando "Borrador HR" + watermark "PROYECTO". Diagnóstico: solo `issued` + `signed_or_ratified` regeneraban; las 5 transitions restantes (`in_review`, `approved`, `voided`, `rejected`, `superseded`) dejaban el PDF stale respecto al `document_status` actual de DB. Bug class más amplio que el síntoma puntual.
