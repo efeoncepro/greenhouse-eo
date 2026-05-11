@@ -632,6 +632,36 @@ const previsionalTreatmentLabel: Record<string, string> = {
   needs_review: 'Revisar'
 }
 
+// TASK-863 V1.2 — badge del PDF refleja documentStatus canónico (no solo readiness).
+// Antes el badge mostraba "Listo para firma" basado en readiness.status='ready', lo
+// cual era engañoso porque el documento aun podia estar en `rendered` (borrador HR)
+// con watermark PROYECTO. Ahora el badge muestra el estado del flow legal real.
+const documentStatusLabel: Record<string, string> = {
+  rendered: 'Borrador HR',
+  in_review: 'En revisión interna',
+  approved: 'Aprobado · pendiente de emisión',
+  issued: 'Listo para firma',
+  signed_or_ratified: 'Firmado / ratificado',
+  blocked: 'Bloqueado para emitir',
+  rejected: 'Rechazado por trabajador',
+  voided: 'Anulado',
+  superseded: 'Reemplazado'
+}
+
+const documentStatusPillStyle = (status: string) => {
+  if (status === 'blocked' || status === 'rejected' || status === 'voided') {
+    return [styles.statusPill, styles.statusPillBlocked]
+  }
+
+  if (status === 'rendered' || status === 'in_review' || status === 'superseded') {
+    return [styles.statusPill, styles.statusPillReview]
+  }
+
+  // issued / signed_or_ratified / approved → success (verde)
+  return styles.statusPill
+}
+
+// Backward-compat: readiness fallback cuando no hay documentStatus explicito.
 const readinessLabel: Record<string, string> = {
   ready: 'Listo para firma',
   needs_review: 'Revisión interna requerida',
@@ -868,7 +898,15 @@ const FinalSettlementPdfDocument = ({
             <Image src={headerLogoSrc} style={styles.logo} />
           </View>
           <View style={styles.docMeta}>
-            <Text style={readinessPillStyle(readinessStatus)}>{readinessLabel[readinessStatus]}</Text>
+            {/* TASK-863 V1.2 — badge refleja documentStatus canonico cuando viene del caller.
+                Fallback a readiness label cuando renderer legacy lo invoca sin documentStatus. */}
+            {documentStatus ? (
+              <Text style={documentStatusPillStyle(documentStatus)}>
+                {documentStatusLabel[documentStatus] ?? documentStatus}
+              </Text>
+            ) : (
+              <Text style={readinessPillStyle(readinessStatus)}>{readinessLabel[readinessStatus]}</Text>
+            )}
           </View>
         </View>
 
