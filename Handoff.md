@@ -1,3 +1,12 @@
+# Sesion 2026-05-11 — TASK-840 Deprecated capabilities cleanup tomada
+
+- **Trigger:** usuario pidió implementar `TASK-840 — ISSUE-068 Fase 6: Deprecated capabilities cleanup`, manteniéndose explícitamente en `develop` y sin cambiar de rama.
+- **Branch:** `develop` por instrucción explícita del usuario; se omite la rama `task/TASK-840-*` del flujo default y se documenta como override operativo.
+- **Ownership:** task movida a `docs/tasks/in-progress/TASK-840-issue-068-fase-6-deprecated-capabilities-cleanup.md`, Lifecycle `in-progress`, README sincronizado. No hay PR/branch TASK-840 activo.
+- **Discovery inicial:** TASK-839 ya cerrada, por lo tanto el bloqueo quedó resuelto. El trabajo toca identity/access, registry DB, audit log, outbox y endpoint App Router; requiere migration y validación contra `capabilities_registry` + grants activos.
+- **Skills:** `greenhouse-agent`, `greenhouse-task-planner` y `vercel:nextjs` cargadas para task lifecycle, backend Greenhouse y App Router.
+- **Siguiente paso inmediato:** completar discovery técnico, presentar AUDIT + mapa + plan y luego implementar slice por slice.
+
 # Sesion 2026-05-11 — TASK-839 Admin Center governance wire-up cerrada
 
 - **Branch:** `develop` por instrucción explícita del usuario; no se cambió de rama.
