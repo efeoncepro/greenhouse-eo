@@ -147,7 +147,9 @@ describe('renderFinalSettlementDocumentPdf', () => {
     expect(text.replace(/\s+/g, ' ')).toContain('Finiquito de contrato de trabajo')
     expect(text).toContain('Listo para firma')
     expect(text).not.toContain('Requiere revisión')
-    expect(text).toContain('Documento GH-FIN-2026-')
+    // TASK-863 V1.1 — metadata técnica movida del header top al footer auditoría.
+    // El prefix "Documento" se quitó; el ID sigue presente en el footer.
+    expect(text).toMatch(/GH-FIN-2026-[A-F0-9]{8}/)
     expect(text).toContain('Snapshot fs-v1')
     expect(text).toContain('Tratamiento')
     expect(text).toContain('Respaldo')
@@ -184,9 +186,10 @@ describe('renderFinalSettlementDocumentPdf', () => {
     expect(text).toContain('Ministro de fe')
     expect(text).toContain('Pendiente de ratificación')
     // Huella renderiza dentro de la caja huellaBox; pdf-parse no siempre captura
-    // strings dentro de boxes pequenos. El text "Huella\ndactilar" puede no aparecer
-    // textual; basta confirmar la columna ministro + Greenhouse footer.
-    expect(text).toContain('Documento generado con Greenhouse')
+    // strings dentro de boxes pequenos. TASK-863 V1.1 — footer consolidado: el
+    // brand "Greenhouse · greenhouse.efeoncepro.com" reemplaza "Documento generado
+    // con Greenhouse" del V1.0.
+    expect(text).toContain('Greenhouse · greenhouse.efeoncepro.com')
   })
 
   it('uses document readiness instead of settlement warnings for the visible issuance state', async () => {

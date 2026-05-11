@@ -715,7 +715,7 @@ export const renderFinalSettlementDocumentForCase = async (input: RenderFinalSet
 
     const documentId = `final-settlement-document-${randomUUID()}`
     const snapshotHash = computeJsonSha256(snapshot)
-    const pdfBytes = await renderFinalSettlementDocumentPdf(snapshot)
+    const pdfBytes = await renderFinalSettlementDocumentPdf(snapshot, { documentStatus: 'rendered' })
     const contentHash = computeBytesSha256(pdfBytes)
     const documentVersion = (latest?.documentVersion ?? 0) + 1
     const fileName = `finiquito-${settlement.memberId}-v${settlement.settlementVersion}-d${documentVersion}.pdf`
@@ -878,6 +878,72 @@ const assertSnapshotHashMatches = (document: FinalSettlementDocument) => {
   }
 }
 
+/**
+ * TASK-863 V1.1 — Regenera el PDF + reemplaza el asset cuando el documento
+ * transita a un estado que requiere render distinto:
+ *   - `issued`: watermark "PROYECTO" → CLEAN (PDF para llevar al notario)
+ *   - `signed_or_ratified`: + bloque de ministro de fe + reserva worker
+ *
+ * Mantiene `pdf_asset_id` apuntando al nuevo asset; el viejo queda con status
+ * `attached` historico (no se borra para audit trail).
+ *
+ * Es idempotente: si el render falla, la transition de estado ya commiteo
+ * (UPDATE document_status) y el operador puede invocar reissue para recovery.
+ * Esto NO es ideal pero evita rollback de un estado legal valido por error
+ * transitorio de render.
+ */
+const regenerateDocumentPdfForStatus = async (
+  client: PoolClient,
+  document: FinalSettlementDocument,
+  newDocumentStatus: 'issued' | 'signed_or_ratified',
+  actorUserId: string,
+  ratification?: FinalSettlementRatification | null
+): Promise<{ pdfAssetId: string; contentHash: string } | null> => {
+  try {
+    // Snapshot inmutable: reuse el existente (hash matches, ya validado upstream).
+    // Para signed_or_ratified, hidratamos la ratification si el caller la pasa.
+    const snapshot: FinalSettlementDocumentSnapshot = ratification
+      ? { ...document.snapshot, ratification }
+      : document.snapshot
+
+    const pdfBytes = await renderFinalSettlementDocumentPdf(snapshot, { documentStatus: newDocumentStatus })
+    const contentHash = computeBytesSha256(pdfBytes)
+    const fileName = `finiquito-${document.memberId}-v${document.settlementVersion}-d${document.documentVersion}-${newDocumentStatus}.pdf`
+
+    const asset = await storeSystemGeneratedPrivateAsset({
+      ownerAggregateType: 'final_settlement_document',
+      ownerAggregateId: document.finalSettlementDocumentId,
+      ownerMemberId: document.memberId,
+      fileName,
+      mimeType: 'application/pdf',
+      bytes: pdfBytes,
+      actorUserId,
+      metadata: {
+        finalSettlementId: document.finalSettlementId,
+        offboardingCaseId: document.offboardingCaseId,
+        documentVersion: document.documentVersion,
+        regeneratedFor: newDocumentStatus,
+        contentHash
+      }
+    })
+
+    await client.query(
+      `UPDATE greenhouse_payroll.final_settlement_documents
+       SET pdf_asset_id = $2, content_hash = $3, updated_at = now(), updated_by_user_id = $4
+       WHERE final_settlement_document_id = $1`,
+      [document.finalSettlementDocumentId, asset.assetId, contentHash, actorUserId]
+    )
+
+    return { pdfAssetId: asset.assetId, contentHash }
+  } catch (error) {
+    // Render fail no debe abortar la transition (estado legal ya commiteado).
+    // El operador puede usar reissue para recovery.
+    console.warn(`[regenerateDocumentPdfForStatus] failed for status=${newDocumentStatus}:`, error instanceof Error ? error.message : error)
+
+    return null
+  }
+}
+
 export const submitFinalSettlementDocumentForReview = async ({
   offboardingCaseId,
   actorUserId
@@ -1031,17 +1097,27 @@ export const issueFinalSettlementDocumentForCase = async ({
 
   const document = mapDocumentRow(result.rows[0])
 
+  // TASK-863 V1.1 — Regenerar PDF al transicionar a issued para que el
+  // operador descargue el PDF SIN watermark "PROYECTO" para llevar al notario.
+  // Idempotente: si falla el render, la transition de estado ya commiteo y
+  // operador puede usar reissue para recovery.
+  const regenerated = await regenerateDocumentPdfForStatus(client, document, 'issued', actorUserId)
+
+  const issuedDocument = regenerated
+    ? { ...document, pdfAssetId: regenerated.pdfAssetId, contentHash: regenerated.contentHash }
+    : document
+
   await insertDocumentEvent(client, {
-    document,
+    document: issuedDocument,
     eventType: EVENT_TYPES.hrFinalSettlementDocumentIssued,
     fromStatus: current.documentStatus,
-    toStatus: document.documentStatus,
+    toStatus: issuedDocument.documentStatus,
     actorUserId,
-    payload: { pdfAssetId: document.pdfAssetId }
+    payload: { pdfAssetId: issuedDocument.pdfAssetId, pdfRegenerated: Boolean(regenerated) }
   })
-  await publishDocumentEvent(client, EVENT_TYPES.hrFinalSettlementDocumentIssued, document)
+  await publishDocumentEvent(client, EVENT_TYPES.hrFinalSettlementDocumentIssued, issuedDocument)
 
-  return document
+  return issuedDocument
 })
 
 export const voidFinalSettlementDocumentForCase = async ({
@@ -1206,23 +1282,51 @@ export const markFinalSettlementDocumentSignedOrRatifiedForCase = async ({
 
   const document = mapDocumentRow(result.rows[0])
 
+  // TASK-863 V1.1 — Regenerar PDF al transicionar a signed_or_ratified.
+  // El nuevo render embebe metadata del ministro de fe + worker reservation
+  // como ratification snapshot, y queda SIN watermark.
+  const ratificationSnapshot: FinalSettlementRatification | null = (() => {
+    const minister = (evidenceRef as Record<string, unknown>) ?? {}
+    const ratifiedAt = typeof minister.ratifiedAt === 'string' ? minister.ratifiedAt : null
+
+    if (!ratifiedAt) return null
+
+    return {
+      ministerKind: typeof minister.ministerKind === 'string' ? minister.ministerKind : null,
+      ministerName: typeof minister.ministerName === 'string' ? minister.ministerName : null,
+      ministerTaxId: typeof minister.ministerTaxId === 'string' ? minister.ministerTaxId : null,
+      notaria: typeof minister.notaria === 'string' ? minister.notaria : null,
+      ratifiedAt,
+      workerReservationOfRights: document.workerReservationOfRights,
+      workerReservationNotes: document.workerReservationNotes,
+      signatureEvidenceAssetId: document.signatureEvidenceAssetId
+    } as FinalSettlementRatification
+  })()
+
+  const regenerated = await regenerateDocumentPdfForStatus(client, document, 'signed_or_ratified', actorUserId, ratificationSnapshot)
+
+  const ratifiedDocument = regenerated
+    ? { ...document, pdfAssetId: regenerated.pdfAssetId, contentHash: regenerated.contentHash }
+    : document
+
   await insertDocumentEvent(client, {
-    document,
+    document: ratifiedDocument,
     eventType: EVENT_TYPES.hrFinalSettlementDocumentSignedOrRatified,
     fromStatus: current.documentStatus,
-    toStatus: document.documentStatus,
+    toStatus: ratifiedDocument.documentStatus,
     actorUserId,
     payload: {
-      signatureEvidenceAssetId: document.signatureEvidenceAssetId,
-      hasExternalEvidenceRef: Object.keys(document.signatureEvidenceRef).length > 0,
-      workerReservationOfRights: document.workerReservationOfRights
+      signatureEvidenceAssetId: ratifiedDocument.signatureEvidenceAssetId,
+      hasExternalEvidenceRef: Object.keys(ratifiedDocument.signatureEvidenceRef).length > 0,
+      workerReservationOfRights: ratifiedDocument.workerReservationOfRights,
+      pdfRegenerated: Boolean(regenerated)
     }
   })
-  await publishDocumentEvent(client, EVENT_TYPES.hrFinalSettlementDocumentSignedOrRatified, document, {
-    workerReservationOfRights: document.workerReservationOfRights
+  await publishDocumentEvent(client, EVENT_TYPES.hrFinalSettlementDocumentSignedOrRatified, ratifiedDocument, {
+    workerReservationOfRights: ratifiedDocument.workerReservationOfRights
   })
 
-  return document
+  return ratifiedDocument
 })
 
 export const getFinalSettlementDocumentDownloadUrl = (document: FinalSettlementDocument) =>

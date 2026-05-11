@@ -226,14 +226,15 @@ const styles = StyleSheet.create({
   tagLine: {
     display: 'flex',
     flexDirection: 'row',
-    flexWrap: 'wrap'
+    flexWrap: 'wrap',
+    gap: 4
   },
   tag: {
-    paddingVertical: 2,
-    paddingHorizontal: 5,
+    paddingVertical: 2.5,
+    paddingHorizontal: 6,
     borderRadius: 999,
-    marginRight: 4,
-    marginBottom: 3,
+    marginRight: 6,
+    marginBottom: 4,
     fontSize: 6.6,
     fontFamily: 'Geist Bold'
   },
@@ -516,19 +517,50 @@ const formatDateLongSpanish = (value: string | null | undefined): string => {
   return `${Number(day)} de ${ES_CL_MONTH_LABELS[monthIndex]} de ${year}`
 }
 
-// TASK-862 Slice D — Watermark resolution segun documentStatus (matriz canonica
-// definida en GREENHOUSE_FINAL_SETTLEMENT_V1_SPEC pinada en mockup vinculante).
-//   rendered / in_review / approved → "PROYECTO" warning tonal (interno HR)
-//   issued → CLEAN (este es el PDF que el trabajador imprime y lleva al notario)
+// TASK-862 Slice D + TASK-863 V1.1 — Watermark resolution canonica.
+// Matriz (canonica del spec):
+//   rendered / in_review / approved → "PROYECTO" warning (interno HR)
+//   issued → CLEAN (PDF para imprimir y llevar al notario)
 //   signed_or_ratified → CLEAN (post-ratificacion)
-//   rejected → "RECHAZADO" error tonal (terminal adverso)
-//   voided → "ANULADO" error tonal
-//   superseded → "REEMPLAZADO" neutral tonal
-const resolveWatermark = (snapshot: FinalSettlementDocumentSnapshot): { text: string; severity: 'warning' | 'error' | 'neutral' } | null => {
-  // documentStatus not in snapshot.finalSettlement; we infer from documentReadiness +
-  // presence of ratification field. The most authoritative signal is ratification
-  // (signed_or_ratified) → no watermark; otherwise readiness.status=blocked → "BLOQUEADO"
-  // else if no ratification → "PROYECTO" for internal review states.
+//   blocked → "BLOQUEADO" error
+//   rejected → "RECHAZADO" error
+//   voided → "ANULADO" error
+//   superseded → "REEMPLAZADO" neutral
+//
+// documentStatus es OPCIONAL para preservar backward-compat (callsites legacy
+// que solo pasan snapshot caen al patron inferido por ratification + readiness).
+type WatermarkInput = {
+  snapshot: FinalSettlementDocumentSnapshot
+  documentStatus?: string | null
+}
+
+const resolveWatermark = ({ snapshot, documentStatus }: WatermarkInput): { text: string; severity: 'warning' | 'error' | 'neutral' } | null => {
+  if (documentStatus) {
+    if (documentStatus === 'issued' || documentStatus === 'signed_or_ratified') {
+      return null
+    }
+
+    if (documentStatus === 'blocked') {
+      return { text: GH_FINIQUITO.resignation.watermark.proyectoBlocked, severity: 'error' }
+    }
+
+    if (documentStatus === 'rejected') {
+      return { text: GH_FINIQUITO.resignation.watermark.rejected, severity: 'error' }
+    }
+
+    if (documentStatus === 'voided') {
+      return { text: GH_FINIQUITO.resignation.watermark.voided, severity: 'error' }
+    }
+
+    if (documentStatus === 'superseded') {
+      return { text: GH_FINIQUITO.resignation.watermark.superseded, severity: 'neutral' }
+    }
+
+    // rendered / in_review / approved → PROYECTO
+    return { text: GH_FINIQUITO.resignation.watermark.proyecto, severity: 'warning' }
+  }
+
+  // Backward-compat fallback
   if (snapshot.ratification) return null
 
   const readinessStatus = snapshot.documentReadiness?.status ?? (snapshot.readiness.hasBlockers ? 'blocked' : 'ready')
@@ -537,7 +569,6 @@ const resolveWatermark = (snapshot: FinalSettlementDocumentSnapshot): { text: st
     return { text: GH_FINIQUITO.resignation.watermark.proyectoBlocked, severity: 'error' }
   }
 
-  // ready / needs_review pre-ratification: internal HR draft
   return { text: GH_FINIQUITO.resignation.watermark.proyecto, severity: 'warning' }
 }
 
@@ -708,7 +739,13 @@ const lineCalculationDetails = (line: FinalSettlementDocumentSnapshot['breakdown
   return []
 }
 
-const FinalSettlementPdfDocument = ({ snapshot }: { snapshot: FinalSettlementDocumentSnapshot }) => {
+const FinalSettlementPdfDocument = ({
+  snapshot,
+  documentStatus
+}: {
+  snapshot: FinalSettlementDocumentSnapshot
+  documentStatus?: string | null
+}) => {
   const documentReadiness = snapshot.documentReadiness ?? {
     status: snapshot.readiness.hasBlockers ? 'blocked' : 'ready',
     hasBlockers: snapshot.readiness.hasBlockers,
@@ -719,7 +756,18 @@ const FinalSettlementPdfDocument = ({ snapshot }: { snapshot: FinalSettlementDoc
   const readinessStatus = documentReadiness.status
   const collaboratorName = snapshot.collaborator.legalName || snapshot.collaborator.displayName || snapshot.finalSettlement.memberId
   const fingerprint = shortHash(snapshot)
-  const documentNumber = `GH-FIN-${new Date(snapshot.generatedAt).getFullYear()}-${snapshot.finalSettlement.finalSettlementId.slice(0, 8)}`
+
+  // TASK-863 V1.1 — Document ID estable per-settlement, derivado de hash determinístico.
+  // Antes: slice(0, 8) del finalSettlementId truncaba slugs humanos ("final-settlement-valentina"
+  // → "final-se"). Ahora: hash SHA-256 de los primeros 8 hex chars upper-case (siempre 8 chars,
+  // legible, nunca corta palabras).
+  const documentIdShort = createHash('sha256')
+    .update(snapshot.finalSettlement.finalSettlementId)
+    .digest('hex')
+    .slice(0, 8)
+    .toUpperCase()
+
+  const documentNumber = `GH-FIN-${new Date(snapshot.generatedAt).getFullYear()}-${documentIdShort}`
   const regime = `${snapshot.finalSettlement.payRegimeSnapshot === 'chile' ? 'Chile dependiente' : snapshot.finalSettlement.payRegimeSnapshot} · ${payrollViaLabel[snapshot.finalSettlement.payrollViaSnapshot] ?? snapshot.finalSettlement.payrollViaSnapshot}`
 
   const netHelp = snapshot.finalSettlement.netPayable < 0
@@ -728,8 +776,8 @@ const FinalSettlementPdfDocument = ({ snapshot }: { snapshot: FinalSettlementDoc
       ? 'Incluye descuentos o retenciones detallados abajo.'
       : null
 
-  // TASK-862 Slice D — Watermark canónico segun documentStatus inferido.
-  const watermark = resolveWatermark(snapshot)
+  // TASK-862 Slice D + TASK-863 V1.1 — Watermark canónico segun documentStatus.
+  const watermark = resolveWatermark({ snapshot, documentStatus })
 
   const watermarkSeverityStyle = watermark
     ? watermark.severity === 'error'
@@ -780,20 +828,15 @@ const FinalSettlementPdfDocument = ({ snapshot }: { snapshot: FinalSettlementDoc
           </View>
         ) : null}
 
+        {/* TASK-863 V1.1 — Header simplificado: logo + status pill. La identidad legal completa del
+            empleador vive solo en "Partes comparecientes". Metadata técnica (documentNumber, hash,
+            timestamp) baja al footer auditoría al final del documento. */}
         <View style={styles.header}>
           <View style={styles.headerLeft}>
             <Image src={headerLogoSrc} style={styles.logo} />
-            <Text style={styles.legalName}>{snapshot.employer.legalName}</Text>
-            <Text style={styles.legalBlock}>
-              RUT {snapshot.employer.taxId ?? 'Pendiente'}{'\n'}
-              {snapshot.employer.legalAddress ?? 'Domicilio legal pendiente'}
-            </Text>
           </View>
           <View style={styles.docMeta}>
             <Text style={readinessPillStyle(readinessStatus)}>{readinessLabel[readinessStatus]}</Text>
-            <Text style={styles.metaText}>Documento {documentNumber}</Text>
-            <Text style={styles.metaText}>Snapshot fs-v{snapshot.finalSettlement.settlementVersion} · Hash {fingerprint}</Text>
-            <Text style={styles.metaText}>Generado {formatDateTime(snapshot.generatedAt)}</Text>
           </View>
         </View>
 
@@ -1041,18 +1084,23 @@ const FinalSettlementPdfDocument = ({ snapshot }: { snapshot: FinalSettlementDoc
           </View>
         </View>
 
+        {/* TASK-863 V1.1 — Footer consolidado: auditoría técnica + paginación + Greenhouse brand
+            en una sola banda. Antes había 2 bandas; ahora 1. Metadata técnica (documentNumber,
+            snapshot version, hash, timestamp) movida desde el header top al footer auditoría. */}
         <View style={styles.footer} fixed>
           <Text>Documento confidencial · {snapshot.employer.legalName} · RUT {snapshot.employer.taxId ?? 'Pendiente'}</Text>
           <Text render={({ pageNumber, totalPages }) => (
-            `Página ${pageNumber} de ${totalPages} · Template ${snapshot.documentTemplateCode} · ${snapshot.documentTemplateVersion}`
+            `Página ${pageNumber} de ${totalPages}`
           )} />
         </View>
-        {/* TASK-862 Slice D — Greenhouse utility branding al footer (legal entity logo arriba). */}
         <View
-          style={[styles.footer, { bottom: 6, borderTop: 'none', paddingTop: 0, justifyContent: 'center' }]}
+          style={[styles.footer, { bottom: 14, borderTop: 'none', paddingTop: 0 }]}
           fixed
         >
-          <Text style={styles.footerGhBrand}>Documento generado con Greenhouse · greenhouse.efeoncepro.com</Text>
+          <Text style={styles.footerGhBrand}>
+            {documentNumber} · Snapshot fs-v{snapshot.finalSettlement.settlementVersion} · Hash {fingerprint} · Generado {formatDateTime(snapshot.generatedAt)} · Template {snapshot.documentTemplateCode} {snapshot.documentTemplateVersion}
+          </Text>
+          <Text style={styles.footerGhBrand}>Greenhouse · greenhouse.efeoncepro.com</Text>
         </View>
       </Page>
     </Document>
@@ -1060,11 +1108,15 @@ const FinalSettlementPdfDocument = ({ snapshot }: { snapshot: FinalSettlementDoc
 }
 
 export const renderFinalSettlementDocumentPdf = async (
-  snapshot: FinalSettlementDocumentSnapshot
+  snapshot: FinalSettlementDocumentSnapshot,
+  options: { documentStatus?: string | null } = {}
 ): Promise<Buffer> => {
   await ensurePdfFontsRegistered()
 
-  const element = createElement(FinalSettlementPdfDocument, { snapshot })
+  const element = createElement(FinalSettlementPdfDocument, {
+    snapshot,
+    documentStatus: options.documentStatus ?? null
+  })
 
   return renderToBuffer(element as unknown as Parameters<typeof renderToBuffer>[0])
 }
