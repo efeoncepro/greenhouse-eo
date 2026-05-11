@@ -132,6 +132,7 @@ jobs:
         id: preflight
         env:
           GITHUB_RELEASE_OBSERVER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           TARGET_SHA: ${{ inputs.target_sha }}
           BYPASS_REASON: ${{ inputs.bypass_preflight_reason }}
           # Cloud SQL Connector via WIF — sin proxy local. El CLI postgres-health

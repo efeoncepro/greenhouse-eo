@@ -10,32 +10,120 @@
 
 import 'server-only'
 
-import * as childProcess from 'node:child_process'
-import { promisify } from 'node:util'
+import { readdir } from 'node:fs/promises'
+import path from 'node:path'
 
+import { Connector, IpAddressTypes } from '@google-cloud/cloud-sql-connector'
+import { Client } from 'pg'
+
+import { createGoogleAuth } from '@/lib/google-credentials'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { redactErrorForResponse } from '@/lib/observability/redact'
+import { resolveSecretByRef } from '@/lib/secrets/secret-manager'
 
 import type { PreflightCheckResult } from '../types'
 import type { PreflightInput } from '../runner'
-
-const PG_STATUS_TIMEOUT_MS = 30_000
-
-const runExecFile = (
-  command: string,
-  args: readonly string[],
-  options: childProcess.ExecFileOptions
-): Promise<{ stdout: string; stderr: string }> => {
-  return promisify(childProcess.execFile)(command, args as string[], options) as Promise<{
-    stdout: string
-    stderr: string
-  }>
-}
 
 const PENDING_REGEX = /(\d+)\s+migration[s]?\s+pending/i
 
 const NO_PENDING_REGEX =
   /(no\s+pending|no\s+migrations\s+to\s+run|migrations\s+complete|todas\s+aplicadas|all\s+applied|0\s+pending)/i
+
+const MIGRATIONS_DIR = 'migrations'
+
+const toIpType = (value: string | undefined) => {
+  switch ((value || '').trim().toUpperCase()) {
+    case 'PRIVATE':
+      return IpAddressTypes.PRIVATE
+    case 'PSC':
+      return IpAddressTypes.PSC
+    default:
+      return IpAddressTypes.PUBLIC
+  }
+}
+
+const normalizeMigrationName = (name: string) => path.basename(name).replace(/\.sql$/i, '')
+
+const listLocalMigrationNames = async (): Promise<readonly string[]> => {
+  const files = await readdir(path.resolve(process.cwd(), MIGRATIONS_DIR))
+
+  return files.filter(file => file.endsWith('.sql')).map(normalizeMigrationName).sort()
+}
+
+const normalizeSecretValue = (value: string | undefined | null) => {
+  const trimmed = value?.trim()
+
+  if (!trimmed) return null
+
+  return trimmed.replace(/^['"]+|['"]+$/g, '').replace(/(?:\\r|\\n)+$/g, '').trim() || null
+}
+
+const resolvePostgresPassword = async () => {
+  const envPassword = normalizeSecretValue(process.env.GREENHOUSE_POSTGRES_PASSWORD)
+
+  if (envPassword) return envPassword
+
+  const secretRef = process.env.GREENHOUSE_POSTGRES_PASSWORD_SECRET_REF?.trim()
+
+  if (!secretRef) return null
+
+  return normalizeSecretValue(await resolveSecretByRef(secretRef))
+}
+
+const createMigrationClient = async () => {
+  const password = await resolvePostgresPassword()
+  const database = process.env.GREENHOUSE_POSTGRES_DATABASE?.trim()
+  const user = process.env.GREENHOUSE_POSTGRES_USER?.trim()
+
+  if (!database || !user || !password) {
+    throw new Error('Postgres migration check is not configured. Missing database, user or password.')
+  }
+
+  const baseOptions = {
+    user,
+    password,
+    database,
+    connectionTimeoutMillis: 15_000
+  }
+
+  const instanceConnectionName = process.env.GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME?.trim()
+
+  if (instanceConnectionName) {
+    const connector = new Connector({
+      auth: createGoogleAuth({
+        scopes: ['https://www.googleapis.com/auth/sqlservice.admin']
+      })
+    })
+
+    const connectorOptions = await connector.getOptions({
+      instanceConnectionName,
+      ipType: toIpType(process.env.GREENHOUSE_POSTGRES_IP_TYPE)
+    })
+
+    return {
+      client: new Client({
+        ...baseOptions,
+        ...connectorOptions
+      }),
+      close: async () => {
+        connector.close()
+      }
+    }
+  }
+
+  return {
+    client: new Client({
+      ...baseOptions,
+      host: process.env.GREENHOUSE_POSTGRES_HOST?.trim() || undefined,
+      port: Number(process.env.GREENHOUSE_POSTGRES_PORT?.trim() || 5432),
+      ssl:
+        process.env.GREENHOUSE_POSTGRES_SSL?.trim().toLowerCase() === 'true'
+          ? { rejectUnauthorized: false }
+          : undefined
+    }),
+    close: async () => undefined
+  }
+}
 
 export interface ParsedPgConnectStatus {
   readonly verdict: 'ok' | 'pending' | 'unparsed'
@@ -68,28 +156,40 @@ export const checkPostgresMigrations = async (
   const observedAt = new Date().toISOString()
 
   try {
-    const { stdout } = await runExecFile('pnpm', ['pg:connect:status'], {
-      timeout: PG_STATUS_TIMEOUT_MS,
-      maxBuffer: 5 * 1024 * 1024
-    })
+    const [localMigrations, connection] = await Promise.all([
+      listLocalMigrationNames(),
+      createMigrationClient()
+    ])
 
-    const parsed = parsePgConnectStatusOutput(stdout)
+    await connection.client.connect()
 
-    if (parsed.verdict === 'pending') {
-      return {
-        checkId: 'postgres_migrations',
-        severity: 'error',
-        status: 'ok',
-        observedAt,
-        durationMs: Date.now() - observedAtStart,
-        summary: `${parsed.pendingCount} migracion(es) pendientes`,
-        error: null,
-        evidence: { pendingCount: parsed.pendingCount, stdoutTail: stdout.slice(-500) },
-        recommendation: 'Aplicar migrations via `pnpm pg:connect:migrate` antes de promover release.'
+    try {
+      const result = await connection.client.query<{ name: string }>(
+        `SELECT name FROM public.pgmigrations ORDER BY name ASC`
+      )
+
+      const applied = new Set(result.rows.map(row => normalizeMigrationName(row.name)))
+      const pending = localMigrations.filter(name => !applied.has(name))
+
+      if (pending.length > 0) {
+        return {
+          checkId: 'postgres_migrations',
+          severity: 'error',
+          status: 'ok',
+          observedAt,
+          durationMs: Date.now() - observedAtStart,
+          summary: `${pending.length} migracion(es) pendientes`,
+          error: null,
+          evidence: {
+            pendingCount: pending.length,
+            pendingMigrations: pending.slice(0, 20),
+            appliedCount: applied.size,
+            localCount: localMigrations.length
+          },
+          recommendation: 'Aplicar migrations via `pnpm pg:connect:migrate` antes de promover release.'
+        }
       }
-    }
 
-    if (parsed.verdict === 'ok') {
       return {
         checkId: 'postgres_migrations',
         severity: 'ok',
@@ -98,21 +198,12 @@ export const checkPostgresMigrations = async (
         durationMs: Date.now() - observedAtStart,
         summary: 'Migrations al dia',
         error: null,
-        evidence: { pendingCount: 0 },
+        evidence: { pendingCount: 0, appliedCount: applied.size, localCount: localMigrations.length },
         recommendation: ''
       }
-    }
-
-    return {
-      checkId: 'postgres_migrations',
-      severity: 'warning',
-      status: 'ok',
-      observedAt,
-      durationMs: Date.now() - observedAtStart,
-      summary: 'pg:connect:status output no parsea',
-      error: null,
-      evidence: { stdoutTail: stdout.slice(-500) },
-      recommendation: 'Ejecutar `pnpm pg:connect:status` manual para verificar migrations al dia.'
+    } finally {
+      await connection.client.end().catch(() => undefined)
+      await connection.close().catch(() => undefined)
     }
   } catch (error) {
     captureWithDomain(error, 'cloud', {
@@ -125,10 +216,10 @@ export const checkPostgresMigrations = async (
       status: 'error',
       observedAt,
       durationMs: Date.now() - observedAtStart,
-      summary: 'pg:connect:status fallo',
+      summary: 'Postgres migrations check fallo',
       error: redactErrorForResponse(error),
       evidence: null,
-      recommendation: 'Verificar Cloud SQL Proxy + GCP ADC + reintentar.'
+      recommendation: 'Verificar Cloud SQL Connector + GCP WIF/ADC + credenciales Postgres.'
     }
   }
 }
