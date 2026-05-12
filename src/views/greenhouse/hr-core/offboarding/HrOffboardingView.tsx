@@ -854,8 +854,8 @@ const HrOffboardingView = () => {
           sx={theme => ({
             p: 3,
             borderRadius: `${theme.shape.customBorderRadius.lg}px`,
-            border: `1px solid ${alpha(theme.palette[tone].main, 0.22)}`,
-            backgroundColor: alpha(theme.palette[tone].main, 0.06)
+            border: `1px solid ${theme.palette.divider}`,
+            backgroundColor: alpha(theme.palette[tone].main, 0.05)
           })}
         >
           <Stack spacing={1.5}>
@@ -879,9 +879,20 @@ const HrOffboardingView = () => {
                 <Typography variant='caption' color='text.secondary'>Próxima decisión operativa</Typography>
               </Stack>
             </Stack>
-            <Typography variant='body2' color='text.secondary'>
-              {item.progress.nextStepHint ?? item.closureLane.helpText ?? 'Revisa el detalle del caso antes de continuar.'}
-            </Typography>
+            {(() => {
+              const hint = item.progress.nextStepHint
+              const help = item.closureLane.helpText
+
+              const detail = hint && hint !== item.nextStep.label
+                ? hint
+                : help && help !== item.nextStep.label
+                  ? help
+                  : 'Revisa el detalle del caso antes de continuar.'
+
+              return (
+                <Typography variant='body2' color='text.secondary'>{detail}</Typography>
+              )
+            })()}
           </Stack>
         </Box>
 
@@ -945,17 +956,29 @@ const HrOffboardingView = () => {
         <Stack spacing={2} sx={{ mt: 'auto' }}>
           {primaryButton}
           <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
-            {item.secondaryActions.map(actionDescriptor => (
-              actionDescriptor.href ? (
-                <Button key={actionDescriptor.code} size='small' variant='text' href={actionDescriptor.href} target='_blank' rel='noreferrer' disabled={actionDescriptor.disabled || saving}>
+            {item.secondaryActions.map(actionDescriptor => {
+              const iconClass = actionDescriptor.code === 'download_pdf'
+                ? 'tabler-file-type-pdf'
+                : actionDescriptor.code === 'reissue_document'
+                  ? 'tabler-refresh'
+                  : actionDescriptor.code === 'replace_resignation_letter'
+                    ? 'tabler-file-replace'
+                    : actionDescriptor.code === 'edit_maintenance'
+                      ? 'tabler-edit'
+                      : 'tabler-arrow-right'
+
+              const startIcon = <i className={iconClass} aria-hidden='true' />
+
+              return actionDescriptor.href ? (
+                <Button key={actionDescriptor.code} size='small' variant='outlined' color='secondary' startIcon={startIcon} href={actionDescriptor.href} target='_blank' rel='noreferrer' disabled={actionDescriptor.disabled || saving}>
                   {actionDescriptor.label}
                 </Button>
               ) : (
-                <Button key={actionDescriptor.code} size='small' variant='outlined' disabled={actionDescriptor.disabled || saving} onClick={() => void runQueueAction(item, actionDescriptor)}>
+                <Button key={actionDescriptor.code} size='small' variant='outlined' color='secondary' startIcon={startIcon} disabled={actionDescriptor.disabled || saving} onClick={() => void runQueueAction(item, actionDescriptor)}>
                   {actionDescriptor.label}
                 </Button>
               )
-            ))}
+            })}
           </Stack>
         </Stack>
       </Stack>
@@ -1393,7 +1416,7 @@ const HrOffboardingView = () => {
         })}
       >
         {summaryTiles.map((tile, index) => {
-          const value = tile.key === 'all' ? (workQueue?.summary.active ?? 0) : (workQueue?.summary[tile.key] ?? 0)
+          const value = tile.key === 'all' ? (workQueue?.summary.total ?? 0) : (workQueue?.summary[tile.key] ?? 0)
           const isActive = filter === tile.filterValue
 
           return (
@@ -1414,17 +1437,29 @@ const HrOffboardingView = () => {
               sx={theme => ({
                 p: 3,
                 cursor: 'pointer',
+                position: 'relative',
                 transition: 'background-color 150ms cubic-bezier(0.2, 0, 0, 1)',
                 borderTop: { xs: index === 0 ? 0 : `1px solid ${theme.palette.divider}`, sm: index < 2 ? 0 : `1px solid ${theme.palette.divider}`, lg: index < 3 ? 0 : `1px solid ${theme.palette.divider}`, xl: 0 },
                 borderLeft: { xs: 0, sm: index % 2 === 1 ? `1px solid ${theme.palette.divider}` : 0, lg: index % 3 !== 0 ? `1px solid ${theme.palette.divider}` : 0, xl: index === 0 ? 0 : `1px solid ${theme.palette.divider}` },
                 backgroundColor: isActive
-                  ? alpha(theme.palette[tile.tone].main, 0.085)
+                  ? alpha(theme.palette[tile.tone].main, 0.12)
                   : value > 0 && tile.key === 'attention' ? alpha(theme.palette.warning.main, 0.04) : 'background.paper',
-                boxShadow: isActive ? `inset 0 -3px 0 0 ${theme.palette[tile.tone].main}` : 'none',
+                ...(isActive && {
+                  '&::after': {
+                    content: '""',
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    height: '100%',
+                    width: '3px',
+                    backgroundColor: theme.palette[tile.tone].main,
+                    pointerEvents: 'none'
+                  }
+                }),
                 '&:hover': {
                   backgroundColor: isActive
-                    ? alpha(theme.palette[tile.tone].main, 0.11)
-                    : alpha(theme.palette[tile.tone].main, 0.04)
+                    ? alpha(theme.palette[tile.tone].main, 0.16)
+                    : alpha(theme.palette[tile.tone].main, 0.06)
                 },
                 '&:focus-visible': {
                   outline: `2px solid ${theme.palette[tile.tone].main}`,
@@ -1450,10 +1485,20 @@ const HrOffboardingView = () => {
                     <i className={tile.icon} />
                   </Box>
                   <Stack spacing={0.25} sx={{ minWidth: 0 }}>
-                    <Typography variant='subtitle2' color='text.primary' noWrap sx={{ fontWeight: isActive ? 800 : 600 }}>
+                    <Typography variant='subtitle2' color='text.primary' noWrap sx={{ fontWeight: isActive ? 700 : 600 }}>
                       {tile.title}
                     </Typography>
-                    <Typography variant='caption' color='text.secondary' noWrap>
+                    <Typography
+                      variant='caption'
+                      color='text.secondary'
+                      sx={{
+                        display: '-webkit-box',
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: 'vertical',
+                        overflow: 'hidden',
+                        lineHeight: 1.35
+                      }}
+                    >
                       {tile.description}
                     </Typography>
                   </Stack>
@@ -1627,7 +1672,7 @@ const HrOffboardingView = () => {
                           >
                             <TableCell sx={{ ...tableColumnSx, minWidth: 230 }}>
                               <Stack spacing={0.5}>
-                                <Typography variant='body2' sx={{ fontWeight: 800 }}>
+                                <Typography variant='body2' sx={{ fontWeight: 600 }}>
                                   {item.collaborator.displayName ?? itemCase.memberId ?? 'Sin colaborador'}
                                 </Typography>
                                 <Typography variant='caption' color='text.secondary'>
@@ -1656,10 +1701,24 @@ const HrOffboardingView = () => {
                             </TableCell>
                             <TableCell sx={{ ...tableColumnSx, minWidth: 200 }}>
                               <Stack spacing={0.75} alignItems='flex-start'>
-                                <Typography variant='body2' sx={{ fontWeight: 800, color: `${rowTone}.main` }}>{item.nextStep.label}</Typography>
-                                <Typography variant='caption' color='text.secondary'>
-                                  {item.progress.nextStepHint ?? item.closureLane.helpText ?? item.closureLane.documentLabel}
-                                </Typography>
+                                <Typography variant='body2' sx={{ fontWeight: 700, color: `${rowTone}.main` }}>{item.nextStep.label}</Typography>
+                                {(() => {
+                                  const hint = item.progress.nextStepHint
+                                  const help = item.closureLane.helpText
+                                  const docLabel = item.closureLane.documentLabel
+
+                                  const detail = hint && hint !== item.nextStep.label
+                                    ? hint
+                                    : help && help !== item.nextStep.label
+                                      ? help
+                                      : docLabel && docLabel !== item.nextStep.label
+                                        ? docLabel
+                                        : null
+
+                                  return detail ? (
+                                    <Typography variant='caption' color='text.secondary'>{detail}</Typography>
+                                  ) : null
+                                })()}
                                 {item.latestDocument ? <CustomChip round='true' size='small' color={documentStatusColor[item.latestDocument.documentStatus] ?? 'default'} label={documentStatusLabel[item.latestDocument.documentStatus] ?? item.latestDocument.documentStatus} /> : null}
                               </Stack>
                             </TableCell>
