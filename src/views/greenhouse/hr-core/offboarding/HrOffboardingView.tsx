@@ -23,16 +23,13 @@ import RadioGroup from '@mui/material/RadioGroup'
 import Select from '@mui/material/Select'
 import Skeleton from '@mui/material/Skeleton'
 import Stack from '@mui/material/Stack'
-import Tab from '@mui/material/Tab'
 import Switch from '@mui/material/Switch'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
-import Tabs from '@mui/material/Tabs'
 import TextField from '@mui/material/TextField'
-import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 import { alpha, useTheme } from '@mui/material/styles'
 import useMediaQuery from '@mui/material/useMediaQuery'
@@ -129,17 +126,27 @@ const settlementStatusLabel: Record<string, string> = {
   cancelled: 'Cancelado'
 }
 
-const queueTabs: Array<{ value: OffboardingWorkQueueFilter; label: string }> = [
-  { value: 'all', label: 'Todos' },
-  { value: 'attention', label: 'Atención' },
-  { value: 'ready_to_calculate', label: 'Listos para cálculo' },
-  { value: 'documents', label: 'Documentos' },
-  { value: 'no_labor_settlement', label: 'Sin finiquito' }
-]
-
-const summaryTiles = [
+const summaryTiles: Array<{
+  key: 'all' | 'attention' | 'readyToCalculate' | 'documents' | 'noLaborSettlement'
+  filterValue: OffboardingWorkQueueFilter
+  icon: string
+  tone: 'primary' | 'secondary' | 'success' | 'warning' | 'info' | 'error'
+  title: string
+  description: string
+  statusLabel: string
+}> = [
+  {
+    key: 'all',
+    filterValue: 'all',
+    icon: 'tabler-list',
+    tone: 'info',
+    title: 'Todos los casos',
+    description: 'Vista completa de la cola',
+    statusLabel: 'Cola completa'
+  },
   {
     key: 'attention',
+    filterValue: 'attention',
     icon: 'tabler-alert-triangle',
     tone: 'warning',
     title: GH_FINIQUITO.resignation.workQueue.summary.attention,
@@ -148,6 +155,7 @@ const summaryTiles = [
   },
   {
     key: 'readyToCalculate',
+    filterValue: 'ready_to_calculate',
     icon: 'tabler-calculator',
     tone: 'success',
     title: GH_FINIQUITO.resignation.workQueue.summary.readyToCalculate,
@@ -156,6 +164,7 @@ const summaryTiles = [
   },
   {
     key: 'documents',
+    filterValue: 'documents',
     icon: 'tabler-file-text',
     tone: 'primary',
     title: GH_FINIQUITO.resignation.workQueue.summary.documents,
@@ -164,13 +173,14 @@ const summaryTiles = [
   },
   {
     key: 'noLaborSettlement',
+    filterValue: 'no_labor_settlement',
     icon: 'tabler-briefcase',
     tone: 'secondary',
     title: GH_FINIQUITO.resignation.workQueue.summary.noLaborSettlement,
     description: 'Honorarios o proveedor externo',
     statusLabel: 'Fuera de finiquito'
   }
-] as const
+]
 
 const tableColumnSx = {
   py: 2.5
@@ -811,12 +821,12 @@ const HrOffboardingView = () => {
     const primaryButton = primaryAction
       ? primaryHref
         ? (
-            <Button fullWidth variant='contained' color={tone === 'secondary' ? 'primary' : tone} disabled={busy || primaryAction.disabled} href={primaryHref}>
+            <Button fullWidth variant='contained' color='primary' disabled={busy || primaryAction.disabled} href={primaryHref}>
               {busy ? 'Procesando' : primaryAction.label}
             </Button>
           )
         : (
-            <Button fullWidth variant='contained' color={tone === 'secondary' ? 'primary' : tone} disabled={busy || primaryAction.disabled} onClick={() => void runQueueAction(item, primaryAction)}>
+            <Button fullWidth variant='contained' color='primary' disabled={busy || primaryAction.disabled} onClick={() => void runQueueAction(item, primaryAction)}>
               {busy ? 'Procesando' : primaryAction.label}
             </Button>
           )
@@ -837,9 +847,7 @@ const HrOffboardingView = () => {
             <IconButton aria-label={GREENHOUSE_COPY.aria.closeDrawer} onClick={() => setSelectedItemId(null)}>
               <i className='tabler-x' aria-hidden='true' />
             </IconButton>
-          ) : (
-            <CustomChip round='true' size='small' color={tone} label={item.nextStep.label} />
-          )}
+          ) : null}
         </Stack>
 
         <Box
@@ -1355,7 +1363,7 @@ const HrOffboardingView = () => {
       <Stack direction={{ xs: 'column', md: 'row' }} justifyContent='space-between' alignItems={{ xs: 'flex-start', md: 'flex-end' }} spacing={3}>
         <Stack spacing={1}>
           <Typography variant='caption' color='text.secondary' sx={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1 }}>
-            Personas y HR / Supervisión
+            Personas y HR / Offboarding
           </Typography>
           <Typography variant='h4'>{GH_FINIQUITO.resignation.workQueue.title}</Typography>
           <Typography variant='body1' color='text.secondary'>{GH_FINIQUITO.resignation.workQueue.subtitle}</Typography>
@@ -1371,10 +1379,11 @@ const HrOffboardingView = () => {
       </Stack>
 
       <Box
+        role='tablist'
         aria-label={GH_FINIQUITO.resignation.workQueue.title}
         sx={theme => ({
           display: 'grid',
-          gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, minmax(0, 1fr))', xl: 'repeat(4, minmax(0, 1fr))' },
+          gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, minmax(0, 1fr))', lg: 'repeat(3, minmax(0, 1fr))', xl: 'repeat(5, minmax(0, 1fr))' },
           gap: 0,
           overflow: 'hidden',
           border: `1px solid ${theme.palette.divider}`,
@@ -1384,16 +1393,43 @@ const HrOffboardingView = () => {
         })}
       >
         {summaryTiles.map((tile, index) => {
-          const value = workQueue?.summary[tile.key] ?? 0
+          const value = tile.key === 'all' ? (workQueue?.summary.active ?? 0) : (workQueue?.summary[tile.key] ?? 0)
+          const isActive = filter === tile.filterValue
 
           return (
             <Box
               key={tile.key}
+              role='tab'
+              tabIndex={0}
+              aria-selected={isActive}
+              aria-controls='offboarding-queue-list'
+              aria-label={`${tile.title}: ${value}`}
+              onClick={() => setFilter(tile.filterValue)}
+              onKeyDown={event => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                  event.preventDefault()
+                  setFilter(tile.filterValue)
+                }
+              }}
               sx={theme => ({
                 p: 3,
-                borderTop: { xs: index === 0 ? 0 : `1px solid ${theme.palette.divider}`, sm: index < 2 ? 0 : `1px solid ${theme.palette.divider}`, xl: 0 },
-                borderLeft: { xs: 0, sm: index % 2 === 1 ? `1px solid ${theme.palette.divider}` : 0, xl: index === 0 ? 0 : `1px solid ${theme.palette.divider}` },
-                backgroundColor: value > 0 && tile.key === 'attention' ? alpha(theme.palette.warning.main, 0.055) : 'background.paper'
+                cursor: 'pointer',
+                transition: 'background-color 150ms cubic-bezier(0.2, 0, 0, 1)',
+                borderTop: { xs: index === 0 ? 0 : `1px solid ${theme.palette.divider}`, sm: index < 2 ? 0 : `1px solid ${theme.palette.divider}`, lg: index < 3 ? 0 : `1px solid ${theme.palette.divider}`, xl: 0 },
+                borderLeft: { xs: 0, sm: index % 2 === 1 ? `1px solid ${theme.palette.divider}` : 0, lg: index % 3 !== 0 ? `1px solid ${theme.palette.divider}` : 0, xl: index === 0 ? 0 : `1px solid ${theme.palette.divider}` },
+                backgroundColor: isActive
+                  ? alpha(theme.palette[tile.tone].main, 0.085)
+                  : value > 0 && tile.key === 'attention' ? alpha(theme.palette.warning.main, 0.04) : 'background.paper',
+                boxShadow: isActive ? `inset 0 -3px 0 0 ${theme.palette[tile.tone].main}` : 'none',
+                '&:hover': {
+                  backgroundColor: isActive
+                    ? alpha(theme.palette[tile.tone].main, 0.11)
+                    : alpha(theme.palette[tile.tone].main, 0.04)
+                },
+                '&:focus-visible': {
+                  outline: `2px solid ${theme.palette[tile.tone].main}`,
+                  outlineOffset: -2
+                }
               })}
             >
               <Stack direction='row' alignItems='center' justifyContent='space-between' spacing={3}>
@@ -1414,18 +1450,15 @@ const HrOffboardingView = () => {
                     <i className={tile.icon} />
                   </Box>
                   <Stack spacing={0.25} sx={{ minWidth: 0 }}>
-                    <Typography variant='subtitle2' color='text.primary' noWrap>
+                    <Typography variant='subtitle2' color='text.primary' noWrap sx={{ fontWeight: isActive ? 800 : 600 }}>
                       {tile.title}
                     </Typography>
                     <Typography variant='caption' color='text.secondary' noWrap>
                       {tile.description}
                     </Typography>
-                    <Typography variant='caption' color={value > 0 ? `${tile.tone}.main` : 'text.secondary'} sx={{ fontWeight: 700 }}>
-                      {tile.statusLabel}
-                    </Typography>
                   </Stack>
                 </Stack>
-                <Typography variant='h5' sx={{ fontVariantNumeric: 'tabular-nums' }}>
+                <Typography variant='h5' sx={{ fontVariantNumeric: 'tabular-nums', color: isActive ? `${tile.tone}.main` : 'text.primary' }}>
                   {value}
                 </Typography>
               </Stack>
@@ -1472,12 +1505,6 @@ const HrOffboardingView = () => {
                 </Typography>
               </Box>
             )}
-
-            <Tabs value={filter} onChange={(_, value: OffboardingWorkQueueFilter) => setFilter(value)} variant='scrollable' allowScrollButtonsMobile aria-label={GREENHOUSE_COPY.aria.filterInput} sx={{ minHeight: 40, '& .MuiTab-root': { minHeight: 40 } }}>
-              {queueTabs.map(tab => (
-                <Tab key={tab.value} value={tab.value} label={`${tab.label} (${queueItems.filter(item => item.case.status !== 'cancelled' && item.filters.includes(tab.value)).length})`} />
-              ))}
-            </Tabs>
 
             {filteredItems.length ? (
               !isDesktopQueue ? (
@@ -1550,14 +1577,13 @@ const HrOffboardingView = () => {
                 </Stack>
               ) : (
                 <DataTableShell identifier='offboarding-work-queue' ariaLabel='Cola operacional de offboarding' density='compact' stickyFirstColumn>
-                  <Table size='small' sx={{ minWidth: 880 }}>
+                  <Table size='small' sx={{ minWidth: 760 }}>
                     <TableHead>
                       <TableRow>
                         <TableCell>Colaborador</TableCell>
                         <TableCell>Caso</TableCell>
                         <TableCell>Estado</TableCell>
                         <TableCell>Próximo paso</TableCell>
-                        <TableCell align='right'>Acción</TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
@@ -1613,7 +1639,9 @@ const HrOffboardingView = () => {
                               <Stack spacing={0.5}>
                                 <Typography variant='caption' sx={caseIdSx}>{itemCase.publicId}</Typography>
                                 <Typography variant='caption' color='text.secondary'>
-                                  {formatDate(itemCase.effectiveDate)} · Último día {formatDate(itemCase.lastWorkingDay)}
+                                  {itemCase.effectiveDate === itemCase.lastWorkingDay
+                                    ? `Último día ${formatDate(itemCase.lastWorkingDay)}`
+                                    : `Vigencia ${formatDate(itemCase.effectiveDate)} · Último día ${formatDate(itemCase.lastWorkingDay)}`}
                                 </Typography>
                               </Stack>
                             </TableCell>
@@ -1634,23 +1662,6 @@ const HrOffboardingView = () => {
                                 </Typography>
                                 {item.latestDocument ? <CustomChip round='true' size='small' color={documentStatusColor[item.latestDocument.documentStatus] ?? 'default'} label={documentStatusLabel[item.latestDocument.documentStatus] ?? item.latestDocument.documentStatus} /> : null}
                               </Stack>
-                            </TableCell>
-                            <TableCell align='right' sx={tableColumnSx}>
-                              <Tooltip title={item.primaryAction ? `Seleccionar y revisar: ${item.primaryAction.label}` : 'Ver detalle'}>
-                                <span>
-                                  <IconButton
-                                    size='small'
-                                    color={selectedItemId === itemCase.offboardingCaseId ? 'primary' : 'default'}
-                                    aria-label={`Ver detalle de ${itemCase.publicId}`}
-                                    onClick={event => {
-                                      event.stopPropagation()
-                                      openDetail()
-                                    }}
-                                  >
-                                    <i className='tabler-layout-sidebar-right' aria-hidden='true' />
-                                  </IconButton>
-                                </span>
-                              </Tooltip>
                             </TableCell>
                           </TableRow>
                         )
