@@ -2,17 +2,17 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
-- Effort: `Alto` (era Medio; reclasificado por verdict v1.1 — 7 slices densos: 5 commands + 7 capabilities + 6 outbox events + 7 endpoints + 2 UI surfaces + parity test heredado)
+- Effort: `Alto` (era Medio; reclasificado por verdict v1.1 — 8 slices densos: errors+audit + 4 commands + capabilities+parity + endpoints + UI + tests)
 - Type: `implementation`
 - Epic: `EPIC-015`
-- Status real: `Diseno v1.1 — arch-architect verdict aplicado 2026-05-12 (5 correcciones pre-Slice-1: 3 bloqueantes + 1 reclasificación + 1 polish bloqueante). TASK-824 + TASK-825 cerradas; commands invocan resolver + cache invalidator listos.`
+- Status real: `Implementacion v1.1 directo en develop (sin branch separada por instruccion operativa 2026-05-12). Spec v1.1 con 5 correcciones verdict aplicadas pre-Slice-1.`
 - Rank: `TBD`
 - Domain: `client_portal`
 - Blocked by: `none` (TASK-825 cerrada 2026-05-12)
-- Branch: `task/TASK-826-client-portal-admin`
+- Branch: `develop` (direct work, no feature branch — user override)
 
 ## Delta 2026-05-12 (tercera revisión — arch-architect verdict v1.1 aplicado pre-Slice-1)
 

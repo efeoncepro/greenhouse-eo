@@ -1,3 +1,19 @@
+# Sesion 2026-05-12 — TASK-826 arch-architect verdict + implementation on develop
+
+- **Trigger**: post TASK-825 cierre, usuario pidió arch-architect verdict sobre TASK-826 (Client Portal Admin Endpoints + 7 Capabilities + Audit + UI Admin, EPIC-015 child 5/8). Task más densa del EPIC. Verdict: 5 correcciones (3 bloqueantes + 1 reclasificación Effort + 1 polish) + 3 Open Questions resueltas pre-execution; implementación directa en develop con 8 slices.
+- **5 correcciones canonizadas en spec v1.1 (commit `2301e9e7`)**:
+  1. **(Bloqueante)** `business_line` drift residual (8 refs en spec). V1.4 §3.1 reconciliación: column DB + code → `applicability_scope` (V1.2 rename); capability + signal names preservan `business_line` (concepto operator-facing).
+  2. **(Bloqueante)** `requireServerSession` → `requireAdminTenantContext()` + `can()` doble gate (CLAUDE.md admin endpoints canónico, TASK-839/848/850 mirror).
+  3. **(Bloqueante)** Zod → `ClientPortalValidationError` + assertion functions custom (CLAUDE.md / greenhouse-backend skill canónico, pattern TASK-finance).
+  4. **(Reclasificación)** Effort Medio → Alto; 8 slices secuenciales (no split en 826A+826B — handoff overhead).
+  5. **(Polish bloqueante)** Parity test capabilities[] heredado de TASK-824 Delta — agregado a Files owned + AC.
+- **3 Open Questions resueltas pre-execution**: catalog UI V1.0 read-only (POST/PUT diferidos V1.1 → reduce scope 7→6 endpoints), pause sin reason permitido con placeholder audit, `org.businessLine` resolver via `service_modules.module_code WHERE module_kind='business_line'` (TASK-016 canonical).
+- **Decisión operativa**: implementación directa sobre `develop`, sin branch separada (instrucción explícita).
+- **Task movida** `to-do/` → `in-progress/`. README + Handoff sync.
+- **Plan**: 8 slices secuenciales (errors+audit+resolver-helper → 4 commands enable/pause-resume/expire-churn → capabilities+seed+parity → 6 endpoints → 2 UI surfaces → tests integration e2e).
+
+---
+
 # Sesion 2026-05-12 — TASK-825 arch-architect verdict + implementation CERRADA on develop
 
 - **Trigger**: post TASK-824 cierre, usuario pidió arch-architect verdict sobre TASK-825 (Client Portal Resolver Canonical, EPIC-015 child 4/8). Verdict: 5 correcciones (3 bloqueantes + 2 polish) aplicadas al spec V1.0 pre-Slice-1; implementación directa en develop con 5 commits incrementales.
