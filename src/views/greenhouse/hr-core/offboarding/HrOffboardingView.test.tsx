@@ -281,6 +281,9 @@ describe('HrOffboardingView', () => {
     expect(await screen.findByText('EO-OFF-2026-HON')).toBeInTheDocument()
     expect(screen.getAllByText('Cierre contractual').length).toBeGreaterThan(0)
     expect(screen.getByText('Sin finiquito laboral')).toBeInTheDocument()
+
+    await userEvent.setup().click(screen.getByText('EO-OFF-2026-HON'))
+
     expect(screen.getByRole('link', { name: 'Revisar pago pendiente' })).toHaveAttribute('href', '/hr/payroll')
   })
 

@@ -33,6 +33,8 @@ import TableRow from '@mui/material/TableRow'
 import Tabs from '@mui/material/Tabs'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
+import { alpha, useTheme } from '@mui/material/styles'
+import useMediaQuery from '@mui/material/useMediaQuery'
 
 import { getMicrocopy } from '@/lib/copy'
 import { GH_FINIQUITO } from '@/lib/copy/finiquito'
@@ -43,7 +45,6 @@ import GreenhouseFileUploader, { type UploadedFileValue } from '@/components/gre
 import DataTableShell from '@/components/greenhouse/data-table/DataTableShell'
 import EmptyState from '@/components/greenhouse/EmptyState'
 import FieldsProgressChip from '@/components/greenhouse/primitives/FieldsProgressChip'
-import MetricSummaryCard from '@/components/greenhouse/primitives/MetricSummaryCard'
 import OperationalPanel from '@/components/greenhouse/primitives/OperationalPanel'
 
 import type { HrMemberOption } from '@/types/hr-core'
@@ -135,6 +136,49 @@ const queueTabs: Array<{ value: OffboardingWorkQueueFilter; label: string }> = [
   { value: 'no_labor_settlement', label: 'Sin finiquito' }
 ]
 
+const summaryTiles = [
+  {
+    key: 'attention',
+    icon: 'tabler-alert-triangle',
+    tone: 'warning',
+    title: GH_FINIQUITO.resignation.workQueue.summary.attention,
+    description: 'Bloqueos, respaldos o ratificación pendiente',
+    statusLabel: 'Resolver primero'
+  },
+  {
+    key: 'readyToCalculate',
+    icon: 'tabler-calculator',
+    tone: 'success',
+    title: GH_FINIQUITO.resignation.workQueue.summary.readyToCalculate,
+    description: 'Renuncias con prerequisitos completos',
+    statusLabel: 'Puede avanzar'
+  },
+  {
+    key: 'documents',
+    icon: 'tabler-file-text',
+    tone: 'primary',
+    title: GH_FINIQUITO.resignation.workQueue.summary.documents,
+    description: 'Documento legal por revisar o ratificar',
+    statusLabel: 'Legal'
+  },
+  {
+    key: 'noLaborSettlement',
+    icon: 'tabler-briefcase',
+    tone: 'secondary',
+    title: GH_FINIQUITO.resignation.workQueue.summary.noLaborSettlement,
+    description: 'Honorarios o proveedor externo',
+    statusLabel: 'Fuera de finiquito'
+  }
+] as const
+
+const severityTone: Record<string, 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'info'> = {
+  neutral: 'secondary',
+  info: 'primary',
+  warning: 'warning',
+  error: 'error',
+  success: 'success'
+}
+
 const nextStatusFor = (status: OffboardingCaseStatus): OffboardingCaseStatus | null => {
   if (status === 'draft' || status === 'needs_review') return 'approved'
   if (status === 'approved') return 'scheduled'
@@ -146,6 +190,8 @@ const nextStatusFor = (status: OffboardingCaseStatus): OffboardingCaseStatus | n
 const today = () => new Date().toISOString().slice(0, 10)
 
 const HrOffboardingView = () => {
+  const theme = useTheme()
+  const isDesktopQueue = useMediaQuery(theme.breakpoints.up('md'), { defaultMatches: true })
   const searchParams = useSearchParams()
   const initialMemberId = searchParams.get('memberId') ?? ''
   const [workQueue, setWorkQueue] = useState<OffboardingWorkQueue | null>(null)
@@ -217,7 +263,65 @@ const HrOffboardingView = () => {
     [filter, queueItems]
   )
 
+  const visibleCaseCount = filteredItems.length
+  const totalCaseCount = queueItems.filter(item => item.case.status !== 'cancelled').length
+
+  const priorityItem = useMemo(
+    () =>
+      queueItems.find(item => item.case.status !== 'cancelled' && item.filters.includes('attention')) ??
+      queueItems.find(item => item.case.status !== 'cancelled' && item.primaryAction) ??
+      queueItems.find(item => item.case.status !== 'cancelled') ??
+      null,
+    [queueItems]
+  )
+
   const selectedItem = queueItems.find(item => item.case.offboardingCaseId === selectedItemId) ?? null
+  const inspectedItem = selectedItem ?? priorityItem
+  const drawerItem = isDesktopQueue ? null : selectedItem
+
+  const toneFor = (item: OffboardingWorkQueueItem) => severityTone[item.nextStep.severity] ?? 'primary'
+
+  const isItemBusy = (item: OffboardingWorkQueueItem) =>
+    saving || settlementSavingCaseId === item.case.offboardingCaseId || documentSavingCaseId === item.case.offboardingCaseId
+
+  const hrefForAction = (actionDescriptor: OffboardingWorkQueueActionDescriptor | null) =>
+    actionDescriptor?.href ?? (actionDescriptor?.code === 'review_payment' || actionDescriptor?.code === 'external_provider_close' ? '/hr/payroll' : null)
+
+  const prerequisiteRowsFor = (item: OffboardingWorkQueueItem) => {
+    if (!item.prerequisites.required) {
+      return [
+        {
+          key: 'not-required',
+          label: 'Finiquito laboral',
+          value: 'No requerido',
+          complete: true
+        }
+      ]
+    }
+
+    return [
+        {
+          key: 'resignation-letter',
+          label: 'Carta de renuncia',
+        value:
+          item.prerequisites.resignationLetter === 'missing'
+            ? GH_FINIQUITO.resignation.prerequisites.chips.resignationLetterMissing
+            : GH_FINIQUITO.resignation.prerequisites.chips.resignationLetterAttached,
+          complete: item.prerequisites.resignationLetter !== 'missing'
+        },
+      {
+        key: 'maintenance',
+        label: 'Pensión de alimentos',
+        value:
+          item.prerequisites.maintenanceObligation === 'missing'
+            ? GH_FINIQUITO.resignation.prerequisites.chips.maintenanceMissing
+            : item.prerequisites.maintenanceObligation === 'subject'
+              ? GH_FINIQUITO.resignation.prerequisites.chips.maintenanceSubject
+              : GH_FINIQUITO.resignation.prerequisites.chips.maintenanceNotSubject,
+        complete: item.prerequisites.maintenanceObligation !== 'missing'
+      }
+    ]
+  }
 
   const loadData = useCallback(async () => {
     setLoading(true)
@@ -687,6 +791,158 @@ const HrOffboardingView = () => {
     }
   }
 
+  const renderCaseInspector = (item: OffboardingWorkQueueItem, mode: 'panel' | 'drawer') => {
+    const tone = toneFor(item)
+    const primaryAction = item.primaryAction
+    const primaryHref = hrefForAction(primaryAction)
+    const busy = isItemBusy(item)
+
+    const primaryButton = primaryAction
+      ? primaryHref
+        ? (
+            <Button fullWidth variant='contained' color={tone === 'secondary' ? 'primary' : tone} disabled={busy || primaryAction.disabled} href={primaryHref}>
+              {busy ? 'Procesando' : primaryAction.label}
+            </Button>
+          )
+        : (
+            <Button fullWidth variant='contained' color={tone === 'secondary' ? 'primary' : tone} disabled={busy || primaryAction.disabled} onClick={() => void runQueueAction(item, primaryAction)}>
+              {busy ? 'Procesando' : primaryAction.label}
+            </Button>
+          )
+      : null
+
+    return (
+      <Stack spacing={4} sx={{ height: '100%' }}>
+        <Stack direction='row' justifyContent='space-between' alignItems='flex-start' spacing={3}>
+          <Stack spacing={1} sx={{ minWidth: 0 }}>
+            <Typography variant='overline' color='text.secondary'>Caso seleccionado</Typography>
+            <Typography variant={mode === 'panel' ? 'h5' : 'h4'} sx={{ lineHeight: 1.15 }}>Detalle operativo</Typography>
+            <Typography variant='body2' color='text.secondary'>
+              Caso {item.case.publicId} · {item.collaborator.displayName ?? item.case.memberId ?? 'Sin colaborador'}
+              {item.collaborator.roleTitle ? ` · ${item.collaborator.roleTitle}` : ''}
+            </Typography>
+          </Stack>
+          {mode === 'drawer' ? (
+            <IconButton aria-label={GREENHOUSE_COPY.aria.closeDrawer} onClick={() => setSelectedItemId(null)}>
+              <i className='tabler-x' aria-hidden='true' />
+            </IconButton>
+          ) : (
+            <CustomChip round='true' size='small' color={tone} label={item.nextStep.label} />
+          )}
+        </Stack>
+
+        <Box
+          sx={theme => ({
+            p: 3,
+            borderRadius: 1.5,
+            border: `1px solid ${alpha(theme.palette[tone].main, 0.22)}`,
+            backgroundColor: alpha(theme.palette[tone].main, 0.06)
+          })}
+        >
+          <Stack spacing={1.5}>
+            <Stack direction='row' alignItems='center' spacing={1.5}>
+              <Box
+                aria-hidden
+                sx={theme => ({
+                  width: 34,
+                  height: 34,
+                  borderRadius: 1.25,
+                  display: 'grid',
+                  placeItems: 'center',
+                  color: `${tone}.main`,
+                  backgroundColor: alpha(theme.palette[tone].main, 0.12)
+                })}
+              >
+                <i className={item.nextStep.severity === 'warning' ? 'tabler-alert-triangle' : item.nextStep.severity === 'success' ? 'tabler-circle-check' : 'tabler-arrow-right'} />
+              </Box>
+              <Stack spacing={0.25}>
+                <Typography variant='subtitle2'>{item.nextStep.label}</Typography>
+                <Typography variant='caption' color='text.secondary'>Próxima decisión operativa</Typography>
+              </Stack>
+            </Stack>
+            <Typography variant='body2' color='text.secondary'>
+              {item.progress.nextStepHint ?? item.closureLane.helpText ?? 'Revisa el detalle del caso antes de continuar.'}
+            </Typography>
+          </Stack>
+        </Box>
+
+        <Stack spacing={2}>
+          <Typography variant='subtitle2'>Estado del cierre</Typography>
+          <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
+            <CustomChip round='true' size='small' color={statusColor[item.case.status] ?? 'default'} label={statusLabel[item.case.status] ?? item.case.status} />
+            {item.latestDocument ? <CustomChip round='true' size='small' color={documentStatusColor[item.latestDocument.documentStatus] ?? 'default'} label={documentStatusLabel[item.latestDocument.documentStatus] ?? item.latestDocument.documentStatus} /> : null}
+          </Stack>
+          <FieldsProgressChip filled={item.progress.completed} total={item.progress.total} srLabel={(filled, total) => `${item.case.publicId}: ${filled} de ${total} pasos listos.`} suffix={total => `de ${total} pasos`} readyLabel={item.progress.completed >= item.progress.total ? 'Listo' : undefined} nextStepHint={item.progress.nextStepHint ?? undefined} />
+        </Stack>
+
+        <Stack spacing={2}>
+          <Typography variant='subtitle2'>Prerequisitos</Typography>
+          <Stack spacing={1.5}>
+            {prerequisiteRowsFor(item).map(row => (
+              <Stack
+                key={row.key}
+                direction='row'
+                alignItems='center'
+                justifyContent='space-between'
+                spacing={2}
+                sx={theme => ({
+                  px: 2.5,
+                  py: 2,
+                  borderRadius: 1,
+                  border: `1px solid ${theme.palette.divider}`,
+                  backgroundColor: row.complete ? alpha(theme.palette.success.main, 0.04) : alpha(theme.palette.warning.main, 0.05)
+                })}
+              >
+                <Stack direction='row' alignItems='center' spacing={1.5} sx={{ minWidth: 0 }}>
+                  <Box aria-hidden sx={{ color: row.complete ? 'success.main' : 'warning.main', display: 'grid', placeItems: 'center' }}>
+                    <i className={row.complete ? 'tabler-circle-check' : 'tabler-alert-circle'} />
+                  </Box>
+                  <Typography variant='body2' sx={{ fontWeight: 700 }}>{row.label}</Typography>
+                </Stack>
+                <Typography variant='caption' color='text.secondary' sx={{ textAlign: 'right' }}>{row.value}</Typography>
+              </Stack>
+            ))}
+          </Stack>
+        </Stack>
+
+        {item.attentionReasons.length ? (
+          <Stack spacing={1.5}>
+            <Typography variant='subtitle2'>Bloqueos visibles</Typography>
+            {item.attentionReasons.map(reason => <Alert key={reason} severity='warning' variant='outlined'>{reason}</Alert>)}
+          </Stack>
+        ) : null}
+
+        {item.latestSettlement ? (
+          <Box sx={theme => ({ px: 3, py: 2.5, borderRadius: 1, border: `1px solid ${theme.palette.divider}`, backgroundColor: alpha(theme.palette.primary.main, 0.035) })}>
+            <Stack direction='row' justifyContent='space-between' spacing={3}>
+              <Typography variant='body2' color='text.secondary'>{settlementStatusLabel[item.latestSettlement.calculationStatus] ?? item.latestSettlement.calculationStatus}</Typography>
+              <Typography variant='body2' sx={{ fontWeight: 800 }}>
+                Neto {formatGreenhouseCurrency(item.latestSettlement.netPayable, 'CLP', { maximumFractionDigits: 0 }, 'es-CL')}
+              </Typography>
+            </Stack>
+          </Box>
+        ) : null}
+
+        <Stack spacing={2} sx={{ mt: 'auto' }}>
+          {primaryButton}
+          <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
+            {item.secondaryActions.map(actionDescriptor => (
+              actionDescriptor.href ? (
+                <Button key={actionDescriptor.code} size='small' variant='text' href={actionDescriptor.href} target='_blank' rel='noreferrer' disabled={actionDescriptor.disabled || saving}>
+                  {actionDescriptor.label}
+                </Button>
+              ) : (
+                <Button key={actionDescriptor.code} size='small' variant='outlined' disabled={actionDescriptor.disabled || saving} onClick={() => void runQueueAction(item, actionDescriptor)}>
+                  {actionDescriptor.label}
+                </Button>
+              )
+            ))}
+          </Stack>
+        </Stack>
+      </Stack>
+    )
+  }
+
   if (loading) {
     return (
       <Stack spacing={6}>
@@ -1085,8 +1341,11 @@ const HrOffboardingView = () => {
         </Stack>
       </Drawer>
 
-      <Stack direction={{ xs: 'column', md: 'row' }} justifyContent='space-between' alignItems={{ xs: 'flex-start', md: 'center' }} spacing={3}>
+      <Stack direction={{ xs: 'column', md: 'row' }} justifyContent='space-between' alignItems={{ xs: 'flex-start', md: 'flex-end' }} spacing={3}>
         <Stack spacing={1}>
+          <Typography variant='caption' color='text.secondary' sx={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1 }}>
+            Personas y HR / Supervisión
+          </Typography>
           <Typography variant='h4'>{GH_FINIQUITO.resignation.workQueue.title}</Typography>
           <Typography variant='body1' color='text.secondary'>{GH_FINIQUITO.resignation.workQueue.subtitle}</Typography>
         </Stack>
@@ -1100,194 +1359,271 @@ const HrOffboardingView = () => {
         </Stack>
       </Stack>
 
-      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, minmax(0, 1fr))', xl: 'repeat(4, minmax(0, 1fr))' }, gap: 4 }}>
-        <MetricSummaryCard title={GH_FINIQUITO.resignation.workQueue.summary.attention} value={workQueue?.summary.attention ?? 0} subtitle='Cartas, declaración o ratificación pendiente' icon='tabler-alert-triangle' iconColor='warning' statusLabel='Atención HR' statusTone='warning' />
-        <MetricSummaryCard title={GH_FINIQUITO.resignation.workQueue.summary.readyToCalculate} value={workQueue?.summary.readyToCalculate ?? 0} subtitle='Prerequisitos legales completos' icon='tabler-calculator' iconColor='success' statusLabel='Siguiente paso claro' statusTone='success' />
-        <MetricSummaryCard title={GH_FINIQUITO.resignation.workQueue.summary.documents} value={workQueue?.summary.documents ?? 0} subtitle='Emitir, reemitir o ratificar' icon='tabler-file-text' iconColor='primary' statusLabel='Legal en curso' statusTone='primary' />
-        <MetricSummaryCard title={GH_FINIQUITO.resignation.workQueue.summary.noLaborSettlement} value={workQueue?.summary.noLaborSettlement ?? 0} subtitle='Honorarios o proveedor externo' icon='tabler-briefcase' iconColor='secondary' statusLabel='Cierre separado' statusTone='secondary' />
+      <Box
+        aria-label={GH_FINIQUITO.resignation.workQueue.title}
+        sx={theme => ({
+          display: 'grid',
+          gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, minmax(0, 1fr))', xl: 'repeat(4, minmax(0, 1fr))' },
+          gap: 0,
+          overflow: 'hidden',
+          border: `1px solid ${theme.palette.divider}`,
+          borderRadius: `${theme.shape.customBorderRadius.lg}px`,
+          backgroundColor: 'background.paper',
+          boxShadow: theme.shadows[1]
+        })}
+      >
+        {summaryTiles.map((tile, index) => {
+          const value = workQueue?.summary[tile.key] ?? 0
+
+          return (
+            <Box
+              key={tile.key}
+              sx={theme => ({
+                p: 3.5,
+                borderTop: { xs: index === 0 ? 0 : `1px solid ${theme.palette.divider}`, sm: index < 2 ? 0 : `1px solid ${theme.palette.divider}`, xl: 0 },
+                borderLeft: { xs: 0, sm: index % 2 === 1 ? `1px solid ${theme.palette.divider}` : 0, xl: index === 0 ? 0 : `1px solid ${theme.palette.divider}` },
+                backgroundColor: value > 0 && tile.key === 'attention' ? alpha(theme.palette.warning.main, 0.055) : 'background.paper'
+              })}
+            >
+              <Stack direction='row' alignItems='center' justifyContent='space-between' spacing={2}>
+                <Stack spacing={0.5} sx={{ minWidth: 0 }}>
+                  <Typography variant='caption' color='text.secondary' sx={{ fontWeight: 800 }}>
+                    {tile.title}
+                  </Typography>
+                  <Typography variant='body2' color='text.secondary' noWrap>
+                    {tile.description}
+                  </Typography>
+                </Stack>
+                <Typography variant='h5' sx={{ fontVariantNumeric: 'tabular-nums' }}>
+                  {value}
+                </Typography>
+              </Stack>
+            </Box>
+          )
+        })}
       </Box>
 
-      <OperationalPanel
-        title='Casos de salida'
-        subheader='Cada fila muestra el bloqueo real y la acción más próxima.'
-        icon='tabler-list-check'
-        action={<CustomChip round='true' color={(workQueue?.summary.active ?? 0) > 0 ? 'warning' : 'success'} label={`${workQueue?.summary.active ?? 0} activo${(workQueue?.summary.active ?? 0) === 1 ? '' : 's'}`} />}
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: { xs: '1fr', lg: 'minmax(0, 1fr) minmax(360px, 420px)' },
+          gap: 4,
+          alignItems: 'start'
+        }}
       >
-        <Stack spacing={4}>
-          {workQueue?.degradedReasons.length ? (
-            <Alert severity='warning' variant='outlined'>La cola cargó con datos parciales: {workQueue.degradedReasons.join(', ')}.</Alert>
-          ) : (
-            <Alert severity='info' variant='outlined'>Datos parciales se muestran como bloqueo o advertencia; la cola no infiere completitud cuando faltan respaldos.</Alert>
-          )}
+        <OperationalPanel
+          title='Cola de casos'
+          subheader='Escanea por bloqueo, selecciona un caso y ejecuta la acción desde el inspector.'
+          icon='tabler-list-check'
+          action={isDesktopQueue ? <CustomChip round='true' color='primary' label={`${visibleCaseCount} de ${totalCaseCount} visibles`} /> : null}
+        >
+          <Stack spacing={4}>
+            {workQueue?.degradedReasons.length ? (
+              <Alert severity='warning' variant='outlined'>La cola cargó con datos parciales: {workQueue.degradedReasons.join(', ')}.</Alert>
+            ) : (
+              <Box
+                role='status'
+                sx={theme => ({
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 2,
+                  px: 3,
+                  py: 2,
+                  borderRadius: 1,
+                  color: 'text.secondary',
+                  backgroundColor: alpha(theme.palette.info.main, 0.06),
+                  border: `1px solid ${alpha(theme.palette.info.main, 0.18)}`
+                })}
+              >
+                <i className='tabler-info-circle' aria-hidden='true' />
+                <Typography variant='body2'>
+                  La cola marca bloqueos con evidencia disponible; si falta respaldo, queda explícito antes de calcular o emitir.
+                </Typography>
+              </Box>
+            )}
 
-          <Tabs value={filter} onChange={(_, value: OffboardingWorkQueueFilter) => setFilter(value)} variant='scrollable' allowScrollButtonsMobile aria-label={GREENHOUSE_COPY.aria.filterInput} sx={{ minHeight: 40, '& .MuiTab-root': { minHeight: 40 } }}>
-            {queueTabs.map(tab => (
-              <Tab key={tab.value} value={tab.value} label={`${tab.label} (${queueItems.filter(item => item.case.status !== 'cancelled' && item.filters.includes(tab.value)).length})`} />
-            ))}
-          </Tabs>
+            <Tabs value={filter} onChange={(_, value: OffboardingWorkQueueFilter) => setFilter(value)} variant='scrollable' allowScrollButtonsMobile aria-label={GREENHOUSE_COPY.aria.filterInput} sx={{ minHeight: 40, '& .MuiTab-root': { minHeight: 40 } }}>
+              {queueTabs.map(tab => (
+                <Tab key={tab.value} value={tab.value} label={`${tab.label} (${queueItems.filter(item => item.case.status !== 'cancelled' && item.filters.includes(tab.value)).length})`} />
+              ))}
+            </Tabs>
 
-          {filteredItems.length ? (
-            <DataTableShell identifier='offboarding-work-queue' ariaLabel='Cola operacional de offboarding' density='compact' stickyFirstColumn>
-              <Table size='small' sx={{ minWidth: 1040 }}>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Caso</TableCell>
-                    <TableCell>Colaborador</TableCell>
-                    <TableCell>Salida</TableCell>
-                    <TableCell>Estado operativo</TableCell>
-                    <TableCell>Próximo paso</TableCell>
-                    <TableCell align='right'>Acción</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
+            {filteredItems.length ? (
+              !isDesktopQueue ? (
+                <Stack spacing={2.5}>
                   {filteredItems.map(item => {
                     const itemCase = item.case
-                    const primaryAction = item.primaryAction
-                    const busy = saving || settlementSavingCaseId === itemCase.offboardingCaseId || documentSavingCaseId === itemCase.offboardingCaseId
-                    const primaryHref = primaryAction?.href ?? (primaryAction?.code === 'review_payment' || primaryAction?.code === 'external_provider_close' ? '/hr/payroll' : null)
+                    const rowTone = toneFor(item)
 
                     return (
-                      <TableRow key={itemCase.offboardingCaseId} hover selected={selectedItemId === itemCase.offboardingCaseId} onClick={() => setSelectedItemId(itemCase.offboardingCaseId)} sx={{ cursor: 'pointer' }}>
-                        <TableCell>
-                          <Stack spacing={0.5}>
-                            <Typography variant='body2' fontWeight={600}>{itemCase.publicId}</Typography>
-                            <Typography variant='caption' color='text.secondary'>{itemCase.separationType}</Typography>
-                          </Stack>
-                        </TableCell>
-                        <TableCell>
-                          <Stack spacing={0.5}>
-                            <Typography variant='body2' fontWeight={600}>{item.collaborator.displayName ?? itemCase.memberId ?? 'Sin colaborador'}</Typography>
-                            <Typography variant='caption' color='text.secondary'>{item.collaborator.roleTitle ?? item.collaborator.primaryEmail ?? 'Sin detalle'}</Typography>
-                          </Stack>
-                        </TableCell>
-                        <TableCell>
-                          <Stack spacing={0.5}>
-                            <Typography variant='body2'>{formatDate(itemCase.effectiveDate)}</Typography>
-                            <Typography variant='caption' color='text.secondary'>Último día {formatDate(itemCase.lastWorkingDay)}</Typography>
-                          </Stack>
-                        </TableCell>
-                        <TableCell>
-                          <Stack spacing={1} alignItems='flex-start'>
-                            <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap alignItems='center'>
-                              <CustomChip round='true' size='small' color={statusColor[itemCase.status] ?? 'default'} label={statusLabel[itemCase.status] ?? itemCase.status} />
-                              <CustomChip round='true' size='small' color={item.closureLane.allowsFinalSettlement ? 'primary' : 'secondary'} label={item.closureLane.label} />
-                            </Stack>
-                            <FieldsProgressChip filled={item.progress.completed} total={item.progress.total} srLabel={(filled, total) => `${itemCase.publicId}: ${filled} de ${total} pasos listos.`} suffix={total => `de ${total} pasos`} readyLabel={item.progress.completed >= item.progress.total ? 'Listo' : undefined} nextStepHint={item.progress.nextStepHint ?? undefined} />
-                            {item.attentionReasons[0] ? <Typography variant='caption' color='warning.main'>{item.attentionReasons[0]}</Typography> : null}
-                          </Stack>
-                        </TableCell>
-                        <TableCell>
-                          <Stack spacing={1} alignItems='flex-start'>
-                            <CustomChip round='true' size='small' color={item.nextStep.severity === 'warning' ? 'warning' : item.nextStep.severity === 'success' ? 'success' : 'info'} label={item.nextStep.label} />
-                            {item.latestSettlement ? (
-                              <Typography variant='caption' color='text.secondary'>
-                                {settlementStatusLabel[item.latestSettlement.calculationStatus] ?? item.latestSettlement.calculationStatus}
-                                {' · Neto '}
-                                {formatGreenhouseCurrency(item.latestSettlement.netPayable, 'CLP', { maximumFractionDigits: 0 }, 'es-CL')}
+                      <Box
+                        key={itemCase.offboardingCaseId}
+                        role='button'
+                        tabIndex={0}
+                        aria-label={`${GREENHOUSE_COPY.actions.view} ${itemCase.publicId}`}
+                        onClick={() => setSelectedItemId(itemCase.offboardingCaseId)}
+                        onKeyDown={event => {
+                          if (event.key === 'Enter' || event.key === ' ') {
+                            event.preventDefault()
+                            setSelectedItemId(itemCase.offboardingCaseId)
+                          }
+                        }}
+                        sx={theme => ({
+                          p: 3,
+                          border: `1px solid ${selectedItemId === itemCase.offboardingCaseId ? alpha(theme.palette[rowTone].main, 0.48) : theme.palette.divider}`,
+                          borderLeft: `4px solid ${theme.palette[rowTone].main}`,
+                          borderRadius: 1.5,
+                          backgroundColor: selectedItemId === itemCase.offboardingCaseId ? alpha(theme.palette[rowTone].main, 0.045) : 'background.paper',
+                          cursor: 'pointer',
+                          transition: 'border-color 160ms ease, background-color 160ms ease, transform 160ms ease',
+                          '&:hover': {
+                            transform: 'translateY(-1px)',
+                            backgroundColor: alpha(theme.palette[rowTone].main, 0.035)
+                          },
+                          '@media (prefers-reduced-motion: reduce)': {
+                            transition: 'none',
+                            '&:hover': { transform: 'none' }
+                          },
+                          '&:focus-visible': {
+                            outline: `2px solid ${theme.palette.primary.main}`,
+                            outlineOffset: 2
+                          }
+                        })}
+                      >
+                        <Stack spacing={2.5}>
+                          <Stack spacing={2}>
+                            <Stack spacing={0.5} sx={{ minWidth: 0 }}>
+                              <Typography variant='body2' sx={{ fontWeight: 800 }}>{itemCase.publicId}</Typography>
+                              <Typography variant='body2' color='text.secondary'>
+                                {item.collaborator.displayName ?? itemCase.memberId ?? 'Sin colaborador'}
                               </Typography>
-                            ) : (
-                              <Typography variant='caption' color='text.secondary'>{item.closureLane.documentLabel}</Typography>
-                            )}
-                            {item.latestDocument ? <CustomChip round='true' size='small' color={documentStatusColor[item.latestDocument.documentStatus] ?? 'default'} label={documentStatusLabel[item.latestDocument.documentStatus] ?? item.latestDocument.documentStatus} /> : null}
+                            </Stack>
+                            <CustomChip round='true' size='small' color={rowTone} label={item.nextStep.label} sx={{ alignSelf: 'flex-start' }} />
                           </Stack>
-                        </TableCell>
-                        <TableCell align='right'>
-                          {primaryAction ? (
-                            primaryHref ? (
-                              <Button
-                                size='small'
-                                variant='contained'
-                                disabled={busy || primaryAction.disabled}
-                                href={primaryHref}
-                                onClick={event => event.stopPropagation()}
-                              >
-                                {busy ? 'Procesando' : primaryAction.label}
-                              </Button>
-                            ) : (
-                              <Button
-                                size='small'
-                                variant='contained'
-                                disabled={busy || primaryAction.disabled}
-                                onClick={event => {
-                                  event.stopPropagation()
-                                  void runQueueAction(item, primaryAction)
-                                }}
-                              >
-                                {busy ? 'Procesando' : primaryAction.label}
-                              </Button>
-                            )
-                          ) : (
-                            <Button size='small' variant='text' onClick={event => { event.stopPropagation(); setSelectedItemId(itemCase.offboardingCaseId) }}>Ver detalle</Button>
-                          )}
-                        </TableCell>
-                      </TableRow>
+                          <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
+                            <CustomChip round='true' size='small' color={statusColor[itemCase.status] ?? 'default'} label={statusLabel[itemCase.status] ?? itemCase.status} />
+                            <CustomChip round='true' size='small' color={item.closureLane.allowsFinalSettlement ? 'primary' : 'secondary'} label={item.closureLane.label} />
+                          </Stack>
+                          <FieldsProgressChip filled={item.progress.completed} total={item.progress.total} srLabel={(filled, total) => `${itemCase.publicId}: ${filled} de ${total} pasos listos.`} suffix={total => `de ${total} pasos`} readyLabel={item.progress.completed >= item.progress.total ? 'Listo' : undefined} nextStepHint={item.progress.nextStepHint ?? undefined} />
+                        </Stack>
+                      </Box>
                     )
                   })}
-                </TableBody>
-              </Table>
-            </DataTableShell>
-          ) : (
-            <EmptyState icon='tabler-list-search' title='No hay casos para este filtro' description='Cambia el filtro o crea un nuevo caso de salida cuando corresponda.' action={<Button variant='contained' onClick={() => setCreateDrawerOpen(true)}>Nuevo caso</Button>} />
-          )}
-        </Stack>
-      </OperationalPanel>
+                </Stack>
+              ) : (
+                <DataTableShell identifier='offboarding-work-queue' ariaLabel='Cola operacional de offboarding' density='compact' stickyFirstColumn>
+                  <Table size='small' sx={{ minWidth: 980 }}>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>Caso</TableCell>
+                        <TableCell>Colaborador</TableCell>
+                        <TableCell>Estado</TableCell>
+                        <TableCell>Próximo paso</TableCell>
+                        <TableCell align='right'>Acción</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {filteredItems.map(item => {
+                        const itemCase = item.case
+                        const rowTone = toneFor(item)
+                        const openDetail = () => setSelectedItemId(itemCase.offboardingCaseId)
 
-      <Drawer anchor='right' open={Boolean(selectedItem)} onClose={() => setSelectedItemId(null)} PaperProps={{ sx: { width: { xs: '100%', sm: 560 }, p: 0 } }}>
-        {selectedItem ? (
-          <Stack spacing={5} sx={{ p: 6 }}>
-            <Stack direction='row' justifyContent='space-between' alignItems='flex-start' spacing={3}>
-              <Stack spacing={1}>
-                <Typography variant='h5'>{selectedItem.case.publicId}</Typography>
-                <Typography variant='body2' color='text.secondary'>{selectedItem.collaborator.displayName ?? selectedItem.case.memberId ?? 'Sin colaborador'} · {selectedItem.closureLane.label}</Typography>
-              </Stack>
-              <IconButton aria-label={GREENHOUSE_COPY.aria.closeDrawer} onClick={() => setSelectedItemId(null)}>
-                <i className='tabler-x' aria-hidden='true' />
-              </IconButton>
-            </Stack>
-
-            <Stack spacing={2}>
-              <Typography variant='subtitle2'>Progreso</Typography>
-              <FieldsProgressChip filled={selectedItem.progress.completed} total={selectedItem.progress.total} srLabel={(filled, total) => `${filled} de ${total} pasos listos para ${selectedItem.case.publicId}.`} suffix={total => `de ${total} pasos`} readyLabel={selectedItem.progress.completed >= selectedItem.progress.total ? 'Listo' : undefined} nextStepHint={selectedItem.progress.nextStepHint ?? undefined} />
-              {selectedItem.attentionReasons.map(reason => <Alert key={reason} severity='warning' variant='outlined'>{reason}</Alert>)}
-            </Stack>
-
-            <Stack spacing={2}>
-              <Typography variant='subtitle2'>Prerequisitos</Typography>
-              <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
-                {selectedItem.prerequisites.required ? (
-                  <>
-                    <CustomChip round='true' size='small' color={selectedItem.prerequisites.resignationLetter === 'missing' ? 'error' : 'success'} label={selectedItem.prerequisites.resignationLetter === 'missing' ? GH_FINIQUITO.resignation.prerequisites.chips.resignationLetterMissing : GH_FINIQUITO.resignation.prerequisites.chips.resignationLetterAttached} />
-                    <CustomChip round='true' size='small' color={selectedItem.prerequisites.maintenanceObligation === 'missing' ? 'error' : 'success'} label={selectedItem.prerequisites.maintenanceObligation === 'missing' ? GH_FINIQUITO.resignation.prerequisites.chips.maintenanceMissing : selectedItem.prerequisites.maintenanceObligation === 'subject' ? GH_FINIQUITO.resignation.prerequisites.chips.maintenanceSubject : GH_FINIQUITO.resignation.prerequisites.chips.maintenanceNotSubject} />
-                  </>
-                ) : (
-                  <CustomChip round='true' size='small' color='secondary' label='No requiere finiquito laboral' />
-                )}
-              </Stack>
-            </Stack>
-
-            <Stack spacing={2}>
-              <Typography variant='subtitle2'>Acciones</Typography>
-              {selectedItem.primaryAction ? (
-                <Button variant='contained' disabled={selectedItem.primaryAction.disabled || saving || settlementSavingCaseId === selectedItem.case.offboardingCaseId || documentSavingCaseId === selectedItem.case.offboardingCaseId} onClick={() => void runQueueAction(selectedItem, selectedItem.primaryAction!)}>
-                  {selectedItem.primaryAction.label}
-                </Button>
-              ) : null}
-              <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
-                {selectedItem.secondaryActions.map(actionDescriptor => (
-                  actionDescriptor.href ? (
-                    <Button key={actionDescriptor.code} size='small' variant='text' href={actionDescriptor.href} target='_blank' rel='noreferrer' disabled={actionDescriptor.disabled || saving}>
-                      {actionDescriptor.label}
-                    </Button>
-                  ) : (
-                    <Button key={actionDescriptor.code} size='small' variant='outlined' disabled={actionDescriptor.disabled || saving} onClick={() => void runQueueAction(selectedItem, actionDescriptor)}>
-                      {actionDescriptor.label}
-                    </Button>
-                  )
-                ))}
-              </Stack>
-            </Stack>
+                        return (
+                          <TableRow
+                            key={itemCase.offboardingCaseId}
+                            hover
+                            selected={selectedItemId === itemCase.offboardingCaseId || (!selectedItemId && priorityItem?.case.offboardingCaseId === itemCase.offboardingCaseId)}
+                            tabIndex={0}
+                            aria-label={`${GREENHOUSE_COPY.actions.view} ${itemCase.publicId}`}
+                            onClick={openDetail}
+                            onKeyDown={event => {
+                              if (event.key === 'Enter' || event.key === ' ') {
+                                event.preventDefault()
+                                openDetail()
+                              }
+                            }}
+                            sx={theme => ({
+                              cursor: 'pointer',
+                              position: 'relative',
+                              transition: 'background-color 140ms ease',
+                              '&:focus-visible': {
+                                outline: `2px solid ${theme.palette.primary.main}`,
+                                outlineOffset: -2
+                              },
+                              '& > td:first-of-type': {
+                                borderLeft: `4px solid ${theme.palette[rowTone].main}`
+                              },
+                              '&.Mui-selected > td': {
+                                backgroundColor: alpha(theme.palette[rowTone].main, 0.055)
+                              },
+                              '&:hover > td': {
+                                backgroundColor: alpha(theme.palette[rowTone].main, 0.04)
+                              }
+                            })}
+                          >
+                            <TableCell>
+                              <Stack spacing={0.5}>
+                                <Typography variant='body2' fontWeight={700}>{itemCase.publicId}</Typography>
+                                <Typography variant='caption' color='text.secondary'>{formatDate(itemCase.effectiveDate)} · Último día {formatDate(itemCase.lastWorkingDay)}</Typography>
+                              </Stack>
+                            </TableCell>
+                            <TableCell>
+                              <Stack spacing={0.5}>
+                                <Typography variant='body2' fontWeight={700}>{item.collaborator.displayName ?? itemCase.memberId ?? 'Sin colaborador'}</Typography>
+                                <Typography variant='caption' color='text.secondary'>{item.collaborator.roleTitle ?? item.collaborator.primaryEmail ?? 'Sin detalle'}</Typography>
+                              </Stack>
+                            </TableCell>
+                            <TableCell>
+                              <Stack spacing={1} alignItems='flex-start'>
+                                <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap alignItems='center'>
+                                  <CustomChip round='true' size='small' color={statusColor[itemCase.status] ?? 'default'} label={statusLabel[itemCase.status] ?? itemCase.status} />
+                                  <CustomChip round='true' size='small' color={item.closureLane.allowsFinalSettlement ? 'primary' : 'secondary'} label={item.closureLane.label} />
+                                </Stack>
+                                <FieldsProgressChip filled={item.progress.completed} total={item.progress.total} srLabel={(filled, total) => `${itemCase.publicId}: ${filled} de ${total} pasos listos.`} suffix={total => `de ${total} pasos`} readyLabel={item.progress.completed >= item.progress.total ? 'Listo' : undefined} nextStepHint={item.progress.nextStepHint ?? undefined} />
+                              </Stack>
+                            </TableCell>
+                            <TableCell>
+                              <Stack spacing={0.75} alignItems='flex-start'>
+                                <Typography variant='body2' sx={{ fontWeight: 800, color: `${rowTone}.main` }}>{item.nextStep.label}</Typography>
+                                <Typography variant='caption' color='text.secondary'>
+                                  {item.progress.nextStepHint ?? item.closureLane.helpText ?? item.closureLane.documentLabel}
+                                </Typography>
+                                {item.latestDocument ? <CustomChip round='true' size='small' color={documentStatusColor[item.latestDocument.documentStatus] ?? 'default'} label={documentStatusLabel[item.latestDocument.documentStatus] ?? item.latestDocument.documentStatus} /> : null}
+                              </Stack>
+                            </TableCell>
+                            <TableCell align='right'>
+                              <Button size='small' variant='text' onClick={event => { event.stopPropagation(); openDetail() }}>
+                                Ver detalle
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        )
+                      })}
+                    </TableBody>
+                  </Table>
+                </DataTableShell>
+              )
+            ) : (
+              <EmptyState icon='tabler-list-search' title='No hay casos para este filtro' description='Cambia el filtro o crea un nuevo caso de salida cuando corresponda.' action={<Button variant='contained' onClick={() => setCreateDrawerOpen(true)}>Nuevo caso</Button>} />
+            )}
           </Stack>
+        </OperationalPanel>
+
+        {isDesktopQueue ? (
+          <OperationalPanel
+            title='Inspector operativo'
+            subheader='Detalle, bloqueo y acción principal del caso seleccionado.'
+            icon='tabler-layout-sidebar-right'
+          >
+            {inspectedItem ? renderCaseInspector(inspectedItem, 'panel') : (
+              <EmptyState icon='tabler-click' title='Selecciona un caso' description='El inspector muestra prerequisitos, bloqueos y la acción segura del caso activo.' />
+            )}
+          </OperationalPanel>
         ) : null}
+      </Box>
+
+      <Drawer anchor='right' open={Boolean(drawerItem)} onClose={() => setSelectedItemId(null)} PaperProps={{ sx: { width: { xs: '100%', sm: 560 }, p: 0 } }}>
+        {drawerItem ? <Stack sx={{ p: 6 }}>{renderCaseInspector(drawerItem, 'drawer')}</Stack> : null}
       </Drawer>
     </Stack>
   )
