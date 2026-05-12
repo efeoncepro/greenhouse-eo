@@ -1,3 +1,18 @@
+# Sesion 2026-05-11 — TASK-489 V2.2 full hardening + TASK-868 spawned (payroll receipts)
+
+- **Trigger continuación arch review**: usuario preguntó "¿por cual task comenzar?" → recomendé TASK-489 foundation. Pidió leer completa con skill arch + aplicar TODOS los ajustes.
+- **TASK-489 V2 hardening completo** (de 161 líneas a ~720): DDL skeleton inline (8 tables, luego 9 con V2.1) + state machine + 9 outbox events v1 + 5/6 reliability signals + 6 capabilities + tenant safety + helper signatures TS + 4-pillar score template + 16 hard rules + 6 patterns fuente.
+- **6 open questions resueltas** con rationale: schema namespace (`greenhouse_core`), document_types V1 (6 native + 1 linked), bridges V1 (3 → 4), IDs (UUID + EO-DOC-NNNNNN), surfaces (/people/[memberId] + Colaborador), Real-Artifact Loop (NO V1).
+- **TASK-489 V2.1 refinement**: `document_kind` ortogonal (`native` vs `linked`) — finiquito entra como linked type V1 apuntando a `final_settlement_documents`. Permite UI uniforme sin duplicar SSOT. Schema +1 column kind + linked_aggregate_table CHECK enum + 1 bridge `document_final_settlement_link` + 1 reliability signal `linked_aggregate_sync_lag`. 5 hard rules nuevas.
+- **TASK-489 V2.2 refinement**: usuario preguntó "¿y los recibos de nómina?" → 4-pillar analysis (Safety/Robustness/Resilience/Scalability) ganó Y1 (aggregate dedicado mirror TASK-863) vs Y2 (linked directo entries) y Y3 (virtual UNION). Decisión: spawn task dedicada NUEVA para preservar verticalidad del aggregate.
+- **TASK-868 creada** (524 líneas hardened canónicas): Payroll Receipt Documents Aggregate + Registry Link. Materializa `greenhouse_payroll.payroll_receipt_documents` con state machine 6 estados (rendered/emitted/distributed/regenerated/superseded/voided) + helper atomic + auto-regen mirror TASK-863 V1.5.2 + audit append-only + 6 outbox events v1 + 3 reliability signals + bridge `document_payroll_receipt_link` + reactive consumer `payrollReceiptDocumentRegistryProjection`. Reusa receipt presenter TASK-758 (no rewrite). 4 slices ~13-17h. Blocked by TASK-489 + TASK-758.
+- **EPIC-001 updated**: TASK-868 agregado como 8º child task del epic.
+- **TASK_ID_REGISTRY updated**: TASK-868 entry agregada.
+- **Aprendizaje canonizado**: pattern "spawn task derivada cuando emerge aggregate dedicado" — TASK-489 V2.1 foundation deja `linked` pattern extensible; TASK-868 lo consume sin requerir schema migration del registry. Misma estructura aplicable a futuras tasks de surfacing para `member_certifications`, `member_evidence`, `person_identity_documents`.
+- **Out of scope deliberado**: NO se modificó código ni schema (TASK-489 + TASK-868 ambas siguen en `to-do/`).
+
+---
+
 # Sesion 2026-05-11 — Arch hardening del chain documental EPIC-001 (TASK-027/489/492/494)
 
 - **Trigger:** usuario pidió invocar `arch-architect` (Greenhouse overlay) para revisar el chain documental EPIC-001 con focus en alineación canónica vs patterns canonizados después de la creación de las tasks: TASK-611/612/613 (Organization Workspace shell + capabilities_registry), TASK-742 (7-layer defense), TASK-771/773 (outbox + reactive consumer), TASK-780 (rollout flag platform), TASK-784 (Person Legal Profile reveal pattern), TASK-863 V1.1→V1.5.2 (final settlement lifecycle + Real-Artifact Verification Loop + Semantic Column Invariants).

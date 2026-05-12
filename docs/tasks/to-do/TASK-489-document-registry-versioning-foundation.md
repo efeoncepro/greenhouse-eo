@@ -18,6 +18,40 @@
 
 ---
 
+## Delta 2026-05-11 V2.2 — TASK-868 spawned (payroll_receipt linked V1.5 via dedicated aggregate)
+
+Pregunta del usuario sobre recibos de nómina disparó 4-pillar analysis:
+
+- Y1 (aggregate dedicado mirror TASK-863): ganó los 4 pilares (Safety/Robustness/Resilience/Scalability).
+- Y2 (linked directo a `payroll_period_entries`): semantic mixing + state machine mismatch + reactive consumer N→1.
+- Y3 (virtual UNION read-time): rompe invariantes audit + capability + reliability.
+
+Decisión: **crear TASK-868** que materializa `greenhouse_payroll.payroll_receipt_documents` (mirror exacto TASK-863 V1.5.2: aggregate + state machine 6 estados + helper canónico atomic + auto-regen + audit append-only + outbox events v1 + reliability signals). TASK-489 V2.1 schema NO cambia — TASK-868 hereda el patrón `kind='linked'` ya canonizado.
+
+**Implicaciones para TASK-489**:
+
+- `document_type_catalog` seed V1: 7 types (6 native + 1 linked `final_settlement`). TASK-868 Slice 1 agrega 8º entry `payroll_receipt` (linked).
+- `linked_aggregate_table` CHECK enum V1: 4 valores (final_settlement, person_identity, member_certifications, member_evidence). TASK-868 Slice 1 extiende a 5 (+ `payroll_receipt_documents`).
+- Bridges V1: 4 (member, organization, client, final_settlement). TASK-868 Slice 1 agrega 5º bridge `document_payroll_receipt_link`.
+- Reactive consumer framework canonizado en TASK-489 V2.1 (`documentRegistryLinkedDocumentSyncProjection` pattern). TASK-868 implementa `payrollReceiptDocumentRegistryProjection` siguiendo el mismo shape.
+
+**Status state mapping ampliado** (TASK-868 6 estados → TASK-489 5 estados canonical):
+
+| Aggregate state (TASK-868) | Registry `verification_status` (TASK-489) | `is_archived` |
+| --- | --- | --- |
+| `rendered` | `pending_review` | FALSE |
+| `emitted` | `verified` | FALSE |
+| `distributed` | `verified` | FALSE |
+| `regenerated` | `verified` | FALSE |
+| `superseded` | `superseded` | FALSE |
+| `voided` | `archived` | TRUE |
+
+**Effort impact TASK-489**: cero adicional (TASK-868 es task separada, contained ~13-17h). TASK-489 V2.1 schema fija el contrato `linked_aggregate_table` extensible; TASK-868 lo consume sin requerir migration nueva al registry. Pattern reusable para futuros aggregates (`member_certifications`, `member_evidence`, `person_identity_documents`) cuando emerjan tasks de surfacing.
+
+Spec TASK-868: `docs/tasks/to-do/TASK-868-payroll-receipt-documents-aggregate.md`.
+
+---
+
 ## Delta 2026-05-11 V2.1 — `document_kind` ortogonal (`native` vs `linked`) — incluye finiquito como type V1
 
 Pregunta del usuario revelaba un gap: el finiquito (TASK-862/863) tiene state machine de 9 estados propio en `greenhouse_payroll.final_settlement_documents`. ¿Debe ser un `document_type` del registry o queda fuera?

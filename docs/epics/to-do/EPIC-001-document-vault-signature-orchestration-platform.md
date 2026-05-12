@@ -50,6 +50,7 @@ El repo ya cruzó el umbral en que MSA/SOW, contratos laborales, anexos, órdene
 - `TASK-493` — Rendering documental y catálogo de templates desacoplado de la firma.
 - `TASK-494` — Convergencia HR Document Vault sobre la plataforma común.
 - `TASK-495` — Convergencia Finance/Legal document chain para MSA, SOW y work orders.
+- `TASK-868` — Payroll Receipt Documents aggregate dedicado (mirror TASK-863 V1.5.2) + registry link como `kind='linked'` `document_type='payroll_receipt'`.
 
 ## Existing Related Work
 
