@@ -27,6 +27,27 @@ Cuando esta task entregue el schema:
 
 Spec actualizada V1.2 §5.1 documenta el contract.
 
+## Delta 2026-05-12 (cuarta revisión — Issue 7 chicken-and-egg parity)
+
+**Issue 7 — view_codes + capabilities seed son FORWARD-LOOKING; parity strict ONLY para data_sources V1.0** (descubierto en Discovery TASK-824 live, 2026-05-12):
+
+Verificación live de catalogs reveló:
+
+- `VIEW_REGISTRY` (`src/lib/admin/view-access-catalog.ts`) contiene 4 de los 16 view_codes seedeados en spec V1.2 §5.5 (`cliente.pulse`, `cliente.proyectos`, `cliente.equipo`, `cliente.campanas`). Los 11 restantes (`cliente.creative_hub`, `cliente.reviews`, `cliente.roi_reports`, etc.) NO existen aún — los materializa TASK-827 (UI composition layer).
+- `entitlements-catalog` contiene SOLO 1 de los 12 capabilities seedeados (`client_portal.workspace`). Los 11 restantes (`client_portal.creative_hub.read`, `client_portal.csc_pipeline.read`, etc.) NO existen aún — los materializa TASK-826 (admin endpoints + capabilities granulares).
+
+Chicken-and-egg architectural: TASK-824 ships ANTES que TASK-826 + TASK-827 (es prerequisite). Si parity test bloquea por view_codes/capabilities missing, TASK-824 no puede cerrarse hasta que TASK-826 + TASK-827 lo desbloqueen — pero TASK-826/827 dependen de las tablas que TASK-824 crea.
+
+Fix canónico aplicado (Option simplificada):
+
+- **Slice 4 V1.0 ship parity test SOLO para `data_sources[]`** (TS union `ClientPortalDataSource` de TASK-822 ya existe — strict parity verificable hoy).
+- **view_codes parity y capabilities parity** deferred a TASK-826 (capabilities) + TASK-827 (views): cuando esos tasks materialicen los catalogs faltantes, agregan SU propio parity test que valida que los seeds de TASK-824 sean consumidos correctamente. Cada task posee la parity de SU catalog.
+- Seeds V1.0 quedan **forward-looking** (registran intent comercial de los view_codes y capabilities que materializarán TASK-826/827). Sin parity strict bloqueante = sin chicken-and-egg.
+
+Spec arquitectónico V1.3 → V1.4 documentando este contract explícitamente.
+
+Cierra OQ-3 de TASK-822 ÚNICAMENTE para `data_sources[]`. Las paridades restantes son explícitamente trabajo de TASK-826 + TASK-827 (cierre downstream).
+
 ## Delta 2026-05-12 (tercera revisión — Issue 6 detectado en FASE 1 Discovery)
 
 **Issue 6 — type/FK drift entre spec V1.2 y DB real** (descubierto en Discovery TASK-824 live, 2026-05-12):

@@ -1,8 +1,8 @@
 # Greenhouse Client Portal Domain Architecture V1
 
-> **Version:** 1.3
+> **Version:** 1.4
 > **Created:** 2026-05-07 por Claude (Opus 4.7)
-> **Updated:** 2026-05-12 por Claude (Opus 4.7) — V1.1 (§3.1 + §3.2 TASK-822), V1.2 (§5.1 rename TASK-824 verdict), V1.3 (§5.2 + §5.3 type/FK drift correction post-PG-discovery: `organization_id UUID` → `TEXT` porque la tabla real es TEXT, y FK `greenhouse_core.users(user_id)` → `greenhouse_core.client_users(user_id)` porque la tabla canónica de usuarios autenticados es `client_users` per FK existente en `user_shortcut_pins`)
+> **Updated:** 2026-05-12 por Claude (Opus 4.7) — V1.1 (§3.1 + §3.2 TASK-822), V1.2 (§5.1 rename TASK-824 verdict), V1.3 (§5.2 + §5.3 type/FK drift post-PG-discovery), V1.4 (§5.5 seed contract: view_codes + capabilities son FORWARD-LOOKING en V1.0; parity strict SOLO para data_sources — view_codes parity y capabilities parity son responsabilidad downstream de TASK-826/827 cuando materialicen los catalogs faltantes)
 > **Audience:** Backend engineers, frontend engineers, product owners, comerciales que vendan módulos del portal cliente, agentes que toquen rutas `/api/client-portal/*`, owners de Globe/Wave/CRM Solutions
 > **Related:** `GREENHOUSE_360_OBJECT_MODEL_V1.md`, `GREENHOUSE_CLIENT_PORTAL_ARCHITECTURE_V1.md` (V3.0, descriptivo — predecesor), `GREENHOUSE_CLIENT_LIFECYCLE_V1.md`, `GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md`, `GREENHOUSE_AGENCY_LAYER_V2.md`, `GREENHOUSE_ASSIGNED_TEAM_ARCHITECTURE_V1.md`, `GREENHOUSE_FEATURE_FLAGS_ROLLOUT_PLATFORM_V1.md`
 > **Supersedes:** este spec NO supersede `GREENHOUSE_CLIENT_PORTAL_ARCHITECTURE_V1.md` V3.0 — coexisten: V3.0 describe la experiencia funcional y los 16 cards Creative Hub; este V1 (Domain) canoniza la **estructura del dominio** y el modelo de módulos on-demand. V3.0 sigue siendo lectura obligatoria para entender qué se compone.
@@ -322,6 +322,19 @@ COMMENT ON COLUMN greenhouse_commercial.engagement_commercial_terms.bundled_modu
 ### 5.5 Seed inicial — 10 módulos canónicos V1.0
 
 NOTA V1.2: la columna `business_line` fue renombrada a `applicability_scope` (ver §5.1 Delta V1.2). Los valores siguen idénticos (rename puro, no cambio semántico de los seeds).
+
+**Delta V1.4 (2026-05-12, post-PG-discovery TASK-824)**: los `view_codes[]` y `capabilities[]` declarados en los 10 seeds son **forward-looking**. Verificación live 2026-05-12:
+
+- De los 16 `view_codes` referenciados, solo 4 existen hoy en `VIEW_REGISTRY` (`cliente.pulse`, `cliente.proyectos`, `cliente.equipo`, `cliente.campanas`). Los 11 restantes (`cliente.creative_hub`, `cliente.reviews`, `cliente.roi_reports`, `cliente.exports`, `cliente.cvr_quarterly`, `cliente.staff_aug`, `cliente.brand_intelligence`, `cliente.csc_pipeline`, `cliente.crm_command`, `cliente.web_delivery`, `cliente.home`) los materializa TASK-827 (UI composition layer).
+- De los 12 `capabilities` referenciados, solo `client_portal.workspace` existe hoy en `entitlements-catalog`. Los 11 restantes (`client_portal.creative_hub.read`, `client_portal.csc_pipeline.read`, `client_portal.brand_intelligence.read`, `client_portal.cvr.read`, `client_portal.cvr.export`, `client_portal.roi.read`, `client_portal.exports.generate`, `client_portal.assigned_team.read`, `client_portal.pulse.read`, `client_portal.staff_aug.read`, `client_portal.crm_command.read`, `client_portal.web_delivery.read`) los materializa TASK-826 (admin endpoints + capabilities granulares).
+
+Contract canónico de parity tests:
+
+- **`data_sources[]` strict parity (TASK-824, esta task)**: el TS union `ClientPortalDataSource` de TASK-822 es source of truth; parity test live rompe build si seed DB ↔ TS union diverge.
+- **`view_codes[]` strict parity (TASK-827)**: cuando TASK-827 materialice los view_codes faltantes en `VIEW_REGISTRY`, agrega SU propio parity test que valida que los seeds de TASK-824 sean consumidos correctamente.
+- **`capabilities[]` strict parity (TASK-826)**: cuando TASK-826 materialice las capabilities faltantes en `entitlements-catalog`, agrega SU propio parity test análogo.
+
+Cada task posee la parity de SU catalog. Sin chicken-and-egg blocking.
 
 ```sql
 -- Globe (3)
