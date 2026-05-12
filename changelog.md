@@ -1,5 +1,9 @@
 # changelog.md
 
+## 2026-05-12
+
+- **Offboarding Work Queue — polish visual post-TASK-867.** `/hr/offboarding` ajusta la jerarquía de la cola operacional: el colaborador pasa a ser la primera señal de lectura, el ID del caso baja a metadata compacta, el summary strip incorpora iconografía/estado operacional y la acción de fila se vuelve un icon button de inspección para no competir con la acción primaria del inspector. Validado con Playwright/Chromium usando el usuario agente dedicado (`agent@greenhouse.efeonce.org`) en desktop/tablet/mobile local, más lint/tsc/test focalizados y `pnpm design:lint`. Sin cambios de API, access model, data contracts ni write paths.
+
 ## 2026-05-11
 
 - **TASK-869 — AI Product Design Studio Skills 2026 SHIPPED en `develop`.** Se crea un sistema operativo de diseño de producto asistido por agentes para Greenhouse, inspirado en la velocidad de Lovable/Stitch pero con guardrails de repo: 5 skills globales locales (`product-design-architect-2026`, `ai-ui-generation-director`, `microinteraction-systems-architect`, `frontend-product-implementation-reviewer`, `visual-regression-product-critic`) + 3 overlays versionados en `.codex/skills/` (`greenhouse-product-ui-architect`, `greenhouse-ai-design-studio`, `greenhouse-ui-enterprise-review`). Se documentan `GREENHOUSE_PRODUCT_UI_OPERATING_MODEL_V1` y `GREENHOUSE_UI_DELIVERY_LOOP_V1`, exigiendo Product UI ADR cuando aplique, generación controlada de alternativas, UX/content/a11y, microinteracciones, Playwright screenshots desktop/laptop/mobile, crítica visual y gate enterprise antes de aprobar UI significativa. No cambia runtime productivo, schemas, rutas ni access model.

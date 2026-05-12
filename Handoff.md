@@ -1,3 +1,14 @@
+# Sesion 2026-05-12 — `/hr/offboarding` visual/product polish post-TASK-867
+
+- **Trigger:** usuario pidió invocar skills UI/UX/microinteracción/product design globales y del repo, analizar `/hr/offboarding`, mejorarla inmediatamente y validar con Playwright/Chromium usando el usuario agente dedicado.
+- **Skills usadas:** overlays Greenhouse UI (`greenhouse-agent`, `greenhouse-portal-ui-implementer`, `greenhouse-ui-orchestrator`, `greenhouse-vuexy-ui-expert`, `greenhouse-microinteractions-auditor`, `greenhouse-ux-content-accessibility`, `greenhouse-ui-review`, `greenhouse-ui-enterprise-review`) + globales (`modern-ui-architect`, `ui-product-design-orchestrator`, `ux-content-accessibility`, `microinteractions-auditor`, `product-design-architect-2026`, `ai-ui-generation-director`, `microinteraction-systems-architect`, `frontend-product-implementation-reviewer`, `visual-regression-product-critic`).
+- **Cambio:** `src/views/greenhouse/hr-core/offboarding/HrOffboardingView.tsx` ajusta jerarquía y densidad: colaborador como primera columna/señal, ID de caso como metadata compacta, summary strip con icono/estado, action column compacta con icon button/tooltip y mobile cards con “Próximo paso” como estado textual no CTA falso.
+- **Sin cambios:** no se tocaron APIs, proyección `OffboardingWorkQueue`, capabilities/views/routeGroups, mutaciones de finiquito/documento ni contratos de datos.
+- **Validación:** `pnpm exec eslint src/views/greenhouse/hr-core/offboarding/HrOffboardingView.tsx`; `pnpm exec tsc --noEmit --pretty false`; `pnpm vitest run src/views/greenhouse/hr-core/offboarding/HrOffboardingView.test.tsx --reporter=dot`; `pnpm design:lint`; Playwright/Chromium local con `agent@greenhouse.efeonce.org` en desktop/tablet/mobile. Capturas en `artifacts/ui-offboarding/`.
+- **Nota:** para capturas contra `dev-greenhouse.efeoncepro.com` hace falta combinar NextAuth agent-session con `x-vercel-protection-bypass`; para local se reinició dev con `NEXTAUTH_URL=http://localhost:3000` para obtener cookie `next-auth.session-token`.
+
+---
+
 # Sesion 2026-05-11 — TASK-869 AI Product Design Studio Skills 2026
 
 - **Trigger:** usuario pidió robustecer las skills UI/UX/microinteracciones con metodologías, patrones modernos 2026 y una barra comparable o superior a Lovable/Stitch, tanto global como repo-safe.

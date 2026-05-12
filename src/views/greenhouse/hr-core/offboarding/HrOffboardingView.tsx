@@ -32,6 +32,7 @@ import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Tabs from '@mui/material/Tabs'
 import TextField from '@mui/material/TextField'
+import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 import { alpha, useTheme } from '@mui/material/styles'
 import useMediaQuery from '@mui/material/useMediaQuery'
@@ -170,6 +171,16 @@ const summaryTiles = [
     statusLabel: 'Fuera de finiquito'
   }
 ] as const
+
+const tableColumnSx = {
+  py: 2.5
+}
+
+const caseIdSx = {
+  fontWeight: 600,
+  fontVariantNumeric: 'tabular-nums',
+  color: 'text.secondary'
+}
 
 const severityTone: Record<string, 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'info'> = {
   neutral: 'secondary',
@@ -834,7 +845,7 @@ const HrOffboardingView = () => {
         <Box
           sx={theme => ({
             p: 3,
-            borderRadius: 1.5,
+            borderRadius: `${theme.shape.customBorderRadius.lg}px`,
             border: `1px solid ${alpha(theme.palette[tone].main, 0.22)}`,
             backgroundColor: alpha(theme.palette[tone].main, 0.06)
           })}
@@ -846,7 +857,7 @@ const HrOffboardingView = () => {
                 sx={theme => ({
                   width: 34,
                   height: 34,
-                  borderRadius: 1.25,
+                  borderRadius: `${theme.shape.customBorderRadius.md}px`,
                   display: 'grid',
                   placeItems: 'center',
                   color: `${tone}.main`,
@@ -888,7 +899,7 @@ const HrOffboardingView = () => {
                 sx={theme => ({
                   px: 2.5,
                   py: 2,
-                  borderRadius: 1,
+                  borderRadius: `${theme.shape.customBorderRadius.md}px`,
                   border: `1px solid ${theme.palette.divider}`,
                   backgroundColor: row.complete ? alpha(theme.palette.success.main, 0.04) : alpha(theme.palette.warning.main, 0.05)
                 })}
@@ -913,7 +924,7 @@ const HrOffboardingView = () => {
         ) : null}
 
         {item.latestSettlement ? (
-          <Box sx={theme => ({ px: 3, py: 2.5, borderRadius: 1, border: `1px solid ${theme.palette.divider}`, backgroundColor: alpha(theme.palette.primary.main, 0.035) })}>
+          <Box sx={theme => ({ px: 3, py: 2.5, borderRadius: `${theme.shape.customBorderRadius.md}px`, border: `1px solid ${theme.palette.divider}`, backgroundColor: alpha(theme.palette.primary.main, 0.035) })}>
             <Stack direction='row' justifyContent='space-between' spacing={3}>
               <Typography variant='body2' color='text.secondary'>{settlementStatusLabel[item.latestSettlement.calculationStatus] ?? item.latestSettlement.calculationStatus}</Typography>
               <Typography variant='body2' sx={{ fontWeight: 800 }}>
@@ -1379,20 +1390,40 @@ const HrOffboardingView = () => {
             <Box
               key={tile.key}
               sx={theme => ({
-                p: 3.5,
+                p: 3,
                 borderTop: { xs: index === 0 ? 0 : `1px solid ${theme.palette.divider}`, sm: index < 2 ? 0 : `1px solid ${theme.palette.divider}`, xl: 0 },
                 borderLeft: { xs: 0, sm: index % 2 === 1 ? `1px solid ${theme.palette.divider}` : 0, xl: index === 0 ? 0 : `1px solid ${theme.palette.divider}` },
                 backgroundColor: value > 0 && tile.key === 'attention' ? alpha(theme.palette.warning.main, 0.055) : 'background.paper'
               })}
             >
-              <Stack direction='row' alignItems='center' justifyContent='space-between' spacing={2}>
-                <Stack spacing={0.5} sx={{ minWidth: 0 }}>
-                  <Typography variant='caption' color='text.secondary' sx={{ fontWeight: 800 }}>
-                    {tile.title}
-                  </Typography>
-                  <Typography variant='body2' color='text.secondary' noWrap>
-                    {tile.description}
-                  </Typography>
+              <Stack direction='row' alignItems='center' justifyContent='space-between' spacing={3}>
+                <Stack direction='row' alignItems='center' spacing={2} sx={{ minWidth: 0 }}>
+                  <Box
+                    aria-hidden='true'
+                    sx={theme => ({
+                      width: 36,
+                      height: 36,
+                      borderRadius: `${theme.shape.customBorderRadius.md}px`,
+                      display: { xs: 'none', md: 'grid' },
+                      placeItems: 'center',
+                      color: `${tile.tone}.main`,
+                      backgroundColor: alpha(theme.palette[tile.tone].main, 0.1),
+                      flexShrink: 0
+                    })}
+                  >
+                    <i className={tile.icon} />
+                  </Box>
+                  <Stack spacing={0.25} sx={{ minWidth: 0 }}>
+                    <Typography variant='subtitle2' color='text.primary' noWrap>
+                      {tile.title}
+                    </Typography>
+                    <Typography variant='caption' color='text.secondary' noWrap>
+                      {tile.description}
+                    </Typography>
+                    <Typography variant='caption' color={value > 0 ? `${tile.tone}.main` : 'text.secondary'} sx={{ fontWeight: 700 }}>
+                      {tile.statusLabel}
+                    </Typography>
+                  </Stack>
                 </Stack>
                 <Typography variant='h5' sx={{ fontVariantNumeric: 'tabular-nums' }}>
                   {value}
@@ -1429,7 +1460,7 @@ const HrOffboardingView = () => {
                   gap: 2,
                   px: 3,
                   py: 2,
-                  borderRadius: 1,
+                  borderRadius: `${theme.shape.customBorderRadius.md}px`,
                   color: 'text.secondary',
                   backgroundColor: alpha(theme.palette.info.main, 0.06),
                   border: `1px solid ${alpha(theme.palette.info.main, 0.18)}`
@@ -1472,7 +1503,7 @@ const HrOffboardingView = () => {
                           p: 3,
                           border: `1px solid ${selectedItemId === itemCase.offboardingCaseId ? alpha(theme.palette[rowTone].main, 0.48) : theme.palette.divider}`,
                           borderLeft: `4px solid ${theme.palette[rowTone].main}`,
-                          borderRadius: 1.5,
+                          borderRadius: `${theme.shape.customBorderRadius.lg}px`,
                           backgroundColor: selectedItemId === itemCase.offboardingCaseId ? alpha(theme.palette[rowTone].main, 0.045) : 'background.paper',
                           cursor: 'pointer',
                           transition: 'border-color 160ms ease, background-color 160ms ease, transform 160ms ease',
@@ -1493,16 +1524,23 @@ const HrOffboardingView = () => {
                         <Stack spacing={2.5}>
                           <Stack spacing={2}>
                             <Stack spacing={0.5} sx={{ minWidth: 0 }}>
-                              <Typography variant='body2' sx={{ fontWeight: 800 }}>{itemCase.publicId}</Typography>
-                              <Typography variant='body2' color='text.secondary'>
+                              <Typography variant='body2' sx={{ fontWeight: 800 }}>
                                 {item.collaborator.displayName ?? itemCase.memberId ?? 'Sin colaborador'}
                               </Typography>
+                              <Typography variant='caption' sx={caseIdSx}>
+                                {itemCase.publicId} · Último día {formatDate(itemCase.lastWorkingDay)}
+                              </Typography>
                             </Stack>
-                            <CustomChip round='true' size='small' color={rowTone} label={item.nextStep.label} sx={{ alignSelf: 'flex-start' }} />
                           </Stack>
                           <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
                             <CustomChip round='true' size='small' color={statusColor[itemCase.status] ?? 'default'} label={statusLabel[itemCase.status] ?? itemCase.status} />
                             <CustomChip round='true' size='small' color={item.closureLane.allowsFinalSettlement ? 'primary' : 'secondary'} label={item.closureLane.label} />
+                          </Stack>
+                          <Stack spacing={0.25}>
+                            <Typography variant='caption' color='text.secondary'>Próximo paso</Typography>
+                            <Typography variant='body2' sx={{ fontWeight: 800, color: `${rowTone}.main` }}>
+                              {item.nextStep.label}
+                            </Typography>
                           </Stack>
                           <FieldsProgressChip filled={item.progress.completed} total={item.progress.total} srLabel={(filled, total) => `${itemCase.publicId}: ${filled} de ${total} pasos listos.`} suffix={total => `de ${total} pasos`} readyLabel={item.progress.completed >= item.progress.total ? 'Listo' : undefined} nextStepHint={item.progress.nextStepHint ?? undefined} />
                         </Stack>
@@ -1512,11 +1550,11 @@ const HrOffboardingView = () => {
                 </Stack>
               ) : (
                 <DataTableShell identifier='offboarding-work-queue' ariaLabel='Cola operacional de offboarding' density='compact' stickyFirstColumn>
-                  <Table size='small' sx={{ minWidth: 980 }}>
+                  <Table size='small' sx={{ minWidth: 880 }}>
                     <TableHead>
                       <TableRow>
-                        <TableCell>Caso</TableCell>
                         <TableCell>Colaborador</TableCell>
+                        <TableCell>Caso</TableCell>
                         <TableCell>Estado</TableCell>
                         <TableCell>Próximo paso</TableCell>
                         <TableCell align='right'>Acción</TableCell>
@@ -1561,19 +1599,25 @@ const HrOffboardingView = () => {
                               }
                             })}
                           >
-                            <TableCell>
+                            <TableCell sx={{ ...tableColumnSx, minWidth: 230 }}>
                               <Stack spacing={0.5}>
-                                <Typography variant='body2' fontWeight={700}>{itemCase.publicId}</Typography>
-                                <Typography variant='caption' color='text.secondary'>{formatDate(itemCase.effectiveDate)} · Último día {formatDate(itemCase.lastWorkingDay)}</Typography>
+                                <Typography variant='body2' sx={{ fontWeight: 800 }}>
+                                  {item.collaborator.displayName ?? itemCase.memberId ?? 'Sin colaborador'}
+                                </Typography>
+                                <Typography variant='caption' color='text.secondary'>
+                                  {item.collaborator.roleTitle ?? item.collaborator.primaryEmail ?? 'Sin detalle'}
+                                </Typography>
                               </Stack>
                             </TableCell>
-                            <TableCell>
+                            <TableCell sx={{ ...tableColumnSx, minWidth: 170 }}>
                               <Stack spacing={0.5}>
-                                <Typography variant='body2' fontWeight={700}>{item.collaborator.displayName ?? itemCase.memberId ?? 'Sin colaborador'}</Typography>
-                                <Typography variant='caption' color='text.secondary'>{item.collaborator.roleTitle ?? item.collaborator.primaryEmail ?? 'Sin detalle'}</Typography>
+                                <Typography variant='caption' sx={caseIdSx}>{itemCase.publicId}</Typography>
+                                <Typography variant='caption' color='text.secondary'>
+                                  {formatDate(itemCase.effectiveDate)} · Último día {formatDate(itemCase.lastWorkingDay)}
+                                </Typography>
                               </Stack>
                             </TableCell>
-                            <TableCell>
+                            <TableCell sx={tableColumnSx}>
                               <Stack spacing={1} alignItems='flex-start'>
                                 <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap alignItems='center'>
                                   <CustomChip round='true' size='small' color={statusColor[itemCase.status] ?? 'default'} label={statusLabel[itemCase.status] ?? itemCase.status} />
@@ -1582,7 +1626,7 @@ const HrOffboardingView = () => {
                                 <FieldsProgressChip filled={item.progress.completed} total={item.progress.total} srLabel={(filled, total) => `${itemCase.publicId}: ${filled} de ${total} pasos listos.`} suffix={total => `de ${total} pasos`} readyLabel={item.progress.completed >= item.progress.total ? 'Listo' : undefined} nextStepHint={item.progress.nextStepHint ?? undefined} />
                               </Stack>
                             </TableCell>
-                            <TableCell>
+                            <TableCell sx={{ ...tableColumnSx, minWidth: 200 }}>
                               <Stack spacing={0.75} alignItems='flex-start'>
                                 <Typography variant='body2' sx={{ fontWeight: 800, color: `${rowTone}.main` }}>{item.nextStep.label}</Typography>
                                 <Typography variant='caption' color='text.secondary'>
@@ -1591,10 +1635,22 @@ const HrOffboardingView = () => {
                                 {item.latestDocument ? <CustomChip round='true' size='small' color={documentStatusColor[item.latestDocument.documentStatus] ?? 'default'} label={documentStatusLabel[item.latestDocument.documentStatus] ?? item.latestDocument.documentStatus} /> : null}
                               </Stack>
                             </TableCell>
-                            <TableCell align='right'>
-                              <Button size='small' variant='text' onClick={event => { event.stopPropagation(); openDetail() }}>
-                                Ver detalle
-                              </Button>
+                            <TableCell align='right' sx={tableColumnSx}>
+                              <Tooltip title={item.primaryAction ? `Seleccionar y revisar: ${item.primaryAction.label}` : 'Ver detalle'}>
+                                <span>
+                                  <IconButton
+                                    size='small'
+                                    color={selectedItemId === itemCase.offboardingCaseId ? 'primary' : 'default'}
+                                    aria-label={`Ver detalle de ${itemCase.publicId}`}
+                                    onClick={event => {
+                                      event.stopPropagation()
+                                      openDetail()
+                                    }}
+                                  >
+                                    <i className='tabler-layout-sidebar-right' aria-hidden='true' />
+                                  </IconButton>
+                                </span>
+                              </Tooltip>
                             </TableCell>
                           </TableRow>
                         )
