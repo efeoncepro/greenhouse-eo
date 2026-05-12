@@ -1,3 +1,16 @@
+# Sesion 2026-05-11 — TASK-869 AI Product Design Studio Skills 2026
+
+- **Trigger:** usuario pidió robustecer las skills UI/UX/microinteracciones con metodologías, patrones modernos 2026 y una barra comparable o superior a Lovable/Stitch, tanto global como repo-safe.
+- **Skills usadas:** `skill-creator` para crear skills progresivas y `greenhouse-task-planner` para registrar la task canónica.
+- **Task cerrada:** `docs/tasks/complete/TASK-869-ai-product-design-studio-skills-2026.md`; `Lifecycle=complete`; `docs/tasks/README.md` y `TASK_ID_REGISTRY.md` sincronizados.
+- **Global instalado localmente:** 5 skills bajo `/Users/jreye/.codex/skills/*`: `product-design-architect-2026`, `ai-ui-generation-director`, `microinteraction-systems-architect`, `frontend-product-implementation-reviewer`, `visual-regression-product-critic`.
+- **Repo versionado:** 3 overlays/gates bajo `.codex/skills/*`: `greenhouse-product-ui-architect`, `greenhouse-ai-design-studio`, `greenhouse-ui-enterprise-review`.
+- **Docs vivas:** nueva arquitectura `docs/architecture/GREENHOUSE_PRODUCT_UI_OPERATING_MODEL_V1.md`, nuevo loop operativo `docs/operations/GREENHOUSE_UI_DELIVERY_LOOP_V1.md`, `project_context.md` y `changelog.md` actualizados.
+- **Nota multi-agente:** `.agents/` está ignorado localmente por `git info/exclude`; por eso el gate enterprise versionable quedó en `.codex/skills/greenhouse-ui-enterprise-review/`. No se tocaron ni stagearon cambios ajenos en `.claude/skills/*`.
+- **Validación:** discovery de skills globales/repo OK; `git diff --check` OK. Hooks de commit/push quedan registrados por Git durante el commit/push.
+
+---
+
 # Sesion 2026-05-11 — TASK-867 cerrada en develop (Offboarding Work Queue Projection + UX Modernization)
 
 - **Trigger:** usuario pidió implementar TASK-867 manteniéndose en `develop` sin cambiar de rama.
