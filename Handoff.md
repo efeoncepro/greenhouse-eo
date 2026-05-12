@@ -1,6 +1,6 @@
-# Sesion 2026-05-12 — TASK-825 arch-architect verdict + implementation on develop
+# Sesion 2026-05-12 — TASK-825 arch-architect verdict + implementation CERRADA on develop
 
-- **Trigger**: post TASK-824 cierre, usuario pidió arch-architect verdict sobre TASK-825 (Client Portal Resolver Canonical, EPIC-015 child 4/8). Verdict: 5 correcciones (3 bloqueantes + 2 polish) aplicadas al spec V1.0 pre-Slice-1; implementación directa en develop sobre las correcciones.
+- **Trigger**: post TASK-824 cierre, usuario pidió arch-architect verdict sobre TASK-825 (Client Portal Resolver Canonical, EPIC-015 child 4/8). Verdict: 5 correcciones (3 bloqueantes + 2 polish) aplicadas al spec V1.0 pre-Slice-1; implementación directa en develop con 5 commits incrementales.
 - **5 correcciones canonizadas en spec v1.1 (commit `caf1b1e4`)**:
   1. **(Bloqueante)** SQL `m.business_line` → `m.applicability_scope` (TASK-824 V1.4 rename). DTO `businessLine` → `applicabilityScope`.
   2. **(Bloqueante)** Endpoint usa `getServerAuthSession()` directo + inline checks (clone TASK-823 `account-summary` pattern). Eliminadas todas las refs a `requireClientSession` que NO existe (TASK-823 V1.1 verdict lo eliminó).
@@ -8,9 +8,18 @@
   4. **(Bloqueante invariant)** Exporta `moduleResolverMeta: ClientPortalReaderMeta` con `classification:'native'`, `ownerDomain:null` (TASK-822 §3.1 hard rule). Primer reader native del BFF.
   5. **(Polish)** Resolver SOLO filtra; reliability signals los implementa TASK-829 con readers dedicados cron-paced. Renombrar "orphan module_key" → "deprecated module filter" (FK enforce orphan imposible).
 - **Adicional**: `asOf?: Date` dead option eliminada (YAGNI); single-flight Promise dedup queda V1.1 follow-up consciente.
-- **Decisión operativa**: implementación directa sobre `develop`, sin branch separada (instrucción explícita).
-- **Task movida** `to-do/` → `in-progress/`. README + Handoff sync.
-- **Plan**: 4 slices (DTO + resolver archivo único + endpoint + tests).
+- **Cierre 2026-05-12**: 5 commits incrementales sin PR ceremony.
+  - `919b4c63` baseline rename to-do → in-progress + Lifecycle sync
+  - `c55601df` Slice 1 — DTO ResolvedClientPortalModule + AssignmentSource (119 líneas)
+  - `91bf6dec` Slice 2 — module-resolver native + cache + 3 helpers + meta (257 líneas, archivo único)
+  - `170084c5` Slice 3 — endpoint GET /api/client-portal/modules clone TASK-823 (86 líneas)
+  - `c9401577` Slice 4 — 36/36 tests verde (24 resolver + 3 native-meta + 7 endpoint + 2 TASK-822 anteriores)
+- **Tests verdes**: 36/36 (4 archivos test, 779ms transform + run). Cubre cache hit/miss/scope/invalidation, includePending bypassea cache, row mapping con `applicabilityScope` (NO `businessLine`), Date expires_at → ISO, error path con `captureWithDomain`, 3 helpers cache hit warm, endpoint 5 estados HTTP, payload NO leak stack/secrets.
+- **Verificación final**: `pnpm build` ✅ + `pnpm lint` ✅ + `pnpm tsc --noEmit` ✅ + 4 grep negativos canónicos limpios (0 `new Pool`, 0 `Response.json` sin `NextResponse`, 0 refs `requireClientSession`, 0 `business_line`/`businessLine` en runtime — solo en anti-regression comments del test).
+- **Primer reader native del BFF efectivo**: el invariant de TASK-822 §3.1 (`readers/native/` con `ClientPortalReaderMeta`) tenía solo un README documentando convención. Esta task lo materializa con consumer real (`moduleResolverMeta` declarado + `assertReaderMeta` validado). Pattern reusable cuando TASK-825b o futuros nativos emerjan.
+- **Cache TTL 60s pattern canonizado para BFF nativo**: mirror exacto de TASK-780 `home_rollout_flags` adaptado a `Map<organizationId, {data, expiresAt}>`. Invalidator scoped/full exportado para uso desde TASK-826 commands post-mutation.
+- **Desbloquea**: TASK-826 (admin endpoints — invalidan cache post-mutation via `__clearClientPortalResolverCache(orgId)`), TASK-827 (UI composition layer — compose menú dinámico desde resolver, page guards con `hasViewCodeAccess`), TASK-828 (cascade reactive consumer — invalida cache scoped post materialización de assignments).
+- **5 estados HTTP canónicos en endpoint** establecen pattern reusable para futuros endpoints `/api/client-portal/*` (TASK-826 admin endpoints replicarán este shape verbatim).
 
 ---
 

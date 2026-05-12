@@ -2,13 +2,13 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `EPIC-015`
-- Status real: `Implementacion v1.1 directo en develop (sin branch separada por instruccion operativa 2026-05-12). Spec v1.1 con 5 correcciones verdict aplicadas pre-Slice-1.`
+- Status real: `Cerrada 2026-05-12 directo en develop. 5 commits incrementales: baseline + Slice 1 DTO + Slice 2 resolver native + Slice 3 endpoint + Slice 4 tests (36/36 verde) + closing. Primer reader native del BFF + cierre del invariant TASK-822 §3.1.`
 - Rank: `TBD`
 - Domain: `client_portal`
 - Blocked by: `none` (TASK-824 cerrada 2026-05-12; schema + seed listos)

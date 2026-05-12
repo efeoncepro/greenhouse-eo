@@ -11,8 +11,17 @@
 - Status real: `Diseno (TASK-824 cerrada 2026-05-12; bloqueada por TASK-825 resolver)`
 - Rank: `TBD`
 - Domain: `client_portal`
-- Blocked by: `TASK-825`
+- Blocked by: `none` (TASK-825 cerrada 2026-05-12)
 - Branch: `task/TASK-826-client-portal-admin`
+
+## Delta 2026-05-12 — TASK-825 cerrada, cache invalidator listo
+
+TASK-825 cerró 2026-05-12 con resolver canónico + cache TTL 60s + invalidator `__clearClientPortalResolverCache(orgId?)` exportado. Cuando esta task arranque:
+
+- **Importar invalidator** desde `@/lib/client-portal/readers/native/module-resolver`. Cada command (`enable/pause/resume/expire/churn`) DEBE llamar `__clearClientPortalResolverCache(organizationId)` post-mutation atómicamente — staleness max 60s sin invalidation; con invalidation, próxima lectura es fresca instantánea.
+- **Endpoint pattern** ya canonizado: clone shape de `src/app/api/client-portal/modules/route.ts` (5 estados HTTP: 401/401-degenerate/403/500-orgId/200/500-throws). Admin endpoints replicarán con tenant check distinto (`internal` o `admin` route group + capability granular).
+- **Resolver expone `includePending=true` opt-in** que bypassea cache — admin UI lo usa para vista de assignments pendientes que aún no son visibles para el cliente.
+- 5 estados HTTP canónicos + `captureWithDomain('client_portal', tags:{source:'api_endpoint', endpoint, stage}, extra:{organizationId})` pattern.
 
 ## Delta 2026-05-12 — TASK-824 cerrada, parity capabilities responsibility heredada
 

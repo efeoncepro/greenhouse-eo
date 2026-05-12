@@ -11,8 +11,18 @@
 - Status real: `Diseno (TASK-824 cerrada 2026-05-12; bloqueada por TASK-825 resolver)`
 - Rank: `TBD`
 - Domain: `client_portal / ui`
-- Blocked by: `TASK-825`
+- Blocked by: `none` (TASK-825 cerrada 2026-05-12)
 - Branch: `task/TASK-827-client-portal-composition`
+
+## Delta 2026-05-12 — TASK-825 cerrada, resolver listo para consumo UI
+
+TASK-825 cerró 2026-05-12 con `resolveClientPortalModulesForOrganization` + 3 helpers + endpoint. Cuando esta task arranque:
+
+- **`ClientPortalNavigation` server component** consume `resolveClientPortalModulesForOrganization(session.user.organizationId)` directo (server-only). Compose menú dinámico desde `modules[].viewCodes` flatten. NO branchear por `business_line` / `tenant_capabilities` inline (hard rule spec V1.4 §16).
+- **Page guards** en cada ruta cliente usan `hasViewCodeAccess(orgId, 'cliente.creative_hub')` → si false, redirect a `/home` o render empty state honesto.
+- **API gates** usan `hasCapabilityViaModule(orgId, 'client_portal.creative_hub.read')` para gates específicos.
+- **Cache TTL 60s warm** — múltiples consumers en el mismo render reusan la query DB ⇒ 1 round-trip por page load.
+- **Endpoint `GET /api/client-portal/modules` ya shipped** — frontend puede consumirlo desde client components si necesita refresh dinámico (SWR / React Query); pero el path canónico es server component + resolver directo (no roundtrip HTTP innecesario).
 
 ## Delta 2026-05-12 — TASK-824 cerrada, parity view_codes responsibility heredada
 

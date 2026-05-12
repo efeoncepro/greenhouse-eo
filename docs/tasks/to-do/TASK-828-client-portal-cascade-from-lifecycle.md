@@ -11,8 +11,15 @@
 - Status real: `Diseno (TASK-824 cerrada 2026-05-12; columna engagement_commercial_terms.bundled_modules ya disponible)`
 - Rank: `TBD`
 - Domain: `client_portal`
-- Blocked by: `TASK-820, TASK-825, TASK-826`
+- Blocked by: `TASK-820, TASK-826` (TASK-825 cerrada 2026-05-12)
 - Branch: `task/TASK-828-client-portal-cascade`
+
+## Delta 2026-05-12 — TASK-825 cerrada, cache invalidation pattern canonizado
+
+TASK-825 cerró 2026-05-12 con `__clearClientPortalResolverCache(orgId?)` invalidator exportado. Cuando esta task arranque (post-TASK-826 que entrega los commands):
+
+- **Reactive consumer `client_portal_modules_from_lifecycle`** que escucha `client.lifecycle.case.completed` (TASK-820 outbox) y materializa/churn-ea assignments DEBE llamar `__clearClientPortalResolverCache(organizationId)` post-materialización para invalidar el cache scoped del cliente afectado. Sin invalidation, el resolver devuelve stale data por hasta 60s (TTL) — con invalidation, próxima lectura del cliente es fresca instantánea.
+- **Pattern atómico**: invalidator es side-effect tras la mutación PG; si la mutación PG falla, no se invalida (no hay efecto fantasma). Si la invalidación falla por algún motivo extraño, el TTL 60s resuelve eventualmente.
 
 ## Delta 2026-05-12 — TASK-824 cerrada, columna bundled_modules disponible
 
