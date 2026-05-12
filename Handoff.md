@@ -1,3 +1,19 @@
+# Sesion 2026-05-12 — TASK-825 arch-architect verdict + implementation on develop
+
+- **Trigger**: post TASK-824 cierre, usuario pidió arch-architect verdict sobre TASK-825 (Client Portal Resolver Canonical, EPIC-015 child 4/8). Verdict: 5 correcciones (3 bloqueantes + 2 polish) aplicadas al spec V1.0 pre-Slice-1; implementación directa en develop sobre las correcciones.
+- **5 correcciones canonizadas en spec v1.1 (commit `caf1b1e4`)**:
+  1. **(Bloqueante)** SQL `m.business_line` → `m.applicability_scope` (TASK-824 V1.4 rename). DTO `businessLine` → `applicabilityScope`.
+  2. **(Bloqueante)** Endpoint usa `getServerAuthSession()` directo + inline checks (clone TASK-823 `account-summary` pattern). Eliminadas todas las refs a `requireClientSession` que NO existe (TASK-823 V1.1 verdict lo eliminó).
+  3. **(Bloqueante)** Resolver vive en `src/lib/client-portal/readers/native/module-resolver.ts` archivo único (no carpeta `modules/` que no existe; spec V1.1 §3.1 canónica).
+  4. **(Bloqueante invariant)** Exporta `moduleResolverMeta: ClientPortalReaderMeta` con `classification:'native'`, `ownerDomain:null` (TASK-822 §3.1 hard rule). Primer reader native del BFF.
+  5. **(Polish)** Resolver SOLO filtra; reliability signals los implementa TASK-829 con readers dedicados cron-paced. Renombrar "orphan module_key" → "deprecated module filter" (FK enforce orphan imposible).
+- **Adicional**: `asOf?: Date` dead option eliminada (YAGNI); single-flight Promise dedup queda V1.1 follow-up consciente.
+- **Decisión operativa**: implementación directa sobre `develop`, sin branch separada (instrucción explícita).
+- **Task movida** `to-do/` → `in-progress/`. README + Handoff sync.
+- **Plan**: 4 slices (DTO + resolver archivo único + endpoint + tests).
+
+---
+
 # Sesion 2026-05-12 — TASK-824 arch-architect verdict + implementation CERRADA on develop
 
 - **Trigger**: post TASK-823 cierre, usuario pidió arch-architect verdict sobre TASK-824 (Client Portal DDL Schema, EPIC-015 child 3/8). Verdict: 5 correcciones (1 bloqueante semántico + 4 polish) aplicadas al spec V1.0 pre-Slice-1; FASE 1 Discovery emergió 2 baseline recalibrations adicionales (Issues 6+7); spec arquitectónica bump V1.1 → V1.4; implementación directa en develop con 6 commits incrementales.

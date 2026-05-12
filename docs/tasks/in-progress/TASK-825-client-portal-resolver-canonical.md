@@ -2,17 +2,17 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `EPIC-015`
-- Status real: `Diseno v1.1 — arch-architect verdict aplicado 2026-05-12 (5 correcciones pre-Slice-1: 3 bloqueantes + 2 polish). TASK-822 + TASK-824 cerradas; sustrato DB + BFF foundation listos.`
+- Status real: `Implementacion v1.1 directo en develop (sin branch separada por instruccion operativa 2026-05-12). Spec v1.1 con 5 correcciones verdict aplicadas pre-Slice-1.`
 - Rank: `TBD`
 - Domain: `client_portal`
 - Blocked by: `none` (TASK-824 cerrada 2026-05-12; schema + seed listos)
-- Branch: `task/TASK-825-client-portal-resolver`
+- Branch: `develop` (direct work, no feature branch — user override)
 
 ## Delta 2026-05-12 (tercera revisión — arch-architect verdict v1.1 aplicado pre-Slice-1)
 
