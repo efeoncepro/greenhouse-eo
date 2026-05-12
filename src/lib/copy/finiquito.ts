@@ -258,6 +258,61 @@ export const GH_FINIQUITO = {
         validationAmount: 'Ingresa un monto mayor a 0.',
         validationBeneficiary: 'Ingresa el nombre del beneficiario.'
       }
+    },
+    workQueue: {
+      title: 'Cola de offboarding',
+      subtitle: 'Prioriza casos, prerequisitos, cálculo, documento y ratificación desde una sola vista operacional.',
+      summary: {
+        attention: 'Requieren acción',
+        readyToCalculate: 'Listos para calcular',
+        documents: 'Documentos en curso',
+        noLaborSettlement: 'Sin finiquito laboral'
+      },
+      lane: {
+        finalSettlement: 'Finiquito laboral',
+        contractualClose: 'Cierre contractual',
+        externalProvider: 'Proveedor externo',
+        needsClassification: 'Por clasificar',
+        finalSettlementHelp: 'Trabajador dependiente en nómina interna; requiere cálculo, documento y ratificación.',
+        contractualCloseHelp: 'Honorarios o relación no laboral; se cierra como relación contractual sin finiquito laboral.',
+        externalProviderHelp: 'El cierre vive en el proveedor laboral o payroll externo.',
+        needsClassificationHelp: 'La combinación contractual requiere clasificación antes de habilitar documentos o pagos.'
+      },
+      nextStep: {
+        uploadResignationLetter: 'Subir carta de renuncia',
+        declareMaintenance: 'Declarar pensión alimentos',
+        calculate: 'Calcular finiquito',
+        approveCalculation: 'Aprobar cálculo',
+        renderDocument: 'Generar documento',
+        submitDocumentReview: 'Enviar a revisión',
+        approveDocument: 'Aprobar documento',
+        issueDocument: 'Emitir documento',
+        registerRatification: 'Registrar ratificación',
+        reviewPayment: 'Revisar pago pendiente',
+        externalProviderClose: 'Cerrar con proveedor',
+        classifyCase: 'Clasificar caso',
+        completed: 'Cierre completo',
+        none: 'Sin acción pendiente'
+      },
+      actions: {
+        approveCase: 'Aprobar caso',
+        scheduleCase: 'Programar salida',
+        executeCase: 'Ejecutar salida',
+        replaceResignationLetter: 'Reemplazar carta',
+        editMaintenance: 'Editar pensión alimentos',
+        reissueDocument: 'Reemitir documento',
+        downloadPdf: 'PDF'
+      },
+      blockers: {
+        resignationLetter: 'Falta carta de renuncia ratificada.',
+        maintenance: 'Falta declaración de pensión de alimentos.',
+        settlementApproval: 'El cálculo debe estar aprobado antes de operar el documento.',
+        noSettlement: 'No existe cálculo vigente.',
+        historicalDocument: 'El documento corresponde a un cálculo anterior.'
+      },
+      progress: {
+        done: 'listo'
+      }
     }
   }
 } as const
