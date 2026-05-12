@@ -305,11 +305,15 @@ const deriveSecondaryActions = (
     secondary.push(action({ code: 'transition_execute', severity: 'success' }))
   }
 
-  if (prerequisites.resignationLetter === 'attached') {
+  if (prerequisites.resignationLetter === 'missing') {
+    secondary.push(action({ code: 'upload_resignation_letter', severity: 'warning' }))
+  } else if (prerequisites.resignationLetter === 'attached') {
     secondary.push(action({ code: 'replace_resignation_letter', severity: 'neutral' }))
   }
 
-  if (prerequisites.maintenanceObligation === 'not_subject' || prerequisites.maintenanceObligation === 'subject') {
+  if (prerequisites.maintenanceObligation === 'missing') {
+    secondary.push(action({ code: 'declare_maintenance', severity: 'warning' }))
+  } else if (prerequisites.maintenanceObligation === 'not_subject' || prerequisites.maintenanceObligation === 'subject') {
     secondary.push(action({ code: 'edit_maintenance', severity: 'neutral' }))
   }
 

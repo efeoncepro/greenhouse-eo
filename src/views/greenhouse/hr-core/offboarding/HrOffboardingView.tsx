@@ -7,17 +7,15 @@ import { useSearchParams } from 'next/navigation'
 import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
-import Card from '@mui/material/Card'
-import CardContent from '@mui/material/CardContent'
-import CardHeader from '@mui/material/CardHeader'
-import Divider from '@mui/material/Divider'
 import Dialog from '@mui/material/Dialog'
 import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
+import Drawer from '@mui/material/Drawer'
 import FormControl from '@mui/material/FormControl'
 import FormControlLabel from '@mui/material/FormControlLabel'
 import Grid from '@mui/material/Grid'
+import IconButton from '@mui/material/IconButton'
 import InputLabel from '@mui/material/InputLabel'
 import MenuItem from '@mui/material/MenuItem'
 import Radio from '@mui/material/Radio'
@@ -25,15 +23,15 @@ import RadioGroup from '@mui/material/RadioGroup'
 import Select from '@mui/material/Select'
 import Skeleton from '@mui/material/Skeleton'
 import Stack from '@mui/material/Stack'
+import Tab from '@mui/material/Tab'
 import Switch from '@mui/material/Switch'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
-import TableContainer from '@mui/material/TableContainer'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
+import Tabs from '@mui/material/Tabs'
 import TextField from '@mui/material/TextField'
-import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 
 import { getMicrocopy } from '@/lib/copy'
@@ -42,19 +40,26 @@ import { GH_FINIQUITO } from '@/lib/copy/finiquito'
 import CustomChip from '@core/components/mui/Chip'
 
 import GreenhouseFileUploader, { type UploadedFileValue } from '@/components/greenhouse/GreenhouseFileUploader'
+import DataTableShell from '@/components/greenhouse/data-table/DataTableShell'
+import EmptyState from '@/components/greenhouse/EmptyState'
+import FieldsProgressChip from '@/components/greenhouse/primitives/FieldsProgressChip'
+import MetricSummaryCard from '@/components/greenhouse/primitives/MetricSummaryCard'
+import OperationalPanel from '@/components/greenhouse/primitives/OperationalPanel'
 
 import type { HrMemberOption } from '@/types/hr-core'
-import type { OffboardingCase, OffboardingCaseStatus, OffboardingSeparationType } from '@/lib/workforce/offboarding'
-import type { FinalSettlement, FinalSettlementStatus } from '@/lib/payroll/final-settlement'
-import type { FinalSettlementDocument } from '@/lib/payroll/final-settlement/document-types'
+import type {
+  OffboardingCase,
+  OffboardingCaseStatus,
+  OffboardingSeparationType,
+  OffboardingWorkQueue,
+  OffboardingWorkQueueActionDescriptor,
+  OffboardingWorkQueueFilter,
+  OffboardingWorkQueueItem
+} from '@/lib/workforce/offboarding'
 import { formatDate } from '@views/greenhouse/hr-core/helpers'
 import { formatCurrency as formatGreenhouseCurrency } from '@/lib/format'
 
 const GREENHOUSE_COPY = getMicrocopy()
-
-type CasesResponse = {
-  cases: OffboardingCase[]
-}
 
 type MembersResponse = {
   members: HrMemberOption[]
@@ -64,14 +69,6 @@ type ContractExpiryScanResponse = {
   opened: OffboardingCase[]
   scanned: number
   skipped: Array<{ memberId: string; reason: string }>
-}
-
-type FinalSettlementDocumentResponse = {
-  document: FinalSettlementDocument | null
-}
-
-type FinalSettlementResponse = {
-  settlement: FinalSettlement | null
 }
 
 const statusColor: Record<string, 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'info'> = {
@@ -92,15 +89,6 @@ const statusLabel: Record<string, string> = {
   blocked: 'Bloqueado',
   executed: 'Ejecutado',
   cancelled: 'Cancelado'
-}
-
-const laneLabel: Record<string, string> = {
-  internal_payroll: 'Payroll interno',
-  external_payroll: 'Payroll externo',
-  non_payroll: 'No payroll',
-  identity_only: 'Solo identidad',
-  relationship_transition: 'Transición',
-  unknown: 'Por revisar'
 }
 
 const documentStatusColor: Record<string, 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'info'> = {
@@ -129,17 +117,7 @@ const documentStatusLabel: Record<string, string> = {
   cancelled: 'Cancelado'
 }
 
-const settlementStatusColor: Record<FinalSettlementStatus | 'none', 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'info'> = {
-  none: 'default',
-  draft: 'secondary',
-  calculated: 'info',
-  reviewed: 'warning',
-  approved: 'success',
-  issued: 'success',
-  cancelled: 'default'
-}
-
-const settlementStatusLabel: Record<FinalSettlementStatus | 'none', string> = {
+const settlementStatusLabel: Record<string, string> = {
   none: 'Sin cálculo',
   draft: 'Borrador',
   calculated: 'Calculado',
@@ -149,63 +127,13 @@ const settlementStatusLabel: Record<FinalSettlementStatus | 'none', string> = {
   cancelled: 'Cancelado'
 }
 
-type ClosureLane = {
-  label: string
-  settlementLabel: string
-  documentLabel: string
-  allowsFinalSettlement: boolean
-  helpText: string | null
-}
-
-const chileDependentContracts = new Set(['indefinido', 'plazo_fijo'])
-
-const isChileDependentInternalPayrollCase = (item: OffboardingCase) =>
-  item.ruleLane === 'internal_payroll'
-  && item.payrollViaSnapshot === 'internal'
-  && item.payRegimeSnapshot === 'chile'
-  && chileDependentContracts.has(item.contractTypeSnapshot)
-
-const closureLaneFor = (item: OffboardingCase): ClosureLane => {
-  if (isChileDependentInternalPayrollCase(item)) {
-    return {
-      label: 'Finiquito laboral',
-      settlementLabel: 'Finiquito',
-      documentLabel: 'Finiquito laboral',
-      allowsFinalSettlement: true,
-      helpText: null
-    }
-  }
-
-  if (item.contractTypeSnapshot === 'honorarios' || item.ruleLane === 'non_payroll') {
-    return {
-      label: 'Cierre contractual',
-      settlementLabel: 'Sin finiquito laboral',
-      documentLabel: 'Cierre contractual',
-      allowsFinalSettlement: false,
-      helpText: 'Honorarios se cierra como relación contractual; no genera finiquito laboral ni descuentos previsionales.'
-    }
-  }
-
-  if (item.payrollViaSnapshot === 'deel' || item.relationshipType === 'eor' || item.ruleLane === 'external_payroll') {
-    return {
-      label: 'Cierre proveedor',
-      settlementLabel: 'Proveedor externo',
-      documentLabel: 'Documento proveedor',
-      allowsFinalSettlement: false,
-      helpText: 'El cierre se coordina con el proveedor externo; Greenhouse no calcula finiquito laboral interno.'
-    }
-  }
-
-  return {
-    label: 'Revisión legal requerida',
-    settlementLabel: 'Por revisar',
-    documentLabel: 'Por revisar',
-    allowsFinalSettlement: false,
-    helpText: 'La combinación contractual requiere clasificación antes de habilitar documentos o pagos.'
-  }
-}
-
-const activeStatuses = new Set<OffboardingCaseStatus>(['draft', 'needs_review', 'approved', 'scheduled', 'blocked'])
+const queueTabs: Array<{ value: OffboardingWorkQueueFilter; label: string }> = [
+  { value: 'all', label: 'Todos' },
+  { value: 'attention', label: 'Atención' },
+  { value: 'ready_to_calculate', label: 'Listos para cálculo' },
+  { value: 'documents', label: 'Documentos' },
+  { value: 'no_labor_settlement', label: 'Sin finiquito' }
+]
 
 const nextStatusFor = (status: OffboardingCaseStatus): OffboardingCaseStatus | null => {
   if (status === 'draft' || status === 'needs_review') return 'approved'
@@ -215,34 +143,27 @@ const nextStatusFor = (status: OffboardingCaseStatus): OffboardingCaseStatus | n
   return null
 }
 
-const nextLabelFor = (status: OffboardingCaseStatus) => {
-  if (status === 'draft' || status === 'needs_review') return 'Aprobar'
-  if (status === 'approved') return 'Programar'
-  if (status === 'scheduled') return 'Ejecutar'
-
-  return null
-}
-
 const today = () => new Date().toISOString().slice(0, 10)
 
 const HrOffboardingView = () => {
   const searchParams = useSearchParams()
   const initialMemberId = searchParams.get('memberId') ?? ''
-  const [cases, setCases] = useState<OffboardingCase[]>([])
+  const [workQueue, setWorkQueue] = useState<OffboardingWorkQueue | null>(null)
   const [members, setMembers] = useState<HrMemberOption[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [documentSavingCaseId, setDocumentSavingCaseId] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [filter, setFilter] = useState<OffboardingWorkQueueFilter>('all')
+  const [selectedItemId, setSelectedItemId] = useState<string | null>(null)
+  const [createDrawerOpen, setCreateDrawerOpen] = useState(false)
   const [memberId, setMemberId] = useState(initialMemberId)
   const [separationType, setSeparationType] = useState<OffboardingSeparationType>('resignation')
   const [effectiveDate, setEffectiveDate] = useState(today())
   const [lastWorkingDay, setLastWorkingDay] = useState(today())
   const [notes, setNotes] = useState('')
   const [scanMessage, setScanMessage] = useState<string | null>(null)
-  const [settlementsByCaseId, setSettlementsByCaseId] = useState<Record<string, FinalSettlement | null>>({})
   const [settlementSavingCaseId, setSettlementSavingCaseId] = useState<string | null>(null)
-  const [documentsByCaseId, setDocumentsByCaseId] = useState<Record<string, FinalSettlementDocument | null>>({})
   const [reissueTarget, setReissueTarget] = useState<OffboardingCase | null>(null)
   const [reissueReason, setReissueReason] = useState('')
   // TASK-862 Slice E — sign-or-ratify dialog (captura ministro de fe + worker reservation).
@@ -289,70 +210,48 @@ const HrOffboardingView = () => {
   const [maintenanceSaving, setMaintenanceSaving] = useState(false)
   const [maintenanceFormError, setMaintenanceFormError] = useState<string | null>(null)
 
-  const activeCases = useMemo(
-    () => cases.filter(item => activeStatuses.has(item.status)),
-    [cases]
+  const queueItems = useMemo(() => workQueue?.items ?? [], [workQueue])
+
+  const filteredItems = useMemo(
+    () => queueItems.filter(item => item.case.status !== 'cancelled' && item.filters.includes(filter)),
+    [filter, queueItems]
   )
 
-  const visibleCases = useMemo(
-    () => cases.filter(item => item.status !== 'cancelled'),
-    [cases]
-  )
+  const selectedItem = queueItems.find(item => item.case.offboardingCaseId === selectedItemId) ?? null
 
   const loadData = useCallback(async () => {
     setLoading(true)
     setError(null)
 
     try {
-      const [casesRes, membersRes] = await Promise.all([
-        fetch('/api/hr/offboarding/cases?limit=200'),
+      const workQueuePath = initialMemberId
+        ? `/api/hr/offboarding/work-queue?limit=200&memberId=${encodeURIComponent(initialMemberId)}`
+        : '/api/hr/offboarding/work-queue?limit=200'
+
+      const [workQueueRes, membersRes] = await Promise.all([
+        fetch(workQueuePath),
         fetch('/api/hr/core/members/options')
       ])
 
-      if (!casesRes.ok) throw new Error('No se pudieron cargar los casos de offboarding.')
+      if (!workQueueRes.ok) throw new Error('No se pudo cargar la cola de offboarding.')
       if (!membersRes.ok) throw new Error('No se pudo cargar el listado de colaboradores.')
 
-      const casesPayload = await casesRes.json() as CasesResponse
+      const workQueuePayload = await workQueueRes.json() as OffboardingWorkQueue
       const membersPayload = await membersRes.json() as MembersResponse
 
-      const settlementPairs = await Promise.all(
-        casesPayload.cases.map(async item => {
-          const settlementRes = await fetch(`/api/hr/offboarding/cases/${item.offboardingCaseId}/final-settlement`)
+      setWorkQueue(workQueuePayload)
+      setSelectedItemId(current => {
+        if (current && workQueuePayload.items.some(item => item.case.offboardingCaseId === current)) return current
 
-          if (!settlementRes.ok) {
-            return [item.offboardingCaseId, null] as const
-          }
-
-          const settlementPayload = await settlementRes.json() as FinalSettlementResponse
-
-          return [item.offboardingCaseId, settlementPayload.settlement] as const
-        })
-      )
-
-      const documentPairs = await Promise.all(
-        casesPayload.cases.map(async item => {
-          const documentRes = await fetch(`/api/hr/offboarding/cases/${item.offboardingCaseId}/final-settlement/document`)
-
-          if (!documentRes.ok) {
-            return [item.offboardingCaseId, null] as const
-          }
-
-          const documentPayload = await documentRes.json() as FinalSettlementDocumentResponse
-
-          return [item.offboardingCaseId, documentPayload.document] as const
-        })
-      )
-
-      setCases(casesPayload.cases)
-      setSettlementsByCaseId(Object.fromEntries(settlementPairs))
-      setDocumentsByCaseId(Object.fromEntries(documentPairs))
+        return null
+      })
       setMembers(membersPayload.members)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error cargando offboarding.')
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [initialMemberId])
 
   useEffect(() => {
     void loadData()
@@ -383,6 +282,7 @@ const HrOffboardingView = () => {
       }
 
       setNotes('')
+      setCreateDrawerOpen(false)
       await loadData()
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error creando caso.')
@@ -542,37 +442,75 @@ const HrOffboardingView = () => {
     }
   }
 
-  const settlementActionFor = (item: OffboardingCase, settlement: FinalSettlement | null) => {
-    if (!closureLaneFor(item).allowsFinalSettlement) return null
-    if (!settlement || settlement.calculationStatus === 'cancelled') return { action: 'calculate' as const, label: 'Calcular' }
+  const openResignationLetterDialog = (item: OffboardingCase) => {
+    setError(null)
+    setResignationLetterFile(null)
+    setResignationLetterTarget(item)
+  }
 
-    if (settlement.calculationStatus === 'calculated' || settlement.calculationStatus === 'reviewed') {
-      return { action: 'approve' as const, label: 'Aprobar cálculo' }
+  const openMaintenanceDialog = (item: OffboardingCase) => {
+    setError(null)
+    setMaintenanceFormError(null)
+    setMaintenanceForm({
+      variant: item.maintenanceObligationJson?.variant ?? 'not_subject',
+      amount: item.maintenanceObligationJson?.amount != null ? String(item.maintenanceObligationJson.amount) : '',
+      beneficiary: item.maintenanceObligationJson?.beneficiary ?? '',
+      evidence: null
+    })
+    setMaintenanceTarget(item)
+  }
+
+  const runQueueAction = async (item: OffboardingWorkQueueItem, descriptor: OffboardingWorkQueueActionDescriptor) => {
+    const offboardingCase = item.case
+
+    setSelectedItemId(offboardingCase.offboardingCaseId)
+
+    if (descriptor.disabled) return
+
+    switch (descriptor.code) {
+      case 'upload_resignation_letter':
+      case 'replace_resignation_letter':
+        openResignationLetterDialog(offboardingCase)
+        break
+      case 'declare_maintenance':
+      case 'edit_maintenance':
+        openMaintenanceDialog(offboardingCase)
+        break
+      case 'calculate':
+        await runSettlementAction(offboardingCase, 'calculate')
+        break
+      case 'approve_calculation':
+        await runSettlementAction(offboardingCase, 'approve')
+        break
+      case 'render_document':
+        await runDocumentAction(offboardingCase, 'render')
+        break
+      case 'submit_document_review':
+        await runDocumentAction(offboardingCase, 'submit-review')
+        break
+      case 'approve_document':
+        await runDocumentAction(offboardingCase, 'approve')
+        break
+      case 'issue_document':
+        await runDocumentAction(offboardingCase, 'issue')
+        break
+      case 'register_ratification':
+        await runDocumentAction(offboardingCase, 'sign-or-ratify')
+        break
+      case 'reissue_document':
+        setError(null)
+        setReissueReason('')
+        setReissueTarget(offboardingCase)
+        break
+      case 'transition_approve':
+      case 'transition_schedule':
+      case 'transition_execute':
+        await transitionCase(offboardingCase)
+        break
+      default:
+        break
     }
-
-    return null
   }
-
-  const documentBelongsToSettlement = (document: FinalSettlementDocument | null, settlement: FinalSettlement | null) =>
-    Boolean(document && settlement && document.finalSettlementId === settlement.finalSettlementId)
-
-  const documentActionFor = (document: FinalSettlementDocument | null, settlement: FinalSettlement | null) => {
-    if (!document) return { action: 'render' as const, label: 'Renderizar doc.' }
-    if (!documentBelongsToSettlement(document, settlement)) return { action: 'render' as const, label: 'Generar doc. vigente' }
-    if (document.documentStatus === 'rendered') return { action: 'submit-review' as const, label: 'Enviar a revisión' }
-    if (document.documentStatus === 'in_review') return { action: 'approve' as const, label: 'Aprobar doc.' }
-    if (document.documentStatus === 'approved') return { action: 'issue' as const, label: 'Emitir' }
-    if (document.documentStatus === 'issued') return { action: 'sign-or-ratify' as const, label: 'Registrar ratificación' }
-
-    return null
-  }
-
-  const canReissueDocument = (document: FinalSettlementDocument | null, settlement: FinalSettlement | null) =>
-    Boolean(
-      documentBelongsToSettlement(document, settlement)
-      && document
-      && ['rendered', 'in_review', 'approved', 'issued'].includes(document.documentStatus)
-    )
 
   const submitReissue = async () => {
     if (!reissueTarget) return
@@ -761,25 +699,6 @@ const HrOffboardingView = () => {
 
   return (
     <Stack spacing={6}>
-      <Stack direction={{ xs: 'column', md: 'row' }} justifyContent='space-between' spacing={4}>
-        <Box>
-          <Typography variant='h4'>Offboarding</Typography>
-          <Typography variant='body2' color='text.secondary'>
-            Casos canónicos de salida laboral o contractual. SCIM y desactivación administrativa son señales, no cierre laboral.
-          </Typography>
-        </Box>
-        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems={{ xs: 'stretch', sm: 'center' }}>
-          <Button variant='tonal' disabled={saving} onClick={scanContractExpiry}>
-            Revisar contratos
-          </Button>
-          <CustomChip
-            round='true'
-            color={activeCases.length > 0 ? 'warning' : 'success'}
-            label={`${activeCases.length} activo${activeCases.length === 1 ? '' : 's'}`}
-          />
-        </Stack>
-      </Stack>
-
       {error && <Alert severity='error' onClose={() => setError(null)}>{error}</Alert>}
       {scanMessage && <Alert severity='info' onClose={() => setScanMessage(null)}>{scanMessage}</Alert>}
 
@@ -1098,15 +1017,28 @@ const HrOffboardingView = () => {
         </DialogActions>
       </Dialog>
 
-      <Card elevation={0} sx={{ border: theme => `1px solid ${theme.palette.divider}` }}>
-        <CardHeader
-          title='Abrir caso manual'
-          subheader='Crea el agregado de salida. El finiquito y documentos quedan para sus lanes posteriores.'
-        />
-        <Divider />
-        <CardContent>
+      <Drawer
+        anchor='right'
+        open={createDrawerOpen}
+        onClose={() => {
+          if (!saving) setCreateDrawerOpen(false)
+        }}
+        PaperProps={{ sx: { width: { xs: '100%', sm: 520 }, p: 0 } }}
+      >
+        <Stack spacing={4} sx={{ p: 6 }}>
+          <Stack direction='row' alignItems='flex-start' justifyContent='space-between' spacing={3}>
+            <Stack spacing={1}>
+              <Typography variant='h5'>Nuevo caso</Typography>
+              <Typography variant='body2' color='text.secondary'>
+                Crea el agregado de salida. El finiquito y documentos quedan para sus lanes posteriores.
+              </Typography>
+            </Stack>
+            <IconButton aria-label={GREENHOUSE_COPY.aria.closeDrawer} onClick={() => setCreateDrawerOpen(false)} disabled={saving}>
+              <i className='tabler-x' aria-hidden='true' />
+            </IconButton>
+          </Stack>
           <Grid container spacing={4}>
-            <Grid size={{ xs: 12, md: 4 }}>
+            <Grid size={{ xs: 12 }}>
               <FormControl fullWidth>
                 <InputLabel>Colaborador</InputLabel>
                 <Select label='Colaborador' value={memberId} onChange={event => setMemberId(event.target.value)}>
@@ -1118,7 +1050,7 @@ const HrOffboardingView = () => {
                 </Select>
               </FormControl>
             </Grid>
-            <Grid size={{ xs: 12, md: 3 }}>
+            <Grid size={{ xs: 12 }}>
               <FormControl fullWidth>
                 <InputLabel>Causal</InputLabel>
                 <Select
@@ -1135,316 +1067,228 @@ const HrOffboardingView = () => {
                 </Select>
               </FormControl>
             </Grid>
-            <Grid size={{ xs: 12, sm: 6, md: 2 }}>
-              <TextField
-                fullWidth
-                type='date'
-                label='Salida efectiva'
-                value={effectiveDate}
-                onChange={event => setEffectiveDate(event.target.value)}
-                InputLabelProps={{ shrink: true }}
-              />
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <TextField fullWidth type='date' label='Salida efectiva' value={effectiveDate} onChange={event => setEffectiveDate(event.target.value)} InputLabelProps={{ shrink: true }} />
             </Grid>
-            <Grid size={{ xs: 12, sm: 6, md: 2 }}>
-              <TextField
-                fullWidth
-                type='date'
-                label='Último día'
-                value={lastWorkingDay}
-                onChange={event => setLastWorkingDay(event.target.value)}
-                InputLabelProps={{ shrink: true }}
-              />
-            </Grid>
-            <Grid size={{ xs: 12, md: 1 }}>
-              <Button fullWidth variant='contained' disabled={!memberId || saving} onClick={createCase} sx={{ height: 40 }}>{GREENHOUSE_COPY.actions.create}</Button>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <TextField fullWidth type='date' label='Último día' value={lastWorkingDay} onChange={event => setLastWorkingDay(event.target.value)} InputLabelProps={{ shrink: true }} />
             </Grid>
             <Grid size={{ xs: 12 }}>
-              <TextField
-                fullWidth
-                multiline
-                minRows={2}
-                label='Notas'
-                value={notes}
-                onChange={event => setNotes(event.target.value)}
-              />
+              <TextField fullWidth multiline minRows={3} label='Notas' value={notes} onChange={event => setNotes(event.target.value)} />
+            </Grid>
+            <Grid size={{ xs: 12 }}>
+              <Button fullWidth variant='contained' disabled={!memberId || saving} onClick={createCase}>
+                {saving ? GREENHOUSE_COPY.loading.saving : GREENHOUSE_COPY.actions.create}
+              </Button>
             </Grid>
           </Grid>
-        </CardContent>
-      </Card>
+        </Stack>
+      </Drawer>
 
-      <Card elevation={0} sx={{ border: theme => `1px solid ${theme.palette.divider}` }}>
-        <CardHeader title='Casos de salida' subheader='Incluye casos activos y ejecutados con finiquito pendiente o emitido' />
-        <Divider />
-        <TableContainer>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Caso</TableCell>
-                <TableCell>Colaborador</TableCell>
-                <TableCell>Estado</TableCell>
-                <TableCell>Lane</TableCell>
-                <TableCell>Salida efectiva</TableCell>
-                <TableCell>Último día</TableCell>
-                <TableCell>Finiquito</TableCell>
-                <TableCell align='right'>Acción</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {visibleCases.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={8}>
-                    <Typography variant='body2' color='text.secondary' sx={{ py: 4, textAlign: 'center' }}>
-                      No hay casos de offboarding para revisar.
-                    </Typography>
-                  </TableCell>
-                </TableRow>
-              ) : visibleCases.map(item => (
-                (() => {
-                  const settlement = settlementsByCaseId[item.offboardingCaseId] ?? null
-                  const closureLane = closureLaneFor(item)
-                  const settlementAction = settlementActionFor(item, settlement)
-                  const settlementBusy = settlementSavingCaseId === item.offboardingCaseId
-                  const settlementApproved = closureLane.allowsFinalSettlement && settlement ? ['approved', 'issued'].includes(settlement.calculationStatus) : false
-                  const document = documentsByCaseId[item.offboardingCaseId] ?? null
-                  const documentAction = closureLane.allowsFinalSettlement ? documentActionFor(document, settlement) : null
-                  const documentIsHistorical = Boolean(document && settlement && document.finalSettlementId !== settlement.finalSettlementId)
-                  const documentBusy = documentSavingCaseId === item.offboardingCaseId
-                  const downloadUrl = document?.pdfAssetId ? `/api/assets/private/${encodeURIComponent(document.pdfAssetId)}` : null
+      <Stack direction={{ xs: 'column', md: 'row' }} justifyContent='space-between' alignItems={{ xs: 'flex-start', md: 'center' }} spacing={3}>
+        <Stack spacing={1}>
+          <Typography variant='h4'>{GH_FINIQUITO.resignation.workQueue.title}</Typography>
+          <Typography variant='body1' color='text.secondary'>{GH_FINIQUITO.resignation.workQueue.subtitle}</Typography>
+        </Stack>
+        <Stack direction='row' spacing={2} flexWrap='wrap' useFlexGap>
+          <Button variant='tonal' color='secondary' disabled={saving || loading} startIcon={<i className='tabler-refresh' aria-hidden='true' />} onClick={scanContractExpiry}>
+            Revisar contratos
+          </Button>
+          <Button variant='contained' startIcon={<i className='tabler-plus' aria-hidden='true' />} onClick={() => setCreateDrawerOpen(true)}>
+            Nuevo caso
+          </Button>
+        </Stack>
+      </Stack>
 
-                  // TASK-863 Slice A — pre-requisitos del finiquito (renuncia voluntaria).
-                  // Solo aplica cuando el caso es resignation Y lane permite finiquito laboral
-                  // (chile_dependent / honorarios no aplican porque honorarios cierra contractualmente).
-                  const prerequisitesRequired = closureLane.allowsFinalSettlement && item.separationType === 'resignation'
-                  const hasResignationLetter = Boolean(item.resignationLetterAssetId)
-                  const hasMaintenanceObligation = Boolean(item.maintenanceObligationJson)
-                  const prerequisitesReady = hasResignationLetter && hasMaintenanceObligation
-                  const prerequisitesBlocking = prerequisitesRequired && !prerequisitesReady
-                  const calculateBlocked = prerequisitesBlocking && settlementAction?.action === 'calculate'
-                  const maintenanceVariant = item.maintenanceObligationJson?.variant ?? null
-                  const maintenanceAmount = item.maintenanceObligationJson?.amount ?? null
+      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, minmax(0, 1fr))', xl: 'repeat(4, minmax(0, 1fr))' }, gap: 4 }}>
+        <MetricSummaryCard title={GH_FINIQUITO.resignation.workQueue.summary.attention} value={workQueue?.summary.attention ?? 0} subtitle='Cartas, declaración o ratificación pendiente' icon='tabler-alert-triangle' iconColor='warning' statusLabel='Atención HR' statusTone='warning' />
+        <MetricSummaryCard title={GH_FINIQUITO.resignation.workQueue.summary.readyToCalculate} value={workQueue?.summary.readyToCalculate ?? 0} subtitle='Prerequisitos legales completos' icon='tabler-calculator' iconColor='success' statusLabel='Siguiente paso claro' statusTone='success' />
+        <MetricSummaryCard title={GH_FINIQUITO.resignation.workQueue.summary.documents} value={workQueue?.summary.documents ?? 0} subtitle='Emitir, reemitir o ratificar' icon='tabler-file-text' iconColor='primary' statusLabel='Legal en curso' statusTone='primary' />
+        <MetricSummaryCard title={GH_FINIQUITO.resignation.workQueue.summary.noLaborSettlement} value={workQueue?.summary.noLaborSettlement ?? 0} subtitle='Honorarios o proveedor externo' icon='tabler-briefcase' iconColor='secondary' statusLabel='Cierre separado' statusTone='secondary' />
+      </Box>
 
-                  return (
-                    <TableRow key={item.offboardingCaseId} hover>
-                      <TableCell>
-                        <Stack spacing={0.5}>
-                          <Typography variant='body2' fontWeight={600}>{item.publicId}</Typography>
-                          <Typography variant='caption' color='text.secondary'>{item.separationType}</Typography>
-                        </Stack>
-                      </TableCell>
-                      <TableCell>{members.find(member => member.memberId === item.memberId)?.displayName ?? item.memberId}</TableCell>
-                      <TableCell>
-                        <CustomChip round='true' size='small' color={statusColor[item.status] ?? 'default'} label={statusLabel[item.status] ?? item.status} />
-                      </TableCell>
-                      <TableCell>
-                        <Stack spacing={0.5}>
-                          <Typography variant='body2'>{laneLabel[item.ruleLane] ?? item.ruleLane}</Typography>
-                          <Typography variant='caption' color='text.secondary'>{closureLane.label}</Typography>
-                        </Stack>
-                      </TableCell>
-                      <TableCell>{formatDate(item.effectiveDate)}</TableCell>
-                      <TableCell>{formatDate(item.lastWorkingDay)}</TableCell>
-                      <TableCell>
-                        <Stack spacing={1.5} alignItems='flex-start'>
-                          <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap alignItems='center'>
-                            <CustomChip
-                              round='true'
-                              size='small'
-                              color={settlementStatusColor[settlement?.calculationStatus ?? 'none'] ?? 'default'}
-                              label={closureLane.allowsFinalSettlement
-                                ? settlementStatusLabel[settlement?.calculationStatus ?? 'none'] ?? settlement?.calculationStatus ?? 'Sin cálculo'
-                                : closureLane.settlementLabel}
-                            />
-                            {settlement && (
-                              <Typography variant='caption' color='text.secondary'>
-                                Neto {formatGreenhouseCurrency(settlement.netPayable, 'CLP', {
-  maximumFractionDigits: 0
-}, 'es-CL')}
-                              </Typography>
-                            )}
+      <OperationalPanel
+        title='Casos de salida'
+        subheader='Cada fila muestra el bloqueo real y la acción más próxima.'
+        icon='tabler-list-check'
+        action={<CustomChip round='true' color={(workQueue?.summary.active ?? 0) > 0 ? 'warning' : 'success'} label={`${workQueue?.summary.active ?? 0} activo${(workQueue?.summary.active ?? 0) === 1 ? '' : 's'}`} />}
+      >
+        <Stack spacing={4}>
+          {workQueue?.degradedReasons.length ? (
+            <Alert severity='warning' variant='outlined'>La cola cargó con datos parciales: {workQueue.degradedReasons.join(', ')}.</Alert>
+          ) : (
+            <Alert severity='info' variant='outlined'>Datos parciales se muestran como bloqueo o advertencia; la cola no infiere completitud cuando faltan respaldos.</Alert>
+          )}
+
+          <Tabs value={filter} onChange={(_, value: OffboardingWorkQueueFilter) => setFilter(value)} variant='scrollable' allowScrollButtonsMobile aria-label={GREENHOUSE_COPY.aria.filterInput} sx={{ minHeight: 40, '& .MuiTab-root': { minHeight: 40 } }}>
+            {queueTabs.map(tab => (
+              <Tab key={tab.value} value={tab.value} label={`${tab.label} (${queueItems.filter(item => item.case.status !== 'cancelled' && item.filters.includes(tab.value)).length})`} />
+            ))}
+          </Tabs>
+
+          {filteredItems.length ? (
+            <DataTableShell identifier='offboarding-work-queue' ariaLabel='Cola operacional de offboarding' density='compact' stickyFirstColumn>
+              <Table size='small' sx={{ minWidth: 1040 }}>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Caso</TableCell>
+                    <TableCell>Colaborador</TableCell>
+                    <TableCell>Salida</TableCell>
+                    <TableCell>Estado operativo</TableCell>
+                    <TableCell>Próximo paso</TableCell>
+                    <TableCell align='right'>Acción</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {filteredItems.map(item => {
+                    const itemCase = item.case
+                    const primaryAction = item.primaryAction
+                    const busy = saving || settlementSavingCaseId === itemCase.offboardingCaseId || documentSavingCaseId === itemCase.offboardingCaseId
+                    const primaryHref = primaryAction?.href ?? (primaryAction?.code === 'review_payment' || primaryAction?.code === 'external_provider_close' ? '/hr/payroll' : null)
+
+                    return (
+                      <TableRow key={itemCase.offboardingCaseId} hover selected={selectedItemId === itemCase.offboardingCaseId} onClick={() => setSelectedItemId(itemCase.offboardingCaseId)} sx={{ cursor: 'pointer' }}>
+                        <TableCell>
+                          <Stack spacing={0.5}>
+                            <Typography variant='body2' fontWeight={600}>{itemCase.publicId}</Typography>
+                            <Typography variant='caption' color='text.secondary'>{itemCase.separationType}</Typography>
                           </Stack>
-                          {settlement?.readinessHasBlockers && (
-                            <Typography variant='caption' color='error.main'>
-                              Hay blockers de cálculo. Revisa vacaciones, compensación y régimen.
-                            </Typography>
-                          )}
-                          {closureLane.helpText && (
-                            <Typography variant='caption' color='text.secondary'>
-                              {closureLane.helpText}
-                            </Typography>
-                          )}
-                          {prerequisitesRequired && (
+                        </TableCell>
+                        <TableCell>
+                          <Stack spacing={0.5}>
+                            <Typography variant='body2' fontWeight={600}>{item.collaborator.displayName ?? itemCase.memberId ?? 'Sin colaborador'}</Typography>
+                            <Typography variant='caption' color='text.secondary'>{item.collaborator.roleTitle ?? item.collaborator.primaryEmail ?? 'Sin detalle'}</Typography>
+                          </Stack>
+                        </TableCell>
+                        <TableCell>
+                          <Stack spacing={0.5}>
+                            <Typography variant='body2'>{formatDate(itemCase.effectiveDate)}</Typography>
+                            <Typography variant='caption' color='text.secondary'>Último día {formatDate(itemCase.lastWorkingDay)}</Typography>
+                          </Stack>
+                        </TableCell>
+                        <TableCell>
+                          <Stack spacing={1} alignItems='flex-start'>
                             <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap alignItems='center'>
-                              <CustomChip
-                                round='true'
-                                size='small'
-                                color={hasResignationLetter ? 'success' : 'error'}
-                                label={hasResignationLetter
-                                  ? GH_FINIQUITO.resignation.prerequisites.chips.resignationLetterAttached
-                                  : GH_FINIQUITO.resignation.prerequisites.chips.resignationLetterMissing}
-                              />
-                              <CustomChip
-                                round='true'
-                                size='small'
-                                color={!hasMaintenanceObligation
-                                  ? 'error'
-                                  : maintenanceVariant === 'not_subject'
-                                    ? 'success'
-                                    : 'warning'}
-                                label={!hasMaintenanceObligation
-                                  ? GH_FINIQUITO.resignation.prerequisites.chips.maintenanceMissing
-                                  : maintenanceVariant === 'not_subject'
-                                    ? GH_FINIQUITO.resignation.prerequisites.chips.maintenanceNotSubject
-                                    : `${GH_FINIQUITO.resignation.prerequisites.chips.maintenanceSubject}${
-                                        typeof maintenanceAmount === 'number'
-                                          ? ` (${formatGreenhouseCurrency(maintenanceAmount, 'CLP', { maximumFractionDigits: 0 }, 'es-CL')})`
-                                          : ''
-                                      }`}
-                              />
+                              <CustomChip round='true' size='small' color={statusColor[itemCase.status] ?? 'default'} label={statusLabel[itemCase.status] ?? itemCase.status} />
+                              <CustomChip round='true' size='small' color={item.closureLane.allowsFinalSettlement ? 'primary' : 'secondary'} label={item.closureLane.label} />
                             </Stack>
-                          )}
-                          {prerequisitesRequired && (
-                            <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
-                              <Button
-                                size='small'
-                                variant={hasResignationLetter ? 'text' : 'outlined'}
-                                disabled={saving}
-                                onClick={() => {
-                                  setError(null)
-                                  setResignationLetterFile(null)
-                                  setResignationLetterTarget(item)
-                                }}
-                              >
-                                {hasResignationLetter
-                                  ? GH_FINIQUITO.resignation.prerequisites.buttons.replaceResignationLetter
-                                  : GH_FINIQUITO.resignation.prerequisites.buttons.uploadResignationLetter}
-                              </Button>
-                              <Button
-                                size='small'
-                                variant={hasMaintenanceObligation ? 'text' : 'outlined'}
-                                disabled={saving}
-                                onClick={() => {
-                                  setError(null)
-                                  setMaintenanceFormError(null)
-                                  setMaintenanceForm({
-                                    variant: item.maintenanceObligationJson?.variant ?? 'not_subject',
-                                    amount: item.maintenanceObligationJson?.amount != null
-                                      ? String(item.maintenanceObligationJson.amount)
-                                      : '',
-                                    beneficiary: item.maintenanceObligationJson?.beneficiary ?? '',
-                                    evidence: null
-                                  })
-                                  setMaintenanceTarget(item)
-                                }}
-                              >
-                                {hasMaintenanceObligation
-                                  ? GH_FINIQUITO.resignation.prerequisites.buttons.editMaintenance
-                                  : GH_FINIQUITO.resignation.prerequisites.buttons.declareMaintenance}
-                              </Button>
-                            </Stack>
-                          )}
-                          <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
-                            {settlementAction && (
-                              <Tooltip
-                                title={calculateBlocked ? GH_FINIQUITO.resignation.prerequisites.calculateBlockedTooltip : ''}
-                                disableHoverListener={!calculateBlocked}
-                                disableFocusListener={!calculateBlocked}
-                              >
-                                <span>
-                                  <Button
-                                    size='small'
-                                    variant='tonal'
-                                    disabled={settlementBusy || saving || calculateBlocked}
-                                    onClick={() => runSettlementAction(item, settlementAction.action)}
-                                  >
-                                    {settlementBusy ? 'Procesando' : settlementAction.label}
-                                  </Button>
-                                </span>
-                              </Tooltip>
-                            )}
-                            {!closureLane.allowsFinalSettlement && item.ruleLane === 'non_payroll' && (
-                              <Button size='small' variant='tonal' href='/hr/payroll'>
-                                Revisar pago pendiente
-                              </Button>
-                            )}
-                            {!closureLane.allowsFinalSettlement && item.ruleLane === 'external_payroll' && (
-                              <Button size='small' variant='tonal' href='/hr/payroll'>
-                                Cierre proveedor
-                              </Button>
-                            )}
+                            <FieldsProgressChip filled={item.progress.completed} total={item.progress.total} srLabel={(filled, total) => `${itemCase.publicId}: ${filled} de ${total} pasos listos.`} suffix={total => `de ${total} pasos`} readyLabel={item.progress.completed >= item.progress.total ? 'Listo' : undefined} nextStepHint={item.progress.nextStepHint ?? undefined} />
+                            {item.attentionReasons[0] ? <Typography variant='caption' color='warning.main'>{item.attentionReasons[0]}</Typography> : null}
                           </Stack>
-                          <CustomChip
-                            round='true'
-                            size='small'
-                            color={documentStatusColor[document?.documentStatus ?? 'draft'] ?? 'default'}
-                            label={closureLane.allowsFinalSettlement
-                              ? document ? documentStatusLabel[document.documentStatus] ?? document.documentStatus : 'Sin documento'
-                              : closureLane.documentLabel}
-                          />
-                          {document?.readiness.status === 'needs_review' && (
-                            <Typography variant='caption' color='warning.main'>
-                              Revisar entidad legal antes de emitir.
-                            </Typography>
-                          )}
-                          {documentIsHistorical && (
-                            <Typography variant='caption' color='warning.main'>
-                              PDF histórico de un cálculo anterior. Genera el documento vigente antes de enviarlo a revisión o reemitir.
-                            </Typography>
-                          )}
-                          <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
-                            {documentAction && (
-                              <Button
-                                size='small'
-                                variant='tonal'
-                                disabled={documentBusy || saving || !settlementApproved}
-                                onClick={() => runDocumentAction(item, documentAction.action)}
-                              >
-                                {documentBusy ? 'Procesando' : documentAction.label}
-                              </Button>
+                        </TableCell>
+                        <TableCell>
+                          <Stack spacing={1} alignItems='flex-start'>
+                            <CustomChip round='true' size='small' color={item.nextStep.severity === 'warning' ? 'warning' : item.nextStep.severity === 'success' ? 'success' : 'info'} label={item.nextStep.label} />
+                            {item.latestSettlement ? (
+                              <Typography variant='caption' color='text.secondary'>
+                                {settlementStatusLabel[item.latestSettlement.calculationStatus] ?? item.latestSettlement.calculationStatus}
+                                {' · Neto '}
+                                {formatGreenhouseCurrency(item.latestSettlement.netPayable, 'CLP', { maximumFractionDigits: 0 }, 'es-CL')}
+                              </Typography>
+                            ) : (
+                              <Typography variant='caption' color='text.secondary'>{item.closureLane.documentLabel}</Typography>
                             )}
-                            {canReissueDocument(document, settlement) && (
+                            {item.latestDocument ? <CustomChip round='true' size='small' color={documentStatusColor[item.latestDocument.documentStatus] ?? 'default'} label={documentStatusLabel[item.latestDocument.documentStatus] ?? item.latestDocument.documentStatus} /> : null}
+                          </Stack>
+                        </TableCell>
+                        <TableCell align='right'>
+                          {primaryAction ? (
+                            primaryHref ? (
                               <Button
                                 size='small'
-                                variant='outlined'
-                                disabled={documentBusy || saving || !settlementApproved}
-                                onClick={() => {
-                                  setError(null)
-                                  setReissueReason('')
-                                  setReissueTarget(item)
+                                variant='contained'
+                                disabled={busy || primaryAction.disabled}
+                                href={primaryHref}
+                                onClick={event => event.stopPropagation()}
+                              >
+                                {busy ? 'Procesando' : primaryAction.label}
+                              </Button>
+                            ) : (
+                              <Button
+                                size='small'
+                                variant='contained'
+                                disabled={busy || primaryAction.disabled}
+                                onClick={event => {
+                                  event.stopPropagation()
+                                  void runQueueAction(item, primaryAction)
                                 }}
                               >
-                                Reemitir
+                                {busy ? 'Procesando' : primaryAction.label}
                               </Button>
-                            )}
-                            {downloadUrl && (
-                              <Button size='small' variant='text' href={downloadUrl} target='_blank' rel='noreferrer'>
-                                PDF
-                              </Button>
-                            )}
-                          </Stack>
-                          {closureLane.allowsFinalSettlement && !settlementApproved && (
-                            <Typography variant='caption' color='text.secondary'>
-                              El documento se habilita cuando el cálculo queda aprobado.
-                            </Typography>
+                            )
+                          ) : (
+                            <Button size='small' variant='text' onClick={event => { event.stopPropagation(); setSelectedItemId(itemCase.offboardingCaseId) }}>Ver detalle</Button>
                           )}
-                        </Stack>
-                      </TableCell>
-                      <TableCell align='right'>
-                        {nextStatusFor(item.status) ? (
-                          <Button size='small' variant='tonal' disabled={saving} onClick={() => transitionCase(item)}>
-                            {nextLabelFor(item.status)}
-                          </Button>
-                        ) : (
-                          <Typography variant='caption' color='text.secondary'>Sin acción</Typography>
-                        )}
-                      </TableCell>
-                    </TableRow>
+                        </TableCell>
+                      </TableRow>
+                    )
+                  })}
+                </TableBody>
+              </Table>
+            </DataTableShell>
+          ) : (
+            <EmptyState icon='tabler-list-search' title='No hay casos para este filtro' description='Cambia el filtro o crea un nuevo caso de salida cuando corresponda.' action={<Button variant='contained' onClick={() => setCreateDrawerOpen(true)}>Nuevo caso</Button>} />
+          )}
+        </Stack>
+      </OperationalPanel>
+
+      <Drawer anchor='right' open={Boolean(selectedItem)} onClose={() => setSelectedItemId(null)} PaperProps={{ sx: { width: { xs: '100%', sm: 560 }, p: 0 } }}>
+        {selectedItem ? (
+          <Stack spacing={5} sx={{ p: 6 }}>
+            <Stack direction='row' justifyContent='space-between' alignItems='flex-start' spacing={3}>
+              <Stack spacing={1}>
+                <Typography variant='h5'>{selectedItem.case.publicId}</Typography>
+                <Typography variant='body2' color='text.secondary'>{selectedItem.collaborator.displayName ?? selectedItem.case.memberId ?? 'Sin colaborador'} · {selectedItem.closureLane.label}</Typography>
+              </Stack>
+              <IconButton aria-label={GREENHOUSE_COPY.aria.closeDrawer} onClick={() => setSelectedItemId(null)}>
+                <i className='tabler-x' aria-hidden='true' />
+              </IconButton>
+            </Stack>
+
+            <Stack spacing={2}>
+              <Typography variant='subtitle2'>Progreso</Typography>
+              <FieldsProgressChip filled={selectedItem.progress.completed} total={selectedItem.progress.total} srLabel={(filled, total) => `${filled} de ${total} pasos listos para ${selectedItem.case.publicId}.`} suffix={total => `de ${total} pasos`} readyLabel={selectedItem.progress.completed >= selectedItem.progress.total ? 'Listo' : undefined} nextStepHint={selectedItem.progress.nextStepHint ?? undefined} />
+              {selectedItem.attentionReasons.map(reason => <Alert key={reason} severity='warning' variant='outlined'>{reason}</Alert>)}
+            </Stack>
+
+            <Stack spacing={2}>
+              <Typography variant='subtitle2'>Prerequisitos</Typography>
+              <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
+                {selectedItem.prerequisites.required ? (
+                  <>
+                    <CustomChip round='true' size='small' color={selectedItem.prerequisites.resignationLetter === 'missing' ? 'error' : 'success'} label={selectedItem.prerequisites.resignationLetter === 'missing' ? GH_FINIQUITO.resignation.prerequisites.chips.resignationLetterMissing : GH_FINIQUITO.resignation.prerequisites.chips.resignationLetterAttached} />
+                    <CustomChip round='true' size='small' color={selectedItem.prerequisites.maintenanceObligation === 'missing' ? 'error' : 'success'} label={selectedItem.prerequisites.maintenanceObligation === 'missing' ? GH_FINIQUITO.resignation.prerequisites.chips.maintenanceMissing : selectedItem.prerequisites.maintenanceObligation === 'subject' ? GH_FINIQUITO.resignation.prerequisites.chips.maintenanceSubject : GH_FINIQUITO.resignation.prerequisites.chips.maintenanceNotSubject} />
+                  </>
+                ) : (
+                  <CustomChip round='true' size='small' color='secondary' label='No requiere finiquito laboral' />
+                )}
+              </Stack>
+            </Stack>
+
+            <Stack spacing={2}>
+              <Typography variant='subtitle2'>Acciones</Typography>
+              {selectedItem.primaryAction ? (
+                <Button variant='contained' disabled={selectedItem.primaryAction.disabled || saving || settlementSavingCaseId === selectedItem.case.offboardingCaseId || documentSavingCaseId === selectedItem.case.offboardingCaseId} onClick={() => void runQueueAction(selectedItem, selectedItem.primaryAction!)}>
+                  {selectedItem.primaryAction.label}
+                </Button>
+              ) : null}
+              <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
+                {selectedItem.secondaryActions.map(actionDescriptor => (
+                  actionDescriptor.href ? (
+                    <Button key={actionDescriptor.code} size='small' variant='text' href={actionDescriptor.href} target='_blank' rel='noreferrer' disabled={actionDescriptor.disabled || saving}>
+                      {actionDescriptor.label}
+                    </Button>
+                  ) : (
+                    <Button key={actionDescriptor.code} size='small' variant='outlined' disabled={actionDescriptor.disabled || saving} onClick={() => void runQueueAction(selectedItem, actionDescriptor)}>
+                      {actionDescriptor.label}
+                    </Button>
                   )
-                })()
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Card>
+                ))}
+              </Stack>
+            </Stack>
+          </Stack>
+        ) : null}
+      </Drawer>
     </Stack>
   )
 }
