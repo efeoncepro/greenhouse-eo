@@ -187,7 +187,21 @@ rm -f /tmp/.x
 
 **Regla**: ANTES de pushear el merge a main, correr `pnpm release:preflight --target-sha=$(git rev-parse develop) --target-branch=main --json` localmente. Si reporta `readyToDeploy=false`, **no pushear**.
 
-### 5. No invocar al arch-architect en cambios canónicos
+### 5. Usar variables bash readonly built-in como locales en workflow steps
+
+**Caso real (2026-05-12 run `25740470728`)**: el step `Poll Vercel API for production deployment matching target_sha` en `production-release.yml` asignaba `UID="${MATCHING%%|*}"`. `$UID` es READONLY built-in de bash (process user ID). bash rechazó con `UID: readonly variable` → exit 1 → step falló sin haber pollado un solo ciclo → release marcado degraded/aborted aunque production estaba healthy.
+
+**Regla**: NUNCA usar como nombre de variable local en shell steps de GH Actions ninguno de los siguientes:
+
+- `UID`, `EUID`, `PPID` — process IDs
+- `BASH_SOURCE`, `BASHOPTS`, `SHELLOPTS` — shell config
+- `BASH`, `BASH_VERSION`, `BASH_VERSINFO` — bash metadata
+- `BASH_ARGC`, `BASH_ARGV`, `BASH_LINENO`, `BASH_REMATCH` — bash internals
+- `HOSTNAME`, `HOSTTYPE`, `MACHTYPE`, `OSTYPE` — system identity
+
+Prefijar con un contexto explícito (`DEPLOY_UID`, `BUILD_PPID`, etc.) o usar minúsculas (`deploy_uid`).
+
+### 6. No invocar al arch-architect en cambios canónicos
 
 **Caso real**: las 4 modificaciones de Codex tocaron archivos canónicos (`sentry-critical-issues.ts`, `vercel-cron-async-critical-gate.mjs`, etc.) sin arch review. Resultado: la lógica del gate quedó más laxa de lo que el spec V1 documenta, y el bug class real (normalizer drift) quedó sin tocar.
 
