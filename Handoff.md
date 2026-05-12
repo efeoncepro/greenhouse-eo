@@ -1,14 +1,24 @@
-# Sesion 2026-05-12 — TASK-823 arch-architect verdict + implementation on develop
+# Sesion 2026-05-12 — TASK-823 arch-architect verdict + implementation CERRADA on develop
 
-- **Trigger**: post TASK-822 cierre, usuario pidió arch-architect verdict sobre TASK-823 (`/api/client-portal/*` API Namespace, EPIC-015 child 2/8). Verdict: 4 correcciones (2 bloqueantes + 2 polish) aplicadas al spec pre-Slice-1, después implementación directa en develop.
-- **4 correcciones canonizadas en spec v1.1**:
+- **Trigger**: post TASK-822 cierre, usuario pidió arch-architect verdict sobre TASK-823 (`/api/client-portal/*` API Namespace, EPIC-015 child 2/8). Verdict: 4 correcciones (2 bloqueantes + 2 polish) aplicadas al spec pre-Slice-1; FASE 1 Discovery emergió Issue 5 (drift `requireServerSession` vs `getServerAuthSession` para API routes — fix canónico per CLAUDE.md); implementación directa en develop con 4 commits incrementales.
+- **5 correcciones canonizadas en spec v1.1**:
   1. Bug de compilación: `redactErrorForResponse` retorna `string`; envolver en `NextResponse.json({error: redactErrorForResponse(err)}, {status})`.
   2. Nombre stale: `getClientAccountSummary` no existe; usar `getOrganizationExecutiveSnapshot` (real re-export TASK-822).
-  3. Helper `requireClientSession` pre-emptive eliminado V1.0; inline check estilo TASK-553. Promover a `requireSessionByTenantType` genérico cuando emerja 2do BFF.
+  3. Helper `requireClientSession` pre-emptive eliminado V1.0; inline check estilo TASK-553.
   4. `/health` performativo eliminado V1.0; extender `/api/admin/platform-health` (TASK-672) cuando emerja necesidad real.
-- **Scope reducido**: 2 endpoints → 1, 1 helper → 0, 4 tests → 3. Effort Bajo → Muy Bajo.
-- **Decisión operativa**: implementación directa sobre `develop`, sin branch separada (instrucción explícita).
-- **Task movida** `to-do/` → `in-progress/`. README + Handoff sync.
+  5. **Detectada en Discovery (post-verdict)**: spec v1.1 escribía `requireServerSession()` pero CLAUDE.md "Auth en server components" línea final dice las API routes usan `getServerAuthSession()` directo (no redirige, return 401 JSON). `requireServerSession()` redirige a `/login` — wrong for APIs. Fix aplicado en baseline #2 commit `7f9a707a` antes de Slice 1.
+- **Cierre 2026-05-12**: 4 commits incrementales sin PR ceremony.
+  - `021d1fe8` baseline rename to-do → in-progress
+  - `b8d55859` sync Lifecycle field + README + Handoff
+  - `7f9a707a` baseline #2 — spec usa getServerAuthSession (Issue 5 fix)
+  - `5b951669` Slice 1 — GET /api/client-portal/account-summary route (90 líneas + JSDoc canónico)
+  - `28379029` Slice 2 — 6 integration tests verde (401×2, 403, 500-orgId-missing, 200 happy, 500-reader-throws con sanitization assertions)
+- **Tests verdes**: 6/6 en src/app/api/client-portal/__tests__/account-summary.test.ts (203ms). Pattern mock mirror de home/snapshot/route.test.ts (vi.mock '@/lib/auth' + reader + captureWithDomain).
+- **Verificación final**: `pnpm build` ✅ + `pnpm lint` ✅ + `pnpm tsc --noEmit` ✅ + 4 grep negativos canónicos limpios (0 Response.json sin NextResponse, 0 error.message raw expuesto, 0 new Pool nuevo, 0 getServerAuthSession en pages).
+- **Scope reducido vs spec original**: 2 endpoints → 1, 1 helper → 0, 4 tests → 6 (más cobertura). Effort Bajo → Muy Bajo. 0 capabilities nuevas, 0 outbox events, 0 reliability signals, 0 migrations.
+- **Domain direction respetada**: `src/app/api/* → @/lib/client-portal/*` (allowed per TASK-822 §3.2). La ESLint rule `no-cross-domain-import-from-client-portal` NO aplica a `src/app/` (enforce solo la dirección inversa producer-domain → client-portal).
+- **Pattern source canónico documentado**: TASK-553 (`src/app/api/me/shortcuts/route.ts`) mirror verbatim, incluyendo defense in depth para `organizationId` null en sessions corruptas (drift del callback NextAuth → Sentry capture con stage='session_validation').
+- **Desbloquea**: TASK-825 (resolver canónico) — agregará `GET /api/client-portal/modules` al mismo namespace con shape canónico replicado. Primer reader **nativo** del BFF nace ahí en `src/lib/client-portal/readers/native/`.
 
 ---
 

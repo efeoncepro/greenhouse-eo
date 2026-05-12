@@ -2,13 +2,13 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
-- Impact: `Bajo` (reducido a 1 endpoint atómico V1.0)
-- Effort: `Muy Bajo` (sin helper + sin health endpoint)
+- Impact: `Bajo` (1 endpoint atómico V1.0)
+- Effort: `Muy Bajo`
 - Type: `implementation`
 - Epic: `EPIC-015`
-- Status real: `Implementacion v1.1 directo en develop (sin branch separada por instruccion operativa 2026-05-12)`
+- Status real: `Cerrada 2026-05-12 directo en develop (sin branch separada). 4 commits: baseline + baseline #2 (Issue 5 getServerAuthSession fix) + Slice 1 route + Slice 2 tests. 6/6 tests verde.`
 - Rank: `TBD`
 - Domain: `client_portal`
 - Blocked by: `none` (TASK-822 cerrada 2026-05-12)
