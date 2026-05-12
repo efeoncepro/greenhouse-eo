@@ -258,7 +258,8 @@ describe('HrOffboardingView', () => {
     renderWithTheme(<HrOffboardingView />)
 
     expect(await screen.findByText('EO-OFF-2026-VAL')).toBeInTheDocument()
-    expect(screen.getByText('Valentina Hoyos')).toBeInTheDocument()
+    // Valentina Hoyos rendered both in the table row + inspector header (TASK-863 round 4 H-prominent case display)
+    expect(screen.getAllByText('Valentina Hoyos').length).toBeGreaterThanOrEqual(1)
     expect(screen.getAllByText('Ejecutado').length).toBeGreaterThan(0)
     expect(screen.getAllByText('Finiquito laboral').length).toBeGreaterThan(0)
     expect(screen.getAllByText('Calcular finiquito').length).toBeGreaterThan(0)
@@ -284,7 +285,8 @@ describe('HrOffboardingView', () => {
 
     await userEvent.setup().click(screen.getByText('EO-OFF-2026-HON'))
 
-    expect(screen.getByRole('link', { name: 'Revisar pago pendiente' })).toHaveAttribute('href', '/hr/payroll')
+    // findByRole espera el mount async tras el cross-fade del inspector (round 4 microinteractions)
+    expect(await screen.findByRole('link', { name: 'Revisar pago pendiente' })).toHaveAttribute('href', '/hr/payroll')
   })
 
   it('reissues an active finiquito document with an auditable reason', async () => {
