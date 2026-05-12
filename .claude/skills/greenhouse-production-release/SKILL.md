@@ -22,6 +22,7 @@ Read only what the task needs, in this order:
 - `CLAUDE.md`
 - `project_context.md`
 - `Handoff.md`
+- **`docs/operations/PRODUCTION_RELEASE_INCIDENT_PLAYBOOK_V1.md` — OBLIGATORIO si el orchestrator falló (no chasees el gate; lee el JSON output como diagnóstico)**
 - `docs/architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md`
 - `docs/operations/runbooks/production-release.md`
 - `docs/manual-de-uso/plataforma/release-orchestrator.md`
