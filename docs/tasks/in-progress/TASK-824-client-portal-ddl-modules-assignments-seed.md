@@ -27,6 +27,23 @@ Cuando esta task entregue el schema:
 
 Spec actualizada V1.2 §5.1 documenta el contract.
 
+## Delta 2026-05-12 (tercera revisión — Issue 6 detectado en FASE 1 Discovery)
+
+**Issue 6 — type/FK drift entre spec V1.2 y DB real** (descubierto en Discovery TASK-824 live, 2026-05-12):
+
+Verificación live PG reveló 2 drifts en §5.2 / §5.3 del spec V1.2:
+
+1. `organizations.organization_id` es **TEXT** en runtime, NO UUID como dice el spec. La migration habría fallado con `ERROR: foreign key constraint cannot be implemented: incompatible types text vs uuid` si se ejecutaba verbatim.
+2. **No existe `greenhouse_core.users`** — la tabla canónica de usuarios autenticados es `greenhouse_core.client_users(user_id)` (verificado vía FK existente en `user_shortcut_pins.user_id` → `client_users.user_id`, TASK-553). El spec usaba un FK inexistente.
+
+Fix aplicado al spec arquitectónico V1.3 (§5.2 + §5.3) ANTES de Slice 1:
+
+- `organization_id UUID NOT NULL REFERENCES greenhouse_core.organizations(organization_id)` → `organization_id TEXT NOT NULL REFERENCES greenhouse_core.organizations(organization_id)`
+- `approved_by_user_id TEXT REFERENCES greenhouse_core.users(user_id)` → `approved_by_user_id TEXT REFERENCES greenhouse_core.client_users(user_id)`
+- `actor_user_id TEXT NOT NULL REFERENCES greenhouse_core.users(user_id)` → `actor_user_id TEXT NOT NULL REFERENCES greenhouse_core.client_users(user_id)`
+
+Sin esta corrección, la migration de Slice 1 habría abortado en runtime. Bug class fuente: spec original V1.0 (2026-05-07) escrito sin verificación PG live.
+
 ## Delta 2026-05-12 (segunda revisión — arch-architect verdict v1.1 aplicado pre-Slice-1)
 
 Cinco correcciones estructurales al spec V1.0 original (1 bloqueante + 4 polish), aplicadas para evitar drift técnico y deuda arquitectónica antes de la primera migration:

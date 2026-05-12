@@ -1,8 +1,8 @@
 # Greenhouse Client Portal Domain Architecture V1
 
-> **Version:** 1.2
+> **Version:** 1.3
 > **Created:** 2026-05-07 por Claude (Opus 4.7)
-> **Updated:** 2026-05-12 por Claude (Opus 4.7) — arch-architect verdict aplicado a TASK-822 (V1.1, §3.1 + §3.2) y a TASK-824 (V1.2, §5.1 rename `business_line` → `applicability_scope` + COMMENT canónico + remove dormant `default_for_business_lines` + parity test contract Option C; reconcilia con `GREENHOUSE_BUSINESS_LINES_ARCHITECTURE_V1.md` hard rule "no duplicar enum del catalogo")
+> **Updated:** 2026-05-12 por Claude (Opus 4.7) — V1.1 (§3.1 + §3.2 TASK-822), V1.2 (§5.1 rename TASK-824 verdict), V1.3 (§5.2 + §5.3 type/FK drift correction post-PG-discovery: `organization_id UUID` → `TEXT` porque la tabla real es TEXT, y FK `greenhouse_core.users(user_id)` → `greenhouse_core.client_users(user_id)` porque la tabla canónica de usuarios autenticados es `client_users` per FK existente en `user_shortcut_pins`)
 > **Audience:** Backend engineers, frontend engineers, product owners, comerciales que vendan módulos del portal cliente, agentes que toquen rutas `/api/client-portal/*`, owners de Globe/Wave/CRM Solutions
 > **Related:** `GREENHOUSE_360_OBJECT_MODEL_V1.md`, `GREENHOUSE_CLIENT_PORTAL_ARCHITECTURE_V1.md` (V3.0, descriptivo — predecesor), `GREENHOUSE_CLIENT_LIFECYCLE_V1.md`, `GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md`, `GREENHOUSE_AGENCY_LAYER_V2.md`, `GREENHOUSE_ASSIGNED_TEAM_ARCHITECTURE_V1.md`, `GREENHOUSE_FEATURE_FLAGS_ROLLOUT_PLATFORM_V1.md`
 > **Supersedes:** este spec NO supersede `GREENHOUSE_CLIENT_PORTAL_ARCHITECTURE_V1.md` V3.0 — coexisten: V3.0 describe la experiencia funcional y los 16 cards Creative Hub; este V1 (Domain) canoniza la **estructura del dominio** y el modelo de módulos on-demand. V3.0 sigue siendo lectura obligatoria para entender qué se compone.
@@ -236,10 +236,12 @@ CREATE TRIGGER modules_append_only_check
 
 Asignación per-cliente time-versioned. Una fila por (organization_id, module_key) activa.
 
+**Delta V1.3 (2026-05-12, PG discovery TASK-824)**: `organization_id` cambia de UUID a TEXT (la tabla `greenhouse_core.organizations.organization_id` es TEXT en runtime, verificado live). FK `approved_by_user_id` apunta a `greenhouse_core.client_users(user_id)` (la tabla canónica de usuarios autenticados; `greenhouse_core.users` no existe).
+
 ```sql
 CREATE TABLE greenhouse_client_portal.module_assignments (
   assignment_id     TEXT PRIMARY KEY,                  -- 'cpma-{uuid}'
-  organization_id   UUID NOT NULL REFERENCES greenhouse_core.organizations(organization_id),
+  organization_id   TEXT NOT NULL REFERENCES greenhouse_core.organizations(organization_id),
   module_key        TEXT NOT NULL REFERENCES greenhouse_client_portal.modules(module_key),
 
   status            TEXT NOT NULL DEFAULT 'pending'
@@ -254,7 +256,7 @@ CREATE TABLE greenhouse_client_portal.module_assignments (
   effective_to      DATE,
   expires_at        TIMESTAMPTZ,                       -- para pilot/trial con timeout
 
-  approved_by_user_id TEXT REFERENCES greenhouse_core.users(user_id),
+  approved_by_user_id TEXT REFERENCES greenhouse_core.client_users(user_id),
   approved_at         TIMESTAMPTZ,
 
   metadata_json     JSONB DEFAULT '{}'::jsonb,
@@ -280,6 +282,8 @@ CREATE INDEX module_assignments_expires_at ON greenhouse_client_portal.module_as
 
 Audit append-only. Anti-UPDATE/DELETE triggers.
 
+**Delta V1.3 (2026-05-12, PG discovery TASK-824)**: FK `actor_user_id` apunta a `greenhouse_core.client_users(user_id)` — misma corrección del §5.2.
+
 ```sql
 CREATE TABLE greenhouse_client_portal.module_assignment_events (
   event_id         TEXT PRIMARY KEY,                   -- 'cpmae-{uuid}'
@@ -289,7 +293,7 @@ CREATE TABLE greenhouse_client_portal.module_assignment_events (
   from_status      TEXT,
   to_status        TEXT,
   payload_json     JSONB NOT NULL DEFAULT '{}'::jsonb,
-  actor_user_id    TEXT NOT NULL REFERENCES greenhouse_core.users(user_id),
+  actor_user_id    TEXT NOT NULL REFERENCES greenhouse_core.client_users(user_id),
   occurred_at      TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
