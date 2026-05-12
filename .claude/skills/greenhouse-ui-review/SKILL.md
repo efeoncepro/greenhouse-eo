@@ -6,6 +6,23 @@ type: gate
 
 # Greenhouse UI Review — Pre-commit Design-time Gate
 
+## Recipe: capture-driven review (V1.1 — desde 2026-05-12)
+
+Para auditar surfaces vivas (no solo código local), usá el helper canónico de captura + el dossier auto-generado:
+
+```bash
+# 1. Genera captura + dossier markdown
+pnpm fe:capture:review <scenario-name> --env=staging
+
+# 2. El comando arma .captures/<run>/review-dossier.md con los frames + prompt estructurado
+# 3. Abrí Claude Code con este skill cargado, adjuntá los frames, y pegá el dossier como prompt
+# 4. Aplicá la 13-row checklist contra cada frame relevante
+```
+
+V1.2 (futuro): el comando invocará Anthropic SDK directamente con el dossier + frames adjuntos → reporte auto en stdout. Por ahora es scaffolding manual.
+
+Doc completa: `docs/manual-de-uso/plataforma/captura-visual-playwright.md`.
+
 ## When to invoke
 
 - **MANDATORY**: before committing any UI change (component, view, primitive) in `src/components/greenhouse/**`, `src/views/**`, or `src/app/**` if the change touches JSX/styling.

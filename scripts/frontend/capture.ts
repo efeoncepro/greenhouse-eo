@@ -39,6 +39,7 @@ import { writeManifest, type CaptureManifest, type FrameRecord } from './lib/man
 import { runScenario } from './lib/recorder'
 import { applySecretMask, assertSafeOutputPath, enforceProductionGate } from './lib/safety'
 import type { CaptureScenario } from './lib/scenario'
+import { uploadCaptureToGcs } from './lib/upload'
 
 const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url))
 const REPO_ROOT = resolve(SCRIPT_DIR, '../..')
@@ -96,7 +97,9 @@ const main = async (): Promise<void> => {
       hold: { type: 'string', default: '1500' },
       gif: { type: 'boolean', default: false },
       headed: { type: 'boolean', default: false },
-      prod: { type: 'boolean', default: false }
+      prod: { type: 'boolean', default: false },
+      device: { type: 'string' },
+      upload: { type: 'string' }
     }
   })
 
@@ -152,8 +155,13 @@ const main = async (): Promise<void> => {
     envConfig,
     viewport: scenario.viewport,
     headed: values.headed === true,
+    deviceName: values.device,
     recordVideoDir: videoDir
   })
+
+  if (values.device) {
+    PRINT(`  device:   ${values.device} (Playwright preset)`)
+  }
 
   let exitCode: 0 | 1 = 0
   let stepError: { message: string; stepIndex: number } | undefined
@@ -261,6 +269,24 @@ const main = async (): Promise<void> => {
 
   writeManifest(outputDir, manifest)
   PRINT(`✓ manifest.json escrito`)
+
+  // OQ-1: opt-in GCS upload
+  if (values.upload) {
+    PRINT(`→ subiendo a gs://${values.upload}/ …`)
+
+    const result = uploadCaptureToGcs(outputDir, values.upload)
+
+    if (result.warning) {
+      PRINT(`  ⚠️  ${result.warning}`)
+    }
+
+    if (result.signedUrl) {
+      PRINT(`✓ subido a ${result.bucketPath}`)
+      PRINT(`  manifest signed URL (7d): ${result.signedUrl}`)
+    } else if (result.bucketPath && !result.warning) {
+      PRINT(`✓ subido a ${result.bucketPath}`)
+    }
+  }
 
   // Audit
   appendAudit({

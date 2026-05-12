@@ -6,7 +6,7 @@
  * canon). Firefox/WebKit fuera de scope V1; agregables como flag futuro.
  */
 
-import { chromium, type Browser, type BrowserContext, type Page } from 'playwright'
+import { chromium, devices, type Browser, type BrowserContext, type Page } from 'playwright'
 
 import type { EnvConfig } from './env'
 
@@ -16,7 +16,16 @@ export interface LaunchOptions {
   deviceScaleFactor?: number
   headed?: boolean
   recordVideoDir: string
+  /**
+   * Optional Playwright device descriptor name (e.g. "iPhone 13", "Pixel 7",
+   * "iPad Pro 11"). Cuando se setea, overridea viewport + userAgent +
+   * deviceScaleFactor con el preset oficial de Playwright. Lista completa:
+   * https://github.com/microsoft/playwright/blob/main/packages/playwright-core/src/server/deviceDescriptorsSource.json
+   */
+  deviceName?: string
 }
+
+export const isKnownDevice = (name: string): boolean => Object.prototype.hasOwnProperty.call(devices, name)
 
 export interface LaunchedSession {
   browser: Browser
@@ -29,16 +38,29 @@ export interface LaunchedSession {
 export const launchCaptureSession = async (opts: LaunchOptions): Promise<LaunchedSession> => {
   const browser = await chromium.launch({ headless: opts.headed !== true })
 
+  const devicePreset = opts.deviceName ? devices[opts.deviceName] : undefined
+
+  if (opts.deviceName && !devicePreset) {
+    throw new Error(
+      `Device "${opts.deviceName}" no es un preset Playwright válido. ` +
+        `Ejemplos: "iPhone 13", "iPhone 13 Pro", "Pixel 7", "iPad Pro 11", "Galaxy S9+". ` +
+        `Lista completa: playwright-core deviceDescriptorsSource.json`
+    )
+  }
+
+  const effectiveViewport = devicePreset?.viewport ?? opts.viewport
+
   const context = await browser.newContext({
+    ...(devicePreset ?? {}),
     storageState: opts.envConfig.storageStatePath,
-    viewport: opts.viewport,
-    deviceScaleFactor: opts.deviceScaleFactor ?? 2,
+    viewport: effectiveViewport,
+    deviceScaleFactor: devicePreset?.deviceScaleFactor ?? opts.deviceScaleFactor ?? 2,
     extraHTTPHeaders: opts.envConfig.bypassSecret
       ? { 'x-vercel-protection-bypass': opts.envConfig.bypassSecret }
       : undefined,
     recordVideo: {
       dir: opts.recordVideoDir,
-      size: opts.viewport
+      size: effectiveViewport
     }
   })
 

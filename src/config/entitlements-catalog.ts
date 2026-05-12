@@ -904,6 +904,17 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     module: 'platform',
     actions: ['update'] as const,
     defaultScope: 'all'
+  },
+  // V1.1 frontend capture helper (scripts/frontend/) — OQ-6
+  // Completa el Triple Gate para production captures. El check actual
+  // (scripts/frontend/lib/safety.ts) honra env var GREENHOUSE_CAPTURE_ACTOR_CAPABILITY
+  // que el operador exporta tras confirmar que posee esta capability.
+  // V1.2: validación PG real vía `can()` lookup runtime.
+  {
+    key: 'platform.frontend.capture_prod',
+    module: 'platform',
+    actions: ['read'] as const,
+    defaultScope: 'all'
   }
 ] as const
 

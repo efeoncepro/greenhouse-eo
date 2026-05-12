@@ -42,7 +42,20 @@ export const applySecretMask = async (page: Page, extraSelectors: string[] = [])
 /**
  * Verifica triple gate para production. Llamado por env.ts pero también
  * desde el CLI como segundo check defense-in-depth.
+ *
+ * Triple gate canónico (V1.1):
+ *   1. GREENHOUSE_CAPTURE_ALLOW_PROD=true (env var, .env.local)
+ *   2. --prod flag (CLI)
+ *   3. GREENHOUSE_CAPTURE_ACTOR_CAPABILITY=platform.frontend.capture_prod
+ *      Actor debe haber confirmado capability vía export antes del run.
+ *
+ * Nota OQ-6: el check #3 NO valida PG runtime (la captura es local). El
+ * operador exporta la env var asumiendo responsabilidad. El audit log
+ * registra al actor y el run para forensic. PG-backed validation real
+ * llega en V1.2 cuando integremos con `tenants/access.ts`.
  */
+export const PRODUCTION_CAPABILITY = 'platform.frontend.capture_prod'
+
 export const enforceProductionGate = (env: string, prodFlag: boolean): void => {
   if (env !== 'production') return
 
@@ -50,16 +63,26 @@ export const enforceProductionGate = (env: string, prodFlag: boolean): void => {
 
   if (!allowProd) {
     throw new Error(
-      'Production captures bloqueadas.\n' +
-        'Triple gate requerido:\n' +
+      'Production captures bloqueadas — Triple Gate requerido:\n' +
         '  1. GREENHOUSE_CAPTURE_ALLOW_PROD=true en .env.local\n' +
         '  2. --prod flag en CLI\n' +
-        '  3. Capability platform.frontend.capture_prod (futuro slice 2.1)'
+        `  3. GREENHOUSE_CAPTURE_ACTOR_CAPABILITY=${PRODUCTION_CAPABILITY}`
     )
   }
 
   if (!prodFlag) {
-    throw new Error('Production captures requieren --prod flag explícito (defense-in-depth, no solo env var)')
+    throw new Error('Production captures requieren --prod flag explícito (defense-in-depth)')
+  }
+
+  const actorCap = process.env.GREENHOUSE_CAPTURE_ACTOR_CAPABILITY
+
+  if (actorCap !== PRODUCTION_CAPABILITY) {
+    throw new Error(
+      `Production captures requieren capability declarada por el actor.\n` +
+        `export GREENHOUSE_CAPTURE_ACTOR_CAPABILITY=${PRODUCTION_CAPABILITY}\n` +
+        `Es responsabilidad del operador asegurarse de poseer la capability vigente.\n` +
+        `El audit log queda registrado para forensic post-hoc.`
+    )
   }
 }
 

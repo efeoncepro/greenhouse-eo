@@ -144,6 +144,81 @@ pnpm fe:capture:gc --apply            # borra de verdad
 pnpm fe:capture:gc --apply --days=7   # threshold custom
 ```
 
+### Caso 7 — Mobile viewport (V1.1)
+
+Cualquier device preset de Playwright funciona vía `--device`:
+
+```bash
+pnpm fe:capture <scenario> --env=staging --device="iPhone 13"
+pnpm fe:capture <scenario> --env=staging --device="Pixel 7"
+pnpm fe:capture <scenario> --env=staging --device="iPad Pro 11"
+pnpm fe:capture <scenario> --env=staging --device="Galaxy S9+"
+```
+
+El preset overridea viewport + userAgent + DPR del scenario. Útil para validar responsive layouts + mobile microinteractions.
+
+### Caso 8 — Visual diff entre 2 capturas (V1.1)
+
+Para comparar 2 runs (ej. antes y después de un cambio de UI):
+
+```bash
+pnpm fe:capture:diff .captures/<prev-run> .captures/<curr-run>
+```
+
+Output:
+- Stdout summary con bytes delta por frame (🟢 same · 🟡 changed >1% · 🔵 added · ⚪ removed)
+- `<curr-run>/diff-vs-<prev>.html` — side-by-side HTML report (abre en browser)
+
+V1.2 agregará pixel-perfect diff vía pixelmatch.
+
+### Caso 9 — Subir captura a GCS bucket (V1.1)
+
+Para compartir una captura con el equipo:
+
+```bash
+pnpm fe:capture <scenario> --env=staging --upload=<bucket-name>
+```
+
+Genera signed URL del manifest (válida 7 días) para compartir. Requiere `gcloud` autenticado localmente (ADC ya configurado por convención).
+
+### Caso 10 — Health probe local (V1.1)
+
+Para verificar salud de capturas recientes (failure rate, mean duration):
+
+```bash
+pnpm fe:capture:health              # last 20 runs
+pnpm fe:capture:health --last=50    # window custom
+pnpm fe:capture:health --json       # machine-readable
+```
+
+Thresholds: 🟡 warning ≥10% failure rate · 🔴 error ≥25%. Exit code 1 si error.
+
+### Caso 11 — UI Review dossier auto-generado (V1.1)
+
+Para auditar una surface viva con el skill `greenhouse-ui-review`:
+
+```bash
+pnpm fe:capture:review <scenario> --env=staging
+# OR re-usar una captura ya hecha:
+pnpm fe:capture:review .captures/<existing-run>
+```
+
+Genera `review-dossier.md` con frames + 13-row checklist + canon Geist+Poppins. Pegás el dossier en una conversación de Claude Code con la skill `greenhouse-ui-review` cargada.
+
+V1.2: invocación directa Anthropic SDK sin copy-paste.
+
+### Caso 12 — Production capture (Triple Gate canónico V1.1)
+
+⚠️ Captura contra production **requiere los 3 gates**:
+
+```bash
+export GREENHOUSE_CAPTURE_ALLOW_PROD=true
+export GREENHOUSE_CAPTURE_ACTOR_CAPABILITY=platform.frontend.capture_prod
+pnpm fe:capture <scenario> --env=production --prod
+```
+
+Solo declaralos si **sabés** que poseés la capability vigente. El audit log registra al actor para forensic post-hoc.
+
 ## Que significan los estados / señales
 
 | Indicador | Significado |

@@ -3,7 +3,9 @@
 ## Status
 
 - Estado: `accepted`
-- Fecha: `2026-05-12`
+- Version: `1.1`
+- Fecha V1.0: `2026-05-12 mañana` — Slice 0-3 (CLI + scenario + recorder + docs)
+- Fecha V1.1: `2026-05-12 tarde` — Delta OQ-1..OQ-6 (upload, device, diff, capability, reliability, ui-review scaffolding)
 - Owner: `Claude / Greenhouse frontend tooling`
 - Relacionado con:
   - `scripts/frontend/` (implementación canónica)
@@ -246,16 +248,41 @@ Append-only JSONL en `.captures/audit.jsonl`. Cada run agrega: timestamp, route,
 | **0** | CLI + auth + scenario parser + recorder + frames marker-based + manifest + 1 demo scenario | ✅ Completo `1f03f019` |
 | **1** | GIF output, `--route` mode, `--headed` flag, audit log JSONL | ✅ Completo `1f03f019` |
 | **2** | Prod triple gate, secret mask, stale-auth auto-refresh, `pnpm fe:capture:gc` | ✅ Completo `1f03f019` |
-| **3** | Documentación: manual de uso + architecture spec + documentation funcional + ADR | ✅ Completo (este doc) |
+| **3** | Documentación: manual de uso + architecture spec + documentation funcional + ADR | ✅ Completo `de1f15dc` |
+| **V1.1** | OQ-1..OQ-6 — upload, device flag, diff, capability, reliability local, ui-review scaffolding | ✅ Completo (este delta) |
 
-## V1.1 backlog (no decidido en V1)
+## V1.1 entregado (Delta 2026-05-12)
 
-- **OQ-1** Auto-upload de captures a GCS bucket cuando un agente cierra una TASK — path estable queda definido para que un cron sweep lo levante después.
-- **OQ-2** Mobile viewport (iPhone 13 simulator). V1 default 1440×900 desktop. Agregable como `--device=iPhone13`.
-- **OQ-3** Visual regression diffing entre captures. Otra herramienta (`playwright-screenshots` + `pixelmatch`). Esta tool captura, no diffea.
-- **OQ-4** Reliability signal `frontend.capture.failed` en Reliability Control Plane.
-- **OQ-5** Integración con `greenhouse-ui-review` skill que corre captura + audit visual con LLM automático.
-- **OQ-6** Capability `platform.frontend.capture_prod` real (completar Triple Gate). V1 solo tiene env var + flag.
+| Item | Comando | Implementación |
+|---|---|---|
+| **OQ-1** GCS upload opt-in | `pnpm fe:capture <s> --env=staging --upload=<bucket>` | `lib/upload.ts` delega a `gcloud storage cp` subprocess (zero new deps). Genera signed URL del manifest válido 7d. |
+| **OQ-2** Mobile viewport | `pnpm fe:capture <s> --device="iPhone 13"` | `lib/browser.ts` consume Playwright `devices[name]` preset; override viewport + userAgent + DPR automático. |
+| **OQ-3** Visual diff | `pnpm fe:capture:diff <prev> <curr>` | `diff.ts` produce stdout summary + `diff-vs-<prev>.html` side-by-side report. Detección por label match + byte-delta threshold 1%. Zero new deps. |
+| **OQ-4** Reliability local | `pnpm fe:capture:health [--last=N] [--json]` | `lib/reliability.ts` + `health.ts` leen `.captures/audit.jsonl`, computan failure rate + last failure + mean duration. Thresholds canónicos `warning ≥10%` / `error ≥25%`. V1.2: PG-backed `greenhouse_serving.frontend_capture_runs` cuando CI consuma el tool. |
+| **OQ-5** ui-review integration | `pnpm fe:capture:review <s>` | `review.ts` corre fe:capture + genera `review-dossier.md` con 13-row checklist + frame refs + canon Geist+Poppins. Skill `greenhouse-ui-review` actualizada con sección "Recipe: capture-driven review" que documenta el flow. V1.2: invocación directa Anthropic SDK. |
+| **OQ-6** Capability completa | `GREENHOUSE_CAPTURE_ACTOR_CAPABILITY=platform.frontend.capture_prod` | Capability declarada en `src/config/entitlements-catalog.ts` + migration `20260512091119820_seed-frontend-capture-prod-capability.sql` con seed idempotente + anti pre-up-marker guard + downgrade-only revert. Triple Gate completo: env var + CLI flag + actor capability declaration. |
+
+### Triple Gate canónico (V1.1 completo)
+
+Production captures (`--env=production`) requieren TODOS:
+
+```text
+1. GREENHOUSE_CAPTURE_ALLOW_PROD=true     (env var, .env.local)
+2. --prod                                   (CLI flag explícito)
+3. GREENHOUSE_CAPTURE_ACTOR_CAPABILITY=platform.frontend.capture_prod
+                                            (actor declara que la posee + audit log lo registra)
+```
+
+V1.2: el check #3 migrará a validación PG real vía `can()` lookup runtime contra el subject del operador.
+
+## V1.2 backlog
+
+- **OQ-3.1** Pixel-perfect visual regression (agregar `pixelmatch` dep opt-in para diff perceptual)
+- **OQ-4.1** Tabla PG `greenhouse_serving.frontend_capture_runs` + reader canónico para reliability signal vía `getReliabilityOverview`
+- **OQ-5.1** Anthropic SDK orchestration directa en `pnpm fe:capture:review` (sin copy-paste manual)
+- **OQ-6.1** Validación PG real del Triple Gate #3 vía `can(subject, 'platform.frontend.capture_prod', 'read', 'all')` cuando emerja necesidad real
+- **OQ-7** Multi-browser support (Firefox, WebKit) además de Chromium
+- **OQ-8** Stagger entrance animations en scenarios (probar la animación de mount inicial)
 
 ## Verificación end-to-end
 

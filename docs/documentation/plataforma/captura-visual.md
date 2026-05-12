@@ -130,3 +130,16 @@ Esta doble confirmación previene que alguien grabe un screenshot y termine crea
 - **Visual regression**: en backlog OQ-3.
 
 > Detalle técnico: [GREENHOUSE_FRONTEND_CAPTURE_HELPER_V1.md](../../architecture/GREENHOUSE_FRONTEND_CAPTURE_HELPER_V1.md) describe el contrato completo, los tipos del DSL, las 5 capas de defense-in-depth, y el roadmap V1.1+.
+
+## V1.1 — Delta 2026-05-12
+
+6 capacidades nuevas entregadas el mismo día:
+
+1. **Mobile viewport** — `--device="iPhone 13"` (o cualquier preset Playwright) overridea viewport + userAgent + DPR. Útil para validar responsive layouts.
+2. **Visual diff** — `pnpm fe:capture:diff <prev> <curr>` compara 2 capturas y emite stdout summary + HTML report side-by-side.
+3. **GCS upload** — `--upload=<bucket>` sube el run al bucket + retorna signed URL del manifest (7 días). Para compartir con el equipo.
+4. **Health probe** — `pnpm fe:capture:health` lee `.captures/audit.jsonl` y reporta failure rate + last failure + mean duration. Útil antes de invocar un loop intensivo.
+5. **UI review dossier** — `pnpm fe:capture:review <scenario>` corre la captura + genera `review-dossier.md` con la 13-row checklist canónica, listo para pegar en Claude Code con la skill `greenhouse-ui-review`.
+6. **Triple Gate completo** — capability `platform.frontend.capture_prod` declarada en `entitlements-catalog` + migration seed canónica. Production captures requieren los 3 gates (env var + flag + capability declaration).
+
+V1.2 backlog: pixel-perfect diff, PG-backed reliability signal, Anthropic SDK orchestration directa, validación PG real del actor capability.
