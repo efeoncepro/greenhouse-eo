@@ -1,4 +1,4 @@
-# Sesion 2026-05-12 — TASK-822 arch-architect verdict + implementation on develop
+# Sesion 2026-05-12 — TASK-822 arch-architect verdict + implementation CERRADA on develop
 
 - **Trigger**: usuario pidió revisión arch-architect de TASK-822 (Client Portal Domain Consolidation, EPIC-015 child 1/8). Verdict: aprobado con 3 correcciones estructurales aplicadas pre-Slice-1.
 - **3 correcciones canonizadas en spec v1.1 + task v1.1**:
@@ -10,8 +10,17 @@
   - OQ-2: 0 readers nativos V1.0 (placeholder files = anti-pattern; primer nativo emerge con TASK-825 resolver).
   - OQ-3: parity test TS↔DB para `ClientPortalDataSource` queda para TASK-824 (la tabla `modules` no existe aún; crear test ahora = falsa señal).
 - **Decisión operativa**: implementación directa sobre `develop`, sin branch separada (instrucción explícita del usuario).
-- **Task movida** `to-do/` → `in-progress/`. README + Handoff sync.
-- **Plan**: 5 slices (estructura + DTO; Sentry whitelist + smoke; ESLint rule; curated re-exports; verificación final).
+- **Cierre 2026-05-12**: 5 commits incrementales sin PR ceremony.
+  - `78179c63` baseline recalibration (spec v1.0 → v1.1; task v1.0 → v1.1; mover to-do→in-progress).
+  - `df48106e` Slice 1 — BFF foundation + DTO `ClientPortalReaderMeta` + barrels + README + helpers placeholder.
+  - `c90b49ba` Slice 2 — Sentry domain `client_portal` whitelist + 2 smoke tests.
+  - `fec0b94c` Slice 3 — ESLint rule `greenhouse/no-cross-domain-import-from-client-portal` modo `error` + 20 RuleTester fixtures + override block en eslint.config.mjs + live smoke fixture validated.
+  - `ea7080fd` Slice 4 — 2 curated re-exports demostrativos (`account-summary` owner `account-360` + `ico-overview` owner `ico-engine`) + 7 meta tests anti-regresión.
+- **Audit Discovery surprise canonizado**: la lista original de 7 re-exports del spec V1.0 era aspiracional, no actual. Solo 2 tienen funciones TS standalone existentes (`getOrganizationExecutiveSnapshot`, `readSpaceMetrics`). Los otros 5 (`creative-hub` 16 cards, `assigned-team`, `pulse` per-cliente, `csc-pipeline`, `brand-intelligence`) son descripciones funcionales V3.0 spec, NO código que se pueda re-exportar hoy. Aplazados a V1.1 cuando TASK-823 + TASK-827 produzcan consumers concretos. Decisión documentada en AUDIT FASE 2.
+- **Verificación final verde**: `pnpm build` ✅ + `pnpm lint` ✅ + `npx tsc --noEmit` ✅ + 23 tests verdes (9 capture + 7 curated meta + 7 cross-domain RuleTester fixtures). 0 imports prohibidos producer→client-portal (grep negativo). 0 `new Pool()` nuevos fuera de canonical postgres client.
+- **Hard rules canonizadas en CLAUDE.md** sección "Client Portal BFF / Anti-Corruption Layer invariants (TASK-822, desde 2026-05-12)".
+- **Desbloquea**: TASK-823 (`/api/client-portal/*` namespace), TASK-824 (DDL `greenhouse_client_portal` + 10 modules seed — el parity test TS↔DB para `ClientPortalDataSource` nace ahí), TASK-825 (resolver canónico — primer reader **nativo** del módulo).
+- **Plataforma BFF efectiva**: nuevos consumers de `@/lib/client-portal/*` (TASK-823 API routes, TASK-827 UI composition layer) ya pueden importar sin riesgo de ciclos — la lint rule protege el invariante leaf-of-DAG desde commit-1.
 
 ---
 

@@ -8,11 +8,21 @@
 - Effort: `Bajo`
 - Type: `implementation`
 - Epic: `EPIC-015`
-- Status real: `Diseno`
+- Status real: `Diseno (desbloqueada 2026-05-12 al cerrar TASK-822)`
 - Rank: `TBD`
 - Domain: `client_portal`
-- Blocked by: `TASK-822`
+- Blocked by: `none` (TASK-822 cerrada 2026-05-12)
 - Branch: `task/TASK-823-client-portal-api`
+
+## Delta 2026-05-12 — TASK-822 cerrada, desbloqueo aplicado
+
+TASK-822 cerró el BFF foundation. Cuando arranque esta task:
+
+- `src/lib/client-portal/` ya existe con DTO `ClientPortalReaderMeta`, Sentry domain `client_portal` registrado, ESLint rule `greenhouse/no-cross-domain-import-from-client-portal` activa, y 2 curated re-exports demostrativos (`account-summary`, `ico-overview`).
+- Los endpoints `/api/client-portal/*` deben **consumir** `@/lib/client-portal/*` (allowed direction); jamás importarse desde producer domains.
+- Cualquier reader nuevo que necesite el API: si vive en un producer domain, re-exportar via `src/lib/client-portal/readers/curated/<name>.ts` + `ClientPortalReaderMeta` tipado; si emerge nativo del BFF, va a `readers/native/` (primer candidato natural es el resolver de TASK-825).
+- `captureWithDomain(err, 'client_portal', { extra })` es el wrapper canónico para errores; NO `Sentry.captureException()` directo.
+- Spec actualizada V1.1 con §3.1 (Module classification) + §3.2 (Domain import direction).
 
 ## Summary
 

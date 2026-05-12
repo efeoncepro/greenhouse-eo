@@ -2,13 +2,13 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `EPIC-015`
-- Status real: `Implementacion v1.1 (sobre develop directamente, sin branch separada por instruccion explicita 2026-05-12)`
+- Status real: `Cerrada 2026-05-12 directo en develop (sin branch separada por instruccion explicita). 5 slices shipped en 5 commits incrementales: baseline recalibration + Slice 1 BFF foundation + Slice 2 Sentry whitelist + Slice 3 ESLint rule + Slice 4 curated re-exports.`
 - Rank: `TBD`
 - Domain: `client_portal`
 - Blocked by: `none`

@@ -8,11 +8,25 @@
 - Effort: `Bajo`
 - Type: `implementation`
 - Epic: `EPIC-015`
-- Status real: `Diseno`
+- Status real: `Diseno (independiente; el BFF TS ya está listo desde 2026-05-12 TASK-822 cierre)`
 - Rank: `TBD`
 - Domain: `client_portal`
 - Blocked by: `none`
 - Branch: `task/TASK-824-client-portal-ddl`
+
+## Delta 2026-05-12 — TASK-822 cerrada, contract de parity TS↔DB pendiente
+
+TASK-822 dejó canonizado el type union `ClientPortalDataSource` en
+`src/lib/client-portal/dto/reader-meta.ts` con 17 values (commercial.engagements,
+finance.invoices, agency.ico, account_360.summary, etc.).
+
+Cuando esta task entregue el schema:
+
+- `greenhouse_client_portal.modules.data_sources TEXT[]` debe aceptar SOLO valores que coincidan con el type union TS. Patrón canonico: CHECK constraint con `unnest(data_sources) <@ ARRAY[...]` o validation a nivel aplicación pre-INSERT.
+- Agregar un parity test `*.live.test.ts` (mismo patrón TASK-611 `capabilities_registry`) que rompa build si TS union y DB enum (o whitelist aplicativa) divergen. Esto cierra la OQ-3 documentada en TASK-822.
+- Si la implementación opta por enum DB en lugar de CHECK constraint sobre TEXT[], el parity test sigue siendo obligatorio.
+
+Spec actualizada V1.1 §3.1 documenta el contract.
 
 ## Summary
 

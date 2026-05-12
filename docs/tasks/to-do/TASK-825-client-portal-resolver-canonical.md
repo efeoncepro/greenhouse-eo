@@ -8,11 +8,24 @@
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `EPIC-015`
-- Status real: `Diseno`
+- Status real: `Diseno (TASK-822 cerrada 2026-05-12; queda bloqueada por TASK-824 schema)`
 - Rank: `TBD`
 - Domain: `client_portal`
-- Blocked by: `TASK-822, TASK-824`
+- Blocked by: `TASK-824`
 - Branch: `task/TASK-825-client-portal-resolver`
+
+## Delta 2026-05-12 — TASK-822 cerrada; este resolver es el primer reader NATIVO del BFF
+
+TASK-822 dejó el BFF preparado para hospedar readers nativos. Por convención
+canonizada en spec V1.1 §3.1:
+
+- El resolver `resolveClientPortalModulesForOrganization` vive en `src/lib/client-portal/readers/native/` (primer archivo bajo esa carpeta — el README de `native/` documenta la convención).
+- Su metadata declara `classification: 'native'` con `ownerDomain: null` (es BFF-owned, no producer-domain-owned). El runtime invariant `assertReaderMeta()` lo enforce; el test pattern de TASK-822 Slice 4 (`curated-meta.test.ts`) puede clonarse para validar el shape native.
+- Importa libremente de producer domains (account-360, agency, ico-engine, etc.) — la ESLint rule canónica permite la dirección BFF → producer.
+- Si emerge la tentación de "compartir" lógica del resolver con producer domains: NO. Producer domains no pueden importar `@/lib/client-portal/*` (lint rule bloquea). Si necesitan algo equivalente, extender API del producer domain en su propio lugar.
+- Errores del path: usar `captureWithDomain(err, 'client_portal', { extra: { organizationId } })` — el domain ya está whitelisted (TASK-822 Slice 2).
+
+Spec actualizada V1.1 §3.1 + §3.2.
 
 ## Summary
 
