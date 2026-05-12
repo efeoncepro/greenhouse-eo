@@ -53,6 +53,7 @@ _Pendiente._
 - [Verificar idioma del portal](plataforma/i18n-runtime.md) — como forzar `gh_locale=en-US`/`es-CL` para QA del runtime i18n sin cambiar URLs privadas ni APIs.
 - [Formatear fechas, montos y numeros](plataforma/formateo-locale-aware.md) — como usar `@/lib/format` para UI, PDFs, Excel y emails sin reintroducir `Intl.*` o `toLocale*` directo; incluye caso Brasil.
 - [Organization Workspace — rollout y operación](plataforma/organizaciones-workspace-rollout.md) — cómo activar progresivamente el nuevo workspace de organizaciones (TASK-612) en `/agency/organizations/[id]` por usuario → rol → global, supervisar las 2 reliability signals, revertir instantáneo per-user, y diagnosticar issues comunes.
+- [Skills de Product Design](plataforma/skills-product-design.md) — qué cambió cuando se incorporó la suite de 17 skills (a11y, motion, performance, forms, state, dataviz, IA, frontend-architect, design-system-governance), cuándo se invoca cada una, cómo se componen, cuándo correr `greenhouse-ui-review` antes de commit y cómo extender el sistema sin romperlo.
 
 ## Plantilla recomendada
 
