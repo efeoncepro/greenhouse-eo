@@ -432,6 +432,31 @@ Documentacion canonica:
   - `Production/main` es el unico lugar donde una capacidad puede declararse `stable`
   - Greenhouse comunica releases principalmente por modulo o feature visible, no solo por plataforma completa
 
+### Regla de Production Release Orchestrator failure — leer el gate como diagnostico, no como obstaculo (post-incidente 2026-05-12)
+
+**Contexto**: el 2026-05-11→12 un agente perdio ~3h en 5 commits "fix(release): …" tratando de hacer el preflight gate mas permisivo en vez de investigar la causa raiz. La causa real eran 2 env vars corruptas en runtime; el fix tomaba 2 comandos. Costo del incidente acumulado: ~2 dias.
+
+**Reglas duras** (cualquier agente — Claude, Codex, Cursor — que enfrente un orchestrator fallido):
+
+- **NUNCA** modificar un check bajo `src/lib/release/preflight/checks/*` para "bajar la severidad" o "ampliar la tolerancia" sin arch-architect review explicito Y bug-class verificado del check itself. El gate detecto algo: tu trabajo es entender QUE.
+- **NUNCA** usar `bypass_preflight_reason` como mute global. Ese flag SOLO trigger `--override-batch-policy` (un check granular). NO bypassa Sentry, NO bypassa migrations pendientes, NO bypassa CI fail.
+- **NUNCA** re-triggear el orchestrator inmediatamente despues de pushear un fix. Esperar:
+  - ~3 min para Vercel build complete + cold-start cycles
+  - ~5-15 min para que Sentry active window (15 min canonica) se enfrie si el fix lo requeria
+- **NUNCA** asumir que un env var es "config, no codigo". Ante Sentry burst recurrente de un secret-related error, inspeccionar bytes hex del env var:
+  ```bash
+  vercel env pull --environment production /tmp/.x --cwd <repo> --yes
+  grep "^FOO_SECRET_REF=" /tmp/.x | xxd
+  rm -f /tmp/.x
+  ```
+- **SIEMPRE** leer `preflight-result.json` completo via `gh run view <id> --log-failed | grep -A 5 '"checkId"\|"severity"\|"summary"\|"title"'`. Cada `checkId` con `severity != ok` te dice exactamente que fix se requiere.
+- **SIEMPRE** invocar arch-architect ANTES de tocar `src/lib/secrets/`, `src/lib/release/`, `src/lib/auth-secrets.ts`, `services/<svc>/deploy.sh`, o `production-release.yml`. Costo 90s; previene horas de churn downstream.
+- **SIEMPRE** verificar el fix LIVE en runtime ANTES de re-triggear el orchestrator (Sentry API query confirma issue lastSeen fuera de 15min, `gcloud run revisions describe` confirma worker revision, `vercel ls --prod` confirma deployment Ready).
+
+**Playbook canonico cross-agent**: `docs/operations/PRODUCTION_RELEASE_INCIDENT_PLAYBOOK_V1.md` — checklist 5 pasos + mapping `checkId → fix canonico` + 5 anti-patterns documentados con ejemplos reales del incidente Codex 2026-05-12.
+
+**Metricas de exito**: si un release blocker toma >2h, el agente DEBE escalar a humano + actualizar el playbook con el caso no cubierto. No seguir empujando commits sin diagnostico.
+
 ### Archivos sensibles
 
 - Tratar con cuidado:
