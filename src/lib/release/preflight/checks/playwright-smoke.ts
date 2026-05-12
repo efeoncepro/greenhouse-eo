@@ -36,6 +36,7 @@ interface WorkflowRun {
   readonly html_url: string
   readonly head_sha: string
   readonly path: string
+  readonly created_at?: string
 }
 
 interface WorkflowRunsResponse {
@@ -58,6 +59,27 @@ const isPlaywrightSmokeRun = (run: WorkflowRun): boolean => {
   return PLAYWRIGHT_SMOKE_NAME_PATTERNS.some(
     pattern => lowerName.includes(pattern) || lowerPath.includes(pattern)
   )
+}
+
+const runCreatedAtMs = (run: WorkflowRun): number => {
+  const parsed = Date.parse(run.created_at ?? '')
+
+  return Number.isFinite(parsed) ? parsed : 0
+}
+
+const latestRunPerWorkflow = (runs: readonly WorkflowRun[]): readonly WorkflowRun[] => {
+  const latest = new Map<string, WorkflowRun>()
+
+  for (const run of runs) {
+    const key = `${run.name}::${run.path ?? ''}`
+    const current = latest.get(key)
+
+    if (!current || runCreatedAtMs(run) >= runCreatedAtMs(current)) {
+      latest.set(key, run)
+    }
+  }
+
+  return [...latest.values()]
 }
 
 export const checkPlaywrightSmoke = async (
@@ -87,7 +109,7 @@ export const checkPlaywrightSmoke = async (
 
   try {
     const data = await githubFetchJson<WorkflowRunsResponse>(endpoint, token)
-    const smokeRuns = data.workflow_runs.filter(isPlaywrightSmokeRun)
+    const smokeRuns = latestRunPerWorkflow(data.workflow_runs.filter(isPlaywrightSmokeRun))
 
     if (smokeRuns.length === 0) {
       return {

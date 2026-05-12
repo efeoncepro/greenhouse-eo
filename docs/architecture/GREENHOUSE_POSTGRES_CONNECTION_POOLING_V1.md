@@ -45,7 +45,8 @@ Greenhouse adopta una **arquitectura de connection management de 4 capas con dep
 
 ```text
 ┌──────────────────────┐
-│ Vercel functions × N │  pool max=3, idleTimeoutMillis=10s    (TASK-846 Slice 3)
+│ Vercel functions × N │  pool max=3, query concurrency=2      (TASK-846 + 2026-05-12)
+│                      │  idleTimeoutMillis=10s
 ├──────────────────────┤
 │ ops-worker           │  pool max=15, idleTimeoutMillis=30s
 ├──────────────────────┤  ──→ Cloud SQL (100 server conns)
@@ -61,7 +62,20 @@ Greenhouse adopta una **arquitectura de connection management de 4 capas con dep
                                 └──────────────────────┘
 ```
 
-V1 NO incluye multiplexer dedicado. Razón: post-Slice 1 ALTER ROLE la saturación bajó de 103% → 66%. Post-Slice 3 runtime-aware pool sizing proyecta utilización 25-35% al volumen actual. **No hay evidencia de que demanda > capacidad PG**, solo había leak de idle connections.
+V1 NO incluye multiplexer dedicado. Razón: post-Slice 1 ALTER ROLE la saturación bajó de 103% → 66%. Post-Slice 3 runtime-aware pool sizing proyecta utilización 25-35% al volumen actual. **No hay evidencia sostenida de que demanda > capacidad PG**; las saturaciones observadas han venido de leaks de idle connections o fan-out local de readers operativos.
+
+### Delta V1.1 — Backpressure local por query (2026-05-12)
+
+Sentry volvió a mostrar `53300` en `/api/admin/reliability` durante un burst del Reliability/Operations overview. La causa raíz no era una tabla faltante ni demanda sostenida, sino fan-out local: un request podía disparar decenas de readers PG en paralelo y, cuando varios crons/previews coincidían, Cloud SQL rechazaba nuevas conexiones.
+
+El cliente canónico `src/lib/postgres/client.ts` ahora agrega una cuarta capa V1:
+
+- `GREENHOUSE_POSTGRES_QUERY_CONCURRENCY` limita queries concurrentes por proceso antes de llegar al `Pool`.
+- Default Vercel: `2`; default no-Vercel: `4`; siempre clamp a `GREENHOUSE_POSTGRES_MAX_CONNECTIONS`.
+- Los errores de capacidad (`53300`, reserved slots, too many clients, connect timeout) reintentan con backoff sin cerrar el pool sano; cerrar el pool ante capacidad agotada amplificaba carreras y podía producir `Cannot use a pool after calling end on the pool`.
+- Los errores que sí indican pool roto siguen reseteando pool/connector.
+
+Además, los checks de presencia de tablas usan `src/lib/db-health/table-presence.ts` para consultar múltiples tablas en una sola roundtrip, reemplazando el patrón repetitivo `SELECT EXISTS (...)`.
 
 ### V2 (futuro, contingente — TASK-847)
 
@@ -148,6 +162,10 @@ NUNCA configurar pg-node Pool con max > 15 en Vercel function. Default canónico
 max=3 (Vercel), max=15 (Cloud Run). Override via GREENHOUSE_POSTGRES_MAX_CONNECTIONS
 solo con justificación documentada.
 
+NUNCA abrir fan-out PG sin backpressure local en surfaces operativas. El helper
+canónico `runGreenhousePostgresQuery()` aplica `GREENHOUSE_POSTGRES_QUERY_CONCURRENCY`
+(default 2 Vercel / 4 no-Vercel) y debe ser la ruta estándar para queries PG.
+
 NUNCA configurar idle_session_timeout=0 en greenhouse_app o greenhouse_ops roles.
 ALTER ROLE canónico: greenhouse_app=5min, greenhouse_ops=15min.
 
@@ -172,11 +190,12 @@ threshold warning > 60%, error > 80%. Steady < 30% indicates V1 sigue suficiente
 sustained > 60% justifica V2 GKE PgBouncer deployment (TASK-847).
 ```
 
-## Defense-in-depth V1 (3 capas)
+## Defense-in-depth V1 (4 capas)
 
 1. **PG-side `idle_session_timeout` por role** (ALTER ROLE): PG corta connections idle > 5min server-side. Persistente cross-restart vía `pg_roles.rolconfig`. Catch-all contra leaks.
 2. **pg-node Pool tuning per-runtime**: max=3 Vercel / max=15 Cloud Run. `idleTimeoutMillis=10s` Vercel / `30s` Cloud Run. Backpressure local.
-3. **Reliability signal `runtime.postgres.connection_saturation`**: detecta regresión global. Steady < 30%, alert > 60%, error > 80%. **Es la señal que dispara V2 deployment data-driven.**
+3. **Query concurrency gate canónico**: `runGreenhousePostgresQuery()` limita fan-out local por proceso y evita que un solo request operativo intente consumir el pool completo.
+4. **Reliability signal `runtime.postgres.connection_saturation`**: detecta regresión global. Steady < 30%, alert > 60%, error > 80%. **Es la señal que dispara V2 deployment data-driven.**
 
 ## Defense-in-depth V2 (4 capas, contingente)
 
@@ -213,3 +232,4 @@ Cuando reliability signal alerta sustained > 60%:
 - **2026-05-09**: ADR creado (Accepted). Trigger: PG saturation 103% live + Sentry weekly report 7 errors NEW.
 - **2026-05-09**: V1 implementación (TASK-845): Slice 1 (ALTER ROLE) aplicado live, saturation 103% → 66%. Slice 3 (runtime-aware pool) commiteado. Defense-in-depth 3 capas activa.
 - **2026-05-09**: Pivot V1 vs V2 documentado. Cloud Run NO soporta PgBouncer (TCP raw incompatible). V2 contingente queda diseñado para GKE Autopilot deployment cuando reliability signal lo justifique. TASK-847 placeholder creada.
+- **2026-05-12**: Delta V1.1 aceptado tras Sentry `/api/admin/reliability`: query concurrency gate + table-presence batch + retry policy que no resetea pool ante capacidad agotada. Saturación observada bajó de 99/97 a 5 conexiones tras cooldown; no se ejecutó restart ni terminación manual de sesiones.

@@ -8,6 +8,7 @@ import { getCloudGcpAuthPosture } from '@/lib/cloud/gcp-auth'
 import { buildCloudHealthSnapshot, getCloudPlatformHealthSnapshot } from '@/lib/cloud/health'
 import { getCloudObservabilityPosture, getCloudSentryIncidents } from '@/lib/cloud/observability'
 import { getCloudPostgresPosture } from '@/lib/cloud/postgres'
+import { getTablePresence, tableExistsIn, type TablePresenceMap } from '@/lib/db-health/table-presence'
 import { readAiLlmOperationsSnapshot } from '@/lib/ico-engine/ai/llm-enrichment-reader'
 import { getNotionDeliveryDataQualityOverview } from '@/lib/integrations/notion-delivery-data-quality'
 import { getEffectiveLatestNotionSyncAt } from '@/lib/integrations/notion-sync-freshness'
@@ -190,18 +191,6 @@ const safeCount = async (query: string, params?: unknown[]): Promise<number> => 
   }
 }
 
-const tableExists = async (schema: string, table: string): Promise<boolean> => {
-  try {
-    const rows = await runGreenhousePostgresQuery<Record<string, unknown> & { exists: boolean }>(
-      `SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = $1 AND table_name = $2) AS exists`,
-      [schema, table]
-    )
-
-    return rows[0]?.exists === true
-  } catch {
-    return false
-  }
-}
 
 const deriveHealth = (
   processed: number,
@@ -341,15 +330,23 @@ const buildCommercialHealthSummary = (metrics: OperationsSubsystemMetric[]) => {
   return `${issueMetrics.length} señal${issueMetrics.length === 1 ? '' : 'es'} Commercial Health con issue activo: ${issueMetrics.map(describeCommercialMetric).join(', ')}.`
 }
 
-export const buildCommercialHealthSubsystem = async (): Promise<OperationsSubsystem> => {
+export const buildCommercialHealthSubsystem = async (
+  tablePresence?: TablePresenceMap
+): Promise<OperationsSubsystem> => {
   try {
-    const [hasServices, hasApprovals, hasPhases, hasOutcomes, hasProgress] = await Promise.all([
-      tableExists('greenhouse_core', 'services'),
-      tableExists('greenhouse_commercial', 'engagement_approvals'),
-      tableExists('greenhouse_commercial', 'engagement_phases'),
-      tableExists('greenhouse_commercial', 'engagement_outcomes'),
-      tableExists('greenhouse_commercial', 'engagement_progress_snapshots')
+    const presence = tablePresence ?? await getTablePresence([
+      { schema: 'greenhouse_core', table: 'services' },
+      { schema: 'greenhouse_commercial', table: 'engagement_approvals' },
+      { schema: 'greenhouse_commercial', table: 'engagement_phases' },
+      { schema: 'greenhouse_commercial', table: 'engagement_outcomes' },
+      { schema: 'greenhouse_commercial', table: 'engagement_progress_snapshots' }
     ])
+
+    const hasServices = tableExistsIn(presence, 'greenhouse_core', 'services')
+    const hasApprovals = tableExistsIn(presence, 'greenhouse_commercial', 'engagement_approvals')
+    const hasPhases = tableExistsIn(presence, 'greenhouse_commercial', 'engagement_phases')
+    const hasOutcomes = tableExistsIn(presence, 'greenhouse_commercial', 'engagement_outcomes')
+    const hasProgress = tableExistsIn(presence, 'greenhouse_commercial', 'engagement_progress_snapshots')
 
     if (!hasServices || !hasApprovals || !hasPhases || !hasOutcomes || !hasProgress) {
       return {
@@ -446,9 +443,12 @@ export const buildCommercialHealthSubsystem = async (): Promise<OperationsSubsys
   }
 }
 
-export const buildFinanceDataQualitySubsystem = async (): Promise<OperationsSubsystem> => {
+export const buildFinanceDataQualitySubsystem = async (
+  tablePresence?: TablePresenceMap
+): Promise<OperationsSubsystem> => {
   try {
-    const hasFinanceTables = await tableExists('greenhouse_finance', 'income')
+    const presence = tablePresence ?? await getTablePresence([{ schema: 'greenhouse_finance', table: 'income' }])
+    const hasFinanceTables = tableExistsIn(presence, 'greenhouse_finance', 'income')
 
     if (!hasFinanceTables) {
       return {
@@ -640,7 +640,9 @@ export const buildFinanceDataQualitySubsystem = async (): Promise<OperationsSubs
  *
  * Spec: docs/tasks/to-do/TASK-729-payroll-reliability-module.md
  */
-export const buildPayrollDataQualitySubsystem = async (): Promise<OperationsSubsystem> => {
+export const buildPayrollDataQualitySubsystem = async (
+  tablePresence?: TablePresenceMap
+): Promise<OperationsSubsystem> => {
   if (process.env.GREENHOUSE_DISABLE_PAYROLL_DETECTORS === 'true') {
     return {
       name: 'Payroll Data Quality',
@@ -654,7 +656,11 @@ export const buildPayrollDataQualitySubsystem = async (): Promise<OperationsSubs
   }
 
   try {
-    const hasPayrollTables = await tableExists('greenhouse_payroll', 'payroll_periods')
+    const presence = tablePresence ?? await getTablePresence([
+      { schema: 'greenhouse_payroll', table: 'payroll_periods' }
+    ])
+
+    const hasPayrollTables = tableExistsIn(presence, 'greenhouse_payroll', 'payroll_periods')
 
     if (!hasPayrollTables) {
       return {
@@ -770,31 +776,37 @@ const buildNotionDeliveryDataQualitySubsystem = (
 }
 
 export const getOperationsOverview = async (): Promise<OperationsOverview> => {
-  const [
-    hasOutbox,
-    hasProjections,
-    hasReactiveLog,
-    hasNotifications,
-    hasServices,
-    hasIcoMetrics,
-    hasIcoAiSignals,
-    hasWebhookEndpoints,
-    hasWebhookInbox,
-    hasWebhookDeliveries,
-    hasWebhookSubscriptions
-  ] = await Promise.all([
-    tableExists('greenhouse_sync', 'outbox_events'),
-    tableExists('greenhouse_sync', 'projection_refresh_queue'),
-    tableExists('greenhouse_sync', 'outbox_reactive_log'),
-    tableExists('greenhouse_notifications', 'notifications'),
-    tableExists('greenhouse_core', 'services'),
-    tableExists('greenhouse_serving', 'ico_member_metrics'),
-    tableExists('greenhouse_serving', 'ico_ai_signals'),
-    tableExists('greenhouse_sync', 'webhook_endpoints'),
-    tableExists('greenhouse_sync', 'webhook_inbox_events'),
-    tableExists('greenhouse_sync', 'webhook_deliveries'),
-    tableExists('greenhouse_sync', 'webhook_subscriptions')
+  const tablePresence = await getTablePresence([
+    { schema: 'greenhouse_sync', table: 'outbox_events' },
+    { schema: 'greenhouse_sync', table: 'projection_refresh_queue' },
+    { schema: 'greenhouse_sync', table: 'outbox_reactive_log' },
+    { schema: 'greenhouse_notifications', table: 'notifications' },
+    { schema: 'greenhouse_core', table: 'services' },
+    { schema: 'greenhouse_serving', table: 'ico_member_metrics' },
+    { schema: 'greenhouse_serving', table: 'ico_ai_signals' },
+    { schema: 'greenhouse_sync', table: 'webhook_endpoints' },
+    { schema: 'greenhouse_sync', table: 'webhook_inbox_events' },
+    { schema: 'greenhouse_sync', table: 'webhook_deliveries' },
+    { schema: 'greenhouse_sync', table: 'webhook_subscriptions' },
+    { schema: 'greenhouse_finance', table: 'income' },
+    { schema: 'greenhouse_commercial', table: 'engagement_approvals' },
+    { schema: 'greenhouse_commercial', table: 'engagement_phases' },
+    { schema: 'greenhouse_commercial', table: 'engagement_outcomes' },
+    { schema: 'greenhouse_commercial', table: 'engagement_progress_snapshots' },
+    { schema: 'greenhouse_payroll', table: 'payroll_periods' }
   ])
+
+  const hasOutbox = tableExistsIn(tablePresence, 'greenhouse_sync', 'outbox_events')
+  const hasProjections = tableExistsIn(tablePresence, 'greenhouse_sync', 'projection_refresh_queue')
+  const hasReactiveLog = tableExistsIn(tablePresence, 'greenhouse_sync', 'outbox_reactive_log')
+  const hasNotifications = tableExistsIn(tablePresence, 'greenhouse_notifications', 'notifications')
+  const hasServices = tableExistsIn(tablePresence, 'greenhouse_core', 'services')
+  const hasIcoMetrics = tableExistsIn(tablePresence, 'greenhouse_serving', 'ico_member_metrics')
+  const hasIcoAiSignals = tableExistsIn(tablePresence, 'greenhouse_serving', 'ico_ai_signals')
+  const hasWebhookEndpoints = tableExistsIn(tablePresence, 'greenhouse_sync', 'webhook_endpoints')
+  const hasWebhookInbox = tableExistsIn(tablePresence, 'greenhouse_sync', 'webhook_inbox_events')
+  const hasWebhookDeliveries = tableExistsIn(tablePresence, 'greenhouse_sync', 'webhook_deliveries')
+  const hasWebhookSubscriptions = tableExistsIn(tablePresence, 'greenhouse_sync', 'webhook_subscriptions')
 
   const aiLlmSnapshot = await readAiLlmOperationsSnapshot().catch(() => ({
     tablesReady: false,
@@ -1167,9 +1179,9 @@ export const getOperationsOverview = async (): Promise<OperationsOverview> => {
       failed: 0,
       lastRun: icoAiSignalsLastSync
     },
-    await buildFinanceDataQualitySubsystem(),
-    await buildCommercialHealthSubsystem(),
-    await buildPayrollDataQualitySubsystem(),
+    await buildFinanceDataQualitySubsystem(tablePresence),
+    await buildCommercialHealthSubsystem(tablePresence),
+    await buildPayrollDataQualitySubsystem(tablePresence),
     buildNotionDeliveryDataQualitySubsystem(notionDeliveryDataQuality)
   ]
 

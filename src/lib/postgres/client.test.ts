@@ -68,6 +68,8 @@ describe('postgres secret-manager config', () => {
         )
       )
     ).toBe(true)
+    expect(isGreenhousePostgresRetryableConnectionError(new Error('timeout exceeded when trying to connect'))).toBe(true)
+    expect(isGreenhousePostgresRetryableConnectionError(new Error('Cannot use a pool after calling end on the pool'))).toBe(true)
     expect(isGreenhousePostgresRetryableConnectionError(new Error('syntax error at or near "FROM"'))).toBe(false)
   })
 

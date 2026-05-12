@@ -241,6 +241,8 @@ export interface AriaCopy {
   theme: string
   paymentOrderTabs: string
   paymentObligationFilters: string
+  breadcrumb: string
+  dismissHelper: string
 }
 
 /**

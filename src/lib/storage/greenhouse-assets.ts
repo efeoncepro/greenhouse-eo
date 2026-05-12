@@ -13,6 +13,7 @@ import { publishOutboxEvent } from '@/lib/sync/publish-event'
 import { deleteGreenhouseStorageObject, downloadGreenhouseStorageObject, uploadGreenhouseStorageObject } from './greenhouse-media'
 import { normalizeGreenhouseAssetOwnershipScope } from './greenhouse-assets-shared'
 import type {
+  DraftUploadContext,
   GreenhouseAssetContext,
   GreenhouseAssetRecord,
   GreenhouseAssetRetentionClass,
@@ -52,14 +53,15 @@ type AssetRow = {
 const PRIVATE_USER_ALLOWED_MIME_TYPES = new Set(['application/pdf', 'image/jpeg', 'image/png', 'image/webp'])
 const SYSTEM_ALLOWED_MIME_TYPES = new Set([...PRIVATE_USER_ALLOWED_MIME_TYPES, 'text/csv', 'text/csv; charset=utf-8'])
 
-const MAX_PRIVATE_UPLOAD_BYTES_BY_CONTEXT: Record<Extract<GreenhouseAssetContext, 'leave_request_draft' | 'purchase_order_draft' | 'master_agreement_draft' | 'certification_draft' | 'evidence_draft' | 'finance_reconciliation_evidence_draft' | 'sample_sprint_report_draft'>, number> = {
+const MAX_PRIVATE_UPLOAD_BYTES_BY_CONTEXT: Record<DraftUploadContext, number> = {
   leave_request_draft: 10 * 1024 * 1024,
   purchase_order_draft: 10 * 1024 * 1024,
   master_agreement_draft: 25 * 1024 * 1024,
   certification_draft: 10 * 1024 * 1024,
   evidence_draft: 10 * 1024 * 1024,
   finance_reconciliation_evidence_draft: 10 * 1024 * 1024,
-  sample_sprint_report_draft: 25 * 1024 * 1024
+  sample_sprint_report_draft: 25 * 1024 * 1024,
+  resignation_letter_ratified_draft: 10 * 1024 * 1024
 }
 
 const CONTEXT_RETENTION_CLASS: Record<GreenhouseAssetContext, GreenhouseAssetRetentionClass> = {
@@ -81,7 +83,9 @@ const CONTEXT_RETENTION_CLASS: Record<GreenhouseAssetContext, GreenhouseAssetRet
   finance_reconciliation_evidence_draft: 'finance_reconciliation_evidence',
   finance_reconciliation_evidence: 'finance_reconciliation_evidence',
   sample_sprint_report_draft: 'commercial_engagement_report',
-  sample_sprint_report: 'commercial_engagement_report'
+  sample_sprint_report: 'commercial_engagement_report',
+  resignation_letter_ratified_draft: 'final_settlement_document',
+  resignation_letter_ratified: 'final_settlement_document'
 }
 
 const CONTEXT_PREFIX: Record<GreenhouseAssetContext, string> = {
@@ -103,7 +107,9 @@ const CONTEXT_PREFIX: Record<GreenhouseAssetContext, string> = {
   finance_reconciliation_evidence_draft: 'finance-reconciliation-evidence',
   finance_reconciliation_evidence: 'finance-reconciliation-evidence',
   sample_sprint_report_draft: 'sample-sprint-reports',
-  sample_sprint_report: 'sample-sprint-reports'
+  sample_sprint_report: 'sample-sprint-reports',
+  resignation_letter_ratified_draft: 'resignation-letters',
+  resignation_letter_ratified: 'resignation-letters'
 }
 
 const toNumber = (value: number | string | null | undefined) => {
@@ -278,7 +284,7 @@ const assertPrivateAssetUpload = ({
   contentType,
   sizeBytes
 }: {
-  contextType: Extract<GreenhouseAssetContext, 'leave_request_draft' | 'purchase_order_draft' | 'master_agreement_draft' | 'certification_draft' | 'evidence_draft' | 'finance_reconciliation_evidence_draft' | 'sample_sprint_report_draft'>
+  contextType: DraftUploadContext
   contentType: string
   sizeBytes: number
 }) => {
@@ -379,7 +385,7 @@ export const createPrivatePendingAsset = async ({
   ownerMemberId,
   metadata
 }: {
-  contextType: Extract<GreenhouseAssetContext, 'leave_request_draft' | 'purchase_order_draft' | 'master_agreement_draft' | 'certification_draft' | 'evidence_draft' | 'finance_reconciliation_evidence_draft' | 'sample_sprint_report_draft'>
+  contextType: DraftUploadContext
   uploadedByUserId: string
   fileName: string
   contentType: string
@@ -536,7 +542,7 @@ export const attachAssetToAggregate = async ({
   client
 }: {
   assetId: string
-  ownerAggregateType: Exclude<GreenhouseAssetContext, 'leave_request_draft' | 'purchase_order_draft' | 'master_agreement_draft' | 'certification_draft' | 'evidence_draft' | 'finance_reconciliation_evidence_draft' | 'sample_sprint_report_draft'>
+  ownerAggregateType: Exclude<GreenhouseAssetContext, DraftUploadContext>
   ownerAggregateId: string
   actorUserId: string
   ownerClientId?: string | null
@@ -872,6 +878,8 @@ export const canTenantAccessAsset = ({
     case 'payroll_export_csv':
       return canAccessPayrollExportAsset(tenant)
     case 'final_settlement_document':
+    case 'resignation_letter_ratified_draft':
+    case 'resignation_letter_ratified':
       return canAccessFinalSettlementDocumentAsset(tenant, asset)
     case 'certification_draft':
     case 'certification':

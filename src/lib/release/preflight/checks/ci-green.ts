@@ -26,6 +26,7 @@ import type { PreflightInput } from '../runner'
 interface WorkflowRun {
   readonly id: number
   readonly name: string
+  readonly path?: string
   readonly status: 'queued' | 'in_progress' | 'completed' | 'waiting' | 'requested'
   readonly conclusion:
     | 'success'
@@ -38,6 +39,7 @@ interface WorkflowRun {
     | null
   readonly html_url: string
   readonly head_sha: string
+  readonly created_at?: string
 }
 
 interface WorkflowRunsResponse {
@@ -46,6 +48,27 @@ interface WorkflowRunsResponse {
 }
 
 const isReleaseDeployWorkflow = (name: string): boolean => RELEASE_DEPLOY_WORKFLOW_NAMES.has(name)
+
+const runCreatedAtMs = (run: WorkflowRun): number => {
+  const parsed = Date.parse(run.created_at ?? '')
+
+  return Number.isFinite(parsed) ? parsed : 0
+}
+
+const latestRunPerWorkflow = (runs: readonly WorkflowRun[]): readonly WorkflowRun[] => {
+  const latest = new Map<string, WorkflowRun>()
+
+  for (const run of runs) {
+    const key = `${run.name}::${run.path ?? ''}`
+    const current = latest.get(key)
+
+    if (!current || runCreatedAtMs(run) >= runCreatedAtMs(current)) {
+      latest.set(key, run)
+    }
+  }
+
+  return [...latest.values()]
+}
 
 export const checkCiGreen = async (input: PreflightInput): Promise<PreflightCheckResult> => {
   const observedAtStart = Date.now()
@@ -72,7 +95,10 @@ export const checkCiGreen = async (input: PreflightInput): Promise<PreflightChec
 
   try {
     const data = await githubFetchJson<WorkflowRunsResponse>(endpoint, token)
-    const nonDeployRuns = data.workflow_runs.filter(run => !isReleaseDeployWorkflow(run.name))
+
+    const nonDeployRuns = latestRunPerWorkflow(
+      data.workflow_runs.filter(run => !isReleaseDeployWorkflow(run.name))
+    )
 
     if (nonDeployRuns.length === 0) {
       return {

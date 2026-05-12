@@ -5,6 +5,7 @@ import { randomUUID } from 'node:crypto'
 import type { PoolClient } from 'pg'
 
 import { getOperatingEntityIdentity } from '@/lib/account-360/organization-identity'
+import { buildSignatureFilenameForTaxId } from '@/lib/legal-signatures'
 import { resolveInitialApprovalAuthority } from '@/lib/approval-authority/resolver'
 import {
   getWorkflowApprovalSnapshotForStage,
@@ -14,6 +15,7 @@ import { query, withTransaction } from '@/lib/db'
 import { PayrollValidationError, normalizeNullableString } from '@/lib/payroll/shared'
 import { storeSystemGeneratedPrivateAsset } from '@/lib/storage/greenhouse-assets'
 import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
+import { captureWithDomain } from '@/lib/observability/capture'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 
 import { readFinalSettlementSnapshot } from '@/lib/person-legal-profile'
@@ -26,6 +28,8 @@ import {
   type FinalSettlementDocument,
   type FinalSettlementDocumentReadiness,
   type FinalSettlementDocumentSnapshot,
+  type FinalSettlementMaintenanceObligation,
+  type FinalSettlementRatification,
   type RenderFinalSettlementDocumentInput
 } from './document-types'
 import { getLatestFinalSettlementForCase } from './store'
@@ -50,6 +54,14 @@ type CollaboratorRow = {
   job_title: string | null
 }
 
+// TASK-862 Slice C — Worker address (TASK-784 person_addresses).
+type WorkerAddressRow = {
+  street_line_1: string | null
+  city: string | null
+  region: string | null
+  presentation_text: string | null
+}
+
 type OrganizationRow = {
   organization_id: string
   legal_name: string | null
@@ -58,6 +70,7 @@ type OrganizationRow = {
   tax_id_type: string | null
   legal_address: string | null
   country: string | null
+  logo_asset_id: string | null
 }
 
 const toTimestampString = (value: unknown): string | null => {
@@ -185,6 +198,46 @@ const getCollaboratorSnapshot = async (memberId: string, profileId: string): Pro
     taxId = null
   }
 
+  // TASK-862 Slice C — Worker address from TASK-784 person_addresses.
+  // Preferimos residence verified; fallback a residence pending (degraded, no blocker).
+  // Cualquier error -> address fields null + readiness check worker_address_resolved
+  // dispara warning (no blocker, no rompe emision).
+  let addressLine1: string | null = null
+  let city: string | null = null
+  let region: string | null = null
+  let addressPresentation: string | null = null
+
+  try {
+    const addressRows = await queryRows<WorkerAddressRow>(
+      `
+        SELECT street_line_1, city, region, presentation_text
+        FROM greenhouse_core.person_addresses
+        WHERE profile_id = $1
+          AND address_type = 'residence'
+          AND archived_at IS NULL
+          AND rejected_at IS NULL
+        ORDER BY
+          CASE verification_status WHEN 'verified' THEN 0 WHEN 'pending_review' THEN 1 ELSE 2 END,
+          updated_at DESC
+        LIMIT 1
+      `,
+      [row.profile_id]
+    )
+
+    if (addressRows[0]) {
+      addressLine1 = addressRows[0].street_line_1
+      city = addressRows[0].city
+      region = addressRows[0].region
+      addressPresentation = addressRows[0].presentation_text
+    }
+  } catch {
+    // Defensive: address gap is non-blocking; readiness check surfaces it.
+    addressLine1 = null
+    city = null
+    region = null
+    addressPresentation = null
+  }
+
   return {
     memberId: row.member_id,
     profileId: row.profile_id,
@@ -192,7 +245,11 @@ const getCollaboratorSnapshot = async (memberId: string, profileId: string): Pro
     legalName: row.legal_name ?? row.full_name,
     primaryEmail: row.primary_email ?? row.canonical_email,
     taxId,
-    jobTitle: row.job_title
+    jobTitle: row.job_title,
+    addressLine1,
+    city,
+    region,
+    addressPresentation
   }
 }
 
@@ -202,7 +259,7 @@ const getEmployerSnapshot = async (
   if (legalEntityOrganizationId) {
     const rows = await queryRows<OrganizationRow>(
       `
-        SELECT organization_id, legal_name, organization_name, tax_id, tax_id_type, legal_address, country
+        SELECT organization_id, legal_name, organization_name, tax_id, tax_id_type, legal_address, country, logo_asset_id
         FROM greenhouse_core.organizations
         WHERE organization_id = $1
           AND active = TRUE
@@ -221,7 +278,12 @@ const getEmployerSnapshot = async (
         taxIdType: row.tax_id_type,
         legalAddress: row.legal_address,
         country: row.country ?? 'CL',
-        source: 'settlement_legal_entity'
+        source: 'settlement_legal_entity',
+        logoAssetId: row.logo_asset_id, // TASK-862 Slice C
+        // TASK-863 V1.4 — firma del representante legal via helper canónico
+        // `@/lib/legal-signatures`. Convención de filename = `{taxId-cleaned}.png`.
+        // Reusable por cualquier flow legal (contratos, addenda, cartas).
+        legalRepresentativeSignaturePath: buildSignatureFilenameForTaxId(row.tax_id)
       }
     }
   }
@@ -239,15 +301,24 @@ const getEmployerSnapshot = async (
     taxIdType: operatingEntity.taxIdType,
     legalAddress: operatingEntity.legalAddress,
     country: operatingEntity.country,
-    source: 'operating_entity_fallback'
+    source: 'operating_entity_fallback',
+    logoAssetId: null, // TASK-862 Slice C — fallback no expone logo; PDF cae a Greenhouse default
+    // TASK-863 V1.4 — fallback path por taxId via helper canónico.
+    legalRepresentativeSignaturePath: buildSignatureFilenameForTaxId(operatingEntity.taxId)
   }
 }
 
 const buildDocumentReadiness = (
   settlement: FinalSettlement,
   employer: FinalSettlementDocumentSnapshot['employer'],
-  collaborator: FinalSettlementDocumentSnapshot['collaborator']
+  collaborator: FinalSettlementDocumentSnapshot['collaborator'],
+  // TASK-862 Slice C — pre-requisitos del finiquito de renuncia voluntaria.
+  resignationLetterAssetId: string | null,
+  maintenanceObligation: FinalSettlementMaintenanceObligation | null
 ): FinalSettlementDocumentReadiness => {
+  const isResignation = settlement.separationType === 'resignation'
+  const workerHasAddress = Boolean(collaborator.addressLine1 || collaborator.addressPresentation)
+
   const checks: FinalSettlementDocumentReadiness['checks'] = [
     {
       code: 'settlement_approved',
@@ -296,6 +367,28 @@ const buildDocumentReadiness = (
         : 'blocked',
       severity: 'blocker',
       message: 'Cada linea del documento debe traer policy, tratamiento y evidencia suficiente.'
+    },
+    // TASK-862 Slice C — 3 readiness checks nuevos. Aplican SOLO cuando separation_type=resignation
+    // (V1 scope). Otras causales heredan los 7 checks anteriores sin extension.
+    {
+      code: 'resignation_letter_uploaded',
+      status: !isResignation || resignationLetterAssetId ? 'passed' : 'blocked',
+      severity: 'blocker',
+      message: 'La carta de renuncia ratificada debe subirse antes de calcular y emitir el finiquito.',
+      evidence: { isResignation, resignationLetterAssetId }
+    },
+    {
+      code: 'maintenance_obligation_declared',
+      status: !isResignation || maintenanceObligation ? 'passed' : 'blocked',
+      severity: 'blocker',
+      message: 'La declaracion de pension de alimentos (Ley 21.389) debe registrarse antes de emitir el finiquito.',
+      evidence: { isResignation, declared: Boolean(maintenanceObligation) }
+    },
+    {
+      code: 'worker_address_resolved',
+      status: workerHasAddress ? 'passed' : 'warning',
+      severity: 'warning',
+      message: 'El domicilio del trabajador no esta registrado. El finiquito puede emitirse pero queda como advertencia para revision HR.'
     }
   ]
 
@@ -309,16 +402,58 @@ const buildDocumentReadiness = (
   }
 }
 
-const buildDocumentSnapshot = async (settlement: FinalSettlement): Promise<{
+// TASK-862 Slice C — Read finiquito pre-reqs from the offboarding case.
+// Tolera fallos defensively: si el case no tiene las columnas todavia (migration
+// no aplicada en algun env), retorna nulls y los readiness checks bloquean.
+const getOffboardingCasePreReqs = async (offboardingCaseId: string): Promise<{
+  resignationLetterAssetId: string | null
+  maintenanceObligation: FinalSettlementMaintenanceObligation | null
+}> => {
+  type CasePreReqRow = {
+    resignation_letter_asset_id: string | null
+    maintenance_obligation_json: FinalSettlementMaintenanceObligation | null
+  }
+
+  try {
+    const rows = await queryRows<CasePreReqRow>(
+      `
+        SELECT resignation_letter_asset_id, maintenance_obligation_json
+        FROM greenhouse_hr.work_relationship_offboarding_cases
+        WHERE offboarding_case_id = $1
+        LIMIT 1
+      `,
+      [offboardingCaseId]
+    )
+
+    const row = rows[0]
+
+    return {
+      resignationLetterAssetId: row?.resignation_letter_asset_id ?? null,
+      maintenanceObligation: row?.maintenance_obligation_json ?? null
+    }
+  } catch {
+    return { resignationLetterAssetId: null, maintenanceObligation: null }
+  }
+}
+
+const buildDocumentSnapshot = async (settlement: FinalSettlement, ratification?: FinalSettlementRatification | null): Promise<{
   snapshot: FinalSettlementDocumentSnapshot
   readiness: FinalSettlementDocumentReadiness
 }> => {
-  const [collaborator, employer] = await Promise.all([
+  const [collaborator, employer, preReqs] = await Promise.all([
     getCollaboratorSnapshot(settlement.memberId, settlement.profileId),
-    getEmployerSnapshot(settlement.legalEntityOrganizationId)
+    getEmployerSnapshot(settlement.legalEntityOrganizationId),
+    getOffboardingCasePreReqs(settlement.offboardingCaseId)
   ])
 
-  const readiness = buildDocumentReadiness(settlement, employer, collaborator)
+  const readiness = buildDocumentReadiness(
+    settlement,
+    employer,
+    collaborator,
+    preReqs.resignationLetterAssetId,
+    preReqs.maintenanceObligation
+  )
+
   const generatedAt = new Date().toISOString()
 
   return {
@@ -383,7 +518,13 @@ const buildDocumentSnapshot = async (settlement: FinalSettlement): Promise<{
       breakdown: settlement.breakdown,
       explanation: settlement.explanation,
       readiness: settlement.readiness,
-      documentReadiness: readiness
+      documentReadiness: readiness,
+      // TASK-862 Slice C — pre-requisitos y datos extendidos en top-level del snapshot.
+      // Slice D los consume para renderizar Ley 21.389 banner, reserva de derechos
+      // bloque + watermark logic + logo empleador.
+      maintenanceObligation: preReqs.maintenanceObligation,
+      resignationLetterAssetId: preReqs.resignationLetterAssetId,
+      ratification: ratification ?? null
     },
     readiness
   }
@@ -561,7 +702,16 @@ export const renderFinalSettlementDocumentForCase = async (input: RenderFinalSet
         [active.finalSettlementDocumentId, input.actorUserId]
       )
 
-      const superseded = mapDocumentRow(supersedeRows.rows[0])
+      const supersededRow = mapDocumentRow(supersedeRows.rows[0])
+
+      // TASK-863 V1.5.2 — Regenera PDF del doc viejo con watermark "REEMPLAZADO" neutral
+      // (matriz V1.1). Si alguien descarga el asset del doc superseded después, ve
+      // claramente que fue reemplazado por una versión posterior.
+      const supersededRegen = await regenerateDocumentPdfForStatus(client, supersededRow, 'superseded', input.actorUserId)
+
+      const superseded = supersededRegen
+        ? { ...supersededRow, pdfAssetId: supersededRegen.pdfAssetId, contentHash: supersededRegen.contentHash }
+        : supersededRow
 
       await insertDocumentEvent(client, {
         document: superseded,
@@ -582,7 +732,7 @@ export const renderFinalSettlementDocumentForCase = async (input: RenderFinalSet
 
     const documentId = `final-settlement-document-${randomUUID()}`
     const snapshotHash = computeJsonSha256(snapshot)
-    const pdfBytes = await renderFinalSettlementDocumentPdf(snapshot)
+    const pdfBytes = await renderFinalSettlementDocumentPdf(snapshot, { documentStatus: 'rendered' })
     const contentHash = computeBytesSha256(pdfBytes)
     const documentVersion = (latest?.documentVersion ?? 0) + 1
     const fileName = `finiquito-${settlement.memberId}-v${settlement.settlementVersion}-d${documentVersion}.pdf`
@@ -603,6 +753,10 @@ export const renderFinalSettlementDocumentForCase = async (input: RenderFinalSet
         reissue: Boolean(input.reissue),
         reissueReason,
         snapshotHash,
+        // TASK-863 V1.5.2 — canonical key para reliability signal drift detection.
+        // Initial draft creation siempre nace en 'rendered'; transitions posteriores
+        // actualizan via regenerateDocumentPdfForStatus que sobrescribe esta key.
+        documentStatusAtRender: 'rendered',
         contentHash
       }
     })
@@ -745,6 +899,114 @@ const assertSnapshotHashMatches = (document: FinalSettlementDocument) => {
   }
 }
 
+/**
+ * TASK-863 V1.1 — Regenera el PDF + reemplaza el asset cuando el documento
+ * transita a un estado que requiere render distinto:
+ *   - `issued`: watermark "PROYECTO" → CLEAN (PDF para llevar al notario)
+ *   - `signed_or_ratified`: + bloque de ministro de fe + reserva worker
+ *
+ * Mantiene `pdf_asset_id` apuntando al nuevo asset; el viejo queda con status
+ * `attached` historico (no se borra para audit trail).
+ *
+ * Es idempotente: si el render falla, la transition de estado ya commiteo
+ * (UPDATE document_status) y el operador puede invocar reissue para recovery.
+ * Esto NO es ideal pero evita rollback de un estado legal valido por error
+ * transitorio de render.
+ */
+// TASK-863 V1.5.2 — Canonical set de transitions que regeneran PDF post-update.
+// `rendered` NO está aquí: ese es el status inicial al crear el draft (línea 725).
+// Cualquier transition fuera de `rendered` invalida el PDF persistido y debe regenerar
+// para preservar invariante "PDF refleja el documentStatus actual".
+type DocumentStatusForRegen =
+  | 'in_review'
+  | 'approved'
+  | 'issued'
+  | 'signed_or_ratified'
+  | 'superseded'
+  | 'voided'
+  | 'rejected'
+
+/**
+ * Regen canónico del PDF post-transición de estado.
+ *
+ * Invariante: TODA transición fuera de `rendered` (estado inicial del draft) debe
+ * pasar por este helper para mantener `pdf_asset_id` apuntando a un PDF rendereado
+ * con el `documentStatus` actual de DB. Drift entre DB.document_status y
+ * Asset.metadata.documentStatusAtRender es detectado por el reliability signal
+ * `payroll.final_settlement_document.pdf_status_drift`.
+ *
+ * Failure mode canónico: si el render falla, la transition de estado en DB ya commiteó
+ * (estado legal es source of truth, no se bloquea por render). Se reporta a Sentry
+ * via captureWithDomain('hr', ...) con tags suficientes para diagnóstico. El reliability
+ * signal alertará drift hasta que el operador haga reissue o el reactive consumer
+ * (futuro V1.5.3) regenere async.
+ */
+const regenerateDocumentPdfForStatus = async (
+  client: PoolClient,
+  document: FinalSettlementDocument,
+  newDocumentStatus: DocumentStatusForRegen,
+  actorUserId: string,
+  ratification?: FinalSettlementRatification | null
+): Promise<{ pdfAssetId: string; contentHash: string } | null> => {
+  try {
+    // Snapshot inmutable: reuse el existente (hash matches, ya validado upstream).
+    // Para signed_or_ratified, hidratamos la ratification si el caller la pasa.
+    const snapshot: FinalSettlementDocumentSnapshot = ratification
+      ? { ...document.snapshot, ratification }
+      : document.snapshot
+
+    const pdfBytes = await renderFinalSettlementDocumentPdf(snapshot, { documentStatus: newDocumentStatus })
+    const contentHash = computeBytesSha256(pdfBytes)
+    const fileName = `finiquito-${document.memberId}-v${document.settlementVersion}-d${document.documentVersion}-${newDocumentStatus}.pdf`
+
+    const asset = await storeSystemGeneratedPrivateAsset({
+      ownerAggregateType: 'final_settlement_document',
+      ownerAggregateId: document.finalSettlementDocumentId,
+      ownerMemberId: document.memberId,
+      fileName,
+      mimeType: 'application/pdf',
+      bytes: pdfBytes,
+      actorUserId,
+      metadata: {
+        finalSettlementId: document.finalSettlementId,
+        offboardingCaseId: document.offboardingCaseId,
+        documentVersion: document.documentVersion,
+        // TASK-863 V1.5.2 — canonical key para reliability signal drift detection.
+        // NUNCA cambiar el nombre de esta key sin actualizar también el reader del signal
+        // en `src/lib/reliability/queries/final-settlement-pdf-status-drift.ts`.
+        documentStatusAtRender: newDocumentStatus,
+        contentHash
+      }
+    })
+
+    await client.query(
+      `UPDATE greenhouse_payroll.final_settlement_documents
+       SET pdf_asset_id = $2, content_hash = $3, updated_at = now(), updated_by_user_id = $4
+       WHERE final_settlement_document_id = $1`,
+      [document.finalSettlementDocumentId, asset.assetId, contentHash, actorUserId]
+    )
+
+    return { pdfAssetId: asset.assetId, contentHash }
+  } catch (error) {
+    // Render fail no debe abortar la transition (estado legal ya commiteado).
+    // Reliability signal `payroll.final_settlement_document.pdf_status_drift` detectará
+    // el drift hasta que operador haga reissue o reactive consumer regenere async.
+    captureWithDomain(error, 'payroll', {
+      tags: {
+        source: 'final_settlement_pdf_regen',
+        stage: newDocumentStatus
+      },
+      extra: {
+        finalSettlementDocumentId: document.finalSettlementDocumentId,
+        memberId: document.memberId,
+        documentVersion: document.documentVersion
+      }
+    })
+
+    return null
+  }
+}
+
 export const submitFinalSettlementDocumentForReview = async ({
   offboardingCaseId,
   actorUserId
@@ -792,16 +1054,25 @@ export const submitFinalSettlementDocumentForReview = async ({
 
   const document = mapDocumentRow(result.rows[0])
 
+  // TASK-863 V1.5.2 — Regenerar PDF al transicionar a in_review para que el badge
+  // refleje "En revisión interna" en lugar del "Borrador HR" del render original.
+  // Watermark PROYECTO se mantiene (matriz V1.1: rendered/in_review/approved → PROYECTO).
+  const regenerated = await regenerateDocumentPdfForStatus(client, document, 'in_review', actorUserId)
+
+  const reviewDocument = regenerated
+    ? { ...document, pdfAssetId: regenerated.pdfAssetId, contentHash: regenerated.contentHash }
+    : document
+
   await insertDocumentEvent(client, {
-    document,
+    document: reviewDocument,
     eventType: EVENT_TYPES.hrFinalSettlementDocumentSubmittedForReview,
     fromStatus: current.documentStatus,
-    toStatus: document.documentStatus,
+    toStatus: reviewDocument.documentStatus,
     actorUserId
   })
-  await publishDocumentEvent(client, EVENT_TYPES.hrFinalSettlementDocumentSubmittedForReview, document)
+  await publishDocumentEvent(client, EVENT_TYPES.hrFinalSettlementDocumentSubmittedForReview, reviewDocument)
 
-  return document
+  return reviewDocument
 })
 
 export const approveFinalSettlementDocumentForCase = async ({
@@ -849,16 +1120,28 @@ export const approveFinalSettlementDocumentForCase = async ({
 
   const document = mapDocumentRow(result.rows[0])
 
+  // TASK-863 V1.5.2 — Regenerar PDF al transicionar a approved para que el badge
+  // refleje "Aprobado · pendiente de emisión" en lugar del "Borrador HR" del render
+  // original. Watermark PROYECTO se mantiene (matriz V1.1: rendered/in_review/approved
+  // → PROYECTO; sólo issued/signed_or_ratified → CLEAN sin watermark).
+  // Bug class fix: el badge persistido en el PDF no reflejaba el estado real del flow
+  // después de aprobar; operador descargaba doc aprobado pero lo veía como "Borrador HR".
+  const regenerated = await regenerateDocumentPdfForStatus(client, document, 'approved', actorUserId)
+
+  const approvedDocument = regenerated
+    ? { ...document, pdfAssetId: regenerated.pdfAssetId, contentHash: regenerated.contentHash }
+    : document
+
   await insertDocumentEvent(client, {
-    document,
+    document: approvedDocument,
     eventType: EVENT_TYPES.hrFinalSettlementDocumentApproved,
     fromStatus: current.documentStatus,
-    toStatus: document.documentStatus,
+    toStatus: approvedDocument.documentStatus,
     actorUserId
   })
-  await publishDocumentEvent(client, EVENT_TYPES.hrFinalSettlementDocumentApproved, document)
+  await publishDocumentEvent(client, EVENT_TYPES.hrFinalSettlementDocumentApproved, approvedDocument)
 
-  return document
+  return approvedDocument
 })
 
 export const issueFinalSettlementDocumentForCase = async ({
@@ -898,17 +1181,27 @@ export const issueFinalSettlementDocumentForCase = async ({
 
   const document = mapDocumentRow(result.rows[0])
 
+  // TASK-863 V1.1 — Regenerar PDF al transicionar a issued para que el
+  // operador descargue el PDF SIN watermark "PROYECTO" para llevar al notario.
+  // Idempotente: si falla el render, la transition de estado ya commiteo y
+  // operador puede usar reissue para recovery.
+  const regenerated = await regenerateDocumentPdfForStatus(client, document, 'issued', actorUserId)
+
+  const issuedDocument = regenerated
+    ? { ...document, pdfAssetId: regenerated.pdfAssetId, contentHash: regenerated.contentHash }
+    : document
+
   await insertDocumentEvent(client, {
-    document,
+    document: issuedDocument,
     eventType: EVENT_TYPES.hrFinalSettlementDocumentIssued,
     fromStatus: current.documentStatus,
-    toStatus: document.documentStatus,
+    toStatus: issuedDocument.documentStatus,
     actorUserId,
-    payload: { pdfAssetId: document.pdfAssetId }
+    payload: { pdfAssetId: issuedDocument.pdfAssetId, pdfRegenerated: Boolean(regenerated) }
   })
-  await publishDocumentEvent(client, EVENT_TYPES.hrFinalSettlementDocumentIssued, document)
+  await publishDocumentEvent(client, EVENT_TYPES.hrFinalSettlementDocumentIssued, issuedDocument)
 
-  return document
+  return issuedDocument
 })
 
 export const voidFinalSettlementDocumentForCase = async ({
@@ -951,17 +1244,25 @@ export const voidFinalSettlementDocumentForCase = async ({
 
   const document = mapDocumentRow(result.rows[0])
 
+  // TASK-863 V1.5.2 — Regenera PDF con watermark "ANULADO" error (matriz V1.1).
+  // Si alguien descarga el asset después, ve inmediatamente que el documento fue anulado.
+  const regenerated = await regenerateDocumentPdfForStatus(client, document, 'voided', actorUserId)
+
+  const voidedDocument = regenerated
+    ? { ...document, pdfAssetId: regenerated.pdfAssetId, contentHash: regenerated.contentHash }
+    : document
+
   await insertDocumentEvent(client, {
-    document,
+    document: voidedDocument,
     eventType: EVENT_TYPES.hrFinalSettlementDocumentVoided,
     fromStatus: current.documentStatus,
-    toStatus: document.documentStatus,
+    toStatus: voidedDocument.documentStatus,
     actorUserId,
     reason: normalizedReason
   })
-  await publishDocumentEvent(client, EVENT_TYPES.hrFinalSettlementDocumentVoided, document, { reason: normalizedReason })
+  await publishDocumentEvent(client, EVENT_TYPES.hrFinalSettlementDocumentVoided, voidedDocument, { reason: normalizedReason })
 
-  return document
+  return voidedDocument
 })
 
 export const rejectFinalSettlementDocumentByWorkerForCase = async ({
@@ -1004,17 +1305,25 @@ export const rejectFinalSettlementDocumentByWorkerForCase = async ({
 
   const document = mapDocumentRow(result.rows[0])
 
+  // TASK-863 V1.5.2 — Regenera PDF con watermark "RECHAZADO" error (matriz V1.1).
+  // Operador o trabajador descargan asset post-rejection y ven inmediatamente el estado.
+  const regenerated = await regenerateDocumentPdfForStatus(client, document, 'rejected', actorUserId)
+
+  const rejectedDocument = regenerated
+    ? { ...document, pdfAssetId: regenerated.pdfAssetId, contentHash: regenerated.contentHash }
+    : document
+
   await insertDocumentEvent(client, {
-    document,
+    document: rejectedDocument,
     eventType: EVENT_TYPES.hrFinalSettlementDocumentRejected,
     fromStatus: current.documentStatus,
-    toStatus: document.documentStatus,
+    toStatus: rejectedDocument.documentStatus,
     actorUserId,
     reason: normalizedReason
   })
-  await publishDocumentEvent(client, EVENT_TYPES.hrFinalSettlementDocumentRejected, document, { reason: normalizedReason })
+  await publishDocumentEvent(client, EVENT_TYPES.hrFinalSettlementDocumentRejected, rejectedDocument, { reason: normalizedReason })
 
-  return document
+  return rejectedDocument
 })
 
 export const markFinalSettlementDocumentSignedOrRatifiedForCase = async ({
@@ -1073,23 +1382,51 @@ export const markFinalSettlementDocumentSignedOrRatifiedForCase = async ({
 
   const document = mapDocumentRow(result.rows[0])
 
+  // TASK-863 V1.1 — Regenerar PDF al transicionar a signed_or_ratified.
+  // El nuevo render embebe metadata del ministro de fe + worker reservation
+  // como ratification snapshot, y queda SIN watermark.
+  const ratificationSnapshot: FinalSettlementRatification | null = (() => {
+    const minister = (evidenceRef as Record<string, unknown>) ?? {}
+    const ratifiedAt = typeof minister.ratifiedAt === 'string' ? minister.ratifiedAt : null
+
+    if (!ratifiedAt) return null
+
+    return {
+      ministerKind: typeof minister.ministerKind === 'string' ? minister.ministerKind : null,
+      ministerName: typeof minister.ministerName === 'string' ? minister.ministerName : null,
+      ministerTaxId: typeof minister.ministerTaxId === 'string' ? minister.ministerTaxId : null,
+      notaria: typeof minister.notaria === 'string' ? minister.notaria : null,
+      ratifiedAt,
+      workerReservationOfRights: document.workerReservationOfRights,
+      workerReservationNotes: document.workerReservationNotes,
+      signatureEvidenceAssetId: document.signatureEvidenceAssetId
+    } as FinalSettlementRatification
+  })()
+
+  const regenerated = await regenerateDocumentPdfForStatus(client, document, 'signed_or_ratified', actorUserId, ratificationSnapshot)
+
+  const ratifiedDocument = regenerated
+    ? { ...document, pdfAssetId: regenerated.pdfAssetId, contentHash: regenerated.contentHash }
+    : document
+
   await insertDocumentEvent(client, {
-    document,
+    document: ratifiedDocument,
     eventType: EVENT_TYPES.hrFinalSettlementDocumentSignedOrRatified,
     fromStatus: current.documentStatus,
-    toStatus: document.documentStatus,
+    toStatus: ratifiedDocument.documentStatus,
     actorUserId,
     payload: {
-      signatureEvidenceAssetId: document.signatureEvidenceAssetId,
-      hasExternalEvidenceRef: Object.keys(document.signatureEvidenceRef).length > 0,
-      workerReservationOfRights: document.workerReservationOfRights
+      signatureEvidenceAssetId: ratifiedDocument.signatureEvidenceAssetId,
+      hasExternalEvidenceRef: Object.keys(ratifiedDocument.signatureEvidenceRef).length > 0,
+      workerReservationOfRights: ratifiedDocument.workerReservationOfRights,
+      pdfRegenerated: Boolean(regenerated)
     }
   })
-  await publishDocumentEvent(client, EVENT_TYPES.hrFinalSettlementDocumentSignedOrRatified, document, {
-    workerReservationOfRights: document.workerReservationOfRights
+  await publishDocumentEvent(client, EVENT_TYPES.hrFinalSettlementDocumentSignedOrRatified, ratifiedDocument, {
+    workerReservationOfRights: ratifiedDocument.workerReservationOfRights
   })
 
-  return document
+  return ratifiedDocument
 })
 
 export const getFinalSettlementDocumentDownloadUrl = (document: FinalSettlementDocument) =>

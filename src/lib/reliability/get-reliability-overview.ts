@@ -27,6 +27,7 @@ import type { SyntheticRouteSnapshot } from '@/types/reliability-synthetic'
 import { buildAiSummarySignals } from './ai/build-ai-summary-signals'
 import { getLatestAiObservationsByScope, type AiObservation } from './ai/reader'
 import { getAccountBalancesFxDriftSignal } from './queries/account-balances-fx-drift'
+import { getFinalSettlementPdfStatusDriftSignal } from './queries/final-settlement-pdf-status-drift'
 import {
   getExpenseDistributionSharedPoolContaminationSignal,
   getExpenseDistributionUnresolvedSignal
@@ -326,6 +327,7 @@ interface ReliabilityOverviewSources {
    * latest artifacts with failed validation or entries newer than artifact.
    */
   payrollComplianceExportDrift?: ReliabilitySignal | null
+  finalSettlementPdfStatusDrift?: ReliabilitySignal | null
 
   /**
    * TASK-766 Slice 2 — Finance CLP currency drift signals. 2 readers que
@@ -547,6 +549,10 @@ export const buildReliabilityOverview = (
     ...(sources.paymentOrderSettlement ?? []),
     // TASK-812 — Previred/LRE artifact registry drift.
     ...(sources.payrollComplianceExportDrift ? [sources.payrollComplianceExportDrift] : []),
+    // TASK-863 V1.5.2 — Final settlement PDF status drift (DB document_status vs
+    // PDF asset metadata.documentStatusAtRender). Defense-in-depth para detectar
+    // regen failure o transition agregada al state machine sin pasar por el helper.
+    ...(sources.finalSettlementPdfStatusDrift ? [sources.finalSettlementPdfStatusDrift] : []),
     // TASK-766 Slice 2 — Finance CLP currency drift signals (expense + income).
     ...(sources.financeClpDrift ?? []),
     // TASK-771 Slice 4 — Provider BQ sync dead-letter signal (drift PG↔BQ).
@@ -754,6 +760,14 @@ export const getReliabilityOverview = async (
     preloadedSources.payrollComplianceExportDrift !== undefined
       ? preloadedSources.payrollComplianceExportDrift
       : await getPayrollComplianceExportDriftSignal().catch(() => null)
+
+  // TASK-863 V1.5.2 — Final settlement PDF status drift (DB vs asset metadata).
+  // Detecta documentos cuyo pdf_asset_id apunta a un PDF rendereado con un
+  // documentStatus distinto al actual en DB. Steady=0 post-helper canónico.
+  const finalSettlementPdfStatusDrift =
+    preloadedSources.finalSettlementPdfStatusDrift !== undefined
+      ? preloadedSources.finalSettlementPdfStatusDrift
+      : await getFinalSettlementPdfStatusDriftSignal().catch(() => null)
 
   // TASK-766 Slice 2 — Finance CLP currency drift signals (expense + income).
   const financeClpDrift =
@@ -1013,6 +1027,7 @@ export const getReliabilityOverview = async (
     domainIncidents,
     paymentOrderSettlement,
     payrollComplianceExportDrift,
+    finalSettlementPdfStatusDrift,
     financeClpDrift,
     providerBqSyncDeadLetter,
     outboxHealth,

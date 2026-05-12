@@ -118,6 +118,95 @@ const isWeekend = (dateKey: string) => {
   return day === 0 || day === 6
 }
 
+/**
+ * TASK-862 Slice A — Compute completed full months between two dates.
+ * Reusa parseDate del modulo. Si startDate >= endDate, devuelve 0.
+ * No fail-loud: dates invalidos devuelven 0 (downstream readiness checks marcan el gap).
+ */
+const computeMonthsBetween = (startDateStr: string | null, endDateStr: string): number => {
+  if (!startDateStr) return 0
+
+  let start: Date
+  let end: Date
+
+  try {
+    start = parseDate(startDateStr)
+    end = parseDate(endDateStr)
+  } catch {
+    return 0
+  }
+
+  const startMs = start.getTime()
+  const endMs = end.getTime()
+
+  if (Number.isNaN(startMs) || Number.isNaN(endMs) || endMs <= startMs) return 0
+
+  const years = end.getUTCFullYear() - start.getUTCFullYear()
+  const months = end.getUTCMonth() - start.getUTCMonth()
+  const dayAdjustment = end.getUTCDate() < start.getUTCDate() ? -1 : 0
+  const totalMonths = years * 12 + months + dayAdjustment
+
+  return Math.max(0, totalMonths)
+}
+
+/**
+ * TASK-862 Slice A — Gratificacion legal proporcional pendiente al termino.
+ *
+ * Aplica SOLO cuando gratificacionLegalMode === 'anual_proporcional'. Modalidad
+ * mensual_25pct ya se paga mes a mes via chileGratificacionLegalAmount dentro de
+ * calculatePayrollTotals; modalidad ninguna no genera derecho.
+ *
+ * Formula art. 50 CT: el empleador puede optar por pagar 25% de lo devengado en
+ * remuneraciones mensuales con tope 4,75 ingresos minimos mensuales anuales.
+ * Proporcional al periodo trabajado.
+ *
+ * mesesDevengados se cappea a 12 porque art. 50 acumula maximo un ciclo anual
+ * entre pagos. No tenemos columna last_annual_gratification_paid_at en
+ * compensation_versions (verificado live), por lo que usamos hireDate como
+ * proxy del ultimo "reset" de acumulacion.
+ *
+ * Si no se puede resolver IMM (Ingreso Minimo Mensual), retorna 0 y no se emite
+ * la linea. Esto es defensive: el motor no debe inventar el tope.
+ */
+const resolveMonthlyGratificationDue = async ({
+  gratificacionLegalMode,
+  baseSalary,
+  hireDate,
+  lastWorkingDay,
+  periodDate
+}: {
+  gratificacionLegalMode: 'mensual_25pct' | 'anual_proporcional' | 'ninguna'
+  baseSalary: number
+  hireDate: string | null
+  lastWorkingDay: string
+  periodDate: string
+}): Promise<number> => {
+  if (gratificacionLegalMode !== 'anual_proporcional') return 0
+  if (baseSalary <= 0) return 0
+
+  const mesesDevengados = Math.min(computeMonthsBetween(hireDate, lastWorkingDay), 12)
+
+  if (mesesDevengados <= 0) return 0
+
+  let immSnapshot: { value: number | null } | null = null
+
+  try {
+    immSnapshot = await getHistoricalEconomicIndicatorForPeriod({
+      indicatorCode: 'IMM',
+      periodDate
+    })
+  } catch {
+    immSnapshot = null
+  }
+
+  if (!immSnapshot?.value || immSnapshot.value <= 0) return 0
+
+  const basePeriodo = baseSalary * mesesDevengados * 0.25
+  const tope = (4.75 * immSnapshot.value / 12) * mesesDevengados
+
+  return roundCurrency(Math.min(basePeriodo, tope))
+}
+
 const countCompensableCalendarDays = async ({
   businessVacationDays,
   lastWorkingDay,
@@ -382,7 +471,20 @@ export const calculateFinalSettlement = async (context: FinalSettlementCalculati
     periodDate
   })
 
-  const vacationDays = Math.max(0, leaveBalance.availableDays)
+  const vacationNetDays = leaveBalance.availableDays // signed: negative = used > rights
+  const vacationDays = Math.max(0, vacationNetDays)
+  const dailyVacationBase = roundTwo(compensation.baseSalary / 30)
+
+  // TASK-862 Slice A — Split feriado in two lines:
+  //   - pending_vacation_carryover: dias arrastrados de anios anteriores (carriedOverDays + progressiveExtraDays)
+  //   - proportional_vacation_current_period: resto del derecho disponible (= allowance + adjustment - used - reserved)
+  // Calendar-day conversion (DT art. 73) sigue siendo total (no se duplica el call); el amount se split
+  // proporcionalmente. Razon: la regla DT cuenta dias corridos consecutivos desde lastWorkingDay+1,
+  // y un split en dos calls daria una suma > total real al chocar weekends/feriados que se cuentan
+  // dos veces.
+  const carryoverBusinessDaysRaw = roundTwo(leaveBalance.carriedOverDays + leaveBalance.progressiveExtraDays)
+  const carryoverBusinessDays = Math.max(0, Math.min(carryoverBusinessDaysRaw, vacationDays))
+  const currentPeriodBusinessDays = Math.max(0, roundTwo(vacationDays - carryoverBusinessDays))
 
   const vacationCalendar = await countCompensableCalendarDays({
     businessVacationDays: vacationDays,
@@ -390,13 +492,40 @@ export const calculateFinalSettlement = async (context: FinalSettlementCalculati
     countryCode
   })
 
-  const dailyVacationBase = roundTwo(compensation.baseSalary / 30)
-  const vacationAmount = roundCurrency(vacationCalendar.calendarDays * dailyVacationBase)
+  const totalVacationAmount = roundCurrency(vacationCalendar.calendarDays * dailyVacationBase)
+  const carryoverShareRatio = vacationDays > 0 ? carryoverBusinessDays / vacationDays : 0
+  const carryoverAmount = roundCurrency(totalVacationAmount * carryoverShareRatio)
+  const currentPeriodAmount = roundCurrency(totalVacationAmount - carryoverAmount)
+
+  // TASK-862 Slice A — Vacaciones adelantadas: descuento autorizado cuando availableDays < 0.
+  // El motor antes hacia Math.max(0, availableDays) y la deuda se silenciaba.
+  const advancedVacationDays = vacationNetDays < 0 ? Math.abs(vacationNetDays) : 0
+  const advancedVacationAmount = roundCurrency(advancedVacationDays * dailyVacationBase)
+
+  // TASK-862 Slice A — Gratificacion legal proporcional para modo anual_proporcional.
+  // mode mensual_25pct ya se cubre en calculatePayrollTotals via chileGratificacionLegalAmount.
+  const gratificationDueAmount = await resolveMonthlyGratificationDue({
+    gratificacionLegalMode: compensation.gratificacionLegalMode,
+    baseSalary: compensation.baseSalary,
+    hireDate,
+    lastWorkingDay: offboardingCase.lastWorkingDay,
+    periodDate
+  })
+
   const manualDeductions = context.manualDeductions ?? []
 
   const statutoryDeductionAmount = pendingBaseSalary + pendingFixedBonus > 0
     ? payrollTotals.chileTotalDeductions ?? 0
     : 0
+
+  // TASK-862 Slice A — payroll_overlap_adjustment como linea INFORMATIVA (amount=0, kind=informational).
+  // Documenta el estado del overlap ledger en el documento, NUNCA aplica charge silencioso.
+  // El filter final preserva lineas informational independientemente del amount.
+  const overlapLedger = payrollOverlap.ledger ?? payrollOverlap
+
+  const overlapLabel = monthlyPayrollCoversPeriod
+    ? `Remuneracion del periodo ya cubierta por nomina mensual ${payrollOverlap.periodId}`
+    : `Nomina mensual ${payrollOverlap.periodId} aun no cubre el periodo`
 
   const breakdown: FinalSettlementBreakdownLine[] = [
     withFinalSettlementPolicy({
@@ -425,21 +554,76 @@ export const calculateFinalSettlement = async (context: FinalSettlementCalculati
       taxability: pendingFixedBonus > 0 ? undefined : 'taxable_non_imponible'
     }),
     withFinalSettlementPolicy({
-      componentCode: 'proportional_vacation',
-      label: 'Feriado proporcional o pendiente',
+      componentCode: 'monthly_gratification_due',
+      label: 'Gratificacion legal proporcional pendiente',
       kind: 'earning' as const,
-      amount: vacationAmount,
+      amount: gratificationDueAmount,
       basis: {
-        businessVacationDays: vacationDays,
+        gratificacionLegalMode: compensation.gratificacionLegalMode,
+        baseSalary: compensation.baseSalary,
+        hireDateSnapshot: hireDate,
+        lastWorkingDay: offboardingCase.lastWorkingDay,
+        formulaSource: 'cl.art_50_CT.4_75_imm_per_12'
+      },
+      formulaRef: 'cl.final_settlement.monthly_gratification_due.v1',
+      sourceRef: { compensationVersionId: compensation.versionId, periodDate },
+      evidence: {
+        dtUrl: 'https://www.dt.gob.cl/portal/1626/w3-article-60145.html',
+        treatment: 'Gratificacion legal art. 50 CT, modalidad anual proporcional acumulada hasta termino.'
+      }
+    }),
+    withFinalSettlementPolicy({
+      componentCode: 'pending_vacation_carryover',
+      label: 'Feriado pendiente - anios anteriores',
+      kind: 'earning' as const,
+      amount: carryoverAmount,
+      basis: {
+        businessVacationDays: carryoverBusinessDays,
         compensatedCalendarDays: vacationCalendar.calendarDays,
         dailyVacationBase,
+        shareRatio: carryoverShareRatio,
         holidaySource: vacationCalendar.holidaySource
       },
-      formulaRef: 'cl.final_settlement.proportional_vacation.dt.v1',
+      formulaRef: 'cl.final_settlement.pending_vacation_carryover.dt.v1',
       sourceRef: { leaveBalanceId: leaveBalance.balanceId, dtUrl: 'https://www.dt.gob.cl/portal/1628/w3-article-60200.html' },
       evidence: {
         siiUrl: 'https://www.sii.cl/preguntas_frecuentes/declaracion_renta/001_140_5683.htm',
-        treatment: 'Ingreso no renta por vacaciones indemnizadas en finiquito.'
+        treatment: 'Ingreso no renta por vacaciones indemnizadas en finiquito (saldo de anios anteriores).'
+      }
+    }),
+    withFinalSettlementPolicy({
+      componentCode: 'proportional_vacation_current_period',
+      label: 'Feriado proporcional - anio en curso',
+      kind: 'earning' as const,
+      amount: currentPeriodAmount,
+      basis: {
+        businessVacationDays: currentPeriodBusinessDays,
+        compensatedCalendarDays: vacationCalendar.calendarDays,
+        dailyVacationBase,
+        shareRatio: 1 - carryoverShareRatio,
+        holidaySource: vacationCalendar.holidaySource
+      },
+      formulaRef: 'cl.final_settlement.proportional_vacation_current_period.dt.v1',
+      sourceRef: { leaveBalanceId: leaveBalance.balanceId, dtUrl: 'https://www.dt.gob.cl/portal/1628/w3-article-60200.html' },
+      evidence: {
+        siiUrl: 'https://www.sii.cl/preguntas_frecuentes/declaracion_renta/001_140_5683.htm',
+        treatment: 'Ingreso no renta por feriado proporcional del anio en curso indemnizado en finiquito.'
+      }
+    }),
+    withFinalSettlementPolicy({
+      componentCode: 'used_or_advanced_vacation_adjustment',
+      label: 'Ajuste por feriado usado o anticipado',
+      kind: 'deduction' as const,
+      amount: advancedVacationAmount,
+      basis: {
+        advancedBusinessDays: advancedVacationDays,
+        dailyVacationBase,
+        leaveBalanceNet: vacationNetDays
+      },
+      formulaRef: 'cl.final_settlement.used_or_advanced_vacation_adjustment.v1',
+      sourceRef: { leaveBalanceId: leaveBalance.balanceId },
+      evidence: {
+        treatment: 'Descuento autorizado por dias de feriado tomados por adelantado sobre el derecho devengado.'
       }
     }),
     withFinalSettlementPolicy({
@@ -465,6 +649,25 @@ export const calculateFinalSettlement = async (context: FinalSettlementCalculati
         deductionBase: 'pending_taxable_remuneration_delta_only'
       }
     }),
+    withFinalSettlementPolicy({
+      componentCode: 'payroll_overlap_adjustment',
+      label: 'Ajuste por superposicion con nomina mensual',
+      kind: 'informational' as const,
+      amount: 0,
+      basis: {
+        coveredByMonthlyPayroll: monthlyPayrollCoversPeriod,
+        periodId: payrollOverlap.periodId,
+        periodStatus: payrollOverlap.status,
+        entryId: payrollOverlap.entryId
+      },
+      formulaRef: 'cl.final_settlement.payroll_overlap_adjustment.informational.v1',
+      sourceRef: { payrollOverlapLedger: overlapLedger, periodId: payrollOverlap.periodId },
+      evidence: {
+        coveredByMonthlyPayroll: monthlyPayrollCoversPeriod,
+        label: overlapLabel,
+        treatment: 'Linea informativa, no afecta totales. Documenta estado de la nomina mensual en el periodo del termino.'
+      }
+    }),
     ...manualDeductions.map(deduction => withFinalSettlementPolicy({
       componentCode: 'authorized_deduction',
       label: deduction.label,
@@ -478,7 +681,7 @@ export const calculateFinalSettlement = async (context: FinalSettlementCalculati
         sourceRef: deduction.sourceRef
       }
     }))
-  ].filter(line => line.amount !== 0)
+  ].filter(line => line.amount !== 0 || line.kind === 'informational')
 
   assertFinalSettlementPolicies(breakdown)
 

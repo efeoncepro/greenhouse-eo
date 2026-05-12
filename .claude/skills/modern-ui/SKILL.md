@@ -13,7 +13,7 @@ This file **overrides** the global `modern-ui` skill's defaults when working ins
 
 ## Why this overlay exists
 
-The global `modern-ui` skill is good for greenfield decisions. Greenhouse is not greenfield: it's a Next.js 16 + MUI 7.x + Vuexy template app with an existing design system at `src/@core/theme/*`. The global skill's generic recommendations (OKLCH colors, Tailwind 4 tokens, Inter font, etc.) don't apply — we have Vuexy + DM Sans + MUI palette already.
+The global `modern-ui` skill is good for greenfield decisions. Greenhouse is not greenfield: it's a Next.js 16 + MUI 7.x + Vuexy template app with an existing design system at `src/@core/theme/*` (Vuexy core, read-only) + `src/components/theme/mergedTheme.ts` (runtime authority — overrides Vuexy defaults). The global skill's generic recommendations (OKLCH colors, Tailwind 4 tokens, Inter font, etc.) don't apply — we have Vuexy + Geist + Poppins + MUI palette already pinned in `mergedTheme.ts`.
 
 This overlay pins Greenhouse-specific decisions so agents don't drift from the existing system.
 
@@ -28,15 +28,30 @@ This overlay pins Greenhouse-specific decisions so agents don't drift from the e
 
 ## Pinned decisions (OVERRIDES global modern-ui)
 
-### 1. Font families — use DM Sans + Poppins ONLY (not Inter, not Geist, not OKLCH fonts)
+### 1. Font families — Geist + Poppins ONLY (NOT DM Sans, NOT Inter)
+
+**Updated 2026-05-12** post TASK-566 / EPIC-004 (Delta 2026-05-01 pivot): DM Sans was deprecated. Current canon:
 
 | Usage | Font |
 |---|---|
-| Body + UI | DM Sans (`var(--font-dm-sans)`) |
-| Display (marketing only) | Poppins (`var(--font-poppins)`) |
-| Numbers | DM Sans + `fontVariantNumeric: 'tabular-nums'` |
+| Body, controls, tables, forms, KPI counts, IDs, amounts | **Geist Sans** (`var(--font-geist)`) |
+| Display headings h1-h4 only | **Poppins** (`var(--font-poppins)`) — auto-applied in `mergedTheme.ts` |
+| Amounts / IDs | Geist + `fontVariantNumeric: 'tabular-nums'` |
 
-**PROHIBITED**: `fontFamily: 'monospace'` for numbers. The global modern-ui skill allows monospace where appropriate — but in Greenhouse, it reads as legacy/technical.
+**Where to find the runtime truth**:
+- `src/app/layout.tsx` — fonts loaded via `next/font/google`
+- `src/components/theme/mergedTheme.ts` lines 138+ — h1-h4 mapped to Poppins, rest inherits Geist
+- `src/components/theme/typography-tokens.ts` — canonical line-heights calibrated for Geist
+
+**To get Poppins on a surface**: use Typography `variant='h1'..'h4'`. Variants h5/h6/subtitle/body/caption all render in Geist.
+
+**PDF migration note**: `src/lib/finance/pdf/register-fonts.ts` keeps DM Sans registered temporarily for legacy PDFs; new PDF code uses Poppins + Geist.
+
+**PROHIBITED**:
+- `fontFamily: 'DM Sans'` or `var(--font-dm-sans)` in NEW code (deprecated)
+- `fontFamily: 'Inter'` (never canonical)
+- `fontFamily: 'monospace'` for numbers — use `fontVariantNumeric: 'tabular-nums'` on Geist
+- Overriding `fontFamily` on Typography to force Poppins outside h1-h4 — promote the variant instead
 
 ### 2. Color space — use MUI palette with opacities, NOT OKLCH
 
@@ -104,7 +119,7 @@ Every animation uses `useReducedMotion` hook.
 
 ### 10. Max 2 font families per surface
 
-Global rule exists in modern-ui — reinforced here because Greenhouse has three available (DM Sans + Poppins + `monospace` system default). Count proactively.
+Global rule exists in modern-ui — reinforced here because Greenhouse has two canonical families loaded (Geist + Poppins). System monospace MUST NOT be used for numbers. Count proactively.
 
 ## Anti-patterns detected in Greenhouse (as of TASK-488)
 
@@ -146,6 +161,19 @@ Invoke the `greenhouse-ui-review` skill. It runs the formal gate checklist.
 - **Translating Figma** → `figma-implement-design` + this overlay + tokens doc
 - **Deciding CSS API** → Global modern-ui Lane D + this overlay (MUI first, Tailwind 4 only if not available)
 
+## How to detect canonical drift (anti-regression for this skill)
+
+When in doubt, **runtime wins**. Before pinning a font/color/spacing decision in this overlay:
+
+1. Grep the actual mergedTheme: `grep -E "fontFamily.*var\\(--font" src/components/theme/mergedTheme.ts`
+2. Grep what's loaded in root layout: `grep "next/font/google" src/app/layout.tsx`
+3. Grep deprecation markers: `grep -rE "deprecated|legacy" src/components/theme src/@core/theme src/lib/finance/pdf 2>/dev/null`
+
+If this overlay says X but runtime says Y, **runtime wins** and this overlay must be updated in the same PR. Documented in CLAUDE.md "Design system runtime authority": `mergedTheme.ts` is the truth.
+
+**Historical drift catch (2026-05-12)**: this overlay v1.0 pinned "DM Sans + Poppins" because TASK-488 canonized that combo. TASK-566 / EPIC-004 (Delta 2026-05-01) pivoted to Geist + Poppins but this overlay wasn't updated, causing an agent to re-recommend DM Sans 11 days later. Lesson: when a Greenhouse runtime pivot happens, update the corresponding skill overlay in the same PR.
+
 ## Version
 
-- **v1.0** — 2026-04-19 — Initial overlay (TASK-488). Pinned 10 decisions, 8 anti-patterns, 2 checklists.
+- **v1.1** — 2026-05-12 — Corrected font canon: Geist (body+UI) + Poppins (display h1-h4). DM Sans flagged as deprecated. Added "How to detect canonical drift" section.
+- **v1.0** — 2026-04-19 — Initial overlay (TASK-488). Pinned 10 decisions, 8 anti-patterns, 2 checklists. **Outdated**: pinned DM Sans which was later deprecated.

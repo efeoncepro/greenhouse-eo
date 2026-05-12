@@ -9,7 +9,7 @@ vi.mock('@/lib/hr-core/leave-domain', () => ({
 }))
 vi.mock('@/lib/finance/economic-indicators', () => ({
   getHistoricalEconomicIndicatorForPeriod: vi.fn(async ({ indicatorCode }: { indicatorCode: string }) => ({
-    value: indicatorCode === 'UF' ? 39000 : 68000
+    value: indicatorCode === 'UF' ? 39000 : indicatorCode === 'IMM' ? 510636 : 68000
   }))
 }))
 vi.mock('@/lib/payroll/tax-table-version', () => ({
@@ -214,11 +214,16 @@ describe('final settlement calculator', () => {
     })
 
     expect(result.readiness.status).toBe('ready')
+    // TASK-862 Slice A — breakdown ahora emite proportional_vacation_current_period (split)
+    // y siempre la linea informativa payroll_overlap_adjustment. Carryover=0 => no se emite carryover line.
+    // gratificacionLegalMode='ninguna' => no se emite monthly_gratification_due.
+    // availableDays>=0 => no se emite used_or_advanced_vacation_adjustment.
     expect(result.breakdown.map(line => line.componentCode)).toEqual([
       'pending_salary',
       'pending_fixed_allowances',
-      'proportional_vacation',
-      'statutory_deductions'
+      'proportional_vacation_current_period',
+      'statutory_deductions',
+      'payroll_overlap_adjustment'
     ])
     expect(result.sourceSnapshot).toMatchObject({
       offboardingCaseId: 'offboarding-case-1',
@@ -228,6 +233,156 @@ describe('final settlement calculator', () => {
     })
     expect(result.totals.grossTotal).toBeGreaterThan(result.totals.deductionTotal)
     expect(result.breakdown.every(line => line.policyCode)).toBe(true)
+    // Linea informativa NO afecta totales (kind='informational')
+    const informationalLine = result.breakdown.find(line => line.componentCode === 'payroll_overlap_adjustment')
+
+    expect(informationalLine?.kind).toBe('informational')
+    expect(informationalLine?.amount).toBe(0)
+  })
+
+  it('emite monthly_gratification_due cuando gratificacionLegalMode=anual_proporcional', async () => {
+    const result = await calculateFinalSettlement({
+      offboardingCase: baseCase,
+      compensation: { ...compensation, gratificacionLegalMode: 'anual_proporcional' as const },
+      leaveBalance: {
+        balanceId: 'lb-1',
+        year: 2026,
+        allowanceDays: 15,
+        progressiveExtraDays: 0,
+        carriedOverDays: 0,
+        adjustmentDays: 0,
+        usedDays: 10,
+        reservedDays: 0,
+        availableDays: 5
+      },
+      payrollOverlap: { covered: false, periodId: '2026-05', status: null, entryId: null, ufValue: null, taxTableVersion: null },
+      hireDate: '2024-01-01',
+      previredEvidence: { period: '2026-04', status: 'paid' }
+    })
+
+    const gratificationLine = result.breakdown.find(line => line.componentCode === 'monthly_gratification_due')
+
+    expect(gratificationLine).toBeDefined()
+    expect(gratificationLine?.kind).toBe('earning')
+    expect(gratificationLine?.amount).toBeGreaterThan(0)
+    // Tope art. 50 CT: (4.75 × IMM 510636 / 12) × 12 meses = ~ 2.425.521; basePeriodo: 1.500.000 × 12 × 0.25 = 4.500.000
+    // → min(basePeriodo, tope) = tope ~ 2.425.521
+    expect(gratificationLine?.amount).toBeLessThan(compensation.baseSalary * 12 * 0.25)
+    expect(gratificationLine?.basis).toMatchObject({
+      gratificacionLegalMode: 'anual_proporcional',
+      formulaSource: 'cl.art_50_CT.4_75_imm_per_12'
+    })
+  })
+
+  it('emite pending_vacation_carryover + proportional_vacation_current_period cuando hay carryover', async () => {
+    const result = await calculateFinalSettlement({
+      offboardingCase: baseCase,
+      compensation,
+      leaveBalance: {
+        balanceId: 'lb-1',
+        year: 2026,
+        allowanceDays: 15,
+        progressiveExtraDays: 0,
+        carriedOverDays: 5, // saldo de anios anteriores
+        adjustmentDays: 0,
+        usedDays: 8,
+        reservedDays: 0,
+        availableDays: 12 // 15 + 5 - 8 = 12
+      },
+      payrollOverlap: { covered: false, periodId: '2026-05', status: null, entryId: null, ufValue: null, taxTableVersion: null },
+      hireDate: '2024-01-01',
+      previredEvidence: { period: '2026-04', status: 'paid' }
+    })
+
+    const carryoverLine = result.breakdown.find(line => line.componentCode === 'pending_vacation_carryover')
+    const currentLine = result.breakdown.find(line => line.componentCode === 'proportional_vacation_current_period')
+
+    expect(carryoverLine).toBeDefined()
+    expect(carryoverLine?.amount).toBeGreaterThan(0)
+    expect(carryoverLine?.basis).toMatchObject({ businessVacationDays: 5 })
+    expect(carryoverLine?.taxability).toBe('not_taxable')
+
+    expect(currentLine).toBeDefined()
+    expect(currentLine?.amount).toBeGreaterThan(0)
+    expect(currentLine?.basis).toMatchObject({ businessVacationDays: 7 }) // 12 - 5
+
+    // Suma = monto total (split proporcional)
+    const totalVacationAmount = (carryoverLine?.amount ?? 0) + (currentLine?.amount ?? 0)
+
+    expect(totalVacationAmount).toBeGreaterThan(0)
+  })
+
+  it('emite used_or_advanced_vacation_adjustment cuando availableDays es negativo', async () => {
+    const result = await calculateFinalSettlement({
+      offboardingCase: baseCase,
+      compensation,
+      leaveBalance: {
+        balanceId: 'lb-1',
+        year: 2026,
+        allowanceDays: 15,
+        progressiveExtraDays: 0,
+        carriedOverDays: 0,
+        adjustmentDays: 0,
+        usedDays: 18, // 3 dias por adelantado
+        reservedDays: 0,
+        availableDays: -3
+      },
+      payrollOverlap: { covered: false, periodId: '2026-05', status: null, entryId: null, ufValue: null, taxTableVersion: null },
+      hireDate: '2024-01-01',
+      previredEvidence: { period: '2026-04', status: 'paid' }
+    })
+
+    const advancedLine = result.breakdown.find(line => line.componentCode === 'used_or_advanced_vacation_adjustment')
+
+    expect(advancedLine).toBeDefined()
+    expect(advancedLine?.kind).toBe('deduction')
+    expect(advancedLine?.amount).toBeGreaterThan(0)
+    expect(advancedLine?.basis).toMatchObject({
+      advancedBusinessDays: 3,
+      leaveBalanceNet: -3
+    })
+
+    // No deberia haber feriado a indemnizar cuando availableDays<0
+    const carryoverLine = result.breakdown.find(line => line.componentCode === 'pending_vacation_carryover')
+    const currentLine = result.breakdown.find(line => line.componentCode === 'proportional_vacation_current_period')
+
+    expect(carryoverLine).toBeUndefined()
+    expect(currentLine).toBeUndefined()
+  })
+
+  it('payroll_overlap_adjustment es informational con amount=0 incluso cuando overlap.covered=true', async () => {
+    const result = await calculateFinalSettlement({
+      offboardingCase: baseCase,
+      compensation,
+      leaveBalance: {
+        balanceId: 'lb-1',
+        year: 2026,
+        allowanceDays: 15,
+        progressiveExtraDays: 0,
+        carriedOverDays: 0,
+        adjustmentDays: 0,
+        usedDays: 10,
+        reservedDays: 0,
+        availableDays: 5
+      },
+      payrollOverlap: {
+        covered: true,
+        periodId: '2026-05',
+        status: 'exported',
+        entryId: 'entry-1',
+        ufValue: 39000,
+        taxTableVersion: '2026-05'
+      },
+      hireDate: '2024-01-01',
+      previredEvidence: { period: '2026-04', status: 'paid' }
+    })
+
+    const overlapLine = result.breakdown.find(line => line.componentCode === 'payroll_overlap_adjustment')
+
+    expect(overlapLine).toBeDefined()
+    expect(overlapLine?.kind).toBe('informational')
+    expect(overlapLine?.amount).toBe(0)
+    expect(overlapLine?.basis).toMatchObject({ coveredByMonthlyPayroll: true, periodId: '2026-05' })
   })
 
   it('does not deduct monthly statutory amounts from proportional vacation already covered by exported payroll', async () => {
@@ -293,7 +448,10 @@ describe('final settlement calculator', () => {
       previredEvidence: { period: '2026-04', status: 'paid' }
     })
 
-    const vacationLine = result.breakdown.find(line => line.componentCode === 'proportional_vacation')
+    // TASK-862 Slice A — antes 'proportional_vacation'; ahora dividido en
+    // pending_vacation_carryover + proportional_vacation_current_period. Sin
+    // carryover en este caso, sigue siendo una sola linea (current_period).
+    const vacationLine = result.breakdown.find(line => line.componentCode === 'proportional_vacation_current_period')
 
     expect(vacationLine).toMatchObject({
       taxTreatment: 'non_income',

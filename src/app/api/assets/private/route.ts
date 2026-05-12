@@ -1,21 +1,33 @@
 import { NextResponse } from 'next/server'
 
-import type { GreenhouseAssetContext, PrivateAssetUploadResponse } from '@/types/assets'
+import type { DraftUploadContext, PrivateAssetUploadResponse } from '@/types/assets'
 import { resolveCurrentHrMemberId } from '@/lib/hr-core/service'
+import { captureWithDomain } from '@/lib/observability/capture'
 import { createPrivatePendingAsset } from '@/lib/storage/greenhouse-assets'
 import { hasRoleCode, hasRouteGroup, requireTenantContext } from '@/lib/tenant/authorization'
 import { ROLE_CODES } from '@/config/role-codes'
 
 export const dynamic = 'force-dynamic'
 
-const isDraftContext = (value: string): value is Extract<GreenhouseAssetContext, 'leave_request_draft' | 'purchase_order_draft' | 'master_agreement_draft' | 'certification_draft' | 'evidence_draft' | 'finance_reconciliation_evidence_draft' | 'sample_sprint_report_draft'> =>
-  value === 'leave_request_draft' || value === 'purchase_order_draft' || value === 'master_agreement_draft' || value === 'certification_draft' || value === 'evidence_draft' || value === 'finance_reconciliation_evidence_draft' || value === 'sample_sprint_report_draft'
+const DRAFT_CONTEXT_VALUES = new Set<DraftUploadContext>([
+  'leave_request_draft',
+  'purchase_order_draft',
+  'master_agreement_draft',
+  'certification_draft',
+  'evidence_draft',
+  'finance_reconciliation_evidence_draft',
+  'sample_sprint_report_draft',
+  'resignation_letter_ratified_draft'
+])
+
+const isDraftContext = (value: string): value is DraftUploadContext =>
+  DRAFT_CONTEXT_VALUES.has(value as DraftUploadContext)
 
 const canUploadForContext = ({
   contextType,
   tenant
 }: {
-  contextType: Extract<GreenhouseAssetContext, 'leave_request_draft' | 'purchase_order_draft' | 'master_agreement_draft' | 'certification_draft' | 'evidence_draft' | 'finance_reconciliation_evidence_draft' | 'sample_sprint_report_draft'>
+  contextType: DraftUploadContext
   tenant: Awaited<ReturnType<typeof requireTenantContext>>['tenant']
 }) => {
   if (!tenant) {
@@ -38,6 +50,12 @@ const canUploadForContext = ({
 
   if (contextType === 'sample_sprint_report_draft') {
     return hasRouteGroup(tenant, 'commercial') || hasRouteGroup(tenant, 'internal') || hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)
+  }
+
+  // TASK-863 — resignation_letter_ratified_draft: HR route group + EFEONCE_ADMIN.
+  // Mismo grupo de retencion legal que final_settlement_document; NO member-only.
+  if (contextType === 'resignation_letter_ratified_draft') {
+    return hasRouteGroup(tenant, 'hr') || hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)
   }
 
   return hasRouteGroup(tenant, 'finance') || hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)
@@ -124,7 +142,65 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'El archivo supera el tamaño permitido.' }, { status: 400 })
     }
 
-    console.error('POST /api/assets/private failed:', error)
+    // TASK-863 hardening: translate PG constraint violations to specific 4xx
+    // responses (was: opaque 500 hid the FK violation root cause).
+    // 23503 = foreign_key_violation, 23505 = unique_violation, 23514 = check_violation.
+    const pgCode = (error as { code?: string })?.code
+    const constraint = (error as { constraint?: string })?.constraint
+
+    if (pgCode === '23503') {
+      captureWithDomain(error, 'identity', {
+        tags: { source: 'assets_private_upload', stage: 'fk_violation' },
+        extra: { constraint }
+      })
+
+      return NextResponse.json(
+        {
+          error: 'Referencia inválida en el asset (FK violation).',
+          detail: constraint ? `constraint=${constraint}` : undefined
+        },
+        { status: 400 }
+      )
+    }
+
+    if (pgCode === '23505') {
+      captureWithDomain(error, 'identity', {
+        tags: { source: 'assets_private_upload', stage: 'unique_violation' },
+        extra: { constraint }
+      })
+
+      return NextResponse.json(
+        { error: 'El asset ya existe (conflicto de unicidad).' },
+        { status: 409 }
+      )
+    }
+
+    if (pgCode === '23514') {
+      captureWithDomain(error, 'identity', {
+        tags: { source: 'assets_private_upload', stage: 'check_violation' },
+        extra: { constraint }
+      })
+
+      return NextResponse.json(
+        { error: 'Valor del asset no cumple las validaciones del catálogo.' },
+        { status: 400 }
+      )
+    }
+
+    if (message.startsWith('upload_failed:')) {
+      captureWithDomain(error, 'identity', {
+        tags: { source: 'assets_private_upload', stage: 'gcs_upload_failed' }
+      })
+
+      return NextResponse.json(
+        { error: 'No se pudo escribir el archivo en el bucket.' },
+        { status: 502 }
+      )
+    }
+
+    captureWithDomain(error, 'identity', {
+      tags: { source: 'assets_private_upload', stage: 'unknown' }
+    })
 
     return NextResponse.json({ error: 'Unable to upload private asset.' }, { status: 500 })
   }

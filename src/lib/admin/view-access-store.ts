@@ -191,6 +191,17 @@ const toPersistedByRole = (persistedRows: RoleAssignmentRow[]) => {
   return persistedByRole
 }
 
+const toRoleFallbackSubject = (role: {
+  roleCode: string
+  isAdmin: boolean
+  routeGroups: string[]
+}) => ({
+  roleCode: role.roleCode,
+  isAdmin: role.isAdmin,
+  isInternal: role.routeGroups.includes('internal'),
+  routeGroups: role.routeGroups
+})
+
 const resolveAuthorizedViewsForTargetUser = ({
   user,
   registryRows,
@@ -885,7 +896,7 @@ export const getAdminPersistedViewAccessGovernance = async () => {
 
         const resolvedAccess = resolvePersistedOrFallbackRoleAccess({
           roleAssignments,
-          role,
+          role: toRoleFallbackSubject(role),
           view
         })
 
@@ -898,7 +909,7 @@ export const getAdminPersistedViewAccessGovernance = async () => {
 
         const resolvedAccess = resolvePersistedOrFallbackRoleAccess({
           roleAssignments,
-          role,
+          role: toRoleFallbackSubject(role),
           view
         })
 

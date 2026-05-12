@@ -130,7 +130,10 @@ const mapCaseRow = (row: OffboardingCaseRow): OffboardingCase => ({
   createdByUserId: row.created_by_user_id,
   updatedByUserId: row.updated_by_user_id,
   createdAt: toTimestampString(row.created_at) ?? '',
-  updatedAt: toTimestampString(row.updated_at) ?? ''
+  updatedAt: toTimestampString(row.updated_at) ?? '',
+  // TASK-862 Slice C — pre-requisitos finiquito (nullable, separation_type=resignation only)
+  resignationLetterAssetId: row.resignation_letter_asset_id ?? null,
+  maintenanceObligationJson: row.maintenance_obligation_json ?? null
 })
 
 const getMemberContext = async (memberId: string, client?: PoolClient) => {
@@ -406,6 +409,192 @@ export const getOffboardingCase = async (caseId: string) => {
 
   return rows[0] ? mapCaseRow(rows[0]) : null
 }
+
+/**
+ * TASK-862 Slice C — Link uploaded resignation letter asset to an offboarding case.
+ * Atomic: en una sola tx valida que (a) el case existe + es separation_type=resignation,
+ * (b) el asset existe en greenhouse_core.assets, (c) UPDATE atomic + inserta evento de audit
+ * en work_relationship_offboarding_case_events.
+ * Idempotente: re-linkar el mismo assetId es no-op. Re-link con assetId distinto sobreescribe
+ * (el operador es responsable de la legitimidad; el evento de audit registra la sustitucion).
+ */
+export const linkResignationLetterAsset = async ({
+  offboardingCaseId,
+  assetId,
+  actorUserId
+}: {
+  offboardingCaseId: string
+  assetId: string
+  actorUserId: string
+}) => withTransaction(async client => {
+  const currentRows = await client.query<OffboardingCaseRow>(
+    `
+      SELECT *
+      FROM greenhouse_hr.work_relationship_offboarding_cases
+      WHERE offboarding_case_id = $1
+      FOR UPDATE
+    `,
+    [offboardingCaseId]
+  )
+
+  const current = currentRows.rows[0] ? mapCaseRow(currentRows.rows[0]) : null
+
+  if (!current) throw new Error('OFFBOARDING_CASE_NOT_FOUND')
+
+  if (current.separationType !== 'resignation') throw new Error('NOT_RESIGNATION_CASE')
+
+  const assetRows = await client.query<{ asset_id: string }>(
+    `SELECT asset_id FROM greenhouse_core.assets WHERE asset_id = $1 LIMIT 1`,
+    [assetId]
+  )
+
+  if (!assetRows.rows[0]) throw new Error('ASSET_NOT_FOUND')
+
+  const previousAssetId = current.resignationLetterAssetId
+
+
+  const updatedRows = await client.query<OffboardingCaseRow>(
+    `
+      UPDATE greenhouse_hr.work_relationship_offboarding_cases
+      SET resignation_letter_asset_id = $2,
+          updated_at = now(),
+          updated_by_user_id = $3
+      WHERE offboarding_case_id = $1
+      RETURNING *
+    `,
+    [offboardingCaseId, assetId, actorUserId]
+  )
+
+  await client.query(
+    `
+      INSERT INTO greenhouse_hr.work_relationship_offboarding_case_events (
+        event_id, offboarding_case_id, event_type, from_status, to_status, actor_user_id, source, reason, payload
+      ) VALUES ($1, $2, $3, NULL, NULL, $4, $5, NULL, $6::jsonb)
+    `,
+    [
+      `offboarding-event-${randomUUID()}`,
+      offboardingCaseId,
+      'resignation_letter_linked',
+      actorUserId,
+      'manual_hr',
+      JSON.stringify({ assetId, previousAssetId })
+    ]
+  )
+
+  return mapCaseRow(updatedRows.rows[0])
+})
+
+/**
+ * TASK-862 Slice C — Declare Ley 21.389 maintenance obligation (pension de alimentos).
+ * Alt A (not_subject): trabajador NO afecto. amount/beneficiary deben ser null.
+ * Alt B (subject): trabajador SI afecto. amount > 0 + beneficiary non-empty obligatorios.
+ * Atomic: valida shape, persiste JSONB + audit event en mismo tx.
+ * Idempotente: re-declarar sobreescribe (el evento de audit registra la sustitucion;
+ * declaredAt + declaredByUserId actualizados a la declaracion actual).
+ */
+export const declareMaintenanceObligation = async ({
+  offboardingCaseId,
+  variant,
+  amount,
+  beneficiary,
+  evidenceAssetId,
+  actorUserId
+}: {
+  offboardingCaseId: string
+  variant: 'not_subject' | 'subject'
+  amount?: number | null
+  beneficiary?: string | null
+  evidenceAssetId?: string | null
+  actorUserId: string
+}) => withTransaction(async client => {
+  // Validation
+  if (variant !== 'not_subject' && variant !== 'subject') {
+    throw new Error('INVALID_VARIANT')
+  }
+
+  let normalizedAmount: number | null = null
+  let normalizedBeneficiary: string | null = null
+
+  if (variant === 'subject') {
+    if (!Number.isFinite(amount) || (amount as number) <= 0) {
+      throw new Error('AMOUNT_REQUIRED_FOR_SUBJECT')
+    }
+
+    if (!beneficiary || beneficiary.trim().length === 0) {
+      throw new Error('BENEFICIARY_REQUIRED_FOR_SUBJECT')
+    }
+
+    normalizedAmount = Math.round(amount as number)
+    normalizedBeneficiary = beneficiary.trim()
+  }
+
+  const currentRows = await client.query<OffboardingCaseRow>(
+    `
+      SELECT *
+      FROM greenhouse_hr.work_relationship_offboarding_cases
+      WHERE offboarding_case_id = $1
+      FOR UPDATE
+    `,
+    [offboardingCaseId]
+  )
+
+  const current = currentRows.rows[0] ? mapCaseRow(currentRows.rows[0]) : null
+
+  if (!current) throw new Error('OFFBOARDING_CASE_NOT_FOUND')
+
+  // Optional evidence asset FK validation
+  if (evidenceAssetId) {
+    const assetRows = await client.query<{ asset_id: string }>(
+      `SELECT asset_id FROM greenhouse_core.assets WHERE asset_id = $1 LIMIT 1`,
+      [evidenceAssetId]
+    )
+
+    if (!assetRows.rows[0]) throw new Error('EVIDENCE_ASSET_NOT_FOUND')
+  }
+
+  const declaredAt = new Date().toISOString()
+
+  const obligation = {
+    variant,
+    ...(normalizedAmount !== null ? { amount: normalizedAmount } : {}),
+    ...(normalizedBeneficiary !== null ? { beneficiary: normalizedBeneficiary } : {}),
+    ...(evidenceAssetId ? { evidenceAssetId } : {}),
+    declaredAt,
+    declaredByUserId: actorUserId
+  }
+
+  const previous = current.maintenanceObligationJson
+
+  const updatedRows = await client.query<OffboardingCaseRow>(
+    `
+      UPDATE greenhouse_hr.work_relationship_offboarding_cases
+      SET maintenance_obligation_json = $2::jsonb,
+          updated_at = now(),
+          updated_by_user_id = $3
+      WHERE offboarding_case_id = $1
+      RETURNING *
+    `,
+    [offboardingCaseId, JSON.stringify(obligation), actorUserId]
+  )
+
+  await client.query(
+    `
+      INSERT INTO greenhouse_hr.work_relationship_offboarding_case_events (
+        event_id, offboarding_case_id, event_type, from_status, to_status, actor_user_id, source, reason, payload
+      ) VALUES ($1, $2, $3, NULL, NULL, $4, $5, NULL, $6::jsonb)
+    `,
+    [
+      `offboarding-event-${randomUUID()}`,
+      offboardingCaseId,
+      'maintenance_obligation_declared',
+      actorUserId,
+      'manual_hr',
+      JSON.stringify({ obligation, previous })
+    ]
+  )
+
+  return mapCaseRow(updatedRows.rows[0])
+})
 
 export const getActiveOffboardingCaseForMember = async (memberId: string) => {
   const rows = await query<OffboardingCaseRow>(

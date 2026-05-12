@@ -64,6 +64,7 @@ Estos CLIs estan autenticados localmente. Cuando una task toca su dominio, **usa
 - **GitHub CLI (`gh`)**: autenticado contra `efeoncepro/greenhouse-eo`. Sirve para issues, PRs, workflow runs, releases.
 - **Vercel CLI (`vercel`)**: autenticado contra el team `efeonce-7670142f`. Sirve para env vars, deployments, project config.
 - **PostgreSQL CLI (`psql`)** via `pnpm pg:connect`: levanta proxy Cloud SQL + conexion auto, sin credenciales manuales.
+- **Frontend Capture (`pnpm fe:capture`)**: helper canonico Playwright + agent auth para grabar `.webm` + frames PNG marker-based + GIF opcional de cualquier ruta del portal. Reemplaza el patron ad-hoc de `_cap.mjs`. Scenario DSL declarativo bajo `scripts/frontend/scenarios/`. Output `.captures/<ISO>_<scenario>/` (gitignored). Triple gate para production. Comandos: `pnpm fe:capture <scenario> --env=staging [--gif] [--headed]` o `pnpm fe:capture --route=/path --env=staging --hold=3000`. GC: `pnpm fe:capture:gc [--apply]` purga >30d. Doc: `docs/manual-de-uso/plataforma/captura-visual-playwright.md`. Usalo cuando una verificacion visual o de microinteractions sea util — sale del ciclo "escribo un _cap.mjs cada vez".
 
 **Regla operativa**: si diagnosticas que la causa raiz de un incidente vive en una de estas plataformas, ejecuta el fix con el CLI con guardrails y verificacion. Documentar pasos manuales para que el usuario los haga es **antipatron** salvo que la accion sea destructiva (eliminar app registration, drop database, force-push), en cuyo caso confirma con el usuario primero.
 
@@ -1101,6 +1102,136 @@ Toda tabla operativa con celdas editables inline o > 8 columnas vive bajo un con
 - **NUNCA** mover `compactContentWidth` a `wide` para resolver overflow de una tabla. Resolver siempre con el contrato (densidad + sticky + scroll fade).
 - **NUNCA** duplicar `BonusInput` u otra primitiva legacy. Migrar consumers a `<InlineNumericEditor>`. `BonusInput.tsx` queda como re-export deprecado hasta que el ultimo consumer migre.
 - **NUNCA** desactivar el visual regression test de `/hr/payroll` para forzar un merge. Si falla por overflow, la solucion es respetar el contrato, no bypass.
+
+### Real-Artifact Iterative Verification Loop — metodología canónica para features visuales (TASK-863 V1.1→V1.5.1, 2026-05-11)
+
+Para cualquier feature que **emita o renderice un artefacto consumido por humanos fuera del agente** — PDFs operativos, documentos legales, emails transaccionales, layouts de detalle complejos, dashboards ejecutivos, exports Excel, recibos, certificados, contratos, addenda — el contrato técnico (`tsc --noEmit` + `pnpm lint` + tests unitarios + fixtures sintéticos) **NO es suficiente** para production-readiness. Live 2026-05-11, TASK-863 (finiquito Valentina Hoyos): 5 rondas iterativas V1.1→V1.5 + hotfix V1.5.1 cerraron 12 hallazgos visuales + 5 bloqueantes legales **invisibles** al audit pre-emisión; emergieron solo al **emitir un caso real, capturarlo, y re-auditarlo con skills sobre el artefacto real**.
+
+**Metodología canónica de 7 pasos** (reusable cross-feature):
+
+1. **Implementar V1** con audit pre-emisión normal (skills de dominio consultadas pre-implementation, `tsc --noEmit`, `pnpm lint`, tests unitarios, fixtures sintéticos, lint rules, type checks).
+2. **Acuerdo explícito con el usuario** para entrar al loop de verificación visual con caso real. El usuario aporta datos productivos (cliente/colaborador/proveedor real con datos reales — nombre, RUT, dirección, cargo, monto). El agente NO inventa datos; opera sobre el caso que el usuario aprueba.
+3. **Sesión Playwright + Chromium con agent auth** (NO mocks):
+    - Setup: `AGENT_AUTH_SECRET=<secret> node scripts/playwright-auth-setup.mjs` genera `.auth/storageState.json` con sesión NextAuth válida del usuario `agent@greenhouse.efeonce.org`.
+    - Navegar al portal real (dev local `http://localhost:3000`, staging `dev-greenhouse.efeoncepro.com` via bypass, o producción cuando aplica — coordinar con el usuario).
+    - Trigger la acción que emite el artefacto (click "Emitir", "Calcular", "Enviar", "Generar PDF", etc.) usando la UI exacta del operador.
+4. **Capturar el artefacto real**:
+    - **PDFs**: descargar el asset emitido (`/api/assets/private/[id]` con sesión válida), abrir con macOS Preview / pdf viewer y screenshot de cada página.
+    - **Emails**: invocar el preview endpoint canónico (`/api/emails/preview/[template]`), screenshot del render Chromium o exportar HTML.
+    - **UI**: screenshot del browser Chromium con la página completa rendereada (Playwright `page.screenshot({ fullPage: true })` o equivalente manual).
+    - **Excel**: descargar el archivo y abrirlo con Numbers/Excel para inspección visual + verificar agregaciones.
+    - **Compartir captura con el agente** en el chat (drag & drop / paste image / file path) para que el agente la consuma visualmente.
+5. **Re-audit comprehensive con 3 skills sobre el artefacto real** (no fixture sintético):
+    - **Skill de dominio** del feature (e.g. `greenhouse-payroll-auditor` para nómina/finiquitos, `greenhouse-finance-accounting-operator` para finance, `commercial-expert` para GTM/sales, etc.).
+    - **Skill UX writing del registro** correspondiente (`greenhouse-ux-writing` en modo `es-CL formal-legal` para textos jurídicos, `es-CL operativo` para docs operacionales, `es-CL técnico` para integraciones, `en-US` para audiencias internacionales).
+    - **Skill visual** apropiada (`modern-ui` para jerarquía/tipografía/spacing/balance, `greenhouse-ux` para layout/component selection, `greenhouse-microinteractions-auditor` cuando hay motion/feedback).
+    - Las 3 skills miran la **misma evidencia visual** (el screenshot/PDF/email real) y reportan independientemente; sus hallazgos se consolidan.
+6. **Iterar fixes hasta limpieza total**:
+    - Aplicar fixes al código.
+    - Re-emitir el artefacto (paso 3 + 4 nuevamente).
+    - Re-auditar (paso 5 nuevamente).
+    - Cerrar bloqueantes uno a uno; cada round produce un commit V1.x.
+    - El loop termina cuando las 3 skills reportan zero blockers Y el usuario aprueba visualmente el resultado.
+7. **Canonizar el resultado** en:
+    - Spec arquitectónica (`docs/architecture/<DOMAIN>_V1_SPEC.md` con Delta del round).
+    - Doc funcional (`docs/documentation/<domain>/<feature>.md` con bump de versión).
+    - Manual de uso (`docs/manual-de-uso/<domain>/<feature>.md`) si aplica al operador.
+    - ADR en `DECISIONS_INDEX.md` si la decisión es contractual cross-domain.
+    - CLAUDE.md + AGENTS.md con invariantes duros si emergen reglas reusables (caso real: Semantic Column Invariants).
+    - Task delta con resumen de los rounds + aprendizaje canonizado.
+
+**Aprendizaje meta canonizado** (TASK-863 evidencia):
+
+Sin paso 3-5 (loop real con artefacto + 3-skill audit), bugs como:
+
+- B-1 cláusula PRIMERO mezclando hitos legales distintos (vicio defendible en demanda)
+- B-2 cláusula SEGUNDO con verbo performativo incorrecto (vicio de consentimiento)
+- B-3 cláusula CUARTO citando solo modificatoria (jurídicamente débil)
+- V1.5.1 cargo del trabajador en col empleador (mezcla semántica de partes)
+- Ligature "fi" rota produciendo "frma" / "defnitivo" / "ratifcada" (typography drift)
+- Footer overlap visual / page break partiendo cláusulas (layout drift)
+
+**quedan latentes** hasta que un cliente, abogado, contralor o auditor externo los detecte — momento en que el costo de remediación (relación con cliente, retraso operativo, riesgo legal/financiero) es **órdenes de magnitud mayor** al costo del loop.
+
+**Cuándo aplicar el loop (decision tree)**:
+
+- ¿El feature emite un artefacto que un humano externo al equipo va a leer/firmar/auditar? → SÍ, aplicar loop completo (pasos 1-7).
+- ¿El feature es solo backend (endpoint, sync, cron) sin render visual? → NO, audit técnico es suficiente.
+- ¿El feature es UI interna del agente (admin tools, debug surfaces)? → Loop simplificado (pasos 1-3 + visual review, sin 3-skill audit).
+- ¿El feature es UI de operador interno (HR, Finance, Agency)? → Loop completo si el resultado de la UI afecta decisiones operativas con blast radius (e.g. cálculo de finiquito, conciliación bancaria, cierre mensual). Audit simplificado si es read-only.
+
+**Herramientas canónicas del loop**:
+
+| Capa | Herramienta canónica | Comando / archivo |
+| --- | --- | --- |
+| Agent auth | NextAuth headless | `POST /api/auth/agent-session` con `AGENT_AUTH_SECRET` |
+| Playwright setup | Storage state generation | `node scripts/playwright-auth-setup.mjs` |
+| Staging request bypass SSO | `staging-request.mjs` | `pnpm staging:request <path>` |
+| PDF capture | Asset download + macOS Preview screenshot | `/api/assets/private/[id]` + `cmd+shift+5` |
+| Email preview | Template render endpoint | `/api/emails/preview/[template]` |
+| UI screenshot | Playwright full-page | `await page.screenshot({ fullPage: true })` |
+| Excel inspection | Numbers / Excel macOS | descarga + apertura manual |
+| Skill re-audit | Agent invocation con artefacto | drag-drop screenshot al chat + invocar skills |
+
+**Pattern fuente** (canonizado live 2026-05-11): TASK-863 V1.1→V1.5.1 cerró 5 rondas iterativas en `docs/tasks/complete/TASK-863-finiquito-prerequisites-ui.md` (sección Delta V1.1-V1.5.1). Es el caso reusable: cuando alguien implemente el próximo doc legal (contrato de trabajo, addenda, certificado de servicio, finiquito de otras causales), seguir esta receta verbatim.
+
+### Semantic Column Invariants — frontend / PDFs / emails / documentos legales (TASK-863 V1.5.1, 2026-05-11)
+
+Cuando una surface renderiza datos en un layout de N columnas donde cada columna **representa una entidad distinta** (empleador vs trabajador, deudor vs acreedor, sender vs receiver, payer vs payee, parte A vs parte B en un contrato), la asignación de cada dato a su columna NO es un detalle visual — es un **invariante semántico de integridad de datos**. Romperlo produce documentos legalmente defendibles como vicio (caso real: PDF de finiquito con "Cargo" del trabajador en col empleador detectado en primer emisión real Valentina Hoyos 2026-05-11).
+
+**Por qué emerge el bug class**: un grid 2-cols con `flexWrap` (PDFs `@react-pdf/renderer`, CSS flexbox/grid, MUI `Grid container`, HTML emails con tables) deja el flujo natural de wrap decidir dónde aterriza cada cell. Si una dimensión existe solo para una parte (e.g. `jobTitle` solo para personas naturales, `taxId` solo para entidades comerciales, `birthDate` solo para personas naturales), su cell impar/par natural cae en la **columna equivocada** y mezcla semánticamente datos de las dos partes.
+
+**⚠️ Reglas duras canónicas** (frontend / PDF / email / documentos legales):
+
+- **NUNCA** dejar que el flujo natural de `flexWrap`, `grid-auto-flow` o `column-wrap` decida la columna semántica de un dato. Si una columna representa una entidad (empleador, trabajador, ministro de fe, payer, receiver, parte A, parte B), TODOS los datos de esa entidad deben aterrizar explícitamente en su columna — NUNCA por accidente del wrap.
+- **NUNCA** intercalar campos de entidades distintas en el mismo grid 2-cols cuando una entidad tenga más dimensiones que la otra. Si los datos no son simétricos (e.g. trabajador tiene `jobTitle` pero la organización empleadora no), inserta **spacer vacío canónico** (`<View style={styles.field} />` en react-pdf, `<td>&nbsp;</td>` en email HTML, `<Grid item />` empty en MUI) en la columna que no aplica para preservar la invariante.
+- **NUNCA** "rellenar" la columna vacía con contenido falso o derivado (e.g. poner "N/A", "—", "No aplica", `displayName` del otro lado, repetir un dato ya mostrado) para "balancear" visualmente. Eso mezcla semántica y confunde al lector.
+- **NUNCA** asumir que un audit pre-emisión cubrió este bug class. El layout-by-wrap se ve correcto en el preview visual cuando todas las dimensiones son simétricas; el bug emerge cuando aparece un campo que solo aplica a una entidad. **Validar con caso real** del dominio, no con fixture sintético.
+- **NUNCA** acoplar `label` del campo a la entidad mediante posicionamiento (e.g. "Cargo" sin prefix asumiendo que la posición lo deja claro). El label debe ser auto-explicativo (`Cargo del trabajador`, `Domicilio empleador`, `RUT empleador`) por si la columna se rompe por regression.
+- **SIEMPRE** que emerja un nuevo campo asimétrico en un layout 2-cols (e.g. agregar `dateOfBirth` que solo aplica a trabajador, `legalEntityType` que solo aplica a empleador), insertar spacer vacío en la otra columna en el mismo commit. Tests visuales/snapshot deben capturar la asimetría.
+- **SIEMPRE** que un documento legal/regulatorio (finiquito, contrato, addenda, certificado, factura, boleta, recibo, carta formal) tenga partes comparecientes, las columnas DEBEN preservar la invariante: parte A en col 1, parte B en col 2, parte C (ministro de fe, testigo, garante) en col 3. Sin excepción.
+- **SIEMPRE** que un email transaccional tenga sender + receiver visibles (e.g. confirmación de pago, notificación de cambio de contrato), preservar el contrato visual de columnas. Templates en `src/views/emails/` que tengan party grids deben seguir esta regla.
+
+**Pattern fuente** (canonizado live 2026-05-11 vía TASK-863 V1.5.1):
+
+```tsx
+// src/lib/payroll/final-settlement/document-pdf.tsx — fix canónico V1.5.1
+<View style={styles.partyGrid}>
+  <Field label='Empleador' value={employer.legalName} />       {/* col 1 */}
+  <Field label='Trabajador/a' value={collaborator.legalName} /> {/* col 2 */}
+  <Field label='RUT empleador' value={employer.taxId} />        {/* col 1 */}
+  <Field label='RUT trabajador/a' value={collaborator.taxId} /> {/* col 2 */}
+  <Field label='Domicilio empleador' value={employer.address} />{/* col 1 */}
+  <Field label='Domicilio trabajador/a' value={worker.address}/>{/* col 2 */}
+  <View style={styles.field} />                                  {/* col 1 — spacer canónico: empleador no tiene cargo */}
+  <Field label='Cargo' value={collaborator.jobTitle} />          {/* col 2 — trabajador */}
+</View>
+```
+
+**Aplicabilidad cross-surface**: la regla aplica a TODAS las surfaces de Greenhouse donde se renderizan datos en columnas semánticamente diferenciadas:
+
+| Surface | Stack | Ejemplos |
+| --- | --- | --- |
+| PDFs operativos | `@react-pdf/renderer` | Finiquitos, contratos, addenda, certificados, boletas, recibos, cartas formales |
+| Emails transaccionales | React Email + MJML/HTML tables | Confirmación pago, notificaciones cambio contrato, recordatorios firma |
+| Tablas operativas MUI | DataTableShell (TASK-743) | Conciliación bancaria (movimiento vs match), payment orders (origen vs destino), payroll (haberes vs descuentos) |
+| Layouts de detalle | MUI Grid container | Drawers de cliente vs proveedor, perfiles persona vs organización |
+| Comparativos visuales | CSS Grid / Flexbox | Before/after, plan A vs plan B, propuesta vs contrato firmado |
+
+**Cuándo invocar audit comprehensive 3-skills** (aprendizaje canonizado del loop V1.1→V1.5):
+
+Para cualquier documento legal/regulatorio nuevo o cambio mayor que vaya a ser firmado/notarizado/auditado externamente, el pre-emisión audit técnico (typecheck + lint + visual review) NO es suficiente. El **pattern canónico post-2026-05-11** es:
+
+1. Implementar V1 con fixtures sintéticos + audit técnico.
+2. **Emitir 1 caso real** del dominio (con datos reales del cliente/colaborador/proveedor).
+3. Invocar comprehensive audit 3-skills sobre el documento real emitido:
+   - **Skill de dominio** (e.g. `greenhouse-payroll-auditor` para nómina/finiquitos, `greenhouse-finance-accounting-operator` para finance, `greenhouse-ux-writing` con foco es-CL formal-legal para textos jurídicos).
+   - **Skill UX writing** apropiada al registro (operativo / formal / legal / técnico).
+   - **Skill `modern-ui`** o equivalente visual para jerarquía/tipografía/spacing/balance.
+4. Iterar fixes hasta cerrar bloqueantes.
+5. **Canonizar** aprendizajes en AGENTS.md + CLAUDE.md + spec arquitectónica + doc funcional + ADR si toca contratos compartidos.
+
+Sin paso 3 (audit comprehensive post-real-emit), bugs como B-1/B-2/B-3 (cláusulas legales con vicio defendible) o V1.5.1 (cargo del trabajador en col empleador) quedan latentes y se manifiestan recién cuando un cliente, abogado, contralor o auditor externo lo detecta — costo mucho mayor.
 
 ### Organization-by-facets — receta canónica (TASK-611/612/613, 2026-05-08)
 

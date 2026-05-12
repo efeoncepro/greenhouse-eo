@@ -1,9 +1,9 @@
 # Offboarding Laboral y Contractual
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-05-04 por Codex
-> **Ultima actualizacion:** 2026-05-07 por Codex
+> **Ultima actualizacion:** 2026-05-11 por Codex
 > **Documentacion tecnica:** [GREENHOUSE_WORKFORCE_OFFBOARDING_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_WORKFORCE_OFFBOARDING_ARCHITECTURE_V1.md)
 
 ---
@@ -50,6 +50,7 @@ Greenhouse resuelve una lane para orientar los pasos posteriores:
 ## Triggers actuales
 
 - HR puede abrir un caso manual desde `/hr/offboarding`.
+- TASK-867: `/hr/offboarding` consume `OffboardingWorkQueue`, una proyeccion read-only que muestra estado operativo, proximo paso, progreso y acciones principales sin recalcular en React ni hacer fetch por fila.
 - People 360 muestra un CTA `Iniciar offboarding` cuando no hay caso activo.
 - SCIM/Admin al desactivar identidad abre un caso `needs_review` de tipo `identity_only`, en vez de esconder la accion como salida laboral.
 - HR puede ejecutar una revision de contratos proximos/vencidos. Esa revision crea casos `needs_review` con source `contract_expiry`; no ejecuta salida automaticamente.
@@ -83,6 +84,7 @@ People 360 muestra esa historia como `Relacion laboral cerrada` y `Relacion cont
 - Autorizacion fina: capability `hr.offboarding_case` con acciones `read`, `create`, `update`, `approve`, `manage`.
 - Finiquito: capability `hr.final_settlement` con acciones `read`, `create`, `update`, `approve`, `manage`.
 - Documento de finiquito: capability `hr.final_settlement_document` con acciones `read`, `create`, `update`, `approve`, `manage`.
+- La cola operacional `GET /api/hr/offboarding/work-queue` exige lectura de las tres capabilities anteriores y no crea capabilities nuevas.
 - Route groups reutilizados: `hr` y `people`.
 - Startup policy: sin cambios.
 

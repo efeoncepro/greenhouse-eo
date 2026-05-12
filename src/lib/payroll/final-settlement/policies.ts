@@ -48,6 +48,26 @@ export const FINAL_SETTLEMENT_COMPONENT_POLICIES: Record<FinalSettlementComponen
     requiresSourceRef: true,
     blocksApprovalWhenAmbiguous: true
   },
+  pending_vacation_carryover: {
+    componentCode: 'pending_vacation_carryover',
+    policyCode: 'cl.final_settlement.pending_vacation_carryover.non_income.v1',
+    legalTreatment: 'legal_indemnity',
+    taxTreatment: 'non_income',
+    previsionalTreatment: 'not_contribution_base',
+    overlapBehavior: 'never_duplicate_monthly',
+    requiresSourceRef: true,
+    blocksApprovalWhenAmbiguous: true
+  },
+  proportional_vacation_current_period: {
+    componentCode: 'proportional_vacation_current_period',
+    policyCode: 'cl.final_settlement.proportional_vacation_current_period.non_income.v1',
+    legalTreatment: 'legal_indemnity',
+    taxTreatment: 'non_income',
+    previsionalTreatment: 'not_contribution_base',
+    overlapBehavior: 'never_duplicate_monthly',
+    requiresSourceRef: true,
+    blocksApprovalWhenAmbiguous: true
+  },
   used_or_advanced_vacation_adjustment: {
     componentCode: 'used_or_advanced_vacation_adjustment',
     policyCode: 'cl.final_settlement.used_or_advanced_vacation_adjustment.v1',

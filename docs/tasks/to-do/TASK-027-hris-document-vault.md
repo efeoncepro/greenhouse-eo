@@ -301,6 +301,23 @@ La implementación puede conservar snapshots de nombre/tamaño/mime para resilie
 - La task queda formalmente anclada a `EPIC-001`.
 - Su ejecución objetivo converge con `TASK-489`, `TASK-492` y `TASK-494` para evitar que HR implemente un vault documental aislado del programa transversal.
 
+## Delta 2026-05-11 — Arch hardening pre-implementación (3 gaps específicos legacy)
+
+Skill `arch-architect` (Greenhouse overlay) revisó las 4 tasks del chain documental aplicando patrones canonizados post-creación (TASK-611/742/771/773/780/784/863). El bulk de los gaps se concentra en `TASK-489` (foundation) y `TASK-494` (convergence HR) — ver Delta 2026-05-11 en esos archivos. Para esta task legacy (absorbida por TASK-494) solo 3 deltas específicos:
+
+1. **TASK-027 queda explícitamente como spec legacy de referencia.** El brief funcional sigue vigente como input histórico, pero la **execution canónica** se hace en `TASK-494`. Cualquier agente que tome trabajo de documents vault HR debe leer **PRIMERO** TASK-494 (con su Delta 2026-05-11) y **SOLO** consultar TASK-027 para entender la intención funcional original.
+2. **Open question sobre `certificado` como type del vault HR queda resuelta**: NO. Las `member_certifications` (TASK-313) ya cubren certificaciones profesionales como agregado canónico separado. El vault HR cubre documentos laborales (contrato, anexo, NDA, licencia médica, doc identidad escaneado). Si emerge necesidad de "certificado laboral" (e.g. certificado de remuneraciones), se crea como `document_type` nuevo en TASK-489 con su retention_class — NO se reabre el debate con `member_certifications`.
+3. **Open question sobre People 360 tab vs bloque dentro de HR profile queda resuelta**: tab dedicada via Organization Workspace shell facet (pattern TASK-611/612/613 aplicado a Colaborador 360). Ver TASK-494 Delta gap #3 para detalle del FACET_REGISTRY entry.
+
+Frontera con dominios adjacentes ahora explícita (NO duplicar):
+
+- `member_certifications` (TASK-313) → profesional (skills, cursos, idiomas, diplomas).
+- `member_evidence` → reputacional/portfolio (work samples).
+- `person_identity_documents` (TASK-784) → DATA personal extraída de doc identidad (RUT, número, expiry).
+- `final_settlement_documents` (TASK-863) → finiquitos con state machine + watermark propio.
+- `member_documents` (TASK-494) → contratos, anexos, NDAs, licencias médicas, doc identidad ASSET escaneado.
+- `documents` (TASK-489) → registry transversal que **agrupa** los anteriores via bridges, NO los reemplaza.
+
 ## Open Questions
 
 - si `document_type='certificado'` sigue siendo necesario en HR Vault o debe separarse semánticamente de certificaciones profesionales

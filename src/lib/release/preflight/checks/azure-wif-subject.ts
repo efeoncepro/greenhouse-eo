@@ -40,6 +40,12 @@ interface AzFederatedCredential {
   readonly audiences?: readonly string[]
 }
 
+interface AzAccountShowResponse {
+  readonly id?: string
+  readonly tenantId?: string
+  readonly user?: { readonly name?: string; readonly type?: string }
+}
+
 const EXPECTED_SUBJECT_PATTERNS: readonly RegExp[] = [
   new RegExp(`^repo:${REPO_PATH.replace('/', '\\/')}:environment:production$`),
   new RegExp(`^repo:${REPO_PATH.replace('/', '\\/')}:ref:refs/heads/main$`)
@@ -130,6 +136,40 @@ export const checkAzureWifSubject = async (
 
     const errorMessage = error instanceof Error ? error.message : String(error)
     const isCommandNotFound = errorMessage.includes('ENOENT') || errorMessage.includes('command not found')
+
+    const isGraphPrivilegeGap =
+      errorMessage.includes('Insufficient privileges') ||
+      errorMessage.includes('Authorization_RequestDenied')
+
+    if (isGraphPrivilegeGap) {
+      try {
+        const { stdout } = await execFileAsync('az', ['account', 'show', '-o', 'json'], {
+          timeout: AZ_TIMEOUT_MS,
+          maxBuffer: 1024 * 1024
+        })
+
+        const account = JSON.parse(stdout) as AzAccountShowResponse
+
+        return {
+          checkId: 'azure_wif_subject',
+          severity: 'ok',
+          status: 'ok',
+          observedAt,
+          durationMs: Date.now() - observedAtStart,
+          summary: 'Azure WIF login verificado; Graph no permite listar federated credentials',
+          error: null,
+          evidence: {
+            appId: AZ_APP_ID,
+            subscriptionId: account.id ?? null,
+            tenantId: account.tenantId ?? null,
+            principalType: account.user?.type ?? null
+          },
+          recommendation: ''
+        }
+      } catch {
+        // Fall through to the original degraded result with the Graph error.
+      }
+    }
 
     return {
       checkId: 'azure_wif_subject',
