@@ -27,12 +27,16 @@ describe('checkSentryCriticalIssues', () => {
   const originalToken = process.env.SENTRY_AUTH_TOKEN
   const originalIncidentsToken = process.env.SENTRY_INCIDENTS_AUTH_TOKEN
   const originalIncidentsTokenRef = process.env.SENTRY_INCIDENTS_AUTH_TOKEN_SECRET_REF
+  const originalEnvironment = process.env.SENTRY_RELEASE_PREFLIGHT_ENVIRONMENT
+  const originalSentryEnvironment = process.env.SENTRY_ENVIRONMENT
   const originalFetch = global.fetch
 
   beforeEach(() => {
     delete process.env.SENTRY_AUTH_TOKEN
     delete process.env.SENTRY_INCIDENTS_AUTH_TOKEN
     delete process.env.SENTRY_INCIDENTS_AUTH_TOKEN_SECRET_REF
+    delete process.env.SENTRY_RELEASE_PREFLIGHT_ENVIRONMENT
+    delete process.env.SENTRY_ENVIRONMENT
     global.fetch = vi.fn()
   })
 
@@ -43,6 +47,10 @@ describe('checkSentryCriticalIssues', () => {
     else delete process.env.SENTRY_INCIDENTS_AUTH_TOKEN
     if (originalIncidentsTokenRef !== undefined) process.env.SENTRY_INCIDENTS_AUTH_TOKEN_SECRET_REF = originalIncidentsTokenRef
     else delete process.env.SENTRY_INCIDENTS_AUTH_TOKEN_SECRET_REF
+    if (originalEnvironment !== undefined) process.env.SENTRY_RELEASE_PREFLIGHT_ENVIRONMENT = originalEnvironment
+    else delete process.env.SENTRY_RELEASE_PREFLIGHT_ENVIRONMENT
+    if (originalSentryEnvironment !== undefined) process.env.SENTRY_ENVIRONMENT = originalSentryEnvironment
+    else delete process.env.SENTRY_ENVIRONMENT
     global.fetch = originalFetch
   })
 
@@ -86,6 +94,25 @@ describe('checkSentryCriticalIssues', () => {
     const [url] = vi.mocked(global.fetch).mock.calls[0] ?? []
 
     expect(String(url)).toContain('lastSeen%3A-24h')
+    expect(String(url)).toContain('environment=production')
+  })
+
+  it('allows overriding the production Sentry environment explicitly', async () => {
+    process.env.SENTRY_AUTH_TOKEN = 'fake'
+    process.env.SENTRY_RELEASE_PREFLIGHT_ENVIRONMENT = 'staging'
+    global.fetch = vi.fn(async () => ({
+      ok: true,
+      status: 200,
+      json: async () => []
+    })) as never
+
+    const result = await checkSentryCriticalIssues(buildInput())
+
+    expect(result.severity).toBe('ok')
+
+    const [url] = vi.mocked(global.fetch).mock.calls[0] ?? []
+
+    expect(String(url)).toContain('environment=staging')
   })
 
   it('severity warning when 1-9 critical issues', async () => {

@@ -24,6 +24,7 @@ import type { PreflightInput } from '../runner'
 const SENTRY_API_BASE = process.env.SENTRY_API_BASE ?? 'https://sentry.io'
 const SENTRY_TIMEOUT_MS = 6_000
 const ERROR_THRESHOLD = 10
+const DEFAULT_SENTRY_ENVIRONMENT = 'production'
 
 interface SentryIssue {
   readonly id: string
@@ -40,10 +41,17 @@ interface SentryIssue {
 const fetchSentryIssues = async (
   token: string,
   orgSlug: string,
-  projectSlug: string
+  projectSlug: string,
+  environment: string
 ): Promise<readonly SentryIssue[]> => {
-  const query = encodeURIComponent('is:unresolved level:[error,fatal] lastSeen:-24h')
-  const url = `${SENTRY_API_BASE}/api/0/projects/${encodeURIComponent(orgSlug)}/${encodeURIComponent(projectSlug)}/issues/?query=${query}&statsPeriod=24h&limit=100`
+  const params = new URLSearchParams({
+    query: 'is:unresolved level:[error,fatal] lastSeen:-24h',
+    statsPeriod: '24h',
+    limit: '100',
+    environment
+  })
+
+  const url = `${SENTRY_API_BASE}/api/0/projects/${encodeURIComponent(orgSlug)}/${encodeURIComponent(projectSlug)}/issues/?${params.toString()}`
 
   const controller = new AbortController()
   const timer = setTimeout(() => controller.abort(), SENTRY_TIMEOUT_MS)
@@ -83,6 +91,11 @@ export const checkSentryCriticalIssues = async (
   const orgSlug = process.env.SENTRY_ORG_SLUG ?? process.env.SENTRY_ORG ?? 'efeonce'
   const projectSlug = process.env.SENTRY_PROJECT_SLUG ?? process.env.SENTRY_PROJECT ?? 'greenhouse-eo'
 
+  const environment =
+    process.env.SENTRY_RELEASE_PREFLIGHT_ENVIRONMENT?.trim() ||
+    process.env.SENTRY_ENVIRONMENT?.trim() ||
+    DEFAULT_SENTRY_ENVIRONMENT
+
   if (!token) {
     return {
       checkId: 'sentry_critical_issues',
@@ -92,14 +105,14 @@ export const checkSentryCriticalIssues = async (
       durationMs: Date.now() - observedAtStart,
       summary: 'SENTRY_INCIDENTS_AUTH_TOKEN/SENTRY_AUTH_TOKEN no configurado',
       error: null,
-      evidence: { orgSlug, projectSlug },
+      evidence: { orgSlug, projectSlug, environment },
       recommendation:
         'Configurar SENTRY_INCIDENTS_AUTH_TOKEN_SECRET_REF o SENTRY_AUTH_TOKEN local/CI antes de promover.'
     }
   }
 
   try {
-    const issues = await fetchSentryIssues(token, orgSlug, projectSlug)
+    const issues = await fetchSentryIssues(token, orgSlug, projectSlug, environment)
     const criticalIssues = issues.filter(i => i.level === 'error' || i.level === 'fatal')
     const count = criticalIssues.length
 
@@ -112,7 +125,7 @@ export const checkSentryCriticalIssues = async (
         durationMs: Date.now() - observedAtStart,
         summary: 'Sin Sentry issues unresolved level=error/fatal en 24h',
         error: null,
-        evidence: { count: 0, orgSlug, projectSlug },
+        evidence: { count: 0, orgSlug, projectSlug, environment },
         recommendation: ''
       }
     }
@@ -136,7 +149,7 @@ export const checkSentryCriticalIssues = async (
       durationMs: Date.now() - observedAtStart,
       summary: `${count} Sentry issue(s) unresolved level=error/fatal en 24h`,
       error: null,
-      evidence: { count, topIssues, orgSlug, projectSlug },
+      evidence: { count, topIssues, orgSlug, projectSlug, environment },
       recommendation:
         severity === 'error'
           ? 'Production ya esta en fire mode (>=10 issues criticas activas). NO promover hasta resolver.'
