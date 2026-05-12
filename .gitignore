@@ -9,6 +9,7 @@
 /coverage
 /artifacts/
 /.auth/
+/.captures/
 /test-results/
 /playwright-report/
 /blob-report/

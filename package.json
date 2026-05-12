@@ -101,6 +101,8 @@
     "secrets:audit": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/secrets/audit.ts",
     "secrets:rotate": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/secrets/rotate.ts",
     "auth:audit-azure-app": "tsx scripts/auth/audit-azure-app.ts",
+    "fe:capture": "tsx scripts/frontend/capture.ts",
+    "fe:capture:gc": "tsx scripts/frontend/gc.ts",
     "release:rollback": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/release/production-rollback.ts",
     "release:watchdog": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/release/production-release-watchdog.ts",
     "release:preflight": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/release/production-preflight.ts",
