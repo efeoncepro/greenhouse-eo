@@ -1,8 +1,8 @@
 # Greenhouse Client Portal Domain Architecture V1
 
-> **Version:** 1.1
+> **Version:** 1.2
 > **Created:** 2026-05-07 por Claude (Opus 4.7)
-> **Updated:** 2026-05-12 por Claude (Opus 4.7) — arch-architect verdict aplicado a TASK-822: agregadas §3.1 (Module classification: curated vs native) y §3.2 (Domain import direction enforced)
+> **Updated:** 2026-05-12 por Claude (Opus 4.7) — arch-architect verdict aplicado a TASK-822 (V1.1, §3.1 + §3.2) y a TASK-824 (V1.2, §5.1 rename `business_line` → `applicability_scope` + COMMENT canónico + remove dormant `default_for_business_lines` + parity test contract Option C; reconcilia con `GREENHOUSE_BUSINESS_LINES_ARCHITECTURE_V1.md` hard rule "no duplicar enum del catalogo")
 > **Audience:** Backend engineers, frontend engineers, product owners, comerciales que vendan módulos del portal cliente, agentes que toquen rutas `/api/client-portal/*`, owners de Globe/Wave/CRM Solutions
 > **Related:** `GREENHOUSE_360_OBJECT_MODEL_V1.md`, `GREENHOUSE_CLIENT_PORTAL_ARCHITECTURE_V1.md` (V3.0, descriptivo — predecesor), `GREENHOUSE_CLIENT_LIFECYCLE_V1.md`, `GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md`, `GREENHOUSE_AGENCY_LAYER_V2.md`, `GREENHOUSE_ASSIGNED_TEAM_ARCHITECTURE_V1.md`, `GREENHOUSE_FEATURE_FLAGS_ROLLOUT_PLATFORM_V1.md`
 > **Supersedes:** este spec NO supersede `GREENHOUSE_CLIENT_PORTAL_ARCHITECTURE_V1.md` V3.0 — coexisten: V3.0 describe la experiencia funcional y los 16 cards Creative Hub; este V1 (Domain) canoniza la **estructura del dominio** y el modelo de módulos on-demand. V3.0 sigue siendo lectura obligatoria para entender qué se compone.
@@ -164,7 +164,13 @@ src/lib/{account-360,agency,ico-engine,commercial,finance,delivery,identity,hr}/
 
 ### 5.1 `greenhouse_client_portal.modules`
 
-Catálogo declarativo de módulos. Append-only (versionable via `effective_to`). NUNCA modificar fila existente.
+Catálogo declarativo de módulos. Append-only (versionable via `effective_to`). NUNCA modificar fila existente excepto `effective_to` (deprecación) o `display_label*` (typo fix operacional).
+
+**Delta V1.2 (2026-05-12, arch-architect verdict TASK-824)**:
+
+- Campo `business_line` (V1.0) renombrado a `applicability_scope` (V1.2). Razón: `GREENHOUSE_BUSINESS_LINES_ARCHITECTURE_V1.md` declara explícitamente "no existe enum PostgreSQL duplicado del catalogo" — la source of truth canónica del business_line del 360 es `greenhouse_core.service_modules.module_code WHERE module_kind='business_line'`. El campo en `client_portal.modules` mezcla dimensiones ortogonales (business_lines reales `globe`/`wave`/`crm_solutions` + metavalue `cross` "aplicable a múltiples" + service_module `staff_aug` "dentro de cross") — por lo tanto NO es business_line en sentido canónico. Rename clarifica semántica + COMMENT canónico documenta la distinción para evitar futuro drift.
+- Campo `default_for_business_lines` (V1.0 reservado dormido) ELIMINADO V1.2. Razón: YAGNI; campos dormidos son drift latente. Si emerge necesidad real en V1.1+, ADD COLUMN nullable migration — cero costo aplazar.
+- Whitelist de `data_sources[]`: V1.0 no especificaba enforcement; V1.2 adopta **Option C — parity test live TS↔DB** (mismo patrón TASK-611 `capabilities_registry`). NO se introduce CHECK constraint sobre `data_sources[]` con array literal hardcodeado (drift latente cada vez que `ClientPortalDataSource` TS union se extienda). Si el catalog crece > 30 values en V1.1+, migrar a Option B (registry table dedicada).
 
 ```sql
 CREATE SCHEMA IF NOT EXISTS greenhouse_client_portal;
@@ -175,22 +181,21 @@ CREATE TABLE greenhouse_client_portal.modules (
   display_label      TEXT NOT NULL,                    -- 'Creative Hub' (es-CL operator-facing)
   display_label_client TEXT NOT NULL,                  -- 'Tu Creative Hub' (cliente-facing, tono cálido)
   description        TEXT,
-  business_line      TEXT NOT NULL
-                     CHECK (business_line IN ('globe','wave','crm_solutions','staff_aug','cross')),
+  applicability_scope TEXT NOT NULL
+                     CHECK (applicability_scope IN ('globe','wave','crm_solutions','staff_aug','cross')),
+                                    -- V1.2 rename desde 'business_line'. Ver COMMENT más abajo.
   tier               TEXT NOT NULL
                      CHECK (tier IN ('standard','addon','pilot','enterprise','internal')),
 
   view_codes         TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
-                                    -- referencias a authorized_views.view_code (TASK-136)
+                                    -- referencias a authorized_views.view_code (TASK-136). Parity test live verifica drift.
   capabilities       TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
-                                    -- capabilities del entitlements platform (TASK-403)
+                                    -- capabilities del entitlements platform (TASK-403). Parity test live verifica drift.
   data_sources       TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
-                                    -- whitelist de dominios que alimentan: 'agency.ico','commercial.engagements','finance.invoices','delivery.tasks','assigned_team'
+                                    -- whitelist de dominios productores: 'agency.ico','commercial.engagements','finance.invoices','delivery.tasks','assigned_team',etc. Parity test live TS↔DB (Option C) verifica drift contra ClientPortalDataSource type union de src/lib/client-portal/dto/reader-meta.ts. NO hay CHECK constraint con array literal hardcodeado (drift latente).
 
   pricing_kind       TEXT NOT NULL
                      CHECK (pricing_kind IN ('bundled','addon_fixed','addon_usage','pilot_no_cost','pilot_success_fee','enterprise_custom')),
-  default_for_business_lines TEXT[] DEFAULT ARRAY[]::TEXT[],
-                                    -- ej. ['globe'] para creative_hub_globe_v1; cliente con business_line=globe lo recibe por default si no hay assignment explícito (V1.0 NO usa este campo aún — reservado para V1.1 inferencia automática)
 
   effective_from     DATE NOT NULL DEFAULT CURRENT_DATE,
   effective_to       DATE,
@@ -200,14 +205,17 @@ CREATE TABLE greenhouse_client_portal.modules (
   CHECK (effective_to IS NULL OR effective_to > effective_from)
 );
 
-CREATE INDEX modules_business_line ON greenhouse_client_portal.modules (business_line) WHERE effective_to IS NULL;
+COMMENT ON COLUMN greenhouse_client_portal.modules.applicability_scope IS
+  'Categoría de aplicabilidad del módulo dentro del dominio client_portal. NO es FK al business_line canónico del 360 (greenhouse_core.service_modules.module_code WHERE module_kind=''business_line''). Mezcla dimensiones ortogonales: business_lines reales (globe, wave, crm_solutions), metavalue cross=aplicable-a-múltiples, y service_module staff_aug=dentro-de-cross. Para resolver el business_line canónico del cliente consumidor, usar greenhouse_core.business_line_metadata. Hard rule canonizada en GREENHOUSE_BUSINESS_LINES_ARCHITECTURE_V1.md: NO duplicar enum del catalogo.';
+
+CREATE INDEX modules_applicability_scope ON greenhouse_client_portal.modules (applicability_scope) WHERE effective_to IS NULL;
 CREATE INDEX modules_tier ON greenhouse_client_portal.modules (tier) WHERE effective_to IS NULL;
 
 -- Append-only triggers
 CREATE OR REPLACE FUNCTION greenhouse_client_portal.modules_no_update_breaking() RETURNS trigger AS $$
 BEGIN
   -- Solo se permite UPDATE de effective_to (deprecación) y display_label* (typo fix)
-  IF NEW.module_key != OLD.module_key OR NEW.business_line != OLD.business_line
+  IF NEW.module_key != OLD.module_key OR NEW.applicability_scope != OLD.applicability_scope
      OR NEW.tier != OLD.tier OR NEW.view_codes != OLD.view_codes
      OR NEW.capabilities != OLD.capabilities OR NEW.data_sources != OLD.data_sources
      OR NEW.pricing_kind != OLD.pricing_kind OR NEW.effective_from != OLD.effective_from THEN
@@ -221,6 +229,8 @@ CREATE TRIGGER modules_append_only_check
   BEFORE UPDATE ON greenhouse_client_portal.modules
   FOR EACH ROW EXECUTE FUNCTION greenhouse_client_portal.modules_no_update_breaking();
 ```
+
+**Parity test live canónico (V1.2)**: `src/lib/client-portal/data-sources/parity.{ts,live.test.ts}` — replica shape de TASK-611 `capabilities_registry`. Lee seed DB y compara los 3 arrays (`data_sources` + `view_codes` + `capabilities`) contra TS sources of truth (`ClientPortalDataSource` union + `VIEW_REGISTRY` + `entitlements-catalog`). Falla loud (rompe build) si emerge drift TS↔DB. CI gate corre en lane con PG config; `describe.skipIf(!hasPgConfig)` permite lint-only runs locales.
 
 ### 5.2 `greenhouse_client_portal.module_assignments`
 
@@ -307,9 +317,11 @@ COMMENT ON COLUMN greenhouse_commercial.engagement_commercial_terms.bundled_modu
 
 ### 5.5 Seed inicial — 10 módulos canónicos V1.0
 
+NOTA V1.2: la columna `business_line` fue renombrada a `applicability_scope` (ver §5.1 Delta V1.2). Los valores siguen idénticos (rename puro, no cambio semántico de los seeds).
+
 ```sql
 -- Globe (3)
-INSERT INTO greenhouse_client_portal.modules (module_key, display_label, display_label_client, business_line, tier, view_codes, capabilities, data_sources, pricing_kind) VALUES
+INSERT INTO greenhouse_client_portal.modules (module_key, display_label, display_label_client, applicability_scope, tier, view_codes, capabilities, data_sources, pricing_kind) VALUES
 ('creative_hub_globe_v1', 'Creative Hub Globe (Bundle)', 'Tu Creative Hub', 'globe', 'standard',
   ARRAY['cliente.pulse','cliente.proyectos','cliente.campanas','cliente.creative_hub','cliente.equipo','cliente.reviews'],
   ARRAY['client_portal.creative_hub.read','client_portal.csc_pipeline.read','client_portal.brand_intelligence.read','client_portal.cvr.read'],
@@ -327,7 +339,7 @@ INSERT INTO greenhouse_client_portal.modules (module_key, display_label, display
   'addon_fixed');
 
 -- Cross-line (3)
-INSERT INTO greenhouse_client_portal.modules (module_key, display_label, display_label_client, business_line, tier, view_codes, capabilities, data_sources, pricing_kind) VALUES
+INSERT INTO greenhouse_client_portal.modules (module_key, display_label, display_label_client, applicability_scope, tier, view_codes, capabilities, data_sources, pricing_kind) VALUES
 ('equipo_asignado', 'Equipo Asignado', 'Tu equipo', 'cross', 'standard',
   ARRAY['cliente.equipo'],
   ARRAY['client_portal.assigned_team.read'],
@@ -345,7 +357,7 @@ INSERT INTO greenhouse_client_portal.modules (module_key, display_label, display
   'bundled');
 
 -- Globe addons (2)
-INSERT INTO greenhouse_client_portal.modules (module_key, display_label, display_label_client, business_line, tier, view_codes, capabilities, data_sources, pricing_kind) VALUES
+INSERT INTO greenhouse_client_portal.modules (module_key, display_label, display_label_client, applicability_scope, tier, view_codes, capabilities, data_sources, pricing_kind) VALUES
 ('brand_intelligence', 'Brand Intelligence (RpA + First-Time Right)', 'Tu Brand Intelligence', 'globe', 'addon',
   ARRAY['cliente.brand_intelligence'],
   ARRAY['client_portal.brand_intelligence.read'],
@@ -357,8 +369,8 @@ INSERT INTO greenhouse_client_portal.modules (module_key, display_label, display
   ARRAY['agency.csc'],
   'addon_fixed');
 
--- Otras business lines (2)
-INSERT INTO greenhouse_client_portal.modules (module_key, display_label, display_label_client, business_line, tier, view_codes, capabilities, data_sources, pricing_kind) VALUES
+-- Otros applicability_scope (2)
+INSERT INTO greenhouse_client_portal.modules (module_key, display_label, display_label_client, applicability_scope, tier, view_codes, capabilities, data_sources, pricing_kind) VALUES
 ('crm_command_legacy', 'CRM Command (legacy, transición a Kortex)', 'Tu CRM Command', 'crm_solutions', 'standard',
   ARRAY['cliente.crm_command'],
   ARRAY['client_portal.crm_command.read'],
@@ -630,7 +642,7 @@ Subsystem nuevo: `Client Portal Health` (registrado en `RELIABILITY_REGISTRY`).
 | `client_portal.assignment.orphan_module_key` | data_quality | error | 0 | assignments con `module_key` no presente en `modules` activos |
 | `client_portal.assignment.lifecycle_module_drift` | drift | warning | 0 | clientes con `lifecycle_stage='active_client'` pero zero assignments activos > 14 días |
 | `client_portal.cascade.dead_letter` | dead_letter | error | 0 | outbox events `client.portal.*` en dead_letter |
-| `client_portal.assignment.business_line_mismatch` | drift | warning | 0 | assignments cuyo módulo declara `business_line` distinto al de la organización (excepto `cross`) |
+| `client_portal.assignment.business_line_mismatch` | drift | warning | 0 | assignments cuyo módulo declara `applicability_scope` distinto al business_line canónico de la organización (excepto cuando `applicability_scope='cross'` que es aplicable a múltiples) |
 | `client_portal.assignment.pilot_expired_not_actioned` | drift | warning | 0 | pilots con `expires_at < now()` y `status='pilot'` (no transitioned a active/churned) |
 | `client_portal.assignment.churned_with_active_session` | drift | error | 0 | client_users con session activa cuya org tiene `lifecycle_stage='inactive'/'churned'` y assignments con `status != 'churned'` |
 
@@ -688,7 +700,7 @@ Subsystem nuevo: `Client Portal Health` (registrado en `RELIABILITY_REGISTRY`).
 - **NUNCA** branchear UI client-side por `tenant_type`, `business_line` o `tenant_capabilities` directo. Toda diferenciación pasa por el resolver.
 - **NUNCA** duplicar datos primarios en `greenhouse_client_portal.*`. Solo catálogo + assignments. Datos viven en dominios productores.
 - **NUNCA** habilitar un módulo manualmente sin pasar por `enableClientPortalModule()`. CHECK constraint + capability + audit.
-- **NUNCA** modificar `modules.*` campos críticos in-place (business_line, tier, view_codes, capabilities, data_sources, pricing_kind, effective_from). Versionar via `effective_to` + nueva fila con `module_key` distinto. Append-only trigger enforced.
+- **NUNCA** modificar `modules.*` campos críticos in-place (applicability_scope, tier, view_codes, capabilities, data_sources, pricing_kind, effective_from). Versionar via `effective_to` + nueva fila con `module_key` distinto. Append-only trigger enforced.
 - **NUNCA** UPDATE/DELETE sobre `module_assignment_events`. Triggers append-only.
 - **NUNCA** loggear `reason`, `cancellation_reason`, `override_reason` raw — `redactSensitive` antes.
 - **NUNCA** invocar `enableClientPortalModule` directo desde UI client-facing. Solo desde admin endpoint o reactive consumer.
@@ -839,7 +851,10 @@ Fases:
 | **Addon** | Módulo `tier='addon'` no incluido en bundle base; requires explicit enable |
 | **Pilot/Trial** | Assignment con `status='pilot'` y `expires_at` set; transitions a `active` o `churned` al expirar |
 | **Drift** | Discrepancia entre assignments y signals legacy (`tenant_capabilities`); detected por reliability signal |
-| **Override** | Acción excepcional de habilitar un módulo cuyo `business_line` no matchea el de la organización; restringido a EFEONCE_ADMIN + audit |
+| **Override** | Acción excepcional de habilitar un módulo cuyo `applicability_scope` no matchea el business_line canónico de la organización; restringido a EFEONCE_ADMIN + audit |
+| **Applicability scope** | Campo `modules.applicability_scope` del dominio client_portal (V1.2 rename desde `business_line`). Mezcla dimensiones ortogonales: business_lines reales (`globe`/`wave`/`crm_solutions`), metavalue `cross` (aplicable a múltiples) y service_module `staff_aug` (dentro de cross). **NO es FK al business_line canónico del 360** (`greenhouse_core.service_modules.module_code WHERE module_kind='business_line'`). Para resolver el business_line canónico del cliente consumidor, usar `greenhouse_core.business_line_metadata`. Hard rule: NO duplicar enum del catalogo (per `GREENHOUSE_BUSINESS_LINES_ARCHITECTURE_V1.md`). |
+| **Business line (canónico)** | Identidad del 360 — fila en `greenhouse_core.service_modules` con `module_kind='business_line'`. Source of truth para `globe`, `wave`, `crm_solutions`. NO confundir con `modules.applicability_scope` del client_portal (que es ortogonal). |
+| **Parity test (client_portal)** | Test live `src/lib/client-portal/data-sources/parity.live.test.ts` que verifica drift TS↔DB de los 3 arrays de `modules` (data_sources + view_codes + capabilities). Replica shape de TASK-611 `capabilities_registry`. `describe.skipIf(!hasPgConfig)` para lint-only runs. |
 
 ---
 
