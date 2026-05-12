@@ -8,17 +8,17 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `optional`
-- Status real: `Mockup aprobado`
+- Status real: `Cerrada`
 - Rank: `TBD`
 - Domain: `hr`
 - Blocked by: `none`
-- Branch: `task/TASK-867-offboarding-work-queue-ux`
+- Branch: `develop` directo por instruccion explicita del usuario
 - Legacy ID: `none`
 - GitHub Issue: `optional`
 
@@ -464,15 +464,15 @@ Evitar:
 
 ## Acceptance Criteria
 
-- [ ] Existe helper server-only `OffboardingWorkQueue` con tests de derivacion.
-- [ ] Existe endpoint read-only `/api/hr/offboarding/work-queue` con auth/capabilities least-privilege.
-- [ ] `HrOffboardingView` deja de hacer N+1 fetch por cada case para settlement/document.
-- [ ] La vista mantiene todos los flujos funcionales existentes de TASK-862/TASK-863.
-- [ ] La UI presenta summary, proximo paso, progreso y accion primaria de forma escaneable.
-- [ ] Los estados loading/empty/partial/error quedan cubiertos.
-- [ ] La copy visible reutilizable vive en `src/lib/copy/finiquito.ts` u otra capa canonica aplicable.
-- [ ] Tests cubren los estados operativos principales y los endpoints de mutacion existentes siguen siendo llamados correctamente.
-- [ ] La decision arquitectonica de la proyeccion queda documentada o explicitamente descartada en el plan con rationale.
+- [x] Existe helper server-only `OffboardingWorkQueue` con tests de derivacion.
+- [x] Existe endpoint read-only `/api/hr/offboarding/work-queue` con auth/capabilities least-privilege.
+- [x] `HrOffboardingView` deja de hacer N+1 fetch por cada case para settlement/document.
+- [x] La vista mantiene todos los flujos funcionales existentes de TASK-862/TASK-863.
+- [x] La UI presenta summary, proximo paso, progreso y accion primaria de forma escaneable.
+- [x] Los estados loading/empty/partial/error quedan cubiertos.
+- [x] La copy visible reutilizable vive en `src/lib/copy/finiquito.ts` u otra capa canonica aplicable.
+- [x] Tests cubren los estados operativos principales y los endpoints de mutacion existentes siguen siendo llamados correctamente.
+- [x] La decision arquitectonica de la proyeccion queda documentada o explicitamente descartada en el plan con rationale.
 
 ## Verification
 
@@ -489,14 +489,16 @@ Evitar:
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
-- [ ] docs funcionales/manual HR quedaron actualizados
-- [ ] cualquier ADR/delta de arquitectura requerido quedo indexado en `docs/architecture/DECISIONS_INDEX.md`
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] docs funcionales/manual HR quedaron actualizados
+- [x] cualquier ADR/delta de arquitectura requerido quedo indexado en `docs/architecture/DECISIONS_INDEX.md`
+
+Nota de cierre: no se agrego ADR dedicado ni entry nueva en `DECISIONS_INDEX.md` porque la implementacion no cambio source of truth, schema, access, eventos ni ownership de mutaciones. La decision quedo documentada como delta arquitectonico en `GREENHOUSE_WORKFORCE_OFFBOARDING_ARCHITECTURE_V1.md`.
 
 ## Follow-ups
 
@@ -519,6 +521,21 @@ Validaciones ejecutadas sobre el mockup:
 - `pnpm design:lint`
 
 Al implementar runtime, no copiar el mock data como fuente de verdad: debe conectarse a la proyeccion read-only `OffboardingWorkQueue` definida en esta task.
+
+## Delta 2026-05-11 — Implementacion cerrada
+
+Se implemento `OffboardingWorkQueue` como contrato read-only server-side en `src/lib/workforce/offboarding/work-queue/` y se expuso `GET /api/hr/offboarding/work-queue` con capabilities de lectura existentes. La vista runtime `/hr/offboarding` consume esa proyeccion, elimina el N+1 cliente-side, adopta el mockup aprobado y conserva los write paths de TASK-862/TASK-863 para carta, pension, calculo, documento, reemision y ratificacion.
+
+Validaciones ejecutadas:
+
+- `pnpm pg:doctor`
+- `pnpm vitest run src/lib/workforce/offboarding/work-queue/derivation.test.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm exec eslint src/views/greenhouse/hr-core/offboarding/HrOffboardingView.tsx src/views/greenhouse/hr-core/offboarding/HrOffboardingView.test.tsx src/lib/workforce/offboarding/work-queue src/app/api/hr/offboarding/work-queue/route.ts src/lib/copy/finiquito.ts`
+- `pnpm design:lint`
+- `pnpm vitest run src/lib/workforce/offboarding src/views/greenhouse/hr-core/offboarding src/lib/copy`
+
+No hubo migraciones, capabilities nuevas, outbox events nuevos ni cambios de view/menu/startup policy.
 
 ## Open Questions
 

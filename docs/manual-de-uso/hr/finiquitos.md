@@ -138,6 +138,8 @@ No todos los casos de offboarding son finiquitos:
 - `Cierre proveedor`: Deel/EOR/contractor externo. Greenhouse registra el cierre operativo; el proveedor es owner del payroll legal.
 - `Revision legal requerida`: clasificacion ambigua. No fuerces calculo automatico.
 
+En `/hr/offboarding`, la cola operacional muestra `Proximo paso` y una accion principal por caso. Si faltan carta de renuncia o declaracion de pension de alimentos, primero completa esos prerequisitos desde el drawer del caso. Cuando ambos esten listos, la accion cambia a `Calcular finiquito`.
+
 ## Estados
 
 | Estado | Significado |

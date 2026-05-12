@@ -155,6 +155,8 @@ Antes de aprobar, Greenhouse revisa:
 
 Los blockers impiden calcular o aprobar. Los warnings quedan como evidencia para revision humana.
 
+Desde TASK-867, `/hr/offboarding` ya no deriva estos pasos en JSX. La vista consume `OffboardingWorkQueue`, que traduce el estado canonico del caso, ultimo calculo y ultimo documento en `proximo paso`, `accion principal`, prerequisitos y progreso. Esa proyeccion es read-only: no reemplaza los endpoints de calcular, aprobar, emitir, reemitir o ratificar.
+
 ## Overlap con nomina mensual
 
 El settlement consulta un `PayrollOverlapLedger` para saber si el mes de salida ya tiene payroll mensual calculado/aprobado/exportado. Si la nomina mensual ya materializo Isapre, AFP, AFC o IUSC, el finiquito no duplica esos descuentos.

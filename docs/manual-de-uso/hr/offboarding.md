@@ -1,9 +1,9 @@
 # Offboarding
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-05-04 por Codex
-> **Ultima actualizacion:** 2026-05-07 por Codex
+> **Ultima actualizacion:** 2026-05-11 por Codex
 > **Modulo:** HR / Workforce
 > **Ruta en portal:** `/hr/offboarding`
 > **Documentacion relacionada:** [Offboarding laboral y contractual](../../documentation/hr/offboarding.md), [GREENHOUSE_WORKFORCE_OFFBOARDING_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_WORKFORCE_OFFBOARDING_ARCHITECTURE_V1.md)
@@ -21,11 +21,12 @@ La vista `Offboarding` permite abrir y operar casos de salida laboral o contract
 ## Crear un caso manual
 
 1. Entra a `Personas y HR > Supervision > Offboarding`.
-2. En `Abrir caso manual`, selecciona el colaborador.
-3. Elige la causal.
-4. Completa `Salida efectiva` y `Ultimo dia`.
-5. Agrega notas si hay contexto operativo o legal relevante.
-6. Haz clic en `Crear`.
+2. Haz clic en `Nuevo caso`.
+3. En el drawer, selecciona el colaborador.
+4. Elige la causal.
+5. Completa `Salida efectiva` y `Ultimo dia`.
+6. Agrega notas si hay contexto operativo o legal relevante.
+7. Haz clic en `Crear`.
 
 El caso queda con lane resuelta automaticamente. Si corresponde a payroll interno Chile, Greenhouse marca que requiere cierre de payroll y reconciliacion de leave. Desde ese caso puedes calcular el finiquito, aprobar el settlement y avanzar el documento formal en el carril `Finiquito`.
 
@@ -35,9 +36,20 @@ Usa `Revisar contratos` para abrir casos `needs_review` cuando hay `contractEndD
 
 Ese boton no ejecuta offboarding, no desactiva usuarios y no fija una fecha de termino laboral. Solo abre una revision para que HR confirme si la relacion termina, se renueva o cambia.
 
+## Usar la cola operacional
+
+La vista principal muestra una cola con summary, filtros y una accion principal por fila:
+
+- `Atencion`: casos con bloqueo o siguiente paso critico.
+- `Listos para calculo`: renuncias con carta y declaracion de pension completas.
+- `Documentos`: casos con documento por revisar, emitir, reemitir o ratificar.
+- `Sin finiquito`: honorarios o proveedor externo.
+
+Haz clic en una fila para abrir el drawer de detalle con progreso, prerequisitos y acciones secundarias.
+
 ## Avanzar estados
 
-La tabla de casos activos muestra la accion disponible:
+La cola muestra la accion disponible cuando corresponde:
 
 - `Aprobar`: valida una salida con fecha efectiva.
 - `Programar`: requiere ultimo dia trabajado.

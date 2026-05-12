@@ -380,6 +380,16 @@ Entonces:
   - reliquidacion o cierre final
   - si Greenhouse calcula o solo referencia
 
+#### Delta 2026-05-11 — OffboardingWorkQueue Projection
+
+TASK-867 agrega `OffboardingWorkQueue` como proyeccion read-only para `/hr/offboarding`.
+
+- Source of truth no cambia: casos en `greenhouse_hr.work_relationship_offboarding_cases`, calculos en `greenhouse_payroll.final_settlements`, documentos en `greenhouse_payroll.final_settlement_documents`.
+- La proyeccion vive en `src/lib/workforce/offboarding/work-queue/` y compone caso + colaborador + ultimo settlement + ultimo documento + prerequisitos + progreso + proximo paso.
+- El endpoint `GET /api/hr/offboarding/work-queue` elimina el N+1 cliente-side de la vista; usa queries batch acotadas e indices existentes.
+- Los `primaryAction` y `secondaryActions` son descriptors de UX. No autorizan ni mutan por si solos; cada write endpoint mantiene sus capability checks y validaciones canonicas.
+- Access model sin cambios: routeGroup `hr`, view `equipo.offboarding`, capabilities `hr.offboarding_case:read`, `hr.final_settlement:read`, `hr.final_settlement_document:read`.
+
 ### Delivery / Assignments / Hierarchy
 
 - bloquear nuevas asignaciones

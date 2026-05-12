@@ -1,10 +1,14 @@
-# Sesion 2026-05-11 — TASK-867 tomada en develop (Offboarding Work Queue Projection + UX Modernization)
+# Sesion 2026-05-11 — TASK-867 cerrada en develop (Offboarding Work Queue Projection + UX Modernization)
 
 - **Trigger:** usuario pidió implementar TASK-867 manteniéndose en `develop` sin cambiar de rama.
-- **Ownership:** task movida a `docs/tasks/in-progress/TASK-867-offboarding-work-queue-projection-ux-modernization.md`; `Lifecycle` actualizado a `in-progress`; índice `docs/tasks/README.md` y registry sincronizados.
-- **Guardrail de rama:** no crear branch aunque la task declare `task/TASK-867-offboarding-work-queue-ux`; prevalece instrucción explícita del usuario para trabajar directo en `develop`.
-- **Estado previo detectado:** `develop` local está 2 commits adelante de `origin/develop` por cambios documentales TASK-489/TASK-868 (`a426da3e`, `0ce35f68`). No son parte de TASK-867; no revertirlos ni mezclarlos deliberadamente.
-- **Próximo paso:** completar Discovery/Audit/Plan antes de tocar runtime, resolviendo Open Questions y contrastando schema/código real.
+- **Estado:** task movida a `docs/tasks/complete/TASK-867-offboarding-work-queue-projection-ux-modernization.md`; `Lifecycle` actualizado a `complete`; `docs/tasks/README.md` y `TASK_ID_REGISTRY.md` sincronizados.
+- **Guardrail de rama:** no se creó branch aunque la task sugería `task/TASK-867-offboarding-work-queue-ux`; prevaleció la instrucción explícita del usuario para trabajar directo en `develop`.
+- **Backend shipped:** nuevo contrato read-only `OffboardingWorkQueue` en `src/lib/workforce/offboarding/work-queue/*` + endpoint `GET /api/hr/offboarding/work-queue`. Reusa `listOffboardingCases()` y agrega batch readers para miembro, último settlement y último documento; no introduce migraciones, eventos ni write paths.
+- **Access model:** sin cambios de routeGroups/views/startup policy. El endpoint exige `hr.offboarding_case:read`, `hr.final_settlement:read` y `hr.final_settlement_document:read`; cada acción de escritura sigue validándose en su endpoint canónico TASK-862/TASK-863.
+- **UI shipped:** `HrOffboardingView` consume la proyección, elimina N+1 por fila, implementa el mockup aprobado con summary strip, tabs/filtros, `DataTableShell`, acción primaria por fila, drawer de detalle y drawer de creación. Se preservaron dialogs y mutaciones existentes para carta, pensión, cálculo, documento, reissue y ratificación.
+- **Docs actualizadas:** arquitectura offboarding, documentación/manual HR offboarding, documentación/manual HR finiquitos, changelog, task, índice y registry.
+- **Validación ejecutada:** `pnpm pg:doctor`; `pnpm vitest run src/lib/workforce/offboarding/work-queue/derivation.test.ts`; `pnpm exec tsc --noEmit --pretty false`; `pnpm exec eslint ...` focalizado; `pnpm design:lint`; `pnpm vitest run src/lib/workforce/offboarding src/views/greenhouse/hr-core/offboarding src/lib/copy`.
+- **Riesgo/follow-up:** no hubo prueba manual browser/preview en esta sesión. Follow-up opcional: signal de reliability para la proyección si aparecen failures runtime persistentes.
 
 ---
 
