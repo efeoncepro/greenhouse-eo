@@ -29,5 +29,7 @@ export const aria: AriaCopy = {
   language: 'Language',
   theme: 'Theme',
   paymentOrderTabs: 'Payment order tabs',
-  paymentObligationFilters: 'Payment obligation filters'
+  paymentObligationFilters: 'Payment obligation filters',
+  breadcrumb: 'Breadcrumb',
+  dismissHelper: 'Dismiss helper'
 }

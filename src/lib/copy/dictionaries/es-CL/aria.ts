@@ -41,5 +41,7 @@ export const aria: AriaCopy = {
   language: 'Idioma',
   theme: 'Tema',
   paymentOrderTabs: 'Pestañas de órdenes de pago',
-  paymentObligationFilters: 'Filtros de obligaciones'
+  paymentObligationFilters: 'Filtros de obligaciones',
+  breadcrumb: 'Ruta de navegación',
+  dismissHelper: 'Ocultar ayuda contextual'
 }

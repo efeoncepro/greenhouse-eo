@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 
 import classnames from 'classnames'
 import { useLocale } from 'next-intl'
@@ -12,9 +13,24 @@ import { verticalLayoutClasses } from '@layouts/utils/layoutClasses'
 import { getGreenhouseNavigationCopy } from '@/config/greenhouse-navigation-copy'
 import { GH_MESSAGES } from '@/lib/copy/client-portal'
 
+const INTERNAL_ROUTE_PREFIXES = ['/agency', '/finance', '/hr', '/people', '/delivery', '/admin', '/ai-tooling']
+
 const FooterContent = () => {
   const { isBreakpointReached } = useVerticalNav()
   const { client: GH_CLIENT_NAV } = getGreenhouseNavigationCopy(useLocale())
+  const pathname = usePathname() ?? ''
+  const isInternalRoute = INTERNAL_ROUTE_PREFIXES.some(prefix => pathname.startsWith(prefix))
+
+  if (isInternalRoute) {
+    return (
+      <div className={classnames(verticalLayoutClasses.footerContent, 'flex items-center gap-3')}>
+        <BrandWordmark brand='efeonce' height={14} sx={{ opacity: 0.7 }} />
+        <span className='text-textSecondary' style={{ fontSize: '0.75rem' }}>
+          {`© ${new Date().getFullYear()} · Efeonce Group`}
+        </span>
+      </div>
+    )
+  }
 
   return (
     <div className={classnames(verticalLayoutClasses.footerContent, 'flex items-center justify-between flex-wrap gap-4')}>

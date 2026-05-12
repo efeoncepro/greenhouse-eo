@@ -223,6 +223,7 @@ const HrOffboardingView = () => {
   const [error, setError] = useState<string | null>(null)
   const [filter, setFilter] = useState<OffboardingWorkQueueFilter>('all')
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null)
+  const [helperBannerDismissed, setHelperBannerDismissed] = useState(false)
   const [createDrawerOpen, setCreateDrawerOpen] = useState(false)
   const [memberId, setMemberId] = useState(initialMemberId)
   const [separationType, setSeparationType] = useState<OffboardingSeparationType>('resignation')
@@ -381,6 +382,19 @@ const HrOffboardingView = () => {
   useEffect(() => {
     void loadData()
   }, [loadData])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    setHelperBannerDismissed(window.localStorage.getItem('gh.offboarding.evidenceBanner.dismissed.v1') === '1')
+  }, [])
+
+  const dismissHelperBanner = () => {
+    setHelperBannerDismissed(true)
+
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem('gh.offboarding.evidenceBanner.dismissed.v1', '1')
+    }
+  }
 
   const createCase = async () => {
     setSaving(true)
@@ -902,7 +916,7 @@ const HrOffboardingView = () => {
             <CustomChip round='true' size='small' color={statusColor[item.case.status] ?? 'default'} label={statusLabel[item.case.status] ?? item.case.status} />
             {item.latestDocument ? <CustomChip round='true' size='small' color={documentStatusColor[item.latestDocument.documentStatus] ?? 'default'} label={documentStatusLabel[item.latestDocument.documentStatus] ?? item.latestDocument.documentStatus} /> : null}
           </Stack>
-          <FieldsProgressChip filled={item.progress.completed} total={item.progress.total} srLabel={(filled, total) => `${item.case.publicId}: ${filled} de ${total} pasos listos.`} suffix={total => `de ${total} pasos`} readyLabel={item.progress.completed >= item.progress.total ? 'Listo' : undefined} nextStepHint={item.progress.nextStepHint ?? undefined} />
+          <FieldsProgressChip filled={item.progress.completed} total={item.progress.total} srLabel={(filled, total) => `${item.case.publicId}: ${filled} de ${total} pasos listos.`} suffix={total => `de ${total} pasos`} readyLabel={item.progress.completed >= item.progress.total ? 'Listo' : undefined} />
         </Stack>
 
         <Stack spacing={2}>
@@ -1385,9 +1399,37 @@ const HrOffboardingView = () => {
 
       <Stack direction={{ xs: 'column', md: 'row' }} justifyContent='space-between' alignItems={{ xs: 'flex-start', md: 'flex-end' }} spacing={3}>
         <Stack spacing={1}>
-          <Typography variant='caption' color='text.secondary' sx={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1 }}>
-            Personas y HR / Offboarding
-          </Typography>
+          <Box
+            component='nav'
+            aria-label={GREENHOUSE_COPY.aria.breadcrumb}
+            sx={{
+              '& ol': {
+                display: 'flex',
+                flexWrap: 'wrap',
+                listStyle: 'none',
+                m: 0,
+                p: 0,
+                gap: 1,
+                alignItems: 'center'
+              }
+            }}
+          >
+            <ol>
+              <li>
+                <Typography variant='caption' color='text.secondary' sx={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1 }}>
+                  Personas y HR
+                </Typography>
+              </li>
+              <li aria-hidden='true'>
+                <Typography variant='caption' color='text.disabled' sx={{ fontWeight: 600 }}>/</Typography>
+              </li>
+              <li>
+                <Typography aria-current='page' variant='caption' color='text.secondary' sx={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1 }}>
+                  Offboarding
+                </Typography>
+              </li>
+            </ol>
+          </Box>
           <Typography variant='h4'>{GH_FINIQUITO.resignation.workQueue.title}</Typography>
           <Typography variant='body1' color='text.secondary'>{GH_FINIQUITO.resignation.workQueue.subtitle}</Typography>
         </Stack>
@@ -1529,7 +1571,7 @@ const HrOffboardingView = () => {
           <Stack spacing={4}>
             {workQueue?.degradedReasons.length ? (
               <Alert severity='warning' variant='outlined'>La cola cargó con datos parciales: {workQueue.degradedReasons.join(', ')}.</Alert>
-            ) : (
+            ) : !helperBannerDismissed ? (
               <Box
                 role='status'
                 sx={theme => ({
@@ -1545,11 +1587,14 @@ const HrOffboardingView = () => {
                 })}
               >
                 <i className='tabler-info-circle' aria-hidden='true' />
-                <Typography variant='body2'>
+                <Typography variant='body2' sx={{ flex: 1 }}>
                   La cola marca bloqueos con evidencia disponible; si falta respaldo, queda explícito antes de calcular o emitir.
                 </Typography>
+                <IconButton size='small' aria-label={GREENHOUSE_COPY.aria.dismissHelper} onClick={dismissHelperBanner}>
+                  <i className='tabler-x' aria-hidden='true' style={{ fontSize: 16 }} />
+                </IconButton>
               </Box>
-            )}
+            ) : null}
 
             {filteredItems.length ? (
               !isDesktopQueue ? (
@@ -1696,7 +1741,7 @@ const HrOffboardingView = () => {
                                   <CustomChip round='true' size='small' color={statusColor[itemCase.status] ?? 'default'} label={statusLabel[itemCase.status] ?? itemCase.status} />
                                   <CustomChip round='true' size='small' color={item.closureLane.allowsFinalSettlement ? 'primary' : 'secondary'} label={item.closureLane.label} />
                                 </Stack>
-                                <FieldsProgressChip filled={item.progress.completed} total={item.progress.total} srLabel={(filled, total) => `${itemCase.publicId}: ${filled} de ${total} pasos listos.`} suffix={total => `de ${total} pasos`} readyLabel={item.progress.completed >= item.progress.total ? 'Listo' : undefined} nextStepHint={item.progress.nextStepHint ?? undefined} />
+                                <FieldsProgressChip filled={item.progress.completed} total={item.progress.total} srLabel={(filled, total) => `${itemCase.publicId}: ${filled} de ${total} pasos listos.`} suffix={total => `de ${total} pasos`} readyLabel={item.progress.completed >= item.progress.total ? 'Listo' : undefined} />
                               </Stack>
                             </TableCell>
                             <TableCell sx={{ ...tableColumnSx, minWidth: 200 }}>
