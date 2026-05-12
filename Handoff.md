@@ -1,3 +1,17 @@
+# Sesion 2026-05-12 — TASK-823 arch-architect verdict + implementation on develop
+
+- **Trigger**: post TASK-822 cierre, usuario pidió arch-architect verdict sobre TASK-823 (`/api/client-portal/*` API Namespace, EPIC-015 child 2/8). Verdict: 4 correcciones (2 bloqueantes + 2 polish) aplicadas al spec pre-Slice-1, después implementación directa en develop.
+- **4 correcciones canonizadas en spec v1.1**:
+  1. Bug de compilación: `redactErrorForResponse` retorna `string`; envolver en `NextResponse.json({error: redactErrorForResponse(err)}, {status})`.
+  2. Nombre stale: `getClientAccountSummary` no existe; usar `getOrganizationExecutiveSnapshot` (real re-export TASK-822).
+  3. Helper `requireClientSession` pre-emptive eliminado V1.0; inline check estilo TASK-553. Promover a `requireSessionByTenantType` genérico cuando emerja 2do BFF.
+  4. `/health` performativo eliminado V1.0; extender `/api/admin/platform-health` (TASK-672) cuando emerja necesidad real.
+- **Scope reducido**: 2 endpoints → 1, 1 helper → 0, 4 tests → 3. Effort Bajo → Muy Bajo.
+- **Decisión operativa**: implementación directa sobre `develop`, sin branch separada (instrucción explícita).
+- **Task movida** `to-do/` → `in-progress/`. README + Handoff sync.
+
+---
+
 # Sesion 2026-05-12 — TASK-822 arch-architect verdict + implementation CERRADA on develop
 
 - **Trigger**: usuario pidió revisión arch-architect de TASK-822 (Client Portal Domain Consolidation, EPIC-015 child 1/8). Verdict: aprobado con 3 correcciones estructurales aplicadas pre-Slice-1.

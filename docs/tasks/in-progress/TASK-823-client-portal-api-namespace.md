@@ -2,17 +2,17 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
-- Impact: `Bajo` (era Medio; reducido a 1 endpoint atómico V1.0)
-- Effort: `Muy Bajo` (era Bajo; sin helper + sin health endpoint = scope mas chico)
+- Impact: `Bajo` (reducido a 1 endpoint atómico V1.0)
+- Effort: `Muy Bajo` (sin helper + sin health endpoint)
 - Type: `implementation`
 - Epic: `EPIC-015`
-- Status real: `Diseno v1.1 (desbloqueada 2026-05-12 al cerrar TASK-822; arch-architect verdict aplicado el mismo dia)`
+- Status real: `Implementacion v1.1 directo en develop (sin branch separada por instruccion operativa 2026-05-12)`
 - Rank: `TBD`
 - Domain: `client_portal`
 - Blocked by: `none` (TASK-822 cerrada 2026-05-12)
-- Branch: `task/TASK-823-client-portal-api`
+- Branch: `develop` (direct work, no feature branch — user override)
 
 ## Delta 2026-05-12 — TASK-822 cerrada, desbloqueo aplicado
 
