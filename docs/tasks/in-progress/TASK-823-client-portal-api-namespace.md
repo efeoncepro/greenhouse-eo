@@ -58,14 +58,14 @@ Hoy las APIs que sirven al portal cliente viven dispersas: `/api/agency/*`, `/ap
 
 Reglas obligatorias:
 
-- `requireServerSession()` (canonical, NO `getServerAuthSession()` directo — ver CLAUDE.md "Auth en server components")
-- Cliente lee SU PROPIO data: `session.user.organizationId` resuelve scope
-- Check inline `if (session.user.tenantType !== 'client') return NextResponse.json({error}, {status: 403})` — NO crear helper específico V1.0 (drift de pre-emptive abstraction; ver Delta 2026-05-12 segunda revisión Issue 3)
-- `redactErrorForResponse(err)` retorna `string`; envolver en `NextResponse.json({ error: redactErrorForResponse(err) }, { status })` (NO retornar el string directo — no compila como Response)
-- `NextResponse.json(...)` consistentemente (NO `Response.json(...)`)
-- `captureWithDomain(err, 'client_portal', { tags: { source: 'api_endpoint', endpoint: 'account_summary' } })` en catch
-- Errors NUNCA exponen `error.stack` ni env vars (helper canónico ya lo enforce)
-- 401 si no session (return JSON, NO redirect — las APIs no redirigen); 403 si session no es de un cliente (`tenantType != 'client'`)
+- `getServerAuthSession()` directo (canonical para API routes — ver CLAUDE.md "Auth en server components / layouts / pages — patrón canónico", línea final: "API routes (route.ts) siguen usando `getServerAuthSession()` directo — no necesitan los wrappers porque las routes son siempre dynamic por default y el manejo de error es distinto (return 401 JSON, no redirect)"). **NOT `requireServerSession()` que redirige a `/login`** — eso es para layouts/pages, no para APIs.
+- Cliente lee SU PROPIO data: `session.user.organizationId` resuelve scope.
+- Check inline `if (!session?.user?.userId) return 401` + `if (session.user.tenantType !== 'client') return 403` — NO crear helper específico V1.0 (pre-emptive abstraction; ver Delta 2026-05-12 segunda revisión Issue 3).
+- `redactErrorForResponse(err)` retorna `string`; envolver en `NextResponse.json({ error: redactErrorForResponse(err) }, { status })` (NO retornar el string directo — no compila como Response).
+- `NextResponse.json(...)` consistentemente (NO `Response.json(...)`).
+- `captureWithDomain(err, 'client_portal', { tags: { source: 'api_endpoint', endpoint: 'account_summary' } })` en catch.
+- Errors NUNCA exponen `error.stack` ni env vars (helper canónico ya lo enforce).
+- 401 JSON si no session (return `NextResponse.json({error:'Unauthorized'}, {status:401})`, NO redirect — las APIs no redirigen); 403 si session no es de un cliente (`tenantType != 'client'`); 500 si session cliente carece de `organizationId` (drift del callback NextAuth + Sentry capture).
 
 ## Normative Docs
 
@@ -136,13 +136,13 @@ Endpoint canónico V1.0, único de la task. Estructura:
 
 ## Detailed Spec
 
-Pattern canónico V1.0 — mirror exacto del shape de TASK-553 (`/api/me/shortcuts/route.ts`):
+Pattern canónico V1.0 — mirror exacto del shape de TASK-553 (`/api/me/shortcuts/route.ts`), API route con `getServerAuthSession()` directo + 401 JSON (no redirect):
 
 ```ts
 // src/app/api/client-portal/account-summary/route.ts
 import { NextResponse } from 'next/server'
 
-import { requireServerSession } from '@/lib/auth/require-server-session'
+import { getServerAuthSession } from '@/lib/auth'
 import { getOrganizationExecutiveSnapshot } from '@/lib/client-portal/readers/curated/account-summary'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { redactErrorForResponse } from '@/lib/observability/redact'
@@ -150,43 +150,45 @@ import { redactErrorForResponse } from '@/lib/observability/redact'
 export const dynamic = 'force-dynamic'
 
 export const GET = async () => {
+  const session = await getServerAuthSession()
+
+  if (!session?.user?.userId) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  if (session.user.tenantType !== 'client') {
+    return NextResponse.json({ error: 'Not a client session' }, { status: 403 })
+  }
+
+  const organizationId = session.user.organizationId
+
+  if (!organizationId) {
+    // Defensive: tenant_type='client' DEBE tener organizationId resuelto en el
+    // session callback de NextAuth. Si emerge en producción, hay drift en auth.ts.
+    captureWithDomain(
+      new Error('client session missing organizationId'),
+      'client_portal',
+      {
+        tags: { source: 'api_endpoint', endpoint: 'account_summary', stage: 'session_validation' },
+        extra: { userId: session.user.userId }
+      }
+    )
+
+    return NextResponse.json({ error: 'Session incomplete' }, { status: 500 })
+  }
+
   try {
-    const session = await requireServerSession()
-
-    if (session.user.tenantType !== 'client') {
-      return NextResponse.json(
-        { error: 'Not a client session' },
-        { status: 403 }
-      )
-    }
-
-    const organizationId = session.user.organizationId
-
-    if (!organizationId) {
-      // Defensive: tenant_type='client' DEBE tener organizationId resuelto en el
-      // session callback. Si emerge en producción, hay drift en auth.ts.
-      captureWithDomain(
-        new Error('client session missing organizationId'),
-        'client_portal',
-        { tags: { source: 'api_endpoint', endpoint: 'account_summary', stage: 'session_validation' } }
-      )
-
-      return NextResponse.json(
-        { error: 'Session incomplete' },
-        { status: 500 }
-      )
-    }
-
     const snapshot = await getOrganizationExecutiveSnapshot(organizationId)
 
     return NextResponse.json(snapshot)
   } catch (err) {
     captureWithDomain(err, 'client_portal', {
-      tags: { source: 'api_endpoint', endpoint: 'account_summary' }
+      tags: { source: 'api_endpoint', endpoint: 'account_summary' },
+      extra: { organizationId }
     })
 
     return NextResponse.json(
-      { error: redactErrorForResponse(err) },
+      { error: 'Unable to load account summary', detail: redactErrorForResponse(err) },
       { status: 500 }
     )
   }
@@ -195,9 +197,11 @@ export const GET = async () => {
 
 Notas del pattern:
 
-- **NO helper extraído** — el check de `tenantType` es 5 líneas inline. Si emerge un 2do BFF, extraer `requireSessionByTenantType(allowed: TenantType[])` genérico en `src/lib/auth/require-server-session.ts`.
+- **`getServerAuthSession()` directo, NO `requireServerSession()`**. Las API routes nunca redirigen (CLAUDE.md "Auth en server components / layouts / pages" línea final). `requireServerSession()` redirige a `/login`; para APIs strict-401 usamos null-check explícito.
+- **NO helper extraído** — el check de `tenantType` es 3 líneas inline. Si emerge un 2do BFF, extraer `requireSessionByTenantType(allowed: TenantType[])` genérico en `src/lib/auth/require-server-session.ts`.
 - **Defense in depth para `organizationId` null** — el session callback de NextAuth DEBE poblar `organizationId` para clientes; si emerge en runtime, captura a Sentry con stage explícito + 500 honesto (no asume invariant en hot path).
-- **`requireServerSession()` sin argumento** — si no hay session, hace redirect a `/login`; para APIs strict-401, usar `getOptionalServerSession()` + check explícito. V1.0 mantiene el redirect (consistente con TASK-553); operadores comerciales que invoquen el endpoint sin session quedan redirected al login form, NextAuth callback los devuelve. NO crear contract paralelo de "401 JSON sin redirect" hasta que emerja consumer concreto (e.g. mobile native que NO renderiza HTML — out of scope V1.0).
+- **`session.user.userId` null-guard** — el optional chaining `session?.user?.userId` cubre los 3 casos degenerados (session null, user null, userId null) en una sola línea. Pattern idéntico al `sessionToSubject` de TASK-553.
+- **Estructura del catch** — captura SOLO el error del reader downstream (`getOrganizationExecutiveSnapshot`), no envuelve los return-401/403 en try (esos no lanzan). Mantiene Sentry signal limpio.
 
 ## Acceptance Criteria
 
