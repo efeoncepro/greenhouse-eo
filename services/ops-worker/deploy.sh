@@ -253,6 +253,15 @@ ENV_VARS="${ENV_VARS},NUBOX_X_API_KEY_SECRET_REF=${NUBOX_X_API_KEY_SECRET_REF}"
 AZURE_AD_CLIENT_ID="${AZURE_AD_CLIENT_ID:-3626642f-0451-4eb2-8c29-d2211ab3176c}"
 ENV_VARS="${ENV_VARS},AZURE_AD_CLIENT_ID=${AZURE_AD_CLIENT_ID}"
 
+# TASK-870 — `GREENHOUSE_PORTAL_BASE_URL` requerido por `/smoke/identity-auth-providers`
+# (probe `portal_auth_health` que pingea `${portalUrl}/api/auth/health`). Default a la
+# production custom domain (única sin Vercel SSO Protection per CLAUDE.md "Vercel
+# Deployment Protection"). Si apunta a `dev-greenhouse.efeoncepro.com` (staging) o a
+# cualquier `.vercel.app` URL, Vercel SSO intercepta con 401 → smoke fail → Sentry burst.
+# Override staging: `GREENHOUSE_PORTAL_BASE_URL=https://dev-greenhouse.efeoncepro.com bash deploy.sh`.
+GREENHOUSE_PORTAL_BASE_URL="${GREENHOUSE_PORTAL_BASE_URL:-https://greenhouse.efeoncepro.com}"
+ENV_VARS="${ENV_VARS},GREENHOUSE_PORTAL_BASE_URL=${GREENHOUSE_PORTAL_BASE_URL}"
+
 # TASK-638 — Reliability AI Observer kill-switch.
 # Declarativo en deploy.sh para que `--set-env-vars` (destructivo) NO lo
 # borre en cada redeploy. Default true en staging, configurable via env.
