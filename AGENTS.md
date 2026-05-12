@@ -436,6 +436,19 @@ Documentacion canonica:
 
 **Contexto**: el 2026-05-11→12 un agente perdio ~3h en 5 commits "fix(release): …" tratando de hacer el preflight gate mas permisivo en vez de investigar la causa raiz. La causa real eran 2 env vars corruptas en runtime; el fix tomaba 2 comandos. Costo del incidente acumulado: ~2 dias.
 
+**⚠️ Regla #0 — Discovery obligatorio (canonical skill trigger)**:
+
+Cualquier agente (Claude, Codex, Cursor, futuros) que enfrente cualquiera de los siguientes triggers DEBE invocar la skill `greenhouse-production-release` ANTES de pushear cualquier fix commit:
+
+- `Production Release Orchestrator` falló en cualquier job
+- `Preflight (TASK-850 CLI)` falló con cualquier `checkId` en severity != ok
+- `Production Release Watchdog` reporta drift sostenido
+- Sentry burst de issues bajo `domain=identity` o `domain=cloud` que coincide con el ciclo del orchestrator
+- Necesitas tocar `src/lib/release/preflight/checks/*`, `services/*/deploy.sh`, o `.github/workflows/production-release*.yml`
+- Necesitas tocar `src/lib/secrets/secret-manager.ts` o cualquier ruta con `*_SECRET_REF`
+
+La skill referencia obligatoriamente `docs/operations/PRODUCTION_RELEASE_INCIDENT_PLAYBOOK_V1.md` que contiene el checklist 5 pasos, mapping `checkId → fix canonico`, 6 anti-patterns, y reglas duras. Saltar la skill es **anti-pattern documentado** en TASK-870 (Codex perdió 3h por no invocarla y pushear fixes sin diagnostico).
+
 **Reglas duras** (cualquier agente — Claude, Codex, Cursor — que enfrente un orchestrator fallido):
 
 - **NUNCA** modificar un check bajo `src/lib/release/preflight/checks/*` para "bajar la severidad" o "ampliar la tolerancia" sin arch-architect review explicito Y bug-class verificado del check itself. El gate detecto algo: tu trabajo es entender QUE.

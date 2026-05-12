@@ -1,7 +1,7 @@
 interface:
   display_name: "Greenhouse Production Release"
-  short_description: "Canonical Greenhouse production release, preflight, orchestrator, watchdog, rollback, and drift recovery guidance."
-  default_prompt: "Use $greenhouse-production-release before any Greenhouse production promotion, release preflight, orchestrator dispatch, production approval, rollback, or watchdog drift recovery."
+  short_description: "Canonical Greenhouse production release, preflight, orchestrator, watchdog, rollback, drift recovery, AND incident recovery (preflight failures, sentry critical issues, env drift, secret ref corruption, smoke probe failures, Wait Vercel READY failures)."
+  default_prompt: "Use $greenhouse-production-release before any Greenhouse production promotion, release preflight, orchestrator dispatch, production approval, rollback, watchdog drift recovery, OR when an orchestrator/preflight run fails (read PRODUCTION_RELEASE_INCIDENT_PLAYBOOK_V1.md FIRST before pushing any fix commit). MANDATORY before touching preflight check code, deploy.sh, or production-release.yml."
 
 policy:
   allow_implicit_invocation: true
