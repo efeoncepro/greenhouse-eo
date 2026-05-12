@@ -471,6 +471,15 @@ Documentacion canonica:
   - rotar passwords PostgreSQL obliga a reprobar `pnpm pg:doctor` o una conexión real
 - Si un secreto mal publicado rompe runtime, auth o integraciones, documentarlo como `ISSUE-###` aunque también exista fix defensivo en código.
 
+#### TASK-870 — Reglas duras V2 (normalizer hardening + active drift detection 2026-05-12)
+
+- **Defense canónica en boundary**: toda env var `*_SECRET_REF` pasa por `normalizeSecretRefValue` en `src/lib/secrets/secret-manager.ts`. El helper aplica `stripEnvVarContamination` (trim → strip surrounding quotes → strip trailing `\r`/`\n` literal y real → trim) + `SECRET_REF_SHAPE` regex. Payloads malformados son rechazados en el boundary; los consumers ven `null` y degradan a fallback canónico sin throw silencioso.
+- **Setear env var en Vercel**: usar `printf %s "<valor>" | vercel env add <NAME> production --force`. Nunca `echo "<valor>"` (appendea LF) ni copy-paste con quotes desde UI.
+- **NO duplicar `stripEnvVarContamination` ni `SECRET_REF_SHAPE`** en consumers/scripts. Para auditores externos, importar `isCanonicalSecretRefShape(value)` desde el módulo canónico.
+- **Diferenciar Sentry**: cuando `resolveSecretByRef` retorna `null`, el caller degrada silente (ref corruption o secret missing — ya cubierto por signal upstream). Capture Sentry solo cuando el secret existe pero el contenido es inválido (e.g. PEM sin `-----BEGIN`). Patrón fuente: `src/lib/release/github-app-token-resolver.ts`.
+- **Reliability signal `secrets.env_ref_format_drift`** (cloud subsystem, kind=drift, error si count>0, steady=0). Detecta env vars `*_SECRET_REF` corruptas en `process.env`. Cuando alerta: el nombre afectado se muestra; re-setear con `printf %s` + redeploy.
+- **Bug class canonizada (2026-05-12)**: env var de production con valor `"name\n"` (quotes + LF literal embebidos) producía burst recurrente de `Sentry "GitHub App private key not valid PEM"` que bloqueaba `Production Release Orchestrator` preflight. Fix V2 (TASK-870) cierra la clase: single-source contamination strip + shape regex + detección activa + Sentry decoupling.
+
 ### Agent Auth (acceso headless para agentes y E2E)
 
 - Endpoint: `POST /api/auth/agent-session` — genera un JWT NextAuth válido sin pasar por login interactivo.

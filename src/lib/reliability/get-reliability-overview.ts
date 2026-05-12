@@ -64,6 +64,7 @@ import { getShortcutsInvalidPinsSignal } from './queries/shortcuts-invalid-pins'
 import { getWorkspaceProjectionFacetViewDriftSignal } from './queries/workspace-projection-drift'
 import { getWorkspaceProjectionUnresolvedRelationsSignal } from './queries/workspace-projection-unresolved-relations'
 import { getCloudRunSilentObservabilitySignal } from './queries/cloud-run-silent-observability'
+import { getSecretsEnvRefFormatDriftSignal } from './queries/secrets-env-ref-format-drift'
 import { getPostgresConnectionSaturationSignal } from './queries/postgres-connection-saturation'
 import { getCriticalTablesMissingSignal } from './queries/critical-tables-missing'
 import { getOutboxUnpublishedLagSignal } from './queries/outbox-unpublished-lag'
@@ -477,6 +478,14 @@ interface ReliabilityOverviewSources {
   cloudRunSilentObservability?: ReliabilitySignal | null
 
   /**
+   * TASK-856 Slice 3 — Secret-ref env var format drift (detección activa).
+   *   - secrets.env_ref_format_drift (drift, error si > 0)
+   * Detecta env vars `*_SECRET_REF` con shape no canónico (quotes, `\n` literal,
+   * whitespace, paths malformados). Steady=0. Roll up bajo moduleKey 'cloud'.
+   */
+  secretsEnvRefFormatDrift?: ReliabilitySignal | null
+
+  /**
    * TASK-845 Slice 6 — PostgreSQL connection saturation data-driven trigger.
    *   - runtime.postgres.connection_saturation (runtime, warning > 60%, error > 80%)
    * Es la señal data-driven que dispara V2 deployment del PgBouncer multiplexer
@@ -587,6 +596,8 @@ export const buildReliabilityOverview = (
     ...(sources.criticalTablesMissing ? [sources.criticalTablesMissing] : []),
     // TASK-844 Slice 5 — Cross-runtime observability anti-regresión.
     ...(sources.cloudRunSilentObservability ? [sources.cloudRunSilentObservability] : []),
+    // TASK-856 Slice 3 — Secret-ref env var format drift (active upstream detection).
+    ...(sources.secretsEnvRefFormatDrift ? [sources.secretsEnvRefFormatDrift] : []),
     // TASK-845 Slice 6 — PG connection saturation (data-driven V2 trigger).
     ...(sources.postgresConnectionSaturation ? [sources.postgresConnectionSaturation] : []),
     // TASK-813 Slice 6 — Commercial engagement instance signals (3).
@@ -929,6 +940,15 @@ export const getReliabilityOverview = async (
       ? preloadedSources.cloudRunSilentObservability
       : await getCloudRunSilentObservabilitySignal().catch(() => null)
 
+  // TASK-856 Slice 3 — Secret-ref env var format drift. Detección activa
+  // upstream del Sentry burst downstream cuando un env var `*_SECRET_REF`
+  // queda persistido con shape no canónico (quotes, `\n` literal, etc.).
+  // Lectura puramente sincrónica sobre process.env, sin GCP round-trip.
+  const secretsEnvRefFormatDrift =
+    preloadedSources.secretsEnvRefFormatDrift !== undefined
+      ? preloadedSources.secretsEnvRefFormatDrift
+      : await getSecretsEnvRefFormatDriftSignal().catch(() => null)
+
   // TASK-845 Slice 6 — PG connection saturation (data-driven trigger para V2
   // PgBouncer multiplexer deployment). Steady < 60%; sustained > 60% justifica
   // TASK-846. Degrada `unknown` si la query falla.
@@ -1045,6 +1065,7 @@ export const getReliabilityOverview = async (
     nuboxSourceFreshness,
     criticalTablesMissing,
     cloudRunSilentObservability,
+    secretsEnvRefFormatDrift,
     postgresConnectionSaturation,
     servicesEngagement,
     commercialHealth,

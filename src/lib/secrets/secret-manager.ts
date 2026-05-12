@@ -60,27 +60,83 @@ const getSecretResolutionCache = () => {
 
 const getSecretRefEnvVarName = (envVarName: string, provided?: string) => provided || `${envVarName}_SECRET_REF`
 
-const normalizeSecretValue = (value: string | undefined) => {
-  const trimmed = value?.trim()
+/**
+ * TASK-870 — Single-source-of-truth para higiene de env var values consumidos
+ * como secret references o secret content. Aplica el contrato canónico:
+ *
+ *   trim → strip surrounding quotes → strip trailing literal `\r`/`\n` y reales → trim
+ *
+ * Cierra el bug class detectado live 2026-05-12 donde `normalizeSecretRefValue`
+ * (legacy) NO strippa comillas envolventes y el `normalizeSecretRef` downstream
+ * construía paths como `projects/.../secrets/"name"/versions/latest` → GCP
+ * NOT_FOUND → fallback silencioso → "is not valid PEM" en Sentry.
+ *
+ * NO loggear `value` ni el sanitized result (puede contener PII / leak de
+ * secret content). Solo length + boolean flags si se necesita observability.
+ */
+const stripEnvVarContamination = (value: string | undefined): string | null => {
+  if (!value) {
+    return null
+  }
+
+  const trimmed = value.trim()
 
   if (!trimmed) {
     return null
   }
 
   const withoutQuotes = trimmed.replace(/^['"]+|['"]+$/g, '').trim()
-  const withoutLiteralLineEndings = withoutQuotes.replace(/(?:\\r|\\n)+$/g, '').trim()
+  const withoutLiteralLineEndings = withoutQuotes.replace(/(?:\\r|\\n|\r|\n)+/g, '').trim()
 
   return withoutLiteralLineEndings ? withoutLiteralLineEndings : null
 }
 
+const normalizeSecretValue = (value: string | undefined) => stripEnvVarContamination(value)
+
+/**
+ * TASK-870 — Shape canónico para el VALOR de un `*_SECRET_REF` env var.
+ *
+ * Acepta las 3 formas documentadas en CLAUDE.md "Secret Manager Hygiene":
+ *   1. bare name             `greenhouse-github-app-private-key`
+ *   2. shorthand             `greenhouse-github-app-private-key:42`
+ *   3. full path             `projects/<project>/secrets/<name>/versions/<version>`
+ *
+ * Sin Capa 2 (esta regex), payloads contaminados que sobrevivan a la limpieza
+ * (quotes embebidos en el medio, whitespace interno, characters fuera del set
+ * permitido por GCP Secret Manager grammar) caerían al cliente GCP y producirían
+ * un NOT_FOUND silencioso. Rechazar en el boundary garantiza que ningún consumer
+ * downstream vea un ref malformado.
+ */
+const SECRET_REF_SHAPE =
+  /^(?:[A-Za-z0-9_-]+(?::[A-Za-z0-9_-]+)?|projects\/[A-Za-z0-9_-]+\/secrets\/[A-Za-z0-9_-]+(?:\/versions\/(?:latest|\d+))?)$/
+
 const normalizeSecretRefValue = (value: string | undefined) => {
-  if (!value) {
+  const sanitized = stripEnvVarContamination(value)
+
+  if (!sanitized) {
     return null
   }
 
-  const sanitized = value.replace(/\\r/g, '').replace(/\\n/g, '').trim()
+  if (!SECRET_REF_SHAPE.test(sanitized)) {
+    console.warn('[secrets] Secret ref failed canonical shape validation; rejecting.', {
+      sanitizedLength: sanitized.length,
+      firstChar: sanitized[0],
+      lastChar: sanitized[sanitized.length - 1]
+    })
 
-  return sanitized ? sanitized : null
+    return null
+  }
+
+  return sanitized
+}
+
+/**
+ * TASK-870 — Predicate exportable para uso desde reliability signals y
+ * scripts de auditoría externos. Sigue la misma regla que el normalizer
+ * canónico (post-strip + shape regex).
+ */
+export const isCanonicalSecretRefShape = (value: string | undefined): boolean => {
+  return normalizeSecretRefValue(value) !== null
 }
 
 const normalizeSecretRef = (ref: string, env: NodeJS.ProcessEnv) => {

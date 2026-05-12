@@ -174,7 +174,25 @@ export const resolveGithubAppInstallationToken = async (): Promise<string | null
   try {
     const privateKeyPem = await resolveSecretByRef(privateKeySecretRef)
 
-    if (!privateKeyPem || !privateKeyPem.trim().startsWith('-----BEGIN')) {
+    if (!privateKeyPem) {
+      // TASK-870 — Diferenciar "ref corruption" (degrade silente a PAT) de
+      // "content corruption" (Sentry alert). Cuando `resolveSecretByRef`
+      // retorna null, el ref env var falló validación canónica (shape regex
+      // en `normalizeSecretRefValue`) o GCP Secret Manager no encontró el
+      // recurso. Ambos casos son detectables upstream via reliability signal
+      // `secrets.env_ref_format_drift` — NO duplicar la alerta en Sentry.
+      console.warn(
+        '[gh-app-token] resolveSecretByRef returned null; falling back to PAT. See reliability signal secrets.env_ref_format_drift for env var drift detection.',
+        { secretRef: privateKeySecretRef }
+      )
+
+      return null
+    }
+
+    if (!privateKeyPem.trim().startsWith('-----BEGIN')) {
+      // Secret existe en GCP pero el contenido no es PEM válido — falla real
+      // de configuración del secret content, NO del env var. Sentry alert
+      // legítimo: requiere intervención humana (re-subir el PEM).
       throw new Error(
         `GitHub App private key from secret '${privateKeySecretRef}' is not valid PEM`
       )
