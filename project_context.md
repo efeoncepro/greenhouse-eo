@@ -35,6 +35,8 @@
   - `github-actions-deployer@efeonce-group.iam.gserviceaccount.com` tiene `roles/cloudsql.client`, versionado en `scripts/setup-github-actions-wif.sh`.
   - publishers CI livianos usan `GREENHOUSE_POSTGRES_MAX_CONNECTIONS=1`.
   - `src/lib/postgres/client.ts` reintenta con backoff acotado errores transitorios de conexión (`53300`, `080xx`, `57P0x`, TLS/reset/too many connections) y sigue fallando loud si persisten.
+  - desde 2026-05-12, el mismo cliente aplica backpressure por query con `GREENHOUSE_POSTGRES_QUERY_CONCURRENCY` (default 2 en Vercel, 4 fuera de Vercel, clamp a `GREENHOUSE_POSTGRES_MAX_CONNECTIONS`) y no resetea el pool ante errores puros de capacidad (`53300`/reserved slots/too many clients), porque cerrar un pool sano durante saturación amplifica carreras.
+  - los checks de presencia de tablas deben usar `src/lib/db-health/table-presence.ts` para batch lookup; no reintroducir loops de `SELECT EXISTS (...)` por tabla.
 - Verificación final: Playwright run `25605103310` publicó `finance.web`, `delivery.web` e `identity.web` con `36/36 passed`; CI run `25605103305` pasó lint, tests, coverage y build.
 - Issue formal: `docs/issues/resolved/ISSUE-072-ci-smoke-lane-publisher-failed-non-blocking.md`.
 

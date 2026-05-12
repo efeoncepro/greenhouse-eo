@@ -30,6 +30,10 @@ declare global {
   var __greenhousePostgresConnector: Connector | undefined
 
   var __greenhousePostgresResetListeners: Set<GreenhousePostgresResetListener> | undefined
+
+  var __greenhousePostgresActiveQueries: number | undefined
+
+  var __greenhousePostgresQueryWaitQueue: Array<() => void> | undefined
 }
 
 type GreenhousePostgresResetReason = {
@@ -62,6 +66,53 @@ const GREENHOUSE_POSTGRES_RETRY_DELAYS_MS = [1_000, 3_000, 7_000] as const
 
 const sleep = (delayMs: number) => new Promise(resolve => setTimeout(resolve, delayMs))
 
+const getGreenhousePostgresQueryConcurrencyLimit = () => {
+  const config = getGreenhousePostgresConfig()
+  const runtimeDefault = isVercelRuntime() ? 2 : 4
+  const requested = normalizeNumber(process.env.GREENHOUSE_POSTGRES_QUERY_CONCURRENCY, runtimeDefault)
+
+  return Math.max(1, Math.min(requested, config.maxConnections))
+}
+
+const acquireGreenhousePostgresQuerySlot = async () => {
+  globalThis.__greenhousePostgresActiveQueries ??= 0
+  globalThis.__greenhousePostgresQueryWaitQueue ??= []
+
+  const limit = getGreenhousePostgresQueryConcurrencyLimit()
+
+  if (globalThis.__greenhousePostgresActiveQueries < limit) {
+    globalThis.__greenhousePostgresActiveQueries += 1
+
+    return
+  }
+
+  await new Promise<void>(resolve => {
+    globalThis.__greenhousePostgresQueryWaitQueue?.push(resolve)
+  })
+}
+
+const releaseGreenhousePostgresQuerySlot = () => {
+  const next = globalThis.__greenhousePostgresQueryWaitQueue?.shift()
+
+  if (next) {
+    next()
+
+    return
+  }
+
+  globalThis.__greenhousePostgresActiveQueries = Math.max(0, (globalThis.__greenhousePostgresActiveQueries ?? 1) - 1)
+}
+
+const withGreenhousePostgresQuerySlot = async <T>(callback: () => Promise<T>): Promise<T> => {
+  await acquireGreenhousePostgresQuerySlot()
+
+  try {
+    return await callback()
+  } finally {
+    releaseGreenhousePostgresQuerySlot()
+  }
+}
+
 export const isGreenhousePostgresRetryableConnectionError = (error: unknown) => {
   if (!(error instanceof Error)) {
     return false
@@ -86,8 +137,31 @@ export const isGreenhousePostgresRetryableConnectionError = (error: unknown) => 
     'write epipe',
     'remaining connection slots are reserved',
     'sorry, too many clients already',
-    'too many connections'
+    'too many connections',
+    'timeout exceeded when trying to connect',
+    'cannot use a pool after calling end on the pool'
   ].some(fragment => message.includes(fragment))
+}
+
+const shouldResetGreenhousePostgresPoolAfterRetryableError = (error: unknown) => {
+  if (!(error instanceof Error)) {
+    return true
+  }
+
+  const code = 'code' in error && typeof error.code === 'string' ? error.code : null
+  const message = error.message.toLowerCase()
+
+  if (
+    code === '53300' ||
+    message.includes('remaining connection slots are reserved') ||
+    message.includes('sorry, too many clients already') ||
+    message.includes('too many connections') ||
+    message.includes('timeout exceeded when trying to connect')
+  ) {
+    return false
+  }
+
+  return true
 }
 
 export const onGreenhousePostgresReset = (listener: GreenhousePostgresResetListener) => {
@@ -261,8 +335,11 @@ export const getGreenhousePostgresPool = async () => {
 export const runGreenhousePostgresQuery = async <T extends Record<string, unknown>>(text: string, values: unknown[] = []) => {
   for (let attempt = 0; attempt <= GREENHOUSE_POSTGRES_RETRY_DELAYS_MS.length; attempt += 1) {
     try {
-      const pool = await getGreenhousePostgresPool()
-      const result = await pool.query<T>(text, values)
+      const result = await withGreenhousePostgresQuerySlot(async () => {
+        const pool = await getGreenhousePostgresPool()
+
+        return pool.query<T>(text, values)
+      })
 
       return result.rows
     } catch (error) {
@@ -280,7 +357,11 @@ export const runGreenhousePostgresQuery = async <T extends Record<string, unknow
         `(attempt ${attempt + 1}/${GREENHOUSE_POSTGRES_RETRY_DELAYS_MS.length}, delay ${delayMs}ms).`,
         error
       )
-      await closeGreenhousePostgres({ source: 'retryable_error', error }).catch(() => undefined)
+
+      if (shouldResetGreenhousePostgresPoolAfterRetryableError(error)) {
+        await closeGreenhousePostgres({ source: 'retryable_error', error }).catch(() => undefined)
+      }
+
       await sleep(delayMs)
     }
   }

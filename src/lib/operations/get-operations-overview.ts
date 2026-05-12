@@ -8,6 +8,7 @@ import { getCloudGcpAuthPosture } from '@/lib/cloud/gcp-auth'
 import { buildCloudHealthSnapshot, getCloudPlatformHealthSnapshot } from '@/lib/cloud/health'
 import { getCloudObservabilityPosture, getCloudSentryIncidents } from '@/lib/cloud/observability'
 import { getCloudPostgresPosture } from '@/lib/cloud/postgres'
+import { getTablePresence, tableExistsIn, type TablePresenceMap } from '@/lib/db-health/table-presence'
 import { readAiLlmOperationsSnapshot } from '@/lib/ico-engine/ai/llm-enrichment-reader'
 import { getNotionDeliveryDataQualityOverview } from '@/lib/integrations/notion-delivery-data-quality'
 import { getEffectiveLatestNotionSyncAt } from '@/lib/integrations/notion-sync-freshness'
@@ -179,70 +180,6 @@ interface FinanceAllocationCountsRow extends Record<string, unknown> {
   direct_without_client: string
   shared_unallocated: string
 }
-
-type TableRef = {
-  schema: string
-  table: string
-}
-
-type TablePresenceMap = ReadonlyMap<string, boolean>
-
-const tablePresenceKey = (schema: string, table: string): string => `${schema}.${table}`
-
-const getTablePresence = async (tables: readonly TableRef[]): Promise<TablePresenceMap> => {
-  const uniqueTables = Array.from(
-    new Map(tables.map(entry => [tablePresenceKey(entry.schema, entry.table), entry])).values()
-  )
-
-  const fallback = new Map(uniqueTables.map(entry => [tablePresenceKey(entry.schema, entry.table), false]))
-
-  if (uniqueTables.length === 0) {
-    return fallback
-  }
-
-  const valuesPlaceholders: string[] = []
-  const params: string[] = []
-
-  uniqueTables.forEach((entry, index) => {
-    const schemaIndex = index * 2 + 1
-    const tableIndex = index * 2 + 2
-
-    valuesPlaceholders.push(`($${schemaIndex}::text, $${tableIndex}::text)`)
-    params.push(entry.schema, entry.table)
-  })
-
-  try {
-    const rows = await runGreenhousePostgresQuery<
-      Record<string, unknown> & { schema_name: string; table_name: string; exists: boolean }
-    >(
-      `WITH expected(schema_name, table_name) AS (
-         VALUES ${valuesPlaceholders.join(', ')}
-       )
-       SELECT
-         expected.schema_name,
-         expected.table_name,
-         (tables.table_name IS NOT NULL) AS exists
-       FROM expected
-       LEFT JOIN information_schema.tables tables
-         ON tables.table_schema = expected.schema_name
-        AND tables.table_name = expected.table_name`,
-      params
-    )
-
-    const presence = new Map(fallback)
-
-    for (const row of rows) {
-      presence.set(tablePresenceKey(row.schema_name, row.table_name), row.exists === true)
-    }
-
-    return presence
-  } catch {
-    return fallback
-  }
-}
-
-const tableExistsIn = (presence: TablePresenceMap, schema: string, table: string): boolean =>
-  presence.get(tablePresenceKey(schema, table)) === true
 
 const safeCount = async (query: string, params?: unknown[]): Promise<number> => {
   try {

@@ -88,6 +88,20 @@ const cleanT708 = {
   externalCashSignalsPromotedInvariantViolation: 0
 }
 
+const tablePresenceRowsFromParams = (params: unknown[] = []) => {
+  const rows: Array<{ schema_name: string; table_name: string; exists: boolean }> = []
+
+  for (let index = 0; index < params.length; index += 2) {
+    rows.push({
+      schema_name: String(params[index]),
+      table_name: String(params[index + 1]),
+      exists: true
+    })
+  }
+
+  return rows
+}
+
 describe('buildFinanceDataQualitySubsystem', () => {
   beforeEach(() => {
     vi.clearAllMocks()
@@ -96,9 +110,9 @@ describe('buildFinanceDataQualitySubsystem', () => {
     mockGetFinanceLedgerHealth.mockResolvedValue({ task708: cleanT708 })
     mockQuery.mockReset()
 
-    mockRunGreenhousePostgresQuery.mockImplementation(async (sql: string) => {
+    mockRunGreenhousePostgresQuery.mockImplementation(async (sql: string, params?: unknown[]) => {
       if (sql.includes('information_schema.tables')) {
-        return [{ exists: true }]
+        return tablePresenceRowsFromParams(params)
       }
 
       if (sql.includes('payment_status IN (\'pending\', \'partial\', \'overdue\')')) {
@@ -157,8 +171,8 @@ describe('buildFinanceDataQualitySubsystem', () => {
     mockCountIncomesWithSettlementDrift.mockResolvedValueOnce(0)
     mockGetFinanceLedgerHealth.mockResolvedValueOnce({ task708: cleanT708 })
     mockRunGreenhousePostgresQuery.mockReset()
-    mockRunGreenhousePostgresQuery.mockImplementation(async (sql: string) => {
-      if (sql.includes('information_schema.tables')) return [{ exists: true }]
+    mockRunGreenhousePostgresQuery.mockImplementation(async (sql: string, params?: unknown[]) => {
+      if (sql.includes('information_schema.tables')) return tablePresenceRowsFromParams(params)
       if (sql.includes('payment_status IN (\'pending\', \'partial\', \'overdue\')')) return [{ cnt: '12' }]
       if (sql.includes('AS direct_without_client')) return [{ direct_without_client: '0', shared_unallocated: '5' }]
       if (sql.includes('labor_allocation_saturation_drift')) return [{ cnt: '0' }]
@@ -183,8 +197,8 @@ describe('buildFinanceDataQualitySubsystem', () => {
       }
     })
     mockRunGreenhousePostgresQuery.mockReset()
-    mockRunGreenhousePostgresQuery.mockImplementation(async (sql: string) => {
-      if (sql.includes('information_schema.tables')) return [{ exists: true }]
+    mockRunGreenhousePostgresQuery.mockImplementation(async (sql: string, params?: unknown[]) => {
+      if (sql.includes('information_schema.tables')) return tablePresenceRowsFromParams(params)
       if (sql.includes('payment_status IN (\'pending\', \'partial\', \'overdue\')')) return [{ cnt: '0' }]
       if (sql.includes('AS direct_without_client')) return [{ direct_without_client: '0', shared_unallocated: '0' }]
       if (sql.includes('labor_allocation_saturation_drift')) return [{ cnt: '0' }]
@@ -206,16 +220,16 @@ describe('buildCommercialHealthSubsystem', () => {
     vi.clearAllMocks()
     mockQuery.mockReset()
 
-    mockRunGreenhousePostgresQuery.mockImplementation(async (sql: string) => {
-      if (sql.includes('information_schema.tables')) return [{ exists: true }]
+    mockRunGreenhousePostgresQuery.mockImplementation(async (sql: string, params?: unknown[]) => {
+      if (sql.includes('information_schema.tables')) return tablePresenceRowsFromParams(params)
       throw new Error(`Unexpected SQL in test:\n${sql}`)
     })
   })
 
   it('rolls up Commercial Health metrics and escalates warning/error counts', async () => {
     mockRunGreenhousePostgresQuery.mockReset()
-    mockRunGreenhousePostgresQuery.mockImplementation(async (sql: string) => {
-      if (sql.includes('information_schema.tables')) return [{ exists: true }]
+    mockRunGreenhousePostgresQuery.mockImplementation(async (sql: string, params?: unknown[]) => {
+      if (sql.includes('information_schema.tables')) return tablePresenceRowsFromParams(params)
       throw new Error(`Unexpected SQL in test:\n${sql}`)
     })
 

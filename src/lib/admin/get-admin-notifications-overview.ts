@@ -1,5 +1,6 @@
 import 'server-only'
 
+import { tableExists } from '@/lib/db-health/table-presence'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { NOTIFICATION_CATEGORIES, type NotificationCategoryConfig } from '@/config/notification-categories'
 
@@ -67,21 +68,6 @@ const safeCount = async (label: string, query: string, params?: unknown[]): Prom
     console.error(`[notifications-overview] safeCount(${label}) failed:`, error)
 
     return 0
-  }
-}
-
-const tableExists = async (schema: string, table: string): Promise<boolean> => {
-  try {
-    const rows = await runGreenhousePostgresQuery<Record<string, unknown> & { exists: boolean }>(
-      `SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = $1 AND table_name = $2) AS exists`,
-      [schema, table]
-    )
-
-    return rows[0]?.exists === true
-  } catch (error) {
-    console.error(`[notifications-overview] tableExists(${schema}.${table}) failed:`, error)
-
-    return false
   }
 }
 

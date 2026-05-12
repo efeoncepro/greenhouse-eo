@@ -1,5 +1,6 @@
 import 'server-only'
 
+import { getTablePresence, tableExistsIn } from '@/lib/db-health/table-presence'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { getAllTriggerEventTypes } from '@/lib/sync/projection-registry'
 import { ensureProjectionsRegistered } from '@/lib/sync/projections'
@@ -20,10 +21,6 @@ export interface ReactiveBacklogOverview {
   lagHours: number | null
   status: ReactiveBacklogStatus
   topEventTypes: ReactiveBacklogTopEventType[]
-}
-
-interface ExistsRow extends Record<string, unknown> {
-  exists: boolean
 }
 
 interface TotalsRow extends Record<string, unknown> {
@@ -84,28 +81,14 @@ export const deriveReactiveBacklogStatus = ({
   return 'degraded'
 }
 
-const tableExists = async (schema: string, table: string) => {
-  try {
-    const rows = await runGreenhousePostgresQuery<ExistsRow>(
-      `SELECT EXISTS (
-         SELECT 1
-         FROM information_schema.tables
-         WHERE table_schema = $1 AND table_name = $2
-       ) AS exists`,
-      [schema, table]
-    )
-
-    return rows[0]?.exists === true
-  } catch {
-    return false
-  }
-}
-
 export const readReactiveBacklogOverview = async (): Promise<ReactiveBacklogOverview> => {
-  const [hasOutboxEvents, hasReactiveLog] = await Promise.all([
-    tableExists('greenhouse_sync', 'outbox_events'),
-    tableExists('greenhouse_sync', 'outbox_reactive_log')
+  const tablePresence = await getTablePresence([
+    { schema: 'greenhouse_sync', table: 'outbox_events' },
+    { schema: 'greenhouse_sync', table: 'outbox_reactive_log' }
   ])
+
+  const hasOutboxEvents = tableExistsIn(tablePresence, 'greenhouse_sync', 'outbox_events')
+  const hasReactiveLog = tableExistsIn(tablePresence, 'greenhouse_sync', 'outbox_reactive_log')
 
   if (!hasOutboxEvents || !hasReactiveLog) {
     return {

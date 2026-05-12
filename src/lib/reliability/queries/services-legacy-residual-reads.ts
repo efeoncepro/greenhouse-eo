@@ -35,7 +35,7 @@ const QUERY_SQL = `
       SELECT 1
       FROM greenhouse_serving.service_attribution_facts saf
       WHERE saf.service_id = s.service_id
-        AND saf.created_at > s.updated_at
+        AND saf.materialized_at > s.updated_at
     )
 `
 
@@ -62,7 +62,7 @@ export const getServicesLegacyResidualReadsSignal = async (): Promise<Reliabilit
         {
           kind: 'sql',
           label: 'Query',
-          value: 'service_attribution_facts.created_at > services.updated_at WHERE status=archived'
+          value: 'service_attribution_facts.materialized_at > services.updated_at WHERE status=archived'
         },
         {
           kind: 'metric',

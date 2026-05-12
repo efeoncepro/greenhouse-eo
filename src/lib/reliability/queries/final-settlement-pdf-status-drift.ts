@@ -128,8 +128,8 @@ const buildSql = (options: FinalSettlementPdfStatusDriftQueryOptions = {}, mode:
           fsd.document_status AS current_document_status,
           fsd.pdf_asset_id,
           a.metadata_json->>'documentStatusAtRender' AS document_status_at_render,
-          a.updated_at::text AS pdf_updated_at,
-          EXTRACT(EPOCH FROM (NOW() - a.updated_at)) / 3600 AS drift_age_hours,
+          COALESCE(a.attached_at, a.uploaded_at, a.created_at)::text AS pdf_updated_at,
+          EXTRACT(EPOCH FROM (NOW() - COALESCE(a.attached_at, a.uploaded_at, a.created_at))) / 3600 AS drift_age_hours,
           NOW()::text AS detected_at`
 
   return {
@@ -139,7 +139,7 @@ const buildSql = (options: FinalSettlementPdfStatusDriftQueryOptions = {}, mode:
       LEFT JOIN greenhouse_core.assets a ON a.asset_id = fsd.pdf_asset_id
       WHERE ${filters.join('\n        AND ')}
         AND ${driftCondition}
-      ${mode === 'rows' ? 'ORDER BY a.updated_at ASC NULLS LAST' : ''}
+      ${mode === 'rows' ? 'ORDER BY COALESCE(a.attached_at, a.uploaded_at, a.created_at) ASC NULLS LAST' : ''}
       ${limitClause}
     `,
     params
