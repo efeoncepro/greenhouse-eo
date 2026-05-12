@@ -11,6 +11,27 @@
 - **Validación pre-trigger:** dos issues Sentry que bloqueaban quedaron fuera de ventana 15min naturalmente cuando los fixes propagaron (GH App: lastSeen 12:34Z, 95min ago; azure_smoke: lastSeen 13:40Z, 38min ago; vercel.json: lastSeen 14:00Z, 17min ago). 0 actives en ventana → preflight pasa sin necesidad de bypass full.
 - **Costo real del incidente:** ~2 días totales (Codex ~3h sin atacar root cause + Claude ~2.5h end-to-end con arch review + verificación + 3 capas de defense). 95% del tiempo Codex lo perdió porque trató la preflight gate como ruido en vez de leerla como diagnóstico.
 - **Meta-aprendizaje canonizado** en `docs/operations/PRODUCTION_RELEASE_INCIDENT_PLAYBOOK_V1.md`: leer la preflight gate como diagnóstico primero, NO como obstáculo; el `bypass_preflight_reason` SOLO es para batch-policy override (no full bypass); cuando un Sentry burst recurre fuera-de-banda con la lógica del release path, escalar a investigación de runtime/env corruption antes de tocar el gate.
+- **Cierre end-to-end** (decisión usuario: Opción A — manifest `aborted` queda como audit, production runtime saludable):
+  - Vercel production `nfjr419lw` Ready (`c41a26b8`) — verified custom domain 200.
+  - 4 workers Cloud Run deployados via orchestrator run `25740470728`.
+  - ops-worker rev `00211-l52` con `AZURE_AD_CLIENT_ID` + `GREENHOUSE_PORTAL_BASE_URL` canonical post-fix.
+  - Smoke `/identity-auth-providers` 5/5 verde post-fix de los 4 config drifts.
+  - Sentry burst de los 3 issues bloqueantes (`GH App private key not valid PEM` + `azure_authorize_endpoint smoke fail` + `portal_auth_health smoke fail`) parado.
+  - Release manifest `c41a26b8` queda `aborted` por workflow bug `$UID` readonly (4to drift detectado live), NO por production state real. Próximo release legítimo (merge develop→main canónico) crea attempt_n=2 con todos los fixes aplicados y cierra `released`.
+- **4 config drifts pre-existentes detectados y canonizados durante recovery** (todos en deploy.sh declarativo ahora + live fixes via gcloud/vercel):
+  1. `GREENHOUSE_GITHUB_APP_PRIVATE_KEY_SECRET_REF` corrupto en Vercel production (quotes + LF literal).
+  2. `AZURE_AD_CLIENT_ID` unset en ops-worker Cloud Run.
+  3. `GREENHOUSE_PORTAL_BASE_URL` apuntando a staging URL (con SSO) en ops-worker Cloud Run.
+  4. `$UID` readonly variable assignment en `production-release.yml` step "Wait Vercel READY".
+- **8 commits TASK-870 en `develop`** (a promover en próximo ciclo legítimo): `c16a0c82` (normalizer V2 + signal), `656cbbd4` (AZURE_AD_CLIENT_ID), `5f42f3f2` (playbook canónico + skills), `de7f0832` (AGENTS.md regla), `584fb49e` (PORTAL_BASE_URL), `bd509d20` (workflow UID fix), `5f10fddb` (anti-pattern #5 al playbook).
+- **Defense-in-depth canonizada para que NUNCA vuelva a pasar**:
+  1. `docs/operations/PRODUCTION_RELEASE_INCIDENT_PLAYBOOK_V1.md` — playbook cross-agent con 3 reglas duras + checklist 5 pasos + tabla checkId→fix + 6 anti-patterns documentados con ejemplos del incidente.
+  2. Reliability signal nuevo `secrets.env_ref_format_drift` (module `cloud`, kind drift, error si >0, steady=0) — detecta env vars `*_SECRET_REF` corruptas upstream del Sentry burst.
+  3. Skills `.claude/` y `.codex/` `greenhouse-production-release` apuntan al playbook como OBLIGATORIO read si orchestrator falló.
+  4. AGENTS.md sección "Regla de Production Release Orchestrator failure" con reglas duras cross-agent.
+  5. CLAUDE.md sección "Secret Manager Hygiene" extendida con reglas V2 + matriz Sentry decoupling.
+  6. ADR canonizado en `DECISIONS_INDEX.md`.
+- **Métrica de éxito futura**: si un release blocker similar emerge, debería cerrarse en <30 min (config drift conocido) o <2h (bug class nuevo). El incidente actual tomó ~2 días por falta de este playbook y por tratar el preflight gate como obstáculo en vez de diagnóstico.
 
 ---
 
