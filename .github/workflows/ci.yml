@@ -14,7 +14,7 @@ jobs:
   quality:
     name: Lint, test and build
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     env:
       CI: true
       NEXT_TELEMETRY_DISABLED: 1
@@ -92,11 +92,14 @@ jobs:
 
       - name: Test
         run: pnpm test:results
-        timeout-minutes: 5
+        # The full unit suite currently takes just over 5 minutes on GitHub
+        # runners while finishing green. Keep this bounded, but leave enough
+        # room for reporter/artifact flushing so a healthy run is not killed.
+        timeout-minutes: 8
 
       - name: Coverage
         run: pnpm test:coverage
-        timeout-minutes: 8
+        timeout-minutes: 10
 
       - name: Test observability summary
         if: always()

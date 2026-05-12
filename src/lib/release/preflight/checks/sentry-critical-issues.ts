@@ -1,8 +1,13 @@
 /**
- * TASK-850 — Preflight check #12: Sentry unresolved critical issues (24h).
+ * TASK-850 — Preflight check #12: Sentry active critical issues.
  *
  * Queries Sentry API for unresolved level=error issues in the project whose
- * last occurrence happened within the last 24h. Threshold ladder:
+ * last occurrence happened within the last 24h, then blocks only issues that
+ * are still active in the recent release window. Sentry `unresolved` is a
+ * triage state; requiring manual issue resolution would couple deployment
+ * safety to Sentry write permissions instead of runtime evidence.
+ *
+ * Threshold ladder for active issues:
  *   - 0 issues → ok
  *   - 1-9 issues → warning (visible to operator, doesn't block)
  *   - 10+ issues → error (block — production already in fire mode)
@@ -25,6 +30,7 @@ const SENTRY_API_BASE = process.env.SENTRY_API_BASE ?? 'https://sentry.io'
 const SENTRY_TIMEOUT_MS = 6_000
 const ERROR_THRESHOLD = 10
 const DEFAULT_SENTRY_ENVIRONMENT = 'production'
+const DEFAULT_ACTIVE_WINDOW_MINUTES = 15
 
 interface SentryIssue {
   readonly id: string
@@ -36,6 +42,26 @@ interface SentryIssue {
   readonly permalink: string
   readonly firstSeen: string
   readonly lastSeen: string
+}
+
+const parseActiveWindowMinutes = (): number => {
+  const raw = process.env.SENTRY_RELEASE_PREFLIGHT_ACTIVE_WINDOW_MINUTES?.trim()
+
+  if (!raw) return DEFAULT_ACTIVE_WINDOW_MINUTES
+
+  const parsed = Number(raw)
+
+  if (!Number.isFinite(parsed) || parsed <= 0) return DEFAULT_ACTIVE_WINDOW_MINUTES
+
+  return Math.max(1, Math.floor(parsed))
+}
+
+const isActiveIssue = (issue: SentryIssue, activeCutoffMs: number): boolean => {
+  const lastSeenMs = Date.parse(issue.lastSeen)
+
+  if (!Number.isFinite(lastSeenMs)) return true
+
+  return lastSeenMs >= activeCutoffMs
 }
 
 const fetchSentryIssues = async (
@@ -96,6 +122,8 @@ export const checkSentryCriticalIssues = async (
     process.env.SENTRY_ENVIRONMENT?.trim() ||
     DEFAULT_SENTRY_ENVIRONMENT
 
+  const activeWindowMinutes = parseActiveWindowMinutes()
+
   if (!token) {
     return {
       checkId: 'sentry_critical_issues',
@@ -105,7 +133,7 @@ export const checkSentryCriticalIssues = async (
       durationMs: Date.now() - observedAtStart,
       summary: 'SENTRY_INCIDENTS_AUTH_TOKEN/SENTRY_AUTH_TOKEN no configurado',
       error: null,
-      evidence: { orgSlug, projectSlug, environment },
+      evidence: { orgSlug, projectSlug, environment, activeWindowMinutes },
       recommendation:
         'Configurar SENTRY_INCIDENTS_AUTH_TOKEN_SECRET_REF o SENTRY_AUTH_TOKEN local/CI antes de promover.'
     }
@@ -114,7 +142,10 @@ export const checkSentryCriticalIssues = async (
   try {
     const issues = await fetchSentryIssues(token, orgSlug, projectSlug, environment)
     const criticalIssues = issues.filter(i => i.level === 'error' || i.level === 'fatal')
-    const count = criticalIssues.length
+    const activeCutoffMs = Date.now() - activeWindowMinutes * 60_000
+    const activeIssues = criticalIssues.filter(i => isActiveIssue(i, activeCutoffMs))
+    const staleIssues = criticalIssues.filter(i => !isActiveIssue(i, activeCutoffMs))
+    const count = activeIssues.length
 
     if (count === 0) {
       return {
@@ -123,21 +154,35 @@ export const checkSentryCriticalIssues = async (
         status: 'ok',
         observedAt,
         durationMs: Date.now() - observedAtStart,
-        summary: 'Sin Sentry issues unresolved level=error/fatal en 24h',
+        summary:
+          staleIssues.length > 0
+            ? `Sin Sentry issues activas level=error/fatal; ${staleIssues.length} stale unresolved en 24h`
+            : 'Sin Sentry issues activas level=error/fatal',
         error: null,
-        evidence: { count: 0, orgSlug, projectSlug, environment },
-        recommendation: ''
+        evidence: {
+          count: 0,
+          staleCount: staleIssues.length,
+          orgSlug,
+          projectSlug,
+          environment,
+          activeWindowMinutes
+        },
+        recommendation:
+          staleIssues.length > 0
+            ? 'Resolver o auditar las issues stale en Sentry; no bloquean si no tienen eventos recientes.'
+            : ''
       }
     }
 
     const severity = count >= ERROR_THRESHOLD ? 'error' : 'warning'
 
-    const topIssues = criticalIssues.slice(0, 5).map(i => ({
+    const topIssues = activeIssues.slice(0, 5).map(i => ({
       id: i.id,
       title: i.title,
       level: i.level,
       count: i.count,
       userCount: i.userCount,
+      lastSeen: i.lastSeen,
       permalink: i.permalink
     }))
 
@@ -147,9 +192,17 @@ export const checkSentryCriticalIssues = async (
       status: 'ok',
       observedAt,
       durationMs: Date.now() - observedAtStart,
-      summary: `${count} Sentry issue(s) unresolved level=error/fatal en 24h`,
+      summary: `${count} Sentry issue(s) activas level=error/fatal en ${activeWindowMinutes}m`,
       error: null,
-      evidence: { count, topIssues, orgSlug, projectSlug, environment },
+      evidence: {
+        count,
+        staleCount: staleIssues.length,
+        topIssues,
+        orgSlug,
+        projectSlug,
+        environment,
+        activeWindowMinutes
+      },
       recommendation:
         severity === 'error'
           ? 'Production ya esta en fire mode (>=10 issues criticas activas). NO promover hasta resolver.'
