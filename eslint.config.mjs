@@ -292,7 +292,8 @@ export default [
       'greenhouse/no-untokenized-fx-math': 'error',
       'greenhouse/no-untokenized-expense-type-for-analytics': 'error',
       'greenhouse/no-inline-facet-visibility-check': 'error',
-      'greenhouse/cloud-run-services-must-init-sentry': 'error'
+      'greenhouse/cloud-run-services-must-init-sentry': 'error',
+      'greenhouse/no-cross-domain-import-from-client-portal': 'error'
     }
   },
   {
@@ -382,6 +383,21 @@ export default [
     ],
     rules: {
       'greenhouse/no-inline-facet-visibility-check': 'off'
+    }
+  },
+
+  // TASK-822 Slice 3 — la lint rule no-cross-domain-import-from-client-portal se
+  // desactiva SOLO dentro del módulo client_portal mismo (importa relativos a
+  // sí mismo) y en los archivos del rule + sus tests. Producer domains que
+  // importen @/lib/client-portal/* siguen disparando error.
+  {
+    files: [
+      'src/lib/client-portal/**',
+      'eslint-plugins/greenhouse/rules/no-cross-domain-import-from-client-portal.mjs',
+      'eslint-plugins/greenhouse/rules/__tests__/no-cross-domain-import-from-client-portal.test.mjs'
+    ],
+    rules: {
+      'greenhouse/no-cross-domain-import-from-client-portal': 'off'
     }
   },
 
