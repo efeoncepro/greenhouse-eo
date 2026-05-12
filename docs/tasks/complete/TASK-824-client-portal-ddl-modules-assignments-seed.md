@@ -2,13 +2,13 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Bajo`
 - Type: `implementation`
 - Epic: `EPIC-015`
-- Status real: `Implementacion v1.1 directo en develop (sin branch separada por instruccion operativa 2026-05-12). Spec V1.2 con 5 correcciones verdict aplicadas pre-Slice-1.`
+- Status real: `Cerrada 2026-05-12 directo en develop. 5 correcciones spec verdict + 2 baseline recalibrations Discovery (Issues 6+7) + 2 slices implementación. Migration aplicada live + 11/11 tests verde (9 unit + 2 live) + 7/7 smokes manuales verde + full build/lint/tsc.`
 - Rank: `TBD`
 - Domain: `client_portal`
 - Blocked by: `none`

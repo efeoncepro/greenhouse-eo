@@ -1,16 +1,33 @@
-# Sesion 2026-05-12 — TASK-824 arch-architect verdict + implementation on develop
+# Sesion 2026-05-12 — TASK-824 arch-architect verdict + implementation CERRADA on develop
 
-- **Trigger**: post TASK-823 cierre, usuario pidió arch-architect verdict sobre TASK-824 (Client Portal DDL Schema, EPIC-015 child 3/8). Verdict: 5 correcciones (1 bloqueante semántico + 4 polish) aplicadas al spec V1.0 pre-Slice-1; spec arquitectónica V1 bump V1.1 → V1.2; implementación directa en develop.
-- **5 correcciones canonizadas en spec V1.2**:
-  1. **(Bloqueante)** rename `business_line` → `applicability_scope` + COMMENT canónico explícito (reconcilia con `GREENHOUSE_BUSINESS_LINES_ARCHITECTURE_V1.md` hard rule "no duplicar enum del catalogo"; el campo mezclaba dimensiones ortogonales globe/wave/crm_solutions reales + cross metavalue + staff_aug service_module).
-  2. Parity test live TS↔DB shape canónico explícito (TASK-611 mirror) en `src/lib/client-portal/data-sources/parity.{ts,test.ts,live.test.ts}`; Option C adoptada (parity test only, NO CHECK array hardcoded en DB).
-  3. Anti pre-up-marker bug check INSIDE la migration (bloque DO + RAISE EXCEPTION, TASK-838 pattern).
+- **Trigger**: post TASK-823 cierre, usuario pidió arch-architect verdict sobre TASK-824 (Client Portal DDL Schema, EPIC-015 child 3/8). Verdict: 5 correcciones (1 bloqueante semántico + 4 polish) aplicadas al spec V1.0 pre-Slice-1; FASE 1 Discovery emergió 2 baseline recalibrations adicionales (Issues 6+7); spec arquitectónica bump V1.1 → V1.4; implementación directa en develop con 6 commits incrementales.
+- **5 correcciones canonizadas en spec V1.2 (verdict inicial)**:
+  1. **(Bloqueante)** rename `business_line` → `applicability_scope` + COMMENT canónico explícito (reconcilia con `GREENHOUSE_BUSINESS_LINES_ARCHITECTURE_V1.md` hard rule "no duplicar enum del catalogo").
+  2. Parity test live TS↔DB shape canónico (TASK-611 mirror); Option C adoptada.
+  3. Anti pre-up-marker bug check INSIDE la migration (TASK-838 pattern).
   4. Campo dormido `default_for_business_lines` eliminado V1.0 (YAGNI).
-  5. Parity test cubre los **3 arrays** (data_sources + view_codes + capabilities), no solo data_sources.
-- **Cierra OQ-3 de TASK-822**: parity test TS↔DB shipped en esta task.
-- **Decisión operativa**: implementación directa sobre `develop`, sin branch separada (instrucción explícita).
-- **Task movida** `to-do/` → `in-progress/`. README + Handoff sync.
-- **Plan**: 5 slices (DDL+anti-pre-up-marker → seed → extension commercial_terms → parity test live → verify + types regen).
+  5. Parity test cubre los 3 arrays (data_sources + view_codes + capabilities) — luego reducido a solo data_sources por Issue 7 chicken-and-egg.
+- **2 baseline recalibrations emergidos en FASE 1 Discovery PG live**:
+  - **Issue 6 (bloqueante post-Discovery)** — `organizations.organization_id` es TEXT en runtime no UUID + `greenhouse_core.users` no existe (canonical = `client_users`). Sin fix, migration habría abortado con `incompatible types text vs uuid`. Spec bump V1.2 → V1.3 (commit `4aa06849`).
+  - **Issue 7 (architectural)** — spec V1.2 §5.5 seedea 11 view_codes + 11 capabilities que NO existen aún en `VIEW_REGISTRY` / `entitlements-catalog`. Chicken-and-egg: TASK-824 ships ANTES que TASK-826 + TASK-827 (los catalogs los materializan ellos). Fix: parity strict ONLY para data_sources V1.0; view_codes parity → TASK-827 responsabilidad, capabilities parity → TASK-826 responsabilidad. Spec bump V1.3 → V1.4 (commit `fca4df5b`).
+- **Cierre 2026-05-12**: 6 commits incrementales sin PR ceremony.
+  - `29fa1f58` baseline rename to-do → in-progress + Lifecycle/README/Handoff sync
+  - `4aa06849` baseline #2 — Issue 6 type/FK drift fix
+  - `fca4df5b` baseline #3 — Issue 7 chicken-and-egg parity V1.4 spec
+  - `0844a13c` Slice 1 — DDL migration + seed + extension + anti pre-up-marker + types regen (CONSOLIDADO)
+  - `0bdbc455` Slice 2 — parity test live data_sources (cierra OQ-3 TASK-822)
+  - (closing) — task move to complete + cross-impact Deltas
+- **Tests + smokes verde**: 9 unit + 2 live PG (parity) + 7 smokes manuales (UNIQUE partial, anti-UPDATE/DELETE events, append-only modules, CHECK pilot expires, NO default_for_business_lines, seed count, bundled_modules extension).
+- **Migration verificada live PG**: 1 schema + 3 tablas + 11 indexes + 10 seed modules (distribución globe=5/cross=2/staff_aug=1/crm_solutions=1/wave=1) + bundled_modules extension + 3 triggers canónicos.
+- **Verificación final**: `pnpm build` ✅ + `pnpm lint` ✅ + `pnpm tsc --noEmit` ✅.
+- **Scope agregado vs spec original**: parity test live data_sources (3 archivos TS + 11 tests) + bloque DO anti pre-up-marker INSIDE migration + COMMENT canónico en `applicability_scope`. Effort sigue **Bajo**.
+- **Cierra OQ-3 de TASK-822** ÚNICAMENTE para `data_sources[]`. Las paridades de `view_codes[]` y `capabilities[]` son responsabilidad explícita de TASK-827 + TASK-826 (cada task posee su catalog).
+- **Desbloquea**: TASK-825 (resolver canónico — primer reader nativo del BFF), TASK-826 (admin endpoints — debe agregar parity test capabilities[]), TASK-827 (UI composition layer — debe agregar parity test view_codes[]), TASK-828 (cascade — necesita columna bundled_modules).
+- **Patrón canonizado**: cuando emerja un dominio nuevo con shape "catalog declarativo + seed forward-looking + canonical catalogs downstream", replicar este patrón (parity test SOLO de los catalogs ya canonizados; deferred parity para los catalogs aún sin materializar). Evita chicken-and-egg sin sacrificar drift detection.
+
+---
+
+# Sesion 2026-05-12 — TASK-823 arch-architect verdict + implementation CERRADA on develop
 
 ---
 

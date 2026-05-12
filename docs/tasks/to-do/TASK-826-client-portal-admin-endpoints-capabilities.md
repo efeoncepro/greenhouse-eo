@@ -8,11 +8,20 @@
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `EPIC-015`
-- Status real: `Diseno`
+- Status real: `Diseno (TASK-824 cerrada 2026-05-12; bloqueada por TASK-825 resolver)`
 - Rank: `TBD`
 - Domain: `client_portal`
 - Blocked by: `TASK-825`
 - Branch: `task/TASK-826-client-portal-admin`
+
+## Delta 2026-05-12 — TASK-824 cerrada, parity capabilities responsibility heredada
+
+TASK-824 cerró el sustrato DB. Esta task hereda **responsabilidad explícita** de la parity test live `capabilities[]` TS↔DB:
+
+- `client_portal.modules.capabilities[]` seed declara 12 capabilities forward-looking (`client_portal.creative_hub.read`, `client_portal.csc_pipeline.read`, `client_portal.brand_intelligence.read`, `client_portal.cvr.read`, `client_portal.cvr.export`, `client_portal.roi.read`, `client_portal.exports.generate`, `client_portal.assigned_team.read`, `client_portal.pulse.read`, `client_portal.staff_aug.read`, `client_portal.crm_command.read`, `client_portal.web_delivery.read`). Solo `client_portal.workspace` existe hoy en `entitlements-catalog`.
+- Cuando esta task materialice las 12 capabilities en `src/config/entitlements-catalog.ts` + seed migration `greenhouse_core.capabilities_registry`, debe agregar parity test `src/lib/client-portal/capabilities/parity.{ts,test.ts,live.test.ts}` replicando shape canónico TASK-611 + patrón TASK-824 Slice 2.
+- Comparator pattern: el seed `modules.capabilities[]` debe ⊆ del set de capability keys del catalog TS. Drift detection bloqueante.
+- Spec V1.4 §5.5 documenta este contract.
 
 ## Summary
 

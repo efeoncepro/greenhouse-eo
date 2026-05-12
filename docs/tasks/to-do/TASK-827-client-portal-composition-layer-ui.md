@@ -8,11 +8,20 @@
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `EPIC-015`
-- Status real: `Diseno`
+- Status real: `Diseno (TASK-824 cerrada 2026-05-12; bloqueada por TASK-825 resolver)`
 - Rank: `TBD`
 - Domain: `client_portal / ui`
 - Blocked by: `TASK-825`
 - Branch: `task/TASK-827-client-portal-composition`
+
+## Delta 2026-05-12 — TASK-824 cerrada, parity view_codes responsibility heredada
+
+TASK-824 cerró el sustrato DB. Esta task hereda **responsabilidad explícita** de la parity test live `view_codes[]` TS↔DB:
+
+- `client_portal.modules.view_codes[]` seed declara 16 view_codes (4 existen hoy en `VIEW_REGISTRY`: `cliente.pulse`, `cliente.proyectos`, `cliente.equipo`, `cliente.campanas`; 11 forward-looking: `cliente.creative_hub`, `cliente.reviews`, `cliente.roi_reports`, `cliente.exports`, `cliente.cvr_quarterly`, `cliente.staff_aug`, `cliente.brand_intelligence`, `cliente.csc_pipeline`, `cliente.crm_command`, `cliente.web_delivery`, `cliente.home`).
+- Cuando esta task materialice los 11 view_codes faltantes en `src/lib/admin/view-access-catalog.ts` `VIEW_REGISTRY`, debe agregar parity test `src/lib/client-portal/view-codes/parity.{ts,test.ts,live.test.ts}` replicando shape canónico TASK-611 + patrón TASK-824 Slice 2.
+- Comparator pattern: el seed `modules.view_codes[]` debe ⊆ del set de viewCode strings del `VIEW_REGISTRY`. Drift detection bloqueante.
+- Spec V1.4 §5.5 documenta este contract.
 
 ## Summary
 

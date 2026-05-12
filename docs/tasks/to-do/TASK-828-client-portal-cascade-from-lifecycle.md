@@ -8,11 +8,20 @@
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `EPIC-015`
-- Status real: `Diseno`
+- Status real: `Diseno (TASK-824 cerrada 2026-05-12; columna engagement_commercial_terms.bundled_modules ya disponible)`
 - Rank: `TBD`
 - Domain: `client_portal`
 - Blocked by: `TASK-820, TASK-825, TASK-826`
 - Branch: `task/TASK-828-client-portal-cascade`
+
+## Delta 2026-05-12 — TASK-824 cerrada, columna bundled_modules disponible
+
+TASK-824 cerró 2026-05-12 con ALTER `greenhouse_commercial.engagement_commercial_terms ADD COLUMN bundled_modules TEXT[] DEFAULT ARRAY[]::TEXT[]`. Cuando esta task arranque:
+
+- La columna existe en runtime con default array vacío (backward compat 100%).
+- Tipos Kysely regenerados cubren la columna.
+- NO hay FK física `bundled_modules[]` → `modules.module_key` (cross-schema boundary, decisión spec V1 §5.4). Esta task DEBE implementar validación lógica al INSERT/UPDATE de `bundled_modules` (e.g. en el helper canónico para setear bundled_modules en commercial terms): cada string debe matchear un `modules.module_key` activo.
+- Cuando emerja la primera surface que setea `bundled_modules`, considerar reliability signal `client_portal.commercial_terms.unknown_bundled_module` que detecte drift (filas en commercial_terms con `bundled_modules` que referencian module_keys inexistentes o ya en `effective_to IS NOT NULL`).
 
 ## Summary
 

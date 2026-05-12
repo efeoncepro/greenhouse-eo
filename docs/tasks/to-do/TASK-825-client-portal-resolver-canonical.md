@@ -11,8 +11,17 @@
 - Status real: `Diseno (TASK-822 cerrada 2026-05-12; queda bloqueada por TASK-824 schema)`
 - Rank: `TBD`
 - Domain: `client_portal`
-- Blocked by: `TASK-824`
+- Blocked by: `none` (TASK-824 cerrada 2026-05-12; schema + seed listos)
 - Branch: `task/TASK-825-client-portal-resolver`
+
+## Delta 2026-05-12 — TASK-824 cerrada, sustrato DB listo
+
+TASK-824 cerró 2026-05-12 con schema `greenhouse_client_portal` (3 tablas + 10 seed modules + ALTER `engagement_commercial_terms.bundled_modules`). Cuando arranque esta task:
+
+- Las 3 tablas existen y están listas para queries del resolver: `modules` (10 seed), `module_assignments` (vacía hasta TASK-826 + TASK-828), `module_assignment_events` (vacía).
+- Tipos Kysely regenerados en `src/types/db.d.ts` cubren las 3 tablas + `engagement_commercial_terms.bundled_modules`.
+- Spec V1.4 canoniza: `applicability_scope` (no business_line), `organization_id TEXT` (no UUID), FK a `client_users` (no `users`), sin `default_for_business_lines`, view_codes/capabilities forward-looking en seed.
+- `data_sources[]` parity test live activo desde TASK-824 Slice 2; este resolver consume datos del catalog confiado de que data_sources son válidos.
 
 ## Delta 2026-05-12 — TASK-822 cerrada; este resolver es el primer reader NATIVO del BFF
 
