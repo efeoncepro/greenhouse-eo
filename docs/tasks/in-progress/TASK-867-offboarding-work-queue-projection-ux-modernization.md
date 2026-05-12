@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -162,6 +162,64 @@ Reglas obligatorias:
      El agente que toma esta task ejecuta Discovery y produce
      plan.md segun TASK_PROCESS.md. No llenar al crear la task.
      ═══════════════════════════════════════════════════════════ -->
+
+## Plan Mode — 2026-05-11
+
+### Discovery Summary
+
+- La spec sigue vigente en su causa raiz: `HrOffboardingView` recompone workflow en cliente y hace N+1 (`cases` + ultimo `final-settlement` + ultimo `final-settlement/document` por caso).
+- El schema/runtime real soporta una proyeccion batch read-only sin migracion:
+  - `greenhouse_hr.work_relationship_offboarding_cases`
+  - `greenhouse_payroll.final_settlements`
+  - `greenhouse_payroll.final_settlement_documents`
+- `pnpm pg:doctor` paso sano contra Cloud SQL dev durante discovery.
+- No existe `OffboardingWorkQueue` en runtime; debe crearse como contrato nuevo de lectura operacional.
+- Los write paths actuales de offboarding, finiquito, documentos, carta de renuncia y pension de alimentos existen y deben conservarse como source of mutation.
+- El mockup aprobado en `/hr/offboarding/mockup` es el contrato visual/UX de la implementacion. La UI runtime debe cablearse a datos reales sin redisenar la experiencia.
+
+### Decisiones
+
+- `OffboardingWorkQueue` vivira como submodulo en `src/lib/workforce/offboarding/work-queue/` con `types`, `derivation`, `query` e `index`, no como archivo monolitico. Rationale: derivacion testeable, menor blast radius y contrato mas reusable.
+- No se requiere ADR dedicado. Rationale: la task no cambia source of truth, schema, access model ni eventos; agrega una proyeccion read-only sobre agregados existentes. Se documentara como delta en `GREENHOUSE_WORKFORCE_OFFBOARDING_ARCHITECTURE_V1.md`.
+- Los action descriptors del work queue son orientacion UI, no autorizacion ni mutacion. Cada write endpoint conserva su capability check canonico.
+- Se preserva el contrato HR actual de `listOffboardingCases()`; no se introducira `space_id` artificial donde el dominio opera por HR/capabilities.
+
+### Access Model
+
+- `routeGroups`: sin cambios; la surface sigue bajo `hr`.
+- `views` / `authorizedViews`: sin cambios; `equipo.offboarding` sigue siendo la view visible.
+- `entitlements`: sin capabilities nuevas. El endpoint read-only exige:
+  - `hr.offboarding_case:read`
+  - `hr.final_settlement:read`
+  - `hr.final_settlement_document:read`
+- `startup policy`: sin cambios.
+
+### Skills
+
+- `greenhouse-agent`: implementacion runtime Greenhouse, rutas y cierre.
+- `greenhouse-ui-orchestrator`: adaptar el mockup aprobado a primitives Vuexy/MUI sin crear UI alternativa.
+- `greenhouse-ux-content-accessibility`: copy, empty/error/loading states, labels y accesibilidad.
+- `greenhouse-microinteractions-auditor`: busy states, focus, acciones secundarias y feedback.
+- `software-architect-2026`: validar que la proyeccion no cree nuevo SSOT ni ADR innecesario.
+
+### Subagent Strategy
+
+- Discovery se ejecuto con dos subagentes:
+  - Docs/access/arquitectura.
+  - Runtime/schema/codigo.
+- Implementacion seguira secuencial en el agente principal porque backend contract y UI consumer quedan acoplados por `OffboardingWorkQueue`.
+
+### Plan
+
+1. Migraciones: ninguna.
+2. Tipos / contratos: crear contrato `OffboardingWorkQueue` y action descriptors.
+3. Queries / readers / helpers: reutilizar `listOffboardingCases()` y agregar batch readers para miembro, ultimo settlement y ultimo documento.
+4. API routes / handlers: crear `GET /api/hr/offboarding/work-queue` con auth/capabilities existentes.
+5. Events / publishers / consumers: sin cambios.
+6. Reliability / observability: error handling sanitizado y tests de derivacion como steady state.
+7. UI / views / pages: refactorizar `HrOffboardingView` para consumir la proyeccion, mantener dialogs y mutaciones actuales, y ajustar visualmente al mockup aprobado.
+8. Docs / handoff / changelog / arquitectura: actualizar arquitectura offboarding, docs/manual HR, changelog y handoff.
+9. Verificacion: tests focalizados, `pnpm exec tsc --noEmit --pretty false`, `pnpm lint` y validacion manual/local si aplica.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 3 — EXECUTION SPEC
@@ -464,5 +522,7 @@ Al implementar runtime, no copiar el mock data como fuente de verdad: debe conec
 
 ## Open Questions
 
-- Confirmar durante Discovery si `OffboardingWorkQueue` debe vivir solo en `src/lib/workforce/offboarding/` o si conviene exponer un submodulo `src/lib/workforce/offboarding/work-queue/` con files separados para types/queries/derivation.
-- Resuelto por aprobacion del mockup: la UI V1 debe incluir drawer de detalle para checklist/progreso/acciones secundarias, salvo que el plan de implementacion detecte un bloqueo tecnico relevante.
+- Resuelto: `OffboardingWorkQueue` vivira en `src/lib/workforce/offboarding/work-queue/` con files separados para types/queries/derivation. Rationale: contrato mas testeable y reusable.
+- Resuelto por aprobacion del mockup: la UI V1 debe incluir drawer de detalle para checklist/progreso/acciones secundarias.
+- Resuelto: no hace falta ADR dedicado; basta con delta en arquitectura workforce/offboarding porque no cambia source of truth, schema, access ni eventos.
+- Resuelto: no existe audit vigente especifico de offboarding/finiquito. Las auditorias payroll revisadas quedan como contexto, no bloqueo.

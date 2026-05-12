@@ -1,3 +1,13 @@
+# Sesion 2026-05-11 — TASK-867 tomada en develop (Offboarding Work Queue Projection + UX Modernization)
+
+- **Trigger:** usuario pidió implementar TASK-867 manteniéndose en `develop` sin cambiar de rama.
+- **Ownership:** task movida a `docs/tasks/in-progress/TASK-867-offboarding-work-queue-projection-ux-modernization.md`; `Lifecycle` actualizado a `in-progress`; índice `docs/tasks/README.md` y registry sincronizados.
+- **Guardrail de rama:** no crear branch aunque la task declare `task/TASK-867-offboarding-work-queue-ux`; prevalece instrucción explícita del usuario para trabajar directo en `develop`.
+- **Estado previo detectado:** `develop` local está 2 commits adelante de `origin/develop` por cambios documentales TASK-489/TASK-868 (`a426da3e`, `0ce35f68`). No son parte de TASK-867; no revertirlos ni mezclarlos deliberadamente.
+- **Próximo paso:** completar Discovery/Audit/Plan antes de tocar runtime, resolviendo Open Questions y contrastando schema/código real.
+
+---
+
 # Sesion 2026-05-11 — TASK-489 V2.2 full hardening + TASK-868 spawned (payroll receipts)
 
 - **Trigger continuación arch review**: usuario preguntó "¿por cual task comenzar?" → recomendé TASK-489 foundation. Pidió leer completa con skill arch + aplicar TODOS los ajustes.
