@@ -117,3 +117,51 @@ describe('captureMessageWithDomain (TASK-844)', () => {
     )
   })
 })
+
+describe('client_portal Sentry domain (TASK-822 Slice 2)', () => {
+  beforeEach(() => {
+    captureExceptionMock.mockClear()
+    captureMessageMock.mockClear()
+  })
+
+  it('captureWithDomain accepts client_portal and tags the exception correctly', () => {
+    const err = new Error('client portal read failure')
+
+    // Type-level assertion: 'client_portal' must be assignable to CaptureDomain.
+    // If the union doesn't include it, this line fails to compile.
+    captureWithDomain(err, 'client_portal', {
+      extra: { organizationId: 'org-test-123' },
+      tags: { source: 'account-summary', stage: 'read' }
+    })
+
+    expect(captureExceptionMock).toHaveBeenCalledTimes(1)
+    expect(captureExceptionMock).toHaveBeenCalledWith(
+      err,
+      expect.objectContaining({
+        tags: {
+          source: 'account-summary',
+          stage: 'read',
+          domain: 'client_portal'
+        },
+        extra: { organizationId: 'org-test-123' },
+        level: 'error'
+      })
+    )
+  })
+
+  it('captureMessageWithDomain accepts client_portal for degraded-mode signals', () => {
+    captureMessageWithDomain('Client portal module assignment orphaned', 'client_portal', {
+      level: 'warning',
+      extra: { orphanModuleKey: 'unknown_module' }
+    })
+
+    expect(captureMessageMock).toHaveBeenCalledTimes(1)
+    expect(captureMessageMock).toHaveBeenCalledWith(
+      'Client portal module assignment orphaned',
+      expect.objectContaining({
+        tags: expect.objectContaining({ domain: 'client_portal' }),
+        level: 'warning'
+      })
+    )
+  })
+})

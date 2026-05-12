@@ -63,6 +63,7 @@ export type CaptureDomain =
   | 'home'
   | 'payroll'
   | 'sync' // TASK-773 — outbox publisher, reactive consumer, projection refreshes
+  | 'client_portal' // TASK-822 — Client Portal BFF / Anti-Corruption Layer (EPIC-015 child 1/8)
 
 export interface CaptureOptions {
   /** Free-form structured context. Ends up in Sentry's `Additional Data`. */
