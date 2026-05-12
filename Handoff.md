@@ -1,3 +1,20 @@
+# Sesion 2026-05-12 — TASK-822 arch-architect verdict + implementation on develop
+
+- **Trigger**: usuario pidió revisión arch-architect de TASK-822 (Client Portal Domain Consolidation, EPIC-015 child 1/8). Verdict: aprobado con 3 correcciones estructurales aplicadas pre-Slice-1.
+- **3 correcciones canonizadas en spec v1.1 + task v1.1**:
+  1. Reframe a BFF/Anti-Corruption Layer (re-export NO transfiere ownership; `account-360/`, `agency/`, `ico-engine/` retienen ownership canónica).
+  2. Module classification dual `curated` vs `native` con metadata tipada (`ClientPortalReaderMeta` interface — compile-checked, grep-able, consumible por TASK-824).
+  3. Domain import direction enforced (`client_portal` es hoja del DAG; ESLint rule `greenhouse/no-cross-domain-import-from-client-portal` modo `error` bloquea ciclos).
+- **Open Questions resueltas pre-execution** (todas no-bloqueantes):
+  - OQ-1: firma exacta V1.0 (sin thin adaptation; reclasifica a `native` si emerge necesidad).
+  - OQ-2: 0 readers nativos V1.0 (placeholder files = anti-pattern; primer nativo emerge con TASK-825 resolver).
+  - OQ-3: parity test TS↔DB para `ClientPortalDataSource` queda para TASK-824 (la tabla `modules` no existe aún; crear test ahora = falsa señal).
+- **Decisión operativa**: implementación directa sobre `develop`, sin branch separada (instrucción explícita del usuario).
+- **Task movida** `to-do/` → `in-progress/`. README + Handoff sync.
+- **Plan**: 5 slices (estructura + DTO; Sentry whitelist + smoke; ESLint rule; curated re-exports; verificación final).
+
+---
+
 # Sesion 2026-05-12 — TASK-870 production release recovery + meta-aprendizaje "no perder más días en esto"
 
 - **Trigger:** Codex había pasado ~3h intentando promover `develop → main`. Pusheó commit merge `75273cb7` + 4 fix commits (`59f5115c`, `a4d65aa2`, `7841f547`, `c41a26b8`) pero el `Production Release Orchestrator` falló preflight 4 veces. Usuario llamó a Claude para investigar. Después de fix, total acumulado del incidente = **~2 días desde primera promoción fallida**.

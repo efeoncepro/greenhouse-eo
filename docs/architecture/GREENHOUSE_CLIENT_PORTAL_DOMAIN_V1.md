@@ -1,7 +1,8 @@
 # Greenhouse Client Portal Domain Architecture V1
 
-> **Version:** 1.0
+> **Version:** 1.1
 > **Created:** 2026-05-07 por Claude (Opus 4.7)
+> **Updated:** 2026-05-12 por Claude (Opus 4.7) — arch-architect verdict aplicado a TASK-822: agregadas §3.1 (Module classification: curated vs native) y §3.2 (Domain import direction enforced)
 > **Audience:** Backend engineers, frontend engineers, product owners, comerciales que vendan módulos del portal cliente, agentes que toquen rutas `/api/client-portal/*`, owners de Globe/Wave/CRM Solutions
 > **Related:** `GREENHOUSE_360_OBJECT_MODEL_V1.md`, `GREENHOUSE_CLIENT_PORTAL_ARCHITECTURE_V1.md` (V3.0, descriptivo — predecesor), `GREENHOUSE_CLIENT_LIFECYCLE_V1.md`, `GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md`, `GREENHOUSE_AGENCY_LAYER_V2.md`, `GREENHOUSE_ASSIGNED_TEAM_ARCHITECTURE_V1.md`, `GREENHOUSE_FEATURE_FLAGS_ROLLOUT_PLATFORM_V1.md`
 > **Supersedes:** este spec NO supersede `GREENHOUSE_CLIENT_PORTAL_ARCHITECTURE_V1.md` V3.0 — coexisten: V3.0 describe la experiencia funcional y los 16 cards Creative Hub; este V1 (Domain) canoniza la **estructura del dominio** y el modelo de módulos on-demand. V3.0 sigue siendo lectura obligatoria para entender qué se compone.
@@ -77,7 +78,72 @@ Consecuencias del gap actual:
 | View governance | `authorized_views` + `view_codes` (TASK-136) | Cada módulo declara sus view_codes |
 | Feature flags variantes | `home_rollout_flags` (TASK-780) | Distinto: ese es shell variant; este es product entitlement |
 
-**Ownership**: `client_portal` es dominio nuevo de primer nivel. Owner técnico inicial: efeonce-account. Sentry domain: `client_portal`.
+**Ownership**: `client_portal` es dominio nuevo de primer nivel **compositivo (BFF / Anti-Corruption Layer del route group `client`)**. Owner técnico inicial: efeonce-account. Sentry domain: `client_portal`.
+
+---
+
+## 3.1 Module classification: curated vs native (TASK-822)
+
+`src/lib/client-portal/` es un **BFF**. Los readers que expone se clasifican en dos categorías mutuamente excluyentes:
+
+| Classification | Carpeta | Semántica | Ownership canónica | Ejemplos V1.0 |
+|---|---|---|---|---|
+| `curated` | `readers/curated/` | Re-export puro de un reader que vive en un dominio productor. Firma exacta, cero adaptation. | Permanece en el dominio productor (`account-360`, `agency`, `ico-engine`). Si la firma upstream cambia, este re-export refleja el cambio automáticamente. | `getClientAccountSummary` (owner `account-360`), readers de Creative Hub (owner `agency`), métricas ICO (owner `ico-engine`) |
+| `native` | `readers/native/` | Nace en `client-portal` porque no tiene owner previo en otro dominio. Owns su firma. | `client_portal` | `resolveClientPortalModulesForOrganization` (TASK-825), composition helpers, BFF-specific shaping |
+
+**Reglas duras**:
+
+- **NUNCA** mover físicamente un reader de su dominio owner a `readers/curated/`. La curated layer es un puntero, NO una mudanza. Si emerge la tentación de "consolidar el código acá", el reader probablemente NO es client-portal-specific y debe quedarse donde está.
+- **NUNCA** clasificar como `curated` un reader que aplica thin adaptation (e.g. agrega un parámetro `clientPortalContext`). Si adapta, es `native` con `ownerDomain` documentando la fuente original.
+- **NUNCA** mezclar dimensiones: `classification` (curated/native) y `ownerDomain` son ortogonales. Curated siempre tiene `ownerDomain` no-null; native siempre tiene `ownerDomain` null.
+- **SIEMPRE** que un reader native emerja, evaluar primero si pertenece a un dominio productor existente. Default: empujar al dominio productor; native solo cuando el dato NO tiene dominio natural (e.g. el resolver del catálogo de módulos pertenece nativamente a `client_portal` porque el catálogo es owned por `client_portal`).
+
+**Metadata canónica obligatoria** (TASK-822 Slice 1):
+
+```ts
+// src/lib/client-portal/dto/reader-meta.ts
+export interface ClientPortalReaderMeta {
+  readonly key: string                                // identifier estable
+  readonly classification: 'curated' | 'native'
+  readonly ownerDomain: string | null                 // 'account-360' | 'agency' | ... | null si native
+  readonly dataSources: readonly ClientPortalDataSource[]
+  readonly clientFacing: boolean
+  readonly routeGroup: 'client' | 'agency' | 'admin'
+}
+```
+
+Cada archivo bajo `readers/{curated,native}/` exporta un `*Meta: ClientPortalReaderMeta` tipado. Esto reemplaza la idea original de JSDoc `@dataSources` tags (JSDoc no es machine-checkable; un export TS sí). Compile-checked, grep-able, consumible por TASK-824 catalog validation (parity test entre `ClientPortalDataSource` type union y `modules.data_sources[]` enum DB).
+
+---
+
+## 3.2 Domain import direction (TASK-822, hoja del DAG)
+
+`client_portal` es **hoja del DAG de dominios**. La dirección de imports está enforced.
+
+**Permitido** (`client_portal` consumidor):
+
+```text
+src/lib/client-portal/**  →  src/lib/{account-360,agency,ico-engine,commercial,finance,delivery,identity}/**
+```
+
+**Prohibido** (`client_portal` productor — anti-pattern):
+
+```text
+src/lib/{account-360,agency,ico-engine,commercial,finance,delivery,identity,hr}/**  →  src/lib/client-portal/**
+```
+
+**Enforcement** (defense in depth, 3 capas):
+
+1. **ESLint rule canónica** `greenhouse/no-cross-domain-import-from-client-portal` (modo `error`, TASK-822 Slice 3). Bloquea el commit. Override block en `eslint.config.mjs` exime `src/lib/client-portal/**` (el módulo puede importarse a sí mismo).
+2. **Grep negativo** en code review: `rg "from '@/lib/client-portal" src/lib/{agency,finance,hr,account-360,ico-engine,identity,delivery,commercial}/` debe estar vacío. Verificación adicional cuando la lint rule esté en mantenimiento o se modifique.
+3. **Doctrina canonizada** en CLAUDE.md (overlay de Greenhouse) cuando emerja el primer dominio adicional con misma forma (e.g. `partner_portal`, `vendor_portal`) — replica el patrón.
+
+**Reglas duras**:
+
+- **NUNCA** crear un import de `@/lib/client-portal/*` desde un dominio productor. La rule lo bloquea; si emerge la necesidad, el reader que se quiere consumir está en el dominio equivocado (mover al dominio productor) o el consumer está en la capa equivocada (mover al BFF si es client-facing).
+- **NUNCA** desactivar la rule per-archivo con `// eslint-disable-next-line`. Si emerge un caso legítimo, agregarlo al override block en `eslint.config.mjs` con comentario justificando.
+- **NUNCA** introducir un dominio paralelo que importe `client_portal` "indirectamente" (e.g. dominio nuevo que importa lo que client_portal importa). Eso recrea el ciclo bajo otro nombre.
+- **SIEMPRE** que un dominio adicional con shape BFF emerja (partner portal, vendor portal, internal admin portal), reusar este patrón: hoja del DAG + lint rule equivalente + classification curated/native + metadata tipada. NO inventar una primitiva nueva.
 
 ---
 
