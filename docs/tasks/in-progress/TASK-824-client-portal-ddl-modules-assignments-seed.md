@@ -2,17 +2,17 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Bajo`
 - Type: `implementation`
 - Epic: `EPIC-015`
-- Status real: `Diseno v1.1 — arch-architect verdict aplicado 2026-05-12 (5 correcciones pre-Slice-1). BFF TS listo desde 2026-05-12 TASK-822 cierre.`
+- Status real: `Implementacion v1.1 directo en develop (sin branch separada por instruccion operativa 2026-05-12). Spec V1.2 con 5 correcciones verdict aplicadas pre-Slice-1.`
 - Rank: `TBD`
 - Domain: `client_portal`
 - Blocked by: `none`
-- Branch: `task/TASK-824-client-portal-ddl`
+- Branch: `develop` (direct work, no feature branch — user override)
 
 ## Delta 2026-05-12 — TASK-822 cerrada, contract de parity TS↔DB pendiente
 

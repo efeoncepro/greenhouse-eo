@@ -1,3 +1,19 @@
+# Sesion 2026-05-12 — TASK-824 arch-architect verdict + implementation on develop
+
+- **Trigger**: post TASK-823 cierre, usuario pidió arch-architect verdict sobre TASK-824 (Client Portal DDL Schema, EPIC-015 child 3/8). Verdict: 5 correcciones (1 bloqueante semántico + 4 polish) aplicadas al spec V1.0 pre-Slice-1; spec arquitectónica V1 bump V1.1 → V1.2; implementación directa en develop.
+- **5 correcciones canonizadas en spec V1.2**:
+  1. **(Bloqueante)** rename `business_line` → `applicability_scope` + COMMENT canónico explícito (reconcilia con `GREENHOUSE_BUSINESS_LINES_ARCHITECTURE_V1.md` hard rule "no duplicar enum del catalogo"; el campo mezclaba dimensiones ortogonales globe/wave/crm_solutions reales + cross metavalue + staff_aug service_module).
+  2. Parity test live TS↔DB shape canónico explícito (TASK-611 mirror) en `src/lib/client-portal/data-sources/parity.{ts,test.ts,live.test.ts}`; Option C adoptada (parity test only, NO CHECK array hardcoded en DB).
+  3. Anti pre-up-marker bug check INSIDE la migration (bloque DO + RAISE EXCEPTION, TASK-838 pattern).
+  4. Campo dormido `default_for_business_lines` eliminado V1.0 (YAGNI).
+  5. Parity test cubre los **3 arrays** (data_sources + view_codes + capabilities), no solo data_sources.
+- **Cierra OQ-3 de TASK-822**: parity test TS↔DB shipped en esta task.
+- **Decisión operativa**: implementación directa sobre `develop`, sin branch separada (instrucción explícita).
+- **Task movida** `to-do/` → `in-progress/`. README + Handoff sync.
+- **Plan**: 5 slices (DDL+anti-pre-up-marker → seed → extension commercial_terms → parity test live → verify + types regen).
+
+---
+
 # Sesion 2026-05-12 — TASK-823 arch-architect verdict + implementation CERRADA on develop
 
 - **Trigger**: post TASK-822 cierre, usuario pidió arch-architect verdict sobre TASK-823 (`/api/client-portal/*` API Namespace, EPIC-015 child 2/8). Verdict: 4 correcciones (2 bloqueantes + 2 polish) aplicadas al spec pre-Slice-1; FASE 1 Discovery emergió Issue 5 (drift `requireServerSession` vs `getServerAuthSession` para API routes — fix canónico per CLAUDE.md); implementación directa en develop con 4 commits incrementales.
