@@ -245,6 +245,14 @@ ENV_VARS="${ENV_VARS},NUBOX_API_BASE_URL=${NUBOX_API_BASE_URL}"
 ENV_VARS="${ENV_VARS},NUBOX_BEARER_TOKEN_SECRET_REF=${NUBOX_BEARER_TOKEN_SECRET_REF}"
 ENV_VARS="${ENV_VARS},NUBOX_X_API_KEY_SECRET_REF=${NUBOX_X_API_KEY_SECRET_REF}"
 
+# TASK-742 + TASK-870 — `AZURE_AD_CLIENT_ID` requerido por `/smoke/identity-auth-providers`
+# (probe `azure_authorize_endpoint`) en `server.ts`. Es un public GUID, NO un secreto
+# (no es el client_secret). Sin esto el smoke cron emite Sentry burst "AZURE_AD_CLIENT_ID
+# unset" cada 5min → preflight check `sentry_critical_issues` bloquea production release
+# orchestrator. Override en CI/local: `AZURE_AD_CLIENT_ID=<other-guid> bash deploy.sh`.
+AZURE_AD_CLIENT_ID="${AZURE_AD_CLIENT_ID:-3626642f-0451-4eb2-8c29-d2211ab3176c}"
+ENV_VARS="${ENV_VARS},AZURE_AD_CLIENT_ID=${AZURE_AD_CLIENT_ID}"
+
 # TASK-638 — Reliability AI Observer kill-switch.
 # Declarativo en deploy.sh para que `--set-env-vars` (destructivo) NO lo
 # borre en cada redeploy. Default true en staging, configurable via env.
