@@ -705,6 +705,109 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
     description: 'Inbox y preferencias de avisos visibles para la sesión.',
     routePath: '/notifications',
     routeGroup: 'client'
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // TASK-827 Slice 0 — viewCodes canonical forward-looking del Client Portal
+  // V1.0. Declarados en `greenhouse_client_portal.modules.view_codes[]` (TASK-824
+  // seed) como contract de surfaces compositivas que el resolver canónico
+  // expone (TASK-825). Las páginas reales se materializan en TASKs derivadas
+  // V1.1 (`client-portal-pages-placeholder-materialization`); este registry
+  // es la PROMESA del contrato a nivel governance.
+  //
+  // Coexistencia con legacy entries (e.g. `cliente.revisiones` ↔ `cliente.reviews`):
+  // ambos viewCodes pueden coexistir mapeando a la misma routePath. El resolver
+  // canónico decide cuál se expone a cliente real via assignment del módulo
+  // que los declara. NO se rompe access existente (legacy `authorizedViews[]`
+  // sigue funcionando para internos via `canSeeView` legacy path).
+  // ─────────────────────────────────────────────────────────────────────────
+  {
+    viewCode: 'cliente.home',
+    section: 'cliente',
+    label: 'Inicio',
+    description: 'Home terminator del client tenant — siempre accesible, renderiza 5-state contract (zero/denied/error/normal).',
+    routePath: '/home',
+    routeGroup: 'client'
+  },
+  {
+    viewCode: 'cliente.creative_hub',
+    section: 'cliente',
+    label: 'Creative Hub',
+    description: 'Hub de operación creativa Globe (16 cards canonical V3.0). Bundle creative_hub_globe_v1.',
+    routePath: '/creative-hub',
+    routeGroup: 'client'
+  },
+  {
+    viewCode: 'cliente.reviews',
+    section: 'cliente',
+    label: 'Revisiones (canonical)',
+    description: 'Queue de revisiones con naming canonical seed TASK-824. Coexiste con cliente.revisiones legacy apuntando a /reviews.',
+    routePath: '/reviews',
+    routeGroup: 'client'
+  },
+  {
+    viewCode: 'cliente.roi_reports',
+    section: 'cliente',
+    label: 'ROI Reports',
+    description: 'Reportes de impacto y ROI del servicio (módulo addon Globe Enterprise).',
+    routePath: '/roi-reports',
+    routeGroup: 'client'
+  },
+  {
+    viewCode: 'cliente.exports',
+    section: 'cliente',
+    label: 'Exports',
+    description: 'Generación de exports operativos (PDF, Excel, CSV) — incluido en ROI Reports addon.',
+    routePath: '/exports',
+    routeGroup: 'client'
+  },
+  {
+    viewCode: 'cliente.cvr_quarterly',
+    section: 'cliente',
+    label: 'CVR trimestral',
+    description: 'Creative Velocity Review trimestral. Addon Globe.',
+    routePath: '/cvr-quarterly',
+    routeGroup: 'client'
+  },
+  {
+    viewCode: 'cliente.staff_aug',
+    section: 'cliente',
+    label: 'Staff Augmentation',
+    description: 'Visibilidad Staff Augmentation — equipo asignado y capacidad.',
+    routePath: '/staff-augmentation',
+    routeGroup: 'client'
+  },
+  {
+    viewCode: 'cliente.brand_intelligence',
+    section: 'cliente',
+    label: 'Brand Intelligence',
+    description: 'Brand Intelligence: RpA + First-Time Right. Addon Globe.',
+    routePath: '/brand-intelligence',
+    routeGroup: 'client'
+  },
+  {
+    viewCode: 'cliente.csc_pipeline',
+    section: 'cliente',
+    label: 'CSC Pipeline',
+    description: 'Creative Supply Chain Pipeline. Addon Globe.',
+    routePath: '/csc-pipeline',
+    routeGroup: 'client'
+  },
+  {
+    viewCode: 'cliente.crm_command',
+    section: 'cliente',
+    label: 'CRM Command',
+    description: 'CRM Command (legacy, transición a Kortex). Módulo crm_solutions.',
+    routePath: '/crm-command',
+    routeGroup: 'client'
+  },
+  {
+    viewCode: 'cliente.web_delivery',
+    section: 'cliente',
+    label: 'Web Delivery',
+    description: 'Web Delivery operativo. Módulo Wave.',
+    routePath: '/web-delivery',
+    routeGroup: 'client'
   }
 ]
 
