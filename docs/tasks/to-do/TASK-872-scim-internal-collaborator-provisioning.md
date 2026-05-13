@@ -664,6 +664,123 @@ La task toca varios planos:
 
 Si Discovery propone una UI de intake nueva, debe declarar explicitamente views/capabilities antes de implementarla.
 
+## Rollout Plan & Risk Matrix
+
+Esta task toca **3 sistemas críticos de producción** (SCIM provisioning, payroll engine, identity reconciliation). El rollout debe respetar invariants estrictos. Sin disciplina de ordering + flag + verification, alta probabilidad de incidente operativo (members entrando a payroll con $0 base, SCIM degradado a 500 en Entra, etc.).
+
+### Slice ordering hard rule
+
+El orden NO es opcional — un agente que ejecute slices fuera de este orden viola el contract:
+
+```text
+Slice 1   (eligibility policy + scim_eligibility_overrides migration)
+   ↓
+Slice 1.5 (members.workforce_intake_status migration)   ← PRECONDICIÓN HARD
+   ↓
+Slice 4   (payroll engine reader gate explícito)         ← MUST SHIP BEFORE Slice 5
+   ↓
+Slice 2   (primitive provisionInternalCollaboratorFromScim)
+   ↓
+Slice 3   (wire SCIM CREATE/PATCH endpoints, con flag default false)
+   ↓                                                      ↘
+Slice 6   (reliability signals readers)                    Slice 5 (backfill + apply Felipe/Maria)
+                                                          ↑
+                                                          ONLY after Slice 4 verified in staging
+```
+
+**Por qué este orden**:
+
+- Slice 1.5 (migration) DEBE preceder a Slice 4 — Slice 4 lee la columna que Slice 1.5 crea.
+- Slice 4 (payroll gate) DEBE preceder a Slice 5 (apply) — sin gate, Felipe entra a payroll con defaults peligrosos.
+- Slice 2 (primitive) consume helpers refactored — debe correr DESPUÉS de Slice 1.5 (necesita columna) y Slice 1 (necesita eligibility function).
+- Slice 3 wraps Slice 2 detrás de flag `SCIM_INTERNAL_COLLABORATOR_PRIMITIVE_ENABLED=false` por default. Sin esto, el merge a producción cambia el comportamiento de SCIM sin oportunidad de revert rápido.
+
+**Test enforcement**: agregar `task-872-slice-order-invariant.test.ts` que parsea el commit log del branch y verifica que los commits respetan ordering. Bloquea merge si fuera de orden.
+
+### Risk matrix
+
+| # | Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
+|---|---|---|---|---|---|
+| R1 | Primitive throws mid-tx → 500 a Entra → `countEscrowed` | SCIM provisioning | medium (primer rollout) | Feature flag `SCIM_INTERNAL_COLLABORATOR_PRIMITIVE_ENABLED=false` default + smoke staging exhaustivo via `provisionOnDemand` antes de flippear prod | Entra Provisioning logs (Azure portal) muestran `countEscrowed > 0` post-deploy. Signal `identity.scim.users_without_member` cuenta. |
+| R2 | Member SCIM-provisioned entra a payroll con $0 base | payroll engine | **HIGH** si Slice 5 corre antes que Slice 4 | Slice ordering hard rule (Slice 4 → Slice 5) + test enforcement + smoke staging payroll engine ANTES del apply prod | Test anti-regresión `getPayrollEligibleMembersForPeriod` excluye `pending_intake`. Signal `workforce.scim_members_pending_profile_completion` alerta si lleva >7d sin completar. |
+| R3 | SSO break por bug en columna nueva | NextAuth Azure AD provider | low | Migration es additive con DEFAULT; auth callback NO lee `workforce_intake_status`. Verificación staging post-migration: smoke login con Felipe (ya tiene client_user). | Sentry domain=identity emite si signIn callback throws. Signal `identity.scim.users_without_identity_profile` baseline. |
+| R4 | Cascade D-2 drift detecta member legacy malformado → primitive throw constante | identity reconciliation | medium (datos legacy desconocidos hasta backfill dry-run) | Dry-run backfill antes de apply reporta `plan.drift[]` ANTES de production; humano resuelve drift via admin endpoint dedicado | Signal `identity.scim.member_identity_drift` cuenta >0 inmediato. |
+| R5 | Backfill apply con allowlist mal especificada materializa N members incorrectos | identity / HR | low (allowlist explícito hard) | `--apply` flag obligatorio + `--allowlist <emails>` obligatorio + dry-run muestra plan ANTES; NO permite apply masivo | Audit `scim_sync_log.operation='BACKFILL'` lista todos los emails afectados; humano review antes/después. |
+| R6 | Migration `workforce_intake_status` rompe consumers downstream que asumen schema viejo | TS compile / Kysely types | low (additive only) | `pnpm db:generate-types` + `pnpm tsc --noEmit` post-migration; CI gate detecta any breakage | tsc errors en CI. |
+| R7 | Outbox event consolidado `scim.internal_collaborator.provisioned v1` colisiona con consumer existente | outbox / reactive projections | low (event nuevo) | Verificar grep `rg "scim.internal_collaborator"` retorna 0 matches pre-merge; declarar en EVENT_CATALOG ANTES de emit | Signal `sync.outbox.unpublished_lag` baseline. |
+| R8 | Cross-tenant leak — Sky user crea member en operating entity Efeonce | identity / cross-tenant | low (test obligatorio G-8) | Test anti-regresión `tenant_type='client' → 0 members nuevos` verde antes de merge | Signal `users_without_member` filtra por `tenant_type='efeonce_internal'` — un Sky leak no contaría ahí, pero `person_memberships` con `organization_id=Efeonce` para profile_id de Sky lo detectaría. |
+| R9 | Admin allowlist L4 mal configurada permite member para spam account | identity / scope abuse | very low (requires admin action + reason ≥20 chars) | Tabla `scim_eligibility_overrides` con audit trail (actor_user_id + reason); endpoint admin requiere capability dedicada | Signal nuevo `identity.scim.allowlist_override_rate` (drift, warning si >5 overrides/mes). |
+
+### Feature flags / cutover
+
+3 flags durante el rollout:
+
+| Flag | Tipo | Default prod | Propósito | Revert |
+|---|---|---|---|---|
+| `SCIM_INTERNAL_COLLABORATOR_PRIMITIVE_ENABLED` | env var Vercel | `false` | Controla si SCIM CREATE invoca primitive nueva. `false` → comportamiento legacy. | Env var a `false` + redeploy Vercel. Tiempo <5 min. |
+| `PAYROLL_WORKFORCE_INTAKE_GATE_ENABLED` | env var Vercel | `false` | Controla si payroll reader filtra `workforce_intake_status='completed'`. `false` → comportamiento legacy (incluye todos `active=TRUE`). Solo flippear a `true` DESPUÉS de verificar que no hay members en `pending_intake` en producción. | Env var a `false` + redeploy. |
+| `SCIM_ELIGIBILITY_FUNCTIONAL_PATTERNS_ENABLED` | env var Vercel | `false` (V1.0), `true` (V1.1) | Controla si L2 regex de funcional accounts está activa. `false` → solo L1+L3+L4 enforce. Permite rollout gradual: primero solo hard rejects, luego patrones funcionales. | Env var a `false` + redeploy. |
+
+**Cutover sequence canónico**:
+
+1. Merge code a `develop` con todos los flags en `false`.
+2. Deploy a staging. Flippear flags en orden: `PAYROLL_WORKFORCE_INTAKE_GATE_ENABLED=true` primero (gate explícito), después `SCIM_INTERNAL_COLLABORATOR_PRIMITIVE_ENABLED=true`, último `SCIM_ELIGIBILITY_FUNCTIONAL_PATTERNS_ENABLED=true`.
+3. Smoke staging exhaustivo entre cada flip.
+4. Merge `develop` → `main` con flags en `false`.
+5. Deploy a prod. Flips en mismo orden que staging, con 24h cooldown entre flag flips para observar signals.
+
+### Rollback plan per slice
+
+| Slice | Rollback | Tiempo | Reversible? | Notas |
+|---|---|---|---|---|
+| Slice 1 (eligibility + overrides table) | Revert PR + drop tabla `scim_eligibility_overrides` via migration down | <30 min | sí | Tabla nueva sin consumers downstream pre-Slice 3. |
+| Slice 1.5 (migration `workforce_intake_status`) | Migration down `ALTER TABLE members DROP COLUMN workforce_intake_status` + `pnpm db:generate-types` + redeploy | <1 hora | sí, parcial | Si Slice 4 ya hizo deploy con gate, debe revertir primero Slice 4. |
+| Slice 2 (primitive) | Revert PR (primitive no se invoca si Slice 3 no la wireó) | <30 min | sí | Primitive aislada hasta que Slice 3 la conecte. |
+| Slice 3 (wire SCIM) | Env var `SCIM_INTERNAL_COLLABORATOR_PRIMITIVE_ENABLED=false` + redeploy. Comportamiento legacy `createUser()` restaurado instant. | <5 min | sí | Path canónico de revert — siempre disponible mientras flag exista. |
+| Slice 4 (payroll gate) | Env var `PAYROLL_WORKFORCE_INTAKE_GATE_ENABLED=false` + redeploy | <5 min | sí | Sin riesgo de pérdida de datos. |
+| Slice 5 (backfill apply Felipe/Maria) | NO rollback automático. Cada apply es append-only. Si emerge bug post-apply, admin endpoint para `UPDATE members SET active=FALSE WHERE member_id IN (...)` + audit row. NUNCA `DELETE FROM members` (FK cascade + audit trail loss). | <2 horas (manual) | parcial | Append-only by design. Decisión humana. |
+| Slice 6 (signals) | Revert PR. Signals desaparecen del dashboard, no impacto operativo. | <30 min | sí | Aditivo puro. |
+| Slice 7 (docs + runbook) | N/A — doc-only. | N/A | N/A | |
+
+### Production verification sequence
+
+Orden canónico de staging → prod. **Stop & escalate** si cualquier verify falla.
+
+**Staging**:
+
+1. `pnpm migrate:up` → verify `\d greenhouse_core.members` muestra columna `workforce_intake_status` + columna `scim_eligibility_overrides` table existe.
+2. `pnpm db:generate-types` + `pnpm tsc --noEmit` verde.
+3. `pnpm test src/lib/scim` + `pnpm test src/lib/payroll` verdes (incluye tests anti-regresión G-1..G-8).
+4. Deploy staging con TODOS los flags en `false`. Verify SCIM existente: `provisionOnDemand` test user → 201 + comportamiento legacy (`client_user` solo).
+5. Flag `PAYROLL_WORKFORCE_INTAKE_GATE_ENABLED=true` en staging. Verify payroll engine reader filtra correctamente con member de prueba `pending_intake`.
+6. Flag `SCIM_INTERNAL_COLLABORATOR_PRIMITIVE_ENABLED=true` en staging. `provisionOnDemand` test user humano → verify primitive ejecuta + 6 writes + outbox event + member visible en People/HR con badge "Ficha pendiente".
+7. `provisionOnDemand` test funcional account `marketing@efeoncepro.com` → verify L2 reject (no member creado, client_user sí, signal `ineligible_accounts_in_scope` cuenta).
+8. Backfill dry-run staging para Felipe/Maria Camila → verify plan esperado (eligible: 2, drift: 0).
+9. Backfill apply staging allowlist Felipe + Maria → verify post-apply queries verdes.
+10. Smoke payroll engine: corrida simulada del próximo período → verify Felipe + Maria NO incluidos.
+
+**Producción** (24h post-staging verde):
+
+11. Coordinar con HR/Finance: comunicar cutover window (1-2 hrs) + sign-off para flippear flags.
+12. Repetir steps 1-3 en prod.
+13. Deploy prod con flags `false`.
+14. Cooldown 24h observando signals (no debe haber regresión en SCIM).
+15. Flip `PAYROLL_WORKFORCE_INTAKE_GATE_ENABLED=true` en prod. Cooldown 24h.
+16. Flip `SCIM_INTERNAL_COLLABORATOR_PRIMITIVE_ENABLED=true` en prod. Cooldown 24h.
+17. Backfill dry-run prod → verify plan esperado.
+18. Backfill apply prod allowlist Felipe + Maria (humano operador ejecuta, no agente).
+19. Verify Felipe + Maria aparecen en People/HR con badge "Ficha pendiente"; verify NO incluidos en próxima corrida payroll (manualmente revisado).
+20. Monitor signals durante 7d post-prod. Si cualquier signal >0 con persistencia → escalation.
+
+### Out-of-band coordination required
+
+Sistemas externos / humanos que requieren coordinación antes del rollout:
+
+- **HR/Finance signoff**: D-1 (workforce_intake_status semantics) impacta el flujo operativo de cómo HR completa fichas laborales. Acuerdo explícito requerido sobre quién opera "transición pending_intake → completed" + qué validation aplica (compensation, contract_terms, person_legal_profile).
+- **Azure AD / Entra**: ninguna modificación al Enterprise App "GH SCIM" requerida en V1.0. Si Discovery determina que el scope Entra "Efeonce Group" incluye cuentas funcionales no deseadas, coordinar con IT para reducir scope ANTES del rollout (preferible) o usar L2 regex (fallback).
+- **Felipe Zurita + Maria Camila Hoyos**: comunicación humana antes del backfill apply: "Vas a empezar a aparecer en People/HR como colaborador con badge 'Ficha pendiente'. Coordinar con HR para completar tus datos laborales." Ambas personas existen como humanos reales; no es solo un test fixture.
+- **Operador HR (CPA/contador)**: review del impact en payroll engine con CPA ANTES de Slice 4 deploy. Confirmar que `WHERE workforce_intake_status='completed'` filter no rompe la corrida actual (debe ser no-op para los 24+ members legacy con default `'completed'`).
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 4 — VERIFICATION & CLOSING
      "Como compruebo que termine y que actualizo?"

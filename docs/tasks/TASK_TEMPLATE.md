@@ -146,6 +146,100 @@ component specs, data flows, pseudocodigo, wireframes de referencia.
 
 Puede omitirse si el Scope ya es suficiente o si la task es umbrella/policy.]
 
+## Rollout Plan & Risk Matrix
+
+[Seccion canonica obligatoria desde 2026-05-13. Declara ordering invariants
+entre slices, riesgos por sistema afectado, feature flags / cutover, y plan
+de rollback por slice.
+
+Para tasks triviales (refactor local, microcopy fix, doc-only) usar la
+plantilla minima: "N/A — additive change, no production runtime impact,
+no rollback needed". Para tasks que tocan SCIM/SSO/payroll/finance/release/
+identity/cron/outbox/migrations, esta seccion es load-bearing y NUNCA
+debe vaciarse con N/A sin justificacion explicita.
+
+Para tasks `umbrella` o `policy` esta seccion puede limitarse a
+"impact-only" (que tasks downstream son afectadas por la decision).]
+
+### Slice ordering hard rule
+
+[Declara explicito el grafo de dependencias entre slices. Cualquier agente
+que ejecute slices fuera de este orden esta violando el contract de la task.
+
+Ejemplo:
+- Slice 1 (foundation) -> Slice 2 (write path) -> Slice 3 (read path)
+- Slice 4 (gate) MUST ship BEFORE Slice 5 (data apply) — sin gate, el
+  data apply rompe payroll.
+- Slice 6 (signals) puede correr en paralelo con Slice 5 una vez que
+  Slice 4 cerro.]
+
+### Risk matrix
+
+[Tabla de riesgos × sistema impactado × probabilidad × mitigation × signal.
+Una fila por riesgo material. Si no hay riesgo material, declarar "N/A
+operationally safe — additive UI/data/contract" con razon.]
+
+| Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
+|---|---|---|---|---|
+| [descripcion concreta] | [SCIM / SSO / payroll / finance / release / identity / cron / outbox / UI / migration / N/A] | [low / medium / high] | [feature flag / dry-run / staging gate / fallback path / circuit breaker] | [reliability signal name o "no signal — emerge en logs"] |
+
+### Feature flags / cutover
+
+[Declara que flags existen (env vars, DB rows, code constants) que permiten
+graduated rollout y revert instant.
+
+Si la task no introduce flags porque el cambio es seguro/aditivo, declarar
+"sin flag — additive, immediate cutover" con razon.
+
+Ejemplo:
+- Env var `SCIM_INTERNAL_COLLABORATOR_PRIMITIVE_ENABLED` (default `false`)
+  controla si el SCIM CREATE invoca primitive nueva. Default `false` en
+  produccion durante staging validation. Flip a `true` post-smoke verde.
+  Revert: env var a `false` + redeploy. Tiempo de revert: <5 min via Vercel.]
+
+### Rollback plan per slice
+
+[Por cada slice, describe explicito como deshacer si emerge bug en
+produccion DESPUES del merge. Incluye comando exacto cuando posible.
+
+Slices que solo agregan cosas (additive — nueva columna con DEFAULT, nueva
+ruta API gateada por capability, nuevo cron disabled) pueden declarar
+"rollback: disable via flag / revert PR" sin detalle.
+
+Slices que MUTAN state (migrations destructivas, backfills, transiciones de
+state machine) DEBEN tener un comando de rollback verificado en staging
+ANTES del apply en prod.]
+
+| Slice | Rollback | Tiempo | Reversible? |
+|---|---|---|---|
+| Slice 1 | [comando / proceso] | [estimacion] | [si / no / parcial] |
+| Slice 2 | [...] | [...] | [...] |
+
+### Production verification sequence
+
+[Orden canonico de staging -> prod cuando la task ship. Cada step incluye
+verificacion antes de avanzar al siguiente. Stop & escalate si cualquier
+verify falla.
+
+Ejemplo:
+1. `pnpm migrate:up` en staging + verify columna existe con default esperado.
+2. Deploy code a staging con flag=false + verify SCIM existente no cambio.
+3. Flip flag=true en staging + Entra `provisionOnDemand` test user +
+   verify primitive ejecuto + member visible + payroll excluye.
+4. Backfill dry-run staging + verify plan esperado.
+5. Backfill apply staging allowlist + verify post-apply.
+6. Repetir 2-5 en produccion con cooldown 24h entre ambientes.
+7. Monitor signals durante 7d post-prod.]
+
+### Out-of-band coordination required
+
+[Sistemas externos que requieren coordinacion humana fuera del repo antes
+del shipping. Ejemplo: cambios en Azure AD App Registration, rotacion de
+secrets GCP, cambio en HubSpot custom properties, comunicacion a operadores
+HR/Finance antes de cambiar comportamiento visible.
+
+Si nada externo requiere coordinacion, declarar "N/A — repo-only change".]
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 4 — VERIFICATION & CLOSING
      "Como compruebo que termine y que actualizo?"

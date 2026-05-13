@@ -62,10 +62,21 @@ Write the complete `.md` file following the structure of `docs/tasks/TASK_TEMPLA
 
 - Zone 0: Status + Summary + Why + Goal
 - Zone 1: Architecture Alignment + Normative Docs + Dependencies + Current Repo State
-- Zone 3: Scope (slices) + Out of Scope + Detailed Spec
+- Zone 3: Scope (slices) + Out of Scope + Detailed Spec + **Rollout Plan & Risk Matrix** (canonical, mandatory desde 2026-05-13)
 - Zone 4: Acceptance Criteria + Verification + Closing Protocol + Follow-ups
 
 **Zone 2 is NOT filled in.** It is the responsibility of the agent that takes the task, not the one that creates it.
+
+**`Rollout Plan & Risk Matrix` es seccion canonica obligatoria** desde 2026-05-13. Vive entre `Detailed Spec` y `Acceptance Criteria`. Subsecciones canonicas: `Slice ordering hard rule`, `Risk matrix` (tabla riesgo × sistema × prob × mitigation × signal), `Feature flags / cutover`, `Rollback plan per slice` (tabla con tiempo + reversible?), `Production verification sequence`, `Out-of-band coordination required`.
+
+Reglas de llenado por tipo de task:
+
+- **Tasks que tocan SCIM/SSO/payroll/finance/release/identity/cron/outbox/migrations destructivas**: la seccion DEBE estar completa, con risk matrix poblada + rollback plan verificado en staging + flag/cutover declarado. NO permitir vaciar con "N/A".
+- **Tasks `implementation` aditivas** (nueva ruta API gateada por capability, columna nueva con DEFAULT, nuevo cron disabled): rellenar subsecciones brevemente; rollback plan puede ser `revert PR + redeploy`.
+- **Tasks `umbrella` o `policy`**: limitar a "impact-only" — listar que tasks downstream afecta la decision. Risk matrix puede ser N/A si la task no introduce runtime change.
+- **Tasks triviales** (refactor local, microcopy fix, doc-only): usar plantilla minima `N/A — additive change, no production runtime impact, no rollback needed` + razon. Nunca solo `N/A` sin razon.
+
+Cuando crees la task, evalua honestamente si toca sistemas criticos. Si toca, **NO permitir merge del task spec hasta que el risk matrix este poblado con detalle**. El operator humano (o agent reviewer) debe ver explicitos los puntos de falla antes de aprobar la task para tomar.
 
 **`Checkpoint` and `Mode` are NOT written in Status.** The agent that takes the task derives them automatically from Priority x Effort per `docs/tasks/TASK_PROCESS.md`.
 
@@ -104,3 +115,4 @@ After user confirmation:
 - **Out of Scope is mandatory.** If it is not clear what does NOT go in, the agent will suffer scope creep. Be explicit.
 - **Do not duplicate existing specs.** If a CODEX_TASK or architecture doc already covers part of the scope, reference that document in `Detailed Spec` or `Normative Docs` instead of copying its content.
 - **Use project terminology.** Use canonical names: `space_id`, ICO Engine, etc. Do not paraphrase or rename.
+- **Rollout Plan & Risk Matrix is canonical.** Toda task de tipo `implementation` que toque runtime de produccion DEBE incluir esta seccion poblada con detalle. Si la task es trivial (doc-only, microcopy, refactor local), declarar explicito por que el rollout es trivial. NUNCA dejar la seccion vacia o con solo "N/A" sin justificacion. Patron canonico desde 2026-05-13 (TASK-872 review arch-architect detecto que sin esta seccion, agentes pueden ejecutar slices fuera de orden y romper SCIM/SSO/payroll).
