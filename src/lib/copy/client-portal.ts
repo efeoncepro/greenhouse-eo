@@ -471,6 +471,21 @@ export const GH_CLIENT_PORTAL_COMPOSITION = {
     ariaLabel: 'Cargando tu portal'
   },
 
+  navigation: {
+    /** ARIA label del `<nav>` container del menú dinámico cliente (Slice 3). */
+    ariaLabel: 'Navegación del portal cliente',
+    /** Tier badge label para items de tipo addon. */
+    addonBadge: 'Addon',
+    /** Empty state inline cuando items.length === 0 (modules.length === 0). */
+    emptyMessage: 'Sin módulos asignados todavía'
+  },
+
+  navigationGroups: {
+    primary: 'Operación',
+    capabilities: 'Módulos',
+    account: 'Mi cuenta'
+  },
+
   emptyState: {
     zeroState: {
       icon: 'tabler-seedling',
