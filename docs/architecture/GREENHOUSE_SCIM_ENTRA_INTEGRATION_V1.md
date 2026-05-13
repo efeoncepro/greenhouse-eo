@@ -142,7 +142,7 @@ Groups map Entra security/M365 groups to Greenhouse. Each group can optionally b
 
 Real-time change notification endpoint. When a user profile changes in Entra, Microsoft Graph pushes a notification within seconds.
 
-- **Validation:** Microsoft sends a GET with `?validationToken=xxx` during subscription creation; the endpoint echoes it as plain text
+- **Validation:** Microsoft Graph validates `notificationUrl` by sending a `POST` with `?validationToken=xxx` during subscription creation; the endpoint echoes the URL-decoded token as `text/plain` with `200 OK` before parsing any notification payload. `GET` with `validationToken` is also accepted for manual/operator probes.
 - **Notifications:** POST with `clientState` validation against the SCIM bearer token (first 16 chars)
 - **Processing:** On notification, fetches all Entra profiles via Graph API, runs the same diff-sync as the daily cron, and re-evaluates hierarchy drift against Graph `manager`
 - **Trade-off:** Fetches all users on each notification (simple, consistent) vs. fetching only the changed user (more efficient but fragile)
