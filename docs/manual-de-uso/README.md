@@ -27,6 +27,10 @@ La diferencia con otras capas de documentacion:
 - [SCIM con Microsoft Entra](identity/scim-entra-provisioning.md) — como verificar provisioning, usar `provisionOnDemand`, interpretar `countEscrowed` y evitar fixes manuales inseguros sobre usuarios o mappings.
 - [Organization Workspace Projection — operación](identity/organization-workspace-projection.md) — como supervisar las 2 nuevas reliability signals (`facet_view_drift`, `unresolved_relations`), interpretar las 5 relaciones canónicas subject↔organización, las 11 capabilities `organization.*` y la disciplina TS↔DB para agregar capabilities nuevas.
 
+### Portal Cliente
+
+- [Menu dinamico y empty states — operacion](client-portal/menu-dinamico-y-empty-states.md) — como activar/pausar/dar de baja modulos para clientes, verificar que esta viendo cada cliente, diagnosticar empty states reportados, atender warnings Sentry `role_view_fallback_used` (regla canonica view registry governance), validar visualmente con mockup `/cliente-portal-mockup`, troubleshooting de los 5 estados canonicos del 5-state contract.
+
 ### Admin Center
 
 _Pendiente._
