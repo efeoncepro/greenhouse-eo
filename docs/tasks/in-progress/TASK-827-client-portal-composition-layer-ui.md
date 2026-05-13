@@ -2,17 +2,17 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Muy Alto` (era `Alto` pre-adjust 2026-05-13 — sube por Slice 0 parity view_codes + boundary explícito legacy↔resolver + 5-state matrix completo)
 - Type: `implementation`
 - Epic: `EPIC-015`
-- Status real: `Diseno (TASK-824/825 cerradas 2026-05-12; lista para arrancar con ajustes spec 2026-05-13)`
+- Status real: `In progress 2026-05-13 directo en develop (sin branch separada por instrucción operativa). 7 Open Questions cerradas D1-D7 en commit 36357f2a`
 - Rank: `TBD`
 - Domain: `client_portal / ui`
-- Blocked by: `none` (TASK-825 cerrada 2026-05-12)
-- Branch: `task/TASK-827-client-portal-composition`
+- Blocked by: `none` (TASK-825 cerrada 2026-05-12; D1-D7 resueltas 2026-05-13)
+- Branch: `develop` (sin branch separada, mismo pattern TASK-822/823/824/825/826)
 
 ## Delta 2026-05-13 — Ajustes spec post audit 4-lens (arch-architect + info-architecture + state-design + greenhouse-ux)
 
