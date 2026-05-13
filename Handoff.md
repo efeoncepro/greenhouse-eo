@@ -1,3 +1,14 @@
+# Sesion 2026-05-13 — Diagnostico SCIM Felipe Zurita / Maria Camila Hoyos
+
+- **Trigger**: usuario reporto que Felipe Zurita y Maria Camila Hoyos se crearon en Microsoft Entra pero "no aparecian" en Greenhouse aunque SCIM esta activo.
+- **Hallazgo principal**: SCIM si creo ambos `greenhouse_core.client_users` correctamente:
+  - Felipe Zurita `fzurita@efeoncepro.com`, Entra OID `ec1b7fd0-87c9-43cd-a46f-1e8c37297258`, SCIM `CREATE 201`, `provisioned_at=2026-05-13T15:24:14Z`, role `collaborator`.
+  - Maria Camila Hoyos `mchoyos@efeoncepro.com`, Entra OID `96bf99f6-f940-4946-ac6b-1231985da8e0`, SCIM `CREATE 201`, `provisioned_at=2026-05-13T15:42:52Z`, role `collaborator`.
+- **Estado Entra/SCIM**: job `GH SCIM` activo y sano (`scheduleState=Active`, `lastState=Succeeded`, `countEscrowed=0`). Ambos usuarios estan en el grupo `Efeonce Group`, que es el unico principal asignado al Enterprise App SCIM.
+- **Drift observado**: al revisar, ambos `client_users` estaban sin `identity_profile_id` y sin `members`. Se ejecuto enrichment targeteado via `syncEntraProfiles()` para esos dos usuarios; resultado `profilesCreated=2`, `profilesLinked=2`, `errors=[]`.
+- **Estado post-operacion**: ambos quedaron con `identity_profile_id` + `identity_profiles` con `canonical_email` y `job_title`. Siguen sin `greenhouse_core.members`, lo cual es coherente con el contrato actual: SCIM crea cuenta/acceso, no ficha laboral/People member.
+- **Riesgo/follow-up**: el intento de sync de avatar emitio warning no bloqueante `AADSTS7000215 invalid_client` para `AZURE_AD_CLIENT_SECRET` efectivo en el entorno local usado por Codex. No afecto el link de identidad, pero conviene revisar el carril Graph/profile sync si el cron/webhook tambien esta usando un secret stale en runtime.
+
 # Sesion 2026-05-13 — TASK-871 + bundled accumulated develop SHIPPED A PRODUCCIÓN
 
 ## 🎉 Production release SUCCESS
