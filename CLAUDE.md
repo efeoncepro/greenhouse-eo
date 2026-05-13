@@ -1404,38 +1404,57 @@ Toda lectura de `expense_payments` o `income_payments` que necesite saldos en CL
 
 **Spec canónica**: `docs/tasks/complete/TASK-774-account-balance-clp-native-reader-contract.md`. Patrón aplicado al path account_balances después de TASK-766 que cubrió cash-out.
 
-### Finance — Cron rematerialize-balances seed contract (ISSUE-069, 2026-05-08)
+### Finance — Rolling rematerialize anchor contract (TASK-871, supersedes ISSUE-069, 2026-05-13)
 
-Todo cron que invoque `rematerializeAccountBalanceRange` (o cualquier primitiva canónica con seed-row contract) **debe** calcular `seedDate = today − (lookbackDays + 1)`, NO `today − lookbackDays`.
+Todo callsite que invoque `rematerializeAccountBalanceRange` desde un cron rolling o el remediation control plane **debe** pasar por las dos primitives canónicas:
 
-**Por qué**: el contrato canónico de `rematerializeAccountBalanceRange` ([src/lib/finance/account-balances-rematerialize.ts:258](src/lib/finance/account-balances-rematerialize.ts#L258)) **NO materializa el día seed** — itera desde `seedDate + 1`. El día seed se inserta como ancla muda (`period_inflows=0, period_outflows=0`) para preservar reconciliation snapshots TASK-721 y respetar el OTB anchor TASK-703.
+1. `computeRollingRematerializationWindow(today, lookbackDays)` → `{ targetStartDate, seedDate, materializeStartDate, materializeEndDate, lookbackDays, policy: 'rolling_window_repair' }` ([services/ops-worker/finance-rematerialize-seed.ts](services/ops-worker/finance-rematerialize-seed.ts)).
+2. `resolveCleanSeedDate({ client, accountId, candidateSeedDate, maxExpandDays=30 })` → `{ ok: true, cleanSeed, ... }` o `{ ok: false, reason: 'exceeded_max_expand', ... }` ([src/lib/finance/account-balances-clean-seed-resolver.ts](src/lib/finance/account-balances-clean-seed-resolver.ts)).
 
-**Bug class** (ISSUE-069): si el caller usa `seedDate = today − lookbackDays`, el día `today − lookbackDays` queda como ancla muda. Cualquier `settlement_leg` / `expense_payment` / `income_payment` con `transaction_date` exactamente en ese día (típicamente registros retroactivos creados horas/días después) NO se contabiliza. Como la ventana del cron rota cada día, el "día ciego" se mueve diariamente — bug determinístico que afecta TODAS las cuentas.
+**Por qué**: el contrato canónico de `rematerializeAccountBalanceRange` ([src/lib/finance/account-balances-rematerialize.ts:258](src/lib/finance/account-balances-rematerialize.ts#L258)) **NO materializa el día seed** — itera desde `seedDate + 1`. El día seed se inserta como ancla muda para preservar reconciliation snapshots TASK-721 y respetar el OTB anchor TASK-703.
 
-**Fix canónico** (1 línea): restar 1 día adicional para que los últimos `lookbackDays` días COMPLETOS se materialicen, incluyendo lo que antes era el "día ciego".
+**Bug class** (ISSUE-069 partial → TASK-871 complete): el fix de ISSUE-069 cambió `today − lookbackDays` → `today − (lookbackDays + 1)`, moviendo el día ciego un día atrás pero NO eliminando la clase estructural. Si en el `seedDate` resultante existen movements canonicos (`settlement_legs`, `income_payments_normalized`, `expense_payments_normalized`), esos movements quedan invisibles. La clase recurrió el 2026-05-13 con 3 cuentas afectadas en `2026-05-05`.
 
-```ts
-// services/ops-worker/finance-rematerialize-seed.ts
-export const computeRematerializeSeedDate = (today: Date, lookbackDays: number): string => {
-  const seedMs = today.getTime() - (lookbackDays + 1) * 86_400_000
+**Fix canónico** (TASK-871, defense-in-depth):
 
-  return new Date(seedMs).toISOString().slice(0, 10)
-}
-```
+- El cron handler (services/ops-worker/server.ts) compone window + integrity check per-account:
+  - Si protected snapshot en window → anchor on it (skip integrity check; operator-accepted closing IS truth).
+  - Si no → `resolveCleanSeedDate(window.seedDate)`. Walks backward hasta clean anchor o devuelve `exceeded_max_expand` para escalar.
+- El remediator (`src/lib/finance/account-balances-fx-drift-remediation.ts`) tiene 5to policy value `rolling_window_repair`:
+  - classifier: matches seed-blind-spot signature + open period + no protected snapshot en día exacto → `auto_remediable, reason='rolling_window_repair_eligible'`.
+  - executor: `seedMode='explicit'` (preserves OTB cache) + `evidenceGuard='block_on_reconciled_drift'` (canonical, no restate over reconciled).
+- `computeRematerializeSeedDate` permanece como wrapper back-compat que devuelve `window.seedDate` — tests ISSUE-069 siguen verdes.
 
 **⚠️ Reglas duras**:
 
-- **NUNCA** llamar `rematerializeAccountBalanceRange` con `seedDate = today − lookbackDays` cuando el objetivo es materializar los últimos `lookbackDays` días completos. Usar siempre `today − (lookbackDays + 1)` o el helper canónico `computeRematerializeSeedDate`.
-- **NUNCA** modificar el contrato de `rematerializeAccountBalanceRange` (seed no se materializa) — es intencional para preservar reconciliation snapshots y OTB. El contrato es load-bearing.
-- **NUNCA** calcular el seed inline en un nuevo handler de cron sin pasar por el helper canónico. Si emerge un nuevo cron similar (e.g. `rematerialize-monthly-balances`), agregar un helper análogo en el mismo archivo y testearlo con el mismo shape de tests.
-- **NUNCA** correr backfill manual con `--from-date` que coincida con el día que necesitas reparar. Usar `seedMode='active_otb'` (default del backfill script) que toma el OTB genesis como seed real, no `--from-date`. El `--from-date` es etiqueta documental.
-- **SIEMPRE** que un nuevo cron emerja consumiendo la primitiva canónica con seed-row contract, agregar test de regresión (`*.test.ts`) que pin-ee `seed = today − (lookbackDays + 1)` con casos edge (lookback=1, 30, cross-month, cross-year).
+- **NUNCA** pasar a `rematerializeAccountBalanceRange` un `seedDate` que tenga `settlement_legs` / `income_payments_normalized` / `expense_payments_normalized` con `transaction_date = seedDate`. La primitive seed = ancla muda; movements ahí desaparecen del materialized. El integrity check `resolveCleanSeedDate` es la única forma canónica de garantizarlo.
+- **NUNCA** modificar el contrato de `rematerializeAccountBalanceRange` (seed no se materializa). Es load-bearing para reconciliation snapshots TASK-721 + OTB anchor TASK-703.
+- **NUNCA** modificar `computeRollingRematerializationWindow` para devolver `seedDate = targetStartDate`. El contracto `seedDate = materializeStartDate − 1` es invariante canónico.
+- **NUNCA** usar `seedMode='active_otb'` en un cron rolling. Mutaría `accounts.opening_balance` cache para drift transitorio. Reservado para audited backfills / full replays.
+- **NUNCA** usar `evidenceGuard: 'warn_only'` en rolling repair. `warn_only` se reserva para `known_bug_class_restatement` con intent operador explícito.
+- **NUNCA** silenciar el escalation cuando `resolveCleanSeedDate` devuelve `ok=false`. El caller DEBE emitir `captureWithDomain('finance', ...)` + skip + permitir escalación humana a `historical_restatement`.
+- **NUNCA** crear nuevo callsite que invoque rematerialize sin pasar por las dos primitives. Si emerge un cron nuevo (e.g. `rematerialize-monthly-balances`), extender o componer las primitives; nunca duplicar date math inline.
+- **NUNCA** modificar el SQL de `resolveCleanSeedDate` para reducir scope sin extender el reliability signal `finance.account_balances.fx_drift` en paralelo. Drift detection y prevention deben moverse juntos.
+- **SIEMPRE** que emerja un nuevo movement primitive (e.g. `treasury_movement`, `intercompany_transfer`, `factoring_leg`), debe ser detectado por `resolveCleanSeedDate` — extender el SQL del helper, NO duplicar lógica inline.
+- **SIEMPRE** que se modifique el state machine del rolling repair (window primitive, resolver, classifier, executor), correr el test suite anti-regresión `services/ops-worker/finance-rematerialize-invariants.test.ts` (4 invariantes pin-eados: shape, cleanSeed semantics, escalation, composition).
 
-**Helper canónico**: [services/ops-worker/finance-rematerialize-seed.ts](services/ops-worker/finance-rematerialize-seed.ts).
-**Tests anti-regresión**: [services/ops-worker/finance-rematerialize-seed.test.ts](services/ops-worker/finance-rematerialize-seed.test.ts) (7 tests).
-**Diagnostic operator tool**: [scripts/finance/diagnose-fx-drift.ts](scripts/finance/diagnose-fx-drift.ts) — lista detalle por (account, fecha) con drift activo, mismo SQL que el reader del signal `finance.account_balances.fx_drift` pero retorna detalle en lugar de COUNT. Útil ANTES de invocar el backfill para saber qué cuentas necesitan recovery.
+**Helpers canónicos**:
 
-**Spec canónica**: `docs/issues/open/ISSUE-069-finance-cron-rematerialize-seed-day-blind-spot.md` (en proceso de resolución).
+- Window: [services/ops-worker/finance-rematerialize-seed.ts](services/ops-worker/finance-rematerialize-seed.ts)
+- Integrity check: [src/lib/finance/account-balances-clean-seed-resolver.ts](src/lib/finance/account-balances-clean-seed-resolver.ts)
+- Remediation policy: [src/lib/finance/account-balances-fx-drift-remediation.ts](src/lib/finance/account-balances-fx-drift-remediation.ts) (`rolling_window_repair` value)
+- Cron handler wire-up: [services/ops-worker/server.ts](services/ops-worker/server.ts) `handleFinanceRematerializeBalances`
+
+**Tests anti-regresión**:
+
+- [services/ops-worker/finance-rematerialize-seed.test.ts](services/ops-worker/finance-rematerialize-seed.test.ts) (20 tests: shape, invariants, edge cases, back-compat)
+- [src/lib/finance/account-balances-clean-seed-resolver.test.ts](src/lib/finance/account-balances-clean-seed-resolver.test.ts) (11 tests: clean/dirty days, max expand, incident shape)
+- [src/lib/finance/account-balances-fx-drift-remediation.test.ts](src/lib/finance/account-balances-fx-drift-remediation.test.ts) (6 new tests: classify, executor, telemetry, skip)
+- [services/ops-worker/finance-rematerialize-invariants.test.ts](services/ops-worker/finance-rematerialize-invariants.test.ts) (7 tests: 4 structural invariants + 30-iter property check)
+
+**Diagnostic operator tool**: [scripts/finance/diagnose-fx-drift.ts](scripts/finance/diagnose-fx-drift.ts) — lista detalle por (account, fecha) con drift activo. Útil para verificar qué cuentas necesitan recovery antes de invocar el remediator con policy=`rolling_window_repair`.
+
+**Spec canónica**: `docs/tasks/complete/TASK-871-account-balance-rolling-anchor-contract.md`. Predecesor (parcial): `docs/issues/resolved/ISSUE-069-finance-cron-rematerialize-seed-day-blind-spot.md` (actualizado 2026-05-13 con nota "fix parcial; TASK-871 cierra contrato completo").
 
 ### Finance — Account drawer temporal modes contract (TASK-776)
 

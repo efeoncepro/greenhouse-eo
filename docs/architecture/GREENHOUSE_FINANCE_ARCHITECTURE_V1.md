@@ -2,7 +2,82 @@
 
 > **Version:** 1.0
 > **Created:** 2026-03-30
-> **Last updated:** 2026-05-07 (TASK-815 Direct Service Expense Allocation Primitive)
+> **Last updated:** 2026-05-13 (TASK-871 Rolling Rematerialization Anchor Contract)
+
+## Delta 2026-05-13 — TASK-871 Rolling Rematerialization Anchor Contract
+
+Closes the seed-blind-spot bug class ISSUE-069 left partially open. The daily Cloud Scheduler cron `ops-finance-rematerialize-balances` + the FX drift remediation control plane now consume a canonical 6-field rolling window primitive + a clean-seed integrity check that walks backward until it finds a movement-free anchor (or escalates honestly to `historical_restatement`).
+
+### Why this exists
+
+The rematerializer `rematerializeAccountBalanceRange` never materializes the seed day by design (loops from `seedDate + 1`) — the seed is a mute anchor that preserves reconciliation snapshots (TASK-721) + OTB anchor (TASK-703). ISSUE-069's fix shifted the seed one day backward but the structural invariant ("the first observed day must be materialized, never used as a silent anchor") was not enforced. Result: any settlement leg / income payment / expense payment registered retroactively on the day that became seed disappeared from the materialized balances.
+
+The 2026-05-13 incident made it visible: `2026-05-05` had real settlement legs for `santander-corp-clp`, `santander-clp`, `global66-clp`, but the cron from 2026-05-13 with `lookbackDays=7` used `2026-05-05` as seedDate → `period_inflows=0, period_outflows=0` for that day → `finance.account_balances.fx_drift` signal went `error` → Playwright smoke red → produce develop → main blocked.
+
+### Canonical primitives
+
+`computeRollingRematerializationWindow(today, lookbackDays)` returns:
+
+```ts
+{
+  targetStartDate: string       // today − lookbackDays (first observed)
+  seedDate: string              // today − (lookbackDays + 1) (mute anchor)
+  materializeStartDate: string  // === targetStartDate; first day actually materialized
+  materializeEndDate: string    // === today (inclusive)
+  lookbackDays: number
+  policy: 'rolling_window_repair'
+}
+```
+
+`resolveCleanSeedDate({ client, accountId, candidateSeedDate, maxExpandDays=30 })` returns:
+
+- `{ ok: true, cleanSeed, originalSeed, daysExpanded, movementBlockers }` when a movement-free anchor is found (with `daysExpanded=0` if the original candidate was clean).
+- `{ ok: false, reason: 'exceeded_max_expand', originalSeed, lastCheckedSeed, daysExpanded, movementBlockers }` when 30 consecutive dirty days exhaust the bound — the caller MUST escalate to `historical_restatement` instead of silently corrupting state.
+
+Both helpers are pure / read-only / idempotent. They live in:
+
+- `services/ops-worker/finance-rematerialize-seed.ts` (window primitive — consumed by both cron + remediator)
+- `src/lib/finance/account-balances-clean-seed-resolver.ts` (integrity check — finance domain primitive, dual-import safe)
+
+### `rematerializeAccountBalanceRange` seed modes (clarified)
+
+- `active_otb`: full replay anchored on the canonical Opening Trial Balance. Mutates `accounts.opening_balance` cache. For audited backfills only. **NOT** for rolling jobs.
+- `explicit`: caller supplies a movement-free seed (resolved via `resolveCleanSeedDate`). Does NOT mutate OTB cache. **Required** for rolling jobs.
+
+### `FxDriftRemediationPolicy` — 5 canonical values
+
+| Policy | Scope | Seed mode | Evidence guard |
+|---|---|---|---|
+| `detect_only` (default) | plan only, never mutate | n/a | n/a |
+| `auto_open_periods` (legacy) | wide open-period drift | `active_otb` | `block_on_reconciled_drift` |
+| `known_bug_class_restatement` | explicit restatement across protected evidence | `active_otb` | `warn_only` |
+| `strict_no_restatement` | only open-period with source evidence | `active_otb` | `block_on_reconciled_drift` |
+| `rolling_window_repair` (TASK-871) | narrow-scope seed-blind-spot repair | **`explicit`** + clean seed | `block_on_reconciled_drift` |
+
+### Cron handler wire-up (services/ops-worker/server.ts)
+
+Per account in `ops-finance-rematerialize-balances`:
+
+1. Compute `window` from `today` + `lookbackDays`.
+2. Look for protected reconciliation snapshot inside the window. If found → anchor on it (operator-accepted closing IS the truth).
+3. Otherwise run `resolveCleanSeedDate(candidateSeedDate=window.seedDate)`:
+   - clean candidate → proceed.
+   - expanded backward → use new clean seed.
+   - `exceeded_max_expand` → skip account + `captureWithDomain('finance')` + push to `escalations[]` in response.
+
+Response shape extended with `window` + `escalations[]` for observability.
+
+### Hard rules (anti-regression)
+
+- **NUNCA** pasar a `rematerializeAccountBalanceRange` un `seedDate` que tenga `settlement_legs`, `income_payments_normalized` o `expense_payments_normalized` con `transaction_date = seedDate`. La primitive seed = ancla muda; movements ahí desaparecen del materialized.
+- **NUNCA** modificar `computeRollingRematerializationWindow` para devolver `seedDate = targetStartDate`. El contracto `seedDate = materializeStartDate − 1` es load-bearing.
+- **NUNCA** usar `seedMode='active_otb'` en un cron rolling. Mutaría `accounts.opening_balance` cache para drift transitorio.
+- **NUNCA** desactivar `block_on_reconciled_drift` en rolling repair. `warn_only` se reserva para `known_bug_class_restatement` con intent operador explícito.
+- **NUNCA** crear un nuevo callsite que invoque rematerialize sin pasar por `computeRollingRematerializationWindow` + `resolveCleanSeedDate`. Extension future de la primitive — no inline date math.
+- **SIEMPRE** que `resolveCleanSeedDate` devuelva `ok=false`, el caller debe emitir Sentry + skip + permitir escalación humana a `historical_restatement`. Nunca silenciar.
+- **SIEMPRE** que emerja un nuevo movement primitive (e.g. `treasury_movement`, `intercompany_transfer`, `factoring_leg`), debe ser detectado por `resolveCleanSeedDate` — extender el SQL del helper, NO duplicar lógica inline.
+
+Spec canónica: `docs/tasks/in-progress/TASK-871-account-balance-rolling-anchor-contract.md`. Predecessor ISSUE-069 (resolved/) updated with delta "fix parcial; TASK-871 cierra contrato completo".
 
 ## Delta 2026-05-07 — TASK-815 Direct Service Expense Allocation Primitive
 

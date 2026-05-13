@@ -1,13 +1,46 @@
-# Sesion 2026-05-13 — TASK-871 Account Balance Rolling Anchor Contract IN-PROGRESS on develop
+# Sesion 2026-05-13 — TASK-871 Account Balance Rolling Anchor Contract SHIPPED on develop (Slices 2-4 + cierre docs)
 
 - **Trigger**: user pidió hacer pase a producción develop→main. Pre-checks revelaron Playwright smoke `finance.account_balances.fx_drift` rojo pre-existing (3 cuentas en 2026-05-05 con drift real). ISSUE-069 era fix parcial; TASK-871 cierra el bug class de raíz.
-- **Path B intentado (recovery + ship hoy) FALLÓ**: el remediator canonical con `evidence-guard=warn_only` reporta `seen=0` aunque diagnose dice `seen=1`. El bug class TASK-871 está activo en el remediator mismo — necesita código deployado primero (TASK-871 Slice 5 explícito).
+- **Path B intentado (recovery + ship hoy) FALLÓ**: el remediator canonical con `evidence-guard=warn_only` reportaba `seen=0` aunque diagnose decía `seen=1`. El bug class TASK-871 estaba activo en el remediator mismo.
 - **Decisión user (4-pilar lens)**: implementar TASK-871 completa (Opción A2 más segura/robusta/escalable). Pausa release hasta cierre.
 - **Branch**: develop directo (sin task branch) — pattern TASK-822..827.
-- **Skills loaded**: arch-architect (Greenhouse overlay) + greenhouse-finance-accounting-operator. Pendientes: greenhouse-backend + greenhouse-cron-sync-ops.
-- **Pre-execution OQ resuelta** (commit baseline): interpretación B — `targetStartDate = today - lookbackDays` → window 8 días observed (lookback + today inclusive). Rationale 4-pilar documentado en spec.
-- **Recovery parcial completado mid-session**: santander-clp ya rematerialized (74 días, closing $1.21M) via apply normal. santander-corp-clp + global66-clp drift persists pending TASK-871 deploy.
-- **Status**: FASE 0 (pre-execution) completa. FASE 1 (Discovery) pending.
+- **Pre-execution OQ resuelta** (baseline commit `5910f0e3`): interpretación B — `targetStartDate = today - lookbackDays` → window 8 días observed (lookback + today inclusive). Rationale 4-pilar documentado en spec.
+
+## Slices ejecutados (5 commits incrementales)
+
+| Slice | Commit | Resumen |
+| --- | --- | --- |
+| Slice 2A | `a918ecd4` | `computeRollingRematerializationWindow` primitive con shape canónico 6-field. `computeRematerializeSeedDate` preservado como wrapper back-compat. 13 tests nuevos. |
+| Slice 2B | `23ba4c2a` | `resolveCleanSeedDate` integrity check — walks backward hasta movement-free anchor o devuelve `exceeded_max_expand` (default maxExpand=30). Consume VIEWs canónicas TASK-766. 11 tests. |
+| Slice 2C | `8524d745` | Wire en cron handler `handleFinanceRematerializeBalances`: protected snapshot anchor → integrity check → clean seed o escalation `captureWithDomain('finance')` + push a `escalations[]`. |
+| Slice 3 | `689d35cf` | `FxDriftRemediationPolicy` 5to value `rolling_window_repair`. classifier + executor con `seedMode='explicit'` + `block_on_reconciled_drift`. Helper movido a `src/lib/finance/` para uso dual cron+remediator. 6 tests nuevos. |
+| Slice 4 | `ec16aca9` | `finance-rematerialize-invariants.test.ts` — 4 invariantes anti-regresión (A shape + property 30-iter, B cleanSeed semantics, C escalation honesty, D composition end-to-end del 2026-05-13 incident). |
+
+## Quality gates locales (CLAUDE.md Task Closing Quality Gate)
+
+- `pnpm test` — 4441 passed, 17 skipped, 71s.
+- `pnpm build` — production Turbopack verde end-to-end.
+- `pnpm tsc --noEmit` — clean.
+- `pnpm lint` — clean.
+
+## Docs canónicos (Slice 6 — local commit pending)
+
+- `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md` — Delta 2026-05-13 nueva sección con primitives + invariantes.
+- `docs/architecture/DECISIONS_INDEX.md` — entry "Rolling rematerialize usa primitive tipada + integrity check + policy `rolling_window_repair` con escalación honesta".
+- `docs/issues/resolved/ISSUE-069-finance-cron-rematerialize-seed-day-blind-spot.md` — Delta 2026-05-13 "fix parcial; TASK-871 cierra contrato completo".
+- `CLAUDE.md` — sección "Finance — Cron rematerialize-balances seed contract (ISSUE-069)" reemplazada por "Finance — Rolling rematerialize anchor contract (TASK-871, supersedes ISSUE-069)".
+- `docs/tasks/in-progress/TASK-871-...` → `docs/tasks/complete/TASK-871-...` (Lifecycle complete + closure section).
+- `docs/tasks/README.md` — row TASK-871 actualizado de "In progress" a Complete.
+
+## Recovery 3 cuentas + release develop→main pendientes de autorización operador (out of local scope)
+
+1. `git push origin develop` → CI automático corre lint + tsc + tests; ops-worker auto-deploy via `.github/workflows/ops-worker-deploy.yml`.
+2. Slice 5 Recovery: `POST /finance/rematerialize-balances` con body `{accountIds:['santander-corp-clp','santander-clp','global66-clp'],lookbackDays:14}` → expected escalations=[], drift cleared. Alternativamente via remediator `POST /finance/account-balances/fx-drift/remediate` con `policy='rolling_window_repair' dryRun=false`.
+3. Verificar `/api/admin/reliability` — `finance.account_balances.fx_drift.severity='ok' count=0`.
+4. Re-run Playwright smoke local o esperar próximo CI scheduled.
+5. Release develop → main via orchestrator canónico `production-release.yml` con `target_sha` post-merge.
+
+**Status**: Implementación + docs + cierre completos localmente. Pendiente push + recovery + release.
 
 ---
 

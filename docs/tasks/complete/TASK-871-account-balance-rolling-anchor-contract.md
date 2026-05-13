@@ -8,13 +8,13 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `optional`
-- Status real: `In Progress 2026-05-13 directo en develop (instrucción operativa: no branch separada). OQ resuelta pre-execution.`
+- Status real: `Implementación shipped 2026-05-13 directo en develop (commits a918ecd4 → 23ba4c2a → 8524d745 → 689d35cf → ec16aca9). Recovery 3 cuentas + release develop→main pendientes de autorización operador. ISSUE-069 actualizado: fix parcial; TASK-871 cierra contrato completo.`
 - Rank: `TBD`
 - Domain: `finance|ops|data|reliability`
 - Blocked by: `none`
@@ -376,3 +376,46 @@ Decision adicional de arquitectura antes de codigo: un rolling job no puede crea
 ## Open Questions
 
 - Confirmar durante Discovery si la ventana rolling de negocio debe ser "ultimos 7 dias calendario incluyendo hoy" o "7 dias previos mas hoy". La respuesta define si el 2026-05-13 con lookback 7 debe materializar desde `2026-05-06` o desde `2026-05-05`, pero en ambos casos el seed debe ser el dia anterior al primer dia materializado.
+  - **RESUELTA pre-execution 2026-05-13** con interpretación B (8 días observed window). Ver sección "Pre-Execution OQ Resolution" al inicio del documento.
+
+## Closure 2026-05-13
+
+### Slices ejecutados localmente
+
+| Slice | Commit | Resumen |
+|---|---|---|
+| Slice 2A | `a918ecd4` | `RollingRematerializationWindow` primitive en `services/ops-worker/finance-rematerialize-seed.ts` + 13 tests (canonical shape + ISSUE-069 back-compat). |
+| Slice 2B | `23ba4c2a` | `resolveCleanSeedDate` integrity check en `src/lib/finance/account-balances-clean-seed-resolver.ts` + 11 tests (clean/dirty/expand/max/incident shape). |
+| Slice 2C | `8524d745` | Wire en `services/ops-worker/server.ts` `handleFinanceRematerializeBalances` — protected snapshot anchor → integrity check → clean seed o escalation Sentry `captureWithDomain('finance')`. Response shape extendido con `window` + `escalations[]`. |
+| Slice 3 | `689d35cf` | `FxDriftRemediationPolicy` extendido con `rolling_window_repair` (5to value). classifier + executor con `seedMode='explicit'` + `block_on_reconciled_drift`. Helper movido a domain `src/lib/finance/`. 6 tests nuevos. |
+| Slice 4 | `ec16aca9` | `services/ops-worker/finance-rematerialize-invariants.test.ts` — 4 invariantes anti-regresión (A shape, B cleanSeed, C escalation, D composition) + property test 30-iter. |
+| Slice 6 docs | (pendiente este commit) | Delta arquitectónico GREENHOUSE_FINANCE_ARCHITECTURE_V1 + DECISIONS_INDEX entry + ISSUE-069 delta closure + CLAUDE.md "Rolling rematerialize anchor contract" supersede ISSUE-069 hard rules + lifecycle complete + tasks README. |
+
+### Quality gates locales (CLAUDE.md Task Closing Quality Gate)
+
+- `pnpm test` — 4441 passed, 17 skipped, 71s.
+- `pnpm build` — production Turbopack verde end-to-end.
+- `pnpm tsc --noEmit` — clean.
+- `pnpm lint` — clean.
+
+### Out of scope local — requiere autorización operador
+
+- **Slice 5 Controlled Recovery**: `global66-clp` + `santander-clp` + `santander-corp-clp` para `2026-05-05`. Disparable via `POST /finance/rematerialize-balances` con body `{accountIds:[...],lookbackDays:14}` después del deploy automático del ops-worker via `.github/workflows/ops-worker-deploy.yml`. Alternativamente via `POST /finance/account-balances/fx-drift/remediate` con `policy='rolling_window_repair'` + `dryRun=false`.
+- **Release develop → main**: orchestrator canónico `production-release.yml` con `target_sha` post-merge. Preflight + approval gate + workers parallel + Vercel READY + post-release health + manifest transition. Smoke `finance-account-balances-fx-drift.spec.ts` debe estar verde antes (recovery cierra el gap).
+
+### Evidencia de la verificación
+
+- Tests anti-regresión: `services/ops-worker/finance-rematerialize-seed.test.ts` (20 tests) + `src/lib/finance/account-balances-clean-seed-resolver.test.ts` (11) + `src/lib/finance/account-balances-fx-drift-remediation.test.ts` (21, +6 nuevos) + `services/ops-worker/finance-rematerialize-invariants.test.ts` (7).
+- Property check 30-iter contra `(today, lookbackDays)` aleatorios pin-ea Invariant A.
+- Test "reproduces the 2026-05-13 incident shape" pin-ea el fix exacto del bug class.
+
+### Cross-impact
+
+- `services/ops-worker/server.ts` (TASK-702 ownership): wire único en `handleFinanceRematerializeBalances`. Helper movido a `src/lib/finance/` para que `account-balances-fx-drift-remediation.ts` (TASK-842 ownership) lo pueda importar sin acoplamiento cross-runtime.
+- `account-balance-evidence-guard.ts` (TASK-721 ownership): NO modificado. Sigue corriendo al final de `rematerializeAccountBalanceRange` con `block_on_reconciled_drift` default.
+- Reliability signal SQL `account-balances-fx-drift.ts` (TASK-774 ownership): NO modificado. Es el oracle/ground truth.
+- VIEWs canónicas TASK-766 (`expense_payments_normalized`, `income_payments_normalized`): consumed read-only por `resolveCleanSeedDate`. NO modificadas.
+
+### Lecciones canonizadas (CLAUDE.md)
+
+Sección "Finance — Rolling rematerialize anchor contract (TASK-871, supersedes ISSUE-069, 2026-05-13)" canoniza las 9 hard rules + helpers canónicos + tests anti-regresión. Pattern reusable cuando emerja otra primitive con "first observed day jamás materializado" — extender o componer las primitives, nunca duplicar date math.
