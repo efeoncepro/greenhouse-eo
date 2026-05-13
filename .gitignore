@@ -48,8 +48,12 @@ yarn-error.log*
 .claude/settings.json
 .claude/scheduled_tasks.lock
 
-# vercel
-.vercel
+# vercel — ignore everything except project.json (canonical scope/project pin)
+# `.vercel/project.json` checked-in pins Vercel CLI to canonical project
+# `prj_d9v6gihlDq4k1EXazPvzWhSU0qbl` in scope `efeonce-7670142f`.
+# Prevents duplicate-project bug class (ISSUE-013 + ISSUE-076).
+.vercel/*
+!.vercel/project.json
 .tmp/
 
 # typescript
@@ -71,7 +75,6 @@ src/assets/iconify-icons/generated-icons.css
 !docs/tasks/**/CODEX_TASK*.md
 # Legacy AI skill artifacts (not the src/lib/ai/ module which is tracked)
 
-.vercel
 
 # Python bytecode caches (Cloud Run services with Python)
 **/__pycache__/
