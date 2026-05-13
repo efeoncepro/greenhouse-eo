@@ -84,6 +84,66 @@ Regla: módulos de dominio extienden estos objetos, no crean identidades paralel
 - Antes de deprecar, verificar grants activos en `role_entitlement_defaults` y `user_entitlement_overrides`. Si existen, migrar/documentar esos grants primero.
 - El reporter one-shot `scripts/governance/find-deprecated-candidates.ts` lista candidates en CSV; no auto-depreca ni reemplaza revisión de operador.
 
+### View Registry Governance Pattern (TASK-827, desde 2026-05-13)
+
+Cualquier `viewCode` agregado a `VIEW_REGISTRY` en `src/lib/admin/view-access-catalog.ts` **debe acompañarse en el MISMO PR** de una migration que:
+
+1. INSERT en `greenhouse_core.view_registry` (gobernanza persistida)
+2. INSERT en `greenhouse_core.role_view_assignments` con `granted=TRUE` para CADA role que deba acceder ese viewCode
+
+**Por qué**: el helper `roleCanAccessViewFallback()` en `src/lib/admin/view-access-store.ts:99-125` opera como signal de gobernanza pendiente. Cuando un viewCode NO tiene fila explícita en `role_view_assignments`, el fallback heurístico resuelve `granted=true` por route_group match Y emite WARNING `role_view_fallback_used` (Sentry domain=identity) — funciona correctamente operacionalmente, pero es ruido de gobernanza incompleta.
+
+**Bug class detectado live (TASK-827 Slice 0, 2026-05-13)**: agregué 11 viewCodes nuevos al TS registry sin migration acompañante → Sentry emitió 10 warnings en sesión cliente real (alert JAVASCRIPT-NEXTJS-4X). Causa raíz: gap entre TS source-of-truth y DB seed. Solución canónica: migration de seed (44 filas: 11 viewCodes × 4 roles), NO patch del fallback ni desactivar telemetría.
+
+**Pattern canónico** (mirror TASK-750/749/827):
+
+```sql
+-- Up Migration
+INSERT INTO greenhouse_core.view_registry
+  (view_code, section, label, description, route_group, route_path, icon, display_order, active, updated_by)
+VALUES
+  ('<section>.<view_code>', '<section>', '<Label>', '<Description>', '<route_group>', '/<path>', 'tabler-<icon>', <N>, TRUE, 'migration:TASK-XXX')
+ON CONFLICT (view_code) DO UPDATE SET
+  label = EXCLUDED.label, description = EXCLUDED.description, route_path = EXCLUDED.route_path,
+  icon = EXCLUDED.icon, active = TRUE, updated_at = NOW(), updated_by = 'migration:TASK-XXX';
+
+INSERT INTO greenhouse_core.role_view_assignments
+  (role_code, view_code, granted, granted_by, granted_at, updated_at, updated_by)
+VALUES
+  ('<role_code>', '<section>.<view_code>', true, 'migration:TASK-XXX', NOW(), NOW(), 'migration:TASK-XXX')
+ON CONFLICT (role_code, view_code) DO UPDATE SET
+  granted = EXCLUDED.granted, updated_at = NOW(), updated_by = 'migration:TASK-XXX';
+
+-- Anti pre-up-marker check (CLAUDE.md regla migration markers)
+DO $$
+DECLARE registered_count INTEGER; granted_count INTEGER;
+BEGIN
+  SELECT COUNT(*) INTO registered_count FROM greenhouse_core.view_registry WHERE view_code IN (...);
+  IF registered_count < <N> THEN
+    RAISE EXCEPTION 'TASK-XXX anti pre-up-marker: expected <N> view_registry rows, got %', registered_count;
+  END IF;
+  -- repeat para role_view_assignments
+END $$;
+
+-- Down Migration (idempotent, append-only audit)
+UPDATE greenhouse_core.role_view_assignments
+SET granted = FALSE, updated_at = NOW(), updated_by = 'migration:TASK-XXX:revert'
+WHERE updated_by = 'migration:TASK-XXX';
+```
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** agregar entry a `VIEW_REGISTRY` TS sin migration acompañante en el mismo PR. La telemetría `role_view_fallback_used` lo detectará en producción y genera ruido Sentry.
+- **NUNCA** desactivar el helper `roleCanAccessViewFallback` ni la captureMessageWithDomain del path. ES la señal canonical de drift gobernanza — load-bearing.
+- **NUNCA** parchear el fallback heurístico para "evitar" el warning. La solución canonical es seed migration; el warning ES el detector.
+- **NUNCA** borrar filas de `role_view_assignments` (append-only governance). Down migration marca `granted=FALSE` preservando audit trail.
+- **NUNCA** definir un viewCode sin `routePath` válido (incluso si la página es placeholder forward-looking — declara el path canonical, page se crea en TASK derivada).
+- **SIEMPRE** que un viewCode se vuelva accesible para más roles (e.g. nuevo addon), migration nueva con INSERT ON CONFLICT DO UPDATE para los grants adicionales. NO modificar la migration original.
+- **SIEMPRE** usar `migration:TASK-XXX` como `granted_by`/`updated_by` audit marker — preserva trazabilidad cross-migration.
+- **SIEMPRE** incluir DO block anti pre-up-marker check (TASK-838 pattern) en migrations que seedean view_registry/role_view_assignments, validando COUNT esperado post-INSERT.
+
+**Spec canónica**: `docs/tasks/complete/TASK-827-client-portal-composition-layer-ui.md` Slice 0 + incident hardening commit `2fd8a60c` (seed 44 filas, 11 viewCodes × 4 roles client_executive/client_manager/client_specialist/efeonce_admin).
+
 ### Secret Manager Hygiene
 
 - Secretos consumidos por `*_SECRET_REF` deben publicarse como scalar crudo: sin comillas envolventes, sin `\n`/`\r` literal y sin whitespace residual.

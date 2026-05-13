@@ -1,3 +1,79 @@
+# Sesion 2026-05-13 — TASK-827 Client Portal Composition Layer CERRADA on develop (EPIC-015 child 6/8 ✅)
+
+- **Trigger**: usuario pidió implementar TASK-827 antes de promover develop→main, en `develop` sin branch separada. Plan canonical FASE 1-6 ejecutado end-to-end.
+
+- **Pre-execution decisions (commit `36357f2a`)**: 7 Open Questions cerradas con lens 4-pilar canonical D1-D7:
+  - D1: `requireViewCodeAccess` bypass para `isInternalPortalUser=true` (support pattern, no impersonation)
+  - D2: `capabilityModules` legacy preservado, V1.1 derivative TASK
+  - D3: `/home` terminator garantizado para `tenant_type='client'`
+  - D4: `resolveAccountManagerEmail` fallback chain (V1.0 hard fallback `support@efeoncepro.com`, V1.1 canonical 360)
+  - D5: mobile parity exacta via Vuexy responsive Drawer
+  - D6: NO skeleton para nav chrome (server component blocking render)
+  - D7: reliability signal `client_portal.composition.resolver_failure_rate` con `moduleKey='identity'` temporal hasta TASK-829 cree subsystem `Client Portal Health`
+
+- **FASE 1 Discovery (3 subagentes Explore paralelos)** detectó 4 baseline recalibrations:
+  - VIEW_REGISTRY YA tenía 11 entries `cliente.*` (no 4) — Slice 0 agrega 11 nuevas
+  - `/home` YA existe como HomeShellV2 — Slice 4 extiende, no crea
+  - `tests/visual/` NO existe en repo — Slice 8 pivot a E2E + RTL render tests
+  - Naming drift `cliente.reviews` (seed) vs `cliente.revisiones` (registry) → ambos coexisten apuntando a `/reviews`
+
+- **Cierre 2026-05-13**: 13 commits incrementales sin PR ceremony directo en develop.
+  - `839e731b` baseline (move to-do→in-progress + Lifecycle sync)
+  - `befa0871` baseline recalibration pre-execution
+  - `36357f2a` D1-D7 decisions documented
+  - `5a691485` Slice 0 — Parity view_codes (11 entries VIEW_REGISTRY + parity.ts/.test.ts/.live.test.ts)
+  - `630fe3c1` Slice 1 — Microcopy dictionary `GH_CLIENT_PORTAL_COMPOSITION` es-CL canonical
+  - `8fcd3962` Slice 5 — 3 empty state components anatomía 5-elementos
+  - `86374a98` Slice 3 — Menu builder pure function + `<ClientPortalNavigation>` server component
+  - `1d2fbbb2` Slice 4 — `requireViewCodeAccess` + `/home` 5-state contract + 9 client pages migradas + slug mapping
+  - `7574f4bc` Slice 2 — Mockup builder `/cliente-portal-mockup` 5 fixtures tipados [mockup-approved-by-user]
+  - `c0f3908e` Slice 6 — Refactor light VerticalMenu + audit grep canonical + comments
+  - `08bcb47c` Slice 7 — Lint rule `no-untokenized-business-line-branching` warn + override block + sweep V1.1
+  - `2fd8a60c` **Incident hardening** — seed migration role_view_assignments 44 filas (4 roles × 11 viewCodes) resuelve `role_view_fallback_used` Sentry alerts
+  - `f2aa49ad` Slice 8 — Reliability signal scaffold + tests (V1.0 returns 'unknown', V1.1 TASK-829 implements adapter)
+
+- **Resultados verificados**:
+  - 38/38 tests TASK-827 verde (parity unit + view-codes slug + menu-builder + signal scaffold)
+  - `pnpm tsc --noEmit` clean
+  - `pnpm lint` full repo: 0 errors + 4 warnings esperadas (target sweep V1.1 — pages organization workspaces que leen session.user.businessLines/serviceModules legítimo cross-domain)
+  - Migration aplicada live a `greenhouse-pg-dev` via `pnpm pg:connect:migrate` (44 filas role_view_assignments + 11 view_registry entries + DO block anti pre-up-marker verde)
+
+- **Incident `role_view_fallback_used` resuelto canónicamente (NO parche)**:
+  - **Causa raíz**: telemetría funcionando como diseñada detectando gap gobernanza post Slice 0 — 11 viewCodes nuevos en VIEW_REGISTRY TS sin seed acompañante en `role_view_assignments` PG → fallback heurístico `roleCanAccessViewFallback` resolvió `granted=true` por route_group match → emitió 11 warnings/sesión cliente
+  - **Solución 4-pilar** (skill arch-architect + Greenhouse overlay):
+    - Safety: migration formaliza grant + audit trail (granted_by + updated_by = 'migration:TASK-827')
+    - Robustness: idempotent INSERT ON CONFLICT DO UPDATE + DO block anti pre-up-marker check
+    - Resilience: NO removí el fallback ni la telemetría — sigue funcionando para detectar drift FUTURO
+    - Scalability: 44 filas permanentes (11 viewCodes × 4 roles). Future viewCodes nuevos requieren mismo pattern (regla canónica nueva en CLAUDE.md)
+  - **Defense in depth**: regla canónica "cualquier viewCode agregado a VIEW_REGISTRY TS requiere migration acompañante en role_view_assignments por cada role" documentada en CLAUDE.md sección nueva
+
+- **Patrón canonizado en este sesion**:
+  - Slice 0 pattern: extender VIEW_REGISTRY TS + migration acompañante role_view_assignments + parity test live
+  - Slice 4 pattern: `requireViewCodeAccess(viewCode)` page guard con D1 bypass internal + redirect canonical `/home?denied=<slug>` / `?error=resolver_unavailable`
+  - Slice 5 pattern: 3 components empty state canonical anatomía 5-elementos consumiendo dictionary + EmptyState primitive del repo
+  - Slice 8 pattern: reliability signal scaffold V1.0 (returns 'unknown' con doc references) → V1.1 telemetry adapter implementa data real, shape canonical preservado
+
+- **Skills invocadas**: arch-architect (Greenhouse overlay — pre-execution + incident resolution), info-architecture (Slice 3 menu composition + URL design), state-design (Slice 5 5-state contract anatomía 5-elementos), greenhouse-backend (Slice 0/3/4/7/8 + migration), greenhouse-ux (Slice 5 components layout), greenhouse-ux-writing (Slice 1 dictionary validation), greenhouse-dev (Slice 5 React components), greenhouse-mockup-builder (Slice 2).
+
+- **TASK derivadas V1.1 registradas en spec Follow-ups**:
+  - `client-portal-legacy-branching-sweep` — promote lint rule warn → error
+  - `capability-modules-resolver-migration` — refactor `resolveCapabilityModules` legacy
+  - `client-portal-vertical-menu-resolver-migration` — refactor full VerticalMenu cliente section
+  - `client-portal-pages-placeholder-materialization` — 10 pages placeholder pendientes (/creative-hub, /brand-intelligence, etc.)
+  - `account-manager-email-canonical-resolver` — D4 V1.1 canonical 360 lookup
+  - `client-portal-resolver-failure-rate-telemetry-adapter` — TASK-829 Sentry events query adapter
+
+- **Desbloquea**: TASK-828 (cascade desde lifecycle ya tiene contract claro), TASK-829 (reliability signals subsystem `Client Portal Health` + 5 signals adicionales + legacy backfill).
+
+---
+
+# Sesion 2026-05-13 — TASK-871 Account Balance Rolling Anchor Contract (task design adjusted, no runtime changes)
+
+- **Trigger**: Playwright E2E smoke en `develop` fallo por `finance.account_balances.fx_drift` en `error`, no por auth/navegacion. Runtime read-only confirmo 3 filas con drift el `2026-05-05`: `santander-corp-clp`, `santander-clp`, `global66-clp`, todas con `transaction_count=0`, persisted inflows/outflows `0`, pero settlement legs reales.
+- **Decision arquitectonica agregada a la task antes de implementar**: un rolling job no puede crear o dejar un seed row sintetico en `account_balances` para una fecha con movimientos reales dentro del horizonte observado. Debe preservar un checkpoint real, usar el cierre materializado previo, o materializar tambien esa fecha desde un anchor anterior.
+- **Task ajustada, no tomada para implementacion**: `docs/tasks/to-do/TASK-871-account-balance-rolling-anchor-contract.md`. Objetivo: cerrar causa raiz sin updates manuales, sin bajar el smoke, sin apagar evidence guard, separando `rolling_window_repair` de `historical_restatement`.
+- **Workspace note**: existen cambios locales ajenos en client-portal; no tocarlos desde TASK-871.
+
 # Sesion 2026-05-13 — ISSUE-075 Entra webhook validation handshake (fix + hardening shipped a develop)
 
 - **Trigger**: Sentry alert `JAVASCRIPT-NEXTJS-4T` a las 06:00:03 -04 (cron `ops-entra-webhook-renew` daily). Microsoft Graph rechaza subscription create/renew con `ValidationError 400` porque el notification endpoint `/api/webhooks/entra-user-change` no respondía al validation handshake **enviado como POST**. El handler GET sí echoba el `validationToken`; el handler POST iba directo a parse del body + validate `clientState` → respondía 400/401 → Microsoft falla la subscription.
