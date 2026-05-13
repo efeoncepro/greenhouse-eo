@@ -7,8 +7,8 @@ import {
   findWorkflow
 } from './workflow-allowlist'
 
-describe('workflow-allowlist — canonical 7 workflows (6 deploy workers + orchestrator)', () => {
-  it('contains exactly the 7 production deploy workflows', () => {
+describe('workflow-allowlist — canonical 8 workflows (6 deploy workers + orchestrator + watchdog)', () => {
+  it('contains exactly the 8 production release workflows', () => {
     expect(RELEASE_DEPLOY_WORKFLOWS.map((w) => w.workflowName).sort()).toEqual(
       [
         'Azure Teams Bot Deploy',
@@ -17,7 +17,8 @@ describe('workflow-allowlist — canonical 7 workflows (6 deploy workers + orche
         'HubSpot Greenhouse Integration Deploy',
         'ICO Batch Worker Deploy',
         'Ops Worker Deploy',
-        'Production Release Orchestrator'
+        'Production Release Orchestrator',
+        'Production Release Watchdog'
       ]
     )
   })
@@ -28,7 +29,7 @@ describe('workflow-allowlist — canonical 7 workflows (6 deploy workers + orche
   })
 
   it('Set is read-only (preserve canonical immutability)', () => {
-    expect(RELEASE_DEPLOY_WORKFLOW_NAMES.size).toBe(7)
+    expect(RELEASE_DEPLOY_WORKFLOW_NAMES.size).toBe(8)
   })
 
   // Anti-regression: el orchestrator DEBE estar en el allowlist para que
@@ -39,6 +40,15 @@ describe('workflow-allowlist — canonical 7 workflows (6 deploy workers + orche
     expect(RELEASE_DEPLOY_WORKFLOW_NAMES.has('Production Release Orchestrator')).toBe(true)
   })
 
+  // Anti-regression: el watchdog scheduled tiene el mismo self-reference loop
+  // que el orchestrator. Detectado live 2026-05-13 run 25822955070 attempt 2:
+  // drift pre-existente en workers (hubspot + ico-batch + commercial-cost)
+  // hizo fallar el watchdog → ci_green lo contó como CI failure → bloqueó
+  // promote a production aunque el orchestrator iba A FIXEAR ese drift.
+  it('includes Production Release Watchdog (closes monitoring-blocks-deploy loop)', () => {
+    expect(RELEASE_DEPLOY_WORKFLOW_NAMES.has('Production Release Watchdog')).toBe(true)
+  })
+
   // El orchestrator NO tiene Cloud Run mapping (no participa en revision drift
   // detection — los workers que despliega via workflow_call sí tienen).
   it('Production Release Orchestrator has NO Cloud Run mapping', () => {
@@ -46,6 +56,15 @@ describe('workflow-allowlist — canonical 7 workflows (6 deploy workers + orche
 
     expect(orchestrator).not.toBeNull()
     expect(orchestrator?.cloudRunService).toBeUndefined()
+  })
+
+  // El watchdog tampoco tiene Cloud Run mapping (es un GitHub Actions
+  // scheduled workflow, no un service deployado).
+  it('Production Release Watchdog has NO Cloud Run mapping', () => {
+    const watchdog = findWorkflow('Production Release Watchdog')
+
+    expect(watchdog).not.toBeNull()
+    expect(watchdog?.cloudRunService).toBeUndefined()
   })
 })
 
