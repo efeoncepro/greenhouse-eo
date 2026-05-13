@@ -32,6 +32,7 @@ import {
   getExpenseDistributionSharedPoolContaminationSignal,
   getExpenseDistributionUnresolvedSignal
 } from './queries/expense-distribution'
+import { getClientPortalResolverFailureRateSignal } from './queries/client-portal-resolver-failure-rate'
 import { getEntraWebhookSubscriptionHealthSignal } from './queries/entra-webhook-subscription-health'
 import { getExpensePaymentsClpDriftSignal } from './queries/expense-payments-clp-drift'
 import { getFinanceClientProfileUnlinkedSignal } from './queries/finance-client-profile-unlinked'
@@ -462,6 +463,17 @@ interface ReliabilityOverviewSources {
   entraWebhookSubscriptionHealth?: ReliabilitySignal | null
 
   /**
+   * TASK-827 Slice 8 — Client portal resolver failure rate.
+   * Single signal:
+   *   - client_portal.composition.resolver_failure_rate (drift)
+   *
+   * V1.0 scaffold (returns `unknown` — telemetry adapter pending TASK-829 V1.1).
+   * Roll up bajo moduleKey 'identity' temporal (D7 decision); TASK-829 migrará
+   * a moduleKey 'client_portal' cuando cree el subsystem dedicado.
+   */
+  clientPortalResolverFailureRate?: ReliabilitySignal | null
+
+  /**
    * TASK-613 Slice 3 — Finance Clients ↔ Organization canonical link signal:
    *   - finance.client_profile.unlinked_organizations (data_quality, warning)
    * Roll up bajo moduleKey 'finance'. Steady state = 0. Cuando > 0,
@@ -602,6 +614,8 @@ export const buildReliabilityOverview = (
     ...(sources.workspaceProjection ?? []),
     // ISSUE-075 hardening — Microsoft Graph webhook subscription health.
     ...(sources.entraWebhookSubscriptionHealth ? [sources.entraWebhookSubscriptionHealth] : []),
+    // TASK-827 Slice 8 — Client portal resolver failure rate (V1.0 scaffold).
+    ...(sources.clientPortalResolverFailureRate ? [sources.clientPortalResolverFailureRate] : []),
     // TASK-613 Slice 3 — Finance Clients ↔ Organization canonical link signal.
     ...(sources.financeClientProfileUnlinked ? [sources.financeClientProfileUnlinked] : []),
     // TASK-841 — Nubox raw/conformed/projection freshness.
@@ -934,6 +948,13 @@ export const getReliabilityOverview = async (
       ? preloadedSources.entraWebhookSubscriptionHealth
       : await getEntraWebhookSubscriptionHealthSignal().catch(() => null)
 
+  // TASK-827 Slice 8 — Client portal resolver failure rate. Single reader
+  // (V1.0 scaffold returns `unknown` hasta que TASK-829 ship telemetry adapter).
+  const clientPortalResolverFailureRate =
+    preloadedSources.clientPortalResolverFailureRate !== undefined
+      ? preloadedSources.clientPortalResolverFailureRate
+      : await getClientPortalResolverFailureRateSignal().catch(() => null)
+
   // TASK-613 Slice 3 — Finance Clients ↔ Organization canonical link signal.
   // Single reader; degrada honestamente a `unknown` si la query falla.
   const financeClientProfileUnlinked =
@@ -1084,6 +1105,7 @@ export const getReliabilityOverview = async (
     identityGovernance,
     workspaceProjection,
     entraWebhookSubscriptionHealth,
+    clientPortalResolverFailureRate,
     financeClientProfileUnlinked,
     nuboxSourceFreshness,
     criticalTablesMissing,
