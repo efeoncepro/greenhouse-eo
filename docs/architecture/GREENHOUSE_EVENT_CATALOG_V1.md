@@ -2,6 +2,32 @@
 
 Catalogo canonico de eventos del sistema de outbox de Greenhouse. Cada evento se registra en `greenhouse_sync.outbox_events` y se publica a BigQuery via el consumer `outbox-publish`.
 
+## Delta 2026-05-12 — TASK-826: Client Portal module assignment lifecycle (5 events v1)
+
+Aggregate type: `client_portal_module_assignment`.
+
+| Event Type | Disparado por | Payload v1 contract | Consumers |
+|---|---|---|---|
+| `client.portal.module.assignment.created` | `enableClientPortalModule({...})` — atomic tx que inserta nuevo assignment + audit + outbox en `greenhouse_client_portal.module_assignments` | `{version:1, assignmentId, organizationId, moduleKey, status:'pending'\|'active'\|'pilot', source, effectiveFrom, expiresAt}` | Resolver TASK-825 cache invalidation, futura cascade reactiva (TASK-828), reliability signals (TASK-829), audit |
+| `client.portal.module.assignment.paused` | `pauseClientPortalModule({...})` — transition `active\|pilot\|pending → paused` | `{version:1, assignmentId, organizationId, moduleKey, fromStatus, toStatus:'paused', actorUserId}` | Resolver cache invalidation, audit, notification optional |
+| `client.portal.module.assignment.resumed` | `resumeClientPortalModule({...})` — transition `paused → active` | `{version:1, assignmentId, organizationId, moduleKey, fromStatus:'paused', toStatus:'active', actorUserId}` | Resolver cache invalidation, audit |
+| `client.portal.module.assignment.expired` | `expireClientPortalModule({...})` — transition non-terminal → `expired`, SET `effective_to=hoy` | `{version:1, assignmentId, organizationId, moduleKey, fromStatus, toStatus:'expired', effectiveTo, actorUserId}` | Resolver cache invalidation, audit, billing (futuro) |
+| `client.portal.module.assignment.churned` | `churnClientPortalModule({...})` — transition non-terminal → `churned`, SET `effective_to=hoy` | `{version:1, assignmentId, organizationId, moduleKey, fromStatus, toStatus:'churned', effectiveTo, actorUserId}` | Resolver cache invalidation, audit, lifecycle reporting, GTM signals (futuro) |
+
+Reglas de emisión:
+
+- Todos los eventos se emiten en la **misma transacción PG** que el UPDATE/INSERT del assignment + el INSERT en `module_assignment_events` (audit append-only). Si el commit falla, el outbox event NO se emite (atomicidad).
+- Idempotency: cuando `enableClientPortalModule` detecta un assignment ya activo con mismo status target, retorna `{idempotent: true}` sin emitir outbox event ni invalidar cache.
+- Cache invalidation post-tx (`__clearClientPortalResolverCache(organizationId)`) NO ocurre si `idempotent=true` — no hubo state change.
+
+Reglas duras (anti-regresión):
+
+- **NUNCA** emitir un assignment event sin haber actualizado primero `module_assignments` + `module_assignment_events` (audit) en la misma tx. Audit log es source of truth append-only via PG triggers.
+- **NUNCA** transicionar desde un terminal status (`expired`, `churned`). Para re-asignar un módulo post-churn, crear un nuevo assignment con el mismo `module_key` + `organization_id` (el unique index parcial `WHERE effective_to IS NULL` lo permite).
+- **NUNCA** bypass del helper canónico (`enable/pause/resume/expire/churn`) para mutar `module_assignments` directo en producción. Toda transición pasa por el command store.
+- **NUNCA** mostrar `paused`, `expired` o `churned` en el resolver client portal (TASK-825). El resolver filtra `IN ('active','pilot','pending')` por contract.
+- Cuando emerja un consumer nuevo (e.g. cascade reactive TASK-828), suscribirse al subset de event_types relevantes (no consumer hace `WHERE event_type LIKE 'client.portal.module.%'` — selectivo por tipo).
+
 ## Delta 2026-05-10 — TASK-812: Payroll compliance export artifacts (2 events v1)
 
 Aggregate type: `payroll_compliance_export_artifact`.
