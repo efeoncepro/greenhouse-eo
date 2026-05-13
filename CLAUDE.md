@@ -1884,7 +1884,117 @@ pnpm release:preflight --override-batch-policy --fail-on-error
 - **SIEMPRE** que emerja un nuevo workflow production deploy, agregarlo a `RELEASE_DEPLOY_WORKFLOWS` ANTES del primer deploy (mismo invariant que TASK-849 watchdog) — ci_green check lo filtra automaticamente del set CI relevante.
 - **SIEMPRE** que se cambie copy es-CL en el output formatter, mantener consistencia con `getMicrocopy()` patterns aunque CLI no use el helper directamente (es operator-facing).
 
-**Spec canonica**: `docs/tasks/in-progress/TASK-850-production-preflight-cli-complete.md`. Migration: `migrations/20260510144012098_task-850-preflight-capabilities.sql`. CLI: `pnpm release:preflight [--json|--output-file=<path>|--fail-on-error|--override-batch-policy|--target-sha=<sha>|--target-branch=<name>]`.
+**Spec canonica**: `docs/tasks/in-progress/TASK-850-production-preflight-cli-complete.md`. Migration: `migrations/20260510144012098_task-850-preflight-capabilities.sql`. CLI: `pnpm release:preflight [--json|--output-file=<path>|--fail-on-error|--override-batch-policy|--bypass-preflight-warnings|--target-sha=<sha>|--target-branch=<name>]`.
+
+### Production Release Operational Playbook (TASK-871 follow-up — lessons 2026-05-13)
+
+5 patterns descubiertos durante el pase a producción de TASK-871 + bundled accumulated develop (4 orchestrator attempts antes de success). Canónicos para que **el próximo release tome <30min** vs las 4+ horas que tomó cerrar este. Spec runs: `25821880395` (vercel timing) + `25822955070` (watchdog loop) + `25823823716` (incomplete bypass) + `25825280928` (SUCCESS con todas las fixes shipped). Manifest released: `e02cb32e9c30-5acb894c-f164-486c-99c0-074d42aefbeb`.
+
+#### Lesson 1 — Vercel BUILDING timing race (~5-8 min)
+
+`git push origin main` triggea Vercel production deploy automaticamente via Git integration. Vercel toma **5-8 min** en build. Si dispatchas el orchestrator inmediatamente, el preflight `vercel_readiness=BUILDING` lo bloquea con `severity=error`.
+
+**Pattern canónico**: **NO** dispatchar el orchestrator inmediatamente post-push a main. Esperar a `vercel inspect <deploy-url>` que reporte `status: ● Ready` (5-8 min típico) ANTES del `gh workflow run production-release.yml`. Alternativamente, verificar con `vercel list greenhouse-eo --scope=efeonce-7670142f | head -3` que la última deployment en Production esté `Ready`.
+
+**⚠️ Regla dura**: **NUNCA** dispatch orchestrator <8 min post-push main. El `vercel_readiness` check NO se reintenta dentro del preflight — un fail aborta el orchestrator.
+
+#### Lesson 2 — Production Release Watchdog self-reference loop
+
+El workflow `Production Release Watchdog` (scheduled cada 30min, TASK-849) reporta `worker_revision_drift` cuando detecta workers Cloud Run en SHAs distintos al último deploy.yml successful. Cuando hay drift pre-existente, el watchdog **FAILA loud**. El preflight `ci_green` cuenta esa failure como CI block.
+
+**Patrón canónico**: el watchdog DEBE estar en `RELEASE_DEPLOY_WORKFLOWS` allowlist (`src/lib/release/workflow-allowlist.ts`) — mismo pattern que `Production Release Orchestrator` ya tenía documentado para su propia self-reference loop. Sin esto, drift pre-existente bloquea TODA promoción a producción incluso cuando el release ES la solución al drift.
+
+**Closed en commit `4f1e09de` (2026-05-13)** agregando `Production Release Watchdog` al array `RELEASE_DEPLOY_WORKFLOWS` + 2 tests anti-regresión (`workflow-allowlist.test.ts`). Allowlist size 7→8.
+
+**⚠️ Regla dura**: **NUNCA** agregar un nuevo workflow scheduled de monitoring (e.g. `Reliability Synthetic Probe`, `Cost Watchdog`) sin agregarlo al allowlist `RELEASE_DEPLOY_WORKFLOWS` con `cloudRunService: undefined`. Sin esto, cada `failure` del monitoring scheduled bloquea producción para siempre — exactamente lo opuesto a la safety intent.
+
+#### Lesson 3 — `bypass_preflight_reason` era una bypass mechanism INCOMPLETA
+
+La spec CLAUDE.md decía:
+> `bypass_preflight_reason >=20 chars + capability platform.release.bypass_preflight` → operator override broad
+
+Pero la CLI sólo implementaba `--override-batch-policy` (downgrade `release_batch_policy` errors a warnings). Otras checks que producen warnings persistentes (`playwright_smoke: 0 workflows for main pushes by design`, `sentry_critical_issues: 1-9 issues = warning`, `vercel_readiness: BUILDING timing race`) seguían bloqueando vía `readyToDeploy=false` aunque el operador supliera bypass_preflight_reason.
+
+**Closed en commit `c594f066` (2026-05-13)** con:
+
+1. CLI nueva flag `--bypass-preflight-warnings` en `scripts/release/production-preflight.ts`.
+2. `shouldFailPreflightCommand(payload, failOnError, bypassWarnings)` extendido: cuando `bypassWarnings=true` solo `overallStatus === 'blocked'` (ERROR severity) bloquea.
+3. Orchestrator workflow `.github/workflows/production-release.yml` pasa AMBOS `--override-batch-policy --bypass-preflight-warnings` cuando `bypass_preflight_reason >= 20`.
+4. 5 tests anti-regresión en `exit-policy.test.ts` (passes degraded, passes unknown, blocks errors, no-op without failOnError, no-op on healthy).
+
+**Resultado**: la spec canónica documentada en CLAUDE.md ahora SÍ matchea el comportamiento del orchestrator. Bypass mechanism completo.
+
+**⚠️ Regla dura**: **NUNCA** documentar un control en CLAUDE.md (override / bypass / capability / gate) sin verificar que el código TS/YAML CompletELY implementa esa semántica. Spec sin implementation completa = self-blocking architectural debt. Pattern: SPEC describes intent → IMPLEMENTATION partial → GAP solo aparece en release real → 4+ hours debugging. Este pattern lo vimos 3 veces hoy (watchdog allowlist incompleto, bypass-preflight-warnings incompleto, Production env approval gate doble invocación no documentada).
+
+#### Lesson 4 — Production environment gate se invoca DOS VECES, no UNA
+
+El workflow `production-release.yml` tiene environment `production` para 2 sets de jobs distintos:
+
+1. **First gate** (post Vercel ready): aprueba los **4 Cloud Run workers** (ops-worker + commercial-cost-worker + ico-batch-worker + hubspot-greenhouse-integration).
+2. **Second gate** (post worker deploys): aprueba los **2 Azure Bicep deploys** (Teams Notifications + Teams Bot).
+
+El operador debe aprobar la `Production` environment **DOS VECES** — primera para workers, segunda para Azure. Cada aprobación crea un `pending_deployment` separado.
+
+**Pattern canónico para auto-approval scriptable** (cuando el operador autorizó plenariamente):
+
+```bash
+# Approve first gate (workers)
+gh api -X POST repos/<owner>/<repo>/actions/runs/<run_id>/pending_deployments \
+  -F 'environment_ids[]=12831857432' \
+  -f state=approved \
+  -f comment="<reason>"
+
+# Wait for workers to deploy → then second gate auto-emerges for Azure
+# Approve second gate (Azure)  — same env_id, second invocation
+gh api -X POST repos/<owner>/<repo>/actions/runs/<run_id>/pending_deployments \
+  -F 'environment_ids[]=12831857432' \
+  -f state=approved \
+  -f comment="<reason>"
+```
+
+`environment_ids[]` apunta al mismo numeric ID del environment Production (`12831857432` en este repo). Cada gate genera deployment ID distinto (`4680795919` workers, `4680866226+4680866228` Azure).
+
+**⚠️ Regla dura**: **NUNCA** asumir que aprobar el environment Production una sola vez completa el release. Verificar `gh api repos/<owner>/<repo>/actions/runs/<run_id>/pending_deployments` post-workers; si retorna 1+ deployments pendientes, aprobar nuevamente.
+
+#### Lesson 5 — Path B "recovery + ship" requiere code-first cuando ambos usan el mismo bug class
+
+Durante TASK-871 (mismo session) intenté "recovery + ship" como Path B (remediator con `policy='rolling_window_repair'`) ANTES de shippear el código que implementaba esa policy. Falló silenciosamente porque el remediator tenía la MISMA bug class TASK-871 internamente.
+
+**Pattern canónico**: cuando una recovery primitive depende de código que aún no está deployed, la secuencia DEBE ser:
+
+1. Code-first: implementar fix + tests + deploy ops-worker (auto via push develop).
+2. Wait for revisión Cloud Run con nuevo GIT_SHA LIVE.
+3. Recovery via la primitive ya deployada (cron Cloud Scheduler manual o admin endpoint).
+4. Verify signal returns ok=0.
+5. Re-run smoke tests post-recovery.
+6. Then release develop→main.
+
+**⚠️ Regla dura**: **NUNCA** invocar una recovery primitive (remediator / repair endpoint / cron manual) cuando el código que implementa la nueva policy aún no está deployed. Si la primitive tiene la bug class que estás intentando arreglar, recovery falla silente. Pattern reusable: code → deploy → verify revision → recovery → verify signal → release.
+
+#### Operational checklist canónico (para próximo release develop → main)
+
+Tiempo objetivo: **<30 min** para bundled releases típicos.
+
+```text
+[ ] 1. Verify develop green (CI + Playwright + ops-worker deploy SUCCESS por commit reciente)
+[ ] 2. Fetch + merge origin/main → develop si hay hotfixes en main
+[ ] 3. Switch a main + merge develop --no-ff con "release: ..." commit message
+[ ] 4. git push origin main
+[ ] 5. WAIT 5-8 min para Vercel production BUILDING → READY (`vercel list ... | head -3`)
+[ ] 6. WAIT for CI on the merge commit to complete green
+[ ] 7. Dispatch orchestrator: `gh workflow run production-release.yml --ref main -f target_sha=<sha> -f bypass_preflight_reason="<>=20 chars>"`
+[ ] 8. Approve first env gate via gh api (workers)
+[ ] 9. WAIT for workers to deploy
+[ ] 10. Approve second env gate via gh api (Azure Bicep)
+[ ] 11. WAIT for orchestrator transition_state → released SUCCESS
+[ ] 12. Dispatch watchdog: `gh workflow run production-release-watchdog.yml --ref main`
+[ ] 13. Verify all 4 Cloud Run GIT_SHAs match target_sha
+[ ] 14. Move resolved issues + update Handoff/changelog + close tasks
+```
+
+**Skills obligatorias antes de dispatch**: `greenhouse-production-release` (read SKILL.md + PRODUCTION_RELEASE_INCIDENT_PLAYBOOK_V1.md + GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md).
+
+**Spec canónica**: `docs/architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md` + `docs/operations/PRODUCTION_RELEASE_INCIDENT_PLAYBOOK_V1.md` + `docs/operations/runbooks/production-release.md`. Last successful release: `25825280928` manifest `e02cb32e9c30-5acb894c-f164-486c-99c0-074d42aefbeb` (2026-05-13).
 
 ### Production Release Orchestrator invariants (TASK-851)
 
