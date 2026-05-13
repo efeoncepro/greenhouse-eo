@@ -1,6 +1,9 @@
 import 'server-only'
 
+import Box from '@mui/material/Box'
+
 import { requireServerSession } from '@/lib/auth/require-server-session'
+import { resolveAccountManagerEmail } from '@/lib/client-portal/composition/resolve-account-manager-email'
 import { buildHomeEntitlementsContext } from '@/lib/home/build-home-entitlements-context'
 import { composeHomeSnapshot } from '@/lib/home/compose-home-snapshot'
 import { getHomeUserIdentity } from '@/lib/home/get-home-user-identity'
@@ -8,6 +11,8 @@ import { captureHomeShellError } from '@/lib/home/observability'
 import { resolveHomeRolloutFlag } from '@/lib/home/rollout-flags'
 import type { HomeUiDensity } from '@/lib/home/contract'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
+import ClientPortalDegradedBanner from '@/views/greenhouse/client-portal/empty-states/ClientPortalDegradedBanner'
+import ModuleNotAssignedEmpty from '@/views/greenhouse/client-portal/empty-states/ModuleNotAssignedEmpty'
 import HomeShellV2 from '@/views/greenhouse/home/v2/HomeShellV2'
 import HomeViewLegacy from '@/views/greenhouse/home/HomeView'
 
@@ -40,9 +45,47 @@ const normalizeDensity = (raw: string | null): HomeUiDensity => {
   return 'cozy'
 }
 
-export default async function HomePage() {
+type HomeSearchParams = {
+  /** Slug user-facing del módulo denegado por `requireViewCodeAccess` (TASK-827 Slice 4). */
+  readonly denied?: string
+
+  /** `'resolver_unavailable'` cuando page guard cae a fallback por throw del resolver. */
+  readonly error?: string
+}
+
+export default async function HomePage({
+  searchParams
+}: {
+  searchParams?: Promise<HomeSearchParams> | HomeSearchParams
+}) {
   const session = await requireServerSession()
   const { user } = session
+
+  // TASK-827 Slice 4 — 5-state contract handling pre-render.
+  // Si el page guard de una ruta cliente redirigió acá con ?denied= o ?error=,
+  // renderizamos el empty state honesto ANTES de la composition normal del home.
+  // Internal portal users no llegan acá con estos params (D1 bypass del guard).
+  const params: HomeSearchParams = searchParams ? await searchParams : {}
+
+  if (user.tenantType === 'client') {
+    if (params.error === 'resolver_unavailable') {
+      return (
+        <Box sx={{ p: 6, maxWidth: 720, mx: 'auto' }}>
+          <ClientPortalDegradedBanner mode='fallback' />
+        </Box>
+      )
+    }
+
+    if (params.denied) {
+      const accountManagerEmail = await resolveAccountManagerEmail(user.clientId ?? '')
+
+      return (
+        <Box sx={{ p: 6, maxWidth: 720, mx: 'auto' }}>
+          <ModuleNotAssignedEmpty publicSlug={params.denied} accountManagerEmail={accountManagerEmail} />
+        </Box>
+      )
+    }
+  }
 
   const [preferences, identity, rolloutFlag] = await Promise.all([
     fetchUserPreferences(user.userId),

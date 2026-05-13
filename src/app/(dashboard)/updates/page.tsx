@@ -2,8 +2,10 @@ import { redirect } from 'next/navigation'
 
 import GreenhouseUpdates from '@views/greenhouse/GreenhouseUpdates'
 
-import { hasAuthorizedViewCode } from '@/lib/tenant/authorization'
+import { requireViewCodeAccess } from '@/lib/client-portal/guards/require-view-code-access'
 import { getTenantContext } from '@/lib/tenant/get-tenant-context'
+
+export const dynamic = 'force-dynamic'
 
 export default async function Page() {
   const tenant = await getTenantContext()
@@ -12,15 +14,8 @@ export default async function Page() {
     redirect('/login')
   }
 
-  const hasAccess = hasAuthorizedViewCode({
-    tenant,
-    viewCode: 'cliente.actualizaciones',
-    fallback: tenant.routeGroups.includes('client')
-  })
-
-  if (!hasAccess) {
-    redirect(tenant.portalHomePath)
-  }
+  // TASK-827 Slice 4 — Page guard canonical resolver-based.
+  await requireViewCodeAccess('cliente.actualizaciones')
 
   return <GreenhouseUpdates />
 }

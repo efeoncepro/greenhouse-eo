@@ -4,7 +4,7 @@ import type { Metadata } from 'next'
 
 
 import GreenhouseDeliveryAnalytics from '@/views/greenhouse/GreenhouseDeliveryAnalytics'
-import { hasAuthorizedViewCode } from '@/lib/tenant/authorization'
+import { requireViewCodeAccess } from '@/lib/client-portal/guards/require-view-code-access'
 import { getTenantContext } from '@/lib/tenant/get-tenant-context'
 
 export const metadata: Metadata = {
@@ -20,15 +20,8 @@ const Page = async () => {
     redirect('/login')
   }
 
-  const hasAccess = hasAuthorizedViewCode({
-    tenant,
-    viewCode: 'cliente.analytics',
-    fallback: tenant.routeGroups.includes('client')
-  })
-
-  if (!hasAccess) {
-    redirect(tenant.portalHomePath)
-  }
+  // TASK-827 Slice 4 — Page guard canonical resolver-based.
+  await requireViewCodeAccess('cliente.analytics')
 
   return <GreenhouseDeliveryAnalytics />
 }

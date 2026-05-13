@@ -2,9 +2,8 @@ import { redirect } from 'next/navigation'
 
 import type { Metadata } from 'next'
 
-
 import GreenhouseClientTeam from '@/views/greenhouse/GreenhouseClientTeam'
-import { hasAuthorizedViewCode } from '@/lib/tenant/authorization'
+import { requireViewCodeAccess } from '@/lib/client-portal/guards/require-view-code-access'
 import { getTenantContext } from '@/lib/tenant/get-tenant-context'
 
 export const metadata: Metadata = {
@@ -20,15 +19,10 @@ const Page = async () => {
     redirect('/login')
   }
 
-  const hasAccess = hasAuthorizedViewCode({
-    tenant,
-    viewCode: 'cliente.equipo',
-    fallback: tenant.routeGroups.includes('client')
-  })
-
-  if (!hasAccess) {
-    redirect(tenant.portalHomePath)
-  }
+  // TASK-827 Slice 4 — Page guard canonical resolver-based (replace legacy
+  // hasAuthorizedViewCode). D1 bypass internal admins. Clientes con cliente.equipo
+  // asignado pasan; otros redirect a /home?denied=equipo.
+  await requireViewCodeAccess('cliente.equipo')
 
   return <GreenhouseClientTeam />
 }
