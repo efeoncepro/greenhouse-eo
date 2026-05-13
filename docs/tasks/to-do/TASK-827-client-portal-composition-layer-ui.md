@@ -697,36 +697,250 @@ Mandatory per state-design skill. Cada surface client-facing distingue 5 estados
 - Real-time updates via cross-instance cache invalidation V2 (si emerge necesidad demostrada — Redis o equivalente)
 - Audit log `client_portal.access.denied_attempts` post-cutover (si compliance lo escala)
 
-## Open Questions (escalar antes de arrancar Slice 4 page guards)
+## Resolved Decisions (closed 2026-05-13 — applied 4-pillar lens: safest/most robust/resilient/scalable)
 
-1. **`isInternalPortalUser=true` viendo `/proyectos` de un cliente** (e.g. admin haciendo soporte): el resolver es N/A porque scope es `organizationId` del cliente, no del admin. Recomendación: `requireViewCodeAccess` hace early-return `if (session.user.isInternalPortalUser) return` ANTES de invocar resolver. Confirmar con product: ¿internos ven el menu cliente cuando navegan surface cliente, o ven menu interno con un "switcher de contexto"?
+Las 7 open questions previas se cierran acá con la respuesta canónica seleccionada bajo el lens de seguridad / robustez / resilencia / escalabilidad. Cada decisión incluye opciones rechazadas con razón en una línea para preservar el rationale ante futuras revisiones.
 
-2. **`capabilityModules` (VerticalMenu líneas 109-112)**: hoy `resolveCapabilityModules({businessLines, serviceModules})` es hardcoded path legacy desde `session.user.businessLines/serviceModules`. Decisión bloqueante:
-   - **Opción A** — migrar al resolver EN TASK-827 (Slice 6 explota a ~Muy Alto effort)
-   - **Opción B** — documentar TODO + TASK derivada V1.1 (effort TASK-827 queda Alto)
-   - Recomendación: Opción B (preserva alcance + permite ship V1.0).
+### D1 (ex-Q1) — Internal user navegando surfaces cliente → `requireViewCodeAccess` bypasses resolver, no banner, no context switcher
 
-3. **`/home` para clientes — ruta canónica exacta**: `dashboardHref` en VerticalMenu es variable. ¿Es `/`, `/home`, `/pulse`? Spec V1 §12 referencia `/home` pero la convención del codebase no está pin-eada. Confirmar antes de Slice 4 (todos los redirects dependen).
+**Decisión**: `requireViewCodeAccess` hace early-return cuando `session.user.isInternalPortalUser === true`. El internal admin (EFEONCE_ADMIN, EFEONCE_OPERATIONS, support roles) accede a cualquier surface cliente para soporte legítimo sin invocar el resolver.
 
-4. **`account_manager_email` source**: CTA "Solicitar acceso" del `<ModuleNotAssignedEmpty>` usa `mailto:` con account manager. Source canónica:
-   - **Opción A**: `tenant_capabilities.account_manager_email` (legacy HubSpot-derived)
-   - **Opción B**: `organizations.account_manager_user_id → users.email` (canonical 360)
-   - Recomendación: Opción B con fallback a `support@efeoncepro.com` cuando null. Confirmar.
+**Patrón canónico**:
+```ts
+export const requireViewCodeAccess = async (viewCode: string): Promise<void> => {
+  const session = await requireServerSession()
 
-5. **Mobile responsive del menú**: spec dice "responsive del componente" sin declarar paridad. Recomendación: paridad exacta de viewCodes (mismo set en mobile y desktop), pattern Drawer responsive ya canónico en Vuexy. Confirmar UX.
+  // D1: internal bypass — support pattern, no impersonation, no audit trail V1.0
+  if (session.user.isInternalPortalUser) return
 
-6. **Skeleton del menu durante cache miss**: cache miss típicamente < 50ms (Postgres JOIN con composite indexes). Recomendación: NO skeleton para nav chrome — render directo. Skeleton aplica para data tables, no para navegación. Confirmar greenhouse-ux.
+  const organizationId = session.user.organizationId
+  if (!organizationId) redirect('/home')
 
-7. **Reliability signal del resolver — owner**: `client_portal.composition.resolver_failure_rate` lógicamente pertenece a TASK-829 (subsystem `Client Portal Health`), pero TASK-827 introduce el code path que lo emite. Decisión: coordinar entrega — el reader vive acá (Slice 8), pero el wire-up en `getReliabilityOverview` y el subsystem rollup se cierra en TASK-829. Confirmar handoff.
+  // ... resolver-gated path para clientes
+}
+```
+
+**Por qué (4-pilar)**:
+- **Safety**: writes en client-facing surfaces YA están gated por `requireAdminTenantContext + can()` (TASK-826). El bypass solo afecta READ. Cross-tenant contamination imposible (página filtra por `organizationId` del session, internal admin no tiene org propia).
+- **Robustness**: single code path, sin branching condicional complejo, sin estado adicional.
+- **Resilience**: si el resolver falla para un cliente, el internal admin sigue accediendo (debugging path preserved). Si emerge bug en path bypass, el blast radius es 0 (admin ya ve datos).
+- **Scalability**: O(1), zero overhead.
+
+**Rechazadas**:
+- Opción B (banner "viewing as client X" + same gating): defeats support purpose — admin no puede ayudar a cliente con algo que el cliente no ve.
+- Opción C (context switcher explícito): extra state, breaks flow, V1.0 overkill.
+
+**Trade-off documentado**: NO hay audit trail de "admin X accedió surface cliente Y" en V1.0. Si compliance escala (Ley 19.628 chilena, GDPR), V1.1 puede agregar logging via `captureWithDomain('identity', { source: 'internal_view_client_surface', ... })` sin breaking changes.
+
+### D2 (ex-Q2) — `capabilityModules` legacy stays untouched in TASK-827, V1.1 TASK derivada
+
+**Decisión**: Opción B — `capabilityModules` (VerticalMenu líneas 109-112) queda intacto en TASK-827. Migración al resolver vive en TASK derivada V1.1 ya registrada en Follow-ups (`capability-modules-resolver-migration`).
+
+**Patrón canónico**: inline comment en `VerticalMenu.tsx` líneas 109-112:
+```ts
+// TASK derivative V1.1: capability-modules-resolver-migration — replace with resolver-fed prop
+// See docs/tasks/to-do/TASK-827-client-portal-composition-layer-ui.md §Follow-ups
+const capabilityModules = resolveCapabilityModules({
+  businessLines: session?.user?.businessLines || [],
+  serviceModules: session?.user?.serviceModules || []
+})
+```
+
+**Por qué (4-pilar)**:
+- **Safety**: el legacy path NO compromete seguridad — sigue gateado por `canSeeView('cliente.modulos', true)` con `authorizedViews[]`. Capability modules son lectura, no escritura. Blast radius: existente.
+- **Robustness**: NO romper algo que funciona. La lint rule `no-untokenized-business-line-branching` está en `warn` no `error` — permite el code path mientras la migración planificada está en queue.
+- **Resilience**: ship TASK-827 en tiempo es más resiliente operacionalmente que esperar a una migración perfecta. ISSUE-075 promotion blocked-by ship V1.0 del EPIC.
+- **Scalability**: scope creep es el mayor riesgo de escalabilidad de delivery. Opción A explotaría effort a Crítico y bloquearía release.
+
+**Rechazada**:
+- Opción A (migrar EN TASK-827): scope explota a Crítico, riesgo de slip en shipping window, bloquea promoción a main del fix ISSUE-075. La complejidad real está en migrar las dependencias downstream (consumers de `capabilityModules` shape), no en el resolver call.
+
+**Trade-off documentado**: clientes verán `capabilityModules` legacy items en su menú "Módulos" junto a los items dinámicos del resolver. Operacionalmente coherente (ambos surfaces se renderizan), pero técnicamente híbrido hasta V1.1. Acceptable.
+
+### D3 (ex-Q3) — `/home` es ruta canónica del client tenant, creada/garantizada por TASK-827 Slice 4
+
+**Decisión**: `/home` es la ruta canónica para `tenant_type='client'`. Slice 4 garantiza que `src/app/(dashboard)/home/page.tsx` exista, es **siempre accesible** para client tenants (sin gating por viewCode), y sirve como terminator de redirects de todos los page guards.
+
+**Patrón canónico**:
+```tsx
+// src/app/(dashboard)/home/page.tsx
+export const dynamic = 'force-dynamic'
+
+export default async function HomePage({ searchParams }: { searchParams: { denied?: string; error?: string } }) {
+  const session = await requireServerSession()
+
+  // D1: internal admin redirected to admin home (separate concern)
+  if (session.user.isInternalPortalUser) redirect('/admin')
+
+  const { organizationId } = session.user
+  if (!organizationId) redirect('/login')
+
+  // D3: /home is terminator — NEVER gated by viewCode, always renders something
+  const modules = await resolveClientPortalModulesForOrganization(organizationId)
+    .catch(err => {
+      captureWithDomain(err, 'client_portal', { tags: { source: 'home_page', stage: 'resolver' } })
+      return []
+    })
+
+  // 5-state contract (§13)
+  if (searchParams.error === 'resolver_unavailable') return <ClientPortalDegradedBanner />
+  if (searchParams.denied) return <ModuleNotAssignedEmpty publicSlug={searchParams.denied} />
+  if (modules.length === 0) return <ClientPortalZeroStateEmpty />
+
+  return <ClientHomeView modules={modules} />
+}
+```
+
+**Por qué (4-pilar)**:
+- **Safety**: `/home` con `tenant_type='client'` siempre accessible — no hay forma de hacer un loop de redirects. Page guards en otras rutas redirigen acá con confianza.
+- **Robustness**: ruta única, predictable. NO depende de `dashboardHref` variable (que es codebase-internal y propenso a drift). Convention pin-eada en spec V1 §12.
+- **Resilience**: incluso si el resolver falla completamente, `/home` renderiza con 5-state contract (degraded/zero/normal). NUNCA blank screen.
+- **Scalability**: trivial — single route, single page component, server-side rendered.
+
+**Coordinación con código existente**:
+- `dashboardHref` variable en `VerticalMenu.tsx` debe resolver a `/home` para client tenants en Slice 6 (refactor branching legacy).
+- Si existe ya una ruta `/` o `/dashboard` que actúa como home para clientes, redirect-to-`/home` para single source of truth.
+- Slice 0 ya declara `cliente.home` en `VIEW_REGISTRY` con `route: '/home'` — coordinado.
+
+**Rechazadas**:
+- `/` (root): chocaría con landing/marketing si emergiera. Ambiguous.
+- `/pulse`: nombre del producto, no ruta. Pulse es viewCode dentro de home, no la ruta misma.
+- `/dashboard`: convención WordPress-style, no canónica en Greenhouse para clients.
+
+### D4 (ex-Q4) — `account_manager_email` resuelto vía canonical 360 con fallback chain explícita
+
+**Decisión**: nuevo helper canónico `resolveAccountManagerEmail(organizationId)` en `src/lib/client-portal/composition/resolve-account-manager-email.ts`. Order:
+
+```ts
+import 'server-only'
+
+export const resolveAccountManagerEmail = async (organizationId: string): Promise<string> => {
+  // 1. Canonical 360: organizations.account_manager_user_id → users.email
+  const canonical = await query<{ email: string | null }>(
+    `SELECT u.email
+     FROM greenhouse_core.organizations o
+     LEFT JOIN greenhouse_core.users u ON u.user_id = o.account_manager_user_id
+     WHERE o.organization_id = $1
+     LIMIT 1`,
+    [organizationId]
+  ).then(rows => rows[0]?.email ?? null).catch(() => null)
+
+  if (canonical) return canonical
+
+  // 2. Legacy HubSpot-derived fallback (during migration window)
+  const legacy = await query<{ email: string | null }>(
+    `SELECT account_manager_email
+     FROM greenhouse_core.tenant_capabilities
+     WHERE organization_id = $1
+     LIMIT 1`,
+    [organizationId]
+  ).then(rows => rows[0]?.email ?? null).catch(() => null)
+
+  if (legacy) return legacy
+
+  // 3. Hard fallback — CTA mailto MUST always work
+  return 'support@efeoncepro.com'
+}
+```
+
+**Por qué (4-pilar)**:
+- **Safety**: la canonical 360 source es FK-enforced (`organizations.account_manager_user_id → users.user_id`) — no hay risk de email phantom. Hard fallback `support@efeoncepro.com` garantiza que el CTA nunca falla.
+- **Robustness**: fallback chain con 3 niveles. Cada nivel cubre un failure mode distinto (org sin AM asignado, AM legacy desde HubSpot, total miss).
+- **Resilience**: si la query canonical falla por DB issue, cae a legacy. Si legacy también falla, cae a hardcoded support. CTA mailto **nunca** muestra placeholder, nunca queda vacío.
+- **Scalability**: 2 queries PG simples con índices existentes (`organizations.organization_id` PK, `tenant_capabilities.organization_id` FK). Cache TTL 5min in-process por organizationId (mirror pattern TASK-780).
+
+**Rechazada**:
+- Opción A sola (legacy HubSpot): drift garantizado contra canonical 360. Email puede estar stale.
+- Solo canonical sin fallback: si `account_manager_user_id IS NULL` (estado válido durante onboarding), CTA mailto rompe.
+
+### D5 (ex-Q5) — Mobile responsive: paridad exacta con Vuexy Drawer
+
+**Decisión**: paridad exacta de viewCodes entre desktop, tablet y mobile. Pattern Vuexy responsive Drawer (ya canónico en codebase) renderiza el mismo set de `navItems` con CSS responsive.
+
+**Por qué (4-pilar)**:
+- **Safety**: single source of truth de navegación — el cliente ve lo mismo en cualquier device. NO hay forma de que un viewCode "se pierda" en mobile.
+- **Robustness**: NO 2 code paths a mantener. Test E2E Playwright corre 1 vez por perfil, no 3 (desktop/tablet/mobile).
+- **Resilience**: si emerge un viewCode nuevo (TASK-derivadas V1.1), aparece automáticamente en todos los breakpoints sin trabajo adicional.
+- **Scalability**: O(1) overhead. Vuexy Drawer ya implementado, zero custom CSS necesario.
+
+**Rechazadas**:
+- Reduced set en mobile: requiere decision tree per-viewCode ("is this mobile-friendly?") que NO escala.
+- Bottom nav vs drawer: 2 componentes a mantener, drift inevitable.
+
+**Trade-off documentado**: si emerge un viewCode con UI que NO funciona en mobile (e.g. tabla con 20 columnas), el FIX es en el viewCode component (responsive design), no en el menú. Menú compone declarativamente, no decide.
+
+### D6 (ex-Q6) — Sin skeleton para navegación, render directo
+
+**Decisión**: `<ClientPortalNavigation>` NO usa skeleton. Server component bloquea el render hasta que el resolver devuelve. Cache hit típico <5ms, miss <50ms con composite indexes.
+
+**Por qué (4-pilar)**:
+- **Safety**: skeleton con shape incorrecta causa CLS (Cumulative Layout Shift) que afecta Core Web Vitals + accessibility. Render directo es safer visualmente.
+- **Robustness**: zero extra component a mantener. NO skeleton-vs-real shape drift posible.
+- **Resilience**: cache miss <50ms es imperceptible. Si el resolver tarda >200ms (rare), el page LOAD percibido es delayed pero el menú aparece completo, NO roto.
+- **Scalability**: skeleton agrega bytes al bundle + render time. Por trivial que sea, suma.
+
+**Pattern canónico Greenhouse**: skeleton aplica para data tables con >5 rows (forms-ux + state-design skill), NO para navigation chrome (greenhouse-ux skill).
+
+**Rechazada**:
+- Skeleton siempre: overhead sin beneficio cuando cache hit es ~99%.
+- Skeleton condicional (solo si latency > 200ms): impossible de detectar server-side sin medir, NO worth la complejidad.
+
+**Trade-off documentado**: en first paint del cold cache, el cliente espera ~50ms más vs un skeleton que rellena visualmente. Acceptable porque el nav NO es content principal — el page body lo es.
+
+### D7 (ex-Q7) — Reliability signal lives in TASK-827, subsystem rollup migra en TASK-829
+
+**Decisión**: TASK-827 Slice 8 implementa:
+- Reader `src/lib/reliability/queries/client-portal-resolver-failure-rate.ts`
+- Wire-up en `getReliabilityOverview` con `moduleKey='identity'` (subsystem existente)
+- Tests anti-regresión
+
+TASK-829 después:
+- Crea `moduleKey='client_portal'` en `STATIC_RELIABILITY_REGISTRY` con subsystem rollup `Client Portal Health`
+- Migra este signal + 5 nuevos al nuevo subsystem
+- Tests parity TS↔DB del nuevo subsystem
+
+**Patrón canónico (Slice 8)**:
+```ts
+// src/lib/reliability/queries/client-portal-resolver-failure-rate.ts
+export const CLIENT_PORTAL_RESOLVER_FAILURE_RATE_SIGNAL_ID =
+  'client_portal.composition.resolver_failure_rate'
+
+export const getClientPortalResolverFailureRateSignal = async (): Promise<ReliabilitySignal> => {
+  // ... query outbox_reactive_log + sentry incidents últimas 5min
+  return {
+    signalId: CLIENT_PORTAL_RESOLVER_FAILURE_RATE_SIGNAL_ID,
+    moduleKey: 'identity',  // TEMP — TASK-829 migra a 'client_portal'
+    kind: 'drift',
+    // ...
+  }
+}
+```
+
+**Por qué (4-pilar)**:
+- **Safety**: el signal nace junto con el code path que emite el failure mode — single PR para reviewer = single mental model.
+- **Robustness**: no hay risk de "signal sin code path" o "code path sin signal". Ambos shippean juntos.
+- **Resilience**: TASK-827 ships con observabilidad day-1. Operator ve el signal en `/admin/operations` desde el primer deploy.
+- **Scalability**: TASK-829 puede iterar sin bloquear TASK-827. La migración del moduleKey es una refactor PR aislado (cambia 1 string, los consumers no notan).
+
+**Coordinación explícita**:
+- TASK-827 Slice 8 menciona en comment que `moduleKey='identity'` es temporal hasta TASK-829
+- TASK-829 spec debe declarar la migración del signal en su Scope
+- Tests de TASK-827 NO assertean `moduleKey === 'identity'` (assert presencia, no valor específico) — esto evita romper tests cuando TASK-829 migre
+
+**Rechazada**:
+- Postergar el signal a TASK-829: TASK-827 ship sin observability, primer Sentry alert es la única señal — defeats purpose de signals proactivos.
+- Crear `Client Portal Health` subsystem en TASK-827: scope creep, TASK-829 lo tiene en su roadmap por buena razón (incluye 5 signals más + legacy backfill).
 
 ## Effort Reasoning
 
-- `Alto` → `Muy Alto` (era Alto pre-adjust 2026-05-13):
+- `Alto` → `Muy Alto` (era Alto pre-adjust 2026-05-13, **CONFIRMADO estable post-decisions 2026-05-13**):
   - +Slice 0 parity 11 view_codes + CI gate (effort medio)
-  - +Boundary explícito internal/client + helper `requireViewCodeAccess` con bypass (effort bajo, pero requiere claridad)
-  - +5-state matrix completo con 3 components empty state distintos (effort medio — antes era 1 component)
+  - +Boundary explícito internal/client + helper `requireViewCodeAccess` con bypass D1 (effort bajo)
+  - +5-state matrix completo con 3 components empty state distintos (effort medio)
   - +Slug mapping `mapViewCodeToPublicSlug` con tests cobertura 100% (effort bajo)
-  - +Reliability signal coordinado (effort bajo)
+  - +Reliability signal D7 con `moduleKey='identity'` temporal (effort bajo)
+  - +`resolveAccountManagerEmail` helper D4 con fallback chain (effort bajo)
+  - +`/home` page D3 con 5-state contract (effort bajo — page existe casi en su totalidad, solo coordinar con `dashboardHref`)
   - +TASK derivadas explícitas (overhead documental, no implementación)
 
-Si Q2 (Opción A `capabilityModules` migration) entra en scope, effort escala a `Crítico`. Recomendación: cerrar Q2 antes de arrancar Slice 1.
+**Effort Crítico evitado**: D2 (Opción B) preserva alcance al diferir `capabilityModules` migration a TASK derivada V1.1. Effort se mantiene `Muy Alto` estable, NO escala a `Crítico`.
