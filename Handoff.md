@@ -1,16 +1,59 @@
-# Sesion 2026-05-12 — TASK-826 arch-architect verdict + implementation on develop
+# Sesion 2026-05-12 — TASK-826 CERRADA on develop (EPIC-015 child 5/8 ✅)
 
-- **Trigger**: post TASK-825 cierre, usuario pidió arch-architect verdict sobre TASK-826 (Client Portal Admin Endpoints + 7 Capabilities + Audit + UI Admin, EPIC-015 child 5/8). Task más densa del EPIC. Verdict: 5 correcciones (3 bloqueantes + 1 reclasificación Effort + 1 polish) + 3 Open Questions resueltas pre-execution; implementación directa en develop con 8 slices.
+- **Trigger**: post TASK-825 cierre, usuario pidió arch-architect verdict sobre TASK-826 (Client Portal Admin Endpoints + Capabilities + Audit + UI Admin). Task más densa del EPIC. Verdict: 5 correcciones aplicadas pre-Slice-1; implementación directa en develop con 8 slices secuenciales.
 - **5 correcciones canonizadas en spec v1.1 (commit `2301e9e7`)**:
-  1. **(Bloqueante)** `business_line` drift residual (8 refs en spec). V1.4 §3.1 reconciliación: column DB + code → `applicability_scope` (V1.2 rename); capability + signal names preservan `business_line` (concepto operator-facing).
-  2. **(Bloqueante)** `requireServerSession` → `requireAdminTenantContext()` + `can()` doble gate (CLAUDE.md admin endpoints canónico, TASK-839/848/850 mirror).
-  3. **(Bloqueante)** Zod → `ClientPortalValidationError` + assertion functions custom (CLAUDE.md / greenhouse-backend skill canónico, pattern TASK-finance).
-  4. **(Reclasificación)** Effort Medio → Alto; 8 slices secuenciales (no split en 826A+826B — handoff overhead).
-  5. **(Polish bloqueante)** Parity test capabilities[] heredado de TASK-824 Delta — agregado a Files owned + AC.
-- **3 Open Questions resueltas pre-execution**: catalog UI V1.0 read-only (POST/PUT diferidos V1.1 → reduce scope 7→6 endpoints), pause sin reason permitido con placeholder audit, `org.businessLine` resolver via `service_modules.module_code WHERE module_kind='business_line'` (TASK-016 canonical).
-- **Decisión operativa**: implementación directa sobre `develop`, sin branch separada (instrucción explícita).
-- **Task movida** `to-do/` → `in-progress/`. README + Handoff sync.
-- **Plan**: 8 slices secuenciales (errors+audit+resolver-helper → 4 commands enable/pause-resume/expire-churn → capabilities+seed+parity → 6 endpoints → 2 UI surfaces → tests integration e2e).
+  1. `business_line` drift residual → V1.4 §3.1 reconciliación: column DB + code → `applicability_scope`; capability + signal names preservan `business_line` operator-facing.
+  2. `requireServerSession` → `requireAdminTenantContext()` + `can()` doble gate (TASK-839/848/850 mirror).
+  3. Zod → `ClientPortalValidationError` + assertion functions custom (greenhouse-backend skill canónico).
+  4. Effort Medio → Alto; 8 slices secuenciales.
+  5. Parity test capabilities[] heredado de TASK-824 Delta.
+- **3 Open Questions resueltas pre-execution**: catalog UI V1.0 read-only (POST/PUT diferidos V1.1), pause sin reason permitido, `org.businessLine` resolver via `service_modules.module_code WHERE module_kind='business_line'`.
+
+- **Cierre 2026-05-12**: 9 commits incrementales sin PR ceremony directo en develop.
+  - `41463118` baseline (move to-do→in-progress + spec v1.1 corrections + Lifecycle sync)
+  - `bab760ad` Slice 1 — errors + audit log writer + resolveOrganizationCanonicalBusinessLines helper + 23 tests
+  - `0059579b` Slice 2 — enableClientPortalModule atomic command + 14 tests (idempotency, BL check, override flow)
+  - `93bc0a4c` Slice 3 — pause/resume commands + 12 tests (state machine + terminal block)
+  - `e4cf8c96` Slice 4 — expire/churn terminal transitions + 12 tests (effective_to, cross-terminal block)
+  - `33a61401` Slice 5 — **19 capabilities materializadas** (7 admin + 12 client-facing read) + 3 seed migrations canónicas + parity test bi-direccional (TS↔DB + seed ⊆ catalog) + 10 unit + 2 live tests
+  - `6d754727` Slice 6 — 4 HTTP endpoints admin doble-gate `requireAdminTenantContext + can()` + 20 integration tests
+  - `21662d02` Slice 7 — 2 UI surfaces Vuexy (`/admin/client-portal/{catalog, organizations/[id]/modules}`) + microcopy `GH_CLIENT_PORTAL_ADMIN` (es-CL validado por skill `greenhouse-ux-writing`) + DataTableShell + 3-dot menu + override flow expandible + churn typing-confirm
+  - `dd39b778` Slice 8 — 6 lifecycle e2e tests + EVENT_CATALOG Delta 2026-05-12 con 5 events v1 documentados
+
+- **Resultados verificados**:
+  - 136/140 tests verde (4 skipped por ausencia de PG en CI sin proxy)
+  - `npx tsc --noEmit` + `npx eslint` clean
+  - 3 migrations live aplicadas vs `greenhouse-pg-dev` (Cloud SQL Proxy)
+  - Parity test live verde: TS catalog (19 entries module=client_portal) ↔ DB capabilities_registry (19 rows) + seed modules.capabilities[] (12 distinct) ⊆ TS catalog
+  - 19 capabilities granulares least-privilege canonizadas: admin (`module.{read_assignment,enable,disable,pause,override_business_line_default}` + `catalog.manage` + `assignment.migrate_legacy`) + client-facing read (`{pulse,creative_hub,csc_pipeline,brand_intelligence,cvr,roi,exports.generate,staff_aug,web_delivery,assigned_team,crm_command,cvr.export}`)
+  - 5 outbox events v1 documentados en EVENT_CATALOG Delta 2026-05-12
+
+- **5 commands canónicos atomic-tx** (`src/lib/client-portal/commands/`):
+  - `enableClientPortalModule` — 5 pasos canónicos (idempotency check → fetch module → BL check con cross/empty/match/override → INSERT+audit+outbox → post-tx cache invalidation skip-if-idempotent)
+  - `pauseClientPortalModule`, `resumeClientPortalModule` — state machine enforce (terminal block 409)
+  - `expireClientPortalModule`, `churnClientPortalModule` — terminal transitions + cross-terminal block + effectiveTo default hoy
+  - Todos respetan invariante: NO bypass desde consumers (single helper canónico) + idempotency idempotent=true sin re-emit
+
+- **UI surfaces** validadas con skills `greenhouse-ux` + `greenhouse-ux-writing` + `modern-ui`:
+  - Card outlined + CardHeader con CTA primario "Habilitar módulo"
+  - DataTableShell wrapper (TASK-743 contract — 8+ columnas)
+  - Status chip outlined con color semántico (success/warning/info/error)
+  - 3-dot menu actions filtered por status (pause solo si active, resume solo si paused, expire si non-terminal, churn siempre)
+  - Dialog Enable con form base + Switch override colapsable que expande Alert warning + textarea (`≥20` chars)
+  - Dialog Churn con typing-confirm (escribir `module_key` para enable Confirmar)
+  - Microcopy `GH_CLIENT_PORTAL_ADMIN`: "Dar de baja" en lugar de "Churn", "Piloto" en lugar de "Pilot", consequence-clear confirmations
+
+- **Defense-in-depth canonizada**:
+  - Atomic tx PG (UPDATE + audit + outbox en misma transacción)
+  - Append-only audit log `module_assignment_events` enforced por PG triggers
+  - Anti pre-up-marker check INSIDE migrations (TASK-838 pattern, 3 migrations)
+  - Parity test live TS↔DB rompe build si emerge drift
+  - DataTableShell + lint rules + DESIGN.md tokens
+
+- **Desbloquea**:
+  - TASK-827 (UI cliente compose desde resolver + page guards + empty states)
+  - TASK-828 (cascade reactive `client.lifecycle.case.completed` → `enableClientPortalModule`/`churnClientPortalModule` directo)
+  - TASK-829 (reliability signals + legacy backfill)
 
 ---
 

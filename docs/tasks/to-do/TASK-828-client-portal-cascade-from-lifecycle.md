@@ -11,8 +11,23 @@
 - Status real: `Diseno (TASK-824 cerrada 2026-05-12; columna engagement_commercial_terms.bundled_modules ya disponible)`
 - Rank: `TBD`
 - Domain: `client_portal`
-- Blocked by: `TASK-820, TASK-826` (TASK-825 cerrada 2026-05-12)
+- Blocked by: `TASK-820` (TASK-825 + TASK-826 cerradas 2026-05-12)
 - Branch: `task/TASK-828-client-portal-cascade`
+
+## Delta 2026-05-12 — TASK-826 cerrada, commands canónicos disponibles
+
+TASK-826 cerró 2026-05-12 con 5 commands canónicos atomic-tx exportados desde `src/lib/client-portal/commands/`:
+
+- `enableClientPortalModule({ organizationId, moduleKey, source: 'lifecycle_case_provision', status: 'active' | 'pilot', effectiveFrom, expiresAt?, approvedByUserId, sourceRefJson, overrideBusinessLineMismatch?, overrideReason? })` — atomic tx PG con BL check, idempotency, audit, outbox v1, cache invalidation. **El reactive consumer debe llamar este helper directo**, NO componer su propia tx.
+- `churnClientPortalModule({ assignmentId, actorUserId, reason, effectiveTo? })` — para módulos que dejan de aplicar post-lifecycle (cliente cambia tier/bundle).
+- `expireClientPortalModule(...)` — para módulos pilot que expiran al cumplir milestone.
+- `pauseClientPortalModule` / `resumeClientPortalModule` — disponibles si emerge necesidad de pause cascade (V1.0 NO usa).
+
+**Outbox events v1 emitidos**: `client.portal.module.assignment.{created,paused,resumed,expired,churned}` — el reactive consumer consume `client.lifecycle.case.completed` (TASK-820) y produce events derivados via los commands.
+
+**Capability del consumer**: el reactive consumer corre con identity sistema (no usuario operador). El audit log registra `actor_user_id='system_cascade'` o equivalente. NO requiere capability check porque corre fuera del request path (cron Cloud Run worker).
+
+**Idempotency en cascade**: `enableClientPortalModule` detecta duplicate (same org+module activo) y retorna `idempotent=true` sin emit outbox. Reentries del cron NO duplican assignments — patrón TASK-773 reactive consumer canónico.
 
 ## Delta 2026-05-12 — TASK-825 cerrada, cache invalidation pattern canonizado
 

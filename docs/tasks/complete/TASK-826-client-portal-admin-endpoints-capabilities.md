@@ -2,7 +2,8 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
+- Completed at: `2026-05-12`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto` (era Medio; reclasificado por verdict v1.1 — 8 slices densos: errors+audit + 4 commands + capabilities+parity + endpoints + UI + tests)

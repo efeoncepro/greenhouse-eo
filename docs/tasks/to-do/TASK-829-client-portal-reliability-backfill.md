@@ -14,6 +14,16 @@
 - Blocked by: `TASK-828`
 - Branch: `task/TASK-829-client-portal-reliability-backfill`
 
+## Delta 2026-05-12 — TASK-826 cerrada, command `enableClientPortalModule` + capability `migrate_legacy` disponibles
+
+TASK-826 cerró 2026-05-12 con:
+
+- `enableClientPortalModule(input)` atomic-tx command exportado desde `src/lib/client-portal/commands/enable-module.ts`. El backfill batch DEBE consumir este helper directo, NO componer su propia tx.
+- Capability `client_portal.assignment.migrate_legacy` (scope=`all`, EFEONCE_ADMIN only) ya seedeada en `capabilities_registry` para gating del backfill admin endpoint/CLI.
+- `source: 'migration_backfill'` (canonical assignment source) disponible en el enum del state machine para distinguir audit rows del backfill vs cascade lifecycle vs admin manual.
+- Idempotency built-in: `enableClientPortalModule` detecta duplicates (org+module activo) y retorna `idempotent=true` sin emit outbox. Reentries del backfill batch NO duplican rows.
+- Outbox event `client.portal.module.assignment.created` v1 con `payload.source='migration_backfill'` emitido por cada nueva fila — base canónica para audit del backfill.
+
 ## Summary
 
 Cierra V1.0 EPIC-015: 6 reliability signals registrados bajo nuevo subsystem `Client Portal Health`, backfill idempotente desde legacy `tenant_capabilities` con dry-run obligatorio, y validación end-to-end del flow completo en producción. Ejecuta migración Fase A (dry-run staging) → Fase B (apply staging) → Fase C (apply producción).
