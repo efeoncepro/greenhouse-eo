@@ -14,6 +14,28 @@
 - Blocked by: `none` (TASK-825 cerrada 2026-05-12; D1-D7 resueltas 2026-05-13)
 - Branch: `develop` (sin branch separada, mismo pattern TASK-822/823/824/825/826)
 
+## Delta 2026-05-13 — Baseline recalibration pre-execution (post Discovery FASE 1)
+
+Discovery cross-módulos (3 subagentes Explore en paralelo) detectó 4 supuestos del spec desactualizados frente al repo real. Recalibración:
+
+- **VIEW_REGISTRY ya tiene 11 entries `cliente.*`** (no 4 como decía spec V1.4): `cliente.{pulse, proyectos, ciclos, configuracion, equipo, analytics, revisiones, actualizaciones, campanas, modulos, notificaciones}`. Slice 0 agrega **5 faltantes** (no 11), no **11**.
+- **Naming drift cliente.reviews vs cliente.revisiones**: el seed `modules.view_codes[]` (migration `20260512184739712_task-824-client-portal-ddl.sql`) declara `cliente.reviews` (inglés), pero VIEW_REGISTRY usa `cliente.revisiones` (español). Slice 0 forward-fix migration UPDATE alinea el seed al nombre canonical español (consistente con `GH_CLIENT_NAV`).
+- **`/home` ya existe** como `HomeShellV2` con `requireServerSession`. Slice 4 NO crea la página — extiende el shell existente para soportar el 5-state contract (`?denied=`, `?error=`, zero-state, normal).
+- **`tests/visual/` NO existe en repo** — el proyecto usa solo `tests/e2e/smoke/*.spec.ts` con Playwright. Slice 8 pivota de visual regression snapshots a **E2E + RTL render tests** (mismo objetivo de cobertura, herramienta existente).
+
+**Recalibración count viewCodes faltantes**:
+
+Intersección DB seed vs VIEW_REGISTRY:
+- En AMBOS (4): `cliente.{pulse, proyectos, equipo, campanas}` ✓
+- En seed pero NO en VIEW_REGISTRY (11): `cliente.{creative_hub, reviews→revisiones, roi_reports, exports, cvr_quarterly, home, staff_aug, brand_intelligence, csc_pipeline, crm_command, web_delivery}`
+- Con `cliente.reviews→revisiones` aligned via migration UPDATE (drift fix), efectivamente faltan **10 viewCodes nuevos** en VIEW_REGISTRY (`cliente.{creative_hub, roi_reports, exports, cvr_quarterly, home, staff_aug, brand_intelligence, csc_pipeline, crm_command, web_delivery}`)
+- `cliente.home` es uno de los 10 — extender VIEW_REGISTRY con entry apuntando a `/home` (ruta existente)
+
+**Total acciones Slice 0 actualizadas**:
+1. Forward-fix migration: `modules.view_codes[]` array UPDATE: `cliente.reviews` → `cliente.revisiones` (1 row affected, `creative_hub_globe_v1` module)
+2. Extender `VIEW_REGISTRY` con 10 entries nuevas
+3. Parity test + CI gate (sin cambio)
+
 ## Delta 2026-05-13 — Ajustes spec post audit 4-lens (arch-architect + info-architecture + state-design + greenhouse-ux)
 
 Audit canónico con 4 lentes (skill `arch-architect` overlay Greenhouse + `info-architecture` + `state-design` + `greenhouse-ux`) identificó 7 hallazgos que se integran a la spec antes de arrancar:
