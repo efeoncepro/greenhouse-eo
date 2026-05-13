@@ -2,6 +2,7 @@ import 'server-only'
 
 import { randomUUID } from 'node:crypto'
 
+import { resolveCleanSeedDate } from '@/lib/finance/account-balances-clean-seed-resolver'
 import { rematerializeAccountBalanceRange } from '@/lib/finance/account-balances-rematerialize'
 import { refreshMonthlyBatch } from '@/lib/finance/account-balances-monthly'
 import {
@@ -11,11 +12,30 @@ import {
 } from '@/lib/reliability/queries/account-balances-fx-drift'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
+/**
+ * FX drift remediation policies.
+ *
+ * - `detect_only` (default): plan + decide, never mutate. Operator audit.
+ * - `auto_open_periods`: legacy — auto-remediate open-period drift with
+ *   `active_otb` seedMode. Wide scope; can collide with protected evidence
+ *   if OTB anchor lives behind reconciled snapshots.
+ * - `known_bug_class_restatement`: explicit restatement across protected
+ *   evidence (ISSUE-069 seed-blind-spot signature). Uses `warn_only`
+ *   evidence guard. Rare; requires operator intent.
+ * - `strict_no_restatement`: only repairs open-period drift with source
+ *   evidence; never touches protected closings.
+ * - `rolling_window_repair` (TASK-871): canonical narrow-scope policy for
+ *   recent seed-blind-spot drift. Uses `computeRollingRematerializationWindow`
+ *   + `resolveCleanSeedDate` to pick a movement-free anchor and
+ *   `seedMode: 'explicit'` (preserves OTB cache). Evidence guard stays in
+ *   `block_on_reconciled_drift` mode — never restates over reconciled snapshots.
+ */
 export type FxDriftRemediationPolicy =
   | 'detect_only'
   | 'auto_open_periods'
   | 'known_bug_class_restatement'
   | 'strict_no_restatement'
+  | 'rolling_window_repair'
 
 export type FxDriftRemediationDecisionKind =
   | 'auto_remediable'
@@ -75,6 +95,34 @@ export type FxDriftRemediationAccountRun = {
   evidenceGuardMode?: 'block_on_reconciled_drift' | 'warn_only' | 'off'
   monthlyRefreshed?: number
   monthlySkipped?: number
+  /**
+   * TASK-871 — seed mode used by the rematerializer. `explicit` means the
+   * caller (rolling_window_repair) supplied a movement-free seed; `active_otb`
+   * means the rematerializer resolved the seed from the canonical Opening
+   * Trial Balance declaration.
+   */
+  seedMode?: 'explicit' | 'active_otb'
+  /**
+   * TASK-871 — when the rolling repair walked backward through dirty days to
+   * find a clean anchor, this captures the expansion telemetry. Empty when
+   * the original seed candidate was already movement-free.
+   */
+  cleanSeedExpansion?: {
+    originalSeed: string
+    cleanSeed: string
+    daysExpanded: number
+  }
+  /**
+   * TASK-871 — when the integrity check could not find a clean anchor within
+   * `maxExpandDays`, the account is skipped without invoking the
+   * rematerializer. The caller escalates to historical_restatement.
+   */
+  skipped?: {
+    reason: 'integrity_check_exceeded_max_expand'
+    originalSeed: string
+    lastCheckedSeed: string
+    daysExpanded: number
+  }
 }
 
 export type FxDriftRemediationResult = FxDriftRemediationPlan & {
@@ -104,6 +152,14 @@ const DEFAULT_MAX_ABS_DRIFT_CLP = '5000000'
 const ymd = (date: Date) => date.toISOString().slice(0, 10)
 
 const todayYmd = () => ymd(new Date())
+
+const subOneDayIso = (dateString: string) => {
+  const prev = new Date(`${dateString}T00:00:00.000Z`)
+
+  prev.setTime(prev.getTime() - 86_400_000)
+
+  return prev.toISOString().slice(0, 10)
+}
 
 const clampInteger = (value: number | undefined, fallback: number, min: number, max: number) => {
   if (typeof value !== 'number' || !Number.isFinite(value)) return fallback
@@ -271,6 +327,43 @@ const classifyRow = ({
       absDriftClp: row.absDriftClp,
       decision: 'auto_remediable',
       reason: 'open_period_drift_with_source_evidence_strict_policy_allows_no_protected_restatement',
+      evidence: baseEvidence
+    }
+  }
+
+  // TASK-871 — canonical narrow-scope policy for recent seed-blind-spot
+  // drift. Matches when the row signature is the well-known
+  // ISSUE-069/TASK-871 pattern, the period is open, and there is no
+  // protected snapshot on the exact affected day. The executor uses the
+  // canonical rolling window primitive + clean seed resolver to repair the
+  // drift without touching protected closings.
+  if (policy === 'rolling_window_repair' && matchesKnownSeedBlindSpotSignature(row)) {
+    return {
+      accountId: row.accountId,
+      accountName: row.accountName,
+      balanceDate: row.balanceDate,
+      driftClp: row.driftClp,
+      absDriftClp: row.absDriftClp,
+      decision: 'auto_remediable',
+      reason: 'rolling_window_repair_eligible',
+      evidence: baseEvidence
+    }
+  }
+
+  // TASK-871 — when policy is rolling_window_repair but the row does NOT
+  // match the seed-blind-spot signature (e.g. drift caused by a different
+  // bug class), keep it visible as `unknown_requires_review` so a human
+  // can triage. Avoid silently auto-remediating drift the policy was not
+  // designed for.
+  if (policy === 'rolling_window_repair') {
+    return {
+      accountId: row.accountId,
+      accountName: row.accountName,
+      balanceDate: row.balanceDate,
+      driftClp: row.driftClp,
+      absDriftClp: row.absDriftClp,
+      decision: 'unknown_requires_review',
+      reason: 'rolling_window_repair_signature_mismatch',
       evidence: baseEvidence
     }
   }
@@ -486,10 +579,106 @@ export const remediateAccountBalancesFxDrift = async (
         byAccount.set(decision.accountId, accountDecisions)
       }
 
+      // TASK-871 — adapter so `resolveCleanSeedDate` (Pick<PoolClient, 'query'>)
+      // can run against `runGreenhousePostgresQuery` (pool-managed, read-only).
+      // The check is idempotent; racing against in-flight settlement legs is
+      // acceptable — the reliability signal catches any drift on the next run.
+      const queryAdapter = {
+        query: async <T extends Record<string, unknown>>(sql: string, params: readonly unknown[]) => {
+          const rows = await runGreenhousePostgresQuery<T>(sql, params as unknown[])
+
+          return { rows } as { rows: T[] }
+        }
+      }
+
       for (const [accountId, decisions] of byAccount) {
         const fromDate = decisions.map(decision => decision.balanceDate).sort()[0]
         const toDate = normalizeDate(input.toDate) ?? todayYmd()
         const hasKnownRestatement = decisions.some(decision => decision.decision === 'known_bug_class_restatement')
+
+        const isRollingWindowRepair = decisions.every(
+          decision => decision.reason === 'rolling_window_repair_eligible'
+        )
+
+        // TASK-871 — canonical rolling repair path. Uses `seedMode='explicit'`
+        // so the OTB declaration cache is not mutated, and resolves the seed
+        // via the integrity check helper to guarantee the mute anchor is
+        // movement-free.
+        if (isRollingWindowRepair) {
+          const candidateSeed = subOneDayIso(fromDate)
+
+          const integrity = await resolveCleanSeedDate({
+            client: queryAdapter as never,
+            accountId,
+            candidateSeedDate: candidateSeed
+          })
+
+          if (!integrity.ok) {
+            runs.push({
+              accountId,
+              fromDate: candidateSeed,
+              toDate,
+              evidenceGuardMode: 'block_on_reconciled_drift',
+              seedMode: 'explicit',
+              skipped: {
+                reason: 'integrity_check_exceeded_max_expand',
+                originalSeed: integrity.originalSeed,
+                lastCheckedSeed: integrity.lastCheckedSeed,
+                daysExpanded: integrity.daysExpanded
+              }
+            })
+
+            continue
+          }
+
+          // Read previous closing as opening seed. With `seedMode='explicit'`
+          // the rematerializer trusts the supplied opening; we use the
+          // closing of the latest snapshot at or before the clean seed.
+          const seedRow = await runGreenhousePostgresQuery<{ closing_balance: string }>(
+            `SELECT closing_balance::text
+             FROM greenhouse_finance.account_balances
+             WHERE account_id = $1 AND balance_date <= $2::date
+             ORDER BY balance_date DESC LIMIT 1`,
+            [accountId, integrity.cleanSeed]
+          )
+
+          const opening = seedRow.length > 0 ? Number(seedRow[0].closing_balance) : 0
+
+          const rematerialized = await rematerializeAccountBalanceRange({
+            accountId,
+            seedDate: integrity.cleanSeed,
+            openingBalance: opening,
+            endDate: toDate,
+            seedMode: 'explicit',
+            evidenceGuard: { mode: 'block_on_reconciled_drift' }
+          })
+
+          const monthly = await refreshMonthlyBatch(
+            monthKeysForRange(accountId, rematerialized.seedDate, toDate)
+          )
+
+          runs.push({
+            accountId,
+            fromDate: rematerialized.seedDate,
+            toDate: rematerialized.endDate,
+            daysMaterialized: rematerialized.daysMaterialized,
+            finalClosingBalance: String(rematerialized.finalClosingBalance),
+            evidenceGuardMode: 'block_on_reconciled_drift',
+            seedMode: 'explicit',
+            cleanSeedExpansion: integrity.daysExpanded > 0
+              ? {
+                  originalSeed: integrity.originalSeed,
+                  cleanSeed: integrity.cleanSeed,
+                  daysExpanded: integrity.daysExpanded
+                }
+              : undefined,
+            monthlyRefreshed: monthly.refreshed,
+            monthlySkipped: monthly.skipped
+          })
+
+          continue
+        }
+
         const evidenceGuardMode = hasKnownRestatement ? 'warn_only' : 'block_on_reconciled_drift'
 
         const rematerialized = await rematerializeAccountBalanceRange({
@@ -510,6 +699,7 @@ export const remediateAccountBalancesFxDrift = async (
           daysMaterialized: rematerialized.daysMaterialized,
           finalClosingBalance: String(rematerialized.finalClosingBalance),
           evidenceGuardMode,
+          seedMode: 'active_otb',
           monthlyRefreshed: monthly.refreshed,
           monthlySkipped: monthly.skipped
         })
@@ -523,12 +713,17 @@ export const remediateAccountBalancesFxDrift = async (
       toDate: normalizeDate(input.toDate)
     })
 
+    // TASK-871 — `runs` may include accounts that were skipped by the
+    // integrity check (`rolling_window_repair` path). Only count accounts
+    // where the rematerializer actually executed.
+    const accountsActuallyRematerialized = runs.filter(run => !run.skipped).length
+
     const resultWithoutStatus = {
       ...plan,
       syncRunId,
       driftRowsRemediated: plan.dryRun ? 0 : eligible.length,
       driftRowsBlocked: blocked,
-      accountsRematerialized: runs.length,
+      accountsRematerialized: accountsActuallyRematerialized,
       residualDriftCount,
       runs
     }

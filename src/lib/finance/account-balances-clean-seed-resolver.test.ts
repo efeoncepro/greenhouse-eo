@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { resolveCleanSeedDate } from './clean-seed-resolver'
+import { resolveCleanSeedDate } from './account-balances-clean-seed-resolver'
 
 /**
  * TASK-871 Slice 2B — resolveCleanSeedDate integrity check tests.
@@ -157,7 +157,7 @@ describe('resolveCleanSeedDate — TASK-871 Slice 2B', () => {
       expect(result.cleanSeed).toBe('2026-05-01')
       expect(result.daysExpanded).toBe(4)
       expect(result.movementBlockers).toHaveLength(4)
-      expect(result.movementBlockers.map(b => b.balanceDate)).toEqual([
+      expect(result.movementBlockers.map((b: { balanceDate: string }) => b.balanceDate)).toEqual([
         '2026-05-05',
         '2026-05-04',
         '2026-05-03',

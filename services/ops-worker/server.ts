@@ -110,8 +110,9 @@ import { buildWeeklyDigest, resolveWeeklyDigestRecipients, WEEKLY_DIGEST_DEFAULT
 import { getCurrentAuthReadiness } from '@/lib/auth-secrets'
 import { probeNextAuthSecretRoundTrip } from '@/lib/auth/readiness'
 
+import { resolveCleanSeedDate } from '@/lib/finance/account-balances-clean-seed-resolver'
+
 import { computeRollingRematerializationWindow } from './finance-rematerialize-seed'
-import { resolveCleanSeedDate } from './clean-seed-resolver'
 import { getReactiveQueueDepth, InvalidDomainError } from './reactive-queue-depth'
 import { runProductCatalogDriftDetectJob } from './product-catalog-drift-detect'
 import { runProductCatalogReconcileV2Job } from './product-catalog-reconcile-v2'
