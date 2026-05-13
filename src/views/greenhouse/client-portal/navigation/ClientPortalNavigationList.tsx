@@ -15,7 +15,7 @@ import {
   groupNavItems,
   type ClientNavItem,
   type NavItemGroup
-} from '@/lib/client-portal/composition/menu-builder'
+} from '@/lib/client-portal/composition/menu-builder-shape'
 import { GH_CLIENT_PORTAL_COMPOSITION } from '@/lib/copy/client-portal'
 
 /**

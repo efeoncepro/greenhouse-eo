@@ -3,6 +3,13 @@ import 'server-only'
 import { VIEW_REGISTRY, type GovernanceViewRegistryEntry } from '@/lib/admin/view-access-catalog'
 
 import type { ResolvedClientPortalModule } from '../dto/module'
+import { groupNavItems, type ClientNavItem, type NavItemGroup, type NavItemTier } from './menu-builder-shape'
+
+// Re-export shape para back-compat con consumers existentes que importan
+// types desde menu-builder.ts. Client components deben importar directo de
+// `menu-builder-shape` para evitar pull-in de `'server-only'` al bundle.
+export { groupNavItems }
+export type { ClientNavItem, NavItemGroup, NavItemTier }
 
 /**
  * TASK-827 Slice 3 — Menu builder canonical del Client Portal Composition Layer.
@@ -30,32 +37,9 @@ import type { ResolvedClientPortalModule } from '../dto/module'
  * Tests anti-regresión cubren los 5 estados del pipeline (`menu-builder.test.ts`).
  */
 
-export type NavItemGroup = 'primary' | 'capabilities' | 'account'
-
-export type NavItemTier = 'standard' | 'addon' | 'pilot'
-
-export interface ClientNavItem {
-  /** ViewCode canonical (e.g. `'cliente.pulse'`). */
-  readonly viewCode: string
-
-  /** Label es-CL desde VIEW_REGISTRY (sentence case, user-facing). */
-  readonly label: string
-
-  /** Ruta destino (desde VIEW_REGISTRY.routePath). */
-  readonly route: string
-
-  /** Icono Tabler (e.g. `'tabler-smart-home'`). */
-  readonly icon: string
-
-  /** Group ordering para sectioning del menú. */
-  readonly group: NavItemGroup
-
-  /**
-   * Tier del módulo ganador del dedup (cuando un viewCode aparece en N
-   * modules, gana el de tier prioritario: standard > addon > pilot).
-   */
-  readonly tier: NavItemTier
-}
+// `NavItemGroup`, `NavItemTier`, `ClientNavItem` re-exportados desde
+// `menu-builder-shape` arriba para back-compat. La declaración canonical
+// vive en el shape file (client-safe).
 
 /**
  * Mapping declarativo `viewCode → { icon, group }`. Cuando emerge un viewCode
@@ -212,22 +196,7 @@ export const composeNavItemsFromModules = (
   return items
 }
 
-/**
- * Helper para agrupar nav items por section. Consumer-friendly para renderizar
- * con dividers entre groups.
- */
-export const groupNavItems = (
-  items: readonly ClientNavItem[]
-): Record<NavItemGroup, readonly ClientNavItem[]> => {
-  const grouped: Record<NavItemGroup, ClientNavItem[]> = {
-    primary: [],
-    capabilities: [],
-    account: []
-  }
-
-  for (const item of items) {
-    grouped[item.group].push(item)
-  }
-
-  return grouped
-}
+// `groupNavItems` re-exportado desde `menu-builder-shape` arriba para
+// back-compat. La declaración canonical vive en el shape file (client-safe,
+// pure function sin server-only). Helper para agrupar nav items por section
+// con dividers entre groups.
