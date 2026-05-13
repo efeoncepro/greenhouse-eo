@@ -64,12 +64,13 @@ Tasks, docs de arquitectura, o commits relacionados.
 
 ## Siguiente ID disponible
 
-`ISSUE-074`
+`ISSUE-076`
 
 ## Open
 
 | ID          | Título                                                                                                                       | Ambiente             | Detectado  | Estado |
 | ----------- | ---------------------------------------------------------------------------------------------------------------------------- | -------------------- | ---------- | ------ |
+| `ISSUE-075` | [Entra webhook validation handshake rejects POST (subscription create/renew fails)](open/ISSUE-075-entra-webhook-validation-handshake-rejects-post.md) | production | 2026-05-13 | open (fix immediate shipped `86890bae`; hardening pendiente) |
 | `ISSUE-044` | [Dashboard pages 500 via agent headless](open/ISSUE-044-dashboard-ssr-500-agent-headless.md)                                  | staging              | 2026-04-11 | open   |
 | `ISSUE-046` | [Deliverability monitor siempre devuelve 0 bounces y 0 complaints](open/ISSUE-046-deliverability-monitor-query-rota.md) | production + staging | 2026-04-13 | open   |
 | `ISSUE-047` | [Kill switch de email sin endpoint CRUD — solo operable por SQL directo](open/ISSUE-047-email-kill-switch-sin-endpoint-crud.md) | production + staging | 2026-04-13 | open   |

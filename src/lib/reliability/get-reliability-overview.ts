@@ -32,6 +32,7 @@ import {
   getExpenseDistributionSharedPoolContaminationSignal,
   getExpenseDistributionUnresolvedSignal
 } from './queries/expense-distribution'
+import { getEntraWebhookSubscriptionHealthSignal } from './queries/entra-webhook-subscription-health'
 import { getExpensePaymentsClpDriftSignal } from './queries/expense-payments-clp-drift'
 import { getFinanceClientProfileUnlinkedSignal } from './queries/finance-client-profile-unlinked'
 import { getIdentityLegalProfileEvidenceOrphanSignal } from './queries/identity-legal-profile-evidence-orphan'
@@ -450,6 +451,17 @@ interface ReliabilityOverviewSources {
   workspaceProjection?: ReliabilitySignal[] | null
 
   /**
+   * ISSUE-075 hardening — Microsoft Graph webhook subscription health.
+   * Single signal:
+   *   - identity.entra.webhook_subscription_health (drift, escalates with expiry proximity)
+   *
+   * Detecta proactivamente cuando la Entra subscription se acerca a su expiry
+   * o ya expiró, en lugar de esperar al Sentry alert del cron renew failing.
+   * Roll up bajo moduleKey 'identity'.
+   */
+  entraWebhookSubscriptionHealth?: ReliabilitySignal | null
+
+  /**
    * TASK-613 Slice 3 — Finance Clients ↔ Organization canonical link signal:
    *   - finance.client_profile.unlinked_organizations (data_quality, warning)
    * Roll up bajo moduleKey 'finance'. Steady state = 0. Cuando > 0,
@@ -588,6 +600,8 @@ export const buildReliabilityOverview = (
     ...(sources.identityGovernance ?? []),
     // TASK-611 Slice 5 — Organization Workspace projection signals (2).
     ...(sources.workspaceProjection ?? []),
+    // ISSUE-075 hardening — Microsoft Graph webhook subscription health.
+    ...(sources.entraWebhookSubscriptionHealth ? [sources.entraWebhookSubscriptionHealth] : []),
     // TASK-613 Slice 3 — Finance Clients ↔ Organization canonical link signal.
     ...(sources.financeClientProfileUnlinked ? [sources.financeClientProfileUnlinked] : []),
     // TASK-841 — Nubox raw/conformed/projection freshness.
@@ -912,6 +926,14 @@ export const getReliabilityOverview = async (
           .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
           .catch(() => null)
 
+  // ISSUE-075 hardening — Microsoft Graph webhook subscription health. Single
+  // reader; consulta `greenhouse_sync.integration_registry.metadata` para
+  // detectar expiración del subscription. Degrada honestamente a `unknown`.
+  const entraWebhookSubscriptionHealth =
+    preloadedSources.entraWebhookSubscriptionHealth !== undefined
+      ? preloadedSources.entraWebhookSubscriptionHealth
+      : await getEntraWebhookSubscriptionHealthSignal().catch(() => null)
+
   // TASK-613 Slice 3 — Finance Clients ↔ Organization canonical link signal.
   // Single reader; degrada honestamente a `unknown` si la query falla.
   const financeClientProfileUnlinked =
@@ -1061,6 +1083,7 @@ export const getReliabilityOverview = async (
     workforceRoleTitle,
     identityGovernance,
     workspaceProjection,
+    entraWebhookSubscriptionHealth,
     financeClientProfileUnlinked,
     nuboxSourceFreshness,
     criticalTablesMissing,
