@@ -83,6 +83,8 @@ if [ "${ENV}" = "production" ]; then
   DEFAULT_GREENHOUSE_INTEGRATION_API_TOKEN_SECRET_REF="greenhouse-integration-api-token"
   DEFAULT_NUBOX_BEARER_TOKEN_SECRET_REF="greenhouse-nubox-bearer-token-production"
   DEFAULT_NUBOX_X_API_KEY_SECRET_REF="greenhouse-nubox-x-api-key-production"
+  DEFAULT_GREENHOUSE_PORTAL_BASE_URL="https://greenhouse.efeoncepro.com"
+  DEFAULT_AZURE_AD_CLIENT_SECRET_REF="greenhouse-azure-ad-client-secret-production:latest"
   echo "=== PRODUCTION deployment ==="
 else
   DEFAULT_NEXTAUTH_SECRET_REF="greenhouse-nextauth-secret-staging:latest"
@@ -92,6 +94,8 @@ else
   DEFAULT_GREENHOUSE_INTEGRATION_API_TOKEN_SECRET_REF="greenhouse-integration-api-token"
   DEFAULT_NUBOX_BEARER_TOKEN_SECRET_REF="greenhouse-nubox-bearer-token-staging"
   DEFAULT_NUBOX_X_API_KEY_SECRET_REF="greenhouse-nubox-x-api-key-staging"
+  DEFAULT_GREENHOUSE_PORTAL_BASE_URL="https://dev-greenhouse.efeoncepro.com"
+  DEFAULT_AZURE_AD_CLIENT_SECRET_REF="greenhouse-azure-ad-client-secret-staging:latest"
   echo "=== STAGING deployment ==="
 fi
 
@@ -105,6 +109,9 @@ NUBOX_BEARER_TOKEN_SECRET_REF="${NUBOX_BEARER_TOKEN_SECRET_REF:-${DEFAULT_NUBOX_
 NUBOX_X_API_KEY_SECRET_REF="${NUBOX_X_API_KEY_SECRET_REF:-${DEFAULT_NUBOX_X_API_KEY_SECRET_REF}}"
 EMAIL_FROM="${EMAIL_FROM:-${DEFAULT_EMAIL_FROM}}"
 HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL="${HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL:-$(gcloud run services describe "${HUBSPOT_SERVICE_NAME}" --project="${PROJECT_ID}" --region="${HUBSPOT_SERVICE_REGION}" --format='value(status.url)')}"
+GREENHOUSE_PORTAL_BASE_URL="${GREENHOUSE_PORTAL_BASE_URL:-${DEFAULT_GREENHOUSE_PORTAL_BASE_URL}}"
+AZURE_AD_CLIENT_ID="${AZURE_AD_CLIENT_ID:-3626642f-0451-4eb2-8c29-d2211ab3176c}"
+AZURE_AD_CLIENT_SECRET_REF="${AZURE_AD_CLIENT_SECRET_REF:-${DEFAULT_AZURE_AD_CLIENT_SECRET_REF}}"
 
 require_non_empty() {
   local name="$1"
@@ -119,6 +126,9 @@ require_non_empty() {
 require_non_empty "NUBOX_API_BASE_URL" "${NUBOX_API_BASE_URL}"
 require_non_empty "NUBOX_BEARER_TOKEN_SECRET_REF" "${NUBOX_BEARER_TOKEN_SECRET_REF}"
 require_non_empty "NUBOX_X_API_KEY_SECRET_REF" "${NUBOX_X_API_KEY_SECRET_REF}"
+require_non_empty "GREENHOUSE_PORTAL_BASE_URL" "${GREENHOUSE_PORTAL_BASE_URL}"
+require_non_empty "AZURE_AD_CLIENT_ID" "${AZURE_AD_CLIENT_ID}"
+require_non_empty "AZURE_AD_CLIENT_SECRET_REF" "${AZURE_AD_CLIENT_SECRET_REF}"
 
 # ─── Secret access helpers ───────────────────────────────────────────────────
 
@@ -244,6 +254,8 @@ ENV_VARS="${ENV_VARS},HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL=${HUBSPOT_GREENHOU
 ENV_VARS="${ENV_VARS},NUBOX_API_BASE_URL=${NUBOX_API_BASE_URL}"
 ENV_VARS="${ENV_VARS},NUBOX_BEARER_TOKEN_SECRET_REF=${NUBOX_BEARER_TOKEN_SECRET_REF}"
 ENV_VARS="${ENV_VARS},NUBOX_X_API_KEY_SECRET_REF=${NUBOX_X_API_KEY_SECRET_REF}"
+ENV_VARS="${ENV_VARS},GREENHOUSE_PORTAL_BASE_URL=${GREENHOUSE_PORTAL_BASE_URL}"
+ENV_VARS="${ENV_VARS},AZURE_AD_CLIENT_ID=${AZURE_AD_CLIENT_ID}"
 
 # TASK-742 + TASK-870 — `AZURE_AD_CLIENT_ID` requerido por `/smoke/identity-auth-providers`
 # (probe `azure_authorize_endpoint`) en `server.ts`. Es un public GUID, NO un secreto
@@ -285,6 +297,7 @@ fi
 # Secrets from Secret Manager (mounted as env vars)
 SECRETS="NEXTAUTH_SECRET=${NEXTAUTH_SECRET_REF}"
 SECRETS="${SECRETS},GREENHOUSE_POSTGRES_PASSWORD=${PG_PASSWORD_REF}"
+SECRETS="${SECRETS},AZURE_AD_CLIENT_SECRET=$(normalize_secret_ref_for_cloud_run "${AZURE_AD_CLIENT_SECRET_REF}")"
 
 if [ -n "${RESEND_API_KEY_SECRET_REF}" ]; then
   SECRETS="${SECRETS},RESEND_API_KEY=$(normalize_secret_ref_for_cloud_run "${RESEND_API_KEY_SECRET_REF}")"
@@ -330,6 +343,7 @@ fi
 
 ensure_secret_accessor_binding "${NEXTAUTH_SECRET_REF}"
 ensure_secret_accessor_binding "${PG_PASSWORD_REF}"
+ensure_secret_accessor_binding "${AZURE_AD_CLIENT_SECRET_REF}"
 
 if [ -n "${RESEND_API_KEY_SECRET_REF}" ]; then
   ensure_secret_accessor_binding "${RESEND_API_KEY_SECRET_REF}"

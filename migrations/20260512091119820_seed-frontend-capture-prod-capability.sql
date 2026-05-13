@@ -13,24 +13,27 @@
 INSERT INTO greenhouse_core.capabilities_registry (
   capability_key,
   module,
-  default_scope,
+  allowed_actions,
+  allowed_scopes,
   description,
   deprecated_at
 )
 VALUES (
   'platform.frontend.capture_prod',
   'platform',
-  'all',
+  ARRAY['read'],
+  ARRAY['all'],
   'Allows running production captures via pnpm fe:capture --env=production (frontend capture helper V1.1, OQ-6). Triple Gate: env var + CLI flag + this capability. Audit log registra cada run para forensic.',
   NULL
 )
 ON CONFLICT (capability_key) DO UPDATE
 SET
   module = EXCLUDED.module,
-  default_scope = EXCLUDED.default_scope,
+  allowed_actions = EXCLUDED.allowed_actions,
+  allowed_scopes = EXCLUDED.allowed_scopes,
   description = EXCLUDED.description,
   deprecated_at = NULL,
-  updated_at = NOW();
+  introduced_at = COALESCE(greenhouse_core.capabilities_registry.introduced_at, NOW());
 
 -- Anti pre-up-marker guard: confirmar que la capability quedó registrada.
 DO $$

@@ -103,16 +103,69 @@ interface VercelCronEntry {
   isExplicitlyAllowed: boolean
 }
 
+/**
+ * Serverless runtime fallback.
+ *
+ * In Vercel standalone output the repository root is not guaranteed to exist
+ * at `process.cwd()`; production can execute from `/app` without `vercel.json`.
+ * The reliability reader must observe the deployed contract, not crash the
+ * whole AI observer because a source-control file is absent from the bundle.
+ *
+ * Keep this snapshot in lockstep with root `vercel.json`. The CI gate still
+ * reads the real file in repository checkouts; this fallback is only for
+ * runtime reliability reads.
+ */
+const CANONICAL_VERCEL_CRON_ENTRIES: readonly VercelCronEntry[] = Object.freeze([
+  {
+    path: '/api/finance/economic-indicators/sync',
+    schedule: '5 23 * * *',
+    isExplicitlyAllowed: false
+  },
+  {
+    path: '/api/cron/sync-previred',
+    schedule: '15 8 * * *',
+    isExplicitlyAllowed: false
+  },
+  {
+    path: '/api/cron/reliability-synthetic',
+    schedule: '*/30 * * * *',
+    isExplicitlyAllowed: false
+  },
+  {
+    path: '/api/cron/notion-delivery-data-quality',
+    schedule: '0 10 * * *',
+    isExplicitlyAllowed: false
+  },
+  {
+    path: '/api/cron/email-data-retention',
+    schedule: '0 3 * * 0',
+    isExplicitlyAllowed: false
+  },
+  {
+    path: '/api/cron/fx-sync-latam?window=morning',
+    schedule: '0 9 * * *',
+    isExplicitlyAllowed: false
+  },
+  {
+    path: '/api/cron/fx-sync-latam?window=midday',
+    schedule: '0 14 * * *',
+    isExplicitlyAllowed: false
+  },
+  {
+    path: '/api/cron/fx-sync-latam?window=evening',
+    schedule: '0 22 * * *',
+    isExplicitlyAllowed: false
+  }
+])
+
 const parseVercelCrons = (): VercelCronEntry[] => {
   const vercelJsonPath = resolve(process.cwd(), 'vercel.json')
   let raw: string
 
   try {
     raw = readFileSync(vercelJsonPath, 'utf8')
-  } catch (error) {
-    throw new Error(
-      `Cannot read vercel.json at ${vercelJsonPath}: ${error instanceof Error ? error.message : 'unknown error'}`
-    )
+  } catch {
+    return [...CANONICAL_VERCEL_CRON_ENTRIES]
   }
 
   // Parse JSON (Vercel's vercel.json is strict JSON, not JSONC).
