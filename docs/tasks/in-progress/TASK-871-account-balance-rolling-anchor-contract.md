@@ -8,19 +8,45 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `optional`
-- Status real: `Diseno`
+- Status real: `In Progress 2026-05-13 directo en develop (instrucción operativa: no branch separada). OQ resuelta pre-execution.`
 - Rank: `TBD`
 - Domain: `finance|ops|data|reliability`
 - Blocked by: `none`
-- Branch: `task/TASK-871-account-balance-rolling-anchor-contract`
+- Branch: `develop` (pattern TASK-822..827)
 - Legacy ID: `none`
 - GitHub Issue: `optional`
+
+## Pre-Execution OQ Resolution (2026-05-13)
+
+**Open Question original**:
+> Confirmar durante Discovery si la ventana rolling de negocio debe ser "ultimos 7 dias calendario incluyendo hoy" o "7 dias previos mas hoy".
+
+**Resolución canonical (lens 4-pilar)**: **Interpretación B — `targetStartDate = today - lookbackDays`**.
+
+Para `today=2026-05-13` con `lookbackDays=7`:
+- `targetStartDate = 2026-05-06` (today - 7)
+- `seedDate = 2026-05-05` (targetStartDate - 1, ancla muda)
+- `materializeStartDate = 2026-05-06` (primer día observed; SE materializa, NO ancla muda)
+- `materializeEndDate = 2026-05-13` (today inclusive)
+- Total días materializados: 8 (lookbackDays + 1 inclusivo)
+- Total días observados: 8 (window)
+
+**Rationale 4-pilar**:
+
+- **Safety**: Interpretación B da 1 día más de buffer para movements registered retroactivamente. Caso real del incidente 2026-05-13: drift en `2026-05-05` con movements registered ese día. Con interpretación A (7 días observed estrictos = 2026-05-07..2026-05-13), el día 2026-05-05 quedaría fuera del observed window completamente → drift persistiría indefinidamente. Con interpretación B (8 días observed = 2026-05-06..2026-05-13), 2026-05-05 = seed con integrity check (Slice 2 invariant) → si hay movements canonicos en seed day, expandir backward hasta seed limpio.
+- **Robustness**: Matches el comportamiento POST-ISSUE-069 (`seedDate = today - (lookbackDays + 1)` ya implementado). Cambio mínimo desde el contracto actual; menos risk de breakage cross-system.
+- **Resilience**: Reliability signal `finance.account_balances.fx_drift` observa los últimos 90 días sin respeto al rolling window. Cuanto más ancho el window observed por el cron, menos days quedan invisibles al daily refresh.
+- **Scalability**: Diferencia 7 vs 8 días observed = O(1) overhead. Trivial en cost daily.
+
+**Invariante canonical asociado**: el `seedDate` siempre es ancla muda (NO se materializa); el `materializeStartDate` siempre es `seedDate + 1 = targetStartDate`. Si `seedDate` tiene movements canonicos (`settlement_legs` / `income_payments_normalized` / `expense_payments_normalized`) con persisted `period_inflows/outflows=0`, expandir el window backward 1 día y recalcular `seedDate` recursive hasta encontrar ancla limpia (max 30 días backward, defense in depth contra OTB anchor cross).
+
+**Implementación**: la primitive `computeRollingRematerializationWindow(today, lookbackDays)` devuelve `{targetStartDate, seedDate, materializeStartDate, materializeEndDate, lookbackDays, policy: 'rolling_window_repair'}`. El cron consume esta primitive y delega a `rematerializeAccountBalanceRange` con `seedDate` (que puede haber expandido si el integrity check disparó). Detalle en Slice 2.
 
 ## Summary
 

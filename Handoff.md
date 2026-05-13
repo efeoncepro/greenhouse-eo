@@ -1,3 +1,16 @@
+# Sesion 2026-05-13 — TASK-871 Account Balance Rolling Anchor Contract IN-PROGRESS on develop
+
+- **Trigger**: user pidió hacer pase a producción develop→main. Pre-checks revelaron Playwright smoke `finance.account_balances.fx_drift` rojo pre-existing (3 cuentas en 2026-05-05 con drift real). ISSUE-069 era fix parcial; TASK-871 cierra el bug class de raíz.
+- **Path B intentado (recovery + ship hoy) FALLÓ**: el remediator canonical con `evidence-guard=warn_only` reporta `seen=0` aunque diagnose dice `seen=1`. El bug class TASK-871 está activo en el remediator mismo — necesita código deployado primero (TASK-871 Slice 5 explícito).
+- **Decisión user (4-pilar lens)**: implementar TASK-871 completa (Opción A2 más segura/robusta/escalable). Pausa release hasta cierre.
+- **Branch**: develop directo (sin task branch) — pattern TASK-822..827.
+- **Skills loaded**: arch-architect (Greenhouse overlay) + greenhouse-finance-accounting-operator. Pendientes: greenhouse-backend + greenhouse-cron-sync-ops.
+- **Pre-execution OQ resuelta** (commit baseline): interpretación B — `targetStartDate = today - lookbackDays` → window 8 días observed (lookback + today inclusive). Rationale 4-pilar documentado en spec.
+- **Recovery parcial completado mid-session**: santander-clp ya rematerialized (74 días, closing $1.21M) via apply normal. santander-corp-clp + global66-clp drift persists pending TASK-871 deploy.
+- **Status**: FASE 0 (pre-execution) completa. FASE 1 (Discovery) pending.
+
+---
+
 # Sesion 2026-05-13 — TASK-827 Client Portal Composition Layer CERRADA on develop (EPIC-015 child 6/8 ✅)
 
 - **Trigger**: usuario pidió implementar TASK-827 antes de promover develop→main, en `develop` sin branch separada. Plan canonical FASE 1-6 ejecutado end-to-end.
