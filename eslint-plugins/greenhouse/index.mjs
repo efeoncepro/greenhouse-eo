@@ -12,6 +12,7 @@
 //   - no-inline-facet-visibility-check              (TASK-611) — organization workspace projection gate
 //   - cloud-run-services-must-init-sentry           (TASK-844) — Cloud Run Node service entrypoints must invoke initSentryForService
 //   - no-cross-domain-import-from-client-portal     (TASK-822) — client_portal is a leaf of the DAG; producer domains MUST NOT import it
+//   - no-untokenized-business-line-branching        (TASK-827) — UI components must NOT branch by session.user.tenantType/businessLines/serviceModules/tenant_capabilities — use resolver canonical (TASK-825)
 
 import noRawTableWithoutShell from './rules/no-raw-table-without-shell.mjs'
 import noHardcodedFontfamily from './rules/no-hardcoded-fontfamily.mjs'
@@ -23,11 +24,12 @@ import noUntokenizedExpenseTypeForAnalytics from './rules/no-untokenized-expense
 import noInlineFacetVisibilityCheck from './rules/no-inline-facet-visibility-check.mjs'
 import cloudRunServicesMustInitSentry from './rules/cloud-run-services-must-init-sentry.mjs'
 import noCrossDomainImportFromClientPortal from './rules/no-cross-domain-import-from-client-portal.mjs'
+import noUntokenizedBusinessLineBranching from './rules/no-untokenized-business-line-branching.mjs'
 
 const plugin = {
   meta: {
     name: 'eslint-plugin-greenhouse',
-    version: '1.6.0'
+    version: '1.7.0'
   },
   rules: {
     'no-raw-table-without-shell': noRawTableWithoutShell,
@@ -39,7 +41,8 @@ const plugin = {
     'no-untokenized-expense-type-for-analytics': noUntokenizedExpenseTypeForAnalytics,
     'no-inline-facet-visibility-check': noInlineFacetVisibilityCheck,
     'cloud-run-services-must-init-sentry': cloudRunServicesMustInitSentry,
-    'no-cross-domain-import-from-client-portal': noCrossDomainImportFromClientPortal
+    'no-cross-domain-import-from-client-portal': noCrossDomainImportFromClientPortal,
+    'no-untokenized-business-line-branching': noUntokenizedBusinessLineBranching
   }
 }
 
