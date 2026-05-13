@@ -72,6 +72,24 @@ export const RELEASE_DEPLOY_WORKFLOWS: readonly ReleaseDeployWorkflow[] = [
     // que es semánticamente correcto: si el orchestrator queda waiting >24h
     // por la approval-gate, eso ES un blocker production legitimo.
     workflowName: 'Production Release Orchestrator'
+  },
+  {
+    // El watchdog scheduled (TASK-849) corre cada 30min y reporta drift
+    // pre-existente del worker_revision_drift signal — por diseño FAILA loud
+    // cuando hay drift activo. NO es un workflow CI: es un detector monitoring.
+    //
+    // Incluir el watchdog en el allowlist canonico evita el mismo self-reference
+    // loop que `Production Release Orchestrator` ya cubre: sin esto, cualquier
+    // drift pre-existente bloquea TODA promoción a production porque el preflight
+    // `ci_green` lo cuenta como CI failure → orchestrator no puede deployar para
+    // fixear el drift que el propio watchdog está reportando. Detectado live
+    // 2026-05-13 run 25822955070 attempt 2 con drift en hubspot + ico-batch +
+    // commercial-cost workers.
+    //
+    // El watchdog NO tiene Cloud Run mapping (no se deploya como service; es un
+    // GitHub Actions scheduled workflow). Stale-approval/pending-without-jobs NO
+    // aplican (es scheduled, no manual workflow_dispatch).
+    workflowName: 'Production Release Watchdog'
   }
 ] as const
 
