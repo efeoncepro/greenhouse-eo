@@ -1,6 +1,6 @@
 # ISSUE-075 — Entra webhook validation handshake rejects POST (subscription create/renew fails)
 
-> **Estado:** Open (fix immediate shipped 2026-05-13; hardening + verification pending)
+> **Estado:** Open — fix + hardening shipped a `develop`, validado en staging end-to-end. Cierre formal pendiente de promoción `develop → main` (release orquestado per TASK-848/851) + trigger manual del cron en producción.
 > **Detectado:** 2026-05-13 06:00:03 -04 vía Sentry alert `JAVASCRIPT-NEXTJS-4T`
 > **Severidad:** Alta — bloquea creación/renovación de Microsoft Graph webhook subscription para Entra ID user changes. Cuando la subscription expira, Greenhouse pierde 100% de notifications de cambios de profiles (resolución vía cron diario `entra-profile-sync` de respaldo, pero con latencia ~24h vs <10s nativo)
 > **Canal de detección:** Sentry (project `javascript-nextjs`, environment `production`)
@@ -106,22 +106,32 @@ Archivos:
 - [x] `pnpm vitest run src/app/api/webhooks/entra-user-change/route.test.ts` — 2/2 tests verdes
 - [x] Pre-push hook (`pnpm lint` + `pnpm tsc --noEmit`) verde
 - [x] Commit `86890bae` pusheado a `develop`
-- [ ] Vercel deploy de develop a staging completado y `/api/webhooks/entra-user-change` responde 200 con echo del token al recibir POST con `?validationToken=test`
-- [ ] Trigger manual del cron `gcloud scheduler jobs run ops-entra-webhook-renew --location=us-east4 --project=efeonce-group` retorna success
+- [x] Vercel deploy de develop a staging completado (`greenhouse-2fi700uvq` Ready 2026-05-13). `POST /api/webhooks/entra-user-change?validationToken=test-handshake-2026-05-13` con bypass devuelve HTTP 200 + `Content-Type: text/plain` + body `test-handshake-2026-05-13` (token echoed correctamente)
+- [ ] **Promoción `develop → main`** via release orquestado (TASK-848/851 path canónico) — 51 commits ahead, requiere preflight + orchestrator workflow, NO hotfix unilateral. Owner: usuario.
+- [ ] Vercel deploy de main a producción completado tras promoción
+- [ ] Trigger manual del cron `gcloud scheduler jobs run ops-entra-webhook-renew --location=us-east4 --project=efeonce-group` retorna success (depende del bullet anterior)
 - [ ] Sentry: 0 nuevos eventos de `JAVASCRIPT-NEXTJS-4T` después del trigger
+- [ ] Reliability signal `identity.entra.webhook_subscription_health` visible en `/admin/operations` bajo subsystem `Identity & Access` con severity `ok` (post primer renew exitoso poblará `expirationDateTime`)
 
-### Hardening (pendiente)
+### Hardening (shipped 2026-05-13 commit `fde07952`)
 
-- [ ] Reliability signal `integrations.entra.webhook_subscription_health` shipped + wired + visible en `/admin/operations` bajo `Identity & Access`
-- [ ] `metadata.expirationDateTime` populated tras próximo create/renew exitoso
-- [ ] `notificationUrl` resuelve a `GREENHOUSE_PUBLIC_BASE_URL` cuando env var está set; fallback a producción
-- [ ] Tests anti-regresión verdes (signal reader + URL resolver)
-- [ ] `pnpm lint`, `pnpm tsc --noEmit`, `pnpm test` verde
-- [ ] Documentación canónica actualizada (`CLAUDE.md` Entra webhook section si emerge regla nueva)
+- [x] Reliability signal `identity.entra.webhook_subscription_health` shipped (`src/lib/reliability/queries/entra-webhook-subscription-health.ts`) + wired en `getReliabilityOverview` bajo módulo `identity`. State machine 6 estados (unknown/legacy_metadata/expired/imminent/approaching/healthy).
+- [x] `persistSubscriptionState` extendido con `expirationDateTime + notificationUrl + lastRenewedAt`. Llamado en AMBOS paths (create + renew, antes solo create). Backward-compatible con rows legacy.
+- [x] `resolveNotificationUrl(env)` exportado. Resolución canónica: `GREENHOUSE_ENTRA_NOTIFICATION_URL` > `GREENHOUSE_PUBLIC_BASE_URL` > `NEXTAUTH_URL` > hardcoded prod fallback. Normaliza trailing slashes + whitespace.
+- [x] 22 tests anti-regresión verdes (`webhook-subscription.test.ts` + `entra-webhook-subscription-health.test.ts`)
+- [x] `pnpm tsc --noEmit` + `pnpm lint` + `pnpm test` verde (pre-push hook ejecutó full suite)
+- [ ] `metadata.expirationDateTime` populated en producción — requiere promoción a main + primer renew exitoso post-deploy
+- [ ] Signal `identity.entra.webhook_subscription_health` reportando `ok` en `/admin/operations` (depende del bullet anterior)
 
 ## Estado
 
-**open** — fix immediate shipped, hardening + verification end-to-end pendiente. Moverá a `resolved/` cuando todos los checkboxes de Verificación estén ✅.
+**open** — fix immediate + hardening completos en `develop` (commits `86890bae` + `fde07952`); validados end-to-end en staging via curl (HTTP 200 + token echoed). Cierre formal pendiente exclusivamente de la **promoción orquestada `develop → main`** (51 commits ahead requieren release path canónico TASK-848/851, NO hotfix). Moverá a `resolved/` cuando:
+
+1. Usuario apruebe la promoción a main vía release orquestado o decisión equivalente
+2. Vercel desplegue prod
+3. Trigger manual del cron en producción retorne success
+4. Sentry `JAVASCRIPT-NEXTJS-4T` no emita nuevos eventos en ≥24h
+5. Reliability signal `identity.entra.webhook_subscription_health` reporte `ok` con `expirationDateTime` válido en `metadata`
 
 ## Relacionado
 
@@ -129,10 +139,13 @@ Archivos:
 - **Cron lane**: TASK-775 (Vercel cron → Cloud Scheduler + ops-worker migration)
 - **Observability platform**: TASK-844 (Cross-Runtime Observability Sentry init) — sin esto el error no aparecería en Sentry desde Cloud Run
 - **Cron wrapper canónico**: `services/ops-worker/cron-handler-wrapper.ts` (`wrapCronHandler` con `domain: 'identity'`)
-- **Reliability registry**: `src/lib/reliability/registry.ts` módulo `identity` (signal nuevo se agrega aquí)
+- **Reliability registry**: `src/lib/reliability/registry.ts` módulo `identity` (signal nuevo wired vía `getReliabilityOverview`)
+- **Reader del signal**: `src/lib/reliability/queries/entra-webhook-subscription-health.ts` (TASK ISSUE-075 hardening)
+- **Helper env-aware URL**: `src/lib/entra/webhook-subscription.ts` (`resolveNotificationUrl`)
 - **Commit fix immediate**: `86890bae` en `develop` (2026-05-13)
-- **Commit hardening**: pendiente
+- **Commit hardening**: `fde07952` en `develop` (2026-05-13)
 - **Sentry event**: `a7964f96092746378de8b706f06fd7f4`
+- **Promoción producción pendiente**: TASK-848 release control plane / TASK-851 orchestrator workflow
 
 ## Lección operativa
 

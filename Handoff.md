@@ -1,3 +1,45 @@
+# Sesion 2026-05-13 — ISSUE-075 Entra webhook validation handshake (fix + hardening shipped a develop)
+
+- **Trigger**: Sentry alert `JAVASCRIPT-NEXTJS-4T` a las 06:00:03 -04 (cron `ops-entra-webhook-renew` daily). Microsoft Graph rechaza subscription create/renew con `ValidationError 400` porque el notification endpoint `/api/webhooks/entra-user-change` no respondía al validation handshake **enviado como POST**. El handler GET sí echoba el `validationToken`; el handler POST iba directo a parse del body + validate `clientState` → respondía 400/401 → Microsoft falla la subscription.
+- **Causa raíz**: Microsoft Graph v1 envía el validation handshake como POST con `?validationToken=xxx` en query string (no como GET históricamente asumido). El endpoint Greenhouse no soportaba ambos métodos en el respond-to-token path.
+
+- **Fix immediate (commit `86890bae` en develop)**: extraído `respondToValidationToken(request)` helper compartido por GET y POST. POST handler invoca el helper ANTES de parse body + validate clientState. Idempotente: notifications normales sin token caen al path normal. 3 archivos: `route.ts` + `route.test.ts` nuevo (2 tests) + spec doc V1 §Notification endpoint corregida (Microsoft envía POST, no GET).
+
+- **Análisis arquitectónico con arch-architect (Greenhouse overlay)** detectó 5 gaps adicionales no cubiertos por el fix:
+  - H1 Falta reliability signal canónico para subscription health (proactive expiry detection vs reactive Sentry alert)
+  - H2 `notificationUrl` hardcoded a producción (impide testing en staging/preview)
+  - H3 `clientState` acoplado a SCIM_BEARER_TOKEN (V1.1 follow-up)
+  - H4 POST handler con dual contract sin marker explícito (cubierto por tests anti-regresión)
+  - H5 Hardcoded subscription resource + changeType (out of scope)
+
+- **Hardening shipped (commit `fde07952` en develop)**:
+  - **Scalability**: `resolveNotificationUrl(env)` exportado en `src/lib/entra/webhook-subscription.ts`. Order canónico `GREENHOUSE_ENTRA_NOTIFICATION_URL > GREENHOUSE_PUBLIC_BASE_URL > NEXTAUTH_URL > prod fallback`. Normaliza trailing slashes + whitespace. Habilita staging/preview.
+  - **Resilience persist completo**: `persistSubscriptionId` → `persistSubscriptionState({subscriptionId, expirationDateTime, notificationUrl, lastRenewedAt})`. Llamado en AMBOS paths (create + renew; antes solo create). Backward-compatible con rows legacy. Helper `getPersistedSubscriptionMetadata()` exportado.
+  - **Resilience reliability signal**: `identity.entra.webhook_subscription_health` (kind=`drift`) en `src/lib/reliability/queries/entra-webhook-subscription-health.ts`. State machine 6 estados: `unknown | legacy_metadata | expired | imminent (<12h) | approaching (<48h) | healthy (>48h)`. Severity ok/warning/error escalada. Wire-up en `getReliabilityOverview` bajo módulo `identity`. Steady=ok.
+  - 22 tests anti-regresión verdes (8 URL resolver + 14 signal state machine + envelope + degradation honest)
+
+- **ISSUE-075 canonizada**: `docs/issues/open/ISSUE-075-entra-webhook-validation-handshake-rejects-post.md`. Documenta cadena del fallo, causa raíz, fix + hardening, verification checkboxes, lección operativa (pattern canónico Greenhouse para webhooks externos con validation handshake: handler GET + POST con respond-to-token first).
+
+- **Verificación end-to-end en staging**: Vercel deploy de develop `greenhouse-2fi700uvq` Ready. Curl `POST /api/webhooks/entra-user-change?validationToken=test-handshake-2026-05-13` con bypass → **HTTP 200 + Content-Type: text/plain + body `test-handshake-2026-05-13`** (token echoed correctamente). Fix verificado code-wise end-to-end.
+
+- **Resultados verificados**:
+  - 22/22 tests nuevos verdes (`pnpm vitest run src/lib/entra/webhook-subscription.test.ts src/lib/reliability/queries/entra-webhook-subscription-health.test.ts`)
+  - `pnpm tsc --noEmit` clean
+  - `pnpm lint` clean (incluido en pre-push hook 2 veces)
+  - Pre-push hook verde en ambos commits (`86890bae` + `fde07952`)
+
+- **Pendiente para cierre formal (decisión usuario)**:
+  - **Promoción `develop → main`** vía release orquestado (TASK-848/851 path canónico). Develop está 51 commits ahead de main; cualquier merge desplegará todos esos commits a producción. NO se hizo hotfix unilateral.
+  - Post-deploy: trigger manual del cron en producción `gcloud scheduler jobs run ops-entra-webhook-renew --location=us-east4 --project=efeonce-group`
+  - Verificar Sentry `JAVASCRIPT-NEXTJS-4T` no emite nuevos eventos ≥24h
+  - Verificar signal `identity.entra.webhook_subscription_health` reporta `ok` en `/admin/operations` (requiere `expirationDateTime` populated por primer renew exitoso post-deploy)
+
+- **Pattern canonizado**: cuando un endpoint expone boundary contract con un servicio externo que envía validation handshakes (Microsoft Graph, HubSpot, Slack, Teams, etc.), soportar TODOS los métodos HTTP que el contract permite + responder al handshake ANTES de cualquier validación de payload + tests anti-regresión que pinneen el comportamiento + reliability signal del subscription health + audit trail estructurado del lifecycle.
+
+- **Skills invocadas**: `arch-architect` (Greenhouse overlay — 4-pilar score + 7 hallazgos + plan).
+
+---
+
 # Sesion 2026-05-12 — TASK-826 CERRADA on develop (EPIC-015 child 5/8 ✅)
 
 - **Trigger**: post TASK-825 cierre, usuario pidió arch-architect verdict sobre TASK-826 (Client Portal Admin Endpoints + Capabilities + Audit + UI Admin). Task más densa del EPIC. Verdict: 5 correcciones aplicadas pre-Slice-1; implementación directa en develop con 8 slices secuenciales.
