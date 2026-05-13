@@ -153,14 +153,26 @@ jobs:
           # (creds vienen de google-github-actions/auth WIF, no de `gcloud auth login`).
           GREENHOUSE_GCLOUD_AUTH_NONINTERACTIVE: 'true'
         run: |
-          # Determine override flag: bypass_preflight_reason >= 20 chars triggers
-          # --override-batch-policy. Audit row will be persisted via the
-          # orchestrator-record-started step in Job 2.
+          # Determine override flags: bypass_preflight_reason >= 20 chars
+          # triggers BOTH --override-batch-policy (downgrades release_batch_policy
+          # errors → warnings) AND --bypass-preflight-warnings (operator override
+          # for degraded readyToDeploy when only warnings present, no errors).
+          #
+          # Together these implement the canonical bypass mechanism documented
+          # in CLAUDE.md ("bypass_preflight_reason >=20 chars + capability
+          # platform.release.bypass_preflight") — the broader override the
+          # orchestrator was designed around but the CLI only partially
+          # implemented before TASK-871 follow-up (2026-05-13 attempts 2/3
+          # blocked by playwright_smoke "0 workflows" + sentry_critical_issues
+          # warning + watchdog self-reference loop).
+          #
+          # Audit trail: bypass reason persisted via orchestrator-record-started
+          # step in Job 2 (release_state_transitions.metadata_json).
           OVERRIDE_FLAG=""
           REASON_LENGTH=${#BYPASS_REASON}
           if [ ${REASON_LENGTH} -ge 20 ]; then
-            OVERRIDE_FLAG="--override-batch-policy"
-            echo "Bypass preflight reason accepted (length=${REASON_LENGTH})"
+            OVERRIDE_FLAG="--override-batch-policy --bypass-preflight-warnings"
+            echo "Bypass preflight reason accepted (length=${REASON_LENGTH}); both override flags active"
           elif [ ${REASON_LENGTH} -gt 0 ]; then
             echo "::error::bypass_preflight_reason length=${REASON_LENGTH} but >=20 chars required"
             exit 1

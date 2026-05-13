@@ -36,6 +36,7 @@ interface CliOptions {
   json: boolean
   failOnError: boolean
   overrideBatchPolicy: boolean
+  bypassWarnings: boolean
   targetSha: string | null
   targetBranch: string
   outputFile: string | null
@@ -46,6 +47,7 @@ const parseArgs = (args: readonly string[]): CliOptions => {
     json: false,
     failOnError: false,
     overrideBatchPolicy: false,
+    bypassWarnings: false,
     targetSha: null,
     targetBranch: 'main',
     outputFile: null
@@ -55,6 +57,7 @@ const parseArgs = (args: readonly string[]): CliOptions => {
     if (arg === '--json') options.json = true
     else if (arg === '--fail-on-error') options.failOnError = true
     else if (arg === '--override-batch-policy') options.overrideBatchPolicy = true
+    else if (arg === '--bypass-preflight-warnings') options.bypassWarnings = true
     else if (arg.startsWith('--target-sha=')) options.targetSha = arg.slice('--target-sha='.length)
     else if (arg.startsWith('--target-branch=')) options.targetBranch = arg.slice('--target-branch='.length)
     else if (arg.startsWith('--output-file=')) options.outputFile = arg.slice('--output-file='.length)
@@ -75,6 +78,10 @@ const parseArgs = (args: readonly string[]): CliOptions => {
           '  --fail-on-error              Exit 1 if readyToDeploy=false',
           '  --override-batch-policy      Downgrade release_batch_policy errors to warnings',
           '                               (requires platform.release.preflight.override_batch_policy + audit)',
+          '  --bypass-preflight-warnings  Operator override: only ERROR severity blocks; degraded',
+          '                               (warnings/unknown) passes. Requires bypass_preflight_reason',
+          '                               >=20 chars + capability platform.release.bypass_preflight.',
+          '                               Audit row persisted by orchestrator.',
           '  --target-sha=<sha>           SHA to validate (default: git HEAD)',
           '  --target-branch=<branch>     Branch to promote to (default: main)',
           '  --help, -h                   This message',
@@ -171,7 +178,7 @@ const main = async (): Promise<void> => {
     stdout.write(formatPreflightAsHuman(payload) + '\n')
   }
 
-  if (shouldFailPreflightCommand(payload, options.failOnError)) {
+  if (shouldFailPreflightCommand(payload, options.failOnError, options.bypassWarnings)) {
     exit(1)
   }
 
