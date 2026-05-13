@@ -10,6 +10,10 @@ Documentacion oficial de la plataforma Greenhouse. Cada documento describe como 
 - [Sistema de Autenticación Resiliente](identity/sistema-auth-resiliente.md) — 7 capas defensivas que protegen el flujo de login (secret hygiene, readiness contract, observability, schema integrity, magic-link self-recovery, smoke lane sintética, rotation playbook). Postmortem de ISSUE-061 y guía de diagnóstico
 - [Provisioning SCIM con Microsoft Entra](identity/scim-entra-provisioning.md) — lifecycle automatico de usuarios y grupos desde Entra, tenant interno Efeonce con `client_id=NULL`, validacion `provisionOnDemand` y manejo seguro de escrows
 
+### Portal Cliente
+
+- [Menu dinamico y acceso a modulos del Portal Cliente](client-portal/menu-dinamico-y-acceso-a-modulos.md) — como funciona el portal cliente compositivo desde TASK-827: catalogo de modulos vendibles (Globe, Wave, addons), resolver canonico server-side, 5 estados visuales canonicos (normal / zero-state recien activado / not_assigned con modulo no comprado / degraded parcial / error completo), page guards resolver-based en 9 rutas cliente, anatomia 5-elementos de empty states, glosario completo. Reemplaza el patron legacy de menu uniforme por business_line.
+
 ### Admin Center
 
 - [Commercial Parties](admin-center/commercial-parties.md) — tablero administrativo del lifecycle comercial: lista de parties, embudo, conflictos de sync, detalle por party, transiciones manuales y sweep operativo
@@ -101,10 +105,6 @@ Documentacion oficial de la plataforma Greenhouse. Cada documento describe como 
 ### Herramientas IA
 
 - [Generador Visual de Assets con IA](ai-tooling/generador-visual-assets.md) — generacion de imagenes (Imagen 4) y animaciones SVG (Gemini) para enriquecer interfaces, banners de perfil por categoria
-
-### Portal Cliente
-
-_Pendiente de documentar._
 
 ---
 

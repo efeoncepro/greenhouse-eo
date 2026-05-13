@@ -400,12 +400,16 @@ jobs:
 
             if [ -n "${MATCHING}" ]; then
               STATE="${MATCHING##*|}"
-              UID="${MATCHING%%|*}"
+              # NOTE: `$UID` is a bash built-in READONLY var (process UID).
+              # Sobrescribir aquí con un deployment UID rompe el job con
+              # `UID: readonly variable` exit 1. Usar `DEPLOY_UID` para que
+              # bash no rechace la asignación.
+              DEPLOY_UID="${MATCHING%%|*}"
               if [ "${STATE}" = "READY" ]; then
-                echo "✓ Vercel production deploy READY: uid=${UID}"
+                echo "✓ Vercel production deploy READY: uid=${DEPLOY_UID}"
                 exit 0
               fi
-              echo "  found deployment ${UID} in state=${STATE}, waiting..."
+              echo "  found deployment ${DEPLOY_UID} in state=${STATE}, waiting..."
             else
               echo "  no Vercel deployment for SHA=${TARGET_SHA} yet, waiting..."
             fi

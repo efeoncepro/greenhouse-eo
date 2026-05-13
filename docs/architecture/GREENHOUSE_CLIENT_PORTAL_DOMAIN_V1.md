@@ -1,10 +1,37 @@
 # Greenhouse Client Portal Domain Architecture V1
 
-> **Version:** 1.0
+> **Version:** 1.4
 > **Created:** 2026-05-07 por Claude (Opus 4.7)
+> **Updated:** 2026-05-12 por Claude (Opus 4.7) — V1.1 (§3.1 + §3.2 TASK-822), V1.2 (§5.1 rename TASK-824 verdict), V1.3 (§5.2 + §5.3 type/FK drift post-PG-discovery), V1.4 (§5.5 seed contract: view_codes + capabilities son FORWARD-LOOKING en V1.0; parity strict SOLO para data_sources — view_codes parity y capabilities parity son responsabilidad downstream de TASK-826/827 cuando materialicen los catalogs faltantes)
 > **Audience:** Backend engineers, frontend engineers, product owners, comerciales que vendan módulos del portal cliente, agentes que toquen rutas `/api/client-portal/*`, owners de Globe/Wave/CRM Solutions
 > **Related:** `GREENHOUSE_360_OBJECT_MODEL_V1.md`, `GREENHOUSE_CLIENT_PORTAL_ARCHITECTURE_V1.md` (V3.0, descriptivo — predecesor), `GREENHOUSE_CLIENT_LIFECYCLE_V1.md`, `GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md`, `GREENHOUSE_AGENCY_LAYER_V2.md`, `GREENHOUSE_ASSIGNED_TEAM_ARCHITECTURE_V1.md`, `GREENHOUSE_FEATURE_FLAGS_ROLLOUT_PLATFORM_V1.md`
 > **Supersedes:** este spec NO supersede `GREENHOUSE_CLIENT_PORTAL_ARCHITECTURE_V1.md` V3.0 — coexisten: V3.0 describe la experiencia funcional y los 16 cards Creative Hub; este V1 (Domain) canoniza la **estructura del dominio** y el modelo de módulos on-demand. V3.0 sigue siendo lectura obligatoria para entender qué se compone.
+
+---
+
+## Delta 2026-05-13 — TASK-827 Composition Layer cerrada
+
+EPIC-015 child 6/8 cerrado. Materializa el resolver canónico (TASK-825) en UI cliente con menú dinámico, page guards, 5 empty states honestos, lint rule warn, reliability signal scaffold.
+
+**Patrones canonizados en TASK-827** (referenciados en §12 UI Composition Layer):
+
+- **Slice 0 — Parity TS↔DB pattern para view_codes**: 11 viewCodes nuevos en `VIEW_REGISTRY` TS + migration acompañante seed `role_view_assignments` (mirror TASK-750/749). Parity test live `src/lib/client-portal/view-codes/parity.{ts,test.ts,live.test.ts}` con `skipIf(!hasPgConfig)`.
+- **Slice 4 — `requireViewCodeAccess` page guard canonical**: D1 bypass para `isInternalPortalUser=true` (tenantType==='efeonce_internal') + redirect canonical a `/home?denied=<slug>` con slug mapping (`mapViewCodeToPublicSlug`) + degradación honesta `?error=resolver_unavailable` via `captureWithDomain('client_portal', ...)`.
+- **Slice 5 — Anatomía 5-elementos canonical empty state**: icon + title + body + primary CTA + secondary CTA. 3 components nuevos (`ModuleNotAssignedEmpty`, `ClientPortalZeroStateEmpty`, `ClientPortalDegradedBanner`). Consume canonical `<EmptyState>` primitive + microcopy dictionary `GH_CLIENT_PORTAL_COMPOSITION`.
+- **Slice 6 — Refactor light + audit grep documented**: VerticalMenu cliente section preservada (D2 + canSeeView legacy) con inline comments + override marker `// client-portal-allowed:` para lint rule Slice 7. TASK derivada V1.1 `client-portal-vertical-menu-resolver-migration` para refactor full.
+- **Slice 8 — Reliability signal scaffold V1.0**: `client_portal.composition.resolver_failure_rate` returns 'unknown' con shape canonical. V1.1 TASK-829 implementa telemetry adapter (Sentry events query domain=client_portal). Shape canonical preservado — V1.1 NO requiere caller-side change.
+
+**Incident hardening (commit `2fd8a60c`)**: causa raíz `role_view_fallback_used` Sentry alerts = 11 viewCodes Slice 0 sin seed acompañante en `role_view_assignments`. Resuelto canónicamente via migration seed 44 filas (4 roles × 11 viewCodes). Regla canonizada en CLAUDE.md "View Registry Governance Pattern (TASK-827)" — cualquier viewCode futuro en VIEW_REGISTRY requiere migration acompañante.
+
+**TASK derivadas V1.1 registradas** (5 follow-ups + 1 telemetry adapter para TASK-829):
+- `client-portal-legacy-branching-sweep` — promote lint rule warn→error
+- `capability-modules-resolver-migration` (D2)
+- `client-portal-vertical-menu-resolver-migration` (Slice 6 deferred)
+- `client-portal-pages-placeholder-materialization` (10 pages placeholder)
+- `account-manager-email-canonical-resolver` (D4 V1.1 canonical 360 lookup)
+- `client-portal-resolver-failure-rate-telemetry-adapter` (TASK-829)
+
+**Desbloquea**: TASK-828 cascade desde lifecycle (consume resolver + emit assignments outbox) + TASK-829 reliability signals subsystem `Client Portal Health` (6 signals adicionales + legacy backfill + telemetry adapter Slice 8 reader real).
 
 ---
 
@@ -77,7 +104,72 @@ Consecuencias del gap actual:
 | View governance | `authorized_views` + `view_codes` (TASK-136) | Cada módulo declara sus view_codes |
 | Feature flags variantes | `home_rollout_flags` (TASK-780) | Distinto: ese es shell variant; este es product entitlement |
 
-**Ownership**: `client_portal` es dominio nuevo de primer nivel. Owner técnico inicial: efeonce-account. Sentry domain: `client_portal`.
+**Ownership**: `client_portal` es dominio nuevo de primer nivel **compositivo (BFF / Anti-Corruption Layer del route group `client`)**. Owner técnico inicial: efeonce-account. Sentry domain: `client_portal`.
+
+---
+
+## 3.1 Module classification: curated vs native (TASK-822)
+
+`src/lib/client-portal/` es un **BFF**. Los readers que expone se clasifican en dos categorías mutuamente excluyentes:
+
+| Classification | Carpeta | Semántica | Ownership canónica | Ejemplos V1.0 |
+|---|---|---|---|---|
+| `curated` | `readers/curated/` | Re-export puro de un reader que vive en un dominio productor. Firma exacta, cero adaptation. | Permanece en el dominio productor (`account-360`, `agency`, `ico-engine`). Si la firma upstream cambia, este re-export refleja el cambio automáticamente. | `getClientAccountSummary` (owner `account-360`), readers de Creative Hub (owner `agency`), métricas ICO (owner `ico-engine`) |
+| `native` | `readers/native/` | Nace en `client-portal` porque no tiene owner previo en otro dominio. Owns su firma. | `client_portal` | `resolveClientPortalModulesForOrganization` (TASK-825), composition helpers, BFF-specific shaping |
+
+**Reglas duras**:
+
+- **NUNCA** mover físicamente un reader de su dominio owner a `readers/curated/`. La curated layer es un puntero, NO una mudanza. Si emerge la tentación de "consolidar el código acá", el reader probablemente NO es client-portal-specific y debe quedarse donde está.
+- **NUNCA** clasificar como `curated` un reader que aplica thin adaptation (e.g. agrega un parámetro `clientPortalContext`). Si adapta, es `native` con `ownerDomain` documentando la fuente original.
+- **NUNCA** mezclar dimensiones: `classification` (curated/native) y `ownerDomain` son ortogonales. Curated siempre tiene `ownerDomain` no-null; native siempre tiene `ownerDomain` null.
+- **SIEMPRE** que un reader native emerja, evaluar primero si pertenece a un dominio productor existente. Default: empujar al dominio productor; native solo cuando el dato NO tiene dominio natural (e.g. el resolver del catálogo de módulos pertenece nativamente a `client_portal` porque el catálogo es owned por `client_portal`).
+
+**Metadata canónica obligatoria** (TASK-822 Slice 1):
+
+```ts
+// src/lib/client-portal/dto/reader-meta.ts
+export interface ClientPortalReaderMeta {
+  readonly key: string                                // identifier estable
+  readonly classification: 'curated' | 'native'
+  readonly ownerDomain: string | null                 // 'account-360' | 'agency' | ... | null si native
+  readonly dataSources: readonly ClientPortalDataSource[]
+  readonly clientFacing: boolean
+  readonly routeGroup: 'client' | 'agency' | 'admin'
+}
+```
+
+Cada archivo bajo `readers/{curated,native}/` exporta un `*Meta: ClientPortalReaderMeta` tipado. Esto reemplaza la idea original de JSDoc `@dataSources` tags (JSDoc no es machine-checkable; un export TS sí). Compile-checked, grep-able, consumible por TASK-824 catalog validation (parity test entre `ClientPortalDataSource` type union y `modules.data_sources[]` enum DB).
+
+---
+
+## 3.2 Domain import direction (TASK-822, hoja del DAG)
+
+`client_portal` es **hoja del DAG de dominios**. La dirección de imports está enforced.
+
+**Permitido** (`client_portal` consumidor):
+
+```text
+src/lib/client-portal/**  →  src/lib/{account-360,agency,ico-engine,commercial,finance,delivery,identity}/**
+```
+
+**Prohibido** (`client_portal` productor — anti-pattern):
+
+```text
+src/lib/{account-360,agency,ico-engine,commercial,finance,delivery,identity,hr}/**  →  src/lib/client-portal/**
+```
+
+**Enforcement** (defense in depth, 3 capas):
+
+1. **ESLint rule canónica** `greenhouse/no-cross-domain-import-from-client-portal` (modo `error`, TASK-822 Slice 3). Bloquea el commit. Override block en `eslint.config.mjs` exime `src/lib/client-portal/**` (el módulo puede importarse a sí mismo).
+2. **Grep negativo** en code review: `rg "from '@/lib/client-portal" src/lib/{agency,finance,hr,account-360,ico-engine,identity,delivery,commercial}/` debe estar vacío. Verificación adicional cuando la lint rule esté en mantenimiento o se modifique.
+3. **Doctrina canonizada** en CLAUDE.md (overlay de Greenhouse) cuando emerja el primer dominio adicional con misma forma (e.g. `partner_portal`, `vendor_portal`) — replica el patrón.
+
+**Reglas duras**:
+
+- **NUNCA** crear un import de `@/lib/client-portal/*` desde un dominio productor. La rule lo bloquea; si emerge la necesidad, el reader que se quiere consumir está en el dominio equivocado (mover al dominio productor) o el consumer está en la capa equivocada (mover al BFF si es client-facing).
+- **NUNCA** desactivar la rule per-archivo con `// eslint-disable-next-line`. Si emerge un caso legítimo, agregarlo al override block en `eslint.config.mjs` con comentario justificando.
+- **NUNCA** introducir un dominio paralelo que importe `client_portal` "indirectamente" (e.g. dominio nuevo que importa lo que client_portal importa). Eso recrea el ciclo bajo otro nombre.
+- **SIEMPRE** que un dominio adicional con shape BFF emerja (partner portal, vendor portal, internal admin portal), reusar este patrón: hoja del DAG + lint rule equivalente + classification curated/native + metadata tipada. NO inventar una primitiva nueva.
 
 ---
 
@@ -98,7 +190,13 @@ Consecuencias del gap actual:
 
 ### 5.1 `greenhouse_client_portal.modules`
 
-Catálogo declarativo de módulos. Append-only (versionable via `effective_to`). NUNCA modificar fila existente.
+Catálogo declarativo de módulos. Append-only (versionable via `effective_to`). NUNCA modificar fila existente excepto `effective_to` (deprecación) o `display_label*` (typo fix operacional).
+
+**Delta V1.2 (2026-05-12, arch-architect verdict TASK-824)**:
+
+- Campo `business_line` (V1.0) renombrado a `applicability_scope` (V1.2). Razón: `GREENHOUSE_BUSINESS_LINES_ARCHITECTURE_V1.md` declara explícitamente "no existe enum PostgreSQL duplicado del catalogo" — la source of truth canónica del business_line del 360 es `greenhouse_core.service_modules.module_code WHERE module_kind='business_line'`. El campo en `client_portal.modules` mezcla dimensiones ortogonales (business_lines reales `globe`/`wave`/`crm_solutions` + metavalue `cross` "aplicable a múltiples" + service_module `staff_aug` "dentro de cross") — por lo tanto NO es business_line en sentido canónico. Rename clarifica semántica + COMMENT canónico documenta la distinción para evitar futuro drift.
+- Campo `default_for_business_lines` (V1.0 reservado dormido) ELIMINADO V1.2. Razón: YAGNI; campos dormidos son drift latente. Si emerge necesidad real en V1.1+, ADD COLUMN nullable migration — cero costo aplazar.
+- Whitelist de `data_sources[]`: V1.0 no especificaba enforcement; V1.2 adopta **Option C — parity test live TS↔DB** (mismo patrón TASK-611 `capabilities_registry`). NO se introduce CHECK constraint sobre `data_sources[]` con array literal hardcodeado (drift latente cada vez que `ClientPortalDataSource` TS union se extienda). Si el catalog crece > 30 values en V1.1+, migrar a Option B (registry table dedicada).
 
 ```sql
 CREATE SCHEMA IF NOT EXISTS greenhouse_client_portal;
@@ -109,22 +207,21 @@ CREATE TABLE greenhouse_client_portal.modules (
   display_label      TEXT NOT NULL,                    -- 'Creative Hub' (es-CL operator-facing)
   display_label_client TEXT NOT NULL,                  -- 'Tu Creative Hub' (cliente-facing, tono cálido)
   description        TEXT,
-  business_line      TEXT NOT NULL
-                     CHECK (business_line IN ('globe','wave','crm_solutions','staff_aug','cross')),
+  applicability_scope TEXT NOT NULL
+                     CHECK (applicability_scope IN ('globe','wave','crm_solutions','staff_aug','cross')),
+                                    -- V1.2 rename desde 'business_line'. Ver COMMENT más abajo.
   tier               TEXT NOT NULL
                      CHECK (tier IN ('standard','addon','pilot','enterprise','internal')),
 
   view_codes         TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
-                                    -- referencias a authorized_views.view_code (TASK-136)
+                                    -- referencias a authorized_views.view_code (TASK-136). Parity test live verifica drift.
   capabilities       TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
-                                    -- capabilities del entitlements platform (TASK-403)
+                                    -- capabilities del entitlements platform (TASK-403). Parity test live verifica drift.
   data_sources       TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
-                                    -- whitelist de dominios que alimentan: 'agency.ico','commercial.engagements','finance.invoices','delivery.tasks','assigned_team'
+                                    -- whitelist de dominios productores: 'agency.ico','commercial.engagements','finance.invoices','delivery.tasks','assigned_team',etc. Parity test live TS↔DB (Option C) verifica drift contra ClientPortalDataSource type union de src/lib/client-portal/dto/reader-meta.ts. NO hay CHECK constraint con array literal hardcodeado (drift latente).
 
   pricing_kind       TEXT NOT NULL
                      CHECK (pricing_kind IN ('bundled','addon_fixed','addon_usage','pilot_no_cost','pilot_success_fee','enterprise_custom')),
-  default_for_business_lines TEXT[] DEFAULT ARRAY[]::TEXT[],
-                                    -- ej. ['globe'] para creative_hub_globe_v1; cliente con business_line=globe lo recibe por default si no hay assignment explícito (V1.0 NO usa este campo aún — reservado para V1.1 inferencia automática)
 
   effective_from     DATE NOT NULL DEFAULT CURRENT_DATE,
   effective_to       DATE,
@@ -134,14 +231,17 @@ CREATE TABLE greenhouse_client_portal.modules (
   CHECK (effective_to IS NULL OR effective_to > effective_from)
 );
 
-CREATE INDEX modules_business_line ON greenhouse_client_portal.modules (business_line) WHERE effective_to IS NULL;
+COMMENT ON COLUMN greenhouse_client_portal.modules.applicability_scope IS
+  'Categoría de aplicabilidad del módulo dentro del dominio client_portal. NO es FK al business_line canónico del 360 (greenhouse_core.service_modules.module_code WHERE module_kind=''business_line''). Mezcla dimensiones ortogonales: business_lines reales (globe, wave, crm_solutions), metavalue cross=aplicable-a-múltiples, y service_module staff_aug=dentro-de-cross. Para resolver el business_line canónico del cliente consumidor, usar greenhouse_core.business_line_metadata. Hard rule canonizada en GREENHOUSE_BUSINESS_LINES_ARCHITECTURE_V1.md: NO duplicar enum del catalogo.';
+
+CREATE INDEX modules_applicability_scope ON greenhouse_client_portal.modules (applicability_scope) WHERE effective_to IS NULL;
 CREATE INDEX modules_tier ON greenhouse_client_portal.modules (tier) WHERE effective_to IS NULL;
 
 -- Append-only triggers
 CREATE OR REPLACE FUNCTION greenhouse_client_portal.modules_no_update_breaking() RETURNS trigger AS $$
 BEGIN
   -- Solo se permite UPDATE de effective_to (deprecación) y display_label* (typo fix)
-  IF NEW.module_key != OLD.module_key OR NEW.business_line != OLD.business_line
+  IF NEW.module_key != OLD.module_key OR NEW.applicability_scope != OLD.applicability_scope
      OR NEW.tier != OLD.tier OR NEW.view_codes != OLD.view_codes
      OR NEW.capabilities != OLD.capabilities OR NEW.data_sources != OLD.data_sources
      OR NEW.pricing_kind != OLD.pricing_kind OR NEW.effective_from != OLD.effective_from THEN
@@ -156,14 +256,18 @@ CREATE TRIGGER modules_append_only_check
   FOR EACH ROW EXECUTE FUNCTION greenhouse_client_portal.modules_no_update_breaking();
 ```
 
+**Parity test live canónico (V1.2)**: `src/lib/client-portal/data-sources/parity.{ts,live.test.ts}` — replica shape de TASK-611 `capabilities_registry`. Lee seed DB y compara los 3 arrays (`data_sources` + `view_codes` + `capabilities`) contra TS sources of truth (`ClientPortalDataSource` union + `VIEW_REGISTRY` + `entitlements-catalog`). Falla loud (rompe build) si emerge drift TS↔DB. CI gate corre en lane con PG config; `describe.skipIf(!hasPgConfig)` permite lint-only runs locales.
+
 ### 5.2 `greenhouse_client_portal.module_assignments`
 
 Asignación per-cliente time-versioned. Una fila por (organization_id, module_key) activa.
 
+**Delta V1.3 (2026-05-12, PG discovery TASK-824)**: `organization_id` cambia de UUID a TEXT (la tabla `greenhouse_core.organizations.organization_id` es TEXT en runtime, verificado live). FK `approved_by_user_id` apunta a `greenhouse_core.client_users(user_id)` (la tabla canónica de usuarios autenticados; `greenhouse_core.users` no existe).
+
 ```sql
 CREATE TABLE greenhouse_client_portal.module_assignments (
   assignment_id     TEXT PRIMARY KEY,                  -- 'cpma-{uuid}'
-  organization_id   UUID NOT NULL REFERENCES greenhouse_core.organizations(organization_id),
+  organization_id   TEXT NOT NULL REFERENCES greenhouse_core.organizations(organization_id),
   module_key        TEXT NOT NULL REFERENCES greenhouse_client_portal.modules(module_key),
 
   status            TEXT NOT NULL DEFAULT 'pending'
@@ -178,7 +282,7 @@ CREATE TABLE greenhouse_client_portal.module_assignments (
   effective_to      DATE,
   expires_at        TIMESTAMPTZ,                       -- para pilot/trial con timeout
 
-  approved_by_user_id TEXT REFERENCES greenhouse_core.users(user_id),
+  approved_by_user_id TEXT REFERENCES greenhouse_core.client_users(user_id),
   approved_at         TIMESTAMPTZ,
 
   metadata_json     JSONB DEFAULT '{}'::jsonb,
@@ -204,6 +308,8 @@ CREATE INDEX module_assignments_expires_at ON greenhouse_client_portal.module_as
 
 Audit append-only. Anti-UPDATE/DELETE triggers.
 
+**Delta V1.3 (2026-05-12, PG discovery TASK-824)**: FK `actor_user_id` apunta a `greenhouse_core.client_users(user_id)` — misma corrección del §5.2.
+
 ```sql
 CREATE TABLE greenhouse_client_portal.module_assignment_events (
   event_id         TEXT PRIMARY KEY,                   -- 'cpmae-{uuid}'
@@ -213,7 +319,7 @@ CREATE TABLE greenhouse_client_portal.module_assignment_events (
   from_status      TEXT,
   to_status        TEXT,
   payload_json     JSONB NOT NULL DEFAULT '{}'::jsonb,
-  actor_user_id    TEXT NOT NULL REFERENCES greenhouse_core.users(user_id),
+  actor_user_id    TEXT NOT NULL REFERENCES greenhouse_core.client_users(user_id),
   occurred_at      TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
@@ -241,9 +347,24 @@ COMMENT ON COLUMN greenhouse_commercial.engagement_commercial_terms.bundled_modu
 
 ### 5.5 Seed inicial — 10 módulos canónicos V1.0
 
+NOTA V1.2: la columna `business_line` fue renombrada a `applicability_scope` (ver §5.1 Delta V1.2). Los valores siguen idénticos (rename puro, no cambio semántico de los seeds).
+
+**Delta V1.4 (2026-05-12, post-PG-discovery TASK-824)**: los `view_codes[]` y `capabilities[]` declarados en los 10 seeds son **forward-looking**. Verificación live 2026-05-12:
+
+- De los 16 `view_codes` referenciados, solo 4 existen hoy en `VIEW_REGISTRY` (`cliente.pulse`, `cliente.proyectos`, `cliente.equipo`, `cliente.campanas`). Los 11 restantes (`cliente.creative_hub`, `cliente.reviews`, `cliente.roi_reports`, `cliente.exports`, `cliente.cvr_quarterly`, `cliente.staff_aug`, `cliente.brand_intelligence`, `cliente.csc_pipeline`, `cliente.crm_command`, `cliente.web_delivery`, `cliente.home`) los materializa TASK-827 (UI composition layer).
+- De los 12 `capabilities` referenciados, solo `client_portal.workspace` existe hoy en `entitlements-catalog`. Los 11 restantes (`client_portal.creative_hub.read`, `client_portal.csc_pipeline.read`, `client_portal.brand_intelligence.read`, `client_portal.cvr.read`, `client_portal.cvr.export`, `client_portal.roi.read`, `client_portal.exports.generate`, `client_portal.assigned_team.read`, `client_portal.pulse.read`, `client_portal.staff_aug.read`, `client_portal.crm_command.read`, `client_portal.web_delivery.read`) los materializa TASK-826 (admin endpoints + capabilities granulares).
+
+Contract canónico de parity tests:
+
+- **`data_sources[]` strict parity (TASK-824, esta task)**: el TS union `ClientPortalDataSource` de TASK-822 es source of truth; parity test live rompe build si seed DB ↔ TS union diverge.
+- **`view_codes[]` strict parity (TASK-827)**: cuando TASK-827 materialice los view_codes faltantes en `VIEW_REGISTRY`, agrega SU propio parity test que valida que los seeds de TASK-824 sean consumidos correctamente.
+- **`capabilities[]` strict parity (TASK-826)**: cuando TASK-826 materialice las capabilities faltantes en `entitlements-catalog`, agrega SU propio parity test análogo.
+
+Cada task posee la parity de SU catalog. Sin chicken-and-egg blocking.
+
 ```sql
 -- Globe (3)
-INSERT INTO greenhouse_client_portal.modules (module_key, display_label, display_label_client, business_line, tier, view_codes, capabilities, data_sources, pricing_kind) VALUES
+INSERT INTO greenhouse_client_portal.modules (module_key, display_label, display_label_client, applicability_scope, tier, view_codes, capabilities, data_sources, pricing_kind) VALUES
 ('creative_hub_globe_v1', 'Creative Hub Globe (Bundle)', 'Tu Creative Hub', 'globe', 'standard',
   ARRAY['cliente.pulse','cliente.proyectos','cliente.campanas','cliente.creative_hub','cliente.equipo','cliente.reviews'],
   ARRAY['client_portal.creative_hub.read','client_portal.csc_pipeline.read','client_portal.brand_intelligence.read','client_portal.cvr.read'],
@@ -261,7 +382,7 @@ INSERT INTO greenhouse_client_portal.modules (module_key, display_label, display
   'addon_fixed');
 
 -- Cross-line (3)
-INSERT INTO greenhouse_client_portal.modules (module_key, display_label, display_label_client, business_line, tier, view_codes, capabilities, data_sources, pricing_kind) VALUES
+INSERT INTO greenhouse_client_portal.modules (module_key, display_label, display_label_client, applicability_scope, tier, view_codes, capabilities, data_sources, pricing_kind) VALUES
 ('equipo_asignado', 'Equipo Asignado', 'Tu equipo', 'cross', 'standard',
   ARRAY['cliente.equipo'],
   ARRAY['client_portal.assigned_team.read'],
@@ -279,7 +400,7 @@ INSERT INTO greenhouse_client_portal.modules (module_key, display_label, display
   'bundled');
 
 -- Globe addons (2)
-INSERT INTO greenhouse_client_portal.modules (module_key, display_label, display_label_client, business_line, tier, view_codes, capabilities, data_sources, pricing_kind) VALUES
+INSERT INTO greenhouse_client_portal.modules (module_key, display_label, display_label_client, applicability_scope, tier, view_codes, capabilities, data_sources, pricing_kind) VALUES
 ('brand_intelligence', 'Brand Intelligence (RpA + First-Time Right)', 'Tu Brand Intelligence', 'globe', 'addon',
   ARRAY['cliente.brand_intelligence'],
   ARRAY['client_portal.brand_intelligence.read'],
@@ -291,8 +412,8 @@ INSERT INTO greenhouse_client_portal.modules (module_key, display_label, display
   ARRAY['agency.csc'],
   'addon_fixed');
 
--- Otras business lines (2)
-INSERT INTO greenhouse_client_portal.modules (module_key, display_label, display_label_client, business_line, tier, view_codes, capabilities, data_sources, pricing_kind) VALUES
+-- Otros applicability_scope (2)
+INSERT INTO greenhouse_client_portal.modules (module_key, display_label, display_label_client, applicability_scope, tier, view_codes, capabilities, data_sources, pricing_kind) VALUES
 ('crm_command_legacy', 'CRM Command (legacy, transición a Kortex)', 'Tu CRM Command', 'crm_solutions', 'standard',
   ARRAY['cliente.crm_command'],
   ARRAY['client_portal.crm_command.read'],
@@ -564,7 +685,7 @@ Subsystem nuevo: `Client Portal Health` (registrado en `RELIABILITY_REGISTRY`).
 | `client_portal.assignment.orphan_module_key` | data_quality | error | 0 | assignments con `module_key` no presente en `modules` activos |
 | `client_portal.assignment.lifecycle_module_drift` | drift | warning | 0 | clientes con `lifecycle_stage='active_client'` pero zero assignments activos > 14 días |
 | `client_portal.cascade.dead_letter` | dead_letter | error | 0 | outbox events `client.portal.*` en dead_letter |
-| `client_portal.assignment.business_line_mismatch` | drift | warning | 0 | assignments cuyo módulo declara `business_line` distinto al de la organización (excepto `cross`) |
+| `client_portal.assignment.business_line_mismatch` | drift | warning | 0 | assignments cuyo módulo declara `applicability_scope` distinto al business_line canónico de la organización (excepto cuando `applicability_scope='cross'` que es aplicable a múltiples) |
 | `client_portal.assignment.pilot_expired_not_actioned` | drift | warning | 0 | pilots con `expires_at < now()` y `status='pilot'` (no transitioned a active/churned) |
 | `client_portal.assignment.churned_with_active_session` | drift | error | 0 | client_users con session activa cuya org tiene `lifecycle_stage='inactive'/'churned'` y assignments con `status != 'churned'` |
 
@@ -622,7 +743,7 @@ Subsystem nuevo: `Client Portal Health` (registrado en `RELIABILITY_REGISTRY`).
 - **NUNCA** branchear UI client-side por `tenant_type`, `business_line` o `tenant_capabilities` directo. Toda diferenciación pasa por el resolver.
 - **NUNCA** duplicar datos primarios en `greenhouse_client_portal.*`. Solo catálogo + assignments. Datos viven en dominios productores.
 - **NUNCA** habilitar un módulo manualmente sin pasar por `enableClientPortalModule()`. CHECK constraint + capability + audit.
-- **NUNCA** modificar `modules.*` campos críticos in-place (business_line, tier, view_codes, capabilities, data_sources, pricing_kind, effective_from). Versionar via `effective_to` + nueva fila con `module_key` distinto. Append-only trigger enforced.
+- **NUNCA** modificar `modules.*` campos críticos in-place (applicability_scope, tier, view_codes, capabilities, data_sources, pricing_kind, effective_from). Versionar via `effective_to` + nueva fila con `module_key` distinto. Append-only trigger enforced.
 - **NUNCA** UPDATE/DELETE sobre `module_assignment_events`. Triggers append-only.
 - **NUNCA** loggear `reason`, `cancellation_reason`, `override_reason` raw — `redactSensitive` antes.
 - **NUNCA** invocar `enableClientPortalModule` directo desde UI client-facing. Solo desde admin endpoint o reactive consumer.
@@ -773,7 +894,10 @@ Fases:
 | **Addon** | Módulo `tier='addon'` no incluido en bundle base; requires explicit enable |
 | **Pilot/Trial** | Assignment con `status='pilot'` y `expires_at` set; transitions a `active` o `churned` al expirar |
 | **Drift** | Discrepancia entre assignments y signals legacy (`tenant_capabilities`); detected por reliability signal |
-| **Override** | Acción excepcional de habilitar un módulo cuyo `business_line` no matchea el de la organización; restringido a EFEONCE_ADMIN + audit |
+| **Override** | Acción excepcional de habilitar un módulo cuyo `applicability_scope` no matchea el business_line canónico de la organización; restringido a EFEONCE_ADMIN + audit |
+| **Applicability scope** | Campo `modules.applicability_scope` del dominio client_portal (V1.2 rename desde `business_line`). Mezcla dimensiones ortogonales: business_lines reales (`globe`/`wave`/`crm_solutions`), metavalue `cross` (aplicable a múltiples) y service_module `staff_aug` (dentro de cross). **NO es FK al business_line canónico del 360** (`greenhouse_core.service_modules.module_code WHERE module_kind='business_line'`). Para resolver el business_line canónico del cliente consumidor, usar `greenhouse_core.business_line_metadata`. Hard rule: NO duplicar enum del catalogo (per `GREENHOUSE_BUSINESS_LINES_ARCHITECTURE_V1.md`). |
+| **Business line (canónico)** | Identidad del 360 — fila en `greenhouse_core.service_modules` con `module_kind='business_line'`. Source of truth para `globe`, `wave`, `crm_solutions`. NO confundir con `modules.applicability_scope` del client_portal (que es ortogonal). |
+| **Parity test (client_portal)** | Test live `src/lib/client-portal/data-sources/parity.live.test.ts` que verifica drift TS↔DB de los 3 arrays de `modules` (data_sources + view_codes + capabilities). Replica shape de TASK-611 `capabilities_registry`. `describe.skipIf(!hasPgConfig)` para lint-only runs. |
 
 ---
 

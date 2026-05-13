@@ -242,4 +242,140 @@ describe('resolveSecret', () => {
 
     expect(accessSecretVersion).toHaveBeenCalledTimes(1)
   })
+
+  // ─────────────────────────────────────────────────────────────────────
+  // TASK-870 — Secret-ref normalizer V2 anti-regression suite.
+  //
+  // Bug class detectada live 2026-05-12 con
+  // GREENHOUSE_GITHUB_APP_PRIVATE_KEY_SECRET_REF persistida en Vercel
+  // production con valor `"greenhouse-github-app-private-key\n"` (bytes
+  // hex `... 6b 65 79 5c 6e 22`). El normalizer legacy NO strippa quotes
+  // envolventes → resource name resultante con quotes embebidos → GCP
+  // NOT_FOUND silencioso → fallback a PAT + Sentry burst recurrente.
+  //
+  // V2 normalizer canónico (single-source via stripEnvVarContamination)
+  // + shape validation regex (SECRET_REF_SHAPE) cierra la clase.
+  // ─────────────────────────────────────────────────────────────────────
+
+  it('TASK-870 — accepts ref with surrounding quotes (auto-strip canonical recovery)', async () => {
+    vi.stubEnv('GCP_PROJECT', 'efeonce-group')
+    vi.stubEnv('NUBOX_BEARER_TOKEN_SECRET_REF', '"nubox-bearer-token"')
+    accessSecretVersion.mockResolvedValue([
+      { payload: { data: Buffer.from('secret-from-manager') } }
+    ])
+
+    const { resolveSecret } = await import('@/lib/secrets/secret-manager')
+    const resolution = await resolveSecret({ envVarName: 'NUBOX_BEARER_TOKEN' })
+
+    // Quote-stripping path: normalizer V2 strippa las quotes → canonical name.
+    // GCP debería ser invocado con el path canónico.
+    expect(accessSecretVersion).toHaveBeenCalledWith({
+      name: 'projects/efeonce-group/secrets/nubox-bearer-token/versions/latest'
+    })
+    expect(resolution.source).toBe('secret_manager')
+    expect(resolution.value).toBe('secret-from-manager')
+  })
+
+  it('TASK-870 — rejects ref with quotes + literal `\\n` (exact production corruption)', async () => {
+    vi.stubEnv('GCP_PROJECT', 'efeonce-group')
+    // Bytes literales observados en `vercel env pull production`:
+    //   key="greenhouse-github-app-private-key\n"
+    // donde `\n` son 2 chars (backslash + n), no LF real.
+    vi.stubEnv(
+      'GREENHOUSE_GITHUB_APP_PRIVATE_KEY_SECRET_REF',
+      '"greenhouse-github-app-private-key\\n"'
+    )
+    accessSecretVersion.mockResolvedValue([
+      { payload: { data: Buffer.from('-----BEGIN RSA PRIVATE KEY-----\nfoo\n-----END RSA PRIVATE KEY-----\n') } }
+    ])
+
+    const { resolveSecret } = await import('@/lib/secrets/secret-manager')
+    const resolution = await resolveSecret({ envVarName: 'GREENHOUSE_GITHUB_APP_PRIVATE_KEY' })
+
+    expect(accessSecretVersion).toHaveBeenCalledWith({
+      name: 'projects/efeonce-group/secrets/greenhouse-github-app-private-key/versions/latest'
+    })
+    expect(resolution.source).toBe('secret_manager')
+  })
+
+  it('TASK-870 — rejects ref with embedded space (shape regex enforcement)', async () => {
+    vi.stubEnv('GCP_PROJECT', 'efeonce-group')
+    vi.stubEnv('NUBOX_BEARER_TOKEN_SECRET_REF', 'nubox bearer token')
+
+    const { resolveSecret } = await import('@/lib/secrets/secret-manager')
+    const resolution = await resolveSecret({ envVarName: 'NUBOX_BEARER_TOKEN' })
+
+    // Shape regex rechaza → normalizer retorna null → GCP NO se invoca.
+    expect(accessSecretVersion).not.toHaveBeenCalled()
+    expect(resolution.source).toBe('unconfigured')
+    expect(resolution.value).toBeNull()
+  })
+
+  it('TASK-870 — rejects ref with malformed projects/... path', async () => {
+    vi.stubEnv('GCP_PROJECT', 'efeonce-group')
+    vi.stubEnv('NUBOX_BEARER_TOKEN_SECRET_REF', 'projects/foo/wrong/path/structure')
+
+    const { resolveSecret } = await import('@/lib/secrets/secret-manager')
+    const resolution = await resolveSecret({ envVarName: 'NUBOX_BEARER_TOKEN' })
+
+    expect(accessSecretVersion).not.toHaveBeenCalled()
+    expect(resolution.source).toBe('unconfigured')
+  })
+
+  it('TASK-870 — accepts real LF at end of ref (single-source contamination strip)', async () => {
+    vi.stubEnv('GCP_PROJECT', 'efeonce-group')
+    vi.stubEnv('NUBOX_BEARER_TOKEN_SECRET_REF', 'nubox-bearer-token\n')
+    accessSecretVersion.mockResolvedValue([
+      { payload: { data: Buffer.from('secret-from-manager') } }
+    ])
+
+    const { resolveSecret } = await import('@/lib/secrets/secret-manager')
+    const resolution = await resolveSecret({ envVarName: 'NUBOX_BEARER_TOKEN' })
+
+    expect(accessSecretVersion).toHaveBeenCalledWith({
+      name: 'projects/efeonce-group/secrets/nubox-bearer-token/versions/latest'
+    })
+    expect(resolution.value).toBe('secret-from-manager')
+  })
+
+  it('TASK-870 — accepts shorthand `<name>:latest` with quotes envolventes (combined contamination)', async () => {
+    vi.stubEnv('GCP_PROJECT', 'efeonce-group')
+    vi.stubEnv('NUBOX_BEARER_TOKEN_SECRET_REF', '"nubox-bearer-token:latest"')
+    accessSecretVersion.mockResolvedValue([
+      { payload: { data: Buffer.from('secret-from-manager') } }
+    ])
+
+    const { resolveSecret } = await import('@/lib/secrets/secret-manager')
+    const resolution = await resolveSecret({ envVarName: 'NUBOX_BEARER_TOKEN' })
+
+    expect(accessSecretVersion).toHaveBeenCalledWith({
+      name: 'projects/efeonce-group/secrets/nubox-bearer-token/versions/latest'
+    })
+    expect(resolution.value).toBe('secret-from-manager')
+  })
+
+  it('TASK-870 — isCanonicalSecretRefShape exposes predicate for external auditors', async () => {
+    const { isCanonicalSecretRefShape } = await import('@/lib/secrets/secret-manager')
+
+    // Canonical accepts
+    expect(isCanonicalSecretRefShape('greenhouse-github-app-private-key')).toBe(true)
+    expect(isCanonicalSecretRefShape('my-secret:42')).toBe(true)
+    expect(isCanonicalSecretRefShape('my-secret:latest')).toBe(true)
+    expect(isCanonicalSecretRefShape(
+      'projects/efeonce-group/secrets/my-secret/versions/latest'
+    )).toBe(true)
+
+    // Contamination accepted post-strip
+    expect(isCanonicalSecretRefShape('"my-secret"')).toBe(true)
+    expect(isCanonicalSecretRefShape('"my-secret\\n"')).toBe(true)
+    expect(isCanonicalSecretRefShape('  my-secret  ')).toBe(true)
+
+    // Hard rejects (shape invalid post-strip)
+    expect(isCanonicalSecretRefShape('my secret')).toBe(false)
+    expect(isCanonicalSecretRefShape('my"quote"middle')).toBe(false)
+    expect(isCanonicalSecretRefShape('projects/foo/wrong/path')).toBe(false)
+    expect(isCanonicalSecretRefShape('')).toBe(false)
+    expect(isCanonicalSecretRefShape(undefined)).toBe(false)
+    expect(isCanonicalSecretRefShape('""')).toBe(false)
+  })
 })

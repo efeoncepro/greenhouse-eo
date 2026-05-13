@@ -1,3 +1,371 @@
+# Sesion 2026-05-13 — TASK-871 Account Balance Rolling Anchor Contract SHIPPED on develop (Slices 2-4 + cierre docs)
+
+- **Trigger**: user pidió hacer pase a producción develop→main. Pre-checks revelaron Playwright smoke `finance.account_balances.fx_drift` rojo pre-existing (3 cuentas en 2026-05-05 con drift real). ISSUE-069 era fix parcial; TASK-871 cierra el bug class de raíz.
+- **Path B intentado (recovery + ship hoy) FALLÓ**: el remediator canonical con `evidence-guard=warn_only` reportaba `seen=0` aunque diagnose decía `seen=1`. El bug class TASK-871 estaba activo en el remediator mismo.
+- **Decisión user (4-pilar lens)**: implementar TASK-871 completa (Opción A2 más segura/robusta/escalable). Pausa release hasta cierre.
+- **Branch**: develop directo (sin task branch) — pattern TASK-822..827.
+- **Pre-execution OQ resuelta** (baseline commit `5910f0e3`): interpretación B — `targetStartDate = today - lookbackDays` → window 8 días observed (lookback + today inclusive). Rationale 4-pilar documentado en spec.
+
+## Slices ejecutados (5 commits incrementales)
+
+| Slice | Commit | Resumen |
+| --- | --- | --- |
+| Slice 2A | `a918ecd4` | `computeRollingRematerializationWindow` primitive con shape canónico 6-field. `computeRematerializeSeedDate` preservado como wrapper back-compat. 13 tests nuevos. |
+| Slice 2B | `23ba4c2a` | `resolveCleanSeedDate` integrity check — walks backward hasta movement-free anchor o devuelve `exceeded_max_expand` (default maxExpand=30). Consume VIEWs canónicas TASK-766. 11 tests. |
+| Slice 2C | `8524d745` | Wire en cron handler `handleFinanceRematerializeBalances`: protected snapshot anchor → integrity check → clean seed o escalation `captureWithDomain('finance')` + push a `escalations[]`. |
+| Slice 3 | `689d35cf` | `FxDriftRemediationPolicy` 5to value `rolling_window_repair`. classifier + executor con `seedMode='explicit'` + `block_on_reconciled_drift`. Helper movido a `src/lib/finance/` para uso dual cron+remediator. 6 tests nuevos. |
+| Slice 4 | `ec16aca9` | `finance-rematerialize-invariants.test.ts` — 4 invariantes anti-regresión (A shape + property 30-iter, B cleanSeed semantics, C escalation honesty, D composition end-to-end del 2026-05-13 incident). |
+
+## Quality gates locales (CLAUDE.md Task Closing Quality Gate)
+
+- `pnpm test` — 4441 passed, 17 skipped, 71s.
+- `pnpm build` — production Turbopack verde end-to-end.
+- `pnpm tsc --noEmit` — clean.
+- `pnpm lint` — clean.
+
+## Docs canónicos (Slice 6 — local commit pending)
+
+- `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md` — Delta 2026-05-13 nueva sección con primitives + invariantes.
+- `docs/architecture/DECISIONS_INDEX.md` — entry "Rolling rematerialize usa primitive tipada + integrity check + policy `rolling_window_repair` con escalación honesta".
+- `docs/issues/resolved/ISSUE-069-finance-cron-rematerialize-seed-day-blind-spot.md` — Delta 2026-05-13 "fix parcial; TASK-871 cierra contrato completo".
+- `CLAUDE.md` — sección "Finance — Cron rematerialize-balances seed contract (ISSUE-069)" reemplazada por "Finance — Rolling rematerialize anchor contract (TASK-871, supersedes ISSUE-069)".
+- `docs/tasks/in-progress/TASK-871-...` → `docs/tasks/complete/TASK-871-...` (Lifecycle complete + closure section).
+- `docs/tasks/README.md` — row TASK-871 actualizado de "In progress" a Complete.
+
+## Recovery 3 cuentas + release develop→main pendientes de autorización operador (out of local scope)
+
+1. `git push origin develop` → CI automático corre lint + tsc + tests; ops-worker auto-deploy via `.github/workflows/ops-worker-deploy.yml`.
+2. Slice 5 Recovery: `POST /finance/rematerialize-balances` con body `{accountIds:['santander-corp-clp','santander-clp','global66-clp'],lookbackDays:14}` → expected escalations=[], drift cleared. Alternativamente via remediator `POST /finance/account-balances/fx-drift/remediate` con `policy='rolling_window_repair' dryRun=false`.
+3. Verificar `/api/admin/reliability` — `finance.account_balances.fx_drift.severity='ok' count=0`.
+4. Re-run Playwright smoke local o esperar próximo CI scheduled.
+5. Release develop → main via orchestrator canónico `production-release.yml` con `target_sha` post-merge.
+
+**Status**: Implementación + docs + cierre completos localmente. Pendiente push + recovery + release.
+
+---
+
+# Sesion 2026-05-13 — TASK-827 Client Portal Composition Layer CERRADA on develop (EPIC-015 child 6/8 ✅)
+
+- **Trigger**: usuario pidió implementar TASK-827 antes de promover develop→main, en `develop` sin branch separada. Plan canonical FASE 1-6 ejecutado end-to-end.
+
+- **Pre-execution decisions (commit `36357f2a`)**: 7 Open Questions cerradas con lens 4-pilar canonical D1-D7:
+  - D1: `requireViewCodeAccess` bypass para `isInternalPortalUser=true` (support pattern, no impersonation)
+  - D2: `capabilityModules` legacy preservado, V1.1 derivative TASK
+  - D3: `/home` terminator garantizado para `tenant_type='client'`
+  - D4: `resolveAccountManagerEmail` fallback chain (V1.0 hard fallback `support@efeoncepro.com`, V1.1 canonical 360)
+  - D5: mobile parity exacta via Vuexy responsive Drawer
+  - D6: NO skeleton para nav chrome (server component blocking render)
+  - D7: reliability signal `client_portal.composition.resolver_failure_rate` con `moduleKey='identity'` temporal hasta TASK-829 cree subsystem `Client Portal Health`
+
+- **FASE 1 Discovery (3 subagentes Explore paralelos)** detectó 4 baseline recalibrations:
+  - VIEW_REGISTRY YA tenía 11 entries `cliente.*` (no 4) — Slice 0 agrega 11 nuevas
+  - `/home` YA existe como HomeShellV2 — Slice 4 extiende, no crea
+  - `tests/visual/` NO existe en repo — Slice 8 pivot a E2E + RTL render tests
+  - Naming drift `cliente.reviews` (seed) vs `cliente.revisiones` (registry) → ambos coexisten apuntando a `/reviews`
+
+- **Cierre 2026-05-13**: 13 commits incrementales sin PR ceremony directo en develop.
+  - `839e731b` baseline (move to-do→in-progress + Lifecycle sync)
+  - `befa0871` baseline recalibration pre-execution
+  - `36357f2a` D1-D7 decisions documented
+  - `5a691485` Slice 0 — Parity view_codes (11 entries VIEW_REGISTRY + parity.ts/.test.ts/.live.test.ts)
+  - `630fe3c1` Slice 1 — Microcopy dictionary `GH_CLIENT_PORTAL_COMPOSITION` es-CL canonical
+  - `8fcd3962` Slice 5 — 3 empty state components anatomía 5-elementos
+  - `86374a98` Slice 3 — Menu builder pure function + `<ClientPortalNavigation>` server component
+  - `1d2fbbb2` Slice 4 — `requireViewCodeAccess` + `/home` 5-state contract + 9 client pages migradas + slug mapping
+  - `7574f4bc` Slice 2 — Mockup builder `/cliente-portal-mockup` 5 fixtures tipados [mockup-approved-by-user]
+  - `c0f3908e` Slice 6 — Refactor light VerticalMenu + audit grep canonical + comments
+  - `08bcb47c` Slice 7 — Lint rule `no-untokenized-business-line-branching` warn + override block + sweep V1.1
+  - `2fd8a60c` **Incident hardening** — seed migration role_view_assignments 44 filas (4 roles × 11 viewCodes) resuelve `role_view_fallback_used` Sentry alerts
+  - `f2aa49ad` Slice 8 — Reliability signal scaffold + tests (V1.0 returns 'unknown', V1.1 TASK-829 implements adapter)
+
+- **Resultados verificados**:
+  - 38/38 tests TASK-827 verde (parity unit + view-codes slug + menu-builder + signal scaffold)
+  - `pnpm tsc --noEmit` clean
+  - `pnpm lint` full repo: 0 errors + 4 warnings esperadas (target sweep V1.1 — pages organization workspaces que leen session.user.businessLines/serviceModules legítimo cross-domain)
+  - Migration aplicada live a `greenhouse-pg-dev` via `pnpm pg:connect:migrate` (44 filas role_view_assignments + 11 view_registry entries + DO block anti pre-up-marker verde)
+
+- **Incident `role_view_fallback_used` resuelto canónicamente (NO parche)**:
+  - **Causa raíz**: telemetría funcionando como diseñada detectando gap gobernanza post Slice 0 — 11 viewCodes nuevos en VIEW_REGISTRY TS sin seed acompañante en `role_view_assignments` PG → fallback heurístico `roleCanAccessViewFallback` resolvió `granted=true` por route_group match → emitió 11 warnings/sesión cliente
+  - **Solución 4-pilar** (skill arch-architect + Greenhouse overlay):
+    - Safety: migration formaliza grant + audit trail (granted_by + updated_by = 'migration:TASK-827')
+    - Robustness: idempotent INSERT ON CONFLICT DO UPDATE + DO block anti pre-up-marker check
+    - Resilience: NO removí el fallback ni la telemetría — sigue funcionando para detectar drift FUTURO
+    - Scalability: 44 filas permanentes (11 viewCodes × 4 roles). Future viewCodes nuevos requieren mismo pattern (regla canónica nueva en CLAUDE.md)
+  - **Defense in depth**: regla canónica "cualquier viewCode agregado a VIEW_REGISTRY TS requiere migration acompañante en role_view_assignments por cada role" documentada en CLAUDE.md sección nueva
+
+- **Patrón canonizado en este sesion**:
+  - Slice 0 pattern: extender VIEW_REGISTRY TS + migration acompañante role_view_assignments + parity test live
+  - Slice 4 pattern: `requireViewCodeAccess(viewCode)` page guard con D1 bypass internal + redirect canonical `/home?denied=<slug>` / `?error=resolver_unavailable`
+  - Slice 5 pattern: 3 components empty state canonical anatomía 5-elementos consumiendo dictionary + EmptyState primitive del repo
+  - Slice 8 pattern: reliability signal scaffold V1.0 (returns 'unknown' con doc references) → V1.1 telemetry adapter implementa data real, shape canonical preservado
+
+- **Skills invocadas**: arch-architect (Greenhouse overlay — pre-execution + incident resolution), info-architecture (Slice 3 menu composition + URL design), state-design (Slice 5 5-state contract anatomía 5-elementos), greenhouse-backend (Slice 0/3/4/7/8 + migration), greenhouse-ux (Slice 5 components layout), greenhouse-ux-writing (Slice 1 dictionary validation), greenhouse-dev (Slice 5 React components), greenhouse-mockup-builder (Slice 2).
+
+- **TASK derivadas V1.1 registradas en spec Follow-ups**:
+  - `client-portal-legacy-branching-sweep` — promote lint rule warn → error
+  - `capability-modules-resolver-migration` — refactor `resolveCapabilityModules` legacy
+  - `client-portal-vertical-menu-resolver-migration` — refactor full VerticalMenu cliente section
+  - `client-portal-pages-placeholder-materialization` — 10 pages placeholder pendientes (/creative-hub, /brand-intelligence, etc.)
+  - `account-manager-email-canonical-resolver` — D4 V1.1 canonical 360 lookup
+  - `client-portal-resolver-failure-rate-telemetry-adapter` — TASK-829 Sentry events query adapter
+
+- **Desbloquea**: TASK-828 (cascade desde lifecycle ya tiene contract claro), TASK-829 (reliability signals subsystem `Client Portal Health` + 5 signals adicionales + legacy backfill).
+
+---
+
+# Sesion 2026-05-13 — TASK-871 Account Balance Rolling Anchor Contract (task design adjusted, no runtime changes)
+
+- **Trigger**: Playwright E2E smoke en `develop` fallo por `finance.account_balances.fx_drift` en `error`, no por auth/navegacion. Runtime read-only confirmo 3 filas con drift el `2026-05-05`: `santander-corp-clp`, `santander-clp`, `global66-clp`, todas con `transaction_count=0`, persisted inflows/outflows `0`, pero settlement legs reales.
+- **Decision arquitectonica agregada a la task antes de implementar**: un rolling job no puede crear o dejar un seed row sintetico en `account_balances` para una fecha con movimientos reales dentro del horizonte observado. Debe preservar un checkpoint real, usar el cierre materializado previo, o materializar tambien esa fecha desde un anchor anterior.
+- **Task ajustada, no tomada para implementacion**: `docs/tasks/to-do/TASK-871-account-balance-rolling-anchor-contract.md`. Objetivo: cerrar causa raiz sin updates manuales, sin bajar el smoke, sin apagar evidence guard, separando `rolling_window_repair` de `historical_restatement`.
+- **Workspace note**: existen cambios locales ajenos en client-portal; no tocarlos desde TASK-871.
+
+# Sesion 2026-05-13 — ISSUE-075 Entra webhook validation handshake (fix + hardening shipped a develop)
+
+- **Trigger**: Sentry alert `JAVASCRIPT-NEXTJS-4T` a las 06:00:03 -04 (cron `ops-entra-webhook-renew` daily). Microsoft Graph rechaza subscription create/renew con `ValidationError 400` porque el notification endpoint `/api/webhooks/entra-user-change` no respondía al validation handshake **enviado como POST**. El handler GET sí echoba el `validationToken`; el handler POST iba directo a parse del body + validate `clientState` → respondía 400/401 → Microsoft falla la subscription.
+- **Causa raíz**: Microsoft Graph v1 envía el validation handshake como POST con `?validationToken=xxx` en query string (no como GET históricamente asumido). El endpoint Greenhouse no soportaba ambos métodos en el respond-to-token path.
+
+- **Fix immediate (commit `86890bae` en develop)**: extraído `respondToValidationToken(request)` helper compartido por GET y POST. POST handler invoca el helper ANTES de parse body + validate clientState. Idempotente: notifications normales sin token caen al path normal. 3 archivos: `route.ts` + `route.test.ts` nuevo (2 tests) + spec doc V1 §Notification endpoint corregida (Microsoft envía POST, no GET).
+
+- **Análisis arquitectónico con arch-architect (Greenhouse overlay)** detectó 5 gaps adicionales no cubiertos por el fix:
+  - H1 Falta reliability signal canónico para subscription health (proactive expiry detection vs reactive Sentry alert)
+  - H2 `notificationUrl` hardcoded a producción (impide testing en staging/preview)
+  - H3 `clientState` acoplado a SCIM_BEARER_TOKEN (V1.1 follow-up)
+  - H4 POST handler con dual contract sin marker explícito (cubierto por tests anti-regresión)
+  - H5 Hardcoded subscription resource + changeType (out of scope)
+
+- **Hardening shipped (commit `fde07952` en develop)**:
+  - **Scalability**: `resolveNotificationUrl(env)` exportado en `src/lib/entra/webhook-subscription.ts`. Order canónico `GREENHOUSE_ENTRA_NOTIFICATION_URL > GREENHOUSE_PUBLIC_BASE_URL > NEXTAUTH_URL > prod fallback`. Normaliza trailing slashes + whitespace. Habilita staging/preview.
+  - **Resilience persist completo**: `persistSubscriptionId` → `persistSubscriptionState({subscriptionId, expirationDateTime, notificationUrl, lastRenewedAt})`. Llamado en AMBOS paths (create + renew; antes solo create). Backward-compatible con rows legacy. Helper `getPersistedSubscriptionMetadata()` exportado.
+  - **Resilience reliability signal**: `identity.entra.webhook_subscription_health` (kind=`drift`) en `src/lib/reliability/queries/entra-webhook-subscription-health.ts`. State machine 6 estados: `unknown | legacy_metadata | expired | imminent (<12h) | approaching (<48h) | healthy (>48h)`. Severity ok/warning/error escalada. Wire-up en `getReliabilityOverview` bajo módulo `identity`. Steady=ok.
+  - 22 tests anti-regresión verdes (8 URL resolver + 14 signal state machine + envelope + degradation honest)
+
+- **ISSUE-075 canonizada**: `docs/issues/open/ISSUE-075-entra-webhook-validation-handshake-rejects-post.md`. Documenta cadena del fallo, causa raíz, fix + hardening, verification checkboxes, lección operativa (pattern canónico Greenhouse para webhooks externos con validation handshake: handler GET + POST con respond-to-token first).
+
+- **Verificación end-to-end en staging**: Vercel deploy de develop `greenhouse-2fi700uvq` Ready. Curl `POST /api/webhooks/entra-user-change?validationToken=test-handshake-2026-05-13` con bypass → **HTTP 200 + Content-Type: text/plain + body `test-handshake-2026-05-13`** (token echoed correctamente). Fix verificado code-wise end-to-end.
+
+- **Resultados verificados**:
+  - 22/22 tests nuevos verdes (`pnpm vitest run src/lib/entra/webhook-subscription.test.ts src/lib/reliability/queries/entra-webhook-subscription-health.test.ts`)
+  - `pnpm tsc --noEmit` clean
+  - `pnpm lint` clean (incluido en pre-push hook 2 veces)
+  - Pre-push hook verde en ambos commits (`86890bae` + `fde07952`)
+
+- **Pendiente para cierre formal (decisión usuario)**:
+  - **Promoción `develop → main`** vía release orquestado (TASK-848/851 path canónico). Develop está 51 commits ahead de main; cualquier merge desplegará todos esos commits a producción. NO se hizo hotfix unilateral.
+  - Post-deploy: trigger manual del cron en producción `gcloud scheduler jobs run ops-entra-webhook-renew --location=us-east4 --project=efeonce-group`
+  - Verificar Sentry `JAVASCRIPT-NEXTJS-4T` no emite nuevos eventos ≥24h
+  - Verificar signal `identity.entra.webhook_subscription_health` reporta `ok` en `/admin/operations` (requiere `expirationDateTime` populated por primer renew exitoso post-deploy)
+
+- **Pattern canonizado**: cuando un endpoint expone boundary contract con un servicio externo que envía validation handshakes (Microsoft Graph, HubSpot, Slack, Teams, etc.), soportar TODOS los métodos HTTP que el contract permite + responder al handshake ANTES de cualquier validación de payload + tests anti-regresión que pinneen el comportamiento + reliability signal del subscription health + audit trail estructurado del lifecycle.
+
+- **Skills invocadas**: `arch-architect` (Greenhouse overlay — 4-pilar score + 7 hallazgos + plan).
+
+---
+
+# Sesion 2026-05-12 — TASK-826 CERRADA on develop (EPIC-015 child 5/8 ✅)
+
+- **Trigger**: post TASK-825 cierre, usuario pidió arch-architect verdict sobre TASK-826 (Client Portal Admin Endpoints + Capabilities + Audit + UI Admin). Task más densa del EPIC. Verdict: 5 correcciones aplicadas pre-Slice-1; implementación directa en develop con 8 slices secuenciales.
+- **5 correcciones canonizadas en spec v1.1 (commit `2301e9e7`)**:
+  1. `business_line` drift residual → V1.4 §3.1 reconciliación: column DB + code → `applicability_scope`; capability + signal names preservan `business_line` operator-facing.
+  2. `requireServerSession` → `requireAdminTenantContext()` + `can()` doble gate (TASK-839/848/850 mirror).
+  3. Zod → `ClientPortalValidationError` + assertion functions custom (greenhouse-backend skill canónico).
+  4. Effort Medio → Alto; 8 slices secuenciales.
+  5. Parity test capabilities[] heredado de TASK-824 Delta.
+- **3 Open Questions resueltas pre-execution**: catalog UI V1.0 read-only (POST/PUT diferidos V1.1), pause sin reason permitido, `org.businessLine` resolver via `service_modules.module_code WHERE module_kind='business_line'`.
+
+- **Cierre 2026-05-12**: 9 commits incrementales sin PR ceremony directo en develop.
+  - `41463118` baseline (move to-do→in-progress + spec v1.1 corrections + Lifecycle sync)
+  - `bab760ad` Slice 1 — errors + audit log writer + resolveOrganizationCanonicalBusinessLines helper + 23 tests
+  - `0059579b` Slice 2 — enableClientPortalModule atomic command + 14 tests (idempotency, BL check, override flow)
+  - `93bc0a4c` Slice 3 — pause/resume commands + 12 tests (state machine + terminal block)
+  - `e4cf8c96` Slice 4 — expire/churn terminal transitions + 12 tests (effective_to, cross-terminal block)
+  - `33a61401` Slice 5 — **19 capabilities materializadas** (7 admin + 12 client-facing read) + 3 seed migrations canónicas + parity test bi-direccional (TS↔DB + seed ⊆ catalog) + 10 unit + 2 live tests
+  - `6d754727` Slice 6 — 4 HTTP endpoints admin doble-gate `requireAdminTenantContext + can()` + 20 integration tests
+  - `21662d02` Slice 7 — 2 UI surfaces Vuexy (`/admin/client-portal/{catalog, organizations/[id]/modules}`) + microcopy `GH_CLIENT_PORTAL_ADMIN` (es-CL validado por skill `greenhouse-ux-writing`) + DataTableShell + 3-dot menu + override flow expandible + churn typing-confirm
+  - `dd39b778` Slice 8 — 6 lifecycle e2e tests + EVENT_CATALOG Delta 2026-05-12 con 5 events v1 documentados
+
+- **Resultados verificados**:
+  - 136/140 tests verde (4 skipped por ausencia de PG en CI sin proxy)
+  - `npx tsc --noEmit` + `npx eslint` clean
+  - 3 migrations live aplicadas vs `greenhouse-pg-dev` (Cloud SQL Proxy)
+  - Parity test live verde: TS catalog (19 entries module=client_portal) ↔ DB capabilities_registry (19 rows) + seed modules.capabilities[] (12 distinct) ⊆ TS catalog
+  - 19 capabilities granulares least-privilege canonizadas: admin (`module.{read_assignment,enable,disable,pause,override_business_line_default}` + `catalog.manage` + `assignment.migrate_legacy`) + client-facing read (`{pulse,creative_hub,csc_pipeline,brand_intelligence,cvr,roi,exports.generate,staff_aug,web_delivery,assigned_team,crm_command,cvr.export}`)
+  - 5 outbox events v1 documentados en EVENT_CATALOG Delta 2026-05-12
+
+- **5 commands canónicos atomic-tx** (`src/lib/client-portal/commands/`):
+  - `enableClientPortalModule` — 5 pasos canónicos (idempotency check → fetch module → BL check con cross/empty/match/override → INSERT+audit+outbox → post-tx cache invalidation skip-if-idempotent)
+  - `pauseClientPortalModule`, `resumeClientPortalModule` — state machine enforce (terminal block 409)
+  - `expireClientPortalModule`, `churnClientPortalModule` — terminal transitions + cross-terminal block + effectiveTo default hoy
+  - Todos respetan invariante: NO bypass desde consumers (single helper canónico) + idempotency idempotent=true sin re-emit
+
+- **UI surfaces** validadas con skills `greenhouse-ux` + `greenhouse-ux-writing` + `modern-ui`:
+  - Card outlined + CardHeader con CTA primario "Habilitar módulo"
+  - DataTableShell wrapper (TASK-743 contract — 8+ columnas)
+  - Status chip outlined con color semántico (success/warning/info/error)
+  - 3-dot menu actions filtered por status (pause solo si active, resume solo si paused, expire si non-terminal, churn siempre)
+  - Dialog Enable con form base + Switch override colapsable que expande Alert warning + textarea (`≥20` chars)
+  - Dialog Churn con typing-confirm (escribir `module_key` para enable Confirmar)
+  - Microcopy `GH_CLIENT_PORTAL_ADMIN`: "Dar de baja" en lugar de "Churn", "Piloto" en lugar de "Pilot", consequence-clear confirmations
+
+- **Defense-in-depth canonizada**:
+  - Atomic tx PG (UPDATE + audit + outbox en misma transacción)
+  - Append-only audit log `module_assignment_events` enforced por PG triggers
+  - Anti pre-up-marker check INSIDE migrations (TASK-838 pattern, 3 migrations)
+  - Parity test live TS↔DB rompe build si emerge drift
+  - DataTableShell + lint rules + DESIGN.md tokens
+
+- **Desbloquea**:
+  - TASK-827 (UI cliente compose desde resolver + page guards + empty states)
+  - TASK-828 (cascade reactive `client.lifecycle.case.completed` → `enableClientPortalModule`/`churnClientPortalModule` directo)
+  - TASK-829 (reliability signals + legacy backfill)
+
+---
+
+# Sesion 2026-05-12 — TASK-825 arch-architect verdict + implementation CERRADA on develop
+
+- **Trigger**: post TASK-824 cierre, usuario pidió arch-architect verdict sobre TASK-825 (Client Portal Resolver Canonical, EPIC-015 child 4/8). Verdict: 5 correcciones (3 bloqueantes + 2 polish) aplicadas al spec V1.0 pre-Slice-1; implementación directa en develop con 5 commits incrementales.
+- **5 correcciones canonizadas en spec v1.1 (commit `caf1b1e4`)**:
+  1. **(Bloqueante)** SQL `m.business_line` → `m.applicability_scope` (TASK-824 V1.4 rename). DTO `businessLine` → `applicabilityScope`.
+  2. **(Bloqueante)** Endpoint usa `getServerAuthSession()` directo + inline checks (clone TASK-823 `account-summary` pattern). Eliminadas todas las refs a `requireClientSession` que NO existe (TASK-823 V1.1 verdict lo eliminó).
+  3. **(Bloqueante)** Resolver vive en `src/lib/client-portal/readers/native/module-resolver.ts` archivo único (no carpeta `modules/` que no existe; spec V1.1 §3.1 canónica).
+  4. **(Bloqueante invariant)** Exporta `moduleResolverMeta: ClientPortalReaderMeta` con `classification:'native'`, `ownerDomain:null` (TASK-822 §3.1 hard rule). Primer reader native del BFF.
+  5. **(Polish)** Resolver SOLO filtra; reliability signals los implementa TASK-829 con readers dedicados cron-paced. Renombrar "orphan module_key" → "deprecated module filter" (FK enforce orphan imposible).
+- **Adicional**: `asOf?: Date` dead option eliminada (YAGNI); single-flight Promise dedup queda V1.1 follow-up consciente.
+- **Cierre 2026-05-12**: 5 commits incrementales sin PR ceremony.
+  - `919b4c63` baseline rename to-do → in-progress + Lifecycle sync
+  - `c55601df` Slice 1 — DTO ResolvedClientPortalModule + AssignmentSource (119 líneas)
+  - `91bf6dec` Slice 2 — module-resolver native + cache + 3 helpers + meta (257 líneas, archivo único)
+  - `170084c5` Slice 3 — endpoint GET /api/client-portal/modules clone TASK-823 (86 líneas)
+  - `c9401577` Slice 4 — 36/36 tests verde (24 resolver + 3 native-meta + 7 endpoint + 2 TASK-822 anteriores)
+- **Tests verdes**: 36/36 (4 archivos test, 779ms transform + run). Cubre cache hit/miss/scope/invalidation, includePending bypassea cache, row mapping con `applicabilityScope` (NO `businessLine`), Date expires_at → ISO, error path con `captureWithDomain`, 3 helpers cache hit warm, endpoint 5 estados HTTP, payload NO leak stack/secrets.
+- **Verificación final**: `pnpm build` ✅ + `pnpm lint` ✅ + `pnpm tsc --noEmit` ✅ + 4 grep negativos canónicos limpios (0 `new Pool`, 0 `Response.json` sin `NextResponse`, 0 refs `requireClientSession`, 0 `business_line`/`businessLine` en runtime — solo en anti-regression comments del test).
+- **Primer reader native del BFF efectivo**: el invariant de TASK-822 §3.1 (`readers/native/` con `ClientPortalReaderMeta`) tenía solo un README documentando convención. Esta task lo materializa con consumer real (`moduleResolverMeta` declarado + `assertReaderMeta` validado). Pattern reusable cuando TASK-825b o futuros nativos emerjan.
+- **Cache TTL 60s pattern canonizado para BFF nativo**: mirror exacto de TASK-780 `home_rollout_flags` adaptado a `Map<organizationId, {data, expiresAt}>`. Invalidator scoped/full exportado para uso desde TASK-826 commands post-mutation.
+- **Desbloquea**: TASK-826 (admin endpoints — invalidan cache post-mutation via `__clearClientPortalResolverCache(orgId)`), TASK-827 (UI composition layer — compose menú dinámico desde resolver, page guards con `hasViewCodeAccess`), TASK-828 (cascade reactive consumer — invalida cache scoped post materialización de assignments).
+- **5 estados HTTP canónicos en endpoint** establecen pattern reusable para futuros endpoints `/api/client-portal/*` (TASK-826 admin endpoints replicarán este shape verbatim).
+
+---
+
+# Sesion 2026-05-12 — TASK-824 arch-architect verdict + implementation CERRADA on develop
+
+- **Trigger**: post TASK-823 cierre, usuario pidió arch-architect verdict sobre TASK-824 (Client Portal DDL Schema, EPIC-015 child 3/8). Verdict: 5 correcciones (1 bloqueante semántico + 4 polish) aplicadas al spec V1.0 pre-Slice-1; FASE 1 Discovery emergió 2 baseline recalibrations adicionales (Issues 6+7); spec arquitectónica bump V1.1 → V1.4; implementación directa en develop con 6 commits incrementales.
+- **5 correcciones canonizadas en spec V1.2 (verdict inicial)**:
+  1. **(Bloqueante)** rename `business_line` → `applicability_scope` + COMMENT canónico explícito (reconcilia con `GREENHOUSE_BUSINESS_LINES_ARCHITECTURE_V1.md` hard rule "no duplicar enum del catalogo").
+  2. Parity test live TS↔DB shape canónico (TASK-611 mirror); Option C adoptada.
+  3. Anti pre-up-marker bug check INSIDE la migration (TASK-838 pattern).
+  4. Campo dormido `default_for_business_lines` eliminado V1.0 (YAGNI).
+  5. Parity test cubre los 3 arrays (data_sources + view_codes + capabilities) — luego reducido a solo data_sources por Issue 7 chicken-and-egg.
+- **2 baseline recalibrations emergidos en FASE 1 Discovery PG live**:
+  - **Issue 6 (bloqueante post-Discovery)** — `organizations.organization_id` es TEXT en runtime no UUID + `greenhouse_core.users` no existe (canonical = `client_users`). Sin fix, migration habría abortado con `incompatible types text vs uuid`. Spec bump V1.2 → V1.3 (commit `4aa06849`).
+  - **Issue 7 (architectural)** — spec V1.2 §5.5 seedea 11 view_codes + 11 capabilities que NO existen aún en `VIEW_REGISTRY` / `entitlements-catalog`. Chicken-and-egg: TASK-824 ships ANTES que TASK-826 + TASK-827 (los catalogs los materializan ellos). Fix: parity strict ONLY para data_sources V1.0; view_codes parity → TASK-827 responsabilidad, capabilities parity → TASK-826 responsabilidad. Spec bump V1.3 → V1.4 (commit `fca4df5b`).
+- **Cierre 2026-05-12**: 6 commits incrementales sin PR ceremony.
+  - `29fa1f58` baseline rename to-do → in-progress + Lifecycle/README/Handoff sync
+  - `4aa06849` baseline #2 — Issue 6 type/FK drift fix
+  - `fca4df5b` baseline #3 — Issue 7 chicken-and-egg parity V1.4 spec
+  - `0844a13c` Slice 1 — DDL migration + seed + extension + anti pre-up-marker + types regen (CONSOLIDADO)
+  - `0bdbc455` Slice 2 — parity test live data_sources (cierra OQ-3 TASK-822)
+  - (closing) — task move to complete + cross-impact Deltas
+- **Tests + smokes verde**: 9 unit + 2 live PG (parity) + 7 smokes manuales (UNIQUE partial, anti-UPDATE/DELETE events, append-only modules, CHECK pilot expires, NO default_for_business_lines, seed count, bundled_modules extension).
+- **Migration verificada live PG**: 1 schema + 3 tablas + 11 indexes + 10 seed modules (distribución globe=5/cross=2/staff_aug=1/crm_solutions=1/wave=1) + bundled_modules extension + 3 triggers canónicos.
+- **Verificación final**: `pnpm build` ✅ + `pnpm lint` ✅ + `pnpm tsc --noEmit` ✅.
+- **Scope agregado vs spec original**: parity test live data_sources (3 archivos TS + 11 tests) + bloque DO anti pre-up-marker INSIDE migration + COMMENT canónico en `applicability_scope`. Effort sigue **Bajo**.
+- **Cierra OQ-3 de TASK-822** ÚNICAMENTE para `data_sources[]`. Las paridades de `view_codes[]` y `capabilities[]` son responsabilidad explícita de TASK-827 + TASK-826 (cada task posee su catalog).
+- **Desbloquea**: TASK-825 (resolver canónico — primer reader nativo del BFF), TASK-826 (admin endpoints — debe agregar parity test capabilities[]), TASK-827 (UI composition layer — debe agregar parity test view_codes[]), TASK-828 (cascade — necesita columna bundled_modules).
+- **Patrón canonizado**: cuando emerja un dominio nuevo con shape "catalog declarativo + seed forward-looking + canonical catalogs downstream", replicar este patrón (parity test SOLO de los catalogs ya canonizados; deferred parity para los catalogs aún sin materializar). Evita chicken-and-egg sin sacrificar drift detection.
+
+---
+
+# Sesion 2026-05-12 — TASK-823 arch-architect verdict + implementation CERRADA on develop
+
+---
+
+# Sesion 2026-05-12 — TASK-823 arch-architect verdict + implementation CERRADA on develop
+
+- **Trigger**: post TASK-822 cierre, usuario pidió arch-architect verdict sobre TASK-823 (`/api/client-portal/*` API Namespace, EPIC-015 child 2/8). Verdict: 4 correcciones (2 bloqueantes + 2 polish) aplicadas al spec pre-Slice-1; FASE 1 Discovery emergió Issue 5 (drift `requireServerSession` vs `getServerAuthSession` para API routes — fix canónico per CLAUDE.md); implementación directa en develop con 4 commits incrementales.
+- **5 correcciones canonizadas en spec v1.1**:
+  1. Bug de compilación: `redactErrorForResponse` retorna `string`; envolver en `NextResponse.json({error: redactErrorForResponse(err)}, {status})`.
+  2. Nombre stale: `getClientAccountSummary` no existe; usar `getOrganizationExecutiveSnapshot` (real re-export TASK-822).
+  3. Helper `requireClientSession` pre-emptive eliminado V1.0; inline check estilo TASK-553.
+  4. `/health` performativo eliminado V1.0; extender `/api/admin/platform-health` (TASK-672) cuando emerja necesidad real.
+  5. **Detectada en Discovery (post-verdict)**: spec v1.1 escribía `requireServerSession()` pero CLAUDE.md "Auth en server components" línea final dice las API routes usan `getServerAuthSession()` directo (no redirige, return 401 JSON). `requireServerSession()` redirige a `/login` — wrong for APIs. Fix aplicado en baseline #2 commit `7f9a707a` antes de Slice 1.
+- **Cierre 2026-05-12**: 4 commits incrementales sin PR ceremony.
+  - `021d1fe8` baseline rename to-do → in-progress
+  - `b8d55859` sync Lifecycle field + README + Handoff
+  - `7f9a707a` baseline #2 — spec usa getServerAuthSession (Issue 5 fix)
+  - `5b951669` Slice 1 — GET /api/client-portal/account-summary route (90 líneas + JSDoc canónico)
+  - `28379029` Slice 2 — 6 integration tests verde (401×2, 403, 500-orgId-missing, 200 happy, 500-reader-throws con sanitization assertions)
+- **Tests verdes**: 6/6 en src/app/api/client-portal/__tests__/account-summary.test.ts (203ms). Pattern mock mirror de home/snapshot/route.test.ts (vi.mock '@/lib/auth' + reader + captureWithDomain).
+- **Verificación final**: `pnpm build` ✅ + `pnpm lint` ✅ + `pnpm tsc --noEmit` ✅ + 4 grep negativos canónicos limpios (0 Response.json sin NextResponse, 0 error.message raw expuesto, 0 new Pool nuevo, 0 getServerAuthSession en pages).
+- **Scope reducido vs spec original**: 2 endpoints → 1, 1 helper → 0, 4 tests → 6 (más cobertura). Effort Bajo → Muy Bajo. 0 capabilities nuevas, 0 outbox events, 0 reliability signals, 0 migrations.
+- **Domain direction respetada**: `src/app/api/* → @/lib/client-portal/*` (allowed per TASK-822 §3.2). La ESLint rule `no-cross-domain-import-from-client-portal` NO aplica a `src/app/` (enforce solo la dirección inversa producer-domain → client-portal).
+- **Pattern source canónico documentado**: TASK-553 (`src/app/api/me/shortcuts/route.ts`) mirror verbatim, incluyendo defense in depth para `organizationId` null en sessions corruptas (drift del callback NextAuth → Sentry capture con stage='session_validation').
+- **Desbloquea**: TASK-825 (resolver canónico) — agregará `GET /api/client-portal/modules` al mismo namespace con shape canónico replicado. Primer reader **nativo** del BFF nace ahí en `src/lib/client-portal/readers/native/`.
+
+---
+
+# Sesion 2026-05-12 — TASK-822 arch-architect verdict + implementation CERRADA on develop
+
+- **Trigger**: usuario pidió revisión arch-architect de TASK-822 (Client Portal Domain Consolidation, EPIC-015 child 1/8). Verdict: aprobado con 3 correcciones estructurales aplicadas pre-Slice-1.
+- **3 correcciones canonizadas en spec v1.1 + task v1.1**:
+  1. Reframe a BFF/Anti-Corruption Layer (re-export NO transfiere ownership; `account-360/`, `agency/`, `ico-engine/` retienen ownership canónica).
+  2. Module classification dual `curated` vs `native` con metadata tipada (`ClientPortalReaderMeta` interface — compile-checked, grep-able, consumible por TASK-824).
+  3. Domain import direction enforced (`client_portal` es hoja del DAG; ESLint rule `greenhouse/no-cross-domain-import-from-client-portal` modo `error` bloquea ciclos).
+- **Open Questions resueltas pre-execution** (todas no-bloqueantes):
+  - OQ-1: firma exacta V1.0 (sin thin adaptation; reclasifica a `native` si emerge necesidad).
+  - OQ-2: 0 readers nativos V1.0 (placeholder files = anti-pattern; primer nativo emerge con TASK-825 resolver).
+  - OQ-3: parity test TS↔DB para `ClientPortalDataSource` queda para TASK-824 (la tabla `modules` no existe aún; crear test ahora = falsa señal).
+- **Decisión operativa**: implementación directa sobre `develop`, sin branch separada (instrucción explícita del usuario).
+- **Cierre 2026-05-12**: 5 commits incrementales sin PR ceremony.
+  - `78179c63` baseline recalibration (spec v1.0 → v1.1; task v1.0 → v1.1; mover to-do→in-progress).
+  - `df48106e` Slice 1 — BFF foundation + DTO `ClientPortalReaderMeta` + barrels + README + helpers placeholder.
+  - `c90b49ba` Slice 2 — Sentry domain `client_portal` whitelist + 2 smoke tests.
+  - `fec0b94c` Slice 3 — ESLint rule `greenhouse/no-cross-domain-import-from-client-portal` modo `error` + 20 RuleTester fixtures + override block en eslint.config.mjs + live smoke fixture validated.
+  - `ea7080fd` Slice 4 — 2 curated re-exports demostrativos (`account-summary` owner `account-360` + `ico-overview` owner `ico-engine`) + 7 meta tests anti-regresión.
+- **Audit Discovery surprise canonizado**: la lista original de 7 re-exports del spec V1.0 era aspiracional, no actual. Solo 2 tienen funciones TS standalone existentes (`getOrganizationExecutiveSnapshot`, `readSpaceMetrics`). Los otros 5 (`creative-hub` 16 cards, `assigned-team`, `pulse` per-cliente, `csc-pipeline`, `brand-intelligence`) son descripciones funcionales V3.0 spec, NO código que se pueda re-exportar hoy. Aplazados a V1.1 cuando TASK-823 + TASK-827 produzcan consumers concretos. Decisión documentada en AUDIT FASE 2.
+- **Verificación final verde**: `pnpm build` ✅ + `pnpm lint` ✅ + `npx tsc --noEmit` ✅ + 23 tests verdes (9 capture + 7 curated meta + 7 cross-domain RuleTester fixtures). 0 imports prohibidos producer→client-portal (grep negativo). 0 `new Pool()` nuevos fuera de canonical postgres client.
+- **Hard rules canonizadas en CLAUDE.md** sección "Client Portal BFF / Anti-Corruption Layer invariants (TASK-822, desde 2026-05-12)".
+- **Desbloquea**: TASK-823 (`/api/client-portal/*` namespace), TASK-824 (DDL `greenhouse_client_portal` + 10 modules seed — el parity test TS↔DB para `ClientPortalDataSource` nace ahí), TASK-825 (resolver canónico — primer reader **nativo** del módulo).
+- **Plataforma BFF efectiva**: nuevos consumers de `@/lib/client-portal/*` (TASK-823 API routes, TASK-827 UI composition layer) ya pueden importar sin riesgo de ciclos — la lint rule protege el invariante leaf-of-DAG desde commit-1.
+
+---
+
+# Sesion 2026-05-12 — TASK-870 production release recovery + meta-aprendizaje "no perder más días en esto"
+
+- **Trigger:** Codex había pasado ~3h intentando promover `develop → main`. Pusheó commit merge `75273cb7` + 4 fix commits (`59f5115c`, `a4d65aa2`, `7841f547`, `c41a26b8`) pero el `Production Release Orchestrator` falló preflight 4 veces. Usuario llamó a Claude para investigar. Después de fix, total acumulado del incidente = **~2 días desde primera promoción fallida**.
+- **Root cause raíz** (descubierta vía Claude tras Codex no atacarla en sus 4 commits): env var Vercel production `GREENHOUSE_GITHUB_APP_PRIVATE_KEY_SECRET_REF` quedó persistida como `"greenhouse-github-app-private-key\n"` (bytes hex `... 6b 65 79 5c 6e 22`, quotes + LF literal embebidos). Drift entre `normalizeSecretValue` (strippa quotes) y `normalizeSecretRefValue` (NO las strippa) → GCP NOT_FOUND silencioso → `Sentry "GH App key not valid PEM"` burst cada ~3min → preflight check `sentry_critical_issues` bloqueaba release.
+- **Plan ejecutado (arch-architect verdict 4-pillar M1-M5):**
+  1. **S0** (audit pasivo pre-merge): 21/21 canonical refs pasan V2 regex local.
+  2. **S1** (atomic commit `c16a0c82`): `stripEnvVarContamination` single-source helper + `SECRET_REF_SHAPE` regex en boundary + reliability signal `secrets.env_ref_format_drift` (module `cloud`, drift, error si >0, steady=0) + `github-app-token-resolver` diferencia ref-corruption (silent degrade a PAT) de content-corruption (Sentry alert) + CLAUDE.md/AGENTS.md hard rules V2 + ADR + TASK-870 spec. 52/52 tests verde, tsc/lint clean.
+  3. **S2** (env Vercel atomic): `printf %s "greenhouse-github-app-private-key" | vercel env update ... production --yes`. BEFORE bytes `… 6b 65 79 5c 6e 22 0a`, AFTER `… 6b 65 79 22 0a`. Vercel `vercel redeploy` production → Ready (`nfjr419lw`).
+  4. **Bonus** (commit `656cbbd4`): durante recovery emergió un 2do Sentry burst — `identity.auth.providers smoke failed: azure_authorize_endpoint reason="AZURE_AD_CLIENT_ID unset"` count=134, config drift de TASK-742 nunca arreglado. Agregué env var al deploy.sh canónico de ops-worker + `gcloud run update --update-env-vars` live (revision `00208-48q`). Smoke 5/5 probes verde post-fix.
+  5. **S3** (orchestrator trigger): run `25740470728` para `c41a26b8` con bypass reason >=20 chars. Preflight pasó (0 actives Sentry en 15min). Record manifest started. Approval gate aprobado via `gh api`. Workers deploy in progress al cierre de esta sesión.
+- **Validación pre-trigger:** dos issues Sentry que bloqueaban quedaron fuera de ventana 15min naturalmente cuando los fixes propagaron (GH App: lastSeen 12:34Z, 95min ago; azure_smoke: lastSeen 13:40Z, 38min ago; vercel.json: lastSeen 14:00Z, 17min ago). 0 actives en ventana → preflight pasa sin necesidad de bypass full.
+- **Costo real del incidente:** ~2 días totales (Codex ~3h sin atacar root cause + Claude ~2.5h end-to-end con arch review + verificación + 3 capas de defense). 95% del tiempo Codex lo perdió porque trató la preflight gate como ruido en vez de leerla como diagnóstico.
+- **Meta-aprendizaje canonizado** en `docs/operations/PRODUCTION_RELEASE_INCIDENT_PLAYBOOK_V1.md`: leer la preflight gate como diagnóstico primero, NO como obstáculo; el `bypass_preflight_reason` SOLO es para batch-policy override (no full bypass); cuando un Sentry burst recurre fuera-de-banda con la lógica del release path, escalar a investigación de runtime/env corruption antes de tocar el gate.
+- **Cierre end-to-end** (decisión usuario: Opción A — manifest `aborted` queda como audit, production runtime saludable):
+  - Vercel production `nfjr419lw` Ready (`c41a26b8`) — verified custom domain 200.
+  - 4 workers Cloud Run deployados via orchestrator run `25740470728`.
+  - ops-worker rev `00211-l52` con `AZURE_AD_CLIENT_ID` + `GREENHOUSE_PORTAL_BASE_URL` canonical post-fix.
+  - Smoke `/identity-auth-providers` 5/5 verde post-fix de los 4 config drifts.
+  - Sentry burst de los 3 issues bloqueantes (`GH App private key not valid PEM` + `azure_authorize_endpoint smoke fail` + `portal_auth_health smoke fail`) parado.
+  - Release manifest `c41a26b8` queda `aborted` por workflow bug `$UID` readonly (4to drift detectado live), NO por production state real. Próximo release legítimo (merge develop→main canónico) crea attempt_n=2 con todos los fixes aplicados y cierra `released`.
+- **4 config drifts pre-existentes detectados y canonizados durante recovery** (todos en deploy.sh declarativo ahora + live fixes via gcloud/vercel):
+  1. `GREENHOUSE_GITHUB_APP_PRIVATE_KEY_SECRET_REF` corrupto en Vercel production (quotes + LF literal).
+  2. `AZURE_AD_CLIENT_ID` unset en ops-worker Cloud Run.
+  3. `GREENHOUSE_PORTAL_BASE_URL` apuntando a staging URL (con SSO) en ops-worker Cloud Run.
+  4. `$UID` readonly variable assignment en `production-release.yml` step "Wait Vercel READY".
+- **8 commits TASK-870 en `develop`** (a promover en próximo ciclo legítimo): `c16a0c82` (normalizer V2 + signal), `656cbbd4` (AZURE_AD_CLIENT_ID), `5f42f3f2` (playbook canónico + skills), `de7f0832` (AGENTS.md regla), `584fb49e` (PORTAL_BASE_URL), `bd509d20` (workflow UID fix), `5f10fddb` (anti-pattern #5 al playbook).
+- **Defense-in-depth canonizada para que NUNCA vuelva a pasar**:
+  1. `docs/operations/PRODUCTION_RELEASE_INCIDENT_PLAYBOOK_V1.md` — playbook cross-agent con 3 reglas duras + checklist 5 pasos + tabla checkId→fix + 6 anti-patterns documentados con ejemplos del incidente.
+  2. Reliability signal nuevo `secrets.env_ref_format_drift` (module `cloud`, kind drift, error si >0, steady=0) — detecta env vars `*_SECRET_REF` corruptas upstream del Sentry burst.
+  3. Skills `.claude/` y `.codex/` `greenhouse-production-release` apuntan al playbook como OBLIGATORIO read si orchestrator falló.
+  4. AGENTS.md sección "Regla de Production Release Orchestrator failure" con reglas duras cross-agent.
+  5. CLAUDE.md sección "Secret Manager Hygiene" extendida con reglas V2 + matriz Sentry decoupling.
+  6. ADR canonizado en `DECISIONS_INDEX.md`.
+- **Métrica de éxito futura**: si un release blocker similar emerge, debería cerrarse en <30 min (config drift conocido) o <2h (bug class nuevo). El incidente actual tomó ~2 días por falta de este playbook y por tratar el preflight gate como obstáculo en vez de diagnóstico.
+
+---
+
 # Sesion 2026-05-12 — Sentry remediation: reliability runtime + access governance
 
 - **Trigger:** usuario reportó múltiples alertas Sentry (`JAVASCRIPT-NEXTJS-41` familia `/api/admin/reliability` y `role_view_fallback_used`) y pidió solución profunda, segura, robusta, resiliente y escalable, no parches.

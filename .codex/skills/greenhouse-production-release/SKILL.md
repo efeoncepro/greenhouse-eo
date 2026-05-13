@@ -1,6 +1,6 @@
 ---
 name: greenhouse-production-release
-description: Use when promoting Greenhouse to production, investigating production release drift, running release preflight, dispatching the production orchestrator, approving production gates, rolling back, or changing the release control plane.
+description: Use when promoting Greenhouse to production, investigating production release drift, running release preflight, dispatching the production orchestrator, approving production gates, rolling back, changing the release control plane, OR recovering from orchestrator/preflight failures and diagnosing release blockers (sentry critical issues, vercel env drift, secret ref corruption, watchdog stale approvals, worker_revision_drift, Wait Vercel READY failure, AZURE_AD_CLIENT_ID drift, smoke probe failures). MANDATORY before touching any preflight check code, deploy.sh, or workflow YAML.
 ---
 
 # Greenhouse Production Release
@@ -21,6 +21,7 @@ Read only what the task needs, in this order:
 - `CLAUDE.md`
 - `project_context.md`
 - `Handoff.md`
+- **`docs/operations/PRODUCTION_RELEASE_INCIDENT_PLAYBOOK_V1.md` — OBLIGATORIO si el orchestrator falló (no chasees el gate; lee el JSON output como diagnóstico)**
 - `docs/architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md`
 - `docs/operations/runbooks/production-release.md`
 - `docs/manual-de-uso/plataforma/release-orchestrator.md`

@@ -80,7 +80,7 @@ import {
   type FxDriftRemediationPolicy
 } from '@/lib/finance/account-balances-fx-drift-remediation'
 import { getFinanceLedgerHealth } from '@/lib/finance/ledger-health'
-import { captureMessageWithDomain } from '@/lib/observability/capture'
+import { captureMessageWithDomain, captureWithDomain } from '@/lib/observability/capture'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { runQuotationLifecycleSweep } from '@/lib/commercial-intelligence/renewal-lifecycle'
 import { sendEmail } from '@/lib/email/delivery'
@@ -110,7 +110,9 @@ import { buildWeeklyDigest, resolveWeeklyDigestRecipients, WEEKLY_DIGEST_DEFAULT
 import { getCurrentAuthReadiness } from '@/lib/auth-secrets'
 import { probeNextAuthSecretRoundTrip } from '@/lib/auth/readiness'
 
-import { computeRematerializeSeedDate } from './finance-rematerialize-seed'
+import { resolveCleanSeedDate } from '@/lib/finance/account-balances-clean-seed-resolver'
+
+import { computeRollingRematerializationWindow } from './finance-rematerialize-seed'
 import { getReactiveQueueDepth, InvalidDomainError } from './reactive-queue-depth'
 import { runProductCatalogDriftDetectJob } from './product-catalog-drift-detect'
 import { runProductCatalogReconcileV2Job } from './product-catalog-reconcile-v2'
@@ -1008,10 +1010,39 @@ const handleFinanceRematerializeBalances = async (req: IncomingMessage, res: Ser
     )
 
     const today = new Date()
-    const seedDate = computeRematerializeSeedDate(today, lookbackDays)
-    const endDate = today.toISOString().slice(0, 10)
 
-    const results: Array<{ accountId: string; days: number; closing: number }> = []
+    // TASK-871 — canonical rolling window primitive. Replaces the legacy
+    // single-value seed computation. The window guarantees the FIRST day
+    // observed (`materializeStartDate`) is materialized, never used as a
+    // mute anchor.
+    const window = computeRollingRematerializationWindow(today, lookbackDays)
+    const endDate = window.materializeEndDate
+
+    const results: Array<{
+      accountId: string
+      days: number
+      closing: number
+      escalated?: { reason: string; daysExpanded: number; lastCheckedSeed?: string }
+    }> = []
+
+    const escalations: Array<{
+      accountId: string
+      reason: string
+      daysExpanded: number
+      lastCheckedSeed?: string
+    }> = []
+
+    // Adapter: the canonical resolver wants Pick<PoolClient, 'query'>; the
+    // handler uses runGreenhousePostgresQuery (pool-managed). Read-only +
+    // idempotent, so racing against in-flight inserts is acceptable — the
+    // reliability signal would catch any post-run drift on the next run.
+    const queryAdapter = {
+      query: async <T extends Record<string, unknown>>(sql: string, params: readonly unknown[]) => {
+        const rows = await runGreenhousePostgresQuery<T>(sql, params as unknown[])
+
+        return { rows } as { rows: T[] }
+      }
+    }
 
     for (const acct of accounts) {
       const protectedSeed = await runGreenhousePostgresQuery<{
@@ -1034,25 +1065,89 @@ const handleFinanceRematerializeBalances = async (req: IncomingMessage, res: Ser
            AND s.snapshot_at::date BETWEEN $2::date AND $3::date
          ORDER BY s.snapshot_at DESC, s.created_at DESC
          LIMIT 1`,
-        [acct.account_id, seedDate, endDate]
+        [acct.account_id, window.seedDate, endDate]
       )
 
-      let effectiveSeedDate = seedDate
+      let effectiveSeedDate = window.seedDate
       let opening: number
       let preserveSeedRow = false
 
       if (protectedSeed.length > 0) {
+        // Protected reconciliation snapshot found inside the rolling window.
+        // The operator already accepted that closing as canonical, so it is
+        // by definition movement-free in the reconciliation sense — we
+        // anchor on it and skip the integrity check.
         effectiveSeedDate = protectedSeed[0].balance_date
         opening = Number(protectedSeed[0].closing_balance)
         preserveSeedRow = true
       } else {
+        // TASK-871 Slice 2C — integrity check. If the candidate seedDate
+        // holds canonical movements, walk backward until a movement-free
+        // day is found (or escalate to historical_restatement).
+        const integrity = await resolveCleanSeedDate({
+          client: queryAdapter as never,
+          accountId: acct.account_id,
+          candidateSeedDate: window.seedDate
+        })
+
+        if (!integrity.ok) {
+          const escalation = {
+            accountId: acct.account_id,
+            reason: integrity.reason,
+            daysExpanded: integrity.daysExpanded,
+            lastCheckedSeed: integrity.lastCheckedSeed
+          }
+
+          escalations.push(escalation)
+          results.push({ accountId: acct.account_id, days: 0, closing: -1, escalated: escalation })
+
+          captureWithDomain(
+            new Error(
+              `Rolling rematerialize seed integrity check exceeded ${integrity.daysExpanded}d expansion for ${acct.account_id} ` +
+                `(original seed=${integrity.originalSeed}, last checked=${integrity.lastCheckedSeed}). ` +
+                `Escalating to historical_restatement.`
+            ),
+            'finance',
+            {
+              tags: {
+                source: 'rolling_rematerialize',
+                stage: 'seed_integrity_check',
+                reason: integrity.reason
+              },
+              extra: {
+                accountId: acct.account_id,
+                originalSeed: integrity.originalSeed,
+                lastCheckedSeed: integrity.lastCheckedSeed,
+                daysExpanded: integrity.daysExpanded,
+                movementBlockerCount: integrity.movementBlockers.length
+              }
+            }
+          )
+
+          console.warn(
+            `[ops-worker] rematerialize ${acct.account_id} escalated: ${integrity.reason} ` +
+              `(daysExpanded=${integrity.daysExpanded}, lastCheckedSeed=${integrity.lastCheckedSeed})`
+          )
+
+          continue
+        }
+
+        if (integrity.daysExpanded > 0) {
+          console.log(
+            `[ops-worker] rematerialize ${acct.account_id} expanded seed ${integrity.daysExpanded}d ` +
+              `(${integrity.originalSeed} → ${integrity.cleanSeed}) to skip canonical movements on dirty days`
+          )
+        }
+
+        effectiveSeedDate = integrity.cleanSeed
+
         // Use the previous day's closing as the seed for this rematerialize.
         const seedRow = await runGreenhousePostgresQuery<{ closing_balance: string }>(
           `SELECT closing_balance::text
            FROM greenhouse_finance.account_balances
            WHERE account_id = $1 AND balance_date <= $2::date
            ORDER BY balance_date DESC LIMIT 1`,
-          [acct.account_id, seedDate]
+          [acct.account_id, effectiveSeedDate]
         )
 
         opening = seedRow.length > 0 ? Number(seedRow[0].closing_balance) : Number(acct.opening_balance ?? 0)
@@ -1141,9 +1236,28 @@ const handleFinanceRematerializeBalances = async (req: IncomingMessage, res: Ser
 
     const durationMs = Date.now() - startMs
 
-    console.log(`[ops-worker] /finance/rematerialize-balances done — ${results.length} accounts, ${durationMs}ms`)
+    console.log(
+      `[ops-worker] /finance/rematerialize-balances done — ${results.length} accounts, ` +
+        `${escalations.length} escalated, ${durationMs}ms`
+    )
 
-    json(res, 200, { accounts: results.length, lookbackDays, seedDate, endDate, results, durationMs })
+    json(res, 200, {
+      accounts: results.length,
+      lookbackDays,
+      window: {
+        targetStartDate: window.targetStartDate,
+        seedDate: window.seedDate,
+        materializeStartDate: window.materializeStartDate,
+        materializeEndDate: window.materializeEndDate,
+        policy: window.policy
+      },
+      // Legacy field preserved for downstream observers; equals window.seedDate.
+      seedDate: window.seedDate,
+      endDate,
+      results,
+      escalations,
+      durationMs
+    })
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error'
 

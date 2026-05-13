@@ -292,7 +292,12 @@ export default [
       'greenhouse/no-untokenized-fx-math': 'error',
       'greenhouse/no-untokenized-expense-type-for-analytics': 'error',
       'greenhouse/no-inline-facet-visibility-check': 'error',
-      'greenhouse/cloud-run-services-must-init-sentry': 'error'
+      'greenhouse/cloud-run-services-must-init-sentry': 'error',
+      'greenhouse/no-cross-domain-import-from-client-portal': 'error',
+      // TASK-827 Slice 7 — modo warn durante migración V1.0. Promote a `error`
+      // vive en TASK derivada V1.1 client-portal-legacy-branching-sweep
+      // (trigger: zero drift ≥30 días post TASK-829 cierre).
+      'greenhouse/no-untokenized-business-line-branching': 'warn'
     }
   },
   {
@@ -382,6 +387,50 @@ export default [
     ],
     rules: {
       'greenhouse/no-inline-facet-visibility-check': 'off'
+    }
+  },
+
+  // TASK-822 Slice 3 — la lint rule no-cross-domain-import-from-client-portal se
+  // desactiva SOLO dentro del módulo client_portal mismo (importa relativos a
+  // sí mismo) y en los archivos del rule + sus tests. Producer domains que
+  // importen @/lib/client-portal/* siguen disparando error.
+  {
+    files: [
+      'src/lib/client-portal/**',
+      'eslint-plugins/greenhouse/rules/no-cross-domain-import-from-client-portal.mjs',
+      'eslint-plugins/greenhouse/rules/__tests__/no-cross-domain-import-from-client-portal.test.mjs'
+    ],
+    rules: {
+      'greenhouse/no-cross-domain-import-from-client-portal': 'off'
+    }
+  },
+
+  // TASK-827 Slice 7 — no-untokenized-business-line-branching override block.
+  // El rule warn-ea cualquier branching legacy session.user.{tenantType,businessLines,
+  // serviceModules}/tenant_capabilities.* en UI surfaces. Exime:
+  //
+  //   - src/components/layout/vertical/VerticalMenu.tsx — D2 + Slice 6 preserva
+  //     legacy canSeeView + resolveCapabilityModules. Migration full a
+  //     <ClientPortalNavigation> vive en TASK derivada V1.1
+  //     `client-portal-vertical-menu-resolver-migration` (declarada en spec
+  //     TASK-827 Follow-ups).
+  //   - src/lib/auth/** — legítimamente lee session.user.tenantType para session
+  //     routing decisions ANTES de cualquier UI render.
+  //   - src/app/api/auth/** — endpoints auth que validan tenant.
+  //   - Foundation _layout.tsx files si emergen casos.
+  //   - El rule mismo + tests.
+  {
+    files: [
+      'src/components/layout/vertical/VerticalMenu.tsx',
+      'src/components/layout/vertical/VerticalMenu (1).tsx',
+      'src/lib/auth/**',
+      'src/app/api/auth/**',
+      'src/app/**/_layout.tsx',
+      'eslint-plugins/greenhouse/rules/no-untokenized-business-line-branching.mjs',
+      'eslint-plugins/greenhouse/rules/__tests__/no-untokenized-business-line-branching.test.mjs'
+    ],
+    rules: {
+      'greenhouse/no-untokenized-business-line-branching': 'off'
     }
   },
 

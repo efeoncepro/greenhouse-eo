@@ -173,4 +173,206 @@ describe('account balances FX drift remediation', () => {
     }))
     expect(refreshMonthlyBatchMock).toHaveBeenCalled()
   })
+
+  describe('TASK-871 — rolling_window_repair policy', () => {
+    it('classifies seed-blind-spot signature as rolling_window_repair_eligible', async () => {
+      listRowsMock.mockResolvedValueOnce([santanderDriftRow])
+
+      const plan = await planAccountBalancesFxDriftRemediation({
+        policy: 'rolling_window_repair'
+      })
+
+      expect(plan.decisions[0]).toMatchObject({
+        decision: 'auto_remediable',
+        reason: 'rolling_window_repair_eligible'
+      })
+    })
+
+    it('does NOT auto-remediate rows that do not match the seed-blind-spot signature', async () => {
+      // Drift row WITHOUT the signature — transactionCount > 0
+      const nonSignatureRow = {
+        ...santanderDriftRow,
+        transactionCount: 5,
+        persistedInflowsClp: '100000.00',
+        persistedOutflowsClp: '50000.00'
+      }
+
+      listRowsMock.mockResolvedValueOnce([nonSignatureRow])
+
+      const plan = await planAccountBalancesFxDriftRemediation({
+        policy: 'rolling_window_repair'
+      })
+
+      expect(plan.decisions[0]).toMatchObject({
+        decision: 'unknown_requires_review',
+        reason: 'rolling_window_repair_signature_mismatch'
+      })
+    })
+
+    it('blocks rolling repair when protected snapshot exists on the exact affected day', async () => {
+      listRowsMock.mockResolvedValueOnce([santanderDriftRow])
+      pgQueryMock.mockResolvedValueOnce([
+        {
+          account_id: 'santander-clp',
+          balance_date: '2026-05-01',
+          snapshot_id: 'snapshot-1',
+          drift_status: 'reconciled'
+        }
+      ])
+
+      const plan = await planAccountBalancesFxDriftRemediation({
+        policy: 'rolling_window_repair'
+      })
+
+      expect(plan.decisions[0]).toMatchObject({
+        decision: 'blocked_reconciled_or_closed',
+        reason: 'accepted_or_reconciled_snapshot_exists'
+      })
+    })
+
+    it('uses seedMode=explicit + block_on_reconciled_drift guard when executing rolling repair', async () => {
+      listRowsMock.mockResolvedValueOnce([santanderDriftRow])
+      countRowsMock.mockResolvedValueOnce(0)
+
+      // pgQueryMock flow per call:
+      //  1. listProtectedEvidence → no protected evidence on 2026-05-01
+      //  2. writeRunStart audit INSERT
+      //  3. resolveCleanSeedDate first day check (candidate=2026-04-30, clean)
+      //  4. seed opening balance lookup
+      //  5. writeRunComplete audit UPDATE
+      pgQueryMock
+        .mockResolvedValueOnce([]) // protected evidence query
+        .mockResolvedValueOnce([]) // writeRunStart
+        .mockResolvedValueOnce([
+          {
+            settlement_legs: '0',
+            income_payments: '0',
+            expense_payments: '0'
+          }
+        ]) // resolveCleanSeedDate(candidate=2026-04-30)
+        .mockResolvedValueOnce([{ closing_balance: '1212492.07' }]) // opening lookup
+        .mockResolvedValueOnce([]) // writeRunComplete
+
+      rematerializeMock.mockResolvedValueOnce({
+        accountId: 'santander-clp',
+        seedDate: '2026-04-30',
+        endDate: '2026-05-09',
+        finalClosingBalance: 1615054.57,
+        daysMaterialized: 9
+      })
+
+      const result = await remediateAccountBalancesFxDrift({
+        policy: 'rolling_window_repair',
+        dryRun: false,
+        toDate: '2026-05-09'
+      })
+
+      expect(result.status).toBe('succeeded')
+      expect(result.accountsRematerialized).toBe(1)
+      expect(rematerializeMock).toHaveBeenCalledWith(expect.objectContaining({
+        accountId: 'santander-clp',
+        seedDate: '2026-04-30',
+        endDate: '2026-05-09',
+        seedMode: 'explicit',
+        openingBalance: 1212492.07,
+        evidenceGuard: { mode: 'block_on_reconciled_drift' }
+      }))
+      expect(result.runs[0]).toMatchObject({
+        accountId: 'santander-clp',
+        seedMode: 'explicit',
+        evidenceGuardMode: 'block_on_reconciled_drift'
+      })
+    })
+
+    it('records cleanSeedExpansion telemetry when seed walked backward', async () => {
+      listRowsMock.mockResolvedValueOnce([santanderDriftRow])
+      countRowsMock.mockResolvedValueOnce(0)
+
+      pgQueryMock
+        .mockResolvedValueOnce([]) // protected evidence query
+        .mockResolvedValueOnce([]) // writeRunStart
+        // resolveCleanSeedDate walks 2026-04-30 (dirty) → 2026-04-29 (clean)
+        .mockResolvedValueOnce([
+          {
+            settlement_legs: '1',
+            income_payments: '0',
+            expense_payments: '0'
+          }
+        ])
+        .mockResolvedValueOnce([
+          {
+            settlement_legs: '0',
+            income_payments: '0',
+            expense_payments: '0'
+          }
+        ])
+        .mockResolvedValueOnce([{ closing_balance: '1212492.07' }])
+        .mockResolvedValueOnce([])
+
+      rematerializeMock.mockResolvedValueOnce({
+        accountId: 'santander-clp',
+        seedDate: '2026-04-29',
+        endDate: '2026-05-09',
+        finalClosingBalance: 1615054.57,
+        daysMaterialized: 10
+      })
+
+      const result = await remediateAccountBalancesFxDrift({
+        policy: 'rolling_window_repair',
+        dryRun: false,
+        toDate: '2026-05-09'
+      })
+
+      expect(result.runs[0]?.cleanSeedExpansion).toEqual({
+        originalSeed: '2026-04-30',
+        cleanSeed: '2026-04-29',
+        daysExpanded: 1
+      })
+    })
+
+    it('skips the account when integrity check exceeds maxExpandDays', async () => {
+      listRowsMock.mockResolvedValueOnce([santanderDriftRow])
+      countRowsMock.mockResolvedValueOnce(1)
+
+      // protected evidence empty + writeRunStart + 31 dirty days from
+      // 2026-04-30 backward to 2026-03-30 (the default maxExpand=30) + writeRunComplete.
+      const calls: Array<Promise<unknown[]>> = [
+        Promise.resolve([]), // protected evidence
+        Promise.resolve([]) // writeRunStart
+      ]
+
+      for (let i = 0; i < 31; i++) {
+        calls.push(
+          Promise.resolve([
+            { settlement_legs: '1', income_payments: '0', expense_payments: '0' }
+          ])
+        )
+      }
+
+      calls.push(Promise.resolve([])) // writeRunComplete
+
+      let callIndex = 0
+
+      pgQueryMock.mockImplementation(() => calls[callIndex++])
+
+      const result = await remediateAccountBalancesFxDrift({
+        policy: 'rolling_window_repair',
+        dryRun: false,
+        toDate: '2026-05-09'
+      })
+
+      // The rematerializer is never invoked when integrity check fails.
+      expect(rematerializeMock).not.toHaveBeenCalled()
+      expect(result.runs).toHaveLength(1)
+      expect(result.runs[0]).toMatchObject({
+        accountId: 'santander-clp',
+        seedMode: 'explicit',
+        evidenceGuardMode: 'block_on_reconciled_drift',
+        skipped: {
+          reason: 'integrity_check_exceeded_max_expand'
+        }
+      })
+      expect(result.accountsRematerialized).toBe(0)
+    })
+  })
 })

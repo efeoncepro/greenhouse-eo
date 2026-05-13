@@ -106,6 +106,12 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
 
   const canSeeSupervisorOrgChart = canSuperviseOrgChart || authorizedViews.includes('equipo.organigrama')
 
+  // TASK-827 D2 — `capabilityModules` legacy preservado. Migración al resolver
+  // canónico (TASK-825) vive en TASK derivada V1.1
+  // `capability-modules-resolver-migration` (ver docs/tasks/in-progress/TASK-827
+  // §Follow-ups). Bloqueante: requiere refactor client→server o fetch via
+  // SWR del endpoint /api/client-portal/modules. V1.0 acepta path híbrido.
+  // client-portal-allowed: legacy business_line branching pre TASK-827 V1.1 migration
   const capabilityModules = resolveCapabilityModules({
     businessLines: session?.user?.businessLines || [],
     serviceModules: session?.user?.serviceModules || []
@@ -588,6 +594,28 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
   // ═══════════════════════════════════════════════════════════════════════
   // CLIENT USERS (external portal)
   // ═══════════════════════════════════════════════════════════════════════
+  //
+  // TASK-827 D2 + Slice 6 — Refactor branching legacy.
+  //
+  // ESTE BLOQUE (líneas ~603-665) usa `canSeeView('cliente.*', true)` legacy
+  // basado en `session.user.authorizedViews[]` (TASK-136). El resolver
+  // canónico (TASK-825) ya está disponible vía
+  // `<ClientPortalNavigation>` server component (`src/views/greenhouse/client-portal/navigation/`).
+  //
+  // Migración FULL al resolver requiere refactor client→server o fetch SWR
+  // del endpoint `/api/client-portal/modules`. V1.0 acepta path híbrido:
+  //   - Server-side: page guards (TASK-827 Slice 4 `requireViewCodeAccess`)
+  //     enforced en CADA page con `cliente.*` viewCode. Resolver canónico
+  //     gateando access real.
+  //   - Client-side (este menú): legacy `canSeeView` muestra/oculta items.
+  //     Si un cliente NO tiene el módulo asignado, click → redirect a
+  //     `/home?denied=<slug>` con `<ModuleNotAssignedEmpty>` (Slice 5).
+  //
+  // TASK derivada V1.1 `client-portal-vertical-menu-resolver-migration`
+  // (ver docs/tasks/in-progress/TASK-827 §Follow-ups) hace el switch full
+  // a `<ClientPortalNavigation>`.
+  //
+  // client-portal-allowed: legacy canSeeView pattern pre TASK-827 V1.1 migration
 
   if (!isInternalPortalUser) {
     // Pure collaborator home

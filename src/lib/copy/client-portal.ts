@@ -442,3 +442,160 @@ export const GH_MESSAGES = {
   request_dialog_close: 'Cerrar',
   request_dialog_copy: 'Copiar solicitud'
 } as const
+
+/**
+ * TASK-827 Slice 1 — Microcopy del Composition Layer del Client Portal.
+ *
+ * Cubre los 5 estados canónicos del 5-state contract (§13 spec V1):
+ *   - loading: aria-label cuando el resolver fetch tarda (raro, cache TTL 60s)
+ *   - empty (zero-state): cliente activo con modules.length === 0
+ *   - not_assigned: cliente intentó acceder ruta cuyo viewCode no está en su set
+ *   - degraded: resolver parcial (algunos modules failed silently)
+ *   - error: resolver falló completo → redirect a /home con error toast
+ *
+ * + `modulePublicLabels`: mapping slug user-facing → nombre comercial + bundle
+ * hint para renderizar `<ModuleNotAssignedEmpty>` con copy correcto. NUNCA leak
+ * `module_key` técnico (e.g. `creative_hub_globe_v1`) al usuario.
+ *
+ * Validado por skill `greenhouse-ux-writing`:
+ *   - Tono: warm-but-professional, no-blame, recoverable
+ *   - es-CL tuteo standard (NO voseo rioplatense)
+ *   - Sentence case
+ *   - Anatomía 5-elementos (icon + title + body + primary CTA + secondary CTA)
+ *   - Specific, no generic ("Solicitar acceso" no "Aceptar")
+ *
+ * Patrón TASK-265: copy de dominio reusable vive en `src/lib/copy/<domain>.ts`.
+ */
+export const GH_CLIENT_PORTAL_COMPOSITION = {
+  loading: {
+    ariaLabel: 'Cargando tu portal'
+  },
+
+  navigation: {
+    /** ARIA label del `<nav>` container del menú dinámico cliente (Slice 3). */
+    ariaLabel: 'Navegación del portal cliente',
+    /** Tier badge label para items de tipo addon. */
+    addonBadge: 'Addon',
+    /** Empty state inline cuando items.length === 0 (modules.length === 0). */
+    emptyMessage: 'Sin módulos asignados todavía'
+  },
+
+  navigationGroups: {
+    primary: 'Operación',
+    capabilities: 'Módulos',
+    account: 'Mi cuenta'
+  },
+
+  emptyState: {
+    zeroState: {
+      icon: 'tabler-seedling',
+      title: 'Bienvenido a Greenhouse',
+      body: 'Tu cuenta está activada. Tu account manager está configurando tus accesos. Te avisaremos por email cuando esté listo.',
+      primaryCta: 'Hablar con mi account manager',
+      secondaryCta: 'Ver mi cuenta'
+    },
+
+    notAssigned: {
+      icon: 'tabler-lock',
+      title: (moduleName: string) => `${moduleName} aún no está activo en tu cuenta`,
+      body: (moduleName: string, bundleHint: string) =>
+        `${moduleName} ${bundleHint}. Si te interesa conocerlo, escríbele a tu account manager.`,
+      primaryCta: 'Solicitar acceso',
+      secondaryCta: 'Volver al inicio',
+      mailtoSubjectPrefix: 'Solicitud de acceso —'
+    }
+  },
+
+  degraded: {
+    bannerTitle: 'Portal en modo degradado',
+    bannerBody:
+      'Algunos módulos no están disponibles temporalmente. Estamos renderizando solo los que sí están disponibles. Si esto persiste, tu account manager te contactará.',
+    retryCta: 'Volver a intentar'
+  },
+
+  error: {
+    toast: 'No pudimos cargar tu portal. Vuelve a intentar en unos segundos.',
+    fallbackTitle: 'Algo salió mal de nuestro lado',
+    fallbackBody:
+      'Te llevamos al inicio mientras lo resolvemos. Si el problema persiste, escríbele a tu account manager.',
+    fallbackCta: 'Ir al inicio'
+  },
+
+  /**
+   * Mapping slug user-facing → nombre comercial + bundle hint. La key es el
+   * slug que aparece en `?denied=<slug>` (output de `mapViewCodeToPublicSlug`,
+   * Slice 4). Se renderiza en `<ModuleNotAssignedEmpty>` invocando
+   * `emptyState.notAssigned.title(name)` + `body(name, bundleHint)`.
+   *
+   * Cuando emerja un módulo nuevo: agregar entry aquí + slug en el helper
+   * canónico. Sin entry, se usa `defaultLabel` (degradación honesta).
+   */
+  modulePublicLabels: {
+    'creative-hub': {
+      name: 'Creative Hub',
+      bundleHint: 'se incluye en planes Globe'
+    },
+    'brand-intelligence': {
+      name: 'Brand Intelligence',
+      bundleHint: 'es un addon disponible para planes Globe'
+    },
+    'csc-pipeline': {
+      name: 'CSC Pipeline',
+      bundleHint: 'es un addon disponible para planes Globe'
+    },
+    'cvr-quarterly': {
+      name: 'Creative Velocity Review trimestral',
+      bundleHint: 'es un addon disponible para planes Globe'
+    },
+    'roi-reports': {
+      name: 'ROI Reports y exports',
+      bundleHint: 'se incluye en planes Globe Enterprise'
+    },
+    'exports': {
+      name: 'Exports operativos',
+      bundleHint: 'se incluye en el addon ROI Reports'
+    },
+    'staff-augmentation': {
+      name: 'Visibilidad de Staff Augmentation',
+      bundleHint: 'está disponible cuando contratas Staff Augmentation'
+    },
+    'crm-command': {
+      name: 'CRM Command',
+      bundleHint: 'es parte de CRM Solutions y está en transición a Kortex'
+    },
+    'web-delivery': {
+      name: 'Web Delivery',
+      bundleHint: 'se incluye en planes Wave'
+    },
+    'creative-hub-globe': {
+      name: 'Creative Hub Globe',
+      bundleHint: 'se incluye en planes Globe estándar'
+    },
+    pulse: {
+      name: 'Pulse',
+      bundleHint: 'está disponible para todas las cuentas activas'
+    },
+    equipo: {
+      name: 'Tu equipo asignado',
+      bundleHint: 'está disponible para todas las cuentas activas'
+    }
+  },
+
+  /**
+   * Fallback usado cuando `?denied=<slug>` no matchea ninguna entry de
+   * `modulePublicLabels`. Degradación honesta: NUNCA blank, NUNCA module_key
+   * técnico. El cliente ve un mensaje genérico recoverable.
+   */
+  defaultLabel: {
+    name: 'Este módulo',
+    bundleHint: 'no está disponible para tu plan actual'
+  },
+
+  /**
+   * Labels usados en el `<ClientPortalNavigation>` (Slice 3) cuando un
+   * `viewCode` está autorizado pero el `display_label_client` del módulo
+   * no resolvió por algún motivo. Fallback estructural — NO debería verse en
+   * producción si el seed está completo.
+   */
+  navItemFallbackLabel: 'Sección'
+} as const

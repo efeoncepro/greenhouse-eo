@@ -203,6 +203,63 @@ export interface GreenhouseAiToolCatalog {
   website_url: string | null;
 }
 
+export interface GreenhouseClientPortalModuleAssignmentEvents {
+  actor_user_id: string;
+  assignment_id: string;
+  event_id: string;
+  event_kind: string;
+  from_status: string | null;
+  occurred_at: Generated<Timestamp>;
+  payload_json: Generated<Json>;
+  to_status: string | null;
+}
+
+export interface GreenhouseClientPortalModuleAssignments {
+  approved_at: Timestamp | null;
+  approved_by_user_id: string | null;
+  assignment_id: string;
+  created_at: Generated<Timestamp>;
+  effective_from: Timestamp;
+  effective_to: Timestamp | null;
+  expires_at: Timestamp | null;
+  metadata_json: Generated<Json | null>;
+  module_key: string;
+  organization_id: string;
+  source: string;
+  source_ref_json: Generated<Json | null>;
+  status: Generated<string>;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseClientPortalModules {
+  /**
+   * Categoría de aplicabilidad del módulo dentro del dominio client_portal. NO es FK al business_line canónico del 360 (greenhouse_core.service_modules.module_code WHERE module_kind='business_line'). Mezcla dimensiones ortogonales: business_lines reales (globe, wave, crm_solutions), metavalue cross=aplicable-a-múltiples, y service_module staff_aug=dentro-de-cross. Para resolver el business_line canónico del cliente consumidor, usar greenhouse_core.business_line_metadata. Hard rule canonizada en GREENHOUSE_BUSINESS_LINES_ARCHITECTURE_V1.md: NO duplicar enum del catalogo.
+   */
+  applicability_scope: string;
+  /**
+   * capabilities granulares que el módulo declara. Forward-looking en V1.0: algunos values aún no existen en entitlements-catalog — TASK-826 los materializa. Parity strict deferred a TASK-826.
+   */
+  capabilities: Generated<string[]>;
+  created_at: Generated<Timestamp>;
+  /**
+   * Whitelist de dominios productores que alimentan el módulo. Parity test live TS↔DB strict en src/lib/client-portal/data-sources/parity.live.test.ts (TASK-824 Slice 3) — rompe build si seed DB ↔ ClientPortalDataSource type union (src/lib/client-portal/dto/reader-meta.ts) diverge.
+   */
+  data_sources: Generated<string[]>;
+  description: string | null;
+  display_label: string;
+  display_label_client: string;
+  effective_from: Generated<Timestamp>;
+  effective_to: Timestamp | null;
+  metadata_json: Generated<Json | null>;
+  module_key: string;
+  pricing_kind: string;
+  tier: string;
+  /**
+   * view_codes que este módulo expone al portal cliente. Forward-looking en V1.0: algunos values aún no existen en VIEW_REGISTRY — TASK-827 los materializa. Parity strict deferred a TASK-827.
+   */
+  view_codes: Generated<string[]>;
+}
+
 export interface GreenhouseCommercialApprovalPolicies {
   active: Generated<boolean>;
   business_line_code: string | null;
@@ -535,6 +592,10 @@ export interface GreenhouseCommercialEngagementAuditLog {
 }
 
 export interface GreenhouseCommercialEngagementCommercialTerms {
+  /**
+   * Module keys del catálogo greenhouse_client_portal.modules. Cascade en TASK-828. FK lógica via parity test + reactive consumer (NO FK física por boundary cross-schema).
+   */
+  bundled_modules: Generated<string[] | null>;
   declared_at: Generated<Timestamp>;
   /**
    * Actor who declared the terms. Nullable only to support ON DELETE SET NULL; declareCommercialTerms requires declaredBy in input.
@@ -8860,6 +8921,9 @@ export interface DB {
   "greenhouse_ai.nexa_threads": GreenhouseAiNexaThreads;
   "greenhouse_ai.reliability_ai_observations": GreenhouseAiReliabilityAiObservations;
   "greenhouse_ai.tool_catalog": GreenhouseAiToolCatalog;
+  "greenhouse_client_portal.module_assignment_events": GreenhouseClientPortalModuleAssignmentEvents;
+  "greenhouse_client_portal.module_assignments": GreenhouseClientPortalModuleAssignments;
+  "greenhouse_client_portal.modules": GreenhouseClientPortalModules;
   "greenhouse_commercial.approval_policies": GreenhouseCommercialApprovalPolicies;
   "greenhouse_commercial.approval_steps": GreenhouseCommercialApprovalSteps;
   "greenhouse_commercial.clause_library": GreenhouseCommercialClauseLibrary;

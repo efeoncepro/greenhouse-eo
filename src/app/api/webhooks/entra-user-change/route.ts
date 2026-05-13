@@ -8,22 +8,28 @@ import { runEntraHierarchyGovernanceScan } from '@/lib/reporting-hierarchy/gover
 export const dynamic = 'force-dynamic'
 export const maxDuration = 30
 
-// ── GET: Microsoft Graph subscription validation ──
-// When creating a subscription, Graph sends a GET with ?validationToken=xxx
-// We must respond with the token as plain text within 10 seconds.
+// ── Microsoft Graph subscription validation ──
+// When creating a subscription, Graph sends ?validationToken=xxx to the
+// notification URL. The token must be echoed as plain text within 10 seconds.
 
-export async function GET(request: Request) {
+const respondToValidationToken = (request: Request): Response | null => {
   const url = new URL(request.url)
   const validationToken = url.searchParams.get('validationToken')
 
-  if (validationToken) {
-    console.log('[entra-webhook] Subscription validation request received')
+  if (!validationToken) return null
 
-    return new Response(validationToken, {
-      status: 200,
-      headers: { 'Content-Type': 'text/plain' }
-    })
-  }
+  console.log('[entra-webhook] Subscription validation request received')
+
+  return new Response(validationToken, {
+    status: 200,
+    headers: { 'Content-Type': 'text/plain' }
+  })
+}
+
+export async function GET(request: Request) {
+  const validationResponse = respondToValidationToken(request)
+
+  if (validationResponse) return validationResponse
 
   return NextResponse.json({ status: 'ok', endpoint: 'entra-user-change' })
 }
@@ -46,6 +52,10 @@ interface GraphNotificationPayload {
 }
 
 export async function POST(request: Request) {
+  const validationResponse = respondToValidationToken(request)
+
+  if (validationResponse) return validationResponse
+
   // 1. Validate client state
   const body = (await request.json().catch(() => null)) as GraphNotificationPayload | null
 

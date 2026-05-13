@@ -8,11 +8,42 @@
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `EPIC-015`
-- Status real: `Diseno`
+- Status real: `Diseno (TASK-824 cerrada 2026-05-12; columna engagement_commercial_terms.bundled_modules ya disponible)`
 - Rank: `TBD`
 - Domain: `client_portal`
-- Blocked by: `TASK-820, TASK-825, TASK-826`
+- Blocked by: `TASK-820` (TASK-825 + TASK-826 cerradas 2026-05-12)
 - Branch: `task/TASK-828-client-portal-cascade`
+
+## Delta 2026-05-12 — TASK-826 cerrada, commands canónicos disponibles
+
+TASK-826 cerró 2026-05-12 con 5 commands canónicos atomic-tx exportados desde `src/lib/client-portal/commands/`:
+
+- `enableClientPortalModule({ organizationId, moduleKey, source: 'lifecycle_case_provision', status: 'active' | 'pilot', effectiveFrom, expiresAt?, approvedByUserId, sourceRefJson, overrideBusinessLineMismatch?, overrideReason? })` — atomic tx PG con BL check, idempotency, audit, outbox v1, cache invalidation. **El reactive consumer debe llamar este helper directo**, NO componer su propia tx.
+- `churnClientPortalModule({ assignmentId, actorUserId, reason, effectiveTo? })` — para módulos que dejan de aplicar post-lifecycle (cliente cambia tier/bundle).
+- `expireClientPortalModule(...)` — para módulos pilot que expiran al cumplir milestone.
+- `pauseClientPortalModule` / `resumeClientPortalModule` — disponibles si emerge necesidad de pause cascade (V1.0 NO usa).
+
+**Outbox events v1 emitidos**: `client.portal.module.assignment.{created,paused,resumed,expired,churned}` — el reactive consumer consume `client.lifecycle.case.completed` (TASK-820) y produce events derivados via los commands.
+
+**Capability del consumer**: el reactive consumer corre con identity sistema (no usuario operador). El audit log registra `actor_user_id='system_cascade'` o equivalente. NO requiere capability check porque corre fuera del request path (cron Cloud Run worker).
+
+**Idempotency en cascade**: `enableClientPortalModule` detecta duplicate (same org+module activo) y retorna `idempotent=true` sin emit outbox. Reentries del cron NO duplican assignments — patrón TASK-773 reactive consumer canónico.
+
+## Delta 2026-05-12 — TASK-825 cerrada, cache invalidation pattern canonizado
+
+TASK-825 cerró 2026-05-12 con `__clearClientPortalResolverCache(orgId?)` invalidator exportado. Cuando esta task arranque (post-TASK-826 que entrega los commands):
+
+- **Reactive consumer `client_portal_modules_from_lifecycle`** que escucha `client.lifecycle.case.completed` (TASK-820 outbox) y materializa/churn-ea assignments DEBE llamar `__clearClientPortalResolverCache(organizationId)` post-materialización para invalidar el cache scoped del cliente afectado. Sin invalidation, el resolver devuelve stale data por hasta 60s (TTL) — con invalidation, próxima lectura del cliente es fresca instantánea.
+- **Pattern atómico**: invalidator es side-effect tras la mutación PG; si la mutación PG falla, no se invalida (no hay efecto fantasma). Si la invalidación falla por algún motivo extraño, el TTL 60s resuelve eventualmente.
+
+## Delta 2026-05-12 — TASK-824 cerrada, columna bundled_modules disponible
+
+TASK-824 cerró 2026-05-12 con ALTER `greenhouse_commercial.engagement_commercial_terms ADD COLUMN bundled_modules TEXT[] DEFAULT ARRAY[]::TEXT[]`. Cuando esta task arranque:
+
+- La columna existe en runtime con default array vacío (backward compat 100%).
+- Tipos Kysely regenerados cubren la columna.
+- NO hay FK física `bundled_modules[]` → `modules.module_key` (cross-schema boundary, decisión spec V1 §5.4). Esta task DEBE implementar validación lógica al INSERT/UPDATE de `bundled_modules` (e.g. en el helper canónico para setear bundled_modules en commercial terms): cada string debe matchear un `modules.module_key` activo.
+- Cuando emerja la primera surface que setea `bundled_modules`, considerar reliability signal `client_portal.commercial_terms.unknown_bundled_module` que detecte drift (filas en commercial_terms con `bundled_modules` que referencian module_keys inexistentes o ya en `effective_to IS NOT NULL`).
 
 ## Summary
 

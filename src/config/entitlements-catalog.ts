@@ -427,6 +427,141 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     actions: ['read', 'launch'] as const,
     defaultScope: 'space'
   },
+
+  // ─────────────────────────────────────────────────────────────
+  // TASK-826 — Client Portal Module Assignment Admin
+  // ─────────────────────────────────────────────────────────────
+  // Granular least-privilege capabilities para enable/pause/expire/churn
+  // de módulos del portal cliente. NO conflated con admin.workspace (que es
+  // broad gate del Admin Center) — el `can()` granular vive aquí.
+  {
+    key: 'client_portal.module.read_assignment',
+    module: 'client_portal',
+    actions: ['read'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'client_portal.module.enable',
+    module: 'client_portal',
+    actions: ['create'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'client_portal.module.disable',
+    module: 'client_portal',
+    actions: ['delete'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'client_portal.module.pause',
+    module: 'client_portal',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
+  // Preserva nombre concept-level `business_line` (NO `applicability_scope`).
+  // Capability semántica = "permitir asignar módulo cuyo applicability_scope
+  // NO matchea el business_line canónico del cliente". Operator-facing label.
+  {
+    key: 'client_portal.module.override_business_line_default',
+    module: 'client_portal',
+    actions: ['approve'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'client_portal.catalog.manage',
+    module: 'client_portal',
+    actions: ['read', 'manage'] as const,
+    defaultScope: 'all'
+  },
+  {
+    key: 'client_portal.assignment.migrate_legacy',
+    module: 'client_portal',
+    actions: ['create'] as const,
+    defaultScope: 'all'
+  },
+
+  // ─────────────────────────────────────────────────────────────
+  // TASK-826 — Client Portal client-facing READ capabilities
+  // ─────────────────────────────────────────────────────────────
+  // Materializa los 9 values forward-looking declarados en
+  // greenhouse_client_portal.modules.capabilities[] (TASK-824 seed).
+  // Son las capabilities que un client_user (tenant_type='client',
+  // route_group=client_portal) necesita para leer cada surface.
+  // defaultScope='space' refleja el contract V1.4: el cliente solo ve sus
+  // propios spaces/orgs (cliente lookup vía session → space_id).
+  {
+    key: 'client_portal.pulse.read',
+    module: 'client_portal',
+    actions: ['read'] as const,
+    defaultScope: 'space'
+  },
+  {
+    key: 'client_portal.creative_hub.read',
+    module: 'client_portal',
+    actions: ['read'] as const,
+    defaultScope: 'space'
+  },
+  {
+    key: 'client_portal.csc_pipeline.read',
+    module: 'client_portal',
+    actions: ['read'] as const,
+    defaultScope: 'space'
+  },
+  {
+    key: 'client_portal.brand_intelligence.read',
+    module: 'client_portal',
+    actions: ['read'] as const,
+    defaultScope: 'space'
+  },
+  {
+    key: 'client_portal.cvr.read',
+    module: 'client_portal',
+    actions: ['read'] as const,
+    defaultScope: 'space'
+  },
+  {
+    key: 'client_portal.roi.read',
+    module: 'client_portal',
+    actions: ['read'] as const,
+    defaultScope: 'space'
+  },
+  {
+    key: 'client_portal.exports.generate',
+    module: 'client_portal',
+    actions: ['export'] as const,
+    defaultScope: 'space'
+  },
+  {
+    key: 'client_portal.staff_aug.read',
+    module: 'client_portal',
+    actions: ['read'] as const,
+    defaultScope: 'space'
+  },
+  {
+    key: 'client_portal.web_delivery.read',
+    module: 'client_portal',
+    actions: ['read'] as const,
+    defaultScope: 'space'
+  },
+  {
+    key: 'client_portal.assigned_team.read',
+    module: 'client_portal',
+    actions: ['read'] as const,
+    defaultScope: 'space'
+  },
+  {
+    key: 'client_portal.crm_command.read',
+    module: 'client_portal',
+    actions: ['read'] as const,
+    defaultScope: 'space'
+  },
+  {
+    key: 'client_portal.cvr.export',
+    module: 'client_portal',
+    actions: ['export'] as const,
+    defaultScope: 'space'
+  },
+
   {
     key: 'my_workspace.workspace',
     module: 'my_workspace',

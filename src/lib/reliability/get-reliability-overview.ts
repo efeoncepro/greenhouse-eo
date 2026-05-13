@@ -32,6 +32,8 @@ import {
   getExpenseDistributionSharedPoolContaminationSignal,
   getExpenseDistributionUnresolvedSignal
 } from './queries/expense-distribution'
+import { getClientPortalResolverFailureRateSignal } from './queries/client-portal-resolver-failure-rate'
+import { getEntraWebhookSubscriptionHealthSignal } from './queries/entra-webhook-subscription-health'
 import { getExpensePaymentsClpDriftSignal } from './queries/expense-payments-clp-drift'
 import { getFinanceClientProfileUnlinkedSignal } from './queries/finance-client-profile-unlinked'
 import { getIdentityLegalProfileEvidenceOrphanSignal } from './queries/identity-legal-profile-evidence-orphan'
@@ -64,6 +66,7 @@ import { getShortcutsInvalidPinsSignal } from './queries/shortcuts-invalid-pins'
 import { getWorkspaceProjectionFacetViewDriftSignal } from './queries/workspace-projection-drift'
 import { getWorkspaceProjectionUnresolvedRelationsSignal } from './queries/workspace-projection-unresolved-relations'
 import { getCloudRunSilentObservabilitySignal } from './queries/cloud-run-silent-observability'
+import { getSecretsEnvRefFormatDriftSignal } from './queries/secrets-env-ref-format-drift'
 import { getPostgresConnectionSaturationSignal } from './queries/postgres-connection-saturation'
 import { getCriticalTablesMissingSignal } from './queries/critical-tables-missing'
 import { getOutboxUnpublishedLagSignal } from './queries/outbox-unpublished-lag'
@@ -449,6 +452,28 @@ interface ReliabilityOverviewSources {
   workspaceProjection?: ReliabilitySignal[] | null
 
   /**
+   * ISSUE-075 hardening — Microsoft Graph webhook subscription health.
+   * Single signal:
+   *   - identity.entra.webhook_subscription_health (drift, escalates with expiry proximity)
+   *
+   * Detecta proactivamente cuando la Entra subscription se acerca a su expiry
+   * o ya expiró, en lugar de esperar al Sentry alert del cron renew failing.
+   * Roll up bajo moduleKey 'identity'.
+   */
+  entraWebhookSubscriptionHealth?: ReliabilitySignal | null
+
+  /**
+   * TASK-827 Slice 8 — Client portal resolver failure rate.
+   * Single signal:
+   *   - client_portal.composition.resolver_failure_rate (drift)
+   *
+   * V1.0 scaffold (returns `unknown` — telemetry adapter pending TASK-829 V1.1).
+   * Roll up bajo moduleKey 'identity' temporal (D7 decision); TASK-829 migrará
+   * a moduleKey 'client_portal' cuando cree el subsystem dedicado.
+   */
+  clientPortalResolverFailureRate?: ReliabilitySignal | null
+
+  /**
    * TASK-613 Slice 3 — Finance Clients ↔ Organization canonical link signal:
    *   - finance.client_profile.unlinked_organizations (data_quality, warning)
    * Roll up bajo moduleKey 'finance'. Steady state = 0. Cuando > 0,
@@ -475,6 +500,14 @@ interface ReliabilityOverviewSources {
    * Detecta Sentry init regression en Cloud Run services. Roll up bajo moduleKey 'cloud'.
    */
   cloudRunSilentObservability?: ReliabilitySignal | null
+
+  /**
+   * TASK-856 Slice 3 — Secret-ref env var format drift (detección activa).
+   *   - secrets.env_ref_format_drift (drift, error si > 0)
+   * Detecta env vars `*_SECRET_REF` con shape no canónico (quotes, `\n` literal,
+   * whitespace, paths malformados). Steady=0. Roll up bajo moduleKey 'cloud'.
+   */
+  secretsEnvRefFormatDrift?: ReliabilitySignal | null
 
   /**
    * TASK-845 Slice 6 — PostgreSQL connection saturation data-driven trigger.
@@ -579,6 +612,10 @@ export const buildReliabilityOverview = (
     ...(sources.identityGovernance ?? []),
     // TASK-611 Slice 5 — Organization Workspace projection signals (2).
     ...(sources.workspaceProjection ?? []),
+    // ISSUE-075 hardening — Microsoft Graph webhook subscription health.
+    ...(sources.entraWebhookSubscriptionHealth ? [sources.entraWebhookSubscriptionHealth] : []),
+    // TASK-827 Slice 8 — Client portal resolver failure rate (V1.0 scaffold).
+    ...(sources.clientPortalResolverFailureRate ? [sources.clientPortalResolverFailureRate] : []),
     // TASK-613 Slice 3 — Finance Clients ↔ Organization canonical link signal.
     ...(sources.financeClientProfileUnlinked ? [sources.financeClientProfileUnlinked] : []),
     // TASK-841 — Nubox raw/conformed/projection freshness.
@@ -587,6 +624,8 @@ export const buildReliabilityOverview = (
     ...(sources.criticalTablesMissing ? [sources.criticalTablesMissing] : []),
     // TASK-844 Slice 5 — Cross-runtime observability anti-regresión.
     ...(sources.cloudRunSilentObservability ? [sources.cloudRunSilentObservability] : []),
+    // TASK-856 Slice 3 — Secret-ref env var format drift (active upstream detection).
+    ...(sources.secretsEnvRefFormatDrift ? [sources.secretsEnvRefFormatDrift] : []),
     // TASK-845 Slice 6 — PG connection saturation (data-driven V2 trigger).
     ...(sources.postgresConnectionSaturation ? [sources.postgresConnectionSaturation] : []),
     // TASK-813 Slice 6 — Commercial engagement instance signals (3).
@@ -901,6 +940,21 @@ export const getReliabilityOverview = async (
           .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
           .catch(() => null)
 
+  // ISSUE-075 hardening — Microsoft Graph webhook subscription health. Single
+  // reader; consulta `greenhouse_sync.integration_registry.metadata` para
+  // detectar expiración del subscription. Degrada honestamente a `unknown`.
+  const entraWebhookSubscriptionHealth =
+    preloadedSources.entraWebhookSubscriptionHealth !== undefined
+      ? preloadedSources.entraWebhookSubscriptionHealth
+      : await getEntraWebhookSubscriptionHealthSignal().catch(() => null)
+
+  // TASK-827 Slice 8 — Client portal resolver failure rate. Single reader
+  // (V1.0 scaffold returns `unknown` hasta que TASK-829 ship telemetry adapter).
+  const clientPortalResolverFailureRate =
+    preloadedSources.clientPortalResolverFailureRate !== undefined
+      ? preloadedSources.clientPortalResolverFailureRate
+      : await getClientPortalResolverFailureRateSignal().catch(() => null)
+
   // TASK-613 Slice 3 — Finance Clients ↔ Organization canonical link signal.
   // Single reader; degrada honestamente a `unknown` si la query falla.
   const financeClientProfileUnlinked =
@@ -928,6 +982,15 @@ export const getReliabilityOverview = async (
     preloadedSources.cloudRunSilentObservability !== undefined
       ? preloadedSources.cloudRunSilentObservability
       : await getCloudRunSilentObservabilitySignal().catch(() => null)
+
+  // TASK-856 Slice 3 — Secret-ref env var format drift. Detección activa
+  // upstream del Sentry burst downstream cuando un env var `*_SECRET_REF`
+  // queda persistido con shape no canónico (quotes, `\n` literal, etc.).
+  // Lectura puramente sincrónica sobre process.env, sin GCP round-trip.
+  const secretsEnvRefFormatDrift =
+    preloadedSources.secretsEnvRefFormatDrift !== undefined
+      ? preloadedSources.secretsEnvRefFormatDrift
+      : await getSecretsEnvRefFormatDriftSignal().catch(() => null)
 
   // TASK-845 Slice 6 — PG connection saturation (data-driven trigger para V2
   // PgBouncer multiplexer deployment). Steady < 60%; sustained > 60% justifica
@@ -1041,10 +1104,13 @@ export const getReliabilityOverview = async (
     workforceRoleTitle,
     identityGovernance,
     workspaceProjection,
+    entraWebhookSubscriptionHealth,
+    clientPortalResolverFailureRate,
     financeClientProfileUnlinked,
     nuboxSourceFreshness,
     criticalTablesMissing,
     cloudRunSilentObservability,
+    secretsEnvRefFormatDrift,
     postgresConnectionSaturation,
     servicesEngagement,
     commercialHealth,
