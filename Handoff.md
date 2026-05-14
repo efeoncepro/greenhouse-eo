@@ -25095,3 +25095,62 @@ Re-smoke a buzon real:
 **Subjects para remediación**: Felipe Zurita (`fzurita@efeoncepro.com`, OID `ec1b7fd0-...`) + Maria Camila Hoyos (`mchoyos@efeoncepro.com`, OID `96bf99f6-...`). Ambos ya con `client_user` + `identity_profile`, falta `member`.
 
 **Próximo paso**: completar FASE 1-4 + presentar plan al operador para STOP checkpoint approval antes de FASE 5 implementación.
+
+---
+
+## 2026-05-13 — TASK-872 SCIM Internal Collaborator Provisioning — Sesión 1 SHIPPED
+
+**Estado**: Slices 1-4 + 6 + 7 entregados en 6 commits incrementales directos a `develop`. Default flags en producción `false` → **zero behavioral change post-merge**. Slice 5 (backfill apply Felipe + Maria Camila Hoyos) diferido a Sesión 2 con coordinación HR + smoke staging exhaustivo + signoff humano.
+
+**6 commits canonicos**:
+
+1. `019a5ffd` — Slice 1 eligibility 4-layer policy + scim_eligibility_overrides table + audit append-only
+2. `353b06a9` — Slice 1.5 workforce_intake_status migration + capabilities registry seed (4 nuevas)
+3. `77d67277` — Slice 2 primitive atomic provisionInternalCollaboratorFromScim + cascade D-2 + outbox consolidado
+4. `0a08a64c` — Slice 3 wire SCIM CREATE endpoint behind feature flag (default false)
+5. `1989265c` — Slice 4 payroll engine gate behind flag (default false)
+6. `54c92b84` — Slice 6 6 reliability signals canonical
+7. `37c00092` (sibling) — repair 12 pre-existing payroll test failures unrelated to TASK-872
+
+**Test coverage final**: 460+ tests verde. Breakdown:
+- SCIM/eligibility unit + live: 30 unit + 11 store live + 5 primitive live + 6 payroll gate live + 3 signals live = **55 tests**
+- Payroll legacy: 420/420 (incluye 12 fixes previously failing)
+- TypeScript + lint: 0 errors
+
+**Arch-architect verifications applied (3 sesiones)**:
+- Slice 1: 5 fixes pre-coding (table shape mirror TASK-404 user_entitlement_overrides, companion audit append-only via trigger PG, discriminated union verdict shape, deny-wins precedence, hardcoded patterns const)
+- Slice 2: 6 fixes pre-coding (idempotency gate first-step, cascade outcome explicit tracking, drift kind discriminator, consolidated event v1 shape, helpers refactor dual-mode, scim_sync_log fuera de tx)
+- Slice 4: 3 verifications (BQ team_members NO tiene column → gate solo PG V1.0 + inline comment V1.1, flag leído runtime no module cache, SQL string concat preserves INDEX usage)
+
+**Trampa latente neutralizada**: defaults `members.contract_type='indefinido' + pay_regime='chile'` ahora gateados explícitamente por `workforce_intake_status='completed'` cuando flag enabled. Slice 4 garantiza que Felipe Zurita no entra a la próxima corrida payroll con $0 base.
+
+**Helpers refactored (dual-mode pattern, backward compat 100%)**:
+- `syncOperatingEntityMembershipForMember(memberId, options?: { client?: PoolClient })`
+- `createMembership(input, options?: { client?: PoolClient })`
+- `deactivateMembership(membershipId, options?: { client?: PoolClient })`
+
+Existing callers no pasan options → comportamiento idéntico a pre-TASK-872. Nuevo primitive pasa `{ client }` para atomicidad transaccional.
+
+**Runbook canonical**: `docs/operations/runbooks/scim-internal-collaborator-recovery.md` con 6 escenarios canónicos (dead_letter SCIM, backfill Felipe/Maria, member identity drift, pending intake >30d, ineligible accounts in scope, allowlist-blocklist conflict).
+
+**Pre-condiciones para Sesión 2 (backfill apply)**:
+1. ✅ Slices 1-7 mergeadas + deployed a staging (vía push a develop)
+2. ⏳ Staging: flag `SCIM_INTERNAL_COLLABORATOR_PRIMITIVE_ENABLED=true` flippeado + `provisionOnDemand` test user humano → verify primitive ejecuta + 6 entities + outbox events
+3. ⏳ Staging: flag `PAYROLL_WORKFORCE_INTAKE_GATE_ENABLED=true` flippeado + corrida payroll mock excluye `pending_intake`
+4. ⏳ Cooldown 24h observando 6 reliability signals → todos en steady state esperado
+5. ⏳ HR signoff sobre workflow `pending_intake → completed`
+6. ⏳ Comunicación humana a Felipe + Maria Camila sobre badge "Ficha pendiente"
+7. ⏳ Operador humano ejecuta backfill apply con allowlist explícita (TBD V1.1 backfill script o V1.0 manual via primitive)
+
+**Risk matrix R1-R9 (de spec TASK-872) — status post-Sesión 1**:
+- R1 SCIM primitive throws → 500 a Entra: mitigado via flag default false. Smoke staging requerido antes de flip.
+- R2 HIGH (Felipe entra a payroll $0): **neutralizado** por Slice 1.5 + Slice 4 + flag ordering hard rule.
+- R3 SSO break: cero riesgo — auth callback no tocado, only additive PG columns.
+- R4 Cascade D-2 drift: signal `member_identity_drift` alerta + runbook escenario 3 cubre recovery.
+- R5 Backfill apply masivo accidental: mitigado — Slice 5 diferido a Sesión 2, requiere apply manual con allowlist.
+- R6 Migration breaks consumers: cero — `pnpm db:generate-types` + tsc verdes.
+- R7 Outbox event collision: cero — `scim.internal_collaborator.provisioned` único en catálogo.
+- R8 Cross-tenant leak: mitigado — branch `if isInternalTenant && flag enabled` enforce.
+- R9 Allowlist abuse: signal `allowlist_blocklist_conflict` + audit append-only en `scim_eligibility_override_changes`.
+
+**Próximo paso operativo (Sesión 2)**: cuando operador esté listo, flippear flag SCIM en staging + correr smoke con `provisionOnDemand` test user + verify signals en steady state. Después coordinar con HR + ejecutar backfill apply Felipe/Maria.

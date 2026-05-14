@@ -41,9 +41,29 @@ Operational evidence:
 
 Residual Entra note: the regular provisioning job can still show historical `countEscrowed` after previous failures. Do not fix that counter with SQL. Use Microsoft Graph provisioning logs, `restart` with `resetScope=Escrows`, and `provisionOnDemand` for controlled validation.
 
-## Delta 2026-05-13 — TASK-872 V1 Internal Collaborator Provisioning (design, no implementation yet)
+## Delta 2026-05-13 — TASK-872 V1 Internal Collaborator Provisioning SHIPPED (code complete, flags default false)
 
-3 decisiones canonizables resueltas durante arch-architect review pre-implementación. Reflejan el contract end-to-end que TASK-872 va a shippear. Spec subordinado: `docs/tasks/to-do/TASK-872-scim-internal-collaborator-provisioning.md` (Delta 2026-05-13).
+Implementación canónica completa. 6 commits incrementales en `develop`:
+
+1. Slice 1 (`019a5ffd`) — eligibility 4-layer policy + scim_eligibility_overrides table + audit append-only
+2. Slice 1.5 (`353b06a9`) — `members.workforce_intake_status` migration + capabilities registry seed
+3. Slice 2 (`77d67277`) — primitive atomic `provisionInternalCollaboratorFromScim` + cascade D-2 + outbox consolidado
+4. Slice 3 (`0a08a64c`) — wire SCIM CREATE endpoint behind feature flag
+5. Slice 4 (`1989265c`) — payroll engine gate behind flag
+6. Slice 6 (`54c92b84`) — 6 reliability signals canónicos
+
+Test coverage: 460+ tests verde (46 SCIM unit + live + 420 payroll). Default flags en producción mantienen comportamiento idéntico a pre-TASK-872 (zero behavioral change post-merge). Flips graduales canónicos:
+
+| Flag | Default | Cuándo flippear | Revert |
+| --- | --- | --- | --- |
+| `SCIM_INTERNAL_COLLABORATOR_PRIMITIVE_ENABLED` | `false` | Tras smoke staging con `provisionOnDemand` test user verde | env var false + redeploy <5min |
+| `PAYROLL_WORKFORCE_INTAKE_GATE_ENABLED` | `false` | Tras flag SCIM enabled + cooldown 24h + corrida payroll mock excluye `pending_intake` | env var false + redeploy <5min |
+
+Runbook canonical: `docs/operations/runbooks/scim-internal-collaborator-recovery.md` (6 escenarios).
+
+Slice 5 (backfill apply Felipe + Maria Camila Hoyos) **diferido a Sesión 2** con coordinación HR + signoff humano + smoke staging exhaustivo. Pre-condiciones documentadas en runbook §Escenario 2.
+
+3 decisiones canonizables aplicadas durante arch-architect review pre-implementación:
 
 ### D-1 — `members.workforce_intake_status` como gate explícito
 
