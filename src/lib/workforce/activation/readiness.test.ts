@@ -79,6 +79,14 @@ describe('TASK-874 resolveWorkforceActivationReadiness', () => {
 
     const result = await resolveWorkforceActivationReadiness('mem-1')
 
+    expect(queryMock).toHaveBeenCalledWith(
+      expect.stringContaining('greenhouse_sync.identity_reconciliation_proposals'),
+      ['mem-1']
+    )
+    expect(queryMock).toHaveBeenCalledWith(
+      expect.not.stringContaining('greenhouse_core.identity_reconciliation_proposals'),
+      ['mem-1']
+    )
     expect(result.ready).toBe(true)
     expect(result.status).toBe('ready_to_complete')
     expect(result.blockerCount).toBe(0)
