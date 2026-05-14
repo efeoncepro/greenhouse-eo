@@ -6,7 +6,10 @@ import { buildTenantEntitlementSubject } from '@/lib/commercial/party/route-enti
 import { can } from '@/lib/entitlements/runtime'
 import { getWorkforceScimMembersPendingProfileCompletionSignal } from '@/lib/reliability/queries/scim-workforce-signals'
 import { getTenantContext } from '@/lib/tenant/get-tenant-context'
-import { listPendingIntakeMembers } from '@/lib/workforce/intake-queue/list-pending-members'
+import {
+  getWorkforceActivationMember,
+  listPendingIntakeMembers
+} from '@/lib/workforce/intake-queue/list-pending-members'
 
 export const dynamic = 'force-dynamic'
 
@@ -18,6 +21,7 @@ const Page = async ({
   await requireServerSession()
   const params = searchParams ? await searchParams : {}
   const initialSelectedMemberId = typeof params.memberId === 'string' ? params.memberId : null
+  const initialDrawer = typeof params.drawer === 'string' ? params.drawer : null
   const tenant = await getTenantContext()
 
   if (!tenant) redirect('/login')
@@ -28,19 +32,26 @@ const Page = async ({
     redirect(tenant.portalHomePath || '/dashboard')
   }
 
-  const [initialPage, pendingSignal] = await Promise.all([
+  const [initialPage, pendingSignal, directMember] = await Promise.all([
     listPendingIntakeMembers({ pageSize: 50, includeReadiness: true }).catch(() => ({
       items: [],
       nextCursor: null,
       hasMore: false,
       totalApprox: null
     })),
-    getWorkforceScimMembersPendingProfileCompletionSignal().catch(() => null)
+    getWorkforceScimMembersPendingProfileCompletionSignal().catch(() => null),
+    initialSelectedMemberId
+      ? getWorkforceActivationMember(initialSelectedMemberId, { includeReadiness: true }).catch(() => null)
+      : Promise.resolve(null)
   ])
+
+  const initialItems = directMember && !initialPage.items.some(item => item.memberId === directMember.memberId)
+    ? [directMember, ...initialPage.items]
+    : [...initialPage.items]
 
   return (
     <WorkforceActivationView
-      initialItems={[...initialPage.items]}
+      initialItems={initialItems}
       initialCursor={initialPage.nextCursor}
       initialHasMore={initialPage.hasMore}
       initialTotalApprox={initialPage.totalApprox}
@@ -49,6 +60,7 @@ const Page = async ({
       completeIntakeApiBasePath='/api/hr/workforce/members'
       intakeApiBasePath='/api/hr/workforce/members'
       initialSelectedMemberId={initialSelectedMemberId}
+      initialExternalIdentityOpen={initialDrawer === 'external-identity' && directMember !== null}
     />
   )
 }

@@ -51,6 +51,7 @@ interface WorkforceActivationViewProps {
   readonly completeIntakeApiBasePath?: string
   readonly intakeApiBasePath?: string
   readonly initialSelectedMemberId?: string | null
+  readonly initialExternalIdentityOpen?: boolean
 }
 
 type ActivationFilter = 'all' | 'ready' | 'compensation' | 'hire_date' | 'relationship' | 'payment' | 'external_identity' | 'contractor'
@@ -414,7 +415,8 @@ const WorkforceActivationView = ({
   apiPath = '/api/admin/workforce/activation',
   completeIntakeApiBasePath = '/api/admin/workforce/members',
   intakeApiBasePath = completeIntakeApiBasePath,
-  initialSelectedMemberId = null
+  initialSelectedMemberId = null,
+  initialExternalIdentityOpen = false
 }: WorkforceActivationViewProps) => {
   const [items, setItems] = useState<PendingIntakeMemberRow[]>(initialItems)
   const [cursor, setCursor] = useState<ListPendingIntakeMembersCursor | null>(initialCursor)
@@ -427,7 +429,7 @@ const WorkforceActivationView = ({
   const [selectedId, setSelectedId] = useState<string | null>(initialSelectedMemberId ?? initialItems[0]?.memberId ?? null)
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [remediationOpen, setRemediationOpen] = useState(false)
-  const [externalIdentityOpen, setExternalIdentityOpen] = useState(false)
+  const [externalIdentityOpen, setExternalIdentityOpen] = useState(initialExternalIdentityOpen)
   const [compensationOpen, setCompensationOpen] = useState(false)
 
   const visibleItems = useMemo(() => filterRows(items, activationFilter), [items, activationFilter])

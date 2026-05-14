@@ -212,3 +212,40 @@ export const listPendingIntakeMembers = async (
 
   return { items, nextCursor, hasMore, totalApprox }
 }
+
+export const getWorkforceActivationMember = async (
+  memberId: string,
+  options: { readonly includeReadiness?: boolean } = {}
+): Promise<PendingIntakeMemberRow | null> => {
+  const rows = await query<Record<string, unknown>>(
+    `SELECT
+        m.member_id,
+        m.display_name,
+        m.primary_email,
+        m.workforce_intake_status,
+        m.identity_profile_id,
+        m.created_at,
+        m.active,
+        EXTRACT(DAY FROM (NOW() - m.created_at))::int AS age_days
+     FROM greenhouse_core.members m
+     WHERE m.member_id = $1
+     LIMIT 1`,
+    [memberId]
+  )
+
+  if (!rows[0]) return null
+
+  const baseItem = rowToPendingIntakeMember(rows[0])
+
+  if (!options.includeReadiness) return baseItem
+
+  const activationReadiness = await resolveWorkforceActivationReadiness(baseItem.memberId)
+
+  return {
+    ...baseItem,
+    readinessStatus: activationReadiness.status,
+    blockerCount: activationReadiness.blockerCount,
+    topBlockerLane: activationReadiness.topBlockerLane ?? undefined,
+    activationReadiness
+  }
+}
