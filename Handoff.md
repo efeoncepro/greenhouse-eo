@@ -43,6 +43,28 @@
   3. Azure infra: sin cambios (skipped) → no rollback necesario.
   4. Marcar manifest `f945daa17b6d-b0067297-b20f-470d-a78b-664dae0882f2` como `rolled_back` via outbox event canónico (TASK-848 state machine).
 
+- **Post-release drift detectado 2026-05-14 22:00Z+ (Codex direct push to main bypass orchestrator)**:
+  - Mientras yo cerraba docs del release (commit `20f2c99d`), Codex committeó y pusheó 3 hotfixes a develop **y main** directo (saltándose el orchestrator canónico):
+    - `ce893f49 / 982accaf fix: align workforce activation reconciliation schema` (17:48Z, 1 línea en `readiness.ts`).
+    - `fa5258a5 / 4fe799cf fix: persist identity source link flags` (17:58Z, `apply-link.ts` + test file).
+    - `4f9ddc81 / cfea1784 fix: include identity link timestamps` (18:06Z, `apply-link.ts` + test).
+  - **Estado post-drift**:
+    - `origin/main` HEAD = `cfea1784` (3 commits ahead del manifest `f945daa1`).
+    - `origin/develop` HEAD = `20f2c99d` + 3 commits de Codex = `ce893f49`.
+    - Vercel production (`greenhouse.efeoncepro.com`) alias del deploy `dpl_BaJU7D3EZs7JCkLowkCjrXYBrwVh` (auto-fired on push:main) → tiene las 3 hotfixes live.
+    - Cloud Run workers (4) siguen en `f945daa1` (no auto-deploy on push:main per TASK-851 contract — solo orchestrator los actualiza).
+    - Release manifest `f945daa17b6d-b0067297...` permanece state=`released` con target `f945daa1` (correcto historicamente; refleja MI release).
+  - **Functional impact: ZERO**. Las 3 hotfixes tocan SOLO:
+    - `src/lib/identity/reconciliation/apply-link.ts` (invocado desde Vercel admin route `/api/admin/identity/reconciliation/apply`).
+    - `src/lib/workforce/activation/readiness.ts` (invocado desde Vercel server actions).
+    - **Ningún Cloud Run worker invoca estos paths** — verificado con grep. Cloud Run workers a `f945daa1` está funcionalmente correcto.
+  - **Drift cosmético a nivel manifest** (no a nivel runtime). Próximo release `develop → main` via orchestrator canónico re-alineará workers a current HEAD.
+  - **Anti-pattern detectado**: Codex pusheó directo a main saltándose la regla canónica skill `greenhouse-production-release`:
+    > Never reintroduce worker production deploys on push:main; workers deploy to production through the orchestrator workflow_call path
+  - Aunque los workers NO se afectaron (por TASK-851), el push directo a main viola el flow canónico release control plane. Si las hotfixes hubieran tocado código corrido en workers, hubieran quedado en drift activo hasta el próximo orchestrator run.
+  - **Recordatorio canónico**: cualquier hotfix a main debe pasar via orchestrator `production-release.yml` workflow_call path, NO push directo. Excepción solo break-glass documentado.
+  - **Stash WIP descartado**: el stash `b04ab52d "apply-link.ts WIP"` que dejé al inicio del release era el work-in-progress de Codex pre-commit del `fa5258a5`. Contenido idéntico al commit shipped. Dropped — sin información residual.
+
 # Sesion 2026-05-14 — TASK-877 Workforce Activation External Identity Reconciliation IN-PROGRESS
 
 - **Cierre 2026-05-14**: TASK-877 queda implementada end-to-end y movida a `complete/` en `develop` por instruccion explicita del usuario.
