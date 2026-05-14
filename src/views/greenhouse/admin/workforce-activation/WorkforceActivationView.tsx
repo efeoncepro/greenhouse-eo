@@ -26,6 +26,7 @@ import CompensationDrawer, { type CompensationSavePayload } from '@/views/greenh
 import CompleteIntakeDrawer, {
   type CompleteIntakeDrawerMember
 } from './CompleteIntakeDrawer'
+import WorkforceExternalIdentityDrawer from './WorkforceExternalIdentityDrawer'
 import WorkforceIntakeRemediationDrawer from './WorkforceIntakeRemediationDrawer'
 
 import type {
@@ -52,7 +53,7 @@ interface WorkforceActivationViewProps {
   readonly initialSelectedMemberId?: string | null
 }
 
-type ActivationFilter = 'all' | 'ready' | 'compensation' | 'hire_date' | 'relationship' | 'payment' | 'contractor'
+type ActivationFilter = 'all' | 'ready' | 'compensation' | 'hire_date' | 'relationship' | 'payment' | 'external_identity' | 'contractor'
 
 const FILTERS: ReadonlyArray<{ key: ActivationFilter; label: string; icon: string }> = [
   { key: 'all', label: GH_WORKFORCE_ACTIVATION.filter_all, icon: 'tabler-list-check' },
@@ -61,6 +62,7 @@ const FILTERS: ReadonlyArray<{ key: ActivationFilter; label: string; icon: strin
   { key: 'hire_date', label: GH_WORKFORCE_ACTIVATION.filter_hire_date, icon: 'tabler-calendar-off' },
   { key: 'relationship', label: GH_WORKFORCE_ACTIVATION.filter_relationship, icon: 'tabler-file-off' },
   { key: 'payment', label: GH_WORKFORCE_ACTIVATION.filter_payment, icon: 'tabler-credit-card-off' },
+  { key: 'external_identity', label: GH_WORKFORCE_ACTIVATION.filter_external_identity, icon: 'tabler-brand-notion' },
   { key: 'contractor', label: GH_WORKFORCE_ACTIVATION.filter_contractor, icon: 'tabler-user-cog' }
 ]
 
@@ -94,6 +96,8 @@ const filterRows = (rows: PendingIntakeMemberRow[], filter: ActivationFilter): P
       return rows.filter(row => hasBlockerLane(row, 'work_relationship') || hasBlockerLane(row, 'legal_profile'))
     case 'payment':
       return rows.filter(row => hasBlockerLane(row, 'payment_profile'))
+    case 'external_identity':
+      return rows.filter(row => hasBlockerLane(row, 'operational_integrations'))
     case 'contractor':
       return rows.filter(row => hasBlockerLane(row, 'contractor_engagement'))
     default:
@@ -423,6 +427,7 @@ const WorkforceActivationView = ({
   const [selectedId, setSelectedId] = useState<string | null>(initialSelectedMemberId ?? initialItems[0]?.memberId ?? null)
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [remediationOpen, setRemediationOpen] = useState(false)
+  const [externalIdentityOpen, setExternalIdentityOpen] = useState(false)
   const [compensationOpen, setCompensationOpen] = useState(false)
 
   const visibleItems = useMemo(() => filterRows(items, activationFilter), [items, activationFilter])
@@ -638,6 +643,15 @@ const WorkforceActivationView = ({
           await refreshQueue(selected?.memberId ?? null)
         }}
         onOpenCompensation={() => setCompensationOpen(true)}
+        onOpenExternalIdentity={() => setExternalIdentityOpen(true)}
+      />
+      <WorkforceExternalIdentityDrawer
+        open={externalIdentityOpen}
+        member={selected}
+        onClose={() => setExternalIdentityOpen(false)}
+        onResolved={async () => {
+          await refreshQueue(selected?.memberId ?? null)
+        }}
       />
       {selected ? (
         <CompensationDrawer

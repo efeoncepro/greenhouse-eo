@@ -1104,6 +1104,42 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     module: 'workforce',
     actions: ['override'] as const,
     defaultScope: 'tenant'
+  },
+  {
+    key: 'workforce.member.external_identity.resolve',
+    module: 'workforce',
+    actions: ['read', 'update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'identity.reconciliation.read',
+    module: 'organization',
+    actions: ['read'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'identity.reconciliation.approve',
+    module: 'organization',
+    actions: ['approve'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'identity.reconciliation.reject',
+    module: 'organization',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'identity.reconciliation.reassign',
+    module: 'organization',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'identity.reconciliation.run',
+    module: 'organization',
+    actions: ['execute'] as const,
+    defaultScope: 'tenant'
   }
 ] as const
 

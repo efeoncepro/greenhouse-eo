@@ -63,7 +63,8 @@ const resolveBindingsForView = (view: GovernanceViewRegistryEntry): ViewEntitlem
       return [
         toBinding(view, 'workforce.member.activation_readiness.read', ['read']),
         toBinding(view, 'workforce.member.intake.update', ['update']),
-        toBinding(view, 'workforce.member.complete_intake', ['update'])
+        toBinding(view, 'workforce.member.complete_intake', ['update']),
+        toBinding(view, 'workforce.member.external_identity.resolve', ['read', 'update'])
       ]
 
     case 'mi_ficha.onboarding':

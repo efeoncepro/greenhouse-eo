@@ -8,17 +8,17 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `optional`
-- Status real: `Diseno`
+- Status real: `Shipped 2026-05-14`
 - Rank: `TBD`
 - Domain: `hr|identity|integrations|ui`
 - Blocked by: `none`
-- Branch: `task/TASK-877-workforce-identity-reconciliation`
+- Branch: `develop` (user-directed exception; no branch switch)
 - Legacy ID: `none`
 - GitHub Issue: `optional`
 

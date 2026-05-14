@@ -9,6 +9,7 @@ import {
 } from '@/lib/workforce/onboarding/store'
 import { resolveRoleTitle } from '@/lib/workforce/role-title'
 
+import { resolveWorkforceExternalIdentityRequirement } from './external-identity-policy'
 import type {
   WorkforceActivationBlockerCode,
   WorkforceActivationIssue,
@@ -29,6 +30,7 @@ interface MemberReadinessRow extends Record<string, unknown> {
   workforce_intake_status: string
   identity_profile_id: string | null
   active: boolean
+  assignable: boolean
   created_at: Date | string | null
   hire_date: Date | string | null
   employment_type: string | null
@@ -46,6 +48,12 @@ interface MemberReadinessRow extends Record<string, unknown> {
   compensation_pay_regime: string | null
   has_login: boolean | null
   has_active_relationship: boolean | null
+  notion_user_id: string | null
+  notion_display_name: string | null
+  notion_source_link_id: string | null
+  notion_source_link_object_id: string | null
+  notion_pending_proposal_count: string | number | null
+  notion_conflict_count: string | number | null
 }
 
 const CRITICAL_LANES: readonly WorkforceActivationLaneKey[] = [
@@ -56,6 +64,7 @@ const CRITICAL_LANES: readonly WorkforceActivationLaneKey[] = [
   'compensation',
   'legal_profile',
   'payment_profile',
+  'operational_integrations',
   'operational_onboarding',
   'contractor_engagement'
 ]
@@ -68,6 +77,7 @@ const LANE_LABELS: Record<WorkforceActivationLaneKey, string> = {
   compensation: 'Compensación',
   legal_profile: 'Identidad legal',
   payment_profile: 'Pago',
+  operational_integrations: 'Integraciones operacionales',
   operational_onboarding: 'Onboarding',
   contractor_engagement: 'Engagement contractor'
 }
@@ -80,6 +90,7 @@ const LANE_OWNERS: Record<WorkforceActivationLaneKey, WorkforceActivationIssue['
   compensation: 'HR Ops',
   legal_profile: 'People Ops',
   payment_profile: 'Finance Ops',
+  operational_integrations: 'People Systems',
   operational_onboarding: 'People Ops',
   contractor_engagement: 'HR Ops'
 }
@@ -92,6 +103,7 @@ const DEFAULT_LANE_DETAIL: Record<WorkforceActivationLaneKey, string> = {
   compensation: 'Compensación vigente con monto y moneda.',
   legal_profile: 'Perfil legal cumple el caso de uso aplicable.',
   payment_profile: 'Ruta de pago aplicable resuelta.',
+  operational_integrations: 'Identidad externa requerida reconciliada.',
   operational_onboarding: 'Checklist operativo no bloquea la habilitación.',
   contractor_engagement: 'No aplica para relación laboral dependiente.'
 }
@@ -102,6 +114,7 @@ const laneLink = (memberId: string, lane: WorkforceActivationLaneKey): string =>
   if (lane === 'payment_profile') return `${base}?tab=payment`
   if (lane === 'legal_profile') return base
   if (lane === 'identity_access') return base
+  if (lane === 'operational_integrations') return `/hr/workforce/activation?member=${memberId}&drawer=external-identity`
 
   return base
 }
@@ -269,6 +282,7 @@ const loadMember = async (memberId: string): Promise<MemberReadinessRow | null> 
        m.workforce_intake_status,
        m.identity_profile_id,
        m.active,
+       m.assignable,
        m.created_at,
        m.hire_date,
        m.employment_type,
@@ -284,6 +298,12 @@ const loadMember = async (memberId: string): Promise<MemberReadinessRow | null> 
        cv.base_salary AS compensation_amount,
        cv.contract_type AS compensation_contract_type,
        cv.pay_regime AS compensation_pay_regime,
+       m.notion_user_id,
+       m.notion_display_name,
+       notion_link.link_id AS notion_source_link_id,
+       notion_link.source_object_id AS notion_source_link_object_id,
+       COALESCE(notion_proposals.pending_count, 0) AS notion_pending_proposal_count,
+       COALESCE(notion_conflicts.conflict_count, 0) AS notion_conflict_count,
        EXISTS (
          SELECT 1
          FROM greenhouse_core.client_users cu
@@ -299,6 +319,32 @@ const loadMember = async (memberId: string): Promise<MemberReadinessRow | null> 
            AND (rel.effective_to IS NULL OR rel.effective_to >= CURRENT_DATE)
        ) AS has_active_relationship
      FROM greenhouse_core.members m
+     LEFT JOIN LATERAL (
+       SELECT sl.link_id, sl.source_object_id
+       FROM greenhouse_core.identity_profile_source_links sl
+       WHERE sl.profile_id = m.identity_profile_id
+         AND sl.source_system = 'notion'
+         AND sl.source_object_type = 'user'
+         AND sl.active = TRUE
+       ORDER BY sl.is_primary DESC, sl.updated_at DESC
+       LIMIT 1
+     ) notion_link ON TRUE
+     LEFT JOIN LATERAL (
+       SELECT COUNT(*)::int AS pending_count
+       FROM greenhouse_core.identity_reconciliation_proposals proposal
+       WHERE proposal.source_system = 'notion'
+         AND proposal.status = 'pending'
+         AND proposal.candidate_member_id = m.member_id
+     ) notion_proposals ON TRUE
+     LEFT JOIN LATERAL (
+       SELECT COUNT(*)::int AS conflict_count
+       FROM greenhouse_core.identity_profile_source_links sl
+       WHERE sl.source_system = 'notion'
+         AND sl.source_object_type = 'user'
+         AND sl.active = TRUE
+         AND sl.source_object_id = COALESCE(m.notion_user_id, notion_link.source_object_id)
+         AND sl.profile_id IS DISTINCT FROM m.identity_profile_id
+     ) notion_conflicts ON TRUE
      LEFT JOIN LATERAL (
        SELECT cv_inner.currency, cv_inner.base_salary, cv_inner.contract_type, cv_inner.pay_regime
        FROM greenhouse_payroll.compensation_versions cv_inner
@@ -524,6 +570,7 @@ export const resolveWorkforceActivationReadiness = async (
       workforceIntakeStatus: 'pending_intake',
       identityProfileId: null,
       active: false,
+      assignable: false,
       createdAt: null,
       ageDays: 0,
       hireDate: null,
@@ -537,7 +584,11 @@ export const resolveWorkforceActivationReadiness = async (
       roleTitle: null,
       roleTitleSource: null,
       compensationCurrency: null,
-      compensationAmount: null
+      compensationAmount: null,
+      notionUserId: null,
+      notionDisplayName: null,
+      notionSourceLinkId: null,
+      externalIdentityRequired: false
     }
 
     const blocker = issue(memberId, 'identity_access', 'member_not_found', 'Colaborador no encontrado', 'No existe member para evaluar.')
@@ -569,6 +620,7 @@ export const resolveWorkforceActivationReadiness = async (
     workforceIntakeStatus: toWorkforceIntakeStatus(row.workforce_intake_status),
     identityProfileId: row.identity_profile_id,
     active: row.active,
+    assignable: row.assignable,
     createdAt: toIsoDateTime(row.created_at),
     ageDays: toInt(row.created_at ? Math.floor((Date.now() - new Date(row.created_at).getTime()) / 86_400_000) : 0),
     hireDate: toIsoDate(row.hire_date),
@@ -582,7 +634,18 @@ export const resolveWorkforceActivationReadiness = async (
     roleTitle: roleTitle.value,
     roleTitleSource: roleTitle.source,
     compensationCurrency: normalizeCurrency(row.compensation_currency, payRegime),
-    compensationAmount: toMoney(row.compensation_amount)
+    compensationAmount: toMoney(row.compensation_amount),
+    notionUserId: row.notion_source_link_object_id ?? row.notion_user_id,
+    notionDisplayName: row.notion_display_name,
+    notionSourceLinkId: row.notion_source_link_id,
+    externalIdentityRequired: false
+  }
+
+  const externalIdentityRequirement = resolveWorkforceExternalIdentityRequirement(snapshot)
+
+  const snapshotWithExternalIdentity: WorkforceActivationMemberSnapshot = {
+    ...snapshot,
+    externalIdentityRequired: externalIdentityRequirement.required
   }
 
   const blockers: WorkforceActivationIssue[] = []
@@ -692,6 +755,56 @@ export const resolveWorkforceActivationReadiness = async (
   warnings.push(...payment.warnings)
   lanes.push(payment.lane)
 
+  const hasNotionLink = Boolean(snapshot.notionUserId || snapshot.notionSourceLinkId)
+  const notionPendingProposalCount = toInt(row.notion_pending_proposal_count)
+  const notionConflictCount = toInt(row.notion_conflict_count)
+
+  if (!externalIdentityRequirement.required) {
+    lanes.push(
+      lane(
+        memberId,
+        'operational_integrations',
+        'not_applicable',
+        externalIdentityRequirement.detail
+      )
+    )
+  } else if (notionConflictCount > 0) {
+    blockers.push(
+      issue(
+        memberId,
+        'operational_integrations',
+        'notion_link_conflict',
+        'Usuario Notion en conflicto',
+        'El usuario Notion asociado aparece activo en otro perfil People; resolver el conflicto antes de activar.'
+      )
+    )
+    lanes.push(lane(memberId, 'operational_integrations', 'blocked', 'Existe conflicto de link Notion activo.'))
+  } else if (hasNotionLink) {
+    lanes.push(lane(memberId, 'operational_integrations', 'ready', DEFAULT_LANE_DETAIL.operational_integrations))
+  } else if (notionPendingProposalCount > 1) {
+    blockers.push(
+      issue(
+        memberId,
+        'operational_integrations',
+        'notion_link_ambiguous',
+        'Más de un candidato Notion',
+        'Hay múltiples propuestas pendientes; elegir una fuente canónica antes de cerrar intake.'
+      )
+    )
+    lanes.push(lane(memberId, 'operational_integrations', 'blocked', 'Propuestas Notion ambiguas requieren revisión humana.'))
+  } else {
+    blockers.push(
+      issue(
+        memberId,
+        'operational_integrations',
+        'notion_link_missing',
+        'Falta usuario Notion reconciliado',
+        'Buscar y aprobar el usuario Notion desde Workforce Activation; no ingresar UUIDs manuales.'
+      )
+    )
+    lanes.push(lane(memberId, 'operational_integrations', 'blocked', 'Falta link Notion activo.'))
+  }
+
   const operationalOnboarding = await resolveOperationalOnboardingLane(memberId)
 
   blockers.push(...operationalOnboarding.blockers)
@@ -727,7 +840,7 @@ export const resolveWorkforceActivationReadiness = async (
         : 'blocked'
 
   return {
-    member: snapshot,
+    member: snapshotWithExternalIdentity,
     status,
     ready,
     readinessScore,

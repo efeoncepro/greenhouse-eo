@@ -8,6 +8,7 @@ export type WorkforceActivationLaneKey =
   | 'compensation'
   | 'legal_profile'
   | 'payment_profile'
+  | 'operational_integrations'
   | 'operational_onboarding'
   | 'contractor_engagement'
 
@@ -35,6 +36,10 @@ export type WorkforceActivationBlockerCode =
   | 'compensation_amount_missing'
   | 'legal_profile_blocked'
   | 'payment_profile_missing_or_unapproved'
+  | 'notion_link_missing'
+  | 'notion_link_ambiguous'
+  | 'notion_link_conflict'
+  | 'notion_discovery_unavailable'
   | 'onboarding_case_blocked'
   | 'contractor_engagement_missing'
 
@@ -77,6 +82,7 @@ export interface WorkforceActivationMemberSnapshot {
   readonly workforceIntakeStatus: WorkforceIntakeStatus
   readonly identityProfileId: string | null
   readonly active: boolean
+  readonly assignable: boolean
   readonly createdAt: string | null
   readonly ageDays: number
   readonly hireDate: string | null
@@ -91,6 +97,10 @@ export interface WorkforceActivationMemberSnapshot {
   readonly roleTitleSource: string | null
   readonly compensationCurrency: 'CLP' | 'USD' | null
   readonly compensationAmount: number | null
+  readonly notionUserId: string | null
+  readonly notionDisplayName: string | null
+  readonly notionSourceLinkId: string | null
+  readonly externalIdentityRequired: boolean
 }
 
 export interface WorkforceActivationReadiness {

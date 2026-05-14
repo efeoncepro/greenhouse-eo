@@ -9,6 +9,94 @@ import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 import type { SourceSystem, ReconciliationProposal, ProposalStatus } from './types'
 import { SOURCE_MEMBER_COLUMN } from './types'
 
+export interface ApplyIdentityLinkOptions {
+  readonly requireCanonicalPostgres?: boolean
+}
+
+const assertNoActiveSourceConflict = async (proposal: ReconciliationProposal): Promise<void> => {
+  if (!proposal.candidateProfileId) return
+
+  const conflicts = await runGreenhousePostgresQuery<{ profile_id: string; source_display_name: string | null }>(
+    `SELECT profile_id, source_display_name
+     FROM greenhouse_core.identity_profile_source_links
+     WHERE source_system = $1
+       AND source_object_type = $2
+       AND source_object_id = $3
+       AND active = TRUE
+       AND profile_id IS DISTINCT FROM $4
+     LIMIT 1`,
+    [
+      proposal.sourceSystem,
+      proposal.sourceObjectType,
+      proposal.sourceObjectId,
+      proposal.candidateProfileId
+    ]
+  )
+
+  if (conflicts.length > 0) {
+    throw new Error(
+      `Cannot apply link: ${proposal.sourceSystem}:${proposal.sourceObjectId} is already active for profile ${conflicts[0].profile_id}`
+    )
+  }
+}
+
+const upsertCanonicalPostgresIdentityLink = async (
+  proposal: ReconciliationProposal,
+  memberColumn: string
+): Promise<void> => {
+  if (proposal.candidateProfileId) {
+    await runGreenhousePostgresQuery(
+      `INSERT INTO greenhouse_core.identity_profile_source_links (
+         link_id, profile_id, source_system, source_object_type, source_object_id,
+         source_user_id, source_email, source_display_name, active
+       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, TRUE)
+       ON CONFLICT (profile_id, source_system, source_object_type, source_object_id)
+       DO UPDATE SET
+         source_user_id = EXCLUDED.source_user_id,
+         source_email = EXCLUDED.source_email,
+         source_display_name = EXCLUDED.source_display_name,
+         active = TRUE,
+         updated_at = NOW()`,
+      [
+        buildIdentitySourceLinkId({
+          profileId: proposal.candidateProfileId,
+          sourceSystem: proposal.sourceSystem,
+          sourceObjectType: proposal.sourceObjectType,
+          sourceObjectId: proposal.sourceObjectId
+        }),
+        proposal.candidateProfileId,
+        proposal.sourceSystem,
+        proposal.sourceObjectType,
+        proposal.sourceObjectId,
+        proposal.sourceObjectId,
+        proposal.sourceEmail,
+        proposal.sourceDisplayName
+      ]
+    )
+
+    await runGreenhousePostgresQuery(
+      `UPDATE greenhouse_core.client_users
+       SET member_id = $1, updated_at = NOW()
+       WHERE identity_profile_id = $2
+         AND (member_id IS NULL OR TRIM(member_id) = '')`,
+      [proposal.candidateMemberId, proposal.candidateProfileId]
+    )
+  }
+
+  await runGreenhousePostgresQuery(
+    `UPDATE greenhouse_core.members
+     SET ${memberColumn} = $1,
+         notion_display_name = CASE
+           WHEN $4 = 'notion' THEN COALESCE(notion_display_name, $2)
+           ELSE notion_display_name
+         END,
+         updated_at = NOW()
+     WHERE member_id = $3
+       AND (${memberColumn} IS NULL OR TRIM(${memberColumn}) = '')`,
+    [proposal.sourceObjectId, proposal.sourceDisplayName, proposal.candidateMemberId, proposal.sourceSystem]
+  )
+}
+
 // ── Apply a confirmed identity link ───────────────────────────────────
 
 /**
@@ -20,14 +108,29 @@ import { SOURCE_MEMBER_COLUMN } from './types'
  *   5. Backfill greenhouse_core.client_users.member_id from the same identity profile (if available)
  *   6. Update proposal status in Postgres
  */
-export async function applyIdentityLink(proposal: ReconciliationProposal): Promise<void> {
+export async function applyIdentityLink(
+  proposal: ReconciliationProposal,
+  options: ApplyIdentityLinkOptions = {}
+): Promise<void> {
   if (!proposal.candidateMemberId) {
     throw new Error(`Cannot apply link: proposal ${proposal.proposalId} has no candidate member`)
+  }
+
+  if (options.requireCanonicalPostgres && !isGreenhousePostgresConfigured()) {
+    throw new Error(`Cannot apply link: canonical Postgres is required for proposal ${proposal.proposalId}`)
+  }
+
+  if (isGreenhousePostgresConfigured()) {
+    await assertNoActiveSourceConflict(proposal)
   }
 
   const bq = getBigQueryClient()
   const projectId = getBigQueryProjectId()
   const memberColumn = SOURCE_MEMBER_COLUMN[proposal.sourceSystem]
+
+  if (options.requireCanonicalPostgres) {
+    await upsertCanonicalPostgresIdentityLink(proposal, memberColumn)
+  }
 
   // 1. Update team_members source column
   await bq.query({
@@ -125,61 +228,11 @@ export async function applyIdentityLink(proposal: ReconciliationProposal): Promi
   })
 
   // 4-5. Update canonical Postgres identity state (if available)
-  if (isGreenhousePostgresConfigured()) {
+  if (isGreenhousePostgresConfigured() && !options.requireCanonicalPostgres) {
     try {
-      if (proposal.candidateProfileId) {
-        await runGreenhousePostgresQuery(
-          `INSERT INTO greenhouse_core.identity_profile_source_links (
-             link_id, profile_id, source_system, source_object_type, source_object_id,
-             source_user_id, source_email, source_display_name, active
-           ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, TRUE)
-           ON CONFLICT (profile_id, source_system, source_object_type, source_object_id)
-           DO UPDATE SET
-             source_user_id = EXCLUDED.source_user_id,
-             source_email = EXCLUDED.source_email,
-             source_display_name = EXCLUDED.source_display_name,
-             active = TRUE,
-             updated_at = NOW()`,
-          [
-            buildIdentitySourceLinkId({
-              profileId: proposal.candidateProfileId,
-              sourceSystem: proposal.sourceSystem,
-              sourceObjectType: proposal.sourceObjectType,
-              sourceObjectId: proposal.sourceObjectId
-            }),
-            proposal.candidateProfileId,
-            proposal.sourceSystem,
-            proposal.sourceObjectType,
-            proposal.sourceObjectId,
-            proposal.sourceObjectId,
-            proposal.sourceEmail,
-            proposal.sourceDisplayName
-          ]
-        )
-
-        await runGreenhousePostgresQuery(
-          `UPDATE greenhouse_core.client_users
-           SET member_id = $1, updated_at = NOW()
-           WHERE identity_profile_id = $2
-             AND (member_id IS NULL OR TRIM(member_id) = '')`,
-          [proposal.candidateMemberId, proposal.candidateProfileId]
-        )
-      }
-
-      await runGreenhousePostgresQuery(
-        `UPDATE greenhouse_core.members
-         SET ${memberColumn} = $1,
-             notion_display_name = CASE
-               WHEN $4 = 'notion' THEN COALESCE(notion_display_name, $2)
-               ELSE notion_display_name
-             END,
-             updated_at = NOW()
-         WHERE member_id = $3
-           AND (${memberColumn} IS NULL OR TRIM(${memberColumn}) = '')`,
-        [proposal.sourceObjectId, proposal.sourceDisplayName, proposal.candidateMemberId, proposal.sourceSystem]
-      )
+      await upsertCanonicalPostgresIdentityLink(proposal, memberColumn)
     } catch {
-      // Postgres may not have this member yet — non-critical
+      // Postgres may not have this member yet — non-critical for legacy batch jobs.
     }
   }
 }

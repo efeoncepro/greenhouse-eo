@@ -34,6 +34,7 @@ interface WorkforceIntakeRemediationDrawerProps {
   readonly onClose: () => void
   readonly onSaved: (readiness: WorkforceActivationReadiness) => Promise<void> | void
   readonly onOpenCompensation: () => void
+  readonly onOpenExternalIdentity: () => void
 }
 
 const employmentOptions: ReadonlyArray<{ value: HrEmploymentType; label: string }> = [
@@ -50,7 +51,8 @@ const WorkforceIntakeRemediationDrawer = ({
   intakeApiBasePath,
   onClose,
   onSaved,
-  onOpenCompensation
+  onOpenCompensation,
+  onOpenExternalIdentity
 }: WorkforceIntakeRemediationDrawerProps) => {
   const snapshot = member?.activationReadiness?.member ?? null
   const [hireDate, setHireDate] = useState('')
@@ -276,6 +278,24 @@ const WorkforceIntakeRemediationDrawer = ({
                   ? `${member.activationReadiness.member.compensationCurrency ?? ''} ${member.activationReadiness.member.compensationAmount}`
                   : 'Sin compensación vigente.'}
               </Typography>
+            </Box>
+
+            <Divider />
+
+            <Box>
+              <Stack direction='row' alignItems='center' justifyContent='space-between' spacing={2}>
+                <Box sx={{ minWidth: 0 }}>
+                  <Typography variant='subtitle1' sx={{ fontWeight: 700 }}>
+                    {GH_WORKFORCE_ACTIVATION.resolver_external_identity_section}
+                  </Typography>
+                  <Typography variant='body2' color='text.secondary'>
+                    {member.activationReadiness?.member.notionUserId ?? 'Sin usuario Notion reconciliado.'}
+                  </Typography>
+                </Box>
+                <Button size='small' variant='tonal' startIcon={<i className='tabler-brand-notion' />} onClick={onOpenExternalIdentity}>
+                  {GH_WORKFORCE_ACTIVATION.resolver_external_identity_open}
+                </Button>
+              </Stack>
             </Box>
 
             <Divider />

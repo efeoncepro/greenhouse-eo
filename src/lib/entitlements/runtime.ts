@@ -385,6 +385,74 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     })
   }
 
+  // TASK-877 — Workforce external identity reconciliation.
+  // HR operators can inspect and resolve Notion identity blockers only from the
+  // Workforce Activation surface. Broader identity reconciliation operations stay
+  // restricted to EFEONCE_ADMIN because they mutate cross-source identity links.
+  if (
+    hasRouteGroup(subject, 'hr') ||
+    hasAuthorizedView(subject, 'equipo.workforce_activation') ||
+    hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)
+  ) {
+    const source: TenantEntitlementSource = hasRouteGroup(subject, 'hr')
+      ? 'route_group'
+      : hasAuthorizedView(subject, 'equipo.workforce_activation')
+        ? 'authorized_view'
+        : 'role'
+
+    for (const action of ['read', 'update'] as const) {
+      addEntitlement(entries, {
+        module: 'workforce',
+        capability: 'workforce.member.external_identity.resolve',
+        action,
+        scope: 'tenant',
+        source
+      })
+    }
+  }
+
+  if (hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
+    addEntitlement(entries, {
+      module: 'organization',
+      capability: 'identity.reconciliation.read',
+      action: 'read',
+      scope: 'tenant',
+      source: 'role'
+    })
+
+    addEntitlement(entries, {
+      module: 'organization',
+      capability: 'identity.reconciliation.approve',
+      action: 'approve',
+      scope: 'tenant',
+      source: 'role'
+    })
+
+    addEntitlement(entries, {
+      module: 'organization',
+      capability: 'identity.reconciliation.reject',
+      action: 'update',
+      scope: 'tenant',
+      source: 'role'
+    })
+
+    addEntitlement(entries, {
+      module: 'organization',
+      capability: 'identity.reconciliation.reassign',
+      action: 'update',
+      scope: 'tenant',
+      source: 'role'
+    })
+
+    addEntitlement(entries, {
+      module: 'organization',
+      capability: 'identity.reconciliation.run',
+      action: 'execute',
+      scope: 'tenant',
+      source: 'role'
+    })
+  }
+
   if (hasRouteGroup(subject, 'hr') || hasAuthorizedView(subject, 'equipo.offboarding') || hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
     const source: TenantEntitlementSource = hasRouteGroup(subject, 'hr')
       ? 'route_group'

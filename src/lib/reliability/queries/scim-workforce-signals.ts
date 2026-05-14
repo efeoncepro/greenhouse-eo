@@ -436,7 +436,111 @@ export const getScimAllowlistBlocklistConflictSignal = async (): Promise<Reliabi
   }
 }
 
-// ── Aggregator: 6 readers in parallel, filter out null catches ──────────────
+// ── 9. identity.external_identity.notion_required_missing ───────────────────
+
+export const IDENTITY_EXTERNAL_NOTION_REQUIRED_MISSING_SIGNAL_ID =
+  'identity.external_identity.notion_required_missing'
+
+export const getIdentityExternalNotionRequiredMissingSignal = async (): Promise<ReliabilitySignal> => {
+  const observedAt = observedAtNow()
+  const source = 'getIdentityExternalNotionRequiredMissingSignal'
+  const label = 'Members asignables sin Notion'
+
+  try {
+    const rows = await query<{ n: number }>(
+      `SELECT COUNT(*)::int AS n
+       FROM greenhouse_core.members m
+       WHERE m.active = TRUE
+         AND m.assignable = TRUE
+         AND m.workforce_intake_status IN ('pending_intake', 'in_review')
+         AND m.notion_user_id IS NULL
+         AND NOT EXISTS (
+           SELECT 1
+           FROM greenhouse_core.identity_profile_source_links sl
+           WHERE sl.profile_id = m.identity_profile_id
+             AND sl.source_system = 'notion'
+             AND sl.source_object_type = 'user'
+             AND sl.active = TRUE
+       )`
+    )
+
+    const count = Number(rows[0]?.n ?? 0)
+
+    return {
+      signalId: IDENTITY_EXTERNAL_NOTION_REQUIRED_MISSING_SIGNAL_ID,
+      moduleKey: 'identity',
+      kind: 'data_quality',
+      source,
+      label,
+      severity: count === 0 ? 'ok' : 'warning',
+      summary:
+        count === 0
+          ? 'Todos los members asignables en activación tienen identidad Notion resuelta o no la requieren.'
+          : `${count} member${count === 1 ? '' : 's'} asignable${count === 1 ? '' : 's'} en activación sin link Notion activo.`,
+      observedAt,
+      evidence: [
+        { kind: 'metric', label: 'count', value: String(count) },
+        { kind: 'doc', label: 'Spec', value: 'docs/tasks/in-progress/TASK-877-workforce-external-identity-reconciliation.md' }
+      ]
+    }
+  } catch (error) {
+    captureWithDomain(error, 'identity', { tags: { source: 'reliability_signal_external_notion_required_missing' } })
+
+    return buildUnknownSignal(IDENTITY_EXTERNAL_NOTION_REQUIRED_MISSING_SIGNAL_ID, 'identity', 'data_quality', label, source, error)
+  }
+}
+
+// ── 10. identity.external_identity.notion_link_conflicts ────────────────────
+
+export const IDENTITY_EXTERNAL_NOTION_LINK_CONFLICTS_SIGNAL_ID =
+  'identity.external_identity.notion_link_conflicts'
+
+export const getIdentityExternalNotionLinkConflictsSignal = async (): Promise<ReliabilitySignal> => {
+  const observedAt = observedAtNow()
+  const source = 'getIdentityExternalNotionLinkConflictsSignal'
+  const label = 'Conflictos de link Notion'
+
+  try {
+    const rows = await query<{ n: number }>(
+      `SELECT COUNT(*)::int AS n
+       FROM (
+         SELECT source_object_id
+         FROM greenhouse_core.identity_profile_source_links
+         WHERE source_system = 'notion'
+           AND source_object_type = 'user'
+           AND active = TRUE
+         GROUP BY source_object_id
+         HAVING COUNT(DISTINCT profile_id) > 1
+       ) conflicts`
+    )
+
+    const count = Number(rows[0]?.n ?? 0)
+
+    return {
+      signalId: IDENTITY_EXTERNAL_NOTION_LINK_CONFLICTS_SIGNAL_ID,
+      moduleKey: 'identity',
+      kind: 'drift',
+      source,
+      label,
+      severity: count === 0 ? 'ok' : 'error',
+      summary:
+        count === 0
+          ? 'Sin usuarios Notion activos asignados a múltiples perfiles People.'
+          : `${count} usuario${count === 1 ? '' : 's'} Notion con links activos contra múltiples perfiles People.`,
+      observedAt,
+      evidence: [
+        { kind: 'metric', label: 'count', value: String(count) },
+        { kind: 'sql', label: 'table', value: 'greenhouse_core.identity_profile_source_links' }
+      ]
+    }
+  } catch (error) {
+    captureWithDomain(error, 'identity', { tags: { source: 'reliability_signal_external_notion_link_conflicts' } })
+
+    return buildUnknownSignal(IDENTITY_EXTERNAL_NOTION_LINK_CONFLICTS_SIGNAL_ID, 'identity', 'drift', label, source, error)
+  }
+}
+
+// ── Aggregator: readers in parallel, filter out null catches ────────────────
 
 export const getScimWorkforceSignals = async (): Promise<ReliabilitySignal[]> => {
   const results = await Promise.all([
@@ -447,7 +551,9 @@ export const getScimWorkforceSignals = async (): Promise<ReliabilitySignal[]> =>
     getWorkforceScimMembersPendingProfileCompletionSignal().catch(() => null),
     getWorkforceActivationBlockerBacklogSignal().catch(() => null),
     getWorkforceActivationReadyNotCompletedSignal().catch(() => null),
-    getScimAllowlistBlocklistConflictSignal().catch(() => null)
+    getScimAllowlistBlocklistConflictSignal().catch(() => null),
+    getIdentityExternalNotionRequiredMissingSignal().catch(() => null),
+    getIdentityExternalNotionLinkConflictsSignal().catch(() => null)
   ])
 
   return results.filter((s): s is ReliabilitySignal => s !== null)

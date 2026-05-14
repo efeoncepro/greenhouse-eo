@@ -1,3 +1,32 @@
+# Sesion 2026-05-14 — TASK-877 Workforce Activation External Identity Reconciliation IN-PROGRESS
+
+- **Cierre 2026-05-14**: TASK-877 queda implementada end-to-end y movida a `complete/` en `develop` por instruccion explicita del usuario.
+- **Qué cambió**: Workforce Activation suma lane crítica `operational_integrations`; members activos/asignables en activación requieren link Notion canónico antes de completar ficha. Se agregaron discovery Notion `users.list`, candidatos/evidencia/confianza en drawer HR, endpoint HR `GET/POST /api/hr/workforce/members/[memberId]/external-identity/notion`, apply Postgres-first con BigQuery mirror, hardening admin reconciliation con capabilities y reassign profile-safe, Postgres-first Notion member map para `sync-notion-conformed`, y 2 reliability signals determinísticos.
+- **Access model**:
+  - `routeGroups`: `hr` mantiene la surface operacional Workforce Activation.
+  - `views`: `equipo.workforce_activation` ahora declara binding a `workforce.member.external_identity.resolve`.
+  - `entitlements`: nueva `workforce.member.external_identity.resolve` para HR; `identity.reconciliation.read|approve|reject|reassign|run` quedan EFEONCE_ADMIN en runtime bajo module canónico `organization` (el vocabulario runtime no tiene module `identity`).
+  - `startup policy`: sin cambios.
+- **Matriz de riesgo**:
+  - Runtime activation false positive: mitigado porque readiness no llama Notion live; solo usa Postgres/proyecciones y policy `assignable && active && pending/in_review`.
+  - Link erróneo: mitigado con candidatos server-side, verificación live de Notion, conflict check en `identity_profile_source_links` y aprobación humana.
+  - Drift Postgres/BigQuery: mitigado con apply Postgres-first + mirror BigQuery y signal de conflictos; `sync-notion-conformed` ya lee Postgres-first con fallback.
+  - Access overgrant: mitigado separando `views`/`routeGroups` de capabilities finas; admin reconciliation solo EFEONCE_ADMIN.
+  - Notion outage/token: discovery degrada a unavailable; no se bloquea render ni se acepta UUID manual.
+- **Rollback listo**:
+  1. Revertir/down migration `20260514175558759_task-877-workforce-external-identity-access.sql` para marcar deprecated las 6 capabilities.
+  2. Retirar runtime grant `workforce.member.external_identity.resolve` para ocultar la resolucion operacional sin tocar readiness historico.
+  3. Si se aplico un link incorrecto, marcar `greenhouse_core.identity_profile_source_links.active=false` para ese `source_object_id`, limpiar `members.notion_user_id/notion_display_name` del member afectado y corregir mirror BigQuery `greenhouse.team_members.notion_user_id`.
+  4. Re-ejecutar `pnpm pg:doctor`, reliability signals y readiness del member afectado.
+- **Validación ejecutada**: `pnpm pg:connect:migrate` aplicó la migración y regeneró tipos; `pnpm pg:doctor`; `pnpm exec tsc --noEmit`; `pnpm design:lint`; `pnpm lint` (0 errores, 4 warnings legacy TASK-825 no tocados); `pnpm exec vitest run src/lib/reliability/queries/scim-workforce-signals.live.test.ts src/lib/entitlements/runtime.test.ts`; `pnpm build`.
+- **No validado**: no se aprobó/rechazó un link real desde UI para no mutar identidades reales de personas observadas; el endpoint quedó listo para prueba manual con operador.
+- **Docs actualizadas**: `docs/tasks/complete/TASK-877...`, `docs/tasks/README.md`, `docs/tasks/TASK_ID_REGISTRY.md`, `docs/tasks/plans/TASK-877-plan.md`, `docs/architecture/GREENHOUSE_PERSON_IDENTITY_CONSUMPTION_V1.md`, `docs/architecture/DECISIONS_INDEX.md`, `changelog.md`, este `Handoff.md`.
+
+- **Ownership**: Codex toma TASK-877 desde `to-do` y la mueve a `in-progress`.
+- **Branch**: `develop` directo por instruccion explicita del usuario; no se cambio de rama aunque la task declara branch canonica.
+- **Estado actual**: shipped local en develop; no hay PR ni branch abierto para TASK-877.
+- **Scope sensible**: identidad externa, Workforce Activation, Notion/BigQuery mirror, access model y UI visible. Requiere Discovery/Audit/Plan completo antes de codigo runtime.
+
 # Sesion 2026-05-14 — TASK-876 Workforce Activation Remediation Flow SHIPPED ✅
 
 - **Hotfix post-feedback 2026-05-14 — Payment profile activation trap**: el usuario creo perfil de pago para Felipe pero Workforce Activation seguia bloqueando con "Perfil de pago faltante o no aprobado". Causa raíz: readiness exige perfil `active` (correcto), backend `approvePaymentProfile()` permite activar/aprobar `draft|pending_approval` (correcto), pero la UI solo mostraba el CTA de aprobación para `pending_approval`; un perfil `draft` quedaba visible pero no operable. Fix canónico: `PaymentProfileCard` y `ProfileDetailDrawer` ahora muestran `Activar perfil` para `draft` sin maker-checker y `Aprobar perfil` para `draft|pending_approval` con maker-checker, sin saltarse la regla maker != checker. `PaymentProfilesPanel` muestra toast por estado creado, `/finance/payment-profiles` incluye `draft` en la cola accionable, `queue-summary` expone `draftCount/actionableCount/actionableProfiles`, y `resolveWorkforceActivationReadiness()` distingue warning `payment_profile_draft_activation_required` cuando existe perfil pero falta activarlo. No se aprobaron ni mutaron datos reales de Felipe/Maria desde automatización.
