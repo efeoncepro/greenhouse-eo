@@ -1,3 +1,48 @@
+# Sesion 2026-05-14 — 🎉 PRODUCTION RELEASE SUCCESS develop → main (40 commits, TASK-872/873/874/875/876/877/878 bundle)
+
+- **Release manifest**: `f945daa17b6d-b0067297-b20f-470d-a78b-664dae0882f2` (state=`released`).
+- **Target SHA**: `f945daa17b6db27ef13338dfef93a1402e3aa1cd` (merge commit `release: promote develop to main — 40 commits`).
+- **Orchestrator run**: [25887251542](https://github.com/efeoncepro/greenhouse-eo/actions/runs/25887251542) — completed/success en ~12 min (dispatch 21:40Z → released 21:52Z).
+- **Watchdog post-release**: run `25887843759` — completed/success. Drift=0 sobre Cloud Run.
+- **Vercel production**: `greenhouse-qgooah9qz-efeonce-7670142f.vercel.app` → `greenhouse.efeoncepro.com` (Ready).
+- **Cloud Run GIT_SHA verified MATCH** sobre 4 workers:
+  - `ops-worker-00223-j7w` (us-east4) — `f945daa1...`
+  - `commercial-cost-worker-00179-bsf` (us-east4) — `f945daa1...`
+  - `ico-batch-worker-00086-lbj` (us-east4) — `f945daa1...`
+  - `hubspot-greenhouse-integration-00064-fc6` (us-central1) — `f945daa1...`
+- **Azure**: Bicep apply skipped por `no_infra_diff` (correcto — sin cambios infra en este bundle). Healthcheck preflight-style verde para ambos stacks (teams-notifications + teams-bot).
+- **Bundle release content**:
+  - TASK-872 SCIM Internal Collaborator Provisioning (PG-first cascade + workforce_intake_status gate + capabilities seed).
+  - TASK-873 Workforce Intake UI V1.1 (drawer + badge + governance surface + reliability signal CTA).
+  - TASK-874 Workforce Activation Readiness Resolver + Workspace.
+  - TASK-875 WorkRelationship Onboarding Case Foundation.
+  - TASK-876 Workforce Activation Remediation Flow + intake update capability.
+  - TASK-877 Workforce Activation External Identity Reconciliation.
+  - **TASK-878 (mi sesión hoy)**: 3 niveles canónicos:
+    1. Slice 1 RETURNING canónico cierra race condition HubSpot webhook (Sentry JAVASCRIPT-NEXTJS-5T eliminado estructuralmente).
+    2. Slice 2 async outbox cutover (`commercial.hubspot_company.sync_requested v1` + projection `hubspot_companies_intake` + reliability signal dead-letter).
+    3. Follow-up canonical API error contract (`canonicalErrorResponse` helper + `CanonicalApiError` client parser + `actionable` flag + `identity.workforce.unlinked_internal_user` signal) — cierra UX banner inglés "Member identity not linked" en es-CL canónico.
+  - Auxiliares: Payment profile context hardening + payroll TASK-872 fixtures + Playwright cookie chunking + workforce smoke filter stability + contractor engagement advisory + payment profile draft activation + person avatars from PG.
+- **Pre-release validation**:
+  - CI on develop `25885273738` — success.
+  - Playwright on develop `25885273740` — success.
+  - CI on merge `25886528323` — success.
+  - Vercel BUILDING → READY ~5 min.
+- **Preflight bypass justificado**: `bypass_preflight_reason` cohesivo: "Bundle cohesivo TASK-872→873→874→875→876→877 workforce lifecycle + TASK-878 canonical API error contract. Migraciones secuenciales dependientes; entitlements + readers + UI surfaces acoplados por lifecycle; split incoherente." — capability `platform.release.bypass_preflight` (EFEONCE_ADMIN solo, audit row creado).
+- **Approval gates** (2 gates como documenta el playbook):
+  - Gate 1 (workers): deployment `4694333291` — approved 21:41:55Z.
+  - Gate 2 (Azure): deployment `4694340774` — approved 21:42:45Z.
+- **State machine progression**: `preflight → ready → deploying → verifying → released` (canonical, no `degraded` ni `aborted`).
+- **Post-release health check**: `/api/auth/health` GREEN.
+- **NO validado** (out of scope post-release):
+  - Smoke E2E manual contra `greenhouse.efeoncepro.com` post-deploy (relegado a watchdog signal + GIT_SHA verify, que sí corrió y reportó OK).
+  - Cualquier validación funcional de las UI nuevas (Workforce Activation surface, Workforce Intake drawer, etc.) — el operador humano debe ejecutarla.
+- **Rollback ready** si emerge incidente:
+  1. `vercel alias set greenhouse-2po0zvu4v.vercel.app greenhouse.efeoncepro.com` (swap a deploy previo `e02cb32e9c30`).
+  2. `gcloud run services update-traffic <svc> --to-revisions=<prev_revision>=100` para los 4 workers.
+  3. Azure infra: sin cambios (skipped) → no rollback necesario.
+  4. Marcar manifest `f945daa17b6d-b0067297-b20f-470d-a78b-664dae0882f2` como `rolled_back` via outbox event canónico (TASK-848 state machine).
+
 # Sesion 2026-05-14 — TASK-877 Workforce Activation External Identity Reconciliation IN-PROGRESS
 
 - **Cierre 2026-05-14**: TASK-877 queda implementada end-to-end y movida a `complete/` en `develop` por instruccion explicita del usuario.
