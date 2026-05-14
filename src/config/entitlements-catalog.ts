@@ -1050,6 +1050,36 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     module: 'platform',
     actions: ['read'] as const,
     defaultScope: 'all'
+  },
+  // TASK-872 — SCIM Internal Collaborator Provisioning capabilities (4 nuevas).
+  // 3 eligibility override (L4 admin allowlist/denylist + backfill execute) +
+  // 1 workforce intake transition (pending_intake → completed).
+  // Patrón canónico TASK-404 (user_entitlement_overrides) + TASK-850 (preflight CLI).
+  // Module 'organization' para SCIM (siguen el namespace canonical de organization
+  // identity); 'workforce' para intake transition (siguen TASK-785 role_title).
+  {
+    key: 'scim.eligibility_override.create',
+    module: 'organization',
+    actions: ['create'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'scim.eligibility_override.delete',
+    module: 'organization',
+    actions: ['delete'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'scim.backfill.execute',
+    module: 'organization',
+    actions: ['execute'] as const,
+    defaultScope: 'all'
+  },
+  {
+    key: 'workforce.member.complete_intake',
+    module: 'workforce',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
   }
 ] as const
 

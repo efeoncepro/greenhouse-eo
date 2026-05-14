@@ -2437,6 +2437,10 @@ export interface GreenhouseCoreMembers {
    */
   twitter_url: string | null;
   updated_at: Generated<Timestamp>;
+  /**
+   * TASK-872 — Gate explícito de ficha laboral. Default completed para legacy backward compat (todos los members existentes pre-migration retienen behaviour idéntico a hoy). SCIM-provisioned members nacen pending_intake. Transición a completed via admin endpoint POST /api/admin/workforce/members/[memberId]/complete-intake con capability workforce.member.complete_intake. Payroll/capacity/compensation/assignments readers filtran = completed antes de operar sobre el member.
+   */
+  workforce_intake_status: Generated<string>;
   years_experience: Numeric | null;
 }
 
