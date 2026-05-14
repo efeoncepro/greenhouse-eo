@@ -331,7 +331,7 @@ const loadMember = async (memberId: string): Promise<MemberReadinessRow | null> 
      ) notion_link ON TRUE
      LEFT JOIN LATERAL (
        SELECT COUNT(*)::int AS pending_count
-       FROM greenhouse_core.identity_reconciliation_proposals proposal
+       FROM greenhouse_sync.identity_reconciliation_proposals proposal
        WHERE proposal.source_system = 'notion'
          AND proposal.status = 'pending'
          AND proposal.candidate_member_id = m.member_id
