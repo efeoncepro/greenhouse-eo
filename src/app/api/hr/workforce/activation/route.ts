@@ -8,6 +8,7 @@ import { redactErrorForResponse } from '@/lib/observability/redact'
 import { getTenantContext } from '@/lib/tenant/get-tenant-context'
 import {
   listPendingIntakeMembers,
+  searchWorkforceActivationMembers,
   type WorkforceIntakeStatusFilter
 } from '@/lib/workforce/intake-queue/list-pending-members'
 
@@ -66,8 +67,24 @@ export const GET = async (request: Request) => {
     const url = new URL(request.url)
     const cursor = parseCursor(url.searchParams.get('cursor'))
     const statusFilter = parseStatusFilter(url.searchParams.get('statusFilter'))
+    const search = url.searchParams.get('q')?.trim() ?? ''
     const pageSizeRaw = url.searchParams.get('pageSize')
     const pageSize = pageSizeRaw ? Math.max(1, Math.min(200, Number(pageSizeRaw))) : 50
+
+    if (search.length >= 2) {
+      const items = await searchWorkforceActivationMembers({
+        query: search,
+        limit: Math.min(pageSize, 20),
+        includeReadiness: true
+      })
+
+      return NextResponse.json({
+        items,
+        nextCursor: null,
+        hasMore: false,
+        totalApprox: items.length
+      })
+    }
 
     const result = await listPendingIntakeMembers({
       cursor,

@@ -35,6 +35,12 @@ export interface ListPendingIntakeMembersOptions {
   readonly includeReadiness?: boolean
 }
 
+export interface SearchWorkforceActivationMembersOptions {
+  readonly query: string
+  readonly limit?: number
+  readonly includeReadiness?: boolean
+}
+
 export interface ListPendingIntakeMembersCursor {
   readonly createdAt: string
   readonly memberId: string
@@ -248,4 +254,56 @@ export const getWorkforceActivationMember = async (
     topBlockerLane: activationReadiness.topBlockerLane ?? undefined,
     activationReadiness
   }
+}
+
+export const searchWorkforceActivationMembers = async ({
+  query: rawQuery,
+  limit = 10,
+  includeReadiness = false
+}: SearchWorkforceActivationMembersOptions): Promise<readonly PendingIntakeMemberRow[]> => {
+  const search = rawQuery.trim()
+
+  if (search.length < 2) return []
+
+  const rows = await query<Record<string, unknown>>(
+    `SELECT
+        m.member_id,
+        m.display_name,
+        m.primary_email,
+        m.workforce_intake_status,
+        m.identity_profile_id,
+        m.created_at,
+        m.active,
+        EXTRACT(DAY FROM (NOW() - m.created_at))::int AS age_days
+     FROM greenhouse_core.members m
+     WHERE m.active = TRUE
+       AND (
+         m.member_id ILIKE $1
+         OR m.display_name ILIKE $1
+         OR m.primary_email ILIKE $1
+       )
+     ORDER BY
+       CASE WHEN m.workforce_intake_status != 'completed' THEN 0 ELSE 1 END,
+       m.display_name ASC
+     LIMIT $2`,
+    [`%${search}%`, Math.max(1, Math.min(20, limit))]
+  )
+
+  const baseItems = rows.map(rowToPendingIntakeMember)
+
+  if (!includeReadiness) return baseItems
+
+  return Promise.all(
+    baseItems.map(async item => {
+      const activationReadiness = await resolveWorkforceActivationReadiness(item.memberId)
+
+      return {
+        ...item,
+        readinessStatus: activationReadiness.status,
+        blockerCount: activationReadiness.blockerCount,
+        topBlockerLane: activationReadiness.topBlockerLane ?? undefined,
+        activationReadiness
+      } satisfies PendingIntakeMemberRow
+    })
+  )
 }

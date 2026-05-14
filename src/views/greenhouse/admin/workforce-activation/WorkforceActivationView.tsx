@@ -12,6 +12,7 @@ import CircularProgress from '@mui/material/CircularProgress'
 import Divider from '@mui/material/Divider'
 import LinearProgress from '@mui/material/LinearProgress'
 import Stack from '@mui/material/Stack'
+import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 
 import { toast } from 'sonner'
@@ -307,11 +308,13 @@ const QueueRow = ({
 const ReadinessInspector = ({
   row,
   onComplete,
-  onResolve
+  onResolve,
+  onExternalIdentity
 }: {
   row: PendingIntakeMemberRow | null
   onComplete: () => void
   onResolve: () => void
+  onExternalIdentity: () => void
 }) => {
   if (!row || !row.activationReadiness) {
     return (
@@ -354,6 +357,11 @@ const ReadinessInspector = ({
           </Stack>
 
           <Stack direction={{ xs: 'column', sm: 'row', lg: 'column' }} spacing={2}>
+            {readiness.member.notionUserId ? null : (
+              <Button fullWidth size='small' variant='tonal' color='secondary' startIcon={<i className='tabler-brand-notion' />} onClick={onExternalIdentity}>
+                {GH_WORKFORCE_ACTIVATION.resolver_external_identity_open}
+              </Button>
+            )}
             {ready ? (
               <Button fullWidth size='small' variant='contained' startIcon={<i className='tabler-circle-check' />} onClick={onComplete}>
                 {GH_WORKFORCE_ACTIVATION.complete}
@@ -426,6 +434,8 @@ const WorkforceActivationView = ({
   const [activationFilter, setActivationFilter] = useState<ActivationFilter>('all')
   const [loadingMore, setLoadingMore] = useState(false)
   const [refreshing, setRefreshing] = useState(false)
+  const [memberSearch, setMemberSearch] = useState('')
+  const [memberSearching, setMemberSearching] = useState(false)
   const [selectedId, setSelectedId] = useState<string | null>(initialSelectedMemberId ?? initialItems[0]?.memberId ?? null)
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [remediationOpen, setRemediationOpen] = useState(false)
@@ -484,6 +494,48 @@ const WorkforceActivationView = ({
       setLoadingMore(false)
     }
   }, [cursor, loadingMore, fetchPage])
+
+  const handleMemberSearch = useCallback(async () => {
+    const query = memberSearch.trim()
+
+    if (query.length < 2 || memberSearching) return
+
+    setMemberSearching(true)
+
+    try {
+      const params = new URLSearchParams()
+
+      params.set('q', query)
+      params.set('pageSize', '10')
+
+      const response = await fetch(`${apiPath}?${params.toString()}`)
+      const data = await response.json().catch(() => null)
+
+      if (!response.ok) {
+        throw new Error(typeof data?.error === 'string' ? data.error : GH_WORKFORCE_INTAKE.queue_load_error)
+      }
+
+      const foundItems = (data?.items ?? []) as PendingIntakeMemberRow[]
+
+      if (foundItems.length === 0) {
+        toast.info(GH_WORKFORCE_ACTIVATION.empty_title)
+
+        return
+      }
+
+      setItems(prev => {
+        const known = new Set(prev.map(item => item.memberId))
+
+        return [...foundItems, ...prev.filter(item => !known.has(item.memberId) || !foundItems.some(found => found.memberId === item.memberId))]
+      })
+      setActivationFilter('all')
+      setSelectedId(foundItems[0]?.memberId ?? null)
+    } catch {
+      toast.error(GH_WORKFORCE_INTAKE.queue_load_error)
+    } finally {
+      setMemberSearching(false)
+    }
+  }, [apiPath, memberSearch, memberSearching])
 
   const refreshQueue = useCallback(async (preferredMemberId?: string | null) => {
     setRefreshing(true)
@@ -595,7 +647,28 @@ const WorkforceActivationView = ({
                   {GH_WORKFORCE_ACTIVATION.queue_subtitle}
                 </Typography>
               </Box>
-              <Stack direction='row' spacing={2} alignItems='center'>
+              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems={{ xs: 'stretch', sm: 'center' }}>
+                <TextField
+                  size='small'
+                  label={GH_WORKFORCE_ACTIVATION.member_search_label}
+                  placeholder={GH_WORKFORCE_ACTIVATION.member_search_placeholder}
+                  value={memberSearch}
+                  onChange={event => setMemberSearch(event.target.value)}
+                  onKeyDown={event => {
+                    if (event.key === 'Enter') void handleMemberSearch()
+                  }}
+                  helperText={GH_WORKFORCE_ACTIVATION.member_search_helper}
+                />
+                <Button
+                  size='small'
+                  variant='tonal'
+                  color='secondary'
+                  disabled={memberSearching || memberSearch.trim().length < 2}
+                  startIcon={memberSearching ? <CircularProgress size={16} /> : <i className='tabler-search' />}
+                  onClick={() => void handleMemberSearch()}
+                >
+                  {GH_WORKFORCE_ACTIVATION.member_search_action}
+                </Button>
                 {refreshing ? <CircularProgress size={18} /> : null}
                 <CustomChip round='true' size='small' variant='tonal' color='primary' label={GH_WORKFORCE_ACTIVATION.queue_count(visibleItems.length)} />
               </Stack>
@@ -626,6 +699,7 @@ const WorkforceActivationView = ({
           row={selected}
           onComplete={() => setDrawerOpen(true)}
           onResolve={() => setRemediationOpen(true)}
+          onExternalIdentity={() => setExternalIdentityOpen(true)}
         />
       </Box>
 
