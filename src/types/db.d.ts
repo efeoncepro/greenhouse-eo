@@ -2852,6 +2852,40 @@ export interface GreenhouseCoreRoleViewAssignments {
   view_code: string;
 }
 
+export interface GreenhouseCoreScimEligibilityOverrideChanges {
+  actor_user_id: string;
+  change_id: string;
+  change_kind: string;
+  metadata_json: Generated<Json>;
+  occurred_at: Generated<Timestamp>;
+  override_id: string;
+  reason: string | null;
+}
+
+export interface GreenhouseCoreScimEligibilityOverrides {
+  created_at: Generated<Timestamp>;
+  /**
+   * allow = bypass L1/L2/L3 (force eligible). deny = block L1-default (force ineligible). Deny gana sobre allow en conflicto simultáneo (hard rule canónica).
+   */
+  effect: string;
+  effective_to: Timestamp | null;
+  expires_at: Timestamp | null;
+  /**
+   * Actor user_id o identifier sistema (e.g. system-bootstrap). NO FK rígido — permite system actors como overrides automáticos.
+   */
+  granted_by: string;
+  match_type: string;
+  /**
+   * Valor canonicalizado: email lowercase; upn lowercase; azure_oid UUID lowercase. La función evaluadora normaliza input antes de comparar.
+   */
+  match_value: string;
+  override_id: string;
+  reason: string;
+  scim_tenant_mapping_id: string;
+  superseded_by: string | null;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseCoreScimGroupMemberships {
   active: Generated<boolean>;
   created_at: Generated<Timestamp>;
@@ -9042,6 +9076,8 @@ export interface DB {
   "greenhouse_core.role_entitlement_defaults": GreenhouseCoreRoleEntitlementDefaults;
   "greenhouse_core.role_view_assignments": GreenhouseCoreRoleViewAssignments;
   "greenhouse_core.roles": GreenhouseCoreRoles;
+  "greenhouse_core.scim_eligibility_override_changes": GreenhouseCoreScimEligibilityOverrideChanges;
+  "greenhouse_core.scim_eligibility_overrides": GreenhouseCoreScimEligibilityOverrides;
   "greenhouse_core.scim_group_memberships": GreenhouseCoreScimGroupMemberships;
   "greenhouse_core.scim_groups": GreenhouseCoreScimGroups;
   "greenhouse_core.scim_sync_log": GreenhouseCoreScimSyncLog;

@@ -25067,3 +25067,31 @@ Re-smoke a buzon real:
 - KPI posterior: `sentToday=19`, `failedToday=0`, `pendingRetry=0`, `deliveryRate=100`.
 - Signal posterior: `notifications.email.render_failure_rate` severity `ok`, `total_render_failures=0`, `delivery_render_failures=0`, `reactive_render_failures=0`, `delivery_failure_rate_percent=0.00`.
 - Confirmacion visual humana: usuario reviso el inbox `jreyes@efeoncepro.com` y reporto "Se ven perfectos".
+
+---
+
+## 2026-05-13 — TASK-872 SCIM Internal Collaborator Provisioning — IN-PROGRESS
+
+**Estado**: spec movida a `in-progress/`, branch NO creado (operador instruyó trabajo directo en `develop`). Arch-architect review completo aplicado al spec en commits `11406bae` + `e360d3ae` (Rollout Plan & Risk Matrix canonizado en template + skill `greenhouse-task-planner` + sección poblada en TASK-872).
+
+**Trabajo en curso** (FASE 1 Discovery iniciada):
+
+- Movida `docs/tasks/to-do/TASK-872-*.md` → `docs/tasks/in-progress/`. Lifecycle: `in-progress`.
+- README + Handoff sincronizados.
+- FASE 1 Discovery: lectura paralela de specs canónicas + exploración src/lib/scim, src/lib/payroll, src/lib/identity. Subagentes Explore en paralelo para mapear payroll reader canónico (Open Question Discovery resuelve).
+- FASE 4 Plan → STOP checkpoint humano pendiente (P1/Alto requires explicit approval pre-Slice 1).
+
+**Decisiones canonizadas pre-Discovery** (arch-architect review):
+
+- D-1: nueva columna `members.workforce_intake_status` (default `'completed'` legacy, `'pending_intake'` SCIM new).
+- D-2: cascade lookup `identity_profile_id → azure_oid → email` + drift detection throw.
+- D-3: eligibility policy 4-layer (`L1 hard reject / L2 funcional regex / L3 name shape / L4 admin override`).
+
+**Riesgos identificados** (Risk Matrix R1-R9 en spec):
+
+- R2 HIGH: si Slice 5 backfill corre antes que Slice 4 payroll gate → Felipe Zurita entra a próxima corrida con $0 base. Slice ordering hard rule + test enforcement obligatorios.
+- R1 MEDIUM: primitive throws → 500 a Entra → countEscrowed. Mitigation via feature flag `SCIM_INTERNAL_COLLABORATOR_PRIMITIVE_ENABLED=false` default.
+
+**Subjects para remediación**: Felipe Zurita (`fzurita@efeoncepro.com`, OID `ec1b7fd0-...`) + Maria Camila Hoyos (`mchoyos@efeoncepro.com`, OID `96bf99f6-...`). Ambos ya con `client_user` + `identity_profile`, falta `member`.
+
+**Próximo paso**: completar FASE 1-4 + presentar plan al operador para STOP checkpoint approval antes de FASE 5 implementación.
