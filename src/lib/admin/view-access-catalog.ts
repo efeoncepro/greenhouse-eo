@@ -483,6 +483,31 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
     routeGroup: 'admin'
   },
   {
+    // TASK-873 Slice 4 — Workforce Activation workspace V1 (esqueleto admin governance).
+    //
+    // **Surface canonical**: este es el variant `admin governance / transitional`
+    // explicitly endorsed by Codex TASK-874 spec line 99
+    // (`/admin/workforce/activation puede quedar como alias/transitional/admin
+    // governance, pero no como ruta/menú primario`). El surface PRIMARIO de
+    // Workforce Activation vive en TASK-874 bajo `equipo.workforce_activation`
+    // + routeGroup `hr` + ruta `/hr/workforce/activation` (o `/workforce/activation`,
+    // a decidir en TASK-874 Plan Mode) con menú visible en `Personas y HR`.
+    //
+    // Migration acompañante en mismo PR: 20260514113914311 (CLAUDE.md TASK-827
+    // governance pattern). Roles canónicos seeded: efeonce_admin + finance_admin
+    // + hr_payroll.
+    //
+    // Mockup canonical aprobado 2026-05-14 (Codex):
+    // `src/views/greenhouse/admin/workforce-activation/mockup/`. TASK-874
+    // materializa ese mockup en el primary HR surface.
+    viewCode: 'administracion.workforce_activation',
+    section: 'administracion',
+    label: 'Workforce Activation',
+    description: 'Surface admin governance / transitional. Cola de colaboradores con ficha laboral pendiente. Surface primario HR-facing ships in TASK-874.',
+    routePath: '/admin/workforce/activation',
+    routeGroup: 'admin'
+  },
+  {
     viewCode: 'administracion.cloud_integrations',
     section: 'administracion',
     label: 'Cloud & Integrations',

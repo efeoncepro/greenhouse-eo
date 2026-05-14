@@ -20,7 +20,7 @@ import type { PersonDetail, PersonDetailAssignment } from '@/types/people'
 import CompensationDrawer, { type CompensationSavePayload } from '@views/greenhouse/payroll/CompensationDrawer'
 import CompleteIntakeDrawer, {
   type CompleteIntakeDrawerMember
-} from '@views/greenhouse/admin/workforce-intake-queue/CompleteIntakeDrawer'
+} from '@views/greenhouse/admin/workforce-activation/CompleteIntakeDrawer'
 import EditProfileDrawer from './drawers/EditProfileDrawer'
 import AddPersonMembershipDrawer from './drawers/AddPersonMembershipDrawer'
 import EditPersonMembershipDrawer, { type MembershipRowData } from './drawers/EditPersonMembershipDrawer'

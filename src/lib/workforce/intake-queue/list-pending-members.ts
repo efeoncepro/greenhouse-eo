@@ -5,7 +5,7 @@ import { query } from '@/lib/db'
 import type { WorkforceIntakeStatus } from '@/types/people'
 
 /**
- * TASK-873 Slice 1 — Cursor-paginated reader for `/admin/workforce/intake-queue`.
+ * TASK-873 Slice 1 — Cursor-paginated reader for `/admin/workforce/activation`.
  *
  * Keyset pagination on (`created_at ASC`, `member_id ASC`) — no OFFSET to keep
  * queries O(log N) at deep pagination. Cursor is the ISO timestamp + memberId

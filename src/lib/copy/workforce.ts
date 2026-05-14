@@ -236,7 +236,7 @@ export const GH_CLIENT_TALENT = {
 // pending_intake | in_review → completed). Surfaces consumidores:
 // - Badge en PeopleListTable (Slice 2)
 // - Botón "Completar ficha" en PersonView + drawer compartido (Slice 3)
-// - Admin queue /admin/workforce/intake-queue (Slice 4)
+// - Admin queue /admin/workforce/activation (Slice 4 — Workforce Activation workspace V1)
 // - Link CTA en /admin/operations dashboard (Slice 5)
 // Operador objetivo: HR (HR_PAYROLL, HR_MANAGER), FINANCE_ADMIN, EFEONCE_ADMIN.
 // Tono: es-CL, tuteo, sentence case. Mirror de GH_RELEASE_ADMIN shape.
@@ -292,9 +292,10 @@ export const GH_WORKFORCE_INTAKE = {
   toast_submit_conflict: 'La ficha está en un estado que no permite la transición.',
 
   // ── Admin queue page ──────────────────────────────────────────────────
-  queue_page_title: 'Fichas laborales pendientes',
+  // Copy alineado con mockup aprobado Codex 2026-05-14 (TASK-874 visual target).
+  queue_page_title: 'Workforce Activation',
   queue_page_subtitle:
-    'Colaboradores creados desde Entra que aún requieren completar contrato y compensación antes de entrar al flujo operativo.',
+    'Habilitación laboral completa antes de cerrar intake: relación, cargo, compensación, pago y onboarding.',
   queue_filter_all: 'Todos',
   queue_filter_pending: 'Pendientes',
   queue_filter_in_review: 'En revisión',
