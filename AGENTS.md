@@ -328,6 +328,29 @@ Documentacion canonica:
   - confirmar que no hay pendientes abiertos en `Handoff.md` para esa zona
   - verificar conflictos con: `git merge --no-commit --no-ff origin/main` (luego `git merge --abort` si solo es verificacion). **No usar** `git merge-tree | grep CONFLICT` — produce falsos positivos con sentencias SQL `ON CONFLICT` del codebase (ver ISSUE-011)
 
+### ⚠️ INVARIANT CANONICO — Push a `main` siempre va por el orchestrator (post-incidente 2026-05-14)
+
+**Detectado 2026-05-14**: Codex pusheo 3 hotfixes directo a `main` (commits `982accaf`, `4fe799cf`, `cfea1784`) post un release ajeno con SHA `f945daa1`. Vercel auto-deployo (correcto comportamiento Git integration) pero los Cloud Run workers no se movieron (correcto per TASK-851 contract — workers solo deployan via orchestrator `workflow_call`). Resultado: drift cosmetico entre Vercel production HEAD y release manifest, audit trail roto, watchdog reportaria worker_revision_drift al proximo run. Las hotfixes pasaron porque no tocaban codigo corrido en workers — pura suerte. Si hubieran tocado `src/lib/sync/*` o `src/lib/reactive-*`, el drift hubiera sido funcional y los workers habrian quedado serving codigo viejo.
+
+**Reglas duras** (zero exceptions outside break-glass):
+
+- **NUNCA** hacer `git push origin main` sin **inmediatamente despues** dispatchar el orchestrator canonico `production-release.yml` con `target_sha=<HEAD del push>`. Cada commit en `main` MUST be tracked by un release manifest en `greenhouse_sync.release_manifests`. La Vercel auto-deploy on `push:main` NO es un release — solo el manifest refleja la verdad de produccion.
+- **NUNCA** assumir "hotfix chico, sin orchestrator" — la regla no tiene excepciones fuera de break-glass documentado. Incluso un typo fix a `main` requiere dispatch del orchestrator para mantener manifest alineado. Si el fix es too trivial for a release manifest, es too trivial para tocar `main` — merge a develop y esperar el proximo release regular.
+- **NUNCA** cherry-pick a `main` un commit que tambien existe en `develop`. Crea SHAs duplicados para el mismo cambio logico (caso real 2026-05-14: `fa5258a5` en develop / `4fe799cf` en main — mismo diff exacto, distinto SHA), confunde audit trail, rompe el exact mirror entre develop/main. Canonical hotfix path va `main → branch → fix → PR → merge → orchestrator dispatch → cherry-pick back a develop` (no la direccion opuesta).
+- **NUNCA** asumir que "no afecta workers" excusa el push directo. Aun si Cloud Run services no cambian, el manifest registry queda inconsistente con production runtime, y el watchdog reportara drift al proximo cron run. El drift cosmetico de manifest tambien rompe audit trail para cualquier rollback futuro.
+- **SIEMPRE** que un hotfix sea urgente para produccion:
+  1. Branch desde `main` (`hotfix/<owner>-<tema>`).
+  2. Fix + commit + push a la branch.
+  3. PR a `main`. Merge cuando greenlit.
+  4. **Inmediatamente** dispatch orchestrator con `target_sha=<merge commit SHA>` y `bypass_preflight_reason=<justificacion >=20 chars>` si aplica break-glass.
+  5. Aprobar gate(s) con audit comment claro.
+  6. Esperar manifest transition a `released`.
+  7. Cherry-pick / merge back a `develop` para sincronizar branches.
+- **SIEMPRE** que un hotfix NO sea urgente (lo normal): mergear a `develop` via PR, ship via canonical release `develop → main` con orchestrator. Sin atajos.
+- **SIEMPRE** que detectes `origin/main` HEAD distinto al target_sha del ultimo manifest `released`, reportarlo en `Handoff.md` como drift y proponer remediation (re-run orchestrator para alinear, o ship next release que cubra ambos SHAs).
+
+Spec canonica: `.claude/skills/greenhouse-production-release/SKILL.md` + `.codex/skills/greenhouse-production-release/SKILL.md` (Hard Rules block) + `docs/architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md`.
+
 ### Ambientes y Vercel
 
 - `Production` en Vercel debe estar asociado a `main`.
