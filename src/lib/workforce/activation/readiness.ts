@@ -33,8 +33,11 @@ interface MemberReadinessRow extends Record<string, unknown> {
   hire_date: Date | string | null
   employment_type: string | null
   contract_type: string | null
+  contract_end_date: Date | string | null
+  daily_required: boolean | null
   pay_regime: string | null
   payroll_via: string | null
+  deel_contract_id: string | null
   role_title: string | null
   role_title_source: string | null
   compensation_currency: string | null
@@ -96,9 +99,9 @@ const DEFAULT_LANE_DETAIL: Record<WorkforceActivationLaneKey, string> = {
 const laneLink = (memberId: string, lane: WorkforceActivationLaneKey): string => {
   const base = `/people/${memberId}`
 
-  if (lane === 'payment_profile') return '/finance/payment-profiles'
-  if (lane === 'legal_profile') return `${base}?tab=legal`
-  if (lane === 'identity_access') return `${base}?tab=access`
+  if (lane === 'payment_profile') return `${base}?tab=payment`
+  if (lane === 'legal_profile') return base
+  if (lane === 'identity_access') return base
 
   return base
 }
@@ -270,8 +273,11 @@ const loadMember = async (memberId: string): Promise<MemberReadinessRow | null> 
        m.hire_date,
        m.employment_type,
        m.contract_type,
+       m.contract_end_date,
+       m.daily_required,
        m.pay_regime,
        m.payroll_via,
+       m.deel_contract_id,
        m.role_title,
        m.role_title_source,
        cv.currency AS compensation_currency,
@@ -501,8 +507,11 @@ export const resolveWorkforceActivationReadiness = async (
       hireDate: null,
       employmentType: null,
       contractType: null,
+      contractEndDate: null,
+      dailyRequired: null,
       payRegime: null,
       payrollVia: null,
+      deelContractId: null,
       roleTitle: null,
       roleTitleSource: null,
       compensationCurrency: null,
@@ -543,8 +552,11 @@ export const resolveWorkforceActivationReadiness = async (
     hireDate: toIsoDate(row.hire_date),
     employmentType: row.employment_type,
     contractType,
+    contractEndDate: toIsoDate(row.contract_end_date),
+    dailyRequired: row.daily_required,
     payRegime,
     payrollVia,
+    deelContractId: row.deel_contract_id,
     roleTitle: roleTitle.value,
     roleTitleSource: roleTitle.source,
     compensationCurrency: normalizeCurrency(row.compensation_currency, payRegime),

@@ -715,7 +715,10 @@ export const EVENT_TYPES = {
 
   // TASK-872 Slice 5 — Workforce intake transition (pending_intake|in_review → completed).
   // Admin endpoint POST /api/admin/workforce/members/[memberId]/complete-intake.
-  workforceMemberIntakeCompleted: 'workforce.member.intake_completed'
+  workforceMemberIntakeCompleted: 'workforce.member.intake_completed',
+
+  // TASK-876 — Workforce Activation remediation before final completion.
+  workforceMemberIntakeUpdated: 'workforce.member.intake_updated'
 } as const
 
 export type EventType = (typeof EVENT_TYPES)[keyof typeof EVENT_TYPES]

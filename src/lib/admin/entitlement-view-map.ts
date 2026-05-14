@@ -62,6 +62,7 @@ const resolveBindingsForView = (view: GovernanceViewRegistryEntry): ViewEntitlem
     case 'equipo.workforce_activation':
       return [
         toBinding(view, 'workforce.member.activation_readiness.read', ['read']),
+        toBinding(view, 'workforce.member.intake.update', ['update']),
         toBinding(view, 'workforce.member.complete_intake', ['update'])
       ]
 

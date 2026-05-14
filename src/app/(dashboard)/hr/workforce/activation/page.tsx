@@ -10,8 +10,14 @@ import { listPendingIntakeMembers } from '@/lib/workforce/intake-queue/list-pend
 
 export const dynamic = 'force-dynamic'
 
-const Page = async () => {
+const Page = async ({
+  searchParams
+}: {
+  searchParams?: Promise<Record<string, string | string[] | undefined>>
+}) => {
   await requireServerSession()
+  const params = searchParams ? await searchParams : {}
+  const initialSelectedMemberId = typeof params.memberId === 'string' ? params.memberId : null
   const tenant = await getTenantContext()
 
   if (!tenant) redirect('/login')
@@ -41,6 +47,8 @@ const Page = async () => {
       pendingSignal={pendingSignal}
       apiPath='/api/hr/workforce/activation'
       completeIntakeApiBasePath='/api/hr/workforce/members'
+      intakeApiBasePath='/api/hr/workforce/members'
+      initialSelectedMemberId={initialSelectedMemberId}
     />
   )
 }

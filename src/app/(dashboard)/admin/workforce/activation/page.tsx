@@ -56,8 +56,14 @@ import { getTenantContext } from '@/lib/tenant/get-tenant-context'
 
 export const dynamic = 'force-dynamic'
 
-const Page = async () => {
+const Page = async ({
+  searchParams
+}: {
+  searchParams?: Promise<Record<string, string | string[] | undefined>>
+}) => {
   await requireServerSession()
+  const params = searchParams ? await searchParams : {}
+  const initialSelectedMemberId = typeof params.memberId === 'string' ? params.memberId : null
   const tenant = await getTenantContext()
 
   if (!tenant) redirect('/login')
@@ -86,6 +92,9 @@ const Page = async () => {
       initialTotalApprox={initialPage.totalApprox}
       pendingSignal={pendingSignal}
       apiPath='/api/admin/workforce/activation'
+      completeIntakeApiBasePath='/api/admin/workforce/members'
+      intakeApiBasePath='/api/admin/workforce/members'
+      initialSelectedMemberId={initialSelectedMemberId}
     />
   )
 }

@@ -4,9 +4,9 @@
 > **Version:** 1.0
 > **Creado:** 2026-05-14 por TASK-873
 > **Modulo:** HR / Workforce / Lifecycle
-> **Rutas:** `/admin/workforce/activation` (admin governance), `/people/[memberId]` (detalle)
-> **Capacidad requerida:** `workforce.member.complete_intake` (asignada a EFEONCE_ADMIN, FINANCE_ADMIN y route_group `hr` que incluye HR_PAYROLL + HR_MANAGER)
-> **Endpoint backend:** `POST /api/admin/workforce/members/[memberId]/complete-intake`
+> **Rutas:** `/hr/workforce/activation` (principal), `/admin/workforce/activation` (admin governance), `/people/[memberId]` (detalle)
+> **Capacidad requerida:** `workforce.member.complete_intake` para cierre final; `workforce.member.intake.update` para remediar datos laborales.
+> **Endpoint backend:** `POST /api/hr/workforce/members/[memberId]/complete-intake` y `PATCH /api/hr/workforce/members/[memberId]/intake`
 
 ## Para que sirve
 
@@ -24,6 +24,10 @@ que pedirle a alguien tecnico que invoque el endpoint manualmente.
 > **Nota TASK-874**: el sistema valida automaticamente contrato, cargo,
 > compensacion, perfil legal y datos de pago antes de completar la ficha.
 > Si hay blockers, resuelvelos primero en `/hr/workforce/activation`.
+>
+> **Nota TASK-876**: el boton de Personas para fichas pendientes ya no abre
+> el drawer final; te lleva al workspace con `?memberId=` para resolver
+> blockers primero.
 
 ## Antes de empezar
 
@@ -83,31 +87,33 @@ Hay dos rutas equivalentes:
 
 1. Entra a `/admin/workforce/activation`.
 2. Aplica el filtro relevante si quieres scope angosto.
-3. Haz click en la fila del colaborador, o presiona el boton **"Completar
-   ficha"** en la columna acciones de esa fila.
-4. Se abre el drawer **"Completar ficha laboral"** en el costado derecho.
-5. Verifica los datos read-only (nombre, correo, estado actual, antiguedad,
+3. Haz click en la fila del colaborador.
+4. Si el inspector muestra blockers, presiona **"Resolver blockers"**.
+5. Completa primero datos laborales, compensacion, legal profile y pago segun corresponda.
+6. Cuando el inspector quede listo, presiona **"Completar ficha"**.
+7. Se abre el drawer **"Completar ficha laboral"** en el costado derecho.
+8. Verifica los datos read-only (nombre, correo, estado actual, antiguedad,
    identity profile).
-6. Lee el banner de advertencia amarillo **"Verifica antes de completar"** —
+9. Lee el banner de advertencia amarillo **"Verifica antes de completar"** —
    confirma que ya revisaste contrato + compensacion + perfil legal + datos
    de pago.
-7. Opcional: escribe una nota en el campo **"Notas (opcional)"** para que
+10. Opcional: escribe una nota en el campo **"Notas (opcional)"** para que
    quede registrada en el audit log y outbox event. Util para anotar quien
    completo, o referenciar tickets de soporte.
-8. Presiona **"Marcar como completada"** (boton naranja contained).
-9. Espera el toast de confirmacion **"Ficha completada"**.
-10. La fila desaparece de la cola.
+11. Presiona **"Marcar como completada"** (boton naranja contained).
+12. Espera el toast de confirmacion **"Ficha completada"**.
+13. La fila desaparece de la cola.
 
 ### Opcion 2: Desde el detalle del colaborador
 
 1. Entra a `/people/[memberId]` (puedes navegar desde la cola, desde el
    directorio People, o de Microsoft Teams si tienes el link).
 2. En el header del perfil, junto al chip Activo / Inactivo, veras un
-   boton naranja **"Completar ficha"** (solo aparece si tu rol tiene la
-   capacidad y el colaborador tiene ficha pendiente).
-3. Presiona el boton.
-4. Se abre el mismo drawer **"Completar ficha laboral"**.
-5. Sigue los pasos 5-10 de la Opcion 1.
+   boton para completar o resolver la ficha si el colaborador esta pendiente.
+3. Presiona el boton. Para `pending_intake` o `in_review`, el sistema abre
+   `/hr/workforce/activation?memberId=<id>`.
+4. Resuelve los blockers desde Workforce Activation y solo despues ejecuta
+   **"Completar ficha"**.
 
 ## Que pasa despues
 
@@ -145,6 +151,7 @@ Cuando completas la ficha:
 | Sintoma | Diagnostico | Solucion |
 |---|---|---|
 | Boton "Completar ficha" no aparece en /people/[memberId] | Tu rol no tiene la capability `workforce.member.complete_intake`, o el member ya esta `completed`. | Verifica con admin que tu rol este en EFEONCE_ADMIN, FINANCE_ADMIN o tenga route_group=hr. Si no, pide acceso. |
+| Al editar fecha de ingreso aparece `Team member not found` | Estabas usando el flujo legacy de HR Core para un member SCIM/PG-only. | Usa `/hr/workforce/activation?memberId=<id>` y guarda desde **Resolver blockers**. TASK-876 cablea ese update contra `greenhouse_core.members`. |
 | /admin/workforce/activation redirige a tu home | Misma causa: te falta la capability. | Pide acceso a admin. |
 | Toast "No fue posible completar la ficha. Revisa los logs." | El endpoint backend fallo (500). | Notifica al equipo tecnico — el error queda en Sentry domain `identity` con detalles. Mientras tanto, NO retries automaticos: deja correr 1-2 min antes de reintentar. |
 | Toast "La ficha esta en un estado que no permite la transicion." | El member ya cambio de estado en otro tab o lo modifico otro operador. | Recarga la pagina. Si el estado quedo en `completed` ya, el badge desaparece. Si quedo en otro estado raro (e.g. test de QA), notifica al equipo tecnico. |

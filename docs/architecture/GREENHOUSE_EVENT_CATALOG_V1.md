@@ -2,6 +2,20 @@
 
 Catalogo canonico de eventos del sistema de outbox de Greenhouse. Cada evento se registra en `greenhouse_sync.outbox_events` y se publica a BigQuery via el consumer `outbox-publish`.
 
+## Delta 2026-05-14 — TASK-876: Workforce intake remediation (1 event v1)
+
+Aggregate type: `workforce_member_intake`
+
+| Event Type | Disparado por | Payload v1 contract | Consumers |
+|---|---|---|---|
+| `workforce.member.intake_updated` | `updateWorkforceMemberIntake()` cuando un operador guarda datos laborales de intake sin completar la ficha | `{version:1, memberId, tenantId, actorUserId, previousStatus, nextStatus, changedFields:string[], reason?:string, occurredAt}` | Auditoria, readiness refresh, futuros consumers de onboarding/payroll |
+
+Reglas duras:
+
+- Este evento no significa ficha completada; la transicion final sigue siendo `workforce.member.intake_completed`.
+- Se emite en la misma transaccion que el update de `greenhouse_core.members`.
+- No debe usarse para backfills silenciosos de casos reales: la accion es operador-humano y auditable.
+
 ## Delta 2026-05-12 — TASK-826: Client Portal module assignment lifecycle (5 events v1)
 
 Aggregate type: `client_portal_module_assignment`.

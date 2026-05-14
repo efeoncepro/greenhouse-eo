@@ -1,5 +1,7 @@
 'use client'
 
+import Link from 'next/link'
+
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
@@ -32,7 +34,7 @@ type Props = {
    * operadores no son EFEONCE_ADMIN pero tienen la capability).
    */
   canCompleteIntake?: boolean
-  onCompleteIntake?: () => void
+  workforceActivationHref?: string
 }
 
 const INTEGRATION_ITEMS = [
@@ -48,7 +50,7 @@ const PersonProfileHeader = ({
   onDeactivate,
   onEditCompensation,
   canCompleteIntake,
-  onCompleteIntake
+  workforceActivationHref
 }: Props) => {
   const { member, integrations, summary } = detail
   const roleCategory = safeRoleCategory(member.roleCategory)
@@ -170,13 +172,14 @@ const PersonProfileHeader = ({
               icon={<i className={member.active ? 'tabler-check' : 'tabler-user-off'} />}
               label={member.active ? 'Activo' : 'Inactivo'}
             />
-            {showCompleteIntake && onCompleteIntake ? (
+            {showCompleteIntake && workforceActivationHref ? (
               <Button
+                component={Link}
+                href={workforceActivationHref}
                 variant='contained'
                 color='warning'
                 size='small'
-                onClick={onCompleteIntake}
-                startIcon={<i className='tabler-check' />}
+                startIcon={<i className='tabler-route' />}
                 aria-label={GH_WORKFORCE_INTAKE.button_complete_intake_aria}
               >
                 {GH_WORKFORCE_INTAKE.button_complete_intake}

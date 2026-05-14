@@ -1,3 +1,20 @@
+# Sesion 2026-05-14 — TASK-876 Workforce Activation Remediation Flow SHIPPED ✅
+
+- **Branch**: `develop` directo por instruccion explicita del usuario; no se cambio de rama.
+- **Regla de datos reales**: no se resolvieron ni mutaron los casos reales de Felipe Zurita ni Maria Camila Hoyos desde automatizacion. El objetivo fue habilitar el flujo para que el operador humano lo pruebe y complete.
+- **Hallazgo clave**: Claude/TASK-874/TASK-875 si dejaron backend para readiness, guard final `complete-intake` y `WorkRelationshipOnboardingCase`, pero faltaba el backend de remediacion: no existia `PATCH /api/hr/workforce/members/[memberId]/intake`, y Personas seguia intentando editar fecha de ingreso por HR Core/BigQuery, lo que falla para members SCIM/PG-only con `Team member not found`.
+- **Qué cambió**: se agrego primitive transaccional `updateWorkforceMemberIntake()` sobre `greenhouse_core.members`, endpoints HR/admin `PATCH .../intake`, endpoint HR `GET .../activation-readiness`, capability `workforce.member.intake.update`, evento outbox `workforce.member.intake_updated`, drawer de remediacion en Workforce Activation y deep-link `?memberId=` desde Personas.
+- **UI/flujo**: Workforce Activation separa ahora `Resolver blockers` de `Completar ficha`. Si readiness no esta ready, el operador abre remediacion con blockers actuales, datos laborales editables, compensacion via `CompensationDrawer` existente y pago via `PaymentProfilesPanel` existente. `Completar ficha` queda como accion final solo cuando readiness lo permite.
+- **Personas**: el CTA de un member pending/in_review navega a `/hr/workforce/activation?memberId=<id>`; la edicion de fecha de ingreso para pending/in_review usa el endpoint workforce y ya no pasa por HR Core legacy.
+- **Access model**:
+  - `routeGroups`: `hr` mantiene la surface primaria.
+  - `views`: `equipo.workforce_activation` suma la capability de update.
+  - `entitlements`: nueva `workforce.member.intake.update` grantada runtime para HR route group, EFEONCE_ADMIN y FINANCE_ADMIN.
+  - `startup policy`: sin cambios.
+- **Migracion aplicada**: `20260514140325495_task-876-workforce-intake-update-capability.sql`; `src/types/db.d.ts` regenerado por `pnpm migrate:up`.
+- **Validacion ejecutada**: `pnpm pg:doctor`, `pnpm migrate:up`, focused Vitest 26/26, `pnpm exec tsc --noEmit --pretty false`, `pnpm design:lint`, `pnpm lint` (0 errores, 4 warnings legacy TASK-825), `pnpm build`, `pnpm fe:capture` y smoke Playwright local abriendo el drawer de remediacion sin guardar datos reales.
+- **Riesgos/follow-ups**: el bloque de pago reusa `PaymentProfilesPanel` admin/finance existente; si se quiere que HR-only cree perfiles sin permisos finance/admin, hay que formalizar una capability delegada de payment profile para HR. Legal Profile sigue viviendo en su faceta dueña; Workforce Activation no duplica ese editor.
+
 # Sesion 2026-05-14 — TASK-875 WorkRelationship Onboarding Case Foundation SHIPPED ✅
 
 - **Branch**: `develop` directo por instruccion del usuario; no se cambio de rama.

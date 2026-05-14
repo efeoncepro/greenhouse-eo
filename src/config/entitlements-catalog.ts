@@ -1088,6 +1088,12 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     defaultScope: 'tenant'
   },
   {
+    key: 'workforce.member.intake.update',
+    module: 'workforce',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
     key: 'workforce.member.activation_readiness.read',
     module: 'workforce',
     actions: ['read'] as const,

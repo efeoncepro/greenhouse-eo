@@ -170,15 +170,23 @@ const PersonProfileTab = ({ detail }: Props) => {
     setEmploymentSaveError(null)
 
     try {
-      const response = await fetch(`/api/hr/core/members/${member.memberId}/profile`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          hireDate: hireDateDraft || null
-        })
-      })
+      const usesWorkforceIntake =
+        member.workforceIntakeStatus !== null && member.workforceIntakeStatus !== 'completed'
+
+      const response = await fetch(
+        usesWorkforceIntake
+          ? `/api/hr/workforce/members/${member.memberId}/intake`
+          : `/api/hr/core/members/${member.memberId}/profile`,
+        {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            hireDate: hireDateDraft || null
+          })
+        }
+      )
 
       const payload = await response.json().catch(() => null)
 
@@ -193,7 +201,11 @@ const PersonProfileTab = ({ detail }: Props) => {
         throw new Error(errorMessage)
       }
 
-      setHireDateOverride(typeof payload?.hireDate === 'string' || payload?.hireDate === null ? payload.hireDate : hireDateDraft || null)
+      const nextHireDate = usesWorkforceIntake
+        ? payload?.after?.hireDate
+        : payload?.hireDate
+
+      setHireDateOverride(typeof nextHireDate === 'string' || nextHireDate === null ? nextHireDate : hireDateDraft || null)
       setEmploymentDialogOpen(false)
     } catch (error) {
       setEmploymentSaveError(error instanceof Error ? error.message : 'No se pudo guardar la fecha de ingreso.')

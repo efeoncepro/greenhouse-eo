@@ -21,10 +21,12 @@ import CustomChip from '@core/components/mui/Chip'
 import { getMicrocopy } from '@/lib/copy'
 import EmptyState from '@/components/greenhouse/EmptyState'
 import { GH_WORKFORCE_ACTIVATION, GH_WORKFORCE_INTAKE } from '@/lib/copy/workforce'
+import CompensationDrawer, { type CompensationSavePayload } from '@/views/greenhouse/payroll/CompensationDrawer'
 
 import CompleteIntakeDrawer, {
   type CompleteIntakeDrawerMember
 } from './CompleteIntakeDrawer'
+import WorkforceIntakeRemediationDrawer from './WorkforceIntakeRemediationDrawer'
 
 import type {
   ListPendingIntakeMembersCursor,
@@ -46,6 +48,8 @@ interface WorkforceActivationViewProps {
   readonly pendingSignal: ReliabilitySignal | null
   readonly apiPath?: string
   readonly completeIntakeApiBasePath?: string
+  readonly intakeApiBasePath?: string
+  readonly initialSelectedMemberId?: string | null
 }
 
 type ActivationFilter = 'all' | 'ready' | 'compensation' | 'hire_date' | 'relationship' | 'payment' | 'contractor'
@@ -289,10 +293,12 @@ const QueueRow = ({
 
 const ReadinessInspector = ({
   row,
-  onComplete
+  onComplete,
+  onResolve
 }: {
   row: PendingIntakeMemberRow | null
   onComplete: () => void
+  onResolve: () => void
 }) => {
   if (!row || !row.activationReadiness) {
     return (
@@ -335,11 +341,17 @@ const ReadinessInspector = ({
           </Stack>
 
           <Stack direction={{ xs: 'column', sm: 'row', lg: 'column' }} spacing={2}>
-            <Button fullWidth size='small' variant={ready ? 'contained' : 'outlined'} disabled={!ready} startIcon={<i className='tabler-circle-check' />} onClick={onComplete}>
-              {GH_WORKFORCE_ACTIVATION.complete}
-            </Button>
-            <Button fullWidth size='small' variant='tonal' color='secondary' startIcon={<i className='tabler-route' />} href={readiness.blockers[0]?.deepLink ?? `/people/${row.memberId}`}>
-              {GH_WORKFORCE_ACTIVATION.unblock_route}
+            {ready ? (
+              <Button fullWidth size='small' variant='contained' startIcon={<i className='tabler-circle-check' />} onClick={onComplete}>
+                {GH_WORKFORCE_ACTIVATION.complete}
+              </Button>
+            ) : (
+              <Button fullWidth size='small' variant='contained' startIcon={<i className='tabler-tool' />} onClick={onResolve}>
+                {GH_WORKFORCE_ACTIVATION.resolve_blockers}
+              </Button>
+            )}
+            <Button fullWidth size='small' variant='tonal' color='secondary' startIcon={<i className='tabler-route' />} onClick={onResolve}>
+              {ready ? GH_WORKFORCE_ACTIVATION.resolve_blockers : GH_WORKFORCE_ACTIVATION.unblock_route}
             </Button>
           </Stack>
 
@@ -388,7 +400,9 @@ const WorkforceActivationView = ({
   initialTotalApprox,
   pendingSignal,
   apiPath = '/api/admin/workforce/activation',
-  completeIntakeApiBasePath = '/api/admin/workforce/members'
+  completeIntakeApiBasePath = '/api/admin/workforce/members',
+  intakeApiBasePath = completeIntakeApiBasePath,
+  initialSelectedMemberId = null
 }: WorkforceActivationViewProps) => {
   const [items, setItems] = useState<PendingIntakeMemberRow[]>(initialItems)
   const [cursor, setCursor] = useState<ListPendingIntakeMembersCursor | null>(initialCursor)
@@ -398,8 +412,10 @@ const WorkforceActivationView = ({
   const [activationFilter, setActivationFilter] = useState<ActivationFilter>('all')
   const [loadingMore, setLoadingMore] = useState(false)
   const [refreshing, setRefreshing] = useState(false)
-  const [selectedId, setSelectedId] = useState<string | null>(initialItems[0]?.memberId ?? null)
+  const [selectedId, setSelectedId] = useState<string | null>(initialSelectedMemberId ?? initialItems[0]?.memberId ?? null)
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const [remediationOpen, setRemediationOpen] = useState(false)
+  const [compensationOpen, setCompensationOpen] = useState(false)
 
   const visibleItems = useMemo(() => filterRows(items, activationFilter), [items, activationFilter])
 
@@ -454,7 +470,7 @@ const WorkforceActivationView = ({
     }
   }, [cursor, loadingMore, fetchPage])
 
-  const handleCompletedFromDrawer = useCallback(async () => {
+  const refreshQueue = useCallback(async (preferredMemberId?: string | null) => {
     setRefreshing(true)
 
     try {
@@ -464,13 +480,42 @@ const WorkforceActivationView = ({
       setCursor(data.nextCursor)
       setHasMore(data.hasMore)
       setTotalApprox(data.totalApprox)
-      setSelectedId(data.items[0]?.memberId ?? null)
+      setSelectedId(prev => {
+        const preferred = preferredMemberId ?? prev
+
+        return data.items.some(item => item.memberId === preferred)
+          ? preferred
+          : data.items[0]?.memberId ?? null
+      })
     } catch {
       toast.error(GH_WORKFORCE_INTAKE.queue_load_error)
     } finally {
       setRefreshing(false)
     }
   }, [fetchPage])
+
+  const handleCompletedFromDrawer = useCallback(async () => {
+    await refreshQueue(null)
+  }, [refreshQueue])
+
+  const handleSaveCompensation = useCallback(async ({ mode, input, versionId }: CompensationSavePayload) => {
+    const isUpdate = mode === 'update' && versionId
+
+    const response = await fetch(isUpdate ? `/api/hr/payroll/compensation/${versionId}` : '/api/hr/payroll/compensation', {
+      method: isUpdate ? 'PATCH' : 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(input)
+    })
+
+    if (!response.ok) {
+      const payload = await response.json().catch(() => ({}))
+
+      throw new Error(payload.error || 'Error al guardar compensación')
+    }
+
+    toast.success(isUpdate ? 'Compensación actualizada' : 'Nueva versión de compensación creada')
+    await refreshQueue(selected?.memberId ?? null)
+  }, [refreshQueue, selected?.memberId])
 
   const showBanner = pendingSignal !== null && (pendingSignal.severity === 'error' || pendingSignal.severity === 'warning')
 
@@ -562,7 +607,11 @@ const WorkforceActivationView = ({
           ) : null}
         </Card>
 
-        <ReadinessInspector row={selected} onComplete={() => setDrawerOpen(true)} />
+        <ReadinessInspector
+          row={selected}
+          onComplete={() => setDrawerOpen(true)}
+          onResolve={() => setRemediationOpen(true)}
+        />
       </Box>
 
       <CompleteIntakeDrawer
@@ -572,6 +621,26 @@ const WorkforceActivationView = ({
         onCompleted={handleCompletedFromDrawer}
         completeIntakeApiBasePath={completeIntakeApiBasePath}
       />
+      <WorkforceIntakeRemediationDrawer
+        open={remediationOpen}
+        member={selected}
+        intakeApiBasePath={intakeApiBasePath}
+        onClose={() => setRemediationOpen(false)}
+        onSaved={async () => {
+          await refreshQueue(selected?.memberId ?? null)
+        }}
+        onOpenCompensation={() => setCompensationOpen(true)}
+      />
+      {selected ? (
+        <CompensationDrawer
+          open={compensationOpen}
+          onClose={() => setCompensationOpen(false)}
+          existingVersion={null}
+          memberId={selected.memberId}
+          memberName={selected.displayName}
+          onSave={handleSaveCompensation}
+        />
+      ) : null}
     </Stack>
   )
 }

@@ -80,8 +80,11 @@ export interface WorkforceActivationMemberSnapshot {
   readonly hireDate: string | null
   readonly employmentType: string | null
   readonly contractType: string | null
+  readonly contractEndDate: string | null
+  readonly dailyRequired: boolean | null
   readonly payRegime: string | null
   readonly payrollVia: string | null
+  readonly deelContractId: string | null
   readonly roleTitle: string | null
   readonly roleTitleSource: string | null
   readonly compensationCurrency: 'CLP' | 'USD' | null

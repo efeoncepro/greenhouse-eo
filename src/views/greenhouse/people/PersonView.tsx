@@ -18,9 +18,6 @@ import { ROLE_CODES } from '@/config/role-codes'
 import type { PersonDetail, PersonDetailAssignment } from '@/types/people'
 
 import CompensationDrawer, { type CompensationSavePayload } from '@views/greenhouse/payroll/CompensationDrawer'
-import CompleteIntakeDrawer, {
-  type CompleteIntakeDrawerMember
-} from '@views/greenhouse/admin/workforce-activation/CompleteIntakeDrawer'
 import EditProfileDrawer from './drawers/EditProfileDrawer'
 import AddPersonMembershipDrawer from './drawers/AddPersonMembershipDrawer'
 import EditPersonMembershipDrawer, { type MembershipRowData } from './drawers/EditPersonMembershipDrawer'
@@ -41,7 +38,6 @@ const PersonView = ({ memberId }: Props) => {
   const [deactivateConfirmOpen, setDeactivateConfirmOpen] = useState(false)
   const [deactivating, setDeactivating] = useState(false)
   const [compensationOpen, setCompensationOpen] = useState(false)
-  const [completeIntakeOpen, setCompleteIntakeOpen] = useState(false)
   const [membershipDrawerOpen, setMembershipDrawerOpen] = useState(false)
   const [editMembership, setEditMembership] = useState<{ membership: MembershipRowData; assignment?: PersonDetailAssignment } | null>(null)
   const [membershipReloadKey, setMembershipReloadKey] = useState(0)
@@ -168,7 +164,7 @@ const PersonView = ({ memberId }: Props) => {
           onDeactivate={() => setDeactivateConfirmOpen(true)}
           onEditCompensation={() => setCompensationOpen(true)}
           canCompleteIntake={canCompleteIntake}
-          onCompleteIntake={() => setCompleteIntakeOpen(true)}
+          workforceActivationHref={`/hr/workforce/activation?memberId=${encodeURIComponent(detail.member.memberId)}`}
         />
         <PersonTabs
           detail={detail}
@@ -180,29 +176,6 @@ const PersonView = ({ memberId }: Props) => {
         />
       </Stack>
 
-      {canCompleteIntake && (
-        <CompleteIntakeDrawer
-          open={completeIntakeOpen}
-          member={
-            detail.member.workforceIntakeStatus &&
-            detail.member.workforceIntakeStatus !== 'completed'
-              ? ({
-                  memberId: detail.member.memberId,
-                  displayName: detail.member.displayName,
-                  primaryEmail: detail.member.publicEmail || detail.member.internalEmail,
-                  workforceIntakeStatus: detail.member.workforceIntakeStatus,
-                  identityProfileId: detail.member.identityProfileId,
-                  createdAt: null,
-                  ageDays: null
-                } satisfies CompleteIntakeDrawerMember)
-              : null
-          }
-          onClose={() => setCompleteIntakeOpen(false)}
-          onCompleted={async () => {
-            await loadDetail()
-          }}
-        />
-      )}
       {isAdmin && (
         <>
           <EditProfileDrawer

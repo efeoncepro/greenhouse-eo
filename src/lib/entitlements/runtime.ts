@@ -343,6 +343,14 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       scope: 'tenant',
       source
     })
+
+    addEntitlement(entries, {
+      module: 'workforce',
+      capability: 'workforce.member.intake.update',
+      action: 'update',
+      scope: 'tenant',
+      source
+    })
   }
 
   // TASK-874 — Workforce Activation readiness.
