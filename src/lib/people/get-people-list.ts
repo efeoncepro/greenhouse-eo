@@ -1,6 +1,6 @@
 import 'server-only'
 
-import type { PeopleListPayload, PersonListItem } from '@/types/people'
+import type { PeopleListPayload, PersonListItem, WorkforceIntakeStatus } from '@/types/people'
 
 import { getBigQueryProjectId } from '@/lib/bigquery'
 import { isGreenhousePostgresConfigured, runGreenhousePostgresQuery } from '@/lib/postgres/client'
@@ -19,6 +19,21 @@ type PeopleListRow = {
   location_country: string | null
   active: boolean | null
   pay_regime: string | null
+  workforce_intake_status: string | null
+}
+
+const KNOWN_WORKFORCE_INTAKE_STATUSES: ReadonlySet<WorkforceIntakeStatus> = new Set([
+  'pending_intake',
+  'in_review',
+  'completed'
+])
+
+const normalizeWorkforceIntakeStatus = (value: string | null): WorkforceIntakeStatus | null => {
+  if (!value) return null
+
+  return KNOWN_WORKFORCE_INTAKE_STATUSES.has(value as WorkforceIntakeStatus)
+    ? (value as WorkforceIntakeStatus)
+    : null
 }
 
 const normalizePersonListItem = (row: PeopleListRow): PersonListItem => {
@@ -44,7 +59,8 @@ const normalizePersonListItem = (row: PeopleListRow): PersonListItem => {
     contractedFte: 1,
     assignedFte: 0,
     totalFte: 0,
-    payRegime: row.pay_regime === 'international' ? 'international' : row.pay_regime === 'chile' ? 'chile' : null
+    payRegime: row.pay_regime === 'international' ? 'international' : row.pay_regime === 'chile' ? 'chile' : null,
+    workforceIntakeStatus: normalizeWorkforceIntakeStatus(row.workforce_intake_status)
   }
 }
 
@@ -213,7 +229,8 @@ const getPeopleListFromPostgres = async (
       m.avatar_url,
       m.location_country,
       m.active,
-      c.pay_regime
+      c.pay_regime,
+      m.workforce_intake_status
     FROM greenhouse_core.members m
     LEFT JOIN current_comp c ON c.member_id = m.member_id
     LEFT JOIN greenhouse_core.departments dept ON dept.department_id = m.department_id
@@ -322,7 +339,10 @@ const getPeopleListFromBigQuery = async (memberIds?: string[]): Promise<PeopleLi
         tm.avatar_url,
         ${locationCountrySelect}
         tm.active,
-        c.pay_regime
+        c.pay_regime,
+        -- TASK-873: BQ fallback no expone workforce_intake_status (vive solo en PG).
+        -- Consumers tratan NULL como 'completed' (back-compat legacy).
+        CAST(NULL AS STRING) AS workforce_intake_status
       FROM \`${projectId}.greenhouse.team_members\` AS tm
       LEFT JOIN current_compensation AS c
         ON c.member_id = tm.member_id

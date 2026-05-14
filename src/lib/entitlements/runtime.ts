@@ -318,6 +318,33 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     })
   }
 
+  // TASK-873 — workforce intake completion gate.
+  // Capability `workforce.member.complete_intake` quedó seedeada en
+  // capabilities_registry por TASK-872 Slice 1.5 pero nunca grantada en
+  // runtime → endpoint POST /api/admin/workforce/members/[memberId]/complete-intake
+  // estaba inaccesible incluso para EFEONCE_ADMIN. TASK-873 cierra ese loop
+  // y declara la matriz canónica: HR route_group (HR_PAYROLL, HR_MANAGER,
+  // etc.) ∪ EFEONCE_ADMIN ∪ FINANCE_ADMIN. La capability sigue siendo
+  // tenant-scoped + action 'update'; el override de readiness (V1.1, TASK-874)
+  // se modelará como capability granular separada.
+  if (
+    hasRouteGroup(subject, 'hr') ||
+    hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) ||
+    hasRole(subject, ROLE_CODES.FINANCE_ADMIN)
+  ) {
+    const source: TenantEntitlementSource = hasRouteGroup(subject, 'hr')
+      ? 'route_group'
+      : 'role'
+
+    addEntitlement(entries, {
+      module: 'workforce',
+      capability: 'workforce.member.complete_intake',
+      action: 'update',
+      scope: 'tenant',
+      source
+    })
+  }
+
   if (hasRouteGroup(subject, 'hr') || hasAuthorizedView(subject, 'equipo.offboarding') || hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
     const source: TenantEntitlementSource = hasRouteGroup(subject, 'hr')
       ? 'route_group'

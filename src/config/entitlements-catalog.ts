@@ -14,7 +14,12 @@ export const ENTITLEMENT_MODULES = [
   'organization',
   // TASK-848 — namespace de control plane production (release / rollback / preflight bypass).
   // Capabilities granulares least-privilege, NO platform.admin catch-all.
-  'platform'
+  'platform',
+  // TASK-872 + TASK-873 — namespace del workflow workforce intake / activation.
+  // Distinto de `hr` (procesos HR transversales) y `people` (directorio operativo).
+  // V1: workforce.member.complete_intake (transición pending_intake → completed).
+  // V1.1 follow-up (TASK-874): workforce.member.activation_readiness.{read,override}.
+  'workforce'
 ] as const
 
 export type GreenhouseEntitlementModule = (typeof ENTITLEMENT_MODULES)[number]

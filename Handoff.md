@@ -1,3 +1,20 @@
+# Sesion 2026-05-14 — TASK-873 Workforce Intake UI V1.1 in-progress
+
+- **Branch**: `develop` (sin branch separada — instrucción operativa "mantente en develop").
+- **Discovery hallazgo bloqueante**: capability `workforce.member.complete_intake` quedó seedeada en `capabilities_registry` por TASK-872 Slice 1.5 pero NUNCA se grantó en `src/lib/entitlements/runtime.ts`. Endpoint `POST /api/admin/workforce/members/[memberId]/complete-intake` retorna 403 incluso para EFEONCE_ADMIN. Slice 1 cierra ese loop.
+- **Open Questions resueltas pre-execution** (las 4 originales + 2 emergentes):
+  - Q1: capability extenderse a `hr_payroll` → SÍ vía `hasRouteGroup('hr')` canonical pattern + EFEONCE_ADMIN + FINANCE_ADMIN.
+  - Q2: banner drawer hardcoded vs configurable → HARDCODED en microcopy V1.
+  - Q3: filter por antigüedad → NO V1 (status filter suficiente).
+  - Q4: drawer historia member → NO V1 (out of scope).
+  - Q5 (emergent): add view_registry entry `admin.workforce.intake_queue` → SÍ con migration seed role_view_assignments (per CLAUDE.md TASK-827 governance pattern).
+  - Q6 (emergent, BLOQUEANTE): grant en runtime.ts → SÍ en Slice 1.
+- **Decisión arquitectónica TASK-873 vs TASK-874**: Codex creó TASK-874 (Workforce Activation Readiness Resolver + Workspace, P1/Alto/Alto, **Blocked by TASK-873**). Análisis arch-architect 4-pillar confirmó orden 873 → 874: spec de 874 lo declara explícitamente; UI thin layer de 873 valida flow operativo HR con datos reales antes de diseñar readiness blockers; queue de 873 es el surface donde el resolver de 874 vive. Optimizaciones tácticas aplicadas para reducir fricción downstream: response shape del API expone slots opcionales `readinessStatus?`, `blockerCount?`, `topBlockerLane?` desde V1.0 → 874 los populate sin breaking change ("thin adapter" que la propia spec de 874 menciona).
+- **Slices entregados al 2026-05-14**:
+  - Slice 1 IN-PROGRESS: runtime grant + microcopy GH_WORKFORCE_INTAKE + helper `listPendingIntakeMembers` cursor keyset + `PersonListItem.workforceIntakeStatus` field + `get-people-list.ts` SELECT extendido. 8/8 tests verdes, tsc clean, lint clean (warnings pre-existentes no relacionados).
+- **Sentry alert observado durante sesión**: JAVASCRIPT-NEXTJS-5A (14 warnings `role_view_fallback_used` en `GET /admin/views`, ts 2026-05-13 09:35:38). **NO causado por TASK-873** (timestamps anteriores al trabajo, mis cambios aún sin commit). Causa raíz: drift TS↔DB en view_registry (95 DB rows vs 96 TS viewCodes — 1 viewCode huérfano agregado por commit reciente sin migration acompañante). Pattern documentado en CLAUDE.md "View Registry Governance Pattern (TASK-827)". Recomendación: crear ISSUE chico de hygiene al cierre TASK-873.
+- **Próximo paso**: Slice 2 (badge en PeopleListTable) → Slice 3 (drawer + botón PersonView) → Slice 4 (admin queue + view registry migration con pattern canonical) → Slice 5 (link CTA operations) → Slice 6 (E2E + docs + close).
+
 # Sesion 2026-05-13 — Diagnostico SCIM Felipe Zurita / Maria Camila Hoyos
 
 - **Trigger**: usuario reporto que Felipe Zurita y Maria Camila Hoyos se crearon en Microsoft Entra pero "no aparecian" en Greenhouse aunque SCIM esta activo.

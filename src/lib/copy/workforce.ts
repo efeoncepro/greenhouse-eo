@@ -231,6 +231,106 @@ export const GH_CLIENT_TALENT = {
   error_profiles: 'No pudimos cargar los perfiles del equipo. Intenta de nuevo.'
 } as const
 
+/* ─────────────────── Workforce Intake (TASK-873) ─────────────────── */
+// Copy canónico para el workflow de Workforce Intake (member.workforce_intake_status
+// pending_intake | in_review → completed). Surfaces consumidores:
+// - Badge en PeopleListTable (Slice 2)
+// - Botón "Completar ficha" en PersonView + drawer compartido (Slice 3)
+// - Admin queue /admin/workforce/intake-queue (Slice 4)
+// - Link CTA en /admin/operations dashboard (Slice 5)
+// Operador objetivo: HR (HR_PAYROLL, HR_MANAGER), FINANCE_ADMIN, EFEONCE_ADMIN.
+// Tono: es-CL, tuteo, sentence case. Mirror de GH_RELEASE_ADMIN shape.
+// V1.0: validación pre-flight queda como TASK-874. El operador confirma
+// manualmente que la ficha está completa antes de completar — la copy lo
+// explicita en el banner del drawer.
+
+export const GH_WORKFORCE_INTAKE = {
+  // ── Badges (PeopleListTable + PersonView) ─────────────────────────────
+  badge_pending_intake: 'Ficha pendiente',
+  badge_in_review: 'Ficha en revisión',
+  badge_pending_intake_aria: 'Colaborador con ficha laboral pendiente de completar',
+  badge_in_review_aria: 'Colaborador con ficha laboral en revisión',
+
+  // ── Status labels (queue + drawer) ────────────────────────────────────
+  status_pending_intake: 'Pendiente',
+  status_in_review: 'En revisión',
+  status_completed: 'Completada',
+
+  // ── Action button (PersonView + queue row) ────────────────────────────
+  button_complete_intake: 'Completar ficha',
+  button_complete_intake_aria: 'Completar ficha laboral del colaborador',
+
+  // ── Complete intake drawer ────────────────────────────────────────────
+  drawer_title: 'Completar ficha laboral',
+  drawer_subtitle_template: (displayName: string) =>
+    `${displayName} dejará de aparecer como pendiente y entrará al flujo operativo de payroll.`,
+  drawer_close_aria: 'Cerrar drawer',
+  drawer_section_member: 'Colaborador',
+  drawer_section_action: 'Confirmar acción',
+  drawer_field_display_name: 'Nombre',
+  drawer_field_email: 'Correo',
+  drawer_field_status: 'Estado actual',
+  drawer_field_age_days: 'Antigüedad',
+  drawer_field_identity_profile: 'Identity profile',
+  drawer_age_days_template: (n: number) =>
+    `${n} día${n === 1 ? '' : 's'} desde creación SCIM`,
+  drawer_warning_title: 'Verifica antes de completar',
+  drawer_warning_body:
+    'Confirma que contrato, compensación, perfil legal y datos de pago están al día. V1.0 no valida los datos automáticamente — la validación pre-flight llega en una iteración posterior.',
+  drawer_reason_label: 'Notas (opcional)',
+  drawer_reason_placeholder: 'Contexto u observación para el registro de auditoría.',
+  drawer_reason_helper: 'Queda registrado en el outbox event y audit log.',
+  drawer_submit: 'Marcar como completada',
+  drawer_submit_loading: 'Completando…',
+  drawer_cancel: 'Cancelar',
+
+  // ── Toasts ────────────────────────────────────────────────────────────
+  toast_submit_success: 'Ficha completada',
+  toast_submit_error: 'No fue posible completar la ficha. Revisa los logs.',
+  toast_submit_forbidden: 'No tienes permiso para completar esta ficha.',
+  toast_submit_not_found: 'No se encontró el colaborador.',
+  toast_submit_conflict: 'La ficha está en un estado que no permite la transición.',
+
+  // ── Admin queue page ──────────────────────────────────────────────────
+  queue_page_title: 'Fichas laborales pendientes',
+  queue_page_subtitle:
+    'Colaboradores creados desde Entra que aún requieren completar contrato y compensación antes de entrar al flujo operativo.',
+  queue_filter_all: 'Todos',
+  queue_filter_pending: 'Pendientes',
+  queue_filter_in_review: 'En revisión',
+  queue_filter_aria: 'Filtrar por estado de ficha',
+
+  queue_column_name: 'Colaborador',
+  queue_column_email: 'Correo',
+  queue_column_status: 'Estado',
+  queue_column_created: 'Creado',
+  queue_column_age: 'Antigüedad',
+  queue_column_actions: 'Acciones',
+  queue_column_actions_aria: 'Acciones del colaborador',
+
+  queue_load_more: 'Cargar más colaboradores',
+  queue_loading: 'Cargando colaboradores…',
+  queue_load_error: 'No fue posible cargar más colaboradores. Intenta de nuevo.',
+
+  queue_empty_title: 'Sin fichas pendientes',
+  queue_empty_body:
+    'No hay colaboradores con ficha laboral pendiente o en revisión. Todo el equipo está al día.',
+
+  // ── Banner (queue + admin operations link) ────────────────────────────
+  banner_warning_template: (count: number, maxAgeDays: number) =>
+    count === 0
+      ? 'Sin colaboradores con ficha pendiente.'
+      : `${count} colaborador${count === 1 ? '' : 'es'} con ficha pendiente > 7 días${maxAgeDays >= 30 ? ` (máx ${maxAgeDays} días — escalar)` : ''}.`,
+  banner_link_to_queue: 'Ver fichas pendientes',
+  banner_link_to_queue_aria: 'Ir al workspace de fichas laborales pendientes',
+
+  // ── Header / breadcrumb ───────────────────────────────────────────────
+  page_breadcrumb_admin: 'Admin',
+  page_breadcrumb_workforce: 'Workforce'
+} as const
+
+export type GhWorkforceIntakeCopy = typeof GH_WORKFORCE_INTAKE
+
 /* ─────────────────── Commercial Pricing ─────────────────── */
 // Copy canónico para el programa de pricing comercial (TASK-463..468).
 // Inventariado y especificado en docs/tasks/complete/TASK-469-commercial-pricing-ui-interface-plan.md §4.
