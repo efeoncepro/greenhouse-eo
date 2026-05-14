@@ -190,7 +190,11 @@ export const AGGREGATE_TYPES = {
 
   // SCIM / Identity (TASK-872) — aggregate canonical para client_users
   // SCIM-provisioning + scim.* events
-  clientUser: 'client_user'
+  clientUser: 'client_user',
+
+  // HubSpot Companies async intake (TASK-878) — batch envelope para webhook
+  // companies/contacts. Mirror del pattern hubspot_services_batch (TASK-813b).
+  hubspotCompaniesBatch: 'hubspot_companies_batch'
 } as const
 
 export type AggregateType = (typeof AGGREGATE_TYPES)[keyof typeof AGGREGATE_TYPES]
@@ -718,7 +722,13 @@ export const EVENT_TYPES = {
   workforceMemberIntakeCompleted: 'workforce.member.intake_completed',
 
   // TASK-876 — Workforce Activation remediation before final completion.
-  workforceMemberIntakeUpdated: 'workforce.member.intake_updated'
+  workforceMemberIntakeUpdated: 'workforce.member.intake_updated',
+
+  // TASK-878 — HubSpot Companies async intake (canonical pattern TASK-813b).
+  // Webhook handler emite este event y retorna <100ms; el reactive consumer
+  // `hubspot_companies_intake` corre `syncHubSpotCompanyById` async en
+  // ops-worker Cloud Run con retry exponencial + dead-letter.
+  commercialHubspotCompanySyncRequested: 'commercial.hubspot_company.sync_requested'
 } as const
 
 export type EventType = (typeof EVENT_TYPES)[keyof typeof EVENT_TYPES]
@@ -870,7 +880,10 @@ export const REACTIVE_EVENT_TYPES = [
   EVENT_TYPES.accountingPlSnapshotMaterialized,
   EVENT_TYPES.accountingPlSnapshotPeriodMaterialized,
   EVENT_TYPES.staffAugPlacementSnapshotMaterialized,
-  EVENT_TYPES.staffAugPlacementSnapshotPeriodMaterialized
+  EVENT_TYPES.staffAugPlacementSnapshotPeriodMaterialized,
+
+  // TASK-878 — Async intake de companies HubSpot (mirror TASK-813b services).
+  EVENT_TYPES.commercialHubspotCompanySyncRequested
 ] as const
 
 // ── Event Payload Types (TASK-247) ──

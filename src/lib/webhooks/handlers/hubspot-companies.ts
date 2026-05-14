@@ -2,13 +2,12 @@ import { createHmac, timingSafeEqual } from 'node:crypto'
 
 import { registerInboundHandler } from '@/lib/webhooks/inbound'
 import { resolveSecret } from '@/lib/webhooks/signing'
-import { syncHubSpotCompanyById } from '@/lib/hubspot/sync-company-by-id'
-import { syncTenantCapabilitiesFromIntegration } from '@/lib/integrations/greenhouse-integration'
+import { publishOutboxEvent } from '@/lib/sync/publish-event'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { enqueueHubSpotServiceEventsAsync } from './hubspot-services'
 
 /**
- * HubSpot companies webhook handler — TASK-706.
+ * HubSpot companies webhook handler — TASK-706 + TASK-878 (async cutover).
  *
  * Suscripción HubSpot Developer Portal:
  *   - company.creation
@@ -24,17 +23,28 @@ import { enqueueHubSpotServiceEventsAsync } from './hubspot-services'
  *   - X-HubSpot-Signature-v3
  *   - X-HubSpot-Request-Timestamp
  *
- * Comportamiento:
+ * Comportamiento canónico (TASK-878 async, mirror TASK-813b services):
  *   1. Valida firma (rechaza requests sin firma válida).
  *   2. Parsea events (HubSpot envía array).
- *   3. Extrae HubSpot company IDs únicos. Para contact events extrae
+ *   3. Delega events `service.*`/`p_services.*` al sub-handler async services.
+ *   4. Extrae HubSpot company IDs únicos. Para contact events extrae
  *      el primaryCompanyId asociado.
- *   4. Para cada company ID, dispara syncHubSpotCompanyById que:
- *      a. Fetcha bridge /companies/{id} + /companies/{id}/contacts
- *      b. UPSERT en greenhouse_crm.companies + greenhouse_crm.contacts
- *      c. Promueve crm → core (organization + client) via syncHubSpotCompanies
- *   5. Falla individualmente no aborta el batch — cada company se intenta y
- *      los errores se capturan en Sentry con domain='integrations.hubspot'.
+ *   5. Para cada company ID, emite outbox event
+ *      `commercial.hubspot_company.sync_requested v1`. Latencia handler
+ *      < 100ms (sólo INSERT outbox por company id).
+ *   6. La projection canónica `hubspot_companies_intake` corre async en
+ *      ops-worker Cloud Run (Cloud Scheduler ops-reactive-finance cada 5min):
+ *      bridge fetch + UPSERT canónico + promote a core + capability sync.
+ *      Reintentos exponenciales (maxRetries=3) + dead-letter automático.
+ *
+ * **Por qué async** (root cause Sentry JAVASCRIPT-NEXTJS-5T, 2026-05-14):
+ *   - `syncHubSpotCompanyById` toma 3-10s por company.
+ *   - HubSpot timeout POST = 5s → retries concurrentes → race conditions.
+ *   - Path async desacopla: webhook nunca timeout, sync corre fuera del
+ *     request path, dispatcher V2 agrupa por aggregateId (= hubspotCompanyId)
+ *     y serializa per-scope eliminando duplicate bridge fetches en burst.
+ *   - Failures individuales se capturan en Sentry con
+ *     `domain='integrations.hubspot'` desde la projection refresh.
  */
 
 const SIGNATURE_HEADER = 'x-hubspot-signature-v3'
@@ -139,6 +149,48 @@ const validateHubSpotSignature = async (
   return timingSafeEqual(expectedBuf, receivedBuf)
 }
 
+/**
+ * TASK-878 — Async intake helper. Emite N outbox events
+ * `commercial.hubspot_company.sync_requested v1` (uno por unique hubspot
+ * company id) que la projection `hubspot_companies_intake` consume vía
+ * ops-reactive-finance cron. Webhook retorna <100ms sin esperar bridge fetch.
+ *
+ * Patrón canónico TASK-771/773. Mirror exacto de `enqueueHubSpotServiceEventsAsync`.
+ *
+ * `aggregateId = hubspotCompanyId` permite al dispatcher V2 agrupar events
+ * concurrentes para el mismo company en una sola refresh call — mata la
+ * race condition raíz que dispararon los webhook retries pre TASK-878 Slice 2.
+ *
+ * Source identifica el origen para audit (hubspot-companies-webhook,
+ * hubspot-companies-webhook-delegation, etc.).
+ */
+export const enqueueHubSpotCompanyEventsAsync = async (
+  companyIds: string[],
+  source: string
+): Promise<{ enqueued: number }> => {
+  const unique = [...new Set(companyIds.map(id => id.trim()).filter(id => id.length > 0))]
+
+  if (unique.length === 0) {
+    return { enqueued: 0 }
+  }
+
+  for (const hubspotCompanyId of unique) {
+    await publishOutboxEvent({
+      aggregateType: 'hubspot_companies_batch',
+      aggregateId: hubspotCompanyId,
+      eventType: 'commercial.hubspot_company.sync_requested',
+      payload: {
+        version: 1,
+        hubspotCompanyId,
+        source,
+        enqueuedAt: new Date().toISOString()
+      }
+    })
+  }
+
+  return { enqueued: unique.length }
+}
+
 const extractCompanyIdsFromEvents = (events: HubSpotEvent[]): string[] => {
   const ids = new Set<string>()
 
@@ -225,61 +277,23 @@ registerInboundHandler('hubspot-companies', async (inboxEvent, rawBody, parsedPa
     return
   }
 
-  // 4. Sync each company. Failures are captured but don't abort the batch.
-  const results: Array<{ id: string; ok: boolean; error?: string }> = []
+  // 4. TASK-878 — Path canónico async: emite outbox events, retorna inmediato.
+  // La projection `hubspot_companies_intake` corre el bridge fetch + UPSERT +
+  // promote + capability sync en ops-reactive-finance cron, fuera del request
+  // path. Latencia handler <100ms (solo INSERT outbox por unique company id).
+  //
+  // Si el publishOutboxEvent falla (PG unreachable), capturamos en Sentry y
+  // rethrow para que HubSpot reintente el batch completo — la idempotencia
+  // del UPSERT canónico + dedup del dispatcher V2 garantiza safe re-runs.
+  try {
+    await enqueueHubSpotCompanyEventsAsync(companyIds, 'hubspot-companies-webhook')
+  } catch (err) {
+    captureWithDomain(err, 'integrations.hubspot', {
+      level: 'error',
+      tags: { source: 'hubspot-companies-webhook', step: 'enqueue-async' },
+      extra: { companyCount: companyIds.length, eventCount: events.length }
+    })
 
-  for (const id of companyIds) {
-    try {
-      const result = await syncHubSpotCompanyById(id, { promote: true, triggeredBy: 'hubspot-webhook' })
-
-      // Persist capability codes (business_lines + service_modules) into the
-      // canonical tenant capabilities table — replicates the work that the
-      // Cloud Run bridge used to do for property changes on `linea_de_servicio`
-      // and `servicios_especificos`. Now everything terminates in Greenhouse.
-      if (result.capabilities.businessLines.length > 0 || result.capabilities.serviceModules.length > 0) {
-        try {
-          await syncTenantCapabilitiesFromIntegration({
-            selector: {
-              clientId: null,
-              publicId: null,
-              sourceSystem: 'hubspot_crm',
-              sourceObjectType: 'company',
-              sourceObjectId: id
-            },
-            sourceSystem: 'hubspot_crm',
-            sourceObjectType: 'company',
-            sourceObjectId: id,
-            confidence: 'high',
-            businessLines: result.capabilities.businessLines,
-            serviceModules: result.capabilities.serviceModules
-          })
-        } catch (err) {
-          captureWithDomain(err, 'integrations.hubspot', {
-            level: 'warning',
-            tags: { source: 'hubspot-companies-webhook', step: 'capability-sync' },
-            extra: { hubspotCompanyId: id }
-          })
-        }
-      }
-
-      results.push({ id, ok: true })
-    } catch (err) {
-      const message = err instanceof Error ? err.message : String(err)
-
-      results.push({ id, ok: false, error: message })
-
-      captureWithDomain(err, 'integrations.hubspot', {
-        level: 'error',
-        tags: { source: 'hubspot-companies-webhook' },
-        extra: { hubspotCompanyId: id, eventCount: events.length }
-      })
-    }
-  }
-
-  const failed = results.filter(r => !r.ok)
-
-  if (failed.length === companyIds.length && failed.length > 0) {
-    // All failed — escalate so HubSpot retries.
-    throw new Error(`All ${failed.length} company syncs failed: ${failed.map(f => `${f.id}=${f.error}`).join('; ')}`)
+    throw err
   }
 })

@@ -54,6 +54,7 @@ import { teamsNotifyProjection } from './teams-notify'
 import { providerBqSyncProjection } from './provider-bq-sync'
 import { hrOnboardingAutoCreateProjection } from './hr-onboarding-auto-create'
 import { hubspotServicesIntakeProjection } from './hubspot-services-intake'
+import { hubspotCompaniesIntakeProjection } from './hubspot-companies-intake'
 import { paymentProfileNotificationsProjection } from './payment-profile-notifications'
 import { engagementConvertedProjection } from './engagement-converted'
 import { engagementCancelledProjection } from './engagement-cancelled'
@@ -123,6 +124,7 @@ export const ensureProjectionsRegistered = () => {
   registerProjection(teamsNotifyProjection)
   registerProjection(providerBqSyncProjection) // TASK-771 — provider.upserted → BQ MERGE + fin_suppliers UPDATE
   registerProjection(hubspotServicesIntakeProjection) // TASK-813b — async intake p_services HubSpot via outbox event
+  registerProjection(hubspotCompaniesIntakeProjection) // TASK-878 — async intake companies + contacts HubSpot via outbox event (mirror TASK-813b)
   registerProjection(hrOnboardingAutoCreateProjection)
   registerProjection(paymentProfileNotificationsProjection) // TASK-753 — notify beneficiary on profile lifecycle events
   registerProjection(engagementConvertedProjection)

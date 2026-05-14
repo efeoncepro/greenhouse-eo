@@ -77,6 +77,25 @@ Reglas duras (anti-regresión):
 - NUNCA bypass del UPSERT canónico para mutar `services` directo en producción. Toda transición pasa por `upsertServiceFromHubSpot()`.
 - NUNCA inventar nuevos `triggeredBy` sin agregar al enum del payload contract.
 
+## Delta 2026-05-14 — TASK-878: HubSpot companies + contacts async intake (1 event v1 nuevo)
+
+Aggregate type: `hubspot_companies_batch`.
+
+| Event type | Trigger | Payload | Consumer |
+| --- | --- | --- | --- |
+| `commercial.hubspot_company.sync_requested` | Webhook `hubspot-companies` recibe events `company.*` / `contact.*` / `object.*` (Developer Platform 2025.2). El handler valida firma, extrae `companyIds` únicos del batch, y emite un event por unique company id. | `{version:1, hubspotCompanyId:string, source:string, enqueuedAt}` | Projection `hubspot_companies_intake` (domain=finance, mirror TASK-813b) consume vía ops-reactive-finance cron, hace bridge fetch (`/companies/{id}` + `/companies/{id}/contacts`) + UPSERT canónico greenhouse_crm + promote crm → core + capability sync, fuera del request path. |
+
+**Por qué async** (root cause Sentry JAVASCRIPT-NEXTJS-5T, 2026-05-14): `syncHubSpotCompanyById` toma 3-10s por company (2 bridge fetches + N contact UPSERTs + promote `syncHubSpotCompanies({fullResync:false})`). HubSpot tiene 5s timeout POST → retries concurrentes → race conditions. TASK-878 Slice 1 cerró la race condition estructural (RETURNING canónico). Slice 2 (este event) cierra la causa arquitectónica: webhook responde <100ms, sync corre async, retries innecesarios.
+
+**Latencia post-refactor**: webhook < 100ms (sólo INSERT outbox por unique company id). Bridge fetch + UPSERT corre fuera del request path en cron `ops-reactive-finance` (cada 5 min). El dispatcher V2 agrupa events por `aggregateId = hubspotCompanyId` y serializa per-scope — N events para el mismo company colapsan en una sola refresh call.
+
+Hard rules:
+
+- NUNCA hacer bridge fetch (Cloud Run hubspot-greenhouse-integration) sincrono dentro del webhook handler request path. Toda materialización companies pasa por el outbox event.
+- NUNCA llamar `syncHubSpotCompanyById` desde un route handler de webhook. El path canónico de runtime es la projection `hubspot_companies_intake`. CLI scripts (`scripts/integrations/hubspot-sync-company.ts`) y admin endpoint (`/api/admin/integrations/hubspot/sync-company`) pueden llamarlo directo porque corren fuera del 5s budget HubSpot.
+- `aggregateId` SIEMPRE = `hubspotCompanyId` (no batch envelope). Permite al dispatcher V2 agrupar concurrent events del mismo company en una sola refresh, eliminando duplicate bridge fetches bajo burst.
+- Reliability signal canonical: `commercial.hubspot_company.intake_dead_letter` (kind=dead_letter, severity=error si count>0, steady=0). Subsystem rollup: `commercial`.
+
 ## Delta 2026-05-06 — TASK-813b: HubSpot p_services async intake (1 event v1 nuevo)
 
 Aggregate type: `hubspot_services_batch`.

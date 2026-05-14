@@ -51,6 +51,7 @@ import { getPaidOrdersWithoutExpensePaymentSignal } from './queries/payment-orde
 import { getPayrollComplianceExportDriftSignal } from './queries/payroll-compliance-export-drift'
 import { getPayrollExpenseMaterializationLagSignal } from './queries/payroll-expense-materialization-lag'
 import { getProviderBqSyncDeadLetterSignal } from './queries/provider-bq-sync-dead-letter'
+import { getHubspotCompaniesIntakeDeadLetterSignal } from './queries/hubspot-companies-intake-dead-letter'
 import { getServiceEngagementEngagementKindUnmappedSignal } from './queries/service-engagement-engagement-kind-unmapped'
 import { getServiceEngagementLifecycleStageUnknownSignal } from './queries/service-engagement-lifecycle-stage-unknown'
 import { getServiceEngagementLineageOrphanSignal } from './queries/service-engagement-lineage-orphan'
@@ -353,6 +354,7 @@ interface ReliabilityOverviewSources {
    * verán datos stale hasta resolver). Mismo patrón que paymentOrderSettlement.
    */
   providerBqSyncDeadLetter?: ReliabilitySignal[] | null
+  hubspotCompaniesIntakeDeadLetter?: ReliabilitySignal | null
 
   /**
    * TASK-773 Slice 4 — Outbox publisher health. 2 readers:
@@ -592,6 +594,8 @@ export const buildReliabilityOverview = (
     ...(sources.financeClpDrift ?? []),
     // TASK-771 Slice 4 — Provider BQ sync dead-letter signal (drift PG↔BQ).
     ...(sources.providerBqSyncDeadLetter ?? []),
+    // TASK-878 Slice 2 — HubSpot companies intake dead-letter (async webhook path).
+    ...(sources.hubspotCompaniesIntakeDeadLetter ? [sources.hubspotCompaniesIntakeDeadLetter] : []),
     // TASK-773 Slice 4 — Outbox publisher health (lag + dead_letter).
     ...(sources.outboxHealth ?? []),
     // TASK-408 Slice 4 — Email render/template safety net.
@@ -832,6 +836,14 @@ export const getReliabilityOverview = async (
       : await getProviderBqSyncDeadLetterSignal()
           .then(signal => [signal])
           .catch(() => null)
+
+  // TASK-878 Slice 2 — HubSpot companies intake dead-letter (mirror provider_bq_sync).
+  // Detecta path async caído: webhook companies emite outbox event pero la projection
+  // no logra completar el sync después de N retries → operador escala bridge / secret.
+  const hubspotCompaniesIntakeDeadLetter =
+    preloadedSources.hubspotCompaniesIntakeDeadLetter !== undefined
+      ? preloadedSources.hubspotCompaniesIntakeDeadLetter
+      : await getHubspotCompaniesIntakeDeadLetterSignal().catch(() => null)
 
   // TASK-773 Slice 4 — Outbox publisher health (lag + dead_letter).
   // 2 readers en paralelo. Cada uno degrada honestamente si su query falla.
@@ -1106,6 +1118,7 @@ export const getReliabilityOverview = async (
     finalSettlementPdfStatusDrift,
     financeClpDrift,
     providerBqSyncDeadLetter,
+    hubspotCompaniesIntakeDeadLetter,
     outboxHealth,
     emailRenderFailure,
     cronStagingDrift,
