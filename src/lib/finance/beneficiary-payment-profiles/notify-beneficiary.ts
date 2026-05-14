@@ -26,7 +26,6 @@ interface ProfileLookupRow {
   beneficiary_type: string
   beneficiary_id: string
   beneficiary_name: string | null
-  provider_slug: string | null
   bank_name: string | null
   account_number_masked: string | null
   currency: 'CLP' | 'USD'
@@ -47,28 +46,6 @@ interface MemberLookupRow {
   [key: string]: unknown
 }
 
-const PROVIDER_LABEL_MAP: Record<string, string> = {
-  bank_internal: 'Banco interno',
-  bank_external: 'Banco externo',
-  santander_chile: 'Santander Chile',
-  bci: 'BCI',
-  banco_estado: 'BancoEstado',
-  banco_chile: 'Banco de Chile',
-  scotiabank: 'Scotiabank',
-  itau: 'Itaú',
-  global66: 'Global66',
-  wise: 'Wise',
-  paypal: 'PayPal',
-  deel: 'Deel',
-  stripe: 'Stripe'
-}
-
-const resolveProviderLabel = (slug: string | null): string | null => {
-  if (!slug) return null
-
-  return PROVIDER_LABEL_MAP[slug] ?? slug
-}
-
 export interface NotifyBeneficiaryInput {
   profileId: string
   kind: PaymentProfileEmailKind
@@ -86,7 +63,7 @@ export const notifyBeneficiaryOfPaymentProfileChange = async (
 ): Promise<NotifyBeneficiaryResult> => {
   const profileRows = await query<ProfileLookupRow>(
     `SELECT profile_id, beneficiary_type, beneficiary_id, beneficiary_name,
-            provider_slug, bank_name, account_number_masked, currency,
+            bank_name, account_number_masked, currency,
             status, metadata_json, cancelled_reason,
             approved_at, cancelled_at, created_at
        FROM greenhouse_finance.beneficiary_payment_profiles
@@ -149,7 +126,6 @@ export const notifyBeneficiaryOfPaymentProfileChange = async (
   }
 
   const fullName = profile.beneficiary_name ?? member.display_name ?? recipientEmail
-  const providerLabel = resolveProviderLabel(profile.provider_slug)
   const requestedByMember = profile.metadata_json?.requested_by === 'member'
 
   const effectiveAt =
@@ -169,7 +145,6 @@ export const notifyBeneficiaryOfPaymentProfileChange = async (
       context: {
         fullName,
         kind: input.kind,
-        providerLabel,
         bankName: profile.bank_name,
         accountNumberMasked: profile.account_number_masked,
         currency: profile.currency,

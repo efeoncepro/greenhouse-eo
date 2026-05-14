@@ -537,7 +537,6 @@ export interface BeneficiaryPaymentProfileChangedEmailTemplateCopy {
   previewText: Record<BeneficiaryPaymentProfileChangedKind, string>
   intro: Record<BeneficiaryPaymentProfileChangedKind, (firstName: string, requestedByMember: boolean) => string>
   missingDate: string
-  providerLabel: string
   bankLabel: string
   accountLabel: string
   currencyLabel: string

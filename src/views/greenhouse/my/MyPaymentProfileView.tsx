@@ -65,22 +65,6 @@ const STATUS_META: Record<string, { label: string; color: 'primary' | 'info' | '
   cancelled: { label: GREENHOUSE_COPY.states.cancelled, color: 'error' }
 }
 
-const PROVIDER_LABELS: Record<string, string> = {
-  bank_internal: 'Banco interno',
-  bank_external: 'Banco externo',
-  santander_chile: 'Santander Chile',
-  bci: 'BCI',
-  banco_estado: 'BancoEstado',
-  banco_chile: 'Banco de Chile',
-  scotiabank: 'Scotiabank',
-  itau: 'Itaú',
-  global66: 'Global66',
-  wise: 'Wise',
-  paypal: 'PayPal',
-  deel: 'Deel',
-  stripe: 'Stripe'
-}
-
 const formatDate = (iso: string | null): string => {
   if (!iso) return '—'
 
@@ -341,7 +325,6 @@ const MyPaymentProfileView = () => {
 
 const ProfileSummary = ({ profile }: { profile: PaymentProfileSafe }) => {
   const statusMeta = STATUS_META[profile.status] ?? { label: profile.status, color: 'secondary' as const }
-  const providerLabel = profile.providerSlug ? (PROVIDER_LABELS[profile.providerSlug] ?? profile.providerSlug) : null
 
   return (
     <Stack spacing={2}>
@@ -356,7 +339,6 @@ const ProfileSummary = ({ profile }: { profile: PaymentProfileSafe }) => {
       <Divider />
 
       <Stack spacing={1}>
-        <DetailRow label='Proveedor' value={providerLabel ?? '—'} />
         <DetailRow label='Banco' value={profile.bankName ?? '—'} />
         <DetailRow label='Número de cuenta' value={profile.accountNumberMasked ?? '—'} mono />
         <DetailRow label='Moneda' value={profile.currency} />

@@ -215,4 +215,52 @@ describe('TASK-753 notifyBeneficiaryOfPaymentProfileChange — schema + degraded
     expect(result.status).toBe('sent')
     expect(mockedSend.mock.calls[0][0].recipients[0].email).toBe('carlos@efeonce.org')
   })
+
+  it('does not expose payment source/provider context in beneficiary emails', async () => {
+    mockedQuery
+      .mockResolvedValueOnce([
+        {
+          profile_id: 'bpp-6',
+          beneficiary_type: 'member',
+          beneficiary_id: 'mem-5',
+          beneficiary_name: 'Felipe Zurita',
+          provider_slug: 'santander',
+          bank_name: 'Banco Falabella',
+          account_number_masked: '•••• 0996',
+          currency: 'CLP',
+          status: 'active',
+          metadata_json: {},
+          cancelled_reason: null,
+          approved_at: new Date('2026-05-14T12:00:00Z'),
+          cancelled_at: null,
+          created_at: new Date('2026-05-14T10:00:00Z')
+        }
+      ])
+      .mockResolvedValueOnce([
+        {
+          member_id: 'mem-5',
+          display_name: 'Felipe Zurita',
+          primary_email: 'felipe@efeonce.org',
+          identity_email: null
+        }
+      ])
+
+    mockedSend.mockResolvedValueOnce({ deliveryId: 'd-3', resendId: 'r-3', status: 'sent' })
+
+    const result = await notifyBeneficiaryOfPaymentProfileChange({
+      profileId: 'bpp-6',
+      kind: 'approved'
+    })
+
+    expect(result.status).toBe('sent')
+
+    const context = mockedSend.mock.calls[0][0].context
+
+    expect(context).not.toHaveProperty('providerLabel')
+    expect(context).toMatchObject({
+      bankName: 'Banco Falabella',
+      accountNumberMasked: '•••• 0996',
+      currency: 'CLP'
+    })
+  })
 })

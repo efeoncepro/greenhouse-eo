@@ -34,7 +34,6 @@ const EMAIL_BASELINE_CASES: EmailBaselineCase[] = [
       <BeneficiaryPaymentProfileChangedEmail
         fullName='Valentina Hoyos'
         kind='approved'
-        providerLabel='Banco de Chile'
         bankName='Banco de Chile'
         accountNumberMasked='•••• 4321'
         currency='CLP'
@@ -313,6 +312,26 @@ const EMAIL_BASELINE_CASES: EmailBaselineCase[] = [
 ]
 
 describe('email template baseline snapshots', () => {
+  it('keeps beneficiary payment profile emails scoped to destination account only', async () => {
+    const html = await render(
+      <BeneficiaryPaymentProfileChangedEmail
+        fullName='Felipe Zurita'
+        kind='approved'
+        bankName='Banco Falabella'
+        accountNumberMasked='•••• 0996'
+        currency='CLP'
+        effectiveAt='2026-05-14'
+        reason={null}
+        requestedByMember
+      />
+    )
+
+    expect(html).toContain('Banco Falabella')
+    expect(html).toContain('•••• 0996')
+    expect(html).not.toContain('Proveedor')
+    expect(html).not.toContain('santander')
+  })
+
   it.each(EMAIL_BASELINE_CASES.map(testCase => [testCase.name, testCase] as const))(
     'renders %s without changing output',
     async (_name, { element, tokenSnippets }) => {
