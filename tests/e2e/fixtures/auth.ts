@@ -1,9 +1,10 @@
-import { test, expect, type Page } from '@playwright/test'
+import { test, expect, type BrowserContext, type Page } from '@playwright/test'
 
 const SIGN_IN_PATH_MARKERS = ['/login', '/signin', '/auth/signin', '/auth/access-denied']
 const DEFAULT_NAVIGATION_ATTEMPTS = 3
 const DEFAULT_NAVIGATION_TIMEOUT_MS = 20_000
 const DEFAULT_NAVIGATION_BACKOFF_MS = 750
+const NEXTAUTH_SESSION_COOKIE_CHUNK_SIZE = 4096 - 163
 
 const TRANSIENT_NAVIGATION_ERROR_PATTERNS = [
   /page\.goto: Timeout \d+ms exceeded/i,
@@ -19,10 +20,63 @@ interface GotoWithTransientRetriesOptions {
   backoffMs?: number
 }
 
+type PlaywrightCookie = Parameters<BrowserContext['addCookies']>[0][number]
+
 const isTransientNavigationError = (error: unknown): boolean => {
   const message = error instanceof Error ? error.message : String(error)
 
   return TRANSIENT_NAVIGATION_ERROR_PATTERNS.some(pattern => pattern.test(message))
+}
+
+export function buildNextAuthSessionCookies(input: {
+  cookieName: string
+  cookieValue: string
+  baseUrl: string
+}): PlaywrightCookie[] {
+  const baseUrl = new URL(input.baseUrl)
+  const expires = Math.floor(Date.now() / 1000) + 86400
+
+  const requiresSecureCookie =
+    baseUrl.protocol === 'https:' ||
+    input.cookieName.startsWith('__Secure-') ||
+    input.cookieName.startsWith('__Host-')
+
+  const cookieBase = {
+    path: '/',
+    httpOnly: true,
+    secure: requiresSecureCookie,
+    sameSite: 'Lax' as const,
+    expires
+  }
+
+  const scopedCookie = input.cookieName.startsWith('__Host-')
+    ? { ...cookieBase, url: baseUrl.origin }
+    : { ...cookieBase, domain: baseUrl.hostname }
+
+  if (input.cookieValue.length <= NEXTAUTH_SESSION_COOKIE_CHUNK_SIZE) {
+    return [
+      {
+        name: input.cookieName,
+        value: input.cookieValue,
+        ...scopedCookie
+      }
+    ]
+  }
+
+  const cookies: PlaywrightCookie[] = []
+
+  for (let index = 0; index * NEXTAUTH_SESSION_COOKIE_CHUNK_SIZE < input.cookieValue.length; index += 1) {
+    cookies.push({
+      name: `${input.cookieName}.${index}`,
+      value: input.cookieValue.slice(
+        index * NEXTAUTH_SESSION_COOKIE_CHUNK_SIZE,
+        (index + 1) * NEXTAUTH_SESSION_COOKIE_CHUNK_SIZE
+      ),
+      ...scopedCookie
+    })
+  }
+
+  return cookies
 }
 
 export async function expectAuthenticated(page: Page) {

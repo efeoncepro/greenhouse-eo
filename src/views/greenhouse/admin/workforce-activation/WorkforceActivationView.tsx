@@ -203,7 +203,15 @@ const SummaryStrip = ({
 
           <Divider />
 
-          <Stack direction='row' spacing={2} useFlexGap flexWrap={{ xs: 'nowrap', md: 'wrap' }} sx={{ overflowX: { xs: 'auto', md: 'visible' }, pb: { xs: 0.5, md: 0 } }}>
+          <Stack
+            role='group'
+            aria-label={GH_WORKFORCE_ACTIVATION.filter_group_aria}
+            direction='row'
+            spacing={2}
+            useFlexGap
+            flexWrap={{ xs: 'nowrap', md: 'wrap' }}
+            sx={{ overflowX: { xs: 'auto', md: 'visible' }, pb: { xs: 0.5, md: 0 } }}
+          >
             {FILTERS.map(item => (
               <Button
                 key={item.key}

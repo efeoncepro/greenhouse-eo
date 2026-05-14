@@ -37,6 +37,7 @@ const BASE_URL = process.env.AGENT_AUTH_BASE_URL || process.env.NEXT_PUBLIC_APP_
 const MODE = process.env.AGENT_AUTH_MODE || 'api'
 const EMAIL = process.env.AGENT_AUTH_EMAIL
 const STORAGE_PATH = resolve(process.env.AGENT_AUTH_STORAGE_PATH || '.auth/storageState.json')
+const NEXTAUTH_SESSION_COOKIE_CHUNK_SIZE = 4096 - 163
 
 if (!EMAIL) {
   console.error('ERROR: AGENT_AUTH_EMAIL is required.')
@@ -55,7 +56,8 @@ async function authViaApi() {
     process.exit(1)
   }
 
-  const url = `${BASE_URL}/api/auth/agent-session`
+  const baseUrl = new URL(BASE_URL)
+  const url = new URL('/api/auth/agent-session', baseUrl).toString()
   const bypassSecret = process.env.VERCEL_AUTOMATION_BYPASS_SECRET
 
   console.log(`→ POST ${url}  (email: ${EMAIL})${bypassSecret ? '  [vercel bypass on]' : ''}`)
@@ -82,26 +84,17 @@ async function authViaApi() {
   const data = await res.json()
   const { cookieName, cookieValue, portalHomePath } = data
 
-  const isSecure = BASE_URL.startsWith('https')
-  const requiresSecureCookie = isSecure || cookieName.startsWith('__Secure-') || cookieName.startsWith('__Host-')
-  const domain = new URL(BASE_URL).hostname
+  const cookies = buildNextAuthSessionCookies({
+    cookieName,
+    cookieValue,
+    baseUrl
+  })
 
   const storageState = {
-    cookies: [
-      {
-        name: cookieName,
-        value: cookieValue,
-        domain,
-        path: '/',
-        httpOnly: true,
-        secure: requiresSecureCookie,
-        sameSite: 'Lax',
-        expires: Math.floor(Date.now() / 1000) + 86400 // 24h
-      }
-    ],
+    cookies,
     origins: [
       {
-        origin: BASE_URL,
+        origin: baseUrl.origin,
         localStorage: []
       }
     ]
@@ -112,8 +105,53 @@ async function authViaApi() {
 
   console.log(`✓ storageState saved to ${STORAGE_PATH}`)
   console.log(`  cookie: ${cookieName}`)
+  console.log(`  chunks: ${cookies.length}`)
   console.log(`  user:   ${data.email} (${data.userId})`)
   console.log(`  home:   ${portalHomePath}`)
+}
+
+function buildNextAuthSessionCookies({ cookieName, cookieValue, baseUrl }) {
+  const expires = Math.floor(Date.now() / 1000) + 86400 // 24h
+
+  const requiresSecureCookie =
+    baseUrl.protocol === 'https:' || cookieName.startsWith('__Secure-') || cookieName.startsWith('__Host-')
+
+  const cookieBase = {
+    path: '/',
+    httpOnly: true,
+    secure: requiresSecureCookie,
+    sameSite: 'Lax',
+    expires
+  }
+
+  const withScope = cookieName.startsWith('__Host-')
+    ? { ...cookieBase, url: baseUrl.origin }
+    : { ...cookieBase, domain: baseUrl.hostname }
+
+  if (cookieValue.length <= NEXTAUTH_SESSION_COOKIE_CHUNK_SIZE) {
+    return [
+      {
+        name: cookieName,
+        value: cookieValue,
+        ...withScope
+      }
+    ]
+  }
+
+  const cookies = []
+
+  for (let index = 0; index * NEXTAUTH_SESSION_COOKIE_CHUNK_SIZE < cookieValue.length; index += 1) {
+    cookies.push({
+      name: `${cookieName}.${index}`,
+      value: cookieValue.slice(
+        index * NEXTAUTH_SESSION_COOKIE_CHUNK_SIZE,
+        (index + 1) * NEXTAUTH_SESSION_COOKIE_CHUNK_SIZE
+      ),
+      ...withScope
+    })
+  }
+
+  return cookies
 }
 
 /**

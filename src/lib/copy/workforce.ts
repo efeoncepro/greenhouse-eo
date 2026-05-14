@@ -351,6 +351,7 @@ export const GH_WORKFORCE_ACTIVATION = {
   filter_relationship: 'Sin relación legal',
   filter_payment: 'Sin pago',
   filter_contractor: 'Contractors',
+  filter_group_aria: 'Filtrar por estado',
   queue_title: 'Cola priorizada',
   queue_subtitle: 'Personas ordenadas por riesgo de activación incompleta.',
   queue_count: (count: number) => `${count} en vista`,

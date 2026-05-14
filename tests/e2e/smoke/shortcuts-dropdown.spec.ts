@@ -1,4 +1,4 @@
-import { expect, gotoWithTransientRetries, test } from '../fixtures/auth'
+import { buildNextAuthSessionCookies, expect, gotoWithTransientRetries, test } from '../fixtures/auth'
 
 const AGENT_SECRET = process.env.AGENT_AUTH_SECRET || ''
 const AGENT_EMAIL = process.env.AGENT_AUTH_EMAIL || 'agent@greenhouse.efeonce.org'
@@ -61,21 +61,14 @@ test.describe('shortcuts dropdown — TASK-553', () => {
     }
 
     const body = (await response.json()) as { cookieValue: string; cookieName: string }
-    const url = new URL(BASE_URL)
-    const isSecure = url.protocol === 'https:'
 
-    await context.addCookies([
-      {
-        name: body.cookieName,
-        value: body.cookieValue,
-        domain: url.hostname,
-        path: '/',
-        httpOnly: true,
-        secure: isSecure,
-        sameSite: 'Lax',
-        expires: Math.floor(Date.now() / 1000) + 86400
-      }
-    ])
+    await context.addCookies(
+      buildNextAuthSessionCookies({
+        cookieName: body.cookieName,
+        cookieValue: body.cookieValue,
+        baseUrl: BASE_URL
+      })
+    )
   })
 
   test('opens, loads, supports add flow without infinite loop', async ({ page }) => {
