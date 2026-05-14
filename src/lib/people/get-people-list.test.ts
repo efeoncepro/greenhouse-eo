@@ -107,6 +107,22 @@ describe('getPeopleList', () => {
       expect(result.summary.coveredClients).toBe(5)
     })
 
+    it('resolves Person 360 gs avatar assets to the protected media proxy', async () => {
+      mockIsConfigured.mockReturnValue(true)
+      mockPgQuery
+        .mockResolvedValueOnce([
+          makePgRow({
+            avatar_url: 'gs://greenhouse-media/users/user-1/avatar.jpg',
+            avatar_user_id: 'user-1'
+          })
+        ])
+        .mockResolvedValueOnce([{ covered_clients: 5 }])
+
+      const result = await getPeopleList()
+
+      expect(result.items[0].avatarUrl).toBe('/api/media/users/user-1/avatar')
+    })
+
     it('keeps the people roster available when capacity snapshot access is denied', async () => {
       mockIsConfigured.mockReturnValue(true)
       mockPgQuery

@@ -1,12 +1,19 @@
 import 'server-only'
 
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
+import { isGreenhousePostgresConfigured, runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
 const toOptionalString = (value: unknown) => {
   if (!value) return null
   if (typeof value === 'string') return value
 
   return null
+}
+
+const toGsAssetPath = (value: unknown) => {
+  const normalized = toOptionalString(value)?.trim()
+
+  return normalized?.startsWith('gs://') ? normalized : null
 }
 
 export const ensureTenantLogoColumn = async () => {
@@ -61,6 +68,39 @@ export const setTenantLogoAssetPath = async ({ clientId, assetPath }: { clientId
 }
 
 export const getUserAvatarAssetPath = async (userId: string) => {
+  if (isGreenhousePostgresConfigured()) {
+    try {
+      const rows = await runGreenhousePostgresQuery<{ avatar_url: string | null }>(
+        `
+          SELECT
+            COALESCE(
+              NULLIF(cu.avatar_url, ''),
+              NULLIF(p360.resolved_avatar_url, '')
+            ) AS avatar_url
+          FROM greenhouse_core.client_users cu
+          LEFT JOIN greenhouse_serving.person_360 p360
+            ON p360.user_id = cu.user_id
+            OR (
+              cu.identity_profile_id IS NOT NULL
+              AND p360.identity_profile_id = cu.identity_profile_id
+            )
+          WHERE cu.user_id = $1
+          LIMIT 1
+        `,
+        [userId]
+      )
+
+      const postgresAssetPath = toGsAssetPath(rows[0]?.avatar_url)
+
+      if (postgresAssetPath) return postgresAssetPath
+    } catch (error) {
+      console.warn(
+        '[media-assets] Unable to resolve user avatar from Postgres; falling back to legacy BigQuery mirror:',
+        error instanceof Error ? error.message : error
+      )
+    }
+  }
+
   const projectId = getBigQueryProjectId()
   const bigQuery = getBigQueryClient()
 
@@ -75,7 +115,7 @@ export const getUserAvatarAssetPath = async (userId: string) => {
     params: { userId }
   })
 
-  return toOptionalString((rows[0] as { avatar_url?: unknown } | undefined)?.avatar_url)
+  return toGsAssetPath((rows[0] as { avatar_url?: unknown } | undefined)?.avatar_url)
 }
 
 export const setUserAvatarAssetPath = async ({ userId, assetPath }: { userId: string; assetPath: string }) => {

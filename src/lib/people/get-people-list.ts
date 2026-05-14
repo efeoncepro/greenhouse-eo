@@ -6,6 +6,7 @@ import { getBigQueryProjectId } from '@/lib/bigquery'
 import { isGreenhousePostgresConfigured, runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { readMemberCapacityEconomicsBatch } from '@/lib/member-capacity-economics/store'
 import { PeopleValidationError, getPeopleTableColumns, pickMemberEmails, roundToTenths, runPeopleQuery, toNumber, toStringArray } from '@/lib/people/shared'
+import { resolveAvatarUrl } from '@/lib/person-360/resolve-avatar'
 
 type PeopleListRow = {
   member_id: string | null
@@ -16,6 +17,7 @@ type PeopleListRow = {
   role_category: string | null
   department_name: string | null
   avatar_url: string | null
+  avatar_user_id: string | null
   location_country: string | null
   active: boolean | null
   pay_regime: string | null
@@ -52,7 +54,7 @@ const normalizePersonListItem = (row: PeopleListRow): PersonListItem => {
     roleTitle: String(row.role_title || 'Efeonce Team'),
     roleCategory: String(row.role_category || 'unknown'),
     departmentName: row.department_name || null,
-    avatarUrl: row.avatar_url || null,
+    avatarUrl: resolveAvatarUrl(row.avatar_url, row.avatar_user_id),
     locationCountry: row.location_country || null,
     active: Boolean(row.active),
     totalAssignments: 0,
@@ -226,7 +228,8 @@ const getPeopleListFromPostgres = async (
       m.role_title,
       m.role_category,
       COALESCE(p360.department_name, dept.name) AS department_name,
-      m.avatar_url,
+      COALESCE(m.avatar_url, p360.resolved_avatar_url) AS avatar_url,
+      p360.user_id AS avatar_user_id,
       m.location_country,
       m.active,
       c.pay_regime,
@@ -337,6 +340,7 @@ const getPeopleListFromBigQuery = async (memberIds?: string[]): Promise<PeopleLi
         tm.role_title,
         tm.role_category,
         tm.avatar_url,
+        CAST(NULL AS STRING) AS avatar_user_id,
         ${locationCountrySelect}
         tm.active,
         c.pay_regime,

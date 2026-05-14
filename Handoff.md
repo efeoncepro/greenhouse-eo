@@ -25267,6 +25267,22 @@ Existing callers no pasan options → comportamiento idéntico a pre-TASK-872. N
 
 ---
 
+## 2026-05-14 — Person 360 avatars Postgres-first fix in progress
+
+**Contexto:** En `/people`, Felipe Zurita y Maria Camila Hoyos aparecian con iniciales aunque Microsoft Graph tiene foto para ambos. Investigacion:
+
+- Graph confirma foto `image/jpeg 420x420` para Felipe (`ec1b7fd0-87c9-43cd-a46f-1e8c37297258`) y Maria Camila (`96bf99f6-f940-4946-ac6b-1231985da8e0`).
+- Staging `/api/people` ya devuelve avatar URL para Felipe, pero `/api/media/users/054d589d-44aa-45ac-93a9-16515bcdaf7e/avatar` daba 404 porque el proxy leia BigQuery `greenhouse.client_users` como source primario y ese mirror no tiene el `user_id` nuevo.
+- Maria Camila aun no tiene `client_users.avatar_url` en Postgres; requiere corrida canonica de Entra profile sync, no SQL/manual patch.
+
+**Cambio aplicado:** `src/lib/admin/media-assets.ts` ahora resuelve avatars Postgres/Person360-first y usa BigQuery solo como fallback legacy. `src/lib/people/get-people-list.ts` usa `resolveAvatarUrl()` con `person_360.user_id`.
+
+**Validacion local:** `pnpm vitest run src/lib/admin/media-assets.test.ts src/lib/people/get-people-list.test.ts` verde (18 tests).
+
+**Pendiente antes de cerrar:** correr `pnpm tsc --noEmit`, `pnpm lint`; desplegar a staging; ejecutar o verificar corrida canonica de Entra profile sync para materializar cualquier foto faltante desde Graph; revalidar `/people` y `/api/media/users/{id}/avatar`.
+
+---
+
 ## 2026-05-13 — TASK-872 Sesión 2 SHIPPED — Backfill apply Felipe + Maria SUCCESSFUL
 
 **Estado FINAL**: TASK-872 movida a `docs/tasks/complete/`. Felipe Zurita + Maria Camila Hoyos materializados como colaboradores operativos en staging PG (`greenhouse-pg-dev`). Sesión 2 entrega Slice 5 backfill engine + CLI + admin endpoint complete_intake.

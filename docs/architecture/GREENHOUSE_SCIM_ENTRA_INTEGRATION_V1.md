@@ -160,7 +160,7 @@ Daily cron job that fetches enrichment data directly from the Microsoft Graph AP
 
 - **Schedule:** `0 8 * * *` (08:00 UTC, 05:00 Chile)
 - **Auth:** OAuth2 client credentials flow (`AZURE_AD_CLIENT_ID` + `AZURE_AD_CLIENT_SECRET`)
-- **Syncs:** `jobTitle`, `country`, `city`, `phone`, `displayName`, `accountEnabled`
+- **Syncs:** `jobTitle`, `country`, `city`, `phone`, `displayName`, `accountEnabled`, Microsoft Graph profile photo
 - **Targets:** `client_users`, `identity_profiles`, `members`
 - **Governance add-on:** resolves Graph `manager` and opens review proposals when Entra disagrees with `greenhouse_core.reporting_lines`
 
@@ -195,6 +195,7 @@ Diff-based update logic:
 - Compares Entra values against current Greenhouse records
 - Only writes when values actually differ (uses `IS DISTINCT FROM` in SQL)
 - Cleans Entra display names by removing organizational suffixes (e.g., " | Efeonce")
+- Stores avatar assets in GCS, writes the canonical `gs://` path to `greenhouse_core.client_users.avatar_url`, lets `greenhouse_serving.person_360.resolved_avatar_url` project it, and writes a browser-safe proxy URL to `greenhouse_core.members.avatar_url` for legacy/member readers. Runtime avatar delivery must resolve from Postgres/Person 360 first; BigQuery is only a legacy mirror.
 
 #### 6b. Hierarchy Governance Lane (`src/lib/reporting-hierarchy/governance.ts`)
 
