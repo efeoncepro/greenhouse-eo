@@ -48,13 +48,16 @@ const upsertCanonicalPostgresIdentityLink = async (
     await runGreenhousePostgresQuery(
       `INSERT INTO greenhouse_core.identity_profile_source_links (
          link_id, profile_id, source_system, source_object_type, source_object_id,
-         source_user_id, source_email, source_display_name, active
-       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, TRUE)
+         source_user_id, source_email, source_display_name, is_primary,
+         is_login_identity, active
+       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, FALSE, FALSE, TRUE)
        ON CONFLICT (profile_id, source_system, source_object_type, source_object_id)
        DO UPDATE SET
          source_user_id = EXCLUDED.source_user_id,
          source_email = EXCLUDED.source_email,
          source_display_name = EXCLUDED.source_display_name,
+         is_primary = COALESCE(greenhouse_core.identity_profile_source_links.is_primary, EXCLUDED.is_primary),
+         is_login_identity = COALESCE(greenhouse_core.identity_profile_source_links.is_login_identity, EXCLUDED.is_login_identity),
          active = TRUE,
          updated_at = NOW()`,
       [
@@ -168,7 +171,9 @@ export async function applyIdentityLink(
             @sourceObjectId AS source_object_id,
             @sourceUserId AS source_user_id,
             @sourceEmail AS source_email,
-            @sourceDisplayName AS source_display_name
+            @sourceDisplayName AS source_display_name,
+            @isPrimary AS is_primary,
+            @isLoginIdentity AS is_login_identity
         ) AS source
         ON target.profile_id = source.profile_id
            AND target.source_system = source.source_system
@@ -179,15 +184,19 @@ export async function applyIdentityLink(
             source_user_id = source.source_user_id,
             source_email = source.source_email,
             source_display_name = source.source_display_name,
+            is_primary = COALESCE(target.is_primary, source.is_primary),
+            is_login_identity = COALESCE(target.is_login_identity, source.is_login_identity),
             active = TRUE
         WHEN NOT MATCHED THEN
           INSERT (
             link_id, profile_id, source_system, source_object_type, source_object_id,
-            source_user_id, source_email, source_display_name, active
+            source_user_id, source_email, source_display_name, is_primary,
+            is_login_identity, active
           )
           VALUES (
             source.link_id, source.profile_id, source.source_system, source.source_object_type, source.source_object_id,
-            source.source_user_id, source.source_email, source.source_display_name, TRUE
+            source.source_user_id, source.source_email, source.source_display_name, source.is_primary,
+            source.is_login_identity, TRUE
           )
       `,
       params: {
@@ -198,7 +207,9 @@ export async function applyIdentityLink(
         sourceObjectId: proposal.sourceObjectId,
         sourceUserId: proposal.sourceObjectId,
         sourceEmail: proposal.sourceEmail,
-        sourceDisplayName: proposal.sourceDisplayName
+        sourceDisplayName: proposal.sourceDisplayName,
+        isPrimary: false,
+        isLoginIdentity: false
       },
       types: {
         linkId: 'STRING',
@@ -208,7 +219,9 @@ export async function applyIdentityLink(
         sourceObjectId: 'STRING',
         sourceUserId: 'STRING',
         sourceEmail: 'STRING',
-        sourceDisplayName: 'STRING'
+        sourceDisplayName: 'STRING',
+        isPrimary: 'BOOL',
+        isLoginIdentity: 'BOOL'
       }
     })
   }
