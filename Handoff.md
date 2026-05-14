@@ -25267,19 +25267,21 @@ Existing callers no pasan options → comportamiento idéntico a pre-TASK-872. N
 
 ---
 
-## 2026-05-14 — Person 360 avatars Postgres-first fix in progress
+## 2026-05-14 — Person 360 avatars Postgres-first fix shipped
 
 **Contexto:** En `/people`, Felipe Zurita y Maria Camila Hoyos aparecian con iniciales aunque Microsoft Graph tiene foto para ambos. Investigacion:
 
 - Graph confirma foto `image/jpeg 420x420` para Felipe (`ec1b7fd0-87c9-43cd-a46f-1e8c37297258`) y Maria Camila (`96bf99f6-f940-4946-ac6b-1231985da8e0`).
 - Staging `/api/people` ya devuelve avatar URL para Felipe, pero `/api/media/users/054d589d-44aa-45ac-93a9-16515bcdaf7e/avatar` daba 404 porque el proxy leia BigQuery `greenhouse.client_users` como source primario y ese mirror no tiene el `user_id` nuevo.
-- Maria Camila aun no tiene `client_users.avatar_url` en Postgres; requiere corrida canonica de Entra profile sync, no SQL/manual patch.
+- Maria Camila no tenia `client_users.avatar_url` en Postgres antes del sync; Graph si tenia foto. Se resolvio con corrida canonica de Entra profile sync en staging, no SQL/manual patch.
 
 **Cambio aplicado:** `src/lib/admin/media-assets.ts` ahora resuelve avatars Postgres/Person360-first y usa BigQuery solo como fallback legacy. `src/lib/people/get-people-list.ts` usa `resolveAvatarUrl()` con `person_360.user_id`.
 
-**Validacion local:** `pnpm vitest run src/lib/admin/media-assets.test.ts src/lib/people/get-people-list.test.ts` verde (18 tests).
+**Validacion local:** `pnpm vitest run src/lib/admin/media-assets.test.ts src/lib/people/get-people-list.test.ts` verde (19 tests), `pnpm tsc --noEmit`, `pnpm lint` (0 errores, 4 warnings legacy TASK-825), pre-push hook verde.
 
-**Pendiente antes de cerrar:** correr `pnpm tsc --noEmit`, `pnpm lint`; desplegar a staging; ejecutar o verificar corrida canonica de Entra profile sync para materializar cualquier foto faltante desde Graph; revalidar `/people` y `/api/media/users/{id}/avatar`.
+**Validacion staging:** deploy staging `b34a2865` Ready. `/api/media/users/054d589d-44aa-45ac-93a9-16515bcdaf7e/avatar` devuelve `HTTP 200 image/jpeg` para Felipe. Luego de correr `/api/cron/entra-profile-sync` via `vercel curl` (21 processed, 8 avatarsSynced, 0 errors), `/api/people` devuelve avatar proxy para Maria Camila y `/api/media/users/dd8a6be9-c7ca-48db-9ec7-1a0f50b56883/avatar` devuelve `HTTP 200 image/jpeg`.
+
+**CI:** Playwright smoke de GitHub verde para `b34a2865`; CI seguia en progreso al momento de este handoff, en etapa Test/Coverage.
 
 ---
 
