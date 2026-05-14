@@ -704,7 +704,11 @@ export const EVENT_TYPES = {
   scimUserCreated: 'scim.user.created',
   scimUserUpdated: 'scim.user.updated',
   scimUserDeactivated: 'scim.user.deactivated',
-  scimInternalCollaboratorProvisioned: 'scim.internal_collaborator.provisioned'
+  scimInternalCollaboratorProvisioned: 'scim.internal_collaborator.provisioned',
+
+  // TASK-872 Slice 5 — Workforce intake transition (pending_intake|in_review → completed).
+  // Admin endpoint POST /api/admin/workforce/members/[memberId]/complete-intake.
+  workforceMemberIntakeCompleted: 'workforce.member.intake_completed'
 } as const
 
 export type EventType = (typeof EVENT_TYPES)[keyof typeof EVENT_TYPES]

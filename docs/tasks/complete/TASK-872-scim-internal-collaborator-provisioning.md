@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto` (post arch-architect review 2026-05-13 — confirma Alto; +1 slice de migration `workforce_intake_status` antes de wire SCIM)

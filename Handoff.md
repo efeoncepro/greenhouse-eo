@@ -25154,3 +25154,61 @@ Existing callers no pasan options → comportamiento idéntico a pre-TASK-872. N
 - R9 Allowlist abuse: signal `allowlist_blocklist_conflict` + audit append-only en `scim_eligibility_override_changes`.
 
 **Próximo paso operativo (Sesión 2)**: cuando operador esté listo, flippear flag SCIM en staging + correr smoke con `provisionOnDemand` test user + verify signals en steady state. Después coordinar con HR + ejecutar backfill apply Felipe/Maria.
+
+---
+
+## 2026-05-13 — TASK-872 Sesión 2 SHIPPED — Backfill apply Felipe + Maria SUCCESSFUL
+
+**Estado FINAL**: TASK-872 movida a `docs/tasks/complete/`. Felipe Zurita + Maria Camila Hoyos materializados como colaboradores operativos en staging PG (`greenhouse-pg-dev`). Sesión 2 entrega Slice 5 backfill engine + CLI + admin endpoint complete_intake.
+
+**Commits Sesión 2** (sumar a 10 commits Sesión 1):
+
+11. `<TBD>` — Slice 5 backfill engine + CLI script (`src/lib/scim/backfill-internal-collaborators.ts` + `scripts/scim/backfill-internal-collaborators.ts`) + admin endpoint complete_intake + event catalog `workforce.member.intake_completed v1` + task close
+
+**Backfill apply real ejecutado** (operador: `user-efeonce-admin-julio-reyes`):
+
+- Felipe Zurita (`fzurita@efeoncepro.com`): member `e603fade-b262-43d3-896f-09f04dd6ddd7` creado, cascade `created_new`
+- Maria Camila Hoyos (`mchoyos@efeoncepro.com`): member `d1a72374-f4b7-415f-b54a-0dcf76749e46` creado, cascade `created_new`
+
+**Post-apply verification** (queries PG real):
+
+- `members` con `azure_oid` matching `client_users.microsoft_oid` ✅
+- `members.workforce_intake_status='pending_intake'` ✅
+- `members.active=true` ✅
+- `client_users.member_id` linkeado ✅
+- `identity_profile_source_links × 2` per profile (azure_ad/user + greenhouse_auth/client_user) ✅
+- `person_memberships(team_member, is_primary=true, active=true)` con `organization_id` = Efeonce Group SpA operating entity ✅
+- 6 outbox events emitidos (2 × scim.user.created + 2 × member.created + 2 × scim.internal_collaborator.provisioned) ✅
+- 2 `scim_sync_log` rows con `operation='BACKFILL', response_status=200, error_message=NULL` ✅
+
+**Idempotency verified**: re-run dry-run reporta Felipe + Maria como `alreadyComplete` (member_id ya poblado). Re-apply sería no-op.
+
+**Reliability signals post-apply** (steady state esperado):
+
+- `identity.scim.users_without_member`: 2 → 1 (1 residual = `support@efeoncepro.com` cuenta funcional legacy. Operador resuelve via runbook escenario 5: reduce scope Entra OR allowlist L4 override.)
+- `identity.scim.users_without_identity_profile`: 0 ✅
+- `workforce.scim_members_pending_profile_completion` (>7d): 0 ✅ (Felipe + Maria recién creados)
+- `identity.scim.member_identity_drift`: 0 ✅
+- `identity.scim.allowlist_blocklist_conflict`: 0 ✅
+- `identity.scim.ineligible_accounts_in_scope`: 0 ✅
+
+**Admin endpoint complete_intake** (Slice 5 follow-up V1.0):
+
+- `POST /api/admin/workforce/members/[memberId]/complete-intake`
+- Auth: `requireAdminTenantContext` + `can(subject, 'workforce.member.complete_intake', 'update', 'tenant')`
+- Body: `{ reason?: string }`
+- Atomic withTransaction: UPDATE `workforce_intake_status='completed'` + outbox event `workforce.member.intake_completed v1` (aggregateType=member, payload schemaVersion=1 con `previousStatus, newStatus, actorUserId, reason, transitionedAt`)
+- Idempotent: si ya `completed`, devuelve 200 sin retransición
+- Validation: source state debe ser `pending_intake` o `in_review`; 409 si distinto
+- V1.0 minimal: NO valida readiness compensation_packages/contract_terms/person_legal_profile (deferred V1.1 cuando emerja UI dedicada Workforce Intake)
+
+**Próximo workflow operativo** (out of TASK-872 scope, V1.1):
+
+1. HR completa datos faltantes Felipe + Maria (compensation_packages + contract_terms + person_legal_profile)
+2. Operador invoca `POST /api/admin/workforce/members/<member_id>/complete-intake` → transición a `completed`
+3. Felipe + Maria entran a payroll engine normalmente
+4. Para support@efeoncepro.com: operador decide reducir scope Entra (preferred) o crear admin allowlist override via `scim_eligibility_overrides`
+
+**Test coverage final TASK-872**: 500+ tests verde. SCIM/eligibility/primitive: 49 tests. Reliability signals: 3 live tests. Payroll legacy: 420 tests (incluye 12 fixes pre-existentes). Lint + tsc verdes.
+
+**Push pendiente**: 11 commits en `develop` local. Operador autoriza push cuando esté listo. Deploy staging via Vercel auto-trigger en push a develop.
